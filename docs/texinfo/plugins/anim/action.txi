@@ -20,7 +20,7 @@ mostly interested in at the moment.
 
 Now if you recall from Mesh Object Concepts (@pxref{MeshObject Concepts}), the
 factory acts as a database of all the vertices, triangles and texels used
-to define a mesh object. The primary purpose of this is have a signle
+to define a mesh object. The primary purpose of this is to have a single
 database for each mesh object. So this is where we will be defining our
 sprite with its multiple actions.
 
@@ -107,7 +107,7 @@ the sprite 3D interface.
 After the frames have been defined, a list of triangles is then declared.
 Note that the @samp{TRIANGLE} tokens are declared after the frames. Trying
 to define the triangles before the frames will result in an error and will
-be flagged as such. Each @samp{TRIANGLE} declaration contains three indecies
+be flagged as such. Each @samp{TRIANGLE} declaration contains three indices
 to the defined frame vertices. The index starts at zero and has a maximum
 value equal the number of vertices minus one. During the course of animation
 the triangle lists are applied to the corresponding frame and are then
@@ -123,7 +123,7 @@ will reference the action both in the map file and in the sprite interface.
 Its also a good idea @emph{not} to use the same name twice, as you will prevent
 the second action from being accessed. You can use the same name for an action
 and a frame, as they are stored in different places. In general though,
-never use the same name for two items of the same type, wether it be a mesh
+never use the same name for two items of the same type, whether it be a mesh
 object, a frame, a motion or whatever.
 
 After the name of the action, we enter into the body of the action where the
@@ -138,7 +138,7 @@ at least one action (usually called @emph{default}) defined for the sprite.
 Lastly to implement this action, the @samp{ACTION} keyword is used in the
 mesh object declaration to tell the engine which action to use on this sprite
 instance. If no action is defined in the mesh object then the engine will
-use the first action defined in the factory reguardless of its name.
+use the first action defined in the factory regardless of its name.
 
 @subsubheading Tweening and Actions.
 

@@ -15,7 +15,7 @@ will slide sideways by using the right button instead of moving.)
 Now move the view, so you can see the floor.
 
 Release all keys and left click on the floor.  Everything should turn red.
-(This is beause the cube is still just one single object from Worldcraft's
+(This is because the cube is still just one single object from Worldcraft's
 perspective.) Now select @emph{Tools/Ungroup}.
 
 Select the floor again.

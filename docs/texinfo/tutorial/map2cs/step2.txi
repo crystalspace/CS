@@ -66,7 +66,7 @@ The ``Build Programs'' settings tab.
 
 @ifinfo
 These are the settings we use, though feel free to experiment yourself with
-these settings if you wish. To get yur maps compiled and running We
+these settings if you wish. To get your maps compiled and running We
 prefer to call these tools using a batch file, which you shall be shown later
 in this tutorial.
 

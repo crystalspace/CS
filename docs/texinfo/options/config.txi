@@ -63,7 +63,7 @@ prepended with the string @samp{Global.}.  So for example the option
 @samp{Global.Walktest.Settings.FPS}.
 
 @item
-Ther user-specific, application-specific domain. This domain works like the
+The user-specific, application-specific domain. This domain works like the
 application-neutral user domain, except that it is not application-neutral.
 A user may set options in this domain, for example, if he wants different
 screen size settings for different applications.

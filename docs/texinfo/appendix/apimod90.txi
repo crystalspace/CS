@@ -139,7 +139,7 @@ Windows @sc{gui} applications.
 The new macro @samp{CS_IMPLEMENT_PLUGIN} must now be invoked by exactly one
 compilation unit of each plugin module.  This macro encapsulates
 platform-specific implementation details for any given platform.  For instance,
-on Windows, this macro defins the @code{DllMain()} function required by all
+on Windows, this macro defines the @code{DllMain()} function required by all
 Windows @sc{dll} modules.
 
 These macros alleviate the need to link applications with specially prepared
@@ -823,7 +823,7 @@ better integrated with the project. It is now also a mesh object.
 dialog panels, and would only return control to the caller when the dialog was
 dismissed.  As a replacement for @code{Execute()}, @code{csApp::StartModal()}
 and @code{csApp::StopModal()} have been introduced.  @code{StartModal()} sets
-up modality for the given component and then immediatelly returns to the
+up modality for the given component and then immediately returns to the
 caller.  From the perspective of the @sc{gui} user the component behaves in the
 standard modal fashion, but from the perspective of the application programmer
 this represents a paradigm shift since the application must now watch events
@@ -842,7 +842,7 @@ be an integer containing the @sc{id} of the pressed button (i.e.
 @code{cscmdOK}, @code{cscmdCancel}, etc.).
 
 A related change was made to @code{csMessageBox()}.  It also now returns
-immediatelly.  It nows sends a similar message to the application when the
+immediately.  It nows sends a similar message to the application when the
 message box is closed (via ``@sc{ok}'' or ``Cancel'').  In this case, the
 userdata object will implement the @sc{scf} interface @code{iMessageBoxData},
 so you can use @code{SCF_QUERY_INTERFACE()} to check for this.

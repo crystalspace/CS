@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 
-@c Unforunately, TeX does not grok this macro in @cindex or @section, etc. :-(
+@c Unfortunately, TeX does not grok this macro in @cindex or @section, etc. :-(
 @macro NeXT{}
 @sc{n}e@sc{xt}
 @end macro

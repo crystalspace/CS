@@ -2,7 +2,7 @@
 @node map2cs.cfg Game-Specific Data, , map2cs Invoking, map2cs
 @subsection Game-Specific Data
 
-This section describes how to access game-specific data from the Crytal Space
+This section describes how to access game-specific data from the Crystal Space
 engine.
 
 @subsubheading Support in the Crystal Space ``map format''

@@ -62,9 +62,9 @@ implementation only surfaces to the application programmer when setting the
 flags while registering the procedural texture.  Almost everything else is
 taken care of transparently.
 
-The only blemish on an otherwise consistent interface and behavious across all
+The only blemish on an otherwise consistent interface and behaviors across all
 platforms and implementations is to do with the texture manager.  This arises
-because there is a too good an optimisation to lose with the software drivers,
+because there is a too good an optimization to lose with the software drivers,
 which requires a little care from the app programmer.  It is basically this:
 When you query for the texture manager from the procedural texture buffer
 interface it may or may not be the same texture manager as that which is used
@@ -229,7 +229,7 @@ procedural textures each frame automatically when the texture is not visible
 (Although @samp{dtsimple} pretty much does so.)  Also the procedural textures
 are all implemented at the graphics driver level and the engine (which has all
 the visibility determination code) doesn't know anything about procedural
-textures, so if you did require to determine visiblility before refreshing
+textures, so if you did require to determine visibility before refreshing
 then currently you would have to implement your own little visibility test.
 Unless there is a huge demand or a really compelling reason to change the
 current situation, I don't expect this to change.

@@ -41,7 +41,7 @@ A test application for the Open DivX video plugin.
 @item cswstest
 This application tests the Crystal Space Windowing System (@sc{csws}), which
 is designed to provide a clean, effective and cross-platform base for creating
-CrystalSpace-related utilites.  Currently there is only one such utility under
+CrystalSpace-related utilities.  Currently there is only one such utility under
 development, the CrystalSpace maze editor (MazeD).  @xref{CSWS}.
 
 @cindex @file{demosky}
@@ -67,20 +67,20 @@ An application demonstrating the Crystal Space ISO engine.
 @cindex @file{map2cs}
 @cindex Applications, @file{map2cs}
 @item map2cs
-A map convertors which converts between Quake style @file{.map} format to the
+A map converter which converts between Quake style @file{.map} format to the
 native Crystal Space map format. It is known to work with WorldCraft
 2.1 Beta and QuArK (Quake Army Knife). @xref{map2cs}.
 
 @cindex @file{mdl2spr}
 @cindex Applications, @file{mdl2spr}
 @item mdl2spr
-This application is a Quake @file{.mdl} and @file{.md2} model convertor.  It
+This application is a Quake @file{.mdl} and @file{.md2} model converter.  It
 converts model files into native Crystal Space sprites. @xref{mdl2spr}.
 
 @cindex @file{metademo}
 @cindex Applications, @file{metademo}
 @item metademo
-A demostration application which draws texture-mapped meta-balls in a
+A demonstration application which draws texture-mapped meta-balls in a
 free-form, dynamic blob.
 
 @cindex @file{perftest}

@@ -27,7 +27,7 @@
 
 #include "cstool/prwater.h"
 
-/// the implementation of the plasma texture
+/// the implementation of the water texture
 csProcWater::csProcWater () : csProcTexture()
 {
   palsize = 0;

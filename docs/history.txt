@@ -44,6 +44,10 @@ The history order is reversed so that new features are at the top.
 	  <lighting> option wouldn't be correctly saved to XML.
 	- Fixed a memory leak with texture layers for a material. There
 	  was no DecRef(). I fixed this by using csRef.
+	- Eric Sunshine applied a large and thorough typographical-error
+	  correction patch to the Texinfo documentation from Andreas Busch
+	  <nobita@t-online.de>.  Also applied a few minor corrections from Eric
+	  Sunshine.
 9-Dec-2002
 	- Fixed a bug in Dynavis where it would consider polygons as possible
 	  occluders even if Z very close to 0. This could cause bad overflow.

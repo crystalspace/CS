@@ -230,14 +230,14 @@ supported. Instead you should use the new @samp{MESHOBJ} keyword.
 It is recommended that anyone who wants to convert to the new system should
 first to read the general documentation about the mesh object plugin system
 (@pxref{MeshObject}).  Read this very carefully.  A good understanding is
-required to perform a succesful conversion.
+required to perform a successful conversion.
 
-In addition to what is explained, there are also two conveniance functions to
+In addition to what is explained, there are also two convenience functions to
 create mesh factories and mesh objects:
 
 @example
 /**
- * Conveniance function to create a mesh factory from a
+ * Convenience function to create a mesh factory from a
  * given type.  The type plugin will only be loaded if
  * needed.  'classId' is the SCF name of the plugin (like
  * 'crystalspace.mesh.object.cube').  Returns NULL on
@@ -252,7 +252,7 @@ virtual iMeshFactoryWrapper* CreateMeshFactory(
   const char* classId, const char* name) = 0;
 
 /**
- * Conveniance function to create a mesh object for a given
+ * Convenience function to create a mesh object for a given
  * factory.  If 'sector' is NULL then the mesh object will
  * not be set to a position.  Returns NULL on failure.  The
  * object will be given the specified name.  'name' can be

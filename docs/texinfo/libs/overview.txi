@@ -11,7 +11,7 @@ sections.
 @table @code
 @item csEngine
 The 3d engine is currently moved to a separate plug-in. For documentation on
-the engine, have a look at @ref{csEngine}. In the future the prefered way
+the engine, have a look at @ref{csEngine}. In the future the preferred way
 to access the engine will be to use the engine plugin. At this moment
 this is still not fully possible because the @sc{scf} interfaces for the
 engine plugin are not complete yet.
@@ -27,8 +27,8 @@ notion of key-value pairs (to be attached to csObject's).
 @item csSys
 All system dependent functionality (non-graphics and non-sound related) is in
 this library, for example keyboard, joystick and mouse driver, system-dependent
-file handling, loading dynamic libraries etc.  This library the main module to
-make Crystal Space applications system-independent.
+file handling, loading dynamic libraries etc.  This library is the main module
+to make Crystal Space applications system-independent.
 
 @item csUtil
 This library contains various utilities. There is an Archive class which can

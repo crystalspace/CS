@@ -3,7 +3,7 @@
 @cindex Internal Structure
 
 This chapter describes how Crystal Space works internally.  This information is
-not nessecary to utilize Crystal Space in your own project.  Instead, it is
+not necessary to utilize Crystal Space in your own project.  Instead, it is
 intended for developers of Crystal Space itself, as well as for those who are
 merely curious about the internal workings of the project.
 

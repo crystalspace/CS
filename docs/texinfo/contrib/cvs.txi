@@ -84,7 +84,7 @@ entire project.
 
 One final thing to remember is that you should @emph{never} commit files that
 you @emph{know} will stop the progress of other developers.  The @sc{cvs}
-respository is the place to commit completed code, not code that needs
+repository is the place to commit completed code, not code that needs
 debugging because you can't find a certain bug.  Other developers should not
 have to stop and track down your bugs just so they can proceed with their own
 coding.  When you've committed code, please monitor the mailing list regularly

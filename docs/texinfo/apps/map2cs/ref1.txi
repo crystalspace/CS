@@ -41,7 +41,7 @@ associated values which may appear in each section.
 
 Specifies the name of the texture, that will be used, when the original
 texture is not found.  If the default texture will not be found, the resulting
-map will not be useable.  You need to manually edit the map file then.  (I
+map will not be usable.  You need to manually edit the map file then.  (I
 don't recommend doing so, but there are users, who just want to do that.)
 
 @item
@@ -51,7 +51,7 @@ Specifies all possible wad files.  You need to give the full path here.  If
 there are several wad files, you need to number them: @samp{wad1},
 @samp{wad2}, and so on.  You can use any number of wad files with
 @file{map2cs}.  The wad files need to be @sc{wad3} format, which means the
-format used by Hald-Life, not the format used by Quake 1 or 2!
+format used by Half-Life, not the format used by Quake 1 or 2!
 
 @item
 @code{pk}
@@ -92,7 +92,7 @@ scale quake maps, but if you need a different factor, just use another value.
 @code{usebsp}
 
 Set this to true, to enable @sc{bsp}-tree generation in all sectors.  That
-should normally be 1 in all cases.  You can set it to 0 for testing puprosed
+should normally be 1 in all cases.  You can set it to 0 for testing purposes
 though.
 
 @item
@@ -101,7 +101,7 @@ though.
 Set this to 1 is you want @sc{map2cs} to remove hidden surfaces.  This is very
 useful for complex maps, because you have no chance to create maps without
 having hidden surfaces, but by removing these surfaces @file{map2cs} must
-sometimes split a polygon inte smaller pieces, so polygon count can even raise
+sometimes split a polygon into smaller pieces, so polygon count can even raise
 but this setting.  I recommend using it anyway, because it will reduce
 required fillrate.  Also the engine can possibly cull away parts of the larger
 polygon which will speed up things.  I recommend setting this to 1 for release

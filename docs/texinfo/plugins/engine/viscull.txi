@@ -395,7 +395,7 @@ filling to world geometry and culling objects only. But this may not
 be enough.
 
 So we present another way to reduce this overhead. This is a @sc{pvs}
-or Potentially Visible Set. Basicly for every octree leaf in the
+or Potentially Visible Set. Basically for every octree leaf in the
 octree we keep a set of all other visible nodes and polygons.
 Before testing a polygon or node against the c-buffer we will first
 see if it is in the @sc{pvs} of the current leaf where the camera is.
@@ -403,7 +403,7 @@ If it is not then we don't need to continue testing. This means we
 can avoid having to transform, perspective project, and scan convert
 the polygon and then test to the c-buffer. This can be a @emph{huge} benefit.
 
-After doing the @sc{pvs} test we have two choices basicly. We can still
+After doing the @sc{pvs} test we have two choices basically. We can still
 decide to use the c-buffer to do finer culling tests. The @sc{pvs} only
 provides region to region visibility. It is possible that less is
 visible from within some point in some region. Whether or not it

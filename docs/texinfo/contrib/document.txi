@@ -30,7 +30,7 @@ make any changes.
 To make writing the documentation easier, @samp{@@node} and @samp{@@menu}
 directives in the Texinfo sources can be repaired, which means that the
 links to the previous, next and top nodes are generated automatically. So you
-can safely write the following line, ommitting the various links which the
+can safely write the following line, omitting the various links which the
 @samp{@@node} directive normally requires:
 
 @example
@@ -131,7 +131,7 @@ Platform-dependent configuration files, such as @file{unixdef.txi},
 Platform-dependent wrapper files, such as @file{cs-unix.txi},
 @file{cs-mac.txi}, etc.  These are the platform-specific root files for the
 entire documentation hierarchy.  They import the platform-dependent
-configration (i.e. @file{unixdef.txi} and then the @sc{ToC} file
+configuration (i.e. @file{unixdef.txi} and then the @sc{ToC} file
 @file{cs.txi}.
 
 @item
@@ -151,7 +151,7 @@ subdirectory.
 
 @subsubheading Formatting Conventions
 
-Here are some general formatting convensions.
+Here are some general formatting conventions.
 
 @itemize @bullet
 @item

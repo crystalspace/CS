@@ -10,7 +10,7 @@ require a quite complex setup, which we shall explain later in this tutorial.
 
 @itemize @bullet
 @item
-Crystal Space - This sounds obvious, but you require a release disrtibution
+Crystal Space - This sounds obvious, but you require a release distribution
 of the Crystal Space game engine. Preferably version 0.18 or above. You can
 obtain this from:
 

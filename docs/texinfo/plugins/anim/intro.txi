@@ -5,7 +5,7 @@
 @emph{Written by Michael Voase,
 @email{mvoase@@midcoast.com.au}.}
 
-Crystal Space provides two basic mechanisms for aniating sprites. The first
+Crystal Space provides two basic mechanisms for animating sprites. The first
 is frame based animation in which a mesh is defined in each frame and used
 in a loop. The second method is skeletal animation where a skeleton is
 defined in the sprite and an interface (@samp{iSkeletonBone}).
@@ -23,11 +23,11 @@ plug in.
 
 This document presumes that you have an operational copy of Crystal Space.
 For details on obtaining and building Crystal Space please refer to the
-relevent sections on obtaining (@pxref{Where to Get}) and building
+relevant sections on obtaining (@pxref{Where to Get}) and building
 (@pxref{Building}) Crystal Space.
 
 I also presume that you have a map file that you can edit to try out much of
-what is written here.  If you havent then it might be a good idea to look for
+what is written here.  If you haven't then it might be a good idea to look for
 the motion-@sc{howto} in the data directory for a sample world file.  In each
 case I will start with the world file definitions then move to the application
 interfaces to round out the commentary.

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Create Your Own Plugin, HOWTO Simple Map Example, HOWTO Setting the CRYSTAL enviroment variable, HOWTO
+@node HOWTO Create Your Own Plugin, HOWTO Simple Map Example, HOWTO Setting the CRYSTAL environment variable, HOWTO
 @subsection Create Your Own Plugin
 
 Making a plugin in Crystal Space is not very hard but nevertheless
@@ -21,7 +21,7 @@ implementation is given; only method declarations. The implementation
 will come later in the code of the plugin.
 
 This concept is similar to the Java interface mechanism. The
-advantage of using this paradigm is that you have a clear seperation 
+advantage of using this paradigm is that you have a clear separation 
 between
 the API and the implementation. This allows one to easily replace an
 implementation of some API or even provide multiple implementations
@@ -78,7 +78,7 @@ has three parts: major, minor, and micro.
 Finally we define the API by making a structure that inherits from
 @samp{iBase}. We use @samp{struct} instead of @samp{class} simply because for
 structures the default visibility is @samp{public} instead of @samp{private} for
-classes. This is just conveniant. There is no other difference between
+classes. This is just convenient. There is no other difference between
 a @samp{struct} or a @samp{class} in C++.
 
 The name @samp{iMyApi} is not random. Crystal Space uses this naming
@@ -171,9 +171,9 @@ the plugin with a pointer to the global object registry.
 But our plugin also needs to implement its own native @samp{iMyApi}
 interface. So here is a situation where the same class needs to
 implement two interfaces at the same time. There are basically two ways
-to do this: multiple inheritence or by using an embedded @sc{scf} class.
+to do this: multiple inheritance or by using an embedded @sc{scf} class.
 We use the second case here since that is more portable. Multiple
-inheritence is known to cause problems on some platforms (i.e. 
+inheritance is known to cause problems on some platforms (i.e. 
 NextStep).
 
 In the example above the class @samp{MyPlugin} directly inherits from
@@ -199,14 +199,14 @@ This macro takes care of the fact that this interface actually belongs to the
 parent class (which is given as a parameter).  One thing it does is declare a
 variable of type @samp{MyPlugin} which is called @samp{scfParent}.  Through
 that variable the method implementations of the embedded interface can access
-the main class.  After declaring the class @samp{Component} we immediatelly
+the main class.  After declaring the class @samp{Component} we immediately
 create an instance of this called @samp{scfiComponent}.  You can call it
 whatever you like.  This name is just a convention in Crystal Space.
 
 Sometimes embedded classes are also made friend of the main
 class so that they can access the private information. In this case
 this is not needed. The only thing that @samp{Component} has is an
-@samp{Initialize()} method which immediatelly transfers control to
+@samp{Initialize()} method which immediately transfers control to
 the parent @samp{Initialize()} method.
 
 @subsubheading Creating the Plugin Implementation (source)
@@ -258,7 +258,7 @@ bool MyPlugin::Initialize (iObjectRegistry* iobject_reg)
 
 void MyPlugin::DoSomething (int param, const csVector3& v)
 @{
-  // Just some stupid behaviour.
+  // Just some stupid behavior.
   if (param == 1)
     store_v = v;
   else

@@ -30,7 +30,7 @@ good, robust, custom @sc{aws} component.
 @subsubsection Parameter Delivery
 
 This section describes automatic @dfn{parameter delivery}, which provides a
-mechanism for extracting compnent parameters from a window definition.
+mechanism for extracting component parameters from a window definition.
 
 In @sc{aws}, all windows are defined by a window definition.
 There may be multiple definitions in a file, or you may have

@@ -678,7 +678,7 @@ structure.
 
 @item
 He added an automated rebuild process for the Windows/@sc{msvc} project files.
-This process gleans nessecary information from the @sc{gnu} makefiles
+This process gleans necessary information from the @sc{gnu} makefiles
 throughout the project in order to entirely eliminate manual maintenance of
 these files.
 

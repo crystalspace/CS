@@ -29,7 +29,7 @@
 
 #define NEW_PROC 0
 
-/// the implementation of the plasma texture
+/// the implementation of the fire texture
 csProcFire::csProcFire () : csProcTexture()
 {
   palsize = 0;

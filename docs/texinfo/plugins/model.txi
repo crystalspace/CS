@@ -25,7 +25,7 @@ After loading a model you will usually need to prepare the data a bit. This
 is needed because the @sc{ids} is not completely independent. In some cases
 this was not possible, while in others this makes things faster and more
 simple. However, Crystal Space provides functions to do this preparation for
-you. They are grouped togeter in a namespace wrapper called
+you. They are grouped together in a namespace wrapper called
 @code{csModelDataTools}. As an example, this includes a function to split
 objects using more than one material into objects that don't. 3d sprites in
 Crystal Space are limited to one material per sprite.

@@ -10,7 +10,7 @@
 
 The main goal of Crystal Space Windowing System (@sc{csws}) is to provide a
 clean, effective and cross-platform base for creating Crystal Space-related
-utilites.  The goal for writing this manual is not to give a extensive overview
+utilities.  The goal for writing this manual is not to give a extensive overview
 of the windowing system, but rather to give the basic concepts so that you have
 something to start with.  Currently, the windowing system @sc{api} changes too
 quickly to keep an extensive overview complete and up-to-date; however the
@@ -44,7 +44,7 @@ always done on the invisible page.  This means flickering on redraw is almost
 impossible in @sc{csws}, while it is common on many @sc{gui}s with
 poorly-written programs.  If visual has more than one @dfn{back-buffer} (as
 with the @sc{os/2} @sc{dive} canvas plugin), the image is automatically
-re-syncronized on all back-buffers, but this slows down the refresh.  Thus if
+re-synchronized on all back-buffers, but this slows down the refresh.  Thus if
 your program is mostly using the windowing system it is advised that you
 disable double-buffering before using the windowing system.
 
@@ -69,7 +69,7 @@ The coordinate system is based on most-used (yet undesirable) system where
 top-left corner is (0,0) and bottom-right corner is (@var{width},
 @var{height}).  It would be better to use the more desirable coordinate system
 which is used, for example in @sc{os/2} and OpenGL, but most programmers are
-already familiar with the less disirable one.
+already familiar with the less desirable one.
 
 Most @sc{csws} functions works with rectangles (@samp{csRect} class).  The
 @samp{csRect} class has four data fields: @samp{xmin}, @samp{xmax},
@@ -198,8 +198,8 @@ have to take care to not draw outside the dirty rectangle; clipping will take
 care of it for you (to minimize the number of draw operations).
 
 All draw operations are clipped first against dirty rectangle and then against
-all component children and neightbours.  So drawing inside a component does not
-change even a pixel in other components, even if component is partialy covered
+all component children and neighbors.  So drawing inside a component does not
+change even a pixel in other components, even if component is partially covered
 by other components.
 
 There are a number of drawing operations that you can use.  Other operations
@@ -359,23 +359,23 @@ draw the polygon (@emph{gouraud}, @emph{mix mode}, @emph{alpha}, and so on).
 
 This is the main component entry point for handling windowing system events.
 Each time user presses a key, moves mouse etc windowing system generates a
-event and sends it to appropiate component.  The normal event flow is top-down,
-i.e.  the root window receives events first, then passes them if appropiate to
+event and sends it to appropriate component.  The normal event flow is top-down,
+i.e.  the root window receives events first, then passes them if appropriate to
 its children which passes it to their respective children and so on.  However,
-there are some basical constraints on event flow that you should know about:
+there are some basic constraints on event flow that you should know about:
 
 @itemize @bullet
 @item
 @code{HandleEvent()} should return a boolean value that states whenever this
 object used the event or not.  If the event has been used, no other component
-will receive it anymore, otherwise windowing system looks for other appropiate
+will receive it anymore, otherwise windowing system looks for other appropriate
 candidates for this event.  The only exception from this rule are broadcast
 events that are sent to all children independently of the fact that component
 @emph{eaten} event or not.
 
 @item
 Mouse events are received only by the topmost component mouse pointer is over
-and its parents.  If other behaviour is desired, a component should capture
+and its parents.  If other behavior is desired, a component should capture
 the mouse by calling @code{app->CaptureMouse(this)}---in this case mouse
 events are sent by application object directly to the object that captured the
 mouse, bypassing normal event flow.  To revert to normal mode of operation
@@ -383,7 +383,7 @@ component should call @code{app->CaptureMouse(NULL)}.
 
 @item
 Keyboard events are sent only to components from @dfn{focus chain}
-(@pxref{CSWS Focus Chain}).  If a different behaviour is desired, component
+(@pxref{CSWS Focus Chain}).  If a different behavior is desired, component
 should capture keyboard events by calling @code{app->CaptureKeyboard(this)}.
 To disable capturing keyboard events component should call
 @code{app->CaptureKeyboard(NULL)}.
@@ -468,7 +468,7 @@ Contains the state flags of the component.  There are two types of state flags
 flags and @dfn{option} flags.  Option flags usually define some static aspect
 of component---for example, whenever component is selectable (i.e. if it can
 become the focused element), or it is partially transparent (see
-irregularily-shaped components) etc.  Dynamic flags often changes during
+irregularly-shaped components) etc.  Dynamic flags often changes during
 component's life, for example component visibility flag, ``component focused''
 flag and so on.  The component state flags starts with the @samp{CSS_} prefix.
 
@@ -476,7 +476,7 @@ You should never manually change state flags.  Instead, there are two methods
 for this: @code{SetState(@var{mask}, @var{state})} and
 @code{GetState(@var{mask})}.  For example, if component is not selectable and
 you want to make it selectable, call @code{component.SetState(CSS_SELECTABLE,
-true)}.  The @code{SetState()} method is virtual and is often overriden to
+true)}.  The @code{SetState()} method is virtual and is often overridden to
 execute some specific functions when component state changes.  For example,
 default @code{SetState()} handler shows or hides the component if
 @samp{CSS_VISIBLE} flag state changes.
@@ -502,13 +502,13 @@ pointer object and many other.
 
 @item csComponent *parent
 Contains the @dfn{parent} component.  Components are chained into a tree, each
-component knows its neightbours (through @samp{next} and @samp{prev} fields),
+component knows its neighbors (through @samp{next} and @samp{prev} fields),
 each parent knows its focused child, and can traverse its list of children by
 starting from focused, then going to @emph{focused-to-next} and so on.
 
 @item csComponent *prev
 @itemx csComponent *next
-Contains the next and previous neightbours in parent's child list.  They are
+Contains the next and previous neighbors in parent's child list.  They are
 never @code{NULL}, chains are always closed.  If a component is the only child
 of another, its next and prev fields points to himself.
 
@@ -522,7 +522,7 @@ possible case when ``focused'' can be @code{NULL}.
 
 @item csComponent *top
 This is the top component in Z-order.  Mouse events are processed in Z-order
-unlike keyboard events.  The focused event is not neccessarily the top
+unlike keyboard events.  The focused event is not necessarily the top
 component, although usually this is true.  If component has
 @samp{CSS_TOPSELECT} flag set, when user activates (focuses) a component, it
 is made the topmost, however if it has this flag reset, its Z-order does not
@@ -564,7 +564,7 @@ value (@samp{A}, @samp{z}, @samp{$}) or one of predefined
 
 @item Key.Modifiers
 Contains the state of shift keys at time when this event has been generated.
-Note that it not neccessarily is the same as current key state.  To decode its
+Note that it not necessarily is the same as current key state.  To decode its
 value you should use the pre-defined @samp{CSMASK_@var{XXX}} constants.  For
 example to check if the @kbd{@key{Alt}} modifier was pressed, and only this
 modifier you might use this code:
@@ -644,9 +644,9 @@ Clipping is the process of removing parts of output covered by other
 components.  @sc{csws} has full clipping implemented for all existing graphics
 primitives.  There is no drawing operation that can influence other
 component's image except transparent windows.  Clipping is performed in the
-following fasion.  First primitive is clipped against @emph{dirty} rectangle
-(to cut off excessive output), then it is clipped against all its neightbours,
-then against @samp{clip parent} window and all its neightbours and so on.
+following fashion.  First primitive is clipped against @emph{dirty} rectangle
+(to cut off excessive output), then it is clipped against all its neighbors,
+then against @samp{clip parent} window and all its neighbors and so on.
 
 @subsubheading Clip Parents
 
@@ -738,7 +738,7 @@ int main(int argc, char const* const argv[])
 @}
 @end example
 
-Pretty simple, eh?  So the result is simple as well.  We got a grey background,
+Pretty simple, eh?  So the result is simple as well.  We got a gray background,
 a mouse and nothing more.  What the program does is:
 
 @itemize @bullet

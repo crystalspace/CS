@@ -15,7 +15,7 @@ this plugin.
 
 @item Network Driver
 Network Driver.  This driver is used to create an implementation of the Socket
-Driver via the @code{CreateSocket()} call.  The Network Driverr calls
+Driver via the @code{CreateSocket()} call.  The Network Driver calls
 appropriate socket startup/shutdown calls for the operating system.
 
 @item Socket Driver
@@ -41,7 +41,7 @@ Blocking/non-blocking buffered read function.
 The Network Driver is used to setup the socket sub-system.  The driver's
 purpose is to provide a method for creating a @sc{bsd} sockets compliant socket
 of either @sc{udp} or @sc{tcp} type.  Upon construction all appropriate socket
-start-up calls are made, like wise with the distructor.
+start-up calls are made, like wise with the destructor.
 
 @table @code
 @item CreateSocket()
@@ -79,9 +79,9 @@ This function closes the socket and it is no longer valid after this point.
 @item Disconnect()
 This function closes the connection then closes the socket.
 @item WaitForConnection()
-This function sets the socket up for incomming connections on a port.
+This function sets the socket up for incoming connections on a port.
 @item Accept()
-This function returns a socket that is connected to a incomming connection 
+This function returns a socket that is connected to a incoming connection 
 from a remote system.
 @item set()
 This function is for internal use and should not be called.

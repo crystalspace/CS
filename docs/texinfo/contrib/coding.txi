@@ -122,7 +122,7 @@ then be sure to @code{#define} the appropriate macro before including
 @item
 @emph{Module and Library Dependencies}
 
-Do not introduce unnecessary dependencies between libaries and modules.
+Do not introduce unnecessary dependencies between libraries and modules.
 Absolutely avoid introducing circular dependencies.
 
 For instance, code in the @code{csGeom} library should never refer to code

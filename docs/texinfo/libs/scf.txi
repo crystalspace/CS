@@ -179,8 +179,8 @@ object is only available after calling @code{scfInitialize()}, the main
 initialization function of @sc{scf}.
 
 To simplify things, all exported classes are supposed to be derived from some
-basical interface called @samp{iBase}. Thus, any interface is supposed to
-implement some basical functionality. Currently @samp{iBase} defines three
+basic interface called @samp{iBase}. Thus, any interface is supposed to
+implement some basic functionality. Currently @samp{iBase} defines three
 interface functions:
 
 @table @code
@@ -385,7 +385,7 @@ And finally, in the parent object's constructor you should initialize all
 embedded interface objects with the
 @code{SCF_CONSTRUCT_EMBEDDED_IBASE(@var{InterfaceName})} macro.  This will
 initialize @samp{scfRefCount} and @samp{scfParent} fields within
-@samp{scf@var{InterfaceName}} member variables to appropiate values (zero and
+@samp{scf@var{InterfaceName}} member variables to appropriate values (zero and
 @samp{this}).  Here is how to do it:
 
 @example
@@ -407,7 +407,7 @@ constructor.
 @subsection Interface Versions
 
 Unlike @sc{com}, @sc{scf} supports interface versions.  That is, a shared
-class could implement verion 0.3.6 of given interface, and if client requests
+class could implement version 0.3.6 of given interface, and if client requests
 that interface of a version lower or equal than 0.3.6, a correct interface
 pointer is returned.  For this to work you need to define inside each
 interface header file (typically named @file{i@var{InterfaceName}}) a
@@ -430,7 +430,7 @@ If your changes are relatively minor, but you do a major release, increase the
 minor version number and drop the micro version to zero.
 
 @item
-If you're in the developement process, and did a minor change to the
+If you're in the development process, and did a minor change to the
 interface, increase the micro version.
 @end itemize
 

@@ -21,7 +21,7 @@ to know how Crystal Space works internally.
 
 To understand this you should know how portals are used in Crystal Space.  You
 should also read the tutorial (@pxref{Tutorial Simple}) as this explains the
-basics for using Crystal Space.  This document is baseed upon the
+basics for using Crystal Space.  This document is based upon the
 @file{simple} application (@file{CS/apps/simple/}) because this discussion
 looks a lot like a tutorial.
 
@@ -102,7 +102,7 @@ and @code{csPolygonSet::TransformWorld2Cam()} (see
 @file{CS/libs/csengine/basic/polyset.cpp}).  The call to
 @code{NewTransformation()} is needed because it is possible that we render the
 same sector multiple times in the same recursion tree.  Because of this we
-don't actually want to loose the transformation that occured the previous time
+don't actually want to loose the transformation that occurred the previous time
 so @code{NewTransformation()} takes care of potentially storing the old
 transformation and setting a new one (mirrors and other space warping portals
 make this feature essential).
@@ -115,7 +115,7 @@ implemented in @file{CS/libs/csengine/basic/polyset.cpp}), and
 
 While drawing the polygons of the sector (which are the sector's walls) some
 of them may be portals.  In that case @code{csPolygonSet::DrawPolygonArray()}
-will immediatelly perform recursion to the destination sector of the portal.
+will immediately perform recursion to the destination sector of the portal.
 This means creating a new @samp{csRenderView} with the new view and then
 recursing into @code{csSector::Draw()} of the new sector.  It is important to
 note that @code{DrawPolygonArray()} may already enter recursion for a new
@@ -136,7 +136,7 @@ collected into the static thing are still in the list of things for the
 sector.  But you can recognize them because they @code{IsMerged()} returns
 true.
 
-Now there are two important cases depending on wether or not there was a
+Now there are two important cases depending on whether or not there was a
 static thing in the previous case.  If there was a static thing or if the
 sector itself had a @sc{bsp} tree, then all remaining things have to be drawn
 using the Z-buffer (ignoring foggy things for the moment).  In this case we

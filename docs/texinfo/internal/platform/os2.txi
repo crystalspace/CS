@@ -118,8 +118,8 @@ pixel format will be used.
 
 @item
 Otherwise the list of @sc{dive} supported pixel formats is scanned.  The most
-wanted mode is R5-G6-B5 mode, if it is not available R6-G6-B4 mode is choosen,
-if it is not available, R5-G5-B5 mode is choosen.  If no 16- or 15-bit mode is
+wanted mode is R5-G6-B5 mode, if it is not available R6-G6-B4 mode is chosen,
+if it is not available, R5-G5-B5 mode is chosen.  If no 16- or 15-bit mode is
 available, code falls back to 256-color mode.
 @end itemize
 
@@ -220,14 +220,14 @@ it, the same happens as with mouse buttons.  Keyboard events are passed by
 @OSTWO{} only to active windows.  To avoid this, the default @emph{focus
 changed} handler in @samp{csSystemDriver} class calls @code{Keyboard->Reset()}
 and @code{Mouse->Reset()} if focus goes away.  @code{Keyboard::Reset()} clears
-all @emph{key pressed} flags and emmits corresponding @samp{csevKeyUp} events.
-@code{Mouse::Reset()} clears all @emph{button down} flags and emmits
+all @emph{key pressed} flags and emits corresponding @samp{csevKeyUp} events.
+@code{Mouse::Reset()} clears all @emph{button down} flags and emits
 corresponding events too.
 @end itemize
 
 By default Crystal Space Windowing System will use builtin @OSTWO{} mouse
 pointers whenever possible (there are three cursors that do not have their
-counterparts in @OSTWO{} and will be emulated in software).  This behaviour
+counterparts in @OSTWO{} and will be emulated in software).  This behavior
 can be controlled by the @samp{SYS_MOUSE_CURSOR = @{@var{yes}|@var{no}@}}
 parameter in configuration file.  If set to @samp{yes}, system mouse pointers
 will be used when available; if set to @samp{no}, mouse pointers will be drawn

@@ -142,7 +142,7 @@ object.
 @cindex material
 @cindex animation
 
-Create a new text file thats the name of your charater in the same directory 
+Create a new text file that is the name of your character in the same directory 
 as the 4 files you exported from 3D Studio MAX.  Then place these four lines 
 in the text file that specifies which parts of your character to load.
 

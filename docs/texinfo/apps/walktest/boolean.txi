@@ -70,7 +70,7 @@ may remove this action again.
 @item move3d
 Toggle between between pure 3D movement (Descent-like) and
 @samp{comfortable} movement (Quake-like). The latter is now default. This
-basicly affects the left and right arrow keys which now rotate the camera
+basically affects the left and right arrow keys which now rotate the camera
 how you would expect it and also includes a gravity system. When you enable
 3D movement the gravity system is also disabled.
 

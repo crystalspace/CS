@@ -36,7 +36,7 @@ syntax:
 
 In other words, the syntax is the same as for a normal light except for
 the @samp{DYNAMIC} keyword. Note that lights usually don't have a name
-but for a pseudo-dynamic light it is conveniant to have one since you can
+but for a pseudo-dynamic light it is convenient to have one since you can
 use that name to find the light later (which is essential if you want to
 change the color/intensity).
 

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node HOWTO Creating External Application using KDevelop, HOWTO Setting the CRYSTAL enviroment variable, HOWTO Creating External MSVC Application, HOWTO
+@node HOWTO Creating External Application using KDevelop, HOWTO Setting the CRYSTAL environment variable, HOWTO Creating External MSVC Application, HOWTO
 @subsection Creating an External Application using KDevelop
 
 @emph{Written by Andreas Busch, @email{nobita@@t-online.de}.  Last updated
@@ -72,7 +72,7 @@ Copy the @file{cs-config} script which you made with @samp{make csconfig}
 inside your Crystal Space tree to the root directory of your new project, and
 make sure it is executable.  Be sure to include the backticks in the field
 @emph{@sc{cflags}} and @emph{@sc{cxxflags}} for the @file{cs-config} script to
-be automaticaly executed in the @emph{Flags and Warnings} tab, otherwise you
+be automatically executed in the @emph{Flags and Warnings} tab, otherwise you
 will get an error message that your C-compiler cannot create executables.  The
 @emph{@sc{cflags}} field should contain @samp{`./cs-config --cflags`}, and the
 @emph{@sc{cxxflags}} field should contain @samp{`./cs-config --cxxflags`}.
@@ -98,7 +98,7 @@ cstool csutil cssys csgfx csgeom}.
 Now over to the @emph{Linker Options}.  Include your additional libraries here
 as needed.  Be sure to link @samp{-libpthread} here as I experienced error-free
 compiled applications with mysterious segmentation faults on execution without
-this.
+this. (Should be fixed and automatically included  with newer cs-config.)
 @ifnotinfo
 
 @picturesss{tutorial,howto,kdevproj,snap6}

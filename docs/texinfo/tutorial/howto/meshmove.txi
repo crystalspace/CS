@@ -21,7 +21,7 @@ This section describes how to move meshes around in your world.
 It is very important to understand the concept of object and world
 space when talking about moving objects. Object space is the coordinate
 system that is used for describing the object itself independent of where
-it is. Depending on the type of object it is usually conveniant to place
+it is. Depending on the type of object it is usually convenient to place
 the origin of that object space at a central spot. For an actor you
 probably want it in at the center of the feet so that you can move the (0,0,0)
 point on the ground and the actor will stand correctly.
@@ -46,7 +46,7 @@ sector is that a mesh can be in several sectors at the same time. This
 happens when the mesh crosses a portal and one side of the mesh is in
 sector A while the other is in sector B. The engine keeps track of this
 and will correctly render such objects provided the list of sectors is
-correctly. Unfortunatelly the engine gives little support for detecting
+correctly. Unfortunately the engine gives little support for detecting
 in which sectors a mesh will be after it moves. This support will certainly
 arrive at some point in the near future.
 

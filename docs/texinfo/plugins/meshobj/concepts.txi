@@ -28,7 +28,7 @@ object in the world will implement this interface.
 
 Mesh Objects often also implement one or more additional type specific
 interfaces to access the characteristics of that Mesh Object.  The engine
-itself does not know about these interfaces.  It is the responsability of the
+itself does not know about these interfaces.  It is the responsibility of the
 application writer to correctly set up the characteristics of all Mesh Objects
 that it uses.  These type specific interfaces are usually called
 @samp{iSomethingState} (replace @emph{Something} with the appropriate name).
@@ -60,7 +60,7 @@ generate all your Mesh Objects of that type.
 In other cases the factory contains default values for some characteristics
 that are copied to all Mesh Objects created from that factory.  In that case
 you can decide to use one factory and change the settings before creating new
-instances.  Or (for conveniance) you can create several factories with default
+instances.  Or (for convenience) you can create several factories with default
 values that you use often and create Mesh Objects from the factory of choice.
 
 @item
@@ -78,7 +78,7 @@ Mesh Object Factories implement the @sc{scf} interface
 
 Mesh Object Factories often implement one or more additional type specific
 interfaces to access the characteristics of that Mesh Object Factory.  The
-engine itself does not know about these interfaces.  It is the responsability
+engine itself does not know about these interfaces.  It is the responsibility
 of the application writer to correctly set up the characteristics of all Mesh
 Objects Factories that it uses.  These type specific interfaces are usually
 called @samp{iSomethingFactoryState} (replace @emph{Something} with the
@@ -108,7 +108,7 @@ Object plug-in itself doesn't know about these loader plug-ins.  In fact, you
 can even write different loader plug-ins for the same Mesh Object Type if you
 so desire.
 
-@subsubheading Responsabilities
+@subsubheading Responsibilities
 
 As mentioned above Mesh Objects only know how to render themselves and how to
 update lighting information.  The engine is responsible for deciding when to

@@ -86,7 +86,7 @@ without being initialized first.
 @strong{Warning:} This is quite expensive in terms of memory consumption.
 
 @item d
-@emph{Cause program to brak into debugger upon detection of serious errors.}
+@emph{Cause program to break into debugger upon detection of serious errors.}
 The debugger will break inside operator @samp{new} or @samp{delete} right
 before exiting back to user program.  By stepping a few times you can detect
 the place where error occurred.
@@ -131,7 +131,7 @@ After you created the map file, just run your program as usual.  If your
 program doesn't have a separate @samp{stdout} stream (such as on @sc{dos},
 @sc{os/2}, Windows, MacOS/9) it is recommended that you always use log file;
 if you didn't you can still redirect the @samp{stdout} to a file using the
-@samp{stdout} redirection, if it is possible (for intance, @samp{./walktest >
+@samp{stdout} redirection, if it is possible (for instance, @samp{./walktest >
 logfile}).
 
 If you will want later to change debugging options, you can load the map file

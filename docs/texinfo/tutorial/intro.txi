@@ -144,7 +144,7 @@ How can I load the plug-in?
 To load a plug-in, you must tell the plug-in manager the name
 of the plug-in as it was registered in the previous step. In the most
 common case you will probably use the plug-in loader to load the plug-in.
-This is a conveniance class that is able to load plug-in as specified
+This is a convenience class that is able to load plug-in as specified
 in a config file, from the commandline, or as requested by the application
 programmer. In addition to loading the plug-in (the plug-in loader will
 use the plug-in manager to do that), the plug-in loader will optionally
@@ -178,7 +178,7 @@ Now how can you actually load the plug-in? You can either load them
 manually in the code using the @code{CS_LOAD_PLUGIN} macro or else
 you can use the plugin loader. As explained above, the plugin loader
 can load plugins specified on the commandline, a config file, or else
-explicitely requested in the code. This is done in a specific way:
+explicitly requested in the code. This is done in a specific way:
 The commandline has highest priority. i.e. if the user specified the
 OpenGL video driver on the commandline then this will be the plugin that
 is loaded on the 'iGraphics3D' tag. The config file and plugins requested
@@ -188,7 +188,7 @@ if neither the commandline nor the config file specified a plug-in for
 the given tag.
 
 There is a class called @code{csInitializer} which contains various
-conveniance routines to help initialize a Crystal Space application.
+convenience routines to help initialize a Crystal Space application.
 This class also contains a routine (@code{RequestPlugins}) which will
 use the plugin loader automatically.
 
@@ -391,7 +391,7 @@ drivers will post events to the global event queue.
 
 We already mentioned several of the functions above. This class (for which
 the definition can be found in @file{include/cstool/initapp.h}) is a
-conveniance class that can be used to help you setup everything needed to
+convenience class that can be used to help you setup everything needed to
 get the application running. In the tutorial below we will use several of the
 functions from @code{csInitializer}. This class contains only static member
 functions.

@@ -38,7 +38,7 @@ portability, these files and network related facilities will suffer
 endian-related problems.  Use the network functions @code{ntohl()},
 @code{ntohs()}, @code{htonl()}, and @code{htons()} to convert numbers to
 canonical format before transmitting them over the network.  You can also make
-use of the Crystal Space endian-related converion functions found in
+use of the Crystal Space endian-related conversion functions found in
 @file{CS/include/cssys/csendian.h}.
 
 @item
@@ -48,7 +48,7 @@ Some platforms require data values to be strictly aligned in memory.  For
 instance, some processors can not access a @samp{long} value at an odd memory
 address or at an address which is not a multiple of four (which is the size in
 bytes of the @samp{long} data type).  In such cases, the program may crash.
-Other processors may be able to access misaligned values, but at grealy
+Other processors may be able to access misaligned values, but at greatly
 reduced speed, which can slow down program execution significantly if done
 frequently enough.
 
@@ -152,9 +152,9 @@ the object's constructor at the time the library is loaded.  Therefore it is
 unsafe to rely on such objects.
 
 @item
-@emph{Avoid Initiailizing Global Variables via Functions in Plug-In Modules}
+@emph{Avoid Initializing Global Variables via Functions in Plug-In Modules}
 
-Avoid initiailizing global variables within a plug-in module via function
+Avoid initializing global variables within a plug-in module via function
 call.  In other words, in the following example, the function @code{foo()}
 should not rely upon the variable @samp{angle} as having been properly
 initialized, assuming that this code fragment appears in a plug-in module.
@@ -166,7 +166,7 @@ void foo() @{ printf("angle=%g\n", angle); @}
 
 Instead, you should arrange for such variables to be initialized manually by
 some other mechanism.  Here is one possible (though not ideal) way to ensure
-that @samp{angle} is initiailized before it is accessed.
+that @samp{angle} is initialized before it is accessed.
 
 @example
 static float angle = 0;

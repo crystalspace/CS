@@ -1,6 +1,6 @@
 @c -*-texinfo-*-
 
-@c Unforunately, TeX does not grok this macro in @cindex or @section, etc. :-(
+@c Unfortunately, TeX does not grok this macro in @cindex or @section, etc. :-(
 @macro NeXT{}
 @sc{n}e@sc{xt}
 @end macro
@@ -56,7 +56,7 @@ As a consequence of the high-level nature of this @sc{api} and certain
 restrictions upon pixel format, the pure AppKit-based 2D driver for Crystal
 Space may not be as fast as a driver written atop a lower-level facility.  With
 MacOS/X, however, drivers are available for OpenGL and CoreGraphics, both of
-which improve rendering speed.  This is especialy true of the OpenGL driver.
+which improve rendering speed.  This is especially true of the OpenGL driver.
 
 @menu
 * NeXT Directories:: Directories
@@ -220,7 +220,7 @@ contained in a configuration file (@file{CS/data/next.cfg}).
 
 @item next.cfg
 A configuration file which defines platform-specific settings such as the menu
-layout appopriate to a particular platform.  This file is actually located in
+layout appropriate to a particular platform.  This file is actually located in
 the @file{CS/data/config} directory which is typically mounted at the virtual
 location @file{/config/} (@pxref{VFS}).
 
@@ -319,7 +319,7 @@ bool csDefaultRunLoop(iObjectRegistry*)
 
 This code launches the AppKit's run-loop but does not address the problem of
 periodically processing Crystal Space's event queue.  To solve this problem
-@samp{NeXTDelegate} artifically injects @dfn{application-defined} events into
+@samp{NeXTDelegate} artificially injects @dfn{application-defined} events into
 the AppKit event queue and then triggers an invocation of
 @code{iEventQueue::Process()} for each such received event.  In particular, a
 single application-defined event is injected into the event queue in order to
@@ -481,7 +481,7 @@ This discussion does not pertain to the MacOS/X OpenGL or CoreGraphics drivers.
 
 With few exceptions, most MacOS/X, MacOS/X Server 1.0 (Rhapsody), OpenStep, and
 NextStep installations are configured for @dfn{true-color} rather than
-palettized color.  However, true-color is rather relative in the case of the
+palletized color.  However, true-color is rather relative in the case of the
 AppKit-based 2D graphics driver since the AppKit supports only a limited number
 of configurations for image data.  In particular, these are:
 
@@ -505,7 +505,7 @@ and adjusts appropriately to the underlying hardware.  The high-level AppKit
 to private and unsupported @sc{api}), and consequently can not make use of it.
 Furthermore, even in 8-bit color mode the application has neither access to,
 nor knowledge of the palette.  In this case the 8-bit number is simply an
-opaque color value from which no furthre interpretation can be made.
+opaque color value from which no further interpretation can be made.
 
 To further complicate matters, in order to achieve decent video performance,
 image data sent to the WindowServer needs to be specially formatted, as
@@ -529,7 +529,7 @@ conform to a certain value.  In this case the alpha bits need to be set to one.
 
 @item
 The rendering engine does not support the common AppKit display modes.  For
-instance, the software rendere has modes for only 8-bit, 15-bit, and 16-bit,
+instance, the software renderer has modes for only 8-bit, 15-bit, and 16-bit,
 but not the 12-bit @sc{rgb} data which is expected by the AppKit image classes.
 
 @item
@@ -601,7 +601,7 @@ suitable for the AppKit.  It also ensures that the alpha byte is set to
 
 The 2D driver is automatically configured to generate 15-bit @sc{rgb} image
 data when running on machines configured for 12-, 15-, or 16-bit @sc{rgba}
-display.  Conversion of Crsytal Space 15-bit @sc{rgb}:555 data to
+display.  Conversion of Crystal Space 15-bit @sc{rgb}:555 data to
 @sc{rgba}:4444 needed by the AppKit and WindowServer is encapsulated in the
 class @samp{NeXTFrameBuffer15}.  In order to avoid time-consuming bit
 manipulation of image data, this class generates a translation table which
@@ -733,7 +733,7 @@ symbolic debugging capability of plug-in modules is retained.
 For keyboard events, Crystal Space's event system expects the platform-specific
 driver to provide both the raw key code and the cooked character code.  For
 instance, for @kbd{@key{Alt}-p}, the raw key code is @kbd{p} and the cooked
-character code would be whatever that keytroke is mapped to in the current
+character code would be whatever that keystroke is mapped to in the current
 key-mapping (for instance, Greek
 @ifnottex
 `pi').

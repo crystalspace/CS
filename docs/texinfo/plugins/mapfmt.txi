@@ -98,7 +98,7 @@ possible to create additional map loaders as plug-in modules which understand
 world data stored in other formats, such as binary.  A map loading plug-in
 module could even load maps over the network from a map file server, or
 generate worlds randomly based upon some set of input properties.  There are
-many possiblities.
+many possibilities.
 
 The map file syntax described in this section, however, is that which is
 understood by the standard map file loader which accompanies Crystal Space.
@@ -662,7 +662,7 @@ final texture on the polygon will be 256x384.
 
 Using a @samp{TEXTURE} statement inside a @samp{POLYGON} or with a
 @samp{PLANE} statement you can obtain even more control over how the texture
-should be scaled accross the polygon.  This is most easily explained with an
+should be scaled across the polygon.  This is most easily explained with an
 example.  Say that you have a polygon like this:
 
 @example
@@ -687,8 +687,8 @@ POLYGON 'poly' (
 With @samp{ORIG}, @samp{FIRST}, and @samp{SECOND} you specify how the u/v
 coordinate system is located.  The origin of u/v is at @samp{ORIG}; the u-axis
 is at @samp{FIRST-ORIG}; and the v-axis is at @samp{SECOND-ORIG}.
-@samp{FIRST_LEN} and @samp{SECOND_LEN} are simlar to @samp{LEN} and
-@samp{TEXLEN} except that you can control the u and v scaling seperately here.
+@samp{FIRST_LEN} and @samp{SECOND_LEN} are similar to @samp{LEN} and
+@samp{TEXLEN} except that you can control the u and v scaling separately here.
 Note that @samp{ORIG}, @samp{FIRST}, and @samp{SECOND} need not coincide with
 vertices of the polygon.  They should just be on the same plane as the
 polygon.  That way you can also create slanted textures.
@@ -705,7 +705,7 @@ have textures that fit perfectly at the borders.  Crystal Space will also be
 able to do some optimizations on polygons that share the same plane (like
 backface culling an entire set of polygons in one operation).  Note that even
 if a @samp{PLANE} is only used by one polygon it does not hurt.  If you do not
-specify the @samp{PLANE}, Crystal Space will creat one anyway.
+specify the @samp{PLANE}, Crystal Space will create one anyway.
 
 Currently Crystal Space assumes that there is a sector called @samp{room}.  It
 will use that as a starting place, and will always start at location (0,0,0)
@@ -776,7 +776,7 @@ currently assumes that every polygon has a texture.
 
 The @samp{ROOM} and @samp{SIXFACE} interfaces are good for human editors but
 it not suited for computer generated output.  Ignore @samp{ROOM} and
-@samp{SIXFACE} if you want to write an editor or convertor and concentrate on
+@samp{SIXFACE} if you want to write an editor or converter and concentrate on
 @samp{SECTOR} and @samp{THING} instead.
 
 @unmacro nonterm

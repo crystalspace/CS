@@ -22,7 +22,7 @@ The alpha of the selection bar texture.
 
 @item Columns
 The number of columns in the list control.  For every column the following
-properties are present (@emph{X} denotes the current cloumn number):
+properties are present (@emph{X} denotes the current column number):
 @itemize
 @item ColumnXImg
 An image for the column header

@@ -315,7 +315,7 @@ Then our main routine creates an instance of our
 access to it easier. The next step is application initialization which
 is done in the @code{Initialize()} function.
 
-Note the usage of the @code{csReport()} function. This is a conveniance
+Note the usage of the @code{csReport()} function. This is a convenience
 function to send a message (usually an error or notification) to the
 reporter plugin. It works a lot like @code{printf} except that you
 additionally need to give the severity level and an identifier which can give
@@ -571,7 +571,7 @@ tutorial we are only going to use the 'thing' mesh object type. This mesh
 object type is very useful for walls of indoor type levels or buildings.
 
 Now we want create the six walls of our room. First we make our thing mesh
-object. Because this is a very common case there is a conveniance function
+object. Because this is a very common case there is a convenience function
 in the engine (called @code{CreateSectorWallsMesh()}) which will create a
 thing mesh and add it to the given sector. The only thing that has to be
 done after this is add polygons to that mesh. To do this we first query

@@ -31,13 +31,13 @@ how artists do things :-).
 @picturess{plugins,engine,cylinder}
 
 @end ifnotinfo
-This sprite has 96 triangles.  If we treat each triangle as a seperate
+This sprite has 96 triangles.  If we treat each triangle as a separate
 object, it has 288 vertices.  Every frame each of those 288 vertices has
 to be transformed from local coordinates to screen space coordinates.
 
 Each vertex is also consuming some memory.  If each vertex only has
 three 32 bit float coordinates, then the sprite uses 3456 bytes of memory,
-but in practise each vertex also has texture alignment, color, and
+but in practice each vertex also has texture alignment, color, and
 surface normal data, and if the sprite has precalculated animation, that
 data is multiplied by the number of frames.
 
@@ -100,21 +100,21 @@ coordinates (vertices), texture coordinates (texels) and vertex normals (for
 shading).  For example: our cylinder could have each triangle connected to
 any 3 of the 48 unique vertices and any 3 of the 98 texels, instead of the
 current system where the triangle has 3 indices used for both vertices and
-texels.  Unfortunately our approach proved ackward, slow and difficult to
+texels.  Unfortunately our approach proved awkward, slow and difficult to
 optimize.
 
 @node 3D Sprites Example 3, , 3D Sprites Example 2, 3D Sprites
 @subsubsection Shading
 
-Seperating the ends of the cylinder sprite for texturing
-(@pxref{3D Sprites Example 2}) has a fortunate side effect.  It seperates the
+Separating the ends of the cylinder sprite for texturing
+(@pxref{3D Sprites Example 2}) has a fortunate side effect.  It separates the
 surface normals of the vertices as well as the texture coordinates.
 
 Surface normals are used for shading the sprite.  Light colors each vertex
 based on the average normal of all of the triangles that share that vertex.
 When all of the vertices in our sprite are shared, all of the edges look
 smooth---even the edges between the sides and the ends of the cylinder.
-With the ends seperated, that edge is now sharply defined.
+With the ends separated, that edge is now sharply defined.
 
 @ifnotinfo
 @picturess{plugins,engine,unseamly}

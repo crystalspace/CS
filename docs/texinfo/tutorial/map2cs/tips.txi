@@ -8,7 +8,7 @@ Here are some general tips for creating maps to use with Crystal Space:
 @item
 Try to use only textures that have sizes that are a power of two: 128*64 would
 be okay for example, 192*32 is not good.  Crystal Space can handle any size of
-textures, but textures that are a power of two are most efficent.  Also try to
+textures, but textures that are a power of two are most efficient.  Also try to
 limit yourself to sizes below 256.  Textures larger than that can't be handled
 for example by @sc{3d/fx} cards.  Crystal Space will do its best to work
 around that problem, but it is pretty easy for you to avoid.
@@ -29,7 +29,7 @@ the details on some texture and apply that texture to a plain wall.
 
 @item
 When adding lights to your level be sure to make use of the entity "light"
-rather than "light_spot" and "light_enviroment". If you use the latter 2
+rather than "light_spot" and "light_environment". If you use the latter 2
 you will experience problems running your level under OpenGL rendering
 under Crystal Space.
 
@@ -48,5 +48,5 @@ such as mirrors and volumetric fog.
 If you know other tips, please email them to me at @email{thieber@@gmx.net}.
 
 I would also really like to receive some prefabs, so if you have created nice
-furniture or things to use in maps, that you want to donnate to the public,
+furniture or things to use in maps, that you want to donate to the public,
 please send them to me.

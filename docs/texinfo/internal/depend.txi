@@ -14,7 +14,7 @@ advertise pure, abstract interfaces which often imply much less dependency
 than actually linking with a library.
 
 @itemize @bullet
-@item Level 1: @emph{Utility---Independant of CS}
+@item Level 1: @emph{Utility---Independent of CS}
 
 @itemize @minus
 @item

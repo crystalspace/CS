@@ -4,7 +4,7 @@
 @cindex Walktest Keys
 @cindex Keyboard Control, Walktest
 
-To navigate through a map in the Watlktest application, use these keys:
+To navigate through a map in the Walktest application, use these keys:
 
 @table @kbd
 @item b
@@ -139,7 +139,7 @@ Increase FOV value.
 Decrease FOV value.
 
 @item @key{ALT}-f
-Toggle FPS dipslay.
+Toggle FPS display.
 
 @item @key{TAB}
 Toggle input console.  For a list of commands, @xref{Console}.

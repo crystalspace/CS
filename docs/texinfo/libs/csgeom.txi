@@ -70,7 +70,7 @@ operators.
 @item
 @emph{Quaternions}
 
-Encapsulation of quternion functionality.
+Encapsulation of quaternion functionality.
 
 @item
 @emph{Planes}
@@ -105,7 +105,7 @@ out perpendicular from the front face.
 There are different types of polygons concerning management of the vertices
 and how they can be used. First, there are the basic 2D and 3D polygons that
 store their vertices as 3D vectors. The clippers are similar to this but
-they are spcialized on clipping other polygons (you lay the clipper somewhere
+they are specialized on clipping other polygons (you lay the clipper somewhere
 on a polygon and cut everything away of the polygon that is outside the
 clipper, resulting in a new, smaller polygon). Then there is a 2D polygon
 that stores its sides as line segments, not its vertices as vectors.

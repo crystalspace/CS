@@ -10,7 +10,9 @@ some questions about Crystal Space, try consulting this list first.
 The first section contains practical questions and answers. The second
 section (see later) contains more technical questions.
 
-More FAQs can also be found online in the CS Wiki 
+More FAQs can also be found online in the Crystal Space Wiki:@*
+
+@noindent
 (@uref{http://crystal.sourceforge.net/phpwiki/index.php?FAQ}).
 
 @itemize @bullet
@@ -40,8 +42,8 @@ for the platform which you are using.  Some of the supported compilers are
 A compiled executable program such as @file{walktest} or @file{blocks}, for
 example.  These are demo programs included in the main source archive.
 
-Note that there exist two types of executables: staticly linked and
-dynamically linked.  If you have a staticly linked executable (for example,
+Note that there exist two types of executables: statically linked and
+dynamically linked.  If you have a statically linked executable (for example,
 the @sc{dos} executable will always be static) then you don't need any of the
 following drivers.  Otherwise you will need the remaining items.
 
@@ -53,7 +55,7 @@ correct library for your system.  On OS/2 and Windows (32 bit) this will be a
 
 @item
 A 2D graphics driver which is particular to your platform.  The 3D rasterizer
-displays its rendered images thorugh the 2D graphics driver.
+displays its rendered images through the 2D graphics driver.
 
 @item
 A network driver, such as the @sc{bsd}-style Sockets driver.  Use this if
@@ -93,7 +95,7 @@ display and will not work with other displays modes.  Note, however, that the
 MacOS/X Server, OpenStep, and NextStep ports of Crystal Space are not subject
 to this limitation.
 
-@strong{A3}: If you are using a dynamicly linked executable then the required
+@strong{A3}: If you are using a dynamically linked executable then the required
 plug-in modules, such as 3D renderer, 2D driver, etc.  usually must reside in
 the same directory.  On BeOS, the plug-in modules must be located in an
 @file{add-ons} subdirectory.  Most ports of Crystal Space use plug-in modules,
@@ -191,7 +193,7 @@ formats, such as @sc{png}, @sc{tga}, @sc{bmp}, @sc{jpg}, and @sc{gif}.
 
 @strong{A4}: Unless a texture is not meant for tiling you should make sure
 that it can be tiled.  This means that if you put a number of textures next to
-each other or above each other the boundaries should seemlessly integrate with
+each other or above each other the boundaries should seamlessly integrate with
 each other.  Of course, it is entirely possible to create textures that are
 specifically drawn for untiled usage.  An example would be a texture
 representing a computer keyboard.
@@ -227,7 +229,7 @@ queries to the Crystal Space mailing list, @ref{Mailing Lists}.
 @strong{Q}: I want to write a game with Crystal Space.  Can I do this?
 
 @strong{A1}: The ultimate purpose of Crystal Space is that it will become a
-useable and powerful engine for writing games and other graphics visualization
+usable and powerful engine for writing games and other graphics visualization
 programs.  As a project which is still under development, it may be simple or
 difficult to build your particular game, depending upon your specific
 requirements.  One way to improve the state of Crystal Space so that it better
@@ -367,14 +369,14 @@ On the pointer returned by the following macros:
 @code{CS_QUERY_PLUGIN_CLASS()}
 @end itemize
 @item
-On a pointer on which you explicitely did @code{IncRef()}.
+On a pointer on which you explicitly did @code{IncRef()}.
 @item
 On an object that you allocated yourselves (which inherits
 from @code{iBase} or another @sc{scf} interface).
 @end itemize
 
 You should do @code{DecRef()} when you no longer need the pointer.
-In some cases you can do it immediatelly after using the pointer like
+In some cases you can do it immediately after using the pointer like
 in this example:
 @example
 iThingState* st =

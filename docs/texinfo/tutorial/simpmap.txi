@@ -370,7 +370,7 @@ The call to @code{iLoader::LoadMapFile()} will take the given filename
 directory. Then it will parse that file and create the geometry which
 is specified there.
 
-If this is succesful then you must call @code{iEngine::Prepare()} to
+If this is successful then you must call @code{iEngine::Prepare()} to
 make sure that all lightmaps are correctly loaded from the cache
 and other necessary setup work is done (i.e. textures are registered
 and so on).

@@ -49,7 +49,7 @@ adding an underscore and an additional letter to specify the side.  So for
 example, if your basename is ``night'', it will use ``night_f'' for the front
 side, ``night_r'' for the right, ``night_b'' for back, ``night_l'' for left,
 ``night_u'' for the upper side and ``night_d'' for the down side.  It is ideal
-to use Terragen to create the respecive textures.  There is also a tutorial
+to use Terragen to create the respective textures.  There is also a tutorial
 explaining how to do this with Terragen, @ref{map2cs Tutorial Skybox}.  This
 key is only available in the @samp{worldspawn} entity.  (Available in Quake
 editors as ``general map properties'' or in the @samp{worldspawn} properties.)

@@ -114,7 +114,7 @@ Defines how to apply normal smoothing on the sprite.
 Set to true if you want to enable frame tweening.  Default is false.
 @end table
 
-A skeleton is a hierarchial structure which is defined as follows:
+A skeleton is a hierarchical structure which is defined as follows:
 
 @table @code
 @item LIMB(@dots{})

@@ -74,7 +74,7 @@ Typed vectors are the type-safe equivalent to the @code{csVector} class. They
 work similar to templates, but use @code{#define}'s instead. Using one of
 these macros, you can create a vector class for a specific type of objects.
 There are several different macros which produce slightly different
-behaviour:
+behavior:
 
 @table @code
 @item CS_DECLARE_TYPED_VECTOR

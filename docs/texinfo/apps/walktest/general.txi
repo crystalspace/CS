@@ -45,7 +45,7 @@ found hilighting is disabled. This command is useful for debugging.
 @item exec
 Start a script containing console commands. Every line in this script is
 performed one line at a time at every new frame. The console automatically
-closes after executing a succesful @samp{exec} command.
+closes after executing a successful @samp{exec} command.
 
 @item coordset
 Set the coordinate of the camera to the given sector and location. Example:
@@ -148,7 +148,7 @@ current sector. Otherwise you can set the fog level for this sector. Syntax
 is @samp{s_fog r,g,b,density}.
 
 @item turn
-Turn arround (so that the camera looks the other way). This command only
+Turn around (so that the camera looks the other way). This command only
 works if @samp{move3d} is enabled.
 
 @item jump
@@ -248,7 +248,7 @@ depth of 1 will create a root and one layer above. The second argument is
 the width. This is the number of branches created at every depth. A good
 tree is @samp{addskel 3,3}. Be careful with large numbers here. The number
 of triangles grows @emph{very} fast! If the width parameter is negative the
-choosen width will be random between 1 and @samp{-width} (inclusive).
+chosen width will be random between 1 and @samp{-width} (inclusive).
 
 @item addghost @var{depth},@var{width}
 Add a floating transparent green ghost. The first argument is the depth. A

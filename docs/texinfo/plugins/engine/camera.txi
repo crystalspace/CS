@@ -171,7 +171,7 @@ space--to (@math{0,0,d}) with @math{d} the distance that you want it to move.
 This is because we defined camera space so that @math{Z} is in front of you.
 
 But we want to know the position of the camera in world space.  In fact, what
-we want to do is to transfrom the camera space position (@math{0,0,d}) to
+we want to do is to transform the camera space position (@math{0,0,d}) to
 world space.  This would then be the new position for the camera.
 
 So we need the inverse transformation.  To calculate the inverse
@@ -403,5 +403,5 @@ $$\pmatrix{
 }$$
 @end tex
 
-With these formulae you should be able to do any movement of the camera that
+With these formulas you should be able to do any movement of the camera that
 you want, including rotating the camera around the direction it is looking.

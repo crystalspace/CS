@@ -18,7 +18,7 @@ upon which higher-level application functionality is built, but the actual
 mechanism by which drivers interact with the application is identical to
 that which is used by all other plug-in modules.
 
-The mechansim by which communication is carried out with plug-in modules and
+The mechanism by which communication is carried out with plug-in modules and
 drivers is known as @sc{scf} (@pxref{SCF}), but plug-ins are actually more than
 that because they work together with the system driver.  You can find all
 information you need in the introduction to the simple tutorial

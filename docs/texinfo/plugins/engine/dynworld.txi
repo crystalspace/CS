@@ -16,7 +16,7 @@ cases you can do a lot.  Following is a summary of these cases.
 First a small definition.  The @dfn{sector-lights} is the list of lights that
 affect some sector.  Every sector will have a sector-lights list containing
 not only the lights in that sector but every light that shines through the
-sector.  It will contain dynamic, psuedo-dynamic and static lights.
+sector.  It will contain dynamic, pseudo-dynamic and static lights.
 
 Another small note about lighting.  Crystal Space currently has static lights,
 pseudo-dynamic lights and dynamic lights.  The pseudo-dynamic lights are an
@@ -59,9 +59,9 @@ Thing has casted shadows or not so that we can remove them.
 @item
 Moving a Thing
 
-This basicly boils down to first destroying it and then recreating it at
+This basically boils down to first destroying it and then recreating it at
 another position.  There is an optimization possible.  If we know that a Thing
-is ment to move from one position to another without interruption then we can
+is meant to move from one position to another without interruption then we can
 calculate the lightmaps as they will become finally (at the last position) and
 just linearly interpolate the lightmaps in between.
 

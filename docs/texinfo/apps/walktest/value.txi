@@ -27,7 +27,7 @@ The following value commands are available:
 @item db_maxpol
 Set/get the maximum number of polygons that is drawn every frame. Normally
 this is set to a very high number so that this maximum is never reached
-(2000000000 polygons every frame should suit everones need for the near
+(2000000000 polygons every frame should suit everyone's need for the near
 future :-)  You can reduce this number for debugging purposes. In
 combination with @samp{fclear} and binding keys to @samp{db_maxpol ++1} and
 @samp{db_maxpol --1} you can get the effect of drawing one polygon at a time.
@@ -36,7 +36,7 @@ combination with @samp{fclear} and binding keys to @samp{db_maxpol ++1} and
 Set/get the maximum number of polygons that is considered by the culling
 routines every frame. Normally this is set to a very high number so that
 this maximum is never reached (2000000000 polygons every frame should suit
-everones need for the near future :-)  You can reduce this number for
+everyone's need for the near future :-)  You can reduce this number for
 debugging purposes.
 
 @item db_octree

@@ -122,14 +122,14 @@ used for backface culling; a polygon has only one visible side.
 Polygons are drawn with a texture.  How the texture is mapped on the polygon
 depends on a transformation matrix.  This is general enough so that you can
 translate, rotate, scale, and mirror the texture in every possible direction.
-The texture is tiled accross the polygon surface.
+The texture is tiled across the polygon surface.
 
 In a pre-computing stage three light-maps are created for every polygon (this
 is explained in more detail later).  Lighting is sampled in a grid which is 16
 by 16 texture pixels (or @dfn{texels}) in size, by default.  Bilinear
 interpolation is used by the texture caching machinery to make this lighting
 appear smooth.  The end result of this is a non-tiled lighted texture that is
-mapped accross the polygon surface.
+mapped across the polygon surface.
 
 A polygon can also be a Portal (see below).  Normally a portal polygon is not
 texture mapped unless the texture is semi-transparent.
@@ -141,7 +141,7 @@ A Portal is a special kind of polygon.
 
 Instead of texture mapping a portal polygon, the renderer will recursively
 draw the sector that this portal points to.  After this, if the texture is
-semi-transparent, the texture will be mapped over the already rendererd
+semi-transparent, the texture will be mapped over the already rendered
 sector.
 
 Portals can also transform space.  This feature can be used to implement

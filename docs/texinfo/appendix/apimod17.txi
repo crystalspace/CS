@@ -168,7 +168,7 @@ collide_system->ResetCollisionPairs();
 collide_system->SetOneHitOnly(@var{true}/@var{false});
 @end example
 
-The argument for the second function depends on wether or not you
+The argument for the second function depends on whether or not you
 are interested in receiving more than one hit.
 
 Note that @code{ResetCollisionPairs()} is important. Every call
@@ -315,7 +315,7 @@ sprite->SetTransform(csMatrix3());
 @end example
 
 @noindent
-It will need to be tranformed to:
+It will need to be transformed to:
 
 @example
 csSprite3D* sprite = new csSprite3D(world);

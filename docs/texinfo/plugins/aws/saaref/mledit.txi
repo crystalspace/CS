@@ -167,7 +167,7 @@ None.
 @anchor{mledReplaceRow}
 @table @code
 @item @strong{ReplaceRow}
-Replaces the text of a specied row.
+Replaces the text of a specified row.
 @end table
 
 @subsubheading Input Parameters

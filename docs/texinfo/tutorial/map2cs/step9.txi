@@ -40,7 +40,7 @@ pretty easily.
 
 Just select all furniture and do a ``To Entity''.  (@file{map2cs} will only 
 use regular world brushes to texture the sector walls, so the table and the 
-other furniture are ``invisble'' to the algorithm that textures the walls.  
+other furniture are ``invisible'' to the algorithm that textures the walls.  
 @ifnotinfo
 
 The much better result can be seen here:

@@ -32,7 +32,7 @@ can download it using the following link.
 
 Firstly goto the location where you downloaded the Cygwin @emph{setup.exe}. I would
 suggest it be in a directory of it's own as during download it will drop the
-distrubtions files in the same location.
+distributions files in the same location.
 
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot1}
@@ -41,7 +41,7 @@ distrubtions files in the same location.
 Click/Double Click on @emph{setup.exe} icon as shown in the screenshot above to begin
 the installation process.
 
-You will be first be propmted with a Cygwin welcome dialog, which can be seen in the
+You will first be prompted with a Cygwin welcome dialog, which can be seen in the
 screenshot below. It tells you basic information e.g. what it is and what version of
 @emph{setup.exe} it is.
 
@@ -74,11 +74,11 @@ be installed on your system. We would suggest creating a directory called @emph{
 at the location of your choice and pointing the installer to that directory.
 
 The next thing to decide if you are a system administrator, is do you want any others with
-system access to have acces to Cygwin. Also you are asked if you wish to use normal DOS text
+system access to have access to Cygwin. Also you are asked if you wish to use normal DOS text
 file formatting or Unix. The difference is the CR/LF (Carriage Return/Line Feed) used in text
 files. This is all a matter of preference for the user. If you are a pure Windows users I
 would use the @emph{DOS} option. However, if you maybe moving the files you use to a Linux
-machine for instance it can be favourable to use the @emph{Unix} option. We leave it you.
+machine for instance it can be favorable to use the @emph{Unix} option. We leave it you.
 
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot4}
@@ -117,7 +117,7 @@ download from.
 @picturessss{build,platform,win32,cygwin,cygshot7}
 @end ifnotinfo
 
-After choosing your closest dowload location, click on the @emph{Next} button
+After choosing your closest download location, click on the @emph{Next} button
 to continue.
 
 The next dialog you will see is the @emph{Select Packages To Install} dialog - See
@@ -160,7 +160,7 @@ complete. Click on the @emph{Ok} button to finish the install process.
 @subsubheading Installing DirectX 8 SDK for Cygwin
 
 The Microsoft DirectX 8 SDK which the Cygwin port uses is one created especially for it. You can
-dowload it via the following link.
+download it via the following link.
 
 @uref{ftp://sunsite.dk/projects/crystal/support/cygwin/DXforCygwin.zip}
 

@@ -16,7 +16,7 @@ section.
 
 Secondly, I am also presuming that you have loaded your sprite into the engine,
 and have access to that sprite via the @samp{iEngine} interface.  That implies
-that you have written a basic Crystal Space applcation (or are hacking up an
+that you have written a basic Crystal Space application (or are hacking up an
 existing application), and can access your sprite mesh factory using calls
 similar to the following:
 
@@ -119,12 +119,12 @@ Current version: 0.0.2
 @table @code
 @item void AddVertices(int number)
 Adds @samp{number} vertices to @strong{all} frames
-in this sprite factory. The all is emphasised so that you are aware
+in this sprite factory. The all is emphasized so that you are aware
 that the actual number of vertices created is @samp{number} multiplied
 by the number of frames. This is done to satisfy the requirement that
 all frames must be of an equal size.
 @item iSpriteFrame* AddFrame()
-Creates a new frame on the spirte frame list and
+Creates a new frame on the sprite frame list and
 returns a pointer to the newly created frame. The loader uses
 this method to load frames into a sprite. For each new frame
 added, an additional bank of vertices and texels is created for
@@ -179,7 +179,7 @@ successful or not.
 @item iSpriteAction* GetCurAction() const
 Returns a pointer to the current action applied to this sprite.
 @item EnableTweening(bool flag)
-Description: Enables or disables tweeing on this sprite according
+Description: Enables or disables tweening on this sprite according
 to @samp{flag}.
 @item bool IsTweeningEnabled() const
 Returns a flag indicating if tweening is enabled for this sprite.

@@ -3,7 +3,7 @@
 @subsection Simple Map Example
 @cindex @code{iImage}
 
-This howto shows you the a very simple map you can make by using a world file
+This @sc{howto} shows you a very simple map you can make by using a world file
 and explains a few of the concepts in it.
 
 Here is the map:

@@ -975,6 +975,6 @@ is typically a buffer you render to in the same way as you would render to the
 main screen. Good procedural texture implementations gives you full blown 3d
 capable facilities to render to the texture. Fortunately Crystal Space has this :)
 Typical uses for procedural textures is when the content of the texture responds
-uniquely to user input or behaviour. A good example is having a computer terminal
+uniquely to user input or behavior. A good example is having a computer terminal
 within the virtual world which the user can type on and can see what they type
 come up on the virtual screen.

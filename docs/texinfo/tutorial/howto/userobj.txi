@@ -15,7 +15,7 @@ Almost all objects in the Crystal Space engine implement the
 objects to them. This can be very useful to attach game specific
 data to Crystal Space objects. For example, you may want to attach
 the state of an actor to the mesh object representing that actor (like
-current amount of amunition, health, @dots{}).
+current amount of ammunition, health, @dots{}).
 
 @subsubheading Defining Game Data
 
@@ -63,7 +63,7 @@ mydata->DecRef ();
 @end example
 
 @code{mesh->QueryObject()} is interesting. Many Crystal Space objects
-that implement @code{iObject} have a conveniance function called
+that implement @code{iObject} have a convenience function called
 @code{QueryObject()} which will return a reference to the @code{iObject}
 implementation. This code is equivalent to:
 
@@ -72,7 +72,7 @@ iObject* obj = SCF_QUERY_INTERFACE (mesh, iObject);
 @end example
 
 with the important difference that @code{QueryObject()} does not increment
-the reference count. If an object doesn't have this conveniance function you
+the reference count. If an object doesn't have this convenience function you
 must use @code{SCF_QUERY_INTERFACE} instead.
 
 @subsubheading Finding Game Data

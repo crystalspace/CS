@@ -6,7 +6,7 @@
 @file{map2cs.cfg}, located within the 'D:\Crystal\CS\data\config\' directory.
 If you need support for multiple configurations, you can use several
 configuration files, but for now we will restrict ourselves to just one file.
-Open up @file{map2cs.cfg} in you favourite editor and edit it, so it looks like
+Open up @file{map2cs.cfg} in you favorite editor and edit it, so it looks like
 the following template:
 
 @example

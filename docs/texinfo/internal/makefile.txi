@@ -22,7 +22,7 @@ this tool; however as of today @sc{gnu} @samp{make} is available for almost
 every platform, so this is not a too big of a price for the goods it brings.
 
 This document is not intended as a @sc{gnu} @samp{make} manual; refer to
-appropiate documents if you do not understand something.  The following text
+appropriate documents if you do not understand something.  The following text
 supposes you are familiar with @sc{gnu} @samp{make} extensions; with at least
 basic features if not with all.
 
@@ -68,7 +68,7 @@ X11_PATH = /usr/X11R6
 @end example
 
 As you can see, the first statement defines the @samp{TARGET} platform and the
-second defines the system-dependend submakefile.  The @samp{MODE} variable
+second defines the system-dependent submakefile.  The @samp{MODE} variable
 defines the default build mode (debug, profile or optimize).
 @samp{USE_PLUGINS} tells whenever we will or will not use dynamic-linked
 libraries.  (On platforms that do not support dynamic linking, system-dependent
@@ -105,7 +105,7 @@ effectively @samp{include mk/subs.mak} turns into:
 @end example
 
 In @code{$(TARGET_MAKEFILE)} we check the @samp{MAKESECTION} variable, and
-execute appropiate makefile statements.  In our case:
+execute appropriate makefile statements.  In our case:
 
 @example
 ifeq ($(MAKESECTION),rootdefines)
@@ -124,7 +124,7 @@ For building something the root makefile runs a submakefile called
 as a separate make process using @samp{$(MAKE) mk/cs.mak @var{args}} command.
 This means that all definitions made for root makefile are ignored in
 @file{cs.mak}, so @file{cs.mak} needs again to include @file{mk/subs.mak} in
-appropiate places with appropiate values for @samp{MAKESECTION}.  For example,
+appropriate places with appropriate values for @samp{MAKESECTION}.  For example,
 to build csutil library, root makefile executes the following command:
 
 @example
@@ -239,7 +239,7 @@ Flags used in debug mode.
 @item CFLAGS.profile
 Flags used in profile mode.
 @item CFLAGS.DLL
-Flags used when compiling object files for dynamicaly-linked libraries (i.e.
+Flags used when compiling object files for dynamically-linked libraries (i.e.
 @code{-fpic}).
 @end table
 
@@ -248,7 +248,7 @@ compiler.  For example the path to some system-dependent include files or
 libraries, or how to define a macro, and so on.  The @sc{gnu} C++ compiler,
 for example, uses the @code{-I@var{path}} form to define a include path; the
 Watcom-C compiler, on other hand, uses the @code{-i=@var{path}} form.  To
-accomodate this, there are a number of variables that contain the equivalent
+accommodate this, there are a number of variables that contain the equivalent
 of required switches for currently selected compiler.  They are summarized
 below.
 
@@ -327,8 +327,8 @@ Another issue is that several types of files use different extensions on
 different platforms.  For example, executable files on Unix typically have no
 extension, whereas on @sc{dos}, @sc{os}/2 and Windows they typically have an
 @file{.exe} extension.  As another example, object files have an @file{.o}
-extension on Unix and an @file{.obj} extension on Windows.  To accomodate
-these differences, several variables are used where appropiate, as summarized
+extension on Unix and an @file{.obj} extension on Windows.  To accommodate
+these differences, several variables are used where appropriate, as summarized
 below.
 
 @table @code

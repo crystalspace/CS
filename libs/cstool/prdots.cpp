@@ -26,7 +26,7 @@
 
 #include "cstool/prdots.h"
 
-/// the implementation of the plasma texture
+/// the implementation of the dots texture
 csProcDots::csProcDots () : csProcTexture()
 {
   palsize = 0;

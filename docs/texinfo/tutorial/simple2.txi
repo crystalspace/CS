@@ -224,7 +224,7 @@ sector. By default there are four render priorities: @samp{sky}, @samp{wall},
 @samp{object}, and @samp{alpha}. Every object can be put in a render
 priority queue. Objects in prior render priorities will be rendered before
 objects in later render priorities. In addition some render priority queues
-sort objects internally based on some other criterium. For example, the
+sort objects internally based on some other criteria. For example, the
 @samp{alpha} render priority will render all objects in that queue
 from back to front. You can create your own additional render queues if
 you want. The default render priority is @samp{object} which you can

@@ -33,7 +33,7 @@ Before you attempt to compile Crystal Space, you must download
 and install the ``msvc_libs'' archive.  This archive contains all
 third party header, pre-built library and dll files used by Crystal
 Space, i.e. @file{zlib.dll}, @file{libjpeg.dll}, @file{png.dll}, etc.
-The latest version of thie archive can be downloaded from:
+The latest version of this archive can be downloaded from:
 
 @noindent
 @ifnottex
@@ -99,15 +99,15 @@ Crystal Space contains support for a Simple Direct Media Layer 2D canvas which
 can be used as an alternative to the default Direct Draw canvas for use with
 the Crystal Space software 3D renderer.  To compile the SDL2D canvas you must
 have the supported 1.2.3 development runtime for your version of @sc{msvc} be
-it 5 or 6.  Please remeber to add the @file{include} and @file{lib} directories
+it 5 or 6.  Please remember to add the @file{include} and @file{lib} directories
 to the global @sc{msvc} options, so @sc{msvc} can see them.
 
 @uref{http://www.libsdl.org}
 
 Also remember to copy the @file{sdl.dll} into the @file{CS\} root directory
-or at it to your systems path before using the SDL2D canvas.
+or add it to your systems path before using the SDL2D canvas.
 
-For instructon on using a specific canvas including
+For instructions on using a specific canvas including
 the @sc{sdl2d} canvas @ref{Common Command Line Options}
 
 @subsubheading Python
@@ -168,7 +168,7 @@ For Visual C++ 6:
 @end iftex
 
 Install this package to a location of your choice on your system. During the install
-process, it will detect MSVC and install itself in the appropraiate directories and
+process, it will detect MSVC and install itself in the appropriate directories and
 the executables in the system path. We suggest you agree to it's automatic detections. 
 
 @subsubheading Setting up and building the AWS plugin
@@ -198,12 +198,12 @@ with your modifications included.
 
 @subsubheading Creative EAX 2.0
 
-In order to build the CS EAX 2.0 enviromental audio plugin (@emph{plgsndrdreax}), requires
+In order to build the CS EAX 2.0 environmental audio plugin (@emph{plgsndrdreax}), requires
 you have the EAX 2.0 SDK on your system. The SDK can be obtained from the following website.
 
 @uref{http://developer.creative.com/LEFTMENU/DC_LM_Downloads.asp}
 
-After installtion you will need to point MSVC to the SDK's include and lib paths.
+After installation you will need to point MSVC to the SDK's include and lib paths.
 
 @subsubheading Compiling Crystal Space
 
@@ -218,7 +218,7 @@ Load @file{CS\mk\visualc\csall.dsw}.
 Remove all projects you don't want to compile.  To do this, right-click on the
 project in the list and select @emph{Unload Project}.  Examples of projects
 which you don't want to compile might include @samp{plgopengl} if you do not
-have the OpenGL @sc{sdk} insatalled, or @samp{plgcspython} if you do not have
+have the OpenGL @sc{sdk} installed, or @samp{plgcspython} if you do not have
 the Python @sc{sdk} installed.
 
 @item
@@ -226,7 +226,7 @@ Make @samp{grpall} your active project.  This is done by right clicking on it
 and then clicking on @emph{Set as Active Project}.
 
 @item
-From the file menu selct @emph{Build->Rebuild All} or alernatively hit your
+From the file menu select @emph{Build->Rebuild All} or alternatively hit your
 @kbd{@key{F7}} key.
 
 @item
@@ -405,7 +405,7 @@ A. Build only the projects you will need. You must build all the Crystal Space
 libraries, however those you may not need can be unloaded (Right click on the
 project you wish unload from the build process and click on Unload). @emph{Be
 very careful when unloading projects as some of Crystal Spaces projects e.g. some
-plugins are dependant on others}.
+plugins are dependent on others}.
 
 @item
 Q. @emph{How can I reduce build sizes?}
@@ -500,7 +500,7 @@ In the above example the software renderer is missing.
 If you are certain that everything is compiled, make sure your working
 directory is set to @file{CS\}.  To do this go to the @emph{Project} menu.
 Select @emph{Settings} and go to the @emph{Debug} tab.  Change the debug
-executate to @file{X:\CS\appname} where @file{X:} is the drive letter where the
+executable to @file{X:\CS\appname} where @file{X:} is the drive letter where the
 Crystal Space project is installed.  Next set the working directory to
 @file{X:\CS}.  Click @sc{ok} and you should be all set.
 
@@ -513,7 +513,7 @@ have the @file{zlib.dll} installed, the @sc{vfs} plugin is dependent upon it.
 @itemize @bullet
 @item
 Q. @emph{My last update did compile, but now I got a new version from the
-@sc{cvs} repository and everthing seems to be broken.}
+@sc{cvs} repository and everything seems to be broken.}
 
 A. When working with Crystal Space, always keep in mind, that this is a
 multiplatform project.  So sometimes not all features will work correct on all

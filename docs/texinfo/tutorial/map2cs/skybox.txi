@@ -19,7 +19,7 @@ I will only explain, how to export the map file to Crystal Space.
 
 @subsubheading Exporting to Crystal Space
 
-When you are done creating your world peform the following steps:
+When you are done creating your world perform the following steps:
 
 @noindent
 Open the ``Rendering Controls'' panel.
@@ -32,7 +32,7 @@ Disable the ``Fixed Height Above Surface'' switch.
 @item
 Set ``Detail'' to @emph{Maximum}.
 @item
-In the ``Camera Settings'' dialog set ``Zoom Maginfication'' to ``1''.
+In the ``Camera Settings'' dialog set ``Zoom Magnification'' to ``1''.
 @item
 Set ``Image Size'' to 512x512 or 256x256.
 @end enumerate

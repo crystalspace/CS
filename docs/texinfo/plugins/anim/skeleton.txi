@@ -14,23 +14,23 @@ and data structures that allow you to control your sprite on a limb by limb
 basis.  Additionally, the @samp{skel3d} module also transparently updates and
 applies the animation transforms on the skeleton of the sprite for you.  To
 accomplish this feat of wizardry, the skeleton employs a number of embedded
-interfaces that permit the rapid updating of skeletal intformation.  However,
-before we can beging, first we must define a skeleton for our sprite.
+interfaces that permit the rapid updating of skeletal information.  However,
+before we can begin, first we must define a skeleton for our sprite.
 
 @subsubheading Sprite Skeleton
 
-The sprite skeleton is a farily simple structure. The most notable difference
+The sprite skeleton is a fairly simple structure. The most notable difference
 from a frame is the addition of connections with embedded transforms that
 permit the attached bones to be translated and transformed about the
 connection point. Each limb of the skeleton has a number of attached vertices
 which are transformed under the influence of the connection transform. The
-declaration for an articulated sprite is very simmilar to a frame animated
+declaration for an articulated sprite is very similar to a frame animated
 sprite, with the notable exception that an articulated sprite usually
-conatins one frame. You can use multiple frames if you want, I dont belive
+contains one frame. You can use multiple frames if you want, I don't believe
 there is a restriction at all, however, generally, a single frame is
 sufficient. We will start with an identical sprite to our previous example,
 then add an appendage to it. The appendage will be the same in shape, but
-intverted and touching the lower appendage by a single point. We will then
+inverted and touching the lower appendage by a single point. We will then
 add an animation to make the top pyramid wobble backward and forward.
 
 @example

@@ -167,7 +167,7 @@ finally light the polygon and it has to be able to correctly interpolate at
 the boundaries of the polygon as well.
 
 @item
-If the polygon that is hit is a portal then recurively continue with the
+If the polygon that is hit is a portal then recursively continue with the
 following sector.  If the recursive calls returns a hit then we have a hit.
 
 @item

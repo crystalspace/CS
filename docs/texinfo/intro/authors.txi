@@ -188,7 +188,8 @@ He also maintains the instructions for building Crystal Space on Windows.
 Andreas Busch (@email{nobita@@t-online.de})
 
 Andreas wrote documentation explaining how to build Crystal Space with
-KDevelop.
+KDevelop.  He also made a very thorough proof-reeading pass through the entire
+user manual and spotted and corrected a large number of typographical problems.
 @end itemize
 
 If we have forgotten anyone or missed a contribution, we sincerely apologize.

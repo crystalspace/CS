@@ -18,7 +18,7 @@ font server allows fonts to be created on the fly from fonts
 
 This HOWTO document does not address using the freetype2 server with
 the assumption that most programs will not want to depend
-on the font existing on all the potential targetted platforms.
+on the font existing on all the potential targeted platforms.
 
 @subsubheading Standard Fonts
 
@@ -85,9 +85,9 @@ This program can be downloaded at:
 @noindent
 @uref{http://ohrthguy.freeshell.org/tools/csfontutil.htm}
 
-Once the @sc{csf} file is created it is can be included
+Once the @sc{csf} file is created it can be included
 in the application no matter what platforms are 
-targetted.  The base font does not have to be on
+targeted.  The base font does not have to be on
 that system.
 
 @subsubheading Using Anti-Aliased Fonts
