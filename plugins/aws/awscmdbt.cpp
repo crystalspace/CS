@@ -14,6 +14,8 @@ const int awsCmdButton::fsNormal =0x0;
 const int awsCmdButton::fsToolbar=0x1;
 const int awsCmdButton::fsBitmap =0x2;
 
+const int awsCmdButton::signalClicked=0x1;
+
 awsCmdButton::awsCmdButton():is_down(false), mouse_is_over(false), 
                              frame_style(0), alpha_level(92),
                              caption(NULL)
@@ -271,9 +273,11 @@ SCF_IMPLEMENT_IBASE_END
 awsCmdButtonFactory::awsCmdButtonFactory(iAws *wmgr):awsComponentFactory(wmgr)
 {
   Register("Command Button");
-  RegisterConstant("bfsNormal",  0x0);
-  RegisterConstant("bfsToolbar", 0x1);
-  RegisterConstant("bfsBitmap",  0x2);
+  RegisterConstant("bfsNormal",  awsCmdButton::fsNormal);
+  RegisterConstant("bfsToolbar", awsCmdButton::fsToolbar);
+  RegisterConstant("bfsBitmap",  awsCmdButton::fsBitmap);
+
+  RegisterConstant("signalCmdButtonClicked",  awsCmdButton::signalClicked);
 }
 
 awsCmdButtonFactory::~awsCmdButtonFactory()

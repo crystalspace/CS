@@ -152,7 +152,7 @@ public:
 
     /// Get a pointer to the sink manager
     virtual iAwsSinkManager *GetSinkMgr();
-
+    
     /// Set the preference manager used by the window system
     virtual void       SetPrefMgr(iAwsPrefManager *pmgr);
 

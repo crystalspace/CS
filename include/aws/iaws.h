@@ -209,7 +209,9 @@ struct iAwsSinkManager : public iBase
 
   /// Finds a sink by name for connection.
   virtual iAwsSink* FindSink(char *name)=0;
-  
+
+  /// Create a new embeddable sink, with parm as the void * passed into the triggers.
+  virtual iAwsSink *CreateSink(void *parm)=0;
 };
 
 SCF_VERSION (iAwsSink, 0, 0, 1);
@@ -223,7 +225,7 @@ struct iAwsSink : public iBase
   virtual void HandleTrigger(int trigger_id, iAwsSource *source)=0;
 
   /// A sink should call this to register trigger events
-  virtual void RegisterTrigger(char *name, void (*Trigger)(iAwsSink *, iAwsSource *))=0;
+  virtual void RegisterTrigger(char *name, void (*Trigger)(void *, iAwsSource *))=0;
 };
 
 

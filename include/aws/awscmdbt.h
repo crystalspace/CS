@@ -56,6 +56,11 @@ public:
 
    /// A button entirely drawn from bitmap images.  Must specify normal, focused and clicked.
    static const int fsBitmap;
+
+   /******* Signals **********************/
+
+   /// An up and down motion for the button
+   static const int signalClicked;
         
     
 public:

@@ -58,6 +58,9 @@ public:
   /// Finds a sink by name for connection.
   virtual iAwsSink* FindSink(char *name);
 
+   /// Create a new embeddable sink, with parm as the void * passed into the triggers.
+  virtual iAwsSink *CreateSink(void *parm);
+
 
 public:
   // Implement iComponent interface.
@@ -74,18 +77,21 @@ class awsSink : public iAwsSink
   struct TriggerMap
   {
     unsigned long name;
-    void (*trigger)(iAwsSink *, iAwsSource *);
+    void (*trigger)(void *, iAwsSource *);
 
-    TriggerMap(unsigned long n, void (*t)(iAwsSink *, iAwsSource *)):name(n), trigger(t) {};
+    TriggerMap(unsigned long n, void (*t)(void *, iAwsSource *)):name(n), trigger(t) {};
   };
     
   /// List of triggers registered.
   csBasicVector triggers;
 
+  /// Parameter to pass to triggers
+  void *parm;
+
 public:
   SCF_DECLARE_IBASE;
 
-  awsSink();
+  awsSink(void *p);
   virtual ~awsSink();
 
   /// Maps a trigger name to a trigger id
@@ -95,7 +101,7 @@ public:
   virtual void HandleTrigger(int trigger, iAwsSource *source);
 
   /// A sink should call this to register trigger events
-  virtual void RegisterTrigger(char *name, void (*Trigger)(iAwsSink *, iAwsSource *));
+  virtual void RegisterTrigger(char *name, void (*Trigger)(void *, iAwsSource *));
   
 };
 

@@ -71,10 +71,16 @@ awsSinkManager::FindSink(char *_name)
   return NULL;
 }
 
+iAwsSink *
+awsSinkManager::CreateSink(void *parm)
+{
+  return new awsSink(parm);
+}
+
 
 ///////////////////////////////////// Signal Sinks //////////////////////////////////////////////////////////
 
-awsSink::awsSink() 
+awsSink::awsSink(void *p):parm(p) 
 {
   
 }
@@ -102,13 +108,13 @@ awsSink::HandleTrigger(int trigger, iAwsSource *source)
 {
   if (triggers.Length() == 0) return;
   
-  void (*Trigger)(iAwsSink *, iAwsSource *) = (((TriggerMap *)(triggers[trigger]))->trigger);
+  void (*Trigger)(void *, iAwsSource *) = (((TriggerMap *)(triggers[trigger]))->trigger);
 
-  (Trigger)(this, source);  
+  (Trigger)(parm, source);  
 }
 
 void 
-awsSink::RegisterTrigger(char *name, void (*Trigger)(iAwsSink *, iAwsSource *))
+awsSink::RegisterTrigger(char *name, void (*Trigger)(void *, iAwsSource *))
 {
   triggers.Push(new TriggerMap(NameToId(name), Trigger));
 }

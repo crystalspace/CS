@@ -121,6 +121,7 @@ awsManager::SetPrefMgr(iAwsPrefManager *pmgr)
    }
 }
 
+
 void
 awsManager::RegisterComponentFactory(awsComponentFactory *factory, char *name)
 {
