@@ -171,6 +171,11 @@ bool Simple::HandleEvent (iEvent& ev)
     CreateSphere ();
     return true;
   }
+  else if (ev.Type == csevKeyDown && ev.Key.Code == 'j')
+  {
+    CreateJointed ();
+    return true;
+  }
   else if (ev.Type == csevKeyDown && ev.Key.Code == 'g')
   { // Toggle gravity.
     dynSys->SetGravity (dynSys->GetGravity () == 0 ?
@@ -457,7 +462,7 @@ bool Simple::Initialize (int argc, const char* const argv[])
   return true;
 }
 
-void Simple::CreateBox (void)
+iRigidBody* Simple::CreateBox (void)
 {
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
@@ -483,9 +488,11 @@ void Simple::CreateBox (void)
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
   rb->SetAngularVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+
+  return rb;
 }
 
-void Simple::CreateSphere (void)
+iRigidBody* Simple::CreateSphere (void)
 {
   // Use the camera transform.
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
@@ -499,8 +506,8 @@ void Simple::CreateSphere (void)
 
   // Set the ball mesh properties.
   iBallState *s = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iBallState);
-  const float r (rand()%10/10.);
-  const csVector3 radius (r, r, r); // This should be the same size as the mesh.
+  const float r (rand()%5/10. + .1);
+  const csVector3 radius (r, r, r);
   s->SetRadius (radius.x, radius.y, radius.z);
   s->SetRimVertices (16);
   s->SetMaterialWrapper (mat);
@@ -520,9 +527,41 @@ void Simple::CreateSphere (void)
   // Fling the body.
   rb->SetLinearVelocity (tc.GetT2O () * csVector3 (0, 0, 6));
   rb->SetAngularVelocity (tc.GetT2O () * csVector3 (0, 0, 5));
+
+  return rb;
 }
 
-void Simple::CreateRoomSolids (const csVector3& center,
+iJoint* Simple::CreateJointed (void)
+{
+  // Use the camera transform.
+  const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
+
+  // Create and position objects.
+  iRigidBody* rb1 = CreateBox();
+  rb1->SetPosition (rb1->GetPosition () +
+   rb1->GetOrientation () * csVector3 (-.5, 0, 0));
+  iRigidBody* rb2 = CreateSphere();
+  rb2->SetPosition (rb2->GetPosition () +
+   rb2->GetOrientation () * csVector3 (.5, 0, 0));
+
+  // Create a joint and attach bodies.
+  iJoint* joint = dynSys->CreateJoint ();
+  joint->Attach (rb1, rb2);
+
+  // Constrain translation.
+  joint->SetMinimumDistance (csVector3 (1, 1, 1));
+  joint->SetMaximumDistance (csVector3 (1, 1, 1));
+  joint->SetTransConstraints (true, true, true);
+
+  // Constrain rotation.
+  joint->SetMinimumAngle (csVector3 (0, 0, 0));
+  joint->SetMaximumAngle (csVector3 (0, 0, 0));
+  joint->SetRotConstraints (true, true, true);
+
+  return joint;
+}
+
+iRigidBody* Simple::CreateRoomSolids (const csVector3& center,
  const csVector3& radius, float thickness)
 {
   // Create a body for the room.
@@ -566,6 +605,7 @@ void Simple::CreateRoomSolids (const csVector3& center,
   rb->AttachColliderBox (
    csVector3 (radius.x*2, radius.y*2, thickness), t, 1, 1000, 0);
 
+  return rb;
 }
 
 void Simple::Start ()

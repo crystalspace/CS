@@ -35,6 +35,7 @@ struct iView;
 struct iDynamics;
 struct iDynamicSystem;
 struct iRigidBody;
+struct iJoint;
 struct iMeshFactoryWrapper;
 
 class Simple
@@ -60,9 +61,10 @@ private:
   void SetupFrame ();
   void FinishFrame ();
 
-  void CreateBox (void);
-  void CreateSphere (void);
-  void CreateRoomSolids (const csVector3& center, const csVector3& radius, float thickness);
+  iRigidBody* CreateBox (void);
+  iRigidBody* CreateSphere (void);
+  iJoint* CreateJointed (void);
+  iRigidBody* CreateRoomSolids (const csVector3& center, const csVector3& radius, float thickness);
 
 public:
   Simple ();
