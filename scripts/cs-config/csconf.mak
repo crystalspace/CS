@@ -1,11 +1,11 @@
 # Target description
-DESCRIPTION.csconfig = cs-config build options script
+DESCRIPTION.cs-config = cs-config build options script
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 PSEUDOHELP += \
-  $(NEWLINE)echo $"  make cs-config     Build the $(DESCRIPTION.csconfig)$"
+  $(NEWLINE)echo $"  make cs-config     Build the $(DESCRIPTION.cs-config)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
