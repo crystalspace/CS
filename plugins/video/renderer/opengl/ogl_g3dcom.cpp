@@ -1771,11 +1771,13 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   float flat_r = queue.flat_color_r;
   float flat_g = queue.flat_color_g;
   float flat_b = queue.flat_color_b;
+  float alpha = BYTE_TO_FLOAT (queue.mixmode & CS_FX_MASK_ALPHA);
+  alpha = SetupBlend (queue.mixmode, alpha, tex_transp);
 
   if (m_renderstate.textured && txt_handle)
   {
     glEnable (GL_TEXTURE_2D);
-    if (txt_mm->GetKeyColor())
+    if (txt_mm->GetKeyColor() && !(alpha < 0.8f))
     {
       glEnable (GL_ALPHA_TEST);
       glAlphaFunc (GL_GEQUAL, 0.8);
@@ -1807,8 +1809,6 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
 
   SetGLZBufferFlags (queue.z_buf_mode);
 
-  float alpha = 1.0f - BYTE_TO_FLOAT (queue.mixmode & CS_FX_MASK_ALPHA);
-  alpha = SetupBlend (queue.mixmode, alpha, tex_transp);
   glColor4f (flat_r, flat_g, flat_b, alpha);
 
   if (txt_handle)
@@ -1869,7 +1869,7 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
       GLuint texturehandle = texturecache_data->Handle;
       glBindTexture (GL_TEXTURE_2D, texturehandle);
 
-      float alpha = 1.0f - BYTE_TO_FLOAT (layer->mode & CS_FX_MASK_ALPHA);
+      float alpha = BYTE_TO_FLOAT (layer->mode & CS_FX_MASK_ALPHA);
       alpha = SetupBlend (layer->mode, alpha, tex_transp);
       glColor4f (1., 1., 1., alpha);
       GLfloat* p_gltxt;
@@ -2412,7 +2412,7 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
   queue.flat_color_b = flat_b;
 
   bool gouraud = (queue.mixmode & CS_FX_GOURAUD) != 0;
-  float alpha = 1.0f - BYTE_TO_FLOAT (queue.mixmode & CS_FX_MASK_ALPHA);
+  float alpha = BYTE_TO_FLOAT (queue.mixmode & CS_FX_MASK_ALPHA);
   bool txt_alpha = false;
   if (poly.mat_handle)
   {
@@ -3517,7 +3517,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     // Setup states
     //===========
     uint m_mixmode = mesh.mixmode;
-    float m_alpha = 1.0f - BYTE_TO_FLOAT (m_mixmode & CS_FX_MASK_ALPHA);
+    float m_alpha = BYTE_TO_FLOAT (m_mixmode & CS_FX_MASK_ALPHA);
     bool m_gouraud = m_renderstate.lighting && m_renderstate.gouraud &&
   	((m_mixmode & CS_FX_GOURAUD) != 0);
 
@@ -3648,7 +3648,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
         bool tex_transp = txt_mm->GetKeyColor () || txt_mm->GetAlphaMap ();
         GLuint texturehandle = texturecache_data->Handle;
         glBindTexture (GL_TEXTURE_2D, texturehandle);
-        float alpha = 1.0f - BYTE_TO_FLOAT (layer->mode & CS_FX_MASK_ALPHA);
+        float alpha = BYTE_TO_FLOAT (layer->mode & CS_FX_MASK_ALPHA);
         alpha = SetupBlend (layer->mode, alpha, tex_transp);
         glColor4f (1., 1., 1., alpha);
         csVector2* mul_uv = work_uv_verts;
@@ -4198,7 +4198,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   // Setup states
   //===========
   uint m_mixmode = mesh.mixmode;
-  float m_alpha = 1.0f - BYTE_TO_FLOAT (m_mixmode & CS_FX_MASK_ALPHA);
+  float m_alpha = BYTE_TO_FLOAT (m_mixmode & CS_FX_MASK_ALPHA);
   bool m_gouraud = m_renderstate.lighting && m_renderstate.gouraud &&
   	((m_mixmode & CS_FX_GOURAUD) != 0);
 
@@ -4382,7 +4382,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       bool tex_transp = txt_mm->GetKeyColor () || txt_mm->GetAlphaMap ();
       GLuint texturehandle = texturecache_data->Handle;
       glBindTexture (GL_TEXTURE_2D, texturehandle);
-      float alpha = 1.0f - BYTE_TO_FLOAT (layer->mode & CS_FX_MASK_ALPHA);
+      float alpha = BYTE_TO_FLOAT (layer->mode & CS_FX_MASK_ALPHA);
       alpha = SetupBlend (layer->mode, alpha, tex_transp);
       glColor4f (1., 1., 1., alpha);
       csVector2* mul_uv = work_uv_verts;
@@ -4888,7 +4888,7 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
     glEnable (GL_ALPHA_TEST);
     glAlphaFunc (GL_GEQUAL, 0.8);
   }
-  float alpha = 1.0f - BYTE_TO_FLOAT (poly.mixmode & CS_FX_MASK_ALPHA);
+  float alpha = BYTE_TO_FLOAT (poly.mixmode & CS_FX_MASK_ALPHA);
   alpha = SetupBlend (poly.mixmode, alpha, tex_transp);
   if (ARB_texture_env_combine)
   {
@@ -5080,7 +5080,7 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
     SetupBlend (CS_FX_COPY, 0, false);
 
   glEnable (GL_TEXTURE_2D);
-  glColor4f (1.0, 1.0, 1.0, Alpha ? (1.0 - BYTE_TO_FLOAT (Alpha)) : 1.0);
+  glColor4f (1.0, 1.0, 1.0, Alpha ? (BYTE_TO_FLOAT (Alpha)) : 1.0);
   glBindTexture (GL_TEXTURE_2D, texturehandle);
 
   // convert texture coords given above to normalized (0-1.0) texture
