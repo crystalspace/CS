@@ -70,9 +70,25 @@ public:
   inline friend csVector3 operator+ (const csVector3& v1, const csVector3& v2)
   { return csVector3(v1.x+v2.x, v1.y+v2.y, v1.z+v2.z); }
 
+  /// Add two vectors of differing type, raise the csVector3 to DVector3.
+  inline friend csDVector3 operator+ (const csDVector3& v1, const csVector3& v2)
+  { return csDVector3(v1.x+v2.x, v1.y+v2.y, v1.z+v2.z); }
+
+  /// Add two vectors of differing type, raise the csVector3 to DVector3.
+  inline friend csDVector3 operator+ (const csVector3& v1, const csDVector3& v2)
+  { return csDVector3(v1.x+v2.x, v1.y+v2.y, v1.z+v2.z); }
+
   /// Subtract two vectors.
   inline friend csVector3 operator- (const csVector3& v1, const csVector3& v2)
   { return csVector3(v1.x-v2.x, v1.y-v2.y, v1.z-v2.z); }
+
+  /// Subtract two vectors of differing type, cast to double.
+  inline friend csDVector3 operator- (const csVector3& v1, const csDVector3& v2)
+  { return csDVector3(v1.x-v2.x, v1.y-v2.y, v1.z-v2.z); }
+
+  /// Subtract two vectors of differing type, cast to double.
+  inline friend csDVector3 operator- (const csDVector3& v1, const csVector3& v2)
+  { return csDVector3(v1.x-v2.x, v1.y-v2.y, v1.z-v2.z); }
 
   /// Take the dot product of two vectors.
   inline friend float operator* (const csVector3& v1, const csVector3& v2)
@@ -102,13 +118,13 @@ public:
   inline friend csVector3 operator* (float f, const csVector3& v)
   { return csVector3(v.x*f, v.y*f, v.z*f); }
 
-  /// Multiply a vector and a scalar double. Casts down the double!
-  inline friend csVector3 operator* (const csVector3& v, double f)
-  { return v * (float)f; }
+  /// Multiply a vector and a scalar double. Upgrade v to DVector.
+  inline friend csDVector3 operator* (const csVector3& v, double f)
+  { return csDVector3(v) * f; }
 
-  /// Multiply a vector and a scalar double. Casts down the double!
-  inline friend csVector3 operator* (double f, const csVector3& v)
-  { return v * (float)f; }
+  /// Multiply a vector and a scalar double. Upgrade v to DVector.
+  inline friend csDVector3 operator* (double f, const csVector3& v)
+  { return csDVector3(v) * f; }
 
   /// Multiply a vector and a scalar int.
   inline friend csVector3 operator* (const csVector3& v, int f)
@@ -122,9 +138,9 @@ public:
   inline friend csVector3 operator/ (const csVector3& v, float f)
   { f = 1.0f/f; return csVector3(v.x*f, v.y*f, v.z*f); }
 
-  /// Divide a vector by a scalar double. Casts down the double!
+  /// Divide a vector by a scalar double. Upgrade v to DVector.
   inline friend csDVector3 operator/ (const csVector3& v, double f)
-  { return v / (float)f; }
+  { return csDVector3(v) / f; }
 
   /// Divide a vector by a scalar int.
   inline friend csVector3 operator/ (const csVector3& v, int f)
