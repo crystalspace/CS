@@ -2495,6 +2495,8 @@ sub new {
 *Set = *cspacec::csBox3_Set;
 *SetMin = *cspacec::csBox3_SetMin;
 *SetMax = *cspacec::csBox3_SetMax;
+*Split = *cspacec::csBox3_Split;
+*TestSplit = *cspacec::csBox3_TestSplit;
 *AdjacentX = *cspacec::csBox3_AdjacentX;
 *AdjacentY = *cspacec::csBox3_AdjacentY;
 *AdjacentZ = *cspacec::csBox3_AdjacentZ;
