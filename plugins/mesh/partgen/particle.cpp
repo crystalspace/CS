@@ -182,9 +182,14 @@ void csNewParticleSystem::Compact ()
 
 void csNewParticleSystem::UpdateBounds ()
 {
-  Bounds.StartBoundingBox ();
-  for (int i=0; i<ParticleCount; i++)
-    Bounds.AddBoundingVertex (PositionArray [i]);
+  if (ParticleCount <= 0)
+    Bounds.StartBoundingBox ();
+  else
+  {
+    Bounds.StartBoundingBox (PositionArray[0]);
+    for (int i=1; i<ParticleCount; i++)
+      Bounds.AddBoundingVertexSmart (PositionArray [i]);
+  }
 }
 
 iMeshObjectFactory* csNewParticleSystem::GetFactory () const

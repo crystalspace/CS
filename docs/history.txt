@@ -6,6 +6,23 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Feb-2004
+	- Jorrit fixed rain mesh object so it now has a reasonably default
+	  box in case the user doesn't call SetBox().
+	- Jorrit fixed csNewParticleSystem so that it first calls
+	  SetupObject() before getting the bounds of the particle system.
+	- Jorrit added csBox2 and csBox3 functions: AddBoundingVertexTest()
+	  and AddBoundingVertexSmartTest(). These functions work the same
+	  as the old none-Test() functions but in addition they return
+	  true if the box was modified by adding the vertex.
+	- Jorrit fixed the fountain particle system so that it correctly
+	  updates the bounds. This avoids crashes in some cases. In addition
+	  the code will also fire a 'ShapeChanged' to the object model
+	  listeners (i.e. cullers) in case the bounding box changes.
+	- Jorrit made csNewParticleSystem::UpdateBounds() a bit faster by
+	  using AddBoundingVertexSmart() instead of AddBoundingVertex().
+	- Jorrit fixed a bug in sprcal3d. It would not set the 'polygon_idx'
+	  to -1 in HitBeamObject().
 15-Feb-2004
 	- Norman Kraemer removed inclusion of recently removed av3dtxt.h in AWS
 	  screencanvas header.

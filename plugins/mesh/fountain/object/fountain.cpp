@@ -56,6 +56,7 @@ void csFountainMeshObject::SetupObject ()
       RestartParticle (i, (fall_time / float (ParticleCount))
       	* float (ParticleCount-i));
     }
+    UpdateBounds ();
   }
 }
 
@@ -129,12 +130,15 @@ void csFountainMeshObject::Update (csTicks elapsed_time)
   csNewParticleSystem::Update (elapsed_time);
   float delta_t = elapsed_time / 1000.0f; // in seconds
   // move particles;
+  bool bounds_modified = false;
   int i;
   for (i=0 ; i < ParticleCount ; i++)
   {
     part_speed[i] += accel * delta_t;
     PositionArray[i] += part_speed[i] * delta_t;
     part_age[i] += delta_t;
+    if (Bounds.AddBoundingVertexSmartTest (PositionArray[i]))
+      bounds_modified = true;
   }
 
   // restart a number of particles
@@ -146,6 +150,11 @@ void csFountainMeshObject::Update (csTicks elapsed_time)
     todo_time -= intersperse;
   }
   time_left = todo_time;
+
+  if (bounds_modified)
+  {
+    scfiObjectModel.ShapeChanged ();
+  }
 }
 
 void csFountainMeshObject::HardTransform (const csReversibleTransform& t)

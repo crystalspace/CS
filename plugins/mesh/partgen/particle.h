@@ -219,6 +219,7 @@ public:
 
   virtual void GetObjectBoundingBox (csBox3& bbox, int)
   {
+    SetupObject ();
     bbox = Bounds;
   }
 

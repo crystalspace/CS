@@ -49,6 +49,7 @@ csRainMeshObject::csRainMeshObject (iEngine *engine, iMeshObjectFactory *fact)
   MixMode = CS_FX_ADD;
   Axis = csVector3 (0, 1, 0);
   Speed = csVector3 (0, -1, 0);
+  SetBox (csVector3 (-1, -1, -1), csVector3 (1, 1, 1));
 }
 
 csRainMeshObject::~csRainMeshObject ()

@@ -313,6 +313,56 @@ public:
     AddBoundingVertexSmart (v.x, v.y);
   }
 
+  /**
+   * Add a new vertex and recalculate the bounding box.
+   * Return true if the box was modified.
+   */
+  bool AddBoundingVertexTest (float x, float y)
+  {
+    bool rc = false;
+    if (x < minbox.x) { minbox.x = x; rc = true; }
+    if (x > maxbox.x) { maxbox.x = x; rc = true; }
+    if (y < minbox.y) { minbox.y = y; rc = true; }
+    if (y > maxbox.y) { maxbox.y = y; rc = true; }
+    return rc;
+  }
+
+  /**
+   * Add a new vertex and recalculate the bounding box.
+   * Return true if the box was modified.
+   */
+  bool AddBoundingVertexTest (const csVector2& v)
+  {
+    return AddBoundingVertexTest (v.x, v.y);
+  }
+
+  /**
+   * Add a new vertex and recalculate the bounding box.
+   * This version is a little more optimal. It assumes however
+   * that at least one point has been added to the bounding box.
+   * Return true if the box was modified.
+   */
+  bool AddBoundingVertexSmartTest (float x, float y)
+  {
+    bool rc = false;
+    if (x < minbox.x) { minbox.x = x; rc = true; }
+    else if (x > maxbox.x) { maxbox.x = x; rc = true; }
+    if (y < minbox.y) { minbox.y = y; rc = true; }
+    else if (y > maxbox.y) { maxbox.y = y; rc = true; }
+    return rc;
+  }
+
+  /**
+   * Add a new vertex and recalculate the bounding box.
+   * This version is a little more optimal. It assumes however
+   * that at least one point has been added to the bounding box.
+   * Return true if the box was modified.
+   */
+  bool AddBoundingVertexSmartTest (const csVector2& v)
+  {
+    return AddBoundingVertexSmartTest (v.x, v.y);
+  }
+
   //-----
   // Maintenance Note: The csBox2 constructors and Set() appear at this point
   // in the file, rather than earlier, in order to appease the OpenStep 4.2
@@ -730,6 +780,60 @@ public:
   void AddBoundingVertexSmart (const csVector3& v)
   {
     AddBoundingVertexSmart (v.x, v.y, v.z);
+  }
+
+  /**
+   * Add a new vertex and recalculate the bounding box.
+   * Returns true if box was modified.
+   */
+  bool AddBoundingVertexTest (float x, float y, float z)
+  {
+    bool rc = false;
+    if (x < minbox.x) { minbox.x = x; rc = true; }
+    if (x > maxbox.x) { maxbox.x = x; rc = true; }
+    if (y < minbox.y) { minbox.y = y; rc = true; }
+    if (y > maxbox.y) { maxbox.y = y; rc = true; }
+    if (z < minbox.z) { minbox.z = z; rc = true; }
+    if (z > maxbox.z) { maxbox.z = z; rc = true; }
+    return rc;
+  }
+
+  /**
+   * Add a new vertex and recalculate the bounding box.
+   * Returns true if box was modified.
+   */
+  bool AddBoundingVertexTest (const csVector3& v)
+  {
+    return AddBoundingVertexTest (v.x, v.y, v.z);
+  }
+
+  /**
+   * Add a new vertex and recalculate the bounding box.
+   * This version is a little more optimal. It assumes however
+   * that at least one point has been added to the bounding box.
+   * Returns true if box was modified.
+   */
+  bool AddBoundingVertexSmartTest (float x, float y, float z)
+  {
+    bool rc = false;
+    if (x < minbox.x) { minbox.x = x; rc = true; }
+    else if (x > maxbox.x) { maxbox.x = x; rc = true; }
+    if (y < minbox.y) { minbox.y = y; rc = true; }
+    else if (y > maxbox.y) { maxbox.y = y; rc = true; }
+    if (z < minbox.z) { minbox.z = z; rc = true; }
+    else if (z > maxbox.z) { maxbox.z = z; rc = true; }
+    return rc;
+  }
+
+  /**
+   * Add a new vertex and recalculate the bounding box.
+   * This version is a little more optimal. It assumes however
+   * that at least one point has been added to the bounding box.
+   * Returns true if box was modified.
+   */
+  bool AddBoundingVertexSmartTest (const csVector3& v)
+  {
+    return AddBoundingVertexSmartTest (v.x, v.y, v.z);
   }
 
   //-----
