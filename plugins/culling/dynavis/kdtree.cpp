@@ -121,6 +121,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 uint32 csKDTree::global_timestamp = 1;
 
+#define KDTREE_MAX 10000000.
+
 csKDTree::csKDTree (csKDTree* parent)
 {
   SCF_CONSTRUCT_IBASE (NULL);
@@ -136,9 +138,9 @@ csKDTree::csKDTree (csKDTree* parent)
 
   obj_bbox_valid = true;
   obj_bbox.StartBoundingBox ();
-  node_bbox.Set (-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE,
-  	-CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE,
-	CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE);
+  node_bbox.Set (-KDTREE_MAX, -KDTREE_MAX,
+  	-KDTREE_MAX, KDTREE_MAX,
+	KDTREE_MAX, KDTREE_MAX);
 
   userobject = NULL;
 }

@@ -399,6 +399,7 @@ bool csFrustumVis::VisTest (iRenderView* rview)
 {
   current_visnr++;
 
+#if 0
 {
 // @@@ Temporariy work around until a bug is fixed with the kdtree
 // and moving objects!
@@ -413,6 +414,7 @@ bool csFrustumVis::VisTest (iRenderView* rview)
 
 return true;
 }
+#endif
 
   // Data for the vis tester.
   FrustTest_Front2BackData data;

@@ -113,6 +113,8 @@ int csSimpleKDTreeChild::FindLeaf (csSimpleKDTree* leaf)
 
 uint32 csSimpleKDTree::global_timestamp = 1;
 
+#define KDTREE_MAX 10000000.
+
 csSimpleKDTree::csSimpleKDTree (csSimpleKDTree* parent)
 {
   child1 = NULL;
@@ -125,9 +127,9 @@ csSimpleKDTree::csSimpleKDTree (csSimpleKDTree* parent)
 
   obj_bbox_valid = true;
   obj_bbox.StartBoundingBox ();
-  node_bbox.Set (-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE,
-  	-CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE,
-	CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE);
+  node_bbox.Set (-KDTREE_MAX, -KDTREE_MAX,
+  	-KDTREE_MAX, KDTREE_MAX,
+	KDTREE_MAX, KDTREE_MAX);
 }
 
 csSimpleKDTree::~csSimpleKDTree ()
