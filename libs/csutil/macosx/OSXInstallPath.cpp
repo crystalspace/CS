@@ -24,29 +24,70 @@
 //
 //-----------------------------------------------------------------------------
 #include "cssysdef.h"
+#include "csutil/stringarray.h"
 #include "csutil/syspath.h"
 #include "OSXInstallPath.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 //-----------------------------------------------------------------------------
+// is_config_dir
+//-----------------------------------------------------------------------------
+static bool is_config_dir(csString path)
+{
+  if (!path.IsEmpty() && path[path.Length() - 1] != CS_PATH_SEPARATOR)
+    path << CS_PATH_SEPARATOR;
+  path << "vfs.cfg";
+  return (access(path, F_OK) == 0);
+}
+
+
+//-----------------------------------------------------------------------------
+// test_config_dir
+//-----------------------------------------------------------------------------
+static bool test_config_dir(csString path)
+{
+  if (!path.IsEmpty())
+  {
+    if (is_config_dir(path))
+      return true;
+
+    if (path[path.Length() - 1] != CS_PATH_SEPARATOR)
+      path << CS_PATH_SEPARATOR;
+    path << "etc" << CS_PATH_SEPARATOR << CS_PACKAGE_NAME;
+    if (is_config_dir(path))
+      return true;
+  }
+  return false;
+}
+
+
+//-----------------------------------------------------------------------------
 // csGetConfigPath
 //-----------------------------------------------------------------------------
 csString csGetConfigPath()
 {
-  csString path;
+  csStringArray candidates;
   char buff[FILENAME_MAX];
   char* env;
 
   if (OSXGetInstallPath(buff, FILENAME_MAX, CS_PATH_SEPARATOR))
-    path = buff;
-  else if ((env = getenv("CRYSTAL")) != 0 && *env != '\0')
-    path = env;
+    candidates.Push(buff);
+  if ((env = getenv("CRYSTAL")) != 0 && *env != '\0')
+    candidates.Push(env);
+  candidates.Push(".");
+#if defined(CS_CONFIGDIR)
+  candidates.Push(CS_CONFIGDIR);
+#endif
+  candidates.Push("/Library/CrystalSpace");
+  candidates.Push("/usr/local");
 
-  if (path.IsEmpty())
-    path << "." << CS_PATH_SEPARATOR;
-  else if (path[path.Length() - 1] != CS_PATH_SEPARATOR)
-    path << CS_PATH_SEPARATOR;
+  for (size_t i = 0, n = candidates.Length(); i < n; i++)
+  {
+    csString path(candidates[i]);
+    if (test_config_dir(path))
+      return path;
+  }
 
-  return path;
+  return ".";
 }

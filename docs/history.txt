@@ -20,6 +20,11 @@ chronological order.
 	- Eric Sunshine augmented csGetPluginPaths() in generic/pluginpaths.cpp
 	  so that it respects the value of CS_PLUGINDIR if defined, which is
 	  configure's notion of where installed plugins will reside.
+	- Eric Sunshine upgraded csGetConfigPath() for MacOS/X so that it
+	  respects CS_CONFIGDIR if defined, in addition to checking the
+	  CrystalSpaceRoot default and the CRYSTAL environment variable. If the
+	  above fail, now also checks a couple other likely (hard-coded)
+	  locations.
 17-Sep-2004
 	- Eric Sunshine fixed a couple methods in odedynam which were returning
 	  a value despite being declared as returning void. Reported by Brendon
