@@ -1654,7 +1654,7 @@ void csChunkLodTerrainObject::AppendShadows (iMovable* movable,
   const int h = pFactory->hm_y;
   int x, y;
 
-  CS_ALLOC_STACK_ARRAY(csVector3, worldVertices, w * h);
+  csVector3* worldVertices = new csVector3 [w * h];
   for (y = 0; y < h; y++)
   {
     for (x = 0; x < w; x++)
@@ -1687,6 +1687,7 @@ void csChunkLodTerrainObject::AppendShadows (iMovable* movable,
       AppendShadowTri (v4, v1, middle, list, origin);
     }
   }
+  delete[] worldVertices;
 }
 
 //---------------------------------------------------------------------------

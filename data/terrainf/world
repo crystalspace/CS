@@ -199,6 +199,7 @@
   <lodvalue name="minimum block size">32</lodvalue>
 	<materialmap image="/lev/terrain/materialmap.png" />
 	<staticlighting>yes</staticlighting>
+	<castshadows>yes</castshadows>
       </params>
       <move> 
         <v x="0" y="0" z="0" /> 
