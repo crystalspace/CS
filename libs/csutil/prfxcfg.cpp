@@ -20,7 +20,8 @@
 #include "csutil/prfxcfg.h"
 #include "csutil/util.h"
 
-csPrefixConfig::csPrefixConfig(const char *fName, iVFS *vfs, const char *prf)
+csPrefixConfig::csPrefixConfig(const char *fName, iVFS *vfs, const char *prf,
+  const char *AliasName)
 {
   long len = strlen(prf);
   Prefix = new char[len + 2];
@@ -29,12 +30,16 @@ csPrefixConfig::csPrefixConfig(const char *fName, iVFS *vfs, const char *prf)
   Prefix[len + 1] = 0;
   PrefixLength = len + 1;
 
+  if (AliasName) Alias = strnew (AliasName);
+  else Alias = NULL;
+
   Load(fName, vfs);
 }
 
 csPrefixConfig::~csPrefixConfig()
 {
   delete[] Prefix;
+  if (Alias) delete[] Alias;
 }
 
 bool csPrefixConfig::LoadNow(const char *Filename, iVFS *vfs, bool overwrite)
@@ -92,4 +97,9 @@ bool csPrefixConfig::SaveNow(const char *Filename, iVFS *vfs) const
   
   // write config file
   return cfg.Save();    
+}
+
+const char *csPrefixConfig::GetFileName () const
+{
+  return Alias ? Alias : csConfigFile::GetFileName ();
 }

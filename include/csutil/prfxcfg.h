@@ -24,22 +24,27 @@
 /**
  * This is an implementation of iConfigFile that stores an ID string
  * at construction, which it then prepends to all config keys on read/write
- * operations.
+ * operations. You can give an alias name at construction that will be
+ * returned instead of the real file name. The real name will still be
+ * used for loading and saving.
  */
 class csPrefixConfig : public csConfigFile
 {
 public:
   /// constructor
-  csPrefixConfig(const char *fName, iVFS *vfs, const char *pref);
+  csPrefixConfig(const char *fName, iVFS *vfs, const char *pref,
+    const char *AliasName = NULL);
   /// destructor
   ~csPrefixConfig();
 
 private:
   virtual bool LoadNow(const char *Filename, iVFS *vfs, bool overwrite);
   virtual bool SaveNow(const char *Filename, iVFS *vfs) const;
+  virtual const char *GetFileName () const;
 
   char *Prefix;
   long PrefixLength;
+  char *Alias;
 };
 
 #endif

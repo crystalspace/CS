@@ -404,12 +404,13 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
     if (cfgacc->GetBool("System.UserConfig", true))
     {
       // open the user-specific, application-neutral config domain
-      cfg = OpenUserConfig("Global");
+      cfg = OpenUserConfig("Global", "User.Global");
       Config->AddDomain(cfg, ConfigPriorityUserGlobal);
       cfg->DecRef();
 
       // open the user-and-application-specific config domain
-      cfg = OpenUserConfig(cfgacc->GetStr("System.ApplicationID", "Noname"));
+      cfg = OpenUserConfig(cfgacc->GetStr("System.ApplicationID", "Noname"),
+        "User.Application");
       Config->AddDomain(cfg, ConfigPriorityUserApp);
       Config->SetDynamicDomain(cfg);
       cfg->DecRef();
@@ -737,12 +738,13 @@ void csSystemDriver::SetSystemDefaults (iConfigManager *Config)
     Config->GetInt ("MouseDriver.DoubleClickDist", 2));
 }
 
-iConfigFile *csSystemDriver::OpenUserConfig(const char *ApplicationID)
+iConfigFile *csSystemDriver::OpenUserConfig(const char *ApplicationID,
+  const char *Alias)
 {
   // the default implementation does not make a difference between different
   // users. It always uses /config/user.cfg, with the application ID as prefix.
 
-  return new csPrefixConfig("/config/user.cfg", VFS, ApplicationID);
+  return new csPrefixConfig("/config/user.cfg", VFS, ApplicationID, Alias);
 }
 
 void csSystemDriver::Help (iConfig* Config)

@@ -51,15 +51,15 @@ public:
   /// remove a configuration domain
   virtual void RemoveDomain(iConfigFile*);
   /// remove a configuration domain
-  virtual void RemoveDomain(char const* path, iVFS*);
+  virtual void RemoveDomain(char const* path);
   /// return a pointer to a single config domain
-  virtual iConfigFile* LookupDomain(char const* path, iVFS*) const;
+  virtual iConfigFile* LookupDomain(char const* path) const;
   /// set the priority of a config domain
-  virtual void SetDomainPriority(char const* path, iVFS*, int priority);
+  virtual void SetDomainPriority(char const* path, int priority);
   /// set the priority of a config domain
   virtual void SetDomainPriority(iConfigFile*, int priority);
   /// return the priority of a config domain
-  virtual int GetDomainPriority(char const* path, iVFS*) const;
+  virtual int GetDomainPriority(char const* path) const;
   /// return the priority of a config domain
   virtual int GetDomainPriority(iConfigFile*) const;
 
@@ -192,11 +192,11 @@ private:
   csVector Iterators;
 
   csConfigDomain *FindConfig(iConfigFile *cfg) const;
-  csConfigDomain *FindConfig(const char *name, iVFS *vfs) const;
+  csConfigDomain *FindConfig(const char *name) const;
   void ClearKeyAboveDynamic(const char *Key);
   void RemoveIterator(csConfigManagerIterator *it);
   void FlushRemoved(int n);
-  int FindRemoved(const char *Filename, iVFS *vfs) const;
+  int FindRemoved(const char *Filename) const;
   void RemoveDomain(class csConfigDomain *cfg);
 };
 

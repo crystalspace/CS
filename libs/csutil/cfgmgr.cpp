@@ -217,13 +217,13 @@ void csConfigManager::AddDomain(iConfigFile *Config, int Priority)
 iConfigFile *csConfigManager::AddDomain(char const* path, iVFS* vfs, int priority)
 {
   if (Optimize) {
-    csConfigDomain *d = FindConfig(path, vfs);
+    csConfigDomain *d = FindConfig(path);
     if (d) {
       AddDomain(d->Cfg, priority);
       return d->Cfg;
     }
 
-    int n = FindRemoved(path, vfs);
+    int n = FindRemoved(path);
     if (n != -1) {
       iConfigFile *cfg = (iConfigFile*)Removed.Get(n);
       AddDomain(cfg, priority);
@@ -246,23 +246,23 @@ void csConfigManager::RemoveDomain(iConfigFile *cfg)
   if (d) RemoveDomain(d);
 }
 
-void csConfigManager::RemoveDomain(char const *path, iVFS *vfs)
+void csConfigManager::RemoveDomain(char const *path)
 {
-  csConfigDomain *d = FindConfig(path, vfs);
+  csConfigDomain *d = FindConfig(path);
   // prevent removal of dynamic domain
   if (d == NULL || d == DynamicDomain) return;
   RemoveDomain(d);
 }
 
-iConfigFile* csConfigManager::LookupDomain(char const *path, iVFS *vfs) const
+iConfigFile* csConfigManager::LookupDomain(char const *path) const
 {
-  csConfigDomain *d = FindConfig(path, vfs);
+  csConfigDomain *d = FindConfig(path);
   return d ? d->Cfg : NULL;
 }
 
-void csConfigManager::SetDomainPriority(char const* path, iVFS *vfs, int priority)
+void csConfigManager::SetDomainPriority(char const* path, int priority)
 {
-  csConfigDomain *d = FindConfig(path, vfs);
+  csConfigDomain *d = FindConfig(path);
   if (d) {
     d->Pri = priority;
     d->Remove();
@@ -280,9 +280,9 @@ void csConfigManager::SetDomainPriority(iConfigFile *cfg, int priority)
   }
 }
 
-int csConfigManager::GetDomainPriority(char const *path, iVFS *vfs) const
+int csConfigManager::GetDomainPriority(char const *path) const
 {
-  csConfigDomain *d = FindConfig(path, vfs);
+  csConfigDomain *d = FindConfig(path);
   return d ? d->Pri : (int)PriorityMedium;
 }
 
@@ -484,12 +484,11 @@ csConfigDomain *csConfigManager::FindConfig(iConfigFile *cfg) const
   return NULL;
 }
 
-csConfigDomain *csConfigManager::FindConfig(const char *Name, iVFS *vfs) const
+csConfigDomain *csConfigManager::FindConfig(const char *Name) const
 {
   for (csConfigDomain *d=FirstDomain; d!=NULL; d=d->Next) {
     if (d->Cfg && d->Cfg->GetFileName() &&
-        strcmp(d->Cfg->GetFileName(), Name)==0 &&
-        d->Cfg->GetVFS() == vfs)
+        strcmp(d->Cfg->GetFileName(), Name)==0)
       return d;
   }
   return NULL;
@@ -518,12 +517,12 @@ void csConfigManager::FlushRemoved(int n)
   Removed.Delete(n);
 }
 
-int csConfigManager::FindRemoved(const char *Name, iVFS *vfs) const
+int csConfigManager::FindRemoved(const char *Name) const
 {
   for (long i=0; i<Removed.Length(); i++) {
     iConfigFile *cfg = (iConfigFile*)Removed.Get(i);
     if (cfg->GetFileName())
-      if (strcmp(cfg->GetFileName(), Name)==0 && cfg->GetVFS()==vfs)
+      if (strcmp(cfg->GetFileName(), Name)==0)
         return i;
   }
   return -1;

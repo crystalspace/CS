@@ -81,15 +81,15 @@ struct iConfigManager : public iConfigFile
   /// remove a configuration domain
   virtual void RemoveDomain(iConfigFile*) = 0;
   /// remove a configuration domain
-  virtual void RemoveDomain(char const* path, iVFS*) = 0;
+  virtual void RemoveDomain(char const* path) = 0;
   /// return a pointer to a single config domain
-  virtual iConfigFile* LookupDomain(char const* path, iVFS*) const = 0;
+  virtual iConfigFile* LookupDomain(char const* path) const = 0;
   /// set the priority of a config domain
-  virtual void SetDomainPriority(char const* path, iVFS*, int priority) = 0;
+  virtual void SetDomainPriority(char const* path, int priority) = 0;
   /// set the priority of a config domain
   virtual void SetDomainPriority(iConfigFile*, int priority) = 0;
   /// return the priority of a config domain
-  virtual int GetDomainPriority(char const* path, iVFS*) const = 0;
+  virtual int GetDomainPriority(char const* path) const = 0;
   /// return the priority of a config domain
   virtual int GetDomainPriority(iConfigFile*) const = 0;
 

@@ -396,7 +396,7 @@ protected:
    * CS/data/config/user.cfg. This function is called at least twice, with
    * different ID strings. This *must* be supported!
    */
-  virtual iConfigFile *OpenUserConfig(const char *ApplicationID);
+  virtual iConfigFile *OpenUserConfig(const char *ApplicationID, const char *Alias);
 
 public:
   DECLARE_IBASE;
