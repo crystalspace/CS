@@ -320,15 +320,6 @@ void csfxScreenDPFXPartial(iGraphics3D *g3d, int x, int y, int w, int h,
   g3d->DrawPolygonFX (dpfx);
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, oldzbufmode);
 #else
-  float hw = float (g3d->GetWidth () / 2);
-  float hh = float (g3d->GetHeight () / 2);
-  float asp = hw / hh;
-
-  float sx = ((float(x) / hw) - 1.0f) * asp;
-  float sy = (float(g3d->GetHeight() - y - 1) / hh) - 1.0f;
-  float smx = sx + (float (w) * asp / hw);
-  float smy = sy - float (h) / hh;
-
   csSimpleRenderMesh mesh;
   static uint indices[4] = {0, 1, 2, 3};
   csVector3 verts[4];
@@ -358,23 +349,23 @@ void csfxScreenDPFXPartial(iGraphics3D *g3d, int x, int y, int w, int h,
   else
     mesh.mixmode = mixmode;
 
-  verts[0].Set (sx, smy, 2.0f);
-  texels[0].Set (0.0f, 1.0f);
+  verts[0].Set (x, y, 0);
+  texels[0].Set (0.0f, 0.0f);
   colors[0].Set (fr, fg, fb, fa);
   
-  verts[1].Set (sx, sy, 2.0f);
-  texels[1].Set (0.0f, 0.0f);
+  verts[1].Set (x + w, y, 0);
+  texels[1].Set (1.0f, 0.0f);
   colors[1].Set (fr, fg, fb, fa);
 
-  verts[2].Set (smx, sy, 2.0f);
-  texels[2].Set (1.0f, 0.0f);
+  verts[2].Set (x + w, y + h, 0);
+  texels[2].Set (1.0f, 1.0f);
   colors[2].Set (fr, fg, fb, fa);
 
-  verts[3].Set (smx, smy, 2.0f);
-  texels[3].Set (1.0f, 1.0f);
+  verts[3].Set (x, y + h, 0);
+  texels[3].Set (0.0f, 1.0f);
   colors[3].Set (fr, fg, fb, fa);
 
-  g3d->DrawSimpleMesh (mesh);
+  g3d->DrawSimpleMesh (mesh, csSimpleMeshScreenspace);
 #endif // CS_USE_NEW_RENDERER
 }
 

@@ -157,9 +157,9 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
       }
 
       /*
-      To get the texture coordinates of a vertex, the coordinates
-      in object space have to be transformed to the texture space.
-      The Z part is simply dropped then.
+	To get the texture coordinates of a vertex, the coordinates
+	in object space have to be transformed to the texture space.
+	The Z part is simply dropped then.
       */
       csMatrix3 t_m;
       csVector3 t_v;
@@ -208,22 +208,22 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
       }
 
       /*
-      Calculate the 'tangent' vector of this poly, needed for dot3.
-      It is "a tangent to the surface which represents the direction 
-      of increase of the t texture coordinate." (Quotation from
-      http://www.ati.com/developer/sdk/rage128sdk/Rage128BumpTutorial.html)
-      Conveniently, all polys have a object->texture space transformatin
-      associated with them.
+	Calculate the 'tangent' vector of this poly, needed for dot3.
+	It is "a tangent to the surface which represents the direction 
+	of increase of the t texture coordinate." (Quotation from
+	http://www.ati.com/developer/sdk/rage128sdk/Rage128BumpTutorial.html)
+	Conveniently, all polys have a object->texture space transformation
+	associated with them.
 
-      @@@ Ignores the fact things can be smooth.
-      But it's simpler for now :)
+	@@@ Ignores the fact things can be smooth.
+	But it's simpler for now :)
       */
       csTransform tangentTF (t_m.GetInverse (), csVector3 (0));
       csVector3 tangent = tangentTF.Other2This (csVector3 (1, 0, 0));
       tangent.Normalize ();
 
       /*
-      Calculate the 'binormal' vector of this poly, needed for dot3.
+	Calculate the 'binormal' vector of this poly, needed for dot3.
       */
       csVector3 binormal = tangentTF.Other2This (csVector3 (0, -1, 0));
       binormal.Normalize ();

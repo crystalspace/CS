@@ -150,7 +150,7 @@ public:
   bool IsLightmapOK (int lmw, int lmh, int lightCellSize) { return false; }
   csPtr<iPolygonRenderer> CreatePolygonRenderer () { return 0; }
   void SetWorldToCamera (csReversibleTransform* w2c) { }
-  void DrawSimpleMesh (const csSimpleRenderMesh& mesh) { }
+  void DrawSimpleMesh (const csSimpleRenderMesh& mesh, uint flags = 0) { }
 private:
   csRef<iObjectRegistry> object_reg;
   csRef<iGraphics2D> G2D;

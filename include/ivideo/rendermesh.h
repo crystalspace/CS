@@ -31,7 +31,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csutil/strset.h"
 #include "csutil/ref.h"
 #include "ivideo/graph3d.h"
-#include "csgeom/transfrm.h"
 #include "ivideo/shader/shader.h"
 #include "csgfx/shadervarcontext.h"
 

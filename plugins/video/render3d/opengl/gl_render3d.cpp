@@ -67,6 +67,8 @@
 csGLStateCache* csGLGraphics3D::statecache = 0;
 csGLExtensionManager* csGLGraphics3D::ext = 0;
 
+const int CS_CLIPPER_EMPTY = 0xf008412;
+
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csGLGraphics3D)
@@ -1669,7 +1671,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,
     const csArray< csArray<csShaderVariable*> > &stacks)
 {
-  if (cliptype == CS_CLIPPER_NONE) return;
+  if (cliptype == CS_CLIPPER_EMPTY) return;
 
   SetupProjection ();
 
@@ -2079,8 +2081,6 @@ void csGLGraphics3D::SetupClipPortals ()
   }
 }
 
-const int CS_CLIPPER_EMPTY = 0xf008412;
-
 void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
 {
   //clipper = new csBoxClipper (10, 10, 200, 200);
@@ -2160,7 +2160,8 @@ csPtr<iPolygonRenderer> csGLGraphics3D::CreatePolygonRenderer ()
   return csPtr<iPolygonRenderer> (new csGLPolygonRenderer (this));
 }
 
-void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh)
+void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh, 
+				     uint flags)
 {
   if (scrapIndicesSize < mesh.indexCount)
   {
@@ -2281,6 +2282,21 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh)
   rmesh.indexend = mesh.indexCount;
   rmesh.variablecontext = &scrapContext;
 
+  if (flags & csSimpleMeshScreenspace)
+  {
+    const float vwf = (float)(viewwidth);
+    const float vhf = (float)(viewheight);
+
+    rmesh.object2camera.SetO2T (
+      csMatrix3 (1.0f, 0.0f, 0.0f,
+		 0.0f, -1.0f, 0.0f,
+		 0.0f, 0.0f, 1.0f));
+    rmesh.object2camera.SetO2TTranslation (csVector3 (
+      vwf / 2.0f, vhf / 2.0f, -aspect));
+  }
+  else
+    rmesh.object2camera = mesh.object2camera;
+
   csShaderVarStack stacks;
   shadermgr->PushVariables (stacks);
   scrapContext.PushVariables (stacks);
@@ -2310,7 +2326,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh)
   {
     rmesh.alphaType = mesh.alphaType.alphaType;
   }
-
+  
   SetZMode (mesh.z_buf_mode);
   csRenderMeshModes modes (rmesh);
   for (int p = 0; p < passCount; p++)
@@ -2327,7 +2343,7 @@ void csGLGraphics3D::DrawSimpleMesh (const csSimpleRenderMesh& mesh)
       mesh.shader->DeactivatePass ();
     }
   }
-
+  
   if (!useShader)
   {
     DeactivateBuffer (CS_VATTRIB_POSITION);

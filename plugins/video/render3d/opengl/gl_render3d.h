@@ -450,7 +450,8 @@ public:
   virtual long GetRenderState (G3D_RENDERSTATEOPTION op) const;
 
   virtual csPtr<iPolygonRenderer> CreatePolygonRenderer ();
-  virtual void DrawSimpleMesh (const csSimpleRenderMesh& mesh);
+  virtual void DrawSimpleMesh (const csSimpleRenderMesh& mesh, 
+    uint flags = 0);
 
   virtual iHalo* CreateHalo (float, float, float,
     unsigned char *, int, int);

@@ -648,7 +648,7 @@ public:
   void DrawPolysMesh (const csCoreRenderMesh* mymesh,
     const csRenderMeshModes& modes,
     const csArray< csArray<csShaderVariable*> > &stacks);
-  void DrawSimpleMesh (const csSimpleRenderMesh &mesh);
+  void DrawSimpleMesh (const csSimpleRenderMesh &mesh, uint flags = 0);
 
   /// Controls shadow drawing
   virtual void SetShadowState (int state)

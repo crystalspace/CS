@@ -4066,7 +4066,8 @@ static bool DoPolyPerspective (csVector3* verts, int num_verts,
 
 }
 
-void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh)
+void csSoftwareGraphics3DCommon::DrawSimpleMesh (const csSimpleRenderMesh &mesh,
+						 uint flags)
 {
   if (scrapIndicesSize < mesh.indexCount)
   {

@@ -32,6 +32,7 @@
 #include "csutil/scf.h"
 #include "csgeom/plane3.h"
 #include "csgeom/vector2.h"
+#include "csgeom/transfrm.h"
 #include "csgeom/tri.h"
 #include "csutil/cscolor.h"
 #include "ivideo/rndbuf.h"
@@ -648,18 +649,68 @@ struct G3DPolygonMesh
   G3DFogInfo* vertex_fog;
 };
 
-/// Type of mesh
+/// Primitive type of a mesh
 enum csRenderMeshType
 {
+  /// Triangles.
   CS_MESHTYPE_TRIANGLES,
+  /// Quads.
   CS_MESHTYPE_QUADS,
+  /**
+   * Triangle strip.
+   * The OpenGL spec describes it pretty well:
+   * "A triangle strip is a series of triangles connected along shared edges. 
+   * A triangle strip is specified by giving a series of defining vertices 
+   * [...]. In this case, the first three vertices define the first triangle 
+   * [...]. Each subsequent  vertex defines a new triangle using that point 
+   * along with two vertices from the previous triangle."
+   */
   CS_MESHTYPE_TRIANGLESTRIP,
+  /**
+   * Triangle fan.
+   * Similar to a triangle strip, however, a triangle is always defined with
+   * the first, previously added and the recently added vertex.
+   */
   CS_MESHTYPE_TRIANGLEFAN,
+  /**
+   * Points.
+   */
   CS_MESHTYPE_POINTS,
+  /**
+   * Point sprites. 
+   * Note: only supported if the \a SupportsPointSprites member of the 
+   * \a csGraphics3DCaps structure for this renderer is true.
+   */
   CS_MESHTYPE_POINT_SPRITES,
+  /**
+   * Lines.
+   */
   CS_MESHTYPE_LINES,
+  /**
+   * Line strip.
+   * A line is defined from the prebviously and recently added vertex.
+   */
   CS_MESHTYPE_LINESTRIP,
+  /**
+   * Render polygons. Note that you <b>*must*</b> supply geometry with the
+   * help of an iPolygonRenderer. In the common case, if you want to draw a
+   * polygon, you probably want to use CS_MESHTYPE_TRIANGLES or 
+   * CS_MESHTYPE_TRIANGLEFAN and triangulate the poly yourself. 
+   */
   CS_MESHTYPE_POLYGON,
+};
+
+/**
+ * Flags to influence the behaviour of DrawSimpleMesh().
+ */
+enum csSimpleMeshFlags
+{
+  /**
+   * Ignore the object2camera transform in the csSimpleRenderMesh struct and
+   * replace it with a transformation that effectively lets you specify the
+   * vertices in screen space.
+   */
+  csSimpleMeshScreenspace     = 0x01,
 };
 
 /**
@@ -707,6 +758,8 @@ struct csSimpleRenderMesh
   csZBufMode z_buf_mode;
   /// (Optional) Mix mode. Defaults to CS_FX_COPY.
   uint mixmode;
+  /// (Optional) Transform to apply to the mesh.
+  csReversibleTransform object2camera;
 
   csSimpleRenderMesh () : colors(0), texture (0), shader (0), dynDomain (0), 
     z_buf_mode (CS_ZBUF_NONE), mixmode (CS_FX_COPY)
@@ -716,7 +769,7 @@ struct csSimpleRenderMesh
   };
 };
 
-SCF_VERSION (iGraphics3D, 5, 4, 0);
+SCF_VERSION (iGraphics3D, 5, 4, 1);
 
 /**
  * This is the standard 3D graphics interface.
@@ -1112,7 +1165,8 @@ struct iGraphics3D : public iBase
    * Note that you can still provide shaders and shader variables, but those
    * are optional.
    */
-  virtual void DrawSimpleMesh (const csSimpleRenderMesh& mesh) = 0;
+  virtual void DrawSimpleMesh (const csSimpleRenderMesh& mesh,
+    uint flags = 0) = 0;
 
   /// Get the z buffer write/test mode
   virtual csZBufMode GetZMode () = 0;

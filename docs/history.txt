@@ -22,6 +22,11 @@ chronological order.
 	- Jorrit attempted to fix the NR OpenPortals() command by trying
 	  to use better ways to fill the portal but it didn't seem to have
 	  worked very well.
+	- res added a member to csSimpleRenderMesh containing the 
+	  transformation.
+	- res augmented DrawSimpleMesh() with a 'flags' parameter.
+	- res added a DrawSimpleMesh() flag to specify coordinates in screen
+	  space.
 8-Jun-2004
 	- Jorrit fixed a bug in the FindByNameWithChild() function in the
 	  engine. This function would crash if there were unnamed meshes
