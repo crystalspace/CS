@@ -1314,7 +1314,7 @@ void csComponent::ObliqueRect3D (int xmin, int ymin, int xmax, int ymax,
   Line (xmin + cornersize, ymin, xmax - 1, ymin, lightindx);
 }
 
-void csComponent::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
+void csComponent::Polygon3D (G3DPolygonDPFX &poly, UInt /*mode*/)
 {
  /* Do clipping as follows: create a minimal rectangle which fits the polygon,
   * clip the rectangle against children & parents, then clip the poly against
@@ -1334,7 +1334,7 @@ void csComponent::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
   rect.Push (lb);
   Clip (rect, this);
 
-  for (int i = rect.Length () - 1; i >= 0; i--)
+  for (i = rect.Length () - 1; i >= 0; i--)
   {
     csRect *cur = (csRect *)rect[i];
 // not implemented yet - todo clipping
