@@ -82,15 +82,15 @@ public:
   virtual void SetRGB (int i, int r, int g, int b);
 
   /// Draw a line
-  virtual void DrawLine (int x1, int y1, int x2, int y2, int color);
+  virtual void DrawLine (float x1, float y1, float x2, float y2, int color);
   /// Draw a box
   virtual void DrawBox (int x, int y, int w, int h, int color);
   /// Draw a pixel
-  virtual void DrawPixel (csGraphics2D *This, int x, int y, int color);
+  virtual void DrawPixel (int x, int y, int color);
   /// Write a single character
-  virtual void WriteChar (csGraphics2D *This, int x, int y, int fg, int bg, char c);
+  virtual void WriteChar (int x, int y, int fg, int bg, char c);
   /// Draw a 2D sprite
-  virtual void DrawSprite (csGraphics2D *This, iTextureHandle *hTex, int sx, int sy,
+  virtual void DrawSprite (iTextureHandle *hTex, int sx, int sy,
     int sw, int sh, int tx, int ty, int tw, int th);
 
   /// Figure out GL RGB color from a packed color format
@@ -100,7 +100,7 @@ public:
    * Get address of video RAM at given x,y coordinates.
    * The OpenGL version of this function just returns NULL.
    */
-  virtual unsigned char* GetPixelAt (csGraphics2D *This, int x, int y);
+  virtual unsigned char* GetPixelAt (int x, int y);
 };
 
 #endif

@@ -36,7 +36,6 @@ IMPLEMENT_IBASE (csGraphics2DGLCommon)
   IMPLEMENTS_INTERFACE (iGraphics2D)
 IMPLEMENT_IBASE_END
 
-// csGraphics2DGLCommon function
 csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
   csGraphics2D (),
   texture_cache (NULL),
@@ -55,7 +54,6 @@ bool csGraphics2DGLCommon::Initialize (iSystem *pSystem)
 
 csGraphics2DGLCommon::~csGraphics2DGLCommon ()
 {
-  // Destroy your graphic interface
   Close ();
 }
 
@@ -67,20 +65,17 @@ bool csGraphics2DGLCommon::Open(const char *Title)
     CsPrintf (MSG_INITIALIZATION, "Version %s", glGetString(GL_VERSION));
   CsPrintf (MSG_INITIALIZATION, "\n");
 
-  // Open your graphic interface
   if (!csGraphics2D::Open (Title))
     return false;
 
   // load font 'server'
   if (LocalFontServer == NULL)
   {
-//       CsPrintf(MSG_INITIALIZATION,"Loading fonts...");
        LocalFontServer = new csGraphics2DOpenGLFontServer(&FontList[0]);
        for (int fontindex=1; 
        		fontindex < 8;
 		fontindex++)
        {
-//       	   CsPrintf(MSG_INITIALIZATION,"%d...",fontindex);
 	   LocalFontServer->AddFont(FontList[fontindex]);
        }
        CsPrintf(MSG_INITIALIZATION,"\n");
@@ -98,9 +93,7 @@ bool csGraphics2DGLCommon::Open(const char *Title)
 
 void csGraphics2DGLCommon::Close(void)
 {
-  // Close your graphic interface
   csGraphics2D::Close ();
-//  CHK (delete [] Memory);
   CHK (delete LocalFontServer);
   LocalFontServer = NULL;
   CHK (delete texture_cache);
@@ -150,7 +143,8 @@ void csGraphics2DGLCommon::setGLColorfromint(int color)
   }
 }
 
-void csGraphics2DGLCommon::DrawLine (int x1, int y1, int x2, int y2, int color)
+void csGraphics2DGLCommon::DrawLine (
+  float x1, float y1, float x2, float y2, int color)
 {
   // prepare for 2D drawing--so we need no fancy GL effects!
   glDisable (GL_TEXTURE_2D);
@@ -159,8 +153,8 @@ void csGraphics2DGLCommon::DrawLine (int x1, int y1, int x2, int y2, int color)
   setGLColorfromint(color);
 
   glBegin (GL_LINES);
-  glVertex2i (x1, Height-y1-1);
-  glVertex2i (x2, Height-y2-1);
+  glVertex2i (GLint(x1), GLint(Height-y1-1));
+  glVertex2i (GLint(x2), GLint(Height-y2-1));
   glEnd ();
 }
 
@@ -180,27 +174,27 @@ void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
   glEnd ();
 }
 
-void csGraphics2DGLCommon::DrawPixel (csGraphics2D *This, int x, int y, int color)
+void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
 {
   // prepare for 2D drawing--so we need no fancy GL effects!
   glDisable (GL_TEXTURE_2D);
   glDisable (GL_BLEND);
   glDisable (GL_DEPTH_TEST);
-  ((csGraphics2DGLCommon *)This)->setGLColorfromint(color);
+  setGLColorfromint(color);
 
   glBegin (GL_POINTS);
-  glVertex2i (x, This->Height - y - 1);
+  glVertex2i (x, Height - y - 1);
   glEnd ();
 }
 
-void csGraphics2DGLCommon::WriteChar (csGraphics2D *This, int x, int y, int fg, int /*bg*/, char c)
+void csGraphics2DGLCommon::WriteChar (int x, int y, int fg, int /*bg*/, char c)
 {
   // prepare for 2D drawing--so we need no fancy GL effects!
   glDisable (GL_TEXTURE_2D);
   glDisable (GL_BLEND);
   glDisable (GL_DEPTH_TEST);
   
-  ((csGraphics2DGLCommon *)This)->setGLColorfromint(fg);
+  setGLColorfromint(fg);
 
   // in fact the WriteCharacter() method properly shifts over
   // the current modelview transform on each call, so that characters
@@ -210,16 +204,16 @@ void csGraphics2DGLCommon::WriteChar (csGraphics2D *This, int x, int y, int fg, 
   // due to the Push/PopMatrix calls
 
   glPushMatrix();
-  glTranslatef (x, This->Height - y - FontList [This->Font].Height,0.0);
+  glTranslatef (x, Height - y - FontList [Font].Height,0.0);
 
-  ((csGraphics2DGLCommon *)This)->LocalFontServer->WriteCharacter(c, This->Font);
+  LocalFontServer->WriteCharacter(c, Font);
   glPopMatrix ();
 }
 
-void csGraphics2DGLCommon::DrawSprite (csGraphics2D *This, iTextureHandle *hTex,
+void csGraphics2DGLCommon::DrawSprite (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th)
 {
-  ((csGraphics2DGLCommon *)This)->texture_cache->Add (hTex);
+  texture_cache->Add (hTex);
 
   // cache the texture if we haven't already.
   csHighColorCacheData *cachedata;
@@ -258,17 +252,17 @@ void csGraphics2DGLCommon::DrawSprite (csGraphics2D *This, iTextureHandle *hTex,
   // draw the bitmap - we could use GL_QUADS, but why?
   glBegin(GL_TRIANGLE_FAN);
   glTexCoord2f(ntx1,nty1);
-  glVertex2i(sx,This->Height-sy-1);
+  glVertex2i(sx,Height-sy-1);
   glTexCoord2f(ntx2,nty1);
-  glVertex2i(sx+sw,This->Height-sy-1);
+  glVertex2i(sx+sw,Height-sy-1);
   glTexCoord2f(ntx2,nty2);
-  glVertex2i(sx+sw,This->Height-sy-sh-1);
+  glVertex2i(sx+sw,Height-sy-sh-1);
   glTexCoord2f(ntx1,nty2);
-  glVertex2i(sx,This->Height-sy-sh-1);
+  glVertex2i(sx,Height-sy-sh-1);
   glEnd();
 }
 
-unsigned char* csGraphics2DGLCommon::GetPixelAt (csGraphics2D* /*This*/, int /*x*/, int /*y*/)
+unsigned char* csGraphics2DGLCommon::GetPixelAt (int /*x*/, int /*y*/)
 {
   return NULL;
 }

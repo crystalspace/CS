@@ -308,8 +308,10 @@ void csTextureManagerOpenGL::Prepare ()
   for (i = 0 ; i < textures.Length () ; i++)
   {
     csTextureMMOpenGL* txt = (csTextureMMOpenGL*)textures[i];
-    if (txt->for_3d ()) txt->alloc_mipmaps (this);
-    if (txt->for_2d ()) txt->alloc_2dtexture (this);
+//  if (txt->for_3d ()) // Mipmaps required by HighColorCache::Add() even for 2D.
+      txt->alloc_mipmaps (this);
+    if (txt->for_2d ())
+      txt->alloc_2dtexture (this);
   }
 
   remap_textures ();
