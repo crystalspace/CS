@@ -16,22 +16,32 @@ private :
 		MAX_STATES = 24,
 	};
 
-	static int s_Count;
 	IDirect3DDevice3 * m_Dev;
 	iSystem * m_Sys;
 
+//-- render states
 	LPDIRECT3DTEXTURE2 m_Texture[MAX_STAGES];
 
 	bool m_AlphaBlendEnable;
 	bool m_ZBufferEnable;
 	bool m_ColorKeyEnable;
-
 	D3DBLEND m_SrcBlend;
 	D3DBLEND m_DstBlend;
-
 	D3DTEXTUREADDRESS m_TextureAddress;
+	D3DCMPFUNC m_ZFunc;
 
 	DWORD m_StageState[MAX_STAGES][MAX_STATES];
+
+//-- pushed states
+
+	LPDIRECT3DTEXTURE2 m_PushTexture[MAX_STAGES];
+	bool m_PushAlphaBlendEnable;
+	bool m_PushZBufferEnable;
+	bool m_PushColorKeyEnable;
+	D3DBLEND m_PushSrcBlend;
+	D3DBLEND m_PushDstBlend;
+	D3DTEXTUREADDRESS m_PushTextureAddress;
+	D3DCMPFUNC m_PushZFunc;
 
 public :
 	void Initialize(IDirect3DDevice3 * Dev, iSystem* Sys)
@@ -39,39 +49,8 @@ public :
 		ASSERT(Dev);
 		ASSERT(Sys);
 
-		s_Count = 0;
 		m_Dev = Dev;
 		m_Sys = Sys;
-
-	// Set Default States
-		// set modulate textureblend in both stages, just in case
-		m_Dev->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-		m_Dev->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-		m_Dev->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE); 
-		m_Dev->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1); 
-		m_Dev->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
-
-//		m_Dev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_BLENDTEXTUREALPHA);
-//		m_Dev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_ADD);
-//		m_Dev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
-		m_Dev->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_MODULATE2X);
-		m_Dev->SetTextureStageState(1, D3DTSS_COLORARG1, D3DTA_TEXTURE);
-		m_Dev->SetTextureStageState(1, D3DTSS_COLORARG2, D3DTA_CURRENT); 
-		m_Dev->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_SELECTARG2); 
-		m_Dev->SetTextureStageState(1, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
-
-		m_Dev->SetTextureStageState(0, D3DTSS_MAGFILTER, D3DTFG_LINEAR);
-		m_Dev->SetTextureStageState(0, D3DTSS_MINFILTER, D3DTFG_LINEAR);
-		m_Dev->SetTextureStageState(0, D3DTSS_MIPFILTER, D3DTFG_LINEAR);
-		m_Dev->SetTextureStageState(1, D3DTSS_MAGFILTER, D3DTFG_LINEAR);
-		m_Dev->SetTextureStageState(1, D3DTSS_MINFILTER, D3DTFG_LINEAR);
-		m_Dev->SetTextureStageState(1, D3DTSS_MIPFILTER, D3DTFG_LINEAR);
-
-		m_Dev->SetTextureStageState(0, D3DTSS_TEXCOORDINDEX, 0);
-		m_Dev->SetTextureStageState(1, D3DTSS_TEXCOORDINDEX, 1);
-
-		m_Dev->SetTextureStageState(0, D3DTSS_ADDRESS, D3DTADDRESS_WRAP);
-		m_Dev->SetTextureStageState(1, D3DTSS_ADDRESS, D3DTADDRESS_CLAMP);
 
 	// Get Current States
 		m_Dev->GetRenderState(D3DRENDERSTATE_SRCBLEND, (unsigned long *) &m_SrcBlend);
@@ -79,6 +58,7 @@ public :
 		m_Dev->GetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, (unsigned long *) &m_AlphaBlendEnable);
 		m_Dev->GetRenderState(D3DRENDERSTATE_COLORKEYENABLE, (unsigned long *) &m_ColorKeyEnable);
 		m_Dev->GetRenderState(D3DRENDERSTATE_TEXTUREADDRESS, (unsigned long *) &m_TextureAddress);
+		m_Dev->GetRenderState(D3DRENDERSTATE_ZFUNC, (unsigned long *) &m_ZFunc);
 
 		unsigned int i, j;
 		for (i = 0; i < MAX_STAGES; i++)
@@ -94,6 +74,8 @@ public :
 			}
 		}
 	}	// end of Initialize()
+
+//--- set render state implementations ---
 			
 	inline void SetTexture(int Stage, LPDIRECT3DTEXTURE2 Tex)
 	{
@@ -157,6 +139,15 @@ public :
 #endif
 	}
 
+	inline void SetZFunc(D3DCMPFUNC Func)
+	{
+		if (m_ZFunc != Func)
+		{
+			m_ZFunc = Func;
+			VERIFY_RESULT(m_Dev->SetRenderState(D3DRENDERSTATE_ZFUNC, Func), DD_OK);
+		}
+	}
+
 	inline void SetStageState(unsigned int Stage,
 								D3DTEXTURESTAGESTATETYPE State,
 								DWORD Value)
@@ -168,6 +159,25 @@ public :
 			VERIFY_RESULT(m_Dev->SetTextureStageState(Stage, State, Value), DD_OK);
 		}
 	}
+
+//--- push/pop implementations ---
+//--- NOTE : DX7 has this in it's new features I believe ---
+
+	void PushTexture(int Stage) { m_PushTexture[Stage] = m_Texture[Stage]; }
+	// this may not work very well because of texture caching
+	void PopTexture(int Stage) { SetTexture(Stage, m_PushTexture[Stage]); }
+	void PushAlphaBlendEnable() { m_PushAlphaBlendEnable = m_AlphaBlendEnable; }
+	void PopAlphaBlendEnable() { SetAlphaBlendEnable(m_PushAlphaBlendEnable); }
+	void PushSrcBlend() { m_PushSrcBlend = m_SrcBlend; }
+	void PopSrcBlend() { SetSrcBlend(m_PushSrcBlend); }
+	void PushDstBlend() { m_PushDstBlend = m_DstBlend; }
+	void PopDstBlend() { SetDstBlend(m_PushDstBlend); }
+	void PushColorKeyEnable() { m_PushColorKeyEnable = m_ColorKeyEnable; }
+	void PopColorKeyEnable() { SetColorKeyEnable(m_PushColorKeyEnable); }
+	void PushTextureAddress() { m_PushTextureAddress = m_TextureAddress; }
+	void PopTextureAddress() { SetTextureAddress(m_PushTextureAddress); }
+	void PushZFunc() { m_PushZFunc = m_ZFunc; }
+	void PopZFunc() { SetZFunc(m_PushZFunc); }
 
 };	// end of csStateCacheDirect3DDx6
 
