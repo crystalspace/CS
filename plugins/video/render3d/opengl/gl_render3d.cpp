@@ -728,13 +728,13 @@ bool csGLRender3D::Open ()
   shadermgr->AddVariable(shvar_light_0_attenuation);
 
 
-  if (ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
+  if (false && ext.CS_GL_NV_vertex_array_range && ext.CS_GL_NV_fence)
   {
     csVARRenderBufferManager * bm = new csVARRenderBufferManager();
     bm->Initialize(this);
     buffermgr = bm;
   } 
-  else if ( ext.CS_GL_ATI_vertex_array_object && ext.CS_GL_ATI_vertex_attrib_array_object)
+  else if (ext.CS_GL_ATI_vertex_array_object && ext.CS_GL_ATI_vertex_attrib_array_object)
   {
     csVaoRenderBufferManager* bm = new csVaoRenderBufferManager();
     bm->Initialize(this);
@@ -845,7 +845,7 @@ bool csGLRender3D::BeginDraw (int drawflags)
 
 void csGLRender3D::FinishDraw ()
 {
-  printf ("Number of tris: %i\n", tricnt);
+  //printf ("Number of tris: %i\n", tricnt);
   tricnt = 0;
   SetMirrorMode (false);
 
@@ -1075,8 +1075,20 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
     csTxtCacheData *cachedata =
       (csTxtCacheData *)gltxthandle->GetCacheData ();
 
-    statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle);
-    statecache->Enable_GL_TEXTURE_2D ();
+    if (gltxthandle->target == iTextureHandle::CS_TEX_IMG_CUBEMAP)
+    {
+      // @@@ SHOULD BE CACHED
+      glEnable (GL_TEXTURE_CUBE_MAP);
+      glBindTexture (GL_TEXTURE_CUBE_MAP, cachedata->Handle);
+    } else if (gltxthandle->target == iTextureHandle::CS_TEX_IMG_3D)
+    {
+      // @@@ SHOULD BE CACHED
+      glEnable (GL_TEXTURE_3D);
+      glBindTexture (GL_TEXTURE_3D, cachedata->Handle);
+    } else{
+      statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle);
+      statecache->Enable_GL_TEXTURE_2D ();
+    }
 
     alpha = 1.0f - BYTE_TO_FLOAT (mymesh->mixmode & CS_FX_MASK_ALPHA);
     alpha = SetMixMode (mymesh->mixmode, alpha, 
@@ -1245,6 +1257,10 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
       normalbuf->Release();
     }
   }
+
+  // @@@ HACK
+  glDisable (GL_TEXTURE_CUBE_MAP);
+  glDisable (GL_TEXTURE_3D);
 
   if (clip_planes_enabled)
   {

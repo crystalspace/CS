@@ -174,7 +174,7 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
     else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_3D)
       glBindTexture (GL_TEXTURE_3D, d->Handle);
     else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_CUBEMAP)
-      glBindTexture (GL_TEXTURE_CUBE_MAP_ARB, d->Handle);
+      glBindTexture (GL_TEXTURE_CUBE_MAP, d->Handle);
 
   }
   else
@@ -197,6 +197,7 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
     }
     else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_3D)
     {
+      glEnable (GL_TEXTURE_3D);
       glBindTexture (GL_TEXTURE_3D, d->Handle);
       glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT);
       glTexParameteri (GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -204,11 +205,11 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
     }
     else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_CUBEMAP)
     {
-      glBindTexture (GL_TEXTURE_CUBE_MAP_ARB, d->Handle);
+      glBindTexture (GL_TEXTURE_CUBE_MAP, d->Handle);
       // Are following lines actually useful ??
-      glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_S, GL_REPEAT);
-      glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_T, GL_REPEAT);
-      glTexParameteri (GL_TEXTURE_CUBE_MAP_ARB, GL_TEXTURE_WRAP_R, GL_REPEAT);
+      glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+      glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+      glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     }
 
    
@@ -244,7 +245,7 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
       }
       else if(txt_mm->target == iTextureHandle::CS_TEX_IMG_3D)
       {
-        R3D->ext.glTexImage3D (GL_TEXTURE_3D, 
+        R3D->ext.glTexImage3DEXT (GL_TEXTURE_3D, 
                       i,
                       txt_mm->TargetFormat (),
                       togl->get_width (),
@@ -271,7 +272,7 @@ void csGLTextureCache::Load (csTxtCacheData *d, bool reload)
         for(j = 0; j < 6; j++)
         {
           glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + j,
-                        j,
+                        i,
                         txt_mm->TargetFormat (),
                         togl->get_width (),
                         togl->get_height(),

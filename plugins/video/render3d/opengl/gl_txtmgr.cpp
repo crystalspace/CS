@@ -85,6 +85,7 @@ csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image, int flags, int 
   this->target = target;
   this->sourceFormat = sourceFormat;
   this->R3D = iR3D;
+  cachedata = 0;
 }
 
 void csGLTextureManager::DetermineStorageSizes ()
