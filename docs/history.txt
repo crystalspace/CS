@@ -36,6 +36,13 @@ The history order is reversed so that new features are at the top.
 	  This lights thing objects correctly.
         - Philip Wyett added physics loader plugin to MSVC build process.
 	- Jorrit updated the documentation to latest region related changes.
+	- Jorrit re-added the bool resolveOnlyRegion parameter (curRegOnly) for
+	  LoadMapFile(). Also added this for LoadLibraryFile(). This is used
+	  in addition to the region parameter now. The region parameter on
+	  its own only causes objects to be added to that region. The
+	  curRegOnly parameter causes objects to be searched in only that
+	  region (as opposed to all regions).
+	  This fixes the -regions commandline option for walktest.
 19-Jun-2003
 	- Oktal made the following changes to the Perl plugin and module:
 	    - Got rid of all the warnings in the Perl plugin and module,

@@ -970,7 +970,8 @@ public:
   	const char* name);
   /// Create an uninitialized mesh factory wrapper
   virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* name);
-  virtual csPtr<iLoaderContext> CreateLoaderContext (iRegion* region = 0);
+  virtual csPtr<iLoaderContext> CreateLoaderContext (iRegion* region,
+  	bool curRegOnly);
   /// Load mesh factory.
   virtual csPtr<iMeshFactoryWrapper> LoadMeshFactory (
   	const char* name, const char* loaderClassId,

@@ -1454,7 +1454,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       {
         region = Engine->CreateRegion (map->map_dir);
       }
-      if (!LevelLoader->LoadMapFile ("world", false, region, do_dupes))
+      if (!LevelLoader->LoadMapFile ("world", false, region, !do_regions,
+      		do_dupes))
         return false;
       if (do_regions)
       {

@@ -1485,7 +1485,7 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
     char buf[255];
     sprintf (buf, "/lev/%s", lev);
     Sys->myVFS->ChDir (buf);
-    LevelLoader->LoadMapFile ("world", cur_region);
+    LevelLoader->LoadMapFile ("world", false, cur_region, true);
     cur_region->Prepare ();
   }
 

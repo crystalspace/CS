@@ -510,7 +510,8 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 		{
 		  const char* txtname = layer_child->GetContentsValue ();
 		  iTextureWrapper* texh;
-		  if (ldr_context->GetRegion ())
+		  if (ldr_context->GetRegion ()
+		  	&& ldr_context->CurrentRegionOnly ())
 		    texh = ldr_context->GetRegion ()->FindTexture (txtname);
 		  else
                     texh = Engine->GetTextureList ()->FindByName (txtname);

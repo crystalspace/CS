@@ -145,6 +145,7 @@ public:
   virtual iLight *FindLight (const char* name);
   virtual bool CheckDupes () const { return false; }
   virtual iRegion* GetRegion () const { return 0; }
+  virtual bool CurrentRegionOnly () const { return false; }
 };
 
 SCF_IMPLEMENT_IBASE(StdIsoLoaderContext);

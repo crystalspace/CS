@@ -32,7 +32,7 @@ struct iSector;
 struct iTextureWrapper;
 struct iLight;
 
-SCF_VERSION (iLoaderContext, 0, 0, 5);
+SCF_VERSION (iLoaderContext, 0, 1, 0);
 
 /**
  * This interface gives the context for the loader.
@@ -70,9 +70,15 @@ struct iLoaderContext : public iBase
 
   /**
    * Return a region if we only want to load in that region.
-   * 0 otherwise.
+   * 0 otherwise. If not 0 then all objects will be created in the region.
    */
   virtual iRegion* GetRegion () const = 0;
+
+  /**
+   * Return true if we only want to look for objects in the region
+   * given by GetRegion().
+   */
+  virtual bool CurrentRegionOnly () const = 0;
 };
 
 /** @} */

@@ -613,11 +613,11 @@ struct iEngine : public iBase
   /**
    * Create a loader context that you can give to loader plugins.
    * It will basically allow loader plugins to find materials, ...
-   * If region != 0 then only that region will
+   * If region != 0 and curRegOnly == true then only that region will
    * be searched. Assign to a csRef or use DecRef().
    */
   virtual csPtr<iLoaderContext> CreateLoaderContext (
-  	iRegion* region = 0) = 0;
+  	iRegion* region = 0, bool curRegOnly = true) = 0;
 
   /**
    * Conveniance function to load a mesh factory from a given loader plugin.

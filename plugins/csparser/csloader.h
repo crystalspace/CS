@@ -279,8 +279,9 @@ private:
   iRegion* region;
   csLoader* loader;
   bool checkDupes;
+  bool curRegOnly;
 public:
-  StdLoaderContext (iEngine* Engine, iRegion* region,
+  StdLoaderContext (iEngine* Engine, iRegion* region, bool curRegOnly,
     csLoader* loader, bool checkDupes);
   virtual ~StdLoaderContext ();
 
@@ -294,6 +295,7 @@ public:
   virtual iLight* FindLight (const char *name);
   virtual bool CheckDupes () const { return checkDupes; }
   virtual iRegion* GetRegion () const { return region; }
+  virtual bool CurrentRegionOnly () const { return curRegOnly; }
 };
 
 /*
@@ -306,6 +308,7 @@ private:
   iRegion* region;
   csLoader* loader;
   bool checkDupes;
+  bool curRegOnly;
   csRefArray<iSector> sectors;
   csRefArray<iMaterialWrapper> materials;
   csRefArray<iTextureWrapper> textures;
@@ -314,7 +317,7 @@ private:
   csRefArray<iLight> lights;
 
 public:
-  ThreadedLoaderContext (iEngine* Engine, iRegion* region,
+  ThreadedLoaderContext (iEngine* Engine, iRegion* region, bool curRegOnly,
     csLoader* loader, bool checkDupes);
   virtual ~ThreadedLoaderContext ();
 
@@ -328,6 +331,7 @@ public:
   virtual iLight* FindLight (const char *name);
   virtual bool CheckDupes () const { return checkDupes; }
   virtual iRegion* GetRegion () const { return region; }
+  virtual bool CurrentRegionOnly () const { return curRegOnly; }
 };
 
 /**
@@ -686,10 +690,11 @@ public:
   virtual csPtr<iSoundWrapper> LoadSound (const char *name, const char *fname);
 
   virtual csPtr<iLoaderStatus> ThreadedLoadMapFile (const char* filename,
-	iRegion* region, bool checkDupes);
+	iRegion* region, bool curRegOnly, bool checkDupes);
   virtual bool LoadMapFile (const char* filename, bool clearEngine,
-	iRegion* region, bool checkDupes);
-  virtual bool LoadLibraryFile (const char* filename, iRegion* region);
+	iRegion* region, bool curRegOnly, bool checkDupes);
+  virtual bool LoadLibraryFile (const char* filename, iRegion* region,
+  	bool curRegOnly);
 
   virtual csPtr<iMeshFactoryWrapper> LoadMeshObjectFactory (const char* fname);
   virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname);

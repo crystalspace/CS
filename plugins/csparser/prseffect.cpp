@@ -45,7 +45,7 @@ bool csLoader::LoadEffectFile(const char* filename)
   }
 
   csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-	new StdLoaderContext (Engine, 0, this, false));
+	new StdLoaderContext (Engine, 0, true, this, false));
 
   csRef<iDocument> doc;
   bool er = TestXml (filename, buf, doc);

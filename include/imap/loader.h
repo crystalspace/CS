@@ -106,7 +106,9 @@ struct iLoader : public iBase
    * If 'region' is not 0 then portals will only connect to the
    * sectors in that region, things will only use thing templates
    * defined in that region and meshes will only use mesh factories
-   * defined in that region.
+   * defined in that region. If the region is not 0 and curRegOnly is true
+   * then objects (materials, factories, ...) will only be found in the
+   * given region.
    * <p>
    * If you use 'checkDupes' == true then materials, textures,
    * and mesh factories will only be loaded if they don't already exist
@@ -121,7 +123,8 @@ struct iLoader : public iBase
    * @@@ NOT IMPLEMENTED YET @@@
    */
   virtual csPtr<iLoaderStatus> ThreadedLoadMapFile (const char* filename,
-	iRegion* region = 0, bool checkDupes = false) = 0;
+	iRegion* region = 0, bool curRegOnly = true,
+	bool checkDupes = false) = 0;
 
   /**
    * Load a map file. If 'clearEngine' is true then the current contents
@@ -129,7 +132,9 @@ struct iLoader : public iBase
    * If 'region' is not 0 then portals will only connect to the
    * sectors in that region, things will only use thing templates
    * defined in that region and meshes will only use mesh factories
-   * defined in that region.
+   * defined in that region. If the region is not 0 and curRegOnly is true
+   * then objects (materials, factories, ...) will only be found in the
+   * given region.
    * <p>
    * If you use 'checkDupes' == true then materials, textures,
    * and mesh factories will only be loaded if they don't already exist
@@ -139,9 +144,11 @@ struct iLoader : public iBase
    * objects have unique names accross all world files.
    */
   virtual bool LoadMapFile (const char* filename, bool clearEngine = true,
-	iRegion* region = 0, bool checkDupes = false) = 0;
+	iRegion* region = 0, bool curRegOnly = true,
+	bool checkDupes = false) = 0;
   /// Load library from a VFS file
-  virtual bool LoadLibraryFile (const char* filename, iRegion* region = 0) = 0;
+  virtual bool LoadLibraryFile (const char* filename, iRegion* region = 0,
+  	bool curRegOnly = true) = 0;
 
   /// Load a Mesh Object Factory from the map file.
   virtual csPtr<iMeshFactoryWrapper> LoadMeshObjectFactory (

@@ -105,12 +105,13 @@ SCF_IMPLEMENT_IBASE(StdLoaderContext);
 SCF_IMPLEMENT_IBASE_END;
 
 StdLoaderContext::StdLoaderContext (iEngine* Engine,
-	iRegion* region, csLoader* loader,
+	iRegion* region, bool curRegOnly, csLoader* loader,
 	bool checkDupes)
 {
   SCF_CONSTRUCT_IBASE (0);
   StdLoaderContext::Engine = Engine;
   StdLoaderContext::region = region;
+  StdLoaderContext::curRegOnly = curRegOnly;
   StdLoaderContext::loader = loader;
   StdLoaderContext::checkDupes = checkDupes;
 }
@@ -121,7 +122,7 @@ StdLoaderContext::~StdLoaderContext ()
 
 iSector* StdLoaderContext::FindSector (const char* name)
 {
-  return Engine->FindSector (name, region);
+  return Engine->FindSector (name, curRegOnly ? region : 0);
 }
 
 iMaterialWrapper* StdLoaderContext::FindMaterial (const char* name)
@@ -129,7 +130,7 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* name)
   // @@@ in case the material is not found a replacement is taken.
   // however, somehow the location of the errorneous material name
   // should be reported. 
-  iMaterialWrapper* mat = Engine->FindMaterial (name, region);
+  iMaterialWrapper* mat = Engine->FindMaterial (name, curRegOnly ? region : 0);
   if (mat)
     return mat;
 
@@ -166,25 +167,26 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* name)
 
 iMeshFactoryWrapper* StdLoaderContext::FindMeshFactory (const char* name)
 {
-  return Engine->FindMeshFactory (name, region);
+  return Engine->FindMeshFactory (name, curRegOnly ? region : 0);
 }
 
 iMeshWrapper* StdLoaderContext::FindMeshObject (const char* name)
 {
-  return Engine->FindMeshObject (name, region);
+  return Engine->FindMeshObject (name, curRegOnly ? region : 0);
 }
 
 iLight* StdLoaderContext::FindLight (const char *name)
 {
   // This function is necessary because Engine::FindLight returns iStatLight
   // and not iLight.
-  csRef<iLightIterator> li = Engine->GetLightIterator(region);
+  csRef<iLightIterator> li = Engine->GetLightIterator (
+  	curRegOnly ? region : 0);
   iLight *light;
 
   while (li->HasNext ())
   {
     light = li->Next ();
-    if (!strcmp (light->GetPrivateObject ()->GetName (),name))
+    if (!strcmp (light->GetPrivateObject ()->GetName (), name))
       return light;
   }
   return 0;
@@ -196,7 +198,7 @@ iTextureWrapper* StdLoaderContext::FindTexture (const char* name)
   // however, somehow the location of the errorneous texture name
   // should be reported. 
   iTextureWrapper* result;
-  if (region)
+  if (region && curRegOnly)
     result = region->FindTexture (name);
   else
     result = Engine->GetTextureList ()->FindByName (name);
@@ -219,11 +221,12 @@ SCF_IMPLEMENT_IBASE(ThreadedLoaderContext);
 SCF_IMPLEMENT_IBASE_END;
 
 ThreadedLoaderContext::ThreadedLoaderContext (iEngine* Engine,
-	iRegion* region, csLoader* loader,
+	iRegion* region, bool curRegOnly, csLoader* loader,
 	bool checkDupes)
 {
   SCF_CONSTRUCT_IBASE (0);
   ThreadedLoaderContext::region = region;
+  ThreadedLoaderContext::curRegOnly = curRegOnly;
   ThreadedLoaderContext::loader = loader;
   ThreadedLoaderContext::checkDupes = checkDupes;
 }
@@ -234,7 +237,7 @@ ThreadedLoaderContext::~ThreadedLoaderContext ()
 
 iSector* ThreadedLoaderContext::FindSector (const char* name)
 {
-  return Engine->FindSector (name, region);
+  return Engine->FindSector (name, curRegOnly ? region : 0);
 }
 
 iMaterialWrapper* ThreadedLoaderContext::FindMaterial (const char* name)
@@ -242,7 +245,7 @@ iMaterialWrapper* ThreadedLoaderContext::FindMaterial (const char* name)
   // @@@ in case the material is not found a replacement is taken.
   // however, somehow the location of the errorneous material name
   // should be reported. 
-  iMaterialWrapper* mat = Engine->FindMaterial (name, region);
+  iMaterialWrapper* mat = Engine->FindMaterial (name, curRegOnly ? region : 0);
   if (mat)
     return mat;
 
@@ -279,19 +282,20 @@ iMaterialWrapper* ThreadedLoaderContext::FindMaterial (const char* name)
 
 iMeshFactoryWrapper* ThreadedLoaderContext::FindMeshFactory (const char* name)
 {
-  return Engine->FindMeshFactory (name, region);
+  return Engine->FindMeshFactory (name, curRegOnly ? region : 0);
 }
 
 iMeshWrapper* ThreadedLoaderContext::FindMeshObject (const char* name)
 {
-  return Engine->FindMeshObject (name, region);
+  return Engine->FindMeshObject (name, curRegOnly ? region : 0);
 }
 
 iLight* ThreadedLoaderContext::FindLight (const char *name)
 {
   // This function is necessary because Engine::FindLight returns iStatLight
   // and not iLight.
-  csRef<iLightIterator> li = Engine->GetLightIterator(region);
+  csRef<iLightIterator> li = Engine->GetLightIterator (
+  	curRegOnly ? region : 0);
   iLight *light;
 
   while (li->HasNext ())
@@ -309,7 +313,7 @@ iTextureWrapper* ThreadedLoaderContext::FindTexture (const char* name)
   // however, somehow the location of the errorneous texture name
   // should be reported. 
   iTextureWrapper* result;
-  if (region)
+  if (region && curRegOnly)
     result = region->FindTexture (name);
   else
     result = Engine->GetTextureList ()->FindByName (name);
@@ -488,17 +492,17 @@ csPtr<iBase> csLoader::TestXmlPlugParse (iLoaderContext* ldr_context,
 //---------------------------------------------------------------------------
 
 csPtr<iLoaderStatus> csLoader::ThreadedLoadMapFile (const char* filename,
-	iRegion* /*region*/, bool /*checkDupes*/)
+	iRegion* /*region*/, bool /*curRegOnly*/, bool /*checkDupes*/)
 {
   return 0;
 }
 
 bool csLoader::LoadMapFile (const char* file, bool clearEngine,
-  iRegion* region, bool checkdupes)
+  iRegion* region, bool curRegOnly, bool checkdupes)
 {
   if (clearEngine) Engine->DeleteAll ();
   csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-	new StdLoaderContext (Engine, region, this, checkdupes));
+	new StdLoaderContext (Engine, region, curRegOnly, this, checkdupes));
 
   csRef<iFile> buf (VFS->Open (file, VFS_FILE_READ));
 
@@ -533,7 +537,8 @@ bool csLoader::LoadMapFile (const char* file, bool clearEngine,
 
 //---------------------------------------------------------------------------
 
-bool csLoader::LoadLibraryFile (const char* fname, iRegion* region)
+bool csLoader::LoadLibraryFile (const char* fname, iRegion* region,
+	bool curRegOnly)
 {
   csRef<iFile> buf (VFS->Open (fname, VFS_FILE_READ));
 
@@ -546,7 +551,7 @@ bool csLoader::LoadLibraryFile (const char* fname, iRegion* region)
   }
 
   csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-	new StdLoaderContext (Engine, region, this, false));
+	new StdLoaderContext (Engine, region, curRegOnly, this, false));
 
   csRef<iDocument> doc;
   bool er = TestXml (fname, buf, doc);
@@ -578,7 +583,7 @@ csPtr<iMeshFactoryWrapper> csLoader::LoadMeshObjectFactory (const char* fname)
   if (!Engine) return 0;
 
   csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-	new StdLoaderContext (Engine, 0, this, false));
+	new StdLoaderContext (Engine, 0, true, this, false));
 
   csRef<iFile> databuff (VFS->Open (fname, VFS_FILE_READ));
 
@@ -638,7 +643,7 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
   csRef<iFile> databuff (VFS->Open (fname, VFS_FILE_READ));
   csRef<iMeshWrapper> mesh;
   csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-	new StdLoaderContext (Engine, 0, this, false));
+	new StdLoaderContext (Engine, 0, true, this, false));
 
   if (!databuff || !databuff->GetSize ())
   {
@@ -1045,7 +1050,7 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
           break;
         case XMLTOKEN_LIBRARY:
 	  if (!LoadLibraryFile (child->GetContentsValue (),
-	  	ldr_context->GetRegion ()))
+	  	ldr_context->GetRegion (), ldr_context->CurrentRegionOnly ()))
 	    return false;
 	  break;
         case XMLTOKEN_START:
@@ -3041,6 +3046,7 @@ iCollection* csLoader::ParseCollection (iLoaderContext* ldr_context,
 	  {
 	    iSector* sect = sl->Get (i);
 	    if ((!ldr_context->GetRegion ()) ||
+	    	(!ldr_context->CurrentRegionOnly ()) ||
 	        ldr_context->GetRegion ()->IsInRegion (sect->QueryObject ()))
 	    {
 	      l = sect->GetLights ()->FindByName (lightname);
@@ -3080,9 +3086,8 @@ iCollection* csLoader::ParseCollection (iLoaderContext* ldr_context,
       case XMLTOKEN_COLLECTION:
         {
 	  const char* colname = child->GetContentsValue ();
-	  //@@@$$$ TODO: Collection in regions.
 	  iCollection* th;
-	  if (ldr_context->GetRegion ())
+	  if (ldr_context->GetRegion () && ldr_context->CurrentRegionOnly ())
 	    th = ldr_context->GetRegion ()->FindCollection (colname);
 	  else
             th = Engine->GetCollections ()->FindByName (colname);

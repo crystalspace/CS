@@ -2773,9 +2773,10 @@ class EngineLoaderContext : public iLoaderContext
 private:
   iEngine* Engine;
   iRegion* region;
+  bool curRegOnly;
 
 public:
-  EngineLoaderContext (iEngine* Engine, iRegion* region);
+  EngineLoaderContext (iEngine* Engine, iRegion* region, bool curRegOnly);
   virtual ~EngineLoaderContext ();
 
   SCF_DECLARE_IBASE;
@@ -2787,7 +2788,8 @@ public:
   virtual iTextureWrapper* FindTexture (const char* name);
   virtual iLight* FindLight(const char *name);
   virtual bool CheckDupes () const { return false; }
-  virtual iRegion* GetRegion () const { return 0; }
+  virtual iRegion* GetRegion () const { return region; }
+  virtual bool CurrentRegionOnly () const { return curRegOnly; }
 };
 
 SCF_IMPLEMENT_IBASE(EngineLoaderContext);
@@ -2795,11 +2797,12 @@ SCF_IMPLEMENT_IBASE(EngineLoaderContext);
 SCF_IMPLEMENT_IBASE_END;
 
 EngineLoaderContext::EngineLoaderContext (iEngine* Engine,
-	iRegion* region)
+	iRegion* region, bool curRegOnly)
 {
   SCF_CONSTRUCT_IBASE (0);
   EngineLoaderContext::Engine = Engine;
   EngineLoaderContext::region = region;
+  EngineLoaderContext::curRegOnly = curRegOnly;
 }
 
 EngineLoaderContext::~EngineLoaderContext ()
@@ -2808,34 +2811,35 @@ EngineLoaderContext::~EngineLoaderContext ()
 
 iSector* EngineLoaderContext::FindSector (const char* name)
 {
-  return Engine->FindSector (name, region);
+  return Engine->FindSector (name, curRegOnly ? region : 0);
 }
 
 iMaterialWrapper* EngineLoaderContext::FindMaterial (const char* name)
 {
-  return Engine->FindMaterial (name, region);
+  return Engine->FindMaterial (name, curRegOnly ? region : 0);
 }
 
 iMeshFactoryWrapper* EngineLoaderContext::FindMeshFactory (const char* name)
 {
-  return Engine->FindMeshFactory (name, region);
+  return Engine->FindMeshFactory (name, curRegOnly ? region : 0);
 }
 
 iMeshWrapper* EngineLoaderContext::FindMeshObject (const char* name)
 {
-  return Engine->FindMeshObject (name, region);
+  return Engine->FindMeshObject (name, curRegOnly ? region : 0);
 }
 
 iTextureWrapper* EngineLoaderContext::FindTexture (const char* name)
 {
-  return Engine->FindTexture (name, region);
+  return Engine->FindTexture (name, curRegOnly ? region : 0);
 }
 
 iLight* EngineLoaderContext::FindLight(const char *name)
 {
   // This function is necessary because Engine::FindLight returns iStatLight
   // and not iLight.
-  csRef<iLightIterator> li = Engine->GetLightIterator(region);
+  csRef<iLightIterator> li = Engine->GetLightIterator (
+  	curRegOnly ? region : 0);
   iLight *light;
 
   while (li->HasNext ())
@@ -2849,9 +2853,11 @@ iLight* EngineLoaderContext::FindLight(const char *name)
 
 //------------------------------------------------------------------------
 
-csPtr<iLoaderContext> csEngine::CreateLoaderContext (iRegion* region)
+csPtr<iLoaderContext> csEngine::CreateLoaderContext (iRegion* region,
+	bool curRegOnly)
 {
-  return csPtr<iLoaderContext> (new EngineLoaderContext (this, region));
+  return csPtr<iLoaderContext> (new EngineLoaderContext (this, region,
+  	curRegOnly));
 }
 
 //------------------------------------------------------------------------
@@ -2885,7 +2891,7 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
   csRef<iMeshFactoryWrapper> fact (CreateMeshFactory (name));
   if (!fact) return 0;
 
-  csRef<iLoaderContext> elctxt (CreateLoaderContext ());
+  csRef<iLoaderContext> elctxt (CreateLoaderContext (0, true));
   csRef<iBase> mof (plug->Parse (
       doc->GetRoot (), elctxt, fact->GetMeshObjectFactory ()));
   if (!mof)
@@ -2950,7 +2956,7 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
     meshwrap->GetMovable ().UpdateMove ();
   }
 
-  csRef<iLoaderContext> elctxt (CreateLoaderContext ());
+  csRef<iLoaderContext> elctxt (CreateLoaderContext (0, true));
   csRef<iBase> mof (plug->Parse (doc->GetRoot (), elctxt, imw));
   if (!mof)
   {
