@@ -122,6 +122,12 @@ public:
   /// Deletes the given object, removing it from the object tree
   virtual void ObjRemove (iObject *obj);
 
+  /// Removes all objects from the tree, without freeing the contents
+  virtual void ObjReleaseAll ();
+
+  /// Deletes all objects, removing them from the object tree
+  virtual void ObjRemoveAll ();
+
   /**
    * Look for a child object that implements the given type. You can
    * optionally pass a name to look for. If FirstName is true then the

@@ -64,25 +64,23 @@ csRegion::~csRegion ()
 
 void csRegion::Region::Clear ()
 {
-  csObject* obj = scfParent->GetChild (csObject::Type, true);
-  while (obj)
-  {
-    scfParent->ObjRelease (obj);
-    obj = scfParent->GetChild (csObject::Type, true);
-  }
+  scfParent->ObjReleaseAll ();
 }
 
 void csRegion::Region::DeleteAll ()
 {
+  iObjectIterator *iter;
+
   // First we need to copy the objects to a csVector to avoid
   // messing up the iterator while we are deleting them.
   csVector copy;
-  for (csObjIterator iter = scfParent->GetIterator (csObject::Type, true);
-  	!iter.IsFinished () ; ++iter)
+  for (iter = scfParent->GetIterator ();
+  	!iter->IsFinished () ; iter->Next ())
   {
-    csObject* o = iter.GetObj ();
+    iObject* o = iter->GetiObject ();
     copy.Push (o);
   }
+  iter->DecRef ();
 
   // Now we iterate over all objects in the 'copy' vector and
   // delete them. This will release them as csObject children
@@ -95,7 +93,7 @@ void csRegion::Region::DeleteAll ()
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
-      csObject* obj = (csObject*)copy[i];
+      iObject* obj = (iObject*)copy[i];
       csCollection* o = QUERY_OBJECT_TYPE (obj, csCollection);
       if (!o) continue;
       scfParent->engine->RemoveCollection (o);
@@ -105,7 +103,7 @@ void csRegion::Region::DeleteAll ()
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
-      csObject* obj = (csObject*)copy[i];
+      iObject* obj = (iObject*)copy[i];
       csMeshWrapper* o = QUERY_OBJECT_TYPE (obj, csMeshWrapper);
       if (!o) continue;
       scfParent->engine->RemoveMesh (o);
@@ -118,7 +116,7 @@ void csRegion::Region::DeleteAll ()
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
-      csObject* obj = (csObject*)copy[i];
+      iObject* obj = (iObject*)copy[i];
       csMeshFactoryWrapper* o = QUERY_OBJECT_TYPE (obj, csMeshFactoryWrapper);
       if (!o) continue;
       scfParent->engine->mesh_factories.Delete (
@@ -129,7 +127,7 @@ void csRegion::Region::DeleteAll ()
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
-      csObject* obj = (csObject*)copy[i];
+      iObject* obj = (iObject*)copy[i];
       csCurveTemplate* o = QUERY_OBJECT_TYPE (obj, csCurveTemplate);
       if (!o) continue;
       scfParent->engine->curve_templates.Delete (
@@ -140,7 +138,7 @@ void csRegion::Region::DeleteAll ()
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
-      csObject* obj = (csObject*)copy[i];
+      iObject* obj = (iObject*)copy[i];
       csSector* o = QUERY_OBJECT_TYPE (obj, csSector);
       if (!o) continue;
       int idx = scfParent->engine->sectors.Find (o);
@@ -154,7 +152,7 @@ void csRegion::Region::DeleteAll ()
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
-      csObject* obj = (csObject*)copy[i];
+      iObject* obj = (iObject*)copy[i];
       csMaterialWrapper* o = QUERY_OBJECT_TYPE (obj, csMaterialWrapper);
       if (!o) continue;
       int idx = scfParent->engine->GetMaterials ()->Find (o);
@@ -168,7 +166,7 @@ void csRegion::Region::DeleteAll ()
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
-      csObject* obj = (csObject*)copy[i];
+      iObject* obj = (iObject*)copy[i];
       csTextureWrapper* o = QUERY_OBJECT_TYPE (obj, csTextureWrapper);
       if (!o) continue;
       int idx = scfParent->engine->GetTextures ()->Find (o);
@@ -180,9 +178,11 @@ void csRegion::Region::DeleteAll ()
     }
 
   for (i = 0 ; i < copy.Length () ; i++)
-    if (copy[i] && ((csObject*)copy[i])->GetType () == csCameraPosition::Type)
+    if (copy[i])
     {
-      csCameraPosition* o = (csCameraPosition*)copy[i];
+      iObject* obj = (iObject*)copy[i];
+      csCameraPosition* o = QUERY_OBJECT_TYPE (obj, csCameraPosition);
+      if (!o) continue;
       int idx = scfParent->engine->camera_positions.Find (o);
       if (idx != -1)
         scfParent->engine->camera_positions.Delete (idx);
@@ -194,7 +194,7 @@ void csRegion::Region::DeleteAll ()
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
-      csObject* obj = (csObject*)copy[i];
+      iObject* obj = (iObject*)copy[i];
       csPolyTxtPlane* o = QUERY_OBJECT_TYPE (obj, csPolyTxtPlane);
       if (!o) continue;
       // Do a release here because the plane may still be used by other
@@ -214,67 +214,67 @@ void csRegion::Region::DeleteAll ()
   for (i = 0 ; i < copy.Length () ; i++)
     if (copy[i])
     {
-      csObject* o = (csObject*)copy[i];
+      iObject* o = (iObject*)copy[i];
       CsPrintf (MSG_INTERNAL_ERROR, "\
 There is still an object in the array after deleting region contents!\n\
-Object name is '%s', object type is '%s'\n",
-	o->GetName () ? o->GetName () : "<NoName>",
-	o->GetType ().ID);
+Object name is '%s'\n",
+	o->GetName () ? o->GetName () : "<NoName>");
     }
 #endif // CS_DEBUG
 }
 
 bool csRegion::Region::PrepareTextures ()
 {
+  iObjectIterator *iter;
   iTextureManager* txtmgr = csEngine::current_engine->G3D->GetTextureManager();
   //txtmgr->ResetPalette ();
 
   // First register all textures to the texture manager.
   {
-    for (csObjIterator iter =
-	scfParent->GetIterator (csTextureWrapper::Type, false);
-  	!iter.IsFinished () ; ++iter)
+    for (iter = scfParent->GetIterator (OBJECT_TYPE_ID(csTextureWrapper));
+  	!iter->IsFinished () ; iter->Next())
     {
-      csTextureWrapper* csth = (csTextureWrapper*)iter.GetObj ();
+      csTextureWrapper* csth = (csTextureWrapper*)iter->GetTypedObj ();
       if (!csth->GetTextureHandle ())
         csth->Register (txtmgr);
     }
+    iter->DecRef ();
   }
 
   // Prepare all the textures.
   //@@@ Only prepare new textures: txtmgr->PrepareTextures ();
   {
-    for (csObjIterator iter =
-	scfParent->GetIterator (csTextureWrapper::Type, false);
-  	!iter.IsFinished () ; ++iter)
+    for (iter = scfParent->GetIterator (OBJECT_TYPE_ID(csTextureWrapper));
+  	!iter->IsFinished () ; iter->Next())
     {
-      csTextureWrapper* csth = (csTextureWrapper*)iter.GetObj ();
+      csTextureWrapper* csth = (csTextureWrapper*)iter->GetTypedObj ();
       csth->GetTextureHandle ()->Prepare ();
     }
+    iter->DecRef ();
   }
 
   // Then register all materials to the texture manager.
   {
-    for (csObjIterator iter = 
-	scfParent->GetIterator (csMaterialWrapper::Type, false);
-  	!iter.IsFinished () ; ++iter)
+    for (iter = scfParent->GetIterator (OBJECT_TYPE_ID(csMaterialWrapper));
+  	!iter->IsFinished () ; iter->Next())
     {
-      csMaterialWrapper* csmh = (csMaterialWrapper*)iter.GetObj ();
+      csMaterialWrapper* csmh = (csMaterialWrapper*)iter->GetTypedObj ();
       if (!csmh->GetMaterialHandle ())
         csmh->Register (txtmgr);
     }
+    iter->DecRef ();
   }
 
   // Prepare all the materials.
   //@@@ Only prepare new materials: txtmgr->PrepareMaterials ();
   {
-    for (csObjIterator iter = 
-	scfParent->GetIterator (csMaterialWrapper::Type, false);
-  	!iter.IsFinished () ; ++iter)
+    for (iter = scfParent->GetIterator (OBJECT_TYPE_ID(csMaterialWrapper));
+  	!iter->IsFinished () ; iter->Next())
     {
-      csMaterialWrapper* csmh = (csMaterialWrapper*)iter.GetObj ();
+      csMaterialWrapper* csmh = (csMaterialWrapper*)iter->GetTypedObj ();
       csmh->GetMaterialHandle ()->Prepare ();
     }
+    iter->DecRef ();
   }
 
   return true;
@@ -293,17 +293,17 @@ bool csRegion::Region::Prepare ()
   return true;
 }
 
-void csRegion::AddToRegion (csObject* obj)
+void csRegion::AddToRegion (iObject* obj)
 {
   ObjAdd (obj);
 }
 
-void csRegion::ReleaseFromRegion (csObject* obj)
+void csRegion::ReleaseFromRegion (iObject* obj)
 {
   ObjRelease (obj);
 }
 
-csObject* csRegion::FindObject (const char* iName, const csIdType& type,
+iObject* csRegion::FindObject (const char* iName, const csIdType& type,
       	bool derived)
 {
   for (csObjIterator iter = GetIterator (type, derived);
@@ -318,39 +318,41 @@ csObject* csRegion::FindObject (const char* iName, const csIdType& type,
 
 iSector* csRegion::Region::FindSector (const char *iName)
 {
-  csSector* obj = (csSector*)scfParent->FindObject(iName,csSector::Type,false);
+  csSector* obj = (csSector*)scfParent->GetChild(
+    OBJECT_TYPE_ID (csSector), iName);
   if (!obj) return NULL;
   return &obj->scfiSector;
 }
 
 iMeshWrapper* csRegion::Region::FindMeshObject (const char *iName)
 {
-  csMeshWrapper* obj = (csMeshWrapper*)scfParent->FindObject (iName,
-  	csMeshWrapper::Type,true);
+  csMeshWrapper* obj = (csMeshWrapper*)scfParent->GetChild (
+    OBJECT_TYPE_ID (csMeshWrapper), iName);
   if (!obj) return NULL;
-  return QUERY_INTERFACE (obj, iMeshWrapper);
+  return &obj->scfiMeshWrapper;
 }
 
 iMeshFactoryWrapper* csRegion::Region::FindMeshFactory (const char *iName)
 {
   csMeshFactoryWrapper* obj = (csMeshFactoryWrapper*)
-    scfParent->FindObject (iName, csMeshFactoryWrapper::Type, false);
+    scfParent->GetChild (OBJECT_TYPE_ID (csMeshFactoryWrapper), iName);
   if (!obj) return NULL;
   return &obj->scfiMeshFactoryWrapper;
 }
 
 iTerrainWrapper* csRegion::Region::FindTerrainObject (const char *iName)
 {
-  csTerrainWrapper* obj = (csTerrainWrapper*)scfParent->FindObject( iName,csTerrainWrapper::Type,true );
+  csTerrainWrapper* obj = (csTerrainWrapper*)scfParent->GetChild (
+    OBJECT_TYPE_ID (csTerrainWrapper), iName);
   if (!obj)
     return NULL;
-  return QUERY_INTERFACE( obj, iTerrainWrapper );
+  return &obj->scfiTerrainWrapper;
 }
 
 iTerrainFactoryWrapper* csRegion::Region::FindTerrainFactory (const char *iName)
 {
   csTerrainFactoryWrapper* obj = (csTerrainFactoryWrapper*)
-    scfParent->FindObject (iName, csTerrainFactoryWrapper::Type, false);
+    scfParent->GetChild (OBJECT_TYPE_ID (csTerrainFactoryWrapper), iName);
   if (!obj)
     return NULL;
   return &obj->scfiTerrainFactoryWrapper;
@@ -358,41 +360,39 @@ iTerrainFactoryWrapper* csRegion::Region::FindTerrainFactory (const char *iName)
 
 iTextureWrapper* csRegion::Region::FindTexture (const char *iName)
 {
-  csObject* obj = scfParent->FindObject (iName, csTextureWrapper::Type, false);
+  csTextureWrapper* obj = (csTextureWrapper*)scfParent->GetChild (
+    OBJECT_TYPE_ID (csTextureWrapper), iName);
   if (!obj) return NULL;
-  csTextureWrapper* wrapper = (csTextureWrapper*)obj;
-  return &wrapper->scfiTextureWrapper;
+  return &obj->scfiTextureWrapper;
 }
 
 iMaterialWrapper* csRegion::Region::FindMaterial (const char *iName)
 {
-  csObject* obj = scfParent->FindObject(iName,csMaterialWrapper::Type,false);
+  csMaterialWrapper* obj = (csMaterialWrapper*)scfParent->GetChild(
+    OBJECT_TYPE_ID (csMaterialWrapper), iName);
   if (!obj) return NULL;
-  csMaterialWrapper* wrapper = (csMaterialWrapper*)obj;
-  return &wrapper->scfiMaterialWrapper;
+  return &obj->scfiMaterialWrapper;
 }
 
 iCameraPosition* csRegion::Region::FindCameraPosition (const char *iName)
 {
-  csObject* obj = scfParent->FindObject (iName, csCameraPosition::Type, false);
+  csCameraPosition* obj = (csCameraPosition*)scfParent->GetChild (
+    OBJECT_TYPE_ID (csCameraPosition), iName);
   if (!obj) return NULL;
-  csCameraPosition* campos = (csCameraPosition*)obj;
-  return &campos->scfiCameraPosition;
+  return &obj->scfiCameraPosition;
 }
 
 iCollection* csRegion::Region::FindCollection (const char *iName)
 {
-  csObject* obj = scfParent->FindObject (iName, csCollection::Type, false);
+  csCollection* obj = (csCollection*)scfParent->GetChild (
+    OBJECT_TYPE_ID (csCollection), iName);
   if (!obj) return NULL;
-  csCollection* coll = (csCollection*)obj;
-  return &coll->scfiCollection;
+  return &obj->scfiCollection;
 }
 
 bool csRegion::IsInRegion (iObject* iobj)
 {
-  csObject* obj = (csObject*)iobj;
-  csObject* objpar = obj->GetObjectParent ();
-  return objpar == (csObject*)this;
+  return iobj->GetObjectParentI () == this;
 }
 
 bool csRegion::Region::IsInRegion (iObject* iobj)

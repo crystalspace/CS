@@ -50,19 +50,19 @@ public:
   /**
    * Add an object to this region.
    */
-  void AddToRegion (csObject* obj);
+  void AddToRegion (iObject* obj);
 
   /**
    * Release an object from this region.
    */
-  void ReleaseFromRegion (csObject* obj);
+  void ReleaseFromRegion (iObject* obj);
 
   /**
    * Find an object of a given name and type.
    * If 'derived' == true it will also consider objects
    * which are of derived types of the given type.
    */
-  csObject* FindObject (const char* iName, const csIdType& type,
+  iObject* FindObject (const char* iName, const csIdType& type,
       	bool derived = false);
 
   /**

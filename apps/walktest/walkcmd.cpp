@@ -452,11 +452,10 @@ bool GetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
 
 void WalkTest::ParseKeyCmds (csObject* src)
 {
-  csObjIterator it = src->GetIterator (csKeyValuePair::Type);
-  while (!it.IsFinished ())
+  iObjectIterator *it = src->GetIterator (OBJECT_TYPE_ID(csKeyValuePair));
+  while (!it->IsFinished ())
   {
-    csObject* obj = it.GetObj ();
-    csKeyValuePair* kp = (csKeyValuePair*)obj;
+    csKeyValuePair* kp = (csKeyValuePair*)it->GetTypedObj ();
     if (!strcmp (kp->GetKey (), "cmd_AnimateSky"))
     {
       csSector *Sector = QUERY_OBJECT_TYPE (src, csSector);
@@ -544,8 +543,10 @@ void WalkTest::ParseKeyCmds (csObject* src)
     {
       // Unknown command. Ignore for the moment.
     }
-    it.Next ();
+    it->Next ();
   }
+  it->DecRef ();
+
   csMeshWrapper *mesh = QUERY_OBJECT_TYPE (src, csMeshWrapper);
   if (mesh)
   {
@@ -556,6 +557,7 @@ void WalkTest::ParseKeyCmds (csObject* src)
       ParseKeyCmds (spr);
     }
   }
+
 }
 
 void WalkTest::ParseKeyCmds ()

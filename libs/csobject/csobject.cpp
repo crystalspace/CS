@@ -82,9 +82,14 @@ public:
   }
   virtual void Reset()
   {
-    Position = 0;
-    if (!TypeCheck ())
-      Next ();
+    if (Object->children == NULL)
+      Position = -1;
+    else
+    {
+      Position = 0;
+      if (!TypeCheck ())
+        Next ();
+    }
   }
   virtual void* GetTypedObj() const
   {
@@ -294,6 +299,18 @@ void csObject::ObjRemove (iObject *obj)
 { 
   ObjRelease (obj);
   obj->DecRef ();
+}
+
+void csObject::ObjReleaseAll ()
+{
+  while (children->count > 0)
+    ObjRelease (children->obj[0]);
+}
+
+void csObject::ObjRemoveAll ()
+{
+  while (children->count > 0)
+    ObjRemove (children->obj[0]);
 }
 
 void* csObject::GetChild (int TypeID, const char *Name, bool fn) const

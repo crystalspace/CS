@@ -49,6 +49,12 @@ struct iObject : public iBase
   /// Deletes the given object, removing it from the object tree
   virtual void ObjRemove (iObject *obj) = 0;
 
+  /// Removes all objects from the tree, without freeing the contents
+  virtual void ObjReleaseAll () = 0;
+
+  /// Deletes all objects, removing them from the object tree
+  virtual void ObjRemoveAll () = 0;
+
   /**
    * Look for a child object that implements the given type. You can
    * optionally pass a name to look for. If FirstName is true then the
