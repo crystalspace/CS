@@ -468,7 +468,7 @@ awsListBox::OnDraw(csRect clip)
 }
 
 bool
-awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int &border, bool child, bool last_child)
+awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, int depth, bool last_child)
 {
   iGraphics2D *g2d = WindowManager()->G2D();
   iGraphics3D *g3d = WindowManager()->G3D();
@@ -482,23 +482,36 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int &border, b
   // Find out if we need to leave now.
   if (y+ith > Frame().ymax) return true;
 
-  // Draw tree box if needed
-  if (row->children)
+  // Figure out how to draw boxes and stuff
+  if (row->children && depth)
   {
+    // When it's a child AND has children...
+    tree_expanded->GetOriginalDimensions(tbw, tbh);
+    g3d->DrawPixmap(tree_expanded, x+2+(tbw*(depth+1)), y, tbw, tbh, 0,0, tbw, tbh);
+    g3d->DrawPixmap(tree_hline, x+2+(tbw*depth), y, tbw, tbh, 0,0, tbw, tbh);
+
+    if (last_child)
+      g3d->DrawPixmap(tree_vline, x+2+(tbw*depth), y, tbw, ith>>1, 0,0, tbw, tbh);    
+    else
+      g3d->DrawPixmap(tree_vline, x+2+(tbw*depth), y, tbw, ith+2, 0,0, tbw, tbh);    
+    
+  }
+  else if (row->children)
+  {
+    // Draw tree box if needed
     tree_expanded->GetOriginalDimensions(tbw, tbh);
     g3d->DrawPixmap(tree_expanded, x+2, y, tbw, tbh, 0,0, tbw, tbh);
   }
-
-  // Draw child lines if needed and figure out where to draw stuff at.
-  if (child)
+  else if (depth)
   {
+    // Draw child lines if needed and figure out where to draw stuff at.
     tree_expanded->GetOriginalDimensions(tbw, tbh);
-    g3d->DrawPixmap(tree_hline, x+2+tbw, y, tbw, tbh, 0,0, tbw, tbh);
+    g3d->DrawPixmap(tree_hline, x+2+(tbw*depth), y, tbw, tbh, 0,0, tbw, tbh);
 
     if (last_child)
-      g3d->DrawPixmap(tree_vline, x+2+tbw, y, tbw, ith>>1, 0,0, tbw, tbh);    
+      g3d->DrawPixmap(tree_vline, x+2+(tbw*depth), y, tbw, ith>>1, 0,0, tbw, tbh);    
     else
-      g3d->DrawPixmap(tree_vline, x+2+tbw, y, tbw, ith+2, 0,0, tbw, tbh);    
+      g3d->DrawPixmap(tree_vline, x+2+(tbw*depth), y, tbw, ith+2, 0,0, tbw, tbh);    
   }
 
   // Draw columns
@@ -518,8 +531,12 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int &border, b
       // Get column width
       if (i==ncolumns-1)
         cw = Frame().xmax-x-border;
-      else if (i==0 && (child || row->children))
-        cw = columns[i].width-tbw;
+      else if (i==0 && depth && row->children)
+        cw = columns[i].width-(tbw*(depth+2));
+      else if (i==0 && row->children)
+        cw = columns[i].width-(tbw*depth);
+      else if (i==0 && depth)
+        cw = columns[i].width-(tbw*(depth+1));
       else
         cw = columns[i].width;
 
@@ -554,9 +571,10 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int &border, b
           break;
 
         default:
-          if (row->children && i==0)   tx = 2+tbw;
-          else if (child && i==0)      tx = 2+(tbw<<1);
-          else                         tx = 2;
+          if      (i==0 && depth && row->children)      tx = 2+(tbw*(depth+2));
+          else if (row->children && i==0)               tx = 2+tbw;
+          else if (depth && i==0)                       tx = 2+(tbw*(depth+1));
+          else                                          tx = 2;
 
           iws = iw+2; 
           break;
@@ -606,7 +624,7 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int &border, b
         int cx=orgx;
         awsListRow *newrow = (awsListRow *)row->children->Get(i);
 
-        if (DrawItemsRecursively(newrow, cx, y, border, true, (i==row->children->Length()-1 ? true : false)))
+        if (DrawItemsRecursively(newrow, cx, y, border, (depth ? depth+2 : depth+1), (i==row->children->Length()-1 ? true : false)))
           return true;
       }
     }
