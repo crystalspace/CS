@@ -23,6 +23,9 @@ chronological order.
 	- Luca added a very informative message in the bottom of the screen 
 	  for the waterdemo application.
         - Matze removed csengine from cs-config
+	- res made the following changes to data/config/opengl.cfg:
+	    - Improved comment for Video.OpenGL.TextureDownsample
+	    - Added GL font cache settings.
 25-Jan-2004
         - Matze did some updates to the jam rules:
             - I decided not to fight autoconf while using custom variable names.
