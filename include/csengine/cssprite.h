@@ -436,6 +436,9 @@ public:
   /// Sets the mode that is used, when drawing that sprite.
   void SetMixmode (UInt m) { MixMode = m; }
 
+  /// Gets the mode that is used, when drawing that sprite.
+  UInt GetMixmode () { return MixMode; }
+
   /**
    * Set a callback which is called just before the sprite is drawn.
    * This is useful to do some expensive computations which only need
