@@ -5,10 +5,17 @@ The history order is reversed so that new features are at the top.
 	  mesh wrappers on your own. This can be useful if you want to display
 	  an object in a CSWS window for example. Normally applications
 	  will rarely use this function.
-	- Martin Geisse added to 3d sprite factories the possibility to set
-	  a default mixing mode for new sprites. The model crossbuilder uses
-	  this feature to enable tiling for generated sprite factories if
-	  required.
+	- Martin Geisse did the following:
+	    - Added to 3d sprite factories the possibility to set
+	      a default mixing mode for new sprites. The model crossbuilder
+	      uses this feature to enable tiling for generated sprite
+	      factories if required.
+	    - Mdltest accepts a file name to load a model file. Currently it
+	      only uses the 3ds importer for this. Finally, it should use
+	      the converter-multiplexer instead.
+	    - The model crossbuilder now takes an iModelDataObject as
+	      parameter instead of an iModelData.
+	    - Fixed a bug in the 3ds importer.
 	- Wouter Wijngaards did the following:
 	    - Changed isotest debug condition. The invisble grid is now
 	      positioned at the old maze position.
