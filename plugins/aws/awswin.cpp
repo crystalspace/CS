@@ -69,6 +69,8 @@ awsWindow::awsWindow () :
 
 awsWindow::~awsWindow ()
 {
+  if (title)
+    title->DecRef();
 }
 
 bool awsWindow::Setup (iAws *_wmgr, iAwsComponentNode *settings)
