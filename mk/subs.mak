@@ -1,8 +1,8 @@
 # This submakefile dynamically compute the name for all
 # driver, libs and apps submakefiles and includes them.
 
-ifneq ($(TARGET),)
-  include mk/system/$(TARGET).mak
+ifneq ($(TARGET_MAKEFILE),)
+  include $(TARGET_MAKEFILE)
 endif
 
 ifeq ($(LIBRARY_SUBMAKEFILES),)

@@ -40,6 +40,11 @@ Short-term cleanups that need to be done:
 	  qualifiers throughout the project.
 	- Eric Sunshine fixed a bug in his CVS snapshot script (snapshot.py).
 	  It failed to close the time stamp file after reading it.
+	- Eric Sunshine eliminated the monolithic and inflexible organization
+	  of the platform-specific system makefiles by removing them from the
+	  global CS/mk/system directory and placing them in the proper and
+	  respective subdirectories of CS/libs/cssys, thus achieving a more
+	  modular configuration.
 11-Feb-2000
 	- Eric Sunshine eliminated several compilation warnings in csPhyziks.
 	- Eric Sunshine eliminated some unsigned versus signed warnings in

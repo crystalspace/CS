@@ -8,8 +8,8 @@
   configbanner clean cleanlib cleandep distclean libs plugins drivers \
   drivers2d drivers3d snddrivers netdrivers
 
-# The following two symbols are intended to be used in "echo" commands
-# config.mak can override them depending on configured system requirements
+# The following two symbols are intended to be used in "echo" commands.
+# config.mak can override them depending on configured platform's requirements.
 "='
 |=|
 -include config.mak
@@ -17,8 +17,9 @@
 include mk/user.mak
 include mk/common.mak
 
-# Find all available system targets
-SYSTARGETS=$(patsubst mk/system/%.mak,%,$(wildcard mk/system/*.mak))
+# Find all available platform targets
+SYSMAKEFILES=$(wildcard libs/cssys/*/*.mak)
+SYSTARGETS=$(basename $(notdir $(SYSMAKEFILES)))
 
 # The initial driver and application targets help text
 SYSHELP = \
@@ -63,12 +64,12 @@ define MAKE_VOLATILE_H
   echo $"#define COMP_$(COMP)$">>volatile.tmp
 endef
 
-# If there is no target defined (makefile system were not configured),
-# look which targets are available in mk/system directory.
+# If there is no target defined (makefile system was not configured),
+# find the available targets and present the list to the user.
 ifeq ($(TARGET),)
 
 MAKESECTION=confighelp
--include $(wildcard mk/system/*.mak)
+-include $(SYSMAKEFILES)
 
 help: banner showplatforms
 
@@ -91,7 +92,7 @@ unknown:
 
 platforms:
 	@echo $(SEPARATOR)
-	@$(MAKE) --no-print-directory showplatforms TARGET=
+	@$(MAKE) --no-print-directory showplatforms TARGET="" TARGET_MAKEFILE=""
 
 showconfig:
 	@echo $"  Configured for $(DESCRIPTION.$(TARGET)) with the following modifiers:$"
@@ -133,13 +134,15 @@ showplatforms:
 	@echo $"  Example: make linux USE_SHARED_PLUGINS=yes MODE=debug$"
 	@echo $(SEPARATOR)
 
-# Prepare for specific system
+# Prepare for specific platform.
 # WARNING: Try to avoid quotes in most important "echo" statements
-# since several systems (OS/2, DOS and WIN32) have a "echo" that does
+# since several platforms (OS/2, DOS and WIN32) have a "echo" that does
 # literal output, i.e. they do not strip quotes from string.
 $(SYSTARGETS):
 	@echo TARGET = $@>config.tmp
-	@$(MAKE) --no-print-directory ROOTCONFIG=config configure TARGET=$@
+	@echo TARGET_MAKEFILE = $(filter %$@.mak,$(SYSMAKEFILES))>>config.tmp
+	@$(MAKE) --no-print-directory ROOTCONFIG=config configure \
+		TARGET=$@ TARGET_MAKEFILE=$(filter %$@.mak,$(SYSMAKEFILES))
 
 ifeq ($(ROOTCONFIG),config)
 

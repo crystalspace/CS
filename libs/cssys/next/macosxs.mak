@@ -55,7 +55,7 @@ NEXT.LFLAGS.EXE=
 NEXT.LFLAGS.DLL=-bundle -undefined suppress
 
 NEXT.FRIEND=yes
-include mk/system/next.mak
+include libs/cssys/next/next.mak
 NEXT.FRIEND=no
 
 override DO.MAKE.VOLATILE=\
