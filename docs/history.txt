@@ -51,6 +51,9 @@ The history order has been reversed so that new features are at the top.
 	  in the vis system. It sometimes says something is invisible
 	  when it is visible.
 	- Fixed crasher in phyztest.
+	- Eric Sunshine eliminated several compilation warnings from MSVC
+	  (reported by Martin Geisse) in sft3dcom.cpp and avistrv.cpp about
+	  variables possibly used uninitialized.
 18-Feb-2001
 	- Martin Geisse added some missing 'volatile' keywords to the
 	  waveout driver.

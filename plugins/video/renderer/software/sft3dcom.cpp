@@ -2365,6 +2365,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
   } L,R;
   L.fv = R.fv = top;
   int sy = L.fy = R.fy = QRound (poly.vertices [top].sy);
+  L.x = R.x = 0; // Pacify MSVC which otherwise says they are used uninitialized.
 
   // Decide whenever we should use Gouraud or flat (faster) routines
   bool do_gouraud = (pqinfo.drawline_gouraud != NULL)
