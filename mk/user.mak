@@ -101,4 +101,4 @@ endif
 # Set this flag to 'yes' if you have a buggy egcs compiler.  You need to set
 # this flag if your EGCS compiler crashes with an "internal compiler error"
 # while compiling Crystal Space.
-BUGGY_EGCS_COMPILER=no
+BUGGY_EGCS_COMPILER=yes
