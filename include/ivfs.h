@@ -73,6 +73,11 @@ SCF_INTERFACE (iFile, 0, 0, 1) : public iBase
   virtual char *GetAllData () = 0;
 };
 
+//Hack for Win32
+#ifdef DeleteFile
+#undef DeleteFile
+#endif
+
 /**
  * The Virtual Filesystem Class is intended to be the only way for Crystal
  * Space engine to access the files. This gives unified control over the
