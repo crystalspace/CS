@@ -22,6 +22,8 @@ Short-term cleanups that need to be done:
 	  it works in a more reasonable manner.
 	- Eric Sunshine fixed pytest so that it makes proper use of SCF and
 	  actually works in accordance with requirements of the system-driver.
+	- Eric Sunshine fixed the csClear plug-in so that it compiles with
+	  compilers which use the old-style casting syntax.
 12-Nov-1999
 	- Brandon Ehle fixes cspython so that it works with SCF.
 	- Michael Dale Long did a major update of Crystal Clear to SCF.
