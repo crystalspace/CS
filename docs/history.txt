@@ -34,6 +34,9 @@ chronological order.
 	  which caused crashes later in the Seek() function. Fixed to start at
 	  0 now.
         - Philip Wyett updated docs to reflect a new msvc_libs release.
+	- Jorrit fixed a problem in the generic renderloop plugin where
+	  SCF_IMPLEMENT_IBASE was combined with
+	  SCF_IMPLEMENT_EMBEDDED_IBASE_END.
 31-Aug-2003
         - Philip Wyett changed #include "GL/glu.h" to <GL/glu.h>, in the new
           GL renderer gl_txtcache.cpp, eliminating the warning messages within
