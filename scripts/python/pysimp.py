@@ -10,7 +10,7 @@ except:
 def CreateRoom(matname):
 	print 'Start creating polygons from Python script...'
 	engine = object_reg.Query_iEngine()
-	room = engine.FindSector("room")
+	room = engine.GetSectors().FindByName("room")
 	walls = engine.CreateSectorWallsMesh(room,"walls")
 	thingstate = walls.GetMeshObject().Query_iThingState()
 	material=engine.FindMaterial(matname)
