@@ -46,14 +46,14 @@ char *csStrNew (const char *s)
 char *csStrNew (const wchar_t *s)
 {
   utf8_char buf[shortStringChars];
-  static const size_t bufChars = sizeof (buf) / sizeof (char);
+  static const size_t bufChars = sizeof (buf) / sizeof (utf8_char);
   size_t charsNeeded;
 
-  if ((charsNeeded = csUnicodeTransform::WCtoUTF8 (buf, s, bufChars, (size_t)-1)
-    /*csWideToUTF8 (buf, s, bufChars)*/) > bufChars)
+  if ((charsNeeded = 
+    csUnicodeTransform::WCtoUTF8 (buf, bufChars, s, (size_t)-1)) > bufChars)
   {
     utf8_char* newbuf = new utf8_char[charsNeeded];
-    csUnicodeTransform::WCtoUTF8 (newbuf, s, charsNeeded, (size_t)-1);
+    csUnicodeTransform::WCtoUTF8 (newbuf, charsNeeded, s, (size_t)-1);
     return (char*)newbuf;
   }
   else
@@ -81,14 +81,12 @@ wchar_t* csStrNewW (const char *s)
   static const size_t bufChars = sizeof (buf) / sizeof (wchar_t);
   size_t charsNeeded;
 
-  if ((charsNeeded = csUnicodeTransform::UTF8toWC (buf, (utf8_char*)s, 
-    bufChars, (size_t)-1)
-    /*csUTF8ToWide (buf, s, bufChars)*/) > bufChars)
+  if ((charsNeeded = csUnicodeTransform::UTF8toWC (buf, bufChars, 
+    (utf8_char*)s, (size_t)-1)) > bufChars)
   {
     wchar_t* newbuf = new wchar_t[charsNeeded];
-    csUnicodeTransform::UTF8toWC (newbuf, (utf8_char*)s, charsNeeded, 
+    csUnicodeTransform::UTF8toWC (newbuf, charsNeeded, (utf8_char*)s, 
       (size_t)-1);
-    //csUTF8ToWide (newbuf, s, charsNeeded);
     return newbuf;
   }
   else
