@@ -24,7 +24,7 @@
 
 void TextureTrans::compute_texture_space (
 	csMatrix3& m, csVector3& v,
-	csVector3& v_orig, csVector3& v1, float len1,
+	const csVector3& v_orig, const csVector3& v1, float len1,
 	float A, float B, float C)
 {
   compute_texture_space (m, v, v_orig.x, v_orig.y, v_orig.z,
@@ -71,7 +71,9 @@ void TextureTrans::compute_texture_space (
 
 void TextureTrans::compute_texture_space (
 	csMatrix3& m, csVector3& v,
-	csVector3& v_orig, csVector3& v1, float len1, csVector3& v2, float len2)
+	const csVector3& v_orig,
+	const csVector3& v1, float len1,
+	const csVector3& v2, float len2)
 {
   float l1 = sqrt (csSquaredDist::PointPoint (v_orig, v1));
   float l2 = sqrt (csSquaredDist::PointPoint (v_orig, v2));
@@ -87,7 +89,7 @@ void TextureTrans::compute_texture_space (
 
 void TextureTrans::compute_texture_space (
 	csMatrix3& m, csVector3& v,
-	csVector3& v_orig, csVector3& v_u, csVector3& v_v)
+	const csVector3& v_orig, const csVector3& v_u, const csVector3& v_v)
 {
   csVector3 v_w = v_u % v_v;
   compute_texture_space (m, v,
@@ -110,4 +112,3 @@ void TextureTrans::compute_texture_space (
   m.Invert ();
   v.x = xo; v.y = yo; v.z = zo;
 }
-

@@ -45,7 +45,7 @@ public:
    */
   static void compute_texture_space (
 	csMatrix3& m, csVector3& v,
-	csVector3& v_orig, csVector3& v1, float len1,
+	const csVector3& v_orig, const csVector3& v1, float len1,
 	float A, float B, float C);
   ///
   static void compute_texture_space (
@@ -60,9 +60,9 @@ public:
    */
   static void compute_texture_space (
 	csMatrix3& m, csVector3& v,
-	csVector3& v_orig,
-	csVector3& v1, float len1,
-	csVector3& v2, float len2);
+	const csVector3& v_orig,
+	const csVector3& v1, float len1,
+	const csVector3& v2, float len2);
 
   /**
    * Similar to the previous function but treat as if the lengths
@@ -70,7 +70,7 @@ public:
    */
   static void compute_texture_space (
 	csMatrix3& m, csVector3& v,
-	csVector3& v_orig, csVector3& v_u, csVector3& v_v);
+	const csVector3& v_orig, const csVector3& v_u, const csVector3& v_v);
 
   /**
    * The most general function. With these you provide the matrix
