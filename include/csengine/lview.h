@@ -95,10 +95,7 @@ private:
 
 public:
   /// Return true if there are further elements to process.
-  virtual bool HasNext ()
-  {
-    return cur != NULL && i < cur_num && i >= 0;
-  }
+  virtual bool HasNext ();
   /// Return the next element.
   virtual csFrustum* Next ();
   /// Get the user data for the last shadow.

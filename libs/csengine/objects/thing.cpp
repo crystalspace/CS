@@ -3532,8 +3532,8 @@ static void *CheckFrustumPolygonsFB (
 
                   // @@@ UGLY!!!: flags are in mesh wrapper!!?
                   if (
-                    (!mesh->GetFlags ().Check (CS_ENTITY_CAMERA)) &&
-                    fview->CheckShadowMask (th->flags.Get ()))
+                      (!mesh->GetFlags ().Check (CS_ENTITY_CAMERA)) &&
+                      fview->CheckShadowMask (th->flags.Get ()))
                     th->AppendShadows (
                         obj->visobj->GetMovable (),
                         shadows,

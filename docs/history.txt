@@ -38,6 +38,16 @@ The history order is reversed so that new features are at the top.
 	  the 3DS importer correctly honors the double-sided triangle flag.
 	  In that case the CS model will have double triangles (one for
 	  every side).
+	- Thanks to the debugging help of Toni Asco Gonzalez I managed to fix
+	  a rather big bug in the lighting routines (more specifically
+	  in iSector::CheckFrustum()). The problem was csShadowIterator
+	  which is supposed to iterate over all shadows. Every seperate thing
+	  will cause a seperate shadow block in the shadow list. The
+	  shadow iterator will iterate over these shadows in the shadow block
+	  list. To do that it will internally iterate over shadow blocks.
+	  However it could happen that a block containing no shadows
+	  got added to the shadow list. The iterator would fail in this case
+	  because it would stop processing further shadow blocks.
 29-Apr-2002
 	- Eric Sunshine renamed OSXDelegate2D_CGBLit.h to
 	  OSXDelegate2D_CGBlit.h (notice the case distinction) so that #include

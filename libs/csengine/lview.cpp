@@ -316,6 +316,58 @@ void csShadowIterator::Reset ()
     i = cur_num - 1;
 }
 
+bool csShadowIterator::HasNext ()
+{
+  if (cur == NULL)
+    return false;
+  if (i >= 0 && i < cur_num)
+    return true;
+  if (onlycur)
+  {
+    cur = NULL;
+    return false;
+  }
+
+  if (dir == 1)
+  {
+    cur = cur->next;
+    while (cur && cur->GetShadowCount () == 0)
+      cur = cur->next;
+
+    bool hn = cur && cur->GetShadowCount () != 0;
+    if (hn)
+    {
+      if (cur) cur_num = cur->GetShadowCount ();
+      if (dir == 1)
+        i = 0;
+      else
+        i = cur_num - 1;
+    }
+    else
+      cur = NULL;
+    return hn;
+  }
+  else
+  {
+    cur = cur->prev;
+    while (cur && cur->GetShadowCount () == 0)
+      cur = cur->prev;
+
+    bool hn = cur && cur->GetShadowCount () != 0;
+    if (hn)
+    {
+      if (cur) cur_num = cur->GetShadowCount ();
+      if (dir == 1)
+        i = 0;
+      else
+        i = cur_num - 1;
+    }
+    else
+      cur = NULL;
+    return hn;
+  }
+}
+
 csFrustum *csShadowIterator::Next ()
 {
   if (!cur)
