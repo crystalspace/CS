@@ -536,12 +536,18 @@ bool csTerrBlock::IsMaterialUsed (int index)
       center.z + size / 2.0);
     const csBox2& terrRegion = terr->region;
 
-    int mmLeft = (int)floor (heightmapSpace.MinX() - terrRegion.MinX());
-    int mmTop = (int)floor (heightmapSpace.MinY() - terrRegion.MinY());
-    int mmRight = (int)ceil (((heightmapSpace.MaxX() - terrRegion.MinX()) /
-      (terrRegion.MaxX() - terrRegion.MinX())) * ((float)(terr->materialMapW - 1)));
-    int mmBottom = (int)ceil ((heightmapSpace.MaxY() - terrRegion.MinY()) /
-      (terrRegion.MaxY() - terrRegion.MinY()) * ((float)(terr->materialMapH - 1)));
+    float wm = ((float)(terr->materialMapW - 1)) /
+                (terrRegion.MaxX() - terrRegion.MinX());
+    float hm = ((float)(terr->materialMapH - 1)) /
+                (terrRegion.MaxY() - terrRegion.MinY());
+    int mmLeft = 
+      (int)floor ((heightmapSpace.MinX() - terrRegion.MinX()) * wm);
+    int mmTop = 
+      (int)floor ((heightmapSpace.MinY() - terrRegion.MinY()) * hm);
+    int mmRight = 
+      (int)ceil ((heightmapSpace.MaxX() - terrRegion.MinX()) * wm);
+    int mmBottom = 
+      (int)ceil ((heightmapSpace.MaxY() - terrRegion.MinY()) * hm);
 
     bool matUsed = false;
     for (int y = mmTop; y <= mmBottom; y++)

@@ -37,6 +37,7 @@ chronological order.
 	      except in the simplest cases.
 	- Eric Sunshine fixed awstest so that it builds again following Bedrich
 	  Zaba's patch.
+	- Anders Stenberg fixed splatting in bruteblock which was broke
 30-May-2004
 	- Jorrit fixed the lightning plugin so that it correctly gets the
 	  bounding box and radius from the genmesh.
