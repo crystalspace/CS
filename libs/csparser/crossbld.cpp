@@ -380,7 +380,9 @@ void csCrossBuild_ThingTemplateFactory::Build_TriangleMesh(csThingTemplate& mesh
 {
   for (int triangleindex=0; triangleindex<buildsource.num_face; triangleindex++)
   {
-    CHK (csPolygonTemplate* ptemp = new csPolygonTemplate (&meshsource, "x"));
+    char buf[10];
+    sprintf (buf, "t%d", triangleindex);
+    CHK (csPolygonTemplate* ptemp = new csPolygonTemplate (&meshsource, buf));
     int a = buildsource.face[0][triangleindex];
     int b = buildsource.face[1][triangleindex];
     int c = buildsource.face[2][triangleindex];
