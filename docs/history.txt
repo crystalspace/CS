@@ -51,6 +51,9 @@ chronological order.
 	  data/config/cacacanvas.cfg you can even run in the linux console.
 	- Wouter Wijngaards fixed map_key in walktest so that it no longer
 	  called strcpy with overlapping src and destination.
+	- Wouter Wijngaards initialised a variable in renderbuffer to be sure.
+	- Wouter Wijngaards committed configure script generated using
+	  autogen.sh.
 24-Mar-2005
 	- res removed a >= 0 comparison with an unsigned var from array.h.
 	- res fixed some wrong ref counting caused by iLoader->LoadTexture()

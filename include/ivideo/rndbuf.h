@@ -281,6 +281,8 @@ struct iRenderBufferAccessor : public iBase
 class csRenderBufferHolder : public csRefCount
 {
 public:
+  /** initialize */
+  csRenderBufferHolder() {accessorMask=0;}
   /**
    * Get buffer by name.
    * If an accessor is set, it will first be called, after that the buffer will be 
