@@ -229,7 +229,7 @@ chronological order.
 	- res made the csStringHash::Request() methods const.
 	- Jorrit fixed a size_t related bug in the engine. This is 1002540
 	  on the tracker.
-	- Eric Sunshine fixed bug in parthphys_ode/Jamfile where it failed to 
+	- Eric Sunshine fixed bug in partphys_ode/Jamfile where it failed to 
 	  invoke ExternalLibs for the ODE library.
 2-Aug-2004
 	- Eric Sunshine localized the faked-up `socklen_t' from csdef.h to
