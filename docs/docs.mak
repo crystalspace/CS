@@ -242,7 +242,7 @@ $(OUT.DOC.IMAGE.DIRS.PDF)  $(OUT.DOC.IMAGE.DIRS.INFO):
 ifeq ($(DOC.IMAGE.LIST),)
 	@echo "No images to copy."
 else
-	echo "Copying images." $(foreach file,$(filter $(foreach \
+	@echo "Copying images." $(foreach file,$(filter $(foreach \
 	ext,$(subst ., ,$(notdir $*)),%.$(ext)),$(DOC.IMAGE.LIST)),\
 	; $(CP) $(file) $(subst $(CSMANUAL_DIR)/,$(dir $*),$(file)))
 endif
@@ -253,10 +253,10 @@ endif
 %.ZAPIMAGES:
 	@echo "Purging images."
 ifneq ($(OUT.DOC.IMAGE.LIST),)
-	$(RM) $(addprefix $(dir $*),$(filter $(foreach \
+	@$(RM) $(addprefix $(dir $*),$(filter $(foreach \
 	ext,$(subst ., ,$(notdir $*)),%.$(ext)),$(OUT.DOC.IMAGE.LIST)))
 ifneq ($(OUT.DOC.IMAGE.DIRS.TOP),)
-	$(RMDIR) $(addprefix $(dir $*),$(OUT.DOC.IMAGE.DIRS.TOP))
+	@$(RMDIR) $(addprefix $(dir $*),$(OUT.DOC.IMAGE.DIRS.TOP))
 endif
 endif
 
