@@ -91,14 +91,17 @@ struct iBCTerrFactoryState : public iBase
   virtual void AddTime (csTicks time) = 0;
   virtual csVector2* GetSize () = 0;
   virtual float GetMultiplier () = 0;
+  /// Create a shared LODMesh that isn't shared. 
   virtual csSharedLODMesh* CreateFreeMesh (bool wavy) = 0;
-  virtual void SetFocusPoint (csVector3* focus) = 0;
+  virtual void SetFocusPoint (const csVector3 focus) = 0;
   virtual csVector2* GetLODUV (int lod_level) = 0;
   virtual float* GetLODDistances () = 0;
   virtual void SetDefaultMaterial ( iMaterialWrapper* mat ) = 0;
   virtual iMaterialWrapper* GetDefaultMaterial () = 0;
+  /// Set number of LOD levels
   virtual int GetUserLOD () = 0;
   virtual float GetSystemDistance () = 0;
+  /// Set distance shared edge usage stops
   virtual void SetSystemDistance (float new_dist) = 0;
 };
 
