@@ -413,7 +413,8 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
   }
   memcpy (n, &face_normals[0], sizeof (csVector3) * new_triangle_count * 3);
 
-  for (i = 0; i < triangle_count * 3; i ++) {
+  for (i = 0; i < triangle_count * 3; i ++) 
+  {
     edge_normals[i] = face_normals[edge_indices[i * 3]];
   }
 
@@ -525,7 +526,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light,
 
   csRenderMesh rmesh;
   //rmesh.object2camera = tr_o2c;
-  rmesh.transfom = &tr_o2c;
+  rmesh.transform = &tr_o2c;
   rmesh.z_buf_mode = CS_ZBUF_TEST;
   rmesh.mixmode = pass->GetMixmodeOverride (); //CS_FX_COPY;
   rmesh.material = 0;
