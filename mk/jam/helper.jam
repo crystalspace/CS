@@ -67,23 +67,6 @@ rule Wildcard
   return $(files:BS) ;
 }
 
-##  Filter list : filter
-##    Returns the list without the words contained in filter.
-rule Filter
-{
-  local i result ;
-
-  for i in $(<)
-  {
-    if ! [ IsElem $(i) $(>) ]
-    {
-      result += $(i) ;
-    }
-  }
-
-  return $(result) ;
-}
-
 ##  Prefix list : prefix
 ##    Adds a prefix to a all elements in list.
 rule Prefix
@@ -132,4 +115,21 @@ rule IsElem
   return $(result) ;
 }
 
+}
+
+##  Filter list : filter
+##    Returns the list without the words contained in filter.
+rule Filter
+{
+  local i result ;
+
+  for i in $(<)
+  {
+    if ! [ IsElem $(i) : $(>) ]
+    {
+      result += $(i) ;
+    }
+  }
+
+  return $(result) ;
 }
