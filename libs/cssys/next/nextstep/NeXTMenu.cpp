@@ -16,6 +16,7 @@
 //
 //-----------------------------------------------------------------------------
 #import "NeXTMenu.h"
+#import "sysdef.h"
 #import "csutil/inifile.h"
 extern "Objective-C" {
 #import <appkit/Application.h>
