@@ -38,6 +38,32 @@ class csVector3;
 class csBox3;
 class csSphere;
 
+SCF_VERSION (iParameterESM, 0, 0, 1);
+
+/**
+ * This interface is a parameter resolver. The operations
+ * in the engine sequence manager use instances of this class
+ * to get the required object (mesh, light, material, ...).
+ */
+struct iParameterESM : public iBase
+{
+  /**
+   * Get the value based on userdata which is given to the
+   * operations. If IsConstant() returns true then the params
+   * parameter may not be used!
+   */
+  virtual iBase* GetValue (iBase* params = NULL) const = 0;
+
+  /**
+   * Returns true if the value is constant and immediatelly available
+   * upon request. In that case operations can store that value so
+   * then don't have to ask for it every time. If this function returns
+   * false then the operation MUST call GetValue() every time it
+   * wants to do something.
+   */
+  virtual bool IsConstant () const = 0;
+};
+
 SCF_VERSION (iEngineSequenceParameters, 0, 0, 2);
 
 /**
@@ -67,6 +93,11 @@ struct iEngineSequenceParameters : public iBase
   virtual int GetParameterIdx (const char* name) const = 0;
 
   /**
+   * Get parameter name.
+   */
+  virtual const char* GetParameterName (int idx) const = 0;
+
+  /**
    * Add a parameter.
    */
   virtual void AddParameter (const char* name, iBase* def_value = NULL) = 0;
@@ -80,9 +111,16 @@ struct iEngineSequenceParameters : public iBase
    * Set a parameter by name.
    */
   virtual void SetParameter (const char* name, iBase* value) = 0;
+
+  /**
+   * Create a parameter ESM which keeps a reference to this parameter
+   * block and knows how to resolve the specified parameter. Returns
+   * NULL if the parameter 'name' is not known in this block.
+   */
+  virtual csPtr<iParameterESM> CreateParameterESM (const char* name) = 0;
 };
 
-SCF_VERSION (iSequenceWrapper, 0, 1, 1);
+SCF_VERSION (iSequenceWrapper, 0, 2, 0);
 
 /**
  * A sequence wrapper. This objects holds the reference
@@ -111,131 +149,73 @@ struct iSequenceWrapper : public iBase
    * GetSequenceParameters() to get a copy of a parameter block to
    * use for running a sequence.
    */
-  virtual iEngineSequenceParameters* CreateParameterBlock () = 0;
+  virtual iEngineSequenceParameters* CreateBaseParameterBlock () = 0;
 
   /**
-   * Get a parameter block which you can then fill in and then
+   * Get the pointer to the base parameter block (or NULL if there is
+   * no such block).
+   */
+  virtual iEngineSequenceParameters* GetBaseParameterBlock () = 0;
+
+  /**
+   * Create a parameter block which you can then fill in and then
    * give as a parameter running this sequence. This essentially
-   * creates a copy of the parameter block created with
-   * CreateParameterBlock(). Modifications on the parameter block
+   * creates a copy of the base parameter block created with
+   * CreateBaseParameterBlock(). Modifications on the parameter block
    * returned by this function have no effect on the parameter block
    * which is kept internally. You should only set the values
    * of the given parameter block and not create/remove variables.
    * This function returns NULL if there is no parameter block
    * for this sequence.
    */
-  virtual csPtr<iEngineSequenceParameters> GetParameterBlock () = 0; 
+  virtual csPtr<iEngineSequenceParameters> CreateParameterBlock () = 0; 
 
   /**
    * Operation: set a material on a mesh.
    */
-  virtual void AddOperationSetMaterial (csTicks time, iMeshWrapper* mesh,
-		  iMaterialWrapper* mat) = 0;
-
-  /**
-   * Operation: set a material on a mesh.
-   * This version works on the supplied iEngineSequenceParameters instance.
-   * So the given indices are parameter indices.
-   */
-  virtual void AddOperationSetMaterial (csTicks time, int meshidx,
-		  int matidx) = 0;
+  virtual void AddOperationSetMaterial (csTicks time, iParameterESM* mesh,
+		  iParameterESM* mat) = 0;
 
   /**
    * Operation: set a material on a polygon.
    */
-  virtual void AddOperationSetPolygonMaterial (csTicks time, iPolygon3D* mesh,
-		  iMaterialWrapper* mat) = 0;
-
-  /**
-   * Operation: set a material on a polygon.
-   * This version works on the supplied iEngineSequenceParameters instance.
-   * So the given indices are parameter indices.
-   */
-  virtual void AddOperationSetPolygonMaterial (csTicks time, int meshidx,
-		  int matidx) = 0;
+  virtual void AddOperationSetPolygonMaterial (csTicks time,
+  		  iParameterESM* polygon, iParameterESM* mat) = 0;
 
   /**
    * Operation: set a light color.
    */
-  virtual void AddOperationSetLight (csTicks time, iLight* light,
-		  const csColor& color) = 0;
-
-  /**
-   * Operation: set a light color.
-   * This version works on the supplied iEngineSequenceParameters instance.
-   * So the given indices are parameter indices.
-   */
-  virtual void AddOperationSetLight (csTicks time, int lightidx,
+  virtual void AddOperationSetLight (csTicks time, iParameterESM* light,
 		  const csColor& color) = 0;
 
   /**
    * Operation: fade a light to some color during some time.
    */
-  virtual void AddOperationFadeLight (csTicks time, iLight* light,
-		  const csColor& color, csTicks duration) = 0;
-
-  /**
-   * Operation: fade a light to some color during some time.
-   * This version works on the supplied iEngineSequenceParameters instance.
-   * So the given indices are parameter indices.
-   */
-  virtual void AddOperationFadeLight (csTicks time, int lightidx,
+  virtual void AddOperationFadeLight (csTicks time, iParameterESM* light,
 		  const csColor& color, csTicks duration) = 0;
 
   /**
    * Operation: set a mesh color.
    */
-  virtual void AddOperationSetMeshColor (csTicks time, iMeshWrapper* mesh,
-		  const csColor& color) = 0;
-
-  /**
-   * Operation: set a mesh color.
-   * This version works on the supplied iEngineSequenceParameters instance.
-   * So the given indices are parameter indices.
-   */
-  virtual void AddOperationSetMeshColor (csTicks time, int meshidx,
+  virtual void AddOperationSetMeshColor (csTicks time, iParameterESM* mesh,
 		  const csColor& color) = 0;
 
   /**
    * Operation: fade a mesh to some color during some time.
    */
-  virtual void AddOperationFadeMeshColor (csTicks time, iMeshWrapper* mesh,
-		  const csColor& color, csTicks duration) = 0;
-
-  /**
-   * Operation: fade a mesh to some color during some time.
-   * This version works on the supplied iEngineSequenceParameters instance.
-   * So the given indices are parameter indices.
-   */
-  virtual void AddOperationFadeMeshColor (csTicks time, int meshidx,
+  virtual void AddOperationFadeMeshColor (csTicks time, iParameterESM* mesh,
 		  const csColor& color, csTicks duration) = 0;
 
   /**
    * Operation: set a fog color and density.
    */
-  virtual void AddOperationSetFog (csTicks time, iSector* sector,
-		  const csColor& color, float density) = 0;
-
-  /**
-   * Operation: set a fog color and density.
-   * This version works on the supplied iEngineSequenceParameters instance.
-   * So the given indices are parameter indices.
-   */
-  virtual void AddOperationSetFog (csTicks time, int sectoridx,
+  virtual void AddOperationSetFog (csTicks time, iParameterESM* sector,
 		  const csColor& color, float density) = 0;
 
   /**
    * Operation: fade fog to some color/density during some time.
    */
-  virtual void AddOperationFadeFog (csTicks time, iSector* sector,
-		  const csColor& color, float density, csTicks duration) = 0;
-
-  /**
-   * Operation: fade fog to some color/density during some time.
-   * This version works on the supplied iEngineSequenceParameters instance.
-   * So the given indices are parameter indices.
-   */
-  virtual void AddOperationFadeFog (csTicks time, int sectoridx,
+  virtual void AddOperationFadeFog (csTicks time, iParameterESM* sector,
 		  const csColor& color, float density, csTicks duration) = 0;
 
   /**
@@ -243,21 +223,7 @@ struct iSequenceWrapper : public iBase
    * the rotation will be equal to the given angle here.
    * Axis is 0, 1, or 2 for x, y, or z. If axis is -1 it is not used.
    */
-  virtual void AddOperationRotateDuration (csTicks time, iMeshWrapper* mesh,
-  		int axis1, float tot_angle1,
-		int axis2, float tot_angle2,
-		int axis3, float tot_angle3,
-		const csVector3& offset,
-		csTicks duration) = 0;
-
-  /**
-   * Operation: rotate object during some time. After the time has elapsed
-   * the rotation will be equal to the given angle here.
-   * Axis is 0, 1, or 2 for x, y, or z. If axis is -1 it is not used.
-   * This version works on the supplied iEngineSequenceParameters instance.
-   * So the given indices are parameter indices.
-   */
-  virtual void AddOperationRotateDuration (csTicks time, int meshidx,
+  virtual void AddOperationRotateDuration (csTicks time, iParameterESM* mesh,
   		int axis1, float tot_angle1,
 		int axis2, float tot_angle2,
 		int axis3, float tot_angle3,
@@ -268,31 +234,14 @@ struct iSequenceWrapper : public iBase
    * Operation: move object during some time. After the time has elapsed
    * the total relative move will be equal to the 'offset'.
    */
-  virtual void AddOperationMoveDuration (csTicks time, iMeshWrapper* mesh,
-		const csVector3& offset, csTicks duration) = 0;
-
-  /**
-   * Operation: move object during some time. After the time has elapsed
-   * the total relative move will be equal to the 'offset'.
-   * This version works on the supplied iEngineSequenceParameters instance.
-   * So the given indices are parameter indices.
-   */
-  virtual void AddOperationMoveDuration (csTicks time, int meshidx,
+  virtual void AddOperationMoveDuration (csTicks time, iParameterESM* mesh,
 		const csVector3& offset, csTicks duration) = 0;
 
   /**
    * Operation: enable/disable a given trigger.
    */
   virtual void AddOperationTriggerState (csTicks time,
-  		  iSequenceTrigger* trigger, bool en) = 0;
-
-  /**
-   * Operation: enable/disable a given trigger.
-   * This version works on the supplied iEngineSequenceParameters instance.
-   * So the given indices are parameter indices.
-   */
-  virtual void AddOperationTriggerState (csTicks time,
-  		  int triggeridx, bool en) = 0;
+  		  iParameterESM* trigger, bool en) = 0;
 
   /**
    * Operation: enable checking of trigger state every 'delay'
@@ -300,17 +249,7 @@ struct iSequenceWrapper : public iBase
    * combination with AddOperationTestTrigger().
    */
   virtual void AddOperationCheckTrigger (csTicks time,
-  		  iSequenceTrigger* trigger, csTicks delay) = 0;
-
-  /**
-   * Operation: enable checking of trigger state every 'delay'
-   * milliseconds (or disable with delay == 0). Use this in
-   * combination with AddOperationTestTrigger().
-   * This version works on the supplied iEngineSequenceParameters instance.
-   * So the given indices are parameter indices.
-   */
-  virtual void AddOperationCheckTrigger (csTicks time,
-  		  int triggeridx, csTicks delay) = 0;
+  		  iParameterESM* trigger, csTicks delay) = 0;
 
   /**
    * Operation: test trigger state and run a sequence if trigger
@@ -319,20 +258,7 @@ struct iSequenceWrapper : public iBase
    * Use in combination with AddOperationCheckTrigger().
    */
   virtual void AddOperationTestTrigger (csTicks time,
-  		  iSequenceTrigger* trigger,
-		  iSequence* trueSequence,
-		  iSequence* falseSequence) = 0;
-
-  /**
-   * Operation: test trigger state and run a sequence if trigger
-   * is still valid or another sequence if not (both sequences
-   * can be NULL in which case nothing is run).
-   * Use in combination with AddOperationCheckTrigger().
-   * This version works on the supplied iEngineSequenceParameters instance.
-   * So the given indices are parameter indices.
-   */
-  virtual void AddOperationTestTrigger (csTicks time,
-  		  int triggeridx,
+  		  iParameterESM* trigger,
 		  iSequence* trueSequence,
 		  iSequence* falseSequence) = 0;
 };
@@ -463,7 +389,7 @@ struct iSequenceTimedOperation : public iBase
   virtual void Do (float time, iBase* params) = 0;
 };
 
-SCF_VERSION (iEngineSequenceManager, 0, 0, 1);
+SCF_VERSION (iEngineSequenceManager, 0, 0, 2);
 
 /**
  * Sequence manager specifically designed for working on
@@ -489,6 +415,11 @@ struct iEngineSequenceManager : public iBase
    */
   virtual iCamera* GetCamera () = 0;
   
+  /**
+   * Create a parameter ESM for a constant value.
+   */
+  virtual csPtr<iParameterESM> CreateParameterESM (iBase* value) = 0;
+
   //-----------------------------------------------------------------------
 
   /**

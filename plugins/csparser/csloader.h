@@ -77,6 +77,7 @@ struct iLODControl;
 struct iLoaderContext;
 struct iSequenceTrigger;
 struct iSequenceWrapper;
+struct iEngineSequenceParameters;
 
 enum
 {
@@ -129,6 +130,7 @@ enum
   XMLTOKEN_NODE,
   XMLTOKEN_NOLIGHTING,
   XMLTOKEN_NOSHADOWS,
+  XMLTOKEN_PAR,
   XMLTOKEN_PARAMS,
   XMLTOKEN_PARAMSFILE,
   XMLTOKEN_PLUGIN,
@@ -226,7 +228,8 @@ enum
   XMLTOKEN_DELAY,
   XMLTOKEN_FIRE,
   XMLTOKEN_SECTORVIS,
-  XMLTOKEN_ONCLICK
+  XMLTOKEN_ONCLICK,
+  XMLTOKEN_POLYGON
 };
 
 class StdLoaderContext;
@@ -317,10 +320,20 @@ private:
   iSequenceTrigger* LoadTrigger (iDocumentNode* node);
   /// Load a list of triggers.
   bool LoadTriggers (iDocumentNode* node);
+  /// Create a sequence and make parameter bindings.
+  iSequenceWrapper* CreateSequence (iDocumentNode* node);
   /// Load a sequence.
   iSequenceWrapper* LoadSequence (iDocumentNode* node);
   /// Load a list of sequences.
   bool LoadSequences (iDocumentNode* node);
+  /// Parse a parameter block for firing a sequence.
+  csPtr<iEngineSequenceParameters> CreateSequenceParameters (
+	iSequenceWrapper* sequence, iDocumentNode* node,
+	const char* parenttype, const char* parentname, bool& error);
+  /// Resolve a parameter for a sequence operation.
+  csPtr<iParameterESM> ResolveOperationParameter (iDocumentNode* opnode,
+	int partypeidx, const char* partype, const char* seqname,
+	iEngineSequenceParameters* base_params);
 
   /// Parse a list of textures and add them to the engine.
   bool ParseTextureList (iDocumentNode* node);

@@ -696,6 +696,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("node", XMLTOKEN_NODE);
   xmltokens.Register ("nolighting", XMLTOKEN_NOLIGHTING);
   xmltokens.Register ("noshadows", XMLTOKEN_NOSHADOWS);
+  xmltokens.Register ("par", XMLTOKEN_PAR);
   xmltokens.Register ("params", XMLTOKEN_PARAMS);
   xmltokens.Register ("paramsfile", XMLTOKEN_PARAMSFILE);
   xmltokens.Register ("plugin", XMLTOKEN_PLUGIN);
@@ -794,6 +795,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("fire", XMLTOKEN_FIRE);
   xmltokens.Register ("sectorvis", XMLTOKEN_SECTORVIS);
   xmltokens.Register ("onclick", XMLTOKEN_ONCLICK);
+  xmltokens.Register ("polygon", XMLTOKEN_POLYGON);
   return true;
 }
 
@@ -807,6 +809,9 @@ void csLoader::SetMode (int iFlags)
 bool csLoader::LoadMap (iDocumentNode* node)
 {
   if (!Engine) return false;
+
+  csRef<iDocumentNode> sequences;
+  csRef<iDocumentNode> triggers;
 
   csRef<iDocumentNode> worldnode = node->GetNode ("world");
   if (worldnode)
@@ -866,12 +871,12 @@ bool csLoader::LoadMap (iDocumentNode* node)
             return false;
           break;
 	case XMLTOKEN_SEQUENCES:
-	  if (!LoadSequences (child))
-	    return false;
+	  // Defer sequence parsing to later.
+	  sequences = child;
 	  break;
 	case XMLTOKEN_TRIGGERS:
-	  if (!LoadTriggers (child))
-	    return false;
+	  // Defer trigger parsing to later.
+	  triggers = child;
 	  break;
 	case XMLTOKEN_PLUGINS:
 	  if (!LoadPlugins (child))
@@ -928,6 +933,15 @@ bool csLoader::LoadMap (iDocumentNode* node)
     return false;
   }
 
+  // Sequences and triggers are parsed at the end because
+  // all sectors and other objects need to be present.
+  if (sequences)
+    if (!LoadSequences (sequences))
+      return false;
+  if (triggers)
+    if (!LoadTriggers (triggers))
+      return false;
+
   return true;
 }
 
@@ -941,6 +955,9 @@ bool csLoader::LoadLibrary (iDocumentNode* node)
     return false;
   }
  
+  csRef<iDocumentNode> sequences;
+  csRef<iDocumentNode> triggers;
+
   csRef<iDocumentNode> libnode = node->GetNode ("library");
   if (libnode)
   {
@@ -958,12 +975,12 @@ bool csLoader::LoadLibrary (iDocumentNode* node)
 	    return false;
       	  break;
 	case XMLTOKEN_SEQUENCES:
-	  if (!LoadSequences (child))
-	    return false;
+	  // Defer sequence parsing to later.
+	  sequences = child;
 	  break;
 	case XMLTOKEN_TRIGGERS:
-	  if (!LoadTriggers (child))
-	    return false;
+	  // Defer trigger parsing to later.
+	  triggers = child;
 	  break;
         case XMLTOKEN_TEXTURES:
           // Append textures to engine.
@@ -1033,6 +1050,15 @@ bool csLoader::LoadLibrary (iDocumentNode* node)
       node, "Expected 'library' token!");
     return false;
   }
+
+  // Sequences and triggers are parsed at the end because
+  // all sectors and other objects need to be present.
+  if (sequences)
+    if (!LoadSequences (sequences))
+      return false;
+  if (triggers)
+    if (!LoadTriggers (triggers))
+      return false;
 
   return true;
 }

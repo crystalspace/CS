@@ -5,6 +5,25 @@ The history order is reversed so that new features are at the top.
 	  engine sequence manager.
 	- Started work on actually being able to pass parameters to
 	  sequences.
+	- Made sure sequences and triggers are always parsed at the end
+	  even if they are not specified at the end.
+	- Added parsing of <params> blocks with sequences.
+	- Completely changed the way parameters are fetched in the engine
+	  sequence manager. Added new iParameterESM interface which is
+	  a parameter resolver. Removed all indexed operation versions.
+	- Parameters in sequences now seem to work. Flarge has an example.
+	  There are still a few limitations left:
+	      - When running one sequence from another running sequence
+	        it is not possible to give parameters to that other
+		sequence. It is only possible to give parameters from
+		within a trigger. When a sequence fires another sequence
+		the parameters from that sequence are given to the other
+		sequence. This is potentially dangerous and I will fix
+		this.
+	      - Some of the operations will not work properly with
+	        parameters. More importantly the fade, move, and rotate
+		type of operations (the ones that cause a timed operation
+		will not work properly).
 	- Eric Sunshine eliminated comilation warnings.
 2-Oct-2002
 	- Cleaned up new thing smoothing code (code style, please people

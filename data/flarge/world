@@ -22920,15 +22920,18 @@
 	</sequence>
 
 	<sequence name="animlight">
-	    <fadelight light="l1" red="0" green="0" blue="0" duration="1000" />
+	    <params>
+	        <par name="light" />
+	    </params>
+	    <fadelight light_par="light" red="0" green="0" blue="0" duration="1000" />
 	    <delay>1000</delay>
-	    <fadelight light="l1" red="1" green="1" blue="1" duration="1000" />
+	    <fadelight light_par="light" red="1" green="1" blue="1" duration="1000" />
 	    <delay>1000</delay>
-	    <fadelight light="l1" red="1" green="0" blue="0" duration="1000" />
+	    <fadelight light_par="light" red="1" green="0" blue="0" duration="1000" />
 	    <delay>1000</delay>
-	    <fadelight light="l1" red="0" green="1" blue="0" duration="1000" />
+	    <fadelight light_par="light" red="0" green="1" blue="0" duration="1000" />
 	    <delay>1000</delay>
-	    <fadelight light="l1" red="0" green="0" blue="1" duration="1000" />
+	    <fadelight light_par="light" red="0" green="0" blue="1" duration="1000" />
 	    <delay>1000</delay>
 	    <enable trigger="animlight" />
 	</sequence>
@@ -23242,7 +23245,9 @@
 
         <trigger name="animlight">
 	    <sectorvis sector="large" />
-	    <fire sequence="animlight" />
+	    <fire sequence="animlight">
+	        <light name="light" light="l1" />
+	    </fire>
 	</trigger>
 	
 	<trigger name="rot_shapes">
