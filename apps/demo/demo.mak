@@ -35,6 +35,8 @@ DEP.CSDEMO = CSGFX CSUTIL CSTOOL CSSYS CSGEOM CSUTIL CSSYS
 LIB.CSDEMO = $(foreach d,$(DEP.CSDEMO),$($d.LIB))
 CFG.CSDEMO = data/config/csdemo.cfg
 
+OUTDIRS += $(OUT.CSDEMO)
+
 TO_INSTALL.EXE	  += $(CSDEMO.EXE)
 TO_INSTALL.CONFIG += $(CFG.CSDEMO)
 
@@ -52,7 +54,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.csdemo csdemoclean csdemocleandep
 
 all: $(CSDEMO.EXE)
-build.csdemo: $(OUT.CSDEMO) $(CSDEMO.EXE)
+build.csdemo: $(OUTDIRS) $(CSDEMO.EXE)
 clean: csdemoclean
 
 $(OUT.CSDEMO)/%$O: $(DIR.CSDEMO)/%.cpp
@@ -60,9 +62,6 @@ $(OUT.CSDEMO)/%$O: $(DIR.CSDEMO)/%.cpp
 
 $(CSDEMO.EXE): $(DEP.EXE) $(OBJ.CSDEMO) $(LIB.CSDEMO)
 	$(DO.LINK.EXE)
-
-$(OUT.CSDEMO):
-	$(MKDIRS)
 
 csdemoclean:
 	-$(RM) csdemo.txt

@@ -37,6 +37,8 @@ OBJ.CSVID = $(addprefix $(OUT.CSVID)/,$(notdir $(SRC.CSVID:.cpp=$O)))
 DEP.CSVID = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.CSVID = $(foreach d,$(DEP.CSVID),$($d.LIB))
 
+OUTDIRS += $(OUT.CSVID)
+
 #TO_INSTALL.EXE += $(CSVID.EXE)
 
 MSVC.DSP += CSVID
@@ -50,8 +52,7 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: build.csvid csvidclean csvidcleandep
 
-all: $(CSVID.EXE)
-build.csvid: $(OUT.CSVID) $(CSVID.EXE)
+build.csvid: $(OUTDIRS) $(CSVID.EXE)
 clean: csvidclean
 
 $(OUT.CSVID)/%$O: $(DIR.CSVID)/%.cpp
@@ -59,9 +60,6 @@ $(OUT.CSVID)/%$O: $(DIR.CSVID)/%.cpp
 
 $(CSVID.EXE): $(DEP.EXE) $(OBJ.CSVID) $(LIB.CSVID)
 	$(DO.LINK.EXE)
-
-$(OUT.CSVID):
-	$(MKDIRS)
 
 csvidclean:
 	-$(RM) csvid.txt

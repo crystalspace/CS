@@ -26,7 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 SIMPCD.EXE = simpcd$(EXE)
 DIR.SIMPCD = apps/tutorial/simpcd
 OUT.SIMPCD = $(OUT)/$(DIR.SIMPCD)
@@ -35,6 +34,8 @@ SRC.SIMPCD = $(wildcard $(DIR.SIMPCD)/*.cpp )
 OBJ.SIMPCD = $(addprefix $(OUT.SIMPCD)/,$(notdir $(SRC.SIMPCD:.cpp=$O)))
 DEP.SIMPCD = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.SIMPCD = $(foreach d,$(DEP.SIMPCD),$($d.LIB))
+
+OUTDIRS += $(OUT.SIMPCD)
 
 #TO_INSTALL.EXE += $(SIMPCD.EXE)
 
@@ -49,8 +50,7 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: build.simpcd simpcdclean simpcdcleandep
 
-all: $(SIMPCD.EXE)
-build.simpcd: $(OUT.SIMPCD) $(SIMPCD.EXE)
+build.simpcd: $(OUTDIRS) $(SIMPCD.EXE)
 clean: simpcdclean
 
 $(OUT.SIMPCD)/%$O: $(DIR.SIMPCD)/%.cpp
@@ -58,9 +58,6 @@ $(OUT.SIMPCD)/%$O: $(DIR.SIMPCD)/%.cpp
 
 $(SIMPCD.EXE): $(DEP.EXE) $(OBJ.SIMPCD) $(LIB.SIMPCD)
 	$(DO.LINK.EXE)
-
-$(OUT.SIMPCD):
-	$(MKDIRS)
 
 simpcdclean:
 	-$(RM) simpcd.txt

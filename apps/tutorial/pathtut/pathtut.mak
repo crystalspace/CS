@@ -26,7 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 PATHTUT.EXE = pathtut$(EXE)
 DIR.PATHTUT = apps/tutorial/pathtut
 OUT.PATHTUT = $(OUT)/$(DIR.PATHTUT)
@@ -35,6 +34,8 @@ SRC.PATHTUT = $(wildcard $(DIR.PATHTUT)/*.cpp )
 OBJ.PATHTUT = $(addprefix $(OUT.PATHTUT)/,$(notdir $(SRC.PATHTUT:.cpp=$O)))
 DEP.PATHTUT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.PATHTUT = $(foreach d,$(DEP.PATHTUT),$($d.LIB))
+
+OUTDIRS += $(OUT.PATHTUT)
 
 #TO_INSTALL.EXE += $(PATHTUT.EXE)
 
@@ -49,8 +50,7 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: build.pathtut pathtutclean pathtutcleandep
 
-all: $(PATHTUT.EXE)
-build.pathtut: $(OUT.PATHTUT) $(PATHTUT.EXE)
+build.pathtut: $(OUTDIRS) $(PATHTUT.EXE)
 clean: pathtutclean
 
 $(OUT.PATHTUT)/%$O: $(DIR.PATHTUT)/%.cpp
@@ -58,9 +58,6 @@ $(OUT.PATHTUT)/%$O: $(DIR.PATHTUT)/%.cpp
 
 $(PATHTUT.EXE): $(DEP.EXE) $(OBJ.PATHTUT) $(LIB.PATHTUT)
 	$(DO.LINK.EXE)
-
-$(OUT.PATHTUT):
-	$(MKDIRS)
 
 pathtutclean:
 	-$(RM) pathtut.txt

@@ -28,7 +28,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 AWSTUT.EXE = awstut$(EXE)
 DIR.AWSTUT = apps/tutorial/awstut
 OUT.AWSTUT = $(OUT)/$(DIR.AWSTUT)
@@ -38,6 +37,8 @@ OBJ.AWSTUT = $(addprefix $(OUT.AWSTUT)/,$(notdir $(SRC.AWSTUT:.cpp=$O)))
 DEP.AWSTUT = CSTOOL CSUTIL CSSYS CSUTIL CSGEOM CSGFX
 LIB.AWSTUT = $(foreach d,$(DEP.AWSTUT),$($d.LIB))
 CFG.AWSTUT = data/config/awstut.cfg
+
+OUTDIRS += $(OUT.AWSTUT)
 
 #TO_INSTALL.EXE    += $(CSWSTEST.EXE)
 #TO_INSTALL.CONFIG += $(CFG.CSWSTEST)
@@ -53,8 +54,7 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: build.awstut awstutclean awstutcleandep
 
-all: $(AWSTUT.EXE)
-build.awstut: $(OUT.AWSTUT) $(AWSTUT.EXE)
+build.awstut: $(OUTDIRS) $(AWSTUT.EXE)
 clean: awstutclean
 
 $(OUT.AWSTUT)/%$O: $(DIR.AWSTUT)/%.cpp
@@ -62,9 +62,6 @@ $(OUT.AWSTUT)/%$O: $(DIR.AWSTUT)/%.cpp
 
 $(AWSTUT.EXE): $(DEP.EXE) $(OBJ.AWSTUT) $(LIB.AWSTUT)
 	$(DO.LINK.EXE)
-
-$(OUT.AWSTUT):
-	$(MKDIRS)
 
 awstutclean:
 	-$(RM) awstut.txt

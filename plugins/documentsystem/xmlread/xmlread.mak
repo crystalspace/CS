@@ -7,7 +7,7 @@ DESCRIPTION.xmlread = Crystal Space XMLRead document system
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make xmlread     Make the $(DESCRIPTION.xmlread)$"
+  $(NEWLINE)echo $"  make xmlread      Make the $(DESCRIPTION.xmlread)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#

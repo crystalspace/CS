@@ -5,7 +5,8 @@ DESCRIPTION.makedep = Dependency generation tool
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make makedep      Make the $(DESCRIPTION.makedep)$"
+APPHELP += \
+  $(NEWLINE)echo $"  make makedep      Make the $(DESCRIPTION.makedep)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -25,7 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 MAKEDEP.EXE=makedep$(EXE.CONSOLE)
 DIR.MAKEDEP = apps/tools/makedep
 OUT.MAKEDEP = $(OUT)/$(DIR.MAKEDEP)
@@ -34,6 +34,8 @@ SRC.MAKEDEP = $(wildcard $(DIR.MAKEDEP)/*.cpp )
 OBJ.MAKEDEP = $(addprefix $(OUT.MAKEDEP)/,$(notdir $(SRC.MAKEDEP:.cpp=$O)))
 DEP.MAKEDEP =
 LIB.MAKEDEP = $(foreach d,$(DEP.MAKEDEP),$($d.LIB))
+
+OUTDIRS += $(OUT.MAKEDEP)
 
 #TO_INSTALL.EXE+=$(MAKEDEP.EXE)
 
@@ -49,7 +51,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.makedep makedepclean makedepcleandep
 
 all: $(MAKEDEP.EXE)
-build.makedep: $(OUT.MAKEDEP) $(MAKEDEP.EXE)
+build.makedep: $(OUTDIRS) $(MAKEDEP.EXE)
 clean: makedepclean
 
 $(OUT.MAKEDEP)/%$O: $(DIR.MAKEDEP)/%.cpp
@@ -60,9 +62,6 @@ $(OUT)/main$O: apps/tools/makedep/main.cpp
 
 $(MAKEDEP.EXE): $(OBJ.MAKEDEP) $(LIB.MAKEDEP)
 	$(DO.LINK.CONSOLE.EXE)
-
-$(OUT.MAKEDEP):
-	$(MKDIRS)
 
 makedepclean:
 	-$(RM) makedep.txt

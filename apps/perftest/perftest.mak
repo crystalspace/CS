@@ -5,7 +5,8 @@ DESCRIPTION.perftest = Crystal Space graphics performance tester
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make perftest     Make the $(DESCRIPTION.perftest)$"
+APPHELP += \
+  $(NEWLINE)echo $"  make perftest     Make the $(DESCRIPTION.perftest)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -34,6 +35,8 @@ OBJ.PERFTEST = $(addprefix $(OUT.PERFTEST)/,$(notdir $(SRC.PERFTEST:.cpp=$O)))
 DEP.PERFTEST = CSUTIL CSTOOL CSSYS CSGEOM CSUTIL CSGFX
 LIB.PERFTEST = $(foreach d,$(DEP.PERFTEST),$($d.LIB))
 
+OUTDIRS += $(OUT.PERFTEST)
+
 TO_INSTALL.EXE += $(PERFTEST.EXE)
 
 MSVC.DSP += PERFTEST
@@ -48,7 +51,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.perftest perftestclean perftestcleandep
 
 all: $(PERFTEST.EXE)
-build.perftest: $(OUT.PERFTEST) $(PERFTEST.EXE)
+build.perftest: $(OUTDIRS) $(PERFTEST.EXE)
 clean: perftestclean
 
 $(OUT.PERFTEST)/%$O: $(DIR.PERFTEST)/%.cpp
@@ -56,9 +59,6 @@ $(OUT.PERFTEST)/%$O: $(DIR.PERFTEST)/%.cpp
 
 $(PERFTEST.EXE): $(DEP.EXE) $(OBJ.PERFTEST) $(LIB.PERFTEST)
 	$(DO.LINK.EXE)
-
-$(OUT.PERFTEST):
-	$(MKDIRS)
 
 perftestclean:
 	-$(RM) perftest.txt

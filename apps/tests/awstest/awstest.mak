@@ -28,7 +28,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 AWSTEST.EXE = awstest$(EXE)
 DIR.AWSTEST = apps/tests/awstest
 OUT.AWSTEST = $(OUT)/$(DIR.AWSTEST)
@@ -38,6 +37,8 @@ OBJ.AWSTEST = $(addprefix $(OUT.AWSTEST)/,$(notdir $(SRC.AWSTEST:.cpp=$O)))
 DEP.AWSTEST = CSTOOL CSUTIL CSSYS CSUTIL CSGEOM CSGFX
 LIB.AWSTEST = $(foreach d,$(DEP.AWSTEST),$($d.LIB))
 CFG.AWSTEST = data/config/awstest.cfg
+
+OUTDIRS += $(OUT.AWSTEST)
 
 #TO_INSTALL.EXE    += $(CSWSTEST.EXE)
 #TO_INSTALL.CONFIG += $(CFG.CSWSTEST)
@@ -54,7 +55,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.awstest awstestclean awstestcleandep
 
 all: $(AWSTEST.EXE)
-build.awstest: $(OUT.AWSTEST) $(AWSTEST.EXE)
+build.awstest: $(OUTDIRS) $(AWSTEST.EXE)
 clean: awstestclean
 
 $(OUT.AWSTEST)/%$O: $(DIR.AWSTEST)/%.cpp
@@ -62,9 +63,6 @@ $(OUT.AWSTEST)/%$O: $(DIR.AWSTEST)/%.cpp
 
 $(AWSTEST.EXE): $(DEP.EXE) $(OBJ.AWSTEST) $(LIB.AWSTEST)
 	$(DO.LINK.EXE)
-
-$(OUT.AWSTEST):
-	$(MKDIRS)
 
 awstestclean:
 	-$(RM) awstest.txt

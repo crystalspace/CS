@@ -11,7 +11,7 @@
 # When finished, add your submakefile's filename to user.mak.
 #
 
-DESCRIPTION.foobar = Crystal Space Foo Bar
+DESCRIPTION.foobar = Crystal Space foo bar
 
 #------------------------------------------------------------- rootdefines ---#
 # Here are defined the makefile target descriptions for the target list.  You
@@ -58,7 +58,15 @@ ifeq ($(MAKESECTION),roottargets)
 
 # These are all the pseudo-targets that will implicitly call your target.
 # Delete the pseudo-targets which are inappropriate for your module.
-all apps libs plugins meshes drivers drivers2d drivers3d snddrivers \
+all \
+apps \
+libs \
+plugins \
+meshes \
+drivers \
+drivers2d \
+drivers3d \
+snddrivers \
 netdrivers: foobar
 
 # These call the target of the same name in the targets section.
@@ -91,19 +99,9 @@ endif # ifeq ($(MAKESECTION),defines)
 #-----------------------------------------------------------------------------#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp path/to/foobar
-
 # If you need to add any special flags, or link with any external libraries,
-# do it here. You should use the compiler-independent flag variables
-# from the first 40 lines of cs.mak.
-# *** WARNING ***
-# Doing this is highly discouraged.  If you really need module-specific flags,
-# you should define makefile variables specific to this module rather than
-# modifying the flags for all modules.
-CFLAGS +=
-CFLAGS.INCLUDE +=
-LFLAGS +=
-LIBS +=
+# do it here.
+FOOBAR.CFLAGS =
 
 # This section is only for plugins. It adds the plugin to the list of plugins
 # as a dynamic or static library depending on the value of USE_PLUGINS.
@@ -130,13 +128,17 @@ TO_INSTALL.EXE += $(FOOBAR.EXE)
 # to write a template to suit them all.
 
 # This section defines files used by this module.
-INC.FOOBAR = $(wildcard path/to/foobar/*.h)
-SRC.FOOBAR = $(wildcard path/to/foobar/*.cpp)
-OBJ.FOOBAR = $(addprefix $(OUT)/,$(notdir $(SRC.FOOBAR:.cpp=$O)))
+DIR.FOOBAR = path/to/foobar
+OUT.FOOBAR = $(OUT)/$(DIR.FOOBAR)
+INC.FOOBAR = $(wildcard $(DIR.FOOBAR)/*.h)
+SRC.FOOBAR = $(wildcard $(DIR.FOOBAR)/*.cpp)
+OBJ.FOOBAR = $(addprefix $(OUT.FOOBAR)/,$(notdir $(SRC.FOOBAR:.cpp=$O)))
 # Customise the following line.
 DEP.FOOBAR = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
 # Omit this if your module does not have an associated configuration file.
 CFG.FOOBAR = data/config/foobar.cfg
+
+OUTDIRS += $(OUT.FOOBAR)
 
 # If your module should be installed and has associated resources, list them
 # here.
@@ -165,33 +167,31 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #-----------------------------------------------------------------------------#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: foobar foobarclean
+.PHONY: foobar foobarclean foobarcleandep
 
-# For applications (omit for plugins).
-all: $(FOOBAR.EXE)
+# For GUI applications (omit for plugins).
 build.foobar: $(OUTDIRS) $(FOOBAR.EXE)
 $(FOOBAR.EXE): $(DEP.EXE) $(OBJ.FOOBAR) $(LIB.FOOBAR)
 	$(DO.LINK.EXE)
+
+# For console (text mode) applications (omit for plugins).
+build.foobar: $(OUTDIRS) $(FOOBAR.EXE)
+$(FOOBAR.EXE): $(OBJ.FOOBAR) $(LIB.FOOBAR)
+	$(DO.LINK.CONSOLE.EXE)
 
 # For plugins (omit for applications)
 foobar: $(OUTDIRS) $(FOOBAR)
 $(FOOBAR): $(OBJ.FOOBAR) $(LIB.FOOBAR)
 	$(DO.PLUGIN)
 
-# If your source files have very specialized compilation requirements that are
-# not handled by the implicit rules, you may need to create your own rule for
-# the files in your module.  If you use this section, you must omit the `vpath'
-# directive above.
-# *** WARNING ****
-# Use of this section is almost never necessary; it should almost always be
-# omitted.
-$(OUT)/%$O: path/to/foobar/%.cpp
-	$(DO.COMPILE.CPP)
+# Rule to build foobar object files from foobar source code.
+$(OUT.FOOBAR)/%$O: $(DIR.FOOBAR)/%.cpp
+	$(DO.COMPILE.CPP) $(FOOBAR.CFLAGS)
 
 # Cleanup generated resources for applications (omit for plugins)
 clean: foobarclean
 foobarclean:
-	-$(RMDIR) $(FOOBAR.EXE) $(OBJ.FOOBAR)
+	-$(RMDIR) $(FOOBAR.EXE) $(OBJ.FOOBAR) foobar.txt
 
 # Cleanup generated resources for plugins (omit for applications)
 clean: foobarclean
@@ -199,12 +199,16 @@ foobarclean:
 	$(RM) $(FOOBAR) $(OBJ.FOOBAR)
 
 # This takes care of creating and including the dependency file.
+cleandep: foobarcleandep
+foobarcleandep:
+	-$(RM) $(OUT.FOOBAR)/foobar.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/foobar.dep
-$(OUTOS)/foobar.dep: $(SRC.FOOBAR)
-	$(DO.DEP)
+dep: $(OUT.FOOBAR) $(OUT.FOOBAR)/foobar.dep
+$(OUT.FOOBAR)/foobar.dep: $(SRC.FOOBAR)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/foobar.dep
+-include $(OUT.FOOBAR)/foobar.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -28,7 +28,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 SCFREG.EXE = scfreg$(EXE.CONSOLE)
 DIR.SCFREG = apps/tools/scfreg
 OUT.SCFREG = $(OUT)/$(DIR.SCFREG)
@@ -37,6 +36,8 @@ SRC.SCFREG = apps/tools/scfreg/scfreg.cpp
 OBJ.SCFREG = $(addprefix $(OUT.SCFREG)/,$(notdir $(SRC.SCFREG:.cpp=$O)))
 DEP.SCFREG = CSSYS CSUTIL CSGEOM
 LIB.SCFREG = $(foreach d,$(DEP.SCFREG),$($d.LIB))
+
+OUTDIRS += $(OUT.SCFREG)
 
 TO_INSTALL.EXE += $(SCFREG.EXE)
 
@@ -51,8 +52,7 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: build.scfreg scfregclean scfregcleandep
 
-all: $(SCFREG.EXE)
-build.scfreg: $(OUT.SCFREG) $(SCFREG.EXE)
+build.scfreg: $(OUTDIRS) $(SCFREG.EXE)
 clean: scfregclean
 
 $(OUT.SCFREG)/%$O: $(DIR.SCFREG)/%.cpp
@@ -60,9 +60,6 @@ $(OUT.SCFREG)/%$O: $(DIR.SCFREG)/%.cpp
 
 $(SCFREG.EXE): $(OBJ.SCFREG) $(LIB.SCFREG)
 	$(DO.LINK.CONSOLE.EXE)
-
-$(OUT.SCFREG):
-	$(MKDIRS)
 
 scfregclean:
 	-$(RM) scfreg.txt

@@ -38,6 +38,8 @@ OBJ.PYSIMP = $(addprefix $(OUT.PYSIMP)/,$(notdir $(SRC.PYSIMP:.cpp=$O)))
 DEP.PYSIMP = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.PYSIMP = $(foreach d,$(DEP.PYSIMP),$($d.LIB))
 
+OUTDIRS += $(OUT.PYSIMP)
+
 #TO_INSTALL.EXE += $(PYSIMP.EXE)
 
 MSVC.DSP += PYSIMP
@@ -52,7 +54,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.pysimp pysimpclean pysimpcleandep
 
 all: $(PYSIMP.EXE)
-build.pysimp: $(OUT.PYSIMP) $(PYSIMP.EXE)
+build.pysimp: $(OUTDIRS) $(PYSIMP.EXE)
 clean: pysimpclean
 
 $(OUT.PYSIMP)/%$O: $(DIR.PYSIMP)/%.cpp
@@ -60,9 +62,6 @@ $(OUT.PYSIMP)/%$O: $(DIR.PYSIMP)/%.cpp
 
 $(PYSIMP.EXE): $(DEP.EXE) $(OBJ.PYSIMP) $(LIB.PYSIMP)
 	$(DO.LINK.EXE)
-
-$(OUT.PYSIMP):
-	$(MKDIRS)
 
 pysimpclean:
 	-$(RM) pysimp.txt

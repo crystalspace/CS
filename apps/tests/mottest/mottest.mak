@@ -28,7 +28,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 MOTTEST.EXE = mottest$(EXE)
 DIR.MOTTEST = apps/tests/mottest
 OUT.MOTTEST = $(OUT)/$(DIR.MOTTEST)
@@ -38,6 +37,8 @@ OBJ.MOTTEST = $(addprefix $(OUT.MOTTEST)/,$(notdir $(SRC.MOTTEST:.cpp=$O)))
 DEP.MOTTEST = CSTOOL CSUTIL CSSYS CSUTIL CSGEOM CSGFX
 LIB.MOTTEST = $(foreach d,$(DEP.MOTTEST),$($d.LIB))
 #CFG.MOTTEST = data/config/mottest.cfg
+
+OUTDIRS += $(OUT.MOTTEST)
 
 #TO_INSTALL.EXE    += $(MOTTEST.EXE)
 #TO_INSTALL.CONFIG += $(CFG.MOTTEST)
@@ -54,7 +55,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.mottest mottestclean mottestcleandep
 
 all: $(MOTTEST.EXE)
-build.mottest: $(OUT.MOTTEST) $(MOTTEST.EXE)
+build.mottest: $(OUTDIRS) $(MOTTEST.EXE)
 clean: mottestclean
 
 $(OUT.MOTTEST)/%$O: $(DIR.MOTTEST)/%.cpp
@@ -62,9 +63,6 @@ $(OUT.MOTTEST)/%$O: $(DIR.MOTTEST)/%.cpp
 
 $(MOTTEST.EXE): $(DEP.EXE) $(OBJ.MOTTEST) $(LIB.MOTTEST)
 	$(DO.LINK.EXE)
-
-$(OUT.MOTTEST):
-	$(MKDIRS)
 
 mottestclean:
 	-$(RM) mottest.txt

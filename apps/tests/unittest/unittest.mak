@@ -1,11 +1,12 @@
 # Application description
-DESCRIPTION.unittest = Crystal Space unittest tester
+DESCRIPTION.unittest = Crystal Space unit tester
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make unittest     Make the $(DESCRIPTION.unittest)$"
+APPHELP += \
+  $(NEWLINE)echo $"  make unittest     Make the $(DESCRIPTION.unittest)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -38,6 +39,8 @@ OBJ.UNITTEST = $(addprefix $(OUT.UNITTEST)/,$(notdir $(SRC.UNITTEST:.cpp=$O)))
 DEP.UNITTEST = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
 LIB.UNITTEST = $(foreach d,$(DEP.UNITTEST),$($d.LIB))
 
+OUTDIRS += $(OUT.UNITTEST)
+
 #TO_INSTALL.EXE += $(UNITTEST.EXE)
 
 MSVC.DSP += UNITTEST
@@ -52,18 +55,15 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.unittest unittestclean unittestcleandep
 
 all: $(UNITTEST.EXE)
-build.unittest: $(OUT.UNITTEST) $(UNITTEST.EXE)
+build.unittest: $(OUTDIRS) $(UNITTEST.EXE)
 clean: unittestclean
+check: unittestcheck
 
 $(OUT.UNITTEST)/%$O: $(DIR.UNITTEST)/%.cpp
 	$(DO.COMPILE.CPP)
-check: unittestcheck
 
 $(UNITTEST.EXE): $(DEP.EXE) $(OBJ.UNITTEST) $(LIB.UNITTEST)
 	$(DO.LINK.CONSOLE.EXE)
-
-$(OUT.UNITTEST):
-	$(MKDIRS)
 
 unittestclean:
 	-$(RM) unittest.txt

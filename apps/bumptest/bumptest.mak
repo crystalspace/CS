@@ -5,7 +5,8 @@ DESCRIPTION.bumptest = Crystal Space bumpmap test
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make bumptest     Make the $(DESCRIPTION.bumptest)$"
+APPHELP += \
+  $(NEWLINE)echo $"  make bumptest     Make the $(DESCRIPTION.bumptest)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -35,6 +36,8 @@ DEP.BUMPTEST = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.BUMPTEST = $(foreach d,$(DEP.BUMPTEST),$($d.LIB))
 CFG.BUMPTEST = data/config/csbumptest.cfg
 
+OUTDIRS += $(OUT.BUMPTEST)
+
 #TO_INSTALL.EXE += $(BUMPTEST.EXE)
 #TO_INSTALL.CONFIG += $(CFG.BUMPTEST)
 
@@ -50,7 +53,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.bumptest bumptestclean bumptestcleandep
 
 all: $(BUMPTEST.EXE)
-build.bumptest: $(OUT.BUMPTEST) $(BUMPTEST.EXE)
+build.bumptest: $(OUTDIRS) $(BUMPTEST.EXE)
 clean: bumptestclean
 
 $(OUT.BUMPTEST)/%$O: $(DIR.BUMPTEST)/%.cpp
@@ -58,9 +61,6 @@ $(OUT.BUMPTEST)/%$O: $(DIR.BUMPTEST)/%.cpp
 
 $(BUMPTEST.EXE): $(DEP.EXE) $(OBJ.BUMPTEST) $(LIB.BUMPTEST)
 	$(DO.LINK.EXE)
-
-$(OUT.BUMPTEST):
-	$(MKDIRS)
 
 bumptestclean:
 	-$(RM) bumptest.txt

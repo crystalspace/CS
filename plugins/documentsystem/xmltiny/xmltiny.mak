@@ -7,7 +7,7 @@ DESCRIPTION.xmltiny = Crystal Space TinyXML document system
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make xmltiny     Make the $(DESCRIPTION.xmltiny)$"
+  $(NEWLINE)echo $"  make xmltiny      Make the $(DESCRIPTION.xmltiny)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#

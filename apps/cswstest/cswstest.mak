@@ -35,6 +35,8 @@ DEP.CSWSTEST = CSWS CSGFX CSGEOM CSSYS CSGEOM CSUTIL CSTOOL CSUTIL CSSYS CSUTIL
 LIB.CSWSTEST = $(foreach d,$(DEP.CSWSTEST),$($d.LIB))
 CFG.CSWSTEST = data/config/cswstest.cfg
 
+OUTDIRS += $(OUT.CSWSTEST)
+
 #TO_INSTALL.EXE    += $(CSWSTEST.EXE)
 #TO_INSTALL.CONFIG += $(CFG.CSWSTEST)
 
@@ -50,7 +52,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.cswstest cswstestclean cswstestcleandep
 
 all: $(CSWSTEST.EXE)
-build.cswstest: $(OUT.CSWSTEST) $(CSWSTEST.EXE)
+build.cswstest: $(OUTDIRS) $(CSWSTEST.EXE)
 clean: cswstestclean
 
 $(OUT.CSWSTEST)/%$O: $(DIR.CSWSTEST)/%.cpp
@@ -58,9 +60,6 @@ $(OUT.CSWSTEST)/%$O: $(DIR.CSWSTEST)/%.cpp
 
 $(CSWSTEST.EXE): $(DEP.EXE) $(OBJ.CSWSTEST) $(LIB.CSWSTEST)
 	$(DO.LINK.EXE)
-
-$(OUT.CSWSTEST):
-	$(MKDIRS)
 
 cswstestclean:
 	-$(RM) cswstest.txt

@@ -26,15 +26,17 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 SIMPLECLOTH.EXE = simplecloth$(EXE)
 DIR.SIMPLECLOTH = apps/tutorial/simplecloth
 OUT.SIMPLECLOTH = $(OUT)/$(DIR.SIMPLECLOTH)
 INC.SIMPLECLOTH = $(wildcard $(DIR.SIMPLECLOTH)/*.h )
 SRC.SIMPLECLOTH = $(wildcard $(DIR.SIMPLECLOTH)/*.cpp )
-OBJ.SIMPLECLOTH = $(addprefix $(OUT.SIMPLECLOTH)/,$(notdir $(SRC.SIMPLECLOTH:.cpp=$O)))
+OBJ.SIMPLECLOTH = \
+  $(addprefix $(OUT.SIMPLECLOTH)/,$(notdir $(SRC.SIMPLECLOTH:.cpp=$O)))
 DEP.SIMPLECLOTH = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.SIMPLECLOTH = $(foreach d,$(DEP.SIMPLECLOTH),$($d.LIB))
+
+OUTDIRS += $(OUT.SIMPLECLOTH)
 
 #TO_INSTALL.EXE += $(SIMPLECLOTH.EXE)
 
@@ -49,8 +51,7 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: build.simplecloth simpleclothclean simpleclothcleandep
 
-all: $(SIMPLECLOTH.EXE)
-build.simplecloth: $(OUT.SIMPLECLOTH) $(SIMPLECLOTH.EXE)
+build.simplecloth: $(OUTDIRS) $(SIMPLECLOTH.EXE)
 clean: simpleclothclean
 
 $(OUT.SIMPLECLOTH)/%$O: $(DIR.SIMPLECLOTH)/%.cpp
@@ -58,9 +59,6 @@ $(OUT.SIMPLECLOTH)/%$O: $(DIR.SIMPLECLOTH)/%.cpp
 
 $(SIMPLECLOTH.EXE): $(DEP.EXE) $(OBJ.SIMPLECLOTH) $(LIB.SIMPLECLOTH)
 	$(DO.LINK.EXE)
-
-$(OUT.SIMPLECLOTH):
-	$(MKDIRS)
 
 simpleclothclean:
 	-$(RM) simplecloth.txt

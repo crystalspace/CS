@@ -26,15 +26,16 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 VSH.EXE = vsh$(EXE.CONSOLE)
 DIR.VSH = apps/tools/vsh
 OUT.VSH = $(OUT)/$(DIR.VSH)
-INC.VSH =
-SRC.VSH = apps/tools/vsh/vsh.cpp
+INC.VSH = $(wildcard $(DIR.VSH)/*.h)
+SRC.VSH = $(wildcard $(DIR.VSH)/*.cpp)
 OBJ.VSH = $(addprefix $(OUT.VSH)/,$(notdir $(SRC.VSH:.cpp=$O)))
 DEP.VSH = CSUTIL CSGFX CSTOOL CSSYS CSUTIL CSSYS CSGEOM
 LIB.VSH = $(foreach d,$(DEP.VSH),$($d.LIB))
+
+OUTDIRS += $(OUT.VSH)
 
 TO_INSTALL.EXE += $(VSH.EXE)
 
@@ -50,7 +51,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.vsh vshclean vshcleandep
 
 all: $(VSH.EXE)
-build.vsh: $(OUT.VSH) $(VSH.EXE)
+build.vsh: $(OUTDIRS) $(VSH.EXE)
 clean: vshclean
 
 $(OUT.VSH)/%$O: $(DIR.VSH)/%.cpp
@@ -58,9 +59,6 @@ $(OUT.VSH)/%$O: $(DIR.VSH)/%.cpp
 
 $(VSH.EXE): $(DEP.EXE) $(OBJ.VSH) $(LIB.VSH)
 	$(DO.LINK.CONSOLE.EXE)
-
-$(OUT.VSH):
-	$(MKDIRS)
 
 vshclean:
 	-$(RM) vsh.txt

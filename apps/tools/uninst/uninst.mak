@@ -28,8 +28,8 @@ ifeq ($(MAKESECTION),postdefines)
 UNINST.EXE = uninst$(EXE.CONSOLE)
 DIR.UNINST = apps/tools/uninst
 OUT.UNINST = $(OUT)/$(DIR.UNINST)
-INC.UNINST =
-SRC.UNINST = apps/tools/uninst/uninst.cpp
+INC.UNINST = $(wildcard $(DIR.UNINST)/*.h)
+SRC.UNINST = $(wildcard $(DIR.UNINST)/*.cpp)
 OBJ.UNINST = $(addprefix $(OUT.UNINST)/,$(notdir $(SRC.UNINST:.cpp=$O)))
 DEP.UNINST =
 LIB.UNINST =

@@ -35,6 +35,8 @@ OBJ.MDLTEST = $(addprefix $(OUT.MDLTEST)/,$(notdir $(SRC.MDLTEST:.cpp=$O)))
 DEP.MDLTEST = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.MDLTEST = $(foreach d,$(DEP.MDLTEST),$($d.LIB))
 
+OUTDIRS += $(OUT.MDLTEST)
+
 #TO_INSTALL.EXE += $(MDLTEST.EXE)
 
 MSVC.DSP += MDLTEST
@@ -49,7 +51,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.mdltest mdltestclean mdltestcleandep
 
 all: $(MDLTEST.EXE)
-build.mdltest: $(OUT.MDLTEST) $(MDLTEST.EXE)
+build.mdltest: $(OUTDIRS) $(MDLTEST.EXE)
 clean: mdltestclean
 
 $(OUT.MDLTEST)/%$O: $(DIR.MDLTEST)/%.cpp
@@ -57,9 +59,6 @@ $(OUT.MDLTEST)/%$O: $(DIR.MDLTEST)/%.cpp
 
 $(MDLTEST.EXE): $(DEP.EXE) $(OBJ.MDLTEST) $(LIB.MDLTEST)
 	$(DO.LINK.EXE)
-
-$(OUT.MDLTEST):
-	$(MKDIRS)
 
 mdltestclean:
 	-$(RM) mdltest.txt

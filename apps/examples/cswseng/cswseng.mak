@@ -5,7 +5,8 @@ DESCRIPTION.cswseng = Crystal Space Example: CSWS And Engine
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make cswseng      Make the $(DESCRIPTION.cswseng)$"
+APPHELP += \
+  $(NEWLINE)echo $"  make cswseng      Make the $(DESCRIPTION.cswseng)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -34,6 +35,8 @@ OBJ.CSWSENG = $(addprefix $(OUT.CSWSENG)/,$(notdir $(SRC.CSWSENG:.cpp=$O)))
 DEP.CSWSENG = CSWS CSTOOL CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.CSWSENG = $(foreach d,$(DEP.CSWSENG),$($d.LIB))
 
+OUTDIRS += $(OUT.CSWSENG)
+
 #TO_INSTALL.EXE    += $(CSWSENG.EXE)
 #TO_INSTALL.CONFIG += $(CFG.CSWSENG)
 
@@ -49,7 +52,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.cswseng cswsengclean cswsengcleandep
 
 all: $(CSWSENG.EXE)
-build.cswseng: $(OUT.CSWSENG) $(CSWSENG.EXE)
+build.cswseng: $(OUTDIRS) $(CSWSENG.EXE)
 clean: cswsengclean
 
 $(OUT.CSWSENG)/%$O: $(DIR.CSWSENG)/%.cpp
@@ -57,9 +60,6 @@ $(OUT.CSWSENG)/%$O: $(DIR.CSWSENG)/%.cpp
 
 $(CSWSENG.EXE): $(DEP.EXE) $(OBJ.CSWSENG) $(LIB.CSWSENG)
 	$(DO.LINK.EXE)
-
-$(OUT.CSWSENG):
-	$(MKDIRS)
 
 cswsengclean:
 	-$(RM) cswseng.txt

@@ -26,7 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 PHYSTUT.EXE = phystut$(EXE)
 DIR.PHYSTUT = apps/tutorial/phystut
 OUT.PHYSTUT = $(OUT)/$(DIR.PHYSTUT)
@@ -35,6 +34,8 @@ SRC.PHYSTUT = $(wildcard $(DIR.PHYSTUT)/*.cpp )
 OBJ.PHYSTUT = $(addprefix $(OUT.PHYSTUT)/,$(notdir $(SRC.PHYSTUT:.cpp=$O)))
 DEP.PHYSTUT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.PHYSTUT = $(foreach d,$(DEP.PHYSTUT),$($d.LIB))
+
+OUTDIRS += $(OUT.PHYSTUT)
 
 TO_INSTALL.EXE += $(PHYSTUT.EXE)
 
@@ -49,8 +50,7 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: build.phystut phystutclean phystutcleandep
 
-all: $(PHYSTUT.EXE)
-build.phystut: $(OUT.PHYSTUT) $(PHYSTUT.EXE)
+build.phystut: $(OUTDIRS) $(PHYSTUT.EXE)
 clean: phystutclean
 
 $(OUT.PHYSTUT)/%$O: $(DIR.PHYSTUT)/%.cpp
@@ -58,9 +58,6 @@ $(OUT.PHYSTUT)/%$O: $(DIR.PHYSTUT)/%.cpp
 
 $(PHYSTUT.EXE): $(DEP.EXE) $(OBJ.PHYSTUT) $(LIB.PHYSTUT)
 	$(DO.LINK.EXE)
-
-$(OUT.PHYSTUT):
-	$(MKDIRS)
 
 phystutclean:
 	-$(RM) phystut.txt

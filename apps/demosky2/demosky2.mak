@@ -34,6 +34,8 @@ OBJ.DEMOSKY2 = $(addprefix $(OUT.DEMOSKY2)/,$(notdir $(SRC.DEMOSKY2:.cpp=$O)))
 DEP.DEMOSKY2 = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.DEMOSKY2 = $(foreach d,$(DEP.DEMOSKY2),$($d.LIB))
 
+OUTDIRS += $(OUT.DEMOSKY2)
+
 #TO_INSTALL.EXE += $(DEMOSKY2.EXE)
 
 MSVC.DSP += DEMOSKY2
@@ -48,7 +50,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.demosky2 demosky2clean demosky2cleandep
 
 all: $(DEMOSKY2.EXE)
-build.demosky2: $(OUT.DEMOSKY2) $(DEMOSKY2.EXE)
+build.demosky2: $(OUTDIRS) $(DEMOSKY2.EXE)
 clean: demosky2clean
 
 $(OUT.DEMOSKY2)/%$O: $(DIR.DEMOSKY2)/%.cpp
@@ -56,9 +58,6 @@ $(OUT.DEMOSKY2)/%$O: $(DIR.DEMOSKY2)/%.cpp
 
 $(DEMOSKY2.EXE): $(DEP.EXE) $(OBJ.DEMOSKY2) $(LIB.DEMOSKY2)
 	$(DO.LINK.EXE)
-
-$(OUT.DEMOSKY2):
-	$(MKDIRS)
 
 demosky2clean:
 	-$(RM) demosky2.txt

@@ -25,7 +25,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 G2DTEST.EXE = g2dtest$(EXE)
 DIR.G2DTEST = apps/tests/g2dtest
 OUT.G2DTEST = $(OUT)/$(DIR.G2DTEST)
@@ -34,6 +33,8 @@ SRC.G2DTEST = apps/tests/g2dtest/g2dtest.cpp
 OBJ.G2DTEST = $(addprefix $(OUT.G2DTEST)/,$(notdir $(SRC.G2DTEST:.cpp=$O)))
 DEP.G2DTEST = CSTOOL CSGFX CSSYS CSUTIL CSGEOM
 LIB.G2DTEST = $(foreach d,$(DEP.G2DTEST),$($d.LIB))
+
+OUTDIRS += $(OUT.G2DTEST)
 
 #TO_INSTALL.EXE += $(G2DTEST.EXE)
 
@@ -48,7 +49,7 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: build.g2dtest g2dtestclean g2dtestcleandep
 
-build.g2dtest: $(OUT.G2DTEST) $(G2DTEST.EXE)
+build.g2dtest: $(OUTDIRS) $(G2DTEST.EXE)
 clean: g2dtestclean
 
 $(OUT.G2DTEST)/%$O: $(DIR.G2DTEST)/%.cpp
@@ -56,9 +57,6 @@ $(OUT.G2DTEST)/%$O: $(DIR.G2DTEST)/%.cpp
 
 $(G2DTEST.EXE): $(DEP.EXE) $(OBJ.G2DTEST) $(LIB.G2DTEST)
 	$(DO.LINK.EXE)
-
-$(OUT.G2DTEST):
-	$(MKDIRS)
 
 g2dtestclean:
 	-$(RM) g2dtest.txt

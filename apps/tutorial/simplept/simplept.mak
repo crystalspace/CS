@@ -26,7 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 SIMPLEPT.EXE = simplept$(EXE)
 DIR.SIMPLEPT = apps/tutorial/simplept
 OUT.SIMPLEPT = $(OUT)/$(DIR.SIMPLEPT)
@@ -35,6 +34,8 @@ SRC.SIMPLEPT = $(wildcard $(DIR.SIMPLEPT)/*.cpp )
 OBJ.SIMPLEPT = $(addprefix $(OUT.SIMPLEPT)/,$(notdir $(SRC.SIMPLEPT:.cpp=$O)))
 DEP.SIMPLEPT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.SIMPLEPT = $(foreach d,$(DEP.SIMPLEPT),$($d.LIB))
+
+OUTDIRS += $(OUT.SIMPLEPT)
 
 #TO_INSTALL.EXE += $(SIMPLEPT.EXE)
 
@@ -49,8 +50,7 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: build.simplept simpleptclean simpleptcleandep
 
-all: $(SIMPLEPT.EXE)
-build.simplept: $(OUT.SIMPLEPT) $(SIMPLEPT.EXE)
+build.simplept: $(OUTDIRS) $(SIMPLEPT.EXE)
 clean: simpleptclean
 
 $(OUT.SIMPLEPT)/%$O: $(DIR.SIMPLEPT)/%.cpp
@@ -58,9 +58,6 @@ $(OUT.SIMPLEPT)/%$O: $(DIR.SIMPLEPT)/%.cpp
 
 $(SIMPLEPT.EXE): $(DEP.EXE) $(OBJ.SIMPLEPT) $(LIB.SIMPLEPT)
 	$(DO.LINK.EXE)
-
-$(OUT.SIMPLEPT):
-	$(MKDIRS)
 
 simpleptclean:
 	-$(RM) simplept.txt

@@ -26,7 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 TBTUT.EXE = tbtut$(EXE)
 DIR.TBTUT = apps/tutorial/tbtut
 OUT.TBTUT = $(OUT)/$(DIR.TBTUT)
@@ -35,6 +34,8 @@ SRC.TBTUT = $(wildcard $(DIR.TBTUT)/*.cpp )
 OBJ.TBTUT = $(addprefix $(OUT.TBTUT)/,$(notdir $(SRC.TBTUT:.cpp=$O)))
 DEP.TBTUT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.TBTUT = $(foreach d,$(DEP.TBTUT),$($d.LIB))
+
+OUTDIRS += $(OUT.TBTUT)
 
 #TO_INSTALL.EXE += $(TBTUT.EXE)
 
@@ -49,8 +50,7 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: build.tbtut tbtutclean tbtutcleandep
 
-all: $(TBTUT.EXE)
-build.tbtut: $(OUT.TBTUT) $(TBTUT.EXE)
+build.tbtut: $(OUTDIRS) $(TBTUT.EXE)
 clean: tbtutclean
 
 $(OUT.TBTUT)/%$O: $(DIR.TBTUT)/%.cpp
@@ -58,9 +58,6 @@ $(OUT.TBTUT)/%$O: $(DIR.TBTUT)/%.cpp
 
 $(TBTUT.EXE): $(DEP.EXE) $(OBJ.TBTUT) $(LIB.TBTUT)
 	$(DO.LINK.EXE)
-
-$(OUT.TBTUT):
-	$(MKDIRS)
 
 tbtutclean:
 	-$(RM) tbtut.txt

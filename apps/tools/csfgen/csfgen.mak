@@ -28,7 +28,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 CSFGEN.EXE = csfgen$(EXE.CONSOLE)
 DIR.CSFGEN = apps/tools/csfgen
 OUT.CSFGEN = $(OUT)/$(DIR.CSFGEN)
@@ -37,6 +36,8 @@ SRC.CSFGEN = $(wildcard $(DIR.CSFGEN)/*.cpp )
 OBJ.CSFGEN = $(addprefix $(OUT.CSFGEN)/,$(notdir $(SRC.CSFGEN:.cpp=$O)))
 DEP.CSFGEN = CSTOOL CSUTIL CSSYS CSGEOM CSUTIL CSGFX
 LIB.CSFGEN = $(foreach d,$(DEP.CSFGEN),$($d.LIB))
+
+OUTDIRS += $(OUT.CSFGEN)
 
 TO_INSTALL.EXE += $(CSFGEN.EXE)
 
@@ -51,8 +52,7 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: build.csfgen csfgenclean csfgencleandep
 
-all: $(CSFGEN.EXE)
-build.csfgen: $(OUT.CSFGEN) $(CSFGEN.EXE)
+build.csfgen: $(OUTDIRS) $(CSFGEN.EXE)
 clean: csfgenclean
 
 $(OUT.CSFGEN)/%$O: $(DIR.CSFGEN)/%.cpp
@@ -60,9 +60,6 @@ $(OUT.CSFGEN)/%$O: $(DIR.CSFGEN)/%.cpp
 
 $(CSFGEN.EXE): $(OBJ.CSFGEN) $(LIB.CSFGEN)
 	$(DO.LINK.CONSOLE.EXE)
-
-$(OUT.CSFGEN):
-	$(MKDIRS)
 
 csfgenclean:
 	-$(RM) csfgen.txt

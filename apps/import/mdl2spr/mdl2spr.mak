@@ -26,7 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 MDL2SPR.EXE = mdl2spr$(EXE.CONSOLE)
 DIR.MDL2SPR = apps/import/mdl2spr
 OUT.MDL2SPR = $(OUT)/$(DIR.MDL2SPR)
@@ -35,6 +34,8 @@ SRC.MDL2SPR = $(wildcard $(DIR.MDL2SPR)/*.cpp )
 OBJ.MDL2SPR = $(addprefix $(OUT.MDL2SPR)/,$(notdir $(SRC.MDL2SPR:.cpp=$O)))
 DEP.MDL2SPR = CSGFX CSUTIL CSSYS CSUTIL CSGEOM
 LIB.MDL2SPR = $(foreach d,$(DEP.MDL2SPR),$($d.LIB))
+
+OUTDIRS += $(OUT.MDL2SPR)
 
 TO_INSTALL.EXE += $(MDL2SPR.EXE)
 
@@ -50,7 +51,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.mdl2spr mdl2sprclean mdl2sprcleandep
 
 all: $(MDL2SPR.EXE)
-build.mdl2spr: $(OUT.MDL2SPR) $(MDL2SPR.EXE)
+build.mdl2spr: $(OUTDIRS) $(MDL2SPR.EXE)
 clean: mdl2sprclean
 
 $(OUT.MDL2SPR)/%$O: $(DIR.MDL2SPR)/%.cpp
@@ -58,9 +59,6 @@ $(OUT.MDL2SPR)/%$O: $(DIR.MDL2SPR)/%.cpp
 
 $(MDL2SPR.EXE): $(OBJ.MDL2SPR) $(LIB.MDL2SPR)
 	$(DO.LINK.CONSOLE.EXE)
-
-$(OUT.MDL2SPR):
-	$(MKDIRS)
 
 mdl2sprclean:
 	-$(RM) mdl2spr.txt

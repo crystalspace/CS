@@ -26,7 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 SIMPLE1.EXE = simple1$(EXE)
 DIR.SIMPLE1 = apps/tutorial/simple1
 OUT.SIMPLE1 = $(OUT)/$(DIR.SIMPLE1)
@@ -35,6 +34,8 @@ SRC.SIMPLE1 = $(wildcard $(DIR.SIMPLE1)/*.cpp )
 OBJ.SIMPLE1 = $(addprefix $(OUT.SIMPLE1)/,$(notdir $(SRC.SIMPLE1:.cpp=$O)))
 DEP.SIMPLE1 = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.SIMPLE1 = $(foreach d,$(DEP.SIMPLE1),$($d.LIB))
+
+OUTDIRS += $(OUT.SIMPLE1)
 
 #TO_INSTALL.EXE += $(SIMPLE1.EXE)
 
@@ -49,8 +50,7 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: build.simple1 simple1clean simple1cleandep
 
-all: $(SIMPLE1.EXE)
-build.simple1: $(OUT.SIMPLE1) $(SIMPLE1.EXE)
+build.simple1: $(OUTDIRS) $(SIMPLE1.EXE)
 clean: simple1clean
 
 $(OUT.SIMPLE1)/%$O: $(DIR.SIMPLE1)/%.cpp
@@ -58,9 +58,6 @@ $(OUT.SIMPLE1)/%$O: $(DIR.SIMPLE1)/%.cpp
 
 $(SIMPLE1.EXE): $(DEP.EXE) $(OBJ.SIMPLE1) $(LIB.SIMPLE1)
 	$(DO.LINK.EXE)
-
-$(OUT.SIMPLE1):
-	$(MKDIRS)
 
 simple1clean:
 	-$(RM) simple1.txt

@@ -26,15 +26,17 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 LGHTNGTEST.EXE = lghtngtest$(EXE)
 DIR.LGHTNGTEST = apps/tests/lghtngtest
 OUT.LGHTNGTEST = $(OUT)/$(DIR.LGHTNGTEST)
 INC.LGHTNGTEST = $(wildcard $(DIR.LGHTNGTEST)/*.h )
 SRC.LGHTNGTEST = $(wildcard $(DIR.LGHTNGTEST)/*.cpp )
-OBJ.LGHTNGTEST = $(addprefix $(OUT.LGHTNGTEST)/,$(notdir $(SRC.LGHTNGTEST:.cpp=$O)))
+OBJ.LGHTNGTEST = \
+  $(addprefix $(OUT.LGHTNGTEST)/,$(notdir $(SRC.LGHTNGTEST:.cpp=$O)))
 DEP.LGHTNGTEST = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.LGHTNGTEST = $(foreach d,$(DEP.LGHTNGTEST),$($d.LIB))
+
+OUTDIRS += $(OUT.LGHTNGTEST)
 
 #TO_INSTALL.EXE += $(LGHTNGTEST.EXE)
 
@@ -50,7 +52,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.lghtngtest lghtngtestclean lghtngtestcleandep
 
 all: $(LGHTNGTEST.EXE)
-build.lghtngtest: $(OUT.LGHTNGTEST) $(LGHTNGTEST.EXE)
+build.lghtngtest: $(OUTDIRS) $(LGHTNGTEST.EXE)
 clean: lghtngtestclean
 
 $(OUT.LGHTNGTEST)/%$O: $(DIR.LGHTNGTEST)/%.cpp
@@ -58,9 +60,6 @@ $(OUT.LGHTNGTEST)/%$O: $(DIR.LGHTNGTEST)/%.cpp
 
 $(LGHTNGTEST.EXE): $(DEP.EXE) $(OBJ.LGHTNGTEST) $(LIB.LGHTNGTEST)
 	$(DO.LINK.EXE)
-
-$(OUT.LGHTNGTEST):
-	$(MKDIRS)
 
 lghtngtestclean:
 	-$(RM) lghtngtest.txt

@@ -35,6 +35,8 @@ DEP.BLOCKS = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.BLOCKS = $(foreach d,$(DEP.BLOCKS),$($d.LIB))
 CFG.BLOCKS = data/config/blocks.cfg
 
+OUTDIRS += $(OUT.BLOCKS)
+
 TO_INSTALL.EXE    += $(BLOCKS.EXE)
 TO_INSTALL.CONFIG += $(CFG.BLOCKS)
 TO_INSTALL.DATA   += data/blocks.zip
@@ -50,8 +52,7 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: build.blocks blocksclean blockscleandep
 
-all: $(BLOCKS.EXE)
-build.blocks: $(OUT.BLOCKS) $(BLOCKS.EXE)
+build.blocks: $(OUTDIRS) $(BLOCKS.EXE)
 clean: blocksclean
 
 $(OUT.BLOCKS)/%$O: $(DIR.BLOCKS)/%.cpp
@@ -59,9 +60,6 @@ $(OUT.BLOCKS)/%$O: $(DIR.BLOCKS)/%.cpp
 
 $(BLOCKS.EXE): $(DEP.EXE) $(OBJ.BLOCKS) $(LIB.BLOCKS)
 	$(DO.LINK.EXE)
-
-$(OUT.BLOCKS):
-	$(MKDIRS)
 
 blocksclean:
 	-$(RM) blocks.txt

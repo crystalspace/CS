@@ -26,7 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 MAP2CS.EXE = map2cs$(EXE.CONSOLE)
 DIR.MAP2CS = apps/import/map2cs
 OUT.MAP2CS = $(OUT)/$(DIR.MAP2CS)
@@ -36,6 +35,8 @@ OBJ.MAP2CS = $(addprefix $(OUT.MAP2CS)/,$(notdir $(SRC.MAP2CS:.cpp=$O)))
 DEP.MAP2CS = CSTOOL CSGFX CSUTIL CSSYS CSUTIL CSGEOM
 LIB.MAP2CS = $(foreach d,$(DEP.MAP2CS),$($d.LIB))
 CFG.MAP2CS = data/config/map2cs.cfg
+
+OUTDIRS += $(OUT.MAP2CS)
 
 TO_INSTALL.EXE    += $(MAP2CS.EXE)
 TO_INSTALL.CONFIG += $(CFG.MAP2CS)
@@ -53,7 +54,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.map2cs map2csclean map2cscleandep
 
 all: $(MAP2CS.EXE)
-build.map2cs: $(OUT.MAP2CS) $(MAP2CS.EXE)
+build.map2cs: $(OUTDIRS) $(MAP2CS.EXE)
 clean: map2csclean
 
 $(OUT.MAP2CS)/%$O: $(DIR.MAP2CS)/%.cpp
@@ -61,9 +62,6 @@ $(OUT.MAP2CS)/%$O: $(DIR.MAP2CS)/%.cpp
 
 $(MAP2CS.EXE): $(OBJ.MAP2CS) $(LIB.MAP2CS)
 	$(DO.LINK.CONSOLE.EXE) $(ZLIB.LFLAGS)
-
-$(OUT.MAP2CS):
-	$(MKDIRS)
 
 map2csclean:
 	-$(RM) map2cs.txt

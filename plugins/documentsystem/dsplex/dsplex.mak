@@ -7,7 +7,7 @@ DESCRIPTION.dsplex = Crystal Space document system multiplexer
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make dsplex     Make the $(DESCRIPTION.dsplex)$"
+  $(NEWLINE)echo $"  make dsplex       Make the $(DESCRIPTION.dsplex)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#

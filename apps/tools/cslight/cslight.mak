@@ -26,7 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 CSLIGHT.EXE = cslight$(EXE)
 DIR.CSLIGHT = apps/tools/cslight
 OUT.CSLIGHT = $(OUT)/$(DIR.CSLIGHT)
@@ -35,6 +34,8 @@ SRC.CSLIGHT = $(wildcard $(DIR.CSLIGHT)/*.cpp )
 OBJ.CSLIGHT = $(addprefix $(OUT.CSLIGHT)/,$(notdir $(SRC.CSLIGHT:.cpp=$O)))
 DEP.CSLIGHT = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.CSLIGHT = $(foreach d,$(DEP.CSLIGHT),$($d.LIB))
+
+OUTDIRS += $(OUT.CSLIGHT)
 
 TO_INSTALL.EXE += $(CSLIGHT.EXE)
 
@@ -52,7 +53,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.cslight cslightclean cslightcleandep
 
 all: $(CSLIGHT.EXE)
-build.cslight: $(OUT.CSLIGHT) $(CSLIGHT.EXE)
+build.cslight: $(OUTDIRS) $(CSLIGHT.EXE)
 clean: cslightclean
 
 $(OUT.CSLIGHT)/%$O: $(DIR.CSLIGHT)/%.cpp
@@ -60,9 +61,6 @@ $(OUT.CSLIGHT)/%$O: $(DIR.CSLIGHT)/%.cpp
 
 $(CSLIGHT.EXE): $(DEP.EXE) $(OBJ.CSLIGHT) $(LIB.CSLIGHT)
 	$(DO.LINK.EXE)
-
-$(OUT.CSLIGHT):
-	$(MKDIRS)
 
 cslightclean:
 	-$(RM) cslight.txt

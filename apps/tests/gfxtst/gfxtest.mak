@@ -26,7 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 GFXTEST.EXE = gfxtest$(EXE.CONSOLE)
 DIR.GFXTEST = apps/tests/gfxtst
 OUT.GFXTEST = $(OUT)/$(DIR.GFXTEST)
@@ -35,6 +34,8 @@ SRC.GFXTEST = apps/tests/gfxtst/gfxtest.cpp
 OBJ.GFXTEST = $(addprefix $(OUT.GFXTEST)/,$(notdir $(SRC.GFXTEST:.cpp=$O)))
 DEP.GFXTEST = CSGFX CSTOOL CSUTIL CSGEOM CSSYS
 LIB.GFXTEST = $(foreach d,$(DEP.GFXTEST),$($d.LIB))
+
+OUTDIRS += $(OUT.GFXTEST)
 
 #TO_INSTALL.EXE += $(GFXTEST.EXE)
 
@@ -49,8 +50,7 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: build.gfxtest gfxtestclean gfxtestcleandep
 
-all: $(GFXTEST.EXE)
-build.gfxtest: $(OUT.GFXTEST) $(GFXTEST.EXE)
+build.gfxtest: $(OUTDIRS) $(GFXTEST.EXE)
 clean: gfxtestclean
 
 $(OUT.GFXTEST)/%$O: $(DIR.GFXTEST)/%.cpp
@@ -58,9 +58,6 @@ $(OUT.GFXTEST)/%$O: $(DIR.GFXTEST)/%.cpp
 
 $(GFXTEST.EXE): $(DEP.EXE) $(OBJ.GFXTEST) $(LIB.GFXTEST)
 	$(DO.LINK.CONSOLE.EXE)
-
-$(OUT.GFXTEST):
-	$(MKDIRS)
 
 gfxtestclean:
 	-$(RM) gfxtest.txt

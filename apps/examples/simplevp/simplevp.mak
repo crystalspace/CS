@@ -35,6 +35,8 @@ OBJ.SIMPLEVP = $(addprefix $(OUT.SIMPLEVP)/,$(notdir $(SRC.SIMPLEVP:.cpp=$O)))
 DEP.SIMPLEVP = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.SIMPLEVP = $(foreach d,$(DEP.SIMPLEVP),$($d.LIB))
 
+OUTDIRS += $(OUT.SIMPLEVP)
+
 #TO_INSTALL.EXE += $(SIMPLEVP.EXE)
 
 MSVC.DSP += SIMPLEVP
@@ -49,7 +51,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.simplevp simplevpclean simplevpcleandep
 
 all: $(SIMPLEVP.EXE)
-build.simplevp: $(OUT.SIMPLEVP) $(SIMPLEVP.EXE)
+build.simplevp: $(OUTDIRS) $(SIMPLEVP.EXE)
 clean: simplevpclean
 
 $(OUT.SIMPLEVP)/%$O: $(DIR.SIMPLEVP)/%.cpp
@@ -57,9 +59,6 @@ $(OUT.SIMPLEVP)/%$O: $(DIR.SIMPLEVP)/%.cpp
 
 $(SIMPLEVP.EXE): $(DEP.EXE) $(OBJ.SIMPLEVP) $(LIB.SIMPLEVP)
 	$(DO.LINK.EXE)
-
-$(OUT.SIMPLEVP):
-	$(MKDIRS)
 
 simplevpclean:
 	-$(RM) simplevp.txt

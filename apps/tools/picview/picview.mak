@@ -1,11 +1,12 @@
 # Application description
-DESCRIPTION.picview = Crystal Space Picture Viewer
+DESCRIPTION.picview = Crystal Space picture viewer
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make picview      Make the $(DESCRIPTION.picview)$"
+APPHELP += \
+  $(NEWLINE)echo $"  make picview      Make the $(DESCRIPTION.picview)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -25,16 +26,16 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 PICVIEW.EXE = picview$(EXE)
 DIR.PICVIEW = apps/tools/picview
 OUT.PICVIEW = $(OUT)/$(DIR.PICVIEW)
 INC.PICVIEW = $(wildcard $(DIR.PICVIEW)/*.h )
 SRC.PICVIEW = $(wildcard $(DIR.PICVIEW)/*.cpp )
 OBJ.PICVIEW = $(addprefix $(OUT.PICVIEW)/,$(notdir $(SRC.PICVIEW:.cpp=$O)))
-DEP.PICVIEW = \
-  CSWS CSTOOL CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
+DEP.PICVIEW = CSWS CSTOOL CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.PICVIEW = $(foreach d,$(DEP.PICVIEW),$($d.LIB))
+
+OUTDIRS += $(OUT.PICVIEW)
 
 #TO_INSTALL.EXE    += $(picview.EXE)
 #TO_INSTALL.CONFIG += $(CFG.PICVIEW)
@@ -51,7 +52,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.picview picviewclean picviewcleandep
 
 all: $(PICVIEW.EXE)
-build.picview: $(OUT.PICVIEW) $(PICVIEW.EXE)
+build.picview: $(OUTDIRS) $(PICVIEW.EXE)
 clean: picviewclean
 
 $(OUT.PICVIEW)/%$O: $(DIR.PICVIEW)/%.cpp
@@ -59,9 +60,6 @@ $(OUT.PICVIEW)/%$O: $(DIR.PICVIEW)/%.cpp
 
 $(PICVIEW.EXE): $(DEP.EXE) $(OBJ.PICVIEW) $(LIB.PICVIEW)
 	$(DO.LINK.EXE)
-
-$(OUT.PICVIEW):
-	$(MKDIRS)
 
 picviewclean:
 	-$(RM) picview.txt

@@ -35,6 +35,8 @@ DEP.ISOMAP = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL
 LIB.ISOMAP = $(foreach d,$(DEP.ISOMAP),$($d.LIB))
 #CFG.ISOMAP = data/config/isomap.cfg
 
+OUTDIRS += $(OUT.ISOMAP)
+
 TO_INSTALL.EXE    += $(ISOMAP.EXE)
 #TO_INSTALL.CONFIG += $(CFG.ISOMAP)
 TO_INSTALL.DATA   += data/isomap/world
@@ -51,7 +53,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.isomap isomapclean isomapcleandep
 
 all: $(ISOMAP.EXE)
-build.isomap: $(OUT.ISOMAP) $(ISOMAP.EXE)
+build.isomap: $(OUTDIRS) $(ISOMAP.EXE)
 clean: isomapclean
 
 $(OUT.ISOMAP)/%$O: $(DIR.ISOMAP)/%.cpp
@@ -59,9 +61,6 @@ $(OUT.ISOMAP)/%$O: $(DIR.ISOMAP)/%.cpp
 
 $(ISOMAP.EXE): $(DEP.EXE) $(OBJ.ISOMAP) $(LIB.ISOMAP)
 	$(DO.LINK.EXE)
-
-$(OUT.ISOMAP):
-	$(MKDIRS)
 
 isomapclean:
 	-$(RM) isomap.txt

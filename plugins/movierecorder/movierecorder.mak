@@ -9,7 +9,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make movierecorder Make the $(DESCRIPTION.movierecorder)$"
+  $(NEWLINE)echo $"  make movierecorderMake the $(DESCRIPTION.movierecorder)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -44,7 +44,8 @@ DIR.MOVIERECORDER = plugins/movierecorder
 OUT.MOVIERECORDER = $(OUT)/$(DIR.MOVIERECORDER)
 INC.MOVIERECORDER = $(wildcard $(DIR.MOVIERECORDER)/*.h)
 SRC.MOVIERECORDER = $(wildcard $(DIR.MOVIERECORDER)/*.cpp) 
-OBJ.MOVIERECORDER = $(addprefix $(OUT.MOVIERECORDER)/,$(notdir $(SRC.MOVIERECORDER:.cpp=$O)))
+OBJ.MOVIERECORDER = \
+  $(addprefix $(OUT.MOVIERECORDER)/,$(notdir $(SRC.MOVIERECORDER:.cpp=$O)))
 DEP.MOVIERECORDER = CSTOOL CSSYS CSUTIL
 CFG.MOVIERECORDER = data/config/movierecorder.cfg
 

@@ -1,11 +1,12 @@
 # Application description
-DESCRIPTION.tbconvert = Crystal Space Big Terrain Conversion Tool
+DESCRIPTION.tbconvert = Crystal Space big terrain converter
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make tbconvert    Make the $(DESCRIPTION.tbconvert)$"
+APPHELP += \
+  $(NEWLINE)echo $"  make tbconvert    Make the $(DESCRIPTION.tbconvert)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -25,14 +26,17 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tools/tbconv
-
 TBCONVERT.EXE = tbconvert$(EXE.CONSOLE)
-INC.TBCONVERT = $(wildcard apps/tools/tbconv/*.h)
-SRC.TBCONVERT = $(wildcard apps/tools/tbconv/*.cpp)
-OBJ.TBCONVERT = $(addprefix $(OUT)/,$(notdir $(SRC.TBCONVERT:.cpp=$O)))
+DIR.TBCONVERT = apps/tools/tbconv
+OUT.TBCONVERT = $(OUT)/$(DIR.TBCONVERT)
+INC.TBCONVERT = $(wildcard $(DIR.TBCONVERT)/*.h)
+SRC.TBCONVERT = $(wildcard $(DIR.TBCONVERT)/*.cpp)
+OBJ.TBCONVERT = \
+  $(addprefix $(OUT.TBCONVERT)/,$(notdir $(SRC.TBCONVERT:.cpp=$O)))
 DEP.TBCONVERT = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
 LIB.TBCONVERT = $(foreach d,$(DEP.TBCONVERT),$($d.LIB))
+
+OUTDIRS += $(OUT.TBCONVERT)
 
 TO_INSTALL.EXE += $(TBCONVERT.EXE)
 
@@ -45,11 +49,13 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.tbconvert tbconvertclean
+.PHONY: build.tbconvert tbconvertclean tbconvertcleandep
 
-all: $(TBCONVERT.EXE)
 build.tbconvert: $(OUTDIRS) $(TBCONVERT.EXE)
 clean: tbconvertclean
+
+$(OUT.TBCONVERT)/%$O: $(DIR.TBCONVERT)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(TBCONVERT.EXE): $(DEP.EXE) $(OBJ.TBCONVERT) $(LIB.TBCONVERT)
 	$(DO.LINK.CONSOLE.EXE)
@@ -58,12 +64,16 @@ tbconvertclean:
 	-$(RM) tbconvert.txt
 	-$(RMDIR) $(TBCONVERT.EXE) $(OBJ.TBCONVERT)
 
+cleandep: tbconvertcleandep
+tbconvertcleandep:
+	-$(RM) $(OUT.TBCONVERT)/tbconvert.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/tbconvert.dep
-$(OUTOS)/tbconvert.dep: $(SRC.TBCONVERT)
-	$(DO.DEP)
+dep: $(OUT.TBCONVERT) $(OUT.TBCONVERT)/tbconvert.dep
+$(OUT.TBCONVERT)/tbconvert.dep: $(SRC.TBCONVERT)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/tbconvert.dep
+-include $(OUT.TBCONVERT)/tbconvert.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

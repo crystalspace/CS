@@ -26,7 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 VIEWMESH.EXE = viewmesh$(EXE)
 DIR.VIEWMESH = apps/tools/viewmesh
 OUT.VIEWMESH = $(OUT)/$(DIR.VIEWMESH)
@@ -35,6 +34,8 @@ SRC.VIEWMESH = $(wildcard $(DIR.VIEWMESH)/*.cpp )
 OBJ.VIEWMESH = $(addprefix $(OUT.VIEWMESH)/,$(notdir $(SRC.VIEWMESH:.cpp=$O)))
 DEP.VIEWMESH = CSWS CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.VIEWMESH = $(foreach d,$(DEP.VIEWMESH),$($d.LIB))
+
+OUTDIRS += $(OUT.VIEWMESH)
 
 TO_INSTALL.EXE += $(VIEWMESH.EXE)
 
@@ -50,7 +51,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.viewmesh viewmeshclean viewmeshcleandep
 
 all: $(VIEWMESH.EXE)
-build.viewmesh: $(OUT.VIEWMESH) $(VIEWMESH.EXE)
+build.viewmesh: $(OUTDIRS) $(VIEWMESH.EXE)
 clean: viewmeshclean
 
 $(OUT.VIEWMESH)/%$O: $(DIR.VIEWMESH)/%.cpp
@@ -58,9 +59,6 @@ $(OUT.VIEWMESH)/%$O: $(DIR.VIEWMESH)/%.cpp
 
 $(VIEWMESH.EXE): $(DEP.EXE) $(OBJ.VIEWMESH) $(LIB.VIEWMESH)
 	$(DO.LINK.EXE)
-
-$(OUT.VIEWMESH):
-	$(MKDIRS)
 
 viewmeshclean:
 	-$(RM) viewmesh.txt

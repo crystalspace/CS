@@ -26,7 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 SIMPVS.EXE = simpvs$(EXE)
 DIR.SIMPVS = apps/tutorial/simpvs
 OUT.SIMPVS = $(OUT)/$(DIR.SIMPVS)
@@ -35,6 +34,8 @@ SRC.SIMPVS = $(wildcard $(DIR.SIMPVS)/*.cpp )
 OBJ.SIMPVS = $(addprefix $(OUT.SIMPVS)/,$(notdir $(SRC.SIMPVS:.cpp=$O)))
 DEP.SIMPVS = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL CSSYS
 LIB.SIMPVS = $(foreach d,$(DEP.SIMPVS),$($d.LIB))
+
+OUTDIRS += $(OUT.SIMPVS)
 
 #TO_INSTALL.EXE += $(SIMPVS.EXE)
 
@@ -49,8 +50,7 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: build.simpvs simpvsclean simpvscleandep
 
-all: $(SIMPVS.EXE)
-build.simpvs: $(OUT.SIMPVS) $(SIMPVS.EXE)
+build.simpvs: $(OUTDIRS) $(SIMPVS.EXE)
 clean: simpvsclean
 
 $(OUT.SIMPVS)/%$O: $(DIR.SIMPVS)/%.cpp
@@ -58,9 +58,6 @@ $(OUT.SIMPVS)/%$O: $(DIR.SIMPVS)/%.cpp
 
 $(SIMPVS.EXE): $(DEP.EXE) $(OBJ.SIMPVS) $(LIB.SIMPVS)
 	$(DO.LINK.EXE)
-
-$(OUT.SIMPVS):
-	$(MKDIRS)
 
 simpvsclean:
 	-$(RM) simpvs.txt

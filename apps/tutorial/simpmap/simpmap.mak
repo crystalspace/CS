@@ -5,7 +5,8 @@ DESCRIPTION.simpmap = Crystal Space tutorial part three, map loading
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make simpmap      Make the $(DESCRIPTION.simpmap)$"
+APPHELP += \
+  $(NEWLINE)echo $"  make simpmap      Make the $(DESCRIPTION.simpmap)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -25,7 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 SIMPMAP.EXE=simpmap$(EXE)
 DIR.SIMPMAP = apps/tutorial/simpmap
 OUT.SIMPMAP = $(OUT)/$(DIR.SIMPMAP)
@@ -34,6 +34,8 @@ SRC.SIMPMAP = $(wildcard $(DIR.SIMPMAP)/*.cpp )
 OBJ.SIMPMAP = $(addprefix $(OUT.SIMPMAP)/,$(notdir $(SRC.SIMPMAP:.cpp=$O)))
 DEP.SIMPMAP = CSTOOL CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 LIB.SIMPMAP = $(foreach d,$(DEP.SIMPMAP),$($d.LIB))
+
+OUTDIRS += $(OUT.SIMPMAP)
 
 #TO_INSTALL.EXE += $(SIMPMAP.EXE)
 
@@ -48,8 +50,7 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: build.simpmap simpmapclean simpmapcleandep
 
-all: $(SIMPMAP.EXE)
-build.simpmap: $(OUT.SIMPMAP) $(SIMPMAP.EXE)
+build.simpmap: $(OUTDIRS) $(SIMPMAP.EXE)
 clean: simpmapclean
 
 $(OUT.SIMPMAP)/%$O: $(DIR.SIMPMAP)/%.cpp
@@ -57,9 +58,6 @@ $(OUT.SIMPMAP)/%$O: $(DIR.SIMPMAP)/%.cpp
 
 $(SIMPMAP.EXE): $(DEP.EXE) $(OBJ.SIMPMAP) $(LIB.SIMPMAP)
 	$(DO.LINK.EXE)
-
-$(OUT.SIMPMAP):
-	$(MKDIRS)
 
 simpmapclean:
 	-$(RM) simpmap.txt

@@ -28,13 +28,17 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tests/perl5tst
-
 PERL5TEST.EXE = perl5tst$(EXE)
-SRC.PERL5TEST = $(wildcard apps/tests/perl5tst/*.cpp)
-OBJ.PERL5TEST = $(addprefix $(OUT)/,$(notdir $(SRC.PERL5TEST:.cpp=$O)))
+DIR.PERL5TEST = apps/tests/perl5tst
+OUT.PERL5TEST = $(OUT)/$(DIR.PERL5TEST)
+INC.PERL5TEST = $(wildcard $(DIR.PERL5TEST)/*.h)
+SRC.PERL5TEST = $(wildcard $(DIR.PERL5TEST)/*.cpp)
+OBJ.PERL5TEST = \
+  $(addprefix $(OUT.PERL5TEST)/,$(notdir $(SRC.PERL5TEST:.cpp=$O)))
 DEP.PERL5TEST = CSTOOL CSUTIL CSSYS
 LIB.PERL5TEST = $(foreach d,$(DEP.PERL5TEST),$($d.LIB))
+
+OUTDIRS += $(OUT.PERL5TEST)
 
 MSVC.DSP += PERL5TEST
 DSP.PERL5TEST.NAME = perl5tst
@@ -45,11 +49,13 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: perl5test perl5testclean
+.PHONY: perl5test perl5testclean perl5testcleandep
 
-all: $(PERL5TEST.EXE)
 build.perl5test: $(OUTDIRS) $(PERL5TEST.EXE)
 clean: perl5testclean
+
+$(OUT.PERL5TEST)/%$O: $(DIR.PERL5TEST)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(PERL5TEST.EXE): $(OBJ.PERL5TEST) $(LIB.PERL5TEST)
 	$(DO.LINK.EXE)
@@ -58,12 +64,16 @@ perl5testclean:
 	-$(RM) perl5test.txt
 	-$(RMDIR) $(PERL5TEST.EXE) $(OBJ.PERL5TEST)
 
+cleandep: perl5testcleandep
+perl5testcleandep:
+	-$(RM) $(OUT.PERL5TEST)/perl5tst.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/perl5tst.dep
-$(OUTOS)/perl5tst.dep: $(SRC.PERL5TEST)
-	$(DO.DEP)
+dep: $(OUT.PERL5TEST) $(OUT.PERL5TEST)/perl5tst.dep
+$(OUT.PERL5TEST)/perl5tst.dep: $(SRC.PERL5TEST)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/perl5tst.dep
+-include $(OUT.PERL5TEST)/perl5tst.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -5,7 +5,8 @@ DESCRIPTION.csfedit = Crystal Space font editor
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make csfedit      Make the $(DESCRIPTION.csfedit)$"
+APPHELP += \
+  $(NEWLINE)echo $"  make csfedit      Make the $(DESCRIPTION.csfedit)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -25,7 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 CSFEDIT.EXE=csfedit$(EXE)
 DIR.CSFEDIT = apps/tools/csfedit
 OUT.CSFEDIT = $(OUT)/$(DIR.CSFEDIT)
@@ -34,6 +34,8 @@ SRC.CSFEDIT = $(wildcard $(DIR.CSFEDIT)/*.cpp )
 OBJ.CSFEDIT = $(addprefix $(OUT.CSFEDIT)/,$(notdir $(SRC.CSFEDIT:.cpp=$O)))
 DEP.CSFEDIT = CSGFX CSWS CSTOOL CSUTIL CSSYS CSGEOM CSUTIL
 LIB.CSFEDIT = $(foreach d,$(DEP.CSFEDIT),$($d.LIB))
+
+OUTDIRS += $(OUT.CSFEDIT)
 
 #TO_INSTALL.EXE += $(CSFEDIT.EXE)
 
@@ -49,7 +51,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.csfedit csfeditclean csfeditcleandep
 
 all: $(CSFEDIT.EXE)
-build.csfedit: $(OUT.CSFEDIT) $(CSFEDIT.EXE)
+build.csfedit: $(OUTDIRS) $(CSFEDIT.EXE)
 clean: csfeditclean
 
 $(OUT.CSFEDIT)/%$O: $(DIR.CSFEDIT)/%.cpp
@@ -57,9 +59,6 @@ $(OUT.CSFEDIT)/%$O: $(DIR.CSFEDIT)/%.cpp
 
 $(CSFEDIT.EXE): $(DEP.EXE) $(OBJ.CSFEDIT) $(LIB.CSFEDIT)
 	$(DO.LINK.EXE)
-
-$(OUT.CSFEDIT):
-	$(MKDIRS)
 
 csfeditclean:
 	-$(RM) csfedit.txt

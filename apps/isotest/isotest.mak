@@ -5,7 +5,8 @@ DESCRIPTION.isotest = Crystal Space isotest demo executable
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make isotest      Make the $(DESCRIPTION.isotest)$"
+APPHELP += \
+  $(NEWLINE)echo $"  make isotest      Make the $(DESCRIPTION.isotest)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -35,6 +36,8 @@ DEP.ISOTEST = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL
 LIB.ISOTEST = $(foreach d,$(DEP.ISOTEST),$($d.LIB))
 #CFG.ISOTEST = data/config/isotest.cfg
 
+OUTDIRS += $(OUT.ISOTEST)
+
 TO_INSTALL.EXE    += $(ISOTEST.EXE)
 #TO_INSTALL.CONFIG += $(CFG.ISOTEST)
 
@@ -50,7 +53,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.isotest isotestclean isotestcleandep
 
 all: $(ISOTEST.EXE)
-build.isotest: $(OUT.ISOTEST) $(ISOTEST.EXE)
+build.isotest: $(OUTDIRS) $(ISOTEST.EXE)
 clean: isotestclean
 
 $(OUT.ISOTEST)/%$O: $(DIR.ISOTEST)/%.cpp
@@ -58,9 +61,6 @@ $(OUT.ISOTEST)/%$O: $(DIR.ISOTEST)/%.cpp
 
 $(ISOTEST.EXE): $(DEP.EXE) $(OBJ.ISOTEST) $(LIB.ISOTEST)
 	$(DO.LINK.EXE)
-
-$(OUT.ISOTEST):
-	$(MKDIRS)
 
 isotestclean:
 	-$(RM) isotest.txt

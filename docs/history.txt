@@ -49,6 +49,23 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed a bug with the INT64_C check in the configure
 	  script which caused the script to crash with a shell error if
 	  stdint.h was not found.
+	- Eric Sunshine made the following changes to the makefiles:
+	    - Converted the remaining "application" makefiles so that they
+	      place their generated files in a personalized subdirectory of
+	      $(OUT), rather than placing them directly in $(OUT).  This lifts
+	      the monolithic restriction that all applications must use
+	      distinct names for their source files.
+	    - Converted the application makefiles to augment OUTDIRS with their
+	      personalized output directories, rather than each having a custom
+	      directory creation rule.  Not only does this simplify the
+	      makefiles slightly, but it also fixes a problem where the
+	      personalized output directories of plugin modules were not
+	      created when an application makefile target (such as "make
+	      walktest") was invoked explicitly and when the project had been
+	      configured with --disable-plugins.
+	    - Updated CS/mk/template.mak to reflect the aforementioned changes.
+	    - Fixed formatting of help messages emitted by "make help" for
+	      several makefiles.
 9-Apr-2003
         - Rhad fixed OpenAL compile with compilers other than MSVC.
           - Changed FillMemory() to memset()

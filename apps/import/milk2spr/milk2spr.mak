@@ -26,7 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 MILK2SPR.EXE = milk2spr$(EXE.CONSOLE)
 DIR.MILK2SPR = apps/import/milk2spr
 OUT.MILK2SPR = $(OUT)/$(DIR.MILK2SPR)
@@ -35,6 +34,8 @@ SRC.MILK2SPR = $(wildcard $(DIR.MILK2SPR)/*.cpp )
 OBJ.MILK2SPR = $(addprefix $(OUT.MILK2SPR)/,$(notdir $(SRC.MILK2SPR:.cpp=$O)))
 DEP.MILK2SPR = CSGFX CSUTIL CSSYS CSUTIL CSGEOM
 LIB.MILK2SPR = $(foreach d,$(DEP.MILK2SPR),$($d.LIB))
+
+OUTDIRS += $(OUT.MILK2SPR)
 
 TO_INSTALL.EXE += $(MILK2SPR.EXE)
 
@@ -50,7 +51,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.milk2spr milk2sprclean milk2sprcleandep
 
 all: $(MILK2SPR.EXE)
-build.milk2spr: $(OUT.MILK2SPR) $(MILK2SPR.EXE)
+build.milk2spr: $(OUTDIRS) $(MILK2SPR.EXE)
 clean: milk2sprclean
 
 $(OUT.MILK2SPR)/%$O: $(DIR.MILK2SPR)/%.cpp
@@ -58,9 +59,6 @@ $(OUT.MILK2SPR)/%$O: $(DIR.MILK2SPR)/%.cpp
 
 $(MILK2SPR.EXE): $(OBJ.MILK2SPR) $(LIB.MILK2SPR)
 	$(DO.LINK.CONSOLE.EXE)
-
-$(OUT.MILK2SPR):
-	$(MKDIRS)
 
 milk2sprclean:
 	-$(RM) milk2spr.txt

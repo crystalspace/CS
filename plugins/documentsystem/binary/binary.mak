@@ -9,7 +9,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make bindoc     Make the $(DESCRIPTION.bindoc)$"
+  $(NEWLINE)echo $"  make bindoc       Make the $(DESCRIPTION.bindoc)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 

@@ -35,6 +35,8 @@ SRC.CALTOCS = $(wildcard $(DIR.CALTOCS)/*.cpp )
 OBJ.CALTOCS = $(addprefix $(OUT.CALTOCS)/,$(notdir $(SRC.CALTOCS:.cpp=$O)))
 DEP.CALTOCS = CSSYS CSUTIL
 
+OUTDIRS += $(OUT.CALTOCS)
+
 TO_INSTALL.EXE    += $(CALTOCS.EXE)
 
 MSVC.DSP += CALTOCS
@@ -50,7 +52,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.caltocs caltocsclean caltocscleandep
 
 all: $(CALTOCS.EXE)
-build.caltocs: $(OUT.CALTOCS) $(CALTOCS.EXE)
+build.caltocs: $(OUTDIRS) $(CALTOCS.EXE)
 clean: caltocsclean
 
 $(OUT.CALTOCS)/%$O: $(DIR.CALTOCS)/%.cpp
@@ -58,9 +60,6 @@ $(OUT.CALTOCS)/%$O: $(DIR.CALTOCS)/%.cpp
 
 $(CALTOCS.EXE): $(OBJ.CALTOCS)
 	$(DO.LINK.CONSOLE.EXE) -lcal3d -lstdc++
-
-$(OUT.CALTOCS):
-	$(MKDIRS)
 
 caltocsclean:
 	-$(RM) caltocs.txt

@@ -42,6 +42,8 @@ DEP.WALKTEST = CSTOOL CSENGINE CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
 LIB.WALKTEST = $(foreach d,$(DEP.WALKTEST),$($d.LIB))
 CFG.WALKTEST = data/config/walktest.cfg data/config/autoexec.cfg
 
+OUTDIRS += $(OUT.WALKTEST)
+
 TO_INSTALL.EXE    += $(WALKTEST.EXE)
 TO_INSTALL.CONFIG += $(CFG.WALKTEST)
 TO_INSTALL.DATA   += \
@@ -60,8 +62,7 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: build.walktest walktestclean walktestcleandep
 
-all: $(WALKTEST.EXE)
-build.walktest: $(OUT.WALKTEST) $(WALKTEST.EXE)
+build.walktest: $(OUTDIRS) $(WALKTEST.EXE)
 clean: walktestclean
 
 $(OUT.WALKTEST)/%$O: $(DIR.WALKTEST)/%.cpp
@@ -69,9 +70,6 @@ $(OUT.WALKTEST)/%$O: $(DIR.WALKTEST)/%.cpp
 
 $(WALKTEST.EXE): $(DEP.EXE) $(OBJ.WALKTEST) $(LIB.WALKTEST)
 	$(DO.LINK.EXE)
-
-$(OUT.WALKTEST):
-	$(MKDIRS)
 
 walktestclean:
 	-$(RM) walktest.txt

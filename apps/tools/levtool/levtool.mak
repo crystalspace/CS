@@ -1,11 +1,12 @@
 # Application description
-DESCRIPTION.levtool = Crystal Space Level Tool
+DESCRIPTION.levtool = Crystal Space map tool
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP += $(NEWLINE)echo $"  make levtool      Make the $(DESCRIPTION.levtool)$"
+APPHELP += \
+  $(NEWLINE)echo $"  make levtool      Make the $(DESCRIPTION.levtool)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -25,7 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 LEVTOOL.EXE = levtool$(EXE.CONSOLE)
 DIR.LEVTOOL = apps/tools/levtool
 OUT.LEVTOOL = $(OUT)/$(DIR.LEVTOOL)
@@ -34,6 +34,8 @@ SRC.LEVTOOL = $(wildcard $(DIR.LEVTOOL)/*.cpp )
 OBJ.LEVTOOL = $(addprefix $(OUT.LEVTOOL)/,$(notdir $(SRC.LEVTOOL:.cpp=$O)))
 DEP.LEVTOOL = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSUTIL CSSYS
 LIB.LEVTOOL = $(foreach d,$(DEP.LEVTOOL),$($d.LIB))
+
+OUTDIRS += $(OUT.LEVTOOL)
 
 TO_INSTALL.EXE    += $(LEVTOOL.EXE)
 
@@ -51,7 +53,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.levtool levtoolclean levtoolcleandep
 
 all: $(LEVTOOL.EXE)
-build.levtool: $(OUT.LEVTOOL) $(LEVTOOL.EXE)
+build.levtool: $(OUTDIRS) $(LEVTOOL.EXE)
 clean: levtoolclean
 
 $(OUT.LEVTOOL)/%$O: $(DIR.LEVTOOL)/%.cpp
@@ -59,9 +61,6 @@ $(OUT.LEVTOOL)/%$O: $(DIR.LEVTOOL)/%.cpp
 
 $(LEVTOOL.EXE): $(DEP.EXE) $(OBJ.LEVTOOL) $(LIB.LEVTOOL)
 	$(DO.LINK.CONSOLE.EXE)
-
-$(OUT.LEVTOOL):
-	$(MKDIRS)
 
 levtoolclean:
 	-$(RM) levtool.txt

@@ -26,7 +26,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-
 MD32SPR.EXE = md32spr$(EXE.CONSOLE)
 DIR.MD32SPR = apps/import/md32spr
 OUT.MD32SPR = $(OUT)/$(DIR.MD32SPR)
@@ -35,6 +34,8 @@ SRC.MD32SPR = $(wildcard $(DIR.MD32SPR)/*.cpp )
 OBJ.MD32SPR = $(addprefix $(OUT.MD32SPR)/,$(notdir $(SRC.MD32SPR:.cpp=$O)))
 DEP.MD32SPR = CSTOOL CSGEOM CSTOOL CSGFX CSSYS CSSYS CSUTIL
 LIB.MD32SPR = $(foreach d,$(DEP.MD32SPR),$($d.LIB))
+
+OUTDIRS += $(OUT.MD32SPR)
 
 TO_INSTALL.EXE += $(MD32SPR.EXE)
 
@@ -51,7 +52,7 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: build.md32spr md32sprclean md32sprcleandep
 
 all: $(MD32SPR.EXE)
-build.md32spr: $(OUT.MD32SPR) $(MD32SPR.EXE)
+build.md32spr: $(OUTDIRS) $(MD32SPR.EXE)
 clean: md32sprclean
 
 $(OUT.MD32SPR)/%$O: $(DIR.MD32SPR)/%.cpp
@@ -59,9 +60,6 @@ $(OUT.MD32SPR)/%$O: $(DIR.MD32SPR)/%.cpp
 
 $(MD32SPR.EXE): $(OBJ.MD32SPR) $(LIB.MD32SPR)
 	$(DO.LINK.CONSOLE.EXE) $(ZLIB.LFLAGS)
-
-$(OUT.MD32SPR):
-	$(MKDIRS)
 
 md32sprclean:
 	-$(RM) md32spr.txt
