@@ -26,7 +26,9 @@
 #include "csphyzik/ctmatrix.h"
 #include <stdarg.h>
 
+#ifndef PI
 #define PI 3.1412L
+#endif
 #define degree_to_rad( A ) ( 2.0*A*PI/360.0 )
 
 // calc rotation matrix from a rotation of an angle around a vector 
