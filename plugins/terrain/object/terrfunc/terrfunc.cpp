@@ -1032,6 +1032,10 @@ void csTerrFuncObject::SetupVisibilityTree (csTerrainQuad* quad,
       for (x = 0 ; x < 5 ; x++)
       {
         dx = dx1 + (float (x) / 4.) * (dx2-dx1);
+	if (dx < 0) dx = 0;
+	if (dx > 1) dx = 1;
+	if (dy < 0) dy = 0;
+	if (dy > 1) dy = 1;
         float h = height_func (height_func_data, dx, dy);
 	if (h < min_height) min_height = h;
 	if (h > max_height) max_height = h;
