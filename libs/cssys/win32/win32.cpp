@@ -1036,3 +1036,16 @@ void Win32Assistant::AlertV (HWND window, int type, const char* title,
   vsprintf(buf, msg, args);
   MessageBox (window, buf, title, style);
 }
+
+//@@@ somewhat ugly.
+extern int _cs_main (int argc, char* argv[]);
+
+#undef main
+
+int main (int argc, char* argv[]) 
+{ 
+  CS_DEBUG_MSVC_INIT_GOOP; 
+  int ret = _cs_main(CS_WIN32_ARGC, CS_WIN32_ARGV); 
+  CS_DEBUG_MSVC_EXIT_GOOP; 
+  return ret; 
+}

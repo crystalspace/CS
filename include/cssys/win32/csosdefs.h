@@ -181,12 +181,26 @@
   #undef  DEBUG_BREAK
   #define DEBUG_BREAK ::DebugBreak()
   
-  #if defined(COMP_VC) && defined(CS_EXTENSIVE_MEMDEBUG)
+  #if defined(COMP_VC) 
     #include <crtdbg.h>
-    #define malloc(size) 	_malloc_dbg ((size), _NORMAL_BLOCK, __FILE__, __LINE__)
-    #define free(ptr) 		_free_dbg ((ptr), _NORMAL_BLOCK)
-    #define realloc(ptr, size) 	_realloc_dbg ((ptr), (size), _NORMAL_BLOCK, __FILE__, __LINE__)
-    #define calloc(num, size)	_calloc_dbg ((num), (size), _NORMAL_BLOCK, __FILE__, __LINE__)
+
+    #if defined(CS_EXTENSIVE_MEMDEBUG)
+      #define malloc(size) 	_malloc_dbg ((size), _NORMAL_BLOCK, __FILE__, __LINE__)
+      #define free(ptr) 		_free_dbg ((ptr), _NORMAL_BLOCK)
+      #define realloc(ptr, size) 	_realloc_dbg ((ptr), (size), _NORMAL_BLOCK, __FILE__, __LINE__)
+      #define calloc(num, size)	_calloc_dbg ((num), (size), _NORMAL_BLOCK, __FILE__, __LINE__)
+
+      // heap consistency check is on by default, leave it
+      #define CS_DEBUG_MSVC_INIT_GOOP 
+      // check for leaks on exit
+      #define CS_DEBUG_MSVC_EXIT_GOOP _CrtDumpMemoryLeaks()
+    #else
+      // turn heap consistency check off
+      #define CS_DEBUG_MSVC_INIT_GOOP \
+        _CrtSetDbgFlag (_CrtSetDbgFlag (_CRTDBG_REPORT_FLAG) & ~_CRTDBG_ALLOC_MEM_DF )
+      // check for leaks on exit
+      #define CS_DEBUG_MSVC_EXIT_GOOP _CrtDumpMemoryLeaks()
+    #endif
   #endif
 
 #else
@@ -195,6 +209,13 @@
   #define VERIFY_RESULT(expression, result) expression
 #endif
 
+#ifndef CS_DEBUG_MSVC_INIT_GOOP 
+  #define CS_DEBUG_MSVC_INIT_GOOP 
+#endif
+
+#ifndef CS_DEBUG_MSVC_EXIT_GOOP 
+  #define CS_DEBUG_MSVC_EXIT_GOOP 
+#endif
 
 #ifdef CS_SYSDEF_PROVIDE_HARDWARE_MMIO
 
@@ -475,8 +496,17 @@ int ApplicationShow = csSW_SHOWNORMAL;
   #define CS_WIN32_ARGV __argv
 #endif
 
+/*
+ if the EXE is compiled as a GUI app,
+ a WinMain is needed. But if compiled
+ as a console app it's not used but main() is
+ instead. To have our MSVC debug goop for both
+ provide versions which call the stuff and
+ redirect to the 'real' main().
+ */
+
 #define CS_IMPLEMENT_PLATFORM_APPLICATION \
-int main (int argc, char* argv[]); \
+int _cs_main (int argc, char* argv[]); \
 HINSTANCE ModuleHandle = NULL; \
 int ApplicationShow = csSW_SHOWNORMAL; \
 int WINAPI WinMain (HINSTANCE hApp, HINSTANCE prev, LPSTR cmd, int show) \
@@ -485,8 +515,16 @@ int WINAPI WinMain (HINSTANCE hApp, HINSTANCE prev, LPSTR cmd, int show) \
   ApplicationShow = show; \
   (void)prev; \
   (void)cmd; \
-  return main(CS_WIN32_ARGC, CS_WIN32_ARGV); \
+  CS_DEBUG_MSVC_INIT_GOOP; \
+  int ret = _cs_main(CS_WIN32_ARGC, CS_WIN32_ARGV); \
+  CS_DEBUG_MSVC_EXIT_GOOP; \
+  return ret; \
 }
+
+// the main() is actually in win32.cpp
+
+#define main _cs_main
+
 #endif
 
 #if !defined(CS_STATIC_LINKED)

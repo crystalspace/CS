@@ -93,7 +93,7 @@ typedef char ImageIDField[256];
 
 #define MAXCOLORS 16384
 
-#define CSTGA_ID "Made with CrystalSpace, see http://crystal.linuxgames.com"
+#define CSTGA_ID "Made with CrystalSpace, see http://crystal.sf.net/"
 #define TGA_MIME "image/tga"
 
 static int mapped, rlencoded;
