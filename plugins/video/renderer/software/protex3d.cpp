@@ -25,6 +25,8 @@
 #include "csgfx/memimage.h"
 #include "csgfx/rgbpixel.h"
 #include "ivideo/texture.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 SCF_IMPLEMENT_FACTORY (csSoftProcTexture3D)
 
@@ -105,7 +107,7 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *main_texman,
       return false;
 
 #ifdef CS_DEBUG
-    System->Printf (CS_MSG_INITIALIZATION, "8bit procedural texture\n");
+    printf ("8bit procedural texture\n");
 #endif
   }
   else
@@ -124,7 +126,7 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *main_texman,
 	return false;
 
 #ifdef CS_DEBUG
-      System->Printf (CS_MSG_INITIALIZATION, "%sbit procedural texture\n",
+      printf ("%sbit procedural texture\n",
         main_texman->pfmt.PixelBytes == 2 ? "16" : "32");
 #endif
     }
@@ -148,8 +150,7 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *main_texman,
         main_texman->SetProcTextureManager (texman);
         texman->ResetPalette ();
 #ifdef CS_DEBUG
-        System->Printf (CS_MSG_INITIALIZATION, 
-          "Preparing dedicated procedural texture manager\n");
+        printf ("Preparing dedicated procedural texture manager\n");
 #endif
         // Initialize the texture manager
         int r,g,b;
@@ -179,7 +180,7 @@ bool csSoftProcTexture3D::Prepare (csTextureManagerSoftware *main_texman,
       }
 
 #ifdef CS_DEBUG
-      System->Printf (CS_MSG_INITIALIZATION, "%s/8bit procedural texture\n",
+      printf ("%s/8bit procedural texture\n",
         main_texman->pfmt.PixelBytes == 2 ? "16" : "32");
 #endif
     }
@@ -212,8 +213,10 @@ iTextureHandle *csSoftProcTexture3D::CreateOffScreenRenderer
 
   if (!G2D)
   {
-    System->Printf (CS_MSG_FATAL_ERROR, 
-		    "Error opening Graphics2D texture context.\n");
+    iObjectRegistry* object_reg = System->GetObjectRegistry ();
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+      	"crystalspace.video.software.protex3d",
+	"Error opening Graphics2D texture context.");
     return NULL;
   }
 

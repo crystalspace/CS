@@ -52,6 +52,7 @@
 #include "isys/plugin.h"
 #include "iutil/objreg.h"
 #include "igraphic/imageio.h"
+#include "ivaria/reporter.h"
 #include "qsqrt.h"
 
 CS_IMPLEMENT_APPLICATION
@@ -61,11 +62,26 @@ CS_IMPLEMENT_APPLICATION
 // The global system driver
 Demo *System;
 
+void Demo::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.application.demo", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 #define  QUERY_PLUG(myPlug, iFace, errMsg) \
   myPlug = CS_QUERY_PLUGIN (plugin_mgr, iFace); \
   if (!myPlug) \
   { \
-    Printf (CS_MSG_FATAL_ERROR, errMsg); \
+    Report (CS_REPORTER_SEVERITY_ERROR, errMsg); \
     return -1; \
   }
 
@@ -73,7 +89,7 @@ Demo *System;
   myPlug = CS_QUERY_PLUGIN_ID (plugin_mgr, funcid, iFace); \
   if (!myPlug) \
   { \
-    Printf (CS_MSG_FATAL_ERROR, errMsg); \
+    Report (CS_REPORTER_SEVERITY_ERROR, errMsg); \
     return -1; \
   }
 
@@ -102,7 +118,7 @@ Demo::~Demo ()
 
 void Cleanup ()
 {
-  System->ConsoleOut ("Cleaning up...\n");
+  csPrintf ("Cleaning up...\n");
   delete System;
 }
 
@@ -114,7 +130,8 @@ iMeshWrapper* Demo::LoadObject (const char* objname, const char* filename,
   if (!databuf || !databuf->GetSize ())
   {
     if (databuf) databuf->DecRef ();
-    Printf (CS_MSG_FATAL_ERROR, "Could not open file '%s' on VFS!\n", filename);
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not open file '%s' on VFS!",
+    	filename);
     exit (0);
   }
   iMeshWrapper* obj = engine->LoadMeshWrapper (classId, objname,
@@ -122,8 +139,8 @@ iMeshWrapper* Demo::LoadObject (const char* objname, const char* filename,
   databuf->DecRef ();
   if (!obj)
   {
-    Printf (CS_MSG_FATAL_ERROR,
-    	"There was an error loading object from file '%s'!\n",
+    Report (CS_REPORTER_SEVERITY_ERROR,
+    	"There was an error loading object from file '%s'!",
 	filename);
     exit (0);
   }
@@ -137,7 +154,8 @@ void Demo::LoadFactory (const char* factname, const char* filename,
   if (!databuf || !databuf->GetSize ())
   {
     if (databuf) databuf->DecRef ();
-    Printf (CS_MSG_FATAL_ERROR, "Could not open file '%s' on VFS!\n", filename);
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not open file '%s' on VFS!",
+    	filename);
     exit (0);
   }
   iMeshFactoryWrapper* fact = engine->LoadMeshFactory (classId, factname,
@@ -145,8 +163,8 @@ void Demo::LoadFactory (const char* factname, const char* filename,
   databuf->DecRef ();
   if (!fact)
   {
-    Printf (CS_MSG_FATAL_ERROR,
-    	"There was an error loading factory from file '%s'!\n",
+    Report (CS_REPORTER_SEVERITY_ERROR,
+    	"There was an error loading factory from file '%s'!",
 	filename);
     exit (0);
   }
@@ -159,7 +177,7 @@ void Demo::SetupFactories ()
   	"ball_factory");
   if (!fact)
   {
-    Printf (CS_MSG_FATAL_ERROR, "Could not open ball plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not open ball plugin!");
     exit (0);
   }
 
@@ -167,7 +185,7 @@ void Demo::SetupFactories ()
   	"surf_factory");
   if (!fact)
   {
-    Printf (CS_MSG_FATAL_ERROR, "Could not open surface plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not open surface plugin!");
     exit (0);
   }
 
@@ -175,7 +193,7 @@ void Demo::SetupFactories ()
   	"fire_factory");
   if (!fact)
   {
-    Printf (CS_MSG_FATAL_ERROR, "Could not open fire plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not open fire plugin!");
     exit (0);
   }
 
@@ -759,21 +777,21 @@ bool Demo::Initialize (int argc, const char* const argv[],
     	CS_FUNCID_ENGINE, iEngine);
   if (!engine)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No engine!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No engine!");
     abort ();
   }
   object_reg->Register (engine);
-  QUERY_PLUG_ID (myG3D, CS_FUNCID_VIDEO, iGraphics3D, "No iGraphics3D plugin !\n");
-  QUERY_PLUG (myG2D, iGraphics2D, "No iGraphics2D plugin !\n");
-  QUERY_PLUG_ID (myVFS, CS_FUNCID_VFS, iVFS, "No iVFS plugin !\n");
-  QUERY_PLUG_ID (myConsole, CS_FUNCID_CONSOLE, iConsoleOutput, "No iConsoleOutput plugin !\n");
+  QUERY_PLUG_ID (myG3D, CS_FUNCID_VIDEO, iGraphics3D, "No iGraphics3D plugin !");
+  QUERY_PLUG (myG2D, iGraphics2D, "No iGraphics2D plugin !");
+  QUERY_PLUG_ID (myVFS, CS_FUNCID_VFS, iVFS, "No iVFS plugin !");
+  QUERY_PLUG_ID (myConsole, CS_FUNCID_CONSOLE, iConsoleOutput, "No iConsoleOutput plugin !");
 
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = myG2D->GetNativeWindow ();
   if (nw) nw->SetTitle ("The Crystal Space Demo.");
   if (!Open ())
   {
-    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
     Cleanup ();
     exit (1);
   }
@@ -802,15 +820,15 @@ bool Demo::Initialize (int argc, const char* const argv[],
     myConsole->Clear ();
 
   // Some commercials...
-  Printf (CS_MSG_INITIALIZATION,
-    "The Crystal Space Demo.\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+    "The Crystal Space Demo.");
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
   engine->SetLightingCacheMode (0);
 
   // Create our world.
-  Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
   engine->RegisterRenderPriority ("starLevel1", 1);
   engine->RegisterRenderPriority ("starLevel2", 2);
@@ -825,7 +843,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
 
   engine->Prepare ();
 
-  Printf (CS_MSG_INITIALIZATION, "--------------------------------------\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------");
 
   view = new csView (engine, myG3D);
   view->GetCamera ()->SetSector (room);
@@ -1730,7 +1748,7 @@ int main (int argc, char* argv[])
   // and initialize them.
   if (!System->Initialize (argc, argv, "/config/csdemo.cfg"))
   {
-    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
+    System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     Cleanup ();
     exit (1);
   }

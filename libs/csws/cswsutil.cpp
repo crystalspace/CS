@@ -26,6 +26,7 @@
 #include "csutil/scanstr.h"
 #include "csutil/csstring.h"
 #include "isys/system.h"
+#include "ivaria/reporter.h"
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--/ Window list --//--
 
@@ -265,14 +266,14 @@ void ParseConfigBitmap (csApp *app, const char *prefix, const char *section,
 
   if (!butdef)
   {
-    app->Printf (CS_MSG_FATAL_ERROR, "Cannot find bitmap definition %s.%s\n",
+    app->Printf (CS_REPORTER_SEVERITY_ERROR, "Cannot find bitmap definition %s.%s\n",
       section, id);
     fatal_exit (0, false);
   }
 
   if (csScanStr (butdef, "%d,%d,%d,%d", &x, &y, &w, &h) != 4)
   {
-    app->Printf (CS_MSG_FATAL_ERROR, "%s.%s): parse error in string: %s\n",
+    app->Printf (CS_REPORTER_SEVERITY_ERROR, "%s.%s): parse error in string: %s\n",
       section, id, butdef);
     fatal_exit (0, false);
   }

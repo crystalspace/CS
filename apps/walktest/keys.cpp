@@ -37,6 +37,7 @@
 #include "ivideo/graph2d.h"
 #include "isound/wrapper.h"
 #include "isound/data.h"
+#include "ivaria/reporter.h"
 
 #include "csengine/wirefrm.h"
 
@@ -64,7 +65,8 @@ void map_key (const char* keyname, csKeyMap* map)
     else if (!strcmp (keyname, "alt")) map->alt = 1;
     else if (!strcmp (keyname, "ctrl")) map->ctrl = 1;
     else if (!strcmp (keyname, "status")) map->need_status = 1;
-    else Sys->Printf (CS_MSG_CONSOLE, "Bad modifier '%s'!\n", keyname);
+    else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Bad modifier '%s'!", keyname);
 
     *dash = '-';
     keyname = dash+1;
@@ -98,7 +100,8 @@ void map_key (const char* keyname, csKeyMap* map)
   else if (!strcmp (keyname, "f10")) map->key = CSKEY_F10;
   else if (!strcmp (keyname, "f11")) map->key = CSKEY_F11;
   else if (!strcmp (keyname, "f12")) map->key = CSKEY_F12;
-  else if (*(keyname+1) != 0) Sys->Printf (CS_MSG_CONSOLE, "Bad key '%s'!\n", keyname);
+  else if (*(keyname+1) != 0) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+  	"Bad key '%s'!", keyname);
   else if ((*keyname >= 'A' && *keyname <= 'Z') || strchr ("!@#$%^&*()_+", *keyname))
   {
     map->shift = 1;
@@ -178,7 +181,8 @@ void bind_key (const char* arg)
     csKeyMap* map = mapping;
     while (map)
     {
-      Sys->Printf (CS_MSG_CONSOLE, "Key '%s' bound to '%s'.\n", keyname (map), map->cmd);
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Key '%s' bound to '%s'.", keyname (map), map->cmd);
       map = map->next;
     }
     return;
@@ -208,8 +212,9 @@ void bind_key (const char* arg)
   else
   {
     csKeyMap* map = find_mapping (arg);
-    if (map) Sys->Printf (CS_MSG_CONSOLE, "Key bound to '%s'!\n", map->cmd);
-    else Sys->Printf (CS_MSG_CONSOLE, "Key not bound!\n");
+    if (map) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Key bound to '%s'!", map->cmd);
+    else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Key not bound!");
   }
 }
 
@@ -242,9 +247,9 @@ void WalkTest::strafe (float speed,int keep_old)
   if (move_3d || map_mode) return;
   static bool pressed = false;
   static float strafe_speed = 0;
-  static long start_time = Time ();
+  static long start_time = csGetClicks ();
 
-  long cur_time = Time ();
+  long cur_time = csGetClicks ();
   if (!keep_old)
   {
     bool new_pressed = ABS (speed) > 0.001;
@@ -284,9 +289,9 @@ void WalkTest::step (float speed,int keep_old)
 
   static bool pressed = false;
   static float step_speed = 0;
-  static long start_time = Time ();
+  static long start_time = csGetClicks ();
 
-  long cur_time = Time ();
+  long cur_time = csGetClicks ();
   if (!keep_old)
   {
     bool new_pressed = ABS (speed) > 0.001;
@@ -330,9 +335,9 @@ void WalkTest::rotate (float speed,int keep_old)
 
   static bool pressed = false;
   static float angle_accel = 0;
-  static long start_time = Time ();
+  static long start_time = csGetClicks ();
 
-  long cur_time = Time ();
+  long cur_time = csGetClicks ();
   if (!keep_old)
   {
     bool new_pressed = ABS (speed) > 0.001;
@@ -614,8 +619,12 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
 
   vw = isect;
   v = view->GetCamera ()->GetTransform ().Other2This (vw);
-  Sys->Printf (CS_MSG_CONSOLE, "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n", v.x, v.y, v.z, vw.x, vw.y, vw.z);
-  Sys->Printf (CS_MSG_DEBUG_0, "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)\n", v.x, v.y, v.z, vw.x, vw.y, vw.z);
+  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+  	"LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)",
+	v.x, v.y, v.z, vw.x, vw.y, vw.z);
+  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+  	"LMB down : cam:(%f,%f,%f) world:(%f,%f,%f)",
+	v.x, v.y, v.z, vw.x, vw.y, vw.z);
 
   if (sel)
   {
@@ -626,7 +635,7 @@ void WalkTest::MouseClick2Handler(iEvent &Event)
 
     iThingState* ps = sel->GetParent ();
     iObject* psobj = SCF_QUERY_INTERFACE (ps, iObject);
-    Sys->Printf (CS_MSG_DEBUG_0, "Hit polygon '%s/%s'\n",
+    Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "Hit polygon '%s/%s'",
     	psobj->GetName (), sel->QueryObject ()->GetName ());
     //Dumper::dump (sel);
     psobj->DecRef ();
@@ -652,10 +661,11 @@ void WalkTest::MouseClick3Handler(iEvent &Event)
   screenPoint.y = Event.Mouse.y;
   closestMesh = FindNextClosestMesh (NULL, view->GetCamera(), &screenPoint);
   if (closestMesh)
-    Sys->Printf (CS_MSG_CONSOLE, "Selected mesh %s\n", closestMesh->
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Selected mesh %s", closestMesh->
     	QueryObject ()->GetName ());
   else
-    Sys->Printf (CS_MSG_CONSOLE, "No mesh selected!\n");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No mesh selected!");
 }
 
 

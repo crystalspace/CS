@@ -223,7 +223,7 @@ void csRegion::Region::DeleteAll ()
       iObject* o = (iObject*)copy[i];
       csEngine::current_engine->ReportBug ("\
 There is still an object in the array after deleting region contents!\n\
-Object name is '%s'\n",
+Object name is '%s'",
 	o->GetName () ? o->GetName () : "<NoName>");
       CS_ASSERT (false);
     }

@@ -72,6 +72,21 @@ csGraphics2DAlleg::~csGraphics2DAlleg ()
     EventOutlet->DecRef ();
 }
 
+void csGraphics2DAlleg::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.canvas.allegro", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 bool csGraphics2DAlleg::Initialize (iSystem *pSystem)
 {
   if (!csGraphics2D::Initialize (pSystem))
@@ -130,7 +145,8 @@ bool csGraphics2DAlleg::Open ()
    && (Width > 800 || Height > 600 || set_gfx_mode (GFX_AUTODETECT, 800, 600, 0, 0))
    && (Width > 1024|| Height > 768 || set_gfx_mode (GFX_AUTODETECT, 1024,768, 0, 0)))
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "ERROR! Could not set graphics mode.\n");
+    Report (CS_REPORTER_SEVERITY_ERROR,
+    	"ERROR! Could not set graphics mode.");
     exit (-1);
   }
 
@@ -138,8 +154,8 @@ bool csGraphics2DAlleg::Open ()
 
   if (bitmap == NULL)
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "Error initializing graphics subsystem: bad "
-                               "videomode!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR,
+    	"Error initializing graphics subsystem: bad videomode!");
     return false;
   }
 
@@ -164,7 +180,8 @@ bool csGraphics2DAlleg::Open ()
       _GetPixelAt = GetPixelAt32;
       break;
     default:
-      CsPrintf (CS_MSG_WARNING, "WARNING: No 2D routines for selected mode!\n");
+      Report (CS_REPORTER_SEVERITY_WARNING,
+      	"WARNING: No 2D routines for selected mode!");
       break;
   } /* endif */
 
@@ -370,7 +387,7 @@ bool csGraphics2DAlleg::PerformExtensionV (char const* command, va_list)
 {
   if (!strcasecmp (command, "fullscreen"))
   {
-    System->Printf (CS_MSG_INITIALIZATION, "Fullscreen toggle.");
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Fullscreen toggle.");
     scale = !scale;
     clear (screen);
     Print (NULL);

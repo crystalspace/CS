@@ -205,6 +205,9 @@ protected:
 public:
   SCF_DECLARE_IBASE;
 
+  /// Report
+  void Report (int severity, const char* msg, ...);
+
   /**
    * Low-level 2D graphics layer.
    * csGraphics3DSoftwareCommon is in charge of creating and managing this.

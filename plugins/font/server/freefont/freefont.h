@@ -202,6 +202,7 @@ public:
   virtual ~csFreeTypeServer ();
 
   virtual bool Initialize (iSystem *Sys);
+  void Report (int severity, const char* msg, ...);
 
   /**
    * Load a font by name.

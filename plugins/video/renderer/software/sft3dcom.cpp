@@ -36,13 +36,12 @@
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include "isys/event.h"
 
 #if defined (DO_MMX)
 #  include "video/renderer/software/i386/cpuid.h"
 #endif
-
-#define SysPrintf System->Printf
 
 int csGraphics3DSoftwareCommon::filter_bf = 1;
 
@@ -348,11 +347,28 @@ void csGraphics3DSoftwareCommon::SharedInitialize(csGraphics3DSoftwareCommon *p)
 #endif
 }
 
+void csGraphics3DSoftwareCommon::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+  {
+    rep->ReportV (severity, "crystalspace.video.software", msg, arg);
+  }
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 bool csGraphics3DSoftwareCommon::Open ()
 {
   if (!G2D->Open ())
   {
-    SysPrintf (CS_MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error opening Graphics2D context.");
     // set "not opened" flag
     width = height = -1;
     return false;
@@ -399,7 +415,8 @@ bool csGraphics3DSoftwareCommon::NewOpen ()
   char vendor [13];
   csDetectCPU (&family, vendor, &features);
   cpu_mmx = (features & CPUx86_FEATURE_MMX) != 0;
-  SysPrintf (CS_MSG_INITIALIZATION, "%d %s CPU detected; FPU (%s) MMX (%s) CMOV (%s)\n",
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+  	"%d %s CPU detected; FPU (%s) MMX (%s) CMOV (%s)",
     family, vendor,
     (features & CPUx86_FEATURE_FPU) ? "yes" : "no",
     (features & CPUx86_FEATURE_MMX) ? "yes" : "no",
@@ -439,8 +456,8 @@ bool csGraphics3DSoftwareCommon::NewOpen ()
 
     if (!csize)
     {
-      SysPrintf (CS_MSG_INITIALIZATION,
-        "Invalid cache size specified, using default\n");
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+        "Invalid cache size specified, using default");
       csize = DEFAULT_CACHE_SIZE;
     }
   }
@@ -2370,8 +2387,8 @@ void csGraphics3DSoftwareCommon::CloseFogObject (CS_ID id)
   FogBuffer* fb = find_fog_buffer (id);
   if (!fb)
   {
-    SysPrintf (CS_MSG_INTERNAL_ERROR,
-    	"ENGINE FAILURE! Try to close a non-open fog object!\n");
+    Report (CS_REPORTER_SEVERITY_BUG,
+    	"ENGINE FAILURE! Try to close a non-open fog object!");
     return;
   }
   if (fb->next) fb->next->prev = fb->prev;
@@ -2459,7 +2476,8 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
     FogBuffer* fb = find_fog_buffer (id);
     if (!fb)
     {
-      SysPrintf (CS_MSG_INTERNAL_ERROR, "ENGINE FAILURE! Fog object not open!\n");
+      Report (CS_REPORTER_SEVERITY_BUG,
+      	"ENGINE FAILURE! Fog object not open!");
       exit (0);
     }
 

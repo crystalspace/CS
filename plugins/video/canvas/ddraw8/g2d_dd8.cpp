@@ -21,6 +21,8 @@
 #include "csgeom/csrect.h"
 #include "g2d_dd8.h"
 #include "isys/system.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 #ifndef DD_FALSE
   #define DD_FALSE S_FALSE
@@ -78,6 +80,21 @@ bool csGraphics2DDDraw8::Initialize(iSystem *pSystem)
     return false;
 
   return true;
+}
+
+void csGraphics2DDDraw8::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.canvas.ddraw8", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
 }
 
 bool csGraphics2DDDraw8::Open ()
@@ -138,7 +155,7 @@ bool csGraphics2DDDraw8::Open ()
   if (!DirectDevice->IsPrimary2D)
     pGuid = &DirectDevice->Guid2D;
 
-  System->Printf (CS_MSG_INITIALIZATION, "Using DirectDraw %s (%s)\n",
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Using DirectDraw %s (%s)",
     DirectDevice->DeviceDescription2D, DirectDevice->DeviceName2D);
 
   // Create a DD object for either the primary device or the secondary.
@@ -688,7 +705,7 @@ HRESULT csGraphics2DDDraw8::InitFail (HRESULT ddrval, LPCTSTR szError)
   if (m_lpDD7)
     m_lpDD7->RestoreDisplayMode ();
 
-  System->Printf (CS_MSG_FATAL_ERROR, szError, ddrval);
+  Report (CS_REPORTER_SEVERITY_ERROR, szError, ddrval);
   DestroyWindow (m_hWnd);
 
   return ddrval;

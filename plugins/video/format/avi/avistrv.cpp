@@ -24,6 +24,7 @@
 #include "ivideo/txtmgr.h"
 #include "isys/plugin.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include <ctype.h>
 
 SCF_IMPLEMENT_IBASE (csAVIStreamVideo)
@@ -460,13 +461,19 @@ bool csAVIStreamVideo::LoadCodec (UByte *pInitData, ULong nInitDataLen,
     }
     else
     {
-      pSystem->Printf (CS_MSG_WARNING, "CODEC class \"%s\" could not be initialized !", cn);
+      csReport (pSystem->GetObjectRegistry (), CS_REPORTER_SEVERITY_WARNING,
+		"crystalspace.video.avi",
+      		"CODEC class \"%s\" could not be initialized !", cn);
       pCodec->DecRef ();
       pCodec = NULL;
     }
   }
   else
-    pSystem->Printf (CS_MSG_WARNING, "CODEC class \"%s\" could not be loaded !", cn);
+  {
+    csReport (pSystem->GetObjectRegistry (), CS_REPORTER_SEVERITY_WARNING,
+		"crystalspace.video.avi",
+      		"CODEC class \"%s\" could not be loaded !", cn);
+  }
 
   return false;
 }

@@ -183,11 +183,12 @@ protected:
   { return (sub_section != NULL); }
 
   /**
-   * Print this sections current summary stats, where sysflags is CS_MSG_STDOUT
-   * etc as defined in iSystem.h
+   * Print this sections current summary stats, where severity is
+   * CS_REPORTER_...
+   * etc as defined in ivaria/reporter.h
    */
-  virtual void PrintSectionStats (int sysflags);
-  virtual void PrintSubsectionStats (int sysflags);
+  virtual void PrintSectionStats (int severity);
+  virtual void PrintSubsectionStats (int severity);
   /**
    * When ran with a debugger, this should cause it to break when starting this
    * frame number, if compiled without CS_DEBUG it will have no effect.  If you

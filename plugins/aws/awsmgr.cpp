@@ -5,6 +5,7 @@
 #include "iengine/engine.h"
 #include "isys/plugin.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include <stdio.h>
 
 awsManager::awsManager(iBase *p):prefmgr(NULL),System(NULL), 
@@ -26,13 +27,13 @@ awsManager::Initialize(iSystem *system)
   System=system;
   iObjectRegistry* object_reg = system->GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  
   printf("aws-debug: getting image loader.\n");
   ImageLoader = CS_QUERY_PLUGIN_ID(plugin_mgr, CS_FUNCID_IMGLOADER, iImageIO);
   
   if (!ImageLoader) 
   {
-    System->Printf(CS_MSG_WARNING,"AWS could not find an image loader plugin.  This is a fatal error.\n");
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.aws",
+      	"AWS could not find an image loader plugin. This is a fatal error.");
     return false;
   }
   
@@ -41,7 +42,8 @@ awsManager::Initialize(iSystem *system)
   
   if (!prefs)
   {
-    System->Printf(CS_MSG_WARNING,"AWS could not create an instance of the default preference manager.  This is a serious error.\n");
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "crystalspace.aws",
+        "AWS could not create an instance of the default preference manager.  This is a serious error.");
     return false;
   }
   else

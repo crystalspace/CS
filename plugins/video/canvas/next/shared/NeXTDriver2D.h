@@ -47,6 +47,7 @@ public:
   virtual ~NeXTDriver2D();
   virtual bool Initialize(iSystem*);
   virtual bool Open(char const* title);
+  void Report (int severity, const char* msg, ...);
   virtual void Close();
   virtual void Print(csRect* = 0);
   virtual bool SetMouseCursor(csMouseCursorID);

@@ -23,6 +23,7 @@
 #include "csws/csmouse.h"
 #include "csws/csapp.h"
 #include "isys/system.h"
+#include "ivaria/reporter.h"
 
 #define MOUSE_TEXTURE_NAME	"csws::Mouse"
 #define NO_VIRTUAL_POS		-999999
@@ -122,7 +123,7 @@ void csMouse::NewPointer (const char *id, const char *posdef)
   for (cID = 0; ; cID++)
     if (!cursor_ids [cID])
     {
-      app->Printf (CS_MSG_WARNING, "WARNING: Unkown mouse cursor id (%s)\n", id);
+      app->Printf (CS_REPORTER_SEVERITY_WARNING, "WARNING: Unkown mouse cursor id (%s)\n", id);
       return;
     }
     else if (!strcmp (id, cursor_ids [cID]))

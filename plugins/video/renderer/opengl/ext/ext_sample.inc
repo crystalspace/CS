@@ -33,7 +33,7 @@ static char const* const knownExtensions[] =
 
 void csGraphics3DOGLCommon::DetectExtensions()
 {
-  SysPrintf (CS_MSG_INITIALIZATION, "Detecting yer gnarly OpenGL extensions.\n");
+  printf ("Detecting yer gnarly OpenGL extensions.\n");
   const unsigned char* extensions = glGetString(GL_EXTENSIONS);
   if (!extensions)
     return;	//No luck, no extensions on this machine.
@@ -51,7 +51,7 @@ void csGraphics3DOGLCommon::DetectExtensions()
       if (*(searchresult + strlen(knownExtensions[i])) == ' ' ||
           *(searchresult + strlen(knownExtensions[i])) == '\0')
       {
-        SysPrintf(CS_MSG_INITIALIZATION,
+        printf (
           "Found extension: %s\n", knownExtensions[i]);
         switch (i)
         {

@@ -38,6 +38,7 @@
 #include "imesh/fountain.h"
 #include "isys/plugin.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include "genmaze.h"
 
 CS_IMPLEMENT_APPLICATION
@@ -69,9 +70,24 @@ IsoTest::~IsoTest ()
   if(light) light->DecRef();
 }
 
+void IsoTest::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.application.isotest", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 void Cleanup ()
 {
-  System->ConsoleOut ("Cleaning up...\n");
+  csPrintf ("Cleaning up...\n");
   delete System;
 }
 
@@ -110,21 +126,21 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   engine = CS_QUERY_PLUGIN (plugin_mgr, iIsoEngine);
   if (!engine)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No IsoEngine plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No IsoEngine plugin!");
     abort ();
   }
 
   myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
     abort ();
   }
 
   myG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
   if (!myG2D)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iGraphics2D plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics2D plugin!");
     abort ();
   }
 
@@ -133,7 +149,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   if (nw) nw->SetTitle ("IsoTest Crystal Space Application");
   if (!Open ())
   {
-    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
     Cleanup ();
     exit (1);
   }
@@ -159,13 +175,12 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   txtmgr->SetPalette ();
 
   // Some commercials...
-  Printf (CS_MSG_INITIALIZATION,
-    "IsoTest Crystal Space Application version 0.1.\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+    "IsoTest Crystal Space Application version 0.1.");
 
   // Create our world.
-  Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
-
-  Printf (CS_MSG_INITIALIZATION, "--------------------------------------\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------");
 
   // create our world to play in, and a view on it.
   world = engine->CreateWorld();
@@ -731,7 +746,7 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!System->Initialize (argc, argv, NULL))
   {
-    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
+    System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     Cleanup ();
     exit (1);
   }

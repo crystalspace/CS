@@ -19,13 +19,14 @@
 
 #include "cssysdef.h"
 #include "csutil/cspmeter.h"
+#include "ivaria/conout.h"
 
 SCF_IMPLEMENT_IBASE (csTextProgressMeter)
   SCF_IMPLEMENTS_INTERFACE (iProgressMeter)
 SCF_IMPLEMENT_IBASE_END
 
-csTextProgressMeter::csTextProgressMeter (iSystem* s, int n, int t)
-	: sys(s), type(t), granularity(10), tick_scale(2),
+csTextProgressMeter::csTextProgressMeter (iConsoleOutput* cons, int n)
+	: console (cons), granularity(10), tick_scale(2),
 	  total(n), current(0), anchor(0)
 {
   SCF_CONSTRUCT_IBASE (NULL);
@@ -56,30 +57,30 @@ void csTextProgressMeter::Step()
 	}
       }
       *p = '\0';
-      sys->Printf(type, "%s", buff);
+      console->PutText ("%s", buff);
       anchor = extent;
     }
     if (current == total)
-      sys->Printf(type, "\n");
+      console->PutText ("\n");
   }
 }
 
 void csTextProgressMeter::Restart()
 {
   Reset();
-  sys->Printf(type, "0%%");
+  console->PutText ("0%%");
 }
 
 void csTextProgressMeter::Abort ()
 {
   current = total;
-  sys->Printf (type, "\n");
+  console->PutText ("\n");
 }
 
 void csTextProgressMeter::Finalize ()
 {
   current = total;
-  sys->Printf (type, "\n");
+  console->PutText ("\n");
 }
 
 void csTextProgressMeter::SetGranularity(int n)

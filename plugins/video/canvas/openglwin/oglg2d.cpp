@@ -23,6 +23,8 @@
 #include "csutil/scf.h"
 #include "oglg2d.h"
 #include "isys/system.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -218,6 +220,21 @@ csGraphics2DOpenGL::~csGraphics2DOpenGL(void)
   m_nGraphicsReady=0;
 }
 
+void csGraphics2DOpenGL::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.canvas.openglwin", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 bool csGraphics2DOpenGL::Initialize (iSystem *pSystem)
 {
   if (!csGraphics2DGLCommon::Initialize (pSystem))
@@ -238,7 +255,8 @@ bool csGraphics2DOpenGL::Initialize (iSystem *pSystem)
     pfmt.PixelBytes = 1;
   }
   
-  CsPrintf (CS_MSG_INITIALIZATION, "Using %d bits per pixel (%d color mode).\n", Depth, 1 << Depth);
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+  	"Using %d bits per pixel (%d color mode).", Depth, 1 << Depth);
   return true;
 }
 
@@ -304,25 +322,30 @@ bool csGraphics2DOpenGL::Open()
       switch(ti)
       {
         case DISP_CHANGE_RESTART:
-        //computer must restart for mode to work.
-        CsPrintf (CS_MSG_INITIALIZATION, "gl2d error: must restart for display change.\n");
-        break;
+          //computer must restart for mode to work.
+          Report (CS_REPORTER_SEVERITY_WARNING,
+		"gl2d error: must restart for display change.");
+          break;
         case DISP_CHANGE_BADFLAGS:
-        //Bad Flag settings
-        CsPrintf (CS_MSG_INITIALIZATION, "gl2d error: display change bad flags.\n");
-        break;
+          //Bad Flag settings
+          Report (CS_REPORTER_SEVERITY_WARNING,
+	  	"gl2d error: display change bad flags.");
+          break;
         case DISP_CHANGE_FAILED:
-        //Failure to display
-        CsPrintf (CS_MSG_INITIALIZATION, "gl2d error: display change failed.\n");
-        break;
+          //Failure to display
+          Report (CS_REPORTER_SEVERITY_WARNING,
+	  	"gl2d error: display change failed.");
+          break;
         case DISP_CHANGE_NOTUPDATED:
-        //No Reg Write Error
-        CsPrintf (CS_MSG_INITIALIZATION, "gl2d error: display change could not write registry.\n");
-        break;
+          //No Reg Write Error
+          Report (CS_REPORTER_SEVERITY_WARNING,
+	  	"gl2d error: display change could not write registry.");
+          break;
         default:
-        //Unknown Error
-        CsPrintf (CS_MSG_INITIALIZATION, "gl2d error: display change gave unknown error.\n");
-        break;
+          //Unknown Error
+          Report (CS_REPORTER_SEVERITY_WARNING,
+	  	"gl2d error: display change gave unknown error.");
+          break;
       }
     }
   }

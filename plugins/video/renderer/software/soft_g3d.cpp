@@ -28,6 +28,7 @@
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -51,8 +52,6 @@ SCF_IMPLEMENT_IBASE_EXT_END
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGraphics3DSoftware::eiSoftConfig)
   SCF_IMPLEMENTS_INTERFACE (iConfig)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-#define SysPrintf System->Printf
 
 csGraphics3DSoftware::csGraphics3DSoftware (iBase *iParent)
   : csGraphics3DSoftwareCommon (iParent)
@@ -89,22 +88,22 @@ bool csGraphics3DSoftware::Open ()
     return false;
 
   bool bFullScreen = G2D->GetFullScreen ();
-  SysPrintf(CS_MSG_INITIALIZATION, 
-	    "Using %s mode %dx%d (internal rendering at %dx%d).\n",
+  Report (CS_REPORTER_SEVERITY_NOTIFY, 
+	    "Using %s mode %dx%d (internal rendering at %dx%d).",
             bFullScreen ? "full screen" : "windowed", 
 	    G2D->GetWidth (), G2D->GetHeight (), width, height);
 
   if (pfmt.PixelBytes == 4)
-    SysPrintf (CS_MSG_INITIALIZATION, 
-      "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.\n",
+    Report (CS_REPORTER_SEVERITY_NOTIFY, 
+      "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.",
       pfmt.PixelBytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
   else if (pfmt.PixelBytes == 2)
-    SysPrintf (CS_MSG_INITIALIZATION, 
-      "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.\n",
+    Report (CS_REPORTER_SEVERITY_NOTIFY, 
+      "Using truecolor mode with %d bytes per pixel and %d:%d:%d RGB mode.",
       pfmt.PixelBytes, pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits);
   else
-    SysPrintf (CS_MSG_INITIALIZATION, 
-	       "Using palette mode with 1 byte per pixel (256 colors).\n");
+    Report (CS_REPORTER_SEVERITY_NOTIFY, 
+	       "Using palette mode with 1 byte per pixel (256 colors).");
 
   return true;
 }

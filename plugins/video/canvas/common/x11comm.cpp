@@ -43,7 +43,7 @@ void GetX11Settings (iSystem *iSys, int &oSimDepth, bool &oUseSHM,
     oSimDepth = atol (val);
     if (oSimDepth != 8 && oSimDepth != 15 && oSimDepth != 16 && oSimDepth != 32)
     {
-      iSys->Printf (CS_MSG_WARNING,
+      printf (
       	"Crystal Space can't run in this simulated depth! (use 8, 15, 16, or 32)!\n");
       oSimDepth = 0;
     }

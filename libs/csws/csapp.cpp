@@ -41,6 +41,7 @@
 #include "isys/plugin.h"
 #include "iutil/objreg.h"
 #include "igraphic/imageio.h"
+#include "ivaria/reporter.h"
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//- csAppPlugin //--
 
@@ -185,7 +186,7 @@ bool csApp::Initialize ()
 
   ImageLoader = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_IMGLOADER, iImageIO);
   if (!ImageLoader)
-    System->Printf (CS_MSG_WARNING,
+    Printf (CS_REPORTER_SEVERITY_WARNING,
       "No image loader. Loading images will fail.\n");
 
   // Now initialize all skin slices
@@ -320,7 +321,8 @@ void csApp::GetFont (iFont *&oFont, int &oFontSize)
 
 void csApp::PrintfV (int mode, char const* format, va_list args)
 {
-  System->Printf (mode, format, args);
+  csReport (System->GetObjectRegistry (), mode,
+  	"crystalspace.csws", format, args);
 }
 
 void csApp::Printf (int mode, char const* format, ...)
@@ -378,7 +380,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
       else if (!strcasecmp (tmp + 7, "no"))
         iFlags &= ~CS_TEXTURE_DITHER;
       else
-        Printf (CS_MSG_WARNING, "Texture `%s': invalid MIPMAP() value, 'yes' or 'no' expected\n", iTexName);
+        Printf (CS_REPORTER_SEVERITY_WARNING, "Texture `%s': invalid MIPMAP() value, 'yes' or 'no' expected\n", iTexName);
     }
     else if (!strncmp (tmp, "Mipmap:", 7))
     {
@@ -387,11 +389,11 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
       else if (!strcasecmp (tmp + 7, "no"))
         iFlags |= CS_TEXTURE_NOMIPMAPS;
       else
-        Printf (CS_MSG_WARNING, "Texture `%s': invalid MIPMAP() value, 'yes' or 'no' expected\n", iTexName);
+        Printf (CS_REPORTER_SEVERITY_WARNING, "Texture `%s': invalid MIPMAP() value, 'yes' or 'no' expected\n", iTexName);
     }
     else
     {
-      Printf (CS_MSG_WARNING, "Texture `%s': Unknown texture parameter: '%s'\n", iTexName, parm);
+      Printf (CS_REPORTER_SEVERITY_WARNING, "Texture `%s': Unknown texture parameter: '%s'\n", iTexName, parm);
       delete [] filename;
       return false;
     }
@@ -399,7 +401,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
 
   if (!filename)
   {
-    Printf (CS_MSG_WARNING, "Texture `%s': No file name defined!\n", iTexName);
+    Printf (CS_REPORTER_SEVERITY_WARNING, "Texture `%s': No file name defined!\n", iTexName);
     return false;
   }
 
@@ -407,7 +409,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
   iDataBuffer *fbuffer = VFS->ReadFile (filename);
   if (!fbuffer || !fbuffer->GetSize ())
   {
-    Printf (CS_MSG_WARNING, "Cannot read image file \"%s\" from VFS\n", filename);
+    Printf (CS_REPORTER_SEVERITY_WARNING, "Cannot read image file \"%s\" from VFS\n", filename);
     delete [] filename;
     return false;
   }

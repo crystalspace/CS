@@ -35,6 +35,7 @@
 #include "csws/cscwheel.h"
 #include "csws/cswsaux.h"
 #include "isys/system.h"
+#include "ivaria/reporter.h"
 
 #define MSGBOX_TEXTURE "csws::MessageBoxIcons"
 
@@ -475,7 +476,7 @@ void cspFileDialog::Reread ()
   if (!(dh = opendir (path)))
   {
     csMessageBox (app, "Error", "Invalid directory", NULL);
-    app->Printf (CS_MSG_INITIALIZATION, "Invalid directory path\n");
+    app->Printf (CS_REPORTER_SEVERITY_NOTIFY, "Invalid directory path\n");
   }
   else
   {

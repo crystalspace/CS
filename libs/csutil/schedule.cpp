@@ -178,7 +178,6 @@ void csSchedule::InsertCall(csSchedulePart *part, int afternow)
   }
   if(afterprev < 0)
   {
-    //System->Printf(CS_MSG_INTERNAL_ERROR, "csSchedule::InsertCall: delay<0\n");
     delete part;
     return;
   }

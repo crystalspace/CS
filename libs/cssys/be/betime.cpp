@@ -21,7 +21,7 @@
 #include "cssys/be/csbe.h"
 
 //-----------------------------------------------------------------------------
-// The class function Time() is maintained in its own source file in order to
+// The function csGetClicks() is maintained in its own source file in order to
 // allow console applications to make use of the system-specific time function
 // without having to link with all of the other facilities referenced by the
 // csSystemDriver class.  Do *not* incorporate the contents of this file into
@@ -29,7 +29,7 @@
 // incorporated, then it will be much more difficult to link a simple console
 // application.
 //-----------------------------------------------------------------------------
-csTime csSystemDriver::Time()
+csTime csGetClicks ()
 {
   return system_time() / 1000;
 }

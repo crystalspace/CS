@@ -119,6 +119,8 @@ public:
   /// Destroy engine
   virtual ~csIsoEngine ();
 
+  void Report (int severity, const char* msg, ...);
+
   //----- iPlugin ------------------------------------------------------
   /// For the system to initialize the plugin, and return success status
   virtual bool Initialize (iSystem* p);

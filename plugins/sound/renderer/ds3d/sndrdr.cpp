@@ -26,6 +26,8 @@
 #include "isys/system.h"
 #include "iutil/cfgfile.h"
 #include "isys/event.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 #include "sndrdr.h"
 #include "sndlstn.h"
@@ -78,7 +80,12 @@ csSoundRenderDS3D::~csSoundRenderDS3D()
 
 bool csSoundRenderDS3D::Open()
 {
-  System->Printf(CS_MSG_INITIALIZATION,"SoundRender DirectSound3D selected\n");
+  iReporter* reporter = CS_QUERY_REGISTRY (System->GetObjectRegistry (),
+  	iReporter);
+  if (reporter)
+    reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
+  	"crystalspace.sound.ds3d",
+	"SoundRender DirectSound3D selected");
   
   HRESULT r;
   if (!AudioRenderer)
@@ -86,8 +93,13 @@ bool csSoundRenderDS3D::Open()
     r = DirectSoundCreate(NULL, &AudioRenderer, NULL);
     if (r != DS_OK)
     {
-      System->Printf(CS_MSG_FATAL_ERROR, "Error : Cannot Initialize "
-        "DirectSound3D (%s).\n", GetError(r));
+      if (reporter)
+        reporter->Report (CS_REPORTER_SEVERITY_ERROR,
+		"crystalspace.sound.ds3d",
+		"Error : Cannot Initialize DirectSound3D (%s).", GetError(r));
+      else
+        csPrintf (
+		"Error : Cannot Initialize DirectSound3D (%s).\n", GetError(r));
       Close();
       return false;
     }
@@ -96,8 +108,13 @@ bool csSoundRenderDS3D::Open()
     r = AudioRenderer->SetCooperativeLevel(GetForegroundWindow(), dwLevel);
     if (r != DS_OK)
     {
-      System->Printf(CS_MSG_FATAL_ERROR, "Error : Cannot Set "
-        "Cooperative Level (%s).\n", GetError(r));
+      if (reporter)
+        reporter->Report (CS_REPORTER_SEVERITY_ERROR,
+		"crystalspace.sound.ds3d",
+		"Error : Cannot Set Cooperative Level (%s).", GetError(r));
+      else
+	csPrintf (
+		"Error : Cannot Set Cooperative Level (%s).\n", GetError(r));
       Close();
       return false;
     }
@@ -111,7 +128,10 @@ bool csSoundRenderDS3D::Open()
 
   float vol = Config->GetFloat("Sound.Volume",-1);
   if (vol>=0) SetVolume(vol);
-  System->Printf (CS_MSG_INITIALIZATION, "  Volume: %g\n", GetVolume());
+  if (reporter)
+    reporter (CS_REPORTER_SEVERITY_NOTIFY,
+	"crystalspace.sound.ds3d",
+    	"  Volume: %g\n", GetVolume());
 
   csTime et, ct;
   System->GetElapsedTime(et, ct);

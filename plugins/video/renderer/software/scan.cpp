@@ -235,23 +235,3 @@ void csScan_InitDrawFX (csTextureHandleSoftware* texture,
   Scan.PrivateCMap = texture->GetPaletteToGlobal8 ();
 }
 
-#define SysPrintf pG3D->System->Printf
-
-void csScan_dump (csGraphics3DSoftwareCommon* pG3D)
-{
-  SysPrintf (CS_MSG_DEBUG_0, "------------------------------------------------\n");
-  if (Scan.bitmap2)
-  {
-    SysPrintf (CS_MSG_DEBUG_0, "Using a texture from the texture cache.\n");
-    SysPrintf (CS_MSG_DEBUG_0, "  Width=%d, height=%d\n", Scan.tw2, Scan.th2);
-  }
-  SysPrintf (CS_MSG_DEBUG_0, "The original unlighted texture:\n");
-  SysPrintf (CS_MSG_DEBUG_0, "  Width=%d, height=%d\n", Scan.tw, Scan.th);
-  SysPrintf (CS_MSG_DEBUG_0, "\n");
-  SysPrintf (CS_MSG_DEBUG_0, "shf_u=%d, shf_w=%d, shf_h=%d\n", Scan.shf_u, Scan.shf_w, Scan.shf_h);
-  SysPrintf (CS_MSG_DEBUG_0, "and_w=%d, and_h=%d\n", Scan.and_w, Scan.and_h);
-  SysPrintf (CS_MSG_DEBUG_0, "\n");
-  SysPrintf (CS_MSG_DEBUG_0, "M=%f, J1=%f, K1=%f\n", Scan.M, Scan.J1, Scan.K1);
-  SysPrintf (CS_MSG_DEBUG_0, "dM=%f, dJ1=%f, dK1=%f\n", Scan.dM, Scan.dJ1, Scan.dK1);
-  SysPrintf (CS_MSG_DEBUG_0, "------------------------------------------------\n");
-}

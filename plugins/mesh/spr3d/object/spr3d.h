@@ -271,6 +271,8 @@ public:
   /// Destroy the template
   virtual ~csSprite3DMeshObjectFactory ();
 
+  void Report (int severity, const char* msg, ...);
+
   /// Set the skeleton for this sprite template.
   void SetSkeleton (csSkel* sk);
 

@@ -1,6 +1,6 @@
 /*
     Generic Console Output Support
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,12 +20,23 @@
 #include <stdarg.h>
 #include <stdio.h>
 
+#include <stdarg.h>
 #include "cssysdef.h"
 #include "cssys/system.h"
 
 // to be called instead of printf (exact same prototype/functionality of printf)
-void csSystemDriver::ConsoleOut (const char *str)
+int csPrintf (const char *str, ...)
 {
-  fputs (str, stdout);
-  fflush (stdout);
+  va_list arg;
+  va_start (arg, str);
+  int rc = ::vprintf (str, arg);
+  va_end (arg);
+  return rc;
 }
+
+// to be called instead of vprintf
+int csVPrintf (const char *str, va_list arg)
+{
+  return ::vprintf (str, arg);
+}
+

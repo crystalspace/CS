@@ -380,7 +380,7 @@ void SysSystemDriver::DispatchMessage(BMessage* m)
       DoContextClose(m);
       break;
     default:
-      Printf(CS_MSG_WARNING,
+      printf(
         "DispatchUserAction(): Unrecognized message (%lu)\n", m->what);
       m->PrintToStream();
       break;

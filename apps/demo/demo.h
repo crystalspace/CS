@@ -32,6 +32,7 @@ struct iFile;
 struct iImageLoader;
 struct iLoaderPlugin;
 struct iMeshWrapper;
+struct iConsoleOutput;
 class DemoSequenceManager;
 class csTransform;
 
@@ -71,6 +72,8 @@ private:
 public:
   Demo ();
   virtual ~Demo ();
+
+  void Report (int severity, const char* msg, ...);
 
   virtual bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);

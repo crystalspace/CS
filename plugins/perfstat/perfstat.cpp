@@ -29,6 +29,7 @@
 #include "isys/event.h"
 #include "isys/plugin.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include "iengine/engine.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -48,8 +49,6 @@ SCF_IMPLEMENT_IBASE_END
 SCF_IMPLEMENT_EMBEDDED_IBASE (csPerfStats::eiPlugin)
   SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-#define SysPrintf System->Printf
 
 csPerfStats::csPerfStats (iBase *iParent)
 {
@@ -219,19 +218,23 @@ void csPerfStats::CalculateFpsStats ()
     lowest_fps = frame->fps;
 }
 
-void csPerfStats::PrintSubsectionStats (int sysflags)
+void csPerfStats::PrintSubsectionStats (int severity)
 {
   if (sub_section)
-    sub_section->PrintSectionStats (sysflags);
+    sub_section->PrintSectionStats (severity);
 }
 
-void csPerfStats::PrintSectionStats (int sysflags)
+void csPerfStats::PrintSectionStats (int severity)
 {
-  SysPrintf (sysflags, "Total Time/s : %f\n", ((float)total_time)/1000.0f);
-  SysPrintf (sysflags, "Total Frames : %d\n", frame_num);
-  SysPrintf (sysflags, "Mean FPS     : %f\n", mean_fps);
-  SysPrintf (sysflags, "Lowest FPS   : %f\n", lowest_fps);
-  SysPrintf (sysflags, "Highest FPS  : %f\n", highest_fps);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (rep)
+  {
+    rep->Report (severity, "crystalspace.perfstats", "Total Time/s : %f", ((float)total_time)/1000.0f);
+    rep->Report (severity, "crystalspace.perfstats", "Total Frames : %d", frame_num);
+    rep->Report (severity, "crystalspace.perfstats", "Mean FPS     : %f", mean_fps);
+    rep->Report (severity, "crystalspace.perfstats", "Lowest FPS   : %f", lowest_fps);
+    rep->Report (severity, "crystalspace.perfstats", "Highest FPS  : %f", highest_fps);
+  }
 }
 
 iPerfStats *csPerfStats::StartNewSubsection (const char *name)
@@ -305,7 +308,7 @@ void csPerfStats::SaveStats ()
   {
     WriteMainHeader ();
     if (!WriteFile ())
-      System->Printf (CS_MSG_STDOUT, "Stats file output error\n");
+      printf ("Stats file output error\n");
   }
 }
 
@@ -336,8 +339,7 @@ void csPerfStats::WriteSummaryStats ()
   entry->len = strlen (entry->buf) + 1;
   entry->frame_num = statlog_section->frame_num;
 
-  if (entry->len > len_guess)
-    System->Printf (CS_MSG_STDOUT, "WARNING MEMORY OVER-RUN IN PERFSTAT\n");
+  CS_ASSERT (entry->len <= len_guess);
 
   statlog_section->statvec->Push (entry);
 }
@@ -416,9 +418,7 @@ void csPerfStats::WriteMainHeader ()
 
     entry->len = strlen (entry->buf)+1;
     entry->frame_num = statlog_section->frame_num;
-    if (entry->len > len_guess)
-      System->Printf (CS_MSG_STDOUT, 
-        "WARNING MEMORY OVER-RUN IN PERFSTAT (WriteMainHeader)\n");
+    CS_ASSERT (entry->len <= len_guess);
 
     statvec->Push (entry);
     g3d->DecRef ();
@@ -437,9 +437,7 @@ void csPerfStats::WriteSubSummary ()
 	     margin);
     entry->len = strlen (entry->buf)+1;
     entry->frame_num = statlog_section->frame_num;
-    if (entry->len > len_guess)
-      System->Printf (CS_MSG_STDOUT, 
-        "WARNING MEMORY OVER-RUN IN PERFSTAT (WriteSubSummary)\n");
+    CS_ASSERT (entry->len <= len_guess);
     statlog_section->statvec->Push (entry);
   }
 }
@@ -455,9 +453,7 @@ void csPerfStats::WriteSubBegin ()
     sprintf (entry->buf, buf, name);
     entry->len = strlen (entry->buf)+1;
     entry->frame_num = statlog_section->frame_num;
-    if (entry->len > len_guess)
-      System->Printf (CS_MSG_STDOUT, 
-		      "WARNING MEMORY OVER-RUN IN PERFSTAT (WriteSubBegin)\n");
+    CS_ASSERT (entry->len <= len_guess);
     statlog_section->statvec->Push (entry);
   }
 }
@@ -513,11 +509,7 @@ bool csPerfStats::WriteFile ()
     total_len += f_buf_len;
 
     f_buf = new char[f_buf_len];
-    if (!f_buf)
-    {
-      System->Printf (CS_MSG_STDOUT, "Out of Memory\n"); 
-      return false;
-    }
+    CS_ASSERT (f_buf);
 
     // probably a better way to fill a string with spaces
     for (i = 0; i < f_buf_len; i++)
@@ -538,11 +530,7 @@ bool csPerfStats::WriteFile ()
   }
 
   char *buffer = new char [total_len];
-  if (!buffer)
-  {
-    System->Printf (CS_MSG_STDOUT, "Out of Memory\n"); 
-    return false;
-  }
+  CS_ASSERT (buffer);
 
   char *buf = buffer;
 

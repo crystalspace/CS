@@ -54,7 +54,7 @@ iSoundData *csLoader::LoadSoundData(const char* filename) {
   {
     ReportError (
 	      "crystalspace.maploader.parse.sound",
-	      "Cannot create sound data from file '%s'!\n", filename);
+	      "Cannot create sound data from file '%s'!", filename);
   }
   else
     Stats->sounds_loaded++;

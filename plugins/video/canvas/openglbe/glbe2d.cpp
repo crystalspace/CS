@@ -21,6 +21,8 @@
 #include "glbe2d.h"
 #include "CrystGLWindow.h"
 #include "isys/system.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include <Screen.h>
 
 CS_IMPLEMENT_PLUGIN
@@ -47,7 +49,12 @@ bool csGraphics2DGLBe::Initialize(iSystem* p)
   bool ok = csGraphics2DGLCommon::Initialize(p);
   if (ok)
   {
-    CsPrintf (CS_MSG_INITIALIZATION, "Crystal Space BeOS OpenGL 2D driver.\n");
+    iReporter* reporter = CS_QUERY_REGISTRY (p->GetObjectRegistry (),
+    	iReporter);
+    if (reporter)
+      reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
+        "crystalspace.canvas.glbe2d",
+      	"Crystal Space BeOS OpenGL 2D driver.");
     // Get current screen information.
     BScreen screen(B_MAIN_SCREEN_ID);
     screen_frame = screen.Frame();

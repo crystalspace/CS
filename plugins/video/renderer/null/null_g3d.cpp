@@ -30,8 +30,7 @@
 #include "isys/plugin.h"
 #include "isys/event.h"
 #include "ivideo/graph2d.h"
-
-#define SysPrintf System->Printf
+#include "ivaria/reporter.h"
 
 ///---------------------------------------------------------------------------
 
@@ -129,7 +128,9 @@ bool csGraphics3DNull::Open ()
 
   if (!G2D->Open ())
   {
-    SysPrintf (CS_MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
+    csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.graphics3d.null",
+    	"Error opening Graphics2D context.");
     // set "not opened" flag
     width = height = -1;
 
@@ -160,7 +161,8 @@ bool csGraphics3DNull::Open ()
 
   SetDimensions (nWidth, nHeight);
 
-  SysPrintf (CS_MSG_INITIALIZATION, "Using %s mode %dx%d.\n",
+  csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_NOTIFY,
+  	"crystalspace.graphics3d.null", "Using %s mode %dx%d.",
             bFullScreen ? "full screen" : "windowed", width, height);
 
   z_buf_mode = CS_ZBUF_NONE;

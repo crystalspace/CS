@@ -61,6 +61,8 @@ public:
   bool Open ();
   void Close ();
 
+  void Report (int severity, const char* msg, ...);
+
   // add a sound source
   void AddSource(csSoundSourceSoftware *);
   // remove a sound source

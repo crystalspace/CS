@@ -22,6 +22,8 @@
 #include "CrystWindow.h"
 #include "csgeom/csrect.h"
 #include "isys/system.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include <Screen.h>
 
 CS_IMPLEMENT_PLUGIN
@@ -47,7 +49,9 @@ bool csGraphics2DBeLib::Initialize(iSystem* isys)
   bool ok = superclass::Initialize(isys);
   if (ok)
   {
-    System->Printf(CS_MSG_INITIALIZATION, "Crystal Space BeOS 2D Driver.\n");
+    csReport (isys->GetObjectRegistry (), CS_REPORTER_SEVERITY_NOTIFY,
+    	"crystalspace.canvas.be",
+      	"Crystal Space BeOS 2D Driver.");
 
     // Get current screen information.
     BScreen screen(B_MAIN_SCREEN_ID);

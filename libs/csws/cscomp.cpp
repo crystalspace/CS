@@ -36,6 +36,7 @@
 #include "isys/system.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
+#include "ivaria/reporter.h"
 
 //--//--//--//--//--//--//--//--//--//--//--//--/ The csComponent class --//--//
 
@@ -488,7 +489,7 @@ bool csComponent::HandleEvent (iEvent &Event)
           if (name)
             if (!ApplySkin ((csSkin *)Event.Command.Info))
             {
-              app->Printf (CS_MSG_FATAL_ERROR,
+              app->Printf (CS_REPORTER_SEVERITY_WARNING,
                 "The skin does not contain a slice for component `%s'\n", name);
               abort ();
             }

@@ -496,6 +496,8 @@ public:
   /// Destructor.
   virtual ~csGraphics3DOGLCommon ();
 
+  void Report (int severity, const char* msg, ...);
+
   /// Initialization for iPlugin.  Sets System pointer.
   virtual bool Initialize (iSystem*);
   /**

@@ -259,8 +259,6 @@ void csScan_InitDraw (int MipMap, csGraphics3DSoftwareCommon* g3d,
   iPolygonTexture* tex, csTextureHandleSoftware* texture, csTextureSoftware *untxt);
 /// Initialize the scanline variables for DrawPolygonFX
 void csScan_InitDrawFX (csTextureHandleSoftware* texture, csTextureSoftware *untxt);
-/// Dump debugging information about last polygon
-void csScan_dump (csGraphics3DSoftwareCommon* pG3D);
 /// Pixel-depth independent routine
 csDrawScanline csScan_scan_zfil;
 /// Pixel-depth independent routine

@@ -149,9 +149,26 @@ void csLoader::ReportError (const char* id, const char* description, ...)
   {
     char buf[1024];
     vsprintf (buf, description, arg);
-    printf ("Error ID: %s\n", id);
-    printf ("Description: %s\n", buf);
-    fflush (stdout);
+    csPrintf ("Error ID: %s\n", id);
+    csPrintf ("Description: %s\n", buf);
+  }
+  va_end (arg);
+}
+
+void csLoader::ReportNotify (const char* description, ...)
+{
+  va_list arg;
+  va_start (arg, description);
+
+  if (Reporter)
+  {
+    Reporter->ReportV (CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.maploader",
+    	description, arg);
+  }
+  else
+  {
+    csVPrintf (description, arg);
+    csPrintf ("\n");
   }
   va_end (arg);
 }
@@ -405,7 +422,7 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
     if (buf) buf->DecRef ();
     ReportError (
 	      "crystalspace.maploader.parse.map",
-    	      "Could not open map file '%s' on VFS!\n", file);
+    	      "Could not open map file '%s' on VFS!", file);
     return false;
   }
 
@@ -422,12 +439,12 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
 
   if (Stats->polygons_loaded)
   {
-    System->Printf (CS_MSG_INITIALIZATION, "Loaded map file:\n");
-    System->Printf (CS_MSG_INITIALIZATION, "  %d polygons (%d portals),\n", Stats->polygons_loaded,
+    ReportNotify ("Loaded map file:");
+    ReportNotify ("  %d polygons (%d portals),", Stats->polygons_loaded,
       Stats->portals_loaded);
-    System->Printf (CS_MSG_INITIALIZATION, "  %d sectors, %d things, %d meshes, \n", Stats->sectors_loaded,
+    ReportNotify ("  %d sectors, %d things, %d meshes, ", Stats->sectors_loaded,
       Stats->things_loaded, Stats->meshes_loaded);
-    System->Printf (CS_MSG_INITIALIZATION, "  %d curves, %d lights, %d sounds.\n", Stats->curves_loaded,
+    ReportNotify ("  %d curves, %d lights, %d sounds.", Stats->curves_loaded,
       Stats->lights_loaded, Stats->sounds_loaded);
   } /* endif */
 
@@ -565,7 +582,7 @@ bool csLoader::LoadLibraryFile (const char* fname)
     if (buf) buf->DecRef ();
     ReportError (
 	      "crystalspace.maploader.parse.library",
-    	      "Could not open library file '%s' on VFS!\n", fname);
+    	      "Could not open library file '%s' on VFS!", fname);
     return false;
   }
 
@@ -647,7 +664,7 @@ iMeshFactoryWrapper* csLoader::LoadMeshObjectFactory (const char* fname)
     if (databuff) databuff->DecRef ();
     ReportError (
 	      "crystalspace.maploader.parse.meshfactory",
-    	      "Could not open mesh object file '%s' on VFS!\n", fname);
+    	      "Could not open mesh object file '%s' on VFS!", fname);
     return NULL;
   }
 
@@ -1591,7 +1608,7 @@ iMeshWrapper * csLoader::LoadMeshObject (const char* fname)
     if (databuff) databuff->DecRef ();
     ReportError (
 	      "crystalspace.maploader.parse.meshobject",
-    	      "Could not open mesh object file '%s' on VFS!\n", fname);
+    	      "Could not open mesh object file '%s' on VFS!", fname);
     return NULL;
   }
 
@@ -1688,36 +1705,35 @@ csLoader::~csLoader()
 }
 
 #define GET_PLUGIN(var, func, intf, msgname)	\
-  var = CS_QUERY_PLUGIN_ID(plugin_mgr, func, intf);	\
-  if (var)					\
-    System->Printf(CS_MSG_INITIALIZATION,	\
-      " "msgname);
+  var = CS_QUERY_PLUGIN_ID(plugin_mgr, func, intf);
 
 bool csLoader::Initialize(iSystem *iSys)
 {
   System = iSys;
   object_reg = System->GetObjectRegistry ();
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  System->Printf(CS_MSG_INITIALIZATION, "Initializing loader plug-in\n ");
+
+  GET_PLUGIN (Reporter, CS_FUNCID_REPORTER, iReporter, "reporter");
+
+  ReportNotify("Initializing loader plug-in ");
   loaded_plugins.plugin_mgr = plugin_mgr;
 
   // get the virtual file system plugin
   VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
-  if (!VFS) {
-    System->Printf (CS_MSG_INITIALIZATION,
-      "Failed to initialize the loader: No VFS plugin.\n");
+  if (!VFS)
+  {
+    ReportNotify (
+      "Failed to initialize the loader: No VFS plugin.");
     return false;
   }
 
   // get all optional plugins
-  GET_PLUGIN (Reporter, CS_FUNCID_REPORTER, iReporter, "reporter");
   GET_PLUGIN (ImageLoader, CS_FUNCID_IMGLOADER, iImageIO, "image-loader");
   GET_PLUGIN (SoundLoader, CS_FUNCID_SNDLOADER, iSoundLoader, "sound-loader");
   GET_PLUGIN (Engine, CS_FUNCID_ENGINE, iEngine, "engine");
   GET_PLUGIN (G3D, CS_FUNCID_VIDEO, iGraphics3D, "video-driver");
   GET_PLUGIN (SoundRender, CS_FUNCID_SOUND, iSoundRender, "sound-driver");
   GET_PLUGIN (MotionManager, CS_FUNCID_MOTION, iMotionManager, "motion-manager");
-  System->Printf(CS_MSG_INITIALIZATION, "\n");
   return true;
 }
 
@@ -1779,7 +1795,8 @@ iCollection* csLoader::ParseCollection (char* name, char* buf)
           csScanStr (params, "%s", str);
 	  iMeshWrapper* spr = Engine->FindMeshObject (str, ResolveOnlyRegion);
           if (!spr)
-            System->Printf (CS_MSG_WARNING, "Mesh object '%s' not found!\n", str);
+            ReportError ("crystalspace.maploader.parse.meshobject",
+	    	"Mesh object '%s' not found!", str);
 	  else
             collection->AddObject (spr->QueryObject());
 # endif

@@ -73,8 +73,8 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   // Sanity check
   if (sizeof (event_queue [0]) != 12)
   {
-    Printf (CS_MSG_FATAL_ERROR, "ERROR! Your compiler does not handle packed structures!\n");
-    Printf (CS_MSG_FATAL_ERROR, "sizeof (event_queue [0]) == %d instead of 12!\n", sizeof (event_queue [0]));
+    printf ("ERROR! Your compiler does not handle packed structures!\n");
+    printf ("sizeof (event_queue [0]) == %d instead of 12!\n", sizeof (event_queue [0]));
     exit (-1);
   }
 

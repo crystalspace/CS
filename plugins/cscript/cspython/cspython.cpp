@@ -22,6 +22,8 @@ extern "C" {
 #include "cssysdef.h"
 #include "cspython.h"
 #include "csutil/csstring.h"
+#include "ivaria/reporter.h"
+#include "iutil/objreg.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -43,7 +45,7 @@ SCF_EXPORT_CLASS_TABLE_END
 
 csPython* csPython::shared_instance = NULL;
 
-csPython::csPython(iBase *iParent) :Sys(NULL), Mode(CS_MSG_INITIALIZATION)
+csPython::csPython(iBase *iParent) :Sys(NULL), Mode(CS_REPORTER_SEVERITY_NOTIFY)
 {
   SCF_CONSTRUCT_IBASE(iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
@@ -52,7 +54,7 @@ csPython::csPython(iBase *iParent) :Sys(NULL), Mode(CS_MSG_INITIALIZATION)
 
 csPython::~csPython()
 {
-  Mode=CS_MSG_INTERNAL_ERROR;
+  Mode=CS_REPORTER_SEVERITY_BUG;
   Py_Finalize();
   Sys=NULL;
 }
@@ -84,7 +86,7 @@ bool csPython::Initialize(iSystem* iSys)
   if (!LoadModule ("cspacec")) return false;
   if (!LoadModule ("cspace")) return false;
 
-  Mode = CS_MSG_STDOUT;
+  Mode = CS_REPORTER_SEVERITY_NOTIFY;
 
   // Store the system pointer in 'cspace.system'.
   char command[256];
@@ -134,8 +136,17 @@ bool csPython::LoadModule(const char* name)
 
 void csPython::Print(bool Error, const char *msg)
 {
-  if(Error)
-    Sys->Printf(CS_MSG_FATAL_ERROR, "CrystalScript Error: %s\n", msg);
+  iObjectRegistry* object_reg = Sys->GetObjectRegistry ();
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (!rep)
+    csPrintf ("%s\n", msg);
   else
-    Sys->Printf(Mode, "%s", msg);
+  {
+    if(Error)
+      rep->Report (CS_REPORTER_SEVERITY_ERROR, "crystalspace.script.python",
+      	"CrystalScript Error: %s", msg);
+    else
+      rep->Report (Mode, "crystalspace.script.python",
+      	"%s", msg);
+  }
 }

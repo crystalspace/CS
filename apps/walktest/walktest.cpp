@@ -210,36 +210,21 @@ WalkTest::~WalkTest ()
   if (LevelLoader) LevelLoader->DecRef();
 }
 
-bool WalkTest::CheckErrors ()
+void WalkTest::Report (int severity, const char* msg, ...)
 {
-  iReporter* reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER,
-  	iReporter);
-  if (!reporter) return false;
-  if (reporter->GetMessageCount () == 0) return false;
-  int i;
-  bool fatal = false;
-  for (i = 0 ; i < reporter->GetMessageCount () ; i++)
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (rep)
   {
-    int severity = reporter->GetMessageSeverity (i);
-    if (severity == CS_REPORTER_SEVERITY_BUG ||
-    	severity == CS_REPORTER_SEVERITY_ERROR)
-      fatal = true;
-    int msgType;
-    if (severity == CS_REPORTER_SEVERITY_BUG)
-      msgType = CS_MSG_INTERNAL_ERROR;
-    else if (severity == CS_REPORTER_SEVERITY_ERROR)
-      msgType = CS_MSG_FATAL_ERROR;
-    else if (severity == CS_REPORTER_SEVERITY_WARNING)
-      msgType = CS_MSG_WARNING;
-    else
-      msgType = CS_MSG_CONSOLE;
-    Sys->Printf (msgType, "id: %s\nmsg: %s\n", reporter->GetMessageId (i),
-      reporter->GetMessageDescription (i));
+    rep->ReportV (severity, "crystalspace.system", msg, arg);
   }
-
-  reporter->Clear ();
-  reporter->DecRef ();
-  return fatal;
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
 }
 
 void WalkTest::SetSystemDefaults (iConfigManager *Config)
@@ -265,23 +250,23 @@ void WalkTest::SetSystemDefaults (iConfigManager *Config)
   if (cmdline->GetOption ("stats"))
   {
     do_stats = true;
-    Sys->Printf (CS_MSG_INITIALIZATION, "Statistics enabled.\n");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Statistics enabled.");
   }
   else if (cmdline->GetOption ("nostats"))
   {
     do_stats = false;
-    Sys->Printf (CS_MSG_INITIALIZATION, "Statistics disabled.\n");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Statistics disabled.");
   }
 
   if (cmdline->GetOption ("fps"))
   {
     do_fps = true;
-    Sys->Printf (CS_MSG_INITIALIZATION, "Frame Per Second enabled.\n");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Frame Per Second enabled.");
   }
   else if (cmdline->GetOption ("nofps"))
   {
     do_fps = false;
-    Sys->Printf (CS_MSG_INITIALIZATION, "Frame Per Second disabled.\n");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Frame Per Second disabled.");
   }
 
   if (cmdline->GetOption ("infinite"))
@@ -297,12 +282,12 @@ void WalkTest::SetSystemDefaults (iConfigManager *Config)
   if (cmdline->GetOption ("colldet"))
   {
     do_cd = true;
-    Sys->Printf (CS_MSG_INITIALIZATION, "Enabled collision detection system.\n");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Enabled collision detection system.");
   }
   else if (cmdline->GetOption ("nocolldet"))
   {
     do_cd = false;
-    Sys->Printf (CS_MSG_INITIALIZATION, "Disabled collision detection system.\n");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Disabled collision detection system.");
   }
 
   if ((val = cmdline->GetOption ("exec")))
@@ -316,14 +301,15 @@ void WalkTest::Help ()
 {
   iConfigManager* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
   SysSystemDriver::Help ();
-  Sys->Printf (CS_MSG_STDOUT, "  -exec=<script>     execute given script at startup\n");
-  Sys->Printf (CS_MSG_STDOUT, "  -[no]stats         statistics (default '%sstats')\n", do_stats ? "" : "no");
-  Sys->Printf (CS_MSG_STDOUT, "  -[no]fps           frame rate printing (default '%sfps')\n", do_fps ? "" : "no");
-  Sys->Printf (CS_MSG_STDOUT, "  -[no]colldet       collision detection system (default '%scolldet')\n", do_cd ? "" : "no");
-  Sys->Printf (CS_MSG_STDOUT, "  -infinite          special infinite level generation (ignores map file!)\n");
-  Sys->Printf (CS_MSG_STDOUT, "  -huge              special huge level generation (ignores map file!)\n");
-  Sys->Printf (CS_MSG_STDOUT, "  -bots              allow random generation of bots\n");
-  Sys->Printf (CS_MSG_STDOUT, "  <path>             load map from VFS <path> (default '%s')\n",
+  //@@@???
+  printf ("  -exec=<script>     execute given script at startup\n");
+  printf ("  -[no]stats         statistics (default '%sstats')\n", do_stats ? "" : "no");
+  printf ("  -[no]fps           frame rate printing (default '%sfps')\n", do_fps ? "" : "no");
+  printf ("  -[no]colldet       collision detection system (default '%scolldet')\n", do_cd ? "" : "no");
+  printf ("  -infinite          special infinite level generation (ignores map file!)\n");
+  printf ("  -huge              special huge level generation (ignores map file!)\n");
+  printf ("  -bots              allow random generation of bots\n");
+  printf ("  <path>             load map from VFS <path> (default '%s')\n",
         cfg->GetStr ("Walktest.Settings.WorldFile", "world"));
 }
 
@@ -895,7 +881,7 @@ void WalkTest::DrawFrame (csTime elapsed_time, csTime current_time)
 	  cfg_playrecording = -1;
 	  if (perf_stats) perf_stats->FinishSubsection ();
 	  recorded_perf_stats = NULL;
-	  Sys->Printf (CS_MSG_CONSOLE, "Demo '%s' finished\n", 
+	  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Demo '%s' finished", 
 		       recorded_perf_stats_name);
 	}
       }
@@ -969,7 +955,7 @@ csTime time0 = (csTime)-1;
 void WalkTest::PrepareFrame (csTime elapsed_time, csTime current_time)
 {
   static csTime prev_time = 0;
-  if (prev_time == 0) prev_time = Time () - 10;
+  if (prev_time == 0) prev_time = csGetClicks () - 10;
 
   // If the time interval is too big, limit to something reasonable
   // This will help a little for software OpenGL :-)
@@ -1046,18 +1032,18 @@ void perf_test (int num)
 {
   Sys->busy_perf_test = true;
   csTime t1, t2, t;
-  Sys->Printf (CS_MSG_CONSOLE, "Performance test busy...\n");
-  t = t1 = Sys->Time ();
+  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Performance test busy...");
+  t = t1 = csGetClicks ();
   int i;
   for (i = 0 ; i < num ; i++)
   {
-    Sys->DrawFrame (Sys->Time ()-t, Sys->Time ());
-    t = Sys->Time ();
+    Sys->DrawFrame (csGetClicks ()-t, csGetClicks ());
+    t = csGetClicks ();
   }
-  t2 = Sys->Time ();
-  Sys->Printf (CS_MSG_CONSOLE, "%f secs to render %d frames: %f fps\n",
+  t2 = csGetClicks ();
+  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "%f secs to render %d frames: %f fps",
         (float)(t2-t1)/1000., num, 100000./(float)(t2-t1));
-  Sys->Printf (CS_MSG_DEBUG_0, "%f secs to render %d frames: %f fps\n",
+  Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "%f secs to render %d frames: %f fps",
         (float)(t2-t1)/1000., num, 100000./(float)(t2-t1));
   cnt = 1;
   time0 = (csTime)-1;
@@ -1074,14 +1060,14 @@ void CaptureScreen ()
   } while (i < 1000 && Sys->myVFS->Exists(name));
   if (i >= 1000)
   {
-    Sys->Printf (CS_MSG_CONSOLE, "Too many screenshot files in current directory\n");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Too many screenshot files in current directory");
     return;
   }
 
   iImage *img = Gfx2D->ScreenShot ();
   if (!img)
   {
-    Sys->Printf (CS_MSG_CONSOLE, "The 2D graphics driver does not support screen shots\n");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "The 2D graphics driver does not support screen shots");
     return;
   }
   iImageIO *imageio = CS_QUERY_PLUGIN (Sys->plugin_mgr, iImageIO);
@@ -1090,9 +1076,9 @@ void CaptureScreen ()
     iDataBuffer *db = imageio->Save (img, "image/png");
     if (db)
     {
-       Sys->Printf (CS_MSG_CONSOLE, "Screenshot: %s\n", name);
+       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Screenshot: %s", name);
       if (!Sys->myVFS->WriteFile (name, (const char*)db->GetData (), db->GetSize ()))
-        Sys->Printf (CS_MSG_CONSOLE, "There was an error while writing screen shot\n");
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "There was an error while writing screen shot");
       db->DecRef ();
     }
     imageio->DecRef ();
@@ -1106,7 +1092,7 @@ void CaptureScreen ()
 
 void Cleanup ()
 {
-  Sys->ConsoleOut ("Cleaning up...\n");
+  csPrintf ("Cleaning up...\n");
   free_keymap ();
   Sys->EndEngine ();
   delete Sys; Sys = NULL;
@@ -1137,7 +1123,7 @@ void WalkTest::EndEngine ()
 
 void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
 {
-  Sys->Printf (CS_MSG_INITIALIZATION, "Computing OBBs ...\n");
+  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Computing OBBs ...");
 
   iPolygonMesh* mesh;
   int sn = engine->GetSectors ()->GetSectorCount ();
@@ -1178,14 +1164,13 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
 //  player = csBeing::PlayerSpawn("Player");
 
 //  init = true;
-//  Sys->Printf (CS_MSG_INITIALIZATION, "DONE\n");
+//  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "DONE");
 }
 
 void WalkTest::LoadLibraryData (void)
 {
   // Load the "standard" library
-  LevelLoader->LoadLibraryFile ("/lib/std/library");
-  if (CheckErrors ())
+  if (!LevelLoader->LoadLibraryFile ("/lib/std/library"))
   {
     Cleanup ();
     exit (0);
@@ -1230,7 +1215,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   object_reg = Sys->GetObjectRegistry ();
   if (!SysSystemDriver::Initialize (argc, argv, iConfigName))
   {
-    Printf (CS_MSG_FATAL_ERROR, "Failed to initialize SysSystemDriver!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Failed to initialize SysSystemDriver!");
     return false;
   }
 
@@ -1242,21 +1227,21 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
     return false;
   }
 
   myG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
   if (!myG2D)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iGraphics2D plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics2D plugin!");
     return false;
   }
 
   myVFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!myVFS)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iVFS plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iVFS plugin!");
     return false;
   }
 
@@ -1265,8 +1250,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   myMotionMan = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_MOTION, iMotionManager);
 
   // Some commercials...
-  Printf (CS_MSG_INITIALIZATION, "Crystal Space version %s (%s).\n", CS_VERSION, CS_RELEASE_DATE);
-  Printf (CS_MSG_INITIALIZATION, "Created by Jorrit Tyberghein and others...\n\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Crystal Space version %s (%s).", CS_VERSION, CS_RELEASE_DATE);
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Created by Jorrit Tyberghein and others...");
 
   // Get all collision detection and movement config file parameters.
   cfg_jumpspeed = cfg->GetFloat ("Walktest.CollDet.JumpSpeed", 0.08);
@@ -1308,7 +1293,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   if (nw) nw->SetTitle ("Crystal Space Standard Test Application");
   if (!Open ())
   {
-    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
     return false;
   }
 
@@ -1329,7 +1314,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   Engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
   if (!Engine)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
     return false;
   }
 
@@ -1337,7 +1322,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!LevelLoader)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No level loader plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No level loader plugin!");
     return false;
   }
 
@@ -1345,7 +1330,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   perf_stats = CS_QUERY_PLUGIN (plugin_mgr, iPerfStats);
   if (!perf_stats)
   {
-    Printf (CS_MSG_WARNING, "No iPerfStats plugin: you will have no performance statistics!\n");
+    Report (CS_REPORTER_SEVERITY_WARNING,
+    	"No iPerfStats plugin: you will have no performance statistics!");
   }
 
   // csView is a view encapsulating both a camera and a clipper.
@@ -1360,7 +1346,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   collide_system = CS_LOAD_PLUGIN (plugin_mgr, p, "CollDet", iCollideSystem);
   if (!collide_system)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No Collision Detection plugin found!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No Collision Detection plugin found!");
     return false;
   }
 
@@ -1379,11 +1365,11 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
     if (!myVFS->ChDir ("/tmp"))
     {
-      Printf (CS_MSG_FATAL_ERROR, "Temporary directory /tmp not mounted on VFS!\n");
+      Report (CS_REPORTER_SEVERITY_ERROR, "Temporary directory /tmp not mounted on VFS!");
       return false;
     }
 
-    Printf (CS_MSG_INITIALIZATION, "Creating initial room!...\n");
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating initial room!...");
     Engine->SetLightingCacheMode (0);
 
     // Unfortunately the current movement system does not allow the user to
@@ -1394,11 +1380,10 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     do_cd = true;
 
     // Load two textures that are used in the maze.
-    if (CheckErrors ()) return false;
-    LevelLoader->LoadTexture ("txt", "/lib/std/stone4.gif");
-    if (CheckErrors ()) return false;
-    LevelLoader->LoadTexture ("txt2", "/lib/std/mystone2.gif");
-    if (CheckErrors ()) return false;
+    if (!LevelLoader->LoadTexture ("txt", "/lib/std/stone4.gif"))
+      return false;
+    if (!LevelLoader->LoadTexture ("txt2", "/lib/std/mystone2.gif"))
+      return false;
 
     if (do_infinite)
     {
@@ -1443,14 +1428,14 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
     // Prepare the engine. This will calculate all lighting and
     // prepare the lightmaps for the 3D rasterizer.
-    csTextProgressMeter* meter = new csTextProgressMeter (this, CS_MSG_CONSOLE);
+    csTextProgressMeter* meter = new csTextProgressMeter (myConsole);
     Engine->Prepare (meter);
     delete meter;
   }
   else
   {
     // Load from a map file.
-    Printf (CS_MSG_INITIALIZATION, "Loading map '%s'...\n", map_dir);
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'...", map_dir);
 
     // Check the map and mount it if required
     char tmp [100];
@@ -1477,16 +1462,13 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
     if (!myVFS->ChDir (map_dir))
     {
-      Printf (CS_MSG_FATAL_ERROR, "The directory on VFS for map file does not exist!\n");
+      Report (CS_REPORTER_SEVERITY_ERROR, "The directory on VFS for map file does not exist!");
       return false;
     }
 
     // Load the map from the file.
     if (!LevelLoader->LoadMapFile ("world"))
-    {
-      if (CheckErrors ()) return false;
       return false;
-    }
 
     LoadLibraryData ();
     Inititalize2DTextures ();
@@ -1494,7 +1476,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
 
     // Prepare the engine. This will calculate all lighting and
     // prepare the lightmaps for the 3D rasterizer.
-    csTextProgressMeter* meter = new csTextProgressMeter (this, CS_MSG_CONSOLE);
+    csTextProgressMeter* meter = new csTextProgressMeter (myConsole);
     Engine->Prepare (meter);
     delete meter;
 
@@ -1515,8 +1497,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     room = Engine->FindSector (room_name);
     if (!room)
     {
-      Printf (CS_MSG_FATAL_ERROR,  "Map does not contain a room called '%s'"
-        " which is used\nas a starting point!\n", room_name);
+      Report (CS_REPORTER_SEVERITY_ERROR,  "Map does not contain a room called '%s'"
+        " which is used\nas a starting point!", room_name);
       return false;
     }
   }
@@ -1539,7 +1521,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     wMissile_whoosh = w ? w->GetSound () : NULL;
    }
 
-  Printf (CS_MSG_INITIALIZATION, "--------------------------------------\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------");
   if (myConsole)
   {
     myConsole->SetVisible (false);
@@ -1563,8 +1545,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   }
 
   // Wait one second before starting.
-  csTime t = Sys->Time ()+1000;
-  while (Sys->Time () < t) ;
+  csTime t = csGetClicks ()+1000;
+  while (csGetClicks () < t) ;
 
   // Allocate the palette as calculated by the texture manager.
   txtmgr->SetPalette ();
@@ -1621,7 +1603,7 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ..., engine) and initialize them.
   if (!Sys->Initialize (argc, argv, "/config/walktest.cfg"))
   {
-    Sys->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     fatal_exit (-1, false);
   }
 

@@ -45,6 +45,8 @@ public:
   virtual ~csSoundDriverMac();
   virtual bool Initialize(iSystem *iSys);
   
+  void Report (int severity, const char* msg, ...);
+
   virtual bool Open(iSoundRender *, int frequency, bool bit16, bool stereo);
   virtual void Close();
 	

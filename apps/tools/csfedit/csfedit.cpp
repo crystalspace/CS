@@ -28,6 +28,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/natwin.h"
 #include "iutil/cfgmgr.h"
+#include "ivaria/reporter.h"
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
 #include <sys/stat.h>
@@ -973,7 +974,9 @@ csEditFont::csEditFont(csApp *iApp, const char *fromfile)
   VFS->DecRef ();
   if (!fntfile)
   {
-    System->Printf (CS_MSG_WARNING, "Could not read font file %s.\n", fromfile);
+    csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_WARNING,
+	"crystalspace.application.csfedit",
+    	"Could not read font file %s.", fromfile);
     return;
   }
 
@@ -1361,9 +1364,10 @@ bool CsfEdit::Initialize ()
   // CSWS apps are a lot more performant with a single-buffered canvas
   GetG2D ()->DoubleBuffer (false);
 
-  Printf (CS_MSG_INITIALIZATION,
+  csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_NOTIFY,
+	"crystalspace.application.csfedit",
     "Crystal Space version %s (%s).\n"
-    "CSF Editor.\n\n",
+    "CSF Editor.\n",
     CS_VERSION, CS_RELEASE_DATE);
 
   csKeyboardAccelerator *ka = new csKeyboardAccelerator (this);

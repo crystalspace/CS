@@ -33,6 +33,7 @@
 #include "imesh/object.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
+#include "ivaria/reporter.h"
 #include "csutil/cscolor.h"
 #include "csgeom/path.h"
 #include "cstool/csfxscr.h"
@@ -57,8 +58,8 @@ RotatePartOp::RotatePartOp (const char* meshName, csTime total,
   mesh = DemoSequenceManager::demo->engine->FindMeshWrapper (meshName);
   if (!mesh)
   {
-    DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
-    	"Can't find mesh '%s'\n", meshName);
+    DemoSequenceManager::demo->Report (CS_REPORTER_SEVERITY_ERROR,
+    	"Can't find mesh '%s'", meshName);
     exit (0);
   }
 }
@@ -76,8 +77,8 @@ AttachOp::AttachOp (const char* meshName, const char* pathName)
     mesh = DemoSequenceManager::demo->engine->FindMeshWrapper (meshName);
     if (!mesh)
     {
-      DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
-    	  "Can't find mesh '%s'\n", meshName);
+      DemoSequenceManager::demo->Report (CS_REPORTER_SEVERITY_ERROR,
+    	  "Can't find mesh '%s'", meshName);
       exit (0);
     }
   }
@@ -86,8 +87,8 @@ AttachOp::AttachOp (const char* meshName, const char* pathName)
   path = DemoSequenceManager::demoseq->FindPath (pathName);
   if (!path)
   {
-    DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
-    	"Can't find path '%s'\n", pathName);
+    DemoSequenceManager::demo->Report (CS_REPORTER_SEVERITY_ERROR,
+    	"Can't find path '%s'", pathName);
     exit (0);
   }
 }
@@ -105,8 +106,8 @@ PathOp::PathOp (csTime t, const char* meshName, const char* pathName)
     mesh = DemoSequenceManager::demo->engine->FindMeshWrapper (meshName);
     if (!mesh)
     {
-      DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
-    	  "Can't find mesh '%s'\n", meshName);
+      DemoSequenceManager::demo->Report (CS_REPORTER_SEVERITY_ERROR,
+    	  "Can't find mesh '%s'", meshName);
       exit (0);
     }
   }
@@ -115,8 +116,8 @@ PathOp::PathOp (csTime t, const char* meshName, const char* pathName)
   path = DemoSequenceManager::demoseq->FindPath (pathName);
   if (!path)
   {
-    DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
-    	"Can't find path '%s'\n", pathName);
+    DemoSequenceManager::demo->Report (CS_REPORTER_SEVERITY_ERROR,
+    	"Can't find path '%s'", pathName);
     exit (0);
   }
 }
@@ -134,15 +135,15 @@ SetupMeshOp::SetupMeshOp (const char* meshName, const char* sectName,
   mesh = DemoSequenceManager::demo->engine->FindMeshWrapper (meshName);
   if (!mesh)
   {
-    DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
-    	"Can't find mesh '%s'\n", meshName);
+    DemoSequenceManager::demo->Report (CS_REPORTER_SEVERITY_ERROR,
+    	"Can't find mesh '%s'", meshName);
     exit (0);
   }
   sector = DemoSequenceManager::demo->engine->FindSector (sectName);
   if (!sector)
   {
-    DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
-    	"Can't find sector '%s'\n", sectName);
+    DemoSequenceManager::demo->Report (CS_REPORTER_SEVERITY_ERROR,
+    	"Can't find sector '%s'", sectName);
     exit (0);
   }
 }
@@ -164,8 +165,8 @@ ShowMeshOp::ShowMeshOp (const char* meshName)
   mesh = DemoSequenceManager::demo->engine->FindMeshWrapper (meshName);
   if (!mesh)
   {
-    DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
-    	"Can't find mesh '%s'\n", meshName);
+    DemoSequenceManager::demo->Report (CS_REPORTER_SEVERITY_ERROR,
+    	"Can't find mesh '%s'", meshName);
     exit (0);
   }
 }
@@ -184,8 +185,8 @@ HideMeshOp::HideMeshOp (const char* meshName)
   mesh = DemoSequenceManager::demo->engine->FindMeshWrapper (meshName);
   if (!mesh)
   {
-    DemoSequenceManager::demo->Printf (CS_MSG_FATAL_ERROR,
-    	"Can't find mesh '%s'\n", meshName);
+    DemoSequenceManager::demo->Report (CS_REPORTER_SEVERITY_ERROR,
+    	"Can't find mesh '%s'", meshName);
     exit (0);
   }
 }

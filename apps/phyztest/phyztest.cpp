@@ -29,6 +29,7 @@
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
 #include "ivaria/polymesh.h"
+#include "ivaria/reporter.h"
 #include "iutil/objreg.h"
 #include "isys/plugin.h"
 
@@ -149,9 +150,24 @@ Phyztest::~Phyztest ()
   SCF_DEC_REF (engine);
 }
 
+void Phyztest::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.application.phyztest", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 void Cleanup ()
 {
-  System->ConsoleOut ("Cleaning up...\n");
+  csPrintf ("Cleaning up...\n");
   delete System;
 }
 
@@ -168,35 +184,35 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
     abort ();
   }
 
   myG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
   if (!myG2D)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iGraphics2D plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics2D plugin!");
     abort ();
   }
 
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
     abort ();
   }
 
   LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!LevelLoader)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
     abort ();
   }
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ())
   {
-    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
     Cleanup ();
     exit (1);
   }
@@ -206,7 +222,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
     courierFont = fs->LoadFont (CSFONT_COURIER);
   else
   {
-    Printf (CS_MSG_FATAL_ERROR, "No font plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No font plugin!");
     Cleanup ();
     exit (1);
   }
@@ -214,7 +230,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   cdsys = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.collisiondetection.rapid", "CollDet", iCollideSystem);
 
   // Some commercials...
-  Printf (CS_MSG_INITIALIZATION, "Phyztest Crystal Space Application version 0.1.\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Phyztest Crystal Space Application version 0.1.");
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
@@ -223,12 +239,12 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   engine->SetLightingCacheMode (0);
 
   // Create our world.
-  Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
 
   if (!LevelLoader->LoadLibraryFile ("/lib/std/library" ) )
   {
-    Printf (CS_MSG_INITIALIZATION, "LIBRARY NOT LOADED!...\n");
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "LIBRARY NOT LOADED!...");
     Shutdown = true;
     return false;
   }
@@ -320,7 +336,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   dynlight->SetSector (room);
   dynlight->Setup ();
 */
-  Printf (CS_MSG_INITIALIZATION, "--------------------------------------\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------");
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by
@@ -365,13 +381,13 @@ void Phyztest::NextFrame ()
   // add a chain
   if (GetKeyState (CSKEY_DEL) && !chain_added )
   {
-    // Printf (CS_MSG_DEBUG_0, "adding chain\n");
+    // Report (CS_REPORTER_SEVERITY_DEBUG, "adding chain");
     // use box template
 
     iMeshFactoryWrapper* bxtmpl = view->GetEngine ()->FindMeshFactory ("box");
     if (!bxtmpl)
     {  
-      Printf (CS_MSG_INITIALIZATION, "couldn't load template 'box'\n");
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "couldn't load template 'box'");
       return;
     }
 
@@ -429,7 +445,7 @@ void Phyztest::NextFrame ()
       iMeshFactoryWrapper* tmpl = view->GetEngine ()->FindMeshFactory ("box");
       if (!tmpl)
       {     
-	Printf (CS_MSG_INITIALIZATION, "couldn't load template 'bot'\n");
+	Report (CS_REPORTER_SEVERITY_NOTIFY, "couldn't load template 'bot'");
 	return;
       }
 
@@ -518,7 +534,7 @@ void Phyztest::NextFrame ()
       {
         //  get the position of this link
         new_p = chain[i]->rb->get_pos();
-	//  Printf (CS_MSG_DEBUG_0, "chain pos %d = %f, %f, %f\n",
+	//  Report (CS_REPORTER_SEVERITY_DEBUG, "chain pos %d = %f, %f, %f",
 	//            i, new_p.x, new_p.y, new_p.z);
         chain[i]->sprt->GetMovable ()->SetPosition ( new_p );
         
@@ -679,7 +695,7 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!System->Initialize (argc, argv, NULL))
   {
-    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
+    System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     Cleanup ();
     exit (1);
   }

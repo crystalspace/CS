@@ -30,6 +30,7 @@
 #include "isys/event.h"
 #include "isys/plugin.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 #if defined(CS_OPENGL_PATH)
 #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
@@ -128,7 +129,7 @@ iTextureHandle *TxtHandleVector::RegisterAndPrepare (iTextureHandle *ogl_txt)
 #ifdef CS_DEBUG
   if ((flags & CS_TEXTURE_PROC) == CS_TEXTURE_PROC) 
   {
-    SysPrintf (CS_MSG_STDOUT, "Big Error, attempting to register and prepare a procedural texture with the software Opengl texture vector\n");
+    printf ("Big Error, attempting to register and prepare a procedural texture with the software Opengl texture vector\n");
   }
 #endif
   // image gets a DecRef() in the software texture manager if procedural texture
@@ -269,7 +270,9 @@ bool csOpenGLProcSoftware::Prepare(
     "crystalspace.graphics3d.software.offscreen", NULL, iGraphics3D);
   if (!soft_proc_g3d)
   {
-    SysPrintf (CS_MSG_FATAL_ERROR, "Error creating offscreen software renderer\n");
+    csReport (system->GetObjectRegistry (), CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.graphics3d.opengl",
+	"Error creating offscreen software renderer");
     return false;
   }
 
@@ -279,7 +282,9 @@ bool csOpenGLProcSoftware::Prepare(
 
   if (!isoft_proc)
   {
-    SysPrintf (CS_MSG_FATAL_ERROR, "Error creating offscreen software renderer\n");
+    csReport (system->GetObjectRegistry (), CS_REPORTER_SEVERITY_ERROR,
+	"crystalspace.graphics3d.opengl",
+    	"Error creating offscreen software renderer");
     return false;
   }
   // temporarily assign parent_g3d as g3d so that the software 3d driver
@@ -320,7 +325,9 @@ bool csOpenGLProcSoftware::Prepare(
     last->next_soft_tex = this;
   }
 
-  SysPrintf (CS_MSG_STDOUT, "GL software procedural texture\n");
+#if CS_DEBUG
+   printf ("GL software procedural texture\n");
+#endif
   return true;
 }
 

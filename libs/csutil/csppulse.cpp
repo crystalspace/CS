@@ -19,12 +19,13 @@
 
 #include "cssysdef.h"
 #include "csutil/csppulse.h"
+#include "ivaria/conout.h"
 
 static char const ANIMATION[] = "-\\|/";
 int const ANIMATION_COUNT = sizeof(ANIMATION) / sizeof(ANIMATION[0]) - 1;
 
-csProgressPulse::csProgressPulse(iSystem* s) :
-    sys(s), type(CS_MSG_INITIALIZATION), state(0), drawn(false) {}
+csProgressPulse::csProgressPulse(iConsoleOutput* cons) :
+    console(cons), state(0), drawn(false) {}
 
 csProgressPulse::~csProgressPulse()
 {
@@ -35,7 +36,7 @@ void csProgressPulse::Erase()
 {
   if (drawn)
   {
-    sys->Printf(type, "\b \b");
+    console->PutText ("\b \b");
     drawn = false;
   }
 }
@@ -50,7 +51,7 @@ void csProgressPulse::Step()
 {
   char const* prefix = (drawn ? "\b" : "");
   drawn = true;
-  sys->Printf(type, "%s%c", prefix, ANIMATION[state]);
+  console->PutText("%s%c", prefix, ANIMATION[state]);
   if (++state >= ANIMATION_COUNT)
     state = 0;
 }

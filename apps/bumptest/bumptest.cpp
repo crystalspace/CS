@@ -36,6 +36,7 @@
 #include "ivideo/natwin.h"
 #include "ivideo/txtmgr.h"
 #include "ivaria/conout.h"
+#include "ivaria/reporter.h"
 #include "imesh/object.h"
 #include "imesh/cube.h"
 #include "imesh/ball.h"
@@ -91,9 +92,24 @@ BumpTest::~BumpTest ()
   if (myG3D) myG3D->DecRef ();
 }
 
+void BumpTest::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.application.bumptest", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 void Cleanup ()
 {
-  System->ConsoleOut ("Cleaning up...\n");
+  csPrintf ("Cleaning up...\n");
   delete System;
 }
 
@@ -325,21 +341,21 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
     abort ();
   }
 
   LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!LevelLoader)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
     abort ();
   }
 
   myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
     abort ();
   }
 
@@ -348,7 +364,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   if (nw) nw->SetTitle ("Bumptest Crystal Space Application");
   if (!Open ())
   {
-    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
     Cleanup ();
     exit (1);
   }
@@ -370,15 +386,15 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   txtmgr->SetPalette ();
 
   // Some commercials...
-  Printf (CS_MSG_INITIALIZATION,
-    "BumpTest Crystal Space Application version 0.1.\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+    "BumpTest Crystal Space Application version 0.1.");
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
   engine->SetLightingCacheMode (0);
 
   // Create our world.
-  Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
   LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
   LevelLoader->LoadTexture ("wood", "/lib/std/andrew_wood.gif");
@@ -470,7 +486,7 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   dynlight->Setup ();
   bumplight = dynlight->QueryLight ();
 
-  Printf (CS_MSG_INITIALIZATION, "--------------------------------------\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------");
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by
@@ -585,7 +601,7 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!System->Initialize (argc, argv, "/config/csbumptest.cfg"))
   {
-    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
+    System->Report (CS_REPORTER_SEVERITY_NOTIFY, "Error initializing system!");
     Cleanup ();
     exit (1);
   }

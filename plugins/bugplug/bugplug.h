@@ -143,6 +143,8 @@ private:
   void Dump (int indent, const csBox2& b);
   void Dump (int indent, const csBox3& b);
 
+  void Report (int severity, const char* msg, ...);
+
   /// Toggle a G3D boolean option.
   void ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name);
 

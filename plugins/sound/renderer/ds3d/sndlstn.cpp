@@ -21,6 +21,8 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "isys/system.h"
+#include "ivaria/reporter.h"
+#include "iutil/objreg.h"
 
 #include "dsound.h"
 
@@ -58,18 +60,26 @@ bool csSoundListenerDS3D::Initialize(csSoundRenderDS3D *srdr) {
   dsbd.dwBufferBytes = 0;
   dsbd.lpwfxFormat = NULL;
 
+  iReporter* reporter = CS_QUERY_REGISTRY (Render->System->GetObjectRegistry (),
+  	iReporter);
+
   HRESULT r;
   r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &PrimaryBuffer, NULL);
   if (r != DS_OK) {
-    Renderer->System->Printf(CS_MSG_INITIALIZATION, "DS3D listener: "
-      "Cannot create primary sound buffer (%s).\n", Renderer->GetError(r));
+    if (reporter)
+      reporter->Report (CS_REPORTER_SEVERITY_WARNING,
+      	"crystalspace.sound.ds3d", "DS3D listener: "
+        "Cannot create primary sound buffer (%s).", Renderer->GetError(r));
     return false;
   }
 	
   r = PrimaryBuffer->QueryInterface(IID_IDirectSound3DListener, (void **) &Listener);
   if (r != DS_OK) {
-    Renderer->System->Printf(CS_MSG_INITIALIZATION, "DS3D listener: Cannot query listener"
-      " interface from primary sound buffer (%s).\n", Renderer->GetError(r));
+    if (reporter)
+      reporter->Report (CS_REPORTER_SEVERITY_WARNING,
+      	"crystalspace.sound.ds3d",
+        "DS3D listener: Cannot query listener"
+        " interface from primary sound buffer (%s).", Renderer->GetError(r));
     return false;
   }
 

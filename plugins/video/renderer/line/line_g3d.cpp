@@ -29,14 +29,13 @@
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include "isys/system.h"
 #include "isys/plugin.h"
 #include "isys/event.h"
 #include "ivideo/graph2d.h"
 #include "imesh/thing/polygon.h"	//@@@
 #include "imesh/thing/lightmap.h"	//@@@
-
-#define SysPrintf System->Printf
 
 CS_IMPLEMENT_PLUGIN
 
@@ -156,7 +155,9 @@ bool csGraphics3DLine::Open ()
 
   if (!G2D->Open ())
   {
-    SysPrintf (CS_MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
+    csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.graphics3d.line",
+	"Error opening Graphics2D context.");
     // set "not opened" flag
     width = height = -1;
 
@@ -187,7 +188,9 @@ bool csGraphics3DLine::Open ()
 
   SetDimensions (nWidth, nHeight);
 
-  SysPrintf (CS_MSG_INITIALIZATION, "Using %s mode %dx%d.\n",
+  csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_NOTIFY,
+	"crystalspace.graphics3d.line",
+  	"Using %s mode %dx%d.",
             bFullScreen ? "full screen" : "windowed", width, height);
 
   z_buf_mode = CS_ZBUF_NONE;

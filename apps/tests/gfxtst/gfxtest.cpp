@@ -28,6 +28,7 @@
 #include "csutil/cfgfile.h"
 #include "iutil/databuff.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include "isys/plugin.h"
 #include "igraphic/imageio.h"
 
@@ -427,7 +428,9 @@ int main (int argc, char *argv[])
   sys.RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
   if (!sys.Initialize (argc, argv, NULL))
   {
-    sys.Printf (CS_MSG_FATAL_ERROR, "Error initializing system !");
+    csReport (sys.GetObjectRegistry (), CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.graphics3d.gfxtest",
+	"Error initializing system !");
     return -1;
   }
 

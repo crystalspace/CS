@@ -57,6 +57,21 @@ csFreeTypeServer::~csFreeTypeServer ()
   if (VFS) VFS->DecRef ();
 }
 
+void csFreeTypeServer::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.font.freefont", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 bool csFreeTypeServer::Initialize (iSystem *Sys)
 {
   System = Sys;
@@ -65,8 +80,8 @@ bool csFreeTypeServer::Initialize (iSystem *Sys)
 
   if (TT_Init_FreeType (&engine))
   {
-    System->Printf (CS_MSG_FATAL_ERROR,
-      "Could not create a TrueType engine instance !\n");
+    Report (CS_REPORTER_SEVERITY_ERROR,
+      "Could not create a TrueType engine instance !");
     return false;
   }
 
@@ -237,24 +252,24 @@ bool csFreeTypeFont::Load (csFreeTypeServer *server)
 {
   if (TT_Open_Face (server->engine, name, &face))
   {
-    server->System->Printf (CS_MSG_WARNING,
-      "Font file %s could not be loaded!\n", name);
+    server->Report (CS_REPORTER_SEVERITY_WARNING,
+      "Font file %s could not be loaded!", name);
     return false;
   }
 
   int error;
   if ((error = TT_Get_Face_Properties (face, &prop)))
   {
-    server->System->Printf(CS_MSG_WARNING,
-      "Get_Face_Properties: error %d.\n", error);
+    server->Report (CS_REPORTER_SEVERITY_WARNING,
+      "Get_Face_Properties: error %d.", error);
     return false;
   }
 
   if ((error = TT_New_Instance (face, &instance)))
   {
-    server->System->Printf(CS_MSG_WARNING,
+    server->Report (CS_REPORTER_SEVERITY_WARNING,
       "Could not create an instance of Font %s."
-      " The font is probably broken!\n", name);
+      " The font is probably broken!", name);
     return false;
   }
 
@@ -267,8 +282,8 @@ bool csFreeTypeFont::Load (csFreeTypeServer *server)
   while (i < prop.num_CharMaps)
   {
     if ((error = TT_Get_CharMap_ID (face, i, &pID, &eID)))
-      server->System->Printf(CS_MSG_WARNING,
-        "Get_CharMap_ID: error %d.\n",error);
+      server->Report (CS_REPORTER_SEVERITY_WARNING,
+        "Get_CharMap_ID: error %d.",error);
     if (server->platformID == pID && server->encodingID == eID)
       break;
     i++;
@@ -277,25 +292,26 @@ bool csFreeTypeFont::Load (csFreeTypeServer *server)
   if (server->platformID != pID || server->encodingID != eID)
   {
     // encoding scheme not found
-    server->System->Printf(CS_MSG_INITIALIZATION,
-      "Font %s does not contain encoding %d for platform %d.\n",
+    server->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "Font %s does not contain encoding %d for platform %d.",
       name, server->encodingID, server->platformID);
 
     if ((error = TT_Get_CharMap_ID (face, 0, &pID, &eID)))
     {
-      server->System->Printf(CS_MSG_WARNING,
-        "Get_CahrMap_ID: error %d.\n",error);
+      server->Report (CS_REPORTER_SEVERITY_WARNING,
+        "Get_CahrMap_ID: error %d.",error);
       return false;
     }
-    server->System->Printf (CS_MSG_INITIALIZATION,
-      "Will instead use encoding %d for platform %d.\n", eID, pID);
+    server->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "Will instead use encoding %d for platform %d.", eID, pID);
     i = 0;
   }
 
   // ok. now lets retrieve a handle the the charmap
   if ((error = TT_Get_CharMap (face, i, &charMap)))
   {
-    server->System->Printf (CS_MSG_WARNING, "Get_CharMap: error %d.\n", error);
+    server->Report (CS_REPORTER_SEVERITY_WARNING,
+    	"Get_CharMap: error %d.", error);
     return false;
   }
 	

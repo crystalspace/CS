@@ -107,6 +107,8 @@ public:
   virtual bool Open ();
   virtual void Close ();
 
+  void Report (int severity, const char* msg, ...);
+
   virtual bool BeginDraw () { return (Memory != NULL); }
 
   virtual void Print (csRect *area = NULL);

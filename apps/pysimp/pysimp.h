@@ -48,6 +48,8 @@ public:
     const char *iConfigName);
   virtual void NextFrame ();
   virtual bool HandleEvent (iEvent &Event);
+
+  void Report (int severity, const char* msg, ...);
 };
 
 #endif // __CS_PYSIMP_H__

@@ -45,7 +45,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (VALUE)
 CS_TOKEN_DEF_END
 
-struct HeightMapData : public iGenerateImageFunction
+struct PrsHeightMapData : public iGenerateImageFunction
 {
   iImage* im;
   int iw, ih;	// Image width and height.
@@ -55,11 +55,11 @@ struct HeightMapData : public iGenerateImageFunction
   bool slope;
   SCF_DECLARE_IBASE;
 
-  HeightMapData (bool s) : im (NULL), slope (s)
+  PrsHeightMapData (bool s) : im (NULL), slope (s)
   {
     SCF_CONSTRUCT_IBASE (NULL);
   }
-  virtual ~HeightMapData ()
+  virtual ~PrsHeightMapData ()
   {
     if (im) im->DecRef ();
   }
@@ -68,11 +68,11 @@ struct HeightMapData : public iGenerateImageFunction
   virtual float GetValue (float dx, float dy);
 };
 
-SCF_IMPLEMENT_IBASE (HeightMapData)
+SCF_IMPLEMENT_IBASE (PrsHeightMapData)
   SCF_IMPLEMENTS_INTERFACE (iGenerateImageFunction)
 SCF_IMPLEMENT_IBASE_END
 
-float HeightMapData::GetSlope (float x, float y)
+float PrsHeightMapData::GetSlope (float x, float y)
 {
   float div = 0.02;
   float mx = x-.01; if (mx < 0) { mx = x; div = .01; }
@@ -90,7 +90,7 @@ float HeightMapData::GetSlope (float x, float y)
   return (fabs(dhdx)+fabs(dhdy))/2.;
 }
 
-float HeightMapData::GetHeight (float x, float y)
+float PrsHeightMapData::GetHeight (float x, float y)
 {
   float dw = fmod (x*(w-1), 1.0f);
   float dh = fmod (y*(h-1), 1.0f);
@@ -118,7 +118,7 @@ float HeightMapData::GetHeight (float x, float y)
   return col * hscale + hshift;
 }
 
-float HeightMapData::GetValue (float x, float y)
+float PrsHeightMapData::GetValue (float x, float y)
 {
   if (slope) return GetSlope (x, y);
   else return GetHeight (x, y);
@@ -158,7 +158,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (char* buf)
           csScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
 	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
 	  if (!img) return NULL;
-	  HeightMapData* data = new HeightMapData (false);
+	  PrsHeightMapData* data = new PrsHeightMapData (false);
   	  data->im = img;
   	  data->iw = img->GetWidth ();
   	  data->ih = img->GetHeight ();
@@ -180,7 +180,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (char* buf)
           csScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
 	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
 	  if (!img) return NULL;
-	  HeightMapData* data = new HeightMapData (true);
+	  PrsHeightMapData* data = new PrsHeightMapData (true);
   	  data->im = img;
   	  data->iw = img->GetWidth ();
   	  data->ih = img->GetHeight ();

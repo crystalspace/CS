@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -42,6 +42,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "iengine/motion.h"
+#include "ivaria/reporter.h"
 
 // This is the default fatal exit function. The user can replace
 // it by some other function that lonjumps somewhere, for example.
@@ -55,6 +56,23 @@ void default_fatal_exit (int errorcode, bool canreturn)
 }
 
 void (*fatal_exit) (int errorcode, bool canreturn) = default_fatal_exit;
+
+void csSystemDriver::ReportSys (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY ((&scfiObjectRegistry), iReporter);
+  if (rep)
+  {
+    rep->ReportV (severity, "crystalspace.system", msg, arg);
+  }
+  else
+  {
+    vprintf (msg, arg);
+    printf ("\n");
+  }
+  va_end (arg);
+}
 
 //------------------------------------------------------- csPlugin class -----//
 
@@ -166,7 +184,8 @@ bool csPluginList::Sort (csSystemDriver *iSys)
   // We'll use char for speed reasons
   if (len > 255)
   {
-    iSys->Printf (CS_MSG_FATAL_ERROR, "PLUGIN LOADER: Too many plugins requested (%d, max 255)\n", len);
+    iSys->ReportSys (CS_REPORTER_SEVERITY_ERROR,
+    	"PLUGIN LOADER: Too many plugins requested (%d, max 255)\n", len);
     return false;
   }
 
@@ -245,10 +264,11 @@ bool csPluginList::RecurseSort (csSystemDriver *iSys, int row, char *order,
       char *already = strchr (loop, col + 1);
       if (already)
       {
-        iSys->Printf (CS_MSG_FATAL_ERROR, "PLUGIN LOADER: Cyclic dependency detected!\n");
+        iSys->ReportSys (CS_REPORTER_SEVERITY_ERROR,
+		"PLUGIN LOADER: Cyclic dependency detected!\n");
         int startx = int (already - loop);
         for (int x = startx; loop [x]; x++)
-          iSys->Printf (CS_MSG_FATAL_ERROR, "   %s %s\n",
+          iSys->ReportSys (CS_REPORTER_SEVERITY_ERROR, "   %s %s\n",
             x == startx ? "+->" : loop [x + 1] ? "| |" : "<-+",
             Get (loop [x] - 1).ClassID);
         error = true;
@@ -303,7 +323,6 @@ csSystemDriver::csSystemDriver () : Plugins (8, 8), EventQueue (),
   EventOutlets.Push (new csEventOutlet (NULL, this));
 
   VFS = NULL;
-  Console = NULL;
 
   debug_level = 0;
   Shutdown = false;
@@ -314,33 +333,6 @@ csSystemDriver::csSystemDriver () : Plugins (8, 8), EventQueue (),
   scfiObjectRegistry.Register (cmdline, "CommandLine");
   //@@@ cmdline->DecRef (); Uncomment when object registry moves out
   // of system driver.
-}
-
-csSystemDriver::~csSystemDriver ()
-{
-  Close ();
-
-  Printf (CS_MSG_DEBUG_0F, "*** System driver is going to shut down now!\n");
-
-  // Free all plugin options (also decrefs their iConfig interfaces)
-  OptionList.DeleteAll ();
-
-  // Deregister all known drivers and plugins
-  if (Console) Console->DecRef ();
-  if (VFS) VFS->DecRef ();
-
-  // Free all plugins
-  Plugins.DeleteAll ();
-  // Free the system event outlet
-  EventOutlets.DeleteAll ();
-
-  iSCF::SCF->Finish ();
-}
-
-bool csSystemDriver::Initialize (int argc, const char* const argv[],
-  const char *iConfigName)
-{
-  Printf (CS_MSG_DEBUG_0F, "*** Initializing system driver!\n");
 
   // Initialize Shared Class Facility|
   char scfconfigpath [MAXPATHLEN + 1];
@@ -361,7 +353,32 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   strcat (scfconfigpath, "scf.cfg");
   csConfigFile scfconfig (scfconfigpath);
   scfInitialize (&scfconfig);
+}
 
+csSystemDriver::~csSystemDriver ()
+{
+  Close ();
+
+  ReportSys (CS_REPORTER_SEVERITY_DEBUG,
+  	"*** System driver is going to shut down now!\n");
+
+  // Free all plugin options (also decrefs their iConfig interfaces)
+  OptionList.DeleteAll ();
+
+  // Deregister all known drivers and plugins
+  if (VFS) VFS->DecRef ();
+
+  // Free all plugins
+  Plugins.DeleteAll ();
+  // Free the system event outlet
+  EventOutlets.DeleteAll ();
+
+  iSCF::SCF->Finish ();
+}
+
+bool csSystemDriver::Initialize (int argc, const char* const argv[],
+  const char *iConfigName)
+{
   // @@@ This is ugly.  We need a better, more generalized way of doing this.
   // Hard-coding the name of the VFS plugin (crytalspace.kernel.vfs) is bad.
   // Then later ensuring that we skip over this same plugin when requested
@@ -375,6 +392,8 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   // can be loaded. At the end, we make the user-and-application-specific
   // config file the dynamic one.
 
+  ReportSys (CS_REPORTER_SEVERITY_DEBUG, "*** Initializing system driver!\n");
+
   iConfigFile *cfg = new csConfigFile();
   iConfigManager* Config = new csConfigManager(cfg, true);
   scfiObjectRegistry.Register (Config, "ConfigManager");
@@ -386,7 +405,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   // Initialize application configuration file
   if (iConfigName)
     if (!cfg->Load (iConfigName, VFS))
-      Printf (CS_MSG_WARNING,
+      ReportSys (CS_REPORTER_SEVERITY_WARNING,
 	"WARNING: Failed to load configuration file `%s'\n", iConfigName);
 
   // look if the user-specific config domain should be used
@@ -428,7 +447,8 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
     // Alternate videodriver
     char temp [100];
     sprintf (temp, "crystalspace.graphics3d.%s", val);
-    Printf (CS_MSG_INITIALIZATION, "Using alternative 3D driver: %s\n", temp);
+    ReportSys (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Using alternative 3D driver: %s\n", temp);
     PluginList.Push (new csPluginLoadRec (CS_FUNCID_VIDEO, temp));
     g3d_override = true;
   }
@@ -496,7 +516,6 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   /// Now find the drivers that are known by the system driver
   if (!VFS)
     VFS = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_VFS, iVFS);
-  Console = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsoleOutput);
 
   // flush all removed config files
   Config->FlushRemoved();
@@ -505,10 +524,10 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
 
 bool csSystemDriver::Open ()
 {
-  Printf (CS_MSG_DEBUG_0F, "*** Opening the drivers now!\n");
+  ReportSys (CS_REPORTER_SEVERITY_DEBUG, "*** Opening the drivers now!\n");
 
   // Now pass the open event to all plugins
-  csEvent Event (GetTime (), csevBroadcast, cscmdSystemOpen);
+  csEvent Event (csGetClicks (), csevBroadcast, cscmdSystemOpen);
   HandleEvent (Event);
 
   return true;
@@ -516,10 +535,10 @@ bool csSystemDriver::Open ()
 
 void csSystemDriver::Close ()
 {
-  Printf (CS_MSG_DEBUG_0F, "*** Closing the drivers now!\n");
+  ReportSys (CS_REPORTER_SEVERITY_DEBUG, "*** Closing the drivers now!\n");
 
   // Warn all plugins the system is going down
-  csEvent Event (GetTime (), csevBroadcast, cscmdSystemClose);
+  csEvent Event (csGetClicks (), csevBroadcast, cscmdSystemClose);
   HandleEvent (Event);
 }
 
@@ -528,7 +547,7 @@ void csSystemDriver::NextFrame ()
   int i;
 
   // Update elapsed time first
-  csTime cur_time = Time ();
+  csTime cur_time = csGetClicks ();
   ElapsedTime = (CurrentTime == csTime (-1)) ? 0 : cur_time - CurrentTime;
   CurrentTime = cur_time;
 
@@ -538,7 +557,7 @@ void csSystemDriver::NextFrame ()
     csPlugin *plugin = Plugins.Get (i);
     if (plugin->EventMask & CSMASK_Nothing)
     {
-      csEvent Event (Time (), csevBroadcast, cscmdPreProcess);
+      csEvent Event (csGetClicks (), csevBroadcast, cscmdPreProcess);
       plugin->Plugin->HandleEvent (Event);
     }
   }
@@ -556,7 +575,7 @@ void csSystemDriver::NextFrame ()
     csPlugin *plugin = Plugins.Get (i);
     if (plugin->EventMask & CSMASK_Nothing)
     {
-      csEvent Event (Time (), csevBroadcast, cscmdPostProcess);
+      csEvent Event (csGetClicks (), csevBroadcast, cscmdPostProcess);
       plugin->Plugin->HandleEvent (Event);
     }
   }
@@ -665,20 +684,23 @@ void csSystemDriver::Help (iConfig* Config)
 		? def.GetString () : "none");
 	break;
     }
-    Printf (CS_MSG_STDOUT, "%-21s%s\n", opt, desc);
+    //@@@????
+    printf ("%-21s%s\n", opt, desc);
+    //ReportSys (CS_MSG_STDOUT, "%-21s%s\n", opt, desc);
   }
 }
 
 void csSystemDriver::Help ()
 {
-  csEvent HelpEvent (Time (), csevBroadcast, cscmdCommandLineHelp);
+  csEvent HelpEvent (csGetClicks (), csevBroadcast, cscmdCommandLineHelp);
   for (int i = 0; i < Plugins.Length (); i++)
   {
     csPlugin *plugin = Plugins.Get (i);
     iConfig *Config = SCF_QUERY_INTERFACE (plugin->Plugin, iConfig);
     if (Config)
     {
-      Printf (CS_MSG_STDOUT, "Options for %s:\n",
+      //@@@???
+      printf ("Options for %s:\n",
         iSCF::SCF->GetClassDescription (plugin->ClassID));
       Help (Config);
       Config->DecRef ();
@@ -686,37 +708,13 @@ void csSystemDriver::Help ()
     plugin->Plugin->HandleEvent (HelpEvent);
   }
 
-  Printf (CS_MSG_STDOUT, "General options:\n");
-  Printf (CS_MSG_STDOUT, "  -help              this help\n");
-  Printf (CS_MSG_STDOUT, "  -video=<s>         the 3D rendering driver (opengl, software, ...)\n");
-  Printf (CS_MSG_STDOUT, "  -canvas=<s>        the 2D canvas driver (asciiart, x2d, ...)\n");
-  Printf (CS_MSG_STDOUT, "  -plugin=<s>        load the plugin after all others\n");
-  Printf (CS_MSG_STDOUT, "  -debug=<n>         set debug level (default=%d)\n", debug_level);
-}
-
-void csSystemDriver::Alert (const char* msg)
-{
-  ConsoleOut (msg);
-  DebugTextOut (true, msg);
-}
-
-void csSystemDriver::Warn (const char* msg)
-{
-  ConsoleOut (msg);
-  DebugTextOut (true, msg);
-}
-
-void csSystemDriver::DebugTextOut (bool flush, const char *str)
-{
-  static FILE *f = NULL;
-  if (!f)
-    f = fopen ("debug.txt", "a+");
-  if (f)
-  {
-    fputs (str, f);
-    if (flush)
-      fflush (f);
-  }
+  //@@@???
+  printf ("General options:\n");
+  printf ("  -help              this help\n");
+  printf ("  -video=<s>         the 3D rendering driver (opengl, software, ...)\n");
+  printf ("  -canvas=<s>        the 2D canvas driver (asciiart, x2d, ...)\n");
+  printf ("  -plugin=<s>        load the plugin after all others\n");
+  printf ("  -debug=<n>         set debug level (default=%d)\n", debug_level);
 }
 
 void csSystemDriver::QueryOptions (iPlugin *iObject)
@@ -794,7 +792,7 @@ void csSystemDriver::RequestPlugin (const char *iPluginName)
 
 csTime csSystemDriver::GetTime ()
 {
-  return Time ();
+  return csGetClicks ();
 }
 
 bool csSystemDriver::GetInstallPath (char *oInstallPath, size_t iBufferSize)
@@ -816,84 +814,13 @@ bool csSystemDriver::PerformExtension (char const* command, ...)
   return rc;
 }
 
-void csSystemDriver::PrintfV (int mode, char const* format, va_list args)
-{
-  char buf[1024];
-  vsprintf (buf, format, args);
-
-  switch (mode)
-  {
-    case CS_MSG_INTERNAL_ERROR:
-    case CS_MSG_FATAL_ERROR:
-      Alert (buf);
-      break;
-
-    case CS_MSG_WARNING:
-      Warn (buf);
-      break;
-
-    case CS_MSG_INITIALIZATION:
-      ConsoleOut (buf);
-      DebugTextOut (true, buf);
-      if (Console)
-        Console->PutText (CS_MSG_INITIALIZATION, buf);
-      break;
-
-    case CS_MSG_CONSOLE:
-      if (Console)
-        Console->PutText (CS_MSG_CONSOLE, buf);
-      else
-        ConsoleOut (buf);
-      break;
-
-    case CS_MSG_STDOUT:
-      ConsoleOut (buf);
-      break;
-
-    case CS_MSG_DEBUG_0:
-      DebugTextOut (false, buf);
-      break;
-
-    case CS_MSG_DEBUG_1:
-      if (debug_level >= 1)
-        DebugTextOut (false, buf);
-      break;
-
-    case CS_MSG_DEBUG_2:
-      if (debug_level >= 2)
-        DebugTextOut (false, buf);
-      break;
-
-    case CS_MSG_DEBUG_0F:
-      DebugTextOut (true, buf);
-      break;
-
-    case CS_MSG_DEBUG_1F:
-      if (debug_level >= 1)
-        DebugTextOut (true, buf);
-      break;
-
-    case CS_MSG_DEBUG_2F:
-      if (debug_level >= 2)
-        DebugTextOut (true, buf);
-      break;
-  } /* endswitch */
-}
-
-void csSystemDriver::Printf (int mode, char const* format, ...)
-{
-  va_list args;
-  va_start (args, format);
-  PrintfV(mode, format, args);
-  va_end (args);
-}
-
 iBase *csSystemDriver::LoadPlugin (const char *iClassID, const char *iFuncID,
   const char *iInterface, int iVersion)
 {
   iPlugin *p = SCF_CREATE_INSTANCE (iClassID, iPlugin);
   if (!p)
-    Printf (CS_MSG_WARNING, "WARNING: could not load plugin `%s'\n", iClassID);
+    ReportSys (CS_REPORTER_SEVERITY_WARNING,
+    	"WARNING: could not load plugin `%s'\n", iClassID);
   else
   {
     int index = Plugins.Push (new csPlugin (p, iClassID, iFuncID));
@@ -911,7 +838,8 @@ iBase *csSystemDriver::LoadPlugin (const char *iClassID, const char *iFuncID,
         return ret;
       }
     }
-    Printf (CS_MSG_WARNING, "WARNING: failed to initialize plugin `%s'\n", iClassID);
+    ReportSys (CS_REPORTER_SEVERITY_WARNING,
+    	"WARNING: failed to initialize plugin `%s'\n", iClassID);
     Plugins.Delete (index);
   }
   return NULL;
@@ -929,7 +857,8 @@ bool csSystemDriver::RegisterPlugin (const char *iClassID,
   }
   else
   {
-    Printf (CS_MSG_WARNING, "WARNING: failed to initialize plugin `%s'\n", iClassID);
+    ReportSys (CS_REPORTER_SEVERITY_WARNING,
+    	"WARNING: failed to initialize plugin `%s'\n", iClassID);
     Plugins.Delete (index);
     return false;
   }
@@ -1014,7 +943,6 @@ bool csSystemDriver::UnloadPlugin (iPlugin *iObject)
   if (!strcmp (p->FuncID, Func)) { Var->DecRef (); Var = NULL; }
 
   CHECK (VFS, CS_FUNCID_VFS)
-  CHECK (Console, CS_FUNCID_CONSOLE)
 
 #undef CHECK
 

@@ -321,6 +321,8 @@ class csAVIFormat : public iStreamFormat
 
   virtual bool Initialize (iSystem *iSys);
 
+  void Report (int severity, const char* msg, ...);
+
   virtual void GetCaps (csStreamFormatCap &caps);
   virtual iStreamIterator* GetStreamIterator ();
   virtual void Select (iAudioStream *pAudio, iVideoStream *pVideo);

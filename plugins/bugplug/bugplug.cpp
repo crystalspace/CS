@@ -37,6 +37,7 @@
 #include "ivideo/txtmgr.h"
 #include "ivideo/fontserv.h"
 #include "ivaria/conout.h"
+#include "ivaria/reporter.h"
 #include "iutil/object.h"
 #include "imesh/object.h"
 #include "imesh/terrfunc.h"
@@ -64,7 +65,20 @@ SCF_IMPLEMENT_IBASE (csBugPlug)
   SCF_IMPLEMENTS_INTERFACE (iPlugin)
 SCF_IMPLEMENT_IBASE_END
 
-#define SysPrintf System->Printf
+void csBugPlug::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.bugplug", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
 
 csBugPlug::csBugPlug (iBase *iParent)
 {
@@ -168,7 +182,7 @@ void csBugPlug::SetupPlugin ()
 
   initialized = true;
 
-  System->Printf (CS_MSG_CONSOLE, "BugPlug loaded...\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug loaded...");
 
   do_clear = false;
 }
@@ -186,14 +200,14 @@ void csBugPlug::UnleashSpider (int cmd)
     }
     else
     {
-      System->Printf (CS_MSG_CONSOLE,
-	"Spider could not weave its web (No sectors)!\n");
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+	"Spider could not weave its web (No sectors)!");
     }
   }
   else
   {
-    System->Printf (CS_MSG_CONSOLE,
-      "Spider could not weave its web (No engine)!\n");
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "Spider could not weave its web (No engine)!");
   }
 }
 
@@ -204,7 +218,7 @@ void csBugPlug::HideSpider (iCamera* camera)
   if (camera)
   {
     char buf[80];
-    System->Printf (CS_MSG_CONSOLE, "Spider caught a camera!\n");
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Spider caught a camera!");
     switch (spider_command)
     {
       case DEBUGCMD_DUMPCAM:
@@ -245,12 +259,12 @@ void csBugPlug::ToggleG3DState (G3D_RENDERSTATEOPTION op, const char* name)
   v = !v;
   if (G3D->SetRenderState (op, v))
   {
-    System->Printf (CS_MSG_CONSOLE, "BugPlug %s %s.\n",
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug %s %s.",
 	v ? "enabled" : "disabled", name);
   }
   else
   {
-    System->Printf (CS_MSG_CONSOLE, "%s not supported for this renderer!\n",
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "%s not supported for this renderer!",
     	name);
   }
 }
@@ -295,11 +309,11 @@ void csBugPlug::MouseButton3 (iCamera* camera)
 
   vw = isect;
   v = camera->GetTransform ().Other2This (vw);
-  System->Printf (CS_MSG_CONSOLE,
-    "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f) poly:'%s'/%d\n",
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+    "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f) poly:'%s'/%d",
     v.x, v.y, v.z, vw.x, vw.y, vw.z, poly_name ? poly_name : "<none>", poly_id);
-  System->Printf (CS_MSG_DEBUG_0,
-    "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f) poly:'%s'/%d\n",
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+    "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f) poly:'%s'/%d",
     v.x, v.y, v.z, vw.x, vw.y, vw.z, poly_name ? poly_name : "<none>", poly_id);
 
   if (sel)
@@ -319,7 +333,7 @@ void csBugPlug::MouseButton3 (iCamera* camera)
       // as soon as the ref count reaches one.
       selected_mesh = mesh;
       const char* n = selected_mesh->QueryObject ()->GetName ();
-      System->Printf (CS_MSG_CONSOLE, "BugPlug found mesh '%s'!\n",
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug found mesh '%s'!",
       	n ? n : "<noname>");
       bool bbox, rad, bm;
       shadow->GetShowOptions (bbox, rad, bm);
@@ -433,11 +447,11 @@ bool csBugPlug::EatKey (iEvent& event)
       process_next_key = !process_next_key;
       if (process_next_key)
       {
-        System->Printf (CS_MSG_CONSOLE, "Press debug key...\n");
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Press debug key...");
       }
       else
       {
-        System->Printf (CS_MSG_CONSOLE, "Back to normal key processing.\n");
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Back to normal key processing.");
       }
       return true;
     }
@@ -446,7 +460,7 @@ bool csBugPlug::EatKey (iEvent& event)
       process_next_mouse = !process_next_mouse;
       if (process_next_mouse)
       {
-        System->Printf (CS_MSG_CONSOLE, "Click on screen...\n");
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Click on screen...");
       }
       return true;
     }
@@ -462,29 +476,29 @@ bool csBugPlug::EatKey (iEvent& event)
       case DEBUGCMD_UNKNOWN:
         return true;
       case DEBUGCMD_QUIT:
-        System->Printf (CS_MSG_CONSOLE, "Nah nah! I will NOT quit!\n");
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Nah nah! I will NOT quit!");
         break;
       case DEBUGCMD_STATUS:
-        System->Printf (CS_MSG_CONSOLE, "I'm running smoothly, thank you...\n");
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "I'm running smoothly, thank you...");
         break;
       case DEBUGCMD_HELP:
-        System->Printf (CS_MSG_CONSOLE, "Sorry, cannot help you yet.\n");
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Sorry, cannot help you yet.");
         break;
       case DEBUGCMD_DUMPENG:
         if (Engine)
 	{
-          System->Printf (CS_MSG_CONSOLE,
-		"Dumping entire engine contents to debug.txt.\n");
+          Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"Dumping entire engine contents to debug.txt.");
 	  Dump (Engine);
-	  System->Printf (CS_MSG_DEBUG_0F, "\n");
+	  Report (CS_REPORTER_SEVERITY_DEBUG, "");
 	}
         break;
       case DEBUGCMD_DUMPSEC:
-        System->Printf (CS_MSG_CONSOLE, "Not implemented yet.\n");
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Not implemented yet.");
         break;
       case DEBUGCMD_CLEAR:
         do_clear = !do_clear;
-        System->Printf (CS_MSG_CONSOLE, "BugPlug %s screen clearing.\n",
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug %s screen clearing.",
 	  	do_clear ? "enabled" : "disabled");
         break;
       case DEBUGCMD_EDGES:
@@ -520,8 +534,8 @@ bool csBugPlug::EatKey (iEvent& event)
         if (G3D)
 	{
 	  G3D->ClearCache ();
-          System->Printf (CS_MSG_CONSOLE,
-	    "BugPlug cleared the texture cache.\n");
+          Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    "BugPlug cleared the texture cache.");
 	}
         break;
       case DEBUGCMD_CACHEDUMP:
@@ -534,7 +548,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	  long v = G3D->GetRenderState (G3DRENDERSTATE_MIPMAPENABLE);
 	  v = (v+1)%5;
 	  G3D->SetRenderState (G3DRENDERSTATE_MIPMAPENABLE, v);
-	  System->Printf (CS_MSG_CONSOLE, "BugPlug set mipmap to '%s'\n",
+	  Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug set mipmap to '%s'",
 	  	choices[v]);
   	}
 	break;
@@ -545,7 +559,7 @@ bool csBugPlug::EatKey (iEvent& event)
 	  long v = G3D->GetRenderState (G3DRENDERSTATE_INTERPOLATIONSTEP);
 	  v = (v+1)%4;
 	  G3D->SetRenderState (G3DRENDERSTATE_INTERPOLATIONSTEP, v);
-	  System->Printf (CS_MSG_CONSOLE, "BugPlug set interpolation to '%s'\n",
+	  Report (CS_REPORTER_SEVERITY_NOTIFY, "BugPlug set interpolation to '%s'",
 	  	choices[v]);
 	}
 	break;
@@ -564,13 +578,13 @@ bool csBugPlug::EatKey (iEvent& event)
 	  state = !state;
 	  if (!G2D->DoubleBuffer (state))
 	  {
-	    System->Printf (CS_MSG_CONSOLE,
-	    	"Double buffer not supported in current video mode!\n");
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Double buffer not supported in current video mode!");
 	  }
 	  else
 	  {
-	    System->Printf (CS_MSG_CONSOLE,
-	    	"BugPlug %s double buffering.\n",
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug %s double buffering.",
 		state ? "enabled" : "disabled");
 	  }
 	}
@@ -601,20 +615,20 @@ bool csBugPlug::EatKey (iEvent& event)
 	  }
 	  if (enable_disable == -1)
 	  {
-	    System->Printf (CS_MSG_CONSOLE,
-	      "BugPlug found no terrains to work with!\n");
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	      "BugPlug found no terrains to work with!");
 	  }
 	  else
 	  {
-	    System->Printf (CS_MSG_CONSOLE,
-	      "BugPlug %s terrain visibility checking!\n",
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+	      "BugPlug %s terrain visibility checking!",
 	      enable_disable ? "enabled" : "disabled");
 	  }
 	}
 	else
 	{
-	  System->Printf (CS_MSG_CONSOLE,
-	    	"BugPlug has no engine to work on!\n");
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug has no engine to work on!");
 	}
         break;
       case DEBUGCMD_MESHBBOX:
@@ -622,8 +636,8 @@ bool csBugPlug::EatKey (iEvent& event)
 	  bool bbox, rad, bm;
 	  shadow->GetShowOptions (bbox, rad, bm);
           bbox = !bbox;
-	  System->Printf (CS_MSG_CONSOLE,
-	    	"BugPlug %s bounding box display.\n",
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug %s bounding box display.",
 		bbox ? "enabled" : "disabled");
 	  shadow->SetShowOptions (bbox, rad, bm);
 	  if ((bbox || rad || bm) && selected_mesh)
@@ -637,8 +651,8 @@ bool csBugPlug::EatKey (iEvent& event)
 	  bool bbox, rad, bm;
 	  shadow->GetShowOptions (bbox, rad, bm);
           rad = !rad;
-	  System->Printf (CS_MSG_CONSOLE,
-	    	"BugPlug %s bounding sphere display.\n",
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"BugPlug %s bounding sphere display.",
 		rad ? "enabled" : "disabled");
 	  shadow->SetShowOptions (bbox, rad, bm);
 	  if ((bbox || rad || bm) && selected_mesh)
@@ -680,7 +694,7 @@ bool csBugPlug::HandleStartFrame (iEvent& /*event*/)
       shadow->RemoveFromEngine (Engine);
       selected_mesh->DecRef ();
       selected_mesh = NULL;
-      System->Printf (CS_MSG_CONSOLE, "Selected mesh is deleted!");
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Selected mesh is deleted!");
     }
   }
   return false;
@@ -741,7 +755,7 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
       if (spider_timeout < 0)
       {
 	HideSpider (NULL);
-        System->Printf (CS_MSG_CONSOLE, "Spider could not catch a camera!\n");
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Spider could not catch a camera!");
       }
     }
   }
@@ -957,8 +971,8 @@ void csBugPlug::ReadKeyBindings (const char* filename)
       }
       else
       {
-        System->Printf (CS_MSG_WARNING,
-    	  "BugPlug hit a badly formed line in '%s'!\n", filename);
+        Report (CS_REPORTER_SEVERITY_WARNING,
+    	  "BugPlug hit a badly formed line in '%s'!", filename);
 	f->DecRef ();
         return;
       }
@@ -967,19 +981,19 @@ void csBugPlug::ReadKeyBindings (const char* filename)
   }
   else
   {
-    System->Printf (CS_MSG_WARNING,
-    	"BugPlug could not read '%s'!\n", filename);
+    Report (CS_REPORTER_SEVERITY_WARNING,
+    	"BugPlug could not read '%s'!", filename);
   }
 }
 
 void csBugPlug::Dump (iEngine* engine)
 {
-  System->Printf (CS_MSG_DEBUG_0, "===========================================\n");
+  Report (CS_REPORTER_SEVERITY_DEBUG, "===========================================");
   iSectorList* sectors = engine->GetSectors ();
   iMeshList* meshes = engine->GetMeshes ();
   iMeshFactoryList* factories = engine->GetMeshFactories ();
-  System->Printf (CS_MSG_DEBUG_0,
-    "%d sectors, %d mesh factories, %d mesh objects\n",
+  Report (CS_REPORTER_SEVERITY_DEBUG,
+    "%d sectors, %d mesh factories, %d mesh objects",
     sectors->GetSectorCount (),
     factories->GetMeshFactoryCount (),
     meshes->GetMeshCount ());
@@ -999,22 +1013,22 @@ void csBugPlug::Dump (iEngine* engine)
     iMeshWrapper* mesh = meshes->GetMesh (i);
     Dump (mesh);
   }
-  System->Printf (CS_MSG_DEBUG_0, "===========================================\n");
+  Report (CS_REPORTER_SEVERITY_DEBUG, "===========================================");
 }
 
 void csBugPlug::Dump (iSector* sector)
 {
   const char* sn = sector->QueryObject ()->GetName ();
-  System->Printf (CS_MSG_DEBUG_0, "    Sector '%s' (%08lx)\n",
+  Report (CS_REPORTER_SEVERITY_DEBUG, "    Sector '%s' (%08lx)",
   	sn ? sn : "?", sector);
-  System->Printf (CS_MSG_DEBUG_0, "    %d meshes, %d lights\n",
+  Report (CS_REPORTER_SEVERITY_DEBUG, "    %d meshes, %d lights",
   	sector->GetMeshCount (), sector->GetLightCount ());
   int i;
   for (i = 0 ; i < sector->GetMeshCount () ; i++)
   {
     iMeshWrapper* mesh = sector->GetMesh (i);
     const char* n = mesh->QueryObject ()->GetName ();
-    System->Printf (CS_MSG_DEBUG_0, "        Mesh '%s' (%08lx)\n",
+    Report (CS_REPORTER_SEVERITY_DEBUG, "        Mesh '%s' (%08lx)",
     	n ? n : "?", mesh);
   }
 }
@@ -1022,31 +1036,31 @@ void csBugPlug::Dump (iSector* sector)
 void csBugPlug::Dump (iMeshWrapper* mesh)
 {
   const char* mn = mesh->QueryObject ()->GetName ();
-  System->Printf (CS_MSG_DEBUG_0, "    Mesh wrapper '%s' (%08lx)\n",
+  Report (CS_REPORTER_SEVERITY_DEBUG, "    Mesh wrapper '%s' (%08lx)",
   	mn ? mn : "?", mesh);
   iMeshObject* obj = mesh->GetMeshObject ();
   if (!obj)
   {
-    System->Printf (CS_MSG_DEBUG_0, "        Mesh object missing!\n");
+    Report (CS_REPORTER_SEVERITY_DEBUG, "        Mesh object missing!");
   }
   else
   {
     iFactory* fact = SCF_QUERY_INTERFACE (obj, iFactory);
     if (fact)
     {
-      System->Printf (CS_MSG_DEBUG_0, "        Plugin '%s'\n",
+      Report (CS_REPORTER_SEVERITY_DEBUG, "        Plugin '%s'",
   	  fact->QueryDescription () ? fact->QueryDescription () : "NULL");
       fact->DecRef ();
     }
     csBox3 bbox;
     obj->GetObjectBoundingBox (bbox);
-    System->Printf (CS_MSG_DEBUG_0, "        Object bounding box:\n");
+    Report (CS_REPORTER_SEVERITY_DEBUG, "        Object bounding box:");
     Dump (8, bbox);
   }
   iMovable* movable = mesh->GetMovable ();
   if (!movable)
   {
-    System->Printf (CS_MSG_DEBUG_0, "        Mesh object missing!\n");
+    Report (CS_REPORTER_SEVERITY_DEBUG, "        Mesh object missing!");
   }
   else
   {
@@ -1059,7 +1073,7 @@ void csBugPlug::Dump (iMeshWrapper* mesh)
     {
       iSector* sec = movable->GetSector (i);
       const char* sn = sec->QueryObject ()->GetName ();
-      System->Printf (CS_MSG_DEBUG_0, "        In sector '%s'\n",
+      Report (CS_REPORTER_SEVERITY_DEBUG, "        In sector '%s'",
       	sn ? sn : "?");
     }
   }
@@ -1068,7 +1082,7 @@ void csBugPlug::Dump (iMeshWrapper* mesh)
 void csBugPlug::Dump (iMeshFactoryWrapper* meshfact)
 {
   const char* mn = meshfact->QueryObject ()->GetName ();
-  System->Printf (CS_MSG_DEBUG_0, "        Mesh factory wrapper '%s' (%08lx)\n",
+  Report (CS_REPORTER_SEVERITY_DEBUG, "        Mesh factory wrapper '%s' (%08lx)",
   	mn ? mn : "?", meshfact);
 }
 
@@ -1078,15 +1092,15 @@ void csBugPlug::Dump (int indent, const csMatrix3& m, char const* name)
   int i;
   for (i = 0 ; i < indent ; i++) ind[i] = ' ';
   ind[i] = 0;
-  System->Printf (CS_MSG_DEBUG_0, "%sMatrix '%s':\n", ind, name);
-  System->Printf (CS_MSG_DEBUG_0, "%s/\n", ind);
-  System->Printf (CS_MSG_DEBUG_0, "%s| %3.2f %3.2f %3.2f\n",
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%sMatrix '%s':", ind, name);
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%s/", ind);
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%s| %3.2f %3.2f %3.2f",
   	ind, m.m11, m.m12, m.m13);
-  System->Printf (CS_MSG_DEBUG_0, "%s| %3.2f %3.2f %3.2f\n",
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%s| %3.2f %3.2f %3.2f",
   	ind, m.m21, m.m22, m.m23);
-  System->Printf (CS_MSG_DEBUG_0, "%s| %3.2f %3.2f %3.2f\n",
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%s| %3.2f %3.2f %3.2f",
   	ind, m.m31, m.m32, m.m33);
-  System->Printf (CS_MSG_DEBUG_0, "%s\\\n", ind);
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%s\\", ind);
 }
 
 void csBugPlug::Dump (int indent, const csVector3& v, char const* name)
@@ -1095,8 +1109,8 @@ void csBugPlug::Dump (int indent, const csVector3& v, char const* name)
   int i;
   for (i = 0 ; i < indent ; i++) ind[i] = ' ';
   ind[i] = 0;
-  System->Printf (CS_MSG_DEBUG_0,
-  	"%sVector '%s': (%f,%f,%f)\n", ind, name, v.x, v.y, v.z);
+  Report (CS_REPORTER_SEVERITY_DEBUG,
+  	"%sVector '%s': (%f,%f,%f)", ind, name, v.x, v.y, v.z);
 }
 
 void csBugPlug::Dump (int indent, const csVector2& v, char const* name)
@@ -1105,7 +1119,7 @@ void csBugPlug::Dump (int indent, const csVector2& v, char const* name)
   int i;
   for (i = 0 ; i < indent ; i++) ind[i] = ' ';
   ind[i] = 0;
-  System->Printf (CS_MSG_DEBUG_0, "%sVector '%s': (%f,%f)\n",
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%sVector '%s': (%f,%f)",
   	ind, name, v.x, v.y);
 }
 
@@ -1115,7 +1129,7 @@ void csBugPlug::Dump (int indent, const csPlane3& p)
   int i;
   for (i = 0 ; i < indent ; i++) ind[i] = ' ';
   ind[i] = 0;
-  System->Printf (CS_MSG_DEBUG_0, "%sA=%2.2f B=%2.2f C=%2.2f D=%2.2f\n",
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%sA=%2.2f B=%2.2f C=%2.2f D=%2.2f",
             ind, p.norm.x, p.norm.y, p.norm.z, p.DD);
 }
 
@@ -1125,7 +1139,7 @@ void csBugPlug::Dump (int indent, const csBox2& b)
   int i;
   for (i = 0 ; i < indent ; i++) ind[i] = ' ';
   ind[i] = 0;
-  System->Printf (CS_MSG_DEBUG_0, "%s(%2.2f,%2.2f)-(%2.2f,%2.2f)\n", ind,
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%s(%2.2f,%2.2f)-(%2.2f,%2.2f)", ind,
   	b.MinX (), b.MinY (), b.MaxX (), b.MaxY ());
 }
 
@@ -1135,7 +1149,7 @@ void csBugPlug::Dump (int indent, const csBox3& b)
   int i;
   for (i = 0 ; i < indent ; i++) ind[i] = ' ';
   ind[i] = 0;
-  System->Printf (CS_MSG_DEBUG_0, "%s(%2.2f,%2.2f,%2.2f)-(%2.2f,%2.2f,%2.2f)\n",
+  Report (CS_REPORTER_SEVERITY_DEBUG, "%s(%2.2f,%2.2f,%2.2f)-(%2.2f,%2.2f,%2.2f)",
   	ind, b.MinX (), b.MinY (), b.MinZ (), b.MaxX (), b.MaxY (), b.MaxZ ());
 }
 
@@ -1145,13 +1159,13 @@ void csBugPlug::Dump (iCamera* c)
   if (!sn) sn = "?";
   csPlane3 far_plane;
   bool has_far_plane = c->GetFarPlane (far_plane);
-  System->Printf (CS_MSG_DEBUG_0,
-  	"Camera: %s (mirror=%d, fov=%d, fovangle=%g,\n",
+  Report (CS_REPORTER_SEVERITY_DEBUG,
+  	"Camera: %s (mirror=%d, fov=%d, fovangle=%g,",
   	sn, c->IsMirrored (), c->GetFOV (), c->GetFOVAngle ());
-  System->Printf (CS_MSG_DEBUG_0, "    shiftx=%g shifty=%g camnr=%d)\n",
+  Report (CS_REPORTER_SEVERITY_DEBUG, "    shiftx=%g shifty=%g camnr=%d)",
   	c->GetShiftX (), c->GetShiftY (), c->GetCameraNumber ());
   if (has_far_plane)
-    System->Printf (CS_MSG_DEBUG_0, "    far_plane=(%g,%g,%g,%g)\n",
+    Report (CS_REPORTER_SEVERITY_DEBUG, "    far_plane=(%g,%g,%g,%g)",
     	far_plane.A (), far_plane.B (), far_plane.C (), far_plane.D ());
   csReversibleTransform& trans = c->GetTransform ();
   Dump (4, trans.GetO2TTranslation (), "Camera vector");
@@ -1163,15 +1177,16 @@ void csBugPlug::Dump (iPolygon3D* poly)
   const char* poly_name = poly->QueryObject ()->GetName ();
   if (!poly_name) poly_name = "<noname>";
   unsigned long poly_id = poly->GetPolygonID ();
-  System->Printf (CS_MSG_DEBUG_0, "Polygon '%s' (id=%ld)\n",
+  Report (CS_REPORTER_SEVERITY_DEBUG, "Polygon '%s' (id=%ld)",
   	poly_name, poly_id);
   int nv = poly->GetVertexCount ();
   int i;
   int* idx = poly->GetVertexIndices ();
-  System->Printf (CS_MSG_DEBUG_0, "  Vertices: ");
+  char buf[256];
+  sprintf (buf, "  Vertices: ");
   for (i = 0 ; i < nv ; i++)
-    System->Printf (CS_MSG_DEBUG_0, "%d ", idx[i]);
-  System->Printf (CS_MSG_DEBUG_0, "\n");
+    sprintf (buf+strlen (buf), "%d ", idx[i]);
+  Report (CS_REPORTER_SEVERITY_DEBUG, buf);
 }
 
 bool csBugPlug::HandleEvent (iEvent& event)

@@ -196,7 +196,7 @@ bool csGraphics2DOpenGL::Initialize (iSystem *pSystem)
   		pfmt.complete ();
 	}
   
-	CsPrintf (CS_MSG_INITIALIZATION, "Using %d bits per pixel (%d color mode).\n", Depth, 1 << Depth);
+	printf ("Using %d bits per pixel (%d color mode).\n", Depth, 1 << Depth);
 
 	return true;
 }

@@ -361,7 +361,7 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
         {
 	  ReportError (
 	      "crystalspace.maploader.parse.material",
-	      "Cannot find texture '%s' for material `%s'\n", str, name);
+	      "Cannot find texture '%s' for material `%s'", str, name);
 	  return NULL;
         }
         break;
@@ -386,7 +386,7 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
 	  {
 	    ReportError (
 	      "crystalspace.maploader.parse.material",
-	      "Only four texture layers supported!\n");
+	      "Only four texture layers supported!");
 	    return NULL;
 	  }
 	  txt_layers[num_txt_layer] = NULL;

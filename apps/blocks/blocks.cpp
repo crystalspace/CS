@@ -65,6 +65,7 @@
 #include "imesh/lighting.h"
 #include "iutil/object.h"
 #include "imap/parser.h"
+#include "ivaria/reporter.h"
 
 #if defined(BLOCKS_NETWORKING)
 #include "inetwork/driver.h"
@@ -87,11 +88,26 @@ static long LastConnectTime = 0;
 // End networking stuff.
 //-----------------------------------------------------------------------------
 
+void Blocks::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.application.blocks", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 #define  QUERY_PLUG_ID(myPlug, funcid, iFace, errMsg) \
   myPlug = CS_QUERY_PLUGIN_ID (plugin_mgr, funcid, iFace); \
   if (!myPlug) \
   { \
-    Sys->Printf (CS_MSG_FATAL_ERROR, errMsg); \
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR, errMsg); \
     return -1; \
   }
 
@@ -99,7 +115,7 @@ static long LastConnectTime = 0;
   myPlug = CS_QUERY_PLUGIN (plugin_mgr, iFace); \
   if (!myPlug) \
   { \
-    Sys->Printf (CS_MSG_FATAL_ERROR, errMsg); \
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR, errMsg); \
     return -1; \
   }
 
@@ -107,7 +123,7 @@ static long LastConnectTime = 0;
   myPlug = CS_QUERY_PLUGIN_ID (plugin_mgr, funcid, iFace); \
   if (!myPlug) \
   { \
-    Sys->Printf (CS_MSG_INITIALIZATION, errMsg); \
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR, errMsg); \
   }
 
 Blocks* Sys = NULL;
@@ -1566,13 +1582,13 @@ void Blocks::freeze_shape ()
 
 void Blocks::dump_shape ()
 {
-  Printf (CS_MSG_DEBUG_0,"Dump shape:\n");
+  Report (CS_REPORTER_SEVERITY_DEBUG,"Dump shape:");
   for (int i = 0 ; i < num_cubes ; i++)
   {
     int x = (int)cube_info[i].dx;
     int y = (int)cube_info[i].dy;
     int z = (int)cube_info[i].dz;
-    Printf (CS_MSG_DEBUG_0, " %d: (%d,%d,%d) d=(%d,%d,%d)\n",
+    Report (CS_REPORTER_SEVERITY_DEBUG, " %d: (%d,%d,%d) d=(%d,%d,%d)",
     	i, player1->cube_x+x, player1->cube_y+y, player1->cube_z+z, x, y, z);
   }
 }
@@ -2529,10 +2545,10 @@ void Blocks::NextFrame ()
           Connection = Listener->Accept();
 	  // These slow down blocks too much.
 	  if (Connection != NULL)
-	    System->Printf(CS_MSG_INITIALIZATION, "Connection accepted\n");
+	    Report (CS_REPORTER_SEVERITY_NOTIFY, "Connection accepted");
 	  else
-	    System->Printf(CS_MSG_INITIALIZATION,
-			   "Awaiting connect (response %d)\n",
+	    Report (CS_REPORTER_SEVERITY_NOTIFY,
+			   "Awaiting connect (response %d)",
 			   Listener->GetLastError());
         }
       
@@ -2922,12 +2938,12 @@ void Blocks::ClientCheckConnection()
   {
     if (strcmp((char *)buff, "BYE") == 0)
     {
-      Sys->Printf(CS_MSG_INITIALIZATION, "Server disconnected.\n");
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Server disconnected.");
       TerminateConnection();
     }
     else
     {
-      //Sys->Printf(CS_MSG_INITIALIZATION, "Server responds: %s\n", buff);
+      //Report (CS_REPORTER_SEVERITY_NOTIFY, "Server responds: %s", buff);
       
       
       if(!player1_net->DecodeFromNetwork(buff,
@@ -2947,7 +2963,7 @@ void Blocks::ClientCheckConnection()
     const csNetworkDriverError err = Connection->GetLastError();
     if (err != CS_NET_ERR_NO_ERROR)
     {
-      Sys->Printf(CS_MSG_INITIALIZATION, "Receive error %d\n", err);
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Receive error %d", err);
       Connection->DecRef();
       Connection = NULL;
     }
@@ -2964,19 +2980,19 @@ void Blocks::ServerCheckConnection()
   {
     if (strcmp((char *)buff, "BYE") == 0)
     {
-      Sys->Printf(CS_MSG_INITIALIZATION, "Other blocks disconnected.\n");
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Other blocks disconnected.");
       TerminateConnection();
       InitNet();
     }
     else if (strcmp((char *)buff, "OK") == 0)
     {
-      Sys->Printf(CS_MSG_INITIALIZATION, "Received data: %s\n", buff);
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Received data: %s", buff);
       Connection->Send("OK", sizeof("OK"));
     }
     
     else
     {
-      Sys->Printf(CS_MSG_INITIALIZATION, "Other blocks responds: %s\n", buff);
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Other blocks responds: %s", buff);
       Connection->Send("You", sizeof("You"));
     }
   }
@@ -2985,7 +3001,7 @@ void Blocks::ServerCheckConnection()
     const csNetworkDriverError err = Connection->GetLastError();
     if (err != CS_NET_ERR_NO_ERROR)
     {
-      Sys->Printf(CS_MSG_INITIALIZATION, "Receive error %d\n", err);
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Receive error %d", err);
       Connection->DecRef();
       Connection = NULL;
     }
@@ -3020,9 +3036,9 @@ bool Blocks::InitNet()
     if (!myNetDrv) return false;
     Listener = myNetDrv->NewListener (source, true, false, false);
     if (Listener != NULL)
-      Sys->Printf (CS_MSG_INITIALIZATION, "Listening on port %s\n", source);
+      Report  (CS_REPORTER_SEVERITY_NOTIFY, "Listening on port %s", source);
     else
-      Sys->Printf (CS_MSG_INITIALIZATION,"Error creating network listener (%d)\n",
+      Report  (CS_REPORTER_SEVERITY_NOTIFY,"Error creating network listener (%d)",
         myNetDrv->GetLastError ());
 
     return (Listener != NULL);
@@ -3040,13 +3056,13 @@ void Blocks::Connect ()
   const char target[] = "localhost:2222";
   Connection = NULL;
   if (!myNetDrv) return;
-  Sys->Printf(CS_MSG_INITIALIZATION, "Attempting connection to %s...", target);
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Attempting connection to %s...", target);
   Connection = myNetDrv->NewConnection(target, true, false);
   if (Connection == NULL)
-    Sys->Printf (CS_MSG_INITIALIZATION,"Error %d\n", myNetDrv->GetLastError());
+    Report  (CS_REPORTER_SEVERITY_NOTIFY,"Error %d", myNetDrv->GetLastError());
   else
-    Sys->Printf(CS_MSG_INITIALIZATION, "OK\nPress a key [A-Z] to send a"
-      "message to the server.\n");
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "OK\nPress a key [A-Z] to send a"
+      "message to the server.");
 }
 
 void Blocks::TerminateConnection()
@@ -3069,8 +3085,7 @@ void Blocks::TerminateConnection()
 
 void Cleanup ()
 {
-  if (Sys)
-    Sys->ConsoleOut ("Cleaning up...\n");
+  csPrintf ("Cleaning up...\n");
   delete Sys;
   Sys = NULL;
 }
@@ -3085,7 +3100,7 @@ int main (int argc, char* argv[])
 
   if (!Sys->Initialize (argc, argv, "/config/blocks.cfg"))
   {
-    Sys->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
+    Sys->Report  (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     Cleanup ();
     fatal_exit (0, false);
   }
@@ -3095,12 +3110,15 @@ int main (int argc, char* argv[])
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iConfigManager* config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
 
+  QUERY_PLUG_ID (Sys->myG3D, CS_FUNCID_VIDEO, iGraphics3D, "No iGraphics3D plugin!");
+  QUERY_PLUG (Sys->myG2D, iGraphics2D, "No iGraphics2D plugin!");
+
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = Gfx2D->GetNativeWindow ();
   if (nw) nw->SetTitle ("3D Blocks");
   if (!Sys->Open ())
   {
-    Sys->Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
     Cleanup ();
     fatal_exit (0, false);
   }
@@ -3113,10 +3131,8 @@ int main (int argc, char* argv[])
 
   Sys->thing_type = Sys->engine->GetThingType ();
 
-  QUERY_PLUG_ID (Sys->myG3D, CS_FUNCID_VIDEO, iGraphics3D, "No iGraphics3D plugin!\n");
-  QUERY_PLUG (Sys->myG2D, iGraphics2D, "No iGraphics2D plugin!\n");
-  QUERY_PLUG_ID (Sys->myVFS, CS_FUNCID_VFS, iVFS, "No iVFS plugin!\n");
-  QUERY_PLUG_NM (Sys->myNetDrv, CS_FUNCID_NETDRV, iNetworkDriver, "No iNetworkDriver plugin!\n");
+  QUERY_PLUG_ID (Sys->myVFS, CS_FUNCID_VFS, iVFS, "No iVFS plugin!");
+  QUERY_PLUG_NM (Sys->myNetDrv, CS_FUNCID_NETDRV, iNetworkDriver, "No iNetworkDriver plugin!");
 
   // Get a font handle
   Sys->font = Gfx2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
@@ -3126,7 +3142,7 @@ int main (int argc, char* argv[])
   	CS_FUNCID_LVLLOADER, iLoader);
   if (!Sys->LevelLoader)
   {
-    Sys->Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
     return -1;
   }
 
@@ -3134,9 +3150,9 @@ int main (int argc, char* argv[])
   Gfx3D->SetRenderState (G3DRENDERSTATE_INTERLACINGENABLE, (long)false);
 
   // Some commercials...
-  Sys->Printf (CS_MSG_INITIALIZATION, "3D Blocks version 1.0.\n");
-  Sys->Printf (CS_MSG_INITIALIZATION,
-    "Created by Jorrit Tyberghein and others...\n\n");
+  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "3D Blocks version 1.0.");
+  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    "Created by Jorrit Tyberghein and others...");
   Sys->txtmgr = Gfx3D->GetTextureManager ();
   Sys->txtmgr->SetVerbose (true);
 
@@ -3148,7 +3164,7 @@ int main (int argc, char* argv[])
   Sys->view = new csView (Sys->engine, Gfx3D);
 
   // Create our world.
-  Sys->Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
+  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
   Sys->engine->SetLightingCacheMode (0);
 
   // Change to virtual directory where Blocks data is stored
@@ -3158,8 +3174,8 @@ int main (int argc, char* argv[])
   world_file.Append("/");
   if (!Sys->myVFS->Exists (world_file.GetData()))
   {
-    Sys->Printf (CS_MSG_FATAL_ERROR,
-      "The directory on VFS (%s) for world file does not exist!\n",
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR,
+      "The directory on VFS (%s) for world file does not exist!",
       world_file.GetData());
     return -1;
   }

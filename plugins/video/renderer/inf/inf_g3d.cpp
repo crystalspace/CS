@@ -27,6 +27,7 @@
 #include "video/renderer/inf/inf_txt.h"
 #include "iutil/cfgfile.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include "isys/system.h"
 #include "isys/plugin.h"
 #include "isys/event.h"
@@ -158,7 +159,9 @@ bool csGraphics3DInfinite::Open ()
 
   if (!G2D->Open ())
   {
-    SysPrintf (CS_MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
+    csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.graphics3d.infinite",
+	"Error opening Graphics2D context.");
     // set "not opened" flag
     width = height = -1;
 
@@ -172,7 +175,9 @@ bool csGraphics3DInfinite::Open ()
   texman->SetPixelFormat (pfmt);
 
   SetDimensions (nWidth, nHeight);
-  SysPrintf(CS_MSG_INITIALIZATION,"Using virtual mode %dx%d.\n",width,height);
+  csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_NOTIFY,
+  	"crystalspace.graphics3d.infinite",
+	"Using virtual mode %dx%d.",width,height);
   z_buf_mode = CS_ZBUF_NONE;
   return true;
 }

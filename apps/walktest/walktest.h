@@ -388,6 +388,9 @@ public:
   virtual bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
 
+  /// Report something to the reporter.
+  void Report (int severity, const char* msg, ...);
+
   /// Fire all commands on an object (run time execution).
   virtual void ActivateObject (iObject* object);
 
@@ -402,12 +405,6 @@ public:
    * them (load time execution).
    */
   virtual void ParseKeyCmds ();
-
-  /**
-   * Check if there are errors and report them.
-   * Returns true if the application should exit (fatal error).
-   */
-  bool CheckErrors ();
 
   ///
   virtual void NextFrame ();

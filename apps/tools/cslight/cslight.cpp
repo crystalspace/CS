@@ -33,6 +33,7 @@
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
 #include "isys/plugin.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -129,9 +130,24 @@ Lighter::~Lighter ()
   if (g3d) g3d->DecRef ();
 }
 
+void Lighter::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.application.cslight", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 void Cleanup ()
 {
-  System->ConsoleOut ("Cleaning up...\n");
+  csPrintf ("Cleaning up...\n");
   delete System;
 }
 
@@ -150,7 +166,7 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!VFS)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iVFS plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iVFS plugin!");
     abort ();
   }
 
@@ -158,21 +174,21 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
     abort ();
   }
 
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!loader)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
     abort ();
   }
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!g3d)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
     abort ();
   }
 
@@ -182,7 +198,7 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   if (nw) nw->SetTitle ("Crystal Space Lighting Application");
   if (!Open ())
   {
-    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
     Cleanup ();
     exit (1);
   }
@@ -218,8 +234,8 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   const char* val = cmdline->GetName ();
   if (!val)
   {
-    Printf (CS_MSG_FATAL_ERROR,
-    	"Please give a level (either a zip file or a VFS dir)!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR,
+    	"Please give a level (either a zip file or a VFS dir)!");
     Cleanup ();
     exit (1);
   }
@@ -250,7 +266,7 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   // Load the level file which is called 'world'.
   if (!loader->LoadMapFile ("world"))
   {
-    Printf (CS_MSG_FATAL_ERROR, "Couldn't load level '%s'!\n", map_dir);
+    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't load level '%s'!", map_dir);
     Cleanup ();
     exit (1);
   }
@@ -285,7 +301,7 @@ int main (int argc, char* argv[])
   // Initialize the main system. This will load all needed plug-ins.
   if (!System->Initialize (argc, argv, NULL))
   {
-    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
+    System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     Cleanup ();
     exit (1);
   }

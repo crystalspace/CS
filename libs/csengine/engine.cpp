@@ -76,7 +76,8 @@ void csEngine::Report (const char* description, ...)
   }
   else
   {
-    vprintf (description, arg);
+    csVPrintf (description, arg);
+    csPrintf ("\n");
   }
   va_end (arg);
 }
@@ -93,7 +94,8 @@ void csEngine::Warn (const char* description, ...)
   }
   else
   {
-    vprintf (description, arg);
+    csVPrintf (description, arg);
+    csPrintf ("\n");
   }
   va_end (arg);
 }
@@ -110,7 +112,8 @@ void csEngine::ReportBug (const char* description, ...)
   }
   else
   {
-    vprintf (description, arg);
+    csVPrintf (description, arg);
+    csPrintf ("\n");
   }
   va_end (arg);
 }
@@ -1097,7 +1100,7 @@ void csEngine::ShineLights (iRegion* iregion, iProgressMeter* meter)
   if (do_relight)
     Report ("Updating VFS....");
   if (!VFS->Sync ())
-    Warn ("Error updating lighttable cache!\n");
+    Warn ("Error updating lighttable cache!");
   if (do_relight)
     Report ("DONE!");
 

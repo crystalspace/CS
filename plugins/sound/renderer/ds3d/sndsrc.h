@@ -37,6 +37,8 @@ public:
   bool Initialize(csSoundRenderDS3D *srdr, csSoundHandleDS3D *hdl, int Mode3d,
     long NumSamples);
 
+  void Report (int severity, const char* msg, ...);
+
   virtual void Play (unsigned long playMethod = 0);
   virtual void Stop ();
   virtual void SetVolume (float volume);

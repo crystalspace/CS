@@ -35,6 +35,7 @@
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include "isys/system.h"
 #include "isys/plugin.h"
 #include "ivideo/graph3d.h"
@@ -47,8 +48,6 @@
 #include "csutil/cscolor.h"
 #include "csgfx/rgbpixel.h"
 #include "qsqrt.h"
-
-#define SysPrintf System->Printf
 
 // uncomment the 'USE_MULTITEXTURE 1' define to enable code for
 // multitexture support - this is independent of the extension detection,
@@ -200,6 +199,21 @@ csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
   clipped_fog.DecRef ();
 }
 
+void csGraphics3DOGLCommon::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.graphics3d.opengl", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 bool csGraphics3DOGLCommon::Initialize (iSystem* p)
 {
   System = p;
@@ -267,7 +281,8 @@ bool csGraphics3DOGLCommon::NewInitialize ()
   	"Video.OpenGL.SuperLightMapSize", 256);
   if (OpenGLLightmapCache::super_lm_size > Caps.maxTexWidth)
     OpenGLLightmapCache::super_lm_size = Caps.maxTexWidth;
-  SysPrintf (CS_MSG_INITIALIZATION, "  Super lightmaps: num=%d size=%dx%d\n",
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+  	"  Super lightmaps: num=%d size=%dx%d",
   	OpenGLLightmapCache::super_lm_num,
 	OpenGLLightmapCache::super_lm_size,
 	OpenGLLightmapCache::super_lm_size);
@@ -288,7 +303,7 @@ bool csGraphics3DOGLCommon::NewInitialize ()
       if (j >= 3) break;
     }
     while (j < 3) clip_optional[j++] = '0';
-    SysPrintf (CS_MSG_INITIALIZATION, "  Optional Clipping: %c%c%c\n",
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "  Optional Clipping: %c%c%c",
       clip_optional[0], clip_optional[1], clip_optional[2]);
   }
 
@@ -308,7 +323,7 @@ bool csGraphics3DOGLCommon::NewInitialize ()
       if (j >= 3) break;
     }
     while (j < 3) clip_required[j++] = '0';
-    SysPrintf (CS_MSG_INITIALIZATION, "  Required Clipping: %c%c%c\n",
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "  Required Clipping: %c%c%c",
         clip_required[0], clip_required[1], clip_required[2]);
   }
 
@@ -329,7 +344,7 @@ bool csGraphics3DOGLCommon::NewInitialize ()
       if (j >= 3) break;
     }
     while (j < 3) clip_outer[j++] = '0';
-    SysPrintf (CS_MSG_INITIALIZATION, "  Outer Clipping: %c%c%c\n",
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "  Outer Clipping: %c%c%c",
         clip_outer[0], clip_outer[1], clip_outer[2]);
   }
 
@@ -491,7 +506,7 @@ void csGraphics3DOGLCommon::PerfTest ()
         cnt++;
       }
       test_modes[i].cnt = cnt;
-      SysPrintf (CS_MSG_INITIALIZATION, "    %d FPS for %c\n", cnt,
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "    %d FPS for %c", cnt,
     	  test_modes[i].mode); fflush (stdout);
     }
     // Sort the results.
@@ -546,7 +561,7 @@ void csGraphics3DOGLCommon::PerfTest ()
       cnt++;
     }
     test_modes[i].cnt = cnt;
-    SysPrintf (CS_MSG_INITIALIZATION, "    %d FPS for %c (small clipper)\n", cnt,
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "    %d FPS for %c (small clipper)", cnt,
     	test_modes[i].mode); fflush (stdout);
   }
 
@@ -575,11 +590,11 @@ void csGraphics3DOGLCommon::PerfTest ()
       j++;
     }
   }
-  SysPrintf (CS_MSG_INITIALIZATION, "    Video.OpenGL.ClipOuter = %c%c%c\n",
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "    Video.OpenGL.ClipOuter = %c%c%c",
   	clip_outer[0], clip_outer[1], clip_outer[2]);
-  SysPrintf (CS_MSG_INITIALIZATION, "    Video.OpenGL.ClipRequired = %c%c%c\n",
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "    Video.OpenGL.ClipRequired = %c%c%c",
   	clip_required[0], clip_required[1], clip_required[2]);
-  SysPrintf (CS_MSG_INITIALIZATION, "    Video.OpenGL.ClipOptional = %c%c%c\n",
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "    Video.OpenGL.ClipOptional = %c%c%c",
   	clip_optional[0], clip_optional[1], clip_optional[2]);
   char buf[4]; buf[3] = 0;
   buf[0] = clip_required[0];
@@ -626,7 +641,7 @@ bool csGraphics3DOGLCommon::NewOpen ()
 
   if (!G2D->Open ())
   {
-    SysPrintf (CS_MSG_FATAL_ERROR, "Error opening Graphics2D context.\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error opening Graphics2D context.");
     // set "not opened" flag
     width = height = -1;
     return false;
@@ -696,13 +711,13 @@ bool csGraphics3DOGLCommon::NewOpen ()
     if (maxtextures > 1)
     {
       m_config_options.do_multitexture_level = maxtextures;
-      SysPrintf (CS_MSG_INITIALIZATION,
-      	"Using multitexture extension with %d texture units\n", maxtextures);
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Using multitexture extension with %d texture units", maxtextures);
     }
     else
     {
-      SysPrintf (CS_MSG_INITIALIZATION,
-      	"WARNING: driver supports multitexture extension but only allows one texture unit!\n");
+      Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"WARNING: driver supports multitexture extension but only allows one texture unit!");
     }
   }
 #endif
@@ -762,9 +777,9 @@ bool csGraphics3DOGLCommon::NewOpen ()
   errtest = glGetError ();
   if (errtest != GL_NO_ERROR)
   {
-    //SysPrintf (CS_MSG_DEBUG_0, "openGL error string: %s\n",
+    //Report (CS_REPORTER_SEVERITY_DEBUG, "openGL error string: %s",
     	//gluErrorString (errtest));
-    SysPrintf (CS_MSG_DEBUG_0, "openGL error: %d\n", errtest);
+    Report (CS_REPORTER_SEVERITY_DEBUG, "openGL error: %d", errtest);
   }
 
   // If blend style is 'auto' try to determine which mode to use by drawing
@@ -3596,8 +3611,8 @@ void csGraphics3DOGLCommon::Guess_BlendMode (GLenum *src, GLenum*dst)
   // these will hold the resultant color intensities
   float blendresult1[3], blendresult2[3];
 
-  SysPrintf (CS_MSG_INITIALIZATION,
-  	"Attempting to determine best blending mode to use.\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+  	"Attempting to determine best blending mode to use.");
 
   // draw the polys
   glDisable (GL_TEXTURE_2D);
@@ -3638,7 +3653,7 @@ void csGraphics3DOGLCommon::Guess_BlendMode (GLenum *src, GLenum*dst)
 
   glReadPixels (2,2,1,1,GL_RGB,GL_FLOAT, &blendresult2);
 
-  SysPrintf (CS_MSG_INITIALIZATION,
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
   	"Blend mode values are %f and %f...",
 	blendresult1[1],
 	blendresult2[1]);
@@ -3654,14 +3669,14 @@ void csGraphics3DOGLCommon::Guess_BlendMode (GLenum *src, GLenum*dst)
 
   if (resultB > 1.5 * resultA)
   {
-    SysPrintf(CS_MSG_INITIALIZATION, "using 'multiplydouble' blend mode.\n");
+    Report(CS_REPORTER_SEVERITY_NOTIFY, "using 'multiplydouble' blend mode.");
 
     *src = GL_DST_COLOR;
     *dst = GL_SRC_COLOR;
   }
   else
   {
-    SysPrintf(CS_MSG_INITIALIZATION, "using 'multiply' blend mode.\n");
+    Report(CS_REPORTER_SEVERITY_NOTIFY, "using 'multiply' blend mode.");
 
     *src = GL_DST_COLOR;
     *dst = GL_ZERO;

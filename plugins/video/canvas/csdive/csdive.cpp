@@ -114,7 +114,7 @@ bool csGraphics2DOS2DIVE::Initialize (iSystem* pSystem)
   // Initialize DIVE
   if (!gdDiveInitialize ())
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "Unable to initialize OS/2 DIVE\n");
+    printf ("Unable to initialize OS/2 DIVE\n");
     return false;
   }
 
@@ -138,7 +138,7 @@ bool csGraphics2DOS2DIVE::Initialize (iSystem* pSystem)
       WindowHeight = hres;
     }
     else
-      System->Printf (CS_MSG_WARNING, "Bad value `%s' for -winsize command-line parameter (W,H expected)\n", val);
+      printf ("Bad value `%s' for -winsize command-line parameter (W,H expected)\n", val);
   }
 
   if ((val = cmdline->GetOption ("winpos")))
@@ -150,7 +150,7 @@ bool csGraphics2DOS2DIVE::Initialize (iSystem* pSystem)
       WindowY = ypos;
     }
     else
-      System->Printf (CS_MSG_WARNING, "Bad value `%s' for -winpos command-line parameter (X,Y expected)\n", val);
+      printf ("Bad value `%s' for -winpos command-line parameter (X,Y expected)\n", val);
   }
 
   if (cmdline->GetOption ("sysmouse")) HardwareCursor = true;
@@ -167,10 +167,10 @@ bool csGraphics2DOS2DIVE::HandleEvent (iEvent &Event)
    && (Event.Command.Code == cscmdCommandLineHelp)
    && System)
   {
-    System->Printf (CS_MSG_STDOUT, "Options for OS/2 DIVE driver:\n");
-    System->Printf (CS_MSG_STDOUT, "  -winpos=<x>,<y>    set window position in percent of screen (default=center)\n");
-    System->Printf (CS_MSG_STDOUT, "  -winsize=<w>,<h>   set window size (default=max fit mode multiple)\n");
-    System->Printf (CS_MSG_STDOUT, "  -[no]sysmouse      use/don't use system mouse cursor (default=%s)\n",
+    printf ("Options for OS/2 DIVE driver:\n");
+    printf ("  -winpos=<x>,<y>    set window position in percent of screen (default=center)\n");
+    printf ("  -winsize=<w>,<h>   set window size (default=max fit mode multiple)\n");
+    printf ("  -[no]sysmouse      use/don't use system mouse cursor (default=%s)\n",
       HardwareCursor ? "use" : "don't");
     return true;
   }
@@ -238,7 +238,7 @@ bool csGraphics2DOS2DIVE::Open ()
     case 8:
       break;
     default:
-      CsPrintf (CS_MSG_FATAL_ERROR, "ERROR: %d bits per pixel modes not supported\n", Depth);
+      printf ("ERROR: %d bits per pixel modes not supported\n", Depth);
       break;
   } /* endswitch */
 
@@ -305,7 +305,7 @@ bool csGraphics2DOS2DIVE::Open ()
 
   if ((Depth >> 3) != pfmt.PixelBytes)
   {
-    CsPrintf (CS_MSG_WARNING, "WARNING: %d bpp mode requested, but not available: using %d bpp mode\n",
+    printf ("WARNING: %d bpp mode requested, but not available: using %d bpp mode\n",
       Depth, pfmt.PixelBytes << 3);
     Depth = pfmt.PixelBytes << 3;
   }
@@ -315,14 +315,14 @@ bool csGraphics2DOS2DIVE::Open ()
   FGVideoMode Mode = // selected mode with double buffering
   { Width, Height, PixelFormat, 2, vmfWindowed };
 
-  CsPrintf (CS_MSG_INITIALIZATION, "Using %c%c%c%c pixel format\n",
+  printf ("Using %c%c%c%c pixel format\n",
     PixelFormat, PixelFormat >> 8, PixelFormat >> 16, PixelFormat >> 24);
 
   // Create PM window
   rq.Parm.CreateWindow.Title = win_title;
   if ((rc = PMcall (pmcmdCreateWindow, &rq)) != pmrcOK)
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "Cannot create PM window: no resources bound to driver?\n");
+    printf ("Cannot create PM window: no resources bound to driver?\n");
     return false;
   }
   WinHandle = rq.Parm.CreateWindow.Handle;
@@ -331,7 +331,7 @@ bool csGraphics2DOS2DIVE::Open ()
   rq.Parm.CreateCtx.Mode = &Mode;
   if ((rc = PMcall (pmcmdCreateDIVEctx, &rq)) != pmrcOK)
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "Cannot create DIVE context\n");
+    printf ("Cannot create DIVE context\n");
     return false;
   }
 
@@ -350,7 +350,7 @@ bool csGraphics2DOS2DIVE::Open ()
   rq.Parm.BindCtx.DesktopH = DesktopH;
   if ((rc = PMcall (pmcmdBindDIVEctx, &rq)) != pmrcOK)
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "Cannot bind DIVE context to window!\n");
+    printf ("Cannot bind DIVE context to window!\n");
     return false;
   }
 
@@ -395,7 +395,7 @@ bool csGraphics2DOS2DIVE::Open ()
       _GetPixelAt = GetPixelAt32;
       break;
     default:
-      CsPrintf (CS_MSG_WARNING, "WARNING: No 2D routines for selected mode!\n");
+      printf ("WARNING: No 2D routines for selected mode!\n");
       break;
   } /* endif */
 

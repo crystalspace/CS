@@ -428,7 +428,7 @@ public:
       return CS_QUERY_PLUGIN(plugin_mgr, iGraphics3D);
     }
     void Print(int mode, const char* format) {
-      self->Printf(mode, format); 
+      printf (format); 
     }
   }
 };

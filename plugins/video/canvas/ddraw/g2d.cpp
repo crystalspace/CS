@@ -25,6 +25,8 @@
 #include "csutil/util.h"
 #include "isys/system.h"
 #include "isys/event.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 #ifndef DD_FALSE 
   // This is normally being done in the ddraw.h file
@@ -68,6 +70,21 @@ csGraphics2DDDraw3::csGraphics2DDDraw3(iBase *iParent) :
 csGraphics2DDDraw3::~csGraphics2DDDraw3 ()
 {
   Close ();
+}
+
+void csGraphics2DDDraw3::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.canvas.ddraw", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
 }
 
 bool csGraphics2DDDraw3::Initialize (iSystem *pSystem)
@@ -128,7 +145,7 @@ bool csGraphics2DDDraw3::Open ()
   if (!DirectDevice->IsPrimary2D)
     pGuid = &DirectDevice->Guid2D;
 
-  System->Printf (CS_MSG_INITIALIZATION, "Using DirectDraw %s (%s)\n",
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Using DirectDraw %s (%s)",
     DirectDevice->DeviceDescription2D, DirectDevice->DeviceName2D);
 
   // Create a DD object for either the primary device or the secondary.
@@ -682,7 +699,7 @@ HRESULT csGraphics2DDDraw3::InitFail (HRESULT hRet, LPCTSTR szError)
   ReleaseAllObjects ();
   if (m_lpDD)
     m_lpDD->RestoreDisplayMode ();
-  System->Printf (CS_MSG_FATAL_ERROR, szError, hRet);
+  Report (CS_REPORTER_SEVERITY_ERROR, szError, hRet);
   DestroyWindow (m_hWnd);
   return hRet;
 }

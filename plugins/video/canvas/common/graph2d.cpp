@@ -93,7 +93,7 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
     	iFontServer);
 #ifdef CS_DEBUG
   if (!FontServer)
-    System->Printf (CS_MSG_WARNING,
+    printf (
       "WARNING: Canvas driver couldn't find a font server plugin!\n"
       "This is normal if you don't want one (warning displays only in "
       "debug mode)\n");

@@ -500,7 +500,8 @@ void SysSystemDriver::NextFrame ()
   {
     if (!GetMessage (&msg, NULL, 0, 0))
     {
-      EventQueue.Put (new csEvent (Time (), csevBroadcast, cscmdQuit, NULL));
+      EventQueue.Put (new csEvent (csGetClicks (),
+      	csevBroadcast, cscmdQuit, NULL));
       return;
     }
 
@@ -511,6 +512,8 @@ void SysSystemDriver::NextFrame ()
   csSystemDriver::NextFrame ();
 }
 
+#if 0
+// @@@ MOVE THIS CODE TO THE WINDOWS CANVASES!
 void SysSystemDriver::Alert (const char* s)
 {
   bool FullScreen = false;
@@ -529,6 +532,7 @@ void SysSystemDriver::Alert (const char* s)
   MessageBox (NULL, s, "Fatal Error", MB_OK | MB_ICONSTOP);
   DebugTextOut (true, s);
 }
+#endif
 
 //----------------------------------------------// SCF Implementation //------//
 
@@ -765,11 +769,8 @@ void SysSystemDriver::SetSystemDefaults (iConfigManager *Config)
 void SysSystemDriver::Help ()
 {
   csSystemDriver::Help();
-  Printf (CS_MSG_STDOUT, "  -[no]console       Create a debug console (default = %s)\n",
+  //@@@???
+  printf ("  -[no]console       Create a debug console (default = %s)\n",
     need_console ? "yes" : "no");
 }
 
-void csSystemDriver::ConsoleOut (const char *str)
-{
-  fputs (str, stdout);
-}  

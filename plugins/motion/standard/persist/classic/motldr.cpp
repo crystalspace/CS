@@ -24,6 +24,7 @@
 #include "isys/plugin.h"
 #include "iutil/databuff.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 #include "csgeom/transfrm.h"
 #include "csgeom/quaterni.h"
@@ -226,6 +227,21 @@ static bool load_quaternion (char* buf, csQuaternion &q)
 
 //=========================================================== Load Motion
 
+void csMotionLoader::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (sys->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.motion.loader", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 iMotion* csMotionLoader::LoadMotion (const char* fname )
 {
   iDataBuffer *databuff = vfs->ReadFile (fname);
@@ -233,7 +249,8 @@ iMotion* csMotionLoader::LoadMotion (const char* fname )
   if (!databuff || !databuff->GetSize ())
   {
     if (databuff) databuff->DecRef ();
-    sys->Printf (CS_MSG_FATAL_ERROR, "Could not open motion file \"%s\" on VFS!\n", fname);
+    Report (CS_REPORTER_SEVERITY_ERROR,
+    	"Could not open motion file \"%s\" on VFS!", fname);
     return NULL;
   }
 
@@ -250,12 +267,12 @@ iMotion* csMotionLoader::LoadMotion (const char* fname )
   {
     if (!data)
     {
-      sys->Printf (CS_MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
+      Report (CS_REPORTER_SEVERITY_ERROR, "Expected parameters instead of '%s'!", buf);
+      exit (1);
     }
 
     if (!motman)
-      sys->Printf (CS_MSG_FATAL_ERROR, "No motion manager loaded!\n");
+      Report (CS_REPORTER_SEVERITY_ERROR, "No motion manager loaded!");
     else
     {
       iMotion* m = motman->FindByName (name);
@@ -311,8 +328,8 @@ bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
   {
     if (!params)
     {
-      sys->Printf (CS_MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
-      fatal_exit (0, false);
+      Report (CS_REPORTER_SEVERITY_ERROR, "Expected parameters instead of '%s'!", buf);
+      exit (1);
     }
     switch (cmd)
     {
@@ -352,8 +369,8 @@ bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
 		  }
 		  break;
 	    default:
-	      sys->Printf (CS_MSG_FATAL_ERROR, "Expected MATRIX, Q, or V instead of '%s'!\n", buf);
-	      fatal_exit (0, false);
+	      Report (CS_REPORTER_SEVERITY_ERROR, "Expected MATRIX, Q, or V instead of '%s'!", buf);
+	      exit (1);
 	  }     
         }
         break;
@@ -391,8 +408,8 @@ bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
 			}
 			break;
 		  default:
-	    	sys->Printf (CS_MSG_FATAL_ERROR, "Expected LINK instead of '%s'!\n", buf);
-	    	fatal_exit (0, false);
+	    	Report (CS_REPORTER_SEVERITY_ERROR, "Expected LINK instead of '%s'!", buf);
+	    	exit (1);
 		}
 	  }
     } // case CS_TOKEN_FRAME
@@ -401,9 +418,9 @@ bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
-    sys->Printf (CS_MSG_FATAL_ERROR, "Token '%s' not found while parsing the a sprite template!\n",
+    Report (CS_REPORTER_SEVERITY_ERROR, "Token '%s' not found while parsing the a sprite template!",
         csGetLastOffender ());
-    fatal_exit (0, false);
+    exit (1);
   }
   return true;
 }
@@ -429,7 +446,7 @@ CS_TOKEN_TABLE_END
 	if (!params)
 	{
 	  printf("Expected parameters instead of '%s'\n", string);
-	  fatal_exit( 0, false );
+	  exit (1);
 	}
 	switch (cmd)
 	{
@@ -456,10 +473,10 @@ CS_TOKEN_TABLE_END
   }
 	if (cmd == CS_PARSERR_TOKENNOTFOUND)
 	{
-	  sys->Printf( CS_MSG_FATAL_ERROR,
-		  "Token '%s' not found while parsing the iMotionLoader plugin\n",
+	  Report(CS_REPORTER_SEVERITY_ERROR,
+		  "Token '%s' not found while parsing the iMotionLoader plugin",
 			csGetLastOffender());
-	  fatal_exit(0,false);
+	  exit (1);
 	}
 	return this;
 }

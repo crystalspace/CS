@@ -37,6 +37,7 @@
 #include "imesh/object.h"
 #include "isys/plugin.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -56,6 +57,21 @@ SCF_EXPORT_CLASS_TABLE (iso)
     "Crystal Space Isometric Engine",
     "crystalspace.kernel., crystalspace.graphics3d., crystalspace.graphics2d.")
 SCF_EXPORT_CLASS_TABLE_END
+
+void csIsoEngine::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (system->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.engine.iso", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
 
 csIsoEngine::csIsoEngine (iBase *iParent)
 {
@@ -99,20 +115,20 @@ bool csIsoEngine::HandleEvent (iEvent& Event)
         g3d = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VIDEO, iGraphics3D);
         if (!g3d)
         {
-          system->Printf(CS_MSG_INTERNAL_ERROR, "IsoEngine: could not get G3D.\n");
+          Report (CS_REPORTER_SEVERITY_ERROR, "IsoEngine: could not get G3D.");
           return false;
         }
         g2d = g3d->GetDriver2D ();
         if (!g2d) 
         {
-          system->Printf(CS_MSG_INTERNAL_ERROR, "IsoEngine: could not get G2D.\n");
+          Report (CS_REPORTER_SEVERITY_ERROR, "IsoEngine: could not get G2D.");
           return false;
         }
         txtmgr = g3d->GetTextureManager();
         if (!txtmgr) 
         {
-          system->Printf(CS_MSG_INTERNAL_ERROR, 
-            "IsoEngine: could not get TextureManager.\n");
+          Report (CS_REPORTER_SEVERITY_ERROR, 
+            "IsoEngine: could not get TextureManager.");
           return false;
         }
         return true;
@@ -250,24 +266,22 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
   iImageIO *imgloader = CS_QUERY_PLUGIN(plugin_mgr, iImageIO);
   if(imgloader==NULL)
   {
-    system->Printf(CS_MSG_INTERNAL_ERROR, "Could not get image loader plugin.\n");
-    system->Printf(CS_MSG_INTERNAL_ERROR, "Failed to load file %s.\n", 
-      vfsfilename);
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not get image loader plugin. "
+    	"Failed to load file %s.", vfsfilename);
     return NULL;
   }
   iVFS *VFS = CS_QUERY_PLUGIN(plugin_mgr, iVFS);
   if(VFS==NULL)
   {
-    system->Printf(CS_MSG_INTERNAL_ERROR, "Could not get VFS plugin.\n");
-    system->Printf(CS_MSG_INTERNAL_ERROR, "Failed to load file %s.\n", 
-      vfsfilename);
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not get VFS plugin. "
+    	"Failed to load file %s.", vfsfilename);
     return NULL;
   }
 
   iDataBuffer *buf = VFS->ReadFile (vfsfilename);
   if(!buf) 
   {
-    system->Printf(CS_MSG_INTERNAL_ERROR, "Could not read vfs file %s\n", 
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not read vfs file %s\n", 
       vfsfilename);
     return NULL;
   }
@@ -275,24 +289,24 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
     txtmgr->GetTextureFormat ());
   if(!image) 
   {
-    system->Printf(CS_MSG_INTERNAL_ERROR, 
-      "The imageloader could not load image %s\n", vfsfilename);
+    Report (CS_REPORTER_SEVERITY_ERROR, 
+      "The imageloader could not load image %s", vfsfilename);
     return NULL;
   }
   iTextureHandle *handle = txtmgr->RegisterTexture(image, CS_TEXTURE_2D |
     CS_TEXTURE_3D);
   if(!handle) 
   {
-    system->Printf(CS_MSG_INTERNAL_ERROR, 
-      "Texturemanager could not register texture %s\n", vfsfilename);
+    Report (CS_REPORTER_SEVERITY_ERROR, 
+      "Texturemanager could not register texture %s", vfsfilename);
     return NULL;
   }
   csIsoMaterial *material = new csIsoMaterial(handle);
   iMaterialHandle *math = txtmgr->RegisterMaterial(material);
   if(!math) 
   {
-    system->Printf(CS_MSG_INTERNAL_ERROR, 
-      "Texturemanager could not register material %s\n", materialname);
+    Report (CS_REPORTER_SEVERITY_ERROR, 
+      "Texturemanager could not register material %s", materialname);
     return NULL;
   }
 

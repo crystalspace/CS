@@ -129,9 +129,8 @@ static void ReportError (iReporter* reporter, const char* id,
   {
     char buf[1024];
     vsprintf (buf, description, arg);
-    printf ("Error ID: %s\n", id);
-    printf ("Description: %s\n", buf);
-    fflush (stdout);
+    csPrintf ("Error ID: %s\n", id);
+    csPrintf ("Description: %s\n", buf);
   }
   va_end (arg);
 }

@@ -63,7 +63,7 @@ iImage* csLoader::LoadImage (const char* name, int Format)
     if (buf) buf->DecRef ();
     ReportError (
 	      "crystalspace.maploader.parse.image",
-    	      "Could not open image file '%s' on VFS!\n", name);
+    	      "Could not open image file '%s' on VFS!", name);
     return NULL;
   }
 

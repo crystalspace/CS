@@ -52,6 +52,8 @@ public:
   csGraphics2DAlleg (iBase *iParent);
   virtual ~csGraphics2DAlleg ();
 
+  void Report (int severity, const char* msg, ...);
+
   virtual bool Initialize (iSystem *pSystem);
   virtual bool Open();
   virtual void Close(void);

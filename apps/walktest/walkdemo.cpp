@@ -45,6 +45,7 @@
 #include "isound/wrapper.h"
 #include "ivideo/graph3d.h"
 #include "ivaria/collider.h"
+#include "ivaria/reporter.h"
 #include "imesh/lighting.h"
 #include "imesh/partsys.h"
 #include "imesh/fountain.h"
@@ -89,7 +90,7 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed)
   iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
   if (!mat)
   {
-    Sys->Printf (CS_MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
     return;
   }
 
@@ -135,7 +136,7 @@ void add_particles_snow (iSector* sector, char* matname, int num, float speed)
   iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
   if (!mat)
   {
-    Sys->Printf (CS_MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
     return;
   }
 
@@ -184,7 +185,7 @@ void add_particles_fire (iSector* sector, char* matname, int num,
   iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
   if (!mat)
   {
-    Sys->Printf (CS_MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
     return;
   }
 
@@ -231,7 +232,7 @@ void add_particles_fountain (iSector* sector, char* matname, int num,
   iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
   if (!mat)
   {
-    Sys->Printf (CS_MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
     return;
   }
 
@@ -279,7 +280,7 @@ void add_particles_explosion (iSector* sector, const csVector3& center, char* ma
   iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
   if (!mat)
   {
-    Sys->Printf (CS_MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
     return;
   }
 
@@ -331,7 +332,7 @@ void add_particles_spiral (iSector* sector, const csVector3& bottom, char* matna
   iMaterialWrapper* mat = Sys->view->GetEngine ()->FindMaterial (matname);
   if (!mat)
   {
-    Sys->Printf (CS_MSG_CONSOLE, "Can't find material '%s' in memory!\n", matname);
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Can't find material '%s' in memory!", matname);
     return;
   }
 
@@ -562,7 +563,7 @@ void add_skeleton_tree (iSector* where, csVector3 const& pos, int depth,
     	"crystalspace.mesh.object.sprite.3d", skelname);
     if (tmpl == NULL)
     {
-      Sys->Printf (CS_MSG_WARNING, "Could not load the sprite 3d plugin!\n");
+      Sys->Report (CS_REPORTER_SEVERITY_WARNING, "Could not load the sprite 3d plugin!");
       return;
     }
     iMeshObjectFactory* fact = tmpl->GetMeshObjectFactory ();
@@ -797,7 +798,7 @@ void add_skeleton_ghost (iSector* where, csVector3 const& pos, int maxdepth,
     	"crystalspace.mesh.object.sprite.3d", skelname);
     if (tmpl == NULL)
     {
-      Sys->Printf (CS_MSG_WARNING, "Could not load the sprite 3d plugin!\n");
+      Sys->Report (CS_REPORTER_SEVERITY_WARNING, "Could not load the sprite 3d plugin!");
       return;
     }
     iMeshObjectFactory* fact = tmpl->GetMeshObjectFactory ();
@@ -1165,7 +1166,7 @@ void fire_missile ()
 
   iMeshFactoryWrapper *tmpl = Sys->view->GetEngine ()->FindMeshFactory (misname);
   if (!tmpl)
-    Sys->Printf (CS_MSG_CONSOLE, "Could not find '%s' sprite factory!\n", misname);
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Could not find '%s' sprite factory!", misname);
   else
   {
     iMeshWrapper* sp = Sys->view->GetEngine ()->CreateMeshWrapper (tmpl, "missile");

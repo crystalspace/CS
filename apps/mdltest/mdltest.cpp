@@ -47,6 +47,7 @@
 #include "iutil/objreg.h"
 #include "csutil/csstring.h"
 #include "isys/plugin.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -73,6 +74,21 @@ iModelDataVertices *Simple::CreateDefaultModelVertexFrame ()
   Vertices->AddTexel (csVector2 (5, 0));
 
   return Vertices;
+}
+
+void Simple::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.application.mdltest", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
 }
 
 iModelData *Simple::CreateDefaultModel (iMaterialWrapper *OtherMaterial)
@@ -172,7 +188,7 @@ iMaterialWrapper *Simple::LoadTexture (const char *name, const char *fn)
 {
   if (!loader->LoadTexture (name, fn))
   {
-    Printf (CS_MSG_FATAL_ERROR, "Error loading texture '%s' !\n", fn);
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error loading texture '%s' !", fn);
     Cleanup ();
     exit (1);
   }
@@ -184,7 +200,7 @@ iModelData *Simple::ImportModel (const char *fn)
   iDataBuffer *filebuf = vfs->ReadFile (fn);
   if (!filebuf)
   {
-    Printf (CS_MSG_FATAL_ERROR, "Error opening model file '%s' !\n", fn);
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error opening model file '%s' !", fn);
     Cleanup ();
     exit (1);
   }
@@ -193,7 +209,7 @@ iModelData *Simple::ImportModel (const char *fn)
   filebuf->DecRef ();
   if (!mdl)
   {
-    Printf (CS_MSG_FATAL_ERROR, "Invalid model file: '%s' !\n", fn);
+    Report (CS_REPORTER_SEVERITY_ERROR, "Invalid model file: '%s' !", fn);
     Cleanup ();
     exit (1);
   }
@@ -227,7 +243,7 @@ Simple::~Simple ()
 
 void Cleanup ()
 {
-  System->ConsoleOut ("Cleaning up...\n");
+  csPrintf ("Cleaning up...\n");
   delete System;
 }
 
@@ -247,49 +263,49 @@ bool Simple::Initialize (int argc, const char* const argv[],
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
     abort ();
   }
 
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!loader)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
     abort ();
   }
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!g3d)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
     abort ();
   }
 
   crossbuilder = CS_QUERY_PLUGIN_ID (plugin_mgr, "CrossBuilder", iCrossBuilder);
   if (!crossbuilder)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iCrossBuilder plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iCrossBuilder plugin!");
     abort ();
   }
 
   converter = CS_QUERY_PLUGIN_ID (plugin_mgr, "Converter", iModelConverter);
   if (!converter)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iModelConverter plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iModelConverter plugin!");
     abort ();
   }
 
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!vfs)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iVFS plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iVFS plugin!");
     abort ();
   }
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ())
   {
-    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
     Cleanup ();
     exit (1);
   }
@@ -301,15 +317,15 @@ bool Simple::Initialize (int argc, const char* const argv[],
   // Initialize the texture manager
   txtmgr->ResetPalette ();
 
-  Printf (CS_MSG_INITIALIZATION,
-    "Simple Crystal Space Application version 0.1.\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+    "Simple Crystal Space Application version 0.1.");
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
   engine->SetLightingCacheMode (0);
 
   // Create our world.
-  Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
   iMaterialWrapper* tm = LoadTexture ("stone", "/lib/std/stone4.gif");
   iMaterialWrapper* tm2 = LoadTexture ("wood", "/lib/std/andrew_wood.gif");
@@ -375,7 +391,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   engine->SetAmbientLight (csColor (0.5, 0.5, 0.5));
 
   engine->Prepare ();
-  Printf (CS_MSG_INITIALIZATION, "Created.\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Created.");
 
   view = new csView (engine, g3d);
   view->GetCamera ()->SetSector (room);
@@ -466,7 +482,7 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!System->Initialize (argc, argv, NULL))
   {
-    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
+    System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     Cleanup ();
     exit (1);
   }

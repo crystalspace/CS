@@ -41,6 +41,7 @@
 #include "imesh/thing/thing.h"
 #include "iutil/objreg.h"
 #include "isys/plugin.h"
+#include "ivaria/reporter.h"
 
 #define SET_BIT(var,mask,state) \
   var = (var & ~(mask)) | ((state) ? (mask) : 0);
@@ -354,14 +355,16 @@ bool ceCswsEngineApp::Initialize ()
   engine = CS_QUERY_PLUGIN (plugin_mgr, iEngine);
   if (!engine)
   {
-    System->Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.cswseng", "No iEngine plugin!");
     abort ();
   }
 
   LevelLoader = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_LVLLOADER, iLoader);
   if (!LevelLoader)
   {
-    System->Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.cswseng", "No iLoader plugin!");
     abort ();
   }
   
@@ -544,7 +547,6 @@ int main (int argc, char* argv[])
   System = &Sys;
 
   iObjectRegistry* object_reg = System->GetObjectRegistry ();
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
   cmdline->AddOption ("mode", "800x600");
@@ -561,6 +563,8 @@ int main (int argc, char* argv[])
     return -1;
   }    
   csInitializeApplication (&Sys);
+
+  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   iNativeWindow* nw = g3d->GetDriver2D ()->GetNativeWindow ();
@@ -579,7 +583,8 @@ int main (int argc, char* argv[])
   if (theApp.Initialize ())
     Sys.Loop ();
   else
-    Sys.Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.cswseng", "Error initializing system!");
 
   return 0;
 }

@@ -135,10 +135,13 @@ void csConsoleOutput::SetBufferSize (int lines)
   buffer->SetLength (lines);
 }
 
-void csConsoleOutput::PutText (int /*iMode*/, const char *text)
+void csConsoleOutput::PutTextV (const char *text2, va_list args)
 {
   int i;
   csString *curline = NULL;
+
+  char text[4096];
+  vsprintf (text, text2, args);
 
   // Scan the string for escape characters
   for (i = 0; text && text [i] != 0; i++)
@@ -321,7 +324,7 @@ void csConsoleOutput::Draw2D (csRect *area)
     {
 #ifdef CS_DEBUG
       if (cx != 0)
-	System->Printf (CS_MSG_WARNING,
+	printf (
 	  "csConsoleOutput:  Current line is empty but cursor x != 0!\n");
 #endif // CS_DEBUG
       cx_pix = 1;
@@ -354,8 +357,7 @@ void csConsoleOutput::Draw2D (csRect *area)
         break;
 #ifdef CS_DEBUG
       default:
-        System->Printf(CS_MSG_WARNING,
-	  "csConsoleOutput:  Invalid cursor setting!\n");
+        printf ("csConsoleOutput:  Invalid cursor setting!\n");
 #endif // CS_DEBUG
     }
   }

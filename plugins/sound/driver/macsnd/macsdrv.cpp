@@ -24,6 +24,8 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "isys/system.h"
+#include "ivaria/reporter.h"
+#include "iutil/objreg.h"
 #include "isound/renderer.h"
 #include "macsdrv.h"
 
@@ -69,10 +71,26 @@ csSoundDriverMac::~csSoundDriverMac()
 {
 }
 
+void csSoundDriverMac::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (m_piSystem->GetObjectRegistry (),
+  	iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.sound.macsnd", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16,
   bool stereo)
 {
-  m_piSystem->Printf (CS_MSG_INITIALIZATION, "\nSoundDriver Mac selected\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "SoundDriver Mac selected");
   
   m_piSoundRender = render;
   OSErr	theError;
@@ -96,7 +114,7 @@ bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16,
 
   theError = SndNewChannel(&mSoundChannel, sampledSynth, outputChannels, 0);
   if (theError != noErr) {
-    m_piSystem->Printf(CS_MSG_FATAL_ERROR, "Unable to open a sound channel.");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Unable to open a sound channel.");
     return false;
   }
   
@@ -136,7 +154,7 @@ bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16,
     mSoundChannel = NULL;
     DisposeRoutineDescriptor(mSoundDBHeader.dbhDoubleBack);
     mSoundDBHeader.dbhDoubleBack = NULL;
-    m_piSystem->Printf(CS_MSG_FATAL_ERROR,
+    Report (CS_REPORTER_SEVERITY_ERROR,
       "Unable to get the space for the sound buffer.");
     return false;
   }
@@ -162,7 +180,7 @@ bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16,
     mSoundDBHeader.dbhDoubleBack = NULL;
     DisposePtr((Ptr)mSoundDBHeader.dbhBufferPtr[0]);
     mSoundDBHeader.dbhBufferPtr[0] = NULL;
-    m_piSystem->Printf(CS_MSG_FATAL_ERROR,
+    Report (CS_REPORTER_SEVERITY_ERROR,
       "Unable to get the space for the sound buffer.");
     return false;
   }
@@ -189,7 +207,7 @@ bool csSoundDriverMac::Open(iSoundRender *render, int frequency, bool bit16,
     mSoundDBHeader.dbhBufferPtr[0] = NULL;
     DisposePtr((Ptr)mSoundDBHeader.dbhBufferPtr[1]);
     mSoundDBHeader.dbhBufferPtr[1] = NULL;
-    m_piSystem->Printf(CS_MSG_FATAL_ERROR,
+    Report (CS_REPORTER_SEVERITY_ERROR,
       "Unable to start the sound playing.");
     return false;
   }

@@ -41,6 +41,7 @@
 #include "iengine/material.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/thing.h"
+#include "ivaria/reporter.h"
 #include "isys/plugin.h"
 #include "iutil/objreg.h"
 
@@ -52,6 +53,21 @@ CS_IMPLEMENT_APPLICATION
 
 // the global system driver variable
 Simple *System;
+
+void Simple::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.application.demosky", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
 
 Simple::Simple ()
 {
@@ -92,7 +108,7 @@ Simple::~Simple ()
 
 void Cleanup ()
 {
-  System->ConsoleOut ("Cleaning up...\n");
+  csPrintf ("Cleaning up...\n");
   delete System;
 }
 
@@ -134,28 +150,28 @@ bool Simple::Initialize (int argc, const char* const argv[],
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
     abort ();
   }
 
   LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!LevelLoader)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
     abort ();
   }
 
   myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
     abort ();
   }
 
   myG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
   if (!myG2D)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iGraphics2D plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics2D plugin!");
     abort ();
   }
 
@@ -164,7 +180,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   if (nw) nw->SetTitle ("Crystal Space Procedural Sky Demo");
   if (!Open ())
   {
-    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
 	Cleanup ();
     exit (1);
   }
@@ -188,14 +204,14 @@ bool Simple::Initialize (int argc, const char* const argv[],
   font = myG2D->GetFontServer()->LoadFont(CSFONT_LARGE);
 
   // Some commercials...
-  Printf (CS_MSG_INITIALIZATION, "Crystal Space Procedural Sky Demo.\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Crystal Space Procedural Sky Demo.");
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
   engine->SetLightingCacheMode (0);
 
   // Create our world.
-  Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
   //LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
   //csMaterialWrapper* tm = engine->GetMaterials ()->FindByName ("stone");
@@ -290,7 +306,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
   engine->Prepare ();
 
-  Printf (CS_MSG_INITIALIZATION, "--------------------------------------\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------");
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by
@@ -527,7 +543,7 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!System->Initialize (argc, argv, NULL))
   {
-    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
+    System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
 	Cleanup ();
     exit (1);
   }

@@ -23,6 +23,7 @@
 #include "soft_g3d.h"
 #include "soft_txt.h"
 #include "isys/system.h"
+#include "ivaria/reporter.h"
 // @@@ The following include needs a cleanup. It is not very good that
 // the 3D rendering is accessing something private from the thing mesh
 // object. Instead a lightmap should be something that is defined in
@@ -290,12 +291,10 @@ void csTextureCacheSoftware::fill_texture (int MipMap, iPolygonTexture* pt,
   (this->*create_lighted_texture) (pt, cached_texture, tex_mm, texman, u_min, v_min, u_max, v_max);
 }
 
-#define SysPrintf iG3D->System->Printf
-
 void csTextureCacheSoftware::dump (csGraphics3DSoftwareCommon *iG3D)
 {
-  SysPrintf (CS_MSG_CONSOLE, "Textures in the cache: %d\n", total_textures);
-  SysPrintf (CS_MSG_CONSOLE, "Total size: %ld bytes\n", total_size);
+  iG3D->Report (CS_REPORTER_SEVERITY_NOTIFY, "Textures in the cache: %d", total_textures);
+  iG3D->Report (CS_REPORTER_SEVERITY_NOTIFY, "Total size: %ld bytes", total_size);
   int mean = (total_textures == 0) ? 0 : total_size / total_textures;
-  SysPrintf (CS_MSG_CONSOLE, "Bytes per texture: %d\n", mean);
+  iG3D->Report (CS_REPORTER_SEVERITY_NOTIFY, "Bytes per texture: %d", mean);
 }

@@ -26,6 +26,7 @@
 #include "csutil/csvector.h"
 #include "iutil/objreg.h"
 #include "isys/plugin.h"
+#include "ivaria/reporter.h"
 
 #include "police.fnt"
 #include "courier.fnt"	// font (C) Andrew Zabolotny
@@ -152,7 +153,9 @@ csDefaultFont *csDefaultFontServer::ReadFontFile(const char *file)
   VFS->DecRef ();
   if (!fntfile)
   {
-    System->Printf (CS_MSG_WARNING, "Could not read font file %s.\n", file);
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+        "crystalspace.font.csfont",
+      	"Could not read font file %s.", file);
     return NULL;
   }
 

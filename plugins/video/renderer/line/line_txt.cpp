@@ -338,9 +338,6 @@ void csTextureManagerLine::create_inv_cmap ()
   if (pfmt.PixelBytes != 1)
     return;
 
-  if (verbose)
-    SysPrintf (CS_MSG_INITIALIZATION, "  Computing inverse colormap...\n");
-
   // Greg Ewing, 12 Oct 1998
   delete inv_cmap;
   inv_cmap = NULL; // let the routine allocate the array itself
@@ -356,9 +353,6 @@ void csTextureManagerLine::create_alpha_tables ()
 {
   if (pfmt.PixelBytes != 1)
     return;
-
-  if (verbose)
-    SysPrintf (CS_MSG_INITIALIZATION, "  Computing alpha tables...\n");
 
   if (!alpha_tables)
     alpha_tables = new csAlphaTables ();
@@ -385,8 +379,6 @@ void csTextureManagerLine::create_alpha_tables ()
 void csTextureManagerLine::compute_palette ()
 {
   if (truecolor) return;
-
-  if (verbose) SysPrintf (CS_MSG_INITIALIZATION, "  Computing palette...\n");
 
   // Allocate first 6*6*4=144 colors in a uniformly-distributed fashion
   // since we'll get lighted/dimmed/colored textures more often
@@ -446,14 +438,10 @@ void csTextureManagerLine::compute_palette ()
 
 void csTextureManagerLine::PrepareTextures ()
 {
-  if (verbose) SysPrintf (CS_MSG_INITIALIZATION, "Preparing textures...\n");
-
   // Drop all "color allocated" flags to locked colors.
   // We won't Clear the palette as we don't care about unused colors anyway.
   // The locked colors will stay the same.
   memcpy(cmap.alloc, locked, sizeof(locked));
-
-  if (verbose) SysPrintf (CS_MSG_INITIALIZATION, "  Creating texture mipmaps...\n");
 
   // Create mipmaps for all textures
   int i;

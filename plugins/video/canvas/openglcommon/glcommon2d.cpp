@@ -23,6 +23,8 @@
 #include "video/canvas/common/scrshot.h"
 #include "csgeom/csrect.h"
 #include "isys/system.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include "qint.h"
 
 SCF_IMPLEMENT_IBASE_EXT (csGraphics2DGLCommon)
@@ -76,12 +78,20 @@ bool csGraphics2DGLCommon::Open ()
 
   const char *renderer = (const char *)glGetString (GL_RENDERER);
   const char *version = (const char *)glGetString (GL_VERSION);
+  iReporter* reporter = CS_QUERY_REGISTRY (System->GetObjectRegistry (),
+  	iReporter);
   if (renderer || version)
-  CsPrintf (CS_MSG_INITIALIZATION, "OpenGL renderer: %s version %s\n",
-    renderer ? renderer : "unknown", version ? version : "unknown");
+    if (reporter)
+      reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
+        "crystalspace.canvas.openglcommon",
+      	"OpenGL renderer: %s version %s",
+        renderer ? renderer : "unknown", version ? version : "unknown");
 
-  CsPrintf (CS_MSG_INITIALIZATION, "Using %s mode at resolution %dx%d.\n",
-	     FullScreen ? "full screen" : "windowed", Width, Height);
+  if (reporter)
+    reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
+        "crystalspace.canvas.openglcommon",
+    	"Using %s mode at resolution %dx%d.",
+	FullScreen ? "full screen" : "windowed", Width, Height);
 
   glClearColor (0., 0., 0., 0.);
   glClearDepth (-1.0);

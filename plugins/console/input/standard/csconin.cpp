@@ -134,7 +134,7 @@ bool csConsoleInput::HandleEvent (iEvent &Event)
           InsertMode = !InsertMode;
           break;
         case CSKEY_ENTER:
-	  Console->PutText(CS_MSG_CONSOLE, "\n");
+	  Console->PutText("\n");
           if (Callback)
             Callback->Execute (line);
           if (line [0])
@@ -251,9 +251,9 @@ void csConsoleInput::SetPrompt (const char *iPrompt)
 void csConsoleInput::Refresh ()
 {
   if (!Console || !Console->GetVisible ()) return;
-  Console->PutText (CS_MSG_CONSOLE, "\r");
-  Console->PutText (CS_MSG_CONSOLE, Prompt);
-  Console->PutText (CS_MSG_CONSOLE, line);
+  Console->PutText ("\r");
+  Console->PutText (Prompt);
+  Console->PutText (line);
   Console->SetCursorPos (PromptLen + CursorPos);
   if (InsertMode)
     Console->SetCursorStyle (csConInsertCursor);

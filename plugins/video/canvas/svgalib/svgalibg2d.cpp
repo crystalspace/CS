@@ -23,6 +23,8 @@
 #include "csgeom/csrect.h"
 #include "cssys/csinput.h"
 #include "isys/system.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -65,6 +67,21 @@ csGraphics2DSVGALib::csGraphics2DSVGALib(iBase *p) : csGraphics2D (p)
   EventOutlet = NULL;
 }
 
+void csGraphics2DSVGALib::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.canvas.svgalib", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 bool csGraphics2DSVGALib::Initialize (iSystem *pSystem)
 {
   if (!csGraphics2D::Initialize (pSystem))
@@ -74,8 +91,8 @@ bool csGraphics2DSVGALib::Initialize (iSystem *pSystem)
 
   // SVGALIB Starts here
 
-  CsPrintf (CS_MSG_INITIALIZATION, "Crystal Space Linux/SVGALIB version.\n"
-    "Using %dx%dx%d resolution.\n\n", Width, Height, Depth);
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Crystal Space Linux/SVGALIB version.\n"
+    "Using %dx%dx%d resolution.", Width, Height, Depth);
 
   gl_copyscreen (&physicalscreen);
 
@@ -177,7 +194,7 @@ bool csGraphics2DSVGALib::Open()
       sprintf (depthstr, "16M32");
       break;
     default :
-      CsPrintf (CS_MSG_FATAL_ERROR, "Unsupported depth %d\n", Depth);
+      Report (CS_REPORTER_SEVERITY_ERROR, "Unsupported depth %d", Depth);
       return false;
   }
 
@@ -186,8 +203,8 @@ bool csGraphics2DSVGALib::Open()
 
   if ((vgamode==-1) || (vga_setmode (vgamode) == -1))
   {
-    CsPrintf (CS_MSG_FATAL_ERROR,
-      "Specified screenmode %s is not available!\n", modestr);
+    Report (CS_REPORTER_SEVERITY_ERROR,
+      "Specified screenmode %s is not available!", modestr);
     return false;
   }
 

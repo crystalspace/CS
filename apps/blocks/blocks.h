@@ -326,6 +326,8 @@ public:
   Blocks ();
   ~Blocks ();
 
+  void Report (int severity, const char* msg, ...);
+
   // Initialization stuff and starting of game/demo.
 
 #if defined(BLOCKS_NETWORKING)

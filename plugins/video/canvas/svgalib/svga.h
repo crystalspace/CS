@@ -53,6 +53,8 @@ public:
   virtual void Close ();
   virtual bool Initialize (iSystem*);
 
+  void Report (int severity, const char* msg, ...);
+
   virtual bool BeginDraw () { return (Memory != NULL); }
   virtual bool DoubleBuffer (bool /*Enable*/) { return true; }
   virtual bool GetDoubleBufferState () { return true; }

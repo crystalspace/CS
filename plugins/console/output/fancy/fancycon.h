@@ -77,9 +77,19 @@ public:
   SCF_DECLARE_IBASE;
   csFancyConsole (iBase *);
   virtual ~csFancyConsole ();
+
+  void Report (int severity, const char* msg, ...);
+
   virtual bool Initialize (iSystem *);
   virtual bool HandleEvent (iEvent &Event);
-  virtual void PutText (int iMode, const char *iText);
+  virtual void PutText (const char *iText, ...)
+  {
+    va_list arg;
+    va_start (arg, iText);
+    PutTextV (iText, arg);
+    va_end (arg);
+  }
+  virtual void PutTextV (const char *iText, va_list args);
   virtual const char *GetLine (int iLine = -1) const
     { return base->GetLine(iLine); }
   virtual void Draw2D (csRect *oRect = 0) { base->Draw2D(oRect); }

@@ -54,7 +54,7 @@
 #undef USE_MULTITEXTURE
 void csGraphics3DOGLCommon::DetectExtensions()
 {
-  SysPrintf(CS_MSG_INITIALIZATION,
+  printf(
     "OpenGL extensions not supported on this platform!\n");
   return;
 }

@@ -29,6 +29,7 @@
 #include "isound/data.h"
 #include "isys/event.h"
 #include "isys/plugin.h"
+#include "ivaria/reporter.h"
 
 #include "srdrcom.h"
 #include "../common/slstn.h"
@@ -66,6 +67,21 @@ csSoundRenderSoftware::csSoundRenderSoftware(iBase* piBase) : Listener(NULL)
   ActivateMixing = false;
 }
 
+void csSoundRenderSoftware::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.sound.software", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 bool csSoundRenderSoftware::Initialize (iSystem *iSys)
 {
   // copy the system pointer
@@ -89,8 +105,8 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   SoundDriver = CS_LOAD_PLUGIN (plugin_mgr, drv, NULL, iSoundDriver);
   if (!SoundDriver) {	
-    System->Printf(CS_MSG_INITIALIZATION,
-      "csSoundRenderSoftware: Failed to load sound driver: %s\n", drv);
+    Report (CS_REPORTER_SEVERITY_ERROR,
+      "csSoundRenderSoftware: Failed to load sound driver: %s", drv);
     return false;
   }
 
@@ -105,7 +121,7 @@ csSoundRenderSoftware::~csSoundRenderSoftware()
 
 bool csSoundRenderSoftware::Open()
 {
-  System->Printf (CS_MSG_INITIALIZATION, "Software Sound Renderer selected\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Software Sound Renderer selected");
 
   SoundDriver->Open(this,
     Config->GetInt("Sound.Software.Frequency", 22050),
@@ -122,9 +138,9 @@ bool csSoundRenderSoftware::Open()
   LoadFormat.Bits = is16Bits() ? 16 : 8;
   LoadFormat.Channels = -1;
 
-  System->Printf (CS_MSG_INITIALIZATION, "  Playing %d Hz, %d bits, %s\n",
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "  Playing %d Hz, %d bits, %s",
     getFrequency(), (is16Bits())?16:8, (isStereo())?"Stereo":"Mono");
-  System->Printf (CS_MSG_INITIALIZATION, "  Volume: %g\n", Volume);
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "  Volume: %g", Volume);
 
   csTime et, ct;
   System->GetElapsedTime(et, ct);

@@ -23,6 +23,7 @@
 #include "csgfx/csimage.h"
 #include "isys/plugin.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 #define MY_CLASSNAME "crystalspace.graphic.image.io.multiplex"
 
@@ -60,9 +61,10 @@ bool csMultiplexImageIO::Initialize (iSystem *pSystem)
 {
   if (pSystem)
   {
-    pSystem->Printf(CS_MSG_INITIALIZATION,
+    csReport (pSystem->GetObjectRegistry (), CS_REPORTER_SEVERITY_NOTIFY,
+      "crystalspace.video.mplex",
       "Initializing image loading multiplexer...\n"
-      "  Looking for image loader modules:\n");
+      "  Looking for image loader modules:");
 
     iObjectRegistry* object_reg = pSystem->GetObjectRegistry ();
     iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
@@ -77,7 +79,10 @@ bool csMultiplexImageIO::Initialize (iSystem *pSystem)
 	char const* classname = classlist->Get(i);
         if (strcasecmp (classname, MY_CLASSNAME))
         {
-	  pSystem->Printf(CS_MSG_INITIALIZATION,"  %s\n",classname);
+	  csReport (pSystem->GetObjectRegistry (),
+	  	CS_REPORTER_SEVERITY_NOTIFY,
+		"crystalspace.video.mplex",
+		"  %s",classname);
 	  iImageIO *plugin = CS_LOAD_PLUGIN (plugin_mgr,
 	  	classname, NULL, iImageIO);
 	  if (plugin)

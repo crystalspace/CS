@@ -664,7 +664,7 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csHazeMeshObjectType)
 
-SCF_EXPORT_CLASS_TABLE (spr2d)
+SCF_EXPORT_CLASS_TABLE (haze)
   SCF_EXPORT_CLASS (csHazeMeshObjectType, "crystalspace.mesh.object.haze",
     "Crystal Space Haze Mesh Type")
 SCF_EXPORT_CLASS_TABLE_END

@@ -21,6 +21,8 @@
 
 #include <stdarg.h>
 #include "csutil/scf.h"
+#include "cssys/system.h"
+#include "iutil/objreg.h"
 
 struct iReporter;
 
@@ -210,6 +212,27 @@ struct iReporter : public iBase
     va_end (arg);
   }
 };
+
+/**
+ * Helper function to use a reporter easily.
+ * This function will also work if no reporter is present and
+ * use stdout in that case.
+ */
+inline void csReport (iObjectRegistry* object_reg, int severity,
+	const char* msgId, const char* description, ...)
+{
+  iReporter* reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  va_list arg;
+  va_start (arg, description);
+  if (reporter)
+    reporter->ReportV (severity, msgId, description, arg);
+  else
+  {
+    csVPrintf (description, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
 
 #endif // __IVARIA_REPORTER_H__
 

@@ -68,7 +68,9 @@ bool Simple::Initialize(int argc, const char* const argv[],
   	"/lib/std/spark.png");
   if (txt == NULL)
   @{
-    Printf (CS_MSG_FATAL_ERROR, "Error loading texture!\n");
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple1",
+    	"Error loading texture!");
     Cleanup ();
     exit (1);
   @}
@@ -128,7 +130,9 @@ bool Simple::Initialize (int argc, const char* const argv[],
   	"/lib/std/sprite1");
   if (imeshfact == NULL)
   @{
-    Printf (CS_MSG_FATAL_ERROR, "Error loading mesh object factory!\n");
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple1",
+    	"Error loading mesh object factory!");
     Cleanup ();
     exit (1);
   @}

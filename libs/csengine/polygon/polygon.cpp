@@ -782,7 +782,7 @@ void csPolygon3D::Finish ()
   csPolyTexLightMap *lmi = GetLightMapInfo ();
   if (!lmi)
   {
-    csEngine::current_engine->ReportBug ("No txt_info in polygon!\n");
+    csEngine::current_engine->ReportBug ("No txt_info in polygon!");
     fatal_exit (0, false);
   }
   lmi->Setup (this, material);
@@ -1023,7 +1023,7 @@ int csPolygon3D::AddVertex (int v)
   if (v >= thing->GetVertexCount ())
   {
     csEngine::current_engine->ReportBug (
-    	"Index number %d is too high for a polygon (max=%d)!\n",
+    	"Index number %d is too high for a polygon (max=%d)!",
     	v, thing->GetVertexCount ());
     return 0;
   }

@@ -44,6 +44,7 @@
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
 #include "imap/parser.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -68,9 +69,24 @@ ViewMesh::~ViewMesh ()
   if (g3d) g3d->DecRef ();
 }
 
+void ViewMesh::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.application.viewmesh", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 void Cleanup ()
 {
-  System->ConsoleOut ("Cleaning up...\n");
+  csPrintf ("Cleaning up...\n");
   delete System;
 }
 
@@ -90,21 +106,21 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
     abort ();
   }
 
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!loader)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
     abort ();
   }
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!g3d)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
     abort ();
   }
 
@@ -114,7 +130,7 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
   if (nw) nw->SetTitle ("View Mesh");
   if (!Open ())
   {
-    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
     Cleanup ();
     exit (1);
   }
@@ -126,19 +142,19 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
   // Initialize the texture manager
   txtmgr->ResetPalette ();
 
-  Printf (CS_MSG_INITIALIZATION,
-    "View Mesh version 0.1.\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+    "View Mesh version 0.1.");
 
   // First disable the lighting cache. Our app is simple enough
   // not to need this.
   engine->SetLightingCacheMode (0);
 
   // Create our world.
-  Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
   {
-    Printf (CS_MSG_FATAL_ERROR, "Error loading 'stone4' texture!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error loading 'stone4' texture!");
     Cleanup ();
     exit (1);
   }
@@ -214,7 +230,7 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
   room->AddLight (light);
 
   engine->Prepare ();
-  Printf (CS_MSG_INITIALIZATION, "Created.\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Created.");
 
   view = new csView (engine, g3d);
   view->GetCamera ()->SetSector (room);
@@ -240,7 +256,7 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
   	  texturefilename);
     if (txt == NULL)
     {
-      Printf (CS_MSG_FATAL_ERROR, "Error loading texture '%s'!\n",
+      Report (CS_REPORTER_SEVERITY_ERROR, "Error loading texture '%s'!",
       	texturefilename);
       Cleanup ();
       exit (1);
@@ -260,7 +276,7 @@ bool ViewMesh::Initialize (int argc, const char* const argv[],
   	  meshfilename);
     if (imeshfact == NULL)
     {
-      Printf (CS_MSG_FATAL_ERROR, "Error loading mesh object factory '%s'!\n",
+      Report (CS_REPORTER_SEVERITY_ERROR, "Error loading mesh object factory '%s'!",
       	meshfilename);
       Cleanup ();
       exit (1);
@@ -362,7 +378,7 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!System->Initialize (argc, argv, NULL))
   {
-    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
+    System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     Cleanup ();
     exit (1);
   }

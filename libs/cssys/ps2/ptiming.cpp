@@ -21,7 +21,7 @@
 #include "SDL/SDL.h"
 
 // This function should return milliseconds since some specific time
-csTime csSystemDriver::Time ()
+csTime csGetClicks ()
 {
    return SDL_GetTicks();
 }

@@ -20,6 +20,8 @@
 #include "csavi.h"
 #include "avistrv.h"
 #include "avistra.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -70,6 +72,21 @@ csAVIFormat::~csAVIFormat ()
     delete [] pData;
     if (pChunkList) delete pChunkList;
   }
+}
+
+void csAVIFormat::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.video.avi", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
 }
 
 bool csAVIFormat::Initialize (iSystem *iSys)
@@ -137,8 +154,8 @@ bool csAVIFormat::InitVideoData ()
   if (bSucc)
   {
     if (fileheader.size > datalen)
-      pSystem->Printf (CS_MSG_WARNING, 
-		       "AVI: RIFF header claims to be longer than the whole file is !\n");
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+		       "AVI: RIFF header claims to be longer than the whole file is !");
     bSucc = false;
     p += len_id;
     memcpy (&hdrl, p, len_hcl);
@@ -195,7 +212,7 @@ bool csAVIFormat::InitVideoData ()
 	  }
 	  else
 	  {
-	    pSystem->Printf (CS_MSG_DEBUG_0, "unrecognized LIST type \"%4c\" .. skipping it !", strl.id);
+	    Report (CS_REPORTER_SEVERITY_DEBUG, "unrecognized LIST type \"%4c\" .. skipping it !", strl.id);
 	  }
 	  p = pListEnd;
 	}
@@ -244,18 +261,18 @@ bool csAVIFormat::InitVideoData ()
 	}
       }
       else
-	pSystem->Printf (CS_MSG_WARNING, "No <avih> chunk found !\n");
+	Report (CS_REPORTER_SEVERITY_WARNING, "No <avih> chunk found !");
     }
     else
-      pSystem->Printf (CS_MSG_WARNING, "No <hdrl> LIST found !\n");
+      Report (CS_REPORTER_SEVERITY_WARNING, "No <hdrl> LIST found !");
   }
   else
-    pSystem->Printf (CS_MSG_WARNING, "No RIFF header found !\n");
+    Report (CS_REPORTER_SEVERITY_WARNING, "No RIFF header found !");
 
   // did we find a video stream ?
   // first check the validity of the streams found
   if (!ValidateStreams ())
-    pSystem->Printf (CS_MSG_WARNING, "No valid videostream found !\n");
+    Report (CS_REPORTER_SEVERITY_WARNING, "No valid videostream found !");
   return vStream.Length () > 0;
 }
 
@@ -401,7 +418,7 @@ ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
     strh.Endian ();
     if (!strh.Is (CHUNK_STRF))
     {
-      pSystem->Printf (CS_MSG_WARNING, "Unsupported streamtype \"%4c\" found ... ignoring it !", 
+      Report (CS_REPORTER_SEVERITY_WARNING, "Unsupported streamtype \"%4c\" found ... ignoring it !", 
 		       strh.id);
       n = AVI_EVEN(strh.size) + len_hcl;
       p += AVI_EVEN(strh.size) + len_hcl;

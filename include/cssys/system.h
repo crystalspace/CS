@@ -19,6 +19,7 @@
 #ifndef __CS_SYSTEM_H__
 #define __CS_SYSTEM_H__
 
+#include <stdarg.h>
 #include <stdio.h>
 
 #include "csutil/util.h"
@@ -40,7 +41,6 @@ class csMouseDriver;
 struct iGraphics3D;
 struct iGraphics2D;
 struct iConfig;
-struct iConsoleOutput;
 struct iConfigManager;
 
 /**
@@ -60,6 +60,7 @@ struct iConfigManager;
  */
 class csSystemDriver : public iSystem
 {
+private:
   /*
    * This is a private structure used to keep the list of plugins.
    */
@@ -209,10 +210,11 @@ class csSystemDriver : public iSystem
 private:
   /// The Virtual File System object
   iVFS *VFS;
-  /// System console
-  iConsoleOutput *Console;
 
 public:
+  /// Print something to the reporter.
+  void ReportSys (int severity, const char* msg, ...);
+
   /// -------------------------- plug-ins --------------------------
 
   /// The list of all plug-ins
@@ -282,23 +284,8 @@ public:
    */
   virtual void Help ();
 
-  /**
-   * Return time in milliseconds (if not supported by a system
-   * just return the time in seconds multiplied by 1000).
-   */
-  static csTime Time ();
-
   /// Get the installation path.
   static bool InstallPath (char *oInstallPath, size_t iBufferSize);
-
-  /// Print a string into debug.txt
-  static void DebugTextOut (bool flush, const char* str);
-
-  /**
-   * Printf version that works on all systems.
-   * Default implementation is in 'libs/cssys/general/'.
-   */
-  static void ConsoleOut  (const char *str);
 
   /// A shortcut for requesting to load a plugin (before Initialize())
   void RequestPlugin (const char *iPluginName);
@@ -335,22 +322,6 @@ protected:
   void Help (iConfig* Config);
 
   /**
-   * Show an alert. This function is called by CsPrintf and
-   * should show an alert in case of an error.
-   * The default implementation writes the message in debug.txt
-   * and on standard output.
-   */
-  virtual void Alert (const char* msg);
-
-  /**
-   * Show a warning. This function is called by CsPrintf and
-   * should show an alert in case of a warning.
-   * The default implementation writes a message in debug.txt
-   * and on standard output.
-   */
-  virtual void Warn (const char* msg);
-
-  /**
    * Query default width/height/depth from config file
    * and from command-line parameters.
    */
@@ -374,17 +345,6 @@ public:
 
   /// Get the time in milliseconds.
   virtual csTime GetTime ();
-  /**
-   * Print a string to the specified device.  This is implemented as a thin
-   * wrapper over PrintfV().
-   */
-  virtual void Printf (int mode, char const* format, ...);
-  /**
-   * Print a string to the specified device.  Since Printf() is just a thin
-   * wrapper over this method, most subclasses which need to provide special
-   * extensions should override PrintfV() rather than Printf()
-   */
-  virtual void PrintfV (int mode, char const* format, va_list);
   /**
    * Execute a system-dependent extension command.  This is implemented as a
    * thin wrapper over PerformExtensionV().
@@ -510,5 +470,13 @@ public:
 
 // Fatal exit routine (which can be replaced if neccessary)
 extern void (*fatal_exit) (int errorcode, bool canreturn);
+
+// CS version of printf
+extern int csPrintf (const char* str, ...);
+// CS version of vprintf
+extern int csVPrintf (const char* str, va_list arg);
+
+// Get the time.
+extern csTime csGetClicks ();
 
 #endif // __CS_SYSTEM_H__

@@ -93,7 +93,7 @@ int main(int argc, const char* const args[])
 
   if (!sys.Initialize (argc, args, NULL))
   {
-    sys.Printf (CS_MSG_FATAL_ERROR, "Error initializing system !");
+    printf ("Error initializing system !");
     return -1;
   }
 

@@ -30,6 +30,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
+#include "ivaria/reporter.h"
 #include "isys/evdefs.h"
 #include "isys/system.h"
 #include "isys/plugin.h"
@@ -126,15 +127,17 @@ bool csSimpleConsole::Initialize (iSystem *iSys)
     fontname = buf;
   iFontServer *fs = G2D->GetFontServer ();
   if (!fs)
-    System->Printf(CS_MSG_FATAL_ERROR,
-      "Console: No font server plug-in loaded!\n");
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.console.output.simple",
+	"Console: No font server plug-in loaded!");
   else
     console_font = fs->LoadFont (fontname);
   if (!console_font)
   {
-    System->Printf (CS_MSG_FATAL_ERROR,
-      "Cannot load font CONFONT=%s defined in configuration file.\n"
-      "Try '*large', '*courier', '*italic' or '*small'\n", buf);
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.console.output.simple",
+        "Cannot load font CONFONT=%s defined in configuration file.\n"
+        "Try '*large', '*courier', '*italic' or '*small'", buf);
     return false;
   }
 
@@ -241,15 +244,18 @@ void csSimpleConsole::PutMessage (bool advance, const char *iText)
     LineMessageNumber++;
 }
 
-void csSimpleConsole::PutText (int /*iMode*/, const char *iText)
+void csSimpleConsole::PutTextV (const char *iText2, va_list args)
 {
   int len;
   char *dst;
   const char *src;
   char c;
 
-  if (iText == 0 || *iText == 0)
+  if (iText2 == 0 || *iText2 == 0)
     goto Done;
+
+  char iText[4096];
+  vsprintf (iText, iText2, args);
 
   len = strlen (Line [LineNumber]);
   dst = Line [LineNumber] + len;

@@ -24,6 +24,8 @@ extern "C" {
 #include "cssysdef.h"
 #include "cslua.h"
 #include "csutil/csstring.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -45,7 +47,8 @@ SCF_EXPORT_CLASS_TABLE_END
 
 csLua* csLua::shared_instance = NULL;
 
-csLua::csLua(iBase *iParent) :Sys(NULL), Mode(CS_MSG_INITIALIZATION), lua_state(NULL)
+csLua::csLua(iBase *iParent) :Sys(NULL), Mode(CS_REPORTER_SEVERITY_NOTIFY),
+	lua_state(NULL)
 {
   SCF_CONSTRUCT_IBASE(iParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiPlugin);
@@ -56,7 +59,7 @@ csLua::csLua(iBase *iParent) :Sys(NULL), Mode(CS_MSG_INITIALIZATION), lua_state(
 
 csLua::~csLua()
 {
-  Mode=CS_MSG_INTERNAL_ERROR;
+  Mode=CS_REPORTER_SEVERITY_BUG;
   lua_close(LUA_STATE());
   lua_state=NULL;
   Sys=NULL;
@@ -82,7 +85,7 @@ bool csLua::Initialize(iSystem* iSys)
 
   cspace_initialize(LUA_STATE());
 
-  Mode=CS_MSG_STDOUT;
+  Mode=CS_REPORTER_SEVERITY_NOTIFY;
 
   // Store the system pointer in 'cspace.system'.
   lua_pushusertag(LUA_STATE(), (void*)Sys, iSystem_tag);
@@ -128,10 +131,19 @@ bool csLua::LoadModule(const char* name)
 
 void csLua::Print(bool Error, const char *msg)
 {
-  if(Error)
-    Sys->Printf(CS_MSG_FATAL_ERROR, "CrystalScript Error: %s\n", msg);
+  iObjectRegistry* object_reg = Sys->GetObjectRegistry ();
+  iReporter* reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (!reporter)
+    csPrintf ("%s\n", msg);
   else
-    Sys->Printf(Mode, "%s", msg);
+  {
+    if(Error)
+      reporter->Report (CS_REPORTER_SEVERITY_ERROR, "crystalspace.script.lua",
+      	"CrystalScript Error: %s", msg);
+    else
+      reporter->Report (Mode, "crystalspace.script.lua",
+      	"%s", msg);
+  }
 }
 
 extern "C" {

@@ -57,7 +57,7 @@ struct iConsoleWatcher : public iBase
 };
 
 
-SCF_VERSION (iConsoleOutput, 2, 0, 0);
+SCF_VERSION (iConsoleOutput, 2, 1, 0);
 
 /**
  * This is the Crystal Space Console interface.  It is an output only system.
@@ -75,7 +75,12 @@ struct iConsoleOutput : public iBase
    * this way: PutText ("some text\r"); This message will disappear
    * as soon as any other message will be sent to console.
    */
-  virtual void PutText (int iMode, const char *iText) = 0;
+  virtual void PutText (const char *iText, ...) = 0;
+
+  /**
+   * Var_args version of PutText.
+   */
+  virtual void PutTextV (const char *iText, va_list args) = 0;
 
   /// Return a line from the buffer (-1 = current line)
   virtual const char *GetLine (int iLine = -1) const = 0;

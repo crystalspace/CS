@@ -33,6 +33,7 @@
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
 #include "isys/plugin.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -58,9 +59,24 @@ PerfTest::~PerfTest ()
   if (ImageLoader) ImageLoader->DecRef();
 }
 
+void PerfTest::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.application.perftest", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 void Cleanup ()
 {
-  System->ConsoleOut ("Cleaning up...\n");
+  csPrintf ("Cleaning up...\n");
   delete System;
 }
 
@@ -71,7 +87,7 @@ iMaterialHandle* PerfTest::LoadMaterial (char* file)
   iDataBuffer *buf = myVFS->ReadFile (file);
   if (!buf || !buf->GetSize ())
   {
-    Printf (CS_MSG_FATAL_ERROR, "Error loading texture '%s'!\n", file);
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error loading texture '%s'!", file);
     exit (-1);
   }
   image = ImageLoader->Load (buf->GetUint8 (), buf->GetSize (),
@@ -100,7 +116,7 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
   myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D plugin!");
     return false;
   }
   iGraphics2D* myG2D = myG3D->GetDriver2D ();
@@ -110,7 +126,7 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ())
   {
-    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
     Cleanup ();
     exit (1);
   }
@@ -118,14 +134,14 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
   ImageLoader = CS_QUERY_PLUGIN_ID(plugin_mgr, CS_FUNCID_IMGLOADER, iImageIO);
   if (!ImageLoader)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No image loader plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No image loader plugin!");
     return false;
   }
 
   myVFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!myVFS)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iVFS plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iVFS plugin!");
     return false;
   }
 
@@ -153,8 +169,8 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
   txtmgr->SetPalette ();
 
   // Some commercials...
-  Printf (CS_MSG_INITIALIZATION,
-    "Crystal Space 3D Performance Tester 0.1.\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+    "Crystal Space 3D Performance Tester 0.1.");
 
   txtmgr->SetPalette ();
 
@@ -202,7 +218,7 @@ void PerfTest::NextFrame ()
     {
       test_skip = false;
       float totalelapsed = float(current_time - last_time)/1000.f;
-      Printf (CS_MSG_INITIALIZATION, "%f FPS\n",
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "%f FPS",
       	current_tester->GetCount ()/totalelapsed);
       Tester* next_tester = current_tester->NextTester ();
       delete current_tester;
@@ -243,7 +259,7 @@ void PerfTest::NextFrame ()
     last_time = current_time;
     char desc[255];
     current_tester->Description (desc);
-    Printf (CS_MSG_INITIALIZATION, desc);
+    Report (CS_REPORTER_SEVERITY_NOTIFY, desc);
     needs_setup = false;
   }
 
@@ -293,7 +309,7 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!System->Initialize (argc, argv, NULL))
   {
-    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
+    System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     Cleanup ();
     exit (1);
   }

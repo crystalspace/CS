@@ -220,9 +220,7 @@ void csSocketDriver::ClearError() { LastError = CS_NET_ERR_NO_ERROR; }
 void csSocketDriver::Open()
 {
   ClearError();
-  Sys->Printf (CS_MSG_INITIALIZATION, "Initializing socket network driver: ");
-  const bool ok = PlatformDriverStart();
-  Sys->Printf (CS_MSG_INITIALIZATION, ok ? "OK\n" : "FAILED\n");
+  PlatformDriverStart();
 }
 
 void csSocketDriver::Close()

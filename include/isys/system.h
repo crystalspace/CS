@@ -23,37 +23,6 @@
 #include "csutil/scf.h"
 #include "iutil/cfgmgr.h"
 
-/*
- * Several types of messages.
- * The type of message is indicated when you call iSystem::Printf().
- * Depending on message type, the message will be put into debug log,
- * will be output to the console and so on.
- */
-/// Internal error, this is a serious bug in CS
-#define CS_MSG_INTERNAL_ERROR	1
-/// Error which prevents proper further execution
-#define CS_MSG_FATAL_ERROR		2
-/// Error which doesn't prevent proper execution
-#define CS_MSG_WARNING		3
-/// Initialization message
-#define CS_MSG_INITIALIZATION	4
-/// Message intended for display on the console
-#define CS_MSG_CONSOLE		5
-/// Message intended for display on stdout
-#define CS_MSG_STDOUT		6
-/// Show message if debug level is 0, 1, or 2 (no debug)
-#define CS_MSG_DEBUG_0		7
-/// Show message if debug level is 1 or 2 (debug mode)
-#define CS_MSG_DEBUG_1		8
-/// Show message if debug level 2 (verbose mode)
-#define CS_MSG_DEBUG_2		9
-/// Show message if debug level is 0, 1, or 2 (no debug) and flush
-#define CS_MSG_DEBUG_0F		10
-/// Show message if debug level is 1 or 2 (debug mode) and flush
-#define CS_MSG_DEBUG_1F		11
-/// Show message if debug level 2 (verbose mode) and flush
-#define CS_MSG_DEBUG_2F		12
-
 struct iPlugin;
 struct iObjectRegistry;
 struct iVFS;
@@ -65,7 +34,7 @@ struct iConfigFile;
 struct iConfigManager;
 
 
-SCF_VERSION (iSystem, 6, 0, 0);
+SCF_VERSION (iSystem, 7, 0, 0);
 
 /**
  * This interface serves as a way for plug-ins to query Crystal Space about
@@ -115,13 +84,6 @@ struct iSystem : public iBase
 
   /// Get the time in milliseconds.
   virtual csTime GetTime () = 0;
-  /// Print a string to the specified device.
-  virtual void Printf (int mode, char const* format, ...) = 0;
-  /**
-   * Print a string to the specified device.  This is just like Printf() except
-   * that it accepts a `va_list' instead of a variable argument list.
-   */
-  virtual void PrintfV (int mode, char const* format, va_list) = 0;
 
   /**
    * Execute a system-dependent extension.<p>

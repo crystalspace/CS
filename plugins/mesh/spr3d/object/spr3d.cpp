@@ -27,6 +27,8 @@
 #include "iengine/rview.h"
 #include "iengine/movable.h"
 #include "iengine/light.h"
+#include "ivaria/reporter.h"
+#include "iutil/objreg.h"
 #include "qsqrt.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -147,6 +149,21 @@ SCF_IMPLEMENT_IBASE_END
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObjectFactory::Sprite3DFactoryState)
   SCF_IMPLEMENTS_INTERFACE (iSprite3DFactoryState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+void csSprite3DMeshObjectFactory::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.mesh.sprite.3d", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
 
 csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
     texels (8, 8), vertices (8, 8), normals (8, 8)
@@ -436,8 +453,8 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base)
 {
   if (base > GetFrameCount())
   {
-    System->Printf (CS_MSG_WARNING, "No frame number: \n", base);
-    System->Printf (CS_MSG_WARNING, "no smoothing performed\n");
+    Report (CS_REPORTER_SEVERITY_WARNING, "No frame number: %d", base);
+    Report (CS_REPORTER_SEVERITY_WARNING, "no smoothing performed");
     return;
   }
   int i;
@@ -450,11 +467,11 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   int i, j;
 
   int num_frames = GetFrameCount();
-  if (base  > num_frames) System->Printf (CS_MSG_WARNING, "No frame number: \n", base);
-  if (frame > num_frames) System->Printf (CS_MSG_WARNING, "No frame number: \n", frame);
+  if (base  > num_frames) Report (CS_REPORTER_SEVERITY_WARNING, "No frame number: %d", base);
+  if (frame > num_frames) Report (CS_REPORTER_SEVERITY_WARNING, "No frame number: %d", frame);
   if (frame > num_frames || base > num_frames)
   {
-    System->Printf (CS_MSG_WARNING, "no smoothing performed\n");
+    Report (CS_REPORTER_SEVERITY_WARNING, "no smoothing performed");
     return;
   }
 
@@ -888,7 +905,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 
   if (!factory->cstxt)
   {
-    factory->System->Printf (CS_MSG_FATAL_ERROR, "Error! Trying to draw a sprite with no material!\n");
+    factory->Report (CS_REPORTER_SEVERITY_ERROR, "Error! Trying to draw a sprite with no material!");
     exit (0); //fatal_exit (0, false);
   }
  
@@ -1131,7 +1148,7 @@ void csSprite3DMeshObject::InitSprite ()
 {
   if (!factory)
   {
-    factory->System->Printf (CS_MSG_FATAL_ERROR, "There is no defined template for this sprite!\n");
+    factory->Report (CS_REPORTER_SEVERITY_ERROR, "There is no defined template for this sprite!");
     exit (0); //fatal_exit (0, false);
   }
 

@@ -36,6 +36,7 @@
 #include "imap/parser.h"
 #include "isys/plugin.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 //------------------------------------------------- We need the 3D engine -----
 
@@ -64,16 +65,30 @@ PySimple::~PySimple ()
     LevelLoader->DecRef();
 }
 
+void PySimple::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.application.pysimple", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
 
 void PySimple::Help () {
   SysSystemDriver::Help ();
-  Printf (CS_MSG_STDOUT, "  -python            Test the csPython plugin\n");
-  Printf (CS_MSG_STDOUT, "  -lua               Test the csLua plugin\n");
+  printf ("  -python            Test the csPython plugin\n");
+  printf ("  -lua               Test the csLua plugin\n");
 }
 
 void Cleanup ()
 {
-  System->ConsoleOut ("Cleaning up...\n");
+  csPrintf ("Cleaning up...\n");
   delete System;
 }
 
@@ -91,21 +106,21 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iEngine plugin!");
     abort ();
   }
 
   myG3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!myG3D)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D loader plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iGraphics3D loader plugin!");
     return false;
   }
 
   LevelLoader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!LevelLoader)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "No iLoader plugin!");
     abort ();
   }
 
@@ -114,14 +129,14 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   if (nw) nw->SetTitle ("Simple Crystal Space Python Application");
   if (!Open ())
   {
-    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
     Cleanup ();
     exit (1);
   }
 
   // Some commercials...
-  Printf (CS_MSG_INITIALIZATION,
-    "Simple Crystal Space Python Application version 0.1.\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+    "Simple Crystal Space Python Application version 0.1.");
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
@@ -130,7 +145,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   engine->SetLightingCacheMode (0);
 
   // Create our world.
-  Printf (CS_MSG_INITIALIZATION, "Creating world!...\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
   LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
   iSector *room = engine->CreateSector ("room");
@@ -151,8 +166,8 @@ bool PySimple::Initialize (int argc, const char* const argv[],
 
   if (!testpython && !testlua)
   {
-    Printf (CS_MSG_FATAL_ERROR,
-      "Please select -python or -lua to select which scripting engine to test!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR,
+      "Please select -python or -lua to select which scripting engine to test!");
     return 0;
   }
 
@@ -199,7 +214,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
 
   engine->Prepare ();
 
-  Printf (CS_MSG_INITIALIZATION, "--------------------------------------\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------");
 
   // csView is a view encapsulating both a camera and a clipper.
   // You don't have to use csView as you can do the same by
@@ -285,7 +300,7 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!System->Initialize (argc, argv, NULL))
   {
-    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
+    System->Report (CS_REPORTER_SEVERITY_ERROR, "Error initializing system!");
     Cleanup ();
     exit (1);
   }

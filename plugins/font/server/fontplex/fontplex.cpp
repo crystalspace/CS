@@ -22,6 +22,7 @@
 #include "isys/system.h"
 #include "isys/plugin.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include "csutil/csvector.h"
 #include "fontplex.h"
 
@@ -69,8 +70,11 @@ bool csFontServerMultiplexor::Initialize (iSystem *System)
     fontservers.Push (fs);
   }
   if (!fontservers.Length ())
-    System->Printf (CS_MSG_WARNING, 
-      "Font server multiplexor: WARNING, no slave font servers found!\n");
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
+        "crystalspace.font.fontplex",
+        "Font server multiplexor: WARNING, no slave font servers found!");
+  }
   return true;
 }
 

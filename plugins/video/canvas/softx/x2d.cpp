@@ -25,6 +25,8 @@
 #include "csgeom/csrect.h"
 #include "isys/system.h"
 #include "isys/event.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include "x2d.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -50,6 +52,21 @@ csGraphics2DXLib::csGraphics2DXLib (iBase *iParent) :
   EventOutlet = NULL;
 }
 
+void csGraphics2DXLib::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.canvas.softx", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 bool csGraphics2DXLib::Initialize (iSystem *pSystem)
 {
   if (!csGraphics2D::Initialize (pSystem))
@@ -60,7 +77,7 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
 
   if (!dpy)
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "FATAL: Cannot open X display\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "FATAL: Cannot open X display");
     exit (-1);
   }
 
@@ -108,7 +125,7 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
   }
   else
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "FATAL: Current screen depth not supported (8, 15, 16 or 32 bpp only)\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "FATAL: Current screen depth not supported (8, 15, 16 or 32 bpp only)");
     exit (1);
   }
 
@@ -267,12 +284,10 @@ csGraphics2DXLib::~csGraphics2DXLib(void)
 bool csGraphics2DXLib::Open()
 {
   if (is_open) return true;
-  CsPrintf (CS_MSG_INITIALIZATION, "Crystal Space X windows driver");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Crystal Space X windows driver");
   if (do_shm)
-    CsPrintf (CS_MSG_INITIALIZATION, " (Using SHM extension).\n");
-  else
-    CsPrintf (CS_MSG_INITIALIZATION, ".\n");
-  CsPrintf (CS_MSG_INITIALIZATION, "Using %d bit %sColor visual\n",
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "(Using SHM extension)");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Using %d bit %sColor visual",
               vinfo.depth, (vclass == PseudoColor) ? "Pseudo" : "True");
 
   // Open your graphic interface
@@ -395,14 +410,14 @@ bool csGraphics2DXLib::Open()
 #ifdef DO_SHM
     if (do_shm)
     {
-      CsPrintf (CS_MSG_INITIALIZATION, "SHM available but could not allocate. "
-        "Trying without SHM.\n");
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "SHM available but could not allocate. "
+        "Trying without SHM.");
       if(xim) { XDestroyImage(xim); xim=NULL; }
       do_shm = false;
       if(!AllocateMemory())
       {
 #endif //DO_SHM
-      CsPrintf (CS_MSG_FATAL_ERROR, "Unable to allocate memory!\n");
+      Report (CS_REPORTER_SEVERITY_ERROR, "Unable to allocate memory!");
       return false;
 #ifdef DO_SHM
       }
@@ -433,7 +448,7 @@ bool csGraphics2DXLib::AllocateMemory ()
     if (do_shm && !XShmQueryExtension (dpy))
     {
       do_shm = false;
-      CsPrintf (CS_MSG_INITIALIZATION, "SHM extension not available on display!\n");
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "SHM extension not available on display!");
     }
     if (do_shm)
     {
@@ -441,7 +456,7 @@ bool csGraphics2DXLib::AllocateMemory ()
 			    ZPixmap, 0, &shmi, Width, Height);
       if (!xim)
       {
-	CsPrintf (CS_MSG_FATAL_ERROR, "XShmCreateImage failed!\n");
+	Report (CS_REPORTER_SEVERITY_ERROR, "XShmCreateImage failed!");
 	return false;
       }
       shm_image = *xim;
@@ -449,13 +464,13 @@ bool csGraphics2DXLib::AllocateMemory ()
         IPC_CREAT | 0777);
       if (shmi.shmid == -1)
       {
-	CsPrintf (CS_MSG_FATAL_ERROR, "shmget failed!\n");
+	Report (CS_REPORTER_SEVERITY_ERROR, "shmget failed!");
 	return false;
       }
       shmi.shmaddr = (char*)shmat (shmi.shmid, 0, 0);
       if (shmi.shmaddr == (char*) -1)
       {
-	CsPrintf (CS_MSG_FATAL_ERROR, "shmat failed!\n");
+	Report (CS_REPORTER_SEVERITY_ERROR, "shmat failed!");
 	return false;
       }
       shmi.readOnly = FALSE;
@@ -577,7 +592,7 @@ void csGraphics2DXLib::restore_332_palette ()
    || (real_pfmt.PixelBytes != 1))
     return;
 
-  CsPrintf (CS_MSG_DEBUG_0, "Restore 3:3:2 palette\n");
+  Report (CS_REPORTER_SEVERITY_DEBUG, "Restore 3:3:2 palette");
 
   int i, r, g, b;
 
@@ -608,7 +623,7 @@ void csGraphics2DXLib::restore_332_palette ()
     color.flags = DoRed | DoGreen | DoBlue;
     XStoreColor (dpy, cmap, &color);
   }
-  CsPrintf (CS_MSG_DEBUG_0, "Done!\n");
+  Report (CS_REPORTER_SEVERITY_DEBUG, "Done!");
 }
 
 void csGraphics2DXLib::recompute_simulated_palette ()
@@ -617,7 +632,7 @@ void csGraphics2DXLib::recompute_simulated_palette ()
    || (real_pfmt.PixelBytes != 1))
     return;
 
-  CsPrintf (CS_MSG_DEBUG_0, "Recompute simulated palette\n");
+  Report (CS_REPORTER_SEVERITY_DEBUG, "Recompute simulated palette");
 
   palent* pe;
   int i;
@@ -718,7 +733,7 @@ void csGraphics2DXLib::recompute_simulated_palette ()
   pe_new[255].g = 255;
   pe_new[255].b = 255;
 
-  CsPrintf (CS_MSG_DEBUG_0, "Recomputing lookup table...\n");
+  Report (CS_REPORTER_SEVERITY_DEBUG, "Recomputing lookup table...");
 
   // Recompute the lookup table from 15/16-bit to 8-bit.
   int r, g, b;
@@ -755,7 +770,7 @@ void csGraphics2DXLib::recompute_simulated_palette ()
 
   delete [] pe;
   delete [] pe_new;
-  CsPrintf (CS_MSG_DEBUG_0, "Done!\n");
+  Report (CS_REPORTER_SEVERITY_DEBUG, "Done!");
 }
 
 void csGraphics2DXLib::recompute_grey_palette ()
@@ -764,7 +779,7 @@ void csGraphics2DXLib::recompute_grey_palette ()
    || (real_pfmt.PixelBytes != 1))
     return;
 
-  CsPrintf (CS_MSG_DEBUG_0, "Compute grey palette\n");
+  Report (CS_REPORTER_SEVERITY_DEBUG, "Compute grey palette");
 
   palent* pe;
   int i;
@@ -780,7 +795,7 @@ void csGraphics2DXLib::recompute_grey_palette ()
     pe[i].cnt = 1;
   }
 
-  CsPrintf (CS_MSG_DEBUG_0, "Recomputing lookup table...\n");
+  Report (CS_REPORTER_SEVERITY_DEBUG, "Recomputing lookup table...");
 
   // Recompute the lookup table from 15/16-bit to 8-bit.
   int r, g, b;
@@ -816,7 +831,7 @@ void csGraphics2DXLib::recompute_grey_palette ()
   }
 
   delete [] pe;
-  CsPrintf (CS_MSG_DEBUG_0, "Done!\n");
+  Report (CS_REPORTER_SEVERITY_DEBUG, "Done!");
 }
 
 bool csGraphics2DXLib::PerformExtensionV (char const* command, va_list)
@@ -1147,11 +1162,11 @@ bool csGraphics2DXLib::HandleEvent (iEvent &Event)
    && (Event.Command.Code == cscmdCommandLineHelp)
    && System)
   {
-    System->Printf (CS_MSG_STDOUT, "Options for X-Windows 2D graphics driver:\n");
-    System->Printf (CS_MSG_STDOUT, "  -sdepth=<depth>    set simulated depth (8, 15, 16, or 32) (default=none)\n");
-    System->Printf (CS_MSG_STDOUT, "  -shm/noshm         SHM extension (default '%sshm')\n",
+    printf ("Options for X-Windows 2D graphics driver:\n");
+    printf ("  -sdepth=<depth>    set simulated depth (8, 15, 16, or 32) (default=none)\n");
+    printf ("  -shm/noshm         SHM extension (default '%sshm')\n",
       do_shm ? "" : "no");
-    System->Printf (CS_MSG_STDOUT, "  -[no]sysmouse      use/don't use system mouse cursor (default=%s)\n",
+    printf ("  -[no]sysmouse      use/don't use system mouse cursor (default=%s)\n",
       do_hwmouse ? "use" : "don't");
     return true;
   }
@@ -1335,14 +1350,14 @@ bool csGraphics2DXLib::ReallocateMemory ()
 #ifdef DO_SHM
     if (do_shm)
     {
-      CsPrintf (CS_MSG_INITIALIZATION, "SHM available but could not allocate. "
-        "Trying without SHM.\n");
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "SHM available but could not allocate. "
+        "Trying without SHM.");
       if(xim) { XDestroyImage(xim); xim=NULL; }
       do_shm = false;
       if(!AllocateMemory())
       {
 #endif //DO_SHM
-        CsPrintf (CS_MSG_FATAL_ERROR, "Unable to allocate memory!\n");
+        Report (CS_REPORTER_SEVERITY_ERROR, "Unable to allocate memory!");
         abort();
 #ifdef DO_SHM
       }

@@ -51,14 +51,12 @@ public:
    *         1 if point p is right of plane '0-v1-v2',
    *      or 0 if point p lies on plane '0-v1-v2'.
    * Plane '0-v1-v2' is the plane passing through points <0,0,0>, v1, and v2.
+   *<p>
+   * Warning: the result of this function when 'p' is exactly on the plane
+   * 0-v1-v2 is undefined. It should return 0 but it will not often do that
+   * due to numerical inaccuracies. So you should probably test for this
+   * case seperatelly.
    */
-//@@@ Warning: This function fails if the three points are co-planar with
-// origin <0,0,0>. Be warned that you should check this before using this
-// function. One method is that since you have a plane that you used to check
-// the vertices, add the normal of the plane to the three vertices. The normal
-// is the only vector that can garuntee that the vertices will be shifted away
-// from origin, and yield a valid result.
-
   static int WhichSide3D (const csVector3& p,
                           const csVector3& v1, const csVector3& v2)
   {

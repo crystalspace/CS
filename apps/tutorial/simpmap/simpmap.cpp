@@ -42,6 +42,7 @@
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
 #include "imap/parser.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -68,7 +69,7 @@ Simple::~Simple ()
 
 void Cleanup ()
 {
-  System->ConsoleOut ("Cleaning up...\n");
+  csPrintf ("Cleaning up...\n");
   delete System;
 }
 
@@ -85,36 +86,46 @@ bool Simple::Initialize (int argc, const char* const argv[],
   iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!VFS)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iVFS plugin!\n");
-    abort ();
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple1",
+    	"No iVFS plugin!");
+    exit (1);
   }
 
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   if (!engine)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
-    abort ();
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple1",
+    	"No iEngine plugin!");
+    exit (1);
   }
 
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (!loader)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iLoader plugin!\n");
-    abort ();
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple1",
+    	"No iLoader plugin!");
+    exit (1);
   }
 
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   if (!g3d)
   {
-    Printf (CS_MSG_FATAL_ERROR, "No iGraphics3D plugin!\n");
-    abort ();
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple1",
+    	"No iGraphics3D plugin!");
+    exit (1);
   }
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ())
   {
-    Printf (CS_MSG_FATAL_ERROR, "Error opening system!\n");
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple1",
+    	"Error opening system!");
     Cleanup ();
     exit (1);
   }
@@ -126,24 +137,31 @@ bool Simple::Initialize (int argc, const char* const argv[],
   // Initialize the texture manager
   txtmgr->ResetPalette ();
 
-  Printf (CS_MSG_INITIALIZATION,
-    "Simple Crystal Space Application version 0.1.\n");
+  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+    	"crystalspace.application.simple1",
+  	"Simple Crystal Space Application version 0.1.");
 
   // Create our world.
-  Printf (CS_MSG_INITIALIZATION, "Loading world!...\n");
+  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+    	"crystalspace.application.simple1",
+  	"Loading world!...");
 
   // Set VFS current directory to the level we want to load.
   VFS->ChDir ("/lev/flarge");
   // Load the level file which is called 'world'.
   if (!loader->LoadMapFile ("world"))
   {
-    Printf (CS_MSG_FATAL_ERROR, "Couldn't load level!\n");
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple1",
+    	"Couldn't load level!");
     Cleanup ();
     exit (1);
   }
 
   engine->Prepare ();
-  Printf (CS_MSG_INITIALIZATION, "Loaded.\n");
+  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+    	"crystalspace.application.simple1",
+  	"Loaded.");
 
   // Find the starting position in this level.
   csVector3 pos (0, 0, 0);
@@ -162,7 +180,9 @@ bool Simple::Initialize (int argc, const char* const argv[],
   }
   if (!room)
   {
-    Printf (CS_MSG_FATAL_ERROR, "Can't find a valid starting position!\n");
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple1",
+    	"Can't find a valid starting position!");
     Cleanup ();
     exit (1);
   }
@@ -253,7 +273,9 @@ int main (int argc, char* argv[])
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!System->Initialize (argc, argv, NULL))
   {
-    System->Printf (CS_MSG_FATAL_ERROR, "Error initializing system!\n");
+    csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple1",
+    	"Error initializing system!");
     Cleanup ();
     exit (1);
   }

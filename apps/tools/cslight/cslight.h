@@ -110,6 +110,8 @@ public:
 
   virtual bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
+
+  void Report (int severity, const char* msg, ...);
 };
 
 #endif // __CSLIGHT_H__

@@ -21,6 +21,7 @@
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "fancycon.h"
+#include "ivaria/reporter.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
@@ -52,6 +53,22 @@ SCF_EXPORT_CLASS_TABLE (fancycon)
   SCF_EXPORT_CLASS (csFancyConsole, "crystalspace.console.output.fancy",
 		"Crystal Space fancy output console")
 SCF_EXPORT_CLASS_TABLE_END
+
+
+void csFancyConsole::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.console.output.fancy", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
 
 csFancyConsole::csFancyConsole (iBase *p) :
   System(0), VFS(0), base(0), G2D(0), G3D(0), ImageLoader(NULL), border_computed(false),
@@ -140,10 +157,10 @@ bool csFancyConsole::HandleEvent (iEvent &Event)
   return false;
 }
 
-void csFancyConsole::PutText (int iMode, const char *iText)
+void csFancyConsole::PutTextV (const char *iText, va_list args)
 {
   base->AutoUpdate(false);
-  base->PutText (iMode, iText);
+  base->PutTextV (iText, args);
   base->AutoUpdate(auto_update);
   if (auto_update && system_ready && G3D->BeginDraw (CSDRAW_2DGRAPHICS))
   {
@@ -409,8 +426,8 @@ void csFancyConsole::LoadPix ()
   const char* dir = ini->GetStr ("FancyConsole.General.Archive");
   const char* mountdir = ini->GetStr ("FancyConsole.General.Mount");
   if (!dir || !mountdir)
-    System->Printf (CS_MSG_WARNING,
-      "FancyConsole: Data resource location unknown\n");
+    Report (CS_REPORTER_SEVERITY_WARNING,
+      "FancyConsole: Data resource location unknown");
   else if (VFS->Mount (mountdir, dir))
   {
     VFS->PushDir ();
@@ -441,7 +458,8 @@ void csFancyConsole::LoadPix ()
     VFS->Unmount (mountdir, dir);
   }
   else
-    System->Printf (CS_MSG_WARNING, "Could not mount %s on %s\n", dir, mountdir);
+    Report (CS_REPORTER_SEVERITY_WARNING,
+    	"Could not mount %s on %s", dir, mountdir);
 }
 
 void csFancyConsole::PrepPix (iConfigFile *ini, const char *sect,
@@ -505,7 +523,7 @@ void csFancyConsole::PrepPix (iConfigFile *ini, const char *sect,
       delete [] data;
     }
     else
-      System->Printf(CS_MSG_WARNING, "Could not read %s\n", pix);
+      Report (CS_REPORTER_SEVERITY_WARNING, "Could not read %s", pix);
   }
 
   Keyname.Clear() << "FancyConsole." << sect << ".do_alpha";

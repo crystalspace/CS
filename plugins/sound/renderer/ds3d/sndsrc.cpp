@@ -27,6 +27,8 @@
 #include "sndsrc.h"
 #include "sndhdl.h"
 #include "isys/system.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 SCF_IMPLEMENT_FACTORY(csSoundSourceDS3D)
 
@@ -52,6 +54,22 @@ csSoundSourceDS3D::~csSoundSourceDS3D() {
   }
   if (Renderer) Renderer->DecRef();
   if (SoundHandle) SoundHandle->DecRef();
+}
+
+void csSoundSourceDS3D::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (Renderer->System->GetObjectRegistry (),
+  	iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.sound.ds3d", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
 }
 
 bool csSoundSourceDS3D::Initialize(csSoundRenderDS3D *srdr,
@@ -89,15 +107,17 @@ bool csSoundSourceDS3D::Initialize(csSoundRenderDS3D *srdr,
 
   r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &Buffer2D, NULL);
   if (r != DS_OK) {
-    srdr->System->Printf(CS_MSG_WARNING, "cannot create secondary sound buffer "
-     "for sound source (%s).\n", srdr->GetError(r));
+    srdr->Report (CS_REPORTER_SEVERITY_WARNING,
+      "cannot create secondary sound buffer "
+      "for sound source (%s).", srdr->GetError(r));
     return false;
   }
 
   r = Buffer2D->QueryInterface(IID_IDirectSound3DBuffer, (void **) &Buffer3D);
   if (r != DS_OK) {
-    srdr->System->Printf(CS_MSG_WARNING, "cannot query 3D buffer interface "
-      "for sound source (%s).\n", srdr->GetError(r));
+    srdr->Report (CS_REPORTER_SEVERITY_WARNING,
+    	"cannot query 3D buffer interface "
+        "for sound source (%s).", srdr->GetError(r));
     return false;
   }
 
@@ -158,8 +178,9 @@ void csSoundSourceDS3D::SetMode3D(int mode3D) {
   
   HRESULT r = Buffer3D->SetMode(Mode, DS3D_DEFERRED);
   if (r != DS_OK) {
-    Renderer->System->Printf(CS_MSG_WARNING, "cannot set secondary sound buffer 3d mode "
-      "for sound source (%s)\n.", Renderer->GetError(r));
+    Renderer->Report (CS_REPORTER_SEVERITY_WARNING,
+    	"cannot set secondary sound buffer 3d mode "
+        "for sound source (%s).", Renderer->GetError(r));
   } else Renderer->SetDirty();
 }
 
@@ -167,8 +188,9 @@ int csSoundSourceDS3D::GetMode3D() {
   DWORD Mode;
   HRESULT r = Buffer3D->GetMode(&Mode);
   if (r != DS_OK) {
-    Renderer->System->Printf(CS_MSG_WARNING, "cannot get secondary sound buffer 3d mode "
-      "for sound source (%s)\n.", Renderer->GetError(r));
+    Renderer->Report (CS_REPORTER_SEVERITY_ERROR,
+    	"cannot get secondary sound buffer 3d mode "
+        "for sound source (%s).", Renderer->GetError(r));
     return false;
   }
   if (Mode == DS3DMODE_NORMAL) return SOUND3D_ABSOLUTE;

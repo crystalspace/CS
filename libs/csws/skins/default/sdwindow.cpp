@@ -24,6 +24,7 @@
 #include "csws/cswsutil.h"
 #include "csws/sdefault.h"
 #include "isys/system.h"
+#include "ivaria/reporter.h"
 #include "qint.h"
 
 #define TITLEBAR_TEXTURE_NAME	"csws::TitlebarButtons"
@@ -38,7 +39,7 @@ void csDefaultWindowSkin::Initialize (csApp *iApp, csSkin *Parent)
     ButtonTex->IncRef ();
   else
   {
-    iApp->Printf (CS_MSG_FATAL_ERROR,
+    iApp->Printf (CS_REPORTER_SEVERITY_ERROR,
       "Cannot find texture %s for default window skin\n", TITLEBAR_TEXTURE_NAME);
     fatal_exit (0, false);
   }

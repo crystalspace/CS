@@ -29,6 +29,7 @@
 #include "iutil/cfgmgr.h"
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include "isys/plugin.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -67,6 +68,21 @@ csGraphics2DLineXLib::csGraphics2DLineXLib (iBase *iParent) :
   EventOutlet = NULL;
 }
 
+void csGraphics2DLineXLib::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.canvas.linex", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
 {
   if (!csGraphics2D::Initialize (pSystem))
@@ -77,7 +93,7 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
 
   if (!dpy)
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "FATAL: Cannot open X display\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "FATAL: Cannot open X display");
     exit (-1);
   }
 
@@ -128,7 +144,7 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
   }
   else
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "FATAL: Current screen depth not supported (8, 15, 16 or 32 bpp only)\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "FATAL: Current screen depth not supported (8, 15, 16 or 32 bpp only)");
     return false;
   }
 
@@ -204,8 +220,8 @@ csGraphics2DLineXLib::~csGraphics2DLineXLib(void)
 bool csGraphics2DLineXLib::Open()
 {
   if (is_open) return true;
-  CsPrintf (CS_MSG_INITIALIZATION, "Crystal Space X windows driver (Line drawing).\n");
-  CsPrintf (CS_MSG_INITIALIZATION, "Using %d bit %sColor visual\n",
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Crystal Space X windows driver (Line drawing).");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Using %d bit %sColor visual",
               vinfo.depth, (vclass == PseudoColor) ? "Pseudo" : "True");
 
   // Open your graphic interface
@@ -642,8 +658,8 @@ bool csGraphics2DLineXLib::HandleEvent (iEvent &Event)
    && (Event.Command.Code == cscmdCommandLineHelp)
    && System)
   {
-    System->Printf (CS_MSG_STDOUT, "Options for X-Windows line 2D graphics driver:\n");
-    System->Printf (CS_MSG_STDOUT, "  -[no]sysmouse      use/don't use system mouse cursor (default=%s)\n",
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Options for X-Windows line 2D graphics driver:");
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "  -[no]sysmouse      use/don't use system mouse cursor (default=%s)",
       do_hwmouse ? "use" : "don't");
     return true;
   }
@@ -816,7 +832,7 @@ bool csGraphics2DLineXLib::ReallocateMemory ()
   DeAllocateMemory ();
   if (!AllocateMemory())
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "Unable to allocate memory!\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Unable to allocate memory!");
     return false;
   }
   EventOutlet->Broadcast (cscmdContextResize, (iGraphics2D *)this);

@@ -36,6 +36,7 @@
 #include "imesh/thing/thing.h"
 #include "imesh/object.h"
 #include "imesh/particle.h"
+#include "ivaria/reporter.h"
 #include "isys/plugin.h"
 #include "iutil/objreg.h"
 #include "csutil/cscolor.h"
@@ -57,7 +58,8 @@ DemoSequenceManager::DemoSequenceManager (Demo* demo)
   	"Sequence", iSequenceManager);
   if (!seqmgr)
   {
-    demo->Printf (CS_MSG_FATAL_ERROR, "Could not load sequence manager plugin!\n");
+    demo->Report (CS_REPORTER_SEVERITY_ERROR,
+    	"Could not load sequence manager plugin!");
     exit (0);
   }
 

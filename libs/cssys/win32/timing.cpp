@@ -27,7 +27,7 @@
 // time. If you don't have milliseconds easily just rewrite by
 // using 'time (NULL)*1000' or something like that.
 
-csTime csSystemDriver::Time ()
+csTime csGetClicks ()
 {
   //03/20/1999 Thomas Hieber: completely redone to get true Millisecond 
   //accuracy instead of very rough ticks. This routine will also provide
@@ -56,7 +56,7 @@ csTime csSystemDriver::Time ()
     {
       //There is no such timer....
       Freq=-1;
-      return Time();
+      return csGetClicks();
     }
   }
 

@@ -46,6 +46,8 @@ public:
     const char *iConfigName);
   virtual bool HandleEvent (iEvent&);
   virtual void NextFrame ();
+
+  void Report (int severity, const char* msg, ...);
 };
 
 #endif // __VIEWMESH_H__

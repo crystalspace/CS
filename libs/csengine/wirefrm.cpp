@@ -179,7 +179,7 @@ void csWfPolygon::SetVertex (int i, csVector3& v)
   if (i >= num_vertices)
   {
     csEngine::current_engine->ReportBug (
-    	"Bad vertex number %d in csWfPolygon::set_vertex!\n", i);
+    	"Bad vertex number %d in csWfPolygon::set_vertex!", i);
     fatal_exit (0, false);
   }
   vertices[i] = v;

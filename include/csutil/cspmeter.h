@@ -20,8 +20,9 @@
 #ifndef __CS_CSPMETER_H__
 #define __CS_CSPMETER_H__
 
-#include "isys/system.h"
 #include "ivaria/pmeter.h"
+
+struct iConsoleOutput;
 
 /**
  * The csTextProgressMeter class displays a simple percentage-style textual
@@ -48,8 +49,7 @@
 class csTextProgressMeter : public iProgressMeter
 {
 private:
-  iSystem* sys;
-  int type;	// One of CS_MSG_INITIALIZATION, CS_MSG_CONSOLE, CS_MSG_STDOUT, etc.
+  iConsoleOutput* console;
   int granularity;
   int tick_scale;
   int total;
@@ -58,15 +58,9 @@ private:
 
 public:
   /// Constructs a new progress meter.
-  csTextProgressMeter (iSystem*, int total = 100,
-  	int type = CS_MSG_INITIALIZATION);
+  csTextProgressMeter (iConsoleOutput* console, int total = 100);
   /// Destroys the progress meter.
   virtual ~csTextProgressMeter () {}
-
-  /// Set the message type for iSystem::Printf().
-  void SetMessageType (int n) { type = n; }
-  /// Get the message type used for iSystem::Printf().
-  int GetMessageType () const { return type; }
 
   /**
    * Set the tick scale.  Valid values are 1-100, inclusive.  Default is 2.  A

@@ -21,7 +21,8 @@
 #define __CS_CSPPULSE_H__
 
 #include "cstypes.h"
-#include "isys/system.h"
+
+struct iConsoleOutput;
 
 /**
  * The csProgressPulse class provides a simple twirling textual cursor built
@@ -42,21 +43,15 @@
 class csProgressPulse
 {
 private:
-  iSystem* sys;
-  int type;	// One of CS_MSG_INITIALIZATION, CS_MSG_CONSOLE, CS_MSG_STDOUT, etc.
+  iConsoleOutput* console;
   int state;
   bool drawn;
 
 public:
   /// Constructs a new progress pulse.
-  csProgressPulse(iSystem*);
+  csProgressPulse(iConsoleOutput*);
   /// Destroys the progress pulse.
   ~csProgressPulse();
-
-  /// Set the message type for iSystem::Printf().
-  void SetMessageType(int n) { type = n; }
-  /// Get the message type used for iSystem::Printf().
-  int GetMessageType() const { return type; }
 
   /// Increment the progress by one pulse.
   void Step();

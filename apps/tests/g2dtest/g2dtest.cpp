@@ -27,6 +27,7 @@
 #include "csutil/csvector.h"
 #include "csutil/rng.h"
 #include "cstool/initapp.h"
+#include "ivaria/reporter.h"
 #include "qint.h"
 
 #include "isys/vfs.h"
@@ -133,7 +134,7 @@ void G2DTestSystemDriver::EnterState (appState newstate, int arg)
   switch (newstate)
   {
     case stPause:
-      timer = Time () + arg;
+      timer = csGetClicks () + arg;
       break;
     case stTestLinePerf:
       lastkey2 = 0;
@@ -277,7 +278,7 @@ void G2DTestSystemDriver::NextFrame ()
       break;
     }
     case stPause:
-      if (int (Time () - timer) > 0)
+      if (int (csGetClicks () - timer) > 0)
         LeaveState ();
       else
         Sleep (1);
@@ -650,8 +651,8 @@ void G2DTestSystemDriver::DrawLinePerf ()
   // Test line drawing performance for 1/4 seconds
   sx += 20; sw -= 40;
   sy += 30; sh -= 40;
-  csRandomGen rng (Time ());
-  csTime start_time = Time (), delta_time;
+  csRandomGen rng (csGetClicks ());
+  csTime start_time = csGetClicks (), delta_time;
   float pix_count = 0;
   do
   {
@@ -666,7 +667,7 @@ void G2DTestSystemDriver::DrawLinePerf ()
       pix_count += sqrt (x2 * x2 + y2 * y2);
     }
     myG2D->PerformExtension ("flush");
-    delta_time = Time () - start_time;
+    delta_time = csGetClicks () - start_time;
   } while (delta_time < 500);
   pix_count = pix_count * (1000.0 / delta_time);
   WriteCentered (0, 16*1, green, black, " Performance: %20.1f pixels/second ", pix_count);
@@ -705,8 +706,8 @@ void G2DTestSystemDriver::DrawTextTest ()
   int colors [4] = { red, green, blue, yellow };
   sx += 20; sw -= 40 + tw;
   sy += 10; sh -= 20 + th;
-  csRandomGen rng (Time ());
-  csTime start_time = Time (), delta_time;
+  csRandomGen rng (csGetClicks ());
+  csTime start_time = csGetClicks (), delta_time;
   int char_count = 0;
   do
   {
@@ -718,7 +719,7 @@ void G2DTestSystemDriver::DrawTextTest ()
       char_count += cc;
     }
     myG2D->PerformExtension ("flush");
-    delta_time = Time () - start_time;
+    delta_time = csGetClicks () - start_time;
   } while (delta_time < 500);
   float perf = char_count * (1000.0 / delta_time);
   SetFont (CSFONT_LARGE);
@@ -755,8 +756,8 @@ void G2DTestSystemDriver::DrawTextTest2 ()
   int colors [4] = { red, green, blue, yellow };
   sx += 20; sw -= 40 + tw;
   sy += 10; sh -= 20 + th;
-  csRandomGen rng (Time ());
-  csTime start_time = Time (), delta_time;
+  csRandomGen rng (csGetClicks ());
+  csTime start_time = csGetClicks (), delta_time;
   int char_count = 0;
   do
   {
@@ -768,7 +769,7 @@ void G2DTestSystemDriver::DrawTextTest2 ()
       char_count += cc;
     }
     myG2D->PerformExtension ("flush");
-    delta_time = Time () - start_time;
+    delta_time = csGetClicks () - start_time;
   } while (delta_time < 500);
   float perf = char_count * (1000.0 / delta_time);
   SetFont (CSFONT_LARGE);
@@ -782,14 +783,17 @@ int main (int argc, char *argv[])
   // Request the font server
   System.RequestPlugin ("crystalspace.font.server.default:" CS_FUNCID_FONTSERVER);
 
+  iObjectRegistry* object_reg = System.GetObjectRegistry ();
+
   if (!System.Initialize (argc, argv, NULL))
   {
-    System.Printf (CS_MSG_FATAL_ERROR, "Unable to initialize system driver!\n");
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.g2dtest",
+	"Unable to initialize system driver!");
     return -1;
   }
 
   csInitializeApplication (&System);
-  iObjectRegistry* object_reg = System.GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
@@ -814,13 +818,17 @@ int main (int argc, char *argv[])
 
   if (!System.myG2D)
   {
-    System.Printf (CS_MSG_FATAL_ERROR, "Unable to load canvas driver!\n");
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.g2dtest",
+	"Unable to load canvas driver!");
     return -1;
   }
 
   if (!System.Open ())
   {
-    System.Printf (CS_MSG_FATAL_ERROR, "Unable to open graphics context!\n");
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.g2dtest",
+        "Unable to open graphics context!");
     return -1;
   }
 

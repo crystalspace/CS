@@ -22,6 +22,7 @@
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/ptextype.h"
 #include "iengine/movable.h"
+#include "ivaria/reporter.h"
 
 extern WalkTest* Sys;
 
@@ -269,7 +270,7 @@ iSector* HugeRoom::create_huge_world (iEngine* engine)
 
   if (seed == 0) seed = rand ();
   srand (seed);
-  Sys->Printf (CS_MSG_INITIALIZATION, "Used seed %u.\n", seed);
+  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY , "Used seed %u.", seed);
 
   int i, num;
 
@@ -471,7 +472,7 @@ iSector* HugeRoom::create_huge_world (iEngine* engine)
 	wall_num_tris, wall_num_tris, 0);
   thing_state->DecRef ();
 
-  Sys->Printf (CS_MSG_INITIALIZATION, "Number of polygons: %d\n", pol_nr);
+  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Number of polygons: %d", pol_nr);
   //room->UseCuller ("@@@ (NOT WORKING!!!)");
   return room;
 }

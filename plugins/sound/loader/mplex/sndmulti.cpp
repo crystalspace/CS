@@ -24,6 +24,7 @@
 #include "isys/plugin.h"
 #include "iutil/strvec.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include "csutil/csvector.h"
 
 #define MY_CLASSNAME "crystalspace.sound.loader.multiplexer"
@@ -91,13 +92,16 @@ csSoundLoaderMultiplexer::~csSoundLoaderMultiplexer()
 
 bool csSoundLoaderMultiplexer::Initialize(iSystem *sys) 
 {
-  sys->Printf(CS_MSG_INITIALIZATION,
-    "Initializing sound loading multiplexer...\n"
-    "  Looking for sound loader modules:\n");
-
-  iStrVector* list = iSCF::SCF->QueryClassList ("crystalspace.sound.loader.");
   iObjectRegistry* object_reg = sys->GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  iReporter* reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+  if (reporter)
+    reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "crystalspace.sound.loader.mplex",
+      "Initializing sound loading multiplexer...\n"
+      "  Looking for sound loader modules:");
+
+  iStrVector* list = iSCF::SCF->QueryClassList ("crystalspace.sound.loader.");
   int const nmatches = list->Length();
   if (nmatches != 0)
   {
@@ -106,7 +110,10 @@ bool csSoundLoaderMultiplexer::Initialize(iSystem *sys)
       char const* classname = list->Get(i);
       if (strcasecmp (classname, MY_CLASSNAME))
       {
-        sys->Printf(CS_MSG_INITIALIZATION, "  %s\n", classname);
+	if (reporter)
+          reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      		"crystalspace.sound.loader.mplex",
+	  	"  %s", classname);
         iSoundLoader *ldr = CS_LOAD_PLUGIN (plugin_mgr, classname, 0,
 		iSoundLoader);
         if (ldr)

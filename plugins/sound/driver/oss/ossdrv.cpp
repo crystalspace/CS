@@ -41,6 +41,8 @@
 #include "isound/listener.h"
 #include "isound/source.h"
 #include "isound/renderer.h"
+#include "ivaria/reporter.h"
+#include "iutil/objreg.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -279,7 +281,9 @@ csSoundDriverOSS::~csSoundDriverOSS()
 bool csSoundDriverOSS::Open(iSoundRender *render, int frequency, bool bit16,
   bool stereo)
 {
-  m_piSystem->Printf (CS_MSG_INITIALIZATION, "\nSoundDriver OSS selected\n");
+  csReport (m_piSystem->GetObjectRegistry (), CS_REPORTER_SEVERITY_NOTIFY,
+  	"crystalspace.sound.oss",
+    	"SoundDriver OSS selected");
   m_piSoundRender = render;
   m_bStereo = stereo;
   m_b16Bits = bit16;

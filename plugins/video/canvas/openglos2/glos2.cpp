@@ -95,7 +95,7 @@ bool csGraphics2DOS2GL::Initialize (iSystem *pSystem)
   // Initialize OpenGL
   if (!gdGLInitialize ())
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "Unable to initialize OpenGL library\n");
+    printf ("Unable to initialize OpenGL library\n");
     return false;
   }
 
@@ -126,7 +126,7 @@ bool csGraphics2DOS2GL::Initialize (iSystem *pSystem)
       WindowY = ypos;
     }
     else
-      System->Printf (CS_MSG_WARNING, "Bad value `%s' for -winpos command-line parameter (X,Y expected)\n", val);
+      printf ("Bad value `%s' for -winpos command-line parameter (X,Y expected)\n", val);
   }
 
   if (cmdline->GetOption ("sysmouse"))
@@ -145,9 +145,9 @@ bool csGraphics2DOS2GL::HandleEvent (iEvent &Event)
    && (Event.Command.Code == cscmdCommandLineHelp)
    && System)
   {
-    System->Printf (CS_MSG_STDOUT, "Options for OS/2 OpenGL canvas driver:\n");
-    System->Printf (CS_MSG_STDOUT, "  -winpos=<x>,<y>    set window position in percent of screen (default=center)\n");
-    System->Printf (CS_MSG_STDOUT, "  -[no]sysmouse      use/don't use system mouse cursor (default=%s)\n",
+    printf ("Options for OS/2 OpenGL canvas driver:\n");
+    printf ("  -winpos=<x>,<y>    set window position in percent of screen (default=center)\n");
+    printf ("  -[no]sysmouse      use/don't use system mouse cursor (default=%s)\n",
       HardwareCursor ? "use" : "don't");
     return true;
   }
@@ -164,7 +164,7 @@ bool csGraphics2DOS2GL::Open ()
   rq.Parm.CreateWindow.Title = win_title;
   if ((rc = PMcall (pmcmdCreateWindow, &rq)) != pmrcOK)
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "Cannot create PM window: no resources bound to executable?\n");
+    printf ("Cannot create PM window: no resources bound to executable?\n");
     return false;
   }
   WinHandle = rq.Parm.CreateWindow.Handle;
@@ -175,7 +175,7 @@ bool csGraphics2DOS2GL::Open ()
   rq.Parm.CreateCtx.ContextFlags = PixelFormat;
   if ((rc = PMcall (pmcmdCreateGLctx, &rq)) != pmrcOK)
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "Cannot create OpenGL context\n");
+    printf ("Cannot create OpenGL context\n");
     return false;
   }
 
@@ -195,7 +195,7 @@ bool csGraphics2DOS2GL::Open ()
   rq.Parm.BindCtx.DesktopH = DesktopH;
   if ((rc = PMcall (pmcmdBindGLctx, &rq)) != pmrcOK)
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "Cannot bind OpenGL context to window!\n");
+    printf ("Cannot bind OpenGL context to window!\n");
     return false;
   }
 

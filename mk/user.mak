@@ -55,6 +55,7 @@ PLUGINS += mesh/metaball/object    mesh/metaball/persist/classic
 PLUGINS += mesh/terrfunc/object    mesh/terrfunc/persist/classic
 PLUGINS += mesh/metagen/object
 PLUGINS += mesh/stars/object
+PLUGINS += mesh/haze/object
 PLUGINS += mesh/thing/persist/classic
 PLUGINS += motion/standard/object  motion/standard/persist/classic
 PLUGINS += engine/3d

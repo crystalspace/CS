@@ -41,7 +41,6 @@ public:
   virtual ~SysSystemDriver ();
   
   virtual void NextFrame ();
-  virtual void Alert (const char* s);
 
   /// Implementation of iWin32SystemDriver interface.
 

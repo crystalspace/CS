@@ -53,6 +53,8 @@ public:
   virtual bool Open ();
   virtual void Close ();
 
+  void Report (int severity, const char* msg, ...);
+
   /// Necessary to access framebuffer
   virtual bool BeginDraw();
   virtual void FinishDraw();

@@ -1,5 +1,80 @@
 The history order is reversed so that new features are at the top.
 
+27-Jul-2001
+	- Removed csSystemDriver::Warn() and Alert().
+	- Removed the console pointer in csSystemDriver.
+	- Removed ConsoleOut() from system driver. It was not used a lot
+	  and in all cases it was defined as a normal puts. Also removed
+	  specific ConsoleOut() implementations for some OS'es.
+	- Instead of ConsoleOut() there is now csPrintf() which works
+	  more like printf (i.e. exactly like printf) but which can be
+	  defined by the platform. The DJGPP port has its own implementation
+	  of csPrintf() which can disable itself if graphics are enabled.
+	  In general csPrintf() should always be used instead of printf.
+	  Little of the code is doing that however.
+	- Also added csVPrintf() which is similar to vprintf().
+	- Removed Time() from system driver.
+	- Instead of Time() there is now csGetClicks(). Currently
+	  iSystem::GetTime() has not been removed yet but that will call
+	  csGetClicks().
+	- Moved the initialization of SCF from csSystemDriver::Initialize()
+	  to the constructor of csSystemDriver. The problem is that SCF
+	  is now required even before Initialize() is called in order to
+	  be able to access the object registry and various objects in
+	  that registry (like the commandline which typically is needed
+	  BEFORE Initialize).
+	- Fixed a crash bug in Blocks.
+	- Fixed a problem with static linking for height generation
+	  classes in both terrfunc and csparser.
+	- Wouter Wijngaards added a haze mesh object. It is capable of
+	  taking a set of convex hulls, where each one fits inside the next
+	  one, and render them. It will compute the outline in linear time.
+	  For now this is the (untested but compiling) mesh object only.
+26-Jul-2001
+	- Removed iSystem::Printf() and iSystem::PrintfV(). The plan is now
+	  to use the reporter instead. To do this you can use the following
+	  initialization code somewhere in your app or plugin init:
+	    #include "ivaria/reporter.h"
+	    iReporter* reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
+	- Added csReport() conveniance function. This function will use
+	  the object registry to see if there is a reporter. If so it will
+	  use it, otherwise it will print to standard output. Example:
+	    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+	    	"crystalspace.???.???", "Bad error in '%s'!", filename);
+	- Keep in mind when replacing Printf() with Report() that report
+	  will automatically add a newline at the end of the string.
+	- In addition removed CS_MSG_ constants. Use the CS_REPORTER_SEVERITY_
+	  constants instead. You can use the following translation:
+	    CS_MSG_WARNING -> ..._WARNING
+	    CS_MSG_FATAL_ERROR -> ..._ERROR
+	    CS_MSG_INITIALIZATION -> ..._NOTIFY
+	    CS_MSG_CONSOLE -> ..._NOTIFY
+	    CS_MSG_STDOUT -> ..._NOTIFY
+	    CS_MSG_INTERNAL_ERROR -> ..._BUG
+	    CS_MSG_DEBUG_? -> ..._DEBUG
+	- Changed the csTextProgressMeter so that it now has an output
+	  console as a parameter and not the msg type (CS_MSG_...) and
+	  iSystem pointers.
+	- Did the same for csProgressPulse.
+	- Removed the 'mode' parameter (which used to be one of CS_MSG_...)
+	  from the iConsoleOutput interface. None of the output console
+	  plugins were using it and it is obsolete anyway.
+	- Added ... to iConsoleOutput::PutText() and also added PutTextV().
+	- Changed all libraries, apps, and plugins in CS to use the reporter
+	  instead of iSystem::Printf(). This affects LOTS of files...
+	- Martin Geisse did the following:
+	    - Committed a big cleanup of typed vectors. This fixes
+	      some cases where one could bypass the type-safety of these
+	      vectors.  Also, all public macros are now grouped at the top of
+	      typedvec.h and nobjvec.h, and the private macros are grouped
+	      together in the 'private' parts of these files.
+	    - Added NULL-testing to iBase vectors and object vectors, i.e.
+	      it is possible to push NULL's on these vectors now
+	    - Added action merging to iModelData*. It is now possible to
+	      merge two objects as long as they don't have actions with the
+	      same name. If that happens, the actions should be merged, but
+	      this is not done yet.
+	- Philip Wyett removed a dead link in os2.txi.
 25-Jul-2001
 	- Added interfaces iNativeWindowManager and iNativeWindow (in
 	  include/ivideo/natwin.h). In the future these interfaces will
@@ -85,6 +160,9 @@ The history order is reversed so that new features are at the top.
 	  scripts so that these resources are now published via the HTTP
 	  protocol only, rather than via both HTTP and FTP.  This was done
 	  since SourceForge plans to discontinue project-specific FTP service.
+	- Philip Wyett fixed LUA plugin for latest changes.
+	- Philip fixed level loading in video.cpp.
+	- Martin Geisse added a missing dependency to csfgen.
 24-Jul-2001
 	- Further work on the decomposition of the system driver.
 	    - The iObjectRegistry in the system driver is now more complete.

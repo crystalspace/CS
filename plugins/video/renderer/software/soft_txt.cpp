@@ -28,10 +28,9 @@
 #include "isys/system.h"
 #include "igraphic/image.h"
 #include "iutil/cfgfile.h"
+#include "ivaria/reporter.h"
 #include "qint.h"
 #include "protex3d.h"
-
-#define SysPrintf System->Printf
 
 #define RESERVED_COLOR(c) ((c == 0) || (c == 255))
 
@@ -580,7 +579,8 @@ void csTextureManagerSoftware::create_inv_cmap ()
     return;
 
   if (verbose)
-    SysPrintf (CS_MSG_INITIALIZATION, "  Computing inverse colormap...\n");
+    G3D->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"  Computing inverse colormap...");
 
   // Greg Ewing, 12 Oct 1998
   delete [] Scan.inv_cmap;
@@ -603,7 +603,7 @@ void csTextureManagerSoftware::create_alpha_tables ()
     return;
 
   if (verbose)
-    SysPrintf (CS_MSG_INITIALIZATION, "  Computing alpha tables...\n");
+    G3D->Report (CS_REPORTER_SEVERITY_NOTIFY, "  Computing alpha tables...");
 
   if (!alpha_tables)
     alpha_tables = new csAlphaTables ();
@@ -632,7 +632,7 @@ void csTextureManagerSoftware::compute_palette ()
   if (truecolor) return;
 
   if (verbose)
-    SysPrintf (CS_MSG_INITIALIZATION, "  Computing palette...\n");
+    G3D->Report (CS_REPORTER_SEVERITY_NOTIFY, "  Computing palette...");
 
   // Allocate first 6*6*4=144 colors in a uniformly-distributed fashion
   // since we'll get lighted/dimmed/colored textures more often
@@ -697,8 +697,9 @@ void csTextureManagerSoftware::compute_palette ()
 void csTextureManagerSoftware::PrepareTextures ()
 {
   if (verbose)
-    SysPrintf (CS_MSG_INITIALIZATION, "Preparing textures (%s dithering)...\n",
-      dither_textures ? "with" : "no");
+    G3D->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Preparing textures (%s dithering)...",
+	dither_textures ? "with" : "no");
 
   // Drop all "color allocated" flags to locked colors.
   // We won't clear the palette as we don't care about unused colors anyway.
@@ -706,7 +707,7 @@ void csTextureManagerSoftware::PrepareTextures ()
   memcpy (cmap.alloc, locked, sizeof(locked));
 
   if (verbose)
-    SysPrintf (CS_MSG_INITIALIZATION, "  Creating texture mipmaps...\n");
+    G3D->Report (CS_REPORTER_SEVERITY_NOTIFY, "  Creating texture mipmaps...");
 
   int i;
 

@@ -26,6 +26,7 @@
 #include "iutil/cfgmgr.h"
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include "cstool/initapp.h"
 
 CS_IMPLEMENT_APPLICATION
@@ -180,7 +181,8 @@ bool csWsTest::Initialize ()
   // CSWS apps are a lot more performant with a single-buffered canvas
   GetG2D ()->DoubleBuffer (false);
 
-  Printf (CS_MSG_INITIALIZATION,
+  csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_NOTIFY,
+    "crystalspace.application.cswstest",
     "Crystal Space Windowing System test version %s (%s).\n"
     "Created by Andrew Zabolotny and others...\n\n",
     CS_VERSION, CS_RELEASE_DATE);

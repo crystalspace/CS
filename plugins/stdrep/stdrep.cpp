@@ -109,11 +109,11 @@ bool csReporterListener::Report (iReporter*, int severity,
     sprintf (msgbuf, "%s\n", description);
 
   if (dest_stdout[severity])
-    fputs (msgbuf, stdout);
+    csPrintf ("%s", msgbuf);
   if (dest_stderr[severity])
     fputs (msgbuf, stderr);
   if (dest_console[severity] && console)
-    console->PutText (CS_MSG_CONSOLE, msgbuf);
+    console->PutText (msgbuf);
   if (dest_alert[severity] && nativewm)
     nativewm->Alert (CS_ALERT_ERROR, "Fatal Error!",
     	"Ok", msgbuf);

@@ -227,6 +227,8 @@ class csLoader : public iLoader
 
   /// Report any error.
   void ReportError (const char* id, const char* description, ...);
+  /// Report a notification.
+  void ReportNotify (const char* description, ...);
 
 public:
   /********** iLoader implementation **********/

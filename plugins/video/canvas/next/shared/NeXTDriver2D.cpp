@@ -27,6 +27,7 @@
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include "isys/event.h"
 #include "isys/system.h"
 #include "csver.h"
@@ -72,6 +73,21 @@ bool NeXTDriver2D::Initialize(iSystem* s)
   return ok;
 }
 
+void NeXTDriver2D::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.canvas.next", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 
 //-----------------------------------------------------------------------------
 // init_driver
@@ -103,8 +119,8 @@ bool NeXTDriver2D::init_driver(int desired_depth)
     }
   }
   else
-    System->Printf(CS_MSG_FATAL_ERROR, "FATAL: Bizarre internal error; "
-      "support for 15- and 32-bit RGB only\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "FATAL: Bizarre internal error; "
+      "support for 15- and 32-bit RGB only");
   return ok;
 }
 
@@ -134,9 +150,9 @@ int NeXTDriver2D::get_desired_depth() const
   }
   if (depth != 0 && depth != 15 && depth != 16 && depth != 32)
   {
-    System->Printf(CS_MSG_WARNING,
+    Report (CS_REPORTER_SEVERITY_WARNING,
       "WARNING: Ignoring request to simulate %d-bit RGB depth.\n"
-      "WARNING: Can only simulate 15-, 16-, or 32-bit RGB depth.\n\n",
+      "WARNING: Can only simulate 15-, 16-, or 32-bit RGB depth.",
       depth);
     depth = 0;
   }
@@ -228,9 +244,9 @@ N2D_PROTO(void,user_close)(NeXTDriverHandle2D handle)
 //-----------------------------------------------------------------------------
 bool NeXTDriver2D::Open(char const* title)
 {
-  System->Printf(CS_MSG_INITIALIZATION, CS_PLATFORM_NAME
+  Report (CS_REPORTER_SEVERITY_NOTIFY, CS_PLATFORM_NAME
     " 2D graphics driver for Crystal Space " CS_VERSION_NUMBER "\n"
-    "Written by Eric Sunshine <sunshine@sunshineco.com>\n\n");
+    "Written by Eric Sunshine <sunshine@sunshineco.com>");
   
   int ok = 0;
   if (superclass::Open(title))
@@ -300,7 +316,7 @@ bool NeXTDriver2D::HandleEvent(iEvent& e)
 void NeXTDriver2D::usage_summary() const
 {
   if (System != 0)
-    System->Printf(CS_MSG_STDOUT,
+    printf (
       "Options for " CS_PLATFORM_NAME " 2D graphics driver:\n"
       "  -simdepth=<depth>  Simulate depth (15, 16, or 32) (default=none)\n");
 }

@@ -53,6 +53,7 @@
 #include "ivaria/perfstat.h"
 #include "imesh/sprite3d.h"
 #include "iengine/statlght.h"
+#include "ivaria/reporter.h"
 
 #include "csengine/polygon.h"
 #include "csengine/radiosty.h"
@@ -229,14 +230,16 @@ bool LoadCamera (iVFS* vfs, const char *fName)
 {
   if (!vfs->Exists (fName))
   {
-    Sys->Printf (CS_MSG_FATAL_ERROR, "Could not open coordinate file '%s'!\n", fName);
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR,
+    	"Could not open coordinate file '%s'!", fName);
     return false;
   }
 
   iDataBuffer *data = vfs->ReadFile(fName);
   if (!data)
   {
-    Sys->Printf (CS_MSG_FATAL_ERROR, "Could not read coordinate file '%s'!\n", fName);
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR,
+    	"Could not read coordinate file '%s'!", fName);
     return false;
   }
 
@@ -266,8 +269,9 @@ bool LoadCamera (iVFS* vfs, const char *fName)
   data->DecRef ();
   if (!s)
   {
-    Sys->Printf (CS_MSG_FATAL_ERROR, "Sector `%s' in coordinate file does not "
-      "exist in this map!\n", sector_name);
+    Sys->Report (CS_REPORTER_SEVERITY_ERROR,
+    	"Sector `%s' in coordinate file does not "
+      "exist in this map!", sector_name);
     return false;
   }
 
@@ -293,7 +297,8 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
   // First check if the texture exists.
   if (!Sys->view->GetEngine ()->FindMaterial (txtname))
   {
-    Sys->Printf (CS_MSG_CONSOLE, "Can't find material '%s' in memory!\n", txtname);
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Can't find material '%s' in memory!", txtname);
     return;
   }
 
@@ -301,7 +306,8 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
   converter * filedata = new converter;
   if (filedata->ivcon (filename, true, false, NULL, Sys->myVFS) == ERROR)
   {
-    Sys->Printf (CS_MSG_CONSOLE, "There was an error reading the data!\n");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"There was an error reading the data!");
     delete filedata;
     return;
   }
@@ -325,7 +331,8 @@ iMeshWrapper* add_meshobj (char* tname, char* sname, iSector* where,
   iMeshFactoryWrapper* tmpl = Sys->Engine->FindMeshFactory (tname);
   if (!tmpl)
   {
-    Sys->Printf (CS_MSG_CONSOLE, "Unknown mesh factory '%s'!\n", tname);
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Unknown mesh factory '%s'!", tname);
     return NULL;
   }
   iSector* isector = SCF_QUERY_INTERFACE (where, iSector);
@@ -356,11 +363,11 @@ void list_meshes (void)
     mesh_name = mesh->QueryObject ()->GetName();
 
     if (mesh_name)
-      Sys->Printf (CS_MSG_CONSOLE, "%s\n", mesh_name);
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "%s", mesh_name);
     else
-      Sys->Printf (CS_MSG_CONSOLE, "A mesh with no name.\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "A mesh with no name.");
   }
-  Sys->Printf (CS_MSG_CONSOLE, "There are:%d meshes\n",
+  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "There are:%d meshes",
 	       Sys->Engine->GetMeshes ()->GetMeshCount ());
 }
 
@@ -370,7 +377,7 @@ void SetConfigOption (iBase* plugin, const char* optName, const char* optValue)
 {
   iConfig* config = SCF_QUERY_INTERFACE (plugin, iConfig);
   if (!config)
-    Sys->Printf (CS_MSG_CONSOLE, "No config interface for this plugin.\n");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No config interface for this plugin.");
   else
   {
     int i;
@@ -380,7 +387,8 @@ void SetConfigOption (iBase* plugin, const char* optName, const char* optValue)
       if (!config->GetOptionDescription (i, &odesc)) break;
       if (strcmp (odesc.name, optName) == 0)
       {
-	Sys->Printf (CS_MSG_CONSOLE, "Set option %s to %s\n", odesc.name, optValue);
+	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Set option %s to %s",
+		odesc.name, optValue);
 	csVariant var;
 	switch (odesc.type)
 	{
@@ -420,7 +428,7 @@ void SetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
 {
   iConfig* config = SCF_QUERY_INTERFACE (plugin, iConfig);
   if (!config)
-    Sys->Printf (CS_MSG_CONSOLE, "No config interface for this plugin.\n");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No config interface for this plugin.");
   else
   {
     int i;
@@ -441,7 +449,7 @@ bool GetConfigOption (iBase* plugin, const char* optName, csVariant& optValue)
 {
   iConfig* config = SCF_QUERY_INTERFACE (plugin, iConfig);
   if (!config)
-    Sys->Printf (CS_MSG_CONSOLE, "No config interface for this plugin.\n");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No config interface for this plugin.");
   else
   {
     int i;
@@ -549,7 +557,8 @@ void WalkTest::ParseKeyCmds (iObject* src)
 	iSector* sect = Engine->FindSector (sector_name);
 	if (!sect)
 	{
-	  Sys->Printf (CS_MSG_WARNING, "Sector '%s' not found! 'entity_Light' is ignored!\n",
+	  Sys->Report (CS_REPORTER_SEVERITY_WARNING,
+	  	"Sector '%s' not found! 'entity_Light' is ignored!",
 	  	sector_name);
 	}
 	else
@@ -557,7 +566,8 @@ void WalkTest::ParseKeyCmds (iObject* src)
 	  iStatLight* l = sect->GetLight (light_name);
 	  if (!l)
 	  {
-	    Sys->Printf (CS_MSG_WARNING, "Light '%s' not found! 'entity_Light' is ignored!\n",
+	    Sys->Report (CS_REPORTER_SEVERITY_WARNING,
+	    	"Light '%s' not found! 'entity_Light' is ignored!",
 	  	light_name);
 	  }
 	  else
@@ -670,49 +680,51 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     csCommandProcessor::perform (cmd, arg);
 #   undef CONPRI
-#   define CONPRI(m) Sys->Printf (CS_MSG_CONSOLE, m);
-    CONPRI("-*- Additional commands -*-\n");
-    CONPRI("Visibility:\n");
-    CONPRI("  emode pvs freezepvs pvsonly\n");
-    CONPRI("  db_octree, db_osolid, db_dumpstubs, db_cbuffer, db_frustum\n");
-    CONPRI("  db_curleaf\n");
-    CONPRI("Lights:\n");
-    CONPRI("  addlight dellight dellights picklight droplight\n");
-    CONPRI("  clrlights setlight\n");
-    CONPRI("Movement:\n");
-    CONPRI("  step_forward step_backward strafe_left strafe_right\n");
-    CONPRI("  look_up look_down rotate_left rotate_right jump move3d\n");
-    CONPRI("  i_forward i_backward i_left i_right i_up i_down i_rotleftc\n");
-    CONPRI("  i_rotleftw i_rotrightc i_rotrightw i_rotleftx i_rotleftz\n");
-    CONPRI("  i_rotrightx i_rotrightz do_gravity colldet freelook\n");
-    CONPRI("Statistics:\n");
-    CONPRI("  stats fps perftest coordshow\n");
-    CONPRI("Special effects:\n");
-    CONPRI("  addbot delbot addskel addghost fire explosion spiral rain\n");
-    CONPRI("  snow fountain flame portal fs_inter fs_fadeout fs_fadecol\n");
-    CONPRI("  fs_fadetxt fs_red fs_green fs_blue fs_whiteout fs_shadevert\n");
-    CONPRI("Debugging:\n");
-    CONPRI("  hi zbuf debug0 debug1 debug2 palette bugplug\n");
-    CONPRI("  db_boxshow db_boxcam1 db_boxcam2 db_boxsize1 db_boxsize2\n");
-    CONPRI("  db_boxnode1 db_boxnode2 db_boxvis db_radstep db_radhi db_radtodo\n");
-    CONPRI("Meshes:\n");
-    CONPRI("  loadmesh addmesh delmesh listmeshes\n");
-    CONPRI("  listactions setaction setmotion\n");
-    CONPRI("Various:\n");
-    CONPRI("  coordsave coordload bind capture map mapproj p_alpha s_fog\n");
-    CONPRI("  snd_play snd_volume record play clrrec saverec\n");
-    CONPRI("  loadrec action plugins conflist confset\n");
+#   define CONPRI(m) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, m);
+    CONPRI("-*- Additional commands -*-");
+    CONPRI("Visibility:");
+    CONPRI("  emode pvs freezepvs pvsonly");
+    CONPRI("  db_octree, db_osolid, db_dumpstubs, db_cbuffer, db_frustum");
+    CONPRI("  db_curleaf");
+    CONPRI("Lights:");
+    CONPRI("  addlight dellight dellights picklight droplight");
+    CONPRI("  clrlights setlight");
+    CONPRI("Movement:");
+    CONPRI("  step_forward step_backward strafe_left strafe_right");
+    CONPRI("  look_up look_down rotate_left rotate_right jump move3d");
+    CONPRI("  i_forward i_backward i_left i_right i_up i_down i_rotleftc");
+    CONPRI("  i_rotleftw i_rotrightc i_rotrightw i_rotleftx i_rotleftz");
+    CONPRI("  i_rotrightx i_rotrightz do_gravity colldet freelook");
+    CONPRI("Statistics:");
+    CONPRI("  stats fps perftest coordshow");
+    CONPRI("Special effects:");
+    CONPRI("  addbot delbot addskel addghost fire explosion spiral rain");
+    CONPRI("  snow fountain flame portal fs_inter fs_fadeout fs_fadecol");
+    CONPRI("  fs_fadetxt fs_red fs_green fs_blue fs_whiteout fs_shadevert");
+    CONPRI("Debugging:");
+    CONPRI("  hi zbuf debug0 debug1 debug2 palette bugplug");
+    CONPRI("  db_boxshow db_boxcam1 db_boxcam2 db_boxsize1 db_boxsize2");
+    CONPRI("  db_boxnode1 db_boxnode2 db_boxvis db_radstep db_radhi db_radtodo");
+    CONPRI("Meshes:");
+    CONPRI("  loadmesh addmesh delmesh listmeshes");
+    CONPRI("  listactions setaction setmotion");
+    CONPRI("Various:");
+    CONPRI("  coordsave coordload bind capture map mapproj p_alpha s_fog");
+    CONPRI("  snd_play snd_volume record play clrrec saverec");
+    CONPRI("  loadrec action plugins conflist confset");
 
 #   undef CONPRI
   }
   else if (!strcasecmp (cmd, "coordsave"))
   {
-    Sys->Printf (CS_MSG_CONSOLE, "Saved camera location in /temp/walktest.cam\n");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Saved camera location in /temp/walktest.cam");
     SaveCamera (Sys->myVFS, "/temp/walktest.cam");
   }
   else if (!strcasecmp (cmd, "coordload"))
   {
-    Sys->Printf (CS_MSG_CONSOLE, "Loaded camera location from /temp/walktest.cam\n");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Loaded camera location from /temp/walktest.cam");
     LoadCamera (Sys->myVFS, "/temp/walktest.cam");
   }
   else if (!strcasecmp (cmd, "plugins"))
@@ -723,7 +735,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       iBase* plugin = Sys->plugin_mgr->GetPlugin (i);
       iFactory* fact = SCF_QUERY_INTERFACE (plugin, iFactory);
-      Sys->Printf (CS_MSG_CONSOLE, "%d: %s\n", i, fact->QueryDescription ());
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"%d: %s", i, fact->QueryDescription ());
       fact->DecRef ();
     }
   }
@@ -734,13 +747,15 @@ bool CommandHandler (const char *cmd, const char *arg)
       int idx;
       sscanf (arg, "%d", &idx);
       if (idx < 0 || idx >= Sys->plugin_mgr->GetPluginCount ())
-	Sys->Printf (CS_MSG_CONSOLE, "Bad value for plugin (see 'plugins' command)!\n");
+	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"Bad value for plugin (see 'plugins' command)!");
       else
       {
         iBase* plugin = Sys->plugin_mgr->GetPlugin (idx);
         iConfig* config = SCF_QUERY_INTERFACE (plugin, iConfig);
 	if (!config)
-	  Sys->Printf (CS_MSG_CONSOLE, "No config interface for this plugin.\n");
+	  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  	"No config interface for this plugin.");
 	else
 	{
           int i;
@@ -748,28 +763,30 @@ bool CommandHandler (const char *cmd, const char *arg)
           {
 	    csOptionDescription odesc;
 	    if (!config->GetOptionDescription (i, &odesc)) break;
-	    Sys->Printf (CS_MSG_CONSOLE, "Option %s (%s) ", odesc.name,
-	        odesc.description);
+	    char buf[256];
+	    sprintf (buf, "Option %s (%s) ", odesc.name, odesc.description);
 	    csVariant var;
 	    config->GetOption (i, &var);
 	    switch (odesc.type)
 	    {
-	      case CSVAR_LONG: Sys->Printf (CS_MSG_CONSOLE, "LONG=%ld\n",
-				   var.GetLong ());
-			       break;
-	      case CSVAR_BOOL: Sys->Printf (CS_MSG_CONSOLE, "BOOL=%d\n",
-				   var.GetBool ());
-			       break;
-	      case CSVAR_CMD: Sys->Printf (CS_MSG_CONSOLE, "CMD\n");
-			       break;
-	      case CSVAR_FLOAT: Sys->Printf (CS_MSG_CONSOLE, "FLOAT=%g\n",
-				   var.GetFloat ());
-			       break;
-	      case CSVAR_STRING: Sys->Printf (CS_MSG_CONSOLE, "STRING=%s\n",
-				   var.GetString ());
-			       break;
-	      default: Sys->Printf (CS_MSG_CONSOLE, "<unknown type>\n");
-		       break;
+	      case CSVAR_LONG: Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	      	"%sLONG=%ld", buf, var.GetLong ());
+		break;
+	      case CSVAR_BOOL: Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	      	"%sBOOL=%d", buf, var.GetBool ());
+	        break;
+	      case CSVAR_CMD: Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	      	"%sCMD", buf);
+		break;
+	      case CSVAR_FLOAT: Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	      	"%sFLOAT=%g", buf, var.GetFloat ());
+		break;
+	      case CSVAR_STRING: Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	      	"%sSTRING=%s", buf, var.GetString ());
+		break;
+	      default: Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	      	"%s<unknown type>", buf);
+		break;
 	    }
           }
 	  config->DecRef ();
@@ -777,7 +794,8 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
     }
     else
-      Sys->Printf (CS_MSG_CONSOLE, "Expected index to plugin (from 'plugins' command)!\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Expected index to plugin (from 'plugins' command)!");
   }
   else if (!strcasecmp (cmd, "confset"))
   {
@@ -788,7 +806,8 @@ bool CommandHandler (const char *cmd, const char *arg)
       int idx;
       csScanStr (arg, "%d,%s,%s", &idx, name, val);
       if (idx < 0 || idx >= Sys->plugin_mgr->GetPluginCount ())
-	Sys->Printf (CS_MSG_CONSOLE, "Bad value for plugin (see 'plugins' command)!\n");
+	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"Bad value for plugin (see 'plugins' command)!");
       else
       {
         iBase* plugin = Sys->plugin_mgr->GetPlugin (idx);
@@ -796,7 +815,8 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
     }
     else
-      Sys->Printf (CS_MSG_CONSOLE, "Expected index to plugin (from 'plugins' command)!\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Expected index to plugin (from 'plugins' command)!");
   }
   else if (!strcasecmp (cmd, "action"))
   {
@@ -804,9 +824,11 @@ bool CommandHandler (const char *cmd, const char *arg)
     csPolygon3D* p = Sys->view->GetCamera ()->GetPrivateObject ()->GetHit (where);
     if (p)
     {
-      Sys->Printf (CS_MSG_CONSOLE, "Action polygon '%s' ", p->GetName ());
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Action polygon '%s'", p->GetName ());
       csThing* ob = p->GetParent ();
-      Sys->Printf (CS_MSG_CONSOLE, "in set '%s'\n", ob->GetName ());
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"in set '%s'", ob->GetName ());
       printf ("ACTION\n");
       Sys->ActivateObject ((csObject*)ob);
     }
@@ -850,14 +872,16 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       Sys->cfg_playrecording = -1;
       Sys->cfg_recording = 0;
-      Sys->Printf (CS_MSG_CONSOLE, "Start recording camera movement...\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Start recording camera movement...");
       if (Sys->perf_stats)
         Sys->recorded_perf_stats = Sys->perf_stats->StartNewSubsection (NULL);
     }
     else
     {
       Sys->cfg_recording = -1;
-      Sys->Printf (CS_MSG_CONSOLE, "Stop recording.\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Stop recording.");
       if (Sys->perf_stats)
         Sys->perf_stats->FinishSubsection ();
       Sys->recorded_perf_stats = NULL;
@@ -869,7 +893,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       Sys->cfg_recording = -1;
       Sys->cfg_playrecording = 0;
-      Sys->Printf (CS_MSG_CONSOLE, "Start playing back camera movement...\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Start playing back camera movement...");
       Sys->cfg_playloop = true;
       if (arg)
       {
@@ -906,7 +931,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
     {
       Sys->cfg_playrecording = -1;
-      Sys->Printf (CS_MSG_CONSOLE, "Stop playback.\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Stop playback.");
       if (Sys->perf_stats)
         Sys->perf_stats->FinishSubsection ();
       Sys->recorded_perf_stats = NULL;
@@ -920,22 +945,27 @@ bool CommandHandler (const char *cmd, const char *arg)
       if (!Sys->recorded_perf_stats->IsSubsection ())
       {
 	if (!arg)
-	  Sys->Printf (CS_MSG_CONSOLE, "Error: Expecting name of subsection.\n");
+	  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  	"Error: Expecting name of subsection.");
 	else
 	{
 	  Sys->recorded_perf_stats->StartNewSubsection (arg);
-	  Sys->Printf (CS_MSG_CONSOLE, "Performance subsection '%s'\n",arg);
+	  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  	"Performance subsection '%s'",arg);
 	}
       }
       else
       {
-	Sys->Printf (CS_MSG_CONSOLE, "Finished performance subsection.\n");
-	Sys->recorded_perf_stats->PrintSubsectionStats (CS_MSG_CONSOLE);
+	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"Finished performance subsection.");
+	Sys->recorded_perf_stats->
+		PrintSubsectionStats (CS_REPORTER_SEVERITY_NOTIFY);
 	Sys->recorded_perf_stats->FinishSubsection ();
       }
     }
     else
-      Sys->Printf (CS_MSG_CONSOLE, "Error: Option valid only when recording.\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Error: Option valid only when recording.");
   }
   else if (!strcasecmp (cmd, "bind"))
   {
@@ -987,13 +1017,15 @@ bool CommandHandler (const char *cmd, const char *arg)
       csOctree* otree = (csOctree*)tree;
       csOctreeNode* l = otree->GetLeaf (Sys->view->GetCamera ()->GetOrigin ());
       Sys->debug_box1 = l->GetBox ();
-      Sys->Printf (CS_MSG_CONSOLE, "Box 1: (%f,%f,%f)-(%f,%f,%f)\n",
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Box 1: (%f,%f,%f)-(%f,%f,%f)",
 	  	Sys->debug_box1.MinX (), Sys->debug_box1.MinY (),
 	  	Sys->debug_box1.MinZ (), Sys->debug_box1.MaxX (),
 	  	Sys->debug_box1.MaxY (), Sys->debug_box1.MaxZ ());
     }
     else
-      Sys->Printf (CS_MSG_CONSOLE, "There is no octree in this sector!\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"There is no octree in this sector!");
 #endif
   }
   else if (!strcasecmp (cmd, "db_boxnode2"))
@@ -1008,13 +1040,15 @@ bool CommandHandler (const char *cmd, const char *arg)
       csOctree* otree = (csOctree*)tree;
       csOctreeNode* l = otree->GetLeaf (Sys->view->GetCamera ()->GetOrigin ());
       Sys->debug_box2 = l->GetBox ();
-      Sys->Printf (CS_MSG_CONSOLE, "Box 2: (%f,%f,%f)-(%f,%f,%f)\n",
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Box 2: (%f,%f,%f)-(%f,%f,%f)",
 	  	Sys->debug_box2.MinX (), Sys->debug_box2.MinY (),
 	  	Sys->debug_box2.MinZ (), Sys->debug_box2.MaxX (),
 	  	Sys->debug_box2.MaxY (), Sys->debug_box2.MaxZ ());
     }
     else
-      Sys->Printf (CS_MSG_CONSOLE, "There is no octree in this sector!\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"There is no octree in this sector!");
 #endif
   }
   else if (!strcasecmp (cmd, "db_boxvis"))
@@ -1029,10 +1063,12 @@ bool CommandHandler (const char *cmd, const char *arg)
       //csOctree* otree = (csOctree*)tree;
       //bool vis1 = otree->BoxCanSeeBox (Sys->debug_box1, Sys->debug_box2);
       //bool vis2 = otree->BoxCanSeeBox (Sys->debug_box2, Sys->debug_box1);
-      //Sys->Printf (CS_MSG_CONSOLE, "Box1->box2:%d box2->box1:%d\n", vis1, vis2);
+      //Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Box1->box2:%d box2->box1:%d", vis1, vis2);
     }
     else
-      Sys->Printf (CS_MSG_CONSOLE, "No octree in this sector!\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"No octree in this sector!");
 #endif
   }
   else if (!strcasecmp (cmd, "db_cbuffer"))
@@ -1063,7 +1099,8 @@ bool CommandHandler (const char *cmd, const char *arg)
       printf ("Solid Mask Z: %04x\n", l->GetSolidMask (BOX_SIDE_Z));
     }
     else
-      Sys->Printf (CS_MSG_CONSOLE, "There is no octree in this sector!\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"There is no octree in this sector!");
 #endif
   }
   else if (!strcasecmp (cmd, "db_dumpstubs"))
@@ -1084,7 +1121,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       //@@@@@Dumper::dump_stubs (spr->GetPolyTreeObject ());
     }
-    Sys->Printf (CS_MSG_DEBUG_0F, "======\n");
+    Sys->Report (CS_REPORTER_SEVERITY_DEBUG, "======");
 #endif
   }
   else if (!strcasecmp (cmd, "db_osolid"))
@@ -1203,8 +1240,9 @@ bool CommandHandler (const char *cmd, const char *arg)
 #if 0
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
     csPolygon3D* hi = arg ? Sys->view->GetCamera ()->GetSector ()->GetPolygon3D (arg) : (csPolygon3D*)NULL;
-    if (hi) Sys->Printf (CS_MSG_CONSOLE, "Hilighting polygon: '%s'\n", arg);
-    else Sys->Printf (CS_MSG_CONSOLE, "Disabled hilighting.\n");
+    if (hi) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"Hilighting polygon: '%s'", arg);
+    else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Disabled hilighting.");
     Sys->selected_polygon = hi;
 #endif
   }
@@ -1221,9 +1259,9 @@ bool CommandHandler (const char *cmd, const char *arg)
         csCommandProcessor::change_int (arg, &a, "portal alpha", 0, 100);
 	hi->SetAlpha (a);
       }
-      else Sys->Printf (CS_MSG_CONSOLE, "Only for portals!\n");
+      else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Only for portals!");
     }
-    else Sys->Printf (CS_MSG_CONSOLE, "No polygon selected!\n");
+    else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No polygon selected!");
 #endif
   }
   else if (!strcasecmp (cmd, "s_fog"))
@@ -1231,7 +1269,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     csFog* f = Sys->view->GetCamera ()->GetSector ()->GetFog ();
     if (!arg)
     {
-      Sys->Printf (CS_MSG_CONSOLE, "Fog in current sector (%f,%f,%f) density=%f\n",
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Fog in current sector (%f,%f,%f) density=%f",
       	f->red, f->green, f->blue, f->density);
     }
     else
@@ -1239,7 +1278,8 @@ bool CommandHandler (const char *cmd, const char *arg)
       float r, g, b, dens;
       if (csScanStr (arg, "%f,%f,%f,%f", &r, &g, &b, &dens) != 4)
       {
-        Sys->Printf (CS_MSG_CONSOLE, "Expected r,g,b,density. Got something else!\n");
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"Expected r,g,b,density. Got something else!");
         return false;
       }
       f->enabled = true;
@@ -1261,7 +1301,8 @@ bool CommandHandler (const char *cmd, const char *arg)
       OpenPortal (Sys->LevelLoader, Sys->view, level);
     }
     else
-      Sys->Printf (CS_MSG_CONSOLE, "Expected parameter 'level'!\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Expected parameter 'level'!");
   }
   else if (!strcasecmp (cmd, "fs_inter"))
   {
@@ -1313,7 +1354,8 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
       else
       {
-        Sys->Printf (CS_MSG_CONSOLE, "Can't find material!\n");
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"Can't find material!");
 	Sys->do_fs_fadetxt = false;
       }
     }
@@ -1390,7 +1432,8 @@ bool CommandHandler (const char *cmd, const char *arg)
       }
 #endif
     }
-    //Sys->Printf (CS_MSG_CONSOLE, "No debug0 implementation in this version.\n");
+    //Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	//"No debug0 implementation in this version.");
 #endif
   }
   else if (!strcasecmp (cmd, "debug1"))
@@ -1399,7 +1442,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     covtree_level++;
     if (covtree_level > 25) covtree_level = 1;
     printf ("covtree_level=%d\n", covtree_level);
-    //Sys->Printf (CS_MSG_CONSOLE, "No debug1 implementation in this version.\n");
+    //Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	//"No debug1 implementation in this version.");
   }
   else if (!strcasecmp (cmd, "debug2"))
   {
@@ -1407,7 +1451,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     extern bool do_covtree_dump;
     do_covtree_dump = !do_covtree_dump;
 #   else
-    Sys->Printf (CS_MSG_CONSOLE, "No debug2 implementation in this version.\n");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    	"No debug2 implementation in this version.");
 #   endif
   }
   else if (!strcasecmp (cmd, "strafe_left"))
@@ -1612,7 +1657,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     	char* txtname);
     if (cnt != 1)
     {
-      Sys->Printf (CS_MSG_CONSOLE, "Expected parameter 'texture'!\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Expected parameter 'texture'!");
     }
     else
       add_particles_explosion (Sys->view->GetCamera ()->GetSector (),
@@ -1627,7 +1673,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     	char* txtname);
     if (cnt != 1)
     {
-      Sys->Printf (CS_MSG_CONSOLE, "Expected parameter 'texture'!\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Expected parameter 'texture'!");
     }
     else
       add_particles_spiral (Sys->view->GetCamera ()->GetSector (),
@@ -1640,7 +1687,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg) cnt = csScanStr (arg, "%s,%s,%s", filename, tempname, txtname);
     if (cnt != 3)
     {
-      Sys->Printf (CS_MSG_CONSOLE, "Expected parameters 'file','template','texture'!\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Expected parameters 'file','template','texture'!");
     }
     else load_meshobj (filename, tempname, txtname);
   }
@@ -1653,8 +1701,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg) cnt = csScanStr (arg, "%s,%s,%f", tname, sname, &size);
     if(cnt != 3)
     {
-      Sys->Printf (CS_MSG_CONSOLE, "Expected parameters 'templatename',");
-      Sys->Printf (CS_MSG_CONSOLE, "'meshname','size'!\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Expected parameters 'templatename','meshname','size'!");
     }
     else
     {
@@ -1673,10 +1721,11 @@ bool CommandHandler (const char *cmd, const char *arg)
       if (mesh)
         meshes->RemoveMesh (mesh);
       else
-        Sys->Printf (CS_MSG_CONSOLE, "Can't find mesh with that name!\n");
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"Can't find mesh with that name!");
     }
     else
-      Sys->Printf (CS_MSG_CONSOLE, "Missing mesh name!\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Missing mesh name!");
   }
   else if (!strcasecmp (cmd, "listmeshes"))
   {
@@ -1690,8 +1739,10 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg) cnt = csScanStr (arg, "%s,%s", name, action);
     if(cnt != 1)
     {
-      Sys->Printf (CS_MSG_CONSOLE, "Expected parameters 'meshname'!\n");
-      Sys->Printf (CS_MSG_CONSOLE, "To get the names use 'listmeshes'\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Expected parameters 'meshname'!");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"To get the names use 'listmeshes'");
     }
     else
     {
@@ -1708,14 +1759,17 @@ bool CommandHandler (const char *cmd, const char *arg)
 	for (i = 0; i < (fstate->GetActionCount ()); i ++)
 	{
 	  aspr_act = fstate->GetAction (i);
-	  Sys->Printf (CS_MSG_CONSOLE, "%s\n", aspr_act->GetName ());
+	  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+	  	"%s", aspr_act->GetName ());
 	}
 	fstate->DecRef ();
       }
       else
       {
-        Sys->Printf (CS_MSG_CONSOLE, "Expected parameters 'meshname'!\n");
-        Sys->Printf (CS_MSG_CONSOLE, "To get the names use 'listmeshes'\n");
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"Expected parameters 'meshname'!");
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"To get the names use 'listmeshes'");
       }
     }
   }
@@ -1727,15 +1781,17 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg) cnt = csScanStr (arg, "%s,%s", name, action);
     if(cnt != 2)
     {
-      Sys->Printf (CS_MSG_CONSOLE, "Expected parameters 'meshname,action'!\n");
-      Sys->Printf (CS_MSG_CONSOLE, "To get the names use 'listmeshes'\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"Expected parameters 'meshname,action'!");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+      	"To get the names use 'listmeshes'");
     }
     else
     {
       // Test to see if the mesh exists.
       iMeshWrapper* wrap = Sys->Engine->FindMeshWrapper (name);
       if (!wrap)
-        Sys->Printf (CS_MSG_CONSOLE, "No such mesh!\n");
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No such mesh!");
       else
       {
         iSprite3DState* state = SCF_QUERY_INTERFACE (wrap->GetMeshObject (),
@@ -1745,15 +1801,15 @@ bool CommandHandler (const char *cmd, const char *arg)
           // Test to see if the action exists for that sprite.
           if (!state->SetAction (action))
 	  {
-            Sys->Printf (CS_MSG_CONSOLE,
-		         "Expected parameters 'meshname,action'!\n");
-	    Sys->Printf (CS_MSG_CONSOLE,
-		   "That mesh does not have that action.\n");
+            Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+		         "Expected parameters 'meshname,action'!");
+	    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+		   "That mesh does not have that action.");
 	  }
 	  state->DecRef ();
         }
         else
-          Sys->Printf (CS_MSG_CONSOLE, "Mesh is not a 3D sprite!");
+          Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Mesh is not a 3D sprite!");
       }
     }
   }
@@ -1765,15 +1821,15 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (arg) cnt = csScanStr (arg, "%s,%s", name, motion);
     if(cnt != 2)
     {
-      Sys->Printf (CS_MSG_CONSOLE, "Expected parameters 'meshname,motion'!\n");
-      Sys->Printf (CS_MSG_CONSOLE, "To get the names use 'listmeshes'\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Expected parameters 'meshname,motion'!");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "To get the names use 'listmeshes'");
     }
     else
     {
       // Test to see if the mesh exists.
       iMeshWrapper* wrap = Sys->Engine->FindMeshWrapper (name);
       if (!wrap)
-        Sys->Printf (CS_MSG_CONSOLE, "No such mesh!\n");
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No such mesh!");
       else
       {
 	iSprite3DState* state = SCF_QUERY_INTERFACE (wrap->GetMeshObject (),
@@ -1788,19 +1844,19 @@ bool CommandHandler (const char *cmd, const char *arg)
 	    {
 	      if (!Sys->myMotionMan->ApplyMotion(sb, motion, motion, true,
 	      	false, 1.0, 0, false))
-	        Sys->Printf (CS_MSG_CONSOLE, "That motion does not exist!\n");
+	        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "That motion does not exist!");
 	    }
 	    else
-	      Sys->Printf (CS_MSG_CONSOLE, "No motion manager exists to animate the skeleton!\n");
+	      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No motion manager exists to animate the skeleton!");
 	    sb->DecRef ();
 	  }
 	  else
-	    Sys->Printf (CS_MSG_CONSOLE, "That sprite does not contain a skeleton!\n");
+	    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "That sprite does not contain a skeleton!");
 	  state->DecRef ();
         }
 	else
 	{
-          Sys->Printf (CS_MSG_CONSOLE, "Mesh is not a 3D sprite!\n");
+          Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Mesh is not a 3D sprite!");
 	}
       }
     }
@@ -1862,10 +1918,10 @@ bool CommandHandler (const char *cmd, const char *arg)
       if (arg && csScanStr (arg, "%f,%f,%f", &r, &g, &b) == 3)
         Sys->selected_light->SetColor (csColor (r, g, b));
       else
-        Sys->Printf (CS_MSG_CONSOLE, "Arguments missing or invalid!\n");
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Arguments missing or invalid!");
     }
     else
-      Sys->Printf (CS_MSG_CONSOLE, "No light selected!\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No light selected!");
   }
   else if (!strcasecmp (cmd, "addlight"))
   {
@@ -1895,7 +1951,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     extern void AttachRandomLight (csDynLight* light);
     if (rnd)
       AttachRandomLight (dyn);
-    Sys->Printf (CS_MSG_CONSOLE, "Dynamic light added.\n");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Dynamic light added.");
   }
   else if (!strcasecmp (cmd, "dellight"))
   {
@@ -1904,7 +1960,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       Sys->view->GetEngine ()->GetCsEngine ()->RemoveDynLight (dyn);
       delete dyn;
-      Sys->Printf (CS_MSG_CONSOLE, "Dynamic light deleted.\n");
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Dynamic light deleted.");
     }
   }
   else if (!strcasecmp (cmd, "dellights"))
@@ -1916,21 +1972,21 @@ bool CommandHandler (const char *cmd, const char *arg)
       Sys->view->GetEngine ()->GetCsEngine ()->RemoveDynLight (dyn);
       delete dyn;
     }
-    Sys->Printf (CS_MSG_CONSOLE, "All dynamic lights deleted.\n");
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "All dynamic lights deleted.");
   }
   else if (!strcasecmp (cmd, "picklight"))
   {
 #   if 0
     pickup_light = Sys->view->GetEngine ()->GetFirstFltLight ();
-    if (pickup_light) Sys->Printf (CS_MSG_CONSOLE, "Floating light taken.\n");
-    else Sys->Printf (CS_MSG_CONSOLE, "No floating light to take.\n");
+    if (pickup_light) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Floating light taken.");
+    else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No floating light to take.");
 #   endif
   }
   else if (!strcasecmp (cmd, "droplight"))
   {
 #   if 0
-    if (pickup_light) Sys->Printf (CS_MSG_CONSOLE, "Floating light dropped.\n");
-    else Sys->Printf (CS_MSG_CONSOLE, "No floating light to drop.\n");
+    if (pickup_light) Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Floating light dropped.");
+    else Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "No floating light to drop.");
     pickup_light = NULL;
 #   endif
   }
@@ -1955,7 +2011,8 @@ bool CommandHandler (const char *cmd, const char *arg)
       if (sb)
         sb->GetSound ()->Play();
       else
-        Sys->Printf (CS_MSG_CONSOLE, "Sound '%s' not found!\n", arg);
+        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"Sound '%s' not found!", arg);
     }
   }
   else if (!strcasecmp (cmd, "snd_volume"))

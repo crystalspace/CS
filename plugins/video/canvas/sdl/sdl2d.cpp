@@ -26,6 +26,8 @@
 #include "csgeom/csrect.h"
 #include "cssys/csinput.h"
 #include "isys/system.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 #include <SDL.h>
 #include <SDL_mutex.h>
@@ -187,6 +189,21 @@ csGraphics2DSDL::csGraphics2DSDL(iBase *iParent) : csGraphics2D (iParent)
   EventOutlet = NULL;
 }
 
+void csGraphics2DSDL::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.canvas.sdl", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 //fixup:
 //  This function increases reference counter for sdl2d.so. This is
 //  necessary to keep all dependent libraries in memory. For example,
@@ -206,14 +223,14 @@ void csGraphics2DSDL::fixlibrary()
     dladdr(sdl2d_scfInitialize,&dlip);
     dlopen(dlip.dli_fname,RTLD_NOW);
 
-    CsPrintf (CS_MSG_INITIALIZATION, "Library %s locked.\n",dlip.dli_fname);
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Library %s locked.",dlip.dli_fname);
 #elif defined(OS_WIN32)
-	CsPrintf (CS_MSG_INITIALIZATION, "SDL generic Win32 support by Crystal"
-		" Space Development Team.\n");
+	Report (CS_REPORTER_SEVERITY_NOTIFY, "SDL generic Win32 support by Crystal"
+		" Space Development Team.");
 #else
-    CsPrintf (CS_MSG_INITIALIZATION,
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
               "WARNING: Your operating system is not tested\n"
-              "         yet with sdl2d video driver!\n");
+              "         yet with sdl2d video driver!");
 #endif
 }
 
@@ -226,14 +243,14 @@ bool csGraphics2DSDL::Initialize (iSystem *pSystem)
 
     // SDL Starts here
 
-    CsPrintf (CS_MSG_INITIALIZATION, "Crystal Space SDL version.\n");
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Crystal Space SDL version.");
 
     //fixup:
     //make library persistent
     fixlibrary();
 
-    CsPrintf (CS_MSG_INITIALIZATION,
-      "Defaults to %dx%dx%d resolution.\n", Width, Height, Depth);
+    Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "Defaults to %dx%dx%d resolution.", Width, Height, Depth);
 
     Memory = NULL;
 
@@ -270,7 +287,7 @@ bool csGraphics2DSDL::Initialize (iSystem *pSystem)
         pfmt.PixelBytes = 4;
         break;
       default:
-        CsPrintf (CS_MSG_FATAL_ERROR, "Pixel depth %d not supported\n", Depth);
+        Report (CS_REPORTER_SEVERITY_ERROR, "Pixel depth %d not supported", Depth);
     }
 
     return true;
@@ -294,14 +311,14 @@ bool csGraphics2DSDL::Open()
 
   if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_NOPARACHUTE) < 0)
   {
-    CsPrintf (CS_MSG_FATAL_ERROR,
-      "Couldn't initialize SDL: %s\n", SDL_GetError());
+    Report (CS_REPORTER_SEVERITY_ERROR,
+      "Couldn't initialize SDL: %s", SDL_GetError());
     exit (1);
   }
 
   screen = SDL_SetVideoMode(Width,Height,Depth,SDL_SWSURFACE);
   if (screen == NULL) {
-    CsPrintf (CS_MSG_FATAL_ERROR, "Couldn't set %dx%dx%d video mode: %s\n",
+    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't set %dx%dx%d video mode: %s",
                                Width, Height, Depth, SDL_GetError());
     return false;
   }
@@ -357,7 +374,7 @@ bool csGraphics2DSDL::Open()
       _GetPixelAt = GetPixelAt32;
       break;
     default:
-      CsPrintf (CS_MSG_FATAL_ERROR, "Pixel depth %d not supported\n", Depth);
+      Report (CS_REPORTER_SEVERITY_ERROR, "Pixel depth %d not supported", Depth);
   }
 
   pfmt.complete ();

@@ -31,6 +31,7 @@
 #include "iengine/texture.h"
 #include "iutil/cfgfile.h"
 #include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -52,6 +53,21 @@ csGraphics2DGLX::csGraphics2DGLX (iBase *iParent) :
   leader_window = window = 0;
 }
 
+void csGraphics2DGLX::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.canvas.glx2d", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 bool csGraphics2DGLX::Initialize (iSystem *pSystem)
 {
   if (!csGraphics2DGLCommon::Initialize (pSystem))
@@ -68,12 +84,12 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
     iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
     dispdriver = CS_LOAD_PLUGIN (plugin_mgr, strDriver, NULL, iOpenGLDisp);
     if (!dispdriver)
-      CsPrintf (CS_MSG_FATAL_ERROR, "Could not create an instance of %s ! Using NULL instead.\n", strDriver);
+      Report (CS_REPORTER_SEVERITY_WARNING, "Could not create an instance of %s ! Using NULL instead.", strDriver);
     else
     {
       if (!dispdriver->open ())
       {
-        printf ("open of displaydriver %s failed!\n", strDriver);
+        Report (CS_REPORTER_SEVERITY_ERROR, "open of displaydriver %s failed!", strDriver);
         return false;
       }
     }
@@ -89,8 +105,8 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
   dpy = XOpenDisplay (NULL);
   if (!dpy)
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "FATAL: Cannot open X display\n");
-    exit (-1);
+    Report (CS_REPORTER_SEVERITY_ERROR, "FATAL: Cannot open X display");
+    return false;
   }
 
   // Set user locale for national character support
@@ -152,12 +168,13 @@ bool csGraphics2DGLX::CreateContext (int *desired_attributes)
     cmap = XCreateColormap (dpy, RootWindow (dpy, active_GLVisual->screen),
 			    active_GLVisual->visual, AllocNone);
 
-//    CsPrintf (CS_MSG_INITIALIZATION, "Seized Visual ID %d\n", 
+//    Report (CS_REPORTER_SEVERITY_NOTIFY, "Seized Visual ID %d", 
 //	      active_GLVisual->visual->visualid);
   }
   else
   {
-    CsPrintf (CS_MSG_FATAL_ERROR, "FATAL: Could not find proper GLX visual\n");
+    Report (CS_REPORTER_SEVERITY_WARNING,
+    	"Could not find proper GLX visual");
  
     // what attribute was not supplied? we know that trying to get
     // all the attributes at once doesn't work.  provide more user info by
@@ -175,18 +192,21 @@ bool csGraphics2DGLX::CreateContext (int *desired_attributes)
 
     if (!glXChooseVisual(dpy, screen_num, color_attributes) )
     {
-      CsPrintf(CS_MSG_FATAL_ERROR, "Graphics display does not support at least 12 bit color\n");
+      Report (CS_REPORTER_SEVERITY_WARNING,
+      	"Graphics display does not support at least 12 bit color");
     }
 
     // try to get visual with a depth buffer
     int depthbuffer_attributes [] = {GLX_RGBA, GLX_DEPTH_SIZE,1, None};
     if (!glXChooseVisual (dpy,screen_num,depthbuffer_attributes))
-      CsPrintf(CS_MSG_FATAL_ERROR,"Graphics display does not support a depth buffer\n");
+      Report (CS_REPORTER_SEVERITY_WARNING,
+      	"Graphics display does not support a depth buffer");
 
     // try to get a visual with double buffering
     int doublebuffer_attributes [] = {GLX_RGBA, GLX_DOUBLEBUFFER, None};
     if (!glXChooseVisual (dpy,screen_num,doublebuffer_attributes))
-	CsPrintf(CS_MSG_FATAL_ERROR,"Graphics display does not provide double buffering\n");
+	Report (CS_REPORTER_SEVERITY_WARNING,
+	  "Graphics display does not provide double buffering");
 
     return false;
   }
@@ -235,8 +255,7 @@ bool csGraphics2DGLX::Open()
   if (!CreateContext (desired_attributes))
     return false;
 
-  CsPrintf (CS_MSG_INITIALIZATION, "\nVideo driver GL/X version ");
-  CsPrintf (CS_MSG_INITIALIZATION, "%s\n",
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Video driver GL/X version %s",
     glXIsDirect (dpy, active_GLContext) ? "(direct renderer)" : "");
 
   Depth = active_GLVisual->depth;
@@ -245,7 +264,7 @@ bool csGraphics2DGLX::Open()
     pfmt.PixelBytes = 4;
   else pfmt.PixelBytes = 2;
 
-  CsPrintf (CS_MSG_INITIALIZATION, "Visual ID: %x, %dbit %s\n",
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Visual ID: %x, %dbit %sn",
 	    active_GLVisual->visualid, Depth, 
 	    visual_class_name (active_GLVisual->c_class));
 
@@ -273,24 +292,25 @@ bool csGraphics2DGLX::Open()
   }
 
   // Report Info
-  CsPrintf (CS_MSG_INITIALIZATION, "Frame buffer: %dbit ", frame_buffer_depth);
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+  	"Frame buffer: %dbit ", frame_buffer_depth);
   if (ctype)
   {
     if (pfmt.RedMask > pfmt.BlueMask)
     {
-      CsPrintf (CS_MSG_INITIALIZATION, 
+      Report (CS_REPORTER_SEVERITY_NOTIFY, 
 		"R%d:G%d:B%d:A%d, ", 
 		pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits, alpha_bits);
     }
     else
     {
-      CsPrintf (CS_MSG_INITIALIZATION, 
+      Report (CS_REPORTER_SEVERITY_NOTIFY, 
 		"B%d:G%d:R%d:A%d, ", 
 		pfmt.BlueBits, pfmt.GreenBits, pfmt.RedBits, alpha_bits);
     }
   } 
-  CsPrintf (CS_MSG_INITIALIZATION, "level %d, double buffered\n", level);
-  CsPrintf (CS_MSG_INITIALIZATION, "Depth buffer: %dbit\n", size_depth_buffer);
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "level %d, double buffered", level);
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Depth buffer: %dbit", size_depth_buffer);
 
   pfmt.complete ();
 

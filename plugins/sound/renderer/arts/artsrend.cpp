@@ -20,6 +20,8 @@
 #include "cssysdef.h"
 #include "artsrend.h"
 #include "isys/system.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 
 #define ARTS_SIMPLESOUNDSERVER "global:Arts_SimpleSoundServer"
 
@@ -68,10 +70,13 @@ bool csArtsRenderer::Initialize (iSystem *iSys)
   dispatcher = new Arts::Dispatcher;
   server = Arts::Reference (ARTS_SIMPLESOUNDSERVER);
   if (server.isNull ())
-    iSys->Printf (CS_MSG_WARNING,
-      "Couldn't get a reference to the soundserver !\n"
-      "Check whether you have the Arts server running "
-      "(usually called \"artsd\")\n");
+  {
+    csReport (iSys->GetObjectRegistry (), CS_REPORTER_SEVERITY_WARNING,
+    	"crystalspace.sound.arts",
+        "Couldn't get a reference to the soundserver !\n"
+        "Check whether you have the Arts server running "
+        "(usually called \"artsd\")");
+  }
   else
     bInit = true;
   return bInit;

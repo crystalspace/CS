@@ -35,6 +35,8 @@ public:
   csSoundDriverWaveOut(iBase *piBase);
   virtual ~csSoundDriverWaveOut();
 
+  void Report (int severity, const char* msg, ...);
+
   // Implementation of interface for iPlugin
   virtual bool Initialize (iSystem *iSys);
   virtual bool HandleEvent (iEvent &e);

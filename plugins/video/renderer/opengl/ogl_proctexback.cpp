@@ -98,7 +98,7 @@ void csOpenGLProcBackBuffer::Prepare (csGraphics3DOGLCommon *g3d,
     memset (buffer, 0, sizeof(char)*width*height*3);
   }
 #ifdef CS_DEBUG
-  SysPrintf (CS_MSG_STDOUT, "GL backbuffer procedural texture\n");
+  printf ("GL backbuffer procedural texture\n");
 #endif
 }
 

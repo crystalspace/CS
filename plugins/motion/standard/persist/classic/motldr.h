@@ -54,6 +54,8 @@ public:
   virtual bool Initialize( iSystem *Sys);
   virtual iBase* Parse( const char* string, iEngine *engine, iBase *context );
 
+  void Report (int severity, const char* msg, ...);
+
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMotionLoader);

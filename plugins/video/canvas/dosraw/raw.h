@@ -39,6 +39,8 @@ public:
   virtual bool Open ();
   virtual void Close (void);
 
+  void Report (int severity, const char* msg, ...);
+
   virtual void Print (csRect *area = NULL);
 
   virtual bool SetMousePosition (int x, int y);

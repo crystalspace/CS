@@ -26,6 +26,8 @@
 #include "isys/system.h"
 #include "isound/renderer.h"
 #include "iutil/cfgfile.h"
+#include "iutil/objreg.h"
+#include "ivaria/reporter.h"
 #include "isys/event.h"
 #include "wodrv.h"
 
@@ -71,10 +73,25 @@ bool csSoundDriverWaveOut::Initialize (iSystem *iSys)
   return true;
 }
 
+void csSoundDriverWaveOut::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  if (rep)
+    rep->ReportV (severity, "crystalspace.sound.driver.waveout", msg, arg);
+  else
+  {
+    csVPrintf (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency,
   bool bit16, bool stereo)
 {
-  System->Printf (CS_MSG_INITIALIZATION, "Wave-Out Sound Driver selected.\n");
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "Wave-Out Sound Driver selected.");
   ActivateSoundProc = false;
 
   // store pointer to sound renderer
@@ -101,7 +118,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency,
 
   // read settings from the config file
   unsigned int RefreshRate=Config->GetInt("Sound.WaveOut.Refresh", 5);
-  System->Printf (CS_MSG_INITIALIZATION, "  updating %d times per second\n",
+  Report (CS_REPORTER_SEVERITY_NOTIFY, "  updating %d times per second",
     RefreshRate);
 
   // setup misc member variables
@@ -116,8 +133,8 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency,
   // support?
   MMRESULT res = waveOutOpen(&WaveOut, WAVE_MAPPER, &Format,
     (LONG)&waveOutProc, 0L, CALLBACK_FUNCTION);
-  if (res != MMSYSERR_NOERROR) System->Printf(CS_MSG_INITIALIZATION,
-    "  could not open Wave-Out system (%s).\n", GetMMError(res));
+  if (res != MMSYSERR_NOERROR) Report (CS_REPORTER_SEVERITY_NOTIFY,
+    "  could not open Wave-Out system (%s).", GetMMError(res));
 
   // Store old volume and set full volume because the software sound renderer
   // will apply volume internally. If this device does not allow volume
@@ -192,8 +209,8 @@ bool csSoundDriverWaveOut::HandleEvent(iEvent &e)
       SoundBlock *Block = (SoundBlock*)BlocksToDelete.Pop();
       MMRESULT res;
       res = waveOutUnprepareHeader(WaveOut, Block->WaveHeader,sizeof(WAVEHDR));
-      if (res != MMSYSERR_NOERROR) System->Printf(CS_MSG_WARNING,
-        "cannot unprepare wave-out header (%s).\n", GetMMError(res));
+      if (res != MMSYSERR_NOERROR) Report (CS_REPORTER_SEVERITY_WARNING,
+        "cannot unprepare wave-out header (%s).", GetMMError(res));
 
       GlobalUnlock(Block->DataHandle);
       GlobalFree(Block->DataHandle);
@@ -266,12 +283,12 @@ void csSoundDriverWaveOut::SoundProc(LPWAVEHDR OldHeader) {
     // data is sent to the output device in the background.
     MMRESULT result = waveOutWrite(WaveOut, lpWaveHdr, sizeof(WAVEHDR)); 
     if (result != MMSYSERR_NOERROR) {
-      System->Printf(CS_MSG_WARNING, "cannot write sound block to wave-out "
-        "(%s).\n", GetMMError(result));
+      Report (CS_REPORTER_SEVERITY_WARNING, "cannot write sound block to wave-out "
+        "(%s).", GetMMError(result));
 
       result = waveOutUnprepareHeader(WaveOut, lpWaveHdr, sizeof(WAVEHDR));
-      if (result != MMSYSERR_NOERROR) System->Printf(CS_MSG_WARNING, "cannot "
-        "unprepare sound block (%s).\n", GetMMError(result));
+      if (result != MMSYSERR_NOERROR) Report(CS_REPORTER_SEVERITY_WARNING, "cannot "
+        "unprepare sound block (%s).", GetMMError(result));
       GlobalUnlock(Block->DataHandle);
       GlobalFree(Block->DataHandle);
       delete Block;
