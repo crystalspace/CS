@@ -145,7 +145,11 @@ csString &csString::Append (const char *iStr, size_t iCount)
   if (iCount == (size_t)-1)
     iCount = strlen (iStr);
   if (iCount == 0)
+  {
+    // make sure string is correctly terminated
+    Data[Size]='\0';
     return *this;
+  }
 
   size_t const NewSize = Size + iCount;
   SetCapacity (NewSize);
