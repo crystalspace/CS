@@ -334,7 +334,7 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
 
   return visibleMeshCache;*/
   
-  csList<visibleMeshCacheHolder>::Iterator it (visibleMeshCache);
+  /*csList<visibleMeshCacheHolder>::Iterator it (visibleMeshCache);
   bool firstEntry = true;
   while (it.HasNext())
   {
@@ -369,7 +369,7 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
       entry->cachedRView = rview;
       return entry->meshList;
     }
-  }
+  }*/
 
   //create a new cache entry
   visibleMeshCacheHolder holder;
@@ -378,7 +378,7 @@ csRenderMeshList *csSector::GetVisibleMeshes (iRenderView *rview)
   holder.meshList = new csRenderMeshList(engine->object_reg);
   cb.Setup (holder.meshList, rview);
   GetVisibilityCuller()->VisTest (rview, &cb);
-  visibleMeshCache.PushFront (holder);
+  //visibleMeshCache.PushFront (holder);
   return holder.meshList;
 }
 

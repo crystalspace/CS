@@ -766,9 +766,14 @@ void csPortalContainer::DrawOnePortal (
   {
     keep_camera_z = camera_vertices[po->GetVertexIndices ()[0]].z;
   }
-#ifndef CS_USE_NEW_RENDERER
   // First call OpenPortal() if needed.
   bool use_float_portal = po->flags.Check (CS_PORTAL_FLOAT);
+  
+#ifdef CS_USE_NEW_RENDERER
+  if (use_float_portal)
+    return;
+#endif
+
   if (use_float_portal)
   {
     static G3DPolygonDFP g3dpoly;
@@ -778,7 +783,9 @@ void csPortalContainer::DrawOnePortal (
     g3dpoly.normal = camera_plane;
     g3d->OpenPortal (&g3dpoly);
   }
-#endif
+
+
+
   // Draw through the portal. If this fails we draw the original polygon
   // instead. Drawing through a portal can fail because we have reached
   // the maximum number that a sector is drawn (for mirrors).
