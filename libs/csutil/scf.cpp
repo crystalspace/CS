@@ -34,8 +34,6 @@ static class scfClassRegistry *ClassRegistry = NULL;
 static bool SortClassRegistry = false;
 /// This is our private instance of csSCF
 static class csSCF *PrivateSCF = NULL;
-/// This is the public instance
-iSCF *iSCF::SCF = NULL;
 
 /// This class manages all SCF functionality
 class csSCF : public iSCF

@@ -1,12 +1,10 @@
 The history order is reversed so that new features are at the top.
 
 31-May-2001
-	- Wyatt Miler did a fix so MacOS/X builds again.
 	- In an effort to understand how the keyframer section in 3DS
 	  works I extended 3ds2lev verbose option to also list the contents
 	  of that section. Unfortunatelly I don't understand how I'm supposed
-	  to extract frame animation from that. Any help would be
-	  appreciated.
+	  to extract frame animation from that. Any help would be appreciated.
 	- Fixed a bug in iso engine. The clipper was one pixel too big.
 	- Added several CS_ASSERT's in another effort to nail the iso+OpenGL
 	  bug.
@@ -18,6 +16,17 @@ The history order is reversed so that new features are at the top.
 	  order to work around an OpenStep compiler bug where unlinkable object
 	  files are generated if an inline function calls a second inline
 	  before the compiler has seen the definition of the second function.
+	- Eric Sunshine eliminated a new circular reference which showed up
+	  when the global iSCF::SCF variable was introduced into scf.cpp.  The
+	  problem was that plugin modules require this variable, thus making it
+	  necessary to link plugins with scf.o.  Unfortunately, scf.o makes
+	  reference to several other symbols, such as those in findlib.o from
+	  cssys.  The upshot was that making plugins rely upon iSCF::SCF in
+	  scf.cpp caused plugins to also depend upon findlib.o, among others.
+	  I fixed this by moving the definition of iSCF::SCF to its own
+	  implementation file (scfimp.cpp).  Now plugins only need to link with
+	  scfimp.o rather than scf.o.  This removes the plugins' dependency
+	  on findlib.o and other object files.
 30-May-2001
 	- Completely removed Crystal Clear from CS. It is now obsolete
 	  and no longer maintained. This removal was done with the permission
