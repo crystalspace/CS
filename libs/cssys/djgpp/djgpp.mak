@@ -7,7 +7,7 @@ DESCRIPTION.djgpp = DOS/DJGPP
 DESCRIPTION.OS.djgpp = DOS
 
 ifeq ($(USE_ALLEGRO),yes)
-  PLUGINS += video/canvas/alleg2
+  PLUGINS += video/canvas/allegro
 else
   PLUGINS += video/canvas/dosraw
 endif
@@ -157,7 +157,7 @@ endif # ifeq ($(MAKESECTION),confighelp)
 #---------------------------------------------------------------- configure ---#
 ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/config)
 
-SYSCONFIG=bin/dosconf.bat
+SYSCONFIG=command /E:8192 /C bin\dosconf.bat
 # Check if "echo" executable is not installed (thus using dumb COMMAND.COM's echo)
 ifeq ($(shell echo ""),"")
 SYSCONFIG += $(NEWLINE)type bin\dosconf.var>>config.tmp
