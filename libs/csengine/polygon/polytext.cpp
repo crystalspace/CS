@@ -833,7 +833,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
         v_t2w,
         light,
         lightpos,
-        polygon->GetPolyPlane ()->Normal (),
+        polygon,
         cosfact);
     
     smap->CalcMaxShadow();
@@ -853,7 +853,7 @@ void csPolyTexture::UpdateFromShadowBitmap (
         light,
         lightpos,
         lightcolor,
-        polygon->GetPolyPlane ()->Normal (),
+        polygon,
         cosfact);
 
     lm->CalcMaxStatic();
@@ -1213,6 +1213,7 @@ float csShadowBitmap::GetLighting (int lm_u, int lm_v)
   }
 }
 
+
 void csShadowBitmap::UpdateLightMap (
   csRGBpixel *lightmap,
   int lightcell_shift,
@@ -1225,7 +1226,7 @@ void csShadowBitmap::UpdateLightMap (
   csLight *light,
   const csVector3 &lightpos,
   const csColor &lightcolor,
-  const csVector3 &poly_normal,
+  csPolygon3D* poly,
   float cosfact)
 {
   if (IsFullyShadowed () || IsFullyUnlit ()) return ;
@@ -1234,7 +1235,7 @@ void csShadowBitmap::UpdateLightMap (
   float light_g = lightcolor.green * CS_NORMAL_LIGHT_LEVEL;
   float light_b = lightcolor.blue * CS_NORMAL_LIGHT_LEVEL;
   bool ful_lit = IsFullyLit ();
-  int i, j;
+  int i, j, act;
   int base_uv = 0;
   float rv_step = (1 << lightcell_shift) * mul_v;
   float ru_step = (1 << lightcell_shift) * mul_u;
@@ -1259,15 +1260,196 @@ void csShadowBitmap::UpdateLightMap (
 
     for (j = 0; j < lm_w; j++, uv++)
     {
-      //@@@
-      //if (i == j) lightmap[uv].red = 255;
-      //if (i == lm_w-1-j) lightmap[uv].blue = 255;
-      //@@@
-      // our v vector calculation is equivalent to
-      // int ru = j << lightcell_shift;
-      // int rv = i << lightcell_shift;
-      // csVector3 v (float (ru + shf_u) * mul_u, float (rv + shf_v) * mul_v, 0);
-      // v = v_t2w + m_t2w * v;
+      v += v_ru;
+      float lightness;
+      if (ful_lit)
+        lightness = 1;
+      else
+      {
+        lightness = GetLighting (j, i);
+        if (lightness < EPSILON) continue;
+      }
+
+      // @@@ Optimization: It should be possible to combine these
+
+      // calculations into a more efficient formula.
+      float d = csSquaredDist::PointPoint (lightpos, v);
+      if (d >= light->GetSquaredRadius ()) continue;
+
+      d = qsqrt (d);
+
+			// Initialize normal with the flat one
+			csVector3 normal = poly->GetPolyPlane()->Normal ();
+			if ( poly->GetParent ()->GetSmoothingFlag() ) 
+			{
+				int* vertexs = poly->GetVertexIndices ();
+				csVector3* normals = poly->GetParent ()->GetNormals ();
+				int vCount = poly->GetVertexCount ();
+				csSegment3* segments = new csSegment3[vCount];
+
+				// int nearest; 
+				csVector3* nearest = new csVector3[vCount];
+				csVector3* nearestNormals = new csVector3[vCount];
+				float *distances = new float[vCount];
+				float shortestDistance = 10000000.0f;  // Big enought?
+				int nearestNormal;
+
+				for (act = 0; act < vCount ; act++)
+				{
+					// Create the 3D Segments
+					segments[act].SetStart ( poly->GetParent()->Vwor(vertexs[act]) );
+					segments[act].SetEnd ( poly->GetParent()->Vwor(vertexs[(act+1)%vCount]) );
+	
+					// Find the nearest point from v to the segment
+					// a: Start
+					// b: End
+					// c: point
+					csVector3 v_a = segments[act].Start ();
+					csVector3 v_b = segments[act].End ();
+					csVector3 v_c = v;
+					float dt_a = (v_c.x - v_a.x) * (v_b.x - v_a.x) + 
+						(v_c.y - v_a.y) * (v_b.y - v_a.y) +
+						(v_c.z - v_a.z) * (v_b.z - v_a.z);
+					float dt_b = (v_c.x - v_b.x) * (v_a.x - v_b.x) + 
+						(v_c.y - v_b.y) * (v_a.y - v_b.y) +
+						(v_c.z - v_b.z) * (v_a.z - v_b.z);
+
+					if (dt_a <= 0)
+					{
+						nearest[act] = v_a;
+					}
+					else
+					{
+						if (dt_b <=0)
+						{
+							nearest[act] = v_b;
+						}
+						else
+						{
+							nearest[act] = v_a + ((v_b - v_a) * dt_a)/(dt_a + dt_b);
+						}
+					}
+	
+					// Find the normal in the nearest point of the segment
+					// ==> Linear interpolation between vertexs
+					float AllDistance = qsqrt( csSquaredDist::PointPoint(segments[act].Start (),segments[act].End() ) );
+					float factorA = 1.0 - ( qsqrt( csSquaredDist::PointPoint(segments[act].Start (),nearest[act]) ) / AllDistance );
+					float factorB = 1.0 - ( qsqrt( csSquaredDist::PointPoint(segments[act].End (),nearest[act]) ) / AllDistance );
+					nearestNormals[act] = factorA * normals[vertexs[act]] + factorB * normals[vertexs[((act+1)%vCount)]];
+
+					// Get the distance
+					distances[act] = qsqrt( csSquaredDist::PointPoint(v,nearest[act]) );
+					if (distances[act] < shortestDistance)
+					{
+						nearestNormal = act;
+						shortestDistance = distances[act];
+					}
+				}
+
+				float *weights = new float[vCount];
+				// Get the weights of vertexes
+				for (act = 0; act < vCount ; act++)
+				{
+					if (distances[act] < 0.001f)
+						weights[act] = 1.0f;
+					else
+						weights[act] = shortestDistance / distances[act];
+				}
+	
+				if ( !poly->PointOnPolygon (v) )
+				{
+					normal = nearestNormals[nearestNormal];
+				}
+				else
+				{
+					normal.x = normal.y = normal.z = 0.0f;
+					for (act = 0; act < vCount ; act++)
+					{
+						normal += weights[act]*nearestNormals[act];
+					}
+				}
+
+				normal.Normalize();
+
+				delete [] nearest;
+				delete [] nearestNormals;
+				delete [] distances;
+				delete [] weights;
+				delete [] segments;
+	
+			}
+
+			float cosinus = (v - lightpos) * normal;
+			cosinus /= d;
+			cosinus += cosfact;
+		  if (cosinus < 0)
+				continue;
+			else if (cosinus > 1)
+				cosinus = 1;
+
+			float scale = cosinus * light->GetBrightnessAtDistance (d) * lightness;
+
+			int l;
+			csRGBpixel &lumel = lightmap[uv];
+			l = lumel.red + QRound (light_r * scale);
+//			if (l<20) l = 20;
+			lumel.red = l < 255 ? l : 255;
+			l = lumel.green + QRound (light_g * scale);
+//			if (l<20) l = 20;
+			lumel.green = l < 255 ? l : 255;
+			l = lumel.blue + QRound (light_b * scale);
+//			if (l<20) l = 20;
+			lumel.blue = l < 255 ? l : 255;
+
+    }
+  }
+}
+
+
+
+
+void csShadowBitmap::UpdateShadowMap (
+  unsigned char *shadowmap,
+  int lightcell_shift,
+  float shf_u,
+  float shf_v,
+  float mul_u,
+  float mul_v,
+  const csMatrix3 &m_t2w,
+  const csVector3 &v_t2w,
+  csLight *light,
+  const csVector3 &lightpos,
+  csPolygon3D* poly,
+  float cosfact)
+{
+  if (IsFullyShadowed () || IsFullyUnlit ()) return ;
+
+  bool ful_lit = IsFullyLit ();
+  int i, j, act;
+  int base_uv = 0;
+  float rv_step = (1 << lightcell_shift) * mul_v;
+  float ru_step = (1 << lightcell_shift) * mul_u;
+  float rv = shf_v * mul_v;
+  float ru_base = shf_u * mul_u - ru_step;
+
+  csVector3 v_ru (m_t2w.m11, m_t2w.m21, m_t2w.m31);
+  csVector3 v_rv (m_t2w.m12, m_t2w.m22, m_t2w.m32);
+  csVector3 v, v_base;
+
+  v_base = v_t2w + rv * v_rv + ru_base * v_ru;
+  v_rv *= rv_step;
+  v_ru *= ru_step;
+
+  for (i = 0; i < lm_h; i++)
+  {
+    int uv = base_uv;
+    base_uv += lm_w;
+
+    v = v_base;
+    v_base += v_rv;
+
+    for (j = 0; j < lm_w; j++, uv++)
+    {
       v += v_ru;
 
       float lightness;
@@ -1287,86 +1469,107 @@ void csShadowBitmap::UpdateLightMap (
 
       d = qsqrt (d);
 
-      float cosinus = (v - lightpos) * poly_normal;
-      cosinus /= d;
-      cosinus += cosfact;
-      if (cosinus < 0)
-        continue;
-      else if (cosinus > 1)
-        cosinus = 1;
+			csVector3 normal = poly->GetPolyPlane()->Normal ();
+			if ( poly->GetParent ()->GetSmoothingFlag() ) 
+			{
+				int* vertexs = poly->GetVertexIndices ();
+				csVector3* normals = poly->GetParent ()->GetNormals ();
+				int vCount = poly->GetVertexCount ();
+				csSegment3* segments = new csSegment3[vCount];
 
-      float scale = cosinus * light->GetBrightnessAtDistance (d) * lightness;
+				// int nearest; 
+				csVector3* nearest = new csVector3[vCount];
+				csVector3* nearestNormals = new csVector3[vCount];
+				float *distances = new float[vCount];
+				float shortestDistance = 10000000.0f;  // Big enought?
+				int nearestNormal;
 
-      int l;
-      csRGBpixel &lumel = lightmap[uv];
-      l = lumel.red + QRound (light_r * scale);
-      lumel.red = l < 255 ? l : 255;
-      l = lumel.green + QRound (light_g * scale);
-      lumel.green = l < 255 ? l : 255;
-      l = lumel.blue + QRound (light_b * scale);
-      lumel.blue = l < 255 ? l : 255;
-    }
-  }
-}
+				for (act = 0; act < vCount ; act++)
+				{
+					// Create the 3D Segments
+					segments[act].SetStart ( poly->GetParent()->Vwor(vertexs[act]) );
+					segments[act].SetEnd ( poly->GetParent()->Vwor(vertexs[(act+1)%vCount]) );
+	
+					// Find the nearest point from v to the segment
+					// a: Start
+					// b: End
+					// c: point
+					csVector3 v_a = segments[act].Start ();
+					csVector3 v_b = segments[act].End ();
+					csVector3 v_c = v;
+					float dt_a = (v_c.x - v_a.x) * (v_b.x - v_a.x) + 
+						(v_c.y - v_a.y) * (v_b.y - v_a.y) +
+						(v_c.z - v_a.z) * (v_b.z - v_a.z);
+					float dt_b = (v_c.x - v_b.x) * (v_a.x - v_b.x) + 
+						(v_c.y - v_b.y) * (v_a.y - v_b.y) +
+						(v_c.z - v_b.z) * (v_a.z - v_b.z);
 
-void csShadowBitmap::UpdateShadowMap (
-  unsigned char *shadowmap,
-  int lightcell_shift,
-  float shf_u,
-  float shf_v,
-  float mul_u,
-  float mul_v,
-  const csMatrix3 &m_t2w,
-  const csVector3 &v_t2w,
-  csLight *light,
-  const csVector3 &lightpos,
-  const csVector3 &poly_normal,
-  float cosfact)
-{
-  if (IsFullyShadowed () || IsFullyUnlit ()) return ;
+					if (dt_a <= 0)
+					{
+						nearest[act] = v_a;
+					}
+					else
+					{
+						if (dt_b <=0)
+						{
+							nearest[act] = v_b;
+						}
+						else
+						{
+							nearest[act] = v_a + ((v_b - v_a) * dt_a)/(dt_a + dt_b);
+						}
+					}
+	
+					// Find the normal in the nearest point of the segment
+					// ==> Linear interpolation between vertexs
+					float AllDistance = qsqrt( csSquaredDist::PointPoint(segments[act].Start (),segments[act].End() ) );
+					float factorA = 1.0 - ( qsqrt( csSquaredDist::PointPoint(segments[act].Start (),nearest[act]) ) / AllDistance );
+					float factorB = 1.0 - ( qsqrt( csSquaredDist::PointPoint(segments[act].End (),nearest[act]) ) / AllDistance );
+					nearestNormals[act] = factorA * normals[vertexs[act]] + factorB * normals[vertexs[((act+1)%vCount)]];
 
-  bool ful_lit = IsFullyLit ();
-  int i, j;
-  int base_uv = 0;
-  float rv_step = (1 << lightcell_shift) * mul_v;
-  float ru_step = (1 << lightcell_shift) * mul_u;
-  float rv = shf_v * mul_v;
-  float ru_base = shf_u * mul_u - ru_step;
+					// Get the distance
+					distances[act] = qsqrt( csSquaredDist::PointPoint(v,nearest[act]) );
+					if (distances[act] < shortestDistance)
+					{
+						nearestNormal = act;
+						shortestDistance = distances[act];
+					}
+				}
 
-  csVector3 v_ru (m_t2w.m11, m_t2w.m21, m_t2w.m31);
-  csVector3 v_rv (m_t2w.m12, m_t2w.m22, m_t2w.m32);
-  csVector3 v, v_base;
+				float *weights = new float[vCount];
+				// Get the weights of vertexes
+				for (act = 0; act < vCount ; act++)
+				{
+					if (distances[act] < 0.001f)
+						weights[act] = 1.0f;
+					else
+						weights[act] = shortestDistance / distances[act];
+				}
+	
+				if ( !poly->PointOnPolygon (v) )
+				{
+					normal = nearestNormals[nearestNormal];
+				}
+				else
+				{
+					normal.x = normal.y = normal.z = 0.0f;
+					for (act = 0; act < vCount ; act++)
+					{
+						normal += weights[act]*nearestNormals[act];
+					}
+				}
 
-  v_base = v_t2w + rv * v_rv + ru_base * v_ru;
-  v_rv *= rv_step;
-  v_ru *= ru_step;
+				normal.Normalize();
 
-  for (i = 0 ; i < lm_h ; i++)
-  {
-    int uv = base_uv;
-    base_uv += lm_w;
+				delete [] nearest;
+				delete [] nearestNormals;
+				delete [] distances;
+				delete [] weights;
+				delete [] segments;
+	
+			}
 
-    v = v_base;
-    v_base += v_rv;
-    for (j = 0 ; j < lm_w ; j++, uv++)
-    {
-      v += v_ru;
-
-      float lightness;
-      if (ful_lit)
-        lightness = 1;
-      else
-      {
-        lightness = GetLighting (j, i);
-        if (lightness < EPSILON) continue;
-      }
-
-      float d = csSquaredDist::PointPoint (lightpos, v);
-      if (d >= light->GetSquaredRadius ()) continue;
-
-      d = qsqrt (d);
-
-      float cosinus = (v - lightpos) * poly_normal;
+      float cosinus = (v - lightpos) * normal;
       cosinus /= d;
       cosinus += cosfact;
       if (cosinus < 0)

@@ -182,7 +182,8 @@ private:
   int max_vertices;
 
   /// Vertices in object space.
-  csVector3* obj_verts;
+  csVector3* obj_verts;  
+
   /**
    * Vertices in world space.
    * It is possible that this array is equal to obj_verts. In that
@@ -193,6 +194,13 @@ private:
   csVector3* cam_verts;
   /// Number of vertices for cam_verts.
   int num_cam_verts;
+
+  /// Normals in object space
+  csVector3* obj_normals;
+
+  /// Smooth flag
+  bool smoothed;
+
   /// Camera number for which the above camera vertices are valid.
   long cameranr;
 
@@ -352,6 +360,12 @@ public:
   int draw_busy;
 
 private:
+
+  
+  /// Calculates the interpolated normals of all vertices
+
+  void CalculateNormals();
+
   /**
    * Prepare the polygon buffer for use by DrawPolygonMesh.
    * If the polygon buffer is already made then this function will do
@@ -441,7 +455,7 @@ private:
   void ComputeThingEdgeTable ();
 
   /// Generate a cachename based on geometry.
-  void GenerateCacheName ();
+  void GenerateCacheName ();  
 
 public:
   /**
@@ -577,6 +591,20 @@ public:
 
   /// Remove all polygons.
   void RemovePolygons ();
+
+  // Smoothing handling Functions
+
+  /// Returns the smothing flag
+  bool GetSmoothingFlag() {return smoothed;};
+
+  /// Sets the smoothing flag
+  void SetSmoothingFlag(bool smooth);
+
+  ///Returns the normals array
+  csVector3* GetNormals(){ return obj_normals;};
+
+
+
 
   //----------------------------------------------------------------------
   // Curve handling functions
@@ -1150,6 +1178,27 @@ public:
     virtual iPolygon3D* IntersectSegment (const csVector3& start,
 	const csVector3& end, csVector3& isect,
 	float* pr = NULL, bool only_portals = false);
+
+    // Normals Handling functions
+
+    ///Sets the smoothing flag
+    virtual void SetSmoothingFlag(bool smoothing)
+    { 
+      scfParent->SetSmoothingFlag(smoothing);
+    };
+
+    ///Sets the smoothing flag
+    virtual bool GetSmoothingFlag()
+    { 
+      return scfParent->GetSmoothingFlag();
+    };
+  
+    ///Sets the smoothing flag
+    virtual csVector3* GetNormals()
+    {
+      return scfParent->GetNormals();
+    };
+
   } scfiThingState;
   friend struct ThingState;
 

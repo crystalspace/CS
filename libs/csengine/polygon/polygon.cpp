@@ -2360,12 +2360,14 @@ stop:
 
 void csPolygon3D::CalculateLightingStatic (csFrustumView *lview, bool vis)
 {
+	bool maybeItsVisible = false;
   csFrustum *light_frustum = lview->GetFrustumContext ()->GetLightFrustum ();
   const csVector3 &center = light_frustum->GetOrigin ();
 
   // If plane is not visible then return (backface culling).
-  if (!csMath3::Visible (center, plane->GetWorldPlane ())) return;
-
+  if (!csMath3::Visible (center, plane->GetWorldPlane ())) 
+		maybeItsVisible = true;
+		
   // Compute the distance from the center of the light
   // to the plane of the polygon.
   float dist_to_plane = GetPolyPlane ()->Distance (center);
@@ -2407,6 +2409,9 @@ void csPolygon3D::CalculateLightingStatic (csFrustumView *lview, bool vis)
   // Update the lightmap given light and shadow frustums in lview.
   if (calc_lmap)
     FillLightMapStatic (lview, vis);
+
+	if (maybeItsVisible) 
+		return;
 
   csPortal *po = GetPortal ();
 

@@ -196,16 +196,15 @@ public:
    *     it could in principle be modified by portals.
    * </ul>
    */
-  void UpdateLightMap (csRGBpixel* lightmap,
+void UpdateLightMap (csRGBpixel* lightmap,
 	int lightcell_shift,
 	float shf_u, float shf_v,
 	float mul_u, float mul_v,
 	const csMatrix3& m_t2w, const csVector3& v_t2w,
 	csLight* light, const csVector3& lightpos,
 	const csColor& lightcolor,
-	const csVector3& poly_normal,
+	csPolygon3D* poly,
 	float cosfact);
-
   /**
    * Take a light and update the shadowmap using the information in
    * this shadow-bitmap.
@@ -227,9 +226,8 @@ public:
 	float mul_u, float mul_v,
 	const csMatrix3& m_t2w, const csVector3& v_t2w,
 	csLight* light, const csVector3& lightpos,
-	const csVector3& poly_normal,
+	csPolygon3D* poly,
 	float cosfact);
-
   /**
    * Return true if this bitmap is fully shadowed.
    */

@@ -69,7 +69,7 @@ struct csFog;
 #define CS_THING_MOVE_OFTEN 1
 #define CS_THING_MOVE_OCCASIONAL 2
 
-SCF_VERSION (iThingState, 0, 1, 0);
+SCF_VERSION (iThingState, 0, 1, 1);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -284,6 +284,17 @@ struct iThingState : public iBase
   virtual iPolygon3D* IntersectSegment (const csVector3& start,
 	const csVector3& end, csVector3& isect,
 	float* pr = NULL, bool only_portals = false) = 0;
+
+  // Normals Handling functions
+
+  ///Sets the smoothing flag
+  virtual void SetSmoothingFlag(bool smoothing) = 0;
+
+  ///Sets the smoothing flag
+  virtual bool GetSmoothingFlag() = 0;
+  
+  ///Sets the smoothing flag
+  virtual csVector3* GetNormals() = 0;
 };
 
 SCF_VERSION (iThingEnvironment, 0, 0, 2);
