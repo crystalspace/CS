@@ -22,30 +22,25 @@
 
   <xsl:output method="text" indent="no"/>
   <xsl:strip-space elements="*"/>
+  <xsl:variable name="tabwidth" select="'  '"/>
 
-  <xsl:template match="/UI">
-    <xsl:choose>
-      <xsl:when test="./class">
-        <xsl:text>window "</xsl:text><xsl:value-of select="./class"/><xsl:text>"</xsl:text>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:text>window "</xsl:text><xsl:value-of select="./widget/property[name[text()='name']]/cstring"/><xsl:text>"</xsl:text>
-      </xsl:otherwise>
-    </xsl:choose>
-    <xsl:call-template name="spacer"/><xsl:text>{</xsl:text>
-    <xsl:apply-templates />
-    <xsl:call-template name="spacer"/><xsl:text>}</xsl:text>
-
-  </xsl:template>
-  
+  <!-- the top level widget types allowed -->
   <xsl:template match="widget[class[text()='QDialog' or text()='QWidget']]">
+    <xsl:call-template name="spacer"/><xsl:text>window "</xsl:text>
+    <xsl:choose>
+      <xsl:when test="/UI/class"><xsl:value-of select="/UI/class"/></xsl:when>
+      <xsl:otherwise><xsl:value-of select="property[name[text()='name']]/cstring"/></xsl:otherwise>
+    </xsl:choose>
+    <xsl:text>"</xsl:text>
+    <xsl:call-template name="spacer"/><xsl:text>{</xsl:text>
     <!-- set the title if any -->
     <xsl:call-template name="style"/>
     <xsl:call-template name="options"/>
     <xsl:apply-templates/>
+    <xsl:call-template name="spacer"/><xsl:text>}</xsl:text>
   </xsl:template>
 
-
+  <!-- list of widgets we convert -->
   <xsl:template match="widget[class[text()='QPushButton' or text()='QRadioButton' or text()='QSlider' or text()='QButtonGroup' or text()='QGroupBox' or text()='QFrame' or text()='QCheckBox' or text()='QLineEdit' or text()='QLabel']]">
     <xsl:call-template name="spacer"/><xsl:call-template name="component_header"/>
     <xsl:call-template name="spacer"/><xsl:text>{</xsl:text>
@@ -53,6 +48,7 @@
     <xsl:call-template name="spacer"/><xsl:text>}</xsl:text>
   </xsl:template>
  
+  <!-- special treatment of QListBox that maps to List Box with one column -->
   <xsl:template match="widget[class[text()='QListBox']]">
     <xsl:call-template name="spacer"/><xsl:call-template name="component_header"/>
     <xsl:call-template name="spacer"/><xsl:text>{</xsl:text>
@@ -177,16 +173,18 @@
   </xsl:template>
     
   <xsl:template name="style">
-    <xsl:call-template name="spacer"/><xsl:text>Style: </xsl:text><xsl:call-template name="prefix"/><xsl:text>fsNormal</xsl:text>
+    <xsl:call-template name="spacer"><xsl:with-param name="here" select="./class"/></xsl:call-template>
+    <xsl:text>Style: </xsl:text><xsl:call-template name="prefix"/><xsl:text>fsNormal</xsl:text>
   </xsl:template>
 
   <xsl:template name="options">
+    <xsl:call-template name="spacer"><xsl:with-param name="here" select="./class"/></xsl:call-template>
     <xsl:choose>
       <xsl:when test="class[text()='QDialog']">
-        <xsl:call-template name="spacer"/><xsl:text>Options: wfoGrip+wfoTitle+wfoClose+wfoMin+wfoZoom+wfoControl</xsl:text>
+        <xsl:text>Options: wfoGrip+wfoTitle+wfoClose+wfoMin+wfoZoom+wfoControl</xsl:text>
       </xsl:when>
       <xsl:when test="class[text()='QWidget']">
-        <xsl:call-template name="spacer"/><xsl:text>Options: wfoTitle+wfoClose</xsl:text>
+        <xsl:text>Options: wfoTitle+wfoClose</xsl:text>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
@@ -232,8 +230,8 @@
     <xsl:param name="here" select="."/>
     <xsl:param name="prefix"><xsl:text>&#10;</xsl:text></xsl:param>
     <xsl:value-of select="$prefix"/>
-    <xsl:if test="$here/../..">
-      <xsl:text>  </xsl:text>
+    <xsl:if test="$here/../../..">
+      <xsl:value-of select="$tabwidth"/>
       <xsl:call-template name="spacer">
         <xsl:with-param name="here" select="$here/.."/>
         <xsl:with-param name="prefix"></xsl:with-param>
