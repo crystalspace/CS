@@ -76,10 +76,12 @@ void csEventOutlet::Post (iEvent *Event)
     if (!cord || !cord->Post (Event))
       Queue->Post (Event);
     else
-      delete Event;
+      if (!Event->Pooled())
+        delete Event;
   }
   else
-    delete Event;
+    if (!Event->Pooled())
+      delete Event;
 }
 
 void csEventOutlet::Key (int iKey, int iChar, bool iDown)

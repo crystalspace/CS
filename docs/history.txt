@@ -71,6 +71,9 @@ The history order is reversed so that new features are at the top.
 	      so the constructor code is incorrect. I will have to patch Pico.
 	    - Rearranged the pgserver initialization code; it was doing things
 	      in the wrong order which was causing a segfault within Pico.
+        - JTarbox Fixed a bug with Post() and added a check to determine if an
+          iEvent object is a csPoolEvent or csEvent object via the Pooled() 
+          function
 27-May-2003
 	- Boyan made the following changes:
 	    - Fixed kyboard focusing component bug in AWS 

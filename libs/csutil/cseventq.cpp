@@ -83,6 +83,8 @@ csPtr<iEvent> csEventQueue::CreateEvent(uint8 type)
   }
   e->Type = type;
   e->Time = csGetTicks();
+  e->Category = 0;
+  e->SubCategory = 0;
   return csPtr<iEvent>((iEvent*)e);
 }
  
