@@ -132,8 +132,6 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_DIALOG			2
 /// Input line palette index
 #define CSPAL_INPUTLINE			3
-/// List box palette index
-#define CSPAL_LISTBOX			CSPAL_INPUTLINE
 /// Menu item palette index
 #define CSPAL_MENUITEM			4
 /// Menu palette index
@@ -144,24 +142,26 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_TITLEBAR			7
 /// Window palette index
 #define CSPAL_WINDOW			8
+/// List box palette index
+#define CSPAL_LISTBOX			9
 /// List box item palette index
-#define CSPAL_LISTBOXITEM		9
+#define CSPAL_LISTBOXITEM		10
 /// Scroll bar palette index
-#define CSPAL_SCROLLBAR			10
+#define CSPAL_SCROLLBAR			11
 /// Notebook palette index
-#define CSPAL_NOTEBOOK			11
+#define CSPAL_NOTEBOOK			12
 /// GridCell palette index
-#define CSPAL_GRIDCELL			12
+#define CSPAL_GRIDCELL			13
 /// GridView palette index
-#define CSPAL_GRIDVIEW  		13
+#define CSPAL_GRIDVIEW  		14
 /// Slider palette index
-#define CSPAL_SPLITTER		        14
+#define CSPAL_SPLITTER		        15
 /// Tree control item palette index
-#define CSPAL_TREEITEM		        15
+#define CSPAL_TREEITEM		        16
 /// Tree control palette index
-#define CSPAL_TREECTRL		        16
+#define CSPAL_TREEBOX		        17
 /// Hine component palette index
-#define CSPAL_HINT			17
+#define CSPAL_HINT			18
 
 /**
  * csApp class color palette indices.<p>
@@ -200,7 +200,7 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_DIALOG_2LIGHT3D		4
 
 /**
- * csButton class color palette indices.<p>
+ * csInputLine class color palette indices.<p>
  */
 /// input line background
 #define CSPAL_INPUTLINE_BACKGROUND	0
@@ -225,49 +225,33 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
  * csListBox class color palette indices.<p>
  */
 /// list box background
-#define CSPAL_LISTBOX_BACKGROUND	CSPAL_INPUTLINE_BACKGROUND
+#define CSPAL_LISTBOX_BACKGROUND	0
 /// background color for cslfsThickRect
-#define CSPAL_LISTBOX_BACKGROUND2	CSPAL_INPUTLINE_BACKGROUND2
+#define CSPAL_LISTBOX_BACKGROUND2	1
 /// 3D border dark
-#define CSPAL_LISTBOX_DARK3D		CSPAL_INPUTLINE_DARK3D
+#define CSPAL_LISTBOX_DARK3D		2
 /// 3D border light
-#define CSPAL_LISTBOX_LIGHT3D		CSPAL_INPUTLINE_LIGHT3D
+#define CSPAL_LISTBOX_LIGHT3D		3
 /// 2nd level 3D border dark
-#define CSPAL_LISTBOX_2DARK3D		CSPAL_INPUTLINE_2DARK3D
+#define CSPAL_LISTBOX_2DARK3D		4
 /// 2nd level 3D border light
-#define CSPAL_LISTBOX_2LIGHT3D		CSPAL_INPUTLINE_2LIGHT3D
-/// list box text
-#define CSPAL_LISTBOX_TEXT		CSPAL_INPUTLINE_TEXT
-/// list box selection background
-#define CSPAL_LISTBOX_SELBACKGROUND	CSPAL_INPUTLINE_SELBACKGROUND
-/// list box selected text
-#define CSPAL_LISTBOX_SELTEXT		CSPAL_INPUTLINE_SELTEXT
+#define CSPAL_LISTBOX_2LIGHT3D		5
 
 /**
- * csTreeCtrl class color palette indices.<p>
+ * csTreeBox class color palette indices.<p>
  */
 /// tree control background
-#define CSPAL_TREECTRL_BACKGROUND	0
+#define CSPAL_TREEBOX_BACKGROUND	0
 /// background color for cstfsThickRect
-#define CSPAL_TREECTRL_BACKGROUND2	1
+#define CSPAL_TREEBOX_BACKGROUND2	1
 /// 3D border dark
-#define CSPAL_TREECTRL_DARK3D		2
+#define CSPAL_TREEBOX_DARK3D		2
 /// 3D border light
-#define CSPAL_TREECTRL_LIGHT3D		3
+#define CSPAL_TREEBOX_LIGHT3D		3
 /// 2nd level 3D border dark
-#define CSPAL_TREECTRL_2DARK3D		4
+#define CSPAL_TREEBOX_2DARK3D		4
 /// 2nd level 3D border light
-#define CSPAL_TREECTRL_2LIGHT3D		5
-/// tree control text
-#define CSPAL_TREECTRL_TEXT		6
-/// tree control selection background
-#define CSPAL_TREECTRL_SELBACKGROUND	7
-/// tree control selected text
-#define CSPAL_TREECTRL_SELTEXT		8
-/// tree control selected text
-#define CSPAL_TREECTRL_BRANCH		9
-/// tree control branchknob color
-#define CSPAL_TREECTRL_BRANCHKNOB	10
+#define CSPAL_TREEBOX_2LIGHT3D		5
 
 /**
  * csMenuItem class color palette indices.<p>
@@ -362,18 +346,16 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_LISTBOXITEM_BACKGROUND	0
 /// Selected listbox item background
 #define CSPAL_LISTBOXITEM_SELECTION	1
-/// Thin rectangle around selected item
-#define CSPAL_LISTBOXITEM_SELRECT	2
 /// Disabled text
-#define CSPAL_LISTBOXITEM_DTEXT		3
+#define CSPAL_LISTBOXITEM_DTEXT		2
 /// Unselected normal text
-#define CSPAL_LISTBOXITEM_UNTEXT	4
+#define CSPAL_LISTBOXITEM_UNTEXT	3
 /// Selected normal text
-#define CSPAL_LISTBOXITEM_SNTEXT	5
+#define CSPAL_LISTBOXITEM_SNTEXT	4
 /// Unselected emphasized text
-#define CSPAL_LISTBOXITEM_UETEXT	6
+#define CSPAL_LISTBOXITEM_UETEXT	5
 /// Selected emphasized text
-#define CSPAL_LISTBOXITEM_SETEXT	7
+#define CSPAL_LISTBOXITEM_SETEXT	6
 
 /**
  * csTreeItem class color palette indices.<p>
@@ -382,18 +364,18 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 #define CSPAL_TREEITEM_BACKGROUND	0
 /// Selected tree item background
 #define CSPAL_TREEITEM_SELECTION	1
-/// Thin rectangle around selected item
-#define CSPAL_TREEITEM_SELRECT		2
 /// Disabled text
-#define CSPAL_TREEITEM_DTEXT		3
+#define CSPAL_TREEITEM_DTEXT		2
 /// Unselected normal text
-#define CSPAL_TREEITEM_UNTEXT		4
+#define CSPAL_TREEITEM_UNTEXT		3
 /// Selected normal text
-#define CSPAL_TREEITEM_SNTEXT		5
+#define CSPAL_TREEITEM_SNTEXT		4
 /// Unselected emphasized text
-#define CSPAL_TREEITEM_UETEXT		6
+#define CSPAL_TREEITEM_UETEXT		5
 /// Selected emphasized text
-#define CSPAL_TREEITEM_SETEXT		7
+#define CSPAL_TREEITEM_SETEXT		6
+/// The lines connecting children
+#define CSPAL_TREEITEM_LINES		7
 
 /**
  * csScrollBar class color palette indices.<p>

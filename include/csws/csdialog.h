@@ -20,7 +20,6 @@
 #ifndef __CSDIALOG_H__
 #define __CSDIALOG_H__
 
-#include "csutil/csbase.h"
 #include "cscomp.h"
 
 /**

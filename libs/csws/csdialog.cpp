@@ -207,6 +207,13 @@ bool csDialog::do_topleft (csComponent *comp, void *param)
 
 void csDialog::SuggestSize (int &w, int &h)
 {
+  // If we have no children, we have some default size
+  if (!top)
+  {
+    w = h = 8;
+    return;
+  }
+
   /// If we never auto-placed the items, place them at top-left corner
   if ((GridX >= 0) && (GridY >= 0) && !first)
     ForEach (do_topleft, this);

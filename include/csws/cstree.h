@@ -1,7 +1,6 @@
 /*
-    Crystal Space Windowing System: tree class
-    Copyright (C) 2000 by Norman Krämer
-    based on the listbox code:
+    Crystal Space Windowing System: tree box class
+    Copyright (C) 2000 by Norman Krämer, based on the listbox code:
     Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
@@ -19,19 +18,196 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSTREECTRL_H__
-#define __CSTREECTRL_H__
+#ifndef __CSTREE_H__
+#define __CSTREE_H__
 
-#include "csutil/csbase.h"
-#include "csutil/cstreend.h"
 #include "cscomp.h"
-#include "csiline.h"
 #include "csscrbar.h"
 
-/// Additional state flag used to mark selected tree items
-#define CSS_TREEITEM_SELECTED	0x00008000
-/// is branch open ?
-#define CSS_TREEITEM_OPEN	0x0000A000
+/**
+ * Tree control - specific messages
+ */
+enum
+{
+  /**
+   * Check if a component is indeed a tree item.
+   * <pre>
+   * IN:  NULL (nothing)
+   * OUT: CS_TREEITEM_MAGIC if it is a tree item.
+   * </pre>
+   */
+  cscmdTreeItemCheck = 0x00000e00,
+  /**
+   * Toggle the tree item (expand/collapse)
+   * <pre>
+   * IN:  Action to perform: 0 - collapse, 1 - expand, other - toggle
+   * OUT: current state (0 - collapsed, 1 - expanded)
+   * </pre>
+   */
+  cscmdTreeItemToggle,
+  /**
+   * Toggle the tree item and all child items in the subtree.
+   * <pre>
+   * IN:  Action to perform: 0 - collapse, 1 - expand
+   * </pre>
+   */
+  cscmdTreeItemToggleAll,
+  /**
+   * Tree item state change notification. This event is sent to parent
+   * before the actual change happens; you still have a chance to forbid
+   * the tree item to change its state. This event is re-sent by tree
+   * items to their parents, so your dialog will always receive these
+   * messages, even if they are emmited by deep tree items.
+   * <pre>
+   * IN:  (csTreeItem *)item;
+   * OUT: CS_TREEITEM_MAGIC to forbid changing state
+   * </pre>
+   */
+  cscmdTreeItemToggleNotify,
+  /**
+   * Notify parent treebox that the size (notably height) of the item
+   * has been changed, and all the tree items should be re-positioned.
+   * <pre>
+   * IN:  (csTreeItem *)item;
+   * </pre>
+   */
+  cscmdTreeItemSizeChangeNotify,
+  /**
+   * This message is sent by a tree to notify its parent that a item
+   * has been focused.
+   * <pre>
+   * IN: (csTreeItem *)Item;
+   * </pre>
+   * To find the parent of the item, check Item->parent; this can be
+   * either another tree item or the tree box. To clarify this, send
+   * the cscmdTreeItemCheck message to the item in question.
+   */
+  cscmdTreeItemFocused,
+  /**
+   * Query what's the previous of a given item.
+   * The 'previous' notion is defined as follows: if this is the first
+   * child tree item, return its parent; otherwise if his previous neightbour
+   * is closed, return it; otherwise return the last child tree item from the
+   * "last->opened ? last->last : last" chain.
+   * If there is no previous item (top of the tree), it returns NULL.
+   * <pre>
+   * OUT: (csTreeItem *)PrevItem
+   * </pre>
+   */
+  cscmdTreeItemGetPrev,
+  /**
+   * Query what's the next of a given item.
+   * The 'next' notion is defined as follows: if the item is opened,
+   * return its first child item; otherwise if it is the last item
+   * in the subtree, return the item following its parent; otherwise
+   * return the next item in the branch.
+   * If there is no next item (bottom of the tree), it returns NULL.
+   * <pre>
+   * OUT: (csTreeItem *)NextItem
+   * </pre>
+   */
+  cscmdTreeItemGetNext,
+  /**
+   * Ask the parent for its first tree item.
+   * <pre>
+   * OUT: (csTreeItem *)Item
+   * </pre>
+   */
+  cscmdTreeItemGetFirst,
+  /**
+   * Ask the parent for its last tree item.
+   * <pre>
+   * OUT: (csTreeItem *)Item
+   * </pre>
+   */
+  cscmdTreeItemGetLast,
+  /**
+   * Sent to parent treebox to notify that a tree item is being deleted.
+   * <pre>
+   * IN: (csTreeItem *)item;
+   * </pre>
+   */
+  cscmdTreeItemDeleteNotify,
+  /**
+   * Sent to treebox parent to notify it that a tree item has been clicked
+   * with the right mouse button.
+   * <pre>
+   * IN: (csTreeItem *)item;
+   * <?pre>
+   */
+  cscmdTreeItemRightClick,
+  /**
+   * Query the selected tree item.Note that the parent of item
+   * is not neccessarily the tree box (it can be a level N child).
+   * <pre>
+   * OUT: (csTreeItem *)item
+   * </pre>
+   */
+  cscmdTreeQuerySelected,
+  /**
+   * Select first item that exactly matches the text.
+   * <pre>
+   * IN: (char *)text
+   * OUT: (csTreeItem *)item (or NULL if not found)
+   * </pre>
+   */
+  cscmdTreeSelectItem,
+  /**
+   * Set horizontal offset for all tree items (horizontal scrolling)
+   * <pre>
+   * IN: (int)deltaX
+   * </pre>
+   */
+  cscmdTreeSetHorizOffset,
+  /**
+   * This message is sent by a tree item to its parent when it receives
+   * a 'mouse down' event.
+   * <pre>
+   * IN:  (csTreeItem *)source;
+   * </pre>
+   */
+  cscmdTreeStartTracking,
+  /**
+   * This message is sent by a tree item to its parent when the mouse
+   * is captured and moved over a unfocused tree item, so that the
+   * csTreeBox component can check whenever the item in question should
+   * be highlighted.
+   * <pre>
+   * IN:  (csTreeItem *)source;
+   * </pre>
+   */
+  cscmdTreeTrack,
+  /**
+   * This command tells to a Tree control object to make given item visible
+   * (and scroll the view if it is not inside the current viewport).
+   * <pre>
+   * IN: (csTreeItem *)item;
+   * </pre>
+   */
+  cscmdTreeMakeVisible,
+  /**
+   * Same as cscmdTreeMakeVisible but tells to make visible the entire
+   * branch (subtree) rather than just the branch, if possible. If the
+   * branch is too high, the top margin will placed be at the top of the
+   * view, and the bottom margin will be clipped.
+   * <pre>
+   * IN: (csTreeItem *)item;
+   * </pre>
+   */
+  cscmdTreeMakeBranchVisible,
+  /**
+   * Completely clear a tree.
+   */
+  cscmdTreeClear
+};
+
+/// Additional state flag to mark open branches
+#define CSS_TREEITEM_OPEN	0x00010000
+/// Child tree items should be re-positioned
+#define CSS_TREEITEM_PLACEITEMS	0x00020000
+
+/// The magic answer that means that the component is indeed a tree item
+#define CS_TREEITEM_MAGIC	(void *)0xdeadface
 
 /**
  * Tree items are divided into several subtypes which will be
@@ -45,19 +221,41 @@ enum csTreeItemStyle
   cstisEmphasized
 };
 
-/// This class encapsulates a tree item
+/**
+ * This class encapsulates a tree item. The tree item always contains
+ * an "expand/collapse" button, optionally contains two pixmaps (shown
+ * depending on the expanded state), and a text string. The button is
+ * displayed only if tree has child items. Also the tree item can contain
+ * any number of child (subordinate) tree items. Note that the tree item
+ * can contain ONLY other csTreeItem's and their derivates; the only
+ * exception is the button component which is handled specialy. Inserting
+ * something other than a csTreeItem into another csTreeItem will crash,
+ * since csTreeItem often does unconditional typecasts to csTreeItem.
+ */
 class csTreeItem : public csComponent
 {
+  friend class csTreeBox;
+
   /// Tree item style
   csTreeItemStyle ItemStyle;
-  /// Horizontal item offset in pixels
-  int deltax;
-  /// Tree item image
-  csPixmap *ItemBitmap;
+  /// Tree item images (for closed(0) and open(1) states)
+  csPixmap *ItemBitmap [2];
   /// Delete bitmap on object deletion?
   bool DeleteBitmap;
-  /// Horizontal and vertical content offset
-  int hOffset, vOffset;
+  /// Horizontal offset of child items
+  int hChildrenOffset;
+  /// The expand/collapse button
+  csButton *button;
+  /// The tree box control
+  csTreeBox *treebox;
+
+  /// Place all child tree items
+  void PlaceItems ();
+  /// Return the next item after this one
+  csTreeItem *NextItem ();
+  /// Return the item preceeding this one
+  csTreeItem *PrevItem ();
+
 public:
   /// Tree item constructor: text item with optional style
   csTreeItem (csComponent *iParent, const char *iText, int iID = 0,
@@ -75,30 +273,66 @@ public:
   /// Handle additional state flags
   virtual void SetState (int mask, bool enable);
 
+  /// Invalidate ourselves when the focus goes to one of our children
+  virtual bool SetFocused (csComponent *comp);
+
+  /// Tell parent to re-position items
+  virtual void Insert (csComponent *comp);
+
+  /// Tell parent to re-position items
+  virtual void Delete (csComponent *comp);
+
   /// Report the minimal size of tree item
   virtual void SuggestSize (int &w, int &h);
 
-  /// Set tree item image
-  void SetBitmap (csPixmap *iBitmap, bool iDelete = true);
+  /// Report the minimal size of tree item and total size with children
+  void SuggestTotalSize (int &w, int &h, int &totw, int &toth);
 
-  /// Set content offset
-  void SetOffset (int ihOffset, int ivOffset)
-  { hOffset = ihOffset; vOffset = ivOffset; Invalidate (); }
+  /// Set tree item image (possibly for open state too)
+  void SetBitmap (csPixmap *iBitmap, csPixmap *iBitmapOpen = NULL,
+    bool iDelete = true);
 
+  /// Set horizontal offset of child items
+  void SetChildOffset (int ihOffset)
+  { hChildrenOffset = ihOffset; }
+
+  /// Toggle the open state of the branch: 0: collapse, 1: expand, other: toggle
+  int Toggle (int iAction = 2);
+
+  /**
+   * For each subtree item call a function with a optional arg
+   * Function returns the first child on which func returnes 'true'
+   * Optionally you can pass an "only for opened branches" flag,
+   * so that only visible branches will be handled.
+   */
+  csTreeItem *ForEachItem (bool (*func) (csTreeItem *child, void *param),
+    void *param = NULL, bool iOnlyOpen = false);
+
+  /// Force a reset of button size & position
+  void ResetButton ()
+  { button->SetRect (0, 0, -1, -1); parent->SendCommand (cscmdTreeItemSizeChangeNotify, this); }
 };
 
 /**
- * Tree control styles
+ * Tree control styles. These are bit masks which can be ORed
+ * together to form a final value sent to the csTreeBox constructor.
  */
-/// Tree can have multiple items selected
-#define CSTS_MULTIPLESEL	0x00000001
 /// Tree has a horizontal scroll bar
-#define CSTS_HSCROLL		0x00000002
+#define CSTS_HSCROLL		0x00000001
 /// Tree has a vertical scroll bar
-#define CSTS_VSCROLL		0x00000004
+#define CSTS_VSCROLL		0x00000002
+/// Automatically hide scrollbars if they are not needed
+#define CSTS_AUTOSCROLLBAR	0x00000004
+/// Tree items have small expand/collapse buttons
+#define CSTS_SMALLBUTTONS	0x00000008
 
 /// default tree control style
-#define CSTS_DEFAULTVALUE	CSTS_VSCROLL
+#define CSTS_DEFAULTVALUE	CSTS_VSCROLL | CSTS_AUTOSCROLLBAR
+
+/// Child tree items should be re-positioned
+#define CSS_TREEBOX_PLACEITEMS	0x00010000
+/// Temporarily ignore cscmdTreeMakeVisible commands (used internally)
+#define CSS_TREEBOX_LOCKVISIBLE	0x00020000
 
 /// Tree control frame styles
 enum csTreeFrameStyle
@@ -112,228 +346,137 @@ enum csTreeFrameStyle
 };
 
 /**
- * Tree control - specific messages
+ * The csTreeBox class is a rectangle which contains a number of subrectangles,
+ * each of which is recursively similar to its parent. In other words, every
+ * tree item can contain a subtree itself. In very other words, the tree is
+ * a graph, every vertex of which has one incoming and several outgoing edges.
+ * The csTreeBox control can hold several trees at once (e.g. it can have
+ * several "roots"). csTreeBox control ALWAYS contains just one selected
+ * item at a time; multiple selection mode is not implemented (I don't see
+ * why this may be useful anyway).
+ *<p>
+ * Every csTreeItem that is inserted into the tree is queried for its preferred
+ * size (in particular its preffered height), and the next item is positioned
+ * at the bottom of every previous item. Every csTreeItem asks in turn all his
+ * child nodes (if the tree node is "open") or just returns its own height
+ * without child nodes.
+ *<p>
+ * Example code how to create a tree:
+ *<code>
+ * csTreeBox *tree = new csTreeBox (app);
+ * tree->SetRect (0, 0, 200, 400);
+ * csTreeItem *item1, *item2, *item3;
+ * item1 = new csTreeItem (tree, "My Computer");
+ *   item2 = new csTreeItem (item1, "C:\\");
+ *     item3 = new csTreeItem (item2, "Blindows");
+ *     item3 = new csTreeItem (item2, "Suxx");
+ *   item2 = new csTreeItem (item1, "D:\\");
+ *     item3 = new csTreeItem (item2, "My Documents");
+ *     item3 = new csTreeItem (item2, "My Toys");
+ *     item3 = new csTreeItem (item2, "My Mom Told Me - Dont Run Windows");
+ *   item2 = new csTreeItem (item1, "\\\\SAMBA\\RULEZ\\FOREVER\\");
+ *     item3 = new csTreeItem (item2, "Home directory");
+ *     item3 = new csTreeItem (item2, "Public stuff");
+ *</code>
+ * Keyboard navigation:
+ * <dl>
+ *   <dt>Up/Down</dt><dd>Select previous/next tree item</dd>
+ *   <dt>Left/Right</dt><dd>Scroll tree horizontally (if meaningful)</dd>
+ *   <dt>Ctrl+Left/Right</dt><dd>Scroll horizontally in big steps</dd>
+ *   <dt>PgUp/PgDn</dt><dd>Go to the previous/next page of the tree.</dd>
+ *   <dt>Shift+PgUp/PgDn</dt><dd>Show the previous/next page of the tree
+ *     (does not move the caret).</dd>
+ *   <dt>Ctrl+PgUp/PgDn</dd><dd>Go to the first/last tree item</dd>
+ *   <dt>Home/End</dt><dd>Scroll to left/right margin.</dd>
+ *   <dt>Ctrl+Home/End</dt><dd>Scroll to the beginning/end of the tree
+ *     (does not move the caret).</dd>
+ *   <dt>Keypad PLUS/MINUS</dt><dd>Expand/collapse current branch.</dd>
+ *   <dt>Ctrl+Keypad PLUS/MINUS</dt><dd>Expand/collapse all branches
+ *     at once.</dd>
+ *   <dt>Shift+Keypad PLUS/MINUS</dt><dd>Expand/collapse all the items
+ *     contained in the current branch.</dd>
+ *   <dt>Space</dt><dd>Toggle expand/collapse current branch</dd>
+ *   <dt>Any other symbols</dt><dd>Find the next item that starts with
+ *     given character. For example, pressing 'a' will find the first
+ *     item following current which starts with 'A' or 'a'; if there
+ *     is no one until the end of tree, the search is restarted from
+ *     top; if there is no such item at all, the cursor stays still.</dd>
+ * </dl>
  */
-enum
+class csTreeBox : public csComponent
 {
   /**
-   * This message is sent by a tree item to its parent when it receives
-   * a 'mouse down' event.
+   * A private class used to insert all tree items into.
+   * This is used since we need to not allow any tree item
+   * to paint on top of treebox border or scrollbars; thus
+   * this class. The hierarchy of a treebox looks this way:
    * <pre>
-   * IN:  (csTreeItem *)source;
+   * csTreeBox
+   *   +--- csTreeBox::csTreeView
+   *          +--- Item 1
+   *          |      +--- Item 1:1
+   *          |      +--- Item 1:2
+   *          |      +--- ...
+   *          +--- Item 2
+   *          ...
    * </pre>
+   * This component should contain ONLY and EXCLUSIVELY csTreeItem's
+   * and their derivates; inserting something other will lead to crash
+   * since csTreeBox often uses unconditional typecasts to csTreeItem.
    */
-  cscmdTreeStartTracking = 0x00000e00,
-  /**
-   * This message is sent by a tree item to its parent when parent
-   * has captured the mouse and mouse is moved over a unfocused tree item
-   * <pre>
-   * IN:  (csTreeItem *)source;
-   * </pre>
-   */
-  cscmdTreeTrack,
-  /**
-   * This command tells to a Tree control object to make given item visible
-   * <pre>
-   * IN: (cstreeItem *)item;
-   * </pre>
-   */
-  cscmdTreeMakeVisible,
-  /**
-   * Completely clear a tree
-   */
-  cscmdTreeClear,
-  /**
-   * Query state of a tree item
-   * <pre>
-   * IN:  NULL
-   * OUT: (int)CS_TREEITEMCHECK_SELECTED or
-   *      (int)CS_TREEITEMCHECK_UNSELECTED
-   * </pre>
-   */
-  cscmdTreeItemCheck,
-  /**
-   * This command is sent to a tree item to set its state
-   * (selected/unselected)
-   * <pre>
-   * IN: (bool)SelectedState;
-   * </pre>
-   */
-  cscmdTreeItemSet,
-  /**
-   * The following command is sent by a tree item to notify
-   * its owner of the fact that it has been selected. Tree
-   * (usually owner of item is a tree control) resends this message
-   * to its parent.
-   * <pre>
-   * IN: (csTreeItem *)source;
-   * </pre>
-   */
-  cscmdTreeItemSelected,
-  /**
-   * Same as above, except notifies owner that tree item has been
-   * deselected.
-   * <pre>
-   * IN: (csTreeItem *)source;
-   * </pre>
-   */
-  cscmdTreeItemDeselected,
-  /**
-   * The following command is sent by a tree item to notify
-   * its owner of the fact that it has been clicked. Tree
-   * (usually owner of item is a tree control) resends this message
-   * to its parent. Unlike cscmdTreeItemSelected message this
-   * message is sent even if tree item has been already selected.
-   * <pre>
-   * IN: (csTreeItem *)source;
-   * </pre>
-   */
-  cscmdTreeItemClicked,
-  /**
-   * The following command is sent by a tree item to notify
-   * its owner of the fact that it has been doubly clicked. Tree
-   * (usually owner of item is a tree control) resends this message
-   * to its parent.
-   * <pre>
-   * IN: (csTreeItem *)source;
-   * </pre>
-   */
-  cscmdTreeItemDoubleClicked,
-  /**
-   * This message is sent by a tree to notify its parent that a item
-   * has been focused.
-   * <pre>
-   * IN: (csTreeItem *)Item;
-   * </pre>
-   * To find the parent tree of the item, use Item->parent;
-   * Item->parent->parent is the trees parent.
-   */
-  cscmdTreeItemFocused,
-  /**
-   * Ask a tree item if it is entirely visible. If not, the tree control
-   * will scroll vertically, if possible, until it will be entirely
-   * visible.
-   * <pre>
-   * IN:  (bool)false
-   * OUT: (bool)true if tree should scroll
-   * </pre>
-   */
-  cscmdTreeItemScrollVertically,
-  /**
-   * Set horizontal offset for a tree item
-   * <pre>
-   * IN: (int)deltaX
-   * </pre>
-   */
-  cscmdTreeItemSetHorizOffset,
-  /**
-   * Query first selected item ID. Handy for non-multiple-select tree controls.
-   * <pre>
-   * OUT: (csTReeItem *)item
-   * </pre>
-   */
-  cscmdTreeQueryFirstSelected,
-  /**
-   * Select first item that exactly matches the text.
-   * <pre>
-   * IN: (char *)text
-   * OUT: (csTreeItem *)item (or NULL if not found)
-   * </pre>
-   */
-  cscmdTreeSelectItem,
-  /**
-   * Make Item2 child of Item1
-   * <pre>
-   * IN: csComponent* [2] = { Item1, Item2 }
-   * OUT: true/false
-   * </pre>
-   */
-  cscmdTreeAddChild,
-  /**
-   * Remove child item from its parent
-   * <pre>
-   * IN: (csComponent*)Item
-   * OUT: NULL
-   * </pre>
-   */
-  cscmdTreeRemoveChild,
-  /**
-   * Remove all tree items 
-   */
-  cscmdTreeRemoveAll
-};
-
-#define CS_TREEITEMCHECK_SELECTED	0xdeadface
-#define CS_TREEITEMCHECK_UNSELECTED	0x0badf00d
-
-/**
- * TRee control class is a rectangle which contains a number of tree
- * items. Tree can have only one selected item at a time (if
- * CSTS_MULTIPLESEL style is not specified) or have multiple selected
- * items at a time (if that style flag is set).
- */
-
-
-class csTreeCtrl : public csComponent
-{
-  class TreeCtrlNode : public csTreeNode
+  class csTreeView : public csComponent
   {
   public:
-    TreeCtrlNode (csComponent *theItem, TreeCtrlNode *theParent, bool isOpen) 
-    : csTreeNode (theParent)
-      { item = theItem; open = isOpen; }
-    ~TreeCtrlNode () { csComponent *c=item; item=NULL; if (c) delete c;}
-    
-    TreeCtrlNode *FindItem (csComponent *theItem);
-    
-    TreeCtrlNode *Next (TreeCtrlNode *after=NULL);
-    TreeCtrlNode *Prev (TreeCtrlNode *before=NULL);
-    csComponent *item;
-    bool open;
-  };
-  friend class TreeCtrlNode;
+    /// Constructor
+    csTreeView (csComponent *iParent);
 
-  TreeCtrlNode *treeroot;
+    /// Resend all command events to parent (csTreeBox)
+    virtual bool HandleEvent (iEvent &Event);
+
+    /// Set parent's CSS_TREEBOX_PLACEITEMS since a item has been removed
+    virtual void Delete (csComponent *comp);
+  } *clipview;
+
   /// Tree style
   int TreeStyle;
   /// Tree frame style
   csTreeFrameStyle FrameStyle;
   /// Tree frame width and height
   int BorderWidth, BorderHeight;
-  /// First tree item
-  csComponent *first;
-  /// First visible tree item
-  csComponent *firstvisible;
-  /// Selection state in mouse capture mode (initialized on MouseDown)
-  bool selstate;
-  /// Number of items that fits vertically
-  int vertcount;
+  /// The timer
+  csComponent *timer;
   /// The scroll bars
   csScrollBar *hscroll, *vscroll;
   /// Status of both scroll bars
   csScrollBarStatus hsbstatus, vsbstatus;
-  /// Horizontal scrolling position & maximum
+  /// Horizontal scrolling position & maximum width of all visible tree items
   int deltax, maxdeltax;
-  /// Flag: place items before redraw?
-  bool fPlaceItems;
-  /// indentation size for subbranches
-  int branchdeltax;
+  /// Vertical scrolling position & total height of all the tree items
+  int deltay, maxdeltay;
+  /// Active tree item
+  csTreeItem *active;
+
+  /// Return the next item after this one
+  csTreeItem *NextItem ();
+  /// Return the item preceeding this one
+  csTreeItem *PrevItem ();
 
 public:
   /// Create input line object
-  csTreeCtrl (csComponent *iParent, int iStyle = CSTS_DEFAULTVALUE,
+  csTreeBox (csComponent *iParent, int iStyle = CSTS_DEFAULTVALUE,
     csTreeFrameStyle iFrameStyle = cstfsThickRect);
 
-  virtual ~csTreeCtrl () 
-  { delete treeroot; }
+  /// Destroy the tree box
+  virtual ~csTreeBox ();
+
   /// Handle external events and generate timeouts
   virtual bool HandleEvent (iEvent &Event);
 
   /// Draw the tree
   virtual void Draw ();
 
-  /// Find a place for each menu item
-  void PlaceItems (bool setscrollbars = true);
+  /// Find a place for each tree item, and optionally set scrollbar parameters
+  void PlaceItems (int sbFlags = CSTS_HSCROLL | CSTS_VSCROLL);
 
   /// Resize child items on parent window resize
   virtual bool SetRect (int xmin, int ymin, int xmax, int ymax);
@@ -342,70 +485,45 @@ public:
    * For each tree item call a function with a optional arg
    * Function returns the first child on which func returnes 'true'
    */
-  csComponent *ForEachItem (bool (*func) (csComponent *child, void *param),
-    void *param = NULL, bool iSelected = true);
+  csTreeItem *ForEachItem (bool (*func) (csTreeItem *child, void *param),
+    void *param = NULL, bool iOnlyOpen = false);
 
-  /// Override SetState method to disable scroll bars as well
+  /// Override SetState method to toggle scrollbars together with CSS_SELECTED
   virtual void SetState (int mask, bool enable);
-
-  /// Tell parent that a new item has been selected
-  virtual bool SetFocused (csComponent *comp);
 
   /// Set fPlaceItems since a item has been inserted
   virtual void Insert (csComponent *comp);
 
-  /// Set fPlaceItems since a item has been removed
-  virtual void Delete (csComponent *comp);
+  /// Expand all items
+  virtual void ExpandAll ();
 
-  /// Open an item 
-  virtual void OpenItem (csComponent *item);
-
-  /// Open all items
-  virtual void OpenAll ();
-
-  /// Collapse an item 
-  virtual void CollapseItem (csComponent *item);
-
-  /// Collapse all
+  /// Collapse all items
   virtual void CollapseAll ();
 
-  /// Closes or opens the item
-  void SwitchOpenState (csComponent *item);
-
-  /// Set branch indentation
-  void SetBranchIndent (int x);
-
-  /// retrieve all selected tree items
-  void FindAllSelected (csVector *list);
+  /// Query tree box style
+  int GetStyle () { return TreeStyle; }
+  /// Query tree box frame style
+  csTreeFrameStyle GetFrameStyle () { return FrameStyle; }
+  /// Change tree box style
+  void SetStyle (int iStyle, csTreeFrameStyle iFrameStyle);
 
 protected:
-  /// Make a tree item visible (same as cscmdTreeMakeVisible)
-  void MakeItemVisible (csComponent *item);
+  friend class csTreeItem;
 
-  /// Make item2 the child of item1, returns false if item1 was not in tree
-  bool AddChild (csComponent *item1, csComponent *item2);
+  /// Set the imagess for expand/collapse button
+  void PrepareButton (csButton *iButton, bool iOpen);
 
-  /// Removes an item from the tree ( and all its children )
-  void RemoveChild (csComponent *item);
+  /// Make a tree item visible (the functionality for cscmdTreeMakeVisible)
+  void MakeItemVisible (csComponent *iItem, bool iChildren = false);
 
-  /// Removes all tree items
-  void RemoveAll ();
+  /// Focus a item (and defocus all other items)
+  void FocusItem (csTreeItem *iItem);
 
-  /// Get the last in the set of opened branches
-  csComponent *GetLast ();
-  
-  csComponent *FindFirstSelected ();
+  /// Scroll vertically by iDelta pixels, possibly preserving caret's relative Y
+  void VScroll (int iDelta, bool iMoveCaret);
 
-  /// Draw the branches of the tree
-  void DrawBranches ();
-
-private:
-  static bool CompareTreeCtrlNode (csTreeNode *node, csSome param, bool stopOnSuccess);
-  static bool TreeItemSelected (csTreeNode *node, csSome param, bool stopOnSuccess);
-  static bool ZipTreeItemCanvas (csTreeNode *node, csSome param, bool stopOnSuccess);
-  static bool OpenAllItems (csTreeNode *node, csSome param, bool stopOnSuccess);
-  static bool CollapsAllItems (csTreeNode *node, csSome param, bool stopOnSuccess);
-  static bool BranchOpen (csTreeNode *node);
+  /// Place scrollbars and the csTreeView.
+  void PlaceScrollbars ();
 };
 
-#endif
+#endif // __CSTREE_H__

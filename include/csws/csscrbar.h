@@ -20,7 +20,6 @@
 #ifndef __CSSCRBAR_H__
 #define __CSSCRBAR_H__
 
-#include "csutil/csbase.h"
 #include "cscomp.h"
 #include "csbutton.h"
 #include "cstimer.h"

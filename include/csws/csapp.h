@@ -46,9 +46,6 @@ enum csAppBackgroundStyle
   csabsSolid
 };
 
-/// Additional application state flag used to decide when to finish CheckDirty()
-#define CSS_RESTART_DIRTY_CHECK        	0x80000000
-
 /**
  * This class is a top-level CrystalSpace Windowing Toolkit object.
  *<p>
@@ -309,11 +306,12 @@ public:
   { GfxPpl.Text (x, y, pplColor (fg), bg != -1 ? pplColor (bg) : bg, Font, FontSize, s); }
 
   /// Draw a (scaled) pixmap
-  void pplPixmap (csPixmap *s2d, int x, int y, int w, int h)
-  { GfxPpl.Pixmap (s2d, x, y, w, h); }
+  void pplPixmap (csPixmap *s2d, int x, int y, int w, int h, uint8 Alpha)
+  { GfxPpl.Pixmap (s2d, x, y, w, h, Alpha); }
   /// Draw a (unscaled but tiled) pixmap
-  void pplTiledPixmap (csPixmap *s2d, int x, int y, int w, int h, int orgx, int orgy)
-  { GfxPpl.TiledPixmap (s2d, x, y, w, h, orgx, orgy); }
+  void pplTiledPixmap (csPixmap *s2d, int x, int y, int w, int h,
+    int orgx, int orgy, uint8 Alpha)
+  { GfxPpl.TiledPixmap (s2d, x, y, w, h, orgx, orgy, Alpha); }
 
   /// Draw a (part) of texture (possibly scaled) in given screen rectangle
   void pplTexture (iTextureHandle *hTex, int sx, int sy, int sw, int sh,

@@ -381,58 +381,188 @@ void csWsTest::MiscDialog ()
   }
 }
 
+class csTreeDialog : public csDialog
+{
+  csTreeBox *tb;
+public:
+  csTreeDialog (csComponent *parent) : csDialog (parent) {}
+  void SetTreeBox (csTreeBox *iTB) { tb = iTB; }
+  virtual bool SetRect (int xmin, int ymin, int xmax, int ymax)
+  {
+    if (!csDialog::SetRect (xmin, ymin, xmax, ymax))
+      return false;
+    tb->SetRect (0, 68, bound.Width (), bound.Height ());
+    return true;
+  }
+  virtual bool HandleEvent (iEvent &Event)
+  {
+    switch (Event.Type)
+    {
+      case csevCommand:
+        switch (Event.Command.Code)
+        {
+          case cscmdRadioButtonSelected:
+          {
+            csRadioButton *rb = (csRadioButton *)Event.Command.Info;
+            tb->SetStyle (tb->GetStyle (), (rb->id == 9900) ? cstfsNone :
+              (rb->id == 9901) ? cstfsThinRect :
+              (rb->id == 9902) ? cstfsThickRect : cstfsNone);
+            break;
+          }
+          case cscmdCheckBoxSwitched:
+          {
+            csCheckBox *cb = (csCheckBox *)Event.Command.Info;
+            int mask = (cb->id == 9910) ? CSTS_HSCROLL :
+                       (cb->id == 9911) ? CSTS_VSCROLL :
+                       (cb->id == 9912) ? CSTS_AUTOSCROLLBAR :
+                       (cb->id == 9913) ? CSTS_SMALLBUTTONS : 0;
+            int style = tb->GetStyle ();
+            if (cb->SendCommand (cscmdCheckBoxQuery))
+              style |= mask;
+            else
+              style &= ~mask;
+            tb->SetStyle (style, tb->GetFrameStyle ());
+            break;
+          }
+        }
+      break;
+    }
+    return csDialog::HandleEvent (Event);
+  }
+};
+
 void csWsTest::TreeDialog ()
 {
   csComponent *window = new csWindow (this, "Tree test",
     CSWS_BUTSYSMENU | CSWS_TITLEBAR | CSWS_BUTHIDE | CSWS_BUTCLOSE |
-    CSWS_BUTMAXIMIZE | CSWS_TOOLBAR | CSWS_TBPOS_BOTTOM);
+    CSWS_BUTMAXIMIZE);
+
+  csTreeDialog *d = new csTreeDialog (window);
+  window->SendCommand (cscmdWindowSetClient, (void *)d);
+
+  // Begin tree control creation
+
+  csTreeBox *tc = new csTreeBox (d, CSTS_HSCROLL | CSTS_VSCROLL, cstfsThinRect);
+  d->SetTreeBox (tc);
+  tc->SetState (CSS_GROUP, true);
+
   window->SetSize (400, 300);
   window->Center ();
 
-  csTreeCtrl *tc = new csTreeCtrl (window, CSTS_HSCROLL | CSTS_VSCROLL | CSTS_MULTIPLESEL, cstfsThinRect);
-  //  tc->SetRect (320, 20, 410, 110);
-  csTreeItem *ti;
-  csComponent *p = tc;
-  ti = new csTreeItem (p, "CrystalSpace Platforms");
-  
-  csComponent *u = new csTreeItem (ti, "Unix");
-  (void)new csTreeItem (u, "FreeBSD");
-  csComponent *li = new csTreeItem (u, "Linux");
-  csComponent *nx = new csTreeItem (u, "NeXT");
-  (void)new csTreeItem (nx, "NextStep");
-  (void)new csTreeItem (nx, "OpenStep");
-  csComponent *ap = new csTreeItem (u, "Apple");
-  (void)new csTreeItem (ap, "MacOS/X Server");
-  (void)new csTreeItem (ap, "MacOS/X");
-  (void)new csTreeItem (ap, "Darwin");
-  (void)new csTreeItem (u, "Solaris");
-  (void)new csTreeItem (u, "Cygnus");
-  (void)new csTreeItem (ti, "Macintosh");
-  (void)new csTreeItem (ti, "BeOS");
-  (void)new csTreeItem (ti, "OS/2");
-  (void)new csTreeItem (ti, "DJGPP");
-  csComponent *w = new csTreeItem (ti, "Windows");
-  csComponent *w32 = new csTreeItem (w, "Win32");
-  (void)new csTreeItem (w32, "Win95");
-  (void)new csTreeItem (w32, "Win98");
-  (void)new csTreeItem (w32, "Win2000");
-  (void)new csTreeItem (w32, "WinNT");
+  csTreeItem *i1, *i2, *i3;
+  i1 = new csTreeItem (tc, "Developement Environments");
+    i2 = new csTreeItem (i1, "Free");
+      new csTreeItem (i2, "Linux");
+      new csTreeItem (i2, "FreeBSD");
+    i2 = new csTreeItem (i1, "Sun");
+      new csTreeItem (i2, "Solaris");
+    i2 = new csTreeItem (i1, "Silicon Graphics");
+      new csTreeItem (i2, "Irix");
+    i2 = new csTreeItem (i1, "NeXT");
+      new csTreeItem (i2, "NextStep");
+      new csTreeItem (i2, "OpenStep");
+    i2 = new csTreeItem (i1, "Apple");
+      new csTreeItem (i1, "Macintosh");
+      new csTreeItem (i2, "MacOS/X Server");
+      new csTreeItem (i2, "MacOS/X");
+      new csTreeItem (i2, "Darwin");
+    i2 = new csTreeItem (i1, "Microsoft");
+      i3 = new csTreeItem (i2, "MS-DOS");
+        new csTreeItem (i2, "DJGPP");
+      i3 = new csTreeItem (i2, "Win32");
+        new csTreeItem (i3, "MSVC");
+        new csTreeItem (i3, "Cygwin32");
+        new csTreeItem (i3, "MinGW32");
+    i2 = new csTreeItem (i1, "BeOS");
+    i2 = new csTreeItem (i1, "IBM");
+      i3 = new csTreeItem (i2, "OS/2");
+        new csTreeItem (i3, "EMX+GCC");
+        new csTreeItem (i3, "Watcom C++");
+      new csTreeItem (i2, "AIX");
+  i1 = new csTreeItem (tc, "Graphical environments");
+    i2 = new csTreeItem (i1, "OpenGL");
+      new csTreeItem (i2, "glos2 (OpenGL/2 canvas)");
+      new csTreeItem (i2, "glx2d (GL/X)");
+      new csTreeItem (i2, "glwin32 (Windows OpenGL)");
+      new csTreeItem (i2, "glmac (Macintosh OpenGL)");
+      new csTreeItem (i2, "glbe (BeOS OpenGL)");
+    i2 = new csTreeItem (i1, "Glide");
+      new csTreeItem (i2, "unxglide (Glide on Linux, possibly on FreeBSD)");
+      new csTreeItem (i2, "beglide (Glide on BeOS)");
+    i2 = new csTreeItem (i1, "Direct3D");
+      new csTreeItem (i2, "ddraw61 (Direct Draw 6.1)");
+    i2 = new csTreeItem (i1, "X11");
+      i3 = new csTreeItem (i2, "x2d (full-featured X11 driver)");
+        new csTreeItem (i3, "SHM");
+        new csTreeItem (i3, "XFree86 full-screen ext");
+      new csTreeItem (i2, "linex2d (debug: display just lines)");
+    i2 = new csTreeItem (i1, "System-specific");
+      new csTreeItem (i2, "csdive (OS/2 Direct Interface to Video Extensions)");
+      new csTreeItem (i2, "Native NeXT graphics canvas");
+      new csTreeItem (i2, "Native BeOS graphics canvas");
+      new csTreeItem (i2, "Native MacOS graphics canvas");
+      new csTreeItem (i2, "dosraw (DOS with raw framebuffer access)");
+    i2 = new csTreeItem (i1, "Cross-platform");
+      new csTreeItem (i2, "svgalib (Linux full-screen raw framebuffer access)");
+      new csTreeItem (i2, "asciiart (text-mode display)");
+      new csTreeItem (i2, "allegro (raw framebuffer access)");
+      new csTreeItem (i2, "mgl (uses the MGL library, full-screen w/2D accel)");
+      new csTreeItem (i2, "sdl (uses the SDL library)");
+      new csTreeItem (i2, "ggi (Unix using the GGI library)");
+  // Add a bitmap to a tree item for testing
+  iTextureHandle *tex = GetTexture ("csws::FileDialog");
+  if (tex)
+  {
+    csPixmap *pix1 = new csPixmap (tex,  0, 0, 16, 13);
+    csPixmap *pix2 = new csPixmap (tex, 16, 0, 16, 13);
+    i1->SetBitmap (pix1, pix2, true);
+  }
 
-  csComponent *d3 = new csTreeItem (li, "3D Renderer");
-  csComponent *sw = new csTreeItem (d3, "Software");
-  (void)new csTreeItem (sw, "X-Windows");
-  (void)new csTreeItem (sw, "SVGALIB console");
-  (void)new csTreeItem (sw, "GGI console");
-  csComponent *hw = new csTreeItem (d3, "Hardware");
-  csComponent *gl = new csTreeItem (hw, "Glide/Voodoo");
-  (void)new csTreeItem (gl, "Glide2");
-  (void)new csTreeItem (gl, "Glide3");
-  csComponent *ogl= new csTreeItem (hw, "OpenGL");
-  (void)new csTreeItem (ogl, "Mesa");
-  (void)new csTreeItem (ogl, "MGL");
-  
-  csComponent *sd = new csTreeItem (li, "SoundDriver");
-  (void)new csTreeItem (sd, "OSS");
+  // Insert some components to control tree style
+  int y = 10;
+  csRadioButton *rb = new csRadioButton (d, 9900);
+  rb->SetPos (5, y); rb->SetState (CSS_GROUP, true);
+  csStatic *st = new csStatic (d, rb, "cstfsNone");
+  st->SetPos (21, y + 2);
+
+  y += 14;
+  rb = new csRadioButton (d, 9901);
+  rb->SetPos (5, y);
+  rb->SendCommand (cscmdRadioButtonSet, (void *)true);
+  st = new csStatic (d, rb, "cstfsThinRect");
+  st->SetPos (21, y + 2);
+
+  y += 14;
+  rb = new csRadioButton (d, 9902);
+  rb->SetPos (5, y);
+  st = new csStatic (d, rb, "cstfsThickRect");
+  st->SetPos (21, y + 2);
+
+  y = 10;
+  csCheckBox *cb = new csCheckBox (d, 9910);
+  cb->SetPos (165, y); cb->SetState (CSS_GROUP, true);
+  cb->SendCommand (cscmdCheckBoxSet, (void *)true);
+  st = new csStatic (d, cb, "CSTS_HSCROLL");
+  st->SetPos (181, y + 2);
+
+  y += 14;
+  cb = new csCheckBox (d, 9911);
+  cb->SetPos (165, y);
+  cb->SendCommand (cscmdCheckBoxSet, (void *)true);
+  st = new csStatic (d, cb, "CSTS_VSCROLL");
+  st->SetPos (181, y + 2);
+
+  y += 14;
+  cb = new csCheckBox (d, 9912);
+  cb->SetPos (165, y);
+  st = new csStatic (d, cb, "CSTS_AUTOSCROLLBAR");
+  st->SetPos (181, y + 2);
+
+  y += 14;
+  cb = new csCheckBox (d, 9913);
+  cb->SetPos (165, y);
+  st = new csStatic (d, cb, "CSTS_SMALLBUTTONS");
+  st->SetPos (181, y + 2);
 }
 
 void csWsTest::GridDialog ()
@@ -510,7 +640,7 @@ void csWsTest::LayoutDialog ()
     CSWS_DEFAULTVALUE & ~CSWS_MENUBAR);
   window->SetSize (400, 300);
   window->Center ();
-  
+
   csGridBagLayout *gb = new csGridBagLayout (window);
 
   csBorderConstraint *blc[5] = {csBorderLayout::CENTER, 

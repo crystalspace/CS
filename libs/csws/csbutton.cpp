@@ -135,7 +135,6 @@ bool csButton::HandleEvent (iEvent &Event)
       } /* endswitch */
       break;
     case csevMouseDown:
-    case csevMouseDoubleClick:
       switch (Event.Mouse.Button)
       {
         case 1:
@@ -148,7 +147,7 @@ bool csButton::HandleEvent (iEvent &Event)
             csComponent::HandleEvent (Event);
           return true;
         case 2:
-          if (parent)
+          if (parent && !GetState (CSS_DISABLED))
             parent->SendCommand (cscmdButtonRightClick, (void *)this);
           return true;
       }

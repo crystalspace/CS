@@ -122,7 +122,6 @@ bool csSpinBox::HandleEvent (iEvent &Event)
         }
       } /* endswitch */
       break;
-    case csevMouseDoubleClick:
     case csevMouseDown:
       if (GetState (CSS_DISABLED))
         return true;

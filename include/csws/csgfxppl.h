@@ -121,10 +121,11 @@ private:
   void Text (int x, int y, int fg, int bg, iFont *font, int fontsize, const char *s);
 
   /// Draw a pixmap
-  void Pixmap (csPixmap *s2d, int x, int y, int w, int h);
+  void Pixmap (csPixmap *s2d, int x, int y, int w, int h, uint8 Alpha);
 
   /// Draw a tiled pixmap
-  void TiledPixmap (csPixmap *s2d, int x, int y, int w, int h, int orgx, int orgy);
+  void TiledPixmap (csPixmap *s2d, int x, int y, int w, int h,
+    int orgx, int orgy, uint8 Alpha);
 
   /// Draw a tiled texture
   void Texture (iTextureHandle *hTex, int sx, int sy, int sw, int sh,

@@ -20,91 +20,8 @@
 #ifndef __CSLISTBX_H__
 #define __CSLISTBX_H__
 
-#include "csutil/csbase.h"
 #include "cscomp.h"
-#include "csiline.h"
 #include "csscrbar.h"
-
-/// Additional state flag used to mark selected list box itens
-#define CSS_LISTBOXITEM_SELECTED	0x00008000
-
-/**
- * List box items are divided into several subtypes which will be
- * shown in different colors.
- */
-enum csListBoxItemStyle
-{
-  /// Normal text
-  cslisNormal,
-  /// Emphasized text
-  cslisEmphasized
-};
-
-/// This class encapsulates a menu item
-class csListBoxItem : public csComponent
-{
-  /// List box item style
-  csListBoxItemStyle ItemStyle;
-  /// Horizontal item offset in pixels
-  int deltax;
-  /// Listbox item image
-  csPixmap *ItemBitmap;
-  /// Delete bitmap on object deletion?
-  bool DeleteBitmap;
-  /// Horizontal and vertical content offset
-  int hOffset, vOffset;
-
-public:
-  /// Listbox item constructor: text item with optional style
-  csListBoxItem (csComponent *iParent, const char *iText, int iID = 0,
-    csListBoxItemStyle iStyle = cslisNormal);
-
-  /// Listbox item destructor
-  virtual ~csListBoxItem ();
-
-  /// Handle input events
-  virtual bool HandleEvent (iEvent &Event);
-
-  /// Draw the menu item
-  virtual void Draw ();
-
-  /// Handle additional state flags
-  virtual void SetState (int mask, bool enable);
-
-  /// Report the minimal size of menu item
-  virtual void SuggestSize (int &w, int &h);
-
-  /// Set listbox item image
-  void SetBitmap (csPixmap *iBitmap, bool iDelete = true);
-
-  /// Set content offset
-  void SetOffset (int ihOffset, int ivOffset)
-  { hOffset = ihOffset; vOffset = ivOffset; Invalidate (); }
-};
-
-/**
- * List box styles
- */
-/// List box can have multiple items selected
-#define CSLBS_MULTIPLESEL	0x00000001
-/// List box has a horizontal scroll bar
-#define CSLBS_HSCROLL		0x00000002
-/// List box has a vertical scroll bar
-#define CSLBS_VSCROLL		0x00000004
-
-/// Default list box style
-#define CSLBS_DEFAULTVALUE	CSLBS_VSCROLL
-
-/// List box frame styles
-enum csListBoxFrameStyle
-{
-  /// List box has no frame
-  cslfsNone,
-  /// List box has a thin 3D rectangular frame
-  cslfsThinRect,
-  /// List box has a thick 3D rectangular frame
-  cslfsThickRect
-};
 
 /**
  * List box - specific messages
@@ -238,8 +155,92 @@ enum
   cscmdListBoxSelectItem
 };
 
+/// Additional state flag used to mark selected list box items
+#define CSS_LISTBOXITEM_SELECTED	0x00010000
+
+/// The magic answer that means that the listbox item is selected
 #define CS_LISTBOXITEMCHECK_SELECTED	0xdeadface
+/// The magic answer that means that the listbox item is not selected
 #define CS_LISTBOXITEMCHECK_UNSELECTED	0x0badf00d
+
+/**
+ * List box items are divided into several subtypes which will be
+ * shown in different colors.
+ */
+enum csListBoxItemStyle
+{
+  /// Normal text
+  cslisNormal,
+  /// Emphasized text
+  cslisEmphasized
+};
+
+/// This class encapsulates a menu item
+class csListBoxItem : public csComponent
+{
+  /// List box item style
+  csListBoxItemStyle ItemStyle;
+  /// Horizontal item offset in pixels
+  int deltax;
+  /// Listbox item image
+  csPixmap *ItemBitmap;
+  /// Delete bitmap on object deletion?
+  bool DeleteBitmap;
+  /// Horizontal contents offset
+  int hOffset;
+
+public:
+  /// Listbox item constructor: text item with optional style
+  csListBoxItem (csComponent *iParent, const char *iText, int iID = 0,
+    csListBoxItemStyle iStyle = cslisNormal);
+
+  /// Listbox item destructor
+  virtual ~csListBoxItem ();
+
+  /// Handle input events
+  virtual bool HandleEvent (iEvent &Event);
+
+  /// Draw the menu item
+  virtual void Draw ();
+
+  /// Handle additional state flags
+  virtual void SetState (int mask, bool enable);
+
+  /// Report the minimal size of menu item
+  virtual void SuggestSize (int &w, int &h);
+
+  /// Set listbox item image
+  void SetBitmap (csPixmap *iBitmap, bool iDelete = true);
+
+  /// Set content offset
+  void SetOffset (int ihOffset)
+  { hOffset = ihOffset; Invalidate (); }
+};
+
+/**
+ * List box styles. These are bit masks that can be ORed together
+ * to form a value passed to csListBox constructor.
+ */
+/// List box can have multiple items selected
+#define CSLBS_MULTIPLESEL	0x00000001
+/// List box has a horizontal scroll bar
+#define CSLBS_HSCROLL		0x00000002
+/// List box has a vertical scroll bar
+#define CSLBS_VSCROLL		0x00000004
+
+/// Default list box style
+#define CSLBS_DEFAULTVALUE	CSLBS_VSCROLL
+
+/// List box frame styles
+enum csListBoxFrameStyle
+{
+  /// List box has no frame
+  cslfsNone,
+  /// List box has a thin 3D rectangular frame
+  cslfsThinRect,
+  /// List box has a thick 3D rectangular frame
+  cslfsThickRect
+};
 
 /**
  * List box class is a rectangle which contains a number of list box

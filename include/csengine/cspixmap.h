@@ -82,21 +82,22 @@ public:
   { return hTex != NULL; }
 
   /// Draw the pixmap given the screen position and new size
-  virtual void DrawScaled (iGraphics3D* g3d, int sx, int sy, int sw, int sh)
-  { g3d->DrawPixmap (hTex, sx, sy, sw, sh, tx, ty, tw, th); }
+  virtual void DrawScaled (iGraphics3D* g3d, int sx, int sy, int sw, int sh,
+    uint8 Alpha = 0)
+  { g3d->DrawPixmap (hTex, sx, sy, sw, sh, tx, ty, tw, th, Alpha); }
 
   /// Draw the pixmap given the screen position and new size (aligned)
   void DrawScaledAlign (iGraphics3D* g3d, int sx, int sy, int sw, int sh,
-    int alnx, int alny)
-  { DrawScaled (g3d, sx - alnx * sw / 2, sy - alny * sh / 2, sw, sh); }
+    int alnx, int alny, uint8 Alpha = 0)
+  { DrawScaled (g3d, sx - alnx * sw / 2, sy - alny * sh / 2, sw, sh, Alpha); }
 
   /// Draw the pixmap without rescale
-  void Draw (iGraphics3D* g3d, int sx, int sy)
-  { DrawScaled (g3d, sx, sy, tw, th); }
+  void Draw (iGraphics3D* g3d, int sx, int sy, uint8 Alpha = 0)
+  { DrawScaled (g3d, sx, sy, tw, th, Alpha); }
 
   /// Draw the pixmap without rescale (aligned)
-  void DrawAlign (iGraphics3D* g3d, int sx, int sy, int alnx, int alny)
-  { DrawScaledAlign (g3d, sx, sy, tw, th, alnx, alny); }
+  void DrawAlign (iGraphics3D* g3d, int sx, int sy, int alnx, int alny, uint8 Alpha = 0)
+  { DrawScaledAlign (g3d, sx, sy, tw, th, alnx, alny, Alpha); }
 
   /**
    * Draw the pixmap tiled over an area. multiple draw commands with the
@@ -105,12 +106,12 @@ public:
    * (0,0) pixel of this pixmap would be drawn.
    */
   void DrawTiled (iGraphics3D* g3d, int sx, int sy, int sw, int sh,
-    int orgx, int orgy)
-  { g3d->DrawPixmap (hTex, sx, sy, sw, sh, sx - orgx, sy - orgy, sw, sh); }
+    int orgx, int orgy, uint8 Alpha = 0)
+  { g3d->DrawPixmap (hTex, sx, sy, sw, sh, sx - orgx, sy - orgy, sw, sh, Alpha); }
 
   /// Fill a rectangle with the pixmap, tiled.
-  void DrawTiled (iGraphics3D* g3d, int sx, int sy, int w, int h)
-  { DrawTiled (g3d, sx, sy, w, h, sx, sy); }
+  void DrawTiled (iGraphics3D* g3d, int sx, int sy, int w, int h, uint8 Alpha = 0)
+  { DrawTiled (g3d, sx, sy, w, h, sx, sy, Alpha); }
 
   /// Return pixmap width
   int Width ()

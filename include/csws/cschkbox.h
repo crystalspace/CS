@@ -20,7 +20,6 @@
 #ifndef __CSCHKBOX_H__
 #define __CSCHKBOX_H__
 
-#include "csutil/csbase.h"
 #include "cscomp.h"
 #include "csbutton.h"
 

@@ -169,7 +169,6 @@ bool csScrollBar::HandleEvent (iEvent &Event)
       } /* endif */
       break;
     case csevMouseDown:
-    case csevMouseDoubleClick:
       if (GetState (CSS_DISABLED))
         return true;
       if (csComponent::HandleEvent (Event))
@@ -458,7 +457,8 @@ noscrollbut:
       botright->SetBitmap (sprarrows[7], sprarrows[11], false);
       botright->SetState (CSS_DISABLED, false);
     } /* endif */
-  } else
+  }
+  else
   {
     scroller->SetBitmap (sprscroller[0], NULL, false);
     if (disable || (status.maxvalue <= 0) || (status.value <= 0))

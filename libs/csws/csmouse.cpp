@@ -143,9 +143,10 @@ bool csMouse::HandleEvent (iEvent &Event)
   switch (Event.Type)
   {
     case csevMouseMove:
-    case csevMouseDoubleClick:
     case csevMouseDown:
     case csevMouseUp:
+    case csevMouseClick:
+    case csevMouseDoubleClick:
       // If mouse moves, reset virtual mouse position
       if (Event.Type == csevMouseMove)
         VirtualX = NO_VIRTUAL_POS;

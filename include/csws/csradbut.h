@@ -20,7 +20,6 @@
 #ifndef __CSRADBUT_H__
 #define __CSRADBUT_H__
 
-#include "csutil/csbase.h"
 #include "cscomp.h"
 #include "csbutton.h"
 

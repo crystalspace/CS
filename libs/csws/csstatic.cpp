@@ -245,7 +245,6 @@ bool csStatic::HandleEvent (iEvent &Event)
       } /* endswitch */
       break;
     case csevMouseDown:
-    case csevMouseDoubleClick:
       if ((style == csscsLabel)
        || (style == csscsFrameLabel))
       {

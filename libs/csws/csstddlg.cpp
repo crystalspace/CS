@@ -31,6 +31,7 @@
 #include "csws/cslistbx.h"
 #include "csws/csstatic.h"
 #include "csws/csradbut.h"
+#include "csws/csiline.h"
 #include "csws/cscwheel.h"
 #include "csws/cswsaux.h"
 #include "isystem.h"
@@ -439,7 +440,7 @@ void cspFileDialog::Reread ()
     name [sep - curp] = 0;
     csListBoxItem *lbi = new csListBoxItem (dp, name, CSFDI_PATHCOMPONENT);
     lbi->SetBitmap (fdspr [1], false);
-    lbi->SetOffset (level * 6, 0);
+    lbi->SetOffset (level * 6);
     level++; curp = sep;
     while ((*curp)
         && ((*curp == '/')
@@ -477,7 +478,7 @@ void cspFileDialog::Reread ()
     {
       csListBoxItem *lbi = new csListBoxItem (dp, dirs.Get(i));
       lbi->SetBitmap (fdspr [0], false);
-      lbi->SetOffset (level * 6, 0);
+      lbi->SetOffset (level * 6);
     }
 
     files.QuickSort (csStrVector::CASE_INSENSITIVE);

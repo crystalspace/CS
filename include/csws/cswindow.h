@@ -20,7 +20,6 @@
 #ifndef __CSWINDOW_H__
 #define __CSWINDOW_H__
 
-#include "csutil/csbase.h"
 #include "cscomp.h"
 #include "csbutton.h"
 

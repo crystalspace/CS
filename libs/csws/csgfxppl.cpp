@@ -143,25 +143,26 @@ void csGraphicsPipeline::Text (int x, int y, int fg, int bg, iFont *font,
   G2D->Write (font, x, y, fg, bg, s);
 }
 
-void csGraphicsPipeline::Pixmap (csPixmap *s2d, int x, int y, int w, int h)
+void csGraphicsPipeline::Pixmap (csPixmap *s2d, int x, int y, int w, int h,
+  uint8 Alpha)
 {
   if (!BeginDraw (CSDRAW_2DGRAPHICS))
     return;
 
   INCLUDE_MIN_POINT (x, y);
   INCLUDE_MAX_POINT (x + w, y + h);
-  s2d->DrawScaled (G3D, x, y, w, h);
+  s2d->DrawScaled (G3D, x, y, w, h, Alpha);
 }
 
 void csGraphicsPipeline::TiledPixmap (csPixmap *s2d, int x, int y, int w, int h,
-  int orgx, int orgy)
+  int orgx, int orgy, uint8 Alpha)
 {
   if (!BeginDraw (CSDRAW_2DGRAPHICS))
     return;
 
   INCLUDE_MIN_POINT (x, y);
   INCLUDE_MAX_POINT (x + w, y + h);
-  s2d->DrawTiled (G3D, x, y, w, h, orgx, orgy);
+  s2d->DrawTiled (G3D, x, y, w, h, orgx, orgy, Alpha);
 }
 
 void csGraphicsPipeline::Texture (iTextureHandle *hTex, int sx, int sy,

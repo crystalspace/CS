@@ -20,7 +20,6 @@
 #ifndef __CSSTATIC_H__
 #define __CSSTATIC_H__
 
-#include "csutil/csbase.h"
 #include "cscomp.h"
 
 /// Possible static component styles

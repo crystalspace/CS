@@ -123,23 +123,28 @@ void csMouseDriver::do_button (int button, bool down, int x, int y)
   Button [button - 1] = down;
 
   cs_time evtime = System->GetTime ();
-  int ev = down ? csevMouseDown : csevMouseUp;
+  System->EventQueue.Put (new csEvent (evtime,
+    down ? csevMouseDown : csevMouseUp, x, y, button, smask));
 
-  if (down)
+  if ((button == LastClickButton)
+   && (evtime - LastClickTime <= DoubleClickTime)
+   && (unsigned (ABS (x - LastClickX)) <= DoubleClickDist)
+   && (unsigned (ABS (y - LastClickY)) <= DoubleClickDist))
   {
-    if ((button == LastClickButton)
-     && (evtime - LastClickTime <= DoubleClickTime)
-     && (unsigned (ABS (x - LastClickX)) <= DoubleClickDist)
-     && (unsigned (ABS (y - LastClickY)) <= DoubleClickDist))
-      ev = csevMouseDoubleClick;
-
+    System->EventQueue.Put (new csEvent (evtime,
+      down ? csevMouseDoubleClick : csevMouseClick, x, y, button, smask));
+    // Don't allow for sequential double click events
+    if (down)
+      LastClickButton = -1;
+  }
+  else if (down)
+  {
+    // Remember the coordinates/button/position of last mousedown event
     LastClickButton = button;
     LastClickTime = evtime;
     LastClickX = x;
     LastClickY = y;
   }
-
-  System->EventQueue.Put (new csEvent (evtime, ev, x, y, button, smask));
 }
 
 void csMouseDriver::do_motion (int x, int y)

@@ -163,7 +163,7 @@ void csDefaultButtonSkin::Draw (csComponent &This)
 
   // Draw image
   if (img)
-    This.Pixmap (img, imgx, imgy, imgw, imgh);
+    This.Pixmap (img, imgx, imgy, imgw, imgh, This.GetState (CSS_DISABLED) ? 192 : 0);
   // Draw text
   if (text)
   {

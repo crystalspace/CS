@@ -20,8 +20,6 @@
 #ifndef __CSMENU_H__
 #define __CSMENU_H__
 
-#include "csutil/csbase.h"
-#include "cssys/csevent.h"
 #include "cscomp.h"
 
 /**
@@ -56,8 +54,6 @@ class csMenuItem : public csComponent
   int underline_pos;
   /// Menu item styles
   int Style;
-  /// Is the menu item checked?
-  bool Checked;
   /// Menu item command code
   int CommandCode;
   /// Sumbenu object
@@ -66,7 +62,7 @@ class csMenuItem : public csComponent
 public:
   /// Menu item constructor: text item with optional style
   csMenuItem (csComponent *iParent, const char *iText,
-    int iCommandCode = cscmdNothing, int iStyle = CSMIS_DEFAULTVALUE);
+    int iCommandCode = 0, int iStyle = CSMIS_DEFAULTVALUE);
 
   /// Menu item constructor: construct a separator item
   csMenuItem (csComponent *iParent, int iStyle = CSMIS_DEFAULTVALUE);

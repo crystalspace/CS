@@ -20,7 +20,6 @@
 #ifndef __CSTTLBAR_H__
 #define __CSTTLBAR_H__
 
-#include "csutil/csbase.h"
 #include "cscomp.h"
 
 /**

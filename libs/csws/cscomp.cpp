@@ -218,8 +218,10 @@ void csComponent::Delete (csComponent *comp)
         cur->Hide ();
         if (cur == focused)
         {
-          focused = (cur->next == focused ? (csComponent*)NULL : cur->next);
-          if (focused && GetState (CSS_FOCUSED))
+          focused = (cur->next == focused) ? (csComponent *)NULL : NextChild (focused);
+          if (cur == focused) // Whoa, delo pahnet kerosinom
+            focused = cur->next;
+          else if (focused && GetState (CSS_FOCUSED))
             focused->SetState (CSS_FOCUSED, true);
         } /* endif */
         if (cur == top)
@@ -401,6 +403,7 @@ bool csComponent::do_handle_event (csComponent *child, void *param)
       child->HandleEvent (*Event);
       return false;
     case csevMouseMove:
+    case csevMouseClick:
     case csevMouseDoubleClick:
     case csevMouseDown:
     case csevMouseUp:
@@ -421,7 +424,8 @@ bool csComponent::do_handle_event (csComponent *child, void *param)
         retc = child->HandleEvent (*Event);
         if (child->GetState (CSS_TRANSPARENT) == 0)
           retc = true;
-      } else
+      }
+      else
         retc = false;
       Event->Mouse.x += dX;
       Event->Mouse.y += dY;
@@ -612,7 +616,6 @@ AbortDrag:
       } /* endswitch */
       break;
     case csevMouseDown:
-    case csevMouseDoubleClick:
       // If mouse has been clicked on this component, no child eaten
       // the event and the component is selectable - select it
       if ((Event.Mouse.Button == 1)
@@ -766,7 +769,7 @@ csComponent *csComponent::NextChild (csComponent *start, bool disabled)
   if (!start) start = focused;
   csComponent *cur = start->next;
   while (cur != start
-      && !cur->GetState (CSS_SELECTABLE)
+      && (cur->GetState (CSS_SELECTABLE | CSS_VISIBLE) != (CSS_SELECTABLE | CSS_VISIBLE))
       && (!disabled || !cur->GetState (CSS_DISABLED)))
     cur = cur->next;
   return cur;
@@ -777,7 +780,7 @@ csComponent *csComponent::PrevChild (csComponent *start, bool disabled)
   if (!start) start = focused;
   csComponent *cur = start->prev;
   while (cur != start
-      && !cur->GetState (CSS_SELECTABLE)
+      && (cur->GetState (CSS_SELECTABLE | CSS_VISIBLE) != (CSS_SELECTABLE | CSS_VISIBLE))
       && (!disabled || !cur->GetState (CSS_DISABLED)))
     cur = cur->prev;
   return cur;
@@ -1429,18 +1432,43 @@ void csComponent::FastClip (csObjVector &rect)
 
 void csComponent::LocalToGlobal (int &x, int &y)
 {
-  x += bound.xmin;
-  y += bound.ymin;
-  if (parent)
-    parent->LocalToGlobal (x, y);
+  // Recursive looks more elegant, but non-recursive is faster :-)
+  register csComponent *cur = this;
+  while (cur)
+  {
+    x += cur->bound.xmin;
+    y += cur->bound.ymin;
+    cur = cur->parent;
+  }
 }
 
 void csComponent::GlobalToLocal (int &x, int &y)
 {
-  x -= bound.xmin;
-  y -= bound.ymin;
-  if (parent)
-    parent->GlobalToLocal (x, y);
+  register csComponent *cur = this;
+  while (cur)
+  {
+    x -= cur->bound.xmin;
+    y -= cur->bound.ymin;
+    cur = cur->parent;
+  }
+}
+
+void csComponent::OtherToThis (csComponent *from, int &x, int &y)
+{
+  register csComponent *cur1 = from;
+  while (cur1 && cur1 != this)
+  {
+    x += cur1->bound.xmin;
+    y += cur1->bound.ymin;
+    cur1 = cur1->parent;
+  }
+  register csComponent *cur2 = this;
+  while (cur2 && cur2 != cur1)
+  {
+    x -= cur2->bound.xmin;
+    y -= cur2->bound.ymin;
+    cur2 = cur2->parent;
+  }
 }
 
 void csComponent::Box (int xmin, int ymin, int xmax, int ymax, int colindx)
@@ -1560,7 +1588,7 @@ void csComponent::Text (int x, int y, int fgindx, int bgindx, const char *s)
     app->pplRestoreClipRect ();
 }
 
-void csComponent::Pixmap (csPixmap *s2d, int x, int y, int w, int h)
+void csComponent::Pixmap (csPixmap *s2d, int x, int y, int w, int h, uint8 Alpha = 0)
 {
   if (!s2d)
     return;
@@ -1582,13 +1610,14 @@ void csComponent::Pixmap (csPixmap *s2d, int x, int y, int w, int h)
   {
     csRect *cur = (csRect *)rect[i];
     app->pplSetClipRect (*cur); restoreclip = true;
-    app->pplPixmap (s2d, x, y, w, h);
+    app->pplPixmap (s2d, x, y, w, h, Alpha);
   } /* endfor */
   if (restoreclip)
     app->pplRestoreClipRect ();
 }
 
-void csComponent::Pixmap (csPixmap *s2d, int x, int y, int w, int h, int orgx, int orgy)
+void csComponent::Pixmap (csPixmap *s2d, int x, int y, int w, int h,
+  int orgx, int orgy, uint8 Alpha = 0)
 {
   if (!s2d)
     return;
@@ -1608,7 +1637,7 @@ void csComponent::Pixmap (csPixmap *s2d, int x, int y, int w, int h, int orgx, i
   {
     csRect *cur = (csRect *)rect [i];
     app->pplTiledPixmap (s2d, cur->xmin, cur->ymin, cur->Width (), cur->Height (),
-      orgx, orgy);
+      orgx, orgy, Alpha);
   } /* endfor */
 }
 

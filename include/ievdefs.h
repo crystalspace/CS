@@ -36,6 +36,7 @@ enum
   csevMouseMove,		// Mouse has been moved
   csevMouseDown,		// A mouse button has been pressed
   csevMouseUp,			// A mouse button has been released
+  csevMouseClick,		// A mouse button has been clicked
   csevMouseDoubleClick,		// A mouse button has been clicked twice
   csevJoystickMove,		// A joystick axis has been moved
   csevJoystickDown,		// A joystick button has been pressed
@@ -71,6 +72,8 @@ enum
 #define CSMASK_MouseDown	(1 << csevMouseDown)
 /// Mouse up events
 #define CSMASK_MouseUp		(1 << csevMouseUp)
+/// Mouse click events
+#define CSMASK_MouseClick	(1 << csevMouseClick)
 /// Mouse double click events
 #define CSMASK_MouseDoubleClick	(1 << csevMouseDoubleClick)
 /// Joystick movement events
@@ -91,7 +94,8 @@ enum
   (CSMASK_KeyDown | CSMASK_KeyUp)
 /// This mask identifies any mouse event
 #define CSMASK_Mouse \
-  (CSMASK_MouseMove|CSMASK_MouseDown|CSMASK_MouseUp|CSMASK_MouseDoubleClick)
+  (CSMASK_MouseMove | CSMASK_MouseDown | CSMASK_MouseUp | CSMASK_MouseClick | \
+   CSMASK_MouseDoubleClick)
 /// This mask identifies any joystick event
 #define CSMASK_Joystick \
   (CSMASK_JoystickMove | CSMASK_JoystickDown | CSMASK_JoystickUp)

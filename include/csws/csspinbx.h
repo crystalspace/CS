@@ -20,11 +20,10 @@
 #ifndef __CSSPINBX_H__
 #define __CSSPINBX_H__
 
-#include "csutil/csbase.h"
-#include "csutil/csstrvec.h"
 #include "cscomp.h"
 #include "cstimer.h"
 #include "csiline.h"
+#include "csutil/csstrvec.h"
 
 /// Spin box item structure
 struct csSpinBoxItem

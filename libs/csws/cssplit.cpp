@@ -53,7 +53,6 @@ bool csSplitter::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {
-    case csevMouseDoubleClick:
     case csevMouseDown:
       if (app->MouseOwner != this && Event.Mouse.Button == 1)
       {

@@ -34,10 +34,15 @@
  */
 class csHint : public csComponent
 {
+  /// Old mouse owner (before the hint has popped up). Usually NULL.
+  csComponent *oldmo;
+
 public:
   /// Create a floating hint with an text string
   csHint (csComponent *iParent, const char *iText, iFont *Font = NULL,
     int iFontSize = -1);
+  /// Cleanup before destruction
+  virtual ~csHint ();
 
   /// Draw the hint object
   virtual void Draw ();

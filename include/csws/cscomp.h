@@ -32,7 +32,31 @@ class csApp;
 class csSkin;
 class csSkinSlice;
 
-/// Component state flags
+/**
+ * Component state flags.<p>
+ * The component state is an (at least) 32-bit integer, which contains
+ * up to 32 state flags. These flags marks various transitional states
+ * which can change in time depending on the activity of the component
+ * (and user actions). These 32 bits are split into several conventional
+ * fields, every set of bits being reserved for different tasks:
+ * <pre>
+ *  31    24 23    16 15     8 7      0
+ * +--------+--------+--------+--------+
+ * |        |        |        |        |
+ * +--------+--------+--------+--------+
+ * \---+---/ \---+--/ \-------+-------/
+ *     |         |            +--------* Reserved for the csComponent class
+ *     |         |                       (masks for these bits are defined below)
+ *     |         +---------------------* Reserved for internal use by CSWS
+ *     |                                 components, derived from csComponent.
+ *     +-------------------------------* Reserved for user-defined components.
+ * </pre>
+ * Thus, all values matching the mask 0x0000ffff are reserved for csComponent,
+ * all values matching the mask 0x00ff0000 are reserved for other CSWS
+ * components (see csListBoxItem, for example), and finally all the
+ * bits matching the mask 0xff000000 are reserved for user.
+ * Pretty generous, eh? ;-)
+ */
 
 /// Component is visible
 #define CSS_VISIBLE		0x00000001
@@ -54,6 +78,8 @@ class csSkinSlice;
 #define CSS_MAXIMIZED		0x00000100
 /// Component or (some of) his children components are dirty
 #define CSS_DIRTY		0x00000200
+/// Additional state flag used to decide when to finish CheckDirty(); ignore it
+#define CSS_RESTART_DIRTY_CHECK	0x00000400
 
 /**
  * Predefined Windowing System Command Codes<p>
@@ -63,7 +89,7 @@ class csSkinSlice;
  * proprietary command codes. To avoid this as much as possible, the following
  * ranges are reserved:<p>
  * <ul>
- *   <li>0x00000000 ... 0x7FFFFFFF: Reserved for CrystalSpace Windowing System
+ *   <li>0x00000000 ... 0x0FFFFFFF: Reserved for CrystalSpace Windowing System
  *     <ul>
  *       <li>0x00000000 ... 0x000000FF: Non-class specific commands
  *       <li>0x00000100 ... 0x000001FF: csWindow class messages
@@ -81,7 +107,7 @@ class csSkinSlice;
  *       <li>0x00000D00 ... 0x00000DFF: csSlider class messages
  *       <li>0x00000E00 ... 0x00000EFF: csTree class messages
  *     </ul>
- *   <li>0x80000000 ... 0xFFFFFFFF: Reserved for user class-specific messages
+ *   <li>0x10000000 ... 0xFFFFFFFF: Reserved for user class-specific messages
  * </ul>
  * All commands receives a input parameter in the Command.Info field of iEvent
  * object. They can reply to the message by assigning to Command.Info a value.
@@ -386,10 +412,10 @@ public:
   /// Select (focus) this component and return true if successful
   bool Select ();
 
-  /// Return next selectable child window after 'start'
+  /// Return next visible selectable child window after 'start'
   virtual csComponent *NextChild (csComponent *start = NULL, bool disabled = false);
 
-  /// Return previous selectable child window before 'start'
+  /// Return previous visible selectable child window before 'start'
   virtual csComponent *PrevChild (csComponent *start = NULL, bool disabled = false);
 
   /// Return next control after 'start', looping through groups
@@ -584,6 +610,13 @@ public:
   /// Convert a pair of X,Y coordinates from global to local coordinate system
   void GlobalToLocal (int &x, int &y);
 
+  /**
+   * Convert a X,Y pair from coordinate system of another window to this one.
+   * This works faster than GlobalToLocal/LocalToGlobal pair in the case when
+   * this component is a N-th level parent for the 'from' component.
+   */
+  void OtherToThis (csComponent *from, int &x, int &y);
+
   /// Drag a window with mouse located at (x,y) window-local coordinates
   void Drag (int x, int y, int DragMode);
 
@@ -707,12 +740,13 @@ public:
   void Text (int x, int y, int fgindx, int bgindx, const char *s);
 
   /// Draw a (scaled) 2D sprite
-  void Pixmap (csPixmap *s2d, int x, int y, int w, int h);
+  void Pixmap (csPixmap *s2d, int x, int y, int w, int h, uint8 Alpha = 0);
   /// Draw a (non-scaled) 2D sprite
-  void Pixmap (csPixmap *s2d, int x, int y)
-  { Pixmap (s2d, x, y, s2d->Width (), s2d->Height ()); }
+  void Pixmap (csPixmap *s2d, int x, int y, uint8 Alpha = 0)
+  { Pixmap (s2d, x, y, s2d->Width (), s2d->Height (), Alpha); }
   /// Draw a (tiled) pixmap (orgy stands for "origin y", not what you though of - shame!)
-  void Pixmap (csPixmap *s2d, int x, int y, int w, int h, int orgx, int orgy);
+  void Pixmap (csPixmap *s2d, int x, int y, int w, int h, int orgx, int orgy,
+    uint8 Alpha = 0);
   /// Draw a (possibly tiled) texture, possibly semi-transparent
   void Texture (iTextureHandle *tex, int x, int y, int w, int h,
     int orgx, int orgy, uint8 Alpha = 0);

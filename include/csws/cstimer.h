@@ -20,9 +20,7 @@
 #ifndef __CSTIMER_H__
 #define __CSTIMER_H__
 
-#include "csutil/csbase.h"
 #include "cscomp.h"
-
 
 /// csTimer class messages
 enum

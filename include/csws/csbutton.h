@@ -20,7 +20,6 @@
 #ifndef __CSBUTTON_H__
 #define __CSBUTTON_H__
 
-#include "csutil/csbase.h"
 #include "cscomp.h"
 
 /// Button style flags: does bitmap and/or text shift when button is pressed?

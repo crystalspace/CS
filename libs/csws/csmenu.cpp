@@ -46,7 +46,6 @@ csMenuItem::csMenuItem (csComponent *iParent, const char *iText,
   Init ();
   SetText (iText);
   Style = iStyle;
-  Checked = false;
   id = CommandCode = iCommandCode;
   state |= CSS_SELECTABLE;
 }
@@ -324,7 +323,8 @@ void csMenuItem::Draw ()
     {
       focused->Hide ();
       focused->SendCommand (cscmdMenuSetItem, NULL);
-    } else if ((vis) && (selected) && (focused->GetState (CSS_VISIBLE) == 0))
+    }
+    else if ((vis) && (selected) && (focused->GetState (CSS_VISIBLE) == 0))
     {
       focused->SendCommand (cscmdMenuSetDropFlag, (void *)false);
       focused->Show (true);

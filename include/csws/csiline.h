@@ -20,7 +20,6 @@
 #ifndef __CSILINE_H__
 #define __CSILINE_H__
 
-#include "csutil/csbase.h"
 #include "cscomp.h"
 
 /// Possible input line frame styles

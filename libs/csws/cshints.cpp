@@ -31,6 +31,12 @@ csHint::csHint (csComponent *iParent, const char *iText, iFont *Font,
   if (app)
     app->InsertClipChild (this);
   SetText (iText);
+  oldmo = app->CaptureMouse (this);
+}
+
+csHint::~csHint ()
+{
+  app->CaptureMouse (oldmo);
 }
 
 void csHint::SetText (const char *iText)
@@ -251,7 +257,7 @@ void csHintManager::HandleEvent (iEvent &Event)
         app->GetMouse ().GetPosition (mx, my);
         // Find the children under mouse cursor
         csComponent *c = app->GetChildAt (mx, my, do_checkhint, this);
-        if (c)
+        if (c && !c->GetState (CSS_DISABLED))
         {
           // Look for a hint for given component
           int idx = FindSortedKey (c);

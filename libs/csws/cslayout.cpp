@@ -34,6 +34,7 @@ csLayout::csLayout (csComponent *iParent, csDialogFrameStyle iFrameStyle)
 {
   bRecalcLayout = true;
   lc = &c;
+  SetState (CSS_TRANSPARENT, true);
 }
 
 int csLayout::GetLayoutingPhase ()
