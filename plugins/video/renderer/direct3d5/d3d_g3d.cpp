@@ -1002,19 +1002,24 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygon& poly)
   
   if ( bLightmapExists )
   {
-    float lu_dif, lv_dif, lu_scale, lv_scale;
-    float fMinU, fMinV, fMaxU, fMaxV;
-    
-    pTex->GetTextureBox( fMinU, fMinV, fMaxU, fMaxV );
+    ILightMap *thelightmap = NULL;
+    pTex->GetLightMap(&thelightmap);
 
-    // calculate lightmapping variables.
-    
-    lu_dif = fMinU;
-    lv_dif = fMinV;
-    
-    lu_scale = 1.0f/(fMaxU - fMinU);
-    lv_scale = 1.0f/(fMaxV - fMinV);
-    
+    int lmwidth, lmrealwidth, lmheight, lmrealheight;
+    thelightmap->GetWidth (lmwidth);
+    thelightmap->GetRealWidth (lmrealwidth);
+    thelightmap->GetHeight (lmheight);
+    thelightmap->GetRealHeight (lmrealheight);
+    float scale_u = (float)(lmrealwidth-1) / (float)lmwidth;
+    float scale_v = (float)(lmrealheight-1) / (float)lmheight;
+
+    float lightmap_low_u, lightmap_low_v, lightmap_high_u, lightmap_high_v;
+    pTex->GetTextureBox(lightmap_low_u,lightmap_low_v,
+                       lightmap_high_u,lightmap_high_v);
+
+    float lightmap_scale_u = scale_u / (lightmap_high_u - lightmap_low_u), 
+          lightmap_scale_v = scale_v / (lightmap_high_v - lightmap_low_v);
+
     if(!bTransparent)
       m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, TRUE);
     else
@@ -1033,8 +1038,17 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygon& poly)
     m_lpd3dDevice->Begin(D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS);
     for (i=0; i<poly.num; i++)
     {
-      z = 1.0f  / (M*(poly.vertices[i].sx-m_nHalfWidth) + N*(poly.vertices[i].sy-m_nHalfHeight) + O);
+      float sx = poly.vertices[i].sx - m_nHalfWidth;
+      float sy = poly.vertices[i].sy - m_nHalfHeight;
+
+      float u_over_sz = (J1 * sx + J2 * sy + J3);
+      float v_over_sz = (K1 * sx + K2 * sy + K3);
+
+      z = 1.0f  / (M*sx + N*sy + O);
       
+      float light_u = (u_over_sz*z - lightmap_low_u) * lightmap_scale_u;
+      float light_v = (v_over_sz*z - lightmap_low_v) * lightmap_scale_v;
+
       vx.sx = poly.vertices[i].sx;
       vx.sy = m_nHeight-poly.vertices[i].sy;
       vx.sz = z*(float)SCALE_FACTOR;
@@ -1050,11 +1064,10 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygon& poly)
       else vx.color = D3DRGBA(0.5, 0.5, 0.5, (float)poly_alpha/100.0f);
       
       vx.specular = 0;
-      vx.tu =  (((J1 * (poly.vertices[i].sx-m_nHalfWidth) + J2 * (poly.vertices[i].sy-m_nHalfHeight) + J3) * z) - lu_dif) * lu_scale;
-      vx.tv =  (((K1 * (poly.vertices[i].sx-m_nHalfWidth) + K2 * (poly.vertices[i].sy-m_nHalfHeight) + K3) * z) - lv_dif) * lv_scale;
-      vx.tu *= ((D3DLightCache_Data *)pLightCache->pData)->ratio_width;
-      vx.tv *= ((D3DLightCache_Data *)pLightCache->pData)->ratio_height;
-      
+
+      vx.tu = light_u;
+      vx.tv = light_v;
+
       m_lpd3dDevice->Vertex( &vx );
     }
     m_lpd3dDevice->End(0);
@@ -1176,7 +1189,7 @@ g_pd3dDevice->DrawPrimitiveStrided( D3DPT_TRIANGLELIST,
 
 // end work in progress Bruce Williams  brucewil@pacbell.net 
 
-STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonQuick (G3DPolygon& poly, bool gouroud)
+STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonQuick (G3DPolygon& poly, bool gouraud)
 {    
   int i;
   HighColorCache_Data *pTexData;
@@ -1197,7 +1210,10 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonQuick (G3DPolygon& poly, bool g
     vx.sy = m_nHeight-poly.vertices[i].sy;
     vx.sz = SCALE_FACTOR / poly.pi_texcoords[i].z;
     vx.rhw = poly.pi_texcoords[i].z;
-    vx.color = D3DRGB(0.8, 0.8, 0.8);
+    if (gouraud)
+      vx.color = D3DRGB(poly.pi_texcoords[i].r, poly.pi_texcoords[i].g, poly.pi_texcoords[i].b);
+    else
+      vx.color = D3DRGB(0.8, 0.8, 0.8);
     vx.specular = D3DRGB(0.0, 0.0, 0.0);
     vx.tu = poly.pi_texcoords[i].u;
     vx.tv = poly.pi_texcoords[i].v;
