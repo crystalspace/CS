@@ -6,6 +6,8 @@ The history order is reversed so that new features are at the top.
 02-Jul-2003
 	- Eric Sunshine fixed some spelling errors in the user manual pointed
 	  out by Vincent Knecht <vince@iefr.ath.cx>: existance -> existence
+	- Anders Stenberg made sure NextFrame is called when rendering with
+	  new renderer.
 01-Jul-2003
 	- HangDude made the following changes:
 	   - Moved anonrndbuf.h from csutil to cstool (on Jorrit's request).

@@ -252,6 +252,8 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n)
       }
     }*/
 
+    csTicks lt = csEngine::current_engine->GetLastAnimationTime ();
+    meshobj->NextFrame (lt,movable.GetPosition ());
     UpdateDeferedLighting (movable.GetFullPosition ());
     return meshobj->GetRenderMeshes (n);
 /*  }
