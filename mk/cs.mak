@@ -35,7 +35,7 @@ ARFLAGS.@=$@
 # Object file extension
 O=.o
 
-ifeq ($(USE_SHARED_PLUGINS),no)
+ifeq ($(USE_SHARED_PLUGINS),yes)
   PLUGINS += $(PLUGINS.DYNAMIC)
 else
   override MAKE_DLL=no
