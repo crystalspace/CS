@@ -504,12 +504,10 @@ int ApplicationShow = csSW_SHOWNORMAL;
 
 #define CS_IMPLEMENT_PLATFORM_APPLICATION \
 int _cs_main (int argc, char* argv[]); \
-HINSTANCE ModuleHandle = 0; \
-int ApplicationShow = csSW_SHOWNORMAL; \
 int WINAPI WinMain (HINSTANCE hApp, HINSTANCE prev, LPSTR cmd, int show) \
 { \
-  ModuleHandle = hApp; \
-  ApplicationShow = show; \
+  (void)hApp; \
+  (void)show; \
   (void)prev; \
   (void)cmd; \
   CS_DEBUG_MSVC_INIT_GOOP; \
@@ -527,14 +525,10 @@ int WINAPI WinMain (HINSTANCE hApp, HINSTANCE prev, LPSTR cmd, int show) \
 #if !defined(CS_STATIC_LINKED)
 
 #define CS_IMPLEMENT_PLATFORM_PLUGIN \
-HINSTANCE ModuleHandle = 0; \
-int ApplicationShow = csSW_SHOWNORMAL; \
 int _cs_main(int argc, char* argv[]) { return 0; } \
 extern "C" BOOL WINAPI \
 DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID /*lpvReserved*/) \
 { \
-  if (fdwReason == DLL_PROCESS_ATTACH) \
-    ModuleHandle = hinstDLL; \
   return TRUE; \
 } \
 extern "C" __declspec(dllexport) \

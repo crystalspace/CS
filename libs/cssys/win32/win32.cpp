@@ -52,10 +52,6 @@ extern int _argc;
 extern char** _argv;
 #endif
 
-bool ApplicationActive = true;
-extern HINSTANCE ModuleHandle;
-extern int ApplicationShow;
-
 void SystemFatalError (char *s)
 {
   ChangeDisplaySettings (0, 0);  // doesn't hurt
@@ -412,6 +408,10 @@ class Win32Assistant :
   public iEventHandler
 {
 private:
+  bool ApplicationActive;
+  HINSTANCE ModuleHandle;
+  int ApplicationShow;
+
   iObjectRegistry* registry;
   /// is a console window to be displayed?
   bool console_window;
@@ -568,6 +568,9 @@ bool csPlatformShutdown(iObjectRegistry* r)
 }
 
 Win32Assistant::Win32Assistant (iObjectRegistry* r) :
+  ApplicationActive (true),
+  ModuleHandle (0),
+  ApplicationShow (SW_SHOWNORMAL),
   console_window (false),  
   is_console_app(false),
   cmdline_help_wanted(false),
@@ -575,8 +578,10 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
 {
   SCF_CONSTRUCT_IBASE(0);
 
-  if (ModuleHandle == 0)
-    ModuleHandle = GetModuleHandle(0);
+  ModuleHandle = GetModuleHandle(0);
+  STARTUPINFO startupInfo;
+  GetStartupInfo (&startupInfo);
+  ApplicationShow = startupInfo.wShowWindow;
 
 // Cygwin has problems with freopen()
 #if defined(CS_DEBUG) || defined(__CYGWIN__)
@@ -591,7 +596,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   cmdline_help_wanted = cmdline->GetOption ("help");
 
   /*
-     to determine if we are actually a console we app we look up
+     to determine if we are actually a console app we look up
      the subsystem field in the PE header.
    */
   PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)ModuleHandle;
@@ -875,13 +880,23 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
   switch (message)
   {
     case WM_ACTIVATEAPP:
-      if (wParam) { ApplicationActive = true; } else { ApplicationActive = false; }
+      if ((GLOBAL_ASSISTANT != 0))
+      {
+        if (wParam) 
+	{ 
+	  GLOBAL_ASSISTANT->ApplicationActive = true; 
+	} 
+	else 
+	{ 
+	  GLOBAL_ASSISTANT->ApplicationActive = false; 
+	}
+      }
 #ifndef DO_DINPUT_KEYBOARD
       memset (&LastCharCode, 0, sizeof (LastCharCode));
 #endif
       break;
     case WM_ACTIVATE:
-      if (GLOBAL_ASSISTANT != 0)
+      if ((GLOBAL_ASSISTANT != 0))
       {
 	iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
         outlet->Broadcast (cscmdFocusChanged,
