@@ -13,6 +13,7 @@ environment.
 * Tutorial Simple 2:: Simple Tutorial 2
 * map2cs Tutorial:: @code{map2cs} Tutorial
 * Tutorial CrystalClear:: A CrystalClear Tutorial
+* WinCVS Tutorial::WinCVS Tutorial
 @end menu
 
 @imports{tutorial,intro.txi}
@@ -20,3 +21,4 @@ environment.
 @imports{tutorial,simple2.txi}
 @importss{tutorial,map2cs,map2cs.txi}
 @imports{tutorial,csclear.txi}
+@importss{tutorial,wincvs,wincvs.txi}
