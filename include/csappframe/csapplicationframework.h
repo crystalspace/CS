@@ -178,6 +178,16 @@ public:
   */
   static bool Start ();
 
+  /**\internal
+  * End application logic.
+  * \remarks
+  * This function is called by the framework's main() implementation to
+  * essentially end the program.
+  * \warning This function is intended for use by the framework library's
+  * main() implementation and should not be called by the user.
+  */
+	static void End ();
+
   /**
   * Quit running the appliation.
   * \remarks
@@ -216,6 +226,16 @@ protected:
   * and states, starting the event queue loop, etc.
   */
   virtual bool Application () = 0;
+
+	/**
+	* Perform any end of program processing.
+	* /remarks
+	* This method is called after the crystal space engine has been shut down,
+	* just before the framework is about to end the program. Unlike the other
+	* overridables of this class, you need not bother overriding this method.
+	* In general, this is provided to allow end of program debugging support.
+	*/
+	virtual void OnExit ();
 
   // Inline Helper Functions
 public:

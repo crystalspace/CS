@@ -42,8 +42,6 @@ csApplicationFramework::csApplicationFramework ()
 csApplicationFramework::~csApplicationFramework ()
 {
   m_Ptr = NULL;
-  DestroyApplication (mp_object_reg);
-  mp_object_reg = NULL;
 }
 
 
@@ -51,6 +49,18 @@ bool csApplicationFramework::Start ()
 {
   CS_ASSERT (NULL != m_Ptr);
   return m_Ptr->Application ();
+}
+
+void csApplicationFramework::End ()
+{
+  CS_ASSERT (NULL != m_Ptr);
+  DestroyApplication (mp_object_reg);
+  mp_object_reg = NULL;
+	m_Ptr->OnExit ();
+}
+
+void csApplicationFramework::OnExit ()
+{
 }
 
 bool csApplicationFramework::Initialize (int argc, char *argv[])

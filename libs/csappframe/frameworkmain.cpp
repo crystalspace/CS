@@ -47,5 +47,6 @@ int main (int argc, char* argv[])
     iReturn = 2;
   }
 
+	csApplicationFramework::End ();
   return iReturn;
 }
