@@ -15,10 +15,19 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
+
 #include "cssysdef.h"
 #include "csgeom/csrectrg.h"
 
 #include <stdio.h>
+
+
+
+#ifdef CS_DEBUG_RECT_REG
+#include <time.h>
+#include "csutil/rng.h"
+#endif
 
 const int MODE_EXCLUDE = 0;
 const int MODE_INCLUDE = 1;
@@ -27,6 +36,7 @@ csRectRegion::csRectRegion () :
   region(0),
   region_count(0),
   region_max(0)
+
 {
 }
 
@@ -281,7 +291,8 @@ void csRectRegion::nkSplit (csRect &r1, csRect &r2)
 
   if (r1.xmax > r2.xmax) // right stripe
   {
-    pushRect (csRect(r2.xmin, r2.ymin, r1.xmax, r2.ymax));
+    //pushRect (csRect(r2.xmin, r2.ymin, r1.xmax, r2.ymax));
+    pushRect( csRect(r2.xmax, r2.ymin, r1.xmax, r2.ymax) );
   }
 
   if (r1.ymax > r2.ymax) // lower stripe
@@ -424,7 +435,7 @@ void csRectRegion::Exclude (const csRect &nrect)
     if (r1.IsEmpty ())
     {
       deleteRect (i);
-      i = 0;
+      i--;
       continue;
     }
 
@@ -450,6 +461,7 @@ void csRectRegion::Exclude (const csRect &nrect)
 
     // Kill rect from list
     deleteRect (i);
+    i--;
 
     // Fragment it
     fragmentRect (r1, r2, MODE_EXCLUDE);
@@ -465,3 +477,283 @@ void csRectRegion::ClipTo (csRect &clip)
       deleteRect (i);
   }
 }
+
+
+
+/******************************* csRectRegionDebugger *********************************************/
+
+#ifdef CS_DEBUG_RECT_REG
+
+csRectRegionDebug::csRectRegionDebug() 
+{
+  rand_seed = time(NULL);
+  num_tests_complete = 0;
+  rand = new csRandomGen(rand_seed);
+  MakeEmpty();
+}
+
+csRectRegionDebug::~csRectRegionDebug()
+{
+  delete rand;
+}
+
+void csRectRegionDebug::Include(const csRect &rect)
+{
+  CS_ASSERT(CheckBounds(rect));
+  for(int i = rect.xmin; i < rect.xmax; i++)
+  {
+    for(int j = rect.ymin; j < rect.ymax; j++)
+    {
+      area[i][j] = true;
+    }
+  }
+}
+
+void csRectRegionDebug::Exclude(const csRect &rect)
+{
+  CS_ASSERT(CheckBounds(rect));
+  for(int i = rect.xmin; i < rect.xmax; i++)
+  {
+    for(int j = rect.ymin; j < rect.ymax; j++)
+    {
+      area[i][j] = false;
+    }
+  }
+}
+
+void csRectRegionDebug::ClipTo(const csRect &clip)
+{
+  for(int i = 0; i < CS_RECT_REG_SIZE; i++)
+  {
+    for(int j = 0; j < CS_RECT_REG_SIZE; j++)
+    {
+      if(!clip.Contains(i,j))
+        area[i][j] = false;
+    }
+  }
+}
+
+void csRectRegionDebug::AssertEqual(const csRectRegion &r)
+{
+  int i,j,k;
+  for(i = 0; i < r.Count(); i++)
+  {
+    csRect rect = r.RectAt(i);
+    CS_ASSERT(CheckBounds(rect));
+    for(j = rect.xmin; j < rect.xmax; j++)
+    {
+      for(k = rect.ymin; k < rect.ymax; k++)
+      {
+        CS_ASSERT(area[j][k] == true);
+        area[j][k] = false;
+      }
+    }
+  }
+
+  for(i = 0; i < CS_RECT_REG_SIZE; i++)
+  {
+    for(j = 0; j < CS_RECT_REG_SIZE; j++)
+    {
+      CS_ASSERT(area[i][j] == false);
+    }
+  }
+
+  for(i = 0; i < r.Count(); i++)
+  {
+    csRect rect = r.RectAt(i);
+    for(j = rect.xmin; j < rect.xmax; j++)
+    {
+      for(int k = rect.ymin; k < rect.ymax; k++)
+      {
+        area[j][k] = true;
+      }
+    }
+  }
+
+  num_tests_complete++;
+}
+
+void csRectRegionDebug::MakeEmpty()
+{
+  for(int i = 0; i < CS_RECT_REG_SIZE; i++)
+  {
+    for(int j = 0; j < CS_RECT_REG_SIZE; j++)
+    {
+      area[i][j] = false;
+    }
+  }
+}
+
+bool csRectRegionDebug::CheckBounds(const csRect &rect)
+{
+  return rect.xmin >= 0 && rect.ymin >= 0 &&
+         rect.xmax <= CS_RECT_REG_SIZE && rect.ymax <= CS_RECT_REG_SIZE;
+}
+
+
+void csRectRegionDebug::UnitTest()
+{
+
+  printf("Running tests");
+
+  int i,j;
+  csRectRegion rr;
+  rr.makeEmpty();
+  MakeEmpty();
+  AssertEqual(rr);
+
+
+
+  // include test
+  for(i= 0; i < 500; i++)
+  {
+    csRect r = RandNonEmptyRect();
+    rr.Include(r);
+    Include(r);
+    AssertEqual(rr);
+  }
+
+  rr.makeEmpty();
+  MakeEmpty();
+  AssertEqual(rr);
+
+  for(i = 0; i < 500; i++)
+  {
+    csRect r = RandRect();
+    rr.Include(r);
+    Include(r);
+    AssertEqual(rr);
+  }
+
+  rr.makeEmpty();
+  MakeEmpty();
+  AssertEqual(rr);
+  
+
+
+  //exclude test
+  csRect r(0,0,CS_RECT_REG_SIZE,CS_RECT_REG_SIZE);
+  Include(r);
+  rr.Include(r);
+  AssertEqual(rr);
+
+  for(i = 0; i < 500; i++)
+  {
+    csRect r = RandRect();
+    rr.Exclude(r);
+    Exclude(r);
+    AssertEqual(rr);
+  }
+
+  csRect r1(0,0,CS_RECT_REG_SIZE,CS_RECT_REG_SIZE);
+  Include(r1);
+  rr.Include(r1);
+  AssertEqual(rr);
+
+  for(i = 0; i < 500; i++)
+  {
+    csRect r = RandNonEmptyRect();
+    rr.Exclude(r);
+    Exclude(r);
+    AssertEqual(rr);
+  }
+
+
+
+  // Clip test
+  rr.makeEmpty();
+  MakeEmpty();
+  AssertEqual(rr);
+
+  for(i = 0; i < 100; i++)
+  {
+    for(j = 0; j < 50; j++)
+    {
+      csRect r = RandNonEmptyRect();
+      rr.Include(r);
+      Include(r);
+    }
+
+    csRect r = RandNonEmptyRect();
+    ClipTo(r);
+    rr.ClipTo(r);
+    AssertEqual(rr);
+  }
+
+  rr.makeEmpty();
+  MakeEmpty();
+  AssertEqual(rr);
+
+  for(i = 0; i < 10; i++)
+  {
+    for(j = 0; j < 50; j++)
+    {
+      csRect r = RandRect();
+      rr.Include(r);
+      Include(r);
+    }
+
+    csRect r = RandRect();
+    ClipTo(r);
+    rr.ClipTo(r);
+    AssertEqual(rr);
+  }
+
+  // intermixed op test
+  rr.makeEmpty();
+  MakeEmpty();
+  AssertEqual(rr);
+
+  for(i = 0; i < 50000; i++)
+  {
+
+    if(i % 1000 == 0)
+      printf(".");
+
+    unsigned int op = rand->Get(11);
+    csRect r = RandRect();
+    if(op < 5)
+    {
+      Include(r);
+      rr.Include(r);
+    }
+    else if(op < 10)
+    {
+      Exclude(r);
+      rr.Exclude(r);
+    }
+    else
+    {
+      ClipTo(r);
+      rr.ClipTo(r);
+    }
+
+    AssertEqual(rr);
+  }
+
+  printf("Done\n");
+
+}
+
+
+csRect csRectRegionDebug::RandRect()
+{
+  csRect r;
+  r.xmin = rand->Get(CS_RECT_REG_SIZE);
+  r.ymin = rand->Get(CS_RECT_REG_SIZE);
+  r.xmax = rand->Get(CS_RECT_REG_SIZE+1);
+  r.ymax = rand->Get(CS_RECT_REG_SIZE+1);
+  return r;
+}
+
+csRect csRectRegionDebug::RandNonEmptyRect()
+{
+  csRect r;
+  r.xmin = rand->Get(CS_RECT_REG_SIZE);
+  r.ymin = rand->Get(CS_RECT_REG_SIZE);
+  r.xmax = r.xmin + rand->Get(CS_RECT_REG_SIZE-r.xmin) + 1;
+  r.ymax = r.ymin + rand->Get(CS_RECT_REG_SIZE-r.ymin) + 1;
+  return r;
+}
+
+#endif

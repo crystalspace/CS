@@ -69,7 +69,7 @@ const char *awsBarChart::Type ()
   return "Bar Chart";
 }
 
-bool awsBarChart::Setup (iAws *_wmgr, awsComponentNode *settings)
+bool awsBarChart::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   // set some defaults before panel setup
   bkg_alpha = 96;

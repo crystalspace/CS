@@ -69,7 +69,7 @@ bool awsControlBar::Execute(const char* action, iAwsParmList* parmlist)
   return false;
 }
 
-bool awsControlBar::Setup(iAws *_wmgr, awsComponentNode* settings)
+bool awsControlBar::Setup(iAws *_wmgr, iAwsComponentNode* settings)
 {
 	frame_drawer.SetBackgroundAlpha(96);
 

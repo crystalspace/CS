@@ -41,7 +41,7 @@ const char *awsRadButton::Type ()
   return "Radio Button";
 }
 
-bool awsRadButton::Setup (iAws *_wmgr, awsComponentNode *settings)
+bool awsRadButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (!awsComponent::Setup (_wmgr, settings)) return false;
 

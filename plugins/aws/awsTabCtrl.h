@@ -49,7 +49,7 @@ class awsTab : public awsComponent
   awsTab ();
   virtual ~awsTab ();
 
-  virtual bool Setup (iAws *_wmgr, awsComponentNode *settings);
+  virtual bool Setup (iAws *_wmgr, iAwsComponentNode *settings);
   virtual bool GetProperty (const char *name, void **parm);
   virtual bool SetProperty (const char *name, void *parm);
 
@@ -150,13 +150,12 @@ protected:
 
  public:
 
-  //SCF_DECLARE_IBASE_EXT (awsComponent);
 
   awsTabCtrl();
   virtual ~awsTabCtrl ();
 
   virtual void OnDraw(csRect clip);
-  virtual bool Setup (iAws *_wmgr, awsComponentNode *settings);
+  virtual bool Setup (iAws *_wmgr, iAwsComponentNode *settings);
   virtual const char *Type (){return "Simple Tab Control";}
 
   virtual csRect getInsets();

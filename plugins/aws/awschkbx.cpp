@@ -37,7 +37,7 @@ const char *awsCheckBox::Type ()
   return "Check Box";
 }
 
-bool awsCheckBox::Setup (iAws *_wmgr, awsComponentNode *settings)
+bool awsCheckBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (!awsComponent::Setup (_wmgr, settings)) return false;
 

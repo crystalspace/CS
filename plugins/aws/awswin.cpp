@@ -68,7 +68,7 @@ awsWindow::~awsWindow ()
 }
 
 
-bool awsWindow::Setup (iAws *_wmgr, awsComponentNode *settings)
+bool awsWindow::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   style = fsNormal;
 
@@ -144,15 +144,17 @@ bool awsWindow::Setup (iAws *_wmgr, awsComponentNode *settings)
   closep.ymin = Frame ().ymin + closep.ymin;
   closep.ymax = Frame ().ymin + closep.ymax;
   
-  awsComponentNode closeinfo("Close Button", "Command Button");
-  closeinfo.Add(new awsIntKey("Style", awsCmdButton::fsNormal));
+  iAwsKeyFactory* closeinfo = pm->CreateKeyFactory();
+  closeinfo->Initialize("Close Button", "Command Button");
+  closeinfo->AddIntKey("Style", awsCmdButton::fsNormal);
+  closeinfo->AddIntKey("IconAlign", awsCmdButton::iconLeft);
+  closeinfo->AddStringKey("Icon", close_button_txt->GetData());
 
-  closeinfo.Add(new awsIntKey("IconAlign", awsCmdButton::iconLeft));
-  closeinfo.Add(new awsStringKey("Icon", close_button_txt));
   close_button.SetFlag(AWSF_CMP_NON_CLIENT);
-  close_button.Create(WindowManager(), this, &closeinfo);
+  close_button.Create(WindowManager(), this, closeinfo->GetThisNode());
   close_button.ResizeTo(closep);
-  
+  closeinfo->DecRef();
+
   slot_close.Connect(&close_button, awsCmdButton::signalClicked, 
     &sink, sink.GetTriggerID("Close"));
   
@@ -167,15 +169,17 @@ bool awsWindow::Setup (iAws *_wmgr, awsComponentNode *settings)
   zoomp.ymin = Frame ().ymin + zoomp.ymin;
   zoomp.ymax = Frame ().ymin + zoomp.ymax;
   
-  awsComponentNode zoominfo("Zoom Button", "Command Button");
-  zoominfo.Add(new awsIntKey("Style", awsCmdButton::fsNormal));
+  iAwsKeyFactory* zoominfo = pm->CreateKeyFactory();
+  zoominfo->Initialize("Zoom Button", "Command Button");
+  zoominfo->AddIntKey("Style", awsCmdButton::fsNormal);
+  zoominfo->AddIntKey("IconAlign", awsCmdButton::iconLeft);
+  zoominfo->AddStringKey("Icon", zoom_button_txt->GetData());
 
-  zoominfo.Add(new awsIntKey("IconAlign", awsCmdButton::iconLeft));
-  zoominfo.Add(new awsStringKey("Icon", zoom_button_txt));
   zoom_button.SetFlag(AWSF_CMP_NON_CLIENT);
-  zoom_button.Create(WindowManager(), this, &zoominfo);
+  zoom_button.Create(WindowManager(), this, zoominfo->GetThisNode());
   zoom_button.ResizeTo(zoomp);
-  
+  zoominfo->DecRef();
+
   slot_zoom.Connect(&zoom_button, awsCmdButton::signalClicked, 
     &sink, sink.GetTriggerID("Zoom"));
   
@@ -191,18 +195,19 @@ bool awsWindow::Setup (iAws *_wmgr, awsComponentNode *settings)
   minp.ymin = Frame ().ymin + minp.ymin;
   minp.ymax = Frame ().ymin + minp.ymax;
   
-  awsComponentNode mininfo("Min Button", "Command Button");
-  mininfo.Add(new awsIntKey("Style", awsCmdButton::fsNormal));
-
-  mininfo.Add(new awsIntKey("IconAlign", awsCmdButton::iconLeft));
-
-  mininfo.Add(new awsStringKey("Icon", min_button_txt));
+  iAwsKeyFactory* mininfo = pm->CreateKeyFactory();
+  mininfo->Initialize("Min Button", "Command Button");
+  mininfo->AddIntKey("Style", awsCmdButton::fsNormal);
+  mininfo->AddIntKey("IconAlign", awsCmdButton::iconLeft);
+  mininfo->AddStringKey("Icon", min_button_txt->GetData());
 
 
   min_button.SetFlag(AWSF_CMP_NON_CLIENT);
-  min_button.Create(WindowManager(), this, &mininfo);
+  min_button.Create(WindowManager(), this, mininfo->GetThisNode());
+  mininfo->DecRef();
   min_button.ResizeTo(minp);
   
+
   slot_min.Connect(&min_button, awsCmdButton::signalClicked, 
     &sink, sink.GetTriggerID("Min"));
   

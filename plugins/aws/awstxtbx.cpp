@@ -71,7 +71,7 @@ const char *awsTextBox::Type ()
   return "Text Box";
 }
 
-bool awsTextBox::Setup (iAws *_wmgr, awsComponentNode *settings)
+bool awsTextBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (!awsComponent::Setup (_wmgr, settings)) return false;
 

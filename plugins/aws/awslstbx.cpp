@@ -118,7 +118,7 @@ const char *awsListBox::Type ()
   return "List Box";
 }
 
-bool awsListBox::Setup (iAws *_wmgr, awsComponentNode *settings)
+bool awsListBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   iString *tn1 = NULL, *tn2 = NULL;
   char buf[64];

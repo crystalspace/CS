@@ -47,7 +47,7 @@ const char *awsStatusBar::Type ()
   return "Status Bar";
 }
 
-bool awsStatusBar::Setup (iAws *_wmgr, awsComponentNode *settings)
+bool awsStatusBar::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (!awsComponent::Setup (_wmgr, settings)) return false;
 

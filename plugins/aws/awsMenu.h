@@ -66,7 +66,7 @@ public:
   awsMenuEntry();
   ~awsMenuEntry();
 
-  virtual bool Setup(iAws* wmgr, awsComponentNode* settings);
+  virtual bool Setup(iAws* wmgr, iAwsComponentNode* settings);
   virtual const char* Type();
 	
   virtual bool GetProperty(const char* name, void **parm);
@@ -101,7 +101,7 @@ public:
   awsMenuBarEntry();
   ~awsMenuBarEntry();
 
-  virtual bool Setup(iAws* wmgr, awsComponentNode* settings);
+  virtual bool Setup(iAws* wmgr, iAwsComponentNode* settings);
   virtual const char* Type();
 	
   virtual bool GetProperty(const char* name, void **parm);
@@ -160,7 +160,7 @@ public:
   awsMenu();
   virtual ~awsMenu();
 
-  virtual bool Setup(iAws *wmgr, awsComponentNode *settings);
+  virtual bool Setup(iAws *wmgr, iAwsComponentNode *settings);
   virtual bool GetProperty(const char* name, void** parm);
 
   /// These can be used to add/remove any type of menu entry to the menu
@@ -219,12 +219,12 @@ public:
   virtual ~awsMenuBar();
 
   virtual const char* Type();
-  virtual bool Setup(iAws *wmgr, awsComponentNode *settings);
+  virtual bool Setup(iAws *wmgr, iAwsComponentNode *settings);
   virtual void StartPopupChange();
   virtual void PositionPopupMenu(iAwsComponent* showing_entry, awsMenu* popup);
   virtual void HideAllPopups();
   virtual bool ShouldTrackMouse();
-  virtual bool Create(iAws* manager, iAwsComponent* parent, awsComponentNode* settings);
+  virtual bool Create(iAws* manager, iAwsComponent* parent, iAwsComponentNode* settings);
   virtual iAwsComponent* GetNewDefaultEntry();
 };
 
@@ -251,9 +251,9 @@ public:
   awsPopupMenu();
   virtual ~awsPopupMenu();
 
-  virtual bool Create(iAws *wmgr, iAwsComponent* parent, awsComponentNode* settings);
+  virtual bool Create(iAws *wmgr, iAwsComponent* parent, iAwsComponentNode* settings);
 
-  virtual bool Setup(iAws *wmgr, awsComponentNode *settings);
+  virtual bool Setup(iAws *wmgr, iAwsComponentNode *settings);
   virtual const char* Type();
 
   static void OnTimer(void* param, iAwsSource* src);

@@ -1,31 +1,36 @@
 #include "cssysdef.h"
 #include "awskcfct.h"
 
-#define KC(x) ((awsKeyContainer *)x)
-
 awsKeyFactory::awsKeyFactory () :
-  base(0),
-  base_in_use(false)
+  base(NULL)
 {
+    SCF_CONSTRUCT_IBASE(NULL);
 }
 
 awsKeyFactory::~awsKeyFactory ()
 {
-  // THIS LEAKS!! Key containers do not yet clean up after themselves!
-  if (base && !base_in_use) delete base;
+  if(base) base->DecRef();
 }
 
 void awsKeyFactory::Initialize (const char* name, const char* component_type)
 {
-  base = new awsComponentNode (name, component_type);
+  awsComponentNode* n = new awsComponentNode (name, component_type);
+  base = SCF_QUERY_INTERFACE(n, iAwsComponentNode);
+  CS_ASSERT(base);
+
+
+  // we have a ref for n and one for base we don't want the one for n though
+  n->DecRef();
 }
 
 void awsKeyFactory::AddToWindowList (iAwsPrefManager *pm)
 {
   if (pm && base)
   {
-    if (strcmp (base->ComponentTypeName ()->GetData (), "Window") == 0)
-      ((awsPrefManager *)pm)->AddWindowDef (base);
+    // following the changes that let us instantiate non-window top level components
+    // this check seems un-needed
+    //if (strcmp (base->ComponentTypeName ()->GetData (), "Window") == 0)
+    ((awsPrefManager *)pm)->AddWindowDef (base);
   }
 }
 
@@ -33,8 +38,7 @@ void awsKeyFactory::AddFactory (iAwsKeyFactory *factory)
 {
   if (base && factory)
   {
-    KC (base)->Add (((awsKeyFactory *)factory)->base);
-    ((awsKeyFactory *)factory)->base_in_use = true;
+    base->Add (((awsKeyFactory *)factory)->base);
   }
 }
 
@@ -42,7 +46,14 @@ void awsKeyFactory::AddIntKey (const char* name, int v)
 {
   if (base)
   {
-    KC (base)->Add (new awsIntKey (name, v));
+    awsIntKey* temp = new awsIntKey(name, v);
+    iAwsIntKey* key = SCF_QUERY_INTERFACE(temp, iAwsIntKey);
+    CS_ASSERT(key);
+
+    base->Add (key);
+
+    temp->DecRef();
+    key->DecRef();
   }
 }
 
@@ -50,7 +61,14 @@ void awsKeyFactory::AddStringKey (const char* name, const char* v)
 {
   if (base)
   {
-    KC (base)->Add (new awsStringKey (name, v));
+    awsStringKey* temp = new awsStringKey(name, v);
+    iAwsStringKey* key = SCF_QUERY_INTERFACE(temp, iAwsStringKey);
+    CS_ASSERT(key);
+
+    base->Add (key);
+
+    temp->DecRef();
+    key->DecRef();
   }
 }
 
@@ -58,7 +76,14 @@ void awsKeyFactory::AddRectKey (const char* name, csRect v)
 {
   if (base)
   {
-    KC (base)->Add (new awsRectKey (name, v));
+    awsRectKey* temp = new awsRectKey(name, v);
+    iAwsRectKey* key = SCF_QUERY_INTERFACE(temp, iAwsRectKey);
+    CS_ASSERT(key);
+
+    base->Add (key);
+
+    temp->DecRef();
+    key->DecRef();
   }
 }
 
@@ -70,7 +95,14 @@ void awsKeyFactory::AddRGBKey (
 {
   if (base)
   {
-    KC (base)->Add (new awsRGBKey (name, r, g, b));
+    awsRGBKey* temp = new awsRGBKey(name, r, g, b);
+    iAwsRGBKey* key = SCF_QUERY_INTERFACE(temp, iAwsRGBKey);
+    CS_ASSERT(key);
+
+    base->Add (key);
+
+    temp->DecRef();
+    key->DecRef();
   }
 }
 
@@ -78,7 +110,14 @@ void awsKeyFactory::AddPointKey (const char* name, csPoint v)
 {
   if (base)
   {
-    KC (base)->Add (new awsPointKey (name, v));
+    awsPointKey* temp = new awsPointKey(name, v);
+    iAwsPointKey* key = SCF_QUERY_INTERFACE(temp, iAwsPointKey);
+    CS_ASSERT(key);
+
+    base->Add (key);
+
+    temp->DecRef();
+    key->DecRef();
   }
 }
 
@@ -90,11 +129,18 @@ void awsKeyFactory::AddConnectionKey (
 {
   if (base)
   {
-    KC (base)->Add (new awsConnectionKey (name, s, t, sig));
+    awsConnectionKey* temp = new awsConnectionKey(name, s, t, sig);
+    iAwsConnectionKey* key = SCF_QUERY_INTERFACE(temp, iAwsConnectionKey);
+    CS_ASSERT(key);
+
+    base->Add (key);
+
+    temp->DecRef();
+    key->DecRef();
   }
 }
 
-awsComponentNode *awsKeyFactory::GetThisNode ()
+iAwsComponentNode *awsKeyFactory::GetThisNode ()
 {
   return base;
 }

@@ -40,7 +40,7 @@ public:
   awsPanel();
   virtual ~awsPanel();
 
-  bool Setup(iAws *_wmgr, awsComponentNode *settings);
+  bool Setup(iAws *_wmgr, iAwsComponentNode *settings);
 
   void OnDraw(csRect clip);
   

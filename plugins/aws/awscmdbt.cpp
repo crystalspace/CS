@@ -37,7 +37,7 @@ const char *awsCmdButton::Type ()
   return "Command Button";
 }
 
-bool awsCmdButton::Setup (iAws *_wmgr, awsComponentNode *settings)
+bool awsCmdButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   int switch_style = is_switch;
   iAwsPrefManager *pm = _wmgr->GetPrefMgr ();
@@ -50,8 +50,11 @@ bool awsCmdButton::Setup (iAws *_wmgr, awsComponentNode *settings)
   if(!pm->GetString(settings, "BitmapOverlay", tn) &&
 	  pm->GetString (settings, "Image", tn))
   {
-    awsStringKey* key = new awsStringKey("BitmapOverlay", tn);
+    awsStringKey* temp = new awsStringKey("BitmapOverlay", tn);
+    iAwsStringKey* key = SCF_QUERY_INTERFACE(temp, iAwsStringKey);
     settings->Add(key);
+    temp->DecRef();
+    key->DecRef();
   }
 
   if (!awsPanel::Setup (_wmgr, settings)) return false;
@@ -226,7 +229,9 @@ void awsCmdButton::OnDraw (csRect /*clip*/)
 	  if(style == fsNormal)
 	  {
 		  if(is_down)
+
 			  showing_style = fsSunken;
+
 		  else
 			  showing_style = fsRaised;
 	  }

@@ -159,7 +159,7 @@ public:
 public:
 
   /// Does some additional setup for windows, including linking into the window hierarchy.
-  virtual bool Setup (iAws *_wmgr, awsComponentNode *settings);
+  virtual bool Setup (iAws *_wmgr, iAwsComponentNode *settings);
 
   /// Gets properties for this window
   bool GetProperty (const char *name, void **parm);

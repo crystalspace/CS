@@ -21,7 +21,7 @@ public:
 
   void OnDraw(csRect clip);
   const char* Type();
-  virtual bool Setup(iAws* manager, awsComponentNode* settings);
+  virtual bool Setup(iAws* manager, iAwsComponentNode* settings);
 };
 
 

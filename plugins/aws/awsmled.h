@@ -178,7 +178,7 @@ class awsMultiLineEdit : public awsComponent
   static const int signalLostFocus;
 
   /// Get's the texture handle and the title, plus style if there is one.
-  virtual bool Setup (iAws *wmgr, awsComponentNode *settings);
+  virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
   /// Gets properties
   bool GetProperty (const char *name, void **parm);

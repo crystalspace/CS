@@ -30,7 +30,7 @@ const char *awsLabel::Type ()
   return "Label";
 }
 
-bool awsLabel::Setup (iAws *_wmgr, awsComponentNode *settings)
+bool awsLabel::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (!awsComponent::Setup (_wmgr, settings)) return false;
 

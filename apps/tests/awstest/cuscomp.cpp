@@ -27,7 +27,7 @@ CustomComponent::CustomComponent()
 CustomComponent::~CustomComponent() {}
 
 
-bool CustomComponent::Setup(iAws *manager, awsComponentNode *settings)
+bool CustomComponent::Setup(iAws *manager, iAwsComponentNode *settings)
 {
   // first thing is to let the base class setup
   // if it returns false then you should too
@@ -62,8 +62,7 @@ void CustomComponent::OnDraw(csRect clip)
 
   iGraphics2D* g2d = WindowManager()->G2D();
 
-  // check the pref manager for other system colors you can get if you get bored with black
-  int black = WindowManager()->GetPrefMgr()->GetColor(AC_BLACK);
+  int black = WindowManager()->GetPrefMgr()->FindColor(0,0,0);
 
   // now we can use whatever 2d graphics functions we like to draw
   // actually the g3d funcs are available too and a ref to g3d can be retrieved from

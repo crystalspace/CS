@@ -44,6 +44,7 @@
 #include "awsMenu.h"
 #include "awsimgvw.h"
 #include "awsmled.h"
+
 #include "aws3dfrm.h"
 
 
@@ -235,9 +236,12 @@ iAwsComponent *awsManager::CreateEmbeddableComponentFrom(const char *name)
 
     // If we have a factory for this component, then create it and set it up.
     if (factory) 
+
 	{
 		factory->DecRef();
+
 		return factory->Create ();
+
 	}
 
 	return NULL;
@@ -889,7 +893,7 @@ iAwsComponent *awsManager::CreateWindowFrom (const char* defname)
     printf ("aws-debug: Searching for window def \"%s\"\n", defname);
 
   // Find the window definition
-  awsComponentNode *cmpnode = GetPrefMgr ()->FindWindowDef (defname);
+  iAwsComponentNode *cmpnode = GetPrefMgr ()->FindWindowDef (defname);
 
   if (DEBUG_MANAGER)
     printf (
@@ -922,18 +926,20 @@ iAwsComponent *awsManager::CreateWindowFrom (const char* defname)
 void awsManager::CreateChildrenFromDef (
   iAws *wmgr,
   iAwsComponent *parent,
-  awsComponentNode *settings)
+  iAwsComponentNode *settings)
 {
   int i;
   for (i = 0; i < settings->Length (); ++i)
   {
-    awsKey *key = settings->GetAt (i);
+    iAwsKey *key = settings->GetAt (i);
 
     if (key == NULL) continue;
 
     if (key->Type () == KEY_COMPONENT)
     {
-      awsComponentNode *comp_node = (awsComponentNode *)key;
+      iAwsComponentNode *comp_node = 
+         SCF_QUERY_INTERFACE(key, iAwsComponentNode);
+      CS_ASSERT(comp_node);
       iAwsComponentFactory *factory = FindComponentFactory (
           comp_node->ComponentTypeName ()->GetData ());
 
@@ -949,24 +955,35 @@ void awsManager::CreateChildrenFromDef (
           // Process all subcomponents of this component.
           CreateChildrenFromDef (wmgr, comp, comp_node);
       }
+    
+      comp_node->DecRef();
+
     }
     else if (key->Type () == KEY_CONNECTIONMAP)
     {
       int j;
-      awsConnectionNode *conmap = (awsConnectionNode *)key;
+      iAwsKeyContainer *conmap = 
+        SCF_QUERY_INTERFACE(key, iAwsKeyContainer);
+      CS_ASSERT(conmap);
       awsSlot *slot = new awsSlot ();
 
       for (j = 0; j < conmap->Length (); ++j)
       {
-        awsConnectionKey *con = (awsConnectionKey *)conmap->GetAt (j);
+        iAwsConnectionKey *con = 
+          SCF_QUERY_INTERFACE(conmap->GetAt (j), iAwsConnectionKey);
+        CS_ASSERT(con);
 
         slot->Connect (parent, con->Signal (), con->Sink (), con->Trigger ());
+        con->DecRef();
       }       // end for count of connections
 
       //  Now that we've processed the connection map, we use a trick and send out
       // a creation signal for the component.  Note that we can't do this until the
       // connection map has been created, or the signal won't go anywhere!
       parent->Broadcast (0xefffffff);
+
+      conmap->DecRef();
+
     }         // end else
   }           // end for count of keys
 
@@ -978,6 +995,7 @@ void awsManager::CreateChildrenFromDef (
 void awsManager::CaptureMouse (iAwsComponent *comp)
 {
   if (DEBUG_MANAGER) printf("aws-debug: Mouse captured\n");
+
 
   mouse_captured = true;
   if (comp == NULL) comp = GetTopComponent ();
@@ -1244,17 +1262,30 @@ void awsManager::RegisterCommonComponents ()
   GetPrefMgr ()->RegisterConstant ("blSouth", 3);
   GetPrefMgr ()->RegisterConstant ("blWest", 4);
 
+
+
   GetPrefMgr ()->RegisterConstant ("fsBump", _3dfsBump);
+
   GetPrefMgr ()->RegisterConstant ("fsSimple", _3dfsSimple);
+
   GetPrefMgr ()->RegisterConstant ("fsRaised", _3dfsRaised);
+
   GetPrefMgr ()->RegisterConstant ("fsSunken", _3dfsSunken);
+
   GetPrefMgr ()->RegisterConstant ("fsFlat", _3dfsFlat);
+
   GetPrefMgr ()->RegisterConstant ("fsNone", _3dfsNone);
+
   GetPrefMgr ()->RegisterConstant ("fsBevel", _3dfsBevel);
+
   GetPrefMgr ()->RegisterConstant ("fsThick", _3dfsThick);
+
   GetPrefMgr ()->RegisterConstant ("fsBitmap", _3dfsBitmap);
+
   GetPrefMgr ()->RegisterConstant ("fsSmallRaised", _3dfsSmallRaised);
+
   GetPrefMgr ()->RegisterConstant ("fsSmallSunken", _3dfsSmallSunken);
+
   
 }
 

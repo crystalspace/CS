@@ -67,7 +67,7 @@ void awsEngineView::OnDraw(csRect )
 
     view->SetRectangle (
         Frame ().xmin,
-        g3d->GetHeight () - Frame ().Height () - Frame ().ymin,
+        g3d->GetHeight () - Frame ().ymax,
         Frame ().Width (),
         Frame ().Height ());
     view->GetCamera ()->SetPerspectiveCenter (

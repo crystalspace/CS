@@ -26,7 +26,7 @@ const char *awsGroupFrame::Type ()
   return "Group Frame";
 }
 
-bool awsGroupFrame::Setup (iAws *_wmgr, awsComponentNode *settings)
+bool awsGroupFrame::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (!awsPanel::Setup (_wmgr, settings)) return false;
 

@@ -65,7 +65,7 @@ class awsNotebookButton : public awsComponent
   awsNotebookButton ();
   virtual ~awsNotebookButton ();
 
-  virtual bool Setup (iAws *_wmgr, awsComponentNode *settings);
+  virtual bool Setup (iAws *_wmgr, iAwsComponentNode *settings);
   virtual bool GetProperty (const char *name, void **parm);
   virtual bool SetProperty (const char *name, void *parm);
 
@@ -102,6 +102,7 @@ public:
   virtual iAwsComponent *Create ();
 };
 
+
 SCF_VERSION (iAwsClientRect, 0, 0, 1);
 struct iAwsClientRect : public iBase
 {
@@ -109,7 +110,7 @@ struct iAwsClientRect : public iBase
    * Return a sub rectangle of the components client rectangle where children can be drawn.
    */
   virtual csRect GetClientRect () = 0;
-};
+}; 
 
 class awsNotebookButtonBar : public awsComponent
 {
@@ -216,7 +217,7 @@ class awsNotebookButtonBar : public awsComponent
   /// Triggered when the component needs to draw
   virtual void OnDraw (csRect clip);
 
-  virtual bool Setup (iAws *_wmgr, awsComponentNode *settings);
+  virtual bool Setup (iAws *_wmgr, iAwsComponentNode *settings);
   virtual const char *Type (){return "Notebook ButtonBar";}
 
   // This will create a button based on the Caption property of the component.
@@ -268,7 +269,7 @@ public:
   virtual ~awsNotebookPage ();
 
 public:
-  virtual bool Setup (iAws *wmgr, awsComponentNode *settings);
+  virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
   /// Gets properties
   bool GetProperty (const char *name, void **parm);
@@ -340,7 +341,7 @@ public:
   static const int fsFlat;
   static const int fsNone;
 
-  virtual bool Setup (iAws *wmgr, awsComponentNode *settings);
+  virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
   /// Gets properties
   bool GetProperty (const char *name, void **parm);

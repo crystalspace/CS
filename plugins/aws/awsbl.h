@@ -58,7 +58,7 @@ public:
 public:
   /// Constructor, clears all components to NULL
   awsBorderLayout(iAwsComponent *owner, 
-      awsComponentNode* settings,
+      iAwsComponentNode* settings,
 		  iAwsPrefManager *pm);
 
   /// Empty destructor
@@ -66,7 +66,7 @@ public:
 
   /** Adds a component to the layout, returning it's actual rect. 
     */
-  virtual csRect AddComponent (iAwsComponent *cmp, awsComponentNode* settings);
+  virtual csRect AddComponent (iAwsComponent *cmp, iAwsComponentNode* settings);
 
   /// Lays out components properly
   virtual void LayoutComponents ();

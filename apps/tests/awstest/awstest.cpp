@@ -406,7 +406,12 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   iAwsWindow *test4 = aws->CreateWindowFrom("Layout Test");
   iAwsWindow *test5 = aws->CreateWindowFrom("Form1");
 
-  if(test3) test3->SetProperty("view", wview);
+  if(test3)
+  {
+    iAwsComponent* engine_view = test3->FindChild("Engine View");
+    if(engine_view)
+      engine_view->SetProperty("view", wview);
+  }
 
   if (test)  test->Show();
   if (test3) test3->Show();
@@ -451,6 +456,7 @@ awsTest::SetupFrame()
 
   // Tell the camera to render into the frame buffer.
   view->Draw ();
+  wview->Draw();
 
   // Start drawing 2D graphics.
   if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;

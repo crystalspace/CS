@@ -397,9 +397,7 @@ window "Engine View"
   component "Engine View" is "Engine View"
 
   {
-
-    Frame: (0,0) - (138, 138)
-
+    Frame: (0,0) - (80, 80)
   }
 
 }

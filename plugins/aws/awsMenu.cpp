@@ -40,7 +40,7 @@ awsMenuEntry::~awsMenuEntry()
   if(sub_menu_image) sub_menu_image->DecRef();
 }
 
-bool awsMenuEntry::Setup (iAws *_wmgr, awsComponentNode *settings)
+bool awsMenuEntry::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (!awsPanel::Setup (_wmgr, settings)) return false;
 
@@ -358,7 +358,7 @@ awsMenuBarEntry::~awsMenuBarEntry()
   if(popup) popup->DecRef();
 }
 
-bool awsMenuBarEntry::Setup (iAws *_wmgr, awsComponentNode *settings)
+bool awsMenuBarEntry::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (!awsCmdButton::Setup (_wmgr, settings)) return false;
 
@@ -480,7 +480,7 @@ awsMenu::~awsMenu()
   }
 }
 
-bool awsMenu::Setup(iAws *wmgr, awsComponentNode *settings)
+bool awsMenu::Setup(iAws *wmgr, iAwsComponentNode *settings)
 {
   sink.RegisterTrigger("Select", &OnSelect);
   sink.RegisterTrigger("Close", &OnClose);
@@ -783,7 +783,7 @@ awsMenuBar::~awsMenuBar()
 {
 }
 
-bool awsMenuBar::Setup(iAws *wmgr, awsComponentNode *settings)
+bool awsMenuBar::Setup(iAws *wmgr, iAwsComponentNode *settings)
 {
   if(!awsMenu::Setup(wmgr, settings)) return false;
   
@@ -818,7 +818,7 @@ bool awsMenuBar::ShouldTrackMouse()
     return false;
 }
 
-bool awsMenuBar::Create(iAws* wmgr, iAwsComponent *parent, awsComponentNode *settings)
+bool awsMenuBar::Create(iAws* wmgr, iAwsComponent *parent, iAwsComponentNode *settings)
 {
   SetID(settings->Name());
   SetParent(parent);
@@ -894,7 +894,7 @@ awsPopupMenu::~awsPopupMenu()
 }
 
 
-bool awsPopupMenu::Create(iAws* wmgr, iAwsComponent *parent, awsComponentNode *settings)
+bool awsPopupMenu::Create(iAws* wmgr, iAwsComponent *parent, iAwsComponentNode *settings)
 {
   SetID(settings->Name());
   SetParent(NULL);
@@ -920,7 +920,7 @@ bool awsPopupMenu::Create(iAws* wmgr, iAwsComponent *parent, awsComponentNode *s
   return true;
 }
 
-bool awsPopupMenu::Setup(iAws *wmgr, awsComponentNode *settings)
+bool awsPopupMenu::Setup(iAws *wmgr, iAwsComponentNode *settings)
 {
   timer = new awsTimer(wmgr->GetObjectRegistry(), this);
   

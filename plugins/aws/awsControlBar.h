@@ -44,7 +44,7 @@ public:
   awsControlBar ();
   virtual ~awsControlBar ();
 
-  virtual bool Setup (iAws *_wmgr, awsComponentNode *settings);
+  virtual bool Setup (iAws *_wmgr, iAwsComponentNode *settings);
   virtual const char *Type ()
   {return "Control Bar";}
 

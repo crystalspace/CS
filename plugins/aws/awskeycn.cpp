@@ -7,7 +7,7 @@
 #include "awsprefs.h"
 #include "awsadler.h"
 
-awsKey* awsKeyContainer::Find (iString *n)
+iAwsKey* awsKeyContainer::Find (iString *n)
 {
   return Find (
       aws_adler32 (
@@ -16,7 +16,7 @@ awsKey* awsKeyContainer::Find (iString *n)
         n->Length ()));
 }
 
-awsKey* awsKeyContainer::Find (const char* n)
+iAwsKey* awsKeyContainer::Find (const char* n)
 {
   return Find (
       aws_adler32 (
@@ -25,7 +25,7 @@ awsKey* awsKeyContainer::Find (const char* n)
 	strlen(n)));
 }
 
-awsKey *awsKeyContainer::Find (unsigned long idname)
+iAwsKey *awsKeyContainer::Find (unsigned long idname)
 {
   if (aws_debug)
     printf (
@@ -36,7 +36,7 @@ awsKey *awsKeyContainer::Find (unsigned long idname)
   int i;
   for (i = 0; i < children.Length (); ++i)
   {
-    awsKey *key = STATIC_CAST (awsKey *, children[i]);
+    iAwsKey *key = STATIC_CAST (iAwsKey *, children[i]);
 
     if (aws_debug)
       printf ("aws-debug: item %d=%lu ? %lu\n", i, key->Name (), idname);
@@ -51,7 +51,7 @@ awsKey *awsKeyContainer::Find (unsigned long idname)
 
 void awsKeyContainer::Remove (iString* name)
 {
-  awsKey* key = Find(name);
+  iAwsKey* key = Find(name);
   
   if (key)
     Remove (key);
@@ -59,36 +59,40 @@ void awsKeyContainer::Remove (iString* name)
 
 void awsKeyContainer::Remove (const char* name)
 {
-  awsKey* key = Find (name);
+  iAwsKey* key = Find (name);
 
   if (key)
     Remove (key);
 }
 
-void awsKeyContainer::Remove (awsKey* key)
+void awsKeyContainer::Remove (iAwsKey* key)
 {
   children.Delete ((csSome) key);
+  key->DecRef();
 }
 
-void awsKeyContainer::Consume (awsKeyContainer *c)
+void awsKeyContainer::Consume (iAwsKeyContainer *c)
 {
   if (aws_debug)
   {
     printf (
       "aws-debug: Consuming %d items (%d items currently).\n",
-      c->children.Length (),
+      c->Length (),
       children.Length ());
   }
 
   int i;
-  for (i = 0; i < c->children.Length (); ++i)
+
+  // c->Length() will change as we go through the loop
+  // so don't try the usual i = 0; i < c->Length(); i++
+  for (i = c->Length()-1; i >= 0; --i)
   {
-    void *p = c->children[i];
-
-    children.Push (p);
+    // everytime we remove the key from c so the next key is always
+    // key in index 0
+    iAwsKey *k = c->GetAt(0);
+    Add(k);
+    c->Remove(k);
   }
-
-  c->children.SetLength (0);
 
   if (aws_debug)
     printf ("aws-debug: Now contains %d items.\n", children.Length ());
@@ -100,7 +104,7 @@ void awsKeyContainer::Consume (awsKeyContainer *c)
 
 // Connection node ///////////////////////////////////////////////////////////////////////////////
 awsConnectionNode::awsConnectionNode () :
-  awsKey(new scfString("Connect"))
+  awsKeyContainer("Connect")
 {
 }
 

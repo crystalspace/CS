@@ -21,8 +21,6 @@
 #include "iaws/awsparm.h"
 #include "iutil/event.h"
 #include "iaws/awsdefs.h"
-#include "aws/awsprefs.h"
-#include "aws/awslayot.h"
 
 /**
  * Class used to create new AWS components.<p>
@@ -87,7 +85,7 @@ public:
     /// until I can find a better solution. Currently you can
     /// not properly embed the menu and popupMenu components like
     /// this
-    virtual bool Create(iAws *m, iAwsComponent *parent, awsComponentNode *settings)
+    virtual bool Create(iAws *m, iAwsComponent *parent, iAwsComponentNode *settings)
     {
       SetID(settings->Name());
       SetParent(parent);
@@ -121,7 +119,7 @@ public:
     }
     
     /// Sets up component
-    virtual bool Setup(iAws *wmgr, awsComponentNode *settings)
+    virtual bool Setup(iAws *wmgr, iAwsComponentNode *settings)
     { return comp->Setup(wmgr, settings); }
     
     /// Event dispatcher, demultiplexes events and sends them off to the proper event handler
@@ -256,6 +254,9 @@ public:
     virtual void LayoutChildren()
     { comp->LayoutChildren (); }
 
+    virtual void AddToLayout(iAwsComponent *cmp, iAwsComponentNode* settings)
+    { comp->AddToLayout(cmp, settings); }
+
 
 public:
     /// Adds a child
@@ -377,11 +378,11 @@ public:
     { return comp->OnGainFocus (); }
 
     /// Gets the layout manager for this component.
-    virtual awsLayoutManager *Layout()
+    virtual iAwsLayoutManager *Layout()
     { return comp->Layout ();}
 
     /// Set the layout manager
-    virtual void SetLayout(awsLayoutManager *layoutMgr)
+    virtual void SetLayout(iAwsLayoutManager *layoutMgr)
     { comp->SetLayout(layoutMgr); }
 
     /// get the components preferred size, used by layout manager
@@ -441,12 +442,12 @@ public:
     { comp->Unlink(); }
 
     /// Links a component into the hierarchy as a sibling above comp
-    virtual void LinkAbove(iAwsComponent* comp)
-    { comp->LinkAbove (comp); }
+    virtual void LinkAbove(iAwsComponent* other)
+    { comp->LinkAbove(other); }
 
     /// Links a component into the hierarchy as a sibling below comp
-    virtual void LinkBelow(iAwsComponent* comp)
-    { comp->LinkBelow(comp); }
+    virtual void LinkBelow(iAwsComponent* other)
+    { comp->LinkBelow(other); }
 
     /// Sets the top child
     virtual void SetTopChild(iAwsComponent* child)

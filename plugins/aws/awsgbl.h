@@ -159,10 +159,10 @@ public:
   /** Constructs a gridbag layout.  Note that columns and rows have a fixed
 	 * percentage size that does not change.
 	 */
-  awsGridBagLayout (iAwsComponent *o, awsComponentNode* settings, iAwsPrefManager *pm);
+  awsGridBagLayout (iAwsComponent *o, iAwsComponentNode* settings, iAwsPrefManager *pm);
 
   /** Adds a component into this GridBagLayout */
-  virtual csRect AddComponent (iAwsComponent *cmp, awsComponentNode* settings);
+  virtual csRect AddComponent (iAwsComponent *cmp, iAwsComponentNode* settings);
 
   /** Lays out components properly */
   virtual void LayoutComponents ();

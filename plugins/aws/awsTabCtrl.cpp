@@ -38,7 +38,7 @@ awsTab::~awsTab ()
 {
 }
 
-bool awsTab::Setup (iAws *_wmgr, awsComponentNode *settings)
+bool awsTab::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (!awsComponent::Setup (_wmgr, settings)) return false;
 
@@ -332,7 +332,7 @@ awsTabCtrl::~awsTabCtrl ()
   if(sink) delete sink;
 }
 
-bool awsTabCtrl::Setup (iAws *_wmgr, awsComponentNode *settings)
+bool awsTabCtrl::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (!awsComponent::Setup (_wmgr, settings)) return false;
 

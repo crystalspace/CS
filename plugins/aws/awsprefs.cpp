@@ -289,7 +289,7 @@ bool awsPrefManager::Load (const char *def_file)
 
 bool awsPrefManager::SelectDefaultSkin (const char* skin_name)
 {
-  awsSkinNode *skin = (awsSkinNode *)skin_defs.GetFirstItem ();
+  iAwsKeyContainer *skin = (iAwsKeyContainer *) skin_defs.GetFirstItem ();
   unsigned long id = NameToId (skin_name);
 
   while (skin)
@@ -305,24 +305,25 @@ bool awsPrefManager::SelectDefaultSkin (const char* skin_name)
       int i;
       for (i = 0; i < def_skin->Length (); ++i)
       {
-        awsKey *k = def_skin->GetAt (i);
+        iAwsKey *k = def_skin->GetAt (i);
 
         if (k->Type () == KEY_STR)
         {
-          awsStringKey *sk = (awsStringKey *) (k);
+          iAwsStringKey *sk = SCF_QUERY_INTERFACE(k, iAwsStringKey);
 
           if (awstxtmgr)
             (void)awstxtmgr->GetTexturebyID (
                 sk->Name (),
                 sk->Value ()->GetData (),
                 true);
+          sk->DecRef();
         }
       }
 
       return true;
     }
 
-    skin = (awsSkinNode *)skin_defs.GetNextItem ();
+    skin = (iAwsKeyContainer *)skin_defs.GetNextItem ();
   }
 
   return false;
@@ -335,13 +336,15 @@ bool awsPrefManager::LookupIntKey (const char *name, int &val)
 
 bool awsPrefManager::LookupIntKey (unsigned long id, int &val)
 {
-  awsKey *k = ((awsKeyContainer *)def_skin)->Find (id);
+  iAwsKey *k = ((iAwsKeyContainer *)def_skin)->Find (id);
 
   if (k)
   {
     if (k->Type () == KEY_INT)
     {
-      val = ((awsIntKey *)k)->Value ();
+      iAwsIntKey* intKey = SCF_QUERY_INTERFACE(k, iAwsIntKey);
+      val = intKey->Value ();
+      intKey->DecRef();
       return true;
     }
   }
@@ -356,13 +359,15 @@ bool awsPrefManager::LookupStringKey (const char *name, iString * &val)
 
 bool awsPrefManager::LookupStringKey (unsigned long id, iString * &val)
 {
-  awsKey *k = ((awsKeyContainer *)def_skin)->Find (id);
+  iAwsKey *k = ((iAwsKeyContainer *)def_skin)->Find (id);
 
   if (k)
   {
     if (k->Type () == KEY_STR)
     {
-      val = ((awsStringKey *)k)->Value ();
+      iAwsStringKey* stringKey = SCF_QUERY_INTERFACE(k, iAwsStringKey);
+      val = stringKey->Value ();
+      stringKey->DecRef();
       return true;
     }
   }
@@ -377,13 +382,15 @@ bool awsPrefManager::LookupRectKey (const char *name, csRect &val)
 
 bool awsPrefManager::LookupRectKey (unsigned long id, csRect &val)
 {
-  awsKey *k = ((awsKeyContainer *)def_skin)->Find (id);
+  iAwsKey *k = ((iAwsKeyContainer *)def_skin)->Find (id);
 
   if (k)
   {
     if (k->Type () == KEY_RECT)
     {
-      val = ((awsRectKey *)k)->Value ();
+      iAwsRectKey* rectKey = SCF_QUERY_INTERFACE(k, iAwsRectKey);
+      val = rectKey->Value ();
+      rectKey->DecRef();
       return true;
     }
   }
@@ -406,14 +413,16 @@ bool awsPrefManager::LookupRGBKey (
   unsigned char &green,
   unsigned char &blue)
 {
-  awsKey *k = ((awsKeyContainer *)def_skin)->Find (id);
+  iAwsKey *k = ((iAwsKeyContainer *)def_skin)->Find (id);
 
   if (k)
   {
     if (k->Type () == KEY_RGB)
     {
-      awsRGBKey::RGB rgb;
-      rgb = ((awsRGBKey *)k)->Value ();
+      iAwsRGBKey::RGB rgb;
+      iAwsRGBKey* rgbKey = SCF_QUERY_INTERFACE(k, iAwsRGBKey);
+      rgb = rgbKey->Value ();
+      rgbKey->DecRef();
 
       red = rgb.red;
       green = rgb.green;
@@ -433,13 +442,15 @@ bool awsPrefManager::LookupPointKey (const char *name, csPoint &val)
 
 bool awsPrefManager::LookupPointKey (unsigned long id, csPoint &val)
 {
-  awsKey *k = ((awsKeyContainer *)def_skin)->Find (id);
+  iAwsKey *k = ((iAwsKeyContainer *)def_skin)->Find (id);
 
   if (k)
   {
     if (k->Type () == KEY_POINT)
     {
-      val = ((awsPointKey *)k)->Value ();
+      iAwsPointKey* pointKey = SCF_QUERY_INTERFACE(k, iAwsPointKey);
+      val = pointKey->Value ();
+      pointKey->DecRef();
       return true;
     }
   }
@@ -447,17 +458,19 @@ bool awsPrefManager::LookupPointKey (unsigned long id, csPoint &val)
   return false;
 }
 
-bool awsPrefManager::GetInt (awsComponentNode *node, const char *name, int &val)
+bool awsPrefManager::GetInt (iAwsComponentNode *node, const char *name, int &val)
 {
   if (!node) return false;
 
-  awsKey *k = ((awsKeyContainer *)node)->Find (NameToId (name));
+  iAwsKey *k = ((iAwsKeyContainer *)node)->Find (NameToId (name));
 
   if (k)
   {
     if (k->Type () == KEY_INT)
     {
-      val = ((awsIntKey *)k)->Value ();
+      iAwsIntKey* ik = SCF_QUERY_INTERFACE(k, iAwsIntKey);
+      val = ik->Value ();
+      ik->DecRef();
       return true;
     }
   }
@@ -465,19 +478,21 @@ bool awsPrefManager::GetInt (awsComponentNode *node, const char *name, int &val)
   return false;
 }
 
-bool awsPrefManager::GetRGB (awsComponentNode *node, const char *name, 
+bool awsPrefManager::GetRGB (iAwsComponentNode *node, const char *name, 
                              unsigned char &red,
                              unsigned char &green,
                              unsigned char &blue)
 {
-  awsKey *k = ((awsKeyContainer *)node)->Find (NameToId (name));
+  iAwsKey *k = ((iAwsKeyContainer *)node)->Find (NameToId (name));
 
   if (k)
   {
     if (k->Type () == KEY_RGB)
     {
-      awsRGBKey::RGB rgb;
-      rgb = ((awsRGBKey *)k)->Value ();
+      iAwsRGBKey::RGB rgb;
+      iAwsRGBKey* rgbKey = SCF_QUERY_INTERFACE(k, iAwsRGBKey);
+      rgb = rgbKey->Value ();
+      rgbKey->DecRef();
 
       red = rgb.red;
       green = rgb.green;
@@ -490,14 +505,14 @@ bool awsPrefManager::GetRGB (awsComponentNode *node, const char *name,
   return false;
 }
 
-bool awsPrefManager::GetRect (awsComponentNode *node, const char *name, csRect &val)
+bool awsPrefManager::GetRect (iAwsComponentNode *node, const char *name, csRect &val)
 {
   if (!node) return false;
 
   if (DEBUG_KEYS)
     printf ("aws-debug: Getting \"%s\" from %p\n", name, node);
 
-  awsKey *k = ((awsKeyContainer *)node)->Find (NameToId (name));
+  iAwsKey *k = ((iAwsKeyContainer *)node)->Find (NameToId (name));
 
   if (DEBUG_KEYS)
     printf ("aws-debug: Node retrieved: %p [%s]\n", node, name);
@@ -506,7 +521,9 @@ bool awsPrefManager::GetRect (awsComponentNode *node, const char *name, csRect &
   {
     if (k->Type () == KEY_RECT)
     {
-      val = ((awsRectKey *)k)->Value ();
+      iAwsRectKey* rectKey = SCF_QUERY_INTERFACE(k, iAwsRectKey);
+      val = rectKey->Value ();
+      rectKey->DecRef();
       return true;
     }
   }
@@ -515,19 +532,21 @@ bool awsPrefManager::GetRect (awsComponentNode *node, const char *name, csRect &
 }
 
 bool awsPrefManager::GetString (
-  awsComponentNode *node,
+  iAwsComponentNode *node,
   const char *name,
   iString * &val)
 {
   if (!node) return false;
 
-  awsKey *k = ((awsKeyContainer *)node)->Find (NameToId (name));
+  iAwsKey *k = ((iAwsKeyContainer *)node)->Find (NameToId (name));
 
   if (k)
   {
     if (k->Type () == KEY_STR)
     {
-      val = ((awsStringKey *)k)->Value ();
+      iAwsStringKey* stringKey = SCF_QUERY_INTERFACE(k, iAwsStringKey);
+      val = stringKey->Value ();
+      stringKey->DecRef();
       return true;
     }
   }
@@ -535,17 +554,17 @@ bool awsPrefManager::GetString (
   return false;
 }
 
-awsComponentNode *awsPrefManager::FindWindowDef (const char *name)
+iAwsComponentNode *awsPrefManager::FindWindowDef (const char *name)
 {
-  awsComponentNode *win = (awsComponentNode *)win_defs.GetFirstItem ();
-  awsComponentNode *firstwin = win;
+  iAwsComponentNode *win = (iAwsComponentNode *)win_defs.GetFirstItem ();
+  iAwsComponentNode *firstwin = win;
   unsigned long id = NameToId (name);
 
   while (win)
   {
     if (win && win->Name () == id) return win;
 
-    win = (awsComponentNode *)win_defs.GetNextItem ();
+    win = (iAwsComponentNode *)win_defs.GetNextItem ();
     if (win == firstwin)
       break;
   }

@@ -6,17 +6,21 @@
 # include "csgeom/csrect.h"
 
 /// Base class for layouts
-class awsLayoutManager
+class awsLayoutManager : public iAwsLayoutManager
 {
 protected:
   iAwsComponent *owner;
   iAwsPrefManager* pm;
 public:
-  awsLayoutManager (iAwsComponent *_owner, awsComponentNode* , iAwsPrefManager* _pm)
+  awsLayoutManager (iAwsComponent *_owner, iAwsComponentNode* , iAwsPrefManager* _pm)
     : owner(_owner), pm(_pm)
-  { }
+  { 
+    SCF_CONSTRUCT_IBASE(NULL);
+  }
   virtual ~awsLayoutManager ()
   { }
+
+  SCF_DECLARE_IBASE;
 
   /**  Sets the owner.  Normally the owner should never change, but in some rare
     * cases (like in the Window class) the owner is set improperly by the setup
@@ -27,7 +31,7 @@ public:
 
   /** Adds a component to the layout, returning it's actual rect. 
     */
-  virtual csRect AddComponent (iAwsComponent *cmp, awsComponentNode* settings) = 0;
+  virtual csRect AddComponent (iAwsComponent *cmp, iAwsComponentNode* settings) = 0;
 
   /// Removes a component from the layout
   virtual void RemoveComponent(iAwsComponent* )

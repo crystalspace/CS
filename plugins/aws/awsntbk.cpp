@@ -43,7 +43,7 @@ const char *awsNotebook::Type ()
   return "Notebook";
 }
 
-bool awsNotebook::Setup (iAws *_wmgr, awsComponentNode *settings)
+bool awsNotebook::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (!awsPanel::Setup (_wmgr, settings)) return false;
 
@@ -211,7 +211,7 @@ awsNotebookPage::~awsNotebookPage ()
   SCF_DEC_REF (caption);
 }
 
-bool awsNotebookPage::Setup (iAws *_wmgr, awsComponentNode *settings)
+bool awsNotebookPage::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (!awsComponent::Setup (_wmgr, settings)) return false;
 
@@ -348,7 +348,7 @@ awsNotebookButton::~awsNotebookButton ()
 {
 }
 
-bool awsNotebookButton::Setup (iAws *_wmgr, awsComponentNode *settings)
+bool awsNotebookButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (!awsComponent::Setup (_wmgr, settings)) return false;
 
@@ -677,7 +677,7 @@ awsNotebookButtonBar::~awsNotebookButtonBar ()
   SCF_DEC_REF (next_slot);
 }
 
-bool awsNotebookButtonBar::Setup (iAws *_wmgr, awsComponentNode *settings)
+bool awsNotebookButtonBar::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (!awsComponent::Setup (_wmgr, settings)) return false;
 

@@ -68,7 +68,7 @@ protected:
   iAwsComponent* above;
 
   /// The layout manager for this component (if one exists)
-  awsLayoutManager *layout;
+  iAwsLayoutManager *layout;
 
   /// The rectangle marking the frame of this component
   csRect frame;
@@ -123,13 +123,13 @@ public:
     * If it returns false then the component was not able to initialize properly and
     * shouldn't be used.
     **/
-  virtual bool Create(iAws* mgr, iAwsComponent* parent, awsComponentNode* settings);
+  virtual bool Create(iAws* mgr, iAwsComponent* parent, iAwsComponentNode* settings);
 
   /**
      *  This is the function that components use to set themselves up.  All components MUST implement this function.
      *  You should also call awsComponent::Setup() so that it can perform some default initialization work.
      */
-  virtual bool Setup (iAws *wmgr, awsComponentNode *settings);
+  virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
   /// Event dispatcher, demultiplexes events and sends them off to the proper event handler
   virtual bool HandleEvent (iEvent &Event);
@@ -233,25 +233,16 @@ public:
   /// Moves this component below all its siblings
   virtual void Lower();
 
-
   /** 
    *  Uses the current layout to update the location/size of all children
    */
   virtual void LayoutChildren ();
 
-
-
   /** 
-
    *  Adds a component to the layout, mostly used for custom components or
-
    * programmatic component creation.
-
    */
-
-  virtual void AddToLayout(iAwsComponent* cmp,awsComponentNode* settings);
-
-
+  virtual void AddToLayout(iAwsComponent* cmp, iAwsComponentNode* settings);
 
   /// Returns the redraw tag
   unsigned int RedrawTag();
@@ -306,13 +297,13 @@ public:
   virtual iAwsComponent *Window();
 
   /// Sets the layout manager for this component.
-  virtual awsLayoutManager *Layout ();
+  virtual iAwsLayoutManager *Layout ();
 
   /// Sets the parent component of this component;
   virtual void SetParent (iAwsComponent *parent);
 
   /// Sets the layout manager for this component.
-  virtual void SetLayout (awsLayoutManager *layout);
+  virtual void SetLayout (iAwsLayoutManager *layout);
 
   /// Gets the preferred size of the component
   virtual csRect getPreferredSize ();

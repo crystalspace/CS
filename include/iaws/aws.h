@@ -24,6 +24,7 @@
 #include "csutil/scf.h"
 #include "csgeom/csrect.h"
 #include "csgeom/cspoint.h"
+#include "csutil/csvector.h"
 #include "iutil/string.h"
 
 struct iAws;
@@ -84,6 +85,126 @@ const int AWSF_AlwaysRedrawWindows=2;
 const int AWSF_RaiseOnMouseOver = 4;
 
 /** @} */
+
+
+
+SCF_VERSION(iAwsKey, 0, 0, 1)
+
+struct iAwsKey : public iBase
+{
+  /// returns the type of key
+  virtual uint8 Type () = 0;
+
+  /// Accessor function gets name of key
+  virtual unsigned long Name () = 0;
+};
+
+SCF_VERSION(iAwsIntKey, 0, 0, 1)
+
+struct iAwsIntKey : public iAwsKey
+{
+  /// Gets the value of this key as an integer
+  virtual int Value () = 0;
+};
+
+SCF_VERSION(iAwsStringKey, 0, 0, 1);
+
+struct iAwsStringKey : public iAwsKey
+{
+  /// Gets the value of this key as an iString
+  virtual iString* Value () = 0;
+};
+
+SCF_VERSION(iAwsRectKey, 0, 0, 1);
+
+struct iAwsRectKey : public iAwsKey
+{
+  /// Gets the value of this key as a rectangle
+  virtual csRect Value () = 0;
+};
+
+SCF_VERSION(iAwsRGBKey, 0, 0, 1);
+
+struct iAwsRGBKey : public iAwsKey
+{
+  struct RGB
+  { 
+    unsigned char red, green, blue;
+  };
+  
+  /// Gets the value of this key as an rgb
+  virtual iAwsRGBKey::RGB &Value() = 0;
+};
+
+SCF_VERSION(iAwsPointKey, 0, 0, 1);
+
+struct iAwsPointKey : public iAwsKey
+{
+  /// Gets the value of this key as a point
+  virtual csPoint Value () = 0;
+};
+
+SCF_VERSION(iAwsConnectionKey, 0, 0, 1);
+
+struct iAwsConnectionKey : public iAwsKey
+{
+  /// Gets the sink for this key
+  virtual iAwsSink *Sink () = 0;
+
+  /// Gets the trigger for this key
+  virtual unsigned long Trigger () = 0;
+
+  /// Gets the signal for this key
+  virtual unsigned long Signal () = 0;
+};
+
+SCF_VERSION(iAwsKeyContainer, 0, 0, 1);
+
+struct iAwsKeyContainer : public iAwsKey
+{
+  /// Looks up a key based on it's name.
+  virtual iAwsKey* Find (iString* name) = 0;
+
+  /// Looks up a key based on it's name.
+  virtual iAwsKey* Find (const char* name) = 0;
+
+  /// Looks up a key based on it's ID.
+  virtual iAwsKey *Find (unsigned long id) = 0;
+
+  virtual csBasicVector &Children () = 0;
+
+  /// Adds an item to the container
+  virtual void Add (iAwsKey *key) = 0;
+
+  /// returns children number i
+  virtual iAwsKey* GetAt (int i) = 0;
+
+  /// returns number of childrens
+  virtual int Length () = 0;
+    
+  /// Removes an item from the container
+  virtual void Remove (iString *name) = 0;
+  /// Removes an item from the container
+  virtual void Remove (const char* name) = 0;
+  /// Removes a specific item from the container
+  virtual void Remove (iAwsKey *key) = 0;
+
+  /// Consumes an entire list by moving all of it's member's to this one, and removing them from it.
+  virtual void Consume (iAwsKeyContainer *c) = 0;
+};
+
+SCF_VERSION(iAwsComponentNode, 0, 0, 1);
+
+struct iAwsComponentNode : public iAwsKeyContainer
+{
+  /// So that we can find out what sort of component type this should be
+  virtual iString *ComponentTypeName () = 0;
+};
+
+
+
+
+
 
 
 /**
@@ -224,7 +345,7 @@ public:
 
 };
 
-SCF_VERSION (iAwsPrefManager, 0, 0, 2);
+SCF_VERSION (iAwsPrefManager, 0, 0, 3);
 
 /// Interface for the preferences manager (window manager needs one.)
 struct iAwsPrefManager : public iBase
@@ -273,19 +394,19 @@ public:
   virtual bool LookupPointKey(unsigned long id, csPoint &point)=0;
 
   /// Get the an integer from a given component node
-  virtual bool GetInt(awsComponentNode *node, const char* name, int &val)=0;
+  virtual bool GetInt(iAwsComponentNode *node, const char* name, int &val)=0;
 
   /// Get the a rect from a given component node
-  virtual bool GetRect(awsComponentNode *node, const char* name, csRect &rect)=0;
+  virtual bool GetRect(iAwsComponentNode *node, const char* name, csRect &rect)=0;
 
   /// Get the value of an integer from a given component node
-  virtual bool GetString(awsComponentNode *node, const char* name, iString *&val)=0;
+  virtual bool GetString(iAwsComponentNode *node, const char* name, iString *&val)=0;
 
   /// Get the a color from a given component node
-  virtual bool GetRGB(awsComponentNode *node, const char* name, unsigned char& r, unsigned char& g, unsigned char& b)=0;
+  virtual bool GetRGB(iAwsComponentNode *node, const char* name, unsigned char& r, unsigned char& g, unsigned char& b)=0;
 
   /// Find window definition and return the component node holding it, Null otherwise
-  virtual awsComponentNode *FindWindowDef(const char* name)=0;
+  virtual iAwsComponentNode *FindWindowDef(const char* name)=0;
 
   /// Sets the value of a color in the global AWS palette.
   virtual void SetColor(int index, int color)=0;
@@ -420,8 +541,29 @@ struct iAwsSlot : public iBase
   virtual void Emit(iAwsSource &source, unsigned long signal)=0;
 };
 
+SCF_VERSION(iAwsLayoutManager, 0, 0, 1);
 
-SCF_VERSION (iAwsComponent, 0, 1, 1);
+struct iAwsLayoutManager
+{
+  /**  Sets the owner.  Normally the owner should never change, but in some rare
+    * cases (like in the Window class) the owner is set improperly by the setup
+    * code and must be fixed by the embedder.  This should ALWAYS be used by widgets
+    * which embed the component and use delegate wrappers (i.e. awsecomponent)
+    */
+  virtual void SetOwner (iAwsComponent *_owner) = 0;
+
+  /** Adds a component to the layout, returning it's actual rect. 
+    */
+  virtual csRect AddComponent (iAwsComponent *cmp, iAwsComponentNode* settings) = 0;
+
+  /// Removes a component from the layout
+  virtual void RemoveComponent(iAwsComponent* ) = 0;
+
+  /// Lays out components properly
+  virtual void LayoutComponents () = 0;
+};
+
+SCF_VERSION (iAwsComponent, 0, 1, 3);
 
 /// Interface that is the base of ALL components.
 struct iAwsComponent : public iAwsSource
@@ -437,10 +579,10 @@ struct iAwsComponent : public iAwsSource
     * If it returns false then the component was not able to initialize properly and
     * shouldn't be used.
     **/
-  virtual bool Create(iAws* mgr, iAwsComponent* parent, awsComponentNode* settings)=0;
+  virtual bool Create(iAws* mgr, iAwsComponent* parent, iAwsComponentNode* settings)=0;
 
   /// Sets up a component.
-  virtual bool Setup(iAws *wmgr, awsComponentNode *settings)=0;
+  virtual bool Setup(iAws *wmgr, iAwsComponentNode *settings)=0;
 
   /// Event dispatcher, demultiplexes events and sends them off to the proper event handler
   virtual bool HandleEvent(iEvent& Event)=0;
@@ -500,13 +642,16 @@ struct iAwsComponent : public iAwsSource
   virtual iAwsComponent *Window()=0;
 
   /// Gets the layout manager for this component.
-  virtual awsLayoutManager *Layout()=0;
+  virtual iAwsLayoutManager *Layout()=0;
 
   /// Sets the parent component of this component.
   virtual void SetParent(iAwsComponent *parent)=0;
 
   /// Sets the layout manager for this component.
-  virtual void SetLayout(awsLayoutManager *layout)=0;
+  virtual void SetLayout(iAwsLayoutManager *layout)=0;
+
+  /// Adds a component to this component's layout
+  virtual void AddToLayout(iAwsComponent *cmp, iAwsComponentNode *settings)=0;
   
   /// Gets the preferred size of the component
   virtual csRect getPreferredSize()=0;
@@ -704,7 +849,7 @@ struct iAwsComponentFactory : public iBase
 };
 
 
-SCF_VERSION (iAwsKeyFactory, 0, 0, 3);
+SCF_VERSION (iAwsKeyFactory, 0, 0, 4);
 
 /// Interface for key factories.
 struct iAwsKeyFactory : public iBase
@@ -728,8 +873,11 @@ struct iAwsKeyFactory : public iBase
    /// Add a connection key
    virtual void AddConnectionKey (const char* name, iAwsSink *s, unsigned long t, unsigned long sig)=0;
    
-   virtual awsComponentNode* GetThisNode () = 0;
+   virtual iAwsComponentNode* GetThisNode () = 0;
 };
+
+
+
 
 /* @} */
 

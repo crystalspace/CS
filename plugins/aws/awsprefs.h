@@ -38,11 +38,18 @@
  registering, and then know how to get their settings from the window
  definition.
 
+
+
  Note that many of these classes use this in the base member initializer list.
+
  While the ISO C++ standard supports this in paragraph 8 of section 12.16.2, 
+
  some compilers do not particularly like it.  It can also be abused by having
+
  some class refer to objects that have not yet been initialized.  Be very careful
+
  in modifying the architecture of keys.
+
 
 ****/
 
@@ -58,23 +65,32 @@ enum {
   KEY_RGB = 6,
   KEY_POINT = 7,
   KEY_CONNECTION = 8,
-  KEY_CONNECTIONMAP = 9
+  KEY_CONNECTIONMAP = 9,
+  KEY_CONTAINER = 10
 };
 
 /// Abstract key interface
-class awsKey
+class awsKey : public iAwsKey
 {
   /// The name of the key
   unsigned long name;
 
   void ComputeKeyID (const char* name, size_t len);
 public:
+  SCF_DECLARE_IBASE;
+
   /// Simple constructor creates new key with name "n" (iString version)
   awsKey (iString *n)
-  { ComputeKeyID (n->GetData (), n->Length()); }
+  { 
+    SCF_CONSTRUCT_IBASE(NULL);
+    ComputeKeyID (n->GetData (), n->Length());
+  }
   /// Simple constructor creates new key with name "n" (const char* version)
   awsKey (const char* n)
-  { ComputeKeyID (n, strlen(n)); }
+  {
+    SCF_CONSTRUCT_IBASE(NULL);
+    ComputeKeyID (n, strlen(n));
+  }
 
   /// Simple destructor does nothing
   virtual ~awsKey ()
@@ -87,12 +103,14 @@ public:
   unsigned long Name () { return name; }
 };
 
-class awsIntKey : public awsKey
+class awsIntKey : public awsKey, public iAwsIntKey
 {
   /// The key's value
   int val;
 
 public:
+
+  SCF_DECLARE_IBASE_EXT(awsKey);
   /// Constructs an integer key with the given name
   awsIntKey (iString *name, int v)
     :  awsKey(name), val(v)
@@ -106,6 +124,9 @@ public:
   virtual ~awsIntKey ()
   { }
 
+  /// Accessor function gets name of key
+  unsigned long Name () { return awsKey::Name(); }
+
   /// So that we know it's an int key
   virtual uint8 Type ()
   { return KEY_INT; }
@@ -115,7 +136,7 @@ public:
   { return val; }
 };
 
-class awsStringKey : public awsKey
+class awsStringKey : public awsKey, public iAwsStringKey
 {
   /// The key's value
   iString *val;
@@ -128,6 +149,9 @@ public:
     : awsKey(name), val(v)
   { }
 #endif
+
+  SCF_DECLARE_IBASE_EXT(awsKey);
+
   /// Constructs a string key with the given name
   awsStringKey (const char* name, const char* v)
     : awsKey(name)
@@ -145,6 +169,9 @@ public:
   virtual ~awsStringKey ()
   { SCF_DEC_REF(val); }
 
+  /// Accessor function gets name of key
+  unsigned long Name () { return awsKey::Name(); }
+
   /// So that we know it's a string key.
   virtual uint8 Type ()
   { return KEY_STR; }
@@ -154,12 +181,14 @@ public:
   { return val; }
 };
 
-class awsRectKey : public awsKey
+class awsRectKey : public awsKey, public iAwsRectKey
 {
   /// The key's value
   csRect val;
   
 public:
+  SCF_DECLARE_IBASE_EXT(awsKey);
+
   /// Constructs an integer key with the given name
   awsRectKey (iString *name, csRect v)
     : awsKey(name), val(v)
@@ -173,6 +202,9 @@ public:
   virtual ~awsRectKey ()
   { }
 
+    /// Accessor function gets name of key
+  unsigned long Name () { return awsKey::Name(); }
+
   /// So that we know this is a rect key
   virtual uint8 Type ()
   { return KEY_RECT; }
@@ -182,19 +214,17 @@ public:
   { return val; }
 };
 
-class awsRGBKey : public awsKey
+class awsRGBKey : public awsKey, public iAwsRGBKey
 {
 public:
-  struct RGB
-  { 
-    unsigned char red, green, blue;
-  };
   
 protected:
   /// The key's value
-  RGB rgb;
+  iAwsRGBKey::RGB rgb;
   
 public:
+  SCF_DECLARE_IBASE_EXT(awsKey);
+
   /// Constructs an integer key with the given name
   awsRGBKey (
     iString *name,
@@ -224,21 +254,26 @@ public:
   virtual ~awsRGBKey ()
   { }
 
+    /// Accessor function gets name of key
+  unsigned long Name () { return awsKey::Name(); }
+
   /// So that we know this is a rect key
   virtual uint8 Type ()
   { return KEY_RGB; }
 
   /// Gets the value of this key as a rectangle
-  awsRGBKey::RGB &Value()
+  iAwsRGBKey::RGB &Value()
   { return rgb; }
 };
 
-class awsPointKey : public awsKey
+class awsPointKey : public awsKey, public iAwsPointKey
 {
   /// The key's value
   csPoint val;
   
 public:
+  SCF_DECLARE_IBASE_EXT(awsKey);
+
   /// Constructs an integer key with the given name
   awsPointKey (iString *name, csPoint v)
     : awsKey(name), val(v)
@@ -252,6 +287,9 @@ public:
   virtual ~awsPointKey ()
   { }
 
+    /// Accessor function gets name of key
+  unsigned long Name () { return awsKey::Name(); }
+
   /// So that we know this is a rect key
   virtual uint8 Type ()
   { return KEY_POINT; }
@@ -261,7 +299,7 @@ public:
   { return val; }
 };
 
-class awsConnectionKey : public awsKey
+class awsConnectionKey : public awsKey, public iAwsConnectionKey
 {
   /// The sink that we want
   iAwsSink *sink;
@@ -272,6 +310,7 @@ class awsConnectionKey : public awsKey
   /// The signal that we want
   unsigned long signal;
 public:
+  SCF_DECLARE_IBASE_EXT(awsKey);
 
   /// Constructs an integer key with the given name
   awsConnectionKey (
@@ -302,6 +341,9 @@ public:
   virtual ~awsConnectionKey ()
   { }
 
+    /// Accessor function gets name of key
+  unsigned long Name () { return awsKey::Name(); }
+
   /// So that we know this is a rect key
   virtual uint8 Type ()
   { return KEY_CONNECTION; }
@@ -320,40 +362,51 @@ public:
 };
 
 //////////////////////////////////  Containers ////////////////////////////////////////////////////////////////////////
-class awsKeyContainer
+class awsKeyContainer : public awsKey, public iAwsKeyContainer
 {
   /// list of children in container.
   csBasicVector children;
 
 public:
-  /// constructor that does nothing
-  awsKeyContainer ()
+  SCF_DECLARE_IBASE_EXT(awsKey);
+
+  /// constructor that assigns a default name
+  awsKeyContainer () : awsKey("Default")
   { }
+
+  /// constructor that assigns name n
+  awsKeyContainer (iString* n) : awsKey(n)
+  { }
+
+  /// constructor that assigns name n
+  awsKeyContainer (const char* n) : awsKey(n)
+  { }
+
   /// destructor that does nothing
   ~awsKeyContainer ()
   { 
-    for (int i=0;i < Length(); i++)
-      delete GetAt(i);
+    for (int i = Length()-1; i >= 0; i--)
+      Remove(GetAt(i));
   }
 
   /// Looks up a key based on it's name.
-  awsKey* Find (iString* name);
+  iAwsKey* Find (iString* name);
 
   /// Looks up a key based on it's name.
-  awsKey* Find (const char* name);
+  iAwsKey* Find (const char* name);
 
   /// Looks up a key based on it's ID.
-  awsKey *Find (unsigned long id);
+  iAwsKey *Find (unsigned long id);
 
   csBasicVector &Children ()
   { return children; }
 
   /// Adds an item to the container
-  void Add (awsKey *key)
-  { children.Push (key); }
+  void Add (iAwsKey *key)
+  { key->IncRef(); children.Push (key); }
   /// returns children number i
-  awsKey* GetAt (int i)
-  { return (awsKey*) children[i]; }
+  iAwsKey* GetAt (int i)
+  { return (iAwsKey*) children[i]; }
 
   /// returns number of childrens
   int Length ()
@@ -364,20 +417,27 @@ public:
   /// Removes an item from the container
   void Remove (const char* name);
   /// Removes a specific item from the container
-  void Remove (awsKey *key);
+  void Remove (iAwsKey *key);
 
   /// Consumes an entire list by moving all of it's member's to this one, and removing them from it.
-  void Consume (awsKeyContainer *c);
+  void Consume (iAwsKeyContainer *c);
+
+  /// Accessor function gets name of key
+  unsigned long Name () { return awsKey::Name(); }
+
+  virtual uint8 Type ()
+  { return KEY_CONTAINER; }
 };
 
-class awsSkinNode : public awsKey, public awsKeyContainer
+class awsSkinNode : public awsKeyContainer
 {
 public:
+
   awsSkinNode (iString *name)
-    : awsKey (name)
+    : awsKeyContainer (name)
   { }
   awsSkinNode (const char* name)
-    : awsKey (name)
+    : awsKeyContainer (name)
   { }
   virtual ~awsSkinNode ()
   { }
@@ -387,19 +447,58 @@ public:
   { return KEY_SKIN; }
 };
 
-class awsComponentNode : public awsKey, public awsKeyContainer
+class awsComponentNode : public awsKeyContainer, public iAwsComponentNode
 {
   /// The type of component, like "Radio Button", "Check Box", etc.
   iString *comp_type;
 public:
+  SCF_DECLARE_IBASE_EXT(awsKeyContainer);
+
   awsComponentNode (iString *name, iString *component_type)
-      : awsKey(name), comp_type(component_type)
+      : awsKeyContainer(name), comp_type(component_type)
   { }
   awsComponentNode (const char* name, const char* component_type)
-      : awsKey(name)
+      : awsKeyContainer(name)
   { comp_type = new scfString (component_type); }
   virtual ~awsComponentNode ()
-  { }
+  { comp_type->DecRef(); }
+
+    /// Looks up a key based on it's name.
+  iAwsKey* Find (iString* name) { return awsKeyContainer::Find(name); }
+
+  /// Looks up a key based on it's name.
+  iAwsKey* Find (const char* name) { return awsKeyContainer::Find(name); }
+
+  /// Looks up a key based on it's ID.
+  iAwsKey *Find (unsigned long id) { return awsKeyContainer::Find(id); }
+
+  csBasicVector &Children ()
+  { return awsKeyContainer::Children(); }
+
+    /// Adds an item to the container
+  void Add (iAwsKey *key)
+  { awsKeyContainer::Add(key); }
+
+    /// returns children number i
+  iAwsKey* GetAt (int i)
+  { return awsKeyContainer::GetAt(i); }
+
+  /// returns number of childrens
+  int Length ()
+  { return awsKeyContainer::Length(); }
+    
+  /// Removes an item from the container
+  void Remove (iString *name) { awsKeyContainer::Remove(name); }
+  /// Removes an item from the container
+  void Remove (const char* name) { awsKeyContainer::Remove(name); }
+  /// Removes a specific item from the container
+  void Remove (iAwsKey *key) { awsKeyContainer::Remove(key); }
+
+  /// Consumes an entire list by moving all of it's member's to this one, and removing them from it.
+  void Consume (iAwsKeyContainer *c) { awsKeyContainer::Consume(c); }
+
+  /// Accessor function gets name of key
+  unsigned long Name () { return awsKey::Name(); }
 
   /// So that we know this is a component node
   virtual uint8 Type ()
@@ -410,7 +509,7 @@ public:
   { return comp_type; }
 };
 
-class awsConnectionNode : public awsKey, public awsKeyContainer
+class awsConnectionNode : public awsKeyContainer
 {
 public:
   awsConnectionNode ();
@@ -460,7 +559,7 @@ class awsPrefManager : public iAwsPrefManager
   unsigned int n_skin_defs;
 
   /// currently selected skin
-  awsSkinNode *def_skin;
+  iAwsKeyContainer *def_skin;
 
   /// color index
   int sys_colors[AC_COLOR_COUNT];
@@ -547,33 +646,36 @@ public:
   virtual bool LookupPointKey (unsigned long id, csPoint &point);
 
   /// Get the value of an integer from a given component node
-  virtual bool GetInt (awsComponentNode *node, const char *name, int &val);
+  virtual bool GetInt (iAwsComponentNode *node, const char *name, int &val);
 
   /// Get the a rect from a given component node
-  virtual bool GetRect (awsComponentNode *node, const char *name, csRect &rect);
+  virtual bool GetRect (iAwsComponentNode *node, const char *name, csRect &rect);
 
   /// Get the value of an integer from a given component node
-  virtual bool GetString (awsComponentNode *node, const char *name, iString * &val);
+  virtual bool GetString (iAwsComponentNode *node, const char *name, iString * &val);
 
   /// Get the a color from a given component node
-  virtual bool GetRGB(awsComponentNode *node, const char *name, unsigned char& r, unsigned char& g, unsigned char& b);
+  virtual bool GetRGB(iAwsComponentNode *node, const char *name, unsigned char& r, unsigned char& g, unsigned char& b);
 
   /// Find window definition and return the component node holding it, Null otherwise
-  virtual awsComponentNode *FindWindowDef (const char *name);
+  virtual iAwsComponentNode *FindWindowDef (const char *name);
 public:
 
   /// Called by internal code to add a parsed out tree of window components.
-  void AddWindowDef (awsComponentNode *win)
+  void AddWindowDef (iAwsComponentNode *win)
   {
     if (!win) return ;
+    win->IncRef();
     win_defs.AddItem (win);
     n_win_defs++;
   }
 
   /// Called by internal code to add a parsed out tree of skin defintions.
-  void AddSkinDef (awsSkinNode *skin)
+  void AddSkinDef (iAwsKeyContainer *skin)
   {
     if (!skin) return ;
+    if( skin->Type() != KEY_SKIN) return;
+    skin->IncRef();
     skin_defs.AddItem (skin);
     n_skin_defs++;
   }

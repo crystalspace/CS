@@ -102,6 +102,7 @@ int main (int argc, char* argv[])
   // Initialize the random number generator
   srand (time (NULL));
 
+
   iObjectRegistry* object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg)
     return -1;

@@ -136,7 +136,7 @@ awsGridBagLayout::GridBagLayoutInfo *
 
   return i;
 }
-awsGridBagLayout::awsGridBagLayout (iAwsComponent *o, awsComponentNode* settings, iAwsPrefManager* pm ) :
+awsGridBagLayout::awsGridBagLayout (iAwsComponent *o, iAwsComponentNode* settings, iAwsPrefManager* pm ) :
   awsLayoutManager(o, settings, pm),
   layoutInfo(NULL),
   columnWidths(NULL),
@@ -157,7 +157,7 @@ void awsGridBagLayout::LayoutComponents ()
 
 csRect awsGridBagLayout::AddComponent (
   iAwsComponent *cmp,
-  awsComponentNode *settings)
+  iAwsComponentNode *settings)
 {
   awsGridBagConstraints c;
 

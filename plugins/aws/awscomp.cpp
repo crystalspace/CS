@@ -121,7 +121,7 @@ iAwsComponent *awsComponent::Parent ()
   return parent;
 }
 
-awsLayoutManager *awsComponent::Layout ()
+iAwsLayoutManager *awsComponent::Layout ()
 {
   return layout;
 }
@@ -131,7 +131,7 @@ void awsComponent::SetParent (iAwsComponent *_parent)
   parent = _parent;
 }
 
-void awsComponent::SetLayout (awsLayoutManager *l)
+void awsComponent::SetLayout (iAwsLayoutManager *l)
 {
   layout = l;
 }
@@ -141,7 +141,8 @@ iAwsComponent *awsComponent::GetComponent ()
   return this;
 }
 
-bool awsComponent::Create(iAws* wmgr, iAwsComponent* parent, awsComponentNode* settings)
+bool awsComponent::Create(iAws* wmgr, iAwsComponent* parent, 
+                          iAwsComponentNode* settings)
 {
   SetID(settings->Name());
   SetParent(parent);
@@ -178,7 +179,7 @@ bool awsComponent::Create(iAws* wmgr, iAwsComponent* parent, awsComponentNode* s
  *  This function is normally called automatically by Create.  You may call it manually if you wish, but
  * there's little reason to do so.
  **************************************************************************************************************/
-bool awsComponent::Setup (iAws *_wmgr, awsComponentNode *settings)
+bool awsComponent::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (wmgr) return false;
 
@@ -212,9 +213,17 @@ bool awsComponent::Setup (iAws *_wmgr, awsComponentNode *settings)
     if (ln)
     {
       if (strcmp ("GridBag", ln->GetData ()) == 0)
-        layout = new awsGridBagLayout (this, settings, pm);
+      {
+        awsGridBagLayout* temp = new awsGridBagLayout (this, settings, pm);
+        layout = SCF_QUERY_INTERFACE(temp, iAwsLayoutManager);
+        temp->DecRef();
+      }
       else if (strcmp ("Border", ln->GetData ()) == 0)
-        layout = new awsBorderLayout (this, settings, pm);
+      {
+        awsBorderLayout* temp = new awsBorderLayout (this, settings, pm);
+        layout = SCF_QUERY_INTERFACE(temp, iAwsLayoutManager);
+        temp->DecRef();
+      }
     }
   }
 
@@ -584,14 +593,10 @@ void awsComponent::LayoutChildren ()
 
 
 
-void awsComponent::AddToLayout(iAwsComponent* cmp,awsComponentNode* settings)
-
+void awsComponent::AddToLayout(iAwsComponent* cmp, iAwsComponentNode* settings)
 {
-
    if (Layout())
-
      Layout()->AddComponent(cmp, settings);
-
 }
 
 

@@ -254,7 +254,7 @@ protected:
   void CreateChildrenFromDef (
         iAws *wmgr,
         iAwsComponent *parent,
-        awsComponentNode *settings);
+        iAwsComponentNode *settings);
 
   /// Checks the updatestore_dirty flag and refreshes the store accordingly.
   void UpdateStore ();

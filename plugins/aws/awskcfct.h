@@ -24,10 +24,8 @@ class awsKeyFactory : public iAwsKeyFactory
    *  of the hierarchy.  If it's not a window, then it must be added to a window eventually to be
    *  useful.
    */
-  awsComponentNode *base;
+  iAwsComponentNode *base;
 
-  /// This is true if we canNOT delete the base when we go.
-  bool base_in_use;
 public:
   SCF_DECLARE_IBASE;
 
@@ -70,7 +68,7 @@ public:
                 unsigned long sig);
 
   /// Get the base node
-  awsComponentNode *GetThisNode ();
+  iAwsComponentNode *GetThisNode ();
 };
 
 #endif

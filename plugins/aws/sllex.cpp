@@ -40,6 +40,7 @@
 #ifdef __cplusplus
 
 #include <stdlib.h>
+/*#include <unistd.h>*/
 
 /* Use prototypes in function declarations. */
 #define YY_USE_PROTOS
@@ -561,20 +562,9 @@ YY_MALLOC_DECL
 			YY_FATAL_ERROR( "input in flex scanner failed" ); \
 		result = n; \
 		} \
-	else \
-		{ \
-		errno=0; \
-		while ( (result = fread(buf, 1, max_size, yyin))==0 && ferror(yyin)) \
-			{ \
-			if( errno != EINTR) \
-				{ \
-				YY_FATAL_ERROR( "input in flex scanner failed" ); \
-				break; \
-				} \
-			errno=0; \
-			clearerr(yyin); \
-			} \
-		}
+	else if ( ((result = fread( buf, 1, max_size, yyin )) == 0) \
+		  && ferror( yyin ) ) \
+		YY_FATAL_ERROR( "input in flex scanner failed" );
 #endif
 
 /* No semi-colon after return; correct usage is to write "yyterminate();" -
@@ -1329,7 +1319,14 @@ YY_BUFFER_STATE b;
 
 #ifndef YY_ALWAYS_INTERACTIVE
 #ifndef YY_NEVER_INTERACTIVE
+#ifdef __cplusplus
+extern "C"
+{
 extern int isatty YY_PROTO(( int ));
+}
+#else
+extern int isatty YY_PROTO(( int ));
+#endif
 #endif
 #endif
 

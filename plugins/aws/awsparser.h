@@ -29,10 +29,9 @@ public:
   /** Report parse errors */
   void ReportError (const char* msg, ...);
 
-  void AddGlobalWindowDef (awsComponentNode* win)
-  { prefmgr->AddWindowDef(win); }
-  void AddGlobalSkinDef (awsSkinNode* skin)
-  { prefmgr->AddSkinDef(skin); }
+  void AddGlobalWindowDef (awsComponentNode* win);
+
+  void AddGlobalSkinDef (awsSkinNode* skin);
 
 protected:
   iFile* input;

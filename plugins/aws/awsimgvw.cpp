@@ -51,7 +51,7 @@ const char *awsImageView::Type ()
   return "Image View";
 }
 
-bool awsImageView::Setup (iAws *_wmgr, awsComponentNode *settings)
+bool awsImageView::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (!awsComponent::Setup (_wmgr, settings)) return false;
 

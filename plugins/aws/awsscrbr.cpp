@@ -86,7 +86,7 @@ const char *awsScrollBar::Type ()
   return "Scroll Bar";
 }
 
-bool awsScrollBar::Setup (iAws *_wmgr, awsComponentNode *settings)
+bool awsScrollBar::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 {
   if (!awsPanel::Setup (_wmgr, settings)) return false;
 
@@ -692,7 +692,7 @@ awsSliderButton::~awsSliderButton ()
   SCF_DEC_REF (timer);
 }
 
-bool awsSliderButton::Setup (iAws *wmgr, awsComponentNode *settings)
+bool awsSliderButton::Setup (iAws *wmgr, iAwsComponentNode *settings)
 {
   if (!awsCmdButton::Setup (wmgr, settings)) return false;
 

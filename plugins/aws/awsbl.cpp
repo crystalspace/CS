@@ -3,7 +3,7 @@
 #include "iaws/aws.h"
 #include "iaws/awsdefs.h"
 
-awsBorderLayout::awsBorderLayout (iAwsComponent *owner, awsComponentNode* settings,
+awsBorderLayout::awsBorderLayout (iAwsComponent *owner, iAwsComponentNode* settings,
 				  iAwsPrefManager *pm):
 
 	    awsLayoutManager(owner, settings, pm), 
@@ -18,7 +18,7 @@ awsBorderLayout::awsBorderLayout (iAwsComponent *owner, awsComponentNode* settin
 };
 
 
-csRect awsBorderLayout::AddComponent (iAwsComponent *cmp, awsComponentNode* settings)
+csRect awsBorderLayout::AddComponent (iAwsComponent *cmp, iAwsComponentNode* settings)
 {
   int d;
 

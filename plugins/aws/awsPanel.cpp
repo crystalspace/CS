@@ -40,7 +40,7 @@ awsPanel::~awsPanel()
 {
 }
 
-bool awsPanel::Setup(iAws *_wmgr, awsComponentNode *settings)
+bool awsPanel::Setup(iAws *_wmgr, iAwsComponentNode *settings)
 {
 	if(!awsComponent::Setup(_wmgr, settings)) return false;
 

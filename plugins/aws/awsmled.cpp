@@ -251,7 +251,7 @@ void awsMultiLineEdit::InsertClipboard (int row, int col)
   }
 }
 
-bool awsMultiLineEdit::Setup (iAws *wmgr, awsComponentNode *settings)
+bool awsMultiLineEdit::Setup (iAws *wmgr, iAwsComponentNode *settings)
 {
   if (!awsComponent::Setup (wmgr, settings)) return false;
 
