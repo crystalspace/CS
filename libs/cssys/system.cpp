@@ -381,11 +381,14 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
   Config->SetDynamicDomainPriority(ConfigPriorityApplication);
   VFS = LOAD_PLUGIN (this, "crystalspace.kernel.vfs", CS_FUNCID_VFS, iVFS);
 
-  // Initialize configuration file
+  // Initialize application configuration file
   if (iConfigName)
     if (!DynamicConfig->Load (iConfigName, VFS))
       Printf (MSG_WARNING,
 	"WARNING: Failed to load configuration file `%s'\n", iConfigName);
+  
+  // Add system driver configuration
+  AddConfig(ConfigPriorityPlugIn, "/config/system.cfg");
 
   // Collect all options from command line
   CollectOptions (argc, argv);

@@ -94,6 +94,7 @@ bool csSimpleConsole::Initialize (iSystem *iSys)
   FrameWidth = G2D->GetWidth ();
   FrameHeight = G2D->GetHeight ();
 
+  System->AddConfig(iSystem::ConfigPriorityPlugIn, "/config/simpcon.cfg");
   iConfigFileNew *Config = System->GetConfig ();
   console_transparent_bg = Config->GetBool ("SimpleConsole.TranspBG", false);
   console_transparent_bg = Config->GetBool ("SimpleConsole.TranspBG", 1);
