@@ -179,7 +179,7 @@ my $COPYRIGHT = "Copyright (C) 2000-2003 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 $ENV{'CVS_RSH'} = 'ssh';
 
 # Ensure that Doxygen and Swig can be found.
-$ENV{'PATH'} = '/home/groups/c/cr/crystal/bin'.$ENV{'PATH'}.':/usr/local/bin';
+$ENV{'PATH'} = '/home/groups/c/cr/crystal/bin:'.$ENV{'PATH'}.':/usr/local/bin';
 
 # The Visual-C++ DSW and DSP generation process is a bit too noisy.
 $ENV{'MSVC_QUIET'} = 'yes';
@@ -192,7 +192,7 @@ my $PUBLIC_DOC_DIR = '/home/groups/c/cr/crystal/htdocs/docs';
 my $BROWSEABLE_DIR = "$PUBLIC_DOC_DIR/online";
 my $PACKAGE_DIR = "$PUBLIC_DOC_DIR/download";
 my $OWNER_GROUP = 'crystal';
-my $TEMPDIR = '/home/groups/c/cr/crystal';
+my $TEMPDIR = '/tmp';
 my @BINARY = ('(?i)\.(dsw|dsp)$');
 
 my @TARGETS =

@@ -44,6 +44,17 @@ The history order is reversed so that new features are at the top.
 	  These .txt files are created on Windows when each application runs.
 	- Norman Kraemer added $@ to call of autoconf in script bin/autogen.sh
 	  to transfer optional commandline parameters to autoconf
+	- Eric Sunshine made the following changes:
+	    - Changed jobber.pl and snapshot.py to once again use /tmp as the
+	      working directory rather than /home/groups/c/cr/crystal.  Use of
+	      the /tmp directory is now possible since SourceForge lifted the
+	      5MB quota restriction which used to plague /tmp.  This should
+	      make these scripts run slightly faster since /tmp is a local
+	      directory, unlike /home/groups/c/cr/crystal which is NFS-mounted.
+	    - Fixed a bug in jobber.pl introduced on 2-May-2003 in which PATH
+	      was gorked, which caused most commands invoked by jobber.pl to
+	      fail when executed from cron (though not when run from an
+	      interactive shell session).
 3-May-2003
 	- Matze changed -Wno-unused-function and -Wno-unused-label flags to
 	  -Wno-unused in aws Jamfile. Seems gcc2.9x doesn't like the first 2

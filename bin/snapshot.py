@@ -115,7 +115,7 @@ snapdir = "/home/groups/c/cr/crystal/htdocs/cvs-snapshots"
 keepsnapshots = 2
 keepdiffs = 14
 keeplogs = 14
-workdir = "/home/groups/c/cr/crystal"
+workdir = "/tmp"
 warnlevel = 0
 
 archivers = (
