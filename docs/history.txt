@@ -77,6 +77,7 @@ The history order has been reversed so that new features are at the top.
 	  increased the likelihood that humans will be able to parse these
 	  function protyptes as well.
 	- Eric Sunshine added missing CSGFX dependency to blocks.mak.
+	- Eric Sunshine added missing CSGFX dependency to cctest.mak.
 16-Apr-2001
 	- Added iEngine::CreateSectorWallsMesh().
 	- Fixed simplep (plugin version of simple) so that it works again.
