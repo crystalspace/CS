@@ -1049,11 +1049,20 @@ AS_IF([test "$no_x" != yes],
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_GL_PREPARE],
     [AC_REQUIRE([AC_PATH_X])
-    AC_REQUIRE([AC_PATH_XTRA])])
+    AC_REQUIRE([AC_PATH_XTRA])
+    AC_CHECK_HEADERS([windows.h])
+    AC_CHECK_TYPE([int32], [AC_DEFINE([HAVE_TYPE_INT32])], [])])
 
 # CS_GL_INCLUDE(CPP-MACRO,FALLBACK,HEADER)
 AC_DEFUN([CS_GL_INCLUDE],
-    [@%:@ifndef CS_HEADER_GLOBAL
+    [AC_REQUIRE([CS_CHECK_GL_PREPARE])
+    @%:@if HAVE_WINDOWS_H
+    @%:@if !HAVE_TYPE_INT32
+    typedef long int32;
+    @%:@endif
+    @%:@include <windows.h>
+    @%:@endif
+    @%:@ifndef CS_HEADER_GLOBAL
     @%:@define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
     @%:@define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
     @%:@endif
