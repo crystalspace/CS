@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+25-Oct-2001
+	- Jorge Acereda fixed coredumps when passing options to the 
+	  software renderer.
 24-Oct-2001
 	- Bumped up development version of CS to 0.91.
 	- Added iSectorIterator interface to iterate over sectors.
