@@ -10,7 +10,7 @@ include libs/cs2d/openglcommon/glcommon2d.mak
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRVHELP += $(NEWLINE)echo $"  make glbe2d        Make the $(DESCRIPTION.glbe2d)$"
+DRVHELP += $(NEWLINE)echo $"  make glbe2d       Make the $(DESCRIPTION.glbe2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
