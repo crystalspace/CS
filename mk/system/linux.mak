@@ -21,7 +21,7 @@ DRIVERS+=cs2d/svgalib
 DRIVERS+=cs3d/opengl cs2d/openglx
 
 # uncomment the following to build the 3D line driver
-DRIVERS+=cs3d/line cs2d/linex
+#DRIVERS+=cs3d/line cs2d/linex
 
 # uncomment some of the following if you have a special MESA version that uses some 
 # of the following hardware/software renderers

@@ -17,7 +17,7 @@ DRIVERS+=cssndrdr/software
 DRIVERS+=cs3d/opengl cs2d/openglx
 
 # uncomment the following to build the 3D line driver
-DRIVERS+=cs3d/line cs2d/linex
+#DRIVERS+=cs3d/line cs2d/linex
 
 # uncomment the following for socket network support
 #DRIVERS+=csnetdrv/sockets
