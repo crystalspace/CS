@@ -7,6 +7,7 @@
 #include "csgeom/poly2d.h"
 #include "csgeom/vector3.h"
 #include "csutil/garray.h"
+#include "csutil/util.h"
 #include "iengine/camera.h"
 #include "iengine/engine.h"
 #include "ivideo/graph3d.h"
@@ -33,6 +34,7 @@ CS_IMPLEMENT_PLUGIN
 nTerrainInfo::nTerrainInfo (iObjectRegistry *obj_reg)
 {
   mesh = new G3DTriangleMesh;
+  mesh->vertex_fog = NULL;
   mG3D = CS_QUERY_REGISTRY (obj_reg, iGraphics3D);
   if (mG3D) {
   // @@@ priority should be a parameter.
@@ -52,6 +54,8 @@ nTerrainInfo::nTerrainInfo (iObjectRegistry *obj_reg)
 
 nTerrainInfo::~nTerrainInfo ()
 {
+  if (mesh->vertex_fog)
+    delete[] mesh->vertex_fog;
   delete mesh;
   if (triangle_count) { delete [] triangles; }
   if (vertex_count) {
@@ -480,6 +484,9 @@ csBigTerrainObject::csBigTerrainObject(iObjectRegistry* _obj_reg, iMeshObjectFac
 csBigTerrainObject::~csBigTerrainObject()
 {
   if (terrain) delete terrain;
+  if (info->light_list) {
+    delete [] info->light_list;
+  }
   if (info)    delete info;
 }
 
@@ -527,7 +534,7 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
   if (image->GetWidth () != image->GetHeight ()) {
     image->Rescale (image->GetWidth (), image->GetWidth ());
   }
-  if (image->GetWidth () != ((1 << (ilogb ((unsigned int)image->GetWidth()))) + 1)) {
+  if (image->GetWidth () != ((1 << (csLog2 (image->GetWidth()))) + 1)) {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
 	    "crystalspace.mesh.object.terrbig",
 		"Unable to process image, must square and width 2^n+1");
