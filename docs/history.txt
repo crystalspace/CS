@@ -24,6 +24,9 @@ chronological order.
 	  should be no leak on multiple prepare calls.
 	- Jorrit added a new bugplug 'unprepare' command to unprepare all
 	  thing meshes. Assigned to alt-u.
+	- Eric Sunshine completely overhauled the Texinfo formatting in the new
+	  sprcal3d.txi so that it formats properly on the printed page, and
+	  rewrote much of the discussion.
 12-Feb-2004
 	- Jorrit did several documentation enhancements:
 	    - Added a link to the new level building section in the

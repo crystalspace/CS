@@ -3,7 +3,7 @@
 @subsection SpriteCal3D Mesh Object
 @cindex MeshObject
 @cindex 3D Sprite
-@cindex cal3d
+@cindex Cal3D
 @cindex @code{iMeshObject}
 @cindex @code{iMeshObjectFactory}
 @cindex @code{iMeshObjectType}
@@ -14,65 +14,100 @@ Cal3D library.
 
 @uref{http://cal3d.sourceforge.net/}
 
-@@@@@@ WRITE ME!
+@@@@@@ WRITE ME: Please cover more topics.
 
 @subsubheading Morph Animations
 
-Adding them to a cal3d file:
+You can add morph target meshes to each mesh.  Remember that morph target
+meshes need to have the same number of vertices and they need to be in the same
+order.  (Do not use the progressive mesh export option!).
 
-@table @code
-@item <mesh file=@dots{} name=@dots{} material=@dots{}> <morphtarget file=@dots{} name=@dots{}/> <morphtarget @dots{}/> @dots{} </mesh>
-You can add morph target meshes to each mesh. Remember that morph 
-target meshes need to have the same amount of vertices and they 
-need to be in the same order (Do not use the progressive mesh export option!).
-@item <morphanimation name=@dots{}> <morphtarget mesh='meshname' morph='morphname'/> <morphtarget @dots{}/> @dots{}</morphanimation>
-Each of the morph target meshes need to be assigned to a morphanimnation.
-Do not add a morphtargetmesh to more than 1 morphanimation, this could result into problems.
-@end table
+@example
+<mesh file="@dots{}" name="@dots{}" material="@dots{}">
+  <morphtarget file="@dots{}" name="@dots{}"/>
+  <morphtarget @dots{}/>
+  @dots{}
+</mesh>
+@end example
 
-You can test a morphanimation if you load the cal3d file in viewmesh.
+Each of the morph target meshes need to be assigned to a
+@samp{morphanimnation}.  Do not add a @samp{morphtargetmesh} to more than one
+@samp{morphanimation}, since the library is not designed for this, and it would
+cause problems.
 
-Using morphanimations in code:
+@example
+<morphanimation name="@dots{}">
+  <morphtarget mesh="meshname" morph="morphname"/>
+  <morphtarget @dots{}/>
+  @dots{}
+</morphanimation>
+@end example
 
-@table @code
-@item int morphanimationid = cal3dfactorystate->FindMorphAnimationName(morphanimationname);
-cal3dfactorystate is the cal3d factory state object.
-Finds the morphanimationid with the givven name.
-@item cal3dstate->BlendMorphTarget(morphanimationid,1.0f,10.0f);
-cal3dstate is the cal3d state object.
-Fully (1.0f) blends the morph animation,
-over a period of (10.0f) ten seconds.
-@item cal3dstate->ClearMorphTarget(i,10.0f);
-And this completely clears a marphanimation,
-over a period of (10.0f) ten seconds.
-@end table
+You can test a morphanimation if you load the Cal3D file in the @file{viewmesh}
+example program.
 
+You can use morph animations programmatically as follows.
+
+@noindent
+In this example, @samp{cal3dfactorystate} is the Cal3D factory state object.
+Using the state object, find the @samp{morphanimationid} with the givven name.
+
+@example
+int morphanimationid =
+  cal3dfactorystate->FindMorphAnimationName(morphanimationname);
+@end example
+
+@noindent
+In this example, cal3dstate is the Cal3D state object.  We instruct it to fully
+blend (1.0f) the morph animation, over a period of (10.0f) ten seconds.
+
+@example
+cal3dstate->BlendMorphTarget(morphanimationid, 1.0f, 10.0f);
+@end example
+
+@noindent
+This example completely clears a morph animation, over a period of ten seconds
+(10.0f).
+
+@example
+cal3dstate->ClearMorphTarget(morphanimationid, 10.0f);
+@end example
 
 @subsubheading Sockets
 
-Socket enable you to 'attach' any mesh object to a triangle.
-The 'attached' meshobject then follows the triangle.
+Sockets enable you to @dfn{attach} any mesh object to a triangle.  The attached
+mesh object then follows the triangle.  Adding a socket to a Cal3D file
+(following the mesh tags) can be done as shown here.  @samp{i}, @samp{j}, and
+@samp{k} should be numbers.  They are all indices.  The loading order of meshes
+is maintained, so you can deduce which mesh you are using.
 
-Adding them to a cal3d file (after the mesh tags...):
-@table @code
-@item <socket name=@dots{} mesh=i submesh=j triangle=k/>
-i,j and k should be numbers. (They are all indices. 
-The loading order of meshes is maintained, 
-so you can deduce which mesh you are using.)
-@end table
+@example
+<socket name="@dots{}" mesh="i" submesh="j" triangle="k"/>
+@end example
 
-You can test a socket if you load the cal3d file in viewmesh.
+You can test a socket if you load the Cal3D file in the @file{viewmesh} example
+program.
 
-Using sockets in code:
-@table @code
-@item iSpriteCal3DSocket* socket = cal3dstate->FindSocket(name);
-cal3dstate is the cal3d state object.
-Finds a socket with a given name.
-@item sprite->GetChildren()->Add( meshwrap );
-sprite is the MeshWrapper of the cal3d sprite.
-meshwrap is the meshwrapper of the mesh object you want to add.
-This adds the meshwrap as a hierarchical child of sprite.
-@item socket->SetMeshWrapper( meshwrap );
-Sets meshwrap in the socket.
-@end table
+You can use sockets programmatically as follows.
 
+@noindent
+In this example, @samp{cal3dstate} is the Cal3D state object.  Here we find a
+socket with a given name.
+
+@example
+iSpriteCal3DSocket* socket = cal3dstate->FindSocket(name);
+@end example
+
+For this example, @samp{sprite} is the @samp{iMeshWrapper} of the Cal3D sprite,
+and @samp{meshwrap} is the @samp{iMeshWrapper} of the mesh object you want to
+add.  This adds the @samp{meshwrap} as a hierarchical child of @samp{sprite}.
+
+@example
+sprite->GetChildren()->Add(meshwrap);
+@end example
+
+Here is how you would set a socket's mesh wrapper.
+
+@example
+socket->SetMeshWrapper(meshwrap);
+@end example
