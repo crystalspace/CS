@@ -77,6 +77,16 @@ SCF_VERSION (iPluginManager, 0, 2, 0);
 /**
  * This is the plugin manager.
  * The plugin manager is guaranteed thread-safe.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>csInitializer::CreateEnvironment()
+ *   <li>csInitializer::CreatePluginManager()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   </ul>
  */
 struct iPluginManager : public iBase
 {

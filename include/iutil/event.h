@@ -32,7 +32,8 @@
  * \addtogroup event_handling
  * @{ */
 
-enum {
+enum
+{
   CS_CRYSTAL_PROTOCOL = 0x43533030L, // 'CS00'
   CS_MUSCLE_PROTOCOL = 0x504d3030L, // 'PM00'
   CS_XML_PROTOCOL = 0x584d4d30L // 'XML0'

@@ -99,7 +99,14 @@ struct csFileTime
 
 SCF_VERSION (iFile, 1, 0, 0);
 
-/// A replacement for FILE type in the virtual file space.
+/**
+ * A replacement for FILE type in the virtual file space.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iVFS::Open()
+ *   </ul>
+ */
 struct iFile : public iBase
 {
   /// Query file name (in VFS)
@@ -189,6 +196,15 @@ SCF_VERSION (iVFS, 1, 0, 0);
  * virtual directory is implemented; however the user is presented with
  * only a list of file names; no fancy things like file size, time etc
  * (file size can be determined after opening it for reading).
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>The VFS plugin (crystalspace.kernel.vfs)
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   </ul>
  */
 struct iVFS : public iBase
 {

@@ -20,6 +20,7 @@ chronological order.
 	  The idea is to make it easier for the user to find out how
 	  to obtain instances of some interface and how those interfaces
 	  are supposed to be used.
+	- Jorrit removed the unused iDataObject and csDataObject.
 	- Luca improved the speed of csLoader::CollectAllChildren method.
 12-Apr-2004
 	- Luca added some code to csloader.cpp/*.h to recursively handle the

@@ -71,6 +71,11 @@ SCF_VERSION (iDocumentAttributeIterator, 0, 0, 1);
 
 /**
  * An iterator over iDocumentNode attributes.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iDocumentNode::GetAttributes()
+ *   </ul>
  */
 struct iDocumentAttributeIterator : public iBase
 {
@@ -86,6 +91,18 @@ SCF_VERSION (iDocumentAttribute, 0, 0, 1);
 
 /**
  * An attribute for an iDocumentNode.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iDocumentNode::SetAttribute()
+ *   <li>iDocumentNode::SetAttributeAsInt()
+ *   <li>iDocumentNode::SetAttributeAsFloat()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iDocumentNode::GetAttribute()
+ *   <li>iDocumentAttributeIterator::Next()
+ *   </ul>
  */
 struct iDocumentAttribute : public iBase
 {
@@ -115,6 +132,11 @@ SCF_VERSION (iDocumentNodeIterator, 0, 0, 1);
 
 /**
  * An iterator over iDocumentNode.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iDocumentNode::GetNodes()
+ *   </ul>
  */
 struct iDocumentNodeIterator : public iBase
 {
@@ -130,6 +152,19 @@ SCF_VERSION (iDocumentNode, 0, 4, 1);
 
 /**
  * Representation of a node in a document.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iDocument::CreateRoot()
+ *   <li>iDocumentNode::CreateNodeBefore()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iDocument::GetRoot()
+ *   <li>iDocumentNode::GetNode()
+ *   <li>iDocumentNode::GetParent()
+ *   <li>iDocumentNodeIterator::Next()
+ *   </ul>
  */
 struct iDocumentNode : public iBase
 {
@@ -236,8 +271,12 @@ struct iDocumentNode : public iBase
   virtual int GetAttributeValueAsInt (const char* name) = 0;
   /// Get an attribute value by name as a floating point value.
   virtual float GetAttributeValueAsFloat (const char* name) = 0;
-  /// Get an attribute value by name as a bool.  "yes", "true", and "1" all are returned as true.
-  virtual bool GetAttributeValueAsBool (const char* name,bool defaultvalue=false) = 0;
+  /**
+   * Get an attribute value by name as a bool.  "yes", "true", and "1" all
+   * are returned as true.
+   */
+  virtual bool GetAttributeValueAsBool (const char* name,
+  	bool defaultvalue=false) = 0;
 
   /// Remove an attribute.
   virtual void RemoveAttribute (const csRef<iDocumentAttribute>& attr) = 0;
@@ -258,6 +297,11 @@ SCF_VERSION (iDocument, 0, 2, 0);
 
 /**
  * Representation of a document containing a hierarchical structure of nodes.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iDocumentSystem::CreateDocument()
+ *   </ul>
  */
 struct iDocument : public iBase
 {
@@ -339,6 +383,18 @@ SCF_VERSION (iDocumentSystem, 0, 0, 1);
 
 /**
  * An iDocument factory.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>XmlRead Document System plugin (crystalspace.documentsystem.xmlread)
+ *   <li>XmlTiny Document System plugin (crystalspace.documentsystem.tinyxml)
+ *   <li>Binary Document System plugin (crystalspace.documentsystem.binary)
+ *   <li>Document System Multiplexer plugin (crystalspace.documentsystem.multiplexer)
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   </ul>
  */
 struct iDocumentSystem : public iBase
 {

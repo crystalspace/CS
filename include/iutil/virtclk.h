@@ -28,6 +28,16 @@ SCF_VERSION (iVirtualClock, 0, 0, 1);
 /**
  * A virtual game clock.  Normally, a single instance of iVirtualClock is
  * placed in the shared object registry (iObjectRegistry).
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>csInitializer::CreateEnvironment()
+ *   <li>csInitializer::CreateVirtualClock()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   </ul>
  */
 struct iVirtualClock : public iBase
 {

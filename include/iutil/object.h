@@ -60,6 +60,21 @@ SCF_VERSION (iObject, 0, 3, 0);
 
 /**
  * This interface is an SCF interface for encapsulating csObject.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Many objects implement this (especially objects in the
+ *       3D engine like meshes, lights, sectors, materials, ...)
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>Many objects have a QueryObject() method that you can use.
+ *   <li>SCF_QUERY_INTERFACE() on the object.
+ *   <li>iObject::GetObjectParent()
+ *   <li>iObject::GetChild()
+ *   <li>iObjectIterator::Next()
+ *   <li>iObjectIterator::GetParentObj()
+ *   </ul>
  */
 struct iObject : public iBase
 {
@@ -128,6 +143,11 @@ SCF_VERSION (iObjectIterator, 0, 1, 0);
  * a bit complicated to use (i.e. you'll have to do a lot of
  * SCF_QUERY_INTERFACE_CALLS if you use it directly). Check out typed object
  * iterators instead.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iObject::GetIterator()
+ *   </ul>
  */
 struct iObjectIterator : public iBase
 {
@@ -152,18 +172,6 @@ struct iObjectIterator : public iBase
   virtual iObject* FindName (const char* name) = 0;
 };
 
-
-SCF_VERSION (iDataObject, 0, 0, 1);
-
-/// This is an iObject that contains a type-less data buffer.
-struct iDataObject : public iBase
-{
-  /// Query the iObject pointer
-  virtual iObject *QueryObject () = 0;
-
-  /// Return the data buffer
-  virtual void* GetData () = 0;
-};
 /** @} */
 
 #endif // __CS_IOBJECT_OBJECT_H__

@@ -101,6 +101,16 @@ struct iKeyComposer : public iBase
  * Also it tracks the current state of all keys.  Typically, one instance of
  * this object is available from the shared-object registry (iObjectRegistry)
  * under the name "crystalspace.driver.input.generic.keyboard".
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>csInitializer::CreateEnvironment()
+ *   <li>csInitializer::CreateInputDrivers()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   </ul>
  */
 struct iKeyboardDriver : public iBase
 {
@@ -151,6 +161,16 @@ SCF_VERSION(iMouseDriver, 0, 0, 1);
  * it is responsible for generating double-click events.  Typically, one
  * instance of this object is available from the shared-object registry
  * (iObjectRegistry) under the name "crystalspace.driver.input.generic.mouse".
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>csInitializer::CreateEnvironment()
+ *   <li>csInitializer::CreateInputDrivers()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   </ul>
  */
 struct iMouseDriver : public iBase
 {
@@ -184,6 +204,16 @@ SCF_VERSION(iJoystickDriver, 0, 0, 1);
  * also for generating joystick events.  Typically, one instance of this object
  * is available from the shared-object registry (iObjectRegistry) under the
  * name "crystalspace.driver.input.generic.joystick".
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>csInitializer::CreateEnvironment()
+ *   <li>csInitializer::CreateInputDrivers()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   </ul>
  */
 struct iJoystickDriver : public iBase
 {

@@ -33,6 +33,19 @@ SCF_VERSION (iComponent, 0, 0, 1);
 
 /**
  * This interface describes a generic component in Crystal Space.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>All plugins implement this interface.
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>SCF_QUERY_INTERFACE() from a plugin instance.
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>csPluginManager
+ *   </ul>
  */
 struct iComponent : public iBase
 {

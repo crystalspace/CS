@@ -42,6 +42,16 @@ SCF_VERSION(iEventQueue, 0, 0, 1);
  * (implementing iEventHandler) can register to receive notification when
  * various events are processed.  Typically, one instance of this object is
  * available from the shared-object registry (iObjectRegistry).
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>csInitializer::CreateEnvironment()
+ *   <li>csInitializer::CreateEventQueue()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   </ul>
  */
 struct iEventQueue : public iBase
 {

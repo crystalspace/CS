@@ -45,7 +45,7 @@ SCF_VERSION(iConfigManager, 0, 0, 3);
  * all objects with higher priority.  The dynamic domain has always priority 0
  * (medium).<p>
  *
- * Differences in behaviour compared to a normal confguration object are:
+ * Differences in behaviour compared to a normal configuration object are:
  * <ul>
  * <li> Deleting a key will not always remove the key from the configuration
  *      completely. It will only remove the key from the dyamic iConfigFile
@@ -65,6 +65,16 @@ SCF_VERSION(iConfigManager, 0, 0, 3);
  *      value. In general it is a bad idea to change something while an
  *      iterator exists.
  * </ul>
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>csInitializer::CreateEnvironment()
+ *   <li>csInitializer::CreateConfigManager()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   </ul>
  */
 struct iConfigManager : public iConfigFile
 {

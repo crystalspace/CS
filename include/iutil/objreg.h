@@ -45,6 +45,19 @@ SCF_VERSION (iObjectRegistry, 0, 0, 4);
 /**
  * This interface serves as a registry of other objects.
  * The object registry is thread-safe.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>csInitializer::CreateObjectRegistry()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>Stored by application.
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Everything.
+ *   </ul>
  */
 struct iObjectRegistry : public iBase
 {

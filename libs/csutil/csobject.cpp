@@ -300,13 +300,3 @@ csPtr<iObjectIterator> csObject::GetIterator ()
   return csPtr<iObjectIterator> (new csObjectIterator (this));
 }
 
-//------------------- miscelaneous simple classes derived from csObject -----//
-
-SCF_IMPLEMENT_IBASE_EXT (csDataObject)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iDataObject)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csDataObject::DataObject)
-  SCF_IMPLEMENTS_INTERFACE (iDataObject)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
