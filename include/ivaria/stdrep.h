@@ -47,8 +47,12 @@ struct iStandardReporterListener : public iBase
   virtual void SetNativeWindowManager (iNativeWindowManager* wm) = 0;
   /// Set the reporter to use.
   virtual void SetReporter (iReporter* rep) = 0;
-  /// Set the debug file to use (standard filename).
-  virtual void SetDebugFile (const char* filename) = 0;
+  /** 
+    * Set the debug file to use (standard filename).
+    * If append is true the debug file name is appended to instead of a new 
+    * one created.
+    */  
+  virtual void SetDebugFile (const char* filename, bool append=false) = 0;
   /**
    * Set useful defaults for output console, native window manager,
    * reporter (will use iObjectRegistry to query for those). The

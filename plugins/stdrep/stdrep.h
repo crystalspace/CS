@@ -86,7 +86,7 @@ private:
   csString lastID;
   csRef<iFont> fnt;
   bool silent;	// Don't show the yellow warnings if true.
-
+  bool append;  // If data should be appended to debug file instead of new    
   static csString DefaultDebugFilename();
 
 public:
@@ -100,7 +100,7 @@ public:
   virtual void SetOutputConsole (iConsoleOutput* console);
   virtual void SetNativeWindowManager (iNativeWindowManager* wm);
   virtual void SetReporter (iReporter* wm);
-  virtual void SetDebugFile (const char* filename); // VFS path.
+  virtual void SetDebugFile (const char* filename, bool append ); // VFS path.
   virtual void SetDefaults ();
   virtual void SetMessageDestination (int severity,
   	bool do_stdout, bool do_stderr, bool do_console,

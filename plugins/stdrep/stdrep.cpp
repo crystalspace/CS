@@ -23,6 +23,7 @@
 #include "csutil/scf.h"
 #include "csutil/util.h"
 #include "csutil/sysfunc.h"
+#include "iutil/cfgmgr.h"
 #include "iutil/event.h"
 #include "iutil/eventh.h"
 #include "iutil/eventq.h"
@@ -36,7 +37,7 @@
 #include "ivideo/fontserv.h"
 #include "ivideo/natwin.h"
 #include "ivaria/conout.h"
-
+  
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csReporterListener)
@@ -81,6 +82,7 @@ csReporterListener::csReporterListener (iBase *iParent)
   reporter = 0;
   scfiEventHandler = 0;
   silent = false;
+  append = false;
 
   debug_filename = DefaultDebugFilename ();
 #ifdef CS_DEBUG
@@ -166,11 +168,18 @@ bool csReporterListener::Initialize (iObjectRegistry* r)
   if (q != 0)
     q->RegisterListener (scfiEventHandler, CSMASK_Nothing);
 
+  csRef<iConfigManager> cfg(CS_QUERY_REGISTRY (r, iConfigManager));
+  if ( cfg )
+  {
+    append = cfg->GetBool("Reporter.FileAppend", false );
+  }
+  
   csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
     iCommandLineParser);
   if (cmdline)
   {
     silent = cmdline->GetOption ("silent") != 0;
+    append = cmdline->GetOption ("append") != 0;
   }
   csRef<iVerbosityManager> verbosemgr (
     CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
@@ -246,7 +255,25 @@ bool csReporterListener::Report (iReporter*, int severity,
     {
       csRef<iVFS> vfs (CS_QUERY_REGISTRY (object_reg, iVFS));
       if (vfs.IsValid())
-        debug_file = vfs->Open (debug_filename, VFS_FILE_WRITE);
+      {  
+        // If log does not exists then create a new one    
+        if ( !(vfs->Exists(debug_filename)) )
+        {
+            debug_file = vfs->Open (debug_filename, VFS_FILE_WRITE);
+        } 
+        else               
+        {
+          // if the log file exists open up using desired behaviour.
+          if ( append )
+          {
+            debug_file = vfs->Open (debug_filename, VFS_FILE_APPEND);            
+          }
+          else
+          { 
+            debug_file = vfs->Open (debug_filename, VFS_FILE_WRITE);
+          }    
+        }        
+      }        
     }
     if (debug_file.IsValid())
     {
@@ -409,10 +436,11 @@ void csReporterListener::SetReporter (iReporter* reporter)
   if (reporter) reporter->AddReporterListener (&scfiReporterListener);
 }
 
-void csReporterListener::SetDebugFile (const char* s)
+void csReporterListener::SetDebugFile (const char* s, bool appendFile )
 {
   debug_file = 0;
   debug_filename = s;
+  append = appendFile;
 }
 
 void csReporterListener::SetDefaults ()
