@@ -137,9 +137,9 @@ class awsNotebookButtonBar : public awsComponent
       te->comp = comp;
       te->sink = sink;
       sink->IncRef ();
-      return csVector::Push ((csSome)te);
+      return csVector::Push ((void*) te);
     }
-    virtual bool FreeItem (csSome Item)
+    virtual bool FreeItem (void* Item)
     {
       tabEntry *te = (tabEntry*)Item;
       te->slot->Disconnect (te->button, awsCmdButton::signalClicked, 
@@ -149,7 +149,7 @@ class awsNotebookButtonBar : public awsComponent
       delete te;
       return true;
     }
-    virtual int Compare (csSome Item1, csSome Item2, int Mode=0) const
+    virtual int Compare (void* Item1, void* Item2, int Mode=0) const
     {
       tabEntry *te1 = (tabEntry *)Item1;
       tabEntry *te2 = (tabEntry *)Item2;
@@ -158,7 +158,7 @@ class awsNotebookButtonBar : public awsComponent
       else
         return (te1->button < te2->button ? -1 : te1->button > te2->button ? 1 : 0);
     }
-    virtual int CompareKey (csSome Item1, csConstSome Key, int Mode=0) const
+    virtual int CompareKey (void* Item1, const void* Key, int Mode=0) const
     {
       (void)Mode;
       tabEntry *te1 = (tabEntry *)Item1;

@@ -1709,7 +1709,7 @@ csGLRender3D::eiShaderRenderInterface::~eiShaderRenderInterface()
 
 }
 
-csSome csGLRender3D::eiShaderRenderInterface::GetPrivateObject(const char* name)
+void* csGLRender3D::eiShaderRenderInterface::GetPrivateObject(const char* name)
 {
   if(strcasecmp(name, "ext") == 0)
     return (void*) (&scfParent->ext);

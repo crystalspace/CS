@@ -109,9 +109,9 @@ class csVFS : public iVFS
   public:
     VfsVector ();
     virtual ~VfsVector ();
-    virtual bool FreeItem (csSome Item);
-    virtual int Compare (csSome Item1, csSome Item2, int Mode) const;
-    virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
+    virtual bool FreeItem (void* Item);
+    virtual int Compare (void* Item1, void* Item2, int Mode) const;
+    virtual int CompareKey (void* Item, const void* Key, int Mode) const;
   } NodeList;
 
   // Current working directory (in fact, the automaticaly-added prefix path)

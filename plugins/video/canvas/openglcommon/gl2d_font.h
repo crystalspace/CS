@@ -74,8 +74,8 @@ protected:
   public:
     GLGlyphVector (int limit, int threshold) : csVector (limit, threshold) {}
     virtual ~GLGlyphVector ();
-    virtual bool FreeItem (csSome Item);
-    virtual int Compare (csSome Item1, csSome Item2, int Mode) const
+    virtual bool FreeItem (void* Item);
+    virtual int Compare (void* Item1, void* Item2, int Mode) const
     {
       (void)Mode;
       GLProtoGlyphSet *gs1 = (GLProtoGlyphSet *)Item1;
@@ -91,7 +91,7 @@ protected:
       else
         return 0;
     }
-    virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const
+    virtual int CompareKey (void* Item, const void* Key, int Mode) const
     {
       (void)Mode;
       GLProtoGlyphSet *gs = (GLProtoGlyphSet *)Item;

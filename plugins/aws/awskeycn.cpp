@@ -67,7 +67,7 @@ void awsKeyContainer::Remove (const char* name)
 
 void awsKeyContainer::Remove (iAwsKey* key)
 {
-  children.Delete ((csSome) key);
+  children.Delete ((void*) key);
   key->DecRef();
 }
 
@@ -77,7 +77,7 @@ void awsKeyContainer::RemoveAll ()
   for (i=0; i < children.Length (); i++)
   {
     iAwsKey *k= STATIC_CAST (iAwsKey *, children[i]);
-    children.Delete ((csSome) k);
+    children.Delete ((void*) k);
     k->DecRef();
   }
 }

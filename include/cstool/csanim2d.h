@@ -54,7 +54,7 @@ public:
     {return (GetFrameCount()==0)?0:(csTicks)FinishTimes.Get(GetFrameCount()-1);}
   /// add a frame. (giving the length of this frame)
   inline void AddFrame(csTicks Delay, csPixmap *s)
-    {FinishTimes.Push((csSome)(GetLength() + Delay)); Frames.Push (s);}
+    {FinishTimes.Push((void*) (GetLength() + Delay)); Frames.Push (s);}
   /// add a frame (giving the length of this frame)
   inline void AddFrame(csTicks Delay, iTextureHandle *Tex)
     {AddFrame(Delay, new csSimplePixmap(Tex));}

@@ -35,14 +35,14 @@ class csArtsRenderer : public iSoundListener
   class soVector : public csVector
   {
   public:
-    int Compare (csSome Item1, csSome Item2, int Mode=0) const
+    int Compare (void* Item1, void* Item2, int Mode=0) const
     {
       (void)Mode;
       csArtsHandle *h1 = (csArtsHandle *)Item1;
       csArtsHandle *h2 = (csArtsHandle *)Item2;
       return (h1 < h2 ? -1 : h1 > h2 ? 1 : 0);
     }
-    int CompareKey (csSome Item1, csConstSome Key, int Mode=0) const
+    int CompareKey (void* Item1, const void* Key, int Mode=0) const
     {
       (void)Mode;
       csArtsHandle *h1 = (csArtsHandle *)Item1;
@@ -50,7 +50,7 @@ class csArtsRenderer : public iSoundListener
       return (h1 < h2 ? -1 : h1 > h2 ? 1 : 0);
     }
     csArtsHandle *Get (int i) const { return (csArtsHandle*)csVector::Get(i); }
-    bool FreeItem (csSome Item){delete (csArtsHandle *)Item; return true;}
+    bool FreeItem (void* Item){delete (csArtsHandle *)Item; return true;}
   };
 
   Arts::SimpleSoundServer server;

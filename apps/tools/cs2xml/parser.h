@@ -87,7 +87,7 @@ class csTokenVector : public csVector
 {
 public:
   virtual ~csTokenVector () {DeleteAll ();}
-  virtual bool FreeItem (csSome Item)
+  virtual bool FreeItem (void* Item)
   {
     delete (csTokenDesc*)Item;
     return true;
@@ -96,7 +96,7 @@ public:
   {
     return (csTokenDesc*)csVector::Get (idx);
   }
-  virtual int Compare (csSome Item1, csSome Item2, int Mode=0) const
+  virtual int Compare (void* Item1, void* Item2, int Mode=0) const
   {
     (void)Mode;
     csTokenDesc *td1 = (csTokenDesc*)Item1;
@@ -105,7 +105,7 @@ public:
     int l2 = td2->len;
     return l1 > l2 ? -1 : l1 < l2 ? 1 : 0;
   }
-  virtual int CompareKey (csSome Item1, csConstSome Key, int Mode=0) const
+  virtual int CompareKey (void* Item1, const void* Key, int Mode=0) const
   {
     (void)Mode;
     csTokenDesc *td1 = (csTokenDesc*)Item1;

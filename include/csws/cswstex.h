@@ -119,9 +119,9 @@ public:
   /// Destroy the object
   virtual ~csWSTexVector ();
   /// Free a texture element
-  virtual bool FreeItem (csSome Item);
+  virtual bool FreeItem (void* Item);
   /// Compare texture with name; used in FindKey ()
-  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
+  virtual int CompareKey (void* Item, const void* Key, int Mode) const;
   /// Get texture by index
   csWSTexture *Get (int idx)
   { return (csWSTexture *)csVector::Get (idx); }

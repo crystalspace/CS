@@ -102,7 +102,7 @@ void csMultiplexImageIO::StoreDesc (const csVector& format)
   // add the formats coming in to our ever growing list
   int i;
   for (i=0; i < format.Length (); i++)
-    formats.Push ((csSome)format.Get (i));
+    formats.Push ((void*)format.Get (i));
 }
 
 const csVector& csMultiplexImageIO::GetDescription ()

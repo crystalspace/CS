@@ -71,7 +71,7 @@ awsMultiLineEdit::awsMultiLineEdit ()
 
   nMarkMode = nClipMarkMode = MARK_ROWWRAP;
   xmaxchar = ymaxchar = 0;
-  vText.Push ((csSome)new csString);
+  vText.Push ((void*) new csString);
   blink_timer = NULL;
   bBlinkOn = false;
   textbox_slot = GetTextBoxBlinkingCursorSlot ();
@@ -146,7 +146,7 @@ void awsMultiLineEdit::MarkedToClipboard ()
       csString *s = (csString*)vText.Get (i);
       csString *m = new csString;
       m->Append (s->GetData () + fromCol, toCol-fromCol);
-      vClipped.Push ((csSome)m);
+      vClipped.Push ((void*) m);
     }
   }
   else if (nMarkMode == MARK_ROWWRAP)
@@ -167,7 +167,7 @@ void awsMultiLineEdit::MarkedToClipboard ()
 
       m->Append (s->GetData () + off, len);
 
-      vClipped.Push ((csSome)m);
+      vClipped.Push ((void*) m);
     }
   }
   else if (nMarkMode == MARK_ROW)
@@ -176,7 +176,7 @@ void awsMultiLineEdit::MarkedToClipboard ()
     {
       csString *s = (csString*)vText.Get (i);
       csString *m = new csString (*s);
-      vClipped.Push ((csSome)m);
+      vClipped.Push ((void*) m);
     }
   }
 }
@@ -194,7 +194,7 @@ void awsMultiLineEdit::InsertClipboard (int row, int col)
       if (atrow == vText.Length ())
       {
         target = new csString;
-        vText.Push ((csSome)target);
+        vText.Push ((void*) target);
       }
       else
         target = (csString*)vText.Get (atrow);
@@ -228,7 +228,7 @@ void awsMultiLineEdit::InsertClipboard (int row, int col)
         if (atrow == vText.Length ())
         {
           target = new csString;
-          vText.Push ((csSome)target);
+          vText.Push ((void*) target);
         }
         else
           target = (csString*)vText.Get (atrow);
@@ -244,7 +244,7 @@ void awsMultiLineEdit::InsertClipboard (int row, int col)
       for (int i=0; i < vClipped.Length (); i++, row++)
       {
         target = new csString (*(csString*)vClipped.Get (i));
-        vText.Insert (atrow, (csSome)target);
+        vText.Insert (atrow, (void*) target);
       }
     }
   }
@@ -376,12 +376,12 @@ bool awsMultiLineEdit::HandleEvent (iEvent &Event)
     Event.Key.Char = 0;
     //    if ((Event.Key.Modifiers & CSMASK_ALT) && Event.Key.Code == 'c')
     //      DEBUG_BREAK;
-    idx = vDispatcher.FindSortedKey ((csConstSome)&Event);
+    idx = vDispatcher.FindSortedKey ((const void*)&Event);
     Event.Key.Modifiers = mod;
     Event.Key.Char = theChar;
   }
   else
-    idx = vDispatcher.FindSortedKey ((csConstSome)&Event);
+    idx = vDispatcher.FindSortedKey ((const void*)&Event);
   if (idx != -1)
     (this->*vDispatcher.Get (idx)->ring) ();
   else
@@ -672,7 +672,7 @@ void awsMultiLineEdit::InsertChar (int c)
   if (c)
   {
     if (vText.Length () == 0)
-      vText.Push ((csSome)new csString);
+      vText.Push ((void*) new csString);
     csString *s=(csString *)vText.Get (row);
     s->Insert (col, (const char)c);
     MoveCursor (row, col+1);  
@@ -943,7 +943,7 @@ void awsMultiLineEdit::BreakInsertRow ()
   csString *sn = new csString;
   sn->Append (s->GetData () + col);
   s->Truncate (col);
-  vText.Insert (row+1, (csSome)sn);
+  vText.Insert (row+1, (void*)sn);
   col = 0;
   MoveCursor (row+1, col);
   Broadcast (signalEnter);
@@ -1098,7 +1098,7 @@ void awsMultiLineEdit::DeleteMarked ()
 
     // make sure we didnt delete everything, if so put in a new empty first line
     if (vText.Length () == 0)
-      vText.Push ((csSome)new csString);
+      vText.Push ((void*) new csString);
 
     MoveCursor (fromRow, fromCol);
   }
@@ -1139,7 +1139,7 @@ void awsMultiLineEdit::actInsertRow (void *owner, iAwsParmList* parmlist)
   if (parmlist->GetInt ("row", &row) && parmlist->GetString ("string", &str) && row <= me->vText.Length () && row >= 0)
   {
     csString *s = new csString (str->GetData ());
-    me->vText.Insert (row, (csSome)s);
+    me->vText.Insert (row, (void*) s);
   }
 }
 
@@ -1172,7 +1172,7 @@ void awsMultiLineEdit::actReplaceRow (void *owner, iAwsParmList* parmlist)
   if (parmlist->GetInt ("row", &row) && parmlist->GetString ("string", &str) && row <= me->vText.Length () && row >= 0)
   {
     csString *s = new csString (str->GetData ());
-    me->vText.Insert (row, (csSome)s);
+    me->vText.Insert (row, (void*) s);
     s = (csString*)me->vText.Get (row+1);
     me->vText.Delete (row+1);
     delete s;
@@ -1250,7 +1250,7 @@ void awsMultiLineEdit::actSetText (void *owner, iAwsParmList* parmlist)
         csString *s = new csString;
         len=strcspn (p, "\n");
         s->Append (p, len);
-        me->vText.Push ((csSome)s);
+        me->vText.Push ((void*) s);
         p += len+1;
       }
     }

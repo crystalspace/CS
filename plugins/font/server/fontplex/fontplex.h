@@ -51,7 +51,7 @@ class csFontServerMultiplexor : public iFontServer
   public:
     virtual ~csFontServerVector ()
     { DeleteAll (); }
-    virtual bool FreeItem (csSome Item)
+    virtual bool FreeItem (void* Item)
     { ((iFontServer *)Item)->DecRef (); return true; }
     iFontServer *Get (int idx)
     { return (iFontServer *)csVector::Get (idx); }

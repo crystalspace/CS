@@ -39,7 +39,7 @@ csKeyboardAccelerator::csAccVector::~csAccVector ()
   DeleteAll ();
 }
 
-bool csKeyboardAccelerator::csAccVector::FreeItem (csSome Item)
+bool csKeyboardAccelerator::csAccVector::FreeItem (void* Item)
 {
   delete (csAccElement *)Item;
   return true;

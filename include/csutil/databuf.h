@@ -51,7 +51,7 @@ public:
   virtual size_t GetSize () const
   { return Size; }
   /// Get the buffer as an abstract pointer
-  virtual csSome GetData () const
+  virtual char* GetData () const
   { return Data; }
 };
 

@@ -34,18 +34,18 @@ csSkin::~csSkin ()
   DeleteAll ();
 }
 
-bool csSkin::FreeItem (csSome Item)
+bool csSkin::FreeItem (void* Item)
 {
   delete (csSkinSlice *)Item;
   return true;
 }
 
-int csSkin::CompareKey (csSome Item, csConstSome Key, int) const
+int csSkin::CompareKey (void* Item, const void* Key, int) const
 {
   return strcmp (((csSkinSlice *)Item)->GetName (), (char *)Key);
 }
 
-int csSkin::Compare (csSome Item1, csSome Item2, int) const
+int csSkin::Compare (void* Item1, void* Item2, int) const
 {
   return strcmp (((csSkinSlice *)Item1)->GetName (), ((csSkinSlice *)Item2)->GetName ());
 }

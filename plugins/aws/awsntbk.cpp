@@ -145,7 +145,7 @@ void awsNotebook::AddChild (iAwsComponent *child)
   awsComponent::AddChild (child);
 
   iString *str = NULL;
-  child->GetProperty ("Caption", (csSome*)&str);
+  child->GetProperty ("Caption", (void**)&str);
   iAwsSource* src = tab_ctrl.AddTab (str, (void*)child);
 
   // hook up the source so we receive the signals
@@ -837,7 +837,7 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
   // determine caption of tab
   iString *str = NULL;
 
-  comp->GetProperty ("Caption", (csSome*)&str);
+  comp->GetProperty ("Caption", (void**)&str);
   if (!str || !str->GetData ())
   {
     SCF_DEC_REF(str);
@@ -856,11 +856,11 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
   btninfo.AddRectKey ("Frame", csRect (0, 0, Frame ().Width (), Frame ().Height ()));
 
   iString *icon = NULL;
-  if (comp->GetProperty ("Icon", (csSome*)&icon) && icon && icon->Length ())
+  if (comp->GetProperty ("Icon", (void**)&icon) && icon && icon->Length ())
   {
     btninfo.AddStringKey ("Icon", icon ? icon->GetData() : "");
     int *iconalign;
-    if (comp->GetProperty ("IconAlign", (csSome*)&iconalign))
+    if (comp->GetProperty ("IconAlign", (void**)&iconalign))
       btninfo.AddIntKey ("IconAlign", *iconalign);
   }
 
@@ -914,7 +914,7 @@ bool awsNotebookButtonBar::Add (iAwsComponent *comp)
 
 bool awsNotebookButtonBar::Remove (iAwsComponent *comp)
 {
-  int idx = vTabs.Find ((csSome)comp);
+  int idx = vTabs.Find ((void*)comp);
 
   if (idx!=-1)
   {
@@ -1056,7 +1056,7 @@ void awsNotebookButtonBar::Activate (int idx)
 void awsNotebookButtonBar::ActivateTab (void *sk, iAwsSource *source)
 {
   awsNotebookButtonBar *bb = (awsNotebookButtonBar *)sk;
-  int idx = bb->vTabs.FindKey ((csConstSome)source->GetComponent (), 1);
+  int idx = bb->vTabs.FindKey ((const void*)source->GetComponent (), 1);
   if (idx != -1 && bb->active != idx)
   {
     // hide the active and make the new one active

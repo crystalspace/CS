@@ -84,11 +84,11 @@ private:
   public:
     ArchiveEntryVector () : csVector (256, 256) {}
     virtual ~ArchiveEntryVector () { DeleteAll (); }
-    virtual bool FreeItem (csSome Item)
+    virtual bool FreeItem (void* Item)
     { delete (ArchiveEntry *)Item; return true; }
-    virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
+    virtual int Compare (void* Item1, void* Item2, int /*Mode*/) const
     { return strcmp (((ArchiveEntry *)Item1)->filename, ((ArchiveEntry *)Item2)->filename); }
-    virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
+    virtual int CompareKey (void* Item, const void* Key, int /*Mode*/) const
     { return strcmp (((ArchiveEntry *)Item)->filename, (char *)Key); }
     ArchiveEntry *Get (int n) const
     { return (ArchiveEntry *)csVector::Get (n); }

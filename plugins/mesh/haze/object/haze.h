@@ -191,7 +191,7 @@ public:
   /// destroy
   virtual ~csHazeLayerVector() {DeleteAll ();}
   /// delete correctly
-  virtual bool FreeItem(csSome Item)
+  virtual bool FreeItem(void* Item)
   { delete (csHazeLayer*)Item; return true; }
   /// get a layer
   csHazeLayer* GetLayer(int nr) {return (csHazeLayer*)Get(nr);}

@@ -176,13 +176,13 @@ csWSTexVector::~csWSTexVector ()
   DeleteAll ();
 }
 
-bool csWSTexVector::FreeItem (csSome Item)
+bool csWSTexVector::FreeItem (void* Item)
 {
   delete (csWSTexture *)Item;
   return true;
 }
 
-int csWSTexVector::CompareKey (csSome Item, csConstSome Key, int Mode) const
+int csWSTexVector::CompareKey (void* Item, const void* Key, int Mode) const
 {
   (void) Mode;
   return strcmp (((csWSTexture *)Item)->GetName (), (char *)Key);

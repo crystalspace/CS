@@ -27,13 +27,13 @@ csPolygonArray::~csPolygonArray ()
   DeleteAll ();
 }
 
-bool csPolygonArray::FreeItem (csSome Item)
+bool csPolygonArray::FreeItem (void* Item)
 {
   delete (csPolygon3D *)Item;
   return true;
 }
 
-int csPolygonArray::CompareKey (csSome Item, csConstSome Key, int Mode) const
+int csPolygonArray::CompareKey (void* Item, const void* Key, int Mode) const
 {
   (void)Mode;
 
@@ -52,13 +52,13 @@ csPolygonStaticArray::~csPolygonStaticArray ()
   DeleteAll ();
 }
 
-bool csPolygonStaticArray::FreeItem (csSome Item)
+bool csPolygonStaticArray::FreeItem (void* Item)
 {
   delete (csPolygon3DStatic *)Item;
   return true;
 }
 
-int csPolygonStaticArray::CompareKey (csSome Item, csConstSome Key,
+int csPolygonStaticArray::CompareKey (void* Item, const void* Key,
 		int Mode) const
 {
   (void)Mode;

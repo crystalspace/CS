@@ -996,6 +996,6 @@ iAwsComponent *awsComponentVector::Get(int idx) const
 }
 int awsComponentVector::Push (iAwsComponent* comp) 
 { 
-  return csVector::Push ((csSome)comp);
+  return csVector::Push ((void*)comp);
 }
 

@@ -46,7 +46,7 @@ public:									\
 class csObjectPool
 {
 protected:
-  csSome *Objects;
+  void** Objects;
   int Num, Max;
 
 public:
@@ -57,7 +57,7 @@ public:
 
   csObjectPool ()
   {
-    Objects = new csSome [16];
+    Objects = new void* [16];
     Num = 0;
     Max = 16;
   }
@@ -78,9 +78,9 @@ public:
   /// Give an object back to the pool
   void Free (void* o) {
     if (Num == Max) {
-      csSome *old = Objects;
-      Objects = new csSome [Max + 16];
-      memcpy (Objects, old, sizeof (csSome) * Max);
+      void** old = Objects;
+      Objects = new void* [Max + 16];
+      memcpy (Objects, old, sizeof (void*) * Max);
       delete[] old;
       Max += 16;
     }

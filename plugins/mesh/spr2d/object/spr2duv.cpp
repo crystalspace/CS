@@ -140,7 +140,7 @@ iSprite2DUVAnimationFrame *csSprite2DUVAnimation::GetFrame (int idx)
 
 iSprite2DUVAnimationFrame *csSprite2DUVAnimation::GetFrame (const char *name)
 {
-  int idx = vFrames.FindKey ((csSome)name);
+  int idx = vFrames.FindKey ((void*) name);
   return (iSprite2DUVAnimationFrame *)(idx != -1 ? vFrames.Get (idx) : NULL);
 }
 
@@ -156,7 +156,7 @@ iSprite2DUVAnimationFrame *csSprite2DUVAnimation::CreateFrame (int idx)
 
 void csSprite2DUVAnimation::MoveFrame (int frame, int idx)
 {
-  csSome p = vFrames.Get (frame);
+  void* p = vFrames.Get (frame);
   if (idx == -1 || idx >= vFrames.Length ())
     vFrames.Push (p);
   else

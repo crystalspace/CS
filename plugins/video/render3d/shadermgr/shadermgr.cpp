@@ -208,7 +208,7 @@ csBasicVector csShaderManager::GetAllVariableNames()
   csHashIterator cIter (variables);
   while(cIter.HasNext())
   {
-    vReturnValue.Push( (csSome) ((iShaderVariable*)cIter.Next())->GetName() );
+    vReturnValue.Push( (void*) ((iShaderVariable*)cIter.Next())->GetName() );
   }
 
   return vReturnValue;
@@ -374,7 +374,7 @@ csBasicVector csShader::GetAllVariableNames()
   csHashIterator cIter (variables);
   while(cIter.HasNext())
   {
-    vReturnValue.Push( (csSome) ((iShaderVariable*)cIter.Next())->GetName() );
+    vReturnValue.Push( (void*) ((iShaderVariable*)cIter.Next())->GetName() );
   }
 
   return vReturnValue;

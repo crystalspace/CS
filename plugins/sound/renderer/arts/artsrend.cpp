@@ -135,7 +135,7 @@ csPtr<iSoundHandle> csArtsRenderer::RegisterSound(iSoundData *sd)
 
 void csArtsRenderer::UnregisterSound(iSoundHandle *sh)
 {
-  int idx = vObject.FindSortedKey ((csConstSome)sh);
+  int idx = vObject.FindSortedKey ((const void*)sh);
   if (idx != -1)
     vObject.Delete (idx);
 

@@ -48,10 +48,10 @@ public:
 class OSXPluginArray : public csVector
 {
 public:
-  virtual bool FreeItem(csSome p) { delete (OSXPluginEntry*)p; return true; }
-  virtual int Compare(csSome p1, csSome p2, int) const
+  virtual bool FreeItem(void* p) { delete (OSXPluginEntry*)p; return true; }
+  virtual int Compare(void* p1, void* p2, int) const
   { return strcmp(((OSXPluginEntry*)p1)->path,((OSXPluginEntry*)p2)->path); }
-  virtual int CompareKey(csSome p, csConstSome k, int) const
+  virtual int CompareKey(void* p, const void* k, int) const
   { return strcmp(((OSXPluginEntry*)p)->path, (char const*)k); }
 };
 

@@ -65,15 +65,15 @@ class CMapCurvePoint;
     inline TYPE*& Get (int n) const				\
     { return (TYPE*&)csVector::Get (n); }			\
     int Find (TYPE* which) const				\
-    { return csVector::Find ((csSome)which); }			\
+    { return csVector::Find ((void*)which); }			\
     int FindKey (const TYPE* value) const			\
-    { return csVector::FindKey ((csSome)value); }		\
+    { return csVector::FindKey ((void*)value); }		\
     inline void Push (TYPE* what)				\
-    { csVector::Push ((csSome)what); }				\
+    { csVector::Push ((void*)what); }				\
     inline TYPE* Pop ()						\
     { return (TYPE*)csVector::Pop (); }				\
     bool Insert (int n, TYPE* Item)				\
-    { return csVector::Insert (n, (csSome)Item); }		\
+    { return csVector::Insert (n, (void*)Item); }		\
   };
 
 CS_DECLARE_TYPED_VECTOR(CMapBrushVector,         CMapBrush);

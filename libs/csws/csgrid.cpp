@@ -38,7 +38,7 @@ csRegionTree2D::csRegionTree2D ()
   memset (children, 0, 5 * sizeof (csRegionTree2D *));
 }
 
-csRegionTree2D::csRegionTree2D (csRect area, csSome data)
+csRegionTree2D::csRegionTree2D (csRect area, void* data)
 {
   region.Set (area);
   csRegionTree2D::data = data;
@@ -55,7 +55,7 @@ csRegionTree2D::~csRegionTree2D ()
 /**
  * Tiles this rect into the tree and creates new children if needed.
  */
-void csRegionTree2D::Insert (csRect &area, csSome data)
+void csRegionTree2D::Insert (csRect &area, void* data)
 {
   if (children [0])
   {
@@ -135,7 +135,7 @@ void csRegionTree2D::FindRegion (const csRect &area, csVector &vLeafList)
 /**
  * Traverse the tree and call user supplied function for every node.
  */
-void csRegionTree2D::Traverse (csRegionTreeFunc userFunc, csSome databag)
+void csRegionTree2D::Traverse (csRegionTreeFunc userFunc, void* databag)
 {
   if (userFunc (this, databag))
   {
@@ -159,9 +159,9 @@ csSparseGrid::csGridRow::~csGridRow ()
   DeleteAll ();
 }
 
-void csSparseGrid::csGridRow::SetAt (int col, csSome data)
+void csSparseGrid::csGridRow::SetAt (int col, void* data)
 {
-  int key = FindSortedKey ((csConstSome)col);
+  int key = FindSortedKey ((const void*)col);
   if (key == -1 && data)
     key = InsertSorted (new csGridRowEntry (col, data));
   else
@@ -176,7 +176,7 @@ csSparseGrid::csGridRowEntry* csSparseGrid::csGridRow::Get (int index)
   return (csSparseGrid::csGridRowEntry*)csVector::Get (index);
 }
 
-int csSparseGrid::csGridRow::Compare (csSome Item1, csSome Item2, int Mode) const
+int csSparseGrid::csGridRow::Compare (void* Item1, void* Item2, int Mode) const
 {
   (void)Mode;
   csSparseGrid::csGridRowEntry *e1 = (csSparseGrid::csGridRowEntry*)Item1;
@@ -184,14 +184,14 @@ int csSparseGrid::csGridRow::Compare (csSome Item1, csSome Item2, int Mode) cons
   return (e1->col < e2->col ? -1 : e1->col > e2->col ? 1 : 0);
 }
 
-int csSparseGrid::csGridRow::CompareKey (csSome Item1, csConstSome Key, int Mode) const
+int csSparseGrid::csGridRow::CompareKey (void* Item1, const void* Key, int Mode) const
 {
   (void)Mode;
   csSparseGrid::csGridRowEntry *e1 = (csSparseGrid::csGridRowEntry*)Item1;
   return (e1->col < (int)Key ? -1 : e1->col > (int)Key ? 1 : 0);
 }
 
-bool csSparseGrid::csGridRow::FreeItem (csSome Item)
+bool csSparseGrid::csGridRow::FreeItem (void* Item)
 {
   delete (csSparseGrid::csGridRowEntry*)Item;
   return true;
@@ -864,7 +864,7 @@ bool csGrid::HandleEvent (iEvent &Event)
  * Resize views proportional to the new size of csGrid.
  * @@@ TODO: TAKE MINIMUM SIZE INTO ACCOUNT
  */
-static bool ResizeViews (csSome node, csSome /*databag*/)
+static bool ResizeViews (void* node, void* /*databag*/)
 {
   csRegionTree2D *t = (csRegionTree2D*)node;
   if (t->children[0] == NULL)
@@ -1026,7 +1026,7 @@ void csGrid::SetCursorPos (int row, int col)
   {
     ycur = row;
     xcur = col;
-    if (parent) parent->SendCommand (cscmdGridCursorChanged, (csSome)this);
+    if (parent) parent->SendCommand (cscmdGridCursorChanged, (void*)this);
   }
 }
 

@@ -266,7 +266,7 @@ protected:
   {
   public:
     animVector () : csVector (8, 16){}
-    virtual int CompareKey (csSome Item1, csConstSome Item2, int Mode) const
+    virtual int CompareKey (void* Item1, const void* Item2, int Mode) const
     {
       (void)Mode;
       csSprite2DUVAnimation *f1 = (csSprite2DUVAnimation *)Item1;
@@ -314,7 +314,7 @@ public:
   }
   void RemoveUVAnimation (iSprite2DUVAnimation *anim)
   {
-    int idx = vAnims.Find ((csSome)anim);
+    int idx = vAnims.Find ((void*)anim);
     if (idx != -1)
     {
       anim->DecRef ();
@@ -323,7 +323,7 @@ public:
   }
   iSprite2DUVAnimation *GetUVAnimation (const char *name)
   {
-    int idx = vAnims.FindKey ((csSome)name);
+    int idx = vAnims.FindKey ((void*) name);
     return (iSprite2DUVAnimation *)(idx != -1 ? vAnims.Get (idx) : NULL);
   }
   iSprite2DUVAnimation *GetUVAnimation (int idx)

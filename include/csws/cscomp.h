@@ -396,7 +396,7 @@ public:
   /// Component skin slice
   csSkinSlice *skinslice;
   /// Abstract pointer for internal use by skin slice
-  csSome *skindata;
+  void** skindata;
   /// Component ID, unique within its parrent's child ring
   unsigned int id;
   /// Component size/position rectangle

@@ -37,7 +37,7 @@ class csBasicVector
 {
 protected:
   int count,limit,threshold;
-  csSome *root;
+  void** root;
 
 public:
   /**
@@ -50,11 +50,11 @@ public:
   virtual ~csBasicVector();
 
   /// Get a reference to n-th element
-  inline csSome& operator [] (int n);
+  inline void* & operator [] (int n);
   /// Same but doesn't call SetLength () in the event n is out of bounds
-  inline csSome& operator [] (int n) const;
+  inline void* & operator [] (int n) const;
   /// Same but in function form
-  inline csSome& Get (int n) const;
+  inline void* & Get (int n) const;
 
   /// Set vector length to n
   void SetLength (int n);
@@ -69,26 +69,26 @@ public:
   /// Delete a chunk of size at the position 'n' (yeah, non virtual too)
   bool DeleteChunk (int n,int size);
   /// Delete the given element from vector (attention: non virtual!)
-  bool Delete (csSome Item);
+  bool Delete (void* Item);
 
   /// Exchange two elements in array
   inline void Exchange (int n1, int n2);
   /// Find a element in array and return its index (or -1 if not found)
-  int Find (csSome which) const;
+  int Find (void* which) const;
 
   /// Push a element on 'top' of vector
-  inline int Push (csSome what);
+  inline int Push (void* what);
   /// Push an elemen on top of the vector if it is not yet contained
-  inline int PushSmart (csSome what);
+  inline int PushSmart (void* what);
   /// Pop a element from vector 'top'
-  inline csSome Pop ();
+  inline void* Pop ();
   /// Return the top element but don't remove it.
-  inline csSome Top () const;
+  inline void* Top () const;
 
   /// Insert element 'Item' before element 'n'
-  bool Insert (int n, csSome Item);
+  bool Insert (int n, void* Item);
   /// Insert a chunk of size at the position 'n'
-  bool InsertChunk (int n, int size, csSome* Item);
+  bool InsertChunk (int n, int size, void** Item);
 };
 
 /**
@@ -118,9 +118,9 @@ public:
   virtual ~csVector () {}
 
   /// Find a element by key (using CompareKey method)
-  int FindKey (csConstSome Key, int Mode = 0) const;
+  int FindKey (const void* Key, int Mode = 0) const;
   /// Find a element in a SORTED array by key (using CompareKey method)
-  int FindSortedKey (csConstSome Key, int Mode = 0) const;
+  int FindSortedKey (const void* Key, int Mode = 0) const;
   /// Partially sort the array
   void QuickSort (int Left, int Right, int Mode = 0);
   /// Same but for all elements
@@ -129,23 +129,23 @@ public:
   /// Delete element number 'n' from vector
   bool Delete (int n, bool FreeIt = true);
   /// Delete the given element from vector
-  bool Delete (csSome Item, bool FreeIt = true);
+  bool Delete (void* Item, bool FreeIt = true);
   /// Replace n-th item with another (free previous value)
-  bool Replace (int n, csSome what, bool FreePrevious = true);
+  bool Replace (int n, void* what, bool FreePrevious = true);
   /// Delete all elements
   void DeleteAll (bool FreeThem = true);
 
   /// Insert element 'Item' so that array remains sorted (assumes its already)
-  int InsertSorted (csSome Item, int *oEqual = NULL, int Mode = 0);
+  int InsertSorted (void* Item, int *oEqual = NULL, int Mode = 0);
   /// Virtual function which frees a vector element; returns success status
-  virtual bool FreeItem (csSome Item);
+  virtual bool FreeItem (void* Item);
   /// Compare two array elements in given Mode
-  virtual int Compare (csSome Item1, csSome Item2, int Mode) const;
+  virtual int Compare (void* Item1, void* Item2, int Mode) const;
   /// Compare entry with a key; for csVector just compare (int)Key vs (int)Item
-  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
+  virtual int CompareKey (void* Item, const void* Key, int Mode) const;
 };
 
-inline csSome& csBasicVector::operator [] (int n)
+inline void* & csBasicVector::operator [] (int n)
 {
   CS_ASSERT (n >= 0);
   if (n >= count)
@@ -153,14 +153,14 @@ inline csSome& csBasicVector::operator [] (int n)
   return (root [n]);
 }
 
-inline csSome& csBasicVector::operator [] (int n) const
+inline void* & csBasicVector::operator [] (int n) const
 {
   CS_ASSERT (n >= 0);
   CS_ASSERT (n < count);
   return (root [n]);
 }
 
-inline csSome& csBasicVector::Get (int n) const
+inline void* & csBasicVector::Get (int n) const
 {
   CS_ASSERT (n >= 0);
   CS_ASSERT (n < count);
@@ -177,49 +177,49 @@ inline int csBasicVector::Length () const
   return (count);
 }
 
-inline bool csBasicVector::Delete (csSome Item)
+inline bool csBasicVector::Delete (void* Item)
 {
   int n = Find (Item);
   if (n == -1) return false;
   else return Delete (n);
 }
 
-inline int csBasicVector::Push (csSome what)
+inline int csBasicVector::Push (void* what)
 {
   SetLength (count + 1);
   root [count - 1] = what;
   return (count - 1);
 }
 
-inline int csBasicVector::PushSmart (csSome what)
+inline int csBasicVector::PushSmart (void* what)
 {
   int n = Find (what);
   return (n == -1) ? Push (what) : n;
 }
 
-inline csSome csBasicVector::Pop ()
+inline void* csBasicVector::Pop ()
 {
   if (count<=0)
     return NULL;
 
-  csSome ret = root [count - 1];
+  void* ret = root [count - 1];
   SetLength (count - 1);
   return (ret);
 }
 
-inline csSome csBasicVector::Top () const
+inline void* csBasicVector::Top () const
 {
   return root [count - 1];
 }
 
 inline void csBasicVector::Exchange (int n1, int n2)
 {
-  csSome tmp = root [n1];
+  void* tmp = root [n1];
   root [n1] = root [n2];
   root [n2] = tmp;
 }
 
-inline bool csVector::Delete (csSome Item, bool FreeIt)
+inline bool csVector::Delete (void* Item, bool FreeIt)
 {
   int n = Find (Item);
   if (n == -1) return false;

@@ -112,7 +112,7 @@ class csRecordVector : public csVector
 {
 public:
   /// Free a single element of the array
-  virtual bool FreeItem (csSome Item)
+  virtual bool FreeItem (void* Item)
   {
     csRecordedCamera* reccam = (csRecordedCamera*)Item;
     delete reccam;

@@ -88,19 +88,19 @@ class csAVIFormat : public iStreamFormat
     public:
       StreamList () : csVector (8, 8){}
       virtual ~StreamList () {}
-      virtual int Compare (csSome Item1, csSome Item2, int) const
+      virtual int Compare (void* Item1, void* Item2, int) const
       {
 	StreamIdx *i1 = (StreamIdx*)Item1, *i2 = (StreamIdx*)Item2;
         return (i1->id < i2->id ? -1 : i1->id > i2->id ? 1 : 0);
       }
-      virtual int CompareKey (csSome Item1, csConstSome Item2, int) const
+      virtual int CompareKey (void* Item1, const void* Item2, int) const
       {
 	StreamIdx *i1 = (StreamIdx*)Item1;
 	uint32 id = (uint32)Item2;
         return (i1->id < id ? -1 : i1->id > id ? 1 : 0);
       }
       virtual StreamIdx *Get (int idx)const {return (StreamIdx*)csVector::Get(idx); }
-      virtual bool FreeItem (csSome Item) { delete (StreamIdx*)Item; return true; }
+      virtual bool FreeItem (void* Item) { delete (StreamIdx*)Item; return true; }
     };
 
     StreamList streamlist;

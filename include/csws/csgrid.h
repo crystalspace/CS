@@ -44,7 +44,7 @@
  * Functions of this type can be used when traversing the tree.
  * return true if you want to dive deeper into tree, false otherwise.
  */
-typedef bool (*csRegionTreeFunc) (csSome node, csSome databag);
+typedef bool (*csRegionTreeFunc) (void* node, void* databag);
 
 class csRegionTree2D;
 class csSparseGrid;
@@ -58,20 +58,20 @@ class csRegionTree2D
 public:
   csRect region;
   csRegionTree2D *children[5]; // max. 5 children possible
-  csSome data;
+  void* data;
 
 public:
   /// Create an empty region
   csRegionTree2D ();
   /// Create a non-empty region with given associated data
-  csRegionTree2D (csRect area, csSome data);
+  csRegionTree2D (csRect area, void* data);
   /// Finish this region object
   ~csRegionTree2D ();
 
   /**
    * Tiles this rect into the tree and creates new children if needed.
    */
-  void Insert (csRect &area, csSome data);
+  void Insert (csRect &area, void* data);
 
   /**
    * Returns a list of leaves that do all contain parts of area.
@@ -81,7 +81,7 @@ public:
   /**
    * Traverse the tree and call user supplied function for every node.
    */
-  void Traverse (csRegionTreeFunc userFunc, csSome databag = NULL);
+  void Traverse (csRegionTreeFunc userFunc, void* databag = NULL);
 
 };
 
@@ -98,9 +98,9 @@ class csSparseGrid
   struct csGridRowEntry
   {
     int col;
-    csSome data;
+    void* data;
     // Initialize the object with given column and associated data
-    csGridRowEntry (int theCol, csSome theData) : col (theCol), data (theData) {}
+    csGridRowEntry (int theCol, void* theData) : col (theCol), data (theData) {}
   };
 
   /*
@@ -120,15 +120,15 @@ class csSparseGrid
     // Destroy the object
     virtual ~csGridRow ();
     // Set the data at given column
-    void SetAt (int col, csSome data);
+    void SetAt (int col, void* data);
     // Get the row entry at given column
     csGridRowEntry *Get (int index);
     // Compare two row entries
-    virtual int Compare (csSome Item1, csSome Item2, int Mode) const;
+    virtual int Compare (void* Item1, void* Item2, int Mode) const;
     // Compare a row entry with a key
-    virtual int CompareKey (csSome Item1, csConstSome Key, int Mode) const;
+    virtual int CompareKey (void* Item1, const void* Key, int Mode) const;
     // Free a row entry item
-    virtual bool FreeItem (csSome Item);
+    virtual bool FreeItem (void* Item);
   };
   friend class csSparseGrid::csGridRow;
 
@@ -144,7 +144,7 @@ class csSparseGrid
     // destructor
     virtual ~csGridRowSet () {DeleteAll ();}
     // Free a particular grid row object
-    virtual bool FreeItem (csSome Item)
+    virtual bool FreeItem (void* Item)
     {
       // XXX: Don't free the data here. It seems we're missing a good policy
       // here on who should delete the data in the rows... Sometimes it's
@@ -163,13 +163,14 @@ public:
   csSparseGrid () : rows (8) {}
 
   /// Get the data at given row/column
-  csSome GetAt (int row, int col)
+  void* GetAt (int row, int col)
   {
-    csSome result = NULL;
-    int idx1 = rows.FindSortedKey ((csConstSome)row);
+    void* result = NULL;
+    int idx1 = rows.FindSortedKey ((const void*)row);
     if (idx1 != -1)
     {
-      int idx2 = ((csGridRow *)rows.Get (idx1)->data)->FindSortedKey ((csConstSome)col);
+      int idx2 = ((csGridRow *)rows.Get (idx1)->data)->FindSortedKey ((const
+	    void*)col);
       if (idx2 != -1)
 	result = ((csGridRow *)rows.Get (idx1)->data)->Get (idx2)->data;
     }
@@ -177,9 +178,9 @@ public:
   }
 
   // Set the data at given row/column
-  void SetAt (int row, int col, csSome data)
+  void SetAt (int row, int col, void* data)
   {
-    int idx = rows.FindSortedKey ((csConstSome)row);
+    int idx = rows.FindSortedKey ((const void*)row);
     if (idx == -1)
       idx = rows.InsertSorted (new csGridRowEntry (row, new csGridRow (row)));
     ((csGridRow *)rows.Get (idx)->data)->SetAt (col, data);
@@ -236,7 +237,7 @@ public:
   /// The row and column for this cell (set before calling Draw() by grid)
   int row, col;
   /// Data associated with this cell
-  csSome data;
+  void* data;
   /// how content should be formated
   csString valuePattern;
 

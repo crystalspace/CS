@@ -41,7 +41,7 @@ class awsMultiLineEdit : public awsComponent
   {
   public:
     virtual ~eventVector () {DeleteAll (); }
-    virtual bool FreeItem (csSome Item){delete (mlEvent*)Item; return true;}
+    virtual bool FreeItem (void* Item){delete (mlEvent*)Item; return true;}
     virtual int DoCompare (const csEvent *e1, const csEvent *e2, int Mode=0) const
     {
       int d = (int)e1->Type - (int)e2->Type;
@@ -58,11 +58,11 @@ class awsMultiLineEdit : public awsComponent
       }
       return d;
     }
-    virtual int Compare (csSome Item1, csSome Item2, int Mode=0) const
+    virtual int Compare (void* Item1, void* Item2, int Mode=0) const
     {
       return DoCompare (&((mlEvent*)Item1)->e, &((mlEvent*)Item2)->e, Mode);
     }
-    virtual int CompareKey (csSome Item, csConstSome Key, int Mode=0) const
+    virtual int CompareKey (void* Item, const void* Key, int Mode=0) const
     {
       return DoCompare (&((mlEvent*)Item)->e, (csEvent*)Key, Mode);
     }
@@ -74,7 +74,7 @@ class awsMultiLineEdit : public awsComponent
       mlEvent *ev = new mlEvent;
       ev->e = e;
       ev->ring = ring;
-      if (InsertSorted ((csSome)ev) >= 0)
+      if (InsertSorted ((void*) ev) >= 0)
         return true;
       delete ev;
       return false;

@@ -133,3 +133,7 @@ levtool -planes yourmap.zip
 Several methods in @code{iPortal} have changed slightly. For example
 @code{SetMirror} now expects a plane instead of a polygon.
 
+@subheading Datatype changes
+
+The @code{csSome}, @code{csConstSome} and @code{uint} types have been removed.
+Use @code{void*}, @code{const void*} and @code{usigned int} instead.

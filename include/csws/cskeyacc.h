@@ -49,7 +49,7 @@ class csKeyboardAccelerator : public csComponent
     /// Destroy the object
     virtual ~csAccVector ();
     /// Virtual function which frees a vector element
-    virtual bool FreeItem (csSome Item);
+    virtual bool FreeItem (void* Item);
   };
 
   /// The table that contains keyboard event->generated event conversion table

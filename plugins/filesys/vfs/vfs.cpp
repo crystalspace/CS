@@ -187,12 +187,12 @@ public:
   {
     DeleteAll ();
   }
-  int CompareKey (csSome Item, csConstSome Key, int Mode) const
+  int CompareKey (void* Item, const void* Key, int Mode) const
   {
     (void)Mode;
     return strcmp (((VfsArchive *)Item)->GetName (), (char *)Key);
   }
-  virtual bool FreeItem (csSome Item)
+  virtual bool FreeItem (void* Item)
   {
     delete (VfsArchive *)Item;
     return true;
@@ -1143,19 +1143,19 @@ csVFS::VfsVector::~VfsVector ()
   DeleteAll ();
 }
 
-bool csVFS::VfsVector::FreeItem (csSome Item)
+bool csVFS::VfsVector::FreeItem (void* Item)
 {
   delete (VfsNode *)Item;
   return true;
 }
 
-int csVFS::VfsVector::Compare (csSome Item1, csSome Item2, int Mode) const
+int csVFS::VfsVector::Compare (void* Item1, void* Item2, int Mode) const
 {
   (void)Mode;
   return strcmp (((VfsNode *)Item1)->VPath, ((VfsNode *)Item2)->VPath);
 }
 
-int csVFS::VfsVector::CompareKey (csSome Item, csConstSome Key, int Mode) const
+int csVFS::VfsVector::CompareKey (void* Item, const void* Key, int Mode) const
 {
   (void)Mode;
   return strcmp (((VfsNode *)Item)->VPath, (char *)Key);

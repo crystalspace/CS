@@ -21,7 +21,7 @@
 #include "cssysdef.h"
 #include "csutil/csstrvec.h"
 
-bool csStrVector::FreeItem (csSome Item)
+bool csStrVector::FreeItem (void* Item)
 {
   delete [] (char *) Item;
   return true;
@@ -32,7 +32,7 @@ csStrVector::~csStrVector ()
   DeleteAll ();
 }
 
-int csStrVector::Compare (csSome Item1, csSome Item2, int Mode) const
+int csStrVector::Compare (void* Item1, void* Item2, int Mode) const
 {
   if (Mode == CASE_INSENSITIVE)
     return strcasecmp ((const char*)Item1, (const char*)Item2);
@@ -40,7 +40,7 @@ int csStrVector::Compare (csSome Item1, csSome Item2, int Mode) const
     return strcmp ((const char*)Item1, (const char*)Item2);
 }
 
-int csStrVector::CompareKey (csSome Item, csConstSome Key, int Mode) const
+int csStrVector::CompareKey (void* Item, const void* Key, int Mode) const
 {
   if (Mode == CASE_INSENSITIVE)
     return strcasecmp ((const char*)Item, (const char*)Key);

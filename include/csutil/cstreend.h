@@ -60,8 +60,8 @@ class csTreeNode
    * successful execution of TreeFunc.
    * SelBranch lets you decide which children to select for further investugation. NULL means all children.
    */
-  csTreeNode *DSF (bool (*TreeFunc)(csTreeNode *node, csSome param, bool stopOnSuccess),
-		   bool (*SelBranch)(csTreeNode *node), csSome param, bool stopOnSuccess)
+  csTreeNode *DSF (bool (*TreeFunc)(csTreeNode *node, void* param, bool stopOnSuccess),
+		   bool (*SelBranch)(csTreeNode *node), void* param, bool stopOnSuccess)
   {
     csTreeNode *foundNode = NULL;
     int i=0;
@@ -86,8 +86,8 @@ class csTreeNode
    * successful execution of TreeFunc.
    * SelBranch lets you decide which children to select for further investugation. NULL means all children.
    */
-  csTreeNode *BSF (bool (*TreeFunc)(csTreeNode *node, csSome param, bool stopOnSuccess),
-		   bool (*SelBranch)(csTreeNode *node), csSome param, bool stopOnSuccess)
+  csTreeNode *BSF (bool (*TreeFunc)(csTreeNode *node, void* param, bool stopOnSuccess),
+		   bool (*SelBranch)(csTreeNode *node), void* param, bool stopOnSuccess)
   {
     csTreeNode *node, *foundNode = NULL;
     csVector fifo;

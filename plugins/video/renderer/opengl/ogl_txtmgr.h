@@ -78,7 +78,7 @@ protected:
   public:
     csTextureOpenGL* operator [] (int idx) const
     { return (csTextureOpenGL*)csVector::Get (idx);}
-    int Push (csTexture *t){ return csVector::Push ((csSome)t);}
+    int Push (csTexture *t){ return csVector::Push ((void*)t);}
   };
 
 public:

@@ -256,7 +256,7 @@ public:
   virtual ~csSpriteFrameVector ();
 
   /// Free a item as a frame.
-  virtual bool FreeItem (csSome Item);
+  virtual bool FreeItem (void* Item);
 };
 
 /**
@@ -269,7 +269,7 @@ public:
   virtual ~csSpriteActionVector ();
 
   /// Free a item as an action.
-  virtual bool FreeItem (csSome Item);
+  virtual bool FreeItem (void* Item);
 };
 
 /**
@@ -282,7 +282,7 @@ public:
   virtual ~csSpriteSocketVector ();
 
   /// Free a item as an action.
-  virtual bool FreeItem (csSome Item);
+  virtual bool FreeItem (void* Item);
 };
 
 class csSprite3DMeshObject;

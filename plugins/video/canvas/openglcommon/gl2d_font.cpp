@@ -84,7 +84,7 @@ GLFontCache::GLGlyphVector::~GLGlyphVector ()
   DeleteAll ();
 }
 
-bool GLFontCache::GLGlyphVector::FreeItem (csSome Item)
+bool GLFontCache::GLGlyphVector::FreeItem (void* Item)
 {
   delete (GLGlyphSet *)Item;
   return true;

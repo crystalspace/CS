@@ -27,7 +27,7 @@ csBasicVector::csBasicVector (int ilimit, int ithreshold) : count(0), root(0)
   limit = (ilimit > 0 ? ilimit : 0);
   threshold = (ithreshold > 0 ? ithreshold : 16);
   if (limit != 0)
-    root = (csSome*)malloc (limit * sizeof(csSome));
+    root = (void**) malloc (limit * sizeof(void*));
 }
 
 csBasicVector::~csBasicVector ()
@@ -47,14 +47,14 @@ void csBasicVector::SetLength (int n)
       root = NULL;
     }
     else if (root == 0)
-      root = (csSome*)malloc(n * sizeof(csSome));
+      root = (void**)malloc(n * sizeof(void*));
     else
-      root = (csSome*)realloc(root, n * sizeof(csSome));
+      root = (void**)realloc(root, n * sizeof(void*));
     limit = n;
   }
 }
 
-int csBasicVector::Find (csSome which) const
+int csBasicVector::Find (void* which) const
 {
   for (int i = 0; i < Length (); i++)
     if (root [i] == which)
@@ -63,14 +63,14 @@ int csBasicVector::Find (csSome which) const
   return -1;
 }
 
-bool csBasicVector::Insert (int n, csSome Item)
+bool csBasicVector::Insert (int n, void* Item)
 {
   if (n <= count)
   {
     SetLength (count + 1); // Increments 'count' as a side-effect.
     const int nmove = (count - n - 1);
     if (nmove > 0)
-      memmove (&root [n + 1], &root [n], nmove * sizeof (csSome));
+      memmove (&root [n + 1], &root [n], nmove * sizeof (void*));
     root [n] = Item;
     return true;
   }
@@ -85,7 +85,7 @@ bool csBasicVector::Delete (int n)
     const int ncount = count - 1;
     const int nmove = ncount - n;
     if (nmove > 0)
-      memmove (&root [n], &root [n + 1], nmove * sizeof (csSome));
+      memmove (&root [n], &root [n + 1], nmove * sizeof (void*));
     SetLength (ncount);
     return true;
   }
@@ -94,16 +94,16 @@ bool csBasicVector::Delete (int n)
 }
 
 
-bool csBasicVector::InsertChunk (int n, int size , csSome* Item)
+bool csBasicVector::InsertChunk (int n, int size , void** Item)
 { // no run-time checks here, just in debug mode
   CS_ASSERT( n <= count );
   CS_ASSERT( size>0 );
   SetLength (count + size); // Increments 'count' as a side-effect
   const int nmove = (count - (n + size));
   if (nmove > 0)
-    memmove ( &root [ n + size ] , &root [ n ] , nmove * sizeof (csSome) );
+    memmove ( &root [ n + size ] , &root [ n ] , nmove * sizeof (void*) );
     
-  memcpy  ( &root [ n ] , Item , size * sizeof (csSome) );    
+  memcpy  ( &root [ n ] , Item , size * sizeof (void*) );    
   return true;  
 }
 
@@ -113,7 +113,7 @@ bool csBasicVector::DeleteChunk (int n, int size)
   CS_ASSERT( (size > 0) && ( n + size <= count ) );
   const int nmove  = count - n - size;
   if ( nmove > 0 )
-    memmove (&root [ n ] , &root [ n + size ] , nmove * sizeof (csSome) );
+    memmove (&root [ n ] , &root [ n + size ] , nmove * sizeof (void*) );
   
   SetLength ( count - size );
   return true;
@@ -128,7 +128,7 @@ void csVector::DeleteAll (bool FreeThem)
     SetLength (0);
 }
 
-bool csVector::FreeItem (csSome Item)
+bool csVector::FreeItem (void* Item)
 {
   (void)Item;
   return true;
@@ -139,7 +139,7 @@ bool csVector::Delete (int n, bool FreeIt)
   if (n < 0 || n >= count)
     return false;
 
-  csSome obj = root[n];
+  void* obj = root[n];
 
   if (!csBasicVector::Delete(n))
       return false;
@@ -150,7 +150,7 @@ bool csVector::Delete (int n, bool FreeIt)
   return true;
 }
 
-bool csVector::Replace (int n, csSome what, bool FreePrevious)
+bool csVector::Replace (int n, void* what, bool FreePrevious)
 {
   if (n >= count)
     return false;
@@ -165,7 +165,7 @@ bool csVector::Replace (int n, csSome what, bool FreePrevious)
   return true;
 }
 
-int csVector::FindKey (csConstSome Key, int Mode) const
+int csVector::FindKey (const void* Key, int Mode) const
 {
   int i;
   for (i = 0; i < Length (); i++)
@@ -174,7 +174,7 @@ int csVector::FindKey (csConstSome Key, int Mode) const
   return -1;
 }
 
-int csVector::FindSortedKey (csConstSome Key, int Mode) const
+int csVector::FindSortedKey (const void* Key, int Mode) const
 {
   int l = 0, r = Length () - 1;
   while (l <= r)
@@ -192,7 +192,7 @@ int csVector::FindSortedKey (csConstSome Key, int Mode) const
   return -1;
 }
 
-int csVector::InsertSorted (csSome Item, int *oEqual, int Mode)
+int csVector::InsertSorted (void* Item, int *oEqual, int Mode)
 {
   int m = 0, l = 0, r = Length () - 1;
   while (l <= r)
@@ -269,13 +269,13 @@ recurse:
   }
 }
 
-int csVector::Compare (csSome Item1, csSome Item2, int Mode) const
+int csVector::Compare (void* Item1, void* Item2, int Mode) const
 {
   (void)Mode;
   return ((int)Item1 > (int)Item2) ? +1 : ((int)Item1 == (int)Item2) ? 0 : -1;
 }
 
-int csVector::CompareKey (csSome Item, csConstSome Key, int Mode) const
+int csVector::CompareKey (void* Item, const void* Key, int Mode) const
 {
   (void)Mode;
   return (Item > Key) ? +1 : (Item == Key) ? 0 : -1;

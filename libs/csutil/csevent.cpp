@@ -193,7 +193,7 @@ bool csEvent::Add(const char *name, int8 v)
     v1 = new csVector();
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((csSome)object);
+  v1->Push((void*) object);
   count++;
   return true;
 }
@@ -208,7 +208,7 @@ bool csEvent::Add(const char *name, uint8 v)
     v1 = new csVector();
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((csSome)object);
+  v1->Push((void*) object);
   count++;
   return true;
 }
@@ -223,7 +223,7 @@ bool csEvent::Add(const char *name, int16 v)
     v1 = new csVector();
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((csSome)object);
+  v1->Push((void*) object);
   count++;
   return true;
 }
@@ -238,7 +238,7 @@ bool csEvent::Add(const char *name, uint16 v)
     v1 = new csVector();
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((csSome)object);
+  v1->Push((void*) object);
   count++;
   return true;
 }
@@ -261,7 +261,7 @@ bool csEvent::Add(const char *name, int32 v, bool force_boolean)
     v1 = new csVector();
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((csSome)object);
+  v1->Push((void*) object);
   count++;
   return true;
 }
@@ -276,7 +276,7 @@ bool csEvent::Add(const char *name, uint32 v)
     v1 = new csVector();
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((csSome)object);
+  v1->Push((void*) object);
   count++;
   return true;
 }
@@ -291,7 +291,7 @@ bool csEvent::Add(const char *name, int64 v)
     v1 = new csVector();
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((csSome)object);
+  v1->Push((void*) object);
   count++;
   return true;
 }
@@ -306,7 +306,7 @@ bool csEvent::Add(const char *name, uint64 v)
     v1 = new csVector();
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((csSome)object);
+  v1->Push((void*) object);
   count++;
   return true;
 }
@@ -321,7 +321,7 @@ bool csEvent::Add(const char *name, float v)
     v1 = new csVector();
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((csSome)object);
+  v1->Push((void*) object);
   count++;
   return true;
 }
@@ -336,7 +336,7 @@ bool csEvent::Add(const char *name, double v)
     v1 = new csVector();
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((csSome)object);
+  v1->Push((void*) object);
   count++;
   return true;
 }
@@ -361,7 +361,7 @@ bool csEvent::Add(const char *name, bool v, bool force_boolean)
     v1 = new csVector();
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((csSome)object);
+  v1->Push((void*) object);
   count++;
   return true;
 }
@@ -380,7 +380,7 @@ bool csEvent::Add(const char *name, char *v)
     v1 = new csVector();
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((csSome)object);
+  v1->Push((void*) object);
   count++;
   return true;
 }
@@ -396,7 +396,7 @@ bool csEvent::Add(const char *name, void *v, uint32 size)
     v1 = new csVector();
     attributes.Put(name, (csHashObject) v1);
   }
-  v1->Push((csSome)object);
+  v1->Push((void*) object);
   count++;
   return true;
 }
@@ -434,7 +434,7 @@ bool csEvent::Add(const char *name, iEvent *v)
         v1 = new csVector();
         attributes.Put(name, (csHashObject) v1);
       }
-      v1->Push((csSome)object);
+      v1->Push((void*) object);
       count++;
       return true;
     }

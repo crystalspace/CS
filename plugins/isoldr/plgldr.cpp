@@ -59,7 +59,7 @@ csIsoLoader::csLoadedPluginVector::~csLoadedPluginVector ()
   DeleteAll ();
 }
 
-bool csIsoLoader::csLoadedPluginVector::FreeItem (csSome Item)
+bool csIsoLoader::csLoadedPluginVector::FreeItem (void* Item)
 {
   csLoaderPluginRec *rec = (csLoaderPluginRec*)Item;
   if (rec->Plugin)

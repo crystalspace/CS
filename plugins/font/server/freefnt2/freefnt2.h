@@ -62,22 +62,22 @@ class csFreeType2Font : public iFont
   public:
     virtual ~csFontDefVector ()
     { DeleteAll (); }
-    virtual bool FreeItem (csSome Item)
+    virtual bool FreeItem (void* Item)
     { delete (GlyphSet *)Item; return true; }
     GlyphSet *Get (int n)
     { return (GlyphSet *)csVector::Get (n); }
-    virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
+    virtual int Compare (void* Item1, void* Item2, int /*Mode*/) const
     {
       int id1 = ((GlyphSet*)Item1)->size, id2 = ((GlyphSet*)Item2)->size;
       return id1 - id2;
     }
-    virtual int CompareKey (csSome Item1, csConstSome Key, int /*Mode*/) const
+    virtual int CompareKey (void* Item1, const void* Key, int /*Mode*/) const
     { int id1 = ((GlyphSet*)Item1)->size; return id1 - (int)Key; }
   } cache;
 
   GlyphSet *FindGlyphSet (int size)
   {
-    int idx = cache.FindKey ((csConstSome)size);
+    int idx = cache.FindKey ((const void*)size);
     return (idx == -1 ? NULL : cache.Get (idx));
   }
 
@@ -192,14 +192,14 @@ class csFreeType2Server : public iFontServer
   public:
     void Put (csFreeType2Font *Font)
     { Font->IncRef (); csVector::Push (Font); }
-    virtual bool FreeItem (csSome Item)
+    virtual bool FreeItem (void* Item)
     { ((csFreeType2Font *)Item)->DecRef (); return true; }
     csFreeType2Font *Get (int n)
     { return (csFreeType2Font *)csVector::Get (n); }
-    virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
+    virtual int Compare (void* Item1, void* Item2, int /*Mode*/) const
     { return strcmp (((csFreeType2Font *)Item1)->name,
                      ((csFreeType2Font *)Item2)->name); }
-    virtual int CompareKey (csSome Item1, csConstSome Key, int /*Mode*/) const
+    virtual int CompareKey (void* Item1, const void* Key, int /*Mode*/) const
     {
       // compare the font names
       const char *id1 = ((csFreeType2Font *)Item1)->name;

@@ -139,12 +139,12 @@ void csVertexBufferManager::UnlockBuffer (iVertexBuffer* buf)
 
 void csVertexBufferManager::AddClient (iVertexBufferManagerClient *client)
 {
-  vClients.Push ((csSome)client);
+  vClients.Push ((void*)client);
 }
 
 void csVertexBufferManager::RemoveClient (iVertexBufferManagerClient *client)
 {
-  int idx = vClients.Find ((csSome)client);
+  int idx = vClients.Find ((void*)client);
   if (idx != -1)
     vClients.Delete (idx);
 }

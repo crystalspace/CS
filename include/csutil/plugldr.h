@@ -46,7 +46,7 @@ public:
   bool Sort (iObjectRegistry* object_reg);
   csPluginLoadRec &Get (int idx)
   { return *(csPluginLoadRec *)csVector::Get (idx); }
-  virtual bool FreeItem (csSome Item)
+  virtual bool FreeItem (void* Item)
   { delete (csPluginLoadRec *)Item; return true; }
 private:
   bool RecurseSort (iObjectRegistry*, int row, int *order, int *loop,

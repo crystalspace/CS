@@ -83,7 +83,7 @@ private:
     // destructor
     ~csLoadedPluginVector ();
     // delete a plugin record
-    virtual bool FreeItem (csSome Item);
+    virtual bool FreeItem (void* Item);
     // find a plugin by its name or load it if it doesn't exist
     iLoaderPlugin* FindPlugin (const char* Name);
     // add a new plugin record

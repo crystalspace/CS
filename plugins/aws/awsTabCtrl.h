@@ -100,14 +100,14 @@ protected:
     awsTab *Get(int idx) const {return (awsTab*)csVector::Get (idx);}
     int Push (awsTab *tab)
     {
-      return csVector::Push ((csSome)tab);
+      return csVector::Push ((void*)tab);
     }
-    virtual bool FreeItem (csSome Item)
+    virtual bool FreeItem (void* Item)
     {
       delete (awsTab*)Item;
       return true;
     }
-    virtual int Compare (csSome Item1, csSome Item2) const
+    virtual int Compare (void* Item1, void* Item2) const
     {
       awsTab *te1 = (awsTab *)Item1;
       awsTab *te2 = (awsTab *)Item2;

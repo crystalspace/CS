@@ -13,13 +13,13 @@ public:
   virtual ~awsListRowVector ();
 
   /// Virtual function which frees a vector element; returns success status
-  virtual bool FreeItem (csSome Item);
+  virtual bool FreeItem (void* Item);
 
   /// Compare two array elements in given Mode
-  virtual int Compare (csSome Item1, csSome Item2, int Mode) const;
+  virtual int Compare (void* Item1, void* Item2, int Mode) const;
 
   /// Compare entry with a key
-  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
+  virtual int CompareKey (void* Item, const void* Key, int Mode) const;
 
   /// Set the sort column
   void SetSortCol (int sc)  { sortcol = sc; }

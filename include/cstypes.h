@@ -94,21 +94,11 @@ typedef int64_t int64;
 #endif // end of #if !defined(CS_BUILTIN_SIZED_TYPES)
 /** @} */
 
-/// Used for uniquely generated id numbers
-typedef uint32 CS_ID;		
+/// Used for uniquely generated id numbers XXX: remove this sometime
+typedef uint32 CS_ID;
 
-/**\name Shortcuts for normal C types
- * @{ */
-/// Default unsigned int, for lazy people
-typedef unsigned int uint;
-/** @} */
-
-/// Time in milli (1/1000) seconds
+/// Time in milli (1/1000) seconds XXX: should be moved to sysfunc.h
 typedef unsigned int csTicks;
 
-/// A pointer to something
-typedef void *csSome;
-/// A pointer to some constant
-typedef const void *csConstSome;
 
 #endif // __CS_CSTYPES_H__

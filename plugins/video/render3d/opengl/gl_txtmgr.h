@@ -102,7 +102,7 @@ private:
   public:
     csGLTexture* operator [] (int idx) const
     { return (csGLTexture*)csVector::Get (idx);}
-    int Push (csGLTexture *t){ return csVector::Push ((csSome)t);}
+    int Push (csGLTexture *t){ return csVector::Push ((void*)t);}
   };
   
   bool transform (iImageVector *ImageVec, csGLTexture *tex);

@@ -51,7 +51,7 @@ protected:
     FrameVector (int ilimit = 0, int ithreshold = 0)
       : csVector (ilimit, ithreshold) {};
     /// Free a single element of the array
-    virtual bool FreeItem (csSome Item)
+    virtual bool FreeItem (void* Item)
     { delete (FrameEntry*)Item; return true; }
   };
 
@@ -72,7 +72,7 @@ protected:
     StatVector (int ilimit = 0, int ithreshold = 0)
       : csVector (ilimit, ithreshold) {};
     /// Free a single element of the array
-    virtual bool FreeItem (csSome Item)
+    virtual bool FreeItem (void* Item)
     { delete (StatEntry*)Item; return true; }
   };
   //------------------------------------------------------------------------

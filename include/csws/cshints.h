@@ -98,11 +98,11 @@ public:
   /// Destroy the hint manager
   virtual ~csHintManager ();
   /// Override FreeItem to correctly free hint store objects
-  virtual bool FreeItem (csSome Item);
+  virtual bool FreeItem (void* Item);
   /// Compare two hints (by csComponent's)
-  virtual int Compare (csSome Item1, csSome Item2, int Mode) const;
+  virtual int Compare (void* Item1, void* Item2, int Mode) const;
   /// Compare a hint with a csComponent
-  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
+  virtual int CompareKey (void* Item, const void* Key, int Mode) const;
   /// Add a new hint
   void Add (const char *iText, csComponent *iComp);
   /// Remove the hint (if any) associated with this component

@@ -68,8 +68,8 @@ public:
 class scfLibraryVector : public csVector
 {
 public:
-  virtual bool FreeItem (csSome Item);
-  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
+  virtual bool FreeItem (void* Item);
+  virtual int CompareKey (void* Item, const void* Key, int Mode) const;
 };
 
 // This is the registry for all shared libraries
@@ -189,13 +189,13 @@ scfClassInfo *scfSharedLibrary::Find (const char *iClassID)
   return NULL;
 }
 
-bool scfLibraryVector::FreeItem (csSome Item)
+bool scfLibraryVector::FreeItem (void* Item)
 {
   delete (scfSharedLibrary *)Item;
   return true;
 }
 
-int scfLibraryVector::CompareKey (csSome Item, csConstSome Key, int) const
+int scfLibraryVector::CompareKey (void* Item, const void* Key, int) const
 {
   return (strcmp (((scfSharedLibrary *)Item)->LibraryName, (char *)Key));
 }
@@ -246,11 +246,11 @@ class scfClassRegistry : public csVector
 public:
   scfClassRegistry () : csVector (16, 16) {}
   virtual ~scfClassRegistry () { DeleteAll (); }
-  virtual bool FreeItem (csSome Item)
+  virtual bool FreeItem (void* Item)
   { delete (scfFactory *)Item; return true; }
-  virtual int CompareKey (csSome Item, csConstSome Key, int) const
+  virtual int CompareKey (void* Item, const void* Key, int) const
   { return strcmp (((scfFactory *)Item)->ClassID, (char *)Key); }
-  virtual int Compare (csSome Item1, csSome Item2, int) const
+  virtual int Compare (void* Item1, void* Item2, int) const
   { return strcmp (((scfFactory *)Item1)->ClassID,
                    ((scfFactory *)Item2)->ClassID); }
 };

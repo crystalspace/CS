@@ -41,7 +41,7 @@ struct iDataBuffer : public iBase
   /// Query the buffer size
   virtual size_t GetSize () const = 0;
   /// Get the buffer as an abstract pointer
-  virtual csSome GetData () const = 0;
+  virtual char* GetData () const = 0;
   /// Get the buffer as an (char *) pointer
   inline char *operator * () const
   { return (char *)GetData (); }

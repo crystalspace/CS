@@ -58,7 +58,7 @@ class csConstraintVector : public csVector
 {
 public:
   /// for looking up an constraint by comparing the attached components
-  virtual int Compare (csSome Item1, csSome Item2, int Mode = 0) const
+  virtual int Compare (void* Item1, void* Item2, int Mode = 0) const
   {
     (void)Mode;
     csLayoutConstraint *c1 = (csLayoutConstraint *)Item1;
@@ -66,7 +66,7 @@ public:
     return (c1->comp < c2->comp ? -1 : c1->comp > c2->comp ? 1 : 0);
   }
   /// look up an constraint given a components
-  virtual int CompareKey (csSome Item1, csConstSome Item2, int Mode = 0) const
+  virtual int CompareKey (void* Item1, const void* Item2, int Mode = 0) const
   {
     (void)Mode;
     csLayoutConstraint *c1 = (csLayoutConstraint *)Item1;
@@ -74,7 +74,7 @@ public:
     return (c1->comp < c2 ? -1 : c1->comp > c2 ? 1 : 0);
   }
   /// for automatic cleanup of the vector elements
-  virtual bool FreeItem (csSome Item)
+  virtual bool FreeItem (void* Item)
   { if (Item) delete (csLayoutConstraint *)Item; return true; }
   /// for convenience
   csLayoutConstraint *Get (int idx)

@@ -83,13 +83,13 @@ public:
   virtual ~csSkin ();
 
   /// Free a skin from this repository
-  virtual bool FreeItem (csSome Item);
+  virtual bool FreeItem (void* Item);
 
   /// Compare a item from this array with some key
-  virtual int CompareKey (csSome Item, csConstSome Key, int) const;
+  virtual int CompareKey (void* Item, const void* Key, int) const;
 
   /// Compare two items from this array
-  virtual int Compare (csSome Item1, csSome Item2, int) const;
+  virtual int Compare (void* Item1, void* Item2, int) const;
 
   /// Get a skin from this array
   csSkinSlice *Get (int iIndex)

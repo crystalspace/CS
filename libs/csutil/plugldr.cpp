@@ -141,7 +141,7 @@ bool csPluginList::Sort (iObjectRegistry* object_reg)
       error = true;
 
   // Reorder plugin list according to "order" array
-  csSome *newroot = (csSome *)malloc (len * sizeof (csSome));
+  void** newroot = (void**) malloc (len * sizeof (void*));
   for (row = 0; row < len; row++)
     newroot [row] = root [order [row] - 1];
   free (root); root = newroot;

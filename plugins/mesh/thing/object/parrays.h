@@ -46,10 +46,10 @@ public:
   virtual ~csPolygonStaticArray ();
 
   /// Delete a particular array element
-  virtual bool FreeItem (csSome Item);
+  virtual bool FreeItem (void* Item);
 
   /// Find a polygon by name
-  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
+  virtual int CompareKey (void* Item, const void* Key, int Mode) const;
 
   /// Get a polygon given its index in the array
   csPolygon3DStatic *Get (int iIndex) const;
@@ -75,10 +75,10 @@ public:
   virtual ~csPolygonArray ();
 
   /// Delete a particular array element
-  virtual bool FreeItem (csSome Item);
+  virtual bool FreeItem (void* Item);
 
   /// Find a polygon by name
-  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
+  virtual int CompareKey (void* Item, const void* Key, int Mode) const;
 
   /// Get a polygon given its index in the array
   csPolygon3D *Get (int iIndex) const;

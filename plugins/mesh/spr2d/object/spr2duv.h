@@ -98,7 +98,7 @@ class csSprite2DUVAnimation : public iSprite2DUVAnimation
   {
   public:
     frameVector () : csVector (8, 16){}
-    virtual int CompareKey (csSome Item1, csConstSome Item2, int Mode) const
+    virtual int CompareKey (void* Item1, const void* Item2, int Mode) const
     {
       (void)Mode;
       csSprite2DUVAnimationFrame *f1 = (csSprite2DUVAnimationFrame *)Item1;

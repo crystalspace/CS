@@ -132,7 +132,7 @@ bool csLinuxJoystick::Init ()
     }
     else
       nJoy++;
-    h.Push ((csSome)fd);
+    h.Push ((void*) fd);
   }
 
   if (nJoy)

@@ -62,7 +62,7 @@ private:
     /// Destroy the vector.
     virtual ~csPluginsVector () { DeleteAll (); }
     /// Find a plugin by its address
-    virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
+    virtual int CompareKey (void* Item, const void* Key, int /*Mode*/) const
     {
       return ((csPlugin *)Item)->Plugin == Key ? 0 : 1;
     }
@@ -70,7 +70,7 @@ private:
     csPlugin *Get (int idx)
     { return (csPlugin *)csVector::Get (idx); }
 
-    virtual bool FreeItem (csSome Item)
+    virtual bool FreeItem (void* Item)
     { delete (csPlugin*)Item; return true; }
   };
 

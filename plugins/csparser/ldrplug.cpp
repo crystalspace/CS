@@ -61,7 +61,7 @@ csLoader::csLoadedPluginVector::~csLoadedPluginVector ()
   DeleteAll ();
 }
 
-bool csLoader::csLoadedPluginVector::FreeItem (csSome Item)
+bool csLoader::csLoadedPluginVector::FreeItem (void* Item)
 {
   csLoaderPluginRec *rec = (csLoaderPluginRec*)Item;
   if (rec->Component && plugin_mgr)

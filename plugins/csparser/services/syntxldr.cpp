@@ -793,16 +793,16 @@ bool csTextSyntaxService::ParsePortal (
 	  return false;
         break;
       case XMLTOKEN_STATIC:
-        flags.Push ((csSome)CS_PORTAL_STATICDEST);
+        flags.Push ((void*)CS_PORTAL_STATICDEST);
         break;
       case XMLTOKEN_FLOAT:
-        flags.Push ((csSome)CS_PORTAL_FLOAT);
+        flags.Push ((void*)CS_PORTAL_FLOAT);
         break;
       case XMLTOKEN_ZFILL:
-        flags.Push ((csSome)CS_PORTAL_ZFILL);
+        flags.Push ((void*)CS_PORTAL_ZFILL);
         break;
       case XMLTOKEN_CLIP:
-        flags.Push ((csSome)CS_PORTAL_CLIPDEST);
+        flags.Push ((void*)CS_PORTAL_CLIPDEST);
         break;
       case XMLTOKEN_SECTOR:
 	{

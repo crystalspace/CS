@@ -83,7 +83,7 @@ private:
   public:
     EventCordsVector() : csVector (16, 16) {}
     virtual ~EventCordsVector() { DeleteAll(); }
-    virtual bool FreeItem(csSome p)
+    virtual bool FreeItem(void* p)
       { ((csEventCord*)p)->DecRef(); return true; }
     csEventCord* Get(int i)
       { return (csEventCord*)csVector::Get(i); }

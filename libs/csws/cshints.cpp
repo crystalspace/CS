@@ -188,13 +188,13 @@ csHintManager::~csHintManager ()
     font->DecRef ();
 }
 
-bool csHintManager::FreeItem (csSome Item)
+bool csHintManager::FreeItem (void* Item)
 {
   free (Item);
   return true;
 }
 
-int csHintManager::Compare (csSome Item1, csSome Item2, int Mode) const
+int csHintManager::Compare (void* Item1, void* Item2, int Mode) const
 {
   (void)Mode;
   HintStore *ts1 = (HintStore *)Item1;
@@ -202,7 +202,7 @@ int csHintManager::Compare (csSome Item1, csSome Item2, int Mode) const
   return (ts1->comp < ts2->comp) ? -1 : (ts1->comp > ts2->comp) ? +1 : 0;
 }
 
-int csHintManager::CompareKey (csSome Item, csConstSome Key, int Mode) const
+int csHintManager::CompareKey (void* Item, const void* Key, int Mode) const
 {
   (void)Mode;
   HintStore *ts = (HintStore *)Item;

@@ -40,7 +40,7 @@ int scfStrVector::Find (const char *iValue) const
 { return v.FindKey (iValue); }
 
 int scfStrVector::FindSorted (const char *iValue) const
-{ return v.FindSortedKey ((csConstSome)iValue); }
+{ return v.FindSortedKey ((const void*)iValue); }
 
 void scfStrVector::QuickSort ()
 { v.QuickSort (); }

@@ -11,14 +11,14 @@ awsListRowVector::~awsListRowVector ()
 {
 }
 
-bool awsListRowVector::FreeItem (csSome Item)
+bool awsListRowVector::FreeItem (void* Item)
 {
   delete (awsListRow *)Item;
 
   return true;
 }
 
-int awsListRowVector::Compare (csSome Item1, csSome Item2, int
+int awsListRowVector::Compare (void* Item1, void* Item2, int
 
 /*Mode*/ ) const
 {
@@ -36,8 +36,8 @@ int awsListRowVector::Compare (csSome Item1, csSome Item2, int
 }
 
 int awsListRowVector::CompareKey (
-  csSome Item,
-  csConstSome Key,
+  void* Item,
+  const void* Key,
   int
 
   /*Mode*/ ) const
