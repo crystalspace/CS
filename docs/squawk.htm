@@ -1,12 +1,12 @@
 <html>
 
 <head>
-<title>Squawk Crystal Space Application</title>
+<title>Squawk game</title>
 </head>
 
 <body>
 
-<h1>Squawk Crystal Space Application</h1>
+<h1>Squawk game</h1>
 
 Created by <a href="mailto:sgalbrai@krl.org">Seth Galbraith</a>, also known as
 <a href="http://www.planetquake.com/simitar/">&quot;The Serpent Lord&quot;</a>
@@ -49,10 +49,18 @@ Esc  exit program
 <h3>Upper view</h3>
 
 <pre>
-up arrow     tilt camera up
-down arrow   tilt camera down
-left arrow   turn camera left
-right arrow  turn camera right
+up arrow     look up
+down arrow   look down
+left arrow   look left
+right arrow  look right
+
+home         look up and left
+end          look down and left
+page up      look up and right
+page down    look down and right
+
+insert       roll left
+delete       roll right
 </pre>
 
 <h3>Lower left view</h3>
@@ -90,22 +98,22 @@ but this causes a Floating Point Exception when I try to look at the sprite.
 <li>The sprite is not centered correctly.  This looks
 like it's a bug in the convertor I used.
 
-<li>"attack" action causes a Floating Point Exception:
-<pre>
-_DrawPolygonFX__20csGraphics3DSoftwareR14G3DPolygonDPFX+1860, line 2130 of soft_g3d.cc
-_Draw__8csSectorR12csRenderView+4186, line 553 of sector.cc
-_Draw__7csWorldP11IGraphics3DP8csCameraP9csClipper+407, line 493 of world.cc7
-_NextFrame__9SqkSystemll+413, line 382 of squawk.cc
-_Loop__15SysSystemDriver+103, line 99 of djgpp.cc
-_main+256, line 404 of squawk.cc
-___crt1_startup+138
-</pre>
+<li>Floating point exceptions in DrawPolygonFX
 
 </ul>
 
 <hr>
 
 <h2><a name="#history"></a>History</h2>
+
+<h3>September 26, 1999 Seth Galbraith</h3>
+<ul>
+<li>A lot of restructuring
+<li>Replaced CS sprite with three .mdl format models
+<li>Changed fixed-size arrays into csVector subclasses
+<li>Created sqkView class which contains multiple csViews
+<li>version 16
+</ul>
 
 <h3>September 21, 1999 Seth Galbraith</h3>
 <ul>
@@ -216,9 +224,7 @@ centered around the middle of the screen
 <ul>
 <li>Chase cameras that follow characters
 <li>Adjust FOV in split views
-<li>Create SqkView class which contains multiple views,
-eventually using a plain text file with information for
-configuring an arbitrary number of not necessarily convex views.
+<li>Use a plain text file with information for configuring views.
 (Probably described as a list of sqkViews which are described as
 a list of csViews which are described as a list of 2d coordinates.
 with an arbitrary number of each type of object allowed.)
@@ -228,7 +234,6 @@ with an arbitrary number of each type of object allowed.)
 
 <ul>
 <li>A local environment to move around in
-<li>Better sprites (easiest to do if I can use .mdl format)
 <li>Create a Squawk or general Crystal Space skybox class
 <li>Make sky textures a command line and config option.
 The base name, the extension for each direction, and the
