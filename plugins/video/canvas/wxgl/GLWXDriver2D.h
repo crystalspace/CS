@@ -115,11 +115,6 @@ public:
   void OnMouseEvent(wxMouseEvent& event);
   void OnEnterWindow(wxMouseEvent& event);
 
-private:
-  bool   m_init;
-  GLuint m_gllist;
-
-
   DECLARE_EVENT_TABLE();
 };
 #endif // __CS_GLWX2D_H__
