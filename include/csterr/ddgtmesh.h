@@ -251,6 +251,14 @@ public:
         return stri[i].edge();
     }
 
+	/// Function to add a bintree.
+	void addBinTree( ddgTBinTree *bt );
+	/// Function to remove a bintree.
+	void removeBinTree( ddgTBinTree *bt );
+	/// Return the bintree for a given index.
+	ddgTBinTree *getBinTree( ddgTreeIndex i)
+	{ assert(i < _bintreeMax); return _bintree[i]; }
+
 	/// Return the required LOD.
 	unsigned int detail( void ) { return _detail; }
 	/// Set the required LOD.
@@ -343,13 +351,6 @@ public:
 	/// Calculate the optimal set of triangles for the mesh at current camera pos.
 	void calculate(void);
 
-	/// Function to add a bintree.
-	void addBinTree( ddgTBinTree *bt );
-	/// Function to remove a bintree.
-	void removeBinTree( ddgTBinTree *bt );
-	/// Return the bintree for a given index.
-	ddgTBinTree *getBinTree( ddgTreeIndex i)
-	{ assert(i < _bintreeMax); return _bintree[i]; }
 	/// Distant clip range triangles beyond this point are not needed.
 	float		farclip(void) { return _farclip; }
 	/// Near clip range triangles beyond this point are not needed.
@@ -424,6 +425,5 @@ public:
 #endif
 
 };
-
 
 #endif

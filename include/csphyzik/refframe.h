@@ -39,6 +39,8 @@ public:
 	~ctReferenceFrame(){}
 
 	static ctReferenceFrame& universe();
+	bool is_universe(){ return is_universe_frame; }
+	bool not_universe(){ return !is_universe_frame; }
 
 	static void add_ref( ctReferenceFrame &rf )
 	{ 
@@ -51,25 +53,6 @@ public:
 			if( rf.not_universe() )
 				delete &rf;
 		}
-	}
-
-	bool is_universe(){ return is_universe_frame; }
-	bool not_universe(){ return !is_universe_frame; }
-
-	void this_to_world( ctVector3 &v )
-	{	
-		v = get_this_to_world()*v + get_world_offset();
-//		if( !T_world_calced() )
-//			calc_T_world();
-//		return T_world.This2Other( v );
-	}
-
-	void this_to_world( ctVector3 &v, ctVector3 &src )
-	{	
-		v = get_this_to_world()*src + get_world_offset();
-//		if( !T_world_calced() )
-//			calc_T_world();
-//		return T_world.This2Other( v );
 	}
 
 	const ctVector3 &get_offset(){ return offset; }
@@ -92,6 +75,22 @@ public:
 	
 	//!me no hiearchy yet really
 	const ctMatrix3 &get_this_to_world(){ return fTg; }
+
+	void this_to_world( ctVector3 &v )
+	{	
+		v = get_this_to_world()*v + get_world_offset();
+//		if( !T_world_calced() )
+//			calc_T_world();
+//		return T_world.This2Other( v );
+	}
+
+	void this_to_world( ctVector3 &v, ctVector3 &src )
+	{	
+		v = get_this_to_world()*src + get_world_offset();
+//		if( !T_world_calced() )
+//			calc_T_world();
+//		return T_world.This2Other( v );
+	}
 
 protected:
 	ctMatrix3 gTf;   // transform from parent frame to this one

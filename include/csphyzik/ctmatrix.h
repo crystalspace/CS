@@ -59,6 +59,9 @@ public:
 		rows[1][2] = rows[2][0] = rows[2][1] = 0.0;
 	}
 
+	ctVector3 &operator[]( const int index ){ return rows[index]; }
+	ctVector3 operator[]( const int index ) const { return rows[index]; }
+
 	ctMatrix3 get_transpose() const {
 		ctMatrix3 Mret;
 		for( int idx = 0; idx < 3; idx++ )
@@ -66,9 +69,6 @@ public:
 				Mret[idx][idy] = rows[idy][idx];
 		return Mret;
 	}
-
-	ctVector3 &operator[]( const int index ){ return rows[index]; }
-	ctVector3 operator[]( const int index ) const { return rows[index]; } //!me eh?
 
 	void orthonormalize();
 
