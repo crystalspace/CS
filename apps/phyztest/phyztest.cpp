@@ -88,7 +88,7 @@ ctRigidBody *add_test_body( ctVector3 ppos )
 ctRigidBody *arb;
 
 	arb = ctRigidBody::new_ctRigidBody();
-	arb->set_m( 20.0 );
+	arb->set_m( 2.0 );
 	arb->set_pos( ppos[0],ppos[1],ppos[2] );
 	arb->calc_simple_I_tensor( .1,.2,.1 );
 	return arb;
@@ -320,8 +320,9 @@ ctVector3 px;
   	}
   	
   	// rotate them so we can see some action.
-  	chain[0]->ab->rotate_around_axis( degree_to_rad(90) );
-  	chain[2]->ab->rotate_around_axis( degree_to_rad(60) );
+  	chain[0]->ab->rotate_around_axis( degree_to_rad(80) );
+    //!me uncomment if you have a good frame-rate
+	// chain[2]->ab->rotate_around_axis( degree_to_rad(60) );
     chain_added = true;
   }
 
@@ -448,7 +449,10 @@ int main (int argc, char* argv[])
   // add gravity to the world.  enviro forces affect all bodies in the world
   ctGravityF *gf = new ctGravityF( 9.81 / M_PER_WORLDUNIT );
   phyz_world.add_enviro_force( gf );
-  
+  // add air resistance
+  ctAirResistanceF *af = new ctAirResistanceF();
+  phyz_world.add_enviro_force( af );
+
   // Create our main class.
   Sys = new Phyztest ();
   // temp hack until we find a better way
