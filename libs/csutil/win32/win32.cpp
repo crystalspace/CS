@@ -659,9 +659,6 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
     case WM_ACTIVATEAPP:
       if ((GLOBAL_ASSISTANT != 0))
       {
-        iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
-	POINT mousePos;
-	GetCursorPos (&mousePos);
         if (wParam) 
 	{ 
 	  GLOBAL_ASSISTANT->ApplicationActive = true; 

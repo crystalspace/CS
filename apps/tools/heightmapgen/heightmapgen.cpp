@@ -184,6 +184,74 @@ static csRef<iDocumentNode> CreateNode (iDocumentNode* parent,
   return node;
 }
 
+void HeightMapGen::CreateHeightmap (int heightmap_res, iCollideSystem* cdsys, 
+                                     iSector* sector, csRGBpixel* hmap_dst, 
+                                     float* height_dst, 
+                                     const csBox3& box)
+{
+  csPrintf ("Creating heightmap...\n"); fflush (stdout);
+
+  float dx = (box.MaxX () - box.MinX () - 0.2) / float (heightmap_res-1);
+  float dz = (box.MaxZ () - box.MinZ () - 0.2) / float (heightmap_res-1);
+  for (int z = 0 ; z < heightmap_res ; z++)
+  {
+    for (int x = 0 ; x < heightmap_res ; x++)
+    {
+      csVector3 start, end;
+      start.x = box.MinX () + (float)x * dx + 0.1;
+      start.y = box.MaxY () + 10.0;
+      start.z = box.MinZ () + (heightmap_res-z-1) * dz + 0.1;
+      end = start;
+      end.y = box.MinY () - 10.0;
+      csVector3 isect;
+      //mesh->HitBeamObject (start, end, isect, 0, 0);
+      csIntersectingTriangle closest_tri;
+      csColliderHelper::TraceBeam (cdsys, sector, start, end,
+      	false, closest_tri, isect);
+      float y = (isect.y - box.MinY ()) / (box.MaxY () - box.MinY ());
+      if (y < 0) y = 0;
+      else if (y > 0.9999) y = 0.9999;
+      *height_dst++ = y;
+      y *= 256.0;
+      hmap_dst->Set (int (y), int (y), int (y));
+      hmap_dst++;
+    }
+  }
+}
+
+void HeightMapGen::CreateBasemap (int heightmap_res, csRGBpixel* basemap_dst, 
+                                   uint8* matmap_dst, const float* height_dst,
+                                   const csArray<TextureLayer>& txt_layers)
+{
+  csPrintf ("Creating base texturemap...\n"); fflush (stdout);
+  for (int z = 0 ; z < heightmap_res ; z++)
+  {
+    csRGBpixel* bm_dst = basemap_dst + (heightmap_res-z-1) * heightmap_res;
+    uint8* mm_dst = matmap_dst + (heightmap_res-z-1) * heightmap_res;
+    for (int x = 0 ; x < heightmap_res ; x++)
+    {
+      float y = *height_dst++;
+      (void)y;
+
+      int layer;
+      //for (layer = 0 ; layer < num_texture_layers ; layer++)
+      //{
+        //if (y >= txt_layers[layer].min_height
+		//&& y <= txt_layers[layer].max_height)
+	  //break;
+      //}
+      //*mm_dst++ = layer;
+      layer = *mm_dst++;
+      bm_dst->Set (
+      	int (txt_layers[layer].average.red * 255.0),
+      	int (txt_layers[layer].average.green * 255.0),
+      	int (txt_layers[layer].average.blue * 255.0)
+      	);
+      bm_dst++;
+    }
+  }
+}
+
 void HeightMapGen::Start ()
 {
   csRef<iImageIO> imageio = CS_QUERY_REGISTRY (object_reg, iImageIO);
@@ -212,16 +280,8 @@ void HeightMapGen::Start ()
   // Heightmap resolution.
   int heightmap_res = cfgmgr->GetInt ("HeightMapGen.HeightmapResolution", 513);
   int num_texture_layers = cfgmgr->GetInt ("HeightMapGen.NumTextureLayers", 3);
-  struct txt_layer
-  {
-    float min_height;
-    float max_height;
-    char texture_name[256];
-    char texture_file[256];
-    csRef<iImage> image;
-    csColor average;
-  };
-  txt_layer* txt_layers = new txt_layer[num_texture_layers];
+  csArray<TextureLayer> txt_layers;
+  txt_layers.SetLength (num_texture_layers);
   int i;
   for (i = 0 ; i < num_texture_layers ; i++)
   {
@@ -229,10 +289,10 @@ void HeightMapGen::Start ()
     str.Format ("HeightMapGen.Layer%d.", i);
     txt_layers[i].min_height = cfgmgr->GetInt ((str+"MinHeight").GetData ());
     txt_layers[i].max_height = cfgmgr->GetInt ((str+"MaxHeight").GetData ());
-    strcpy (txt_layers[i].texture_name, cfgmgr->GetStr (
-    	(str+"TextureName").GetData (), ""));
-    strcpy (txt_layers[i].texture_file, cfgmgr->GetStr (
-    	(str+"TextureFile").GetData (), ""));
+    txt_layers[i].texture_name = cfgmgr->GetStr (
+    	(str+"TextureName").GetData (), "");
+    txt_layers[i].texture_file = cfgmgr->GetStr (
+    	(str+"TextureFile").GetData (), "");
   }
 
   csRef<csImageMemory> heightmap_img;
@@ -270,7 +330,7 @@ void HeightMapGen::Start ()
     {
       csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.heightmapgen",
-	"Failed to read texture file '%s'!", txt_layers[i].texture_file);
+	"Failed to read texture file '%s'!", txt_layers[i].texture_file.GetData());
       return;
     }
     txt_layers[i].image = imageio->Load (buf->GetUint8 (), buf->GetSize (),
@@ -292,8 +352,8 @@ void HeightMapGen::Start ()
     	float (r / (w*h)) / 255.0,
     	float (g / (w*h)) / 255.0,
     	float (b / (w*h)) / 255.0);
-    printf ("Average color for %s: %g,%g,%g\n",
-    	txt_layers[i].texture_file,
+    csPrintf ("Average color for %s: %g,%g,%g\n",
+    	txt_layers[i].texture_file.GetData(),
 	txt_layers[i].average.red,
 	txt_layers[i].average.green,
 	txt_layers[i].average.blue);
@@ -301,70 +361,18 @@ void HeightMapGen::Start ()
   }
 
   csRGBpixel* hmap_dst = (csRGBpixel*)(heightmap_img->GetImageData ());
-  float dx = (box.MaxX () - box.MinX () - 0.2) / float (heightmap_res-1);
-  float dz = (box.MaxZ () - box.MinZ () - 0.2) / float (heightmap_res-1);
-  int x, z;
   float* height = new float[heightmap_res*heightmap_res];
   float* height_dst = height;
 
   // Create the heightmap first.
-  printf ("Creating heightmap...\n"); fflush (stdout);
-  for (z = 0 ; z < heightmap_res ; z++)
-  {
-    for (x = 0 ; x < heightmap_res ; x++)
-    {
-      csVector3 start, end;
-      start.x = box.MinX () + x * dx + 0.1;
-      start.y = box.MaxY () + 10.0;
-      start.z = box.MinZ () + (heightmap_res-z-1) * dz + 0.1;
-      end = start;
-      end.y = box.MinY () - 10.0;
-      csVector3 isect;
-      //mesh->HitBeamObject (start, end, isect, 0, 0);
-      csIntersectingTriangle closest_tri;
-      csColliderHelper::TraceBeam (cdsys, sector, start, end,
-      	false, closest_tri, isect);
-      float y = (isect.y - box.MinY ()) / (box.MaxY () - box.MinY ());
-      if (y < 0) y = 0;
-      else if (y > 0.9999) y = 0.9999;
-      *height_dst++ = y;
-      y *= 256.0;
-      hmap_dst->Set (int (y), int (y), int (y));
-      hmap_dst++;
-    }
-  }
-  printf ("Creating base texturemap...\n"); fflush (stdout);
+  CreateHeightmap (heightmap_res, cdsys, sector, hmap_dst, height_dst, box);
 
   // Now create the base texture and material map.
   csRGBpixel* basemap_dst = (csRGBpixel*)(basetexture_img->GetImageData ());
   uint8* matmap_dst = (uint8*)(materialmap_img->GetImageData ());
-  height_dst = height;
-  for (z = 0 ; z < heightmap_res ; z++)
-  {
-    csRGBpixel* bm_dst = basemap_dst + (heightmap_res-z-1) * heightmap_res;
-    uint8* mm_dst = matmap_dst + (heightmap_res-z-1) * heightmap_res;
-    for (x = 0 ; x < heightmap_res ; x++)
-    {
-      float y = *height_dst++;
-      (void)y;
+  CreateBasemap (heightmap_res, basemap_dst, matmap_dst, height_dst, 
+    txt_layers);
 
-      int layer;
-      //for (layer = 0 ; layer < num_texture_layers ; layer++)
-      //{
-        //if (y >= txt_layers[layer].min_height
-		//&& y <= txt_layers[layer].max_height)
-	  //break;
-      //}
-      //*mm_dst++ = layer;
-      layer = *mm_dst++;
-      bm_dst->Set (
-      	int (txt_layers[layer].average.red * 255.0),
-      	int (txt_layers[layer].average.green * 255.0),
-      	int (txt_layers[layer].average.blue * 255.0)
-      	);
-      bm_dst++;
-    }
-  }
   delete[] height;
 
   csString heightmap_output_file = cfgmgr->GetStr (
@@ -384,6 +392,7 @@ void HeightMapGen::Start ()
   csString world_name = cfgmgr->GetStr (
   	"HeightMapGen.WorldOutput", "/this/world");
 
+  csPrintf ("Writing images...\n"); fflush (stdout);
   csRef<iDataBuffer> db = imageio->Save (heightmap_img,
     	"image/png", "progressive");
   if (db)
@@ -426,6 +435,7 @@ void HeightMapGen::Start ()
     return;
   }
 
+  csPrintf ("Writing world...\n"); fflush (stdout);
   csRef<iDocumentSystem> docsys;
   docsys.AttachNew (new csTinyDocumentSystem ());
   csRef<iDocument> doc = docsys->CreateDocument ();
@@ -636,9 +646,8 @@ void HeightMapGen::Start ()
 #endif
   }
 
-  printf ("%s\n", doc->Write (VFS, world_name));
-
-  delete[] txt_layers;
+  const char* err = doc->Write (VFS, world_name);
+  if (err != 0) csPrintf ("%s\n", err);
 }
 
 /*---------------------------------------------------------------------*

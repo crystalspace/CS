@@ -116,6 +116,7 @@ typedef unsigned int GLhandleARB;
 
 #include "iutil/cmdline.h"
 #include "iutil/objreg.h"
+#include "iutil/verbositymanager.h"
 #include "ivaria/reporter.h"
 #include "plugins/video/canvas/openglcommon/iogl.h"
 #include "ivideo/graph2d.h"
@@ -208,10 +209,10 @@ private:
 
   void Report (const char* msg, ...)
   {
-    csRef<iCommandLineParser> cmdline (
-      CS_QUERY_REGISTRY (object_reg, iCommandLineParser));
+    csRef<iVerbosityManager> verbosemgr (
+      CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
     
-    if (cmdline->GetOption ("verbose") == 0)
+    if (!verbosemgr->CheckFlag ("renderer"))
       return;
     
     va_list arg;

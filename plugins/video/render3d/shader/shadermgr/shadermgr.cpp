@@ -44,7 +44,7 @@
 #include "iutil/virtclk.h"
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
-#include "iutil/cmdline.h"
+#include "iutil/verbositymanager.h"
 #include "ivaria/reporter.h"
 #include "ivideo/texture.h"
 
@@ -112,10 +112,10 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
 
-  csRef<iCommandLineParser> cmdline =
-    CS_QUERY_REGISTRY (objectreg, iCommandLineParser);
-  if (cmdline)
-    do_verbose = (cmdline->GetOption ("verbose") != 0);
+  csRef<iVerbosityManager> verbosemgr (
+    CS_QUERY_REGISTRY (objectreg, iVerbosityManager));
+  if (verbosemgr) 
+    do_verbose = verbosemgr->CheckFlag ("shader");
   else
     do_verbose = false;
 

@@ -32,6 +32,7 @@
 #include "csutil/plugmgr.h"
 #include "csutil/prfxcfg.h"
 #include "csutil/scfstrset.h"
+#include "csutil/verbosity.h"
 #include "csutil/virtclk.h"
 #include "csutil/xmltiny.h"
 #include "iengine/engine.h"
@@ -50,6 +51,7 @@
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "iutil/strset.h"
+#include "iutil/verbositymanager.h"
 #include "iutil/vfs.h"
 #include "iutil/virtclk.h"
 #include "ivaria/conin.h"
@@ -113,6 +115,7 @@ iObjectRegistry* csInitializer::CreateEnvironment (
           CreateEventQueue(r) &&
           CreateVirtualClock(r) &&
           CreateCommandLineParser(r, argc, argv) &&
+          CreateVerbosityManager(r) &&
           CreateConfigManager(r) &&
           CreateInputDrivers(r) &&
 	  CreateStringSet (r) &&
@@ -198,6 +201,22 @@ iCommandLineParser* csInitializer::CreateCommandLineParser(
   return c;
 }
 
+iVerbosityManager* csInitializer::CreateVerbosityManager (
+  iObjectRegistry* r)
+{
+  csRef<iVerbosityManager> vm;
+  const char* verbosity = 0;
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (
+    r, iCommandLineParser));
+  if (cmdline.IsValid())
+  {
+    verbosity = cmdline->GetOption ("verbose");
+  }
+  vm.AttachNew (new csVerbosityManager (verbosity));
+  r->Register (vm, "iVerbosityManager");
+  return vm;
+}
+
 iConfigManager* csInitializer::CreateConfigManager (iObjectRegistry* r)
 {
   csRef<iConfigFile> cfg = csPtr<iConfigFile> (new csConfigFile ());
@@ -209,15 +228,14 @@ iConfigManager* csInitializer::CreateConfigManager (iObjectRegistry* r)
 
 static void SetupPluginLoadErrVerbosity(iObjectRegistry* r)
 {
-  csRef<iCommandLineParser> cmdline(CS_QUERY_REGISTRY(r, iCommandLineParser));
-  if (cmdline.IsValid())
+  csRef<iVerbosityManager> verbosemgr (
+    CS_QUERY_REGISTRY(r, iVerbosityManager));
+  bool verbose = CS_LOAD_LIB_VERBOSE;
+  if (verbosemgr.IsValid())
   {
-    bool verbose = CS_LOAD_LIB_VERBOSE;
-    char const* const s = cmdline->GetOption("verbose");
-    if (s != 0)
-      verbose = true;
-    csSetLoadLibraryVerbose(verbose);
+    verbose = verbosemgr->CheckFlag ("loadlib");
   }
+  csSetLoadLibraryVerbose (verbose);
 }
 
 iVFS* csInitializer::SetupVFS(iObjectRegistry* r, const char* pluginID)

@@ -20,7 +20,7 @@
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
-#include "iutil/cmdline.h"
+#include "iutil/verbositymanager.h"
 #include "imap/services.h"
 #include "ivaria/keyval.h"
 #include "ivaria/reporter.h"
@@ -1043,13 +1043,13 @@ bool csXMLShaderCompiler::Initialize (iObjectRegistry* object_reg)
   if (!synldr)
     return false;
 
-  csRef<iCommandLineParser> cmdline =
-    CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
-  if (cmdline)
-    do_verbose = (cmdline->GetOption ("verbose") != 0);
+  csRef<iVerbosityManager> verbosemgr (
+    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+  if (verbosemgr) 
+    do_verbose = verbosemgr->CheckFlag ("shader");
   else
     do_verbose = false;
-
+    
   return true;
 }
 

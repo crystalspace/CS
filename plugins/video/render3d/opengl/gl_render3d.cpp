@@ -730,10 +730,10 @@ bool csGLGraphics3D::Open ()
 {
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
   	object_reg, iPluginManager);
-  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (
-  	object_reg, iCommandLineParser);
 
-  verbose = cmdline->GetOption ("verbose") != 0;
+  csRef<iVerbosityManager> verbosemgr (
+    CS_QUERY_REGISTRY (object_reg, iVerbosityManager));
+  if (verbosemgr) verbose = verbosemgr->CheckFlag ("renderer");
   if (!verbose) bugplug = 0;
 
   textureLodBias = config->GetFloat ("Video.OpenGL.TextureLODBias",

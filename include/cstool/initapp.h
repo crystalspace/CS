@@ -53,6 +53,7 @@ struct iPluginManager;
 struct iVirtualClock;
 struct iCommandLineParser;
 struct iConfigManager;
+struct iVerbosityManager;
 
 /**\name Plugin request macros
  * Utility macros to select what plugins you want to have loaded.
@@ -166,6 +167,7 @@ public:
    * <li>CreateEventQueue()</li>
    * <li>CreateVirtualClock()</li>
    * <li>CreateCommandLineParser()</li>
+   * <li>CreateVerbosityManager()</li>
    * <li>CreateConfigManager()</li>
    * <li>CreateInputDrivers()</li>
    * <li>CreateStringSet()</li>
@@ -228,6 +230,12 @@ public:
    */
   static iCommandLineParser* CreateCommandLineParser (
     iObjectRegistry*, int argc, char const* const argv[]);
+
+  /**
+   * Create and, if needed, register the verbosity manager. It is used by a 
+   * lot of plugins to control diagnostoc output while running.
+   */
+  static iVerbosityManager* CreateVerbosityManager (iObjectRegistry*);
 
   /**
    * Create the config manager. This function will register the created

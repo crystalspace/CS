@@ -36,6 +36,21 @@ private:
 
   bool LoadMap ();
 
+  struct TextureLayer
+  {
+    float min_height;
+    float max_height;
+    csString texture_name;
+    csString texture_file;
+    csRef<iImage> image;
+    csColor average;
+  };
+  void CreateHeightmap (int heightmap_res, iCollideSystem* cdsys, iSector* sector,
+    csRGBpixel* hmap_dst, float* height_dst, const csBox3& box);
+  void CreateBasemap (int heightmap_res, csRGBpixel* basemap_dst, 
+    uint8* matmap_dst, const float* height_dst, 
+    const csArray<TextureLayer>& txt_layers);
+
 public:
   HeightMapGen (iObjectRegistry* object_reg);
   ~HeightMapGen ();

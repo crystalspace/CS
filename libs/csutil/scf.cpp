@@ -28,6 +28,7 @@
 #include "csutil/scopedmutexlock.h"
 #include "csutil/strset.h"
 #include "csutil/util.h"
+#include "csutil/verbosity.h"
 #include "csutil/xmltiny.h"
 #include "iutil/document.h"
 
@@ -573,29 +574,10 @@ void scfInitialize (csPluginPaths* pluginPaths, bool verbose)
   PrivateSCF->ScanPluginsInt (pluginPaths, 0);
 }
 
-static bool check_verbosity(int argc, char const* const argv[])
-{
-  bool verbose = false;
-  for (int i = 1; i < argc; ++i)
-  {
-    char const* s = argv[i];
-    if (*s == '-')
-    {
-      do { ++s; } while (*s == '-');
-      if (strcmp(s, "verbose") == 0)
-      {
-	verbose = true;
-	break;
-      }
-    }
-  }
-  return verbose;
-}
-
 void scfInitialize (int argc, const char* const argv[])
 {
   csPluginPaths* pluginPaths = csGetPluginPaths (argv[0]);
-  scfInitialize (pluginPaths, check_verbosity(argc, argv));
+  scfInitialize (pluginPaths, csCheckVerbosity (argc, argv, "scf"));
   delete pluginPaths;
 }
 

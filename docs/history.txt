@@ -6,6 +6,13 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Dec-2004
+	- res removed some unneeded code from win32.cpp.
+	- res moved some code in heightmapgen into their own methods.
+	- res added some helpers to allow more fine-grained verbosity control
+	  via --verbose.
+	- res changed the Win32 plugin loading error reporting to use 
+	  csPrintfErr().
 25-Dec-2004
 	- PK fixed a small bug: changed 'i' to 'm' in thing.cpp:1084
 	  for (int m = 0; i < repMaterials.Length(); m++)
