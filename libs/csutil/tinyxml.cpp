@@ -303,63 +303,6 @@ TiDocumentNode* TiDocumentNodeChildren::InsertBeforeChild(
 }
 
 
-TiDocumentNode* TiDocumentNodeChildren::InsertAfterChild(
-  TiDocumentNode* afterThis, const TiDocumentNode& addThis )
-{
-  if ( !afterThis || afterThis->parent != this )
-    return 0;
-
-  TiDocumentNode* node = addThis.Clone(GetDocument ());
-  if ( !node )
-    return 0;
-  node->parent = this;
-
-  node->prev = afterThis;
-  node->next = afterThis->next;
-  if ( afterThis->next )
-  {
-    afterThis->next->prev = node;
-  }
-  else
-  {
-    assert( lastChild == afterThis );
-    lastChild = node;
-  }
-  afterThis->next = node;
-  return node;
-}
-
-
-TiDocumentNode* TiDocumentNodeChildren::ReplaceChild( TiDocumentNode* replaceThis, const TiDocumentNode& withThis )
-{
-  if ( replaceThis->parent != this )
-    return 0;
-
-  TiDocument* doc = GetDocument ();
-  TiDocumentNode* node = withThis.Clone(doc);
-  if ( !node )
-    return 0;
-
-  node->next = replaceThis->next;
-  node->prev = replaceThis->prev;
-
-  if ( replaceThis->next )
-    replaceThis->next->prev = node;
-  else
-    lastChild = node;
-
-  if ( replaceThis->prev )
-    replaceThis->prev->next = node;
-  else
-    firstChild = node;
-
-  doc->DeleteNode (replaceThis);
-
-  node->parent = this;
-  return node;
-}
-
-
 bool TiDocumentNodeChildren::RemoveChild( TiDocumentNode* removeThis )
 {
   if ( removeThis->parent != this )
@@ -394,71 +337,6 @@ TiDocumentNode* TiDocumentNodeChildren::FirstChild( const char * value ) const
   }
   return 0;
 }
-
-TiDocumentNode* TiDocumentNodeChildren::LastChild( const char * value ) const
-{
-  TiDocumentNode* node;
-  for ( node = lastChild; node; node = node->prev )
-  {
-    const char* node_val = node->Value ();
-    if (node_val && strcmp (node_val, value) == 0)
-      return node;
-  }
-  return 0;
-}
-
-TiDocumentNode* TiDocumentNodeChildren::IterateChildren(
-  TiDocumentNode* previous ) const
-{
-  if ( !previous )
-  {
-    return FirstChild();
-  }
-  else
-  {
-    return previous->NextSibling();
-  }
-}
-
-TiDocumentNode* TiDocumentNodeChildren::IterateChildren(
-  const char * val, TiDocumentNode* previous ) const
-{
-  if ( !previous )
-  {
-    return FirstChild( val );
-  }
-  else
-  {
-    return previous->NextSibling( val );
-  }
-}
-
-TiXmlElement* TiDocumentNodeChildren::FirstChildElement() const
-{
-  TiDocumentNode* node;
-
-  for (  node = FirstChild(); node; node = node->NextSibling() )
-  {
-    if ( node->ToElement() )
-      return node->ToElement();
-  }
-  return 0;
-}
-
-TiXmlElement* TiDocumentNodeChildren::FirstChildElement(
-  const char * value ) const
-{
-  TiDocumentNode* node;
-
-  for (  node = FirstChild( value ); node;
-    node = node->NextSibling( value ) )
-  {
-    if ( node->ToElement() )
-      return node->ToElement();
-  }
-  return 0;
-}
-
 
 // -------------------------------------------------------------------------
 

@@ -335,35 +335,6 @@ public:
   TiDocumentNode* FirstChild()  const  { return firstChild; }
   TiDocumentNode* FirstChild( const char * value ) const;
 
-  TiDocumentNode* LastChild() const  { return lastChild; }
-  TiDocumentNode* LastChild( const char * value ) const;
-
-  /**
-   * An alternate way to walk the children of a node.
-   * One way to iterate over nodes is:
-   * @verbatim
-   * for( child = parent->FirstChild(); child; child = child->NextSibling() )
-   * @endverbatim
-   *
-   * IterateChildren does the same thing with the syntax:
-   * @verbatim
-   * child = 0;
-   * while( child = parent->IterateChildren( child ) )
-   * @endverbatim
-   *
-   * IterateChildren takes the previous child as input and finds
-   * the next one. If the previous child is null, it returns the
-   * first. IterateChildren will return null when done.
-   */
-  TiDocumentNode* IterateChildren( TiDocumentNode* previous ) const;
-
-  /**
-   * This flavor of IterateChildren searches for children with a particular
-   * 'value'.
-   */
-  TiDocumentNode* IterateChildren( const char * value,
-    TiDocumentNode* previous ) const;
-
   /**
    * Add a new node related to this. Adds a child past the LastChild.
    * Returns a pointer to the new object or NULL if an error occured.
@@ -377,28 +348,8 @@ public:
   TiDocumentNode* InsertBeforeChild( TiDocumentNode* beforeThis,
     const TiDocumentNode& addThis );
 
-  /**
-   * Add a new node related to this. Adds a child after the specified child.
-   * Returns a pointer to the new object or NULL if an error occured.
-   */
-  TiDocumentNode* InsertAfterChild(  TiDocumentNode* afterThis,
-    const TiDocumentNode& addThis );
-
-  /**
-   * Replace a child of this node.
-   * Returns a pointer to the new object or NULL if an error occured.
-   */
-  TiDocumentNode* ReplaceChild( TiDocumentNode* replaceThis,
-    const TiDocumentNode& withThis );
-
   /// Delete a child of this node.
   bool RemoveChild( TiDocumentNode* removeThis );
-
-  /// Convenience function to get through elements.
-  TiXmlElement* FirstChildElement()  const;
-
-  /// Convenience function to get through elements.
-  TiXmlElement* FirstChildElement( const char * value ) const;
 
 protected:
   // Figure out what is at *p, and parse it. Returns null if it is not an xml
@@ -811,13 +762,6 @@ public:
 
   /// Parse the given null terminated block of xml data.
   virtual const char* Parse( TiDocument* document,  const char* p );
-
-  /**
-   * Get the root element -- the only top level element -- of the document.
-   * In well formed XML, there should only be one. TinyXml is tolerant of
-   * multiple elements at the document level.
-   */
-  TiXmlElement* RootElement() const { return FirstChildElement(); }
 
   /// If, during parsing, a error occurs, Error will be set to true.
   bool Error() const { return error; }
