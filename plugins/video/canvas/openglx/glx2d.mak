@@ -32,6 +32,12 @@ ifeq ($(MAKESECTION),postdefines)
 
 # Local CFLAGS and libraries
 LIBS._GLX2D+=-L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
+CFLAGS.GLX2D+=-I$(X11_PATH)/include
+
+ifeq ($(USE_XFREE86VM),yes)
+  CFLAGS.GLX2D+=-DXFREE86VM
+  LIBS._GLX2D+=-lXxf86vm
+endif
 
 ifeq ($(USE_MESA),1)
   ifdef MESA_PATH
@@ -46,13 +52,6 @@ else
   endif
   LIBS._GLX2D+=-lGL
 endif
-
-ifeq ($(USE_XFREE86VM),yes)
-  CFLAGS.GLX2D+=-DXFREE86VM
-  LIBS._GLX2D+=-lXxf86vm
-endif
-
-CFLAGS.GLX2D+=-I$(X11_PATH)/include
 
 # The 2D GLX driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
