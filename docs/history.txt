@@ -22,6 +22,11 @@ The history order is reversed so that new features are at the top.
 	  might look over the country. Here Spider will strike! It will put
 	  a curse on the wanderer which will reveal his whereabouts to Spider
 	  at any time in the future! The only remedy to this curse is death!
+	- Fixed a bug with BugPlug. It will now work correctly together with
+	  Iso engine and other applications that don't use the 3D engine.
+	  Previously it assumed there always was an iEngine. Now it just
+	  disables all functionality that has to do with iEngine (like the
+	  Spider). All other functionality will work though.
 11-Jun-2001
 	- Created a new 'bugplug' plugin. This plugin will give debugging
 	  functionality to any CS app. To use it just add the following

@@ -80,7 +80,7 @@ csBugPlug::~csBugPlug ()
 {
   if (spider)
   {
-    spider->UnweaveWeb (Engine);
+    if (Engine) spider->UnweaveWeb (Engine);
     delete spider;
   }
   if (Engine) Engine->DecRef ();
@@ -112,8 +112,7 @@ void csBugPlug::SetupPlugin ()
     Engine = QUERY_PLUGIN_ID (System, CS_FUNCID_ENGINE, iEngine);
   if (!Engine)
   {
-    printf ("No engine!\n");
-    return;
+    // No engine. It is possible that we are working with the iso-engine.
   }
 
   if (!G3D)
@@ -277,10 +276,13 @@ bool csBugPlug::EatKey (iEvent& event)
         System->Printf (MSG_CONSOLE, "Sorry, cannot help you yet.\n");
         break;
       case DEBUGCMD_DUMPENG:
-        System->Printf (MSG_CONSOLE,
+        if (Engine)
+	{
+          System->Printf (MSG_CONSOLE,
 		"Dumping entire engine contents to debug.txt.\n");
-	Dump (Engine);
-	System->Printf (MSG_DEBUG_0F, "\n");
+	  Dump (Engine);
+	  System->Printf (MSG_DEBUG_0F, "\n");
+	}
         break;
       case DEBUGCMD_DUMPSEC:
         System->Printf (MSG_CONSOLE, "Not implemented yet.\n");
@@ -375,10 +377,13 @@ bool csBugPlug::EatKey (iEvent& event)
       case DEBUGCMD_FOV:
       case DEBUGCMD_FOVANGLE:
         // Set spider on a hunt.
-	spider_command = cmd;
-	spider_hunting = true;
-	spider->ClearCamera ();
-        spider->WeaveWeb (Engine);
+	if (Engine)
+	{
+	  spider_command = cmd;
+	  spider_hunting = true;
+	  spider->ClearCamera ();
+          spider->WeaveWeb (Engine);
+	}
         break;
     }
     process_next_key = false;
