@@ -271,7 +271,7 @@ void csBugPlug::MouseButton3 (iCamera* camera)
   csVector3 isect, end = origin + (vw - origin) * 60;
 
   sector->HitBeam (origin, end, isect);
-  iPolygon3D* poly;
+  iPolygon3D* poly = NULL;
   iObject* sel = sector->HitBeam (origin, end, isect, &poly);
   const char* poly_name;
   unsigned long poly_id;

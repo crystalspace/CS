@@ -1418,7 +1418,6 @@ bool csTerrFuncObject::HitBeamObject (const csVector3& start,
   printf("Inc :(%f,%f,%f)\n",inc.x,inc.y,inc.z);
 #endif
 
-  st += inc;
   csSegment3 rev ( end, st );
   int x, y, index = -1, i, max, _index;
   while (1)
