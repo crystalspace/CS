@@ -93,8 +93,7 @@ void Bot::move (csTicks elapsed_time)
   {
     GetMovable ().SetSector (s);
     iLight* lights[2];
-    int num_lights = engine->GetCsEngine ()->GetNearbyLights
-      (s->GetPrivateObject (), new_p,
+    int num_lights = engine->GetNearbyLights (s, new_p,
         CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
     UpdateLighting (lights, num_lights);
     if (light)

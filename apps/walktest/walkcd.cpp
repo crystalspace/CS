@@ -196,16 +196,14 @@ int FindSectors (csVector3 v, csVector3 d, iSector *s, iSector **sa)
   int c = 0;
   // @@@ Avoid this sqrt somehow? i.e. by having it in the objects.
   float size = sqrt (d.x * d.x + d.y * d.y + d.z * d.z);
-  //@@@@@@@@@@@
-  csEngine* engine = (csEngine*)(Sys->Engine);
-  csSectorIt* it = engine->GetNearbySectors (s->GetPrivateObject (), v, size);
-  csSector* sector;
+  iSectorIterator* it = Sys->Engine->GetNearbySectors (s, v, size);
+  iSector* sector;
   while ((sector = it->Fetch ()) != NULL)
   {
-    sa[c++] = &(sector->scfiSector);
+    sa[c++] = sector;
     if (c >= MAXSECTORSOCCUPIED) break;
   }
-  delete it;
+  it->DecRef ();
   return c;
 }
 

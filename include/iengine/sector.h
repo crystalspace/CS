@@ -178,4 +178,25 @@ struct iSectorList : public iBase
   virtual iSector *FindByName (const char *Name) const = 0;
 };
 
+SCF_VERSION (iSectorIterator, 0, 0, 1);
+
+/**
+ * An iterator to iterate over sectors. Some functions in CS
+ * return this.
+ */
+struct iSectorIterator : public iBase
+{
+  /// Restart iterator.
+  virtual void Restart () = 0;
+
+  /// Get sector from iterator. Return NULL at end.
+  virtual iSector* Fetch () = 0;
+
+  /**
+   * Get last position that was used from Fetch. This can be
+   * different from 'pos' because of space warping.
+   */
+  virtual const csVector3& GetLastPosition () = 0;
+};
+
 #endif // __IENGINE_SECTOR_H__

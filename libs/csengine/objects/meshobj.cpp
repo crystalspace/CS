@@ -199,9 +199,8 @@ void csMeshWrapper::UpdateDeferedLighting (const csVector3& pos)
       light_worktable.SetLimit (defered_num_lights);
 
     iSector* sect = movable_sectors->Get (0);
-    int num_lights = csEngine::current_engine->GetNearbyLights (
-      sect->GetPrivateObject (),
-      pos, defered_lighting_flags,
+    int num_lights = csEngine::current_iengine->GetNearbyLights (
+      sect, pos, defered_lighting_flags,
       light_worktable.GetArray (), defered_num_lights);
     UpdateLighting (light_worktable.GetArray (), num_lights);
   }

@@ -2,6 +2,15 @@ The history order is reversed so that new features are at the top.
 
 24-Oct-2001
 	- Bumped up development version of CS to 0.91.
+	- Added iSectorIterator interface to iterate over sectors.
+	- csSectorIt and csObjectIt are now private classes for csengine
+	  and they implement iSectorIterator and the already existing
+	  iObjectIterator.
+	- Changed GetNearbySectors() and GetNearbyObjects() to return
+	  the iterator and work with SCF objects. Also added both functions
+	  to iEngine.
+	- Also added GetNearbyLights() to iEngine and changed prototype
+	  to work with SCF interfaces.
 23-Oct-2001
 	- Michael Voase improved lighting on water procedural texture in
 	  flarge.

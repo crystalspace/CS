@@ -130,107 +130,6 @@ public:
   csSector* GetLastSector ();
 };
 
-/**
- * Iterator to iterate over sectors in the engine which are within
- * a radius from a given point.
- * This iterator assumes there are no fundamental changes
- * in the engine while it is being used.
- * If changes to the engine happen the results are unpredictable.
- */
-class csSectorIt
-{
-private:
-  // The position and radius.
-  csSector* sector;
-  csVector3 pos;
-  float radius;
-  // Polygon index (to loop over all portals).
-  // If -1 then we return current sector first.
-  int cur_poly;
-  // If not null then this is a recursive sector iterator
-  // that we are currently using.
-  csSectorIt* recursive_it;
-  // If true then this iterator has ended.
-  bool has_ended;
-  // Last position (from Fetch).
-  csVector3 last_pos;
-
-public:
-  /// Construct an iterator and initialize to start.
-  csSectorIt (csSector* sector, const csVector3& pos, float radius);
-
-  /// Destructor.
-  ~csSectorIt ();
-
-  /// Restart iterator.
-  void Restart ();
-
-  /// Get sector from iterator. Return NULL at end.
-  csSector* Fetch ();
-
-  /**
-   * Get last position that was used from Fetch. This can be
-   * different from 'pos' because of space warping.
-   */
-  const csVector3& GetLastPosition () { return last_pos; }
-};
-
-/**
- * Iterator to iterate over objects in the engine.
- * This iterator assumes there are no fundamental changes
- * in the engine while it is being used.
- * If changes to the engine happen the results are unpredictable.
- */
-class csObjectIt
-{
-  friend class csEngine;
-
-private:
-  // The engine for this iterator.
-  csEngine* engine;
-  // The starting position and radius.
-  csSector* start_sector;
-  csVector3 start_pos;
-  float radius;
-  // Current position ('pos' can be warped so that's why it is here).
-  csSector* cur_sector;
-  csVector3 cur_pos;
-  // Current object.
-  iObject* cur_object;
-  // Current index.
-  int cur_idx;
-  // Iterator over the sectors.
-  csSectorIt* sectors_it;
-  // Current object list to iterate over
-  enum {
-    ITERATE_SECTORS,
-    ITERATE_STATLIGHTS,
-    ITERATE_DYNLIGHTS,
-    ITERATE_MESHES,
-    ITERATE_NONE
-  } CurrentList;
-
-private:
-  // Start looking for stuff.
-  void StartStatLights ();
-  void StartMeshes ();
-  void EndSearch ();
-
-  /// Construct an iterator and initialize to start.
-  csObjectIt (csEngine*, csSector* sector,
-    const csVector3& pos, float radius);
-
-public:
-  /// Destructor.
-  ~csObjectIt ();
-
-  /// Restart iterator.
-  void Restart ();
-
-  /// Get object from iterator. Return NULL at end.
-  iObject* Fetch ();
-};
-
 CS_DECLARE_OBJECT_VECTOR (csCollectionListHelper, iCollection);
 
 /**
@@ -855,15 +754,15 @@ public:
    * This function returns the actual number of lights added to the 'lights'
    * array.
    */
-  int GetNearbyLights (csSector* sector, const csVector3& pos, ULong flags,
-  	iLight** lights, int max_num_lights);
+  virtual int GetNearbyLights (iSector* sector, const csVector3& pos,
+  	ULong flags, iLight** lights, int max_num_lights);
 
   /**
    * This routine returns an iterator to iterate over
    * all nearby sectors.
-   * Delete the iterator with 'delete' when ready.
+   * Delete the iterator with 'DecRef()' when ready.
    */
-  csSectorIt* GetNearbySectors (csSector* sector,
+  virtual iSectorIterator* GetNearbySectors (iSector* sector,
   	const csVector3& pos, float radius);
 
   /**
@@ -871,9 +770,9 @@ public:
    * all objects of a given type that are within a radius
    * of a given position. You can use SCF_QUERY_INTERFACE to get
    * any interface from the returned objects. <p>
-   * Delete the iterator with 'delete' when ready.
+   * Delete the iterator with 'DecRef()' when ready.
    */
-  csObjectIt* GetNearbyObjects (csSector* sector,
+  virtual iObjectIterator* GetNearbyObjects (iSector* sector,
     const csVector3& pos, float radius);
 
   /**

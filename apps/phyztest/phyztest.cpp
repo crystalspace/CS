@@ -603,8 +603,7 @@ void Phyztest::SetupFrame ()
   {
     csVector3 new_p = rb_bot->get_pos ();
     iLight* lights[2];
-    int num_lights = engine->GetCsEngine ()->
-      GetNearbyLights (room->GetPrivateObject (), new_p, 
+    int num_lights = engine->GetNearbyLights (room, new_p, 
 		       CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
     bot->UpdateLighting (lights, num_lights);  
   }
@@ -641,8 +640,7 @@ void Phyztest::SetupFrame ()
         chain[i]->sprt->GetMovable ()->SetTransform (m);
 	chain[i]->sprt->GetMovable ()->UpdateMove ();
 
-        num_lights = engine->GetCsEngine ()->
-	  GetNearbyLights (room->GetPrivateObject (), new_p, 
+        num_lights = engine->GetNearbyLights (room, new_p, 
 			   CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
         chain[i]->sprt->UpdateLighting (lights, num_lights); 
       }

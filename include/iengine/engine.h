@@ -30,6 +30,9 @@ class csColor;
 struct csTextureLayer;
 
 struct iSector;
+struct iSectorIterator;
+struct iObjectIterator;
+struct iLight;
 struct iStatLight;
 struct iDynLight;
 struct iSprite;
@@ -143,7 +146,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 6, 2);
+SCF_VERSION (iEngine, 0, 6, 3);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -415,6 +418,46 @@ struct iEngine : public iBase
   virtual void SetAmbientLight (const csColor &) = 0;
   /// Return the amount of ambient light
   virtual void GetAmbientLight (csColor &) const = 0;
+
+  /**
+   * This routine returns all lights which might affect an object
+   * at some position according to the following flags:<br>
+   * <ul>
+   * <li>CS_NLIGHT_SHADOWS: detect shadows and don't return lights for
+   *     which the object is shadowed (not implemented yet).
+   * <li>CS_NLIGHT_STATIC: return static lights.
+   * <li>CS_NLIGHT_DYNAMIC: return dynamic lights.
+   * <li>CS_NLIGHT_NEARBYSECTORS: Also check lights in nearby sectors
+   *     (not implemented yet).
+   * </ul><br>
+   * It will only return as many lights as the size that you specified
+   * for the light array. The returned lights are not guaranteed to be sorted
+   * but they are guaranteed to be the specified number of lights closest to
+   * the given position.<br>
+   * This function returns the actual number of lights added to the 'lights'
+   * array.
+   */
+  virtual int GetNearbyLights (iSector* sector, const csVector3& pos,
+  	ULong flags, iLight** lights, int max_num_lights) = 0;
+
+  /**
+   * This routine returns an iterator to iterate over
+   * all nearby sectors.
+   * Delete the iterator with 'DecRef()' when ready.
+   */
+  virtual iSectorIterator* GetNearbySectors (iSector* sector,
+  	const csVector3& pos, float radius) = 0;
+
+  /**
+   * This routine returns an iterator to iterate over
+   * all objects of a given type that are within a radius
+   * of a given position. You can use SCF_QUERY_INTERFACE to get
+   * any interface from the returned objects.<p>
+   * Delete the iterator with 'DecRef()' when ready.
+   */
+  virtual iObjectIterator* GetNearbyObjects (iSector* sector,
+    const csVector3& pos, float radius) = 0;
+
 };
 
 #endif // __IENGINE_ENGINE_H__

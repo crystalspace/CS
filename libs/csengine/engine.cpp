@@ -233,6 +233,117 @@ void csEngineMeshList::RemoveMesh (iMeshWrapper* mesh)
 
 //---------------------------------------------------------------------------
 
+/**
+ * Iterator to iterate over sectors in the engine which are within
+ * a radius from a given point.
+ * This iterator assumes there are no fundamental changes
+ * in the engine while it is being used.
+ * If changes to the engine happen the results are unpredictable.
+ */
+class csSectorIt : public iSectorIterator
+{
+private:
+  // The position and radius.
+  csSector* sector;
+  csVector3 pos;
+  float radius;
+  // Polygon index (to loop over all portals).
+  // If -1 then we return current sector first.
+  int cur_poly;
+  // If not null then this is a recursive sector iterator
+  // that we are currently using.
+  csSectorIt* recursive_it;
+  // If true then this iterator has ended.
+  bool has_ended;
+  // Last position (from Fetch).
+  csVector3 last_pos;
+
+public:
+  /// Construct an iterator and initialize to start.
+  csSectorIt (csSector* sector, const csVector3& pos, float radius);
+
+  /// Destructor.
+  virtual ~csSectorIt ();
+
+  SCF_DECLARE_IBASE;
+
+  /// Restart iterator.
+  virtual void Restart ();
+
+  /// Get sector from iterator. Return NULL at end.
+  virtual iSector* Fetch ();
+
+  /**
+   * Get last position that was used from Fetch. This can be
+   * different from 'pos' because of space warping.
+   */
+  virtual const csVector3& GetLastPosition () { return last_pos; }
+};
+
+/**
+ * Iterator to iterate over objects in the engine.
+ * This iterator assumes there are no fundamental changes
+ * in the engine while it is being used.
+ * If changes to the engine happen the results are unpredictable.
+ */
+class csObjectIt : public iObjectIterator
+{
+  friend class csEngine;
+
+private:
+  // The engine for this iterator.
+  csEngine* engine;
+  // The starting position and radius.
+  csSector* start_sector;
+  csVector3 start_pos;
+  float radius;
+  // Current position ('pos' can be warped so that's why it is here).
+  csSector* cur_sector;
+  csVector3 cur_pos;
+  // Current object.
+  iObject* cur_object;
+  // Current object for iterator.
+  iObject* it_cur_obj;
+  // Current index.
+  int cur_idx;
+  // Iterator over the sectors.
+  csSectorIt* sectors_it;
+  // Current object list to iterate over
+  enum {
+    ITERATE_SECTORS,
+    ITERATE_STATLIGHTS,
+    ITERATE_DYNLIGHTS,
+    ITERATE_MESHES,
+    ITERATE_NONE
+  } CurrentList;
+
+private:
+  // Start looking for stuff.
+  void StartStatLights ();
+  void StartMeshes ();
+  void EndSearch ();
+
+  /// Construct an iterator and initialize to start.
+  csObjectIt (csEngine*, csSector* sector,
+    const csVector3& pos, float radius);
+  iObject* Fetch ();
+
+public:
+  /// Destructor.
+  virtual ~csObjectIt ();
+
+  SCF_DECLARE_IBASE;
+
+  virtual void Reset ();
+  virtual bool Next ();
+  virtual iObject* GetObject () const;
+  virtual bool IsFinished () const;
+  virtual iObject* GetParentObj () const { return NULL; }
+  virtual bool FindName (const char* name) { return false; }
+};
+
+//---------------------------------------------------------------------------
+
 csLightIt::csLightIt (csEngine* e, iRegion* r) : engine (e), region (r)
 {
   Restart ();
@@ -290,8 +401,13 @@ csSector* csLightIt::GetLastSector ()
 
 //---------------------------------------------------------------------------
 
+SCF_IMPLEMENT_IBASE (csSectorIt)
+  SCF_IMPLEMENTS_INTERFACE (iSectorIterator)
+SCF_IMPLEMENT_IBASE_END
+
 csSectorIt::csSectorIt (csSector* sector, const csVector3& pos, float radius)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
   csSectorIt::sector = sector;
   csSectorIt::pos = pos;
   csSectorIt::radius = radius;
@@ -313,13 +429,13 @@ void csSectorIt::Restart ()
   has_ended = false;
 }
 
-csSector* csSectorIt::Fetch ()
+iSector* csSectorIt::Fetch ()
 {
   if (has_ended) return NULL;
 
   if (recursive_it)
   {
-    csSector* rc = recursive_it->Fetch ();
+    iSector* rc = recursive_it->Fetch ();
     if (rc)
     {
       last_pos = recursive_it->GetLastPosition ();
@@ -333,7 +449,7 @@ csSector* csSectorIt::Fetch ()
   {
     cur_poly = 0;
     last_pos = pos;
-    return sector;
+    return sector ? &(sector->scfiSector) : NULL;
   }
 
 #if 0
@@ -371,16 +487,21 @@ csSector* csSectorIt::Fetch ()
 
 //---------------------------------------------------------------------------
 
+SCF_IMPLEMENT_IBASE (csObjectIt)
+  SCF_IMPLEMENTS_INTERFACE (iObjectIterator)
+SCF_IMPLEMENT_IBASE_END
+
 csObjectIt::csObjectIt (csEngine* e, csSector* sector,
   const csVector3& pos, float radius)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
   csObjectIt::engine = e;
   csObjectIt::start_sector = sector;
   csObjectIt::start_pos = pos;
   csObjectIt::radius = radius;
   sectors_it = new csSectorIt (sector, pos, radius);
 
-  Restart ();
+  Reset ();
 }
 
 csObjectIt::~csObjectIt ()
@@ -388,11 +509,12 @@ csObjectIt::~csObjectIt ()
   delete sectors_it;
 }
 
-void csObjectIt::Restart ()
+void csObjectIt::Reset ()
 {
   CurrentList = ITERATE_DYNLIGHTS;
   cur_object = engine->GetFirstDynLight ();
   sectors_it->Restart ();
+  it_cur_obj = NULL;
 }
 
 void csObjectIt::StartStatLights ()
@@ -410,6 +532,22 @@ void csObjectIt::StartMeshes ()
 void csObjectIt::EndSearch ()
 {
   CurrentList = ITERATE_NONE;
+}
+
+bool csObjectIt::Next ()
+{
+  it_cur_obj = Fetch ();
+  return it_cur_obj != NULL;
+}
+
+iObject* csObjectIt::GetObject () const
+{
+  return it_cur_obj;
+}
+
+bool csObjectIt::IsFinished () const
+{
+  return it_cur_obj != NULL;
 }
 
 iObject* csObjectIt::Fetch ()
@@ -446,7 +584,9 @@ iObject* csObjectIt::Fetch ()
   // Handle this sector first.
   if (CurrentList == ITERATE_SECTORS)
   {
-    cur_sector = sectors_it->Fetch ();
+    iSector* s = sectors_it->Fetch ();
+    if (s) cur_sector = s->GetPrivateObject ();
+    else cur_sector = NULL;
     if (!cur_sector)
     {
       EndSearch ();
@@ -1600,7 +1740,7 @@ static int compare_light (const void* p1, const void* p2)
   return 0;
 }
 
-int csEngine::GetNearbyLights (csSector* sector, const csVector3& pos,
+int csEngine::GetNearbyLights (iSector* sector, const csVector3& pos,
 	ULong flags, iLight** lights, int max_num_lights)
 {
   int i;
@@ -1629,7 +1769,7 @@ int csEngine::GetNearbyLights (csSector* sector, const csVector3& pos,
     csDynLight* dl = first_dyn_lights;
     while (dl)
     {
-      if (dl->GetSector () == sector)
+      if (dl->GetSector () == sector->GetPrivateObject ())
       {
         sqdist = csSquaredDist::PointPoint (pos, dl->GetCenter ());
         if (sqdist < dl->GetSquaredRadius ())
@@ -1646,7 +1786,7 @@ int csEngine::GetNearbyLights (csSector* sector, const csVector3& pos,
   // Add all static lights to the array (if CS_NLIGHT_STATIC is set).
   if (flags & CS_NLIGHT_STATIC)
   {
-    iLightList* ll = sector->scfiSector.GetLights ();
+    iLightList* ll = sector->GetLights ();
     for (i = 0 ; i < ll->GetCount () ; i++)
     {
       iLight* l = ll->Get (i);
@@ -1671,24 +1811,26 @@ int csEngine::GetNearbyLights (csSector* sector, const csVector3& pos,
   {
     // We found more lights than we can put in the given array
     // so we sort the lights and then return the nearest.
-    qsort (light_array->array, light_array->num_lights, sizeof (LightAndDist), compare_light);
+    qsort (light_array->array, light_array->num_lights,
+    	sizeof (LightAndDist), compare_light);
     for (i = 0 ; i < max_num_lights; i++)
       lights[i] = light_array->GetLight (i);
     return max_num_lights;
   }
 }
 
-csSectorIt* csEngine::GetNearbySectors (csSector* sector,
+iSectorIterator* csEngine::GetNearbySectors (iSector* sector,
 	const csVector3& pos, float radius)
 {
-  csSectorIt* it = new csSectorIt (sector, pos, radius);
+  csSectorIt* it = new csSectorIt (sector->GetPrivateObject (), pos, radius);
   return it;
 }
 
-csObjectIt* csEngine::GetNearbyObjects (csSector* sector,
+iObjectIterator* csEngine::GetNearbyObjects (iSector* sector,
   const csVector3& pos, float radius)
 {
-  csObjectIt* it = new csObjectIt (this, sector, pos, radius);
+  csObjectIt* it = new csObjectIt (this, sector->GetPrivateObject (),
+  	pos, radius);
   return it;
 }
 
