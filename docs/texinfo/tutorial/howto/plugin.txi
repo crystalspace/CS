@@ -267,7 +267,7 @@ int MyPlugin::GetSomething () const
 @end example
 
 The first macro is @code{CS_IMPLEMENT_PLUGIN()}. This indicates to the
-@sc{Crystal Space} framework that this module will end up as a plugin
+Crystal Space framework that this module will end up as a plugin
 (as opposed to an application or library). On some platforms this
 actually makes a difference; on others it does not.  For best portability,
 you should use this macro in exactly one C++ file within each plugin
