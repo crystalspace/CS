@@ -1467,7 +1467,7 @@ bool csTextSyntaxService::ParseMatrix (iDocumentNode* node, csMatrix3 &m)
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     switch (id)
@@ -1547,7 +1547,7 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode)
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     switch (id)
@@ -1589,7 +1589,7 @@ bool csTextSyntaxService::ParseTextureMapping (
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     switch (id)
@@ -1765,7 +1765,7 @@ bool csTextSyntaxService::ParsePortal (
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     switch (id)
@@ -1886,7 +1886,7 @@ bool csTextSyntaxService::ParsePoly3d (
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     switch (id)
@@ -2269,11 +2269,11 @@ iString* csTextSyntaxService::Debug_UnitTest ()
   csRef<iDocumentSystem> xml;
   xml.Take (new csTinyDocumentSystem ());
   csRef<iDocument> doc = xml->CreateDocument ();
-  const char* error = doc->ParseXML ("\
+  const char* error = doc->Parse ("\
     <root>\
-      <v x=1 y=2 z=3/>\
+      <v x='1' y='2' z='3'/>\
       <matrix>\
-        <scale>3</scale>\
+        <scale all='3'/>\
 	<m13>1.5</m13>\
       </matrix>\
       <mixmode>\

@@ -497,7 +497,7 @@ bool csLoader::ParseMaterialList (iDocumentNode* node, const char* prefix)
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     switch (id)
@@ -523,7 +523,7 @@ bool csLoader::ParseTextureList (iDocumentNode* node)
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     switch (id)
@@ -563,7 +563,7 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     switch (id)
@@ -700,7 +700,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node, const char *pref
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     switch (id)
@@ -761,7 +761,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iDocumentNode* node, const char *pref
 	  while (layer_it->HasNext ())
 	  {
 	    csRef<iDocumentNode> layer_child = layer_it->Next ();
-	    if (layer_child->GetType () != CS_XMLNODE_ELEMENT) continue;
+	    if (layer_child->GetType () != CS_NODE_ELEMENT) continue;
 	    const char* layer_value = layer_child->GetValue ();
 	    csStringID layer_id = xmltokens.Request (layer_value);
 	    switch (layer_id)

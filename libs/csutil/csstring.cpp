@@ -216,7 +216,7 @@ csString &csString::Collapse()
   return *this;
 }
 
-csString &csString::FormatV(const char *format, va_list args)
+csString &csString::FormatV (const char *format, va_list args)
 {
   if (Data == 0) // Ensure that backing-store exists prior to vsnprintf().
     SetCapacity(255);
@@ -238,14 +238,14 @@ csString &csString::FormatV(const char *format, va_list args)
   return *this;
 }
 
-csString &csString::Format(const char *format, ...)
+csString &csString::Format (const char *format, ...)
 {
   va_list args;
-  va_start(args, format);
+  va_start (args, format);
 
-  FormatV(format, args);
+  FormatV (format, args);
 
-  va_end(args);
+  va_end (args);
   return *this;
 }
 

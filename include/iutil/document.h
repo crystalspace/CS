@@ -1,5 +1,5 @@
 /*
-    Crystal Space XML Interface
+    Crystal Space Document Interface
     Copyright (C) 2002 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
@@ -28,18 +28,19 @@ struct iDocumentAttribute;
 struct iFile;
 struct iDataBuffer;
 struct iString;
+struct iVFS;
 
 /**
- * Possible node types for XML.
+ * Possible node types for documents.
  */
-enum csXmlNodeType
+enum csDocumentNodeType
 {
-  CS_XMLNODE_DOCUMENT = 1,
-  CS_XMLNODE_ELEMENT,
-  CS_XMLNODE_COMMENT,
-  CS_XMLNODE_UNKNOWN,
-  CS_XMLNODE_TEXT,
-  CS_XMLNODE_DECLARATION
+  CS_NODE_DOCUMENT = 1,
+  CS_NODE_ELEMENT,
+  CS_NODE_COMMENT,
+  CS_NODE_UNKNOWN,
+  CS_NODE_TEXT,
+  CS_NODE_DECLARATION
 };
 
 //===========================================================================
@@ -62,7 +63,7 @@ struct iDocumentAttributeIterator : public iBase
 SCF_VERSION (iDocumentAttribute, 0, 0, 1);
 
 /**
- * This represents an attribute in XML.
+ * This represents an attribute for a document node.
  */
 struct iDocumentAttribute : public iBase
 {
@@ -101,28 +102,28 @@ struct iDocumentNodeIterator : public iBase
 
 //===========================================================================
 
-SCF_VERSION (iDocumentNode, 0, 2, 0);
+SCF_VERSION (iDocumentNode, 0, 3, 0);
 
 /**
- * This represents a node in XML.
+ * This represents a node in a document.
  */
 struct iDocumentNode : public iBase
 {
   /**
-   * Get the type of this node (one of CS_XMLNODE_...).
+   * Get the type of this node (one of CS_NODE_...).
    */
-  virtual csXmlNodeType GetType () = 0;
+  virtual csDocumentNodeType GetType () = 0;
 
   /**
    * Get the value of this node.
    * What this is depends on the type of the node:
    * <ul>
-   * <li>CS_XMLNODE_DOCUMENT: filename of the xml file
-   * <li>CS_XMLNODE_ELEMENT: name of the element
-   * <li>CS_XMLNODE_COMMENT: comment text
-   * <li>CS_XMLNODE_UNKNOWN: tag contents
-   * <li>CS_XMLNODE_TEXT: text string
-   * <li>CS_XMLNODE_DECLARATION: undefined
+   * <li>CS_NODE_DOCUMENT: filename of the xml file
+   * <li>CS_NODE_ELEMENT: name of the element
+   * <li>CS_NODE_COMMENT: comment text
+   * <li>CS_NODE_UNKNOWN: tag contents
+   * <li>CS_NODE_TEXT: text string
+   * <li>CS_NODE_DECLARATION: undefined
    * </ul>
    */
   virtual const char* GetValue () = 0;
@@ -130,12 +131,12 @@ struct iDocumentNode : public iBase
    * Set the value of this node.
    * What this is depends on the type of the node:
    * <ul>
-   * <li>CS_XMLNODE_DOCUMENT: filename of the xml file
-   * <li>CS_XMLNODE_ELEMENT: name of the element
-   * <li>CS_XMLNODE_COMMENT: comment text
-   * <li>CS_XMLNODE_UNKNOWN: tag contents
-   * <li>CS_XMLNODE_TEXT: text string
-   * <li>CS_XMLNODE_DECLARATION: undefined
+   * <li>CS_NODE_DOCUMENT: filename of the xml file
+   * <li>CS_NODE_ELEMENT: name of the element
+   * <li>CS_NODE_COMMENT: comment text
+   * <li>CS_NODE_UNKNOWN: tag contents
+   * <li>CS_NODE_TEXT: text string
+   * <li>CS_NODE_DECLARATION: undefined
    * </ul>
    */
   virtual void SetValue (const char* value) = 0;
@@ -157,17 +158,13 @@ struct iDocumentNode : public iBase
   virtual void RemoveNodes () = 0;
 
   /**
-   * Move a node (which should be a child of this node) before the given
-   * node.
+   * Create a new node of the given type before the given node.
+   * If the given node is NULL then it will be added at the end.
+   * Returns the new node or NULL if the given type is not valid
+   * (CS_NODE_DOCUMENT is not allowed here for example).
    */
-  virtual void MoveNodeBefore (const csRef<iDocumentNode>& node,
-  	const csRef<iDocumentNode>& before) = 0;
-  /**
-   * Move a node (which should be a child of this node) after the given
-   * node.
-   */
-  virtual void MoveNodeAfter (const csRef<iDocumentNode>& node,
-  	const csRef<iDocumentNode>& after) = 0;
+  virtual csRef<iDocumentNode> CreateNodeBefore (csDocumentNodeType type,
+  	iDocumentNode* before) = 0;
 
   /**
    * Get the value of a node. What this does is scan all child nodes
@@ -208,40 +205,18 @@ struct iDocumentNode : public iBase
 
   /// Change or add an attribute.
   virtual void SetAttribute (const char* name, const char* value) = 0;
-  /**
-   * Create a new attribute at the end.
-   */
-  virtual csRef<iDocumentAttribute> CreateAttribute () = 0;
-  /**
-   * Create a new attribute before the given attribute.
-   */
-  virtual csRef<iDocumentAttribute> CreateAttributeBefore (
-  	const csRef<iDocumentAttribute>& attr) = 0;
-  /**
-   * Create a new attribute after the given attribute.
-   */
-  virtual csRef<iDocumentAttribute> CreateAttributeAfter (
-  	const csRef<iDocumentAttribute>& attr) = 0;
-  /**
-   * Move an attribute (which should be a child of this node) before the
-   * given attribute.
-   */
-  virtual void MoveAttributeBefore (const csRef<iDocumentAttribute>& attr,
-  	const csRef<iDocumentAttribute>& before) = 0;
-  /**
-   * Move an attribute (which should be a child of this node) after the
-   * given attribute.
-   */
-  virtual void MoveAttributeAfter (const csRef<iDocumentAttribute>& attr,
-  	const csRef<iDocumentAttribute>& after) = 0;
+  /// Change or add an attribute as int.
+  virtual void SetAttributeAsInt (const char* name, int value) = 0;
+  /// Change or add an attribute as float.
+  virtual void SetAttributeAsFloat (const char* name, float value) = 0;
 };
 
 //===========================================================================
 
-SCF_VERSION (iDocument, 0, 0, 2);
+SCF_VERSION (iDocument, 0, 1, 0);
 
 /**
- * This represents a document in XML.
+ * This represents a document.
  */
 struct iDocument : public iBase
 {
@@ -251,63 +226,61 @@ struct iDocument : public iBase
   /// Create a root node. This will clear the previous root node if any.
   virtual csRef<iDocumentNode> CreateRoot () = 0;
 
-  /// Create an unlinked element node.
-  virtual csRef<iDocumentNode> CreateElement () = 0;
-
-  /// Create an unlinked comment node.
-  virtual csRef<iDocumentNode> CreateComment () = 0;
-
-  /// Create an unlinked text node.
-  virtual csRef<iDocumentNode> CreateText (const char* value) = 0;
-
   /// Get the current root node.
   virtual csRef<iDocumentNode> GetRoot () = 0;
 
   /**
-   * Parse XML file from an iFile.
+   * Parse document file from an iFile.
    * This will clear the previous root node if any.
    * Returns NULL if all is ok. Otherwise it will return an error
    * string.
    */
-  virtual const char* ParseXML (iFile* file) = 0;
+  virtual const char* Parse (iFile* file) = 0;
 
   /**
-   * Parse XML file from an iDataBuffer.
+   * Parse document file from an iDataBuffer.
    * This will clear the previous root node if any.
    * Returns NULL if all is ok. Otherwise it will return an error
    * string.
    */
-  virtual const char* ParseXML (iDataBuffer* buf) = 0;
+  virtual const char* Parse (iDataBuffer* buf) = 0;
 
   /**
-   * Parse XML file from an iString.
+   * Parse document file from an iString.
    * This will clear the previous root node if any.
    * Returns NULL if all is ok. Otherwise it will return an error
    * string.
    */
-  virtual const char* ParseXML (iString* str) = 0;
+  virtual const char* Parse (iString* str) = 0;
 
   /**
-   * Parse XML file from a char array.
+   * Parse document file from a char array.
    * This will clear the previous root node if any.
    * Returns NULL if all is ok. Otherwise it will return an error
    * string.
    */
-  virtual const char* ParseXML (const char* buf) = 0;
+  virtual const char* Parse (const char* buf) = 0;
 
   /**
-   * Write out XML file to an iFile.
+   * Write out document file to an iFile.
    * This will return NULL if all is ok. Otherwise it will return an
    * error string.
    */
-  virtual const char* WriteXML (iFile* file) = 0;
+  virtual const char* Write (iFile* file) = 0;
 
   /**
-   * Write out XML file to an iString.
+   * Write out document file to an iString.
    * This will return NULL if all is ok. Otherwise it will return an
    * error string.
    */
-  virtual const char* WriteXML (iString& str) = 0;
+  virtual const char* Write (iString* str) = 0;
+
+  /**
+   * Write out document file to a VFS file.
+   * This will return NULL if all is ok. Otherwise it will return an
+   * error string.
+   */
+  virtual const char* Write (iVFS* vfs, const char* filename) = 0;
 };
 
 //===========================================================================
@@ -315,7 +288,7 @@ struct iDocument : public iBase
 SCF_VERSION (iDocumentSystem, 0, 0, 1);
 
 /**
- * The XML plugin.
+ * The document system.
  */
 struct iDocumentSystem : public iBase
 {

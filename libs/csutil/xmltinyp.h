@@ -151,7 +151,7 @@ public:
 
   SCF_DECLARE_IBASE;
 
-  virtual csXmlNodeType GetType ();
+  virtual csDocumentNodeType GetType ();
   virtual const char* GetValue ();
   virtual void SetValue (const char* value);
   virtual csRef<iDocumentNode> GetParent ();
@@ -161,10 +161,8 @@ public:
   virtual csRef<iDocumentNode> GetNode (const char* type);
   virtual void RemoveNode (const csRef<iDocumentNode>& child);
   virtual void RemoveNodes ();
-  virtual void MoveNodeBefore (const csRef<iDocumentNode>& node,
-  	const csRef<iDocumentNode>& before);
-  virtual void MoveNodeAfter (const csRef<iDocumentNode>& node,
-  	const csRef<iDocumentNode>& after);
+  virtual csRef<iDocumentNode> CreateNodeBefore (csDocumentNodeType type,
+  	iDocumentNode* before);
 
   virtual const char* GetContentsValue ();
   virtual int GetContentsValueAsInt ();
@@ -178,15 +176,8 @@ public:
   virtual void RemoveAttribute (const csRef<iDocumentAttribute>& attr);
   virtual void RemoveAttributes ();
   virtual void SetAttribute (const char* name, const char* value);
-  virtual csRef<iDocumentAttribute> CreateAttribute ();
-  virtual csRef<iDocumentAttribute> CreateAttributeBefore (
-  	const csRef<iDocumentAttribute>& attr);
-  virtual csRef<iDocumentAttribute> CreateAttributeAfter (
-  	const csRef<iDocumentAttribute>& attr);
-  virtual void MoveAttributeBefore (const csRef<iDocumentAttribute>& attr,
-  	const csRef<iDocumentAttribute>& before);
-  virtual void MoveAttributeAfter (const csRef<iDocumentAttribute>& attr,
-  	const csRef<iDocumentAttribute>& after);
+  virtual void SetAttributeAsInt (const char* name, int value);
+  virtual void SetAttributeAsFloat (const char* name, float value);
 };
 
 /**
@@ -205,17 +196,15 @@ public:
 
   virtual void Clear ();
   virtual csRef<iDocumentNode> CreateRoot ();
-  virtual csRef<iDocumentNode> CreateElement ();
-  virtual csRef<iDocumentNode> CreateComment ();
-  virtual csRef<iDocumentNode> CreateText (const char* value);
 
   virtual csRef<iDocumentNode> GetRoot ();
-  virtual const char* ParseXML (iFile* file);
-  virtual const char* ParseXML (iDataBuffer* buf);
-  virtual const char* ParseXML (iString* str);
-  virtual const char* ParseXML (const char* buf);
-  virtual const char* WriteXML (iFile* file);
-  virtual const char* WriteXML (iString& str);
+  virtual const char* Parse (iFile* file);
+  virtual const char* Parse (iDataBuffer* buf);
+  virtual const char* Parse (iString* str);
+  virtual const char* Parse (const char* buf);
+  virtual const char* Write (iFile* file);
+  virtual const char* Write (iString* str);
+  virtual const char* Write (iVFS* vfs, const char* filename);
 };
 
 #endif // __CSUTIL_XMLTINYPRIV_H__

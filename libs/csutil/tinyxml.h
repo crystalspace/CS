@@ -37,6 +37,47 @@ distribution.
 #include <string.h>
 #include <assert.h>
 
+// >>> JORRIT
+// @@@ This is an EXTREMELY ugly hack.
+// I want to avoid touching the TinyXml sources too much (to ensure we
+// can upgrade easily to new versions of TinyXml). But I need a function
+// to output XML to an iString. So I do this by redefining FILE and
+// all FILE related routines (fprintf) to work on iString instead.
+#include "iutil/string.h"
+#include "csutil/scfstr.h"
+#define FILE iString
+#define fprintf new_fprintf
+#define fputs new_fputs
+#define fopen new_fopen
+#define fseek new_fseek
+#define ftell new_ftell
+#define fclose new_fclose
+#define fgets new_fgets
+#ifdef stdout
+#undef stdout
+#endif
+#define stdout NULL
+static void new_fprintf (iString* file, const char* msg, ...)
+{
+  scfString str;
+  va_list args;
+  va_start (args, msg);
+  str.FormatV (msg, args);
+  va_end (args);
+
+  file->Append (str);
+}
+static void new_fputs (const char* msg, iString* file)
+{
+  file->Append (msg);
+}
+static iString* new_fopen (const char* fn, const char* m) { return NULL; }
+static void new_fseek (iString*, int, int) { }
+static long new_ftell (iString*) { return 0; }
+static void new_fclose (iString*) { }
+static int new_fgets (const char*, int, iString*) { return 0; }
+// <<< JORRIT
+
 // Help out windows:
 #if defined( _DEBUG ) && !defined( DEBUG )
 #define DEBUG

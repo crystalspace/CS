@@ -69,6 +69,21 @@ iString &scfString::Append (const iString *iStr, size_t iCount)
   return *this;
 }
 
+void scfString::Format (const char* format, ...)
+{
+  va_list args;
+  va_start (args, format);
+
+  FormatV (format, args);
+
+  va_end (args);
+}
+
+void scfString::FormatV (const char* format, va_list args)
+{
+  s.FormatV (format, args);
+}
+
 void scfString::Replace (const iString *iStr, size_t iCount)
 { s.Replace (iStr->GetData (), iCount); }
 

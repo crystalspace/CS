@@ -673,7 +673,7 @@ bool csThingLoader::LoadThingPart (iDocumentNode* node, iLoaderContext* ldr_cont
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     switch (id)
@@ -1181,7 +1181,7 @@ iBase* csPlaneLoader::Parse (iDocumentNode* node,
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     switch (id)
@@ -1439,7 +1439,7 @@ iBase* csBezierLoader::Parse (iDocumentNode* node,
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     switch (id)

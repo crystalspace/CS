@@ -480,7 +480,7 @@ bool csLoader::LoadMapFile (const char* file, bool iClearEngine,
       xml.Take (new csTinyDocumentSystem ());
     }
     csRef<iDocument> doc = xml->CreateDocument ();
-    const char* error = doc->ParseXML (buf);
+    const char* error = doc->Parse (buf);
     if (error == NULL)
     {
       if (!LoadMap (doc->GetRoot ()))
@@ -3264,7 +3264,7 @@ bool csLoader::LoadMap (iDocumentNode* node)
     while (it->HasNext ())
     {
       csRef<iDocumentNode> child = it->Next ();
-      if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+      if (child->GetType () != CS_NODE_ELEMENT) continue;
       const char* value = child->GetValue ();
       csStringID id = xmltokens.Request (value);
       switch (id)
@@ -3379,7 +3379,7 @@ bool csLoader::LoadPlugins (iDocumentNode* node)
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     switch (id)
@@ -3436,7 +3436,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     switch (id)
@@ -3841,7 +3841,7 @@ iStatLight* csLoader::ParseStatlight (iDocumentNode* node)
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     switch (id)
@@ -4081,7 +4081,7 @@ iSector* csLoader::ParseSector (iDocumentNode* node)
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_XMLNODE_ELEMENT) continue;
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     switch (id)

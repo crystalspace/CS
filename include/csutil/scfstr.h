@@ -95,6 +95,11 @@ public:
   /// Append a string to this one (possibly iCount characters from the string)
   virtual iString &Append (const iString *iStr, size_t iCount = (size_t)-1);
 
+  /// Format.
+  virtual void Format (const char *format, ...) CS_GNUC_PRINTF (2, 3);
+  /// Format.
+  virtual void FormatV (const char *format, va_list args);
+
   /// Replace contents of this string with the contents of another
   virtual void Replace (const iString *iStr, size_t iCount = (size_t)-1);
 

@@ -22,7 +22,7 @@
 
 #include "csutil/scf.h"
 
-SCF_VERSION (iString, 0, 0, 1);
+SCF_VERSION (iString, 0, 1, 0);
 
 /// This is a SCF-compatible interface for csString.
 struct iString : public iBase
@@ -73,6 +73,20 @@ struct iString : public iBase
 
   /// Append a string to this one (possibly iCount characters from the string)
   virtual iString &Append (const iString *iStr, size_t iCount = (size_t)-1)=0;
+
+  /**
+   * Format this string using sprintf() formatting directives.  Automatically
+   * allocates sufficient memory to hold result.  Newly formatted string
+   * overwrites previous string value.
+   */
+  virtual void Format (const char *format, ...) CS_GNUC_PRINTF (2, 3) = 0;
+
+  /**
+   * Format this string using sprintf() formatting directives in a va_list.
+   * Automatically allocates sufficient memory to hold result.  Newly
+   * formatted string overwrites previous string value.
+   */
+  virtual void FormatV (const char *format, va_list args) = 0;
 
   /// Replace contents of this string with the contents of another
   virtual void Replace (const iString *iStr, size_t iCount = (size_t)-1) = 0;

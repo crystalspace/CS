@@ -1,5 +1,27 @@
 The history order is reversed so that new features are at the top.
 
+14-Aug-2002
+	- Removed CreateElement(), CreateText(), and CreateComment() again.
+	  Will do this differently.
+	- Added iDocumentNode::CreateNodeBefore() to create nodes before
+	  the given node (or at end if given node is NULL).
+	- Renamed csXmlNodeType to csDocumentNodeType. Also renamed
+	  the CS_XMLNODE_... constants to CS_NODE_....
+	- Fixed unittest of syntax services. It was performing a bad
+	  test with the 'scale' token.
+	- Added iString::Format() and FormatV() (similar to csString versions).
+	- Renamed ParseXML() and WriteXML() to Parse() and Write() in iDocument.
+	- Implemented a VERY dirty hack in the TinyXML source code. We would
+	  like to avoid modifying those sources too much (to make it easier
+	  to upgrade if that is needed). However I needed a function to write
+	  out XML to iString as opposed to FILE*. So I just redefined FILE
+	  and all FILE related routines (fprintf, ...) to work on iString :-)
+	  Of course, this hack is local to the TinyXml sources.
+	- Added version of Write() that takes a VFS filename.
+	- Implemented three versions of Write() to write out document files.
+	- Removed all CreateAttribute... and MoveAttribute... functions
+	  from iDocumentNode. Instead there is only SetAttribute() which is
+	  now implemented.
 13-Aug-2002
 	- Implemented XML versions of LoadMap() and LoadSector() in the
 	  main loader.
@@ -17,13 +39,13 @@ The history order is reversed so that new features are at the top.
 	  registry. If not it will use the tinyxml parser. Using that it is
 	  possible to make your own implementations of iXmlSystem using another
 	  XML parser.
-	- Fixed cs2xml so that it makes an XML world file that can almost be read
-	  by the current loader (still need to fix a few things manually but
-	  I will not continue writing cs2xml like this anyway. The plan is to
-	  let cs2xml generate a node tree and output that using the XML system).
-	  By doing this I could confirm that XML map loading works for very simple
-	  levels now (sectors, textures, materials, lights, and thing mesh objects).
-	  This is a very nice step indeed.
+	- Fixed cs2xml so that it makes an XML world file that can almost be
+	  read by the current loader (still need to fix a few things manually
+	  but I will not continue writing cs2xml like this anyway. The plan is
+	  to let cs2xml generate a node tree and output that using the XML
+	  system). By doing this I could confirm that XML map loading works
+	  for very simple levels now (sectors, textures, materials, lights,
+	  and thing mesh objects). This is a very nice step indeed.
 	- Did the following renames:
 	    iXmlSystem -> iDocumentSystem
 	    iXmlNode -> iDocumentNode

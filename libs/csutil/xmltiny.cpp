@@ -24,10 +24,10 @@
 #include "csutil/util.h"
 #include "csutil/xmltiny.h"
 #include "csutil/xmltinyp.h"
-#include "csutil/tinyxml.h"
 #include "iutil/vfs.h"
 #include "iutil/string.h"
 #include "iutil/databuff.h"
+#include "csutil/tinyxml.h"
 
 //------------------------------------------------------------------------
 
@@ -158,16 +158,16 @@ csRef<iDocumentNode> csTinyXmlNode::GetParent ()
   return child;
 }
 
-csXmlNodeType csTinyXmlNode::GetType ()
+csDocumentNodeType csTinyXmlNode::GetType ()
 {
   switch (node->Type ())
   {
-    case TiDocumentNode::DOCUMENT: return CS_XMLNODE_DOCUMENT;
-    case TiDocumentNode::ELEMENT: return CS_XMLNODE_ELEMENT;
-    case TiDocumentNode::COMMENT: return CS_XMLNODE_COMMENT;
-    case TiDocumentNode::TEXT: return CS_XMLNODE_TEXT;
-    case TiDocumentNode::DECLARATION: return CS_XMLNODE_DECLARATION;
-    default: return CS_XMLNODE_UNKNOWN;
+    case TiDocumentNode::DOCUMENT: return CS_NODE_DOCUMENT;
+    case TiDocumentNode::ELEMENT: return CS_NODE_ELEMENT;
+    case TiDocumentNode::COMMENT: return CS_NODE_COMMENT;
+    case TiDocumentNode::TEXT: return CS_NODE_TEXT;
+    case TiDocumentNode::DECLARATION: return CS_NODE_DECLARATION;
+    default: return CS_NODE_UNKNOWN;
   }
 }
 
@@ -206,7 +206,7 @@ csRef<iDocumentNode> csTinyXmlNode::GetNode (const char* type)
 
 void csTinyXmlNode::RemoveNode (const csRef<iDocumentNode>& child)
 {
-  CS_ASSERT (child.IsValid ());
+  //CS_ASSERT (child.IsValid ());
   node->RemoveChild (((csTinyXmlNode*)(iDocumentNode*)child)->GetTiNode ());
 }
 
@@ -215,16 +215,81 @@ void csTinyXmlNode::RemoveNodes ()
   node->Clear ();
 }
 
-void csTinyXmlNode::MoveNodeBefore (const csRef<iDocumentNode>& node,
-  	const csRef<iDocumentNode>& before)
+csRef<iDocumentNode> csTinyXmlNode::CreateNodeBefore (csDocumentNodeType type,
+	iDocumentNode* before)
 {
-  // @@@ TODO
-}
-
-void csTinyXmlNode::MoveNodeAfter (const csRef<iDocumentNode>& node,
-  	const csRef<iDocumentNode>& after)
-{
-  // @@@ TODO
+  csRef<iDocumentNode> n;
+  TiDocumentNode* child = NULL;
+  switch (type)
+  {
+    case CS_NODE_DOCUMENT:
+      break;
+    case CS_NODE_ELEMENT:
+      {
+        TiXmlElement el (NULL);
+	if (before)
+	  child = node->InsertBeforeChild (
+	  	((csTinyXmlNode*)(iDocumentNode*)before)->GetTiNode (),
+		el);
+        else
+	  child = node->InsertEndChild (el);
+        //CS_ASSERT (child != NULL);
+      }
+      break;
+    case CS_NODE_COMMENT:
+      {
+        TiXmlComment el;
+	if (before)
+	  child = node->InsertBeforeChild (
+	  	((csTinyXmlNode*)(iDocumentNode*)before)->GetTiNode (),
+		el);
+        else
+	  child = node->InsertEndChild (el);
+        //CS_ASSERT (child != NULL);
+      }
+      break;
+    case CS_NODE_TEXT:
+      {
+        TiXmlText el (NULL);
+	if (before)
+	  child = node->InsertBeforeChild (
+	  	((csTinyXmlNode*)(iDocumentNode*)before)->GetTiNode (),
+		el);
+        else
+	  child = node->InsertEndChild (el);
+        //CS_ASSERT (child != NULL);
+      }
+      break;
+    case CS_NODE_DECLARATION:
+      {
+        TiXmlDeclaration el;
+	if (before)
+	  child = node->InsertBeforeChild (
+	  	((csTinyXmlNode*)(iDocumentNode*)before)->GetTiNode (),
+		el);
+        else
+	  child = node->InsertEndChild (el);
+        //CS_ASSERT (child != NULL);
+      }
+      break;
+    case CS_NODE_UNKNOWN:
+      {
+        TiXmlUnknown el;
+	if (before)
+	  child = node->InsertBeforeChild (
+	  	((csTinyXmlNode*)(iDocumentNode*)before)->GetTiNode (),
+		el);
+        else
+	  child = node->InsertEndChild (el);
+        //CS_ASSERT (child != NULL);
+      }
+      break;
+    default:
+      break;
+  }
+  if (child)
+    n.Take (new csTinyXmlNode (child));
+  return n;
 }
 
 const char* csTinyXmlNode::GetContentsValue ()
@@ -312,42 +377,25 @@ void csTinyXmlNode::RemoveAttributes ()
 
 void csTinyXmlNode::SetAttribute (const char* name, const char* value)
 {
-  // @@@ TODO
+  TiXmlElement* el = node->ToElement ();
+  if (el) el->SetAttribute (name, value);
 }
 
-csRef<iDocumentAttribute> csTinyXmlNode::CreateAttribute ()
+void csTinyXmlNode::SetAttributeAsInt (const char* name, int value)
 {
-  csRef<iDocumentAttribute> attr;
-  // @@@ TODO
-  return attr;
+  TiXmlElement* el = node->ToElement ();
+  if (el) el->SetAttribute (name, value);
 }
 
-csRef<iDocumentAttribute> csTinyXmlNode::CreateAttributeBefore (
-  	const csRef<iDocumentAttribute>& before)
+void csTinyXmlNode::SetAttributeAsFloat (const char* name, float value)
 {
-  csRef<iDocumentAttribute> attr;
-  // @@@ TODO
-  return attr;
-}
-
-csRef<iDocumentAttribute> csTinyXmlNode::CreateAttributeAfter (
-  	const csRef<iDocumentAttribute>& after)
-{
-  csRef<iDocumentAttribute> attr;
-  // @@@ TODO
-  return attr;
-}
-
-void csTinyXmlNode::MoveAttributeBefore (const csRef<iDocumentAttribute>& attr,
-  	const csRef<iDocumentAttribute>& before)
-{
-  // @@@ TODO
-}
-
-void csTinyXmlNode::MoveAttributeAfter (const csRef<iDocumentAttribute>& attr,
-  	const csRef<iDocumentAttribute>& after)
-{
-  // @@@ TODO
+  TiXmlElement* el = node->ToElement ();
+  if (el)
+  {
+    char v[64];
+    sprintf (v, "%g", value);
+    el->SetAttribute (name, v);
+  }
 }
 
 //------------------------------------------------------------------------
@@ -378,56 +426,27 @@ csRef<iDocumentNode> csTinyXmlDocument::CreateRoot ()
   return root;
 }
 
-csRef<iDocumentNode> csTinyXmlDocument::CreateElement ()
-{
-  // @@@ Will TinyXML clean up these nodes later? Who
-  // is responsible for this? If we create an element
-  // here and it is never linked into an XML tree then
-  // we have a memory leak for sure.
-  // Same for CreateComment() and CreateText().
-  TiXmlElement* el = new TiXmlElement (NULL);
-  csRef<iDocumentNode> node;
-  node.Take (new csTinyXmlNode (el));
-  return node;
-}
-
-csRef<iDocumentNode> csTinyXmlDocument::CreateComment ()
-{
-  TiXmlComment* el = new TiXmlComment ();
-  csRef<iDocumentNode> node;
-  node.Take (new csTinyXmlNode (el));
-  return node;
-}
-
-csRef<iDocumentNode> csTinyXmlDocument::CreateText (const char* value)
-{
-  TiXmlText* el = new TiXmlText (value);
-  csRef<iDocumentNode> node;
-  node.Take (new csTinyXmlNode (el));
-  return node;
-}
-
 csRef<iDocumentNode> csTinyXmlDocument::GetRoot ()
 {
   return root;
 }
 
-const char* csTinyXmlDocument::ParseXML (iFile* file)
+const char* csTinyXmlDocument::Parse (iFile* file)
 {
   return "Not implemented yet!";
 }
 
-const char* csTinyXmlDocument::ParseXML (iDataBuffer* buf)
+const char* csTinyXmlDocument::Parse (iDataBuffer* buf)
 {
-  return ParseXML ((const char*)buf->GetData ());
+  return Parse ((const char*)buf->GetData ());
 }
 
-const char* csTinyXmlDocument::ParseXML (iString* str)
+const char* csTinyXmlDocument::Parse (iString* str)
 {
-  return ParseXML ((const char*)*str);
+  return Parse ((const char*)*str);
 }
 
-const char* csTinyXmlDocument::ParseXML (const char* buf)
+const char* csTinyXmlDocument::Parse (const char* buf)
 {
   CreateRoot ();
   TiDocument* doc = (TiDocument*)(((csTinyXmlNode*)(iDocumentNode*)root)
@@ -438,14 +457,32 @@ const char* csTinyXmlDocument::ParseXML (const char* buf)
   return NULL;
 }
 
-const char* csTinyXmlDocument::WriteXML (iFile* file)
+const char* csTinyXmlDocument::Write (iFile* file)
 {
-  return "Not implemented yet!";
+  scfString str;
+  const char* error = Write (&str);
+  if (error) return error;
+  if (!file->Write (str.GetData (), str.Length ()))
+    return "Error writing file!";
+  return NULL;
 }
 
-const char* csTinyXmlDocument::WriteXML (iString& str)
+const char* csTinyXmlDocument::Write (iString* str)
 {
-  return "Not implemented yet!";
+  TiDocument* doc = (TiDocument*)(((csTinyXmlNode*)(iDocumentNode*)root)
+  	->GetTiNode ());
+  doc->Print (str, 0);
+  return NULL;
+}
+
+const char* csTinyXmlDocument::Write (iVFS* vfs, const char* filename)
+{
+  scfString str;
+  const char* error = Write (&str);
+  if (error) return error;
+  if (!vfs->WriteFile (filename, str.GetData (), str.Length ()))
+    return "Error writing file!";
+  return NULL;
 }
 
 //------------------------------------------------------------------------
