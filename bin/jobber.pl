@@ -265,6 +265,7 @@ my $MAKE = 'make';
 my $CONFIGURE = "cat << EOF > config.mak\n" .
     "TARGET = unix\n" .
     "TARGET_MAKEFILE = libs/cssys/unix/unix.mak\n" .
+    "USE_PLUGINS = yes\n" .
     "CMD.MKDIR = mkdir\n" .
     "CMD.MKDIRS = mkdir -p\n" .
     "PROC = UNKNOWN\n" .

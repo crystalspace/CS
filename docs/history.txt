@@ -25,6 +25,11 @@ The history order is reversed so that new features are at the top.
 	  Previously, win32/loadlib.cpp simply threw away all diagnostic
 	  information, which made it impossible to debug plugin load failures
 	  on Windows.
+	- Eric Sunshine augmented jobber.pl so that it emits "USE_PLUGINS=yes"
+	  to the config.mak file which it fakes up.  This fixes the problem in
+	  which scftutor.mak was misbehaving and adding dog.cpp and worm.cpp to
+	  the appzoo project.  (These files should have appeared only in the
+	  plgdog and plgworm projects.)
 19-Jan-2003
 	- Fixed a problem where RemoveObject() would not properly remove
 	  objects from the sectors so memory leaks would occur.
