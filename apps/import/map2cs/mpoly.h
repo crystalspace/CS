@@ -135,9 +135,9 @@ protected:
     */
   bool CheckIfInside(const CdVector3&               point,
                      const CMapTexturedPlaneVector& planes,
-                     CMapTexturedPlane*&            pIgnorePlane1,
-                     CMapTexturedPlane*&            pIgnorePlane2,
-                     CMapTexturedPlane*&            pIgnorePlane3);
+                     CMapTexturedPlane const*       pIgnorePlane1,
+                     CMapTexturedPlane const*       pIgnorePlane2,
+                     CMapTexturedPlane const*       pIgnorePlane3);
 
   /// For debugging purposes: Dump all info to stdout.
   void DumpPolyinfo(CMapTexturedPlane*             pBaseplane,

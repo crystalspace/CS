@@ -448,9 +448,9 @@ int  CMapPolygon::GetNumberOfValidVertices(CMapTexturedPlane*             pPlane
 
 bool CMapPolygon::CheckIfInside(const CdVector3&               point,
                                 const CMapTexturedPlaneVector& planes,
-                                CMapTexturedPlane*&            pIgnorePlane1,
-                                CMapTexturedPlane*&            pIgnorePlane2,
-                                CMapTexturedPlane*&            pIgnorePlane3)
+                                CMapTexturedPlane const*       pIgnorePlane1,
+                                CMapTexturedPlane const*       pIgnorePlane2,
+                                CMapTexturedPlane const*       pIgnorePlane3)
 {
   //All thre planes create at least a single point. Now we need to
   //determine, if that point is inside or outside the given polygons
@@ -514,9 +514,7 @@ void CMapPolygon::DumpPolyinfo(CMapTexturedPlane*             pBaseplane,
           {
             double v=(c==0)?point.x:(c==1)?point.y:point.z;
 
-            if (CheckIfInside(point, planes, pBaseplane,
-	    	(CMapTexturedPlane*)planes[x], 
-		(CMapTexturedPlane*)planes[y]))
+            if (CheckIfInside(point, planes, pBaseplane, planes[x], planes[y]))
             {
               printf("%8.3fI ",v); //10 char "Inside"
             }
