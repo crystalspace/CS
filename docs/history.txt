@@ -19,7 +19,7 @@ The history order is reversed so that new features are at the top.
 	  System.Plugins.iDocumentSystem = crystalspace.documentsystem.xmlread
 	  Walktest already has this line now.
 	- Optimized memory usage in the new 'xmlread' plugin.
-	- res added CONSTI64() and CONSTUI64() macros to cstypes.h for 
+	- res added CONST_I64() and CONST_UI64() macros to cstypes.h for 
 	  specifying 64bit constants on all platforms.
 	- Changed csloader plugin to use iFile instead of iDataBuffer for
 	  reading. The reason is that the new 'xmlread' plugin can save
@@ -27,6 +27,11 @@ The history order is reversed so that new features are at the top.
 	- Changed the readxml parser so that it no longer does any string
 	  manipulation. Instead it gets the string data directly from the
 	  XML data it is reading.
+	- res made the following changes to the newly arrived movie recorder:
+	    - use of CS types (uint8 etc.) instead of custom typedefs 
+	    - use of 64bit portability macros and some other fixes to make it
+	      compile on MSVC.
+	    - added mmx.h from original NuppelVideo sources.
 1-Apr-2003
 	- Reverted dllwrap change to win32gcc.mak from 4 days ago since
 	  it prevents debug symbols from being present in plugins.

@@ -22,9 +22,12 @@
     
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "cssysdef.h"
+
+#if defined(DO_MMX) && defined(COMP_GCC)
+# define MMX
+#endif
+
 #include "rtjpeg.h"
 
 #ifdef MMX
@@ -51,28 +54,59 @@ static const unsigned char RTjpeg_ZZ[64]={
 62, 55,
 63 };
 
-static const __u64 RTjpeg_aan_tab[64]={
-4294967296ULL, 5957222912ULL, 5611718144ULL, 5050464768ULL, 4294967296ULL, 3374581504ULL, 2324432128ULL, 1184891264ULL, 
-5957222912ULL, 8263040512ULL, 7783580160ULL, 7005009920ULL, 5957222912ULL, 4680582144ULL, 3224107520ULL, 1643641088ULL, 
-5611718144ULL, 7783580160ULL, 7331904512ULL, 6598688768ULL, 5611718144ULL, 4408998912ULL, 3036936960ULL, 1548224000ULL, 
-5050464768ULL, 7005009920ULL, 6598688768ULL, 5938608128ULL, 5050464768ULL, 3968072960ULL, 2733115392ULL, 1393296000ULL, 
-4294967296ULL, 5957222912ULL, 5611718144ULL, 5050464768ULL, 4294967296ULL, 3374581504ULL, 2324432128ULL, 1184891264ULL, 
-3374581504ULL, 4680582144ULL, 4408998912ULL, 3968072960ULL, 3374581504ULL, 2651326208ULL, 1826357504ULL, 931136000ULL, 
-2324432128ULL, 3224107520ULL, 3036936960ULL, 2733115392ULL, 2324432128ULL, 1826357504ULL, 1258030336ULL, 641204288ULL, 
-1184891264ULL, 1643641088ULL, 1548224000ULL, 1393296000ULL, 1184891264ULL, 931136000ULL, 641204288ULL, 326894240ULL, 
+static const uint64 RTjpeg_aan_tab[64]={
+  CONST_UI64(4294967296), CONST_UI64(5957222912), 
+  CONST_UI64(5611718144), CONST_UI64(5050464768), 
+  CONST_UI64(4294967296), CONST_UI64(3374581504), 
+  CONST_UI64(2324432128), CONST_UI64(1184891264), 
+
+  CONST_UI64(5957222912), CONST_UI64(8263040512), 
+  CONST_UI64(7783580160), CONST_UI64(7005009920), 
+  CONST_UI64(5957222912), CONST_UI64(4680582144), 
+  CONST_UI64(3224107520), CONST_UI64(1643641088),
+
+  CONST_UI64(5611718144), CONST_UI64(7783580160), 
+  CONST_UI64(7331904512), CONST_UI64(6598688768), 
+  CONST_UI64(5611718144), CONST_UI64(4408998912), 
+  CONST_UI64(3036936960), CONST_UI64(1548224000), 
+
+  CONST_UI64(5050464768), CONST_UI64(7005009920), 
+  CONST_UI64(6598688768), CONST_UI64(5938608128), 
+  CONST_UI64(5050464768), CONST_UI64(3968072960), 
+  CONST_UI64(2733115392), CONST_UI64(1393296000), 
+
+  CONST_UI64(4294967296), CONST_UI64(5957222912), 
+  CONST_UI64(5611718144), CONST_UI64(5050464768), 
+  CONST_UI64(4294967296), CONST_UI64(3374581504), 
+  CONST_UI64(2324432128), CONST_UI64(1184891264), 
+
+  CONST_UI64(3374581504), CONST_UI64(4680582144), 
+  CONST_UI64(4408998912), CONST_UI64(3968072960), 
+  CONST_UI64(3374581504), CONST_UI64(2651326208), 
+  CONST_UI64(1826357504), CONST_UI64(931136000), 
+
+  CONST_UI64(2324432128), CONST_UI64(3224107520), 
+  CONST_UI64(3036936960), CONST_UI64(2733115392), 
+  CONST_UI64(2324432128), CONST_UI64(1826357504), 
+  CONST_UI64(1258030336), CONST_UI64(641204288), 
+
+  CONST_UI64(1184891264), CONST_UI64(1643641088), 
+  CONST_UI64(1548224000), CONST_UI64(1393296000), 
+  CONST_UI64(1184891264), CONST_UI64(931136000), 
+  CONST_UI64(641204288),  CONST_UI64(326894240), 
 };
 
 #ifndef MMX
-static __s32 RTjpeg_ws[64+31];
+static int32 RTjpeg_ws[64+31];
 #endif
-__u8 RTjpeg_alldata[2*64+4*64+4*64+4*64+4*64+32];
+uint8 RTjpeg_alldata[2*64+4*64+4*64+4*64+4*64+32];
 
-__s16 *block; // rh
-__s16 *RTjpeg_block;
-__s32 *RTjpeg_lqt;
-__s32 *RTjpeg_cqt;
-__u32 *RTjpeg_liqt;
-__u32 *RTjpeg_ciqt;
+int16 *block; // rh
+int16 *RTjpeg_block;
+int32 *RTjpeg_lqt;
+int32 *RTjpeg_cqt;
+uint32 *RTjpeg_liqt;
+uint32 *RTjpeg_ciqt;
 
 unsigned char RTjpeg_lb8;
 unsigned char RTjpeg_cb8;
@@ -80,14 +114,14 @@ int RTjpeg_width, RTjpeg_height;
 int RTjpeg_Ywidth, RTjpeg_Cwidth;
 int RTjpeg_Ysize, RTjpeg_Csize;
 
-__s16 *RTjpeg_old=NULL;
+int16 *RTjpeg_old=NULL;
 
 #ifdef MMX
 mmx_t RTjpeg_lmask;
 mmx_t RTjpeg_cmask;
 #else
-__u16 RTjpeg_lmask;
-__u16 RTjpeg_cmask;
+uint16 RTjpeg_lmask;
+uint16 RTjpeg_cmask;
 #endif
 int RTjpeg_mtest=0;
 
@@ -130,10 +164,10 @@ static const unsigned char RTjpeg_chrom_quant_tbl[64] = {
 /* Block to Stream (encoding)                         */
 /*                                                    */
 
-int RTjpeg_b2s(__s16 *data, __s8 *strm, __u8 bt8)
+int RTjpeg_b2s(int16 *data, int8 *strm, uint8 bt8)
 {
  register int ci, co=1;
- register __s16 ZZvalue;
+ register int16 ZZvalue;
  register unsigned char bitten;
  register unsigned char bitoff;
 
@@ -153,8 +187,8 @@ int RTjpeg_b2s(__s16 *data, __s8 *strm, __u8 bt8)
 // return 2;
 
  // first byte allways written
- (__u8)strm[0]=
-      (__u8)(data[RTjpeg_ZZ[0]]>254) ? 254:((data[RTjpeg_ZZ[0]]<0)?0:data[RTjpeg_ZZ[0]]);
+ strm[0]=
+      (int8)(data[RTjpeg_ZZ[0]]>254) ? 254:((data[RTjpeg_ZZ[0]]<0)?0:data[RTjpeg_ZZ[0]]);
 
 
  ci=63;
@@ -163,7 +197,7 @@ int RTjpeg_b2s(__s16 *data, __s8 *strm, __u8 bt8)
  bitten = ((unsigned char)ci) << 2;
 
  if (ci==0) {
-   (__u8)strm[1]= bitten; 
+   strm[1]= (int8)bitten; 
    co = 2;
    return (int)co;
  }
@@ -192,7 +226,7 @@ int RTjpeg_b2s(__s16 *data, __s8 *strm, __u8 bt8)
    }
 
    if( bitoff == 0 ) {
-      (__u8)strm[co]= bitten; 
+      strm[co]= (int8)bitten; 
       bitten = 0;
       bitoff = 8; 
       co++;
@@ -204,7 +238,7 @@ int RTjpeg_b2s(__s16 *data, __s8 *strm, __u8 bt8)
  /* ci must be 0 */
  if(bitoff != 6) {
 
-      (__u8)strm[co]= bitten; 
+      strm[co]= (int8)bitten; 
       co++;
      
  }
@@ -221,7 +255,7 @@ HERZWEH:
    break;
  case 2:
  case 0:
-   (__u8)strm[co]= bitten; 
+   strm[co]= (int8)bitten; 
    bitoff = 4;
    co++;
    bitten = 0; // clear half nibble values in bitten
@@ -242,7 +276,7 @@ HERZWEH:
    bitten |= (ZZvalue&0xf)<<bitoff;
 
    if( bitoff == 0 ) {
-      (__u8)strm[co]= bitten; 
+      strm[co]= (int8)bitten; 
       bitten = 0;
       bitoff = 8;
       co++;
@@ -252,14 +286,14 @@ HERZWEH:
  
  /* ci must be 0 */
  if( bitoff == 0 ) {
-    (__u8)strm[co]= bitten; 
+    strm[co]= (int8)bitten; 
     co++;
  }  
  goto BAUCHWEH;
 
 HIRNWEH:
 
- (__u8)strm[co]= bitten; 
+ strm[co]= (int8)bitten; 
  co++;
   
 
@@ -270,11 +304,11 @@ HIRNWEH:
 
    if(ZZvalue>0) 
    {
-     strm[co++]=(__s8)(ZZvalue>127)?127:ZZvalue;
+     strm[co++]=(int8)(ZZvalue>127)?127:ZZvalue;
    } 
    else 
    {
-     strm[co++]=(__s8)(ZZvalue<-128)?-128:ZZvalue;
+     strm[co++]=(int8)(ZZvalue<-128)?-128:ZZvalue;
    }
 
  }
@@ -300,7 +334,7 @@ fprintf(stdout, "\n\n");
 /* Stream to Block  (decoding)                        */
 /*                                                    */
 
-int RTjpeg_s2b(__s16 *data, __s8 *strm, __u8 bt8, __u32 *qtbl)
+int RTjpeg_s2b(int16 *data, int8 *strm, uint8 bt8, uint32 *qtbl)
 {
  int ci;
  register int co;
@@ -310,7 +344,7 @@ int RTjpeg_s2b(__s16 *data, __s8 *strm, __u8 bt8, __u32 *qtbl)
 
  /* first byte always read */
  i=RTjpeg_ZZ[0];
- data[i]=((__u8)strm[0])*qtbl[i];
+ data[i]=((uint8)strm[0])*qtbl[i];
 
  /* we start at the behind */ 
 
@@ -442,10 +476,10 @@ fprintf(stdout, "\n\n");
 
 #else
 
-int RTjpeg_b2s(__s16 *data, __s8 *strm, __u8 bt8)
+int RTjpeg_b2s(int16 *data, int8 *strm, uint8 bt8)
 {
  register int ci, co=1, tmp;
- register __s16 ZZvalue;
+ register int16 ZZvalue;
 
 #ifdef SHOWBLOCK
 
@@ -457,7 +491,7 @@ int RTjpeg_b2s(__s16 *data, __s8 *strm, __u8 bt8)
 
 #endif
 
- (__u8)strm[0]=(__u8)(data[RTjpeg_ZZ[0]]>254) ? 254:((data[RTjpeg_ZZ[0]]<0)?0:data[RTjpeg_ZZ[0]]);
+ (uint8)strm[0]=(uint8)(data[RTjpeg_ZZ[0]]>254) ? 254:((data[RTjpeg_ZZ[0]]<0)?0:data[RTjpeg_ZZ[0]]);
 
  for(ci=1; ci<=bt8; ci++) 
  {
@@ -465,11 +499,11 @@ int RTjpeg_b2s(__s16 *data, __s8 *strm, __u8 bt8)
 
    if(ZZvalue>0) 
 	{
-     strm[co++]=(__s8)(ZZvalue>127)?127:ZZvalue;
+     strm[co++]=(int8)(ZZvalue>127)?127:ZZvalue;
    } 
 	else 
 	{
-     strm[co++]=(__s8)(ZZvalue<-128)?-128:ZZvalue;
+     strm[co++]=(int8)(ZZvalue<-128)?-128:ZZvalue;
    }
  }
 
@@ -479,11 +513,11 @@ int RTjpeg_b2s(__s16 *data, __s8 *strm, __u8 bt8)
 
   if(ZZvalue>0)
   {
-   strm[co++]=(__s8)(ZZvalue>63)?63:ZZvalue;
+   strm[co++]=(int8)(ZZvalue>63)?63:ZZvalue;
   } 
   else if(ZZvalue<0)
   {
-   strm[co++]=(__s8)(ZZvalue<-64)?-64:ZZvalue;
+   strm[co++]=(int8)(ZZvalue<-64)?-64:ZZvalue;
   } 
   else /* compress zeros */
   {
@@ -494,20 +528,20 @@ int RTjpeg_b2s(__s16 *data, __s8 *strm, __u8 bt8)
    } 
 	while((ci<64)&&(data[RTjpeg_ZZ[ci]]==0));
 
-   strm[co++]=(__s8)(63+(ci-tmp));
+   strm[co++]=(int8)(63+(ci-tmp));
    ci--;
   }
  }
  return (int)co;
 }
 
-int RTjpeg_s2b(__s16 *data, __s8 *strm, __u8 bt8, __u32 *qtbl)
+int RTjpeg_s2b(int16 *data, int8 *strm, uint8 bt8, uint32 *qtbl)
 {
  int ci=1, co=1, tmp;
  register int i;
 
  i=RTjpeg_ZZ[0];
- data[i]=((__u8)strm[0])*qtbl[i];
+ data[i]=((uint8)strm[0])*qtbl[i];
 
  for(co=1; co<=bt8; co++)
  {
@@ -537,19 +571,19 @@ int RTjpeg_s2b(__s16 *data, __s8 *strm, __u8 bt8, __u32 *qtbl)
 void RTjpeg_quant_init(void)
 {
  int i;
- __s16 *qtbl;
+ int16 *qtbl;
  
- qtbl=(__s16 *)RTjpeg_lqt;
- for(i=0; i<64; i++)qtbl[i]=(__s16)RTjpeg_lqt[i];
+ qtbl=(int16 *)RTjpeg_lqt;
+ for(i=0; i<64; i++)qtbl[i]=(int16)RTjpeg_lqt[i];
 
- qtbl=(__s16 *)RTjpeg_cqt;
- for(i=0; i<64; i++)qtbl[i]=(__s16)RTjpeg_cqt[i];
+ qtbl=(int16 *)RTjpeg_cqt;
+ for(i=0; i<64; i++)qtbl[i]=(int16)RTjpeg_cqt[i];
 }
 
 static mmx_t RTjpeg_ones=(mmx_t)(long long)0x0001000100010001LL;
 static mmx_t RTjpeg_half=(mmx_t)(long long)0x7fff7fff7fff7fffLL;
 
-void RTjpeg_quant(__s16 *block, __s32 *qtbl)
+void RTjpeg_quant(int16 *block, int32 *qtbl)
 {
  int i;
  mmx_t *bl, *ql;
@@ -590,12 +624,12 @@ void RTjpeg_quant_init(void)
 {
 }
 
-void RTjpeg_quant(__s16 *block, __s32 *qtbl)
+void RTjpeg_quant(int16 *block, int32 *qtbl)
 {
  int i;
  
  for(i=0; i<64; i++)
-   block[i]=(__s16)((block[i]*qtbl[i]+32767)>>16);
+   block[i]=(int16)((block[i]*qtbl[i]+32767)>>16);
 }
 #endif
 
@@ -611,14 +645,14 @@ static mmx_t RTjpeg_zero =(mmx_t)(long long)0x0000000000000000LL;
 
 #else
 
-#define FIX_0_382683433  ((__s32)   98)		/* FIX(0.382683433) */
-#define FIX_0_541196100  ((__s32)  139)		/* FIX(0.541196100) */
-#define FIX_0_707106781  ((__s32)  181)		/* FIX(0.707106781) */
-#define FIX_1_306562965  ((__s32)  334)		/* FIX(1.306562965) */
+#define FIX_0_382683433  ((int32)   98)		/* FIX(0.382683433) */
+#define FIX_0_541196100  ((int32)  139)		/* FIX(0.541196100) */
+#define FIX_0_707106781  ((int32)  181)		/* FIX(0.707106781) */
+#define FIX_1_306562965  ((int32)  334)		/* FIX(1.306562965) */
 
-#define DESCALE10(x) (__s16)( ((x)+128) >> 8)
-#define DESCALE20(x)  (__s16)(((x)+32768) >> 16)
-#define D_MULTIPLY(var,const)  ((__s32) ((var) * (const)))
+#define DESCALE10(x) (int16)( ((x)+128) >> 8)
+#define DESCALE20(x)  (int16)(((x)+32768) >> 16)
+#define D_MULTIPLY(var,const)  ((int32) ((var) * (const)))
 #endif
 
 void RTjpeg_dct_init(void)
@@ -627,20 +661,20 @@ void RTjpeg_dct_init(void)
  
  for(i=0; i<64; i++)
  {
-  RTjpeg_lqt[i]=(((__u64)RTjpeg_lqt[i]<<32)/RTjpeg_aan_tab[i]);
-  RTjpeg_cqt[i]=(((__u64)RTjpeg_cqt[i]<<32)/RTjpeg_aan_tab[i]);
+  RTjpeg_lqt[i]=(((uint64)RTjpeg_lqt[i]<<32)/RTjpeg_aan_tab[i]);
+  RTjpeg_cqt[i]=(((uint64)RTjpeg_cqt[i]<<32)/RTjpeg_aan_tab[i]);
  }
 }
 
-void RTjpeg_dctY(__u8 *idata, __s16 *odata, int rskip)
+void RTjpeg_dctY(uint8 *idata, int16 *odata, int rskip)
 {
 #ifndef MMX
-  __s32 tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
-  __s32 tmp10, tmp11, tmp12, tmp13;
-  __s32 z1, z2, z3, z4, z5, z11, z13;
-  __u8 *idataptr;
-  __s16 *odataptr;
-  __s32 *wsptr;
+  int32 tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
+  int32 tmp10, tmp11, tmp12, tmp13;
+  int32 z1, z2, z3, z4, z5, z11, z13;
+  uint8 *idataptr;
+  int16 *odataptr;
+  int32 *wsptr;
   int ctr;
 
   idataptr = idata;
@@ -1537,17 +1571,17 @@ void RTjpeg_dctY(__u8 *idata, __s16 *odata, int rskip)
 #endif
 }
 
-#define FIX_1_082392200  ((__s32)  277)		/* FIX(1.082392200) */
-#define FIX_1_414213562  ((__s32)  362)		/* FIX(1.414213562) */
-#define FIX_1_847759065  ((__s32)  473)		/* FIX(1.847759065) */
-#define FIX_2_613125930  ((__s32)  669)		/* FIX(2.613125930) */
+#define FIX_1_082392200  ((int32)  277)		/* FIX(1.082392200) */
+#define FIX_1_414213562  ((int32)  362)		/* FIX(1.414213562) */
+#define FIX_1_847759065  ((int32)  473)		/* FIX(1.847759065) */
+#define FIX_2_613125930  ((int32)  669)		/* FIX(2.613125930) */
 
-#define DESCALE(x) (__s16)( ((x)+4) >> 3)
+#define DESCALE(x) (int16)( ((x)+4) >> 3)
 
 /* clip yuv to 16..235 (should be 16..240 for cr/cb but ... */
 
 #define RL(x) ((x)>235) ? 235 : (((x)<16) ? 16 : (x))
-#define MULTIPLY(var,const)  (((__s32) ((var) * (const)) + 128)>>8)
+#define MULTIPLY(var,const)  (((int32) ((var) * (const)) + 128)>>8)
 
 void RTjpeg_idct_init(void)
 {
@@ -1555,12 +1589,12 @@ void RTjpeg_idct_init(void)
  
  for(i=0; i<64; i++)
  {
-  RTjpeg_liqt[i]=((__u64)RTjpeg_liqt[i]*RTjpeg_aan_tab[i])>>32;
-  RTjpeg_ciqt[i]=((__u64)RTjpeg_ciqt[i]*RTjpeg_aan_tab[i])>>32;
+  RTjpeg_liqt[i]=((uint64)RTjpeg_liqt[i]*RTjpeg_aan_tab[i])>>32;
+  RTjpeg_ciqt[i]=((uint64)RTjpeg_ciqt[i]*RTjpeg_aan_tab[i])>>32;
  }
 }
 
-void RTjpeg_idct(__u8 *odata, __s16 *data, int rskip)
+void RTjpeg_idct(uint8 *odata, int16 *data, int rskip)
 {
 #ifdef MMX
 
@@ -2554,15 +2588,15 @@ static mmx_t fix_108n184	= (mmx_t)(long long)0xcf04cf04cf04cf04LL;
 	movq_r2m(mm3, *(dataptr));
 
 #else
-  __s32 tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
-  __s32 tmp10, tmp11, tmp12, tmp13;
-  __s32 z5, z10, z11, z12, z13;
-  __s16 *inptr;
-  __s32 *wsptr;
-  __u8 *outptr;
+  int32 tmp0, tmp1, tmp2, tmp3, tmp4, tmp5, tmp6, tmp7;
+  int32 tmp10, tmp11, tmp12, tmp13;
+  int32 z5, z10, z11, z12, z13;
+  int16 *inptr;
+  int32 *wsptr;
+  uint8 *outptr;
   int ctr;
-  __s32 dcval;
-  __s32 workspace[64];
+  int32 dcval;
+  int32 workspace[64];
 
   inptr = data;
   wsptr = workspace;
@@ -2622,14 +2656,14 @@ static mmx_t fix_108n184	= (mmx_t)(long long)0xcf04cf04cf04cf04LL;
     tmp5 = tmp11 - tmp6;
     tmp4 = tmp10 + tmp5;
 
-    wsptr[0] = (__s32) (tmp0 + tmp7);
-    wsptr[56] = (__s32) (tmp0 - tmp7);
-    wsptr[8] = (__s32) (tmp1 + tmp6);
-    wsptr[48] = (__s32) (tmp1 - tmp6);
-    wsptr[16] = (__s32) (tmp2 + tmp5);
-    wsptr[40] = (__s32) (tmp2 - tmp5);
-    wsptr[32] = (__s32) (tmp3 + tmp4);
-    wsptr[24] = (__s32) (tmp3 - tmp4);
+    wsptr[0] = (int32) (tmp0 + tmp7);
+    wsptr[56] = (int32) (tmp0 - tmp7);
+    wsptr[8] = (int32) (tmp1 + tmp6);
+    wsptr[48] = (int32) (tmp1 - tmp6);
+    wsptr[16] = (int32) (tmp2 + tmp5);
+    wsptr[40] = (int32) (tmp2 - tmp5);
+    wsptr[32] = (int32) (tmp3 + tmp4);
+    wsptr[24] = (int32) (tmp3 - tmp4);
 
     inptr++;
     wsptr++;
@@ -2706,15 +2740,15 @@ void RTjpeg_init_data(void)
  dptr=dptr>>5;
  dptr=dptr<<5; /* cache align data */
  
- RTjpeg_block=(__s16 *)dptr;
- dptr+=sizeof(__s16)*64;
- RTjpeg_lqt=(__s32 *)dptr;
- dptr+=sizeof(__s32)*64;
- RTjpeg_cqt=(__s32 *)dptr;
- dptr+=sizeof(__s32)*64;
- RTjpeg_liqt=(__u32 *)dptr;
- dptr+=sizeof(__u32)*64;
- RTjpeg_ciqt=(__u32 *)dptr;
+ RTjpeg_block=(int16 *)dptr;
+ dptr+=sizeof(int16)*64;
+ RTjpeg_lqt=(int32 *)dptr;
+ dptr+=sizeof(int32)*64;
+ RTjpeg_cqt=(int32 *)dptr;
+ dptr+=sizeof(int32)*64;
+ RTjpeg_liqt=(uint32 *)dptr;
+ dptr+=sizeof(uint32)*64;
+ RTjpeg_ciqt=(uint32 *)dptr;
 }
 
 /*
@@ -2728,18 +2762,18 @@ Input: buf -> pointer to 128 ints for quant values store to pass back to
        Q -> quality factor (192=best, 32=worst)
 */
 
-void RTjpeg_init_Q(__u8 Q)
+void RTjpeg_init_Q(uint8 Q)
 {
  int i;
- __u64 qual;
+ uint64 qual;
  
- qual=(__u64)Q<<(32-7); /* 32 bit FP, 255=2, 0=0 */
+ qual=(uint64)Q<<(32-7); /* 32 bit FP, 255=2, 0=0 */
 
  for(i=0; i<64; i++)
  {
-  RTjpeg_lqt[i]=(__s32)((qual/((__u64)RTjpeg_lum_quant_tbl[i]<<16))>>3);
+  RTjpeg_lqt[i]=(int32)((qual/((uint64)RTjpeg_lum_quant_tbl[i]<<16))>>3);
   if(RTjpeg_lqt[i]==0)RTjpeg_lqt[i]=1;
-  RTjpeg_cqt[i]=(__s32)((qual/((__u64)RTjpeg_chrom_quant_tbl[i]<<16))>>3);
+  RTjpeg_cqt[i]=(int32)((qual/((uint64)RTjpeg_chrom_quant_tbl[i]<<16))>>3);
   if(RTjpeg_cqt[i]==0)RTjpeg_cqt[i]=1;
   RTjpeg_liqt[i]=(1<<16)/(RTjpeg_lqt[i]<<3);
   RTjpeg_ciqt[i]=(1<<16)/(RTjpeg_cqt[i]<<3);
@@ -2773,10 +2807,10 @@ Input: buf -> pointer to 128 ints for quant values store to pass back to
        
 */
 
-void RTjpeg_init_compress(__u32 *buf, int width, int height, int Q)
+void RTjpeg_init_compress(long unsigned int *buf, int width, int height, int Q)
 {
  int i;
- __u64 qual;
+ uint64 qual;
  
  RTjpeg_init_data();
  
@@ -2787,13 +2821,13 @@ void RTjpeg_init_compress(__u32 *buf, int width, int height, int Q)
  RTjpeg_Cwidth = RTjpeg_width>>4;
  RTjpeg_Csize= (width>>1) * height;
 
- qual=(__u64)Q<<(32-7); /* 32 bit FP, 255=2, 0=0 */
+ qual=(uint64)Q<<(32-7); /* 32 bit FP, 255=2, 0=0 */
 
  for(i=0; i<64; i++)
  {
-  RTjpeg_lqt[i]=(__s32)((qual/((__u64)RTjpeg_lum_quant_tbl[i]<<16))>>3);
+  RTjpeg_lqt[i]=(int32)((qual/((uint64)RTjpeg_lum_quant_tbl[i]<<16))>>3);
   if(RTjpeg_lqt[i]==0)RTjpeg_lqt[i]=1;
-  RTjpeg_cqt[i]=(__s32)((qual/((__u64)RTjpeg_chrom_quant_tbl[i]<<16))>>3);
+  RTjpeg_cqt[i]=(int32)((qual/((uint64)RTjpeg_chrom_quant_tbl[i]<<16))>>3);
   if(RTjpeg_cqt[i]==0)RTjpeg_cqt[i]=1;
   RTjpeg_liqt[i]=(1<<16)/(RTjpeg_lqt[i]<<3);
   RTjpeg_ciqt[i]=(1<<16)/(RTjpeg_cqt[i]<<3);
@@ -2817,7 +2851,7 @@ void RTjpeg_init_compress(__u32 *buf, int width, int height, int Q)
   buf[64+i]=RTjpeg_ciqt[i];
 }
 
-void RTjpeg_init_decompress(__u32 *buf, int width, int height)
+void RTjpeg_init_decompress(uint32 *buf, int width, int height)
 {
  int i;
 
@@ -2848,12 +2882,12 @@ void RTjpeg_init_decompress(__u32 *buf, int width, int height)
 // RTjpeg_color_init();
 }
 
-int RTjpeg_compressYUV420(__s8 *sp, unsigned char *bp)
+int RTjpeg_compressYUV420(int8 *sp, unsigned char *bp)
 {
- __s8 * sb;
- register __s8 * bp1 = (__s8*) (bp + (RTjpeg_width<<3));
- register __s8 * bp2 = (__s8*) (bp + RTjpeg_Ysize);
- register __s8 * bp3 = (__s8*) (bp2 + (RTjpeg_Csize>>1));
+ int8 * sb;
+ register int8 * bp1 = (int8*) (bp + (RTjpeg_width<<3));
+ register int8 * bp2 = (int8*) (bp + RTjpeg_Ysize);
+ register int8 * bp3 = (int8*) (bp2 + (RTjpeg_Csize>>1));
  register int i, j, k;
 
 #ifdef MMX
@@ -2865,27 +2899,27 @@ int RTjpeg_compressYUV420(__s8 *sp, unsigned char *bp)
  {
   for(j=0, k=0; j<RTjpeg_width; j+=16, k+=8)
   {
-   RTjpeg_dctY((__u8*)bp+j, RTjpeg_block, RTjpeg_Ywidth);
+   RTjpeg_dctY((uint8*)bp+j, RTjpeg_block, RTjpeg_Ywidth);
    RTjpeg_quant(RTjpeg_block, RTjpeg_lqt);
    sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_lb8);
 
-   RTjpeg_dctY((__u8*)bp+j+8, RTjpeg_block, RTjpeg_Ywidth);
+   RTjpeg_dctY((uint8*)bp+j+8, RTjpeg_block, RTjpeg_Ywidth);
    RTjpeg_quant(RTjpeg_block, RTjpeg_lqt);
    sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_lb8);
 
-   RTjpeg_dctY((__u8*)bp1+j, RTjpeg_block, RTjpeg_Ywidth);
+   RTjpeg_dctY((uint8*)bp1+j, RTjpeg_block, RTjpeg_Ywidth);
    RTjpeg_quant(RTjpeg_block, RTjpeg_lqt);
    sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_lb8);
 
-   RTjpeg_dctY((__u8*)bp1+j+8, RTjpeg_block, RTjpeg_Ywidth);
+   RTjpeg_dctY((uint8*)bp1+j+8, RTjpeg_block, RTjpeg_Ywidth);
    RTjpeg_quant(RTjpeg_block, RTjpeg_lqt);
    sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_lb8);
 
-   RTjpeg_dctY((__u8*)bp2+k, RTjpeg_block, RTjpeg_Cwidth);
+   RTjpeg_dctY((uint8*)bp2+k, RTjpeg_block, RTjpeg_Cwidth);
    RTjpeg_quant(RTjpeg_block, RTjpeg_cqt);
    sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_cb8);
 
-   RTjpeg_dctY((__u8*)bp3+k, RTjpeg_block, RTjpeg_Cwidth);
+   RTjpeg_dctY((uint8*)bp3+k, RTjpeg_block, RTjpeg_Cwidth);
    RTjpeg_quant(RTjpeg_block, RTjpeg_cqt);
    sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_cb8);
 
@@ -2902,11 +2936,11 @@ int RTjpeg_compressYUV420(__s8 *sp, unsigned char *bp)
  return (sp-sb);
 }
 
-int RTjpeg_compressYUV422(__s8 *sp, unsigned char *bp)
+int RTjpeg_compressYUV422(int8 *sp, unsigned char *bp)
 {
- __s8 * sb;
- register __s8 * bp2 = (__s8*) bp + RTjpeg_Ysize;
- register __s8 * bp3 = bp2 + RTjpeg_Csize;
+ int8 * sb;
+ register int8 * bp2 = (int8*) bp + RTjpeg_Ysize;
+ register int8 * bp3 = bp2 + RTjpeg_Csize;
  register int i, j, k;
 
 #ifdef MMX
@@ -2918,19 +2952,19 @@ int RTjpeg_compressYUV422(__s8 *sp, unsigned char *bp)
  {
   for(j=0, k=0; j<RTjpeg_width; j+=16, k+=8)
   {
-   RTjpeg_dctY((__u8*)bp+j, RTjpeg_block, RTjpeg_Ywidth);
+   RTjpeg_dctY((uint8*)bp+j, RTjpeg_block, RTjpeg_Ywidth);
    RTjpeg_quant(RTjpeg_block, RTjpeg_lqt);
    sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_lb8);
 
-   RTjpeg_dctY((__u8*)bp+j+8, RTjpeg_block, RTjpeg_Ywidth);
+   RTjpeg_dctY((uint8*)bp+j+8, RTjpeg_block, RTjpeg_Ywidth);
    RTjpeg_quant(RTjpeg_block, RTjpeg_lqt);
    sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_lb8);
 
-   RTjpeg_dctY((__u8*)bp2+k, RTjpeg_block, RTjpeg_Cwidth);
+   RTjpeg_dctY((uint8*)bp2+k, RTjpeg_block, RTjpeg_Cwidth);
    RTjpeg_quant(RTjpeg_block, RTjpeg_cqt);
    sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_cb8);
 
-   RTjpeg_dctY((__u8*)bp3+k, RTjpeg_block, RTjpeg_Cwidth);
+   RTjpeg_dctY((uint8*)bp3+k, RTjpeg_block, RTjpeg_Cwidth);
    RTjpeg_quant(RTjpeg_block, RTjpeg_cqt);
    sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_cb8);
 
@@ -2946,9 +2980,9 @@ int RTjpeg_compressYUV422(__s8 *sp, unsigned char *bp)
  return (sp-sb);
 }
 
-int RTjpeg_compress8(__s8 *sp, unsigned char *bp)
+int RTjpeg_compress8(int8 *sp, unsigned char *bp)
 {
- __s8 * sb;
+ int8 * sb;
  int i, j;
 
 #ifdef MMX
@@ -2961,7 +2995,7 @@ int RTjpeg_compress8(__s8 *sp, unsigned char *bp)
  {
   for(j=0; j<RTjpeg_width; j+=8)
   {
-   RTjpeg_dctY((__u8*)bp+j, RTjpeg_block, RTjpeg_width);
+   RTjpeg_dctY((uint8*)bp+j, RTjpeg_block, RTjpeg_width);
    RTjpeg_quant(RTjpeg_block, RTjpeg_lqt);
    sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_lb8);
   }
@@ -2974,10 +3008,10 @@ int RTjpeg_compress8(__s8 *sp, unsigned char *bp)
  return (sp-sb);
 }
 
-void RTjpeg_decompressYUV422(__s8 *sp, __u8 *bp)
+void RTjpeg_decompressYUV422(int8 *sp, uint8 *bp)
 {
- register __s8 * bp2 = (__s8*) bp + RTjpeg_Ysize;
- register __s8 * bp3 = bp2 + (RTjpeg_Csize);
+ register int8 * bp2 = (int8*) bp + RTjpeg_Ysize;
+ register int8 * bp3 = bp2 + (RTjpeg_Csize);
  int i, j,k;
 
 #ifdef MMX
@@ -2992,25 +3026,25 @@ void RTjpeg_decompressYUV422(__s8 *sp, __u8 *bp)
    else
    { 
     sp+=RTjpeg_s2b(RTjpeg_block, sp, RTjpeg_lb8, RTjpeg_liqt);
-    RTjpeg_idct((__u8*)bp+j, RTjpeg_block, RTjpeg_width);
+    RTjpeg_idct((uint8*)bp+j, RTjpeg_block, RTjpeg_width);
    }
    if(*sp==-1)sp++;
    else
    { 
     sp+=RTjpeg_s2b(RTjpeg_block, sp, RTjpeg_lb8, RTjpeg_liqt);
-    RTjpeg_idct((__u8*)bp+j+8, RTjpeg_block, RTjpeg_width);
+    RTjpeg_idct((uint8*)bp+j+8, RTjpeg_block, RTjpeg_width);
    }
    if(*sp==-1)sp++;
    else
    { 
     sp+=RTjpeg_s2b(RTjpeg_block, sp, RTjpeg_cb8, RTjpeg_ciqt);
-    RTjpeg_idct((__u8*)bp2+k, RTjpeg_block, RTjpeg_width>>1);
+    RTjpeg_idct((uint8*)bp2+k, RTjpeg_block, RTjpeg_width>>1);
    } 
    if(*sp==-1)sp++;
    else
    { 
     sp+=RTjpeg_s2b(RTjpeg_block, sp, RTjpeg_cb8, RTjpeg_ciqt);
-    RTjpeg_idct((__u8*)bp3+k, RTjpeg_block, RTjpeg_width>>1);
+    RTjpeg_idct((uint8*)bp3+k, RTjpeg_block, RTjpeg_width>>1);
    } 
   }
   bp+=RTjpeg_width<<3;
@@ -3022,11 +3056,11 @@ void RTjpeg_decompressYUV422(__s8 *sp, __u8 *bp)
 #endif
 }
 
-void RTjpeg_decompressYUV420(__s8 *sp, __u8 *bp)
+void RTjpeg_decompressYUV420(int8 *sp, uint8 *bp)
 {
- register __s8 * bp1 = (__s8*)bp + (RTjpeg_width<<3);
- register __s8 * bp2 = (__s8*)bp + RTjpeg_Ysize;
- register __s8 * bp3 = bp2 + (RTjpeg_Csize>>1);
+ register int8 * bp1 = (int8*)bp + (RTjpeg_width<<3);
+ register int8 * bp2 = (int8*)bp + RTjpeg_Ysize;
+ register int8 * bp3 = bp2 + (RTjpeg_Csize>>1);
  int i, j,k;
 
 #ifdef MMX
@@ -3041,37 +3075,37 @@ void RTjpeg_decompressYUV420(__s8 *sp, __u8 *bp)
    else
    { 
     sp+=RTjpeg_s2b(RTjpeg_block, sp, RTjpeg_lb8, RTjpeg_liqt);
-    RTjpeg_idct((__u8*)bp+j, RTjpeg_block, RTjpeg_width);
+    RTjpeg_idct((uint8*)bp+j, RTjpeg_block, RTjpeg_width);
    }
    if(*sp==-1)sp++;
    else
    { 
     sp+=RTjpeg_s2b(RTjpeg_block, sp, RTjpeg_lb8, RTjpeg_liqt);
-    RTjpeg_idct((__u8*)bp+j+8, RTjpeg_block, RTjpeg_width);
+    RTjpeg_idct((uint8*)bp+j+8, RTjpeg_block, RTjpeg_width);
    }
    if(*sp==-1)sp++;
    else
    { 
     sp+=RTjpeg_s2b(RTjpeg_block, sp, RTjpeg_lb8, RTjpeg_liqt);
-    RTjpeg_idct((__u8*)bp1+j, RTjpeg_block, RTjpeg_width);
+    RTjpeg_idct((uint8*)bp1+j, RTjpeg_block, RTjpeg_width);
    }
    if(*sp==-1)sp++;
    else
    { 
     sp+=RTjpeg_s2b(RTjpeg_block, sp, RTjpeg_lb8, RTjpeg_liqt);
-    RTjpeg_idct((__u8*)bp1+j+8, RTjpeg_block, RTjpeg_width);
+    RTjpeg_idct((uint8*)bp1+j+8, RTjpeg_block, RTjpeg_width);
    }
    if(*sp==-1)sp++;
    else
    { 
     sp+=RTjpeg_s2b(RTjpeg_block, sp, RTjpeg_cb8, RTjpeg_ciqt);
-    RTjpeg_idct((__u8*)bp2+k, RTjpeg_block, RTjpeg_width>>1);
+    RTjpeg_idct((uint8*)bp2+k, RTjpeg_block, RTjpeg_width>>1);
    } 
    if(*sp==-1)sp++;
    else
    { 
     sp+=RTjpeg_s2b(RTjpeg_block, sp, RTjpeg_cb8, RTjpeg_ciqt);
-    RTjpeg_idct((__u8*)bp3+k, RTjpeg_block, RTjpeg_width>>1);
+    RTjpeg_idct((uint8*)bp3+k, RTjpeg_block, RTjpeg_width>>1);
    } 
   }
   bp+=RTjpeg_width<<4;
@@ -3084,7 +3118,7 @@ void RTjpeg_decompressYUV420(__s8 *sp, __u8 *bp)
 #endif
 }
 
-void RTjpeg_decompress8(__s8 *sp, __u8 *bp)
+void RTjpeg_decompress8(int8 *sp, uint8 *bp)
 {
  int i, j;
 
@@ -3119,23 +3153,24 @@ void RTjpeg_init_mcompress(void)
 
  if(!RTjpeg_old)
  {
-  RTjpeg_old=(__s16*)malloc((4*RTjpeg_width*RTjpeg_height)+32);
+  RTjpeg_old=(int16*)malloc((4*RTjpeg_width*RTjpeg_height)+32);
   tmp=(unsigned long)RTjpeg_old;
   tmp+=32;
   tmp=tmp>>5;
-  RTjpeg_old=(__s16 *)(tmp<<5);
+  RTjpeg_old=(int16 *)(tmp<<5);
  }
  if (!RTjpeg_old)
  {
   fprintf(stderr, "RTjpeg: Could not allocate memory\n");
   exit(-1);
  }
- bzero(RTjpeg_old, ((4*RTjpeg_width*RTjpeg_height)));
+ //bzero(RTjpeg_old, ((4*RTjpeg_width*RTjpeg_height)));
+ memset (RTjpeg_old, 0, ((4*RTjpeg_width*RTjpeg_height)));
 }
 
 #ifdef MMX
 
-int RTjpeg_bcomp(__s16 *old, mmx_t *mask)
+int RTjpeg_bcomp(int16 *old, mmx_t *mask)
 {
  int i;
  mmx_t *mold=(mmx_t *)old;
@@ -3173,7 +3208,7 @@ int RTjpeg_bcomp(__s16 *old, mmx_t *mask)
  if(result.q)
  {
 //  if(!RTjpeg_mtest)
-//   for(i=0; i<16; i++)((__u64 *)old)[i]=((__u64 *)RTjpeg_block)[i];
+//   for(i=0; i<16; i++)((uint64 *)old)[i]=((uint64 *)RTjpeg_block)[i];
   return 0;
  }
 // printf(".");
@@ -3181,7 +3216,7 @@ int RTjpeg_bcomp(__s16 *old, mmx_t *mask)
 }
 
 #else
-int RTjpeg_bcomp(__s16 *old, __u16 *mask)
+int RTjpeg_bcomp(int16 *old, uint16 *mask)
 {
  int i;
 
@@ -3189,7 +3224,7 @@ int RTjpeg_bcomp(__s16 *old, __u16 *mask)
   if(abs(old[i]-RTjpeg_block[i])>*mask)
   {
    if(!RTjpeg_mtest)
-    for(i=0; i<16; i++)((__u64 *)old)[i]=((__u64 *)RTjpeg_block)[i];
+    for(i=0; i<16; i++)((uint64 *)old)[i]=((uint64 *)RTjpeg_block)[i];
    return 0;
   }
  return 1;
@@ -3201,19 +3236,19 @@ void RTjpeg_set_test(int i)
  RTjpeg_mtest=i;
 }
 
-int RTjpeg_mcompressYUV420(__s8 *sp, unsigned char *bp, __u16 lmask, __u16 cmask)
+int RTjpeg_mcompressYUV420(int8 *sp, unsigned char *bp, uint16 lmask, uint16 cmask)
 {
- __s8 * sb;
-//rh __s16 *block;
- register __s8 * bp1 = (__s8*) bp + (RTjpeg_width<<3);
- register __s8 * bp2 = (__s8*) bp + RTjpeg_Ysize;
- register __s8 * bp3 = bp2 + (RTjpeg_Csize>>1);
+ int8 * sb;
+//rh int16 *block;
+ register int8 * bp1 = (int8*) bp + (RTjpeg_width<<3);
+ register int8 * bp2 = (int8*) bp + RTjpeg_Ysize;
+ register int8 * bp3 = bp2 + (RTjpeg_Csize>>1);
  register int i, j, k;
 
 #ifdef MMX
  emms();
- RTjpeg_lmask=(mmx_t)(((__u64)lmask<<48)|((__u64)lmask<<32)|((__u64)lmask<<16)|lmask);
- RTjpeg_cmask=(mmx_t)(((__u64)cmask<<48)|((__u64)cmask<<32)|((__u64)cmask<<16)|cmask);
+ RTjpeg_lmask=(mmx_t)(((uint64)lmask<<48)|((uint64)lmask<<32)|((uint64)lmask<<16)|lmask);
+ RTjpeg_cmask=(mmx_t)(((uint64)cmask<<48)|((uint64)cmask<<32)|((uint64)cmask<<16)|cmask);
 #else
  RTjpeg_lmask=lmask;
  RTjpeg_cmask=cmask;
@@ -3226,56 +3261,56 @@ int RTjpeg_mcompressYUV420(__s8 *sp, unsigned char *bp, __u16 lmask, __u16 cmask
  {
   for(j=0, k=0; j<RTjpeg_width; j+=16, k+=8)
   {
-   RTjpeg_dctY((__u8*)bp+j, RTjpeg_block, RTjpeg_Ywidth);
+   RTjpeg_dctY((uint8*)bp+j, RTjpeg_block, RTjpeg_Ywidth);
    RTjpeg_quant(RTjpeg_block, RTjpeg_lqt);
    if(RTjpeg_bcomp(block, &RTjpeg_lmask))
    {
-    *((__u8 *)sp++)=255;
+    *((uint8 *)sp++)=255;
    } 
 	else sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_lb8);
    block+=64;
 
-   RTjpeg_dctY((__u8*)bp+j+8, RTjpeg_block, RTjpeg_Ywidth);
+   RTjpeg_dctY((uint8*)bp+j+8, RTjpeg_block, RTjpeg_Ywidth);
    RTjpeg_quant(RTjpeg_block, RTjpeg_lqt);
    if(RTjpeg_bcomp(block, &RTjpeg_lmask))
    {
-    *((__u8 *)sp++)=255;
+    *((uint8 *)sp++)=255;
    } 
 	else sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_lb8);
    block+=64;
 
-   RTjpeg_dctY((__u8*)bp1+j, RTjpeg_block, RTjpeg_Ywidth);
+   RTjpeg_dctY((uint8*)bp1+j, RTjpeg_block, RTjpeg_Ywidth);
    RTjpeg_quant(RTjpeg_block, RTjpeg_lqt);
    if(RTjpeg_bcomp(block, &RTjpeg_lmask))
    {
-    *((__u8 *)sp++)=255;
+    *((uint8 *)sp++)=255;
    } 
 	else sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_lb8);
    block+=64;
 
-   RTjpeg_dctY((__u8*)bp1+j+8, RTjpeg_block, RTjpeg_Ywidth);
+   RTjpeg_dctY((uint8*)bp1+j+8, RTjpeg_block, RTjpeg_Ywidth);
    RTjpeg_quant(RTjpeg_block, RTjpeg_lqt);
    if(RTjpeg_bcomp(block, &RTjpeg_lmask))
    {
-    *((__u8 *)sp++)=255;
+    *((uint8 *)sp++)=255;
    } 
 	else sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_lb8);
    block+=64;
 
-   RTjpeg_dctY((__u8*)(__u8*)bp2+k, RTjpeg_block, RTjpeg_Cwidth);
+   RTjpeg_dctY((uint8*)(uint8*)bp2+k, RTjpeg_block, RTjpeg_Cwidth);
    RTjpeg_quant(RTjpeg_block, RTjpeg_cqt);
    if(RTjpeg_bcomp(block, &RTjpeg_cmask))
    {
-    *((__u8 *)sp++)=255;
+    *((uint8 *)sp++)=255;
    } 
 	else sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_cb8);
    block+=64;
 
-   RTjpeg_dctY((__u8*)(__u8*)bp3+k, RTjpeg_block, RTjpeg_Cwidth);
+   RTjpeg_dctY((uint8*)(uint8*)bp3+k, RTjpeg_block, RTjpeg_Cwidth);
    RTjpeg_quant(RTjpeg_block, RTjpeg_cqt);
    if(RTjpeg_bcomp(block, &RTjpeg_cmask))
    {
-    *((__u8 *)sp++)=255;
+    *((uint8 *)sp++)=255;
    } 
 	else sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_cb8);
    block+=64;
@@ -3293,25 +3328,25 @@ int RTjpeg_mcompressYUV420(__s8 *sp, unsigned char *bp, __u16 lmask, __u16 cmask
 }
 
 
-int RTjpeg_mcompressYUV422(__s8 *sp, unsigned char *bp, __u16 lmask, __u16 cmask)
+int RTjpeg_mcompressYUV422(int8 *sp, unsigned char *bp, uint16 lmask, uint16 cmask)
 {
- __s8 * sb;
- __s16 *block;
- register __s8 * bp2;
- register __s8 * bp3;
+ int8 * sb;
+ int16 *block;
+ register int8 * bp2;
+ register int8 * bp3;
  register int i, j, k;
 
 #ifdef MMX
  emms();
- RTjpeg_lmask=(mmx_t)(((__u64)lmask<<48)|((__u64)lmask<<32)|((__u64)lmask<<16)|lmask);
- RTjpeg_cmask=(mmx_t)(((__u64)cmask<<48)|((__u64)cmask<<32)|((__u64)cmask<<16)|cmask);
+ RTjpeg_lmask=(mmx_t)(((uint64)lmask<<48)|((uint64)lmask<<32)|((uint64)lmask<<16)|lmask);
+ RTjpeg_cmask=(mmx_t)(((uint64)cmask<<48)|((uint64)cmask<<32)|((uint64)cmask<<16)|cmask);
 #else
  RTjpeg_lmask=lmask;
  RTjpeg_cmask=cmask;
 #endif
  
  bp = bp - RTjpeg_width*0;
- bp2 = (__s8*) bp + RTjpeg_Ysize-RTjpeg_width*0;
+ bp2 = (int8*) bp + RTjpeg_Ysize-RTjpeg_width*0;
  bp3 = bp2 + RTjpeg_Csize;
 
  sb=sp;
@@ -3321,38 +3356,38 @@ int RTjpeg_mcompressYUV422(__s8 *sp, unsigned char *bp, __u16 lmask, __u16 cmask
  {
   for(j=0, k=0; j<RTjpeg_width; j+=16, k+=8)
   {
-   RTjpeg_dctY((__u8*)bp+j, RTjpeg_block, RTjpeg_Ywidth);
+   RTjpeg_dctY((uint8*)bp+j, RTjpeg_block, RTjpeg_Ywidth);
    RTjpeg_quant(RTjpeg_block, RTjpeg_lqt);
    if(RTjpeg_bcomp(block, &RTjpeg_lmask))
    {
-    *((__u8 *)sp++)=255;
+    *((uint8 *)sp++)=255;
    } 
 	else sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_lb8);
    block+=64;
 
-   RTjpeg_dctY((__u8*)bp+j+8, RTjpeg_block, RTjpeg_Ywidth);
+   RTjpeg_dctY((uint8*)bp+j+8, RTjpeg_block, RTjpeg_Ywidth);
    RTjpeg_quant(RTjpeg_block, RTjpeg_lqt);
    if(RTjpeg_bcomp(block, &RTjpeg_lmask))
    {
-    *((__u8 *)sp++)=255;
+    *((uint8 *)sp++)=255;
    } 
 	else sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_lb8);
    block+=64;
 
-   RTjpeg_dctY((__u8*)(__u8*)bp2+k, RTjpeg_block, RTjpeg_Cwidth);
+   RTjpeg_dctY((uint8*)(uint8*)bp2+k, RTjpeg_block, RTjpeg_Cwidth);
    RTjpeg_quant(RTjpeg_block, RTjpeg_cqt);
    if(RTjpeg_bcomp(block, &RTjpeg_cmask))
    {
-    *((__u8 *)sp++)=255;
+    *((uint8 *)sp++)=255;
    } 
 	else sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_cb8);
    block+=64;
 
-   RTjpeg_dctY((__u8*)(__u8*) bp3+k, RTjpeg_block, RTjpeg_Cwidth);
+   RTjpeg_dctY((uint8*)(uint8*) bp3+k, RTjpeg_block, RTjpeg_Cwidth);
    RTjpeg_quant(RTjpeg_block, RTjpeg_cqt);
    if(RTjpeg_bcomp(block, &RTjpeg_cmask))
    {
-    *((__u8 *)sp++)=255;
+    *((uint8 *)sp++)=255;
    } 
 	else sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_cb8);
    block+=64;
@@ -3369,15 +3404,15 @@ int RTjpeg_mcompressYUV422(__s8 *sp, unsigned char *bp, __u16 lmask, __u16 cmask
  return (sp-sb);
 }
 
-int RTjpeg_mcompress8(__s8 *sp, unsigned char *bp, __u16 lmask)
+int RTjpeg_mcompress8(int8 *sp, unsigned char *bp, uint16 lmask)
 {
- __s8 * sb;
- __s16 *block;
+ int8 * sb;
+ int16 *block;
  int i, j;
 
 #ifdef MMX
  emms();
- RTjpeg_lmask=(mmx_t)(((__u64)lmask<<48)|((__u64)lmask<<32)|((__u64)lmask<<16)|lmask);
+ RTjpeg_lmask=(mmx_t)(((uint64)lmask<<48)|((uint64)lmask<<32)|((uint64)lmask<<16)|lmask);
 #else
  RTjpeg_lmask=lmask;
 #endif
@@ -3390,11 +3425,11 @@ int RTjpeg_mcompress8(__s8 *sp, unsigned char *bp, __u16 lmask)
  {
   for(j=0; j<RTjpeg_width; j+=8)
   {
-   RTjpeg_dctY((__u8*)bp+j, RTjpeg_block, RTjpeg_width);
+   RTjpeg_dctY((uint8*)bp+j, RTjpeg_block, RTjpeg_width);
    RTjpeg_quant(RTjpeg_block, RTjpeg_lqt);
    if(RTjpeg_bcomp(block, &RTjpeg_lmask))
    {
-    *((__u8 *)sp++)=255;
+    *((uint8 *)sp++)=255;
 //    printf("* %d ", sp[-1]);
    } else sp+=RTjpeg_b2s(RTjpeg_block, sp, RTjpeg_lb8);
    block+=64;
@@ -3417,12 +3452,12 @@ void RTjpeg_color_init(void)
 #define KcbB 132252
 #define Ky 76284
 
-void RTjpeg_yuv422rgb(__u8 *buf, __u8 *rgb, int stride)
+void RTjpeg_yuv422rgb(uint8 *buf, uint8 *rgb, int stride)
 {
  int tmp;
  int i, j;
- __s32 y, crR, crG, cbG, cbB;
- __u8 *bufcr, *bufcb, *bufy, *bufoute;
+ int32 y, crR, crG, cbG, cbB;
+ uint8 *bufcr, *bufcb, *bufy, *bufoute;
  int yskip;
  
  yskip=RTjpeg_width;
@@ -3465,12 +3500,12 @@ void RTjpeg_yuv422rgb(__u8 *buf, __u8 *rgb, int stride)
 }
 
 
-void RTjpeg_yuv420rgb(__u8 *buf, __u8 *rgb, int stride)
+void RTjpeg_yuv420rgb(uint8 *buf, uint8 *rgb, int stride)
 {
  int tmp;
  int i, j;
- __s32 y, crR, crG, cbG, cbB;
- __u8 *bufcr, *bufcb, *bufy, *bufoute, *bufouto;
+ int32 y, crR, crG, cbG, cbB;
+ uint8 *bufcr, *bufcb, *bufy, *bufoute, *bufouto;
  int oskip, yskip;
  
  if(stride==0)
@@ -3539,12 +3574,12 @@ void RTjpeg_yuv420rgb(__u8 *buf, __u8 *rgb, int stride)
 }
 
 
-void RTjpeg_yuvrgb32(__u8 *buf, __u8 *rgb, int stride)
+void RTjpeg_yuvrgb32(uint8 *buf, uint8 *rgb, int stride)
 {
  int tmp;
  int i, j;
- __s32 y, crR, crG, cbG, cbB;
- __u8 *bufcr, *bufcb, *bufy, *bufoute, *bufouto;
+ int32 y, crR, crG, cbG, cbB;
+ uint8 *bufcr, *bufcb, *bufy, *bufoute, *bufouto;
  int oskip, yskip;
  
  if(stride==0)
@@ -3615,12 +3650,12 @@ void RTjpeg_yuvrgb32(__u8 *buf, __u8 *rgb, int stride)
  }
 }
 
-void RTjpeg_yuvrgb24(__u8 *buf, __u8 *rgb, int stride)
+void RTjpeg_yuvrgb24(uint8 *buf, uint8 *rgb, int stride)
 {
  int tmp;
  int i, j;
- __s32 y, crR, crG, cbG, cbB;
- __u8 *bufcr, *bufcb, *bufy, *bufoute, *bufouto;
+ int32 y, crR, crG, cbG, cbB;
+ uint8 *bufcr, *bufcb, *bufy, *bufoute, *bufouto;
  int oskip, yskip;
  
  if(stride==0)
@@ -3688,12 +3723,12 @@ void RTjpeg_yuvrgb24(__u8 *buf, __u8 *rgb, int stride)
  }
 }
 
-void RTjpeg_yuvrgb16(__u8 *buf, __u8 *rgb, int stride)
+void RTjpeg_yuvrgb16(uint8 *buf, uint8 *rgb, int stride)
 {
  int tmp;
  int i, j;
- __s32 y, crR, crG, cbG, cbB;
- __u8 *bufcr, *bufcb, *bufy, *bufoute, *bufouto;
+ int32 y, crR, crG, cbG, cbB;
+ uint8 *bufcr, *bufcb, *bufy, *bufoute, *bufouto;
  int oskip, yskip;
  unsigned char r, g, b;
  
@@ -3785,8 +3820,9 @@ void RTjpeg_yuvrgb16(__u8 *buf, __u8 *rgb, int stride)
 
 /* fix stride */
 
-void RTjpeg_yuvrgb8(__u8 *buf, __u8 *rgb, int stride)
+void RTjpeg_yuvrgb8(uint8 *buf, uint8 *rgb, int stride)
 {
- bcopy(buf, rgb, RTjpeg_width*RTjpeg_height);
+ //bcopy(buf, rgb, RTjpeg_width*RTjpeg_height);
+  memcpy (rgb, buf, RTjpeg_width*RTjpeg_height);
 }
 

@@ -23,11 +23,13 @@
  * 
  */
 
+#include "cssysdef.h"
+
 #include "nuppelwriter.h"
 #include "minilzo.h"
 #include "rtjpeg.h"
 #include "nuppelvideo.h"
-#include <string.h>
+//#include <string.h>
 
 /* Colorspace conversion routines from rgb2yuv420.cpp */
 void InitLookupTable();
@@ -152,7 +154,7 @@ void NuppelWriter::writeFrame(unsigned char *frameBuffer) {
 
   if (rtjpeg) {
     /* Compress the frame using RTJpeg (lossy) */
-    currentBufferSize = RTjpeg_mcompressYUV420((__s8*) compressBuffer, yuvBuffer, 1, 1);
+    currentBufferSize = RTjpeg_mcompressYUV420((int8*) compressBuffer, yuvBuffer, 1, 1);
     currentBuffer = compressBuffer;
     frameh.comptype = '1';
   }
