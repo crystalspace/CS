@@ -468,8 +468,11 @@ void CS_EXPORTED_NAME(Class,_scfFinalize)(bool close_module)		\
 {									\
   if (close_module)							\
   {									\
-    CS_STATIC_VARIABLE_CLEANUP						\
-    iSCF::SCF = 0;							\
+    /* @@@ FIXME: Module cleanup is requested more than once, thus */	\
+    /* destroying static variables multiple times.  Investigate */	\
+    /* solution. */							\
+    /* CS_STATIC_VARIABLE_CLEANUP */					\
+    /* iSCF::SCF = 0; */						\
   }									\
 }
 
