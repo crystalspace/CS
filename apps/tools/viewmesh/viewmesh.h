@@ -44,6 +44,7 @@ private:
   iSector* room;
   iView* view;
   iMeshWrapper *sprite;
+  csVector3 spritepos;
 
   csMenu *menu;
   csWindow *dialog;

@@ -63,6 +63,7 @@
 CS_IMPLEMENT_APPLICATION
 
 #define VIEWMESH_COMMAND_LOADMESH 77701
+#define VIEWMESH_COMMAND_LOADLIB  77702
 #define VIEWMESH_STATES_SELECT_START  77800
 #define VIEWMESH_COMMAND_CAMMODE1 77711
 #define VIEWMESH_COMMAND_CAMMODE2 77712
@@ -79,6 +80,7 @@ ViewMesh::ViewMesh (iObjectRegistry *object_reg, csSkin &Skin)
   loader = NULL;
   g3d = NULL;
   menu = NULL;
+  sprite = NULL;
   dialog = NULL;
   cammode = movenormal;
 }
@@ -89,6 +91,7 @@ ViewMesh::~ViewMesh ()
   if (engine) engine->DecRef ();
   if (loader) loader->DecRef();
   if (g3d) g3d->DecRef ();
+  if (sprite) sprite->DecRef();
   if (menu) delete menu;
   if (dialog) delete dialog;
 }
@@ -100,6 +103,17 @@ void ViewMesh::Help ()
   printf ("  -Scale=<ratio>     Scale the Object\n");
   printf ("  <meshfile>         Load the specified mesh object\n");
 }
+
+/* This is the data we keeep for modal processing */
+struct ModalData : public iBase
+{
+    uint code;
+    SCF_DECLARE_IBASE;
+    ModalData() { SCF_CONSTRUCT_IBASE(NULL); }
+};
+
+SCF_IMPLEMENT_IBASE (ModalData)
+SCF_IMPLEMENT_IBASE_END
 
 bool ViewMesh::HandleEvent (iEvent& ev)
 {
@@ -142,22 +156,45 @@ bool ViewMesh::HandleEvent (iEvent& ev)
       switch(ev.Command.Code)
       {
 	case VIEWMESH_COMMAND_LOADMESH:
-	{
+	  {
 	  menu->Hide();
       	  if (dialog)
 	    delete dialog;
-	  dialog= csFileDialog (this, "Select Mesh Object", "/this/", "Open", true);
-	  StartModal (dialog, NULL);
+	  dialog= csFileDialog (this, "Select Mesh Object", "/this/", "Open", 
+	      true);
+	  
+	  ModalData *data=new ModalData;
+	  data->code = VIEWMESH_COMMAND_LOADMESH;
+	  StartModal (dialog, data);
+
 	  return true;
-	}
+	  }
+	case VIEWMESH_COMMAND_LOADLIB:
+	  {
+	  menu->Hide();
+	  if (dialog)
+	    delete dialog;
+	  dialog = csFileDialog (this, "Select Texture Lib", "/this/", "Open",
+	      true);
+
+	  ModalData *data=new ModalData;
+	  data->code = VIEWMESH_COMMAND_LOADLIB;
+	  StartModal (dialog, data);
+
+	  return true;
+	  }
+	
 	case VIEWMESH_COMMAND_CAMMODE1:
 	  cammode = movenormal;
+	  menu->Hide();
 	  return true;
 	case VIEWMESH_COMMAND_CAMMODE2:
 	  cammode = moveorigin;
+	  menu->Hide();
 	  return true;
 	case VIEWMESH_COMMAND_CAMMODE3:
 	  cammode = rotateorigin;
+	  menu->Hide();
 	  return true;
 	case cscmdStopModal:
 	{
@@ -165,10 +202,29 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	  csQueryFileDialog (dialog, filename, sizeof(filename));
 	  delete dialog;
 	  dialog = NULL;
+	  ModalData *data = (ModalData *) GetTopModalUserdata();
 
-	  if (!LoadSprite(filename,1))
+	  switch (data->code)
 	  {
-	    Printf (CS_REPORTER_SEVERITY_ERROR, "couldn't load mesh");
+	    case VIEWMESH_COMMAND_LOADMESH:
+	      if (!LoadSprite(filename,1))
+	      {
+		Printf (CS_REPORTER_SEVERITY_ERROR, "couldn't load mesh %s",
+		    filename);
+	      }
+	      break;
+	    case VIEWMESH_COMMAND_LOADLIB:
+	      if (!loader->LoadLibraryFile(filename))
+	      {
+		Printf (CS_REPORTER_SEVERITY_ERROR, "couldn't load lib %s",
+		    filename);
+	      }
+	      else
+	      {
+		// register the textures
+		engine->Prepare();
+	      }
+	      break;
 	  }
 	  ConstructMenu();
 	  return true;
@@ -203,12 +259,19 @@ bool ViewMesh::LoadSprite(const char *filename,float scale)
   if (!imeshfactwrap)
     return false;
 
+  // eventually remove the old sprite
+  // FIXME: This badly fails if you load the same object again!
+  if (sprite)
+  {
+    sprite->GetMovable()->ClearSectors();
+    engine->GetMeshes()->Remove(sprite);
+    sprite->DecRef();
+  }
+
   sprite = engine->CreateMeshWrapper(
       imeshfactwrap, "MySprite", room,
       csVector3 (0, 10, 0));
   csMatrix3 m; m.Identity(); m *= scale;
-  sprite->GetMovable()->GetTransform();
-  sprite->GetMovable()->UpdateMove();
   iSprite3DState *spstate = SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
       iSprite3DState);
   if (spstate)
@@ -218,13 +281,13 @@ bool ViewMesh::LoadSprite(const char *filename,float scale)
   }
     
   // Update Sprite States menu
+  stateslist.DeleteAll();
+  stateslist.Push (csStrNew("default"));
   iMeshObjectFactory *imeshfact= imeshfactwrap->GetMeshObjectFactory();
   iSprite3DFactoryState *factstate= SCF_QUERY_INTERFACE(imeshfact,
       iSprite3DFactoryState);
   if (factstate)
   {
-    stateslist.DeleteAll();
-    stateslist.Push (csStrNew("default"));
     for (int i=0;i<factstate->GetActionCount();i++)
     {
       iSpriteAction *spaction = factstate->GetAction(i);
@@ -235,6 +298,11 @@ bool ViewMesh::LoadSprite(const char *filename,float scale)
   imeshfactwrap->DecRef();
   sprite->DeferUpdateLighting (CS_NLIGHT_DYNAMIC|CS_NLIGHT_STATIC, 10);
 
+  // try to get center of the sprite
+  csBox3 box;
+  sprite->GetWorldBoundingBox(box);
+  spritepos = box.GetCenter();
+
   return true;
 }
 
@@ -244,6 +312,7 @@ void ViewMesh::ConstructMenu()
     delete menu;
   menu = new csMenu(this, csmfs3D, 0);
   (void)new csMenuItem(menu,"Load Mesh", VIEWMESH_COMMAND_LOADMESH);
+  (void)new csMenuItem(menu,"Load TextureLib", VIEWMESH_COMMAND_LOADLIB);
 
   // StateMenu
   csMenu *statesmenu = new csMenu(NULL);
@@ -264,6 +333,8 @@ void ViewMesh::ConstructMenu()
   (void)new csMenuItem(menu,"~Quit", cscmdQuit);
   menu->Hide();
 }
+
+#define SPRITEPOS   spritepos
 
 void ViewMesh::Draw()
 {
@@ -310,13 +381,28 @@ void ViewMesh::Draw()
 	    c->GetTransform().SetOrigin (orig + VEC_UP * 4 * speed);
 	  if (GetKeyState (CSKEY_PGDN))
 	    c->GetTransform().SetOrigin (orig + VEC_DOWN * 4 * speed);
-	  c->GetTransform().LookAt (
-	      csVector3(0,10,0)-c->GetTransform().GetOrigin(), 
-	      csVector3(1,-1,1) );
+	  c->GetTransform().LookAt (SPRITEPOS-orig, csVector3(0,1,0) );
   	  break;
 	}
       case rotateorigin:
-	break;
+	{
+	  csVector3 orig = c->GetTransform().GetOrigin();
+	  if (GetKeyState (CSKEY_LEFT))
+	    orig = csYRotMatrix3(-speed) * (orig-SPRITEPOS) + SPRITEPOS;
+	  if (GetKeyState (CSKEY_RIGHT))
+	    orig = csYRotMatrix3(speed) * (orig-SPRITEPOS) + SPRITEPOS;
+	  if (GetKeyState (CSKEY_UP))
+	    orig = csXRotMatrix3(speed) * (orig-SPRITEPOS) + SPRITEPOS;
+	  if (GetKeyState (CSKEY_DOWN))
+	    orig = csXRotMatrix3(-speed) * (orig-SPRITEPOS) + SPRITEPOS;  
+	  c->GetTransform().SetOrigin(orig);
+	  if (GetKeyState (CSKEY_PGUP))
+	    c->Move(VEC_FORWARD * 4 * speed);
+	  if (GetKeyState (CSKEY_PGDN))
+	    c->Move(VEC_BACKWARD * 4 * speed);
+	  c->GetTransform().LookAt (SPRITEPOS-orig, csVector3(0,1,0) );	
+	  break;
+	}
       default:
 	break;
     }	
@@ -489,13 +575,16 @@ bool ViewMesh::Initialize ()
   // Load specified Libraries
   Printf (CS_REPORTER_SEVERITY_NOTIFY, "Loading libs...");
   const char *libname;
-  for (int i=0; (libname=cmdline->GetOption("Lib",i)); i++)
+  int i;
+  for (i=0; (libname=cmdline->GetOption("Lib",i)); i++)
   {
     if (!loader->LoadLibraryFile(libname))
     {
       Printf (CS_REPORTER_SEVERITY_ERROR, "Couldn load lib %s.", libname);
     }
   }
+  if (i>0)
+    engine->Prepare();
       
   // Load a texture for our sprite.
   if (texturefilename && texturename)
