@@ -31,7 +31,8 @@ SCF_IMPLEMENT_IBASE(csSoundSourceSoftware)
 SCF_IMPLEMENT_IBASE_END;
 
 csSoundSourceSoftware::csSoundSourceSoftware(csSoundRenderSoftware *srdr,
-    csSoundHandleSoftware *hdl, int m3d) {
+    csSoundHandleSoftware *hdl, int m3d)
+{
   SCF_CONSTRUCT_IBASE(hdl);
 
   SoundRender = srdr;
@@ -47,7 +48,6 @@ csSoundSourceSoftware::csSoundSourceSoftware(csSoundRenderSoftware *srdr,
 
 csSoundSourceSoftware::~csSoundSourceSoftware()
 {
-  Stop();
 }
 
 void csSoundSourceSoftware::Play(unsigned long pMethod)
@@ -58,14 +58,17 @@ void csSoundSourceSoftware::Play(unsigned long pMethod)
   if (PlayMethod & SOUND_RESTART) Restart();
 }
 
-void csSoundSourceSoftware::Stop() {
-  if (Active) {
+void csSoundSourceSoftware::Stop()
+{
+  if (Active)
+  {
     Active=false;
     SoundRender->RemoveSource(this);
   }
 }
 
-void csSoundSourceSoftware::Restart() {
+void csSoundSourceSoftware::Restart()
+{
   if (!SoundHandle->Data) return;
   if (SoundHandle->Data->IsStatic())
     SoundPos = 0;
@@ -73,51 +76,63 @@ void csSoundSourceSoftware::Restart() {
     SoundHandle->Data->ResetStreamed();
 }
 
-bool csSoundSourceSoftware::IsActive() {
+bool csSoundSourceSoftware::IsActive()
+{
   return Active;
 }
 
-void csSoundSourceSoftware::SetVolume(float vol) {
+void csSoundSourceSoftware::SetVolume(float vol)
+{
   Volume = vol;
 }
 
-float csSoundSourceSoftware::GetVolume() {
+float csSoundSourceSoftware::GetVolume()
+{
   return Volume;
 }
 
-void csSoundSourceSoftware::SetFrequencyFactor(float factor) {
+void csSoundSourceSoftware::SetFrequencyFactor(float factor)
+{
   FrequencyFactor = factor;
 }
 
-float csSoundSourceSoftware::GetFrequencyFactor() {
+float csSoundSourceSoftware::GetFrequencyFactor()
+{
   return FrequencyFactor;
 }
 
-int csSoundSourceSoftware::GetMode3D() {
+int csSoundSourceSoftware::GetMode3D()
+{
   return Mode3d;
 }
 
-void csSoundSourceSoftware::SetMode3D(int m3d) {
+void csSoundSourceSoftware::SetMode3D(int m3d)
+{
   Mode3d = m3d;
 }
 
-void csSoundSourceSoftware::SetPosition(csVector3 pos) {
+void csSoundSourceSoftware::SetPosition(csVector3 pos)
+{
   Position=pos;
 }
 
-csVector3 csSoundSourceSoftware::GetPosition() {
+csVector3 csSoundSourceSoftware::GetPosition()
+{
   return Position;
 }
 
-void csSoundSourceSoftware::SetVelocity(csVector3 v) {
+void csSoundSourceSoftware::SetVelocity(csVector3 v)
+{
   Velocity=v;
 }
 
-csVector3 csSoundSourceSoftware::GetVelocity() {
+csVector3 csSoundSourceSoftware::GetVelocity()
+{
   return Velocity;
 }
 
-void csSoundSourceSoftware::Prepare(float BaseVolume) {
+void csSoundSourceSoftware::Prepare(float BaseVolume)
+{
   // frequency
   CalcFreqFactor=FrequencyFactor;
 
@@ -133,17 +148,21 @@ void csSoundSourceSoftware::Prepare(float BaseVolume) {
   // position of the listener's ears
   csVector3 EarL,EarR;
 
-  if (Mode3d == SOUND3D_RELATIVE) {
+  if (Mode3d == SOUND3D_RELATIVE)
+  {
     // position of the sound is relative to the listener, so we simply
     // place the listener at (0,0,0) with front (0,0,1) and top (0,1,0)
     EarL = csVector3(-Listener->GetHeadSize()/2, 0, 0);
     EarR = csVector3(+Listener->GetHeadSize()/2, 0, 0);
-  } else {
+  }
+  else
+  {
     // calculate the 'left' vector
     csVector3 Front,Top,Left;
     Listener->GetDirection(Front,Top);
     Left=Top%Front;
-    if (Left.Norm()<EPSILON) {
+    if (Left.Norm()<EPSILON)
+    {
       // user has supplied bad front and top vectors
       CalcVolL = CalcVolR = 0;
       return;
@@ -252,8 +271,8 @@ void csSoundSourceSoftware::Prepare(float BaseVolume) {
 }
 
 void csSoundSourceSoftware::WriteBuffer(const void *Source, void *Dest,
-        long NumSamples) {
-
+        long NumSamples)
+{
   csSoundFormat outfmt;
   outfmt.Freq = SoundRender->getFrequency();
   outfmt.Bits = SoundRender->is16Bits() ? 16 : 8;
@@ -262,13 +281,16 @@ void csSoundSourceSoftware::WriteBuffer(const void *Source, void *Dest,
   const csSoundFormat *InputFormat = SoundHandle->Data->GetFormat();
   const csSoundFormat *OutputFormat = &outfmt;
 
-  if (OutputFormat->Bits == 16) {
+  if (OutputFormat->Bits == 16)
+  {
     #define stype short
     #define NullSample 0
     ADDTOBUFFER_BITS
     #undef stype
     #undef NullSample
-  } else {
+  }
+  else
+  {
     #define stype unsigned char
     #define NullSample 128
     ADDTOBUFFER_BITS
@@ -336,3 +358,4 @@ void csSoundSourceSoftware::AddToBufferStatic(void *mem, long size)
     }
   }
 }
+

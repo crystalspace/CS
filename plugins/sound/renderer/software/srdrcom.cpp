@@ -214,7 +214,8 @@ void csSoundRenderSoftware::Close()
   }
 }
 
-iSoundHandle *csSoundRenderSoftware::RegisterSound(iSoundData *snd) {
+iSoundHandle *csSoundRenderSoftware::RegisterSound(iSoundData *snd)
+{
   // convert the sound
   if (!snd->Initialize(&LoadFormat)) return NULL;
 
@@ -224,7 +225,8 @@ iSoundHandle *csSoundRenderSoftware::RegisterSound(iSoundData *snd) {
   return hdl;
 }
 
-void csSoundRenderSoftware::UnregisterSound(iSoundHandle *snd) {
+void csSoundRenderSoftware::UnregisterSound(iSoundHandle *snd)
+{
   int n = SoundHandles.Find(snd);
   if (n != -1) {
     csSoundHandleSoftware *hdl = (csSoundHandleSoftware *)snd;
@@ -264,14 +266,17 @@ float csSoundRenderSoftware::GetVolume()
   return Volume;
 }
 
-void csSoundRenderSoftware::AddSource(csSoundSourceSoftware *src) {
+void csSoundRenderSoftware::AddSource(csSoundSourceSoftware *src)
+{
   Sources.Push(src);
   src->IncRef();
 }
 
-void csSoundRenderSoftware::RemoveSource(csSoundSourceSoftware *src) {
+void csSoundRenderSoftware::RemoveSource(csSoundSourceSoftware *src)
+{
   int n=Sources.Find(src);
-  if (n!=-1) {
+  if (n!=-1)
+  {
     Sources.Delete(n);
     src->DecRef();
   }

@@ -29,16 +29,19 @@ csSoundHandleSoftware::csSoundHandleSoftware(csSoundRenderSoftware *srdr, iSound
   Registered = true;
 }
 
-csSoundHandleSoftware::~csSoundHandleSoftware() {
+csSoundHandleSoftware::~csSoundHandleSoftware()
+{
   SoundRender->DecRef();
 }
 
-void csSoundHandleSoftware::Unregister() {
+void csSoundHandleSoftware::Unregister()
+{
   Registered = false;
   ReleaseSoundData();
 }
 
-iSoundSource *csSoundHandleSoftware::CreateSource(int Mode3d) {
+iSoundSource *csSoundHandleSoftware::CreateSource(int Mode3d)
+{
   if (!Registered) return NULL;
   return new csSoundSourceSoftware(SoundRender, this, Mode3d);
 }
@@ -53,3 +56,4 @@ void csSoundHandleSoftware::vUpdate(void *buf, long Num)
       src->WriteBuffer(buf, SoundRender->memory, Num);
   }
 }
+
