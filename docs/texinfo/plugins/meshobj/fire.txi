@@ -63,7 +63,7 @@ This plugin has no factory state interface.
 
 @subsubheading Factory Loader
 
-The fountain mesh factory loader has no parameters.
+The fire mesh factory loader has no parameters.
 
 @subsubheading Object State Interface
 
