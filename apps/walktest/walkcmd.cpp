@@ -1213,7 +1213,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       char level[100];
       ScanStr (arg, "%s", level);
-      void OpenPortal (iLoaderNew*, csView* view, char* lev);
+      void OpenPortal (iLoader*, csView* view, char* lev);
       OpenPortal (Sys->LevelLoader, Sys->view, level);
     }
     else

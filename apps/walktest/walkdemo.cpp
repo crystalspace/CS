@@ -1387,7 +1387,7 @@ csMeshWrapper* CreatePortalThing (const char* name, csSector* room,
   return thing;
 }
 
-void OpenPortal (iLoaderNew *LevelLoader, csView* view, char* lev)
+void OpenPortal (iLoader *LevelLoader, csView* view, char* lev)
 {
   csSector* room = view->GetCamera ()->GetSector ();
   csVector3 pos = view->GetCamera ()->Camera2World (csVector3 (0, 0, 1));

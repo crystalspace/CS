@@ -30,7 +30,7 @@ class csEngine;
 class csDynLight;
 struct iCollideSystem;
 struct iFont;
-struct iLoaderNew;
+struct iLoader;
 
 enum TextAlignmentModes {ALIGN_LEFT,ALIGN_RIGHT,ALIGN_CENTER};
 
@@ -47,7 +47,7 @@ public:
   float angle;
   int motion_flags;
   iCollideSystem* cdsys;
-  iLoaderNew *LevelLoader;
+  iLoader *LevelLoader;
   void WriteShadow (int align, int x, int y, int fg, char *str,...);
   void Write (int align, int x, int y, int fg, int bg, char *str,...);
 public:

@@ -122,10 +122,10 @@ bool Simple::Initialize (int argc, const char* const argv[],
   engine = Engine->GetCsEngine ();
   Engine->DecRef ();
 
-  LevelLoader = QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoaderNew);
+  LevelLoader = QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
   if (!LevelLoader)
   {
-    CsPrintf (MSG_FATAL_ERROR, "No iLoaderNew plugin!\n");
+    CsPrintf (MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   }
 
@@ -164,7 +164,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   // Create our world.
   Printf (MSG_INITIALIZATION, "Creating world!...\n");
 
-  //csLoader::LoadTexture (engine, "stone", "/lib/std/stone4.gif");
+  //LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
   //csMaterialWrapper* tm = engine->GetMaterials ()->FindByName ("stone");
 
   sky = new csProcSky();

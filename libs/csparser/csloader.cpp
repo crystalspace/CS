@@ -2376,12 +2376,12 @@ bool csLoader::LoadMotion (iMotion* mot, char* buf)
 }
 
 
-/************ iLoaderNew implementation **************/
+/************ iLoader implementation **************/
 
 //--- Plugin stuff -----------------------------------------------------------
 
 IMPLEMENT_IBASE(csLoader);
-  IMPLEMENTS_INTERFACE(iLoaderNew);
+  IMPLEMENTS_INTERFACE(iLoader);
   IMPLEMENTS_INTERFACE(iPlugIn);
 IMPLEMENT_IBASE_END;
 

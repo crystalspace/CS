@@ -3041,10 +3041,10 @@ int main (int argc, char* argv[])
   Sys->font = Sys->G2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
 
   // Get the level loader
-  Sys->LevelLoader = QUERY_PLUGIN_ID(Sys, CS_FUNCID_LVLLOADER, iLoaderNew);
+  Sys->LevelLoader = QUERY_PLUGIN_ID(Sys, CS_FUNCID_LVLLOADER, iLoader);
   if (!Sys->LevelLoader)
   {
-    CsPrintf (MSG_FATAL_ERROR, "No iLoaderNew plugin!\n");
+    CsPrintf (MSG_FATAL_ERROR, "No iLoader plugin!\n");
     return -1;
   }
 

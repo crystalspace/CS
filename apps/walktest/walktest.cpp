@@ -1314,7 +1314,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   engine = Engine->GetCsEngine ();
 
   // Find the level loader plugin
-  LevelLoader = QUERY_PLUGIN_ID (Sys, CS_FUNCID_LVLLOADER, iLoaderNew);
+  LevelLoader = QUERY_PLUGIN_ID (Sys, CS_FUNCID_LVLLOADER, iLoader);
   if (!LevelLoader)
   {
     Printf (MSG_FATAL_ERROR, "No level loader plugin!\n");

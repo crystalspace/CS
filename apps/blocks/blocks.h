@@ -35,7 +35,7 @@ class csDynLight;
 struct iMaterialWrapper;
 struct iTextureManager;
 struct iFont;
-struct iLoaderNew;
+struct iLoader;
 struct iThingState;
 struct iMeshObjectType;
 
@@ -309,7 +309,7 @@ public:
 
   // The font we are typing with
   iFont *font;
-  iLoaderNew *LevelLoader;
+  iLoader *LevelLoader;
 
 public:
   Blocks ();

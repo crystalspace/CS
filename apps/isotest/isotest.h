@@ -30,7 +30,7 @@ struct iIsoView;
 struct iIsoWorld;
 struct iIsoSprite;
 struct iIsoLight;
-struct iLoaderNew;
+struct iLoader;
 struct iFont;
 
 class IsoTest : public SysSystemDriver

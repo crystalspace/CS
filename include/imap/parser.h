@@ -33,7 +33,7 @@ class csMeshFactoryWrapper;
 class csMeshWrapper;
 
 /**
- * Bit flags for the loader (used in csLoader::SetMode).
+ * Bit flags for the loader (used in iLoader::SetMode).
  * Some actions may be unwanted during loading, thus these flags.
  */
 /// Do not compress vertices
@@ -45,38 +45,10 @@ class csMeshWrapper;
 
 
 SCF_VERSION (iLoader, 0, 0, 1);
-
-/**
- * This is a common interface for geometry loaders.
- * It provides methods for loading entire maps as well as separate models.
- */
-struct iLoader : public iPlugIn
-{
-  /**
-   * Load the given file (from VFS) into engine.
-   * This does not clear anything that could be already loaded there; call
-   * ClearAll () if you need it.
-   */
-  virtual bool Load (const char *iName) = 0;
-
-  /**
-   * Parse a string and load the model/s.
-   * It is not adviced to make heavy use of this feature; some loaders (e.g.
-   * the standard one) can speed up loading by preparsing files and storing the
-   * pre-tokenized data somewhere near the original file; if you use this
-   * method you will always go through the tokenizer first.  The caller should
-   * be prepared for iData to be modified.  This is not always the case (for
-   * example the standard loader just temporarily modifies it and restores
-   * back) but in any case for performance reasons this memory could be used.
-   */
-  virtual bool Parse (char *iData) = 0;
-};
-
-SCF_VERSION (iLoaderNew, 0, 0, 1);
 /**
  * This interface will replace iLoader somewhere in the future.
  */
-struct iLoaderNew : public iPlugIn
+struct iLoader : public iPlugIn
 {
   /// Set loader mode (see CS_LOADER_XXX flags above)
   virtual void SetMode (int iFlags) = 0;

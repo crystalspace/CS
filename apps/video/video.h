@@ -39,7 +39,7 @@ private:
   csEngine* engine;
   iStreamFormat *pVideoFormat;
   iVideoStream *pVStream;
-  iLoaderNew *LevelLoader;
+  iLoader *LevelLoader;
 
   bool InitProcDemo ();
 

@@ -65,7 +65,7 @@ class csTerrainWrapper;
 /**
  * The loader for Crystal Space maps.
  */
-class csLoader : public iLoaderNew
+class csLoader : public iLoader
 {
   class csLoadedPluginVector : public csVector
   {
@@ -195,7 +195,7 @@ class csLoader : public iLoaderNew
   csMaterialWrapper* FindMaterial (const char *iName, bool onlyRegion = false);
 
 public:
-  /********** iLoaderNew implementation **********/
+  /********** iLoader implementation **********/
   DECLARE_IBASE;
   
   // virtual file system
