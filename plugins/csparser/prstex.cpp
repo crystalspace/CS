@@ -540,9 +540,6 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
       case XMLTOKEN_REFLECTION:
 	reflection = child->GetContentsValueAsFloat ();
         break;
-      case XMLTOKEN_LAYER:
-        // @@@ TODO: add shortcut to support NR!
-        break;
       case XMLTOKEN_SHADER:
         {
 	  shaders_mentioned = true;

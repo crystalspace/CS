@@ -182,14 +182,6 @@
         </material>
         <material name="robotMulti">
             <texture>oldmetal.gif</texture>
-            <layer>
-                <texture>spark</texture>
-                <scale u="20" v="20" />
-                <mixmode>
-                    <add />
-                    <tiling />
-                </mixmode>
-            </layer>
 	    <shader type="standard">std_lighting_detail_add</shader>
 	    <shadervar name="tex detail" type="texture">spark</shadervar>
 	    <shadervar name="detail texture scale" type="vector2">20,20</shadervar>
@@ -202,14 +194,6 @@
         </material>
         <material name="bricks">
             <texture>bricks.gif</texture>
-            <layer>
-                <texture>spark</texture>
-                <scale u="10" v="10" />
-                <mixmode>
-                    <alpha>0.75</alpha>
-                    <tiling />
-                </mixmode>
-            </layer>
 	    <shader type="standard">std_lighting_detail_alpha</shader>
 	    <shadervar name="tex detail" type="texture">spark</shadervar>
 	    <shadervar name="detail texture scale" type="vector2">10,10</shadervar>

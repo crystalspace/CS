@@ -10,6 +10,8 @@ chronological order.
 	- Jorrit reverted a fix from res2k in walktest/keys.cpp which changes
 	  the way keys are parsed. This fix breaks parsing of keys with
 	  modifiers.
+	- Jorrit removed the OR specific layer statements from csparser
+	  and from data/flarge/world.
 23-Jan-2005
 	- Eric Sunshine applied a boundary-condition fix from Andrew Mann for
 	  the timspec::tv_nsec overflow check in csPosixCondition::Wait().
