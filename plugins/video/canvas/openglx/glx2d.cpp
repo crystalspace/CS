@@ -51,7 +51,7 @@ SCF_IMPLEMENT_FACTORY (csGraphics2DGLX)
 
 // csGraphics2DGLX function
 csGraphics2DGLX::csGraphics2DGLX (iBase *iParent) :
-  csGraphics2DGLCommon (iParent), cmap (0)
+  csGraphics2DGLCommon (iParent), cmap (0), hardwareaccelerated(false)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiOpenGLInterface);
 }
@@ -76,6 +76,7 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
   const char *strDriver;
   dispdriver = 0;
   xvis = 0;
+  hardwareaccelerated = false;
 
   if (!csGraphics2DGLCommon::Initialize (object_reg))
     return false;
@@ -219,13 +220,19 @@ bool csGraphics2DGLX::CreateVisuals ()
     GLX_RED_SIZE, 4,
     GLX_BLUE_SIZE, 4,
     GLX_GREEN_SIZE, 4,
-    GLX_STENCIL_SIZE, 1,
     GLX_DOUBLEBUFFER,
+#ifdef CS_USE_NEW_RENDERER
+    GLX_ALPHA_SIZE, 8,
+    GLX_STENCIL_SIZE, 8,
+#else
+    GLX_STENCIL_SIZE, 1,
+#endif
     None
   };
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating Context\n");
   // find a visual that supports all the features we need
   xvis = glXChooseVisual (dpy, screen_num, desired_attributes);
+  hardwareaccelerated = true;
 
   // if a visual was found that we can use, make a graphics context which
   // will be bound to the application window.  If a visual was not
@@ -234,6 +241,7 @@ bool csGraphics2DGLX::CreateVisuals ()
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
       "Cannot use preferred GLX visual - Generic visual will be used.");
+    hardwareaccelerated = false;
 
     // what attribute was not supplied? we know that trying to get
     // all the attributes at once doesn't work.  provide more user info by
@@ -341,6 +349,12 @@ bool csGraphics2DGLX::CreateVisuals ()
 
 bool csGraphics2DGLX::PerformExtensionV (char const* command, va_list args)
 {
+  if (!strcasecmp (command, "hardware_accelerated"))
+  {
+    bool* hasaccel = (bool*)va_arg (args, bool*);
+    *hasaccel = hardwareaccelerated;
+    return true;
+  }
   if (!strcasecmp (command, "fullscreen"))
   {
     xwin->SetFullScreen (!xwin->GetFullScreen ());
