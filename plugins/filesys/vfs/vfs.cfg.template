@@ -27,6 +27,7 @@ VFS.Mount.fonts/unifont = $(CS_DATADIR)$/unifont.zip
 VFS.Mount.fonts/ttf   = $(CS_DATADIR)$/ttf$/, $(TTF_PATH:$.$/), $(CS_DATADIR)$/ttf-vera.zip
 
 VFS.Mount.lev/flarge   = $(CS_MAPDIR)$/flarge$/
+VFS.Mount.lev/pvstest  = $(CS_MAPDIR)$/pvstest$/
 VFS.Mount.lev/r3dtest  = $(CS_MAPDIR)$/r3dtest$/
 VFS.Mount.lev/parallaxtest = $(CS_MAPDIR)$/parallaxtest$/
 VFS.Mount.lev/stenciltest = $(CS_MAPDIR)$/stenciltest$/
