@@ -646,8 +646,8 @@ treating all incoming events identically.  It never hijacks ownership of the
 event by stealing the caller's reference.  Instead, @code{Post()} uniformly
 invokes @code{IncRef()} on each incoming event in order to claim its own
 reference.  This means that callers are no longer burdened by having to
-determine whether or not the event's reference is going to be hijacked.  Thus,
-the above code should be re-written as:
+determine whether or not the callers's reference is going to be hijacked.
+Thus, the above code should now be re-written as:
 
 @example
 csRef<iEvent> e;
@@ -657,7 +657,7 @@ eventq->Post(e);
 
 Events created with @code{iEventQueue::CreateEvent()} or
 @code{iEventOutlet::CreateEvent()} are unaffected by this change since the
-client has always been responsible for managing the event's reference count in
+client has never had to worry about @code{Post()} hijacking the reference in
 these cases.
 
 @subheading New Renderer-Related Changes
@@ -1186,6 +1186,16 @@ At initialization time, @sc{vfs} now searches for its configuration file,
 (@code{csGetConfigPath()}).  The first @file{vfs.cfg} file found during this
 search is the one used to initialize the facility.  In the past, @sc{vfs}
 searched for @file{vfs.cfg} only in the Crystal Space installation directory.
+
+The @sc{vfs} volume @file{/temp} has been renamed to @file{/varia} in the
+default @file{vfs.cfg} file in order to avoid confusion with the like-named
+@sc{vfs} volume @file{/tmp}, which represents user-writable temporary storage.
+The @file{/varia} volume (n@'ee @file{/temp}), on the other hand, resides
+within @file{$@{prefix@}/etc/crystal} (where @file{$@{prefix@}} is the
+installation location), and this location usually is not writable by the
+typical user.  External projects may, of course, still create any @sc{vfs}
+volume desired, including @file{/temp}, by supplying a project-specific
+@file{vfs.cfg}.
 
 @subheading Internationalization
 
