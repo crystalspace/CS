@@ -72,8 +72,8 @@ class csPtDotsLoader : public csBaseProctexLoader
 public:
   csPtDotsLoader(iBase *p);
 
-  csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
-  	iBase* context);
+  virtual csPtr<iBase> Parse (iDocumentNode* node,
+    iLoaderContext* ldr_context, iBase* context);
 };
 
 class csPtWaterLoader : public csBaseProctexLoader
@@ -81,8 +81,8 @@ class csPtWaterLoader : public csBaseProctexLoader
 public:
   csPtWaterLoader(iBase *p);
 
-  csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
-  	iBase* context);
+  virtual csPtr<iBase> Parse (iDocumentNode* node, 
+    iLoaderContext* ldr_context, iBase* context);
 };
 
 class csPtPlasmaLoader : public csBaseProctexLoader
@@ -90,8 +90,8 @@ class csPtPlasmaLoader : public csBaseProctexLoader
 public:
   csPtPlasmaLoader(iBase *p);
 
-  csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
-  	iBase* context);
+  virtual csPtr<iBase> Parse (iDocumentNode* node, 
+    iLoaderContext* ldr_context, iBase* context);
 };
 
 #endif

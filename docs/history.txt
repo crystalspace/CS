@@ -50,6 +50,7 @@ chronological order.
 	  assigned OR compatibility shader if a shader for some shader type
 	  is set. This was done to allow the removal of the implicitly set
 	  OR compatibility shader.
+	- res virtualized some methods in the standard proctex plugin.
 27-Mar-2004
 	- Anders Stenberg did the following NR changes:
 	    - Added the possibility to route Cg programs through

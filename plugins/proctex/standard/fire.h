@@ -46,8 +46,8 @@ class csPtFireLoader : public csBaseProctexLoader
 public:
   csPtFireLoader(iBase *p);
 
-  csPtr<iBase> Parse (iDocumentNode* node, iLoaderContext* ldr_context,
-  	iBase* context);
+  virtual csPtr<iBase> Parse (iDocumentNode* node, 
+    iLoaderContext* ldr_context, iBase* context);
 };
 
 #endif 
