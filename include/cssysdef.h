@@ -79,6 +79,22 @@
  * configuration files may override these.
  */
 
+/**\def CS_ALLOC_STACK_ARRAY(type, var, size)
+ * Dynamic stack memory allocation.
+ * \param type Type of the array elements.
+ * \param var Name of the array to be allocated.
+ * \param size Number of elements to be allocated.
+ */
+#ifdef COMP_GCC
+// In GCC we are able to declare stack vars of dynamic size directly
+#  define CS_ALLOC_STACK_ARRAY(type, var, size) \
+      type var [size]
+#else
+#  include <malloc.h>
+#  define CS_ALLOC_STACK_ARRAY(type, var, size) \
+      type *var = (type *)alloca ((size) * sizeof (type))
+#endif
+
 /**\def TEMP_DIR
  * Directory for temporary files
  */
@@ -168,22 +184,6 @@
 #  if !defined(COMP_VC) && !defined(COMP_BC)
 #    include <unistd.h>
 #  endif
-#endif
-
-/**\def CS_ALLOC_STACK_ARRAY(type, var, size)
- * Dynamic stack memory allocation.
- * \param type Type of the array elements.
- * \param var Name of the array to be allocated.
- * \param size Number of elements to be allocated.
- */
-#ifdef COMP_GCC
-// In GCC we are able to declare stack vars of dynamic size directly
-#  define CS_ALLOC_STACK_ARRAY(type, var, size) \
-      type var [size]
-#else
-#  include <malloc.h>
-#  define CS_ALLOC_STACK_ARRAY(type, var, size) \
-      type *var = (type *)alloca ((size) * sizeof (type))
 #endif
 
 #ifdef CS_SYSDEF_PROVIDE_ACCESS
