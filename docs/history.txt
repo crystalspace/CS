@@ -8,7 +8,9 @@ chronological order.
 
 3-Jan-2004
         - Philip Wyett continued a general cleanup of CS code formatting.
-	- Steven Geens fixed a very fatal typo.
+	- Steven Geens fixed a very fatal typo in sprcal3dstate.
+	- Steven Geens added a fast way to check the sockets of a cal3d sprite
+	  in viewmesh.
 2-Jan-2004
 	- Jorrit added an optimization to the portal container so that
 	  a more optimal transfrom from camera->2D is used in case no

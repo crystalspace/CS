@@ -48,6 +48,8 @@
 #include "imesh/object.h"
 #include "imesh/sprite3d.h"
 #include "imesh/spritecal3d.h"
+#include "imesh/fountain.h"
+#include "imesh/partsys.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/natwin.h"
@@ -86,6 +88,7 @@ CS_IMPLEMENT_APPLICATION
 #define VIEWMESH_COMMAND_FORWARDACTION  77717
 #define VIEWMESH_COMMAND_BLEND          78300
 #define VIEWMESH_COMMAND_CLEAR          78400
+#define VIEWMESH_COMMAND_SOCKET         78500
 
 //-----------------------------------------------------------------------------
 
@@ -413,6 +416,52 @@ bool ViewMesh::HandleEvent (iEvent& ev)
            cal3dstate->ClearMorphTarget(i,10.0f);
         }
       }
+      if (ev.Command.Code >= VIEWMESH_COMMAND_SOCKET &&
+	  ev.Command.Code < VIEWMESH_COMMAND_SOCKET + 100)
+      {
+	csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
+	      iSpriteCal3DState));
+	if (cal3dstate)
+	{
+	  int i = ev.Command.Code - VIEWMESH_COMMAND_SOCKET;
+	  iSpriteCal3DSocket* socket = cal3dstate->FindSocket(socketlist.Get(i));
+	  
+	  if(!socket->GetMeshWrapper())
+	  {
+	    //Hack code to add a particle fountain could be a lot prettier
+	    csRef<iPluginManager> plugin_mgr (
+		CS_QUERY_REGISTRY (object_reg, iPluginManager));
+	    csRef<iMeshObjectType> fountain_type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+		"crystalspace.mesh.object.fountain", iMeshObjectType);
+	    if (!fountain_type)
+	      fountain_type = CS_LOAD_PLUGIN (plugin_mgr,
+		  "crystalspace.mesh.object.fountain", iMeshObjectType);
+	    if (!fountain_type)
+	      printf ("No ball type plug-in found!\n");
+	    csRef<iMeshObjectFactory> fountain_factory = fountain_type->NewFactory ();
+
+	    csRef<iMeshObject> fountainMesh = fountain_factory->NewInstance ();
+	    csRef<iFountainState> fountainState =
+	      SCF_QUERY_INTERFACE (fountainMesh, iFountainState);
+	    fountainState->SetParticleCount (50);
+	    fountainState->SetDropSize (0.05,0.05);
+	    fountainState->SetSpeed(1);
+	    fountainState->SetOpening(0.2);
+	    csRef<iParticleState> partState =
+	      SCF_QUERY_INTERFACE (fountainMesh, iParticleState);
+	    iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
+	    partState->SetMaterialWrapper (mat);
+	    partState->SetColor(csColor(0.7,0.9,1));
+
+	    csRef<iMeshWrapper> meshwrap = engine->CreateMeshWrapper(
+		fountainMesh, "Fountain", room,
+		csVector3 (0, 10, 0));
+	    sprite->GetChildren()->Add( meshwrap );
+	    socket->SetMeshWrapper( meshwrap );
+	    sprite->DeferUpdateLighting(CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+	  }
+	}
+      }
       break;
   }
 
@@ -509,11 +558,15 @@ bool ViewMesh::LoadSprite(const char *filename, float scale)
 	      push.Append(factstate->GetMeshName(i));
 	      meshlist.Push(push);
 	  }
-          int j;
+	  int j;
           for (j=0;j<factstate->GetMorphAnimationCount();j++)
           {
             morphanimationlist.Push(csStrNew (factstate->GetMorphAnimationName(j)));
-          }
+	  }
+	  for(j=0;j< factstate->GetSocketCount();j++)
+	  {
+	    socketlist.Push(factstate->GetSocket(j)->GetName());
+	  }
       }
     }
   }
@@ -635,6 +688,15 @@ void ViewMesh::ConstructMenu()
                            VIEWMESH_COMMAND_CLEAR+i);
     }
     (void)new csMenuItem(menu, "Clear Morph Animation", clearmenu);
+    //sockets
+    csMenu *socketmenu = new csMenu(0);
+    for(i=0;i<socketlist.Length();i++)
+    {
+      (void)new csMenuItem(socketmenu, socketlist.Get(i),
+			   VIEWMESH_COMMAND_SOCKET+i);
+    }
+    (void)new csMenuItem(menu, "Use Socket", socketmenu);
+
   }
   else
   {
@@ -824,6 +886,11 @@ bool ViewMesh::Initialize ()
   Printf (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
   if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
+  {
+    Printf (CS_REPORTER_SEVERITY_ERROR, "Error loading 'stone4' texture!");
+    return false;
+  }
+  if (!loader->LoadTexture ("spark", "/lib/std/spark.png"))
   {
     Printf (CS_REPORTER_SEVERITY_ERROR, "Error loading 'stone4' texture!");
     return false;

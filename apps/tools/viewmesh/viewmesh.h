@@ -53,7 +53,7 @@ private:
 
   csMenu *menu,*activemenu;
   csWindow *dialog;
-  csStringArray stateslist,actionlist,activelist,meshlist,morphanimationlist;
+  csStringArray stateslist,actionlist,activelist,meshlist,morphanimationlist,socketlist;
   enum { movenormal, moveorigin, rotateorigin } cammode;
 
   void UpdateSpritePosition(csTicks elapsed);
