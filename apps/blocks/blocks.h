@@ -32,6 +32,7 @@ class csEngine;
 class csMeshWrapper;
 class csMeshFactoryWrapper;
 class csDynLight;
+class csView;
 struct iMaterialWrapper;
 struct iTextureManager;
 struct iFont;
@@ -304,6 +305,7 @@ private:
 public:
   iMeshObjectType* thing_type;
   csEngine* engine;
+  csView* view;
   iTextureManager* txtmgr;
   static int white, black, red;
 

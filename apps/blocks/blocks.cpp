@@ -78,8 +78,6 @@ static long LastConnectTime = 0;
 
 Blocks* Sys = NULL;
 
-csView* view = NULL;
-
 #define Gfx3D System->G3D
 #define Gfx2D System->G2D
 
@@ -283,6 +281,7 @@ char* TextEntryMenu::GetSelectedEntry ()
 Blocks::Blocks ()
 {
   engine = NULL;
+  view = NULL;
   LevelLoader = NULL;
 
   full_rotate_x = create_rotate_x (M_PI/2);
@@ -358,6 +357,7 @@ Blocks::~Blocks ()
 {
   delete dynlight;
   if (engine) engine->Clear ();
+  delete view;
   delete keyconf_menu;
 #if defined(BLOCKS_NETWORKING)
   TerminateConnection();
@@ -2994,9 +2994,9 @@ void Blocks::TerminateConnection()
 
 void cleanup ()
 {
-  Sys->console_out ("Cleaning up...\n");
-  delete view;
-  Sys->DecRef ();
+  if (Sys)
+    Sys->console_out ("Cleaning up...\n");
+  delete Sys;
   Sys = NULL;
 }
 
@@ -3063,7 +3063,7 @@ int main (int argc, char* argv[])
   // manually creating a camera and a clipper but it makes things a little
   // easier.
 
-  view = new csView (Sys->engine, Gfx3D);
+  Sys->view = new csView (Sys->engine, Gfx3D);
 
   // Create our world.
   Sys->Printf (MSG_INITIALIZATION, "Creating world!...\n");

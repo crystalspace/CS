@@ -17,6 +17,9 @@ The history order has been reversed so that new features are at the top.
 	  take corrective measures. The reason that operations are not always
 	  executed at the right time is that frame rate can be low and
 	  the sequence manager only gets executed once every frame.
+	- Eric Sunshine reverted Philip Wyett's changes to blocks.cpp.  Philip
+	  was trying to eliminate a hang at termination time on Win2000, but
+	  only ended up side-stepping the issue by leaking the csSystemDriver.
 18-Apr-2001
 	- Removed the test for stencil buffer since it seems that just doing
 	  that test is enough to break significant parts of OpenGL on some
