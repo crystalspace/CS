@@ -13,6 +13,10 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+25-Nov-1999
+	- Michael Ewert <mewert99@yahoo.com> supplied a new version of
+	  phyztest.cpp, the Phyziks test program.  This version is stable at
+	  4-7 FPS (and briefly at 3, but looks wrong).
 24-Nov-1999
 	- Eric Sunshine fixed a transpostion error in snddata.cpp which was
 	  leaking memory.
