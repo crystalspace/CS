@@ -94,3 +94,18 @@ REGISTER_STRING( subtract, "subtract" )
 REGISTER_STRING( interpolate, "interpolate" )
 REGISTER_STRING( dot_product, "dot product" )
 REGISTER_STRING( dot_product_to_alpha, "dot product to alpha" )
+
+/////////////////////////////////////////
+// NVVertex program support
+/////////////////////////////////////////
+REGISTER_STRING( nvvertex_program_gl, "nvvertex program gl")
+REGISTER_STRING( nvvertex_const_1, "nvvertex program constant 1")
+REGISTER_STRING( nvvertex_const_2, "nvvertex program constant 2")
+REGISTER_STRING( nvvertex_const_3, "nvvertex program constant 3")
+REGISTER_STRING( nvvertex_const_4, "nvvertex program constant 4")
+REGISTER_STRING( nvvertex_const_5, "nvvertex program constant 5")
+REGISTER_STRING( nvvertex_const_6, "nvvertex program constant 6")
+REGISTER_STRING( nvvertex_const_7, "nvvertex program constant 7")
+REGISTER_STRING( nvvertex_const_8, "nvvertex program constant 8")
+REGISTER_STRING( nvvertex_const_9, "nvvertex program constant 9")
+REGISTER_STRING( nvvertex_const_10, "nvvertex program constant 10")
