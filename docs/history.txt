@@ -21,6 +21,12 @@ The history order has been reversed so that new features are at the top.
 	  of yesterday where several plugins modules were applying 'delete'
 	  to iConfigFile rather than DecRef().  Also fixed one plugin which
 	  was leaking an iConfigFile reference.
+	- Eric Sunshine added documentation for 'make all' to the "pseudo
+	  targets" help section of the makefile.
+	- Eric Sunshine eliminated a compilation warning in vsh.cpp
+	- Eric Sunshine fixed compilation errors in these files following
+	  Andrew's big changes: blocks.cpp, inputcmd.cpp, map.cpp,
+	  metasys.cpp, perftest.cpp.
 2-Oct-2000
 	- Andrew Zabolotny did the following changes to CS:
 	    - Overhauled the csIniFile class. There is now a new
