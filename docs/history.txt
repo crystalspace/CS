@@ -1,6 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
 30-Oct-2000
+	- Two fixes to csws. Andrew: you forgot SYSDEF_ALLOCA and
+	  also default parameters cannot be repeated in the cpp file.
 	- Andrew Zabolotny did the following changes:
 	    - Fixed a bug in default window theme that caused
 	      background texture to not be drawn if the window is not

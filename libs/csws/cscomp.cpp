@@ -20,6 +20,7 @@
 #include <stddef.h>
 #include <ctype.h>
 
+#define SYSDEF_ALLOCA
 #define SYSDEF_CASE
 #include "cssysdef.h"
 #include "csengine/cspixmap.h"
@@ -1830,7 +1831,7 @@ void csComponent::Close ()
 }
 
 csComponent *csComponent::GetChildAt (int x, int y,
-  bool (*func) (csComponent *, void *) = NULL, void *data = NULL)
+  bool (*func) (csComponent *, void *), void *data)
 {
   // Check clip children first
   for (int i = clipchildren.Length () - 1; i >= 0; i--)
