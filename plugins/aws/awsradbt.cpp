@@ -13,7 +13,9 @@ const int awsRadButton:: alignLeft = 0x0;
 const int awsRadButton:: alignRight = 0x1;
 const int awsRadButton:: alignCenter = 0x2;
 
-const int awsRadButton:: signalClicked = 0x1;
+const int awsRadButton:: signalClicked   = 0x1;
+const int awsRadButton:: signalTurnedOff = 0x2;
+const int awsRadButton:: signalTurnedOn  = 0x3;
 
 awsRadButton::awsRadButton () :
   is_down(false),
@@ -127,6 +129,8 @@ void awsRadButton::ClearGroup ()
 
     if (cmp && cmp != this) cmp->HandleEvent (Event);
   }
+
+  Broadcast (signalTurnedOn);
 }
 
 bool awsRadButton::HandleEvent (iEvent &Event)
@@ -138,6 +142,7 @@ bool awsRadButton::HandleEvent (iEvent &Event)
     case csevGroupOff:
       if (is_on)
       {
+		Broadcast (signalTurnedOff);
 		Broadcast (signalClicked);
         is_on = false;
         Invalidate ();
@@ -347,6 +352,8 @@ awsRadButtonFactory::awsRadButtonFactory (
   RegisterConstant ("rbAlignLeft", awsRadButton::alignLeft);
   RegisterConstant ("rbAlignRight", awsRadButton::alignRight);
   RegisterConstant ("signalRadButtonClicked", awsRadButton::signalClicked);
+  RegisterConstant ("signalRadButtonTurnedOff", awsRadButton::signalTurnedOff);
+  RegisterConstant ("signalRadButtonTurnedOn", awsRadButton::signalTurnedOn);
 }
 
 awsRadButtonFactory::~awsRadButtonFactory ()
