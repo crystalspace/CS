@@ -159,6 +159,9 @@ install-arch:
 		$(CURDIR)/debian/tmp/etc/crystalspace
 	mv $(CURDIR)/debian/tmp/usr/lib/crystalspace/*.cfg \
 		$(CURDIR)/debian/tmp/etc/crystalspace
+	# Fed up of missing files, should not have to do this
+	cp $(CURDIR)/CS/data/config/*.cfg \
+		$(CURDIR)/debian/tmp/etc/crystalspace
 
 	dh_movefiles -a
 
