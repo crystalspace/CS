@@ -65,15 +65,22 @@ Typical code usage, assuming geometry data in 'tris.md2', and
 the skin in a texture named 'myskin':
 ========================================================
 // imports and converts the md2 file to neutral format
-converter filedata;
+converter* filedata = new converter;
 filedata.ivcon('tris.md2');
 
 //  converts from neutral format to Crystal Space format
 csCrossBuild_SpriteTemplateFactory builder;
 
 csSpriteTemplate *result = build.CrossBuild(filedata);
+delete filedata;
 result->SetTexture(Sys-view->GetWorld()->GetTextures, 'myskin');
 ========================================================
+
+Note that at this time you should not create a 'converter' object on
+the stack, since its size is so large that the application may crash
+on some platforms.  Instead create the object on the heap as illustrated
+in the example.  A future version of 'converter' may not have this
+limitation.
 
 The last line set the skin texture.  Note that skin textures are not
 read in by either the converter or the builder.  You are responsible
