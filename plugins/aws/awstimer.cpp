@@ -46,12 +46,9 @@ awsTimer::~awsTimer ()
 {
   if (!stopped)
   {
-    iEventQueue *eq= CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> eq (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (eq)
-    {
       eq->RemoveListener (&scfiEventHandler);
-      eq->DecRef ();
-    }
   }
 
   SCF_DEC_REF (vc);
@@ -103,12 +100,9 @@ void awsTimer::Stop ()
   if (!stopped)
   {
     stopped = true;
-    iEventQueue *eq= CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> eq(CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (eq)
-    {
       eq->RemoveListener (&scfiEventHandler);
-      eq->DecRef ();
-    }
   }
 }
 
@@ -116,11 +110,10 @@ bool awsTimer::Start ()
 {
   if (Setup () && stopped)
   {
-    iEventQueue *eq= CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> eq(CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (eq)
     {
       eq->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
-      eq->DecRef ();
       stopped = false;
       start = vc->GetCurrentTicks ();
     }

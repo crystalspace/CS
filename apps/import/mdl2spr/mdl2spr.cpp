@@ -37,7 +37,7 @@ static float positionMdlZ = 0.0;
 static bool actionNamingMdl = true;
 static bool resizeSkin = true;
 static int maxFrames = -1;
-iImageIO* mdl2spr_imageio = 0;
+csRef<iImageIO> mdl2spr_imageio;
 
 static void usage(FILE* s, int rc)
 {
@@ -207,8 +207,7 @@ int main(int argc,char *argv[])
   mdl->WriteSPR(argv[argc - 1], scaleMdl, delayMdl, positionMdlX,
     positionMdlY, positionMdlZ, actionNamingMdl, resizeSkin, maxFrames);
 
-  if (mdl2spr_imageio != 0)
-    mdl2spr_imageio->DecRef ();
+  mdl2spr_imageio = NULL;
   iSCF::SCF->Finish ();
 
   delete mdl;

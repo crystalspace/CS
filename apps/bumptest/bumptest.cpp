@@ -113,11 +113,10 @@ void BumpTest::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
   {
     rep->ReportV (severity, "crystalspace.application.bumptest", msg, arg);
-    rep->DecRef ();
   }
   else
   {
@@ -144,13 +143,13 @@ bool BumpTest::InitProcDemo ()
   matBump = prBump->Initialize (object_reg, engine, txtmgr, "bumps");
   prBump->PrepareAnim ();
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iMeshObjectType* thing_type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.thing", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  csRef<iMeshObjectType> thing_type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.thing", iMeshObjectType));
   if (!thing_type)
     thing_type = CS_LOAD_PLUGIN (plugin_mgr,
     	"crystalspace.mesh.object.thing", iMeshObjectType);
-  plugin_mgr->DecRef ();
   if (!thing_type)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No thing mesh plugin!");
@@ -158,7 +157,6 @@ bool BumpTest::InitProcDemo ()
   }
 
   csRef<iMeshObjectFactory> thing_fact (thing_type->NewFactory ());
-  thing_type->DecRef ();
   csRef<iMeshObject> thing_obj (SCF_QUERY_INTERFACE (thing_fact, iMeshObject));
 
   csRef<iMaterialWrapper> imatBump (
@@ -222,26 +220,24 @@ bool BumpTest::InitProcDemo ()
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 1.0);
   //  */
 
-  iMeshWrapper* thing_wrap = engine->CreateMeshWrapper ("Bumpy");
+  csRef<iMeshWrapper> thing_wrap (engine->CreateMeshWrapper ("Bumpy"));
 
   thing_wrap->SetMeshObject (thing_obj);
   thing_wrap->HardTransform (csTransform (csMatrix3 (), csVector3 (0, 5, 1)));
   thing_wrap->GetMovable ()->SetSector (room);
   thing_wrap->GetMovable ()->UpdateMove ();
 
-  iLightingInfo* linfo = SCF_QUERY_INTERFACE (thing_obj, iLightingInfo);
+  csRef<iLightingInfo> linfo (SCF_QUERY_INTERFACE (thing_obj, iLightingInfo));
   linfo->InitializeDefault ();
   room->ShineLights (thing_wrap);
   linfo->PrepareLighting ();
-  linfo->DecRef ();
-  thing_wrap->DecRef ();
 
 
 #if 0
   iMeshFactoryWrapper* sprfact = engine->CreateMeshFactory (
     "crystalspace.mesh.object.sprite.3d", "sprite3d");
-  iSprite3DFactoryState* sprfactstate = SCF_QUERY_INTERFACE(
-    sprfact->GetMeshObjectFactory(), iSprite3DFactoryState);
+  csRef<iSprite3DFactoryState> sprfactstate (SCF_QUERY_INTERFACE(
+    sprfact->GetMeshObjectFactory(), iSprite3DFactoryState));
   sprfactstate->SetMaterialWrapper(imatBump);
   iSpriteAction *a0 = sprfactstate->AddAction();
   a0->SetName("Action0");
@@ -258,18 +254,16 @@ bool BumpTest::InitProcDemo ()
   sprfactstate->GetTexel(0,3).Set(0,2);
   sprfactstate->AddTriangle(0,1,2);
   sprfactstate->AddTriangle(0,2,3);
-  sprfactstate->DecRef();
   iMeshWrapper* sprite = engine->CreateMeshWrapper(sprfact, "bumpspr",
     room, csVector3(0, 5, 1) );
   sprite->GetMovable ()->UpdateMove ();
-  iSprite3DState* spstate = SCF_QUERY_INTERFACE (sprite->GetMeshObject (),
-    iSprite3DState);
+  csRef<iSprite3DState> spstate (SCF_QUERY_INTERFACE (sprite->GetMeshObject (),
+    iSprite3DState));
 
   spstate->SetLighting(false);
   spstate->SetBaseColor(csColor(1.,1.,1.));
   spstate->SetMaterialWrapper(imatBump);
   spstate->SetMixMode(CS_FX_MULTIPLY2 | CS_FX_TILING);
-  spstate->DecRef ();
 #endif
 
   return true;
@@ -400,10 +394,10 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
-  iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
+  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
   iPolygon3D* p;
-  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
-  	iThingState);
+  csRef<iThingState> walls_state (
+  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->CreateVertex (csVector3 (-5, 0, 5));
@@ -451,9 +445,6 @@ bool BumpTest::Initialize (int argc, const char* const argv[],
   p->CreateVertex (csVector3 (-5, 0, -5));
   p->CreateVertex (csVector3 (5, 0, -5));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
-
-  walls_state->DecRef ();
-  walls->DecRef ();
 
 #if 0
   LevelLoader->LoadTexture ("flare_center", "/lib/std/snow.jpg");
@@ -557,12 +548,9 @@ bool BumpTest::BumpHandleEvent (iEvent &Event)
 {
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-    {
       q->GetEventOutlet()->Broadcast (cscmdQuit);
-      q->DecRef ();
-    }
     return true;
   }
 

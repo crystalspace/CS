@@ -144,7 +144,7 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* name)
   if (tex)
   {
     // Add a default material with the same name as the texture
-    iMaterial* material = Engine->CreateBaseMaterial (tex);
+    csRef<iMaterial> material (Engine->CreateBaseMaterial (tex));
     iMaterialWrapper *mat = Engine->GetMaterialList ()
       	->NewMaterial (material);
     // First we have to extract the optional region name from the name:
@@ -162,7 +162,6 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* name)
       mat->Register (tm);
       mat->GetMaterialHandle()->Prepare();
     }
-    material->DecRef ();
     return mat;
   }
 
@@ -501,14 +500,12 @@ bool csLoader::LoadMap (char* buf)
       	  break;
         case CS_TOKEN_MESHFACT:
           {
-            iMeshFactoryWrapper* t = Engine->CreateMeshFactory (name);
+            csRef<iMeshFactoryWrapper> t (Engine->CreateMeshFactory (name));
 	    if (!t || !LoadMeshObjectFactory (t, params))
 	    {
 	      // Error is already reported.
-	      if (t) t->DecRef ();
 	      return false;
 	    }
-	    if (t) t->DecRef ();
           }
 	  break;
         case CS_TOKEN_REGION:
@@ -762,16 +759,14 @@ bool csLoader::LoadLibrary (char* buf)
           break;
         case CS_TOKEN_MESHFACT:
           {
-            iMeshFactoryWrapper* t = Engine->CreateMeshFactory (name);
+            csRef<iMeshFactoryWrapper> t (Engine->CreateMeshFactory (name));
 	    if (t)
 	    {
 	      if (!LoadMeshObjectFactory (t, params))
 	      {
 		// Error is already reported.
-		t->DecRef ();
 		return false;
 	      }
-	      t->DecRef ();
 	    }
 	  }
 	  break;
@@ -1061,9 +1056,9 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
               "Please use PARAMS before specifying LOD!");
 	    return false;
 	  }
-	  iLODControl* lodctrl = SCF_QUERY_INTERFACE (
+	  csRef<iLODControl> lodctrl (SCF_QUERY_INTERFACE (
 	    	stemp->GetMeshObjectFactory (),
-		iLODControl);
+		iLODControl));
 	  if (!lodctrl)
 	  {
             ReportError (
@@ -1073,10 +1068,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	  }
 	  if (!LoadLodControl (lodctrl, params))
 	  {
-	    lodctrl->DecRef ();
 	    return false;
 	  }
-	  lodctrl->DecRef ();
 	}
         break;
       case CS_TOKEN_ADDON:
@@ -1107,8 +1100,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	  }
 	  else
 	  {
-	    iMeshObjectFactory* mof2 = SCF_QUERY_INTERFACE (mof,
-	    	iMeshObjectFactory);
+	    csRef<iMeshObjectFactory> mof2 (SCF_QUERY_INTERFACE (mof,
+	    	iMeshObjectFactory));
 	    if (!mof2)
 	    {
               ReportError (
@@ -1118,7 +1111,6 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	    }
 	    stemp->SetMeshObjectFactory (mof2);
 	    mof2->SetLogicalParent (stemp);
-	    mof2->DecRef ();
 	    mof->DecRef ();
 	  }
 	}
@@ -1162,8 +1154,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	  }
 	  else
 	  {
-	    iMeshObjectFactory* mof2 = SCF_QUERY_INTERFACE (mof,
-	    	iMeshObjectFactory);
+	    csRef<iMeshObjectFactory> mof2 (SCF_QUERY_INTERFACE (mof,
+	    	iMeshObjectFactory));
 	    if (!mof2)
 	    {
               ReportError (
@@ -1173,7 +1165,6 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	    }
 	    stemp->SetMeshObjectFactory (mof2);
 	    mof2->SetLogicalParent (stemp);
-	    mof2->DecRef ();
 	    mof->DecRef ();
 	  }
         }
@@ -1192,9 +1183,9 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
           mat = GetLoaderContext ()->FindMaterial (str);
           if (mat)
 	  {
-	    iSprite3DFactoryState* state = SCF_QUERY_INTERFACE (
+	    csRef<iSprite3DFactoryState> state (SCF_QUERY_INTERFACE (
 	    	stemp->GetMeshObjectFactory (),
-		iSprite3DFactoryState);
+		iSprite3DFactoryState));
 	    if (!state)
 	    {
               ReportError (
@@ -1203,7 +1194,6 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	      return false;
 	    }
             state->SetMaterialWrapper (mat);
-	    state->DecRef ();
 	  }
           else
           {
@@ -1229,8 +1219,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	    return false;
 	  }
 
-	  iModelData *Model = ModelConverter->Load (buf->GetUint8 (),
-	  	buf->GetSize ());
+	  csRef<iModelData> Model (ModelConverter->Load (buf->GetUint8 (),
+	  	buf->GetSize ()));
           if (!Model)
 	  {
             ReportError (
@@ -1243,7 +1233,6 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	  csModelDataTools::MergeObjects (Model, false);
 	  iMeshFactoryWrapper *stemp2 =
 	    CrossBuilder->BuildSpriteFactoryHierarchy (Model, Engine, mat);
-	  Model->DecRef ();
 
 	  stemp->SetMeshObjectFactory (stemp2->GetMeshObjectFactory ());
 	  int i;
@@ -1270,17 +1259,15 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 
       case CS_TOKEN_MESHFACT:
         {
-          iMeshFactoryWrapper* t = Engine->CreateMeshFactory (name);
+          csRef<iMeshFactoryWrapper> t (Engine->CreateMeshFactory (name));
 	  csReversibleTransform child_transf;
           if (!LoadMeshObjectFactory (t, params, &child_transf))
 	  {
 	    // Error is already reported.
-	    if (t) t->DecRef ();
 	    return false;
 	  }
 	  stemp->GetChildren ()->Add (t);
 	  t->SetTransform (child_transf);
-	  t->DecRef ();
         }
 	break;
 
@@ -1453,9 +1440,9 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
               "Mesh object is missing!");
 	    return NULL;
 	  }
-	  iLODControl* lodctrl = SCF_QUERY_INTERFACE (
+	  csRef<iLODControl> lodctrl (SCF_QUERY_INTERFACE (
 	    	mesh->GetMeshObject (),
-		iLODControl);
+		iLODControl));
 	  if (!lodctrl)
 	  {
             ReportError (
@@ -1465,10 +1452,8 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (char* buf)
 	  }
 	  if (!LoadLodControl (lodctrl, params))
 	  {
-	    lodctrl->DecRef ();
 	    return NULL;
 	  }
-	  lodctrl->DecRef ();
 	}
         break;
       case CS_TOKEN_PRIORITY:
@@ -1813,9 +1798,9 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	      "Only use LOD after PARAMS!");
 	    return false;
 	  }
-	  iLODControl* lodctrl = SCF_QUERY_INTERFACE (
+	  csRef<iLODControl> lodctrl (SCF_QUERY_INTERFACE (
 	    	mesh->GetMeshObject (),
-		iLODControl);
+		iLODControl));
 	  if (!lodctrl)
 	  {
             ReportError (
@@ -1825,10 +1810,8 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	  }
 	  if (!LoadLodControl (lodctrl, params))
 	  {
-	    lodctrl->DecRef ();
 	    return false;
 	  }
-	  lodctrl->DecRef ();
 	}
         break;
       case CS_TOKEN_PRIORITY:
@@ -1898,7 +1881,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
         break;
       case CS_TOKEN_MESHOBJ:
         {
-	  iMeshWrapper* sp = Engine->CreateMeshWrapper (name);
+	  csRef<iMeshWrapper> sp (Engine->CreateMeshWrapper (name));
           if (!LoadMeshObject (sp, params))
 	  {
 	    // Error is already reported.
@@ -1906,7 +1889,6 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	  }
 	  sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetChildren ()->Add (sp);
-	  sp->DecRef ();
         }
         break;
       case CS_TOKEN_HARDMOVE:
@@ -2003,7 +1985,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	  iBase* mo = plug->Parse (params, GetLoaderContext (), NULL);
           if (mo)
           {
-	    iMeshObject* mo2 = SCF_QUERY_INTERFACE (mo, iMeshObject);
+	    csRef<iMeshObject> mo2 (SCF_QUERY_INTERFACE (mo, iMeshObject));
 	    if (!mo2)
 	    {
               ReportError (
@@ -2016,15 +1998,11 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	    if (mo2->GetFactory () && mo2->GetFactory ()->GetLogicalParent ())
 	    {
 	      iBase* lp = mo2->GetFactory ()->GetLogicalParent ();
-	      iMeshFactoryWrapper* mfw = SCF_QUERY_INTERFACE (lp,
-	      	iMeshFactoryWrapper);
+	      csRef<iMeshFactoryWrapper> mfw (SCF_QUERY_INTERFACE (lp,
+	      	iMeshFactoryWrapper));
 	      if (mfw)
-	      {
 	        mesh->SetFactory (mfw);
-		mfw->DecRef ();
-	      }
 	    }
-	    mo2->DecRef ();
             mo->DecRef ();
           }
           else
@@ -2063,7 +2041,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	  	GetLoaderContext (), NULL);
           if (mo)
           {
-	    iMeshObject* mo2 = SCF_QUERY_INTERFACE (mo, iMeshObject);
+	    csRef<iMeshObject> mo2 (SCF_QUERY_INTERFACE (mo, iMeshObject));
 	    if (!mo2)
 	    {
               ReportError (
@@ -2076,15 +2054,11 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	    if (mo2->GetFactory () && mo2->GetFactory ()->GetLogicalParent ())
 	    {
 	      iBase* lp = mo2->GetFactory ()->GetLogicalParent ();
-	      iMeshFactoryWrapper* mfw = SCF_QUERY_INTERFACE (lp,
-	      	iMeshFactoryWrapper);
+	      csRef<iMeshFactoryWrapper> mfw (SCF_QUERY_INTERFACE (lp,
+	      	iMeshFactoryWrapper));
 	      if (mfw)
-	      {
 	        mesh->SetFactory (mfw);
-		mfw->DecRef ();
-	      }
 	    }
-	    mo2->DecRef ();
             mo->DecRef ();
           }
           else
@@ -2121,13 +2095,12 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, char* buf)
 	      "Only use LMCACHE after PARAMS!");
 	    return false;
 	  }
-	  iLightingInfo* li = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-	  	iLightingInfo);
+	  csRef<iLightingInfo> li (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+	  	iLightingInfo));
 	  if (li)
 	  {
 	    csScanStr (params, "%s", str);
 	    li->SetCacheName (str);
-	    li->DecRef ();
 	  }
 	}
         break;
@@ -3319,17 +3292,15 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
         break;
       case CS_TOKEN_MESHOBJ:
         {
-	  iMeshWrapper* mesh = Engine->CreateMeshWrapper (name);
+	  csRef<iMeshWrapper> mesh (Engine->CreateMeshWrapper (name));
           if (!LoadMeshObject (mesh, params))
 	  {
 	    // Error is already reported.
-	    mesh->DecRef ();
 	    return NULL; // @@@ Leak
 	  }
 	  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetMovable ()->SetSector (sector);
 	  mesh->GetMovable ()->UpdateMove ();
-	  mesh->DecRef ();
         }
         break;
       case CS_TOKEN_MESHLIB:
@@ -3616,17 +3587,15 @@ bool csLoader::LoadLibrary (iDocumentNode* node)
           break;
         case XMLTOKEN_MESHFACT:
           {
-            iMeshFactoryWrapper* t = Engine->CreateMeshFactory (
-			    child->GetAttributeValue ("name"));
+            csRef<iMeshFactoryWrapper> t (Engine->CreateMeshFactory (
+			    child->GetAttributeValue ("name")));
 	    if (t)
 	    {
 	      if (!LoadMeshObjectFactory (t, child))
 	      {
 	        // Error is already reported.
-		t->DecRef ();
 		return false;
 	      }
-	      t->DecRef ();
 	    }
 	  }
 	  break;
@@ -3802,8 +3771,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	  }
 	  else
 	  {
-	    iMeshObjectFactory* mof2 = SCF_QUERY_INTERFACE (mof,
-	    	iMeshObjectFactory);
+	    csRef<iMeshObjectFactory> mof2 (SCF_QUERY_INTERFACE (mof,
+	    	iMeshObjectFactory));
 	    if (!mof2)
 	    {
               SyntaxService->ReportError (
@@ -3814,7 +3783,6 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	    }
 	    stemp->SetMeshObjectFactory (mof2);
 	    mof2->SetLogicalParent (stemp);
-	    mof2->DecRef ();
 	    mof->DecRef ();
 	  }
 	}
@@ -3855,8 +3823,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	  }
 	  else
 	  {
-	    iMeshObjectFactory* mof2 = SCF_QUERY_INTERFACE (mof,
-	    	iMeshObjectFactory);
+	    csRef<iMeshObjectFactory> mof2 (SCF_QUERY_INTERFACE (mof,
+	    	iMeshObjectFactory));
 	    if (!mof2)
 	    {
               SyntaxService->ReportError (
@@ -3867,7 +3835,6 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	    }
 	    stemp->SetMeshObjectFactory (mof2);
 	    mof2->SetLogicalParent (stemp);
-	    mof2->DecRef ();
 	    mof->DecRef ();
 	  }
         }
@@ -3886,9 +3853,9 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
           mat = GetLoaderContext ()->FindMaterial (matname);
           if (mat)
 	  {
-	    iSprite3DFactoryState* state = SCF_QUERY_INTERFACE (
+	    csRef<iSprite3DFactoryState> state (SCF_QUERY_INTERFACE (
 	    	stemp->GetMeshObjectFactory (),
-		iSprite3DFactoryState);
+		iSprite3DFactoryState));
 	    if (!state)
 	    {
               SyntaxService->ReportError (
@@ -3897,7 +3864,6 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	      return false;
 	    }
             state->SetMaterialWrapper (mat);
-	    state->DecRef ();
 	  }
           else
           {
@@ -3923,8 +3889,8 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	    return false;
 	  }
 
-	  iModelData *Model = ModelConverter->Load (buf->GetUint8 (),
-	  	buf->GetSize ());
+	  csRef<iModelData> Model (ModelConverter->Load (buf->GetUint8 (),
+	  	buf->GetSize ()));
           if (!Model)
 	  {
             SyntaxService->ReportError (
@@ -3937,7 +3903,6 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	  csModelDataTools::MergeObjects (Model, false);
 	  iMeshFactoryWrapper *stemp2 =
 	    CrossBuilder->BuildSpriteFactoryHierarchy (Model, Engine, mat);
-	  Model->DecRef ();
 
 	  stemp->SetMeshObjectFactory (stemp2->GetMeshObjectFactory ());
 	  int i;
@@ -3962,18 +3927,16 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 
       case XMLTOKEN_MESHFACT:
         {
-          iMeshFactoryWrapper* t = Engine->CreateMeshFactory (
-	  	child->GetAttributeValue ("name"));
+          csRef<iMeshFactoryWrapper> t (Engine->CreateMeshFactory (
+	  	child->GetAttributeValue ("name")));
 	  csReversibleTransform child_transf;
           if (!LoadMeshObjectFactory (t, child, &child_transf))
 	  {
 	    // Error is already reported above.
-	    if (t) t->DecRef ();
 	    return false;
 	  }
 	  stemp->GetChildren ()->Add (t);
 	  t->SetTransform (child_transf);
-	  t->DecRef ();
         }
 	break;
 
@@ -4453,8 +4416,8 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
         break;
       case XMLTOKEN_MESHOBJ:
         {
-	  iMeshWrapper* sp = Engine->CreateMeshWrapper (
-			  child->GetAttributeValue ("name"));
+	  csRef<iMeshWrapper> sp (Engine->CreateMeshWrapper (
+			  child->GetAttributeValue ("name")));
           if (!LoadMeshObject (sp, child))
 	  {
 	    // Error is already reported.
@@ -4462,7 +4425,6 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	  }
 	  sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetChildren ()->Add (sp);
-	  sp->DecRef ();
         }
         break;
       case XMLTOKEN_HARDMOVE:
@@ -4531,7 +4493,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	  iBase* mo = plug->Parse (child, GetLoaderContext (), NULL);
           if (mo)
           {
-	    iMeshObject* mo2 = SCF_QUERY_INTERFACE (mo, iMeshObject);
+	    csRef<iMeshObject> mo2 (SCF_QUERY_INTERFACE (mo, iMeshObject));
 	    if (!mo2)
 	    {
               SyntaxService->ReportError (
@@ -4544,15 +4506,11 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	    if (mo2->GetFactory () && mo2->GetFactory ()->GetLogicalParent ())
 	    {
 	      iBase* lp = mo2->GetFactory ()->GetLogicalParent ();
-	      iMeshFactoryWrapper* mfw = SCF_QUERY_INTERFACE (lp,
-	      	iMeshFactoryWrapper);
+	      csRef<iMeshFactoryWrapper> mfw (SCF_QUERY_INTERFACE (lp,
+	      	iMeshFactoryWrapper));
 	      if (mfw)
-	      {
 	        mesh->SetFactory (mfw);
-		mfw->DecRef ();
-	      }
 	    }
-	    mo2->DecRef ();
             mo->DecRef ();
           }
           else
@@ -4597,7 +4555,7 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	  	GetLoaderContext (), NULL);
           if (mo)
           {
-	    iMeshObject* mo2 = SCF_QUERY_INTERFACE (mo, iMeshObject);
+	    csRef<iMeshObject> mo2 (SCF_QUERY_INTERFACE (mo, iMeshObject));
 	    if (!mo2)
 	    {
               SyntaxService->ReportError (
@@ -4610,15 +4568,11 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	    if (mo2->GetFactory () && mo2->GetFactory ()->GetLogicalParent ())
 	    {
 	      iBase* lp = mo2->GetFactory ()->GetLogicalParent ();
-	      iMeshFactoryWrapper* mfw = SCF_QUERY_INTERFACE (lp,
-	      	iMeshFactoryWrapper);
+	      csRef<iMeshFactoryWrapper> mfw (SCF_QUERY_INTERFACE (lp,
+	      	iMeshFactoryWrapper));
 	      if (mfw)
-	      {
 	        mesh->SetFactory (mfw);
-		mfw->DecRef ();
-	      }
 	    }
-	    mo2->DecRef ();
             mo->DecRef ();
           }
           else
@@ -4659,13 +4613,10 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	      child, "Only use 'lmcache' after 'params'!");
 	    return false;
 	  }
-	  iLightingInfo* li = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-	  	iLightingInfo);
+	  csRef<iLightingInfo> li (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+	  	iLightingInfo));
 	  if (li)
-	  {
 	    li->SetCacheName (child->GetContentsValue ());
-	    li->DecRef ();
-	  }
 	}
         break;
       default:
@@ -5362,10 +5313,9 @@ iKeyValuePair* csLoader::ParseKey (iDocumentNode* node, iObject* pParent)
     return NULL;
   }
   csKeyValuePair* cskvp = new csKeyValuePair (name, value);
-  iKeyValuePair* kvp = SCF_QUERY_INTERFACE (cskvp, iKeyValuePair);
+  csRef<iKeyValuePair> kvp (SCF_QUERY_INTERFACE (cskvp, iKeyValuePair));
   if (pParent)
     pParent->ObjAdd (kvp->QueryObject ());
-  kvp->DecRef ();
   return kvp;
 }
 
@@ -5512,17 +5462,15 @@ iSector* csLoader::ParseSector (iDocumentNode* node)
 		secname ? secname : "<noname>");
 	    return NULL; // @@@ Leak
 	  }
-	  iMeshWrapper* mesh = Engine->CreateMeshWrapper (meshname);
+	  csRef<iMeshWrapper> mesh (Engine->CreateMeshWrapper (meshname));
           if (!LoadMeshObject (mesh, child))
 	  {
 	    // Error is already reported.
-	    mesh->DecRef ();
 	    return NULL; // @@@ Leak
 	  }
 	  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetMovable ()->SetSector (sector);
 	  mesh->GetMovable ()->UpdateMove ();
-	  mesh->DecRef ();
         }
         break;
       case XMLTOKEN_MESHLIB:

@@ -448,13 +448,12 @@ void csPolygon2D::DrawFilled (
           bool reset = true;
           while (lp)
           {
-            iLight *il = SCF_QUERY_INTERFACE (lp->GetLight (), iLight);
+            csRef<iLight> il (SCF_QUERY_INTERFACE (lp->GetLight (), iLight));
             unsplit->UpdateVertexLighting (
                 il,
                 lp->GetLight ()->GetColor (),
                 true,
                 reset);
-            il->DecRef ();
             reset = false;
             lp = lp->GetNextPoly ();
           }

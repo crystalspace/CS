@@ -81,11 +81,10 @@ void csCommandLineHelper::Help (iObjectRegistry* object_reg,
   CS_ASSERT (cmdline != NULL);
 
   // First send a global cscmdCommandLineHelp event.
-  iEventQueue* evq = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  csRef<iEventQueue> evq (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (evq)
   {
     iEventOutlet* evout = evq->GetEventOutlet ();
-    evq->DecRef ();
     CS_ASSERT (evout != NULL);
     // We use ImmediateBroadcast here because after processing commandline
     // help the application usually exits. This means there is no chance
@@ -93,27 +92,22 @@ void csCommandLineHelper::Help (iObjectRegistry* object_reg,
     evout->ImmediateBroadcast (cscmdCommandLineHelp, NULL);
   }
 
-  iPluginManager* plgmgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plgmgr (CS_QUERY_REGISTRY (object_reg, iPluginManager));
   int i;
   for (i = 0; i < plgmgr->GetPluginCount (); i++)
   {
     iBase* plug = plgmgr->GetPlugin (i);
-    iConfig* config = SCF_QUERY_INTERFACE (plug, iConfig);
+    csRef<iConfig> config (SCF_QUERY_INTERFACE (plug, iConfig));
     if (config)
     {
-      iFactory* fact = SCF_QUERY_INTERFACE (plug, iFactory);
+      csRef<iFactory> fact (SCF_QUERY_INTERFACE (plug, iFactory));
       if (fact)
-      {
         printf ("Options for %s:\n", fact->QueryDescription ());
-	fact->DecRef ();
-      }
       else
         printf ("Options for unknown plugin:\n");
       Help (config);
-      config->DecRef ();
     }
   }
-  plgmgr->DecRef ();
   cmdline->DecRef ();
 
   //@@@???

@@ -73,10 +73,10 @@ void csPluginManager::Clear ()
 
 void csPluginManager::QueryOptions (iComponent *obj)
 {
-  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
+  csRef<iCommandLineParser> CommandLine (CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser));
 
-  iConfig *Config = SCF_QUERY_INTERFACE (obj, iConfig);
+  csRef<iConfig> Config (SCF_QUERY_INTERFACE (obj, iConfig));
   if (Config)
   {
     int on = OptionList.Length ();
@@ -130,9 +130,7 @@ void csPluginManager::QueryOptions (iComponent *obj)
         pio->Config->SetOption (pio->ID, &optval);
       }
     }
-    Config->DecRef ();
   }
-  CommandLine->DecRef ();
 }
 
 iBase *csPluginManager::LoadPlugin (const char *classID,
@@ -276,7 +274,7 @@ bool csPluginManager::UnloadPlugin (iComponent* obj)
   if (idx < 0)
     return false;
 
-  iConfig *config = SCF_QUERY_INTERFACE (obj, iConfig);
+  csRef<iConfig> config (SCF_QUERY_INTERFACE (obj, iConfig));
   if (config)
   {
     for (int i = OptionList.Length () - 1; i >= 0; i--)
@@ -285,7 +283,6 @@ bool csPluginManager::UnloadPlugin (iComponent* obj)
       if (pio->Config == config)
         OptionList.Delete (i);
     }
-    config->DecRef ();
   }
 
   object_reg->Unregister ((iBase *)obj, NULL);

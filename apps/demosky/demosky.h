@@ -91,11 +91,12 @@ public:
 
 
 /** A flock of birds, a collection of sprites*/
-class Flock {
+class Flock
+{
   /// nr of sprites
   int nr;
   /// the sprites
-  iMeshWrapper **spr;
+  csRef<iMeshWrapper> *spr;
   /// sprite speed, accel
   csVector3 *speed, *accel;
 

@@ -144,12 +144,9 @@ bool Simple::HandleEvent (iEvent& ev)
   }
   else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-    {
       q->GetEventOutlet()->Broadcast (cscmdQuit);
-      q->DecRef ();
-    }
     return true;
   }
 
@@ -277,9 +274,9 @@ bool Simple::Initialize2 ()
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
-  iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
-  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
-  	iThingState);
+  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
+  csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
+  	iThingState));
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
@@ -329,26 +326,20 @@ bool Simple::Initialize2 ()
   p->CreateVertex (csVector3 (5, 0, -5));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
-  walls_state->DecRef ();
-  walls->DecRef ();
-
-  iStatLight* light;
+  csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
 
   light = engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
   	csColor (1, 0, 0), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
   light = engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
   	csColor (0, 0, 1), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
   light = engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
   	csColor (0, 1, 0), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
   engine->Prepare ();
 

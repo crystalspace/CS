@@ -87,24 +87,21 @@ int csNamedObjectVector::Find (iObject *obj) const
 
 int csNamedObjectVector::Compare (csSome Item1, csSome Item2, int)
 {
-  iObject *obj1 = SCF_QUERY_INTERFACE (((iBase*)Item1), iObject);
-  iObject *obj2 = SCF_QUERY_INTERFACE (((iBase*)Item2), iObject);
+  csRef<iObject> obj1 (SCF_QUERY_INTERFACE (((iBase*)Item1), iObject));
+  csRef<iObject> obj2 (SCF_QUERY_INTERFACE (((iBase*)Item2), iObject));
 
   int res = (obj1->GetName () == obj2->GetName ()) ? 0
        : strcmp (obj1->GetName (), obj2->GetName ());
-  obj1->DecRef ();
-  obj2->DecRef ();
   return res;
 }
 
 int csNamedObjectVector::CompareKey (csSome Item, csConstSome Key, int)
 {
-  iObject *obj = SCF_QUERY_INTERFACE (((iBase*)Item), iObject);
+  csRef<iObject> obj (SCF_QUERY_INTERFACE (((iBase*)Item), iObject));
   const char *name = (const char *)Key;
 
   int res = (obj->GetName () == name) ? 0
        : strcmp (obj->GetName (), name);
-  obj->DecRef ();
   return res;
 }
 

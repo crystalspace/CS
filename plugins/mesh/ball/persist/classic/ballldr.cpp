@@ -172,8 +172,8 @@ bool csBallFactoryLoader::Initialize (iObjectRegistry* object_reg)
 iBase* csBallFactoryLoader::Parse (const char* /*string*/,
 	iLoaderContext*, iBase* /* context */)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.ball", iMeshObjectType);
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.ball", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.ball",
@@ -187,15 +187,14 @@ iBase* csBallFactoryLoader::Parse (const char* /*string*/,
     return NULL;
   }
   iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
   return fact;
 }
 
 iBase* csBallFactoryLoader::Parse (iDocumentNode*,
 			     iLoaderContext*, iBase*)
 {
-  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.ball", iMeshObjectType);
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.ball", iMeshObjectType));
   if (!type)
   {
     type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.ball",
@@ -209,7 +208,6 @@ iBase* csBallFactoryLoader::Parse (iDocumentNode*,
     return NULL;
   }
   iMeshObjectFactory* fact = type->NewFactory ();
-  type->DecRef ();
   return fact;
 }
 

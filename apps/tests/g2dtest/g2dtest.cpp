@@ -164,12 +164,11 @@ G2DTestSystemDriver::G2DTestSystemDriver (int argc, char* argv[])
     exit (0);
   }
 
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
   {
     EventOutlet = q->GetEventOutlet();
     EventOutlet->IncRef();
-    q->DecRef ();
   }
 }
 
@@ -1124,9 +1123,10 @@ int main (int argc, char *argv[])
     exit (0);
   }
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser));
 
   System.myG2D = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
   // Now load the canvas plugin
@@ -1151,8 +1151,6 @@ int main (int argc, char *argv[])
       return -1;
     }
   }
-  plugin_mgr->DecRef ();
-  cmdline->DecRef ();
 
   if (!System.myG2D)
   {

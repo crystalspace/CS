@@ -42,7 +42,7 @@ struct csRGBcolor;
 struct csTextureLayer
 {
   /// Texture handle
-  iTextureHandle* txt_handle;
+  csRef<iTextureHandle> txt_handle;
   /// Mode: one of #CS_FX_ADD ...
   uint mode;    
   /// Txt mapping scale relative to parent texture

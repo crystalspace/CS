@@ -108,12 +108,10 @@ SysSystemDriver::~SysSystemDriver ()
 {
   if (EventOutlet)
     EventOutlet->DecRef ();
-  iEventQueue* event_queue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  csRef<iEventQueue> event_queue (
+  	CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (event_queue)
-  {
     event_queue->RemoveListener (&scfiEventHandler);
-    event_queue->DecRef ();
-  }
 }
 
 bool SysSystemDriver::HandleEvent (iEvent& e)
@@ -124,12 +122,9 @@ bool SysSystemDriver::HandleEvent (iEvent& e)
   {
     if (!EventOutlet)
     {
-      iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+      csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
       if (q != NULL)
-      {
         EventOutlet = q->CreateEventOutlet (this);
-	q->DecRef ();
-      }
     }
 
     bool ExtKey = false;
@@ -271,11 +266,10 @@ bool SysSystemDriver::Initialize ()
 {
   if (!csSystemDriver::Initialize ()) return false;
 
-  iEventQueue* event_queue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  csRef<iEventQueue> event_queue (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   CS_ASSERT (event_queue != NULL);
   event_queue->RegisterListener (&scfiEventHandler,
   	CSMASK_Nothing | CSMASK_Broadcast);
-  event_queue->DecRef ();
 
   return true;
 }

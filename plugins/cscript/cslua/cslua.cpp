@@ -133,7 +133,7 @@ bool csLua::LoadModule(const char* name)
 
 void csLua::Print(bool Error, const char *msg)
 {
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (!rep)
     csPrintf ("%s\n", msg);
   else
@@ -144,7 +144,6 @@ void csLua::Print(bool Error, const char *msg)
     else
       rep->Report (Mode, "crystalspace.script.lua",
       	"%s", msg);
-    rep->DecRef ();
   }
 }
 

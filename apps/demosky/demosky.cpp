@@ -70,11 +70,10 @@ void DemoSky::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (System->object_reg, iReporter));
   if (rep)
   {
     rep->ReportV (severity, "crystalspace.application.demosky", msg, arg);
-    rep->DecRef ();
   }
   else
   {
@@ -305,9 +304,9 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   iMaterialWrapper* imatd = sky_d->Initialize(object_reg, engine, txtmgr, "sky_d");
 
   room = engine->CreateSector ("room");
-  iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
-  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
-  	iThingState);
+  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
+  csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
+  	iThingState));
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (imatd);
@@ -376,8 +375,6 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
   SetTexSpace (sky_b, p, 256, p->GetVertex  (0), p->GetVertex  (1),
 	       2.0f * size, p->GetVertex (3), 2.0f * size);
   p->GetFlags ().Set(CS_POLY_LIGHTING, 0);
-  walls_state->DecRef ();
-  walls->DecRef ();
 
   LevelLoader->LoadTexture ("seagull", "/lib/std/seagull.gif");
   iMaterialWrapper *sg = engine->GetMaterialList ()->FindByName("seagull");
@@ -460,12 +457,9 @@ bool DemoSky::HandleEvent (iEvent &Event)
 
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-    {
       q->GetEventOutlet()->Broadcast (cscmdQuit);
-      q->DecRef ();
-    }
     return true;
   }
 
@@ -478,14 +472,15 @@ Flock::Flock(iEngine *engine, int num, iMaterialWrapper *mat, iSector *sector)
   printf("Creating flock of %d birds\n", num);
   //  mat->IncRef ();
   nr = num;
-  spr = new iMeshWrapper* [nr];
+  spr = new csRef<iMeshWrapper> [nr];
   speed = new csVector3[nr];
   accel = new csVector3[nr];
   int i;
-  iMeshFactoryWrapper *fact = engine->CreateMeshFactory(
-    "crystalspace.mesh.object.sprite.2d", "BirdFactory");
-  iSprite2DFactoryState *state = SCF_QUERY_INTERFACE(fact->GetMeshObjectFactory(),
-    iSprite2DFactoryState);
+  csRef<iMeshFactoryWrapper> fact (engine->CreateMeshFactory(
+    "crystalspace.mesh.object.sprite.2d", "BirdFactory"));
+  csRef<iSprite2DFactoryState> state (
+  	SCF_QUERY_INTERFACE(fact->GetMeshObjectFactory(),
+	iSprite2DFactoryState));
   state->SetMaterialWrapper(mat);
   state->SetLighting(false);
 
@@ -509,8 +504,8 @@ Flock::Flock(iEngine *engine, int num, iMaterialWrapper *mat, iSector *sector)
     pos.z -= (float(rand() + 1.0f) / float(RAND_MAX)) * 20.0f;
     spr[i] = engine->CreateMeshWrapper(fact, "Bird", sector, pos);
 
-    iSprite2DState *sprstate = SCF_QUERY_INTERFACE(spr[i]->GetMeshObject(),
-      iSprite2DState);
+    csRef<iSprite2DState> sprstate (SCF_QUERY_INTERFACE(spr[i]->GetMeshObject(),
+      iSprite2DState));
     sprstate->GetVertices().SetLimit(4);
     sprstate->GetVertices().SetLength(4);
     sprstate->GetVertices()[0].color_init.Set(1.0f, 1.0f, 1.0f);
@@ -531,11 +526,8 @@ Flock::Flock(iEngine *engine, int num, iMaterialWrapper *mat, iSector *sector)
     sprstate->GetVertices()[3].pos.Set(-sz, -sz);
     sprstate->GetVertices()[3].u = 0.2f;
     sprstate->GetVertices()[3].v = 1.0f;
-    sprstate->DecRef();
 
   }
-  state->DecRef();
-  fact->DecRef ();
 }
 
 
@@ -543,7 +535,7 @@ Flock::~Flock()
 {
   int i;
   for(i=0; i<nr; i++)
-    spr[i]->DecRef();
+    spr[i] = NULL;
   delete[] spr;
   delete[] speed;
   delete[] accel;

@@ -31,6 +31,7 @@
 #include "cstool/prwater.h"
 #include "csgfx/rgbpixel.h"
 #include "ivideo/graph3d.h"
+#include "ivideo/texture.h"
 #include "ivideo/material.h"
 #include "iengine/engine.h"
 #include "iengine/texture.h"

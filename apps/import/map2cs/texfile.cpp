@@ -79,21 +79,20 @@ void CTextureFile::SetOriginalData(char* Data, int Size)
   // because the image loader doesn't ever use the system driver!
   // If this changes then map2cs needs a system driver too!
   static bool IL_Loaded = false;
-  static iImageIO *ImageLoader = NULL;
+  static csRef<iImageIO> ImageLoader;
   if (!IL_Loaded)
   {
     IL_Loaded = true;
 
-    ImageLoader = SCF_CREATE_INSTANCE("crystalspace.graphic.image.io.multiplex", iImageIO);
+    ImageLoader = SCF_CREATE_INSTANCE(
+    	"crystalspace.graphic.image.io.multiplex", iImageIO);
     if (ImageLoader)
     {
-      iComponent *Plugin = SCF_QUERY_INTERFACE (ImageLoader, iComponent);
+      csRef<iComponent> Plugin (SCF_QUERY_INTERFACE (ImageLoader, iComponent));
       if (!Plugin || !Plugin->Initialize(NULL))
       {
-        ImageLoader->DecRef();
 	ImageLoader = NULL;
       }
-      Plugin->DecRef ();
     }
   }
 

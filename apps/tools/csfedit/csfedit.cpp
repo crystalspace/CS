@@ -975,9 +975,8 @@ csEditFont::csEditFont(csApp *iApp, const char *fromfile)
   /// taken from csfont plugin...
 
   /*  @@@ need to be able to get VFS names
-  iVFS *VFS = CS_QUERY_REGISTRY (System->object_reg, iVFS);
-  iDataBuffer *fntfile = VFS->ReadFile (fromfile);
-  VFS->DecRef ();
+  csRef<iVFS> VFS (CS_QUERY_REGISTRY (System->object_reg, iVFS));
+  csRef<iDataBuffer> fntfile (VFS->ReadFile (fromfile));
   if (!fntfile)
   {
     csReport (System->object_reg, CS_REPORTER_SEVERITY_WARNING,
@@ -1001,7 +1000,6 @@ csEditFont::csEditFont(csApp *iApp, const char *fromfile)
   if (data [0] != 'C' || data [1] != 'S' ||  data [2] != 'F')
   {
 error:
-    //fntfile->DecRef (); // @@@
     ///// create empty font
     fontname = csStrNew("LoadingError");
     chars = new csEditChar* [numchars];
@@ -1085,8 +1083,6 @@ error:
   // allocate memory and copy the font
   uint8* FontBitmap = new uint8 [fontsize];
   memcpy (FontBitmap, binary + numchars, fontsize);
-
-  //fntfile->DecRef (); // @@@
 
   ///// further processing of InividualWidth and FontBitmap
   /// create characters
@@ -1440,11 +1436,11 @@ bool CsfEdit::HandleEvent (iEvent &Event)
 	  int rc = (int)Event.Command.Info;
 	  if (rc == 0 || rc == cscmdCancel) { delete d; return true; }
 
-	  iMessageBoxData* mbd = SCF_QUERY_INTERFACE (GetTopModalUserdata (),
-	  	iMessageBoxData);
+	  csRef<iMessageBoxData> mbd (
+	  	SCF_QUERY_INTERFACE (GetTopModalUserdata (),
+	  	iMessageBoxData));
 	  if (mbd)
 	  {
-	    mbd->DecRef ();
             if (rc == cscmdOK) editfont->Save();
 	    delete d;
 	    return true;
@@ -1573,9 +1569,8 @@ int main (int argc, char* argv[])
     exit (0);
   }
 
-  iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
   iNativeWindow* nw = g3d->GetDriver2D ()->GetNativeWindow ();
-  g3d->DecRef ();
   if (nw) nw->SetTitle ("Crystal Space Font Editor");
 
   if (!csInitializer::OpenApplication (object_reg))
@@ -1585,14 +1580,12 @@ int main (int argc, char* argv[])
   }
 
   // Look for skin variant from config file
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
-  iConfigManager* cfg = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser));
+  csRef<iConfigManager> cfg (CS_QUERY_REGISTRY (object_reg, iConfigManager));
   DefaultSkin.Prefix = cmdline->GetOption ("skin");
   if (!DefaultSkin.Prefix)
     DefaultSkin.Prefix = cfg->GetStr ("CSWS.Skin.Variant", NULL);
-  cmdline->DecRef ();
-  cfg->DecRef ();
 
   // Create our application object
   CsfEdit app (object_reg, DefaultSkin);

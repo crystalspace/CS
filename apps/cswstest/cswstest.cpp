@@ -848,9 +848,9 @@ bool csWsTest::HandleEvent (iEvent &Event)
 	  csComponent* d = GetTopModalComponent ();
 	  int rc = (int)Event.Command.Info;
 	  if (rc == 0 || rc == cscmdCancel) { delete d; return true; }
-	  iMessageBoxData* mbd = SCF_QUERY_INTERFACE (GetTopModalUserdata (),
-	  	iMessageBoxData);
-	  if (mbd) { mbd->DecRef (); delete d; return true; }
+	  csRef<iMessageBoxData> mbd (
+	  	SCF_QUERY_INTERFACE (GetTopModalUserdata (), iMessageBoxData));
+	  if (mbd) { delete d; return true; }
 
 	  ModalData* data = (ModalData*)GetTopModalUserdata ();
 	  CS_ASSERT (data != NULL);
@@ -1045,16 +1045,14 @@ int main (int argc, char* argv[])
     return -1;
   }
 
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
-  iConfigManager* config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser));
+  csRef<iConfigManager> config (CS_QUERY_REGISTRY (object_reg, iConfigManager));
 
   // Look for skin variant from config file
   DefaultSkin.Prefix = cmdline->GetOption ("skin");
   if (!DefaultSkin.Prefix)
     DefaultSkin.Prefix = config->GetStr ("CSWS.Skin.Variant", NULL);
-  cmdline->DecRef ();
-  config->DecRef ();
 
   // Create our application object
   csWsTest *app = new csWsTest (object_reg, DefaultSkin);

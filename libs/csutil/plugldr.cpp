@@ -232,8 +232,8 @@ csPluginLoader::~csPluginLoader ()
 bool csPluginLoader::LoadPlugins ()
 {
   // Collect all options from command line
-  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
+  csRef<iCommandLineParser> CommandLine (CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser));
   CS_ASSERT (CommandLine != NULL);
 
   // The list of plugins
@@ -282,10 +282,8 @@ bool csPluginLoader::LoadPlugins ()
     PluginList.Push (new csPluginLoadRec (tag, temp));
   }
 
-  CommandLine->DecRef (); CommandLine = NULL;
-
   // Now load and initialize all plugins
-  iConfigManager* Config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  csRef<iConfigManager> Config (CS_QUERY_REGISTRY (object_reg, iConfigManager));
   csRef<iConfigIterator> plugin_list (Config->Enumerate ("System.Plugins."));
   if (plugin_list)
   {
@@ -301,7 +299,7 @@ bool csPluginLoader::LoadPlugins ()
     }
   }
 
-  iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
 
   // Check all requested plugins and see if there is already
   // a plugin with that tag present. If not we add it.
@@ -330,8 +328,6 @@ bool csPluginLoader::LoadPlugins ()
   // Sort all plugins by their dependency lists
   if (!PluginList.Sort (object_reg))
   {
-    Config->DecRef ();
-    if (VFS) VFS->DecRef ();
     return false;
   }
 
@@ -351,9 +347,6 @@ bool csPluginLoader::LoadPlugins ()
     {
       if (!object_reg->Register (plg, r.Tag))
       {
-        Config->DecRef ();
-        plugin_mgr->DecRef ();
-        if (VFS) VFS->DecRef ();
         if (r.Tag)
           csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	    "crystalspace.pluginloader.loadplugins",
@@ -374,21 +367,15 @@ bool csPluginLoader::LoadPlugins ()
     const csPluginLoadRec& r = PluginList.Get(n);
     if (r.plugin)
     {
-      iComponent* comp = SCF_QUERY_INTERFACE (r.plugin, iComponent);
+      csRef<iComponent> comp (SCF_QUERY_INTERFACE (r.plugin, iComponent));
       if (comp)
-      {
         comp->Initialize (object_reg);
-	comp->DecRef ();
-      }
     }
   }
 
   // flush all removed config files
   Config->FlushRemoved();
 
-  Config->DecRef ();
-  plugin_mgr->DecRef ();
-  if (VFS) VFS->DecRef ();
   return true;
 }
 

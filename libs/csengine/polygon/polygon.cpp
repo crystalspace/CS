@@ -695,11 +695,10 @@ void csPolygon3D::eiPolygon3D::CreatePlane (
 
 bool csPolygon3D::eiPolygon3D::SetPlane (const char *iName)
 {
-  iThingEnvironment *te = SCF_QUERY_INTERFACE (
+  csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (
       csEngine::current_engine->GetThingType (),
-      iThingEnvironment);
+      iThingEnvironment));
   iPolyTxtPlane *ppl = te->FindPolyTxtPlane (iName);
-  te->DecRef ();
   if (!ppl) return false;
   scfParent->SetTextureSpace (ppl->GetPrivateObject ());
   return true;
@@ -2026,7 +2025,7 @@ bool csPolygon3D::WriteToCache (iCacheManager* cache_mgr, int id)
           & CS_ENGINE_CACHE_WRITE)
       {
         csColor *sc = goi->GetStaticColors ();
-        csMemFile* cf = new csMemFile ();
+        csRef<csMemFile> cf (csPtr<csMemFile> (new csMemFile ()));
 
         uint16 num_verts = convert_endian ((uint16) GetVertexCount ());
         cf->Write ((char *) &num_verts, sizeof (num_verts));
@@ -2045,11 +2044,7 @@ bool csPolygon3D::WriteToCache (iCacheManager* cache_mgr, int id)
 
 	if (!cache_mgr->CacheData ((void*)(cf->GetData ()),
 		cf->GetSize (), type, NULL, uid))
-	{
-	  cf->DecRef ();
 	  return false;
-	}
-        cf->DecRef ();
       }
     }
   }

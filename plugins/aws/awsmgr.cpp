@@ -83,12 +83,9 @@ awsManager::~awsManager ()
 {
   if (scfiEventHandler)
   {
-    iEventQueue *q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-    {
       q->RemoveListener (scfiEventHandler);
-      q->DecRef ();
-    }
 
     scfiEventHandler->DecRef ();
   }
@@ -873,8 +870,8 @@ void awsManager::CreateChildrenFromDef (
 
     if (key->Type () == KEY_COMPONENT)
     {
-      iAwsComponentNode *comp_node = 
-         SCF_QUERY_INTERFACE(key, iAwsComponentNode);
+      csRef<iAwsComponentNode> comp_node (
+      	SCF_QUERY_INTERFACE(key, iAwsComponentNode));
       CS_ASSERT(comp_node);
       iAwsComponentFactory *factory = FindComponentFactory (
           comp_node->ComponentTypeName ()->GetData ());
@@ -891,35 +888,28 @@ void awsManager::CreateChildrenFromDef (
           // Process all subcomponents of this component.
           CreateChildrenFromDef (wmgr, comp, comp_node);
       }
-    
-      comp_node->DecRef();
-
     }
     else if (key->Type () == KEY_CONNECTIONMAP)
     {
       int j;
-      iAwsKeyContainer *conmap = 
-        SCF_QUERY_INTERFACE(key, iAwsKeyContainer);
+      csRef<iAwsKeyContainer> conmap (
+      	SCF_QUERY_INTERFACE(key, iAwsKeyContainer));
       CS_ASSERT(conmap);
       awsSlot *slot = new awsSlot ();
 
       for (j = 0; j < conmap->Length (); ++j)
       {
-        iAwsConnectionKey *con = 
-          SCF_QUERY_INTERFACE(conmap->GetAt (j), iAwsConnectionKey);
+        csRef<iAwsConnectionKey> con (
+		SCF_QUERY_INTERFACE(conmap->GetAt (j), iAwsConnectionKey));
         CS_ASSERT(con);
 
         slot->Connect (parent, con->Signal (), con->Sink (), con->Trigger ());
-        con->DecRef();
       }       // end for count of connections
 
       //  Now that we've processed the connection map, we use a trick and send out
       // a creation signal for the component.  Note that we can't do this until the
       // connection map has been created, or the signal won't go anywhere!
       parent->Broadcast (0xefffffff);
-
-      conmap->DecRef();
-
     }         // end else
   }           // end for count of keys
 

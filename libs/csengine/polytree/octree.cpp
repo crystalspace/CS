@@ -1008,7 +1008,7 @@ void csOctree::Cache (csOctreeNode *node, iFile *cf)
 void csOctree::Cache (iCacheManager* cache_mgr)
 {
   csMemFile m;
-  iFile *mf = SCF_QUERY_INTERFACE ((&m), iFile);
+  csRef<iFile> mf (SCF_QUERY_INTERFACE ((&m), iFile));
   WriteString (mf, "OCTR", 4);
   WriteLong (mf, 100002);       // Version number.
   WriteBox3 (mf, bbox);
@@ -1017,7 +1017,6 @@ void csOctree::Cache (iCacheManager* cache_mgr)
   Cache ((csOctreeNode *)root, mf);
   cache_mgr->CacheData ((void*)(m.GetData ()), m.GetSize (),
   	"octree", NULL, 0);
-  mf->DecRef ();
 }
 
 bool csOctree::ReadFromCache (
@@ -1185,15 +1184,16 @@ bool csOctree::ReadFromCache (
   csRef<iDataBuffer> data (cache_mgr->ReadCache ("octree", NULL, 0));
   if (!data) return false;	// File doesn't exist
 
-  csMemFile* cf = new csMemFile ((char*)data->GetData (), data->GetSize (),
-  	csMemFile::DISPOSITION_IGNORE);
+  csRef<csMemFile> cf (
+  	csPtr<csMemFile> (
+		new csMemFile ((char*)data->GetData (), data->GetSize (),
+  		csMemFile::DISPOSITION_IGNORE)));
   char buf[10];
   ReadString (cf, buf, 4);
   if (strncmp (buf, "OCTR", 4))
   {
     csEngine::current_engine->Warn (
         "Cached octree not valid! Will be ignored.");
-    cf->DecRef ();
     return false;               // Bad format!
   }
 
@@ -1204,7 +1204,6 @@ bool csOctree::ReadFromCache (
         "Mismatched format version. Expected %d, got %ld!",
         100002,
         format_version);
-    cf->DecRef ();
     return false;
   }
 
@@ -1226,7 +1225,6 @@ bool csOctree::ReadFromCache (
       new_polygons,
       num);
   delete[] new_polygons;
-  cf->DecRef ();
   return rc;
 }
 

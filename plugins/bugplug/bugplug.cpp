@@ -92,12 +92,9 @@ void csBugPlug::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.bugplug", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);
@@ -180,12 +177,9 @@ csBugPlug::~csBugPlug ()
   }
   if (scfiEventHandler)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-    {
       q->RemoveListener (scfiEventHandler);
-      q->DecRef ();
-    }
     scfiEventHandler->DecRef ();
   }
 }
@@ -198,14 +192,11 @@ bool csBugPlug::Initialize (iObjectRegistry *object_reg)
     scfiEventHandler = new EventHandler (this);
   }
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (q != 0)
-  {
     q->RegisterListener (scfiEventHandler,
     	CSMASK_Nothing|CSMASK_KeyUp|CSMASK_KeyDown|
   	CSMASK_MouseUp|CSMASK_MouseDown|CSMASK_MouseMove);
-    q->DecRef ();
-  }
   return true;
 }
 
@@ -281,7 +272,7 @@ void csBugPlug::VisculCmd (const char* cmd)
       "Bugplug is currently now tracking a visibility culler!");
     return;
   }
-  iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (visculler, iDebugHelper);
+  csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (visculler, iDebugHelper));
   if (!dbghelp)
   {
     Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -298,7 +289,6 @@ void csBugPlug::VisculCmd (const char* cmd)
     Report (CS_REPORTER_SEVERITY_NOTIFY,
       "Viscul command '%s' not supported!", cmd);
   }
-  dbghelp->DecRef ();
 }
 
 void csBugPlug::VisculView (iCamera* camera)
@@ -637,7 +627,8 @@ bool csBugPlug::EatKey (iEvent& event)
         break;
       case DEBUGCMD_ENGINECMD:
 	{
-	  iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (Engine, iDebugHelper);
+	  csRef<iDebugHelper> dbghelp (
+	  	SCF_QUERY_INTERFACE (Engine, iDebugHelper));
 	  if (dbghelp)
 	  {
 	    if (dbghelp->DebugCommand (args))
@@ -650,7 +641,6 @@ bool csBugPlug::EatKey (iEvent& event)
               Report (CS_REPORTER_SEVERITY_NOTIFY,
 	        "Engine command '%s' not supported!", args);
 	    }
-	    dbghelp->DecRef ();
 	  }
 	}
         break;
@@ -809,8 +799,9 @@ bool csBugPlug::EatKey (iEvent& event)
 	    for (j = 0 ; j < ml->GetCount () ; j++)
 	    {
 	      iMeshWrapper* terr = ml->Get (j);
-	      iTerrFuncState* st = SCF_QUERY_INTERFACE (terr->GetMeshObject (),
-	      	iTerrFuncState);
+	      csRef<iTerrFuncState> st (
+	      	SCF_QUERY_INTERFACE (terr->GetMeshObject (),
+	      	iTerrFuncState));
 	      if (st)
 	      {
 	        if (enable_disable == -1)
@@ -818,7 +809,6 @@ bool csBugPlug::EatKey (iEvent& event)
 		  enable_disable = (int) (!st->IsVisTestingEnabled ());
 		}
 		st->SetVisTesting ((bool) enable_disable);
-	        st->DecRef ();
 	      }
 	    }
 	  }
@@ -1011,12 +1001,9 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
 
   if (visculler)
   {
-    iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (visculler, iDebugHelper);
+    csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (visculler, iDebugHelper));
     if (dbghelp)
-    {
       dbghelp->Dump (G3D);
-      dbghelp->DecRef ();
-    }
   }
 
   if (debug_sector.show)
@@ -1380,7 +1367,7 @@ bool csBugPlug::ReadLine (iFile* file, char* buf, int nbytes)
 
 void csBugPlug::ReadKeyBindings (const char* filename)
 {
-  iFile* f = VFS->Open (filename, VFS_FILE_READ);
+  csRef<iFile> f (VFS->Open (filename, VFS_FILE_READ));
   if (f)
   {
     char buf[256];
@@ -1396,11 +1383,9 @@ void csBugPlug::ReadKeyBindings (const char* filename)
       {
         Report (CS_REPORTER_SEVERITY_WARNING,
     	  "BugPlug hit a badly formed line in '%s'!", filename);
-	f->DecRef ();
         return;
       }
     }
-    f->DecRef ();
   }
   else
   {
@@ -1469,13 +1454,10 @@ void csBugPlug::Dump (iMeshWrapper* mesh)
   }
   else
   {
-    iFactory* fact = SCF_QUERY_INTERFACE (obj, iFactory);
+    csRef<iFactory> fact (SCF_QUERY_INTERFACE (obj, iFactory));
     if (fact)
-    {
       Report (CS_REPORTER_SEVERITY_DEBUG, "        Plugin '%s'",
   	  fact->QueryDescription () ? fact->QueryDescription () : "NULL");
-      fact->DecRef ();
-    }
     csBox3 bbox;
     obj->GetObjectModel ()->GetObjectBoundingBox (bbox);
     Report (CS_REPORTER_SEVERITY_DEBUG, "        Object bounding box:");
@@ -1702,11 +1684,10 @@ iMaterialWrapper* csBugPlug::FindColor (float r, float g, float b)
   	Engine->GetCurrentRegion ());
   if (mw) return mw;
   // Create a new material.
-  iMaterial* mat = Engine->CreateBaseMaterial (NULL, 0, NULL, NULL);
+  csRef<iMaterial> mat (Engine->CreateBaseMaterial (NULL, 0, NULL, NULL));
   mat->SetFlatColor (csRGBcolor (int (r*255), int (g*255), int (b*255)));
   mw = Engine->GetMaterialList ()->NewMaterial (mat);
   mw->QueryObject ()->SetName (name);
-  mat->DecRef ();
   mw->Register (G3D->GetTextureManager ());
   mw->GetMaterialHandle ()->Prepare ();
   return mw;
@@ -1723,10 +1704,11 @@ void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
   csBox3 tbox;
   tbox.Set (box.Min ()-pos, box.Max ()-pos);
 
-  iMeshFactoryWrapper* mf = Engine->CreateMeshFactory (
-  	"crystalspace.mesh.object.genmesh", name ? name : "__BugPlug_fact__");
-  iGeneralFactoryState* gfs = SCF_QUERY_INTERFACE (mf->GetMeshObjectFactory (),
-  	iGeneralFactoryState);
+  csRef<iMeshFactoryWrapper> mf (Engine->CreateMeshFactory (
+  	"crystalspace.mesh.object.genmesh", name ? name : "__BugPlug_fact__"));
+  csRef<iGeneralFactoryState> gfs (
+  	SCF_QUERY_INTERFACE (mf->GetMeshObjectFactory (),
+  	iGeneralFactoryState));
   CS_ASSERT (gfs != NULL);
   gfs->SetMaterialWrapper (mat);
   gfs->GenerateBox (tbox);
@@ -1739,18 +1721,15 @@ void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
   gfs->GetColors ()[5].Set (.2, .2, .2);
   gfs->GetColors ()[6].Set (.9, .9, .9);
   gfs->GetColors ()[7].Set (.6, .6, .6);
-  gfs->DecRef ();
 
-  iMeshWrapper* mw = Engine->CreateMeshWrapper (
-  	mf, name ? name : "__BugPlug_mesh__", debug_sector.sector, pos);
-  mf->DecRef ();
-  iGeneralMeshState* gms = SCF_QUERY_INTERFACE (mw->GetMeshObject (),
-  	iGeneralMeshState);
+  csRef<iMeshWrapper> mw (Engine->CreateMeshWrapper (
+  	mf, name ? name : "__BugPlug_mesh__", debug_sector.sector, pos));
+  csRef<iGeneralMeshState> gms (SCF_QUERY_INTERFACE (mw->GetMeshObject (),
+  	iGeneralMeshState));
   CS_ASSERT (gms != NULL);
   gms->SetLighting (false);
   gms->SetColor (csColor (0, 0, 0));
   gms->SetManualColors (true);
-  gms->DecRef ();
 
   // The following two calls are not needed since CS_ZBUF_USE and
   // Object render priority are the default but they show how you
@@ -1759,7 +1738,6 @@ void csBugPlug::DebugSectorBox (const csBox3& box, float r, float g, float b,
   mw->SetRenderPriority (Engine->GetObjectRenderPriority ());
 
   //mw->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
-  mw->DecRef ();
 }
 
 void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
@@ -1774,10 +1752,11 @@ void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
   csVector3 ss2 = s2-s1;
   csVector3 ss3 = s3-s1;
 
-  iMeshFactoryWrapper* mf = Engine->CreateMeshFactory (
-  	"crystalspace.mesh.object.genmesh", "__BugPlug_tri__");
-  iGeneralFactoryState* gfs = SCF_QUERY_INTERFACE (mf->GetMeshObjectFactory (),
-  	iGeneralFactoryState);
+  csRef<iMeshFactoryWrapper> mf (Engine->CreateMeshFactory (
+  	"crystalspace.mesh.object.genmesh", "__BugPlug_tri__"));
+  csRef<iGeneralFactoryState> gfs (
+  	SCF_QUERY_INTERFACE (mf->GetMeshObjectFactory (),
+  	iGeneralFactoryState));
   CS_ASSERT (gfs != NULL);
   gfs->SetMaterialWrapper (mat);
   gfs->SetVertexCount (3);
@@ -1799,25 +1778,21 @@ void csBugPlug::DebugSectorTriangle (const csVector3& s1, const csVector3& s2,
   gfs->GetColors ()[0].Set (1, 1, 1);
   gfs->GetColors ()[1].Set (0, 0, 0);
   gfs->GetColors ()[2].Set (0, 0, 0);
-  gfs->DecRef ();
 
-  iMeshWrapper* mw = Engine->CreateMeshWrapper (
-  	mf, "__BugPlug_tri__", debug_sector.sector, pos);
-  mf->DecRef ();
-  iGeneralMeshState* gms = SCF_QUERY_INTERFACE (mw->GetMeshObject (),
-  	iGeneralMeshState);
+  csRef<iMeshWrapper> mw (Engine->CreateMeshWrapper (
+  	mf, "__BugPlug_tri__", debug_sector.sector, pos));
+  csRef<iGeneralMeshState> gms (SCF_QUERY_INTERFACE (mw->GetMeshObject (),
+  	iGeneralMeshState));
   CS_ASSERT (gms != NULL);
   gms->SetLighting (false);
   gms->SetColor (csColor (0, 0, 0));
   gms->SetManualColors (true);
   gms->SetMixMode (CS_FX_ADD);
-  gms->DecRef ();
 
   mw->SetZBufMode (CS_ZBUF_TEST);
   mw->SetRenderPriority (Engine->GetAlphaRenderPriority ());
 
   //mw->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
-  mw->DecRef ();
 }
 
 void csBugPlug::SwitchDebugSector (const csReversibleTransform& trans)

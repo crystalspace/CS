@@ -97,12 +97,9 @@ void IsoTest::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (System->object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.application.isotest", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);
@@ -260,9 +257,8 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
     exit (1);
   }
 
-  iFontServer *fsvr = CS_QUERY_REGISTRY (object_reg, iFontServer);
+  csRef<iFontServer> fsvr (CS_QUERY_REGISTRY (object_reg, iFontServer));
   font = fsvr->LoadFont(CSFONT_LARGE);
-  fsvr->DecRef ();
 
   // Setup the texture manager
   iTextureManager* txtmgr = myG3D->GetTextureManager ();

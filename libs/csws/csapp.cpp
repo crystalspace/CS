@@ -70,13 +70,12 @@ bool csApp::csAppPlugin::Initialize (iObjectRegistry *object_reg)
   app->VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!app->VFS) return false;
 
-  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (q != NULL)
   {
     app->EventOutlet = q->GetEventOutlet();
     // We want ALL the events! :)
     q->RegisterListener (&scfiEventHandler, (unsigned int)(~0));
-    q->DecRef ();
   }
   return true;
 }
@@ -149,12 +148,9 @@ csApp::~csApp ()
     delete mi;
   }
 
-  iEventQueue *eq = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  csRef<iEventQueue> eq (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (eq)
-  {
     eq->RemoveListener (&scfiPlugin->scfiEventHandler);
-    eq->DecRef ();
-  }
   plugin_mgr->UnloadPlugin (scfiPlugin);
 
   // Delete all children prior to shutting down the system

@@ -317,8 +317,8 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
     return;
   }
 
-  iModelData *Model = Sys->ModelConverter->Load (buf->GetUint8 (),
-  	buf->GetSize ());
+  csRef<iModelData> Model (Sys->ModelConverter->Load (buf->GetUint8 (),
+  	buf->GetSize ()));
   if (!Model)
   {
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY,
@@ -331,7 +331,6 @@ void load_meshobj (char *filename, char *templatename, char* txtname)
   iMeshFactoryWrapper *wrap =
     Sys->CrossBuilder->BuildSpriteFactoryHierarchy (Model, Sys->Engine,
     Sys->Engine->GetMaterialList ()->FindByName (txtname));
-  Model->DecRef ();
   wrap->QueryObject ()->SetName (templatename);
 }
 
@@ -424,8 +423,8 @@ void load_thing (iSector* sector, csVector3 position,
     return;
   }
 
-  iModelData *Model = Sys->ModelConverter->Load (buffer->GetUint8(),
-  	buffer->GetSize());
+  csRef<iModelData> Model (Sys->ModelConverter->Load (buffer->GetUint8(),
+  	buffer->GetSize()));
   if(!Model)
   {
     Sys->Report(CS_REPORTER_SEVERITY_NOTIFY,
@@ -435,7 +434,6 @@ void load_thing (iSector* sector, csVector3 position,
 
   csRef<iObjectIterator> it2 (Model->QueryObject()->GetIterator());
   GenerateThing(it2,mat,spriteName,sector,position, ParseScaleFactor(it));
-  Model->DecRef();
 }
 
 

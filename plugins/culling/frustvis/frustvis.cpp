@@ -96,12 +96,11 @@ bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
 
   delete kdtree;
 
-  iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
   if (g3d)
   {
     scr_width = g3d->GetWidth ();
     scr_height = g3d->GetHeight ();
-    g3d->DecRef ();
   }
   else
   {
@@ -553,14 +552,14 @@ static bool IntersectSegment_Front2Back (csSimpleKDTree* treenode,
       if (csIntersect3::BoxSegment (obj_bbox, data->seg, box_isect) != -1)
       {
         // This object is possibly intersected by this beam.
-	iMeshWrapper* mesh = SCF_QUERY_INTERFACE (visobj_wrap->visobj,
-		iMeshWrapper);
+	csRef<iMeshWrapper> mesh (SCF_QUERY_INTERFACE (visobj_wrap->visobj,
+		iMeshWrapper));
 	if (mesh)
 	{
 	  if (!mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE))
 	  {
-	    iThingState* st = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-	      	iThingState);
+	    csRef<iThingState> st (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+	      	iThingState));
 	    if (st)
 	    {
 	      // Transform our vector to object space.
@@ -582,11 +581,8 @@ static bool IntersectSegment_Front2Back (csSimpleKDTree* treenode,
 		data->isect = movtrans.This2Other (obj_isect);
 		data->mesh = mesh;
 	      }
-
-	      st->DecRef ();
 	    }
 	  }
-	  mesh->DecRef ();
 	}
       }
     }

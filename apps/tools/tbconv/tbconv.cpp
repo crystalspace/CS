@@ -92,13 +92,15 @@ bool TerrBigTool::Init ()
 
 bool TerrBigTool::Convert ()
 {
-  iPluginManager *plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iMeshObjectType *terrtype = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.terrbig", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  csRef<iMeshObjectType> terrtype (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.terrbig", iMeshObjectType));
   if (!terrtype)
     terrtype = CS_LOAD_PLUGIN (plugin_mgr,
 	"crystalspace.mesh.object.terrbig", iMeshObjectType); 
-  if (!terrtype) {
+  if (!terrtype)
+  {
     ReportError ("Cannot find big terrain plugin\n");
     abort ();
   }
@@ -110,9 +112,6 @@ bool TerrBigTool::Convert ()
   csRef<iTerrBigState> terrstate (SCF_QUERY_INTERFACE (terrobj, iTerrBigState));
 
   terrstate->ConvertImageToMapFile (input, imageio, cmdline->GetName(1));
-
-  terrtype->DecRef();
-  plugin_mgr->DecRef();
 
   return true;
 }

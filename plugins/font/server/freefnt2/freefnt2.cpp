@@ -74,12 +74,9 @@ void csFreeType2Server::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.font.freefont2", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);
@@ -353,7 +350,7 @@ int csFreeType2Font::GetLength (const char *text, int maxwidth)
 bool csFreeType2Font::Load (iVFS *pVFS, csFreeType2Server *server)
 {
   int error;
-  iFile *file = pVFS->Open (name, VFS_FILE_READ);
+  csRef<iFile> file (pVFS->Open (name, VFS_FILE_READ));
   if (file)
   {
     size_t size = file->GetSize ();
@@ -364,7 +361,6 @@ bool csFreeType2Font::Load (iVFS *pVFS, csFreeType2Server *server)
       fontdata = new FT_Byte[size];
       if (file->Read ((char*)fontdata, size) != size)
       {
-        file->DecRef ();
         server->Report (CS_REPORTER_SEVERITY_WARNING,
                         "Font file %s could not be read!\n", name);
         return false;
@@ -375,7 +371,6 @@ bool csFreeType2Font::Load (iVFS *pVFS, csFreeType2Server *server)
 	return false;
       if ((error=FT_New_Memory_Face (server->library, fontdata, size, 0, &face)))
       {
-        file->DecRef ();
         server->Report (CS_REPORTER_SEVERITY_WARNING,
 	  "Font file %s could not be loaded: %s (%d)\n", 
 	  name, server->GetErrorDescription (error), error);
@@ -384,7 +379,6 @@ bool csFreeType2Font::Load (iVFS *pVFS, csFreeType2Server *server)
     }
     else
     {
-      file->DecRef ();
       server->Report (CS_REPORTER_SEVERITY_WARNING,
                       "Could not determine filesize for fontfile %s!\n", name);
       return false;
@@ -396,8 +390,6 @@ bool csFreeType2Font::Load (iVFS *pVFS, csFreeType2Server *server)
                     "Could not open fontfile %s!\n", name);
     return false;
   }
-
-  file->DecRef ();
 
   // we do not change the default values of the new instance
 

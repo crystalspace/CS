@@ -74,10 +74,9 @@ void ProcCallback::UseTexture (iTextureWrapper*)
 {
   if (!pt->PrepareAnim ()) return;
   csTicks elapsed_time, current_time;
-  iVirtualClock* vc = CS_QUERY_REGISTRY (pt->object_reg, iVirtualClock);
+  csRef<iVirtualClock> vc (CS_QUERY_REGISTRY (pt->object_reg, iVirtualClock));
   elapsed_time = vc->GetElapsedTicks ();
   current_time = vc->GetCurrentTicks ();
-  vc->DecRef ();
   if (pt->last_cur_time == current_time) return;
   pt->Animate (current_time);
   pt->last_cur_time = current_time;
@@ -89,9 +88,8 @@ bool csProcTexture::Initialize (iObjectRegistry* object_reg)
   iImage *proc_image;
   proc_image = (iImage*) new csImageMemory (mat_w, mat_h);
 
-  iEngine* engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
   tex = engine->GetTextureList ()->NewTexture (proc_image);
-  engine->DecRef ();
   proc_image->DecRef ();
   if (!tex)
     return false;
@@ -136,10 +134,9 @@ iMaterialWrapper* csProcTexture::Initialize (iObjectRegistry * object_reg,
     tex->GetTextureHandle ()->Prepare ();
   }
   //PrepareAnim ();
-  iMaterial* material = engine->CreateBaseMaterial (tex);
+  csRef<iMaterial> material (engine->CreateBaseMaterial (tex));
   iMaterialWrapper* mat = engine->GetMaterialList ()->NewMaterial (material);
   mat->QueryObject ()->SetName (name);
-  material->DecRef ();
   if (txtmgr)
   {
     mat->Register (txtmgr);

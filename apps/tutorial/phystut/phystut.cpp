@@ -179,12 +179,9 @@ bool Simple::HandleEvent (iEvent& ev)
   }
   else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-    {
       q->GetEventOutlet()->Broadcast (cscmdQuit);
-      q->DecRef ();
-    }
     return true;
   }
 
@@ -310,9 +307,9 @@ bool Simple::Initialize ()
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
-  iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
-  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
-  	iThingState);
+  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
+  csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
+  	iThingState));
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
@@ -362,31 +359,24 @@ bool Simple::Initialize ()
   p->CreateVertex (csVector3 (5, -5, -5));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
-  walls_state->DecRef ();
-  walls->DecRef ();
-
-  iStatLight* light;
+  csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
 
   light = engine->CreateLight (NULL, csVector3 (3, 0, 0), 8,
   	csColor (1, 0, 0), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
   light = engine->CreateLight (NULL, csVector3 (-3, 0,  0), 8,
   	csColor (0, 0, 1), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
   light = engine->CreateLight (NULL, csVector3 (0, 0, 3), 8,
   	csColor (0, 1, 0), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
   light = engine->CreateLight (NULL, csVector3 (0, -3, 0), 8,
   	csColor (1, 1, 0), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
   engine->Prepare ();
 
@@ -460,7 +450,7 @@ iRigidBody* Simple::CreateBox (void)
   const csOrthoTransform& tc = view->GetCamera ()->GetTransform ();
 
   // Create the mesh.
-  iMeshWrapper* mesh = engine->CreateMeshWrapper (boxFact, "box", room);
+  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (boxFact, "box", room));
   mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
 
   // Create a body and attach the mesh.
@@ -468,7 +458,6 @@ iRigidBody* Simple::CreateBox (void)
   rb->SetProperties (1, csVector3 (0), csMatrix3 ());
   rb->SetPosition (tc.GetOrigin ());
   rb->AttachMesh (mesh);
-  mesh->DecRef ();
 
   // Create and attach a box collider.
   const csMatrix3 tm;
@@ -491,27 +480,25 @@ iRigidBody* Simple::CreateSphere (void)
 
 
   // Create the mesh.
-  iMeshWrapper* mesh = engine->CreateMeshWrapper (ballFact, "ball", room);
+  csRef<iMeshWrapper> mesh (engine->CreateMeshWrapper (ballFact, "ball", room));
   mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
 
   iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
 
   // Set the ball mesh properties.
-  iBallState *s = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iBallState);
+  csRef<iBallState> s (
+  	SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iBallState));
   const float r (rand()%5/10. + .1);
   const csVector3 radius (r, r, r);
   s->SetRadius (radius.x, radius.y, radius.z);
   s->SetRimVertices (16);
   s->SetMaterialWrapper (mat);
-  s->DecRef ();
-
 
   // Create a body and attach the mesh.
   csRef<iRigidBody> rb = dynSys->CreateBody ();
   rb->SetProperties (radius.Norm()/2, csVector3 (0), csMatrix3 ());
   rb->SetPosition (tc.GetOrigin ());
   rb->AttachMesh (mesh);
-  mesh->DecRef ();
 
   // Create and attach a sphere collider.
   rb->AttachColliderSphere (radius.Norm()/2, csVector3 (0), 10, 1, .8);

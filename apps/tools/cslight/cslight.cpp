@@ -141,12 +141,9 @@ void Lighter::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (System->object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.application.cslight", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);
@@ -167,7 +164,7 @@ bool Lighter::SetMapDir (const char* map_dir)
 {
   char tmp[512];
   sprintf (tmp, "%s/", map_dir);
-  iVFS* myVFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  csRef<iVFS> myVFS (CS_QUERY_REGISTRY (object_reg, iVFS));
   if (!myVFS->Exists (map_dir))
   {
     char *name = strrchr (map_dir, '/');
@@ -195,11 +192,10 @@ bool Lighter::SetMapDir (const char* map_dir)
   }
   if (!myVFS->ChDir (map_dir))
   {
-    myVFS->DecRef ();
-    Report (CS_REPORTER_SEVERITY_ERROR, "The directory on VFS for map file does not exist!");
+    Report (CS_REPORTER_SEVERITY_ERROR,
+    	"The directory on VFS for map file does not exist!");
     return false;
   }
-  myVFS->DecRef ();
   return true;
 }
 
@@ -303,11 +299,10 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   int cmd_idx = 0;
   for (;;)
   {
-    iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-  	  iCommandLineParser);
+    csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
+  	  iCommandLineParser));
     const char* val = cmdline->GetName (cmd_idx);
     cmd_idx++;
-    cmdline->DecRef ();
     if (!val) break;
     if (strlen (val) > 7 && !strncmp ("cache:", val, 6))
     {
@@ -340,11 +335,10 @@ bool Lighter::Initialize (int argc, const char* const argv[],
   for (;;)
   {
     char map_dir[512];
-    iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-  	  iCommandLineParser);
+    csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
+  	  iCommandLineParser));
     const char* val = cmdline->GetName (cmd_idx);
     cmd_idx++;
-    cmdline->DecRef ();
     if (!val)
     {
       if (map_idx > 0)

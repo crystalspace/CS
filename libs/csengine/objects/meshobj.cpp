@@ -69,7 +69,6 @@ csMeshWrapper::csMeshWrapper (
 
   csEngine::current_engine->AddToCurrentRegion (this);
   csMeshWrapper::mesh = mesh;
-  mesh->IncRef ();
   draw_cb = NULL;
   factory = NULL;
   zbufMode = CS_ZBUF_USE;
@@ -105,15 +104,12 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent) :
 
 void csMeshWrapper::SetMeshObject (iMeshObject *mesh)
 {
-  if (mesh) mesh->IncRef ();
-  if (csMeshWrapper::mesh) csMeshWrapper::mesh->DecRef ();
   csMeshWrapper::mesh = mesh;
 }
 
 csMeshWrapper::~csMeshWrapper ()
 {
   if (draw_cb) draw_cb->DecRef ();
-  if (mesh) mesh->DecRef ();
 }
 
 void csMeshWrapper::UpdateMove ()
@@ -301,9 +297,9 @@ void csMeshWrapper::PlaceMesh ()
   for (i = 0; i < ml->GetCount (); i++)
   {
     iMeshWrapper *mesh = ml->Get (i);
-    iThingState *thing = SCF_QUERY_INTERFACE (
+    csRef<iThingState> thing (SCF_QUERY_INTERFACE (
         mesh->GetMeshObject (),
-        iThingState);
+        iThingState));
     if (thing)
     {
       // @@@ This function will currently only consider portals on things
@@ -336,8 +332,6 @@ void csMeshWrapper::PlaceMesh ()
           }
         }
       }
-
-      thing->DecRef ();
     }
   }
 }
@@ -544,7 +538,6 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
   csMeshFactoryWrapper::meshFact = meshFact;
-  meshFact->IncRef ();
   parent = NULL;
   children.SetMeshFactory (this);
   csEngine::current_engine->AddToCurrentRegion (this);
@@ -553,7 +546,6 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (
 csMeshFactoryWrapper::csMeshFactoryWrapper ()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
-  csMeshFactoryWrapper::meshFact = NULL;
   parent = NULL;
   children.SetMeshFactory (this);
   csEngine::current_engine->AddToCurrentRegion (this);
@@ -561,14 +553,10 @@ csMeshFactoryWrapper::csMeshFactoryWrapper ()
 
 csMeshFactoryWrapper::~csMeshFactoryWrapper ()
 {
-  if (meshFact) meshFact->DecRef ();
 }
 
 void csMeshFactoryWrapper::SetMeshObjectFactory (iMeshObjectFactory *meshFact)
 {
-  if (meshFact) meshFact->IncRef ();
-  if (csMeshFactoryWrapper::meshFact)
-    csMeshFactoryWrapper::meshFact->DecRef ();
   csMeshFactoryWrapper::meshFact = meshFact;
 }
 

@@ -21,12 +21,11 @@ awsParser::~awsParser ()
 
 bool awsParser::Initialize (const char* filename)
 {
-  iVFS* vfs = CS_QUERY_REGISTRY (objreg, iVFS);
+  csRef<iVFS> vfs (CS_QUERY_REGISTRY (objreg, iVFS));
   if (!vfs)
     return false;
   
   input = vfs->Open (filename, VFS_FILE_READ);
-  vfs->DecRef ();
   if (!input)
     return false;
 

@@ -376,12 +376,9 @@ bool awsNotebookButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
 void awsNotebookButton::GetClientRect (csRect &pf)
 {
   awsComponent *t = (awsComponent *)Parent ();
-  iAwsClientRect *cr = SCF_QUERY_INTERFACE (t, iAwsClientRect);
+  csRef<iAwsClientRect> cr (SCF_QUERY_INTERFACE (t, iAwsClientRect));
   if (cr)
-  {
     pf = cr->GetClientRect ();
-    cr->DecRef ();
-  }
   else
     pf = Parent ()->Frame ();
 }

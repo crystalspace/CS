@@ -108,10 +108,10 @@ bool ceEngineView::HandleEvent (iEvent &Event)
       if (Event.Command.Code == cscmdPreProcess)
       {
         csTicks elapsed_time, current_time;
-	iVirtualClock* vc = CS_QUERY_REGISTRY (app->object_reg, iVirtualClock);
+	csRef<iVirtualClock> vc (
+		CS_QUERY_REGISTRY (app->object_reg, iVirtualClock));
         elapsed_time = vc->GetElapsedTicks ();
 	current_time = vc->GetCurrentTicks ();
-	vc->DecRef ();
 
         // Now rotate the camera according to keyboard state
         float speed = (elapsed_time / 1000.0f) * (0.03f * 20.0f);
@@ -285,9 +285,9 @@ void ceCswsEngineApp::SetupDefaultWorld ()
   }
 
   iSector* room = engine->CreateSector ("room");
-  iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
-  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
-  	iThingState);
+  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
+  csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
+  	iThingState));
   start_sector = room;
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
@@ -337,23 +337,18 @@ void ceCswsEngineApp::SetupDefaultWorld ()
   p->CreateVertex (csVector3 (-5, -1, -5));
   p->CreateVertex (csVector3 (5, -1, -5));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
-  walls_state->DecRef ();
-  walls->DecRef ();
 
   iLightList* ll = room->GetLights ();
-  iStatLight* light;
+  csRef<iStatLight> light;
   light = engine->CreateLight (NULL, csVector3(-3, 5, 0), 10,
   	csColor(1, 0, 0), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
   light = engine->CreateLight (NULL, csVector3(3, 5, 0), 10,
   	csColor(0, 0, 1), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
   light = engine->CreateLight (NULL, csVector3(0, 5, -3), 10,
   	csColor(0, 1, 0), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 }
 
 bool ceCswsEngineApp::Initialize ()
@@ -468,11 +463,11 @@ bool ceCswsEngineApp::HandleEvent (iEvent &Event)
 
         if (GetTopModalUserdata ())
 	{
-          iMessageBoxData* mbd = SCF_QUERY_INTERFACE (GetTopModalUserdata (),
-		iMessageBoxData);
+          csRef<iMessageBoxData> mbd (
+	  	SCF_QUERY_INTERFACE (GetTopModalUserdata (),
+		iMessageBoxData));
 	  if (mbd)
 	  {
-	    mbd->DecRef ();
 	    delete d;
 	    return true;
 	  }
@@ -582,10 +577,9 @@ int main (int argc, char* argv[])
     return -1;
   }
 
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser));
   cmdline->AddOption ("mode", "800x600");
-  cmdline->DecRef ();
 
   // Check for commandline help.
   if (csCommandLineHelper::CheckHelp (object_reg))
@@ -594,9 +588,8 @@ int main (int argc, char* argv[])
     exit (0);
   }
 
-  iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
   iNativeWindow* nw = g3d->GetDriver2D ()->GetNativeWindow ();
-  g3d->DecRef ();
   if (nw) nw->SetTitle ("Crystal Space Example: CSWS And Engine");
 
   if (!csInitializer::OpenApplication (object_reg))

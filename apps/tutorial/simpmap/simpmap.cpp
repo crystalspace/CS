@@ -132,12 +132,9 @@ bool Simple::HandleEvent (iEvent& ev)
   }
   else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-    {
       q->GetEventOutlet()->Broadcast (cscmdQuit);
-      q->DecRef ();
-    }
     return true;
   }
   else if (ev.Type == csevKeyDown && ev.Key.Code == 'l')
@@ -161,9 +158,8 @@ bool Simple::SimpleEventHandler (iEvent& ev)
 bool Simple::LoadMap ()
 {
   // Set VFS current directory to the level we want to load.
-  iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
   VFS->ChDir ("/lev/partsys");
-  VFS->DecRef ();
   // Load the level file which is called 'world'.
   if (!loader->LoadMapFile ("world"))
   {

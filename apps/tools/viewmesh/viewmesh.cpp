@@ -87,7 +87,6 @@ ViewMesh::ViewMesh (iObjectRegistry *object_reg, csSkin &Skin)
   loader = NULL;
   g3d = NULL;
   menu = NULL;
-  sprite = NULL;
   dialog = NULL;
   imeshfact = NULL;
   cammode = movenormal;
@@ -100,7 +99,6 @@ ViewMesh::~ViewMesh ()
   if (engine) engine->DecRef ();
   if (loader) loader->DecRef();
   if (g3d) g3d->DecRef ();
-  if (sprite) sprite->DecRef();
   if (menu) delete menu;
   if (dialog) delete dialog;
 }
@@ -140,13 +138,10 @@ bool ViewMesh::HandleEvent (iEvent& ev)
     case csevKeyDown:
       if (ev.Key.Code == CSKEY_ESC)
       {
-	iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+	csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
 	if (q)
-	{
 	  q->GetEventOutlet()->Broadcast
 	    (cscmdQuit);
-	  q->DecRef ();
-	}
 	return true;
       }
       break;
@@ -262,14 +257,12 @@ bool ViewMesh::HandleEvent (iEvent& ev)
       if (ev.Command.Code > VIEWMESH_STATES_SELECT_START &&
 	  ev.Command.Code < VIEWMESH_STATES_SELECT_START + 100)
       {
-      	iSprite3DState *spstate = SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
-	    iSprite3DState);
+      	csRef<iSprite3DState> spstate (
+		SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
+		iSprite3DState));
 	if (spstate)
-	{
 	  spstate->SetAction(
 	      stateslist.Get(ev.Command.Code - VIEWMESH_STATES_SELECT_START) );
-	  spstate->DecRef();
-	}
 	menu->Hide();
 	return true;
       }
@@ -297,7 +290,8 @@ bool ViewMesh::LoadSprite(const char *filename,float scale)
     dir = "/";
   VFS->ChDir (dir);
 
-  iMeshFactoryWrapper *imeshfactwrap = loader->LoadMeshObjectFactory (fn);
+  csRef<iMeshFactoryWrapper> imeshfactwrap (
+  	loader->LoadMeshObjectFactory (fn));
   delete[] path;
 
   if (!imeshfactwrap)
@@ -309,29 +303,22 @@ bool ViewMesh::LoadSprite(const char *filename,float scale)
   {
     sprite->GetMovable()->ClearSectors();
     engine->GetMeshes()->Remove(sprite);
-    sprite->DecRef();
   }
 
   sprite = engine->CreateMeshWrapper(
       imeshfactwrap, "MySprite", room,
       csVector3 (0, 10, 0));
   csMatrix3 m; m.Identity(); m *= scale;
-  iSprite3DState *spstate = SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
-      iSprite3DState);
+  csRef<iSprite3DState> spstate (SCF_QUERY_INTERFACE(sprite->GetMeshObject(),
+      iSprite3DState));
   if (spstate)
-  {
     spstate->SetAction("default");
-    spstate->DecRef();
-  }
 
   // Update Sprite States menu
 	stateslist.Push (csStrNew("default"));
-  if (imeshfact)
-		imeshfact->DecRef();
-
-	imeshfact= imeshfactwrap->GetMeshObjectFactory();
-  iSprite3DFactoryState *factstate= SCF_QUERY_INTERFACE(imeshfact,
-      iSprite3DFactoryState);
+  imeshfact = imeshfactwrap->GetMeshObjectFactory();
+  csRef<iSprite3DFactoryState> factstate(SCF_QUERY_INTERFACE(imeshfact,
+      iSprite3DFactoryState));
   if (factstate)
   {
     for (int i=0;i<factstate->GetActionCount();i++)
@@ -339,9 +326,7 @@ bool ViewMesh::LoadSprite(const char *filename,float scale)
       iSpriteAction *spaction = factstate->GetAction(i);
       stateslist.Push (csStrNew(spaction->GetName()));
     }
-    factstate->DecRef();
   }
-  imeshfactwrap->DecRef();
   sprite->DeferUpdateLighting (CS_NLIGHT_DYNAMIC|CS_NLIGHT_STATIC, 10);
 
   // try to get center of the sprite
@@ -349,27 +334,23 @@ bool ViewMesh::LoadSprite(const char *filename,float scale)
   sprite->GetWorldBoundingBox(box);
   spritepos = box.GetCenter();
 
-	return true;
+  return true;
 }
 
 bool ViewMesh::SaveSprite(const char *filename)
 {
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
 
-  iSaverPlugin* saver = CS_LOAD_PLUGIN (plugin_mgr,
-    "crystalspace.mesh.saver.factory.sprite.3d.binary", iSaverPlugin);
+  csRef<iSaverPlugin> saver (CS_LOAD_PLUGIN (plugin_mgr,
+    "crystalspace.mesh.saver.factory.sprite.3d.binary", iSaverPlugin));
 	
 	
-  iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
 
-  iFile* cf;
-  cf = VFS->Open (filename, VFS_FILE_WRITE);
+  csRef<iFile> cf (VFS->Open (filename, VFS_FILE_WRITE));
   saver->WriteDown(imeshfact, cf);
 
-  saver->DecRef();
-  cf->DecRef();
-  VFS->DecRef ();
-  plugin_mgr->DecRef ();
   return true;
 }
 
@@ -543,9 +524,9 @@ bool ViewMesh::Initialize ()
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
-  iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
-  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
-  	iThingState);
+  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
+  csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
+  	iThingState));
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
@@ -595,30 +576,23 @@ bool ViewMesh::Initialize ()
   p->CreateVertex (csVector3 (5, 0, -5));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
-  walls_state->DecRef ();
-  walls->DecRef ();
-
-  iStatLight* light;
+  csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
   light = engine->CreateLight (NULL, csVector3 (-3, 10, 0), 10,
   	csColor (.8, .8, .8), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
   light = engine->CreateLight (NULL, csVector3 (3, 10,  0), 10,
   	csColor (.8, .8, .8), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
   light = engine->CreateLight (NULL, csVector3 (0, 10, -3), 10,
   	csColor (.8, .8, .8), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
   light = engine->CreateLight (NULL, csVector3 (0, 10,  3), 10,
   	csColor (.8, .8, .8), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
   engine->Prepare ();
   Printf (CS_REPORTER_SEVERITY_NOTIFY, "Created.");
@@ -630,14 +604,13 @@ bool ViewMesh::Initialize ()
 
   txtmgr->SetPalette ();
 
-  iCommandLineParser *cmdline;
+  csRef<iCommandLineParser> cmdline;
   VM_QUERYPLUGIN (cmdline, iCommandLineParser, "iCommandLineParser");
 
   const char* meshfilename = cmdline->GetName (0);
   const char* texturefilename = cmdline->GetName (1);
   const char* texturename = cmdline->GetName (2);
   const char* scaleTxt = cmdline->GetOption("Scale");
-  cmdline->DecRef ();
   float scale = 1;
   if (scaleTxt != NULL)
   {

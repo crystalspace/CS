@@ -65,11 +65,11 @@ SCF_IMPLEMENT_IBASE_END
 
 bool csDefaultRunLoop (iObjectRegistry* r)
 {
-  iEventQueue* q = CS_QUERY_REGISTRY(r, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(r, iEventQueue));
   if (!q) return false;
-  iEventQueue* ev = CS_QUERY_REGISTRY(r, iEventQueue);
-  if (!ev) { q->DecRef (); return false; }
-  iVirtualClock* vc = CS_QUERY_REGISTRY(r, iVirtualClock);
+  csRef<iEventQueue> ev (CS_QUERY_REGISTRY(r, iEventQueue));
+  if (!ev) return false;
+  csRef<iVirtualClock> vc (CS_QUERY_REGISTRY(r, iVirtualClock));
 
   csDefaultQuitEventHandler eh;
   q->RegisterListener(&eh, CSMASK_Broadcast);
@@ -82,9 +82,6 @@ bool csDefaultRunLoop (iObjectRegistry* r)
   }
 
   q->RemoveListener (&eh);
-  q->DecRef ();
-  ev->DecRef ();
-  if (vc) vc->DecRef ();
   return true;
 }
 

@@ -712,12 +712,9 @@ csEngine::~csEngine ()
 {
   if (scfiEventHandler)
   {
-    iEventQueue *q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q != 0)
-    {
       q->RemoveListener (scfiEventHandler);
-      q->DecRef ();
-    }
 
     scfiEventHandler->DecRef ();
   }
@@ -788,12 +785,9 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
   // Tell event queue that we want to handle broadcast events
   if (!scfiEventHandler) scfiEventHandler = new EventHandler (this);
 
-  iEventQueue *q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
   if (q)
-  {
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
-    q->DecRef ();
-  }
 
   csConfigAccess cfg (object_reg, "/config/engine.cfg");
   ReadConfig (cfg);
@@ -936,11 +930,11 @@ void csEngine::DeleteAll ()
   delete textures;
   textures = new csTextureList ();
 
-  iThingEnvironment *te = SCF_QUERY_INTERFACE (thing_type, iThingEnvironment);
+  csRef<iThingEnvironment> te (
+  	SCF_QUERY_INTERFACE (thing_type, iThingEnvironment));
   CS_ASSERT (te != NULL);
   te->ClearPolyTxtPlanes ();
   te->ClearCurveTemplates ();
-  te->DecRef ();
 
   // Delete engine states and their references to cullers before cullers are
 
@@ -1366,16 +1360,14 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
     iMeshWrapper *s = (iMeshWrapper *)meshes[sn];
     if (!region || region->IsInRegion (s->QueryObject ()))
     {
-      iLightingInfo *linfo = SCF_QUERY_INTERFACE (
-        s->GetMeshObject (),
-        iLightingInfo);
+      csRef<iLightingInfo> linfo (SCF_QUERY_INTERFACE (
+        s->GetMeshObject (), iLightingInfo));
       if (linfo)
       {
         if (do_relight)
           linfo->InitializeDefault ();
         else
           linfo->ReadFromCache (cm, 0);               // ID?
-        linfo->DecRef ();
       }
     }
 
@@ -1448,14 +1440,12 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
     iMeshWrapper *s = (iMeshWrapper *)meshes[sn];
     if (!region || region->IsInRegion (s->QueryObject ()))
     {
-      iLightingInfo *linfo = SCF_QUERY_INTERFACE (
-          s->GetMeshObject (),
-          iLightingInfo);
+      csRef<iLightingInfo> linfo (SCF_QUERY_INTERFACE (
+          s->GetMeshObject (), iLightingInfo));
       if (linfo)
       {
         if (do_relight) linfo->WriteToCache (cm, 0);  // @@@ id
         linfo->PrepareLighting ();
-        linfo->DecRef ();
       }
     }
 
@@ -2068,9 +2058,8 @@ int csEngine::GetNearbyLights (
         sqdist = csSquaredDist::PointPoint (pos, dl->GetCenter ());
         if (sqdist < dl->GetSquaredRadius ())
         {
-          iLight *il = SCF_QUERY_INTERFACE (dl, iLight);
+          csRef<iLight> il (SCF_QUERY_INTERFACE (dl, iLight));
           light_array->AddLight (il, sqdist);
-          il->DecRef ();
         }
       }
 
@@ -2183,7 +2172,8 @@ void csEngine::GetNearbyObjectList (iSector* sector,
     if (mw->IsVisible ())
     {
       AddObject (list, num_objects, max_objects, imw->QueryObject ());
-      iThingState* st = SCF_QUERY_INTERFACE (imw->GetMeshObject (), iThingState);
+      csRef<iThingState> st (
+      	SCF_QUERY_INTERFACE (imw->GetMeshObject (), iThingState));
       if (st)
       {
 	// Check if there are portals and if they are near the position.
@@ -2221,7 +2211,6 @@ void csEngine::GetNearbyObjectList (iSector* sector,
 	    }
 	  }
 	}
-	st->DecRef ();
       }
     }
   }
@@ -2516,13 +2505,13 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
   // That's because that duplicate factory can still be in another
   // region. And even if this is not the case then factories with same
   // name are still allowed.
-  iPluginManager *plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iMeshObjectType *type = CS_QUERY_PLUGIN_CLASS (
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (
       plugin_mgr,
       classId,
-      iMeshObjectType);
+      iMeshObjectType));
   if (!type) type = CS_LOAD_PLUGIN (plugin_mgr, classId, iMeshObjectType);
-  plugin_mgr->DecRef ();
   if (!type) return NULL;
 
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
@@ -2531,7 +2520,6 @@ csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
   // don't pass the name to avoid a second search
   iMeshFactoryWrapper *fwrap = CreateMeshFactory (fact, NULL);
   if (fwrap && name) fwrap->QueryObject ()->SetName (name);
-  type->DecRef ();
   return csPtr<iMeshFactoryWrapper> (fwrap);
 }
 
@@ -2651,17 +2639,17 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
   const char *loaderClassId,
   iDataBuffer *input)
 {
-  iPluginManager *plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iLoaderPlugin *plug = CS_QUERY_PLUGIN_CLASS (
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  csRef<iLoaderPlugin> plug (CS_QUERY_PLUGIN_CLASS (
       plugin_mgr,
       loaderClassId,
-      iLoaderPlugin);
+      iLoaderPlugin));
   if (!plug)
     plug = CS_LOAD_PLUGIN (plugin_mgr, loaderClassId, iLoaderPlugin);
-  plugin_mgr->DecRef ();
   if (!plug) return csPtr<iMeshFactoryWrapper> (NULL);
 
-  iMeshFactoryWrapper *fact = CreateMeshFactory (name);
+  csRef<iMeshFactoryWrapper> fact (CreateMeshFactory (name));
   if (!fact) return csPtr<iMeshFactoryWrapper> (NULL);
 
   char *buf = **input;
@@ -2669,11 +2657,9 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
   iBase *mof = plug->Parse (
       buf, elctxt, fact->GetMeshObjectFactory ());
   elctxt->DecRef ();
-  plug->DecRef ();
   if (!mof)
   {
     GetMeshFactories ()->Remove (fact);
-    fact->DecRef ();
     return csPtr<iMeshFactoryWrapper> (NULL);
   }
 
@@ -2682,7 +2668,6 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
   {
     // @@@ ERROR?
     GetMeshFactories ()->Remove (fact);
-    fact->DecRef ();
     return csPtr<iMeshFactoryWrapper> (NULL);
   }
 
@@ -2690,6 +2675,7 @@ csPtr<iMeshFactoryWrapper> csEngine::LoadMeshFactory (
   mof2->SetLogicalParent (fact);
   mof2->DecRef ();
   mof->DecRef ();
+  fact->IncRef (); // Avoid cleanup of smart pointer.
   return csPtr<iMeshFactoryWrapper> (fact);
 }
 
@@ -2700,14 +2686,14 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
   iSector *sector,
   const csVector3 &pos)
 {
-  iPluginManager *plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iLoaderPlugin *plug = CS_QUERY_PLUGIN_CLASS (
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  csRef<iLoaderPlugin> plug (CS_QUERY_PLUGIN_CLASS (
       plugin_mgr,
       loaderClassId,
-      iLoaderPlugin);
+      iLoaderPlugin));
   if (!plug)
     plug = CS_LOAD_PLUGIN (plugin_mgr, loaderClassId, iLoaderPlugin);
-  plugin_mgr->DecRef ();
   if (!plug) return csPtr<iMeshWrapper> (NULL);
 
   csMeshWrapper *meshwrap = new csMeshWrapper (NULL);
@@ -2727,7 +2713,6 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
   iBase *mof = plug->Parse (
       buf, elctxt, imw);
   elctxt->DecRef ();
-  plug->DecRef ();
   if (!mof)
   {
     GetMeshes ()->Remove (imw);
@@ -2792,17 +2777,16 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   iSector *sector,
   const csVector3 &pos)
 {
-  iPluginManager *plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iMeshObjectType *type = CS_QUERY_PLUGIN_CLASS (
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (
       plugin_mgr,
       classId,
-      iMeshObjectType);
+      iMeshObjectType));
   if (!type) type = CS_LOAD_PLUGIN (plugin_mgr, classId, iMeshObjectType);
-  plugin_mgr->DecRef ();
   if (!type) return csPtr<iMeshWrapper> (NULL);
 
   csRef<iMeshObjectFactory> fact (type->NewFactory ());
-  type->DecRef ();
   if (!fact) return csPtr<iMeshWrapper> (NULL);
 
   csRef<iMeshObject> mo (SCF_QUERY_INTERFACE (fact, iMeshObject));
@@ -2826,119 +2810,107 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
 bool csEngine::RemoveObject (iBase *object)
 {
   {
-    iSector *sector = SCF_QUERY_INTERFACE (object, iSector);
+    csRef<iSector> sector (SCF_QUERY_INTERFACE (object, iSector));
     if (sector)
     {
       if (region)
         region->QueryObject ()->ObjRemove (sector->QueryObject ());
       sectors.scfiSectorList.Remove (sector);
-      sector->DecRef ();
       return true;
     }
   }
   {
-    iCameraPosition *cp = SCF_QUERY_INTERFACE (object, iCameraPosition);
+    csRef<iCameraPosition> cp (SCF_QUERY_INTERFACE (object, iCameraPosition));
     if (cp)
     {
       if (region) region->QueryObject ()->ObjRemove (cp->QueryObject ());
       camera_positions.scfiCameraPositionList.Remove (cp);
-      cp->DecRef ();
       return true;
     }
   }
   {
-    iDynLight *dl = SCF_QUERY_INTERFACE (object, iDynLight);
+    csRef<iDynLight> dl (SCF_QUERY_INTERFACE (object, iDynLight));
     if (dl)
     {
       if (region) region->QueryObject ()->ObjRemove (dl->QueryObject ());
       RemoveDynLight (dl);
-      dl->DecRef ();
       return true;
     }
   }
   {
-    iCollection *col = SCF_QUERY_INTERFACE (object, iCollection);
+    csRef<iCollection> col (SCF_QUERY_INTERFACE (object, iCollection));
     if (col)
     {
       if (region) region->QueryObject ()->ObjRemove (col->QueryObject ());
       collections.scfiCollectionList.Remove (col);
-      col->DecRef ();
       return true;
     }
   }
   {
-    iTextureWrapper *txt = SCF_QUERY_INTERFACE (object, iTextureWrapper);
+    csRef<iTextureWrapper> txt (SCF_QUERY_INTERFACE (object, iTextureWrapper));
     if (txt)
     {
       if (region) region->QueryObject ()->ObjRemove (txt->QueryObject ());
       GetTextureList ()->Remove (txt);
-      txt->DecRef ();
       return true;
     }
   }
   {
-    iMaterialWrapper *mat = SCF_QUERY_INTERFACE (
+    csRef<iMaterialWrapper> mat (SCF_QUERY_INTERFACE (
         object,
-        iMaterialWrapper);
+        iMaterialWrapper));
     if (mat)
     {
       if (region) region->QueryObject ()->ObjRemove (mat->QueryObject ());
       GetMaterialList ()->Remove (mat);
-      mat->DecRef ();
       return true;
     }
   }
   {
-    iMeshFactoryWrapper *factwrap = SCF_QUERY_INTERFACE (
+    csRef<iMeshFactoryWrapper> factwrap (SCF_QUERY_INTERFACE (
         object,
-        iMeshFactoryWrapper);
+        iMeshFactoryWrapper));
     if (factwrap)
     {
       if (region)
         region->QueryObject ()->ObjRemove (factwrap->QueryObject ());
       mesh_factories.scfiMeshFactoryList.Remove (factwrap);
-      factwrap->DecRef ();
       return true;
     }
   }
   {
-    iMeshWrapper *meshwrap = SCF_QUERY_INTERFACE (object, iMeshWrapper);
+    csRef<iMeshWrapper> meshwrap (SCF_QUERY_INTERFACE (object, iMeshWrapper));
     if (meshwrap)
     {
       if (region)
         region->QueryObject ()->ObjRemove (meshwrap->QueryObject ());
       meshes.scfiMeshList.Remove (meshwrap);
-      meshwrap->DecRef ();
       return true;
     }
   }
   {
-    iPolyTxtPlane *ptp = SCF_QUERY_INTERFACE (object, iPolyTxtPlane);
+    csRef<iPolyTxtPlane> ptp (SCF_QUERY_INTERFACE (object, iPolyTxtPlane));
     if (ptp)
     {
       if (region) region->QueryObject ()->ObjRemove (ptp->QueryObject ());
 
-      iThingEnvironment *te = SCF_QUERY_INTERFACE (
+      csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (
           GetThingType (),
-          iThingEnvironment);
+          iThingEnvironment));
       te->RemovePolyTxtPlane (ptp);
-      te->DecRef ();
-      ptp->DecRef ();
       return true;
     }
   }
   {
-    iCurveTemplate *ct = SCF_QUERY_INTERFACE (object, iCurveTemplate);
+    csRef<iCurveTemplate> ct (SCF_QUERY_INTERFACE (object, iCurveTemplate));
     if (ct)
     {
       if (region) region->QueryObject ()->ObjRemove (ct->QueryObject ());
 
-      iThingEnvironment *te = SCF_QUERY_INTERFACE (
+      csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (
           GetThingType (),
-          iThingEnvironment);
+          iThingEnvironment));
       te->RemoveCurveTemplate (ct);
-      te->DecRef ();
-      ct->DecRef ();
       return true;
     }
   }

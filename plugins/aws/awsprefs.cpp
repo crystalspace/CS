@@ -309,14 +309,13 @@ bool awsPrefManager::SelectDefaultSkin (const char* skin_name)
 
         if (k->Type () == KEY_STR)
         {
-          iAwsStringKey *sk = SCF_QUERY_INTERFACE(k, iAwsStringKey);
+          csRef<iAwsStringKey> sk (SCF_QUERY_INTERFACE(k, iAwsStringKey));
 
           if (awstxtmgr)
             (void)awstxtmgr->GetTexturebyID (
                 sk->Name (),
                 sk->Value ()->GetData (),
                 true);
-          sk->DecRef();
         }
       }
 
@@ -342,9 +341,8 @@ bool awsPrefManager::LookupIntKey (unsigned long id, int &val)
   {
     if (k->Type () == KEY_INT)
     {
-      iAwsIntKey* intKey = SCF_QUERY_INTERFACE(k, iAwsIntKey);
+      csRef<iAwsIntKey> intKey (SCF_QUERY_INTERFACE(k, iAwsIntKey));
       val = intKey->Value ();
-      intKey->DecRef();
       return true;
     }
   }
@@ -365,9 +363,8 @@ bool awsPrefManager::LookupStringKey (unsigned long id, iString * &val)
   {
     if (k->Type () == KEY_STR)
     {
-      iAwsStringKey* stringKey = SCF_QUERY_INTERFACE(k, iAwsStringKey);
+      csRef<iAwsStringKey> stringKey (SCF_QUERY_INTERFACE(k, iAwsStringKey));
       val = stringKey->Value ();
-      stringKey->DecRef();
       return true;
     }
   }
@@ -388,9 +385,8 @@ bool awsPrefManager::LookupRectKey (unsigned long id, csRect &val)
   {
     if (k->Type () == KEY_RECT)
     {
-      iAwsRectKey* rectKey = SCF_QUERY_INTERFACE(k, iAwsRectKey);
+      csRef<iAwsRectKey> rectKey (SCF_QUERY_INTERFACE(k, iAwsRectKey));
       val = rectKey->Value ();
-      rectKey->DecRef();
       return true;
     }
   }
@@ -420,9 +416,8 @@ bool awsPrefManager::LookupRGBKey (
     if (k->Type () == KEY_RGB)
     {
       iAwsRGBKey::RGB rgb;
-      iAwsRGBKey* rgbKey = SCF_QUERY_INTERFACE(k, iAwsRGBKey);
+      csRef<iAwsRGBKey> rgbKey (SCF_QUERY_INTERFACE(k, iAwsRGBKey));
       rgb = rgbKey->Value ();
-      rgbKey->DecRef();
 
       red = rgb.red;
       green = rgb.green;
@@ -448,9 +443,8 @@ bool awsPrefManager::LookupPointKey (unsigned long id, csPoint &val)
   {
     if (k->Type () == KEY_POINT)
     {
-      iAwsPointKey* pointKey = SCF_QUERY_INTERFACE(k, iAwsPointKey);
+      csRef<iAwsPointKey> pointKey (SCF_QUERY_INTERFACE(k, iAwsPointKey));
       val = pointKey->Value ();
-      pointKey->DecRef();
       return true;
     }
   }
@@ -468,9 +462,8 @@ bool awsPrefManager::GetInt (iAwsComponentNode *node, const char *name, int &val
   {
     if (k->Type () == KEY_INT)
     {
-      iAwsIntKey* ik = SCF_QUERY_INTERFACE(k, iAwsIntKey);
+      csRef<iAwsIntKey> ik (SCF_QUERY_INTERFACE(k, iAwsIntKey));
       val = ik->Value ();
-      ik->DecRef();
       return true;
     }
   }
@@ -490,9 +483,8 @@ bool awsPrefManager::GetRGB (iAwsComponentNode *node, const char *name,
     if (k->Type () == KEY_RGB)
     {
       iAwsRGBKey::RGB rgb;
-      iAwsRGBKey* rgbKey = SCF_QUERY_INTERFACE(k, iAwsRGBKey);
+      csRef<iAwsRGBKey> rgbKey (SCF_QUERY_INTERFACE(k, iAwsRGBKey));
       rgb = rgbKey->Value ();
-      rgbKey->DecRef();
 
       red = rgb.red;
       green = rgb.green;
@@ -521,9 +513,8 @@ bool awsPrefManager::GetRect (iAwsComponentNode *node, const char *name, csRect 
   {
     if (k->Type () == KEY_RECT)
     {
-      iAwsRectKey* rectKey = SCF_QUERY_INTERFACE(k, iAwsRectKey);
+      csRef<iAwsRectKey> rectKey (SCF_QUERY_INTERFACE(k, iAwsRectKey));
       val = rectKey->Value ();
-      rectKey->DecRef();
       return true;
     }
   }
@@ -544,9 +535,8 @@ bool awsPrefManager::GetString (
   {
     if (k->Type () == KEY_STR)
     {
-      iAwsStringKey* stringKey = SCF_QUERY_INTERFACE(k, iAwsStringKey);
+      csRef<iAwsStringKey> stringKey (SCF_QUERY_INTERFACE(k, iAwsStringKey));
       val = stringKey->Value ();
-      stringKey->DecRef();
       return true;
     }
   }

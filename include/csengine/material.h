@@ -43,7 +43,7 @@ private:
   /// flat shading color
   csRGBcolor flat_color;
   /// the texture of the material (can be NULL)
-  iTextureWrapper *texture;
+  csRef<iTextureWrapper> texture;
   /// Number of texture layers (currently maximum 4).
   int num_texture_layers;
   /// Optional texture layer.

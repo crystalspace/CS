@@ -824,19 +824,19 @@ bool csTextSyntaxService::ParsePoly3d (
 
   if (!thing_type)
   {
-    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    csRef<iPluginManager> plugin_mgr (
+    	CS_QUERY_REGISTRY (object_reg, iPluginManager));
     CS_ASSERT (plugin_mgr != NULL);
     thing_type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	  "crystalspace.mesh.object.thing", iMeshObjectType);
     if (!thing_type)
       thing_type = CS_LOAD_PLUGIN (plugin_mgr,
     	  "crystalspace.mesh.object.thing", iMeshObjectType);
-    plugin_mgr->DecRef ();
   }
 
   CS_ASSERT (thing_type != NULL);
-  iThingEnvironment* te =
-    SCF_QUERY_INTERFACE (thing_type, iThingEnvironment);
+  csRef<iThingEnvironment> te (
+  	SCF_QUERY_INTERFACE (thing_type, iThingEnvironment));
 
   uint texspec = 0;
   int tx_uv_i1 = 0;
@@ -866,7 +866,6 @@ bool csTextSyntaxService::ParsePoly3d (
     {
       ::ReportError (reporter, "crystalspace.syntax.polygon",
         "Expected parameters instead of '%s'!", buf);
-      te->DecRef ();
       return false;
     }
     switch (cmd)
@@ -878,7 +877,6 @@ bool csTextSyntaxService::ParsePoly3d (
         {
           ::ReportError (reporter, "crystalspace.syntax.polygon",
             "Couldn't find material named '%s'!", str);
-          te->DecRef ();
           return false;
         }
         poly3d->SetMaterial (mat);
@@ -962,7 +960,6 @@ bool csTextSyntaxService::ParsePoly3d (
 	  }
 	  else
 	  {
-	    te->DecRef ();
 	    return false;
 	  }
         }
@@ -987,7 +984,6 @@ bool csTextSyntaxService::ParsePoly3d (
 			   tx_uv_i3, tx_uv3,
 			   plane_name, poly3d->QueryObject ()->GetName ()))
 	{
-	  te->DecRef ();
 	  return false;
 	}
         break;
@@ -1071,7 +1067,6 @@ bool csTextSyntaxService::ParsePoly3d (
               poly3d->SetTextureType (shading);
 	  else
 	  {
-	    te->DecRef ();
 	    return false;
 	  }
 	}
@@ -1092,7 +1087,7 @@ bool csTextSyntaxService::ParsePoly3d (
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
 	  iPolyTexType* ptt = poly3d->GetPolyTexType ();
-	  iPolyTexFlat* fs = SCF_QUERY_INTERFACE (ptt, iPolyTexFlat);
+	  csRef<iPolyTexFlat> fs (SCF_QUERY_INTERFACE (ptt, iPolyTexFlat));
           int num, nv = poly3d->GetVertexCount ();
 	  fs->Setup (poly3d);
           float list [2 * 100];
@@ -1101,14 +1096,14 @@ bool csTextSyntaxService::ParsePoly3d (
 	    num = nv;
           for (int i = 0; i < num; i++)
             fs->SetUV (i, list [i * 2], list [i * 2 + 1]);
-	  fs->DecRef ();
         }
         break;
       case CS_TOKEN_COLORS:
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
 	  iPolyTexType* ptt = poly3d->GetPolyTexType ();
-	  iPolyTexGouraud* gs = SCF_QUERY_INTERFACE (ptt, iPolyTexGouraud);
+	  csRef<iPolyTexGouraud> gs (
+	  	SCF_QUERY_INTERFACE (ptt, iPolyTexGouraud));
           int num, nv = poly3d->GetVertexCount ();
 	  gs->Setup (poly3d);
           float list [3 * 100];
@@ -1118,14 +1113,13 @@ bool csTextSyntaxService::ParsePoly3d (
           for (int i = 0; i < num; i++)
             gs->SetColor (i, csColor (list [i * 3], list [i * 3 + 1],
 				      list [i * 3 + 2]));
-	  gs->DecRef ();
         }
         break;
       case CS_TOKEN_UVA:
         {
           poly3d->SetTextureType (POLYTXT_GOURAUD);
 	  iPolyTexType* ptt = poly3d->GetPolyTexType ();
-	  iPolyTexFlat* fs = SCF_QUERY_INTERFACE (ptt, iPolyTexFlat);
+	  csRef<iPolyTexFlat> fs (SCF_QUERY_INTERFACE (ptt, iPolyTexFlat));
           int num, nv = poly3d->GetVertexCount ();
 	  fs->Setup (poly3d);
           float list [3 * 100];
@@ -1138,7 +1132,6 @@ bool csTextSyntaxService::ParsePoly3d (
             fs->SetUV (i, cos (a) * list [i * 3 + 1] + list [i * 3 + 2],
                           sin (a) * list [i * 3 + 1] + list [i * 3 + 2]);
           }
-	  fs->DecRef ();
         }
         break;
     }
@@ -1148,7 +1141,6 @@ bool csTextSyntaxService::ParsePoly3d (
     ::ReportError (reporter, "crystalspace.syntax.polygon",
       "Token '%s' not found while parsing a polygon ('%s')!",
       parser->GetLastOffender (), poly3d->QueryObject()->GetName());
-    te->DecRef ();
     return false;
   }
 
@@ -1158,7 +1150,6 @@ bool csTextSyntaxService::ParsePoly3d (
       "Polygon '%s' in line %d contains just %d vertices!",
       poly3d->QueryObject()->GetName(), parser->GetParserLine (),
       poly3d->GetVertexCount ());
-    te->DecRef ();
     return false;
   }
 
@@ -1282,7 +1273,7 @@ bool csTextSyntaxService::ParsePoly3d (
   if (texspec & CSTEX_UV_SHIFT)
   {
     iPolyTexType* ptt = poly3d->GetPolyTexType ();
-    iPolyTexLightMap* plm = SCF_QUERY_INTERFACE (ptt, iPolyTexLightMap);
+    csRef<iPolyTexLightMap> plm (SCF_QUERY_INTERFACE (ptt, iPolyTexLightMap));
     if (plm)
     {
       plm->GetPolyTxtPlane ()->GetTextureSpace (tx_matrix, tx_vector);
@@ -1293,7 +1284,6 @@ bool csTextSyntaxService::ParsePoly3d (
       csVector3 shift (uv_shift.x, uv_shift.y, 0);
       tx_vector -= tx_matrix.GetInverse () * shift;
       poly3d->SetTextureSpace (tx_matrix, tx_vector);
-      plm->DecRef ();
     }
   }
 
@@ -1303,7 +1293,6 @@ bool csTextSyntaxService::ParsePoly3d (
 
   OptimizePolygon (poly3d);
 
-  te->DecRef ();
   return true;
 }
 
@@ -1878,14 +1867,14 @@ bool csTextSyntaxService::ParsePoly3d (
 
   if (!thing_type)
   {
-    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    csRef<iPluginManager> plugin_mgr (
+    	CS_QUERY_REGISTRY (object_reg, iPluginManager));
     CS_ASSERT (plugin_mgr != NULL);
     thing_type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
   	  "crystalspace.mesh.object.thing", iMeshObjectType);
     if (!thing_type)
       thing_type = CS_LOAD_PLUGIN (plugin_mgr,
     	  "crystalspace.mesh.object.thing", iMeshObjectType);
-    plugin_mgr->DecRef ();
   }
 
   CS_ASSERT (thing_type != NULL);

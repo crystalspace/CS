@@ -412,11 +412,13 @@ static bool process_file (const char *fname)
   else
     fmt = CS_IMGFMT_ANY;
 
-  csRef<iImage> ifile (ImageLoader->Load (buffer, fsize, fmt | CS_IMGFMT_ALPHA));
+  csRef<iImage> ifile (
+  	ImageLoader->Load (buffer, fsize, fmt | CS_IMGFMT_ALPHA));
   delete [] buffer;
   if (!ifile)
   {
-    printf ("%s: failed to recognise image format for %s\n", programname, fname);
+    printf ("%s: failed to recognise image format for %s\n",
+    	programname, fname);
     return false;
   }
 
@@ -469,8 +471,8 @@ static bool process_file (const char *fname)
   if (opt.sharpen)
   {
     printf ("Sharpening image with strength %d\n", opt.sharpen);
-    iImage *ifile2 = ifile->Sharpen (opt.transp ? &transpcolor : NULL, opt.sharpen);
-    ifile->DecRef ();
+    iImage *ifile2 = csPtr<iImage> (
+    	ifile->Sharpen (opt.transp ? &transpcolor : NULL, opt.sharpen));
     ifile = ifile2;
   }
 
@@ -492,7 +494,6 @@ static bool process_file (const char *fname)
   }
 
   // Destroy the image object
-  ifile->DecRef ();
 
   return success;
 }

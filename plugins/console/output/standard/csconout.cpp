@@ -90,12 +90,9 @@ csConsoleOutput::~csConsoleOutput ()
 {
   if (scfiEventHandler)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
     if (q != 0)
-    {
       q->RemoveListener (scfiEventHandler);
-      q->DecRef ();
-    }
     scfiEventHandler->DecRef ();
   }
   if (font)
@@ -129,12 +126,9 @@ bool csConsoleOutput::Initialize (iObjectRegistry *object_reg)
   // We want to see broadcast events
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-  {
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
-    q->DecRef ();
-  }
   return true;
 }
 

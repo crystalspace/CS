@@ -554,10 +554,9 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   console_window = false;
 #endif
 
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (r, iCommandLineParser);
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (r, iCommandLineParser));
   if (cmdline->GetOption ("console")) console_window = true;
   if (cmdline->GetOption ("noconsole")) console_window = false;
-  cmdline->DecRef ();
 
   if (!console_window)
     DisableConsole ();
@@ -607,10 +606,9 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
 
   m_hCursor = LoadCursor (0, IDC_ARROW);
 
-  iEventQueue* q = CS_QUERY_REGISTRY (registry, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY (registry, iEventQueue));
   CS_ASSERT (q != NULL);
   q->RegisterListener (this, CSMASK_Nothing | CSMASK_Broadcast);
-  q->DecRef ();
 }
 
 Win32Assistant::~Win32Assistant ()
@@ -623,12 +621,9 @@ Win32Assistant::~Win32Assistant ()
 
 void Win32Assistant::Shutdown()
 {
-  iEventQueue* q = CS_QUERY_REGISTRY (registry, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY (registry, iEventQueue));
   if (q != 0)
-  {
     q->RemoveListener(this);
-    q->DecRef ();
-  }
 }
 
 void Win32Assistant::SetWinCursor (HCURSOR cur)
@@ -646,12 +641,9 @@ iEventOutlet* Win32Assistant::GetEventOutlet()
 {
   if (EventOutlet == 0)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY(registry, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY(registry, iEventQueue));
     if (q != 0)
-    {
       EventOutlet = q->CreateEventOutlet(this);
-      q->DecRef ();
-    }
   }
   return EventOutlet;
 }

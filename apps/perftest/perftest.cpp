@@ -73,12 +73,9 @@ void PerfTest::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (System->object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.application.perftest", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);
@@ -236,8 +233,8 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
   txtmgr->SetPalette ();
 
   const char *val;
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser));
   val = cmdline->GetOption ("2d");
   if (val)
   {
@@ -250,7 +247,6 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
   val = cmdline->GetOption ("3d");
   if (val)
     draw_2d = false;
-  cmdline->DecRef ();
 
   needs_setup = true;
 
@@ -305,12 +301,9 @@ void PerfTest::SetupFrame ()
 	}
 	else
 	{
-	  iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+	  csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
 	  if (q)
-	  {
 	    q->GetEventOutlet()->Broadcast (cscmdQuit);
-	    q->DecRef ();
-	  }
         }
       }
     }
@@ -320,12 +313,10 @@ void PerfTest::SetupFrame ()
   if (needs_setup)
   {
     if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-    iConsoleOutput *Console = CS_QUERY_REGISTRY (object_reg, iConsoleOutput);
+    csRef<iConsoleOutput> Console (
+    	CS_QUERY_REGISTRY (object_reg, iConsoleOutput));
     if (Console)
-    {
       Console->Clear ();
-      Console->DecRef ();
-    }
     last_time = current_time;
     char desc[255];
     current_tester->Description (desc);
@@ -344,12 +335,9 @@ bool PerfTest::HandleEvent (iEvent &Event)
 {
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-    {
       q->GetEventOutlet()->Broadcast (cscmdQuit);
-      q->DecRef ();
-    }
     return true;
   }
   else if ((Event.Type == csevKeyDown) && (Event.Key.Code == ' '))

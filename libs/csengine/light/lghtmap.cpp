@@ -119,9 +119,8 @@ csShadowMap *csLightMap::NewShadowMap (csLight *light, int w, int h)
 
   smap->Alloc (&light->scfiLight, w, h);
 
-  iStatLight *slight = SCF_QUERY_INTERFACE (light, iStatLight);
+  csRef<iStatLight> slight (SCF_QUERY_INTERFACE (light, iStatLight));
   slight->GetPrivateObject ()->RegisterLightMap (this);
-  slight->DecRef ();
 
   return smap;
 }
@@ -425,7 +424,7 @@ void csLightMap::Cache (
   //-------------------------------
   // Write the normal lightmap data.
   //-------------------------------
-  csMemFile* cf = new csMemFile ();
+  csRef<csMemFile> cf (csPtr<csMemFile> (new csMemFile ()));
 
   cf->Write (ps.header, 4);
   s = ps.x1;
@@ -459,12 +458,8 @@ void csLightMap::Cache (
   if (!cache_mgr->CacheData ((void*)(cf->GetData ()), cf->GetSize (),
   	type, NULL, uid))
   {
-    cf->DecRef ();
     return;
   }
-
-  // Close the file.
-  cf->DecRef ();
 
   //-------------------------------
   // Write the dynamic data.
@@ -488,7 +483,7 @@ void csLightMap::Cache (
       type = "lmpol_d";
     else
       type = "lmcur_d";
-    cf = new csMemFile ();
+    cf = csPtr<csMemFile> (new csMemFile ());
 
     cf->Write (lh.header, 4);
     l = convert_endian (lh.dyn_cnt);
@@ -510,10 +505,8 @@ void csLightMap::Cache (
     if (!cache_mgr->CacheData ((void*)(cf->GetData ()), cf->GetSize (),
     	type, NULL, uid))
     {
-      cf->DecRef ();
       return;
     }
-    cf->DecRef ();
   }
 }
 

@@ -68,12 +68,9 @@ void csFancyConsole::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.console.output.fancy", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);
@@ -95,12 +92,9 @@ csFancyConsole::~csFancyConsole ()
 {
   if (scfiEventHandler)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-    {
       q->RemoveListener (scfiEventHandler);
-      q->DecRef ();
-    }
     scfiEventHandler->DecRef ();
   }
   if (ImageLoader)
@@ -126,9 +120,9 @@ bool csFancyConsole::Initialize (iObjectRegistry *object_reg)
   csConfigAccess ini(object_reg, "/config/fancycon.cfg");
   char const* baseclass = ini->GetStr("FancyConsole.General.Superclass",
     "crystalspace.console.output.standard");
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   base = CS_LOAD_PLUGIN (plugin_mgr, baseclass, iConsoleOutput);
-  plugin_mgr->DecRef ();
   if (!base)
     return false;
 
@@ -143,12 +137,9 @@ bool csFancyConsole::Initialize (iObjectRegistry *object_reg)
   // Tell event queue that we want to handle broadcast events
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-  {
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
-    q->DecRef ();
-  }
 
   int x, y, w, h;
   base->PerformExtension("GetPos", &x, &y, &w, &h);
@@ -503,13 +494,12 @@ void csFancyConsole::PrepPix (iConfigFile *ini, const char *sect,
   {
     size_t len = 0;
     char *data = NULL;
-    iFile *F = VFS->Open (pix, VFS_FILE_READ);
+    csRef<iFile> F (VFS->Open (pix, VFS_FILE_READ));
     if (F)
     {
       len = F->GetSize ();
       data = new char [len];
       if (data) len = F->Read (data, len);
-      F->DecRef ();
     }
     if (len)
     {

@@ -89,12 +89,9 @@ void PySimple::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (System->object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.application.pysimple", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);
@@ -254,12 +251,13 @@ bool PySimple::Initialize (int argc, const char* const argv[],
     return 0;
   }
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   if(testpython)
   {
     // Initialize the python plugin.
-    iScript* is = CS_LOAD_PLUGIN (plugin_mgr,
-      "crystalspace.script.python", iScript);
+    csRef<iScript> is (CS_LOAD_PLUGIN (plugin_mgr,
+      "crystalspace.script.python", iScript));
     if (is)
     {
       // Load a python module (scripts/python/pysimp.py).
@@ -271,32 +269,27 @@ bool PySimple::Initialize (int argc, const char* const argv[],
       // This will create the polygons in the room.
       if (!is->RunText ("pysimp.CreateRoom('stone')"))
         return 0;
-
-      is->DecRef ();
     }
   }
 
   if (testlua)
   {
     //Now try some lua scripting stuff
-    iScript* is = CS_LOAD_PLUGIN (plugin_mgr,
-      "crystalspace.script.lua", iScript);
+    csRef<iScript> is (CS_LOAD_PLUGIN (plugin_mgr,
+      "crystalspace.script.lua", iScript));
     if (is)
     {
       if (!is->LoadModule ("scripts/lua/pysimp.lua"))
         return 0;
       if (!is->RunText ("CreateRoom('stone')"))
         return 0;
-      is->DecRef();
     }
   }
-  plugin_mgr->DecRef ();
 
-  iStatLight* light;
+  csRef<iStatLight> light;
   light = engine->CreateLight (NULL, csVector3 (0, 5, 0), 10,
   	csColor (1, 0, 0), false);
   room->GetLights ()->Add (light->QueryLight ());
-  light->DecRef ();
 
   engine->Prepare ();
 
@@ -357,12 +350,9 @@ bool PySimple::HandleEvent (iEvent &Event)
 {
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-    {
       q->GetEventOutlet()->Broadcast (cscmdQuit);
-      q->DecRef ();
-    }
     return true;
   }
 

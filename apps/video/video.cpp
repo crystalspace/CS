@@ -99,12 +99,9 @@ void Video::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (System->object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.application.video", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);
@@ -249,11 +246,12 @@ bool Video::Initialize (int argc, const char* const argv[],
   LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
-  iMaterialWrapper *iMW = SCF_QUERY_INTERFACE (tm, iMaterialWrapper);
+  csRef<iMaterialWrapper> iMW (SCF_QUERY_INTERFACE (tm, iMaterialWrapper));
 
   room = engine->CreateSector ("room");
-iMeshWrapper *wallmesh = engine->CreateSectorWallsMesh (room, "walls");
-  iThingState* walls = SCF_QUERY_INTERFACE (wallmesh->GetMeshObject (), iThingState);
+  csRef<iMeshWrapper> wallmesh (engine->CreateSectorWallsMesh (room, "walls"));
+  csRef<iThingState> walls (
+  	SCF_QUERY_INTERFACE (wallmesh->GetMeshObject (), iThingState));
 
   csVector3
 	   f1 (-5, 20, 5),
@@ -313,23 +311,16 @@ iMeshWrapper *wallmesh = engine->CreateSectorWallsMesh (room, "walls");
   p->CreateVertex (b4);
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
-  iMW->DecRef ();
-  walls->DecRef ();
-  wallmesh->DecRef ();
-
-  iStatLight* light;
+  csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
   light = engine->CreateLight (NULL, csVector3(-3, 5, 0), 10, csColor(1, 0, 0), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
   light = engine->CreateLight (NULL, csVector3(3, 5, 0), 10, csColor(0, 0, 1), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
   light = engine->CreateLight (NULL, csVector3(0, 5, -3), 10, csColor(0, 1, 0), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
   engine->Prepare ();
 
@@ -354,12 +345,11 @@ iMeshWrapper *wallmesh = engine->CreateSectorWallsMesh (room, "walls");
 
   if (pVideoFormat)
   {
-    iVFS *pVFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+    csRef<iVFS> pVFS (CS_QUERY_REGISTRY (object_reg, iVFS));
     if (pVFS)
     {
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Opening the video file.");
       csRef<iFile> pFile (pVFS->Open ("/this/data/video.avi", VFS_FILE_READ));
-      pVFS->DecRef ();
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Scanning the video file.");
       if (pFile && pVideoFormat->Load (pFile))
       {
@@ -463,12 +453,9 @@ bool Video::HandleEvent (iEvent &Event)
 {
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-    {
       q->GetEventOutlet()->Broadcast (cscmdQuit);
-      q->DecRef ();
-    }
     return true;
   }
 

@@ -83,13 +83,12 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *obj = copy[i];
-      iCollection *o = SCF_QUERY_INTERFACE (obj, iCollection);
+      csRef<iCollection> o (SCF_QUERY_INTERFACE (obj, iCollection));
       if (!o) continue;
 
       engine->GetCollections ()->Remove (o);
       ObjRemove (obj);
       copy[i] = NULL;
-      o->DecRef ();
     }
   }
 
@@ -98,13 +97,12 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *obj = copy[i];
-      iMeshWrapper *o = SCF_QUERY_INTERFACE (obj, iMeshWrapper);
+      csRef<iMeshWrapper> o (SCF_QUERY_INTERFACE (obj, iMeshWrapper));
       if (!o) continue;
 
       engine->GetMeshes ()->Remove (o);
       ObjRemove (obj);
       copy[i] = NULL;
-      o->DecRef ();
     }
   }
 
@@ -113,15 +111,14 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *obj = copy[i];
-      iMeshFactoryWrapper *o = SCF_QUERY_INTERFACE (
+      csRef<iMeshFactoryWrapper> o (SCF_QUERY_INTERFACE (
           obj,
-          iMeshFactoryWrapper);
+          iMeshFactoryWrapper));
       if (!o) continue;
 
       engine->GetMeshFactories ()->Remove (o);
       ObjRemove (obj);
       copy[i] = NULL;
-      o->DecRef ();
     }
   }
 
@@ -130,13 +127,12 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *obj = copy[i];
-      iSector *o = SCF_QUERY_INTERFACE (obj, iSector);
+      csRef<iSector> o (SCF_QUERY_INTERFACE (obj, iSector));
       if (!o) continue;
 
       engine->GetSectors ()->Remove (o);
       ObjRemove (obj);
       copy[i] = NULL;
-      o->DecRef ();
     }
   }
 
@@ -145,13 +141,12 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *obj = copy[i];
-      iMaterialWrapper *o = SCF_QUERY_INTERFACE (obj, iMaterialWrapper);
+      csRef<iMaterialWrapper> o (SCF_QUERY_INTERFACE (obj, iMaterialWrapper));
       if (!o) continue;
 
       engine->GetMaterialList ()->Remove (o);
       ObjRemove (obj);
       copy[i] = NULL;
-      o->DecRef ();
     }
   }
 
@@ -160,13 +155,12 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *obj = copy[i];
-      iTextureWrapper *o = SCF_QUERY_INTERFACE (obj, iTextureWrapper);
+      csRef<iTextureWrapper> o (SCF_QUERY_INTERFACE (obj, iTextureWrapper));
       if (!o) continue;
 
       engine->GetTextureList ()->Remove (o);
       ObjRemove (obj);
       copy[i] = NULL;
-      o->DecRef ();
     }
   }
 
@@ -175,13 +169,12 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *obj = copy[i];
-      iCameraPosition *o = SCF_QUERY_INTERFACE (obj, iCameraPosition);
+      csRef<iCameraPosition> o (SCF_QUERY_INTERFACE (obj, iCameraPosition));
       if (!o) continue;
 
       engine->GetCameraPositions ()->Remove (o);
       ObjRemove (obj);
       copy[i] = NULL;
-      o->DecRef ();
     }
   }
 
@@ -190,18 +183,15 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *obj = copy[i];
-      iCurveTemplate *o = SCF_QUERY_INTERFACE (obj, iCurveTemplate);
+      csRef<iCurveTemplate> o (SCF_QUERY_INTERFACE (obj, iCurveTemplate));
       if (!o) continue;
       ObjRemove (obj);
       copy[i] = NULL;
-      o->DecRef ();
 
-      iThingEnvironment *te = SCF_QUERY_INTERFACE (
+      csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (
           engine->GetThingType (),
-          iThingEnvironment);
+          iThingEnvironment));
       te->RemoveCurveTemplate (o);
-      o->DecRef ();
-      te->DecRef ();
     }
   }
 
@@ -210,17 +200,15 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *obj = copy[i];
-      iPolyTxtPlane *o = SCF_QUERY_INTERFACE (obj, iPolyTxtPlane);
+      csRef<iPolyTxtPlane> o (SCF_QUERY_INTERFACE (obj, iPolyTxtPlane));
       if (!o) continue;
       ObjRemove (obj);
       copy[i] = NULL;
 
-      iThingEnvironment *te = SCF_QUERY_INTERFACE (
+      csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (
           engine->GetThingType (),
-          iThingEnvironment);
+          iThingEnvironment));
       te->RemovePolyTxtPlane (o);
-      o->DecRef ();
-      te->DecRef ();
     }
   }
 

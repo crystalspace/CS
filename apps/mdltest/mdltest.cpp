@@ -72,12 +72,11 @@ void Cleanup ();
 
 void InitializeSprite (iMeshWrapper *SpriteWrapper)
 {
-  iSprite3DState *sprState = SCF_QUERY_INTERFACE (
-  	SpriteWrapper->GetMeshObject (), iSprite3DState);
+  csRef<iSprite3DState> sprState (SCF_QUERY_INTERFACE (
+  	SpriteWrapper->GetMeshObject (), iSprite3DState));
   sprState->SetBaseColor (csColor (1, 1, 1));
   sprState->SetLighting (false);
   sprState->SetAction ("action");
-  sprState->DecRef ();
 
   int i;
   iMeshList* ml = SpriteWrapper->GetChildren ();
@@ -110,12 +109,9 @@ void Simple::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.application.mdltest", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);
@@ -410,7 +406,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
     exit (-1);
   }
 
-  iImageIO *imageio = CS_QUERY_REGISTRY (object_reg, iImageIO);
+  csRef<iImageIO> imageio (CS_QUERY_REGISTRY (object_reg, iImageIO));
   if (!imageio)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No iModelConverter plugin!\n");
@@ -450,26 +446,24 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
   // -------------------------------------------------------------------------
 
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser));
   const char *Filename = cmdline->GetName (0);
-  cmdline->DecRef ();
   iModelData *Model = Filename ? ImportModel (Filename) : CreateDefaultModel ();
 
   csModelDataTools::MergeObjects (Model, true);
 
 //  Model->LoadImages (vfs, imageio, g3d->GetTextureManager ()->GetTextureFormat ());
-  imageio->DecRef ();
 //  Model->RegisterTextures (engine->GetTextureList ());
 //  Model->RegisterMaterials (engine->GetMaterialList ());
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  iMeshObjectType* ThingType = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.thing", iMeshObjectType);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
+  csRef<iMeshObjectType> ThingType (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+  	"crystalspace.mesh.object.thing", iMeshObjectType));
   if (!ThingType)
     ThingType = CS_LOAD_PLUGIN (plugin_mgr,
     	"crystalspace.mesh.object.thing", iMeshObjectType);
-  plugin_mgr->DecRef ();
   if (!ThingType)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "No thing mesh plugin!");
@@ -477,7 +471,6 @@ bool Simple::Initialize (int argc, const char* const argv[],
   }
 
   csRef<iMeshObjectFactory> ThingFactory (ThingType->NewFactory ());
-  ThingType->DecRef ();
 
   csRef<iThingState> fState (
 	SCF_QUERY_INTERFACE (ThingFactory, iThingState));
@@ -535,12 +528,9 @@ bool Simple::HandleEvent (iEvent& Event)
 {
   if (Event.Type == csevKeyDown && Event.Key.Code == CSKEY_ESC)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-    {
       q->GetEventOutlet()->Broadcast (cscmdQuit);
-      q->DecRef ();
-    }
     return true;
   }
 

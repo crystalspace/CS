@@ -44,9 +44,9 @@ private:
   iGraphics3D* g3d;
   iSector* room;
   iView* view;
-  iMeshWrapper *sprite;
+  csRef<iMeshWrapper> sprite;
   csVector3 spritepos;
-	iMeshObjectFactory *imeshfact;
+  iMeshObjectFactory* imeshfact;
 
   csMenu *menu;
   csWindow *dialog;

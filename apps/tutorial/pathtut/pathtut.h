@@ -44,7 +44,7 @@ private:
   iVirtualClock* vc;
   iSector* room;
   iView* view;
-  iMeshWrapper* sprite;
+  csRef<iMeshWrapper> sprite;
   csPath*   m_Path;
   csTicks   m_Duration; //Time for 1 Complete Circle
   csTicks   m_CurrentTime;

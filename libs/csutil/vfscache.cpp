@@ -93,7 +93,7 @@ bool csVfsCacheManager::CacheData (void* data, uint32 size,
   GetVFS ()->ChDir (vfsdir);
   CacheName (buf, type ? type : current_type,
   	scope ? scope : current_scope, id);
-  iFile *cf = GetVFS ()->Open (buf, VFS_FILE_WRITE);
+  csRef<iFile> cf (GetVFS ()->Open (buf, VFS_FILE_WRITE));
   GetVFS ()->PopDir ();
 
   if (!cf)
@@ -105,7 +105,6 @@ bool csVfsCacheManager::CacheData (void* data, uint32 size,
   }
 
   uint32 ws = cf->Write ((const char*)data, size);
-  cf->DecRef ();
   if (ws != size)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,

@@ -164,12 +164,11 @@ static void ExtractObjects (iModelData *Parent, csModelDataObjectVector &vec)
 {
   while (1)
   {
-    iModelDataObject *obj = CS_GET_CHILD_OBJECT ((Parent->QueryObject ()),
-      iModelDataObject);
+    csRef<iModelDataObject> obj (CS_GET_CHILD_OBJECT ((Parent->QueryObject ()),
+      iModelDataObject));
     if (!obj) break;
     vec.Push (obj);
     Parent->QueryObject ()->ObjRemove (obj->QueryObject ());
-    obj->DecRef ();
   }
 }
 
@@ -231,15 +230,14 @@ static iModelDataAction *MergeAction (iModelDataAction *In1,
   int i;
   for (i=0; i<In1->GetFrameCount (); i++)
   {
-    iModelDataVertices *ver = SCF_QUERY_INTERFACE (In1->GetState (i),
-      iModelDataVertices);
+    csRef<iModelDataVertices> ver (SCF_QUERY_INTERFACE (In1->GetState (i),
+      iModelDataVertices));
     if (ver)
     {
       iModelDataVertices *NewVertices = Swap ?
         new csModelDataVertices (In2, ver) : new csModelDataVertices (ver, In2);
       Out->AddFrame (In1->GetTime (i), NewVertices->QueryObject ());
       NewVertices->DecRef ();
-      ver->DecRef ();
     }
   }
   return Out;
@@ -588,13 +586,13 @@ void csModelDataTools::CopyVerticesMapped (iModelDataObject *dest,
 	int i;
     for (i=0; i<OldAction->GetFrameCount (); i++)
     {
-      iModelDataVertices *oldver = SCF_QUERY_INTERFACE (OldAction->GetState (i),
-        iModelDataVertices);
+      csRef<iModelDataVertices> oldver (
+      	SCF_QUERY_INTERFACE (OldAction->GetState (i),
+        iModelDataVertices));
       if (oldver)
       {
         ver = BuildMappedVertexFrame (oldver, Map);
 	NewAction->AddFrame (OldAction->GetTime (i), ver->QueryObject ());
-        oldver->DecRef ();
 	ver->DecRef ();
       }
     }
@@ -939,13 +937,10 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
     {
       for (i=0; i<Action->GetFrameCount (); i++)
       {
-        iModelDataVertices *ver =
-	  SCF_QUERY_INTERFACE (Action->GetState (i), iModelDataVertices);
+        csRef<iModelDataVertices> ver (
+		SCF_QUERY_INTERFACE (Action->GetState (i), iModelDataVertices));
 	if (ver)
-	{
 	  VertexFrames.PushSmart (ver);
-	  ver->DecRef ();
-	}
       }
     }
     it->Next ();

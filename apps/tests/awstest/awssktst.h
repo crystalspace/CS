@@ -8,7 +8,7 @@ class awsTestSink
 {
 
   iAws     *wmgr;
-  iAwsSink *sink;
+  csRef<iAwsSink> sink;
   iString  *user;
   iString  *pass;
 

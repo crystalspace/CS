@@ -71,7 +71,6 @@ PathTut::PathTut ()
   kbd = NULL;
   vc = NULL;
   view = NULL;
-  sprite = NULL;
   m_Path = NULL;
 }
 
@@ -83,7 +82,6 @@ PathTut::~PathTut ()
   if (g3d) g3d->DecRef ();
   if (kbd) kbd->DecRef ();
   if (view) view->DecRef ();
-  if (sprite) sprite->DecRef ();
   if (m_Path) delete m_Path;
   csInitializer::DestroyApplication (object_reg);
 }
@@ -140,12 +138,9 @@ bool PathTut::HandleEvent (iEvent& ev)
   }
   else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-    {
       q->GetEventOutlet()->Broadcast (cscmdQuit);
-      q->DecRef ();
-    }
     return true;
   }
 
@@ -264,9 +259,9 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
-  iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
-  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
-  	iThingState);
+  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
+  csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
+  	iThingState));
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
@@ -316,26 +311,20 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   p->CreateVertex (csVector3 (5, 0, -5));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
-  walls_state->DecRef ();
-  walls->DecRef ();
-
-  iStatLight* light;
+  csRef<iStatLight> light;
   iLightList* ll = room->GetLights ();
 
   light = engine->CreateLight (NULL, csVector3 (-3, 5, 0), 10,
   	csColor (1, 0, 0), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
   light = engine->CreateLight (NULL, csVector3 (3, 5,  0), 10,
   	csColor (0, 0, 1), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
   light = engine->CreateLight (NULL, csVector3 (0, 5, -3), 10,
   	csColor (0, 1, 0), false);
   ll->Add (light->QueryLight ());
-  light->DecRef ();
 
   engine->Prepare ();
 
@@ -360,8 +349,8 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   }
 
   // Load a sprite template from disk.
-  iMeshFactoryWrapper* imeshfact = loader->LoadMeshObjectFactory (
-  	"/lib/std/sprite1");
+  csRef<iMeshFactoryWrapper> imeshfact (loader->LoadMeshObjectFactory (
+  	"/lib/std/sprite1"));
   if (imeshfact == NULL)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -379,11 +368,9 @@ bool PathTut::Initialize (int argc, const char* const argv[])
   	imeshfact, "MySprite", room,
 	csVector3 (-3, 5, 3));
   sprite->GetMovable ()->UpdateMove ();
-  iSprite3DState* spstate = SCF_QUERY_INTERFACE (sprite->GetMeshObject (),
-  	iSprite3DState);
+  csRef<iSprite3DState> spstate (SCF_QUERY_INTERFACE (sprite->GetMeshObject (),
+  	iSprite3DState));
   spstate->SetAction ("default");
-  imeshfact->DecRef ();
-  spstate->DecRef ();
  
   // Initialize the Path to move the sprite around in a ellipse.
   InitializePath ();

@@ -69,12 +69,9 @@ void DemoSky::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (System->object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.application.demosky", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);
@@ -255,8 +252,8 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
 
   /// ball mesh
   const char* classId = "crystalspace.mesh.object.ball";
-  iMeshFactoryWrapper *mesh_fact = engine->CreateMeshFactory(classId,
-    "ballFact");
+  csRef<iMeshFactoryWrapper> mesh_fact (engine->CreateMeshFactory(classId,
+    "ballFact"));
 
   if (!LevelLoader->LoadTexture ("white", "/lib/std/white.gif"))
   {
@@ -277,8 +274,8 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
     CS_ENTITY_NOLIGHTING);
 
   csVector3 meshradius(100.,100.,100.);
-  iBallState *ballstate = SCF_QUERY_INTERFACE( skydome->GetMeshObject(),
-    iBallState);
+  csRef<iBallState> ballstate (SCF_QUERY_INTERFACE( skydome->GetMeshObject(),
+    iBallState));
   ballstate->SetRadius( meshradius.x, meshradius.y, meshradius.z );
   ballstate->SetShift( 0,0,0 );
   //ballstate->SetRimVertices( 12 );
@@ -322,9 +319,6 @@ bool DemoSky::Initialize (int argc, const char* const argv[],
 
   ballstate->PaintSky(skytime, NULL, NULL, NULL, NULL);
 
-  ballstate->DecRef();
-  mesh_fact->DecRef();
-
   engine->Prepare ();
 
   Report (CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------");
@@ -356,10 +350,9 @@ void DemoSky::SetupFrame ()
   float secsperday = 30.;
   skytime += (elapsed_time / ( 1000.0f * secsperday ));
   while(skytime > 1.0f) skytime -= 1.0f;
-  iBallState *ballstate = SCF_QUERY_INTERFACE( skydome->GetMeshObject(),
-    iBallState);
+  csRef<iBallState> ballstate (SCF_QUERY_INTERFACE( skydome->GetMeshObject(),
+    iBallState));
   ballstate->PaintSky(skytime, NULL, NULL, NULL, NULL);
-  ballstate->DecRef();
 
   // Now rotate the camera according to keyboard state
 
@@ -407,12 +400,9 @@ bool DemoSky::HandleEvent (iEvent &Event)
 {
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-    {
       q->GetEventOutlet()->Broadcast (cscmdQuit);
-      q->DecRef ();
-    }
     return true;
   }
 

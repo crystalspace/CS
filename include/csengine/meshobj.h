@@ -189,7 +189,7 @@ protected:
 
 private:
   /// Mesh object corresponding with this csMeshWrapper.
-  iMeshObject* mesh;
+  csRef<iMeshObject> mesh;
 
   /// Children of this object (other instances of iMeshWrapper).
   csMeshMeshList children;
@@ -581,7 +581,7 @@ class csMeshFactoryWrapper : public csObject
 {
 private:
   /// Mesh object factory corresponding with this csMeshFactoryWrapper.
-  iMeshObjectFactory* meshFact;
+  csRef<iMeshObjectFactory> meshFact;
 
   /// Optional parent of this object (can be NULL).
   iMeshFactoryWrapper* parent;

@@ -258,7 +258,7 @@ bool Simple::Initialize (int argc, const char* const argv[])
   // Create the procedural texture and a material for it
   ProcTexture = new csEngineProcTex ();
   // Find the pointer to VFS.
-  iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  csRef<iVFS> VFS (CS_QUERY_REGISTRY (object_reg, iVFS));
   if (!VFS)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -269,20 +269,18 @@ bool Simple::Initialize (int argc, const char* const argv[])
 
   if (!ProcTexture->Initialize (g3d, engine, VFS, loader))
   {
-    VFS->DecRef ();
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simplept",
     	"Could not initialize procedural texture!");
     return false;
   }
-  VFS->DecRef ();
   iTextureWrapper *tw = engine->GetTextureList ()->NewTexture
       (ProcTexture->GetTextureHandle());
   iMaterialWrapper *ProcMat = engine->CreateMaterial ("procmat", tw);
   room = engine->CreateSector ("proctex-room");
-  iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
-  iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
-  	iThingState);
+  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
+  csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
+  	iThingState));
 
   walls_state->CreateVertex (csVector3 (-8, -8, -5));
   walls_state->CreateVertex (csVector3 (-3, -3, +8));
@@ -300,14 +298,10 @@ bool Simple::Initialize (int argc, const char* const argv[])
   CreatePolygon (walls_state, 0, 3, 7, 4, tm);
   CreatePolygon (walls_state, 7, 6, 5, 4, tm);
 
-  walls_state->DecRef ();
-  walls->DecRef ();
-
-  iStatLight* light;
+  csRef<iStatLight> light;
   light = engine->CreateLight (NULL, csVector3 (0, 0, 0), 20,
   	csColor (1, 1, 1), false);
   room->GetLights ()->Add (light->QueryLight ());
-  light->DecRef ();
 
   engine->Prepare ();
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
@@ -328,12 +322,9 @@ bool Simple::HandleEvent (iEvent& Event)
 {
   if (Event.Type == csevKeyDown && Event.Key.Code == CSKEY_ESC)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q)
-    {
       q->GetEventOutlet()->Broadcast (cscmdQuit);
-      q->DecRef ();
-    }
     return true;
   }
 

@@ -83,10 +83,9 @@ void csPortal::SetReferencedObject (iReferencedObject *b)
   }
   else
   {
-    iSector *s = SCF_QUERY_INTERFACE (b, iSector);
+    csRef<iSector> s (SCF_QUERY_INTERFACE (b, iSector));
     CS_ASSERT (s != NULL);
     SetSector (s);
-    s->DecRef ();
   }
 }
 
@@ -102,24 +101,22 @@ void csPortal::SetSector (iSector *s)
     if (sector)
     {
       // First unlink from the previous sector.
-      iReferencedObject *refobj = SCF_QUERY_INTERFACE (
+      csRef<iReferencedObject> refobj (SCF_QUERY_INTERFACE (
           sector,
-          iReferencedObject);
+          iReferencedObject));
       CS_ASSERT (refobj != NULL);
       refobj->RemoveReference (&scfiPortal);
-      refobj->DecRef ();
     }
 
     sector = s;
     if (sector)
     {
       // Link to the new sector.
-      iReferencedObject *refobj = SCF_QUERY_INTERFACE (
+      csRef<iReferencedObject> refobj (SCF_QUERY_INTERFACE (
           sector,
-          iReferencedObject);
+          iReferencedObject));
       CS_ASSERT (refobj != NULL);
       refobj->AddReference (&scfiPortal);
-      refobj->DecRef ();
     }
   }
 }
@@ -394,7 +391,7 @@ void csPortal::CheckFrustum (iFrustumView *lview, int alpha)
   bool copied_frustums = false;
 
   // If true then we have to restore color.
-  iLightingProcessInfo *linfo = NULL;
+  csRef<iLightingProcessInfo> linfo;
   bool restore_color = false;
   csColor old_color;
 
@@ -428,7 +425,6 @@ void csPortal::CheckFrustum (iFrustumView *lview, int alpha)
     if (ud) linfo = SCF_QUERY_INTERFACE (ud, iLightingProcessInfo);
     if (linfo)
     {
-      linfo->DecRef ();
       if (alpha)
       {
         float fr, fg, fb;

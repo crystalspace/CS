@@ -57,51 +57,46 @@ csVideoPreferences::~csVideoPreferences ()
 
 void csVideoPreferences::CleanUp ()
 {
-  iConfigManager* cfgmgr = CS_QUERY_REGISTRY (object_reg, iConfigManager);
+  csRef<iConfigManager> cfgmgr (CS_QUERY_REGISTRY (object_reg, iConfigManager));
 
   if (aws_canvas) { aws_canvas->DecRef (); aws_canvas = NULL; }
   if (imageio)
   {
     object_reg->Unregister (imageio, "iImageIO");
-    iComponent* comp = SCF_QUERY_INTERFACE (imageio, iComponent);
+    csRef<iComponent> comp (SCF_QUERY_INTERFACE (imageio, iComponent));
     plugmgr->UnloadPlugin (comp);
-    comp->DecRef ();
     imageio->DecRef ();
     imageio = NULL;
   }
   if (aws)
   {
     object_reg->Unregister (aws, "iAws");
-    iComponent* comp = SCF_QUERY_INTERFACE (aws, iComponent);
+    csRef<iComponent> comp (SCF_QUERY_INTERFACE (aws, iComponent));
     plugmgr->UnloadPlugin (comp);
-    comp->DecRef ();
     aws->DecRef ();
     aws = NULL;
   }
   if (g3d)
   {
     object_reg->Unregister (g3d, "iGraphics3D");
-    iComponent* comp = SCF_QUERY_INTERFACE (g3d, iComponent);
+    csRef<iComponent> comp (SCF_QUERY_INTERFACE (g3d, iComponent));
     plugmgr->UnloadPlugin (comp);
-    comp->DecRef ();
     g3d->DecRef ();
     g3d = NULL;
   }
   if (g2d)
   {
     object_reg->Unregister (g2d, "iGraphics2D");
-    iComponent* comp = SCF_QUERY_INTERFACE (g2d, iComponent);
+    csRef<iComponent> comp (SCF_QUERY_INTERFACE (g2d, iComponent));
     plugmgr->UnloadPlugin (comp);
-    comp->DecRef ();
     g2d->DecRef ();
     g2d = NULL;
   }
   if (fontserv)
   {
     object_reg->Unregister (fontserv, "iFontServer");
-    iComponent* comp = SCF_QUERY_INTERFACE (fontserv, iComponent);
+    csRef<iComponent> comp (SCF_QUERY_INTERFACE (fontserv, iComponent));
     plugmgr->UnloadPlugin (comp);
-    comp->DecRef ();
     fontserv->DecRef ();
     fontserv = NULL;
   }
@@ -109,36 +104,33 @@ void csVideoPreferences::CleanUp ()
   if (plugmgr) { plugmgr->DecRef (); plugmgr = NULL; }
 
   cfgmgr->FlushRemoved ();
-  cfgmgr->DecRef ();
 }
 
 void csVideoPreferences::SelectMode ()
 {
   CleanUp ();
-  iPluginManager* plugmgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugmgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
 
-  iFontServer* fs = CS_LOAD_PLUGIN (plugmgr, "crystalspace.font.server.default",
-  	iFontServer);
+  csRef<iFontServer> fs (
+  	CS_LOAD_PLUGIN (plugmgr, "crystalspace.font.server.default",
+  	iFontServer));
   object_reg->Register (fs, "iFontServer");
-  fs->DecRef ();
 
   if (mode == 0)
   {
-    iGraphics3D* g;
-    g = CS_LOAD_PLUGIN (plugmgr, "crystalspace.graphics3d.software",
-  	iGraphics3D);
+    csRef<iGraphics3D> g (
+    	CS_LOAD_PLUGIN (plugmgr, "crystalspace.graphics3d.software",
+  	iGraphics3D));
     object_reg->Register (g, "iGraphics3D");
-    g->DecRef ();
   }
   else
   {
-    iGraphics3D* g;
-    g = CS_LOAD_PLUGIN (plugmgr, "crystalspace.graphics3d.opengl",
-  	iGraphics3D);
+    csRef<iGraphics3D> g (
+    	CS_LOAD_PLUGIN (plugmgr, "crystalspace.graphics3d.opengl",
+  	iGraphics3D));
     object_reg->Register (g, "iGraphics3D");
-    g->DecRef ();
   }
-  plugmgr->DecRef ();
 }
 
 bool csVideoPreferences::Setup (iObjectRegistry* object_reg)

@@ -13,6 +13,8 @@ The history order is reversed so that new features are at the top.
 	- Changed iCollideSystem->CreateCollider() to return csPtr.
 	- Removed unittest.h app header. It is not needed.
 	- Fixed unit tester of syntax services.
+	- Removed lots (but far from all) DecRef() calls from entire
+	  CS. Replaced with csRef usage.
 8-Sep-2002
 	- Changed iModelConverter->Load() to return csPtr.
 	- Changed iModelConverter->Save() to return csPtr.

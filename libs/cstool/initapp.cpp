@@ -246,21 +246,19 @@ bool csInitializer::SetupConfigManager (
   iVFS* VFS = CS_QUERY_REGISTRY (r, iVFS);
   if (!VFS)
   {
-    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (r, iPluginManager);
+    csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (r, iPluginManager));
     VFS = (iVFS*)(plugin_mgr->QueryPlugin ("iVFS", VERSION_iVFS));
-    plugin_mgr->DecRef ();
   }
   if (!VFS)
   {
-    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (r, iPluginManager);
+    csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (r, iPluginManager));
     VFS = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.kernel.vfs", iVFS);
-    plugin_mgr->DecRef ();
     if (!VFS)
       return false;
     r->Register (VFS, "iVFS");
   }
 
-  iConfigManager* Config = CS_QUERY_REGISTRY (r, iConfigManager);
+  csRef<iConfigManager> Config (CS_QUERY_REGISTRY (r, iConfigManager));
   iConfigFile* cfg = Config->GetDynamicDomain ();
   Config->SetDomainPriority (cfg, iConfigManager::ConfigPriorityApplication);
 
@@ -269,7 +267,6 @@ bool csInitializer::SetupConfigManager (
     if (!cfg->Load (configName, VFS))
     {
       VFS->DecRef ();
-      Config->DecRef ();
       return false;
     }
   VFS->DecRef ();
@@ -296,7 +293,6 @@ bool csInitializer::SetupConfigManager (
   }
 
   config_done = true;
-  Config->DecRef ();
   return true;
 }
 
@@ -342,11 +338,10 @@ bool csInitializer::SetupEventHandler (
   iObjectRegistry* r, iEventHandler* evhdlr, unsigned int eventmask)
 {
   CS_ASSERT(installed_event_handler == 0);
-  iEventQueue* q = CS_QUERY_REGISTRY (r, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY (r, iEventQueue));
   if (q)
   {
     q->RegisterListener (evhdlr, eventmask);
-    q->DecRef ();
     installed_event_handler = evhdlr;
     return true;
   }
@@ -412,10 +407,9 @@ void csInitializer::DestroyApplication (iObjectRegistry* r)
   csPlatformShutdown (r);
   if (installed_event_handler)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (r, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY (r, iEventQueue));
     CS_ASSERT (q != NULL);
     q->RemoveListener (installed_event_handler);
-    q->DecRef ();
   }
   delete global_sys;
 

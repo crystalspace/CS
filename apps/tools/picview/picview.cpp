@@ -232,11 +232,11 @@ bool PicViewApp::HandleEvent (iEvent &Event)
 
         if (GetTopModalUserdata ())
 	{
-          iMessageBoxData* mbd = SCF_QUERY_INTERFACE (GetTopModalUserdata (),
-		iMessageBoxData);
+          csRef<iMessageBoxData> mbd (
+	  	SCF_QUERY_INTERFACE (GetTopModalUserdata (),
+		iMessageBoxData));
 	  if (mbd)
 	  {
-	    mbd->DecRef ();
 	    delete d;
 	    return true;
 	  }
@@ -331,10 +331,9 @@ int main (int argc, char* argv[])
     return -1;
   }
 
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-  	iCommandLineParser);
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser));
   cmdline->AddOption ("mode", "1024x768");
-  cmdline->DecRef ();
 
   // Check for commandline help.
   if (csCommandLineHelper::CheckHelp (object_reg))
@@ -345,9 +344,8 @@ int main (int argc, char* argv[])
 
   srand (time (NULL));
 
-  iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
   iNativeWindow* nw = g3d->GetDriver2D ()->GetNativeWindow ();
-  g3d->DecRef ();
   if (nw) nw->SetTitle ("Crystal Space Picture Viewer");
 
   if (!csInitializer::OpenApplication (object_reg))

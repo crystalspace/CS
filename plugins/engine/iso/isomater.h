@@ -24,6 +24,7 @@
 #include "csutil/csobject.h"
 #include "csutil/nobjvec.h"
 #include "ivideo/material.h"
+#include "ivideo/texture.h"
 #include "iengine/material.h"
 #include "ivaria/iso.h"
 #include "ivideo/effects/efdef.h"

@@ -57,13 +57,10 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
     {
       for (i=0; i<ac->GetFrameCount (); i++)
       {
-        iModelDataVertices *ver =
-	  SCF_QUERY_INTERFACE (ac->GetState (i), iModelDataVertices);
+        csRef<iModelDataVertices> ver (
+		SCF_QUERY_INTERFACE (ac->GetState (i), iModelDataVertices));
         if (ver)
-	{
 	  Frames.PushSmart (ver);
-	  ver->DecRef ();
-	}
       }
     }
     it1->Next ();
@@ -113,8 +110,8 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
   it1 = Object->QueryObject ()->GetIterator ();
   while (!it1->IsFinished ())
   {
-    iModelDataPolygon *poly =
-      SCF_QUERY_INTERFACE (it1->GetObject (), iModelDataPolygon);
+    csRef<iModelDataPolygon> poly (
+    	SCF_QUERY_INTERFACE (it1->GetObject (), iModelDataPolygon));
     if (poly)
     {
       // build the vertex array
@@ -129,8 +126,6 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
       // store the material if we don't have any yet
       if (!Material && poly->GetMaterial ())
         Material = poly->GetMaterial ();
-
-      poly->DecRef ();
     }
     it1->Next ();
   }

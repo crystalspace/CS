@@ -1546,12 +1546,11 @@ csPtr<iDataBuffer> csVFS::ReadFile (const char *FileName)
 
 bool csVFS::WriteFile (const char *FileName, const char *Data, size_t Size)
 {
-  iFile *F = Open (FileName, VFS_FILE_WRITE);
+  csRef<iFile> F (Open (FileName, VFS_FILE_WRITE));
   if (!F)
     return false;
 
   bool success = (F->Write (Data, Size) == Size);
-  F->DecRef ();
   return success;
 }
 

@@ -356,14 +356,11 @@ void csStatLight::CalculateLighting (iMeshWrapper *th)
   // @@@ Engine should not know about iThingState!!!
   if (th)
   {
-    iThingState *thing_state = SCF_QUERY_INTERFACE (
+    csRef<iThingState> thing_state (SCF_QUERY_INTERFACE (
         th->GetMeshObject (),
-        iThingState);
+        iThingState));
     if (thing_state)
-    {
       thing_state->CheckFrustum ((iFrustumView *) &lview, th->GetMovable ());
-      thing_state->DecRef ();
-    }
   }
 
   lptq->UpdateMaps (this, GetCenter (), GetColor ());

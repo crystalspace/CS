@@ -47,7 +47,6 @@ csMaterial::csMaterial () :
 }
 
 csMaterial::csMaterial (iTextureWrapper *w) :
-  texture(w),
   num_texture_layers(0),
   diffuse(CS_DEFMAT_DIFFUSE),
   ambient(CS_DEFMAT_AMBIENT),
@@ -56,23 +55,16 @@ csMaterial::csMaterial (iTextureWrapper *w) :
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMaterialEngine);
+  texture = w;
   flat_color.Set (255, 255, 255); // Default state is white, flat-shaded.
-  if (texture) texture->IncRef ();
 }
 
 csMaterial::~csMaterial ()
 {
-  if (texture) texture->DecRef ();
-
-  int i;
-  for (i = 0; i < num_texture_layers; i++)
-    if (texture_layer_wrappers[i]) texture_layer_wrappers[i]->DecRef ();
 }
 
 void csMaterial::SetTextureWrapper (iTextureWrapper *tex)
 {
-  if (tex) tex->IncRef ();
-  if (texture) texture->DecRef ();
   texture = tex;
 }
 

@@ -164,11 +164,10 @@ void csSector::PrepareMesh (iMeshWrapper *mesh)
 
   if (culler)
   {
-    iVisibilityObject *vo = SCF_QUERY_INTERFACE (
+    csRef<iVisibilityObject> vo (SCF_QUERY_INTERFACE (
         mesh,
-        iVisibilityObject);
+        iVisibilityObject));
     culler->RegisterVisObject (vo);
-    vo->DecRef ();
   }
 }
 
@@ -178,11 +177,10 @@ void csSector::UnprepareMesh (iMeshWrapper *mesh)
 
   if (culler)
   {
-    iVisibilityObject *vo = SCF_QUERY_INTERFACE (
+    csRef<iVisibilityObject> vo (SCF_QUERY_INTERFACE (
         mesh,
-        iVisibilityObject);
+        iVisibilityObject));
     culler->UnregisterVisObject (vo);
-    vo->DecRef ();
   }
 }
 
@@ -226,9 +224,8 @@ bool csSector::UseCuller (const char *meshname)
     iMeshWrapper *th = meshes.Get (i);
     th->GetMovable ()->UpdateMove ();
 
-    iVisibilityObject *vo = SCF_QUERY_INTERFACE (th, iVisibilityObject);
+    csRef<iVisibilityObject> vo (SCF_QUERY_INTERFACE (th, iVisibilityObject));
     culler->RegisterVisObject (vo);
-    vo->DecRef ();
   }
   return true;
 }
@@ -244,10 +241,9 @@ bool csSector::UseCullerPlugin (const char *plugname)
   culler_mesh = NULL;
 
   // Load the culler plugin.
-  iPluginManager* plugmgr = CS_QUERY_REGISTRY (csEngine::object_reg,
-  	iPluginManager);
+  csRef<iPluginManager> plugmgr (CS_QUERY_REGISTRY (csEngine::object_reg,
+  	iPluginManager));
   culler = CS_LOAD_PLUGIN (plugmgr, plugname, iVisibilityCuller);
-  plugmgr->DecRef ();
 
   if (!culler)
   {
@@ -266,9 +262,8 @@ bool csSector::UseCullerPlugin (const char *plugname)
     iMeshWrapper *th = meshes.Get (i);
     th->GetMovable ()->UpdateMove ();
 
-    iVisibilityObject *vo = SCF_QUERY_INTERFACE (th, iVisibilityObject);
+    csRef<iVisibilityObject> vo (SCF_QUERY_INTERFACE (th, iVisibilityObject));
     culler->RegisterVisObject (vo);
-    vo->DecRef ();
   }
   return true;
 }
@@ -409,9 +404,9 @@ csPolygon3D *csSector::IntersectSegment (
     if (mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE)) continue;
 
     // @@@ UGLY!!!
-    iThingState *ith = SCF_QUERY_INTERFACE (
+    csRef<iThingState> ith (SCF_QUERY_INTERFACE (
         mesh->GetMeshObject (),
-        iThingState);
+        iThingState));
     if (ith)
     {
       csThing *sp = (csThing *) (ith->GetPrivateObject ());
@@ -448,8 +443,6 @@ csPolygon3D *csSector::IntersectSegment (
         isect = cur_isect;
         if (p_mesh) *p_mesh = mesh->GetPrivateObject ();
       }
-
-      ith->DecRef ();
     }
   }
 

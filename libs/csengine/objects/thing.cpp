@@ -228,7 +228,7 @@ void csThing::GenerateCacheName ()
 
   if (logparent)
   {
-    iMeshWrapper* mw = SCF_QUERY_INTERFACE (logparent, iMeshWrapper);
+    csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (logparent, iMeshWrapper));
     if (mw)
     {
       if (mw->QueryObject ()->GetName ())
@@ -238,7 +238,6 @@ void csThing::GenerateCacheName ()
       if (sect && sect->QueryObject ()->GetName ())
         mf.Write (sect->QueryObject ()->GetName (),
 		strlen (sect->QueryObject ()->GetName ()));
-      mw->DecRef ();
     }
   }
   
@@ -1201,12 +1200,11 @@ static void *IntersectSegmentTestPol (
     {
       csBspPolygon *bsppol = (csBspPolygon *)polygon[i];
       csVisObjInfo *obj = bsppol->GetOriginator ();
-      iMeshWrapper *mesh = SCF_QUERY_INTERFACE (
+      csRef<iMeshWrapper> mesh (SCF_QUERY_INTERFACE (
           obj->visobj,
-          iMeshWrapper);
+          iMeshWrapper));
       if (mesh)
       {
-        mesh->DecRef ();
         if (mesh->GetMeshObject () == &(thing->scfiMeshObject)) continue;
         if (
           bsppol->IntersectSegment (
@@ -1215,14 +1213,13 @@ static void *IntersectSegmentTestPol (
               idata->isect,
               NULL))
         {
-          iThingState *thing = SCF_QUERY_INTERFACE (
+          csRef<iThingState> thing (SCF_QUERY_INTERFACE (
               mesh->GetMeshObject (),
-              iThingState);
+              iThingState));
           if (thing)
           {
             //@@@@@@ UGLY!
             csThing *th = (csThing *) (thing->GetPrivateObject ());
-            thing->DecRef ();
 
             csPolygon3D *p = th->IntersectSegment (
                 idata->seg.Start (),
@@ -3247,8 +3244,7 @@ void csThing::RegisterVisObject (iVisibilityObject *visobj)
   csVisObjInfo *vinf = new csVisObjInfo ();
   vinf->visobj = visobj;
 
-  iShadowCaster *shadcast = SCF_QUERY_INTERFACE (visobj, iShadowCaster);
-  if (shadcast) shadcast->DecRef ();
+  csRef<iShadowCaster> shadcast (SCF_QUERY_INTERFACE (visobj, iShadowCaster));
   vinf->shadcast = shadcast;
   vinf->bbox = new csPolyTreeBBox ();
 
@@ -3338,8 +3334,7 @@ bool csThing::VisTest (iRenderView *irview)
 
       iVisibilityObject *vo = vinf->visobj;
 
-      iMeshWrapper *mw = SCF_QUERY_INTERFACE (vo, iMeshWrapper);
-      mw->DecRef ();
+      csRef<iMeshWrapper> mw (SCF_QUERY_INTERFACE (vo, iMeshWrapper));
       if (mw->GetMeshObject () == &scfiMeshObject)
       {
         // If the object represents the object of the culler then
@@ -3531,16 +3526,15 @@ static void *CheckFrustumPolygonsFB (
 
       // @@@ The code below is all not very nice. We should not assume
       // that only meshes can be used in vis info.
-      iMeshWrapper *mesh = SCF_QUERY_INTERFACE (
+      csRef<iMeshWrapper> mesh (SCF_QUERY_INTERFACE (
           obj->visobj,
-          iMeshWrapper);
+          iMeshWrapper));
       if (mesh)
       {
-        mesh->DecRef ();
         if (!fdata->visible_things.In (mesh))
         {
-          iShadowCaster *shadcast = SCF_QUERY_INTERFACE (
-              mesh->GetMeshObject (), iShadowCaster);
+          csRef<iShadowCaster> shadcast (SCF_QUERY_INTERFACE (
+              mesh->GetMeshObject (), iShadowCaster));
           if (shadcast)
           {
             csPolyIndexed &pi = bsppol->GetPolygon ();
@@ -3567,8 +3561,6 @@ static void *CheckFrustumPolygonsFB (
 
               fdata->visible_things.AddNoTest (mesh);
             }
-
-            shadcast->DecRef ();
           }
         }
       }
@@ -3761,15 +3753,14 @@ void csThing::CastShadows (iFrustumView *fview)
     // Only if the thing has right flags do we consider it for shadows.
     if (fview->CheckProcessMask (mesh->GetFlags ().Get ()))
     {
-      iShadowReceiver *shadrcv = SCF_QUERY_INTERFACE (
+      csRef<iShadowReceiver> shadrcv (SCF_QUERY_INTERFACE (
         mesh->GetMeshObject (),
-        iShadowReceiver);
+        iShadowReceiver));
       if (shadrcv)
       {
         // Skip doing lighting for the thing containing the culler itself.
         if (shadrcv != &(scfiShadowReceiver))
           shadrcv->CastShadows (mesh->GetMovable (), fview);
-        shadrcv->DecRef ();
       }
     }
   }
@@ -3954,9 +3945,8 @@ void csThing::MergeTemplate (
   curves_scale = tpl->GetCurvesScale ();
 
   //@@@ TEMPORARY
-  iThingState *ith = SCF_QUERY_INTERFACE (tpl, iThingState);
+  csRef<iThingState> ith (SCF_QUERY_INTERFACE (tpl, iThingState));
   ParentTemplate = (csThing *) (ith->GetPrivateObject ());
-  ith->DecRef ();
 
   merge_vertices = new int[tpl->GetVertexCount () + 1];
   for (i = 0; i < tpl->GetVertexCount (); i++)
@@ -4256,8 +4246,7 @@ void csThingObjectType::RemoveCurveTemplate (iCurveTemplate *ct)
   for (i = 0; i < curve_templates.Length (); i++)
   {
     csCurveTemplate *cti = (csCurveTemplate *)curve_templates[i];
-    iCurveTemplate *i_cti = SCF_QUERY_INTERFACE (cti, iCurveTemplate);
-    i_cti->DecRef ();
+    csRef<iCurveTemplate> i_cti (SCF_QUERY_INTERFACE (cti, iCurveTemplate));
     if (ct == i_cti)
     {
       curve_templates.Delete (i);

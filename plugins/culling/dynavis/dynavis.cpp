@@ -140,12 +140,11 @@ bool csDynaVis::Initialize (iObjectRegistry *object_reg)
   delete covbuf; covbuf = NULL;
   delete tcovbuf; tcovbuf = NULL;
 
-  iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
   if (g3d)
   {
     scr_width = g3d->GetWidth ();
     scr_height = g3d->GetHeight ();
-    g3d->DecRef ();
   }
   else
   {
@@ -277,14 +276,13 @@ static bool PrintObjects (csKDTree* treenode, void*, uint32)
   {
     csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
     	objects[i]->GetObject ();
-    iObject* iobj = SCF_QUERY_INTERFACE (visobj_wrap->visobj, iObject);
+    csRef<iObject> iobj (SCF_QUERY_INTERFACE (visobj_wrap->visobj, iObject));
     if (iobj)
     {
       char name[255];
       if (iobj->GetName ()) sprintf (name, "'%s'", iobj->GetName ());
       else strcpy (name, "<noname>");
       printf ("%s ", name);
-      iobj->DecRef ();
     }
   }
   return true;
@@ -443,12 +441,11 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
 
   if (do_state_dump)
   {
-    iObject* iobj = SCF_QUERY_INTERFACE (visobj, iObject);
+    csRef<iObject> iobj (SCF_QUERY_INTERFACE (visobj, iObject));
     if (iobj)
     {
       printf ("CovIns of object %s\n", iobj->GetName () ? iobj->GetName () :
       	"<noname>");
-      iobj->DecRef ();
     }
   }
 
@@ -569,13 +566,12 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
 
   if (do_state_dump)
   {
-    iObject* iobj = SCF_QUERY_INTERFACE (visobj, iObject);
+    csRef<iObject> iobj (SCF_QUERY_INTERFACE (visobj, iObject));
     if (iobj)
     {
       printf ("CovOutIns of object %s (max_depth=%g)\n",
       	iobj->GetName () ? iobj->GetName () : "<noname>",
 	max_depth);
-      iobj->DecRef ();
     }
     printf ("  campos_obj=%g,%g,%g\n",
     	campos_object.x, campos_object.y, campos_object.z);
@@ -648,13 +644,12 @@ void csDynaVis::AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
       write_queue->Append (box, max_depth, obj);
       if (do_state_dump)
       {
-        iObject* iobj = SCF_QUERY_INTERFACE (visobj, iObject);
+        csRef<iObject> iobj (SCF_QUERY_INTERFACE (visobj, iObject));
         if (iobj)
         {
           printf ("AppendWriteQueue of object %s (max_depth=%g)\n",
       	    iobj->GetName () ? iobj->GetName () : "<noname>",
 	    max_depth);
-          iobj->DecRef ();
         }
       }
     }
@@ -821,7 +816,7 @@ end:
   if (do_state_dump)
   {
     const csBox3& obj_bbox = obj->child->GetBBox ();
-    iObject* iobj = SCF_QUERY_INTERFACE (obj->visobj, iObject);
+    csRef<iObject> iobj (SCF_QUERY_INTERFACE (obj->visobj, iObject));
     printf ("Obj (%g,%g,%g)-(%g,%g,%g) (%s) %s\n",
     	obj_bbox.MinX (), obj_bbox.MinY (), obj_bbox.MinZ (),
     	obj_bbox.MaxX (), obj_bbox.MaxY (), obj_bbox.MaxZ (),
@@ -833,7 +828,6 @@ end:
 	hist->reason == VISIBLE ? "visible" :
 	"?"
 	);
-    if (iobj) iobj->DecRef ();
     if (hist->reason != INVISIBLE_FRUSTUM && hist->reason != VISIBLE_INSIDE
     	&& hist->reason != VISIBLE_HISTORY)
     {
@@ -1187,14 +1181,14 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
       if (csIntersect3::BoxSegment (obj_bbox, data->seg, box_isect) != -1)
       {
         // This object is possibly intersected by this beam.
-	iMeshWrapper* mesh = SCF_QUERY_INTERFACE (visobj_wrap->visobj,
-		iMeshWrapper);
+	csRef<iMeshWrapper> mesh (SCF_QUERY_INTERFACE (visobj_wrap->visobj,
+		iMeshWrapper));
 	if (mesh)
 	{
 	  if (!mesh->GetFlags ().Check (CS_ENTITY_INVISIBLE))
 	  {
-	    iThingState* st = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-	      	iThingState);
+	    csRef<iThingState> st (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+	      	iThingState));
 	    if (st)
 	    {
 	      // Transform our vector to object space.
@@ -1216,11 +1210,8 @@ static bool IntersectSegment_Front2Back (csKDTree* treenode, void* userdata,
 		data->isect = movtrans.This2Other (obj_isect);
 		data->mesh = mesh;
 	      }
-
-	      st->DecRef ();
 	    }
 	  }
-	  mesh->DecRef ();
 	}
       }
     }
@@ -1422,11 +1413,10 @@ void csDynaVis::CastShadows (iFrustumView* fview)
 csPtr<iString> csDynaVis::Debug_UnitTest ()
 {
   csKDTree* kdtree = new csKDTree (NULL);
-  iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (kdtree, iDebugHelper);
+  csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (kdtree, iDebugHelper));
   if (dbghelp)
   {
     iString* rc = dbghelp->UnitTest ();
-    dbghelp->DecRef ();
     if (rc)
     {
       delete kdtree;
@@ -1440,7 +1430,6 @@ csPtr<iString> csDynaVis::Debug_UnitTest ()
   if (dbghelp)
   {
     iString* rc = dbghelp->UnitTest ();
-    dbghelp->DecRef ();
     if (rc)
     {
       delete covbuf;
@@ -1454,7 +1443,6 @@ csPtr<iString> csDynaVis::Debug_UnitTest ()
   if (dbghelp)
   {
     iString* rc = dbghelp->UnitTest ();
-    dbghelp->DecRef ();
     if (rc)
     {
       delete tcovbuf;
@@ -2119,7 +2107,8 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
 	  tot_poly_dynavis += polymesh->GetPolygonCount ();
 	}
 
-        iObject* iobj = SCF_QUERY_INTERFACE (visobj_wrap->visobj, iObject);
+        csRef<iObject> iobj (
+		SCF_QUERY_INTERFACE (visobj_wrap->visobj, iObject));
         printf ("  obj(%d,'%s')  vis=%s   vispix=%d totpix=%d      %s\n",
       	  i,
 	  (iobj && iobj->GetName ()) ? iobj->GetName () : "?",
@@ -2133,7 +2122,6 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
 	  vispix, totpix,
 	  vispix != 0 && visobj_wrap->history->reason < VISIBLE
 	  	? "????" : "");
-        if (iobj) iobj->DecRef ();
       }
     }
     printf ("Summary: #objects=%d #vis(exact)=%d #vis(dynavis)=%d\n",
@@ -2153,13 +2141,12 @@ csTicks csDynaVis::Debug_Benchmark (int num_iterations)
   csTicks rc = 0;
 
   csKDTree* kdtree = new csKDTree (NULL);
-  iDebugHelper* dbghelp = SCF_QUERY_INTERFACE (kdtree, iDebugHelper);
+  csRef<iDebugHelper> dbghelp (SCF_QUERY_INTERFACE (kdtree, iDebugHelper));
   if (dbghelp)
   {
     csTicks r = dbghelp->Benchmark (num_iterations);
     printf ("kdtree:   %d ms\n", r);
     rc += r;
-    dbghelp->DecRef ();
   }
   delete kdtree;
 
@@ -2170,7 +2157,6 @@ csTicks csDynaVis::Debug_Benchmark (int num_iterations)
     csTicks r = dbghelp->Benchmark (num_iterations);
     printf ("covbuf:   %d ms\n", r);
     rc += r;
-    dbghelp->DecRef ();
   }
   delete covbuf;
 

@@ -814,7 +814,7 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
   csTicks seed = csGetTicks ();
   srand (seed);
 
-  iString* dbdump;
+  csRef<iString> dbdump;
   scfString* rc = new scfString ();
   csString& str = rc->GetCsString ();
 
@@ -932,7 +932,6 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
   if (!Debug_CheckTree (str)) return csPtr<iString> (rc);
   dbdump = Debug_Statistics ();
   printf ("Step 1: %s", dbdump->GetData ()); fflush (stdout);
-  dbdump->DecRef ();
 
   //=================
   // Now we flatten the tree completely.
@@ -941,7 +940,6 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
   if (!Debug_CheckTree (str)) return csPtr<iString> (rc);
   dbdump = Debug_Statistics ();
   printf ("Flat  : %s", dbdump->GetData ()); fflush (stdout);
-  dbdump->DecRef ();
 
   //=================
   // Do a FullDistribute() again. Since we now start from a flattened
@@ -952,7 +950,6 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
   if (!Debug_CheckTree (str)) return csPtr<iString> (rc);
   dbdump = Debug_Statistics ();
   printf ("Optim : %s", dbdump->GetData ()); fflush (stdout);
-  dbdump->DecRef ();
 
   //=================
   // Now we are going to test traversal. The crucial thing here is
@@ -1039,7 +1036,6 @@ csPtr<iString> csKDTree::Debug_UnitTest ()
   if (!Debug_CheckTree (str)) return rc;
   dbdump = Debug_Statistics ();
   printf ("Traver: %s", dbdump->GetData ()); fflush (stdout);
-  dbdump->DecRef ();
 
   rc->DecRef ();
   return csPtr<iString> (NULL);
