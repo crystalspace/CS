@@ -13,6 +13,21 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+26-Oct-1999
+	- Eric Sunshine fixed a bug which was causing the engine to crash
+	  when a non-coplaner polygon was found in a world.
+	- Eric Sunshine fixed a number of reported makefile problems.
+	- Eric Sunshine fixed makefiles so that linking once again succeeds
+	  when USE_SHARED_PLUGINS=no and on NeXT platforms.
+	- Eric Sunshine fixed numerous new compiler warnings as well as
+	  some errors.
+	- Eric Sunshine worked around more OpenStep compiler bugs which were
+	  triggered by recent CS changes.
+	- Eric Sunshine fixed csString so that it really is possible to
+	  disable COM in the class.  (Unfortunately, numerous other parts of
+	  the system rely on the fact that csString is COM-patible, so it is
+	  not yet possible to actually disable COM in csString without
+	  breaking anything.)
 25-Oct-1999
 	- CrystalClear updates from Michael Dale Long.
 	- FINALLY fixed the bug in the quadcube!!! Lighting shadow
