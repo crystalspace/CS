@@ -458,7 +458,10 @@ void csTextureManagerLine::PrepareTextures ()
   // Create mipmaps for all textures
   int i;
   for (i = 0; i < textures.Length (); i++)
-    textures [i]->CreateMipmaps ();
+  {
+    csTextureMM *txt = textures.Get (i);
+    txt->CreateMipmaps ();
+  }
 
   // The only thing left to do is to compute the palette
   // Everything other has been done during textures registration

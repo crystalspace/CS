@@ -27,6 +27,27 @@ Short-term cleanups that need to be done:
 	  two vectors.
 	- Fixed a camera transformation bug in cctest.
 	- Added csSolidBspCube (a cube of solid BSP trees).
+	- Andrew Zabolotny did the following changes:
+	    - Completely removed MIPMAP_MODE=nice/verynice. This made the
+	      code a bit cleaner and a bit faster (this was checked even
+	      during rendering of each polygon). Also removed BLEND_MIPMAP0
+	      which was simply ugly.
+	    - Fixed the bug with lighmaps and AMBIENT_WHITE=50 (Eric).
+	    - Fixed the bug with vertical strips of garbage being displayed
+	      in specific places of maze.zip (Eric again).
+	    - Added csMatrix2 class to math2d.h. I need it for MazeD
+	      (texture mapping).
+	    - Fixed a bug in graph2d.cpp that caused horizontal lines to
+	      be displayed much slower than they could be.
+	    - Further improvement on texture mapping in MazeD. Now
+	      correctly reads texture mapping parameters from world file.
+	    - Added "show console" menu item to MazeD.
+	    - Added per-texture MIPMAP(yes|no) and DITHER(yes|no) option.o
+	      I.e. you can write in world file:
+		TEXTURE 'red ball' (FILE (/lib/tex/redball.gif)o
+		MIPMAP(no) DITHER(yes))
+	      Dithering is now by default off in soft3d.cfg.
+	- Fixed line renderer because Andrew broke it a little.
 15-Mar-2000
 	- Fixed bug in terrain interface to terrain engine. Now passes
 	  1/z instead of z. This fixes the OpenGL clipping bug and also
