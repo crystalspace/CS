@@ -28,8 +28,6 @@
 #include "csutil/scf.h"
 #include "isnddrv.h"
 
-extern const CLSID CLSID_OSSSoundDriver;
-
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
@@ -79,7 +77,7 @@ protected:
 
 public:
   DECLARE_IBASE;
-  csSoundDriverOSS(iSystem* piSystem);
+  csSoundDriverOSS(iBase *iParent);
   virtual ~csSoundDriverOSS();
 
   bool Initialize(iSystem *iSys);
@@ -91,7 +89,7 @@ public:
   float GetVolume();
   void LockMemory(void **mem, int *memsize);
   void UnlockMemory();
-  void IsBackground(bool *back);
+  bool IsBackground();
   bool Is16Bits();
   bool IsStereo();
   int GetFrequency();

@@ -195,7 +195,7 @@ static void* soundptr;
 
 void isTime(int)
 {
-    iSoundRender *mysound=(ISoundRender*)soundptr;
+    iSoundRender *mysound=(iSoundRender*)soundptr;
     if (!AudioDeviceBlocked())
        mysound->MixingFunction();
 }
