@@ -1,5 +1,18 @@
 The history order is reversed so that new features are at the top.
 
+10-Oct-2001
+	- Slight optimization in csSector::IntersectSegment() where it
+	  would transform back the intersection point even if there
+	  was no intersection.
+	- Small change in bugplug.
+	- Changed iVisibilityCuller interface so that the IntersectSegment()
+	  now also returns the mesh that was hit (or NULL if the mesh
+	  corresponding with the culler was hit).
+	- Changed iSector::HitBeam() to use the mesh returned by
+	  iVisibilityCuller::IntersectSegment() now. This fixes a bug where
+	  HitBeam() would sometimes return the right polygon that was hit
+	  but not the right mesh (i.e. it would always return the static
+	  mesh in those cases).
 9-Oct-2001
 	- Removed iSystem::GetObjectRegistry().
 	- The object registry is now a parameter to the system driver and

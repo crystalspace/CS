@@ -725,6 +725,7 @@ struct ISectData
   csVector3 isect;
   float r;
   bool only_local;	// If true we only consider polygons in the culler mesh
+  csMeshWrapper* mesh;	// Hit mesh
 };
 
 /*
@@ -756,13 +757,15 @@ static void* IntersectSegmentTestPol (csThing* thing,
   int i;
   for (i = 0 ; i < num ; i++)
   {
-    // @@@ What about other types of polygons?
     if (polygon[i]->GetType () == 1)
     {
       csPolygon3D* p = (csPolygon3D*)polygon[i];
       if (p->IntersectSegment (idata->seg.Start (), idata->seg.End (),
       		idata->isect, &(idata->r)))
+      {
+        idata->mesh = NULL;
         return (void*)p;
+      }
     }
     else if ((!idata->only_local) && polygon[i]->GetType () == 3)
     {
@@ -790,7 +793,10 @@ static void* IntersectSegmentTestPol (csThing* thing,
 			idata->seg.End (),
 			idata->isect, &(idata->r));
 	    if (p)
+	    {
+	      idata->mesh = mesh->GetPrivateObject ();
 	      return p;
+	    }
 	  }
 	}
       }
@@ -800,12 +806,13 @@ static void* IntersectSegmentTestPol (csThing* thing,
 }
 
 csPolygon3D* csThing::IntersectSegmentFull (const csVector3& start, 
-  const csVector3& end, csVector3& isect, float* pr)
+  const csVector3& end, csVector3& isect, float* pr, csMeshWrapper** p_mesh)
 {
   if (static_tree)
   {
     // Version with culler.
     ISectData idata;
+    idata.mesh = NULL;
     idata.only_local = false;
     idata.seg.Set (start, end);
     void* rc = static_tree->Front2Back (start, IntersectSegmentTestPol,
@@ -814,6 +821,7 @@ csPolygon3D* csThing::IntersectSegmentFull (const csVector3& start,
     {
       if (pr) *pr = idata.r;
       isect = idata.isect;
+      if (p_mesh) *p_mesh = idata.mesh;
       return (csPolygon3D*)rc;
     }
     return NULL;
@@ -841,6 +849,7 @@ csPolygon3D* csThing::IntersectSegmentFull (const csVector3& start,
       }
     }
     if (pr) *pr = best_r;
+    if (p_mesh) *p_mesh = NULL;
     return best_p;
   }
 }
@@ -3066,9 +3075,18 @@ iMeshObjectFactory* csThing::MeshObject::GetFactory () const
 //---------------------------------------------------------------------------
 
 iPolygon3D* csThing::VisCull::IntersectSegment (const csVector3& start, 
-  const csVector3& end, csVector3& isect, float* pr)
+  const csVector3& end, csVector3& isect, float* pr, iMeshWrapper** p_mesh)
 {
-  csPolygon3D* p = scfParent->IntersectSegmentFull (start, end, isect, pr);
+  csMeshWrapper* m;
+  csPolygon3D* p = scfParent->IntersectSegmentFull (start, end, isect, pr,
+  	&m);
+  if (p_mesh)
+  {
+    if (m)
+      *p_mesh = &(m->scfiMeshWrapper);
+    else
+      *p_mesh = NULL;
+  }
   if (p)
     return &(p->scfiPolygon3D);
   else

@@ -443,13 +443,14 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
   {
     // culler_mesh has option CS_THING_MOVE_NEVER so
     // object space == world space.
+    iMeshWrapper* mesh;
     iPolygon3D* ip = culler->IntersectSegment (start, end,
-	isect, &r);
+	isect, &r, &mesh);
     if (ip)
     {
       best_p = ip->GetPrivateObject ();
       best_r = r;
-      if (p_mesh) *p_mesh = culler_mesh;
+      if (p_mesh) *p_mesh = mesh ? mesh->GetPrivateObject () : culler_mesh;
     }
   }
 
@@ -480,13 +481,13 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
       }
       csPolygon3D* p = sp->IntersectSegment (obj_start, obj_end,
 		obj_isect, &r, only_portals);
-      if (sp->GetMovingOption () == CS_THING_MOVE_NEVER)
-        cur_isect = obj_isect;
-      else
-        cur_isect = movtrans.This2Other (obj_isect);
 
       if (p && r < best_r)
       {
+        if (sp->GetMovingOption () == CS_THING_MOVE_NEVER)
+          cur_isect = obj_isect;
+        else
+          cur_isect = movtrans.This2Other (obj_isect);
         best_r = r;
 	best_p = p;
 	isect = cur_isect;

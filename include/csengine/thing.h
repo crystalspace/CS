@@ -778,11 +778,12 @@ public:
    *
    * This version is similar to IntersectSegment() but it will also test
    * polygons of all objects which are registered to the visibility culler
-   * of this thing (if there is any).
+   * of this thing (if there is any). It also returns the mesh wrapper
+   * that was hit. If this is NULL then this mesh was hit.
    */
   csPolygon3D* IntersectSegmentFull (const csVector3& start, 
 	const csVector3& end, csVector3& isect,
-	float* pr = NULL);
+	float* pr = NULL, csMeshWrapper** p_mesh = NULL);
 
   /**
    * Check frustum visibility on this thing.
@@ -1053,7 +1054,8 @@ public:
       return scfParent->VisTest (irview);
     }
     virtual iPolygon3D* IntersectSegment (const csVector3& start,
-      const csVector3& end, csVector3& isect, float* pr = NULL);
+      const csVector3& end, csVector3& isect, float* pr = NULL,
+      iMeshWrapper** p_mesh = NULL);
     virtual bool SupportsShadowCasting ()
     {
       return true;

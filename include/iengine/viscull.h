@@ -28,9 +28,10 @@ struct iVisibilityObject;
 struct iMovable;
 struct iShadowReceiver;
 struct iPolygon3D;
+struct iMeshWrapper;
 class csBox3;
 
-SCF_VERSION (iVisibilityCuller, 0, 0, 4);
+SCF_VERSION (iVisibilityCuller, 0, 0, 5);
 
 /**
  * This interface represents a visibility culling system.
@@ -67,10 +68,13 @@ struct iVisibilityCuller : public iBase
 
   /**
    * Intersect a beam using this culler and return the intersection
-   * point and polygon.
+   * point, the mesh and optional polygon. If the returned mesh is NULL
+   * then this means that the object belonging to the culler itself was
+   * hit.
    */
   virtual iPolygon3D* IntersectSegment (const csVector3& start,
-    const csVector3& end, csVector3& isect, float* pr = NULL) = 0;
+    const csVector3& end, csVector3& isect, float* pr = NULL,
+    iMeshWrapper** p_mesh = NULL) = 0;
 
   /// Returns true if shadow casting is supported.
   virtual bool SupportsShadowCasting () = 0;

@@ -294,7 +294,6 @@ void csBugPlug::MouseButton3 (iCamera* camera)
   csVector3 origin = camera->GetTransform ().GetO2TTranslation ();
   csVector3 isect, end = origin + (vw - origin) * 60;
 
-  sector->HitBeam (origin, end, isect);
   iPolygon3D* poly = NULL;
   iMeshWrapper* sel = sector->HitBeam (origin, end, isect, &poly);
   const char* poly_name;
@@ -314,10 +313,10 @@ void csBugPlug::MouseButton3 (iCamera* camera)
   vw = isect;
   v = camera->GetTransform ().Other2This (vw);
   Report (CS_REPORTER_SEVERITY_NOTIFY,
-    "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f) poly:'%s'/%d",
+    "LMB down : c:(%f,%f,%f) w:(%f,%f,%f) p:'%s'/%d",
     v.x, v.y, v.z, vw.x, vw.y, vw.z, poly_name ? poly_name : "<none>", poly_id);
   Report (CS_REPORTER_SEVERITY_NOTIFY,
-    "LMB down : cam:(%f,%f,%f) world:(%f,%f,%f) poly:'%s'/%d",
+    "LMB down : c:(%f,%f,%f) w:(%f,%f,%f) p:'%s'/%d",
     v.x, v.y, v.z, vw.x, vw.y, vw.z, poly_name ? poly_name : "<none>", poly_id);
 
   if (sel)
