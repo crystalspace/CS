@@ -881,23 +881,37 @@ void csPolygon3D::Finish ()
   if (portal)
     portal->SetFilter (material->GetMaterialHandle ()->GetTexture ());
 
-  if (
-    flags.Check (CS_POLY_LIGHTING) &&
-    csLightMap::CalcLightMapWidth (lmi->tex->w_orig) <= 256 &&
-    csLightMap::CalcLightMapHeight (lmi->tex->h) <= 256)
-  //&& TEXW (lmi->tex) * TEXH (lmi->tex) < 1000000)
+  if (flags.Check (CS_POLY_LIGHTING))
   {
-    csLightMap *lm = new csLightMap ();
-    lmi->tex->SetLightMap (lm);
+    int lmw = csLightMap::CalcLightMapWidth (lmi->tex->w_orig);
+    int lmh = csLightMap::CalcLightMapHeight (lmi->tex->h);
+    if ((lmw > 256) || (lmh > 256))
+    {
+      csEngine::current_engine->Report ("Oversize lightmap (%dx%d) "
+        "for polygon '%s'", lmw, lmh, GetName());
+    }
+    else
+    {
+      csLightMap *lm = new csLightMap ();
+      lmi->tex->SetLightMap (lm);
 
-    int r, g, b;
+      int r, g, b;
 
-    //@@@sector->GetAmbientColor (r, g, b);
-    r = csLight::ambient_red;
-    g = csLight::ambient_green;
-    b = csLight::ambient_blue;
-    lm->Alloc (lmi->tex->w_orig, lmi->tex->h, r, g, b);
-    lm->DecRef ();
+      //@@@sector->GetAmbientColor (r, g, b);
+      r = csLight::ambient_red;
+      g = csLight::ambient_green;
+      b = csLight::ambient_blue;
+      lm->Alloc (lmi->tex->w_orig, lmi->tex->h, r, g, b);
+
+      if (!csEngine::current_engine->G3D->IsLightmapOK (lmi->GetPolyTex()))
+      {
+	csEngine::current_engine->Report ("Renderer can't handle lightmap "
+	  "for polygon '%s'", GetName());
+	flags.Set (CS_POLY_LM_REFUSED, CS_POLY_LM_REFUSED);
+      }
+
+      lm->DecRef ();
+    }
   }
 
 #ifdef DO_HW_UVZ
@@ -1004,8 +1018,8 @@ void csPolygon3D::SetTextureSpace (
   float det = m.Determinant ();
   if (ABS (det) < EPSILON)
   {
-    printf (
-      "Warning: badly specified UV coordinates for polygon '%s'!\n",
+    csEngine::current_engine->Warn (
+      "Warning: badly specified UV coordinates for polygon '%s'!",
       GetName ());
     SetTextureSpace (p1, p2, 1);
     return ;
