@@ -22,19 +22,7 @@ CCFLAGS += $(COMPILER.CFLAGS) $(COMPILER.CFLAGS.$(VARIANT)) ;
 C++FLAGS += $(COMPILER.CFLAGS) $(COMPILER.C++FLAGS)
 	    $(COMPILER.CFLAGS.$(VARIANT)) $(COMPILER.C++FLAGS.$(VARIANT)) ;
 LINKLIBS += $(COMPILER.LFLAGS) $(COMPILER.LFLAGS.$(VARIANT)) ;
-
-switch $(VARIANT)
-{
-case optimize :
-    SHORTVARIANT = opt ;
-case debug :
-    SHORTVARIANT = dbg ;
-case profile :
-    SHORTVARIANT = prf ;
-case * :
-    SHORTVARIANT = $(VARIANT) ;
-}
-LOCATE.OBJECTS = $(LOCATE.OBJECTS)/$(SHORTVARIANT) ;
+LOCATE.OBJECTS = $(LOCATE.OBJECTS)/$(VARIANT) ;
 
 ##  SubVariant variantname
 ##    Specify subvarianet which are placed in separate compilation directories.

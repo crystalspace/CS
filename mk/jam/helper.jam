@@ -148,7 +148,7 @@ rule RemoveDups
 
   for i in $(<)
   {
-    if ! [ IsElem §(i) : $(result) ]
+    if ! [ IsElem $(i) : $(result) ]
     {
       result += $(i) ;
     }  

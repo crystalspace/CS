@@ -6,6 +6,18 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-Oct-2003
+	- Eric Sunshine fixed a bug in RemoveDups from helper.jam.  It was
+	  trying to dereference a variable using an 8-bit character instead of
+	  dollar sign ($).  The result was that the function was a complete
+	  no-op; it did not remove duplicates at all.  As a consequence, when
+	  building targets in static mode, many libraries were mentioned
+	  hundreds of times in the link statement, with the result that the
+	  command length was too long, causing Jam to abort.  Also reverted
+	  Matze's attempted fix for this problem yesterday where he added a
+	  hack to shorten the pathnames mentioned by the the link statement.
+	  This hack did not fix the problem, and is not necessary now that the
+	  real problem has been corrected.
 14-Oct-2003
 	- Eric Sunshine fixed typographical error in constant expression in
 	  cssys/general/platformconfig.cpp: S_IWGRPS_IXGRP --> S_IWGRP|S_IXGRP.
