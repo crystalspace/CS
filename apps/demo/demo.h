@@ -43,6 +43,11 @@ public:
   iEngine* engine;
   iSector* room;
   iView* view;
+  iGraphics3D *myG3D;
+  iGraphics2D *myG2D;
+  iVFS *myVFS;
+  iConsoleOutput *myConsole;
+
   DemoSequenceManager* seqmgr;
   iFont* font;
   int col_red, col_blue, col_white, col_black;

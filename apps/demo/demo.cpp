@@ -52,10 +52,23 @@
 
 //-----------------------------------------------------------------------------
 
+#define  QUERY_PLUG(myPlug, iFace, errMsg) \
+  myPlug = QUERY_PLUGIN (this, iFace); \
+  if (!myPlug) \
+  { \
+    Printf (MSG_FATAL_ERROR, errMsg); \
+    return -1; \
+  }
+
 Demo::Demo ()
 {
   engine = NULL;
   seqmgr = NULL;
+  myG3D = NULL;
+  myG2D = NULL;
+  myVFS = NULL;
+  myConsole = NULL;
+
   message[0] = 0;
 }
 
@@ -63,6 +76,10 @@ Demo::~Demo ()
 {
   if (engine)
     engine->DecRef ();
+  if (myG3D) myG3D->DecRef ();
+  if (myG2D) myG2D->DecRef ();
+  if (myVFS) myVFS->DecRef ();
+  if (myConsole) myConsole->DecRef ();
   delete seqmgr;
 }
 
@@ -76,7 +93,7 @@ iMeshWrapper* Demo::LoadObject (const char* objname, const char* filename,
 	const char* classId, const char* loaderClassId,
 	iSector* sector, const csVector3& pos)
 {
-  iDataBuffer* databuf = System->VFS->ReadFile (filename);
+  iDataBuffer* databuf = myVFS->ReadFile (filename);
   if (!databuf || !databuf->GetSize ())
   {
     if (databuf) databuf->DecRef ();
@@ -99,7 +116,7 @@ iMeshWrapper* Demo::LoadObject (const char* objname, const char* filename,
 void Demo::LoadFactory (const char* factname, const char* filename,
 	const char* classId, const char* loaderClassId)
 {
-  iDataBuffer* databuf = System->VFS->ReadFile (filename);
+  iDataBuffer* databuf = myVFS->ReadFile (filename);
   if (!databuf || !databuf->GetSize ())
   {
     if (databuf) databuf->DecRef ();
@@ -247,6 +264,8 @@ static void SetTexSpace (iPolygon3D* poly,
   texv += vvector / float(size);
   texulen += ulen * 2. / float(size);
   texvlen += vlen * 2. / float(size);
+  printf ("Orig = (%g, %g, %g), First =(%g, %g, %g, %g), Second =(%g, %g, %g, %g) \n", 
+  texorig.x, texorig.y, texorig.z, texu.x, texu.y, texu.z, texulen,texv.x, texv.y, texv.z, texvlen);
   poly->SetTextureSpace (texorig, texu, texulen, texv, texvlen);
 }
 
@@ -262,16 +281,18 @@ void Demo::SetupSector ()
 
   float size = 500.0; /// Size of the skybox -- around 0,0,0 for now.
   iPolygon3D* p;
+  printf ("down:\n");
   p = walls_state->CreatePolygon ("d");
   p->SetMaterial (engine->FindMaterial ("nebula_d"));
   p->CreateVertex (csVector3 (-size, -size, size));
   p->CreateVertex (csVector3 (size, -size, size));
   p->CreateVertex (csVector3 (size, -size, -size));
   p->CreateVertex (csVector3 (-size, -size, -size));
-  SetTexSpace (p, 256, p->GetVertex (2), p->GetVertex (3),
-  	2.*size, p->GetVertex (1), 2.*size);
+  SetTexSpace (p, 256, p->GetVertex (0), p->GetVertex (1),
+  	2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
+  printf ("up:\n");
   p = walls_state->CreatePolygon ("u");
   p->SetMaterial (engine->FindMaterial ("nebula_u"));
   p->CreateVertex (csVector3 (-size, size, -size));
@@ -282,6 +303,7 @@ void Demo::SetupSector ()
   	2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
+  printf ("front:\n");
   p = walls_state->CreatePolygon ("f");
   p->SetMaterial (engine->FindMaterial ("nebula_f"));
   p->CreateVertex (csVector3 (-size, size, size));
@@ -292,6 +314,7 @@ void Demo::SetupSector ()
 	2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
+  printf ("right:\n");
   p = walls_state->CreatePolygon ("r");
   p->SetMaterial (engine->FindMaterial ("nebula_r"));
   p->CreateVertex (csVector3 (size, size, size));
@@ -302,6 +325,7 @@ void Demo::SetupSector ()
   	2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
+  printf ("left:\n");
   p = walls_state->CreatePolygon ("l");
   p->SetMaterial (engine->FindMaterial ("nebula_l"));
   p->CreateVertex (csVector3 (-size, size, -size));
@@ -312,6 +336,7 @@ void Demo::SetupSector ()
   	2.*size, p->GetVertex (3), 2.*size);
   p->GetFlags ().Set (CS_POLY_LIGHTING, 0);
 
+  printf ("back:\n");
   p = walls_state->CreatePolygon ("b");
   p->SetMaterial (engine->FindMaterial ("nebula_b"));
   p->CreateVertex (csVector3 (size, size, -size));
@@ -333,6 +358,8 @@ void Demo::SetupSector ()
   walls->SetZBufMode (CS_ZBUF_NONE);
   walls_state = QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
 
+  printf ("stars:\n");
+  printf ("down:\n");
   size = 200.0; /// Size of the skybox -- around 0,0,0 for now.
   p = walls_state->CreatePolygon ("d");
   p->SetMaterial (engine->FindMaterial ("stars"));
@@ -346,6 +373,7 @@ void Demo::SetupSector ()
   iPolyTexType* pt = p->GetPolyTexType ();
   pt->SetMixMode (CS_FX_ADD);
 
+  printf ("up:\n");
   p = walls_state->CreatePolygon ("u");
   p->SetMaterial (engine->FindMaterial ("stars"));
   p->CreateVertex (csVector3 (-size, size, -size));
@@ -358,6 +386,7 @@ void Demo::SetupSector ()
   pt = p->GetPolyTexType ();
   pt->SetMixMode (CS_FX_ADD);
 
+  printf ("front:\n");
   p = walls_state->CreatePolygon ("f");
   p->SetMaterial (engine->FindMaterial ("stars"));
   p->CreateVertex (csVector3 (-size, size, size));
@@ -370,6 +399,7 @@ void Demo::SetupSector ()
   pt = p->GetPolyTexType ();
   pt->SetMixMode (CS_FX_ADD);
 
+  printf ("right:\n");
   p = walls_state->CreatePolygon ("r");
   p->SetMaterial (engine->FindMaterial ("stars"));
   p->CreateVertex (csVector3 (size, size, size));
@@ -382,6 +412,7 @@ void Demo::SetupSector ()
   pt = p->GetPolyTexType ();
   pt->SetMixMode (CS_FX_ADD);
 
+  printf ("left:\n");
   p = walls_state->CreatePolygon ("l");
   p->SetMaterial (engine->FindMaterial ("stars"));
   p->CreateVertex (csVector3 (-size, size, -size));
@@ -394,6 +425,7 @@ void Demo::SetupSector ()
   pt = p->GetPolyTexType ();
   pt->SetMixMode (CS_FX_ADD);
 
+  printf ("back:\n");
   p = walls_state->CreatePolygon ("b");
   p->SetMaterial (engine->FindMaterial ("stars"));
   p->CreateVertex (csVector3 (size, size, -size));
@@ -723,6 +755,10 @@ bool Demo::Initialize (int argc, const char* const argv[],
     Printf (MSG_FATAL_ERROR, "No engine!\n");
     abort ();
   }
+  QUERY_PLUG (myG3D, iGraphics3D, "No iGraphics3D plugin !\n");
+  QUERY_PLUG (myG2D, iGraphics2D, "No iGraphics2D plugin !\n");
+  QUERY_PLUG (myVFS, iVFS, "No iVFS plugin !\n");
+  QUERY_PLUG (myConsole, iConsoleOutput, "No iConsoleOutput plugin !\n");
 
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ("The Crystal Space Demo."))
@@ -733,7 +769,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
   }
 
   // Setup the texture manager
-  iTextureManager* txtmgr = G3D->GetTextureManager ();
+  iTextureManager* txtmgr = myG3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
   // Initialize the texture manager
@@ -748,12 +784,12 @@ bool Demo::Initialize (int argc, const char* const argv[],
 	txtmgr->ReserveColor (r * 32, g * 32, b * 64);
   txtmgr->SetPalette ();
 
-  font = G2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
+  font = myG2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
 
   // Initialize the console
-  if (System->Console != NULL)
+  if (myConsole != NULL)
     // Don't let messages before this one appear
-    System->Console->Clear ();
+    myConsole->Clear ();
 
   // Some commercials...
   Printf (MSG_INITIALIZATION,
@@ -781,7 +817,7 @@ bool Demo::Initialize (int argc, const char* const argv[],
 
   Printf (MSG_INITIALIZATION, "--------------------------------------\n");
 
-  view = engine->CreateView (G3D);
+  view = engine->CreateView (myG3D);
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -900));
   view->GetCamera ()->GetTransform ().RotateThis (csVector3 (0, 1, 0), .8);
@@ -819,7 +855,7 @@ void Demo::GfxWrite (int x, int y, int fg, int bg, char *str, ...)
   vsprintf (buf, str, arg);
   va_end (arg);
 
-  G2D->Write (font, x, y, fg, bg, buf);
+  myG2D->Write (font, x, y, fg, bg, buf);
 }
 
 void Demo::FileWrite (iFile* file, char *str, ...)
@@ -921,25 +957,25 @@ void Demo::NextFrame ()
   }
 
   // Tell 3D driver we're going to display 3D things.
-  if (!G3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS
+  if (!myG3D->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS
   	| CSDRAW_CLEARZBUFFER))
     return;
 
   if (map_enabled != MAP_EDIT)
   {
     view->Draw ();
-    seqmgr->Draw3DEffects (G3D);
+    seqmgr->Draw3DEffects (myG3D);
     if (map_enabled == MAP_EDIT_FORWARD)
-      csfxFadeToColor (G3D, .3, csColor (0, 0, 1));
+      csfxFadeToColor (myG3D, .3, csColor (0, 0, 1));
   }
 
   // Start drawing 2D graphics.
-  if (!System->G3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+  if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
 
   if (map_enabled == MAP_EDIT)
-    G2D->Clear (0);
+    myG2D->Clear (0);
   else if (map_enabled < MAP_EDIT)
-    seqmgr->Draw2DEffects (G2D);
+    seqmgr->Draw2DEffects (myG2D);
   if (map_enabled >= MAP_OVERLAY)
     seqmgr->DebugDrawPaths (view->GetCamera (), map_selpath,
     	map_tl, map_br, map_selpoint);
@@ -949,7 +985,7 @@ void Demo::NextFrame ()
   int fw, fh;
   font->GetMaxSize (fw, fh);
   int tx = 10;
-  int ty = G2D->GetHeight ()-fh-3;
+  int ty = myG2D->GetHeight ()-fh-3;
   char messageLine[100];
   messageLine[0] = 0;
   switch (map_enabled)
@@ -980,9 +1016,9 @@ void Demo::NextFrame ()
   }
 
   // Drawing code ends here.
-  G3D->FinishDraw ();
+  myG3D->FinishDraw ();
   // Print the final output.
-  G3D->Print (NULL);
+  myG3D->Print (NULL);
 }
 
 void Demo::DrawEditInfo ()
@@ -990,9 +1026,9 @@ void Demo::DrawEditInfo ()
   int fw, fh;
   font->GetMaxSize (fw, fh);
   fh += 2;
-  int dim = G2D->GetHeight ()-10;
-  G2D->DrawBox (dim+5, 0, G2D->GetWidth ()-dim-5,
-  	G2D->GetHeight (), col_white);
+  int dim = myG2D->GetHeight ()-10;
+  myG2D->DrawBox (dim+5, 0, myG2D->GetWidth ()-dim-5,
+  	myG2D->GetHeight (), col_white);
   cs_time start, total;
   csNamedPath* np = seqmgr->GetSelectedPath (map_selpath, start, total);
   if (np)
@@ -1343,16 +1379,16 @@ bool Demo::HandleEvent (iEvent &Event)
 	    // Make a backup of the original file.
 	    strcpy (backup, buf);
 	    strcat (backup, ".bak");
-	    VFS->DeleteFile (backup);
-	    iDataBuffer* dbuf = VFS->ReadFile (buf);
+	    myVFS->DeleteFile (backup);
+	    iDataBuffer* dbuf = myVFS->ReadFile (buf);
 	    if (dbuf)
 	    {
 	      if (dbuf->GetSize ())
-	        VFS->WriteFile (backup, **dbuf, dbuf->GetSize ());
+	        myVFS->WriteFile (backup, **dbuf, dbuf->GetSize ());
 	      dbuf->DecRef ();
 	    }
 
-	    iFile* fp = VFS->Open (buf, VFS_FILE_WRITE);
+	    iFile* fp = myVFS->Open (buf, VFS_FILE_WRITE);
 	    if (fp)
 	    {
 	      int i, num = np->GetNumPoints ();
@@ -1635,7 +1671,7 @@ bool Demo::HandleEvent (iEvent &Event)
   {
     if (Event.Mouse.Button == 1)
     {
-      csVector2 p (Event.Mouse.x, G2D->GetHeight ()-Event.Mouse.y);
+      csVector2 p (Event.Mouse.x, myG2D->GetHeight ()-Event.Mouse.y);
       csVector3 v;
       view->GetCamera ()->InvPerspective (p, 1, v);
       csVector3 vw = view->GetCamera ()->GetTransform ().This2Other (v);
@@ -1656,7 +1692,7 @@ bool Demo::HandleEvent (iEvent &Event)
       else if (map_enabled == MAP_EDIT)
       {
         p.y = Event.Mouse.y;
-	int dim = G2D->GetHeight ()-10;
+	int dim = myG2D->GetHeight ()-10;
 	float dx = (map_br.x-map_tl.x)/2.;
 	float dy = (map_br.y-map_tl.y)/2.;
 	float cx = map_tl.x + (map_br.x-map_tl.x)*(1-(dim-p.x)/dim);

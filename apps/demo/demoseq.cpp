@@ -368,7 +368,7 @@ void DemoSequenceManager::DebugPositionObjects (iCamera* camera,
 void DemoSequenceManager::DebugDrawPath (csNamedPath* np, bool hi,
 	const csVector2& tl, const csVector2& br, int selpoint)
 {
-  int dim = demo->G2D->GetHeight ()-10;
+  int dim = demo->myG2D->GetHeight ()-10;
   int col = demo->col_gray;
   if (hi) col = demo->col_white;
   float r;
@@ -380,7 +380,7 @@ void DemoSequenceManager::DebugDrawPath (csNamedPath* np, bool hi,
     int x = int ((p.x-tl.x)*dim / (br.x-tl.x));
     int y = int ((p.z-tl.y)*dim / (br.y-tl.y));
     if (x > 0 && x < dim && y > 0 && y < dim)
-      demo->G2D->DrawPixel (x, y, col);
+      demo->myG2D->DrawPixel (x, y, col);
   }
   float* px, * py, * pz;
   px = np->GetDimensionValues (0);
@@ -399,17 +399,17 @@ void DemoSequenceManager::DebugDrawPath (csNamedPath* np, bool hi,
     int y = int ((pz[j]-tl.y)*dim/(br.y-tl.y));
     if (x > 0 && x < dim && y > 0 && y < dim)
     {
-      demo->G2D->DrawPixel (x, y, col);
-      demo->G2D->DrawPixel (x-1, y, col);
-      demo->G2D->DrawPixel (x+1, y, col);
-      demo->G2D->DrawPixel (x, y-1, col);
-      demo->G2D->DrawPixel (x, y+1, col);
+      demo->myG2D->DrawPixel (x, y, col);
+      demo->myG2D->DrawPixel (x-1, y, col);
+      demo->myG2D->DrawPixel (x+1, y, col);
+      demo->myG2D->DrawPixel (x, y-1, col);
+      demo->myG2D->DrawPixel (x, y+1, col);
       if (hi && selpoint == j)
       {
         csVector3 forward (fx[j], fy[j], fz[j]);
         forward.Normalize ();
         forward *= 20.;
-        demo->G2D->DrawLine (x, y, int (x+forward.x), int (y-forward.z),
+        demo->myG2D->DrawLine (x, y, int (x+forward.x), int (y-forward.z),
       	  demo->col_cyan);
       }
     }
@@ -425,19 +425,19 @@ void DemoSequenceManager::DrawSelPoint (
   int y = int ((pos.z-tl.y)*dim/(br.y-tl.y));
   if (x > 0 && x < dim && y > 0 && y < dim)
   {
-    demo->G2D->DrawPixel (x, y, col);
-    demo->G2D->DrawPixel (x-1, y-1, col);
-    demo->G2D->DrawPixel (x-2, y-2, col);
-    demo->G2D->DrawPixel (x+1, y+1, col);
-    demo->G2D->DrawPixel (x+2, y+2, col);
-    demo->G2D->DrawPixel (x+1, y-1, col);
-    demo->G2D->DrawPixel (x+2, y-2, col);
-    demo->G2D->DrawPixel (x-1, y+1, col);
-    demo->G2D->DrawPixel (x-2, y+2, col);
+    demo->myG2D->DrawPixel (x, y, col);
+    demo->myG2D->DrawPixel (x-1, y-1, col);
+    demo->myG2D->DrawPixel (x-2, y-2, col);
+    demo->myG2D->DrawPixel (x+1, y+1, col);
+    demo->myG2D->DrawPixel (x+2, y+2, col);
+    demo->myG2D->DrawPixel (x+1, y-1, col);
+    demo->myG2D->DrawPixel (x+2, y-2, col);
+    demo->myG2D->DrawPixel (x-1, y+1, col);
+    demo->myG2D->DrawPixel (x-2, y+2, col);
     csVector3 f = forward;
     f.Normalize ();
     f *= fwlen;
-    demo->G2D->DrawLine (x, y, int (x+f.x), int (y-f.z), col);
+    demo->myG2D->DrawLine (x, y, int (x+f.x), int (y-f.z), col);
   }
 }
 
@@ -452,11 +452,11 @@ void DemoSequenceManager::DebugDrawPaths (iCamera* camera,
   //=====
   // Draw the border around the map.
   //=====
-  int dim = demo->G2D->GetHeight ()-10;
-  demo->G2D->DrawLine (0, 0, dim, 0, demo->col_cyan);
-  demo->G2D->DrawLine (0, dim, dim, dim, demo->col_cyan);
-  demo->G2D->DrawLine (0, 0, 0, dim, demo->col_cyan);
-  demo->G2D->DrawLine (dim, 0, dim, dim, demo->col_cyan);
+  int dim = demo->myG2D->GetHeight ()-10;
+  demo->myG2D->DrawLine (0, 0, dim, 0, demo->col_cyan);
+  demo->myG2D->DrawLine (0, dim, dim, dim, demo->col_cyan);
+  demo->myG2D->DrawLine (0, 0, 0, dim, demo->col_cyan);
+  demo->myG2D->DrawLine (dim, 0, dim, dim, demo->col_cyan);
 
   //=====
   // Draw the current camera.

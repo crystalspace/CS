@@ -66,7 +66,7 @@ DemoSequenceLoader::DemoSequenceLoader (Demo* demo,
   DemoSequenceLoader::demo = demo;
   DemoSequenceLoader::demoseq = demoseq;
   DemoSequenceLoader::seqmgr = seqmgr;
-  iDataBuffer* buf = demo->VFS->ReadFile (fileName);
+  iDataBuffer* buf = demo->myVFS->ReadFile (fileName);
   if (!buf || !buf->GetSize ())
   {
     if (buf) buf->DecRef ();
@@ -422,7 +422,7 @@ csNamedPath* DemoSequenceLoader::LoadPath (char* buf, const char* pName)
       {
 	char fname[255];
 	ScanStr (params, "%s", fname);
-  	iDataBuffer* buf = demo->VFS->ReadFile (fname);
+  	iDataBuffer* buf = demo->myVFS->ReadFile (fname);
 	if (!buf || !buf->GetSize ())
 	{
 	  if (buf) buf->DecRef ();
