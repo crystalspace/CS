@@ -304,12 +304,12 @@ void csTriangleArrayPolygonBuffer::AddTriangles (csTrianglesPerMaterial* pol,
   float lm_scale_u, lm_scale_v, lm_offset_u, lm_offset_v;
 
   poly_texture->GetTextureBox (lm_low_u,lm_low_v,lm_high_u,lm_high_v);
-  if (lm_high_u <= lm_offset_u)
+  if (lm_high_u <= lm_low_u)
     lm_scale_u = 1.;       // @@@ Is this right?
   else
     lm_scale_u = 1. / (lm_high_u - lm_low_u);
 
-  if (lm_high_v <= lm_offset_v)
+  if (lm_high_v <= lm_low_v)
     lm_scale_v = 1.;       // @@@ Is this right?
   else
     lm_scale_v = 1. / (lm_high_v - lm_low_v);
