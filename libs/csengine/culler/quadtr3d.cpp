@@ -391,7 +391,7 @@ int csQuadTree3D::insert_polygon_func (csQuadTree3D* pObj,
   /// So, the polygon bbox overlaps this node. How much?
   ///----------------------------------------------------
 
-  if(1)
+  if(0)
   printf("quadtree3d at %d Checking node %d+%d %d,%d (%d)\n", node_pos->depth,
     node_pos->offset, node_pos->bytepos, node_pos->node_x, node_pos->node_y,
     node_state);
