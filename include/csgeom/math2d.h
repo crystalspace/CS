@@ -355,6 +355,21 @@ public:
     const csPlane2& p,                     // plane Ax+By+Cz+D=0
     csVector2& isect,                     // intersection point
     float& dist);                       // distance from u to isect
+
+  /**
+   * Return the intersection point. This version does not test if
+   * there really is an intersection. It just assumes there is one.
+   */
+  static void PlaneNoTest (const csVector2& u, const csVector2& v,
+                     const csPlane2& p, csVector2& isect, float& dist)
+  {
+    float x,y, denom;
+    x = v.x-u.x;  y = v.y-u.y;
+    denom = p.norm.x*x + p.norm.y*y;
+    dist = -(p.norm*u + p.CC) / denom;
+    isect.x = u.x + dist*x;  isect.y = u.y + dist*y;
+  }
+
 };
 
 /**

@@ -85,11 +85,12 @@ int csPoly2DEdges::AddEdge (const csVector2& v1, const csVector2& v2)
   return num_edges-1;
 }
 
-#define ONPLANE(c) ((c) > -EPSILON && (c) < EPSILON)
-#define ATLEFT(c) ((c) <= -EPSILON)
-#define ATLEFTORPLANE(c) ((c) < EPSILON)
-#define ATRIGHT(c) ((c) >= EPSILON)
-#define ATRIGHTORPLANE(c) ((c) > -EPSILON)
+#define EPS .05
+#define ONPLANE(c) ((c) > -EPS && (c) < EPS)
+#define ATLEFT(c) ((c) <= -EPS)
+#define ATLEFTORPLANE(c) ((c) < EPS)
+#define ATRIGHT(c) ((c) >= EPS)
+#define ATRIGHTORPLANE(c) ((c) > -EPS)
 
 void csPoly2DEdges::Intersect (const csPlane2& plane,
 	csPoly2DEdges* left, csPoly2DEdges* right, bool& onplane)
@@ -128,7 +129,7 @@ void csPoly2DEdges::Intersect (const csPlane2& plane,
         left->AddEdge (edges[i]);
       else
       {
-        csIntersect2::Plane (edges[i].v1, edges[i].v2,
+        csIntersect2::PlaneNoTest (edges[i].v1, edges[i].v2,
       	  plane, isect, dist);
 	left->AddEdge (edges[i].v1, isect);
 	right->AddEdge (isect, edges[i].v2);
@@ -140,7 +141,7 @@ void csPoly2DEdges::Intersect (const csPlane2& plane,
         right->AddEdge (edges[i]);
       else
       {
-        csIntersect2::Plane (edges[i].v1, edges[i].v2,
+        csIntersect2::PlaneNoTest (edges[i].v1, edges[i].v2,
       	  plane, isect, dist);
 	right->AddEdge (edges[i].v1, isect);
 	left->AddEdge (isect, edges[i].v2);

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
     Largely rewritten by Ivan Avramovic <ivan@avramovic.com>
   
     This library is free software; you can redistribute it and/or

@@ -47,6 +47,10 @@ private:
   csPlane2 splitter;
   /// Center point on original edge that was using for the splitter plane.
   csVector2 split_center;
+  /// Point to the right of the center.
+  csVector2 split_right_center;
+  /// Point to the left of the center.
+  csVector2 split_left_center;
 //@@@
 // For debugging: start,end
 csVector2 split_start, split_end;

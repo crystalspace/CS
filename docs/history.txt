@@ -39,6 +39,10 @@ Short-term cleanups that need to be done:
 	  code. Unfortunatelly this makes an error message less readable
 	  but it makes it easier to compile CS on platforms that don't
 	  have the GLU library (like mine).
+	- Did a lot more work on debugging the solid bsp stuff. I now
+	  have a good understanding of what is going wrong. I don't have
+	  a good (read 'fast') solution yet. I have decreased the chance
+	  of the error occuring right now.
 20-Mar-2000
 	- Michael Dale Long did a few changes to CrystalClear:
 	    - Major update to ccActor.  Sprite code should be fully
