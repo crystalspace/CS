@@ -4825,172 +4825,498 @@ CS_PREP_GL_FUNCTION( csPFNGLISPROGRAMARB, glIsProgramARB);
 
 #ifndef GL_NV_vertex_program
 #define GL_NV_vertex_program 1
+#ifndef GL_VERTEX_PROGRAM_NV
 #define GL_VERTEX_PROGRAM_NV              0x8620
+#endif
+#ifndef GL_VERTEX_STATE_PROGRAM_NV
 #define GL_VERTEX_STATE_PROGRAM_NV        0x8621
+#endif
+#ifndef GL_ATTRIB_ARRAY_SIZE_NV
 #define GL_ATTRIB_ARRAY_SIZE_NV           0x8623
+#endif
+#ifndef GL_ATTRIB_ARRAY_STRIDE_NV
 #define GL_ATTRIB_ARRAY_STRIDE_NV         0x8624
+#endif
+#ifndef GL_ATTRIB_ARRAY_TYPE_NV
 #define GL_ATTRIB_ARRAY_TYPE_NV           0x8625
+#endif
+#ifndef GL_CURRENT_ATTRIB_NV
 #define GL_CURRENT_ATTRIB_NV              0x8626
+#endif
+#ifndef GL_PROGRAM_LENGTH_NV
 #define GL_PROGRAM_LENGTH_NV              0x8627
+#endif
+#ifndef GL_PROGRAM_STRING_NV
 #define GL_PROGRAM_STRING_NV              0x8628
+#endif
+#ifndef GL_MODELVIEW_PROJECTION_NV
 #define GL_MODELVIEW_PROJECTION_NV        0x8629
+#endif
+#ifndef GL_IDENTITY_NV
 #define GL_IDENTITY_NV                    0x862A
+#endif
+#ifndef GL_INVERSE_NV
 #define GL_INVERSE_NV                     0x862B
+#endif
+#ifndef GL_TRANSPOSE_NV
 #define GL_TRANSPOSE_NV                   0x862C
+#endif
+#ifndef GL_INVERSE_TRANSPOSE_NV
 #define GL_INVERSE_TRANSPOSE_NV           0x862D
+#endif
+#ifndef GL_MAX_TRACK_MATRIX_STACK_DEPTH_NV
 #define GL_MAX_TRACK_MATRIX_STACK_DEPTH_NV 0x862E
+#endif
+#ifndef GL_MAX_TRACK_MATRICES_NV
 #define GL_MAX_TRACK_MATRICES_NV          0x862F
+#endif
+#ifndef GL_MATRIX0_NV
 #define GL_MATRIX0_NV                     0x8630
+#endif
+#ifndef GL_MATRIX1_NV
 #define GL_MATRIX1_NV                     0x8631
+#endif
+#ifndef GL_MATRIX2_NV
 #define GL_MATRIX2_NV                     0x8632
+#endif
+#ifndef GL_MATRIX3_NV
 #define GL_MATRIX3_NV                     0x8633
+#endif
+#ifndef GL_MATRIX4_NV
 #define GL_MATRIX4_NV                     0x8634
+#endif
+#ifndef GL_MATRIX5_NV
 #define GL_MATRIX5_NV                     0x8635
+#endif
+#ifndef GL_MATRIX6_NV
 #define GL_MATRIX6_NV                     0x8636
+#endif
+#ifndef GL_MATRIX7_NV
 #define GL_MATRIX7_NV                     0x8637
+#endif
+#ifndef GL_CURRENT_MATRIX_STACK_DEPTH_NV
 #define GL_CURRENT_MATRIX_STACK_DEPTH_NV  0x8640
+#endif
+#ifndef GL_CURRENT_MATRIX_NV
 #define GL_CURRENT_MATRIX_NV              0x8641
+#endif
+#ifndef GL_VERTEX_PROGRAM_POINT_SIZE_NV
 #define GL_VERTEX_PROGRAM_POINT_SIZE_NV   0x8642
+#endif
+#ifndef GL_VERTEX_PROGRAM_TWO_SIDE_NV
 #define GL_VERTEX_PROGRAM_TWO_SIDE_NV     0x8643
+#endif
+#ifndef GL_PROGRAM_PARAMETER_NV
 #define GL_PROGRAM_PARAMETER_NV           0x8644
+#endif
+#ifndef GL_ATTRIB_ARRAY_POINTER_NV
 #define GL_ATTRIB_ARRAY_POINTER_NV        0x8645
+#endif
+#ifndef GL_PROGRAM_TARGET_NV
 #define GL_PROGRAM_TARGET_NV              0x8646
+#endif
+#ifndef GL_PROGRAM_RESIDENT_NV
 #define GL_PROGRAM_RESIDENT_NV            0x8647
+#endif
+#ifndef GL_TRACK_MATRIX_NV
 #define GL_TRACK_MATRIX_NV                0x8648
+#endif
+#ifndef GL_TRACK_MATRIX_TRANSFORM_NV
 #define GL_TRACK_MATRIX_TRANSFORM_NV      0x8649
+#endif
+#ifndef GL_VERTEX_PROGRAM_BINDING_NV
 #define GL_VERTEX_PROGRAM_BINDING_NV      0x864A
+#endif
+#ifndef GL_PROGRAM_ERROR_POSITION_NV
 #define GL_PROGRAM_ERROR_POSITION_NV      0x864B
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY0_NV
 #define GL_VERTEX_ATTRIB_ARRAY0_NV        0x8650
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY1_NV
 #define GL_VERTEX_ATTRIB_ARRAY1_NV        0x8651
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY2_NV
 #define GL_VERTEX_ATTRIB_ARRAY2_NV        0x8652
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY3_NV
 #define GL_VERTEX_ATTRIB_ARRAY3_NV        0x8653
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY4_NV
 #define GL_VERTEX_ATTRIB_ARRAY4_NV        0x8654
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY5_NV
 #define GL_VERTEX_ATTRIB_ARRAY5_NV        0x8655
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY6_NV
 #define GL_VERTEX_ATTRIB_ARRAY6_NV        0x8656
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY7_NV
 #define GL_VERTEX_ATTRIB_ARRAY7_NV        0x8657
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY8_NV
 #define GL_VERTEX_ATTRIB_ARRAY8_NV        0x8658
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY9_NV
 #define GL_VERTEX_ATTRIB_ARRAY9_NV        0x8659
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY10_NV
 #define GL_VERTEX_ATTRIB_ARRAY10_NV       0x865A
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY11_NV
 #define GL_VERTEX_ATTRIB_ARRAY11_NV       0x865B
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY12_NV
 #define GL_VERTEX_ATTRIB_ARRAY12_NV       0x865C
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY13_NV
 #define GL_VERTEX_ATTRIB_ARRAY13_NV       0x865D
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY14_NV
 #define GL_VERTEX_ATTRIB_ARRAY14_NV       0x865E
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY15_NV
 #define GL_VERTEX_ATTRIB_ARRAY15_NV       0x865F
+#endif
+#ifndef GL_MAP1_VERTEX_ATTRIB0_4_NV
 #define GL_MAP1_VERTEX_ATTRIB0_4_NV       0x8660
+#endif
+#ifndef GL_MAP1_VERTEX_ATTRIB1_4_NV
 #define GL_MAP1_VERTEX_ATTRIB1_4_NV       0x8661
+#endif
+#ifndef GL_MAP1_VERTEX_ATTRIB2_4_NV
 #define GL_MAP1_VERTEX_ATTRIB2_4_NV       0x8662
+#endif
+#ifndef GL_MAP1_VERTEX_ATTRIB3_4_NV
 #define GL_MAP1_VERTEX_ATTRIB3_4_NV       0x8663
+#endif
+#ifndef GL_MAP1_VERTEX_ATTRIB4_4_NV
 #define GL_MAP1_VERTEX_ATTRIB4_4_NV       0x8664
+#endif
+#ifndef GL_MAP1_VERTEX_ATTRIB5_4_NV
 #define GL_MAP1_VERTEX_ATTRIB5_4_NV       0x8665
+#endif
+#ifndef GL_MAP1_VERTEX_ATTRIB6_4_NV
 #define GL_MAP1_VERTEX_ATTRIB6_4_NV       0x8666
+#endif
+#ifndef GL_MAP1_VERTEX_ATTRIB7_4_NV
 #define GL_MAP1_VERTEX_ATTRIB7_4_NV       0x8667
+#endif
+#ifndef GL_MAP1_VERTEX_ATTRIB8_4_NV
 #define GL_MAP1_VERTEX_ATTRIB8_4_NV       0x8668
+#endif
+#ifndef GL_MAP1_VERTEX_ATTRIB9_4_NV
 #define GL_MAP1_VERTEX_ATTRIB9_4_NV       0x8669
+#endif
+#ifndef GL_MAP1_VERTEX_ATTRIB10_4_NV
 #define GL_MAP1_VERTEX_ATTRIB10_4_NV      0x866A
+#endif
+#ifndef GL_MAP1_VERTEX_ATTRIB11_4_NV
 #define GL_MAP1_VERTEX_ATTRIB11_4_NV      0x866B
+#endif
+#ifndef GL_MAP1_VERTEX_ATTRIB12_4_NV
 #define GL_MAP1_VERTEX_ATTRIB12_4_NV      0x866C
+#endif
+#ifndef GL_MAP1_VERTEX_ATTRIB13_4_NV
 #define GL_MAP1_VERTEX_ATTRIB13_4_NV      0x866D
+#endif
+#ifndef GL_MAP1_VERTEX_ATTRIB14_4_NV
 #define GL_MAP1_VERTEX_ATTRIB14_4_NV      0x866E
+#endif
+#ifndef GL_MAP1_VERTEX_ATTRIB15_4_NV
 #define GL_MAP1_VERTEX_ATTRIB15_4_NV      0x866F
+#endif
+#ifndef GL_MAP2_VERTEX_ATTRIB0_4_NV
 #define GL_MAP2_VERTEX_ATTRIB0_4_NV       0x8670
+#endif
+#ifndef GL_MAP2_VERTEX_ATTRIB1_4_NV
 #define GL_MAP2_VERTEX_ATTRIB1_4_NV       0x8671
+#endif
+#ifndef GL_MAP2_VERTEX_ATTRIB2_4_NV
 #define GL_MAP2_VERTEX_ATTRIB2_4_NV       0x8672
+#endif
+#ifndef GL_MAP2_VERTEX_ATTRIB3_4_NV
 #define GL_MAP2_VERTEX_ATTRIB3_4_NV       0x8673
+#endif
+#ifndef GL_MAP2_VERTEX_ATTRIB4_4_NV
 #define GL_MAP2_VERTEX_ATTRIB4_4_NV       0x8674
+#endif
+#ifndef GL_MAP2_VERTEX_ATTRIB5_4_NV
 #define GL_MAP2_VERTEX_ATTRIB5_4_NV       0x8675
+#endif
+#ifndef GL_MAP2_VERTEX_ATTRIB6_4_NV
 #define GL_MAP2_VERTEX_ATTRIB6_4_NV       0x8676
+#endif
+#ifndef GL_MAP2_VERTEX_ATTRIB7_4_NV
 #define GL_MAP2_VERTEX_ATTRIB7_4_NV       0x8677
+#endif
+#ifndef GL_MAP2_VERTEX_ATTRIB8_4_NV
 #define GL_MAP2_VERTEX_ATTRIB8_4_NV       0x8678
+#endif
+#ifndef GL_MAP2_VERTEX_ATTRIB9_4_NV
 #define GL_MAP2_VERTEX_ATTRIB9_4_NV       0x8679
+#endif
+#ifndef GL_MAP2_VERTEX_ATTRIB10_4_NV
 #define GL_MAP2_VERTEX_ATTRIB10_4_NV      0x867A
+#endif
+#ifndef GL_MAP2_VERTEX_ATTRIB11_4_NV
 #define GL_MAP2_VERTEX_ATTRIB11_4_NV      0x867B
+#endif
+#ifndef GL_MAP2_VERTEX_ATTRIB12_4_NV
 #define GL_MAP2_VERTEX_ATTRIB12_4_NV      0x867C
+#endif
+#ifndef GL_MAP2_VERTEX_ATTRIB13_4_NV
 #define GL_MAP2_VERTEX_ATTRIB13_4_NV      0x867D
+#endif
+#ifndef GL_MAP2_VERTEX_ATTRIB14_4_NV
 #define GL_MAP2_VERTEX_ATTRIB14_4_NV      0x867E
+#endif
+#ifndef GL_MAP2_VERTEX_ATTRIB15_4_NV
 #define GL_MAP2_VERTEX_ATTRIB15_4_NV      0x867F
+#endif
 #endif 
 
 #ifndef GL_ARB_vertex_program
+#ifndef GL_ARB_vertex_program
 #define GL_ARB_vertex_program 1
+#endif
+#ifndef GL_VERTEX_PROGRAM_ARB
 #define GL_VERTEX_PROGRAM_ARB				        	    0x8620
+#endif
+#ifndef GL_VERTEX_PROGRAM_POINT_SIZE_ARB
 #define GL_VERTEX_PROGRAM_POINT_SIZE_ARB	       	0x8642
+#endif
+#ifndef GL_VERTEX_PROGRAM_TWO_SIDE_ARB
 #define GL_VERTEX_PROGRAM_TWO_SIDE_ARB	    	    0x8643
+#endif
+#ifndef GL_COLOR_SUM_ARB
 #define GL_COLOR_SUM_ARB				        		      0x8458
+#endif
+#ifndef GL_PROGRAM_FORMAT_ASCII_ARB
 #define GL_PROGRAM_FORMAT_ASCII_ARB			        	0x8875
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY_ENABLED_ARB
 #define GL_VERTEX_ATTRIB_ARRAY_ENABLED_ARB	     	0x8622
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY_SIZE_ARB
 #define GL_VERTEX_ATTRIB_ARRAY_SIZE_ARB		        0x8623
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY_STRIDE_ARB
 #define GL_VERTEX_ATTRIB_ARRAY_STRIDE_ARB	        0x8624
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY_TYPE_ARB
 #define GL_VERTEX_ATTRIB_ARRAY_TYPE_ARB           0x8625
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY_NORMALIZED_ARB
 #define GL_VERTEX_ATTRIB_ARRAY_NORMALIZED_ARB     0x886A
+#endif
+#ifndef GL_CURRENT_VERTEX_ATTRIB_ARB
 #define GL_CURRENT_VERTEX_ATTRIB_ARB		        	0x8626
+#endif
+#ifndef GL_VERTEX_ATTRIB_ARRAY_POINTER_ARB
 #define GL_VERTEX_ATTRIB_ARRAY_POINTER_ARB        0x8645
+#endif
+#ifndef GL_PROGRAM_LENGTH_ARB
 #define GL_PROGRAM_LENGTH_ARB                     0x8627
+#endif
+#ifndef GL_PROGRAM_FORMAT_ARB
 #define GL_PROGRAM_FORMAT_ARB                     0x8876
+#endif
+#ifndef GL_PROGRAM_BINDING_ARB
 #define GL_PROGRAM_BINDING_ARB                    0x8677
+#endif
+#ifndef GL_PROGRAM_INSTRUCTIONS_ARB
 #define GL_PROGRAM_INSTRUCTIONS_ARB               0x88A0
+#endif
+#ifndef GL_MAX_PROGRAM_INSTRUCTIONS_ARB
 #define GL_MAX_PROGRAM_INSTRUCTIONS_ARB           0x88A1
+#endif
+#ifndef GL_PROGRAM_NATIVE_INSTRUCTIONS_ARB
 #define GL_PROGRAM_NATIVE_INSTRUCTIONS_ARB        0x88A2
+#endif
+#ifndef GL_MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB
 #define GL_MAX_PROGRAM_NATIVE_INSTRUCTIONS_ARB    0x88A3
+#endif
+#ifndef GL_PROGRAM_TEMPORARIES_ARB
 #define GL_PROGRAM_TEMPORARIES_ARB                0x88A4
+#endif
+#ifndef GL_MAX_PROGRAM_TEMPORARIES_ARB
 #define GL_MAX_PROGRAM_TEMPORARIES_ARB            0x88A5
+#endif
+#ifndef GL_PROGRAM_NATIVE_TEMPORARIES_ARB
 #define GL_PROGRAM_NATIVE_TEMPORARIES_ARB         0x88A6
+#endif
+#ifndef GL_MAX_PROGRAM_NATIVE_TEMPORARIES_ARB
 #define GL_MAX_PROGRAM_NATIVE_TEMPORARIES_ARB     0x88A7
+#endif
+#ifndef GL_PROGRAM_PARAMETERS_ARB
 #define GL_PROGRAM_PARAMETERS_ARB                 0x88A8
+#endif
+#ifndef GL_MAX_PROGRAM_PARAMETERS_ARB
 #define GL_MAX_PROGRAM_PARAMETERS_ARB             0x88A9
+#endif
+#ifndef GL_PROGRAM_NATIVE_PARAMETERS_ARB
 #define GL_PROGRAM_NATIVE_PARAMETERS_ARB          0x88AA
+#endif
+#ifndef GL_MAX_PROGRAM_NATIVE_PARAMETERS_ARB
 #define GL_MAX_PROGRAM_NATIVE_PARAMETERS_ARB      0x88AB
+#endif
+#ifndef GL_PROGRAM_ATTRIBS_ARB
 #define GL_PROGRAM_ATTRIBS_ARB                    0x88AC
+#endif
+#ifndef GL_MAX_PROGRAM_ATTRIBS_ARB
 #define GL_MAX_PROGRAM_ATTRIBS_ARB                0x88AD
+#endif
+#ifndef GL_PROGRAM_NATIVE_ATTRIBS_ARB
 #define GL_PROGRAM_NATIVE_ATTRIBS_ARB             0x88AE
+#endif
+#ifndef GL_MAX_PROGRAM_NATIVE_ATTRIBS_ARB
 #define GL_MAX_PROGRAM_NATIVE_ATTRIBS_ARB         0x88AF
+#endif
+#ifndef GL_PROGRAM_ADDRESS_REGISTERS_ARB
 #define GL_PROGRAM_ADDRESS_REGISTERS_ARB          0x88B0
+#endif
+#ifndef GL_MAX_PROGRAM_ADDRESS_REGISTERS_ARB
 #define GL_MAX_PROGRAM_ADDRESS_REGISTERS_ARB      0x88B1
+#endif
+#ifndef GL_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB
 #define GL_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB   0x88B2
+#endif
+#ifndef GL_MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB
 #define GL_MAX_PROGRAM_NATIVE_ADDRESS_REGISTERS_ARB  0x88B3
+#endif
+#ifndef GL_MAX_PROGRAM_LOCAL_PARAMETERS_ARB
 #define GL_MAX_PROGRAM_LOCAL_PARAMETERS_ARB        0x88B4
+#endif
+#ifndef GL_MAX_PROGRAM_ENV_PARAMETERS_ARB
 #define GL_MAX_PROGRAM_ENV_PARAMETERS_ARB          0x88B5
+#endif
+#ifndef GL_PROGRAM_UNDER_NATIVE_LIMITS_ARB
 #define GL_PROGRAM_UNDER_NATIVE_LIMITS_ARB         0x88B6
+#endif
+#ifndef GL_PROGRAM_STRING_ARB
 #define GL_PROGRAM_STRING_ARB                      0x8628
+#endif
+#ifndef GL_PROGRAM_ERROR_POSITION_ARB
 #define GL_PROGRAM_ERROR_POSITION_ARB              0x864B
+#endif
+#ifndef GL_CURRENT_MATRIX_ARB
 #define GL_CURRENT_MATRIX_ARB                      0x8641
+#endif
+#ifndef GL_TRANSPOSE_CURRENT_MATRIX_ARB
 #define GL_TRANSPOSE_CURRENT_MATRIX_ARB            0x88B7
+#endif
+#ifndef GL_CURRENT_MATRIX_STACK_DEPTH_ARB
 #define GL_CURRENT_MATRIX_STACK_DEPTH_ARB          0x8640
+#endif
+#ifndef GL_MAX_VERTEX_ATTRIBS_ARB
 #define GL_MAX_VERTEX_ATTRIBS_ARB                  0x8869
+#endif
+#ifndef GL_MAX_PROGRAM_MATRICES_ARB
 #define GL_MAX_PROGRAM_MATRICES_ARB                0x862F
+#endif
+#ifndef GL_MAX_PROGRAM_MATRIX_STACK_DEPTH_ARB
 #define GL_MAX_PROGRAM_MATRIX_STACK_DEPTH_ARB      0x862E
+#endif
+#ifndef GL_PROGRAM_ERROR_STRING_ARB
 #define GL_PROGRAM_ERROR_STRING_ARB                0x8874
+#endif
+#ifndef GL_MATRIX0_ARB
 #define GL_MATRIX0_ARB                                  0x88C0
+#endif
+#ifndef GL_MATRIX1_ARB
 #define GL_MATRIX1_ARB                                  0x88C1
+#endif
+#ifndef GL_MATRIX2_ARB
 #define GL_MATRIX2_ARB                                  0x88C2
+#endif
+#ifndef GL_MATRIX3_ARB
 #define GL_MATRIX3_ARB                                  0x88C3
+#endif
+#ifndef GL_MATRIX4_ARB
 #define GL_MATRIX4_ARB                                  0x88C4
+#endif
+#ifndef GL_MATRIX5_ARB
 #define GL_MATRIX5_ARB                                  0x88C5
+#endif
+#ifndef GL_MATRIX6_ARB
 #define GL_MATRIX6_ARB                                  0x88C6
+#endif
+#ifndef GL_MATRIX7_ARB
 #define GL_MATRIX7_ARB                                  0x88C7
+#endif
+#ifndef GL_MATRIX8_ARB
 #define GL_MATRIX8_ARB                                  0x88C8
+#endif
+#ifndef GL_MATRIX9_ARB
 #define GL_MATRIX9_ARB                                  0x88C9
+#endif
+#ifndef GL_MATRIX10_ARB
 #define GL_MATRIX10_ARB                                 0x88CA
+#endif
+#ifndef GL_MATRIX11_ARB
 #define GL_MATRIX11_ARB                                 0x88CB
+#endif
+#ifndef GL_MATRIX12_ARB
 #define GL_MATRIX12_ARB                                 0x88CC
+#endif
+#ifndef GL_MATRIX13_ARB
 #define GL_MATRIX13_ARB                                 0x88CD
+#endif
+#ifndef GL_MATRIX14_ARB
 #define GL_MATRIX14_ARB                                 0x88CE
+#endif
+#ifndef GL_MATRIX15_ARB
 #define GL_MATRIX15_ARB                                 0x88CF
+#endif
+#ifndef GL_MATRIX16_ARB
 #define GL_MATRIX16_ARB                                 0x88D0
+#endif
+#ifndef GL_MATRIX17_ARB
 #define GL_MATRIX17_ARB                                 0x88D1
+#endif
+#ifndef GL_MATRIX18_ARB
 #define GL_MATRIX18_ARB                                 0x88D2
+#endif
+#ifndef GL_MATRIX19_ARB
 #define GL_MATRIX19_ARB                                 0x88D3
+#endif
+#ifndef GL_MATRIX20_ARB
 #define GL_MATRIX20_ARB                                 0x88D4
+#endif
+#ifndef GL_MATRIX21_ARB
 #define GL_MATRIX21_ARB                                 0x88D5
+#endif
+#ifndef GL_MATRIX22_ARB
 #define GL_MATRIX22_ARB                                 0x88D6
+#endif
+#ifndef GL_MATRIX23_ARB
 #define GL_MATRIX23_ARB                                 0x88D7
+#endif
+#ifndef GL_MATRIX24_ARB
 #define GL_MATRIX24_ARB                                 0x88D8
+#endif
+#ifndef GL_MATRIX25_ARB
 #define GL_MATRIX25_ARB                                 0x88D9
+#endif
+#ifndef GL_MATRIX26_ARB
 #define GL_MATRIX26_ARB                                 0x88DA
+#endif
+#ifndef GL_MATRIX27_ARB
 #define GL_MATRIX27_ARB                                 0x88DB
+#endif
+#ifndef GL_MATRIX28_ARB
 #define GL_MATRIX28_ARB                                 0x88DC
+#endif
+#ifndef GL_MATRIX29_ARB
 #define GL_MATRIX29_ARB                                 0x88DD
+#endif
+#ifndef GL_MATRIX30_ARB
 #define GL_MATRIX30_ARB                                 0x88DE
+#endif
+#ifndef GL_MATRIX31_ARB
 #define GL_MATRIX31_ARB                                 0x88DF
+#endif
 
 
 #endif

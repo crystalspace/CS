@@ -42,6 +42,8 @@ chronological order.
 	  OBJ.CSUTIL makefile variable, thus causing make-based builds to fail.
 	- Eric Sunshine fixed bugs in libs/cssys/cssys.mak where it failed to
 	  respect $(SRCDIR) in all cases.
+	- Eric Sunshine eliminated hundreds of "macro redifinition" warnings
+	  from renderer/opengl/csglext.h.
 16-Sep-2003
 	- Jorrit fixed the thing plugin so that it now actually registers
 	  leaving portals to the sector.
