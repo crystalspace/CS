@@ -38,7 +38,7 @@ csRenderMeshList::~csRenderMeshList ()
 {
 }
 
-void csRenderMeshList::AddRenderMeshes (csRenderMesh** meshes, int num, 
+void csRenderMeshList::AddRenderMeshes (csRenderMesh** meshes, int num,
                                    long renderPriority,
 				   csZBufMode z_buf_mode)
 {
@@ -122,7 +122,7 @@ static int SortMeshMaterial (void const* item1,
 {
   csRenderMesh* m1 = *(csRenderMesh**) item1;
   csRenderMesh* m2 = *(csRenderMesh**) item2;
-  
+
   if (m1->portal != 0 && m2->portal == 0)
     return 1;
   else if (m2->portal != 0 && m1->portal == 0)
@@ -140,12 +140,10 @@ static int SortMeshMaterial (void const* item1,
 void csRenderMeshList::GetSortedMeshList (
 	csArray<csRenderMesh*>& meshes)
 {
-  // iterate, and if needed, sort the lists
-  // also sum up how many objects we have
-  int numObjects = 0;
+  // Iterate, and if needed, sort the lists
+  meshes.Empty ();
 
   csPDelArray < renderMeshListInfo >::Iterator it = renderList.GetIterator ();
-  
   while (it.HasNext ())
   {
     renderMeshListInfo* listEnt = it.Next ();
@@ -155,7 +153,7 @@ void csRenderMeshList::GetSortedMeshList (
     if (listEnt->sortingOption == CS_RENDPRI_BACK2FRONT)
     {
       listEnt->meshList.Sort (SortMeshBack2Front);
-    } 
+    }
     else if (listEnt->sortingOption == CS_RENDPRI_FRONT2BACK)
     {
       listEnt->meshList.Sort (SortMeshFront2Back);
@@ -165,26 +163,12 @@ void csRenderMeshList::GetSortedMeshList (
       listEnt->meshList.Sort (SortMeshMaterial);
     }
 
-    numObjects += listEnt->meshList.Length ();
-  }
-
-  meshes.Empty ();
-  meshes.SetCapacity (numObjects);
-  int currentElement;
-  
-  it.Reset ();
-
-  while (it.HasNext ())
-  {
-    renderMeshListInfo* listEnt = it.Next ();
-
-    if (0 == listEnt)
-      continue;
-
-    for (currentElement = 0; currentElement < listEnt->meshList.Length (); 
-      ++currentElement)
+    int numObjects = listEnt->meshList.Length ();
+    int j;
+    for (j = 0 ; j < numObjects ; j++)
     {
-      meshes.Push (listEnt->meshList.Get (currentElement));
+      meshes.Push (listEnt->meshList[j]);
     }
   }
 }
+

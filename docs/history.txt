@@ -31,6 +31,8 @@ chronological order.
 	- Jorrit removed the sorting of the renderMeshListInfo structures
 	  in csRenderMeshList. This is not needed since they are already
 	  inserted sorted.
+	- Jorrit optimized csRenderMeshList->GetSortedMeshList() a bit more
+	  by avoiding the two iterator loops over the render priorities.
 8-Jan-2004
 	- Jorrit moved include/ivideo/rendersteps directory to
 	  include/iengine/rendersteps. Apparently this was forgotten during
