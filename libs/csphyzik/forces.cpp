@@ -195,7 +195,7 @@ ctVector3 ctCappedSpringF::apply_F( ctDynamicEntity &pe )
 	real dist = d.Norm();
 	real disp = 0;
 	if ( dist>cap_max ) disp = dist-cap_max;
-	else if ( dist<cap_min ) disp = cap_min-dist;
+	else if ( dist<cap_min ) disp = dist-cap_min;
 	if ( d*d > MIN_REAL ) // avoid divide by zero
 	  d = d.Unit();
 	else
