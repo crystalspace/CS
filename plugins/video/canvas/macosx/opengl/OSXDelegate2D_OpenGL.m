@@ -57,7 +57,13 @@ NSOpenGLContext *context;
     // Attributes for OpenGL contexts (0 is for fullscreen, 1 is for window)
     NSOpenGLPixelFormatAttribute attribs[] = {
         NSOpenGLPFAWindow, NSOpenGLPFADoubleBuffer, NSOpenGLPFAAccelerated,
-        NSOpenGLPFAColorSize, depth, NSOpenGLPFADepthSize, 16, 
+        NSOpenGLPFAColorSize, depth, NSOpenGLPFADepthSize, 32,
+#ifndef CS_USE_NEW_RENDERER
+        NSOpenGLPFAStencilSize, 1,
+#else
+        NSOpenGLPFAStencilSize, 8,
+        NSOpenGLPFAAlphaSize, 8,
+#endif
         NSOpenGLPFAScreenMask, CGDisplayIDToOpenGLDisplayMask(display), nil
     };
 
