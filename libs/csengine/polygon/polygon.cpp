@@ -630,7 +630,7 @@ void csPolygon3D::SetupHWUV()
 }
 #endif
 
-void csPolygon3D::CreateLightMaps (iGraphics3D* g3d)
+void csPolygon3D::CreateLightMaps (iGraphics3D* /*g3d*/)
 {
   if (orig_poly) return;
   csLightMapped *lmi = GetLightMapInfo ();
