@@ -1,5 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
+20-Apr-2000
+	- Andrew Zabolotny did another try to fix the Windows port
+	  by adding an assembly version of memcpy.
+	- Chris Bruner did a small fix to the Windows port.
 19-Apr-2000
 	- Andrew Zabolotny did a few changes to the windows port to
 	  try to get it working after his large changes from a few
@@ -19,6 +23,20 @@ The history order has been reversed so that new features are at the top.
 	  Note that there is still some stuff to clean up here. The
 	  csFrustrumView structure contains too much that is specific to
 	  lighting.
+	- Wouter Wijngaards made radiosity faster, fixed it a bit and
+	  added support for colored diffuse reflection.
+	- Radiosity is now omitted when -inhrecalc is given and otherwise
+	  only done when recalculation is forced.
+	- Eric Sunshine fixed csSector so that it embeds iSector rather
+	  than inheriting from it in order to work around
+	  multiple-inheritance bug in NextStep compiler.  It can't deal
+	  with two parents inheriting from the same base class (iBase,
+	  in this case), though it has no problem with multiple
+	  inheritance in general.
+	- Eric also fixed another problem with NextStep compiler complaining
+	  about subclasses of csObject (polygon.h and polyset.h) redeclaring
+	  GetName() and SetName() as virtual even though they
+	  were not so in the parent class.
 18-Apr-2000
 	- Norman Kramer added QueueExtendedKeyEvent to support regional
 	  keyboardlayouts. For an example see HandleEvent in x2d.cpp.
