@@ -77,7 +77,7 @@ csLightMap::csLightMap ()
   CONSTRUCT_IBASE (NULL);
   first_smap = NULL;
   cachedata = NULL;
-  last_lview = NULL;
+  last_frustum_id = 0;
 }
 
 csLightMap::~csLightMap ()

@@ -179,16 +179,17 @@ void *PackDPFX (G3DPolygonDPFX &poly)
     sizeof (float) * 3;
 
   void *ret = new char [size];
+  void *cur = ret;
 
-#define PUT(t,v)  *((t *)ret) = v; ret = ((t *)ret) + 1
+#define PUT(t,v)  *((t *)cur) = v; cur = ((t *)cur) + 1
 
   PUT (int, poly.num);
   size = poly.num * sizeof (G3DTexturedVertex);
-  memcpy (ret, poly.vertices, size);
-  ret = ((char *)ret) + size;
+  memcpy (cur, poly.vertices, size);
+  cur = ((char *)cur) + size;
   size = poly.num * sizeof (G3DFogInfo);
-  memcpy (ret, poly.fog_info, size);
-  ret = ((char *)ret) + size;
+  memcpy (cur, poly.fog_info, size);
+  cur = ((char *)cur) + size;
   PUT (bool, poly.use_fog);
   PUT (float, poly.inv_aspect);
   PUT (iTextureHandle *, poly.txt_handle);

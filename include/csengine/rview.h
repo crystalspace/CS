@@ -429,15 +429,20 @@ public:
   /// Userdata belonging to the callback.
   void* callback_data;
 
+  /**
+   * Every light frustum has its own numeric ID which UNIQUELY identifies it.
+   * This ID is incremented each time a new frustum is created.
+   */
+  int frustum_id;
+
 public:
-  ///
-  csFrustumView () : light_frustum (NULL), callback (NULL), callback_data (NULL) { }
- 
-  ///
-  ~csFrustumView ()
-  {
-    CHK (delete light_frustum);
-  }
+  /// Constructor. frustum_id is generated each time a new object is created.
+  csFrustumView ();
+  /// Copy constructor. Everything is copied except the frustum ID
+  csFrustumView (csFrustumView &iCopy);
+
+  /// Destroy the object
+  ~csFrustumView ();
 };
 
 

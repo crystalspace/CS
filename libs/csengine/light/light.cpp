@@ -32,10 +32,32 @@
 
 //---------------------------------------------------------------------------
 
+static int __last_frustum_id = 666;
+
+csFrustumView::csFrustumView () : light_frustum (NULL), callback (NULL),
+  callback_data (NULL)
+{
+  frustum_id = __last_frustum_id++;
+}
+
+csFrustumView::csFrustumView (csFrustumView &iCopy)
+{
+  // hehe. kind of a trick.
+  memcpy (this, &iCopy, sizeof (csFrustumView));
+  // Generate a new id
+  frustum_id = __last_frustum_id++;
+}
+
+csFrustumView::~csFrustumView ()
+{
+  delete light_frustum;
+}
+
+//---------------------------------------------------------------------------
+
 int csLight::ambient_red = DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_green = DEFAULT_LIGHT_LEVEL;
 int csLight::ambient_blue = DEFAULT_LIGHT_LEVEL;
-int csLight::lighting_cookie = 0;
 
 IMPLEMENT_CSOBJTYPE (csLight,csObject);
 
@@ -212,7 +234,6 @@ void csStatLight::CalculateLighting ()
 
   CHK (lview.light_frustum = new csFrustum (center));
   lview.light_frustum->MakeInfinite ();
-  lighting_cookie++;
   sector->CheckFrustum (lview);
 }
 
@@ -240,7 +261,6 @@ void csStatLight::CalculateLighting (csThing* th)
 
   CHK (lview.light_frustum = new csFrustum (center));
   lview.light_frustum->MakeInfinite ();
-  lighting_cookie++;
   th->CheckFrustum (lview);
 }
 
@@ -269,7 +289,6 @@ void csStatLight::LightingFunc (csLightingFunc* callback, void* callback_data)
 
   CHK (lview.light_frustum = new csFrustum (center));
   lview.light_frustum->MakeInfinite ();
-  lighting_cookie++;
   sector->CheckFrustum (lview);
 }
 
@@ -397,7 +416,6 @@ void csDynLight::Setup ()
 
   CHK (lview.light_frustum = new csFrustum (center));
   lview.light_frustum->MakeInfinite ();
-  lighting_cookie++;
   sector->CheckFrustum (lview);
 }
 

@@ -26,7 +26,6 @@
 class csPolyTexture;
 class csPolygonSet;
 class csPolygon3D;
-class csFrustumView;
 class csLight;
 class csWorld;
 class Dumper;
@@ -168,9 +167,7 @@ private:
   void *cachedata;
 
   /// Used when computing lightmaps to fill every lightmap only once
-  csFrustumView *last_lview;
-  /// The lighting cookie when last_lview was valid
-  int last_lighting_cookie;
+  int last_frustum_id;
 
   /**
    * Convert three lightmap tables to the right mixing mode.

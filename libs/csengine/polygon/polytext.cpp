@@ -207,11 +207,9 @@ void csPolyTexture::InitLightMaps ()
 bool csPolyTexture::GetLightmapBounds (csFrustumView *lview, csVector3 *bounds)
 {
   // Take care not to fill same lightmap twice
-  if (lm->last_lview == lview
-   && lm->last_lighting_cookie == csLight::lighting_cookie)
+  if (lm->last_frustum_id == lview->frustum_id)
     return false;
-  lm->last_lview = lview;
-  lm->last_lighting_cookie = csLight::lighting_cookie;
+  lm->last_frustum_id = lview->frustum_id;
 
   csPolyTxtPlane *txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
   csMatrix3 m_t2w = txt_pl->m_world2tex.GetInverse ();
