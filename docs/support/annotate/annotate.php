@@ -13,6 +13,7 @@ $self=$PHP_SELF;
 
 readXMLFile($file);
 print "<a name=\"comments\">\n";
+
 if ($action=="") {
     printEntries();
     print "<a href=\"$self?action=showadd#comments\">Add a comment</a><br>\n";
@@ -94,11 +95,12 @@ function printEntries()
     global $entries;
 
     foreach ($entries as $e) {
-	print "<table width=\"95%\" bgcolor=\"#555555\" celspacing=\"0\" celpadding=\"0\"><tr>\n";
-	print "<td width=\"47%\">".$e->author."</td>\n";
-	print "<td><a href=\"mailto:".$e->email."\">".$e->email."</a></td>\n";
-	print "</td></tr>\n";
-	print "<table width=\"95%\" bgcolor=\"#eeeeee\"><tr><td>\n";
+	print "<table width=\"100%\" bgcolor=\"#ff88cc\" celspacing=\"0\" celpadding=\"0\">\n";
+	print "<tr><td>".$e->author."</td>";
+	print "<td align=\"right\">";
+	print "<a href=\"mailto:".$e->email."\">".$e->email."</a></td></tr>\n";
+	print "</table>";
+	print "<table bgcolor=\"#eeeeee\"><tr><td>";
 	print $e->text;
 	print "</td></tr></table>\n";
 	print "<br>\n";
