@@ -20,6 +20,10 @@ The history order is reversed so that new features are at the top.
 	  if exact clipping was needed.
 	- res fixed MSVC assertion in csString::Collapse() if the string
 	  contains characters >= 0x80
+	- Eric Sunshine worked around an internal compiler error on MacOS/X by
+	  slightly reorganizing csGraphics3DOGLCommon::ClipTriangleMesh() in
+	  ogl_g3dcom.cpp.  Also eliminated a significant number of compilation
+	  warnings.
 30-Jan-2003
 	- Greatly modified the DrawPolygonMesh and polygon buffer
 	  code in the OpenGL renderer. This is still very experimental

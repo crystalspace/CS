@@ -2745,7 +2745,6 @@ void csGraphics3DOGLCommon::DrawPolygonMaterialOnly (G3DPolygonDP& poly)
 
   static GLfloat glverts[100*4];
   static GLfloat gltxt[100*2];
-  static GLfloat gltxttrans[100*2];
 
   GLfloat* glv = glverts, * glt = gltxt;
   for (i = 0; i < poly.num; i++)
@@ -3406,7 +3405,7 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     const csVector3& frust_origin,
     csPlane3* planes, int num_planes)
 {
-  int i, j;
+  int i;
 
   // Make sure our worktables are big enough for the clipped mesh.
   int num_tri = num_triangles*2+50;
@@ -3425,10 +3424,8 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
   for (i = 0 ; i < num_triangles ; i++)
   {
     csTriangle& tri = triangles[i];
-    int cnt = int (ct[tri.a] == -1)
-        + int (ct[tri.b] == -1)
-	+ int (ct[tri.c] == -1);
-    if (cnt == 0)
+    bool isect = (ct[tri.a] == -1) | (ct[tri.b] == -1) | (ct[tri.c] == -1);
+    if (!isect)
     {
       //=====
       // All three vertices are outside the frustum. It is still
@@ -3438,10 +3435,10 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       // triangle is not visible.
       //=====
       if (ct[tri.a] != ct[tri.b] || ct[tri.a] != ct[tri.c])
-        cnt = 1;
+        isect = true;
     }
 
-    if (cnt == 0)
+    if (!isect)
     {
       //=====
       // Easiest case: triangle is not visible.
@@ -3661,9 +3658,11 @@ CS_IMPLEMENT_STATIC_VAR (Get_dpmesh_persp, dpmesh_persp, ())
 typedef csGrowingArray<bool> dpmesh_visible;
 CS_IMPLEMENT_STATIC_VAR (Get_dpmesh_visible, dpmesh_visible, ())
 
+#if 0
 static dpmesh_tr_verts *dp_tr_verts = NULL;
 static dpmesh_persp *dp_persp = NULL;
 static dpmesh_visible *dp_visible = NULL;
+#endif
 
 static void PlaneZ (
   const csVector3 &u,
@@ -4233,9 +4232,6 @@ uint prev_mixmode = ~0;
       SetupDTMClipping (trimesh);
       SetupDTMTransforms (trimesh.vertex_mode);
       csVector3* work_verts = trimesh.buffers[0]->GetVertices ();
-      csVector2* work_uv_verts = trimesh.buffers[0]->GetTexels ();
-      csColor* work_colors = trimesh.buffers[0]->GetColors ();
-      G3DFogInfo* work_fog = trimesh.vertex_fog;
       float* work_userarrays[CS_VBUF_TOTAL_USERA];
       int userarraycomponents[CS_VBUF_TOTAL_USERA];
       int i;
@@ -5787,7 +5783,6 @@ void csGraphics3DOGLCommon::FogDrawTriangleMesh (G3DTriangleMesh& mesh,
     ci.effect = NULL;
     SetupDTMClipping (mesh);
   }
-  int i;
 
   //===========
   // Update work tables.
