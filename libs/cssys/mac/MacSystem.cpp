@@ -460,7 +460,7 @@ void SysSystemDriver::Loop ()
   theError = InstallEventLoopTimer (GetMainEventLoop(), 0, 0.000001, GetTimerUPP(), 0, &theTimer);
 #endif
 
-  while (!Shutdown && !ExitLoop) {
+  while (!Shutdown) {
 #if ! TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
     NextFrame ();
 #endif
@@ -505,8 +505,6 @@ void SysSystemDriver::Loop ()
       }
     }
   }
-
-  ExitLoop = false;
 
 #if TARGET_API_MAC_CARBON || TARGET_API_MAC_OSX
   if (theTimer) {
@@ -784,7 +782,7 @@ void SysSystemDriver::HandleMenuSelection( const short menuNum, const short item
 #endif
         } else if (itemNum == CountMenuItems( GetMenuHandle(menuNum) )) {
             // We'll assume that the quit is the last item in the File menu.
-            ExitLoop = true;
+            Shutdown = true;
         }
     }
 }
@@ -1333,7 +1331,7 @@ OSErr SysSystemDriver::HandleAppleEvent( const AppleEvent *theEvent )
                 break;
 
             case kAEQuitApplication:
-                ExitLoop = true;
+                Shutdown = true;
                 break;
 
             default:

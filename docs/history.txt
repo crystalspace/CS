@@ -1,6 +1,28 @@
 The history order is reversed so that new features are at the top.
 
+27-Jun-2001
+	- Eric Sunshine removed the now obsolete csevQuitLoop event.  This is
+	  not needed anymore since CSWS no longer invokes iSystem::Loop()
+	  recursively.
+	- Eric Sunshine removed the csSystemDriver::ExitLoop isntance variable
+	  and all associated support code.
+	- Eric Sunshine removed the following outdated documents from the
+	  CS/docs/incoming directory: collide.txt, csupdate.txt, extmodel.txt,
+	  glossary.tex, makecreat.tex, mazed.html, mazed.txi,
+	  mazed_interface.html, mazed_preface.html, mazed_tutorial.html,
+	  octree.tex.  Also removed the following files from the
+	  CS/docs/incoming/images directory: cswhite.jpg, csws.gif, MazeD.gif,
+	  ObjMaker.gif, smalllogo.jpg, smcslogo.jpg, texture6.gif, tutor1.gif,
+	  tutor2.gif.
+	- Eric Sunshine added a new glossary.txi to the Appendix in the user's
+	  manual.  This is based upon the old glossary.tex from the `incoming'
+	  directory.
+	- Eric Sunshine moved the content of CS/docs/incoming/csupdate.txt
+	  directly into the csupdate.py script.  This information is now
+	  accessed via the --detailed-help option.
 26-Jun-2001
+	- Philip updated the win32gcc.txi doc to add explanation about
+	  PYTHONPATH environment variable.
 	- Fixed a problem in apimod19.txi. The document incorrectly stated
 	  that you had to do SCF_QUERY_INTERFACE() in order to get the
 	  pointer to VFS, G3D, and other plugins from the system driver.
@@ -40,8 +62,6 @@ The history order is reversed so that new features are at the top.
 	- Wouter Wijngaards added a randomly generated maze to isotest
 	  application.
 	- Philip Wyett fixed a small compile problem in iso engine.
-	- Philip updated the win32gcc.txi doc to add explanation about
-	  PYTHONPATH environment variable.
 	- Michael Voasse implemented radius calculation on metaball,
 	  'borrowed' HitBeamObject code from sprite3d and fixed shape
 	  number update.

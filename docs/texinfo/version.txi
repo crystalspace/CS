@@ -1,4 +1,4 @@
 @c -*-texinfo-*-
-@set UPDATED 26 June 2001
-@set EDITION 19.dev.15
+@set UPDATED 27 June 2001
+@set EDITION 19.dev.16
 @set VERSION 19.dev

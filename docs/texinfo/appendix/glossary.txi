@@ -1,0 +1,60 @@
+@c -*-texinfo-*-
+@node Glossary, FAQ, Contributing, Top
+@appendix Glossary
+@cindex Glossary
+
+This is a short glossary of terminology used throughout the documentation as
+well as in discussions of 3D graphics.
+
+@table @emph
+@item Camera Space
+Before viewing objects and rooms are transformed from world to camera space.
+This means that the position of the camera is set at (0,0,0); the positive z
+direction points away from the eys the y direction is up and the x direction is
+right.
+
+@item Light-Map Space
+Two-dimensional (l,m) coordinate-system corresponding to some point on a
+light-map.  Light-map space is closely related to texture space.
+
+@item Object Space
+Every object or room is defined with its own local 3D coordinate system
+typically centered around (0,0,0).
+
+@item Portal
+A Portal is one of the polygons of a sector which will not be texture mapped
+(unless it has a semi-transparent texture).  Instead the other sector (visible
+through that portal) will be drawn.  A portal may even point back into the the
+sector in which it is contained.  This is useful for portals which act as
+mirrors.
+
+@item @sc{scf}
+The shared class facility.  A mechanism for managing plugin modules and
+treating objects in a uniform manner.  @xref{SCF}.
+
+@item Screen Space
+Two-dimensional coordinate-system corresponding to physical screen coordinates.
+Screen space is perspective corrected camera space.
+
+@item Sector
+A geometry container.  A sector is populated with mesh objects which are built
+from convex polygons in order to define the visual and physical attributes of
+the sector.
+
+@item Texture Space
+Two-dimensional (u,v) coordinate-system corresponding to some point on a
+texture.  Texture space is given by a transformation matrix and vector going
+from object space to texture space.
+
+@item Thing
+A mesh object which defines the fixed geometry within a sector.
+
+@item World Space
+Three-dimensional coordinate-system corresponding to the world in which all
+objects live.  Mesh objects are mapped from object space to world space via a
+matrix transformation.
+
+@item @sc{vfs}
+The virtual file system.  A mechanism for unifying filesystem access between
+various platforms.  @xref{VFS}.
+@end table

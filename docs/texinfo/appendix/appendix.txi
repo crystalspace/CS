@@ -1,3 +1,4 @@
 @c -*-texinfo-*-
+@imports{appendix,glossary.txi}
 @imports{appendix,faq.txi}
 @imports{appendix,apimod.txi}

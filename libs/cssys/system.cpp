@@ -311,8 +311,6 @@ csSystemDriver::csSystemDriver () : PlugIns (8, 8), EventQueue (),
   debug_level = 0;
   Shutdown = false;
   CurrentTime = cs_time (-1);
-
-  ExitLoop = false;
 }
 
 csSystemDriver::~csSystemDriver ()
@@ -620,9 +618,8 @@ void csSystemDriver::NextFrame ()
 
 void csSystemDriver::Loop ()
 {
-  while (!Shutdown && !ExitLoop)
+  while (!Shutdown)
     NextFrame ();
-  ExitLoop = false;
 }
 
 bool csSystemDriver::HandleEvent (iEvent&Event)
@@ -632,9 +629,6 @@ bool csSystemDriver::HandleEvent (iEvent&Event)
     {
       case cscmdQuit:
         Shutdown = true;
-        break;
-      case cscmdQuitLoop:
-        ExitLoop = true;
         break;
       case cscmdFocusChanged:
         // If user switches away from our application, reset

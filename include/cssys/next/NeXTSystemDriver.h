@@ -36,8 +36,8 @@ private:
 
   void init_menu(iConfigFile*);
   void advance_state();			// Calls NextFrame(), etc.
-  bool continue_looping() const { return (!ExitLoop && continue_running()); }
   bool continue_running() const { return !Shutdown; }
+  bool continue_looping() const { return (continue_running()); }
 
 public:
   SCF_DECLARE_IBASE_EXT(csSystemDriver);

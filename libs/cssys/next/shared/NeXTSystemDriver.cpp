@@ -122,10 +122,7 @@ void NeXTSystemDriver::advance_state()
 {
   NextFrame();
   if (!continue_looping())
-  {
     NeXTDelegate_stop_event_loop(controller);
-    ExitLoop = false;
-  }
 }
 
 
@@ -141,7 +138,7 @@ void NeXTSystemDriver::advance_state()
 //	    Query whether or not the application's event loop should continue
 //	    running.  The result is returned as a boolean result in the integer
 //	    variable referenced by the argument.  Returns `true' if the system
-//	    driver variables ExitLoop and Shutdown are both false.
+//	    driver variable Shutdown is false.
 //	continuerunning <int*>
 //	    Query whether or not the application's event loop should continue
 //	    running.  The result is returned as a boolean result in the integer

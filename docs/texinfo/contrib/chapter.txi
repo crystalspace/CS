@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Contributing, FAQ, Internals, Top
+@node Contributing, Glossary, Internals, Top
 @chapter Contributing to Crystal Space
 
 @imports{contrib,intro.txi}

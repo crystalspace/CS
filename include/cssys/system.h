@@ -286,8 +286,6 @@ public:
   csJoystickDriver Joystick;
   /// Set to non-zero to exit csSystemDriver::Loop()
   bool Shutdown;
-  /// Same as Shutdown but set manually by windowing system
-  bool ExitLoop;
   /// Debugging level (0 = no debug, 1 = normal debug, 2 = verbose debug)
   int debug_level;
   /// List of all options for all plug-in modules.

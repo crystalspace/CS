@@ -105,6 +105,7 @@ version @value{VERSION}, last updated @value{UPDATED}.
 * Plug-In Drivers:: Plug-In Modules and Drivers
 * Internals:: Internal Project Structure
 * Contributing:: Contributing to Crystal Space
+* Glossary::
 * FAQ:: Frequently Asked Questions (@sc{faq})
 * API Modifications:: Significant @sc{api} Changes
 * Index::

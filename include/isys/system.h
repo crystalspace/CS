@@ -200,8 +200,7 @@ struct iSystem : public iBase
 
   /**
    * System loop.
-   * This function returns only when an cscmdQuit or an cscmdQuitLoop
-   * broadcast is encountered.
+   * This function returns only when an cscmdQuit broadcast is encountered.
    */
   virtual void Loop () = 0;
 

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node FAQ, API Modifications, Contributing, Top
+@node FAQ, API Modifications, Glossary, Top
 @appendix Frequently Asked Questions (@sc{faq})
 @cindex Frequently Asked Questions
 @cindex @sc{faq}

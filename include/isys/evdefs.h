@@ -280,14 +280,6 @@ enum
   cscmdQuit,
 
   /**
-   * The following event is very similar to cscmdQuit except that
-   * it causes system driver to quit just one level of the event loop,
-   * if it was called recursively. Before exiting ::Loop the quit
-   * condition is reset, thus you may call ::Loop later again.
-   */
-  cscmdQuitLoop,
-
-  /**
    * Application has changed its "focused" status.<p>
    * This command is posted (or is not posted) by system-dependent driver.
    * This event is generated whenever user application receives/loses focus.

@@ -286,7 +286,7 @@ run-loop is generally implemented in this fashion:
 
 @example
 csSystemDriver::Loop() @{
-    while (!Shutdown && !ExitLoop) @{
+    while (!Shutdown) @{
         NextFrame(); // @r{Process events and render next frame.}
     @}
 @}
