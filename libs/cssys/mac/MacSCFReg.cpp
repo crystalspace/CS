@@ -58,7 +58,7 @@ Str255	gAppName;
 FSSpec	gAppLocation;
 bool Shutdown = false;
 csIniFile *ini = NULL;
-bool verbose = true;
+bool verbose = false;
 
 OSErr AppleEventHandler( AppleEvent *event, AppleEvent *reply, long refCon );
 AEEventHandlerUPP AppleEventHandlerUPP = NULL;
