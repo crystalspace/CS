@@ -388,18 +388,18 @@ void Blocks::add_cube (int dx, int dy, int dz, int x, int y, int z)
 
   csPolygon3D* p;
 
-  p = cube->GetPolygon ("f1"); set_uv (p, 0, 0, 1, 0, 1, 1);
-  p = cube->GetPolygon ("f2"); set_uv (p, 0, 0, 1, 1, 0, 1);
-  p = cube->GetPolygon ("t1"); set_uv (p, 0, 0, 1, 0, 1, 1);
-  p = cube->GetPolygon ("t2"); set_uv (p, 0, 0, 1, 1, 0, 1);
-  p = cube->GetPolygon ("b1"); set_uv (p, 0, 0, 1, 0, 1, 1);
-  p = cube->GetPolygon ("b2"); set_uv (p, 0, 0, 1, 1, 0, 1);
-  p = cube->GetPolygon ("d1"); set_uv (p, 0, 0, 1, 0, 1, 1);
-  p = cube->GetPolygon ("d2"); set_uv (p, 0, 0, 1, 1, 0, 1);
-  p = cube->GetPolygon ("l1"); set_uv (p, 0, 0, 1, 0, 1, 1);
-  p = cube->GetPolygon ("l2"); set_uv (p, 0, 0, 1, 1, 0, 1);
-  p = cube->GetPolygon ("r1"); set_uv (p, 0, 0, 1, 0, 1, 1);
-  p = cube->GetPolygon ("r2"); set_uv (p, 0, 0, 1, 1, 0, 1);
+  p = cube->GetPolygon3D ("f1"); set_uv (p, 0, 0, 1, 0, 1, 1);
+  p = cube->GetPolygon3D ("f2"); set_uv (p, 0, 0, 1, 1, 0, 1);
+  p = cube->GetPolygon3D ("t1"); set_uv (p, 0, 0, 1, 0, 1, 1);
+  p = cube->GetPolygon3D ("t2"); set_uv (p, 0, 0, 1, 1, 0, 1);
+  p = cube->GetPolygon3D ("b1"); set_uv (p, 0, 0, 1, 0, 1, 1);
+  p = cube->GetPolygon3D ("b2"); set_uv (p, 0, 0, 1, 1, 0, 1);
+  p = cube->GetPolygon3D ("d1"); set_uv (p, 0, 0, 1, 0, 1, 1);
+  p = cube->GetPolygon3D ("d2"); set_uv (p, 0, 0, 1, 1, 0, 1);
+  p = cube->GetPolygon3D ("l1"); set_uv (p, 0, 0, 1, 0, 1, 1);
+  p = cube->GetPolygon3D ("l2"); set_uv (p, 0, 0, 1, 1, 0, 1);
+  p = cube->GetPolygon3D ("r1"); set_uv (p, 0, 0, 1, 0, 1, 1);
+  p = cube->GetPolygon3D ("r2"); set_uv (p, 0, 0, 1, 1, 0, 1);
 
   room->AddThing (cube);
   csVector3 v ((x-CUBE_DIM/2)*BLOCK_DIM, z*BLOCK_DIM+1, (y-CUBE_DIM/2)*BLOCK_DIM);
