@@ -2836,6 +2836,11 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	      }
 	    }
 	  }
+	  SyntaxService->ReportError (
+		"crystalspace.maploader.load.plugin", child,
+		"File '%s' doesn't contain <params>, <meshobj>, nor <meshfact>!",
+		fname);
+	  goto error;
 	}
 	break;
       case XMLTOKEN_PARAMSFILE:

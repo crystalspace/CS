@@ -38,6 +38,8 @@ chronological order.
 	      nothing else. After that you can use <params> like usual.
 	- Jorrit fixed a bug so that <file> in combination with <meshfact>
 	  actually works.
+	- Jorrit added error reporting in case the <file> is not a meshfact,
+	  meshobj, or params.
 18-Nov-2003
 	- Keith committed a new version of the Max level export scripts.
 	  This version supports ThingFactories and instances now.  Also
