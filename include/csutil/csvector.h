@@ -88,7 +88,7 @@ public:
   /// Insert element 'Item' before element 'n'
   bool Insert (int n, csSome Item);
   /// Insert a chunk of size at the position 'n'
-  bool InsertChunk (int n, int size, csSome Item);
+  bool InsertChunk (int n, int size, csSome* Item);
 };
 
 /**
