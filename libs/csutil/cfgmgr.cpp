@@ -20,6 +20,7 @@
 #include "csutil/cfgmgr.h"
 #include "csutil/cfgfile.h"
 #include "csutil/util.h"
+#include "csutil/hashmap.h"
 
 /* helper classes */
 
@@ -72,15 +73,35 @@ private:
   csConfigDomain *CurrentDomain;
   iConfigIterator *CurrentIterator;
   char *Subsection;
-  csVector Iterated;
+  csHashMap Iterated;
 public:
   DECLARE_IBASE;
 
   void ClearIterated() {
-    while (Iterated.Length()>0) {
-      char *n = (char*)Iterated.Pop();
+    csHashIterator *it = Iterated.GetIterator();
+    while (it->HasNext()) {
+      char *n = (char*)it->Next();
       delete[] n;
     }
+    delete it;
+    Iterated.DeleteAll();
+  }
+  bool FindIterated(const char *Key) {
+    csHashKey HashKey = csHashCompute(CurrentIterator->GetKey());
+    csHashIterator *it = Iterated.GetIterator(HashKey);
+    while (it->HasNext()) {
+      char *n = (char*)it->Next();
+      if (strcmp(n, Key)==0) {
+        delete it;
+        return true;
+      }
+    }
+    delete it;
+    return false;
+  }
+  void AddIterated(const char *Key) {
+    csHashKey HashKey = csHashCompute(Key);
+    Iterated.Put(HashKey, strnew(Key));
   }
 
   csConfigManagerIterator(csConfigManager *cfg, const char *sub) {
@@ -113,12 +134,9 @@ public:
   virtual bool Next() {
     if (CurrentIterator) {
       if (CurrentIterator->Next()) {
-        // look if key was already iterated
-        for (long i=0; i<Iterated.Length(); i++) {
-          if (strcmp((char*)Iterated.Get(i), CurrentIterator->GetKey()) == 0)
-            return Next();
-        }
-        Iterated.Push(strnew(CurrentIterator->GetKey()));
+        if (FindIterated(CurrentIterator->GetKey()))
+          return Next();
+        AddIterated(CurrentIterator->GetKey());
         return true;
       } else {
         CurrentIterator->DecRef();
@@ -469,9 +487,9 @@ csConfigDomain *csConfigManager::FindConfig(iConfigFileNew *cfg) const
 csConfigDomain *csConfigManager::FindConfig(const char *Name, iVFS *vfs) const
 {
   for (csConfigDomain *d=FirstDomain; d!=NULL; d=d->Next) {
-    if (d->Cfg &&
-        (d->Cfg->GetVFS() == vfs) &&
-        (strcmp(d->Cfg->GetFileName(), Name)==0))
+    if (d->Cfg && d->Cfg->GetFileName() &&
+        strcmp(d->Cfg->GetFileName(), Name)==0 &&
+        d->Cfg->GetVFS() == vfs)
       return d;
   }
   return NULL;
@@ -504,8 +522,9 @@ int csConfigManager::FindRemoved(const char *Name, iVFS *vfs) const
 {
   for (long i=0; i<Removed.Length(); i++) {
     iConfigFileNew *cfg = (iConfigFileNew*)Removed.Get(i);
-    if (strcmp(cfg->GetFileName(), Name)==0 && cfg->GetVFS()==vfs)
-      return i;
+    if (cfg->GetFileName())
+      if (strcmp(cfg->GetFileName(), Name)==0 && cfg->GetVFS()==vfs)
+        return i;
   }
   return -1;
 }
