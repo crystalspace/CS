@@ -229,6 +229,12 @@ void csSpriteTemplate::GenerateLOD ()
 
   csLOD::CalculateLOD (new_mesh, verts, translate, emerge_from);
 
+//// DEBUG CODE ////
+for (i = 0 ; i < GetNumTexels() ; i++)
+//translate [i] = (i + 1) % GetNumTexels();
+translate [i] = i;
+////////////////////
+
   for (i = 0 ; i < frames.Length () ; i++)
   {
     int j;
@@ -249,6 +255,18 @@ void csSpriteTemplate::GenerateLOD ()
     tr.b = translate[tr.b];
     tr.c = translate[tr.c];
   }
+
+//// DEBUG CODE ////
+for (i = 0 ; i < GetNumTexels() ; i++)
+{
+// THIS LINE MAKES WEIRD LIGHTING EFFECTS
+texel_to_vertex [(i + 1) % GetNumTexels()] = i;
+// THIS LINE HAS NO EFFECT
+texel_to_normal [(i + 1) % GetNumTexels()] = i;
+}
+////////////////////
+
+/*
   if (texel_to_normal != NULL)
   {
     CHK (int* ttn = new int [GetNumTexels()]);
@@ -265,6 +283,7 @@ void csSpriteTemplate::GenerateLOD ()
     CHK (delete [] texel_to_vertex);
     texel_to_vertex = ttv;
   }
+*/
 
   CHK (delete [] translate);
   CHK (delete verts);
