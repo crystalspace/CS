@@ -54,9 +54,11 @@ void ToLower(char *dst, const char *src) {
 
 void WriteBone(FILE *f, int ind, float scale, CalCoreSkeleton *skel, CalCoreBone *bone) {
   ifprintf(f, ind, "LIMB '%s' (\n", bone->getName().c_str());
+#if 1
   const CalVector &pos=bone->getTranslation();
   const CalQuaternion &rot=bone->getRotation();
-  ifprintf(f, ind, "TRANSFORM(V(%f,%f,%f)Q(%f,%f,%f,%f))\n", pos.m_x*scale, pos.m_y*scale, pos.m_z*scale, rot.m_x, rot.m_y, rot.m_z, rot.m_w);
+  ifprintf(f, ind, "TRANSFORM(V(%f,%f,%f)Q(%f,%f,%f,%f))\n", pos.x*scale, pos.y*scale, pos.z*scale, rot.x, rot.y, rot.z, rot.w);
+#endif
 
   int *ptr=(int*)bone->getUserData();
   if(ptr) {
@@ -73,6 +75,7 @@ void WriteBone(FILE *f, int ind, float scale, CalCoreSkeleton *skel, CalCoreBone
     CalCoreBone *child=skel->getCoreBone(*iteratorChildId);
     WriteBone(f, ind+1, scale, skel, child);
   }
+
   ifprintf(f, ind, ")\n");
 }
 
@@ -174,15 +177,15 @@ int ExportSprite(const char* filename, float scale, float timescale, CalCoreMode
     }
 
 //Store xyz
-#if 0 //TODO Azverkan this is for trying to export the model in its "standard pose"
+#if 1 //TODO Azverkan this is for trying to export the model in its "standard pose"
     CalBone *bone=calModel.getSkeleton()->getVectorBone()[useinf->boneId];
-    CalVector pos(useinf->x, useinf->y, useinf->z);
-    pos.transform(bone->getRotationAbsolute());
-    pos.add(bone->getTranslationAbsolute());
+    CalVector pos(v->position);
+    pos *= bone->getCoreBone()->getRotationBoneSpace();
+    pos += bone->getCoreBone()->getTranslationBoneSpace();
 
-    ifprintf(f, ind, "V(%f,%f,%f:%f,%f)\n", pos.m_x*scale, pos.m_y*scale, pos.m_z*scale, t->u, 1.0f-t->v);
+    ifprintf(f, ind, "V(%f,%f,%f:%f,%f)\n", pos.x*scale, pos.y*scale, pos.z*scale, t->u, 1.0f-t->v);
 #else
-    ifprintf(f, ind, "V(%f,%f,%f:%f,%f)\n", useinf->x*scale, useinf->y*scale, useinf->z*scale, t->u, 1.0f-t->v);
+    ifprintf(f, ind, "V(%f,%f,%f:%f,%f)\n", v->position.x*scale, v->position.y*scale, v->position.z*scale, t->u, 1.0f-t->v);
 #endif
 
 //Add to bone list
@@ -249,7 +252,14 @@ int ExportSprite(const char* filename, float scale, float timescale, CalCoreMode
         CalQuaternion q;
 	CalVector v;
 #if 0 //TODO Azverkan this is for trying to export the model in its "standard pose"
-	SkeletonCalToCrystal(q, keyframe->getRotation(), bone->getRotation(), v, keyframe->getTranslation(), bone->getTranslation());
+//	SkeletonCalToCrystal(q, keyframe->getRotation(), bone->getRotation(), v, keyframe->getTranslation(), bone->getTranslation());
+
+	v = coreBone->getTranslationBoneSpace();
+	v *= keyframe->getRotation();
+	v += keyframe->getTranslation();
+
+	q = coreBone->getRotationBoneSpace();
+	q *= keyframe->getRotation();
 #else
 	q=keyframe->getRotation();
 	v=keyframe->getTranslation();
@@ -258,7 +268,7 @@ int ExportSprite(const char* filename, float scale, float timescale, CalCoreMode
 	v[1]*=scale;
 	v[2]*=scale;
 
-        ifprintf(f, ind, "FRAME '%f' (ROT(Q(%f,%f,%f,%f)) POS(%f,%f,%f))\n",keyframe->getTime()*timescale,q.m_x,q.m_y,q.m_z,q.m_w,v.m_x,v.m_y,v.m_z);
+        ifprintf(f, ind, "FRAME '%f' (ROT(Q(%f,%f,%f,%f)) POS(%f,%f,%f))\n",keyframe->getTime()*timescale,q.x,q.y,q.z,q.w,v.x,v.y,v.z);
       }
 
       ifprintf(f, --ind, ")\n");
@@ -312,7 +322,7 @@ int ConvertModel(const char *filename) {
     if(tmp)
       *tmp=0;
 
-    if(strcmp(cmd, "scale")==0) {
+    if(strcmp(cmd, "geomscale")==0) {
       scale=atof(param);
       printf("Scale Geom to %f\n", scale);
     } else if(strcmp(cmd, "timescale")==0) {
