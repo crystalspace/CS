@@ -601,6 +601,7 @@ SCF_IMPLEMENT_IBASE (csSprite3DMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSprite3DState)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::Sprite3DState)
@@ -609,6 +610,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::PolyMesh)
   SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csSprite3DMeshObject::eiVertexBufferManagerClient)
+  SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 /// Static vertex array.
@@ -627,6 +632,7 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSprite3DState);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
   cur_frame = 0;
   factory = NULL;
   force_otherskin = false;
@@ -659,6 +665,7 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
 
   vbuf = NULL;
   vbuf_tween = NULL;
+  vbufmgr = NULL;
 }
 
 csSprite3DMeshObject::~csSprite3DMeshObject ()
@@ -666,6 +673,7 @@ csSprite3DMeshObject::~csSprite3DMeshObject ()
   if (vis_cb) vis_cb->DecRef ();
   if (vbuf) vbuf->DecRef ();
   if (vbuf_tween) vbuf_tween->DecRef ();
+  if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
   uv_verts.DecRef ();
   tr_verts.DecRef ();
   fog_verts.DecRef ();
@@ -1121,7 +1129,13 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 
   // @@@ The priority of the vertex buffer should be a parameter for the sprite.
   if (!vbuf)
-    vbuf = g3d->GetVertexBufferManager ()->CreateBuffer (1);
+  {
+    // we need that to remove us from the manager later on. Bad we have no
+    // object registry at hand
+    vbufmgr = g3d->GetVertexBufferManager ();
+    vbuf = vbufmgr->CreateBuffer (1);
+    vbufmgr->AddClient (&scfiVertexBufferManagerClient);
+  }
 
   g3dmesh.buffers[0] = vbuf;
   if (do_tween)
@@ -1130,7 +1144,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     vbuf_tween_texels = real_uv_verts;
     vbuf_tween_colors = vertex_colors;
     if (!vbuf_tween)
-      vbuf_tween = g3d->GetVertexBufferManager ()->CreateBuffer (0);
+      vbuf_tween = vbufmgr->CreateBuffer (0);
     g3dmesh.buffers[1] = vbuf_tween;
     g3dmesh.morph_factor = tween_ratio;
     g3dmesh.num_vertices_pool = 2;
@@ -1690,6 +1704,19 @@ iSkeletonState* csSprite3DMeshObject::Sprite3DState::GetSkeletonState () const
   iSkeletonState* iskelstate = SCF_QUERY_INTERFACE_SAFE (scfParent->GetSkeletonState (), iSkeletonState);
   if (iskelstate) iskelstate->DecRef ();
   return iskelstate;
+}
+
+void csSprite3DMeshObject::eiVertexBufferManagerClient::ManagerClosing ()
+{
+  if (scfParent->vbuf)
+    scfParent->vbuf->DecRef ();
+  if (scfParent->vbuf_tween)
+    scfParent->vbuf_tween->DecRef ();
+  if (scfParent->vbuf || scfParent->vbuf_tween)
+  {
+    scfParent->vbuf = scfParent->vbuf_tween = NULL;
+    scfParent->vbufmgr = NULL;
+  }
 }
 
 //----------------------------------------------------------------------
