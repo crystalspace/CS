@@ -242,18 +242,18 @@
 	<usecfg>texturecompression</usecfg>
       </applicable>
     </rule>
-    <rule description="GeForce FX 5xxxXT: Slow VBO">
+    <rule description="GeForce FX 5xxx: Slow VBO">
       <conditions>
-	<regexp string="renderer" pattern="^GeForce FX 5...XT" />
+	<regexp string="renderer" pattern="^GeForce FX 5..." />
 	<!-- @@@ Add some version check ? -->
       </conditions>
       <applicable>
 	<usecfg>novbo</usecfg>
       </applicable>
     </rule>
-    <rule description="GeForce FX 5xxxXT: Broken 'Inverted fog'">
+    <rule description="GeForce FX 5xxx: Broken 'Inverted fog'">
       <conditions>
-	<regexp string="renderer" pattern="^GeForce FX 5...XT" />
+	<regexp string="renderer" pattern="^GeForce FX 5..." />
 	<!-- @@@ Add some version check ? -->
       </conditions>
       <applicable>

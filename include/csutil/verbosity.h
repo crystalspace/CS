@@ -23,7 +23,7 @@
 /**\file
  * Verbosity management helpers
  */
-
+#include "csextern.h"
 #include "iutil/verbositymanager.h"
 
 #include "csutil/csstring.h"
@@ -45,7 +45,7 @@
  * only specific classes or subclasses, e.g. <tt>--verbose=*,-scf</tt> will
  * enable verbosity for everything except the SCF diagnostic information.
  */
-class csVerbosityParser
+class CS_CSUTIL_EXPORT csVerbosityParser
 {
   struct VerbosityFlag
   {
@@ -99,7 +99,7 @@ extern CS_CSUTIL_EXPORT bool csCheckVerbosity (int argc,
  * Default iVerbosityManager implementation. Basically a thin wrapper around 
  * csVerbosityParser.
  */
-class csVerbosityManager : public iVerbosityManager
+class CS_CSUTIL_EXPORT csVerbosityManager : public iVerbosityManager
 {
   csVerbosityParser vp;
 public:

@@ -19,13 +19,14 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-
 #ifndef __CS_FLOATRAND_H__
 #define __CS_FLOATRAND_H__
 
-extern unsigned int cs_floatrand_seed;
+#include "csextern.h"
 
-extern inline float csFastRandFloat ()
+CS_CSUTIL_EXPORT_VAR unsigned int cs_floatrand_seed;
+
+static inline float csFastRandFloat ()
 {
   static unsigned int b = 1664525;
   static unsigned int c = 1013904223;

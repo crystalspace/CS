@@ -51,6 +51,12 @@
 #ifndef CS_IMPORT_SYM
 #  define CS_IMPORT_SYM
 #endif
+#ifndef CS_EXPORT_VAR
+#  define CS_EXPORT_VAR
+#endif
+#ifndef CS_IMPORT_VAR
+#  define CS_IMPORT_VAR		extern
+#endif
 
 #include "csextern.h"
 
