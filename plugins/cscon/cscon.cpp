@@ -49,17 +49,16 @@ csConsole::csConsole(iBase *base)
 
 csConsole::~csConsole()
 {
-  //@@@ This is disabled due to a bug in some implementations of iSystem
-  //if(piSystem)
-  //piSystem->DecRef();
-  if(piG2D)
-    piG2D->DecRef();
+  if (piSystem)
+    piSystem->DecRef ();
+  if (piG2D)
+    piG2D->DecRef ();
   delete buffer;
 }
 
 bool csConsole::Initialize(iSystem *system)
 {
-  piSystem = system;
+  (piSystem = system)->IncRef ();
   piG2D = QUERY_PLUGIN(piSystem, iGraphics2D);
   if(!piG2D)
     return false;

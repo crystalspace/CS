@@ -179,8 +179,13 @@ protected:
    */
   virtual csImageFile* LoadImage (UByte* iBuffer, ULong iSize, int iFormat) = 0;
 
-  /// Not really needed
-  virtual ~csImageLoader() { }
+  /*
+   * WARNING: This class should have NO destructor otherwise csgfxldr library
+   * will be unusable for linking into plugins because on most platforms
+   * static objects (see bool RegisterXXX()) will register an atexit()
+   * callback for the destructor, and during program exit sequence the
+   * plugins won't be present in memory (they are unloaded in ~SystemDriver).
+   */
 
 public:
   /**

@@ -42,6 +42,7 @@
 #include "csengine/thingtpl.h"
 #include "csutil/vfs.h"
 #include "csutil/csstring.h"
+#include "cssys/csendian.h"
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -1305,7 +1306,6 @@ void converter::init_program_data ( ) {
 
     John Burkardt
 */
-  extern long convert_endian (long l);
   byte_swap = (convert_endian (0x12345678L) != 0x12345678L);
   debug = FALSE;
   num_color = 0;

@@ -72,10 +72,10 @@ csImageFile* csWALImageLoader::LoadImage (UByte* iBuffer, ULong iSize, int iForm
 bool ImageWALFile::Load (UByte* iBuffer, ULong iSize)
 {
   WALHeader head = *(WALHeader *)iBuffer;
-  head.width = little_endian_int (head.width);
-  head.height = little_endian_int (head.height);
-  head.offsets [0] = little_endian_int (head.offsets [0]);
-  head.offsets [3] = little_endian_int (head.offsets [3]);
+  head.width = little_endian_long (head.width);
+  head.height = little_endian_long (head.height);
+  head.offsets [0] = little_endian_long (head.offsets [0]);
+  head.offsets [3] = little_endian_long (head.offsets [3]);
   
   // There's no id-tag in .WAL files, so the only way I know to check
   // if it's a wal, is to use this method. Hope it works

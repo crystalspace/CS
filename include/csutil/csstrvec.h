@@ -39,7 +39,7 @@ public:
 
   /// Constructor just passes control to csVector's
   csStrVector (int ilimit = 64, int ithreshold = 64) :
-   csVector (ilimit, ithreshold) {}
+    csVector (ilimit, ithreshold) {}
 
   /// Delete all inserted strings before deleting the object itself
   virtual ~csStrVector ();

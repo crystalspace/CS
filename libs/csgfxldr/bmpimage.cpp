@@ -54,21 +54,21 @@ csImageFile* csBMPImageLoader::LoadImage (UByte* iBuffer, ULong iSize,
 // access it as the given type.
 //-----------------------------------------------------------------------------
 
-static inline UShort us_endian(const UByte* ptr)
+static inline UShort us_endian (const UByte* ptr)
 {
-  UShort n;
+  short n;
   memcpy(&n, ptr, sizeof(n));
   return convert_endian(n);
 }
 
-static inline ULong ul_endian(const UByte* ptr)
+static inline ULong ul_endian (const UByte* ptr)
 {
-  ULong n;
+  long n;
   memcpy(&n, ptr, sizeof(n));
   return convert_endian(n);
 }
 
-static inline long l_endian(const UByte* ptr)
+static inline long l_endian (const UByte* ptr)
 {
   long n;
   memcpy(&n, ptr, sizeof(n));

@@ -37,17 +37,16 @@ csConsoleInput::csConsoleInput(iBase *base)
 
 csConsoleInput::~csConsoleInput()
 {
-  //@@@ This is disabled due to a bug in some implementations of iSystem
-  //if(piSystem)
-  //piSystem->DecRef();
-  if(piConsole)
-    piConsole->DecRef();
+  if (piSystem)
+    piSystem->DecRef ();
+  if (piConsole)
+    piConsole->DecRef ();
   delete buffer;
 }
 
 bool csConsoleInput::Initialize(iSystem *system)
 {
-  piSystem = system;
+  (piSystem = system)->IncRef ();
   return true;
 }
 
