@@ -19,6 +19,9 @@ chronological order.
 	- Jorrit changed pvsvis to also accept a 'minnode' keyword. This
 	  can be used to set the minimal node of the kdtree used by the
 	  PVS culler.
+	- Eric Sunshine reverted Jorrit's reversion of Frank's change to
+	  walktest/keys.cpp and also corrected the problem with Frank's change
+	  which caused parsing to misbehave.
 23-Jan-2005
 	- Eric Sunshine applied a boundary-condition fix from Andrew Mann for
 	  the timspec::tv_nsec overflow check in csPosixCondition::Wait().
