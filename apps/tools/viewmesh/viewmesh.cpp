@@ -92,6 +92,7 @@ ViewMesh::ViewMesh (iObjectRegistry *object_reg, csSkin &Skin)
   cammode = movenormal;
   spritepos = csVector3(0,10,0);
   move_sprite_speed = 0;
+  scale = 1;
 }
 
 ViewMesh::~ViewMesh ()
@@ -695,6 +696,7 @@ bool ViewMesh::Initialize ()
   if (scaleTxt != NULL)
   {
     sscanf (scaleTxt, "%f", &scale);
+    printf ("Scaling: %f\n", scale);
   }
 
   // Load specified Libraries
