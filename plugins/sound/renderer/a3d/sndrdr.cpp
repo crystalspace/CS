@@ -20,9 +20,7 @@
 #include <stdio.h>
 #include <windows.h>
 
-#include "ia3d.h"
-#include <initguid.h>
-#include "dsound.h"
+#include "ia3dapi.h"
 
 #include "sysdef.h"
 #include "cscom/com.h"
@@ -85,27 +83,25 @@ STDMETHODIMP csSoundRenderA3D::Open()
   
   SysPrintf (MSG_INITIALIZATION, "\nSoundRender Aureal3D selected\n");
 
-  if (FAILED(hr = A3dCreate(NULL,(void **)&m_p3DAudioRenderer,NULL)))
+	CoInitialize(NULL);
+
+	hr = CoCreateInstance(CLSID_A3dApi, NULL, CLSCTX_INPROC_SERVER,
+	                      IID_IA3d4, (void **)&m_p3DAudioRenderer);
+  if (FAILED(hr))
+  {
+    SysPrintf(MSG_FATAL_ERROR, "Error : Cannot CoCreateInstance Aureal3D Api !");
+    Close();
+    return(hr);
+  }
+
+  if (FAILED(hr = m_p3DAudioRenderer->Init(NULL, NULL, A3DRENDERPREFS_DEFAULT)))
   {
     SysPrintf(MSG_FATAL_ERROR, "Error : Cannot Initialize Aureal3D !");
     Close();
     return(hr);
   }
   
-  switch (hr)
-  {
-  case A3D_OK_OLD_DLL:
-    SysPrintf (MSG_INITIALIZATION, "Warning : Older A3d drivers detected.\nYou should consider downloading new drivers from www.aureal.com\n");
-    break;
-  case DS_OK:
-    SysPrintf (MSG_INITIALIZATION, "Warning : A3d Direct Sound failed to initialize.\nYou are running Microsoft Direct Sound.\n");
-    break;
-  default:
-    break;
-  }
-  
-  DWORD dwLevel = DSSCL_NORMAL;
-  if (FAILED(hr = m_p3DAudioRenderer->SetCooperativeLevel(GetForegroundWindow(), dwLevel)))
+  if (FAILED(hr = m_p3DAudioRenderer->SetCooperativeLevel(GetForegroundWindow(), A3D_CL_NORMAL)))
   {
     SysPrintf(MSG_FATAL_ERROR, "Error : Cannot Set Cooperative Level!");
     Close();
@@ -130,17 +126,21 @@ STDMETHODIMP csSoundRenderA3D::Close()
 
   if (m_p3DAudioRenderer)
   {
-    if ((hr = m_p3DAudioRenderer->Release()) < DS_OK)
+    if ((hr = m_p3DAudioRenderer->Release()) < S_OK)
       return(hr);
     
     m_p3DAudioRenderer = NULL;
   }
+
+  CoUninitialize();
 
   return S_OK;
 }
 
 STDMETHODIMP csSoundRenderA3D::Update()
 {
+  m_p3DAudioRenderer->Flush();
+
   return S_OK;
 }
 

@@ -134,11 +134,22 @@ STDMETHODIMP csSoundRenderDS3D::Update()
 
 STDMETHODIMP csSoundRenderDS3D::SetVolume(float vol)
 {
+  long dsvol;
+  if (m_pListener)
+  {
+    m_pListener->m_pDS3DPrimaryBuffer->SetVolume(dsvol);
+  }
   return S_OK;
 }
 
 STDMETHODIMP csSoundRenderDS3D::GetVolume(float *vol)
 {
+  long dsvol;
+  if (m_pListener)
+  {
+    m_pListener->m_pDS3DPrimaryBuffer->GetVolume(&dsvol);
+  }
+
   return S_OK;
 }
 

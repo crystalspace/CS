@@ -58,7 +58,7 @@ public:
 	DECLARE_INTERFACE_TABLE(csSoundRenderA3D)
 
 public:
-	LPDIRECTSOUND		m_p3DAudioRenderer;
+	IA3d4 *m_p3DAudioRenderer;
   ISystem* m_piSystem;
 
   /// print to the system's device

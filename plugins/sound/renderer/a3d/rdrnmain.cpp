@@ -22,8 +22,10 @@
 
 #include <stdlib.h>
 
-#include "dsound.h"
-#include "ia3d.h"
+#include <objbase.h>
+#include <initguid.h>
+
+#include "ia3dapi.h"
 
 #include "sysdef.h"
 #include "cscom/com.h"

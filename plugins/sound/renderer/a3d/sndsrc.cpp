@@ -22,8 +22,7 @@
 #include "cscom/com.h"
 #include "isystem.h"
 
-#include "dsound.h"
-#include "ia3d.h"
+#include "ia3dapi.h"
 
 #include "cssndrdr/a3d/sndrdr.h"
 #include "cssndrdr/a3d/sndsrc.h"
@@ -39,8 +38,8 @@ csSoundSourceA3D::csSoundSourceA3D()
   info.fPosX = info.fPosY = info.fPosZ = 0.0;
   info.fVelX = info.fVelY = info.fVelZ = 0.0;
 
-  m_pDS3DBuffer2D = NULL;
-  m_pDS3DBuffer3D = NULL;
+  m_p3DSource = NULL;
+  m_p3DAudioRenderer = NULL;
 }
 
 csSoundSourceA3D::~csSoundSourceA3D()
@@ -52,7 +51,6 @@ int csSoundSourceA3D::CreateSource(ISoundRender * render, csSoundBuffer * sound)
 {
   HRESULT                 hr;
   csSoundRenderA3D *renderA3D;
-  DSBUFFERDESC    dsbd;
   VOID                            *pbWrite1 = NULL, *pbWrite2 = NULL;
   DWORD                           cbLen1, cbLen2;
   DWORD           dwMode;
@@ -67,10 +65,13 @@ int csSoundSourceA3D::CreateSource(ISoundRender * render, csSoundBuffer * sound)
   if (!m_p3DAudioRenderer)
     return(E_FAIL);
   
-  ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
-  dsbd.dwSize = sizeof(DSBUFFERDESC);
-  
-  dsbd.dwFlags = DSBCAPS_STATIC | DSBCAPS_CTRLDEFAULT | DSBCAPS_CTRL3D;
+  if ((hr = m_p3DAudioRenderer->NewSource( A3DSOURCE_INITIAL_RENDERMODE_A3D , &m_p3DSource)) != S_OK)
+  {
+    if (m_p3DSource)
+      m_p3DSource = NULL;
+
+    return(hr);
+  }
   
   WAVEFORMATEX    wfxFormat;
   wfxFormat.wFormatTag                    = WAVE_FORMAT_PCM;
@@ -80,68 +81,51 @@ int csSoundSourceA3D::CreateSource(ISoundRender * render, csSoundBuffer * sound)
   wfxFormat.nBlockAlign           = (wfxFormat.wBitsPerSample*wfxFormat.nChannels)/8;
   wfxFormat.nAvgBytesPerSec       = wfxFormat.nBlockAlign*wfxFormat.nSamplesPerSec;
   wfxFormat.cbSize                                = 0;
-  dsbd.lpwfxFormat = &wfxFormat;
-  dsbd.dwBufferBytes = sound->getSize();
-  
-  m_pDS3DBuffer2D = NULL;
-  m_pDS3DBuffer3D = NULL;
-  
-  if ((hr = m_p3DAudioRenderer->CreateSoundBuffer(&dsbd, &m_pDS3DBuffer2D, NULL)) != DS_OK)
+
+  if ((hr = m_p3DSource->SetWaveFormat((void*)&wfxFormat)) != S_OK)
   {
-    if (m_pDS3DBuffer2D)
-      m_pDS3DBuffer2D = NULL;
+    if (m_p3DSource != NULL)
+    {
+      m_p3DSource->Release();
+      m_p3DSource = NULL;
+    }
+
     return(hr);
   }
-  
-  if ((hr = m_pDS3DBuffer2D->Lock(0, sound->getSize(), &pbWrite1, &cbLen1, &pbWrite2, &cbLen2, 0L)) != DS_OK)
+
+  if ((hr = m_p3DSource->AllocateWaveData(sound->getSize())) != S_OK)
   {
-    if (pbWrite1 != NULL)
+    if (m_p3DSource != NULL)
     {
-      m_pDS3DBuffer2D->Unlock(pbWrite1, sound->getSize(), pbWrite2, 0);
-      pbWrite1 = NULL;
+      m_p3DSource->Release();
+      m_p3DSource = NULL;
     }
-    
-    if (m_pDS3DBuffer2D != NULL)
+
+    return(hr);
+  }
+
+  if ((hr = m_p3DSource->Lock(0, sound->getSize(), &pbWrite1, &cbLen1, &pbWrite2, &cbLen2, A3D_ENTIREBUFFER)) != S_OK)
+  {
+    if (m_p3DSource != NULL)
     {
-      m_pDS3DBuffer2D->Release();
-      m_pDS3DBuffer2D = NULL;
+      m_p3DSource->Release();
+      m_p3DSource = NULL;
     }
-    
+
     return(hr);
   }
   
   CopyMemory(pbWrite1, sound->getData(), sound->getSize());
     
-  if ((hr = m_pDS3DBuffer2D->Unlock(pbWrite1, sound->getSize(), pbWrite2, 0)) != DS_OK)
+  if ((hr = m_p3DSource->Unlock(pbWrite1, sound->getSize(), pbWrite2, 0)) != S_OK)
   {
-    if (pbWrite1 != NULL)
+    if (m_p3DSource != NULL)
     {
-      m_pDS3DBuffer2D->Unlock(pbWrite1, sound->getSize(), pbWrite2, 0);
-      pbWrite1 = NULL;
-    }
-    
-    if (m_pDS3DBuffer2D != NULL)
-    {
-      m_pDS3DBuffer2D->Release();
-      m_pDS3DBuffer2D = NULL;
+      m_p3DSource->Release();
+      m_p3DSource = NULL;
     }
     
     return(hr);
-  }
-  
-
-  pbWrite1 = NULL;
-  pbWrite2 = NULL;
-
-  if((hr = m_pDS3DBuffer2D->QueryInterface(IID_IDirectSound3DBuffer, (void **) &m_pDS3DBuffer3D)) < DS_OK)
-  {
-  }
-  else
-  {
-    dwMode = DS3DMODE_NORMAL;
-    if ((hr = m_pDS3DBuffer3D->SetMode(dwMode, DS3D_IMMEDIATE)) < DS_OK)
-    {
-    }
   }
   
   return S_OK;
@@ -151,23 +135,18 @@ int csSoundSourceA3D::DestroySource()
 {
   HRESULT hr;
   
-  if (m_pDS3DBuffer3D)
+  if (m_p3DSource)
   {
-    if ((hr = m_pDS3DBuffer3D->Release()) < DS_OK)
+    if ((hr = m_p3DSource->Stop()) < S_OK)
       return(hr);
     
-    m_pDS3DBuffer3D = NULL;
-  }
-  
-  if (m_pDS3DBuffer2D)
-  {
-    if ((hr = m_pDS3DBuffer2D->Stop()) < DS_OK)
+    if ((hr = m_p3DSource->FreeWaveData()) != S_OK)
+      return(hr);
+
+    if ((hr = m_p3DSource->Release()) < S_OK)
       return(hr);
     
-    if ((hr = m_pDS3DBuffer2D->Release()) < DS_OK)
-      return(hr);
-    
-    m_pDS3DBuffer2D = NULL;
+    m_p3DSource = NULL;
   }
 
   return S_OK;
@@ -175,12 +154,12 @@ int csSoundSourceA3D::DestroySource()
 
 STDMETHODIMP csSoundSourceA3D::PlaySource(bool inLoop)
 {
-  if (m_pDS3DBuffer2D)
+  if (m_p3DSource)
   {
     if (inLoop)
-      m_pDS3DBuffer2D->Play(0, 0, DSBPLAY_LOOPING);
+      m_p3DSource->Play(A3D_LOOPED);
     else
-      m_pDS3DBuffer2D->Play(0, 0, 0);
+      m_p3DSource->Play(A3D_SINGLE);
   }
 
   return S_OK;
@@ -188,21 +167,37 @@ STDMETHODIMP csSoundSourceA3D::PlaySource(bool inLoop)
 
 STDMETHODIMP csSoundSourceA3D::StopSource()
 {
-  if (m_pDS3DBuffer2D)
-    m_pDS3DBuffer2D->Stop();
+  if (m_p3DSource)
+    m_p3DSource->Stop();
 
   return S_OK;
 }
 
 STDMETHODIMP csSoundSourceA3D::SetPosition(float x, float y, float z)
 {
+  HRESULT hr;
+  
   info.fPosX = x; info.fPosY = y; info.fPosZ = z;
+
+  if(!m_p3DSource)
+    return E_FAIL;
+
+  m_p3DSource->SetPosition3f(x, y, z);
 
   return S_OK;
 }
 
 STDMETHODIMP csSoundSourceA3D::SetVelocity(float x, float y, float z)
 {
+  HRESULT hr;
+  
+  info.fVelX = x; info.fVelY = y; info.fVelZ = z;
+
+  if(!m_p3DSource)
+    return E_FAIL;
+
+  m_p3DSource->SetVelocity3f(x, y, z);
+
   return S_OK;
 }
 

@@ -48,9 +48,8 @@ public:
 	int DestroySource();
 	int CreateSource(ISoundRender *render, csSoundBuffer * sound);
 
-  LPDIRECTSOUNDBUFFER		m_pDS3DBuffer2D;
-  LPDIRECTSOUND3DBUFFER	m_pDS3DBuffer3D;
-  LPDIRECTSOUND		m_p3DAudioRenderer;
+  IA3dSource *m_p3DSource;
+  IA3d4 *m_p3DAudioRenderer;
 };
 
 #endif // __CSSOUNDSOURCEA3D_H__

@@ -51,9 +51,8 @@ public:
   int CreateListener(ISoundRender *render);
 	int DestroyListener();
 
-  LPDIRECTSOUNDBUFFER		m_pDS3DPrimaryBuffer;
-	LPDIRECTSOUND3DLISTENER	m_pDS3DListener;
-  LPDIRECTSOUND		m_p3DAudioRenderer;
+	IA3dListener	*m_p3DListener;
+  IA3d4 *m_p3DAudioRenderer;
 };
 
 #endif // __CSSOUNDLISTENERA3D_H__
