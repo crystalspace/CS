@@ -54,6 +54,7 @@ protected:
   void ReportV (const char* msgid, int severity, 
 	iDocumentNode* errornode, const char* msg, va_list arg);
   bool ParseGradientShade (iDocumentNode* node, csGradientShade& shade);
+  bool WriteGradientShade (iDocumentNode* node, csGradientShade* shade);
 
 public:
   SCF_DECLARE_IBASE;
@@ -63,24 +64,37 @@ public:
   bool Initialize (iObjectRegistry* object_reg);
 
   virtual bool ParseBool (iDocumentNode* node, bool& result, bool def_result);
+  virtual bool WriteBool (iDocumentNode* node, const char* name, bool value,
+                          bool default_value);
   virtual bool ParseMatrix (iDocumentNode* node, csMatrix3 &m);
+  virtual bool WriteMatrix (iDocumentNode* node, csMatrix3* m);
   virtual bool ParseVector (iDocumentNode* node, csVector3 &v);
+  virtual bool WriteVector (iDocumentNode* node, csVector3* v);
   virtual bool ParseBox (iDocumentNode* node, csBox3 &v);
+  virtual bool WriteBox (iDocumentNode* node, csBox3* v);
   virtual bool ParseColor (iDocumentNode* node, csColor &c);
+  virtual bool WriteColor (iDocumentNode* node, csColor* c);
   virtual bool ParseColor (iDocumentNode* node, csColor4 &c);
+  virtual bool WriteColor (iDocumentNode* node, csColor4* c);
   virtual bool ParseMixmode (iDocumentNode* node, uint &mixmode,
     bool allowFxMesh = false);
+  virtual bool WriteMixmode (iDocumentNode* node, uint mixmode, bool allowFxMesh);
   virtual bool HandlePortalParameter (
 	iDocumentNode* child, iLoaderContext* ldr_context,
 	uint32 &flags, bool &mirror, bool &warp, int& msv,
 	csMatrix3 &m, csVector3 &before, csVector3 &after,
 	iString* destSector, bool& handled, bool& autoresolve);
-  virtual bool ParseGradient (iDocumentNode* node,
-			      csGradient& gradient);
+  virtual bool ParseGradient (iDocumentNode* node, csGradient& gradient);
+  virtual bool WriteGradient (iDocumentNode* node, csGradient* gradient);
   virtual bool ParseShaderVar (iDocumentNode* node, csShaderVariable& var);
+  virtual bool WriteShaderVar (iDocumentNode* node, csShaderVariable* var);
   virtual bool ParseAlphaMode (iDocumentNode* node, iStringSet* strings,
     csAlphaMode& alphaMode);
+  virtual bool WriteAlphaMode (iDocumentNode* node, iStringSet* strings,
+    csAlphaMode* alphaMode);
   virtual bool ParseZMode (iDocumentNode* node, csZBufMode& zmode,
+    bool allowZmesh);
+  virtual bool WriteZMode (iDocumentNode* node, csZBufMode* zmode,
     bool allowZmesh);
 
   virtual void ReportError (const char* msgid, iDocumentNode* errornode,

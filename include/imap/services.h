@@ -82,9 +82,20 @@ struct iSyntaxService : public iBase
   	bool def_result) = 0;
   
   /**
+   * Write a node representing the value of the boolean.
+   */
+  virtual bool WriteBool (iDocumentNode* node, const char* name,
+                          bool value, bool default_value) = 0;
+  
+  /**
    * Parse a matrix description. Returns true if successful.
    */
   virtual bool ParseMatrix (iDocumentNode* node, csMatrix3 &m) = 0;
+
+  /**
+   * Write a matrix description. Returns true if successful.
+   */
+  virtual bool WriteMatrix (iDocumentNode* node, csMatrix3* m) = 0;
 
   /**
    * Parse a vector description. Returns true if successful.
@@ -92,9 +103,19 @@ struct iSyntaxService : public iBase
   virtual bool ParseVector (iDocumentNode* node, csVector3 &v) = 0;
 
   /**
+   * Write a vector description. Returns true if successful.
+   */
+  virtual bool WriteVector (iDocumentNode* node, csVector3* v) = 0;
+
+  /**
    * Parse a box description. Returns true if successful.
    */
   virtual bool ParseBox (iDocumentNode* node, csBox3 &v) = 0;
+
+  /**
+   * Write a box description. Returns true if successful.
+   */
+  virtual bool WriteBox (iDocumentNode* node, csBox3* v) = 0;
 
   /**
    * Parse a color description. Returns true if successful.
@@ -102,15 +123,31 @@ struct iSyntaxService : public iBase
   virtual bool ParseColor (iDocumentNode* node, csColor &c) = 0;
 
   /**
+   * Write a color description. Returns true if successful.
+   */
+  virtual bool WriteColor (iDocumentNode* node, csColor* c) = 0;
+
+  /**
    * Parse a color description. Returns true if successful.
    */
   virtual bool ParseColor (iDocumentNode* node, csColor4 &c) = 0;
+
+  /**
+   * Write a color description. Returns true if successful.
+   */
+  virtual bool WriteColor (iDocumentNode* node, csColor4* c) = 0;
 
   /**
    * Parse a mixmode description. Returns true if successful.
    */
   virtual bool ParseMixmode (iDocumentNode* node, uint &mixmode,
     bool allowFxMesh = false) = 0;
+
+  /**
+   * Write a mixmode description. Returns true if successful.
+   */
+  virtual bool WriteMixmode (iDocumentNode* node, uint mixmode,
+    bool allowFxMesh) = 0;
 
   /**
    * Handles a common portal parameter.
@@ -131,10 +168,22 @@ struct iSyntaxService : public iBase
 			      csGradient& gradient) = 0;
 
   /**
+   * Write a color gradient.
+   */
+  virtual bool WriteGradient (iDocumentNode* node,
+			      csGradient* gradient) = 0;
+
+  /**
    * Parse a shader variable declaration
    */
   virtual bool ParseShaderVar (iDocumentNode* node, 
     csShaderVariable& var) = 0;
+			    
+  /**
+   * Write a shader variable declaration
+   */
+  virtual bool WriteShaderVar (iDocumentNode* node, 
+    csShaderVariable* var) = 0;
 			    
   /**
    * Report an error and also gives a path in the XML tree.
@@ -161,6 +210,12 @@ struct iSyntaxService : public iBase
     csAlphaMode& alphaMode) = 0;
     
   /**
+   * Write an alphamode description. Returns true if successful.
+   */
+  virtual bool WriteAlphaMode (iDocumentNode* node, iStringSet* strings,
+    csAlphaMode* alphaMode) = 0;
+    
+  /**
    * Attempt to parse a zmode from \a node.
    * \a allowZmesh specifies whether ZMESH and ZMESH2 zmodes should be 
    * saved to \a zmode or rejected, causing the method to fail and return
@@ -171,6 +226,12 @@ struct iSyntaxService : public iBase
    */
   virtual bool ParseZMode (iDocumentNode* node, csZBufMode& zmode,
     bool allowZmesh = false) = 0;
+
+  /**
+   * Write a ZMode description. Returns true if successful.
+   */
+  virtual bool WriteZMode (iDocumentNode* node, csZBufMode* zmode,
+    bool allowZmesh) = 0;
 };
 
 /** @} */

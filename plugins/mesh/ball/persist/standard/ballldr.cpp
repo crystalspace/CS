@@ -397,6 +397,46 @@ bool csBallSaver::WriteDown (iBase* obj, iDocumentNode* parent)
     if (!ball) return false;
     if (!mesh) return false;
 
+    //Writedown Reversed tag
+    synldr->WriteBool(paramsNode, "reversed", ball->IsReversed(), false);
+
+    //Writedown Toponly tag
+    synldr->WriteBool(paramsNode, "toponly", ball->IsTopOnly(), false);
+
+    //Writedown Cylindrical tag
+    synldr->WriteBool(paramsNode, "cylindrical", ball->IsCylindricalMapping(), false);
+    
+    //Writedown Lighting tag
+    synldr->WriteBool(paramsNode, "lighting", ball->IsLighting(), true);
+
+    //Writedown Color tag
+    csColor col = ball->GetColor();
+    csRef<iDocumentNode> colorNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    colorNode->SetValue("color");
+    synldr->WriteColor(colorNode, &col);
+
+    //Writedown Radius tag
+    float rx,ry,rz;
+    ball->GetRadius(rx,ry,rz);
+    csRef<iDocumentNode> radiusNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    radiusNode->SetValue("radius");
+    radiusNode->SetAttributeAsFloat("x", rx);
+    radiusNode->SetAttributeAsFloat("y", ry);
+    radiusNode->SetAttributeAsFloat("z", rz);
+
+    //Writedown Shift tag
+    csVector3 shift = ball->GetShift();
+    csRef<iDocumentNode> shiftNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    shiftNode->SetValue("shift");
+    synldr->WriteVector(shiftNode, &shift);
+
+    //Writedown Numrim tag
+    int numrim = ball->GetRimVertices();
+    csRef<iDocumentNode> numrimNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    numrimNode->SetValue("numrim");
+    csRef<iDocumentNode> numrimValueNode = numrimNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+    numrimValueNode->SetValueAsInt(numrim);
+
     //Writedown Factory tag
     csRef<iMeshFactoryWrapper> fact = 
       SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMeshFactoryWrapper);
@@ -412,38 +452,28 @@ bool csBallSaver::WriteDown (iBase* obj, iDocumentNode* parent)
       }    
     }    
     
-    //Writedown Radius tag
-    float rx,ry,rz;
-    ball->GetRadius(rx,ry,rz);
-    csRef<iDocumentNode> radiusNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    radiusNode->SetValue("radius");
-    radiusNode->SetAttributeAsFloat("x", rx);
-    radiusNode->SetAttributeAsFloat("y", ry);
-    radiusNode->SetAttributeAsFloat("z", rz);
+    //Writedown Material tag
+    csRef<iMaterialWrapper> mat = 
+      SCF_QUERY_INTERFACE(mesh->GetFactory()->GetLogicalParent(), iMaterialWrapper);
+    if (mat)
+    {
+      const char* matname = mat->QueryObject()->GetName();
+      if (matname && *matname)
+      {
+        csRef<iDocumentNode> matNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+        matNode->SetValue("material");
+        csRef<iDocumentNode> matnameNode = matNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+        matnameNode->SetValue(matname);
+      }    
+    }    
 
-    //Writedown Shift tag
-    csVector3 shift = ball->GetShift();
-    csRef<iDocumentNode> shiftNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-    shiftNode->SetValue("shift");
-    shiftNode->SetAttributeAsFloat("x", shift.x);
-    shiftNode->SetAttributeAsFloat("y", shift.y);
-    shiftNode->SetAttributeAsFloat("z", shift.z);
+    //Writedown Mixmode tag
+    int mixmode = ball->GetMixMode();
+    csRef<iDocumentNode> mixmodeNode = paramsNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    mixmodeNode->SetValue("mixmode");
+    synldr->WriteMixmode(mixmodeNode, mixmode, true);
   }
-      
-  paramsNode=0;
-  
   return true;
 }
-
-/*
-<factory>ballFact</factory>
-<material>plasma</material>
-<numrim>16</numrim>
-<radius x="1" y="1" z="1" />
-<shift x="0" y="0" z="0" />
-<mixmode>
-  <multiply />
-</mixmode>
-*/
 
 

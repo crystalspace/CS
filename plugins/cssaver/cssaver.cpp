@@ -125,12 +125,12 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
     iTextureWrapper *texWrap=texList->Get(i);
     csRef<iDocumentNode> child = current->CreateNodeBefore(CS_NODE_ELEMENT, 0);
     const char *name=texWrap->QueryObject()->GetName();
+    child->SetValue("texture");
     if (name && *name)
       child->SetAttribute("name", name);
     iImage* img = texWrap->GetImageFile();
     if (img)
     {
-      child->SetValue("texture");
       const char* filename=img->GetName();
       if (filename && *filename)
         CreateValueNode(child, "file", filename);
@@ -148,7 +148,7 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
     }
     else
     {
-      CS_ASSERT(false);
+      //CS_ASSERT(false);
     }
   }
   return true;
@@ -491,8 +491,8 @@ csRef<iString> csSaver::SaveMapFile()
   parent->SetValue("world");
 
   //TBD: this crashes for me, dunno why, have to look at it more closley.
-  //if (!SaveTextures(parent)) return 0;
-  //if (!SaveMaterials(parent)) return 0;
+  if (!SaveTextures(parent)) return 0;
+  if (!SaveMaterials(parent)) return 0;
   
   //TBD: Save the Factories
   //if (!SaveFactories(parent)) return 0;

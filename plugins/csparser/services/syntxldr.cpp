@@ -109,6 +109,25 @@ bool csTextSyntaxService::ParseBool (iDocumentNode* node, bool& result,
   return false;
 }
 
+bool csTextSyntaxService::WriteBool (iDocumentNode* node, const char* name,
+                                     bool value, bool default_value)
+{
+  if (value != default_value)
+  {
+    if (value)
+    {
+      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue(name);
+    }
+    else
+    {
+      csRef<iDocumentNode> valueNode = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+      valueNode->SetValue(name);
+      valueNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue("no");
+    }
+  }
+  return true;
+}
+
 bool csTextSyntaxService::ParseMatrix (iDocumentNode* node, csMatrix3 &m)
 {
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
@@ -171,6 +190,47 @@ bool csTextSyntaxService::ParseMatrix (iDocumentNode* node, csMatrix3 &m)
   return true;
 }
 
+bool csTextSyntaxService::WriteMatrix (iDocumentNode* node, csMatrix3* m)
+{
+  csRef<iDocumentNode> m11Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  m11Node->SetValue("m11");
+  m11Node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValueAsFloat(m->m11);
+
+  csRef<iDocumentNode> m12Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  m12Node->SetValue("m12");
+  m12Node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValueAsFloat(m->m12);
+
+  csRef<iDocumentNode> m13Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  m13Node->SetValue("m13");
+  m13Node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValueAsFloat(m->m13);
+
+  csRef<iDocumentNode> m21Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  m21Node->SetValue("m21");
+  m21Node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValueAsFloat(m->m21);
+
+  csRef<iDocumentNode> m22Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  m22Node->SetValue("m22");
+  m22Node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValueAsFloat(m->m22);
+
+  csRef<iDocumentNode> m23Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  m23Node->SetValue("m23");
+  m23Node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValueAsFloat(m->m23);
+
+  csRef<iDocumentNode> m31Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  m31Node->SetValue("m31");
+  m31Node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValueAsFloat(m->m31);
+
+  csRef<iDocumentNode> m32Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  m32Node->SetValue("m32");
+  m32Node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValueAsFloat(m->m32);
+
+  csRef<iDocumentNode> m33Node = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  m33Node->SetValue("m33");
+  m33Node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValueAsFloat(m->m33);
+
+  return true;
+}
+
 bool csTextSyntaxService::ParseBox (iDocumentNode* node, csBox3 &v)
 {
   csVector3 miv, mav;
@@ -198,6 +258,24 @@ bool csTextSyntaxService::ParseBox (iDocumentNode* node, csBox3 &v)
   return true;
 }
 
+bool csTextSyntaxService::WriteBox (iDocumentNode* node, csBox3* v)
+{
+  csRef<iDocumentNode> boxNode = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  boxNode->SetValue("box");
+  csRef<iDocumentNode> minNode = boxNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  minNode->SetValue("min");
+  minNode->SetAttributeAsFloat("x", v->MinX());
+  minNode->SetAttributeAsFloat("y", v->MinY());
+  minNode->SetAttributeAsFloat("z", v->MinZ());
+  csRef<iDocumentNode> maxNode = boxNode->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+  maxNode->SetValue("max");
+  maxNode->SetAttributeAsFloat("x", v->MaxX());
+  maxNode->SetAttributeAsFloat("y", v->MaxY());
+  maxNode->SetAttributeAsFloat("z", v->MaxZ());
+
+  return true;
+}
+
 bool csTextSyntaxService::ParseVector (iDocumentNode* node, csVector3 &v)
 {
   v.x = node->GetAttributeValueAsFloat ("x");
@@ -206,11 +284,27 @@ bool csTextSyntaxService::ParseVector (iDocumentNode* node, csVector3 &v)
   return true;
 }
 
+bool csTextSyntaxService::WriteVector (iDocumentNode* node, csVector3* v)
+{
+  node->SetAttributeAsFloat("x", v->x);
+  node->SetAttributeAsFloat("y", v->y);
+  node->SetAttributeAsFloat("z", v->z);
+  return true;
+}
+
 bool csTextSyntaxService::ParseColor (iDocumentNode* node, csColor &c)
 {				      
   c.red = node->GetAttributeValueAsFloat ("red");
   c.green = node->GetAttributeValueAsFloat ("green");
   c.blue = node->GetAttributeValueAsFloat ("blue");
+  return true;
+}
+
+bool csTextSyntaxService::WriteColor (iDocumentNode* node, csColor* col)
+{				      
+  node->SetAttributeAsFloat("red", col->red);
+  node->SetAttributeAsFloat("green", col->green);
+  node->SetAttributeAsFloat("blue", col->blue);
   return true;
 }
 
@@ -224,6 +318,15 @@ bool csTextSyntaxService::ParseColor (iDocumentNode* node, csColor4 &c)
     c.alpha = attr->GetValueAsFloat ();
   else
     c.alpha = 1.0f;
+  return true;
+}
+
+bool csTextSyntaxService::WriteColor (iDocumentNode* node, csColor4* col)
+{				      
+  node->SetAttributeAsFloat("red", col->red);
+  node->SetAttributeAsFloat("green", col->green);
+  node->SetAttributeAsFloat("blue", col->blue);
+  node->SetAttributeAsFloat("alpha", col->alpha);
   return true;
 }
 
@@ -293,6 +396,16 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode,
   return true;
 
 #undef MIXMODE_EXCLUSIVE
+}
+
+bool csTextSyntaxService::WriteMixmode (iDocumentNode* node, uint mixmode,
+					bool allowFxMesh)
+{
+  //TBD
+  node->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
+    ("SyntaxService: WriteMixmode not yet supported!");
+
+  return true;
 }
 
 bool csTextSyntaxService::HandlePortalParameter (
@@ -499,6 +612,14 @@ bool csTextSyntaxService::ParseGradientShade (iDocumentNode* node,
   return true;
 }
 
+bool csTextSyntaxService::WriteGradientShade (iDocumentNode* node, 
+					      csGradientShade* shade)
+{
+  //TBD
+  node->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
+    ("SyntaxService: WriteMixmode not yet supported!");
+  return true;
+}
 bool csTextSyntaxService::ParseGradient (iDocumentNode* node,
 					 csGradient& gradient)
 {
@@ -529,6 +650,15 @@ bool csTextSyntaxService::ParseGradient (iDocumentNode* node,
         return false;
     }
   }
+  return true;
+}
+
+bool csTextSyntaxService::WriteGradient (iDocumentNode* node,
+					 csGradient* gradient)
+{
+  //TBD
+  node->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
+    ("SyntaxService: WriteMixmode not yet supported!");
   return true;
 }
 
@@ -617,6 +747,15 @@ bool csTextSyntaxService::ParseShaderVar (iDocumentNode* node,
       return false;
   }
 
+  return true;
+}
+
+bool csTextSyntaxService::WriteShaderVar (iDocumentNode* node,
+					  csShaderVariable* var)
+{
+  //TBD
+  node->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
+    ("SyntaxService: WriteMixmode not yet supported!");
   return true;
 }
 
@@ -710,6 +849,16 @@ bool csTextSyntaxService::ParseAlphaMode (iDocumentNode* node,
 #undef ALPHAMODE_WARN
 }
 
+bool csTextSyntaxService::WriteAlphaMode (iDocumentNode* node, 
+					  iStringSet* strings,
+					  csAlphaMode* alphaMode)
+{
+  //TBD
+  node->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
+    ("SyntaxService: WriteMixmode not yet supported!");
+  return true;
+}
+
 bool csTextSyntaxService::ParseZMode (iDocumentNode* node, 
 				      csZBufMode& zmode,    
 				      bool allowZmesh)
@@ -749,6 +898,15 @@ bool csTextSyntaxService::ParseZMode (iDocumentNode* node,
   return true;
 }
 
+bool csTextSyntaxService::WriteZMode (iDocumentNode* node, 
+				      csZBufMode* zmode,    
+				      bool allowZmesh)
+{
+  //TBD
+  node->CreateNodeBefore(CS_NODE_COMMENT, 0)->SetValue
+    ("SyntaxService: WriteMixmode not yet supported!");
+  return true;
+}
 
 void csTextSyntaxService::ReportError (const char* msgid,
 	iDocumentNode* errornode, const char* msg, ...)

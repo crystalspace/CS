@@ -10,6 +10,10 @@ chronological order.
 	- Remi Bonnet moved some code from vsh inside vfs to allow other
 	  apps to load mount files at run time (new API func: 
 	  LoadMountsFromFile)
+	- PK made the following changes:
+	  - Extended the iSyntaxService for iSaver.
+	  - Implemented the iSaverPlugin for ballmesh.
+	  - Fixed the texture saving in iSaver for images.
 23-Jul-2004
 	- Jorrit fixed csbench so it first removes the csbench_report.zip.
 	  Not doing that causes corrupted zip files due to bugs in VFS.
