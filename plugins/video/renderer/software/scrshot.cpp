@@ -54,13 +54,13 @@ public:
   virtual int GetSize () { return 0; }
   /// Resize the image to the given size
   virtual void Resize (int NewWidth, int NewHeight)
-  { }
+  { (void) NewWidth; (void) NewHeight; }
   /// Create a new iImage which is a mipmapped version of this one.
   virtual iImage *MipMap (int step, RGBPixel *transp)
-  { return NULL; }
+  { (void)step; (void)transp; return NULL; }
   /// Set image file name
   virtual void SetName (const char *iName)
-  { }
+  { (void) iName; }
   /// Get image file name
   virtual const char *GetName ()
   { return "dummy"; }

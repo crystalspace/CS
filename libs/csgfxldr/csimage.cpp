@@ -396,8 +396,10 @@ void csImageFile::convert_rgb (RGBPixel *iImage)
           Alpha [i] = iImage [i].alpha;
       }
       if ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
+      {
         // The most complex case: reduce an RGB image to a paletted image.
-        csQuantizeRGB (iImage, pixels, 256, (UByte *)Image, Palette);
+        csQuantizeRGB (iImage, pixels, (UByte *&)Image, Palette);
+      }
       delete [] iImage;
       break;
     case CS_IMGFMT_TRUECOLOR:

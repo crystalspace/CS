@@ -36,7 +36,7 @@
  * image and palette (the size of resulting image is exactly "pixels" bytes,
  * the size of resulting palette is palsize colors).
  */
-extern void csQuantizeRGB (RGBPixel *image, int pixels, int palsize,
+extern void csQuantizeRGB (RGBPixel *image, int pixels, 
   UByte *&outimage, RGBPixel *&outpalette);
 
 #endif // __QUANTIZE_H__

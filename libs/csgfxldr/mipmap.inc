@@ -237,7 +237,7 @@ startloop:
 #else
     a = 0;
 #endif
-    MIPMAP_PROCESS (0, 1, -(w - 2));
+    MIPMAP_PROCESS (0, 1, 0-(w - 2));
     MIPMAP_OUTPUT;
 #endif
 

@@ -17,6 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "sysdef.h"
 #include "csgfxldr/quantize.h"
 #include <string.h>
 #include <stdlib.h>
@@ -78,6 +79,12 @@
 #  define G_BIT		16
 #  define B_BIT		8
 #endif
+
+// The algorithm itself could handle any size of Palette, but we would need to
+// dynamically allocate the memory for this. If we use a fixes size, we can
+// use a local array while quantising the image. (It seems like gcc can handle
+// local arrays of variable sizes, but MSVC 6.0 can't)
+#define PALSIZE 256
 
 // Compute masks for effectively separating R,G and B components from a ULong.
 // For a little-endian machine they are respectively
@@ -285,11 +292,11 @@ static int compare_boxes (const void *i1, const void *i2)
   return (count1 < count2) ? -1 : (count1 == count2) ? 0 : +1;
 }
 
-void csQuantizeRGB (RGBPixel *image, int pixels, int palsize,
+void csQuantizeRGB (RGBPixel *image, int pixels, 
   UByte *&outimage, RGBPixel *&outpalette)
 {
   // Sanity check
-  if (!pixels || !palsize)
+  if (!pixels)
     return;
 
   // First, allocate the histogram
@@ -308,7 +315,7 @@ void csQuantizeRGB (RGBPixel *image, int pixels, int palsize,
   }
 
   // Good. Now we create the array of color space boxes.
-  box = new csColorBox [palsize];
+  box = new csColorBox [PALSIZE];
   int boxcount = 1;
   box [0].Set (0, HIST_R_MAX - 1, 0, HIST_G_MAX - 1, 0, HIST_B_MAX - 1);
   box [0].Shrink ();
@@ -316,7 +323,7 @@ void csQuantizeRGB (RGBPixel *image, int pixels, int palsize,
   box [0].CountPixels ();
 
   // Loop until we have enough boxes (or we're out of pixels)
-  while (boxcount < palsize)
+  while (boxcount < PALSIZE)
   {
     // Find the box that should be split
     // We're making this decision the following way:
@@ -325,7 +332,7 @@ void csQuantizeRGB (RGBPixel *image, int pixels, int palsize,
     // - the rest of palette we prefer to split largest boxes.
     int bi, bestbox = -1;
     unsigned bestrating = 0;
-    if (boxcount < palsize / 2)
+    if (boxcount < PALSIZE / 2)
     {
       for (bi = 0; bi < boxcount; bi++)
         if (bestrating < box [bi].ColorCount)
@@ -440,7 +447,7 @@ void csQuantizeRGB (RGBPixel *image, int pixels, int palsize,
   // Either we're out of splittable boxes, or we have palsize boxes.
 
   // Assign successive palette indices to all boxes
-  UByte Index [palsize];
+  UByte Index [256];
   for (count = 0; count < boxcount; count++)
     Index [count] = count;
   // Sort palette indices by usage (a side bonus to quantization)
@@ -448,14 +455,14 @@ void csQuantizeRGB (RGBPixel *image, int pixels, int palsize,
 
   // Allocate the picture and the palette
   if (!outimage) outimage = new UByte [pixels];
-  if (!outpalette) outpalette = new RGBPixel [palsize];
+  if (!outpalette) outpalette = new RGBPixel [PALSIZE];
 
   // Now compute the mean color for each box
   for (count = 0; count < boxcount; count++)
     box [count].GetMeanColor (outpalette [Index [count]]);
 
   // Fill the unused colormap entries with zeros
-  memset (&outpalette [boxcount], 0, (palsize - boxcount) * sizeof (RGBPixel));
+  memset (&outpalette [boxcount], 0, (PALSIZE - boxcount) * sizeof (RGBPixel));
 
   // We will re-use the histogram memory for a inverse colormap. However, we
   // will need just a byte per element, so we'll assign the address of

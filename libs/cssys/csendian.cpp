@@ -152,11 +152,11 @@ union int_swap
   struct { char b1,b2,b3,b4; } b;
 };
 
-typedef union short_swap
+typedef union t_short_swap
 {
   unsigned short s;
   struct { char b1,b2; } b;
-};
+} short_swap;
 
 static unsigned long init_big_endian_long (unsigned long value);
 static unsigned long init_little_endian_long (unsigned long value);
