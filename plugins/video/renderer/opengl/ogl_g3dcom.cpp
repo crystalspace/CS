@@ -1619,7 +1619,18 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   float flat_b = queue.flat_color_b;
 
   if (m_renderstate.textured && mat_handle)
+  {
     glEnable (GL_TEXTURE_2D);
+    if (txt_mm->GetKeyColor())
+    {
+      glEnable (GL_ALPHA_TEST);
+      glAlphaFunc (GL_GEQUAL, 0.8);
+    }
+    else
+    {
+      glDisable (GL_ALPHA_TEST);
+    }
+  }
   else
   {
     glDisable (GL_TEXTURE_2D);
@@ -1771,6 +1782,11 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
 #endif
 
   queue.Reset ();
+
+  if (txt_mm->GetKeyColor())
+  {
+    glDisable (GL_ALPHA_TEST);
+  }
 }
 
 int csFogQueue::AddVertices (int num)
@@ -3669,6 +3685,11 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   // configure base texture for texure unit 0
   glActiveTextureARB (GL_TEXTURE0_ARB);
   glBindTexture (GL_TEXTURE_2D, texturehandle);
+  if (txt_mm->GetKeyColor())
+  {
+    glEnable (GL_ALPHA_TEST);
+    glAlphaFunc (GL_GEQUAL, 0.8);
+  }
   float alpha = 1.0f - BYTE_TO_FLOAT (poly.mixmode & CS_FX_MASK_ALPHA);
   alpha = SetupBlend (poly.mixmode, alpha, tex_transp);
   if (ARB_texture_env_combine)
@@ -3749,6 +3770,11 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   glDisable (GL_TEXTURE_2D);
   glActiveTextureARB (GL_TEXTURE0_ARB);
   glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+  if (txt_mm->GetKeyColor())
+  {
+    glDisable (GL_ALPHA_TEST);
+  }
 }
 
 float csGraphics3DOGLCommon::GetZBuffValue (int x, int y)

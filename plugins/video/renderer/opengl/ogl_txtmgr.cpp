@@ -204,6 +204,80 @@ bool csTextureHandleOpenGL::FindFormatType ()
 	    _src->alpha = 0;
 	  _src++;
 	}
+	
+	// Now we draw borders inside all keycolored areas.
+	// This removes the halos of keycolor when using bilinear filtering
+	int h, rows, w, cols;
+	h = rows = image->GetHeight ();
+	w = image->GetWidth();
+	_src = (csRGBpixel *)image->GetImageData ();
+	while (rows--)
+	{
+	  cols = w;
+	  while (cols--) {
+  	    if (!_src[(rows*w)+cols].alpha)
+	    {
+	      int n=0, r=0, g=0, b=0, xl, xr, yt, yb;
+
+	      if (!cols) 
+	      {
+		xl = w-1;
+		xr = 1;
+	      } 
+	      else if (cols==w-1) 
+	      {
+		xl = cols-1;
+		xr = 0;
+	      }
+	      else
+	      {
+		xl = cols-1;
+		xr = cols+1;
+	      }
+
+	      if (!rows) 
+	      {
+		yt = h-1;
+		yb = 1;
+	      } 
+	      else if (rows==h-1) 
+	      {
+		yt = rows-1;
+		yb = 0;
+	      }
+	      else
+	      {
+		yt = rows-1;
+		yb = rows+1;
+	      }
+
+#define CHECK_PIXEL(d) { \
+  if (_src[(d)].alpha) \
+  { \
+    n++; \
+    r+=_src[(d)].red; \
+    g+=_src[(d)].green; \
+    b+=_src[(d)].blue; \
+	      } \
+} 
+	      CHECK_PIXEL((yt*w)+xl);
+	      CHECK_PIXEL((yt*w)+cols);
+	      CHECK_PIXEL((yt*w)+xr);
+	      CHECK_PIXEL((rows*w)+xl);
+	      CHECK_PIXEL((rows*w)+xr);
+	      CHECK_PIXEL((yb*w)+xl);
+	      CHECK_PIXEL((yb*w)+cols);
+	      CHECK_PIXEL((yb*w)+xr);
+#undef CHECK_PIXEL
+	      if (n)
+	      {
+		_src[(rows*w)+cols].red = r / n;
+		_src[(rows*w)+cols].green = g / n;
+		_src[(rows*w)+cols].blue = b / n;
+	      }
+	    }
+	  }
+	}
       }
     }
     
@@ -538,7 +612,9 @@ void csTextureHandleOpenGL::CreateMipmaps ()
     //  printf ("meancolor\n");
     ComputeMeanColor (vTex[nTex]->get_width (), vTex[nTex]->get_height (), 
 		      (csRGBpixel *)prevImage->GetImageData ());
-    prevImage->DecRef ();
+    //prevImage->DecRef ();
+    // the above DecRef() caused errors when using software renderer proctexes.
+    // @@@ causes not DecRef'ing it a leak?
   }
   else
     ComputeMeanColor (vTex[0]->get_width (), vTex[0]->get_height (),
