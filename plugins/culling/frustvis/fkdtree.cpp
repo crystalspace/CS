@@ -340,7 +340,10 @@ void csSimpleKDTree::DistributeLeafObjects ()
     float bbox_min = bbox.Min (split_axis);
     float bbox_max = bbox.Max (split_axis);
     bool leaf_replaced = false;
-    if (bbox_min <= split_location)
+    // The SMALL_EPSILON is used to ensure that when bbox_min
+    // is equal to bbox_max we don't get a situation where
+    // both of the if's are not used.
+    if (bbox_min-SMALL_EPSILON <= split_location)
     {
       objects[i]->ReplaceLeaf (this, child1);
       leaf_replaced = true;

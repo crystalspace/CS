@@ -5,6 +5,7 @@ The history order is reversed so that new features are at the top.
 	  Python plugin and SWIG 1.1. The new cspython plugin is built when\
 	  USE_NEW_CSPYTHON_PLUGIN=yes during make. It is now put in
 	  mk/local.mak.
+	- Fixed frustvis/dynavis for completely flat objects.
 	- Keith Fulton fixed a bug in frame anim of sprite3d's when going
 	  from a time delayed frame to a space displacement frame.
 7-Jan-2002
