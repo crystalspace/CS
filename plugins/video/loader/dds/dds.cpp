@@ -330,13 +330,6 @@ struct Color8888
   unsigned char r,g,b,a;
 };
 
-/*struct Color565
-{
-  unsigned nBlue : 5;
-  unsigned nGreen : 6;
-  unsigned nRed : 5;
-};*/
-
 static inline int ColorComponent (int x, int bitcount, int shift)
 {
   int val = ((x >> shift) & ((1 << bitcount) - 1));
@@ -595,9 +588,12 @@ void Loader::DecompressDXT5 (csRGBpixel* buffer, uint8* source,
   uint32          bits;
 
   Temp = source;
-  for (z = 0; z < depth; z++) {
-    for (y = 0; y < Height; y += 4) {
-      for (x = 0; x < Width; x += 4) {
+  for (z = 0; z < depth; z++) 
+  {
+    for (y = 0; y < Height; y += 4) 
+    {
+      for (x = 0; x < Width; x += 4) 
+      {
 	if (y >= Height || x >= Width)
 	  break;
 	alphas[0] = Temp[0];
@@ -684,7 +680,7 @@ void Loader::DecompressDXT5 (csRGBpixel* buffer, uint8* source,
 	//      it operates on a 6-byte system.
 
 	// First three bytes
-	little_endian_long (bits = *((int32*)alphamask));
+	bits = little_endian_long (*((int32*)alphamask));
 	for (j = 0; j < 2; j++) 
 	{
 	  for (i = 0; i < 4; i++) 
