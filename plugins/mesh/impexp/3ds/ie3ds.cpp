@@ -240,7 +240,7 @@ static void LoadTriangles (iModelDataObject *pDataObject,
 
     csVector3 backnormal[3];
 
-    int normindex;
+    int normindex = 0;
 
     if (!pCurFace->smoothing)
     {
