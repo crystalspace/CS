@@ -190,7 +190,16 @@ void csImageVolumeMaker::AppendPending ()
       curAlpha += slicePix;
     }
   }
-  delete[] data; data = newData;
+  switch (Format & CS_IMGFMT_MASK)
+  {
+    case CS_IMGFMT_PALETTED8: 
+      delete[] ((uint8*)data);
+      break;
+    case CS_IMGFMT_TRUECOLOR: 
+      delete[] ((csRGBpixel*)data);
+      break;
+  }
+  data = newData;
   delete[] alpha; alpha = newAlpha;
   Depth = newDepth;
   pendingImages.DeleteAll();
