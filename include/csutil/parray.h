@@ -56,6 +56,8 @@ private:
   csPDelArray (const csPDelArray&) {}
   csPDelArray& operator= (const csPDelArray&) { return *this; }
 
+  typedef csArray<T*, csPDelArrayElementHandler<T*> > superclass;
+
 public:
   /**
    * Initialize object to hold initially 'ilimit' elements, and increase
@@ -110,7 +112,7 @@ public:
     else
     {
       int old_len = Length ();
-      csArray<T*>::SetLength (n);
+      superclass::SetLength (n);
       for (int i = old_len ; i < n ; i++) Get(i) = new T (what);
     }
   }
@@ -118,13 +120,13 @@ public:
   /// Call csArray<T*>::SetLength(n, w).
   void SetLength (int n, T* const &w)
   {
-    csArray<T*>::SetLength(n, w);
+    superclass::SetLength(n, w);
   }
 
   /// Call csArray<T*>::SetLength(n).
   void SetLength (int n)
   {
-    csArray<T*, csPDelArrayElementHandler<T*> >::SetLength(n);
+    superclass::SetLength(n);
   }
 };
 
