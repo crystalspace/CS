@@ -20,6 +20,11 @@ chronological order.
 	  that it reports the discovered program's version in all cases.
 	  Previously, it only reported the version number if the version check
 	  failed.
+	- Eric Sushine added missing forward declaration for csRandomGen to
+	  imesh/spritecal3d.h.
+	- Eric Sunshine added copy constructor and assignment operator to
+	  csMatrix3.  Also moved implementation of axis-angle specifier
+	  constructor to .cpp file.  Removed unnecessary 'inline' keywords.
 5-Jan-2004
 	- res fixed sprcal3d so render buffers are created correctly for 
 	  multi-mesh models.

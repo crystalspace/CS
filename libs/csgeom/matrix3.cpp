@@ -24,6 +24,30 @@
 #include "csgeom/quaterni.h"
 
 //---------------------------------------------------------------------------
+csMatrix3::csMatrix3 (float x,float y, float z, float angle)
+{
+  float c = cos(angle);
+  float s = sin(angle);
+  float t = 1.0 - c;
+  m11 = c + x * x * t;
+  m22 = c + y * y * t;
+  m33 = c + z * z * t;
+
+  double tmp1 = x * y * t;
+  double tmp2 = z * s;
+  m21 = tmp1 + tmp2;
+  m12 = tmp1 - tmp2;
+
+  tmp1 = x * z * t;
+  tmp2 = y * s;
+  m31 = tmp1 - tmp2;
+  m13 = tmp1 + tmp2;
+  tmp1 = y * z * t;
+  tmp2 = x * s;
+  m32 = tmp1 + tmp2;
+  m23 = tmp1 - tmp2;
+}
+
 csMatrix3 &csMatrix3::operator+= (const csMatrix3 &m)
 {
   m11 += m.m11;
@@ -312,6 +336,7 @@ bool operator> (float f, const csMatrix3 &m)
 }
 
 //---------------------------------------------------------------------------
+
 csXRotMatrix3::csXRotMatrix3 (float angle)
 {
   m11 = 1;
@@ -350,5 +375,3 @@ csZRotMatrix3::csZRotMatrix3 (float angle)
   m32 = 0;
   m33 = 1;
 }
-
-//---------------------------------------------------------------------------

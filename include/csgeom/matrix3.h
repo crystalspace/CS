@@ -61,89 +61,72 @@ public:
 	m31(am31), m32(am32), m33(am33)
   {}
 
+  /// Copy constructor.
+  csMatrix3 (csMatrix3 const& o) { Set(o); }
+
   /// Construct a matrix from axis-angle specifier.
-  csMatrix3 (float x,float y, float z, float angle)
-  {
-    float c = cos(angle);
-    float s = sin(angle);
-    float t = 1.0 - c;
-    m11 = c + x*x*t;
-    m22 = c + y*y*t;
-    m33 = c + z*z*t;
-
-
-    double tmp1 = x*y*t;
-    double tmp2 = z*s;
-    m21 = tmp1 + tmp2;
-    m12 = tmp1 - tmp2;
-
-    tmp1 = x*z*t;
-    tmp2 = y*s;
-    m31 = tmp1 - tmp2;
-    m13 = tmp1 + tmp2;
-    tmp1 = y*z*t;
-    tmp2 = x*s;
-    m32 = tmp1 + tmp2;
-    m23 = tmp1 - tmp2;
-  }
+  csMatrix3 (float x,float y, float z, float angle);
 
   /// Construct a matrix with a quaternion.
   explicit csMatrix3 (const csQuaternion &quat) { Set (quat); }
 
   /// Get the first row of this matrix as a vector.
-  inline csVector3 Row1() const { return csVector3 (m11,m12,m13); }
+  csVector3 Row1() const { return csVector3 (m11,m12,m13); }
 
   /// Get the second row of this matrix as a vector.
-  inline csVector3 Row2() const { return csVector3 (m21,m22,m23); }
+  csVector3 Row2() const { return csVector3 (m21,m22,m23); }
 
   /// Get the third row of this matrix as a vector.
-  inline csVector3 Row3() const { return csVector3 (m31,m32,m33); }
+  csVector3 Row3() const { return csVector3 (m31,m32,m33); }
 
   /// Get the first column of this matrix as a vector.
-  inline csVector3 Col1() const { return csVector3 (m11,m21,m31); }
+  csVector3 Col1() const { return csVector3 (m11,m21,m31); }
 
   /// Get the second column of this matrix as a vector.
-  inline csVector3 Col2() const { return csVector3 (m12,m22,m32); }
+  csVector3 Col2() const { return csVector3 (m12,m22,m32); }
 
   /// Get the third column of this matrix as a vector.
-  inline csVector3 Col3() const { return csVector3 (m13,m23,m33); }
+  csVector3 Col3() const { return csVector3 (m13,m23,m33); }
 
   /// Set matrix values.
-  inline void Set (float m11, float m12, float m13,
-                   float m21, float m22, float m23,
-                   float m31, float m32, float m33)
+  void Set (float o11, float o12, float o13,
+            float o21, float o22, float o23,
+            float o31, float o32, float o33)
   {
-    csMatrix3::m11 = m11; csMatrix3::m12 = m12; csMatrix3::m13 = m13;
-    csMatrix3::m21 = m21; csMatrix3::m22 = m22; csMatrix3::m23 = m23;
-    csMatrix3::m31 = m31; csMatrix3::m32 = m32; csMatrix3::m33 = m33;
+    m11 = o11; m12 = o12; m13 = o13;
+    m21 = o21; m22 = o22; m23 = o23;
+    m31 = o31; m32 = o32; m33 = o33;
   }
 
   /// Initialize matrix with a quaternion.
-  void Set (const csQuaternion &quat);
+  void Set (const csQuaternion&);
+
+  /// Assign another matrix to this one.
+  csMatrix3& operator= (const csMatrix3& o) { Set(o); return *this; }
 
   /// Add another matrix to this matrix.
-  csMatrix3& operator+= (const csMatrix3& m);
+  csMatrix3& operator+= (const csMatrix3&);
 
   /// Subtract another matrix from this matrix.
-  csMatrix3& operator-= (const csMatrix3& m);
+  csMatrix3& operator-= (const csMatrix3&);
 
   /// Multiply another matrix with this matrix.
-  csMatrix3& operator*= (const csMatrix3& m);
+  csMatrix3& operator*= (const csMatrix3&);
 
   /// Multiply this matrix with a scalar.
-  csMatrix3& operator*= (float s);
+  csMatrix3& operator*= (float);
 
   /// Divide this matrix by a scalar.
-  csMatrix3& operator/= (float s);
+  csMatrix3& operator/= (float);
 
   /// Unary + operator.
-  inline csMatrix3 operator+ () const { return *this; }
+  csMatrix3 operator+ () const { return *this; }
   /// Unary - operator.
-  inline csMatrix3 operator- () const
+  csMatrix3 operator- () const
   {
     return csMatrix3(-m11,-m12,-m13,
                      -m21,-m22,-m23,
-                    -m31,-m32,-m33);
+                     -m31,-m32,-m33);
   }
 
   /// Transpose this matrix.
@@ -153,16 +136,14 @@ public:
   csMatrix3 GetTranspose () const;
 
   /// Return the inverse of this matrix.
-  inline csMatrix3 GetInverse () const
+  csMatrix3 GetInverse () const
   {
     csMatrix3 C(
              (m22*m33 - m23*m32), -(m12*m33 - m13*m32),  (m12*m23 - m13*m22),
             -(m21*m33 - m23*m31),  (m11*m33 - m13*m31), -(m11*m23 - m13*m21),
-             (m21*m32 - m22*m31), -(m11*m32 - m12*m31),  (m11*m22 - m12*m21) );
+             (m21*m32 - m22*m31), -(m11*m32 - m12*m31),  (m11*m22 - m12*m21));
     float s = (float)1./(m11*C.m11 + m12*C.m21 + m13*C.m31);
-
     C *= s;
-
     return C;
   }
 
@@ -214,44 +195,41 @@ class csXRotMatrix3 : public csMatrix3
 {
 public:
   /**
-   * Return a rotation matrix around the X axis.
-   * 'angle' is given in radians.
-   * Looking along the X axis with Y pointing to the right and Z pointing up
-   * a rotation of PI/2 will rotate 90 degrees in anti-clockwise direction
-   * (i.e. 0,1,0 -> 0,0,1).
+   * Return a rotation matrix around the X axis.  'angle' is given in radians.
+   * Looking along the X axis with Y pointing to the right and Z pointing up a
+   * rotation of PI/2 will rotate 90 degrees in anti-clockwise direction (i.e.
+   * 0,1,0 -> 0,0,1).
    */
   csXRotMatrix3 (float angle);
 };
 
-/// An instance of csMatrix3 that is initialized as a rotation about Y
+/// An instance of csMatrix3 that is initialized as a rotation about Y.
 class csYRotMatrix3 : public csMatrix3
 {
 public:
   /**
-   * Return a rotation matrix around the Y axis.
-   * 'angle' is given in radians.
-   * Looking along the Y axis with X pointing to the right and Z pointing up
-   * a rotation of PI/2 will rotate 90 degrees in anti-clockwise direction
-   * (i.e. 1,0,0 -> 0,0,1).
+   * Return a rotation matrix around the Y axis.  'angle' is given in radians.
+   * Looking along the Y axis with X pointing to the right and Z pointing up a
+   * rotation of PI/2 will rotate 90 degrees in anti-clockwise direction (i.e.
+   * 1,0,0 -> 0,0,1).
    */
   csYRotMatrix3 (float angle);
 };
 
-/// An instance of csMatrix3 that is initialized as a rotation about Z
+/// An instance of csMatrix3 that is initialized as a rotation about Z.
 class csZRotMatrix3 : public csMatrix3
 {
 public:
   /**
-   * Return a rotation matrix around the Z axis.
-   * 'angle' is given in radians.
-   * Looking along the Z axis with X pointing to the right and Y pointing up
-   * a rotation of PI/2 will rotate 90 degrees in anti-clockwise direction
-   * (i.e. 1,0,0 -> 0,1,0).
+   * Return a rotation matrix around the Z axis.  'angle' is given in radians.
+   * Looking along the Z axis with X pointing to the right and Y pointing up a
+   * rotation of PI/2 will rotate 90 degrees in anti-clockwise direction (i.e.
+   * 1,0,0 -> 0,1,0).
    */
   csZRotMatrix3 (float angle);
 };
 
-/// An instance of csMatrix3 that is initialized to scale the X dimension
+/// An instance of csMatrix3 that is initialized to scale the X dimension.
 class csXScaleMatrix3 : public csMatrix3
 {
 public:
@@ -261,7 +239,7 @@ public:
   csXScaleMatrix3 (float scaler) : csMatrix3(scaler, 0, 0, 0, 1, 0, 0, 0, 1) {}
 };
 
-/// An instance of csMatrix3 that is initialized to scale the Y dimension
+/// An instance of csMatrix3 that is initialized to scale the Y dimension.
 class csYScaleMatrix3 : public csMatrix3
 {
 public:
@@ -271,7 +249,7 @@ public:
   csYScaleMatrix3 (float scaler) : csMatrix3(1, 0, 0, 0, scaler, 0, 0, 0, 1) {}
 };
 
-/// An instance of csMatrix3 that is initialized to scale the Z dimension
+/// An instance of csMatrix3 that is initialized to scale the Z dimension.
 class csZScaleMatrix3 : public csMatrix3
 {
 public:
