@@ -1155,7 +1155,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     	int num, float speed);
     if (cnt <= 2) speed = 2;
     if (cnt <= 1) num = 500;
-    if (cnt <= 0) strcpy (txtname, "raindrop.png");
+    if (cnt <= 0) strcpy (txtname, "raindrop");
     add_particles_rain (Sys->view->GetCamera ()->GetSector (),
     	txtname, num, speed);
   }
@@ -1172,7 +1172,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     	int num, float speed);
     if (cnt <= 2) speed = .3;
     if (cnt <= 1) num = 500;
-    if (cnt <= 0) strcpy (txtname, "snow.jpg");
+    if (cnt <= 0) strcpy (txtname, "snow");
     add_particles_snow (Sys->view->GetCamera ()->GetSector (),
     	txtname, num, speed);
   }
@@ -1186,7 +1186,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     extern void add_particles_fire (csSector* sector, char* txtname,
     	int num, const csVector3& origin);
     if (cnt <= 1) num = 50;
-    if (cnt <= 0) strcpy (txtname, "raindrop.png");
+    if (cnt <= 0) strcpy (txtname, "raindrop");
     add_particles_fire (Sys->view->GetCamera ()->GetSector (),
     	txtname, num, Sys->view->GetCamera ()->GetOrigin ()-
 	csVector3 (0, Sys->cfg_body_height, 0));
@@ -1201,7 +1201,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     extern void add_particles_fountain (csSector* sector, char* txtname,
     	int num, const csVector3& origin);
     if (cnt <= 1) num = 400;
-    if (cnt <= 0) strcpy (txtname, "spark.png");
+    if (cnt <= 0) strcpy (txtname, "spark");
     add_particles_fountain (Sys->view->GetCamera ()->GetSector (),
     	txtname, num, Sys->view->GetCamera ()->GetOrigin ()-
 	csVector3 (0, Sys->cfg_body_height, 0));

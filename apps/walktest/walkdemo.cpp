@@ -472,7 +472,7 @@ void add_skeleton_tree (csSector* where, csVector3 const& pos, int depth,
     tmpl = new csSpriteTemplate ();
     tmpl->SetName (skelname);
     Sys->world->sprite_templates.Push (tmpl);
-    tmpl->SetMaterial (Sys->world->GetMaterials ()->FindByName ("white.gif"));
+    tmpl->SetMaterial (Sys->world->GetMaterials ()->FindByName ("white"));
     int vertex_idx = 0;
     csFrame* fr = tmpl->AddFrame ();
     fr->SetName ("f");
@@ -669,7 +669,7 @@ void add_skeleton_ghost (csSector* where, csVector3 const& pos, int maxdepth,
     tmpl = new csSpriteTemplate ();
     tmpl->SetName (skelname);
     Sys->world->sprite_templates.Push (tmpl);
-    tmpl->SetMaterial (Sys->world->GetMaterials ()->FindByName ("green.gif"));
+    tmpl->SetMaterial (Sys->world->GetMaterials ()->FindByName ("green"));
     int vertex_idx = 0;
     csFrame* fr = tmpl->AddFrame ();
     fr->SetName ("f");
@@ -917,7 +917,7 @@ void HandleDynLight (csDynLight* dyn)
         es->dir = 1;
         csDataObject* esdata = new csDataObject (es);
         dyn->ObjAdd (esdata);
-        add_particles_explosion (dyn->GetSector (), dyn->GetCenter (), "explo.jpg");
+        add_particles_explosion (dyn->GetSector (), dyn->GetCenter (), "explo");
         return;
       }
       else ms->dir.SetOrigin (v);

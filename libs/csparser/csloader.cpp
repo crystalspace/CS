@@ -5010,6 +5010,7 @@ bool csLoader::LoadLibrary (char* buf)
 
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (TEXTURES)
+    TOKEN_TABLE (MATERIALS)
     TOKEN_TABLE (THING)
     TOKEN_TABLE (SPRITE)
     TOKEN_TABLE (SOUNDS)
@@ -5044,6 +5045,10 @@ bool csLoader::LoadLibrary (char* buf)
         case TOKEN_TEXTURES:
           // Append textures to world.
           if (!LoadTextures (params))
+            return false;
+          break;
+        case TOKEN_MATERIALS:
+          if (!LoadMaterials (params))
             return false;
           break;
         case TOKEN_SOUNDS:

@@ -14,6 +14,43 @@ The history order has been reversed so that new features are at the top.
 	  needs to be implemented in csMovable and using a better
 	  algorithm. It wasn't used anyway.
 	- Fixed documentation for csCamera::LookAt() a little.
+	- Andrew Zabolotny did the following:
+	    - Fixed unlighted textures in 32 bit videomodes.
+	    - Fixed halo drawing in 32-bit modes. Halos with R > 1 used
+	      to overflow because the highest of the 32 bits is used for
+	      sign. Now halos are limited to R [0..2] G [0..2] B [0..2].
+	    - Changed HALO() keyword a bit; the old syntax is supported
+	      for backward compatibility still. The new syntax is:
+		HALO (halo_type, ...)
+	      The arguments after halo_type depends of the halo type.
+	      Currently there are two types of halo supported:
+		CROSS, the old halo type. Two arguments are expected:
+			halo intensity (float) and "cross-factor" (float).
+		NOVA, a new halo type (stolen from GIMP). Three arguments
+			are expected: initial random seed (integer), number
+			of spokes (integer) and roundness (float).
+	      Nova halo looks best if used with bright whitish lights
+	      (e.g. R||G||B > 1).  Example: LIGHT (CENTER (xx,xx,xx)
+	      RADIUS (xx) COLOR (1,1.2,1.4) HALO (NOVA))
+	    - Changed a bit the loader: added the FindMaterial(char*)
+	      routine which tries to find a material with given name; if
+	      not found it tries to find a texture with this name; if it
+	      is found a material is created from it.
+	      This way it is compatible with old worlds, and with new
+	      worlds as well.
+	    - Changed the loader so that polygons with portals and with
+	      alpha == 0 (e.g. absolutely transparent) will get the
+	      POLYTXT_NONE shading type. If you are going to change the
+	      alpha value later (e.g. to make a portal dynamically
+	      appear/disappear) you should call poly->SetTextureType ()
+	      manually. This conserves quite a bit of memory which is
+	      normally not used. For example, with flarge.zip this reduces
+	      the size of lightmaps from 415K to 312K.
+	    - Cleaned up the opengl makefiles a little.
+	- Added MATERIALS support to LIBRARY keyword.
+	- Fixed standard.zip to the changes from Andrew (i.e. added a
+	  MATERIALS section to standard.zip).
+	- Fixed apps to refer to the right materials now.
 27-Aug-2000
 	- Made new iMovable interface and let csMovable implement it (through
 	  embedding).

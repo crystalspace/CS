@@ -1090,7 +1090,7 @@ void WalkTest::Inititalize2DTextures ()
 
   // Find the Crystal Space logo and set the renderer Flag to for_2d, to allow
   // the use in the 2D part.
-  texh = texlist->FindByName ("cslogo.gif");
+  texh = texlist->FindByName ("cslogo");
   if (texh)
     texh->flags = CS_TEXTURE_2D;
 }
@@ -1104,7 +1104,7 @@ void WalkTest::Create2DSprites(void)
   csTextureList *texlist = world->GetTextures ();
 
   // Create a 2D sprite for the Logo.
-  texh = texlist->FindByName ("cslogo.gif");
+  texh = texlist->FindByName ("cslogo");
   if (texh)
   {
     phTex = texh->GetTextureHandle();
