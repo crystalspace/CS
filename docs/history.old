@@ -1205,7 +1205,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	      to the time of the point you are editing.
 	    - Added new shuttle model from Michael Voase.
 	    - Added new station model from Thomas Hieber (as yet untextured).
-	    - Wouter Wijngaards did the following:
+	- Wouter Wijngaards did the following:
 	      Added a bumpmapping test application. It contains a procedural
 	      texture that is used to approximate bumpmapping. 3d hardware
 	      may be able to do bumpmapping nicer looking and faster, if it
