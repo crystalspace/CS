@@ -354,7 +354,7 @@ struct iVFS : public iBase
   virtual bool LoadMountsFromFile (iConfigFile* file) = 0;
 
   /**
-   * Conveniance function to set the current VFS directory to the given path.
+   * Convenience function to set the current VFS directory to the given path.
    * The path can be any of the following:
    * <ul>
    * <li>A valid VFS path. In that case this is equivalent to calling

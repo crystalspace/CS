@@ -415,7 +415,7 @@ struct iEngine : public iBase
   virtual iSharedVariableList* GetVariableList () const = 0;
 
   /**
-   * Conveniance function to add a mesh and all children of that
+   * Convenience function to add a mesh and all children of that
    * mesh to the engine.
    */
   virtual void AddMeshAndChildren (iMeshWrapper* mesh) = 0;
