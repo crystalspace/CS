@@ -24,6 +24,10 @@ chronological order.
 	- Eric Sunshine added #include <sys/ioctl.h> to Linux Joystick test in
 	  configure.ac and to csjoylin.cpp.  Reported as necessary for Linux
 	  2.2 by Dariusz Dawidowski <chfsoft@interia.pl>.
+	- Luca fixed a bug in awsTextBox class: in fact it was not possible to
+	  delete with the 'Del' key the first character contained in the text box.
+	  Luca also added a 'friend' declaration to make the physics ode plugin
+	  compile properly on VisualC++ 6.
 13-Dec-2003
 	- Eric Sunshine applied patch from Randall Foreman
           <eidpers@comcast.net>.  csModelConverterASE was accidentally

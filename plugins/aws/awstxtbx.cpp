@@ -566,9 +566,9 @@ bool awsTextBox::OnKeyboard (const csKeyEventData& eventData)
     case CSKEY_DEL:
       if (strCursor < text->Length ())
       {
-	int chSize = csUnicodeTransform::UTF8Skip (
+        int chSize = csUnicodeTransform::UTF8Skip (
 	  (utf8_char*)text->GetData () + strCursor, 
-	  strCursor);
+	  text->Length () - strCursor);
 
 	EnsureCursorToStartDistance (5);
         if (strStart < 0) strStart = 0;
