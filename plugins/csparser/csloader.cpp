@@ -2835,6 +2835,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	        AddToRegion (ldr_context, t->QueryObject ());
 	      }
 	    }
+	    break;
 	  }
 	  SyntaxService->ReportError (
 		"crystalspace.maploader.load.plugin", child,
