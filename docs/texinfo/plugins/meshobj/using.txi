@@ -6,7 +6,7 @@
 @cindex @code{iMeshObjectFactory}
 @cindex @code{iMeshObjectType}
 @cindex @code{iParticleState}
-@cindex @code{csMeshWrapper}
+@cindex @code{iMeshWrapper}
 
 @emph{Written by Jorrit Tyberghein,
 @email{jorrit.tyberghein@@uz.kuleuven.ac.be}.}
@@ -17,12 +17,12 @@ detail about the specific Mesh Object Types that Crystal Space supports.
 @subsubheading General
 
 When the engine works with instances of Mesh Objects it does so through the
-@samp{csMeshWrapper} class.  @samp{csMeshWrapper} holds the reference to the
+@samp{iMeshWrapper} interface.  @samp{iMeshWrapper} holds the reference to the
 @samp{iMeshObject} instances implementing the particular type of Mesh Object.
-@samp{csMeshWrapper} is responsible for deciding when to draw a Mesh Object and
-when to light it.  @samp{csMeshWrapper} also manages the position of the object
+@samp{iMeshWrapper} is responsible for deciding when to draw a Mesh Object and
+when to light it.  @samp{iMeshWrapper} also manages the position of the object
 in the world and manages possible hierarchical transformations (i.e.
-@samp{csMeshWrapper} has an array of @samp{csMeshWrapper} children).
+@samp{iMeshWrapper} has an array of @samp{iMeshWrapper} children).
 
 @subsubheading Loading From Map File
 
@@ -96,8 +96,7 @@ relative to the parent.
 
 When you have Mesh Objects loaded into Crystal Space using the map file syntax
 illustrated above, then you can query the parameters from your application by
-using the standard @sc{api} in the @samp{csEngine} class (or via
-@samp{iEngine}).
+using the standard @sc{api} in the @samp{iEngine} interface.
 
 @subsubheading Using Directly From Code
 
@@ -133,8 +132,8 @@ multiple interfaces like this (for example, the particle systems implement both
 
 @item
 For every instance of @samp{iMeshObject} you need to create a
-@samp{csMeshWrapper} instance for the engine.  Then you set up the
-@samp{csMeshWrapper} by placing it in the sector that you want it and setup its
+@samp{iMeshWrapper} instance for the engine.  Then you set up the
+@samp{iMeshWrapper} by placing it in the sector that you want it and setup its
 position and rotation (transformation).
 @end itemize
 
@@ -160,20 +159,14 @@ void SetupWorld ()
 @{
   @dots{}
   // Make a ball using the ball plug-in.
-  iMeshObject* ballMesh =
-    ball_factory->NewInstance ();
-  iBallState* ballState =
-    QUERY_INTERFACE (ballMesh, iBallState);
+  iMeshObject* ballMesh = ball_factory->NewInstance ();
+  iBallState* ballState = QUERY_INTERFACE (ballMesh, iBallState);
   ballState->SetRadius (.5, .5, .5);
-  ballState->SetMaterialWrapper (
-    QUERY_INTERFACE (material, iMaterialWrapper));
+  ballState->SetMaterialWrapper (material);
   ballState->SetRimVertices (12);
 
-  ball = new csMeshWrapper (engine, ballMesh);
+  iMeshWrapper* ball = engine->CreateMeshObject (ballMesh, "MyBall", room);
   ballMesh->DecRef ();
-  ball->SetName ("MyBall");
-  engine->meshes.Push (ball);
-  ball->GetMovable ().SetSector (room);
   m.Identity ();
   ball->GetMovable ().SetTransform (m);
   ball->GetMovable ().SetPosition (csVector3 (-3, 5, -3));
