@@ -1850,7 +1850,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   if (mymesh->meshtype == CS_MESHTYPE_POINT_SPRITES) 
   {
     glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE);
-    glDisable(GL_POINT_SPRITE_ARB);
+    glDisable (GL_POINT_SPRITE_ARB);
   }
 
   SetMirrorMode (false);

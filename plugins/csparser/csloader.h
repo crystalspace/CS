@@ -741,7 +741,7 @@ public:
   virtual bool LoadMapFile (const char* filename, bool clearEngine,
 	iRegion* region, bool curRegOnly, bool checkDupes);
   virtual bool LoadLibraryFile (const char* filename, iRegion* region,
-  	bool curRegOnly);
+  	bool curRegOnly, bool checkDupes);
 
   virtual csPtr<iMeshFactoryWrapper> LoadMeshObjectFactory (const char* fname);
   virtual csPtr<iMeshWrapper> LoadMeshObject (const char* fname);

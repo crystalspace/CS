@@ -148,7 +148,7 @@ struct iLoader : public iBase
 	bool checkDupes = false) = 0;
   /// Load library from a VFS file
   virtual bool LoadLibraryFile (const char* filename, iRegion* region = 0,
-  	bool curRegOnly = true) = 0;
+  	bool curRegOnly = true, bool checkDupes = false) = 0;
 
   /// Load a Mesh Object Factory from the map file.
   virtual csPtr<iMeshFactoryWrapper> LoadMeshObjectFactory (

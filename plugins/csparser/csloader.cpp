@@ -639,7 +639,7 @@ bool csLoader::LoadMapFile (const char* file, bool clearEngine,
 //---------------------------------------------------------------------------
 
 bool csLoader::LoadLibraryFile (const char* fname, iRegion* region,
-	bool curRegOnly)
+	bool curRegOnly, bool checkDupes)
 {
   csRef<iFile> buf (VFS->Open (fname, VFS_FILE_READ));
 
@@ -652,7 +652,7 @@ bool csLoader::LoadLibraryFile (const char* fname, iRegion* region,
   }
 
   csRef<iLoaderContext> ldr_context = csPtr<iLoaderContext> (
-	new StdLoaderContext (Engine, region, curRegOnly, this, false));
+	new StdLoaderContext (Engine, region, curRegOnly, this, checkDupes));
 
   csRef<iDocument> doc;
   bool er = LoadStructuredDoc (fname, buf, doc);
@@ -1222,10 +1222,23 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
             return false;
           break;
         case XMLTOKEN_LIBRARY:
+	{
+	  const char* name = child->GetAttributeValue ("checkdupes");
+	  bool dupes = ldr_context->CheckDupes ();
+	  if (name)
+	  {
+	    if (!strcasecmp (name, "true") || !strcasecmp (name, "yes") ||
+	    	!strcasecmp (name, "1") || !strcasecmp (name, "on"))
+	      dupes = true;
+	    else
+	      dupes = false;
+	  }
 	  if (!LoadLibraryFile (child->GetContentsValue (),
-	  	ldr_context->GetRegion (), ldr_context->CurrentRegionOnly ()))
+	  	ldr_context->GetRegion (), ldr_context->CurrentRegionOnly (),
+		dupes))
 	    return false;
 	  break;
+	}
         case XMLTOKEN_START:
         {
 	  const char* name = child->GetAttributeValue ("name");
@@ -1303,10 +1316,23 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node)
       switch (id)
       {
         case XMLTOKEN_LIBRARY:
+	{
+	  const char* name = child->GetAttributeValue ("checkdupes");
+	  bool dupes = ldr_context->CheckDupes ();
+	  if (name)
+	  {
+	    if (!strcasecmp (name, "true") || !strcasecmp (name, "yes") ||
+	    	!strcasecmp (name, "1") || !strcasecmp (name, "on"))
+	      dupes = true;
+	    else
+	      dupes = false;
+	  }
 	  if (!LoadLibraryFile (child->GetContentsValue (),
-	  	ldr_context->GetRegion (), ldr_context->CurrentRegionOnly ()))
+	  	ldr_context->GetRegion (), ldr_context->CurrentRegionOnly (),
+		ldr_context->CheckDupes ()))
 	    return false;
 	  break;
+	}
         case XMLTOKEN_ADDON:
 	  if (!LoadAddOn (ldr_context, child, (iEngine*)Engine))
 	    return false;

@@ -1891,15 +1891,31 @@ void csBugPlug::Dump (iEngine* engine)
 {
   Report (CS_REPORTER_SEVERITY_DEBUG,
   	"===========================================");
+  iTextureList* txts = engine->GetTextureList ();
+  iMaterialList* mats = engine->GetMaterialList ();
   iSectorList* sectors = engine->GetSectors ();
   iMeshList* meshes = engine->GetMeshes ();
   iMeshFactoryList* factories = engine->GetMeshFactories ();
   Report (CS_REPORTER_SEVERITY_DEBUG,
-    "%d sectors, %d mesh factories, %d mesh objects",
+    "%d textures, %d materials, %d sectors, %d mesh factories, %d mesh objects",
+    txts->GetCount (),
+    mats->GetCount (),
     sectors->GetCount (),
     factories->GetCount (),
     meshes->GetCount ());
   int i;
+  for (i = 0 ; i < txts->GetCount () ; i++)
+  {
+    iTextureWrapper* txt = txts->Get (i);
+    Report (CS_REPORTER_SEVERITY_DEBUG, "texture %d '%s'", i,
+    	txt->QueryObject ()->GetName ());
+  }
+  for (i = 0 ; i < mats->GetCount () ; i++)
+  {
+    iMaterialWrapper* mat = mats->Get (i);
+    Report (CS_REPORTER_SEVERITY_DEBUG, "material %d '%s'", i,
+    	mat->QueryObject ()->GetName ());
+  }
   for (i = 0 ; i < sectors->GetCount () ; i++)
   {
     iSector* sector = sectors->Get (i);

@@ -22,6 +22,17 @@ chronological order.
 	  when this resizing functionality was added to csView by Pascal.
 	- Jorrit added a missing clipportal_dirty = true to the NR GL renderer
 	  BeginDraw() implementation.
+	- Jorrit added dumping of material and textures to bugplug
+	  'dumpeng' command.
+	- Jorrit extended iLoader->LoadLibraryFile() so that it now also
+	  has a checkDupes parameter (default false). Also the checkdupes
+	  parameter from LoadMapFile() is passed along to LoadLibraryFile()
+	  if the map contains 'library' statements.
+	- Jorrit added a new attribute 'checkdupes' to 'library'. So if you say:
+	    <library checkdupes="true">somelib.lib</library>
+	  Then during loading of the library it will check for duplicate
+	  objects (factories, textures, materials, ...) and don't load them
+	  if they are already loaded in the engine.
 14-Jun-2004
 	- Jorrit implemented correct static lighting for static lod. In case
 	  of casting shadows, the lowest detail object that has a shadow
