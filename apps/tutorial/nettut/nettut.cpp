@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
 	printf("%s running udp on port %d.\n", (role ? "client" : "server"), port);
   }
   
-  csInitializer::InitializeSCF();
+  csInitializer::InitializeSCF (argc, argv);
 
   /// load our ensocket plugin
   driver = SCF_CREATE_INSTANCE("crystalspace.network.driver.sockets2", iNetworkDriver2);

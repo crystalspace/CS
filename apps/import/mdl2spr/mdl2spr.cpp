@@ -181,7 +181,7 @@ int main(int argc,char *argv[])
     }
   }
 
-  scfInitialize (0);
+  scfInitialize (argc, argv);
 
   const char* mdlfile = argv[argc - 2];
   QModel* mdl = 0;
