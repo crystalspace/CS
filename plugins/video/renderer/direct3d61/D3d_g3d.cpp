@@ -2178,9 +2178,9 @@ void csGraphics3DDirect3DDx6::SetClipper (csVector2* vertices, int num_vertices)
 
 void csGraphics3DDirect3DDx6::GetClipper (csVector2* vertices, int& num_vertices)
 {
-  if (!clipper) { num_vertices = 0; return; }
-  num_vertices = clipper->GetNumVertices ();
-  csVector2* clip_verts = clipper->GetClipPoly ();
+  if (!m_pClipper) { num_vertices = 0; return; }
+  num_vertices = m_pClipper->GetNumVertices ();
+  csVector2* clip_verts = m_pClipper->GetClipPoly ();
   int i;
   for (i = 0 ; i < num_vertices ; i++)
     vertices[i] = clip_verts[i];

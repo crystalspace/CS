@@ -4,6 +4,7 @@ The history order has been reversed so that new features are at the top.
 	- Fixed the bug when that could cause severe problems when
 	  loading a world for which the octree isn't valid anymore. The
 	  partially loaded octree was not cleaned up properly.
+	- Fixed a compile bug in DDraw61::GetClipper().
 	- As from a suggestion from Terrence Stewart I implemented
 	  csPolygon2D::FillZBuf() which will fill the Z buffer for
 	  that polygon (and not do texture mapping). This is now used
