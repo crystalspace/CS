@@ -483,7 +483,7 @@ void csCurve::GetCoverageMatrix (csFrustumView& lview,
       // if we have any shadow frustrums
       if (has_shadows)
       {
-        csShadowFrustum* csf;
+        csShadowFrustum* csf = NULL;
 	shadow_it->Reset ();
 	while (shadow_it->HasNext ())
 	{
