@@ -40,6 +40,9 @@ MsvcGenWorkspace #PROJECTNAME# ;
 
 local hash = "\$" ;
 MsvcGenConfig CRYSTAL.AVAILABLE : yes ;
+MsvcGenConfig CRYSTAL.DEFINES ;
+MsvcGenConfig CRYSTAL.CFLAGS ;
+MsvcGenConfig CRYSTAL.LFLAGS ;
 MsvcGenConfig CRYSTAL.LIBS : 
   "libcstool.lib libcsgfx.lib libcsgeom.lib libcsutil.lib" ;
 MsvcGenConfig CRYSTAL.LIBS.DEBUG : 
@@ -65,6 +68,8 @@ if $(CEL.DESIRED) = yes
 {
   MsvcGenConfig CEL.AVAILABLE : yes ;
   MsvcGenConfig CEL.DEFINES : USE_CEL ;
+  MsvcGenConfig CEL.CFLAGS ;
+  MsvcGenConfig CEL.LFLAGS ;
   MsvcGenConfig CEL.LIBS : "libceltool.lib" ;
   MsvcGenConfig CEL.LIBS.DEBUG : "libceltool_d.lib" ;
   MsvcGenConfig CEL.INCDIRS :
