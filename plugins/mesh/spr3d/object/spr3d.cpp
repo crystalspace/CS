@@ -1731,7 +1731,8 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
   last_pos = cur_pos;
 
   // If the sprite has only one frame we disable tweening here.
-  if (cur_action->GetFrameCount () <= 1) do_tweening = false;
+  bool do_tween = do_tweening;
+  if (cur_action->GetFrameCount () <= 1) do_tween = false;
 
   // Single-step mode starts here
   if (onestep)
@@ -1884,7 +1885,7 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
    * based on the excess time or excess displacement.  The Draw code
    * actually does the tweening of the vertices.
    */
-  if (do_tweening)
+  if (do_tween)
   {
     if (cur_action->GetFrameDelay(cur_frame))
     {

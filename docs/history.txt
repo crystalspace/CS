@@ -10,6 +10,9 @@ The history order is reversed so that new features are at the top.
 	  flag. Currently this new feature is not yet working properly.
 	  Needs more testing and fixing.
 	- Optimized the polygon drawing structures in graph3d.h a little.
+	- Fixed a bug in spr3d. When there one action had only one frame
+	  and that action was selected then tweening would be disabled
+	  permanently. Now it is only disabled for that action.
 24-Mar-2003
 	- Cleaned up indentation in new event code. Note to Jonathan:
 	  a tab == 8 spaces. Indentation == 2 spaces.
