@@ -1,5 +1,6 @@
 
 #include "cssysdef.h"
+#include "csutil/scf.h"
 
 CS_IMPLEMENT_PLUGIN
 

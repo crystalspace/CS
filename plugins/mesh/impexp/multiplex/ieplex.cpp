@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "iutil/databuff.h"
 #include "csutil/csstring.h"
-#include "csutil/csvector.h"
+#include "csutil/typedvec.h"
 #include "isys/system.h"
 #include "isys/plugin.h"
 #include "imesh/mdlconv.h"
@@ -68,7 +68,7 @@ SCF_IMPLEMENT_FACTORY (csModelConverterMultiplexer);
 
 SCF_EXPORT_CLASS_TABLE (ieplex)
   SCF_EXPORT_CLASS (csModelConverterMultiplexer,
-    "crystalspace.modelconverter.multiplexer"
+    "crystalspace.modelconverter.multiplexer",
     "Multiplexer for Model Converters")
 SCF_EXPORT_CLASS_TABLE_END
 
