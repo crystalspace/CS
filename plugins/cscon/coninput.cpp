@@ -80,7 +80,6 @@ bool csConsoleInput::HandleEvent(csEvent &event)
       break;
     case CSKEY_UP:
       {
-	//	printf("Cursor")
 	int ancient_history = history;
 	// If we're at the top of the list, cycle down to the bottom
 	if(history==0)
@@ -93,14 +92,14 @@ bool csConsoleInput::HandleEvent(csEvent &event)
 	  // Make sure neither the console line nor the buffer line is NULL
 	  if(!(consoleText==NULL||bufferText==NULL)) {
 	    int start = consoleText->Length() - bufferText->Length();
-	    cursor -= consoleText->Length();
 	    piConsole->DeleteText(start > 0 ? start : 0);
 	  }
 	  bufferText = buffer->GetLine(history);
 	  if(bufferText&&(!bufferText->IsEmpty())) {
 	    piConsole->PutText(bufferText->GetData());
-	    cursor += bufferText->Length();
-	  }
+	    cursor = bufferText->Length();
+	  } else
+	    cursor = 0;
 	}
       }
       break;
@@ -118,14 +117,14 @@ bool csConsoleInput::HandleEvent(csEvent &event)
 	  // Make sure neither the console line nor the buffer line is NULL
 	  if(!(consoleText==NULL||bufferText==NULL)) {
 	    int start = consoleText->Length() - bufferText->Length();
-	    cursor -= consoleText->Length();
 	    piConsole->DeleteText(start > 0 ? start : 0);
 	  }
 	  bufferText = buffer->GetLine(history);
 	  if(bufferText&&(!bufferText->IsEmpty())) {
 	    piConsole->PutText(bufferText->GetData());
-	    cursor += bufferText->Length();
-	  }
+	    cursor = bufferText->Length();
+	  } else
+	    cursor = 0;
 	}
       }
       break;
@@ -182,9 +181,7 @@ bool csConsoleInput::HandleEvent(csEvent &event)
 	}
 	if(piConsole&&echo) {
 	  csString put((char) event.Key.Code);
-//	  char p[5]; sprintf(p, "%d", event.Key.Code );
 	  piConsole->PutText(put.GetData());
-//	  piConsole->PutText(p);
 	}
       }
     }
