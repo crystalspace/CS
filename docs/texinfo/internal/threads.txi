@@ -1,0 +1,31 @@
+@c -*-texinfo-*-
+@node Threads in CS, , Makefile How-To, Internals
+@section Threads in Crystal Space
+@cindex Threads
+
+@noindent
+@emph{Written by Jorrit Tyberghein, @email{bit@@eltech.ru}.}
+
+The Crystal Space project as such is not thread-safe. So when using
+threads in combination with Crystal Space you have to be careful. However,
+several parts of Crystal Space are thread-safe to some degree. This is
+documented in this section. However, by default you must assume that some
+Crystal Space plugin or module is not thread-safe unless it is mentioned here.
+
+@itemize @bullet
+@item
+@sc{scf} class loading/unloading is safe. This means that
+@code{SCF_CREATE_INSTANCE} and all the routines in @code{iSCF} that have
+to do with loaded classes are safe.
+
+@item
+The plugin manager is safe. So macros like @code{CS_LOAD_PLUGIN},
+@code{CS_LOAD_PLUGIN_ALWAYS}, and @code{CS_QUERY_PLUGIN_CLASS} are safe.
+
+@item
+The object registry is safe. So macros like @code{CS_QUERY_REGISTRY}
+are safe. The @code{iObjectRegistryIterator} takes a copy of the data
+over which it iterates so it will not even lock.
+
+@end itemize
+

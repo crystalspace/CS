@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2001 by Jorrit Tyberghein
+    Copyright (C) 1998-2003 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -55,6 +55,8 @@ csPluginManager::csPluginManager (iObjectRegistry* object_reg) :
 {
   SCF_CONSTRUCT_IBASE (NULL);
   csPluginManager::object_reg = object_reg;
+  // We need a recursive mutex.
+  mutex = csMutex::Create (true);
 }
 
 csPluginManager::~csPluginManager ()
@@ -64,6 +66,7 @@ csPluginManager::~csPluginManager ()
 
 void csPluginManager::Clear ()
 {
+  csScopedMutexLock lock (mutex);
   OptionList.DeleteAll ();
 
   // Free all plugins.
@@ -145,6 +148,7 @@ iBase *csPluginManager::LoadPlugin (const char *classID,
   }
   else
   {
+    csScopedMutexLock lock (mutex);
     int index = -1;
     // See if the plugin is already in our plugin list.
     for (int i = 0 ; i < Plugins.Length () ; i++)
@@ -211,6 +215,7 @@ iBase *csPluginManager::LoadPlugin (const char *classID,
 bool csPluginManager::RegisterPlugin (const char *classID,
   iComponent *obj)
 {
+  csScopedMutexLock lock (mutex);
   int index = Plugins.Push (new csPlugin (obj, classID));
   if (obj->Initialize (object_reg))
   {
@@ -230,11 +235,13 @@ bool csPluginManager::RegisterPlugin (const char *classID,
 
 int csPluginManager::GetPluginCount ()
 {
+  csScopedMutexLock lock (mutex);
   return Plugins.Length ();
 }
 
 iBase* csPluginManager::GetPlugin (int idx)
 {
+  csScopedMutexLock lock (mutex);
   csPlugin* pl = Plugins.Get (idx);
   return pl->Plugin;
 }
@@ -242,6 +249,7 @@ iBase* csPluginManager::GetPlugin (int idx)
 iBase *csPluginManager::QueryPlugin (const char *iInterface, int iVersion)
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
+  csScopedMutexLock lock (mutex);
   for (int i = 0; i < Plugins.Length (); i++)
   {
     iBase *ret =
@@ -256,6 +264,7 @@ iBase *csPluginManager::QueryPlugin (const char* classID,
 				    const char *iInterface, int iVersion)
 {
   scfInterfaceID ifID = iSCF::SCF->GetInterfaceID (iInterface);
+  csScopedMutexLock lock (mutex);
   for (int i = 0 ; i < Plugins.Length () ; i++)
   {
     csPlugin* pl = Plugins.Get (i);
@@ -270,6 +279,7 @@ iBase *csPluginManager::QueryPlugin (const char* classID,
 
 bool csPluginManager::UnloadPlugin (iComponent* obj)
 {
+  csScopedMutexLock lock (mutex);
   int idx = Plugins.FindKey (obj);
   if (idx < 0)
     return false;

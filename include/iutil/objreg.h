@@ -44,6 +44,7 @@ SCF_VERSION (iObjectRegistry, 0, 0, 4);
 
 /**
  * This interface serves as a registry of other objects.
+ * The object registry is thread-safe.
  */
 struct iObjectRegistry : public iBase
 {
@@ -95,13 +96,20 @@ struct iObjectRegistry : public iBase
 
   /**
    * Get an iterator with all objects implementing the given interface.
+   * Note that the iterator iterates over a copy of the elements in the
+   * object registry so no thread-locking on the object registry happens except
+   * at the time the iterator is created.
    */
-  virtual iObjectRegistryIterator* Get (scfInterfaceID id, int version) = 0;
+  virtual csPtr<iObjectRegistryIterator> Get (
+  	scfInterfaceID id, int version) = 0;
 
   /**
    * Get an iterator with all objects in this object registry.
+   * Note that the iterator iterates over a copy of the elements in the
+   * object registry so no thread-locking on the object registry happens except
+   * at the time the iterator is created.
    */
-  virtual iObjectRegistryIterator* Get () = 0;
+  virtual csPtr<iObjectRegistryIterator> Get () = 0;
 };
 
 SCF_VERSION (iObjectRegistryIterator, 0, 0, 1);

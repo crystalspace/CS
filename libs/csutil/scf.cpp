@@ -24,6 +24,8 @@
 #include "csutil/scfstrv.h"
 #include "csutil/strset.h"
 #include "csutil/util.h"
+#include "csutil/ref.h"
+#include "csutil/scopedmutexlock.h"
 
 /// This is the registry for all class factories
 static class scfClassRegistry *ClassRegistry = NULL;
@@ -32,9 +34,16 @@ static bool SortClassRegistry = false;
 /// This is our private instance of csSCF
 static class csSCF *PrivateSCF = NULL;
 
-/// This class manages all SCF functionality
+/**
+ * This class manages all SCF functionality
+ * The SCF module loader routines (CreateInstance, RegisterClass, ...)
+ * are all thread-safe.
+ */
 class csSCF : public iSCF
 {
+private:
+  csRef<csMutex> mutex;
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -431,6 +440,9 @@ csSCF::csSCF ()
   if (!LibraryRegistry)
     LibraryRegistry = new scfLibraryVector ();
 #endif
+
+  // We need a recursive mutex.
+  mutex = csMutex::Create (true);
 }
 
 csSCF::~csSCF ()
@@ -478,6 +490,8 @@ void csSCF::Finish ()
 void *csSCF::CreateInstance (const char *iClassID, const char *iInterface,
   int iVersion)
 {
+  csScopedMutexLock lock (mutex);
+
   // Pre-sort class registry for doing binary searches
   if (SortClassRegistry)
   {
@@ -510,6 +524,8 @@ void *csSCF::CreateInstance (const char *iClassID, const char *iInterface,
 void csSCF::UnloadUnusedModules ()
 {
 #ifndef CS_STATIC_LINKED
+  csScopedMutexLock lock (mutex);
+
   for (int i = LibraryRegistry->Length () - 1; i >= 0; i--)
   {
     scfSharedLibrary *sl = (scfSharedLibrary *)LibraryRegistry->Get (i);
@@ -522,6 +538,8 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
   const char *Dependencies)
 {
 #ifndef CS_STATIC_LINKED
+  csScopedMutexLock lock (mutex);
+
   if (ClassRegistry->FindKey (iClassID) >= 0)
     return false;
   // Create a factory and add it to class registry
@@ -538,6 +556,8 @@ bool csSCF::RegisterClass (const char *iClassID, const char *iLibraryName,
 
 bool csSCF::RegisterStaticClass (scfClassInfo *iClassInfo)
 {
+  csScopedMutexLock lock (mutex);
+
   if (ClassRegistry->FindKey (iClassInfo->ClassID) >= 0)
     return false;
   // Create a factory and add it to class registry
@@ -556,6 +576,8 @@ bool csSCF::RegisterClassList (scfClassInfo *iClassInfo)
 
 bool csSCF::UnregisterClass (const char *iClassID)
 {
+  csScopedMutexLock lock (mutex);
+
   // If we have no class registry, we aren't initialized (or were finalized)
   if (!ClassRegistry)
     return false;
@@ -572,43 +594,49 @@ bool csSCF::UnregisterClass (const char *iClassID)
 
 const char *csSCF::GetClassDescription (const char *iClassID)
 {
-  int idx = ClassRegistry->FindKey (iClassID);
+  csScopedMutexLock lock (mutex);
 
+  int idx = ClassRegistry->FindKey (iClassID);
   if (idx >= 0)
   {
     iFactory *cf = (iFactory *)ClassRegistry->Get (idx);
     return cf->QueryDescription ();
-  } /* endif */
+  }
 
   return NULL;
 }
 
 const char *csSCF::GetClassDependencies (const char *iClassID)
 {
-  int idx = ClassRegistry->FindKey (iClassID);
+  csScopedMutexLock lock (mutex);
 
+  int idx = ClassRegistry->FindKey (iClassID);
   if (idx >= 0)
   {
     iFactory *cf = (iFactory *)ClassRegistry->Get (idx);
     return cf->QueryDependencies ();
-  } /* endif */
+  }
 
   return NULL;
 }
 
 bool csSCF::ClassRegistered (const char *iClassID)
 {
+  csScopedMutexLock lock (mutex);
   return (ClassRegistry->FindKey (iClassID) >= 0);
 }
 
 scfInterfaceID csSCF::GetInterfaceID (const char *iInterface)
 {
+  csScopedMutexLock lock (mutex);
   return (scfInterfaceID)InterfaceRegistry.Request (iInterface);
 }
 
 iStrVector* csSCF::QueryClassList (char const* pattern)
 {
   scfStrVector* v = new scfStrVector();
+
+  csScopedMutexLock lock (mutex);
   int const rlen = ClassRegistry->Length();
   if (rlen != 0)
   {

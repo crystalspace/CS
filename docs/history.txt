@@ -3,6 +3,19 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+18-Apr-2003
+	- Started a document describing which parts of Crystal Space are
+	  thread-safe and which are not.
+	- Made SCF class loading/unloading thread-safe. This means
+	  that SCF_CREATE_INSTANCE is safe.
+	- Made the plugin manager thread-safe. This also means that macros
+	  like CS_LOAD_PLUGIN and CS_QUERY_PLUGIN_CLASS are now thread-safe.
+	- Made the object registry thread-safe. This means things like
+	  CS_QUERY_REGISTRY are now thread-safe.
+	- Also the object registry now returns a csPtr<> for the
+	  object registry iterators.
+	- Added an entry to the faq about lack of hardware stencil causing
+	  possible slow-down if not accelerated.
 17-Apr-2003
 	- Fixed a bug in the common polygon buffer implementation where it
 	  was incrementing the ref count on poly_texture without testing if

@@ -63,6 +63,7 @@ SCF_VERSION (iPluginManager, 0, 1, 0);
 
 /**
  * This is the plugin manager.
+ * The plugin manager is guaranteed thread-safe.
  */
 struct iPluginManager : public iBase
 {

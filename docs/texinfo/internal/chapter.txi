@@ -12,9 +12,11 @@ merely curious about the internal workings of the project.
 * Dependencies::
 * Makefile How-To::
 * Memory Debugger:: Crystal Space Memory Debugger
+* Threads in CS:: Threads in Crystal Space
 @end menu
 
 @importss{internal,platform,details.txi}
 @imports{internal,depend.txi}
 @imports{internal,makefile.txi}
 @imports{internal,memdebug.txi}
+@imports{internal,threads.txi}

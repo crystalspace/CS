@@ -113,6 +113,8 @@ SCF_IMPLEMENT_IBASE_END
 csObjectRegistry::csObjectRegistry () : clearing (false)
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  // We need a recursive mutex.
+  mutex = csMutex::Create (true);
 }
 
 csObjectRegistry::~csObjectRegistry ()
@@ -124,6 +126,8 @@ csObjectRegistry::~csObjectRegistry ()
 
 void csObjectRegistry::Clear ()
 {
+  csScopedMutexLock lock (mutex);
+
   clearing = true;
   int i;
   for (i = registry.Length() - 1; i >= 0; i--)
@@ -144,6 +148,8 @@ void csObjectRegistry::Clear ()
 
 bool csObjectRegistry::Register (iBase* obj, char const* tag)
 {
+  csScopedMutexLock lock (mutex);
+
   CS_ASSERT (registry.Length () == tags.Length ());
   if (!clearing)
   {
@@ -169,6 +175,8 @@ bool csObjectRegistry::Register (iBase* obj, char const* tag)
 
 void csObjectRegistry::Unregister (iBase* obj, char const* tag)
 {
+  csScopedMutexLock lock (mutex);
+
   CS_ASSERT (registry.Length () == tags.Length ());
   if (!clearing)
   {
@@ -195,6 +203,8 @@ void csObjectRegistry::Unregister (iBase* obj, char const* tag)
 
 iBase* csObjectRegistry::Get (char const* tag)
 {
+  csScopedMutexLock lock (mutex);
+
   CS_ASSERT (registry.Length () == tags.Length ());
   int i;
   for (i = registry.Length() - 1; i >= 0; i--)
@@ -212,6 +222,8 @@ iBase* csObjectRegistry::Get (char const* tag)
 
 iBase* csObjectRegistry::Get (char const* tag, scfInterfaceID id, int version)
 {
+  csScopedMutexLock lock (mutex);
+
   CS_ASSERT (registry.Length () == tags.Length ());
   int i;
   for (i = registry.Length() - 1; i >= 0; i--)
@@ -233,10 +245,12 @@ iBase* csObjectRegistry::Get (char const* tag, scfInterfaceID id, int version)
   return NULL;
 }
 
-iObjectRegistryIterator* csObjectRegistry::Get (scfInterfaceID id, int version)
+csPtr<iObjectRegistryIterator> csObjectRegistry::Get (
+	scfInterfaceID id, int version)
 {
   csObjectRegistryIterator* iterator = new csObjectRegistryIterator ();
   int i;
+  csScopedMutexLock lock (mutex);
   for (i = registry.Length() - 1; i >= 0; i--)
   {
     iBase* b = (iBase*)registry[i];
@@ -248,19 +262,20 @@ iObjectRegistryIterator* csObjectRegistry::Get (scfInterfaceID id, int version)
       interf->DecRef ();
     }
   }
-  return iterator;
+  return csPtr<iObjectRegistryIterator> (iterator);
 }
 
-iObjectRegistryIterator* csObjectRegistry::Get ()
+csPtr<iObjectRegistryIterator> csObjectRegistry::Get ()
 {
   csObjectRegistryIterator* iterator = new csObjectRegistryIterator ();
   int i;
+  csScopedMutexLock lock (mutex);
   for (i = registry.Length() - 1; i >= 0; i--)
   {
     iBase* b = (iBase*)registry[i];
     char* t = (char*)tags[i];
     iterator->Add (b, t);
   }
-  return iterator;
+  return csPtr<iObjectRegistryIterator> (iterator);
 }
 

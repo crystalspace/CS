@@ -20,6 +20,7 @@
 #define __CS_PLUGMGR_H__
 
 #include "csutil/scf.h"
+#include "csutil/scopedmutexlock.h"
 #include "csutil/csvector.h"
 #include "csutil/parray.h"
 #include "iutil/config.h"
@@ -30,10 +31,14 @@ struct iObjectRegistry;
 
 /**
  * This is the standard implementation of the plugin manager.
+ * The plugin manager is thread-safe.
  */
 class csPluginManager : public iPluginManager
 {
 private:
+  /// Mutex to make the plugin manager thread-safe.
+  csRef<csMutex> mutex;
+
   /**
    * This is a private structure used to keep the list of plugins.
    */

@@ -21,16 +21,19 @@
 
 #include <stdarg.h>
 #include <stdio.h>
-#include "csutil/scf.h"
 #include "iutil/objreg.h"
+#include "csutil/scf.h"
 #include "csutil/csvector.h"
+#include "csutil/scopedmutexlock.h"
 
 /**
  * This is an implementation of iObjectRegistry.
+ * Thread-safe!
  */
 class csObjectRegistry : public iObjectRegistry
 {
 private:
+  csRef<csMutex> mutex;
   csVector registry;
   csVector tags;
   // True when this object is being cleared; prevents external changes.
@@ -72,12 +75,12 @@ public:
   /**
    * Get an iterator with all objects implementing the given interface.
    */
-  virtual iObjectRegistryIterator* Get (scfInterfaceID id, int version);
+  virtual csPtr<iObjectRegistryIterator> Get (scfInterfaceID id, int version);
 
   /**
    * Get an iterator with all objects in this object registry.
    */
-  virtual iObjectRegistryIterator* Get ();
+  virtual csPtr<iObjectRegistryIterator> Get ();
 };
 
 #endif // __CS_OBJREG_H__
