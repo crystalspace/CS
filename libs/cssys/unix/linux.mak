@@ -9,8 +9,6 @@ DRIVERS+=cs2d/softx cs3d/software
 DRIVERS+=cs3d/opengl cs2d/openglx
 DRIVERS+=cs3d/inf cs2d/inf
 #DRIVERS+=cs3d/line cs2d/linex
-#DRIVERS+=cs3d/glide2 cs2d/unxglide2
-#DRIVERS+=cs3d/glide3 cs2d/unxglide3
 
 # uncomment the following to build SVGALIB and/or GGI 2D drivers
 #DRIVERS+=cs2d/svgalib
@@ -29,6 +27,14 @@ DRIVERS+=cs3d/inf cs2d/inf
 #DRIVERS+=cs2d/openglx/svga
 DRIVERS+=cs2d/openglx/empty
 
+# uncomment the following to build Glide stuff
+#GLIDE_VERSIONS=2 3
+DRIVERS+= $(addprefix cs3d/glide, $(GLIDE_VERSIONS))
+ifneq ($(strip $(GLIDE_VERSIONS)),)
+DRIVERS+=cs2d/unxglide
+endif
+GLIDE2_PATH=-I/usr/include/glide2
+GLIDE3_PATH=-I/usr/include/glide3
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
