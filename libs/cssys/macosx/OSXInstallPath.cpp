@@ -36,14 +36,22 @@
 char* csGetConfigPath()
 {
   char* buff = new char[1024];
-  if (!OSXGetInstallPath(buff, sizeof(buff), PATH_SEPARATOR))
+  if (!OSXGetInstallPath(buff, 1024, PATH_SEPARATOR))
   {
     char const* path = getenv("CRYSTAL");
     if (!path || *path == 0)
-      strncpy (buff, ".", sizeof(buff));
+      strncpy (buff, ".", 1024);
     else
-      strncpy (buff, path, sizeof(buff));
+      strncpy (buff, path, 1024);
   }
+
+  // Add our path separator if not present.
+  int length = strlen(buff);
+  if (buff[length-1]!=PATH_SEPARATOR && length <=1022) {
+      buff[length]=PATH_SEPARATOR;
+      buff[length+1]='\0';
+  }
+  
   return buff;
 }
 
@@ -60,7 +68,7 @@ char** csGetPluginPaths()
   strncpy(buff, cpath, 1024);
   strncat(buff, OS_MACOSX_PLUGIN_DIR, 1024);
   buff[1023] = '\0';
-
+  
   paths[0] = buff;
   paths[1] = cpath;
   paths[2] = csStrNew(".");
