@@ -59,7 +59,12 @@ else
   CFLAGS.STATIC_COM+=$(CFLAGS.D)SCL_GLX2D
 endif
 DESCRIPTION.$(GLX2D) = $(DESCRIPTION.glx2d)
-SRC.GLX2D = $(wildcard libs/cs2d/openglx/*.cpp $(SRC.COMMON.DRV2D))
+SRC.GLX2D = $(wildcard libs/cs2d/openglx/*.cpp \
+  libs/cs3d/opengl/ogl_*cache.cpp libs/cs3d/opengl/ogl_txtmgr.cpp \
+  libs/cs3d/opengl/itexture.cpp \
+  libs/cs3d/common/txtmgr.cpp libs/cs3d/common/memheap.cpp \
+  libs/cs3d/common/inv_cmap.cpp libs/cs3d/common/imgtools.cpp\
+  $(SRC.COMMON.DRV2D))
 OBJ.GLX2D = $(addprefix $(OUT),$(notdir $(SRC.GLX2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
