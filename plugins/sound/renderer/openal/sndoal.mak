@@ -92,7 +92,9 @@ sndoalclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)/sndoal.dep
 $(OUTOS)/sndoal.dep: $(SRC.SNDOAL)
-	$(DO.DEP)
+	$(DO.DEP1) \
+	$(OPENAL.CFLAGS) \
+	$(DO.DEP2)
 else
 -include $(OUTOS)/sndoal.dep
 endif

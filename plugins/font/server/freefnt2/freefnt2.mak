@@ -70,7 +70,9 @@ freefnt2clean:
 ifdef DO_DEPEND
 dep: $(OUTOS)/freefont2.dep
 $(OUTOS)/freefont2.dep: $(SRC.FREEFONT2)
-	$(DO.DEP)
+	$(DO.DEP1) \
+	$(FT2.CFLAGS) \
+	$(DO.DEP2)
 else
 -include $(OUTOS)/freefont2.dep
 endif

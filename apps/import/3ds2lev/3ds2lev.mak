@@ -27,8 +27,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/import/3ds2lev
-
 3DS2LEV.EXE = 3ds2lev$(EXE.CONSOLE)
 INC.3DS2LEV = $(wildcard apps/import/3ds2lev/*.h)
 SRC.3DS2LEV = $(wildcard apps/import/3ds2lev/*.cpp)
@@ -53,6 +51,9 @@ ifeq ($(MAKESECTION),targets)
 build.3ds2lev: $(OUTDIRS) $(3DS2LEV.EXE)
 clean: 3ds2levclean
 
+$(OUT)/%$O: apps/import/3ds2lev/%.cpp
+	$(DO.COMPILE.CPP) $(3DS.CFLAGS)
+
 $(3DS2LEV.EXE): $(OBJ.3DS2LEV) $(LIB.3DS2LEV)
 	$(DO.LINK.CONSOLE.EXE) $(3DS.LFLAGS)
 
@@ -63,7 +64,9 @@ ifdef DO_DEPEND
 3ds2levdep: $(OUTOS)/3ds2lev.dep
 #dep: $(OUTOS)/3ds2lev.dep
 $(OUTOS)/3ds2lev.dep: $(SRC.3DS2LEV)
-	$(DO.DEP)
+	$(DO.DEP1) \
+	$(3DS.CFLAGS) \
+	$(DO.DEP2)
 else
 -include $(OUTOS)/3ds2lev.dep
 endif

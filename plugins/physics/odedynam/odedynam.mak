@@ -61,15 +61,10 @@ odedynam: $(OUTDIRS) $(ODEDYNAM)
 $(OUT)/%$O: plugins/physics/odedynam/%.cpp
 	$(DO.COMPILE.CPP) $(ODE.CFLAGS)
 
-<<<<<<< odedynam.mak
-$(ODEDYNAM): $(OBJ.ODEDYNAM) $(LIB.ODEDYNAM)
-	$(DO.PLUGIN) $(ODE.LFLAGS)
-=======
 $(ODEDYNAM): $(OBJ.ODEDYNAM) $(LIB.ODEDYNAM)
 	$(DO.PLUGIN.PREAMBLE) \
 	$(DO.PLUGIN.CORE) $(ODE.LFLAGS) \
 	$(DO.PLUGIN.POSTAMBLE)
->>>>>>> 1.8
 
 clean: odedynamclean
 odedynamclean:
@@ -78,7 +73,9 @@ odedynamclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)/odedynam.dep
 $(OUTOS)/odedynam.dep: $(SRC.ODEDYNAM)
-	$(DO.DEP)
+	$(DO.DEP1) \
+	$(ODE.CFLAGS) \
+	$(DO.DEP2)
 else
 -include $(OUTOS)/odedynam.dep
 endif
