@@ -209,10 +209,16 @@ void csStarsMeshObject::DrawStarBox (iRenderView* rview,
 
 }
 
-void csStarsMeshObject::GetObjectBoundingBox (csBox3& b, int /*type*/)
+void csStarsMeshObject::GetObjectBoundingBox (csBox3& b)
 {
   SetupObject ();
   b = box;
+}
+
+void csStarsMeshObject::SetObjectBoundingBox (const csBox3& b)
+{
+  box = b;
+  scfiObjectModel.ShapeChanged ();
 }
 
 //----------------------------------------------------------------------

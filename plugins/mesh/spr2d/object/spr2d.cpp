@@ -360,10 +360,15 @@ void csSprite2DMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderB
   }
 }
 
-void csSprite2DMeshObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
+void csSprite2DMeshObject::GetObjectBoundingBox (csBox3& bbox)
 {
   SetupObject ();
   bbox.Set (-radius, radius);
+}
+
+void csSprite2DMeshObject::SetObjectBoundingBox (const csBox3&)
+{
+  // @@@ TODO
 }
 
 void csSprite2DMeshObject::HardTransform (const csReversibleTransform& t)

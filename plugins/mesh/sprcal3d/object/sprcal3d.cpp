@@ -912,10 +912,16 @@ void csSpriteCal3DMeshObject::RecalcBoundingBox (csBox3& bbox)
 }
 
 
-void csSpriteCal3DMeshObject::GetObjectBoundingBox (csBox3& bbox, int type)
+void csSpriteCal3DMeshObject::GetObjectBoundingBox (csBox3& bbox)
 {
   RecalcBoundingBox (object_bbox);
   bbox = object_bbox;
+}
+
+void csSpriteCal3DMeshObject::SetObjectBoundingBox (const csBox3& bbox)
+{
+  object_bbox = bbox;
+  scfiObjectModel.ShapeChanged ();
 }
 
 void csSpriteCal3DMeshObjectFactory::GetRadius (csVector3& rad, csVector3& cent)
@@ -924,8 +930,7 @@ void csSpriteCal3DMeshObjectFactory::GetRadius (csVector3& rad, csVector3& cent)
   rad.Set(1,1,1);
 }
 
-void csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox (csBox3& bbox,
-	int type)
+void csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox (csBox3& bbox)
 {
   CalCoreSkeleton *skel = calCoreModel.getCoreSkeleton ();
   skel->calculateBoundingBoxes(&calCoreModel);
@@ -941,11 +946,16 @@ void csSpriteCal3DMeshObjectFactory::GetObjectBoundingBox (csBox3& bbox,
   }
 }
 
+void csSpriteCal3DMeshObjectFactory::SetObjectBoundingBox (const csBox3&)
+{
+  // @@@ TODO
+}
+
 void csSpriteCal3DMeshObject::GetObjectBoundingBox (csBox3& bbox,
-	int type, csVector3 *verts,int vertCount)
+	csVector3 *verts,int vertCount)
 {
   if (object_bbox.Empty())
-    RecalcBoundingBox(object_bbox);
+    RecalcBoundingBox (object_bbox);
   bbox = object_bbox;
 }
 

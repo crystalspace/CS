@@ -866,7 +866,7 @@ float csMeshWrapper::GetSquaredDistance (iRenderView *rview)
   iCamera* camera = rview->GetCamera ();
   // calculate distance from camera to mesh
   csBox3 obox;
-  GetObjectModel ()->GetObjectBoundingBox (obox, CS_BBOX_MAX);
+  GetObjectModel ()->GetObjectBoundingBox (obox);
   csVector3 obj_center = (obox.Min () + obox.Max ()) / 2;
   csVector3 wor_center;
   if (movable.IsFullTransformIdentity ())
@@ -880,7 +880,7 @@ float csMeshWrapper::GetSquaredDistance (iRenderView *rview)
 
 void csMeshWrapper::GetFullBBox (csBox3& box)
 {
-  GetObjectModel ()->GetObjectBoundingBox (box, CS_BBOX_MAX);
+  GetObjectModel ()->GetObjectBoundingBox (box);
   iMovable* mov = &movable.scfiMovable;
   while (mov)
   {
@@ -965,7 +965,7 @@ int csMeshWrapper::HitBeamBBox (
   float *pr)
 {
   csBox3 b;
-  GetObjectModel ()->GetObjectBoundingBox (b, CS_BBOX_MAX);
+  GetObjectModel ()->GetObjectBoundingBox (b);
 
   csSegment3 seg (start, end);
   return csIntersect3::BoxSegment (b, seg, isect, pr);
@@ -978,11 +978,11 @@ void csMeshWrapper::GetWorldBoundingBox (csBox3 &cbox)
     wor_bbox_movablenr = movable.GetUpdateNumber ();
 
     if (movable.IsFullTransformIdentity ())
-      GetObjectModel ()->GetObjectBoundingBox (wor_bbox, CS_BBOX_MAX);
+      GetObjectModel ()->GetObjectBoundingBox (wor_bbox);
     else
     {
       csBox3 obj_bbox;
-      GetObjectModel ()->GetObjectBoundingBox (obj_bbox, CS_BBOX_MAX);
+      GetObjectModel ()->GetObjectBoundingBox (obj_bbox);
 
       // @@@ Maybe it would be better to really calculate the bounding box
       // here instead of just transforming the object space bounding box?

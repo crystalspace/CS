@@ -700,10 +700,16 @@ void csBallMeshObject::UpdateLighting (const csArray<iLight*>& lights,
 }
 
 
-void csBallMeshObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
+void csBallMeshObject::GetObjectBoundingBox (csBox3& bbox)
 {
   SetupObject ();
   bbox = object_bbox;
+}
+
+void csBallMeshObject::SetObjectBoundingBox (const csBox3& bbox)
+{
+  object_bbox = bbox;
+  scfiObjectModel.ShapeChanged ();
 }
 
 void csBallMeshObject::HardTransform (const csReversibleTransform& t)

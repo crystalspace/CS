@@ -33,32 +33,6 @@ struct iPolygonMesh;
 struct iObjectModel;
 class csBox3;
 
-/**
- * \name Bounding box types
- * @{ */
- 
-/**
- * For iObjectModel::GetObjectBoundingBox() get a normal bounding box which
- * may or may not be recalculated depending on the changing geometry of
- * the object.
- */
-#define CS_BBOX_NORMAL 0
-/**
- * For iObjectModel::GetObjectBoundingBox() get a totally accurate bounding
- * box. Not all plugins support this. Some will just return a normal
- * bounding box.
- */
-#define CS_BBOX_ACCURATE 1
-/**
- * For iObjectModel::GetObjectBoundingBox() get the maximum bounding box
- * that this object will ever use. For objects that don't have a preset
- * maximum bounding box this just has to be a reasonable estimate of
- * a realistic maximum bounding box.
- */
-#define CS_BBOX_MAX 2
-
-/** @} */
-
 SCF_VERSION (iObjectModelListener, 0, 0, 1);
 
 /**
@@ -71,7 +45,7 @@ struct iObjectModelListener : public iBase
   virtual void ObjectModelChanged (iObjectModel* model) = 0;
 };
 
-SCF_VERSION (iObjectModel, 0, 3, 0);
+SCF_VERSION (iObjectModel, 0, 4, 0);
 
 /**
  * This interface represents data related to some geometry in object
@@ -178,22 +152,15 @@ struct iObjectModel : public iBase
 
   /**
    * Get the bounding box in object space for this mesh object.
-   * Type has three possibilities:
-   * <ul>
-   * <li> #CS_BBOX_NORMAL: get a normal bounding box which
-   *      may or may not be recalculated depending on the changing
-   *      geometry of the object.
-   * <li> #CS_BBOX_ACCURATE: get a totally accurate bounding
-   *      box. Not all plugins support this. Some will just return a normal
-   *      bounding box.
-   * <li> #CS_BBOX_MAX: get the maximum bounding box
-   *      that this object will ever use. For objects that don't have a
-   *      preset maximum bounding box this just has to be a reasonable
-   *      estimate of a realistic maximum bounding box.
-   * </ul>
    */
-  virtual void GetObjectBoundingBox (csBox3& bbox,
-  	int type = CS_BBOX_NORMAL) = 0;
+  virtual void GetObjectBoundingBox (csBox3& bbox) = 0;
+
+  /**
+   * Override the bounding box of this mesh object in object space.
+   * Note that some mesh objects don't have a bounding box on their own
+   * and may delegate this call to their factory (like genmesh).
+   */
+  virtual void SetObjectBoundingBox (const csBox3& bbox) = 0;
 
   /**
    * Get the radius and center of this object in object space.

@@ -489,6 +489,11 @@ public:
   void GetBoundingBox (csBox3& box);
 
   /**
+   * Set the bounding box in object space for this polygon set.
+   */
+  void SetBoundingBox (const csBox3& box);
+
+  /**
    * Get the bounding box for this object given some transformation (movable).
    */
   void GetBoundingBox (iMovable* movable, csBox3& box);
@@ -756,10 +761,13 @@ public:
   class ObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
-    virtual void GetObjectBoundingBox (csBox3& bbox,
-    	int /*type = CS_BBOX_NORMAL*/)
+    virtual void GetObjectBoundingBox (csBox3& bbox)
     {
       scfParent->GetBoundingBox (bbox);
+    }
+    virtual void SetObjectBoundingBox (const csBox3& bbox)
+    {
+      scfParent->SetBoundingBox (bbox);
     }
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {

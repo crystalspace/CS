@@ -2030,10 +2030,16 @@ csRenderMesh** csTerrainObject::GetRenderMeshes (int &n,
   return returnMeshes->GetArray ();
 }
 
-void csTerrainObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
+void csTerrainObject::GetObjectBoundingBox (csBox3& bbox)
 {
   SetupObject ();
   bbox = global_bbox;
+}
+
+void csTerrainObject::SetObjectBoundingBox (const csBox3& bbox)
+{
+  global_bbox = bbox;
+  scfiObjectModel.ShapeChanged ();
 }
 
 void csTerrainObject::GetRadius (csVector3& rad, csVector3& cent)

@@ -279,7 +279,8 @@ public:
   void SetMixMode (uint mode) { MixMode = mode; }
   uint GetMixMode () const { return MixMode; }
   const csColor& GetColor () const { return color; }
-  void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
+  void GetObjectBoundingBox (csBox3& bbox);
+  void SetObjectBoundingBox (const csBox3& bbox);
 
   //----------------------- iMeshObject implementation ----------------------
   SCF_DECLARE_IBASE;
@@ -482,6 +483,7 @@ public:
   void Invalidate ();
 
   const csBox3& GetObjectBoundingBox ();
+  void SetObjectBoundingBox (const csBox3& bbox);
   const csVector3& GetRadius ();
 
   /**
@@ -627,9 +629,13 @@ public:
   class ObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csFoliageMeshObjectFactory);
-    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+    virtual void GetObjectBoundingBox (csBox3& bbox)
     {
       bbox = scfParent->GetObjectBoundingBox ();
+    }
+    virtual void SetObjectBoundingBox (const csBox3& bbox)
+    {
+      scfParent->SetObjectBoundingBox (bbox);
     }
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {

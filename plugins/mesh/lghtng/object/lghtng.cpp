@@ -123,9 +123,15 @@ csRenderMesh** csLightningMeshObject::GetRenderMeshes (int &n,
 }
 
 
-void csLightningMeshObject::GetObjectBoundingBox (csBox3& retbbox, int type)
+void csLightningMeshObject::GetObjectBoundingBox (csBox3& retbbox)
 {
-  GenMesh->GetObjectModel ()->GetObjectBoundingBox (retbbox, type);
+  GenMesh->GetObjectModel ()->GetObjectBoundingBox (retbbox);
+}
+
+void csLightningMeshObject::SetObjectBoundingBox (const csBox3& inbbox)
+{
+  GenMesh->GetObjectModel ()->SetObjectBoundingBox (inbbox);
+  scfiObjectModel.ShapeChanged ();
 }
 
 void csLightningMeshObject::GetRadius (csVector3& rad, csVector3& cent)

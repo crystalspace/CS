@@ -371,16 +371,21 @@ public:
   friend struct PolyMesh;
 
   //------------------------- iObjectModel implementation ----------------
-  void GetObjectBoundingBox (csBox3& bbox, int type, csVector3 *verts,int vertCount);
-  void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
+  void GetObjectBoundingBox (csBox3& bbox, csVector3 *verts,int vertCount);
+  void GetObjectBoundingBox (csBox3& bbox);
+  void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (csVector3& rad, csVector3& cent);
 
   class ObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObjectFactory);
-    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+    virtual void GetObjectBoundingBox (csBox3& bbox)
     {
-      scfParent->GetObjectBoundingBox (bbox, type);
+      scfParent->GetObjectBoundingBox (bbox);
+    }
+    virtual void SetObjectBoundingBox (const csBox3& bbox)
+    {
+      scfParent->SetObjectBoundingBox (bbox);
     }
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {
@@ -1113,16 +1118,22 @@ public:
   } scfiLODControl;
   friend struct LODControl;
 
-  void GetObjectBoundingBox (csBox3& bbox, int type, csVector3 *verts,int vertCount);
-  void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
+  void GetObjectBoundingBox (csBox3& bbox, csVector3 *verts,
+  	int vertCount);
+  void GetObjectBoundingBox (csBox3& bbox);
+  void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (csVector3& rad, csVector3& cent);
 
   class ObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObject);
-    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+    virtual void GetObjectBoundingBox (csBox3& bbox)
     {
-      scfParent->GetObjectBoundingBox (bbox, type);
+      scfParent->GetObjectBoundingBox (bbox);
+    }
+    virtual void SetObjectBoundingBox (const csBox3& bbox)
+    {
+      scfParent->SetObjectBoundingBox (bbox);
     }
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {

@@ -14,6 +14,14 @@ chronological order.
 	  an efficient manner. However. This pvs culler is not yet useful
 	  since the pvscalc application is not doing anything yet. Also pvsvis
 	  has not been tested yet.
+	- Jorrit removed the type parameter from
+	  iObjectModel->GetObjectBoundingBox(). There was no mesh object
+	  that actually used that parameter so it was pretty much useless.
+	  In practice objects have only one bounding box anyway. The
+	  CS_BBOX_ constants are also removed.
+	- Jorrit added an iObjectModel->SetObjectBoundingBox() so that you
+	  can force a bounding box for a specific mesh object. This does
+	  not yet work for all types of meshes though.
 20-Jan-2005
 	- res made the following changes:
 	    - Let the GL renderer always clear the stencil buffer in 

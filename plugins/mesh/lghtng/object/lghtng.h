@@ -76,7 +76,8 @@ public:
 
   /// Destructor.
   virtual ~csLightningMeshObject ();
-  void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
+  void GetObjectBoundingBox (csBox3& bbox);
+  void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (csVector3& rad, csVector3& cent);
 
   ///--------------------- iMeshObject implementation ------------------------
@@ -113,9 +114,13 @@ public:
   class ObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csLightningMeshObject);
-    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+    virtual void GetObjectBoundingBox (csBox3& bbox)
     {
-      scfParent->GetObjectBoundingBox (bbox, type);
+      scfParent->GetObjectBoundingBox (bbox);
+    }
+    virtual void SetObjectBoundingBox (const csBox3& bbox)
+    {
+      scfParent->SetObjectBoundingBox (bbox);
     }
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {

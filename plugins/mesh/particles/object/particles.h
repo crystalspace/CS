@@ -629,7 +629,8 @@ public:
   iMaterialWrapper* GetMaterialWrapper () const { return matwrap; }
   void InvalidateMaterialHandles () {}
 
-  void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
+  void GetObjectBoundingBox (csBox3& bbox);
+  void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (csVector3& rad, csVector3& c);
 
   bool LoadPhysicsPlugin (const char *plugin_id);
@@ -969,9 +970,11 @@ public:
   struct eiObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csParticlesObject);
-    void GetObjectBoundingBox (csBox3& b, int t = CS_BBOX_NORMAL)
-    { scfParent->GetObjectBoundingBox (b, t); }
-    void GetRadius (csVector3& r, csVector3& c)
+    virtual void GetObjectBoundingBox (csBox3& b)
+    { scfParent->GetObjectBoundingBox (b); }
+    virtual void SetObjectBoundingBox (const csBox3& b)
+    { scfParent->SetObjectBoundingBox (b); }
+    virtual void GetRadius (csVector3& r, csVector3& c)
     { scfParent->GetRadius (r, c); }
   } scfiObjectModel;
   friend struct eiObjectModel;

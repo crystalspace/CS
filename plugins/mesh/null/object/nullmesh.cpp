@@ -109,9 +109,15 @@ void csNullmeshMeshObject::SetBoundingBox (const csBox3& box)
   scfiObjectModel.ShapeChanged ();
 }
 
-void csNullmeshMeshObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
+void csNullmeshMeshObject::GetObjectBoundingBox (csBox3& bbox)
 {
   bbox = box;
+}
+
+void csNullmeshMeshObject::SetObjectBoundingBox (const csBox3& bbox)
+{
+  box = bbox;
+  scfiObjectModel.ShapeChanged ();
 }
 
 bool csNullmeshMeshObject::HitBeamOutline (const csVector3& /*start*/,

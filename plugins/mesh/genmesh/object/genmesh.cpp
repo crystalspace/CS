@@ -1029,9 +1029,14 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
   return &meshPtr;
 }
 
-void csGenmeshMeshObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
+void csGenmeshMeshObject::GetObjectBoundingBox (csBox3& bbox)
 {
   bbox = factory->GetObjectBoundingBox ();
+}
+
+void csGenmeshMeshObject::SetObjectBoundingBox (const csBox3& bbox)
+{
+  factory->SetObjectBoundingBox (bbox);
 }
 
 void csGenmeshMeshObject::GetRadius (csVector3& rad, csVector3& cent)
@@ -1439,6 +1444,13 @@ const csBox3& csGenmeshMeshObjectFactory::GetObjectBoundingBox ()
   SetupFactory ();
   if (!object_bbox_valid) CalculateBBoxRadius ();
   return object_bbox;
+}
+
+void csGenmeshMeshObjectFactory::SetObjectBoundingBox (const csBox3& bbox)
+{
+  SetupFactory ();
+  object_bbox_valid = true;
+  object_bbox = bbox;
 }
 
 

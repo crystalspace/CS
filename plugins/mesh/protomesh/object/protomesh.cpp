@@ -394,6 +394,12 @@ const csBox3& csProtoMeshObjectFactory::GetObjectBoundingBox ()
   return object_bbox;
 }
 
+void csProtoMeshObjectFactory::SetObjectBoundingBox (const csBox3& bbox)
+{
+  object_bbox_valid = true;
+  object_bbox = bbox;
+}
+
 void csProtoMeshObjectFactory::SetupFactory ()
 {
   if (!initialized)

@@ -35,6 +35,10 @@ csMeshObject::csMeshObject (iEngine *eng)
 {
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+
+  boundingbox.SetCenter (csVector3 (0, 0, 0));
+  boundingbox.SetSize (csVector3 (CS_BOUNDINGBOX_MAXVALUE,
+    CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE));
 }
 
 csMeshObject::~csMeshObject ()
@@ -118,17 +122,20 @@ iMaterialWrapper* csMeshObject::GetMaterialWrapper () const
   return 0;
 }
 
-void csMeshObject::GetObjectBoundingBox (csBox3& bbox, int type)
+void csMeshObject::GetObjectBoundingBox (csBox3& bbox)
 {
-  bbox.SetCenter (csVector3 (0, 0, 0));
-  bbox.SetSize (csVector3 (CS_BOUNDINGBOX_MAXVALUE,
-    CS_BOUNDINGBOX_MAXVALUE, CS_BOUNDINGBOX_MAXVALUE));
+  bbox = boundingbox;
+}
+
+void csMeshObject::SetObjectBoundingBox (const csBox3& bbox)
+{
+  boundingbox = bbox;
 }
 
 void csMeshObject::GetRadius (csVector3& radius, csVector3& center)
 {
   csBox3 b;
-  GetObjectBoundingBox (b, CS_BBOX_NORMAL);
+  GetObjectBoundingBox (b);
   radius = (b.Max () - b.Min ()) * 0.5f;
   center = b.GetCenter ();
 }

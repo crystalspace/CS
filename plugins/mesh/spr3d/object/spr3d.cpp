@@ -913,10 +913,15 @@ void csSprite3DMeshObjectFactory::HardTransform (const csReversibleTransform& t)
   scfiObjectModel.ShapeChanged ();
 }
 
-void csSprite3DMeshObjectFactory::GetObjectBoundingBox (csBox3& b, int /*type*/)
+void csSprite3DMeshObjectFactory::GetObjectBoundingBox (csBox3& b)
 {
   csSpriteFrame* cframe = GetAction (0)->GetCsFrame (0);
   cframe->GetBoundingBox (b);
+}
+
+void csSprite3DMeshObjectFactory::SetObjectBoundingBox (const csBox3&)
+{
+  // @@@ TODO
 }
 
 void csSprite3DMeshObjectFactory::GetRadius (csVector3& rad, csVector3& cent)
@@ -1308,11 +1313,16 @@ float csSprite3DMeshObject::GetScreenBoundingBox (
   return cbox.MaxZ ();
 }
 
-void csSprite3DMeshObject::GetObjectBoundingBox (csBox3& b, int /*type*/)
+void csSprite3DMeshObject::GetObjectBoundingBox (csBox3& b)
 {
   CS_ASSERT (cur_action != 0);
   csSpriteFrame* cframe = cur_action->GetCsFrame (cur_frame);
   cframe->GetBoundingBox (b);
+}
+
+void csSprite3DMeshObject::SetObjectBoundingBox (const csBox3&)
+{
+  // @@@ TODO
 }
 
 void csSprite3DMeshObject::GetRadius (csVector3& rad, csVector3& cent)

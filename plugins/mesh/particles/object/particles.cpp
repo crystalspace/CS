@@ -664,28 +664,15 @@ bool csParticlesObject::HitBeamObject (const csVector3& start,
   return false;
 }
 
-void csParticlesObject::GetObjectBoundingBox (csBox3& bbox, int type)
+void csParticlesObject::GetObjectBoundingBox (csBox3& bbox)
 {
-  bbox.StartBoundingBox ();
-  switch (type)
-  {
-  case CS_BBOX_NORMAL:
-    bbox.AddBoundingVertex (-radius, -radius, -radius);
-    bbox.AddBoundingVertex (radius, radius, radius);
-    break;
-  case CS_BBOX_ACCURATE:
-    // TODO: Vertices, not just points (and radius)
-    //for (int i = 0; i < max_particles; i++)
-    //  bbox.AddBoundingVertex (positions[i]);
-    bbox.AddBoundingVertex (-radius, -radius, -radius);
-    bbox.AddBoundingVertex (radius, radius, radius);
-    break;
-  case CS_BBOX_MAX:
-    // TODO: Come up with a better estimated maximum
-    bbox.AddBoundingVertex (-100000.0f, -100000.0f, -100000.0f);
-    bbox.AddBoundingVertex (100000.0f, 100000.0f, 100000.0f);
-    break;
-  }
+  bbox.Set (csVector3 (-radius, -radius, -radius),
+  	csVector3 (radius, radius, radius));
+}
+
+void csParticlesObject::SetObjectBoundingBox (const csBox3&)
+{
+  // @@@ TODO
 }
 
 void csParticlesObject::GetRadius(csVector3 &rad, csVector3 &c)

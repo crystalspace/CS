@@ -939,3 +939,12 @@ As a side-effect of these changes, the @samp{csImageFile} and
 
 The function @code{iMaterialList::NewMaterial()} now needs an additional
 name parameter. It is not recommended to change the name later.
+
+@subheading @code{iObjectModel} Change
+
+The function @code{iObjectModel::GetObjectBoundingBox()} only has one
+parameter now. The optional @samp{type} parameter has been removed as it
+was not implemented anywhere. In addition to that the constants
+@code{CS_BBOX_NORMAL}, @code{CS_BBOX_ACCURATE}, and @code{CS_BBOX_MAX}
+are also removed.
+

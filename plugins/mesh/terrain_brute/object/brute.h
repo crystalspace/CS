@@ -394,7 +394,8 @@ public:
 
   int CollisionDetect (iMovable *m, csTransform *p);
 
-  void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
+  void GetObjectBoundingBox (csBox3& bbox);
+  void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (csVector3& rad, csVector3& cent);
 
   SCF_DECLARE_IBASE;
@@ -497,9 +498,13 @@ public:
   class eiObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csTerrainObject);
-    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+    virtual void GetObjectBoundingBox (csBox3& bbox)
     {
-      scfParent->GetObjectBoundingBox (bbox, type);
+      scfParent->GetObjectBoundingBox (bbox);
+    }
+    virtual void SetObjectBoundingBox (const csBox3& bbox)
+    {
+      scfParent->SetObjectBoundingBox (bbox);
     }
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {
@@ -736,9 +741,13 @@ public:
   class eiObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csTerrainFactory);
-    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+    virtual void GetObjectBoundingBox (csBox3& bbox)
     {
-      //scfParent->GetObjectBoundingBox (bbox, type);
+      //scfParent->GetObjectBoundingBox (bbox);
+    }
+    virtual void SetObjectBoundingBox (const csBox3& bbox)
+    {
+      //scfParent->SetObjectBoundingBox (bbox);
     }
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {

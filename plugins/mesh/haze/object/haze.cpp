@@ -929,10 +929,16 @@ void csHazeMeshObject::DrawPoly(iRenderView *rview, iGraphics3D *g3d,
 
 }
 
-void csHazeMeshObject::GetObjectBoundingBox (csBox3& retbbox, int /*type*/)
+void csHazeMeshObject::GetObjectBoundingBox (csBox3& retbbox)
 {
   SetupObject ();
   retbbox = bbox;
+}
+
+void csHazeMeshObject::SetObjectBoundingBox (const csBox3& inbbox)
+{
+  bbox = inbbox;
+  scfiObjectModel.ShapeChanged ();
 }
 
 void csHazeMeshObject::HardTransform (const csReversibleTransform& t)

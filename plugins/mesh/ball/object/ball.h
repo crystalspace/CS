@@ -214,7 +214,8 @@ public:
   /// paint a sky
   void PaintSky(float time, float **dayvert, float **nightvert,
     float **topsun, float **sunset);
-  void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
+  void GetObjectBoundingBox (csBox3& bbox);
+  void SetObjectBoundingBox (const csBox3& bbox);
 
   /**
    * Calculate polygons for iPolygonMesh.
@@ -268,9 +269,13 @@ public:
   {
   public:
     SCF_DECLARE_EMBEDDED_IBASE (csBallMeshObject);
-    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+    virtual void GetObjectBoundingBox (csBox3& bbox)
     {
-      scfParent->GetObjectBoundingBox (bbox, type);
+      scfParent->GetObjectBoundingBox (bbox);
+    }
+    virtual void SetObjectBoundingBox (const csBox3& bbox)
+    {
+      scfParent->SetObjectBoundingBox (bbox);
     }
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {

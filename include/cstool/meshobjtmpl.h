@@ -79,6 +79,9 @@ protected:
   /// Flags.
   csFlags flags;
 
+  /// The bounding box.
+  csBox3 boundingbox;
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -216,12 +219,17 @@ public:
    */
   virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
 
-
   /**
    * See igeom/objmodel.h for specification. The default implementation
    * returns an infinite bounding box.
    */
-  virtual void GetObjectBoundingBox (csBox3& bbox, int type);
+  virtual void GetObjectBoundingBox (csBox3& bbox);
+
+  /**
+   * See igeom/objmodel.h for specification. Overrides the default bounding
+   * box.
+   */
+  virtual void SetObjectBoundingBox (const csBox3& bbox);
 
   /**
    * See igeom/objmodel.h for specification. The default implementation
@@ -233,9 +241,13 @@ public:
   struct CS_CSTOOL_EXPORT eiObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMeshObject);
-    virtual void GetObjectBoundingBox (csBox3& bbox, int type)
+    virtual void GetObjectBoundingBox (csBox3& bbox)
     {
-      scfParent->GetObjectBoundingBox (bbox, type);
+      scfParent->GetObjectBoundingBox (bbox);
+    }
+    virtual void SetObjectBoundingBox (const csBox3& bbox)
+    {
+      scfParent->SetObjectBoundingBox (bbox);
     }
     virtual void GetRadius (csVector3& radius, csVector3& center)
     {

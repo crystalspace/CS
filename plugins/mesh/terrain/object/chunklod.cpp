@@ -148,9 +148,14 @@ csPtr<iMeshObject> csChunkLodTerrainFactory::NewInstance ()
   return csPtr<iMeshObject>(new csChunkLodTerrainObject (this));
 }
 
-void csChunkLodTerrainFactory::GetObjectBoundingBox (csBox3& bbox, int type)
+void csChunkLodTerrainFactory::GetObjectBoundingBox (csBox3& bbox)
 {
   bbox = root->BBox ();
+}
+
+void csChunkLodTerrainFactory::SetObjectBoundingBox (const csBox3&)
+{
+  // @@@ TODO
 }
 
 void csChunkLodTerrainFactory::GetRadius (csVector3& rad, csVector3& c)

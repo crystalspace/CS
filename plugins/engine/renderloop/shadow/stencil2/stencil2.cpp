@@ -702,7 +702,8 @@ void csStencil2ShadowStep::Perform (iRenderView* rview, iSector* sector,
         }
 
         csBox3 model_bounding_box;
-        sp->GetMeshObject()->GetObjectModel() ->GetObjectBoundingBox(model_bounding_box);
+        sp->GetMeshObject()->GetObjectModel()
+		->GetObjectBoundingBox(model_bounding_box);
 
         const csReversibleTransform& tf = sp->GetMovable ()->GetTransform ();
 

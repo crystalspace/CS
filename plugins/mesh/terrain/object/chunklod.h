@@ -214,14 +214,17 @@ public:
   virtual iMeshObjectType* GetMeshObjectType () const { return chunklod_type; }
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 
-  void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
+  void GetObjectBoundingBox (csBox3& bbox);
+  void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (csVector3& rad, csVector3& c);
 
   struct eiObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csChunkLodTerrainFactory);
-    virtual void GetObjectBoundingBox (csBox3& b, int t = CS_BBOX_NORMAL)
-    { scfParent->GetObjectBoundingBox (b, t); }
+    virtual void GetObjectBoundingBox (csBox3& b)
+    { scfParent->GetObjectBoundingBox (b); }
+    virtual void SetObjectBoundingBox (const csBox3& b)
+    { scfParent->SetObjectBoundingBox (b); }
     virtual void GetRadius (csVector3& r, csVector3& c)
     { scfParent->GetRadius (r, c); }
   } scfiObjectModel;
@@ -544,8 +547,10 @@ public:
   struct eiObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csChunkLodTerrainObject);
-    virtual void GetObjectBoundingBox (csBox3& b, int t = CS_BBOX_NORMAL)
-    { scfParent->pFactory->GetObjectBoundingBox (b, t); }
+    virtual void GetObjectBoundingBox (csBox3& b)
+    { scfParent->pFactory->GetObjectBoundingBox (b); }
+    virtual void SetObjectBoundingBox (const csBox3& b)
+    { scfParent->pFactory->SetObjectBoundingBox (b); }
     virtual void GetRadius (csVector3& r, csVector3& c)
     { scfParent->pFactory->GetRadius (r, c); }
   } scfiObjectModel;

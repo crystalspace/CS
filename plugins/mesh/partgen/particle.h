@@ -208,10 +208,15 @@ public:
   /// Set whether this particle system applies lighting
   virtual void SetLighting (bool enable);
 
-  virtual void GetObjectBoundingBox (csBox3& bbox, int)
+  virtual void GetObjectBoundingBox (csBox3& bbox)
   {
     SetupObject ();
     bbox = Bounds;
+  }
+  virtual void SetObjectBoundingBox (const csBox3& bbox)
+  {
+    Bounds = bbox;
+    scfiObjectModel.ShapeChanged ();
   }
 
   /// Set selfdestruct mode on, and msec to live.

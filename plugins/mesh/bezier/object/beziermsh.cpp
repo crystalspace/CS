@@ -655,6 +655,13 @@ void csBezierMesh::GetBoundingBox (csBox3 &box)
   box = static_data->obj_bbox;
 }
 
+void csBezierMesh::SetBoundingBox (const csBox3& b)
+{
+  static_data->obj_bbox_valid = true;
+  static_data->obj_bbox = b;
+  scfiObjectModel.ShapeChanged ();
+}
+
 void csBezierMesh::GetBoundingBox (iMovable *movable, csBox3 &box)
 {
   if (wor_bbox_movablenr != movable->GetUpdateNumber ())

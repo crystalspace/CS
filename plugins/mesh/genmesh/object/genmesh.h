@@ -204,7 +204,8 @@ public:
   const csColor& GetColor () const { return base_color; }
   void SetManualColors (bool m) { do_manual_colors = m; }
   bool IsManualColors () const { return do_manual_colors; }
-  void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
+  void GetObjectBoundingBox (csBox3& bbox);
+  void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (csVector3& rad, csVector3& cent);
   void SetShadowCasting (bool m) { do_shadows = m; }
   void SetShadowReceiving (bool m) { do_shadow_rec = m; }
@@ -632,6 +633,7 @@ public:
   { return anon_buffer_names; }
 
   const csBox3& GetObjectBoundingBox ();
+  void SetObjectBoundingBox (const csBox3& bbox);
   const csVector3& GetRadius ();
 
   /**
@@ -906,9 +908,13 @@ public:
   class ObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
-    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+    virtual void GetObjectBoundingBox (csBox3& bbox)
     {
       bbox = scfParent->GetObjectBoundingBox ();
+    }
+    virtual void SetObjectBoundingBox (const csBox3& bbox)
+    {
+      scfParent->SetObjectBoundingBox (bbox);
     }
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {

@@ -238,10 +238,15 @@ public:
     iMovable* movable, uint32 frustum_mask);
 
   //--------------------- For csMeshObject ------------------------------//
-  virtual void GetObjectBoundingBox (csBox3& bbox, int)
+  virtual void GetObjectBoundingBox (csBox3& bbox)
   {
     Prepare ();
     bbox = object_bbox;
+  }
+  virtual void SetObjectBoundingBox (const csBox3& bbox)
+  {
+    object_bbox = bbox;
+    scfiObjectModel.ShapeChanged ();
   }
   virtual void GetRadius (csVector3& radius, csVector3& center);
 };

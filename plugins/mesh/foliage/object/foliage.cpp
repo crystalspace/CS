@@ -695,6 +695,13 @@ const csBox3& csFoliageMeshObjectFactory::GetObjectBoundingBox ()
   return object_bbox;
 }
 
+void csFoliageMeshObjectFactory::SetObjectBoundingBox (const csBox3& bbox)
+{
+  SetupFactory ();
+  object_bbox_valid = true;
+  object_bbox = bbox;
+}
+
 void csFoliageMeshObjectFactory::SetupFactory ()
 {
   if (!initialized)

@@ -96,12 +96,12 @@ public:
     rad = do_rad;
   }
 
-  void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+  void GetObjectBoundingBox (csBox3& bbox)
   {
-    (void)type;
     bbox.Set (-100000, -100000, -100000, 100000, 100000, 100000);
     return;
   }
+  void SetObjectBoundingBox (const csBox3&) { }
   void GetRadius (csVector3& rad, csVector3& cent)
   {
      rad.Set (200000, 200000, 200000);
@@ -142,9 +142,13 @@ public:
     virtual void SetPolygonMeshShadows (iPolygonMesh*) { }
     virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
     { return 0; }
-    virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)
+    virtual void GetObjectBoundingBox (csBox3& bbox)
     {
-      scfParent->GetObjectBoundingBox (bbox, type);
+      scfParent->GetObjectBoundingBox (bbox);
+    }
+    virtual void SetObjectBoundingBox (const csBox3& bbox)
+    {
+      scfParent->SetObjectBoundingBox (bbox);
     }
     virtual void GetRadius (csVector3& rad, csVector3& cent)
     {

@@ -1003,6 +1003,13 @@ csPtr<iMeshObject> csThingStatic::NewInstance ()
   return csPtr<iMeshObject> (&thing->scfiMeshObject);
 }
 
+void csThingStatic::SetBoundingBox (const csBox3 &box)
+{
+  SetObjBboxValid (true);
+  obj_bbox = box;
+  scfiObjectModel.ShapeChanged ();
+}
+
 void csThingStatic::GetBoundingBox (csBox3 &box)
 {
   int i;
