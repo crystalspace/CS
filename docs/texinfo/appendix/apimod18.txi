@@ -43,7 +43,83 @@ removed and is now also handled by @code{csEngine::NextFrame()}.
 @subheading Configuration File Changes
 @cindex Configuration Files
 
-The configuration file format has changed significantly. @@@@@@TODO
+The configuration file format has changed significantly. In contrast to the
+@sc{ini} format used before, Crystal Space now uses a flat format. Sections
+are gone. Every config file is just a list of keys in the following format:
+@example
+; optional comment
+; (can also be several lines long)
+KeyName = Value
+@end example
+Also, key names have been changed completely. Keys are organized in a
+pseudo-hierarchical structure by using key names like
+@samp{Engine.Lighting.Ambient.Red}. To convert your own config files to the
+new format, you should best take all keys from all sections and rename them
+to @samp{ApplicationName.SectionName.KeyName}. This is only a suggestion.
+You can choose whatever name you want, except the initial
+@samp{ApplicationName.}. This is done to give every option a unique name.
+The same should be done for plugins (@samp{PluginName.SectionName.KeyName}).
+
+Comments at the end of the file are preserved and put back at the end when
+saving the file.
+
+On the application side, things have also changed:
+@itemize @bullet
+@item
+The old @code{csIniFile} class still exists. All these changes refer to the
+difference between @code{csIniFile} and @code{csConfigFile}, and the
+difference between @code{iConfigFile} and @code{iConfigFileNew}. Sorry for
+this mess, but there were a few cases where I could not (yet) port modules
+to the new config system, so they still require the old system. This will
+change soon. The header files for the new system are @file{csutil/cfgfile.h}
+and @file{icfgnew.h}. The main system config file already uses the new system.
+
+@item
+To read or write config keys, you now only pass the key name and default
+value, because sections don't exist anymore. Be careful when porting,
+because the line
+@example
+const char *s = Config->GetStr("section", "key");
+@end example
+in your code may now be interpreted as
+@example
+const char *s = Config->GetStr("key", "default");
+@end example
+The compiler will not complain about this.
+
+@item
+@code{GetYesNo()} and @code{SetYesNo()} have been renamed to @code{GetBool()}
+and @code{SetBool()}.
+
+@item
+The @samp{dirty} flag is now hidden inside the config file object. The
+@code{Save()} method will look for this flag.
+
+@item
+The section and data iterators have been merged to a single object. This
+iterator can be used to cycle through all options, or through all options
+in one @dfn{subsection}, which is the initial substring of the key name.
+For example, if you iterate all options in subsection @samp{Engine.Lighting.},
+you'll get all options whose name begin with this string. Note the trailing
+dot. It is part of the subsection name. This is important if you have other
+options like @samp{Engine.LightingActivate}, which would otherwise be
+enumerated as well. It is also important because you can ask an iterator for
+the @dfn{local} name of the current key, which is everything but the
+subsection name. For example, If your iterator loops through
+@samp{Engine.Lighting.}, then the key @samp{Engine.Lighting.Ambient.Red}
+would have the local name @samp{Ambient.Red}. If you omit the trailing dot,
+this would be @samp{.Ambient.Red}, which may not be what you want. To
+retrieve the local name, call @code{Iterator->GetName(true);}.
+
+@item
+Some methods for easier access to key values have been added to the iterators.
+So you can now read integer, float and bool values as well, not only strings.
+
+@item
+The @code{Prev()} method of iterators has been removed because a new planned
+implementation of the @code{iConfigFileNew} interface is probably not able
+to implement this method. Also, it was never used.
+@end itemize
 
 @subheading Mesh Object Plug-ins
 @cindex Mesh Object Plug-ins
