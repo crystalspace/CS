@@ -22,24 +22,21 @@
 #	package should use 60 for this value, while OpenStep and NextStep
 #	packages should use 40.  The default, if not specified, is 40.
 #
-# TODO
-#	Upgrade to reflect the new directory structure used with Crystal Space
-#	beta 13.  Currently it expects the directory structure from beta 12.
-#
 #------------------------------------------------------------------------------
 
-SRC=./cryst
-PACK=${HOME}/cryst
-PROGS="cryst mazed blocks"
-DATA="blocks.zip large.zip MazeD.zip"
-DOCS="blocks.txt config.txt console.txt faq.html"
-SRCFILES="autoexec.cfg blocks.cfg coord cryst.cfg csCOM.cfg MazeD.cfg \
-	standard.zip"
-READMEFILES="README src/system/next/README.Binaries"
+SRC=./CS
+DST=${1-"outgoing"}
+PACK=${DST}/CS
+PROGS="walktest mazed blocks metademo"
+DATA="flarge.zip maze.zip room.zip MazeD.zip blocks.zip"
+DOCS="blocks.txt config.txt console.txt keys.txt README.NeXT"
+SRCFILES="autoexec.cfg blocks.cfg cryst.cfg csCOM.cfg softrndr.cfg coord \
+	MazeD.cfg metademo.cfg standard.zip"
+READMEFILES="README INSTALL.NeXT-Binary"
 
 AMBIENT=40
-if [ $# -gt 0 ]; then
-    AMBIENT=$1
+if [ $# -gt 1 ]; then
+    AMBIENT=$2
     shift;
     fi
 echo "Using ambient value: ${AMBIENT}"
@@ -69,6 +66,7 @@ PATCH_FILE()
     DESC=$1; shift
     echo -n " ${DESC}"
     mv ${FILE} ${FILE}.old
+    chmod u+w ${FILE}.old
     sed "s:${PATTERN}:${REPLACE}:" < ${FILE}.old > ${FILE}
     rm ${FILE}.old
     }
@@ -79,17 +77,20 @@ if [ ! -d ${SRC} ]; then
     fi
 
 echo "Creating package: ${PACK}"
-rm -rf ${PACK}
+if [ ! -d ${DST} ]; then
+    mkdir ${DST}
+    fi
 
+rm -rf ${PACK}
 mkdir ${PACK}
 mkdir ${PACK}/data
 mkdir ${PACK}/docs
 
-COPY_FILES "readme" ./ ./ ${READMEFILES}
+COPY_FILES "readme" docs ./ ${READMEFILES}
 COPY_FILES "data" data data ${DATA}
 COPY_FILES "documentation" docs docs ${DOCS}
-COPY_FILES "support" src ./ ${SRCFILES}
-COPY_FILES "program" src ./ ${PROGS}
+COPY_FILES "support" ./ ./ ${SRCFILES}
+COPY_FILES "program" ./ ./ ${PROGS}
 
 echo -n "Stripping program files:"
 for f in ${PROGS}; do
@@ -99,32 +100,19 @@ for f in ${PROGS}; do
 echo ""
 
 echo -n "Patching cryst.cfg:"
-PATTERN="WORLDFILE="
-REPLACE="WORLDFILE=data/"
-PATCH_FILE cryst.cfg "paths"
-
 PATTERN="AMBIENT_WHITE=20"
 REPLACE="AMBIENT_WHITE=${AMBIENT}"
 PATCH_FILE cryst.cfg "brightness"
 echo ""
 
-echo -n "Patching MazeD.cfg:"
-PATTERN="../data"
-REPLACE="data"
-PATCH_FILE MazeD.cfg "paths"
-echo ""
-
-echo -n "Patching blocks.cfg:"
-PATTERN="../data"
-REPLACE="data"
-PATCH_FILE blocks.cfg "paths"
-echo ""
-
-mv ${PACK}/README.Binaries ${PACK}/README.NeXT
-echo -n "Patching README.NeXT:"
-PATTERN="./cryst large.zip"
-REPLACE="./cryst data/large.zip"
-PATCH_FILE README.NeXT "paths"
+mv ${PACK}/INSTALL.NeXT-Binary ${PACK}/INSTALL.NeXT
+echo -n "Patching INSTALL.NeXT:"
+PATTERN="./walktest \(-*[a-z]* *\)large.zip"
+REPLACE="./walktest \1data/large.zip"
+PATCH_FILE INSTALL.NeXT "paths"
+PATTERN="large.zip"
+REPLACE="flarge.zip"
+PATCH_FILE INSTALL.NeXT "names "
 echo ""
 
 echo -n "Fixing permissions: "
