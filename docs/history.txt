@@ -5,6 +5,8 @@ The history order is reversed so that new features are at the top.
 
 2-Apr-2003
 	- Matze removed the csSome, csConstSome and uint type from cstypes.h
+	- Matze added the movierecorder plugin from Micah Dowty
+	  <micah@navi.picogui.org>
 1-Apr-2003
 	- Reverted dllwrap change to win32gcc.mak from 4 days ago since
 	  it prevents debug symbols from being present in plugins.

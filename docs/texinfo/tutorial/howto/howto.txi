@@ -30,6 +30,7 @@ code.
 * HOWTO Create Your Own Plugin:: Create Your Own Plugin
 * HOWTO Simple Map Example:: Simple Map Example
 * HOWTO Use custom font:: Using a Custom Font
+* HOWTO Recording Movies:: Recording in-game movies
 @end menu
 
 @importss{tutorial,howto,smartptr.txi}
@@ -49,4 +50,5 @@ code.
 @importss{tutorial,howto,plugin.txi}
 @importss{tutorial,howto,simpmap.txi}
 @importss{tutorial,howto,custfont.txi}
+@importss{tutorial,howto,movierec.txi}
 

@@ -1,0 +1,69 @@
+@c -*-texinfo-*-
+@node HOWTO Recording Movies, , HOWTO Use custom font, HOWTO
+@subsection Recording Movies
+@cindex movie, video, recording, movierecorder
+
+This section describes how to use the in-game movie recorder.
+
+@subsubheading What is the movie recorder useful for?
+
+The movie recorder plugin lets you record a Crystal Space application's video output
+quickly into a NuppelVideo file. NuppelVideo is a format designed for fast recording rather
+than efficient storage, so typically you would reencode the resulting video in DivX or a
+similar format.
+
+The plugin keeps Crystal Space's virtual clock in sync with the movie's frame rate, so you
+can render very complex scenes slower than real-time and play them back later full speed.
+
+Currently this plugin does not handle audio or formats other than NuppelVideo, but both of
+these are planned for the future.
+
+@subsubheading Setting up the movie recorder
+
+The movie recorder plugin (probably @samp{movierecorder.so} or @samp{movierecorder.dll})
+should be compiled as part of a full Crystal Space build.
+
+You can also use the movie recorder with an existing binary without any recompilation. Just
+place the movie recorder plugin in the app's lib directory, and add these lines to the app's
+@samp{scf.cfg}:
+@example
+  ; Realtime movie recorder
+  crystalspace.utilities.movierecorder = movierecorder
+@end example
+
+Like Bugplug, the movie recorder can be loaded and manipulated explicitly by an application
+or it can be loaded transparently into an existing app. To load it transparently, you can
+add a line to @samp{data/config/user.cfg}:
+@example
+  Global.System.Plugins.iMovieRecorder = crystalspace.utilities.movierecorder
+@end example
+
+Now the movie recorder plugin should load automatically when your app initializes.
+
+@subsubheading Using the movie recorder
+
+Like Bugplug's screenshot facility, the movie recorder creates a new numbered file when you
+press the recording hotkey. By default, this key is @samp{alt-r}. If you can see notice
+messages overlaid on your app or in the terminal you're running it from, you should see a
+``Video recorder started'' message indicating the name of the file being recorded to. Press
+the record hotkey again to stop the recording.
+
+During recording, you can use the pause hotkey to temporarily suspend recording. By default
+this is @samp{alt-p}. Press it again to resume recording to the same file.
+
+@subsubheading Processing the resulting movies
+
+You can view the resulting Nuppelvideo files using mplayer, an open source and crossplatform
+media player. For redistribution, you should use a format with a better compression ratio,
+like DivX. mplayer's counterpart, mencoder, handles this task nicely:
+@example
+mencoder crystal000.nuv -o my_movie.avi -ovc lavc -lavcopts vcodec=mpeg4:vbitrate=1600
+@end example
+This creates an AVI file using ffmpeg's mpeg4 codec. See mencoder's manpage for more information.
+
+@subsubheading Configuring the movie recorder
+
+The movie recorder reads a configuration frile from @samp{data/config/movierecorder.cfg} if
+it exists. This file lets you change the recording and pause hotkeys, the filenames, and
+compression settings. See the comments in the default @samp{movierecorder.cfg} for a
+description of each item.

@@ -62,6 +62,7 @@ PLUGINS += collide/rapid
 PLUGINS += collide/opcode
 PLUGINS += perfstat
 PLUGINS += bugplug
+PLUGINS += movierecorder
 PLUGINS += reporter stdrep
 PLUGINS += mesh/crossbld
 PLUGINS += mesh/impexp/ieplex
