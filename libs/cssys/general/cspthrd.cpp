@@ -90,7 +90,7 @@ bool csPosixMutex::LockWait()
 
 bool csPosixMutex::LockTry ()
 {
-  uint32 ret;
+  uint32 ret = 0;
   int rc = pthread_mutex_trylock (&mutex);
   switch (rc)
   {
