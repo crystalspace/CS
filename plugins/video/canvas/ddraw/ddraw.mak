@@ -34,6 +34,7 @@ ifeq ($(COMP),GCC)
 # Mingw/Cygwin both use libddraw.a (static lib) as the
 # place to get MS DirectDraw references from
   LIBS.DDRAW+=$(LFLAGS.l)ddraw$
+  LIBS.DINPUT+=$(LFLAGS.l)dinput$
 else
   LIBS.DDRAW+=$(LFLAGS.l)ddraw$(LIB)
 endif
@@ -46,7 +47,11 @@ else
 # Generate Static Libs
   DDRAW=$(OUT)$(LIB_PREFIX)ddraw2d$(LIB)
   DEP.EXE+=$(DDRAW)
-  LIBS.EXE+=$(LIBS.DDRAW)
+  ifeq ($(COMP),GCC)
+    LIBS.EXE+=$(LIBS.DDRAW) $(LIBS.DINPUT)
+  else
+    LIBS.EXE+=$(LIBS.DDRAW)
+  endif
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_DDRAW2D
 endif
 
