@@ -55,7 +55,7 @@ csPtr<iImage> csLoader::LoadImage (const char* fname, int Format)
   csRef<iDataBuffer> buf (VFS->ReadFile (fname));
   if (!buf || !buf->GetSize ())
   {
-    ReportError (
+    ReportWarning (
 	"crystalspace.maploader.parse.image",
     	"Could not open image file '%s' on VFS!", fname);
     return NULL;
