@@ -653,7 +653,6 @@ void csThing::RemoveUnusedVertices ()
   }
   else
     wor_verts = obj_verts;
-printf ("Deleted %d vertices\n", num_vertices-count_relevant); fflush (stdout);
   num_vertices = max_vertices = count_relevant;
 
   // Now we can remap the vertices in all polygons.
@@ -1192,6 +1191,23 @@ void csThing::DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
       keep_plane = new csPolyPlane (*(p->GetPlane ()));
     }
 
+    // Before we draw through the portal we see if we are rendering
+    // for an object that uses a static tree (i.e. c-buffer). If that is
+    // the case we clear the c-buffer for the portal shape. We can safely
+    // do this because the c-buffer algo for this sector has finished
+    // anyway.
+    if (p->GetParent ()->GetStaticTree () &&
+    	csEngine::current_engine->GetEngineMode () == CS_ENGINE_FRONT2BACK)
+    {
+      csCBuffer* c_buffer = csEngine::current_engine->GetCBuffer ();
+      if (c_buffer)
+      {
+        c_buffer->Initialize ();
+        c_buffer->InsertPolygon (poly->GetVertices (),
+      	  poly->GetVertexCount (), true);
+      }
+    }
+
     // Draw through the portal. If this fails we draw the original polygon
     // instead. Drawing through a portal can fail because we have reached
     // the maximum number that a sector is drawn (for mirrors).
@@ -1477,7 +1493,6 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	iRenderView* d, csPolygon2DQueue* poly_queue, bool pvs)
 {
   csPolygon3D* p;
-  csPortal* po;
   csVector3* verts;
   int num_verts;
   int i;
@@ -1539,7 +1554,7 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
     	else pclip_plane = NULL;
         clip = (csPolygon2D*)(render_pool->Alloc ());
         if ( bsppol->ClipToPlane (pclip_plane, camtrans.GetOrigin (),
-	  	verts, num_verts))
+	  	verts, num_verts, !icam->IsMirrored ()))
 	{
       	  csPlane3* plclip = icam->GetFarPlane ();
           // The far plane is defined negative. So if the polygon is entirely
@@ -1554,7 +1569,9 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
             {
 	      if (c_buffer->TestPolygon (clip->GetVertices (),
 	  	   clip->GetVertexCount ()))
+{
 	        mark_vis = true;
+}
             }
 	  }
 	}
@@ -1603,12 +1620,16 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
                               icam->IsMirrored ())
          && clip->ClipAgainst (d->GetClipper ()))
         {
-          po = p->GetPortal ();
 	  if (csEngine::current_engine->IsPVSOnly ())
             visible = true;
 	  else
+	  {
+	    // A portal is considered an non-transparent surface
+	    // here (i.e. a normal polygon). So we simply do
+	    // InsertPolygon() as opposed to TestPolygon() for portals.
             visible = c_buffer->InsertPolygon (clip->GetVertices (),
 		    clip->GetVertexCount ());
+	  }
         }
       }
 
@@ -1634,7 +1655,6 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	  visible = false;
 	}
       }
-
       if (visible)
       {
         poly_queue->Push (p, clip);
@@ -2175,11 +2195,13 @@ bool csThing::DrawTest (iRenderView* rview, iMovable* movable)
   {
     csReversibleTransform tr_o2c = camtrans
     	* movable->GetFullTransform ().GetInverse ();
-    return rview->TestBSphere (tr_o2c, sphere);
+    bool rc = rview->TestBSphere (tr_o2c, sphere);
+    return rc;
   }
   else
   {
-    return rview->TestBSphere (camtrans, sphere);
+    bool rc = rview->TestBSphere (camtrans, sphere);
+    return rc;
   }
 #else
   csBox3 b;
@@ -2545,8 +2567,10 @@ bool csThing::DrawFoggy (iRenderView* d, iMovable*)
       if (do_clip_plane) pclip_plane = &clip_plane;
       else pclip_plane = NULL;
       if (!front &&
-        p->ClipToPlane (pclip_plane, camtrans.GetOrigin (), verts, num_verts, false) &&
-        p->DoPerspective (camtrans, verts, num_verts, clip, orig_triangle, icam->IsMirrored ()) &&
+        p->ClipToPlane (pclip_plane, camtrans.GetOrigin (), verts,
+		num_verts, false) &&
+        p->DoPerspective (camtrans, verts, num_verts, clip, orig_triangle,
+		icam->IsMirrored ()) &&
         clip->ClipAgainst (d->GetClipper ()))
       {
         p->GetPlane ()->WorldToCamera (camtrans, verts[0]);

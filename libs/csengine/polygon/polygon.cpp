@@ -791,6 +791,7 @@ void csPolygon3D::Finish ()
     case POLYTXT_GOURAUD:
       // Ensure the respective arrays are allocated
       GetGouraudInfo ()->Setup (this);
+      return;
     case POLYTXT_LIGHTMAP:
       // If material has no texture, switch our type to POLYTXT_NONE
       if (!material->GetMaterialHandle ()->GetTexture ())

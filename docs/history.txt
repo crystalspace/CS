@@ -4,6 +4,23 @@ The history order is reversed so that new features are at the top.
 	- Matt Reda fixed a bug in the OpenGL renderer which caused
 	  fades (F5 in walktest and fade effect in csdemo) not to work
 	  correctly anymore.
+	- Fixed a bug in iRenderView::TestBSphere(). This bug was fixed
+	  some time ago in iRenderView::ClipBSphere() but I forgot
+	  to fix TestBSphere() too.
+	- Fixed a bug which affected visibility testing of objects in a
+	  sector using octree which was seen through a mirror. The
+	  mirror caused culling to be wrong. This means that mirrors now
+	  work properly if included with the culler object (i.e. the object
+	  using VISTREE() setting).
+	- Fixed a stupid bug in the engine which prevented Blocks from
+	  working properly.
+	- When traversing a portal that is located in a sector using
+	  c-buffer visibility culling then we have to clear the c-buffer
+	  for the area of the portal. This used to be done in the portal
+	  class but the problem is that we do it all the time then even
+	  if the sector doesn't use c-buffer (i.e. we do it as soon as
+	  the c-buffer is used globally). I moved this code to the polygon
+	  drawer because then we can do it only when it is really needed.
 2-Feb-2002
 	- Toxe fixed a brand new bug in csMeshWrapper::HitBeam().
 1-Feb-2002

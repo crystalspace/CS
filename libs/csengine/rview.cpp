@@ -619,9 +619,9 @@ bool csRenderView::TestBSphere (const csReversibleTransform& o2c,
   //------
   if (ctxt->do_clip_plane)
   {
-    bool mirror = GetCamera ()->IsMirrored ();
+//bool mirror = GetCamera ()->IsMirrored ();
     float dist = ctxt->clip_plane.Classify (tr_center);
-    if (mirror) dist = -dist;
+    dist = -dist;
     if ((-dist) > radius) return false;
   }
 
@@ -640,15 +640,11 @@ bool csRenderView::ClipBSphere (const csReversibleTransform& o2c,
   const csVector3& tr_center = tr_sphere.GetCenter ();
   float radius = tr_sphere.GetRadius ();
 
-//printf ("1 radius=%g center=%g,%g,%g\n", radius, tr_center.x, tr_center.y, tr_center.z); fflush (stdout);
-
   //------
   // Test if object is behind the camera plane.
   //------
   if (tr_center.z+radius <= 0)
     return false;
-
-//printf ("2\n"); fflush (stdout);
 
   //------
   // Test against far plane if needed.
@@ -656,13 +652,11 @@ bool csRenderView::ClipBSphere (const csReversibleTransform& o2c,
   csPlane3* far_plane = ctxt->icamera->GetFarPlane ();
   if (far_plane)
   {
-//printf ("3 far_plane->D()=%g\n", far_plane->D ()); fflush (stdout);
     // Ok, so this is not really far plane clipping - we just dont draw this
     // object if the bounding sphere is further away than the D
     // part of the farplane.
     if (tr_center.z-radius > far_plane->D ())
       return false;
-//printf ("4\n"); fflush (stdout);
   }
 
   //------
@@ -670,7 +664,6 @@ bool csRenderView::ClipBSphere (const csReversibleTransform& o2c,
   //------
   bool fully_inside = csSquaredDist::PointPoint (csVector3 (0),
   	tr_center) <= radius * radius;
-//printf ("5 fully_inside=%d\n", fully_inside); fflush (stdout);
 
   //------
   // Test if there is a chance we must clip to current portal.
@@ -684,7 +677,6 @@ bool csRenderView::ClipBSphere (const csReversibleTransform& o2c,
   else
   {
     TestSphereFrustum (ctxt->iview_frustum, tr_center, radius, inside, outside);
-//printf ("6 inside=%d outside=%d\n", inside, outside); fflush (stdout);
     if (outside) return false;
     if (!inside) clip_portal = CS_CLIP_NEEDED;
     else clip_portal = CS_CLIP_NOT;
@@ -704,13 +696,10 @@ bool csRenderView::ClipBSphere (const csReversibleTransform& o2c,
   clip_plane = CS_CLIP_NOT;
   if (ctxt->do_clip_plane)
   {
-//bool mirror = GetCamera ()->IsMirrored ();
     float dist = ctxt->clip_plane.Classify (tr_center);
-//printf ("7 do_clip_plane mirror=%d dist=%g\n", mirror, dist); fflush (stdout);
     dist = -dist;
     if ((-dist) > radius) return false;
     else if (dist <= radius) clip_plane = CS_CLIP_NEEDED;
-//printf ("8\n"); fflush (stdout);
   }
 
   //------
@@ -724,7 +713,6 @@ bool csRenderView::ClipBSphere (const csReversibleTransform& o2c,
   //------
   if ((!ctxt->do_clip_frustum) || clip_portal != CS_CLIP_NEEDED)
   {
-//printf ("9 !do_clip_frustum\n"); fflush (stdout);
     if (fully_inside)
     {
       clip_portal = CS_CLIP_TOPLEVEL;
@@ -733,7 +721,6 @@ bool csRenderView::ClipBSphere (const csReversibleTransform& o2c,
     {
       CS_ASSERT (GetTopFrustum () != NULL);
       TestSphereFrustum (GetTopFrustum (), tr_center, radius, inside, outside);
-//printf ("10 inside=%d outside=%d\n", inside, outside); fflush (stdout);
       // Because TestSphereFrustum() is not 100% accurate it is possible
       // that the test here returns 'outside' even though we previously
       // tested that the sphere was not outside a smaller frustum.
@@ -741,7 +728,6 @@ bool csRenderView::ClipBSphere (const csReversibleTransform& o2c,
       if (!inside) clip_portal = CS_CLIP_TOPLEVEL;
     }
   }
-//printf ("11 clip_portal=%d clip_plane=%d clip_z_plane=%d\n", clip_portal, clip_plane, clip_z_plane); fflush (stdout);
 
   return true;
 }

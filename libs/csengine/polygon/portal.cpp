@@ -239,20 +239,6 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
 {
   if (!CompleteSector (rview)) return false;
 
-  // Initialize the 2D/3D culler. We only traverse through portals
-  // after the culler has been used in the previous sector so this is
-  // safe to do here.
-  if (csEngine::current_engine->GetEngineMode () == CS_ENGINE_FRONT2BACK)
-  {
-    csCBuffer* c_buffer = csEngine::current_engine->GetCBuffer ();
-    if (c_buffer)
-    {
-      c_buffer->Initialize ();
-      c_buffer->InsertPolygon (new_clipper->GetVertices (),
-      	new_clipper->GetVertexCount (), true);
-    }
-  }
-
   if (sector->GetPrivateObject ()->draw_busy >= 5)
     return false;
 
