@@ -1370,26 +1370,6 @@ bool awsListBox::OnMouseDown (int
   return false;
 }
 
-bool awsListBox::OnMouseUp (int, int, int)
-{
-  return false;
-}
-
-bool awsListBox::OnMouseMove (int, int, int)
-{
-  return false;
-}
-
-bool awsListBox::OnMouseClick (int, int, int)
-{
-  return false;
-}
-
-bool awsListBox::OnMouseDoubleClick (int, int, int)
-{
-  return false;
-}
-
 bool awsListBox::OnMouseExit ()
 {
   mouse_is_over = false;
@@ -1405,21 +1385,6 @@ bool awsListBox::OnMouseEnter ()
   mouse_is_over = true;
   Invalidate ();
   return true;
-}
-
-bool awsListBox::OnKeypress (int, int)
-{
-  return false;
-}
-
-bool awsListBox::OnLostFocus ()
-{
-  return false;
-}
-
-bool awsListBox::OnGainFocus ()
-{
-  return false;
 }
 
 void awsListBox::OnAdded ()

@@ -158,15 +158,6 @@ public:
   /// Triggered when this component gains mouse focus
   virtual bool OnMouseEnter ();
 
-  /// Triggered when the user presses a key
-  virtual bool OnKeypress (int key, int modifiers);
-
-  /// Triggered when the keyboard focus is lost
-  virtual bool OnLostFocus ();
-
-  /// Triggered when the keyboard focus is gained
-  virtual bool OnGainFocus ();
-
   /// Adds in the inc and dec buttons appropriately
   virtual void OnAdded ();
 

@@ -382,57 +382,6 @@ void awsBarChart::OnDraw (csRect clip)
   }
 }
 
-bool awsBarChart::OnMouseDown (int, int, int)
-{
-  return false;
-}
-
-bool awsBarChart::OnMouseUp (int, int, int)
-{
-  return false;
-}
-
-bool awsBarChart::OnMouseMove (int, int, int)
-{
-  return false;
-}
-
-bool awsBarChart::OnMouseClick (int, int, int)
-{
-  return false;
-}
-
-bool awsBarChart::OnMouseDoubleClick (int, int, int)
-{
-  return false;
-}
-
-bool awsBarChart::OnMouseExit ()
-{
-  return false;
-}
-
-bool awsBarChart::OnMouseEnter ()
-{
-  return false;
-}
-
-bool awsBarChart::OnKeypress (int, int)
-{
-  return false;
-}
-
-bool awsBarChart::OnLostFocus ()
-{
-  return false;
-}
-
-bool awsBarChart::OnGainFocus ()
-{
-  return false;
-}
-
-
 void 
 awsBarChart::Push(BarItem &i, bool normal)
 {

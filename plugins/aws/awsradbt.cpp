@@ -304,21 +304,6 @@ bool awsRadButton::OnMouseUp (int, int, int)
   return true;
 }
 
-bool awsRadButton::OnMouseMove (int, int, int)
-{
-  return false;
-}
-
-bool awsRadButton::OnMouseClick (int, int, int)
-{
-  return false;
-}
-
-bool awsRadButton::OnMouseDoubleClick (int, int, int)
-{
-  return false;
-}
-
 bool awsRadButton::OnMouseExit ()
 {
   mouse_is_over = false;
@@ -334,21 +319,6 @@ bool awsRadButton::OnMouseEnter ()
   mouse_is_over = true;
   Invalidate ();
   return true;
-}
-
-bool awsRadButton::OnKeypress (int, int)
-{
-  return false;
-}
-
-bool awsRadButton::OnLostFocus ()
-{
-  return false;
-}
-
-bool awsRadButton::OnGainFocus ()
-{
-  return false;
 }
 
 /************************************* Command Button Factory ****************/

@@ -343,7 +343,7 @@ public:
   virtual bool OnMouseEnter ();
 
   /// Triggered when the user presses a key
-  virtual bool OnKeypress (int key, int modifiers);
+  virtual bool OnKeypress (int key, int cha, int modifiers);
 
   /// Triggered when the keyboard focus is lost
   virtual bool OnLostFocus ();

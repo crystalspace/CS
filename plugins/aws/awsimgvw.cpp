@@ -226,16 +226,6 @@ bool awsImageView::OnMouseMove (int, int, int)
   return false;
 }
 
-bool awsImageView::OnMouseClick (int, int, int)
-{
-  return false;
-}
-
-bool awsImageView::OnMouseDoubleClick (int, int, int)
-{
-  return false;
-}
-
 bool awsImageView::OnMouseExit ()
 {
   mouse_is_over = false;
@@ -251,21 +241,6 @@ bool awsImageView::OnMouseEnter ()
   mouse_is_over = true;
   Invalidate ();
   return true;
-}
-
-bool awsImageView::OnKeypress (int, int)
-{
-  return false;
-}
-
-bool awsImageView::OnLostFocus ()
-{
-  return false;
-}
-
-bool awsImageView::OnGainFocus ()
-{
-  return false;
 }
 
 /************************************* Command Button Factory ****************/

@@ -75,17 +75,15 @@ void awsParser::ReportError (const char* msg, ...)
 
 void awsParser::AddGlobalWindowDef(awsComponentNode* win)
 { 
-  iAwsComponentNode* cn = SCF_QUERY_INTERFACE(win, iAwsComponentNode);
+  iAwsComponentNode* cn = (iAwsComponentNode*) win;
   prefmgr->AddWindowDef(cn);
   cn->DecRef();
-  win->DecRef();
 }
 
 void awsParser::AddGlobalSkinDef(awsSkinNode *skin)
 { 
-  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(skin, iAwsKeyContainer);
+  iAwsKeyContainer* kc = (iAwsKeyContainer*) skin;
   prefmgr->AddSkinDef(kc);
   kc->DecRef();
-  skin->DecRef();
 }
 

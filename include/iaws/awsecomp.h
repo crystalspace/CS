@@ -140,7 +140,7 @@ public:
        case csevMouseExit:
          return OnMouseExit ();
        case csevKeyDown:
-         return OnKeypress (Event.Key.Char, Event.Key.Modifiers);
+         return OnKeypress (Event.Key.Code, Event.Key.Char, Event.Key.Modifiers);
        case csevGainFocus:
          return OnGainFocus ();
        case csevLostFocus:
@@ -366,8 +366,8 @@ public:
     { return comp->OnMouseEnter (); }
 
     /// Triggered when the user presses a key
-    virtual bool OnKeypress(int key, int modifiers)
-    { return comp->OnKeypress (key, modifiers); }
+    virtual bool OnKeypress(int key, int cha, int modifiers)
+    { return comp->OnKeypress (key, cha, modifiers); }
 
     /// Triggered when the keyboard focus is lost
     virtual bool OnLostFocus()

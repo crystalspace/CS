@@ -488,21 +488,6 @@ bool awsCmdButton::OnMouseUp (int, int, int)
   return true;
 }
 
-bool awsCmdButton::OnMouseMove (int, int, int)
-{
-  return true;
-}
-
-bool awsCmdButton::OnMouseClick (int, int, int)
-{
-  return false;
-}
-
-bool awsCmdButton::OnMouseDoubleClick (int, int, int)
-{
-  return false;
-}
-
 bool awsCmdButton::OnMouseExit ()
 {
   mouse_is_over = false;
@@ -517,21 +502,6 @@ bool awsCmdButton::OnMouseEnter ()
 {
   mouse_is_over = true;
   Invalidate ();
-  return true;
-}
-
-bool awsCmdButton::OnKeypress (int, int)
-{
-  return false;
-}
-
-bool awsCmdButton::OnLostFocus ()
-{
-  return true;
-}
-
-bool awsCmdButton::OnGainFocus ()
-{
   return true;
 }
 

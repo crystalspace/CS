@@ -252,21 +252,6 @@ bool awsCheckBox::OnMouseUp (int, int, int)
   return true;
 }
 
-bool awsCheckBox::OnMouseMove (int, int, int)
-{
-  return false;
-}
-
-bool awsCheckBox::OnMouseClick (int, int, int)
-{
-  return false;
-}
-
-bool awsCheckBox::OnMouseDoubleClick (int, int, int)
-{
-  return false;
-}
-
 bool awsCheckBox::OnMouseExit ()
 {
   mouse_is_over = false;
@@ -282,21 +267,6 @@ bool awsCheckBox::OnMouseEnter ()
   mouse_is_over = true;
   Invalidate ();
   return true;
-}
-
-bool awsCheckBox::OnKeypress (int, int)
-{
-  return false;
-}
-
-bool awsCheckBox::OnLostFocus ()
-{
-  return false;
-}
-
-bool awsCheckBox::OnGainFocus ()
-{
-  return false;
 }
 
 /************************************* Command Button Factory ****************/

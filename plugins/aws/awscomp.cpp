@@ -344,7 +344,7 @@ bool awsComponent::HandleEvent (iEvent &Event)
       return OnMouseExit ();
 
     case csevKeyDown:
-      return OnKeypress (Event.Key.Char, Event.Key.Modifiers);
+      return OnKeypress (Event.Key.Code, Event.Key.Char, Event.Key.Modifiers);
 
     case csevGainFocus:
       return OnGainFocus ();
@@ -876,7 +876,7 @@ bool awsComponent::OnMouseEnter ()
   return false;
 }
 
-bool awsComponent::OnKeypress (int, int)
+bool awsComponent::OnKeypress (int, int, int)
 {
   return false;
 }

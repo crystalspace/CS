@@ -173,21 +173,6 @@ bool awsLabel::OnMouseUp (int, int, int)
   return false;
 }
 
-bool awsLabel::OnMouseMove (int, int, int)
-{
-  return false;
-}
-
-bool awsLabel::OnMouseClick (int, int, int)
-{
-  return false;
-}
-
-bool awsLabel::OnMouseDoubleClick (int, int, int)
-{
-  return false;
-}
-
 bool awsLabel::OnMouseExit ()
 {
   mouse_is_over = false;
@@ -204,21 +189,6 @@ bool awsLabel::OnMouseEnter ()
 
   //Invalidate();
   return true;
-}
-
-bool awsLabel::OnKeypress (int, int)
-{
-  return false;
-}
-
-bool awsLabel::OnLostFocus ()
-{
-  return false;
-}
-
-bool awsLabel::OnGainFocus ()
-{
-  return false;
 }
 
 /************************************* Command Button Factory ****************/

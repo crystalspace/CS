@@ -10,14 +10,13 @@
 
 #include <stdio.h>
 
-const int awsTextBox:: fsNormal = 0x0;
-const int awsTextBox:: fsBitmap = 0x1;
-const int awsTextBox:: signalChanged = 0x1;
-const int awsTextBox:: signalLostFocus = 0x2;
+const int awsTextBox::fsNormal = 0x0;
+const int awsTextBox::fsBitmap = 0x1;
 
-const int awsTextBox:: signalEnterPressed = 0x3;
-
-const int awsTextBox:: signalTabPressed = 0x4;
+const int awsTextBox::signalChanged = 0x1;
+const int awsTextBox::signalLostFocus = 0x2;
+const int awsTextBox::signalEnterPressed = 0x3;
+const int awsTextBox::signalTabPressed = 0x4;
 
 static iAwsSink *textbox_sink = 0;
 
@@ -402,26 +401,6 @@ bool awsTextBox::OnMouseDown (int, int, int)
   return true;
 }
 
-bool awsTextBox::OnMouseUp (int, int, int)
-{
-  return false;
-}
-
-bool awsTextBox::OnMouseMove (int, int, int)
-{
-  return false;
-}
-
-bool awsTextBox::OnMouseClick (int, int, int)
-{
-  return false;
-}
-
-bool awsTextBox::OnMouseDoubleClick (int, int, int)
-{
-  return false;
-}
-
 bool awsTextBox::OnMouseExit ()
 {
   mouse_is_over = false;
@@ -436,27 +415,17 @@ bool awsTextBox::OnMouseEnter ()
   return true;
 }
 
-bool awsTextBox::OnKeypress (int key, int modifiers)
+bool awsTextBox::OnKeypress (int key, int Char, int)
 {
-  (void)modifiers;
-
   switch (key)
-
   {
-
     case CSKEY_ENTER:
-
-        Broadcast (signalEnterPressed);
-
-        break;
+      Broadcast (signalEnterPressed);
+      break;
 
     case CSKEY_TAB:
-
-        Broadcast (signalTabPressed);
-
-        break;
-
-
+      Broadcast (signalTabPressed);
+      break;
 
     case CSKEY_BACKSPACE:
       if (cursor > 0) cursor--;
@@ -471,25 +440,21 @@ bool awsTextBox::OnKeypress (int key, int modifiers)
 
     default:
       {
-        if (cs_isprint ((char)key))
-        {
-          bool ignore = false;
+	if (!cs_isprint (Char))
+	  break;
+	
+	if (disallow && (strchr (disallow->GetData (), Char) != 0))
+	  break;
+	
+	char str[2];
+	str[0] = (char)Char;
+	str[1] = 0;
 
-          if (disallow && (strchr (disallow->GetData (), key) != 0))
-            ignore = true;
-
-          if (!ignore)
-          {
-            char str[2];
-            str[0] = (char)key;
-            str[1] = 0;
-
-            text->Append (scfString (str));
-            cursor++;
-            Broadcast (signalChanged);
-          } // end if ignore
-        }   // end if is printable
-      }     // end default case
+	printf ("Appending %c\n", Char);
+	text->Append (str);
+	cursor++;
+	Broadcast (signalChanged);
+      }
   }         // end switch
   Invalidate ();
   return true;
@@ -520,10 +485,8 @@ awsTextBoxFactory::awsTextBoxFactory (iAws *wmgr) :
 
   RegisterConstant ("signalTextBoxChanged", awsTextBox::signalChanged);
   RegisterConstant ("signalTextBoxLostFocus", awsTextBox::signalLostFocus);
-
-  RegisterConstant ("signalEnterKeyPressed", awsTextBox::signalEnterKeyPressed);
-
-  RegisterConstant ("signalTabKeyPressed", awsTextBox::signalLostFocus);
+  RegisterConstant ("signalEnterKeyPressed", awsTextBox::signalEnterPressed);
+  RegisterConstant ("signalTabKeyPressed", awsTextBox::signalTabPressed);
 }
 
 awsTextBoxFactory::~awsTextBoxFactory ()

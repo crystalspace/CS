@@ -165,56 +165,6 @@ void awsStatusBar::OnDraw (csRect /*clip*/)
 
 }
 
-bool awsStatusBar::OnMouseDown (int, int, int)
-{
-  return false;
-}
-
-bool awsStatusBar::OnMouseUp (int, int, int)
-{
-  return false;
-}
-
-bool awsStatusBar::OnMouseMove (int, int, int)
-{
-  return false;
-}
-
-bool awsStatusBar::OnMouseClick (int, int, int)
-{
-  return false;
-}
-
-bool awsStatusBar::OnMouseDoubleClick (int, int, int)
-{
-  return false;
-}
-
-bool awsStatusBar::OnMouseExit ()
-{
-  return false;
-}
-
-bool awsStatusBar::OnMouseEnter ()
-{
-  return false;
-}
-
-bool awsStatusBar::OnKeypress (int, int)
-{
-  return false;
-}
-
-bool awsStatusBar::OnLostFocus ()
-{
-  return false;
-}
-
-bool awsStatusBar::OnGainFocus ()
-{
-  return false;
-}
-
 csRect awsStatusBar::getInsets()
 {
   switch(frame_style)

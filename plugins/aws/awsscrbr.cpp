@@ -611,21 +611,6 @@ bool awsScrollBar::OnMouseEnter ()
   return true;
 }
 
-bool awsScrollBar::OnKeypress (int, int)
-{
-  return false;
-}
-
-bool awsScrollBar::OnLostFocus ()
-{
-  return false;
-}
-
-bool awsScrollBar::OnGainFocus ()
-{
-  return false;
-}
-
 void awsScrollBar::OnAdded ()
 {
   AddChild (incVal);

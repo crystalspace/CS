@@ -142,10 +142,10 @@ static const short yyrhs[] =
 static const short yyrline[] =
 {
        0,    76,    77,    80,    81,    82,    83,    90,    95,   101,
-     108,   111,   113,   115,   117,   125,   135,   146,   152,   160,
-     163,   165,   167,   175,   187,   193,   200,   216,   219,   221,
-     223,   225,   229,   235,   242,   257,   267,   268,   269,   270,
-     271,   272,   273,   274
+     108,   111,   113,   115,   117,   124,   133,   143,   149,   157,
+     160,   162,   164,   171,   182,   188,   195,   210,   213,   215,
+     217,   219,   223,   229,   236,   250,   260,   261,   262,   263,
+     264,   265,   266,   267
 };
 #endif
 
@@ -1047,19 +1047,17 @@ case 13:
     break;}
 case 14:
 { awsConnectionNode *cn = new awsConnectionNode();
-                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(yyvsp[-1].keycont, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = (iAwsKeyContainer*) yyvsp[-1].keycont;
 		  cn->Consume (kc);
-                  kc->DecRef();
-		  delete yyvsp[-1].keycont;
+		  kc->DecRef();
 		  yyval.key = cn;
 		;
     break;}
 case 15:
 { awsComponentNode *cn = new awsComponentNode(yyvsp[-5].str, yyvsp[-3].str);
-                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(yyvsp[-1].keycont, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = (iAwsKeyContainer*) yyvsp[-1].keycont;
 		  cn->Consume(kc);
                   kc->DecRef();
-		  delete yyvsp[-1].keycont;
 		  yyval.key = cn;
 		  free(yyvsp[-5].str);
 		  free(yyvsp[-3].str);
@@ -1067,10 +1065,9 @@ case 15:
     break;}
 case 16:
 { awsComponentNode *cn = new awsComponentNode(yyvsp[-3].str, "Window");
-                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(yyvsp[-1].keycont, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = (iAwsKeyContainer*) yyvsp[-1].keycont;
 		  cn->Consume(kc);
                   kc->DecRef();
-		  delete yyvsp[-1].keycont;
 		  yyval.key = cn;
 		  free(yyvsp[-3].str);
 		;
@@ -1098,19 +1095,17 @@ case 21:
     break;}
 case 22:
 { awsConnectionNode *cn = new awsConnectionNode();
-                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(yyvsp[-1].keycont, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = (iAwsKeyContainer*) yyvsp[-1].keycont;
 		  cn->Consume(kc);
                   kc->DecRef();
-		  delete yyvsp[-1].keycont;
 		  yyval.key=cn;
 		;
     break;}
 case 23:
 { awsComponentNode *cn = new awsComponentNode(yyvsp[-5].str, yyvsp[-3].str);
-                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(yyvsp[-1].keycont, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = (iAwsKeyContainer*) yyvsp[-1].keycont;
 		  cn->Consume(kc);
                   kc->DecRef();
-		  delete yyvsp[-1].keycont;
 		  yyval.key=cn;
 		  free(yyvsp[-5].str);
 		  free(yyvsp[-3].str);
@@ -1130,10 +1125,9 @@ case 25:
     break;}
 case 26:
 { awsComponentNode *win = new awsComponentNode(yyvsp[-3].str, "Default");
-                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(yyvsp[-1].keycont, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = (iAwsKeyContainer*) yyvsp[-1].keycont;
 		  win->Consume(kc);
                   kc->DecRef();
-		  delete yyvsp[-1].keycont;
 		  yyval.comp = win;
 		  free(yyvsp[-3].str);
 		;
@@ -1167,10 +1161,9 @@ case 33:
     break;}
 case 34:
 { awsSkinNode *skin = new awsSkinNode(yyvsp[-3].str);
-                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(yyvsp[-1].keycont, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = (iAwsKeyContainer*) yyvsp[-1].keycont;
                   skin->Consume(kc);
                   kc->DecRef();
-                  delete yyvsp[-1].keycont;
 		  yyval.skin = skin;
 		  free(yyvsp[-3].str);
 		;

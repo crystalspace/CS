@@ -116,28 +116,25 @@ component_item:
 		{  $$ = new awsRectKey($1, csRect($4, $6, $10, $12)); free($1); }
 	| TOKEN_CONNECT	'{' connection_item_list '}'
 		{ awsConnectionNode *cn = new awsConnectionNode();
-                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE($3, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = (iAwsKeyContainer*) $3;
 		  cn->Consume (kc);
-                  kc->DecRef();
-		  delete $3;
+		  kc->DecRef();
 		  $$ = cn;
 		}
 	| TOKEN_COMPONENT TOKEN_STR TOKEN_IS TOKEN_STR '{' component_item_list '}'
 		{ awsComponentNode *cn = new awsComponentNode($2, $4);
-                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE($6, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = (iAwsKeyContainer*) $6;
 		  cn->Consume(kc);
                   kc->DecRef();
-		  delete $6;
 		  $$ = cn;
 		  free($2);
 		  free($4);
 		}
 	| TOKEN_WINDOW TOKEN_STR '{' component_item_list '}'
 		{ awsComponentNode *cn = new awsComponentNode($2, "Window");
-                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE($4, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = (iAwsKeyContainer*) $4;
 		  cn->Consume(kc);
                   kc->DecRef();
-		  delete $4;
 		  $$ = cn;
 		  free($2);
 		}
@@ -166,18 +163,16 @@ window_item:
 		{ $$ = new awsRectKey($1, csRect($4, $6, $10, $12)); free($1); }
 	| TOKEN_CONNECT '{' connection_item_list '}'
 		{ awsConnectionNode *cn = new awsConnectionNode();
-                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE($3, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = (iAwsKeyContainer*) $3;
 		  cn->Consume(kc);
                   kc->DecRef();
-		  delete $3;
 		  $$=cn;
 		}
         | TOKEN_COMPONENT TOKEN_STR TOKEN_IS TOKEN_STR '{' component_item_list '}'
 		{ awsComponentNode *cn = new awsComponentNode($2, $4);
-                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE($6, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = (iAwsKeyContainer*) $6;
 		  cn->Consume(kc);
                   kc->DecRef();
-		  delete $6;
 		  $$=cn;
 		  free($2);
 		  free($4);
@@ -200,10 +195,9 @@ window_item_list:
 window:
 	TOKEN_WINDOW TOKEN_STR  '{' window_item_list '}'
 		{ awsComponentNode *win = new awsComponentNode($2, "Default");
-                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE($4, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = (iAwsKeyContainer*) $4;
 		  win->Consume(kc);
                   kc->DecRef();
-		  delete $4;
 		  $$ = win;
 		  free($2);
 		}
@@ -242,10 +236,9 @@ skin_item_list:
 skin:
 	TOKEN_SKIN TOKEN_STR '{' skin_item_list '}'
 		{ awsSkinNode *skin = new awsSkinNode($2);
-                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE($4, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = (iAwsKeyContainer*) $4;
                   skin->Consume(kc);
                   kc->DecRef();
-                  delete $4;
 		  $$ = skin;
 		  free($2);
 		}

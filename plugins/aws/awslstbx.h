@@ -331,32 +331,11 @@ public:
   /// Triggered when the user presses a mouse button down
   virtual bool OnMouseDown (int button, int x, int y);
 
-  /// Triggered when the user unpresses a mouse button
-  virtual bool OnMouseUp (int button, int x, int y);
-
-  /// Triggered when the user moves the mouse
-  virtual bool OnMouseMove (int button, int x, int y);
-
-  /// Triggered when the user clicks the mouse
-  virtual bool OnMouseClick (int button, int x, int y);
-
-  /// Triggered when the user double clicks the mouse
-  virtual bool OnMouseDoubleClick (int button, int x, int y);
-
   /// Triggered when this component loses mouse focus
   virtual bool OnMouseExit ();
 
   /// Triggered when this component gains mouse focus
   virtual bool OnMouseEnter ();
-
-  /// Triggered when the user presses a key
-  virtual bool OnKeypress (int key, int modifiers);
-
-  /// Triggered when the keyboard focus is lost
-  virtual bool OnLostFocus ();
-
-  /// Triggered when the keyboard focus is gained
-  virtual bool OnGainFocus ();
 
   /// Updates the scrollbar so that it's in the right place and has the right stuff.
   virtual void OnAdded ();

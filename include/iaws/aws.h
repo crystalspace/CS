@@ -793,7 +793,7 @@ struct iAwsComponent : public iAwsSource
   virtual bool OnMouseEnter()=0;
 
   /// Triggered when the user presses a key
-  virtual bool OnKeypress(int key, int modifiers)=0;
+  virtual bool OnKeypress(int key, int cha, int modifiers)=0;
 
   /// Triggered when the keyboard focus is lost
   virtual bool OnLostFocus()=0;
