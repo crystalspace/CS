@@ -4,6 +4,12 @@ The history order has been reversed so that new features are at the top.
 	- Alex Pfaffe did some fixes on terrain engine. He also resynced
 	  with DDG. Various bug fixes and optimizations.
 	- Small fix to terrain engine (removal of bogus 'inline').
+	- Eric Sunshine eliminated a compilation warning about multi-line '//'
+	  comment in ddgbtree.cpp.
+	- Eric Sunshine fixed several warnings throughout the project reported
+	  by EGCS 1.1.2.
+	- Eric Sunshine added a lot of missing 'const' qualifiers to csrect.
+	- Eric Sunshine fixed the 'clean' target in mazed.mak.
 28-May-2000
 	- Changed the way csPolyTree::ClassifyPoint() works. Instead
 	  of assuming space is open and testing six directions to prove
@@ -99,8 +105,10 @@ The history order has been reversed so that new features are at the top.
 	  flexibility.
 	- Eric Sunshine updated documentation to reflect fact that WalkTest
 	  now requires that new "rapid" plug-in exist at run-time.
-	- Frank O'Connor did some fixes to MSVC project files and
-	  added new RAPID plugin.
+	- Eric Sunshine finished the task of renaming "font renderer" to "font
+	  server" by renaming all classes, files, variables, and interfaces.
+	- Frank O'Connor did some fixes to MSVC project files and added new
+	  RAPID plugin.
 	- Frank also removed a few warnings in OpenGL dynamic texture
 	  implementation.
 25-May-2000
