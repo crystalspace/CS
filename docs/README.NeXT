@@ -3,7 +3,7 @@
 
     This document was written by Eric Sunshine <sunshine@sunshineco.com>
     Copyright (C)1999 by Eric Sunshine
-    1999/07/16
+    1999/07/19
 
     Also see INSTALL.NeXT for installation details.
 ===============================================================================
@@ -504,6 +504,7 @@ this limitation may not be particularly severe.
 ---------------
 This is a list of items which are planned for future releases of this project.
 
+    o Round window position down rather than up.
     o Rewrite code which queries for device depth.  It should really be
       querying the WindowServer directly instead of the AppKit, since the
       WindowServer has a better notion of its preferred image format.  Under
@@ -513,10 +514,11 @@ This is a list of items which are planned for future releases of this project.
     o NeXTSystemProxy.h is identical in the nextstep & openstep directories.
       It can be moved to the shared directory.
     o Possibly implement sound support.
-    o Consult with Jorrit concerning "true color" video modes.  The more I
-      think about it, the more I think it can be implemented without too much
-      difficulty, but I would like some clarification with regards to the
-      engine's treatment of color bits/masks.
+    o Consult with Jorrit or Andrew Zabolotny concerning "true color" video
+      modes.  The more I think about it, the more I think it can be
+      implemented without too much difficulty, but I would like some
+      clarification with regards to the engine's treatment of color
+      bits/masks.
 
 
 9. Bugs
@@ -552,25 +554,28 @@ This is a list of known problems with the current release of this project.
       (BEGIN_INTERFACE_TABLE) in graph2d.cpp, the problem disappears.
       Currently conditional compilation directives are used to ignore the
       offending code.
-    o When compiled with "debug" on OpenStep 4.2, applications crash upon
-      invocation of csVector constructor.  Works fine when compiled with
-      "optimized".
-    o Keyboard events generated with the "alt" modifier are not correctly 
-      translated to Crystal Space events.  The reason is that NextStep "cooks" 
-      the key-code completely into some other character prior to sending the 
-      key-down event, and there is no way to recover the original unmodified 
-      key-code.  This is a short-coming in NeXT's event system.  Fortunately 
-      neither MacOS/X Server nor OpenStep suffer from this problem since both 
-      provide the much needed ability to recover the uncooked key-code.  One 
-      possible solution to this problem for NextStep is to use the raw 
-      keyboard scan-code and manually cook that into the appropriate ASCII 
-      key-code, but this is a very ugly solution since there are at least 
-      seven distinct keyboard / hardware combinations that NextStep runs on, 
-      and it would be necessary to hard-code scan-codes for each one.  
+    o Keyboard events generated with the "alt" modifier are not correctly
+      translated to Crystal Space events.  The reason is that NextStep "cooks"
+      the key-code completely into some other character prior to sending the
+      key-down event, and there is no way to recover the original unmodified
+      key-code.  This is a short-coming in NeXT's event system.  Fortunately
+      neither MacOS/X Server nor OpenStep suffer from this problem since both
+      provide the much needed ability to recover the uncooked key-code.  One
+      possible solution to this problem for NextStep is to use the raw
+      keyboard scan-code and manually cook that into the appropriate ASCII
+      key-code, but this is a very ugly solution since there are at least
+      seven distinct keyboard / hardware combinations that NextStep runs on,
+      and it would be necessary to hard-code scan-codes for each one.
 
 
 10. History
 -----------
+1999/07/19 (13r012+CVS)
+    Once again create_lighted_texture_true_rgb_priv() was causing HPPA
+        compiler to crash with an internal error.  Presumably the argument
+	list changed, which made the methods signature longer.  To work
+	around this, I shortened the method's name yet again.
+
 1999/07/16 (13r012+CVS)
     Updated all ports to work with Crystal Space beta 13.  Much has changed
         including a new directory hierarchy.  Updated all documentation to
@@ -583,6 +588,11 @@ This is a list of known problems with the current release of this project.
         and drivers targets work even for platforms which specify USE_DLL=no.
     Updated PrimEdit to work with beta 13.
     Now TARGET_ARCHS is a "sticky" option, specified at configuration time.
+    Worked around compiler bug in OpenStep 4.2 where compiler corrupts virtual
+        table pointers when compiling for debug.  Did so by adding
+	-finline-functions flag to compilation statement even for debug.  See
+	openstep.mak for a full explanation.
+    Added -finline-function when compiling for optimize.
 
 1999/03/02 (12r002)
     Fixed a very nasty crasher where Bot::move() was trying to generate a unit
