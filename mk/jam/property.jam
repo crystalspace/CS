@@ -37,7 +37,7 @@ rule SetProperty
   local p = [ _PropertyName $(<) : $(>) ] ;
   local v = $(3) ;
   if ! $(v) { v = "true" ; }
-  $(p) = "true" ;
+  $(p) = $(v) ;
 }
 
 # ClearProperty bag : name
