@@ -66,7 +66,7 @@ public:
   virtual void DrawBox (int , int , int , int , int )
   { }
  
-  virtual void Write (iFont*, int, int, int, int, const char*)
+  virtual void Write (iFont*, int, int, int, int, const char*, unsigned)
   { }
   virtual void WriteBaseline (iFont* , int, int, int, int, const char*)
   { }
