@@ -596,10 +596,10 @@ int FindIntersection(CDTriangle *t1,CDTriangle *t2,csVector3 line[2])
 // Is the size of the camera/person and the origin
 // coordinates (OX,OY,OZ) locate the bbox with respect to the eye.
 // This player is 1.8 metres tall (assuming 1cs unit = 1m) (6feet)
-#define DX    0.8
-#define DY    1.5
-#define DZ    0.8
-#define OY   (-0.8)
+#define DX    0.75
+#define DY    1.4
+#define DZ    0.75
+#define OY   (-0.7)
 
 #define DX_L  0.4
 #define DZ_L  0.4
@@ -781,6 +781,8 @@ int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt)
 
 void DoGravity (csVector3& pos, csVector3& vel)
 {
+  pos=Sys->view->GetCamera ()->GetOrigin ();
+
   csVector3 new_pos = pos+vel;
   csMatrix3 m;
   csOrthoTransform test (m, new_pos);
@@ -873,11 +875,13 @@ void DoGravity (csVector3& pos, csVector3& vel)
     Sys->on_ground = true;
   }
 
-  pos = new_pos;
   new_pos -= Sys->view->GetCamera ()->GetOrigin ();
   Sys->view->GetCamera ()->MoveWorld (new_pos);
 
   Sys->velocity = Sys->view->GetCamera ()->GetO2T ()*vel;
+
+  if(!Sys->do_gravity)
+    Sys->velocity.y -= SIGN (Sys->velocity.y) * MIN (0.017, fabs (Sys->velocity.y));
 }
 
 void WalkTest::PrepareFrame (long elapsed_time, long current_time)
@@ -893,8 +897,6 @@ void WalkTest::PrepareFrame (long elapsed_time, long current_time)
       CreateColliders ();
       player_spawned=true;
     }
-
-    pos=view->GetCamera ()->GetOrigin ();
 
     for (int repeats=0 ; repeats<((elapsed_time)/25.0+0.5) ; repeats++)
     {
@@ -930,9 +932,6 @@ void WalkTest::PrepareFrame (long elapsed_time, long current_time)
       angle += angle_velocity;
     }
   }
-
-  if (!do_gravity)
-    velocity.y -= SIGN (velocity.y) * MIN (0.017, fabs (velocity.y));
 
 #if 0
   if (do_cd && csBeing::init)
