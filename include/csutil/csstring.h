@@ -21,7 +21,6 @@
 #define __CSSTRING_H__
 
 #include "sysdef.h"
-#include "cscom/com.h"
 #include "css/cssdefs.h"
 #include "string.h"
 #include "stdlib.h"
@@ -50,6 +49,9 @@
 #define csSTR csString
 #define csCSTR const csSTR
 
+#ifndef NO_STRING_COM
+#include "cscom/com.h"
+
 extern const GUID IID_IString;
 
 interface IString:public IUnknown {
@@ -57,8 +59,10 @@ interface IString:public IUnknown {
 
 	STDMETHOD (xData)(DATA** data) PURE;
 };
-
 class csString:public IString {
+#else
+class csString {
+#endif
 	DATA *Data;
 	int Size, MaxSize;
 
@@ -287,6 +291,7 @@ public:
 
 	bool operator==(csCSTR& op) { return Comp(op); }
 
+#ifndef NO_STRING_COM
 	DECLARE_IUNKNOWN();
   DECLARE_INTERFACE_TABLE(csString);
 	QUERY_DERIVED(IString)
@@ -303,6 +308,7 @@ public:
 	STDMETHODIMP xLength(unsigned long int* Size);
 	STDMETHODIMP xData(DATA** data);
 };
+#endif
 
 inline csSTR operator+(const DATA* op, const csSTR& op2) { return csSTR(op).Append(op2); }
 
