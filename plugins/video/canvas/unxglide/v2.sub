@@ -65,7 +65,7 @@ glidx2d2: $(OUTDIRS) $(GLIDX2D2)
 
 $(OUT)glidx2d2$O: libs/cs2d/unxglide/glidex2d.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLIDX2D2)
-$(OUT)glide2common2d$O: libs/cs2d/glide2common/glide2common2d.cpp
+$(OUT)glide2common2d$O: libs/cs2d/glide2common/glide2common2d.cpp libs/cs2d/glide2common/glidcurs.h
 	$(DO.COMPILE.CPP) $(CFLAGS.GLIDX2D2)
 $(OUT)%$O: libs/cs2d/common/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GLIDX2D2)
