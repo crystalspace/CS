@@ -28,7 +28,7 @@
 
 //--//--//--//--//--//--//--//--//--//--//--/ assembler implementations --//--//
 
-#if defined (PROC_X86) && defined (DO_NASM)
+#if defined (PROC_X86) && (CS_PROCSIZE == 32) && defined (DO_NASM)
 #  include "i386/scan16a.h"
 #endif // PROC_X86
 

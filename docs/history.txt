@@ -33,6 +33,12 @@ chronological order.
 	- Remi Bonnet fixed a typo in csHash::DeleteElement.     
 	- Jorrit added a new iCameraSectorListener interface that you can
 	  implement to get notified of when the camera changes sector.
+	- res changed configure to emit a CS_PROCSIZE #define to volatile.h
+	  containing the processor's bit size, superseding the 
+	  CS_PLATFORM_IS_64BITS #define.
+	- res changed configure to emit a TARGET.PROCESSORSIZE buil property,
+	  containing the processor's bit size.
+	- res changed the software renderer to not use asm on 64bit machines.
 7-Jul-2004
 	- Jorrit fixed several compile errors for gcc 2.95 as reported by
 	  Darius Dawidowski. Darius also reported a warning in spr2d

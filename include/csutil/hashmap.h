@@ -36,7 +36,7 @@ class csHashIteratorReversible;
 
 class csHashMap;
 
-#ifndef CS_PLATFORM_IS_64BITS
+#if (CS_PROCSIZE == 32)
 # if (_MSC_VER >= 1300)
   /*
    * Silence VC7 64bit warning.

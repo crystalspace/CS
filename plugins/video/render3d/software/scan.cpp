@@ -19,10 +19,10 @@
 
 #include "cssysdef.h"
 #include "qint.h"
+#include "sft3dcom.h"
 #include "scan.h"
 #include "tcache.h"
 #include "soft_txt.h"
-#include "sft3dcom.h"
 #include "sttest.h"
 
 /// The only instance of this structure lives here

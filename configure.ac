@@ -1663,6 +1663,17 @@ CS_SYS_PLUGIN_MAIN
 
 
 #------------------------------------------------------------------------------
+# Check for sizeof (long) to determine whether the platform is 32 or 64 bit.
+#------------------------------------------------------------------------------
+AC_CHECK_SIZEOF([long])
+AS_IF([test $ac_cv_sizeof_long = 8],
+     [CS_HEADER_PROPERTY([CS_PROCSIZE], [64])
+      CS_EMIT_BUILD_PROPERTY([TARGET.PROCESSORSIZE], [64])],
+     [CS_HEADER_PROPERTY([CS_PROCSIZE], [32])
+      CS_EMIT_BUILD_PROPERTY([TARGET.PROCESSORSIZE], [32])])
+
+
+#------------------------------------------------------------------------------
 # Determine host CPU.
 #
 # CS_CHECK_HOST_CPU
@@ -1688,7 +1699,8 @@ CS_HEADER_PROPERTY([PROC_$cs_host_cpu_normalized])
 CS_HEADER_PROPERTY([CS_PROCESSOR_NAME],
     [AS_ESCAPE(["])$cs_host_cpu[]AS_ESCAPE(["])])
 
-AS_IF([test $cs_host_cpu = x86], [CS_HEADER_PROPERTY([DO_MMX])])
+AS_IF([test $cs_host_cpu = x86], 
+  [CS_HEADER_PROPERTY([DO_MMX])])
 
 
 
@@ -1724,15 +1736,6 @@ AS_IF([test $cs_cv_header_stdint_h = yes],
             #include <stdint.h>]],
             [(void)INT64_C(0x100000000)])],
         [], [C++], [CS_HEADER_PROPERTY([CS_HAS_STDINT_H])])])
-
-
-
-#------------------------------------------------------------------------------
-# Check for sizeof (long) to determine whether the platform is 32 or 64 bit.
-#------------------------------------------------------------------------------
-AC_CHECK_SIZEOF([long])
-AS_IF([test $ac_cv_sizeof_long = 8],
-    [CS_HEADER_PROPERTY([CS_PLATFORM_IS_64BITS])])
 
 
 

@@ -52,7 +52,9 @@
 //#define CS_BUILD_SHARED_LIBS
 
 #ifdef _WIN64
-  #define CS_PLATFORM_IS_64BITS
+  #define CS_PROCSIZE	64
+#else
+  #define CS_PROCSIZE	32
 #endif
 
 //#define CS_REF_TRACKER
