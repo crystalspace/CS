@@ -64,8 +64,8 @@ DSP.MSCSPERL5.NAME = csperl5
 DSP.MSCSPERL5.TYPE = plugin
 DSP.MSCSPERL5.CFLAGS = /D "NDEBUG" /D "WIN32" /D "_CONSOLE" /D "NO_STRICT" \
                        /D "HAVE_DES_FCRYPT" /D "PERL_IMPLICIT_CONTEXT" \
-                       /D "PERL_IMPLICIT_SYS" /D "USE_PERLIO"
-                       /D "PERL_MSVCRT_READFIX"
+                       /D "PERL_IMPLICIT_SYS" /D "USE_PERLIO" \
+                       /D "PERL_MSVCRT_READFIX" \
 MSCSPERL5 = $(CSPERL5)
 LIB.MSCSPERL5 = $(LIB.CSPERL5) $(LIBPREFIX)perl58$(LIB)
 INC.MSCSPERL5 = $(INC.CSPERL5)
