@@ -68,8 +68,8 @@ public:
   virtual void SetMaterialWrapper(iMaterialWrapper *material)
   {csIsoSprite::material = material;}
   virtual iMaterialWrapper* GetMaterialWrapper() const {return material;}
-  virtual void SetMixmode(UInt mode) {mixmode = mode;}
-  virtual UInt GetMixmode() const {return mixmode;}
+  virtual void SetMixMode(UInt mode) {mixmode = mode;}
+  virtual UInt GetMixMode() const {return mixmode;}
   virtual void Draw(iIsoRenderView *rview);
   virtual void SetGrid(iIsoGrid *grid);
   virtual void SetAllColors(const csColor& color);
