@@ -190,6 +190,128 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (OpFadeFog::SequenceTimedOperation)
   SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+/**
+ * Set fog operation. Indexed version.
+ */
+class OpSetFogIdx : public OpStandard
+{
+private:
+  int sectoridx;
+  csColor color;
+  float density;
+
+public:
+  OpSetFogIdx (int sectoridx, const csColor& color, float density)
+  {
+    OpSetFogIdx::sectoridx = sectoridx;
+    OpSetFogIdx::color = color;
+    OpSetFogIdx::density = density;
+  }
+
+  virtual void Do (csTicks /*dt*/, iBase* params)
+  {
+    // The following cast is in theory unsafe but in this particular
+    // case it cannot fail because we only allow instances of
+    // iEngineSequenceParameters as parameters.
+    iEngineSequenceParameters* par = (iEngineSequenceParameters*)params;
+
+    csRef<iSector> sector = SCF_QUERY_INTERFACE (
+    	par->GetParameter (sectoridx), iSector);
+
+    if (density < 0.001)
+      sector->DisableFog ();
+    else
+      sector->SetFog (density, color);
+  }
+};
+
+/**
+ * Fade fog operation. Indexed version.
+ */
+class OpFadeFogIdx : public OpStandard
+{
+private:
+  int sectoridx;
+  csColor start_col, end_col;
+  float start_density, end_density;
+  csTicks duration;
+  iEngineSequenceManager* eseqmgr;
+
+public:
+  OpFadeFogIdx (int sectoridx, const csColor& color, float density,
+  	csTicks duration, iEngineSequenceManager* eseqmgr)
+  {
+    SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSequenceTimedOperation);
+    OpFadeFogIdx::sectoridx = sectoridx;
+    OpFadeFogIdx::end_col = color;
+    OpFadeFogIdx::end_density = density;
+    OpFadeFogIdx::duration = duration;
+    OpFadeFogIdx::eseqmgr = eseqmgr;
+  }
+
+  virtual void Do (csTicks dt, iBase* params)
+  {
+    // The following cast is in theory unsafe but in this particular
+    // case it cannot fail because we only allow instances of
+    // iEngineSequenceParameters as parameters.
+    iEngineSequenceParameters* par = (iEngineSequenceParameters*)params;
+
+    csRef<iSector> sector = SCF_QUERY_INTERFACE (
+    	par->GetParameter (sectoridx), iSector);
+
+    csFog* fog = sector->GetFog ();
+    start_col.red = fog->red;
+    start_col.green = fog->green;
+    start_col.blue = fog->blue;
+    start_density = fog->density;
+    eseqmgr->FireTimedOperation (dt, duration, &scfiSequenceTimedOperation,
+    	params);
+  }
+
+  void DoTimed (float time, iBase* params)
+  {
+    // The following cast is in theory unsafe but in this particular
+    // case it cannot fail because we only allow instances of
+    // iEngineSequenceParameters as parameters.
+    iEngineSequenceParameters* par = (iEngineSequenceParameters*)params;
+
+    csRef<iSector> sector = SCF_QUERY_INTERFACE (
+    	par->GetParameter (sectoridx), iSector);
+
+    float density = (1-time) * start_density + time * end_density;
+    if (density < 0.001)
+      sector->DisableFog ();
+    else
+    {
+      csColor color;
+      color.red = (1-time) * start_col.red + time * end_col.red;
+      color.green = (1-time) * start_col.green + time * end_col.green;
+      color.blue = (1-time) * start_col.blue + time * end_col.blue;
+      sector->SetFog (density, color);
+    }
+  }
+
+  SCF_DECLARE_IBASE_EXT (OpStandard);
+
+  struct SequenceTimedOperation : public iSequenceTimedOperation
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (OpFadeFogIdx);
+    virtual void Do (float time, iBase* params)
+    {
+      scfParent->DoTimed (time, params);
+    }
+  } scfiSequenceTimedOperation;
+  friend struct SequenceTimedOperation;
+};
+
+SCF_IMPLEMENT_IBASE_EXT (OpFadeFogIdx)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_IBASE_EXT_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (OpFadeFogIdx::SequenceTimedOperation)
+  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 //---------------------------------------------------------------------------
 
 /**
@@ -349,6 +471,109 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (OpFadeLight::SequenceTimedOperation)
   SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+/**
+ * Set light operation. Indexed version.
+ */
+class OpSetLightIdx : public OpStandard
+{
+private:
+  int lightidx;
+  csColor color;
+
+public:
+  OpSetLightIdx (int lightidx, const csColor& color)
+  {
+    OpSetLightIdx::lightidx = lightidx;
+    OpSetLightIdx::color = color;
+  }
+
+  virtual void Do (csTicks /*dt*/, iBase* params)
+  {
+    // The following cast is in theory unsafe but in this particular
+    // case it cannot fail because we only allow instances of
+    // iEngineSequenceParameters as parameters.
+    iEngineSequenceParameters* par = (iEngineSequenceParameters*)params;
+
+    csRef<iLight> light = SCF_QUERY_INTERFACE (
+    	par->GetParameter (lightidx), iLight);
+    light->SetColor (color);
+  }
+};
+
+/**
+ * Fade light operation. Indexed version.
+ */
+class OpFadeLightIdx : public OpStandard
+{
+private:
+  int lightidx;
+  csColor start_col, end_col;
+  csTicks duration;
+  iEngineSequenceManager* eseqmgr;
+
+public:
+  OpFadeLightIdx (int lightidx, const csColor& color,
+  	csTicks duration, iEngineSequenceManager* eseqmgr)
+  {
+    SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSequenceTimedOperation);
+    OpFadeLightIdx::lightidx = lightidx;
+    OpFadeLightIdx::end_col = color;
+    OpFadeLightIdx::duration = duration;
+    OpFadeLightIdx::eseqmgr = eseqmgr;
+  }
+
+  virtual void Do (csTicks dt, iBase* params)
+  {
+    // The following cast is in theory unsafe but in this particular
+    // case it cannot fail because we only allow instances of
+    // iEngineSequenceParameters as parameters.
+    iEngineSequenceParameters* par = (iEngineSequenceParameters*)params;
+
+    csRef<iLight> light = SCF_QUERY_INTERFACE (
+    	par->GetParameter (lightidx), iLight);
+    start_col = light->GetColor ();
+    eseqmgr->FireTimedOperation (dt, duration, &scfiSequenceTimedOperation,
+    	params);
+  }
+
+  void DoTimed (float time, iBase* params)
+  {
+    // The following cast is in theory unsafe but in this particular
+    // case it cannot fail because we only allow instances of
+    // iEngineSequenceParameters as parameters.
+    iEngineSequenceParameters* par = (iEngineSequenceParameters*)params;
+
+    csRef<iLight> light = SCF_QUERY_INTERFACE (
+    	par->GetParameter (lightidx), iLight);
+
+    csColor color;
+    color.red = (1-time) * start_col.red + time * end_col.red;
+    color.green = (1-time) * start_col.green + time * end_col.green;
+    color.blue = (1-time) * start_col.blue + time * end_col.blue;
+    light->SetColor (color);
+  }
+
+  SCF_DECLARE_IBASE_EXT (OpStandard);
+
+  struct SequenceTimedOperation : public iSequenceTimedOperation
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (OpFadeLightIdx);
+    virtual void Do (float time, iBase* params)
+    {
+      scfParent->DoTimed (time, params);
+    }
+  } scfiSequenceTimedOperation;
+  friend struct SequenceTimedOperation;
+};
+
+SCF_IMPLEMENT_IBASE_EXT (OpFadeLightIdx)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_IBASE_EXT_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (OpFadeLightIdx::SequenceTimedOperation)
+  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 //---------------------------------------------------------------------------
 
 /**
@@ -429,6 +654,111 @@ SCF_IMPLEMENT_IBASE_EXT (OpFadeMeshColor)
 SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (OpFadeMeshColor::SequenceTimedOperation)
+  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+/**
+ * Set mesh color operation. Indexed version.
+ */
+class OpSetMeshColorIdx : public OpStandard
+{
+private:
+  int meshidx;
+  csColor color;
+
+public:
+  OpSetMeshColorIdx (int meshidx, const csColor& color)
+  {
+    OpSetMeshColorIdx::meshidx = meshidx;
+    OpSetMeshColorIdx::color = color;
+  }
+
+  virtual void Do (csTicks /*dt*/, iBase* params)
+  {
+    // The following cast is in theory unsafe but in this particular
+    // case it cannot fail because we only allow instances of
+    // iEngineSequenceParameters as parameters.
+    iEngineSequenceParameters* par = (iEngineSequenceParameters*)params;
+
+    csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE (
+    	par->GetParameter (meshidx), iMeshWrapper);
+
+    mesh->GetMeshObject ()->SetColor (color);
+  }
+};
+
+/**
+ * Fade mesh operation. Indexed version.
+ */
+class OpFadeMeshColorIdx : public OpStandard
+{
+private:
+  int meshidx;
+  csColor start_col, end_col;
+  csTicks duration;
+  iEngineSequenceManager* eseqmgr;
+
+public:
+  OpFadeMeshColorIdx (int meshidx, const csColor& color,
+  	csTicks duration, iEngineSequenceManager* eseqmgr)
+  {
+    SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSequenceTimedOperation);
+    OpFadeMeshColorIdx::meshidx = meshidx;
+    OpFadeMeshColorIdx::end_col = color;
+    OpFadeMeshColorIdx::duration = duration;
+    OpFadeMeshColorIdx::eseqmgr = eseqmgr;
+  }
+
+  virtual void Do (csTicks dt, iBase* params)
+  {
+    // The following cast is in theory unsafe but in this particular
+    // case it cannot fail because we only allow instances of
+    // iEngineSequenceParameters as parameters.
+    iEngineSequenceParameters* par = (iEngineSequenceParameters*)params;
+
+    csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE (
+    	par->GetParameter (meshidx), iMeshWrapper);
+
+    mesh->GetMeshObject ()->GetColor (start_col);
+    eseqmgr->FireTimedOperation (dt, duration, &scfiSequenceTimedOperation,
+    	params);
+  }
+
+  void DoTimed (float time, iBase* params)
+  {
+    // The following cast is in theory unsafe but in this particular
+    // case it cannot fail because we only allow instances of
+    // iEngineSequenceParameters as parameters.
+    iEngineSequenceParameters* par = (iEngineSequenceParameters*)params;
+
+    csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE (
+    	par->GetParameter (meshidx), iMeshWrapper);
+
+    csColor color;
+    color.red = (1-time) * start_col.red + time * end_col.red;
+    color.green = (1-time) * start_col.green + time * end_col.green;
+    color.blue = (1-time) * start_col.blue + time * end_col.blue;
+    mesh->GetMeshObject ()->SetColor (color);
+  }
+
+  SCF_DECLARE_IBASE_EXT (OpStandard);
+
+  struct SequenceTimedOperation : public iSequenceTimedOperation
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (OpFadeMeshColorIdx);
+    virtual void Do (float time, iBase* params)
+    {
+      scfParent->DoTimed (time, params);
+    }
+  } scfiSequenceTimedOperation;
+  friend struct SequenceTimedOperation;
+};
+
+SCF_IMPLEMENT_IBASE_EXT (OpFadeMeshColorIdx)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_IBASE_EXT_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (OpFadeMeshColorIdx::SequenceTimedOperation)
   SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
@@ -548,6 +878,139 @@ SCF_IMPLEMENT_IBASE_EXT (OpRotate)
 SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (OpRotate::SequenceTimedOperation)
+  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+/**
+ * Rotate operation. Indexed version.
+ */
+class OpRotateIdx : public OpStandard
+{
+private:
+  int meshidx;
+  int axis1, axis2, axis3;
+  float tot_angle1, tot_angle2, tot_angle3;
+  csVector3 offset;
+  csReversibleTransform start_transform;
+  csTicks duration;
+  iEngineSequenceManager* eseqmgr;
+
+public:
+  OpRotateIdx (int meshidx,
+  	int axis1, float tot_angle1,
+  	int axis2, float tot_angle2,
+  	int axis3, float tot_angle3,
+	const csVector3& offset,
+  	csTicks duration, iEngineSequenceManager* eseqmgr)
+  {
+    SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSequenceTimedOperation);
+    OpRotateIdx::meshidx = meshidx;
+    OpRotateIdx::axis1 = axis1;
+    OpRotateIdx::tot_angle1 = tot_angle1;
+    OpRotateIdx::axis2 = axis2;
+    OpRotateIdx::tot_angle2 = tot_angle2;
+    OpRotateIdx::axis3 = axis3;
+    OpRotateIdx::tot_angle3 = tot_angle3;
+    OpRotateIdx::offset = offset;
+    OpRotateIdx::duration = duration;
+    OpRotateIdx::eseqmgr = eseqmgr;
+  }
+
+  virtual void Do (csTicks dt, iBase* params)
+  {
+    // The following cast is in theory unsafe but in this particular
+    // case it cannot fail because we only allow instances of
+    // iEngineSequenceParameters as parameters.
+    iEngineSequenceParameters* par = (iEngineSequenceParameters*)params;
+
+    csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE (
+    	par->GetParameter (meshidx), iMeshWrapper);
+
+    iMovable* movable = mesh->GetMovable ();
+    start_transform = movable->GetTransform ();
+    eseqmgr->FireTimedOperation (dt, duration, &scfiSequenceTimedOperation,
+    	params);
+  }
+
+  void DoTimed (float time, iBase* params)
+  {
+    // The following cast is in theory unsafe but in this particular
+    // case it cannot fail because we only allow instances of
+    // iEngineSequenceParameters as parameters.
+    iEngineSequenceParameters* par = (iEngineSequenceParameters*)params;
+
+    csRef<iMeshWrapper> mesh = SCF_QUERY_INTERFACE (
+    	par->GetParameter (meshidx), iMeshWrapper);
+
+    csReversibleTransform trans = start_transform;
+    trans.Translate (-offset);
+    csVector3 o (0);
+    switch (axis1)
+    {
+      case -1:
+        break;
+      case 0:
+        trans = trans * csTransform (csXRotMatrix3 (tot_angle1*time), o);
+	break;
+      case 1:
+        trans = trans * csTransform (csYRotMatrix3 (tot_angle1*time), o);
+	break;
+      case 2:
+        trans = trans * csTransform (csZRotMatrix3 (tot_angle1*time), o);
+	break;
+    }
+    switch (axis2)
+    {
+      case -1:
+        break;
+      case 0:
+        trans = trans * csTransform (csXRotMatrix3 (tot_angle2*time), o);
+	break;
+      case 1:
+        trans = trans * csTransform (csYRotMatrix3 (tot_angle2*time), o);
+	break;
+      case 2:
+        trans = trans * csTransform (csZRotMatrix3 (tot_angle2*time), o);
+	break;
+    }
+    switch (axis3)
+    {
+      case -1:
+        break;
+      case 0:
+        trans = trans * csTransform (csXRotMatrix3 (tot_angle3*time), o);
+	break;
+      case 1:
+        trans = trans * csTransform (csYRotMatrix3 (tot_angle3*time), o);
+	break;
+      case 2:
+        trans = trans * csTransform (csZRotMatrix3 (tot_angle3*time), o);
+	break;
+    }
+    trans.Translate (offset);
+    mesh->GetMovable ()->SetTransform (trans);
+    mesh->GetMovable ()->UpdateMove ();
+    mesh->DeferUpdateLighting (CS_NLIGHT_STATIC | CS_NLIGHT_DYNAMIC, 10);
+  }
+
+  SCF_DECLARE_IBASE_EXT (OpStandard);
+
+  struct SequenceTimedOperation : public iSequenceTimedOperation
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (OpRotateIdx);
+    virtual void Do (float time, iBase* params)
+    {
+      scfParent->DoTimed (time, params);
+    }
+  } scfiSequenceTimedOperation;
+  friend struct SequenceTimedOperation;
+};
+
+SCF_IMPLEMENT_IBASE_EXT (OpRotateIdx)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_IBASE_EXT_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (OpRotateIdx::SequenceTimedOperation)
   SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
@@ -842,50 +1305,52 @@ void csSequenceWrapper::AddOperationSetMaterial (csTicks time,
 void csSequenceWrapper::AddOperationSetLight (csTicks time,
 	int lightidx, const csColor& color)
 {
-  //OpSetLight* op = new OpSetLight (light, color);
-  //sequence->AddOperation (time, op);
-  //op->DecRef ();
+  OpSetLightIdx* op = new OpSetLightIdx (lightidx, color);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
 }
 
 void csSequenceWrapper::AddOperationFadeLight (csTicks time,
 	int lightidx, const csColor& color, csTicks duration)
 {
-  //OpFadeLight* op = new OpFadeLight (light, color, duration, eseqmgr);
-  //sequence->AddOperation (time, op);
-  //op->DecRef ();
+  OpFadeLightIdx* op = new OpFadeLightIdx (lightidx, color, duration, eseqmgr);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
 }
 
 void csSequenceWrapper::AddOperationSetMeshColor (csTicks time,
 	int meshidx, const csColor& color)
 {
-  //OpSetMeshColor* op = new OpSetMeshColor (mesh, color);
-  //sequence->AddOperation (time, op);
-  //op->DecRef ();
+  OpSetMeshColorIdx* op = new OpSetMeshColorIdx (meshidx, color);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
 }
 
 void csSequenceWrapper::AddOperationFadeMeshColor (csTicks time,
 	int meshidx, const csColor& color, csTicks duration)
 {
-  //OpFadeMeshColor* op = new OpFadeMeshColor (mesh, color, duration, eseqmgr);
-  //sequence->AddOperation (time, op);
-  //op->DecRef ();
+  OpFadeMeshColorIdx* op = new OpFadeMeshColorIdx (
+  	meshidx, color, duration, eseqmgr);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
 }
 
 void csSequenceWrapper::AddOperationSetFog (csTicks time,
 	int sectoridx, const csColor& color, float density)
 {
-  //OpSetFog* op = new OpSetFog (sector, color, density);
-  //sequence->AddOperation (time, op);
-  //op->DecRef ();
+  OpSetFogIdx* op = new OpSetFogIdx (sectoridx, color, density);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
 }
 
 void csSequenceWrapper::AddOperationFadeFog (csTicks time,
 	int sectoridx, const csColor& color, float density,
 	csTicks duration)
 {
-  //OpFadeFog* op = new OpFadeFog (sector, color, density, duration, eseqmgr);
-  //sequence->AddOperation (time, op);
-  //op->DecRef ();
+  OpFadeFogIdx* op = new OpFadeFogIdx (
+  	sectoridx, color, density, duration, eseqmgr);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
 }
 
 void csSequenceWrapper::AddOperationRotateDuration (csTicks time,
@@ -895,11 +1360,11 @@ void csSequenceWrapper::AddOperationRotateDuration (csTicks time,
 	int axis3, float tot_angle3,
 	const csVector3& offset, csTicks duration)
 {
-  //OpRotate* op = new OpRotate (mesh,
-  	//axis1, tot_angle1, axis2, tot_angle2, axis3, tot_angle3,
-	//offset, duration, eseqmgr);
-  //sequence->AddOperation (time, op);
-  //op->DecRef ();
+  OpRotateIdx* op = new OpRotateIdx (meshidx,
+  	axis1, tot_angle1, axis2, tot_angle2, axis3, tot_angle3,
+	offset, duration, eseqmgr);
+  sequence->AddOperation (time, op);
+  op->DecRef ();
 }
 
 void csSequenceWrapper::AddOperationMoveDuration (csTicks time,
