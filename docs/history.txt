@@ -13,6 +13,7 @@ chronological order.
 	  will get the shadows.
 	- res made some small comment changes in ivideo/shader/shader.h and
 	  csutil/csuctransform.h.
+	- Remi Bonnet added DeleteElement and NextNoAdvance to csHash.
 13-Jun-2004
 	- res changed the Win32 thread error reporting to be less 
 	  macro-centric.
