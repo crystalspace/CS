@@ -64,15 +64,9 @@ The BeOS-specific 2D Graphics class is csGraphics2DBeLib and it is derived from 
 
 2.1 Operation of BeOS 2D Graphics Driver
 ========================================
-!!! FIXME: Out of date !!!
-During the initialisation of COM by:
-  if (!Sys->Initialize (argc, argv, world->GetEngineConfigCOM ()))
+During system initialisation in csSystemDriver::Initialize() an instance of the 3D graphics driver is created by the SCF system.  The 3D driver then uses SCF to create an instance of the 2D Be driver. teInstance().  This method creates a new Graphics3DSoftware and returns a pointer to its interface.
 
-csSystemDriver::Initialize() is called and in this method, csSystemDriver::InitGraphics() is eventually called.  This first sets up the graphics context class factory.  This factory is then used to create an instance of the 3D graphics object by a call to the method csGraphics3DSoftwareFactory::CreateInstance().  This method creates a new Graphics3DSoftware and returns a pointer to its interface.  The csGraphics3DSoftware::csGraphics3DSoftware() constructor initialises the class factory for the 2D driver and creates an instance of csGraphics2DBeLib via COM.
-
-The csGraphics2DBeLib constructor checks that the interface has been succesfully created.
-
-When csGraphics3DSoftware::Initialize() executes, it calls csGraphics2DBeLib::Initialize().  This method begins by calling csGraphics2D::Initialize() which initialises default values for parameters like pixel format, screen size and the actual methods used to implement the virtual methods GetPixelAt(), DrawPixel(), WriteChar() and DrawSprite().  csGraphics2DBeLib::Initialize() then uses BScreen to access the current color_space setting and uses it to set the correct values for all these parameters.  it also creates a bitmap of the required color_space pointed to by private BBitMap* cryst_bitmap[].
+When csGraphics3DSoftware::Initialize() executes, it calls csGraphics2DBeLib::Initialize().  This method begins by calling csGraphics2D::Initialize() which initialises default values for parameters like pixel format, screen size and the actual methods used to implement the virtual methods GetPixelAt(), DrawPixel(), WriteChar() and DrawSprite().  csGraphics2DBeLib::Initialize() then uses BScreen to access the current color_space setting and uses it to set the correct values for all these parameters.  it also creates a bitmap of the required color_space pointed to by private BBitMap* bitmap.
 
 csGraphics3DSoftware::Open() calls csGraphics2DBeLib::Open() [defined in cs2d/be/belibg2d.cpp] which begins by calling the inherited csGraphics2D::Open() method [defined in cs2d/common/graph2d.cpp].  csGraphics2D::Open() creates an int array with the number of scanlines designated in cryst.cfg and sets up the static csGraphics2D::ScanLine pointer to it.  It then initialises it with precalculated addresses of each scanline in the bitmap.  A new instance of CrystView and attached to a new instance of CrystWindow.  [N.B.: If changeable screen sizes are to be implemented, Scanline may have to be deleted and recreated.]
 
@@ -97,7 +91,6 @@ The Print() method displays the bitmap by locking the window, blitting the BBitm
 ========================================
 This is the list of BeOS-specific bugs compiled by Eric Sunshine <sunshine@sunshineco.com>.  These bugs are being actively eradicated.
 
-- Remove double-buffering support.  It serves no meaningful purpose in this windowed environment, and is a waste of memory.
 - Add full-screen support.  Be careful about the resolution, since CS can use any arbitrary window dimension.
 - Application should be able to redraw rendering window when BeOS asks for a redraw even if CS is busy (that is, not pushing out a continuous stream of frames).  There are already cases where this is needed, and will be very important when a pause feature is added.
 - Pause when not foreground application.  Make sure that screen redraws correctly even when paused.
@@ -107,7 +100,6 @@ This is the list of BeOS-specific bugs compiled by Eric Sunshine <sunshine@sunsh
 - It is possible to close the window while the application is starting, yet the application does not terminate.
 - Glide driver does not compile.
 - It is probably not safe to be inserting mouse and keyboard events into CS's event queue from the main thread while the queue is being processed by a secondary thread.  It is also probably unsafe to cascade mouse moved events from inside "LoopThread" thread.
-- Should auto-detect buggy egcs compiler.
 - Ked Shayer <c.shayer2@ukonline.co.uk> suggests using NASM for the assembler code.
 
 This is the list of problems which have recently been fixed.
@@ -141,3 +133,4 @@ This is the list of problems which have recently been fixed.
 - Squawk crashes upon initialization when using OpenGL driver.
 - Application bombs at termination when using OpenGL driver.
 - Document building libjpeg.a.  People have trouble with this.
+- Remove double-buffering support.  It serves no meaningful purpose in this windowed environment, and is a waste of memory.

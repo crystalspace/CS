@@ -1,7 +1,7 @@
 How to run CrystalSpace on BeOS
 ===============================
 By David Huen (david@huen.freeserve.co.uk) 1999/07/01
-Amended by Eric Sunshine (sunshine@sunshineco.com) 1999/08/30
+Amended by Eric Sunshine (sunshine@sunshineco.com) 1999/11/17
 
 CrystalSpace is a full-featured 3D graphics engine and the BeOS port was originally created by Xavier Pianet.  David Huen sort of picked it up in Xavier's prolonged absence.  Most recently, Eric Sunshine significantly cleaned up and re-engineered the BeOS port, ensuring that all programs compile cleanly and run properly right out of the box.  He also heavily updated the accompanying documentation.
 
@@ -69,9 +69,9 @@ You may want to switch to a different workspace and set the screen resolution to
 Form Terminal within this workspace, go to the CS/ folder and type:
 walktest   This will run the WalkTest example program with the settings from the cryst.cfg file (usually software renderer).  Alternately you can choose the driver by specifying the -driver keyword:
 
-walktest -driver software  # Runs in software mode.
-walktest -driver opengl    # Runs in OpenGL mode.
-walktest -driver glide     # Runs in Glide mode.
+walktest -video=software  # Runs in software mode.
+walktest -video=opengl  # Runs in OpenGL mode.
+walktest -video=glide  # Runs in Glide mode.
 
 Alt-f will switch you in and out of full screen.  (Note, the software driver does not currently implement full screen mode.)
 
@@ -87,7 +87,7 @@ Other interesting example applications which you can run are blocks, metademo, s
 
 You should be able to start experimenting with the BeOS port at this stage.
 
-There may well be mistakes in this document.  Please feel free to correct them and send the text to one of the port maintainers, such as Eric Sunshine <sunshine@sunshineco.com>, David Huen >david@huen.freeserve.co.uk>, or Jorrit Tyberghein <Jorrit.Tyberghein@uz.kuleuven.ac.be>.
+There may well be mistakes in this document.  Please feel free to correct them and send the text to one of the port maintainers, such as Eric Sunshine <sunshine@sunshineco.com>, David Huen <david@huen.freeserve.co.uk>, or Jorrit Tyberghein <Jorrit.Tyberghein@uz.kuleuven.ac.be>.
 
 
 >>> IGNORE: THIS SECTION WILL SOON BE OBSOLETE >>>
