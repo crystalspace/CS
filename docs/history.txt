@@ -19,6 +19,30 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+17-Jun-99:
+	- Further optimizations on the new lighting system. Reordered a few
+	  relevant calculations to discover more rapidly when lighting should
+	  not be done for a polygon and also eliminated having to check
+	  for shadow frustrums which are not relevant.
+	- Due to the previous optimizations it is now possible to enable
+	  shadows for things for dynamic lights without loosing too much
+	  speed. There are still more optimizations to do so I think I'm
+	  going to have an option to any dynamic light so that you can say
+	  if things should cast shadows or not.
+	- Fixed a severe memory overwrite bug in the lighting routines
+	  (dynamic AND static).
+	- Add SetFlags/GetFlags to csLight to set and get flags (what did you
+	  expect? :-) There is only one flag right now and that is
+	  CS_LIGHT_THINGSHADOWS which indicates if the light casts shadows
+	  for things. For static lights this is true by default. For dynamic
+	  lights this is false by default.
+	- Extended 'addlight' console command with a fifth parameter. 0 is
+	  without CS_LIGHT_THINGSHADOWS and 1 is with CS_LIGHT_THINGSHADOWS.
+	  So 'addlight 1,0,0,100,1' creates a dynamic light at the current
+	  position with color red (1,0,0), radius 100 and which causes shadows
+	  to be cast from things.
+	- With this it is possible to see that the shadow calculation for
+	  things is still not completely correct.
 16-Jun-99:
 	- Added CHK macro to many 'new' and 'delete' commands.
 	- Fixed memory debugger so that it works again.
@@ -31,6 +55,12 @@ Short-term cleanups that need to be done:
 	  shadows for things. I will test this new system very well and if it
 	  works good I will remove the old support (like removing BlockingThings).
 	- I removed BlockingThings and CheckForThings to make things simpler.
+	- Thomas Hieber significantly cleaned up the G3DPolygon structure to make
+	  its usage simpler for all versions of DrawPolygon.
+	- Thomas also changed the Windows OpenGL 2D driver to use the new
+	  common OpenGL 2D code.
+	- Thomas changed system.cpp to set pointer to system to NULL earlier.
+	- Thomas added Win VC++ project files for MetaDemo.
 15-Jun-99:
 	- Applied patch from Or Siu Hang for MazeD. Changes are:
 		- Zip file creation/edit/saving is enabled: You may now
