@@ -32,7 +32,7 @@ iConfigManager* config =
 const char* p = config->GetStr ("MyGame.Settings.CollDetPlugin",
   	"crystalspace.collisiondetection.rapid");
 iCollideSystem* cd_sys =
-  CS_LOAD_PLUGIN (plugmgr, p, "CollDet", iCollideSystem);
+  CS_LOAD_PLUGIN (plugmgr, p, iCollideSystem);
 if (!cd_sys)
 @{
   csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -65,7 +65,11 @@ iCollider* MyGame::InitCollider (iMeshWrapper* mesh)
   iPolygonMesh* polmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
   	iPolygonMesh);
   if (polmesh)
-    return cd_sys->CreateCollider (polmesh);
+  @{
+    iCollider* cd = cd_sys->CreateCollider (polmesh);
+    polmesh->DecRef ();
+    return cd;
+  @}
   else
     return NULL;
 @}
@@ -99,6 +103,7 @@ bool MyGame::InitCollider (iMeshWrapper* mesh)
   if (polmesh)
   @{
     new csColliderWrapper (mesh->QueryObject (), cd_sys, polmesh);
+    polmesh->DecRef ();
     return true;
   @}
   else

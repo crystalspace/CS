@@ -20,29 +20,21 @@ ways to make sure you have this plugin in your application. You can put
 a line in your config file like this:
 
 @example
-System.Plugins.ImageLoader = crystalspace.graphic.image.io.multiplex
+  System.Plugins.iImageIO = crystalspace.graphic.image.io.multiplex
 @end example
 
-Or you can put the following line in your @code{main} routine right
-before calling @code{csSystemDriver::Initialize()}:
+Or you can put the following line in your @code{main} routine in
+the call to @code{csInitializer::RequestPlugins()}:
 
 @example
-System->RequestPlugin (
-  "crystalspace.graphic.image.io.multiplex:ImageLoader");
-@dots{}
-if (!System->Initialize (argc, argv, NULL))
-@{
-@dots{}
+  CS_REQUEST_IMAGELOADER,
 @end example
 
 To finally be able to use the image loader in your application you
 need to do:
 
 @example
-iPluginManager* plugmgr =
-  CS_QUERY_REGISTRY (object_reg, iPluginManager);
-iImageIO* imgldr =
-  CS_QUERY_PLUGIN_ID (plugmgr, CS_FUNCID_IMGLOADER, iImageIO);
+iImageIO* imgldr = CS_QUERY_REGISTRY (object_reg, iImageIO);
 @end example
 
 When you don't need it anymore you must call @code{imgldr->DecRef ()}.
@@ -112,3 +104,4 @@ The include files useful for this section are:
 #include "ivideo/txtmgr.h"
 #include "isys/vfs.h"
 @end example
+

@@ -19,6 +19,8 @@ The history order is reversed so that new features are at the top.
 	- Updated the simple2 and simpmap tutorial documentation.
 	- Renamed apimod19.txi to apimod90.txi and updated the file for the
 	  latest changes.
+	- Updated several of the howto's with regards to recent global
+	  changes.
 18-Oct-2001
 	- Michael Voase shifted water and fire proctex down to the basement.
 	- Removed usage of cs_snprintf in cfgfile.cpp and
