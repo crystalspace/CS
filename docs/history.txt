@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+15-Apr-2002
+	- Disabled the use of DrawPolygonMultiTexture() in OpenGL renderer
+	  even if multi-texture is enabled. DrawPolygonMultiTexture() is
+	  obsolete and cannot correctly support super lightmaps. It should
+	  never be used. I leave the code in cvs for now as a reference
+	  for future multi-texture implementations.
+	- Enabled multi-texture again in GeForce specific OpenGL configuration.
 14-Apr-2002
 	- In one version of csTextureTrans::compute_texture_space()
 	  there were two calls to qisqrt() (equivalent to 1/sqrt()).

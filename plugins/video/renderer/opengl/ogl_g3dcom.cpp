@@ -1178,8 +1178,10 @@ void csGraphics3DOGLCommon::CommonOpen ()
   // Initialize the default method calls
   DrawPolygonCall = &csGraphics3DOGLCommon::DrawPolygonSingleTexture;
 
+#if 0
   if (ARB_multitexture)
     DrawPolygonCall = &csGraphics3DOGLCommon::DrawPolygonMultiTexture;  
+#endif
 }
 
 void csGraphics3DOGLCommon::SharedOpen (csGraphics3DOGLCommon *d)
@@ -5868,11 +5870,16 @@ void csGraphics3DOGLCommon::SetGLZBufferFlagsPass2 (csZBufMode flags,
   }
 }
 
+// @@@
+// This function is now obsolete and cannot work correctly with
+// the super lightmaps. We need a totally different way to handle
+// multi-texture.
+
+#if 0
 // Shortcut to override standard polygon drawing when we have
 // multitexture
 void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
 {
-
   // count 'real' number of vertices
   int num_vertices = 1;
   int i;
@@ -6094,6 +6101,7 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
     glDisable (GL_ALPHA_TEST);
   }
 }
+#endif
 
 float csGraphics3DOGLCommon::GetZBuffValue (int x, int y)
 {

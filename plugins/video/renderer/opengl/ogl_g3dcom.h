@@ -860,11 +860,13 @@ public:
   virtual void DrawPixmap (iTextureHandle *hTex, int sx, int sy,
     int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha);
 
+#if 0
   /**
    * Draw a fully-featured polygon assuming one has an OpenGL renderer
    * that supports ARB_multitexture
    */
   void DrawPolygonMultiTexture (G3DPolygonDP &poly);
+#endif
 
   /**
    * Flush the DrawPolygon queue if needed.
