@@ -306,6 +306,8 @@ void D3DTextureCache::Load (csD3DCacheData* cached_texture)
   iTextureHandle* txt_handle = (iTextureHandle *)cached_texture->pSource;
   csTextureMM*    txt_mm     = (csTextureMM *)   txt_handle->GetPrivateObject ();
 
+  txt_handle->IncRef();
+
   bool transp = txt_handle->GetTransparent ();
   DDCOLORKEY key;
   if (transp)
@@ -469,6 +471,8 @@ void D3DLightMapCache::Load (csD3DCacheData *cached_lightmap)
 {
   iLightMap *piLM = (iLightMap *)cached_lightmap->pSource;
   ASSERT( piLM );
+
+  piLM->IncRef();
   
   int lwidth = piLM->GetWidth();
   int lheight = piLM->GetHeight();
