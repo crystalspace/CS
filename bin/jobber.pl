@@ -20,7 +20,7 @@
 #
 #==============================================================================
 #------------------------------------------------------------------------------
-# docproc.pl
+# jobber.pl
 #
 #    A tool for automatically processing documentation and committing changes
 #    to the CVS repository in which the documentation resides.  This tool
@@ -77,7 +77,7 @@ use POSIX 'tmpnam';
 use strict;
 $Getopt::Long::ignorecase = 0;
 
-my $PROG_NAME = 'docproc.pl';
+my $PROG_NAME = 'jobber.pl';
 my $PROG_VERSION = '1.9';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
