@@ -1,0 +1,6 @@
+EXE=
+DLL=.so
+LIBS.EXE.PLATFORM=-ldl -lm -lnsl
+LFLAGS.GENERAL=$(LFLAGS.L)/usr/local/lib -lpthread
+LFLAGS.DLL=-shared -Wl,-soname -Wl,$@
+

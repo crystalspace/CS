@@ -27,10 +27,13 @@ common_cxxflags=""
 
 makevars()
 {
-echo Makevars not supported with jam build.
-}
-
+cat << "__EOF__"
 __END__
+
+  cat $(MAKEVARS) >> $(<)
+
+  echo "__EOF__" >> $(<) 
+  echo "}" >> $(<)
 
   cat $(SUBDIR)/cs-config.temppost >> $(<)
 }
@@ -46,6 +49,19 @@ rule ConfigHelper
   LOCATE on cs-config.temppre cs-config.temppost = $(SUBDIR) ;
   Depends $(<) : Jamconfig cs-config.temppre cs-config.temppost 
   		 $(TOP)/scripts/cs-config/Jamfile ;
+
+# hack to produce a makevars output similar to the old ones
+  switch $(TARGET.OS)
+  {
+  case WIN32 :
+    MAKEVARS = makevar.win32 ;
+  case MACOS_X :
+    MAKEVARS = makevar.macosx ;
+  case * :
+    MAKEVARS = makevar.unix ;
+  }
+  MAKEVARS = $(MAKEVARS:R=$(SUBDIR)) ;
+  Depends $(<) : $(MAKEVARS) ;
 
   InstallApplication $(<) ;
 }

@@ -1,0 +1,20 @@
+EXE = .app
+DLL = .csplugin
+MACOSX.APP_EXE  = $@/Contents/MacOS/$(notdir $(basename $@))
+MACOSX.APP_ICON = libs/cssys/macosx/appicon.icns
+MACOSX.APP_DIR  = .
+MACOSX.APP_EXT  = .app
+CFLAGS.GENERAL = -force_cpusubtype_ALL -Wno-precomp -fno-common -pipe
+LFLAGS.GENERAL = $(MACOSX.LFLAGS.CONFIG) -lpthread
+LFLAGS.EXE = -framework AppKit -framework Foundation
+LFLAGS.CONSOLE.EXE = -framework AppKit -framework Foundation
+LFLAGS.DLL = -bundle -framework AppKit -framework Foundation
+LIBS.EXE.PLATFORM=$(LFLAGS.GENERAL) $(LFLAGS.EXE)
+AR = libtool
+ARFLAGS = -static -o
+define DO.LINK.EXE
+  sh $(SRCDIR)/libs/cssys/macosx/appwrap.sh $(notdir $(basename $@)) $(MACOSX.APP_DIR) $(MACOSX.APP_ICON) $(SRCDIR)/include/csver.h
+  $(NEWLINE)$(LINK) $(LFLAGS) $(LFLAGS.EXE) -o $(MACOSX.APP_EXE) $(^^) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
+  touch $@
+endef
+      

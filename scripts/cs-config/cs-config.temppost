@@ -55,8 +55,6 @@ Options:
 	[--libs]
 	[--cflags]
 	[--cxxflags]
-	[--includes]
-	[--makevars]
 	[--help]
 Libraries:
 	csengine
