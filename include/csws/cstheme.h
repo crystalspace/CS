@@ -20,8 +20,6 @@
 #ifndef __CSTHEME_H__
 #define __CSTHEME_H__
 
-#define CSWS_INTERNAL
-#include "csws.h"
 #include "csutil/hashmap.h"
 
 class csThemeComponent;
