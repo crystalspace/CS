@@ -8,7 +8,8 @@ DESCRIPTION.OS.win32gcc = Win32
 PLUGINS+= cscript/cspython
 PLUGINS+= sound/renderer/software
 PLUGINS+= video/canvas/ddraw
-#PLUGINS+= video/canvas/ddraw61 video/renderer/direct3d61
+PLUGINS+= video/canvas/ddraw8
+#video/renderer/direct3d8
 
 # if u have the following line uncommented make sure one  
 # LIBS.OPENGL.SYSTEM is set below or you have a custom 
