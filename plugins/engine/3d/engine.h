@@ -498,6 +498,9 @@ public:
    */
   iEngineSequenceManager* GetEngineSequenceManager ();
 
+  /// Get (but don't create) the engine sequence manager.
+  iEngineSequenceManager* FetchEngineSequenceManager () { return eseqmgr; }
+
 public:
   /**
    * Initialize an empty engine.  The only thing that is valid just after

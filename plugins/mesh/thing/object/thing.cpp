@@ -2841,6 +2841,22 @@ void csThing::PrepareRenderMeshes (
 
 #endif
 
+void csThing::PrepareForUse ()
+{
+#ifdef __USE_MATERIALS_REPLACEMENT__
+  Prepare ();
+  ClearLMs ();
+  PrepareLMs ();
+  PreparePolygonBuffer ();
+#else // __USE_MATERIALS_REPLACEMENT__
+  Prepare ();
+  PreparePolygonBuffer ();
+  PrepareLMs ();
+
+  UpdateDirtyLMs ();
+#endif // __USE_MATERIALS_REPLACEMENT__
+}
+
 csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview, 
                                          iMovable* movable, uint32 frustum_mask)
 {

@@ -817,6 +817,8 @@ public:
 
   void InvalidateMaterialHandles ();
 
+  void PrepareForUse ();
+
   //----------------------------------------------------------------------
   // Bounding information
   //----------------------------------------------------------------------
@@ -978,20 +980,7 @@ public:
 
     /// Prepare.
     virtual void Prepare ()
-    {
-#ifdef __USE_MATERIALS_REPLACEMENT__
-      scfParent->Prepare ();
-      scfParent->ClearLMs ();
-      scfParent->PrepareLMs ();
-      scfParent->PreparePolygonBuffer ();
-#else // __USE_MATERIALS_REPLACEMENT__
-      scfParent->Prepare ();
-      scfParent->PreparePolygonBuffer ();
-      scfParent->PrepareLMs ();
-
-      scfParent->UpdateDirtyLMs ();
-#endif // __USE_MATERIALS_REPLACEMENT__
-    }
+    { scfParent->PrepareForUse (); }
 
     /// Unprepare.
     virtual void Unprepare ()

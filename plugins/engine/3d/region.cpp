@@ -58,7 +58,7 @@ void csRegion::DeleteAll ()
 {
   csRef<iObjectIterator> iter;
   iEngineSequenceManager* engseq = csEngine::current_engine
-  	->GetEngineSequenceManager ();
+  	->FetchEngineSequenceManager ();
 
   // First we need to copy the objects to a vector to avoid
   // messing up the iterator while we are deleting them.
@@ -87,7 +87,7 @@ void csRegion::DeleteAll ()
       csRef<iSequenceWrapper> o (SCF_QUERY_INTERFACE (obj, iSequenceWrapper));
       if (!o) continue;
 
-      engseq->RemoveSequence (o);
+      if (engseq) engseq->RemoveSequence (o);
       ObjRemove (obj);
       copy[i] = 0;
     }
@@ -101,7 +101,7 @@ void csRegion::DeleteAll ()
       csRef<iSequenceTrigger> o (SCF_QUERY_INTERFACE (obj, iSequenceTrigger));
       if (!o) continue;
 
-      engseq->RemoveTrigger (o);
+      if (engseq) engseq->RemoveTrigger (o);
       ObjRemove (obj);
       copy[i] = 0;
     }
