@@ -303,7 +303,6 @@ int WINAPI WinMain (HINSTANCE hApp, HINSTANCE prev, LPSTR cmd, int show) \
 
 #define CS_IMPLEMENT_PLUGIN \
 HINSTANCE ModuleHandle = NULL; \
-int ApplicationShow = SW_SHOWNORMAL; \
 extern "C" BOOL WINAPI \
 DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID /*lpvReserved*/) \
 { \
