@@ -116,7 +116,8 @@ bool CTextureFile::AddToVFS(csRef<iVFS> VFS, const char* path)
     {
       printf ("Texture %s: file %s already exists, but has different size (%d != %d).\n"
 	"Maybe a texture with this name exists in multiple archives?\n",
-	m_Texturename, vfssize, m_OriginalData.GetSize());
+	(const char*) m_Texturename, 
+	(const char*) m_Filename, vfssize, m_OriginalData.GetSize());
     }
   }
   else

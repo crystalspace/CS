@@ -131,7 +131,7 @@ bool CMapCurve::Write(csRef<iDocumentNode> node, CCSWorld* pWorld)
   {
     DocNode meshfact = CreateNode (node, "meshfact");
     meshfact->SetAttribute ("name", 
-      csString().Format ("curve_%s", m_Name));
+      csString().Format ("curve_%s", (const char*) m_Name));
     CreateNode (meshfact, "plugin", "thingFact");
     DocNode params = CreateNode (meshfact, "params");
     int row, col;
@@ -171,7 +171,7 @@ bool CMapCurve::Write(csRef<iDocumentNode> node, CCSWorld* pWorld)
       for (x=0; x<(pCurve->GetNumCols()-1)/2; x++)
       {
 	csString tmp;
-	tmp.Format ("bez_%s_%d_%d", m_Name, y, x);
+	tmp.Format ("bez_%s_%d_%d", (const char*) m_Name, y, x);
 
         DocNode curve = CreateNode (params, "curve");
 	curve->SetAttribute ("name", tmp);
