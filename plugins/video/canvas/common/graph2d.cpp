@@ -242,7 +242,7 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
   else if (fx2 - fx1)
   {
     if (fx1 > fx2) { int tmp = fx1; fx1 = fx2; fx2 = tmp; }
-    int count = x2 - x1 + 1;
+    int count = fx2 - fx1 + 1;
     switch (pfmt.PixelBytes)
     {
       case 1:
@@ -272,40 +272,40 @@ void csGraphics2D::DrawBox (int x, int y, int w, int h, int color)
   if ((x > ClipX2) || (y > ClipY2))
     return;
   if (x < ClipX1)
-    w += (x - ClipX1), x = ClipX1;
+    w -= (ClipX1 - x), x = ClipX1;
   if (y < ClipY1)
-    h += (y - ClipY1), y = ClipY1;
+    h -= (ClipY1 - y), y = ClipY1;
   if (x + w > ClipX2)
     w = ClipX2 - x;
-  if (x + h > ClipX2)
+  if (y + h > ClipY2)
     h = ClipY2 - y;
   if ((w <= 0) || (h <= 0))
     return;
   switch (pfmt.PixelBytes)
   {
     case 1:
-      while (w)
+      while (h)
       {
         memset (GetPixelAt (x, y), color, w);
-        y++;
+        y++; h--;
       } /* endwhile */
       break;
     case 2:
-      while (w)
+      while (h)
       {
         register UShort *dest = (UShort *)GetPixelAt (x, y);
         register int count = w;
         while (count--) *dest++ = color;
-        y++;
+        y++; h--;
       } /* endwhile */
       break;
     case 4:
-      while (w)
+      while (h)
       {
         register ULong *dest = (ULong *)GetPixelAt (x, y);
         register int count = w;
         while (count--) *dest++ = color;
-        y++;
+        y++; h--;
       } /* endwhile */
       break;
   } /* endswitch */

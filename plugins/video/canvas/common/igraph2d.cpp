@@ -73,7 +73,7 @@ STDMETHODIMP IXGraphics2D::DrawLine(float x1, float y1, float x2, float y2, int 
 STDMETHODIMP IXGraphics2D::DrawBox (int x, int y, int w, int h, int color)
 {
   METHOD_PROLOGUE( csGraphics2D, XGraphics2D );
-  (pThis->DrawBox)(x, y, w, h, color);
+  pThis->DrawBox (x, y, w, h, color);
   return S_OK;
 }
 
