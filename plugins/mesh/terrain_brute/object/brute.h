@@ -119,7 +119,7 @@ public:
   bool IsLeaf () 
   { return children[0] == 0; }
 
-  void DrawTest (iRenderView *rview, uint32 frustum_mask, 
+  void DrawTest (iGraphics3D* g3d, iRenderView *rview, uint32 frustum_mask, 
                  csReversibleTransform &transform);
 
   bool detach;
@@ -235,6 +235,7 @@ private:
   float lod_distance;
 
   iObjectRegistry* object_reg;
+  csRef<iGraphics3D> g3d;
   iBase* logparent;
   csRef<iMeshObjectFactory> pFactory;
   csRef<iMeshObjectDrawCallback> vis_cb;

@@ -385,7 +385,8 @@ void csTerrBlock::CalcLOD (iRenderView *rview)
       children[i]->CalcLOD (rview);
 }
 
-void csTerrBlock::DrawTest (iRenderView *rview, uint32 frustum_mask,
+void csTerrBlock::DrawTest (iGraphics3D* g3d,
+			    iRenderView *rview, uint32 frustum_mask,
                             csReversibleTransform &transform)
 {
   if (!built)
@@ -398,17 +399,15 @@ void csTerrBlock::DrawTest (iRenderView *rview, uint32 frustum_mask,
                     children[2]->built &&
                     children[3]->built)
   {
-    children[0]->DrawTest (rview, frustum_mask, transform);
-    children[1]->DrawTest (rview, frustum_mask, transform);
-    children[2]->DrawTest (rview, frustum_mask, transform);
-    children[3]->DrawTest (rview, frustum_mask, transform);
+    children[0]->DrawTest (g3d, rview, frustum_mask, transform);
+    children[1]->DrawTest (g3d, rview, frustum_mask, transform);
+    children[2]->DrawTest (g3d, rview, frustum_mask, transform);
+    children[3]->DrawTest (g3d, rview, frustum_mask, transform);
     return;
   }
 
   if (!mesh_vertices)
   {
-    csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (terr->object_reg, iGraphics3D);
-
     int num_mesh_vertices = (res+1)*(res+1);
     mesh_vertices = 
       g3d->CreateRenderBuffer (
@@ -456,7 +455,7 @@ void csTerrBlock::DrawTest (iRenderView *rview, uint32 frustum_mask,
     texcoord_data = 0;
 
     mesh_colors = 
-      g3d->CreateRenderBuffer (sizeof(csVector2)*num_mesh_vertices,
+      g3d->CreateRenderBuffer (sizeof(csVector3)*num_mesh_vertices,
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
       3, false);
     mesh_colors->CopyToBuffer (color_data,
@@ -580,6 +579,7 @@ csTerrainObject::csTerrainObject (iObjectRegistry* object_reg,
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTerrainObjectState);
   csTerrainObject::object_reg = object_reg;
   csTerrainObject::pFactory = pFactory;
+  g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   logparent = 0;
   initialized = false;
 
@@ -951,7 +951,7 @@ bool csTerrainObject::DrawTest (iRenderView* rview, iMovable* movable,
   rview->SetupClipPlanes (tr_o2c, planes, frustum_mask);
 
   //rendermeshes.Empty ();
-  rootblock->DrawTest (rview, 0, tr_o2c);
+  rootblock->DrawTest (g3d, rview, 0, tr_o2c);
 
   if (returnMeshes->Length () == 0)
     return false;

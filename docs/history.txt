@@ -31,6 +31,12 @@ chronological order.
 	- aarobber added a Clone function to iMeshObjectFactory.  None of them
 	  are currently implemented and will return 0.
 	- aarobber implemented csParticlesObject's Clone function.
+	- Jorrit fixed bruteblock. It would allocate a color buffer with
+	  only room for two components per color instead of three. This
+	  would crash in many cases.
+	- Jorrit did a small optimization to bruteblock. Instead of getting
+	  g3d from the object registry all the time it is now cached
+	  in the mesh object.
 2-Jun-2004
 	- Jorrit reverted the change from Andres Freund that checks on the
 	  presence of <params> in a mesh object. There are cases where
