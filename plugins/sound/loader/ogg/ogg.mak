@@ -61,7 +61,7 @@ sndogg: $(OUTDIRS) $(SNDOGG)
 # XXX: not that nice here, should add a test for vorbisfile and libvorbis to
 # configure as well...
 $(SNDOGG): $(OBJ.SNDOGG) $(LIB.SNDOGG)
-	$(DO.PLUGIN) $(OGG.LFLAGS) -lvorbisfile -lvorbis
+	$(DO.PLUGIN) $(VORBISFILE.LFLAGS)
 
 clean: sndoggclean
 sndoggclean:

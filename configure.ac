@@ -1248,15 +1248,37 @@ CS_CHECK_LIB_WITH([mikmod],
 
 
 #-----------------------------------------------------------------------------
-# Check for libogg.  In addition to the standard installed locations, we
-# also search CS/libs/libogg*.
+# Check for libogg/libvorbis/libvorbisfile.
+# In addition to the standard installed locations, we
+# also search CS/libs/libogg*.CS/libs/libvorbis.* CS/libs/libvorbisfile*
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([ogg],
     [AC_LANG_PROGRAM(
 	[#include <ogg/ogg.h>],
-	[/*some test would be nice here...*/])],
+	[ogg_sync_state state; ogg_sync_init(&state);])],
     [libs/libogg*], [],                                                         
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_libogg], [OGG])])
+AS_IF([test "$cs_cv_libogg" = yes],
+    [CS_CHECK_LIB_WITH([vorbis],
+	[AC_LANG_PROGRAM([#include <vorbis/codec.h>],
+	  [vorbis_info info; vorbis_info_init(&info);])],
+	[libs/libvorbis.*], [],
+	[CS_MAKEFILE_BUILD_RESULT([cs_cv_libvorbis], [VORBIS])], [],
+	[$cs_cv_libogg_cflags],
+	[$cs_cv_libogg_lflags],
+	[$cs_cv_libogg_libs])])
+AS_IF([test "$cs_cv_libvorbis" = yes],
+    [CS_CHECK_LIB_WITH([vorbisfile],
+	[AC_LANG_PROGRAM(
+	  [#include <vorbis/vorbisfile.h>
+	   #include <stdio.h>],
+	  [ OggVorbis_File file;
+	    ov_test(stdin, &file, "", 0); ])],
+	[libs/libvorbisfile*], [],
+	[CS_MAKEFILE_BUILD_RESULT([cs_cv_libvorbisfile], [VORBISFILE])], [],
+	[$cs_cv_libogg_cflags $cs_cv_libvorbis_cflags],
+	[$cs_cv_libogg_lflags $cs_cv_libvorbis_lflags],
+	[$cs_cv_libogg_libs $cs_cv_libvorbis_libs])])
 
 
 
@@ -1267,11 +1289,10 @@ CS_CHECK_LIB_WITH([ogg],
 CS_CHECK_LIB_WITH([3ds],
     [AC_LANG_PROGRAM(
 	[#include <lib3ds/file.h>],
-	[/*some test would be nice here...*/])],
+	[lib3ds_file_new();])],
     [libs/lib3ds*], [],                                                         
-    [CS_MAKEFILE_BUILD_RESULT([cs_cv_lib3ds], [3DS])])
-
-
+    [CS_MAKEFILE_BUILD_RESULT([cs_cv_lib3ds], [3DS])], [],
+    [], [],[-lm])
 
 #-----------------------------------------------------------------------------
 # Check for libode.  In addition to the standard installed locations, we
@@ -1280,8 +1301,8 @@ CS_CHECK_LIB_WITH([3ds],
 CS_CHECK_LIB_WITH([ode],
     [AC_LANG_PROGRAM(
 	[#include <ode/ode.h>],
-	[/*some test would be nice here...*/])],
-    [libs/libode*], [],                                                         
+	[dWorldCreate();])],
+    [libs/libode*], [C++],
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_libode], [ODE])])
 
 
@@ -1292,8 +1313,8 @@ CS_CHECK_LIB_WITH([ode],
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([openal],
     [AC_LANG_PROGRAM(
-	[#include <AL/al.h>],
-	[/*some test would be nice here...*/])],
+	[#include <AL/alut.h>],
+	[alutInit (0, 0);])],
     [libs/libopenal*], [],
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_libopenal], [OPENAL])])
 

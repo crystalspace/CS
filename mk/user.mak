@@ -130,7 +130,7 @@ ifeq ($(FT2.AVAILABLE),yes)
 PLUGINS.DYNAMIC += font/server/freefnt2
 endif
 PLUGINS.DYNAMIC += aws
-ifeq ($(OGG.AVAILABLE),yes)
+ifeq ($(VORBISFILE.AVAILABLE),yes)
 PLUGINS.DYNAMIC += sound/loader/ogg
 endif
 ifeq ($(MIKMOD.AVAILABLE),yes)
