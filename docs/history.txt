@@ -23,7 +23,12 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed several compilation warnings and errors in
 	  simpcons.h and cssprite.cpp which afflicted MSVC++.
 	- Made the colors for Blocks a little nicer.
-	- Fixed bug with camera position. Uninitialized variable.
+	- Fixed bug with camera position in Blocks. Uninitialized variable.
+	- Dynamic light for Blocks startup screen works again.
+	- Blocks writes out score now.
+	- Blocks unpauses correctly when you restart game while paused.
+	- Added visible raster to Blocks to help see where a shape
+	  will fall.
 	- Eric Sunshine fixed a couple problems with handling of key input
 	  in the Win32 driver in the absence of DirectInput.  The ESC key
 	  was generating multiple key-down events, and the Return key was

@@ -19,15 +19,15 @@
 /*
   TODO:
     Make nice startup screen with moving blocks as demo.
-    Print out score.
     Detect end of game when blocks are too high.
     Better rotation of blocks.
     Better textures.
-    Better recognition of side of play area.
     Make keys configurable.
     Fix bug with partially shifted blocks.
     Add highscore list.
     Add 'nightmare' level.
+    'pause' should temporarily remove visible blocks (or fog area).
+    Make it possible to change play area size.
  */
 
 #define SYSDEF_ACCESS
@@ -153,6 +153,19 @@ void Blocks::init_game ()
   move_down_dx = dest_move_down_dx[cur_hor_dest];
   move_down_dy = dest_move_down_dy[cur_hor_dest];
   cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
+
+  pause = false;
+}
+
+void reset_vertex_colors (csThing* th)
+{
+  int i;
+  for (i = 0 ; i < th->GetNumPolygons () ; i++)
+  {
+    csPolygon3D* p = (csPolygon3D*)(th->GetPolygon (i));
+    p->UpdateVertexLighting (NULL, csColor (0, 0, 0), true, true);
+    p->UpdateVertexLighting (NULL, csColor (0, 0, 0), false, true);
+  }
 }
 
 
@@ -183,6 +196,20 @@ csMatrix3 Blocks::create_rotate_z (float angle)
   return rotate_z;
 }
 
+csPolygonTemplate* add_polygon_template (csThingTemplate* tmpl,
+	char* name, csTextureHandle* texture,
+	int vt0, int vt1, int vt2, int vt3 = -1)
+{
+  csPolygonTemplate* p;
+  p = new csPolygonTemplate (tmpl, name, texture);
+  tmpl->AddPolygon (p);
+  p->AddVertex (vt0);
+  p->AddVertex (vt1);
+  p->AddVertex (vt2);
+  if (vt3 != -1) p->AddVertex (vt3);
+  return p;
+}
+
 void Blocks::add_pilar_template ()
 {
   float dim = CUBE_DIM/2.;
@@ -202,67 +229,37 @@ void Blocks::add_pilar_template ()
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
-  p = new csPolygonTemplate (pilar_tmpl, "d", pilar_txt);
-  pilar_tmpl->AddPolygon (p);
-  p->AddVertex (3);
-  p->AddVertex (2);
-  p->AddVertex (1);
-  p->AddVertex (0);
+  p = add_polygon_template (pilar_tmpl, "d", pilar_txt, 3, 2, 1, 0);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	pilar_tmpl->Vtex (0), pilar_tmpl->Vtex (1), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = new csPolygonTemplate (pilar_tmpl, "b", pilar_txt);
-  pilar_tmpl->AddPolygon (p);
-  p->AddVertex (0);
-  p->AddVertex (1);
-  p->AddVertex (5);
-  p->AddVertex (4);
+  p = add_polygon_template (pilar_tmpl, "b", pilar_txt, 0, 1, 5, 4);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	pilar_tmpl->Vtex (0), pilar_tmpl->Vtex (1), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = new csPolygonTemplate (pilar_tmpl, "t", pilar_txt);
-  pilar_tmpl->AddPolygon (p);
-  p->AddVertex (4);
-  p->AddVertex (5);
-  p->AddVertex (6);
-  p->AddVertex (7);
+  p = add_polygon_template (pilar_tmpl, "t", pilar_txt, 4, 5, 6, 7);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	pilar_tmpl->Vtex (4), pilar_tmpl->Vtex (5), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = new csPolygonTemplate (pilar_tmpl, "f", pilar_txt);
-  pilar_tmpl->AddPolygon (p);
-  p->AddVertex (7);
-  p->AddVertex (6);
-  p->AddVertex (2);
-  p->AddVertex (3);
+  p = add_polygon_template (pilar_tmpl, "f", pilar_txt, 7, 6, 2, 3);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	pilar_tmpl->Vtex (7), pilar_tmpl->Vtex (6), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = new csPolygonTemplate (pilar_tmpl, "l", pilar_txt);
-  pilar_tmpl->AddPolygon (p);
-  p->AddVertex (4);
-  p->AddVertex (7);
-  p->AddVertex (3);
-  p->AddVertex (0);
+  p = add_polygon_template (pilar_tmpl, "l", pilar_txt, 4, 7, 3, 0);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	pilar_tmpl->Vtex (7), pilar_tmpl->Vtex (3), 1, A, B, C);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = new csPolygonTemplate (pilar_tmpl, "r", pilar_txt);
-  pilar_tmpl->AddPolygon (p);
-  p->AddVertex (6);
-  p->AddVertex (5);
-  p->AddVertex (1);
-  p->AddVertex (2);
+  p = add_polygon_template (pilar_tmpl, "r", pilar_txt, 6, 5, 1, 2);
   p->PlaneNormal (&A, &B, &C);
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
       	pilar_tmpl->Vtex (6), pilar_tmpl->Vtex (5), 1, A, B, C);
@@ -270,6 +267,71 @@ void Blocks::add_pilar_template ()
 
   world->thing_templates.Push (pilar_tmpl);
 }
+
+void Blocks::add_vrast_template ()
+{
+  float dim = RAST_DIM;
+  vrast_tmpl = new csThingTemplate ();
+  vrast_tmpl->SetName ("vrast");
+  vrast_tmpl->AddVertex (-dim, 0, dim);
+  vrast_tmpl->AddVertex (dim, 0, dim);
+  vrast_tmpl->AddVertex (-dim, ZONE_HEIGHT*CUBE_DIM, dim);
+  vrast_tmpl->AddVertex (dim, ZONE_HEIGHT*CUBE_DIM, dim);
+
+  csPolygonTemplate* p;
+  float A, B, C;
+  csMatrix3 tx_matrix;
+  csVector3 tx_vector;
+
+  p = add_polygon_template (vrast_tmpl, "f", raster_txt, 0, 1, 3, 2);
+  p->PlaneNormal (&A, &B, &C);
+  TextureTrans::compute_texture_space (tx_matrix, tx_vector,
+      	vrast_tmpl->Vtex (0), vrast_tmpl->Vtex (1), 1, A, B, C);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+
+#if 0
+  p = add_polygon_template (vrast_tmpl, "b", raster_txt, 2, 3, 1, 0);
+  p->PlaneNormal (&A, &B, &C);
+  TextureTrans::compute_texture_space (tx_matrix, tx_vector,
+      	vrast_tmpl->Vtex (0), vrast_tmpl->Vtex (1), 1, A, B, C);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+#endif
+
+  world->thing_templates.Push (vrast_tmpl);
+}
+
+void Blocks::add_hrast_template ()
+{
+  float dim = RAST_DIM;
+  hrast_tmpl = new csThingTemplate ();
+  hrast_tmpl->SetName ("hrast");
+  hrast_tmpl->AddVertex ((-(float)ZONE_DIM/2.)*CUBE_DIM, .02, -dim);
+  hrast_tmpl->AddVertex ((-(float)ZONE_DIM/2.)*CUBE_DIM, .02, dim);
+  hrast_tmpl->AddVertex (((float)ZONE_DIM/2.)*CUBE_DIM, .02, -dim);
+  hrast_tmpl->AddVertex (((float)ZONE_DIM/2.)*CUBE_DIM, .02, dim);
+
+  csPolygonTemplate* p;
+  float A, B, C;
+  csMatrix3 tx_matrix;
+  csVector3 tx_vector;
+
+  p = add_polygon_template (hrast_tmpl, "f", raster_txt, 0, 1, 3, 2);
+  p->PlaneNormal (&A, &B, &C);
+  TextureTrans::compute_texture_space (tx_matrix, tx_vector,
+      	hrast_tmpl->Vtex (0), hrast_tmpl->Vtex (1), 1, A, B, C);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+
+#if 0
+  p = add_polygon_template (hrast_tmpl, "b", raster_txt, 2, 3, 1, 0);
+  p->PlaneNormal (&A, &B, &C);
+  TextureTrans::compute_texture_space (tx_matrix, tx_vector,
+      	hrast_tmpl->Vtex (0), hrast_tmpl->Vtex (1), 1, A, B, C);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+#endif
+
+  world->thing_templates.Push (hrast_tmpl);
+}
+
 
 void Blocks::add_pilar (int x, int y)
 {
@@ -285,6 +347,37 @@ void Blocks::add_pilar (int x, int y)
   pilar->Transform ();
 }
 
+void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
+{
+  csThing* vrast;
+  vrast = new csThing ();
+  vrast->SetName ("vrast");
+  vrast->SetSector (room);
+  vrast->SetFlags (CS_ENTITY_MOVEABLE, 0);
+  vrast->MergeTemplate (vrast_tmpl, raster_txt, 1);
+  room->AddThing (vrast);
+  csVector3 v ((x-ZONE_DIM/2)*CUBE_DIM+dx, 0, (y-ZONE_DIM/2)*CUBE_DIM+dy);
+  csMatrix3 rot = create_rotate_y (rot_z);
+  vrast->Transform (rot);
+  vrast->SetMove (room, v);
+  vrast->Transform ();
+}
+
+void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
+{
+  csThing* hrast;
+  hrast = new csThing ();
+  hrast->SetName ("hrast");
+  hrast->SetSector (room);
+  hrast->SetFlags (CS_ENTITY_MOVEABLE, 0);
+  hrast->MergeTemplate (hrast_tmpl, raster_txt, 1);
+  room->AddThing (hrast);
+  csVector3 v ((x-ZONE_DIM/2)*CUBE_DIM+dx, 0, (y-ZONE_DIM/2)*CUBE_DIM+dy);
+  csMatrix3 rot = create_rotate_y (rot_z);
+  hrast->Transform (rot);
+  hrast->SetMove (room, v);
+  hrast->Transform ();
+}
 
 void Blocks::add_cube_template ()
 {
@@ -304,88 +397,34 @@ void Blocks::add_cube_template ()
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
-  p = new csPolygonTemplate (cube_tmpl, "d1", cube_txt);
-  cube_tmpl->AddPolygon (p);
-  p->AddVertex (3);
-  p->AddVertex (2);
-  p->AddVertex (1);
+  p = add_polygon_template (cube_tmpl, "d1", cube_txt, 3, 2, 1);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+  p = add_polygon_template (cube_tmpl, "d2", cube_txt, 3, 1, 0);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = new csPolygonTemplate (cube_tmpl, "d2", cube_txt);
-  cube_tmpl->AddPolygon (p);
-  p->AddVertex (3);
-  p->AddVertex (1);
-  p->AddVertex (0);
+  p = add_polygon_template (cube_tmpl, "b1", cube_txt, 0, 1, 5);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+  p = add_polygon_template (cube_tmpl, "b2", cube_txt, 0, 5, 4);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = new csPolygonTemplate (cube_tmpl, "b1", cube_txt);
-  cube_tmpl->AddPolygon (p);
-  p->AddVertex (0);
-  p->AddVertex (1);
-  p->AddVertex (5);
+  p = add_polygon_template (cube_tmpl, "t1", cube_txt, 4, 5, 6);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+  p = add_polygon_template (cube_tmpl, "t2", cube_txt, 4, 6, 7);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = new csPolygonTemplate (cube_tmpl, "b2", cube_txt);
-  cube_tmpl->AddPolygon (p);
-  p->AddVertex (0);
-  p->AddVertex (5);
-  p->AddVertex (4);
+  p = add_polygon_template (cube_tmpl, "f1", cube_txt, 7, 6, 2);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+  p = add_polygon_template (cube_tmpl, "f2", cube_txt, 7, 2, 3);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = new csPolygonTemplate (cube_tmpl, "t1", cube_txt);
-  cube_tmpl->AddPolygon (p);
-  p->AddVertex (4);
-  p->AddVertex (5);
-  p->AddVertex (6);
+  p = add_polygon_template (cube_tmpl, "l1", cube_txt, 4, 7, 3);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+  p = add_polygon_template (cube_tmpl, "l2", cube_txt, 4, 3, 0);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
-  p = new csPolygonTemplate (cube_tmpl, "t2", cube_txt);
-  cube_tmpl->AddPolygon (p);
-  p->AddVertex (4);
-  p->AddVertex (6);
-  p->AddVertex (7);
+  p = add_polygon_template (cube_tmpl, "r1", cube_txt, 6, 5, 1);
   p->SetTextureSpace (tx_matrix, tx_vector);
-
-  p = new csPolygonTemplate (cube_tmpl, "f1", cube_txt);
-  cube_tmpl->AddPolygon (p);
-  p->AddVertex (7);
-  p->AddVertex (6);
-  p->AddVertex (2);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-
-  p = new csPolygonTemplate (cube_tmpl, "f2", cube_txt);
-  cube_tmpl->AddPolygon (p);
-  p->AddVertex (7);
-  p->AddVertex (2);
-  p->AddVertex (3);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-
-  p = new csPolygonTemplate (cube_tmpl, "l1", cube_txt);
-  cube_tmpl->AddPolygon (p);
-  p->AddVertex (4);
-  p->AddVertex (7);
-  p->AddVertex (3);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-
-  p = new csPolygonTemplate (cube_tmpl, "l2", cube_txt);
-  cube_tmpl->AddPolygon (p);
-  p->AddVertex (4);
-  p->AddVertex (3);
-  p->AddVertex (0);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-
-  p = new csPolygonTemplate (cube_tmpl, "r1", cube_txt);
-  cube_tmpl->AddPolygon (p);
-  p->AddVertex (6);
-  p->AddVertex (5);
-  p->AddVertex (1);
-  p->SetTextureSpace (tx_matrix, tx_vector);
-
-  p = new csPolygonTemplate (cube_tmpl, "r2", cube_txt);
-  cube_tmpl->AddPolygon (p);
-  p->AddVertex (6);
-  p->AddVertex (1);
-  p->AddVertex (2);
+  p = add_polygon_template (cube_tmpl, "r2", cube_txt, 6, 1, 2);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
   world->thing_templates.Push (cube_tmpl);
@@ -403,7 +442,7 @@ void set_uv (csPolygon3D* p, float u1, float v1, float u2, float v2,
   gs->SetUV (2, u3, v3);
 }
 
-csThing* Blocks::create_cube_thing (int dx, int dy, int dz)
+csThing* Blocks::create_cube_thing (float dx, float dy, float dz)
 {
   csThing* cube;
   cube = new csThing ();
@@ -430,7 +469,7 @@ csThing* Blocks::create_cube_thing (int dx, int dy, int dz)
   return cube;
 }
 
-void Blocks::add_cube (int dx, int dy, int dz, int x, int y, int z)
+void Blocks::add_cube (float dx, float dy, float dz, float x, float y, float z)
 {
   csThing* cube = add_cube_thing (room, dx, dy, dz,
   	(x-ZONE_DIM/2)*CUBE_DIM,
@@ -443,7 +482,7 @@ void Blocks::add_cube (int dx, int dy, int dz, int x, int y, int z)
   num_cubes++;
 }
 
-csThing* Blocks::add_cube_thing (csSector* sect, int dx, int dy, int dz,
+csThing* Blocks::add_cube_thing (csSector* sect, float dx, float dy, float dz,
 	float x, float y, float z)
 {
   csThing* cube = create_cube_thing (dx, dy, dz);
@@ -570,6 +609,14 @@ void Blocks::start_shape (BlShapeType type, int x, int y, int z)
   cube_y = y;
   cube_z = z;
   speed = .2;
+  int i;
+  for (i = 0 ; i < num_cubes ; i++)
+  {
+    csThing* t = cube_info[i].thing;
+    reset_vertex_colors (t);
+    room->ShineLights (t);
+  }
+  csPolygonSet::current_light_frame_number++;
 }
 
 void Blocks::start_demo_shape (BlShapeType type, float x, float y, float z)
@@ -811,17 +858,17 @@ void Blocks::rotate_shape_internal (const csMatrix3& rot)
   for (i = 0 ; i < num_cubes ; i++)
   {
     csVector3 v;
-    v.x = (float)cube_info[i].dx;
-    v.y = (float)cube_info[i].dy;
-    v.z = (float)cube_info[i].dz;
+    v.x = cube_info[i].dx*10.;
+    v.y = cube_info[i].dy*10.;
+    v.z = cube_info[i].dz*10.;
     v = rot * v;
 
-    if (v.x < 0) cube_info[i].dx = (int)(v.x-.5);
-    else cube_info[i].dx = (int)(v.x+.5);
-    if (v.y < 0) cube_info[i].dy = (int)(v.y-.5);
-    else cube_info[i].dy = (int)(v.y+.5);
-    if (v.z < 0) cube_info[i].dz = (int)(v.z-.5);
-    else cube_info[i].dz = (int)(v.z+.5);
+    if (v.x < 0) cube_info[i].dx = (float)((int)(v.x-.5)/10.);
+    else cube_info[i].dx = (float)((int)(v.x+.5)/10.);
+    if (v.y < 0) cube_info[i].dy = (float)((int)(v.y-.5)/10.);
+    else cube_info[i].dy = (float)((int)(v.y+.5)/10.);
+    if (v.z < 0) cube_info[i].dz = (float)((int)(v.z-.5)/10.);
+    else cube_info[i].dz = (float)((int)(v.z+.5)/10.);
   }
 }
 
@@ -833,9 +880,9 @@ void Blocks::freeze_shape ()
 
   for (i = 0 ; i < num_cubes ; i++)
   {
-    x = cube_x+cube_info[i].dx;
-    y = cube_y+cube_info[i].dy;
-    z = cube_z+cube_info[i].dz;
+    x = cube_x+(int)cube_info[i].dx;
+    y = cube_y+(int)cube_info[i].dy;
+    z = cube_z+(int)cube_info[i].dz;
     set_cube (x, y, z, true);
     sprintf (cubename, "cubeAt%d%d%d", x, y, z);
     // Before we let go of the shape (lose the pointer to it) we set it's
@@ -851,9 +898,9 @@ void Blocks::dump_shape ()
   CsPrintf (MSG_DEBUG_0,"Dump shape:\n");
   for (i = 0 ; i < num_cubes ; i++)
   {
-    x = cube_info[i].dx;
-    y = cube_info[i].dy;
-    z = cube_info[i].dz;
+    x = (int)cube_info[i].dx;
+    y = (int)cube_info[i].dy;
+    z = (int)cube_info[i].dz;
     CsPrintf (MSG_DEBUG_0, " %d: (%d,%d,%d) d=(%d,%d,%d)\n",
     	i, cube_x+x, cube_y+y, cube_z+z, x, y, z);
   }
@@ -865,9 +912,9 @@ bool Blocks::check_new_shape_location (int dx, int dy, int dz)
   int x, y, z;
   for (i = 0 ; i < num_cubes ; i++)
   {
-    x = cube_x+cube_info[i].dx + dx;
-    y = cube_y+cube_info[i].dy + dy;
-    z = cube_z+cube_info[i].dz + dz;
+    x = cube_x+(int)cube_info[i].dx + dx;
+    y = cube_y+(int)cube_info[i].dy + dy;
+    z = cube_z+(int)cube_info[i].dz + dz;
     if (get_cube (x, y, z)) return false;
   }
   return true;
@@ -899,17 +946,6 @@ bool Blocks::check_new_shape_rotation (const csMatrix3& rot)
   return true;
 }
 
-void reset_vertex_colors (csThing* th)
-{
-  int i;
-  for (i = 0 ; i < th->GetNumPolygons () ; i++)
-  {
-    csPolygon3D* p = (csPolygon3D*)(th->GetPolygon (i));
-    p->UpdateVertexLighting (NULL, csColor (0, 0, 0), true, true);
-    p->UpdateVertexLighting (NULL, csColor (0, 0, 0), false, true);
-  }
-}
-
 void Blocks::updateScore (void)
 {
   int increase = 0;
@@ -923,7 +959,7 @@ void Blocks::updateScore (void)
     }
   }
 
-  score+=increase*increase;
+  score += increase*increase;
 }
 
 void Blocks::move_cubes (time_t elapsed_time)
@@ -1057,12 +1093,12 @@ void Blocks::InitTextures ()
 
   // Maybe we shouldn't load the textures again if this is not the first time.
   Sys->set_pilar_texture (
-    csLoader::LoadTexture (Sys->world, "txt1", "stone4.gif"));
+    csLoader::LoadTexture (Sys->world, "pilar", "stone4.gif"));
   Sys->set_cube_texture (
-    csLoader::LoadTexture (Sys->world, "txt2", "cube.gif"));
-  //Sys->set_cube_texture (
-    //csLoader::LoadTexture (Sys->world, "txt2", "clouds_thick1.jpg"));
-  csLoader::LoadTexture (Sys->world, "txt3", "mystone2.gif");
+    csLoader::LoadTexture (Sys->world, "cube", "cube.gif"));
+  Sys->set_raster_texture (
+    csLoader::LoadTexture (Sys->world, "raster", "clouds_thick1.jpg"));
+  csLoader::LoadTexture (Sys->world, "room", "mystone2.gif");
   csLoader::LoadTexture (Sys->world, "clouds", "clouds.gif");
 }
 
@@ -1073,7 +1109,7 @@ void Blocks::InitWorld ()
   //-----
   // Prepare the game area.
   //-----
-  csTextureHandle* tm = world->GetTextures ()->GetTextureMM ("txt3");
+  csTextureHandle* tm = world->GetTextures ()->GetTextureMM ("room");
   room = Sys->world->NewSector ();
   room->SetName ("room");
   Sys->set_cube_room (room);
@@ -1115,10 +1151,27 @@ void Blocks::InitWorld ()
 
   Sys->add_pilar_template ();
   Sys->add_cube_template ();
+  Sys->add_vrast_template ();
+  Sys->add_hrast_template ();
+
   Sys->add_pilar (-1, -1);
   Sys->add_pilar (ZONE_DIM, -1);
   Sys->add_pilar (-1, ZONE_DIM);
   Sys->add_pilar (ZONE_DIM, ZONE_DIM);
+
+  int i;
+  for (i = 0 ; i < ZONE_DIM-1 ; i++)
+  {
+    Sys->add_vrast (-1, i, CUBE_DIM/2, CUBE_DIM/2, -M_PI/2);
+    Sys->add_vrast (ZONE_DIM-1, i, CUBE_DIM/2, CUBE_DIM/2, M_PI/2);
+    Sys->add_vrast (i, -1, CUBE_DIM/2, CUBE_DIM/2, 0);
+    Sys->add_vrast (i, ZONE_DIM-1, CUBE_DIM/2, CUBE_DIM/2, M_PI);
+  }
+
+  Sys->add_hrast (-1, 2, CUBE_DIM/2, CUBE_DIM/2, -M_PI/2);
+  Sys->add_hrast (ZONE_DIM-1, 2, CUBE_DIM/2, CUBE_DIM/2, -M_PI/2);
+  Sys->add_hrast (2, -1, CUBE_DIM/2, CUBE_DIM/2, 0);
+  Sys->add_hrast (2, ZONE_DIM-1, CUBE_DIM/2, CUBE_DIM/2, 0);
 
   room->AddLight (new csStatLight (-3, 5, 0, 10, .8, .4, .4, false));
   room->AddLight (new csStatLight (3, 5, 0, 10, .4, .4, .8, false));
@@ -1280,7 +1333,6 @@ void Blocks::lower (time_t elapsed_time)
 {
   float elapsed = (float)elapsed_time/1000.;
   float elapsed_fall = elapsed*speed;
-  float elapsed_move = elapsed*1.6;
   float elapsed_cam_move = elapsed*1.6;
 
   if (cam_move_dist)
@@ -1390,7 +1442,10 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
   view->Draw ();
 
   // Start drawing 2D graphics
-  //if (!Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+  if (!Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+  char scorebuf[50];
+  sprintf (scorebuf, "%d", score);
+  Gfx2D->Write (10, Sys->FrameHeight-20, 0xffff, 0, scorebuf);
 
   // Drawing code ends here
   Gfx3D->FinishDraw ();

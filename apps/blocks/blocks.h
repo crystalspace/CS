@@ -72,6 +72,7 @@ enum BlShapeType
 #define NUM_HARD_SHAPE (SHAPE_FLATXX+1)
 
 #define CUBE_DIM .4
+#define RAST_DIM .02
 
 // By zone we mean the space where the shapes move/fall.
 #define ZONE_DIM 6
@@ -86,7 +87,7 @@ enum BlShapeType
 struct CubeInfo
 {
   csThing* thing;
-  int dx, dy, dz;
+  float dx, dy, dz;
 };
 
 ///
@@ -95,8 +96,11 @@ class Blocks : public SysSystemDriver
 private:
   csThingTemplate* cube_tmpl;
   csThingTemplate* pilar_tmpl;
+  csThingTemplate* vrast_tmpl;
+  csThingTemplate* hrast_tmpl;
   csTextureHandle* cube_txt;
   csTextureHandle* pilar_txt;
+  csTextureHandle* raster_txt;
   csSector* room;
   csSector* demo_room;
   csDynLight* dynlight;
@@ -226,19 +230,24 @@ public:
   void eatkeypress (int key, bool shift, bool alt, bool ctrl);
 
   // Creating cubes and other geometry.
-  csThing* create_cube_thing (int dx, int dy, int dz);
-  csThing* add_cube_thing (csSector* sect, int dx, int dy, int dz,
+  csThing* create_cube_thing (float dx, float dy, float dz);
+  csThing* add_cube_thing (csSector* sect, float dx, float dy, float dz,
   	float x, float y, float z);
-  void add_cube (int dx, int dy, int dz, int x, int y, int z);
+  void add_cube (float dx, float dy, float dz, float x, float y, float z);
   void add_pilar (int x, int y);
+  void add_vrast (int x, int y, float dx, float dy, float rot_z);
+  void add_hrast (int x, int y, float dx, float dy, float rot_z);
 
   // All the templates for creating geometry.
   void add_cube_template ();
   void add_pilar_template ();
+  void add_vrast_template ();
+  void add_hrast_template ();
 
   // Default textures for geometry.
   void set_cube_texture (csTextureHandle* ct) { cube_txt = ct; }
   void set_pilar_texture (csTextureHandle* ct) { pilar_txt = ct; }
+  void set_raster_texture (csTextureHandle* ct) { raster_txt = ct; }
 
   // Handle movement of the game.
   void move_cubes (time_t elapsed_time);
