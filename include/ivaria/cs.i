@@ -203,7 +203,7 @@ struct iGraphics2D : public iBase
   virtual bool SetMouseCursor (csMouseCursorID iShape) = 0;
 //  virtual bool PerformExtension (char const* command, ...) = 0;
 //  virtual bool PerformExtensionV (char const* command, va_list) = 0;
-  virtual iImage *ScreenShot () = 0;
+  virtual csPtr<iImage> ScreenShot () = 0;
   virtual iGraphics2D *CreateOffScreenCanvas (int width, int height,
      void *buffer, bool alone_hint, csPixelFormat *ipfmt,
      csRGBpixel *palette = NULL, int pal_size = 0) = 0;
@@ -331,15 +331,15 @@ struct iImage : public iBase
   int GetHeight ();
   int GetSize ();
   void Rescale (int NewWidth, int NewHeight);
-  iImage *MipMap (int step, csRGBpixel *transp);
+  csPtr<iImage> MipMap (int step, csRGBpixel *transp);
   void SetName (const char *iName);
   const char *GetName ();
   int GetFormat ();
   csRGBpixel *GetPalette ();
   void *GetAlpha ();
   void SetFormat (int iFormat);
-  iImage *Clone ();
-  iImage *Crop (int x, int y, int width, int height);
+  csPtr<iImage> Clone ();
+  csPtr<iImage> Crop (int x, int y, int width, int height);
 };
 
 struct iTextureManager : public iBase

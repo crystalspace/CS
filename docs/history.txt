@@ -25,6 +25,8 @@ The history order is reversed so that new features are at the top.
 	      expects such offsets to fit within 16-bits, but these offsets did
 	      not, and there appears to be no way to instruct the assembler to
 	      use 32-bit offsets.
+	- Fixed python plugin for csPtr changes with some functions
+	  that return iImage.
 16-Sep-2002
 	- Fixed a DecRef() problem with the g2d plugin (ddraw). Please
 	  people! When replacing a normal pointer with a csRef you
