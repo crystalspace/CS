@@ -26,8 +26,7 @@ The Windows port of Crystal Space is currently maintained by Philip Wyett
 @subsubsection General Information
 
 To compile Crystal Space for Windows, you'll need the @emph{Microsoft Developer
-Studio} or @emph{Microsoft Visual C++} version 6, with Service pack 5 installed
-and optionally the Microsoft Processor Pack.
+Studio} or @emph{Microsoft Visual C++} version 6, with Service pack 5 installed.
 
 You may try to compile Crystal Space with version 5 of @emph{Visual C++},
 however it is unsupported and not recommended.  @xref{Win32 MSVC5}.
