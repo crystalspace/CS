@@ -3,7 +3,7 @@
 
     This document was written by Eric Sunshine <sunshine@sunshineco.com>
     Copyright (C)1999 by Eric Sunshine
-    1999/10/08
+    1999/10/10
 
     Also see INSTALL.NeXT for installation details.
 ===============================================================================
@@ -588,6 +588,12 @@ This is a list of known problems with the current release of this project.
 
 10. History
 -----------
+1999/10/10 (15r000+CVS)
+    Reworked dynamic linking so that it deals gracefully with the case when it
+        is asked to load the same module multiple times.  It now keeps a
+        record of loaded images plus their handles.  This allows the new
+        Crystal Clear facility to work.
+
 1999/10/06 (15r000+CVS)
     Implemented dynamic linking support.  The 2D driver, 3D renderer, and
         sound & network drivers are now linked into the application

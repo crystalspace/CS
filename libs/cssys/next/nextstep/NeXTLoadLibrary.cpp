@@ -48,53 +48,168 @@ extern "C" {
 }
 
 //-----------------------------------------------------------------------------
-// Symbol Table -- Associates a {handle:symbol} pair with an address.
-// Could be rewritten as a hash table for faster lookups.
+// An extensible array of records.
 //-----------------------------------------------------------------------------
-class NeXTSymbolTable
+class NeXTRecordArray
+    {
+private:
+	char* table;
+	int record_size;
+	int count;
+	int capacity;
+protected:
+virtual	bool compare( void const*, void const* ) const = 0;
+virtual	void destroy( void* ) = 0;
+	void* search( void const* ) const;
+public:
+	NeXTRecordArray( int rec_size ) :
+		table(0), record_size(rec_size), count(0), capacity(0) {}
+	virtual ~NeXTRecordArray() { empty(); }
+	void* append();	// Returns address of new record.
+	void empty();
+    };
+
+void* NeXTRecordArray::append()
+    {
+    if (count >= capacity)
+	{
+	capacity += 64;
+	int const nbytes = capacity * record_size;
+	if (table == 0)
+	    table = (char*)malloc( nbytes );
+	else
+	    table = (char*)realloc( table, nbytes );
+	}
+    return (table + (record_size * count++));
+    }
+
+void* NeXTRecordArray::search( void const* key ) const
+    {
+    char* p = table;
+    for (int i = 0; i < count; i++, p += record_size)
+	if (compare( key, p ))
+	    return p;
+    return 0;
+    }
+
+void NeXTRecordArray::empty()
+    {
+    if (count > 0)
+	{
+	char* p = table;
+	for (int i = 0; i < count; i++, p+= record_size)
+	    destroy(p);
+	free( table );
+	table = 0;
+	count = 0;
+	capacity = 0;
+	}
+    }
+
+
+//-----------------------------------------------------------------------------
+// Image File Table -- Associates an image file name with a handle.
+//-----------------------------------------------------------------------------
+class NeXTImageFileTable : public NeXTRecordArray
+    {
+private:
+	struct Tuple
+	    {
+	    char const* name;
+	    CS_HLIBRARY handle;
+	    };
+protected:
+virtual	bool compare( void const*, void const* ) const;
+virtual	void destroy( void* );
+public:
+	NeXTImageFileTable() : NeXTRecordArray( sizeof(Tuple) ) {}
+	void add( char const* name, CS_HLIBRARY );
+	CS_HLIBRARY find( char const* ) const;
+    };
+
+void NeXTImageFileTable::add( char const* name, CS_HLIBRARY handle )
+    {
+    Tuple* p = (Tuple*)append();
+    p->name = strdup( name );
+    p->handle = handle;
+    }
+
+CS_HLIBRARY NeXTImageFileTable::find( char const* name ) const
+    {
+    Tuple const key = { name, 0 };
+    Tuple const* tuple = (Tuple const*)search( &key );
+    return (tuple == 0 ? 0 : tuple->handle);
+    }
+
+bool NeXTImageFileTable::compare( void const* p1, void const* p2 ) const
+    {
+    return (strcmp(((Tuple const*)p1)->name, ((Tuple const*)p2)->name) == 0);
+    }
+
+void NeXTImageFileTable::destroy( void* p )
+    {
+    free( (char*)((Tuple*)p)->name );
+    }
+
+
+//-----------------------------------------------------------------------------
+// Symbol Table -- Associates a {handle:symbol} pair with an address.
+//-----------------------------------------------------------------------------
+class NeXTSymbolTable : public NeXTRecordArray
     {
 private:
 	struct Tuple
 	    {
 	    CS_HLIBRARY handle;
-	    char const* symbol;	// Does not copy symbol name.
+	    char const* symbol;
 	    PROC address;
 	    };
-
-	Tuple* table;
-	int count;
-	int capacity;
+protected:
+virtual	bool compare( void const*, void const* ) const;
+virtual	void destroy( void* );
 public:
-	NeXTSymbolTable() : table(0), count(0), capacity(0) {}
-	~ NeXTSymbolTable() { if (table != 0) free( table ); }
+	NeXTSymbolTable() : NeXTRecordArray( sizeof(Tuple) ) {}
 	void add( CS_HLIBRARY, char const*, PROC );
 	PROC find( CS_HLIBRARY, char const* ) const;
     };
 
 void NeXTSymbolTable::add( CS_HLIBRARY handle, char const* symbol, PROC addr )
     {
-    if (count >= capacity)
-	{
-	capacity += 64;
-	int const nbytes = capacity * sizeof(table[0]);
-	if (table == 0)
-	    table = (Tuple*)malloc( nbytes );
-	else
-	    table = (Tuple*)realloc( table, nbytes );
-	}
-    Tuple& r = table[ count++ ];
-    r.handle = handle;
-    r.symbol = symbol;
-    r.address = addr;
+    Tuple* p = (Tuple*)append();
+    p->handle = handle;
+    p->symbol = strdup( symbol );
+    p->address = addr;
     }
 
 PROC NeXTSymbolTable::find( CS_HLIBRARY handle, char const* symbol ) const
     {
-    Tuple const* p = table;
-    for (int i = 0; i < count; i++, p++)
-	if (p->handle == handle && strcmp(p->symbol, symbol) == 0)
-	    return p->address;
-    return 0;
+    Tuple const key = { handle, symbol, 0 };
+    Tuple const* tuple = (Tuple const*)search( &key );
+    return (tuple == 0 ? 0 : tuple->address);
+    }
+
+bool NeXTSymbolTable::compare( void const* p1, void const* p2 ) const
+    {
+    Tuple const* t1 = (Tuple const*)p1;
+    Tuple const* t2 = (Tuple const*)p2;
+    return (t1->handle == t2->handle && strcmp(t1->symbol, t2->symbol) == 0);
+    }
+
+void NeXTSymbolTable::destroy( void* p )
+    {
+    free( (char*)((Tuple*)p)->symbol );
+    }
+
+
+//-----------------------------------------------------------------------------
+// shared_image_table
+//-----------------------------------------------------------------------------
+static NeXTImageFileTable& shared_image_table()
+    {
+    static NeXTImageFileTable* table = 0;
+    if (table == 0)
+	table = new NeXTImageFileTable;
+    return *table;
     }
 
 
@@ -113,11 +228,11 @@ static NeXTSymbolTable& shared_symbol_table()
 //-----------------------------------------------------------------------------
 // native_lookup
 //-----------------------------------------------------------------------------
-static PROC native_lookup( char const* symbol )
+static PROC native_lookup( char const* symbol, bool required = true )
     {
     unsigned long address = 0;
     NXStream* stream = NXOpenFile( 1, NX_WRITEONLY );
-    if (rld_lookup( stream, symbol, &address ) == 0)
+    if (rld_lookup( stream, symbol, &address ) == 0 && required)
 	NXPrintf( stream, "Symbol undefined: %s\n", symbol );
     NXClose( stream );
     return (PROC)address;
@@ -147,7 +262,7 @@ static void register_standard_symbols( CS_HLIBRARY handle )
     for (int i = 0; i < STANDARD_SYMBOLS_COUNT; i++)
 	{
 	char const* const symbol = STANDARD_SYMBOLS[i];
-	PROC const address = native_lookup( symbol );
+	PROC const address = native_lookup( symbol, false );
 	if (address != 0)
 	    {
 	    table.add( handle, symbol, address );
@@ -178,23 +293,28 @@ static bool initialize_module( CS_HLIBRARY handle )
 //-----------------------------------------------------------------------------
 CS_HLIBRARY SysLoadLibrary( char const* obj )
     {
-    CS_HLIBRARY handle = 0;
-    char const* const objs[2] = { obj, 0 };
-    struct mach_header* header = 0;
-    NXStream* stream = NXOpenFile( 1, NX_WRITEONLY );
-    if (objc_loadModules( (char**)objs, stream, 0, &header, 0 ) == 0)
+    NeXTImageFileTable& images = shared_image_table();
+    CS_HLIBRARY handle = images.find( obj );
+    if (handle == 0)
 	{
-	handle = (CS_HLIBRARY)header;
-	register_standard_symbols( handle );
-	if (!initialize_module( handle ))
+	char const* const objs[2] = { obj, 0 };
+	struct mach_header* header = 0;
+	NXStream* stream = NXOpenFile( 1, NX_WRITEONLY );
+	if (objc_loadModules( (char**)objs, stream, 0, &header, 0 ) == 0)
 	    {
-	    handle = 0;	// Failed to initialize.
-	    NXPrintf( stream, "Unable to initialize library '%s'.\n", obj );
+	    handle = (CS_HLIBRARY)header;
+	    images.add( obj, handle );
+	    register_standard_symbols( handle );
+	    if (!initialize_module( handle ))
+		{
+		handle = 0;	// Failed to initialize.
+		NXPrintf(stream, "Unable to initialize library '%s'.\n", obj);
+		}
 	    }
+	else
+	    NXPrintf( stream, "Unable to load library '%s'.\n", obj );
+	NXClose( stream );
 	}
-    else
-	NXPrintf( stream, "Unable to load library '%s'.\n", obj );
-    NXClose( stream );
     return handle;
     }
 
