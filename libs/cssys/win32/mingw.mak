@@ -24,7 +24,7 @@ OUTSUFX.yes=
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
-.SUFFIXES: .exe .dll .a
+.SUFFIXES: .exe .dll .def .a
 
 # Processor type.
 PROC=INTEL
@@ -167,6 +167,8 @@ ifeq ($(USE_SHARED_PLUGINS),yes)
 #
 	MAKE_DLL=yes
 	DLL=.dll
+	DEF=.def
+	DLL_SUFFIX=dll
 
 #
 # Whenever AR is invoked, create a .def file
@@ -174,7 +176,7 @@ ifeq ($(USE_SHARED_PLUGINS),yes)
 # immediately after the .def file is created
 #
 
-  LIB=.def
+  LIB=$(DEF)
 	override ARFLAGS.@=
 	override LFLAGS.@= -mdll -o $@
 	
@@ -188,7 +190,11 @@ ifeq ($(USE_SHARED_PLUGINS),yes)
 #
 # c++ -shared *.o [*.def] -o *.dll
 
-#	DO.BUILD.DLL = $(CXX) $(LFLAGS.GENERAL) $@ $(DLL_FLAGS) $(^^)
+override LFLAGS.@=-mdll -o
+
+CPP=c++
+
+BUILD.DLL = $(CPP) $(LFLAGS.@) $@ $^
 
 #(OUT)%.def: %.dll
 #	$(DO.BUILD.DLL)  
@@ -224,7 +230,9 @@ SRC.SYS_CSSYS = libs/cssys/win32/printf.cpp \
   libs/cssys/win32/timing.cpp libs/cssys/win32/dir.cpp \
   libs/cssys/win32/win32.cpp libs/cssys/win32/loadlib.cpp \
   support/gnu/getopt.c support/gnu/getopt1.cpp
-SRC.SYS_CSSYS_EXE=libs/cssys/win32/exeentry.cpp
+#
+# Disabled exeentry.cpp as it was generating duplicate ModuleHandle references
+#SRC.SYS_CSSYS_EXE=libs/cssys/win32/exeentry.cpp
 SRC.SYS_CSSYS_DLL=libs/cssys/win32/dllentry.cpp
 
 
