@@ -14,6 +14,17 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 23-Aug-1999
+	- Minimize splitter in BSP tree creator uses random selection
+	  instead of initial polygons. This improves BSP tree creation
+	  a LOT!
+	- Added vertical line optimization to c-buffer handling. This
+	  is a single c-buffer line which holds information about the
+	  full-line status of every horizontal line. If that c-buffer
+	  line is full then this means that the hole screen is full.
+	  Also we can avoid having to scan-convert a polygon if the top
+	  and bottom vertices fall inside a span of that vertical
+	  c-buffer line. This gives a considerable speed improvement.
+	- Stop BSP processing if the c-buffer screen is full.
 	- Eric Sunshine performed a major overhaul and re-engineering of the
 	  BeOS port of Crystal Space.  The port is now about 95% usable
 	  versus 25% prior to this effort.  In addition, numerous bugs were
@@ -70,7 +81,14 @@ Short-term cleanups that need to be done:
 	  "clean" target was trying to delete the X-windows OpenGL driver
 	  even on non-X platforms.
 	- Eric Sunshine removed some obnoxious debugging output from MazeD.
+22-Aug-1999
+	- Fixed potentially very harmful bug in csPoly3D::MakeRoom().
 20-Aug-1999
+	- Fixed problem in cscom.cpp with 'int i' declaration inside
+	  for loop.
+	- Some changes from Ivan Avramovic. Minor changes to csMatrix3.
+	  The Get?Rotation routines are now implemented as subclasses
+	  and the Eigen functions have been moved into the CD lib.
 	- Eric Sunshine fixed a new compilation warning about an uninitialized
 	  variable in WalkTest.
 19-Aug-1999
