@@ -33,7 +33,8 @@ COMP=GCC
 # System-dependent help commands
 SYSMODIFIERSHELP = \
   echo $"  USE_OMF=yes$|no    Use OMF object module format (yes) or a.out format (no)$"
-SYSMODIFIERS="USE_OMF=$(USE_OMF)"
+  echo $"  USE_CRTDLL=yes$|no Use EMX C runtime DLLs (default yes) or not$"
+SYSMODIFIERS=USE_OMF=$(USE_OMF) USE_CRTDLL=$(USE_CRTDLL)
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
@@ -87,10 +88,10 @@ LFLAGS.GENERAL=-Zmt
 
 # Flags for the linker which are used when optimizing.
 LFLAGS.optimize=-s
-ifeq ($(USE_OMF),yes)
-LFLAGS.optimize+=-Zsys -Zsmall-conv
+ifeq ($(USE_OMF)/$(USE_CRTDLL),yes/no)
+  LFLAGS.optimize+=-Zsmall-conv -Zsys
 else
-LFLAGS.optimize+=-Zcrtdll
+  LFLAGS.optimize+=-Zcrtdll
 endif
 
 # Flags for the linker which are used when debugging.
@@ -189,9 +190,14 @@ export SHELL
 ifeq ($(USE_OMF),)
 USE_OMF = yes
 endif
+# Default value for USE_CRTDLL
+ifeq ($(USE_CRTDLL),)
+USE_CRTDLL = yes
+endif
 
 configure:
 	@echo export USE_OMF = $(USE_OMF)>>config.mak
+	@echo export USE_CRTDLL = $(USE_CRTDLL)>>config.mak
 	@cmd /c bin\\os2conf.cmd>>config.mak
 
 endif # ifeq ($(MAKESECTION),configure)
