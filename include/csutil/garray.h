@@ -52,6 +52,8 @@
     }									\
     Type &operator [] (int n)						\
     { CS_ASSERT (n >= 0 && n < limit); return root [n]; }		\
+    const Type &operator [] (int n) const				\
+    { CS_ASSERT (n >= 0 && n < limit); return root [n]; }		\
     Type &Get (int n)							\
     { CS_ASSERT (n >= 0 && n < limit); return root [n]; }		\
     void Delete (int n)							\
