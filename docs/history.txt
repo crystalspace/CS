@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+17-Jun-2003
+	- Marten fixed an error with uninitialized extensions in render3d.
+	- Marten fixed jamfiles for glshader_. They need to link to GL.
 16-Jun-2003
 	- Oktal separated a multiple-argument %ignore directive into several
 	  single-argument ones, in perlpre.i, in order to support older

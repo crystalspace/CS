@@ -1,5 +1,7 @@
 SubDir TOP plugins video render3d shaderplugins glshader_mtex ;
 
+if $(GL.AVAILABLE) = "yes"
+{
 Plugin glshader_mtex
 	: [ Wildcard *.cpp *.h ]
 ;
@@ -8,3 +10,4 @@ ExternalLibs glshader_mtex :  GL ;
 
 Help glshader_mtex : "Crystal Space Render3d Shaderplugin for multitexturing" ;
 
+}

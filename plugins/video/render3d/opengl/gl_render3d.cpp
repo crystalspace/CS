@@ -713,6 +713,7 @@ bool csGLRender3D::Open ()
   ext->InitGL_ARB_multitexture ();
   ext->InitGL_ARB_texture_compression ();
   ext->InitGL_ARB_vertex_buffer_object ();
+  ext->InitGL_ARB_vertex_program ();
   ext->InitGL_SGIS_generate_mipmap ();
   ext->InitGL_EXT_texture_filter_anisotropic ();
   ext->InitGL_EXT_texture_lod_bias ();
@@ -1088,7 +1089,7 @@ bool csGLRender3D::ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer)
   void* data = buffer->Lock (CS_BUF_LOCK_RENDER);
   if (data)
   {
-    ext->glEnableVertexAttribArrayARB (attrib);
+    if (ext->glEnableVertexAttribArrayARB) ext->glEnableVertexAttribArrayARB (attrib);
     if (bind)
     {
       if (use_hw_render_buffers)
@@ -1111,7 +1112,7 @@ void csGLRender3D::DeactivateBuffer (csVertexAttrib attrib)
 {
   if (vertattrib[attrib])
   {
-    ext->glDisableVertexAttribArrayARB (attrib);
+    if (ext->glDisableVertexAttribArrayARB) ext->glDisableVertexAttribArrayARB (attrib);
     vertattrib[attrib]->Release ();
     vertattribenabled[attrib] = false;
   }

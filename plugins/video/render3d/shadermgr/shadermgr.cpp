@@ -650,6 +650,7 @@ void csShaderPass::Deactivate()
 void csShaderPass::SetupState (csRenderMesh *mesh)
 {
   int i;
+  iRender3D* myr = r3d;
 
   for (i=0; i<STREAMMAX; i++)
   {
@@ -657,7 +658,7 @@ void csShaderPass::SetupState (csRenderMesh *mesh)
     {
       iRenderBuffer* buf  = mesh->streamsource->GetBuffer (streammapping[i]);
       if (buf)
-        if (r3d->ActivateBuffer ((csVertexAttrib)i, buf))
+        if (myr->ActivateBuffer ((csVertexAttrib)i, buf))
           continue;
     }
     r3d->DeactivateBuffer ((csVertexAttrib)i);
@@ -782,7 +783,7 @@ bool csShaderPass::Load(iDocumentNode* node)
 
   BuildTokenHash();
   csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(objectreg, iShaderManager);
-  csRef<iRender3D> r3d = CS_QUERY_REGISTRY(objectreg, iRender3D);
+  r3d = CS_QUERY_REGISTRY(objectreg, iRender3D);
   csRef<iSyntaxService> synserv = 
     CS_QUERY_REGISTRY (objectreg, iSyntaxService);
 
