@@ -72,7 +72,7 @@ void csGLShaderFVP::Deactivate()
 }
 
 void csGLShaderFVP::SetupState (
-  csRenderMesh *mesh, csArray<iShaderVariableContext*> &dynamicDomains)
+  csRenderMesh *mesh, const csArray<iShaderVariableContext*> &dynamicDomains)
 {
   int i;
 

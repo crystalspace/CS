@@ -67,7 +67,7 @@ public:
   virtual void Deactivate();
 
   virtual void SetupState (csRenderMesh *mesh, 
-    csArray<iShaderVariableContext*> &dynamicDomains) {}
+    const csArray<iShaderVariableContext*> &dynamicDomains) {}
 
   virtual void ResetState () {}
 

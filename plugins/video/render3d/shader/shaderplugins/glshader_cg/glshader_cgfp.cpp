@@ -105,14 +105,14 @@ void csShaderGLCGFP::Deactivate()
 }
 
 void csShaderGLCGFP::SetupState ( csRenderMesh *mesh, 
-                                csArray<iShaderVariableContext*> &dynamicDomains)
+	const csArray<iShaderVariableContext*>& dynamicDomains)
 {
   int i;
 
   // set variables
   for(i = 0; i < variablemap.Length(); ++i)
   {
-	if (!variablemap[i].parameter)
+    if (!variablemap[i].parameter)
       continue;
     csShaderVariable* lvar = GetVariable(variablemap[i].name);
 

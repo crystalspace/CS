@@ -69,7 +69,7 @@ void csShaderGLAVP::Deactivate()
 }
 
 void csShaderGLAVP::SetupState (csRenderMesh *mesh, 
-				csArray<iShaderVariableContext*> &dynamicDomains)
+	const csArray<iShaderVariableContext*>& dynamicDomains)
 {
   int i;
   const csGLExtensionManager* ext = shaderPlug->ext;
