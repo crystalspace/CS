@@ -47,15 +47,18 @@ struct iDynamics : public iBase
 {
   /// Create a rigid body and add it to the simulation
   virtual csPtr<iDynamicSystem> CreateSystem () = 0;
-
+  
   /// Create a rigid body and add it to the simulation
   virtual void RemoveSystem (iDynamicSystem* system) = 0;
+
+  /// Finds a system by name
+  virtual iDynamicSystem* FindSystem (const char *name) = 0;
 
   /// Step the simulation forward by stepsize.
   virtual void Step (float stepsize) = 0;
 };
 
-SCF_VERSION (iDynamicSystem, 0, 0, 1);
+SCF_VERSION (iDynamicSystem, 0, 0, 2);
 
 /**
  * This is the interface for the dynamics core.
@@ -65,6 +68,8 @@ SCF_VERSION (iDynamicSystem, 0, 0, 1);
  */
 struct iDynamicSystem : public iBase
 {
+  /// returns the underlying object
+  virtual iObject *QueryObject (void) = 0;
   /// Set the global gravity.
   virtual void SetGravity (const csVector3& v) = 0;
   /// Get the global gravity.
@@ -78,6 +83,9 @@ struct iDynamicSystem : public iBase
 
   /// Create a rigid body and add it to the simulation
   virtual void RemoveBody( iRigidBody* body ) = 0;
+
+  /// Finds a body within a system
+  virtual iRigidBody *FindBody (const char *name) = 0;
 
   /// Create a body group.  Bodies in a group don't collide with each other
   virtual csPtr<iBodyGroup> CreateGroup () = 0;
@@ -136,7 +144,7 @@ struct iBodyGroup : public iBase
    virtual bool BodyInGroup (iRigidBody *body) = 0;
 };
 
-SCF_VERSION (iRigidBody, 0, 0, 1);
+SCF_VERSION (iRigidBody, 0, 0, 2);
 
 /**
  * This is the interface for a rigid body.
@@ -146,6 +154,8 @@ SCF_VERSION (iRigidBody, 0, 0, 1);
  */
 struct iRigidBody : public iBase
 {
+  /// returns the underlying object
+  virtual iObject *QueryObject (void) = 0;
   /** 
    * Makes a body stop reacting dynamically.  This is especially useful
    * for environmental objects.  It will also increase speed in some cases

@@ -22,6 +22,7 @@
 
 #include "csgeom/vector3.h"
 #include "csutil/csobjvec.h"
+#include "csutil/nobjvec.h"
 #include "csutil/garray.h"
 #include "csgeom/transfrm.h"
 #include "iengine/mesh.h"
@@ -89,7 +90,7 @@ private:
   static int geomclassnum;
   static dJointGroupID contactjoints;
 
-  csObjVector systems;
+  csNamedObjVector systems;
 
 public:
   SCF_DECLARE_IBASE;
@@ -102,6 +103,7 @@ public:
 
   virtual csPtr<iDynamicSystem> CreateSystem ();
   virtual void RemoveSystem (iDynamicSystem* system);
+  virtual iDynamicSystem* FindSystem (const char *name);
 
   virtual void Step (float stepsize);
 
@@ -144,7 +146,7 @@ public:
  * It also handles collision response.
  * Collision detection is done in another plugin.
  */
-class csODEDynamicSystem : public iDynamicSystem
+class csODEDynamicSystem : public csObject
 {
 private:
   dWorldID worldID;
@@ -153,12 +155,41 @@ private:
   csRef<iCollideSystem> collidesys;
   csRef<iDynamicsMoveCallback> move_cb;
 
-  csObjVector bodies;
+  csNamedObjVector bodies;
   csObjVector groups;
   csObjVector joints;
 
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT (csObject);
+
+  struct DynamicSystem : public iDynamicSystem {
+    SCF_DECLARE_EMBEDDED_IBASE (csODEDynamicSystem);
+    iObject *QueryObject ()
+    { return scfParent; }
+    void SetGravity (const csVector3 &v)
+    { scfParent->SetGravity (v); }
+    const csVector3 GetGravity () const 
+    { return scfParent->GetGravity (); }
+    void Step (float stepsize)
+    { scfParent->Step (stepsize); }
+    csPtr<iRigidBody> CreateBody ()
+    { return scfParent->CreateBody (); }
+    void RemoveBody (iRigidBody *body)
+    { scfParent->RemoveBody (body); }
+    iRigidBody *FindBody (const char *name)
+    { return scfParent->FindBody (name); }
+    csPtr<iBodyGroup> CreateGroup ()
+    { return scfParent->CreateGroup (); }
+    void RemoveGroup (iBodyGroup *group)
+    { scfParent->RemoveGroup (group); }
+    csPtr<iJoint> CreateJoint ()
+    { return scfParent->CreateJoint (); }
+    void RemoveJoint (iJoint *joint)
+    { scfParent->RemoveJoint (joint); }
+    iDynamicsMoveCallback* GetDefaultMoveCallback ()
+    { return scfParent->GetDefaultMoveCallback (); }
+  } scfiDynamicSystem;
+  friend struct DynamicSystem;
 
   csODEDynamicSystem ();
   virtual ~csODEDynamicSystem ();
@@ -174,6 +205,7 @@ public:
 
   virtual csPtr<iRigidBody> CreateBody ();
   virtual void RemoveBody (iRigidBody* body);
+  virtual iRigidBody *FindBody (const char *name);
 
   virtual csPtr<iBodyGroup> CreateGroup ();
   virtual void RemoveGroup (iBodyGroup *group);
@@ -212,7 +244,7 @@ public:
  * It can also be attached to a movable or a bone,
  * to automatically update it.
  */
-class csODERigidBody : public iRigidBody
+class csODERigidBody : public csObject
 {
 private:
   dBodyID bodyID;
@@ -230,7 +262,103 @@ private:
   csRef<iDynamicsCollisionCallback> coll_cb;
 
 public:
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT (csObject);
+
+  struct RigidBody : public iRigidBody 
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csODERigidBody);
+    iObject *QueryObject ()
+    { return scfParent; }
+    bool MakeStatic (void) 
+    { return scfParent->MakeStatic (); }
+    bool MakeDynamic (void)
+    { return scfParent->MakeDynamic (); }
+    bool IsStatic (void) 
+    { return scfParent->IsStatic (); }
+    csRef<iBodyGroup> GetGroup (void) 
+    { return scfParent->GetGroup (); }
+    bool AttachColliderMesh (iMeshWrapper* mesh, const csOrthoTransform& trans, 
+	float friction, float density, float elasticity)
+    { return scfParent->AttachColliderMesh (mesh, trans, friction, density, elasticity); }
+    bool AttachColliderCylinder (float length, float radius, 
+	const csOrthoTransform& trans, float friction, float density, float elasticity)
+    { return scfParent->AttachColliderCylinder (length, radius, trans, friction, density, elasticity); }
+    bool AttachColliderBox (const csVector3 &size, 
+	const csOrthoTransform& trans, float friction, float density, float elasticity)
+    { return scfParent->AttachColliderBox (size, trans, friction, density, elasticity); }
+    bool AttachColliderSphere (float radius, const csVector3 &offset, 
+	float friction, float density, float elasticity)
+    { return scfParent->AttachColliderSphere (radius, offset, friction, density, elasticity); }
+    bool AttachColliderPlane (const csPlane3 &plane, float friction,
+    float density, float elasticity)
+	{ return scfParent->AttachColliderPlane (plane, friction, density, elasticity); }
+    void SetPosition (const csVector3& trans) 
+    { scfParent->SetPosition (trans); }
+    const csVector3 GetPosition () const
+    { return scfParent->GetPosition (); }
+    void SetOrientation (const csMatrix3& trans) 
+    { scfParent->SetOrientation (trans); }
+    const csMatrix3 GetOrientation () const 
+    { return scfParent->GetOrientation (); }
+    void SetTransform (const csOrthoTransform& trans) 
+    { scfParent->SetTransform (trans); }
+    const csOrthoTransform GetTransform () const 
+    { return scfParent->GetTransform (); }
+    void SetLinearVelocity (const csVector3& vel) 
+    { scfParent->SetLinearVelocity (vel); }
+    const csVector3 GetLinearVelocity () const 
+    { return scfParent->GetLinearVelocity(); }
+    void SetAngularVelocity (const csVector3& vel) 
+    { scfParent->SetAngularVelocity (vel); }
+    const csVector3 GetAngularVelocity () const 
+    { return scfParent->GetAngularVelocity (); }
+    void SetProperties (float mass, const csVector3& center, const csMatrix3& inertia) 
+    { scfParent->SetProperties (mass, center, inertia); }
+    void GetProperties (float* mass, csVector3* center, csMatrix3* inertia) 
+    { scfParent->GetProperties (mass, center, inertia); }
+    void AdjustTotalMass (float targetmass) 
+    { scfParent->AdjustTotalMass (targetmass); }
+    void AddForce (const csVector3& force) 
+    { scfParent->AddForce (force); }
+    void AddTorque (const csVector3& force) 
+    { scfParent->AddTorque (force); }
+    void AddRelForce (const csVector3& force) 
+    { scfParent->AddRelForce (force); }
+    void AddRelTorque (const csVector3& force) 
+    { scfParent->AddRelTorque (force); }
+    void AddForceAtPos (const csVector3& force, const csVector3& pos) 
+    { scfParent->AddForceAtPos (force, pos); }
+    void AddForceAtRelPos (const csVector3& force,
+	const csVector3& pos) 
+    { scfParent->AddForceAtRelPos (force, pos); }
+    void AddRelForceAtPos (const csVector3& force,
+  	const csVector3& pos) 
+    { scfParent->AddRelForceAtPos (force, pos); }
+    void AddRelForceAtRelPos (const csVector3& force,
+  	const csVector3& pos) 
+    { scfParent->AddRelForceAtRelPos (force, pos); }
+    const csVector3 GetForce () const
+    { return scfParent->GetForce (); }
+    const csVector3 GetTorque () const
+    { return scfParent->GetTorque (); }
+    void AttachMesh (iMeshWrapper* mesh) 
+    { return scfParent->AttachMesh (mesh); }
+    csRef<iMeshWrapper> GetAttachedMesh () 
+    { return scfParent->GetAttachedMesh (); }
+    void AttachBone (iSkeletonBone* bone) 
+    { scfParent->AttachBone (bone); }
+    csRef<iSkeletonBone> GetAttachedBone () 
+    { return scfParent->GetAttachedBone (); }
+    void SetMoveCallback (iDynamicsMoveCallback* cb) 
+    { scfParent->SetMoveCallback (cb); }
+    void SetCollisionCallback (iDynamicsCollisionCallback* cb) 
+    { scfParent->SetCollisionCallback (cb); }
+    void Collision (iRigidBody *other) 
+    { scfParent->Collision (other); }
+    void Update () 
+    { scfParent->Update (); }
+  } scfiRigidBody;
+  friend struct RigidBody;
 
   csODERigidBody (csODEDynamicSystem* sys);
   virtual ~csODERigidBody ();
