@@ -7,6 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 6-Feb-2005
+        - Magodra made the following changes:
+            - Fixed a problem where csSpriteCal3DMeshObject::SetMaterial
+              caused crash when called before internal data structures where
+              set up properly.
 	- res made the following changes:
 	    - Fixed a problem in the GL extension manager where WGL exts were
 	      never initialized.
