@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+23-Nov-2002
+	- Removed the meta manager again. This is a totally unneeded
+	  addition since it is already possible to attach name/value
+	  data to any thing that supports iObject. Just use the following
+	  syntax:
+	  	<key name="editor_bla" value="whatever" />
 22-Nov-2002
 	- All spr2d instances used to have their own local copy of
 	  G3DPolygonDPFX. Since this structure is more than 4K big I decided

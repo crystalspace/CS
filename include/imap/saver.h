@@ -21,10 +21,6 @@ struct iSaver : public iBase {
    * Return the current engine contents as a string.
    */ 
   virtual iString* SaveMapFile()=0;
-  /**
-   * Register a meta-data manager for use with this saver.
-   */
-  virtual void UseMetaManager (iMetaManager *mm) = 0;
 };
 
 #endif

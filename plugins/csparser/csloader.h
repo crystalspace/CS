@@ -231,9 +231,7 @@ enum
   XMLTOKEN_POLYGON,
   XMLTOKEN_ARG,
   XMLTOKEN_ARGS,
-  XMLTOKEN_VARIABLELIST,
-
-  XMLTOKEN_META
+  XMLTOKEN_VARIABLELIST
 };
 
 class StdLoaderContext;
@@ -563,11 +561,6 @@ public:
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize(p); }
   } scfiComponent;
-
-private:
-  csRef<iMetaManager> metamanager;
-public:
-  virtual void UseMetaManager (iMetaManager *mm);
 };
 
 #endif // __CS_CSLOADER_H__

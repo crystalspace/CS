@@ -74,7 +74,6 @@
 #include "imesh/mdldata.h"
 #include "imesh/crossbld.h"
 #include "ivaria/reporter.h"
-#include "imap/meta.h"
 
 //---------------------------------------------------------------------------
 
@@ -802,8 +801,6 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("polygon", XMLTOKEN_POLYGON);
   xmltokens.Register ("arg", XMLTOKEN_ARG);
   xmltokens.Register ("args", XMLTOKEN_ARGS);
-
-  xmltokens.Register ("meta", XMLTOKEN_META);
   return true;
 }
 
@@ -1461,10 +1458,6 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
 	  stemp->HardTransform (tr);
         }
         break;
-      case XMLTOKEN_META:
-        if (metamanager) metamanager->Load
-          (stemp->QueryObject (), child->GetContentsValue ());
-        break;
       default:
 	SyntaxService->ReportBadToken (child);
         return false;
@@ -1765,10 +1758,6 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iDocumentNode* node)
 	  }
 	  mesh = t->CreateMeshWrapper ();
 	}
-        break;
-      case XMLTOKEN_META:
-        if (metamanager) metamanager->Load
-          (mesh->QueryObject (), child->GetContentsValue ());
         break;
       default:
 	SyntaxService->ReportBadToken (child);
@@ -2110,10 +2099,6 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	  if (li)
 	    li->SetCacheName (child->GetContentsValue ());
 	}
-        break;
-      case XMLTOKEN_META:
-        if (metamanager) metamanager->Load
-          (mesh->QueryObject (), child->GetContentsValue ());
         break;
       default:
 	SyntaxService->ReportBadToken (child);
@@ -2501,10 +2486,6 @@ iCollection* csLoader::ParseCollection (iDocumentNode* node)
 	  }
         }
         break;
-      case XMLTOKEN_META:
-        if (metamanager) metamanager->Load
-          (collection->QueryObject (), child->GetContentsValue ());
-        break;
       default:
 	SyntaxService->ReportBadToken (child);
 	collection->DecRef ();
@@ -2556,10 +2537,6 @@ bool csLoader::ParseStart (iDocumentNode* node, iCameraPosition* campos)
 	  campos->SetFarPlane (&p);
         }
 	break;
-      case XMLTOKEN_META:
-        if (metamanager) metamanager->Load
-          (campos->QueryObject (), child->GetContentsValue ());
-        break;
       default:
 	SyntaxService->ReportBadToken (child);
 	return false;
@@ -3115,10 +3092,6 @@ iSector* csLoader::ParseSector (iDocumentNode* node)
 	    return NULL;
         }
         break;
-      case XMLTOKEN_META:
-        if (metamanager) metamanager->Load
-          (sector->QueryObject (), child->GetContentsValue ());
-        break;
       default:
 	SyntaxService->ReportBadToken (child);
 	return NULL;
@@ -3213,11 +3186,6 @@ void csLoader::ParseSharedVariable (iDocumentNode* node)
   {
     ReportWarning("csLoader::ParseSharedVariable",node,"Variable tag does not have name attribute.");
   }
-}
-
-void csLoader::UseMetaManager (iMetaManager *mm)
-{
-  metamanager = mm;
 }
 
 //========================================================================

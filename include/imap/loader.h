@@ -38,7 +38,6 @@ struct iSoundHandle;
 struct iMeshWrapper;
 struct iMeshFactoryWrapper;
 struct iSoundWrapper;
-struct iMetaManager;
 
 /**\name Loader bit flags
  * Used in iLoader::SetMode().
@@ -129,9 +128,6 @@ struct iLoader : public iBase
   
   /// Load and parse a effect from file
   virtual bool LoadEffectFile (const char* filename) = 0;
-
-  /// Register a meta-data manager for use with this loader.
-  virtual void UseMetaManager (iMetaManager *mm) = 0;
 };
 
 /** } */

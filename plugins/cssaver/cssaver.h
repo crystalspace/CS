@@ -13,7 +13,6 @@ class csSaver : public iSaver {
   iObjectRegistry* object_reg;
   csRef<iEngine> engine;
 
-  csRef<iMetaManager> metamanager;
 public:
   SCF_DECLARE_IBASE;
 
@@ -32,8 +31,6 @@ public:
 
   iString* SaveMapFile();
   bool SaveMapFile(const char *filename);
-
-  void UseMetaManager (iMetaManager *mm);
 
   struct eiComponent : public iComponent
   {
