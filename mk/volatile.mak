@@ -74,6 +74,9 @@ endif
 ifeq ($(NASM.AVAILABLE),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_NASM$">>volatile.tmp
 endif
+ifeq ($(SVGA.AVAILABLE),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_HAS_SVGALIB$">>volatile.tmp
+endif
 ifeq ($(DO_MMX),yes)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_MMX$">>volatile.tmp
 endif

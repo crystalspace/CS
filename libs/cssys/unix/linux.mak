@@ -9,6 +9,10 @@ DESCRIPTION.OS.linux = Linux
 #PLUGINS+=device/joystick/linux
 
 # Choose which 2D/3D driver combinations you want to build/use
+ifeq ($(SVGA.AVAILABLE),yes)
+PLUGINS += video/canvas/svgalib
+endif
+
 ifeq ($(X11.AVAILABLE),yes)
   PLUGINS+=video/canvas/softx
   PLUGINS+=video/canvas/linex

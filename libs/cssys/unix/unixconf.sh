@@ -63,7 +63,7 @@ msg_checking "for svgalib"
 echo "#include <vga.h>" > conftest.cpp
 ${CXX} -c conftest.cpp 2>/dev/null
 if [ $? -eq 0 ]; then
-  echo "PLUGINS += video/canvas/svgalib"
+  echo "SVGA.AVAILABLE = yes"
   msg_result "yes"
 else
   msg_result "no"

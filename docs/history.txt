@@ -18,6 +18,12 @@ The history order is reversed so that new features are at the top.
 		- net/driver/ensocket
 		- cscript/cspython
 	    - Eliminated the unused SOUND_LIBS makefile variable.
+	    - Changed the SVGALIB detection script so that it no longer
+	      enables the svgalib canvas.  It is now the makefile's
+	      responsibility to enable this plugin when the SVGA.AVAILABLE
+	      variable is set to "yes".
+	    - Added new CS_HAS_SVGALIB macro to volatile.h.
+	    - Removed all dependence upon OS_LINUX from the project.
 2-Jan-2003
 	- Eric Sunshine changed the OpenGL-related configuration script and
 	  makefiles so that it is now the responsibility of the configuration

@@ -124,6 +124,7 @@ PLUGINS.DYNAMIC += aws
 #PLUGINS.DYNAMIC += sound/renderer/openal
 #PLUGINS.DYNAMIC += physics/odedynam
 #PLUGINS.DYNAMIC += physics/loader
+#PLUGINS.DYNAMIC += device/joystick/linux
 #PLUGINS.DYNAMIC += video/render3d/opengl
 #PLUGINS.DYNAMIC += video/render3d/shadermgr
 #PLUGINS.DYNAMIC += video/render3d/shaderplugins/glshader_arb

@@ -32,15 +32,13 @@
    {
      if (getenv ("GGI_DISPLAY"))
        return "crystalspace.graphics2d.ggi";
-     else
-#  if defined (OS_LINUX)
-     if (getenv ("DISPLAY"))
-#  endif
+     else if (getenv ("DISPLAY"))
        return "crystalspace.graphics2d.x2d";
-#  if defined (OS_LINUX)
+#  if defined (CS_HAS_SVGALIB)
      else
        return "crystalspace.graphics2d.svgalib";
 #  endif
+     return 0;
    }
 #endif
 

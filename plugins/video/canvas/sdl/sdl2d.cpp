@@ -49,7 +49,7 @@ CS_IMPLEMENT_PLUGIN
 
 //fixup:
 //  For dlopen::dladdr
-#ifdef OS_LINUX
+#ifdef CS_USE_GNU_DLADDR
 #    ifndef __USE_GNU
 #        define __USE_GNU 1
 #    endif
@@ -219,7 +219,7 @@ void csGraphics2DSDL::Report (int severity, const char* msg, ...)
 
 void csGraphics2DSDL::fixlibrary()
 {
-#if defined(OS_LINUX)
+#if defined(CS_USE_GNU_DLADDR)
     Dl_info dlip;
 
     dladdr((const void*)sdl2d_scfInitialize,&dlip);

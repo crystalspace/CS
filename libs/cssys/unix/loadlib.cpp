@@ -46,11 +46,10 @@ csLibraryHandle csFindLoadLibrary (const char *iName)
     csAddLibraryPath (path);
   }
 
-#ifdef OS_LINUX
-  return csFindLoadLibrary ("", iName, ".so");
-#else
-  return csFindLoadLibrary ("lib", iName, ".so");
-#endif
+  csLibraryHandle handle = csFindLoadLibrary ("", iName, ".so");
+  if (handle == 0)
+    handle = csFindLoadLibrary ("lib", iName, ".so");
+  return handle;
 }
 
 csLibraryHandle csLoadLibrary (const char* iName)
@@ -60,11 +59,9 @@ csLibraryHandle csLoadLibrary (const char* iName)
 
 void csPrintLibraryError (const char *iModule)
 {
-  const char * dlerr = dlerror();
+  const char* dlerr = dlerror();
   if (dlerr)
-    fprintf (stderr, "DLERROR (%s): %s\n",
-	   iModule? iModule : "(null)",
-	   dlerr);
+    fprintf (stderr, "DLERROR (%s): %s\n", iModule? iModule : "(null)", dlerr);
 }
 
 void *csGetLibrarySymbol (csLibraryHandle Handle, const char *iName)
