@@ -2812,14 +2812,17 @@ void csThingObjectType::AllocLightmaps (const csPolyGroup& inputPolys,
 	  csRect r;
 	  if ((slmSR = slm->GetRects ()->Alloc (lmw, lmh, r)) != 0)
 	  {
-	    rlm = 
-	      slm->rendererSLM->RegisterLightmap (r.xmin, r.ymin, 
-	        lmw - LM_BORDER, lmh - LM_BORDER);
-	    //polytxt->RecalculateDynamicLights ();
-	    //rlm->SetData (lm->GetMapData ());
-
-	    rlm->SetLightCellSize (polytxt->GetLightCellSize ());
-	    polytxt->SetRendererLightmap (rlm);
+            if ( slm->rendererSLM )
+            {
+	        rlm =  slm->rendererSLM->RegisterLightmap (r.xmin, r.ymin,  
+                                                           lmw - LM_BORDER, 
+                                                           lmh - LM_BORDER);
+	        //polytxt->RecalculateDynamicLights ();
+	        //rlm->SetData (lm->GetMapData ());
+        
+	        rlm->SetLightCellSize (polytxt->GetLightCellSize ());
+	        polytxt->SetRendererLightmap (rlm);
+            }
 
 	    stuffed = true;
 	    slm->freeLumels -= (lmw * lmh);
