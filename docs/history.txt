@@ -25,6 +25,7 @@ chronological order.
 	  particle system.
 	- res fixed the haze plugin to use the _EXT versions of SCF macros for
 	  descendants of csHazeHull.
+	- res fixed some GCC warnings & errors in the shader plugins.
 3-Apr-2004
 	- Jorrit fixed a new compile error in the simple console plugin.
 	- Jorrit added a new 'back2front' keyword for the genmesh factory

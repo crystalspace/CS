@@ -117,7 +117,7 @@ void csShaderGLPS1_NV::ResetState ()
 
 void csShaderGLPS1_NV::ActivateTextureShaders ()
 {
-  if(tex_program_num != ~0)
+  if (tex_program_num != (GLuint)~0)
   {
     glCallList(tex_program_num);
     return;

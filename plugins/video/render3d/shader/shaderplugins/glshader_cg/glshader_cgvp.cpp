@@ -178,9 +178,9 @@ bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 	    remap.GetExtend (varIndex) = to;				    \
 	  else
 	#define REMAP_VARIANTS(name, to)				    \
-	  REMAP(name ## "IT", to ## ".invtrans")			    \
-	  REMAP(name ## "T", to ## ".transpose")			    \
-	  REMAP(name ## "I", to ## ".inverse")				    \
+	  REMAP(name "IT", to ".invtrans")			    	    \
+	  REMAP(name "T", to ".transpose")			    	    \
+	  REMAP(name "I", to ".inverse")				    \
 	  REMAP(name, to)
 	#define MATRIX_MAP(name, nvMatrix, arbMatrix)			    \
 	  REMAP_VARIANTS (# name, arbMatrix)
@@ -258,11 +258,11 @@ bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
     #define NAMEDENTRIES(Basename, Matrix)		  \
       NAMEDTRACKERENTRY (Basename, Matrix,		  \
 	GL_IDENTITY_NV)					  \
-      NAMEDTRACKERENTRY (Basename ## "I", Matrix,	  \
+      NAMEDTRACKERENTRY (Basename "I", Matrix,	  	  \
 	GL_INVERSE_NV)					  \
-      NAMEDTRACKERENTRY (Basename ## "T", Matrix,	  \
+      NAMEDTRACKERENTRY (Basename "T", Matrix,	  	  \
 	GL_TRANSPOSE_NV)				  \
-      NAMEDTRACKERENTRY (Basename ## "IT", Matrix,	  \
+      NAMEDTRACKERENTRY (Basename "IT", Matrix,	  	  \
 	GL_INVERSE_TRANSPOSE_NV)			  
 
     #define MATRIX_MAP(name, nvMatrix, arbMatrix)	  \
