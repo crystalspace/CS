@@ -327,8 +327,9 @@ public:
   /// iLight implementation
   struct Light : public iLight
   {
+    csLight* GetPrivateObject () { return scfParent; }
+
     SCF_DECLARE_EMBEDDED_IBASE (csLight);
-    virtual csLight* GetPrivateObject () { return scfParent; }
     virtual const char* GetLightID () { return scfParent->GetLightID (); }
     virtual iObject *QueryObject() { return scfParent; }
     virtual int GetDynamicType () const

@@ -133,6 +133,11 @@ private:
   csRefArray<iSectorCallback> sector_cb_vector;
 
   /**
+   * List of sector mesh callbacks.
+   */
+  csRefArray<iSectorMeshCallback> sector_mesh_cb_vector;
+
+  /**
    * All static and pseudo-dynamic lights in this sector.
    * This vector contains objects of type iLight*.
    */
@@ -316,6 +321,11 @@ public:
   {
     return sector_cb_vector.Get (idx);
   }
+
+  void AddSectorMeshCallback (iSectorMeshCallback* cb);
+  void RemoveSectorMeshCallback (iSectorMeshCallback* cb);
+  void FireNewMesh (iMeshWrapper* mesh);
+  void FireRemoveMesh (iMeshWrapper* mesh);
 
   //----------------------------------------------------------------------
   // Visibility Stuff
@@ -504,7 +514,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSector);
 
-    virtual csSector *GetPrivateObject ()
+    csSector *GetPrivateObject ()
       { return (csSector*)scfParent; }
     virtual iObject *QueryObject()
       { return scfParent; }
@@ -572,6 +582,16 @@ public:
     {
       return scfParent->GetSectorCallback (idx);
     }
+
+    virtual void AddSectorMeshCallback (iSectorMeshCallback* cb)
+    {
+      scfParent->AddSectorMeshCallback (cb);
+    }
+    virtual void RemoveSectorMeshCallback (iSectorMeshCallback* cb)
+    {
+      scfParent->RemoveSectorMeshCallback (cb);
+    }
+
     virtual void CheckFrustum (iFrustumView* lview)
     {
       scfParent->CheckFrustum (lview);

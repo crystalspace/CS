@@ -33,7 +33,6 @@
 #include "iutil/object.h"
 
 class csVector3;
-class csSector;
 class csColor;
 class csBox3;
 class csReversibleTransform;
@@ -70,6 +69,24 @@ struct iSectorCallback : public iBase
   virtual void Traverse (iSector* sector, iBase* context) = 0;
 };
 
+/**
+ * Set a callback which is called when a mesh is added or removed
+ * from this sector.
+ */
+struct iSectorMeshCallback : public iBase
+{
+  /**
+   * New mesh. Note that this is also called if the mesh is added as child
+   * of another mesh that is in the sector.
+   */
+  virtual void NewMesh (iSector* sector, iMeshWrapper* mesh) = 0;
+
+  /**
+   * Remove mesh.
+   */
+  virtual void RemoveMesh (iSector* sector, iMeshWrapper* mesh) = 0;
+};
+
 SCF_VERSION (iSector, 0, 5, 4);
 
 /**
@@ -101,8 +118,6 @@ SCF_VERSION (iSector, 0, 5, 4);
  */
 struct iSector : public iBase
 {
-  /// @@@ Used by the engine to retrieve internal sector object (ugly)
-  virtual csSector *GetPrivateObject () = 0;
   /// Get the iObject for this sector.
   virtual iObject *QueryObject () = 0;
 
@@ -257,6 +272,17 @@ struct iSector : public iBase
 
   /// Get the specified sector callback.
   virtual iSectorCallback* GetSectorCallback (int idx) const = 0;
+
+  /**
+   * Add a mesh callback. This will call IncRef() on the callback
+   * So make sure you call DecRef() to release your own reference.
+   */
+  virtual void AddSectorMeshCallback (iSectorMeshCallback* cb) = 0;
+
+  /**
+   * Remove a mesh callback.
+   */
+  virtual void RemoveSectorMeshCallback (iSectorMeshCallback* cb) = 0;
 
   /// Used for portal traversal.
   virtual void CheckFrustum (iFrustumView* lview) = 0;

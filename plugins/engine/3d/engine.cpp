@@ -1323,7 +1323,7 @@ void csEngine::ForceRelight (iLight* light, iRegion* region)
     }
   }
 
-  light->GetPrivateObject ()->CalculateLighting ();
+  ((csLight::Light*)light)->GetPrivateObject ()->CalculateLighting ();
 
   iCacheManager* cm = GetCacheManager ();
   for (sn = 0 ; sn < num_meshes ; sn++)
@@ -1627,7 +1627,7 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
       }
       lit_cnt++;
       l = lit->Next ();
-      l->GetPrivateObject ()->CalculateLighting ();
+      ((csLight::Light*)l)->GetPrivateObject ()->CalculateLighting ();
       if (meter) meter->Step ();
     }
 
@@ -2439,7 +2439,8 @@ int csEngine::GetNearbyLights (
 
   light_array->Reset ();
 
-  csKDTree* kdtree = sector->GetPrivateObject ()->GetLightKDTree ();
+  csKDTree* kdtree = ((csSector::eiSector*)sector)->GetPrivateObject ()
+  	->GetLightKDTree ();
   csVector3 position = pos;
   kdtree->Front2Back (pos, FindLightPos_Front2Back, &position, 0);
 
@@ -2484,7 +2485,8 @@ int csEngine::GetNearbyLights (
 
   light_array->Reset ();
 
-  csKDTree* kdtree = sector->GetPrivateObject ()->GetLightKDTree ();
+  csKDTree* kdtree = ((csSector::eiSector*)sector)->GetPrivateObject ()
+  	->GetLightKDTree ();
   csBox3 bbox = box;
   kdtree->Front2Back (box.Min (), FindLightBox_Front2Back, &bbox, 0);
 

@@ -343,6 +343,10 @@ void csMeshWrapper::MoveToSector (iSector *s)
   // If we are a portal container then we have to register ourselves
   // to the sector.
   if (portal_container) s->RegisterPortalMesh (&scfiMeshWrapper);
+
+  // Fire the new mesh callbacks in the sector.
+  ((csSector::eiSector*)s)->GetPrivateObject ()->FireNewMesh (&scfiMeshWrapper);
+
   int i;
   for (i = 0; i < children.GetCount (); i++)
   {
@@ -357,6 +361,11 @@ void csMeshWrapper::MoveToSector (iSector *s)
 
 void csMeshWrapper::RemoveFromSectors (iSector* sector)
 {
+  // Fire the remove mesh callbacks in the sector.
+  if (sector)
+    ((csSector::eiSector*)sector)->GetPrivateObject ()->FireRemoveMesh (
+  	&scfiMeshWrapper);
+
   ClearFromSectorPortalLists (sector);
   int i;
   for (i = 0; i < children.GetCount (); i++)
@@ -428,7 +437,8 @@ void csMeshWrapper::SetRenderPriority (long rp)
   for (i = 0; i < sectors->GetCount (); i++)
   {
     iSector *ss = sectors->Get (i);
-    if (ss) ss->GetPrivateObject ()->RelinkMesh (&scfiMeshWrapper);
+    if (ss) ((csSector::eiSector*)ss)->GetPrivateObject ()
+    	->RelinkMesh (&scfiMeshWrapper);
   }
 }
 
@@ -1350,7 +1360,8 @@ void csMeshMeshList::PrepareMesh (iMeshWrapper* child)
   iSectorList* sl = mov->GetSectors ();
   for (int i = 0 ; i < sl->GetCount() ; i++)
   {
-    csSector* sector = sl->Get (i)->GetPrivateObject ();
+    csSector* sector = ((csSector::eiSector*)(sl->Get (i)))
+    	->GetPrivateObject ();
     sector->UnprepareMesh (child);
     sector->PrepareMesh (child);
   }
@@ -1372,8 +1383,8 @@ void csMeshMeshList::FreeMesh (iMeshWrapper* item)
 
   for (int i = 0 ; i < mesh->GetCsMovable().GetSectors()->GetCount() ; i++)
   {
-    csSector* sector = mesh->GetCsMovable ().GetSectors ()->Get (i)
-        ->GetPrivateObject ();
+    iSector* isector = mesh->GetCsMovable ().GetSectors ()->Get (i);
+    csSector* sector = ((csSector::eiSector*)isector)->GetPrivateObject ();
     sector->UnprepareMesh (item);
   }
 

@@ -70,19 +70,21 @@ csSectorLightList::~csSectorLightList ()
 void csSectorLightList::PrepareLight (iLight* item)
 {
   csLightList::PrepareLight (item);
-  item->GetPrivateObject ()->SetSector (&(sector->scfiSector));
+  ((csLight::Light*)item)->GetPrivateObject ()
+  	->SetSector (&(sector->scfiSector));
 
   const csVector3& center = item->GetCenter ();
   float radius = item->GetInfluenceRadius ();
   csBox3 lightbox (center - csVector3 (radius), center + csVector3 (radius));
   csKDTreeChild* childnode = kdtree->AddObject (lightbox, (void*)item);
-  item->GetPrivateObject ()->SetChildNode (childnode);
+  ((csLight::Light*)item)->GetPrivateObject ()->SetChildNode (childnode);
 }
 
 void csSectorLightList::FreeLight (iLight* item)
 {
-  item->GetPrivateObject ()->SetSector (0);
-  kdtree->RemoveObject (item->GetPrivateObject ()->GetChildNode ());
+  ((csLight::Light*)item)->GetPrivateObject ()->SetSector (0);
+  kdtree->RemoveObject (((csLight::Light*)item)->GetPrivateObject ()
+  	->GetChildNode ());
   csLightList::FreeLight (item);
 }
 
@@ -779,6 +781,30 @@ void csSector::Draw (iRenderView *rview)
   rl->Draw (rview, (iSector*)&scfiSector);
 }
 
+void csSector::AddSectorMeshCallback (iSectorMeshCallback* cb)
+{
+  sector_mesh_cb_vector.Push (cb);
+}
+
+void csSector::RemoveSectorMeshCallback (iSectorMeshCallback* cb)
+{
+  sector_mesh_cb_vector.Delete (cb);
+}
+
+void csSector::FireNewMesh (iMeshWrapper* mesh)
+{
+  size_t i;
+  for (i = 0 ; i < sector_mesh_cb_vector.Length () ; i++)
+    sector_mesh_cb_vector[i]->NewMesh (&scfiSector, mesh);
+}
+
+void csSector::FireRemoveMesh (iMeshWrapper* mesh)
+{
+  size_t i;
+  for (i = 0 ; i < sector_mesh_cb_vector.Length () ; i++)
+    sector_mesh_cb_vector[i]->RemoveMesh (&scfiSector, mesh);
+}
+
 void csSector::CheckFrustum (iFrustumView *lview)
 {
   int i = sector_cb_vector.Length ()-1;
@@ -811,7 +837,7 @@ void csSector::ShineLights (csProgressPulse *pulse)
   {
     if (pulse != 0) pulse->Step ();
 
-    csLight *cl = lights.Get (i)->GetPrivateObject ();
+    csLight *cl = ((csLight::Light*)lights.Get (i))->GetPrivateObject ();
     cl->CalculateLighting ();
   }
 }
@@ -823,7 +849,7 @@ void csSector::ShineLights (iMeshWrapper *mesh, csProgressPulse *pulse)
   {
     if (pulse != 0) pulse->Step ();
 
-    csLight *cl = lights.Get (i)->GetPrivateObject ();
+    csLight *cl = ((csLight::Light*)lights.Get (i))->GetPrivateObject ();
     cl->CalculateLighting (mesh);
   }
 }

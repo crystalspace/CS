@@ -29,7 +29,6 @@
 #include "csutil/scf.h"
 #include "iengine/fview.h"
 
-class csLight;
 class csColor;
 class csFlags;
 struct iLight;
@@ -211,9 +210,6 @@ SCF_VERSION (iLight, 0, 0, 9);
  */
 struct iLight : public iBase
 {
-  /// Get private pointer to light object. UGLY
-  virtual csLight* GetPrivateObject () = 0;
-
   /// Get the id of this light. This is a 16-byte MD5.
   virtual const char* GetLightID () = 0;
 
