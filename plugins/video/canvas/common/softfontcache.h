@@ -26,7 +26,7 @@ class csGraphics2D;
 
 class csSoftFontCache : public csFontCache
 {
-protected:
+public:
   struct SoftGlyphCacheData : public csFontCache::GlyphCacheData
   {
     csRef<iDataBuffer> glyphDataBuf;
@@ -48,51 +48,6 @@ protected:
 public:
   csSoftFontCache (csGraphics2D* G2D);
   virtual ~csSoftFontCache ();
-};
-
-class csSoftFontCache8 : public csSoftFontCache
-{
-public:
-  csSoftFontCache8 (csGraphics2D* G2D);
-
-  virtual void WriteString (iFont *font, int x, int y, int fg, int bg, 
-    const utf8_char* text, uint flags);
-};
-
-class csSoftFontCache16_NoAA : public csSoftFontCache
-{
-public:
-  csSoftFontCache16_NoAA (csGraphics2D* G2D);
-
-  virtual void WriteString (iFont *font, int x, int y, int fg, int bg, 
-    const utf8_char* text, uint flags);
-};
-
-class csSoftFontCache16_555 : public csSoftFontCache
-{
-public:
-  csSoftFontCache16_555 (csGraphics2D* G2D);
-
-  virtual void WriteString (iFont *font, int x, int y, int fg, int bg, 
-    const utf8_char* text, uint flags);
-};
-
-class csSoftFontCache16_565 : public csSoftFontCache
-{
-public:
-  csSoftFontCache16_565 (csGraphics2D* G2D);
-
-  virtual void WriteString (iFont *font, int x, int y, int fg, int bg, 
-    const utf8_char* text, uint flags);
-};
-
-class csSoftFontCache32 : public csSoftFontCache
-{
-public:
-  csSoftFontCache32 (csGraphics2D* G2D);
-
-  virtual void WriteString (iFont *font, int x, int y, int fg, int bg, 
-    const utf8_char* text, uint flags);
 };
 
 #endif // __CS_CANVAS_COMMON_SOFTFONTCACHE_H__

@@ -116,6 +116,8 @@ protected:
   int refreshRate;
   /// Activate Vsync
   bool vsync;
+
+  void CreateDefaultFontCache ();
 private:
   /// Find a color in palette mode.
   int FindRGBPalette (int r, int g, int b);
@@ -206,7 +208,11 @@ public:
       ((r >> (8 - pfmt.RedBits))   << pfmt.RedShift) |
       ((g >> (8 - pfmt.GreenBits)) << pfmt.GreenShift) |
       ((b >> (8 - pfmt.BlueBits))  << pfmt.BlueShift) |
-      ((a >> (8 - pfmt.AlphaBits)) << pfmt.AlphaShift);
+      ((255 - a) << 24);
+    /* Alpha is "inverted" so '-1' can be decomposed to a 
+       transparent color. (But alpha not be inverted, '-1'
+       would be "opaque white". However, -1 is the color
+       index for "transparent text background". */
   }
   /// Write a text string into the back buffer
   virtual void Write (iFont *font , int x, int y, int fg, int bg,

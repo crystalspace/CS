@@ -44,6 +44,7 @@
 #include "iutil/virtclk.h"
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
+#include "iutil/cmdline.h"
 #include "ivaria/reporter.h"
 #include "ivideo/texture.h"
 
@@ -111,6 +112,13 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
 
+  csRef<iCommandLineParser> cmdline =
+    CS_QUERY_REGISTRY (objectreg, iCommandLineParser);
+  if (cmdline)
+    do_verbose = (cmdline->GetOption ("verbose") != 0);
+  else
+    do_verbose = false;
+
   csRef<iEventQueue> q = CS_QUERY_REGISTRY (objectreg, iEventQueue);
   if (q)
     q->RegisterListener (scfiEventHandler,
@@ -135,9 +143,10 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
 	CS_LOAD_PLUGIN (plugin_mgr, classname, iShaderCompiler);
       if (plugin)
       {
-        Report (CS_REPORTER_SEVERITY_NOTIFY,
-	  "Loaded compilerplugin %s, compiler: %s", 
-          classname,plugin->GetName());
+	if (do_verbose)
+	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    "Loaded compiler plugin %s, compiler: %s", 
+	    classname,plugin->GetName());
         RegisterCompiler(plugin);
       }
     }

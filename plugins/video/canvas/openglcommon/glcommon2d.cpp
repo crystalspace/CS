@@ -119,31 +119,28 @@ bool csGraphics2DGLCommon::Open ()
   const char *version = (const char *)glGetString (GL_VERSION);
   csRef<iReporter> reporter (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (renderer || version || vendor)
-    if (reporter)
-      reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
-        "crystalspace.canvas.openglcommon",
-        "OpenGL renderer: %s (vendor: %s) version %s",
-        renderer ? renderer : "unknown", vendor ? vendor: "unknown", 
-	version ? version : "unknown");
-
-  if (reporter)
-    reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
       "crystalspace.canvas.openglcommon",
-      "Using %s mode at resolution %dx%d.",
-      FullScreen ? "full screen" : "windowed", Width, Height);
+      "OpenGL renderer: %s (vendor: %s) version %s",
+      renderer ? renderer : "unknown", vendor ? vendor: "unknown", 
+      version ? version : "unknown");
 
-  if (reporter)
+  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+    "crystalspace.canvas.openglcommon",
+    "Using %s mode at resolution %dx%d.",
+    FullScreen ? "full screen" : "windowed", Width, Height);
+
   {
     csString pfStr;
     GetPixelFormatString (currentFormat, pfStr);
 
-    reporter->Report (CS_REPORTER_SEVERITY_NOTIFY,
+    csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
       "crystalspace.canvas.openglcommon",
       "Pixel format: %s", pfStr.GetData());
   }
   if (currentFormat[glpfvColorBits] < 24)
   {
-    reporter->Report (CS_REPORTER_SEVERITY_WARNING,
+    csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
       "crystalspace.canvas.openglcommon",
       "WARNING! Crystal Space performs better in 24 or 32 bit display mode!");
   }

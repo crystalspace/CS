@@ -375,7 +375,7 @@ void G2DTestSystemDriver::SetupFrame ()
 	  else
             EnterState (stCustomCursor);
           break;
-  case stAlphaTest:
+	case stAlphaTest:
           SetNormalCursor ();
           DrawAlphaTestScreen ();
           EnterState (stBackBufferON);
@@ -914,6 +914,9 @@ void G2DTestSystemDriver::DrawAlphaTestScreen ()
   myG2D->DrawBox (190, 80, 50, 100, black);
   myG2D->DrawBox (20, 100, 150, 75, myG2D->FindRGB (205, 0, 125, 200));
   myG2D->DrawBox (120, 100, 100, 50, myG2D->FindRGB (120, 50, 50, 100));
+  myG2D->DrawLine (30, 110, 120, 60, myG2D->FindRGB (255, 128, 128, 128));
+  myG2D->DrawLine (120, 60, 70, 120, myG2D->FindRGB (128, 255, 128, 128));
+  myG2D->DrawLine (70, 120, 30, 110, myG2D->FindRGB (128, 128, 255, 128));
 
   myG2D->Write (font, 50, 140, myG2D->FindRGB (255, 255, 255, 100), -1,
     "Here is some partially transparent text");

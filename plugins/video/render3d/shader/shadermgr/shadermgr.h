@@ -57,6 +57,8 @@ private:
   csRef<iTextureManager> txtmgr;
   csRef<iStringSet> strings;
 
+  bool do_verbose;
+
   csRefArray<iShader> shaders;
   csRefArray<iShaderCompiler> compilers;
 

@@ -36,6 +36,7 @@
 #include "ivaria/reporter.h"
 
 #include "softfontcache.h"
+#include "softfontcacheimpl.h"
 
 SCF_IMPLEMENT_IBASE(csGraphics2D)
   SCF_IMPLEMENTS_INTERFACE(iGraphics2D)
@@ -232,6 +233,28 @@ void csGraphics2D::ChangeDepth (int d)
   Depth = d;
 }
 
+void csGraphics2D::CreateDefaultFontCache ()
+{
+  if (!fontCache)
+  {
+    if (pfmt.PixelBytes == 1)
+    {
+      fontCache = new csSoftFontCacheImpl<uint8, 
+	csPixMixerCopy <uint8> > (this);
+    }
+    else if (pfmt.PixelBytes == 2)
+    {
+      fontCache = new csSoftFontCacheImpl<uint16, 
+	csPixMixerRGBA<uint16> > (this);
+    }
+    else if (pfmt.PixelBytes == 4)
+    {
+      fontCache = new csSoftFontCacheImpl<uint32,
+	csPixMixerRGBA<uint32> > (this);
+    }
+  }
+}
+
 csGraphics2D::~csGraphics2D ()
 {
   if (scfiEventHandler)
@@ -288,32 +311,7 @@ bool csGraphics2D::Open ()
   for (i = 0, addr = 0; i < Height; i++, addr += bpl)
     LineAddress[i] = addr;
 
-  if (!fontCache)
-  {
-    if (pfmt.PixelBytes == 1)
-    {
-      fontCache = new csSoftFontCache8 (this);
-    }
-    else if (pfmt.PixelBytes == 2)
-    {
-      if (pfmt.GreenMask == 0x07e0)
-      {
-        fontCache = new csSoftFontCache16_565 (this);
-      }
-      else if (pfmt.GreenMask == 0x03e0)
-      {
-        fontCache = new csSoftFontCache16_555 (this);
-      }
-      else
-      {
-        fontCache = new csSoftFontCache16_NoAA (this);
-      }
-    }
-    else if (pfmt.PixelBytes == 4)
-    {
-      fontCache = new csSoftFontCache32 (this);
-    }
-  }
+  CreateDefaultFontCache ();
 
   SetClipRect (0, 0, Width, Height);
 
@@ -376,25 +374,64 @@ void csGraphics2D::ClearAll (int color)
   } while (GetPage () != CurPage);
 }
 
+#include "draw_common.h"
+
 void csGraphics2D::DrawPixel8 (csGraphics2D *This, int x, int y, int color)
 {
   if ((x >= This->ClipX1) && (x < This->ClipX2)
    && (y >= This->ClipY1) && (y < This->ClipY2))
-    *(This->GetPixelAt (x, y)) = color;
+  {
+    int realColor;
+    uint8 alpha;
+    SplitAlpha (color, realColor, alpha);
+    *(This->GetPixelAt (x, y)) = realColor;
+  }
 }
 
 void csGraphics2D::DrawPixel16 (csGraphics2D *This, int x, int y, int color)
 {
   if ((x >= This->ClipX1) && (x < This->ClipX2)
    && (y >= This->ClipY1) && (y < This->ClipY2))
-    *(short *)(This->GetPixelAt (x, y)) = color;
+  {
+    int realColor;
+    uint8 alpha;
+    SplitAlpha (color, realColor, alpha);
+
+    if (alpha == 0)
+      return;
+    else if (alpha == 255)
+    {
+      *(uint16*)(This->GetPixelAt (x, y)) = realColor;
+    }
+    else
+    {
+      csPixMixerRGBA<uint16> mixer (This, realColor, alpha);
+      mixer.Mix (*(uint16*)(This->GetPixelAt (x, y)));
+    }
+  }
 }
 
 void csGraphics2D::DrawPixel32 (csGraphics2D *This, int x, int y, int color)
 {
   if ((x >= This->ClipX1) && (x < This->ClipX2)
    && (y >= This->ClipY1) && (y < This->ClipY2))
-    *(long *)(This->GetPixelAt (x, y)) = color;
+  {
+    int realColor;
+    uint8 alpha;
+    SplitAlpha (color, realColor, alpha);
+
+    if (alpha == 0)
+      return;
+    else if (alpha == 255)
+    {
+      *(uint32*)(This->GetPixelAt (x, y)) = realColor;
+    }
+    else
+    {
+      csPixMixerRGBA<uint32> mixer (This, realColor, alpha);
+      mixer.Mix (*(uint32*)(This->GetPixelAt (x, y)));
+    }
+  }
 }
 
 void csGraphics2D::DrawPixels (
@@ -492,138 +529,60 @@ void csGraphics2D::Blit (int x, int y, int w, int h,
 }
 
 #ifndef NO_DRAWLINE
+
+#include "draw_line.h"
+
 void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
 {
   if (ClipLine (x1, y1, x2, y2, ClipX1, ClipY1, ClipX2, ClipY2))
     return;
 
-  int fx1 = csQint (x1), fx2 = csQint (x2),
-      fy1 = csQint (y1), fy2 = csQint (y2);
+  int realColor;
+  uint8 alpha;
+  SplitAlpha (color, realColor, alpha);
 
-
-  // Adjust the farthest margin
-  //if (fx1 < fx2) { if (float (fx2) == x2) fx2--; }
-  //else if (fx1 > fx2) { if (float (fx1) == x1) fx1--; }
-  //if (fy1 < fy2) { if (float (fy2) == y2) fy2--; }
-  //else if (fy1 > fy2) { if (float (fy1) == y1) fy1--; }
-
-
-  if (fy1 == fy2)
+  if (alpha == 0)
+    return;
+  else if (alpha == 255)
   {
-    if (fx2 - fx1)
-    {
-      if (fx1 > fx2) { int tmp = fx1; fx1 = fx2; fx2 = tmp; }
-      int count = fx2 - fx1 + 1;
-      switch (pfmt.PixelBytes)
-      {
-        case 1:
-          memset (GetPixelAt (fx1, fy1), color, count);
-          break;
-        case 2:
-        {
-          uint16 *dest = (uint16 *)GetPixelAt (fx1, fy1);
-          while (count--) *dest++ = color;
-          break;
-        }
-        case 4:
-        {
-          uint32 *dest = (uint32 *)GetPixelAt (fx1, fy1);
-          while (count--) *dest++ = color;
-          break;
-        }
-      } /* endswitch */
-    }
-    else
-      DrawPixel (fx1, fy1, color);
-  }
-  else if (abs (fx2 - fx1) > abs (fy2 - fy1))
-  {
-    // Transform floating-point format to 16.16 fixed-point
-    fy1 = csQint16 (y1); fy2 = csQint16 (y2);
-
-    if (fx1 > fx2)
-    {
-      int tmp = fx1; fx1 = fx2; fx2 = tmp;
-      tmp = fy1; fy1 = fy2; fy2 = tmp;
-    }
-
-    // delta Y can be negative
-    int deltay = (fy2 - fy1) / (fx2 - fx1 + 1);
-
-#define H_LINE(pixtype)                     \
-  {                             \
-    int x, y;  \
-    for (x = fx1, y = fy1 + deltay / 2; x <= fx2; x++)  \
-    {                               \
-      pixtype *p = (pixtype *)(Memory +             \
-        (x * sizeof (pixtype) + LineAddress [y >> 16]));    \
-      *p = color; y += deltay;                  \
-    }                               \
-  }
-
-/*#define H_LINE(pixtype)                       \
-  {                             \
-    int x, y;  \
-    for (x = fx1, y = fy1 + deltay / 2; x <= fx2; x++)  \
-    {                               \
-      DrawPixel(x, (y>>16), color); y += deltay;                    \
-    }                               \ */
-
     switch (pfmt.PixelBytes)
     {
-      case 1: H_LINE (uint8); break;
-      case 2: H_LINE (uint16); break;
-      case 4: H_LINE (uint32); break;
-    } /* endswitch */
-
-#undef H_LINE
+      case 1:
+	csG2DDrawLine<uint8, csPixMixerCopy<uint8> >::DrawLine (this,
+	  x1, y1, x2, y2, realColor, alpha);
+	break;
+      case 2:
+	csG2DDrawLine<uint16, csPixMixerCopy<uint16> >::DrawLine (this,
+	  x1, y1, x2, y2, realColor, alpha);
+	break;
+      case 4:
+	csG2DDrawLine<uint32, csPixMixerCopy<uint32> >::DrawLine (this,
+	  x1, y1, x2, y2, realColor, alpha);
+	break;
+    }
   }
   else
   {
-    // Transform floating-point format to 16.16 fixed-point
-    fx1 = csQint16 (x1); fx2 = csQint16 (x2);
-
-    if (fy1 > fy2)
-    {
-      int tmp = fy1; fy1 = fy2; fy2 = tmp;
-      tmp = fx1; fx1 = fx2; fx2 = tmp;
-    }
-
-    // delta X can be negative
-    int deltax = (fx2 - fx1) / (fy2 - fy1 + 1);
-
-#define V_LINE(pixtype)                     \
-  {                             \
-    int x, y; \
-    for (x = fx1 + deltax / 2, y = fy1; y <= fy2; y++)  \
-    {                               \
-      pixtype *p = (pixtype *)(Memory +             \
-        ((x >> 16) * sizeof (pixtype) + LineAddress [y]));  \
-      *p = color; x += deltax;                  \
-    }                               \
-  }
-
-/*#define V_LINE(pixtype)                       \
-  {                             \
-    int x, y; \
-    for (x = fx1 + deltax / 2, y = fy1; y <= fy2; y++)  \
-    {                               \
-      DrawPixel((x>>16), y, color); \
-      x += deltax; \
-    }                               \
-  }*/
-
     switch (pfmt.PixelBytes)
     {
-      case 1: V_LINE (uint8); break;
-      case 2: V_LINE (uint16); break;
-      case 4: V_LINE (uint32); break;
-    } /* endswitch */
-
-#undef V_LINE
+      case 1:
+	csG2DDrawLine<uint8, csPixMixerCopy<uint8> >::DrawLine (this,
+	  x1, y1, x2, y2, realColor, alpha);
+	break;
+      case 2:
+	csG2DDrawLine<uint16, csPixMixerRGBA<uint16> >::DrawLine (this,
+	  x1, y1, x2, y2, realColor, alpha);
+	break;
+      case 4:
+	csG2DDrawLine<uint32, csPixMixerRGBA<uint32> >::DrawLine (this,
+	  x1, y1, x2, y2, realColor, alpha);
+	break;
+    }
   }
 }
 #endif
+
+#include "draw_box.h"
 
 void csGraphics2D::DrawBox (int x, int y, int w, int h, int color)
 {
@@ -639,34 +598,49 @@ void csGraphics2D::DrawBox (int x, int y, int w, int h, int color)
     h = ClipY2 - y;
   if ((w <= 0) || (h <= 0))
     return;
-  switch (pfmt.PixelBytes)
+
+  int realColor;
+  uint8 alpha;
+  SplitAlpha (color, realColor, alpha);
+
+  if (alpha == 0)
+    return;
+  else if (alpha == 255)
   {
-    case 1:
-      while (h)
-      {
-        memset (GetPixelAt (x, y), color, w);
-        y++; h--;
-      } /* endwhile */
-      break;
-    case 2:
-      while (h)
-      {
-        register uint16 *dest = (uint16 *)GetPixelAt (x, y);
-        register int count = w;
-        while (count--) *dest++ = color;
-        y++; h--;
-      } /* endwhile */
-      break;
-    case 4:
-      while (h)
-      {
-        register uint32 *dest = (uint32 *)GetPixelAt (x, y);
-        register int count = w;
-        while (count--) *dest++ = color;
-        y++; h--;
-      } /* endwhile */
-      break;
-  } /* endswitch */
+    switch (pfmt.PixelBytes)
+    {
+      case 1:
+	csG2DDrawBox<uint8, csPixMixerCopy<uint8> >::DrawBox (this,
+	  x, y, w, h, realColor, alpha);
+	break;
+      case 2:
+	csG2DDrawBox<uint16, csPixMixerCopy<uint16> >::DrawBox (this,
+	  x, y, w, h, realColor, alpha);
+	break;
+      case 4:
+	csG2DDrawBox<uint32, csPixMixerCopy<uint32> >::DrawBox (this,
+	  x, y, w, h, realColor, alpha);
+	break;
+    }
+  }
+  else
+  {
+    switch (pfmt.PixelBytes)
+    {
+      case 1:
+	csG2DDrawBox<uint8, csPixMixerCopy<uint8> >::DrawBox (this,
+	  x, y, w, h, realColor, alpha);
+	break;
+      case 2:
+	csG2DDrawBox<uint16, csPixMixerRGBA<uint16> >::DrawBox (this,
+	  x, y, w, h, realColor, alpha);
+	break;
+      case 4:
+	csG2DDrawBox<uint32, csPixMixerRGBA<uint32> >::DrawBox (this,
+	  x, y, w, h, realColor, alpha);
+	break;
+    }
+  }
 }
 
 void csGraphics2D::SetClipRect (int xmin, int ymin, int xmax, int ymax)

@@ -10,6 +10,10 @@ chronological order.
 	- Jorrit worked further on foliage mesh. Added support for
 	  specifying LOD control in a foliage object.
 	- Jorrit fixed foliage so that it compiles again.
+	- res added alpha blending support to the software canvases.
+	- res fixed a crash in the GL canvases when a reporter was not present.
+	- res changed the shader manager to only report the loaded shader
+	  compiler plugins in '-verbose' mode.
 18-Oct-2004
 	- res enhanced the OpenGL canvases so blending is always functioning
 	  (lack of an alpha channel in the frame buffer isn't really a reason

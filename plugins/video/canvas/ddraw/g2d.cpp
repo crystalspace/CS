@@ -729,13 +729,11 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
   pfmt.AlphaMask = ddpf.dwRGBAlphaBitMask;
   Depth = ddpf.dwRGBBitCount;
 
-  if (fontCache) delete fontCache;
+  if (fontCache) delete fontCache; fontCache = 0;
   if (Depth == 8)
   {
     pfmt.PalEntries = 256;
     pfmt.PixelBytes = 1;
-
-    fontCache = new csSoftFontCache8 (this);
   }
   else if (Depth == 16)
   {
@@ -745,15 +743,6 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
     // Set pixel format
     pfmt.PixelBytes = 2;
     pfmt.PalEntries = 0;
-
-    if (ddpf.dwGBitMask == 0x03e0)
-    {
-      fontCache = new csSoftFontCache16_555 (this);
-    }
-    else
-    {
-      fontCache = new csSoftFontCache16_565 (this);
-    }
   }
   else if (Depth == 32)
   {
@@ -763,10 +752,9 @@ HRESULT csGraphics2DDDraw3::InitSurfaces ()
     // calculate CS's pixel format structure.
     pfmt.PixelBytes = 4;
     pfmt.PalEntries = 0;
-    
-    fontCache = new csSoftFontCache32 (this);
   }
   pfmt.complete ();
+  CreateDefaultFontCache ();
   fontCache->SetClipRect (ClipX1, ClipY1, ClipX2, ClipY2);
 
   m_lpddsBack->GetSurfaceDesc (&ddsd);

@@ -43,13 +43,11 @@
  */
 class csFontCache
 {
-protected:
+public:
   struct KnownFont;
-
   /**
    * Some basic data associated with a glyph.
    */
-public:
   struct GlyphCacheData
   {
     /// Font
@@ -130,7 +128,7 @@ protected:
    * it doesn't take up memory.
    */
   typedef csArray<PlaneGlyphs*, PlaneGlyphElementHandler> PlaneGlyphsArray;
-
+public:
   /**
    * A font known to the cache.
    */
@@ -141,6 +139,9 @@ protected:
     int fontSize;
     PlaneGlyphsArray planeGlyphs;
   };
+  /// the current clipping rect
+  int ClipX1, ClipY1, ClipX2, ClipY2;
+protected:
 
   /// Array of known fonts.
   csArray<KnownFont*> knownFonts;
@@ -196,12 +197,6 @@ protected:
   FontDeleteNotify* deleteCallback;
 
   void CleanupCache ();
-
-  /// the current clipping rect
-  int ClipX1, ClipY1, ClipX2, ClipY2;
-
-  /// Delete empty PlaneGlyphs from known fonts
-  void PurgeEmptyPlanes ();
 public:
   csFontCache ();
   virtual ~csFontCache ();
@@ -224,6 +219,8 @@ public:
   /// Get cached data for the least used glyph.
   GlyphCacheData* GetLeastUsed ();
 
+  /// Delete empty PlaneGlyphs from known fonts
+  void PurgeEmptyPlanes ();
 
   void SetClipRect (int x1, int y1, int x2, int y2)
   { 
