@@ -30,6 +30,7 @@ The history order is reversed so that new features are at the top.
 	- Matze changed the way the jam install rule looks for scfreg. Now you
 	  can also use it easily in external projects by simply setting
 	  CMD.SCFREG
+	- Norman Kraemer added some information to vd.m4 about whats going on.
 28-Apr-2003
 	- Matze fixed vfs.cfg generation when doing jam install.
 	- Eric Sunshine made the following changes to the cspython build
