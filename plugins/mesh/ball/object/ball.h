@@ -65,6 +65,7 @@ private:
    * camera to see if it needs to recalculate this.
    */
   csBox3 camera_bbox;
+  csBox3 world_bbox;
 
   /// Current camera number.
   long cur_cameranr;
@@ -192,7 +193,7 @@ public:
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
   virtual bool HitBeamObject (const csVector3&, const csVector3&,
-  	csVector3&, float*) { return false; }
+  	csVector3&, float*);
   virtual long GetShapeNumber () const { return shapenr; }
   virtual uint32 GetLODFeatures () const { return current_features; }
   virtual void SetLODFeatures (uint32 mask, uint32 value)

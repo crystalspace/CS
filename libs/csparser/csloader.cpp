@@ -2470,7 +2470,7 @@ iMaterialWrapper* csLoader::ParseMaterial (char *name, char* buf, const char *pr
       case CS_TOKEN_COLOR:
         col_set = true;
         if (!ParseColor (params, col))
-	  return false;
+	  return NULL;
         break;
       case CS_TOKEN_DIFFUSE:
         csScanStr (params, "%f", &diffuse);
@@ -2762,7 +2762,7 @@ iStatLight* csLoader::ParseStatlight (char* name, char* buf)
           break;
         case CS_TOKEN_KEY:
           if (!ParseKey (params, &Keys))
-	    return false;
+	    return NULL;
           break;
         case CS_TOKEN_HALO:
 	  str[0] = 0;
@@ -2956,7 +2956,7 @@ iMapNode* csLoader::ParseNode (char* name, char* buf, iSector* sec)
 	return NULL;
       case CS_TOKEN_KEY:
         if (!ParseKey (params, pNode->QueryObject ()))
-	  return false;
+	  return NULL;
         break;
       case CS_TOKEN_POSITION:
         csScanStr (params, "%f,%f,%f", &x, &y, &z);
@@ -3010,7 +3010,7 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
     {
       case CS_TOKEN_ADDON:
 	if (!LoadAddOn (params, sector))
-	  return false;
+	  return NULL;
       	break;
       case CS_TOKEN_CULLER:
 	if (!csScanStr (params, "%s", bspname))
@@ -3068,7 +3068,7 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
       case CS_TOKEN_KEY:
       {
         if (!ParseKey (params, sector->QueryObject()))
-	  return false;
+	  return NULL;
         break;
       }
     }

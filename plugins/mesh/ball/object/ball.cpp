@@ -97,14 +97,8 @@ void csBallMeshObject::GetTransformedBoundingBox (long cameranr,
   cur_cameranr = cameranr;
   cur_movablenr = movablenr;
 
-  camera_bbox.StartBoundingBox (trans * csVector3 (-radiusx/2, -radiusy/2, -radiusz/2));
-  camera_bbox.AddBoundingVertexSmart (trans * csVector3 ( radiusx/2, -radiusy/2, -radiusz/2));
-  camera_bbox.AddBoundingVertexSmart (trans * csVector3 (-radiusx/2,  radiusy/2, -radiusz/2));
-  camera_bbox.AddBoundingVertexSmart (trans * csVector3 ( radiusx/2,  radiusy/2, -radiusz/2));
-  camera_bbox.AddBoundingVertexSmart (trans * csVector3 (-radiusx/2, -radiusy/2,  radiusz/2));
-  camera_bbox.AddBoundingVertexSmart (trans * csVector3 ( radiusx/2, -radiusy/2,  radiusz/2));
-  camera_bbox.AddBoundingVertexSmart (trans * csVector3 (-radiusx/2,  radiusy/2,  radiusz/2));
-  camera_bbox.AddBoundingVertexSmart (trans * csVector3 ( radiusx/2,  radiusy/2,  radiusz/2));
+  camera_bbox.StartBoundingBox (trans * csVector3 (-radiusx, -radiusy, -radiusz) + shift);
+  camera_bbox.AddBoundingVertexSmart (trans * csVector3 ( radiusx,  radiusy,  radiusz) + shift);
 
   cbox = camera_bbox;
 }
@@ -361,9 +355,9 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
   normals = new csVector3[num_vertices];
   for (i = 0 ; i < num_vertices ; i++)
   {
-    vertices[i].x *= radiusx/2;
-    vertices[i].y *= radiusy/2;
-    vertices[i].z *= radiusz/2;
+    vertices[i].x *= radiusx;
+    vertices[i].y *= radiusy;
+    vertices[i].z *= radiusz;
     normals[i] = vertices[i].Unit ();
     vertices[i] += shift;
   }
@@ -418,14 +412,8 @@ void csBallMeshObject::SetupObject ()
     top_mesh.vertex_fog = NULL;
 
     GenerateSphere (verts_circle, top_mesh, top_normals);
-    object_bbox.StartBoundingBox (csVector3 (-radiusx/2, -radiusy/2, -radiusz/2));
-    object_bbox.AddBoundingVertexSmart (csVector3 ( radiusx/2, -radiusy/2, -radiusz/2));
-    object_bbox.AddBoundingVertexSmart (csVector3 (-radiusx/2,  radiusy/2, -radiusz/2));
-    object_bbox.AddBoundingVertexSmart (csVector3 ( radiusx/2,  radiusy/2, -radiusz/2));
-    object_bbox.AddBoundingVertexSmart (csVector3 (-radiusx/2, -radiusy/2,  radiusz/2));
-    object_bbox.AddBoundingVertexSmart (csVector3 ( radiusx/2, -radiusy/2,  radiusz/2));
-    object_bbox.AddBoundingVertexSmart (csVector3 (-radiusx/2,  radiusy/2,  radiusz/2));
-    object_bbox.AddBoundingVertexSmart (csVector3 ( radiusx/2,  radiusy/2,  radiusz/2));
+    object_bbox.StartBoundingBox (csVector3 (-radiusx, -radiusy, -radiusz) + shift);
+    object_bbox.AddBoundingVertexSmart (csVector3 ( radiusx,  radiusy,  radiusz) + shift);
     top_mesh.morph_factor = 0;
     top_mesh.num_vertices_pool = 1;
     top_mesh.do_morph_texels = false;
@@ -583,6 +571,52 @@ void csBallMeshObject::HardTransform (const csReversibleTransform& t)
   initialized = false;
   shapenr++;
 }
+
+bool csBallMeshObject::HitBeamObject( const csVector3& start, const csVector3& end, 
+  csVector3& isect, float *pr)
+{
+  // @@@ We might consider checking to a lower LOD version only.
+  // This function is not very fast if the bounding box test succeeds.
+  // Plagarism notice: Ripped form Sprite3D.
+#ifdef CS_DEBUG
+  printf("Ball:Hit Beam Object\n");
+  printf("Debug:\n");
+  printf("Segment: (%f,%f,%f) to (%f,%f,%f)\n",start.x,start.y,start.z,
+	end.x,end.y,end.z);
+  printf("BBox: (%f,%f,%f) to (%f,%f,%f)\n",
+	object_bbox.Min().x,
+	object_bbox.Min().y,
+	object_bbox.Min().z,
+	object_bbox.Max().x,
+	object_bbox.Max().y,
+	object_bbox.Max().z
+	);
+#endif
+  csSegment3 seg (start, end);
+  if (!csIntersect3::BoxSegment (object_bbox, seg, isect, pr))
+    return false;
+  int i, max = top_mesh.num_triangles;
+  csVector3 *vrt = top_mesh.vertices[0];
+  csTriangle *tr = top_mesh.triangles;
+  for (i = 0 ; i < max ; i++)
+  {
+    if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
+    	vrt[tr[i].c], seg, isect))
+    {
+      if (pr)
+      {
+        *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
+		csSquaredDist::PointPoint (start, end));
+      }
+#ifdef CS_DEBUG
+	  printf("Ball:Hit Beam Object: HIT! intersect : (%f,%f,%f)\n",isect.x,isect.y,isect.z);
+#endif
+      return true;
+    }
+  }
+  return false;
+}
+
 
 //----------------------------------------------------------------------
 
