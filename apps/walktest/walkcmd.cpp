@@ -343,6 +343,33 @@ csSprite3D* add_sprite (char* tname, char* sname, csSector* where,
   return spr;
 }
 
+
+void list_sprites(void)
+{
+  int num_sprites;
+  const char* sprite_name;
+  csSprite* sprite;
+
+  num_sprites = Sys->world->sprites.Length();
+
+  for(int i = 0; i < num_sprites; i++)
+  {
+    sprite = (csSprite*) Sys->world->sprites[i];
+    sprite_name = sprite->GetName();
+
+    if(sprite_name)
+      Sys->Printf (MSG_CONSOLE, "%s\n", sprite_name);
+    else
+      Sys->Printf (MSG_CONSOLE, "A sprite with no name.\n");
+  }
+  Sys->Printf (MSG_CONSOLE, "There are:%d sprites\n",
+	       Sys->world->sprites.Length());
+}
+
+
+
+
+
 //===========================================================================
 
 void WalkTest::ParseKeyCmds (csObject* src)
@@ -522,10 +549,14 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  snow fountain flame\n");
     CONPRI("Debugging:\n");
     CONPRI("  fclear hi frustum zbuf debug0 debug1 debug2 edges palette\n");
+    CONPRI("Sprites:\n");
+    CONPRI(" loadsprite addsprite delsprite listsprites \n");
+    CONPRI(" listactions setaction\n");
     CONPRI("Various:\n");
     CONPRI("  coordsave coordload bind capture map mapproj p_alpha s_fog\n");
-    CONPRI("  snd_play snd_volume loadsprite addsprite delsprite\n");
-    CONPRI("  record play clrrec saverec loadrec action\n");
+    CONPRI("  snd_play snd_volume record play clrrec saverec\n");
+    CONPRI("   loadrec action\n");
+
 #   undef CONPRI
   }
   else if (!strcasecmp (cmd, "coordsave"))
@@ -1155,6 +1186,76 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     else
       CsPrintf (MSG_CONSOLE, "Missing sprite name!\n");
+  }
+  else if (!strcasecmp (cmd, "listsprites"))
+  {
+    list_sprites();
+  }
+  else if(!strcasecmp(cmd, "listactions"))
+  {
+    char name[100];
+    char action[100];
+    int cnt = 0;
+    if (arg) cnt = ScanStr (arg, "%s,%s", name, action);
+    if(cnt != 1)
+    {
+      Sys->Printf (MSG_CONSOLE, "Expected parameters 'spritename'!\n");
+      Sys->Printf (MSG_CONSOLE, "To get the names use 'listsprites'\n");
+    }
+    else
+    {
+      // See if the sprite exists.
+      
+      csSprite3D* aspr = (csSprite3D *) Sys->world->sprites.FindByName(name);
+      
+      if(aspr)
+      {
+        Sys->Printf (MSG_CONSOLE, "Not implemented!  Can't get at the info\n");
+      }
+      else
+      {
+        Sys->Printf (MSG_CONSOLE, "Expected parameters 'spritename'!\n");
+        Sys->Printf (MSG_CONSOLE, "To get the names use 'listsprites'\n");
+      }
+      
+    }
+    
+  }
+  else if (!strcasecmp (cmd, "setaction"))
+  {
+    char name[100];
+    char action[100];
+    int cnt = 0;
+    if (arg) cnt = ScanStr (arg, "%s %s", name, action);
+    if(cnt != 2)
+    {
+      Sys->Printf (MSG_CONSOLE, "Expected parameters 'spritename action'!\n");
+      Sys->Printf (MSG_CONSOLE, "To get the names use 'listsprites'\n");
+    }
+    else
+    {
+      // Test to see if the sprite exists.
+      csSprite3D* aspr = (csSprite3D *) Sys->world->sprites.FindByName(name);
+      
+      if(aspr)
+      {
+        // Test to see if the action exists for that sprite.
+        if(!aspr->SetAction(action))
+	{
+          Sys->Printf (MSG_CONSOLE,
+		       "Expected parameters 'spritename action'!\n");
+	  Sys->Printf (MSG_CONSOLE,
+		 "That sprite does not have that action.\n");
+	}
+      }
+      else
+      {
+        Sys->Printf (MSG_CONSOLE,
+		     "Expected parameters 'spritename action'!\n");
+	Sys->Printf (MSG_CONSOLE,
+		 "That sprite does not exist, use the listsprites command.\n");
+      }
+    }
   }
   else if (!strcasecmp (cmd, "addskel"))
   {
