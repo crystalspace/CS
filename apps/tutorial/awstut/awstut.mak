@@ -36,7 +36,7 @@ SRC.AWSTUT = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.AWSTUT)/*.cpp ))
 OBJ.AWSTUT = $(addprefix $(OUT.AWSTUT)/,$(notdir $(SRC.AWSTUT:.cpp=$O)))
 DEP.AWSTUT = CSTOOL CSUTIL CSSYS CSUTIL CSGEOM CSGFX
 LIB.AWSTUT = $(foreach d,$(DEP.AWSTUT),$($d.LIB))
-CFG.AWSTUT = $(SRCDIR)/data/config/awstut.cfg
+CFG.AWSTUT = 
 
 OUTDIRS += $(OUT.AWSTUT)
 

@@ -7,5 +7,3 @@ LinkWith awstut : csgeom csgfx cssys cstool csutil ;
 
 Help awstut : "Alternate Windowing System Tutorial" ;
 
-InstallConfig awstut.cfg ;
-
