@@ -64,7 +64,7 @@ public:
    * to 3. This contrasts with Min() and Max() because
    * those are only the min and max corners.
    */
-  csVector2 GetCorner (int corner);
+  csVector2 GetCorner (int corner) const;
 
   /// Test if the given coordinate is in this box.
   bool In (const csVector2& v) const
@@ -248,7 +248,7 @@ public:
    * to 7. This contrasts with Min() and Max() because
    * those are only the min and max corners.
    */
-  csVector3 GetCorner (int corner);
+  csVector3 GetCorner (int corner) const;
 
   /// Test if the given coordinate is in this box.
   bool In (const csVector3& v) const

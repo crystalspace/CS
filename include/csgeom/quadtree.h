@@ -21,6 +21,7 @@
 
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
+#include "csgeom/box.h"
 
 // A quadtree node can be in three states: empty, full, or partial.
 // If empty or full the state of the children does not matter.
@@ -46,11 +47,6 @@ private:
    */
   csQuadtreeNode* children[4];
 
-  /**
-   * Corners of this node.
-   */
-  csVector2 corners[4];
-
   /// Center point for this node.
   csVector2 center;
   /// Contents state of this node.
@@ -65,16 +61,12 @@ private:
    */
   ~csQuadtreeNode ();
 
-  /// Set box.
-  void SetBox (const csVector2& corner00, const csVector2& corner01,
-  	const csVector2& corner11, const csVector2& corner10);
+  /// Set center.
+  void SetCenter (const csVector2& cen) { center = cen; }
 
 public:
   /// Get center.
   const csVector2& GetCenter () { return center; }
-
-  /// Get corner.
-  const csVector2& GetCorner (int idx) { return corners[idx]; }
 
   /// Get contents state.
   int GetState () { return state; }
@@ -93,30 +85,28 @@ class csQuadtree
 private:
   /// The root of the tree.
   csQuadtreeNode* root;
+  /// The bounding box of the entire tree.
+  csBox bbox;
 
 private:
   /// Build the tree with a given depth.
-  void Build (csQuadtreeNode* node, const csVector2& corner00,
-  	const csVector2& corner01, const csVector2& corner11,
-	const csVector2& corner10, int depth);
+  void Build (csQuadtreeNode* node, const csBox& box, int depth);
 
   /// Insert a polygon in the node.
   bool InsertPolygon (csQuadtreeNode* node,
 	csVector2* verts, int num_verts,
-	bool i00, bool i01, bool i11, bool i10);
+	const csBox& cur_bbox, const csBox& pol_bbox);
 
   /// Test a polygon in the node.
   bool TestPolygon (csQuadtreeNode* node,
 	csVector2* verts, int num_verts,
-	bool i00, bool i01, bool i11, bool i10);
+	const csBox& cur_bbox, const csBox& pol_bbox);
 
 public:
   /**
-   * Create an empty tree.<br>
-   * Corners are defined as:<br>
-   * 0 = topleft, 1=topright, 2=bottomright, 3=bottomleft.
+   * Create an empty tree with the given box.
    */
-  csQuadtree (csVector2* corners, int depth);
+  csQuadtree (const csBox& box, int depth);
 
   /**
    * Destroy the whole quadtree.
@@ -138,13 +128,15 @@ public:
    * Return true if the tree was modified (i.e. if parts of the
    * polygon were visible.
    */
-  bool InsertPolygon (csVector2* verts, int num_verts);
+  bool InsertPolygon (csVector2* verts, int num_verts,
+  	const csBox& pol_bbox);
 
   /**
    * Test for polygon visibility with the quad-tree.
    * Return true if polygon is visible.
    */
-  bool TestPolygon (csVector2* verts, int num_verts);
+  bool TestPolygon (csVector2* verts, int num_verts,
+  	const csBox& pol_bbox);
 };
 
 #endif /*QUADTREE_H*/

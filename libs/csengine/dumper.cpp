@@ -436,19 +436,6 @@ void Dumper::dump (csQuadtree* tree)
   CHK (buf = new char [depthp*depthp]);
 
   CsPrintf (MSG_DEBUG_0, "Depth=%d depthp=%d\n", depth, depthp);
-  CsPrintf (MSG_DEBUG_0, "Corners for root:\n");
-  CsPrintf (MSG_DEBUG_0, "  0: %f,%f\n",
-  	tree->root->corners[0].x,
-  	tree->root->corners[0].y);
-  CsPrintf (MSG_DEBUG_0, "  1: %f,%f\n",
-  	tree->root->corners[1].x,
-  	tree->root->corners[1].y);
-  CsPrintf (MSG_DEBUG_0, "  2: %f,%f\n",
-  	tree->root->corners[2].x,
-  	tree->root->corners[2].y);
-  CsPrintf (MSG_DEBUG_0, "  3: %f,%f\n",
-  	tree->root->corners[3].x,
-  	tree->root->corners[3].y);
   memset (buf, '?', depthp*depthp);
   dump (tree->root, buf, depthp, depth-1,
   	0, 0, depthp-1, depthp-1);

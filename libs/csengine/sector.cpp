@@ -397,7 +397,7 @@ static int count_cull_node_notvis_behind;
 static int count_cull_node_notvis_cbuffer;
 static int count_cull_node_vis;
 
-// @@@ This routine need to be cleaned up!!! It needs to
+// @@@ This routine need to be cleaned up!!! It probably needs to
 // be part of the class.
 
 bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
@@ -478,7 +478,8 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
 
     // c-buffer test.
     bool vis;
-    if (quadtree) vis = quadtree->TestPolygon (persp.GetVertices (), persp.GetNumVertices ());
+    if (quadtree) vis = quadtree->TestPolygon (persp.GetVertices (), persp.GetNumVertices (),
+    	persp.GetBoundingBox ());
     else vis = c_buffer->TestPolygon (persp.GetVertices (), persp.GetNumVertices ());
     if (!vis)
     {
@@ -504,64 +505,6 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   }
   return true;
 }
-
-#if 0
-bool CullOctreeNodeQuad (csPolygonTree* tree, csPolygonTreeNode* node,
-	const csVector3& pos, void* data)
-{
-  if (!node) return false;
-  if (node->Type () != NODE_OCTREE) return true;
-  int i;
-  csOctree* otree = (csOctree*)tree;
-  csOctreeNode* onode = (csOctreeNode*)node;
-  csQuadtree* quadtree = csWorld::current_world->GetQuadtree ();
-  csRenderView* rview = (csRenderView*)data;
-  csVector3 array[6];
-  int num_array;
-  otree->GetConvexOutline (onode, pos, array, num_array);
-  if (num_array)
-  {
-    // If all vertices are behind z plane then the node is
-    // not visible.
-    int num_z_0 = 0;
-    for (i = 0 ; i < num_array ; i++)
-    {
-      array[i] = rview->Other2This (array[i]);
-      if (array[i].z < SMALL_EPSILON) num_z_0++;
-    }
-    if (num_z_0 == num_array)
-    {
-      // Node behind camera.
-      count_cull_node_notvis_behind++;
-      return false;
-    }
-
-    // Quadtree test.
-    if (!quadtree->TestPolygon (array, num_array))
-    {
-      count_cull_node_notvis_cbuffer++;
-      return false;
-    }
-  }
-  count_cull_node_vis++;
-  // If a node is visible we check wether or not it has a minibsp.
-  // If it has a minibsp then we need to transform all vertices used
-  // by that minibsp to camera space.
-  csVector3* cam;
-  int* indices;
-  int num_indices;
-  if (onode->GetMiniBspVerts ())
-  {
-    csPolygonSet* pset = (csPolygonSet*)(otree->GetParent ());
-    cam = pset->GetCameraVertices ();
-    indices = onode->GetMiniBspVerts ();
-    num_indices = onode->GetMiniBspNumVerts ();
-    for (i = 0 ; i < num_indices ; i++)
-      cam[indices[i]] = rview->Other2This (pset->Vwor (indices[i]));
-  }
-  return true;
-}
-#endif
 
 void csSector::Draw (csRenderView& rview)
 {

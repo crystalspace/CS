@@ -283,12 +283,8 @@ void csWorld::EnableQuadtree (bool en)
     CHK (delete c_buffer);
     c_buffer = NULL;
     if (quadtree) return;
-    csVector2 corners[4];
-    corners[0] = csVector2 (0,  frame_height);
-    corners[1] = csVector2 (frame_width, frame_height);
-    corners[2] = csVector2 (frame_height, 0);
-    corners[3] = csVector2 (0, 0);
-    CHK (quadtree = new csQuadtree (corners, 8));
+    csBox box (0, 0, frame_width, frame_height);
+    CHK (quadtree = new csQuadtree (box, 8));
   }
   else
   {

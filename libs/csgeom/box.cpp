@@ -23,7 +23,7 @@
 
 //---------------------------------------------------------------------------
 
-csVector2 csBox::GetCorner (int corner)
+csVector2 csBox::GetCorner (int corner) const
 {
   switch (corner)
   {
@@ -112,7 +112,7 @@ bool operator< (const csVector2& point, const csBox& box)
 
 //---------------------------------------------------------------------------
 
-csVector3 csBox3::GetCorner (int corner)
+csVector3 csBox3::GetCorner (int corner) const
 {
   switch (corner)
   {

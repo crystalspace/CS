@@ -38,55 +38,38 @@ csQuadtreeNode::~csQuadtreeNode ()
   CHK (delete children[3]);
 }
 
-void csQuadtreeNode::SetBox (const csVector2& corner00, const csVector2& corner01,
-  	const csVector2& corner11, const csVector2& corner10)
-{
-  corners[0] = corner00;
-  corners[1] = corner01;
-  corners[2] = corner11;
-  corners[3] = corner10;
-  center = (corner00 + corner11) / 2;
-}
-
 //--------------------------------------------------------------------------
 
-void csQuadtree::Build (csQuadtreeNode* node, const csVector2& corner00,
-  	const csVector2& corner01, const csVector2& corner11,
-	const csVector2& corner10, int depth)
+void csQuadtree::Build (csQuadtreeNode* node, const csBox& box, int depth)
 {
-  node->SetBox (corner00, corner01, corner11, corner10);
+  node->SetCenter ((box.Min () + box.Max ())/2);
   if (depth <= 0) return;
   const csVector2& center = node->GetCenter ();
 
+  csBox childbox;
+
   CHK (node->children[0] = new csQuadtreeNode ());
-  Build (node->children[0],
-  	corner00, (corner00+corner01)/2,
-  	center, (corner00+corner10)/2,
-	depth-1);
+  childbox.Set (box.Min (), center);
+  Build (node->children[0], childbox, depth-1);
 
   CHK (node->children[1] = new csQuadtreeNode ());
-  Build (node->children[1],
-  	(corner00+corner01)/2, corner01,
-  	(corner01+corner11)/2, center,
-	depth-1);
+  childbox.Set (center.x, box.MinY (), box.MaxX (), center.y);
+  Build (node->children[1], childbox, depth-1);
 
   CHK (node->children[2] = new csQuadtreeNode ());
-  Build (node->children[2],
-  	center, (corner01+corner11)/2,
-  	corner11, (corner10+corner11)/2,
-	depth-1);
+  childbox.Set (center, box.Max ());
+  Build (node->children[2], childbox, depth-1);
 
   CHK (node->children[3] = new csQuadtreeNode ());
-  Build (node->children[3],
-  	(corner00+corner10)/2, center,
-  	(corner10+corner11)/2, corner10,
-	depth-1);
+  childbox.Set (box.MinX (), center.y, center.x, box.MaxY ());
+  Build (node->children[3], childbox, depth-1);
 }
 
-csQuadtree::csQuadtree (csVector2* corners, int depth)
+csQuadtree::csQuadtree (const csBox& box, int depth)
 {
+  bbox = box;
   CHK (root = new csQuadtreeNode ());
-  Build (root, corners[0], corners[1], corners[2], corners[3], depth-1);
+  Build (root, box, depth-1);
 }
 
 csQuadtree::~csQuadtree ()
@@ -123,199 +106,622 @@ bool IsVisibleFull (
   return false;
 }
 
+// Test if a bounding box is completely inside a convex polygon.
+bool BoxEntirelyInPolygon (csVector2* verts, int num_verts, const csBox& bbox)
+{
+  return (csPoly2D::In (verts, num_verts, bbox.GetCorner (0)) &&
+          csPoly2D::In (verts, num_verts, bbox.GetCorner (1)) &&
+          csPoly2D::In (verts, num_verts, bbox.GetCorner (2)) &&
+          csPoly2D::In (verts, num_verts, bbox.GetCorner (3)));
+}
 
 bool csQuadtree::InsertPolygon (csQuadtreeNode* node,
 	csVector2* verts, int num_verts,
-	bool i00, bool i01, bool i11, bool i10)
+	const csBox& cur_bbox, const csBox& pol_bbox)
 {
   // If node is completely full already then nothing can happen.
   if (node->GetState () == CS_QUAD_FULL) return false;
 
-  if (i00 && i01 && i11 && i10)
+  csQuadtreeNode** children = node->children;
+  // If there are no children then this node is set to state partial.
+  if (!children[0])
   {
-    // This node is completely contained in the polygon.
-    // We know the node was not completely full so we make it
-    // full and indicate to the caller that the node state has changed.
+    node->SetState (CS_QUAD_PARTIAL);
+    return true;
+  }
+
+  // If there are children and we are empty then we propagate
+  // the empty state to the children. This is because our
+  // state is going to change so the children need to be valid.
+  if (node->GetState () == CS_QUAD_EMPTY)
+  {
+    children[0]->SetState (CS_QUAD_EMPTY);
+    children[1]->SetState (CS_QUAD_EMPTY);
+    children[2]->SetState (CS_QUAD_EMPTY);
+    children[3]->SetState (CS_QUAD_EMPTY);
+  }
+
+  csBox childbox;
+  const csVector2& center = node->GetCenter ();
+  bool vis, rc1, rc2, rc3, rc4;
+  csVector2 v;
+  int i;
+  rc1 = rc2 = rc3 = rc4 = false;
+
+  // center_vis contains visibility info about the visibility
+  // of the center inside the polygon.
+  bool center_vis = csPoly2D::In (verts, num_verts, center);
+  // Visibility information for the four central points of the sides
+  // of every edge of the total area. We precompute this because
+  // we're going to need this information anyway.
+  v.x = cur_bbox.MinX ();
+  v.y = center.y;
+  bool left_vis = csPoly2D::In (verts, num_verts, v);
+  v.x = cur_bbox.MaxX ();
+  bool right_vis = csPoly2D::In (verts, num_verts, v);
+  v.x = center.x;
+  v.y = cur_bbox.MinY ();
+  bool top_vis = csPoly2D::In (verts, num_verts, v);
+  v.y = cur_bbox.MaxY ();
+  bool bottom_vis = csPoly2D::In (verts, num_verts, v);
+
+  // Check the bounding box of the polygon against all four
+  // child areas (by comparing the bounding box against the center).
+  // If the bounding box overlaps the child area then we continue
+  // the check to see if the polygon also overlaps the child area.
+
+  // Child 0 (top/left).
+  if (children[0]->GetState () != CS_QUAD_FULL &&
+  	pol_bbox.MinX () <= center.x && pol_bbox.MinY () <= center.y)
+  {
+    vis = false;
+    // If any of the three corners is in polygon then polygon is visible.
+    if (center_vis || left_vis || top_vis) vis = true;
+    // If bbox is entirely in child area then polygon is visible.
+    else if (pol_bbox.MaxX () <= center.x && pol_bbox.MaxY () <= center.y) vis = true;
+    else if (pol_bbox.MaxX () <= center.x)
+    {
+      // If bbox crosses child area vertically but does not cross
+      // it horizontally (both left and right) then polygon is visible.
+      if (pol_bbox.MinX () >= cur_bbox.MinX ()) vis = true;
+      // Else we have a difficult case. Here we know the bottom-left corner
+      // of the child area is inside the bounding box. We test every vertex
+      // of the polygon and see if any is inside the child area. In that
+      // case the polygon is visible.
+      else
+        for (i = 0 ; i < num_verts ; i++)
+	  if (verts[i].y <= center.y && verts[i].x >= cur_bbox.MinX ())
+	  {
+	    vis = true;
+	    break;
+	  }
+    }
+    else if (pol_bbox.MaxY () <= center.y)
+    {
+      if (pol_bbox.MinY () >= cur_bbox.MinY ()) vis = true;
+      else
+        for (i = 0 ; i < num_verts ; i++)
+	  if (verts[i].x <= center.x && verts[i].y >= cur_bbox.MinY ())
+	  {
+	    vis = true;
+	    break;
+	  }
+    }
+    else
+      for (i = 0 ; i < num_verts ; i++)
+	if (verts[i].x <= center.x && verts[i].y <= center.y)
+	{
+	  vis = true;
+	  break;
+	}
+
+    if (vis)
+    {
+      // We already calculated wether or not three of the four corners
+      // of the child area are inside the polygon. We only need
+      // to test the fourth one. If all are in the polygon then
+      // the node is full and we can stop recursion.
+      if (center_vis && left_vis && top_vis && csPoly2D::In (verts, num_verts, cur_bbox.Min ()))
+      {
+        children[0]->SetState (CS_QUAD_FULL);
+	rc1 = true;
+      }
+      else
+      {
+        childbox.Set (cur_bbox.Min (), center);
+        rc1 = InsertPolygon (children[0], verts, num_verts, childbox, pol_bbox);
+      }
+    }
+  }
+
+  // Child 1 (top/right).
+  if (children[1]->GetState () != CS_QUAD_FULL &&
+  	pol_bbox.MaxX () > center.x && pol_bbox.MinY () <= center.y)
+  {
+    vis = false;
+    if (center_vis || right_vis || top_vis) vis = true;
+    else if (pol_bbox.MinX () >= center.x && pol_bbox.MaxY () <= center.y) vis = true;
+    else if (pol_bbox.MinX () >= center.x)
+    {
+      if (pol_bbox.MaxX () <= cur_bbox.MaxX ()) vis = true;
+      else
+        for (i = 0 ; i < num_verts ; i++)
+	  if (verts[i].y <= center.y && verts[i].x <= cur_bbox.MaxX ())
+	  {
+	    vis = true;
+	    break;
+	  }
+    }
+    else if (pol_bbox.MaxY () <= center.y)
+    {
+      if (pol_bbox.MinY () >= cur_bbox.MinY ()) vis = true;
+      else
+        for (i = 0 ; i < num_verts ; i++)
+	  if (verts[i].x >= center.x && verts[i].y >= cur_bbox.MinY ())
+	  {
+	    vis = true;
+	    break;
+	  }
+    }
+    else
+      for (i = 0 ; i < num_verts ; i++)
+	if (verts[i].x >= center.x && verts[i].y <= center.y)
+	{
+	  vis = true;
+	  break;
+	}
+
+    if (vis)
+    {
+      v.x = cur_bbox.MaxX ();
+      v.y = cur_bbox.MinY ();
+      if (center_vis && right_vis && top_vis && csPoly2D::In (verts, num_verts, v))
+      {
+        children[1]->SetState (CS_QUAD_FULL);
+	rc2 = true;
+      }
+      else
+      {
+        childbox.Set (center.x, cur_bbox.MinY (), cur_bbox.MaxX (), center.y);
+        rc2 = InsertPolygon (children[1], verts, num_verts, childbox, pol_bbox);
+      }
+    }
+  }
+
+  // Child 2 (bottom/right).
+  if (children[2]->GetState () != CS_QUAD_FULL &&
+  	pol_bbox.MaxX () > center.x && pol_bbox.MaxY () > center.y)
+  {
+    vis = false;
+    if (center_vis || right_vis || bottom_vis) vis = true;
+    else if (pol_bbox.MinX () >= center.x && pol_bbox.MinY () >= center.y) vis = true;
+    else if (pol_bbox.MinX () >= center.x)
+    {
+      if (pol_bbox.MaxX () <= cur_bbox.MaxX ()) vis = true;
+      else
+        for (i = 0 ; i < num_verts ; i++)
+	  if (verts[i].y >= center.y && verts[i].x <= cur_bbox.MaxX ())
+	  {
+	    vis = true;
+	    break;
+	  }
+    }
+    else if (pol_bbox.MinY () >= center.y)
+    {
+      if (pol_bbox.MaxY () <= cur_bbox.MaxY ()) vis = true;
+      else
+        for (i = 0 ; i < num_verts ; i++)
+	  if (verts[i].x >= center.x && verts[i].y <= cur_bbox.MaxY ())
+	  {
+	    vis = true;
+	    break;
+	  }
+    }
+    else
+      for (i = 0 ; i < num_verts ; i++)
+	if (verts[i].x >= center.x && verts[i].y >= center.y)
+	{
+	  vis = true;
+	  break;
+	}
+
+    if (vis)
+    {
+      if (center_vis && right_vis && top_vis && csPoly2D::In (verts, num_verts, cur_bbox.Max ()))
+      {
+        children[2]->SetState (CS_QUAD_FULL);
+	rc3 = true;
+      }
+      else
+      {
+        childbox.Set (center, cur_bbox.Max ());
+        rc3 = InsertPolygon (children[2], verts, num_verts, childbox, pol_bbox);
+      }
+    }
+  }
+
+  // Child 3 (bottom/left).
+  if (children[3]->GetState () != CS_QUAD_FULL &&
+  	pol_bbox.MinX () <= center.x && pol_bbox.MaxY () > center.y)
+  {
+    vis = false;
+    if (center_vis || left_vis || bottom_vis) vis = true;
+    else if (pol_bbox.MaxX () <= center.x && pol_bbox.MinY () >= center.y) vis = true;
+    else if (pol_bbox.MaxX () <= center.x)
+    {
+      if (pol_bbox.MinX () >= cur_bbox.MinX ()) vis = true;
+      else
+        for (i = 0 ; i < num_verts ; i++)
+	  if (verts[i].y >= center.y && verts[i].x >= cur_bbox.MinX ())
+	  {
+	    vis = true;
+	    break;
+	  }
+    }
+    else if (pol_bbox.MinY () >= center.y)
+    {
+      if (pol_bbox.MaxY () <= cur_bbox.MaxY ()) vis = true;
+      else
+        for (i = 0 ; i < num_verts ; i++)
+	  if (verts[i].x <= center.x && verts[i].y <= cur_bbox.MaxY ())
+	  {
+	    vis = true;
+	    break;
+	  }
+    }
+    else
+      for (i = 0 ; i < num_verts ; i++)
+	if (verts[i].x >= center.x && verts[i].y >= center.y)
+	{
+	  vis = true;
+	  break;
+	}
+
+    if (vis)
+    {
+      v.x = cur_bbox.MinX ();
+      v.y = cur_bbox.MaxY ();
+      if (center_vis && right_vis && top_vis && csPoly2D::In (verts, num_verts, v))
+      {
+        children[3]->SetState (CS_QUAD_FULL);
+	rc4 = true;
+      }
+      else
+      {
+  	childbox.Set (cur_bbox.MinX (), center.y, center.x, cur_bbox.MaxY ());
+        rc4 = InsertPolygon (children[3], verts, num_verts, childbox, pol_bbox);
+      }
+    }
+  }
+
+  if (children[0]->GetState () == CS_QUAD_FULL &&
+      children[1]->GetState () == CS_QUAD_FULL &&
+      children[2]->GetState () == CS_QUAD_FULL &&
+      children[3]->GetState () == CS_QUAD_FULL)
+  {
     node->SetState (CS_QUAD_FULL);
     return true;
   }
 
-  bool vis = false;
-  if (i00 || i01 || i11 || i10)
-  {
-    // At least one vertex of this node is in the polygon.
-    // This means the polygon is visible in the node.
-    vis = true;
-  }
-  else
-  {
-    // None of the vertices of the node are in the polygon.
-    // In this case we must perform a more heavy test.
-
-    // If any of the polygon vertices is in the node then
-    // the polygon is visible.
-    int i;
-    for (i = 0 ; i < num_verts ; i++)
-      if (csPoly2D::In (node->corners, 4, verts[i]))
-      {
-        vis = true;
-	break;
-      }
-
-    if (!vis)
-      vis = IsVisibleFull (node->corners, 4, verts, num_verts);
-  }
-
-  // If polygon is not visible in node then nothing happens
-  // here.
-  if (!vis) return false;
-
-  // The polygon partially overlaps with the node.
-  // In this case we set the state of the node to CS_QUAD_PARTIAL
-  // and traverse to the children (if any).
-  bool was_empty = (node->GetState () == CS_QUAD_EMPTY);
   node->SetState (CS_QUAD_PARTIAL);
-
-  csQuadtreeNode** children = node->children;
-  if (!children[0])
-  {
-    // This node has no children. Just return that the state
-    // of the node has changed (note that going from
-    // CS_QUAD_PARTIAL to CS_QUAD_PARTIAL is also seen as a state
-    // change because this means that the polygon may be visible here).
-    return true;
-  }
-  else
-  {
-    // This node has children.
-    if (was_empty)
-    {
-      children[0]->SetState (CS_QUAD_EMPTY);
-      children[1]->SetState (CS_QUAD_EMPTY);
-      children[2]->SetState (CS_QUAD_EMPTY);
-      children[3]->SetState (CS_QUAD_EMPTY);
-    }
-    bool i0a = csPoly2D::In (verts, num_verts, children[0]->GetCorner (1));
-    bool i1a = csPoly2D::In (verts, num_verts, children[3]->GetCorner (2));
-    bool ia0 = csPoly2D::In (verts, num_verts, children[0]->GetCorner (3));
-    bool ia1 = csPoly2D::In (verts, num_verts, children[1]->GetCorner (2));
-    bool iaa = csPoly2D::In (verts, num_verts, children[0]->GetCorner (2));
-    bool rc0 = InsertPolygon (children[0], verts, num_verts, i00, i0a, iaa, ia0);
-    bool rc1 = InsertPolygon (children[1], verts, num_verts, i0a, i01, ia1, iaa);
-    bool rc3 = InsertPolygon (children[2], verts, num_verts, iaa, ia1, i11, i1a);
-    bool rc2 = InsertPolygon (children[3], verts, num_verts, ia0, iaa, i1a, i10);
-    if (children[0]->GetState () == CS_QUAD_FULL &&
-        children[1]->GetState () == CS_QUAD_FULL &&
-        children[2]->GetState () == CS_QUAD_FULL &&
-        children[3]->GetState () == CS_QUAD_FULL)
-    {
-      // If all children are full then this node also becomes full.
-      node->SetState (CS_QUAD_FULL);
-    }
-    // If one of the children changed state then we have changed state.
-    return rc0 || rc1 || rc2 || rc3;
-  }
-
   return true;
 }
 
-bool csQuadtree::InsertPolygon (csVector2* verts, int num_verts)
+bool csQuadtree::InsertPolygon (csVector2* verts, int num_verts, const csBox& pol_bbox)
 {
-  bool i00 = csPoly2D::In (verts, num_verts, root->GetCorner (0));
-  bool i01 = csPoly2D::In (verts, num_verts, root->GetCorner (1));
-  bool i11 = csPoly2D::In (verts, num_verts, root->GetCorner (2));
-  bool i10 = csPoly2D::In (verts, num_verts, root->GetCorner (3));
-  bool rc = InsertPolygon (root, verts, num_verts, i00, i01, i11, i10);
-  return rc;
+  // If root is already full then there is nothing that can happen further.
+  if (root->GetState () == CS_QUAD_FULL) return false;
+
+  // If the bounding box of the tree does not overlap with the bounding box of
+  // the polygon then we can return false here.
+  if (!bbox.Overlap (pol_bbox)) return false;
+
+  // If bounding box of tree is completely inside bounding box of polygon then
+  // it is possible that tree is completely in polygon. We test that condition
+  // further.
+  if (bbox < pol_bbox)
+  {
+    if (BoxEntirelyInPolygon (verts, num_verts, bbox))
+    {
+      // Polygon completely covers tree. In that case set state
+      // of tree to full and return true.
+      root->SetState (CS_QUAD_FULL);
+      return true;
+    }
+  }
+
+  return InsertPolygon (root, verts, num_verts, bbox, pol_bbox);
 }
 
 bool csQuadtree::TestPolygon (csQuadtreeNode* node,
 	csVector2* verts, int num_verts,
-	bool i00, bool i01, bool i11, bool i10)
+	const csBox& cur_bbox, const csBox& pol_bbox)
 {
-  // If node is completely full then polygon is not
-  // visible in this node.
+  // If node is completely full already then nothing can happen.
   if (node->GetState () == CS_QUAD_FULL) return false;
-
-  if (i00 && i01 && i11 && i10)
-  {
-    // This node is completely contained in the polygon.
-    // Since the node is not full we have to assume that the
-    // polygon can be visible in the node.
-    return true;
-  }
-
-  bool vis = false;
-  if (i00 || i01 || i11 || i10)
-  {
-    // At least one vertex of this node is in the polygon.
-    // This means the polygon is visible in the node.
-    vis = true;
-  }
-  else
-  {
-    // None of the vertices of the node are in the polygon.
-    // In this case we must perform a more heavy test.
-
-    // If any of the polygon vertices is in the node then
-    // the polygon is visible.
-    int i;
-    for (i = 0 ; i < num_verts ; i++)
-      if (csPoly2D::In (node->corners, 4, verts[i]))
-      {
-        vis = true;
-	break;
-      }
-
-    if (!vis)
-      vis = IsVisibleFull (node->corners, 4, verts, num_verts);
-  }
-
-  // If polygon is not visible in node then nothing happens
-  // here.
-  if (!vis) return false;
-
-  // The polygon partially overlaps with the node.
-
-  // If this node is empty then polygon is visible.
+  // If node is completely empty then polygon is always visible.
   if (node->GetState () == CS_QUAD_EMPTY) return true;
 
-  // Otherwise we have to check the state in the children (if any).
   csQuadtreeNode** children = node->children;
-  if (!children[0])
+  // If there are no children then we assume polygon is not visible.
+  // This is an optimization which is not entirely correct@@@
+  if (!children[0]) return true;
+
+  csBox childbox;
+  const csVector2& center = node->GetCenter ();
+  bool vis;
+  csVector2 v;
+  int i;
+
+  // center_vis contains visibility info about the visibility
+  // of the center inside the polygon.
+  bool center_vis = csPoly2D::In (verts, num_verts, center);
+  // Visibility information for the four central points of the sides
+  // of every edge of the total area. We precompute this because
+  // we're going to need this information anyway.
+  v.x = cur_bbox.MinX ();
+  v.y = center.y;
+  bool left_vis = csPoly2D::In (verts, num_verts, v);
+  v.x = cur_bbox.MaxX ();
+  bool right_vis = csPoly2D::In (verts, num_verts, v);
+  v.x = center.x;
+  v.y = cur_bbox.MinY ();
+  bool top_vis = csPoly2D::In (verts, num_verts, v);
+  v.y = cur_bbox.MaxY ();
+  bool bottom_vis = csPoly2D::In (verts, num_verts, v);
+
+  // Check the bounding box of the polygon against all four
+  // child areas (by comparing the bounding box against the center).
+  // If the bounding box overlaps the child area then we continue
+  // the check to see if the polygon also overlaps the child area.
+
+  // Child 0 (top/left).
+  if (children[0]->GetState () != CS_QUAD_FULL &&
+  	pol_bbox.MinX () <= center.x && pol_bbox.MinY () <= center.y)
   {
-    // This node has no children. This means that the polygon
-    // is visible in this node.
-    // @@@ However, we shortcut this by saying the polygon is not visible.
-    // This is not completely correct but it speeds up things considerably.
-    return false;
-    //return true;
-  }
-  else
-  {
-    // This node has children.
-    bool i0a = csPoly2D::In (verts, num_verts, children[0]->GetCorner (1));
-    bool i1a = csPoly2D::In (verts, num_verts, children[3]->GetCorner (2));
-    bool ia0 = csPoly2D::In (verts, num_verts, children[0]->GetCorner (3));
-    bool ia1 = csPoly2D::In (verts, num_verts, children[1]->GetCorner (2));
-    bool iaa = csPoly2D::In (verts, num_verts, children[0]->GetCorner (2));
-    if (TestPolygon (children[0], verts, num_verts, i00, i0a, iaa, ia0)) return true;
-    if (TestPolygon (children[1], verts, num_verts, i0a, i01, ia1, iaa)) return true;
-    if (TestPolygon (children[2], verts, num_verts, iaa, ia1, i11, i1a)) return true;
-    if (TestPolygon (children[3], verts, num_verts, ia0, iaa, i1a, i10)) return true;
-    // Polygon is not visible in any of the children.
-    return false;
+    vis = false;
+    // If any of the three corners is in polygon then polygon is visible.
+    if (center_vis || left_vis || top_vis) vis = true;
+    // If bbox is entirely in child area then polygon is visible.
+    else if (pol_bbox.MaxX () <= center.x && pol_bbox.MaxY () <= center.y) vis = true;
+    else if (pol_bbox.MaxX () <= center.x)
+    {
+      // If bbox crosses child area vertically but does not cross
+      // it horizontally (both left and right) then polygon is visible.
+      if (pol_bbox.MinX () >= cur_bbox.MinX ()) vis = true;
+      // Else we have a difficult case. Here we know the bottom-left corner
+      // of the child area is inside the bounding box. We test every vertex
+      // of the polygon and see if any is inside the child area. In that
+      // case the polygon is visible.
+      else
+        for (i = 0 ; i < num_verts ; i++)
+	  if (verts[i].y <= center.y && verts[i].x >= cur_bbox.MinX ())
+	  {
+	    vis = true;
+	    break;
+	  }
+    }
+    else if (pol_bbox.MaxY () <= center.y)
+    {
+      if (pol_bbox.MinY () >= cur_bbox.MinY ()) vis = true;
+      else
+        for (i = 0 ; i < num_verts ; i++)
+	  if (verts[i].x <= center.x && verts[i].y >= cur_bbox.MinY ())
+	  {
+	    vis = true;
+	    break;
+	  }
+    }
+    else
+      for (i = 0 ; i < num_verts ; i++)
+	if (verts[i].x <= center.x && verts[i].y <= center.y)
+	{
+	  vis = true;
+	  break;
+	}
+
+    if (vis)
+    {
+      // We already calculated wether or not three of the four corners
+      // of the child area are inside the polygon. We only need
+      // to test the fourth one. If all are in the polygon then
+      // we cover the node and we can stop recursion. Polygon is
+      // visible in that case becase node is not full.
+      if (center_vis && left_vis && top_vis && csPoly2D::In (verts, num_verts, cur_bbox.Min ()))
+      {
+        return true;
+      }
+      else
+      {
+        childbox.Set (cur_bbox.Min (), center);
+        if (TestPolygon (children[0], verts, num_verts, childbox, pol_bbox)) return true;
+      }
+    }
   }
 
-  return true;
+  // Child 1 (top/right).
+  if (children[1]->GetState () != CS_QUAD_FULL &&
+  	pol_bbox.MaxX () > center.x && pol_bbox.MinY () <= center.y)
+  {
+    vis = false;
+    if (center_vis || right_vis || top_vis) vis = true;
+    else if (pol_bbox.MinX () >= center.x && pol_bbox.MaxY () <= center.y) vis = true;
+    else if (pol_bbox.MinX () >= center.x)
+    {
+      if (pol_bbox.MaxX () <= cur_bbox.MaxX ()) vis = true;
+      else
+        for (i = 0 ; i < num_verts ; i++)
+	  if (verts[i].y <= center.y && verts[i].x <= cur_bbox.MaxX ())
+	  {
+	    vis = true;
+	    break;
+	  }
+    }
+    else if (pol_bbox.MaxY () <= center.y)
+    {
+      if (pol_bbox.MinY () >= cur_bbox.MinY ()) vis = true;
+      else
+        for (i = 0 ; i < num_verts ; i++)
+	  if (verts[i].x >= center.x && verts[i].y >= cur_bbox.MinY ())
+	  {
+	    vis = true;
+	    break;
+	  }
+    }
+    else
+      for (i = 0 ; i < num_verts ; i++)
+	if (verts[i].x >= center.x && verts[i].y <= center.y)
+	{
+	  vis = true;
+	  break;
+	}
+
+    if (vis)
+    {
+      v.x = cur_bbox.MaxX ();
+      v.y = cur_bbox.MinY ();
+      if (center_vis && right_vis && top_vis && csPoly2D::In (verts, num_verts, v))
+      {
+        return true;
+      }
+      else
+      {
+        childbox.Set (center.x, cur_bbox.MinY (), cur_bbox.MaxX (), center.y);
+        if (TestPolygon (children[1], verts, num_verts, childbox, pol_bbox)) return true;
+      }
+    }
+  }
+
+  // Child 2 (bottom/right).
+  if (children[2]->GetState () != CS_QUAD_FULL &&
+  	pol_bbox.MaxX () > center.x && pol_bbox.MaxY () > center.y)
+  {
+    vis = false;
+    if (center_vis || right_vis || bottom_vis) vis = true;
+    else if (pol_bbox.MinX () >= center.x && pol_bbox.MinY () >= center.y) vis = true;
+    else if (pol_bbox.MinX () >= center.x)
+    {
+      if (pol_bbox.MaxX () <= cur_bbox.MaxX ()) vis = true;
+      else
+        for (i = 0 ; i < num_verts ; i++)
+	  if (verts[i].y >= center.y && verts[i].x <= cur_bbox.MaxX ())
+	  {
+	    vis = true;
+	    break;
+	  }
+    }
+    else if (pol_bbox.MinY () >= center.y)
+    {
+      if (pol_bbox.MaxY () <= cur_bbox.MaxY ()) vis = true;
+      else
+        for (i = 0 ; i < num_verts ; i++)
+	  if (verts[i].x >= center.x && verts[i].y <= cur_bbox.MaxY ())
+	  {
+	    vis = true;
+	    break;
+	  }
+    }
+    else
+      for (i = 0 ; i < num_verts ; i++)
+	if (verts[i].x >= center.x && verts[i].y >= center.y)
+	{
+	  vis = true;
+	  break;
+	}
+
+    if (vis)
+    {
+      if (center_vis && right_vis && top_vis && csPoly2D::In (verts, num_verts, cur_bbox.Max ()))
+      {
+        return true;
+      }
+      else
+      {
+        childbox.Set (center, cur_bbox.Max ());
+        if (TestPolygon (children[2], verts, num_verts, childbox, pol_bbox)) return true;
+      }
+    }
+  }
+
+  // Child 3 (bottom/left).
+  if (children[3]->GetState () != CS_QUAD_FULL &&
+  	pol_bbox.MinX () <= center.x && pol_bbox.MaxY () > center.y)
+  {
+    vis = false;
+    if (center_vis || left_vis || bottom_vis) vis = true;
+    else if (pol_bbox.MaxX () <= center.x && pol_bbox.MinY () >= center.y) vis = true;
+    else if (pol_bbox.MaxX () <= center.x)
+    {
+      if (pol_bbox.MinX () >= cur_bbox.MinX ()) vis = true;
+      else
+        for (i = 0 ; i < num_verts ; i++)
+	  if (verts[i].y >= center.y && verts[i].x >= cur_bbox.MinX ())
+	  {
+	    vis = true;
+	    break;
+	  }
+    }
+    else if (pol_bbox.MinY () >= center.y)
+    {
+      if (pol_bbox.MaxY () <= cur_bbox.MaxY ()) vis = true;
+      else
+        for (i = 0 ; i < num_verts ; i++)
+	  if (verts[i].x <= center.x && verts[i].y <= cur_bbox.MaxY ())
+	  {
+	    vis = true;
+	    break;
+	  }
+    }
+    else
+      for (i = 0 ; i < num_verts ; i++)
+	if (verts[i].x >= center.x && verts[i].y >= center.y)
+	{
+	  vis = true;
+	  break;
+	}
+
+    if (vis)
+    {
+      v.x = cur_bbox.MinX ();
+      v.y = cur_bbox.MaxY ();
+      if (center_vis && right_vis && top_vis && csPoly2D::In (verts, num_verts, v))
+      {
+        return true;
+      }
+      else
+      {
+  	childbox.Set (cur_bbox.MinX (), center.y, center.x, cur_bbox.MaxY ());
+        if (TestPolygon (children[3], verts, num_verts, childbox, pol_bbox)) return true;
+      }
+    }
+  }
+
+  return false;
 }
 
-bool csQuadtree::TestPolygon (csVector2* verts, int num_verts)
+bool csQuadtree::TestPolygon (csVector2* verts, int num_verts, const csBox& pol_bbox)
 {
-  bool i00 = csPoly2D::In (verts, num_verts, root->GetCorner (0));
-  bool i01 = csPoly2D::In (verts, num_verts, root->GetCorner (1));
-  bool i11 = csPoly2D::In (verts, num_verts, root->GetCorner (2));
-  bool i10 = csPoly2D::In (verts, num_verts, root->GetCorner (3));
-  return TestPolygon (root, verts, num_verts, i00, i01, i11, i10);
+  // If root is already full then there is nothing that can happen further.
+  if (root->GetState () == CS_QUAD_FULL) return false;
+
+  // If the bounding box of the tree does not overlap with the bounding box of
+  // the polygon then we can return false here.
+  if (!bbox.Overlap (pol_bbox)) return false;
+
+  // If bounding box of tree is completely inside bounding box of polygon then
+  // it is possible that tree is completely in polygon. We test that condition
+  // further.
+  if (bbox < pol_bbox)
+  {
+    if (BoxEntirelyInPolygon (verts, num_verts, bbox))
+    {
+      // Polygon completely covers tree. In that case return
+      // true because polygon will be visible (node is not full).
+      return true;
+    }
+  }
+
+  return TestPolygon (root, verts, num_verts, bbox, pol_bbox);
 }
+
 

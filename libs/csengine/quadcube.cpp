@@ -94,7 +94,7 @@ bool csQuadtreePersp::InsertPolygon (csVector3* verts, int num_verts,
   if (!DoPerspective (verts, num_verts, persp)) return false;
   if (clipper && !persp.ClipAgainst (clipper)) return false;
   return csQuadtree::InsertPolygon (persp.GetVertices (),
-  	persp.GetNumVertices ());
+  	persp.GetNumVertices (), persp.GetBoundingBox ());
 }
 
 bool csQuadtreePersp::TestPolygon (csVector3* verts, int num_verts,
@@ -104,7 +104,7 @@ bool csQuadtreePersp::TestPolygon (csVector3* verts, int num_verts,
   if (!DoPerspective (verts, num_verts, persp)) return false;
   if (clipper && !persp.ClipAgainst (clipper)) return false;
   return csQuadtree::TestPolygon (persp.GetVertices (),
-  	persp.GetNumVertices ());
+  	persp.GetNumVertices (), persp.GetBoundingBox ());
 }
 
 csQuadcube::csQuadcube (float z, int depth)
@@ -112,18 +112,14 @@ csQuadcube::csQuadcube (float z, int depth)
   float x = (csWorld::frame_width/2) * csCamera::default_inv_aspect * z;
   float y = (csWorld::frame_height/2) * csCamera::default_inv_aspect * z;
   z_dist = z;
-  csVector2 corners[4];
-  corners[0] = csVector2 (-x,  y);
-  corners[1] = csVector2 ( x,  y);
-  corners[2] = csVector2 ( x, -y);
-  corners[3] = csVector2 (-x, -y);
+  csBox box (-x, -y, x, y);
 
-  CHK (trees[0] = new csQuadtreePersp (corners, depth));
-  CHK (trees[1] = new csQuadtreePersp (corners, depth));
-  CHK (trees[2] = new csQuadtreePersp (corners, depth));
-  CHK (trees[3] = new csQuadtreePersp (corners, depth));
-  CHK (trees[4] = new csQuadtreePersp (corners, depth));
-  CHK (trees[5] = new csQuadtreePersp (corners, depth));
+  CHK (trees[0] = new csQuadtreePersp (box, depth));
+  CHK (trees[1] = new csQuadtreePersp (box, depth));
+  CHK (trees[2] = new csQuadtreePersp (box, depth));
+  CHK (trees[3] = new csQuadtreePersp (box, depth));
+  CHK (trees[4] = new csQuadtreePersp (box, depth));
+  CHK (trees[5] = new csQuadtreePersp (box, depth));
 }
 
 csQuadcube::~csQuadcube ()

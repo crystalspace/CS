@@ -578,7 +578,8 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         {
 	  if (quadtree)
 	  {
-	    if (quadtree->TestPolygon (clip->GetVertices (), clip->GetNumVertices ()))
+	    if (quadtree->TestPolygon (clip->GetVertices (), clip->GetNumVertices (),
+	    	clip->GetBoundingBox ()))
               sp3d->MarkVisible ();
 	  }
 	  else if (c_buffer->TestPolygon (clip->GetVertices (), clip->GetNumVertices ()))
@@ -605,7 +606,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         {
 	  if (quadtree)
             visible = quadtree->TestPolygon (clip->GetVertices (),
-		  clip->GetNumVertices ());
+		  clip->GetNumVertices (), clip->GetBoundingBox ());
 	  else
             visible = c_buffer->TestPolygon (clip->GetVertices (),
 		  clip->GetNumVertices ());
@@ -614,7 +615,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         {
 	  if (quadtree)
             visible = quadtree->InsertPolygon (clip->GetVertices (),
-		  clip->GetNumVertices ());
+		  clip->GetNumVertices (), clip->GetBoundingBox ());
 	  else
             visible = c_buffer->InsertPolygon (clip->GetVertices (),
 		  clip->GetNumVertices ());
