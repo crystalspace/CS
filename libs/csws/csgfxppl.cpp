@@ -103,7 +103,7 @@ void csGraphicsPipeline::Pixel (int x, int y, int color)
   pe->Pixel.color = color;
 }
 
-void csGraphicsPipeline::Text (int x, int y, int fg, int bg, int font, const char *s)
+void csGraphicsPipeline::Text (int x, int y, int fg, int bg, int font, int fontsize, const char *s)
 {
   csPipeEntry *pe = AllocOp (pipeopTEXT);
   if (!pe) return;
@@ -112,6 +112,7 @@ void csGraphicsPipeline::Text (int x, int y, int fg, int bg, int font, const cha
   pe->Text.fg = fg;
   pe->Text.bg = bg;
   pe->font = font;
+  pe->fontsize = fontsize;
   CHK (pe->Text.string = strnew (s));
 }
 
@@ -305,10 +306,11 @@ void csGraphicsPipeline::Flush (int iCurPage)
       case pipeopTEXT:
       {
         G2D->SetFontID (op->font);
+        G2D->SetFontSize (op->fontsize);
         G2D->Write (op->Text.x, op->Text.y,
          op->Text.fg, op->Text.bg, op->Text.string);
-        int tmpx = op->Text.x + TextWidth (op->Text.string, op->font);
-        int tmpy = op->Text.y + TextHeight (op->font);
+        int tmpx = op->Text.x + TextWidth (op->Text.string, op->font, op->fontsize);
+        int tmpy = op->Text.y + TextHeight (op->font, op->fontsize);
         INCLUDE_MIN_POINT (op->Text.x, op->Text.y);
         INCLUDE_MAX_POINT (tmpx, tmpy);
         CHK (delete[] op->Text.string);
@@ -460,13 +462,17 @@ sync:
   } /* endwhile */
 }
 
-int csGraphicsPipeline::TextWidth (const char *text, int Font)
+int csGraphicsPipeline::TextWidth (const char *text, int Font, int FontSize)
 {
+  G2D->SetFontID (Font);
+  G2D->SetFontSize (FontSize);
   return text ? G2D->GetTextWidth (Font, text) : 0;
 }
 
-int csGraphicsPipeline::TextHeight (int Font)
+int csGraphicsPipeline::TextHeight (int Font, int FontSize)
 {
+  G2D->SetFontID (Font);
+  G2D->SetFontSize (FontSize);
   return G2D->GetTextHeight (Font);
 }
 

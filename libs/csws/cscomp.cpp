@@ -33,7 +33,7 @@
 // The csComponent class itself
 csComponent::csComponent (csComponent *iParent) : state (CSS_VISIBLE),
   originalpalette (true), DragStyle (CS_DRAG_MOVEABLE), clipparent (NULL),
-  text (NULL), Font (csFontParent), Maximized (false), focused (NULL),
+  text (NULL), Font (csFontParent), FontSize (-1), Maximized (false), focused (NULL),
   top (NULL), next (NULL), prev (NULL), parent (NULL), app (NULL), id (0)
 {
   SetPalette (NULL, 0);
@@ -1103,14 +1103,24 @@ int csComponent::GetFont ()
     return csFontCourier;
 }
 
+int csComponent::GetFontSize ()
+{
+  if (FontSize != -1)
+    return FontSize;
+  else if (parent)
+    return parent->GetFontSize ();
+  else
+    return 12;
+}
+
 int csComponent::TextWidth (const char *text)
 {
-  return app->TextWidth (text, GetFont ());
+  return app->TextWidth (text, GetFont (), GetFontSize () );
 }
 
 int csComponent::TextHeight ()
 {
-  return app->TextHeight (GetFont ());
+  return app->TextHeight (GetFont (), GetFontSize ());
 }
 
 void csComponent::Box (int xmin, int ymin, int xmax, int ymax, int colindx)
@@ -1223,7 +1233,7 @@ void csComponent::Text (int x, int y, int fgindx, int bgindx, const char *s)
     {
       app->pplSetClipRect (*cur); restoreclip = true;
       app->pplText (x, y, GetColor (fgindx), bgindx >= 0 ? GetColor (bgindx) : -1,
-        GetFont (), s);
+        GetFont (), GetFontSize (), s);
     } /* endif */
   } /* endfor */
   if (restoreclip)
@@ -1541,6 +1551,19 @@ void csComponent::SetFont (int iFont, bool IncludeChildren)
   Font = iFont;
   if (IncludeChildren)
     ForEach (do_setfont, (void *)iFont);
+}
+
+static bool do_setfontsize (csComponent *child, void *param)
+{
+  child->SetFontSize ((int)param, true);
+  return false;
+}
+
+void csComponent::SetFontSize (int iFontSize, bool IncludeChildren)
+{
+  FontSize = iFontSize;
+  if (IncludeChildren)
+    ForEach (do_setfontsize, (void *)iFontSize);
 }
 
 void csComponent::SuggestSize (int &w, int &h)
