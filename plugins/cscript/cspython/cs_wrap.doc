@@ -232,8 +232,6 @@ GetMaterialHandle()
 1.10.  class iGraphics3D
 ------------------------
 
-Initialize(pSystem)
-
 Open(Title)
 
 Close()
