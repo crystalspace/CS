@@ -128,7 +128,6 @@ void csProcPlasma::MakePalette (int max)
 void csProcPlasma::Animate (csTicks current_time)
 {
   (void)current_time;
-  int x, y;
   /// draw palette
   //for(int i=0; i<palsize; i++)
   //{
@@ -137,6 +136,8 @@ void csProcPlasma::Animate (csTicks current_time)
   //}
 
 #ifndef CS_USE_NEW_RENDERER
+  int x, y;
+
   g3d->SetRenderTarget (tex->GetTextureHandle ());
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
 

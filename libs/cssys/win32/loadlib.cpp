@@ -267,10 +267,12 @@ void InternalScanPluginDir (iStrVector*& messages,
 {
   // @@@ ugly hack!
 #ifdef COMP_VC
-  if ((strcasecmp (dir, csGetConfigPath()) == 0) || (strcmp (dir, ".") == 0))
+  char* cfgpath = csGetConfigPath();
+  if ((strcasecmp (dir, cfgpath) == 0) || (strcmp (dir, ".") == 0))
   {
     recursive = false;
   }
+  delete[] cfgpath;
 #endif
 
   csString filemask;

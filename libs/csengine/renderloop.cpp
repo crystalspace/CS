@@ -106,6 +106,10 @@ csRenderLoop::csRenderLoop (csEngine* engine)
   csRenderLoop::engine = engine;
 }
 
+csRenderLoop::~csRenderLoop ()
+{
+}
+
 void csRenderLoop::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
 {
   rview.SetEngine (engine);

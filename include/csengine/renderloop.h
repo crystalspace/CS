@@ -51,6 +51,7 @@ public:
   SCF_DECLARE_IBASE;
 
   csRenderLoop (csEngine* engine);
+  virtual ~csRenderLoop();
 
   void StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview);
   virtual void Draw (iCamera* c, iClipper2D* clipper);

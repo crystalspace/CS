@@ -35,6 +35,15 @@ The history order is reversed so that new features are at the top.
 	- res added Jamfiles for the render loop loader/standard rendersteps
 	  along with some minor compile fixes.
 	- res updated the MSVC6 makefile templates.
+	- res made the following changes to the MSVC warning suppression:
+	    - added some missing descriptions of silenced warnings
+	    - removed silencing of "unused variable" warning and turned 
+	      emission of "class has virtual functions, but destructor is not 
+	      virtual" on. This is the beginning of an attempt to have MSVC 
+	      emit the same warnings as GCC (as far as possible.) More tweaks 
+	      will follow over time.
+	- res made some common functions 'intrinsic' on MSVC.
+	- res fixed a few compiler warnings.
 14-Jun-2003
 	- Jorrit got a fix from Arthur K. (nemerle@lsk.pl) for two memory
 	  leaks in AWS.

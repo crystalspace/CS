@@ -41,19 +41,24 @@
   #pragma warning(disable:4100)   // Use of void* as a formal function parameter
   #pragma warning(disable:4390)   // Empty control statement
   #pragma warning(disable:4514)   // Removed unreferenced inlines. Only MSVC 6 relevant.
-  #pragma warning(disable:4505)
-  #pragma warning(disable:4146)
-  #pragma warning(disable:4701)
-  #pragma warning(disable:4355)
-  #pragma warning(disable:4101)
-  #pragma warning(disable:4102)
-  #pragma warning(disable:4005)
-  #pragma warning(disable:4130)
-  #pragma warning(disable:4711)
+  #pragma warning(disable:4505)   // 'function' : unreferenced local function has been removed
+  #pragma warning(disable:4146)   // unary minus operator applied to unsigned type, result still unsigned
+  #pragma warning(disable:4701)	  // local variable 'name' may be used without having been initialized
+  #pragma warning(disable:4355)   // 'this' : used in base member initializer list
+  #pragma warning(disable:4102)   // 'label' : unreferenced label
+  #pragma warning(disable:4005)   // 'identifier' : macro redefinition
+  #pragma warning(disable:4130)   // 'operator' : logical operation on address of string constant
+  #pragma warning(disable:4711)   // function 'function' selected for inline expansion
+
+  #pragma warning(default:4265)   // class has virtual functions, but destructor is not virtual
 
   #pragma inline_depth (255)
   #pragma inline_recursion (on)
   #pragma auto_inline (on)
+
+  #pragma intrinsic (memset, memcpy, memcmp)
+  #pragma intrinsic (strcpy, strcmp, strlen, strcat)
+  #pragma intrinsic (abs, fabs)
 
   #ifdef __CRYSTAL_SPACE__
     #pragma code_seg("CSpace")	  // Just for fun :)

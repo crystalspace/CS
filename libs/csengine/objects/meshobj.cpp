@@ -230,7 +230,7 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n)
 {
   iMeshWrapper *meshwrap = &scfiMeshWrapper;
 
-  int i;
+  //int i;
   // Callback are traversed in reverse order so that they can safely
   // delete themselves.
 /*  i = draw_cb_vector.Length ()-1;
