@@ -181,8 +181,8 @@ csRGBcolor csProcSky::GetSkyBlue(const csVector3& spot, float& haze,
     if(d>mirrorplace){
       haze = 1.0-(d-mirrorplace)/200. ;
       if(haze<0.0)haze=0.0;
-      haze += float(rand()&0xFF)/256./10.;
-      if(haze>1.0)haze=1.0;
+      //haze += float(rand()&0xFF)/256./10.;
+      //if(haze>1.0)haze=1.0;
     }
     if(d>1.0)d=1.0;
     r = int( (maxhaze.red) - d*50.);
