@@ -30,6 +30,9 @@ chronological order.
 	- Jorrit moved the entire renderloop stuff from
 	  plugins/video/render3d/renderloop to plugins/engine/renderloop
 	  where it belongs.
+        - res removed plugins/engine/renderloop/stdsteps/lightiter.pp.
+          This file was a leftover from some debugging times ago which must
+          have made it's way to CVS by accident.
 7-Sep-2003
 	- Jorrit performed a lot of changes to unify the new and old
 	  renderer branches:
