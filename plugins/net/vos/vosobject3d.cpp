@@ -32,6 +32,7 @@
 
 #include "vosobject3d.h"
 #include <vos/metaobjects/a3dl/a3dl.hh>
+#include <vos/metaobjects/property/remoteproperty.hh>
 
 using namespace VUtil;
 using namespace VOS;
@@ -347,9 +348,17 @@ void csMetaObject3D::notifyChildInserted (VobjectEvent &event)
     {
       LOG("vosobject3d", 4, "adding property listener");
       vRef<Property> p = meta_cast<Property> (event.getChild());
-      p->addParentListener (&DoNothingListener::static_);
-      p->addPropertyListener (this);
-      p->setPriority (Message::LowLatency);
+      if(p.isValid())
+      {
+        p->addParentListener (&DoNothingListener::static_);
+        p->addPropertyListener (this);
+        p->setPriority (Message::LowLatency);
+        vRef<RemoteProperty> rp = meta_cast<RemoteProperty> (event.getChild());
+        if(rp.isValid())
+        {
+          rp->enableAsyncReplace(true);
+        }
+      }
     }
     catch (...)
     {
