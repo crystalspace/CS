@@ -515,6 +515,18 @@ bool PartEdit::RecreateParticleSystem()
 
   emitState = SCF_QUERY_INTERFACE (mesh, iEmitState);
 
+  /* Clear out the current emitter settings since we're going to ditch them all
+   *  and start fresh.  Don't worry, the state_* structures are still intact
+   *  and we will use them to build new emitters afterwards.
+   */
+  InitEmitterList(&startpos);
+  InitEmitterList(&startspeed);
+  InitEmitterList(&startaccel);
+  InitEmitterList(&fieldspeed);
+  InitEmitterList(&fieldaccel);
+  InitEmitterList(&attractor);
+
+  // Force emitter setup.  Even if some parameters haven't changed, set them all.
   force_emitter_setup=true;
   UpdateParticleSystem();
 
@@ -824,13 +836,6 @@ bool PartEdit::Initialize ()
 
   current_graphic="/lib/std/cslogo2.png";
 
-
-  InitEmitterList(&startpos);
-  InitEmitterList(&startspeed);
-  InitEmitterList(&startaccel);
-  InitEmitterList(&fieldspeed);
-  InitEmitterList(&fieldaccel);
-  InitEmitterList(&attractor);
 
   RecreateParticleSystem();
 
