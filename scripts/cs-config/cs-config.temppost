@@ -4,7 +4,6 @@ depends()
     case $1 in
 	-lcsappframe) DEPS="-lcstool -lcsutil" ;;
 	-lcsutil) DEPS="" ;;
-	-lcsengine) DEPS="-lcstool -lcsgeom -lcsutil" ;;
 	-lcsgeom) DEPS="-lcsutil" ;;
 	-lcsgfx) DEPS="-lcsutil" ;;
 	-lcstool) DEPS="-lcsgfx -lcsgeom -lcsutil" ;;
@@ -59,7 +58,6 @@ Options:
 	[--help]
 Libraries:
 	csappframe
-	csengine
 	csgeom
 	csgfx
 	cstool
