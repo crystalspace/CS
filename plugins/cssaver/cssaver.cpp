@@ -79,7 +79,7 @@ bool csSaver::Initialize(iObjectRegistry* p)
 }
 
 csRef<iDocumentNode> csSaver::CreateNode(
-  csRef<iDocumentNode>& parent, const char* name)
+  iDocumentNode* parent, const char* name)
 {
   csRef<iDocumentNode> child = parent->CreateNodeBefore(CS_NODE_ELEMENT, 0);
   child->SetValue (name);
@@ -87,7 +87,7 @@ csRef<iDocumentNode> csSaver::CreateNode(
 }
 
 csRef<iDocumentNode> csSaver::CreateValueNode(
-  csRef<iDocumentNode>& parent, const char* name, const char* value)
+  iDocumentNode* parent, const char* name, const char* value)
 {
   csRef<iDocumentNode> child = CreateNode(parent, name);
   csRef<iDocumentNode> text = child->CreateNodeBefore(CS_NODE_TEXT, 0);
@@ -96,7 +96,7 @@ csRef<iDocumentNode> csSaver::CreateValueNode(
 }
 
 csRef<iDocumentNode> csSaver::CreateValueNodeAsFloat(
-  csRef<iDocumentNode>& parent, const char* name, float value)
+  iDocumentNode* parent, const char* name, float value)
 {
   csRef<iDocumentNode> child = CreateNode(parent, name);
   csRef<iDocumentNode> text = child->CreateNodeBefore(CS_NODE_TEXT, 0);
@@ -105,7 +105,7 @@ csRef<iDocumentNode> csSaver::CreateValueNodeAsFloat(
 }
 
 csRef<iDocumentNode> csSaver::CreateValueNodeAsColor(
-  csRef<iDocumentNode>& parent, const char* name, const csColor &color)
+  iDocumentNode* parent, const char* name, const csColor &color)
 {
   csRef<iDocumentNode> child=CreateNode(parent, name);
   child->SetAttributeAsFloat("red",   color.red  );
@@ -114,7 +114,7 @@ csRef<iDocumentNode> csSaver::CreateValueNodeAsColor(
   return child;
 }
 
-bool csSaver::SaveTextures(csRef<iDocumentNode>& parent)
+bool csSaver::SaveTextures(iDocumentNode *parent)
 {
   csRef<iDocumentNode> current = CreateNode(parent, "textures");
 
@@ -153,7 +153,7 @@ bool csSaver::SaveTextures(csRef<iDocumentNode>& parent)
   return true;
 }
 
-bool csSaver::SaveMaterials(csRef<iDocumentNode>& parent)
+bool csSaver::SaveMaterials(iDocumentNode *parent)
 {
   csRef<iDocumentNode> current = CreateNode(parent, "materials");
   iMaterialList *matList=engine->GetMaterialList();
@@ -257,7 +257,7 @@ bool csSaver::SaveMaterials(csRef<iDocumentNode>& parent)
   return true;
 }
 
-bool csSaver::SaveRenderPriorities(csRef<iDocumentNode> &parent)
+bool csSaver::SaveRenderPriorities(iDocumentNode *parent)
 {
 	csRef<iDocumentNode> rpnode = CreateNode(parent, "renderpriorities");
 	int rpcount = engine->GetRenderPriorityCount();
@@ -295,7 +295,7 @@ bool csSaver::SaveRenderPriorities(csRef<iDocumentNode> &parent)
 }
 
 
-bool csSaver::SaveCameraPositions(csRef<iDocumentNode> &parent)
+bool csSaver::SaveCameraPositions(iDocumentNode *parent)
 {
   csRef<iCameraPositionList> camlist = engine->GetCameraPositions();
 	
@@ -347,7 +347,7 @@ bool csSaver::SaveCameraPositions(csRef<iDocumentNode> &parent)
   return true;
 }
 
-bool csSaver::SaveSectors(csRef<iDocumentNode> &parent)
+bool csSaver::SaveSectors(iDocumentNode *parent)
 {
   iSectorList* sectorList=engine->GetSectors();
   for (int i=0; i<sectorList->GetCount(); i++)
@@ -362,7 +362,7 @@ bool csSaver::SaveSectors(csRef<iDocumentNode> &parent)
 	return true;
 }
 
-bool csSaver::SaveSectorMeshes(iSector *s, csRef<iDocumentNode> &parent)
+bool csSaver::SaveSectorMeshes(iSector *s, iDocumentNode *parent)
 {
   iMeshList* meshList = s->GetMeshes();
   for (int i=0; i<meshList->GetCount(); i++)
@@ -370,9 +370,9 @@ bool csSaver::SaveSectorMeshes(iSector *s, csRef<iDocumentNode> &parent)
     iMeshWrapper* meshwrapper = meshList->Get(i);
     //Create the Tag for the MeshObj
     csRef<iDocumentNode> meshNode = CreateNode(parent, "meshobj");
-	//Check if it's a portal
-	csRef<iPortalContainer> portal = SCF_QUERY_INTERFACE(meshwrapper->GetMeshObject(), iPortalContainer);
-	if (portal) 
+    //Check if it's a portal
+    csRef<iPortalContainer> portal = SCF_QUERY_INTERFACE(meshwrapper->GetMeshObject(), iPortalContainer);
+    if (portal) 
     {
       meshNode->SetValue ("portal");
       for (int i=0; i<portal->GetPortalCount(); i++)
@@ -383,14 +383,14 @@ bool csSaver::SaveSectorMeshes(iSector *s, csRef<iDocumentNode> &parent)
     if (name && *name) 
     meshNode->SetAttribute("name", name);
 
-    //TBD: write <plugin>
-    
     //Let the iSaverPlugin write the parameters of the mesh
     //It has to create the params node itself, maybe it might like to write
     //more things outside the params at a later stage. you never know ;)
     csRef<iFactory> factory;
     iMeshObjectFactory* meshobjectfactory = meshwrapper->GetMeshObject()->GetFactory();
     if (meshobjectfactory)
+      //TBD: implement this
+      //factory = SCF_QUERY_INTERFACE(meshobjectfactory->GetMeshObjectType(), iFactory);
       factory = SCF_QUERY_INTERFACE(meshobjectfactory, iFactory);
     if (!factory) 
       factory = SCF_QUERY_INTERFACE(meshwrapper->GetMeshObject(), iFactory);
@@ -400,9 +400,12 @@ bool csSaver::SaveSectorMeshes(iSector *s, csRef<iDocumentNode> &parent)
       if (pluginname && *pluginname)
       {
         csRef<iDocumentNode> pluginNode = CreateNode(meshNode, "plugin");
+
+        //Add the plugin tag
         pluginNode->CreateNodeBefore(CS_NODE_TEXT)->SetValue((const char*)pluginname);
         csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
+        //Replace the object with saver in the ID
         const char* origstring = ".object.";
         const char* newstring = ".saver.";
         for (int i=0; i<pluginname.Length()-8; i++)
@@ -411,11 +414,10 @@ bool csSaver::SaveSectorMeshes(iSector *s, csRef<iDocumentNode> &parent)
             pluginname=pluginname.Slice(0,i)+newstring + pluginname.Slice(i+8,pluginname.Length());
         }
 
+        //Invoke the iSaverPlugin::WriteDown
         csRef<iSaverPlugin> saver = CS_QUERY_PLUGIN_CLASS(plugin_mgr, pluginname, iSaverPlugin);
-
         if (!saver) saver = CS_LOAD_PLUGIN(plugin_mgr, pluginname, iSaverPlugin);
-
-        if (saver) saver->WriteDown(object_reg, meshNode);
+        if (saver) saver->WriteDown(meshwrapper->GetMeshObject(), meshNode);
       }
 
     }      
@@ -425,9 +427,10 @@ bool csSaver::SaveSectorMeshes(iSector *s, csRef<iDocumentNode> &parent)
 	return true;
 }
 
-bool csSaver::SavePortals(iPortal *portal, csRef<iDocumentNode> &parent)
+bool csSaver::SavePortals(iPortal *portal, iDocumentNode *parent)
 {
   csRef<iDocumentNode> sectorNode = CreateNode(parent, "sector");
+  portal->CompleteSector(0);
   iSector* sector = portal->GetSector();
   if (sector)
   {
@@ -439,7 +442,7 @@ bool csSaver::SavePortals(iPortal *portal, csRef<iDocumentNode> &parent)
   return true;
 }
 
-bool csSaver::SaveSectorLights(iSector *s, csRef<iDocumentNode> &parent)
+bool csSaver::SaveSectorLights(iSector *s, iDocumentNode *parent)
 {
   iLightList* lightList = s->GetLights();
   for (int i=0; i<lightList->GetCount(); i++)
@@ -452,24 +455,24 @@ bool csSaver::SaveSectorLights(iSector *s, csRef<iDocumentNode> &parent)
     csString name = light->QueryObject()->GetName();
     if (!name.Compare("__light__")) lightNode->SetAttribute("name", name);
 
-	//Add the light center node
+    //Add the light center node
     csVector3 center = light->GetCenter();
     csRef<iDocumentNode> centerNode = CreateNode(lightNode, "center");
-	centerNode->SetAttributeAsFloat("x", center.x);
-	centerNode->SetAttributeAsFloat("y", center.y);
-	centerNode->SetAttributeAsFloat("z", center.z);
+    centerNode->SetAttributeAsFloat("x", center.x);
+    centerNode->SetAttributeAsFloat("y", center.y);
+    centerNode->SetAttributeAsFloat("z", center.z);
 
-	//Add the light center node
-    //int radius = //light->GetRadius();
-    //csRef<iDocumentNode> radiusNode = CreateNode(lightNode, "radius");
-	//radiusNode->CreateNodeBefore(CS_NODE_TEXT)->SetAttributeAsFloat(radius);
+    //Add the light center node
+    int radius = light->GetInfluenceRadius();
+    csRef<iDocumentNode> radiusNode = CreateNode(lightNode, "radius");
+    radiusNode->CreateNodeBefore(CS_NODE_TEXT)->SetValueAsFloat(radius);
 
-	//Add the light center node
+    //Add the light center node
     csColor color = light->GetColor();
     csRef<iDocumentNode> colorNode = CreateNode(lightNode, "center");
-	colorNode->SetAttributeAsFloat("red", color.red);
-	colorNode->SetAttributeAsFloat("green", color.green);
-	colorNode->SetAttributeAsFloat("blue", color.blue);
+    colorNode->SetAttributeAsFloat("red", color.red);
+    colorNode->SetAttributeAsFloat("green", color.green);
+    colorNode->SetAttributeAsFloat("blue", color.blue);
   }
   return true;
 }

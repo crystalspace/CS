@@ -40,22 +40,22 @@ public:
   bool Initialize(iObjectRegistry*);
 
   static csRef<iDocumentNode> CreateNode(
-    csRef<iDocumentNode>& parent, const char* name);
+    iDocumentNode *parent, const char* name);
   static csRef<iDocumentNode> CreateValueNode(
-    csRef<iDocumentNode>& parent, const char* name, const char* value);
+    iDocumentNode *parent, const char* name, const char* value);
   static csRef<iDocumentNode> CreateValueNodeAsFloat(
-    csRef<iDocumentNode>& parent, const char* name, float value);
+    iDocumentNode *parent, const char* name, float value);
   static csRef<iDocumentNode> CreateValueNodeAsColor(
-    csRef<iDocumentNode>& parent, const char* name, const csColor &color);
+    iDocumentNode *parent, const char* name, const csColor &color);
 
-  bool SaveTextures(csRef<iDocumentNode>& parent);
-  bool SaveMaterials(csRef<iDocumentNode>& parent);
-  bool SaveCameraPositions(csRef<iDocumentNode> &parent);
-  bool SaveRenderPriorities(csRef<iDocumentNode> &parent);
-  bool SaveSectors(csRef<iDocumentNode> &parent);
-  bool SaveSectorMeshes(iSector *s, csRef<iDocumentNode> &parent);
-  bool SaveSectorLights(iSector *s, csRef<iDocumentNode> &parent);
-  bool SavePortals(iPortal *portal, csRef<iDocumentNode> &parent);
+  bool SaveTextures(iDocumentNode *parent);
+  bool SaveMaterials(iDocumentNode *parent);
+  bool SaveCameraPositions(iDocumentNode *parent);
+  bool SaveRenderPriorities(iDocumentNode *parent);
+  bool SaveSectors(iDocumentNode *parent);
+  bool SaveSectorMeshes(iSector *s, iDocumentNode *parent);
+  bool SaveSectorLights(iSector *s, iDocumentNode *parent);
+  bool SavePortals(iPortal *portal, iDocumentNode *parent);
 
   virtual csRef<iString> SaveMapFile();
   virtual bool SaveMapFile(const char *filename);
