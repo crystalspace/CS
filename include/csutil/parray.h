@@ -37,6 +37,7 @@ public:
   // make them public here.
   using csArrayBase<T*>::Length;
   using csArrayBase<T*>::Capacity;
+  using csArrayBase<T*>::Find;
 
   /// This function prototype is used for Sort()
   typedef int ArraySortCompareFunction (void const* item1,
@@ -145,16 +146,6 @@ public:
       SetLength (n + 1);
     delete root[n];
     root[n] = ptr;
-  }
-
-  /// Find a element in array and return its index (or -1 if not found).
-  int Find (T* which) const
-  {
-    int i;
-    for (i = 0 ; i < Length () ; i++)
-      if (root[i] == which)
-        return i;
-    return -1;
   }
 
   /// Push a element on 'top' of vector.

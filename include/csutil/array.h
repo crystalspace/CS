@@ -53,6 +53,7 @@ public:
   // make them public here.
   using csArrayBase<T>::Length;
   using csArrayBase<T>::Capacity;
+  using csArrayBase<T>::Find;
 
   /// This function prototype is used for Sort()
   typedef int ArraySortCompareFunction (void const* item1,
@@ -229,15 +230,6 @@ public:
   T& operator [] (int n)
   {
     return Get(n);
-  }
-
-  /// Find a element in array and return its index (or -1 if not found).
-  int Find (T const& which) const
-  {
-    for (int i = 0, n = Length(); i < n; i++)
-      if (root[i] == which)
-        return i;
-    return -1;
   }
 
   /**

@@ -20,19 +20,22 @@
 #ifndef __CS_REFARR_H__
 #define __CS_REFARR_H__
 
+#include "csutil/arraybase.h"
 #include "csutil/ref.h"
 
 /**
  * An array of smart pointers.
  */
 template <class T>
-class csRefArray
+class csRefArray : private csArrayBase<csRef<T> >	// Note! Private!
 {
-private:
-  int count, limit, threshold;
-  csRef<T>* root;
-
 public:
+  // We take the following public functions from csArrayBase<T> and
+  // make them public here.
+  using csArrayBase<csRef<T> >::Length;
+  using csArrayBase<csRef<T> >::Capacity;
+  //using csArrayBase<csRef<T> >::Find;	We have our own Find.
+
   typedef int ArrayCompareFunction (T* item1, T* item2);
   typedef int ArrayCompareKeyFunction (T* item, void* key);
   
@@ -41,22 +44,17 @@ public:
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
   csRefArray (int ilimit = 0, int ithreshold = 0)
+  	: csArrayBase<csRef<T> > (ilimit, ithreshold)
   {
-    count = 0;
-    limit = (ilimit > 0 ? ilimit : 0);
-    threshold = (ithreshold > 0 ? ithreshold : 16);
-    if (limit != 0)
-      root = (csRef<T>*)calloc (limit, sizeof(csRef<T>));
-    else
-      root = 0;
+    // memset on capacity???
   }
 
   /// Copy constructor.
   csRefArray (const csRefArray<T>& source)
   {
-    limit = source.limit;
+    capacity = source.capacity;
     threshold = source.threshold;
-    root = (csRef<T>*)calloc (limit, sizeof(csRef<T>));
+    root = (csRef<T>*)calloc (capacity, sizeof(csRef<T>));
     count = source.Length ();
     for (int i = 0 ; i < count ; i++)
       root [i] = source[i];
@@ -73,10 +71,10 @@ public:
     destination.DeleteAll ();
     destination.root = root;
     destination.count = count;
-    destination.limit = limit;
+    destination.capacity = capacity;
     destination.threshold = threshold;
     root = 0;
-    limit = count = 0;
+    capacity = count = 0;
   }
 
   /**
@@ -84,15 +82,10 @@ public:
    */
   void DeleteAll ()
   {
-    if (root)
-    {
-      int i;
-      for (i = 0 ; i < limit ; i++)
-        root[i] = 0;	// Clear ref.
-      free (root);
-      root = 0;
-      limit = count = 0;
-    }
+    int i;
+    for (i = 0 ; i < count ; i++)
+      root[i] = 0;	// Clear ref
+    DeleteRoot ();
   }
 
   /**
@@ -103,46 +96,36 @@ public:
     DeleteAll ();
   }
 
-  /// Set vector length to n.
-  void SetLength (int n)
+  /**
+   * Truncate array to specified number of elements. The new number of
+   * elements cannot exceed the current number of elements. Use SetLength()
+   * for a more general way to enlarge the array.
+   */
+  void Truncate (int n)
   {
-    // Free all items between new count and old count.
-    int i;
-    for (i = n ; i < count ; i++) root[i] = 0;
-
-    int old_count = count;
-    count = n;
-
-    if (n > limit || (limit > threshold && n < limit - threshold))
+    CS_ASSERT(n >= 0);
+    CS_ASSERT(n <= count);
+    if (n < count)
     {
-      n = ((n + threshold - 1) / threshold ) * threshold;
-      if (!n)
-      {
-        DeleteAll ();
-      }
-      else if (root == 0)
-        root = (csRef<T>*)calloc (n, sizeof(csRef<T>));
-      else
-      {
-        csRef<T>* newroot = (csRef<T>*)calloc (n, sizeof(csRef<T>));
-	memcpy (newroot, root, old_count * sizeof (csRef<T>));
-	free (root);
-	root = newroot;
-      }
-      limit = n;
+      for (int i = n; i < count; i++)
+        root[i]= 0;	// Clear ref.
+      SetLengthUnsafe(n);
     }
   }
 
-  /// Query vector length.
-  int Length () const
+  /// Set vector length to n.
+  void SetLength (int n)
   {
-    return count;
-  }
-
-  /// Query vector limit.
-  int Limit () const
-  {
-    return limit;
+    if (n <= count)
+    {
+      Truncate (n);
+    }
+    else
+    {
+      int old_len = Length ();
+      SetLengthUnsafe (n);
+      memset (root+old_len, 0, (n-old_len)*sizeof (csRef<T>));
+    }
   }
 
   /// Get a const reference.

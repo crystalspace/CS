@@ -95,6 +95,16 @@ public:
   {
     return capacity;
   }
+
+  /// Find a element in array and return its index (or -1 if not found).
+  int Find (T const& which) const
+  {
+    int i;
+    for (i = 0 ; i < Length () ; i++)
+      if (root[i] == which)
+        return i;
+    return -1;
+  }
 };
 
 #endif
