@@ -27,22 +27,10 @@ class ddgTBinMesh;
 class ddgTBinTree;
 class ddgHeightMap;
 class ddgBBox;
-class ddgVBuffer;
+class ddgVArray;
+class ddgContext;
 class csTextureHandle;
 class csVector3;
-
-class ddgColor3
-{
-public:
-  /// Data
-  unsigned char v[3];
-  /// Set values
-  void set( ddgColor3 *c ) { v[0] = c->v[0]; v[1] = c->v[1]; v[2] = c->v[2]; }
-  /// Set values
-  void set( ddgColor3 c ) { v[0] = c.v[0]; v[1] = c.v[1]; v[2] = c.v[2]; }
-  /// Set values
-  void set( unsigned char r, unsigned char g, unsigned char b ) { v[0] = r; v[1] = g; v[2] = b; }
-};
 
 /**
  * This object encapsulates a terrain surface so that it
@@ -54,24 +42,22 @@ private:
   ///
   ddgTBinMesh* mesh;
   ///
-  ddgHeightMap* height;
+  ddgHeightMap* heightMap;
   ///
   ddgBBox* clipbox;
   ///
-  ddgVBuffer *vbuf;
+  ddgVArray *vbuf;
+  ///
+  ddgContext *context;
   /// Terrain handle.
   csTextureHandle *_textureMap;
   /// World to camera transformation matrix.
   double wtoc[16];
-  /// Colours used at various altitudes.
-  ddgColor3 _cliff, _beach, _grass, _trees, _rock, _snow;
-  /// Angle/Altitude at which color takes effect.
-  float	_cliffangle, _beachalt, _grassalt, _treealt, _rockalt, _snowalt;
   /// Texture scale factor.
   float _texturescale;
-  /// Terrains location offset in world space.
+  /// Terrain's location offset in world space.
   csVector3	_pos;
-  /// Terrains size in world space.
+  /// Terrain's size in world space.
   csVector3 _size;
 public:
   /**
@@ -82,15 +68,16 @@ public:
   /// Destructor.
   virtual ~csTerrain ();
 
+  ddgContext* GetContext() { return context; }
   ///
   ddgTBinMesh* GetMesh () { return mesh; }
   ///
-  ddgHeightMap* GetHeightMap () { return height; }
+  ddgHeightMap* GetHeightMap () { return heightMap; }
   ///
   ddgBBox* GetBBox () { return clipbox; }
 
   /// Load the heightmap.
-  bool Initialize (const void* heightmap, unsigned long size);
+  bool Initialize (const void* heightMapFile, unsigned long size);
 
   /**
    * Draw this terrain given a view and transformation.
@@ -101,10 +88,8 @@ public:
   void SetTexture (csTextureHandle *texture) { _textureMap = texture; }
   /// Set the amount of triangles
   void SetDetail(unsigned int detail);
-  /// Choose a color for a vertex.
-  void classify( csVector3 *p, ddgColor3 *c);
   /// Put a triangle into the vertex buffer.
-  bool PushTriangle(ddgTBinTree *bt, unsigned int tvc, ddgVBuffer *vbuf);
+  bool drawTriangle(ddgTBinTree *bt, unsigned int tvc, ddgVArray *vbuf);
   /**
    * If current transformation puts us below the terrain at the given x,z location
    * then we have hit the terrain.  We adjust position to be at level of terrain

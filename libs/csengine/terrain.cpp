@@ -15,14 +15,15 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "sysdef.h"
+
 #include "csengine/terrain.h"
 #include "csengine/pol2d.h"
 #include "csengine/texture.h"
-#include "csterr/ddgtmesh.h"
-#include "csterr/ddgbtree.h"
-#include "csterr/ddgvbuf.h"
+#include "struct/ddgcntxt.h"
+#include "struct/ddgtmesh.h"
+#include "struct/ddgbtree.h"
+#include "struct/ddgvarr.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/polyclip.h"
@@ -30,10 +31,11 @@
 
 IMPLEMENT_CSOBJTYPE (csTerrain,csObject);
 
+
 csTerrain::csTerrain () : csObject()
 {
   clipbox = NULL;
-  height = NULL;
+  heightMap = NULL;
   mesh = NULL;
   vbuf = NULL;
 }
@@ -41,7 +43,7 @@ csTerrain::csTerrain () : csObject()
 csTerrain::~csTerrain ()
 {
   delete mesh;
-  delete height;
+  delete heightMap;
   delete clipbox;
   delete vbuf;
 }
@@ -49,149 +51,148 @@ csTerrain::~csTerrain ()
 void csTerrain::SetDetail( unsigned int detail)
 {
   mesh->minDetail(detail);
-  mesh->maxDetail(detail);
-  mesh->absMaxDetail((unsigned int)(detail * 0.25));
-}
-
-
-void csTerrain::classify (csVector3 *p, ddgColor3 *c)
-{
-  // Steep normal
-  if      (p->y < _beachalt) c->set (_beach);
-  else if (p->y < _grassalt) c->set (_grass);
-  else if (p->y < _treealt)  c->set (_trees);
-  else if (p->y < _rockalt)  c->set (_rock);
-  else                       c->set (_snow);
+  mesh->maxDetail(detail*1.1);
+  mesh->absMaxDetail((unsigned int)(detail * 1.25));
+  mesh->nearClip(1.0);
+  mesh->farClip(150.0);
 }
 
 static csRenderView *grview = NULL;
-// Perform coord transformation using CS instead of DDG.
-csVector3 transformer (csVector3 vin)
-{
-  if (grview)
-    return grview->World2Camera (vin);
-  else
-    return vin;
-}
 
-bool csTerrain::Initialize (const void* heightmap, unsigned long size)
+bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
 {
   grview = NULL;
-  height = new ddgHeightMap ();
-  if (height->readTGN (heightmap, size))
-    height->generateHeights (257,257,5);
-  mesh = new ddgTBinMesh (height);
-  clipbox = new ddgBBox (ddgVector3(0,0,3),ddgVector3(640, 480, 15000));
+  heightMap = new ddgHeightMap ();
+  if (heightMap->readTGN (heightMapFile, size))
+    return false;
 
-  vbuf = new ddgVBuffer ();
+  mesh = new ddgTBinMesh (heightMap);
+  clipbox = new ddgBBox (ddgVector3(0,0,3),ddgVector3(640, 480, 15000));
+  context = new ddgContext ();
+
+  vbuf = new ddgVArray ();
 
   vbuf->size (25000);
   vbuf->renderMode (true, false, true);
   vbuf->init ();
   vbuf->reset ();
-  mesh->init ();
+  mesh->init (context);
 
-  _cliff.set (175,175,175);
-  _beach.set (200,200,50);
-  _grass.set (95,145,70);
-  _trees.set (25,50,25);
-  _rock.set (125,125,125);
-  _snow.set (250,250,250);
+/*
+JORRIT:  Create mesh->getBinTreeNo()/2  CS textures
+         and put them in an array so I can reach them in the 
+		 Draw method.
+		 This is probably not even the right place do this, perhaps
+		 it is better done in csLoader.
+		 I would suggest that in the world file syntax we derive the
+		 the texture name from the heightMap file name eg.
+		 myTerrain.TGN
+		 has textures named:
+		 myTerrain0.jpg
+		 myTerrain1.jpg 
+		 ...
+		 myTerrain128.jpg
+		 
+	 Here is how DDG does it, but I use the ddgTexture class which is
+	 openGL specific:  unsigned int i, r = 0, c = 0, k;
+  _texturescale = 8;			// Texture is 8x the resolution of terrain
+  unsigned int	width = heightMap->rows()*_texturescale;
+  unsigned int height = heightMap->cols()*_texturescale;
+  // Input texture is size 2^n+1 x 2^m+1
+  // Assumption:
+  // bintree pairs each form a square region on the mother texture.
+  // Eg. 0/1  is bottom left n-1/n is top right of mother texture.
+  // each bintree pair can be mapped left to right, top to bottom
+  // onto the mother texture.
 
-  _cliffangle = 0.2; // up component of normal vector.
-  _beachalt = 0;
-  _grassalt = 3;
-  _treealt = 5;
-  _rockalt = 7;
-  _snowalt = 999;
+  k = width * height;
+  // Calculate size of split textures.
+  k = 2*k / mesh->getBinTreeNo();
+  k = sqrt(k);
+
+
+
+  char fileNameBuf[32];
+  ddgStr	tbasename("terrainTexture.tga");
+  for (i = 0; i < mesh->getBinTreeNo()/2; i++)
+  {
+    ostrstream msg(fileNameBuf,32);
+    msg << tbasename.s << i << ".tga" << '\0';
+    ddgStr sname;
+    sname.assign(fileNameBuf);
+    ddgImage *simg = new ddgImage();
+    // Load the file if it exists, otherwise create if from the texture.
+    if (simg->readFile(sname)== ddgFailure)
+      return false;			// Failed to load texture file.
+		_texture[i] = new ddgTexture(simg);
+		_texture[i]->linear(true);
+		_texture[i]->repeat(false);
+		_texture[i]->scale( k, k);
+		_texture[i]->mode(_meshcolor ? ddgTexture::MODULATE : ddgTexture::DECAL);
+		_texture[i]->init();
+
+    c = c + k;
+    if (c + 1 >= width)
+	{
+      r += k;
+      c = 0;
+	}
+  }
+*/
 
   // We are going to get texture coords from the terrain engine
   // ranging from 0 to rows and 0 to cols.
   // CS wants them to range from 0 to 1.
-  _texturescale  = 10.0 / height->rows();
   _pos = csVector3(0,0,0);
-  _size = csVector3(height->cols(),height->maxf(),height->rows());
+  _size = csVector3(heightMap->cols(),mesh->wheight(mesh->absMaxHeight()),heightMap->rows());
   return true;
 }
 
-bool csTerrain::PushTriangle(ddgTBinTree *bt, ddgVBIndex tvc, ddgVBuffer *vbuf)
+
+/**
+ *  Retrieve info for a single triangle.
+ *  Returns true if triangle should be rendered at all.
+ */
+bool csTerrain::drawTriangle( ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbuf )
 {
-  ddgTriIndex tva, tv0, tv1;
-  static csVector3 p1, p2, p3;
-  static csVector3 *cp1, *cp2, *cp3;
-  static csVector3 n1, n2, n3;
-  static ddgVector2 t1, t2, t3;
-  // static ddgColor3  c1, c2, c3;
-  unsigned int i1 = 0, i2 = 0, i3 = 0;
-  // If triangle is visible.
-  if (DDG_BGET(bt->tri (tvc)->vis(), DDGCF_ALLOUT))
-    return false;
+	if ( !bt->visible(tvc))
+		return ddgFailure;
 
-  tva = ddgTBinTree::parent (tvc);
-  tv0 = bt->v0 (tvc);
-  tv1 = bt->v1 (tvc);
+    static ddgVector3 p1, p2, p3;
+    static ddgColor3 c1, c2, c3;
+    static ddgVector2 t1, t2, t3;
+    unsigned int i1 = 0, i2 = 0, i3 = 0;
 
-  // Get the camera space coords.
-  cp1 = bt->pos (tva);
-  cp2 = bt->pos (tv0);
-  cp3 = bt->pos (tv1);
+    ddgTriIndex 
+		tva = bt->parent(tvc),
+		tv1 = bt->v0(tvc),
+		tv0 = bt->v1(tvc);
 
-  i1 = bt->vertex (tva,&p1);
-  i2 = bt->vertex (tv0,&p2);
-  i3 = bt->vertex (tv1,&p3);
+    i1 = bt->vertex(tva,&p1);
+    i2 = bt->vertex(tv0,&p2);
+    i3 = bt->vertex(tv1,&p3);
 
-  // if (vbuf->normalOn())
-  // {
-  //    if (!i1) bt->normal(tva,&n1);
-  //    if (!i2) bt->normal(tv0,&n2);
-  //    if (!i3) bt->normal(tv1,&n3);
-  // }
+	if (!i1) bt->textureC(tva,t1);
+	if (!i2) bt->textureC(tv0,t2);
+	if (!i3) bt->textureC(tv1,t3);
 
-  if (vbuf->textureOn ())
-  {
-    if (!i1)
-    {
-      bt->textureC(tva,t1);
-      t1.multiply( _texturescale);
-      t1.v[0] -= ((int)t1[0]);
-      t1.v[1] -= ((int)t1[1]);
-    }
-    if (!i2)
-    {
-      bt->textureC(tv0,t2);
-      t2.multiply( _texturescale);
-      t2.v[0] -= ((int)t2[0]);
-      t2.v[1] -= ((int)t2[1]);
-    }
-    if (!i3)
-    {
-      bt->textureC(tv1,t3);
-      t3.multiply( _texturescale);
-      t3.v[0] -= ((int)t3[0]);
-      t3.v[1] -= ((int)t3[1]);
-    }
-  }
-  // if (vbuf->colorOn())
-  // {
-  //   if (!i1) classify(&p1,&c1);
-  //   if (!i2) classify(&p2,&c2);
-  //   if (!i3) classify(&p3,&c3);
-  // }
-  // Push them into the buffer.
-  if (!i1) i1 = vbuf->pushVT (cp1,&t1);
-  if (!i2) i2 = vbuf->pushVT (cp2,&t2);
-  if (!i3) i3 = vbuf->pushVT (cp3,&t3);
+    if (!i1) i1 = vbuf->pushVT(&p1,&t1);
+    if (!i2) i2 = vbuf->pushVT(&p2,&t2);
+    if (!i3) i3 = vbuf->pushVT(&p3,&t3);
 
-  // Record that these vertices are in the buffer.
-  bt->tri (tva)->vbufindex (i1); bt->tri (tva)->setvbufflag ();
-  bt->tri (tv0)->vbufindex (i2); bt->tri (tv0)->setvbufflag ();
-  bt->tri (tv1)->vbufindex (i3); bt->tri (tv1)->setvbufflag ();
-  vbuf->pushIndex (i1,i2,i3);
-  return true;
+    // Record that these vertices are in the buffer.
+    bt->vbufferIndex(tva,i1);
+    bt->vbufferIndex(tv0,i2);
+    bt->vbufferIndex(tv1,i3);
+    vbuf->pushTriangle(i1,i2,i3);
+
+    return ddgSuccess;
 }
 
 void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 {
+/*
+
   G3DPolygonDPFX poly;
 
   bool moved = false;
@@ -204,7 +205,7 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   poly.flat_color_b = 255;
   poly.txt_handle = _textureMap->GetTextureHandle ();
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
-    false /*use_z_buf*/ ? CS_ZBUF_USE : CS_ZBUF_FILL);
+    false ? CS_ZBUF_USE : CS_ZBUF_FILL);
   rview.g3d->StartPolygonFX (poly.txt_handle, CS_FX_GOURAUD);
   grview = &rview;
 
@@ -266,6 +267,63 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
     vbuf->sort ();
   }
 
+
+  ////////////// HERE IS HOW DDG RENDERS THE TRIANGLE MESH PER TEXTURE
+
+  		unsigned int i = 0, s = 0;
+		ddgTBinTree *bt;
+
+		// If our orientation has changed, reload the buffer.
+		if (modified)
+		{
+			ddgVBuffer::reset();
+			// Update the vertex buffers.
+			ddgCacheIndex ci = 0;
+			while (i < _mesh->getBinTreeNo())
+			{
+				if (bt = _mesh->getBinTree(i))
+				{
+					unsigned int v = 0;
+					// Render each triangle.
+					ci = bt->chain();
+					// Render each triangle.
+					while (ci)
+					{
+						ddgTNode *tn = (ddgTNode*) _mesh->tcache()->get(ci);
+ 						if (drawTriangle(bt, tn->tindex(), ctx) == ddgSuccess)
+							v++;
+						ci = tn->next();
+					}
+					bt->visTriangle(v);
+				}
+				i++;
+			}
+
+		}
+
+		// Render the vertex buffer piece by piece.
+		i = 0;
+		while (i < _mesh->getBinTreeNo())
+		{
+			if (mode.flags.texture && _texture && (i%2 == 0) && _texture[i/2])
+				_texture[i/2]->activate();
+
+			if ((bt = _mesh->getBinTree(i)) && (bt->visTriangle() > 0))
+			{
+				// Render this bintree.
+				range(s,bt->visTriangle());
+
+				super::draw(ctx);
+				s = s+bt->visTriangle();
+			}
+			i++;
+		}
+
+	}
+	if (mode.flags.texture && _texture )
+		_texture[0]->deactivate();
+
+  ///////////////////// OLD CS TERRAIN CODE ///////////////////////
   // Render
   csVector3 *p1, *p2, *p3;
   ddgVector2 t1, t2, t3;
@@ -341,11 +399,53 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   }
 
   rview.g3d->FinishPolygonFX ();
+*/
 }
+/*
+// Define a player object which can handle collision detection against
+// the terrain.
+class ddgPlayer : public ddgControl
+{
+	typedef	ddgControl super;
+public:
+	ddgPlayer( ddgVector3 *p, ddgVector3 *o) : super(p,o) {}
+	///  Update the current position and orientation.
+	bool update(void)
+	{
+		if( super::update())
+		{
+			float terrainHeight;
+			// Keep camera above the terrain and within bounds.
+			ddgVector3 campos(position());
 
+			// Stay within x,z limits.
+			if (campos[0] < 0) campos[0] = 0;
+			if (campos[2] < 0) campos[2] = 0;
+			if (campos[0] > tsize) campos[0] = tsize;
+			if (campos[2] > tsize) campos[2] = tsize;
+
+			// Follow terrain.
+			terrainHeight = mesh ? mesh->height(campos[0],campos[2]) : 0.0;
+			// Don't go below sea level.
+			if (terrainHeight < sealevel)
+				terrainHeight = sealevel;
+
+			terrainHeight +=  groundHeight;
+			if (campos[1] < terrainHeight)
+				campos[1] = terrainHeight;
+			position()->set(campos[0],campos[1],campos[2]);
+			return true;
+		}
+		else
+			return false;
+	}
+};
+ddgPlayer *player = 0;
+*/
 // If we hit this terrain adjust our position to be on top of it.
 int csTerrain::CollisionDetect( csTransform *transform )
 {
+
   float h;
   // Translate us into terrain coordinate space.
   csVector3 p = transform->GetOrigin () - _pos;
@@ -363,4 +463,5 @@ int csTerrain::CollisionDetect( csTransform *transform )
   p = p + _pos;
   transform->SetOrigin (p);
   return 1;
+
 }
