@@ -445,6 +445,7 @@ int main (int argc, char * argv[])
   curmodel = 0;
   modelnum = -1;
   mode_xyz = MODE_XZY;
+  flags |= FLAG_SWAP_V; // default to lower left texture origin
 
   argc--;
   argv++;
@@ -470,7 +471,7 @@ int main (int argc, char * argv[])
                " -d        Don't remove duplicated vertices\n"
                " -3        Output 3D sprite instead of level\n"
                " -m num    Output only one object from 3DS (use -l to list)\n"
-	       " -tl       Make texture origin lower left\n"
+	       " -tl       Make texture origin lower left (default)\n"
 	       " -xyz      Convert model xyz -> CS xyz\n"
 	       " -xzy      Convert model xyz -> CS xzy (default)\n"
 	       " -yxz      Convert model xyz -> CS yxz\n"

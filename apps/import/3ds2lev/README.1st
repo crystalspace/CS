@@ -3,10 +3,12 @@ In 3DSMax you must define the names of objects correctly.
 
 All walls, floors, roof, and anything that "closes" the room must have
 his name starting with "_s_".
+The name of the objects should not be more than 10 chars. For example "_s_GazeboBars" is not correct, you must use "_s_Bars" only.
 
 If you have an object with a trasparent texture, then his name must start with "_t_".
 
 A 3DSMax object can have only 1 texture for the converter to work. If you need more textures, split the objects in different objects.
+The name of the texture should be the name of the texture file, as a default Max places name like "1 - Default". You must replace this with the name of the texture file. Please note that it must be all lower case: so "Gazebo_Bars.png" is not correct, "gazebo_bars.png" is correct.
 
 Lights:
 The converter supports also lights with this rules:

@@ -13,6 +13,8 @@ The history order is reversed so that new features are at the top.
 	  rather than invoking that expensive function each time csGetTicks()
 	  is called.  Note that this modification is untested since I don't
 	  have access to GCC3.
+	- Luca Pancallo improved 3ds2lev so that textures are now correctly
+	  uv mapped when the -tl option is used.
 31-Oct-2001
 	- Removed the windows pen support added by 'res'.  I don't have the
 	  needed include files on mingw.

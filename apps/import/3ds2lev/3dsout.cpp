@@ -71,9 +71,8 @@ void OutpHeadCS (FILE *o, Lib3dsFile *p3dsFile)
     fprintf (o, "  TEXTURES (\n");
 
     // set the current mesh to the first in the file
-
     for (j=0; j<numTextures; j++)
-        fprintf (o, "    TEXTURE '%s' (FILE (%s.png)) \n",textures[j], textures[j]);
+        fprintf (o, "    TEXTURE '%s' (FILE (%s)) \n",textures[j], textures[j]);
 
     fprintf (o, "  )\n\n");
 
@@ -267,9 +266,14 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
 	             numMesh, i, pCurFace->points[0], pCurFace->points[1], pCurFace->points[2],
 	             lighting ? "" : " LIGHTING (no)");
         fprintf (o, "          TEXTURE (UV (0,%g,%g,1,%g,%g,2,%g,%g))\n",
-                 mapV0[0][0], mapV0[0][1],
+                 mapV0[0][0], (flags & FLAG_SWAP_V ? 1.-mapV0[0][1] : mapV0[0][1]),
+                 mapV1[0][0], (flags & FLAG_SWAP_V ? 1.-mapV1[0][1] : mapV1[0][1]),
+                 mapV2[0][0], (flags & FLAG_SWAP_V ? 1.-mapV2[0][1] : mapV2[0][1]));
+
+/*                 mapV0[0][0], mapV0[0][1],
                  mapV1[0][0], mapV1[0][1],
                  mapV2[0][0], mapV2[0][1]);
+                 */
         fprintf (o, "        )\n"); // close polygon
       }
 
