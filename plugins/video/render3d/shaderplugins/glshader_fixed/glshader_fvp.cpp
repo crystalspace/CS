@@ -156,10 +156,58 @@ void csGLShaderFVP::Deactivate(iShaderPass* current)
 
 void csGLShaderFVP::SetupState (iShaderPass *current, csRenderMesh *mesh)
 {
+  if (environment == ENVIRON_REFLECT_CUBE)
+  {
+    //setup for environmental cubemapping
+    glTexGeni(GL_S,GL_TEXTURE_GEN_MODE,GL_REFLECTION_MAP_ARB);
+    glTexGeni(GL_T,GL_TEXTURE_GEN_MODE,GL_REFLECTION_MAP_ARB);
+    glTexGeni(GL_R,GL_TEXTURE_GEN_MODE,GL_REFLECTION_MAP_ARB);
+
+    glEnable(GL_TEXTURE_GEN_S);
+    glEnable(GL_TEXTURE_GEN_T);
+    glEnable(GL_TEXTURE_GEN_R);
+
+    csReversibleTransform *t = &mesh->object2camera;
+
+    const csMatrix3 &orientation = t->GetO2T();
+    const csVector3 &translation = t->GetO2TTranslation();
+
+    float mAutoTextureMatrix[16];
+    // Transpose 3x3 in order to invert matrix (rotation)
+    // Note that we need to invert the Z _before_ the rotation
+    // No idea why we have to invert the Z at all, but reflection is wrong without it
+    mAutoTextureMatrix[0] = orientation.m11; 
+    mAutoTextureMatrix[1] = orientation.m12; 
+    mAutoTextureMatrix[2] = orientation.m13;
+
+    mAutoTextureMatrix[4] = orientation.m21;
+    mAutoTextureMatrix[5] = orientation.m22;
+    mAutoTextureMatrix[6] = orientation.m23;
+
+    mAutoTextureMatrix[8] = orientation.m31; 
+    mAutoTextureMatrix[9] = orientation.m32; 
+    mAutoTextureMatrix[10] = orientation.m33;
+
+    mAutoTextureMatrix[3] = mAutoTextureMatrix[7] = mAutoTextureMatrix[11] = 0.0f;
+    mAutoTextureMatrix[12] = mAutoTextureMatrix[13] = mAutoTextureMatrix[14] = 0.0f;
+    mAutoTextureMatrix[15] = 1.0f;  
+
+    glMatrixMode(GL_TEXTURE);
+    glLoadMatrixf(mAutoTextureMatrix);
+  }
 }
 
 void csGLShaderFVP::ResetState ()
 {
+  if (environment == ENVIRON_REFLECT_CUBE)
+  {
+    glDisable(GL_TEXTURE_GEN_S);
+    glDisable(GL_TEXTURE_GEN_T);
+    glDisable(GL_TEXTURE_GEN_R);
+
+    glMatrixMode (GL_TEXTURE);
+    glLoadIdentity ();
+  }
 }
 
 void csGLShaderFVP::BuildTokenHash()
@@ -168,6 +216,8 @@ void csGLShaderFVP::BuildTokenHash()
   xmltokens.Register("declare",XMLTOKEN_DECLARE);
   xmltokens.Register("light", XMLTOKEN_LIGHT);
   xmltokens.Register("ambient", XMLTOKEN_AMBIENT);
+  xmltokens.Register("environment", XMLTOKEN_ENVIRONMENT);
+  xmltokens.Register("reflect", XMLTOKEN_REFLECT);
 
   xmltokens.Register("integer", 100+csShaderVariable::INT);
   xmltokens.Register("float", 100+csShaderVariable::FLOAT);
@@ -217,60 +267,6 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
       csStringID id = xmltokens.Request (value);
       switch(id)
       {
-      /*case XMLTOKEN_PROGRAM:
-          {
-            //save for later loading
-            programstring = new char[strlen(child->GetContentsValue())+1];
-            strcpy(programstring, child->GetContentsValue());
-          }
-          break;
-        case XMLTOKEN_DECLARE:
-          {
-            //create a new variable
-            csRef<csShaderVariable> var = shadermgr->CreateVariable (
-              strings->Request(child->GetAttributeValue ("name")));
-
-            // @@@ Will leak! Should do proper refcounting.
-            var->IncRef ();
-
-            csStringID idtype = xmltokens.Request (
-	    	child->GetAttributeValue("type") );
-            idtype -= 100;
-            var->SetType( (csShaderVariable::VariableType) idtype);
-            switch(idtype)
-            {
-              case csShaderVariable::INT:
-                var->SetValue( child->GetAttributeValueAsInt("default") );
-                break;
-              case csShaderVariable::FLOAT:
-                var->SetValue( child->GetAttributeValueAsFloat("default") );
-                break;
-              case csShaderVariable::STRING:
-                var->SetValue(new scfString (
-			child->GetAttributeValue("default")) );
-                break;
-              case csShaderVariable::VECTOR3:
-                const char* def = child->GetAttributeValue("default");
-                csVector3 v;
-                sscanf(def, "%f,%f,%f", &v.x, &v.y, &v.z);
-                var->SetValue( v );
-                break;
-            }
-            AddVariable (var);
-          }
-          break;
-        case XMLTOKEN_VARIABLEMAP:
-          {
-            variablemap.Push (variablemapentry ());
-            int i = variablemap.Length ()-1;
-
-            variablemap[i].name = strings->Request (
-              child->GetAttributeValue("variable"));
-
-            variablemap[i].registernum = 
-              child->GetAttributeValueAsInt("register");
-          }
-          break;*/
         case XMLTOKEN_LIGHT:
           {
             do_lighting = true;
@@ -328,6 +324,24 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
               ambientvar = strings->Request ("STANDARD_LIGHT_AMBIENT");
           
             do_lighting = true;
+          }
+          break;
+        case XMLTOKEN_ENVIRONMENT:
+          {
+            const char* str;
+            if (str = child->GetAttributeValue ("type"))
+            {
+              if (!strcasecmp(str, "reflection"))
+              {
+                if (str = child->GetAttributeValue ("mapping"))
+                {
+                  if (!strcasecmp(str, "cube"))
+                  {
+                    environment = ENVIRON_REFLECT_CUBE;
+                  }
+                }
+              }
+            }
           }
           break;
         default:

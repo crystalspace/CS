@@ -33,7 +33,15 @@ private:
     XMLTOKEN_FIXEDVP = 1,
     XMLTOKEN_DECLARE,
     XMLTOKEN_LIGHT,
-    XMLTOKEN_AMBIENT
+    XMLTOKEN_AMBIENT,
+    XMLTOKEN_ENVIRONMENT,
+    XMLTOKEN_REFLECT
+  };
+
+  enum ENVMODE
+  {
+    ENVIRON_NONE = 0,
+    ENVIRON_REFLECT_CUBE
   };
 
   csPDelArray<csSymbolTable> symtabs;
@@ -59,6 +67,8 @@ private:
   csArray<lightingentry> lights;
   bool do_lighting;
 
+  ENVMODE environment;
+
   csGLExtensionManager* ext;
   csRef<iObjectRegistry> object_reg;
 
@@ -79,6 +89,7 @@ public:
     this->ext = ext;
     symtab = new csSymbolTable;
   
+    environment = ENVIRON_NONE;
     g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   }
   virtual ~csGLShaderFVP ()
