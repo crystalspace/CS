@@ -464,9 +464,12 @@ void csProtoMeshObjectFactory::PreGetShaderVariableValue (
     {
       mesh_normals_dirty_flag = false;
       if (!normal_buffer)
+      {
+        // Create a buffer that doesn't copy the data.
         normal_buffer = g3d->CreateRenderBuffer (
           sizeof (csVector3)*PROTO_VERTS, CS_BUF_STATIC,
           CS_BUFCOMP_FLOAT, 3, false);
+      }
       normal_buffer->CopyToBuffer (
         normals, sizeof (csVector3)*PROTO_VERTS);
     }
@@ -502,18 +505,24 @@ void csProtoMeshObjectFactory::PrepareBuffers ()
   {
     mesh_vertices_dirty_flag = false;
     if (!vertex_buffer)
+    {
+      // Create a buffer that doesn't copy the data.
       vertex_buffer = g3d->CreateRenderBuffer (
           sizeof(csVector3)*PROTO_VERTS, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
           3);
+    }
     vertex_buffer->CopyToBuffer (vertices, sizeof(csVector3)*PROTO_VERTS);
   }
   if (mesh_texels_dirty_flag)
   {
     mesh_texels_dirty_flag = false;
     if (!texel_buffer)
+    {
+      // Create a buffer that doesn't copy the data.
       texel_buffer = g3d->CreateRenderBuffer (
           sizeof(csVector2)*PROTO_VERTS, CS_BUF_STATIC, CS_BUFCOMP_FLOAT,
           2);
+    }
     texel_buffer->CopyToBuffer (texels, sizeof(csVector2)*PROTO_VERTS);
   }
   if (mesh_triangle_dirty_flag)
