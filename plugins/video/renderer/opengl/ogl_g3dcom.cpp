@@ -909,14 +909,14 @@ void csGraphics3DOGLCommon::SetupClipPlanes ()
       plane_eq[1] = pl.B ();
       plane_eq[2] = pl.C ();
       plane_eq[3] = pl.D ();
-      glClipPlane (GL_CLIP_PLANE0+i, plane_eq);
+      glClipPlane ((GLenum)(GL_CLIP_PLANE0+i), plane_eq);
       i1 = i;
     }
     plane_eq[0] = 0;
     plane_eq[1] = 0;
     plane_eq[2] = 1;
     plane_eq[3] = -.001;
-    glClipPlane (GL_CLIP_PLANE0+i, plane_eq);
+    glClipPlane ((GLenum)(GL_CLIP_PLANE0+i), plane_eq);
   }
 }
 
@@ -978,6 +978,9 @@ void csGraphics3DOGLCommon::SetClipper (iClipper2D* clip, int cliptype)
 
 bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
 {
+  if (DrawMode & CSDRAW_3DGRAPHICS)
+    FlushDrawPolygon ();
+
   // if 2D graphics is not locked, lock it
   if ((DrawFlags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
    && (!(DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))))
@@ -1010,8 +1013,8 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
 
 void csGraphics3DOGLCommon::FinishDraw ()
 {
-  // ASSERT( G2D );
-
+  if (DrawMode & CSDRAW_3DGRAPHICS)
+    FlushDrawPolygon ();
 
   if (DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
   {
@@ -1082,6 +1085,287 @@ static float SetupBlend (UInt mode, float m_alpha, bool has_alpha)
   return m_alpha;
 }
 
+void csGraphics3DOGLCommon::FlushDrawPolygon ()
+{
+  if (queue.num_triangles <= 0) return;
+  int i, j;
+
+  csMaterialHandle* mat_handle = (csMaterialHandle*)queue.mat_handle;
+  iTextureHandle* txt_handle = mat_handle->GetTexture ();
+  csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *)
+  	txt_handle->GetPrivateObject ();
+  // Initialize our static drawing information and cache
+  // the texture in the texture cache (if this is not already the case).
+  CacheTexture (queue.mat_handle);
+
+  bool tex_transp;
+  int poly_alpha = queue.alpha;
+
+  csGLCacheData *texturecache_data;
+  texturecache_data = (csGLCacheData *)txt_mm->GetCacheData ();
+  tex_transp = txt_mm->GetKeyColor () || txt_mm->GetAlphaMap ();
+  GLuint texturehandle = texturecache_data->Handle;
+
+  float flat_r = 1., flat_g = 1., flat_b = 1.;
+
+  glShadeModel (GL_FLAT);
+  if (m_renderstate.textured)
+    glEnable (GL_TEXTURE_2D);
+  else
+  {
+    glDisable (GL_TEXTURE_2D);
+    UByte r, g, b;
+    queue.mat_handle->GetTexture ()->GetMeanColor (r, g, b);
+    flat_r = BYTE_TO_FLOAT (r);
+    flat_g = BYTE_TO_FLOAT (g);
+    flat_b = BYTE_TO_FLOAT (b);
+  }
+
+  SetGLZBufferFlags (queue.z_buf_mode);
+
+  if (poly_alpha == 0 && queue.mixmode != CS_FX_COPY)
+  {
+    float alpha = 1.0f - BYTE_TO_FLOAT (poly_alpha);
+    bool has_alpha = txt_handle->GetKeyColor () || txt_handle->GetAlphaMap ();
+    alpha = SetupBlend (queue.mixmode, alpha, has_alpha);
+    glColor4f (flat_r, flat_g, flat_b, alpha);
+  }
+  else if ((poly_alpha > 0) || tex_transp)
+  {
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glEnable (GL_BLEND);
+    if (poly_alpha > 0)
+      glColor4f (flat_r, flat_g, flat_b, 1.0 - BYTE_TO_FLOAT (poly_alpha));
+    else
+      glColor4f (flat_r, flat_g, flat_b, 1.0);
+  }
+  else
+  {
+    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+    glDisable (GL_BLEND);
+    glColor4f (flat_r, flat_g, flat_b, 0.);
+  }
+
+  csglBindTexture (GL_TEXTURE_2D, texturehandle);
+
+  glEnableClientState (GL_VERTEX_ARRAY);
+  glEnableClientState (GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer (4, GL_FLOAT, 0, queue.glverts);
+  glTexCoordPointer (2, GL_FLOAT, 0, queue.gltxt);
+  glDrawElements (GL_TRIANGLES, queue.num_triangles*3, GL_UNSIGNED_INT,
+  	  queue.tris);
+
+  // If we have need other texture passes (for whatever reason)
+  // we set the z-buffer to second pass state.
+  if ((queue.do_lightmaps && m_renderstate.lighting) ||
+      m_config_options.do_extra_bright ||
+      queue.use_fog ||
+      mat_handle->GetNumTextureLayers () > 0)
+  {
+    SetGLZBufferFlagsPass2 (queue.z_buf_mode, true);
+  }
+
+  // Here we add all extra texture layers if there are some.
+  for (j = 0 ; j < mat_handle->GetNumTextureLayers () ; j++)
+  {
+    csTextureLayer* layer = mat_handle->GetTextureLayer (j);
+    iTextureHandle* txt_handle = layer->txt_handle;
+    csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *)
+    	txt_handle->GetPrivateObject ();
+    csGLCacheData *texturecache_data;
+    texturecache_data = (csGLCacheData *)txt_mm->GetCacheData ();
+    //tex_transp = txt_mm->GetKeyColor () || txt_mm->GetAlphaMap ();
+    GLuint texturehandle = texturecache_data->Handle;
+    csglBindTexture (GL_TEXTURE_2D, texturehandle);
+
+    float alpha = 1.0f - BYTE_TO_FLOAT (layer->mode & CS_FX_MASK_ALPHA);
+    alpha = SetupBlend (layer->mode, alpha, false);
+    glColor4f (1., 1., 1., alpha);
+    GLfloat* p_gltxt;
+    if (mat_handle->TextureLayerTranslated (j))
+    {
+      GLfloat* src = queue.gltxt;
+      GLfloat* dst = queue.layer_gltxt;
+      int uscale = layer->uscale;
+      int vscale = layer->vscale;
+      int ushift = layer->ushift;
+      int vshift = layer->vshift;
+      for (i = 0 ; i < queue.num_vertices ; i++)
+      {
+	*dst++ = (*src++) * uscale + ushift;
+	*dst++ = (*src++) * vscale + vshift;
+      }
+
+      p_gltxt = queue.layer_gltxt;
+    }
+    else
+    {
+      p_gltxt = queue.gltxt;
+    }
+    glTexCoordPointer (2, GL_FLOAT, 0, p_gltxt);
+    glDrawElements (GL_TRIANGLES, queue.num_triangles*3, GL_UNSIGNED_INT,
+  	queue.tris);
+  }
+
+  // Next draw the lightmaps over the texture.  The two are blended
+  // together. If a lightmap exists, extract the proper
+  // data (GL handle, plus texture coordinate bounds)
+
+  glEnable (GL_TEXTURE_2D);
+  glEnable (GL_BLEND);
+  // The following blend function is configurable.
+  glBlendFunc (m_config_options.m_lightmap_src_blend,
+		 m_config_options.m_lightmap_dst_blend);
+  for (j = 0 ; j < queue.num_lightmaps ; j++)
+  {
+    // find lightmap information, if any
+    iPolygonTexture *tex = queue.poly_textures[j];
+    iLightMap *thelightmap = tex->GetLightMap ();
+    if (thelightmap && m_renderstate.lighting)
+    {
+      // Initialize our static drawing information and cache
+      // the lightmap.
+      if (m_renderstate.lighting)
+        lightmap_cache->cache_lightmap (tex);
+
+      csGLCacheData *lightmapcache_data = (csGLCacheData *)
+      	thelightmap->GetCacheData ();
+      GLuint lightmaphandle = lightmapcache_data->Handle;
+
+      csglBindTexture (GL_TEXTURE_2D, lightmaphandle);
+      float lm_scale_u = lightmapcache_data->lm_scale_u;
+      float lm_scale_v = lightmapcache_data->lm_scale_v;
+      float lm_offset_u = lightmapcache_data->lm_offset_u;
+      float lm_offset_v = lightmapcache_data->lm_offset_v;
+      int vtidx = queue.start_vt[j];
+      GLfloat* src = queue.GetGLTxt (vtidx);
+      GLfloat* dst = queue.GetLayerGLTxt (vtidx);
+      for (i = 0 ; i < queue.len_vt[j] ; i++)
+      {
+        *dst++ = (*src++ - lm_offset_u) * lm_scale_u;
+        *dst++ = (*src++ - lm_offset_v) * lm_scale_v;
+      }
+      // @@@ Is doing a triangle fan better here?
+      glVertexPointer (4, GL_FLOAT, 0, queue.glverts);
+      glTexCoordPointer (2, GL_FLOAT, 0, queue.layer_gltxt);
+      glDrawElements (GL_TRIANGLES, queue.len_tri[j]*3, GL_UNSIGNED_INT,
+  	  queue.tris+queue.start_tri[j]*3);
+    }
+  }
+
+  // An extra pass which improves the lighting on SRC*DST so that
+  // it looks more like 2*SRC*DST.
+  if (m_config_options.do_extra_bright)
+  {
+    glDisable (GL_TEXTURE_2D);
+    glShadeModel (GL_SMOOTH);
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA);
+    // glBlendFunc (GL_ZERO, GL_SRC_COLOR);
+
+    glColor4f (2, 2, 2, 0);
+    glVertexPointer (4, GL_FLOAT, 0, queue.glverts);
+    glDrawElements (GL_TRIANGLES, queue.num_triangles*3, GL_UNSIGNED_INT,
+  	  queue.tris);
+  }
+
+  // If there is vertex fog then we apply that last.
+  if (queue.use_fog)
+  {
+    csglBindTexture (GL_TEXTURE_2D, m_fogtexturehandle);
+    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+    glShadeModel (GL_SMOOTH);
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glEnableClientState (GL_COLOR_ARRAY);
+    glColorPointer (3, GL_FLOAT, 0, queue.fog_color);
+    glVertexPointer (4, GL_FLOAT, 0, queue.glverts);
+    glTexCoordPointer (2, GL_FLOAT, 0, queue.fog_txt);
+    glDrawElements (GL_TRIANGLES, queue.num_triangles*3, GL_UNSIGNED_INT,
+  	  queue.tris);
+    glDisableClientState (GL_COLOR_ARRAY);
+  }
+
+  glDisableClientState (GL_VERTEX_ARRAY);
+  glDisableClientState (GL_TEXTURE_COORD_ARRAY);
+
+  queue.Reset ();
+}
+
+int csPolyQueue::AddVertices (int num)
+{
+  num_vertices += num;
+  if (num_vertices > max_vertices)
+  {
+    GLfloat* new_ar;
+    int old_num = num_vertices-num;
+    max_vertices += 40;
+    new_ar = new GLfloat [max_vertices*4];
+    if (glverts) memcpy (new_ar, glverts, sizeof (GLfloat)*4*old_num);
+    delete[] glverts; glverts = new_ar;
+    new_ar = new GLfloat [max_vertices*2];
+    if (gltxt) memcpy (new_ar, gltxt, sizeof (GLfloat)*2*old_num);
+    delete[] gltxt; gltxt = new_ar;
+    new_ar = new GLfloat [max_vertices*2];
+    if (layer_gltxt) memcpy (new_ar, layer_gltxt, sizeof (GLfloat)*2*old_num);
+    delete[] layer_gltxt; layer_gltxt = new_ar;
+    new_ar = new GLfloat [max_vertices*3];
+    if (fog_color) memcpy (new_ar, fog_color, sizeof (GLfloat)*3*old_num);
+    delete[] fog_color; fog_color = new_ar;
+    new_ar = new GLfloat [max_vertices*2];
+    if (fog_txt) memcpy (new_ar, fog_txt, sizeof (GLfloat)*2*old_num);
+    delete[] fog_txt; fog_txt = new_ar;
+  }
+  return num_vertices-num;
+}
+
+int csPolyQueue::AddLightmap ()
+{
+  num_lightmaps++;
+  if (num_lightmaps > max_lightmaps)
+  {
+    int old_num = num_lightmaps-1;
+    max_lightmaps += 10;
+    iPolygonTexture** new_arp = new iPolygonTexture* [max_lightmaps];
+    if (poly_textures) memcpy (new_arp, poly_textures,
+    	sizeof (iPolygonTexture*) * old_num);
+    delete[] poly_textures; poly_textures = new_arp;
+    int* new_ar;
+    new_ar = new int [max_lightmaps];
+    if (start_vt) memcpy (new_ar, start_vt, sizeof (int) * old_num);
+    delete[] start_vt; start_vt = new_ar;
+    new_ar = new int [max_lightmaps];
+    if (len_vt) memcpy (new_ar, len_vt, sizeof (int) * old_num);
+    delete[] len_vt; len_vt = new_ar;
+    new_ar = new int [max_lightmaps];
+    if (start_tri) memcpy (new_ar, start_tri, sizeof (int) * old_num);
+    delete[] start_tri; start_tri = new_ar;
+    new_ar = new int [max_lightmaps];
+    if (len_tri) memcpy (new_ar, len_tri, sizeof (int) * old_num);
+    delete[] len_tri; len_tri = new_ar;
+  }
+  return num_lightmaps-1;
+}
+
+void csPolyQueue::AddTriangle (int i1, int i2, int i3)
+{
+  int old_num = num_triangles;
+  num_triangles++;
+  if (num_triangles > max_triangles)
+  {
+    max_triangles += 20;
+    int* new_ar;
+    new_ar = new int [max_triangles*3];
+    if (tris) memcpy (new_ar, tris, sizeof (int) * 3 * old_num);
+    delete[] tris; tris = new_ar;
+  }
+  tris[old_num*3+0] = i1;
+  tris[old_num*3+1] = i2;
+  tris[old_num*3+2] = i3;
+}
 
 #define SMALL_D 0.01
 
@@ -1096,7 +1380,7 @@ static float SetupBlend (UInt mode, float m_alpha, bool has_alpha)
  */
 #define VERTEX_NEAR_THRESHOLD   0.001
 
-void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
+void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
 {
   if (poly.num < 3)
     return;
@@ -1104,18 +1388,6 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   int i;
   float P1, P2, P3, P4;
   float Q1, Q2, Q3, Q4;
-
-  // take shortcut drawing if possible
-  if (ShortcutDrawPolygon && (this->*ShortcutDrawPolygon) (poly))
-    return;
-
-  // For debugging: is we reach the maximum number of polygons to draw
-  // we simply stop.
-  dbg_current_polygon++;
-  if (dbg_current_polygon == dbg_max_polygons_to_draw - 1)
-    return;
-  if (dbg_current_polygon >= dbg_max_polygons_to_draw - 1)
-    return;
 
   // count 'real' number of vertices
   int num_vertices = 1;
@@ -1129,6 +1401,28 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   // if this is a 'degenerate' polygon, skip it
   if (num_vertices < 3)
     return;
+
+  //========
+  // First check if this polygon is different from the current polygons
+  // in the queue. If so we need to flush the queue.
+  //========
+  if (poly.use_fog != queue.use_fog ||
+      poly.mat_handle != queue.mat_handle ||
+      poly.alpha != queue.alpha ||
+      poly.mixmode != queue.mixmode ||
+      z_buf_mode != queue.z_buf_mode)
+  {
+    FlushDrawPolygon ();
+  }
+
+  //========
+  // Store information in the queue.
+  //========
+  queue.use_fog = poly.use_fog;
+  queue.mat_handle = poly.mat_handle;
+  queue.alpha = poly.alpha;
+  queue.mixmode = poly.mixmode;
+  queue.z_buf_mode = z_buf_mode;
 
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
@@ -1159,18 +1453,6 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     N = -Bc * inv_Dc * inv_aspect;
     O = -Cc * inv_Dc;
   }
-
-  iPolygonTexture *tex = poly.poly_texture;
-  csMaterialHandle* mat_handle = (csMaterialHandle*)poly.mat_handle;
-  iTextureHandle* txt_handle = mat_handle->GetTexture ();
-  csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *) txt_handle->GetPrivateObject ();
-
-  // find lightmap information, if any
-  iLightMap *thelightmap = tex->GetLightMap ();
-
-  // Initialize our static drawing information and cache
-  // the texture in the texture cache (if this is not already the case).
-  CacheTexture (tex);
 
   // @@@ The texture transform matrix is currently written as
   // T = M*(C-V)
@@ -1211,70 +1493,11 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     K3 = Q3 + Q4 * O;
   }
 
-  bool tex_transp;
-  int poly_alpha = poly.alpha;
-
-  csGLCacheData *texturecache_data;
-  texturecache_data = (csGLCacheData *)txt_mm->GetCacheData ();
-  tex_transp = txt_mm->GetKeyColor () || txt_mm->GetAlphaMap ();
-  GLuint texturehandle = texturecache_data->Handle;
-
-  float flat_r = 1., flat_g = 1., flat_b = 1.;
-
-  glShadeModel (GL_FLAT);
-  if (m_renderstate.textured)
-    glEnable (GL_TEXTURE_2D);
-  else
-  {
-    glDisable (GL_TEXTURE_2D);
-    UByte r, g, b;
-    poly.mat_handle->GetTexture ()->GetMeanColor (r, g, b);
-    flat_r = BYTE_TO_FLOAT (r);
-    flat_g = BYTE_TO_FLOAT (g);
-    flat_b = BYTE_TO_FLOAT (b);
-  }
-
-  SetGLZBufferFlags ();
-
-  if (poly_alpha == 0 && poly.mixmode != CS_FX_COPY)
-  {
-    float alpha = 1.0f - BYTE_TO_FLOAT (poly_alpha);
-    bool has_alpha = txt_handle->GetKeyColor () || txt_handle->GetAlphaMap ();
-    alpha = SetupBlend (poly.mixmode, alpha, has_alpha);
-    glColor4f (flat_r, flat_g, flat_b, alpha);
-  }
-  else if ((poly_alpha > 0) || tex_transp)
-  {
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glEnable (GL_BLEND);
-    if (poly_alpha > 0)
-      glColor4f (flat_r, flat_g, flat_b, 1.0 - BYTE_TO_FLOAT (poly_alpha));
-    else
-      glColor4f (flat_r, flat_g, flat_b, 1.0);
-  }
-  else
-  {
-    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-    glDisable (GL_BLEND);
-    glColor4f (flat_r, flat_g, flat_b, 0.);
-  }
-
-  csglBindTexture (GL_TEXTURE_2D, texturehandle);
-
   float sx, sy, sz, one_over_sz, u_over_sz, v_over_sz;
 
-  // Check if there was a DrawPolygon the previous time.
-  start_draw_poly ();
-
-  // First copy all data in an array so that we can minimize
-  // the amount of code that goes between glBegin/glEnd. This
-  // is from an OpenGL high-performance FAQ.
-  // @@@ HARDCODED LIMIT OF 64 VERTICES!
-  static GLfloat glverts[4*64];
-  static GLfloat gltxt[2*64];
-  int vtidx = 0;
-  int txtidx = 0;
+  int idx = queue.AddVertices (poly.num);
+  GLfloat* glverts = queue.GetGLVerts (idx);
+  GLfloat* gltxt = queue.GetGLTxt (idx);
   for (i = 0; i < poly.num; i++)
   {
     sx = poly.vertices[i].sx - width2;
@@ -1293,152 +1516,35 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
 
     // modified to use homogenous object space coordinates instead
     // of homogenous texture space coordinates
-    gltxt[txtidx++] = u_over_sz * sz;
-    gltxt[txtidx++] = v_over_sz * sz;
-    glverts[vtidx++] = poly.vertices[i].sx * sz;
-    glverts[vtidx++] = poly.vertices[i].sy * sz;
-    glverts[vtidx++] = -1.0;
-    glverts[vtidx++] = sz;
+    *gltxt++ = u_over_sz * sz;
+    *gltxt++ = v_over_sz * sz;
+    *glverts++ = poly.vertices[i].sx * sz;
+    *glverts++ = poly.vertices[i].sy * sz;
+    *glverts++ = -1.0;
+    *glverts++ = sz;
   }
 
-  GLfloat* p_gltxt, * p_glverts;
-  p_gltxt = gltxt;
-  p_glverts = glverts;
-
-  glBegin (GL_TRIANGLE_FAN);
-  for (i = 0 ; i < poly.num ; i++)
+  // Triangulate.
+  int triidx = queue.num_triangles;
+  for (i = 2 ; i < poly.num ; i++)
   {
-    glTexCoord2fv (p_gltxt); p_gltxt += 2;
-    glVertex4fv (p_glverts); p_glverts += 4;
-  }
-  glEnd ();
-
-  // If we have need other texture passes (for whatever reason)
-  // we set the z-buffer to second pass state.
-  if ((thelightmap && m_renderstate.lighting) ||
-      m_config_options.do_extra_bright ||
-      poly.use_fog ||
-      mat_handle->GetNumTextureLayers () > 0)
-    SetGLZBufferFlagsPass2 (false);
-
-  // Here we add all extra texture layers if there are some.
-  static GLfloat layer_gltxt[2*64];
-  int j;
-  for (j = 0 ; j < mat_handle->GetNumTextureLayers () ; j++)
-  {
-    csTextureLayer* layer = mat_handle->GetTextureLayer (j);
-    iTextureHandle* txt_handle = layer->txt_handle;
-    csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *) txt_handle->GetPrivateObject ();
-    csGLCacheData *texturecache_data;
-    texturecache_data = (csGLCacheData *)txt_mm->GetCacheData ();
-    //tex_transp = txt_mm->GetKeyColor () || txt_mm->GetAlphaMap ();
-    GLuint texturehandle = texturecache_data->Handle;
-    csglBindTexture (GL_TEXTURE_2D, texturehandle);
-
-    float alpha = 1.0f - BYTE_TO_FLOAT (layer->mode & CS_FX_MASK_ALPHA);
-    alpha = SetupBlend (layer->mode, alpha, false);
-    glColor4f (1., 1., 1., alpha);
-    if (mat_handle->TextureLayerTranslated (j))
-    {
-      GLfloat* src = gltxt;
-      p_gltxt = layer_gltxt;
-      int uscale = layer->uscale;
-      int vscale = layer->vscale;
-      int ushift = layer->ushift;
-      int vshift = layer->vshift;
-      for (i = 0 ; i < poly.num ; i++)
-      {
-	*p_gltxt++ = (*src++) * uscale + ushift;
-	*p_gltxt++ = (*src++) * vscale + vshift;
-      }
-      p_gltxt = layer_gltxt;
-    }
-    else
-    {
-      p_gltxt = gltxt;
-    }
-    p_glverts = glverts;
-    glBegin (GL_TRIANGLE_FAN);
-    for (i = 0 ; i < poly.num ; i++)
-    {
-      glTexCoord2fv (p_gltxt); p_gltxt += 2;
-      glVertex4fv (p_glverts); p_glverts += 4;
-    }
-    glEnd ();
+    queue.AddTriangle (idx+0, idx+i-1, idx+i);
   }
 
-  // next draw the lightmap over the texture.  The two are blended
-  // together. If a lightmap exists, extract the proper
-  // data (GL handle, plus texture coordinate bounds)
-  if (thelightmap && m_renderstate.lighting)
-  {
-    csGLCacheData *lightmapcache_data = (csGLCacheData *)thelightmap->GetCacheData ();
-    GLuint lightmaphandle = lightmapcache_data->Handle;
+  int lmidx = queue.AddLightmap ();
+  queue.start_vt[lmidx] = idx;
+  queue.len_vt[lmidx] = poly.num;
+  queue.start_tri[lmidx] = triidx;
+  queue.len_tri[lmidx] = poly.num-2;
+  iPolygonTexture *tex = poly.poly_texture;
+  queue.poly_textures[lmidx] = tex;
+  iLightMap *thelightmap = tex->GetLightMap ();
+  if (thelightmap) queue.do_lightmaps = true;
 
-    csglBindTexture (GL_TEXTURE_2D, lightmaphandle);
-    glEnable (GL_TEXTURE_2D);
-
-    glEnable (GL_BLEND);
-    // The following blend function is configurable.
-    glBlendFunc (m_config_options.m_lightmap_src_blend,
-		 m_config_options.m_lightmap_dst_blend);
-
-    txtidx = 0;
-    float lm_scale_u = lightmapcache_data->lm_scale_u;
-    float lm_scale_v = lightmapcache_data->lm_scale_v;
-    float lm_offset_u = lightmapcache_data->lm_offset_u;
-    float lm_offset_v = lightmapcache_data->lm_offset_v;
-    for (i = 0; i < poly.num; i++)
-    {
-      gltxt[txtidx] = (gltxt[txtidx] - lm_offset_u) * lm_scale_u;
-      txtidx++;
-      gltxt[txtidx] = (gltxt[txtidx] - lm_offset_v) * lm_scale_v;
-      txtidx++;
-    }
-
-    p_gltxt = gltxt;
-    p_glverts = glverts;
-    glBegin (GL_TRIANGLE_FAN);
-    for (i = 0 ; i < poly.num ; i++)
-    {
-      glTexCoord2fv (p_gltxt); p_gltxt += 2;
-      glVertex4fv (p_glverts); p_glverts += 4;
-    }
-    glEnd ();
-  }
-
-  // An extra pass which improves the lighting on SRC*DST so that
-  // it looks more like 2*SRC*DST.
-  if (m_config_options.do_extra_bright)
-  {
-    glDisable (GL_TEXTURE_2D);
-    glShadeModel (GL_SMOOTH);
-    glEnable (GL_BLEND);
-    glBlendFunc (GL_DST_ALPHA, GL_ONE_MINUS_DST_ALPHA);
-    // glBlendFunc (GL_ZERO, GL_SRC_COLOR);
-
-    p_glverts = glverts;
-    glBegin (GL_TRIANGLE_FAN);
-    glColor4f (2, 2, 2, 0);
-    for (i = 0; i < poly.num; i++)
-    {
-      glVertex4fv (p_glverts);
-      p_glverts += 4;
-    }
-    glEnd ();
-  }
-  // If there is vertex fog then we apply that last.
   if (poly.use_fog)
   {
-    csglBindTexture (GL_TEXTURE_2D, m_fogtexturehandle);
-    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-    glShadeModel (GL_SMOOTH);
-    glEnable (GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    p_glverts = glverts;
-    glBegin (GL_TRIANGLE_FAN);
+    GLfloat* fog_color = queue.GetFogColor (idx);
+    GLfloat* fog_txt = queue.GetFogTxt (idx);
     for (i = 0; i < poly.num; i++)
     {
       // Formula for fog is:
@@ -1448,21 +1554,18 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
       // P = texture color
       // C = destination color
 
-      // specify fog vertex color
-      glColor3f (poly.fog_info[i].r, poly.fog_info[i].g, poly.fog_info[i].b);
+      *fog_color++ = poly.fog_info[i].r;
+      *fog_color++ = poly.fog_info[i].g;
+      *fog_color++ = poly.fog_info[i].b;
 
       // specify fog vertex alpha value using the fog table and fog
       // distance
       if (poly.fog_info[i].intensity > FOG_MAXVALUE)
-	glTexCoord2f (FOGTABLE_CLAMPVALUE,0.0);
+        *fog_txt++ = FOGTABLE_CLAMPVALUE;
       else
-	glTexCoord2f (poly.fog_info[i].intensity / FOGTABLE_MAXDISTANCE, 0.0);
-
-      // specify fog vertex location
-      glVertex4fv (p_glverts); p_glverts += 4;
+        *fog_txt++ = poly.fog_info[i].intensity / FOGTABLE_MAXDISTANCE;
+      *fog_txt++ = 0.0;
     }
-    glEnd ();
-
   }
 }
 
@@ -1485,6 +1588,8 @@ void csGraphics3DOGLCommon::DrawPolygonZFill (G3DPolygonDP & poly)
   // if this is a 'degenerate' polygon, skip it
   if (num_vertices < 3)
     return;
+
+  FlushDrawPolygon ();
 
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
@@ -1518,7 +1623,7 @@ void csGraphics3DOGLCommon::DrawPolygonZFill (G3DPolygonDP & poly)
 
   glDisable (GL_TEXTURE_2D);
   glShadeModel (GL_FLAT);
-  SetGLZBufferFlags ();
+  SetGLZBufferFlags (z_buf_mode);
   glBlendFunc (GL_ZERO, GL_ONE);
   glEnable (GL_BLEND);
 
@@ -1569,6 +1674,7 @@ round16 (long f)
 
 void csGraphics3DOGLCommon::StartPolygonFX (iMaterialHandle * handle, UInt mode)
 {
+  FlushDrawPolygon ();
   end_draw_poly ();
 
 //@@@ Experimental!!!
@@ -1624,7 +1730,7 @@ void csGraphics3DOGLCommon::StartPolygonFX (iMaterialHandle * handle, UInt mode)
   else
     glDisable (GL_TEXTURE_2D);
 
-  SetGLZBufferFlags ();
+  SetGLZBufferFlags (z_buf_mode);
 }
 
 void csGraphics3DOGLCommon::FinishPolygonFX ()
@@ -1715,7 +1821,7 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
     // -GL_DEPTH_BUFFER_BIT saves depth test function
     // -GL_TEXTURE_BIT saves current texture handle
     glPushAttrib ( GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_TEXTURE_BIT );
-    SetGLZBufferFlagsPass2 (false);
+    SetGLZBufferFlagsPass2 (z_buf_mode, false);
   }
 
   if (m_multimat)
@@ -2150,6 +2256,7 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
 
 void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 {
+  FlushDrawPolygon ();
   end_draw_poly ();
 
   bool stencil_enabled = false;
@@ -2233,7 +2340,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     SetupClipPlanes ();
     clip_planes_enabled = true;
     for (i = 0 ; i <= frustum.GetNumVertices () ; i++)	// One extra!
-      glEnable (GL_CLIP_PLANE0+i);
+      glEnable ((GLenum)(GL_CLIP_PLANE0+i));
   }
 
   //===========
@@ -2497,26 +2604,12 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     glColor4f (flat_r, flat_g, flat_b, m_alpha);
   }
 
-
-//csColor cols[8];
-//cols[0].Set (0, 0, 0);
-//cols[1].Set (1, 0, 0);
-//cols[2].Set (0, 1, 0);
-//cols[3].Set (0, 0, 1);
-//cols[4].Set (1, 1, 0);
-//cols[5].Set (1, 0, 1);
-//cols[6].Set (0, 1, 1);
-//cols[7].Set (1, 1, 1);
-//if (!colstate_enabled) glEnableClientState (GL_COLOR_ARRAY);
-//glColorPointer (3, GL_FLOAT, 0, cols);
-
-
   glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
 
   // If we have multi-texturing or fog we set the second pass Z-buffer
   // mode here.
   if (multitex || mesh.do_fog)
-    SetGLZBufferFlagsPass2 (true);
+    SetGLZBufferFlagsPass2 (z_buf_mode, true);
 
   //===========
   // Here we perform multi-texturing.
@@ -2640,7 +2733,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     glDisable (GL_STENCIL_TEST);
   if (clip_planes_enabled)
     for (i = 0 ; i <= frustum.GetNumVertices () ; i++)	// One extra!
-      glDisable (GL_CLIP_PLANE0+i);
+      glDisable ((GLenum)(GL_CLIP_PLANE0+i));
 }
 
 
@@ -2762,6 +2855,7 @@ long csGraphics3DOGLCommon::GetRenderState (G3D_RENDERSTATEOPTION op)
 
 void csGraphics3DOGLCommon::ClearCache ()
 {
+  FlushDrawPolygon ();
   end_draw_poly ();
 
   // We will clear lightmap cache since when unloading a world lightmaps
@@ -2777,6 +2871,7 @@ void csGraphics3DOGLCommon::DumpCache ()
 void csGraphics3DOGLCommon::DrawLine (const csVector3 & v1, const csVector3 & v2,
 	float fov, int color)
 {
+  FlushDrawPolygon ();
   end_draw_poly ();
 
   if (v1.z < SMALL_Z && v2.z < SMALL_Z)
@@ -2815,9 +2910,9 @@ void csGraphics3DOGLCommon::DrawLine (const csVector3 & v1, const csVector3 & v2
   G2D->DrawLine (px1, py1, px2, py2, color);
 }
 
-void csGraphics3DOGLCommon::SetGLZBufferFlags ()
+void csGraphics3DOGLCommon::SetGLZBufferFlags (csZBufMode flags)
 {
-  switch (z_buf_mode)
+  switch (flags)
   {
     case CS_ZBUF_NONE:
       glDisable (GL_DEPTH_TEST);
@@ -2843,9 +2938,10 @@ void csGraphics3DOGLCommon::SetGLZBufferFlags ()
   }
 }
 
-void csGraphics3DOGLCommon::SetGLZBufferFlagsPass2 (bool multiPol)
+void csGraphics3DOGLCommon::SetGLZBufferFlagsPass2 (csZBufMode flags,
+	bool multiPol)
 {
-  switch (z_buf_mode)
+  switch (flags)
   {
     case CS_ZBUF_NONE:
       glDisable (GL_DEPTH_TEST);
@@ -3044,7 +3140,7 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   csglBindTexture (GL_TEXTURE_2D, lightmaphandle);
   glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-  SetGLZBufferFlags ();
+  SetGLZBufferFlags (z_buf_mode);
 
   float lm_scale_u = lightmapcache_data->lm_scale_u;
   float lm_scale_v = lightmapcache_data->lm_scale_v;
@@ -3115,8 +3211,9 @@ void csGraphics3DOGLCommon::DrawPolygon (G3DPolygonDP & poly)
 #if USE_EXTENSIONS
   if (ARB_multitexture)
   {
-    DrawPolygonMultiTexture (poly);
-    return;
+    //@@@ This needs to be done differently. Currently disabled.
+    //DrawPolygonMultiTexture (poly);
+    //return;
   }
 #endif
   DrawPolygonSingleTexture (poly);
@@ -3125,6 +3222,7 @@ void csGraphics3DOGLCommon::DrawPolygon (G3DPolygonDP & poly)
 void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha)
 {
+  FlushDrawPolygon ();
   end_draw_poly ();
 
   int ClipX1, ClipY1, ClipX2, ClipY2;

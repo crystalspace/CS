@@ -54,6 +54,89 @@ struct csOpenGLCaps
   bool need_screen_clipping;
 };
 
+/**
+ * Queue to optimize DrawPolygon.
+ * Polygons with the same material and other modes will be added to
+ * this queue so that they can be rendered in one step.
+ */
+class csPolyQueue
+{
+public:
+  bool use_fog;
+  iMaterialHandle* mat_handle;
+  int alpha;
+  UInt mixmode;
+  csZBufMode z_buf_mode;
+
+  // For lightmap rendering.
+  bool do_lightmaps;
+  int num_lightmaps;
+  int max_lightmaps;
+  iPolygonTexture** poly_textures;
+  int* start_vt;	// Index in vertex arrays
+  int* len_vt;		// Size of this lightmap
+  int* start_tri;	// Index in triangle arrays
+  int* len_tri;		// Number of triangles in this lightmap
+
+  // Vertices.
+  int num_vertices;
+  int max_vertices;
+  GLfloat* glverts;	// 4*max_vertices
+  GLfloat* gltxt;	// 2*max_vertices
+  GLfloat* layer_gltxt;	// 2*max_vertices
+  GLfloat* fog_color;	// 3*max_vertices
+  GLfloat* fog_txt;	// 2*max_vertices
+
+  // Triangles.
+  int num_triangles;
+  int max_triangles;
+  int* tris;		// 3*max_triangles
+
+  /// Add some vertices. Return index of the added vertices.
+  int AddVertices (int num);
+  /// Add a lightmap. Return index of the added lightmap.
+  int AddLightmap ();
+  /// Add a triangle.
+  void AddTriangle (int i1, int i2, int i3);
+  /// Reset the queue to empty.
+  void Reset ()
+  {
+    num_triangles = 0;
+    num_lightmaps = 0;
+    num_vertices = 0;
+    do_lightmaps = false;
+  }
+
+  GLfloat* GetGLVerts (int idx) { return &glverts[idx<<2]; }
+  GLfloat* GetGLTxt (int idx) { return &gltxt[idx<<1]; }
+  GLfloat* GetLayerGLTxt (int idx) { return &layer_gltxt[idx<<1]; }
+  GLfloat* GetFogColor (int idx) { return &fog_color[idx*3]; }
+  GLfloat* GetFogTxt (int idx) { return &fog_txt[idx<<1]; }
+
+  csPolyQueue () : num_lightmaps (0), max_lightmaps (0),
+  	poly_textures (NULL), start_vt (NULL), len_vt (NULL),
+	start_tri (NULL), len_tri (NULL),
+	num_vertices (0), max_vertices (0),
+	glverts (NULL), gltxt (NULL), layer_gltxt (NULL),
+	fog_color (NULL), fog_txt (NULL),
+	num_triangles (0), max_triangles (0),
+	tris (NULL) { }
+  ~csPolyQueue ()
+  {
+    delete[] poly_textures;
+    delete[] start_vt;
+    delete[] len_vt;
+    delete[] start_tri;
+    delete[] len_tri;
+    delete[] glverts;
+    delete[] gltxt;
+    delete[] layer_gltxt;
+    delete[] fog_color;
+    delete[] fog_txt;
+    delete[] tris;
+  }
+};
+
 #define OPENGL_CLIP_AUTO		'a'	// Used for auto-detection.
 #define OPENGL_CLIP_NONE		'n'
 #define OPENGL_CLIP_ZBUF		'z'
@@ -65,7 +148,7 @@ struct csOpenGLCaps
 #define OPENGL_CLIP_LAZY_STENCIL	'S'
 #define OPENGL_CLIP_LAZY_PLANES		'P'
 
-///
+/// Crystal Space OpenGL driver.
 class csGraphics3DOGLCommon : public iGraphics3D
 {
 private:
@@ -77,7 +160,7 @@ private:
    * to SetRenderState and the call to the polygon
    * drawing routine
    */
-  void SetGLZBufferFlags ();
+  void SetGLZBufferFlags (csZBufMode flags);
 
   /**
    * Set proper GL flags based on ZBufMode.
@@ -96,7 +179,7 @@ private:
    * we will first render five polygon for first pass, then five for
    * second pass). In that case we need ZEQUAL mode.
    */
-  void SetGLZBufferFlagsPass2 (bool multiPol);
+  void SetGLZBufferFlagsPass2 (csZBufMode flags, bool multiPol);
 
   /**
    * Pointer to a member function that tries to draw the polygon in a quick
@@ -242,6 +325,9 @@ protected:
   csPlane3 near_plane;
   /// If the near plane is used.
   bool do_near_plane;
+
+  /// Polygon queue.
+  csPolyQueue queue;
 
   /// Current aspect ratio for perspective correction.
   float aspect;
@@ -492,6 +578,7 @@ public:
   /// Draw a polygon mesh.
   virtual void DrawPolygonMesh (G3DPolygonMesh& mesh)
   {
+    FlushDrawPolygon ();
     DefaultDrawPolygonMesh (mesh, this, o2c, clipper, aspect, inv_aspect,
     	width2, height2);
   }
@@ -567,6 +654,11 @@ public:
    */
   bool DrawPolygonMultiTexture (G3DPolygonDP &poly);
 
+  /**
+   * Flush the DrawPolygon queue if needed.
+   */
+  void FlushDrawPolygon ();
+  
   /**
    * Draw a fully-featured polygon assuming one has an OpenGL renderer
    * that only has a single texture unit.

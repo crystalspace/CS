@@ -18,6 +18,13 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in the fire plugin which was accidently broken by
 	  Eric a few days ago. I also optimized Eric's solution a little by
 	  avoiding the test for Colors==0 every time.
+	- Added texture state caching for OpenGL::DrawPolygon. If the engine
+	  sends in polygons with the same material together then OpenGL
+	  will cache them and send them all to OpenGL at once. This is
+	  especially the case when detail textures and fog. Depending on the
+	  level this can be a big optimization. But the engine itself still
+	  needs some enhancements to actually sort polygons on material and
+	  so on.
 9-May-2001
 	- Martin Geisse added a version of typed vectors that don't delete
 	  their elements.
