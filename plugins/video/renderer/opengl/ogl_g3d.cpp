@@ -1065,7 +1065,7 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
   // handle.  This includes software clipping.
   if (mesh.do_clip && clipper)
   {
-  //  SysPrintf(MSG_DEBUG_0, "Falling back to software clipping in DrawTriangleMesh\n");
+  ///  SysPrintf(MSG_DEBUG_0, "Falling back to software clipping in DrawTriangleMesh\n");
     DefaultDrawTriangleMesh (mesh, this, o2c, clipper, aspect, width2, height2);
     return;
   }
@@ -1162,25 +1162,6 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
   glPushMatrix();
   glLoadIdentity();
 
-  glTranslatef(width2,height2,0);
-
-
-  // Set up perspective transform.  This is done in the modelview matrix.
-  // We could do it in the projection matrix like a normal app would,
-  // but manipulating multiple transform matrices per DrawTriangleMesh() call
-  // would simply add to the complexity and overhead.
-  for (i = 0 ; i < 16 ; i++)
-    matrixholder[i] = 0.0;
-  
-  matrixholder[0] = matrixholder[5] = matrixholder[10] = matrixholder[15] = 1.0;
-  
-  matrixholder[10] = 0.0;
-  matrixholder[11] = 1.0/aspect;
-  matrixholder[14] = -1.0/aspect;
-  matrixholder[15] = 0.0;
-
-  glMultMatrixf(matrixholder);
-
   // set up world->camera transform, if needed
   if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
   {
@@ -1242,6 +1223,32 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
       //visible[i] = true;
     //}
   //}
+
+  // Set up perspective transform.
+  // we have to change the standard projection matrix used for
+  // drawing in other parts of CS.  Normally an orthogonal projection
+  // is used since CS does the perspective projection for us.
+  // Here, we need to reproduce CS's perspective projection using
+  // OpenGL matrices.
+
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glLoadIdentity();
+
+  glOrtho (0., (GLdouble) width, 0., (GLdouble) height, -1.0, 1.0);
+  glTranslatef(width2,height2,0);
+
+  for (i = 0 ; i < 16 ; i++)
+    matrixholder[i] = 0.0;
+  
+  matrixholder[0] = matrixholder[5] = matrixholder[10] = matrixholder[15] = 1.0;
+  
+  matrixholder[10] = 0.0;
+  matrixholder[11] = 1.0/aspect;
+  matrixholder[14] = -1.0/aspect;
+  matrixholder[15] = 0.0;
+
+  glMultMatrixf(matrixholder);
 
   // Fill flat color if renderer decide to paint it flat-shaded
   G3DPolygonDPFX poly;
@@ -1340,6 +1347,8 @@ void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
   FinishPolygonFX ();
 
   glMatrixMode(GL_MODELVIEW);
+  glPopMatrix();
+  glMatrixMode(GL_PROJECTION);
   glPopMatrix();
 }
 
