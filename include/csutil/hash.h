@@ -43,7 +43,7 @@ uint32 csHashCompute (char const*, int length);
  */
 template <class T> class csHash
 {
-private:
+protected:
   struct Element
   {
     uint32 key;
@@ -53,7 +53,10 @@ private:
     Element (const Element &other) : key (other.key), value (other.value) {}
   };
   csArray< csArray<Element> > Elements;
+
   int Modulo;
+
+private:
   int InitModulo;
   int GrowRate;
   int MaxSize;
@@ -218,6 +221,104 @@ public:
   int GetSize () const
   {
     return Size;
+  }
+
+  /// An iterator class for the hash.
+  class Iterator
+  {
+  private:
+    const csHash<T> *hash;
+    uint32 key;
+    int bucket, size, element;
+
+    void Seek ()
+    {
+      do element++;
+        while (element < size && hash->Elements[bucket][element].key != key);
+    }
+
+  protected:
+    Iterator (const csHash<T> *hash0, uint32 key0)
+    : hash (hash0), key (key0), bucket (key % hash->Modulo),
+      size (hash->Elements[bucket].Length ()) { Return (); }
+    Iterator (const Iterator &o)
+    : hash (o.hash), bucket (o.bucket), size (o.size), element (o.element) {}
+
+  public:
+    /// Returns a boolean indicating whether or not the hash has more elements.
+    bool HasNext () const
+    {
+      return element < size;
+    }
+
+    /// Get the next element's value.
+    const T& Next ()
+    {
+      const T &ret = hash->Elements[bucket][element].value;
+      Seek ();
+      return ret;
+    }
+
+    /// Move the iterator back to the first element.
+    void Return () { element = 0; Seek (); }
+  };
+
+  /// An iterator class for the hash.
+  class GlobalIterator
+  {
+  private:
+    const csHash<T> *hash;
+    int bucket, size, element;
+
+    void Zero () { bucket = element = 0; }
+    void Init () { size = hash->Elements[bucket].Length (); }
+
+  protected:
+    GlobalIterator (const csHash<T> *hash0) : hash (hash0) { Zero (); Init (); }
+    GlobalIterator (const Iterator &o) : hash (o.hash), bucket (o.bucket),
+      size (o.size), element (o.element) {}
+
+  public:
+    /// Returns a boolean indicating whether or not the hash has more elements.
+    bool HasNext () const
+    {
+      if (hash->Elements.IsEmpty ()) return false;
+      return element < size || bucket < hash->Elements.Length ();
+    }
+
+    /// Get the next element's value.
+    const T& Next ()
+    {
+      const T &ret = hash->Elements[bucket][element].value;
+      if (++element >= hash->Elements[bucket].Length ())
+      {
+        element = 0;
+        bucket++;
+        Init ();
+      }
+      return ret;
+    }
+
+    /// Get the next element's value and key.
+    const T& Next (uint32 &key)
+    {
+      key = hash->Elements[bucket][element].key;
+      return Next ();
+    }
+
+    /// Move the iterator back to the first element.
+    void Return () { Zero (); Init (); }
+  };
+
+  /// Return an iterator for the hash.
+  Iterator GetIterator (uint32 key) const
+  {
+    return Iterator (this, key);
+  }
+
+  GlobalIterator GetIterator () const
+  {
+    return GlobalIterator (this);
   }
 };
 
