@@ -1565,21 +1565,20 @@ int csOctree::ClassifyPolygon (csOctreeNode* node, const csPoly3D& poly)
 
   csPoly3D inputF, inputB, inputFF, inputFB, inputBF, inputBB;
   const csPoly3D* npF, * npB, * npFF, * npFB, * npBF, * npBB;
-  // NextStep couldn't construct array of csPoly3D correctly, so do it manually.
-  csPoly3D i0, i1, i2, i3, i4, i5, i6, i7;
-  csPoly3D* const input[8] = { &i0, &i1, &i2, &i3, &i4, &i5, &i6, &i7 };
+  csPoly3D inputFFF, inputFFB, inputFBF, inputFBB,
+  	   inputBFF, inputBFB, inputBBF, inputBBB;
   const csPoly3D* nps[8];
   SplitOptPlane2 (&poly, inputF, &npF, inputB, &npB, 0, center.x);
   SplitOptPlane2 (npF, inputFF, &npFF, inputFB, &npFB, 1, center.y);
   SplitOptPlane2 (npB, inputBF, &npBF, inputBB, &npBB, 1, center.y);
-  SplitOptPlane2 (npFF, *input[OCTREE_FFF], &nps[OCTREE_FFF],
-  	*input[OCTREE_FFB], &nps[OCTREE_FFB], 2, center.z);
-  SplitOptPlane2 (npFB, *input[OCTREE_FBF], &nps[OCTREE_FBF],
-  	*input[OCTREE_FBB], &nps[OCTREE_FBB], 2, center.z);
-  SplitOptPlane2 (npBF, *input[OCTREE_BFF], &nps[OCTREE_BFF],
-  	*input[OCTREE_BFB], &nps[OCTREE_BFB], 2, center.z);
-  SplitOptPlane2 (npBB, *input[OCTREE_BBF], &nps[OCTREE_BBF],
-  	*input[OCTREE_BBB], &nps[OCTREE_BBB], 2, center.z);
+  SplitOptPlane2 (npFF, inputFFF, &nps[OCTREE_FFF],
+  	inputFFB, &nps[OCTREE_FFB], 2, center.z);
+  SplitOptPlane2 (npFB, inputFBF, &nps[OCTREE_FBF],
+  	inputFBB, &nps[OCTREE_FBB], 2, center.z);
+  SplitOptPlane2 (npBF, inputBFF, &nps[OCTREE_BFF],
+  	inputBFB, &nps[OCTREE_BFB], 2, center.z);
+  SplitOptPlane2 (npBB, inputBBF, &nps[OCTREE_BBF],
+  	inputBBB, &nps[OCTREE_BBB], 2, center.z);
   int i;
   bool found_open = false, found_solid = false;
   for (i = 0 ; i < 8 ; i++)
