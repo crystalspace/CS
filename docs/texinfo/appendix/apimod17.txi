@@ -262,6 +262,7 @@ and @code{things} vectors. In addition to this the @code{GetNext} and @code
 Here is some old code to operate on things:
 
 @example
+csThing* thing = new csThing (world);
 sector->AddThing (thing);
 thing->SetPosition (csVector3 (0,0,3));
 thing->SetTransform (csMatrix3 ());
@@ -274,6 +275,8 @@ delete thing;
 then this will now become:
 
 @example
+csThing* thing = new csThing (world);
+world->things.Push (thing);
 thing->GetMovable ().SetSector (sector);
 thing->GetMovable ().SetPosition (csVector3 (0,0,3));
 thing->GetMovable ().SetTransform (csMatrix3 ());
@@ -285,6 +288,8 @@ world->RemoveThing (thing);
 or even:
 
 @example
+csThing* thing = new csThing (world);
+world->things.Push (thing);
 csMovable& move = thing->GetMovable ();
 move.SetSector (sector);
 move.SetPosition (csVector3 (0,0,3));
@@ -297,6 +302,8 @@ world->RemoveThing (thing);
 The old behaviour for sprites:
 
 @example
+csSprite3D* sprite = new csSprite3D (world);
+world->sprites.Push (sprite);
 sprite->MoveToSector (sector);
 sprite->SetPosition (csVector3 (0,0,3));
 sprite->SetTransform (csMatrix3 ());
@@ -305,6 +312,8 @@ sprite->SetTransform (csMatrix3 ());
 becomes (note the new @code{UpdateMove}):
 
 @example
+csSprite3D* sprite = new csSprite3D (world);
+world->sprites.Push (sprite);
 csMovable& move = sprite->GetMovable ();
 move.SetSector (sector);
 move.SetPosition (csVector3 (0,0,3));
