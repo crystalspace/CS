@@ -179,6 +179,8 @@ enum
   XMLTOKEN_SOUNDS,
   XMLTOKEN_START,
   XMLTOKEN_STATICLOD,
+  XMLTOKEN_STATICPOS,
+  XMLTOKEN_STATICSHAPE,
   XMLTOKEN_T,
   XMLTOKEN_TEXTURE,
   XMLTOKEN_TEXTURES,
@@ -412,9 +414,9 @@ private:
      * plugin doesn't exist.
      */
     bool FindPlugin (const char* Name, iLoaderPlugin*& plug,
-    	iBinaryLoaderPlugin*& binplug);
+    	iBinaryLoaderPlugin*& binplug, iDocumentNode*& defaults);
     // add a new plugin record
-    void NewPlugin (const char* ShortName, const char* ClassID);
+    void NewPlugin (const char* ShortName, iDocumentNode* child);
     /**
      * Delete all loaded plugins.
      */
@@ -562,7 +564,7 @@ private:
   bool HandleMeshParameter (iLoaderContext* ldr_context,
   	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* child,
 	csStringID id, bool& handled, char*& priority,
-	bool do_portal_container);
+	bool do_portal_container, bool& staticpos, bool& staticshape);
   /**
    * Load the mesh object from the map file.
    * The parent is not 0 if this mesh is going to be part of a hierarchical

@@ -53,6 +53,7 @@ private:
   bool do_beam; // Show the intersection beam.
   csVector3 beam[2];
   csVector3 isec;
+  csFlags flags;
 
 public:
 
@@ -116,6 +117,7 @@ public:
   SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return 0; }
+  virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual bool Draw (iRenderView*, iMovable*, csZBufMode);
   virtual csRenderMesh** GetRenderMeshes (int& n) { n = 0; return 0; }

@@ -201,6 +201,7 @@ public:
   iVertexBufferManager *vbufmgr;
   csBox3 bbox;
   csVector3 radius;
+  csFlags flags;
 
   // flatten info
   bool btop, bright, bdown, bleft, initheight;
@@ -248,6 +249,7 @@ public:
 
   virtual iMeshObjectFactory* GetFactory () const { return pFactory; }
 
+  virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual csRenderMesh **GetRenderMeshes (int & n) { n = 0; return 0; }
 
@@ -709,6 +711,7 @@ public:
   int* LOD_Mesh_Numbers; // # of shared meshes per LOD_Level
   bool initialized; // true after all variables are set
   iMaterialWrapper* default_mat;
+  csFlags flags;
 
   csBCLODOwner** owners;
   int last_level, last_owner;
@@ -728,6 +731,7 @@ public:
 
   SCF_DECLARE_IBASE;
 
+  virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual iObjectModel* GetObjectModel () { return 0; }
 

@@ -294,6 +294,8 @@ private:
   /// scale factor
   csVector3 scale;
 
+  csFlags flags;
+
 protected:
   /// Initializes a mesh structure
   void InitMesh (nTerrainInfo *info);
@@ -365,6 +367,7 @@ public:
   virtual iMeshObjectFactory* GetFactory () const { return pFactory; }
 
   /// Does some pre-draw work (buffers all vertices to be drawn, draw will render these.)
+  virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual csRenderMesh** GetRenderMeshes (int& n) { n = 0; return 0; }
 
@@ -445,6 +448,7 @@ class csBigTerrainObjectFactory : public iMeshObjectFactory
 {
 private:
   iBase* logparent;
+  csFlags flags;
 
 public:
   iObjectRegistry *object_reg;
@@ -457,6 +461,7 @@ public:
 
   SCF_DECLARE_IBASE;
 
+  virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
 
   virtual void HardTransform (const csReversibleTransform&) { }

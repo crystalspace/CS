@@ -608,8 +608,8 @@ csPtr<iBase> csClothMeshLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find factory '%s'!", factname);
 	    return 0;
 	  }
-	  mesh      = fact->GetMeshObjectFactory ()->NewInstance ();
-      meshstate = SCF_QUERY_INTERFACE (mesh, iClothMeshState);
+	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
+	  meshstate = SCF_QUERY_INTERFACE (mesh, iClothMeshState);
 	}
 	break;
       case XMLTOKEN_MATERIAL:

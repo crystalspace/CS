@@ -844,6 +844,7 @@ csChunkLodTerrainObject::~csChunkLodTerrainObject ()
 }
 
 int optimized_meshes;
+
 bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv, 
 	csChunkLodTerrainFactory::MeshTreeNode* node, float kappa) 
 {

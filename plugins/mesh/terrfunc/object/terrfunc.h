@@ -151,6 +151,8 @@ public:
   // This number is increased whenever there is a lighting change
   long dirlight_number;
 
+  csFlags flags;
+
   // For shadows. This grid is like a z-buffer indicating the closeness
   // of that part of the landscape to the light.
   float* shadow_map;
@@ -500,6 +502,7 @@ public:
 
   virtual iMeshObjectFactory* GetFactory () const { return pFactory; }
 
+  virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual csRenderMesh **GetRenderMeshes (int &n) { n = 0; return 0; }
 
@@ -724,6 +727,7 @@ class csTerrFuncObjectFactory : public iMeshObjectFactory
 {
 private:
   iBase* logparent;
+  csFlags flags;
 
 public:
   iObjectRegistry *object_reg;
@@ -736,6 +740,7 @@ public:
 
   SCF_DECLARE_IBASE;
 
+  virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
 
   virtual void HardTransform (const csReversibleTransform&) { }

@@ -49,6 +49,8 @@ private:
   float density;
   float max_dist;
 
+  csFlags flags;
+
   int seed;
 
   bool initialized;
@@ -125,6 +127,7 @@ public:
   SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return factory; }
+  virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual csRenderMesh **GetRenderMeshes (int &n) { n = 0; return 0; }
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
@@ -237,6 +240,7 @@ class csStarsMeshObjectFactory : public iMeshObjectFactory
 {
 private:
   iBase* logparent;
+  csFlags flags;
 
 public:
   /// Constructor.
@@ -248,6 +252,7 @@ public:
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
 
+  virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }

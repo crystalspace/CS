@@ -108,13 +108,16 @@ struct csPolygonRange
 /** \name Thing flags
  * @{ */
 /**
- * If CS_THING_NOCOMPRESS is set then vertices of this thing will not
+ * If CS_THING_NOCOMPRESS is set then vertices of this thing factory will not
  * be compressed. By default the vertex table is compressed before the
  * thing is used for the first time (this means that duplicate vertices
- * are removed).
+ * are removed). This is a flag for iMeshObjectFactory.
  */
-#define CS_THING_NOCOMPRESS 4
+#define CS_THING_NOCOMPRESS 0x00010000
+/** @} */
 
+/** \name Move option flags
+ * @{ */
 /**
  * The following flags affect movement options for a thing. See
  * SetMovingOption() for more info.
@@ -549,9 +552,6 @@ struct iThingFactoryState : public iBase
    * DeleteVertices(0,1000000000).
    */
   virtual void DeleteVertices (int from, int to) = 0;
-
-  /// Set thing flags (see CS_THING_... values above)
-  virtual csFlags& GetFlags () = 0;
 
   /**
    * Sets the smoothing flag.

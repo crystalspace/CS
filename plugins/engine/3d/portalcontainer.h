@@ -157,6 +157,8 @@ private:
   csRenderMesh rmesh;
   csRenderMesh *rmeshPtr;
   iMovable* last_movable;
+  csFlags flags;
+
 protected:
   /**
    * Destructor.  This is private in order to force clients to use DecRef()
@@ -203,6 +205,7 @@ public:
 
   //--------------------- For iMeshObject ------------------------------//
   virtual iMeshObjectFactory* GetFactory () const { return 0; }
+  virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable,
   	csZBufMode zbufMode);

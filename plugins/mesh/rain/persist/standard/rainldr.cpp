@@ -251,7 +251,7 @@ csPtr<iBase> csRainLoader::Parse (iDocumentNode* node,
 	    return 0;
 	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
-      rainstate = SCF_QUERY_INTERFACE (mesh, iRainState);
+	  rainstate = SCF_QUERY_INTERFACE (mesh, iRainState);
 	}
 	break;
       case XMLTOKEN_MATERIAL:

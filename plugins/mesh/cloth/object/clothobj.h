@@ -63,7 +63,7 @@ class           Cloth;
 // how are you supposed to assign materials to the meshobject from the
 // client application? 
 // //////////////////////////////////////////////////////////////////////////////////////////
-class           csStuffObject:public iMeshObject 
+class csStuffObject : public iMeshObject 
 {
     G3DTriangleMesh mesh;
     Integrator     *Dynamics;
@@ -83,9 +83,11 @@ class           csStuffObject:public iMeshObject
     iMaterialWrapper *material;
     csColor        *colors;
     uint            MixMode;
-                    csRef < iVertexBuffer > vbuf;
+    csRef < iVertexBuffer > vbuf;
     iVertexBufferManager *vbufmgr;
     iMeshObjectDrawCallback *vis_cb;
+
+    csFlags flags;
 
     // ------------------BEGIN iVertexBufferManagerClient
     // implementation------------------///
@@ -130,6 +132,7 @@ class           csStuffObject:public iMeshObject
 
     // -----------------------| BEGIN MeshObject Impl
     // |-------------------------------//
+    virtual csFlags& GetFlags () { return flags; }
     virtual bool    DrawTest(iRenderView * rview, iMovable * movable);
     virtual csRenderMesh **GetRenderMeshes (int & n) { n = 0; return 0; }
     virtual bool    Draw(iRenderView * rview, iMovable * movable,
@@ -230,16 +233,18 @@ virtual bool    IsManualColors() const { return false; };
 // could allow me
 // / to reset to factory settings?
 
-class           StuffFactory:public iMeshObjectFactory 
+class StuffFactory : public iMeshObjectFactory 
 {
   public:
     iObjectRegistry * object_reg;
+    csFlags flags;
 
     SCF_DECLARE_IBASE;
     StuffFactory(iBase * parent);
     virtual ~ StuffFactory();
-    virtual bool    Initialize(iObjectRegistry * iO_R);
-    virtual         csPtr < iMeshObject > NewInstance();
+    virtual bool Initialize(iObjectRegistry * iO_R);
+    virtual csFlags& GetFlags () { return flags; }
+    virtual csPtr < iMeshObject > NewInstance();
     virtual iObjectModel* GetObjectModel () { return 0; }
 
     virtual void    HardTransform(const csReversibleTransform &);

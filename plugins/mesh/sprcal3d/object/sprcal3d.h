@@ -160,6 +160,8 @@ private:
   /// The sockets.
   csPDelArray<csSpriteCal3DSocket> sockets;
 
+  csFlags flags;
+
 public:
   iObjectRegistry* object_reg;
   iVirtualClock* vc;
@@ -230,12 +232,12 @@ public:
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
 
+  virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-
 
   //------------------ iPolygonMesh interface implementation ----------------//
 
@@ -484,6 +486,8 @@ private:
   float idle_override_interval;
   int   idle_action;
 
+  csFlags flags;
+
   /**
    * Each mesh must have its own individual socket assignments,
    * but the vector must be copied down from the factory at create time.
@@ -675,6 +679,7 @@ public:
     	iMeshObjectFactory));
     return ifact;	// DecRef is ok here.
   }
+  virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual csRenderMesh **GetRenderMeshes (int &n);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);

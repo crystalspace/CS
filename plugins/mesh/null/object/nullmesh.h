@@ -45,6 +45,8 @@ private:
   iMeshObjectDrawCallback* vis_cb;
   float radius;
   csBox3 box;
+  csFlags object_flags;
+  csFlags factory_flags;
 
 public:
   /// Constructor.
@@ -71,6 +73,7 @@ public:
   {
     return (iMeshObjectFactory*)factory;
   }
+  virtual csFlags& GetFlags () { return object_flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
@@ -154,6 +157,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csNullmeshMeshObject);
 
+    virtual csFlags& GetFlags () { return scfParent->factory_flags; }
     virtual csPtr<iMeshObject> NewInstance ();
     virtual void HardTransform (const csReversibleTransform&) {}
     virtual bool SupportsHardTransform () const { return false; }

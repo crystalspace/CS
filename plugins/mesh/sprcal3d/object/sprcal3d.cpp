@@ -521,13 +521,14 @@ void csSpriteCal3DMeshObjectFactory::BindMaterials()
   // make one material thread for each material
   // NOTE: this is not the right way to do it, but this viewer can't do the right
   // mapping without further information on the model etc.
-  for(materialId = 0; materialId < calCoreModel.getCoreMaterialCount(); materialId++)
+  for (materialId = 0 ; materialId < calCoreModel.getCoreMaterialCount()
+  	; materialId++)
   {
     // create the a material thread
-    calCoreModel.createCoreMaterialThread(materialId);
+    calCoreModel.createCoreMaterialThread (materialId);
 
     // initialize the material thread
-    calCoreModel.setCoreMaterialId(materialId, 0, materialId);
+    calCoreModel.setCoreMaterialId (materialId, 0, materialId);
   }
 }
 

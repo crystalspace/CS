@@ -331,7 +331,8 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   iBinaryLoaderPlugin* Binplug;
   if (type && !plugin)
   {
-    if (!loaded_plugins.FindPlugin (type, Plug, Binplug))
+    iDocumentNode* defaults = 0;
+    if (!loaded_plugins.FindPlugin (type, Plug, Binplug, defaults))
     {
       if ((!strcasecmp (type, "dots")) ||
 	  (!strcasecmp (type, "plasma")) ||
@@ -359,10 +360,17 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
 	delete[] type;
 	type = newtype;
 
-	loaded_plugins.FindPlugin (type, Plug, Binplug);
+	loaded_plugins.FindPlugin (type, Plug, Binplug, defaults);
       }
     }
     plugin = Plug;
+
+    if (defaults != 0)
+    {
+      ReportWarning (
+	        "crystalspace.maploader.parse.texture",
+                node, "'defaults' section is ignored for textures!");
+    }
   }
 
   if (type && !plugin)

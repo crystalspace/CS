@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "csloader.h"
 #include "imap/reader.h"
+#include "iutil/document.h"
 
 struct csLoaderPluginRec
 {
@@ -28,6 +29,7 @@ struct csLoaderPluginRec
   csRef<iComponent> Component;
   csRef<iLoaderPlugin> Plugin;
   csRef<iBinaryLoaderPlugin> BinPlugin;
+  csRef<iDocumentNode> defaults;
 
   csLoaderPluginRec (const char* shortName,
 	const char *classID,
@@ -47,6 +49,11 @@ struct csLoaderPluginRec
   {
     delete [] ShortName;
     delete [] ClassID;
+  }
+
+  void SetDefaults (iDocumentNode* defaults)
+  {
+    csLoaderPluginRec::defaults = defaults;
   }
 };
 
@@ -115,26 +122,41 @@ bool csLoader::csLoadedPluginVector::GetPluginFromRec (
 
 bool csLoader::csLoadedPluginVector::FindPlugin (
 	const char* Name, iLoaderPlugin*& plug,
-	iBinaryLoaderPlugin*& binplug)
+	iBinaryLoaderPlugin*& binplug, iDocumentNode*& defaults)
 {
   csScopedMutexLock lock (mutex);
   // look if there is already a loading record for this plugin
   csLoaderPluginRec* pl = FindPluginRec (Name);
   if (pl)
   {
+    defaults = pl->defaults;
     return GetPluginFromRec (pl, plug, binplug);
   }
 
   // create a new loading record
-  NewPlugin (0, Name);
+  vector.Push (new csLoaderPluginRec (0, Name, 0, 0, 0));
+  defaults = 0;
   return GetPluginFromRec (vector.Get(vector.Length()-1),
   	plug, binplug);
 }
 
 void csLoader::csLoadedPluginVector::NewPlugin
-	(const char *ShortName, const char *ClassID)
+	(const char *ShortName, iDocumentNode* child)
 {
   csScopedMutexLock lock (mutex);
-  vector.Push (new csLoaderPluginRec (ShortName, ClassID, 0, 0, 0));
+  csRef<iDocumentNode> id = child->GetNode ("id");
+  if (id)
+  {
+    const char* ClassID = id->GetContentsValue ();
+    csLoaderPluginRec* pr = new csLoaderPluginRec (ShortName, ClassID, 0, 0, 0);
+    csRef<iDocumentNode> defaults = child->GetNode ("defaults");
+    pr->SetDefaults (defaults);
+    vector.Push (pr);
+  }
+  else
+  {
+    const char* ClassID = child->GetContentsValue ();
+    vector.Push (new csLoaderPluginRec (ShortName, ClassID, 0, 0, 0));
+  }
 }
 

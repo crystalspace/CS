@@ -1143,7 +1143,8 @@ iMeshObjectFactory *csBezierMesh::MeshObject::GetFactory () const
 //---------------------------------------------------------------------------
 csPtr<iMeshObject> csBezierMesh::MeshObjectFactory::NewInstance ()
 {
-  csBezierMesh *thing = new csBezierMesh (scfParent, scfParent->static_data->thing_type);
+  csBezierMesh *thing = new csBezierMesh (scfParent,
+  	scfParent->static_data->thing_type);
   thing->MergeTemplate (&(scfParent->scfiBezierFactoryState), 0);
   return csPtr<iMeshObject> (&thing->scfiMeshObject);
 }

@@ -82,7 +82,8 @@ void ConstructBillboardTask::doTask()
   fact->SetMaterialWrapper (metamat->GetMaterialWrapper());
 
   // Create the mesh object and query the state
-  csRef<iMeshObject> mesh = billboard_factory->GetMeshObjectFactory()->NewInstance();
+  csRef<iMeshObject> mesh = billboard_factory->GetMeshObjectFactory ()
+  	->NewInstance();
   csRef<iSprite2DState> state = SCF_QUERY_INTERFACE (mesh, iSprite2DState);
   if (!state) return;
 

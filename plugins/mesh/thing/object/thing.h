@@ -429,8 +429,6 @@ public:
   virtual void RemovePolygon (int idx);
   virtual void RemovePolygons ();
 
-  virtual csFlags& GetFlags () { return flags; }
-
   virtual void SetSmoothingFlag (bool smoothing) { smoothed = smoothing; }
   virtual bool GetSmoothingFlag () { return smoothed; }
   virtual csVector3* GetNormals () { return obj_normals; }
@@ -495,6 +493,7 @@ public:
 
   //-------------------- iMeshObjectFactory interface implementation ---------
 
+  virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
@@ -640,6 +639,8 @@ private:
 
   float current_lod;
   uint32 current_features;
+
+  csFlags flags;
 
 #ifdef CS_USE_NEW_RENDERER
   csDirtyAccessArray<csRenderMesh*> renderMeshes;
@@ -1089,6 +1090,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
     virtual iMeshObjectFactory* GetFactory () const;
+    virtual csFlags& GetFlags () { return scfParent->flags; }
     virtual bool DrawTest (iRenderView* rview, iMovable* movable)
     {
       return scfParent->DrawTest (rview, movable);

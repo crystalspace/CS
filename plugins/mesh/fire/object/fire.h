@@ -275,6 +275,7 @@ class csFireMeshObjectFactory : public iMeshObjectFactory
 private:
   iObjectRegistry* object_reg;
   iBase* logparent;
+  csFlags flags;
 
 public:
   /// Constructor.
@@ -286,6 +287,7 @@ public:
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
 
+  virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }

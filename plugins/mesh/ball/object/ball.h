@@ -74,6 +74,7 @@ private:
   csVector3* top_normals;
   bool initialized;
   csBox3 object_bbox;
+  csFlags flags;
 
 #ifdef CS_USE_NEW_RENDERER
   unsigned int* ball_indices;
@@ -264,6 +265,7 @@ public:
   SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return factory; }
+  virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
@@ -447,6 +449,7 @@ public:
   iBase* logparent;
   iEngine* engine;
   csRef<iLightManager> light_mgr;
+  csFlags flags;
 
   /// Constructor.
   csBallMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
@@ -457,6 +460,7 @@ public:
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
 
+  virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }

@@ -81,9 +81,11 @@ class csChunkLodTerrainFactory : public iMeshObjectFactory
 private:
   iBase* parent;
   iObjectRegistry *object_reg;
+  csFlags flags;
 
   csVector3 scale;
-  struct Data {
+  struct Data
+  {
     csVector3 pos;
     csVector3 norm;
     csVector3 tan;
@@ -151,7 +153,8 @@ private:
     csShaderVariableContext dynDomain;
     SCF_DECLARE_IBASE;
   
-    MeshTreeNode (csChunkLodTerrainFactory* p, int x, int y, int w, int h, float error);
+    MeshTreeNode (csChunkLodTerrainFactory* p, int x, int y, int w, int h,
+    	float error);
     virtual ~MeshTreeNode ();
 
     MeshTreeNode *GetChild (int i) 
@@ -178,12 +181,13 @@ public:
   csChunkLodTerrainFactory (csChunkLodTerrainType* p, iObjectRegistry* objreg);
   virtual ~csChunkLodTerrainFactory ();
 
-  csPtr<iMeshObject> NewInstance ();
-  void HardTransform (const csReversibleTransform&) { }
-  bool SupportsHardTransform () const { return false; }
-  void SetLogicalParent (iBase* lp) { parent = lp; }
-  iBase* GetLogicalParent () const { return parent; }
-  iObjectModel* GetObjectModel () { return &scfiObjectModel; }
+  virtual csFlags& GetFlags () { return flags; }
+  virtual csPtr<iMeshObject> NewInstance ();
+  virtual void HardTransform (const csReversibleTransform&) { }
+  virtual bool SupportsHardTransform () const { return false; }
+  virtual void SetLogicalParent (iBase* lp) { parent = lp; }
+  virtual iBase* GetLogicalParent () const { return parent; }
+  virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   void GetRadius (csVector3& rad, csVector3& c);

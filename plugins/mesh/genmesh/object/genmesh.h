@@ -104,6 +104,7 @@ private:
   csColor color;
   float current_lod;
   uint32 current_features;
+  csFlags flags;
 
   bool do_shadows;
   bool do_shadow_rec;
@@ -216,6 +217,7 @@ public:
   {
     return (iMeshObjectFactory*)factory;
   }
+  virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual csRenderMesh** GetRenderMeshes (int &n);
@@ -495,6 +497,7 @@ public:
   iBase* logparent;
   csGenmeshMeshObjectType* genmesh_type;
   csRef<iLightManager> light_mgr;
+  csFlags flags;
 
   iEngine* engine;
 
@@ -564,6 +567,7 @@ public:
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
 
+  virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }

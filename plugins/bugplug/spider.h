@@ -55,6 +55,7 @@ private:
   iBase* logparent;
   csWeakRef<iCamera> camera;
   iMeshWrapper* wrap;
+  csFlags flags;
 
 public:
   csSpider ();
@@ -90,6 +91,7 @@ public:
   SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return 0; }
+  virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual bool Draw (iRenderView*, iMovable*, csZBufMode) { return false; }
   virtual csRenderMesh** GetRenderMeshes (int& n) { n = 0; return 0; }

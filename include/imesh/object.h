@@ -22,6 +22,7 @@
 #include "csutil/scf.h"
 #include "csgeom/box.h"
 #include "ivideo/graph3d.h"
+#include "csutil/flags.h"
 
 struct iMeshObject;
 struct iMeshObjectFactory;
@@ -36,6 +37,33 @@ struct csRenderMesh;
 class csColor;
 class csReversibleTransform;
 
+/** \name Mesh object flags
+ * @{ */
+/**
+ * If CS_MESH_STATICPOS is set then this mesh will never move.
+ * This is a hint for the engine. The mesh object itself can also
+ * use this flag to optimize internal data structures.
+ */
+#define CS_MESH_STATICPOS 1
+
+/**
+ * If CS_MESH_STATICSHAPE is set then this mesh will never animate.
+ * This is a hint for the engine. The mesh object itself can also
+ * use this flag to optimize internal data structures.
+ */
+#define CS_MESH_STATICSHAPE 2
+/** @} */
+
+/** \name Mesh factory flags
+ * @{ */
+/**
+ * If CS_FACTORY_STATICSHAPE is set then this factory will never animate.
+ * This is a hint for the engine. The mesh factory itself can also
+ * use this flag to optimize internal data structures.
+ */
+#define CS_FACTORY_STATICSHAPE 2
+/** @} */
+
 SCF_VERSION (iMeshObjectDrawCallback, 0, 0, 1);
 
 /**
@@ -48,7 +76,7 @@ struct iMeshObjectDrawCallback : public iBase
 };
 
 
-SCF_VERSION (iMeshObject, 0, 2, 1);
+SCF_VERSION (iMeshObject, 0, 3, 0);
 
 /**
  * This is a general mesh object that the engine can interact with. The mesh
@@ -63,6 +91,17 @@ struct iMeshObject : public iBase
    * Get the reference to the factory that created this mesh object.
    */
   virtual iMeshObjectFactory* GetFactory () const = 0;
+
+  /**
+   * Get flags for this object. The following flags are at least supported:
+   * <ul>
+   * <li>#CS_MESH_STATICPOS: mesh will never move.
+   * <li>#CS_MESH_STATICSHAPE: mesh will never animate.
+   * </ul>
+   * Mesh objects may implement additional flags. These mesh object specific
+   * flags must be equal to at least 0x00010000.
+   */
+  virtual csFlags& GetFlags () = 0;
 
   /**
    * First part of Draw. The engine will call this DrawTest() before
@@ -231,6 +270,16 @@ SCF_VERSION (iMeshObjectFactory, 0, 0, 6);
  */
 struct iMeshObjectFactory : public iBase
 {
+  /**
+   * Get flags for this factory. The following flags are at least supported:
+   * <ul>
+   * <li>#CS_FACTORY_STATICSHAPE: factory will never animate.
+   * </ul>
+   * Mesh factories may implement additional flags. These mesh factory specific
+   * flags must be equal to at least 0x00010000.
+   */
+  virtual csFlags& GetFlags () = 0;
+
   /// Create an instance of iMeshObject.
   virtual csPtr<iMeshObject> NewInstance () = 0;
 

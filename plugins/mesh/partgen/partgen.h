@@ -87,6 +87,8 @@ protected:
   float current_lod;
   uint32 current_features;
 
+  csFlags flags;
+
   bool initialized;
   /// Set up this object.
   virtual void SetupObject () = 0;
@@ -229,6 +231,7 @@ public:
   SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return factory; }
+  virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual csRenderMesh** GetRenderMeshes (int& n) { n = 0; return 0; }
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);

@@ -290,6 +290,17 @@ animation is required). You have to be aware of lighting problems mentioned
 above, though.
 
 @item
+There are two flags that can also help performance considerably. If you have
+a mesh that will never move then you should use the @samp{staticpos} flag
+on the mesh object in the map (or @code{CS_MESH_STATICPOS} flag for
+@code{iMeshObject}). This is a hint for the engine and the mesh object so that
+it may optimize performance based on the fact that the object will never
+move. The other flag is @samp{staticshape}. This flag can be set on factories
+and mesh objects and indicates that the object will not animate (never changes
+shape). This corresponds with the @code{CS_MESH_STATICSHAPE} or
+@code{CS_FACTORY_STATICSHAPE} flags.
+
+@item
 Game actors and creatures should use @samp{sprite3d} or @samp{sprcal3d}.
 @end itemize
 

@@ -3,7 +3,12 @@
         <plugin name="bezier">crystalspace.mesh.loader.bezier</plugin>
         <plugin name="bezierFact">crystalspace.mesh.loader.factory.bezier</plugin>
         <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
-        <plugin name="thingFact">crystalspace.mesh.loader.factory.thing</plugin>
+        <plugin name="thingFact">
+	    <id>crystalspace.mesh.loader.factory.thing</id>
+	    <defaults>
+	    	<staticshape />
+	    </defaults>
+	</plugin>
         <plugin name="spr3dFact">crystalspace.mesh.loader.factory.sprite.3d</plugin>
         <plugin name="spr3d">crystalspace.mesh.loader.sprite.3d</plugin>
         <plugin name="spr2dFact">crystalspace.mesh.loader.factory.sprite.2d</plugin>

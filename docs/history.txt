@@ -6,6 +6,50 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Feb-2004
+	- Jorrit added the ability to specify defaults for mesh object types
+	  in the map loader. Here is an example to demonstrate how this works:
+	      <plugins>
+		<plugin name="thingFact">
+		  <id>crystalspace.mesh.loader.factory.thing</id>
+		  <defaults>
+		    ...
+		  </defaults>
+		</plugin>
+		...
+	      </plugins>
+	  Basically you attach the defaults to the short plugin name that you
+	  can later use in meshobj or meshfact definitions. These defaults
+	  can be anything you can specify directly in the meshobj or meshfact
+	  (NOT in the params section!). For example, priority, zfill, and
+	  zuse are commands you can place there.
+	- Jorrit addes the 'staticpos' and 'staticshape' keywords for mesh
+	  objects and factories (only 'staticshape' for factories). These
+	  options are hints for the engine. When you specify 'staticpos'
+	  for a mesh object the engine knows that the object will never move
+	  and can optimize for that (in the future, there are no such
+	  optimizations at this moment). If you specify 'staticshape' for
+	  mesh objects or factories then you tell the engine that the object
+	  will never change shape (or animate). If you specify one of these
+	  hints for an object but you violate what the hint means (i.e. you
+	  move an object that has 'staticpos' set) then the result will
+	  be undefined.
+	- Jorrit added iMeshObject->GetFlags() and
+	  iMeshObjectFactory->GetFlags() so that it is possible to specify
+	  flags for mesh objects and factories.
+	- Jorrit added the following flags:
+		- CS_MESH_STATICPOS for mesh objects
+		- CS_MESH_STATICSHAPE for mesh objects
+		- CS_FACTORY_STATICSHAPE for mesh factories
+	  These flags will be set by the 'staticpos' and 'staticshape'
+	  keywords in the map loader.
+	  Mesh objects may implement their own additional flags but these
+	  flags must be equal to 0x00010000 or higher.
+	- Jorrit removed iThingFactoryState->GetFlags(). The only flag that
+	  was there (CS_THING_NOCOMPRESS) has now become a flag of
+	  iMeshObjectFactory->GetFlags().
+	- Jorrit also updated the level building document with information
+	  on the new staticpos and staticshape flags.
 17-Feb-2004
 	- Jorrit fixed a bug in csPolygonMeshTools::Triangulate(). It would
 	  try to allocate a 0 size array in some cases.

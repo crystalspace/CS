@@ -1033,6 +1033,8 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("slope", XMLTOKEN_SLOPE);
   xmltokens.Register ("solid", XMLTOKEN_SOLID);
   xmltokens.Register ("staticlod", XMLTOKEN_STATICLOD);
+  xmltokens.Register ("staticpos", XMLTOKEN_STATICPOS);
+  xmltokens.Register ("staticshape", XMLTOKEN_STATICSHAPE);
   xmltokens.Register ("value", XMLTOKEN_VALUE);
 
   xmltokens.Register ("alphamodifier1", XMLTOKEN_ALPHAMODIFIER1);
@@ -1448,7 +1450,7 @@ bool csLoader::LoadPlugins (iDocumentNode* node)
     {
       case XMLTOKEN_PLUGIN:
 	loaded_plugins.NewPlugin (child->GetAttributeValue ("name"),
-			child->GetContentsValue ());
+			child);
         break;
       default:
 	SyntaxService->ReportBadToken (child);
@@ -1843,10 +1845,22 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
   iLoaderPlugin* plug = 0;
   iBinaryLoaderPlugin* binplug = 0;
   iMaterialWrapper *mat = 0;
+  bool staticshape = false;
 
+  csRef<iDocumentNodeIterator> prev_it;
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext ())
+  while (true)
   {
+    if (!it->HasNext ())
+    {
+      // Iterator has finished. Check if we still have to continue
+      // with the normal iterator first (non-defaults).
+      if (!prev_it) break;
+      it = prev_it;
+      prev_it = 0;
+      continue;
+    }
+
     csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char* value = child->GetValue ();
@@ -1908,6 +1922,10 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  if (!LoadLodControl (lodctrl, child))
 	    return false;
         }
+        break;
+      case XMLTOKEN_STATICSHAPE:
+        if (!SyntaxService->ParseBool (child, staticshape, true))
+	  return false;
         break;
       case XMLTOKEN_NULLMESH:
         {
@@ -2195,13 +2213,30 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
         break;
 
       case XMLTOKEN_PLUGIN:
-	if (!loaded_plugins.FindPlugin (child->GetContentsValue (),
-		plug, binplug))
-	{
-	  SyntaxService->ReportError (
- 	      "crystalspace.maploader.parse.meshfact",
-	      child, "Error loading plugin '%s'!", child->GetContentsValue ());
-	  return false;
+        {
+	  if (prev_it || plug || binplug)
+	  {
+	    SyntaxService->ReportError (
+ 	        "crystalspace.maploader.parse.meshfact",
+	        child, "Please specify only one plugin!");
+	    return false;
+	  }
+
+	  iDocumentNode* defaults = 0;
+	  if (!loaded_plugins.FindPlugin (child->GetContentsValue (),
+		plug, binplug, defaults))
+	  {
+	    SyntaxService->ReportError (
+ 	        "crystalspace.maploader.parse.meshfact",
+	        child, "Error loading plugin '%s'!", child->GetContentsValue ());
+	    return false;
+	  }
+	  if (defaults)
+	  {
+	    // Set aside current iterator and start a new one.
+	    prev_it = it;
+	    it = defaults->GetNodes ();
+	  }
 	}
         break;
 
@@ -2295,13 +2330,16 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
     }
   }
 
+  stemp->GetMeshObjectFactory ()->GetFlags ().SetBool (CS_FACTORY_STATICSHAPE,
+  	staticshape);
+
   return true;
 }
 
 bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
 	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* child,
 	csStringID id, bool& handled, char*& priority,
-	bool do_portal_container)
+	bool do_portal_container, bool& staticpos, bool& staticshape)
 {
 #undef TEST_MISSING_MESH
 #define TEST_MISSING_MESH \
@@ -2317,6 +2355,14 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
   handled = true;
   switch (id)
   {
+    case XMLTOKEN_STATICPOS:
+      if (!SyntaxService->ParseBool (child, staticpos, true))
+	return false;
+      break;
+    case XMLTOKEN_STATICSHAPE:
+      if (!SyntaxService->ParseBool (child, staticshape, true))
+	return false;
+      break;
     case XMLTOKEN_STATICLOD:
       {
 	TEST_MISSING_MESH
@@ -2581,6 +2627,8 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
   char* priority = '\0';
 
   iMeshWrapper* mesh = 0;
+  bool staticpos = false;
+  bool staticshape = false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -2591,7 +2639,7 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
     csStringID id = xmltokens.Request (value);
     bool handled;
     if (!HandleMeshParameter (ldr_context, mesh, 0, child, id,
-    	handled, priority, false))
+    	handled, priority, false, staticpos, staticshape))
       goto error;
     if (!handled) switch (id)
     {
@@ -2637,6 +2685,8 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
   }
   if (!priority) priority = csStrNew ("object");
   mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+  mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICPOS, staticpos);
+  mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICSHAPE, staticshape);
 
   delete[] priority;
   return mesh;
@@ -2785,17 +2835,30 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 
   iLoaderPlugin* plug = 0;
   iBinaryLoaderPlugin* binplug = 0;
+  bool staticpos = false;
+  bool staticshape = false;
 
+  csRef<iDocumentNodeIterator> prev_it;
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext ())
+  while (true)
   {
+    if (!it->HasNext ())
+    {
+      // Iterator has finished. Check if we still have to continue
+      // with the normal iterator first (non-defaults).
+      if (!prev_it) break;
+      it = prev_it;
+      prev_it = 0;
+      continue;
+    }
+
     csRef<iDocumentNode> child = it->Next ();
     if (child->GetType () != CS_NODE_ELEMENT) continue;
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     bool handled;
     if (!HandleMeshParameter (ldr_context, mesh, parent, child, id,
-    	handled, priority, false))
+    	handled, priority, false, staticpos, staticshape))
       goto error;
     if (!handled) switch (id)
     {
@@ -3058,6 +3121,14 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 
       case XMLTOKEN_PLUGIN:
 	{
+	  if (prev_it || plug || binplug)
+	  {
+	    SyntaxService->ReportError (
+ 	        "crystalspace.maploader.parse.plugin",
+	        child, "Please specify only one plugin!");
+	    return false;
+	  }
+
 	  const char* plugname = child->GetContentsValue ();
 	  if (!plugname)
 	  {
@@ -3066,12 +3137,19 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	      child, "Specify a plugin name with 'plugin'!");
 	    goto error;
 	  }
-	  if (!loaded_plugins.FindPlugin (plugname, plug, binplug))
+	  iDocumentNode* defaults = 0;
+	  if (!loaded_plugins.FindPlugin (plugname, plug, binplug, defaults))
 	  {
 	    SyntaxService->ReportError (
  	        "crystalspace.maploader.parse.meshobj",
 	        child, "Error loading plugin '%s'!", plugname);
 	    goto error;
+	  }
+	  if (defaults)
+	  {
+	    // Set aside current iterator and start a new one.
+	    prev_it = it;
+	    it = defaults->GetNodes ();
 	  }
 	}
         break;
@@ -3083,6 +3161,8 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 
   if (!priority) priority = csStrNew ("object");
   mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+  mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICPOS, staticpos);
+  mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICSHAPE, staticshape);
 
   delete[] priority;
   return true;
@@ -3148,7 +3228,8 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
   if (plugin_name != 0)
   {
     // Short-hand notation: <addon plugin="bla"> ... </addon>
-    if (!loaded_plugins.FindPlugin (plugin_name, plug, binplug))
+    iDocumentNode* defaults = 0;
+    if (!loaded_plugins.FindPlugin (plugin_name, plug, binplug, defaults))
     {
       SyntaxService->ReportError (
  	        "crystalspace.maploader.parse.addon",
@@ -3162,6 +3243,12 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
 	        "crystalspace.maploader.load.plugin",
                 node, "Could not load plugin!");
       return false;
+    }
+    if (defaults != 0)
+    {
+      ReportWarning (
+	        "crystalspace.maploader.load.plugin",
+                node, "'defaults' section is ignored for addons!");
     }
     csRef<iBase> rc = plug->Parse (node, ldr_context, context);
     if (!rc) return false;
@@ -3240,14 +3327,23 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
           break;
 
         case XMLTOKEN_PLUGIN:
-	  if (!loaded_plugins.FindPlugin (child->GetContentsValue (),
-		  plug, binplug))
 	  {
-	    SyntaxService->ReportError (
- 	        "crystalspace.maploader.parse.addon",
-	        child, "Error loading plugin '%s'!",
-		child->GetContentsValue ());
-	    return false;
+	    iDocumentNode* defaults = 0;
+	    if (!loaded_plugins.FindPlugin (child->GetContentsValue (),
+		  plug, binplug, defaults))
+	    {
+	      SyntaxService->ReportError (
+ 	          "crystalspace.maploader.parse.addon",
+	          child, "Error loading plugin '%s'!",
+		  child->GetContentsValue ());
+	      return false;
+	    }
+	    if (defaults != 0)
+	    {
+	      ReportWarning (
+	        "crystalspace.maploader.parse.addon",
+                child, "'defaults' section is ignored for addons!");
+	    }
 	  }
           break;
         default:
@@ -4221,6 +4317,8 @@ bool csLoader::ParsePortals (iLoaderContext* ldr_context,
   const char* container_name = node->GetAttributeValue ("name");
   iMeshWrapper* container_mesh = 0;
   char* priority = 0;
+  bool staticpos = false;
+  bool staticshape = false;
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -4230,7 +4328,7 @@ bool csLoader::ParsePortals (iLoaderContext* ldr_context,
     csStringID id = xmltokens.Request (value);
     bool handled;
     if (!HandleMeshParameter (ldr_context, container_mesh, parent, child, id,
-    	handled, priority, true))
+    	handled, priority, true, staticpos, staticshape))
       goto error;
     if (!handled) switch (id)
     {
@@ -4247,6 +4345,10 @@ bool csLoader::ParsePortals (iLoaderContext* ldr_context,
 
   if (!priority) priority = csStrNew ("object");
   container_mesh->SetRenderPriority (Engine->GetRenderPriority (priority));
+  container_mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICPOS,
+  	staticpos);
+  container_mesh->GetMeshObject ()->GetFlags ().SetBool (CS_MESH_STATICSHAPE,
+  	staticshape);
 
   delete[] priority;
   return true;

@@ -125,6 +125,7 @@ private:
   csColor constant_color;
   csParticleColorMethod color_method;
   csWeakRef<iParticlesColorCallback> color_callback;
+  csFlags flags;
 
 public:
   SCF_DECLARE_IBASE;
@@ -132,12 +133,13 @@ public:
   csParticlesFactory (csParticlesType* p, iObjectRegistry* objreg);
   virtual ~csParticlesFactory ();
 
-  csPtr<iMeshObject> NewInstance ();
-  void HardTransform (const csReversibleTransform&) {}
-  bool SupportsHardTransform () const { return false; }
-  void SetLogicalParent (iBase* lp) { parent = lp; }
-  iBase* GetLogicalParent () const { return parent; }
-  iObjectModel* GetObjectModel () { return 0; }
+  virtual csFlags& GetFlags () { return flags; }
+  virtual csPtr<iMeshObject> NewInstance ();
+  virtual void HardTransform (const csReversibleTransform&) {}
+  virtual bool SupportsHardTransform () const { return false; }
+  virtual void SetLogicalParent (iBase* lp) { parent = lp; }
+  virtual iBase* GetLogicalParent () const { return parent; }
+  virtual iObjectModel* GetObjectModel () { return 0; }
 
   void SetMaterial (iMaterialWrapper *mat)
   { material = mat; }
@@ -532,7 +534,8 @@ private:
   csWeakRef<iParticlesColorCallback> color_callback;
 
   const csArray<csParticlesData> *point_data;
-  struct i_vertex {
+  struct i_vertex
+  {
     csVector3 position;
     csVector4 color;
   };
@@ -553,6 +556,8 @@ private:
   csVector3 emitter;
   float radius;
 
+  csFlags flags;
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -563,6 +568,8 @@ public:
   iMeshObjectFactory* GetFactory () const
   { return (iMeshObjectFactory*)pFactory; }
 
+  virtual csFlags& GetFlags () { return flags; }
+
   /**
    * Does all pre-render calculation.  Determines which LOD children in the
    * tree should be drawn
@@ -572,7 +579,7 @@ public:
   /// Updates the lighting
   void UpdateLighting (iLight** lights, int num_lights, iMovable* movable);
 
-  bool Draw (iRenderView*, iMovable*, csZBufMode)
+  virtual bool Draw (iRenderView*, iMovable*, csZBufMode)
   { /* deprecated */ return false; }
 
   /// Returns the mesh, ready for rendering

@@ -72,6 +72,9 @@ protected:
   /// Tell the engine that this object wants to be deleted
   void WantToDie ();
 
+  /// Flags.
+  csFlags flags;
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -86,6 +89,11 @@ public:
    * implementation for this method.
    */
   virtual iMeshObjectFactory* GetFactory () const = 0;
+
+  /**
+   * See imesh/object.h for specification.
+   */
+  virtual csFlags& GetFlags () { return flags; }
 
   /**
    * See imesh/object.h for specification. The default implementation
@@ -255,6 +263,9 @@ protected:
   /// Object registry.
   iObjectRegistry* object_reg;
 
+  /// Flags.
+  csFlags flags;
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -266,6 +277,11 @@ public:
 
   /// destructor
   virtual ~csMeshFactory ();
+
+  /**
+   * See imesh/object.h for specification.
+   */
+  virtual csFlags& GetFlags () { return flags; }
 
   /**
    * See imesh/object.h for specification. There is no default

@@ -327,6 +327,9 @@ private:
   float current_lod;
   uint32 current_features;
 
+  csFlags object_flags;
+  csFlags factory_flags;
+
 private:
   /**
    * Invalidate a thing. This has to be called when new polygons are
@@ -762,6 +765,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
     virtual iMeshObjectFactory* GetFactory () const;
+    virtual csFlags& GetFlags () { return scfParent->object_flags; }
     virtual bool DrawTest (iRenderView* rview, iMovable* movable)
     {
       return scfParent->DrawTest (rview, movable);
@@ -815,6 +819,7 @@ public:
   struct MeshObjectFactory : public iMeshObjectFactory
   {
     SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
+    virtual csFlags& GetFlags () { return scfParent->factory_flags; }
     virtual csPtr<iMeshObject> NewInstance ();
     virtual void HardTransform (const csReversibleTransform& t)
     {

@@ -196,6 +196,7 @@ private:
   csVector3 radius;
   float current_lod;
   uint32 current_features;
+  csFlags flags;
 
   /// Polygon.
   G3DPolygonDPFX g3dpolyfx;
@@ -289,6 +290,7 @@ public:
   SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return ifactory; }
+  virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual csRenderMesh **GetRenderMeshes (int &n) { n = 0; return 0; }
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
@@ -391,6 +393,7 @@ private:
   /// vector of csHazeLayer
   csPDelArray<csHazeLayer> layers;
   iBase* logparent;
+  csFlags flags;
 
 public:
   /// Constructor.
@@ -413,6 +416,7 @@ public:
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
 
+  virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual void HardTransform (const csReversibleTransform&) { }
   virtual bool SupportsHardTransform () const { return false; }

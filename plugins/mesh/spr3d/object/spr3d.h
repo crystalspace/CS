@@ -356,6 +356,7 @@ private:
   /// The normals
   csPDelArray<csPoly3D> normals;
 
+  csFlags flags;
 
   /**
    * Connectivity information for this sprite template.
@@ -630,6 +631,7 @@ public:
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
 
+  virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return true; }
@@ -1067,6 +1069,8 @@ private:
    * but the vector must be copied down from the factory at create time.
    */
   csPDelArray<csSpriteSocket> sockets;
+
+  csFlags flags;
 
 public:
 
@@ -1695,6 +1699,7 @@ public:
     	iMeshObjectFactory));
     return ifact;	// DecRef is ok here.
   }
+  virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual csRenderMesh **GetRenderMeshes (int &n);

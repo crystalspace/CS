@@ -122,6 +122,9 @@ use @code{GetFactory()}.
 @code{iThingState::GetVertexC()} has been removed. It is no longer possible
 to get camera space information from a thing.
 
+@code{iThingFactoryState::GetFlags()} has been removed. Use
+@code{iMeshObjectFactory::GetFlags()} instead.
+
 The interface @samp{iPolygon3D} is completely removed.  The
 @samp{iThingFactoryState} now contains a lot of new functions to create and
 manipulate polygons.  Here is an example:

@@ -49,6 +49,7 @@ class csLightningMeshObject : public iMeshObject
   csRef<iMeshObjectFactory> ifactory;
   iBase* logparent;
   csLightningMeshObjectFactory* factory;
+  csFlags flags;
 
   iMaterialWrapper* material;
   uint MixMode;
@@ -84,6 +85,7 @@ public:
   SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const { return ifactory; }
+  virtual csFlags& GetFlags () { return flags; }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
   virtual csRenderMesh **GetRenderMeshes (int &n) { n = 0; return 0; }
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
@@ -240,12 +242,16 @@ private:
   csVector3 origin;
   csVector3 directional;  
   iBase* logparent;  
+  csFlags flags;
 
-  void CalculateFractal (int left, int right, float lh, float rh, int xyz, csVector3 *Vertices);
+  void CalculateFractal (int left, int right, float lh, float rh, int xyz,
+  	csVector3 *Vertices);
   void CalculateFractal ();
+
 public:
   /// Constructor.
-  csLightningMeshObjectFactory (iBase *pParent, iObjectRegistry *object_registry);
+  csLightningMeshObjectFactory (iBase *pParent,
+  	iObjectRegistry *object_registry);
   /// Destructor.
   virtual ~csLightningMeshObjectFactory ();
   /// Get the material for this 2D sprite.
@@ -270,6 +276,7 @@ public:
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
 
+  virtual csFlags& GetFlags () { return flags; }
   virtual csPtr<iMeshObject> NewInstance ();
   virtual iObjectModel* GetObjectModel () { return 0; }
   virtual void HardTransform (const csReversibleTransform&) { }
