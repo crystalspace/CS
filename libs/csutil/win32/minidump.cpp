@@ -21,20 +21,6 @@
 
 #include "csutil/win32/minidump.h"
 
-/*
-struct ThreadContextFilterInfo
-{
-  HANDLE filterThread;
-  CONTEXT newContext;
-};
-
-static BOOL CALLBACK ThreadFilterCB (PVOID CallbackParam,
-  const PMINIDUMP_CALLBACK_INPUT CallbackInput, 
-  PMINIDUMP_CALLBACK_OUTPUT CallbackOutput)
-{
-}
-*/
-
 const char* cswinMinidumpWriter::WriteMinidump (
   PMINIDUMP_EXCEPTION_INFORMATION except)
 {
@@ -57,20 +43,17 @@ const char* cswinMinidumpWriter::WriteMinidump (
     0);
 
   /*
-    The callstack for the thread we were called from is kinda crappy,
-    (IP somewhere in the kernel), so replace it with a stack that at
-    least points to this function.
+    @@@ The callstack for the thread we were called from is kinda crappy,
+    (IP somewhere in the kernel), maybe replace it with a stack that at
+    least points to this function at some point.
+
+    Stack is fine when exception information is passed in.
    */
-  /*ThreadContextFilterInfo filter;
-  filter.filterThread = GetCurrentThread ();
-  memset (&filter.newContext, 0, sizeof (filter.newContext));
-  filter.newContext.ContextFlags = CONTEXT_FULL;
-  GetThreadContext (filter.filterThread, &filter.newContext);*/
 
   bool dumpSucceeded = DbgHelp::MiniDumpWriteDump (GetCurrentProcess(),
     GetCurrentProcessId(), dumpFile,
-    MiniDumpWithDataSegs | MiniDumpScanMemory | 
-    MiniDumpWithIndirectlyReferencedMemory,
+    MiniDumpWithDataSegs | MiniDumpScanMemory/* | 
+    MiniDumpWithIndirectlyReferencedMemory*/,
     except, 0, 0);
 
   CloseHandle (dumpFile);

@@ -22,6 +22,7 @@ chronological order.
 	  only happen for objects in alpha render priority. Nevertheless in the
 	  future we should consider precomputing the z information so we
 	  don't have to calculate it in the sort routine itself.
+	- res tweaked the flags for minidump generation a bit.
 6-Apr-2004
 	- Jorrit finished the implementation of csBSPTree.
 	- Jorrit implemented back2front for genmesh. This new feature works
