@@ -23,6 +23,7 @@
 #include "isystem.h"
 #include "iplugin.h"
 #include "inetcmd.h"
+#include "isector.h"
 
 SCF_VERSION (iCmdMgr, 0, 0, 1);
 
@@ -60,6 +61,13 @@ struct iCMDMGR: public iPlugIn
 
   virtual int GetLastError() =0;
   virtual int GetProtocolVersion() = 0;
+
+  virtual void AddWorld(char *name, iSector *sector) = 0;
+  virtual void DropWorld(iSector *sector) = 0;
+
+  virtual void AddSector(char *name, iSector *world, iSector *sector) = 0;
+  virtual void DropSector(iSector *world, iSector *sector) = 0;
+
 };
 
 
