@@ -92,7 +92,7 @@ struct iCamera : public iBase
    */
   virtual void SetFOV (int fov, int width) = 0;
   /**
-   * Set the FOV in radians. 'fov' is the desired FOV in degrees. 'width' is
+   * Set the FOV in degrees. 'fov' is the desired FOV in degrees. 'width' is
    * the display width in pixels.
    */
   virtual void SetFOVAngle (float fov, int width) = 0;
