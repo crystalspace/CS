@@ -141,7 +141,6 @@ struct iSpriteSocket : public iBase
   virtual void SetTriangleIndex (int tri_index) = 0;
   /// Get the index of the triangle for the socket.
   virtual int GetTriangleIndex () const = 0;
-
 };
 
 SCF_VERSION (iSprite3DFactoryState, 0, 0, 3);
@@ -244,11 +243,11 @@ struct iSprite3DFactoryState : public iBase
   virtual iSpriteSocket* AddSocket () = 0;
   /// find a named socket into the sprite.
   virtual iSpriteSocket* FindSocket (const char * name) const = 0;
-  /// find a socked based on the sprite attached to it
+  /// find a socked based on the sprite attached to it.
   virtual iSpriteSocket* FindSocket (iMeshWrapper *mesh) const = 0;  
-  /// Query the number of sockets
+  /// Query the number of sockets.
   virtual int GetSocketCount () const = 0;
-  /// Query the socket number f
+  /// Query the socket number f.
   virtual iSpriteSocket* GetSocket (int f) const = 0;
 
   /// Enable skeletal animation for this factory.
