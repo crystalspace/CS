@@ -124,8 +124,6 @@ struct iFont : public iBase
    */
   virtual void GetDimensions (const char *text, int &oW, int &oH, int &desc) = 0;
 
-  virtual void GetDimensions (const char *text, int &oW, int &oH, int &, int &, int &) = 0;
-
   /**
    * Determine how many characters from this string can be written
    * without exceeding given width (in pixels)
