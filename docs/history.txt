@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-May-2004
+	- Jorrit added a proper copy constructor to csHashMapReversible.
+	  Without that copy constructor doing a copy of such a hashmap
+	  will cause the pointers to the internal hashmaps to be copied
+	  instead of making new objects. This fix makes sure that it is
+	  now safe to assign 'csEvent' structures. This in turn should
+	  have fixed crash at exit in cswstest but that doesn't seem
+	  to be the case.
 23-May-2004
 	- Eric Sunshine fixed ambiguous assignment from csRef<> to csWeakRef<>
 	  in csEngine::GetEngineSequenceManager().  Reported by David

@@ -26,6 +26,13 @@ csHashMapReversible::csHashMapReversible (uint32 size)
   HalfReverse = new csHashMap (size);
 }
 
+csHashMapReversible::csHashMapReversible (const csHashMapReversible& m) :
+	csHashMap (m)
+{
+  Reverse = new csHashMap (*m.Reverse);
+  HalfReverse = new csHashMap (*m.HalfReverse);
+}
+
 csHashMapReversible::~csHashMapReversible ()
 {
   delete Reverse;

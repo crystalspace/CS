@@ -35,6 +35,7 @@ protected:
 
 public:
   csHashMapReversible (uint32 size = 211);
+  csHashMapReversible (const csHashMapReversible& m);
 
   virtual ~csHashMapReversible ();
 
