@@ -93,10 +93,7 @@ class ctQuatRigidBody : public ctEntity {
   int get_state(real *sa);
 
   int set_state(real *sa);
-  int set_delta_state(real *sa) {
-    
-    return get_state_size();
-  }
+  int set_delta_state(real *sa);
 
  protected:
   // Protected internal utility functions
