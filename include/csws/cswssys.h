@@ -50,11 +50,11 @@ public:
   /// Call application to process queued events
   virtual void NextFrame (long elapsed_time, long current_time);
   /// Replace DemoWrite() for output to debug console
-  virtual void DemoWrite (const char* buf);
+  virtual void DemoWrite (const char *buf);
   /// Display an alert message
-  virtual void Alert (char* msg);
+  virtual void Alert (const char *msg);
   /// Display a warning message
-  virtual void Warn (char* msg);
+  virtual void Warn (const char *msg);
 };
 
 #endif // __CSWSSYS_H__

@@ -123,6 +123,10 @@ enum
    */
   cscmdMenuPlaceItems,
   /**
+   * Same, but delayed - until first ::Draw()
+   */
+  cscmdMenuPlaceItemsDelayed,
+  /**
    * Tell menu to capture the mouse, if its parent menu didn't so.
    * <pre>
    * IN: (csComponent *)Source;
@@ -229,6 +233,8 @@ class csMenu : public csComponent
   csComponent *oldparentfocus;
   /// Are submenus opened?
   bool SubMenuOpened;
+  /// Flag: re-place items on first ::Draw()?
+  bool fPlaceItems;
 
 public:
   /// Current menu item

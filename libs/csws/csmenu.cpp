@@ -58,6 +58,7 @@ csMenuItem::csMenuItem (csComponent *iParent, int iStyle)
   Init ();
   Style = iStyle | CSMIS_SEPARATOR;
   CommandCode = cscmdNothing;
+  iParent->SendCommand (cscmdMenuPlaceItemsDelayed);
 }
 
 csMenuItem::csMenuItem (csComponent *iParent, char *iText, csMenu *iSubMenu,
@@ -253,6 +254,10 @@ bool csMenuItem::HandleEvent (csEvent &Event)
           return false;
       } /* endswitch */
       break;
+    case csevMouseDown:
+      if (Event.Mouse.Button == 2)
+        parent->SendCommand (cscmdDeactivateMenu, (void *)cscmdCancel);
+      break;
     case csevMouseUp:
       if ((Event.Mouse.Button == 1)
        && bound.Contains (Event.Mouse.x, Event.Mouse.y))
@@ -399,6 +404,7 @@ csMenu::csMenu (csComponent *iParent, csMenuFrameStyle iFrameStyle,
   MenuStyle = iMenuStyle;
   oldparentfocus = NULL;
   SubMenuOpened = false;
+  fPlaceItems = false;
   switch (iFrameStyle)
   {
     case csmfsNone:
@@ -425,6 +431,9 @@ csMenu::csMenu (csComponent *iParent, csMenuFrameStyle iFrameStyle,
 
 void csMenu::Draw ()
 {
+  if (fPlaceItems)
+    PlaceItems ();
+
   switch (FrameStyle)
   {
     case csmfsNone:
@@ -738,6 +747,9 @@ bool csMenu::HandleEvent (csEvent &Event)
         case cscmdMenuPlaceItems:
           PlaceItems ();
           return true;
+        case cscmdMenuPlaceItemsDelayed:
+          fPlaceItems = true;
+          return true;
         case cscmdMenuCaptureMouse:
           if (parent->SendCommand (cscmdMenuCaptureMouse, this))
             app->CaptureMouse (this);
@@ -853,6 +865,8 @@ static bool do_place_items (csComponent *child, void *param)
 
 void csMenu::PlaceItems ()
 {
+  fPlaceItems = false;
+
   // Call PlaceItems for child chain
   ForEach (do_place_items);
 

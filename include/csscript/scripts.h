@@ -32,6 +32,12 @@ public:
 
   /// Create a new script and add it to the global list
   static void NewScript(LanguageLayer* layer, char* name, char* params);
+
+  /// Clear a particular script
+  static void ClearScript (char* name);
+
+  /// Clear all scripts
+  static void ClearScripts ();
 };
 
 #endif /*TRIGGER_H*/

@@ -403,9 +403,12 @@ bool csWindow::Maximize ()
   if (!Maximized && (DragStyle & CS_DRAG_SIZEABLE) && parent)
   {
     OrgBound.Set (bound);
-    SetRect (- BorderWidth, - BorderHeight,
+    csRect newbound (- BorderWidth, - BorderHeight,
       parent->bound.Width () + BorderWidth,
       parent->bound.Height () + BorderHeight);
+    // give a chance to parent window to limit "maximize" bounds
+    parent->SendCommand (cscmdLimitMaximize, (void *)&newbound);
+    csComponent::SetRect (newbound);
     Maximized = true;
 
     csButton *bt = (csButton *)GetChild (CSWID_BUTMAXIMIZE);

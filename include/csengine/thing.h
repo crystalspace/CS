@@ -74,6 +74,9 @@ private:
   /// If convex, this holds the index to the center vertex.
   int center_idx;
 
+  /// Pointer to the Thing Template which it derived from
+  csThingTemplate* ParentTemplate;
+
 public:
   /**
    * Create an empty thing.
@@ -136,6 +139,11 @@ public:
    * Set the world to object tranformation.
    */
   void SetTransform (const csReversibleTransform& t) { obj = t; }
+
+  /**
+   * Get the world to object tranformation.
+   */
+  csReversibleTransform& GetTransform () { return obj; }
 
   /**
    * Relative move.
@@ -214,10 +222,13 @@ public:
   	float default_texlen = 1, CLights* default_lightx = NULL,
 	csVector3* shift = NULL, csMatrix3* transform = NULL);
 
-  // Pointer to the Thing Template which it derived from
-  csThingTemplate* ParentTemplate;
+  /// Set parent template
+  void SetTemplate (csThingTemplate *t)
+  { ParentTemplate = t; }
 
-
+  /// Query parent template
+  csThingTemplate *GetTemplate () const
+  { return ParentTemplate; }
 
   CSOBJTYPE;
 };

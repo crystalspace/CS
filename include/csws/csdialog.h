@@ -58,6 +58,7 @@ enum csDialogFrameStyle
  */
 class csDialog : public csComponent
 {
+protected:
   /// Dialog frame style
   csDialogFrameStyle FrameStyle;
   /// Automatical grid placement parameters
@@ -66,8 +67,6 @@ class csDialog : public csComponent
   bool SnapSizeToGrid;
   /// First component
   csComponent *first;
-
-protected:
   /// Border width and height
   int BorderWidth, BorderHeight;
 
@@ -106,6 +105,8 @@ public:
 protected:
   /// Used by SuggestSize
   static bool do_topleft (csComponent *comp, void *param);
+  /// Place all dialog items in correspondence to GridX, GridY and SnapSizeToGrid
+  bool PlaceItems ();
 };
 
 #endif // __CSDIALOG_H__

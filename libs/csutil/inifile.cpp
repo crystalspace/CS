@@ -689,7 +689,21 @@ setval:
 bool csIniFile::SetStr (const char *SectionPath, const char *KeyName,
   const char *Value)
 {
-  return (SetData (SectionPath, KeyName, Value, strlen (Value)));
+  return (SetData (SectionPath, KeyName, Value, Value ? strlen (Value) : 0));
+}
+
+bool csIniFile::SetInt (const char *SectionPath, const char *KeyName, int Value)
+{
+  char output [20];
+  sprintf (output, "%d", Value);
+  return SetStr (SectionPath, KeyName, output);
+}
+
+bool csIniFile::SetFloat (const char *SectionPath, const char *KeyName, float Value)
+{
+  char output [20];
+  sprintf (output, "%g", Value);
+  return SetStr (SectionPath, KeyName, output);
 }
 
 bool csIniFile::SetComment (const char *SectionPath, const char *KeyName,

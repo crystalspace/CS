@@ -34,7 +34,7 @@ csObjVector& Get_Script_List()
 
 csScript* csScriptList::GetScript(const char* name)
 {
-  return (csScript*)( Get_Script_List().FindByName(name) );
+  return (csScript*) (Get_Script_List ().FindByName (name));
 }
 
 void csScriptList::NewScript (LanguageLayer* layer, char* name, char* params)
@@ -59,7 +59,7 @@ void csScriptList::NewScript (LanguageLayer* layer, char* name, char* params)
   if (!strncmp (params, "prim", (int)(par-params)))
   {
     CHK (PrimScript* sc = new PrimScript (layer));
-    csNameObject::AddName(*sc,name);
+    csNameObject::AddName (*sc, name);
     par++;
     sc->load (&par);
     s = (csScript*)sc;
@@ -67,7 +67,7 @@ void csScriptList::NewScript (LanguageLayer* layer, char* name, char* params)
   else if (!strncmp (params, "int", (int)(par-params)))
   {
     CHK (IntScript* sc = new IntScript (layer));
-    csNameObject::AddName(*sc,name);
+    csNameObject::AddName (*sc, name);
     par++;
     sc->load (par);
     s = (csScript*)sc;
@@ -80,5 +80,21 @@ void csScriptList::NewScript (LanguageLayer* layer, char* name, char* params)
   }
 
   s->prepare ();
-  Get_Script_List().Push (s);
+  Get_Script_List ().Push (s);
+}
+
+void csScriptList::ClearScript (char* name)
+{
+  csObject *o = Get_Script_List().FindByName (name);
+  if (o)
+  {
+    int idx = Get_Script_List().Find (o);
+    if (idx >= 0)
+      Get_Script_List ().Delete (idx);
+  }
+}
+
+void csScriptList::ClearScripts ()
+{
+  Get_Script_List ().DeleteAll ();
 }

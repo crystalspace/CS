@@ -27,23 +27,25 @@ CSOBJTYPE_IMPL(csNameObject,csObject);
 CSOBJTYPE_IMPL(csDataObject,csObject);
 CSOBJTYPE_IMPL(csPObject,csObject);
 
-csNameObject::csNameObject(const char* n) : csObject()
+csNameObject::csNameObject (const char *n) : csObject ()
 {
-  if (n) strncpy(name, n, 30);  else name[0] = 0;
-  name[29] = 0;
+  if (n)
+    strncpy (name, n, 30);
+  else
+    name [0] = 0;
+  name [29] = 0;
 }
 
-const char* csNameObject::GetName(csObject& csobj)
+const char* csNameObject::GetName (csObject& csobj)
 {
-  csObject *o = csobj.GetObj(csNameObject::Type());
-  if (o) return ((csNameObject*) o)->Name();
+  csObject *o = csobj.GetObj (csNameObject::Type ());
+  if (o)
+    return ((csNameObject*)o)->Name ();
   return NULL;
 }
 
-void csNameObject::AddName(csObject& csobj, const char* name)
+void csNameObject::AddName (csObject& csobj, const char* name)
 {
-  CHK(csNameObject* nameobj = new csNameObject(name));
-  csobj.ObjAdd(nameobj); 
+  CHK (csNameObject* nameobj = new csNameObject (name));
+  csobj.ObjAdd (nameobj);
 }
-
-

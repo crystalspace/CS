@@ -177,7 +177,7 @@ void appSystemDriver::DemoWrite (const char* buf)
   } /* endif */
 }
 
-void appSystemDriver::Alert (char* msg)
+void appSystemDriver::Alert (const char *msg)
 {
   if (DemoReady)
   {
@@ -190,7 +190,7 @@ void appSystemDriver::Alert (char* msg)
     csSystemDriver::Alert (msg);
 }
 
-void appSystemDriver::Warn (char* msg)
+void appSystemDriver::Warn (const char *msg)
 {
   if (DemoReady)
   {

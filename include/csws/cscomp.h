@@ -83,6 +83,115 @@ enum
 };
 
 /**
+ * Predefined Windowing System Command Codes<p>
+ * The list below does not contain all defined messages; these are only the
+ * most general ones. Any class which defines some class-specific messages
+ * should ensure that no other command is using the integer value of its
+ * proprietary command codes. To avoid this as much as possible, the following
+ * ranges are reserved:<p>
+ * <ul>
+ *   <li>0x00000000 ... 0x7FFFFFFF: Reserved for CrystalSpace Windowing System
+ *       <ul>
+ *         <li>0x00000000 ... 0x000000FF: Non-class specific commands
+ *         <li>0x00000100 ... 0x000001FF: csWindow class messages
+ *         <li>0x00000200 ... 0x000002FF: csMenu class messages
+ *         <li>0x00000300 ... 0x000003FF: csTimer class messages
+ *         <li>0x00000400 ... 0x000004FF: csListBox class messages
+ *         <li>0x00000500 ... 0x000005FF: csButton class messages
+ *         <li>0x00000600 ... 0x000006FF: csScrollBar class messages
+ *         <li>0x00000700 ... 0x000007FF: csStatic class messages
+ *         <li>0x00000800 ... 0x000008FF: csCheckBox class messages
+ *         <li>0x00000900 ... 0x000009FF: csRadioButton class messages
+ *         <li>0x00000A00 ... 0x00000AFF: csSpinBox class messages
+ *       </ul>
+ *   <li>0x80000000 ... 0xFFFFFFFF: Reserved for user class-specific messages
+ * </ul>
+ * All commands receives a input parameter in the Command.Info field of csEvent
+ * object. They can reply to the message by assigning to Command.Info a value.
+ * In the description of messages below they are marked by 'IN' (the value
+ * is initially passed to object) and 'OUT' (the value is expected to be filled
+ * in by the object) labels. If no IN or OUT labels are present, the value of
+ * Command.Info is ignored. Since Command.Info is of type (void *) it should
+ * be casted to appropiate type before filling/after reading.
+ */
+enum
+{
+  /**
+   * Broadcasted before csApp::Process () begins to process current messages
+   * in application message queue.
+   */
+  cscmdPreProcess = 0x100,
+  /**
+   * Broadcasted after csApp::Process () finished to process messages
+   * in application message queue.
+   */
+  cscmdPostProcess,
+  /**
+   * This event is broadcasted to refresh invalidated components.
+   */
+  cscmdRedraw,
+  /**
+   * Query a control if it would like to be the default control in a dialog.<p>
+   * The control is 'default' if it has a 'default' attribute (this is
+   * control-specific, for example buttons have the CSBSTY_DEFAULT style).
+   * <pre>
+   * IN: NULL
+   * OUT: (csComponent *) or NULL;
+   * </pre>
+   */
+  cscmdAreYouDefault,
+  /**
+   * This message is sent by parent to its active child to activate
+   * whatever action it does. For example, this message is sent by a
+   * dialog window to its active child when user presses Enter key.
+   * <pre>
+   * IN: NULL
+   * OUT: (csComponent *)this if successful;
+   * </pre>
+   */
+  cscmdActivate,
+  /**
+   * This broadcast message is posted after system palette has been changed.
+   * If class has looked up any colors in palette, it should redo it.
+   */
+  cscmdPaletteChanged,
+  /**
+   * The "hide window" command
+   */
+  cscmdHide,
+  /**
+   * The "maximize window" command
+   */
+  cscmdMaximize,
+  /**
+   * The "close window" button
+   */
+  cscmdClose,
+  /**
+   * This messages gives a chance to parent window to limit child's
+   * "maximized" rectangle.
+   * <pre>
+   * IN: (csRect *)MaximizedRectangle
+   * OUT: modify rectangle if needed
+   * </pre>
+   */
+  cscmdLimitMaximize,
+  /**
+   * These commands are used for message boxes. MessageBox (...) returns
+   * cscmdOK, cscmdCancel and so on depending on which button user presses.
+   */
+  cscmdOK,
+  ///
+  cscmdCancel,
+  ///
+  cscmdAbort,
+  ///
+  cscmdRetry,
+  ///
+  cscmdIgnore
+};
+
+/**
  * Drag mode flags: these flags are used by csComp::Drag to compute
  * new window coordinates when dragging window with mouse
  */
@@ -108,7 +217,7 @@ enum
  * subclassed from csComponent. Each component can have a number of child
  * components. Child components are chained together in a ring list; the only
  * case when a NULL can be encountered in this list is when component has
- * no children. When a component has at least one child and you traverse the
+ * no children. When a component has at least one child and if you traverse the
  * child list you should take care to avoid looping forever through them.<p>
  *
  * A csComponent object is a rectangle area of screen which can contain
@@ -120,7 +229,7 @@ enum
 class csComponent : public csBase
 {
 protected:
-  /// Object state flags (see csState structure)
+  /// Object state flags (see CSS_XXX flags)
   int state;
   /// Rectangle that should be redrawn
   csRect dirty;
@@ -156,7 +265,7 @@ public:
   csComponent *next, *prev;
   /// Parent component or NULL
   csComponent *parent;
-  /// An array of 'clip children', i.e. components which are clipped against us
+  /// An array of 'clip children', i.e. components which are clipped inside our bounds
   csVector clipchildren;
   /// Top-level application object
   csApp *app;
@@ -219,9 +328,7 @@ public:
 
   /**
    * Change Z-order of a child component above 'below' (can be NULL
-   * for lowest Z-order) neightbour. This also changes the order
-   * in which components are inserted into parent window, since
-   * we have only one linked list.
+   * for lowest Z-order) neightbour.
    */
   bool SetZorder (csComponent *comp, csComponent *below);
 
@@ -389,6 +496,9 @@ public:
    * flags (dragtype should be any combination of CS_DRAG_XXX bits).
    */
   void SetSizingCursor (int dragtype);
+
+  /// Query current mouse location (returns true if mouse is inside this component)
+  bool GetMousePosition (int &x, int &y);
 
   /**
    * Handle a mouse drag event. Check if mouse cursor is within BorderW/BorderH

@@ -664,6 +664,11 @@ public:
   /// Get world to local translation
   inline csVector3 GetW2TTranslation () const { return -v_obj2world; }
 
+  /// Get sprite origin
+  inline const csVector3 &GetOrigin () const { return v_obj2world; }
+  /// Get sprite transform
+  inline const csMatrix3 &GetT2W () const { return m_obj2world; }
+
   /// Move this sprite to one sector (conveniance function).
   void MoveToSector (csSector* s);
 

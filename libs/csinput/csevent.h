@@ -46,122 +46,6 @@ enum
 #define IS_KEYBOARD_EVENT(e) (((e).Type == csevKeyUp)		\
 			   || ((e).Type == csevKeyDown))
 
-/**
- * Predefined Windowing System Command Codes<p>
- * The list below does not contain all defined messages; these are only the
- * most general ones. Any class which defines some class-specific messages
- * should ensure that no other command is using the integer value of its
- * proprietary command codes. To avoid this as much as possible, the following
- * ranges are reserved:<p>
- * <ul>
- *   <li>0x00000000 ... 0x7FFFFFFF: Reserved for CrystalSpace Windowing System
- *       <ul>
- *         <li>0x00000000 ... 0x000000FF: Non-class specific commands
- *         <li>0x00000100 ... 0x000001FF: csWindow class messages
- *         <li>0x00000200 ... 0x000002FF: csMenu class messages
- *         <li>0x00000300 ... 0x000003FF: csTimer class messages
- *         <li>0x00000400 ... 0x000004FF: csListBox class messages
- *         <li>0x00000500 ... 0x000005FF: csButton class messages
- *         <li>0x00000600 ... 0x000006FF: csScrollBar class messages
- *         <li>0x00000700 ... 0x000007FF: csStatic class messages
- *         <li>0x00000800 ... 0x000008FF: csCheckBox class messages
- *         <li>0x00000900 ... 0x000009FF: csRadioButton class messages
- *         <li>0x00000A00 ... 0x00000AFF: csSpinBox class messages
- *       </ul>
- *   <li>0x80000000 ... 0xFFFFFFFF: Reserved for user class-specific messages
- * </ul>
- * All commands receives a input parameter in the Command.Info field of csEvent
- * object. They can reply to the message by assigning to Command.Info a value.
- * In the description of messages below they are marked by 'IN' (the value
- * is initially passed to object) and 'OUT' (the value is expected to be filled
- * in by the object) labels. If no IN or OUT labels are present, the value of
- * Command.Info is ignored. Since Command.Info is of type (void *) it should
- * be casted to appropiate type before filling/after reading.
- */
-enum
-{
-  /**
-   * No command
-   */
-  cscmdNothing = 0,
-  /**
-   * The event below causes application to quit immediately, no matter
-   * which window posted the event.
-   */
-  cscmdQuit,
-  /**
-   * Broadcasted before csApp::Process () begins to process current messages
-   * in application message queue.
-   */
-  cscmdPreProcess,
-  /**
-   * Broadcasted after csApp::Process () finished to process messages
-   * in application message queue.
-   */
-  cscmdPostProcess,
-  /**
-   * This event is broadcasted to refresh invalidated components.
-   */
-  cscmdRedraw,
-  /**
-   * Program window changed in-focus status.
-   * <pre>
-   * IN: false -> window lose focus, true -> window got focus
-   * </pre>
-   */
-  cscmdFocusChanged,
-  /**
-   * Query a control if it would like to be the default control in a dialog.<p>
-   * The control is 'default' if it has a 'default' attribute (this is
-   * control-specific, for example buttons have the CSBSTY_DEFAULT style).
-   * <pre>
-   * IN: NULL
-   * OUT: (csComponent *) or NULL;
-   * </pre>
-   */
-  cscmdAreYouDefault,
-  /**
-   * This message is sent by parent to its active child to activate
-   * whatever action it does. For example, this message is sent by a
-   * dialog window to its active child when user presses Enter key.
-   * <pre>
-   * IN: NULL
-   * OUT: (csComponent *)this if successful;
-   * </pre>
-   */
-  cscmdActivate,
-  /**
-   * This broadcast message is posted after system palette has been changed.
-   * If class has looked up any colors in palette, it should redo it.
-   */
-  cscmdPaletteChanged,
-  /**
-   * The "hide window" command
-   */
-  cscmdHide,
-  /**
-   * The "maximize window" command
-   */
-  cscmdMaximize,
-  /**
-   * The "close window" button
-   */
-  cscmdClose,
-  /**
-   * These commands are used for message boxes. MessageBox (...) returns
-   * cscmdOK, cscmdCancel and so on depending on which button user presses.
-   */
-  cscmdOK,
-  ///
-  cscmdCancel,
-  ///
-  cscmdAbort,
-  ///
-  cscmdRetry,
-  ///
-  cscmdIgnore
-};
-
 /// Shift key masks
 /// "Shift" key mask
 #define CSMASK_SHIFT		0x00000001
@@ -226,6 +110,33 @@ enum
 #define CSKEY_F12		1024
 /// The "center" key ("5" on numeric keypad)
 #define CSKEY_CENTER		1025
+
+/**
+ * Predefined Command Codes<p>
+ * The list below does not contain all defined messages; these are only the
+ * most general ones. Crystal Space Windowing System has a broad range of
+ * predefined commands; look in CSWS header files for more info.
+ */
+enum
+{
+  /**
+   * No command
+   */
+  cscmdNothing = 0,
+  /**
+   * The event below causes application to quit immediately, no matter
+   * which window posted the event.
+   */
+  cscmdQuit,
+  /**
+   * Application has changed its "focused" status.
+   * This command is posted (or is not posted) by system-dependent driver.
+   * <pre>
+   * IN: false -> window lose focus, true -> window got focus
+   * </pre>
+   */
+  cscmdFocusChanged,
+};
 
 /**
  * This class represents a windowing system event.<p>

@@ -144,54 +144,58 @@ bool csDialog::HandleEvent (csEvent &Event)
   return false;
 }
 
+bool csDialog::PlaceItems ()
+{
+  if ((GridX >= 0) && (GridY >= 0))
+  {
+    if (!first)
+      first = focused;
+    if (!first)
+      return true;
+
+    csComponent *cur = first;
+    int curX = BorderWidth + GridX, curY = BorderHeight + GridY;
+    int maxX = -1, maxY = -1;
+    do
+    {
+      int lastX, lastY;
+      for ( ; ; )
+      {
+        lastX = curX + cur->bound.Width ();
+        lastY = curY + cur->bound.Height ();
+        if (lastX > bound.Width () - BorderWidth)
+        {
+          if (curX == BorderWidth + GridX)
+            break;
+          curX = BorderWidth + GridX;
+          curY = maxY + GridY;
+        }
+        else
+          break;
+      } /* endfor */
+      if (!cur->bound.IsEmpty ())
+      {
+        cur->SetRect (curX, curY, lastX, lastY);
+        if (lastX > maxX)
+          maxX = lastX;
+        if (lastY > maxY)
+          maxY = lastY;
+        curX = lastX + GridX;
+      } /* endif */
+      cur = cur->next;
+    } while (cur != first); /* enddo */
+    if (SnapSizeToGrid)
+      return csComponent::SetRect (bound.xmin, bound.ymin,
+        bound.xmin + maxX + GridX + BorderWidth,
+        bound.ymin + maxY + GridY + BorderHeight);
+  } /* endif */
+  return true;
+}
+
 bool csDialog::SetRect (int xmin, int ymin, int xmax, int ymax)
 {
   if (csComponent::SetRect (xmin, ymin, xmax, ymax))
-  {
-    if ((GridX >= 0) && (GridY >= 0))
-    {
-      if (!first)
-        first = focused;
-      if (!first)
-        return true;
-
-      csComponent *cur = first;
-      int curX = BorderWidth + GridX, curY = BorderHeight + GridY;
-      int maxX = -1, maxY = -1;
-      do
-      {
-        int lastX, lastY;
-        for ( ; ; )
-        {
-          lastX = curX + cur->bound.Width ();
-          lastY = curY + cur->bound.Height ();
-          if (lastX > bound.Width () - BorderWidth)
-          {
-            if (curX == BorderWidth + GridX)
-              break;
-            curX = BorderWidth + GridX;
-            curY = maxY + GridY;
-          }
-	  else
-            break;
-        } /* endfor */
-        if (!cur->bound.IsEmpty ())
-        {
-          cur->SetRect (curX, curY, lastX, lastY);
-	  if (lastX > maxX)
-	    maxX = lastX;
-          if (lastY > maxY)
-            maxY = lastY;
-          curX = lastX + GridX;
-        } /* endif */
-        cur = cur->next;
-      } while (cur != first); /* enddo */
-      if (SnapSizeToGrid)
-        return csComponent::SetRect (xmin, ymin,
-	  xmin + maxX + GridX + BorderWidth, ymin + maxY + GridY + BorderHeight);
-    } /* endif */
-    return true;
-  } /* endif */
+    return PlaceItems ();
   return false;
 }
 

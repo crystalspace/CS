@@ -115,11 +115,15 @@ public:
   /// Get a boolean value from the configuration instance.
   bool GetYesNo (const char *SectionPath, const char *KeyName, bool def = false) const;
 
-  /// Set data: if DataSize is 0 or Data is NULL, delete entry
+  /// Set data: if Data is NULL, delete entry
   bool SetData (const char *SectionPath, const char *KeyName, csConstSome Data,
     size_t DataSize);
   /// Set an asciiz value (shortcut for SetData)
   bool SetStr (const char *SectionPath, const char *KeyName, const char *Value);
+  /// Set an integer value (shortcut for SetData)
+  bool SetInt (const char *SectionPath, const char *KeyName, int Value);
+  /// Set an floating-point value (shortcut for SetData)
+  bool SetFloat (const char *SectionPath, const char *KeyName, float Value);
   /// Set comment for given section/entry
   bool SetComment (const char *SectionPath, const char *KeyName, const char *Text);
 

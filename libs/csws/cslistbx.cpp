@@ -555,6 +555,24 @@ bool csListBox::HandleEvent (csEvent &Event)
             return true;
           } /* endif */
           return false;
+        default:
+          if ((Event.Key.Code >= ' ')
+           && (Event.Key.Code <= 255)
+           && !(Event.Key.ShiftKeys & (CSMASK_CTRL | CSMASK_ALT)))
+          {
+            // Find first next item that starts with this letter
+            csComponent *cur = focused->next;
+            while (cur != focused)
+              if (cur->SendCommand (cscmdListBoxItemCheck, NULL)
+               && (cur->GetText () [0] == Event.Key.Code))
+              {
+                SendCommand (cscmdListBoxTrack, (void *)cur);
+                return true;
+              }
+              else
+                cur = cur->next;
+            return true;
+          }
       } /* endswitch */
       break;
     case csevCommand:

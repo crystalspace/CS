@@ -996,7 +996,7 @@ int csVFS::VfsVector::CompareKey (csSome Item, csConstSome Key, int Mode) const
 
 // ---------------------------------------------------------------- csVFS --- //
 
-csVFS::csVFS (csIniFile *Config)
+csVFS::csVFS (csIniFile *Config) : dirstack (8, 8)
 {
   cwd = new char [2];
   cwd [0] = VFS_PATH_SEPARATOR;
@@ -1158,6 +1158,21 @@ bool csVFS::ChDir (const char *Path)
 
   ArchiveCache.CheckUp ();
   return true;
+}
+
+void csVFS::PushDir ()
+{
+  dirstack.Push (strnew (cwd));
+}
+
+bool csVFS::PopDir ()
+{
+  if (!dirstack.Length ())
+    return false;
+  char *olddir = dirstack.Pop ();
+  bool retcode = ChDir (olddir);
+  delete [] olddir;
+  return retcode;
 }
 
 bool csVFS::Exists (const char *Path) const

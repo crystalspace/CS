@@ -1324,6 +1324,13 @@ void csComponent::SetSizingCursor (int dragtype)
     SetMouse (csmcSizeNS);
 }
 
+bool csComponent::GetMousePosition (int &x, int &y)
+{
+  app->GetMouse ()->GetPosition (x, y);
+  GlobalToLocal (x, y);
+  return bound.ContainsRel (x, y);
+}
+
 bool csComponent::HandleDragEvent (csEvent &Event, int BorderW, int BorderH)
 {
   switch (Event.Type)
@@ -1535,7 +1542,10 @@ bool csComponent::Maximize ()
   if (!Maximized && (DragStyle & CS_DRAG_SIZEABLE) && parent)
   {
     OrgBound.Set (bound);
-    SetRect (0, 0, parent->bound.Width (), parent->bound.Height ());
+    csRect newbound (0, 0, parent->bound.Width (), parent->bound.Height ());
+    // give a chance to parent window to limit "maximize" bounds
+    parent->SendCommand (cscmdLimitMaximize, (void *)&newbound);
+    SetRect (newbound);
     Maximized = true;
     return true;
   } /* endif */

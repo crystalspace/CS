@@ -22,7 +22,7 @@
 #define __VFS_H__
 
 #include "def.h"
-#include "csvector.h"
+#include "csstrvec.h"
 
 // Composite path divider
 #define VFS_PATH_DIVIDER        ','
@@ -82,6 +82,8 @@ class csVFS : public csBase
   char cnsufx [VFS_MAX_PATH_LEN + 1];
   // The initialization file
   csIniFile *config;
+  // Directory stack (used in PushDir () and PopDir ())
+  csStrVector dirstack;
 
 public:
   /// Initialize VFS by reading contents of given INI file
@@ -97,7 +99,11 @@ public:
   /// Get current working directory
   const char *GetCwd () const
   { return cwd; }
-//  { return (CONST_CAST (const char *) (cwd)); }
+
+  /// Push current directory
+  void PushDir ();
+  /// Pop current directory
+  bool PopDir ();
 
   /**
    * Expand given virtual path, interpret all "." and ".."'s relative to
