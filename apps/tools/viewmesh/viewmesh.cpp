@@ -546,7 +546,7 @@ bool ViewMesh::LoadSprite(const char *filename, float scale)
 								    iSpriteCal3DFactoryState));
       if (factstate)
       {
-        factstate->SetRenderScale(scale);
+        factstate->RescaleFactory(scale);
 	  for (int i=0; i<factstate->GetMeshCount(); i++)
 	  {
 	      csString push;
