@@ -139,7 +139,7 @@ csShadowFrustum::csShadowFrustum (const csShadowFrustum& orig)
 
 //---------------------------------------------------------------------------
 
-csShadowFrustum* csShadowIterator::Next ()
+csFrustum* csShadowIterator::Next ()
 {
   if (!cur) return NULL;
   csShadowFrustum* s;
@@ -157,6 +157,7 @@ csShadowFrustum* csShadowIterator::Next ()
     if (dir == 1) i = 0;
     else i = cur_num-1;
   }
+  cur_shad = s;
   return s;
 }
 
@@ -174,6 +175,14 @@ csShadowBlock* csShadowIterator::GetCurrentShadowBlock ()
     else if (onlycur || !cur->prev) return NULL;
     else return cur->prev;
   }
+}
+
+void csShadowIterator::AppendToShadowBlock (csShadowBlock* sb, bool copy)
+{
+  if (copy)
+    sb->AddShadow (cur_shad);
+  else
+    sb->AddShadowNoCopy (cur_shad);
 }
 
 void csShadowIterator::DeleteCurrent ()

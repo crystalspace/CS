@@ -266,9 +266,9 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
       csShadowIterator* shadow_it = slist->GetShadowIterator ();
       while (shadow_it->HasNext ())
       {
-        csShadowFrustum* sf = shadow_it->Next ();
-        if (sf->IsRelevant ())
-          copy_slist->AddShadow (sf);
+        shadow_it->Next ();
+        if (shadow_it->IsRelevant ())
+	  shadow_it->AppendToShadowBlock (copy_slist);
       }
       delete shadow_it;
       copy_slist->Transform (&warp_wor);
@@ -321,10 +321,9 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
       csShadowIterator* shadow_it = slist->GetShadowIterator ();
       while (shadow_it->HasNext ())
       {
-        csShadowFrustum* sf = shadow_it->Next ();
-        if (sf->IsRelevant ())
-          copy_slist->AddShadowNoCopy (sf);
-          //@@@copy_slist->AddShadow (sf);
+        shadow_it->Next ();
+        if (shadow_it->IsRelevant ())
+	  shadow_it->AppendToShadowBlock (copy_slist, false);
       }
       delete shadow_it;
 

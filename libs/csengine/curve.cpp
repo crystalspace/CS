@@ -403,7 +403,7 @@ void csCurve::ShineDynLight (csLightPatch* lp)
 	bool shad = false;
 	while (shadow_it->HasNext ())
 	{
-          csShadowFrustum* csf = shadow_it->Next ();
+          csFrustum* csf = shadow_it->Next ();
           // is this point in shadow
           if (csf->Contains(pos - csf->GetOrigin()))
 	  {
@@ -483,7 +483,7 @@ void csCurve::GetCoverageMatrix (csFrustumView& lview,
       // if we have any shadow frustrums
       if (has_shadows)
       {
-        csShadowFrustum* csf = NULL;
+        csFrustum* csf = NULL;
 	shadow_it->Reset ();
 	while (shadow_it->HasNext ())
 	{
@@ -523,7 +523,7 @@ void csCurve::CalculateLighting (csFrustumView& lview)
     lp->Initialize (4);
 
     // Copy shadow frustums.
-    csShadowFrustum* sf;
+    csFrustum* sf;
     csShadowIterator* shadow_it = lview.shadows->GetShadowIterator ();
     lp->shadows.DeleteShadows ();
     while (shadow_it->HasNext ())
@@ -531,7 +531,7 @@ void csCurve::CalculateLighting (csFrustumView& lview)
       sf = shadow_it->Next ();
       //if (sf->relevant) @@@: It would be nice if we could optimize earlier 
       //                       to determine relevant shadow frustums in curves
-      lp->shadows.AddShadow (sf);
+      shadow_it->AppendToShadowBlock (&lp->shadows);
     }
     delete shadow_it;
 

@@ -103,14 +103,14 @@ class csDelayedLightingInfo : public csFrustumViewCleanup
       shadows.DeleteShadows ();
     }
 
-    void CheckShadow (csShadowFrustum *frust, int count)
+    void CheckShadow (csShadowIterator* shadow_it, csFrustum *frust, int count)
     {
-      if (!frust->IsRelevant ())
+      if (!shadow_it->IsRelevant ())
         return;
       for (int i = 0; i < count; i++)
         if (GetShadow (i) == frust)
           return;
-      shadows.AddShadowNoCopy (frust);
+      shadow_it->AppendToShadowBlock (&shadows, false);
     }
   };
 
@@ -214,8 +214,8 @@ bool csDelayedLightingInfo::Collect (csFrustumView *lview, csPolygon3D *poly)
   int ns = lvi->shadows.GetNumShadows ();
   while (shadow_it->HasNext ())
   {
-    csShadowFrustum* csf = shadow_it->Next ();
-    lvi->CheckShadow (csf, ns);
+    csFrustum* csf = shadow_it->Next ();
+    lvi->CheckShadow (shadow_it, csf, ns);
   }
   delete shadow_it;
   return !lvi->unlit_poly;
@@ -614,7 +614,7 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
   // At the same time, add the overlapping shadows to the coverage matrix.
   int nsf;
   csShadowIterator* shadow_it;
-  csShadowFrustum *csf;
+  csFrustum *csf;
   if (dli)
   {
     nsf = dli->GetShadowCount () + dli->GetUnlitPolyCount ();
@@ -626,8 +626,8 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
     shadow_it = lview.shadows->GetShadowIterator ();
     while (shadow_it->HasNext ())
     {
-      csf = shadow_it->Next ();
-      if (csf->IsRelevant ()) nsf++;
+      shadow_it->Next ();
+      if (shadow_it->IsRelevant ()) nsf++;
     }
     shadow_it->Reset ();
   }
@@ -637,7 +637,7 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
   {
     csf = shadow_it->Next ();
     if (!dli)
-      while (!csf->IsRelevant ())
+      while (!shadow_it->IsRelevant ())
         csf = shadow_it->Next ();
 
     // MAX_OUTPUT_VERTICES should be far too enough
@@ -1041,9 +1041,9 @@ b:      if (scanL2 == MinIndex) goto finish;
 	bool shadow = false;
 	while (shadow_it->HasNext ())
 	{
-	  csShadowFrustum* shadow_frust = shadow_it->Next ();
-	  if (shadow_frust->IsRelevant () &&
-	  	shadow_frust->GetShadowPolygon () != polygon)
+	  csFrustum* shadow_frust = shadow_it->Next ();
+	  if (shadow_it->IsRelevant () &&
+	  	((csPolygon3D*)(shadow_it->GetUserData ())) != polygon)
 	    if (shadow_frust->Contains (v2-shadow_frust->GetOrigin ()))
 	    { shadow = true; break; }
 	}

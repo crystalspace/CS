@@ -346,6 +346,7 @@ private:
   bool onlycur;
   int dir;	// 1 or -1 for direction.
   inline csShadowIterator (csShadowBlock* cur, bool onlycur, int dir);
+  csShadowFrustum* cur_shad;
 
 public:
   /// Return true if there are further elements to process.
@@ -354,7 +355,13 @@ public:
     return cur != NULL && i < cur_num && i >= 0;
   }
   /// Return the next element.
-  csShadowFrustum* Next ();
+  csFrustum* Next ();
+  /// Get the user data for the last shadow.
+  void* GetUserData () { return (void*)cur_shad->GetShadowPolygon (); }
+  /// Return if the last shadow is relevant or not.
+  bool IsRelevant () { return cur_shad->IsRelevant (); }
+  /// Mark the last shadow as relevant.
+  void MarkRelevant (bool rel) { cur_shad->MarkRelevant (rel); }
   /// Reset the iterator to start again from initial setup.
   inline void Reset ();
   /// Delete the last element returned.
@@ -363,6 +370,8 @@ public:
   csShadowBlock* GetCurrentShadowBlock ();
   /// Return the shadow list for the 'next' element.
   csShadowBlock* GetNextShadowBlock () { return cur; }
+  /// Append the current shadow to some other shadow block.
+  void AppendToShadowBlock (csShadowBlock* sb, bool copy = true);
 };
 
 /**

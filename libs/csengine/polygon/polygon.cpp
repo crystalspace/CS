@@ -1565,9 +1565,9 @@ void csPolygon3D::FillLightMap (csFrustumView& lview)
     csShadowIterator* shadow_it = lview.shadows->GetShadowIterator ();
     while (shadow_it->HasNext ())
     {
-      csShadowFrustum* sf = shadow_it->Next ();
-      if (sf->IsRelevant ())
-        lp->shadows.AddShadow (sf);
+      shadow_it->Next ();
+      if (shadow_it->IsRelevant ())
+	shadow_it->AppendToShadowBlock (&lp->shadows);
     }
     delete shadow_it;
 
@@ -1622,22 +1622,22 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview,
   // For every shadow frustum...
   while (shadow_it->HasNext ())
   {
-    csShadowFrustum* sf = shadow_it->Next ();
+    csFrustum* sf = shadow_it->Next ();
     // First check if the plane of the shadow frustum is close to the plane
     // of the polygon (the input parameter 'plane'). If so then we discard the
     // frustum as not relevant.
     if (csMath3::PlanesClose (*sf->GetBackPlane (), plane))
-      sf->MarkRelevant (false);
+      shadow_it->MarkRelevant (false);
     else
     {
-      csPolygon3D* sfp = sf->GetShadowPolygon ();
+      csPolygon3D* sfp = (csPolygon3D*)(shadow_it->GetUserData ());
       switch (csFrustum::BatchClassify (
         lf_verts, lf_normals, lf->GetNumVertices (),
         sf->GetVertices (), sf->GetNumVertices ()))
       {
         case CS_FRUST_PARTIAL:
         case CS_FRUST_INSIDE:
-          sf->MarkRelevant ();
+          shadow_it->MarkRelevant (true);
 	  // If partial then we first test if the light and shadow
 	  // frustums are adjacent. If so then we ignore the shadow
 	  // frustum as well (not relevant).
@@ -1665,20 +1665,20 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview,
 		      (d1.z < -EPSILON && d2.z > EPSILON) ||
 		      (d1.z > EPSILON && d2.z < -EPSILON))
 		{
-		  sf->MarkRelevant (false);
+		  shadow_it->MarkRelevant (false);
 		  break;
 		}
 	      }
-	      if (!sf->IsRelevant ()) break;
+	      if (!shadow_it->IsRelevant ()) break;
 	      j1 = j;
 	      a1 = a;
 	    }
-	    if (!sf->IsRelevant ()) break;
+	    if (!shadow_it->IsRelevant ()) break;
 	    i1 = i;
 	  }
 	  break;
         case CS_FRUST_OUTSIDE:
-          sf->MarkRelevant (false);
+          shadow_it->MarkRelevant (false);
           break;
         case CS_FRUST_COVERED:
 	  delete shadow_it;

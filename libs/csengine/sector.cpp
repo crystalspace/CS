@@ -1043,7 +1043,7 @@ void* csSector::CheckFrustumPolygons (csSector*,
 void CompressShadowFrustums (csShadowBlockList* list)
 {
   csShadowIterator* shadow_it = list->GetShadowIterator (true);
-  csShadowFrustum* sf;
+  csFrustum* sf;
   if (!shadow_it->HasNext ()) { delete shadow_it; return; }
 
   csCBufferCube* cb = csEngine::current_engine->GetCBufCube ();

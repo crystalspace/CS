@@ -2,6 +2,13 @@ The history order has been reversed so that new features are at the top.
 
 11-Mar-2001
 	- Eric Sunshine fixed some Texinfo mark-up problems in win32.txi.
+	- Added interfaces iShadowBlock, iShadowBlockList, and iShadowIterator.
+	  These will be used by the iShadowSystem. Extended iShadowSystem,
+	  iShadowCaster, and iShadowReceiver a bit.
+	- Changed the csShadowIterator a bit so that it will be easier
+	  to let it implement iShadowReceiver. The basic idea is that
+	  csShadowFrustum must become a private concept of the shadow
+	  blocks and that only csFrustum is used.
 10-Mar-2001
 	- Cleaned up layout in DDG loader and also made a small fix
 	  in csTerrainWrapper constructor declaration.
