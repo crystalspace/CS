@@ -31,9 +31,9 @@ CSCONFIG.TMP = $(OUT)/csconfig.tmp
 
 TO_INSTALL.EXE	+= $(CSCONFIG.EXE)
 
-# This section is specially protected by DO_INSTALL in order to prevent
+# This section is specially protected by DO_CREATE_CSCONFIG in order to prevent
 # execution of sed commands for _all_ other build targets.  DO_CREATE_CSCONFIG
-# is only defined when the top-level 'csconfig' target is invoked.
+# is only defined when the top-level `csconfig' target is invoked.
 
 ifeq ($(DO_CREATE_CSCONFIG),yes)
 
