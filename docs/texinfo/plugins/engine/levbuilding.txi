@@ -105,13 +105,12 @@ the following guidelines for that sector:
 that don't have a lot of polygons. For example, a big wall is usually a good
 occluder. However, it is possible that the wall is created using lots of
 detailed polygons. That doesn't make the wall a bad occluder but it increases
-the cost of using that wall as an occluder. To help that you should add
-dummy polygon mesh (this is called @samp{occlusion mesh}) for visibility
-culling to that object. That occlusion mesh should have roughly the shape
-of the wall but it will only have a few polygons
-which means that @samp{Dynavis} can use it in a more efficient manner. Below
-follows an example on how to set another mesh for visibility culling in a
-map file. Note that you should not replace the visibility culling mesh if the
+the cost of using that wall as an occluder. To help that you should add a
+dummy polygon mesh (this is called an @samp{occlusion mesh}) to that object.
+This occlusion mesh should have roughly the shape of the wall but it will
+only have a few polygons which means that @samp{Dynavis} can use it in a
+more efficient manner. Below follows an example on how to set an occlusion
+mesh in a map file. Note that you should not replace the occlusion mesh if the
 base mesh is already good enough.
 @item
 If you have complex objects that have very little chance of occluding
@@ -125,7 +124,9 @@ For culling objects @samp{Dynavis} prefers small objects. Keep in mind that
 culling always happens on entire objects. i.e. either the object is (partially)
 visible and it will be rendered completely or else the object is invisible.
 So a large object has less chance of being culled away since it needs to
-be covered entirely before it can be considered invisible.
+be covered entirely before it can be considered invisible. Note that this
+guidelines conflicts with the next guideline and also with what OpenGL
+actually prefers to get.
 @item
 For occluding other objects @samp{Dynavis} prefers large objects. Large
 objects are also prefered for other reasons (i.e. OpenGL is most efficient
@@ -202,7 +203,7 @@ materials and lightmapped, vertex based, or stencil based lighting. It is not
 easy to animate them internally so they are usually used for static
 objects. If you use lightmaps then these will also not be updated if the
 object moves so that's another consideration. @samp{thing} objects are
-heavy-weight (use some memory). Their main advantage is the support of lightmaps
+heavy-weight (use more memory). Their main advantage is the support of lightmaps
 which means that they can represent shadows even if they only have a few
 polygons. In contrast, an object that only supports vertex lighting can
 not have shadows on a single polygon or triangle (except if stencil based
@@ -210,8 +211,8 @@ lighting is used).
 @item
 @samp{genmesh}: a @samp{genmesh} is a triangle mesh object with a single
 material. It only supports vertex or stencil based lighting and it is also
-not designed for internal animation (although it is possible). Genmeshes
-are very efficient with regards to memory usage and rendering speed.
+not designed for internal animation (although it is possible to do so).
+Genmeshes are very efficient with regards to memory usage and rendering speed.
 @item
 @samp{sprite3d}: a @samp{sprite3d} is similar to a @samp{genmesh} except
 that it also supports frame based animation.
@@ -224,13 +225,14 @@ Here are some guidelines on using these objects:
 
 @itemize
 @item
-For static geometry, @samp{thing} or @samp{genmesh} are ideal. @samp{genmesh}
-is typically used for high-detail objects that only need a single material
-(every triangle can use other parts of the texture) and where there is no
-need for detailed shadows on the individual triangles (usually a @samp{genmesh}
-object is either small or high detailed so that shadows are accuratelly
-represented using vertex lighting only). @samp{thing} is used in case you
-want large objects that have little detail but required detailed lighting.
+For static geometry, @samp{thing} or @samp{genmesh} objects are ideal.
+@samp{genmesh} is typically used for high-detail objects that only need a
+single material (every triangle can use other parts of the texture) and where
+there is no need for detailed shadows on the individual triangles (usually a
+@samp{genmesh} object is either small or high detailed so that shadows are
+accuratelly represented using vertex lighting only). @samp{thing} is used in
+case you want large objects that have little detail but require detailed
+lighting.
 @item
 If you plan on using stencil lighting only then it is probably best to
 use @samp{genmesh} more.
@@ -278,11 +280,11 @@ more optimal for OpenGL. There are four disadvantages to this technique:
 You have to be able to fit the smaller textures in the big texture without
 too much waste. Fitting four 64x64 textures in one 128x128 texture is easy
 but fitting three 64x64 textures in one 128x128 texture is going to waste
-one some precious texture memory. Of course you could try to use the
+some precious texture memory. Of course you could try to use the
 remaining 64x64 space for textures on other objects.
 @item
-It is possible that you have lower quality textures because combining them
-on a bigger texture may otherwise overflow hardware limitations.
+It is possible that you have to use lower quality textures because combining
+them on a bigger texture may otherwise overflow hardware limitations.
 @item
 It is harder for the artist to create models with this technique.
 @item
