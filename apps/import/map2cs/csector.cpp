@@ -453,9 +453,9 @@ bool CCSSector::WriteCurves(csRef<iDocumentNode> node, CIWorld* pWorld)
 	  DocNode meshobj = CreateNode (node, "meshobj");
 	  meshobj->SetAttribute ("name",
 	    csString().Format ("%s_e%d_c%d", pEntity->GetName(), i, curve));
-	  CreateNode (node, "plugin", "bezier");
-	  CreateNode (node, "zuse");
-	  CreateNode (node, "priority", pEntity->GetValueOfKey("priority", "object"));
+	  CreateNode (meshobj, "plugin", "bezier");
+	  //CreateNode (meshobj, "zuse");
+	  //CreateNode (meshobj, "priority", pEntity->GetValueOfKey("priority", "object"));
 
 	  DocNode params = CreateNode (meshobj, "params");
           CreateNode (params, "factory", 

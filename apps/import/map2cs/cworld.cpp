@@ -721,7 +721,7 @@ bool CCSWorld::WriteCurvetemplates(csRef<iDocumentNode> node)
       CTextureFile* pTexture = pCurve->GetTexture();
       if (pTexture->IsVisible())
       {
-        //pCurve->Write(node, this);
+        pCurve->Write(node, this);
       }
     }
   }

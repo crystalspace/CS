@@ -132,12 +132,14 @@ bool CMapCurve::Write(csRef<iDocumentNode> node, CCSWorld* pWorld)
     DocNode meshfact = CreateNode (node, "meshfact");
     meshfact->SetAttribute ("name", 
       csString().Format ("curve_%s", (const char*) m_Name));
-    CreateNode (meshfact, "plugin", "thingFact");
+    CreateNode (meshfact, "plugin", "bezierFact");
     DocNode params = CreateNode (meshfact, "params");
     int row, col;
     CdVector3 Center(0,0,0);
     double    NumVect = 0.0;
 
+    DocNode centerN = CreateNode (params, "curvecenter");
+    CreateNode (params, "curvescale", 80);
     for (row=0; row<pCurve->GetNumRows(); row++)
     {
       for (col=0; col<pCurve->GetNumCols(); col++)
@@ -159,11 +161,9 @@ bool CMapCurve::Write(csRef<iDocumentNode> node, CCSWorld* pWorld)
       Center *= 1.0/NumVect;
     }
 
-    DocNode cc = CreateNode (params, "curvecenter");
-    cc->SetAttributeAsFloat ("x", Center.x*pWorld->GetScalefactor());
-    cc->SetAttributeAsFloat ("y", Center.z*pWorld->GetScalefactor());
-    cc->SetAttributeAsFloat ("z", Center.y*pWorld->GetScalefactor());
-    CreateNode (params, "curvescale", 80);
+    centerN->SetAttributeAsFloat ("x", Center.x*pWorld->GetScalefactor());
+    centerN->SetAttributeAsFloat ("y", Center.z*pWorld->GetScalefactor());
+    centerN->SetAttributeAsFloat ("z", Center.y*pWorld->GetScalefactor());
 
     int y, x;
     for (y=0; y<(pCurve->GetNumRows()-1)/2; y++)
