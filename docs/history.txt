@@ -42,6 +42,19 @@ The history order is reversed so that new features are at the top.
 	    win32conf.var --> libs/cssys/win32/winconf.var
 	- Fixed a problem in mingw config.
 	- Jorge Acereda added a missing DecRef() in initapp.cpp.
+	- Eric Sunshine made the following changes to cs-config.temppost which
+	  allow it to work with older Bourne shells:
+	    - Rewrote the `while' loop in addlib() so that it no longer relies
+	      upon the negation operator (`!') since that operator is not
+	      understood by older shells.
+	    - Rewrote argument handling in the functions so that they work even
+	      with older shells which do not scope input arguments on a
+	      per-function basis.  Specifically, with older shells, variables
+	      such as $@, $*, $1, $2, etc. are _always_ global; so if one
+	      function invokes another function, the input arguments of the
+	      first function get overwritten.  Therefore, functions must cache
+	      input arguments before invoking other functions, assuming that
+	      they want to continue referring to those arguments.
 5-Nov-2001
 	- Fixed a bug in bin/chkheadr.sh which caused that test to always
 	  fail with the result that CS_USE_FAKE_SOCKLEN_TYPE would always
