@@ -368,31 +368,6 @@ void csBugPlug::SwitchCuller (iSector* sector, const char* culler)
   sector->SetVisibilityCullerPlugin (culler);
 }
 
-void csBugPlug::AddSelectedMesh (iMeshWrapper* m)
-{
-  int i;
-  for (i = 0 ; i < selected_meshes.Length () ; i++)
-  {
-#if defined(COMP_VC) && (_MSC_VER < 1300)
-    if (((iMeshWrapper*)selected_meshes[i]) == m) 
-#else
-    if (selected_meshes[i] == m) 
-#endif
-      return;
-  }
-  selected_meshes.Push (m);
-}
-
-void csBugPlug::RemoveSelectedMesh (iMeshWrapper* m)
-{
-  int i;
-  for (i = 0 ; i < selected_meshes.Length () ; i++)
-    if (selected_meshes[i] == m)
-    {
-      selected_meshes.DeleteIndex (i);
-      return;
-    }
-}
 
 void csBugPlug::SelectMesh (iSector* sector, const char* meshname)
 {
@@ -427,6 +402,38 @@ void csBugPlug::SelectMesh (iSector* sector, const char* meshname)
   {
     Report (CS_REPORTER_SEVERITY_NOTIFY,
       "Couldn't find matching meshes for pattern '%s'.", meshname);
+  }
+}
+
+void csBugPlug::AddSelectedMesh (iMeshWrapper* m)
+{
+  int i;
+  int count = selected_meshes.Length ();
+  for (i = 0 ; i < count ; i++)
+  {
+    // Assign selected_mesh[i] to temporary variable to avoid an
+    // internal MSVC6 error. Luca
+    iMeshWrapper* mesh = selected_meshes[i];
+    if (mesh == m) 
+      return;
+  }
+  selected_meshes.Push (m);
+}
+
+void csBugPlug::RemoveSelectedMesh (iMeshWrapper* m)
+{
+  int i;
+  int count = selected_meshes.Length ();
+  for (i = 0 ; i < count ; i++)
+  {
+    // Assign selected_mesh[i] to temporary variable to avoid an
+    // internal MSVC6 error. Luca
+    iMeshWrapper* mesh = selected_meshes[i];
+    if (mesh == m)
+    {
+      selected_meshes.DeleteIndex (i);
+      return;
+    }
   }
 }
 

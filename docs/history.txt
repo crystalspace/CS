@@ -34,6 +34,10 @@ chronological order.
 	- Jorrit did a huge optimization to the NR renderer by disabling
 	  z=0 plane clipping. We have to see if this gives any problems
 	  at all.
+	- Luca fixed an internal compiler error which MSVC6 users would get 
+	  in the bugplug plugin. He replaced the recent fix he already did
+	  with a more clean solution to the problem, avoiding the use of
+	  ugly an #idef directive.
 29-Jun-2004
 	- Jorrit fixed a bug in spr3d where manually specifying sprite normals
 	  didn't work.
