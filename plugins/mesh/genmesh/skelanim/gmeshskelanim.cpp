@@ -84,7 +84,7 @@ csSkelBone::~csSkelBone ()
 	SCF_DESTRUCT_IBASE ();
 }
 
-csSkelBone *csSkelBone::FindChild (const char *name)
+iGenMeshSkeletonBone *csSkelBone::FindChild (const char *name)
 {
 	for (size_t i = 0; i < bones.Length () ; i++)
 	{
@@ -690,10 +690,11 @@ void csGenmeshSkelAnimationControl::TransformVerticesToBones (const csVector3* v
 
 	for (i = 0 ; i < f_bones.Length () ; i++)
 	{
-		// Really stuppid
+		// Really stupid
 		if (f_bones[i]->GetParent ())
 		{
-			size_t parent_index = f_bones.Find (f_bones[i]->GetParent ());
+			csSkelBone *p = CS_STATIC_CAST(csSkelBone*,f_bones[i]->GetParent());
+			size_t parent_index = f_bones.Find (p);
 			csRef<csSkelBone> child = bones[i];
 			bones[parent_index]->AddBone (child);
 			child->SetParent (bones[parent_index]);

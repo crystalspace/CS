@@ -165,7 +165,7 @@ public:
 	virtual void SetName (const char* name) {csSkelBone::name = csStrNew (name); }
 	virtual csReversibleTransform &GetTransform () { return transform; }
 	virtual csReversibleTransform &GetFullTransform () { return full_transform; }
-	virtual csSkelBone* GetParent () { return parent; }
+	virtual iGenMeshSkeletonBone* GetParent () { return parent; }
 	virtual void GetSkinBox (csBox3 &box, csVector3 &center);
 	virtual void SetMode (BoneTransformMode mode) { bone_mode = mode; }
 	virtual BoneTransformMode GetMode () { return bone_mode; }
@@ -173,8 +173,8 @@ public:
 	virtual iRigidBody *GetRigidBody () { return rigid_body; }
 
 	virtual int GetChildrenCount () { return bones.Length () ;}
-	virtual csSkelBone *GetChild (int i) { return bones[i]; }
-	virtual csSkelBone *FindChild (const char *name);
+	virtual iGenMeshSkeletonBone *GetChild (int i) { return bones[i]; }
+	virtual iGenMeshSkeletonBone *FindChild (const char *name);
 };
 
 /**

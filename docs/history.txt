@@ -41,6 +41,12 @@ chronological order.
 	  to choose if it should use the const or non-const float* operator.
 	  Removed the float* operators. (This same fix was applied to an
 	  earlier version of Opcode on 15-Jan-2004.)
+	- Eric Sunshine fixed problem in csSkelBone where it specified a return
+	  type for its GetParent(), GetChild(), and FindChild() methods which
+	  did not correspond to the return type specified in the
+	  iGenMeshSkeletonBone interface which it implements.  This made it
+	  unbuildable with older compilers which do not allow the return type
+	  of an overloaded virtual method to change.
 5-Feb-2005
 	- Mike Handverger fixed a bug in iDynamicSystem::AttachColliderMesh
           ODE needs number of tris * 3 to build the mesh data.
