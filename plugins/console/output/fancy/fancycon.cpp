@@ -50,9 +50,8 @@ EXPORT_CLASS_TABLE (fancycon)
 EXPORT_CLASS_TABLE_END
 
 csFancyConsole::csFancyConsole (iBase *p) :
-  System(0), VFS(0), base(0), G2D(0), G3D(0), border_computed(false),
-  pix_loaded(false), system_ready(false), auto_update(true), visible(true),
-  ImageLoader(NULL)
+  System(0), VFS(0), base(0), G2D(0), G3D(0), ImageLoader(NULL), border_computed(false),
+  pix_loaded(false), system_ready(false), auto_update(true), visible(true)
 {
   CONSTRUCT_IBASE (p);
   CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
@@ -95,9 +94,7 @@ bool csFancyConsole::Initialize (iSystem *system)
   G2D = G3D->GetDriver2D ();
   G2D->IncRef ();
 
-  ImageLoader = QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageLoader);
-  if (!ImageLoader)
-    return false;
+  ImageLoader = NULL;
 
   // Tell system driver that we want to handle broadcast events
   if (!System->CallOnEvents (&scfiPlugIn, CSMASK_Broadcast))
@@ -121,6 +118,7 @@ bool csFancyConsole::HandleEvent (iEvent &Event)
           system_ready = true;
 	  if (!pix_loaded)
 	  {
+            ImageLoader = QUERY_PLUGIN_ID (System, CS_FUNCID_IMGLOADER, iImageLoader);
 	    LoadPix ();
 	    pix_loaded = true;
 	  }
@@ -158,7 +156,7 @@ void csFancyConsole::PutText (int iMode, const char *iText)
 
 void csFancyConsole::Draw3D (csRect *oArea)
 {
-  if (!visible) return;
+  if (!visible || !ImageLoader) return;
 
   bool btext, bgour;
   int i;
