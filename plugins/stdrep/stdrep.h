@@ -81,6 +81,7 @@ private:
   bool show_msgid[5];
   csRef<csMutex> mutex;
   csRefArray<csTimedMessage> messages;
+  csString lastID;
 
   static csString DefaultDebugFilename();
 

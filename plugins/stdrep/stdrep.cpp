@@ -189,7 +189,6 @@ bool csReporterListener::Initialize (iObjectRegistry* r)
 bool csReporterListener::Report (iReporter*, int severity,
 	const char* msgID, const char* description)
 {
-  static csString lastID ("");
   bool repeatedID = false;
   if (lastID.Compare (msgID))
     repeatedID = true;
