@@ -2,6 +2,19 @@ The history order has been reversed so that new features are at the top.
 
 20-Dec-2000
 	- Eric Sunshine eliminated a compilation warning in me_matmn.cpp.
+	- Eric Sunshine made the following changes to MetaBalls:
+	    - Fixed bug which prevented statistical text from displaying.  This
+	      bug has existed since the beginning of time but was only
+	      triggered recently.  The problem was that the `count' instance
+	      variable, which plays a role in determining when statistics
+	      should be displayed, was never initialized.
+	    - Added default initializers for all other instance variables (in
+	      addition to `count').
+	    - Removed unnecessary call to csSystem::GetElapsedTime().
+	    - Fixed bug: MetaSys::Help() was printing null-pointer for default
+	      texture name.
+	    - No longer crashes when unable to load texture.  Now prints
+	      meaningful error message and exits cleanly.
 19-Dec-2000
 	- Andrew Zabolotny did the following changes:
 	    - Fixed a error in inifile.cpp. The array allocated with
