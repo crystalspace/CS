@@ -1,0 +1,57 @@
+@c -*-texinfo-*-
+@node Name = "Command Button", Name = "Label", All components, AWS Standard Component Signal and Action reference
+@subsubsection Name = "Command Button"
+
+@subheading Signals
+
+@table @samp
+@item signalCmdButtonClicked
+Occurs when the user clicks a mouse button on the
+  component.
+@end table
+  
+@subheading Properties
+
+@table @samp
+@item Caption
+Used to change the text on the button.
+@end table
+  
+@subheading Frame Styles
+
+@table @samp
+@item bfsNormal
+A normal frame with text and a 3d border, image optional.
+
+@item bfsToolbar
+A normal frame without text, but may have an image.
+
+@item bfsBitmap
+
+A frame whose appearance is entirely dictated by images.  This frame style MUST 
+be present with the BitmapNormal, BitmapFocused and BitmapClicked attributes in 
+a definition file. 
+@end table
+
+@subheading Attributes 
+
+@table @samp
+@item Style 
+Defines the frame style. 
+
+@item Alpha 
+Alpha level of the button.  Only used for bfsBitmap style. 
+
+@item Caption 
+The button’s text. 
+@end table
+
+@subheading Skin Attributes
+
+@table @samp
+@item OverlayTextureAlpha 
+Used for texturing the button with a global texture.  Can be used to give a "liquid" look to buttons.  
+
+@item Texture 
+Used for overlaying the button with the global texture.
+@end table

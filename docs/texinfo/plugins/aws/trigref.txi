@@ -1,0 +1,19 @@
+@c -*-texinfo-*-
+@node AWS Standard Sink Trigger Reference, AWS Standard Component Signal and Action reference, How you can write your own component, AWS
+@subsection AWS Standard Sink Trigger Reference
+
+The following table lists triggers that the awsStandardSink hosts. 
+
+@table @samp
+@item Hide
+Hides the component that sent the signal.
+
+@item Show
+Shows the component that sent the signal.
+
+@item Invalidate
+Invalidates the component that sent the signal (forces a redraw).
+
+@item HideWindow
+Hides the window that the component that sent the signal is in.
+@end table

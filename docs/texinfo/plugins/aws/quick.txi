@@ -1,0 +1,45 @@
+@c -*-texinfo-*-
+@node AWS Quick Start, Actually finding out what your user is doing, AWS, AWS
+@subsection Quick Start
+
+In order to startup and use AWS, currently, the following needs to be done: 
+
+Load the AWS plugin: 
+
+@code{aws = CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.window.alternatemanager", 
+"awsManager", iAws); }
+
+Setup the AWS plugin: 
+
+@example
+aws->SetDefaultContext(engine, myG3D->GetTextureManager());
+@end example
+
+Load definition files: 
+
+@example
+aws->GetPrefMgr()->Load("./data/temp/awstest.def");
+@end example
+
+Select a default skin that @strong{all} windows will use:
+
+@example
+aws->GetPrefMgr()->SelectDefaultSkin("Normal Windows");
+@end example
+
+Create and show your windows:
+
+@example
+awsWindow *test = aws->CreateWindowFrom("Splash");
+awsWindow *test2 = aws->CreateWindowFrom("Another"); 
+if (test)  test->Show();
+if (test2) test2->Show();
+@end example
+
+That’s it.  AWS is designed to be easy to use.  Of course, this brief look 
+doesn’t suppose that you want to get any data from components in the windows, 
+nor does it suppose that you want to do anything other than show your windows.  
+The windows created here will be fully-fledged windows with all the controls 
+listed in the definition that you’ve created.  For more advanced topics, read 
+"@ref{Actually finding out what your user is doing}" and "@ref{How you can write your 
+own component}".

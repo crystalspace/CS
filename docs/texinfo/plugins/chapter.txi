@@ -36,6 +36,7 @@ information you need in the introduction to the simple tutorial
 * csPython::
 * Animation::
 * Model Conversion:: Importing Model Files
+* AWS::
 @end menu
 
 @imports{plugins,overview.txi}
@@ -49,3 +50,4 @@ information you need in the introduction to the simple tutorial
 @imports{plugins,python.txi}
 @importss{plugins,anim,anim.txi}
 @imports{plugins,model.txi}
+@imports{plugins,aws.txi}

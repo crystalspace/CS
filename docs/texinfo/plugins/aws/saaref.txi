@@ -1,0 +1,22 @@
+@c -*-texinfo-*-
+@node AWS Standard Component Signal and Action reference, , AWS Standard Sink Trigger Reference, AWS
+@subsection AWS Standard Component Signal and Action reference
+
+@menu
+* All components::
+* Name = "Command Button"::
+* Name = "Label"::
+* Name = "Check Box"::
+* Name = "Radio Button"::
+* Name = "Group Frame"::
+* Name = "List Box"::
+@end menu
+
+@importsss{plugins,aws,saaref,all.txi}
+@importsss{plugins,aws,saaref,cmdbtn.txi}
+@importsss{plugins,aws,saaref,label.txi}
+@importsss{plugins,aws,saaref,checkbox.txi}
+@importsss{plugins,aws,saaref,radiobtn.txi}
+@importsss{plugins,aws,saaref,grpframe.txi}
+@importsss{plugins,aws,saaref,listbox.txi}
+

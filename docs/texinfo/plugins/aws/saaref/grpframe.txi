@@ -1,0 +1,23 @@
+@c -*-texinfo-*-
+@node Name = "Group Frame", Name = "List Box", Name = "Radio Button", AWS Standard Component Signal and Action reference
+@subsubsection Name = "Group Frame"
+
+@subheading Attributes
+
+@table @samp
+@item Style
+One of: gfsBump, gfsSimple, gfsSunken, gfsRaised. Determines the style of frame for the component.
+
+@item Caption
+The text caption for the component, always drawn on the upper-left part of the frame.
+@end table
+
+@subheading Skin Attributes
+
+@table @samp
+@item OverlayTextureAlpha
+Used for texturing the frame area with a global texture. 
+
+@item Texture
+Used for overlaying the frame area with the global texture.
+@end table

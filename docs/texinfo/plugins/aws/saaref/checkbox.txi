@@ -1,0 +1,49 @@
+@c -*-texinfo-*-
+@node Name = "Check Box", Name = "Radio Button", Name = "Label", AWS Standard Component Signal and Action reference
+@subsubsection Name = "Check Box"
+
+@subheading Signals
+
+@table @samp
+@item signalCheckBoxClicked
+Generated when the check box’s state changes (on to off)
+@end table
+
+@subheading Attributes
+
+@table @samp
+@item Alpha
+The alpha of the checkbox images.
+
+@item Align
+Either cbAlignLeft or cbAlignRight, aligns the control and text.
+
+@item Caption
+The text caption for the component.
+@end table
+
+@subheading Skin Attributes
+
+@table @samp
+@item CheckBoxUp
+The image drawn when the checkbox is unpressed.
+
+@item CheckBoxDn
+The image drawn when the checkbox is pressed.
+
+@item CheckBoxOn
+The image drawn over the checkbox when it’s state is "on"
+
+@item CheckBoxOff
+The image drawn over the checkbox when it’s state is "off"
+@end table
+
+@subheading Properties
+
+@table @samp
+@item Caption
+The text of the label.
+
+@item State
+Whether the component is "on" or "off"
+@end table

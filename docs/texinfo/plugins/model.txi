@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Model Conversion, , Animation, Plug-In Drivers
+@node Model Conversion, AWS, Animation, Plug-In Drivers
 @section Importing Model Files
 @cindex Model Importing
 @cindex Importing Model Files

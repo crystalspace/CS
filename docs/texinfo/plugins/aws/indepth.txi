@@ -1,0 +1,20 @@
+@c -*-texinfo-*-
+@node In-depth explanation of AWS architecture
+@subsection In-depth explanation of AWS architecture
+
+@menu
+* What is the contract between signals, slots, and sources from a reference standpoint?::
+@end menu
+
+@node What is the contract between signals, slots, and sources from a reference standpoint?
+@subsubsection What is the contract between signals, slots, and sources from a reference standpoint?
+
+A signal source maintains a list of slots.  Thus, a source maintains a list of 
+references to each slot connected to it. A slot maintains a list of sinks that 
+it is connected to.  The sink manager keeps a list of sinks, and thus also keeps 
+a reference to each sink. Once a sink has been registered it cannot be 
+unregistered.  This may be changed in the future, but it is important to 
+remember that a sink cannot go away until all slots bound to it go away.  The 
+same may be said for slots: a slot cannot go away until the signal source it’s 
+connected to disconnects.  A slot may be disconnected from a signal source at 
+any time.
