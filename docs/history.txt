@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+10-Apr-2004
+	- Jorrit fixed a bug in spr3d with new renderer. It would try to
+	  tween vertices also for skeletal animation. That would cause
+	  crashes for skeletal sprites.
 9-Apr-2004
 	- Jorrit added iMeshWrapper->SetZBufModeRecursive(),
 	  SetFlagsRecursive(), and SetRenderPriorityRecursive(). These

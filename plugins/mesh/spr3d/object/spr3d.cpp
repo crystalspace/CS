@@ -2941,7 +2941,7 @@ void csSprite3DMeshObject::PreGetShaderVariableValue (
         sizeof (csVector3)*final_num_vertices, CS_BUF_DYNAMIC,
 		CS_BUFCOMP_FLOAT, 3, false);
     }
-    if (tween_ratio > EPSILON)
+    if (!skeleton_state && tween_ratio > EPSILON)
     {
       csRenderBufferLock<csVector3> tweenedVerts (vertices);
 
