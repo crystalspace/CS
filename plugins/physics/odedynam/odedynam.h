@@ -46,6 +46,7 @@
 #include "ivaria/ode.h"
 
 struct iObjectRegistry;
+struct iVirtualClock;
 struct iMeshWrapper;
 struct iSkeletonBone;
 class csPolygonTree;
@@ -106,6 +107,9 @@ class csODEDynamics : public iDynamics
 {
 private:
   csRef<iObjectRegistry> object_reg;
+  csRef<iVirtualClock> clock;
+
+  bool process_events;
 
   static int geomclassnum;
   static dJointGroupID contactjoints;
@@ -167,6 +171,8 @@ public:
   float FrameLimit () { return 1.0 / limittime; }
   void AddFrameUpdateCallback (iODEFrameUpdateCallback *cb) { updates.Push (cb); }
   void RemoveFrameUpdateCallback (iODEFrameUpdateCallback *cb) { updates.Delete (cb); }
+  void EnableEventProcessing (bool enable);
+  bool EventProcessingEnabled () { return process_events; }
   void EnableFastObjects (bool enable) { fastobjects = enable; }
   bool FastObjectsEnabled () { return false; }
 
@@ -205,6 +211,10 @@ public:
     { scfParent->AddFrameUpdateCallback (cb); }
     void RemoveFrameUpdateCallback (iODEFrameUpdateCallback *cb)
     { scfParent->RemoveFrameUpdateCallback (cb); }
+    void EnableEventProcessing (bool enable)
+    { scfParent->EnableEventProcessing (enable); }
+    bool EventProcessingEnabled ()
+    { return scfParent->EventProcessingEnabled (); }
     void EnableFastObjects (bool enable)
     { scfParent->EnableFastObjects (enable); }
     bool FastObjectsEnabled ()
@@ -219,6 +229,25 @@ public:
       return scfParent->Initialize (object_reg);
     }
   } scfiComponent;
+
+  bool HandleEvent (iEvent& Event);
+  struct EventHandler : public iEventHandler
+  {
+  private:
+    csODEDynamics* parent;
+  public:
+    SCF_DECLARE_IBASE;
+    EventHandler (csODEDynamics* parent)
+    {
+      SCF_CONSTRUCT_IBASE (0);
+      EventHandler::parent = parent;
+    }
+    virtual ~EventHandler ()
+    { SCF_DESTRUCT_IBASE (); }
+    virtual bool HandleEvent (iEvent& ev)
+    { return parent->HandleEvent (ev); }
+  };
+  csRef<csODEDynamics::EventHandler> scfiEventHandler;
 };
 
 class csODEBodyGroup;

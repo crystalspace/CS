@@ -21,7 +21,12 @@
 #include "cstool/collider.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
+#include "iutil/event.h"
+#include "iutil/eventq.h"
+#include "iutil/evdefs.h"
+#include "iutil/virtclk.h"
 #include "ivaria/collider.h"
+#include "ivaria/reporter.h"
 #include "csgeom/polytree.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
@@ -47,6 +52,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 SCF_IMPLEMENT_EMBEDDED_IBASE (csODEDynamics::Component)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_IBASE (csODEDynamics::EventHandler)
+  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_IBASE_EXT (csODEDynamicSystem)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iDynamicSystem)
@@ -102,6 +111,8 @@ csODEDynamics::csODEDynamics (iBase* parent)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiODEDynamicState);
   object_reg = 0;
+  scfiEventHandler = 0;
+  process_events = false;
 
   // Initialize the colliders so that the class isn't overwritten
   dGeomID id = dCreateSphere (0, 1);
@@ -119,7 +130,9 @@ csODEDynamics::csODEDynamics (iBase* parent)
   cfm = 1e-5f;
 
   rateenabled = false;
-  steptime = limittime = total_elapsed = 0.0;
+  steptime = 0.1;
+  limittime = 1.0;
+  total_elapsed = 0.0;
 
   stepfast = false;
   sfiter = 10;
@@ -128,6 +141,13 @@ csODEDynamics::csODEDynamics (iBase* parent)
 
 csODEDynamics::~csODEDynamics ()
 {
+  if (scfiEventHandler)
+  {
+    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q)
+      q->RemoveListener (scfiEventHandler);
+    scfiEventHandler->DecRef();
+  }
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiODEDynamicState);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_DESTRUCT_IBASE();
@@ -136,6 +156,10 @@ csODEDynamics::~csODEDynamics ()
 bool csODEDynamics::Initialize (iObjectRegistry* object_reg)
 {
   csODEDynamics::object_reg = object_reg;
+
+  clock = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  if (!clock)
+    return false;
 
   return true;
 }
@@ -162,6 +186,12 @@ iDynamicSystem *csODEDynamics::FindSystem (const char *name)
 void csODEDynamics::Step (float elapsed_time)
 {
   float stepsize;
+  if (process_events) 
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, "csODEDynamics", 
+      "Step was called after event processing was enabled");
+    return;
+  }
   if (rateenabled) 
   {
   	stepsize = steptime;
@@ -892,6 +922,57 @@ void csODEDynamics::SetStepFastIterations (int iter)
       iODEDynamicSystemState);
     sys->SetStepFastIterations (iter);
   }
+}
+
+void csODEDynamics::EnableEventProcessing (bool enable)
+{
+  if (enable && !process_events) {
+    process_events = true;
+
+    if (!scfiEventHandler) 
+      scfiEventHandler = csPtr<EventHandler> (new EventHandler (this));
+    csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+    if (q)
+      q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
+  } else if (!enable && process_events) {
+    process_events = false;
+
+    if (scfiEventHandler)
+    {
+      csRef<iEventQueue> q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+      if (q)
+        q->RemoveListener (scfiEventHandler);
+      scfiEventHandler->DecRef();
+    }
+  }
+}
+
+bool csODEDynamics::HandleEvent (iEvent& Event)
+{
+  if (Event.Type == csevBroadcast && Event.Command.Code == cscmdPreProcess)
+  {
+    float stepsize = steptime;
+    float elapsed_time = ((float)clock->GetElapsedTicks ())/1000.0;
+    if (elapsed_time > limittime) elapsed_time = limittime;
+    total_elapsed += elapsed_time;
+
+    // TODO handle fractional total_remaining (interpolate render)
+    while (total_elapsed > stepsize) 
+    {
+      total_elapsed -= stepsize;
+      for (long i=0; i<systems.Length(); i++)
+      {
+        systems.Get (i)->Step (stepsize);
+        for (long j = 0; j < updates.Length(); j ++) 
+        {
+          updates[i]->Execute (stepsize);
+        }
+        dJointGroupEmpty (contactjoints);
+      }
+    }
+    return true;
+  }
+  return false;
 }
 
 csODEDynamicSystem::csODEDynamicSystem (float erp, float cfm)

@@ -95,6 +95,14 @@ struct iODEDynamicState : public iBase
   virtual void RemoveFrameUpdateCallback (iODEFrameUpdateCallback *cb) = 0;
 
   /** 
+   * This makes updates happen on the cscmdPreProcess 
+   * and invalidates calls to Step()
+   * This should be used in conjuction with the FrameRate calls
+   */
+  virtual void EnableEventProcessing (bool enable) = 0;
+  virtual bool EventProcessingEnabled () = 0;
+
+  /** 
    * The following enables special robustness checks for fast
    * moving objects to determine if they will tunneling and 
    * adjusts the physics frame resolution (rate) to a double
