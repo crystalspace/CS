@@ -16,6 +16,9 @@ chronological order.
 	  most features mentioned in the feature list. That way the
 	  feature list is a good starting point to find out how to do
 	  something.
+	- Troy altered csODERigidBody class altered to use 'spaces' instead 
+	  of geom groups. ( geom groups are deprecated in ode now).  This corrects 
+		problem with non-placeable geom error messages from debug build of ode.  
 13-Aug-2003
 	- res renamed the rlloader, rlsstd and rlsstencil plugins to less
 	  cryptic rendloop_loader, rendstep_std and rendstep_stencil.
