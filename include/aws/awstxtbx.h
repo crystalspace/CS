@@ -28,6 +28,9 @@ class awsTextBox : public awsComponent
    /// True if the component has focus
    bool has_focus;
 
+   /// True if the component should mask chars
+   int  should_mask;
+   
    /// Holds the background texture: either global texture, or override in component.
    iTextureHandle *bkg;
 
@@ -42,6 +45,9 @@ class awsTextBox : public awsComponent
 
    /// Text that's not allowed to add
    iString *disallow;
+
+   /// Character to replace text with
+   iString *maskchar;
    
    /// Position of first character we display.
    int start;

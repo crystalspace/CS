@@ -744,7 +744,7 @@ awsManager::CheckFocus(iAwsComponent *cmp, iEvent &Event)
             Event.Type = et;
           }
 
-          if (Event.Type == csevMouseDown)
+          if (Event.Type == csevMouseClick)
           {
             if (keyb_focus != cmp)
             {
@@ -789,7 +789,14 @@ awsManager::RegisterCommonComponents()
   (void)new awsLabelFactory(this);
   (void)new awsTextBoxFactory(this);
 
+  // Standard sink
   GetSinkMgr()->RegisterSink("awsStandardSink", new awsStandardSink());
+
+  // Global constants
+  GetPrefMgr()->RegisterConstant("True", 1);
+  GetPrefMgr()->RegisterConstant("False", 0);
+  GetPrefMgr()->RegisterConstant("Yes", 1);
+  GetPrefMgr()->RegisterConstant("No", 0);
 }
 
 iGraphics2D *

@@ -19,10 +19,10 @@ const int awsTextBox::fsBitmap =0x1;
 const int awsTextBox::signalChanged=0x1;
 const int awsTextBox::signalLostFocus=0x2;
 
-awsTextBox::awsTextBox(): mouse_is_over(false), has_focus(false),
+awsTextBox::awsTextBox(): mouse_is_over(false), has_focus(false), should_mask(0),
                           bkg(NULL),
                           frame_style(0), alpha_level(92),
-                          text(NULL), disallow(NULL), 
+                          text(NULL), disallow(NULL), maskchar(NULL), 
                           start(0), cursor(0)
 { 
 }
@@ -45,10 +45,13 @@ awsTextBox::Setup(iAws *_wmgr, awsComponentNode *settings)
  pm->LookupIntKey("ButtonTextureAlpha", alpha_level); // global get
  pm->GetInt(settings, "Style", frame_style);
  pm->GetInt(settings, "Alpha", alpha_level);          // local overrides, if present.
+ pm->GetInt(settings, "Masked", should_mask);
  pm->GetString(settings, "Text", text);
  pm->GetString(settings, "Disallow", disallow);
+ pm->GetString(settings, "MaskChar", maskchar);
 
  if (text) cursor=text->Length();
+ else text = new scfString();
 
  switch(frame_style)
  {
@@ -176,7 +179,17 @@ awsTextBox::OnDraw(csRect clip)
   if (text && text->Length())
   {     
     int tw, th, tx, ty, mcc;
-                  
+    iString *saved;
+
+    if (should_mask && maskchar)
+    {
+      saved = text->Clone();
+
+      unsigned int i;
+      for(i=0; i<text->Length(); ++i)
+        text->SetAt(i, maskchar->GetAt(0));
+    }
+
     // Get the maximum number of characters we can use
     mcc = WindowManager()->GetPrefMgr()->GetDefaultFont()->GetLength(text->GetData()+start, Frame().Width()-10);
      
@@ -202,6 +215,14 @@ awsTextBox::OnDraw(csRect clip)
                WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE),
                -1,
                tmp.GetData());
+
+    if (should_mask && maskchar && saved)
+    {
+      text->Clear();
+      text->Append(saved);
+      saved->Clear();
+      saved->DecRef();
+    }
 
     if (has_focus)
       g2d->DrawLine(Frame().xmin+tx+tw+1,Frame().ymin+ty,Frame().xmin+tx+tw+1,Frame().ymin+ty+th, WindowManager()->GetPrefMgr()->GetColor(AC_TEXTFORE));
@@ -281,15 +302,24 @@ awsTextBox::OnKeypress(int key, int modifiers)
     {
       if (cs_isprint((char)key))
       {
-        char str[2];
-        str[0] = (char)key;
-        str[1] = 0;
+        bool ignore=false;
+
+        if (disallow &&
+           (strchr(disallow->GetData(), key)!=0))
+            ignore=true;
       
-        text->Append(scfString(str));
-        cursor++;
-      }
-    }
-  }
+        if (!ignore)
+        {
+          char str[2];
+          str[0] = (char)key;
+          str[1] = 0;
+      
+          text->Append(scfString(str));
+          cursor++;
+        } // end if ignore
+      } // end if is printable
+    } // end default case
+  } // end switch
 
   Invalidate();
   return true;
