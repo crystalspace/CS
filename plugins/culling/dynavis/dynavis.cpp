@@ -412,15 +412,17 @@ void csDynaVis::UpdateObject (csVisibilityObjectWrapper* visobj_wrap)
   visobj_wrap->update_number = movable->GetUpdateNumber ();
 }
 
-static void Perspective (const csVector3& v, csVector2& p, float fov,
-    	float sx, float sy)
+namespace
+{
+
+void Perspective (const csVector3& v, csVector2& p, float fov, float sx, float sy)
 {
   float iz = fov / v.z;
   p.x = v.x * iz + sx;
   p.y = v.y * iz + sy;
 }
 
-static bool PrintObjects (csKDTree* treenode, void*, uint32, uint32&)
+bool PrintObjects (csKDTree* treenode, void*, uint32, uint32&)
 {
   int num_objects;
   csKDTreeChild** objects;
@@ -442,6 +444,7 @@ static bool PrintObjects (csKDTree* treenode, void*, uint32, uint32&)
   }
   return true;
 }
+} // end of anonymous namespace
 
 struct VisTest_Front2BackData
 {
