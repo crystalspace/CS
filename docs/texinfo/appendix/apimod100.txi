@@ -1508,5 +1508,13 @@ variable.
 
 @subheading @samp{chunklod} Terrain Removal
 
-The @samp{chunklod} terrain plugin has been removed. Instead use the
-@samp{bruteblock} terrain engine.
+The @samp{chunklod} terrain plugin has been removed:
+
+@noindent
+@code{crystalspace.mesh.object.terrain.chunklod}
+
+@noindent
+Instead use the @samp{bruteblock} terrain engine.
+
+@noindent
+@code{crystalspace.mesh.object.terrain.bruteblock}
