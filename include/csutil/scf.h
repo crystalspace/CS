@@ -94,7 +94,7 @@ public:									\
  * scfCreateInstance function) which should be passed to this macro.
  */
 #define CONSTRUCT_IBASE(Parent)						\
-  scfRefCount = 0; scfParent = Parent;
+  scfRefCount = 1; scfParent = Parent;
 
 /**
  * The CONSTRUCT_EMBEDDED_IBASE macro should be invoked inside the
@@ -102,7 +102,7 @@ public:									\
  * (not inside the constructor of the embedded interface)
  */
 #define CONSTRUCT_EMBEDDED_IBASE(Interface)				\
-  Interface.scfRefCount = 0; Interface.scfParent = this;
+  Interface.scfRefCount = 1; Interface.scfParent = this;
 
 /**
  * The following macro should be used within the C++ source module that
