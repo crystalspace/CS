@@ -12,6 +12,9 @@ The history order is reversed so that new features are at the top.
 	  change, however, future targets can modify, add, remove files in
 	  multiple directories.  For instance, the upcoming Swig re-generation
 	  target will touch files in several directories.
+	- Oktal updated the csperl5 Jamfile in line with the recent updates to
+	  the Makefile (see Oktal 30-Apr-2003). It is still disabled, because
+	  I can't figure out how to enable and test it (see Matze 29-Apr-2003)
 1-May-2003
 	- res made the following changes to VFS:
 	    - Added iFile::SetPos() to complement iFile::GetPos().

@@ -5,7 +5,7 @@ if $(PERL5.AVAILABLE) = "yes" && ! DISABLED
   if $(CMD.SWIG)
   {
     # for details and comments look at the cspython Jamfile
-    local target = [ FGristFiles cswigpl5.cpp ] ;
+    local target = [ FGristFiles cswigpl5.inc ] ;
     local sources = [ FGristFiles cspace.i ] ;
 
     SEARCH on $(sources) = $(TOP)/include/ivaria ;
