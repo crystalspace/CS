@@ -25,8 +25,8 @@ int NeXTGetInstallPath(char *oInstallPath, size_t iBufferSize, char pathSep)
         s = [defs stringForKey:@"CrystalSpaceRoot"];
         if (s != 0 && ![s isEqualToString:@""])
         {
-            result = 1;
             NSMutableString *path = [s mutableCopy];
+            result = 1;
             if ([path characterAtIndex:[path length]] != pathSep)
                 [path appendFormat:@"%c", pathSep];
                 
