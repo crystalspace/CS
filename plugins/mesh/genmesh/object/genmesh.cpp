@@ -375,7 +375,11 @@ void csGenmeshMeshObject::RemoveListener (iObjectModelListener *listener)
 bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();
+#ifndef CS_USE_NEW_RENDERER
   iGraphics3D* g3d = rview->GetGraphics3D ();
+#else
+  iRender3D* r3d = rview->GetGraphics3D ();
+#endif
   iCamera* camera = rview->GetCamera ();
 
   // First create the transformation from object to camera space directly:
@@ -398,12 +402,20 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   	clip_z_plane) == false)
     return false;
 
+#ifndef CS_USE_NEW_RENDERER
   g3d->SetObjectToCamera (&tr_o2c);
   G3DTriangleMesh& m = factory->GetMesh ();
   m.clip_portal = clip_portal;
   m.clip_plane = clip_plane;
   m.clip_z_plane = clip_z_plane;
   m.do_mirror = camera->IsMirrored ();
+#else
+  r3d->SetObjectToCamera (&tr_o2c);
+  mesh.clip_portal = clip_portal;
+  mesh.clip_plane = clip_plane;
+  mesh.clip_z_plane = clip_z_plane;
+  mesh.do_mirror = camera->IsMirrored ();
+#endif
   return true;
 }
 
@@ -546,12 +558,21 @@ bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 
   if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
 
+#ifndef CS_USE_NEW_RENDERER
   iGraphics3D* g3d = rview->GetGraphics3D ();
+#else
+  iRender3D* r3d = rview->GetGraphics3D ();
+#endif
 
   // Prepare for rendering.
+#ifndef CS_USE_NEW_RENDERER
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
+#else
+  mesh.z_buf_mode = mode;
+#endif
 
   mater->Visit ();
+#ifndef CS_USE_NEW_RENDERER
   G3DTriangleMesh& m = factory->GetMesh ();
   iVertexBuffer* vbuf = factory->GetVertexBuffer ();
   iVertexBufferManager* vbufmgr = factory->GetVertexBufferManager ();
@@ -567,6 +588,14 @@ bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   rview->CalculateFogMesh (g3d->GetObjectToCamera (), m);
   g3d->DrawTriangleMesh (m);
   vbufmgr->UnlockBuffer (vbuf);
+#else
+  mesh.SetIndexRange (0, factory->GetTriangleCount () * 3);
+  mesh.SetMaterialWrapper (mater);
+  csRef<iStreamSource> stream = SCF_QUERY_INTERFACE (factory, iStreamSource);
+  mesh.SetStreamSource (stream);
+  mesh.SetType (csRenderMesh::MESHTYPE_TRIANGLES);
+  r3d->DrawMesh (&mesh);
+#endif
 
   return true;
 }
@@ -582,11 +611,10 @@ bool csGenmeshMeshObject::HitBeamOutline (const csVector3& start,
   // This is now closer to an outline hitting method. It will
   // return as soon as it touches any triangle in the mesh, and
   // will be a bit faster than its more accurate cousin (below).
-  G3DTriangleMesh& m = factory->GetMesh ();
 
   csSegment3 seg (start, end);
-  int i, max = m.num_triangles;
-  csTriangle *tr = m.triangles;
+  int i, max = factory->GetTriangleCount();
+  csTriangle *tr = factory->GetTriangles();
   csVector3 *vrt = factory->GetVertices ();
   for (i = 0 ; i < max ; i++)
   {
@@ -609,16 +637,15 @@ bool csGenmeshMeshObject::HitBeamObject (const csVector3& start,
   // It will cycle through every triangle in the mesh serching for the
   // closest intersection. Slower, but returns the closest hit.
   // Usage is optional.
-  G3DTriangleMesh& m = factory->GetMesh ();
 
   csSegment3 seg (start, end);
-  int i, max = m.num_triangles;
+  int i, max = factory->GetTriangleCount();
   float tot_dist = csSquaredDist::PointPoint (start, end);
   float dist, temp;
   float itot_dist = 1 / tot_dist;
   dist = temp = tot_dist;
   csVector3 *vrt = factory->GetVertices (), tmp;
-  csTriangle *tr = m.triangles;
+  csTriangle *tr = factory->GetTriangles();
   for (i = 0 ; i < max ; i++)
   {
     if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
@@ -667,51 +694,101 @@ csMeshedPolygon* csGenmeshMeshObject::PolyMesh::GetPolygons ()
 
 SCF_IMPLEMENT_IBASE (csGenmeshMeshObjectFactory)
   SCF_IMPLEMENTS_INTERFACE (iMeshObjectFactory)
+#ifdef CS_USE_NEW_RENDERER
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iStreamSource)
+#endif
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iGeneralFactoryState)
+#ifndef CS_USE_NEW_RENDERER
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
+#endif
 SCF_IMPLEMENT_IBASE_END
+
+#ifdef CS_USE_NEW_RENDERER
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObjectFactory::StreamSource)
+  SCF_IMPLEMENTS_INTERFACE (iStreamSource) 
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+#endif
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObjectFactory::GeneralFactoryState)
   SCF_IMPLEMENTS_INTERFACE (iGeneralFactoryState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+#ifndef CS_USE_NEW_RENDERER
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObjectFactory::
 	eiVertexBufferManagerClient)
   SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
+#endif
 
 csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
 	iObjectRegistry* object_reg)
 {
   SCF_CONSTRUCT_IBASE (pParent);
+#ifdef CS_USE_NEW_RENDERER
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiStreamSource);
+#endif
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiGeneralFactoryState);
+#ifndef CS_USE_NEW_RENDERER 
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
+#endif
   csGenmeshMeshObjectFactory::object_reg = object_reg;
   logparent = NULL;
   initialized = false;
   object_bbox_valid = false;
+#ifndef CS_USE_NEW_RENDERER
   top_mesh.num_triangles = 0;
   top_mesh.triangles = NULL;
   top_mesh.vertex_fog = NULL;
+#else
+  num_mesh_triangles = 0;
+  mesh_triangles = NULL;
+#endif
   num_mesh_vertices = 0;
   mesh_vertices = NULL;
   mesh_texels = NULL;
   mesh_colors = NULL;
   mesh_normals = NULL;
+#ifndef CS_USE_NEW_RENDERER
   vbufmgr = NULL;
+#endif
   material = NULL;
   polygons = NULL;
+#ifdef CS_USE_NEW_RENDERER
+  vertex_buffer = NULL;
+  normal_buffer = NULL;
+  texel_buffer = NULL;
+  color_buffer = NULL;
+  index_buffer = NULL;
+
+  csRef<iRender3D> r3d (CS_QUERY_REGISTRY (object_reg, iRender3D));
+  vertex_name = r3d->GetStringContainer ()->Request ("vertices");
+  texel_name = r3d->GetStringContainer ()->Request ("texture coordinates");
+  normal_name = r3d->GetStringContainer ()->Request ("normals");
+  color_name = r3d->GetStringContainer ()->Request ("colors");
+  index_name = r3d->GetStringContainer ()->Request ("indices");
+
+  mesh_vertices_dirty_flag = false;
+  mesh_texels_dirty_flag = false;
+  mesh_normals_dirty_flag = false;
+  mesh_colors_dirty_flag = false;
+  mesh_triangle_dirty_flag = false;
+#endif
+
 }
 
 csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
 {
+#ifndef CS_USE_NEW_RENDERER
   if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
+#endif
   delete[] mesh_normals;
   delete[] mesh_vertices;
   delete[] mesh_colors;
   delete[] mesh_texels;
+#ifndef CS_USE_NEW_RENDERER
   delete[] top_mesh.triangles;
   delete[] top_mesh.vertex_fog;
+#endif
   delete[] polygons;
 }
 
@@ -754,6 +831,7 @@ const csBox3& csGenmeshMeshObjectFactory::GetObjectBoundingBox ()
   return object_bbox;
 }
 
+#ifndef CS_USE_NEW_RENDERER
 void csGenmeshMeshObjectFactory::SetupVertexBuffer ()
 {
   if (!vbuf)
@@ -769,9 +847,11 @@ void csGenmeshMeshObjectFactory::SetupVertexBuffer ()
     top_mesh.buffers[0] = vbuf;
   }
 }
+#endif
 
 void csGenmeshMeshObjectFactory::SetupFactory ()
 {
+#ifndef CS_USE_NEW_RENDERER
   if (!initialized)
   {
     initialized = true;
@@ -784,7 +864,70 @@ void csGenmeshMeshObjectFactory::SetupFactory ()
     top_mesh.do_morph_colors = false;
     top_mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
   }
+#endif
 }
+
+#ifdef CS_USE_NEW_RENDERER
+iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
+{
+  csRef<iRender3D> r3d (CS_QUERY_REGISTRY (object_reg, iRender3D));
+  if (name == vertex_name) {
+    if (mesh_vertices_dirty_flag) {
+      vertex_buffer = r3d->GetBufferManager ()->GetBuffer (
+        sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC);
+      csVector3* vbuf = (csVector3*)vertex_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      memcpy (vbuf, mesh_vertices, sizeof (csVector3)*num_mesh_vertices);
+      vertex_buffer->Release ();
+    }
+	return vertex_buffer;
+  }
+  if (name == texel_name) {
+    if (mesh_texels_dirty_flag) {
+      texel_buffer = r3d->GetBufferManager ()->GetBuffer (
+        sizeof (csVector2)*num_mesh_vertices, CS_BUF_STATIC);
+      csVector2* tbuf = (csVector2*)texel_buffer->Lock (iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      memcpy (tbuf, mesh_texels, sizeof (csVector2)*num_mesh_vertices);
+      texel_buffer->Release ();
+    }
+    return texel_buffer;
+  }
+  if (name == normal_name) {
+    if (mesh_normals_dirty_flag) {
+      normal_buffer = r3d->GetBufferManager ()->GetBuffer (
+        sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC);
+      csVector3 *nbuf = (csVector3*)normal_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      memcpy (nbuf, mesh_normals, sizeof (csVector3)*num_mesh_vertices);
+      normal_buffer->Release ();
+    }
+    return normal_buffer;
+  }
+  if (name == color_name) {
+    if (mesh_colors_dirty_flag) {
+      color_buffer = r3d->GetBufferManager ()->GetBuffer (
+        sizeof (csColor)*num_mesh_vertices, CS_BUF_STATIC);
+      csColor *cbuf = (csColor*)color_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      memcpy (cbuf, mesh_colors, sizeof (csColor)*num_mesh_vertices);
+      color_buffer->Release();
+    }
+    return color_buffer;
+  }
+  if (name == index_name) {
+    if (mesh_triangle_dirty_flag) {
+      index_buffer = r3d->GetBufferManager ()->GetBuffer (
+        sizeof (unsigned int)*num_mesh_triangles*3, CS_BUF_INDEX);
+      unsigned int *ibuf = (unsigned int *)index_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
+      for (int i = 0; i < num_mesh_triangles; i ++) {
+        ibuf[i * 3 + 0] = mesh_triangles[i].a;
+        ibuf[i * 3 + 1] = mesh_triangles[i].b;
+        ibuf[i * 3 + 2] = mesh_triangles[i].a;
+      }
+      index_buffer->Release ();
+    }
+    return index_buffer;
+  }
+  return NULL;
+}
+#endif
 
 void csGenmeshMeshObjectFactory::SetVertexCount (int n)
 {
@@ -794,20 +937,30 @@ void csGenmeshMeshObjectFactory::SetVertexCount (int n)
   delete[] mesh_vertices;
   delete[] mesh_colors;
   delete[] mesh_texels;
+#ifndef CS_USE_NEW_RENDERER
   delete[] top_mesh.vertex_fog;
+#endif
   mesh_normals = new csVector3 [num_mesh_vertices];
   mesh_vertices = new csVector3 [num_mesh_vertices];
   mesh_colors = new csColor [num_mesh_vertices];
   mesh_texels = new csVector2 [num_mesh_vertices];
+#ifndef CS_USE_NEW_RENDERER
   top_mesh.vertex_fog = new G3DFogInfo [num_mesh_vertices];
+#endif
 }
 
 void csGenmeshMeshObjectFactory::SetTriangleCount (int n)
 {
+#ifndef CS_USE_NEW_RENDERER
   top_mesh.num_triangles = n;
   initialized = false;
   delete[] top_mesh.triangles;
   top_mesh.triangles = new csTriangle [top_mesh.num_triangles];
+#else
+  num_mesh_triangles = n;
+  if (mesh_triangles) delete [] mesh_triangles;
+  mesh_triangles = new csTriangle [num_mesh_triangles];
+#endif
 }
 
 struct CompressVertex
@@ -944,16 +1097,27 @@ void csGenmeshMeshObjectFactory::CalculateNormals ()
 {
   int i, j;
 
+#ifndef CS_USE_NEW_RENDERER
   int num_triangles = top_mesh.num_triangles;
+#else
+  int num_triangles = num_mesh_triangles;
+#endif
   csTriangle* tris;
   csVector3* new_verts;
   int new_num_verts;
   int* mapping;
 
+#ifndef CS_USE_NEW_RENDERER
   bool compressed = CompressVertices (mesh_vertices, num_mesh_vertices,
       new_verts, new_num_verts,
       top_mesh.triangles, num_triangles, tris,
       mapping);
+#else
+  bool compressed = CompressVertices (mesh_vertices, num_mesh_vertices,
+      new_verts, new_num_verts,
+      mesh_triangles, num_triangles, tris,
+      mapping);
+#endif
 
   csTriangleMesh* tri_mesh = new csTriangleMesh ();
   tri_mesh->SetTriangles (tris, num_triangles);
@@ -1058,6 +1222,14 @@ void csGenmeshMeshObjectFactory::Invalidate ()
   object_bbox_valid = false;
   delete[] polygons;
   polygons = NULL;
+
+#ifdef CS_USE_NEW_RENDERER
+  mesh_vertices_dirty_flag = true;
+  mesh_texels_dirty_flag = true;
+  mesh_normals_dirty_flag = true;
+  mesh_colors_dirty_flag = true;
+  mesh_triangle_dirty_flag = true;
+#endif
 }
 
 void csGenmeshMeshObjectFactory::HardTransform (
@@ -1067,6 +1239,9 @@ void csGenmeshMeshObjectFactory::HardTransform (
   for (i = 0 ; i < num_mesh_vertices ; i++)
     mesh_vertices[i] = t.This2Other (mesh_vertices[i]);
   initialized = false;
+#ifdef CS_USE_NEW_RENDERER
+  mesh_vertices_dirty_flag = true;
+#endif  
 }
 
 csPtr<iMeshObject> csGenmeshMeshObjectFactory::NewInstance ()
@@ -1077,6 +1252,7 @@ csPtr<iMeshObject> csGenmeshMeshObjectFactory::NewInstance ()
   return csPtr<iMeshObject> (im);
 }
 
+#ifndef CS_USE_NEW_RENDERER
 void csGenmeshMeshObjectFactory::eiVertexBufferManagerClient::ManagerClosing ()
 {
   if (scfParent->vbuf)
@@ -1085,15 +1261,25 @@ void csGenmeshMeshObjectFactory::eiVertexBufferManagerClient::ManagerClosing ()
     scfParent->vbufmgr = NULL;
   }
 }
+#endif
 
 csMeshedPolygon* csGenmeshMeshObjectFactory::GetPolygons ()
 {
   if (!polygons)
   {
+#ifndef CS_USE_NEW_RENDERER
     csTriangle* triangles = top_mesh.triangles;
     polygons = new csMeshedPolygon [top_mesh.num_triangles];
+#else
+    csTriangle* triangles = mesh_triangles;
+    polygons = new csMeshedPolygon [num_mesh_triangles];
+#endif
     int i;
+#ifndef CS_USE_NEW_RENDERER
     for (i = 0 ; i < top_mesh.num_triangles ; i++)
+#else
+    for (i = 0 ; i < num_mesh_triangles ; i++)
+#endif
     {
       polygons[i].num_vertices = 3;
       polygons[i].vertices = &triangles[i].a;

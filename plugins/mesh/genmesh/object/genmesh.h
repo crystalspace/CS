@@ -33,6 +33,9 @@
 #include "igeom/objmodel.h"
 #include "igeom/polymesh.h"
 #include "iengine/shadcast.h"
+#ifdef CS_USE_NEW_RENDERER
+#include "ivideo/rndbuf.h"
+#endif
 
 struct iMaterialWrapper;
 struct iObjectRegistry;
@@ -67,6 +70,9 @@ public:
 class csGenmeshMeshObject : public iMeshObject
 {
 private:
+#ifdef CS_USE_NEW_RENDERER
+  csRenderMesh mesh;
+#endif
   csGenmeshMeshObjectFactory* factory;
   iBase* logparent;
   iMaterialWrapper* material;
@@ -189,7 +195,6 @@ public:
   	csVector3& isect, float* pr);
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
-
   //------------------------- iObjectModel implementation ----------------
   class ObjectModel : public iObjectModel
   {
@@ -352,16 +357,37 @@ public:
 class csGenmeshMeshObjectFactory : public iMeshObjectFactory
 {
 private:
+#ifndef CS_USE_NEW_RENDERER
   csRef<iVertexBuffer> vbuf;
   iVertexBufferManager* vbufmgr;
-
+#endif
   iMaterialWrapper* material;
+#ifndef CS_USE_NEW_RENDERER
   G3DTriangleMesh top_mesh;
+#endif
   csVector3* mesh_vertices;
   csVector2* mesh_texels;
   csVector3* mesh_normals;
   csColor* mesh_colors;
   int num_mesh_vertices;
+#ifdef CS_USE_NEW_RENDERER
+  csTriangle* mesh_triangles;
+  int num_mesh_triangles;
+
+  bool mesh_vertices_dirty_flag;
+  bool mesh_texels_dirty_flag;
+  bool mesh_normals_dirty_flag;
+  bool mesh_colors_dirty_flag;
+  bool mesh_triangle_dirty_flag;
+
+  csRef<iRenderBuffer> vertex_buffer;
+  csRef<iRenderBuffer> texel_buffer;
+  csRef<iRenderBuffer> normal_buffer;
+  csRef<iRenderBuffer> color_buffer;
+  csRef<iRenderBuffer> index_buffer;
+
+  csStringID vertex_name, texel_name, normal_name, color_name, index_name;
+#endif
 
   csVector3 radius;
   csBox3 object_bbox;
@@ -373,8 +399,10 @@ private:
   /// Calculate bounding box and radius.
   void CalculateBBoxRadius ();
 
+#ifndef CS_USE_NEW_RENDERER
   /// Retrieve a vertexbuffer from the manager if not done already.
   void SetupVertexBuffer ();
+#endif
 
   /**
    * Compress vertices. This is for CalculateNormals().
@@ -391,6 +419,7 @@ private:
    */
   void SetupFactory ();
 
+#ifndef CS_USE_NEW_RENDERER
   /// interface to receive state of vertexbuffermanager
   struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
   {
@@ -398,6 +427,7 @@ private:
     virtual void ManagerClosing ();
   }scfiVertexBufferManagerClient;
   friend struct eiVertexBufferManagerClient;
+#endif
 
 public:
   iObjectRegistry* object_reg;
@@ -416,13 +446,25 @@ public:
   iMaterialWrapper* GetMaterialWrapper () const { return material; }
   void SetVertexCount (int n);
   int GetVertexCount () const { return num_mesh_vertices; }
+#ifndef CS_USE_NEW_RENDERER
   csVector3* GetVertices () { SetupFactory (); return mesh_vertices; }
   csVector2* GetTexels () { SetupFactory (); return mesh_texels; }
   csVector3* GetNormals () { SetupFactory (); return mesh_normals; }
   csColor* GetColors () { SetupFactory (); return mesh_colors; }
+#else
+  csVector3* GetVertices () { mesh_vertices_dirty_flag = true; return mesh_vertices; }
+  csVector2* GetTexels () { mesh_texels_dirty_flag = true; return mesh_texels; }
+  csVector3* GetNormals () { mesh_normals_dirty_flag = true; return mesh_normals; }
+  csColor* GetColors () { mesh_colors_dirty_flag = true; return mesh_colors; }
+#endif
   void SetTriangleCount (int n);
+#ifndef CS_USE_NEW_RENDERER
   int GetTriangleCount () const { return top_mesh.num_triangles; }
   csTriangle* GetTriangles () { SetupFactory (); return top_mesh.triangles; }
+#else
+  int GetTriangleCount () const { return num_mesh_triangles; }
+  csTriangle* GetTriangles () { mesh_triangle_dirty_flag = true; return mesh_triangles; }
+#endif
   void Invalidate ();
   void CalculateNormals ();
   void GenerateBox (const csBox3& box);
@@ -433,7 +475,7 @@ public:
    * Calculate polygons for iPolygonMesh.
    */
   csMeshedPolygon* GetPolygons ();
-
+#ifndef CS_USE_NEW_RENDERER
   iVertexBufferManager* GetVertexBufferManager ()
   {
     SetupFactory ();
@@ -449,6 +491,17 @@ public:
     SetupFactory ();
     return top_mesh;
   }
+#else
+  iRenderBuffer *GetBuffer (csStringID name);
+  //------------------------- iStreamSource implementation ----------------
+  class StreamSource : public iStreamSource 
+  {
+	SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObjectFactory);
+    iRenderBuffer *GetBuffer (csStringID name)
+	{ return scfParent->GetBuffer (name); }
+  } scfiStreamSource;
+  friend class StreamSource;
+#endif
 
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
