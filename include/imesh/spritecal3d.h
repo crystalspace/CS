@@ -35,6 +35,7 @@ struct iRenderView;
 struct iVFS;
 
 class CalModel;
+class CalCoreModel;
 
 SCF_VERSION (iSpriteCal3DSocket, 0, 0, 1);
 
@@ -278,6 +279,12 @@ struct iSpriteCal3DFactoryState : public iBase
   virtual int GetSocketCount () const = 0;
   /// Query the socket number f.
   virtual iSpriteCal3DSocket* GetSocket (int f) const = 0;
+  /** This gives you access to the internal Cal3d Core Model class
+   *  which sprcal3dfact wraps.  If you use it directly, you run
+   *  the risk of making sprcal3dfact and CalCoreModel get out of sync.
+   *  Use carefully!
+   */
+  virtual CalCoreModel *GetCal3DCoreModel() = 0;
 };
 
 SCF_VERSION (iSpriteCal3DState, 0, 0, 2);

@@ -60,6 +60,8 @@ chronological order.
 	- Luca fixed a problem VisualC++6 users have with inner classes,
 	  which by default cannot access to any non-public member 
 	  of the containing class.
+	- Steven Geens added the ability to ask the CalCoreModel from
+	  iSpriteCal3DFactoryState.
 27-Jun-2004
 	- res worked around a possible VC7 64bit warning in 
 	  csIntegralHashKeyHandler<>.

@@ -435,6 +435,11 @@ public:
       return ifr;       // DecRef is ok here.
     }
 
+    virtual CalCoreModel *GetCal3DCoreModel()
+    {
+      return &scfParent->calCoreModel;
+    }
+
   } scfiSpriteCal3DFactoryState;
   struct LODControl : public iLODControl
   {
