@@ -1,6 +1,7 @@
 SubDir TOP data ;
 
-InstallData [ Wildcard *.zip ] : maps ;
+InstallData awsdef.zip csws.zip fancycon.zip standard.zip stdtex.zip
+            ttf-vera.zip unifont.csf unifont.zip ;
 
 maps = flarge partsys particles terrain r3dtest stenciltest isomap ;
 for map in $(maps) {
