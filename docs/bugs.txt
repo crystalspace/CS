@@ -1,0 +1,89 @@
+PROBLEM: Bots are unstable. Cause crashes often because of faulty collision detection.
+SOLUTION: probably rewrite them using CD system. However bug may be indicative
+of something internal which is wrong in CS since in principle the ad hoc
+CD method should work.
+DIFFICULTY: moderate
+
+PROBLEM: The missile sometimes gets stuck in the wall.
+SOLUTION: This is also due to broken collision detection which should
+be rewritten using the real CD system.
+DIFFICULTY: moderate
+
+PROBLEM: Lightmapping of curves is still a bit wrong.
+SOLUTION: further investigation is needed.
+DIFFICULTY: moderate
+
+PROBLEM: Lightmapping in Glide is still broken.
+SOLUTION: Don't know.
+DIFFICULTY: Moderate?
+
+PROBLEM: No halos in 8-bit and 32-bit display mode.
+SOLUTION: 32-bit display mode is easy. It just
+needs to be done. 8-bit is another matter.
+DIFFICULTY: easy to moderate
+
+PROBLEM: Halos are also missing in some 3D hardware accelerated drivers
+(OpenGL and Glide).
+SOLUTION: A more general solution (alpha mapped texture?) may solve all
+problems at once. Or else implement it ad hoc again.
+DIFFICULTY: moderate to hard
+
+PROBLEM: No fog in hardware accelerated renderers.
+SOLUTION: Either we need the solution with layered fog. Denis already
+sent me code for that but I found no time to integrate it yet. Paul G
+Allen is also working on fog in OpenGL.
+DIFFICULTY: moderate to hard
+
+PROBLEM: Semi-transparent textures (textures in which one color is completely
+transparent and the rest is opaque) only work correctly in 16-bit color. In
+32-bit color there is no transparancy and in 8-bit color there is only
+transparency in some cases.
+SOLUTION: For the 8-bit problem I suspect there is a problem in the texture
+cache here (maybe the difference between 'white light only' and 'general color').
+32-bit transparancy needs to be investigate.
+DIFFICULTY: easy
+
+PROBLEM: As far as I know the previously mentioned semi-transparent texture
+feature is also not supported by the 3D hardware accelerated drivers.
+SOLUTION: Look for a suitable solution.
+DIFFICULTY: moderate
+
+PROBLEM: There is no startup text in 8-bit display color.
+SOLUTION: Probably easy to fix. Just need to have a look.
+DIFFICULTY: easy
+
+PROBLEM: OpenGL and Glide don't support 2D text yet.
+SOLUTION: I believe Gary Haussman is busy implementing this for
+OpenGL.
+DIFFICULTY: moderate
+
+PROBLEM: AMD and K6 processors seem to have problems with CS?
+SOLUTION: No idea yet. This needs to be investigated. Does every AMD
+and K6 owner have problems?
+DIFFICULTY: moderate to hard?
+
+PROBLEM: Precalculated lighting needs to be rewritten. For example,
+reflection (with radiosity) on things does not work correctly.
+SOLUTION: Either depend on the new REMPES system. But in addition we
+will also want to rewrite the lighting routines so that things cast
+shadows using shadow volumes instead of the current ray tracing method.
+DIFFICULTY: hard
+
+PROBLEM: Turn on 'freelook' and look around in mirror.zip. After some time
+CS will crash while trying to draw a polygon.
+SOLUTION: No idea?
+DIFFICULTY: moderate?
+
+PROBLEM: MazeD only works in windowed mode (on Windows).
+SOLUTION: Rewrite buggy getpage() method in Windows renderer.
+DIFFICULTY: easy
+
+PROBLEM: Console only shows one line at a time in Windows.
+SOLUTION: Unless we find a better solution, we should introduce
+a system, where drivers can tell the engine what they can do,
+and what not. I have found a fix for the console that worked nice
+for me, but was a problem for Jorrit, so he removed it again. I
+think we could have a variant, that will do a complete update of
+the screen and one that will do a partial update.
+DIFFICULTY: moderate
+
