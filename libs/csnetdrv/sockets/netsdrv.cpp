@@ -104,7 +104,7 @@ bool csSocketEndPoint::ValidateSocket()
 bool csSocketEndPoint::PlatformSetBlocking(bool blocks)
 {
   unsigned long flag = (blocks ? 0 : 1);
-  return (CS_IOCTLSOCKET(Socket, FIONBIO, &flag) == -1);
+  return (CS_IOCTLSOCKET(Socket, FIONBIO, &flag) == 0);
 }
 
 #else
