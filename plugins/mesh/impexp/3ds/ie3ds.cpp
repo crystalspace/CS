@@ -154,22 +154,68 @@ const csModelConverterFormat *csModelConverter3ds::GetFormat( int idx ) const
 
 
 
-static void AddTexels(Lib3dsTexel * pCurTexel, int numTexels,
-	iModelDataVertices * Vertices)
+static void AddTexels(Lib3dsMesh *p3dsMesh,  
+		      int numTexels, iModelDataVertices * Vertices)
 {
   csVector2 texel;
   float tex1, tex2;
   int i;
+  Lib3dsVector bbmin;
+  Lib3dsVector bbmax;
+  float xdist, ydist, zdist;
 
   if (!numTexels)
   {
     // This means that the model doesn't contains UV coordinates so
     // we will use the default ones.
-    Vertices->AddTexel (csVector2 (0, 0));
+    /*Vertices->AddTexel (csVector2 (0, 0));
     Vertices->AddTexel (csVector2 (1, 0));
-    Vertices->AddTexel (csVector2 (1, 1));
+    Vertices->AddTexel (csVector2 (1, 1));*/
+
+    // do a planar mapping, onto the plane made up by the 
+    // axis of the two largest bounding box dimensions.
+    // looks interesting as well, and has nice side effect
+    // that the same vertex can not have different texture
+    // coordinates.
+    lib3ds_mesh_bounding_box (p3dsMesh, bbmin, bbmax);
+    xdist = bbmax[0] - bbmin[0];
+    ydist = bbmax[1] - bbmin[1];
+    zdist = bbmax[2] - bbmin[2];
+
+    int numVertices = p3dsMesh->points;
+    Lib3dsPoint *pCurPoint = p3dsMesh->pointL;
+
+    if ((xdist > zdist) && (ydist > zdist))
+    {
+      for (i = 0; i < numVertices; i++)
+      {
+	Vertices->AddTexel (csVector2 ((pCurPoint->pos[0]  - bbmin[0])/ xdist,
+	  (pCurPoint->pos[1]  - bbmin[1])/ ydist));
+	pCurPoint++;
+      }
+    }
+    else if ((ydist > xdist) && (zdist > xdist))
+    {
+      for (i = 0; i < numVertices; i++)
+      {
+	Vertices->AddTexel (csVector2 ((pCurPoint->pos[1] - bbmin[1]) / ydist,
+	  (pCurPoint->pos[2] - bbmin[2]) / zdist));
+	pCurPoint++;
+      }
+    } 
+    else
+    {
+      for (i = 0; i < numVertices; i++)
+      {
+	Vertices->AddTexel (csVector2 ((pCurPoint->pos[0] - bbmin[0]) / xdist,
+	  (pCurPoint->pos[2]  - bbmin[2])/ zdist));
+	pCurPoint++;
+      }
+    }
+
     return;
   };
+  Lib3dsTexel *pCurTexel = p3dsMesh->texelL;
   for(i = 0; i < numTexels; i++)
   {
      tex1 = pCurTexel[0][0];
@@ -266,10 +312,10 @@ static void LoadTriangles (iModelDataObject *pDataObject,
 	{
 	  index = pCurFace->points[j];
 	  // now add the vertex
-	  if(hasTexels) 
+//	  if(hasTexels) 
 	    pCurPoly->AddVertex(index, normindex , 0, index);
-	  else 
-	    pCurPoly->AddVertex(index, normindex , 0, j);
+//	  else 
+//	    pCurPoly->AddVertex(index, normindex , 0, j);
 	  }
       }
     }
@@ -314,10 +360,10 @@ static void LoadTriangles (iModelDataObject *pDataObject,
 	  adj_faces[index]->Get(firstadjface).normal = normindex;
 	}
 	// now add the vertex
-	if(hasTexels) 
+//	if(hasTexels) 
 	  pCurPoly->AddVertex(index, normindex, 0, index);
-	else 
-	  pCurPoly->AddVertex(index, normindex, 0, j);
+//	else 
+//	  pCurPoly->AddVertex(index, normindex, 0, j);
         if (pCurMat && pCurMat->two_sided)
 	  backnormal[j] = -normal;
       }
@@ -331,10 +377,10 @@ static void LoadTriangles (iModelDataObject *pDataObject,
 	  index = pCurFace->points[j];
 	  normindex = Vertices->AddNormal (backnormal[j]);
 	  // now add the vertex
-	  if(hasTexels) 
+//	  if(hasTexels) 
 	    pCurPoly->AddVertex(index, normindex , 0, index);
-	  else 
-	    pCurPoly->AddVertex(index, normindex , 0, j);
+//	  else 
+//	    pCurPoly->AddVertex(index, normindex , 0, j);
 	  }
       }
     }
@@ -485,20 +531,18 @@ bool csModelConverter3ds::LoadMeshObjectData( iModelDataObject *pDataObject,
 
   //  load up the vertices
   Lib3dsPoint *pCurPoint;
-  Lib3dsTexel *pCurTexel;
   float *xyz;
   csVector3 vertex;
 
   int numTexels = p3dsMesh->texels;
 
   pCurPoint = p3dsMesh->pointL;
-  pCurTexel = p3dsMesh->texelL;
 
   // add a dummy normal, white as the default color and three default texels
   //Vertices->AddNormal (csVector3 (0, 0, 0));
   Vertices->AddColor (csColor (1, 1, 1));
 
-  AddTexels(pCurTexel,numTexels,Vertices);
+  AddTexels(p3dsMesh,numTexels,Vertices);
 
 
   for ( i = 0 ; i < numVertices ; i++ )
