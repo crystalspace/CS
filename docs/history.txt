@@ -44,6 +44,8 @@ chronological order.
 	  performs a wildcard for all of the common source and header
 	  extensions (C, C++, Objective-C), rather than searching only for
 	  *.cpp and *.h.
+	- Vincent Knecht updated rpm.txi manual page: --with newrenderer
+	  switch has changed to --with oldrenderer.
 28-Nov-2004
 	- Eric Sunshine made the new-renderer the default. Users wanting to use
 	  the old-renderer must select it manually.
