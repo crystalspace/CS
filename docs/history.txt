@@ -8,6 +8,8 @@ chronological order.
 
 17-Nov-2003
 	- Jorrit removed obsolete bits64.h from Dynavis.
+	- Jorrit performed additional micro-optimizations in the coverage
+	  routines of Dynavis.
 16-Nov-2003
 	- Eric Sunshine fixed bug in make and Jam `install' targets where they
 	  neglected to install the generated volatile.h if the build directory

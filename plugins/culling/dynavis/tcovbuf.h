@@ -35,6 +35,9 @@
 #define NUM_DEPTHCOL (NUM_TILECOL/8)
 #define NUM_DEPTH (NUM_DEPTHROW * NUM_DEPTHCOL)
 
+#define TILECOL_EMPTY 0
+#define TILECOL_FULL ((uint32)~0)
+
 typedef uint32 csTileCol;
 
 /**
