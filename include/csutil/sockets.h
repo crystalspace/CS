@@ -73,8 +73,12 @@ typedef unsigned int csNetworkSocket;
 // Platforms which supply a socklen_t type should define CS_HAVE_SOCKLEN_T.
 // Note that we invoke the typedef only if some other entity has not already
 // #defined socklen_t, since the #define would cause problems (for example,
-//  `typedef int int').
-#if !defined(CS_HAVE_SOCKLEN_T) && !defined(socklen_t)
+// `typedef int int'). Some system-supplied headers will #define
+// __socklen_t_defined if the socklen_t typedef has already been setup, so we
+// check that as well.
+#if !defined(CS_HAVE_SOCKLEN_T) && \
+    !defined(socklen_t) && \
+    !defined(__socklen_t_defined)
   typedef int socklen_t;
 #endif
 

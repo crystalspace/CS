@@ -2066,8 +2066,8 @@ CS_CHECK_BUILD([for socket support], [cs_cv_sys_socket],
 
 AS_IF([test $cs_cv_sys_socket = yes],
     [AC_CHECK_TYPE([socklen_t],
+	[CS_HEADER_PROPERTY([CS_HAVE_SOCKLEN_T])],
 	[],
-	[CS_HEADER_PROPERTY([CS_USE_FAKE_SOCKLEN_TYPE])],
 	[[#if HAVE_UNISTD_H
 	#include <unistd.h>
 	#endif

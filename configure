@@ -54564,9 +54564,7 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_type_socklen_t" >&5
 echo "${ECHO_T}$ac_cv_type_socklen_t" >&6
 if test $ac_cv_type_socklen_t = yes; then
-  :
-else
-  cs_header_text="${cs_header_text}#define CS_USE_FAKE_SOCKLEN_TYPE
+  cs_header_text="${cs_header_text}#define CS_HAVE_SOCKLEN_T
 "
 fi
 
