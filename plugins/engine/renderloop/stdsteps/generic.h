@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2003 by Jorrit Tyberghein
 	      (C) 2003 by Frank Richter
+              (C) 2003 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -29,6 +30,8 @@
 #include "ivideo/rendersteps/igeneric.h"
 #include "ivideo/rendersteps/ilightiter.h"
 #include "ivideo/shader/shader.h"
+
+#include "cstool/rendermeshlist.h"
 
 #include "../common/basesteptype.h"
 #include "../common/basesteploader.h"
@@ -77,22 +80,25 @@ private:
   bool zOffset;
   csZBufMode zmode;
   csRef<iStringSet> strings;
+  iObjectRegistry *objreg;
 
-  // @@@ Veeery rough
+  // helperclass for the visculling. this creates a list
+  // of meshes, which we later render
   class ViscullCallback : public iVisibilityCullerListener
   {
-    iGraphics3D* g3d;
-    csStringID shadertype;
-    iRenderView* rview;
   public:
     SCF_DECLARE_IBASE;
 
-    ViscullCallback (iGraphics3D* g3d, csStringID shadertype, 
-      iRenderView* rview);
+    ViscullCallback (iRenderView* rview, iObjectRegistry* objreg);
     virtual ~ViscullCallback () {}
 
     void ObjectVisible (iVisibilityObject *visobject, 
       iMeshWrapper *mesh);
+
+    csRenderMeshList meshList;
+
+  private:
+    iRenderView* rview;
   };
 
 public:

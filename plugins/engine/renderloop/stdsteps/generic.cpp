@@ -1,6 +1,7 @@
 /*
     Copyright (C) 2003 by Jorrit Tyberghein
 	      (C) 2003 by Frank Richter
+              (C) 2003 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -155,6 +156,8 @@ csGenericRenderStep::csGenericRenderStep (
 {
   SCF_CONSTRUCT_IBASE(0);
 
+  objreg = object_reg;
+
   strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
     "crystalspace.renderer.stringset", iStringSet);
 
@@ -175,6 +178,8 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
   if (num == 0) return;
 
   iShaderTechnique *tech = shader->GetShader()->GetBestTechnique ();
+
+  if (tech == 0) return;
 
   for (int p=0; p<tech->GetPassCount (); p++)
   {
@@ -217,8 +222,49 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
 
   iVisibilityCuller* viscull = sector->GetVisibilityCuller ();
   // @@@ Don't alloc/dealloc every frame!
-  ViscullCallback* callback = new ViscullCallback (g3d, shadertype, rview);
+  ViscullCallback* callback = new ViscullCallback (rview, objreg);
   viscull->VisTest (rview, callback);
+  
+  //draw
+  int num;
+  csRenderMesh** meshes = callback->meshList.GetSortedMeshList (num);
+   
+  CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, num);
+  int numSSM = 0;
+  iShaderWrapper* shader = 0;
+
+  for (int n = 0; n < num; n++)
+  {
+    csRenderMesh* mesh = meshes[n];
+
+    iShaderWrapper* meshShader = 
+      mesh->material->GetMaterialHandle()->GetShader(shadertype);
+    if (meshShader != shader)
+    {
+      // @@@ Need error reporter
+      if (shader != 0)
+      {
+        csGenericRenderStep::RenderMeshes (g3d, shader, sameShaderMeshes, 
+        numSSM);
+      }
+
+      shader = meshShader;
+      numSSM = 0;
+    }
+    sameShaderMeshes[numSSM++] = mesh;
+  }
+  
+  if (numSSM != 0)
+  {
+    // @@@ Need error reporter
+    if (shader != 0)
+    {
+      csGenericRenderStep::RenderMeshes (g3d, shader, sameShaderMeshes, 
+      numSSM);
+    }
+  }
+   
+  delete[] meshes;
   delete callback;
 
   //g3d->SetShadowState (CS_SHADOW_VOLUME_FINISH);
@@ -263,13 +309,11 @@ csZBufMode csGenericRenderStep::GetZBufMode ()
   return zmode;
 }
 
-csGenericRenderStep::ViscullCallback::ViscullCallback (iGraphics3D* g3d, 
-						       csStringID shadertype,
-						       iRenderView* rview)
+csGenericRenderStep::ViscullCallback::ViscullCallback (iRenderView *rview, 
+                                                       iObjectRegistry *objreg)
+                                                       : meshList (objreg)
 {
   SCF_CONSTRUCT_IBASE(0);
-  ViscullCallback::g3d = g3d;
-  ViscullCallback::shadertype = shadertype;
   ViscullCallback::rview = rview;
 }
 
@@ -280,7 +324,9 @@ void csGenericRenderStep::ViscullCallback::ObjectVisible (
 
   int num;
   csRenderMesh** meshes = mesh->GetRenderMeshes (num);
-  CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, num);
+  meshList.AddRenderMeshes (meshes, num, mesh->GetRenderPriority ());
+
+  /*CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, num);
   int numSSM = 0;
   iShaderWrapper* shader = 0;
 
@@ -314,5 +360,5 @@ void csGenericRenderStep::ViscullCallback::ObjectVisible (
     }
   }
 
-  
+  */
 }
