@@ -77,32 +77,42 @@ struct iBallState : public iBase
   /// Test if cylindrical texture mapping is used.
   virtual bool IsCylindricalMapping () const = 0;
 
-  /** Set the colours of the dome to a gradient, vertically.
-   *  the horizon_height is 0, the zenith_height is 1,
-   *  the gradient is then interpolated to get the colour.
-   *  The gradient is specified using a float**, where entry
-   *  gradient[nr] is an array of 4 elements {height, r, g, b}.
-   *  The entries must be in sorted order, low to high. End with a NULL
-   *  e.g. (0.0, 100.0, { {0.0, 1,0,1}, {1.0, 0,0,0}, 0} for a 
-   *  gradient from purple to black.
+  /** 
+   * Set the colours of the dome to a gradient, vertically.
+   * the horizon_height is 0, the zenith_height is 1,
+   * the gradient is then interpolated to get the colour.
+   * The gradient is specified using a float**, where entry
+   * gradient[nr] is an array of 4 elements {height, r, g, b}.
+   * The entries must be in sorted order, low to high. End with a NULL
+   * e.g. (0.0, 100.0, { {0.0, 1,0,1}, {1.0, 0,0,0}, 0} for a 
+   * gradient from purple to black.
    */ 
   virtual void ApplyVertGradient(float horizon_height, float zenith_height,
     float** gradient) = 0;
 
-  /** Create a lightspot on the colours of the dome.
-   *  The position indicates the direction of center of the lightspot
-   *  wrt. the center of the ball mesh.
-   *  The size gives the size of the spot, 1.0 for the sun.
-   *  The gradient is used to get the colours for the lightspot.
-   *  pass NULL for a sunlike gradient.
+  /** 
+   * Create a lightspot on the colours of the dome.
+   * The position indicates the direction of center of the lightspot
+   * wrt. the center of the ball mesh.
+   * The size gives the size of the spot, 1.0 for the sun.
+   * The gradient is used to get the colours for the lightspot.
+   * pass NULL for a sunlike gradient.
    */
   virtual void ApplyLightSpot(const csVector3& position, float size,
     float **gradient) = 0;
 
-  /** Animate the ball as a skydome for earth.
-   *  Give a time - from 0.0 to 1.0.
-   *   0.0 is sunrise, daytime after, 0.5 is sunset, night following.
-   *  If you pass NULL for the gradients, a default will be used.
+  /** 
+   * Animate the ball as a skydome for earth.
+   * Give a time - from 0.0 to 1.0.
+   * 0.0 is sunrise, daytime after, 0.5 is sunset, night following.
+   * If you pass NULL for the gradients, a default will be used.
+   * Note that both dayvert=nightvert and topsun=sunset, and only
+   * the colors can be different in them. Thus those pairs must be
+   * of the same length, and have the same interpolation values.
+   * This condition can be satisfied for any pair of gradients, by
+   * inserting points in one into the other with the interpolated
+   * color of the other. Thus the gradient pairs are identical, save
+   * for the r,g,b values.
    */
   virtual void PaintSky(float time, float **dayvert, float **nightvert,
     float **topsun, float **sunset) = 0;
