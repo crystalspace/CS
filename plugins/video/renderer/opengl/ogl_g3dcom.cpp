@@ -1919,7 +1919,6 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
 {
   if (queue.num_triangles <= 0) return;
 
-  int i, j;
   csMaterialHandle* mat_handle = (csMaterialHandle*)queue.mat_handle;
   iTextureHandle* txt_handle = NULL;
   csTextureHandleOpenGL *txt_mm = NULL;
@@ -2035,13 +2034,12 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   //=================
   if (multimat)
   {
-    for (j = 0 ; j < mat_handle->GetTextureLayerCount () ; j++)
+    int j, i;
+    for (j = 0; j < mat_handle->GetTextureLayerCount (); j++)
     {
       csTextureLayer* layer = mat_handle->GetTextureLayer (j);
-      iTextureHandle* txt_handle = layer->txt_handle;
-      csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *)
-        txt_handle->GetPrivateObject ();
-      csTxtCacheData *texturecache_data;
+      txt_handle = layer->txt_handle;
+      txt_mm = (csTextureHandleOpenGL *)txt_handle->GetPrivateObject ();
       texturecache_data = (csTxtCacheData *)txt_mm->GetCacheData ();
       tex_transp = txt_mm->GetKeyColor () || txt_mm->GetAlphaMap ();
       GLuint texturehandle = texturecache_data->Handle;
@@ -2059,10 +2057,10 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
         float vscale = layer->vscale;
         float ushift = layer->ushift;
         float vshift = layer->vshift;
-        for (i = 0 ; i < queue.num_vertices ; i++)
+        for (i = 0; i < queue.num_vertices; i++)
         {
-	  *dst++ = (*src++) * uscale + ushift;
-	  *dst++ = (*src++) * vscale + vshift;
+          *dst++ = (*src++) * uscale + ushift;
+          *dst++ = (*src++) * vscale + vshift;
         }
 
         p_gltxt = queue.layer_gltxt;
