@@ -12,10 +12,14 @@ chronological order.
 	  Added documentation.  Minor whitespace cleanup.  Re-generated
 	  configure script with Autoconf 2.57 on Unix to fix formatting of
 	  --help, which Windows Autoconf messes up.
+	- Jorrit added csStrKey which can be used as a simple key type for
+	  usage with csHash and csConstCharHashKeyHandler. csStrKey makes
+	  a copy of the key so it is safer to use then just using
+	  const char* as the key.
 23-Nov-2003
-        - Matze fixed jam clean target for libraries
+        - Matze fixed jam clean target for libraries.
         - Matze fixed a bug when SubInclude rule was placed in the middle of a
-          jam file
+          jam file.
 22-Nov-2003
 	- res made the following changes to configure:
 	    - Now checks for a 'cslibs-config' script, which provide 

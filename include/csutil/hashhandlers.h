@@ -26,13 +26,15 @@
 
 #include "csutil/hash.h"
 #include "csutil/ref.h"
+#include "csutil/util.h"
 
 /**
  * A hash key handler for const char* strings.
  * It uses strcmp () to compare two strings, so using this key handler is safe
  * even if two strings have the same hash key.
  * \remark Be aware that this key handler does NOT allocate any copies of the
- *  keys!
+ * keys! If you want to make copies then you can use csStrKey as the type
+ * of the key instead of const char*.
  */
 class csConstCharHashKeyHandler
 {
@@ -46,6 +48,23 @@ public:
   {
     return (strcmp (key1, key2) == 0);
   }
+};
+
+/**
+ * This is a simple helper class to make a copy of a const char*.
+ * This can be used together with csConstCharHashKeyHandler to have a hash that
+ * makes copies of the keys.
+ */
+class csStrKey
+{
+private:
+  char* str;
+
+public:
+  csStrKey (const char* s) { str = csStrNew (s); }
+  csStrKey (const csStrKey& c) { str = csStrNew (c.str); }
+  ~csStrKey () { delete[] str; }
+  operator const char* () const { return str; }
 };
 
 /**
