@@ -94,28 +94,8 @@ csNullmeshMeshObject::~csNullmeshMeshObject ()
   SCF_DESTRUCT_IBASE ();
 }
 
-bool csNullmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
+bool csNullmeshMeshObject::DrawTest (iRenderView*, iMovable*, uint32)
 {
-  iCamera* camera = rview->GetCamera ();
-
-  // First create the transformation from object to camera space directly:
-  //   W = Mow * O - Vow;
-  //   C = Mwc * (W - Vwc)
-  // ->
-  //   C = Mwc * (Mow * O - Vow - Vwc)
-  //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  csReversibleTransform tr_o2c = camera->GetTransform ();
-  if (!movable->IsFullTransformIdentity ())
-    tr_o2c /= movable->GetFullTransform ();
-
-  csSphere sphere;
-  sphere.SetCenter (csVector3 (0, 0, 0));
-  sphere.SetRadius (radius);
-  int clip_portal, clip_plane, clip_z_plane;
-  csVector3 camera_origin;
-  if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-  	clip_z_plane, camera_origin) == false)
-    return false;
   return true;
 }
 

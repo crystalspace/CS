@@ -133,7 +133,8 @@ class csStuffObject : public iMeshObject
     // -----------------------| BEGIN MeshObject Impl
     // |-------------------------------//
     virtual csFlags& GetFlags () { return flags; }
-    virtual bool    DrawTest(iRenderView * rview, iMovable * movable);
+    virtual bool    DrawTest(iRenderView * rview, iMovable * movable,
+    	uint32 frustum_mask);
     virtual csRenderMesh **GetRenderMeshes (int & n,iRenderView*, 
       iMovable*, uint32) { n = 0; return 0; }
     virtual bool    Draw(iRenderView * rview, iMovable * movable,

@@ -312,7 +312,8 @@ void csParticlesObject::SetParticleRadius (float rad)
   }
 }
 
-bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
+bool csParticlesObject::DrawTest (iRenderView*, iMovable*,
+	uint32)
 {
   return true;
 }

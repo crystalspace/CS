@@ -354,10 +354,10 @@ const csArray<iLight*>& csMeshWrapper::GetRelevantLights (int /*maxLights*/,
   return relevant_lights;
 }
 
-void csMeshWrapper::Draw (iRenderView *rview)
+void csMeshWrapper::Draw (iRenderView *rview, uint32 frustum_mask)
 {
   if (flags.Check (CS_ENTITY_INVISIBLEMESH)) return;
-  DrawInt (rview);
+  DrawInt (rview, frustum_mask);
 }
 
 csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview, 
@@ -486,13 +486,13 @@ void csMeshWrapper::AddMeshToStaticLOD (int lod, iMeshWrapper* mesh)
 
 //---------------------------------------------------------------------------
 
-void csMeshWrapper::DrawInt (iRenderView *rview)
+void csMeshWrapper::DrawInt (iRenderView *rview, uint32 frustum_mask)
 {
   if (imposter_active && CheckImposterRelevant (rview))
     if (DrawImposter (rview))
       return;
 
-  DrawIntFull (rview);
+  DrawIntFull (rview, frustum_mask);
 }
 
 bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
@@ -502,7 +502,7 @@ bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
   return (wor_sq_dist > dist*dist);
 }
 
-void csMeshWrapper::DrawIntFull (iRenderView *rview)
+void csMeshWrapper::DrawIntFull (iRenderView *rview, uint32 frustum_mask)
 {
   iMeshWrapper *meshwrap = &scfiMeshWrapper;
 
@@ -517,7 +517,7 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview)
     i--;
   }
 
-  if (meshobj->DrawTest (rview, &movable.scfiMovable))
+  if (meshobj->DrawTest (rview, &movable.scfiMovable, frustum_mask))
   {
     csTicks lt = csEngine::current_engine->GetLastAnimationTime ();
     if (lt != 0)

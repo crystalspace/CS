@@ -53,7 +53,7 @@ void csMeshObject::WantToDie ()
   }
 }
 
-bool csMeshObject::DrawTest (iRenderView*, iMovable*)
+bool csMeshObject::DrawTest (iRenderView*, iMovable*, uint32)
 {
   return true;
 }

@@ -235,7 +235,8 @@ public:
 
   virtual iMeshObjectFactory* GetFactory () const { return factory; }
   virtual csFlags& GetFlags () { return flags; }
-  virtual bool DrawTest (iRenderView* rview, iMovable* movable);
+  virtual bool DrawTest (iRenderView* rview, iMovable* movable,
+  	uint32 frustum_mask);
   virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview,
     iMovable* movable, uint32 frustum_mask);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);

@@ -56,7 +56,7 @@ csShadow::~csShadow ()
   SCF_DESTRUCT_IBASE ();
 }
 
-bool csShadow::DrawTest (iRenderView* rview, iMovable*)
+bool csShadow::DrawTest (iRenderView* rview, iMovable*, uint32)
 {
   if (!shadow_mesh) return false;
   // See if we are in the same sector as the mesh.

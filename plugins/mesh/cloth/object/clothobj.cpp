@@ -180,7 +180,8 @@ csStuffObject::~csStuffObject()
   SCF_DESTRUCT_IBASE();
 };
 
-bool csStuffObject::DrawTest(iRenderView *rview, iMovable *movable) 
+bool csStuffObject::DrawTest(iRenderView *rview, iMovable *movable,
+	uint32 frustum_mask) 
 {
   //printf(" draw test \n");
   // SetupMesh();
@@ -189,19 +190,10 @@ bool csStuffObject::DrawTest(iRenderView *rview, iMovable *movable)
   csReversibleTransform tr_o2c = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
-  csVector3 radius;
-  csSphere sphere;
-  GetRadius (radius, sphere.GetCenter ());
-  float max_radius = radius.x;
-  if (max_radius < radius.y) max_radius = radius.y;
-  if (max_radius < radius.z) max_radius = radius.z;
-  sphere.SetRadius (max_radius);
   
   int clip_portal, clip_plane, clip_z_plane;
-  csVector3 camera_origin;
-  if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-  	clip_z_plane, camera_origin) == false)
-    return false;
+  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
+  	clip_z_plane);
 
   iGraphics3D* g3d = rview->GetGraphics3D ();
   g3d->SetObjectToCamera (&tr_o2c);

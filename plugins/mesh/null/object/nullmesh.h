@@ -74,7 +74,7 @@ public:
     return (iMeshObjectFactory*)factory;
   }
   virtual csFlags& GetFlags () { return object_flags; }
-  virtual bool DrawTest (iRenderView* rview, iMovable* movable);
+  virtual bool DrawTest (iRenderView* rview, iMovable* movable, uint32);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {

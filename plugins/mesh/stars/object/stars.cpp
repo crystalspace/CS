@@ -88,7 +88,7 @@ void csStarsMeshObject::SetupObject ()
   }
 }
 
-bool csStarsMeshObject::DrawTest (iRenderView*, iMovable*)
+bool csStarsMeshObject::DrawTest (iRenderView*, iMovable*, uint32)
 {
   SetupObject ();
   return true;

@@ -867,9 +867,6 @@ bool csBezierMesh::DrawCurves (
     csBox2 sbox;
     if (c->GetScreenBoundingBox (obj_cam, icam, cbox, sbox) < 0)
       continue;                                 // Not visible.
-    int clip_portal, clip_plane, clip_z_plane;
-    if (!rview->ClipBBox (sbox, cbox, clip_portal, clip_plane, clip_z_plane))
-      continue;                                 // Not visible.
 
     // If we have a dirty lightmap recombine the curves and the shadow maps.
     bool updated_lm = c->RecalculateDynamicLights ();
@@ -926,28 +923,18 @@ bool csBezierMesh::DrawCurves (
   return true;                                  //@@@ RETURN correct vis info
 }
 
-bool csBezierMesh::DrawTest (iRenderView *rview, iMovable *movable)
+bool csBezierMesh::DrawTest (iRenderView *rview, iMovable *movable,
+	uint32 frustum_mask)
 {
   Prepare ();
-
-  iCamera *icam = rview->GetCamera ();
-  const csReversibleTransform &camtrans = icam->GetTransform ();
 
   // Only get the transformation if this thing can move.
   cached_movable = movable;
   WorUpdate ();
 
-  csBox3 b;
-  GetBoundingBox (b);
-
-  csSphere sphere;
-  sphere.SetCenter (b.GetCenter ());
-  sphere.SetRadius (static_data->max_obj_radius);
-  csReversibleTransform tr_o2c = camtrans;
-  if (!movable->IsFullTransformIdentity ())
-    tr_o2c /= movable->GetFullTransform ();
-  bool rc = rview->TestBSphere (tr_o2c, sphere);
-  return rc;
+  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
+  	clip_z_plane);
+  return true;
 }
 
 bool csBezierMesh::Draw (iRenderView *rview, iMovable *movable,

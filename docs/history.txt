@@ -25,6 +25,20 @@ chronological order.
 	- Jorrit removed the 'camera' flag for render priorities in the
 	  engine and the loader. The keyword is still recognized by the loader
 	  but only a deprecated warning is given.
+	- Jorrit modified RenderQueues for OR so that it also keeps the
+	  frustum_mask. That way we can finally pass along the frustum_mask
+	  to the meshes and use the same kind of clipping as is now
+	  present in NR.
+	- Jorrit removed iMeshWrapper::Draw(). This is not useful to have
+	  as it is OR specific and only the engine is really capable of
+	  drawing meshes.
+	- Jorrit extended iMeshObject->DrawTest() with a frustum_mask
+	  parameter (OR only).
+	- Jorrit changed all mesh objects to use the new frustum_mask in OR
+	  too.
+	- Jorrit fixed the NR GetRenderMeshes() for the portal container class
+	  so that it no longer ignores the movable transform. Moving portals
+	  simply didn't work with NR.
 	- Neil Mosafi added forward declare for iGraphics3D to 
 	  ivideo/custcursor.h
 25-Apr-2004

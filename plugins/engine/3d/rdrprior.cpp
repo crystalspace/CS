@@ -40,7 +40,7 @@ void csRenderQueueSet::ClearVisible ()
       visible[i]->SetLength (0);
 }
 
-void csRenderQueueSet::AddVisible (iMeshWrapper *mesh)
+void csRenderQueueSet::AddVisible (csMeshWrapper *mesh, uint32 frustum_mask)
 {
   long pri = mesh->GetRenderPriority ();
 
@@ -52,18 +52,18 @@ void csRenderQueueSet::AddVisible (iMeshWrapper *mesh)
   // look if the desired queue exists, and create it if not
   if (!visible[pri])
   {
-    csArrayMeshPtr* mvnd = new csArrayMeshPtr ();
+    csArrayMeshMask* mvnd = new csArrayMeshMask ();
     visible.Put (pri, mvnd);
   }
 
   // add the mesh wrapper
-  visible[pri]->Push (mesh);
+  visible[pri]->Push (csMeshWithMask (mesh, frustum_mask));
 }
 
 struct comp_mesh_comp
 {
   float z;
-  iMeshWrapper *mesh;
+  csMeshWithMask mesh_with_mask;
 };
 
 typedef csDirtyAccessArray<comp_mesh_comp> engine3d_comp_mesh_z;
@@ -81,35 +81,26 @@ static int comp_mesh (const void *el1, const void *el2)
     return 0;
 }
 
-iMeshWrapper** csRenderQueueSet::SortAll (iRenderView* rview,
-	int& tot_num, uint32 current_visnr)
+void csRenderQueueSet::SortAll (csArrayMeshMask& meshes, iRenderView* rview)
 {
-  tot_num = 0;
-
   int tot_objects = 0;
   int priority;
   for (priority = 0 ; priority < visible.Length () ; priority++)
   {
     Sort (rview, priority);
-    csArrayMeshPtr* v = visible[priority];
+    csArrayMeshMask* v = visible[priority];
     if (v)
       tot_objects += v->Length ();
   }
-  if (!tot_objects) return 0;
+  if (!tot_objects) return;
 
-  iMeshWrapper** meshes = new iMeshWrapper* [tot_objects];
   for (priority = 0 ; priority < visible.Length () ; priority++)
   {
-    csArrayMeshPtr* v = visible[priority];
+    csArrayMeshMask* v = visible[priority];
     if (v)
       for (int i = 0 ; i < v->Length () ; i++)
-      {
-        iMeshWrapper *sp = v->Get (i);
-        meshes[tot_num++] = sp;
-      }
+        meshes.Push ((*v)[i]);
   }
-
-  return meshes;
 }
 
 void csRenderQueueSet::Sort (iRenderView *rview, int priority)
@@ -121,7 +112,7 @@ void csRenderQueueSet::Sort (iRenderView *rview, int priority)
       priority);
   if (rendsort == CS_RENDPRI_NONE) return ;
 
-  csArrayMeshPtr *v = visible[priority];
+  csArrayMeshMask *v = visible[priority];
   if (v->Length () > comp_mesh_z.Length ())
     comp_mesh_z.SetLength (v->Length ());
 
@@ -129,7 +120,8 @@ void csRenderQueueSet::Sort (iRenderView *rview, int priority)
   int i;
   for (i = 0; i < v->Length (); i++)
   {
-    iMeshWrapper *mesh = v->Get (i);
+    csMeshWithMask& mesh_with_mask = v->Get (i);
+    csMeshWrapper *mesh = mesh_with_mask.mesh;
     csVector3 rad, cent;
     mesh->GetRadius (rad, cent);
 
@@ -141,7 +133,7 @@ void csRenderQueueSet::Sort (iRenderView *rview, int priority)
     comp_mesh_z[i].z = rendsort == CS_RENDPRI_FRONT2BACK
     	? tr_cent.z
 	: -tr_cent.z;
-    comp_mesh_z[i].mesh = mesh;
+    comp_mesh_z[i].mesh_with_mask = mesh_with_mask;
   }
 
   qsort (
@@ -152,7 +144,7 @@ void csRenderQueueSet::Sort (iRenderView *rview, int priority)
 
   for (i = 0; i < v->Length (); i++)
   {
-    (*v)[i] = comp_mesh_z[i].mesh;
+    (*v)[i] = comp_mesh_z[i].mesh_with_mask;
   }
 
   return ;

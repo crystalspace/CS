@@ -423,7 +423,7 @@ void csIsoMeshSprite::Draw(iIsoRenderView *rview)
   csIsoFakeRenderView *fakerview = new csIsoFakeRenderView();
   fakerview->SetIsoData(rview, fakecam);
 
-  if (mesh->DrawTest (fakerview, movable))
+  if (mesh->DrawTest (fakerview, movable, 0xff))	// @@@ Fake!
   {
     if (mesh->Draw (fakerview, movable, zbufmode))
     {

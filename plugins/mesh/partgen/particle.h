@@ -186,7 +186,8 @@ public:
   virtual iMeshObjectFactory* GetFactory () const;
 
   /// quick visibility test
-  virtual bool DrawTest (iRenderView* rview, iMovable* movable);
+  virtual bool DrawTest (iRenderView* rview, iMovable* movable,
+  	uint32 frustum_mask);
   virtual csRenderMesh** GetRenderMeshes (int& n, iRenderView* rview, 
     iMovable* movable, uint32 frustum_mask);
 

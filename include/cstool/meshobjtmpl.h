@@ -101,7 +101,8 @@ public:
    * See imesh/object.h for specification. The default implementation
    * does nothing and always returns true.
    */
-  virtual bool DrawTest (iRenderView* rview, iMovable* movable);
+  virtual bool DrawTest (iRenderView* rview, iMovable* movable,
+  	uint32 frustum_mask);
 
   /**
    * See imesh/object.h for specification. The default implementation

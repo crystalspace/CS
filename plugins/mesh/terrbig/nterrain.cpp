@@ -753,15 +753,16 @@ void csBigTerrainObject::InitMesh (nTerrainInfo *info)
   info->GetMesh()->vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
 }
 
-bool csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
+bool csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable,
+	uint32 frustum_mask)
 {
   if (terrain)
   {
     iCamera* cam = rview->GetCamera ();
 
-	csReversibleTransform tr_o2c = cam->GetTransform ();
-	tr_o2c /= movable->GetFullTransform ();
-    terrain->SetObjectToCamera(tr_o2c);
+    csReversibleTransform tr_o2c = cam->GetTransform ();
+    tr_o2c /= movable->GetFullTransform ();
+    terrain->SetObjectToCamera (tr_o2c);
     csBox3 bbox;
     GetObjectBoundingBox (bbox);
     terrain->AssembleTerrain(rview, movable, info, bbox);
@@ -778,20 +779,12 @@ bool csBigTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
       info->GetMesh()->mixmode = 0;
     }
 
-	csVector3 radius;
-	csSphere sphere;
-    GetRadius (radius, sphere.GetCenter());
-	float max_radius = (radius.x > radius.y) ? radius.x : radius.y;
-	max_radius = (max_radius > radius.z) ? max_radius : radius.z;
-	sphere.SetRadius (max_radius);
-	int clip_portal, clip_plane, clip_z_plane;
-	csVector3 camera_origin;
-	if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-	  clip_z_plane, camera_origin) == false)
-	  return false;
-	info->GetMesh()->clip_portal = clip_portal;
-	info->GetMesh()->clip_plane = clip_plane;
-	info->GetMesh()->clip_z_plane = clip_z_plane;
+    int clip_portal, clip_plane, clip_z_plane;
+    rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
+	  clip_z_plane);
+    info->GetMesh()->clip_portal = clip_portal;
+    info->GetMesh()->clip_plane = clip_plane;
+    info->GetMesh()->clip_z_plane = clip_z_plane;
     if (light_mgr)
     {
       const csArray<iLight*>& relevant_lights = light_mgr

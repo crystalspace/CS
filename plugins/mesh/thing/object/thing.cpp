@@ -2124,6 +2124,7 @@ void csThing::DrawPolygonArrayDPM (
   iMovable *movable,
   csZBufMode zMode)
 {
+#ifndef CS_USE_NEW_RENDERER
   PreparePolygonBuffer ();
 
   iCamera *icam = rview->GetCamera ();
@@ -2132,15 +2133,9 @@ void csThing::DrawPolygonArrayDPM (
     tr_o2c /= movable->GetFullTransform ();
 
   G3DPolygonMesh mesh;
-  csVector3 radius;
-  csSphere sphere;
-  static_data->GetRadius (radius, sphere.GetCenter ());
-  sphere.SetRadius (static_data->max_obj_radius);
-  csVector3 camera_origin;
-  if (rview->ClipBSphere (tr_o2c, sphere, mesh.clip_portal, mesh.clip_plane,
-  	mesh.clip_z_plane, camera_origin) == false)
-    return;	// Not visible.
-
+  mesh.clip_portal = clip_portal;
+  mesh.clip_plane = clip_plane;
+  mesh.clip_z_plane = clip_z_plane;
   rview->GetGraphics3D ()->SetObjectToCamera (&tr_o2c);
   rview->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zMode);
 
@@ -2159,6 +2154,7 @@ void csThing::DrawPolygonArrayDPM (
 
   rview->CalculateFogMesh (tr_o2c,mesh);
   rview->GetGraphics3D ()->DrawPolygonMesh (mesh);
+#endif
 }
 
 void csThing::InvalidateMaterialHandles ()
@@ -2388,45 +2384,21 @@ void PolyMeshHelper::ForceCleanup ()
 
 //-------------------------------------------------------------------------
 
-bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
+bool csThing::DrawTest (iRenderView *rview, iMovable *movable,
+	uint32 frustum_mask)
 {
   Prepare ();
-
-  iCamera *icam = rview->GetCamera ();
-  const csReversibleTransform &camtrans = icam->GetTransform ();
-
-  // Only get the transformation if this thing can move.
-  bool can_move = false;
-  if (movable && cfg_moving != CS_THING_MOVE_NEVER)
-  {
-    can_move = true;
-  }
 
   //@@@ Ok?
   cached_movable = movable;
   WorUpdate ();
 
-  csBox3 b;
-  static_data->GetBoundingBox (b);
+#ifndef CS_USE_NEW_RENDERER
+  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
+  	clip_z_plane);
+#endif
 
-  csSphere sphere;
-  sphere.SetCenter (b.GetCenter ());
-  sphere.SetRadius (static_data->max_obj_radius);
-
-  if (can_move)
-  {
-    csReversibleTransform tr_o2c = camtrans;
-    if (!movable->IsFullTransformIdentity ())
-      tr_o2c /= movable->GetFullTransform ();
-    bool rc = rview->TestBSphere (tr_o2c, sphere);
-    return rc;
-  }
-  else
-  {
-    bool rc = rview->TestBSphere (camtrans, sphere);
-    return rc;
-  }
-
+  return true;
 }
 
 bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)

@@ -292,7 +292,7 @@ protected:
    * This function determines whether to draw the imposter
    * or the true mesh and calls the appropriate function.
    */
-  void DrawInt (iRenderView* rview);
+  void DrawInt (iRenderView* rview, uint32 frustum_mask);
 
   /**
    * Destructor.  This is private in order to force clients to use DecRef()
@@ -434,7 +434,7 @@ public:
    * Draw this mesh object given a camera transformation.
    * If needed the skeleton state will first be updated.
    */
-  void Draw (iRenderView* rview);
+  void Draw (iRenderView* rview, uint32 frustum_mask);
 
   // Static LOD methods.
   iLODControl* CreateStaticLOD ();
@@ -531,7 +531,7 @@ public:
    * Draw this mesh object given a camera transformation, non-impostered.
    * If needed the skeleton state will first be updated.
    */
-  void DrawIntFull (iRenderView* rview);
+  void DrawIntFull (iRenderView* rview, uint32 frustum_mask);
 
   //---------- Bounding volume and beam functions -----------------//
 
@@ -760,10 +760,6 @@ public:
     virtual void GetRadius (csVector3& rad, csVector3 &cent) const
     {
       scfParent->GetRadius (rad,cent);
-    }
-    virtual void Draw (iRenderView* rview)
-    {
-      scfParent->Draw (rview);
     }
     virtual iLODControl* CreateStaticLOD ()
     {

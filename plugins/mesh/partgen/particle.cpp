@@ -371,7 +371,8 @@ void csNewParticleSystem::SetupParticles (
   }
 }
 
-bool csNewParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)
+bool csNewParticleSystem::DrawTest (iRenderView* rview, iMovable* movable,
+	uint32 frustum_mask)
 {
   SetupObject ();
 
@@ -381,42 +382,7 @@ bool csNewParticleSystem::DrawTest (iRenderView* rview, iMovable* movable)
   if (!movable->IsFullTransformIdentity ())
     trans /= movable->GetFullTransform ();
 
-  // build a bounding box in camera space
-  csBox3 cbox;
-  int i;
-  for (i=0; i<8; i++)
-    cbox.AddBoundingVertexSmart (trans * Bounds.GetCorner (i));
-  if (cbox.MaxZ () < 0) return false;
-
-   // transform from camera to screen space
-  csBox2 sbox;
-
-  if (cbox.MinZ () <= 0)
-  {
-    sbox.Set (-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE,
-	          +CS_BOUNDINGBOX_MAXVALUE, +CS_BOUNDINGBOX_MAXVALUE);
-  }
-  else
-  {
-    sbox.StartBoundingBox ();
-    float fov = camera->GetFOV ();
-    float shift_x = camera->GetShiftX ();
-    float shift_y = camera->GetShiftY ();
-
-    for (i=0; i<8; i++)
-    {
-      csVector3 cv = cbox.GetCorner (i);
-      int inv_z = QInt (fov / cv.z);
-      int sx = QInt (cv.x * inv_z + shift_x);
-      int sy = QInt (cv.y * inv_z + shift_y);
-      sbox.AddBoundingVertex (sx, sy);
-    }
-  }
-
-  // Test visibility of bounding box with the clipper
-  if (!rview->ClipBBox (sbox, cbox, ClipPortal, ClipPlane, ClipZ))
-    return false;
-
+  rview->CalculateClipSettings (frustum_mask, ClipPortal, ClipPlane, ClipZ);
 
   if (Lighting && light_mgr)
   {

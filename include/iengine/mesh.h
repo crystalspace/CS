@@ -465,14 +465,6 @@ struct iMeshWrapper : public iBase
   virtual void GetRadius (csVector3& rad, csVector3& cent) const = 0;
 
   /**
-   * Draw this mesh. This is a function that you normally don't have
-   * to call on your own as the engine does this for you. However it can
-   * be useful to have this function in some special cases where you
-   * want to render mesh objects in a CSWS window or something like that.
-   */
-  virtual void Draw (iRenderView* rview) = 0;
-
-  /**
    * Create a LOD control for this mesh wrapper. This is relevant
    * only if the mesh is a hierarchical mesh. The LOD control will be
    * used to select which children are visible and which are not.

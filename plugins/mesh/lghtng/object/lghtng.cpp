@@ -109,9 +109,10 @@ void csLightningMeshObject::SetupObject ()
 }
 
 
-bool csLightningMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
+bool csLightningMeshObject::DrawTest (iRenderView* rview, iMovable* movable,
+	uint32 frustum_mask)
 {
-  return GenMesh->DrawTest (rview, movable);
+  return GenMesh->DrawTest (rview, movable, frustum_mask);
 }
 
 bool csLightningMeshObject::Draw (iRenderView* rview, iMovable* movable,

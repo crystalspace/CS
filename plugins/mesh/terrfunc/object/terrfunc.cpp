@@ -1797,7 +1797,7 @@ void csTerrFuncObject::InitQuadDiv()
 }
 
 
-bool csTerrFuncObject::DrawTest (iRenderView*, iMovable*)
+bool csTerrFuncObject::DrawTest (iRenderView*, iMovable*, uint32)
 {
   // @@@ Can we do something more sensible here?
   return true;

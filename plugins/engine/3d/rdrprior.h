@@ -22,23 +22,38 @@
 #include "csutil/array.h"
 #include "csutil/parray.h"
 
-struct iMeshWrapper;
+struct csMeshWrapper;
 struct iRenderView;
 
-typedef csArray<iMeshWrapper*> csArrayMeshPtr;
-typedef csPDelArray<csArrayMeshPtr> csArrayMeshPtrVector;
+struct csMeshWithMask
+{
+  csMeshWrapper* mesh;
+  uint32 frustum_mask;
+  csMeshWithMask ()
+  {
+  }
+  csMeshWithMask (csMeshWrapper* m, uint32 fm)
+  {
+    mesh = m;
+    frustum_mask = fm;
+  }
+};
+
+typedef csArray<csMeshWithMask> csArrayMeshMask;
+typedef csPDelArray<csArrayMeshMask> csArrayMeshMaskVector;
 
 /**
  * This class contains a list of rendering queues, each of which is a list
  * of mesh wrappers. The rendering queues are sorted by rendering priority.
  * Note that the mesh objects are not reference-counted!
+ * This entire class is OR only!
  */
 class csRenderQueueSet
 {
 private:
   // List of visiblel meshes per render priority. Updating
   // during VisTest() (OR only!)
-  csArrayMeshPtrVector visible;
+  csArrayMeshMaskVector visible;
 
 public:
   /// Constructor.
@@ -49,21 +64,24 @@ public:
   /// Clear all visible meshes.
   void ClearVisible ();
   
-  /// Register a visible mesh object.
-  void AddVisible (iMeshWrapper *mesh);
+  /**
+   * Register a visible mesh object.
+   * OR only!
+   */
+  void AddVisible (csMeshWrapper *mesh, uint32 frustum_mask);
 
   /**
-   * Sort all priority queues and return a sorted list of all mesh
-   * objects for all priorities. This list should be deleted with delete[]
-   * later. Returns 0 if there are no visible objects.
-   * The number of objects returned in 'tot_num' is the size of the
-   * returned array. Note that this function will only add
+   * Sort all priority queues and fills a sorted list of all mesh
+   * objects for all priorities. Note that this function will only add
    * visible objects to the array (i.e. iVisibilityObject)!
+   * OR only!
    */
-  iMeshWrapper** SortAll (iRenderView* rview, int& tot_num,
-	uint32 current_visnr);
+  void SortAll (csArrayMeshMask& meshes, iRenderView* rview);
 
-  /// Sort this queue based on the flags for that queue.
+  /**
+   * Sort this queue based on the flags for that queue.
+   * OR only!
+   */
   void Sort (iRenderView* rview, int priority);
 };
 

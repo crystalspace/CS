@@ -364,7 +364,7 @@ public:
   bool DrawTestQuad (iRenderView* rv, MeshTreeNodeWrapper* node
 	/*csChunkLodTerrainFactory::MeshTreeNode* node*/, float kappa,
 	uint32 frustum_mask);
-  bool DrawTest (iRenderView* rview, iMovable* movable);
+  bool DrawTest (iRenderView* rview, iMovable* movable, uint32 frustum_mask);
 
   bool Draw (iRenderView*, iMovable*, csZBufMode) 
   { /* deprecated */ return false; }

@@ -172,7 +172,6 @@ csRenderMesh** csPortalContainer::GetRenderMeshes (int& num,
   }
   else
   {
-    tr_o2c /= movtrans;
     if (!rview->ClipBSphere (tr_o2c, sphere, clip_portal,
       clip_plane, clip_z_plane, camera_origin))
     {
@@ -181,15 +180,24 @@ csRenderMesh** csPortalContainer::GetRenderMeshes (int& num,
     }
   }
 
-  //first, check if we have any usable mesh
-  if(lastMeshPtr->inUse == true)
+  //csReversibleTransform tr_o2c = camtrans;
+  //if (!movable->IsFullTransformIdentity ())
+    //tr_o2c /= movtrans;
+  //csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
+
+  //rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
+  	//clip_z_plane);
+
+  // first, check if we have any usable mesh.
+  if (lastMeshPtr->inUse == true)
   {
     lastMeshPtr = 0;
     //check the list
     int i;
-    for(i = 0; i<meshes.Length (); i++)
+    for (i = 0; i<meshes.Length (); i++)
     {
-      if (meshes[i]->inUse == false){
+      if (meshes[i]->inUse == false)
+      {
         lastMeshPtr = meshes[i];
         break;
       }
@@ -913,13 +921,14 @@ void csPortalContainer::CastShadows (iMovable* movable, iFrustumView* fview)
 
 //--------------------- For iMeshObject ------------------------------//
 
-bool csPortalContainer::DrawTest (iRenderView* rview, iMovable*)
+bool csPortalContainer::DrawTest (iRenderView* rview, iMovable*,
+	uint32)
 {
   Prepare ();
 
   iCamera* camera = rview->GetCamera ();
-  const csMovable& cmovable = meshwrapper->GetCsMovable ();
   const csReversibleTransform& camtrans = camera->GetTransform ();
+  const csMovable& cmovable = meshwrapper->GetCsMovable ();
   const csReversibleTransform& movtrans = cmovable.GetFullTransform ();
 
   if (movable_nr != cmovable.GetUpdateNumber ())
@@ -932,7 +941,7 @@ bool csPortalContainer::DrawTest (iRenderView* rview, iMovable*)
   if (movable_identity)
   {
     if (!rview->ClipBSphere (camtrans, sphere, clip_portal,
-  	clip_plane, clip_z_plane, camera_origin))
+        clip_plane, clip_z_plane, camera_origin))
       return false;
   }
   else
@@ -940,10 +949,12 @@ bool csPortalContainer::DrawTest (iRenderView* rview, iMovable*)
     csReversibleTransform tr_o2c = camtrans;
     tr_o2c /= movtrans;
     if (!rview->ClipBSphere (tr_o2c, sphere, clip_portal,
-  	clip_plane, clip_z_plane, camera_origin))
+        clip_plane, clip_z_plane, camera_origin))
       return false;
   }
 
+  //rview->CalculateClipSettings (frustum_mask,
+  	//clip_portal, clip_plane, clip_z_plane);
   return true;
 }
 

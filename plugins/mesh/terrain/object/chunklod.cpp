@@ -849,7 +849,8 @@ bool csChunkLodTerrainObject::DrawTestQuad (iRenderView* rv,
   return true;
 }
 
-bool csChunkLodTerrainObject::DrawTest (iRenderView* rview, iMovable* movable)
+bool csChunkLodTerrainObject::DrawTest (iRenderView* rview, iMovable* movable,
+	uint32)
 {
   iCamera* cam = rview->GetCamera ();
   tr_o2c = cam->GetTransform ();
@@ -876,7 +877,7 @@ csRenderMesh** csChunkLodTerrainObject::GetRenderMeshes (
 	int &n, iRenderView* rview, 
 	iMovable* movable, uint32 frustum_mask)
 {
-  if (!DrawTest (rview, movable))
+  if (!DrawTest (rview, movable, frustum_mask))
   {
     n = 0;
     return 0;

@@ -123,7 +123,8 @@ struct iMeshObject : public iBase
    * expensive data. If DrawTest() returns false the engine will not
    * call Draw().
    */
-  virtual bool DrawTest (iRenderView* rview, iMovable* movable) = 0;
+  virtual bool DrawTest (iRenderView* rview, iMovable* movable,
+  	uint32 frustum_mask) = 0;
 
   /**
    * Draw this mesh object. Returns false if not visible.

@@ -330,12 +330,12 @@ public:
     if (num > 0)
     {
       csBox3 box;
-      //cmesh->GetWorldBoundingBox (box);
+      //@@@ Don't call this here! cmesh->GetWorldBoundingBox (box);
       privMeshlist->AddRenderMeshes (meshes, num, cmesh->GetRenderPriority (),
 	  cmesh->GetZBufMode (), box);
     }
 #else
-    sector->GetRenderQueues ().AddVisible (&(cmesh->scfiMeshWrapper));
+    sector->GetRenderQueues ().AddVisible (cmesh, frustum_mask);
 #endif
   }
 
@@ -636,7 +636,7 @@ void csSector::PrepareDraw (iRenderView *rview)
   }
 
   // CS_ENTITY_CAMERA meshes have to be moved to right position first.
-  const csArrayMeshPtr& cm = camera_meshes;
+  const csArray<iMeshWrapper*>& cm = camera_meshes;
   for (i = 0 ; i < cm.Length () ; i++)
   {
     iMeshWrapper* m = cm.Get (i);
@@ -859,30 +859,28 @@ void csSector::Draw (iRenderView *rview)
     // First sort everything based on render priority and return
     // a big list of visible objects. This will use the visibility
     // information calculated by VisTest() above.
-    int num_objects;
-    iMeshWrapper** objects = RenderQueues.SortAll (rview, num_objects,
-		    current_visnr);
+    csArrayMeshMask objects;
+    objects.SetCapacity (meshes.GetCount ());
+    RenderQueues.SortAll (objects, rview);
 
-    // Draw the meshes.
-    for (i = 0 ; i < num_objects ; i++)
+    // Draw the objects.
+    for (i = 0 ; i < objects.Length () ; i++)
     {
-      iMeshWrapper* sp = objects[i];
+      csMeshWithMask& mesh_with_mask = objects[i];
+      csMeshWrapper* sp = mesh_with_mask.mesh;
       if (!prev_sector ||
           sp->GetMovable ()->GetSectors ()->Find (prev_sector) == -1)
       {
         // Mesh is not in the previous sector or there is no previous
         // sector.
-        sp->Draw (rview);
+        sp->Draw (rview, mesh_with_mask.frustum_mask);
       }
       else if (draw_prev_sector)
       {
         // @@@ Here we should draw clipped to the portal.
-        sp->Draw (rview);
+        sp->Draw (rview, mesh_with_mask.frustum_mask);
       }
     }
-
-    delete[] objects;
-
   }
 
   // queue all halos in this sector to be drawn.

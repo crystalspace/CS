@@ -161,7 +161,8 @@ void csSprite2DMeshObject::SetupObject ()
 
 static csVector3 cam;
 
-bool csSprite2DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
+bool csSprite2DMeshObject::DrawTest (iRenderView* rview, iMovable* movable,
+	uint32)
 {
   SetupObject ();
 

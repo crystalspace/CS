@@ -554,11 +554,12 @@ float csHazeMeshObject::GetScreenBoundingBox (long cameranr,
 }
 
 
-bool csHazeMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
+bool csHazeMeshObject::DrawTest (iRenderView* rview, iMovable* movable,
+	uint32 frustum_mask)
 {
   SetupObject ();
 
-  if(layers.Length() <= 0) return false;
+  if (layers.Length () <= 0) return false;
 
   //iGraphics3D* g3d = rview->GetGraphics3D ();
   iCamera* camera = rview->GetCamera ();
@@ -566,26 +567,9 @@ bool csHazeMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   csReversibleTransform tr_o2c = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
-  float fov = camera->GetFOV ();
-  float shiftx = camera->GetShiftX ();
-  float shifty = camera->GetShiftY ();
-  csBox2 sbox;
-  csBox3 cbox;
-
-  if (GetScreenBoundingBox (camera->GetCameraNumber (),
-        movable->GetUpdateNumber (), fov, shiftx, shifty,
-        tr_o2c, sbox, cbox) < 0)
-  {
-    //printf("No draw\n");
-    return false;
-  }
-  int clip_portal, clip_plane, clip_z_plane;
-  if (rview->ClipBBox (sbox, cbox, clip_portal, clip_plane,
-        clip_z_plane) == false)
-  {
-    //printf("No draw(2)\n");
-    return false;
-  }
+  //int clip_portal, clip_plane, clip_z_plane;
+  //rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
+  	//clip_z_plane);
 
   return true;
 }

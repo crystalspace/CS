@@ -1368,7 +1368,8 @@ void csSpriteCal3DMeshObject::PositionChild (iMeshObject* child,
   }
 }
 
-bool csSpriteCal3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
+bool csSpriteCal3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable,
+	uint32 frustum_mask)
 {
   SetupObject ();
 
@@ -1391,18 +1392,9 @@ bool csSpriteCal3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 
   //  tr_o2c *= scale_mat;
 
-  csVector3 radius;
-  csSphere sphere;
-  GetRadius (radius, sphere.GetCenter ());
-  float max_radius = radius.x;
-  if (max_radius < radius.y) max_radius = radius.y;
-  if (max_radius < radius.z) max_radius = radius.z;
-  sphere.SetRadius (max_radius);
   int clip_portal, clip_plane, clip_z_plane;
-  csVector3 camera_origin;
-  if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-      clip_z_plane, camera_origin) == false)
-    return false;
+  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
+      clip_z_plane);
 
 #ifndef CS_USE_NEW_RENDERER
   g3d->SetObjectToCamera (&tr_o2c);

@@ -49,7 +49,7 @@ csSpider::~csSpider ()
   SCF_DESTRUCT_IBASE ();
 }
 
-bool csSpider::DrawTest (iRenderView* rview, iMovable*)
+bool csSpider::DrawTest (iRenderView* rview, iMovable*, uint32)
 {
   if (!camera)
   {

@@ -574,7 +574,7 @@ public:
    * Does all pre-render calculation.  Determines which LOD children in the
    * tree should be drawn
    */
-  bool DrawTest (iRenderView* rview, iMovable* movable);
+  bool DrawTest (iRenderView* rview, iMovable* movable, uint32 frustum_mask);
 
   /// Updates the lighting
   void UpdateLighting (iLight** lights, int num_lights, iMovable* movable);

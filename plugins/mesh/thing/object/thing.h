@@ -645,7 +645,8 @@ private:
   csFlags flags;
 
 #ifdef CS_USE_NEW_RENDERER
-  struct rmHolder {
+  struct rmHolder
+  {
     csDirtyAccessArray<csRenderMesh*> renderMeshes;
   };
   csArray<rmHolder*> rmHolderList;
@@ -653,6 +654,8 @@ private:
 
   void PrepareRenderMeshes ();
   void ClearRenderMeshes ();
+#else
+  int clip_portal, clip_plane, clip_z_plane;
 #endif
 
   // Mixmode for rendering.
@@ -832,7 +835,7 @@ public:
   /**
    * Test if this thing is visible or not.
    */
-  bool DrawTest (iRenderView* rview, iMovable* movable);
+  bool DrawTest (iRenderView* rview, iMovable* movable, uint32 frustum_mask);
 
   /**
    * Draw this thing given a view and transformation.
@@ -1084,9 +1087,10 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csThing);
     virtual iMeshObjectFactory* GetFactory () const;
     virtual csFlags& GetFlags () { return scfParent->flags; }
-    virtual bool DrawTest (iRenderView* rview, iMovable* movable)
+    virtual bool DrawTest (iRenderView* rview, iMovable* movable,
+    	uint32 frustum_mask)
     {
-      return scfParent->DrawTest (rview, movable);
+      return scfParent->DrawTest (rview, movable, frustum_mask);
     }
     virtual bool Draw (iRenderView* rview, iMovable* movable,
     	csZBufMode zMode)

@@ -1342,7 +1342,8 @@ csSpriteSocket* csSprite3DMeshObject::FindSocket (iMeshWrapper *mesh) const
   return 0;
 }
 
-bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
+bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable,
+	uint32 frustum_mask)
 {
   SetupObject ();
 
@@ -1358,126 +1359,6 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 #endif
   iCamera* camera = rview->GetCamera ();
 
-  /*
-   *  If we're going to figure out the position of a socket-attached mesh here in the drawing function
-   *   we should be setting this position for THIS frame not for the next frame!
-   */
-
-    // Drill down into the parent and compute the center of
-  // the socket where this mesh should be located along with the rotation angles
-/* Steven Geens removed this code and added it to PositionChild
-   He  left the code here untill he could be absolutely sure he didn't break anything.
-  csRef<iMeshWrapper> mw = 0;
-  if(logparent) mw = SCF_QUERY_INTERFACE (logparent, iMeshWrapper);
-  if (mw)
-  {
-    // Get the parent of this wrapper
-    iMeshWrapper* parent = mw->GetParentContainer();
-    if (parent)
-    {
-      // Get the parent of this wrapper
-      iMeshFactoryWrapper* mfw = parent->GetFactory();
-      if (mfw)
-      {
-        // Get the parent of this wrapper
-        iMeshObjectFactory* mof = mfw->GetMeshObjectFactory();
-        if (mof)
-        {
-	  // Find the parent mesh factory to get vertices
-          csRef<iSprite3DFactoryState> sof (SCF_QUERY_INTERFACE (
-              mof, iSprite3DFactoryState));
-          if (sof)
-          {
-            // Find the socket in the parent mesh
-	    csRef<iSprite3DState> parent_sprite (SCF_QUERY_INTERFACE (
-              parent->GetMeshObject(), iSprite3DState));
-	    if (parent_sprite)
-	    {
-              iSpriteSocket * socket = parent_sprite->FindSocket(mw);
-              if (socket)
-              {
-                // Get the index of the triange at that spot
-                int tri_index = socket->GetTriangleIndex();
-                csTriangle& tri = sof->GetTriangles()[tri_index];
-              
-                // This cast is crummy, but the only way to get at it.
-                csSprite3DMeshObject *cs = 
-                  (csSprite3DMeshObject *)parent->GetMeshObject();
-              
-                int current_frame = cs->GetCurFrame();
-                csSpriteAction2* current_action = cs->GetCurAction();
-              
-                csSpriteFrame* cf = 
-                  current_action->GetCsFrame (current_frame);
-              
-                int idx = cf->GetAnmIndex();
-                csVector3 * current_verts = sof->GetVertices(idx);
-  
-                csVector3 spot_verts[3];
-                csVector3 center;
-                if (!cs->IsTweeningEnabled())
-                {
-                  spot_verts[0] = current_verts[tri.a];
-                  spot_verts[1] = current_verts[tri.b];
-                  spot_verts[2] = current_verts[tri.c];
-                  center = 
-                    (spot_verts[0] + spot_verts[1] + spot_verts[2]) / 3;
-                }
-                else
-                {
-                  // Get the verts for the next frame
-                  csSpriteFrame * nframe = 0;
-                  if (current_frame + 1 < current_action->GetFrameCount())
-                    nframe = current_action->GetCsFrame (current_frame + 1);
-                  else
-                    nframe = current_action->GetCsFrame (0);
-                  int nf_idx = nframe->GetAnmIndex();
-                  csVector3 * next_verts = sof->GetVertices(nf_idx);
-
-                  // Interpolate between them
-                  float parent_tween_ratio = cs->GetTweenRatio();
-                  float remainder = 1 - parent_tween_ratio;
-    
-                  // Lets look at the tween ratio also... Maybe this is the glitch
-                  spot_verts[0] = 
-                    parent_tween_ratio * next_verts[tri.a] + 
-                    remainder * current_verts[tri.a];
-
-                  spot_verts[1] = 
-                    parent_tween_ratio * next_verts[tri.b] + 
-                    remainder * current_verts[tri.b];
-
-                  spot_verts[2] = 
-                    parent_tween_ratio * next_verts[tri.c] + 
-                    remainder * current_verts[tri.c];
-  
-              
-                  // Create the center of the triangle for translation
-                  center = 
-                    (spot_verts[0] + spot_verts[1] + spot_verts[2]) / 3;
-                }
-              
-                // Get the normal to this triangle based on the verts
-                csVector3 ab = spot_verts[1] - spot_verts[0];
-                csVector3 bc = spot_verts[2] - spot_verts[1];
-                csVector3 normal = ab % bc;
-              
-                csReversibleTransform trans = movable->GetFullTransform();
-                trans.SetOrigin(center);
-                trans.LookAt(normal, csVector3(0,1,0));
-                movable->SetTransform(trans);
-                movable->UpdateMove();
-	      }
-            }
-          }
-        }
-      }
-    }
-  }
-
-*/
-
-
   // First create the transformation from object to camera space directly:
   //   W = Mow * O - Vow;
   //   C = Mwc * (W - Vwc)
@@ -1488,18 +1369,9 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
 
-  csVector3 radius;
-  csSphere sphere;
-  GetRadius (radius, sphere.GetCenter ());
-  float max_radius = radius.x;
-  if (max_radius < radius.y) max_radius = radius.y;
-  if (max_radius < radius.z) max_radius = radius.z;
-  sphere.SetRadius (max_radius);
   int clip_portal, clip_plane, clip_z_plane;
-  csVector3 camera_origin;
-  if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-  	clip_z_plane, camera_origin) == false)
-    return false;
+  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
+  	clip_z_plane);
 
   UpdateWorkTables (factory->GetVertexCount());
 

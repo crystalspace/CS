@@ -317,6 +317,9 @@ private:
   /// If true then this thing has been prepared (Prepare() function).
   bool prepared;
 
+  /// For clipping.
+  int clip_portal, clip_plane, clip_z_plane;
+
   /**
    * This number is compared with the static_data_nr in the static data to
    * see if static data has changed and this thing needs to updated local
@@ -490,7 +493,7 @@ public:
   /**
    * Test if this thing is visible or not.
    */
-  bool DrawTest (iRenderView* rview, iMovable* movable);
+  bool DrawTest (iRenderView* rview, iMovable* movable, uint32 frustum_mask);
 
   /**
    * Draw this thing given a view and transformation.
@@ -766,9 +769,10 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csBezierMesh);
     virtual iMeshObjectFactory* GetFactory () const;
     virtual csFlags& GetFlags () { return scfParent->object_flags; }
-    virtual bool DrawTest (iRenderView* rview, iMovable* movable)
+    virtual bool DrawTest (iRenderView* rview, iMovable* movable,
+    	uint32 frustum_mask)
     {
-      return scfParent->DrawTest (rview, movable);
+      return scfParent->DrawTest (rview, movable, frustum_mask);
     }
     virtual csRenderMesh **GetRenderMeshes (int &n, iRenderView*, 
       iMovable*, uint32) { n = 0; return 0; }
