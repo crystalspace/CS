@@ -1,5 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
+14-Jul-2000
+	- Brandon Ehle restarted work on Crystal Script (python).
+	  New layout is interface based, which allos for more dynamicism
+	  and lower runtime memory requirements.
 13-Jul-2000
 	- Removed 'solidbsp' command from documentation.
 	- Added SetMainFrustum to csQuadTree3D to change the frustum for an
@@ -19,6 +23,13 @@ The history order has been reversed so that new features are at the top.
 	- Wouter Wijngaards added csMaterial class. Is now used by polygons.
 	  The API is backwards compatible though, only resulting in a
 	  seperate material for each polygon if used the old way.
+	- Wouter added bumpmap class, it will store a bumpmap in different
+	  formats given a source image.
+	- Wouter improved fountain command. Now uses spark
+	  texture and has 400 particles, nice color and rotation; which
+	  looks nice.
+	- Wouter also fixed rain so that the texture should no longer be
+	  upside down, snow had the same problem and should be fixed too.
 12-Jul-2000
 	- Added new csHashSet class. This is a class that you can use
 	  to add objects and to test if some object is already in the
