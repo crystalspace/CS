@@ -187,7 +187,7 @@ csGraphics3DOGLCommon* csGraphics3DOGLCommon::ogl_g3d = NULL;
 iGLStateCache* csGraphics3DOGLCommon::statecache = NULL;
 
 #define USE_OGL_EXT(ext) \
-  bool csGraphics3DOGLCommon::##ext = false;
+  bool csGraphics3DOGLCommon::ext = false;
 #include "ogl_suppext.h"
 #undef USE_OGL_EXT
 
@@ -4796,7 +4796,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     {
       csTrianglesPerSuperLightmap* unlitPolys = polbuf->GetUnlitPolys();
       lightmap_cache->Cache(unlitPolys,dirty,&modified);
-      csLightMapQueue* fog_queue = lightmap_cache->GetQueue(unlitPolys);
+      //csLightMapQueue* fog_queue = lightmap_cache->GetQueue(unlitPolys);
       int num_triangles = unlitPolys->numTriangles;
       csTriangle* triangles = unlitPolys->triangles.GetArray();
       int num_vertices = unlitPolys->numVertices;
@@ -5381,7 +5381,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     }
   }
 
-  int i, k;
+  int i;
 
   //===========
   // Update work tables.
@@ -5697,17 +5697,24 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       {
         if( string == csEffectStrings::fog ) 
           inputtex = -1;
-      } else inputtex = layer->GetStateFloat( csEffectStrings::texture_source );
+      }
+      else
+      {
+	// @@@ This is suspicious: inputtex is int but routine returns float?
+	inputtex = layer->GetStateFloat( csEffectStrings::texture_source );
+      }
       
       if( inputtex==-1 )
       {
         statecache->SetTexture (GL_TEXTURE_2D, m_fogtexturehandle);
         statecache->EnableState (GL_TEXTURE_2D, l);
-      } else if( inputtex==1 )
+      }
+      else if( inputtex==1 )
       {
         CacheTexture (mesh.mat_handle);
         txt_handle = mesh.mat_handle->GetTexture ();
-      } else if( inputtex-2<((csMaterialHandle*)mesh.mat_handle)->GetTextureLayerCount()) 
+      }
+      else if( inputtex-2<((csMaterialHandle*)mesh.mat_handle)->GetTextureLayerCount()) 
       {
         csTextureLayer* lay = ((csMaterialHandle*)mesh.mat_handle)->GetTextureLayer (inputtex-2);
         txt_handle = lay->txt_handle;
