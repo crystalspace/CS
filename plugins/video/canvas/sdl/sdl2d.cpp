@@ -309,7 +309,7 @@ bool csGraphics2DSDL::Open(const char *Title)
 
   SDL_WM_SetCaption(Title, NULL);
   SDL_EnableKeyRepeat(250, 30);
-  SDL_ShowCursor(0);
+  SDL_ShowCursor(1);
 
 #if SHADE_BUF
   cursorNo = csmcNone;
