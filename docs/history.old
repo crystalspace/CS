@@ -25,6 +25,10 @@ Here is the old history.
 	  Support for curved surfaces is still lacking.
 28-Dec-1999
 	- Thomas Hieber did some changes to DDraw support.
+	- Eric Sunshine updated the CVS configuration so that a notification
+	  message is sent to recipients of the new mailing list
+	  crystal-cvs@lists.sourceforge.net whenever chnages are committed to
+	  the repository.
 27-Dec-1999
 	- Further changes to MazeD and handling of flat colors from
 	  Norman Kramer.
