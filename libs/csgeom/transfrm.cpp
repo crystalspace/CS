@@ -19,6 +19,7 @@
 
 #include <math.h>
 #include "cssysdef.h"
+#include "csgeom/matrix3.h"
 #include "csgeom/transfrm.h"
 #include "qsqrt.h"
 
@@ -218,22 +219,6 @@ csPlane3& operator/= (csPlane3& p, const csReversibleTransform& t)
   p.DD -= p.norm * (t.m_o2t*t.v_o2t);
   p.norm = t.m_t2o * p.norm;
   return p;
-}
-
-csReversibleTransform& operator*= (csReversibleTransform& t1,
-                                 const csReversibleTransform& t2)
-{
-  t1.v_o2t = t2.v_o2t + t2.m_t2o*t1.v_o2t;
-  t1.m_o2t *= t2.m_o2t;
-  t1.m_t2o *= t1.m_t2o;
-  return t1;
-}
-
-csReversibleTransform operator* (const csReversibleTransform& t1,
-                               const csReversibleTransform& t2)
-{
-  return csReversibleTransform (t1.m_o2t*t2.m_o2t, t2.m_t2o*t1.m_t2o, 
-                             t2.v_o2t + t2.m_t2o*t1.v_o2t); 
 }
 
 csTransform operator* (const csTransform& t1, const csReversibleTransform& t2)

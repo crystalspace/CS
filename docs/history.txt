@@ -12,6 +12,9 @@ The history order is reversed so that new features are at the top.
 	  a little as well. In general it would be nice to try to find
 	  all places where '*' is used on matrices and transforms
 	  and try to replace it with *= if possible or useful.
+	- Optimized csReversibleTransform *= operator a little more.
+	- Optimized csReversibleTransform * by inlining it.
+	- Optimized csReversibleTransform *= by inlining it.
 	- Eric Sunshine fixed the Apple/NeXT ports so that they are once again
 	  buildable following Philip's change to MAXPATHLEN.
 8-Dec-2001

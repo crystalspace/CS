@@ -331,10 +331,21 @@ public:
   friend csSphere operator/ (const csSphere& p, const csReversibleTransform& t);
   /// Combine two transforms, with the rightmost being applied first.
   friend csReversibleTransform& operator*= (csReversibleTransform& t1,
-                                          const csReversibleTransform& t2);
+                                          const csReversibleTransform& t2)
+  {
+    t1.v_o2t = t2.m_t2o*t1.v_o2t;
+    t1.v_o2t += t2.v_o2t;
+    t1.m_o2t *= t2.m_o2t;
+    t1.m_t2o *= t1.m_t2o;
+    return t1;
+  }
   /// Combine two transforms, with the rightmost being applied first.
   friend csReversibleTransform operator* (const csReversibleTransform& t1,
-                                        const csReversibleTransform& t2);
+                                        const csReversibleTransform& t2)
+  {
+    return csReversibleTransform (t1.m_o2t*t2.m_o2t, t2.m_t2o*t1.m_t2o, 
+                             t2.v_o2t + t2.m_t2o*t1.v_o2t); 
+  }
   /// Combine two transforms, with the rightmost being applied first.
   friend csTransform operator* (const csTransform& t1, 
                               const csReversibleTransform& t2);
