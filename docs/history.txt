@@ -8,6 +8,8 @@ chronological order.
 
 20-Dec-2003
 	 - Andreas Busch added Yield() to csThread for posix and win32.
+	 - res made some changes to GL proc texes and the GL canvas to work 
+	   around flipping issues.
 19-Dec-2003
 	- Eric Sunshine added the new method
 	  csInitializer::RequestPlugins(csArray<csPluginRequest> const&) to

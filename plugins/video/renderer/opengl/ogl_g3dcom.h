@@ -240,7 +240,7 @@ public:
    * Set mirror mode for the rasterizer. Then polygons have
    * to be rendered as seen from the other side.
    */
-  static void SetMirrorMode (bool mirror);
+  void SetMirrorMode (bool mirror);
 
   /**
    * Set glOrtho() settings depending on current render

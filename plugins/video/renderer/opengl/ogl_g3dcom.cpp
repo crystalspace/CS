@@ -1334,8 +1334,22 @@ void csGraphics3DOGLCommon::SetGlOrtho (bool inverted)
 {
   if (render_target)
   {
+    /*
+      Render target: draw everything in top-left corner, but flipped.
+     */
     if (inverted)
+    {
+      int txt_w, txt_h;
+      render_target->GetMipMapDimensions (0, txt_w, txt_h);
+
       glOrtho (0., (GLdouble) (width+1), (GLdouble) (height+1), 0., -1.0, 10.0);
+      /*
+        @@@ Oddity: SetupDTMTransform() calls glTranslatef() with the
+	perspective center after SetGlOrtho(). So we "fix" that here by 
+	also correcting for the perspective center.
+       */
+      glTranslatef (0, (txt_h / 2) - asp_center_y, 0);
+    }
     else
       glOrtho (0., (GLdouble) (width+1), 0., (GLdouble) (height+1), -1.0, 10.0);
   }
@@ -1391,7 +1405,22 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
 
       glMatrixMode (GL_PROJECTION);
       glLoadIdentity ();
-      SetGlOrtho (false);
+      if ((DrawFlags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS)) == 
+	CSDRAW_2DGRAPHICS)
+      {
+	/*
+	 Render target: draw everything in top-left corner, but flipped.
+        */
+	glOrtho (0., (GLdouble) width, (GLdouble) (2 * height - txt_h), (GLdouble) (height - txt_h), -1.0, 10.0);
+	glCullFace (GL_BACK);
+      }
+      else
+      {
+	// Same, but for 2D.
+        SetGlOrtho (true);
+      }
+      glMatrixMode (GL_MODELVIEW);
+      inverted = true;
       glViewport (1, -1, width+1, height+1);
     }
 
@@ -1446,7 +1475,6 @@ void csGraphics3DOGLCommon::FinishDraw ()
   {
     G2D->FinishDraw ();
   }
-  DrawMode = 0;
 
   if (render_target)
   {
@@ -1458,6 +1486,13 @@ void csGraphics3DOGLCommon::FinishDraw ()
       glLoadIdentity ();
       glOrtho (0., width, 0., height, -1.0, 10.0);
       glViewport (0, 0, width, height);
+      inverted = false;
+      
+      if ((DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS)) == 
+	CSDRAW_2DGRAPHICS)
+      {
+	glCullFace (GL_FRONT);
+      }
     }
 
     if (rt_onscreen)
@@ -1529,6 +1564,8 @@ void csGraphics3DOGLCommon::FinishDraw ()
     }
   }
   render_target = 0;
+  
+  DrawMode = 0;
 }
 
 void csGraphics3DOGLCommon::Print (csRect * area)
@@ -1880,13 +1917,15 @@ void csGraphics3DOGLCommon::DisableClientStateTextureArray ()
 }
 
 static bool mirror_mode = false;
+static bool mirror_mode_inv = false;
 
 void csGraphics3DOGLCommon::SetMirrorMode (bool mirror)
 {
-  if (mirror == mirror_mode)
+  if ((mirror == mirror_mode) && (inverted == mirror_mode_inv))
     return;
   mirror_mode = mirror;
-  if (mirror)
+  mirror_mode_inv = inverted;
+  if ((mirror && (!inverted)) || ((!mirror) && inverted))
     glCullFace (GL_BACK);
   else
     glCullFace (GL_FRONT);
@@ -4366,6 +4405,7 @@ void csGraphics3DOGLCommon::SetupDTMTransforms (int vertex_mode)
   SetGlOrtho (inverted);
 
   glTranslatef (asp_center_x, asp_center_y, 0);
+
   int i;
   for (i = 0 ; i < 16 ; i++) matrixholder[i] = 0.0;
   matrixholder[0] = matrixholder[5] = 1.0;

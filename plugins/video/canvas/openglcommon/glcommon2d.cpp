@@ -469,7 +469,17 @@ void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
 
   glColor3f (0., 0., 0.);
 #ifndef CS_USE_NEW_RENDERER
-  glRasterPos2i (x, Height-y-h+1);
+  //glRasterPos2i (x, Height-y-h+1);
+  /*
+    @@@ HACK Below is only correct when a render target was set:
+    This sets up the screen so every drawing takes place in a rect in the
+    upper left, but flipped. However, the raster position is transformed,
+    but glDrawPixels() always takes those as the lower left dest coord (in
+    window.) So it has to drawn h pixels farther down. Meaning, when NO
+    render target is set, this code will simply draw at the wrong spot
+    on the screen. On the other hand, only PTs use Blit() at the moment.
+   */
+  glRasterPos2i (x, Height-y+1);
 #else
   glRasterPos2i (x, Height-y-h);
 #endif // CS_USE_NEW_RENDERER
