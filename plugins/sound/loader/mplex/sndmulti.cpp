@@ -107,7 +107,9 @@ bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)
   int const nmatches = list->Length();
   if (nmatches != 0)
   {
-	int i;
+    int i;
+    csVector pushback;
+
     for (i = 0; i < nmatches; i++)
     {
       char const* classname = list->Get(i);
@@ -120,9 +122,20 @@ bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)
         iSoundLoader *ldr = CS_LOAD_PLUGIN (plugin_mgr, classname, 0,
 		iSoundLoader);
         if (ldr)
-	  Loaders.Push(ldr);
+	{
+	  // ok the following is a bit hacky, but since the mp3 loader skips junk until
+	  // it finds something useful chances are high it finds some "good" header the
+	  // bigger the input gets, so we give all other loaders a chance to look at it
+	  // first
+	  if (strstr (classname, "mp3"))
+	    pushback.Push (ldr);
+	  else
+	    Loaders.Push(ldr);
+	}
       }
     }
+    for (i=0; i < pushback.Length (); i++)
+      Loaders.Push((iSoundLoader*)pushback.Get (i));
   }
   list->DecRef();
   return true;
