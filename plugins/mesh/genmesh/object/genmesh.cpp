@@ -531,7 +531,12 @@ void csGenmeshMeshObject::SetupObject ()
     }
     iMaterialWrapper* mater = material;
     if (!mater) mater = factory->GetMaterialWrapper ();
-    material_needs_visit = mater->IsVisitRequired ();
+    // @@@ FIXME: it seems when loading multiple maps at once in WT,
+    // mater sometimes gets 0
+    if (mater) 
+    {
+      material_needs_visit = mater->IsVisitRequired ();
+    }
 
 #ifdef CS_USE_NEW_RENDERER
     if (svcontext == 0)
