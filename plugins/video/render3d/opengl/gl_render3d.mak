@@ -9,7 +9,7 @@ ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
 DRIVERHELP += \
-  $(NEWLINE)echo $"  make gl3d         Make the $(DESCRIPTION.gl3d)$"
+  $(NEWLINE)echo $"  make gl_render3d         Make the $(DESCRIPTION.gl3d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -66,7 +66,7 @@ else
 endif
 
 INC.gl_render3d = $(wildcard plugins/video/render3d/opengl/*.h)
-SRC.gl_render3d = $(wildcard plugins/video/renderer/opengl/*.cpp)
+SRC.gl_render3d = $(wildcard plugins/video/render3d/opengl/*.cpp)
 OBJ.gl_render3d = $(addprefix $(OUT)/,$(notdir $(SRC.gl_render3d:.cpp=$O)))
 DEP.gl_render3d = CSGEOM CSUTIL CSSYS CSUTIL CSGFX
 CFG.gl_render3d = data/config/render3d/render3d.cfg data/config/render3d/opengl.cfg
@@ -76,7 +76,7 @@ TO_INSTALL.CONFIG += $(CFG.gl_render3d)
 MSVC.DSP += gl_render3d
 DSP.gl_render3d.NAME = gl_render3d
 DSP.gl_render3d.TYPE = plugin
-DSP.gl_render3d.RESOURCES = $(wildcard plugins/video/renderer/opengl/ext/*.inc)
+DSP.gl_render3d.RESOURCES = $(wildcard plugins/video/render3d/opengl/ext/*.inc)
 DSP.gl_render3d.LIBS = opengl32 glu32
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -91,7 +91,7 @@ clean: gl_render3dclean
 
 gl_render3d: $(OUTDIRS) $(gl_render3d)
 
-$(OUT)/%$O: plugins/video/renderer/opengl/%.cpp
+$(OUT)/%$O: plugins/video/render3d/opengl/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.PIXEL_LAYOUT) $(CFLAGS.gl_render3d)
 
 $(gl_render3d): $(OBJ.gl_render3d) $(LIB.gl_render3d)

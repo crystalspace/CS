@@ -20,9 +20,32 @@
 #ifndef __IVIDEO_RENDER3D_H__
 #define __IVIDEO_RENDER3D_H__
 
+
+#include "csutil/scf.h"
+
+class csRect;
+class csReversibleTransform;
+class csStringHash;
+
+
+struct csRenderMesh;
+
+struct iGraphics2D;
+struct iTextureManager;
+struct iRenderBufferManager;
+struct iLightingManager;
+
+class csRender3dCaps
+{
+};
+
+SCF_VERSION (iRender3D, 0, 0, 1);
+
+
 /**
  * New 3D Interface. Work in progress!
  */
+
 struct iRender3D : public iBase
 {
   /// Open 3d renderer.
@@ -35,7 +58,7 @@ struct iRender3D : public iBase
    * Get a pointer to our 2d canvas driver. NOTE: It's not increfed,
    * and therefore it shouldn't be decref-ed by caller.
    */
-  virtual iGraphic2d* Get2DDriver() = 0;
+  virtual iGraphics2D* Get2DDriver() = 0;
 
   /// Get a pointer to our texture manager
   virtual iTextureManager* GetTextureManager() = 0;
@@ -77,7 +100,8 @@ struct iRender3D : public iBase
   virtual void DrawMesh(csRenderMesh* mymesh) = 0;
 
   /// Get a stringhash to be used by our streamsources etc.
-  virtual csStringHash GetStringContainer() = 0;
+  virtual csStringHash* GetStringContainer() = 0;
 };
 
 #endif // __IVIDEO_RENDER3D_H__
+

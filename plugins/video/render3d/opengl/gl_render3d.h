@@ -20,37 +20,63 @@
 #ifndef __GL_RENDER3D_H__
 #define __GL_RENDER3D_H__
 
+
+#include "csgeom/csrect.h"
+#include "csgeom/vector2.h"
+#include "csgeom/vector3.h"
+
+#include "csutil/cscolor.h"
+#include "csutil/csstring.h"
+#include "csutil/strhash.h"
+
+#include "iutil/event.h"
+#include "iutil/eventh.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/render3d.h"
+#include "ivideo/effects/efclient.h"
+
 struct iObjectRegistry;
-struct iGraphics2D;
 struct iTextureManager;
 struct iRenderBufferManager;
 struct iLightingManager;
+
+struct iEffectServer;
 struct iEffectDefinition;
 struct iEffectTechnique;
-class csRender3dCaps;
+struct iEvent;
+
+
+SCF_VERSION (csGLRender3D, 0, 0, 1);
 
 class csGLRender3D : public iRender3D
 {
 private:
-  iObjectRegistry* object_reg;
-  csRef<iGraphics2D> g2d;
+  csRef<iObjectRegistry> object_reg;
+  csRef<iGraphics2D> G2D;
   csRef<iTextureManager> texturemgr;
   csRef<iRenderBufferManager> buffermgr;
   csRef<iLightingManager> lightmgr;
   csRef<iEffectServer> effectserver;
+  
 
   float fov;
   int viewwidth, viewheight;
 
   csRender3dCaps rendercaps;
 
-  csStringHash strings;
-  
+  csStringHash* strings;
+
+  ////////////////////////////////////////////////////////////////////
+  //                         Private helpers
+  ////////////////////////////////////////////////////////////////////
+	
+  void Report (int severity, const char* msg, ...);
+
 public:
   SCF_DECLARE_IBASE;
 
   csGLRender3D (iBase *parent);
-  ~csGLRender3D ();
+  virtual ~csGLRender3D ();
 
   ////////////////////////////////////////////////////////////////////
   //                            iRender3d
@@ -62,12 +88,10 @@ public:
   /// Close renderer and release all resources used
   void Close();
 
-  /**
-   * Get a pointer to our 2d canvas driver. NOTE: It's not increfed,
-   * and therefore it shouldn't be decref-ed by caller.
-   */
-  iGraphics2d* Get2DDriver() 
-    { return g2d; }
+  /// Get a pointer to our 2d canvas driver. NOTE: It's not increfed,
+  /// and therefore it shouldn't be decref-ed by caller.
+  iGraphics2D* Get2DDriver() 
+    { return G2D; }
 
   /// Get a pointer to our texture manager
   iTextureManager* GetTextureManager() 
@@ -136,7 +160,7 @@ public:
   //                          iComponent
   ////////////////////////////////////////////////////////////////////
 
-  bool Initialize (iObjectRegistry reg);
+  bool Initialize (iObjectRegistry* reg);
 
   struct eiComponent : public iComponent
   {
@@ -144,7 +168,7 @@ public:
     virtual bool Initialize (iObjectRegistry* reg)
       { return scfParent->Initialize (reg); }
   } scfiComponent;
-  
+	
   ////////////////////////////////////////////////////////////////////
   //                         iEventHandler
   ////////////////////////////////////////////////////////////////////
@@ -161,10 +185,13 @@ public:
       SCF_CONSTRUCT_IBASE (NULL);
       EventHandler::parent = parent;
     }
+    
     SCF_DECLARE_IBASE;
     virtual bool HandleEvent (iEvent& ev) 
       { return parent->HandleEvent (ev); }
   } * scfiEventHandler;
+
 };
 
 #endif // __GL_RENDER3D_H__
+

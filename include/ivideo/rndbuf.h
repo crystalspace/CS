@@ -20,20 +20,55 @@
 #ifndef __IVIDEO_RNDBUF_H__
 #define __IVIDEO_RNDBUF_H__
 
+#include "csutil/strhash.h"
+
+class csVector3;
+class csVector2;
+class csColor;
+
+struct iLightingInfo;
+struct iTextureHandle;
+
 
 /// Where the buffer is placed
-enum 
+typedef enum _CS_RENDERBUFFER_TYPE
 {
-  BUF_SYSTEM,   /// In system main memory (RAM)
-  BUF_AGP,      /// In special AGP allocated memory
-  BUF_VIDEO     /// In videoram
-} RENDERBUFFER_LOCATION;
+  CS_BUF_DYNAMIC,
+  CS_BUF_STATIC
+} CS_RENDERBUFFER_TYPE;
 
 
-struct iRenderBufferManager
+/**
+ * This is a general buffer to be used by the renderer. It can ONLY be
+ * created by the VB manager
+ */
+struct iRenderBuffer : public iBase
+{
+  
+  /// Get a raw pointer to the bufferdata as different datatypes
+  virtual float* GetFloatBuffer() = 0;
+  virtual unsigned char* GetUCharBuffer() = 0;
+  virtual unsigned int* GetUIntBuffer() = 0;
+  virtual csVector3* GetVector3Buffer() = 0;
+  virtual csVector2* GetVector2Buffer() = 0;
+  virtual csColor* GetColorBuffer() = 0;
+
+  /// Get type of buffer (where it's located)
+  virtual CS_RENDERBUFFER_TYPE GetBufferType() = 0;
+
+  /// Get number of indices in the data (as different datatypes)
+  virtual int GetFloatLength() = 0;
+  virtual int GetUCharLength() = 0;
+  virtual int GetUintLength() = 0;
+  virtual int GetVec3Length() = 0;
+  virtual int GetVec2Length() = 0;
+  virtual int GetColorLength() = 0;
+};
+
+struct iRenderBufferManager : public iBase
 {
   /// Allocate a buffer of the specified type and return it
-  virtual iRenderBuffer* GetBuffer(int buffersize, RENDERBUFFER_LOCATION location) = 0;
+  virtual iRenderBuffer* GetBuffer(int buffersize, CS_RENDERBUFFER_TYPE location) = 0;
   
   /// Lock a specified buffer. Return true if successful
   virtual bool LockBuffer(iRenderBuffer* buffer) = 0;
@@ -42,16 +77,16 @@ struct iRenderBufferManager
   virtual void UnlockBuffer(iRenderBuffer* buffer) = 0;
 };
 
-struct iStreamSource
+struct iStreamSource : public iBase
 {
   /// Get a named buffer
-  iRenderBuffer* GetBuffer(csStringID name) = 0;
+  virtual iRenderBuffer* GetBuffer(csStringID name) = 0;
 };
 
 struct csRenderMesh
 {
   /// Type of mesh
-  enum
+  typedef enum
   {
     MESHTYPE_TRIANGLES,
     MESHTYPE_QUADS,
@@ -63,9 +98,9 @@ struct csRenderMesh
   } meshtype;
 
   ///Special attributes. Please don't change, it's used as flags
-  enum
+  typedef enum
   {
-    SPECIAL_NONE = 0
+    SPECIAL_NONE = 0,
     SPECIAL_BILLBOARD = 1,
     SPECIAL_ZFILL = 2
   } specialattributes;
@@ -95,31 +130,5 @@ struct csRenderMesh
   virtual iTextureHandle* GetLightmapHandle() = 0;
 };
 
-/**
- * This is a general buffer to be used by the renderer. It can ONLY be
- * created by the VB manager
- */
-struct iRenderBuffer : public iBase
-{
-  
-  /// Get a raw pointer to the bufferdata as different datatypes
-  virtual float* GetFloatBuffer() = 0;
-  virtual unsigned char* GetUCharBuffer() = 0;
-  virtual unsigned int* GetUIntBuffer() = 0;
-  virtual csVector3* GetVector3Buffer() = 0;
-  virtual csVector2* GetVector2Buffer() = 0;
-  virtual csColor* GetColorBuffer() = 0;
-
-  /// Get type of buffer (where it's located)
-  virtual RENDERBUFFER_LOCATION GetBufferType() = 0;
-
-  /// Get number of indices in the data (as different datatypes)
-  virtual int GetFloatLength() = 0;
-  virtual int GetUCharLength() = 0;
-  virtual int GetUintLength() = 0;
-  virtual int GetVec3Length() = 0;
-  virtual int GetVec2Length() = 0;
-  virtual int GetColorLength() = 0;
-};
 
 #endif //  __IVIDEO_RNDBUF_H__

@@ -18,9 +18,33 @@
 */
 
 #include "cssysdef.h"
+
+
+#include "csutil/objreg.h"
+#include "csutil/ref.h"
+#include "csutil/scf.h"
+#include "csutil/strhash.h"
+
+#include "iutil/comp.h"
+#include "iutil/plugin.h"
+#include "iutil/eventq.h"
+#include "ivaria/reporter.h"
+
+#include "ivideo/lighting.h"
+#include "ivideo/txtmgr.h"
+#include "ivideo/rndbuf.h"
 #include "ivideo/render3d.h"
 
-#include "render3d.h"
+
+#include "gl_render3d.h"
+
+#include "ivideo/effects/efserver.h"
+#include "ivideo/effects/efdef.h"
+#include "ivideo/effects/eftech.h"
+#include "ivideo/effects/efpass.h"
+#include "ivideo/effects/eflayer.h"
+
+
 
 SCF_IMPLEMENT_IBASE(csGLRender3D)
   SCF_IMPLEMENTS_INTERFACE(iRender3D)
@@ -48,6 +72,25 @@ csGLRender3D::csGLRender3D (iBase *parent)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEffectClient);
 }
 
+csGLRender3D::~csGLRender3D()
+{
+}
+
+void csGLRender3D::Report (int severity, const char* msg, ...)
+{
+  va_list arg;
+  va_start (arg, msg);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
+  if (rep)
+    rep->ReportV (severity, "crystalspace.render3d.opengl", msg, arg);
+  else
+  {
+    csPrintfV (msg, arg);
+    csPrintf ("\n");
+  }
+  va_end (arg);
+}
+
 
 ////////////////////////////////////////////////////////////////////
 //                         iRender3D
@@ -58,7 +101,7 @@ csGLRender3D::csGLRender3D (iBase *parent)
 
 bool csGLRender3D::Open ()
 {
-  if (!g2d->Open ())
+  if (!G2D->Open ())
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Error opening Graphics2D context.");
     return false;
@@ -73,12 +116,13 @@ bool csGLRender3D::Open ()
       "crystalspace.video.effects.stdserver", iEffectServer);
     object_reg->Register (effectserver, "iEffectServer");
   }
+  return true;
 }
 
 void csGLRender3D::Close ()
 {
-  if (g2d)
-    g2d->Close ();
+  if (G2D)
+    G2D->Close ();
 }
 
 bool csGLRender3D::BeginDraw (int drawflags)
@@ -95,7 +139,26 @@ void csGLRender3D::Print (csRect* area)
   G2D->Print (area);
 }
 
+csReversibleTransform* csGLRender3D::GetWVMatrix()
+{
+  return NULL;
+}
 
+void csGLRender3D::SetWVMatrix(csReversibleTransform* wvmatrix)
+{
+}
+
+void csGLRender3D::SetDimension(int width, int height)
+{
+}
+
+void csGLRender3D::SetFOV(float fov)
+{
+}
+
+void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
+{
+}
 
 ////////////////////////////////////////////////////////////////////
 //                         iEffectClient
@@ -104,7 +167,7 @@ void csGLRender3D::Print (csRect* area)
 
 
 
-bool csGLRender3D::Validate (iEffectDefinition* effect, iEffectTechnique* technique);
+bool csGLRender3D::Validate (iEffectDefinition* effect, iEffectTechnique* technique)
 {
   return false;
 }
@@ -134,10 +197,11 @@ bool csGLRender3D::Initialize (iObjectRegistry* p)
   csRef<iPluginManager> plugin_mgr (
     CS_QUERY_REGISTRY (object_reg, iPluginManager));
 
+
   // @@@ Should check what canvas to load
-  g2d = CS_LOAD_PLUGIN (plugin_mgr, 
+  G2D = CS_LOAD_PLUGIN (plugin_mgr, 
     "crystalspace.graphics2d.glwin32", iGraphics2D);
-  if (!g2d)
+  if (!G2D)
     return false;
 
   return true;
