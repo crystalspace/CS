@@ -58,6 +58,7 @@ TO_INSTALL.DATA   += $(addprefix $(SRCDIR)/, \
 MSVC.DSP += WALKTEST
 DSP.WALKTEST.NAME = walktest
 DSP.WALKTEST.TYPE = appgui
+DSP.WALKTEST.LIBS = zlib
 
 $(WALKTEST.EXE).WINRSRC = $(SRCDIR)/libs/csutil/win32/rsrc/cs1.rc
 
@@ -75,7 +76,7 @@ $(OUT.WALKTEST)/%$O: $(SRCDIR)/$(DIR.WALKTEST)/%.cpp
 	$(DO.COMPILE.CPP)
 
 $(WALKTEST.EXE): $(DEP.EXE) $(OBJ.WALKTEST) $(LIB.WALKTEST)
-	$(DO.LINK.EXE)
+	$(DO.LINK.EXE) $(ZLIB.LFLAGS)
 
 walktestclean:
 	-$(RM) walktest.txt

@@ -3,6 +3,7 @@ SubDir TOP apps walktest ;
 Help walktest : "Crystal Space WalkTest demo" ;
 Application walktest : [ Wildcard *.cpp *.h ] ;
 LinkWith walktest : csgeom csgfx cstool csutil ;
+ExternalLibs walktest : ZLIB ;
 Win32Resource walktest : [ ConcatDirs $(TOP) libs csutil win32 rsrc cs1.rc ] ;
 
 CompileGroups bugplug    : walkall ;

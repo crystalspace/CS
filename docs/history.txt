@@ -67,6 +67,8 @@ chronological order.
 	  x = [(A,B,C) * U + D ] / (A,B,C) * (V - U). Look to the comments in 
 	  the code for more clarifications. He also set some default values 
 	 (and documented it) for the output arguments.
+	- res changed the walktest Make-/Jamfile to link against zlib (needed
+	  by the minidump code).
 25-Apr-2004
 	- Jorrit changed the way render priorities work in the engine. The
 	  RenderQueues field no longer contains all meshes for all render
