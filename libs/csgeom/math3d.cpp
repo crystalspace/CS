@@ -28,18 +28,19 @@
 float csVector3::Norm () const
 { return sqrt (x*x + y*y + z*z); }
 
-void csVector3::Normalize() {
-float len;
-  len = this->Norm();
-  if( len > SMALL_EPSILON )
+void csVector3::Normalize ()
+{
+  float len;
+  len = this->Norm ();
+  if (len > SMALL_EPSILON)
     *this /= len;
 }
 
 // conversion from single precision vector to double
-csVector3::csVector3( const csDVector3 &csv ){ x = (float)csv.x; y = (float)csv.y; z = (float)csv.z; }
+csVector3::csVector3 (const csDVector3 &csv) { x = (float)csv.x; y = (float)csv.y; z = (float)csv.z; }
 
 // conversion from single precision vector to double
-void csVector3::operator=( const csDVector3 &csv ){ x = (float)csv.x; y = (float)csv.y; z = (float)csv.z; }
+void csVector3::operator= (const csDVector3 &csv) { x = (float)csv.x; y = (float)csv.y; z = (float)csv.z; }
 
 
 //---------------------------------------------------------------------------
