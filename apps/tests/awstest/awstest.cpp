@@ -319,7 +319,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   col_cyan = myG2D->FindRGB (0, 255, 255);
   col_green = myG2D->FindRGB (0, 255, 0);
 
-  if (AWSTEST_CANVAS == AWSTEST_SINGLEPROC)
+/*  if (AWSTEST_CANVAS == AWSTEST_SINGLEPROC)
   {
     awsCanvas = aws->CreateDefaultCanvas(engine, myG3D->GetTextureManager(), 512, 512, 0);
     //aws->SetFlag(AWSF_AlwaysEraseWindows);  // Only set for surface or direct-drawing w/o engine
@@ -332,9 +332,9 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   {
     awsCanvas = aws->CreateCustomCanvas(myG2D, myG3D);
     aws->SetFlag(AWSF_AlwaysRedrawWindows);     // Only set for direct-drawing with engine
-  }
+  }*/
 
-  aws->SetCanvas(awsCanvas);
+  aws->SetupCanvas(NULL, myG2D, myG3D);
 
   // next, setup sinks before loading any preferences
   awsTestSink *s    = new awsTestSink();
