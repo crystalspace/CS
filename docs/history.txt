@@ -17,6 +17,9 @@ The history order is reversed so that new features are at the top.
 	  validate the level. At this moment it will only test if all
 	  polygons with more than three vertices are well-formed in the
 	  sense that all vertices of the polygon must be on the same plane.
+	- Cleaned up the timed operations code in the engine sequencer
+	  a bit. Also made it more efficient by not requiring as much
+	  object creation.
 23-Sep-2002
 	- Added new iEngineSequenceManager API. This is going to be used
 	  for an engine sequence manager. More info on this new feature

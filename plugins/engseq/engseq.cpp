@@ -89,32 +89,40 @@ public:
 };
 
 /**
- * Fade fog timed operation.
+ * Fade fog operation.
  */
-class TimedOpFadeFog : public iSequenceTimedOperation
+class OpFadeFog : public OpStandard
 {
 private:
   csRef<iSector> sector;
   csColor start_col, end_col;
   float start_density, end_density;
+  csTicks duration;
+  iEngineSequenceManager* eseqmgr;
 
 public:
-  TimedOpFadeFog (iSector* sector,
-  	const csColor& start_col, float start_density,
-  	const csColor& end_col, float end_density)
+  OpFadeFog (iSector* sector, const csColor& color, float density,
+  	csTicks duration, iEngineSequenceManager* eseqmgr)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
-    TimedOpFadeFog::sector = sector;
-    TimedOpFadeFog::start_col = start_col;
-    TimedOpFadeFog::start_density = start_density;
-    TimedOpFadeFog::end_col = end_col;
-    TimedOpFadeFog::end_density = end_density;
+    SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSequenceTimedOperation);
+    OpFadeFog::sector = sector;
+    OpFadeFog::end_col = color;
+    OpFadeFog::end_density = density;
+    OpFadeFog::duration = duration;
+    OpFadeFog::eseqmgr = eseqmgr;
   }
-  virtual ~TimedOpFadeFog () { }
 
-  SCF_DECLARE_IBASE;
+  virtual void Do (csTicks dt)
+  {
+    csFog* fog = sector->GetFog ();
+    start_col.red = fog->red;
+    start_col.green = fog->green;
+    start_col.blue = fog->blue;
+    start_density = fog->density;
+    eseqmgr->FireTimedOperation (dt, duration, &scfiSequenceTimedOperation);
+  }
 
-  virtual void Do (float time)
+  void DoTimed (float time)
   {
     float density = (1-time) * start_density + time * end_density;
     if (density < 0.001)
@@ -128,45 +136,27 @@ public:
       sector->SetFog (density, color);
     }
   }
+
+  SCF_DECLARE_IBASE_EXT (OpStandard);
+
+  struct SequenceTimedOperation : public iSequenceTimedOperation
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (OpFadeFog);
+    virtual void Do (float time)
+    {
+      scfParent->DoTimed (time);
+    }
+  } scfiSequenceTimedOperation;
+  friend struct SequenceTimedOperation;
 };
 
-SCF_IMPLEMENT_IBASE (TimedOpFadeFog)
+SCF_IMPLEMENT_IBASE_EXT (OpFadeFog)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_IBASE_EXT_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (OpFadeFog::SequenceTimedOperation)
   SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
-SCF_IMPLEMENT_IBASE_END
-
-/**
- * Fade fog operation.
- */
-class OpFadeFog : public OpStandard
-{
-private:
-  csRef<iSector> sector;
-  csColor color;
-  float density;
-  csTicks duration;
-  iEngineSequenceManager* eseqmgr;
-
-public:
-  OpFadeFog (iSector* sector, const csColor& color, float density,
-  	csTicks duration, iEngineSequenceManager* eseqmgr)
-  {
-    OpFadeFog::sector = sector;
-    OpFadeFog::color = color;
-    OpFadeFog::density = density;
-    OpFadeFog::duration = duration;
-    OpFadeFog::eseqmgr = eseqmgr;
-  }
-
-  virtual void Do (csTicks dt)
-  {
-    csFog* fog = sector->GetFog ();
-    csColor start_col (fog->red, fog->green, fog->blue);
-    TimedOpFadeFog* timedop = new TimedOpFadeFog (
-    	sector, start_col, fog->density, color, density);
-    eseqmgr->FireTimedOperation (dt, duration, timedop);
-    timedop->DecRef ();
-  }
-};
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 //---------------------------------------------------------------------------
 
@@ -193,49 +183,13 @@ public:
 };
 
 /**
- * Fade light timed operation.
- */
-class TimedOpFadeLight : public iSequenceTimedOperation
-{
-private:
-  csRef<iLight> light;
-  csColor start_col, end_col;
-
-public:
-  TimedOpFadeLight (iLight* light,
-  	const csColor& start_col, const csColor& end_col)
-  {
-    SCF_CONSTRUCT_IBASE (NULL);
-    TimedOpFadeLight::light = light;
-    TimedOpFadeLight::start_col = start_col;
-    TimedOpFadeLight::end_col = end_col;
-  }
-  virtual ~TimedOpFadeLight () { }
-
-  SCF_DECLARE_IBASE;
-
-  virtual void Do (float time)
-  {
-    csColor color;
-    color.red = (1-time) * start_col.red + time * end_col.red;
-    color.green = (1-time) * start_col.green + time * end_col.green;
-    color.blue = (1-time) * start_col.blue + time * end_col.blue;
-    light->SetColor (color);
-  }
-};
-
-SCF_IMPLEMENT_IBASE (TimedOpFadeLight)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
-SCF_IMPLEMENT_IBASE_END
-
-/**
  * Fade light operation.
  */
 class OpFadeLight : public OpStandard
 {
 private:
   csRef<iLight> light;
-  csColor color;
+  csColor start_col, end_col;
   csTicks duration;
   iEngineSequenceManager* eseqmgr;
 
@@ -243,28 +197,55 @@ public:
   OpFadeLight (iLight* light, const csColor& color,
   	csTicks duration, iEngineSequenceManager* eseqmgr)
   {
+    SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSequenceTimedOperation);
     OpFadeLight::light = light;
-    OpFadeLight::color = color;
+    OpFadeLight::end_col = color;
     OpFadeLight::duration = duration;
     OpFadeLight::eseqmgr = eseqmgr;
   }
 
   virtual void Do (csTicks dt)
   {
-    const csColor& start_col = light->GetColor ();
-    TimedOpFadeLight* timedop = new TimedOpFadeLight (
-    	light, start_col, color);
-    eseqmgr->FireTimedOperation (dt, duration, timedop);
-    timedop->DecRef ();
+    start_col = light->GetColor ();
+    eseqmgr->FireTimedOperation (dt, duration, &scfiSequenceTimedOperation);
   }
+
+  void DoTimed (float time)
+  {
+    csColor color;
+    color.red = (1-time) * start_col.red + time * end_col.red;
+    color.green = (1-time) * start_col.green + time * end_col.green;
+    color.blue = (1-time) * start_col.blue + time * end_col.blue;
+    light->SetColor (color);
+  }
+
+  SCF_DECLARE_IBASE_EXT (OpStandard);
+
+  struct SequenceTimedOperation : public iSequenceTimedOperation
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (OpFadeLight);
+    virtual void Do (float time)
+    {
+      scfParent->DoTimed (time);
+    }
+  } scfiSequenceTimedOperation;
+  friend struct SequenceTimedOperation;
 };
+
+SCF_IMPLEMENT_IBASE_EXT (OpFadeLight)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_IBASE_EXT_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (OpFadeLight::SequenceTimedOperation)
+  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 //---------------------------------------------------------------------------
 
 /**
- * Timed rotation operator.
+ * Operate operation.
  */
-class TimedOpRotate : public iSequenceTimedOperation
+class OpRotate : public OpStandard
 {
 private:
   csRef<iMeshWrapper> mesh;
@@ -272,31 +253,38 @@ private:
   float tot_angle1, tot_angle2, tot_angle3;
   csVector3 offset;
   csReversibleTransform start_transform;
+  csTicks duration;
+  iEngineSequenceManager* eseqmgr;
 
 public:
-  TimedOpRotate (iMeshWrapper* mesh,
-  	const csReversibleTransform& start_transform,
-	int axis1, float tot_angle1,
-	int axis2, float tot_angle2,
-	int axis3, float tot_angle3,
-	const csVector3& offset)
+  OpRotate (iMeshWrapper* mesh,
+  	int axis1, float tot_angle1,
+  	int axis2, float tot_angle2,
+  	int axis3, float tot_angle3,
+	const csVector3& offset,
+  	csTicks duration, iEngineSequenceManager* eseqmgr)
   {
-    SCF_CONSTRUCT_IBASE (NULL);
-    TimedOpRotate::mesh = mesh;
-    TimedOpRotate::axis1 = axis1;
-    TimedOpRotate::tot_angle1 = tot_angle1;
-    TimedOpRotate::axis2 = axis2;
-    TimedOpRotate::tot_angle2 = tot_angle2;
-    TimedOpRotate::axis3 = axis3;
-    TimedOpRotate::tot_angle3 = tot_angle3;
-    TimedOpRotate::offset = offset;
-    TimedOpRotate::start_transform = start_transform;
+    SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSequenceTimedOperation);
+    OpRotate::mesh = mesh;
+    OpRotate::axis1 = axis1;
+    OpRotate::tot_angle1 = tot_angle1;
+    OpRotate::axis2 = axis2;
+    OpRotate::tot_angle2 = tot_angle2;
+    OpRotate::axis3 = axis3;
+    OpRotate::tot_angle3 = tot_angle3;
+    OpRotate::offset = offset;
+    OpRotate::duration = duration;
+    OpRotate::eseqmgr = eseqmgr;
   }
-  virtual ~TimedOpRotate () { }
 
-  SCF_DECLARE_IBASE;
+  virtual void Do (csTicks dt)
+  {
+    iMovable* movable = mesh->GetMovable ();
+    start_transform = movable->GetTransform ();
+    eseqmgr->FireTimedOperation (dt, duration, &scfiSequenceTimedOperation);
+  }
 
-  virtual void Do (float time)
+  void DoTimed (float time)
   {
     csReversibleTransform trans = start_transform;
     trans.Translate (-offset);
@@ -348,97 +336,29 @@ public:
     mesh->GetMovable ()->UpdateMove ();
     mesh->DeferUpdateLighting (CS_NLIGHT_STATIC | CS_NLIGHT_DYNAMIC, 10);
   }
+
+  SCF_DECLARE_IBASE_EXT (OpStandard);
+
+  struct SequenceTimedOperation : public iSequenceTimedOperation
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (OpRotate);
+    virtual void Do (float time)
+    {
+      scfParent->DoTimed (time);
+    }
+  } scfiSequenceTimedOperation;
+  friend struct SequenceTimedOperation;
 };
 
-SCF_IMPLEMENT_IBASE (TimedOpRotate)
+SCF_IMPLEMENT_IBASE_EXT (OpRotate)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_IBASE_EXT_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (OpRotate::SequenceTimedOperation)
   SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
-SCF_IMPLEMENT_IBASE_END
-
-/**
- * Operate operation.
- */
-class OpRotate : public OpStandard
-{
-private:
-  csRef<iMeshWrapper> mesh;
-  int axis1, axis2, axis3;
-  float tot_angle1, tot_angle2, tot_angle3;
-  csVector3 offset;
-  csTicks duration;
-  iEngineSequenceManager* eseqmgr;
-
-public:
-  OpRotate (iMeshWrapper* mesh,
-  	int axis1, float tot_angle1,
-  	int axis2, float tot_angle2,
-  	int axis3, float tot_angle3,
-	const csVector3& offset,
-  	csTicks duration, iEngineSequenceManager* eseqmgr)
-  {
-    OpRotate::mesh = mesh;
-    OpRotate::axis1 = axis1;
-    OpRotate::tot_angle1 = tot_angle1;
-    OpRotate::axis2 = axis2;
-    OpRotate::tot_angle2 = tot_angle2;
-    OpRotate::axis3 = axis3;
-    OpRotate::tot_angle3 = tot_angle3;
-    OpRotate::offset = offset;
-    OpRotate::duration = duration;
-    OpRotate::eseqmgr = eseqmgr;
-  }
-
-  virtual void Do (csTicks dt)
-  {
-    iMovable* movable = mesh->GetMovable ();
-    TimedOpRotate* timedop = new TimedOpRotate (
-    	mesh, movable->GetTransform (),
-	axis1, tot_angle1,
-	axis2, tot_angle2,
-	axis3, tot_angle3,
-	offset);
-    eseqmgr->FireTimedOperation (dt, duration, timedop);
-    timedop->DecRef ();
-  }
-};
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 //---------------------------------------------------------------------------
-
-/**
- * Timed move operator.
- */
-class TimedOpMove : public iSequenceTimedOperation
-{
-private:
-  csRef<iMeshWrapper> mesh;
-  csVector3 offset;
-  csVector3 start_pos;
-
-public:
-  TimedOpMove (iMeshWrapper* mesh,
-  	const csVector3& start_pos,
-	const csVector3& offset)
-  {
-    SCF_CONSTRUCT_IBASE (NULL);
-    TimedOpMove::mesh = mesh;
-    TimedOpMove::offset = offset;
-    TimedOpMove::start_pos = start_pos;
-  }
-  virtual ~TimedOpMove () { }
-
-  SCF_DECLARE_IBASE;
-
-  virtual void Do (float time)
-  {
-    csVector3 new_pos = start_pos + time * offset;
-    mesh->GetMovable ()->GetTransform ().SetOrigin (new_pos);
-    mesh->GetMovable ()->UpdateMove ();
-    mesh->DeferUpdateLighting (CS_NLIGHT_STATIC | CS_NLIGHT_DYNAMIC, 10);
-  }
-};
-
-SCF_IMPLEMENT_IBASE (TimedOpMove)
-  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
-SCF_IMPLEMENT_IBASE_END
 
 /**
  * Operate operation.
@@ -448,6 +368,7 @@ class OpMove : public OpStandard
 private:
   csRef<iMeshWrapper> mesh;
   csVector3 offset;
+  csVector3 start_pos;
   csTicks duration;
   iEngineSequenceManager* eseqmgr;
 
@@ -456,6 +377,7 @@ public:
 	const csVector3& offset,
   	csTicks duration, iEngineSequenceManager* eseqmgr)
   {
+    SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSequenceTimedOperation);
     OpMove::mesh = mesh;
     OpMove::offset = offset;
     OpMove::duration = duration;
@@ -465,13 +387,38 @@ public:
   virtual void Do (csTicks dt)
   {
     iMovable* movable = mesh->GetMovable ();
-    TimedOpMove* timedop = new TimedOpMove (
-    	mesh, movable->GetTransform ().GetOrigin (),
-	offset);
-    eseqmgr->FireTimedOperation (dt, duration, timedop);
-    timedop->DecRef ();
+    start_pos = movable->GetTransform ().GetOrigin ();
+    eseqmgr->FireTimedOperation (dt, duration, &scfiSequenceTimedOperation);
   }
+
+  void DoTimed (float time)
+  {
+    csVector3 new_pos = start_pos + time * offset;
+    mesh->GetMovable ()->GetTransform ().SetOrigin (new_pos);
+    mesh->GetMovable ()->UpdateMove ();
+    mesh->DeferUpdateLighting (CS_NLIGHT_STATIC | CS_NLIGHT_DYNAMIC, 10);
+  }
+
+  SCF_DECLARE_IBASE_EXT (OpStandard);
+
+  struct SequenceTimedOperation : public iSequenceTimedOperation
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (OpMove);
+    virtual void Do (float time)
+    {
+      scfParent->DoTimed (time);
+    }
+  } scfiSequenceTimedOperation;
+  friend struct SequenceTimedOperation;
 };
+
+SCF_IMPLEMENT_IBASE_EXT (OpMove)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_IBASE_EXT_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (OpMove::SequenceTimedOperation)
+  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 //---------------------------------------------------------------------------
 
