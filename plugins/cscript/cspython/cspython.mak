@@ -118,7 +118,7 @@ $(OUT)%$O: plugins/cscript/cspython/%.c
 	$(DO.COMPILE.C) $(CFLAGS.PYTHON)
 
 $(SWIG.CSPYTHON): $(SWIG.INTERFACE)
-	swig -python -c++ -shadow -o $(SWIG.CSPYTHON) $(SWIG.INTERFACE)
+	swig -python -c++ -docstring -dascii -Sbefore -shadow -Iinclude/ -o $(SWIG.CSPYTHON) $(SWIG.INTERFACE)
 	mv plugins/cscript/cspython/cspace.py scripts/python/
 
 python.cex: plugins/cscript/cspython/python.cin
