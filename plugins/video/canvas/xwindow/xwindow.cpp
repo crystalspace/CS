@@ -34,10 +34,16 @@
 #include "ivaria/reporter.h"
 #include "video/canvas/common/scancode.h"
 
+// Define this if you want keyboard-grabbing behavior enabled.  For now it is
+// disabled by default.  In the future, we should probably provide an API for
+// setting this at run-time (though this API, when properly generalized to be
+// platform-neutral, does not belong in iGraphics2D; but rather in some input-
+// or keyboard-related interface).
+#undef CS_XWIN_GRAB_KEYBOARD
+
 CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csXWindow)
-
 
 SCF_IMPLEMENT_IBASE(csXWindow)
   SCF_IMPLEMENTS_INTERFACE(iXWindow)
@@ -638,6 +644,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
 	  EventOutlet->Broadcast (cscmdFocusChanged,
 				  (void *)(event.type == FocusIn));
 #ifndef CS_DEBUG
+#ifdef CS_XWIN_GRAB_KEYBOARD
 	  if (xf86vm && !keyboard_grabbed &&
 	      event.xfocus.window == wm_win)
 	  {
@@ -650,6 +657,7 @@ bool csXWindow::HandleEvent (iEvent &Event)
 	    keyboard_grabbed = 2;
 	  }
 #endif
+#endif
 	  break;
 	}
       case FocusOut:
@@ -657,8 +665,10 @@ bool csXWindow::HandleEvent (iEvent &Event)
 	  EventOutlet->Broadcast (cscmdFocusChanged,
 				  (void *)(event.type == FocusIn));
 #ifndef CS_DEBUG
+#ifdef CS_XWIN_GRAB_KEYBOARD
 	  if (xf86vm && keyboard_grabbed && !--keyboard_grabbed)
 	    XUngrabKeyboard (dpy, CurrentTime);
+#endif
 #endif
 	  break;
 	}

@@ -10,6 +10,17 @@ The history order is reversed so that new features are at the top.
 	  all cases, it failed to take the terminating null byte into account.
 	  In other cases, it was just wildly miscalculating the necessary
 	  allocation size.
+	- Eric Sunshine disabled "keyboard grabbing" by default in the
+	  X-windows (xwindow) canvas since it seems generally to cause more
+	  problems for people than it solves.  For instance, it prevents people
+	  from using hot-keys intended for the window manager (which is
+	  external to CS).  In the future, however, it might be useful to
+	  provide an API for controlling this behavior at run-time since it is
+	  reasonable that games might want to avoid losing keyboard focus
+	  during some intense action sequence when the user accidentally hits
+	  some incorrect batch of keys.  Note that the API for this feature,
+	  once properly generalized to be platform-neutral, does not belong in
+	  iGraphics2D; but rather in some input- or keyboard-related interface.
 22-Jul-2003
         - Philip Wyett fixed inconsistent swig -I flag in make build and
 	  aligning it with jam build.  cs_pyth.cpp will now be identical
