@@ -135,7 +135,7 @@ void csTextureMM::create_mipmap_bitmap (csTextureManager* tex, int steps, unsign
   if (!ifile) return;
   IImageFile* if2;
   bool tran = get_transparent ();
-  if (tran || tex->mipmap_nice == MIPMAP_UGLY) ifile->MipMap (steps, &if2);
+  if (tran || tex->mipmap_nice == MIPMAP_UGLY) ifile->MipMap (steps, &if2); 
   else if (tex->mipmap_nice == MIPMAP_DEFAULT) ifile->MipMap (steps, NULL, NULL, &if2);
   else ifile->MipMap (steps, &csTextureManager::mipmap_filter_1, &csTextureManager::mipmap_filter_2, &if2);
   convert_to_internal (tex, if2, bm);
@@ -418,24 +418,50 @@ void csTextureMM::remap_texture_32 (csTextureManager* new_palette)
 }
 
 
-void csHardwareAcceleratedTextureMM::convert_to_internal (csTextureManager* /*tex*/,
+void csHardwareAcceleratedTextureMM::convert_to_internal (csTextureManager* tex,
                                                           IImageFile* imfile, 
                                                           unsigned char* bm)
 {
   int s;
   imfile->GetSize (s);
-  RGBPixel* bmsrc;
-  imfile->GetImageData (&bmsrc);
-  int r, g, b;
-  ULong* bml = (ULong*)bm;
-  while (s > 0)
+  RGBPixel* src;
+  imfile->GetImageData (&src);
+  ULong* dest = (ULong*) bm;
+
+  // Map the texture to the RGB palette.
+
+  //Approximation for black, because we can't use real black. Value 0 is 
+  //reserved for transparent pixels!
+  ULong  black = tex->get_almost_black(); 
+
+  if (get_transparent ())
   {
-    r = bmsrc->red;
-    g = bmsrc->green;
-    b = bmsrc->blue;
-    *bml++ = (r<<16)|(g<<8)|b;
-    bmsrc++;
-    s--;
+    //transparent Textures need special processing. Every texel, that is transp_color
+    //will be transformed to 0, because that is the color we use internally to mark
+    //transparent texels.
+    while (s>0)
+    {
+      if (transp_color == *src)
+      {
+        *dest++ = 0;
+      }
+      else
+      {
+        ULong texel = (src->red<<16) | (src->green<<8) | src->blue;;
+        *dest++ = texel ? texel : black; //transform 0 to become "black"
+      }
+      src++;
+      s--;
+    }
+  }
+  else
+  {
+    while (s>0)
+    {
+      *dest++ = (src->red<<16) | (src->green<<8) | src->blue;
+      src++;
+      s--;
+    }
   }
 }
 
