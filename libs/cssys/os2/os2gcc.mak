@@ -146,7 +146,8 @@ SRC.SYS_CSSYS = \
   libs/cssys/general/printf.cpp \
   libs/cssys/general/runloop.cpp \
   libs/cssys/general/sysinit.cpp \
-  libs/cssys/general/timing.cpp
+  libs/cssys/general/timing.cpp \
+  libs/cssys/general/username.cpp
 
 # The C compiler (autodetected)
 #CC=gcc -c
