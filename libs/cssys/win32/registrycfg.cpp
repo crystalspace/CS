@@ -127,17 +127,17 @@ void csRegistryConfig::SetFileName (const char*, iVFS*)
 bool csRegistryConfig::Load (const char* iFileName, iVFS*, bool Merge,
     bool NewWins)
 {
-  return false;
+  return true;
 }
 
 bool csRegistryConfig::Save ()
 {
-  return false;
+  return true;
 }
 
 bool csRegistryConfig::Save (const char *iFileName, iVFS*)
 {
-  return false;
+  return true;
 }
 
 void csRegistryConfig::Clear ()
