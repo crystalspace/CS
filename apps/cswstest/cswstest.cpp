@@ -22,8 +22,7 @@
 #include "csws/csws.h"
 
 // We need the Virtual File System plugin
-REGISTER_STATIC_CLASS (csVFS, "crystalspace.kernel.vfs",
-  "Crystal Space Virtual File System plug-in")
+REGISTER_STATIC_LIBRARY (vfs)
 
 class csWsTest : public csApp
 {
