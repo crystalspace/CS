@@ -45,6 +45,12 @@ chronological order.
 	      lit.
 	    - Fixed a bug in csGetKeyDesc() causing bogus key strings to be
 	      returned for character keys.
+	- Rhad added float support to aws for scrollbars.  This involved some
+	  additions to the various aws interfaces.  It also involved expanding
+	  the parser a bit to handle numeric values with a decimal point.  I
+	  think everything worked out OK, but I'm not really proficient with 
+	  flex or yacc, so if something doesn't appear to work, please let me
+	  know (or fix it!).
 21-Oct-2003
 	- Rhad added UI for Initial Speed and Initial Acceleration to partedit.
 	- Eric Sunshine made the following configuration-related changes:

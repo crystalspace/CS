@@ -123,6 +123,15 @@ struct iAwsIntKey : public iAwsKey
   virtual int Value () = 0;
 };
 
+SCF_VERSION(iAwsFloatKey, 0, 0, 1)
+
+/// Document me!@@@
+struct iAwsFloatKey : public iAwsKey
+{
+  /// Gets the value of this key as a float
+  virtual float Value () = 0;
+};
+
 SCF_VERSION(iAwsStringKey, 0, 0, 1);
 
 /// Document me!@@@
@@ -472,6 +481,9 @@ public:
 
   /// Get the an integer from a given component node
   virtual bool GetInt(iAwsComponentNode *node, const char* name, int &val)=0;
+
+  /// Get the float value from a given component node
+  virtual bool GetFloat(iAwsComponentNode *node, const char* name, float &val)=0;
 
   /// Get the a rect from a given component node
   virtual bool GetRect(iAwsComponentNode *node, const char* name,

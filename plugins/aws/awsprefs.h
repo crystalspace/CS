@@ -67,7 +67,8 @@ enum {
   KEY_POINT = 7,
   KEY_CONNECTION = 8,
   KEY_CONNECTIONMAP = 9,
-  KEY_CONTAINER = 10
+  KEY_CONTAINER = 10,
+  KEY_FLOAT = 11
 };
 
 /// Abstract key interface
@@ -136,6 +137,41 @@ public:
   int Value ()
   { return val; }
 };
+
+
+class awsFloatKey : public awsKey, public iAwsFloatKey
+{
+  /// The key's value
+  float val;
+
+public:
+
+  SCF_DECLARE_IBASE_EXT(awsKey);
+  /// Constructs a float key with the given name
+  awsFloatKey (iString *name, float v)
+    :  awsKey(name), val(v)
+  { }
+  /// Constructs a float key with the given name
+  awsFloatKey (const char* name, float v)
+    : awsKey(name), val(v)
+  { }
+
+  /// Destructor does nothing
+  virtual ~awsFloatKey ()
+  { }
+
+  /// Accessor function gets name of key
+  unsigned long Name () { return awsKey::Name(); }
+
+  /// So that we know it's a float key
+  virtual uint8 Type ()
+  { return KEY_FLOAT; }
+
+  /// Gets the value of this key as a float
+  float Value ()
+  { return val; }
+};
+
 
 class awsStringKey : public awsKey, public iAwsStringKey
 {
@@ -614,6 +650,12 @@ public:
   /// Lookup the value of an int key by id (from the skin def)
   virtual bool LookupIntKey (unsigned long id, int &val);
 
+  /// Lookup the value of a float key by name (from the skin def)
+  virtual bool LookupFloatKey (const char *name, float &val);
+
+  /// Lookup the value of a float key by id (from the skin def)
+  virtual bool LookupFloatKey (unsigned long id, float &val);
+
   /// Lookup the value of a string key by name (from the skin def)
   virtual bool LookupStringKey (const char *name, iString * &val);
 
@@ -648,6 +690,9 @@ public:
 
   /// Get the value of an integer from a given component node
   virtual bool GetInt (iAwsComponentNode *node, const char *name, int &val);
+
+  /// Get the value of an integer from a given component node
+  virtual bool GetFloat (iAwsComponentNode *node, const char *name, float &val);
 
   /// Get the a rect from a given component node
   virtual bool GetRect (iAwsComponentNode *node, const char *name, csRect &rect);

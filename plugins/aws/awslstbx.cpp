@@ -156,7 +156,7 @@ bool awsListBox::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   int i;
   int sb_h, sb_w;
   int border = 3;
-  int min = 0, max = 0, change = 1, bigchange = 1;
+  float min = 0, max = 0, change = 1, bigchange = 1;
 
   if (!awsPanel::Setup (_wmgr, settings)) return false;
 
@@ -294,7 +294,6 @@ void awsListBox::ScrollChanged (void *sk, iAwsSource *source)
 
 void awsListBox::UpdateMap ()
 {
-  int map_size_m1;
 
   if (map_dirty)
   {
@@ -308,9 +307,17 @@ void awsListBox::UpdateMap ()
     map_size = CountVisibleItems (&rows);
     map = new awsListRow *[map_size];
 
-    // Set the scroll bar's max position
-    map_size_m1 = map_size;
-    scrollbar->SetProperty ("Max", &map_size_m1);
+    /* Set the scroll bar's max position.  Since we're using the
+	 * pagesize (amount visible) property of the scrollbar, the max
+	 * position will be the total number of rows.  The pagesize will
+	 * be the number of visible rows, and the current value of the
+	 * scrollbar will be the topmost visible row. 
+	 */
+    float max_scroll;
+    max_scroll = map_size;
+    scrollbar->SetProperty ("Max", &max_scroll);
+
+
 
     // Map out items
     MapVisibleItems (&rows, start, map);
@@ -333,6 +340,7 @@ int awsListBox::CountVisibleItems (awsListRowVector *v)
 
   return count;
 }
+
 
 void awsListBox::MapVisibleItems (
   awsListRowVector *v,
@@ -948,7 +956,10 @@ void awsListBox::OnDraw (csRect clip)
           row = (awsListRow *)parent->children->Get (i);
       }
     }   // end while draw items recursively
-    scrollbar->SetProperty ("PageSize", &drawable_count);
+
+	// Map to a float to set PageSize for scrollbar
+	float drawable_float=drawable_count;
+    scrollbar->SetProperty ("PageSize", &drawable_float);
 
   }   // end if there are any rows to draw
 }

@@ -44,6 +44,7 @@ window                  /* printf("window-"); */ return TOKEN_WINDOW;
 for                     /* printf("for-");    */ return TOKEN_FOR;
 from                    /* printf("from-");   */ return TOKEN_FROM;
 [0-9]+                  /* printf("<int>-");  */ awslval->val = atoi(awstext);   return TOKEN_NUM;
+[0-9]*\.[0-9]+          /* printf("<float>-"); */ awslval->fval = atof(awstext);   return TOKEN_FLOAT;
 [a-zA-Z]+[a-zA-Z0-9]*   /* printf("<attr>-"); */ awslval->str = strdup(awstext); return TOKEN_ATTR;
 \"[^\n\"]*\"             /* printf("<str>-");  */ awstext[awsleng-1]=0; awslval->str = strdup(awstext+1); return TOKEN_STR;
 [ \t\r\n]+              /* eat all spaces and stuff */

@@ -30,7 +30,8 @@
 %pure_parser
 %union {
   char   *str;			/* For returning titles and handles to items. */
-  int     val;			/* For returning numbers                      */
+  int     val;			/* For returning integer numbers              */
+  float  fval;			/* For returning non-integer numbers          */
   csRect *rect;			/* For returning rectangular regions          */
   awsKey *key;     		/* For returning keys to various definition items */
   awsComponentNode *comp;	/* for returning windows		      */
@@ -51,6 +52,7 @@ extern int awslineno;
 %}
 
 %token <val>  TOKEN_NUM
+%token <fval> TOKEN_FLOAT
 %token <str>  TOKEN_STR
 %token <str>  TOKEN_ATTR
 %token        TOKEN_SKIN
@@ -61,6 +63,7 @@ extern int awslineno;
 %token	      TOKEN_CONNECT
 %token        TOKEN_IS
 
+%type  <fval>	expf
 %type  <val>	exp constant_item
 %type  <key>	skin_item window_item component_item connection_item
 %type  <keycont> component_item_list connection_item_list window_item_list skin_item_list
@@ -111,6 +114,8 @@ connection_item_list:
 component_item:
 	TOKEN_ATTR ':' TOKEN_STR
 		{  $$ = new awsStringKey($1, $3); free($1); free($3); }
+	| TOKEN_ATTR ':' expf
+		{  $$ = new awsFloatKey($1, $3); free($1); }
 	| TOKEN_ATTR ':' exp
 		{  $$ = new awsIntKey($1, $3); free($1); }
 	| TOKEN_ATTR ':' exp ',' exp ',' exp
@@ -160,6 +165,8 @@ component_item_list:
 window_item:
 	TOKEN_ATTR ':' TOKEN_STR
 		{ $$ = new awsStringKey($1, $3); free($1); free($3); }
+	| TOKEN_ATTR ':' expf
+		{ $$ = new awsFloatKey($1, $3); free($1); }
 	| TOKEN_ATTR ':' exp
 		{ $$ = new awsIntKey($1, $3); free($1); }
 	| TOKEN_ATTR ':' '(' exp ',' exp ')' '-' '(' exp ',' exp ')'
@@ -215,6 +222,8 @@ skin_item:
 		{ $$ = new awsStringKey($1, $3); free($1); free($3); }
 	| TOKEN_ATTR ':' exp ',' exp ',' exp
 		{ $$ = new awsRGBKey($1, $3, $5, $7); free($1); }
+	| TOKEN_ATTR ':' expf
+		{ $$ = new awsFloatKey($1, $3); free($1); }
 	| TOKEN_ATTR ':' exp
 		{ $$ = new awsIntKey($1, $3); free($1); }
 	| TOKEN_ATTR ':' '(' exp ',' exp ')'
@@ -259,6 +268,14 @@ constant_item:
 		  free($1);
 		}
 ;
+
+expf:	TOKEN_FLOAT		{ $$ = $1; }
+	| expf '+' expf		{ $$ = $1 + $3; }
+	| expf '-' expf		{ $$ = $1 - $3; }
+	| expf '*' expf		{ $$ = $1 * $3; }
+	| expf '/' expf		{ $$ = $1 / $3; }
+	| '-' expf %prec NEG	{ $$ = -$2; }
+	| '(' expf ')'		{ $$ = $2; }
 
 exp:    TOKEN_NUM		{ $$ = $1; }
 	| constant_item		{ $$ = $1; }

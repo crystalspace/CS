@@ -94,23 +94,60 @@ bool awsScrollBar::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   iAwsPrefManager *pm = WindowManager ()->GetPrefMgr ();
 
   pm->GetInt (settings, "Orientation", orientation);
-  int h = (int)min;
-  h = (int)min;
-  pm->GetInt (settings, "Min", h);
-  min = (float)h;
-  h = (int)value;
-  pm->GetInt (settings, "Value", h);
-  value = (float)h;
-  h = 1;
-  pm->GetInt (settings, "Max", h);
-  max = (float)h;
-  h = (int)amntvis;
-  pm->GetInt (settings, "PageSize", h);
-  amntvis = (float)h;
-  pm->GetInt (settings, "Change", h);
-  value_delta = (float)h;
-  pm->GetInt (settings, "BigChange", h);
-  value_page_delta = (float)h;
+
+  /*  Numbers are parsed into either floats or ints depending on
+   *   the presence of a decimal point.
+   *  If we're expecting a float and we don't find one, we should
+   *   check for an int, since the numeric value may have just been
+   *   specified as a whole number - in which case it would be parsed
+   *   as an int.
+   */
+
+  int ival;
+
+  min=0.0f;
+  if (!pm->GetFloat (settings, "Min", min))
+  {
+	  if (pm->GetInt(settings,"Min",ival))
+		  min=(float)ival;
+  }
+
+  value=0.0f;
+  if (!pm->GetFloat (settings, "Value", value))
+  {
+	  if (pm->GetInt(settings,"Value",ival))
+		  value=(float)ival;
+  }
+
+  max=1.0f;
+  if (!pm->GetFloat (settings, "Max", max))
+  {
+	  if (pm->GetInt(settings,"Max",ival))
+		  max=(float)ival;
+  }
+
+  amntvis=1.0f;
+  if (!pm->GetFloat (settings, "PageSize", amntvis))
+  {
+	  if (pm->GetInt(settings,"PageSize",ival))
+		  amntvis=(float)ival;
+  }
+
+  
+  value_delta=1.0f;
+  if (!pm->GetFloat (settings, "Change", value_delta))
+  {
+	  if (pm->GetInt(settings,"Change",ival))
+		  value_delta=(float)ival;
+  }
+
+  value_page_delta=1.0f;
+  if (!pm->GetFloat (settings, "BigChange", value_page_delta))
+  {
+	  if (pm->GetInt(settings,"BigChange",ival))
+		  value_page_delta=(float)ival;
+  }
+
 
   // Setup embedded buttons
   incVal = new awsSliderButton;
@@ -363,7 +400,7 @@ void awsScrollBar::KnobTick (void *sk, iAwsSource *)
    *  attempted to fix them.
    */
   // For non "proportional" scrollbars, this value is sb->max (the Max property of the scrollbar) + 1
-  int maxval = (int)(sb->max  - sb->amntvis + 1);
+  float maxval = (sb->max  - sb->amntvis + 1);
 
   if (sb->orientation == sboVertical)
   {
@@ -465,7 +502,7 @@ void awsScrollBar::TickTock (void *sk, iAwsSource *)
       return ;
   }
 
- int maxval = (int)(sb->max - sb->amntvis + 1);
+  float maxval = (sb->max - sb->amntvis + 1);
   sb->value =
     (
       sb->value < sb->min ? sb->min :
@@ -483,7 +520,7 @@ void awsScrollBar::IncClicked (void *sk, iAwsSource *)
   sb->value += sb->value_delta;
 
   /// Check floor and ceiling
- int maxval = (int)(sb->max - sb->amntvis + 1);
+  float maxval = (sb->max - sb->amntvis + 1);
   sb->value =
     (
      sb->value < sb->min ? sb->min :
@@ -501,7 +538,7 @@ void awsScrollBar::DecClicked (void *sk, iAwsSource *)
   sb->value -= sb->value_delta;
 
   /// Check floor and ceiling
- int maxval = (int)(sb->max - sb->amntvis + 1);
+  float maxval = (sb->max - sb->amntvis + 1);
   sb->value =
     (
       sb->value < sb->min ? sb->min :

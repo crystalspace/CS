@@ -351,6 +351,29 @@ bool awsPrefManager::LookupIntKey (unsigned long id, int &val)
   return false;
 }
 
+bool awsPrefManager::LookupFloatKey (const char *name, float &val)
+{
+  return LookupFloatKey (NameToId (name), val);
+}
+
+bool awsPrefManager::LookupFloatKey (unsigned long id, float &val)
+{
+  iAwsKey *k = ((iAwsKeyContainer *)def_skin)->Find (id);
+
+  if (k)
+  {
+    if (k->Type () == KEY_FLOAT)
+    {
+      csRef<iAwsFloatKey> floatKey (SCF_QUERY_INTERFACE(k, iAwsFloatKey));
+      val = floatKey->Value ();
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
 bool awsPrefManager::LookupStringKey (const char *name, iString * &val)
 {
   return LookupStringKey (NameToId (name), val);
@@ -465,6 +488,25 @@ bool awsPrefManager::GetInt (iAwsComponentNode *node, const char *name, int &val
     {
       csRef<iAwsIntKey> ik (SCF_QUERY_INTERFACE(k, iAwsIntKey));
       val = ik->Value ();
+      return true;
+    }
+  }
+
+  return false;
+}
+
+bool awsPrefManager::GetFloat (iAwsComponentNode *node, const char *name, float &val)
+{
+  if (!node) return false;
+
+  iAwsKey *k = ((iAwsKeyContainer *)node)->Find (NameToId (name));
+
+  if (k)
+  {
+    if (k->Type () == KEY_FLOAT)
+    {
+      csRef<iAwsFloatKey> fk (SCF_QUERY_INTERFACE(k, iAwsFloatKey));
+      val = fk->Value ();
       return true;
     }
   }
