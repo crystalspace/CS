@@ -117,6 +117,7 @@ bool csGraphics3DOGLCommon::ARB_multitexture = false;
 bool csGraphics3DOGLCommon::ARB_texture_compression = false;
 bool csGraphics3DOGLCommon::NV_vertex_array_range = false;
 bool csGraphics3DOGLCommon::ARB_texture_env_combine = false;
+bool csGraphics3DOGLCommon::SGIS_generate_mipmap = false;
 
 # define _CSGLEXT_
 # define CSGL_FOR_ALL
@@ -298,7 +299,7 @@ allFound = allFound && fName != NULL;
 	  if (*(searchresult + strlen(ext)) == ' ' ||
 	      *(searchresult + strlen(ext)) == '\0')
 	  {
-	    Report (CS_REPORTER_SEVERITY_NOTIFY, "Found extension: %s\n", ext);
+	    Report (CS_REPORTER_SEVERITY_NOTIFY, "Found extension: %s", ext);
 	    if (!strcmp (ext, "GL_ARB_multitexture"))
 	    {
 #if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_ARB_multitexture)
@@ -387,6 +388,25 @@ allFound = allFound && fName != NULL;
 			"Could not get all function addresse for %s", ext);
 #endif
 	    }
+	    else if (!strcmp (ext, "GL_SGIS_generate_mipmap"))
+	    {
+#if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_SGIS_generate_mipmap)
+	      bool &allFound = SGIS_generate_mipmap;
+	      allFound = true;
+#             define _CSGLEXT_
+#             define CSGL_SGIS_generate_mipmap
+#             include "csglext.h"
+#             undef CSGL_SGIS_generate_mipmap
+#endif
+	    }
+#if CS_DEBUG
+	    else
+	    {
+	      // useful to catch typos
+	      Report (CS_REPORTER_SEVERITY_NOTIFY,
+		"  ... but don't know what to do with %s", ext);
+	    }
+#endif
 	  }
 	  // find next occurance -- we could have multiple matches if we match the
 	  // substring of another extension, but only one will trigger the if
@@ -1005,7 +1025,7 @@ bool csGraphics3DOGLCommon::NewOpen ()
     max_texture_size = Caps.maxTexHeight;
 
   int max_cache_size = 1024*1024*16; // 32mb combined cache
-  texture_cache = new OpenGLTextureCache (max_cache_size);
+  texture_cache = new OpenGLTextureCache (max_cache_size, this);
   lightmap_cache = new OpenGLLightmapCache (this);
   texture_cache->SetBilinearMapping (config->GetBool
         ("Video.OpenGL.EnableBilinearMap", true));
@@ -3668,10 +3688,10 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
       csLightMapQueue* lm_queue = NULL;
       iLightMap * lm = NULL;
       iPolygonTexture* prevPoly = NULL;
-      float lm_scale_u;
-      float lm_scale_v;
-      float lm_offset_u;
-      float lm_offset_v;
+      float lm_scale_u = 1.0f;
+      float lm_scale_v = 1.0f;
+      float lm_offset_u = 0.0f;
+      float lm_offset_v = 0.0f;
 
       for (tri_idx = 0 ; tri_idx < num_triangles ; tri_idx++)
       {

@@ -59,6 +59,8 @@ struct csTxtCacheData
  */
 class OpenGLTextureCache
 {
+private:
+  csGraphics3DOGLCommon* g3d;
 protected:
   bool rstate_bilinearmap;
 
@@ -73,7 +75,7 @@ protected:
   long total_size;
 public:
   /// Takes the maximum size of the cache.
-  OpenGLTextureCache (int max_size);
+  OpenGLTextureCache (int max_size, csGraphics3DOGLCommon* g3d);
   ///
   ~OpenGLTextureCache ();
 

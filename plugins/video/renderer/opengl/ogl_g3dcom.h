@@ -378,6 +378,7 @@ protected:
   friend class csTextureManagerOpenGL;
   friend class OpenGLTextureCache;
   friend class csTextureHandleOpenGL;
+  friend class csOpenGLProcBackBuffer;
 
   /**
    * OpenGL capabilities.
@@ -537,6 +538,7 @@ static fType fName
   static bool ARB_texture_compression;
   static bool NV_vertex_array_range;
   static bool ARB_texture_env_combine;
+  static bool SGIS_generate_mipmap;
 
 public:
   SCF_DECLARE_IBASE;

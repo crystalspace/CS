@@ -26,6 +26,7 @@
 #include "imesh/thing/lightmap.h"	//@@@!!!
 #include "imesh/thing/polygon.h"	//@@@!!!
 #include "ivideo/graph3d.h"
+#include "ivaria/reporter.h"
 
 // need definitions of R24(), G24(), and B24()
 #ifndef CS_NORMAL_LIGHT_LEVEL
@@ -61,12 +62,13 @@ void OpenGLTextureCache::Unload (csTxtCacheData *d)
 
 //----------------------------------------------------------------------------//
 
-OpenGLTextureCache::OpenGLTextureCache (int max_size)
+OpenGLTextureCache::OpenGLTextureCache (int max_size, csGraphics3DOGLCommon* g3d)
 {
   cache_size = max_size;
   num = 0;
   head = tail = NULL;
   total_size = 0;
+  OpenGLTextureCache::g3d = g3d;
 }
 
 OpenGLTextureCache::~OpenGLTextureCache ()
@@ -172,14 +174,21 @@ void OpenGLTextureCache::Load (csTxtCacheData *d, bool reload)
 
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
     rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
-  if (((txt_mm->GetFlags () & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS)) 
-      == CS_TEXTURE_3D)
-    && ((txt_mm->GetFlags () & CS_TEXTURE_PROC) != CS_TEXTURE_PROC))
+  if (((txt_mm->GetFlags () & (CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS | CS_TEXTURE_PROC)) 
+      == CS_TEXTURE_3D))
   {
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
       rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR 
                          : GL_NEAREST_MIPMAP_NEAREST);
   } 
+  else if (((txt_mm->GetFlags () & (CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS) ) 
+    == CS_TEXTURE_PROC) && ( g3d->SGIS_generate_mipmap ) )
+  {
+    glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_TRUE );  
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+      rstate_bilinearmap ? GL_LINEAR_MIPMAP_LINEAR 
+                         : GL_NEAREST_MIPMAP_NEAREST);
+  }
   else
   {
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
