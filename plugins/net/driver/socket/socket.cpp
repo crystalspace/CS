@@ -184,7 +184,7 @@ csSocketListener::csSocketListener(iBase* p, csNetworkSocket s,
     CloseSocket();
 }
 
-iNetworkConnection* csSocketListener::Accept()
+csPtr<iNetworkConnection> csSocketListener::Accept()
 {
   iNetworkConnection* connection = NULL;
   if (ValidateSocket())
@@ -197,7 +197,7 @@ iNetworkConnection* csSocketListener::Accept()
     else if (CS_GETSOCKETERROR != EWOULDBLOCK)
       LastError = CS_NET_ERR_CANNOT_ACCEPT;
   }
-  return connection;
+  return csPtr<iNetworkConnection> (connection);
 }
 
 csNetworkSocket csSocketListener::csSocket::GetSocket() const
@@ -265,20 +265,27 @@ unsigned long csSocketDriver::ResolveAddress(const char* host)
   return address;
 }
 
-iNetworkConnection* csSocketDriver::NewConnection(
+csPtr<iNetworkConnection> csSocketDriver::NewConnection(
   const char* target, bool reliable, bool blocking)
 {
   ClearError();
   iNetworkConnection* connection = NULL;
-  if (target != NULL) // Unparse target "host:port#".
+  if (target != NULL)
   {
     char* host = NULL;
     unsigned short port = 0;
     const char* p = strchr(target, ':');
+    const char* proto = strchr(target, '/');
     if (p != NULL)
     {
       host = strdup(target);
       host[p - target] = '\0';
+      if (proto)
+      {
+        host[proto - target] = '\0';
+        if (strcasecmp (proto + 1, "tcp")) reliable = true;
+        else if (strcasecmp (proto + 1, "udp")) reliable = false;
+      }
       port = atoi(p + 1);
     }
 
@@ -307,17 +314,25 @@ iNetworkConnection* csSocketDriver::NewConnection(
     if (host != NULL)
       free(host);
   }
-  return connection;
+  return csPtr<iNetworkConnection> (connection);
 }
 
-iNetworkListener* csSocketDriver::NewListener(const char* source,
+csPtr<iNetworkListener> csSocketDriver::NewListener(const char* source,
   bool reliable, bool blockingListener, bool blockingConnection)
 {
   ClearError();
   iNetworkListener* listener = NULL;
+
+  const char* proto = strchr(source, '/');
+  if (proto)
+  {
+    if (strcasecmp (proto + 1, "tcp")) reliable = true;
+    else if (strcasecmp (proto + 1, "udp")) reliable = false;
+  }
   const unsigned short port = atoi(source);
   if (port == 0)
     LastError = CS_NET_ERR_CANNOT_PARSE_ADDRESS;
+
   else
   {
     csNetworkSocket s = CreateSocket(reliable);
@@ -325,7 +340,7 @@ iNetworkListener* csSocketDriver::NewListener(const char* source,
       listener = new csSocketListener(this, s, port, blockingListener,
         blockingConnection);
   }
-  return listener;
+  return csPtr<iNetworkListener> (listener);
 }
 
 csNetworkDriverCapabilities csSocketDriver::GetCapabilities() const

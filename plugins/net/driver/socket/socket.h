@@ -70,7 +70,7 @@ protected:
 public:
   csSocketListener(iBase* p, csNetworkSocket s, unsigned short port,
     bool blockingListener, bool blockingConnection);
-  virtual iNetworkConnection* Accept();
+  virtual csPtr<iNetworkConnection> Accept();
   virtual void Terminate() { superclass::Terminate(); }
   virtual csNetworkDriverError GetLastError() const
     { return superclass::GetLastError(); }
@@ -103,19 +103,21 @@ public:
   virtual csNetworkDriverError GetLastError () const { return LastError; }
 
   /**
-   * The target should be a <host,port#> tuple.  It should be a string
-   * containing: "host:port#" (ie. "localhost:888").  Host can be an IP
-   * address (ie. "192.168.0.1"), a hostname (ie. "localhost"), or the empty
-   * string, in which case "localhost" is assumed.
+   * The target should be a string containing: "host:port/protocol"
+   * (eg. "localhost:888/tcp"). Host can be an IP address
+   * (eg. "192.168.0.1"), a hostname (eg. "localhost"), or the empty string,
+   * in which case "localhost" is assumed. Protocol is optional, can be
+   * "tcp" or "udp", and defaults to the value of the reliable flag.
    */
-  virtual iNetworkConnection* NewConnection(const char* target,
+  virtual csPtr<iNetworkConnection> NewConnection(const char* target,
     bool reliable, bool blocking);
 
   /**
-   * The source should be a port# on which to listen.  It should be a string
-   * containing: "port#" (ie. "888").
+   * The source should be a string containing "port/protocol"
+   * (eg. "888/tcp"). Protocol is optional, can be "tcp" or "udp", and
+   * defaults to the value of the reliable flag.
    */
-  virtual iNetworkListener* NewListener(const char* source,
+  virtual csPtr<iNetworkListener> NewListener(const char* source,
     bool reliable, bool blockingListener, bool blockingConnection);
 
   SCF_DECLARE_IBASE;

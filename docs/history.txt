@@ -41,6 +41,12 @@ The history order is reversed so that new features are at the top.
 	  __STDC_CONSTANT_MACROS if we want to use the macros from stdint.h
 	- Matze fixed the movierecorder plugin. Seems the mmx stuff only works
 	  on gcc 3.x
+	- Oktal made some updates to the "old" network sockets driver:
+	    - target and source string arguments to iNetworkDriver::
+	      NewConnection() and NewListener() respectively, now take an
+	      optional suffix, "/tcp" or "/udp".
+	    - That means that the reliable flags are now deprecated.
+	    - Switched to csPtr in appropriate places.
 1-Apr-2003
 	- Reverted dllwrap change to win32gcc.mak from 4 days ago since
 	  it prevents debug symbols from being present in plugins.
