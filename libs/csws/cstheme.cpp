@@ -257,8 +257,8 @@ void csThemeComponent::BroadcastThemeChange ()
 csThemeWindow::csThemeWindow (csTheme *ntheme) : csThemeComponent (ntheme)
 {
   name = "csWindow";
-  BorderLightColor = CSPAL_WINDOW_2LIGHT3D;
-  BorderDarkColor = CSPAL_WINDOW_2DARK3D;
+  BorderLightColor = CSPAL_WINDOW_LIGHT3D;
+  BorderDarkColor = CSPAL_WINDOW_DARK3D;
   BackgroundColor = CSPAL_WINDOW_BORDER;
   BorderPixmap = NULL;
   BackgroundPixmap = NULL;

@@ -270,7 +270,7 @@ void csWindow::Draw ()
     case cswfsNone:
       break;
     case cswfsThin:
-      thwin->DrawBorder(*this,csthfsThin,bw,bh,li,di);
+      thwin->DrawBorder(*this,csthfsThin,bw,bh,di,di);
       break;
     case cswfs3D:
     {
