@@ -381,6 +381,7 @@ void csDynLight::Setup ()
 
 void csDynLight::SetColor (const csColor& col)
 {
+  csLight::SetColor (col);
   csLightPatch* lp = lightpatches;
   while (lp)
   {
