@@ -46,12 +46,87 @@ CS_IMPLEMENT_STATIC_VAR (Get_visible, dpmesh_visible, ())
 static dpmesh_tr_verts *tr_verts = NULL;
 static dpmesh_persp *persp = NULL;
 static dpmesh_visible *visible = NULL;
+
+static void PlaneZ (
+  const csVector3 &u,
+  const csVector3 &v,
+  float z,
+  csVector3 &isect)
+{
+  float denom;
+  csVector3 vu = v - u;
+
+  denom = vu.z;
+  if (denom == 0)
+  {
+    // they are parallel
+    isect = v;
+    return;
+  }
+  float dist = -(u.z + (-z)) / denom;
+  if (dist < -SMALL_EPSILON || dist > 1 + SMALL_EPSILON) return;
+
+  isect = u + dist * vu;
+}
+
+static bool ClipPolygonZ (
+  csVector3* pverts,
+  csVector3* verts,
+  int &num_verts)
+{
+  int i, i1, num_vertices = num_verts;
+  bool zs, z1s;
+  bool vis[100];
+
+  float z = 0.01;
+
+  for (i = 0; i < num_vertices; i++)
+  {
+    vis[i] = pverts[i].z >= z;
+  }
+
+  // This routine assumes clipping is needed.
+  num_verts = 0;
+
+  i1 = num_vertices - 1;
+
+  for (i = 0; i < num_vertices; i++)
+  {
+    zs = vis[i];
+    z1s = vis[i1];
+
+    if (!z1s && zs)
+    {
+      PlaneZ (pverts[i1], pverts[i], z, verts[num_verts]);
+      num_verts++;
+      verts[num_verts++] = pverts[i];
+    }
+    else if (z1s && !zs)
+    {
+      PlaneZ (pverts[i1], pverts[i], z, verts[num_verts]);
+      num_verts++;
+    }
+    else if (z1s && zs)
+    {
+      verts[num_verts++] = pverts[i];
+    }
+
+    i1 = i;
+  }
+
+  return true;
+}
+
+
 /*
  * Default implementation of DrawPolygonMesh which works with polygon
  * buffers that are equal to csPolArrayPolygonBuffer.
  * If 'clipper' == NULL then no clipping will happen.
  * If 'lazyclip' == true then only a lazy clip will happen (currently
  * not supported).
+ * WARNING: This version does NOT support vertex_fog. It is supposed
+ * to be used with renderers that do fog another way (like with the
+ * Z-buffer like the software renderer does).
  */
 void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
 	const csReversibleTransform& o2c,
@@ -134,15 +209,41 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
     poly.poly_texture = pol.poly_texture;
     int j;
     // @@@ Support mirror here.
-    // @@@ Check for visibility of three vertices.
+    int vis_cnt = 0;
     for (j = 0 ; j < poly.num ; j++)
     {
       int vidx = pol.vertices[j];
-      poly.vertices[j].x = (*persp)[vidx].x;
-      poly.vertices[j].y = (*persp)[vidx].y;
-      if (mesh.vertex_fog)
-        poly.fog_info[j] = mesh.vertex_fog[vidx];
+      if ((*visible)[vidx]) vis_cnt++;
     }
+    if (vis_cnt == 0) continue;
+    if (vis_cnt < poly.num)
+    {
+      csVector3 p[100];
+      csVector3 clip_p[100];
+      // We need some kind of clipping.
+      for (j = 0 ; j < poly.num ; j++)
+      {
+        int vidx = pol.vertices[j];
+        p[j] = work_verts[vidx];
+      }
+      ClipPolygonZ (p, clip_p, poly.num);
+      for (j = 0 ; j < poly.num ; j++)
+      {
+        float iz = aspect / clip_p[j].z;
+        poly.vertices[j].x = clip_p[j].x * iz + width2;
+        poly.vertices[j].y = clip_p[j].y * iz + height2;
+      }
+    }
+    else
+    {
+      for (j = 0 ; j < poly.num ; j++)
+      {
+        int vidx = pol.vertices[j];
+        poly.vertices[j].x = (*persp)[vidx].x;
+        poly.vertices[j].y = (*persp)[vidx].y;
+      }
+    }
+
 
     // Clip polygon. Note that the clipper doesn't care about the
     // orientation of the polygon vertices. It works just as well in
@@ -152,7 +253,7 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
       csVector2 clipped_poly[100];
       int clipped_num;
       uint8 clip_result = clipper->Clip (poly.vertices, poly.num,
-      	clipped_poly, clipped_num);
+      	  clipped_poly, clipped_num);
       if (clip_result == CS_CLIP_OUTSIDE) continue;
       if (clip_result != CS_CLIP_INSIDE)
       {

@@ -9,6 +9,9 @@ The history order is reversed so that new features are at the top.
 	  section of the documentation about who did what with the new
 	  renderer.
 	- Release of CS 0.96r001.
+	- The software implementation of DrawPolygonMesh was not at all
+	  behaving well in case polygons go beyond the Z-plane. Fixed this
+	  now.
 28-Jan-2003
 	- Keith Fulton did the following:
 	    - Fixed opposite logic bug in binary sprite saver which was
