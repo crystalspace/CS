@@ -96,13 +96,11 @@ bool awsManager::Initialize (iObjectRegistry *object_reg)
 {
   awsManager::object_reg = object_reg;
 
-  prefmgr = csPtr<iAwsPrefManager> (
-	  SCF_CREATE_INSTANCE("crystalspace.window.preferencemanager",
-				iAwsPrefManager));
+  prefmgr = SCF_CREATE_INSTANCE("crystalspace.window.preferencemanager",
+				iAwsPrefManager);
 
-  sinkmgr = csPtr<iAwsSinkManager> (
-	  SCF_CREATE_INSTANCE ("crystalspace.window.sinkmanager",
-			        iAwsSinkManager));
+  sinkmgr = SCF_CREATE_INSTANCE ("crystalspace.window.sinkmanager",
+			        iAwsSinkManager);
 
   if (!prefmgr)
   {

@@ -29,9 +29,9 @@
 CS_IMPLEMENT_APPLICATION
 
 /// these are our interfaces
-iNetworkDriver2 *driver = 0;
-iNetworkSocket2 *server = 0;
-iNetworkSocket2 *client = 0;
+csRef<iNetworkDriver2> driver;
+csRef<iNetworkSocket2> server;
+csRef<iNetworkSocket2> client;
 
 void usage ( char *arg )
 {
@@ -189,7 +189,7 @@ int main(int argc, char *argv[])
 	printf("I got '%s' from the client.\n",buffer);
 	
   /// kill the server
-	server->DecRef();
+	server = 0;
 	return 0;
 
   } else {
@@ -220,11 +220,11 @@ int main(int argc, char *argv[])
 	/// close client connection
 	client->Close();
 	/// kill our client connection
-	client->DecRef();
+	client = 0;
   }
 
   /// kill our driver
-  driver->DecRef();
+  driver = 0;
 
   return 0;
 }

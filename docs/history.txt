@@ -16,6 +16,11 @@ chronological order.
 	- Jorrit cleaned up the shader plugins.
 	- Duhprey fixed an error in shadow caps.  Fixes one of the glitches
 	  behind the wall in r3dtest.
+	- DeSigna:
+	  - fixed the SCF_CREATE_INSTANCE macro to return a csPtr<>, in 
+	    accordance to the other SCF macros.
+	  - fixed all usage of SCF_CREATE_INSTANCE in CS to work correctly.
+	  - fixed nettut to use csRef<> tracking instead of raw pointers 
 12-Sep-2003
 	- Jorrit moved the progressive LOD calculation classes from sprite3d
 	  to csgeom.

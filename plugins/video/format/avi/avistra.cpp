@@ -80,7 +80,6 @@ bool csAVIStreamAudio::Initialize (const csAVIFormat::AVIHeader *ph,
 csAVIStreamAudio::~csAVIStreamAudio ()
 {
   delete pChunk;
-  if (pCodec) pCodec->DecRef ();
 }
 
 void csAVIStreamAudio::GetStreamDescription (csStreamDescription &desc)
@@ -145,7 +144,6 @@ bool csAVIStreamAudio::LoadCodec (uint8 *pInitData, uint32 nInitDataLen,
       csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
 		"crystalspace.video.avi",
 		"CODEC class \"%s\" could not be initialized !", cn);
-      pCodec->DecRef ();
       pCodec = 0;
     }
   }

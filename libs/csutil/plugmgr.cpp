@@ -178,7 +178,17 @@ void csPluginManager::QueryOptions (iComponent *obj)
 iBase *csPluginManager::LoadPlugin (const char *classID,
   const char *iInterface, int iVersion, bool init)
 {
-  iComponent *p = SCF_CREATE_INSTANCE (classID, iComponent);
+  iComponent *p = 0;
+
+  { 
+    // The reference must be held beyond the scope of this block.
+    csRef<iComponent> dummy (SCF_CREATE_INSTANCE (classID, iComponent));
+    if (dummy) {
+      p = dummy;
+      p->IncRef();
+    }
+  }
+  
   if (!p)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,

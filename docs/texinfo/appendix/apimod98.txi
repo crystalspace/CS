@@ -473,3 +473,6 @@ For @code{iLight}: @code{SetRadius}, @code{GetRadius}, and @code{GetSquaredRadiu
 For @code{iMaterialEngine} and related: @code{GetTextureWrapper} for
 layers now expects a @code{csStringID} instead of an integer.
 
+@subheading SCF Changes
+
+The SCF_CREATE_INSTANCE macro returns csPtr<>, to be consistent with the rest of the SCF instantiation and query macros.

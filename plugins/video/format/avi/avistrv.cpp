@@ -440,7 +440,7 @@ bool csAVIStreamVideo::LoadCodec (uint8 *pInitData, uint32 nInitDataLen,
   char cn[128];
   sprintf (cn, "crystalspace.video.codec.avi.%s", strdesc.codec);
   // try open this class
-  pCodec = csPtr<iAVICodec> (SCF_CREATE_INSTANCE (cn, iAVICodec));
+  pCodec = SCF_CREATE_INSTANCE (cn, iAVICodec);
   if (pCodec)
   {
     // codec exists, now try to initialize it

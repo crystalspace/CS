@@ -33,7 +33,7 @@ class csAVIStreamAudio : public iAudioStream
   csAudioStreamDescription strdesc;
 
   iObjectRegistry *object_reg;
-  iAVICodec *pCodec;
+  csRef<iAVICodec> pCodec;
 
   bool LoadCodec (uint8 *pInitData, uint32 nInitDataLen, uint8 *pFormatEx, uint32 nFormatEx);
 
