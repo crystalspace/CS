@@ -1,5 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
+19-Jun-2000
+	- Wouter Wijngaards added a new snow particle system.
+	- Added 'snow' console command that works almost the same as
+	  the 'rain' console command.
 18-Jun-2000
 	- Norman Kramer fixed Squawk and csgame following the recent modifications
 	  in sprite creation.

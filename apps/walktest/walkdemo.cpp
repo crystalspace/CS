@@ -138,6 +138,65 @@ void add_particles_rain (csSector* sector, char* txtname, int num, float speed)
 }
 
 //===========================================================================
+// Demo particle system (snow).
+//===========================================================================
+void add_particles_snow (csSector* sector, char* txtname, int num, float speed)
+{
+  // First check if the texture exists.
+  csTextureHandle* txt = Sys->view->GetWorld ()->GetTextures ()->
+  	FindByName (txtname);
+  if (!txt)
+  {
+    Sys->Printf (MSG_CONSOLE, "Can't find texture '%s' in memory!\n", txtname);
+    return;
+  }
+
+  csPolygonSetBBox* pset_bbox = sector->GetBoundingBox ();
+  csPolygonSet* pset = sector;
+  if (!pset_bbox)
+  {
+    sector->CreateBoundingBox ();
+    pset_bbox = sector->GetBoundingBox ();
+    if (!pset_bbox)
+    {
+      // If there still is no bbox we calculate one for the static
+      // thing inside.
+      csThing* thing = sector->GetStaticThing ();
+      pset = thing;
+      if (thing)
+      {
+        pset_bbox = thing->GetBoundingBox ();
+	if (!pset_bbox)
+	{
+	  thing->CreateBoundingBox ();
+          pset_bbox = thing->GetBoundingBox ();
+	}
+      }
+    }
+  }
+  if (pset_bbox)
+  {
+    csBox3 bbox;
+    bbox.StartBoundingBox (pset->Vwor (pset_bbox->i1));
+    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i2));
+    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i3));
+    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i4));
+    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i5));
+    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i6));
+    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i7));
+    bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i8));
+
+    csSnowParticleSystem* exp = new csSnowParticleSystem (
+    	  Sys->view->GetWorld (), num,
+  	  txt, CS_FX_ADD, false, .1, .1,
+	  bbox.Min (), bbox.Max (),
+	  csVector3 (0, -speed, 0), .2);
+    exp->MoveToSector (sector);
+    exp->SetColor (csColor (.25,.25,.25));
+  }
+}
+
+//===========================================================================
 // Demo particle system (explosion).
 //===========================================================================
 void add_particles_explosion (csSector* sector, const csVector3& center, char* txtname)
