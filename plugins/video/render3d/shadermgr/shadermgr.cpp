@@ -48,6 +48,7 @@
 //#include "ivideo/shader/shadervar.h"
 #include "ivideo/render3d.h"
 #include "ivideo/rndbuf.h"
+#include "ivideo/rendermesh.h"
 #include "shadermgr.h"
 
 // Pluginstuff

@@ -44,6 +44,10 @@
 
 #include "ivaria/bugplug.h"
 
+#ifdef CS_USE_NEW_RENDERER
+#include "ivideo/rendermesh.h"
+#endif
+
 // Option variable: render portals?
 bool csSector:: do_portals = true;
 
