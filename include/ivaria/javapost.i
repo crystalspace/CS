@@ -235,10 +235,8 @@ csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 MAKE_CONSTANT(int, CSMASK_Nothing, (1 << csevNothing))
 #undef CSMASK_FrameProcess
 MAKE_CONSTANT(int, CSMASK_FrameProcess, (CSMASK_Nothing))
-#undef CSMASK_KeyDown
-MAKE_CONSTANT(int, CSMASK_KeyDown, (1 << csevKeyDown))
-#undef CSMASK_KeyUp
-MAKE_CONSTANT(int, CSMASK_KeyUp, (1 << csevKeyUp))
+#undef CSMASK_Keyboard
+MAKE_CONSTANT(int, CSMASK_Keyboard, (1 << csevKeyboard))
 #undef CSMASK_MouseMove
 MAKE_CONSTANT(int, CSMASK_MouseMove, (1 << csevMouseMove))
 #undef CSMASK_MouseDown
@@ -261,8 +259,6 @@ MAKE_CONSTANT(int, CSMASK_Command, (1 << csevCommand))
 MAKE_CONSTANT(int, CSMASK_Broadcast, (1 << csevBroadcast))
 #undef CSMASK_Network
 MAKE_CONSTANT(int, CSMASK_Network, (1 << csevNetwork))
-#undef CSMASK_Keyboard
-MAKE_CONSTANT(int, CSMASK_Keyboard, (CSMASK_KeyDown | CSMASK_KeyUp))
 #undef CSMASK_Mouse
 MAKE_CONSTANT(int, CSMASK_Mouse, (CSMASK_MouseMove | CSMASK_MouseDown | CSMASK_MouseUp | CSMASK_MouseClick | CSMASK_MouseDoubleClick))
 #undef CSMASK_Joystick
@@ -275,34 +271,30 @@ MAKE_CONSTANT(int, CSMASK_Input, (CSMASK_Keyboard | CSMASK_Mouse | CSMASK_Joysti
 %constant int CSMASK_Nothing = 0x1;
 #undef CSMASK_FrameProcess
 %constant int CSMASK_FrameProcess = 0x1;
-#undef CSMASK_KeyDown
-%constant int CSMASK_KeyDown = 0x2;
-#undef CSMASK_KeyUp
-%constant int CSMASK_KeyUp = 0x4;
-#undef CSMASK_MouseMove
-%constant int CSMASK_MouseMove = 0x8;
-#undef CSMASK_MouseDown
-%constant int CSMASK_MouseDown = 0x10;
-#undef CSMASK_MouseUp
-%constant int CSMASK_MouseUp = 0x20;
-#undef CSMASK_MouseClick
-%constant int CSMASK_MouseClick = 0x40;
-#undef CSMASK_MouseDoubleClick
-%constant int CSMASK_MouseDoubleClick = 0x80;
-#undef CSMASK_JoystickMove
-%constant int CSMASK_JoystickMove = 0x100;
-#undef CSMASK_JoystickDown
-%constant int CSMASK_JoystickDown = 0x200;
-#undef CSMASK_JoystickUp
-%constant int CSMASK_JoystickUp = 0x400;
-#undef CSMASK_Command
-%constant int CSMASK_Command = 0x800;
-#undef CSMASK_Broadcast
-%constant int CSMASK_Broadcast = 0x1000;
-#undef CSMASK_Network
-%constant int CSMASK_Network = 0x2000;
 #undef CSMASK_Keyboard
-%constant int CSMASK_Keyboard = (CSMASK_KeyDown | CSMASK_KeyUp);
+%constant int CSMASK_Keyboard = 0x2;
+#undef CSMASK_MouseMove
+%constant int CSMASK_MouseMove = 0x4;
+#undef CSMASK_MouseDown
+%constant int CSMASK_MouseDown = 0x8;
+#undef CSMASK_MouseUp
+%constant int CSMASK_MouseUp = 0x10;
+#undef CSMASK_MouseClick
+%constant int CSMASK_MouseClick = 0x20;
+#undef CSMASK_MouseDoubleClick
+%constant int CSMASK_MouseDoubleClick = 0x40;
+#undef CSMASK_JoystickMove
+%constant int CSMASK_JoystickMove = 0x80;
+#undef CSMASK_JoystickDown
+%constant int CSMASK_JoystickDown = 0x100;
+#undef CSMASK_JoystickUp
+%constant int CSMASK_JoystickUp = 0x200;
+#undef CSMASK_Command
+%constant int CSMASK_Command = 0x400;
+#undef CSMASK_Broadcast
+%constant int CSMASK_Broadcast = 0x800;
+#undef CSMASK_Network
+%constant int CSMASK_Network = 0x1000;
 #undef CSMASK_Mouse
 %constant int CSMASK_Mouse = (CSMASK_MouseMove | CSMASK_MouseDown | CSMASK_MouseUp | CSMASK_MouseClick | CSMASK_MouseDoubleClick);
 #undef CSMASK_Joystick

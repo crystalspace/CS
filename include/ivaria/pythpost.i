@@ -28,8 +28,7 @@
 
 	CSMASK_Nothing = (1 << csevNothing)
 	CSMASK_FrameProcess = CSMASK_Nothing
-	CSMASK_KeyDown = (1 << csevKeyDown)
-	CSMASK_KeyUp = (1 << csevKeyUp)
+	CSMASK_Keyboard = (1 << csevKeyboard)
 	CSMASK_MouseMove = (1 << csevMouseMove)
 	CSMASK_MouseDown = (1 << csevMouseDown)
 	CSMASK_MouseUp = (1 << csevMouseUp)
@@ -42,7 +41,6 @@
 	CSMASK_Broadcast = (1 << csevBroadcast)
 	CSMASK_Network = (1 << csevNetwork)
 
-	CSMASK_Keyboard = (CSMASK_KeyDown | CSMASK_KeyUp)
 	CSMASK_Mouse = (CSMASK_MouseMove | CSMASK_MouseDown | CSMASK_MouseUp
 		| CSMASK_MouseClick | CSMASK_MouseDoubleClick)
 	CSMASK_Joystick = (CSMASK_JoystickMove | CSMASK_JoystickDown
