@@ -65,6 +65,10 @@ chronological order.
 	  ugly work-around in the code for avoiding it.
 	- Rhad added Field Speed and Field Acceleration interface windows
 	  to partedit.
+	- Rhad changed partedit so the particle system is only recreated when
+	  it must be due to parameter changes that cannot be incorporated into
+	  the running system.  This allows for smooth adjustment of most values
+	  on a running system.
 21-Oct-2003
 	- Rhad added UI for Initial Speed and Initial Acceleration to partedit.
 	- Eric Sunshine made the following configuration-related changes:
