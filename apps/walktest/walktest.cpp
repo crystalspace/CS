@@ -35,7 +35,6 @@
 #include "csengine/csview.h"
 #include "csengine/stats.h"
 #include "csengine/light.h"
-#include "csengine/dynlight.h"
 #include "csengine/texture.h"
 #include "csengine/thing.h"
 #include "csengine/wirefrm.h"
@@ -861,8 +860,6 @@ void WalkTest::PrepareFrame (cs_time elapsed_time, cs_time current_time)
   elapsed_time = current_time - prev_time;
   if (elapsed_time > 250)
     prev_time = current_time - (elapsed_time = 250);
-
-  CLights::LightIdle (); // SJI
 
   if (do_cd)
   {

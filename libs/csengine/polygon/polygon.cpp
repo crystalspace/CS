@@ -26,7 +26,6 @@
 #include "csengine/sector.h"
 #include "csengine/world.h"
 #include "csengine/light.h"
-#include "csengine/dynlight.h"
 #include "csengine/lghtmap.h"
 #include "csengine/camera.h"
 #include "csengine/portal.h"
@@ -57,7 +56,6 @@ static DECLARE_GROWING_ARRAY_REF (VectorArray, csVector3);
 csPolyTexLightMap::csPolyTexLightMap () : csPolyTexType ()
 {
   txt_plane = NULL;
-  theDynLight = NULL;
   tex = new csPolyTexture ();
   lightmap_up_to_date = false;
 }

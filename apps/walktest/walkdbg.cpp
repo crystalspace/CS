@@ -25,7 +25,6 @@
 #include "csengine/dumper.h"
 #include "csengine/stats.h"
 #include "csengine/light.h"
-#include "csengine/dynlight.h"
 #include "csengine/texture.h"
 #include "csengine/thing.h"
 #include "csengine/wirefrm.h"

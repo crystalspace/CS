@@ -27,7 +27,6 @@
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
 
-class csThingTemplate;
 class csMaterialWrapper;
 class csSector;
 class csWorld;
@@ -155,10 +154,10 @@ public:
 class Blocks : public SysSystemDriver
 {
 private:
-  csThingTemplate* cube_tmpl;
-  csThingTemplate* pillar_tmpl;
-  csThingTemplate* vrast_tmpl;
-  csThingTemplate* hrast_tmpl;
+  csThing* cube_tmpl;
+  csThing* pillar_tmpl;
+  csThing* vrast_tmpl;
+  csThing* hrast_tmpl;
   csMaterialWrapper* cube_mat;
   csMaterialWrapper* cubef1_mat;
   csMaterialWrapper* cubef2_mat;
@@ -353,11 +352,11 @@ public:
 
   // Creating cubes and other geometry.
   csThing* create_cube_thing (float dx, float dy, float dz,
-  	csThingTemplate* tmpl);
+  	csThing* tmpl);
   csThing* add_cube_thing (csSector* sect, float dx, float dy, float dz,
-  	float x, float y, float z, csThingTemplate* tmpl);
+  	float x, float y, float z, csThing* tmpl);
   void add_cube (float dx, float dy, float dz, float x, float y, float z,
-  	csThingTemplate* tmpl);
+  	csThing* tmpl);
   void add_pillar (int x, int y);
   void add_vrast (int x, int y, float dx, float dy, float rot_z);
   void add_hrast (int x, int y, float dx, float dy, float rot_z);

@@ -28,7 +28,6 @@
 #include "csengine/sector.h"
 #include "csengine/world.h"
 #include "csengine/light.h"
-#include "csengine/dynlight.h"
 #include "csengine/lghtmap.h"
 #include "csengine/camera.h"
 #include "csengine/portal.h"

@@ -102,7 +102,7 @@ class csLoader
   /// Parse a 3D polygon definition and return a new object
   static csPolygon3D* load_poly3d (char* polyname, char* buf,
     csMaterialWrapper* default_material, float default_texlen,
-    CLights* default_lightx, csPolygonSet* parent);
+    csPolygonSet* parent);
 
   /// Load a image and return an iImage object
   static iImage* load_image(const char* name);

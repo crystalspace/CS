@@ -1,6 +1,31 @@
 The history order has been reversed so that new features are at the top.
 
+17-Sep-2000
+	- Seth Galbraith did the following to docs:
+	    - Removed section on seperate vertex, texel, and normal arrays
+	      (which didn't work out very well :-)
+	    - Added ideas for smoothing unwanted shading edges
+	      (by interfering with vertex normal calculation).
+	- Finished csThing::MergeTemplate(csThing*).
+	- Removed the obsolete CLights class (uniform dynamic lighting,
+	  it wasn't working anyway).
+	- Made csPolygon3D::ComputeNormal() public.
+	- Removed csThingTemplate completely. Instead of csThingTemplate
+	  you can now make a copy of a normal csThing (using
+	  csThing::MergeTemplate). It is still possible to push csThing
+	  instances on the csWorld::thing_templates list. Things that
+	  are on that list are only for template use.
+	  Note that one other implication of this is that csPolygonTemplate
+	  is also removed. 90% of the work of fixing your applications
+	  is done by just replacing csThingTemplate with csThing. The other
+	  10% boils down to replacing the old API from csThingTemplate
+	  with the mostly similar API from csThing.
+	- Fixed (or tried to fix) most of the apps with regards to this.
+	  I think this worked out well except for MazeD. MazeD compiles
+	  but I cannot give any other guarantees. I didn't fix shooter
+	  nor csgame.
 16-Sep-2000
+	- Martin Geisse added the interface for music support.
 	- Started the first work towards removing csThingTemplate. This
 	  involves changing the way that curves are loaded. Now it is possible
 	  to define a curve in a thing. Previously it was only possible to

@@ -80,26 +80,6 @@ csPolygon3D *csPolygonArrayNoFree::Get (int iIndex) const
   return (csPolygon3D *)(csPolygonInt *)csVector::Get (iIndex);
 }
 
-//----------------------------------------------- csPolygonTemplateArray -----//
-
-csPolygonTemplateArray::~csPolygonTemplateArray ()
-{
-  DeleteAll ();
-}
-
-bool csPolygonTemplateArray::FreeItem (csSome Item)
-{
-  delete (csPolygonTemplate *)Item;
-  return true;
-}
-
-int csPolygonTemplateArray::CompareKey (csSome Item, csConstSome Key, int Mode) const
-{
-  (void) Mode;
-  const char *name = ((csPolygonTemplate *)Item)->GetName ();
-  return name ? strcmp (name, (char *)Key) : -1;
-}
-
 //------------------------------------------------- csCurveTemplateArray -----//
 
 csCurveTemplateArray::~csCurveTemplateArray ()

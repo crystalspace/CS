@@ -26,13 +26,11 @@
 #include "csengine/campos.h"
 #include "csengine/keyval.h"
 #include "csengine/light.h"
-#include "csengine/dynlight.h"
 #include "csengine/polyplan.h"
 #include "csengine/polytmap.h"
 #include "csengine/polygon.h"
 #include "csengine/pol2d.h"
 #include "csengine/polytext.h"
-#include "csengine/thingtpl.h"
 #include "csengine/thing.h"
 #include "csengine/cssprite.h"
 #include "csengine/csspr2d.h"
@@ -726,7 +724,6 @@ void csWorld::Clear ()
   sprite_templates.DeleteAll ();
   thing_templates.DeleteAll ();
   sectors.DeleteAll ();
-  CLights::DeleteAll ();
   camera_positions.DeleteAll ();
   int i;
   for (i = 0 ; i < planes.Length () ; i++)
@@ -1794,7 +1791,7 @@ bool csWorld::DeleteLibrary (const char *iName)
   DELETE_ALL_OBJECTS (collections, csCollection)
   DELETE_ALL_OBJECTS (sprites, csSprite)
   DELETE_ALL_OBJECTS (sprite_templates, csSpriteTemplate)
-  DELETE_ALL_OBJECTS (thing_templates, csThingTemplate)
+  DELETE_ALL_OBJECTS (thing_templates, csThing)
   DELETE_ALL_OBJECTS (sectors, csSector)
   DELETE_ALL_OBJECTS ((*textures), csTextureWrapper)
   DELETE_ALL_OBJECTS ((*materials), csMaterialWrapper)

@@ -37,7 +37,6 @@
 
 class csSector;
 class StatLight;
-class CLights;
 class csMaterialWrapper;
 class csPolyPlane;
 class csPolyTxtPlane;
@@ -350,13 +349,6 @@ private:
    */
   bool lightmap_up_to_date;
 
-  /**
-   * A uniform dynamic light for this poly.
-   * This is used for flashing the polygon in a uniform way
-   * (unlike positional dynamic lights).
-   */
-  CLights* theDynLight;
-
 private:
   /// Constructor.
   csPolyTexLightMap ();
@@ -393,11 +385,6 @@ public:
    * Get the lightmap belonging with this polygon.
    */
   iLightMap* GetLightMap () { return tex->GetLightMap (); }
-
-  /**
-   * Set the uniform dynamic light.
-   */
-  void SetUniformDynLight (CLights* l) { theDynLight = l; }
 };
 
 /*----------------------------------------------------------------------------*/
@@ -523,13 +510,6 @@ private:
    * this object is visible.
    */
   ULong pvs_vis_nr;
-
-  /**
-   * Precompute the plane normal. Normally this is done automatically by
-   * set_texture_space but if needed you can call this function again when
-   * something has changed.
-   */
-  void ComputeNormal ();
 
   /**
    * Return twice the signed area of the polygon in world space coordinates using
@@ -682,6 +662,13 @@ public:
    * efficiency.
    */
   int AddVertex (float x, float y, float z);
+
+  /**
+   * Precompute the plane normal. Normally this is done automatically by
+   * set_texture_space but if needed you can call this function again when
+   * something has changed.
+   */
+  void ComputeNormal ();
 
   /**
    * After the plane normal and the texture matrices have been set

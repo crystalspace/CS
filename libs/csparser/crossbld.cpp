@@ -25,6 +25,8 @@
 #include "csparser/crossbld.h"
 #include "csengine/world.h"
 #include "csengine/texture.h"
+#include "csengine/thing.h"
+#include "csengine/polygon.h"
 #include "csgfxldr/csimage.h"
 #include "cssys/system.h"
 #include "csutil/scfstrv.h"
@@ -250,7 +252,7 @@ csCrossBuild_ThingTemplateFactory::~csCrossBuild_ThingTemplateFactory()
 /// full thing template builder
 csBase *csCrossBuild_ThingTemplateFactory::CrossBuild(converter &buildsource)
 {
-  csThingTemplate *newtemplate = new csThingTemplate();
+  csThing *newtemplate = new csThing(NULL); //@@@### BAD! NEED A PARENT
   CrossBuild ((csBase*)newtemplate, buildsource);
   return newtemplate;
 }
@@ -258,7 +260,7 @@ csBase *csCrossBuild_ThingTemplateFactory::CrossBuild(converter &buildsource)
 /// full thing template builder (second variant)
 void csCrossBuild_ThingTemplateFactory::CrossBuild(csBase* object, converter &buildsource)
 {
-  csThingTemplate *newtemplate = (csThingTemplate*)object;
+  csThing *newtemplate = (csThing*)object;
   buildsource.set_animation_frame(0);
 
   // Add the vertices
@@ -269,7 +271,7 @@ void csCrossBuild_ThingTemplateFactory::CrossBuild(csBase* object, converter &bu
 }
 
 /// frame build method
-void csCrossBuild_ThingTemplateFactory::Add_Vertices (csThingTemplate &framesource, converter& buildsource)
+void csCrossBuild_ThingTemplateFactory::Add_Vertices (csThing &framesource, converter& buildsource)
 {
   for (int coordindex=0; coordindex<buildsource.num_cor3; coordindex++)
   {
@@ -283,24 +285,24 @@ void csCrossBuild_ThingTemplateFactory::Add_Vertices (csThingTemplate &framesour
 
 
 /// triangle mesh builder
-void csCrossBuild_ThingTemplateFactory::Build_TriangleMesh(csThingTemplate& meshsource,converter& buildsource)
+void csCrossBuild_ThingTemplateFactory::Build_TriangleMesh(csThing& meshsource,converter& buildsource)
 {
   for (int triangleindex=0; triangleindex<buildsource.num_face; triangleindex++)
   {
     char buf[10];
     sprintf (buf, "t%d", triangleindex);
-    csPolygonTemplate* ptemp = new csPolygonTemplate (&meshsource, buf);
+    csPolygon3D* ptemp = meshsource.NewPolygon (NULL); //@@@### MATERIAL WRAPPER
     int a = buildsource.face[0][triangleindex];
     int b = buildsource.face[1][triangleindex];
     int c = buildsource.face[2][triangleindex];
     ptemp->AddVertex (a);
     ptemp->AddVertex (b);
     ptemp->AddVertex (c);
-    ptemp->SetUV (0, buildsource.cor3_uv[0][a], buildsource.cor3_uv[1][a]);
-    ptemp->SetUV (1, buildsource.cor3_uv[0][b], buildsource.cor3_uv[1][b]);
-    ptemp->SetUV (2, buildsource.cor3_uv[0][c], buildsource.cor3_uv[1][c]);
-    ptemp->flags.Set (CS_POLYTPL_TEXMODE, CS_POLYTPL_TEXMODE_GOURAUD);
-    meshsource.AddPolygon (ptemp);
+    ptemp->SetTextureType (POLYTXT_GOURAUD);
+    csPolyTexGouraud* gs = ptemp->GetGouraudInfo ();
+    gs->SetUV (0, buildsource.cor3_uv[0][a], buildsource.cor3_uv[1][a]);
+    gs->SetUV (1, buildsource.cor3_uv[0][b], buildsource.cor3_uv[1][b]);
+    gs->SetUV (2, buildsource.cor3_uv[0][c], buildsource.cor3_uv[1][c]);
   }
 }
 

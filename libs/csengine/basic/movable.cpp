@@ -94,6 +94,7 @@ void csMovable::ClearSectors ()
 
 void csMovable::AddSector (csSector* sector)
 {
+  if (sector == NULL) return;
   if (parent == NULL)
   {
     sectors.Push (sector);

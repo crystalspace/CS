@@ -110,33 +110,6 @@ public:
 };
 
 
-class csPolygonTemplate;
-
-/**
- * A dynamic array of polygon templates.
- * Used in thing template class.
- */
-class csPolygonTemplateArray : public csVector
-{
-public:
-  /// Create the polygon array object
-  csPolygonTemplateArray (int iLimit, int iDelta) : csVector (iLimit, iDelta)
-  { }
-
-  /// Destroy the polygon array and all inserted polygons
-  virtual ~csPolygonTemplateArray ();
-
-  /// Delete a particular array element
-  virtual bool FreeItem (csSome Item);
-
-  /// Find a polygon by name
-  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
-
-  /// Get a polygon given its index in the array
-  csPolygonTemplate *Get (int iIndex) const
-  { return (csPolygonTemplate *)csVector::Get (iIndex); }
-};
-
 class csCurveTemplate;
 
 /**

@@ -33,7 +33,6 @@
 #include "csengine/skeleton.h"
 #include "csengine/polygon.h"
 #include "csengine/polytmap.h"
-#include "csengine/dynlight.h"
 #include "csengine/textrans.h"
 #include "csengine/world.h"
 #include "csengine/light.h"
@@ -233,6 +232,7 @@ TOKEN_DEF_START
   TOKEN_DEF (STATELESS)
   TOKEN_DEF (STATIC)
   TOKEN_DEF (SWIRL)
+  TOKEN_DEF (CLONE)
   TOKEN_DEF (TEMPLATE)
   TOKEN_DEF (TERRAIN)
   TOKEN_DEF (TEX)
@@ -1335,8 +1335,7 @@ csPolygonSet& csLoader::ps_process (csPolygonSet& ps, csSector* sector,
     case TOKEN_POLYGON:
       {
 	csPolygon3D* poly3d = load_poly3d (name, params,
-          info.default_material, info.default_texlen,
-          info.default_lightx, &ps);
+          info.default_material, info.default_texlen, &ps);
 	if (poly3d)
 	{
 	  ps.AddPolygon (poly3d);
@@ -1765,6 +1764,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky
     TOKEN_TABLE (MOVE)
     TOKEN_TABLE (HARDMOVE)
     TOKEN_TABLE (TEMPLATE)
+    TOKEN_TABLE (CLONE)
     TOKEN_TABLE (KEY)
     TOKEN_TABLE (CAMERA)
   TOKEN_TABLE_END
@@ -1781,7 +1781,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky
 
   csLoaderStat::things_loaded++;
   PSLoadInfo info;
-  thing->GetMovable ().SetSector (sec);
+  if (sec) thing->GetMovable ().SetSector (sec);
 
   csReversibleTransform obj;
   long cmd;
@@ -1843,7 +1843,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky
       case TOKEN_TEMPLATE:
         {
           ScanStr (params, "%s", str);
-          csThingTemplate* t = (csThingTemplate*)World->thing_templates.FindByName (str);
+          csThing* t = (csThing*)World->thing_templates.FindByName (str);
           if (!t)
           {
             CsPrintf (MSG_FATAL_ERROR, "Couldn't find thing template '%s'!\n", str);
@@ -1852,13 +1852,34 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky
 	  if (info.use_mat_set)
           {
             thing->MergeTemplate (t, World->GetMaterials (), info.mat_set_name,
-              info.default_material, info.default_texlen, info.default_lightx);
+              info.default_material, info.default_texlen, false);
             info.use_mat_set = false;
 	  }
           else
             thing->MergeTemplate (t, info.default_material, info.default_texlen,
-              info.default_lightx);
-          csLoaderStat::polygons_loaded += t->GetNumPolygon ();
+		false);
+          csLoaderStat::polygons_loaded += t->GetNumPolygons ();
+        }
+        break;
+      case TOKEN_CLONE:
+        {
+          ScanStr (params, "%s", str);
+          csThing* t = (csThing*)World->things.FindByName (str);
+          if (!t)
+          {
+            CsPrintf (MSG_FATAL_ERROR, "Couldn't find thing '%s'!\n", str);
+            fatal_exit (0, false);
+          }
+	  if (info.use_mat_set)
+          {
+            thing->MergeTemplate (t, World->GetMaterials (), info.mat_set_name,
+              info.default_material, info.default_texlen, true);
+            info.use_mat_set = false;
+	  }
+          else
+            thing->MergeTemplate (t, info.default_material, info.default_texlen,
+		true);
+          csLoaderStat::polygons_loaded += t->GetNumPolygons ();
         }
         break;
       case TOKEN_KEY:
@@ -1895,7 +1916,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec, bool is_sky
 
 csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
   csMaterialWrapper* default_material, float default_texlen,
-  CLights* default_lightx, csPolygonSet* parent)
+  csPolygonSet* parent)
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (TEXNR)
@@ -1974,8 +1995,6 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
   float u_shift = 0, v_shift = 0;
 
   bool do_mirror = false;
-  csPolyTexLightMap* pol_lm = poly3d->GetLightMapInfo ();
-  if (pol_lm) pol_lm->SetUniformDynLight (default_lightx);
   int set_colldet = 0; // If 1 then set, if -1 then reset, else default.
 
   char str[255];
@@ -2558,7 +2577,7 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
 }
 
 //---------------------------------------------------------------------------
-
+#if 0
 csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
   csMaterialWrapper* default_material, float default_texlen,
   csThingTemplate* parent)
@@ -2814,6 +2833,7 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
 
   return ptemplate;
 }
+#endif
 
 csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
   csMaterialWrapper* default_material, float default_texlen,
@@ -2977,6 +2997,7 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
 
 //---------------------------------------------------------------------------
 
+#if 0
 csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf)
 {
   TOKEN_TABLE_START (commands)
@@ -3146,9 +3167,11 @@ csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf)
     tmpl->Vtex(i) = v_move + m_move * tmpl->Vtex(i);
   return tmpl;
 }
+#endif
 
 //---------------------------------------------------------------------------
 
+#if 0
 csThingTemplate* csLoader::load_sixtpl (char* tname, char* buf)
 {
   TOKEN_TABLE_START (commands)
@@ -3405,6 +3428,7 @@ csThingTemplate* csLoader::load_sixtpl (char* tname, char* buf)
 
   return tmpl;
 }
+#endif
 
 //---------------------------------------------------------------------------
 
@@ -3444,12 +3468,6 @@ struct Color
   float len;
 };
 
-struct DLight
-{
-  ObName poly;
-  ObName light;
-};
-
 struct Todo
 {
   ObName poly;
@@ -3457,15 +3475,12 @@ struct Todo
   int tv1, tv2;
   csMaterialWrapper* material;
   int col_idx;          // Idx in colors table if there was an override.
-  CLights* light;       // A dynamic light for this polygon
 };
 
 void add_to_todo (Todo* todo, int& todo_end, char* poly,
         int v1, int v2, int v3, int v4, int tv1, int tv2,
         csMaterialWrapper* material, int col_idx,
-        CLights* light,
-        Color* colors, int num_colors,
-        DLight* dlights, int num_light)
+        Color* colors, int num_colors)
 {
   int i;
   strcpy (todo[todo_end].poly, poly);
@@ -3477,17 +3492,10 @@ void add_to_todo (Todo* todo, int& todo_end, char* poly,
   todo[todo_end].tv2 = tv2;
   todo[todo_end].material = material;
   todo[todo_end].col_idx = col_idx;
-  todo[todo_end].light = light;
   for (i = 0 ; i < num_colors ; i++)
     if (!strcmp (poly, colors[i].poly))
     {
       todo[todo_end].col_idx = i;
-      break;
-    }
-  for (i = 0 ; i < num_light ; i++)
-    if (!strcmp (poly, dlights[i].poly))
-    {
-      todo[todo_end].light = CLights::FindByName (dlights[i].light);
       break;
     }
   todo_end++;
@@ -3628,9 +3636,6 @@ csSector* csLoader::load_room (char* secname, char* buf)
 
   int num_colors = 0;
   Color colors[MAX_ROOM_COLORS];
-
-  int num_light = 0;
-  DLight dlights[MAX_ROOM_LIGHT];
 
   csVector3 v0 (-1,  1,  1);
   csVector3 v1 ( 1,  1,  1);
@@ -3959,17 +3964,17 @@ csSector* csLoader::load_room (char* secname, char* buf)
   int todo_end = 0;
 
   add_to_todo (todo, todo_end, "north", 0, 1, 3, 2, 0, 1,
-               material, -1, NULL, colors, num_colors, dlights, num_light);
+               material, -1, colors, num_colors);
   add_to_todo (todo, todo_end, "east", 1, 5, 7, 3, 1, 5,
-               material, -1, NULL, colors, num_colors, dlights, num_light);
+               material, -1, colors, num_colors);
   add_to_todo (todo, todo_end, "south", 5, 4, 6, 7, 5, 4,
-               material, -1, NULL, colors, num_colors, dlights, num_light);
+               material, -1, colors, num_colors);
   add_to_todo (todo, todo_end, "west", 4, 0, 2, 6, 4, 0,
-               material, -1, NULL, colors, num_colors, dlights, num_light);
+               material, -1, colors, num_colors);
   add_to_todo (todo, todo_end, "up", 4, 5, 1, 0, 4, 5,
-               material, -1, NULL, colors, num_colors, dlights, num_light);
+               material, -1, colors, num_colors);
   add_to_todo (todo, todo_end, "down", 2, 3, 7, 6, 2, 3,
-               material, -1, NULL, colors, num_colors, dlights, num_light);
+               material, -1, colors, num_colors);
 
   int split;
   while (done < todo_end)
@@ -4006,7 +4011,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
           add_to_todo(todo, todo_end, pname, i1, sector->GetNumVertices ()-2,
                       sector->GetNumVertices ()-1, i4, todo[done].tv1,
                       todo[done].tv2, todo[done].material, todo[done].col_idx,
-                      todo[done].light, colors, num_colors, dlights,num_light);
+                      colors, num_colors);
           i1 = sector->GetNumVertices () - 2;
           i4 = sector->GetNumVertices () - 1;
         }
@@ -4014,7 +4019,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
         sprintf (pname, "%s%c", todo[done].poly, l+'A');
         add_to_todo (todo, todo_end, pname, i1, i2, i3, i4, todo[done].tv1,
                      todo[done].tv2, todo[done].material, todo[done].col_idx,
-                     todo[done].light, colors, num_colors, dlights, num_light);
+                     colors, num_colors);
       }
       else
       {
@@ -4037,8 +4042,8 @@ csSector* csLoader::load_room (char* secname, char* buf)
           add_to_todo(todo, todo_end, pname, sector->GetNumVertices () - 2,
                       sector->GetNumVertices () - 1,
                       i3, i4, todo[done].tv1, todo[done].tv2,
-                      todo[done].material, todo[done].col_idx, todo[done].light,
-                      colors, num_colors, dlights, num_light);
+                      todo[done].material, todo[done].col_idx,
+                      colors, num_colors);
           i3 = sector->GetNumVertices () - 1;
           i4 = sector->GetNumVertices () - 2;
         }
@@ -4046,7 +4051,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
         sprintf (pname, "%s%d", todo[done].poly, l+1);
         add_to_todo (todo, todo_end, pname, i1, i2, i3, i4, todo[done].tv1,
                      todo[done].tv2, todo[done].material, todo[done].col_idx,
-                     todo[done].light, colors, num_colors, dlights, num_light);
+                     colors, num_colors);
       }
     }
     else
@@ -4071,8 +4076,6 @@ csSector* csLoader::load_room (char* secname, char* buf)
       else
         p->SetTextureSpace ((csPolyTxtPlane*)World->planes.FindByName (colors[idx].plane));
       p->flags.Set (CS_POLY_LIGHTING, (no_lighting ? 0 : CS_POLY_LIGHTING));
-      csPolyTexLightMap* pol_lm = p->GetLightMapInfo ();
-      if (pol_lm) pol_lm->SetUniformDynLight (todo[done].light);
       OptimizePolygon (p);
     }
     done++;
@@ -4658,11 +4661,11 @@ bool csLoader::LoadWorld (char* buf)
           break;
         case TOKEN_THING:
           if (!World->thing_templates.FindByName (name))
-            World->thing_templates.Push (load_thingtpl (name, params));
+            World->thing_templates.Push (load_thing (name, params, NULL, false));
           break;
         case TOKEN_SIXFACE:
           if (!World->thing_templates.FindByName (name))
-            World->thing_templates.Push (load_sixtpl (name, params));
+            World->thing_templates.Push (load_sixface (name, params, NULL));
           break;
         case TOKEN_SECTOR:
           if (!World->sectors.FindByName (name))
@@ -4958,7 +4961,7 @@ bool csLoader::LoadLibrary (char* buf)
           break;
         case TOKEN_THING:
           if (!World->thing_templates.FindByName (name))
-            World->thing_templates.Push (load_thingtpl (name, params));
+            World->thing_templates.Push (load_thing (name, params, NULL, false));
           break;
       }
     }

@@ -38,7 +38,6 @@ class csMaterialList;
 class csPolygon3D;
 class csCamera;
 class csThing;
-class csThingTemplate;
 class csCollection;
 class csStatLight;
 class csDynLight;
@@ -407,7 +406,7 @@ public:
 
   /**
    * List of thing templates. This vector contains objects of
-   * type csThingTemplate*.
+   * type csThing*.
    */
   csNamedObjVector thing_templates;
 

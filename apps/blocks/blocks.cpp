@@ -45,7 +45,6 @@
 #include "csengine/light.h"
 #include "csengine/lghtmap.h"
 #include "csengine/thing.h"
-#include "csengine/thingtpl.h"
 #include "csengine/textrans.h"
 #include "csengine/csview.h"
 #include "igraph3d.h"
@@ -424,24 +423,25 @@ csMatrix3 Blocks::create_rotate_z (float angle)
   return rotate_z;
 }
 
-csPolygonTemplate* add_polygon_template (csThingTemplate* tmpl,
+csPolygon3D* add_polygon_template (csThing* tmpl,
 	char* name, csMaterialWrapper* material,
 	int vt0, int vt1, int vt2, int vt3 = -1)
 {
-  csPolygonTemplate* p;
-  p = new csPolygonTemplate (tmpl, name, material);
-  tmpl->AddPolygon (p);
+  csPolygon3D* p;
+  p = tmpl->NewPolygon (material);
+  p->SetName (name);
   p->AddVertex (vt0);
   p->AddVertex (vt1);
   p->AddVertex (vt2);
   if (vt3 != -1) p->AddVertex (vt3);
+  p->ComputeNormal ();
   return p;
 }
 
 void Blocks::add_pillar_template ()
 {
   float dim = CUBE_DIM/2.;
-  pillar_tmpl = new csThingTemplate ();
+  pillar_tmpl = new csThing (world);
   pillar_tmpl->SetName ("pillar");
   pillar_tmpl->AddVertex (-dim, 0, dim);
   pillar_tmpl->AddVertex (dim, 0, dim);
@@ -452,45 +452,45 @@ void Blocks::add_pillar_template ()
   pillar_tmpl->AddVertex (dim, ZONE_HEIGHT*CUBE_DIM, -dim);
   pillar_tmpl->AddVertex (-dim, ZONE_HEIGHT*CUBE_DIM, -dim);
 
-  csPolygonTemplate* p;
-  float A, B, C;
+  csPolygon3D* p;
+  csVector3 norm;
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
   p = add_polygon_template (pillar_tmpl, "d", pillar_mat, 3, 2, 1, 0);
-  p->PlaneNormal (&A, &B, &C);
+  norm = p->GetPolyPlane ()->GetNormal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	pillar_tmpl->Vtex (0), pillar_tmpl->Vtex (1), 1, A, B, C);
+      	pillar_tmpl->Vobj (0), pillar_tmpl->Vobj (1), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
   p = add_polygon_template (pillar_tmpl, "b", pillar_mat, 0, 1, 5, 4);
-  p->PlaneNormal (&A, &B, &C);
+  norm = p->GetPolyPlane ()->GetNormal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	pillar_tmpl->Vtex (0), pillar_tmpl->Vtex (1), 1, A, B, C);
+      	pillar_tmpl->Vobj (0), pillar_tmpl->Vobj (1), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
   p = add_polygon_template (pillar_tmpl, "t", pillar_mat, 4, 5, 6, 7);
-  p->PlaneNormal (&A, &B, &C);
+  norm = p->GetPolyPlane ()->GetNormal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	pillar_tmpl->Vtex (4), pillar_tmpl->Vtex (5), 1, A, B, C);
+      	pillar_tmpl->Vobj (4), pillar_tmpl->Vobj (5), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
   p = add_polygon_template (pillar_tmpl, "f", pillar_mat, 7, 6, 2, 3);
-  p->PlaneNormal (&A, &B, &C);
+  norm = p->GetPolyPlane ()->GetNormal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	pillar_tmpl->Vtex (7), pillar_tmpl->Vtex (6), 1, A, B, C);
+      	pillar_tmpl->Vobj (7), pillar_tmpl->Vobj (6), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
   p = add_polygon_template (pillar_tmpl, "l", pillar_mat, 4, 7, 3, 0);
-  p->PlaneNormal (&A, &B, &C);
+  norm = p->GetPolyPlane ()->GetNormal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	pillar_tmpl->Vtex (7), pillar_tmpl->Vtex (3), 1, A, B, C);
+      	pillar_tmpl->Vobj (7), pillar_tmpl->Vobj (3), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
   p = add_polygon_template (pillar_tmpl, "r", pillar_mat, 6, 5, 1, 2);
-  p->PlaneNormal (&A, &B, &C);
+  norm = p->GetPolyPlane ()->GetNormal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	pillar_tmpl->Vtex (6), pillar_tmpl->Vtex (5), 1, A, B, C);
+      	pillar_tmpl->Vobj (6), pillar_tmpl->Vobj (5), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
   world->thing_templates.Push (pillar_tmpl);
@@ -499,29 +499,29 @@ void Blocks::add_pillar_template ()
 void Blocks::add_vrast_template ()
 {
   float dim = RAST_DIM;
-  vrast_tmpl = new csThingTemplate ();
+  vrast_tmpl = new csThing (world);
   vrast_tmpl->SetName ("vrast");
   vrast_tmpl->AddVertex (-dim, 0, dim);
   vrast_tmpl->AddVertex (dim, 0, dim);
   vrast_tmpl->AddVertex (-dim, ZONE_HEIGHT*CUBE_DIM, dim);
   vrast_tmpl->AddVertex (dim, ZONE_HEIGHT*CUBE_DIM, dim);
 
-  csPolygonTemplate* p;
-  float A, B, C;
+  csPolygon3D* p;
+  csVector3 norm;
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
   p = add_polygon_template (vrast_tmpl, "f", raster_mat, 0, 1, 3, 2);
-  p->PlaneNormal (&A, &B, &C);
+  norm = p->GetPolyPlane ()->GetNormal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	vrast_tmpl->Vtex (0), vrast_tmpl->Vtex (1), 1, A, B, C);
+      	vrast_tmpl->Vobj (0), vrast_tmpl->Vobj (1), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
 #if 0
   p = add_polygon_template (vrast_tmpl, "b", raster_mat, 2, 3, 1, 0);
-  p->PlaneNormal (&A, &B, &C);
+  norm = p->GetPolyPlane ()->GetNormal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	vrast_tmpl->Vtex (0), vrast_tmpl->Vtex (1), 1, A, B, C);
+      	vrast_tmpl->Vobj (0), vrast_tmpl->Vobj (1), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 #endif
 
@@ -531,7 +531,7 @@ void Blocks::add_vrast_template ()
 void Blocks::add_hrast_template ()
 {
   float dim = RAST_DIM;
-  hrast_tmpl = new csThingTemplate ();
+  hrast_tmpl = new csThing (world);
   hrast_tmpl->SetName ("hrast");
 
   // zone_dim s were BIG here changed.
@@ -546,22 +546,22 @@ void Blocks::add_hrast_template ()
   hrast_tmpl->AddVertex (((float)ZONE_DIM/2.)*CUBE_DIM, .02, -dim);
   hrast_tmpl->AddVertex (((float)ZONE_DIM/2.)*CUBE_DIM, .02, dim);
 
-  csPolygonTemplate* p;
-  float A, B, C;
+  csPolygon3D* p;
+  csVector3 norm;
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
   p = add_polygon_template (hrast_tmpl, "f", raster_mat, 0, 1, 3, 2);
-  p->PlaneNormal (&A, &B, &C);
+  norm = p->GetPolyPlane ()->GetNormal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	hrast_tmpl->Vtex (0), hrast_tmpl->Vtex (1), 1, A, B, C);
+      	hrast_tmpl->Vobj (0), hrast_tmpl->Vobj (1), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 
 #if 0
   p = add_polygon_template (hrast_tmpl, "b", raster_mat, 2, 3, 1, 0);
-  p->PlaneNormal (&A, &B, &C);
+  norm = p->GetPolyPlane ()->GetNormal ();
   TextureTrans::compute_texture_space (tx_matrix, tx_vector,
-      	hrast_tmpl->Vtex (0), hrast_tmpl->Vtex (1), 1, A, B, C);
+      	hrast_tmpl->Vobj (0), hrast_tmpl->Vobj (1), 1, norm.x, norm.y, norm.z);
   p->SetTextureSpace (tx_matrix, tx_vector);
 #endif
 
@@ -633,7 +633,7 @@ void Blocks::ChangeThingMaterial (csThing* thing, csMaterialWrapper* mat)
 void Blocks::add_cube_template ()
 {
   float dim = CUBE_DIM/2.;
-  cube_tmpl = new csThingTemplate ();
+  cube_tmpl = new csThing (world);
   cube_tmpl->SetName ("cube");
   cube_tmpl->AddVertex (-dim, -dim, dim);
   cube_tmpl->AddVertex (dim, -dim, dim);
@@ -644,7 +644,7 @@ void Blocks::add_cube_template ()
   cube_tmpl->AddVertex (dim, dim, -dim);
   cube_tmpl->AddVertex (-dim, dim, -dim);
 
-  csPolygonTemplate* p;
+  csPolygon3D* p;
   csMatrix3 tx_matrix;
   csVector3 tx_vector;
 
@@ -694,7 +694,7 @@ void set_uv (csPolygon3D* p, float u1, float v1, float u2, float v2,
 
 // dx,dy,dz are logical coordinates (Z vertical).
 csThing* Blocks::create_cube_thing (float dx, float dy, float dz,
-	csThingTemplate* tmpl)
+	csThing* tmpl)
 {
   csThing* cube;
   cube = new csThing (world);
@@ -706,7 +706,7 @@ csThing* Blocks::create_cube_thing (float dx, float dy, float dz,
   	(dx-shift_rotate.x)*CUBE_DIM,
   	(dz-shift_rotate.z)*CUBE_DIM,
 	(dy-shift_rotate.y)*CUBE_DIM);
-  cube->MergeTemplate (tmpl, cube_mat, 1, NULL, &shift, NULL);
+  cube->MergeTemplate (tmpl, cube_mat, 1, true, &shift, NULL);
 
   csPolygon3D* p;
   p = cube->GetPolygon3D ("f1"); set_uv (p, 0, 0, 1, 0, 1, 1);
@@ -726,7 +726,7 @@ csThing* Blocks::create_cube_thing (float dx, float dy, float dz,
 
 // dx,dy,dz and x,y,z are logical coordinates (Z vertical).
 void Blocks::add_cube (float dx, float dy, float dz, float x, float y, float z,
-	csThingTemplate* tmpl)
+	csThing* tmpl)
 {
   csThing* cube = add_cube_thing (room, dx, dy, dz,
   	(x-(player1->zone_dim)/2+shift_rotate.x)*CUBE_DIM,
@@ -742,7 +742,7 @@ void Blocks::add_cube (float dx, float dy, float dz, float x, float y, float z,
 // dx,dy,dz are logical coordinates (Z vertical).
 // x,y,z are physical coordinates (Y vertical).
 csThing* Blocks::add_cube_thing (csSector* sect, float dx, float dy, float dz,
-	float x, float y, float z, csThingTemplate* tmpl)
+	float x, float y, float z, csThing* tmpl)
 {
   csThing* cube = create_cube_thing (dx, dy, dz, tmpl);
   cube->GetMovable ().SetSector (sect);

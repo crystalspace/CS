@@ -34,8 +34,6 @@ class csStatLight;
 class csMaterialWrapper;
 class csMaterialList;
 class csPolygon3D;
-class CLights;
-class csThingTemplate;
 struct iGraphics3D;
 
 /**
@@ -90,7 +88,7 @@ private:
   int center_idx;
 
   /// Pointer to the Thing Template which it derived from.
-  csThingTemplate* ParentTemplate;
+  csThing* ParentTemplate;
 
   /**
    * Utility function to be called whenever obj changes which updates
@@ -256,46 +254,27 @@ public:
   csPolygon3D* IntersectSphere (csVector3& center, float radius, float* pr = NULL);
 
   /**
-   * Add polygons and vertices from the specified template.
-   */
-  void MergeTemplate (csThingTemplate* tpl, csMaterialWrapper* default_material = NULL,
-  	float default_texlen = 1, CLights* default_lightx = NULL,
-	csVector3* shift = NULL, csMatrix3* transform = NULL);
-
-#if 0
-  /**
    * Add polygons and vertices from the specified template. Replace the materials if they 
    * match one in the matList.
    */
   void MergeTemplate (csThing* tpl, csMaterialList* matList, const char* prefix, 
 	csMaterialWrapper* default_material = NULL,
-  	float default_texlen = 1, CLights* default_lightx = NULL,
+  	float default_texlen = 1, bool objspace = false,
 	csVector3* shift = NULL, csMatrix3* transform = NULL);
 
   /**
    * Add polygons and vertices from the specified thing (seen as template).
    */
   void MergeTemplate (csThing* tpl, csMaterialWrapper* default_material = NULL,
-  	float default_texlen = 1, CLights* default_lightx = NULL,
+  	float default_texlen = 1, bool objspace = false,
 	csVector3* shift = NULL, csMatrix3* transform = NULL);
-#endif
-
-  /**
-   * Add polygons and vertices from the specified thing (seen as template).
-   * Replace the materials if they match one in the matList.
-   */
-  void MergeTemplate (csThingTemplate* tpl, csMaterialList* matList, const char* prefix, 
-	csMaterialWrapper* default_material = NULL,
-  	float default_texlen = 1, CLights* default_lightx = NULL,
-	csVector3* shift = NULL, csMatrix3* transform = NULL);
-
 
   /// Set parent template
-  void SetTemplate (csThingTemplate *t)
+  void SetTemplate (csThing *t)
   { ParentTemplate = t; }
 
   /// Query parent template
-  csThingTemplate *GetTemplate () const
+  csThing *GetTemplate () const
   { return ParentTemplate; }
 
   CSOBJTYPE;

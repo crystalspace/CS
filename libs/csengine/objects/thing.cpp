@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998,2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,7 +19,6 @@
 #include "cssysdef.h"
 #include "qint.h"
 #include "csengine/thing.h"
-#include "csengine/thingtpl.h"
 #include "csengine/polygon.h"
 #include "csengine/polytmap.h"
 #include "csengine/pol2d.h"
@@ -554,10 +553,9 @@ void csThing::Merge (csThing* other)
 }
 
 
-void csThing::MergeTemplate (csThingTemplate* tpl,
+void csThing::MergeTemplate (csThing* tpl,
   csMaterialWrapper* default_material, float default_texlen,
-  CLights* default_lightx,
-  csVector3* shift, csMatrix3* transform)
+  bool objspace, csVector3* shift, csMatrix3* transform)
 {
   (void)default_texlen;
   int i, j;
@@ -571,80 +569,58 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
   merge_vertices = new int [tpl->GetNumVertices ()+1];
   for (i = 0 ; i < tpl->GetNumVertices () ; i++)
   {
-    csVector3 v = tpl->Vtex (i);
+    csVector3 v;
+    if (objspace) v = tpl->Vobj (i);
+    else v = tpl->Vwor (i);
     if (transform) v = *transform * v;
     if (shift) v += *shift;
     merge_vertices[i] = AddVertex (v);
   }
 
-  for (i = 0 ; i < tpl->GetNumPolygon () ; i++)
+  for (i = 0 ; i < tpl->polygons.Length () ; i++)
   {
-    csPolygonTemplate* pt = tpl->GetPolygon (i);
+    csPolygon3D* pt = tpl->GetPolygon3D (i);
     csPolygon3D* p;
-    p = NewPolygon (pt->GetMaterial ());
+    p = NewPolygon (pt->GetMaterialWrapper ());
     p->SetName (pt->GetName());
-    if (!pt->GetMaterial ()) p->SetMaterial (default_material);
-    int* idx = pt->GetVerticesIdx ();
-    for (j = 0 ; j < pt->GetNumVertices () ; j++)
+    if (!pt->GetMaterialWrapper ()) p->SetMaterial (default_material);
+    int* idx = pt->GetVertices ().GetVertexIndices ();
+    for (j = 0 ; j < pt->GetVertices ().GetNumVertices () ; j++)
       p->AddVertex (merge_vertices[idx[j]]);
 
-    // Copy some of the flags from polygon template
-    p->flags.Set (CS_POLY_LIGHTING, pt->flags.Get ());
+    p->flags.SetAll (pt->flags.Get ());
+    p->SetTextureType (pt->GetTextureType ());
 
-    // Set collision detection flags, if needed
-    if ((pt->flags.Get () & CS_POLYTPL_COLLDET) == CS_POLYTPL_COLLDET_DISABLE)
-      p->flags.Reset (CS_POLY_COLLDET);
-    else if ((pt->flags.Get () & CS_POLYTPL_COLLDET) == CS_POLYTPL_COLLDET_ENABLE)
-      p->flags.Set (CS_POLY_COLLDET);
-
-    // Set polygon texture type
-    switch (pt->flags.Get () & CS_POLYTPL_TEXMODE)
+    csPolyTexFlat* txtflat_src = pt->GetFlatInfo ();
+    if (txtflat_src)
     {
-      case CS_POLYTPL_TEXMODE_NONE:
-        p->SetTextureType (POLYTXT_NONE);
-        break;
-      case CS_POLYTPL_TEXMODE_FLAT:
-        p->SetTextureType (POLYTXT_FLAT);
-        break;
-      case CS_POLYTPL_TEXMODE_GOURAUD:
-        p->SetTextureType (POLYTXT_GOURAUD);
-        break;
-      case CS_POLYTPL_TEXMODE_LIGHTMAP:
-      {
-        p->SetTextureType (POLYTXT_LIGHTMAP);
-        csPolyTexLightMap* pol_lm = p->GetLightMapInfo ();
-        if (pol_lm) pol_lm->SetUniformDynLight (default_lightx);
-        break;
-      }
-    }
-
-    csVector2 *uv_coords = pt->GetUVCoords ();
-    if (uv_coords)
-    {
-      csPolyTexFlat *fs = p->GetFlatInfo ();
-      if (fs)
-      {
-        fs->Setup (p);
+      csPolyTexFlat* txtflat_dst = p->GetFlatInfo ();
+      txtflat_dst->Setup (p);
+      csVector2 *uv_coords = txtflat_src->GetUVCoords ();
+      if (uv_coords)
         for (j = 0; j < pt->GetNumVertices (); j++)
-          fs->SetUV (j, uv_coords [j].x, uv_coords [j].y);
-      }
+          txtflat_dst->SetUV (j, uv_coords[j].x, uv_coords[j].y);
     }
 
-    csColor *colors = pt->GetColors ();
-    if (colors)
+    csPolyTexGouraud* txtgour_src = pt->GetGouraudInfo ();
+    if (txtgour_src)
     {
-      csPolyTexGouraud *gs = p->GetGouraudInfo ();
-      if (gs)
-      {
-        gs->Setup (p);
+      csPolyTexGouraud* txtgour_dst = p->GetGouraudInfo ();
+      txtgour_dst->Setup (p);
+      csColor* col = txtgour_src->GetColors ();
+      if (col)
         for (j = 0; j < pt->GetNumVertices (); j++)
-          gs->SetColor (j, colors [j]);
-      }
+          txtgour_dst->SetColor (j, col[j]);
     }
 
-    // This is unused for anything else than POLYTXT_LIGHTMAP;
-    // however it won't hurt even if it is not of this type.
-    p->SetTextureSpace (pt->GetTextureMatrix (), pt->GetTextureVector ());
+    csMatrix3 m;
+    csVector3 v (0);
+    csPolyTexLightMap* txtlmi_src = pt->GetLightMapInfo ();
+    if (txtlmi_src)
+    {
+      txtlmi_src->GetTxtPlane ()->GetTextureSpace (m, v);
+    }
+    p->SetTextureSpace (m, v);
   }
 
   for (i = 0; i < tpl->GetNumCurveVertices (); i++)
@@ -652,11 +628,11 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
 
   for (i = 0; i < tpl->GetNumCurves (); i++)
   {
-    csCurveTemplate *pt = tpl->GetCurve (i);
-    csCurve *p = pt->MakeCurve ();
+    csCurveTemplate* pt = tpl->GetCurve (i)->GetParentTemplate ();
+    csCurve* p = pt->MakeCurve ();
     p->SetName (pt->GetName ());
     p->SetParent (this);
-    p->SetSector (movable.GetSector (0));
+    p->SetSector (tpl->movable.GetSector (0));
 
     if (!pt->GetMaterialWrapper ()) p->SetMaterialWrapper (default_material);
     for (j = 0 ; j < pt->NumVertices () ; j++)
@@ -667,15 +643,15 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
   delete [] merge_vertices;
 }
 
-void csThing::MergeTemplate (csThingTemplate* tpl, csMaterialList* matList,
+void csThing::MergeTemplate (csThing* tpl, csMaterialList* matList,
   const char* prefix, csMaterialWrapper* default_material, float default_texlen,
-  CLights* default_lightx, csVector3* shift, csMatrix3* transform)
+  bool objspace, csVector3* shift, csMatrix3* transform)
 {
   int i;
   const char *txtname;
   char *newname=NULL;
     
-  MergeTemplate (tpl, default_material, default_texlen, default_lightx,
+  MergeTemplate (tpl, default_material, default_texlen, objspace,
     shift, transform);
     
   // Now replace the materials.
@@ -691,113 +667,6 @@ void csThing::MergeTemplate (csThingTemplate* tpl, csMaterialList* matList,
     delete [] newname;
   }
 }
-
-#if 0
-void csThing::MergeTemplate (csThing* tpl,
-  csMaterialWrapper* default_material, float default_texlen,
-  CLights* default_lightx,
-  csVector3* shift, csMatrix3* transform)
-{
-  (void)default_texlen;
-  int i, j;
-  int* merge_vertices;
-
-  //TODO should merge? take averages or something?
-  curves_center = tpl->curves_center;
-  curves_scale = tpl->curves_scale;
-  //@@@### Set parent template as thing...!!! ParentTemplate = tpl;
-
-  merge_vertices = new int [tpl->GetNumVertices ()+1];
-  for (i = 0 ; i < tpl->GetNumVertices () ; i++)
-  {
-    csVector3 v = tpl->Vwor (i);//@@@### wor of obj?
-    if (transform) v = *transform * v;
-    if (shift) v += *shift;
-    merge_vertices[i] = AddVertex (v);
-  }
-
-  for (i = 0 ; i < tpl->polygons.Length () ; i++)
-  {
-    csPolygon3D* pt = tpl->GetPolygon3D (i);
-    csPolygon3D* p;
-    p = NewPolygon (pt->GetMaterialWrapper ());
-    p->SetName (pt->GetName());
-    if (!pt->GetMaterialWrapper ()) p->SetMaterialWrapper (default_material);
-    int* idx = pt->GetVertices ().GetVertexIndices ();
-    for (j = 0 ; j < pt->GetVertices ().GetNumVertices () ; j++)
-      p->AddVertex (merge_vertices[idx[j]]);
-
-    p->flags = pt->flags;
-    // Set polygon texture type
-    switch (pt->flags.Get () & CS_POLYTPL_TEXMODE)
-    {
-      case CS_POLYTPL_TEXMODE_NONE:
-        p->SetTextureType (POLYTXT_NONE);
-        break;
-      case CS_POLYTPL_TEXMODE_FLAT:
-        p->SetTextureType (POLYTXT_FLAT);
-        break;
-      case CS_POLYTPL_TEXMODE_GOURAUD:
-        p->SetTextureType (POLYTXT_GOURAUD);
-        break;
-      case CS_POLYTPL_TEXMODE_LIGHTMAP:
-      {
-        p->SetTextureType (POLYTXT_LIGHTMAP);
-        csPolyTexLightMap* pol_lm = p->GetLightMapInfo ();
-        if (pol_lm) pol_lm->SetUniformDynLight (default_lightx);
-        break;
-      }
-    }
-@@@###
-    csVector2 *uv_coords = pt->GetUVCoords ();
-    if (uv_coords)
-    {
-      csPolyTexFlat *fs = p->GetFlatInfo ();
-      if (fs)
-      {
-        fs->Setup (p);
-        for (j = 0; j < pt->GetNumVertices (); j++)
-          fs->SetUV (j, uv_coords [j].x, uv_coords [j].y);
-      }
-    }
-
-    csColor *colors = pt->GetColors ();
-    if (colors)
-    {
-      csPolyTexGouraud *gs = p->GetGouraudInfo ();
-      if (gs)
-      {
-        gs->Setup (p);
-        for (j = 0; j < pt->GetNumVertices (); j++)
-          gs->SetColor (j, colors [j]);
-      }
-    }
-
-    // This is unused for anything else than POLYTXT_LIGHTMAP;
-    // however it won't hurt even if it is not of this type.
-    p->SetTextureSpace (pt->GetTextureMatrix (), pt->GetTextureVector ());
-  }
-
-  for (i = 0; i < tpl->GetNumCurveVertices (); i++)
-    AddCurveVertex (tpl->CurveVertex (i), tpl->CurveTexel (i));
-
-  for (i = 0; i < tpl->GetNumCurves (); i++)
-  {
-    csCurveTemplate *pt = tpl->GetCurve (i);
-    csCurve *p = pt->MakeCurve ();
-    p->SetName (pt->GetName ());
-    p->SetParent (this);
-    p->SetSector (movable.GetSector (0));
-
-    if (!pt->GetMaterialWrapper ()) p->SetMaterialWrapper (default_material);
-    for (j = 0 ; j < pt->NumVertices () ; j++)
-      p->SetControlPoint (j, pt->GetVertex (j));
-    AddCurve (p);
-  }
-
-  delete [] merge_vertices;
-}
-#endif
 
 void csThing::UpdateInPolygonTrees ()
 {

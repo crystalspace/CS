@@ -22,7 +22,6 @@
 #include "csengine/polytmap.h"
 #include "csengine/pol2d.h"
 #include "csengine/polytext.h"
-#include "csengine/dynlight.h"
 #include "csengine/world.h"
 #include "csengine/camera.h"
 #include "csengine/sector.h"

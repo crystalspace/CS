@@ -23,7 +23,6 @@
 #include "csgeom/transfrm.h"
 
 class csMaterialWrapper;
-class CLights;
 class csWorld;
 class csTextureList;
 
@@ -32,7 +31,6 @@ class PSLoadInfo
 public:
   csMaterialWrapper* default_material;
   float default_texlen;
-  CLights* default_lightx;
   bool use_mat_set;
   char* mat_set_name;
   csReversibleTransform hard_trans;
@@ -40,7 +38,7 @@ public:
   
   ///
   PSLoadInfo () : default_material (NULL),
-   default_texlen (1), default_lightx (NULL),
+   default_texlen (1),
    use_mat_set (false), mat_set_name (NULL),
    do_hard_trans (false) {}
 

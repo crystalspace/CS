@@ -30,7 +30,6 @@
 #include "csutil/vfs.h"
 #include "csengine/cssprite.h"
 #include "csengine/triangle.h"
-#include "csengine/thingtpl.h"
 
 /**
  * The general cross builder interface.  All cross builders inherit from
@@ -137,7 +136,7 @@ class csCrossBuild_SpriteTemplateFactory : public csCrossBuild_Factory
 /**
  * The thing template factory makes a whole thing template by
  * extracting the first frame from a converter and stuffing it
- * into a csThingTemplate object.
+ * into a csThing object.
  * Note that the converted thing will be using gouraud shading.
  */
 class csCrossBuild_ThingTemplateFactory : public csCrossBuild_Factory
@@ -169,13 +168,13 @@ class csCrossBuild_ThingTemplateFactory : public csCrossBuild_Factory
     /**
      * Add all vertices to the thing template.
      */
-    void Add_Vertices (csThingTemplate& framesource, converter& buildsource);
+    void Add_Vertices (csThing& framesource, converter& buildsource);
 
     /**
      * Make triangle mesh by extracting data from the
      * converter data
      */
-    void Build_TriangleMesh(csThingTemplate& meshsource, converter& buildsource);
+    void Build_TriangleMesh(csThing& meshsource, converter& buildsource);
 };
 
 /**

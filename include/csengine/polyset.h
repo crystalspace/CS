@@ -37,7 +37,6 @@ class csSector;
 class csWorld;
 class csCamera;
 class csMaterialWrapper;
-class CLights;
 class csPolygon2D;
 class csPolygon2DQueue;
 class csBspTree;
