@@ -37,6 +37,8 @@ chronological order.
 	- Jorrit fixed a problem in the generic renderloop plugin where
 	  SCF_IMPLEMENT_IBASE was combined with
 	  SCF_IMPLEMENT_EMBEDDED_IBASE_END.
+	- Jorrit fixed a stupid bug he introduced with his more recent
+	  changes.
 31-Aug-2003
         - Philip Wyett changed #include "GL/glu.h" to <GL/glu.h>, in the new
           GL renderer gl_txtcache.cpp, eliminating the warning messages within

@@ -2679,6 +2679,7 @@ csRenderMesh **csThing::GetRenderMeshes (int &num)
 
   //PrepareLMs (); // @@@ Maybe more here ?
 
+  num = renderMeshes.Length ();
   for (int i = 0; i < materials_to_visit.Length (); i++)
   {
     materials_to_visit[i]->Visit ();
