@@ -59,6 +59,23 @@ The history order has been reversed so that new features are at the top.
 	- Extended the loader with HARDMOVE for mesh objects.
 	- The thing loader plugin is still not working correctly but we
 	  are getting there.
+	- Added polygon ID which I will use for caching the lightmaps
+	  instead of the old sector/thing/ID way. This will mean that
+	  adding a polygon to a level will invalidate a lot of lightmaps
+	  but on the other hand it is safer and easier. The previous
+	  method depended on things and sectors having unique names.
+	- Added curve ID as well for a similar reason.
+	- Changed caching of lightmaps for polygons and curves using the
+	  new ID system.
+	- The above change fixes a bug where things loaded with the thing
+	  loader plugin would not correctly behave with regards to the lighting
+	  cache because those things don't have a name (their name is inside
+	  the mesh wrapper instead).
+	- The thing loader now works a lot better. There is still a problem
+	  with movable things (as you can see from the new version of flarge
+	  that I committed). The problem is that there is still a movable
+	  instance in csThing itself which is used instead of the correct
+	  movable in csMeshWrapper.
 4-Apr-2001
 	- Started work on thing loader and saver. Although things haven't
 	  moved to a plugin yet it is already possible to make real

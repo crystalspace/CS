@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -26,6 +26,7 @@
 class csPolyTexture;
 class csThing;
 class csPolygon3D;
+class csCurve;
 class csLight;
 class csEngine;
 class Dumper;
@@ -263,16 +264,13 @@ public:
 
   /**
    * Read from the cache. Return true if succesful.
-   * Index is the index of the polygon in the containing object. It is used
-   * for identifying the lightmap on disk.
    */
-  bool ReadFromCache (int w, int h, csThing* owner,
-    csObject* obj, bool isPolygon, int index, csEngine*);
+  bool ReadFromCache (int w, int h, csObject* obj, bool isPolygon, csEngine*);
 
   /**
    * Cache the lightmaps in the precalculation area.
    */
-  void Cache (csThing* owner, csPolygon3D* poly, int index, csEngine*);
+  void Cache (csPolygon3D* poly, csCurve* curve, csEngine*);
 
   /**
    * Convert the lightmaps to the correct mixing mode.

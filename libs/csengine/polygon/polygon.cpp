@@ -240,6 +240,8 @@ void csPolyTexGouraud::SetDynamicColor (int i, float r, float g, float b)
 
 //---------------------------------------------------------------------------
 
+unsigned long csPolygon3D::last_polygon_id = 0;
+
 IMPLEMENT_CSOBJTYPE (csPolygon3D,csObject);
 
 IMPLEMENT_IBASE_EXT (csPolygon3D)
@@ -254,6 +256,7 @@ csPolygon3D::csPolygon3D (csMaterialWrapper* material) : csPolygonInt (),
   csObject (), vertices (4)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
+  polygon_id = last_polygon_id++;
 
   if (material) SetMaterial (material);
   else csPolygon3D::material = NULL;
@@ -289,6 +292,7 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csPolygonInt (),
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3D);
 
+  polygon_id = last_polygon_id++;
   const char* tname = poly.GetName ();
   if (tname) SetName (tname);
 
@@ -1581,7 +1585,7 @@ bool csPolygon3D::IntersectRayPlane (const csVector3& start, const csVector3& en
   return r >= 0;
 }
 
-void csPolygon3D::InitLightMaps (csThing* owner, bool do_cache, int index)
+void csPolygon3D::InitLightMaps (bool do_cache)
 {
   if (orig_poly) return;
   csPolyTexLightMap* lmi = GetLightMapInfo ();
@@ -1593,7 +1597,7 @@ void csPolygon3D::InitLightMaps (csThing* owner, bool do_cache, int index)
     lmi->lightmap_up_to_date = false;
   }
   else if (!lmi->tex->lm->ReadFromCache (lmi->tex->w_orig, lmi->tex->h,
-    owner, this, true, index, csEngine::current_engine))
+    this, true, csEngine::current_engine))
   {
     lmi->tex->InitLightMaps ();
     lmi->lightmap_up_to_date = true;
@@ -1999,7 +2003,7 @@ void csPolygon3D::CalculateDelayedLighting (csFrustumView *lview,
   lview->RestoreFrustumContext (old_ctxt);
 }
 
-void csPolygon3D::CacheLightMaps (csThing* owner, int index)
+void csPolygon3D::CacheLightMaps ()
 {
   if (orig_poly) return;
   csPolyTexLightMap* lmi = GetLightMapInfo ();
@@ -2009,7 +2013,7 @@ void csPolygon3D::CacheLightMaps (csThing* owner, int index)
   {
     lmi->lightmap_up_to_date = true;
     if (csEngine::current_engine->IsLightingCacheEnabled () && do_cache_lightmaps)
-      lmi->tex->lm->Cache (owner, this, index, csEngine::current_engine);
+      lmi->tex->lm->Cache (this, NULL, csEngine::current_engine);
   }
   lmi->tex->lm->ConvertToMixingMode ();
 }

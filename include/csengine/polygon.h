@@ -437,6 +437,11 @@ class csPolygon3D : public csPolygonInt, public csObject
   friend class csPolyTexture;
 
 private:
+  /// ID for this polygon.
+  unsigned long polygon_id;
+  /// Last used ID.
+  static unsigned long last_polygon_id;
+
   /*
    * A table of indices into the vertices of the parent csThing
    * (container).
@@ -549,6 +554,9 @@ public:
    * some stuff is shared).
    */
   virtual ~csPolygon3D ();
+
+  /// Get the ID of this polygon.
+  unsigned long GetPolygonID () { return polygon_id; }
 
   /**
    * Set type of texturing to use for this polygon (one of
@@ -976,10 +984,8 @@ public:
    * cache in the level archive.
    * If do_cache == false this function will not try to read the lightmap
    * from the cache.
-   * Index is the index of this polygon into the containing object. This
-   * is used to identify the lightmap data on disk.
    */
-  void InitLightMaps (csThing* owner, bool do_cache, int index);
+  void InitLightMaps (bool do_cache);
 
   /**
    * Fill the lightmap of this polygon according to the given light and
@@ -1039,7 +1045,7 @@ public:
    * the calculated lightmap to the level archive. This function does
    * nothing if the cached lightmap was already up-to-date.
    */
-  void CacheLightMaps (csThing* owner, int index);
+  void CacheLightMaps ();
 
   /**
    * Transform the plane of this polygon from object space to world space.

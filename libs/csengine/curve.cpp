@@ -29,6 +29,8 @@
 #include "csengine/engine.h"
 #include "csengine/lppool.h"
 
+unsigned long csCurve::last_curve_id = 0;
+
 // Initialize the cache for Bezier curves
 static csBezier2 bezierCache;
 
@@ -294,7 +296,7 @@ void csCurve::Normal (csVector3& /*vec*/, double /*u*/, double /*v*/)
 // #define CURVE_LM_SIZE 32
 #define CURVE_LM_SIZE (8 - 2) /*this is the real value - 2*/
 
-void csCurve::InitLightMaps (csThing* owner, bool do_cache, int index)
+void csCurve::InitLightMaps (bool do_cache)
 {
   if (!IsLightable ()) return;
   lightmap = new csLightMap ();
@@ -311,8 +313,8 @@ void csCurve::InitLightMaps (csThing* owner, bool do_cache, int index)
   if (csEngine::do_force_relight) lightmap_up_to_date = false;
   else 
     if (!lightmap->ReadFromCache ( CURVE_LM_SIZE*csLightMap::lightcell_size,
-           CURVE_LM_SIZE*csLightMap::lightcell_size, owner, this, false, 
-           index, csEngine::current_engine))
+           CURVE_LM_SIZE*csLightMap::lightcell_size, this, false, 
+           csEngine::current_engine))
     lightmap_up_to_date = true;
   else lightmap_up_to_date = true;
 }
@@ -741,13 +743,13 @@ void csCurve::SetObject2World (csReversibleTransform* o2w)
   }
 }
 
-void csCurve::CacheLightMaps (csThing* owner, int index)
+void csCurve::CacheLightMaps ()
 {
   if (!lightmap) return;
   if (!lightmap_up_to_date)
   {
     lightmap_up_to_date = true;
-    lightmap->Cache (owner, NULL, index, csEngine::current_engine);
+    lightmap->Cache (NULL, this, csEngine::current_engine);
   }
   lightmap->ConvertToMixingMode ();
 }
@@ -891,6 +893,7 @@ csCurve::csCurve (csCurveTemplate* parent_tmpl) : csObject (),
     lightmap (NULL), lightmap_up_to_date (false)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiCurve);
+  curve_id = last_curve_id++;
 } 
 
 iCurveTemplate* csCurve::Curve::GetParentTemplate ()

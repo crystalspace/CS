@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -202,25 +202,13 @@ struct LightHeader
   long dyn_cnt;		// Number of dynamic maps
 };
 
-void CacheName (char *buf, csThing *owner, int index, char *suffix)
+void CacheName (char *buf, char* prefix, unsigned long id, char *suffix)
 {
-  const char* name = owner->GetName ();
-  if (!name)
-    CsPrintf (MSG_WARNING, "Lighting cache is used while some objects don't have names!\n");
-
-  if (owner->GetType () == csThing::Type)
-  {
-    const char* pname = ((csThing*)owner)->GetMovable ().GetSector (0)->GetName ();
-    if (!pname)
-      CsPrintf (MSG_WARNING, "Lighting cache is used while some objects don't have names!\n");
-    sprintf (buf, "lm/%s_%s_%d%s", pname ? pname : ".", name ? name : ".", index, suffix);
-  }
-  else
-    sprintf (buf, "lm/%s_%d%s", name ? name : ".", index, suffix);
+  sprintf (buf, "lm/%s%d%s", prefix, id, suffix);
 }
 
-bool csLightMap::ReadFromCache (int w, int h, csThing* owner,
-  csObject* obj, bool isPolygon, int index, csEngine* engine)
+bool csLightMap::ReadFromCache (int w, int h,
+  csObject* obj, bool isPolygon, csEngine* engine)
 {
   char buf[200];
   PolySave ps, pswanted;
@@ -230,9 +218,12 @@ bool csLightMap::ReadFromCache (int w, int h, csThing* owner,
   int i;
 
   csPolygon3D* poly = NULL;
+  csCurve* curve = NULL;
   
   if (isPolygon)
     poly = (csPolygon3D*)obj;
+  else
+    curve = (csCurve*)obj;
 
   SetSize (w, h);
 
@@ -245,10 +236,13 @@ bool csLightMap::ReadFromCache (int w, int h, csThing* owner,
     pswanted.x2 = convert_endian (float2short (poly->Vobj (1).x));
     pswanted.y2 = convert_endian (float2short (poly->Vobj (1).y));
     pswanted.z2 = convert_endian (float2short (poly->Vobj (1).z));
+    CacheName (buf, "P", poly->GetPolygonID (), "");
+  }
+  else
+  {
+    CacheName (buf, "C", curve->GetCurveID (), "");
   }
   pswanted.lm_size = convert_endian (lm_size);
-
-  CacheName (buf, owner, index, "");
 
   iDataBuffer* data = engine->VFS->ReadFile (buf);
   if (!data) return false;
@@ -296,7 +290,10 @@ bool csLightMap::ReadFromCache (int w, int h, csThing* owner,
   //-------------------------------
   // Now load the dynamic data.
   //-------------------------------
-  CacheName (buf, owner, index, "_d");
+  if (poly)
+    CacheName (buf, "P", poly->GetPolygonID (), "_d");
+  else
+    CacheName (buf, "C", curve->GetCurveID (), "_d");
   data = engine->VFS->ReadFile (buf);
   if (!data) return true;	// No dynamic data. @@@ Recalculate dynamic data?
 
@@ -344,7 +341,7 @@ bool csLightMap::ReadFromCache (int w, int h, csThing* owner,
   return true;
 }
 
-void csLightMap::Cache (csThing* owner, csPolygon3D* poly, int index, csEngine* engine)
+void csLightMap::Cache (csPolygon3D* poly, csCurve* curve, csEngine* engine)
 {
   (void) engine;
   char buf[200];
@@ -361,6 +358,11 @@ void csLightMap::Cache (csThing* owner, csPolygon3D* poly, int index, csEngine* 
     ps.x2 = convert_endian (float2short (poly->Vobj (1).x));
     ps.y2 = convert_endian (float2short (poly->Vobj (1).y));
     ps.z2 = convert_endian (float2short (poly->Vobj (1).z));
+    CacheName (buf, "P", poly->GetPolygonID (), "");
+  }
+  else
+  {
+    CacheName (buf, "C", curve->GetCurveID (), "");
   }
   ps.lm_size = convert_endian (lm_size);
   ps.lm_cnt = 0;
@@ -372,7 +374,6 @@ void csLightMap::Cache (csThing* owner, csPolygon3D* poly, int index, csEngine* 
   //-------------------------------
   // Write the normal lightmap data.
   //-------------------------------
-  CacheName (buf, owner, index, "");
   iFile *cf = engine->VFS->Open (buf, VFS_FILE_WRITE);
   cf->Write (ps.header, 4);
   s = ps.x1;      cf->Write ((char*)&s, sizeof (s));
@@ -404,7 +405,10 @@ void csLightMap::Cache (csThing* owner, csPolygon3D* poly, int index, csEngine* 
     while (smap) { lh.dyn_cnt++; smap = smap->next; }
     smap = first_smap;
 
-    CacheName (buf, owner, index, "_d");
+    if (poly)
+      CacheName (buf, "P", poly->GetPolygonID (), "_d");
+    else
+      CacheName (buf, "C", curve->GetCurveID (), "_d");
     cf = engine->VFS->Open (buf, VFS_FILE_WRITE);
     cf->Write (lh.header, 4);
     l = convert_endian (lh.dyn_cnt);

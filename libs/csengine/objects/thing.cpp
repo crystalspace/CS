@@ -2333,18 +2333,18 @@ void csThing::InitLightMaps (bool do_cache)
   Prepare ();
   int i;
   for (i = 0 ; i < polygons.Length () ; i++)
-    polygons.Get (i)->InitLightMaps (this, do_cache, i);
+    polygons.Get (i)->InitLightMaps (do_cache);
   for (i = 0 ; i < GetNumCurves () ; i++)
-    curves.Get (i)->InitLightMaps (this, do_cache, polygons.Length ()+i);
+    curves.Get (i)->InitLightMaps (do_cache);
 }
 
 void csThing::CacheLightMaps ()
 {
   int i;
   for (i = 0 ; i < polygons.Length () ; i++)
-    polygons.Get (i)->CacheLightMaps (this, i);
+    polygons.Get (i)->CacheLightMaps ();
   for (i = 0 ; i < GetNumCurves () ; i++)
-    curves.Get (i)->CacheLightMaps (this, polygons.Length ()+i);
+    curves.Get (i)->CacheLightMaps ();
 }
 
 void csThing::Merge (csThing* other)

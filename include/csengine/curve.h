@@ -115,6 +115,11 @@ class csCurve : public csObject
   friend class Dumper;
 
 private:
+  /// ID for this curve.
+  unsigned long curve_id;
+  /// Last used ID.
+  static unsigned long last_curve_id;
+
   csMaterialWrapper* cstxt;
   // Pointer to the parent template.
   csCurveTemplate* parent_template;
@@ -157,6 +162,9 @@ public:
 
   /// Destructor
   virtual ~csCurve ();
+
+  /// Get the ID of this curve.
+  unsigned long GetCurveID () { return curve_id; }
 
   /**
    * Populate a coverage matrix which relates shadow information for this 
@@ -238,7 +246,7 @@ public:
   ///
   virtual void Normal (csVector3& vec, double u, double v);
   ///
-  void InitLightMaps (csThing* owner, bool do_cache, int index);
+  void InitLightMaps (bool do_cache);
 
   /// Add a lightpatch to this curves list of light patches
   void AddLightPatch (csLightPatch* lp);
@@ -256,7 +264,7 @@ public:
   void CalculateLighting (csFrustumView& lview);
 
   ///
-  void CacheLightMaps (csThing* owner, int index);
+  void CacheLightMaps ();
 
   /// Do a hard transform on this curve.
   virtual void HardTransform (const csReversibleTransform& trans);

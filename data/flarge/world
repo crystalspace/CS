@@ -26,6 +26,7 @@ WORLD (
     MATERIAL 'robot' (TEXTURE ('oldmetal.gif'))
     MATERIAL 'raindrop' (TEXTURE ('raindrop'))
     MATERIAL 'white' (TEXTURE ('white.gif'))
+    MATERIAL 'bricks' (TEXTURE ('bricks.gif'))
   )
 
   ADDON (
@@ -302,11 +303,13 @@ WORLD (
     PARAMS ()
   )
 
-  THING 'cube' (
+  MESHOBJ 'cube' (
+    PLUGIN ('crystalspace.mesh.loader.factory.thing')
+    PARAMS (
     VERTEX (-0.5,-0.5,-0.5) VERTEX (-0.5,-0.5,0.5) VERTEX (-0.5,0.5,-0.5)
     VERTEX (-0.5,0.5,0.5) VERTEX (0.5,-0.5,-0.5) VERTEX (0.5,-0.5,0.5)
     VERTEX (0.5,0.5,-0.5) VERTEX (0.5,0.5,0.5)
-    MATERIAL ('bricks.gif')
+    MATERIAL ('bricks')
     POLYGON 'north' (
       VERTICES (1,5,7,3)
       TEXTURE (
@@ -348,6 +351,7 @@ WORLD (
         MATRIX (-0.333333,0,-0,0,0,-0.333333,0,0.333333,0)
         V (0.5,-0.5,0.5)
       )
+    )
     )
   )
   THING 'stair_rail' (
@@ -2544,25 +2548,55 @@ WORLD (
       )
     )
     )
-    THING 'cube2' (
-      TEMPLATE ('cube') MOVE (MATRIX (ROT_X (45)) V (-16,-1,36))
-      MOVEABLE ()
+    MESHOBJ 'cube2' (
+      PLUGIN ('crystalspace.mesh.loader.thing')
+      PARAMS (
+        FACTORY ('cube')
+        MOVEABLE ()
+      )
+      MOVE (MATRIX (ROT_X (45)) V (-16,-1,36))
       KEY ("entity_Rotate", "90,0,0,yes")
     )
-    THING 'cube3' (
-      TEMPLATE ('cube') HARDMOVE (MATRIX (ROT_Y (45)) V (-14,-1,36))
+    MESHOBJ 'cube3' (
+      PLUGIN ('crystalspace.mesh.loader.thing')
+      PARAMS (
+        FACTORY ('cube')
+      )
+      HARDMOVE (MATRIX (ROT_Y (45)) V (-14,-1,36))
     )
-    THING 'cube4' (TEMPLATE ('cube') MOVE (MATRIX (ROT_Z (45)) V (-12,-1,36))
+    MESHOBJ 'cube4' (
+      PLUGIN ('crystalspace.mesh.loader.thing')
+      PARAMS (
+        FACTORY ('cube')
+        MOVEABLE ()
+      )
       KEY ("entity_Rotate", "90,0,0,yes")
-      MOVEABLE ()
+      MOVE (MATRIX (ROT_Z (45)) V (-12,-1,36))
     )
-    THING 'cube5' (TEMPLATE ('cube') HARDMOVE (MATRIX (ROT_X (10)) V (-18,1,36)))
-    THING 'cube6' (TEMPLATE ('cube') MOVE (MATRIX (ROT_Y (10)) V (-16,1,36))
+    MESHOBJ 'cube5' (
+      PLUGIN ('crystalspace.mesh.loader.thing')
+      PARAMS (FACTORY ('cube'))
+      HARDMOVE (MATRIX (ROT_X (10)) V (-18,1,36))
+    )
+    MESHOBJ 'cube6' (
+      PLUGIN ('crystalspace.mesh.loader.thing')
+      PARAMS (
+        FACTORY ('cube')
+        MOVEABLE ()
+      )
       KEY ("entity_Rotate", "0,0,180,yes")
-      MOVEABLE ()
+      MOVE (MATRIX (ROT_Y (10)) V (-16,1,36))
     )
-    THING 'cube7' (TEMPLATE ('cube') HARDMOVE (MATRIX (ROT_Z (10)) V (-14,1,36)))
-    THING 'cube8' (TEMPLATE ('cube') HARDMOVE (MATRIX (ROT_X (45) ROT_Y (10)) V (-12,1,36)))
+    MESHOBJ 'cube7' (
+      PLUGIN ('crystalspace.mesh.loader.thing')
+      PARAMS (FACTORY ('cube'))
+      HARDMOVE (MATRIX (ROT_Z (10)) V (-14,1,36))
+    )
+    MESHOBJ 'cube8' (
+      PLUGIN ('crystalspace.mesh.loader.thing')
+      PARAMS (FACTORY ('cube'))
+      HARDMOVE (MATRIX (ROT_X (45) ROT_Y (10)) V (-12,1,36))
+    )
     THING 'prism3_1' (TEMPLATE ('prism3') HARDMOVE (V (-4,0,30)))
     THING 'prism4_1' (TEMPLATE ('prism4') HARDMOVE (V (-4,2,30)))
     THING 'circle1' (TEMPLATE ('circle') MOVE (V (-16,1,30))
