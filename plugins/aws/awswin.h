@@ -342,6 +342,9 @@ public:
 
     /// Triggered when the keyboard focus is gained
     virtual bool OnGainFocus();
+
+    /// Triggered at the beginning of each frame
+    virtual bool OnFrame();
 };
 
 #endif

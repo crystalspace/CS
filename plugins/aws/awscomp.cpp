@@ -257,6 +257,9 @@ awsComponent::HandleEvent(iEvent& Event)
 
   case csevLostFocus:
     return OnLostFocus();
+
+  case csevFrameStart:
+    return OnFrame();
     
   }
 
@@ -390,6 +393,7 @@ bool awsComponent::OnMouseEnter()                                { return false;
 bool awsComponent::OnKeypress(int key, int modifiers)            { return false; }
 bool awsComponent::OnLostFocus()                                 { return false; }
 bool awsComponent::OnGainFocus()                                 { return false; }
+bool awsComponent::OnFrame()                                     { return false; }
 
 /////////////////////////////////////  awsComponentFactory ////////////////////////////////////////////////////////
 

@@ -593,10 +593,24 @@ awsWindow::HandleEvent(iEvent& Event)
   case csevKeyDown:
     return OnKeypress(Event.Key.Char, Event.Key.Modifiers);
 
+  case csevFrameStart:
+    return OnFrame();
   }
 
   return false;
 
+}
+
+bool 
+awsWindow::OnFrame()
+{
+  if (view)
+  {
+    WindowManager()->Mark(Frame());
+    return true;
+  }
+
+  return false; 
 }
 
 bool 

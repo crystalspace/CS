@@ -19,6 +19,7 @@
 #include "iutil/objreg.h"
 #include "iutil/event.h"
 #include "ivaria/reporter.h"
+#include "csutil/csevent.h"
 
 // includes for registration/embedding
 #include "awscomp.h"
@@ -384,6 +385,8 @@ awsManager::Redraw()
   int    erasefill = GetPrefMgr()->GetColor(AC_TRANSPARENT);
   int    i;
 
+  iAwsWindow *curwin=top, *oldwin = 0;
+
 
   redraw_tag++;
 
@@ -391,7 +394,19 @@ awsManager::Redraw()
 
   ptG3D->BeginDraw(CSDRAW_2DGRAPHICS);
   ptG2D->SetClipRect(0,0,ptG2D->GetWidth()-1, ptG2D->GetHeight()-1);
-  
+
+  // Broadcast frame events.
+  while (curwin)
+  { 
+    if (!curwin->isHidden())
+    {
+      csEvent Event;
+      Event.Type = csevFrameStart;
+      curwin->HandleEvent(Event);
+    }
+    curwin = curwin->WindowBelow();
+  }
+
   // check to see if there is anything to redraw.
   if (dirty.Count() == 0 && !(flags & AWSF_AlwaysRedrawWindows))
     return;
@@ -403,11 +418,11 @@ awsManager::Redraw()
 
   /******* The following code is only executed if there is something to redraw *************/
 
-  iAwsWindow *curwin=top, *oldwin = 0;
+  curwin=top;
 
   // check to see if any part of this window needs redrawn, or if the always draw flag is set
   while (curwin)
-  {
+  { 
     if ((!curwin->isHidden()) && (WindowIsDirty(curwin) || (flags & AWSF_AlwaysRedrawWindows)))
     {
       curwin->SetRedrawTag(redraw_tag);
