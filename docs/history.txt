@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+17-Jul-2003
+        - Philip Wyett fixed broken glrender3d makefile. OBJ.GLRENDER3D should
+          have had OUT.GLRENDER3D not DIR.GLRENDER3D.
 16-Jul-2003
 	- Anders Stenberg made the following new renderer additions and fixes:
 	  - Made AWS work. (Added some stub functions to comply with interface 
