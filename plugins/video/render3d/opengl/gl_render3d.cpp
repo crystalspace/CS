@@ -955,7 +955,7 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
   SetWriteMask (true, true, true, true);
 
   int i = 0;
-  for (i = 0; i < 16; i++)
+  for (i = 15; i >= 0; i--)
     DeactivateTexture (i);
 
   if (render_target)
@@ -1036,11 +1036,6 @@ bool csGLGraphics3D::BeginDraw (int drawflags)
     {
       ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
       ext->glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-    }
-    if (ext->CS_GL_ARB_multitexture)
-    {
-      ext->glActiveTextureARB(GL_TEXTURE0_ARB);
-      ext->glClientActiveTextureARB(GL_TEXTURE0_ARB);
     }
     statecache->Disable_GL_ALPHA_TEST ();
 

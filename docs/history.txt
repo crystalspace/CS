@@ -9,6 +9,7 @@ chronological order.
 28-Nov-2003
 	- res added some NR VC7 projects to csall.
 	- res made lots of changes. Waterdemo now works again.
+	- res fixed missing shader program deactivation.
 25-Nov-2003
 	- Marten Svanfeldt branched CS with the new branch NEW_SHADERSYS.
 	  The purpose of this branch is to develop the new shadersystem 

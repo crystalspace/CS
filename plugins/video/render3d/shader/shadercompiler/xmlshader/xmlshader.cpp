@@ -514,6 +514,9 @@ bool csXMLShader::DeactivatePass ()
   shaderPass *thispass = &passes[currentPass];
   currentPass = ~0;
 
+  if(thispass->vp) thispass->vp->Deactivate ();
+  if(thispass->fp) thispass->fp->Deactivate ();
+
   g3d->SetBufferState(thispass->vertexattributes, clear_buffers, 
     lastBufferCount);
   lastBufferCount=0;
