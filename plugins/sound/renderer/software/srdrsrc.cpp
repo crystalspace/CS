@@ -345,6 +345,11 @@ void csSoundSourceSoftware::AddToBufferStatic(void *mem, long size)
 	mem = ((unsigned char *)mem) + Num * OutBPS;
       }
       if (NumSamples == 0) break;
+      if (!(PlayMethod & SOUND_LOOP))
+      {
+        Active = false;
+	break;
+      }
 
       if (Num == 0)
       {
