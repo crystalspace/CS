@@ -135,7 +135,7 @@ void csGraphics2DGLCommon::setGLColorfromint (int color)
   switch (pfmt.PixelBytes)
   {
     case 1: // paletted colors
-      glColor3i (Palette [color].red, Palette [color].green, Palette [color].blue);
+      glColor3ub (Palette [color].red, Palette [color].green, Palette [color].blue);
       break;
     case 2: // 16bit color
     case 4: // truecolor
