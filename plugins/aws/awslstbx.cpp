@@ -868,10 +868,6 @@ void awsListBox::OnDraw (csRect /*clip*/)
     }   // end while draw items recursively
     scrollbar->SetProperty ("PageSize", &drawable_count);
 
-    int adjusted_max = map_size - 1 - drawable_count;
-    if (adjusted_max < 1) adjusted_max = 1;
-
-    scrollbar->SetProperty ("Max", (void *) &adjusted_max);
   }     // end if there are any rows to draw
 }
 
