@@ -65,8 +65,10 @@ else
   TO_INSTALL.STATIC_LIBS += $(gl_render3d)
 endif
 
-INC.gl_render3d = $(wildcard plugins/video/render3d/opengl/*.h)
-SRC.gl_render3d = $(wildcard plugins/video/render3d/opengl/*.cpp)
+INC.gl_render3d = $(wildcard plugins/video/render3d/opengl/*.h) \
+  plugins/video/render3d/common/txtmgr.h
+SRC.gl_render3d = $(wildcard plugins/video/render3d/opengl/*.cpp) \
+  plugins/video/render3d/common/txtmgr.cpp
 OBJ.gl_render3d = $(addprefix $(OUT)/,$(notdir $(SRC.gl_render3d:.cpp=$O)))
 DEP.gl_render3d = CSGEOM CSUTIL CSSYS CSUTIL CSGFX
 CFG.gl_render3d = data/config/render3d/render3d.cfg data/config/render3d/opengl.cfg
