@@ -1071,9 +1071,7 @@ bool csRenderView::ClipBBox (
   int &clip_z_plane)
 {
   //------
-
   // Test against far plane if needed.
-
   //------
   csPlane3 *far_plane = ctxt->icamera->GetFarPlane ();
   if (far_plane)

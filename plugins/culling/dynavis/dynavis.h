@@ -24,11 +24,19 @@
 #include "iutil/dbghelp.h"
 #include "csutil/csvector.h"
 #include "csutil/scf.h"
+#include "csgeom/plane3.h"
 #include "iengine/viscull.h"
 
 class csKDTree;
 class csKDTreeChild;
 class csCoverageBuffer;
+
+enum csVisReason
+{
+  INVISIBLE_PARENT = 0,	// Invisible because some parent node is invisible.
+  VISIBLE,		// Just visible.
+  LAST_REASON
+};
 
 /**
  * This object is a wrapper for an iVisibilityObject from the engine.
@@ -40,6 +48,7 @@ public:
   csKDTreeChild* child;
   long update_number;	// Last used update_number from movable.
   long shape_number;	// Last used shape_number from visobj.
+  csVisReason reason;	// Reason object is visible/invisible.
 };
 
 /**
@@ -55,6 +64,9 @@ private:
 
   // For Debug_Dump(g3d): keep the last original camera.
   iCamera* debug_camera;
+
+  // During VisTest() we keep the current frustum as planes.
+  csPlane3 planeL, planeR, planeU, planeD;
 
   // Scan all objects, mark them as invisible and check if they
   // have moved since last frame (and update them in the kdtree then).

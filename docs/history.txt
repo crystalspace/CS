@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+14-May-2002
+	- Improved the visual debugger for Dynavis.
+	- Started work on actually implementing frustum culling in Dynavis.
 13-May-2002
 	- Fixed a bug in the csCoverageBuffer.
 	- Small optimization to csCoverageBuffer::TestRectangle().
@@ -3645,7 +3648,7 @@ The history order is reversed so that new features are at the top.
 	  sufficiently generalized that it is as useful for applications which
 	  do not use the CreateEnvironment() convenience function, as it is for
 	  those which do.
-	- Eric Sunshined fixed csdemo so that it no longer requires that the
+	- Eric Sunshine fixed csdemo so that it no longer requires that the
 	  "simple" console be loaded; since it wasn't making use of the console
 	  anyhow.
 	- Optimized __calc_area in csgeom (used for lighting). An optimization
