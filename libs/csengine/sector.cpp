@@ -521,7 +521,7 @@ csSector* csSector::FollowSegment (csReversibleTransform& t,
       }
       if (po->flags.Check (CS_PORTAL_WARP))
       {
-        po->WarpSpaceMove (t, mirror);
+        po->WarpSpace (t, mirror);
 	new_position = po->Warp (new_position);
       }
       csSector* dest_sect = po->GetSector ()->GetPrivateObject ();
