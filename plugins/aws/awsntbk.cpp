@@ -159,7 +159,7 @@ bool awsNotebook::Execute (const char* action, iAwsParmList* parmlist)
     iAwsComponent* comp = FindChild (comp_name->GetData ());
     if (!comp) return false;
 
-    tab_ctrl.ActivateTab((intptr_t)comp);
+    tab_ctrl.ActivateTabParam ((intptr_t)comp);
 
     return true;
   }

@@ -522,28 +522,28 @@ iAwsSource* awsTabCtrl::AddTab (iString* caption, intptr_t user_param)
   return (iAwsSource*)btn;
 }
 
-void awsTabCtrl::RemoveTab (intptr_t user_param)
+void awsTabCtrl::RemoveTabParam (intptr_t user_param)
 {
   int idx = FindTab (user_param);
-  if (idx >= 0) RemoveTab (idx);
+  if (idx >= 0) RemoveTabIndex (idx);
 }
 
 void awsTabCtrl::RemoveTab (iAwsSource *src)
 {
   int idx = vTabs.Find ((awsTab*)src->GetComponent ());
-  if (idx >= 0) RemoveTab (idx);
+  if (idx >= 0) RemoveTabIndex (idx);
 }
 
-void awsTabCtrl::RemoveTab (int index)
+void awsTabCtrl::RemoveTabIndex (int index)
 {
   if (index != -1)
   {
     if (index == active)
     {
       if (vTabs.Length () - 1 == (size_t)active)
-        ActivateTab (active - 1);
+        ActivateTabIndex (active - 1);
       else
-        ActivateTab (active + 1);
+        ActivateTabIndex (active + 1);
     }
 
     vTabs.Get (first)->SetFirst (false);
@@ -663,21 +663,21 @@ int awsTabCtrl::FindTab (intptr_t user_param)
   return -1;
 }
 
-void awsTabCtrl::ActivateTab (intptr_t param)
+void awsTabCtrl::ActivateTabParam (intptr_t param)
 {
   int idx = FindTab (param);
   if (idx >= 0)
-    ActivateTab (idx);
+    ActivateTabIndex (idx);
 }
 
 void awsTabCtrl::ActivateTab (iAwsSource *src)
 {
   int idx = vTabs.Find ((awsTab*) src->GetComponent ());
   if (idx >= 0)
-    ActivateTab (idx);
+    ActivateTabIndex (idx);
 }
 
-void awsTabCtrl::ActivateTab (int idx)
+void awsTabCtrl::ActivateTabIndex (int idx)
 {
   // We need to set active before calling SetActive because SetActive will
   // fire a signal back to the ActivateTabCallback which will recurse back to 
@@ -717,7 +717,7 @@ void awsTabCtrl::ActivateTabCallback (intptr_t p, iAwsSource *source)
   if (idx != -1 && tc->active != idx)
   {
     // Hide the active and make the new one active.
-    tc->ActivateTab (idx);
+    tc->ActivateTabIndex (idx);
     tc->MakeVisible (idx);
   }
 }

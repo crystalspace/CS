@@ -8,6 +8,11 @@ chronological order.
 
 23-Mar-2005
 	- res removed the Apache snprintf code.
+	- res fixed AWS after the recent 64bit compatibility changes. In 
+	  awsTabCtrl where methods like e.g. RemoveTab() with overloads that
+	  had int and intptr_t in the same place, which at least VC7 didn't
+	  like. Fixed that by giving the int methods (which take an index)
+	  an "Index" suffix and the intptr_t methods an "Param" suffix.
 22-Mar-2005
 	- Jorrit removed the slow RAPID and memory consuming collision
 	  detection plugin. OPCODE is now a lot better.

@@ -179,7 +179,7 @@ public:
    * This will remove the tab at index. The next tab will become active
    * (or the prev if no next exist) if this was the active one.
    */
-  void RemoveTab (int index);
+  void RemoveTabIndex (int index);
 
   /**
    * Remove the tab that uses this source. The next tab will become active
@@ -191,14 +191,14 @@ public:
    * Remove the tab that has this user param. The next tab will become
    * active (or the prev if no next exist) if this was the active one.
    */
-  void RemoveTab (intptr_t user_param);
+  void RemoveTabParam (intptr_t user_param);
 
   /// Activate the <idx>-th tab.
-  void ActivateTab (int idx);
+  void ActivateTabIndex (int idx);
   /// Activate the tab that uses this src.
   void ActivateTab (iAwsSource* src);
   /// Activate the tab that uses this user_param.
-  void ActivateTab (intptr_t param);
+  void ActivateTabParam (intptr_t param);
 
   /// Returns the source for the currently active tab.
   iAwsSource* GetActiveTab ();
