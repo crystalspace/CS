@@ -360,7 +360,9 @@ Michael Dale Long <mlong@custom.net> helped fixing the Glide port.
 Gary Haussmann <haussman@cthulhu.engr.sgi.com> wrote the OpenGL port.
 
 Andrew Kenneth Milton <akm@zeus.theinternet.com.au> gave me a makefile for
-FreeBSD.
+FreeBSD and did some other FreeBSD patches.
+
+Brian Haskin <haskin@ptway.com> also did some FreeBSD patches.
 
 Conor Stokes <cstokes@wantree.com.au> further optimized the 16-bit scanline
 drawers which were already optimized by Olivier Langlois.
@@ -395,6 +397,9 @@ Denis Dmitriev <mrsigma@mail.quik.com> gave me a routine to split a
 convex object into slices parallel to the view plane (useful for volumetric
 fog). He also added a progress bar to the console (during lighting) and
 added a new way to do bilinear filtering for the software renderer.
+
+Denis Dmitriev <mrsigma@mail.quik.com> dramatically improved the quality
+of the precalculated lightmaps.
 
 Thomas Hieber <thieber@gmx.net> helped on the Windows project files and also
 contributed various other things.
