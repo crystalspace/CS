@@ -768,7 +768,8 @@ bool csMeshMeshList::PrepareItem (csSome item)
      (since removing the mesh above also removes it from the culler...) */
   for (int i = 0 ; i < mesh->GetMovable().GetSectors()->GetCount() ; i++)
   {
-    csSector* sector = mesh->GetMovable ().GetSectors ()->Get (i);
+    csSector* sector = mesh->GetMovable ().GetSectors ()->Get (i)
+    	->GetPrivateObject ();
     sector->UnprepareMesh (child);
     sector->PrepareMesh (child);
   }
