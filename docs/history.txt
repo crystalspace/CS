@@ -9,6 +9,10 @@ chronological order.
 19-Aug-2003
 	- Jorrit fixed a bug in the new optimization in odedynamics where
 	  the transform of the object was ignored.
+	- Eric Sunshine fixed scfSharedLibrary constructor so that it invokes
+	  csPrintLibraryError() if the plugin fails to load.  This error
+	  reporting was accidentally dropped with all of the recent SCF
+	  implementation changes.
 18-Aug-2003
 	- Jorrit fixed a bug with destruction of hierarchical factories.
 	  The problem was that it was trying to remove objects from

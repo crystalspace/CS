@@ -177,6 +177,8 @@ scfSharedLibrary::scfSharedLibrary (const char *lib, const char *core)
     else
       csPrintLibraryError(sym);
   }
+  else
+    csPrintLibraryError(LibraryName);
 }
 
 scfSharedLibrary::~scfSharedLibrary ()
@@ -327,8 +329,6 @@ void scfFactory::IncRef ()
 	if (CreateFunc == 0)
 	  csPrintLibraryError(sym);
       }
-    } else {
-      csPrintLibraryError(NULL);
     }
       
 
