@@ -318,6 +318,7 @@ void Demo::SetupSector ()
   walls->SetZBufMode (CS_ZBUF_NONE);
   iThingState* walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (),
       iThingState);
+  walls_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
 
   float size = 500.0; /// Size of the skybox -- around 0,0,0 for now.
   iPolygon3D* p;
@@ -398,6 +399,7 @@ void Demo::SetupSector ()
   walls->SetRenderPriority (engine->GetRenderPriority ("starLevel2"));
   walls->SetZBufMode (CS_ZBUF_NONE);
   walls_state = SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
+  walls_state->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
 
   size = 200.0; /// Size of the skybox -- around 0,0,0 for now.
   p = walls_state->CreatePolygon ("d");

@@ -24,6 +24,11 @@ he history order is reversed so that new features are at the top.
 	  particular, it now runs a script which sets up the User's Manual and
 	  the API reference to accept user-annotation.
 	- Made csPortal::SetFilter() safer.
+	- FINALLY fixed CAMERA objects for real. CAMERA objects will now
+	  at last mirror correctly :-)
+	  I fixed the problem by moving the object instead of the camera.
+	  This is actually more logical and a lot easier. No more
+	  transformation magic.
 20-Jan-2002
 	- Tobias Brueckner did the following:
 	    - Fixed a potential initialization bug in the GLX OpenGL
