@@ -42,7 +42,7 @@ skin "Normal Windows"
 
 window "LoginWindow"
 {
-  Frame: (100,200)-(400,300)
+  Frame: (100,200)-(415,325)
   Style: wfsNormal
   Options: wfoBeveledBorder
 

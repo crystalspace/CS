@@ -42,7 +42,7 @@ skin "Normal Windows"
 
 window "PrefsWindow"
 {
-  Frame: (100,200)-(470,245)
+  Frame: (100,200)-(470,259)
   Style: wfsNormal
   Options: wfoBeveledBorder
 
