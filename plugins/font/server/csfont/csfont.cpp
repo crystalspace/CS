@@ -501,7 +501,8 @@ int csDefaultFont::GetLength (const char *text, int maxwidth)
   while (*text)
   {
     int chr = (*(uint8 *)text) - First;
-    if ((chr >= 0) && (chr < Glyphs))
+ //   if ((chr >= 0) && (chr < Glyphs))
+    if ((chr < 0) || (chr >= Glyphs))
 		chr = 0;
 
     int w = IndividualWidth [chr];
