@@ -60,7 +60,8 @@
 
 #include "imesh/terrfunc.h"
 #include "imesh/genmesh.h"
-//#include "ilight/testlt.h"
+
+
 
 /*#include "csengine/material.h"
 #include "csengine/texture.h"*/
@@ -207,9 +208,12 @@ void R3DTest::SetupFrame ()
   int x = mouse->GetLastX();
   int y = mouse->GetLastY();
 
-  view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_UP, speed * (y-h) * 2);
-  view->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_RIGHT, speed * (x-w) * 2);
-  r3d->GetDriver2D ()->SetMousePosition (w, h);
+  //if (hasfocus)
+  {
+    view->GetCamera ()->GetTransform ().RotateThis (CS_VEC_TILT_UP, (y-h) * 0.01);
+    view->GetCamera ()->GetTransform ().RotateOther (CS_VEC_ROT_RIGHT, (x-w) * 0.01);
+    r3d->GetDriver2D ()->SetMousePosition (w, h);
+  }
 
 
 
@@ -249,7 +253,8 @@ void R3DTest::SetupFrame ()
     fnt = fntsvr->LoadFont (CSFONT_COURIER);
   }
   char text[1024];
-  sprintf (text, "Ah, it iz le test!      Le FPS c'est cyrrentlee %f, frame %d", FPS, framecount);
+  //sprintf (text, "Ah, it iz le test!      Le FPS c'est cyrrentlee %f, frame %d", FPS/*, framecount*/);
+  sprintf (text, "%f", FPS);
   r3d->GetDriver2D ()->Write (fnt, 10, 50, 0x00FF00FF, -1, text);
 
   r3d->FinishDraw ();
@@ -262,7 +267,14 @@ void R3DTest::FinishFrame ()
 
 bool R3DTest::HandleEvent (iEvent& ev)
 {
-  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  if (ev.Type == cscmdFocusChanged)
+  {
+    hasfocus = (bool)ev.Command.Info;
+    int w = r3d->GetDriver2D ()->GetWidth()/2;
+    int h = r3d->GetDriver2D ()->GetHeight()/2;
+    r3d->GetDriver2D ()->SetMousePosition (w, h);
+  }
+  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   {
     r3dtest->SetupFrame ();
     return true;
@@ -419,6 +431,41 @@ bool R3DTest::Initialize ()
   engine->Prepare ();
 
   r3d->GetDriver2D ()->SetMouseCursor( csmcNone );
+
+#ifdef CS_USE_NEW_RENDERER
+  // Load in lighting shaders
+  csRef<iShaderManager> shmgr ( CS_QUERY_REGISTRY(object_reg, iShaderManager));
+  if(shmgr)
+  {
+    csRef<iShader> shader (shmgr->CreateShader());
+    if(shader)
+    {
+      csRef<iShaderTechnique> tech (shader->CreateTechnique());
+      if(tech)
+      {
+        tech->SetPriority(100);
+        csRef<iShaderPass> pass (tech->CreatePass());
+        if(pass)
+        {
+          csRef<iShaderProgram> vp (shmgr->CreateShaderProgram("gl_arb_vp"));
+          csRef<iDataBuffer> mybuff(vfs->ReadFile("/shader/vertexlight.avp"));
+          vp->Load(mybuff);
+          pass->SetVertexProgram(vp);
+        }
+      }
+      if(shader->Prepare())
+      {
+        for (int i=0; i<engine->GetMaterialList ()->GetCount (); i++)
+          engine->GetMaterialList ()->Get (i)->GetMaterial ()->SetShader(shader);
+      }
+    }
+  }
+#endif // CS_USE_NEW_RENDERER
+
+  hasfocus = true;
+  int w = r3d->GetDriver2D ()->GetWidth()/2;
+  int h = r3d->GetDriver2D ()->GetHeight()/2;
+  r3d->GetDriver2D ()->SetMousePosition (w, h);
 
   return true;
 }

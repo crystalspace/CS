@@ -51,6 +51,8 @@ private:
   csRef<iVFS> vfs;
   csRef<iVirtualClock> vc;
 
+  bool hasfocus;
+
   iSector* room;
 
   csTestMesh* testmesh;
