@@ -25,6 +25,7 @@
 
 // The minimal width of the new grid view when we split a view horiz. or vert.
 #define MIN_GRIDVIEW_SIZE	8
+#define GRIDVIEW_BORDER_SIZE    2
 
 /******************************************************************************
  * csRegionTree2D
@@ -199,14 +200,18 @@ bool csSparseGrid::csGridRow::FreeItem (csSome Item)
 
 csGridCell::csGridCell () : csComponent (NULL), inUse (false)
 {
+  state |= CSS_SELECTABLE;
   valuePattern = "%s";
   SetPalette (CSPAL_GRIDCELL);
 }
 
 void csGridCell::DrawLine (int x1, int y1, int x2, int y2, csCellBorder& border)
 {
+  bool sel = GetState (CSS_GRIDCELL_SELECTED);
+
   if (border.style == gcbsLine)
-    Box (MIN (x1, x2), y1, MAX (x1, x2), y2, CSPAL_GRIDCELL_BORDER_FG);
+    Box (MIN (x1, x2), y1, MAX (x1, x2), y2, 
+	 sel ? CSPAL_GRIDCELL_SEL_BORDER_FG : CSPAL_GRIDCELL_BORDER_FG);
   else if (border.style != gcbsNone)
   {
     int maxX, maxY, i = 0, nSegs, xcompo, ycompo;
@@ -225,13 +230,15 @@ void csGridCell::DrawLine (int x1, int y1, int x2, int y2, csCellBorder& border)
     x1 = MIN (x1, x2); x2 = MAX (x1, x2);
     // linesegments in linepattern
     nSegs = linepattern [int (border.style) - 1][0];
+    int colFG = sel ? CSPAL_GRIDCELL_SEL_BORDER_FG : CSPAL_GRIDCELL_BORDER_FG;
+    int colBG = sel ? CSPAL_GRIDCELL_SEL_BORDER_BG : CSPAL_GRIDCELL_BORDER_BG;
     while (x1 < maxX && y1 < maxY)
     {
       i = i % nSegs;
       x2 = x1 + linepattern [int (border.style) - 1][1 + 2 * i + xcompo];
       y2 = y1 + linepattern [int (border.style) - 1][1 + 2 * i + ycompo];
       Box (x1, y1, MIN (x2, maxX), MIN (y2, maxY),
-        (i & 1 ? CSPAL_GRIDCELL_BORDER_BG : CSPAL_GRIDCELL_BORDER_FG));
+        (i & 1 ? colBG : colFG));
       //printf("%d,%d -> %d,%d = %d\n", x1, y1, x2, y2,(i&1 ? 0 : 1));
       x1 = x2; y1 = y2;
       i++;
@@ -242,6 +249,7 @@ void csGridCell::DrawLine (int x1, int y1, int x2, int y2, csCellBorder& border)
 void csGridCell::Draw ()
 {
   int lx = 0, rx = 0, ty = 0, by = 0; // offsets if borders are drawn;
+  bool sel = GetState (CSS_GRIDCELL_SELECTED);
 
   if (upper.style != gcbsNone)
   {
@@ -273,13 +281,15 @@ void csGridCell::Draw ()
   bound.xmax -= rx;
   bound.ymax -= by;
   
-  Box (0, 0, bound.Width (), bound.Height (), CSPAL_GRIDCELL_BACKGROUND);
+  Box (0, 0, bound.Width (), bound.Height (), 
+       sel ? CSPAL_GRIDCELL_SEL_BACKGROUND: CSPAL_GRIDCELL_BACKGROUND);
   if (data)
   {
     int fh, fw = GetTextSize (((csString*)data)->GetData (), &fh);
     int tx = (bound.Width () - fw) / 2;
     int ty = (bound.Height () - fh) / 2;
-    Text (tx, ty, CSPAL_GRIDCELL_DATA_FG, CSPAL_GRIDCELL_DATA_BG,
+    Text (tx, ty, sel ? CSPAL_GRIDCELL_SEL_DATA_FG : CSPAL_GRIDCELL_DATA_FG, 
+	  sel ? CSPAL_GRIDCELL_SEL_DATA_BG : CSPAL_GRIDCELL_DATA_BG,
       ((csString *)data)->GetData ());
   }
   bound.xmin -= lx;
@@ -339,11 +349,15 @@ bool csGridView::SetRect (int xmin, int ymin, int xmax, int ymax)
   if (csComponent::SetRect (xmin, ymin, xmax, ymax))
   {
     if (hscroll)
-      hscroll->SetRect (0, bound.Height () - CSSB_DEFAULTSIZE,
-        bound.Width () - (vscroll ? CSSB_DEFAULTSIZE-1 : 0), bound.Height ());
+      hscroll->SetRect (0, 
+			bound.Height () - CSSB_DEFAULTSIZE,
+			bound.Width () - (vscroll ? CSSB_DEFAULTSIZE : 0), 
+			bound.Height ());
     if (vscroll)
-      vscroll->SetRect (bound.Width () - CSSB_DEFAULTSIZE, 0,
-        bound.Width (), bound.Height () - (hscroll ? CSSB_DEFAULTSIZE-1 : 0));
+      vscroll->SetRect (bound.Width () - CSSB_DEFAULTSIZE, 
+			0,
+			bound.Width (), 
+			bound.Height () - (hscroll ? CSSB_DEFAULTSIZE : 0));
     fPlaceItems = true;
     return true;
   }
@@ -444,27 +458,90 @@ static bool DrawCellComponents (csComponent *child, void *param)
   return false;
 }
 
-void csGridView::Draw ()
+void csGridView::CooAt (int theX, int theY, int &theRow, int &theCol)
 {
-  if (fPlaceItems)
-    PlaceItems ();
-
-  int y = 0, x, n;
-  int c, actRow = row;
+  int y = 0, x, n, c;
+  int actRow = row;
+  int actCol = col;
   csRect rc;
   csRegionTree2D *r;
   csVector vRegions;
   csGridCell *cell = NULL;
 
-  while (y < bound.Height () && actRow < area.ymax)
+  theCol = area.xmin -1;
+  theRow = area.ymin -1;
+
+  rc.Set (actCol, actRow, actCol+1, area.ymax);
+  vRegions.SetLength (0);
+  pGrid->regions->FindRegion (rc, vRegions);
+  n = 0;
+  c = actRow;
+  while (y < bound.Height () && y < theY && n < vRegions.Length ())
+  {
+    r = (csRegionTree2D*)vRegions.Get (n++);
+    for (; c < r->region.ymax && c < area.ymax && y < theY; c++)
+    {
+      cell = (csGridCell *)r->data;
+      y += cell->bound.Height ();
+      actRow++;
+    }
+  }
+
+  if (y >= theY)
+  {
+    actRow--;
+    rc.Set (actCol, actRow, area.xmax, actRow+1);
+    vRegions.SetLength (0);
+    pGrid->regions->FindRegion (rc, vRegions);
+    x = 0; 
+    n = 0;
+    c = actCol;
+    while (x < bound.Width () && x < theX && n < vRegions.Length ())
+    {
+      r = (csRegionTree2D*)vRegions.Get (n++);
+      for (; c < r->region.xmax && x < theX && c < area.xmax; c++)
+      {
+	cell = (csGridCell *)r->data;
+	x += cell->bound.Width ();
+	actCol++;
+      }
+    }
+    
+    if (x>=theX)
+    {
+      actCol--;
+      theRow = actRow;
+      theCol = actCol;
+    }
+  }
+}
+
+void csGridView::Draw ()
+{
+  if (fPlaceItems)
+    PlaceItems ();
+
+  int y = GRIDVIEW_BORDER_SIZE, x, n;
+  int c, actRow = row;
+  csRect rc;
+  csRegionTree2D *r;
+  csVector vRegions;
+  csGridCell *cell = NULL;
+  int cs = pGrid->GetCursorStyle ();
+  int cr, cc;
+  bool sel;
+
+  pGrid->GetCursorPos (cr, cc);
+
+  while (y < bound.Height ()-GRIDVIEW_BORDER_SIZE && actRow < area.ymax)
   {
     rc.Set (col, actRow, area.xmax, actRow + 1);
     vRegions.SetLength (0);
     pGrid->regions->FindRegion (rc, vRegions);
     if (vRegions.Length () == 0)
       break; // no more rows to draw
-    x = 0; n = 0; c = col;
-    while (x < bound.Width () && n < vRegions.Length () && c < area.xmax)
+    x = GRIDVIEW_BORDER_SIZE; n = 0; c = col;
+    while (x < bound.Width ()-GRIDVIEW_BORDER_SIZE && n < vRegions.Length () && c < area.xmax)
     {
       r = (csRegionTree2D*)vRegions.Get (n++);
       cell = (csGridCell *)r->data;
@@ -475,6 +552,12 @@ void csGridView::Draw ()
         cell->row = actRow;
         cell->col = c;
         cell->data = pGrid->grid->GetAt (actRow, c);
+	// if a grid cursor is to be shown, then
+	// we will toggle the selected state of the component
+	sel = (cs == CSGCS_CELL && c == cc && actRow == cr) ||
+	  (cs == CSGCS_ROW && actRow == cr) ||
+	  (cs == CSGCS_COLUMN && c == cc);
+	cell->SetState (CSS_GRIDCELL_SELECTED, sel);
         cell->Draw ();
         cell->ForEach (DrawCellComponents, NULL, true);
         x += cell->bound.Width ();
@@ -485,9 +568,19 @@ void csGridView::Draw ()
     actRow++;
   }
 
-  // fill the remainingspace with backcolor
-  Box (0, y, bound.Width (), bound.Height (), CSPAL_GRIDVIEW_BACKGROUND);
   csComponent::Draw ();
+  sel = pGrid->GetActiveView () == this;
+  Box (0, 0, bound.Width (), GRIDVIEW_BORDER_SIZE, 
+       sel ? CSPAL_GRIDVIEW_SEL_DARK3D : CSPAL_GRIDVIEW_DARK3D);
+  Box (0, bound.Height ()- GRIDVIEW_BORDER_SIZE, bound.Width (), bound.Height (),
+       sel ? CSPAL_GRIDVIEW_SEL_DARK3D : CSPAL_GRIDVIEW_DARK3D);
+  Box (0, 0, GRIDVIEW_BORDER_SIZE, bound.Height (),
+       sel ? CSPAL_GRIDVIEW_SEL_DARK3D : CSPAL_GRIDVIEW_DARK3D);
+  Box (bound.Width () - GRIDVIEW_BORDER_SIZE, 0, bound.Width (), bound.Height (), 
+       sel ? CSPAL_GRIDVIEW_SEL_DARK3D : CSPAL_GRIDVIEW_DARK3D);
+	  
+  // fill the remainingspace with backcolor
+  //  Box (0, y, bound.Width (), bound.Height (), CSPAL_GRIDVIEW_BACKGROUND);
 }
 
 bool csGridView::HandleEvent (iEvent& Event)
@@ -497,6 +590,10 @@ bool csGridView::HandleEvent (iEvent& Event)
     case csevCommand:
       switch (Event.Command.Code)
       {
+        case cscmdReceiveFocus:
+        case cscmdLoseFocus:
+	  Invalidate (true);
+	  break;
         case cscmdScrollBarValueChanged:
         {
           csScrollBar *bar = (csScrollBar*)Event.Command.Info;
@@ -527,7 +624,25 @@ bool csGridView::HandleEvent (iEvent& Event)
         }
       }
       break;
-  }
+  case csevMouseClick:
+    if (Event.Mouse.Button == 1)
+    {
+      bool succ = csComponent::HandleEvent (Event);
+      if (!succ) // if no scrollbar handle was pressed
+      {
+	pGrid->SetActiveView (this);
+	if (pGrid->GetCursorStyle () != CSGCS_NONE)
+	{
+	  int atrow, atcol;
+	  CooAt (Event.Mouse.x, Event.Mouse.y, atrow, atcol);
+	  pGrid->SetCursorPos (atrow, atcol);
+	}
+	return true;
+      }
+      return succ;
+    }
+    break;
+  } 
   return csComponent::HandleEvent (Event);
 }
 
@@ -610,6 +725,9 @@ csGrid::csGrid (csComponent *pParent, int nRows, int nCols,
 void csGrid::init (csComponent *pParent, csRect &rc, int iStyle, csGridCell *gc)
 {
   grid = new csSparseGrid;
+  SetCursorStyle (CSGCS_NONE);
+  SetCursorPos (0, 0);
+
   SetPalette (CSPAL_GRIDVIEW);
   SetState (CSS_SELECTABLE, true);
   vRegionStyles.Push (gc);
@@ -624,6 +742,7 @@ void csGrid::init (csComponent *pParent, csRect &rc, int iStyle, csGridCell *gc)
     splitterY = new csSplitter (this);
   if (pParent)
     pParent->SendCommand (cscmdWindowSetClient, (void *)this);
+  SetActiveView (GetRootView ());
 }
 
 csGrid::~csGrid ()
@@ -687,9 +806,50 @@ bool csGrid::HandleEvent (iEvent &Event)
         break;
       }
       break;
+  case csevKeyDown:
+    switch (Event.Key.Code)
+    {
+    case CSKEY_DOWN:
+      if (GetCursorStyle () != CSGCS_NONE)
+      {
+	const csRect &rc = GetRootView ()->GetArea ();
+	if (ycur < rc.ymax)
+	  ycur++;
+	return true;
+      }
+      break;
+    case CSKEY_UP:
+      if (GetCursorStyle () != CSGCS_NONE)
+      {
+	const csRect &rc = GetRootView ()->GetArea ();
+	if (ycur > rc.ymin)
+	  ycur--;
+	return true;
+      }
+      break;
+    case CSKEY_LEFT:
+      if (GetCursorStyle () != CSGCS_NONE)
+      {
+	const csRect &rc = GetRootView ()->GetArea ();
+	if (xcur > rc.xmin)
+	  xcur--;
+	return true;
+      }
+      break;
+    case CSKEY_RIGHT:
+      if (GetCursorStyle () != CSGCS_NONE)
+      {
+	const csRect &rc = GetRootView ()->GetArea ();
+	if (xcur < rc.xmax)
+	  xcur++;
+	return true;
+      }
+      break;
+    }
   }
   return csComponent::HandleEvent (Event);
 }
+
 
 /**
  * Resize views proportional to the new size of csGrid.
@@ -828,4 +988,36 @@ void csGrid::CreateRegion (csRect& rc, csGridCell *cell)
     vRegionStyles.Push (cell);
   }
   Invalidate (true);
+}
+
+void csGrid::SetCursorStyle (int iCursorStyle)
+{
+  cursorStyle = iCursorStyle;
+}
+
+int csGrid::GetCursorStyle ()
+{
+  return cursorStyle;
+}
+
+void csGrid::GetCursorPos (int &row, int &col)
+{
+  row = ycur;
+  col = xcur;
+}
+
+void csGrid::SetCursorPos (int row, int col)
+{
+  if (row != ycur || col != xcur)
+  {
+    ycur = row;
+    xcur = col;
+    if (parent) parent->SendCommand (cscmdGridCursorChanged);
+  }
+}
+
+void csGrid::SetActiveView (csGridView *view)
+{
+  if (GetFocused () != view) SetFocused (view);
+  activeView = view;
 }

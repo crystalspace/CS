@@ -187,15 +187,19 @@ static int palette_csGridCell [] =
   cs_Color_White,			// selected cell border foreground color
   cs_Color_Black,			// selected cell border background color
   cs_Color_Black,			// Data foreground color
-  cs_Color_White			// Data background color
+  cs_Color_White,			// Data background color
+  cs_Color_White,			// selected Data foreground color
+  cs_Color_Black			// selected Data background color
 };
 
 // Grid class default palette
 static int palette_csGridView [] =
 {
   cs_Color_Gray_L,			// Grid background
-  cs_Color_Gray_D,			// 3D border dark
-  cs_Color_Gray_M			// 3D border light
+  cs_Color_Gray_M,			// 3D border dark
+  cs_Color_Gray_M,			// 3D border light
+  cs_Color_Green_M,			// 3D border dark selected
+  cs_Color_Red_L			// 3D border light selected
 };
 
 // Splitter class default palette
