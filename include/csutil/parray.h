@@ -52,8 +52,6 @@ public:
 template <class T>
 class csPDelArray : public csArray<T*, csPDelArrayElementHandler<T*> >
 {
-  typedef csPDelArrayElementHandler<T*> superclass;
-
 private:
   csPDelArray (const csPDelArray&) {}
   csPDelArray& operator= (const csPDelArray&) { return *this; }
@@ -112,9 +110,15 @@ public:
     else
     {
       int old_len = Length ();
-      SetLength (n, 0);
+      csArray<T*>::SetLength (n);
       for (int i = old_len ; i < n ; i++) Get(i) = new T (what);
     }
+  }
+
+  /// Call csArray<T*>::SetLength(n, w).
+  void SetLength (int n, T* const &w)
+  {
+    csArray<T*>::SetLength(n, w);
   }
 
   /// Call csArray<T*>::SetLength(n).
