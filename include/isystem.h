@@ -22,6 +22,9 @@
 
 #include "csutil/scf.h"
 
+//TODO Python HACK
+class csSystemDriver;
+
 /// Several types of messages.
 #define MSG_INTERNAL_ERROR 1    // Internal error, this is a serious bug in CS
 #define MSG_FATAL_ERROR 2       // Error which prevents proper further execution
@@ -124,6 +127,9 @@ struct iSystem : public iBase
   /// A shortcut for requesting to load a plugin (before Initialize())
   void RequestPlugin (const char *iPluginName)
   { AddOptionCL ("plugin", iPluginName); }
+
+//TODO Python HACK
+  virtual csSystemDriver* GetSystemDriver()=0;
 };
 
 #endif

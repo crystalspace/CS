@@ -81,6 +81,8 @@ endif
 # Flags for the compiler which are used when debugging.
 CFLAGS.debug=-g3 -gstabs
 
+CFLAGS.memdebug=-g3 -gstabs
+
 # Flags for the compiler which are used when profiling.
 CFLAGS.profile=-pg -O -g
 
@@ -92,6 +94,8 @@ LFLAGS.GENERAL=
 
 # Flags for the linker which are used when debugging.
 LFLAGS.debug=-g3
+
+LFLAGS.memdebug=-g3
 
 # Flags for the linker which are used when profiling.
 LFLAGS.profile=-pg

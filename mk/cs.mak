@@ -215,7 +215,7 @@ pdfbook: crystal.pdf classpdf
 
 text: $(TEXT_FILES)
 
-cs-help-html.zip: html/index.html
+cs-help-html.zip: html
 	zip -9 -rp cs-help-html.zip csdoc html pics crystal.hh*
 
 cs-help-pdf.zip: pdf

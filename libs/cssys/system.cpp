@@ -1086,3 +1086,8 @@ void csSystemDriver::AddNameCL (const char *iName)
 {
   CommandLineNames.Push (strnew (iName));
 }
+
+//TODO Python HACK
+csSystemDriver* csSystemDriver::GetSystemDriver() { 
+  return this; 
+}

@@ -393,6 +393,9 @@ public:
   virtual void AddOptionCL (const char *iName, const char *iValue);
   /// Add a command-line name to the command-line names array
   virtual void AddNameCL (const char *iName);
+
+//TODO Python HACK
+  csSystemDriver* GetSystemDriver();
 };
 
 // Shortcuts for compatibility

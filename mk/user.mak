@@ -89,9 +89,10 @@ DO_MMX=yes
 # used after it has been freed.  Define MEM_CHECK_FILL symbol so that newly
 # allocated memory will be filled with garbage to detect memory areas that are
 # used uninitialized (since most OSes fills allocated memory with zeros).
-#MEM=-DMEM_CHECK -DMEM_CHECK_FILL
-#MEM=-DMEM_CHECK -DMEM_CHECK_EXTENSIVE
-MEM=
+
+MEM.memdebug=-DMEM_CHECK -DMEM_CHECK_FILL -DMEM_CHECK_EXTENSIVE
+
+MEM=$(MEM.$(MODE))
 
 # Set to 1 to use Mesa instead of "real" OpenGL.  You can define MESA_PATH
 # variable in environment to point to MesaGL base path
