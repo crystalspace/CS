@@ -31,14 +31,14 @@ JPEG_LFLAGS=''
 
 # A list of header:library directory tuples.  An attempt is made to build a
 # small test program using the specified directories.  The tuples may include
-# wildcards for cases when the libpng directory is suffixed by a version
+# wildcards for cases when the libjpeg directory is suffixed by a version
 # number.
 #
 # Current cases:
 # - Bare `:' in order to test using no special directories for the case when
 #   the compiler and linker default search paths are sufficient.
 # - /usr/local for compilers and linkers which do not search this by default.
-# - In case the user does not have permission to install libpng as root, we
+# - In case the user does not have permission to install libjpeg as root, we
 #   also search the CS/lib/libjpeg and CS/lib/jpeg directories.
 # - The Fink package management facility for MacOS/X installs in /sw by
 #   default.
@@ -91,10 +91,10 @@ if [ ${JPEG_OK} -eq 1 ]; then
   echo "JPEG.LFLAGS = ${JPEG_LFLAGS}"
   msg_result "yes"
   if [ -n "${JPEG_CFLAGS}" ]; then
-    msg_inform "libpng cflags... ${JPEG_CFLAGS}"
+    msg_inform "libjpeg cflags... ${JPEG_CFLAGS}"
   fi
   if [ -n "${JPEG_LFLAGS}" ]; then
-    msg_inform "libpng lflags... ${JPEG_LFLAGS}"
+    msg_inform "libjpeg lflags... ${JPEG_LFLAGS}"
   fi
 else
   msg_result "no"
