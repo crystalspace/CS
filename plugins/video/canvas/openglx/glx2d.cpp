@@ -57,7 +57,7 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
   const char *strDriver;
   if (config)
   {
-    if ((strDriver = config->GetStr ("Display", "Driver")))
+    if ((strDriver = config->GetStr ("Display", "Driver", NULL)))
     {
       dispdriver = LOAD_PLUGIN (pSystem, strDriver, NULL, iOpenGLDisp);
       if (!dispdriver)
