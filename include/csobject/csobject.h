@@ -47,10 +47,7 @@ protected:
   /// The array of child nodes
   csObjContainer *children;
 
-  /**
-   * Since most csObject's have names, we have a separate name
-   * rather than inserting some kind of csNamedObject child.
-   */
+  /// Object's name or NULL if unnamed.
   char *Name;
 
   /// Set the parent csObject. Implemented in csPObject class.
@@ -66,11 +63,11 @@ public:
   virtual ~csObject ();
 
   /// Set object name
-  void SetName (const char *iName)
+  virtual void SetName (const char *iName)
   { delete [] Name; Name = strnew (iName); }
 
   /// Query object name
-  const char *GetName () const
+  virtual const char *GetName () const
   { return Name; }
 
   /// Get the unique ID associated with this object
