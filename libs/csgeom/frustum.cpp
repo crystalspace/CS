@@ -400,10 +400,10 @@ int csFrustum::Classify (csVector3* frustum, int num_frust,
       if ((prev_d < 0 && d > 0)
        || (prev_d > 0 && d < 0))
       {
-#if 1
+#if 0
 	// This version should be faster.
-	if ((poly [pvp] % v1) * poly [pv] >= 0)
-	  if ((v2 % poly [pvp]) * poly [pv] >= 0)
+	if (((poly [pvp] % v1) * poly [pv])*prev_d  >= 0)
+	  if (((v2 % poly [pvp]) * poly [pv])*prev_d >= 0)
 	    return CS_FRUST_PARTIAL;
 
 	//float f1 = (poly [pvp] % v1) * poly [pv];
