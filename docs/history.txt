@@ -20,6 +20,8 @@ chronological order.
 	- Jorrit fixed a bug in the generic renderloop step plugin. When
 	  render portals it was not flushing the list of meshes with the
 	  same shader.
+	- Jorrit fixed a bug in the csList::Iterator. It was always skipping
+	  the first element.
 8-Jan-2004
 	- Jorrit moved include/ivideo/rendersteps directory to
 	  include/iengine/rendersteps. Apparently this was forgotten during

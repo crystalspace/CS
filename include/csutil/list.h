@@ -40,15 +40,15 @@ protected:
 			      csListElement* newprev)
       : next(newnext), prev(newprev), data(d)
     {}
-  
+
     /// Next element in list. If this is the last one, then next is 0
     csListElement* next;
-  
+
     /// Previous element in list. If this is the first one, prev is 0
     csListElement* prev;
-  
+
     /// Accual data
-    T data;         
+    T data;
   };
 
   /// Remove specific item by explicit ref
@@ -78,7 +78,7 @@ public:
     Iterator(const Iterator& other)
     { ptr = other.ptr; }
     /// Another Copy Constructor
-    Iterator(const csList<T> &list, bool reverse = false) 
+    Iterator(const csList<T> &list, bool reverse = false)
     {
       reversed = reverse;
       if (reverse) ptr = list.tail;
@@ -124,26 +124,30 @@ public:
     /// Advance to next element and return it.
     T* Next ()
     {
+      T* rc = *this;
       ptr = ptr->next;
-      return *this;
+      return rc;
     }
     /// Backup to previous element and return it.
     T* Prev()
-    { 
+    {
+      T* rc = *this;
       ptr = ptr->prev;
-      return *this;
+      return rc;
     }
     /// Advance to next element and return it.
     Iterator& operator++()
-    { 
+    {
+      T* rc = *this;
       ptr = ptr->next;
-      return *this;
+      return rc;
     }
     /// Backup to previous element and return it.
     Iterator& operator--()
-    { 
+    {
+      T* rc = *this;
       ptr = ptr->prev;
-      return *this;
+      return rc;
     }
   protected:
     friend class csList<T>;
@@ -160,7 +164,7 @@ public:
 
   /// Add an item first in list. Copy T into the listdata
   Iterator PushFront (const T & item);
-  
+
   /// Add an item last in list. Copy T into the listdata
   Iterator PushBack (const T & item);
 
@@ -191,7 +195,7 @@ public:
     Delete (head);
     return true;
   }
-  
+
   /// Deletes the last element of the list
   bool PopBack ()
   {
@@ -326,7 +330,7 @@ inline void csList<T>::Delete (csListElement *el)
     el->prev->next = el->next;
   else
     head = el->next;
-  
+
   if (el->next)
     el->next->prev = el->prev;
   else
