@@ -146,7 +146,7 @@ manager is responsible for creating renderloops.
 
 @item
 @code{render_context}: Interface @samp{iTextureHandle}.  This is used while
-rendering on a texture (i.e. when using @code{iGraphics3D::SetRenderTarget()}
+rendering on a texture (i.e.  when using @code{iGraphics3D::SetRenderTarget()}
 is in effect).
 
 @item
@@ -339,16 +339,7 @@ which is somewhat time-consuming.
 @item
 @code{shadow_receiver}: Interface @samp{iShadowReceiver}.  Some meshes
 implement this interface.  Again, as an optimization, a pointer to this
-information is maintained. In case the mesh uses static lod this will actually
-point to a shadow receiver that multiplexes so that the shadows go to
-all children of this mesh.
-
-@item
-@code{shadow_caster}: Interface @samp{iShadowCaster}.  Some meshes
-implement this interface.  Again, as an optimization, a pointer to this
-information is maintained. In case the mesh uses static lod this will actually
-point to a shadow caster that will fetch all shadows from the highest
-detail objects.
+information is maintained.
 
 @item
 @code{portal_container}: Interface @samp{iPortalContainer}.  A portal container
@@ -474,7 +465,7 @@ represents object space and @dfn{Other} represents world space.
 
 @item
 @code{is_identity}: Type @samp{bool}.  If the @samp{obj} transform is an
-identity transform (i.e. neither moves nor rotates the object) then it is
+identity transform (i.e.  neither moves nor rotates the object) then it is
 possible to perform various optimizations.
 
 @item
@@ -527,7 +518,7 @@ radius, sector, etc.
 
 @item
 @code{childnode}: Class @samp{csKDTreeChild}.  Lights are represented in a
-@sc{kd}-tree that lives in the sector (see above).  This child object is the
+KD-tree that lives in the sector (see above).  This child object is the
 representation of the light in that tree.
 
 @item
@@ -650,7 +641,7 @@ rendering of a frame but every time a portal is traversed a new
 
 @item
 @code{original_camera}: Interface @samp{iCamera}.  This points at the original
-camera which was used when starting the rendering (i.e. the top level camera).
+camera which was used when starting the rendering (i.e.  the top level camera).
 Normally, this camera will be constant unless there is a space warping portal
 (a portal that changes space; for example, a mirror).  In that case a new
 camera is created for the new render context.
@@ -806,136 +797,128 @@ The settings for this step are restored.
 
 @subsubheading Drawing a Frame: Getting the Visible Meshes
 
-One very important function that is called from within
-@code{iRenderStep::Perform()} is @code{iSector::GetVisibleMeshes()}.  This
-function is responsible for finding all meshes that are visible.  To calculate
-this the sector uses the visibility culler that is in every sector.  At
-this moment we have two possible implementations for that visibility culler:
-@dfn{Frustvis} and @dfn{Dynavis}.  Frustvis performs frustum culling alone.
-This means that every object that is in the view frustum is considered visible.
-Dynavis does frustum culling and also attempts to find out which objects are
-visible and which are not by using an occlusion buffer.  There is another
-chapter explaining the differences a bit more and also how Dynavis works
-internally.  The description here is only a short synopsis.
-@code{GetVisibleMeshes()} performs the following actions in the order shown:
+One very important function that is called from within @code{iRenderStep::Perform()}
+is @code{iSector::GetVisibleMeshes()}. This function is responsible for finding all
+meshes that are visible. To calculate this the sector will use the visibility
+culler that is in every sector. At this moment we have two possible implementations
+for that visibility culler: @samp{Frustvis} and @samp{Dynavis}. Frustvis will do
+frustum culling alone. That means that every object that is in the view frustum
+is considered visible. Dynavis will do frustum culling and also try to find out which
+objects are visible and which are not by using an occlusion buffer. There is another
+chapter explaining the differences a bit more and also how dynavis works internally.
+Here we only explain what happens in short. The @code{GetVisibleMeshes()} function
+will do the following things:
 
 @itemize @bullet
 @item
-In every sector a list of visible mesh lists is maintained.  The reason for
-this is that sometimes @code{GetVisibleMeshes()} is called multiple times in
-one frame and it is desirable to avoid duplicating the visibility culling,
-since that can be expensive (especially in the case of Dynavis).  Therefore, a
-cache of visible mesh lists is kept, and each entry in that cache (i.e. every
-list of meshes in that cache) has an associated current frame number and
-context identification number.  These two numbers are used to check if the
-cached list can be used for the given frame and context.  If there is no such
-cached list then proceed to the next step.  Otherwise return the cached list
-that matches the frame and context identification.
+First in every sector we maintain a list of visible mesh lists. The reason for this
+is that sometimes GetVisibleMeshes() is called multiple times in one frame and
+we don't want to redo the visibility culling as that can be expensive (especially
+in the case of Dynavis). So we keep a cache of visible mesh lists and every entry
+in that cache (i.e. every list of meshes in that cache) has an associated current
+frame number and context id number. These two numbers are used to check if the
+cached list can be used for the given frame and context. If there is no such
+cached list then we must proceed to the next step. Otherwise we return the cached
+list that matches the frame and context id.
 
 @item
-If there is no matching list in the cache, then a slot in the list of cached
-mesh lists which was for another frame is re-used.  It is known that the chosen
-list will never be used again since that frame has already been rendered (it is
-in the past).  So, if such an entry is found, the list can be re-used, and
-re-calculation via the visibility culler can be performed (by calling
+If there is no matching list in the cache we find a slot in the list of cached
+mesh lists which was for another frame. We know that that list will never be used
+again since that frame has already been rendered (it is in the past). So if we find
+such an entry we reuse that list and recalculate the visibility culler (we call
 @code{iVisibilityCuller::VisTest()}.
 
 @item
-If no such dead entry is found, a new entry is added to the cache and is
-populated with the visible meshes by again calling
-@code{iVisibilityCuller::VisTest()}.
+If we can't find an entry we can reuse we add a new entry to the cache and we
+populate it with the visible meshes by again calling @code{iVisibilityCuller::VisTest()}.
 @end itemize
 
-@code{iVisibilityCuller::VisTest()} internally uses a @sc{kd}-tree to traverse
-the objects in the sector and, for all visible objects, it invokes the
-@samp{iVisibilityCullerListener} callback that was provided as a parameter of
-the @code{VisTest()} call.  More detail about the actual implementation of
-@code{VisTest()} for both Frustvis and Dynavis will be presented in later
-sections.
+The @code{iVisibilityCuller::VisTest()} function will internally use a KD-tree
+to traverse the objects in the sector and for all visible objects it will call
+the @code{iVisibilityCullerListener} callback that was given as a parameter of the
+@code{VisTest()} call. I will go into more detail in the actual implementation of
+@code{VisTest()} for both Frustvis and Dynavis in later sections.
 
-The callback's @code{ObjectVisible()} is a function that resides in the sector
-(the culler itself is implemented in another plugin).  @code{ObjectVisible()}
-will mark the given object as visible by adding all @samp{csRenderMesh}
-instances as returned by the visible @samp{iMeshObject} (through the
-@code{iMeshObject::GetRenderMeshes()} invocation) to the list of visible meshes
-which is being built.  In addition, it will also do something special if the
-mesh is a hierarchical mesh that uses static @sc{lod}.  In such a case, it will
-calculate which of the children should be visible for the given distance to the
-camera (and other potential factors), and will mark that child as visible too.
+The @code{ObjectVisible()} function in the callback is a function that resides
+in the sector again (the culler itself is implemented in another plugin). ObjectVisible
+will mark the given object as visible by adding all @code{csRenderMesh} instances
+as returned by the visible @code{iMeshObject} (through the
+@code{iMeshObject::GetRenderMeshes()} call) to the list of visible meshes that we
+are building. In addition to that it will also do something special if the mesh
+is a hierarchical mesh that uses static lod. In that case it will calculate which
+of the children should be visible for the given distance to the camera (and other
+potential factors) and it will mark that child as visible too.
 
 It is important to note that there is an important difference between normal
-hierarchical meshes and static @sc{lod} meshes with regards to the visibility
-culler.  Both are implemented using hierarchical meshes but, in case of a
-normal hierarchical mesh, all children are registered with the visibility
-culler as seperate meshes.  This means that every mesh in a hierarchical mesh
-is considered a seperate entity for the visibility culler, and is also tested
-for visibility on its own (so a child of a hierarchical mesh can be visible
-even if the parent is not visible).  For a static @sc{lod} mesh the situation
-is completely different.  In that case, the children are not registered with
-the visibility culler but, instead, the mesh object will mark the correct child
-as visible when it, itself, is visible.  This means that you must always make
-sure that, with static @sc{lod}, the parent is a mesh that is at least as big
-as the biggest child.  Usually, a @samp{nullmesh} with an appropriate box is
-used for this purpose.
+hierarchical meshes and static lod meshes with regards to the visibility culler.
+Both are implemented using hierarchical meshes but in case of a normal hierarchical
+mesh all children are registered to the visibility culler as seperate meshes. That
+means that every mesh in a hierarchical mesh is considered a seperate entity for
+the visibility culler and is also tested for visibility on its own (so a child
+of a hierarchical mesh can be visible even if the parent is not visible). For a static
+lod mesh the situation is completely different. There the children are not registered
+to the visibility culler but instead the mesh object will mark the right child as visible
+when it itself is visible. That means that you must always make sure that with static
+lod the parent is a mesh that is at least as big as the biggest child. Usually a nullmesh
+with an appropriate box is used for that purpose.
 
 @subsubheading Drawing a Frame: Traversing Portals
 
-While performing the renderstep, it will try traverse portals if that
-renderstep has portal traversal enabled.  This will proceed to
-@code{iPortalContainer::Draw()}, which will perform the following actions in
-the order shown:
+During perform of the renderstep it will try traverse portals if that renderstep
+has portal traversal enabled. This will proceed to @code{iPortalContainer::Draw()}
+which will do the following steps:
 
 @itemize @bullet
 @item
-@code{Prepare()} is invoked in order to ensure that the portal container is
-ready for use.  This function will initialize the portal container, compress
-the vertices (remove double vertices), and calculate the bounding box and
-sphere.
+First it will call @code{Prepare()} to make sure that the portal container
+is ready for use. This function will initialize the portal container, compress
+the vertices (remove double vertices) and calculate the bounding box and sphere.
 
 @item
-@code{WorldToCamera()} is invoked.  This will take the world space vertices and
-planes and transform them to camera space.
+Then it will call @code{WorldToCamera()}. This will take the world space vertices
+and planes and transform them to camera space.
 
 @item
-The portal and far plane are set up, if needed.
+Then it sets up the portal and far plane if needed.
 
 @item
-During the call to @code{GetRenderMeshes()} that occurred earlier (when the
-renderloop called @code{iSector->GetVisibleMeshes()}) it tested if the portal
-container object needed to be clipped to the frustum or near plane.  The result
-of that clip test was stored in the variables @code{clip_plane},
-@code{clip_portal}, and @code{clip_z_plane}.  If clipping is required then, at
-ths stage, it will loop over every portal and clip it before traversal.  If no
-clipping is required, it will simply loop over all portals and traverse them.
+During the call to @code{GetRenderMeshes()} that occured earlier (when the renderloop
+called @code{iSector->GetVisibleMeshes()}) we tested if the portal container object
+needed to be clipped to the frustum or near plane. We kept the result of that
+clip result in the variables @code{clip_plane}, @code{clip_portal}, and
+@code{clip_z_plane}. If clipping is required then we will loop over every portal
+and clip it before we traverse it. If no clipping is required we will simply loop
+over all portals and traverse them.
 
 @item
-Traversing through a portal is done with @code{DrawOnePortal()}.  This function
-will first set up various things for fog and floating portals (like calling
-@code{iGraphics3D::OpenPortal()}, for instance), and then call
-@code{csPortal::Draw()}.
+Traversing through a portal is done with @code{DrawOnePortal()}. This function will
+first set up various things for fog and floating portals (like call
+@code{iGraphics3D::OpenPortal()}) and then it will call @code{csPortal::Draw()}.
 
 @item
-@code{csPortal::Draw()} will first make sure the sector is present by calling
-@code{CompleteSector()}.  This function invokes missing sector callbacks if the
-sector is missing and if such callbacks have been registered.  This gives the
-application a chance to load the destination sector.  If this fails then portal
-traversal will not occur.
+@code{csPortal::Draw()} will first make sure the sector is there by calling
+@code{CompleteSector()}. This function calls missing sector callbacks if the sector
+is missing and if those callbacks are there. This gives the application a chance
+to load the destination sector. If this fails then portal traversal will not occur.
 
 @item
-@code{csPortal::Draw()} will also make sure portal recursion is not occurring
-too deeply the same sector.  This is done to avoid infinite loops caused by
-space warping portals that warp back in space so that the same portal is
-visible again.
+@code{csPortal::Draw()} will also make sure we are not recursing too much in the
+same sector. This is to avoid infinite loops caused by space warping portals
+that warp back in space so that the same portal is visible again.
 
 @item
-The @samp{csRenderView} for the current portal is updated (i.e. clipper, fog
-information, recursion level, last portal, previous sector, clip plane, etc.).
+Then this function will update the @code{csRenderView} for the current portal
+(i.e. clipper, fog information, recursion level, last portal, previous sector,
+clip plane, @dots{}).
 
 @item
-If this is a space warping portal (a portal that changes the camera transform),
-then a new camera is created.  @@@@@@ TODO Continue here...
+If this is a space warping portal (a portal that changes the camera transform) then
+a new camera is created. @@@@@@ TODO Continue here...
+
 @end itemize
 
-@@@@@@TODO: explain Frustvis::VisTest()@*
-@@@@@@TODO: explain Dynavis::VisTest()@*
-@@@@@@TODO: explain the operations of one mesh object in the above context@*
+
+@@@@@@TODO: explain Frustvis::VisTest()
+@@@@@@TODO: explain Dynavis::VisTest()
+@@@@@@TODO: explain the operations of one mesh object in the above context
+
