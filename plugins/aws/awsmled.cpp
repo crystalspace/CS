@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/csuctransform.h"
 #include "csutil/csstring.h"
-#include "csutil/inpnames.h"
+#include "csutil/inputdef.h"
 #include "ivideo/fontserv.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -392,8 +392,8 @@ bool awsMultiLineEdit::SetHandler (const char *action,  const char *event)
   csEvent e;
   bool bSucc = false;
 
-  csInputDefinition inputDef;
-  if (inputDef.Parse (event))
+  csInputDefinition inputDef (event);
+  if (inputDef.IsValid ())
   {
     if (!strcmp (action, "next char"))
       bSucc = vDispatcher.Add (inputDef, &awsMultiLineEdit::NextChar);

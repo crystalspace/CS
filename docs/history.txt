@@ -39,6 +39,9 @@ chronological order.
 	  And it now binds to csInputDefinition's instead of iEvent's with a
 	  dodgy hash function.
 	- Oktal added a Quick Start section to the Perl chapter in the manual.
+	- Oktal changed the csInputDefinition empty constructor from
+	  protected to public.
+	- Oktal updated AWS to use the new csInputDefinition.
 9-Aug-2004
 	- Jorrit did a fix to csQrount() and other csQ... (except for
 	  csQint()).  In case CS_QINT_WORKAROUND was defined only csQint()

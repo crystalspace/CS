@@ -29,7 +29,7 @@
 #include "iutil/csinput.h"
 #include "csutil/csevent.h"
 #include "csutil/parray.h"
-#include "csutil/inpnames.h"
+#include "csutil/inputdef.h"
 
 class awsMultiLineEdit : public awsComponent
 {

@@ -61,11 +61,12 @@ protected:
   void Initialize (uint32 honorModifiers, bool useCookedCode);
   void InitializeFromEvent (iEvent *ev);
 
-  csInputDefinition (uint32 honorModifiers = 0, bool useCookedCode = false);
-
   friend class csInputBinder;
 
 public:
+  /// Default constructor.
+  csInputDefinition (uint32 honorModifiers = 0, bool useCookedCode = false);
+
   /// Copy constructor.
   csInputDefinition (const csInputDefinition &other);
 
