@@ -777,7 +777,7 @@ void csGraphics2DDDraw3::ClearSystemPalette ()
   Palette->palPalEntry [255].peFlags = 0;
 
   int c;
-  for (c = 0; c < 256; c++)
+  for (c = 1; c < 255; c++)
   {
     Palette->palPalEntry [c].peRed = 0;
     Palette->palPalEntry [c].peGreen = 0;
@@ -820,7 +820,7 @@ bool csGraphics2DDDraw3::CreateIdentityPalette (csRGBpixel *p)
   Palette->palPalEntry [255].peBlue = 255;
   Palette->palPalEntry [255].peFlags = 0;
 
-  for (i = 0; i < 256; i++)
+  for (i = 1; i < 255; i++)
   {
     Palette->palPalEntry [i].peRed = p [i].red;
     Palette->palPalEntry [i].peGreen = p [i].green;
