@@ -371,7 +371,7 @@ void Cs2Xml::ParseMatrix (csParser *parser, csRef<iDocumentNode>& parent,
   float angle;
   float scaler;
   int num;
-  float list[100];
+  float list[1000];
   char* orig_buf = csStrNew (buf);
 
   while ((cmd = parser->GetCommand (&buf, commands, &params)) > 0)
@@ -953,7 +953,7 @@ void Cs2Xml::ParseV (char const* parent_token, csParser* parser,
   {
     // In this case we have a VERTICES from a POLYGON.
     int i;
-    int list[100];
+    int list[1000];
     int num;
     csScanStr (params, "%D", list, &num);
     for (i = 0 ; i < num ; i++)
@@ -1097,7 +1097,7 @@ void Cs2Xml::ParseVertices (char const* parent_token, csParser* parser,
     {
       // In this case we have VERTICES from a bezier.
       int i;
-      int list[100];
+      int list[1000];
       int num;
       csScanStr (params, "%D", list, &num);
       for (i = 0 ; i < num ; i++)
@@ -1123,7 +1123,7 @@ void Cs2Xml::ParseVertices (char const* parent_token, csParser* parser,
   {
     // In this case we have VERTICES from a POLYGON.
     int i;
-    int list[100];
+    int list[1000];
     int num;
     csScanStr (params, "%D", list, &num);
     for (i = 0 ; i < num ; i++)
@@ -1223,7 +1223,7 @@ void Cs2Xml::ParseTriangle (char const* parent_token, csParser* parser,
 	csRef<iDocumentNode>& parent, char*& name, char* params,
 	char const* tokname)
 {
-  int list[100];
+  int list[1000];
   int num;
   csScanStr (params, "%D", list, &num);
   csRef<iDocumentNode> child = parent->CreateNodeBefore (
