@@ -167,7 +167,8 @@ csListBox::csListBox (csComponent *iParent, int iStyle,
   csListBoxFrameStyle iFrameStyle) : csComponent (iParent),
     ListBoxStyle(iStyle),  FrameStyle(iFrameStyle),
     deltax(0), fPlaceItems(false),
-    FrameBitmap(NULL), fDelFrameBitmap(false)
+    FrameBitmap(NULL), fDelFrameBitmap(false), FrameAlpha(0)
+    
 {
   state |= CSS_SELECTABLE;
   SetPalette (CSPAL_LISTBOX);
@@ -768,5 +769,10 @@ void csListBox::SetTexture(csPixmap *iTexture, bool iDelFrameBitmap)
     FrameBitmap=iTexture;
     fDelFrameBitmap=iDelFrameBitmap;
   }
+}
+
+void csListBox::SetAlpha(uint8 iAlpha)
+{
+ FrameAlpha = iAlpha;
 }
 
