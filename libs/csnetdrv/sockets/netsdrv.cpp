@@ -26,6 +26,7 @@
 #if defined(OS_WIN32)
 #define CS_IOCTLSOCKET ioctlsocket
 #define CS_CLOSESOCKET closesocket
+#define EWOULDBLOCK WSAEWOULDBLOCK
 #else
 #define CS_IOCTLSOCKET ioctl
 #define CS_CLOSESOCKET close
@@ -105,7 +106,7 @@ bool csSocketConnection::Send(const void* data, size_t nbytes)
   bool ok = false;
   if (ValidateSocket())
   {
-    if (send(Socket, (void*)data, nbytes, 0) != -1)
+    if (send(Socket, (const char*)data, nbytes, 0) != -1)
       ok = true;
     else
       LastError = CS_NET_ERR_CANNOT_SEND;
@@ -118,7 +119,7 @@ size_t csSocketConnection::Receive(void* buff, size_t maxbytes)
   size_t received = 0;
   if (ValidateSocket())
   {
-    received = recv(Socket, buff, maxbytes, 0);
+    received = recv(Socket, (char*) buff, maxbytes, 0);
     if (received == (size_t)-1)
     {
       received = 0;
@@ -161,7 +162,7 @@ iNetworkConnection* csSocketListener::Accept()
   if (ValidateSocket())
   {
     struct sockaddr addr;
-    socklen_t addrlen = sizeof(sockaddr);
+    int addrlen = sizeof(sockaddr);
     csNetworkSocket s = accept(Socket, &addr, &addrlen);
     if (s != CS_NET_SOCKET_INVALID)
       connection = new csSocketConnection(scfParent, s, BlockingConnection);
@@ -241,7 +242,7 @@ iNetworkConnection* csSocketDriver::NewConnection(
     const char* p = strchr(target, ':');
     if (p != NULL)
     {
-      host = strnew(target);
+      host = strdup(target);
       host[p - target] = '\0';
       port = atoi(p + 1);
     }
@@ -308,7 +309,7 @@ bool csSocketDriver::PlatformDriverStop()  { return true; }
 
 #else
 
-bool csNetworkDriverSockets::PlatformDriverStart()
+bool csSocketDriver::PlatformDriverStart()
 {
   bool ok = false;
   WSADATA wsaData;
@@ -325,7 +326,7 @@ bool csNetworkDriverSockets::PlatformDriverStart()
   return ok;
 }
 
-bool csNetworkDriverSockets::PlatformDriverStop()
+bool csSocketDriver::PlatformDriverStop()
 {
   bool ok = WSACleanup();
   if (!ok)
