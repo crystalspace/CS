@@ -363,8 +363,8 @@ bool csODEParticlePhysics::HandleEvent (iEvent &event)
       part.sort = po.particles->GetObjectToCamera ().Other2This (part.position).z;
       po.bodies[j].sort = part.sort;
     }
-    po.data.Sort(DataSort);
-    po.bodies.Sort(BodySort);
+    po.data.Sort (DataSort);
+    po.bodies.Sort (BodySort);
   }
   return true;
 }

@@ -64,10 +64,16 @@ class csODEParticlePhysics : public iParticlesPhysics
     }
     return 0;
   }
-  static int DataSort(void const *item1, void const *item2)
-  { return (int)ceil(((csParticlesData*)item2)->sort - ((csParticlesData*)item1)->sort); }
-  static int BodySort(void const *item1, void const *item2)
-  { return (int)ceil(((SortableBody*)item2)->sort - ((SortableBody*)item1)->sort); }
+  static int DataSort(csParticlesData const& item1, csParticlesData const& item2)
+  { 
+    float sort = item2.sort - item1.sort; 
+    return (sort < 0.0f) ? -1 : ((sort > 0.0f) ? 1 : 0);
+  }
+  static int BodySort(SortableBody const& item1, SortableBody const& item2)
+  { 
+    float sort = item2.sort - item1.sort; 
+    return (sort < 0.0f) ? -1 : ((sort > 0.0f) ? 1 : 0);
+  }
 public:
   SCF_DECLARE_IBASE;
 

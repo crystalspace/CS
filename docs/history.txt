@@ -23,6 +23,8 @@ chronological order.
 	  shader plugins.  Also added 'softshader' to user.mak.
 	- Anders Stenberg fixed a problem with fog calculation. Still not
 	  working though.
+	- res fixed a compile error in partphys_ode after the recent array
+	  changes.
 25-Mar-2004
 	- res ported code to properly handle keycolored procedural textures
 	  over from the OR.
