@@ -56,6 +56,17 @@ chronological order.
 	  under the name csPolygonMeshTools :-)
 	  So I just moved the two functions in csPolyMeshTools to the
 	  already exsisting csPolygonMeshTools in csgeom.
+	- res made the following changes:
+	    - ARB VPs can now contain a <description> token. The content of it 
+	      is displayed in case of a program error (or warning).
+	    - ARB VP spec says that a program error string may be available
+	      even if no program error occured. The error string is displayed
+	      as well in this case (but it's not fatal.)
+	    - Several Load() functions in the shader manager errorneously
+	      returned 'false' even if no problem occured.
+	    - Changed the logic to determine the shadow mesh. Now, only the
+	      shadow mesh is used; if not present, no shadow is casted.
+	      However, the shadow mesh is tested for closedness.
 3-Sep-2003
 	- Peter Amstutz changed nullmesh to properly initialize it's
 	  bounding box to a legal (albeit extremely small) value.

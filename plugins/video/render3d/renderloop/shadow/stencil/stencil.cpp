@@ -19,8 +19,10 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "csutil/garray.h"
+#include "csutil/flags.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/vector4.h"
+#include "csgeom/pmtools.h"
 
 #include "iengine/rview.h"
 #include "iengine/camera.h"
@@ -34,9 +36,11 @@
 #include "iutil/strset.h"
 #include "iutil/document.h"
 #include "ivideo/rendermesh.h"
+#include "ivaria/reporter.h"
 
-//#define SHADOW_CULL 1
+//#define SHADOW_CACHE_DEBUG
 
+#include "polymesh.h"
 #include "stencil.h"
 
 CS_IMPLEMENT_PLUGIN
@@ -52,9 +56,10 @@ SCF_IMPLEMENT_IBASE (csStencilShadowCacheEntry)
   SCF_IMPLEMENTS_INTERFACE (iRenderBufferSource);
 SCF_IMPLEMENT_IBASE_END
 
-csStencilShadowCacheEntry::csStencilShadowCacheEntry (iBase* parent)
+csStencilShadowCacheEntry::csStencilShadowCacheEntry (csStencilShadowStep* parent,
+						      iMeshWrapper* mesh)
 {
-  SCF_CONSTRUCT_IBASE (parent);
+  SCF_CONSTRUCT_IBASE (0);
   shadow_vertex_buffer = 0;
   shadow_normal_buffer = 0;
   active_index_buffer = 0;
@@ -67,23 +72,18 @@ csStencilShadowCacheEntry::csStencilShadowCacheEntry (iBase* parent)
   edge_normals = 0;
 
   enable_caps = false;
+
+  csStencilShadowCacheEntry::parent = parent;
+  meshWrapper = mesh;
+  model = 0;
+
+  csRef<iObjectModel> model = mesh->GetMeshObject ()->GetObjectModel ();
+  model->AddListener (this);
+  ObjectModelChanged (model);
 }
 
 csStencilShadowCacheEntry::~csStencilShadowCacheEntry ()
 {
-}
-
-bool csStencilShadowCacheEntry::Initialize (iObjectRegistry *objreg) 
-{
-  model = 0;
-  g3d = CS_QUERY_REGISTRY (objreg, iGraphics3D);
-  if (!g3d) { return false; }
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (objreg,
-	"crystalspace.renderer.stringset", iStringSet);
-  shadow_vertex_name = strings->Request ("shadow vertices");
-  shadow_normal_name = strings->Request ("shadow normals");
-  shadow_index_name = strings->Request ("indices");
-  return true;
 }
 
 void csStencilShadowCacheEntry::SetActiveLight (iLight *light, 
@@ -109,8 +109,9 @@ void csStencilShadowCacheEntry::SetActiveLight (iLight *light,
       (entry->meshLightPos - meshlightpos).SquaredNorm () > 0.02) 
   {
     entry->meshLightPos = meshlightpos;
-    if (entry->shadow_index_buffer == 0) { 
-      entry->shadow_index_buffer = g3d->CreateRenderBuffer (
+    if (entry->shadow_index_buffer == 0) 
+    { 
+      entry->shadow_index_buffer = parent->g3d->CreateRenderBuffer (
         sizeof (unsigned int)*triangle_count*12, CS_BUF_STATIC/*CS_BUF_INDEX*/,
         CS_BUFCOMP_UNSIGNED_INT, 1, true);
     }
@@ -249,18 +250,38 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
 {
   if (csStencilShadowCacheEntry::model != model)
   {
-    //printf ("New model %8.8x, old model %8.8x\n", model,
-      //csStencilShadowCacheEntry::model);
+   #ifdef SHADOW_CACHE_DEBUG
+    printf ("New model %8.8x, old model %8.8x\n", model,
+      csStencilShadowCacheEntry::model);
+   #endif
     csStencilShadowCacheEntry::model = model;	
   }
 
   //first try to use a MeshShadow polygonmesh
   //but if we don't get any, attempt to use collidemesh
   csRef<iPolygonMesh> mesh = model->GetPolygonMeshShadows ();
-  if (!mesh)
+  if (mesh)
+  {
+    bool isClosed = false;
+    // @@@ Need some flag to "force closed"
+
+    // @@@ Not good when the object model changes often.
+    if (!(isClosed || csPolygonMeshTools::IsMeshClosed (mesh)))
+    {
+      csStencilPolygonMesh* newMesh = new csStencilPolygonMesh;
+      newMesh->CopyFrom (mesh);
+
+      csArray<csMeshedPolygon> newPolys;
+      csPolygonMeshTools::CloseMesh (mesh, newPolys);
+      newMesh->AddPolys (newPolys);
+
+      mesh.AttachNew (newMesh);
+    }
+  }
+  else
   {
     // No shadow casting for this object.
-    return; 
+    return;
   }
 
   csVector3 *verts = mesh->GetVertices ();
@@ -280,10 +301,10 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
     vertex_count = mesh->GetVertexCount ();
 	triangle_count = new_triangle_count;
 
-    shadow_vertex_buffer = g3d->CreateRenderBuffer (
+    shadow_vertex_buffer = parent->g3d->CreateRenderBuffer (
        sizeof (csVector3)*new_triangle_count*3, CS_BUF_STATIC,
        CS_BUFCOMP_FLOAT, 3, false);
-    shadow_normal_buffer = g3d->CreateRenderBuffer (
+    shadow_normal_buffer = parent->g3d->CreateRenderBuffer (
        sizeof (csVector3)*new_triangle_count*3, CS_BUF_STATIC,
        CS_BUFCOMP_FLOAT, 3, false);
 
@@ -374,14 +395,26 @@ void csStencilShadowCacheEntry::ObjectModelChanged (iObjectModel* model)
 
 iRenderBuffer *csStencilShadowCacheEntry::GetRenderBuffer (csStringID name)
 {
-  if (name == shadow_vertex_name)
+  if (name == parent->shadow_vertex_name) 
+  {
     return shadow_vertex_buffer;
-  if (name == shadow_normal_name)
+  }
+  if (name == parent->shadow_normal_name) 
+  {
     return shadow_normal_buffer;
-  if (name == shadow_index_name)
+  }
+  if (name == parent->shadow_index_name) 
+  {
     return active_index_buffer;
+  }
   return 0;
 }
+
+//---------------------------------------------------------------------------
+
+csStringID csStencilShadowStep::shadow_index_name = csInvalidStringID;
+csStringID csStencilShadowStep::shadow_normal_name = csInvalidStringID;
+csStringID csStencilShadowStep::shadow_vertex_name = csInvalidStringID;
 
 csStencilShadowStep::csStencilShadowStep (iBase* parent)/* : 
   shadowDrawVisCallback (this)*/
@@ -391,6 +424,16 @@ csStencilShadowStep::csStencilShadowStep (iBase* parent)/* :
 
 csStencilShadowStep::~csStencilShadowStep ()
 {
+}
+
+void csStencilShadowStep::Report (int severity, const char* msg, ...)
+{
+  va_list args;
+  va_start (args, msg);
+  csReportV (object_reg, severity, 
+    "crystalspace.renderloop.step.shadow.stencil", msg,
+    args);
+  va_end (args);
 }
 
 bool csStencilShadowStep::Initialize (iObjectRegistry* objreg)
@@ -407,33 +450,47 @@ bool csStencilShadowStep::Initialize (iObjectRegistry* objreg)
     shmgr = CS_LOAD_PLUGIN (plugin_mgr,
       "crystalspace.graphics3d.shadermanager",
       iShaderManager);
-
-    if (!shmgr) 
-    {
-      printf ("Unable to load ShaderManager!\n");
-      return false;
-    }
+  }
+  if (!shmgr) 
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Unable to retrieve shader manager!");
+    return false;
   }
   shadow = shmgr->CreateShader ();
   if (!shadow) 
   {
-    printf ("Unable to create new shader\n");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Unable to create new shader");
     return false;
   }
-
   csRef<iVFS> vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
   csRef<iDataBuffer> buf = vfs->ReadFile ("/shader/shadow.xml");
   //csRef<iDataBuffer> buf = vfs->ReadFile ("/shader/shadowdebug.xml");
-  shadow->Load (buf);
+  if (!shadow->Load (buf))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Unable to load shadow shader");
+    return false;
+  }
   shadow->Prepare ();
 
   shadowWrapper = shmgr->GetShader (shadow->GetName ());
   shadowWrapper->SelectMaterial (0);
 
   // @@@ Dunno if this should be _here_ really.
-  csRef<iShaderManager> shadman = 
-    CS_QUERY_REGISTRY (object_reg, iShaderManager);
-  shadman->AddChild (shadowWrapper);
+  shmgr->AddChild (shadowWrapper);
+
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (objreg,
+	"crystalspace.renderer.stringset", iStringSet);
+  if (!strings)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Unable to retrieve string set");
+    return false;
+  }
+  if (shadow_vertex_name == csInvalidStringID)
+    shadow_vertex_name = strings->Request ("shadow vertices");
+  if (shadow_normal_name == csInvalidStringID)
+    shadow_normal_name = strings->Request ("shadow normals");
+  if (shadow_index_name == csInvalidStringID)
+    shadow_index_name = strings->Request ("indices");
 
   return true;
 }
@@ -467,11 +524,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light, iMeshWr
   if (shadowCacheEntry == 0) 
   {
     /* need the extra reference for the hashmap */
-    shadowCacheEntry = new csStencilShadowCacheEntry ((iRenderStep*)this);
-    shadowCacheEntry->Initialize (object_reg);
-    csRef<iObjectModel> model = mesh->GetMeshObject ()->GetObjectModel ();
-    model->AddListener (shadowCacheEntry);
-    shadowCacheEntry->ObjectModelChanged (model);
+    shadowCacheEntry = new csStencilShadowCacheEntry (this, mesh);
     shadowcache.Put ((csHashKey)mesh, shadowCacheEntry);
   }
 
@@ -503,8 +556,7 @@ void csStencilShadowStep::DrawShadow (iRenderView* rview, iLight* light, iMeshWr
       rmesh.indexstart = 0;
       rmesh.indexend = index_range;
       /*
-        WTF? The same mesh drawn twice, one immediately after another? -
-	That has to be optimized, kids! [res]
+        @@@ Try to get rid of drawing the mesh twice
        */
       g3d->SetShadowState (CS_SHADOW_VOLUME_FAIL1);
       g3d->DrawMesh (&rmesh);
@@ -592,10 +644,7 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
 	obj->GetMeshObject ()->GetObjectModel ();
       if (!model) { continue; } // Can't do shadows on this
       /* need the extra reference for the hashmap */
-      shadowCacheEntry = new csStencilShadowCacheEntry ((iRenderStep*)this);
-      shadowCacheEntry->Initialize (object_reg);
-      model->AddListener (shadowCacheEntry);
-      shadowCacheEntry->ObjectModelChanged (model);
+      shadowCacheEntry = new csStencilShadowCacheEntry (this, obj);
       shadowcache.Put ((csHashKey)obj, shadowCacheEntry);
     }
 
@@ -625,11 +674,11 @@ void csStencilShadowStep::Perform (iRenderView* rview, iSector* sector,
 
       if (sp) 
       {
-        sp->GetRadius (rad, center);
+	sp->GetRadius (rad, center);
         
-        csVector3 pos = sp->GetMovable() ->GetTransform ().This2Other (center); //transform it
-        csVector3 radWorld = sp->GetMovable ()->GetTransform ().This2Other (rad);
-        maxRadius = MAX(radWorld.x, MAX(radWorld.y, radWorld.z));
+	csVector3 pos = sp->GetMovable() ->GetTransform ().This2Other (center); //transform it
+	csVector3 radWorld = sp->GetMovable ()->GetTransform ().This2Other (rad);
+	maxRadius = MAX(radWorld.x, MAX(radWorld.y, radWorld.z));
   
         if (!lightBehindCamera)
 	{

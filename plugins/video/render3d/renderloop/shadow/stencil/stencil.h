@@ -39,11 +39,15 @@
 #include "../../common/basesteploader.h"
 #include "../../common/parserenderstep.h"
 
+class csStencilShadowStep;
+
 class csStencilShadowCacheEntry : public iObjectModelListener,
 				  public iRenderBufferSource
 {
 private:
-  iObjectModel *model;
+  csRef<csStencilShadowStep> parent;
+  iObjectModel* model;
+  iMeshWrapper* meshWrapper;
 
   struct csLightCacheEntry 
   {
@@ -54,13 +58,12 @@ private:
   };
   csHashMap lightcache;
 
-  csStringID shadow_vertex_name, shadow_normal_name, shadow_index_name;
   csRef<iRenderBuffer> shadow_vertex_buffer;
   csRef<iRenderBuffer> shadow_normal_buffer;
   csRef<iRenderBuffer> active_index_buffer;
-  csRef<iGraphics3D> g3d;
 
-  struct EdgeInfo {
+  struct EdgeInfo 
+  {
     csVector3 a, b;
     csVector3 norm;
     int ind_a, ind_b;
@@ -77,12 +80,12 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  csStencilShadowCacheEntry (iBase* parent);
+  csStencilShadowCacheEntry (csStencilShadowStep* parent, 
+    iMeshWrapper* mesh);
   virtual ~csStencilShadowCacheEntry ();
 
-  bool Initialize (iObjectRegistry *objreg);
-
-  void SetActiveLight (iLight *light, csVector3 meshlightpos, int& active_index_range, int& active_edge_start);
+  void SetActiveLight (iLight *light, csVector3 meshlightpos, 
+    int& active_index_range, int& active_edge_start);
   virtual void ObjectModelChanged (iObjectModel* model);
   virtual iRenderBuffer *GetRenderBuffer (csStringID name);
   void EnableShadowCaps () { enable_caps = true; }
@@ -95,16 +98,26 @@ class csStencilShadowStep : public iRenderStep,
 			    public iRenderStepContainer
 {
 private:
+  friend class csStencilShadowCacheEntry;
+
   csRef<iObjectRegistry> object_reg;
   csRef<iGraphics3D> g3d;
   csRef<iShader> shadow;
   csRef<iShaderWrapper> shadowWrapper;
 
+  static csStringID shadow_vertex_name;
+  static csStringID shadow_normal_name; 
+  static csStringID shadow_index_name;
+
   csRefArray<iLightRenderStep> steps;
 
   csHashMap shadowcache;
-  void DrawShadow (iRenderView* rview, iLight* light, iMeshWrapper *mesh, iShaderPass *pass);
+  void DrawShadow (iRenderView* rview, iLight* light, iMeshWrapper *mesh, 
+    iShaderPass *pass);
+
+  void Report (int severity, const char* msg, ...);
 public:
+
   SCF_DECLARE_IBASE;
 
   csStencilShadowStep (iBase *parent);

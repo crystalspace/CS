@@ -356,7 +356,7 @@ void csShader::BuildTokenHash()
   xmltokens.Register("vector3", 100+csShaderVariable::VECTOR3);
 }
 
-bool csShader::Load(iDocumentNode* node)
+bool csShader::Load (iDocumentNode* node)
 {
   if (!node) 
     return false;
@@ -427,7 +427,7 @@ bool csShader::Load(iDocumentNode* node)
       }
     }
   }
-  return false;
+  return true;
 }
 
 bool csShader::Load (iDataBuffer* program)
@@ -442,7 +442,7 @@ bool csShader::Load (iDataBuffer* program)
       "Error parsing document: %s", error);
     return false;
   }
-  return Load(doc->GetRoot()->GetNode("shader"));
+  return (Load (doc->GetRoot ()->GetNode ("shader")));
 }
 
 
@@ -640,7 +640,7 @@ void csShaderPass::BuildTokenHash()
   xmltokens.Register("vector3", 100+csShaderVariable::VECTOR3);
 }
 
-bool csShaderPass::Load(iDocumentNode* node)
+bool csShaderPass::Load (iDocumentNode* node)
 {
 
   if (!node) 
@@ -857,7 +857,7 @@ bool csShaderPass::Load(iDocumentNode* node)
       }
     }
   }
-  return false;
+  return true;
 }
 
 bool csShaderPass::Load(iDataBuffer* program)
@@ -940,7 +940,7 @@ void csShaderTechnique::BuildTokenHash()
 
 }
 
-bool csShaderTechnique::Load(iDocumentNode* node)
+bool csShaderTechnique::Load (iDocumentNode* node)
 {
   if (!node) 
     return false;
@@ -1010,7 +1010,7 @@ bool csShaderTechnique::Load(iDocumentNode* node)
     }
     }
   }
-  return false;
+  return true;
 }
 
 bool csShaderTechnique::Load(iDataBuffer* program)

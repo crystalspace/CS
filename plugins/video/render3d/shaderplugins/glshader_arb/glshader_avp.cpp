@@ -46,6 +46,15 @@ SCF_IMPLEMENT_IBASE(csShaderGLAVP)
 SCF_IMPLEMENTS_INTERFACE(iShaderProgram)
 SCF_IMPLEMENT_IBASE_END
 
+void csShaderGLAVP::Report (int severity, const char* msg, ...)
+{
+  va_list args;
+  va_start (args, msg);
+  csReportV (object_reg, severity, 
+    "crystalspace.graphics3d.shader.glarb", msg, args);
+  va_end (args);
+}
+
 void csShaderGLAVP::Activate(iShaderPass* current, csRenderMesh* mesh)
 {
   //enable it
@@ -83,7 +92,7 @@ void csShaderGLAVP::ResetState ()
 {
 }
 
-bool csShaderGLAVP::LoadProgramStringToGL(const char* programstring)
+bool csShaderGLAVP::LoadProgramStringToGL (const char* programstring)
 {
   if(!programstring)
     return false;
@@ -111,22 +120,41 @@ bool csShaderGLAVP::LoadProgramStringToGL(const char* programstring)
   const GLubyte * programErrorString = glGetString(GL_PROGRAM_ERROR_STRING_ARB);
 
   int errorpos;
-  glGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &errorpos);
+  glGetIntegerv (GL_PROGRAM_ERROR_POSITION_ARB, &errorpos);
   if(errorpos != -1)
   {
-    char* end = strchr (programstring+errorpos, '\n');
+    CS_ALLOC_STACK_ARRAY (char, errorStart, strlen (programstring) + 1);
+    strcpy (errorStart, programstring);
+
+    const char* start = errorStart + errorpos;
+    while (start > errorStart)
+    {
+      if (*(start - 1) == '\n')
+      {
+	break;
+      }
+      start--;
+    }
+
+    char* end = strchr (start, '\n');
     if (end)
       *(end-1) = 0;
-    const char* start = strrchr (programstring, '\n');
-    if (!start)
-      start = programstring+errorpos;
-    else
-      start++;
 
-    csReport ( object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.graphics3d.shader.glarb", "Couldn't load vertexprogram");
-    csReport ( object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.graphics3d.shader.glarb", "Programerror at: \"%s\"", start);
-    csReport ( object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.graphics3d.shader.glarb", "Errorstring %s", programErrorString);
+    Report (CS_REPORTER_SEVERITY_WARNING, 
+      "Couldn't load vertex program \"%s\"", description);
+    Report (CS_REPORTER_SEVERITY_WARNING, "Program error at: \"%s\"", start);
+    Report (CS_REPORTER_SEVERITY_WARNING, "Error string: '%s'", 
+      programErrorString);
     return false;
+  }
+  else
+  {
+    if ((programErrorString != 0) && (*programErrorString != 0))
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+	"Warning for vertex program \"%s\": '%s'", description, 
+	programErrorString);
+    }
   }
 
   return true;
@@ -134,15 +162,18 @@ bool csShaderGLAVP::LoadProgramStringToGL(const char* programstring)
 
 void csShaderGLAVP::BuildTokenHash()
 {
-  xmltokens.Register("ARBVP",XMLTOKEN_ARBVP);
-  xmltokens.Register("declare",XMLTOKEN_DECLARE);
-  xmltokens.Register("variablemap",XMLTOKEN_VARIABLEMAP);
-  xmltokens.Register("program", XMLTOKEN_PROGRAM);
+  xmltokens.Register ("arbvp", XMLTOKEN_ARBVP);
+  xmltokens.Register ("declare", XMLTOKEN_DECLARE);
+  xmltokens.Register ("variablemap", XMLTOKEN_VARIABLEMAP);
+  xmltokens.Register ("program", XMLTOKEN_PROGRAM);
+  xmltokens.Register ("description", XMLTOKEN_DESCRIPTION);
 
-  xmltokens.Register("integer", 100+csShaderVariable::INT);
-  xmltokens.Register("float", 100+csShaderVariable::FLOAT);
-  xmltokens.Register("string", 100+csShaderVariable::STRING);
-  xmltokens.Register("vector3", 100+csShaderVariable::VECTOR3);
+  // Note: to avoid collision between the XMLTOKENs and the SV types,
+  // the XMLTOKENs start with 100
+  xmltokens.Register ("integer", csShaderVariable::INT);
+  xmltokens.Register ("float", csShaderVariable::FLOAT);
+  xmltokens.Register ("string", csShaderVariable::STRING);
+  xmltokens.Register ("vector3", csShaderVariable::VECTOR3);
 }
 
 bool csShaderGLAVP::Load(iDataBuffer* program)
@@ -186,10 +217,14 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
       case XMLTOKEN_PROGRAM:
         {
           //save for later loading
-          programstring = new char[strlen(child->GetContentsValue())+1];
-          strcpy(programstring, child->GetContentsValue());
+          programstring = csStrNew (child->GetContentsValue ());
         }
-          break;
+        break;
+      case XMLTOKEN_DESCRIPTION:
+	{
+	  description = csStrNew (child->GetContentsValue ());
+	}
+	break;
       case XMLTOKEN_DECLARE:
         {
           //create a new variable
@@ -201,7 +236,6 @@ bool csShaderGLAVP::Load(iDocumentNode* program)
           var->IncRef ();
 
           csStringID idtype = xmltokens.Request( child->GetAttributeValue("type") );
-          idtype -= 100;
           var->SetType( (csShaderVariable::VariableType) idtype);
           switch(idtype)
           {

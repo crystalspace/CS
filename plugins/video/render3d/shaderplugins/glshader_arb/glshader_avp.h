@@ -28,10 +28,11 @@ class csShaderGLAVP : public iShaderProgram
 private:
   enum
   {
-    XMLTOKEN_ARBVP = 1,
+    XMLTOKEN_ARBVP = 100,
     XMLTOKEN_DECLARE,
     XMLTOKEN_VARIABLEMAP,
-    XMLTOKEN_PROGRAM
+    XMLTOKEN_PROGRAM,
+    XMLTOKEN_DESCRIPTION
   };
 
   csPDelArray<csSymbolTable> symtabs;
@@ -49,7 +50,6 @@ private:
   csGLExtensionManager* ext;
   csRef<iObjectRegistry> object_reg;
 
-
   unsigned int program_num;
 
   csStringHash xmltokens;
@@ -57,9 +57,10 @@ private:
   void BuildTokenHash();
 
   char* programstring;
-
+  char* description;
   bool validProgram;
 
+  void Report (int severity, const char* msg, ...);
 public:
   SCF_DECLARE_IBASE;
 
@@ -70,11 +71,13 @@ public:
     this->object_reg = objreg;
     this->ext = ext;
     programstring = 0;
+    description = 0;
     symtab = new csSymbolTable;
   }
   virtual ~csShaderGLAVP ()
   {
     delete[] programstring;
+    delete[] description;
     delete symtab;
   }
 
