@@ -195,7 +195,7 @@ void HideMeshOp::Do (cs_time /*dt*/)
 void TestOp::Do (cs_time dt)
 {
   printf ("dt=%ld fps=%g\n", dt,
-  	DemoSequenceManager::demoseq->GetFPS ()); fflush (stdout);
+  	(long)DemoSequenceManager::demoseq->GetFPS ()); fflush (stdout);
 }
 
 //-----------------------------------------------------------------------------
