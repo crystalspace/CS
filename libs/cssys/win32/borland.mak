@@ -1,0 +1,187 @@
+# This is the makefile for Borland compiler (bcc32 for Win32)
+
+# Friendly names for building environment
+DESCRIPTION.borland = Windows with Borland
+
+# Choose which drivers you want to build/use
+# cs2d/ddraw6 cs2d/openglwin cs3d/direct3d5 cs3d/direct3d6 cs3d/opengl
+#
+DRIVERS+=cs2d/ddraw cs3d/software \
+  csnetdrv/null csnetman/null csnetman/simple \
+  cssnddrv/null cssndrdr/null cssndrdr/software
+
+# Uncomment the following to get an startup console window
+#CONSOLE_FLAGS = -DWIN32_USECONSOLE
+
+#---------------------------------------------------- rootdefines & defines ---#
+ifneq (,$(findstring defines,$(MAKESECTION)))
+
+.SUFFIXES: .exe .dll
+
+# Processor type.
+PROC=INTEL
+
+# Operating system
+OS=WIN32
+
+# Compiler
+COMP=BCC32
+
+# Command to update a target
+#UPD=bin/dosupd.bat $@ DEST
+
+endif # ifneq (,$(findstring defines,$(MAKESECTION)))
+
+#------------------------------------------------------------------ defines ---#
+ifeq ($(MAKESECTION),defines)
+
+include mk/dos.mak
+
+# Typical prefix for library filenames
+LIB_PREFIX=lib
+
+# Extra libraries needed on this system (beside drivers)
+LIBS.EXE=dxextra.lib
+
+# Where can the Zlib library be found on this system?
+Z_LIBS=zlib.lib
+
+# Where can the PNG library be found on this system?
+PNG_LIBS=png.lib
+
+# Where can the JPG library be found on this system?
+JPG_LIBS=libjpeg.lib
+
+# Where can the optional sound libraries be found on this system?
+SOUND_LIBS=
+
+# Does this system require libsocket.a?
+NEED_SOCKET_LIB=
+
+# Flags for C compiler to direct output to the rule target
+CFLAGS.@ = -o$@
+
+# Flags for linker to direct output to the rule target
+LFLAGS.@ = -e$@
+
+# Indicate where special include files can be found.
+CFLAGS.INCLUDE=-Iinclude/cssys/win32
+
+# General flags for the compiler which are used in any case.
+CFLAGS.GENERAL=-w-8027 -DWIN32_VOLATILE -x- $(CFLAGS.SYSTEM)
+
+586=-5 -OS
+686=-6 -OS
+ULTRAOPTIMIZE=-Oi -Ov
+
+# Flags for the compiler which are used when optimizing.
+CFLAGS.optimize=-d -ff -O2
+
+# Flags for the compiler which are used when debugging.
+#CFLAGS.debug=-Od -v -vi- -vG -y
+
+# Flags for the compiler which are used when profiling.
+CFLAGS.profile=
+
+# Flags for the compiler which are used when building a shared library.
+CFLAGS.DLL=
+
+# General flags for the linker which are used in any case.
+LFLAGS.GENERAL=
+
+# Flags for the linker which are used when optimizing.
+LFLAGS.optimize=
+
+# Flags for the linker which are used when debugging.
+LFLAGS.debug=
+
+# Flags for the linker which are used when profiling.
+LFLAGS.profile=
+
+# Flags for the linker which are used when building a shared library.
+LFLAGS.DLL=-WD
+
+# Typical extension for objects and static libraries
+LIB=.lib
+define AR
+  @rm -f $@
+endef
+ARFLAGS=
+ARFLAGS.@=$(subst /,\,$@)
+
+# System-dependent flags to pass to NASM
+NASMFLAGS.SYSTEM=
+
+# System dependent source files included into CSSYS library
+SRC.SYS_CSSYS = libs/cssys/win32/printf.cpp libs/cssys/win32/timing.cpp \
+  libs/cssys/win32/dir.cpp libs/cssys/win32/win32.cpp \
+  libs/cssys/win32/loadlib.cpp support/gnu/getopt.c support/gnu/getopt1.c
+SRC.SYS_CSSYS_EXE=libs/cssys/win32/exeentry.cpp
+SRC.SYS_CSSYS_DLL=libs/cssys/win32/dllentry.cpp
+
+# The C compiler
+CC=bcc32 -c
+
+# The C++ compiler
+CXX=bcc32 -c
+
+# The linker.
+LINK=bcc32
+
+# Command sequence for creating a directory.
+# Note that directories will have forward slashes. Please
+# make sure that this command accepts that (or use 'subst' first).
+ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL)))
+  MKDIR = mkdir $(subst /,\,$(@:/=))
+else
+  MKDIR = mkdir $@
+endif
+
+# For using sockets we should link with sockets library
+NETSOCK_LIBS=
+
+# Extra parameters for 'sed' which are used for doing 'make depend'.
+SYS_SED_DEPEND=-e "s/\.ob*j*\:/\$$O:/g"
+
+# Flags for linking a GUI and a console executable
+LFLAGS.EXE=-WC
+LFLAGS.CONSOLE.EXE=-WC
+
+# Use makedep to build dependencies
+DEPEND_TOOL=mkdep
+
+endif # ifeq ($(MAKESECTION),defines)
+
+#-------------------------------------------------------------- postdefines ---#
+ifeq ($(MAKESECTION),postdefines)
+
+L^=$+
+DO.COMPILE.C = $(CC) $(CFLAGS) $(CFLAGS.INCLUDE) $(CFLAGS.@) $(<<)
+DO.COMPILE.CPP = $(CXX) $(CFLAGS) $(CFLAGS.INCLUDE) $(CFLAGS.@) $(<<)
+
+define DO.STATIC.LIBRARY
+	$(AR)
+	$(foreach curobj,$(^^),tlib "$(ARFLAGS.@)" "+$(subst /,\,$(curobj))";)
+endef
+
+endif # ifeq ($(MAKESECTION),postdefines)
+
+#--------------------------------------------------------------- confighelp ---#
+ifeq ($(MAKESECTION),confighelp)
+
+ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL)))
+"=
+|=³
+endif
+
+SYSHELP += \
+  $(NEWLINE)echo $"  make borland      Prepare for building under and for $(DESCRIPTION.borland)$"
+
+endif # ifeq ($(MAKESECTION),confighelp)
+
+#---------------------------------------------------------------- configure ---#
+ifeq ($(ROOTCONFIG),config)
+
+#SYSCONFIG=bin/win32conf.bat
+
+endif # ifeq ($(ROOTCONFIG),config)
