@@ -50,6 +50,8 @@ chronological order.
 	  iMeshObjectFactory->GetFlags().
 	- Jorrit also updated the level building document with information
 	  on the new staticpos and staticshape flags.
+	- Jorrit added csBlockAllocator::Compact(). This function will remove
+	  all blocks that have no items.
 17-Feb-2004
 	- Jorrit fixed a bug in csPolygonMeshTools::Triangulate(). It would
 	  try to allocate a 0 size array in some cases.

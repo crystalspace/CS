@@ -191,6 +191,22 @@ public:
   }
 
   /**
+   * Compact the block allocator so that all blocks that are completely
+   * free are removed. The blocks that still contain elements are not touched.
+   */
+  void Compact ()
+  {
+    int i = blocks.Length ()-1;
+    while (i >= 0)
+    {
+      if (blocks[i].firstfree == (csFreeList*)blocks[i].memory &&
+      	  blocks[i].firstfree->next == 0)
+        blocks.DeleteIndex (i);
+      i--;
+    }
+  }
+
+  /**
    * Allocate a new element.
    */
   T* Alloc ()
