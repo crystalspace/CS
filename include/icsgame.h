@@ -589,6 +589,87 @@ struct iDataSaver : public iBase
 
 //---------------------------------------------------------------------------
 
+SCF_VERSION (iGameNetworkConnection, 0, 1, 0);
+
+/**
+ * A Data Loader allows entites to read a structured datafile
+ */
+struct iGameNetworkConnection : public iBase
+{
+  /**
+   * Sends an event across the network connection to an entity.
+   * Relevance time is in seconds and gives the time, after that,
+   * the event can be safely dropped. If you set Relevance time
+   * to 0, the event will get sent, even if it takes forever.
+   */
+  virtual void SendEvent(const char*     Sender,
+                         const char*     Target, 
+                         const char*     EventName,
+                         iAttributeList* InPar,
+                         float           RelevanceTime) = 0;
+
+  /**
+   * Revokes an event, that has not yet been deleivered. 
+   * This method is only there to optimise transmission. It
+   * can't be guaranteed, that the event will not arrive after
+   * you have deleted it!
+   */
+  virtual void RevokeEvent(const char*     Sender,
+                           const char*     Target,
+                           const char*     EventName) = 0;
+
+  /**
+   * Set the connection parameters
+   */
+  virtual void SetConnectionParameters(int MaxBytesPerSecond,
+                                       int MaxMessagesPerSecond) = 0;
+
+  /**
+   * Checks, if the connection is established and working.
+   */
+  virtual bool IsConnectionReady();
+
+  /// Disconnect a network connection
+  virtual void Disconnect();
+};
+
+//---------------------------------------------------------------------------
+
+SCF_VERSION (iGameServerConnection, 0, 1, 0);
+
+/**
+ * A network connection from the multiplayer client to the server.
+ */
+struct iGameServerConnection : public iBase
+{
+  /// Get the according network connection object
+  virtual iGameNetworkConnection* GetConnection() = 0;
+
+  /// Return a list of server names
+  virtual void FindServers(iAttributeArray& pServers) = 0;
+
+  /// Connect to the server with the given name
+  virtual void ConnectToServer(const char* Server) = 0;
+};
+
+//---------------------------------------------------------------------------
+
+SCF_VERSION (iGameClientConnection, 0, 1, 0);
+
+/**
+ * A network connection from the multiplayer client to the server.
+ */
+struct iGameClientConnection : public iBase
+{
+  /// Get the according network connection object
+  virtual iGameNetworkConnection* GetConnection() = 0;
+
+  /// Gets the name of the Client. (Must be unique for a server)
+  virtual const char* GetName() = 0;
+};
+
+//---------------------------------------------------------------------------
+
 SCF_VERSION (iGameCore, 0, 1, 0);
 
 /**
