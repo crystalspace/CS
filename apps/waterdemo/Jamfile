@@ -1,5 +1,8 @@
 SubDir TOP apps waterdemo ;
 
+if $(USE_NEW_RENDERER) = "yes"
+{
+
 Application waterdemo
 	: [ Wildcard *.cpp *.h ]
 ;
@@ -9,3 +12,4 @@ CompileGroups waterdemo : nrall ;
 
 Help waterdemo : "Displaying rendering of a watersurface in new renderer" ;
 
+}
