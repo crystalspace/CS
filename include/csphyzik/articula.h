@@ -110,7 +110,7 @@ protected:
 
 	ctRigidBody *handle;	// rigid body for the root of this articulated body
 	ctJoint *inboard_joint;  // joint attaching this body to parent. NULL if root
-	ctLinkList_ctArticulatedBody outboard_links;  // children 
+	ctLinkList<ctArticulatedBody> outboard_links;  // children 
 
 	bool is_grounded;  // is it fixed to the world frame?
 

@@ -20,6 +20,7 @@
 
 #include "csphyzik/qtrbconn.h"
 #include "csphyzik/qtrigid.h"
+#include "csphyzik/phyzent.h"
 
 ctQuatRigidBodyConnector::ctQuatRigidBodyConnector(ctQuatRigidBody *rb,
 						   ctVector3 offset)

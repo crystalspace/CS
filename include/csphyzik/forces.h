@@ -92,7 +92,7 @@ public:
 	virtual void add_body( ctPhysicalEntity *bod ){ if( body_vector.get_size() < 2 ) body_vector.add_link( bod ); }
 
 protected:
-	ctLinkList_ctVector3 attachment_point_vector;
+	ctLinkList<ctVector3> attachment_point_vector;
 	real rest_length;
 	
 };

@@ -26,9 +26,8 @@
 #include "csphyzik/phyzent.h"
 #include "csphyzik/linklist.h"
 #include "csphyzik/odesolve.h"
+#include "csphyzik/ctcat.h"
 #include "csutil/csdllist.h"
-
-class ctCatastropheManager;
 
 enum worldstate { CTWS_NORMAL, CTWS_REWOUND };
 
@@ -138,9 +137,9 @@ protected:
   worldstate fsm_state;  
   real rewound_from;
 
-  ctLinkList_ctEntity body_list;
-  ctLinkList_ctForce enviro_force_list;
-  ctLinkList_ctCatastropheManager catastrophe_list;
+  ctLinkList<ctEntity> body_list;
+  ctLinkList<ctForce> enviro_force_list;
+  ctLinkList<ctCatastropheManager> catastrophe_list;
   
   OdeSolver *ode_to_math;  // would an equation by any other name smell as sweet?
 

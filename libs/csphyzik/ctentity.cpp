@@ -21,6 +21,7 @@
 #include "sysdef.h"
 #include "csphyzik/entity.h"
 #include "csphyzik/solver.h"
+#include "csphyzik/phyzent.h"
 #include "csphyzik/debug.h"
 
 ctEntity::ctEntity()

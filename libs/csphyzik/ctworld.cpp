@@ -180,7 +180,7 @@ errorcode ctWorld::evolve( real t1, real t2 )
 {
   real ta, tb;
   ctCatastropheManager *cat;
-  ctLinkList_ctCatastropheManager recent_cat;
+  ctLinkList<ctCatastropheManager> recent_cat;
 
   long loops = 300;  //make sure we don't go into an infinite loop
 

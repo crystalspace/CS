@@ -24,6 +24,7 @@
 #include "csphyzik/qtrigid.h"
 #include "csphyzik/ctquat.h"
 #include "csphyzik/qtrbconn.h"
+#include "csphyzik/phyzent.h"
 
 ctQuatRigidBody::ctQuatRigidBody(ctVector3 x, real M) {
   mass = M;

@@ -68,7 +68,7 @@ public:
 	// add another body that this force works on
 	virtual void add_body( ctPhysicalEntity *bod ){ body_vector.add_link( bod ); }
 
-	ctLinkList_ctPhysicalEntity body_vector;  
+	ctLinkList<ctPhysicalEntity> body_vector;  
 
 };
 

@@ -25,7 +25,6 @@
 #include "csphyzik/force.h"
 #include "csphyzik/linklist.h"
 #include "csphyzik/refframe.h"
-#include "csphyzik/linklist.h"
 
 // flags
 #define CTF_NOREWIND 0x1
@@ -103,7 +102,7 @@ protected:
   // uses forces list and current state to do this.
   ctSolver *solver;
 
-  ctLinkList_ctForce forces;   // list of all forces affecting this object
+  ctLinkList<ctForce> forces;   // list of all forces affecting this object
 };
 
 #endif
