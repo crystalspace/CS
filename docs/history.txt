@@ -33,6 +33,8 @@ The history order has been reversed so that new features are at the top.
 	  look nice) and better visibility testing is also needed.
 	  The default function for the terrain is a sin+cos function.
 	  Also LOD is not really implemented at the moment.
+	- Removed SKYDOME keyword from thing loader. Skydomes can now
+	  be done using the ball mesh plugin.
 11-Apr-2001
 	- Norman Kramer fixed ptlab.
 	- Norman Kramer fixed the video app so that it works completely

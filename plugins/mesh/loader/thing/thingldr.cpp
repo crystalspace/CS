@@ -98,7 +98,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SCALE)
   CS_TOKEN_DEF (SECOND)
   CS_TOKEN_DEF (SECOND_LEN)
-  CS_TOKEN_DEF (SKYDOME)
   CS_TOKEN_DEF (SHADING)
   CS_TOKEN_DEF (STATIC)
   CS_TOKEN_DEF (TEMPLATE)
@@ -380,205 +379,6 @@ static UInt ParseMixmode (char* buf)
     return 0;
   }
   return Mixmode;
-}
-
-static bool skydome_process (iThingState* thing_state, char* name, char* buf,
-        iMaterialWrapper* material, int vt_offset)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (RADIUS)
-    CS_TOKEN_TABLE (VERTICES)
-    CS_TOKEN_TABLE (LIGHTING)
-  CS_TOKEN_TABLE_END
-
-  long cmd;
-  char* params;
-  float radius = 0.0f;
-  int i, j;
-  int num = 0;
-  iPolyTexType* ptt;
-  iPolyTexGouraud* gs;
-  iPolyTexFlat* fs;
-
-  // Previous vertices.
-  int prev_vertices[60];        // @@@ HARDCODED!
-  float prev_u[60];
-  float prev_v[60];
-
-  char poly_name[30], * end_poly_name;
-  strcpy (poly_name, name);
-  end_poly_name = strchr (poly_name, 0);
-  int lighting_flags = CS_POLY_LIGHTING;
-
-  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
-  {
-    switch (cmd)
-    {
-      case CS_TOKEN_RADIUS:
-        ScanStr (params, "%f", &radius);
-        break;
-      case CS_TOKEN_VERTICES:
-        ScanStr (params, "%D", prev_vertices, &num);
-	for (i = 0 ; i < num ; i++)
-	  prev_vertices[i] += vt_offset;
-        break;
-      case CS_TOKEN_LIGHTING:
-        {
-	  int do_lighting;
-          ScanStr (params, "%b", &do_lighting);
-	  if (do_lighting) lighting_flags = CS_POLY_LIGHTING;
-	  else lighting_flags = 0;
-        }
-        break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    printf ("Token '%s' not found while parsing a skydome!\n",
-    	csGetLastOffender ());
-    return false;
-  }
-
-  csMatrix3 t_m;
-  csVector3 t_v (0, 0, 0);
-
-  // If radius is negative we have an up-side-down skydome.
-  float vert_radius = radius;
-  if (radius < 0) radius = -radius;
-
-  // Number of degrees between layers.
-  float radius_step = 180. / num;
-
-  // Calculate u,v for the first series of vertices (the outer circle).
-  for (j = 0 ; j < num ; j++)
-  {
-    float angle = 2.*radius_step*j * 2.*M_PI/360.;
-    if (vert_radius < 0) angle = 2.*M_PI-angle;
-    prev_u[j] = cos (angle) * .5 + .5;
-    prev_v[j] = sin (angle) * .5 + .5;
-  }
-
-  // Array with new vertex indices.
-  int new_vertices[60];         // @@@ HARDCODED == BAD == EASY!
-  float new_u[60];
-  float new_v[60];
-
-  // First create the layered triangle strips.
-  for (i = 1 ; i < num/2 ; i++)
-  {
-    //-----
-    // First create a new series of vertices.
-    //-----
-    // Angle from the center to the new circle of vertices.
-    float new_angle = i*radius_step * 2.*M_PI/360.;
-    // Radius of the new circle of vertices.
-    float new_radius = radius * cos (new_angle);
-    // Height of the new circle of vertices.
-    float new_height = vert_radius * sin (new_angle);
-    // UV radius.
-    float uv_radius = (1. - 2.*(float)i/(float)num) * .5;
-    for (j = 0 ; j < num ; j++)
-    {
-      float angle = j*2.*radius_step * 2.*M_PI/360.;
-      if (vert_radius < 0) angle = 2.*M_PI-angle;
-      new_vertices[j] = thing_state->CreateVertex (
-      	csVector3 (
-                         new_radius * cos (angle),
-                         new_height,
-                         new_radius * sin (angle)));
-      new_u[j] = uv_radius * cos (angle) + .5;
-      new_v[j] = uv_radius * sin (angle) + .5;
-    }
-
-    //-----
-    // Now make the triangle strips.
-    //-----
-    for (j = 0 ; j < num ; j++)
-    {
-      sprintf (end_poly_name, "%d_%d_A", i, j);
-      iPolygon3D* p = thing_state->CreatePolygon (poly_name);
-      p->SetMaterial (material);
-      p->GetFlags ().Set (CS_POLY_LIGHTING, lighting_flags);
-      p->SetCosinusFactor (1);
-      p->CreateVertex (prev_vertices[j]);
-      p->CreateVertex (new_vertices[(j+1)%num]);
-      p->CreateVertex (new_vertices[j]);
-      p->SetTextureType (POLYTXT_GOURAUD);
-      ptt = p->GetPolyTexType ();
-      gs = QUERY_INTERFACE (ptt, iPolyTexGouraud);
-      fs = QUERY_INTERFACE (ptt, iPolyTexFlat);
-      gs->Setup (p);
-      fs->SetUV (0, prev_u[j], prev_v[j]);
-      fs->SetUV (1, new_u[(j+1)%num], new_v[(j+1)%num]);
-      fs->SetUV (2, new_u[j], new_v[j]);
-      fs->DecRef ();
-      gs->DecRef ();
-
-      p->SetTextureSpace (t_m, t_v);
-
-      sprintf (end_poly_name, "%d_%d_B", i, j);
-      p = thing_state->CreatePolygon (poly_name);
-      p->SetMaterial (material);
-      p->GetFlags ().Set (CS_POLY_LIGHTING, lighting_flags);
-      p->SetCosinusFactor (1);
-      p->CreateVertex (prev_vertices[j]);
-      p->CreateVertex (prev_vertices[(j+1)%num]);
-      p->CreateVertex (new_vertices[(j+1)%num]);
-      p->SetTextureType (POLYTXT_GOURAUD);
-      ptt = p->GetPolyTexType ();
-      gs = QUERY_INTERFACE (ptt, iPolyTexGouraud);
-      fs = QUERY_INTERFACE (ptt, iPolyTexFlat);
-      gs->Setup (p);
-      fs->SetUV (0, prev_u[j], prev_v[j]);
-      fs->SetUV (1, prev_u[(j+1)%num], prev_v[(j+1)%num]);
-      fs->SetUV (2, new_u[(j+1)%num], new_v[(j+1)%num]);
-      fs->DecRef ();
-      gs->DecRef ();
-      p->SetTextureSpace (t_m, t_v);
-    }
-
-    //-----
-    // Copy the new vertex array to prev_vertices.
-    //-----
-    for (j = 0 ; j < num ; j++)
-    {
-      prev_vertices[j] = new_vertices[j];
-      prev_u[j] = new_u[j];
-      prev_v[j] = new_v[j];
-    }
-  }
-
-  // Create the top vertex.
-  int top_vertex = thing_state->CreateVertex (csVector3 (0, vert_radius, 0));
-  float top_u = .5;
-  float top_v = .5;
-
-  //-----
-  // Make the top triangle fan.
-  //-----
-  for (j = 0 ; j < num ; j++)
-  {
-    sprintf (end_poly_name, "%d_%d", num/2, j);
-    iPolygon3D* p = thing_state->CreatePolygon (poly_name);
-    p->SetMaterial (material);
-    p->GetFlags ().Set (CS_POLY_LIGHTING, lighting_flags);
-    p->SetCosinusFactor (1);
-    p->CreateVertex (top_vertex);
-    p->CreateVertex (prev_vertices[j]);
-    p->CreateVertex (prev_vertices[(j+1)%num]);
-    p->SetTextureType (POLYTXT_GOURAUD);
-    ptt = p->GetPolyTexType ();
-    gs = QUERY_INTERFACE (ptt, iPolyTexGouraud);
-    fs = QUERY_INTERFACE (ptt, iPolyTexFlat);
-    gs->Setup (p);
-    fs->SetUV (0, top_u, top_v);
-    fs->SetUV (1, prev_u[j], prev_v[j]);
-    fs->SetUV (2, prev_u[(j+1)%num], prev_v[(j+1)%num]);
-    fs->DecRef ();
-    gs->DecRef ();
-    p->SetTextureSpace (t_m, t_v);
-  }
-  return true;
 }
 
 static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
@@ -1089,7 +889,6 @@ static bool load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
     CS_TOKEN_TABLE (CLONE)
     CS_TOKEN_TABLE (CAMERA)
     CS_TOKEN_TABLE (VISTREE)
-    CS_TOKEN_TABLE (SKYDOME)
     CS_TOKEN_TABLE (PART)
     CS_TOKEN_TABLE (FACTORY)
   CS_TOKEN_TABLE_END
@@ -1197,10 +996,6 @@ static bool load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
 	if (!load_thing_part (info, imeshwrap, engine,
 		thing_state, params, thing_state->GetVertexCount (), false))
 	  return false;
-        break;
-      case CS_TOKEN_SKYDOME:
-        skydome_process (thing_state, name, params, info.default_material,
-	    vt_offset);
         break;
       case CS_TOKEN_VERTEX:
         {
