@@ -248,10 +248,6 @@ int ImageGifFile::decode_gif (UByte* iBuffer, long iSize, int* Prefix,
 	  keycolour_r = tcol.red;
 	  keycolour_g = tcol.green;
 	  keycolour_b = tcol.blue;
-#ifdef CS_DEBUG
-	  printf("Transparent colour index is %d (%d,%d,%d).\n", 
-	    transp_index, tcol.red, tcol.green, tcol.blue);
-#endif // CS_DEBUG
 	}
 	gptr += ch;
 	break;
