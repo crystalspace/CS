@@ -10,14 +10,8 @@ The history order is reversed so that new features are at the top.
 	    - Removed the Python 2.2 cs_pyth.cpp hack from the MSVC6
               build docs. It is no longer needed after the expansion
               and recent upgrade of the Python plugin.
-	    - Initialized csInvalidStringID to 4294967295 and eliminated
-              MSVC compiler warning. You could cast the old ~0 rval, but
-              I feel it is simpler to give people the actual result of
-              the 1s compliment and a fixed and easily identifiable error
-              code, rather than leaving them to work out what result is.
-              Feel free to change for preference.
-            - Reverted previous and changed to cast method to eliminate
-              GCC compiler warning.
+            - Eliminated MSVC compiler warning by casting rval of
+              csInvalidStringID.
 26-Apr-2003
 	- Norman Kraemer added a swig.jam file for custom swig rules and
 	  used the new power to rebuild the cs_pyth.cpp from cspace.i if
