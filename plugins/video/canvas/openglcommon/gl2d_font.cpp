@@ -211,7 +211,7 @@ GLGlyphSet *GLFontCache::CacheFont (iFont *font)
         }
         // set up the texture info
         memset (fontbitmapdata, 0, fontbitmapsize);
-#ifdef CS_USE_NEW_RENDERER'
+#ifdef CS_USE_NEW_RENDERER
         glBindTexture (GL_TEXTURE_2D, nTexNames [nCurrentTex]);
 #else
         statecache->SetTexture (GL_TEXTURE_2D, nTexNames [nCurrentTex]);
