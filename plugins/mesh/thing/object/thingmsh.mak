@@ -22,8 +22,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp $(SRCDIR)/plugins/mesh/thing/object
-
 ifeq ($(USE_PLUGINS),yes)
   THING = $(OUTDLL)/thing$(DLL)
   LIB.THING = $(foreach d,$(DEP.THING),$($d.LIB))
@@ -35,11 +33,15 @@ else
   TO_INSTALL.STATIC_LIBS += $(THING)
 endif
 
-INF.THING = $(SRCDIR)/plugins/mesh/thing/object/thing.csplugin
-INC.THING = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/thing/object/*.h))
-SRC.THING = $(wildcard $(addprefix $(SRCDIR)/,plugins/mesh/thing/object/*.cpp))
-OBJ.THING = $(addprefix $(OUT)/,$(notdir $(SRC.THING:.cpp=$O)))
+DIR.THING = plugins/mesh/thing/object
+OUT.THING = $(OUT)/$(DIR.THING)
+INF.THING = $(SRCDIR)/$(DIR.THING)/thing.csplugin
+INC.THING = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.THING)/*.h))
+SRC.THING = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.THING)/*.cpp))
+OBJ.THING = $(addprefix $(OUT.THING)/,$(notdir $(SRC.THING:.cpp=$O)))
 DEP.THING = CSGEOM CSUTIL CSUTIL
+
+OUTDIRS += $(OUT.THING)
 
 MSVC.DSP += THING
 DSP.THING.NAME = thing
@@ -49,8 +51,12 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: thing thingclean
+.PHONY: thing thingclean thingcleandep
+
 thing: $(OUTDIRS) $(THING)
+
+$(OUT.THING)/%$O: $(SRCDIR)/$(DIR.THING)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(THING): $(OBJ.THING) $(LIB.THING)
 	$(DO.PLUGIN)
@@ -59,12 +65,16 @@ clean: thingclean
 thingclean:
 	-$(RMDIR) $(THING) $(OBJ.THING) $(OUTDLL)/$(notdir $(INF.THING))
 
+cleandep: thingcleandep
+thingcleandep:
+	-$(RM) $(OUT.THING)/thing.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/thing.dep
-$(OUTOS)/thing.dep: $(SRC.THING)
-	$(DO.DEP)
+dep: $(OUT.THING) $(OUT.THING)/thing.dep
+$(OUT.THING)/thing.dep: $(SRC.THING)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/thing.dep
+-include $(OUT.THING)/thing.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
