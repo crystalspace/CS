@@ -1452,7 +1452,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 
   float sqdistance = distance;
 
-  if (sqdistance < 0.01f) sqdistance = 0.01f;
+  //if (sqdistance < 0.01f) sqdistance = 0.01f;
 
   // This function calculates radiosity with linear light attenuation
   // because that is what CS uses internally as well.
@@ -1479,7 +1479,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 #endif
 
   //shoot_dest->AddDelta(shoot_src, src_uv, ruv, totalfactor, src_lumel_color);
-  if(totalfactor > 0.000001) 
+  //if(totalfactor > 0.000001) 
     shoot_dest->AddToDelta(ruv, delta_color * totalfactor * 1.);
 
   // specular gloss
