@@ -96,7 +96,6 @@ public:
   InfPortalCS () : csPortalCS () { lviews = NULL; }
   virtual bool Draw (csPolygon2D* new_clipper, csPlane* portal_plane, bool loose_end, csRenderView& rview);
   virtual csPolygon3D* FollowBeam (csVector3& start, csVector3& end, csPolygon3D* poly, float* sqdist);
-  virtual bool BlockingThings (csVector3& start, csVector3& end, csPolygon3D** poly);
   virtual void CalculateLighting (csLightView& lview);
 };
 

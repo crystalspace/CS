@@ -266,12 +266,6 @@ csPolygon3D* InfPortalCS::FollowBeam (csVector3& start, csVector3& end, csPolygo
   else return NULL;
 }
 
-bool InfPortalCS::BlockingThings (csVector3& start, csVector3& end, csPolygon3D** poly)
-{
-  if (GetSector ()) return csPortalCS::BlockingThings (start, end, poly);
-  else return false;
-}
-
 void InfPortalCS::CalculateLighting (csLightView& lview)
 {
   if (!GetSector ())
