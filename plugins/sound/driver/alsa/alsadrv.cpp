@@ -15,7 +15,6 @@
 	License along with this library; if not, write to the Free
 	Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "cssysdef.h"
 #include "alsadrv.h"
 #include "ivaria/reporter.h"
@@ -106,7 +105,8 @@ bool csSoundDriverALSA::AudioDevice::Open(int& frequency, bool& bit16, bool& ste
 
 
   /* Set sample rate. If the exact rate is not supported */
-  /* by the hardware, use nearest possible rate.         */ 
+  /* by the hardware, use nearest possible rate.         */
+#ifndef ALSA_PCM_OLD_HW_PARAMS_API
   if (snd_pcm_hw_params_set_rate_near(pcm_handle, hwparams, &rate, &dir) < 0)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
@@ -115,8 +115,11 @@ bool csSoundDriverALSA::AudioDevice::Open(int& frequency, bool& bit16, bool& ste
 	      frequency, pcm_name);
     return false;
   }
-
   if (rate != (unsigned int)frequency) 
+#else
+  rate = snd_pcm_hw_params_set_rate_near(pcm_handle, hwparams, frequency, &dir);
+  if (dir != 0)
+#endif
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_WARNING,
 	      "crystalspace.sound.alsa", 
