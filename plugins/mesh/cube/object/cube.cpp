@@ -374,15 +374,13 @@ int csCubeMeshObject::HitBeamBBox (const csVector3& start,
 bool csCubeMeshObject::HitBeamOutline (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr)
 {
-  if (HitBeamBBox (start, end, isect, pr) < 0) return true;
-  else return false;
+  return (HitBeamBBox (start, end, isect, pr) < 0) ? false : true;
 }
 
 bool csCubeMeshObject::HitBeamObject(const csVector3& start,
   const csVector3& end, csVector3& isect, float *pr)
 {
-  if (HitBeamBBox (start, end, isect, pr) < 0) return true;
-  else return false;
+  return (HitBeamBBox (start, end, isect, pr) < 0) ? false : true;
 }
 
 
