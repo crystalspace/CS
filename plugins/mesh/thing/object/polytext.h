@@ -235,7 +235,6 @@ public:
 class csPolyTexture : public iPolygonTexture
 {
   friend class csPolygon3D;
-  friend class csPolygon2D;
 
 public:
   /// Transformation from world to texture space.

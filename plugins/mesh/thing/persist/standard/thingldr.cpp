@@ -255,7 +255,7 @@ bool csThingLoader::ParseTextureMapping (
         len.x = 0;
         break;
       case XMLTOKEN_PLANE:
-	synldr->ReportError ("crystalspace.syntax.texture", child,
+	synldr->ReportError ("crystalspace.thingldr.texture", child,
                 "<plane> for <texmap> no longer supported! Use levtool -planes to convert map!");
         return false;
       case XMLTOKEN_UVSHIFT:
@@ -293,7 +293,7 @@ bool csThingLoader::ParseTextureMapping (
 	    case 1: idx2 = idx; uv2.x = x; uv2.y = y; break;
 	    case 2: idx3 = idx; uv3.x = x; uv3.y = y; break;
 	    default:
-              synldr->ReportError ("crystalspace.syntax.texture", child,
+              synldr->ReportError ("crystalspace.thingldr.texture", child,
                 "Too many <uv> nodes inside <texmap>! Only 3 allowed");
 	      return false;
 	  }
@@ -310,14 +310,14 @@ bool csThingLoader::ParseTextureMapping (
   {
     if (!len.y)
     {
-      synldr->ReportError ("crystalspace.syntax.texture", node,
+      synldr->ReportError ("crystalspace.thingldr.texture", node,
         "Bad texture specification for polygon '%s'", polyname);
       len.y = 1;
       return false;
     }
     if (!len.z)
     {
-      synldr->ReportError ("crystalspace.syntax.texture", node,
+      synldr->ReportError ("crystalspace.thingldr.texture", node,
         "Bad texture specification for polygon '%s'", polyname);
       len.z = 1;
       return false;
@@ -327,7 +327,7 @@ bool csThingLoader::ParseTextureMapping (
   {
     if (!len.y)
     {
-      synldr->ReportError ("crystalspace.syntax.texture", node,
+      synldr->ReportError ("crystalspace.thingldr.texture", node,
         "Bad texture specification for polygon '%s'", polyname);
       len.y = 1;
       return false;
@@ -400,7 +400,7 @@ bool csThingLoader::ParsePortal (
   }
   if (destSector->Length () == 0)
   {
-    synldr->ReportError ("crystalspace.syntax.portal", node,
+    synldr->ReportError ("crystalspace.thingldr.portal", node,
       "Missing sector in portal!");
     return false;
   }
@@ -432,8 +432,8 @@ bool csThingLoader::ParsePoly3d (
   }
 
   CS_ASSERT (thing_type != 0);
-  csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (
-  	thing_type, iThingEnvironment));
+  csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (
+  	thing_type, iThingEnvironment);
 
   uint texspec = 0;
   int tx_uv_i1 = 0;
@@ -470,7 +470,7 @@ bool csThingLoader::ParsePoly3d (
         mat = ldr_context->FindMaterial (child->GetContentsValue ());
         if (mat == 0)
         {
-          synldr->ReportError ("crystalspace.syntax.polygon", child,
+          synldr->ReportError ("crystalspace.thingldr.polygon", child,
             "Couldn't find material named '%s'!", child->GetContentsValue ());
           return false;
         }
@@ -484,12 +484,6 @@ bool csThingLoader::ParsePoly3d (
           poly3d->GetFlags ().Set (CS_POLY_LIGHTING,
 	  	do_lighting ? CS_POLY_LIGHTING : 0);
         }
-        break;
-      case XMLTOKEN_ALPHA:
-        poly3d->SetAlpha (child->GetContentsValueAsInt () * 655 / 256);
-	// Disable vis culling for alpha objects.
-	if (!set_viscull) set_viscull = -1;
-	if_portal_delete_polygon = false;
         break;
       case XMLTOKEN_VISCULL:
         {
@@ -514,7 +508,7 @@ bool csThingLoader::ParsePoly3d (
 	{
 	  // If we don't have a mesh then we can't correctly define
 	  // portals.
-	  synldr->ReportError ("crystalspace.syntax.polygon", child,
+	  synldr->ReportError ("crystalspace.thingldr.polygon", child,
 	    "Internal error! Mesh wrapper is missing for loading a portal!");
 	  return false;
 	}
@@ -560,21 +554,17 @@ bool csThingLoader::ParsePoly3d (
 	  poly3d->EnableTextureMapping (shading);
 	}
         break;
-      case XMLTOKEN_MIXMODE:
-        {
-          uint mixmode;
-	  if (synldr->ParseMixmode (child, mixmode))
-	  {
-	    if (poly3d->IsTextureMappingEnabled ())
-	    {
-              poly3d->SetMixMode (mixmode);
-	      if (mixmode & CS_FX_MASK_ALPHA)
-	        poly3d->SetAlpha (mixmode & CS_FX_MASK_ALPHA);
-	      if_portal_delete_polygon = false;
-	    }
-	  }
-	}
+      case XMLTOKEN_ALPHA:
+	synldr->ReportError (
+	  "crystalspace.thingldr.polygon",
+	  child, "<alpha> for polygons is no longer supported! Use <mixmode> for the entire mesh instead!");
+	return false;
         break;
+      case XMLTOKEN_MIXMODE:
+	synldr->ReportError (
+	  "crystalspace.thingldr.polygon",
+	  child, "<mixmode> for polygons is no longer supported! Use <mixmode> for the entire mesh instead!");
+	return false;
       default:
         synldr->ReportBadToken (child);
         return false;
@@ -583,7 +573,7 @@ bool csThingLoader::ParsePoly3d (
 
   if (poly3d->GetVertexCount () < 3)
   {
-    synldr->ReportError ("crystalspace.syntax.polygon", node,
+    synldr->ReportError ("crystalspace.thingldr.polygon", node,
       "Polygon '%s' contains just %d vertices!",
       poly3d->GetName(),
       poly3d->GetVertexCount ());
@@ -619,19 +609,19 @@ bool csThingLoader::ParsePoly3d (
   {
     if (tx_uv_i1 > poly3d->GetVertexCount())
     {
-        synldr->ReportError ("crystalspace.syntax.polygon", node,
+        synldr->ReportError ("crystalspace.thingldr.polygon", node,
 	  "Bad texture specification: vertex index 1 doesn't exist!");
 	return false;
     }
     if (tx_uv_i2 > poly3d->GetVertexCount())
     {
-        synldr->ReportError ("crystalspace.syntax.polygon", node,
+        synldr->ReportError ("crystalspace.thingldr.polygon", node,
 	  "Bad texture specification: vertex index 2 doesn't exist!");
 	return false;
     }
     if (tx_uv_i3 > poly3d->GetVertexCount())
     {
-        synldr->ReportError ("crystalspace.syntax.polygon", node,
+        synldr->ReportError ("crystalspace.thingldr.polygon", node,
 	  "Bad texture specification: vertex index 3 doesn't exist!");
 	return false;
     }
@@ -646,13 +636,13 @@ bool csThingLoader::ParsePoly3d (
     {
       if ((tx1-tx_orig) < SMALL_EPSILON)
       {
-        synldr->ReportError ("crystalspace.syntax.polygon", node,
+        synldr->ReportError ("crystalspace.thingldr.polygon", node,
           "Bad texture specification!");
 	return false;
       }
       else if ((tx2-tx_orig) < SMALL_EPSILON)
       {
-        synldr->ReportError ("crystalspace.syntax.polygon", node,
+        synldr->ReportError ("crystalspace.thingldr.polygon", node,
           "Bad texture specification!");
 	return false;
       }
@@ -662,7 +652,7 @@ bool csThingLoader::ParsePoly3d (
     {
       if ((tx1-tx_orig) < SMALL_EPSILON)
       {
-        synldr->ReportError ("crystalspace.syntax.polygon", node,
+        synldr->ReportError ("crystalspace.thingldr.polygon", node,
           "Bad texture specification!");
 	return false;
       }
@@ -861,6 +851,9 @@ if (!info.thing_fact_state) \
 	iThingState); \
 }
 
+  uint mixmode = CS_FX_COPY;
+  csArray<int> polygons_to_delete;
+
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
   {
@@ -1019,12 +1012,17 @@ Nag to Jorrit about this feature if you want it.");
 	  			    engine, poly3d,
 				    info.default_texlen, info.thing_fact_state,
 				    vt_offset, poly_delete, mesh);
-	  if (poly_delete || !success)
+	  if (!success)
 	  {
 	    info.thing_fact_state->RemovePolygon (
 	      info.thing_fact_state->FindPolygonIndex (poly3d));
+	    return false;
 	  }
-	  if (!success) return false;
+	  if (poly_delete)
+	  {
+	    polygons_to_delete.Push (
+	    	info.thing_fact_state->FindPolygonIndex (poly3d));
+	  }
         }
         break;
 
@@ -1063,16 +1061,43 @@ Nag to Jorrit about this feature if you want it.");
 	CREATE_FACTORY_IF_NEEDED;
 	info.thing_fact_state->SetSmoothingFlag (true);
 	break;
+
+      case XMLTOKEN_MIXMODE:
+        CHECK_TOPLEVEL("mixmode");
+        CHECK_OBJECTONLY("mixmode");
+        {
+	  if (synldr->ParseMixmode (child, mixmode))
+	  {
+            info.thing_state->SetMixMode (mixmode);
+	  }
+	}
+        break;
+
       default:
         synldr->ReportBadToken (child);
 	return false;
     }
   }
 
-  if (!info.thing_fact_state) {
+  if (!info.thing_fact_state)
+  {
     synldr->ReportError ("crystalspace.thingloader.loadpart",
 	node, "No Vertex or face in params node found.");
     return false;
+  }
+ 
+  if (mixmode == CS_FX_COPY)
+  {
+    // Mixmode is copy, delete all polygons that became portals.
+    int i;
+    for (i = polygons_to_delete.Length ()-1 ; i >= 0 ; i--)
+      info.thing_fact_state->RemovePolygon (polygons_to_delete[i]);
+    if (info.thing_fact_state->GetPolygonCount () == 0)
+    {
+      synldr->ReportError ("crystalspace.thingloader.loadpart",
+	node, "No more polygons left after converting to portals! This is not supported!");
+      return false;
+    }
   }
 
   return true;

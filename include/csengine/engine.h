@@ -401,11 +401,6 @@ private:
   /// Pointer to radiosity system if we are in step-by-step radiosity mode.
   //csRadiosity* rad_debug;
 
-  /// Default fastmesh thresshold.
-  int default_fastmesh_thresshold;
-  /// Fastmesh thresshold.
-  int fastmesh_thresshold;
-
   /// Clear the Z-buffer every frame.
   bool clear_zbuf;
 
@@ -677,11 +672,6 @@ public:
   virtual void SetLightingCacheMode (int mode) { lightcache_mode = mode; }
   /// Get the mode for the lighting cache.
   virtual int GetLightingCacheMode () { return lightcache_mode; }
-
-  /// Set the fastmesh thresshold.
-  virtual void SetFastMeshThresshold (int th) { fastmesh_thresshold = th; }
-  /// Get the fastmesh thresshold.
-  virtual int GetFastMeshThresshold () const { return fastmesh_thresshold; }
 
   /// Set clear z buffer flag
   virtual void SetClearZBuf (bool yesno)

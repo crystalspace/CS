@@ -110,16 +110,6 @@ struct iPolygon3DStatic : public iBase
   /// Create a polygon vertex and add it to parent object
   virtual int CreateVertex (const csVector3 &iVertex) = 0;
 
-  /// Get the alpha transparency value for this polygon.
-  virtual int GetAlpha () = 0;
-  /**
-   * Set the alpha transparency value for this polygon.
-   * Not all renderers support all possible values. 0, 25, 50,
-   * 75, and 100 will always work but other values may give
-   * only the closest possible to one of the above.
-   */
-  virtual void SetAlpha (int iAlpha) = 0;
-
   /// Create a private polygon texture mapping plane
   virtual void CreatePlane (const csVector3 &iOrigin,
     const csMatrix3 &iMatrix) = 0;
@@ -198,11 +188,6 @@ struct iPolygon3DStatic : public iBase
    */
   virtual bool IsTransparent () = 0;
 
-  /// Sets the mode that is used for drawing.
-  virtual void SetMixMode (uint m) = 0;
-  /// Gets the mode that is used for drawing.
-  virtual uint GetMixMode () = 0;
-
   /**
    * Intersect object-space segment with this polygon. Return
    * true if it intersects and the intersection point in object coordinates.
@@ -276,8 +261,6 @@ struct iPolygon3D : public iBase
 
   /// Get the given polygon vertex coordinates in world space
   virtual const csVector3 &GetVertexW (int idx) const = 0;
-  /// Get the given polygon vertex coordinates in camera space
-  virtual const csVector3 &GetVertexC (int idx) const = 0;
 
   /// Get world space plane.
   virtual const csPlane3& GetWorldPlane () = 0;

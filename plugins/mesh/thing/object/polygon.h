@@ -34,7 +34,6 @@
 class csFrustumView;
 class csFrustumContext;
 class csPolyTxtPlane;
-class csPolygon2D;
 class csPolygon3D;
 class csLightMap;
 class csLightPatch;
@@ -109,21 +108,6 @@ private:
   //csLightMapMapping* mapping;
   csPolyLightMapMapping* mapping;
   csPolyTextureMapping* tmapping;
-
-  /**
-   * 0 is no alpha, 25 is 25% see through and 75% texture and so on.
-   * Valid values are from 0 to 100; some renderers in some modes will
-   * approximate it (and some values like 25/50/75 are optimized for speed).
-   * Note that alpha is in range 0..255, 0 for 0% and 255 for 100%.
-   */
-  uint16 Alpha;
-
-  /**
-   * MixMode to use for drawing this polygon (plus alpha value
-   * which is stored separately). The GetMixMode() function will
-   * overlap both variables to get one compound value.
-   */
-  uint MixMode;
 
   /**
    * Return twice the signed area of the polygon in world space coordinates
@@ -505,37 +489,8 @@ public:
    */
   bool PointOnPolygon (const csVector3& v);
 
-  /// Get the alpha transparency value for this polygon.
-  int GetAlpha () const
-  {
-    return Alpha;
-  }
-
-  /**
-   * Set the alpha transparency value for this polygon.
-   * Not all renderers support all possible values. 0, 25, 50,
-   * 75, and 100 will always work but other values may give
-   * only the closest possible to one of the above.
-   */
-  void SetAlpha (int alpha)
-  {
-    Alpha = (uint16) alpha;
-  }
-
   /// Get the material handle for the texture manager.
   iMaterialHandle *GetMaterialHandle ();
-
-  /// Sets the mode that is used for DrawPolygonFX.
-  void SetMixMode (uint m)
-  {
-    MixMode = m & ~CS_FX_MASK_ALPHA;
-  }
-
-  /// Gets the mode that is used for DrawPolygonFX.
-  uint GetMixMode () const
-  {
-    return (MixMode | Alpha);
-  }
 
   /// Make a clone of this static polygon.
   csPolygon3DStatic* Clone ();
@@ -573,11 +528,6 @@ public:
     { return scfParent->AddVertex (idx); }
     virtual int CreateVertex (const csVector3 &vertex)
     { return scfParent->AddVertex (vertex); }
-
-    virtual int GetAlpha ()
-    { return scfParent->GetAlpha (); }
-    virtual void SetAlpha (int iAlpha)
-    { scfParent->SetAlpha (iAlpha); }
 
     virtual void CreatePlane (const csVector3 &origin,
       const csMatrix3 &matrix);
@@ -632,14 +582,6 @@ public:
     virtual bool IsTransparent ()
     {
       return scfParent->IsTransparent ();
-    }
-    virtual void SetMixMode (uint m)
-    {
-      scfParent->SetMixMode (m);
-    }
-    virtual uint GetMixMode ()
-    {
-      return scfParent->GetMixMode ();
     }
     virtual bool IntersectSegment (const csVector3& start, const csVector3& end,
                           csVector3& isect, float* pr = 0)
@@ -819,24 +761,6 @@ public:
   { return thing->Vwor (static_data->vertices.GetVertexIndices ()[idx]); }
 
   /**
-   * 'idx' is a local index into the vertices table of the polygon.
-   * This index is translated to the index in the parent container and
-   * a reference to the vertex in camera-space is returned.
-   */
-  const csVector3& Vcam (int idx) const
-  { return thing->Vcam (static_data->vertices.GetVertexIndices ()[idx]); }
-
-  /**
-   * Before calling a series of Vcam() you should call
-   * UpdateTransformation() first to make sure that the camera vertex set
-   * is up-to-date.
-   */
-  void UpdateTransformation (const csTransform& c, long cam_cameranr)
-  {
-    thing->UpdateTransformation (c, cam_cameranr);
-  }
-
-  /**
    * Before calling a series of Vwor() you should call
    * WorUpdate() first to make sure that the world vertex set
    * is up-to-date.
@@ -870,14 +794,6 @@ public:
    * Get the list of light patches for this polygon.
    */
   csLightPatch* GetLightpatches () { return lightpatches; }
-
-  /**
-   * Clip a polygon against a plane (in camera space).
-   * The plane is defined as going through v1, v2, and (0,0,0).
-   * The 'verts' array is modified and 'num' is also modified if needed.
-   */
-  void ClipPolyPlane (csVector3* verts, int* num, bool mirror,
-  	csVector3& v1, csVector3& v2);
 
   /**
    * Initialize the lightmaps for this polygon.
@@ -979,40 +895,6 @@ public:
    */
   void ObjectToWorld (const csReversibleTransform& t, const csVector3& vwor);
 
-  /**
-   * Clip this camera space polygon to the given plane. 'plane' can be 0
-   * in which case no clipping happens.<p>
-   *
-   * If this function returns false then the polygon is not visible (backface
-   * culling, no visible vertices, ...) and 'verts' will be 0. Otherwise
-   * this function will return true and 'verts' will point to the new
-   * clipped polygon (this is a pointer to a static table of vertices.
-   * WARNING! Because of this you cannot do new ClipToPlane calls until
-   * you have processed the 'verts' array!).<p>
-   *
-   * If 'cw' is true the polygon has to be oriented clockwise in order to be
-   * visible. Otherwise it is the other way around.
-   */
-  bool ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
-  	csVector3*& pverts, int& num_verts, bool cw = true);
-
-  /**
-   * This is the link between csPolygon3D and csPolygon2D (see below for
-   * more info about csPolygon2D). It should be used after the parent
-   * container has been transformed from world to camera space.
-   * It will fill the given csPolygon2D with a perspective corrected
-   * polygon that is also clipped to the view plane (Z=SMALL_Z).
-   * If all vertices are behind the view plane the polygon will not
-   * be visible and it will return false.
-   * 'do_perspective' will also do back-face culling and returns false
-   * if the polygon is not visible because of this.
-   * If the polygon is deemed to be visible it will return true.
-   */
-  bool DoPerspective (csVector3* source,
-  	int num_verts, csPolygon2D* dest, bool mirror,
-	int fov, float shift_x, float shift_y,
-	const csPlane3& plane_cam);
-
   SCF_DECLARE_IBASE;
 
   //------------------- iPolygon3D interface implementation -------------------
@@ -1039,8 +921,6 @@ public:
     }
     virtual const csVector3 &GetVertexW (int idx) const
     { return scfParent->Vwor (idx); }
-    virtual const csVector3 &GetVertexC (int idx) const
-    { return scfParent->Vcam (idx); }
 
     virtual const csPlane3& GetWorldPlane ()
     {

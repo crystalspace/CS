@@ -559,17 +559,6 @@ struct iEngine : public iBase
   virtual int GetLightingCacheMode () = 0;
 
   /**
-   * Set the thresshold (in number of polygons) after which the thing
-   * mesh plugin will automatically switch to FASTMESH mode.
-   * \param th If the number
-   * of polygons is greater or equal compared to this thresshold then
-   * CS_THING_FASTMESH will be made default. 500 is the default.
-   */
-  virtual void SetFastMeshThresshold (int th) = 0;
-  /// Get the fastmesh thresshold.
-  virtual int GetFastMeshThresshold () const = 0;
-
-  /**
    * Require that the Z-buffer is cleared every frame. The engine
    * itself will not use this setting but will only return the
    * correct flag in GetBeginDrawFlags() so that the Z-buffer is actually

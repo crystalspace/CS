@@ -9,6 +9,24 @@ chronological order.
 8-Oct-2003
 	- Jorrit fixed keycolor rendering in the old OpenGL renderer in case
 	  DrawPolygonMesh was used (fastmesh).
+	- Jorrit added support for setting global mixmode on a thing (only
+	  for objects). Extended iThingState with SetMixMode() and GetMixMode().
+	  Also extended the thingloader with a new <mixmode> keyword.
+	- Jorrit removed support for setting mixmode and alpha for individual
+	  polygons. It is now only possible to set this on the entire mesh.
+	  So if you need a transparent polygon then you have to make it
+	  a seperate mesh.
+	- Jorrit fixed alpha support with DrawPolygonMesh by doing the above
+	  change. However, the alpha is still to dark in combination with
+	  a lightmap. The old OpenGL renderer still needs fixing for that.
+	- Jorrit removed support for individual polygon drawing in thing.
+	  This greatly cleans up thing. The fastmesh thresshold flag has
+	  been removed too as this no longer makes sense: all thing meshes
+	  are fastmesh now.
+	- Jorrit removed csPolygon2D in thing mesh plugin completely. This
+	  class is no longer needed.
+	- Jorrit removed support for getting camera vertices from iThingState
+	  and iPolygon3D (GetVertexC() function).
 7-Oct-2003
 	- Jorrit changed the main loader for portals:
 	    - New <portals> statement that can group several portals and

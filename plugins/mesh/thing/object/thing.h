@@ -54,8 +54,6 @@ class csThing;
 class csThingStatic;
 class csThingObjectType;
 class csPolygon3D;
-class csPolygon2D;
-class csPoly2DPool;
 class csLightPatchPool;
 class csPolyTexLightMap;
 struct iShadowBlockList;
@@ -471,7 +469,7 @@ public:
   iRenderBuffer *GetRenderBuffer (csStringID name);
 
   void FillRenderMeshes (csDirtyAccessArray<csRenderMesh*>& rmeshes,
-    const csArray<RepMaterial>& repMaterials);
+    const csArray<RepMaterial>& repMaterials, uint mixmode);
 #endif
 
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
@@ -513,13 +511,6 @@ private:
    * case this is a thing that never moves.
    */
   csVector3* wor_verts;
-  /// Vertices in camera space.
-  csVector3* cam_verts;
-  /// Number of vertices for cam_verts.
-  int num_cam_verts;
-
-  /// Camera number for which the above camera vertices are valid.
-  long cameranr;
 
   /**
    * This number indicates the last value of the movable number.
@@ -601,6 +592,9 @@ private:
   void ClearRenderMeshes ();
 #endif
 
+  // Mixmode for rendering.
+  uint mixmode;
+
   /// A group of polys that share the same material.
   struct csPolyGroup
   {
@@ -625,15 +619,6 @@ private:
   void ClearLMs ();
   void UpdateDirtyLMs ();
 
-public:
-  /**
-   * How many times are we busy drawing this thing (recursive).
-   * This is an important variable as it indicates to
-   * 'new_transformation' which set of camera vertices it should
-   * use.
-   */
-  int draw_busy;
-
 private:
   /**
    * Prepare the polygon buffer for use by DrawPolygonMesh.
@@ -657,21 +642,6 @@ private:
    */
   void DrawPolygonArrayDPM (iRenderView* rview, iMovable* movable,
   	csZBufMode zMode);
-
-  /**
-   * Draw the given array of polygons.
-   */
-  void DrawPolygonArray (const csReversibleTransform& t,
-	iRenderView* rview, csZBufMode zMode);
-
-  /**
-   * Draw one 3D/2D polygon combination. The 2D polygon is the transformed
-   * and clipped version of the 3D polygon.
-   * 't' is the movable transform.
-   */
-  static void DrawOnePolygon (csPolygon3D* p, csPolygon2D* poly,
-	const csReversibleTransform& t,
-	iRenderView* d, csZBufMode zMode, const csPlane3& camera_plane);
 
   /// Generate a cachename based on geometry.
   char* GenerateCacheName ();  
@@ -698,13 +668,6 @@ public:
    * possible that this coordinate will not be valid.
    */
   const csVector3& Vwor (int idx) const { return wor_verts[idx]; }
-
-  /**
-   * Return the camera space vector for the vertex.
-   * Make sure you recently called UpdateTransformation(). Otherwise it is
-   * possible that this coordinate will not be valid.
-   */
-  const csVector3& Vcam (int idx) const { return cam_verts[idx]; }
 
   //----------------------------------------------------------------------
   // Polygon handling functions
@@ -872,21 +835,8 @@ public:
   // Transformation
   //----------------------------------------------------------------------
 
-  /**
-   * Transform to the given camera if needed. This function will use
-   * the camera number to avoid unneeded transformation.
-   */
-  void UpdateTransformation (const csTransform& c, long cam_cameranr);
-
   /// Make sure the world vertices are up-to-date.
   void WorUpdate ();
-
-  /// Get the array of camera vertices.
-  csVector3* GetCameraVertices (const csTransform& c, long cam_cameranr)
-  {
-    UpdateTransformation (c, cam_cameranr);
-    return cam_verts;
-  }
 
   //----------------------------------------------------------------------
   // Various
@@ -930,6 +880,15 @@ public:
   void StaticLightChanged (iStatLight* statlight);
   void StaticLightDisconnect (iStatLight* statlight);
 
+  void SetMixMode (uint mode)
+  {
+    mixmode = mode;
+  }
+  uint GetMixMode () const
+  {
+    return mixmode;
+  }
+
   SCF_DECLARE_IBASE;
 
   //------------------------- iThingState interface -------------------------
@@ -951,10 +910,6 @@ public:
     { return scfParent->wor_verts[i]; }
     virtual const csVector3* GetVerticesW () const
     { return scfParent->wor_verts; }
-    virtual const csVector3 &GetVertexC (int i) const
-    { return scfParent->cam_verts[i]; }
-    virtual const csVector3* GetVerticesC () const
-    { return scfParent->cam_verts; }
 
     virtual int GetMovingOption () const
     { return scfParent->GetMovingOption (); }
@@ -965,8 +920,7 @@ public:
     virtual void Prepare ()
     {
       scfParent->Prepare ();
-      if (scfParent->static_data->flags.Check (CS_THING_FASTMESH))
-        scfParent->PreparePolygonBuffer ();
+      scfParent->PreparePolygonBuffer ();
     }
 
     /// Unprepare.
@@ -983,6 +937,14 @@ public:
     virtual void ClearReplacedMaterials ()
     {
       scfParent->ClearReplacedMaterials ();
+    }
+    virtual void SetMixMode (uint mode)
+    {
+      scfParent->SetMixMode (mode);
+    }
+    virtual uint GetMixMode () const
+    {
+      return scfParent->GetMixMode ();
     }
   } scfiThingState;
   friend struct ThingState;
@@ -1127,8 +1089,6 @@ public:
    * are destructed they actually refer to G3D to clear the cache.
    */
   csRef<iGraphics3D> G3D;
-  /// An object pool for 2D polygons used by the rendering process.
-  csPoly2DPool* render_pol2d_pool;
   /// An object pool for lightpatches.
   csLightPatchPool* lightpatch_pool;
 

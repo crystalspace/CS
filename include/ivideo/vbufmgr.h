@@ -113,11 +113,11 @@ struct iPolygonBuffer : public iBase
   /**
    * Gets the number of vertices.
    */
-  virtual int iPolygonBuffer::GetVertexCount () const = 0;
+  virtual int GetVertexCount () const = 0;
   /**
    * Gets the array of vertices.  	
    */
-  virtual csVector3* iPolygonBuffer::GetVertices () const = 0;
+  virtual csVector3* GetVertices () const = 0;
   /**
    * Add a material.
    */

@@ -22,7 +22,6 @@
 #include "qint.h"
 #include "thing.h"
 #include "polygon.h"
-#include "pol2d.h"
 #include "polytext.h"
 #include "lppool.h"
 #include "csgeom/polypool.h"
@@ -209,15 +208,6 @@ void csThingStatic::Prepare ()
   {
     prepared = true;
 
-    if (thing_type->engine)
-    {
-      if (static_polygons.Length () >= thing_type->engine->
-    	  GetFastMeshThresshold ())
-      {
-	flags.Set (CS_THING_FASTMESH);
-      }
-    }
-
     if (!flags.Check (CS_THING_NOCOMPRESS))
     {
       CompressVertices ();
@@ -300,6 +290,7 @@ void csThingStatic::PrepareLMLayout ()
       int lmw = (csLightMap::CalcLightMapWidth (lm->GetOriginalWidth ()));
       int lmh = (csLightMap::CalcLightMapHeight (lm->GetHeight ()));
       lp->totalLumels += lmw * lmh;
+//printf ("lmw*lmh=%d\n", lmw*lmh); fflush (stdout);
     }
 
     lp->polys.Push (polyIdx);
@@ -1013,7 +1004,8 @@ iRenderBuffer* csThingStatic::GetRenderBuffer (csStringID name)
 
 void csThingStatic::FillRenderMeshes (
 	csDirtyAccessArray<csRenderMesh*>& rmeshes,
-	const csArray<RepMaterial>& repMaterials)
+	const csArray<RepMaterial>& repMaterials,
+	uint mixmode)
 {
   polyRenderers.DeleteAll ();
 
@@ -1075,7 +1067,7 @@ void csThingStatic::FillRenderMeshes (
 
     rm->buffersource = this;
     rm->z_buf_mode = CS_ZBUF_USE;
-    rm->mixmode = CS_FX_COPY; 
+    rm->mixmode = mixmode; 
     rm->material = pg.material;
     //rm->meshtype = CS_MESHTYPE_TRIANGLES;
     rm->meshtype = CS_MESHTYPE_POLYGON;
@@ -1210,17 +1202,14 @@ csThing::csThing (iBase *parent, csThingStatic* static_data) :
   logparent = 0;
 
   wor_verts = 0;
-  cam_verts = 0;
-  num_cam_verts = 0;
-
-  draw_busy = 0;
 
   dynamic_ambient.Set (0,0,0);
   light_version = 1;
 
+  mixmode = CS_FX_COPY;
+
   ParentTemplate = 0;
 
-  cameranr = -1;
   movablenr = -1;
   wor_bbox_movablenr = -1;
   cached_movable = 0;
@@ -1254,8 +1243,6 @@ csThing::~csThing ()
   {
     delete[] wor_verts;
   }
-
-  delete[] cam_verts;
 
   polygons.FreeAll ();
 
@@ -1427,32 +1414,8 @@ void csThing::WorUpdate ()
             p->ObjectToWorld (movtrans, p->Vwor (0));
           }
 	}
-
-        // If the movable changed we invalidate the camera number as well
-        // to make sure the camera vertices are recalculated as well.
-        cameranr--;
       }
       break;
-  }
-}
-
-void csThing::UpdateTransformation (const csTransform &c, long cam_cameranr)
-{
-  if (!cam_verts || static_data->num_vertices != num_cam_verts)
-  {
-    delete[] cam_verts;
-    cam_verts = new csVector3[static_data->num_vertices];
-    num_cam_verts = static_data->num_vertices;
-    cameranr = cam_cameranr - 1;  // To make sure we will transform.
-  }
-
-  if (cameranr != cam_cameranr)
-  {
-    cameranr = cam_cameranr;
-
-    int i;
-    for (i = 0; i < static_data->num_vertices; i++)
-      cam_verts[i] = c.Other2This (wor_verts[i]);
   }
 }
 
@@ -1656,86 +1619,6 @@ bool csThing::HitBeamObject (const csVector3& start,
   return true;
 }
 
-void csThing::DrawOnePolygon (
-  csPolygon3D *p,
-  csPolygon2D *poly,
-  const csReversibleTransform& t,
-  iRenderView *d,
-  csZBufMode zMode,
-  const csPlane3& camera_plane)
-{
-  if (d->AddedFogInfo ())
-  {
-    // If fog info was added then we are dealing with vertex fog and
-    // the current sector has fog. This means we have to complete the
-    // fog_info structure with the plane of the current polygon.
-    d->GetFirstFogInfo ()->outgoing_plane = camera_plane;
-  }
-
-  poly->DrawFilled (d, p, camera_plane, zMode);
-}
-
-void csThing::DrawPolygonArray (
-  const csReversibleTransform& t,
-  iRenderView *d,
-  csZBufMode zMode)
-{
-  csPolygon3D *p;
-  csVector3 *verts;
-  int num_verts;
-  int i;
-  //@@@@ TOO MANY POINTERS:
-  csPoly2DPool *render_pool = static_data->thing_type->render_pol2d_pool;
-  csPolygon2D *clip;
-  iCamera *icam = d->GetCamera ();
-  const csReversibleTransform &camtrans = icam->GetTransform ();
-
-  // Setup clip and far plane.
-  csPlane3 clip_plane, *pclip_plane;
-  bool do_clip_plane = d->GetClipPlane (clip_plane);
-  if (do_clip_plane)
-    pclip_plane = &clip_plane;
-  else
-    pclip_plane = 0;
-
-  csPlane3 *plclip = icam->GetFarPlane ();
-  bool mirrored = icam->IsMirrored ();
-  int fov = icam->GetFOV ();
-  float shift_x = icam->GetShiftX ();
-  float shift_y = icam->GetShiftY ();
-
-  for (i = 0; i < polygons.Length (); i++)
-  {
-    p = polygons[i];
-    p->UpdateTransformation (camtrans, icam->GetCameraNumber ());
-    if (p->ClipToPlane (pclip_plane, camtrans.GetOrigin (), verts, num_verts))  //@@@Pool for verts?
-    {
-      // The far plane is defined negative. So if the polygon is entirely
-      // in front of the far plane it is not visible. Otherwise we will render
-      // it.
-      if (
-        !plclip ||
-        csPoly3D::Classify (*plclip, verts, num_verts) != CS_POL_FRONT)
-      {
-        clip = (csPolygon2D *) (render_pool->Alloc ());
-	csPlane3 plane_cam;
-        p->WorldToCameraPlane (camtrans, verts[0], plane_cam);
-        if (
-          p->DoPerspective (
-              verts, num_verts,
-              clip, mirrored, fov, shift_x, shift_y,
-	      plane_cam) &&
-          clip->ClipAgainst (d->GetClipper ()))
-        {
-          DrawOnePolygon (p, clip, t, d, zMode, plane_cam);
-        }
-
-        render_pool->Free (clip);
-      }
-    }
-  }
-}
-
 struct MatPol
 {
   iMaterialWrapper *mat;
@@ -1800,6 +1683,7 @@ void csThing::PreparePolygonBuffer ()
 	verts.Push (vnum);
       }
 
+//printf ("i=%d j=%d lm=%p\n", i, j, litPolys[i]->lightmaps[j]); fflush (stdout);
       polybuf->AddPolygon (spoly->GetVertexCount (), verts.GetArray (), 
 	tmapping, mapping, 
 	spoly->GetObjectPlane (), 
@@ -1890,7 +1774,7 @@ void csThing::DrawPolygonArrayDPM (
   mesh.do_mirror = icam->IsMirrored ();
   mesh.vertex_mode = G3DPolygonMesh::VM_WORLDSPACE;
   mesh.vertex_fog = 0;
-  mesh.mixmode = CS_FX_COPY;
+  mesh.mixmode = mixmode;
 
   rview->CalculateFogMesh(tr_o2c,mesh);
   rview->GetGraphics3D ()->DrawPolygonMesh (mesh);
@@ -2191,29 +2075,11 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
 
 bool csThing::Draw (iRenderView *rview, iMovable *movable, csZBufMode zMode)
 {
-  iCamera *icam = rview->GetCamera ();
-  const csReversibleTransform &camtrans = icam->GetTransform ();
-
-  draw_busy++;
-
   PrepareLMs ();
   UpdateDirtyLMs ();
 
-  if (static_data->flags.Check (CS_THING_FASTMESH))
-    DrawPolygonArrayDPM (
-      rview,
-      movable,
-      zMode);
-  else
-  {
-    UpdateTransformation (camtrans, icam->GetCameraNumber ());
-    DrawPolygonArray (
-      movable->GetTransform (),
-      rview,
-      zMode);
-  }
+  DrawPolygonArrayDPM (rview, movable, zMode);
 
-  draw_busy--;
   return true;                                  // @@@@ RETURN correct vis info
 }
 
@@ -2227,8 +2093,6 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
   WorUpdate ();
 
   int i;
-
-  draw_busy++;
 
   iFrustumViewUserdata* fvud = lview->GetUserdata ();
   iLightingProcessInfo* lpi = (iLightingProcessInfo*)fvud;
@@ -2266,8 +2130,6 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
     else
       poly->CalculateLightingStatic (lview, movable, lptq, true);
   }
-
-  draw_busy--;
 }
 
 void csThing::InitializeDefault (bool clear)
@@ -2387,7 +2249,7 @@ void csThing::Merge (csThing *other)
 
 void csThing::PrepareRenderMeshes ()
 {
-  static_data->FillRenderMeshes (renderMeshes, replace_materials);
+  static_data->FillRenderMeshes (renderMeshes, replace_materials, mixmode);
   int i;
   materials_to_visit.DeleteAll ();
   for (i = 0 ; i < renderMeshes.Length () ; i++)
@@ -2451,6 +2313,7 @@ void csThing::PrepareLMs ()
   int i;
   for (i = 0; i < static_data->litPolys.Length(); i++)
   {
+//printf ("PrepareLMs i=%d\n", i); fflush (stdout);
     const csThingStatic::csStaticLitPolyGroup& slpg = 
       *(static_data->litPolys[i]);
 
@@ -2461,7 +2324,7 @@ void csThing::PrepareLMs ()
     if (!pgSLM.slmCreated)
     {
       pgSLM.SLM = txtmgr->CreateSuperLightmap (slpg.staticSLM->width, 
-        slpg.staticSLM->height);;
+        slpg.staticSLM->height);
       pgSLM.slmCreated = true;
       superLMs.Put (slpg.staticSLM, pgSLM);
     }
@@ -2491,6 +2354,7 @@ void csThing::PrepareLMs ()
       int j;
       for (j = 0; j < slpg.polys.Length(); j++)
       {
+//printf ("    PrepareLMs j=%d\n", j); fflush (stdout);
 	csPolygon3D* poly = polygons[slpg.polys[j]];
 
 	lpg->polys.Push (poly);
@@ -2630,13 +2494,11 @@ csThingObjectType::csThingObjectType (iBase *pParent) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiConfig);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
   lightpatch_pool = 0;
-  render_pol2d_pool = 0;
   do_verbose = false;
 }
 
 csThingObjectType::~csThingObjectType ()
 {
-  delete render_pol2d_pool;
   delete lightpatch_pool;
 }
 
@@ -2649,7 +2511,6 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
   G3D = g;
 
   lightpatch_pool = new csLightPatchPool ();
-  render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory ());
 
   csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
@@ -2679,10 +2540,7 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
 void csThingObjectType::Clear ()
 {
   delete lightpatch_pool;
-  delete render_pol2d_pool;
-
   lightpatch_pool = new csLightPatchPool ();
-  render_pol2d_pool = new csPoly2DPool (csPolygon2DFactory::SharedFactory ());
 }
 
 csPtr<iMeshObjectFactory> csThingObjectType::NewFactory ()

@@ -6,38 +6,6 @@
 This section documents the major changes between versions 0.96 and 0.98 of of
 Crystal Space.
 
-@subheading Polygon Texture Mapping Changes
-@cindex @code{iPolygon3D}
-@cindex @code{iPolyTexNone}
-@cindex @code{iPolyTexGouraud}
-@cindex @code{iPolyTexFlat}
-@cindex @code{iPolyTexLightMap}
-@cindex shading
-
-The following interfaces have been removed: @samp{iPolyTexNone},
-@samp{iPolyTexGouraud}, @samp{iPolyTexFlat}, and  @samp{iPolyTexLightMap}.
-The combined @sc{api} from @samp{iPolyTexNone} and the @samp{iPolyTexLightMap}
-have moved to @samp{iPolygon3D} itself.
-
-@code{iPolygon3D::SetTextureType()} and @code{GetTextureType()} have been
-removed.  Instead use:
-
-@itemize @bullet
-@item
-@code{iPolygon3D::EnableTextureMapping()}
-@item
-@code{iPolygon3D::IsTextureMappingEnabled()}
-@end itemize
-
-@code{iPolygon3D::GetPolyTexType()} has been removed.
-
-The @samp{<shading>} keyword in polygons in map files now accepts a boolean
-value instead of @samp{NONE}, @samp{FLAT}, @samp{GOURAUD}, or @samp{LIGHTMAP}.
-With this you can enable/disable lightmapping.
-
-If you want gouraud shaded polygons you should use the @file{genmesh}
-mesh object plugin instead.
-
 @subheading Bezier Curve Changes
 @cindex Bezier Curve Changes
 @cindex @code{iCurveTemplate}
@@ -134,6 +102,51 @@ build the polygons. Note that @code{SCF_QUERY_INTERFACE()} of
 @samp{iThingFactoryState} no longer works on a thing mesh object. You must
 use @code{GetFactory()}.
 
+@code{iThingState::GetVertexC()} has been removed. It is no longer possible
+to get camera space information from a thing.
+
+@subheading Polygon Texture Mapping Changes
+@cindex @code{iPolygon3D}
+@cindex @code{iPolyTexNone}
+@cindex @code{iPolyTexGouraud}
+@cindex @code{iPolyTexFlat}
+@cindex @code{iPolyTexLightMap}
+@cindex shading
+
+The following interfaces have been removed: @samp{iPolyTexNone},
+@samp{iPolyTexGouraud}, @samp{iPolyTexFlat}, and  @samp{iPolyTexLightMap}.
+The combined @sc{api} from @samp{iPolyTexNone} and the @samp{iPolyTexLightMap}
+have moved to @samp{iPolygon3D} itself.
+
+@code{iPolygon3D::SetTextureType()} and @code{GetTextureType()} have been
+removed.  Instead use:
+
+It is no longer possible to set mixmode and alpha for individual polygons
+(i.e. functions like @code{iPolygon3D::SetMixMode()} and
+@code{iPolygon3D::SetAlpha()} have been removed. Instead use the new
+@code{iThingState::SetMixMode()} function to set the mixmode globally.
+If needed you will have to seperate the transparent polygon in a seperate
+thing mesh.
+
+@code{iPolygon3D::GetVertexC()} has been removed. It is no longer possible
+to get camera space information from a polygon.
+
+@itemize @bullet
+@item
+@code{iPolygon3D::EnableTextureMapping()}
+@item
+@code{iPolygon3D::IsTextureMappingEnabled()}
+@end itemize
+
+@code{iPolygon3D::GetPolyTexType()} has been removed.
+
+The @samp{<shading>} keyword in polygons in map files now accepts a boolean
+value instead of @samp{NONE}, @samp{FLAT}, @samp{GOURAUD}, or @samp{LIGHTMAP}.
+With this you can enable/disable lightmapping.
+
+If you want gouraud shaded polygons you should use the @file{genmesh}
+mesh object plugin instead.
+
 @subheading Polygon Planes
 @cindex @code{iPolyTxtPlane}
 @cindex @code{iThingEnvironment}
@@ -171,8 +184,8 @@ from @samp{v} to @samp{wv} and @samp{w} to @samp{ww}.
 Portals in thing have been removed completely! Instead there is now a seperate
 portal container object which belongs in the engine (otherwise it is just
 a mesh like any other mesh). To create a portal you can use the conveniance
-functions @code{iEngine->CreatePortal()} and
-@code{iEngine->CreatePortalContainer()}. Here is an example of old code
+functions @code{iEngine::CreatePortal()} and
+@code{iEngine::CreatePortalContainer()}. Here is an example of old code
 and how to change it to new code:
 
 @example

@@ -73,9 +73,7 @@ struct iThingFactoryState : public iBase
    * This function can be called at any time in the creation of the object
    * and it can be called multiple time but it normally only makes sense
    * to call this function after you have finished adding all polygons
-   * and all vertices.<p>
-   * Note that calling this function will make the camera vertex array
-   * invalid.
+   * and all vertices.
    */
   virtual void CompressVertices () = 0;
 
@@ -149,7 +147,7 @@ struct iThingFactoryState : public iBase
   virtual void SetCosinusFactor (float cosfact) = 0;
 };
 
-SCF_VERSION (iThingState, 0, 6, 1);
+SCF_VERSION (iThingState, 0, 6, 2);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -174,10 +172,6 @@ struct iThingState : public iBase
   virtual const csVector3 &GetVertexW (int idx) const = 0;
   /// Get the vertex coordinates in world space
   virtual const csVector3* GetVerticesW () const = 0;
-  /// Get the given vertex coordinates in camera space
-  virtual const csVector3 &GetVertexC (int idx) const = 0;
-  /// Get the vertex coordinates in camera space
-  virtual const csVector3* GetVerticesC () const = 0;
 
   /**
    * Get the moving option.
@@ -244,6 +238,11 @@ struct iThingState : public iBase
    * factory).
    */
   virtual void ClearReplacedMaterials () = 0;
+
+  /// Set mix mode.
+  virtual void SetMixMode (uint mode) = 0;
+  /// Get mix mode.
+  virtual uint GetMixMode () const = 0;
 };
 
 SCF_VERSION (iThingEnvironment, 0, 3, 0);

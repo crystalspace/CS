@@ -3014,10 +3014,9 @@ bool csLoader::LoadSettings (iDocumentNode* node)
     switch (id)
     {
       case XMLTOKEN_FASTMESH:
-        {
-	  int th = child->GetContentsValueAsInt ();
-	  Engine->SetFastMeshThresshold (th);
-	}
+	ReportWarning (
+	    "crystalspace.maploader.parse.xml",
+	    "<fastmesh> is no longer needed.");
 	break;
       case XMLTOKEN_CLEARZBUF:
         {

@@ -133,9 +133,6 @@
             <file>/lib/stdtex/topping.png</file>
         </texture>
     </textures>
-    <settings>
-        <fastmesh>10</fastmesh>
-    </settings>
     <variables>
         <variable name="Std Thing Angle" value="0.54321" />
         <variable name="Std Thing Range" value="50.5" />
@@ -4697,8 +4694,8 @@
                             </matrix>
                             <v x="-2.5" y="3.4" z="-0.1" />
                         </texmap>
-                        <alpha>75</alpha>
                     </p>
+                    <mixmode><alpha>0.75</alpha></mixmode>
 	        </params>
 	    </meshobj>
             <params>
@@ -6174,7 +6171,7 @@
         </light>
     </sector>
     <sector name="win3a">
-        <meshobj name="walls">
+        <meshobj name="walls_transp">
             <plugin>thing</plugin>
             <zfill />
             <params>
@@ -6192,7 +6189,6 @@
                     <v>5</v>
                     <v>1</v>
                     <material>window</material>
-                    <alpha>50</alpha>
                     <portal>
                         <sector>win3b</sector>
                     </portal>
@@ -6211,6 +6207,21 @@
                         <v x="-8.5" y="2.4" z="20.25" />
                     </texmap>
                 </p>
+                <mixmode><alpha>0.50</alpha></mixmode>
+	    </params>
+	</meshobj>
+        <meshobj name="walls">
+            <plugin>thing</plugin>
+            <zfill />
+            <params>
+                <v x="-8.5" y="0" z="20" />
+                <v x="-8.5" y="0" z="20.25" />
+                <v x="-8.5" y="2.4" z="20" />
+                <v x="-8.5" y="2.4" z="20.25" />
+                <v x="-6" y="0" z="20" />
+                <v x="-6" y="0" z="20.25" />
+                <v x="-6" y="2.4" z="20" />
+                <v x="-6" y="2.4" z="20.25" />
                 <material>oldbrick</material>
                 <p name="east">
                     <v>7</v>
@@ -6319,6 +6330,45 @@
         </meshobj>
     </sector>
     <sector name="win3b">
+        <meshobj name="walls_transp">
+            <plugin>thing</plugin>
+            <zfill />
+            <params>
+                <v x="-8.5" y="0" z="20.25" />
+                <v x="-8.5" y="0" z="20.5" />
+                <v x="-8.5" y="2.4" z="20.25" />
+                <v x="-8.5" y="2.4" z="20.5" />
+                <v x="-6" y="0" z="20.25" />
+                <v x="-6" y="0" z="20.5" />
+                <v x="-6" y="2.4" z="20.25" />
+                <v x="-6" y="2.4" z="20.5" />
+                <p name="south">
+                    <v>6</v>
+                    <v>2</v>
+                    <v>0</v>
+                    <v>4</v>
+                    <material>window</material>
+                    <portal>
+                        <sector>win3a</sector>
+                    </portal>
+                    <texmap>
+                        <matrix>
+                            <m11>-1</m11>
+                            <m12>0</m12>
+                            <m13>0</m13>
+                            <m21>0</m21>
+                            <m22>-1</m22>
+                            <m23>0</m23>
+                            <m31>0</m31>
+                            <m32>0</m32>
+                            <m33>-1</m33>
+                        </matrix>
+                        <v x="-6" y="2.4" z="20.25" />
+                    </texmap>
+                </p>
+                <mixmode><alpha>0.50</alpha></mixmode>
+	    </params>
+	</meshobj>
         <meshobj name="walls">
             <plugin>thing</plugin>
             <zfill />
@@ -6373,31 +6423,6 @@
                             <m33>0</m33>
                         </matrix>
                         <v x="-6" y="2.4" z="20.5" />
-                    </texmap>
-                </p>
-                <p name="south">
-                    <v>6</v>
-                    <v>2</v>
-                    <v>0</v>
-                    <v>4</v>
-                    <material>window</material>
-                    <alpha>50</alpha>
-                    <portal>
-                        <sector>win3a</sector>
-                    </portal>
-                    <texmap>
-                        <matrix>
-                            <m11>-1</m11>
-                            <m12>0</m12>
-                            <m13>0</m13>
-                            <m21>0</m21>
-                            <m22>-1</m22>
-                            <m23>0</m23>
-                            <m31>0</m31>
-                            <m32>0</m32>
-                            <m33>-1</m33>
-                        </matrix>
-                        <v x="-6" y="2.4" z="20.25" />
                     </texmap>
                 </p>
                 <material>oldbrick</material>
@@ -6609,6 +6634,54 @@
         </meshobj>
     </sector>
     <sector name="shapes">
+        <meshobj name="walls_transp">
+            <plugin>thing</plugin>
+            <zfill />
+            <params>
+                <v x="-20" y="-3" z="20.5" />
+                <v x="-20" y="-3" z="40" />
+                <v x="-20" y="3" z="20.5" />
+                <v x="-20" y="3" z="40" />
+                <v x="-13" y="-3" z="20.5" />
+                <v x="-13" y="-1" z="20.5" />
+                <v x="-13" y="2.4" z="20.5" />
+                <v x="-13" y="3" z="20.5" />
+                <v x="-10.5" y="-3" z="20.5" />
+                <v x="-10.5" y="-1" z="20.5" />
+                <v x="-10.5" y="2.4" z="20.5" />
+                <v x="-10.5" y="3" z="20.5" />
+                <v x="0" y="-3" z="20.5" />
+                <v x="0" y="-3" z="40" />
+                <v x="0" y="3" z="20.5" />
+                <v x="0" y="3" z="40" />
+                <p name="down">
+                    <v>1</v>
+                    <v>13</v>
+                    <v>12</v>
+                    <v>0</v>
+                    <material>yellowcheckers</material>
+                    <portal>
+                        <sector>shapes</sector>
+                        <mirror />
+                    </portal>
+                    <texmap>
+                        <matrix>
+                            <m11>0.166667</m11>
+                            <m12>0</m12>
+                            <m13>0</m13>
+                            <m21>0</m21>
+                            <m22>0</m22>
+                            <m23>-0.166667</m23>
+                            <m31>0</m31>
+                            <m32>-0.166667</m32>
+                            <m33>0</m33>
+                        </matrix>
+                        <v x="-20" y="-3" z="40" />
+                    </texmap>
+                </p>
+                <mixmode><alpha>0.50</alpha></mixmode>
+            </params>
+	</meshobj>
         <meshobj name="walls">
             <plugin>thing</plugin>
             <zfill />
@@ -6709,32 +6782,6 @@
                             <m33>0</m33>
                         </matrix>
                         <v x="-20" y="3" z="20.5" />
-                    </texmap>
-                </p>
-                <p name="down">
-                    <v>1</v>
-                    <v>13</v>
-                    <v>12</v>
-                    <v>0</v>
-                    <material>yellowcheckers</material>
-                    <alpha>50</alpha>
-                    <portal>
-                        <sector>shapes</sector>
-                        <mirror />
-                    </portal>
-                    <texmap>
-                        <matrix>
-                            <m11>0.166667</m11>
-                            <m12>0</m12>
-                            <m13>0</m13>
-                            <m21>0</m21>
-                            <m22>0</m22>
-                            <m23>-0.166667</m23>
-                            <m31>0</m31>
-                            <m32>-0.166667</m32>
-                            <m33>0</m33>
-                        </matrix>
-                        <v x="-20" y="-3" z="40" />
                     </texmap>
                 </p>
                 <material>oldbrick</material>
@@ -10743,6 +10790,65 @@
         </meshobj>
     </sector>
     <sector name="hall1">
+        <meshobj name="walls_transp">
+            <plugin>thing</plugin>
+            <zfill />
+            <params>
+                <v x="-20" y="8" z="40" />
+                <v x="-20" y="8" z="45" />
+                <v x="-20" y="10" z="45" />
+                <v x="-20" y="11.4" z="40" />
+                <v x="-20" y="15" z="45" />
+                <v x="-20" y="18" z="40" />
+                <v x="-20" y="18" z="45" />
+                <v x="-10" y="10" z="45" />
+                <v x="-10" y="15" z="45" />
+                <v x="-9.85" y="8" z="40" />
+                <v x="-9.85" y="9" z="40" />
+                <v x="-9.85" y="11.4" z="40" />
+                <v x="-9.15" y="8" z="40" />
+                <v x="-9.15" y="9" z="40" />
+                <v x="-9.15" y="11.4" z="40" />
+                <v x="-9" y="8" z="40" />
+                <v x="-9" y="11.4" z="40" />
+                <v x="-7" y="10" z="45" />
+                <v x="-7" y="15" z="45" />
+                <v x="-6" y="8" z="40" />
+                <v x="-6" y="11.4" z="40" />
+                <v x="0" y="8" z="40" />
+                <v x="0" y="8" z="45" />
+                <v x="0" y="10" z="45" />
+                <v x="0" y="11.4" z="40" />
+                <v x="0" y="15" z="45" />
+                <v x="0" y="18" z="40" />
+                <v x="0" y="18" z="45" />
+                <p name="north2B">
+                    <v>8</v>
+                    <v>18</v>
+                    <v>17</v>
+                    <v>7</v>
+                    <material>yellow</material>
+                    <portal>
+                        <sector>box</sector>
+                    </portal>
+                    <texmap>
+                        <matrix>
+                            <m11>0.2</m11>
+                            <m12>0</m12>
+                            <m13>0</m13>
+                            <m21>0</m21>
+                            <m22>-0.2</m22>
+                            <m23>0</m23>
+                            <m31>0</m31>
+                            <m32>0</m32>
+                            <m33>0.2</m33>
+                        </matrix>
+                        <v x="-20" y="18" z="45" />
+                    </texmap>
+                </p>
+                <mixmode><alpha>0.49</alpha></mixmode>
+	    </params>
+	</meshobj>
         <meshobj name="walls">
             <plugin>thing</plugin>
             <zfill />
@@ -10947,31 +11053,6 @@
                         <v x="-20" y="18" z="45" />
                     </texmap>
                 </p>
-                <p name="north2B">
-                    <v>8</v>
-                    <v>18</v>
-                    <v>17</v>
-                    <v>7</v>
-                    <material>yellow</material>
-                    <alpha>49</alpha>
-                    <portal>
-                        <sector>box</sector>
-                    </portal>
-                    <texmap>
-                        <matrix>
-                            <m11>0.2</m11>
-                            <m12>0</m12>
-                            <m13>0</m13>
-                            <m21>0</m21>
-                            <m22>-0.2</m22>
-                            <m23>0</m23>
-                            <m31>0</m31>
-                            <m32>0</m32>
-                            <m33>0.2</m33>
-                        </matrix>
-                        <v x="-20" y="18" z="45" />
-                    </texmap>
-                </p>
                 <material>bricks</material>
                 <p name="north2C">
                     <v>18</v>
@@ -11126,6 +11207,49 @@
         </meshobj>
     </sector>
     <sector name="hall2d">
+        <meshobj name="walls_transp">
+            <plugin>thing</plugin>
+            <zfill />
+            <params>
+                <v x="-20" y="8" z="45" />
+                <v x="-20" y="8" z="50" />
+                <v x="-20" y="10" z="45" />
+                <v x="-20" y="10" z="50" />
+                <v x="-10" y="10" z="45" />
+                <v x="-10" y="10" z="50" />
+                <v x="-7" y="10" z="45" />
+                <v x="-7" y="10" z="50" />
+                <v x="0" y="8" z="45" />
+                <v x="0" y="8" z="50" />
+                <v x="0" y="10" z="45" />
+                <v x="0" y="10" z="50" />
+                <p name="upB">
+                    <v>4</v>
+                    <v>6</v>
+                    <v>7</v>
+                    <v>5</v>
+                    <material>red</material>
+                    <portal>
+                        <sector>box</sector>
+                    </portal>
+                    <texmap>
+                        <matrix>
+                            <m11>0.2</m11>
+                            <m12>0</m12>
+                            <m13>0</m13>
+                            <m21>0</m21>
+                            <m22>0</m22>
+                            <m23>0.2</m23>
+                            <m31>0</m31>
+                            <m32>0.2</m32>
+                            <m33>0</m33>
+                        </matrix>
+                        <v x="-20" y="10" z="45" />
+                    </texmap>
+                </p>
+                <mixmode><alpha>0.49</alpha></mixmode>
+            </params>
+	</meshobj>
         <meshobj name="walls">
             <plugin>thing</plugin>
             <zfill />
@@ -11274,31 +11398,6 @@
                         <v x="-20" y="10" z="45" />
                     </texmap>
                 </p>
-                <p name="upB">
-                    <v>4</v>
-                    <v>6</v>
-                    <v>7</v>
-                    <v>5</v>
-                    <material>red</material>
-                    <alpha>49</alpha>
-                    <portal>
-                        <sector>box</sector>
-                    </portal>
-                    <texmap>
-                        <matrix>
-                            <m11>0.2</m11>
-                            <m12>0</m12>
-                            <m13>0</m13>
-                            <m21>0</m21>
-                            <m22>0</m22>
-                            <m23>0.2</m23>
-                            <m31>0</m31>
-                            <m32>0.2</m32>
-                            <m33>0</m33>
-                        </matrix>
-                        <v x="-20" y="10" z="45" />
-                    </texmap>
-                </p>
                 <p name="upC">
                     <v>6</v>
                     <v>10</v>
@@ -11327,6 +11426,49 @@
         </meshobj>
     </sector>
     <sector name="hall2u">
+        <meshobj name="walls_transp">
+            <plugin>thing</plugin>
+            <zfill />
+            <params>
+                <v x="-20" y="15" z="45" />
+                <v x="-20" y="15" z="50" />
+                <v x="-20" y="18" z="45" />
+                <v x="-20" y="18" z="50" />
+                <v x="-10" y="15" z="45" />
+                <v x="-10" y="15" z="50" />
+                <v x="-7" y="15" z="45" />
+                <v x="-7" y="15" z="50" />
+                <v x="0" y="15" z="45" />
+                <v x="0" y="15" z="50" />
+                <v x="0" y="18" z="45" />
+                <v x="0" y="18" z="50" />
+                <p name="downB">
+                    <v>5</v>
+                    <v>7</v>
+                    <v>6</v>
+                    <v>4</v>
+                    <material>green</material>
+                    <portal>
+                        <sector>box</sector>
+                    </portal>
+                    <texmap>
+                        <matrix>
+                            <m11>0.2</m11>
+                            <m12>0</m12>
+                            <m13>0</m13>
+                            <m21>0</m21>
+                            <m22>0</m22>
+                            <m23>-0.2</m23>
+                            <m31>0</m31>
+                            <m32>-0.2</m32>
+                            <m33>0</m33>
+                        </matrix>
+                        <v x="-20" y="15" z="50" />
+                    </texmap>
+                </p>
+                <mixmode><alpha>0.49</alpha></mixmode>
+            </params>
+	</meshobj>
         <meshobj name="walls">
             <plugin>thing</plugin>
             <zfill />
@@ -11457,31 +11599,6 @@
                     <v>0</v>
                     <portal>
                         <sector>hall2l</sector>
-                    </portal>
-                    <texmap>
-                        <matrix>
-                            <m11>0.2</m11>
-                            <m12>0</m12>
-                            <m13>0</m13>
-                            <m21>0</m21>
-                            <m22>0</m22>
-                            <m23>-0.2</m23>
-                            <m31>0</m31>
-                            <m32>-0.2</m32>
-                            <m33>0</m33>
-                        </matrix>
-                        <v x="-20" y="15" z="50" />
-                    </texmap>
-                </p>
-                <p name="downB">
-                    <v>5</v>
-                    <v>7</v>
-                    <v>6</v>
-                    <v>4</v>
-                    <material>green</material>
-                    <alpha>49</alpha>
-                    <portal>
-                        <sector>box</sector>
                     </portal>
                     <texmap>
                         <matrix>
@@ -11830,6 +11947,53 @@
         </meshobj>
     </sector>
     <sector name="hall3">
+        <meshobj name="walls_transp">
+            <plugin>thing</plugin>
+            <zfill />
+            <params>
+                <v x="-20" y="8" z="50" />
+                <v x="-20" y="10" z="50" />
+                <v x="-20" y="15" z="50" />
+                <v x="-20" y="18" z="50" />
+                <v x="-12" y="8" z="60" />
+                <v x="-12" y="12" z="60" />
+                <v x="-10" y="10" z="50" />
+                <v x="-10" y="15" z="50" />
+                <v x="-8" y="8" z="60" />
+                <v x="-8" y="12" z="60" />
+                <v x="-7" y="10" z="50" />
+                <v x="-7" y="15" z="50" />
+                <v x="0" y="8" z="50" />
+                <v x="0" y="10" z="50" />
+                <v x="0" y="15" z="50" />
+                <v x="0" y="18" z="50" />
+                <p name="south2B">
+                    <v>11</v>
+                    <v>7</v>
+                    <v>6</v>
+                    <v>10</v>
+                    <material>blue</material>
+                    <portal>
+                        <sector>box</sector>
+                    </portal>
+                    <texmap>
+                        <matrix>
+                            <m11>-0.2</m11>
+                            <m12>0</m12>
+                            <m13>0</m13>
+                            <m21>0</m21>
+                            <m22>-0.2</m22>
+                            <m23>0</m23>
+                            <m31>0</m31>
+                            <m32>0</m32>
+                            <m33>-0.2</m33>
+                        </matrix>
+                        <v x="0" y="18" z="50" />
+                    </texmap>
+                </p>
+                <mixmode><alpha>0.49</alpha></mixmode>
+            </params>
+	</meshobj>
         <meshobj name="walls">
             <plugin>thing</plugin>
             <zfill />
@@ -12022,31 +12186,6 @@
                         <v x="0" y="18" z="50" />
                     </texmap>
                 </p>
-                <p name="south2B">
-                    <v>11</v>
-                    <v>7</v>
-                    <v>6</v>
-                    <v>10</v>
-                    <material>blue</material>
-                    <alpha>49</alpha>
-                    <portal>
-                        <sector>box</sector>
-                    </portal>
-                    <texmap>
-                        <matrix>
-                            <m11>-0.2</m11>
-                            <m12>0</m12>
-                            <m13>0</m13>
-                            <m21>0</m21>
-                            <m22>-0.2</m22>
-                            <m23>0</m23>
-                            <m31>0</m31>
-                            <m32>0</m32>
-                            <m33>-0.2</m33>
-                        </matrix>
-                        <v x="0" y="18" z="50" />
-                    </texmap>
-                </p>
                 <p name="south2C">
                     <v>7</v>
                     <v>2</v>
@@ -12080,7 +12219,7 @@
         </light>
     </sector>
     <sector name="box">
-        <meshobj name="walls">
+        <meshobj name="walls_transp">
             <plugin>thing</plugin>
             <zfill />
             <params>
@@ -12098,7 +12237,6 @@
                     <v>5</v>
                     <v>1</v>
                     <material>blue</material>
-                    <alpha>49</alpha>
                     <portal>
                         <sector>hall3</sector>
                     </portal>
@@ -12123,7 +12261,6 @@
                     <v>4</v>
                     <v>5</v>
                     <material>misty</material>
-                    <alpha>49</alpha>
                     <portal>
                         <sector>hall2r</sector>
                     </portal>
@@ -12148,7 +12285,6 @@
                     <v>0</v>
                     <v>4</v>
                     <material>yellow</material>
-                    <alpha>49</alpha>
                     <portal>
                         <sector>hall1</sector>
                     </portal>
@@ -12173,7 +12309,6 @@
                     <v>1</v>
                     <v>0</v>
                     <material>misty</material>
-                    <alpha>49</alpha>
                     <portal>
                         <sector>hall2l</sector>
                     </portal>
@@ -12198,7 +12333,6 @@
                     <v>7</v>
                     <v>3</v>
                     <material>green</material>
-                    <alpha>49</alpha>
                     <portal>
                         <sector>hall2u</sector>
                     </portal>
@@ -12223,7 +12357,6 @@
                     <v>4</v>
                     <v>0</v>
                     <material>red</material>
-                    <alpha>49</alpha>
                     <portal>
                         <sector>hall2d</sector>
                     </portal>
@@ -12242,6 +12375,7 @@
                         <v x="-10" y="10" z="50" />
                     </texmap>
                 </p>
+                <mixmode><alpha>0.49</alpha></mixmode>
             </params>
         </meshobj>
     </sector>
@@ -12381,6 +12515,125 @@
         </meshobj>
     </sector>
     <sector name="street1">
+        <meshobj name="walls_transp">
+            <plugin>thing</plugin>
+            <zfill />
+            <params>
+                <v x="-43" y="-1" z="-10" />
+                <v x="-43" y="-1" z="-8.5" />
+                <v x="-43" y="-1" z="-5" />
+                <v x="-43" y="-1" z="0" />
+                <v x="-43" y="-1" z="3.5" />
+                <v x="-43" y="-1" z="5" />
+                <v x="-43" y="11" z="-10" />
+                <v x="-43" y="11" z="-5" />
+                <v x="-43" y="11" z="0" />
+                <v x="-43" y="11" z="5" />
+                <v x="-38" y="-1" z="-10" />
+                <v x="-38" y="-1" z="5" />
+                <v x="-38" y="11" z="-10" />
+                <v x="-38" y="11" z="5" />
+                <v x="-33" y="-1" z="-10" />
+                <v x="-33" y="-1" z="5" />
+                <v x="-33" y="6" z="-10" />
+                <v x="-33" y="11" z="-10" />
+                <v x="-33" y="11" z="5" />
+                <v x="-28" y="-1" z="5" />
+                <v x="-28" y="11" z="5" />
+                <v x="-23" y="-1" z="-10" />
+                <v x="-23" y="-1" z="5" />
+                <v x="-23" y="6" z="-10" />
+                <v x="-23" y="11" z="-10" />
+                <v x="-23" y="11" z="5" />
+                <v x="-20.5" y="-1" z="-10" />
+                <v x="-20.5" y="1" z="-10" />
+                <v x="-20.5" y="3.5" z="-10" />
+                <v x="-20.5" y="5.5" z="-10" />
+                <v x="-20.5" y="8" z="-10" />
+                <v x="-20.5" y="11" z="-10" />
+                <v x="-19" y="-1" z="-10" />
+                <v x="-19" y="1" z="-10" />
+                <v x="-19" y="3.5" z="-10" />
+                <v x="-19" y="5.5" z="-10" />
+                <v x="-19" y="8" z="-10" />
+                <v x="-19" y="11" z="-10" />
+                <v x="-18" y="-1" z="-10" />
+                <v x="-18" y="-1" z="-8.5" />
+                <v x="-18" y="-1" z="5" />
+                <v x="-18" y="11" z="-10" />
+                <v x="-18" y="11" z="5" />
+                <v x="-13" y="-1" z="-10" />
+                <v x="-13" y="-1" z="-8.5" />
+                <v x="-13" y="11" z="-10" />
+                <v x="-12" y="-1" z="5" />
+                <v x="-12" y="4" z="5" />
+                <v x="-12" y="11" z="5" />
+                <v x="-10" y="-1" z="5" />
+                <v x="-10" y="4" z="5" />
+                <v x="-10" y="11" z="5" />
+                <v x="-8" y="-1" z="-10" />
+                <v x="-8" y="11" z="-10" />
+                <v x="-3" y="-1" z="-10" />
+                <v x="-3" y="-1" z="-8.5" />
+                <v x="-3" y="-1" z="-5" />
+                <v x="-3" y="-1" z="0" />
+                <v x="-3" y="-1" z="3.5" />
+                <v x="-3" y="-1" z="5" />
+                <v x="-3" y="11" z="-10" />
+                <v x="-3" y="11" z="-5" />
+                <v x="-3" y="11" z="0" />
+                <v x="-3" y="11" z="5" />
+                <p name="southE2">
+                    <v>34</v>
+                    <v>28</v>
+                    <v>27</v>
+                    <v>33</v>
+                    <material>window</material>
+                    <portal>
+                        <sector>win4</sector>
+                    </portal>
+                    <texmap>
+                        <matrix>
+                            <m11>-0.333333</m11>
+                            <m12>0</m12>
+                            <m13>0</m13>
+                            <m21>0</m21>
+                            <m22>-0.333333</m22>
+                            <m23>0</m23>
+                            <m31>0</m31>
+                            <m32>0</m32>
+                            <m33>-0.333333</m33>
+                        </matrix>
+                        <v x="-3" y="11" z="-10" />
+                    </texmap>
+                </p>
+                <p name="southE4">
+                    <v>36</v>
+                    <v>30</v>
+                    <v>29</v>
+                    <v>35</v>
+                    <material>window</material>
+                    <portal>
+                        <sector>win5</sector>
+                    </portal>
+                    <texmap>
+                        <matrix>
+                            <m11>-0.333333</m11>
+                            <m12>0</m12>
+                            <m13>0</m13>
+                            <m21>0</m21>
+                            <m22>-0.333333</m22>
+                            <m23>0</m23>
+                            <m31>0</m31>
+                            <m32>0</m32>
+                            <m33>-0.333333</m33>
+                        </matrix>
+                        <v x="-3" y="11" z="-10" />
+                    </texmap>
+                </p>
+                <mixmode><alpha>0.49</alpha></mixmode>
+            </params>
+	</meshobj>
         <meshobj name="walls">
             <plugin>thing</plugin>
             <zfill />
@@ -12984,31 +13237,6 @@
                         <v x="-43" y="12" z="-10" />
                     </texmap>
                 </p>
-                <p name="southE2">
-                    <v>34</v>
-                    <v>28</v>
-                    <v>27</v>
-                    <v>33</v>
-                    <material>window</material>
-                    <alpha>49</alpha>
-                    <portal>
-                        <sector>win4</sector>
-                    </portal>
-                    <texmap>
-                        <matrix>
-                            <m11>-0.333333</m11>
-                            <m12>0</m12>
-                            <m13>0</m13>
-                            <m21>0</m21>
-                            <m22>-0.333333</m22>
-                            <m23>0</m23>
-                            <m31>0</m31>
-                            <m32>0</m32>
-                            <m33>-0.333333</m33>
-                        </matrix>
-                        <v x="-3" y="11" z="-10" />
-                    </texmap>
-                </p>
                 <p name="southE3">
                     <v>35</v>
                     <v>29</v>
@@ -13028,31 +13256,6 @@
                             <m33>-0.111111</m33>
                         </matrix>
                         <v x="-43" y="12" z="-10" />
-                    </texmap>
-                </p>
-                <p name="southE4">
-                    <v>36</v>
-                    <v>30</v>
-                    <v>29</v>
-                    <v>35</v>
-                    <material>window</material>
-                    <alpha>49</alpha>
-                    <portal>
-                        <sector>win5</sector>
-                    </portal>
-                    <texmap>
-                        <matrix>
-                            <m11>-0.333333</m11>
-                            <m12>0</m12>
-                            <m13>0</m13>
-                            <m21>0</m21>
-                            <m22>-0.333333</m22>
-                            <m23>0</m23>
-                            <m31>0</m31>
-                            <m32>0</m32>
-                            <m33>-0.333333</m33>
-                        </matrix>
-                        <v x="-3" y="11" z="-10" />
                     </texmap>
                 </p>
                 <material>bricks</material>
@@ -15950,7 +16153,7 @@
         <meshobj>tire4</meshobj>
     </collection>
     <sector name="win4">
-        <meshobj name="walls">
+        <meshobj name="walls_transp">
             <plugin>thing</plugin>
             <zfill />
             <params>
@@ -15968,7 +16171,6 @@
                     <v>5</v>
                     <v>1</v>
                     <material>window</material>
-                    <alpha>49</alpha>
                     <portal>
                         <sector>street1</sector>
                     </portal>
@@ -15987,6 +16189,21 @@
                         <v x="-20.5" y="3.5" z="-10" />
                     </texmap>
                 </p>
+                <mixmode><alpha>0.49</alpha></mixmode>
+            </params>
+	</meshobj>
+        <meshobj name="walls">
+            <plugin>thing</plugin>
+            <zfill />
+            <params>
+                <v x="-20.5" y="1" z="-10.5" />
+                <v x="-20.5" y="1" z="-10" />
+                <v x="-20.5" y="3.5" z="-10.5" />
+                <v x="-20.5" y="3.5" z="-10" />
+                <v x="-19" y="1" z="-10.5" />
+                <v x="-19" y="1" z="-10" />
+                <v x="-19" y="3.5" z="-10.5" />
+                <v x="-19" y="3.5" z="-10" />
                 <material>bricks</material>
                 <p name="east">
                     <v>7</v>
@@ -16095,7 +16312,7 @@
         </meshobj>
     </sector>
     <sector name="win5">
-        <meshobj name="walls">
+        <meshobj name="walls_transp">
             <plugin>thing</plugin>
             <zfill />
             <params>
@@ -16113,7 +16330,6 @@
                     <v>5</v>
                     <v>1</v>
                     <material>window</material>
-                    <alpha>49</alpha>
                     <portal>
                         <sector>street1</sector>
                     </portal>
@@ -16132,6 +16348,21 @@
                         <v x="-20.5" y="8" z="-10" />
                     </texmap>
                 </p>
+                <mixmode><alpha>0.49</alpha></mixmode>
+            </params>
+	</meshobj>
+        <meshobj name="walls">
+            <plugin>thing</plugin>
+            <zfill />
+            <params>
+                <v x="-20.5" y="5.5" z="-10.5" />
+                <v x="-20.5" y="5.5" z="-10" />
+                <v x="-20.5" y="8" z="-10.5" />
+                <v x="-20.5" y="8" z="-10" />
+                <v x="-19" y="5.5" z="-10.5" />
+                <v x="-19" y="5.5" z="-10" />
+                <v x="-19" y="8" z="-10.5" />
+                <v x="-19" y="8" z="-10" />
                 <material>bricks</material>
                 <p name="east">
                     <v>7</v>
@@ -18696,6 +18927,59 @@
         </light>
     </sector>
     <sector name="kamer2r">
+        <meshobj name="walls_transp">
+            <plugin>thing</plugin>
+            <zfill />
+            <params>
+                <v x="15" y="-19" z="11" />
+                <v x="15" y="-19" z="16" />
+                <v x="15" y="-14" z="11" />
+                <v x="15" y="-14" z="16" />
+                <v x="34" y="-19" z="11" />
+                <v x="34" y="-19" z="16" />
+                <v x="34" y="-14" z="11" />
+                <v x="34" y="-14" z="16" />
+                <p name="east">
+                    <v>7</v>
+                    <v>6</v>
+                    <v>4</v>
+                    <v>5</v>
+                    <material>plasma</material>
+                    <lighting>no</lighting>
+		    <colldet>no</colldet>
+                    <portal>
+                        <sector>corridor</sector>
+                        <ww x="59.1" y="-21.7" z="2.3" />
+                        <matrix>
+                            <m11>0</m11>
+                            <m12>0</m12>
+                            <m13>-1</m13>
+                            <m21>0</m21>
+                            <m22>1</m22>
+                            <m23>0</m23>
+                            <m31>1</m31>
+                            <m32>0</m32>
+                            <m33>0</m33>
+                        </matrix>
+                    </portal>
+                    <texmap>
+                        <matrix>
+                            <m11>0</m11>
+                            <m12>0</m12>
+                            <m13>-0.2</m13>
+                            <m21>0</m21>
+                            <m22>-0.2</m22>
+                            <m23>0</m23>
+                            <m31>0.2</m31>
+                            <m32>0</m32>
+                            <m33>0</m33>
+                        </matrix>
+                        <v x="34" y="-14" z="16" />
+                    </texmap>
+                </p>
+                <mixmode> <add /> </mixmode>
+            </params>
+	</meshobj>
         <meshobj name="walls">
             <plugin>thing</plugin>
             <zfill />
@@ -18727,47 +19011,6 @@
                             <m33>0.2</m33>
                         </matrix>
                         <v x="15" y="-14" z="16" />
-                    </texmap>
-                </p>
-                <p name="east">
-                    <v>7</v>
-                    <v>6</v>
-                    <v>4</v>
-                    <v>5</v>
-                    <material>plasma</material>
-                    <mixmode>
-                        <add />
-                    </mixmode>
-                    <lighting>no</lighting>
-		    <colldet>no</colldet>
-                    <portal>
-                        <sector>corridor</sector>
-                        <ww x="59.1" y="-21.7" z="2.3" />
-                        <matrix>
-                            <m11>0</m11>
-                            <m12>0</m12>
-                            <m13>-1</m13>
-                            <m21>0</m21>
-                            <m22>1</m22>
-                            <m23>0</m23>
-                            <m31>1</m31>
-                            <m32>0</m32>
-                            <m33>0</m33>
-                        </matrix>
-                    </portal>
-                    <texmap>
-                        <matrix>
-                            <m11>0</m11>
-                            <m12>0</m12>
-                            <m13>-0.2</m13>
-                            <m21>0</m21>
-                            <m22>-0.2</m22>
-                            <m23>0</m23>
-                            <m31>0.2</m31>
-                            <m32>0</m32>
-                            <m33>0</m33>
-                        </matrix>
-                        <v x="34" y="-14" z="16" />
                     </texmap>
                 </p>
                 <p name="south">
