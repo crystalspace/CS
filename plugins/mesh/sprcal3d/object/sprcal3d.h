@@ -139,12 +139,14 @@ class csSpriteCal3DSocket : public iSpriteCal3DSocket
     virtual iMeshWrapper* GetMeshWrapper () const {return attached_mesh;}
 
     /// Set the index of the triangle for the socket.
-    virtual void SetTriangleIndex (int tri_index) { triangle_index = tri_index; }
+    virtual void SetTriangleIndex (int tri_index)
+    { triangle_index = tri_index; }
     /// Get the index of the triangle for the socket.
     virtual int GetTriangleIndex () const { return triangle_index; }
 
     /// Set the index of the submesh for the socket.
-    virtual void SetSubmeshIndex (int subm_index) { submesh_index = subm_index;}
+    virtual void SetSubmeshIndex (int subm_index)
+    { submesh_index = subm_index;}
     /// Get the index of the submesh for the socket.
     virtual int GetSubmeshIndex () const { return submesh_index;}
 
@@ -154,20 +156,30 @@ class csSpriteCal3DSocket : public iSpriteCal3DSocket
     virtual int GetMeshIndex () const {return mesh_index;}
 
     /// Set the transform of the primary mesh
-    virtual void SetTransform (const csReversibleTransform & trans) { attached_mesh_trans = trans; }
+    virtual void SetTransform (const csReversibleTransform & trans)
+    { attached_mesh_trans = trans; }
     /// Get the transform of the primary mesh
-    virtual csReversibleTransform GetTransform () const { return attached_mesh_trans; }
+    virtual csReversibleTransform GetTransform () const
+    { return attached_mesh_trans; }
 
-    /// Get a count of the secondary attached meshes (this doesn't include the primary mesh)
-    virtual size_t GetSecondaryCount () const { return (int)secondary_meshes.Length(); }
+    /**
+     * Get a count of the secondary attached meshes (this doesn't include the
+     * primary mesh)
+     */
+    virtual size_t GetSecondaryCount () const
+    { return (int)secondary_meshes.Length(); }
     /// Get the attached secondary mesh at the given index
-    virtual iMeshWrapper * GetSecondaryMesh (size_t index) { return secondary_meshes[index].mesh; }
+    virtual iMeshWrapper * GetSecondaryMesh (size_t index)
+    { return secondary_meshes[index].mesh; }
     /// Get the transform of the attached secondary mesh at the given index
-    virtual csReversibleTransform GetSecondaryTransform (size_t index) { return secondary_meshes[index].trans; }
+    virtual csReversibleTransform GetSecondaryTransform (size_t index)
+    { return secondary_meshes[index].trans; }
     /// Set the transform of the attached secondary mesh at the given index
-    virtual void SetSecondaryTransform (size_t index, csReversibleTransform trans) { secondary_meshes[index].trans = trans; }
+    virtual void SetSecondaryTransform (size_t index,
+      csReversibleTransform trans) { secondary_meshes[index].trans = trans; }
     /// Attach a secondary mesh
-    virtual size_t AttachSecondary (iMeshWrapper * mesh, csReversibleTransform trans);
+    virtual size_t AttachSecondary (iMeshWrapper* mesh,
+      csReversibleTransform trans);
     /// Detach a secondary mesh
     virtual void DetachSecondary (const csString & mesh_name);
     virtual void DetachSecondary (size_t index);
@@ -180,10 +192,9 @@ class csSpriteCal3DSocket : public iSpriteCal3DSocket
 class csSpriteCal3DMeshObject;
 
 /**
- * A Cal3D sprite based on a triangle mesh with a single texture.
- * Animation is done with frames.
- * This class represents a template from which a csSpriteCal3D
- * class can be made.
+ * A Cal3D sprite based on a triangle mesh with a single texture.  Animation is
+ * done with frames.  This class represents a template from which a
+ * csSpriteCal3D class can be made.
  */
 class csSpriteCal3DMeshObjectFactory : public iMeshObjectFactory
 {
@@ -202,14 +213,11 @@ private:
   /// This is the factory equivalent class in cal3d.
   CalCoreModel calCoreModel;
   csPDelArray<csCal3DAnimation> anims;
-  csPDelArray<csCal3DMesh>   submeshes;
-  csArray<csString>          morph_animation_names;
+  csPDelArray<csCal3DMesh> submeshes;
+  csArray<csString> morph_animation_names;
 
-  csString     basePath;
-
-  /// The sockets.
+  csString basePath;
   csPDelArray<csSpriteCal3DSocket> sockets;
-
   csFlags flags;
 
 public:
@@ -260,10 +268,11 @@ public:
   	const char *morphtarget_name);
   bool AddCoreMaterial(iMaterialWrapper *mat);
   void BindMaterials();
-  bool RegisterAnimCallback(const char *anim, CalAnimationCallback *callback,float min_interval);
+  bool RegisterAnimCallback(const char *anim, CalAnimationCallback *callback,
+    float min_interval);
   bool RemoveAnimCallback(const char *anim, CalAnimationCallback *callback);
 
-  int  GetMeshCount() { return (int)submeshes.Length(); }
+  int GetMeshCount() { return (int)submeshes.Length(); }
   int GetMorphAnimationCount() { return (int)morph_animation_names.Length(); }
   int GetMorphTargetCount(int mesh_id);
   const char *GetMeshName(int idx);
@@ -284,9 +293,8 @@ public:
   /// Query the socket number f
   csSpriteCal3DSocket* GetSocket (int f) const
   {
-    return ((size_t)f < sockets.Length ())
-      ? (csSpriteCal3DSocket *)sockets [f]
-      : (csSpriteCal3DSocket*)0;
+    return ((size_t)f < sockets.Length()) ?
+      (csSpriteCal3DSocket*)sockets [f] : (csSpriteCal3DSocket*)0;
   }
 
 
@@ -349,10 +357,10 @@ public:
       return factory->GetTriangles();
     }
 
-    virtual void Lock () { }
-    virtual void Unlock () { }
+    virtual void Lock () {}
+    virtual void Unlock () {}
 
-    virtual csFlags& GetFlags () { return flags;  }
+    virtual csFlags& GetFlags () { return flags; }
     virtual uint32 GetChangeNumber() const { return 0; }
 
     PolyMesh () : polygons (0)
@@ -365,13 +373,13 @@ public:
       Cleanup ();
       SCF_DESTRUCT_IBASE ();
     }
-    void Cleanup () { } //  delete[] polygons; polygons = 0; }
+    void Cleanup () {} //  delete[] polygons; polygons = 0; }
 
     csMeshedPolygon* polygons;
   } scfiPolygonMesh;
   friend struct PolyMesh;
 
-  //------------------------- iObjectModel implementation ----------------
+  //------------------------- iObjectModel implementation --------------------
   void GetObjectBoundingBox (csBox3& bbox, csVector3 *verts,int vertCount);
   void GetObjectBoundingBox (csBox3& bbox);
   void SetObjectBoundingBox (const csBox3& bbox);
@@ -397,7 +405,7 @@ public:
 
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 
-  //--------------------- iSpriteCal3DFactoryState implementation -------------//
+  //------------------- iSpriteCal3DFactoryState implementation --------------
   struct SpriteCal3DFactoryState : public iSpriteCal3DFactoryState
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObjectFactory);
@@ -419,23 +427,30 @@ public:
     virtual void RescaleFactory(float factor)
     { scfParent->RescaleFactory(factor); }
 
-    virtual bool LoadCoreSkeleton(iVFS *vfs,const char *filename)
+    virtual bool LoadCoreSkeleton(iVFS *vfs, const char *filename)
     { return scfParent->LoadCoreSkeleton(vfs,filename); }
 
-    virtual int LoadCoreAnimation(iVFS *vfs,const char *filename,const char *name,int type,float base_vel,float min_vel,float max_vel,int min_interval,int max_interval,int idle_pct, bool lock)
-    { return scfParent->LoadCoreAnimation(vfs,filename,name,type,base_vel,min_vel,max_vel,min_interval,max_interval,idle_pct,lock); }
+    virtual int LoadCoreAnimation(iVFS *vfs, const char *filename,
+      const char *name, int type, float base_vel, float min_vel, float max_vel,
+      int min_interval,int max_interval,int idle_pct, bool lock)
+    { return scfParent->LoadCoreAnimation(vfs, filename, name, type, base_vel,
+        min_vel, max_vel, min_interval, max_interval, idle_pct, lock); }
 
-    virtual int LoadCoreMesh(iVFS *vfs,const char *filename,const char *name,bool attach,iMaterialWrapper *defmat)
-    { return scfParent->LoadCoreMesh(vfs,filename,name,attach,defmat); }
+    virtual int LoadCoreMesh(iVFS *vfs, const char *filename, const char *name,
+      bool attach,iMaterialWrapper *defmat)
+    { return scfParent->LoadCoreMesh(vfs, filename, name, attach, defmat); }
 
     virtual int AddMorphAnimation(const char *name)
     { return scfParent->AddMorphAnimation(name); }
     
-    virtual bool AddMorphTarget(int morphanimation_index,const char *mesh_name, const char *morphtarget_name)
-    { return scfParent->AddMorphTarget(morphanimation_index,mesh_name, morphtarget_name); }
+    virtual bool AddMorphTarget(int morphanimation_index,
+      const char *mesh_name, const char *morphtarget_name)
+    { return scfParent->AddMorphTarget(morphanimation_index, mesh_name,
+        morphtarget_name); }
  
-    virtual int LoadCoreMorphTarget(iVFS *vfs,int mesh_index,const char *filename,const char *name)
-    { return scfParent->LoadCoreMorphTarget(vfs,mesh_index,filename,name); }
+    virtual int LoadCoreMorphTarget(iVFS *vfs, int mesh_index,
+      const char *filename,const char *name)
+    { return scfParent->LoadCoreMorphTarget(vfs, mesh_index, filename,name); }
 	    
     virtual bool AddCoreMaterial(iMaterialWrapper *mat)
     { return scfParent->AddCoreMaterial(mat); }
@@ -509,12 +524,14 @@ public:
       return &scfParent->calCoreModel;
     }
     
-    virtual bool RegisterAnimCallback(const char *anim, CalAnimationCallback *callback,float min_interval)
+    virtual bool RegisterAnimCallback(const char *anim,
+      CalAnimationCallback *callback,float min_interval)
     {
       return scfParent->RegisterAnimCallback(anim,callback,min_interval);
     }
 
-    virtual bool RemoveAnimCallback(const char *anim, CalAnimationCallback *callback)
+    virtual bool RemoveAnimCallback(const char *anim,
+      CalAnimationCallback *callback)
     {
       return scfParent->RemoveAnimCallback(anim,callback);
     }
@@ -545,7 +562,7 @@ public:
     {
       return 0;
     }
-    virtual void GetLOD(iSharedVariable *& first,iSharedVariable *& second) const
+    virtual void GetLOD(iSharedVariable*& first,iSharedVariable*& second) const
     {
       first=0; second=0;
     }
@@ -582,6 +599,10 @@ private:
 
   // Optimization: only update animation when true.
   int do_update;	// If 0 we update, else we decrease.
+
+  
+  // User defined position update things  
+  csRef<iAnimTimeUpdateHandler> anim_time_handler;
 
   csFlags flags;
 
@@ -659,10 +680,21 @@ private:
     {
       SCF_DESTRUCT_IBASE ();
     }
-    virtual void PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer);
+    virtual void PreGetBuffer (csRenderBufferHolder*, csRenderBufferName);
     
   };
   friend class BaseAccessor;
+
+  /**
+   * Default animation time update handler (simply invokes CalModel::update()).
+   */
+  struct DefaultAnimTimeUpdateHandler : public iAnimTimeUpdateHandler
+  {
+    SCF_DECLARE_IBASE;
+    DefaultAnimTimeUpdateHandler() { SCF_CONSTRUCT_IBASE(0); }
+    virtual ~DefaultAnimTimeUpdateHandler() { SCF_DESTRUCT_IBASE(); }
+    void UpdatePosition (float delta, CalModel*);
+  };
 
   bool rmeshesSetup;
   csRef<iStringSet> strings;
@@ -676,12 +708,12 @@ private:
   bool arrays_initialized;
   csBox3 object_bbox;
   uint bboxVersion;
-  csArray<csColor*>         *meshes_colors;
-  csArray<int>		     attached_ids;
-  csArray<bool>             *is_initialized;
+  csArray<csColor*> *meshes_colors;
+  csArray<int> attached_ids;
+  csArray<bool> *is_initialized;
   bool lighting_dirty;
   csColor dynamic_ambient;
-  csArray<csArray<csVector3* > > vertices;
+  csArray< csArray<csVector3*> > vertices;
   bool vertices_allocated;
   bool vertices_dirty;
 
@@ -699,11 +731,10 @@ private:
 
   void InitSubmeshLighting (int mesh, int submesh, CalRenderer *pCalRenderer,
     iMovable* movable);
-  void UpdateLightingSubmesh (const csArray<iLight*>& lights, iMovable* movable, 
-    CalRenderer *pCalRenderer, int mesh, int submesh,float *have_normals=NULL);
+  void UpdateLightingSubmesh (const csArray<iLight*>& lights, iMovable*, 
+    CalRenderer*, int mesh, int submesh, float* have_normals=0);
   void UpdateLighting (iMovable* movable, CalRenderer *pCalRenderer);
-  void UpdateLighting (const csArray<iLight*>& lights,
-      iMovable* movable);
+  void UpdateLighting (const csArray<iLight*>& lights, iMovable* movable);
 
 public:
   float updateanim_sqdistance1;
@@ -715,7 +746,6 @@ public:
 
 public:
   SCF_DECLARE_IBASE;
-
   CS_LEAKGUARD_DECLARE (csSpriteCal3DMeshObject);
 
   /// The parent.
@@ -737,7 +767,7 @@ public:
   void LightChanged (iLight* light);
   void LightDisconnect (iLight* light);
 
-  //------------------------- iLightingInfo interface -------------------------
+  //------------------------ iLightingInfo interface -------------------------
   struct LightingInfo : public iLightingInfo
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObject);
@@ -774,7 +804,7 @@ public:
   } scfiLightingInfo;
   friend struct LightingInfo;
 
-  ///------------------------ iMeshObject implementation ----------------------
+  //----------------------- iMeshObject implementation -----------------------
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
       csVector3& intersect, float* pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
@@ -801,7 +831,7 @@ public:
   }
   virtual void InvalidateMaterialHandles () { }
   /**
-   * see imesh/object.h for specification. The default implementation
+   * See imesh/object.h for specification. The default implementation
    * does nothing.
    */
   virtual void PositionChild (iMeshObject* child,csTicks current_time);
@@ -838,7 +868,7 @@ public:
   virtual iBase* GetLogicalParent () const { return logparent; }
   void SetUserData(void *data);
 
-  //------------------ iPolygonMesh interface implementation ----------------//
+  //------------------ iPolygonMesh interface implementation -----------------
   struct PolyMesh : public iPolygonMesh
   {
   private:
@@ -898,7 +928,7 @@ public:
 
   virtual iObjectModel* GetObjectModel () { return &scfiObjectModel; }
 
-  //--------------------- iSpriteCal3DState implementation -------------//
+  //--------------------- iSpriteCal3DState implementation -------------------
   int GetAnimCount();
   const char *GetAnimName(int idx);
   int  GetAnimType(int idx);
@@ -940,9 +970,8 @@ public:
   /// Query the socket number f
   csSpriteCal3DSocket* GetSocket (int f) const
   {
-    return ((size_t)f < sockets.Length ())
-      ? (csSpriteCal3DSocket *)sockets [f]
-      : (csSpriteCal3DSocket*)0;
+    return ((size_t)f < sockets.Length()) ?
+      (csSpriteCal3DSocket*)sockets[f] : (csSpriteCal3DSocket*)0;
   }
 
   bool SetMaterial(const char *mesh_name,iMaterialWrapper *mat);
@@ -960,21 +989,23 @@ public:
     calModel.getMixer()->setAnimationTime(animationTime);
   }
 
+  void SetAnimTimeUpdateHandler (iAnimTimeUpdateHandler*);
+
   struct SpriteCal3DState : public iSpriteCal3DState
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSpriteCal3DMeshObject);
 
     virtual int GetAnimCount()
     {
-	return scfParent->GetAnimCount();
+      return scfParent->GetAnimCount();
     }
     virtual const char *GetAnimName(int idx)
     {
-	return scfParent->GetAnimName(idx);
+      return scfParent->GetAnimName(idx);
     }
     virtual int GetAnimType(int idx)
     {
-	return scfParent->GetAnimType(idx);
+      return scfParent->GetAnimType(idx);
     }
     virtual int FindAnim(const char* name)
     {
@@ -982,11 +1013,11 @@ public:
     }
     virtual void ClearAllAnims()
     {
-	scfParent->ClearAllAnims();
+      scfParent->ClearAllAnims();
     }
     virtual bool SetAnimCycle(const char *name, float weight)
     {
-	return scfParent->SetAnimCycle(name,weight);
+      return scfParent->SetAnimCycle(name,weight);
     }
     virtual bool SetAnimCycle(int idx, float weight)
     {
@@ -1022,16 +1053,16 @@ public:
     }
     virtual bool SetAnimAction(const char *name, float delayIn, float delayOut)
     {
-	return scfParent->SetAnimAction(name,delayIn,delayOut);
+      return scfParent->SetAnimAction(name,delayIn,delayOut);
     }
     virtual bool SetAnimAction(int idx, float delayIn, float delayOut)
     {
-	return scfParent->SetAnimAction(idx,delayIn,delayOut);
+      return scfParent->SetAnimAction(idx,delayIn,delayOut);
     }
 
     virtual bool SetVelocity(float vel,csRandomGen *rng=0)
     {
-	return scfParent->SetVelocity(vel,rng);
+      return scfParent->SetVelocity(vel,rng);
     }
     virtual void SetDefaultIdleAnim(const char *name)
     {
@@ -1040,22 +1071,23 @@ public:
 
     virtual void SetLOD(float lod)
     {
-	scfParent->SetLOD(lod);
+      scfParent->SetLOD(lod);
     }
     virtual bool AttachCoreMesh(const char *meshname)
-    {  return scfParent->AttachCoreMesh(meshname); }
+    { return scfParent->AttachCoreMesh(meshname); }
 
     virtual bool AttachCoreMesh(int mesh_id,int iMatWrapID)
-    {  return scfParent->AttachCoreMesh(mesh_id,iMatWrapID); }
+    { return scfParent->AttachCoreMesh(mesh_id,iMatWrapID); }
 
     virtual bool DetachCoreMesh(const char *meshname)
-    {  return scfParent->DetachCoreMesh(meshname); }
+    { return scfParent->DetachCoreMesh(meshname); }
 
     virtual bool DetachCoreMesh(int mesh_id)
-    {  return scfParent->DetachCoreMesh(mesh_id); }
+    { return scfParent->DetachCoreMesh(mesh_id); }
 
-    virtual bool BlendMorphTarget(int morph_animation_id, float weight, float delay)
-    {  return scfParent->BlendMorphTarget(morph_animation_id, weight, delay); }
+    virtual bool BlendMorphTarget(int morph_animation_id, float weight,
+      float delay)
+    { return scfParent->BlendMorphTarget(morph_animation_id, weight, delay); }
 
     virtual bool ClearMorphTarget(int morph_animation_id, float delay)
     { return scfParent->ClearMorphTarget(morph_animation_id, delay); }
@@ -1095,11 +1127,11 @@ public:
     }
     virtual void SetTimeFactor(float timeFactor)
     {
-        scfParent->SetTimeFactor(timeFactor);
+      scfParent->SetTimeFactor(timeFactor);
     }
     virtual float GetTimeFactor()
     {
-        return scfParent->GetTimeFactor();
+      return scfParent->GetTimeFactor();
     }
     virtual float GetAnimationTime()
     {
@@ -1119,14 +1151,17 @@ public:
     }
     virtual void SetUserData(void *data)
     {
-        scfParent->SetUserData(data);
+      scfParent->SetUserData(data);
     }
-
+    virtual void SetAnimTimeUpdateHandler(iAnimTimeUpdateHandler* p)
+    {
+      scfParent->SetAnimTimeUpdateHandler(p);
+    }
 
   } scfiSpriteCal3DState;
   friend struct SpriteCal3DState;
 
-  //--------------------- iLODControl implementation -------------//
+  //--------------------- iLODControl implementation -------------------------
   int GetLODPolygonCount (float lod)
   { return 0; }
 
@@ -1145,15 +1180,14 @@ public:
     {
       return scfParent->GetLODPolygonCount (lod);
     }
-    virtual void GetLOD(iSharedVariable *& first,iSharedVariable *& second) const
+    virtual void GetLOD(iSharedVariable*& first,iSharedVariable*& second) const
     {
       first=0; second=0;
     }
   } scfiLODControl;
   friend struct LODControl;
 
-  void GetObjectBoundingBox (csBox3& bbox, csVector3 *verts,
-  	int vertCount);
+  void GetObjectBoundingBox (csBox3& bbox, csVector3 *verts, int vertCount);
   void GetObjectBoundingBox (csBox3& bbox);
   void SetObjectBoundingBox (const csBox3& bbox);
   void GetRadius (csVector3& rad, csVector3& cent);
@@ -1205,23 +1239,24 @@ public:
 
   bool Initialize (iObjectRegistry* p);
 
-  //------------------------ iMeshObjectType implementation --------------
+  //------------------------ iMeshObjectType implementation ------------------
   SCF_DECLARE_IBASE;
 
   /// New Factory.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
 
-  //------------------- iConfig interface implementation -------------------
+  //------------------- iConfig interface implementation ---------------------
   struct csSpriteCal3DConfig : public iConfig
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObjectType);
-    virtual bool GetOptionDescription (int idx, csOptionDescription *option) { return false; }
+    virtual bool GetOptionDescription (int idx, csOptionDescription *option)
+    { return false; }
     virtual bool SetOption (int id, csVariant* value) { return false; }
     virtual bool GetOption (int id, csVariant* value) { return false; }
   } scfiConfig;
   friend struct csSpriteCal3DConfig;
 
-  //--------------------- iComponent interface implementation
+  //--------------------- iComponent interface implementation ----------------
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSpriteCal3DMeshObjectType);
@@ -1230,7 +1265,7 @@ public:
   } scfiComponent;
   friend struct eiComponent;
 
-  //--------------------- iLODControl implementation -------------//
+  //--------------------- iLODControl implementation -------------------------
   struct LODControl : public iLODControl
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObjectType);
@@ -1254,7 +1289,7 @@ public:
     {
       return 0;
     }
-    virtual void GetLOD(iSharedVariable *& first,iSharedVariable *& second) const
+    virtual void GetLOD(iSharedVariable*& first,iSharedVariable*& second) const
     {
       first=0; second=0;
     }

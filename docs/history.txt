@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Mar-2005
+	- Eric Sunshine applied patch from <obi666@users.sourceforge.net>
+	  (patch #1155282), which adds iAnimTimeUpdateHandler for
+	  sprcal3d. This handler allows clients to override the default
+	  advancement behavhior of csSpriteCal3DMeshObject::Advance(), which
+	  normally merely invokes CalModel::update(). Eric also made a number
+	  of improvements to the patch, such as adding missing Doxygen
+	  comments, increasing robustness, and making better use of CS
+	  functionality.  In addition, Eric performed a bit of formatting
+	  cleanup of the sprcal3d-related header files.
 3-Mar-2005
 	- Jorrit fixed a compile error in spr2d. ||= is not a valid
 	  C++ operator. So put the original |= back.

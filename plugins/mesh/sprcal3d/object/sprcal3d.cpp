@@ -709,6 +709,17 @@ SCF_IMPLEMENT_IBASE_END
 
 //=============================================================================
 
+SCF_IMPLEMENT_IBASE (csSpriteCal3DMeshObject::DefaultAnimTimeUpdateHandler)
+  SCF_IMPLEMENTS_INTERFACE (iAnimTimeUpdateHandler)
+SCF_IMPLEMENT_IBASE_END
+
+void csSpriteCal3DMeshObject::DefaultAnimTimeUpdateHandler::UpdatePosition(
+  float delta, CalModel* model)
+{
+  model->update(delta);
+}
+
+//=============================================================================
 SCF_IMPLEMENT_IBASE (csSpriteCal3DMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLightingInfo)
@@ -793,6 +804,8 @@ csSpriteCal3DMeshObject::csSpriteCal3DMeshObject (iBase *pParent,
   updateanim_skip2 = 20;	// Skip every 20 frames.
   updateanim_sqdistance3 = 50*50;
   updateanim_skip3 = 1000;	// Animate very rarely.
+
+  anim_time_handler.AttachNew(new DefaultAnimTimeUpdateHandler());
 }
 
 csSpriteCal3DMeshObject::~csSpriteCal3DMeshObject ()
@@ -1746,7 +1759,10 @@ bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
   float delta = ((float)current_time - last_update_time)/1000.0F;
   if (!current_time)
     delta = 0;
-  calModel.update(delta);
+
+  if (anim_time_handler.IsValid())
+    anim_time_handler->UpdatePosition (delta, &calModel);
+
   if (current_time)
     last_update_time = current_time;
 
@@ -2150,6 +2166,12 @@ bool csSpriteCal3DMeshObject::ClearMorphTarget(int morph_animation_id,
     return false;
   }
   return calModel.getMorphTargetMixer()->clear(morph_animation_id,delay);
+}
+
+void csSpriteCal3DMeshObject::SetAnimTimeUpdateHandler(
+  iAnimTimeUpdateHandler* p)
+{
+  anim_time_handler = p;
 }
 
 csSpriteCal3DSocket* csSpriteCal3DMeshObject::AddSocket ()

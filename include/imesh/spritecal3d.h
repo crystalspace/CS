@@ -41,8 +41,7 @@ class CalCoreModel;
 SCF_VERSION (iSpriteCal3DSocket, 0, 0, 2);
 
 /**
- * A socket for specifying where sprites can plug into
- * other sprites.
+ * A socket for specifying where sprites can plug into other sprites.
  */
 struct iSpriteCal3DSocket : public iBase
 {
@@ -76,28 +75,30 @@ struct iSpriteCal3DSocket : public iBase
   /// Get the transform of the main mesh
   virtual csReversibleTransform GetTransform () const = 0;
 
-  /// Get a count of the secondary attached meshes (this doesn't include the primary mesh)
+  /**
+   * Get a count of the secondary attached meshes (this doesn't include the
+   * primary mesh)
+   */
   virtual size_t GetSecondaryCount () const = 0;
   /// Get the attached secondary mesh at the given index
   virtual iMeshWrapper * GetSecondaryMesh (size_t index) = 0;
   /// Get the transform of the attached secondary mesh at the given index
   virtual csReversibleTransform GetSecondaryTransform (size_t index) = 0;
   /// Set the transform of the attached secondary mesh at the given index
-  virtual void SetSecondaryTransform (size_t index, csReversibleTransform trans) = 0;
+  virtual void SetSecondaryTransform (size_t index, csReversibleTransform) = 0;
   /// Attach a secondary mesh
-  virtual size_t AttachSecondary (iMeshWrapper * mesh, csReversibleTransform trans) = 0;
-  /// Detach a secondary mesh
+  virtual size_t AttachSecondary (iMeshWrapper*, csReversibleTransform) = 0;
+  /// Detach a secondary mesh by name
   virtual void DetachSecondary (const csString & mesh_name) = 0;
+  /// Detach a secondary mesh by index
   virtual void DetachSecondary (size_t index) = 0;
   /// Finds the index of the given attached secondary mesh
   virtual size_t FindSecondary (const csString & mesh_name) = 0;
 };
 
 
-
 SCF_VERSION (iSpriteCal3DFactoryState, 0, 0, 3);
 struct CalAnimationCallback;
-
 
 /**
  * This interface describes the API for the 3D sprite factory mesh object.
@@ -332,6 +333,27 @@ struct iSpriteCal3DFactoryState : public iBase
 
 };
 
+SCF_VERSION (iAnimTimeUpdateHandler, 0, 0, 1); 
+
+/**
+ * By default, csSpriteCal3DMeshObject::Advance() updates the model's via
+ * CalModel::update() with the elapsed time since the last advancement.  If
+ * this simplistic approach is insufficient for your case, you can override the
+ * default behavior by providing your own implementation of the
+ * iAnimTimeUpdateHandler interface and registering it with
+ * iSpriteCal3DState::SetAnimTimeUpdateHandler().
+*/
+struct iAnimTimeUpdateHandler : public iBase
+{
+  /**
+   * Given the elapsed time, update the position of the model. By default,
+   * csSpriteCal3DMeshObject::Advance() updates the model's via
+   * CalModel::update(), but you can override this simplistic approach by
+   * implementing your own UpdatePosition() method.
+   */
+  virtual void UpdatePosition (float delta, CalModel*) = 0;
+};
+
 SCF_VERSION (iSpriteCal3DState, 0, 0, 2);
 
 /**
@@ -544,15 +566,24 @@ struct iSpriteCal3DState : public iBase
   /// Set current animation time.
   virtual void SetAnimationTime(float animationTime) = 0;
 
-  /** This gives you access to the internal Cal3d Model class
-   *  which sprcal3d wraps.  If you use it directly, you run
-   *  the risk of making sprcal3d and CalModel get out of sync.
-   *  Use carefully!
+  /**
+   * This gives you access to the internal Cal3d Model class which sprcal3d
+   * wraps.  If you use it directly, you run the risk of making sprcal3d and
+   * CalModel get out of sync.  Use carefully!
    */
   virtual CalModel *GetCal3DModel() = 0;
 
   /// Set user data in the model, for access from the callback later, mostly.
   virtual void SetUserData(void *data) = 0;
+  
+  /**
+   * This gives you ability to update the internal Cal3d model directly rather
+   * than relying upon the default behavior which merely invokes
+   * CalModel::update().  You may need to do this, for example, when you want
+   * to move Cal3d skeleton from your own code (to implement rag-doll physics,
+   * for instance).
+   */
+  virtual void SetAnimTimeUpdateHandler(iAnimTimeUpdateHandler*) = 0;
 };
 
 #endif// __CS_IMESH_SPRITECAL3D_H__
