@@ -27,6 +27,9 @@ chronological order.
 	  to force compiling of a specific priority technique in a shader.
 	  These new functions will be used by csbench so that it can try
 	  out different techniques of a shader.
+	- Keith added SetDefaultIdleAnim to sprcal3d, which allows multiple
+	  idle anims to be selected from by the caller for use in
+	  SetVelocity(0) calls.
 19-Jun-2004
 	- Rhad fixed a typo in the ode and simple physics plugins for particles
 	  that was swapping the green and blue components of constant colors.
