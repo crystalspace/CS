@@ -1,6 +1,6 @@
 %define name    crystalspace
 %define version 0.99
-%define release 7
+%define release 8
 %define prefix	/usr
 
 %define with_DEBUG 0
@@ -26,15 +26,27 @@ Version: %{version}
 License: LGPL
 
 %description
-Crystal Space is a free (LGPL) and portable 3D SDK written in C++.
+Crystal Space is a free (LGPL) and portable 3D SDK
+written in C++.
+
+# Utils package
+%package -n %{name}-utils
+Summary: Utilities for Crystal Space free 3D SDK.
+Group: Development/C++
+Provides:       %{name}-utils = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
+%description -n %{name}-utils
+Utilities for Crystal Space free 3D SDK.
 
 # Dev package
 %package -n %{name}-devel
 Summary: C++ headers and link libraries for Crystal Space free 3D SDK.
 Group: Development/C++
 Provides:       %{name}-devel = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 %description -n %{name}-devel
-Headers and link libraries needed for building projects based upon the Crystal Space 3D SDK.
+Headers and link libraries needed for building
+projects based upon the Crystal Space 3D SDK.
 
 # Docs package
 %package -n %{name}-doc
@@ -42,7 +54,8 @@ Summary: Documentation for Crystal Space free 3D SDK
 Group: Development/C++
 Provides:       %{name}-doc = %{version}-%{release}
 %description -n %{name}-doc
-Documentation (manual and public API reference) for CrystalSpace free 3D SDK.
+Documentation (manual and public API reference)
+for CrystalSpace free 3D SDK.
 
 %prep
 %setup -n CS
@@ -65,7 +78,7 @@ make all
 %install
 DESTDIR=%{buildroot} make install
 
-%post
+%post -n %{name}-utils
 %{prefix}/bin/cslight -canvas=null -video=null flarge
 %{prefix}/bin/cslight -canvas=null -video=null partsys
 
@@ -76,15 +89,88 @@ rm -rf "$RPM_BUILD_ROOT"
 %files -n %{name}
 %defattr(-,root,root)
 
-%{prefix}/bin/*
-%{_sysconfdir}/%{name}/*
+%{_sysconfdir}/%{name}/asciiart.cfg
+%{_sysconfdir}/%{name}/autoexec.cfg
+%{_sysconfdir}/%{name}/bugplug.cfg
+%{_sysconfdir}/%{name}/bugplug.key
+%{_sysconfdir}/%{name}/csws.cfg
+%{_sysconfdir}/%{name}/dynavis.cfg
+%{_sysconfdir}/%{name}/engine.cfg
+%{_sysconfdir}/%{name}/fancycon.cfg
+%{_sysconfdir}/%{name}/fontplex.cfg
+%{_sysconfdir}/%{name}/freetype.cfg
+%{_sysconfdir}/%{name}/gldrivers.xml
+%{_sysconfdir}/%{name}/joystick.cfg
+%{_sysconfdir}/%{name}/macosx.cfg
+%{_sysconfdir}/%{name}/mouse.cfg
+%{_sysconfdir}/%{name}/movierecorder.cfg
+%{_sysconfdir}/%{name}/null3d.cfg
+%{_sysconfdir}/%{name}/opengl.cfg
+%{_sysconfdir}/%{name}/r3dopengl.cfg
+%{_sysconfdir}/%{name}/shadermgr.cfg
+%{_sysconfdir}/%{name}/simpcon.cfg
+%{_sysconfdir}/%{name}/soft3d.cfg
+%{_sysconfdir}/%{name}/sound.cfg
+%{_sysconfdir}/%{name}/sprcal3d.cfg
+%{_sysconfdir}/%{name}/standardcon.cfg
+%{_sysconfdir}/%{name}/system.cfg
+%{_sysconfdir}/%{name}/thing.cfg
+%{_sysconfdir}/%{name}/vfs.cfg
+%{_sysconfdir}/%{name}/video.cfg
+
 %{_libdir}/%{name}/*
-%{_datadir}/%{name}/*
+
+%{_datadir}/%{name}/data/*.zip
+%{_datadir}/%{name}/data/aws/*
+%{_datadir}/%{name}/data/cube/*
+%{_datadir}/%{name}/data/varia/*
+%{_datadir}/%{name}/data/shader/*
+
+#---------------------UTILS------------------------
+%files -n %{name}-utils
+%defattr(-,root,root)
+
+%{prefix}/bin/pvscalc
+%{prefix}/bin/vsh
+%{prefix}/bin/viewmesh
+%{prefix}/bin/partedit
+%{prefix}/bin/lighter
+%{prefix}/bin/levtool
+%{prefix}/bin/heightmapgen
+%{prefix}/bin/docconv
+%{prefix}/bin/cslight
+%{prefix}/bin/csfgen
+%{prefix}/bin/csfedit
+%{prefix}/bin/csbench
+%{prefix}/bin/md22spr
+%{prefix}/bin/md32spr
+%{prefix}/bin/map2cs
+%{prefix}/bin/maya2spr
+%{prefix}/bin/3ds2lev
+%{prefix}/bin/walktest
+%{prefix}/bin/csdemo
+
+%{_datadir}/%{name}/data/maps/*
+%{_datadir}/%{name}/conversion/*
+
+%{_sysconfdir}/%{name}/awstest.cfg
+%{_sysconfdir}/%{name}/awstut.cfg
+%{_sysconfdir}/%{name}/csbumptest.cfg
+%{_sysconfdir}/%{name}/csdemo.cfg
+%{_sysconfdir}/%{name}/cswstest.cfg
+%{_sysconfdir}/%{name}/g2dtest.cfg
+%{_sysconfdir}/%{name}/heightmapgen.cfg
+%{_sysconfdir}/%{name}/lighter.xml
+%{_sysconfdir}/%{name}/map2cs.cfg
+%{_sysconfdir}/%{name}/walktest.cfg
+%{_sysconfdir}/%{name}/waterdemo.cfg
 
 #---------------------DOC-------------------------
 %files -n %{name}-doc
 %defattr(-,root,root)
+
 %docdir docs
+
 %{_datadir}/doc/%{name}-%{version}/README.html
 %{_datadir}/doc/%{name}-%{version}/html/manual/*.html
 %{_datadir}/doc/%{name}-%{version}/html/manual/build/platform/win32/cygwin/*.jpg
@@ -105,7 +191,16 @@ rm -rf "$RPM_BUILD_ROOT"
 #---------------------DEV-------------------------
 %files -n %{name}-devel
 %defattr(-,root,root)
-%{prefix}/lib/*.a
+
+%{prefix}/bin/cs-config
+%{_libdir}/*.a
+
+# (vk) Scripting related files are here for now
+%{prefix}/bin/*.cex
+%{_datadir}/%{name}/bindings/*
+
+%{_datadir}/%{name}/build/*
+
 %{prefix}/include/%{name}/*.h
 %{prefix}/include/%{name}/csws/*.h
 %{prefix}/include/%{name}/iaws/*.h
@@ -136,6 +231,9 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/%{name}/igraphic/*.h
 
 %changelog
+* Wed Jan 05 2005 Vincent Knecht <vknecht@users.sourceforge.net> 0.99-8
+- Made a separate package for utilities.
+
 * Mon Dec 13 2004 Eric Sunshine <sunshine@sunshineco.com> 0.99-7
 - The old-renderer has been retired.
 

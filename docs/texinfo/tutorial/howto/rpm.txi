@@ -82,16 +82,19 @@ rpm -ba cs.spec --with perl
 The binary @sc{rpm}'s should be under @file{rpm/RPMS/}, and the source @sc{rpm}
 in @file{rpm/SRPMS/}.
 
-The process creates three Crystal Space binary @sc{rpm} packages:
+The process creates four Crystal Space binary @sc{rpm} packages:
 
 @itemize @bullet
 @item
-@samp{crystalspace} base package. It provides executables, plugins, data and
-configuration files.
+@samp{crystalspace} base package. It provides plugins, data and configuration
+files.
 @item
 @samp{crystalspace-devel} development package. It provides headers and static
 libraries needed for development.
 @item
 @samp{crystalspace-doc} documentation package. It provides @sc{api} and user
 manual documentation in @sc{html} format.
+@item
+@samp{crystalspace-utils} utilities package. It provides executables, data
+(especially map files) and configuration files.
 @end itemize

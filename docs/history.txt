@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Jan-2005
+	- Vincent Knecht changed rpm/cs.spec to put utilities in their own
+	  package, named crystalspace-utils. Also updated the RPM Howto in
+	  the manual.
 4-Jan-2005
 	- Jorrit added a new iSectorMeshCallback and associated setter
 	  functions in iSector. With this callback you can get notified whenever
