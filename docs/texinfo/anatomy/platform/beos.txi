@@ -131,10 +131,11 @@ access the current @samp{color_space} setting and uses it to set the correct
 values for all these parameters.  it also creates a bitmap of the required
 @samp{color_space} pointed to by private @samp{BBitMap*} bitmap.
 
-@code{csGraphics3DSoftware::Open()} calls @code{csGraphics2DBeLib::Open()}
-which is (defined in @file{plugins/video/canvas/be/belibg2d.cpp}) which begins
-by calling the inherited @file{csGraphics2D::Open()} method (defined in
-@file{plugins/video/canvas/common/graph2d.cpp}).  @code{csGraphics2D::Open()}
+@code{csGraphics3DSoftware::Open()} calls upon the method
+@code{csGraphics2DBeLib::Open()}, which is defined in the file
+@file{CS/plugins/video/canvas/be/belibg2d.cpp}.  This @code{Open()} method
+begins by calling the inherited @file{csGraphics2D::Open()} method defined in
+@file{plugins/video/canvas/common/graph2d.cpp}.  @code{csGraphics2D::Open()}
 creates an @samp{int} array with the number of scanlines designated in
 @file{cryst.cfg} and sets up the static @samp{csGraphics2D::ScanLine} pointer
 to it.  It then initialises it with precalculated addresses of each scanline
