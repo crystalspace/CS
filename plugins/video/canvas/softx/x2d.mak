@@ -53,10 +53,10 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: x2d libxclean
+.PHONY: x2d x2dclean
 
 # Chain rules
-clean: libxclean
+clean: x2dclean
 
 x2d: $(OUTDIRS) $(XLIB2D)
 
@@ -66,7 +66,7 @@ $(OUT)%$O: libs/cs2d/softx/%.cpp
 $(XLIB2D): $(OBJ.XLIB2D) $(DEP.X2D)
 	$(DO.PLUGIN) $(LIBS.LOCAL.X2D)
 
-libxclean:
+x2dclean:
 	$(RM) $(XLIB2D) $(OBJ.XLIB2D)
 
 ifdef DO_DEPEND
