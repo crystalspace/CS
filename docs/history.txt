@@ -22,6 +22,9 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed the -video option so that it no longer generates
 	  warning messages, crashes the application, or tries to load multiple
 	  drivers.
+	- Eric Sunshine fixed a number of csClear and csPython makefiles so
+	  that the targets are only listed if the respective plugins are
+	  enabled via the makefile PLUGINS variable.
 21-Nov-1999
 	- Michael Dale Long added some changes to CrystalClear:
 	    - Fixed rotation skew in cctest.
