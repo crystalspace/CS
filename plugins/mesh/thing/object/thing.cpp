@@ -2699,13 +2699,9 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
   int clip_portal, clip_plane, clip_z_plane;
-  csVector3 camera_origin;
-  if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-    clip_z_plane, camera_origin) == false)
-  {
-    num = 0;
-    return 0;    
-  }
+  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
+  	clip_z_plane);
+  csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
 
   rmHolder *rmH = rmHolderList[rmHolderListIndex];
 

@@ -227,6 +227,11 @@ struct iRenderView : public iBase
   virtual void CalculateFogMesh (const csTransform &tr_o2c, 
     G3DPolygonMesh &mesh) = 0;
 
+  /**
+   * Given a frustum_mask, calculate the clip settings.
+   */
+  virtual void CalculateClipSettings (uint32 frustum_mask,
+    int &clip_portal, int &clip_plane, int &clip_z_plane) = 0;
 
   /**
    * Test if the given bounding sphere (in object space coordinates)

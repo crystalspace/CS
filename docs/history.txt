@@ -13,6 +13,12 @@ chronological order.
 	- Jorrit removed the almost unused CS_CLIP_PORTAL flag for clipping
 	  (was only used in the OR GL renderer). This greatly simplifies the
 	  clipping routines.
+	- Jorrit added a new iRenderView->CalculateClipSettings() routine
+	  which calculates the clip settings out of the frustum mask. This
+	  can be used by GetRenderMeshes() implementations of meshes instead
+	  of calling the complicated ClipBBox()/ClipBSphere() routines. This
+	  will be a lot faster.
+	- Jorrit extended thing and genmesh to use the new system already.
 21-Apr-2004
 	- Jorrit fixed compilation of the engine plugin with OR after
 	  breaking it yesterday.

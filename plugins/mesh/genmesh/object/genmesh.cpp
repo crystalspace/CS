@@ -1008,17 +1008,9 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
     tr_o2c /= movable->GetFullTransform ();
 
   int clip_portal, clip_plane, clip_z_plane;
-  csVector3 radius;
-  csSphere sphere;
-  GetRadius (radius, sphere.GetCenter ());
-  float max_radius = radius.x;
-  if (max_radius < radius.y) max_radius = radius.y;
-  if (max_radius < radius.z) max_radius = radius.z;
-  sphere.SetRadius (max_radius);
-  csVector3 camera_origin;
-  if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
-      clip_z_plane, camera_origin) == false)
-    return 0;
+  rview->CalculateClipSettings (frustum_mask, clip_portal, clip_plane,
+      clip_z_plane);
+  csVector3 camera_origin = tr_o2c.GetT2OTranslation ();
 
   lighting_movable = movable;
 

@@ -286,6 +286,9 @@ public:
   virtual bool TestBSphere (const csReversibleTransform& o2c,
     const csSphere& sphere);
 
+  virtual void CalculateClipSettings (uint32 frustum_mask,
+    int &clip_portal, int &clip_plane, int &clip_z_plane);
+
   virtual bool ClipBSphere (const csReversibleTransform& o2c,
     const csSphere& sphere, int& clip_portal, int& clip_plane,
     int& clip_z_plane, csVector3& camera_origin);

@@ -859,17 +859,16 @@ bool csRenderView::TestBSphere (
   return true;
 }
 
-#if 0
-bool csRenderView::CalculateClipSettings (
+void csRenderView::CalculateClipSettings (
   uint32 frustum_mask,
   int &clip_portal,
   int &clip_plane,
   int &clip_z_plane)
 {
-  if (frustum_mask & 0xf == 0)
-    clip_portal = CS_CLIP_NOT;
-  else
+  if (frustum_mask & 0xf)
     clip_portal = CS_CLIP_NEEDED;
+  else
+    clip_portal = CS_CLIP_NOT;
 
   if (frustum_mask & 0x10)
     clip_z_plane = CS_CLIP_NEEDED;
@@ -880,10 +879,7 @@ bool csRenderView::CalculateClipSettings (
     clip_plane = CS_CLIP_NEEDED;
   else
     clip_plane = CS_CLIP_NOT;
-
-  return true;
 }
-#endif
 
 bool csRenderView::ClipBSphere (
   const csReversibleTransform &o2c,
