@@ -1,8 +1,16 @@
-﻿Crystal Space detailed change log.
+Crystal Space detailed change log.
 http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+8-Apr-2003
+	- Fixed two bugs in dynamic ambient for things:
+	    - Overflow wasn't checked so if you used a value that was too
+	      high it would wrap instead of clamp.
+	    - Dynamic ambient is now multiplied with 128 instead of 255. This
+	      brings the dynamic ambient color range in the same range as
+	      the rest of CS with 1 meaning full bright and 2 meaning
+	      double brightness.
 7-Apr-2003
         - Rhad changed MSVC specific CopyMemory to memcpy() in OpenAL
           sound renderer.  Increased default sound buffer to 1.0 seconds
@@ -21,6 +29,7 @@ The history order is reversed so that new features are at the top.
 	    - sequence manager
 	- Additionally replaced a few csGetTicks() calls in walktest movement
 	  code with the virtual clock.
+	- Removed obsolete csThingBBox bounding box in csThing.
 6-Apr-2003
         - Rhad fixed some thread syncronization issues in the OpenAL
           and Direct Sound 3d sound renderers.

@@ -551,9 +551,13 @@ bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
   if (dyn_ambient_r || dyn_ambient_g || dyn_ambient_b)
   {
     csRGBpixel ambient;
-    ambient.Set ((unsigned char)(dyn_ambient_r * 255),
-                 (unsigned char)(dyn_ambient_g * 255),
-                 (unsigned char)(dyn_ambient_b * 255),
+    int dr = QInt (dyn_ambient_r * 128);
+    int dg = QInt (dyn_ambient_g * 128);
+    int db = QInt (dyn_ambient_b * 128);
+    if (dr > 255) dr = 255;
+    if (dg > 255) dg = 255;
+    if (db > 255) db = 255;
+    ambient.Set ((unsigned char)dr, (unsigned char)dg, (unsigned char)db,
 		 0);	// Use alpha 0 so we can use this for UnsafeAdd.
 
     if (max_static_color_values.red   + ambient.red   < 256  &&
