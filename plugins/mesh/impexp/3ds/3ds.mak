@@ -13,9 +13,9 @@ ifeq ($(MAKESECTION),roottargets)
 .PHONY: ie3ds ie3dsclean
 plugins meshes all: ie3ds
 
-ieplexclean:
+ie3dsclean:
 	$(MAKE_CLEAN)
-ieplex:
+ie3ds:
 	$(MAKE_TARGET) MAKE_DLL=yes
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -38,11 +38,12 @@ endif
 INC.IE3DS = $(wildcard plugins/mesh/impexp/3ds/*.h)
 SRC.IE3DS = $(wildcard plugins/mesh/impexp/3ds/*.cpp)
 OBJ.IE3DS = $(addprefix $(OUT),$(notdir $(SRC.IE3DS:.cpp=$O)))
-DEP.IE3DS = CSGEOM CSUTIL CSSYS CSUTIL LIB3DS-101D
+DEP.IE3DS = CSGEOM CSUTIL CSSYS CSUTIL
 
 MSVC.DSP += IE3DS
-DSP.IEPLEX.NAME = ie3ds
-DSP.IEPLEX.TYPE = plugin
+DSP.IE3DS.NAME = ie3ds
+DSP.IE3DS.TYPE = plugin
+DSP.IE3DS.LIBS = lib3ds-101d
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
@@ -54,8 +55,8 @@ ie3ds: $(OUTDIRS) $(IE3DS)
 $(IE3DS): $(OBJ.IE3DS) $(LIB.IE3DS)
 	$(DO.PLUGIN)
 
-clean: ieplexclean
-ieplexclean:
+clean: ie3dsclean
+ie3dsclean:
 	-$(RM) $(IE3DS) $(OBJ.IE3DS)
 
 ifdef DO_DEPEND
