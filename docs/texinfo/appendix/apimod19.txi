@@ -199,18 +199,8 @@ imgldr->DecRef ();
 @cindex @code{iLoader}
 @cindex Level Loading
 
-At this moment the level loader is not yet a plugin but already
-behaves like one. For that reason you still have to do:
-
-@example
-SCF_REGISTER_STATIC_LIBRARY (lvlload)
-@end example
-
-Somewhere in the beginning of your program (this is a declaration, put
-it outside code).
-
-Then make sure you have the level loader plugin by putting the following
-in your config file:
+The level loader is now a plugin. Make sure you have it loaded by putting the
+following in your config file:
 
 @example
 System.PlugIns.LevelLoader = crystalspace.level.loader
@@ -789,7 +779,13 @@ was renamed to @samp{csColliderWrapper}.
 @subheading Key/Node Mechanism
 @cindex @code{csKeyValuePair}
 
-The @samp{csKeyValuePair} class moved from @file{csengine} to @file{cstool}.
+The @samp{csKeyValuePair} and @samp{csMapNode} classes moved from
+@file{csengine} to @file{cstool}.
+
+@subheading @code{csView}
+@cindex @code{csView}
+
+The @samp{csView} class moved from @samp{csengine} to @samp{cstool}.
 
 @subheading System Driver Variables
 
@@ -824,6 +820,12 @@ pointer to the shared @sc{vfs} instance.  For example:
 iSystem* sys = @dots{};
 iVFS* vfs = CS_QUERY_PLUGIN_ID (sys, CS_FUNCID_VFS, iVFS);
 @end example
+
+@subheading Global @samp{System} Variable Removed
+
+The global system driver variable, called @samp{System} and defined in
+@samp{cssys}, has been removed. If your application wants to use a global
+system driver variable anyway, you have to define it yourself.
 
 @subheading @sc{ddg} Terrain Engine Removed
 @cindex @sc{ddg} Terrain Engine
@@ -951,3 +953,4 @@ Removed @code{csMeshWrapper::GetChildren()}.  Instead use
 
 Renamed @code{csFilenameMatches()} to @code{csGlobMatches()} (from
 @file{csutil} library).
+
