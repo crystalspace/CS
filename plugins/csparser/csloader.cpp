@@ -1092,6 +1092,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("meshlib", XMLTOKEN_MESHLIB);
   xmltokens.Register ("meshobj", XMLTOKEN_MESHOBJ);
   xmltokens.Register ("meshref", XMLTOKEN_MESHREF);
+  xmltokens.Register ("meta", XMLTOKEN_META);
   xmltokens.Register ("move", XMLTOKEN_MOVE);
   xmltokens.Register ("movelight", XMLTOKEN_MOVELIGHT);
   xmltokens.Register ("mipmap", XMLTOKEN_MIPMAP);
@@ -1241,7 +1242,11 @@ bool csLoader::LoadMap (iLoaderContext* ldr_context, iDocumentNode* node)
 	    return false;
 	  break;
         case XMLTOKEN_ADDON:
-	  if (!LoadAddOn (ldr_context, child, (iEngine*)Engine))
+	  if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, false))
+	    return false;
+      	  break;
+        case XMLTOKEN_META:
+	  if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, true))
 	    return false;
       	  break;
         case XMLTOKEN_MESHFACT:
@@ -1419,7 +1424,11 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node)
 	  break;
 	}
         case XMLTOKEN_ADDON:
-	  if (!LoadAddOn (ldr_context, child, (iEngine*)Engine))
+	  if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, false))
+	    return false;
+      	  break;
+        case XMLTOKEN_META:
+	  if (!LoadAddOn (ldr_context, child, (iEngine*)Engine, true))
 	    return false;
       	  break;
 	case XMLTOKEN_SEQUENCES:
@@ -1994,7 +2003,11 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
         }
         break;
       case XMLTOKEN_ADDON:
-	if (!LoadAddOn (ldr_context, child, stemp))
+	if (!LoadAddOn (ldr_context, child, stemp, false))
+	  return false;
+      	break;
+      case XMLTOKEN_META:
+	if (!LoadAddOn (ldr_context, child, stemp, true))
 	  return false;
       	break;
       case XMLTOKEN_LODLEVEL:
@@ -2549,7 +2562,12 @@ bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
       break;
     case XMLTOKEN_ADDON:
       TEST_MISSING_MESH
-      if (!LoadAddOn (ldr_context, child, mesh))
+      if (!LoadAddOn (ldr_context, child, mesh, false))
+	return false;
+      break;
+    case XMLTOKEN_META:
+      TEST_MISSING_MESH
+      if (!LoadAddOn (ldr_context, child, mesh, true))
 	return false;
       break;
     case XMLTOKEN_NOLIGHTING:
@@ -2971,7 +2989,11 @@ bool csLoader::LoadPolyMeshInSector (iLoaderContext* ldr_context,
     switch (id)
     {
       case XMLTOKEN_ADDON:
-        if (!LoadAddOn (ldr_context, child, mesh))
+        if (!LoadAddOn (ldr_context, child, mesh, false))
+	  return false;
+        break;
+      case XMLTOKEN_META:
+        if (!LoadAddOn (ldr_context, child, mesh, true))
 	  return false;
         break;
       case XMLTOKEN_MOVE:
@@ -3490,7 +3512,7 @@ bool csLoader::ParseImposterSettings (iMeshWrapper* mesh, iDocumentNode *node)
 }
 
 bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
-	iDocumentNode* node, iBase* context)
+	iDocumentNode* node, iBase* context, bool is_meta)
 {
   iLoaderPlugin* plug = 0;
   iBinaryLoaderPlugin* binplug = 0;
@@ -3502,7 +3524,8 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
     iDocumentNode* defaults = 0;
     if (!loaded_plugins.FindPlugin (plugin_name, plug, binplug, defaults))
     {
-      ReportWarning (
+      if (!is_meta)
+        ReportWarning (
  	        "crystalspace.maploader.parse.addon",
 	        node, "Couldn't find or load addon plugin '%s'!",
 		plugin_name);
@@ -3510,7 +3533,8 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
     }
     if (!plug)
     {
-      ReportWarning (
+      if (!is_meta)
+        ReportWarning (
 	        "crystalspace.maploader.load.plugin",
                 node, "Could not find or load addon plugin!");
       return true;
@@ -3540,7 +3564,8 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
         case XMLTOKEN_PARAMS:
 	  if (!plug)
 	  {
-            ReportWarning (
+	    if (!is_meta)
+              ReportWarning (
 	        "crystalspace.maploader.load.plugin",
                 child, "Could not find or load plugin!");
 	    return true;
@@ -3555,7 +3580,8 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
         case XMLTOKEN_PARAMSFILE:
 	  if (!plug && !binplug)
 	  {
-            ReportWarning (
+	    if (!is_meta)
+              ReportWarning (
 	        "crystalspace.maploader.load.plugin",
                 child, "Could not find or load plugin!");
 	    return true;
@@ -3603,7 +3629,8 @@ bool csLoader::LoadAddOn (iLoaderContext* ldr_context,
 	    if (!loaded_plugins.FindPlugin (child->GetContentsValue (),
 		  plug, binplug, defaults))
 	    {
-	      ReportWarning (
+	      if (!is_meta)
+	        ReportWarning (
  	          "crystalspace.maploader.parse.addon",
 	          child, "Could not find or load plugin '%s'!",
 		  child->GetContentsValue ());
@@ -3848,6 +3875,11 @@ iCollection* csLoader::ParseCollection (iLoaderContext* ldr_context,
     switch (id)
     {
       case XMLTOKEN_ADDON:
+	SyntaxService->ReportError (
+		"crystalspace.maploader.parse.collection",
+         	child, "'addon' not yet supported in collection!");
+	return 0;
+      case XMLTOKEN_META:
 	SyntaxService->ReportError (
 		"crystalspace.maploader.parse.collection",
          	child, "'addon' not yet supported in collection!");
@@ -4389,6 +4421,11 @@ iMapNode* csLoader::ParseNode (iDocumentNode* node, iSector* sec)
 		"crystalspace.maploader.parse.node",
         	child, "'addon' not yet supported in node!");
 	return 0;
+      case XMLTOKEN_META:
+	SyntaxService->ReportError (
+		"crystalspace.maploader.parse.node",
+        	child, "'meta' not yet supported in node!");
+	return 0;
       case XMLTOKEN_KEY:
         {
           iKeyValuePair* kvp = 0;
@@ -4703,7 +4740,11 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	}
 	break;
       case XMLTOKEN_ADDON:
-	if (!LoadAddOn (ldr_context, child, sector))
+	if (!LoadAddOn (ldr_context, child, sector, false))
+	  goto error;
+      	break;
+      case XMLTOKEN_META:
+	if (!LoadAddOn (ldr_context, child, sector, true))
 	  goto error;
       	break;
       case XMLTOKEN_PORTAL:

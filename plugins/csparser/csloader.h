@@ -151,6 +151,7 @@ enum
   XMLTOKEN_MESHLIB,
   XMLTOKEN_MESHOBJ,
   XMLTOKEN_MESHREF,
+  XMLTOKEN_META,
   XMLTOKEN_MOVE,
   XMLTOKEN_MOVELIGHT,
   XMLTOKEN_MIPMAP,
@@ -583,7 +584,7 @@ private:
    * Load a plugin in general.
    */
   bool LoadAddOn (iLoaderContext* ldr_context,
-  	iDocumentNode* node, iBase* context);
+  	iDocumentNode* node, iBase* context, bool is_meta);
 
   /**
    * Load the render priority section.

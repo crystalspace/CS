@@ -13,6 +13,16 @@ chronological order.
 	  polygons were rejected due to wrong orientation.
 	- Jorrit fixed initialization problems in pvstree (detected by
 	  valgrind).
+	- Jorrit added support for a new 'meta' tag in the map loader.
+	  This 'meta' tag is exactly the same as 'addon' (i.e. where you
+	  use 'addon' you can also use 'meta' with same syntax). The
+	  only difference is that 'meta' will not show a warning or error
+	  in case the plugin cannot be found. So 'meta' can be used in
+	  situations where you want the addon plugin to be optional and
+	  not give any warnings at runtime. This can be useful to add
+	  specific information useful for tools. I plan to use this to
+	  add meta data for pvscalc.
+	- Jorrit added initialization of alphaType in the map loader.
 15-Feb-2005
 	- Jorrit added csIntersect3::IntersectPolygon() to intersect
 	  a polygon with a segment.

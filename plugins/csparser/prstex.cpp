@@ -156,7 +156,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
   TextureLoaderContext context (txtname);
   csRef<iDocumentNode> ParamsNode;
   char* type = 0;
-  csAlphaMode::AlphaType alphaType;
+  csAlphaMode::AlphaType alphaType = csAlphaMode::alphaNone;
   bool overrideAlphaType = false;
 
   csRefArray<iDocumentNode> key_nodes;
