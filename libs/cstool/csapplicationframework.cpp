@@ -55,9 +55,10 @@ csApplicationFramework::~csApplicationFramework ()
     called, and csApplicationFramework itself has no csRef<>s. So it's safe to
     call DestroyApplication() here.
    */
-  DestroyApplication (object_reg);
-  m_Ptr = 0;
+  if (object_reg != 0)
+    DestroyApplication (object_reg);
   object_reg = 0;
+  m_Ptr = 0;
 }
 
 
