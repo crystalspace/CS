@@ -292,6 +292,8 @@ void DemoSky::NextFrame ()
   csTicks elapsed_time, current_time;
   GetElapsedTime (elapsed_time, current_time);
 
+  //printf("elapsed %d\n", (int)elapsed_time);
+
   float speed = (elapsed_time / 1000.) * (0.03 * 20);
   // animate sky
   float secsperday = 30.;
@@ -326,13 +328,16 @@ void DemoSky::NextFrame ()
   // Start drawing 2D graphics.
   if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
 
+  char buf[255];
   const char *text = "Escape to quit. Arrow keys/pgup/pgdown to move.";
+  float hour = skytime * 24. + 8;
+  sprintf(buf, "%2dhr. %s", int(hour)%24, text);
   int txtx = 10;
   int txty = myG2D->GetHeight() - 20;
-  myG2D->Write(font, txtx+1, txty+1, myG3D->GetTextureManager()->FindRGB(0,0,0), 
-    -1, text);
-  myG2D->Write(font, txtx, txty, myG3D->GetTextureManager()->FindRGB(192,192,192),
-    -1, text);
+  myG2D->Write(font, txtx+1, txty+1, 
+    myG3D->GetTextureManager()->FindRGB(0,0,0), -1, buf);
+  myG2D->Write(font, txtx, txty, 
+    myG3D->GetTextureManager()->FindRGB(192,192,192), -1, buf);
 
   // Drawing code ends here.
   myG3D->FinishDraw ();

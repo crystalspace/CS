@@ -772,6 +772,7 @@ void csBallMeshObject::ApplyLightSpot(const csVector3& position, float size,
     //ball_colors[i] = ball_colors[i]*(1-apply) + color*apply;
     ball_colors[i] += color*apply;
     ball_colors[i].Clamp(2,2,2);
+    ball_colors[i].ClampDown();
   }
 }
 
@@ -794,7 +795,7 @@ void csBallMeshObject::PaintSky(float time, float **dayvert, float **nightvert,
   float *def_topsun[] = {sun0, sun1, sun2, NULL};
 
   float sunset0[] = {0.0, 0.9,0.9,-0.9};
-  float sunset1[] = {0.5, 0.1,-0.6,-0.8};
+  float sunset1[] = {0.5, 0.1,-0.8,-0.6};
   float sunset2[] = {1.0, 1,-0.9,1};
   float* def_sunset[] = {sunset0, sunset1, sunset2, NULL};
 
@@ -884,7 +885,8 @@ void csBallMeshObject::PaintSky(float time, float **dayvert, float **nightvert,
   else
   {
     float maxdist = radiusy * apply_size / 1.4;
-    if(sunpos.y < shift.y - maxdist)
+    if( ((time > 0.6) && (time < 0.9))
+       || (sunpos.y < shift.y - maxdist))
       apparent.Set(0,0,0); // deep night
     else
       GetGradientColor(applysun, (shift.y - sunpos.y)/maxdist, apparent);
@@ -892,6 +894,10 @@ void csBallMeshObject::PaintSky(float time, float **dayvert, float **nightvert,
   csColor skyatsun;
   GetGradientColor(applyvert, 0.0, skyatsun);
   apparent += skyatsun;
+  apparent.Clamp(2.0, 2.0, 2.0);
+  apparent.ClampDown();
+  //printf("Apparent is %g, %g, %g\n", apparent.red, apparent.green,
+    //apparent.blue);
   for(i=0; i<num_ball_vertices; i++)
     if(ball_vertices[i].y < shift.y)
       ball_colors[i] = apparent;
