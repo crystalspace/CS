@@ -27,10 +27,10 @@
 #include "csengine/camera.h"
 #include "csengine/world.h"
 
-LanguageLayer::LanguageLayer (csWorld* world, csCamera* camera)
+LanguageLayer::LanguageLayer (csWorld* w, csCamera* c)
 {
-  LanguageLayer::world = world;
-  LanguageLayer::camera = camera;
+  world = w;
+  camera = c;
   first_run = NULL;
 }
 
@@ -229,7 +229,8 @@ void LanguageLayer::matrix_rot_z (csMatrix3& m, float angle)
   m.m31 = 0;           m.m32 = 0;           m.m33 = 1;
 }
 
-void LanguageLayer::set_light_intensity (csLight* light, float l1, float l2, float l3)
+void LanguageLayer::set_light_intensity(
+  csLight* light, float l1, float l2, float l3)
 {
   csIdType t = light->GetType ();
   if (t == csStatLight::Type() || t == csDynLight::Type())
@@ -296,7 +297,7 @@ void LanguageLayer::suspend (csRunScript* run, long milli)
   //@@@
 }
 
-//----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 CSOBJTYPE_IMPL(csScript,csObject);
 
@@ -309,7 +310,7 @@ csScript::~csScript ()
 {
 }
 
-//----------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 CSOBJTYPE_IMPL(csRunScript,csObject);
 
@@ -360,4 +361,3 @@ void TriggerList::perform (csObject* object)
     t = t->next;
   }
 }
-
