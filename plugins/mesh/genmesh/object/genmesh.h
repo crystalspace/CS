@@ -442,12 +442,14 @@ private:
   int num_mesh_vertices;
   csVector3* mesh_tri_normals;
 #ifdef CS_USE_NEW_RENDERER
+  int* edge_indices;
   csVector3* edge_normals;
   csVector3* edge_midpts;
   csTriangle* mesh_triangles;
   int num_mesh_triangles;
 
   bool mesh_vertices_dirty_flag;
+  bool mesh_shadow_vertices_dirty_flag;
   bool mesh_texels_dirty_flag;
   bool mesh_tri_normals_dirty_flag;
   bool mesh_normals_dirty_flag;
@@ -459,13 +461,14 @@ private:
   csRef<iRender3D> r3d;
 
   csRef<iRenderBuffer> vertex_buffer;
+  csRef<iRenderBuffer> shadow_vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
   csRef<iRenderBuffer> normal_buffer;
   csRef<iRenderBuffer> trinormal_buffer;
   csRef<iRenderBuffer> color_buffer;
   csRef<iRenderBuffer> index_buffer;
 
-  csStringID vertex_name, texel_name, normal_name, trinormal_name, color_name, index_name;
+  csStringID vertex_name, shadow_vertex_name, texel_name, normal_name, trinormal_name, color_name, index_name;
 
   csRefArray<iRenderBuffer> anon_buffers;
   csGrowingArray<csStringID> anon_names;
@@ -556,6 +559,7 @@ public:
   int GetTriangleCount () const { return num_mesh_triangles; }
   csTriangle* GetTriangles () { mesh_triangle_dirty_flag = true; return mesh_triangles; }
   csVector3* GetFaceNormals () { return mesh_tri_normals; }
+  int* GetEdgeIndices () { return edge_indices; }
   csVector3* GetEdgeNormals () { return edge_normals; }
   csVector3* GetEdgeMidpoint () { return edge_midpts; }
 #endif
@@ -678,25 +682,25 @@ public:
     }
 #ifdef CS_USE_NEW_RENDERER
     virtual bool AddStream (const char *name, int component_size)
-	{
-	  return scfParent->AddStream (name, component_size);
-	}
-	virtual bool SetStreamComponent (const char *name, int index, int component, float value)
-	{
-	  return scfParent->SetStreamComponent (name, index, component, value);
-	}
-	virtual bool SetStreamComponent (const char *name, int index, int component, int value)
-	{
-	  return scfParent->SetStreamComponent (name, index, component, value);
+    {
+      return scfParent->AddStream (name, component_size);
     }
-	virtual bool SetStream (const char *name, float *value) 
-	{
-	  return scfParent->SetStream (name, value);
-	}
-	virtual bool SetStream (const char *name, int *value) 
-	{
-	  return scfParent->SetStream (name, value);
-	}
+    virtual bool SetStreamComponent (const char *name, int index, int component, float value)
+    {
+      return scfParent->SetStreamComponent (name, index, component, value);
+    }
+    virtual bool SetStreamComponent (const char *name, int index, int component, int value)
+    {
+      return scfParent->SetStreamComponent (name, index, component, value);
+    }
+    virtual bool SetStream (const char *name, float *value) 
+    {
+      return scfParent->SetStream (name, value);
+    }
+    virtual bool SetStream (const char *name, int *value) 
+    {
+      return scfParent->SetStream (name, value);
+    }
 #endif
   } scfiGeneralFactoryState;
   friend class GeneralFactoryState;
