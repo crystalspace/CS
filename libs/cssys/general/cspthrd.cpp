@@ -26,6 +26,11 @@
 #define CS_SHOW_ERROR
 #endif
 
+csMutex* csMutex::Create ()
+{
+  return new csPosixMutex;
+}
+
 csPosixMutex::csPosixMutex ()
 {
   lasterr = NULL;
@@ -143,6 +148,10 @@ const char* csPosixMutex::GetLastError ()
   return lasterr;
 }
 
+csSemaphore* csSemaphore::Create (uint32 value)
+{
+  return new csPosixSemaphore (value);
+}
 
 csPosixSemaphore::csPosixSemaphore (uint32 value)
 {
@@ -205,6 +214,16 @@ bool csPosixSemaphore::Destroy ()
   return rc == 0;
 }
 
+const char* csPosixSemaphore::GetLastError ()
+{
+  return lasterr;
+}
+
+csCondition* csCondition::Create (uint32 conditionAttributes)
+{
+  return new csPosixCondition (conditionAttributes);
+}
+
 csPosixCondition::csPosixCondition (uint32 /*conditionAttributes*/)
 {
   pthread_cond_init (&cond, NULL);
@@ -224,7 +243,7 @@ void csPosixCondition::Signal (bool bAll)
     pthread_cond_signal (&cond);
 }
 
-bool csPosixCondition::Wait (csPosixMutex *mutex, csTicks timeout)
+bool csPosixCondition::Wait (csMutex *mutex, csTicks timeout)
 {
   int rc = 0;
   if (timeout > 0)
@@ -235,7 +254,7 @@ bool csPosixCondition::Wait (csPosixMutex *mutex, csTicks timeout)
     gettimeofday (&now, &tz);
     to.tv_sec = now.tv_sec + (timeout / 1000);
     to.tv_nsec = (now.tv_usec + (timeout % 1000)*1000)*1000;
-    rc = pthread_cond_timedwait (&cond, &mutex->mutex, &to);
+    rc = pthread_cond_timedwait (&cond, &((csPosixMutex*)mutex)->mutex, &to);
     switch (rc)
     {
     case ETIMEDOUT:
@@ -253,7 +272,7 @@ bool csPosixCondition::Wait (csPosixMutex *mutex, csTicks timeout)
     }
   }
   else
-    pthread_cond_wait (&cond, &mutex->mutex);
+    pthread_cond_wait (&cond, &((csPosixMutex*)mutex)->mutex);
   CS_SHOW_ERROR;
   return rc == 0;
 }
@@ -270,11 +289,22 @@ bool csPosixCondition::Destroy ()
     lasterr = NULL;
     break;
   default:
-    lasterr = "Unknown error while destroying mutex";
+    lasterr = "Unknown error while destroying condition";
     break;
   }
   CS_SHOW_ERROR;
   return rc == 0;
+}
+
+const char* csPosixCondition::GetLastError ()
+{
+  return lasterr;
+}
+
+
+csThread* csThread::Create (iRunnable *runnable, uint32 options)
+{
+  return new csPosixThread (runnable, options);
 }
 
 csPosixThread::csPosixThread (iRunnable *runnable, uint32 /*options*/)

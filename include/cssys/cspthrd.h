@@ -7,41 +7,43 @@
 
 struct iRunnable;
 
-class csPosixThread
+class csPosixThread : public csThread
 {
- protected:
+ public:
   /**
    * Construct a new thread.
    * The thread does not run yet, you have to call Start () upon it
    */
   csPosixThread (iRunnable *runnable, uint32 options);
-  ~csPosixThread ();
+  virtual ~csPosixThread ();
 
   /**
    * This actually starts the thread.
    * If something gone wrong false is returned.
    */
-  bool Start ();
+  virtual bool Start ();
 
   /**
    * Kindly asking the thread to stop. 
    * (This is eventually honred by the thread at cancellation points like MutexLocks)
    */
-  bool Stop ();
+  virtual bool Stop ();
 
-  bool Wait ();
+  virtual bool Wait ();
 
   /**
    * This brutally kills the thread. No kindly asking, no nothing.
    */
-  bool Kill ();
+  virtual bool Kill ();
 
   /**
    * Return the last eror description and NULL if there was none.
    */
-  const char* GetLastError ();
+  virtual const char* GetLastError ();
 
+ protected:
   static void* ThreadRun (void *param);
+
  protected:
   pthread_t thread;
   csRef<iRunnable> runnable;
@@ -49,18 +51,20 @@ class csPosixThread
   bool running, created;
 };
 
-class csPosixMutex
+class csPosixMutex : public csMutex
 {
- protected:
+ public:
   csPosixMutex ();
-  ~csPosixMutex ();
-  
-  bool LockWait ();
-  bool LockTry  ();
-  bool Release  ();
-  const char* GetLastError ();
-  static void Cleanup (void *arg);
+  virtual ~csPosixMutex ();
 
+  virtual bool LockWait ();
+  virtual bool LockTry  ();
+  virtual bool Release  ();
+  virtual const char* GetLastError ();
+
+  static void Cleanup (void *arg);
+ protected:
+  
  private:
   bool Destroy ();
  protected:
@@ -69,16 +73,18 @@ class csPosixMutex
   friend class csPosixCondition;
 };
 
-class csPosixSemaphore
+class csPosixSemaphore : public csSemaphore
 {
- protected:
+ public:
   csPosixSemaphore (uint32 value);
-  ~csPosixSemaphore ();
-  bool LockWait ();
-  bool LockTry ();
-  bool Release ();
-  uint32 Value ();
-  const char* GetLastError ();
+  virtual ~csPosixSemaphore ();
+
+  virtual bool LockWait ();
+  virtual bool LockTry ();
+  virtual bool Release ();
+  virtual uint32 Value ();
+  virtual const char* GetLastError ();
+
  protected:
   const char *lasterr;
   sem_t sem;
@@ -86,14 +92,16 @@ class csPosixSemaphore
   bool Destroy ();
 };
 
-class csPosixCondition
+class csPosixCondition : public csCondition
 {
- protected:
+ public:
   csPosixCondition (uint32 conditionAttributes);
-  ~csPosixCondition ();
-  void Signal (bool bAll);
-  bool Wait (csPosixMutex *mutex, csTicks timeout);
-  const char* GetLastError ();
+  virtual ~csPosixCondition ();
+
+  virtual void Signal (bool bAll=false);
+  virtual bool Wait (csMutex *mutex, csTicks timeout=0);
+  virtual const char* GetLastError ();
+
  private:
   bool Destroy ();
  private:
@@ -101,12 +109,7 @@ class csPosixCondition
   const char* lasterr;
 };
 
-typedef csPosixThread csThreadImpl;
-typedef csPosixMutex csMutexImpl;
-typedef csPosixSemaphore csSemaphoreImpl;
-typedef csPosixCondition csConditionImpl;
-
-#define CS_SAFE_LOCKWAIT(m) m.LockWait(); pthread_cleanup_push(m.Cleanup,&m)
-#define CS_SAFE_RELEASE(m) pthread_cleanup_pop(0); m.Release()
+#define CS_SAFE_LOCKWAIT(m) m->LockWait(); pthread_cleanup_push(((csPosixMutex*)m)->Cleanup,m)
+#define CS_SAFE_RELEASE(m) pthread_cleanup_pop(0); m->Release()
 
 #endif

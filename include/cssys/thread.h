@@ -20,7 +20,6 @@
 #define _CS_THREAD_H_
 
 #include "csutil/scf.h"
-#include CS_THREAD_INC
 
 // list of thread initialisation attributes
 
@@ -63,73 +62,64 @@ struct iRunnable : public iBase
   */
 };
 
-class csThread : protected csThreadImpl
+struct csThread 
 {
- public:
-  /**
-   * Construct a new thread.
-   * The thread does not run yet, you have to call Start () upon it
-   */
-  csThread (iRunnable *runnable, uint32 options=0): csThreadImpl (runnable, options){}
-
   /**
    * This actually starts the thread.
    * If something gone wrong false is returned.
    */
-  bool Start (){ return csThreadImpl::Start (); }
+  virtual bool Start () = 0;
 
   /**
    * Kindly asking the thread to stop. 
    * (This is eventually honred by the thread at cancellation points like MutexLocks)
    * You can then call Start () again (it does not resume operation where stopped but starts over agin)
    */
-  bool Stop () { return csThreadImpl::Stop (); }
+  virtual bool Stop () = 0;
 
-  bool Wait () { return csThreadImpl::Wait (); }
+  virtual bool Wait () = 0;
 
   /**
    * This brutally kills the thread. No kindly asking, no nothing.
    */
-  bool Kill () { return csThreadImpl::Kill (); }
+  virtual bool Kill () = 0;
 
   /**
    * Return the last eror description and NULL if there was none.
    */
-  const char *GetLastError () { return csThreadImpl::GetLastError (); }
+  virtual const char *GetLastError () = 0;
+
+  static csThread* Create (iRunnable *runnable, uint32 options=0);
 };
 
-class csMutex : protected csMutexImpl
+struct csMutex
 {
- friend class csCondition;
- public:
-  bool LockWait() { return csMutexImpl::LockWait (); }
-  bool LockTry () { return csMutexImpl::LockTry (); }
-  bool Release () { return csMutexImpl::Release (); }
-  const char* GetLastError () { return csMutexImpl::GetLastError (); }
-  static void Cleanup (void *arg) { csMutexImpl::Cleanup  (arg); }
- private:
-  csMutexImpl* GetImpl () {return this;}
+  friend struct csCondition;
+  static csMutex* Create ();
+  virtual bool LockWait() = 0;
+  virtual bool LockTry () = 0;
+  virtual bool Release () = 0;
+  virtual const char* GetLastError () = 0;
 };
 
-class csSemaphore : protected csSemaphoreImpl
+struct csSemaphore
 {
- public:
-  csSemaphore (uint32 value):csSemaphoreImpl (value){}
-  bool LockWait () { return csSemaphoreImpl::LockWait (); }
-  bool LockTry () { return csSemaphoreImpl::LockTry (); }
-  bool Release () { return csSemaphoreImpl::Release (); }
-  uint32 Value () { return csSemaphoreImpl::Value (); }
-  const char* GetLastError () { return csSemaphoreImpl::GetLastError (); }
+  static csSemaphore* Create (uint32 value);
+  virtual bool LockWait () = 0;
+  virtual bool LockTry () = 0;
+  virtual bool Release () = 0;
+  virtual uint32 Value () = 0;
+  virtual const char* GetLastError () = 0;
 };
 
-class csCondition : protected csConditionImpl
+struct csCondition
 {
- public:
-  csCondition (uint32 conditionAttributes=0):csConditionImpl (conditionAttributes){}
-  void Signal (bool bAll = false) { csConditionImpl::Signal (bAll); }
-  bool Wait (csMutex *mutex, csTicks timeout=0) { return csConditionImpl::Wait (mutex->GetImpl (), timeout); }
-  const char* GetLastError () { return csConditionImpl::GetLastError (); }
+  static csCondition* Create (uint32 conditionAttributes=0);
+  virtual void Signal (bool bAll = false) = 0;
+  virtual bool Wait (csMutex *mutex, csTicks timeout=0) = 0;
+  virtual const char* GetLastError () = 0;
 };
 
+#include CS_THREAD_INC
 
 #endif
