@@ -29,6 +29,7 @@ struct iEngine;
 struct iReporter;
 struct iPluginManager;
 struct iObjectRegistry;
+struct iSyntaxService;
 
 /**
  * Ball factory loader.
@@ -105,6 +106,7 @@ private:
   iReporter* reporter;
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
+  iSyntaxService *synldr;
 
 public:
   SCF_DECLARE_IBASE;
@@ -138,6 +140,7 @@ private:
   iReporter* reporter;
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
+  iSyntaxService *synldr;
 
 public:
   SCF_DECLARE_IBASE;

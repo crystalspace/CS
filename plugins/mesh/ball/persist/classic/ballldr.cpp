@@ -39,6 +39,7 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "imap/services.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -113,7 +114,7 @@ SCF_EXPORT_CLASS_TABLE (ballldr)
   SCF_EXPORT_CLASS (csBallFactorySaver, "crystalspace.mesh.saver.factory.ball",
     "Crystal Space Ball Factory Saver")
   SCF_EXPORT_CLASS (csBallLoader, "crystalspace.mesh.loader.ball",
-    "Crystal Space Ball Mesh Loader")
+		    "Crystal Space Ball Mesh Loader")
   SCF_EXPORT_CLASS (csBallSaver, "crystalspace.mesh.saver.ball",
     "Crystal Space Ball Mesh Saver")
 SCF_EXPORT_CLASS_TABLE_END
@@ -217,11 +218,13 @@ csBallLoader::csBallLoader (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   reporter = NULL;
+  synldr = NULL;
 }
 
 csBallLoader::~csBallLoader ()
 {
-  if (reporter) reporter->DecRef ();
+  SCF_DEC_REF (reporter);
+  SCF_DEC_REF (synldr);
 }
 
 bool csBallLoader::Initialize (iObjectRegistry* object_reg)
@@ -229,63 +232,11 @@ bool csBallLoader::Initialize (iObjectRegistry* object_reg)
   csBallLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
-  return true;
-}
-
-static UInt ParseMixmode (iReporter* reporter, char* buf)
-{
-  CS_TOKEN_TABLE_START (modes)
-    CS_TOKEN_TABLE (COPY)
-    CS_TOKEN_TABLE (MULTIPLY2)
-    CS_TOKEN_TABLE (MULTIPLY)
-    CS_TOKEN_TABLE (ADD)
-    CS_TOKEN_TABLE (ALPHA)
-    CS_TOKEN_TABLE (TRANSPARENT)
-    CS_TOKEN_TABLE (KEYCOLOR)
-    CS_TOKEN_TABLE (TILING)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-
-  UInt Mixmode = 0;
-
-  while ((cmd = csGetObject (&buf, modes, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      ReportError (reporter,
-		"crystalspace.ballloader.parse.mixmode.badformat",
-		"Bad format while parsing mixmode!");
-      return ~0;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_TILING: Mixmode |= CS_FX_TILING; break;
-      case CS_TOKEN_COPY: Mixmode |= CS_FX_COPY; break;
-      case CS_TOKEN_MULTIPLY: Mixmode |= CS_FX_MULTIPLY; break;
-      case CS_TOKEN_MULTIPLY2: Mixmode |= CS_FX_MULTIPLY2; break;
-      case CS_TOKEN_ADD: Mixmode |= CS_FX_ADD; break;
-      case CS_TOKEN_ALPHA:
-	Mixmode &= ~CS_FX_MASK_ALPHA;
-	float alpha;
-        csScanStr (params, "%f", &alpha);
-	Mixmode |= CS_FX_SETALPHA(alpha);
-	break;
-      case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
-      case CS_TOKEN_KEYCOLOR: Mixmode |= CS_FX_KEYCOLOR; break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    ReportError (reporter,
-		"crystalspace.ballloader.parse.mixmode.badtoken",
-		"Token '%s' not found while parsing mixmodes!",
-		csGetLastOffender ());
-    return ~0;
-  }
-  return Mixmode;
+  synldr = CS_QUERY_PLUGIN (plugin_mgr, iSyntaxService);
+  if (!synldr)
+    synldr = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.syntax.loader.service.text", 
+			     CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
+  return synldr;
 }
 
 iBase* csBallLoader::Parse (const char* string, iEngine* engine,
@@ -419,9 +370,11 @@ iBase* csBallLoader::Parse (const char* string, iEngine* engine,
 	}
 	break;
       case CS_TOKEN_MIXMODE:
-	UInt mm = ParseMixmode (reporter, params);
-	if (mm == (UInt)~0)
+	UInt mm;
+	if (!synldr->ParseMixmode (params, mm))
 	{
+	  ReportError (reporter, "crystalspace.ballloader.parse.unknownmaterial",
+		       synldr->GetLastError ());
 	  if (ballstate) ballstate->DecRef ();
 	  mesh->DecRef ();
 	  return NULL;
@@ -442,11 +395,13 @@ csBallSaver::csBallSaver (iBase* pParent)
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   reporter = NULL;
+  synldr = NULL;
 }
 
 csBallSaver::~csBallSaver ()
 {
-  if (reporter) reporter->DecRef ();
+  SCF_DEC_REF (reporter);
+  SCF_DEC_REF (synldr);
 }
 
 bool csBallSaver::Initialize (iObjectRegistry* object_reg)
@@ -454,25 +409,11 @@ bool csBallSaver::Initialize (iObjectRegistry* object_reg)
   csBallSaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_REPORTER, iReporter);
-  return true;
-}
-
-static void WriteMixmode(iStrVector *str, UInt mixmode)
-{
-  str->Push(csStrNew("  MIXMODE ("));
-  if(mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
-  if(mixmode&CS_FX_ADD) str->Push(csStrNew(" ADD ()"));
-  if(mixmode&CS_FX_MULTIPLY) str->Push(csStrNew(" MULTIPLY ()"));
-  if(mixmode&CS_FX_MULTIPLY2) str->Push(csStrNew(" MULTIPLY2 ()"));
-  if(mixmode&CS_FX_KEYCOLOR) str->Push(csStrNew(" KEYCOLOR ()"));
-  if(mixmode&CS_FX_TILING) str->Push(csStrNew(" TILING ()"));
-  if(mixmode&CS_FX_TRANSPARENT) str->Push(csStrNew(" TRANSPARENT ()"));
-  if(mixmode&CS_FX_ALPHA) {
-    char buf[MAXLINE];
-    sprintf(buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str->Push(csStrNew(buf));
-  }
-  str->Push(csStrNew(")"));
+  synldr = CS_QUERY_PLUGIN (plugin_mgr, iSyntaxService);
+  if (!synldr)
+    synldr = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.syntax.loader.service.text", 
+			     CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
+  return synldr;
 }
 
 void csBallSaver::WriteDown (iBase* obj, iStrVector *str,
@@ -503,34 +444,24 @@ void csBallSaver::WriteDown (iBase* obj, iStrVector *str,
   sprintf(buf, "FACTORY ('%s')\n", name);
   str->Push(csStrNew(buf));
   if(state->GetMixMode() != CS_FX_COPY)
-  {
-    WriteMixmode(str, state->GetMixMode());
-  }
+    str->Push (csStrNew (synldr->MixmodeToText (state->GetMixMode(), 0)));
 
   // Mesh information
   float x=0, y=0, z=0;
   state->GetRadius(x, y, z);
-  sprintf(buf, "RADIUS (%g, %g, %g)\n", x, y, z);
-  str->Push(csStrNew(buf));
-  sprintf(buf, "SHIFT (%g, %g, %g)\n", state->GetShift ().x,
-    state->GetShift ().y, state->GetShift ().z);
-  str->Push(csStrNew(buf));
+  str->Push(csStrNew(synldr->VectorToText ("RADIUS", x, y, z, 0)));
+  str->Push(csStrNew(synldr->VectorToText ("SHIFT", state->GetShift (), 0)));
   sprintf(buf, "NUMRIM (%d)\n", state->GetRimVertices());
   str->Push(csStrNew(buf));
   sprintf(buf, "MATERIAL (%s)\n", state->GetMaterialWrapper()->
     QueryObject ()->GetName());
   str->Push(csStrNew(buf));
-  if (!state->IsLighting ())
-    str->Push (csStrNew ("LIGHTING (no)\n"));
-  if (state->IsReversed ())
-    str->Push (csStrNew ("REVERSED (yes)\n"));
-  if (state->IsTopOnly ())
-    str->Push (csStrNew ("TOPONLY (yes)\n"));
-  if (state->IsCylindricalMapping ())
-    str->Push (csStrNew ("CYLINDRICAL (yes)\n"));
+  str->Push (csStrNew (synldr->BoolToText ("LIGHTING",state->IsLighting (),0)));
+  str->Push (csStrNew (synldr->BoolToText ("REVERSED",state->IsReversed (),0)));
+  str->Push (csStrNew (synldr->BoolToText ("TOPONLY",state->IsTopOnly (),0)));
+  str->Push (csStrNew (synldr->BoolToText ("CYLINDRICAL",state->IsCylindricalMapping (),0)));
   csColor col = state->GetColor ();
-  sprintf(buf, "COLOR (%g,%g,%g)\n", col.red, col.green, col.blue);
-  str->Push(csStrNew(buf));
+  str->Push(csStrNew(synldr->VectorToText ("COLOR", col.red, col.green, col.blue, 0)));
 
   fact->DecRef();
   mesh->DecRef();
