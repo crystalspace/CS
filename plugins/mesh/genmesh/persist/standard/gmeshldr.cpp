@@ -61,7 +61,7 @@ enum
   XMLTOKEN_T,
   XMLTOKEN_N,
 #ifdef CS_USE_NEW_RENDERER
-  XMLTOKEN_STREAM,
+  XMLTOKEN_RENDERBUFFER,
 #endif
   XMLTOKEN_COLORS,
   XMLTOKEN_AUTONORMALS,
@@ -138,14 +138,14 @@ bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("autonormals", XMLTOKEN_AUTONORMALS);
   xmltokens.Register ("n", XMLTOKEN_N);
 #ifdef CS_USE_NEW_RENDERER
-  xmltokens.Register ("stream", XMLTOKEN_STREAM);
+  xmltokens.Register ("renderbuffer", XMLTOKEN_RENDERBUFFER);
 #endif
   return true;
 }
 
 #ifdef CS_USE_NEW_RENDERER
 
-bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node,
+bool csGeneralFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
 	iGeneralFactoryState* state)
 {
   if(!node) return false;
@@ -154,7 +154,7 @@ bool csGeneralFactoryLoader::ParseStream(iDocumentNode *node,
   csRef<iDocumentNode> child;
   csRef<iDocumentNodeIterator> children = node->GetNodes();
 
-  if(!children.IsValid()) return false; // empty stream..
+  if(!children.IsValid()) return false; // empty renderbuffer..
   
   const char *comptype = node->GetAttributeValue("type");
   const char *name = node->GetAttributeValue("name");
@@ -360,8 +360,8 @@ csPtr<iBase> csGeneralFactoryLoader::Parse (iDocumentNode* node,
         state->SetVertexCount (child->GetContentsValueAsInt ());
 	break;
 #ifdef CS_USE_NEW_RENDERER
-      case XMLTOKEN_STREAM:
-        ParseStream(child, state);
+      case XMLTOKEN_RENDERBUFFER:
+        ParseRenderBuffer(child, state);
         break;
 #endif
       case XMLTOKEN_T:

@@ -60,7 +60,7 @@ public:
     iLoaderContext* ldr_context, iBase* context);
 
 #ifdef CS_USE_NEW_RENDERER
-  bool ParseStream(iDocumentNode *node, iGeneralFactoryState* state);
+  bool ParseRenderBuffer(iDocumentNode *node, iGeneralFactoryState* state);
 #endif // CS_USE_NEW_RENDERER
 
   struct eiComponent : public iComponent
