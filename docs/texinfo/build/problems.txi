@@ -7,18 +7,18 @@ work in progress.  Expect these problems to go away in the future.
 
 @itemize @bullet
 @item
-All ports of Crystal Space require a 15-bit, 16-bit, or 32-bit display to run.
-It will @emph{not} work on 24-bit displays.
+Software renderer: Crystal Space requires a 15-bit, 16-bit, or 32-bit display
+to run.  It will @emph{not} work on 24-bit displays.
 
 @item
 OpenGL: If your OpenGL display looks really bad (bad quality of lighting
 compared to the software renderer) then you may have a card which does not
-support the desired blending mode @code{2*SRC*DST} that Crystal Space uses.
-You can edit @file{data/config/opengl.cfg} and change the @samp{LightmapMode}
-option to @samp{multiply} (which all cards should understand) or any of the
-other values.  @samp{multiply} will make everything dark but at least it will
-look right.  The @sc{riva} 128@sc{zx} is an example of a card which doesn't
-support @code{2*SRC*DST}.
+support the desired blending mode @samp{2*SRC*DST} that Crystal Space uses.
+You can edit @file{CS/data/config/opengl.cfg} and change the
+@samp{LightmapMode} option to @samp{multiply} (which all cards should
+understand) or any of the other values.  @samp{multiply} will make everything
+dark but at least it will look right.  The @sc{riva} 128@sc{zx} is an example
+of a card which doesn't support @samp{2*SRC*DST}.
 
 @item
 Direct3D: Not currently supported.  (If you would like to write a Direct3D
