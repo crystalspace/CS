@@ -1,5 +1,24 @@
 The history order is reversed so that new features are at the top.
 
+17-Sep-2001
+	- Added the following short-hands to the thing loader:
+	    - V for VERTEX in a thing or thing-part.
+	    - V for VERTICES in a polygon or bezier.
+	    - P for POLYGON.
+	- It is now also possible to use the PLANE statement outside
+	  the TEXTURE statement. This is shorter to specify. i.e. instead
+	  of POLYGON 'p' (... TEXTURE (PLANE ('xxx'))) you can now
+	  say: POLYGON 'p' (... PLANE ('xxx')).
+	- Added new XPLANE, YPLANE, and ZPLANE statements for a polygon.
+	  These will create a texture plane with the given direction,
+	  position, and density. If the plane was already created then
+	  it will be reused. Notation is XPLANE (x,dens). 'dens' is
+	  the tile value for the texture. dens==2 means the texture will be
+	  tiled once in an area of 2x2 units.
+	  Note that these new statements are for conveniance. They don't
+	  give much control over how the texture will be aligned on the
+	  polygon (i.e. the uv shift). If you want full control you still
+	  have to use the ADDON keyword with the plane plugin.
 16-Sep-2001
 	- Print out polygon name in error message indicating overflow
 	  in number of vertices.

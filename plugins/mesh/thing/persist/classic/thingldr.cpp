@@ -90,8 +90,12 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ORIG)
   CS_TOKEN_DEF (PART)
   CS_TOKEN_DEF (PLANE)
+  CS_TOKEN_DEF (XPLANE)
+  CS_TOKEN_DEF (YPLANE)
+  CS_TOKEN_DEF (ZPLANE)
   CS_TOKEN_DEF (POLYGON)
   CS_TOKEN_DEF (PORTAL)
+  CS_TOKEN_DEF (P)
   CS_TOKEN_DEF (RADIUS)
   CS_TOKEN_DEF (ROT)
   CS_TOKEN_DEF (ROT_X)
@@ -116,11 +120,11 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (VERTEX)
   CS_TOKEN_DEF (VERTICES)
   CS_TOKEN_DEF (VVEC)
-  CS_TOKEN_DEF (V)
   CS_TOKEN_DEF (VISTREE)
   CS_TOKEN_DEF (W)
   CS_TOKEN_DEF (WARP)
   CS_TOKEN_DEF (ZFILL)
+  CS_TOKEN_DEF (V)
 CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csThingLoader)
@@ -432,6 +436,11 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
     CS_TOKEN_TABLE (ALPHA)
     CS_TOKEN_TABLE (COSFACT)
     CS_TOKEN_TABLE (MIXMODE)
+    CS_TOKEN_TABLE (PLANE)
+    CS_TOKEN_TABLE (XPLANE)
+    CS_TOKEN_TABLE (YPLANE)
+    CS_TOKEN_TABLE (ZPLANE)
+    CS_TOKEN_TABLE (V)
   CS_TOKEN_TABLE_END
 
   CS_TOKEN_TABLE_START (tex_commands)
@@ -490,10 +499,13 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
   csVector3 tx_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
   float tx1_len = default_texlen, tx2_len = default_texlen;
   float tx_len = default_texlen;
+  char xplane_name[100];
+  char yplane_name[100];
+  char zplane_name[100];
 
   csMatrix3 tx_matrix;
   csVector3 tx_vector (0, 0, 0);
-  char plane_name[30];
+  char plane_name[100];
   plane_name[0] = 0;
   bool uv_shift_given = false;
   float u_shift = 0, v_shift = 0;
@@ -609,6 +621,42 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
             poly3d->GetPortal ()->SetWarp (m_w, v_w_before, v_w_after);
         }
         break;
+      case CS_TOKEN_XPLANE:
+	tx_uv_given = false;
+        tx_len = 0;
+	plane_name[0] = 0;
+	xplane_name[0] = 0;
+	yplane_name[0] = 0;
+	zplane_name[0] = 0;
+	strcpy (xplane_name, params);
+	break;
+      case CS_TOKEN_YPLANE:
+	tx_uv_given = false;
+        tx_len = 0;
+	plane_name[0] = 0;
+	xplane_name[0] = 0;
+	yplane_name[0] = 0;
+	zplane_name[0] = 0;
+	strcpy (yplane_name, params);
+	break;
+      case CS_TOKEN_ZPLANE:
+	tx_uv_given = false;
+        tx_len = 0;
+	plane_name[0] = 0;
+	xplane_name[0] = 0;
+	yplane_name[0] = 0;
+	zplane_name[0] = 0;
+	strcpy (zplane_name, params);
+	break;
+      case CS_TOKEN_PLANE:
+	tx_uv_given = false;
+	xplane_name[0] = 0;
+	yplane_name[0] = 0;
+	zplane_name[0] = 0;
+        csScanStr (params, "%s", str);
+        strcpy (plane_name, str);
+        tx_len = 0;
+        break;
       case CS_TOKEN_TEXTURE:
         while ((cmd = csGetObject(&params, tex_commands, &name, &params2)) > 0)
         {
@@ -668,6 +716,9 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
               break;
             case CS_TOKEN_PLANE:
 	      tx_uv_given = false;
+	      xplane_name[0] = 0;
+	      yplane_name[0] = 0;
+	      zplane_name[0] = 0;
               csScanStr (params2, "%s", str);
               strcpy (plane_name, str);
               tx_len = 0;
@@ -706,6 +757,7 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
 	  }
         }
         break;
+      case CS_TOKEN_V:
       case CS_TOKEN_VERTICES:
         {
           int list[100], num;
@@ -858,6 +910,63 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
       printf ("Bad texture specification for PLANE '%s'\n", name);
     else poly3d->SetTextureSpace (tx_orig, tx1, tx1_len);
   }
+  else if (xplane_name[0])
+  {
+    iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
+  	iThingEnvironment);
+    char buf[200];
+    sprintf (buf, "__X_%s__", xplane_name);
+    iPolyTxtPlane* pl = te->FindPolyTxtPlane (buf);
+    if (!pl)
+    {
+      float x, dens;
+      csScanStr (xplane_name, "%f,%f", &x, &dens);
+      pl = te->CreatePolyTxtPlane ();
+      pl->QueryObject()->SetName (buf);
+      pl->SetTextureSpace (csVector3 (x, 0, 0), csVector3 (x, 1, 0), dens,
+      	csVector3 (x, 0, 1), dens);
+    }
+    poly3d->SetTextureSpace (pl);
+    te->DecRef ();
+  }
+  else if (yplane_name[0])
+  {
+    iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
+  	iThingEnvironment);
+    char buf[200];
+    sprintf (buf, "__Y_%s__", yplane_name);
+    iPolyTxtPlane* pl = te->FindPolyTxtPlane (buf);
+    if (!pl)
+    {
+      float y, dens;
+      csScanStr (yplane_name, "%f,%f", &y, &dens);
+      pl = te->CreatePolyTxtPlane ();
+      pl->QueryObject()->SetName (buf);
+      pl->SetTextureSpace (csVector3 (0, y, 0), csVector3 (1, y, 0), dens,
+      	csVector3 (0, y, 1), dens);
+    }
+    poly3d->SetTextureSpace (pl);
+    te->DecRef ();
+  }
+  else if (zplane_name[0])
+  {
+    iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
+  	iThingEnvironment);
+    char buf[200];
+    sprintf (buf, "__Z_%s__", zplane_name);
+    iPolyTxtPlane* pl = te->FindPolyTxtPlane (buf);
+    if (!pl)
+    {
+      float z, dens;
+      csScanStr (zplane_name, "%f,%f", &z, &dens);
+      pl = te->CreatePolyTxtPlane ();
+      pl->QueryObject()->SetName (buf);
+      pl->SetTextureSpace (csVector3 (0, 0, z), csVector3 (1, 0, z), dens,
+      	csVector3 (0, 1, z), dens);
+    }
+    poly3d->SetTextureSpace (pl);
+    te->DecRef ();
+  }
   else if (plane_name[0])
   {
     iThingEnvironment* te = SCF_QUERY_INTERFACE (engine->GetThingType (),
@@ -931,6 +1040,8 @@ static bool load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
     CS_TOKEN_TABLE (FASTMESH)
     CS_TOKEN_TABLE (PART)
     CS_TOKEN_TABLE (FACTORY)
+    CS_TOKEN_TABLE (V)
+    CS_TOKEN_TABLE (P)
   CS_TOKEN_TABLE_END
 
   char* name = NULL;
@@ -1046,6 +1157,7 @@ static bool load_thing_part (ThingLoadInfo& info, iMeshWrapper* imeshwrap,
 		thing_state, params, thing_state->GetVertexCount (), false))
 	  return false;
         break;
+      case CS_TOKEN_V:
       case CS_TOKEN_VERTEX:
         {
 	  csVector3 v;
@@ -1102,6 +1214,7 @@ Nag to Jorrit about this feature if you want it.\n");
         }
 #endif
         break;
+      case CS_TOKEN_P:
       case CS_TOKEN_POLYGON:
         {
 	  iPolygon3D* poly3d = load_poly3d (engine, xname, params,
@@ -1431,6 +1544,7 @@ iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
     CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (NAME)
     CS_TOKEN_TABLE (VERTICES)
+    CS_TOKEN_TABLE (V)
   CS_TOKEN_TABLE_END
 
   char *xname;
@@ -1473,6 +1587,7 @@ iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
         }
         tmpl->SetMaterial (mat);
         break;
+      case CS_TOKEN_V:
       case CS_TOKEN_VERTICES:
         {
           int list[100], num;
