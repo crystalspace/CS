@@ -34,6 +34,7 @@
 
 #include "cs3d/direct3d61/d3d_txtcache.h"
 #include "cs3d/direct3d61/d3d_txtmgr.h"
+#include "cs3d/direct3d61/d3d_states.h"
 #include "csutil/scf.h"
 #include "cssys/win32/IDDetect.h"
 #include "igraph3d.h"
@@ -157,6 +158,8 @@ class csGraphics3DDirect3DDx6 : public iGraphics3D
 
   /// The private config file
   csIniFile *config;
+
+  csStateCacheDirect3DDx6 m_States;
 
 public:
   DECLARE_IBASE;
