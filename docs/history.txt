@@ -150,24 +150,24 @@ chronological order.
 	  csArray<csRef<T> >). This greatly cleans up a lot of code and
 	  also improves speed.
 	- res further worked on the Jam msvcgen. Now, metadata is added to the
-	  generated .rc file as well. 
+	  generated .rc file as well.
 	- res worked around the makedep compile problems on MinGW: in case a
 	  "CS_NO_STDIO_REPLACEMENTS" macro is defined, Win32 csosdefs.h won't
 	  so the stdio aliasing alias.
-	- res updated some comments in the bindoc plugin and removed some 
+	- res updated some comments in the bindoc plugin and removed some
 	  leftover debug stuff.
-	- res added <cs-config> tags around the UPCASE make macro(or how is 
+	- res added <cs-config> tags around the UPCASE make macro(or how is
 	  it called?)
 	- res made the following changes:
 	    - Removed some leftover super LM code from the old GL renderer.
 	    - In the Thing SLM stuff some arrays of structs were replaced
-	      with arrays of pointers to resp. structs to avoid some 
+	      with arrays of pointers to resp. structs to avoid some
 	      unnecessary copying of data.
 	    - Fixed some problems in csSubRectangles2 rectangle allocation
 	      that caused problems when reclaiming allocated rectangle
 	      space.
-	    - Added a small debug aid to csBlockAllocator: a #define at 
-	      compile time causes freed objects to be overwritten with a 
+	    - Added a small debug aid to csBlockAllocator: a #define at
+	      compile time causes freed objects to be overwritten with a
 	      certain byte value.
 4-Aug-2003
 	- Oktal added the following to csutil:
@@ -179,10 +179,10 @@ chronological order.
 	    - A csTree<T> class, which is a binary tree.
 	    - In csArray, csPDelArray and csRefArray, added default sorting
 	      callbacks DefaultCompare, DefaultCompareKey and DefaultSort.
-	- Anders Stenberg changed pico plugin to use pico's internal 
-	  framebuffer drawing. Now pico handles all drawing (to a 
-	  memory framebuffer), and CS just relays this to the real 
-	  framebuffer. This means we get perfect(?) output, although no 
+	- Anders Stenberg changed pico plugin to use pico's internal
+	  framebuffer drawing. Now pico handles all drawing (to a
+	  memory framebuffer), and CS just relays this to the real
+	  framebuffer. This means we get perfect(?) output, although no
 	  acceleration from CS. This could/should be upgraded later.
         - Philip Wyett added sprcal3d and it's loader to 'user.mak'. Also
           made both these and the jam builds test for 'HAS_CAL3D' to
@@ -231,7 +231,6 @@ chronological order.
 	  to csunicode.h which was addressing the symptom rather than the
 	  cause.  We need to determine the actual problem (if there is one),
 	  and instead address that.
-	- Paul Garceau updated csunicode.h back to pre-hack version of csunicode.h.
 3-Aug-2003
 	- Paul G. implemented a very nasty (and hopefully very temporary) hack
 	  for csunicode.h to define CS_WCHAR_T_SIZE appropriately for
@@ -284,13 +283,13 @@ chronological order.
 	- Jorrit replaced a lot of 'if (bla) delete bla' with 'delete bla'.
 	  C++ guarantees that 'delete' will check on null pointer so there is
 	  no need to add another test.
-	- Luca replaced some call to Delete (int) (which no longer exists) 
+	- Luca replaced some call to Delete (int) (which no longer exists)
 	  with DeleteIndex (int) in the source code of the csSoundRenderDS3D
 	  class.
 	- Eric Sunshine fixed compilation problems with partedit on MacOS/X.
 	- Anders Stenberg & Oktal did various changes and fixes to the pico
 	  plugin. It still shouldn't and can't be used, since it pretty much
-	  doesn't work at all. Something resembling almost sensible output 
+	  doesn't work at all. Something resembling almost sensible output
 	  should now be possible to achieve though.
 	- Anders Stenberg added better pixel format handling in csGraphics3D,
 	  since it was needed for the abuse pgserver puts it through.
@@ -571,22 +570,22 @@ chronological order.
 	- res fixed a bug where WGL extensions weren't always initialized
 	  properly.
 	- res removed the unused DirectInput keyboard handling code.
-	- res augmented configure to check the sizeof(long). This is used 
+	- res augmented configure to check the sizeof(long). This is used
 	  to determine whether the platform is a 32 or 64 bit environment.
 	- res added types to cstypes.h which are (un)signed integers with the
-	  same size as a pointer. They are intended in existing cases where 
-	  pointers are casted to ints/longs (it appears that long on 64-bit 
+	  same size as a pointer. They are intended in existing cases where
+	  pointers are casted to ints/longs (it appears that long on 64-bit
 	  MSVC is still 32 bits large, so it can't be used. Tho I'm not sure.)
-	- res augmented configure to check the sizeof(wchar_t). 
+	- res augmented configure to check the sizeof(wchar_t).
 	- Oktal added overloaded constructors to csHashIterator and
 	  csGlobalHashIterator that allow them to be initialized from const
 	  hashmaps, and added methods to them for the manipulation of
 	  iterators initialized from const hashmaps.
 	- Reed Hedges added csInitializer::SetupVFS, and changed
 	  csInitializer::SetupConfigManager to use that function.
-	- res committed some forgotten files and fixed some cut'n'paste and 
+	- res committed some forgotten files and fixed some cut'n'paste and
 	  similar stupid errors.
-        - acraig added missing #include<wchar.h> in csutil/util.cpp 
+        - acraig added missing #include<wchar.h> in csutil/util.cpp
 28-Jul-2003
 	- Jorrit removed several csVector's throughout CS:
 	    - Replaced 'render_priorities' in the engine with csStringArray.
@@ -663,7 +662,7 @@ chronological order.
 	- Jorrit replaced all usages of the deprecated csPArray<T> with
 	  csArray<T*>. Also removed csPArray<T>.
 	- Jorrit added InsertSorted() and FindSortedKey() to csArray<T>.
-	- Luca changed the behaviour of awsRadButton::OnKeypress, 
+	- Luca changed the behaviour of awsRadButton::OnKeypress,
 	  awsCheckBox::OnKeypress and awsCmdButton::OnKeypress. Now those
 	  methods return true iff the key event is really "eaten". Before
 	  they were returning always true, even if the key event was not used
@@ -687,10 +686,10 @@ chronological order.
 	      user.cfg).
 	    - Updated a lot of extremely out-of-date information in
 	      texinfo/internal, and removed a bunch of obsolete information.
-	- Norman Kraemer fixed his fixes to pythmod_setup.py and changed 
+	- Norman Kraemer fixed his fixes to pythmod_setup.py and changed
 	  cspython.mak to pass the location of CS libaries to the python
 	  dist package.
-	- Norman also removed a few dozen warnings about using char as array 
+	- Norman also removed a few dozen warnings about using char as array
 	  index in the software renderer.
 24-Jul-2003
 	- Reed Hedges made some minor updates to the AWS "Quick Start" section
