@@ -57,9 +57,7 @@ else
 endif
 DESCRIPTION.$(GLX2D) = $(DESCRIPTION.glx2d)
 SRC.GLX2D = $(wildcard plugins/video/canvas/openglx/*.cpp \
-  $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D)) \
-  plugins/video/canvas/common/dyntex2d.cpp
-
+  $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D))
 OBJ.GLX2D = $(addprefix $(OUT),$(notdir $(SRC.GLX2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
