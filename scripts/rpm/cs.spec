@@ -1,5 +1,5 @@
 %define name    crystalspace
-%define version 20040628
+%define version 20040704
 %define release 1
 %define prefix	/usr
 
@@ -62,24 +62,27 @@ sh configure \
 %if %{with_PERL}
  --with-perl \
 %endif
---prefix=%{prefix}
+ --prefix=%{prefix} \
+ --libdir=%{prefix}/lib \
+ --datadir=%{prefix}/share \
+ --sysconfdir=/etc
 
 make all
 
 %install
 DESTDIR=%{buildroot} make install
 
-%if ! %{with_NR}
  CRYSTAL=%{buildroot}%{prefix} \
- CS_DATADIR=%{buildroot}%{prefix}/share/crystal \
- CS_MAPDIR=%{buildroot}%{prefix}/share/crystal/maps \
+ CS_DATADIR=%{buildroot}%{_datadir}/crystal \
+ CS_MAPDIR=%{buildroot}%{_datadir}/crystal/maps \
+ CS_CONFIGDIR=%{buildroot}%{_sysconfdir}/crystal \
  %{buildroot}%{prefix}/bin/cslight -canvas=null2d -video=null flarge
 
  CRYSTAL=%{buildroot}%{prefix} \
- CS_DATADIR=%{buildroot}%{prefix}/share/crystal \
- CS_MAPDIR=%{buildroot}%{prefix}/share/crystal/maps \
+ CS_DATADIR=%{buildroot}%{_datadir}/crystal \
+ CS_MAPDIR=%{buildroot}%{_datadir}/crystal/maps \
+ CS_CONFIGDIR=%{buildroot}%{_sysconfdir}/crystal \
  %{buildroot}%{prefix}/bin/cslight -canvas=null2d -video=null partsys
-%endif
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
@@ -88,9 +91,9 @@ rm -rf "$RPM_BUILD_ROOT"
 %files -n %{name}
 %defattr(-,root,root)
 %{prefix}/bin/*
-%{prefix}/etc/crystal/*
-%{prefix}/lib/crystal/*
-%{prefix}/share/crystal/*
+%{_sysconfdir}/crystal/*
+%{_libdir}/crystal/*
+%{_datadir}/crystal/*
 
 #---------------------DOC-------------------------
 %files -n %{name}-doc
@@ -147,6 +150,11 @@ rm -rf "$RPM_BUILD_ROOT"
 %{prefix}/include/igraphic/*.h
 
 %changelog
+* Sun Jul 04 2004 Vincent Knecht <vknecht@users.sourceforge.net> 20040704-1
+- Specified datadir, libdir and sysconfig switches at configure step.
+- Specified CS_CONFIGDIR in cslight commands.
+- Re-enabled levels relighting when building NR.
+
 * Mon Jun 28 2004 Vincent Knecht <vknecht@users.sourceforge.net> 20040628-1
 - Added conditional build flags to enable debug, NR and perl plugin.
 - Disabled relighting of levels when building NR. Crashes for me.
