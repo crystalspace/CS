@@ -45,7 +45,7 @@ public:
    * the referenced object by assuming that its IncRef() method has already
    * been called, and invokes its DecRef() method upon destruction.
    */
-  csRef (T* newobj) : obj (newobj) { }
+  explicit csRef (T* newobj) : obj (newobj) { }
   
   /**
    * Smart pointer copy constructor.
