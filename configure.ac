@@ -1438,6 +1438,7 @@ AS_IF([test $cs_cv_libcal3d = yes],
 # Check for SDL.
 #------------------------------------------------------------------------------
 AC_CHECK_TOOLS([SDLCONFIG], [sdl12-config sdl11-config sdl-config])
+
 AC_CACHE_CHECK([for SDL], [cs_cv_libsdl],
     [AS_IF([test -n "$SDLCONFIG"],
 	[cs_cv_libsdl=yes
@@ -1445,8 +1446,12 @@ AC_CACHE_CHECK([for SDL], [cs_cv_libsdl],
 	cs_cv_libsdl_lflags=''
 	cs_cv_libsdl_libs=`AC_RUN_LOG([$SDLCONFIG --libs])`],
 	[cs_cv_libsdl=no])])
+
 AS_IF([test $cs_cv_libsdl = yes],
-    [CS_EMIT_BUILD_RESULT([cs_cv_libsdl], [SDL])])
+    [CS_CHECK_BUILD([if SDL is sufficiently recent], [cs_cv_sdl_recent],
+	[AC_LANG_PROGRAM([[#include <SDL.h>]], [SDL_EnableKeyRepeat(0,0)])],
+	[], [], [CS_EMIT_BUILD_RESULT([cs_cv_libsdl], [SDL])], [], [],
+	[$cs_cv_libsdl_cflags], [$cs_cv_libsdl_lflags], [$cs_cv_libsdl_libs])])
 
 
 

@@ -24,6 +24,11 @@ chronological order.
 	  influence radius would be calculated at zero and the light would
 	  be ignored. Solved by not calculating the influence radius if
 	  the radius is already manually given by the user.
+	- Eric Sunshine added a "sufficiently recent" test to the SDL check in
+	  configure.ac.
+	- Eric Sunshine added csRef<> constructor and assignment operator to
+	  csWeakRef<> in order to avoid ambiguous overloads when assigning
+	  csRef<> to csWeakRef<>.
 28-Jun-2004
 	- Eric Sunshine fixed csApplicationFramework destructor so that it does
 	  not bomb out if csApplicationFramework::Main() was not called.

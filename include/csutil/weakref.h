@@ -80,6 +80,15 @@ public:
   }
 
   /**
+   * Construct a weak reference from a csRef<>.
+   */
+  csWeakRef (csRef<T> const& newobj)
+  {
+    obj = newobj;
+    Link ();
+  }
+
+  /**
    * Weak pointer copy constructor.
    */
   csWeakRef (csWeakRef const& other) : obj (other.obj)
@@ -112,6 +121,20 @@ public:
   csWeakRef& operator = (T* newobj)
   {
     if (obj != newobj)
+    {
+      Unlink ();
+      obj = newobj;
+      Link ();
+    }
+    return *this;
+  }
+
+  /**
+   * Assign a csRef<> to this weak reference.
+   */
+  csWeakRef& operator = (csRef<T> const& newobj)
+  {
+    if (newobj != obj)
     {
       Unlink ();
       obj = newobj;
