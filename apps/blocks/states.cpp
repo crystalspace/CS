@@ -201,7 +201,7 @@ bool States::DecodeStates ()
 bool States::PrintData (const char* fileName) const
 {
   csPrintf("\n--------------------------------------------------\n");
-  csPrintf("%s\n",encodedData);
+  csPrintf("%s\n",(char*)encodedData);
   csPrintf("\n--------------------------------------------------\n");
   csPrintf("%f,%f,%d,%d,%d,%d,%d,%d\n",
     speed, cur_speed, score, cube_x, cube_y, cube_z, zone_dim, new_zone_dim);
