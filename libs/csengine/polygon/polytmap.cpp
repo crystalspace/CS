@@ -18,9 +18,9 @@
 
 #include "cssysdef.h"
 #include "csengine/polytmap.h"
-#include "csengine/textrans.h"
 #include "csengine/engine.h"
 #include "csgeom/transfrm.h"
+#include "csgeom/textrans.h"
 
 //---------------------------------------------------------------------------
 

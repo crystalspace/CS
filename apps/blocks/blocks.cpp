@@ -33,6 +33,7 @@
 #include "cssys/system.h"
 #include "csutil/csstring.h"
 #include "csutil/cscolor.h"
+#include "csgeom/textrans.h"
 
 #include "isys/vfs.h"
 #include "iutil/cfgmgr.h"
@@ -58,7 +59,6 @@
 #include "iobject/object.h"
 #include "imap/parser.h"
 
-#include "csengine/textrans.h"
 #include "csengine/thing.h"
 
 #if defined(BLOCKS_NETWORKING)

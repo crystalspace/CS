@@ -19,7 +19,7 @@
 #include <math.h>
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
-#include "csengine/textrans.h"
+#include "csgeom/textrans.h"
 #include "qsqrt.h"
 
 //---------------------------------------------------------------------------
