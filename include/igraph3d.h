@@ -356,6 +356,81 @@ struct G3DTriangleMesh
 };
 
 /**
+ * A polygon. Note that this structure is only valid if used
+ * in combination with a vertex or edge table.  The vertex array then
+ * contains indices in that table (either vertices or edges).
+ */
+struct csPolygonDPM
+{
+  int vertices;
+  int *vertex;
+};
+
+/**
+ * Structure containing all info needed by DrawPolygonMesh.
+ * In theory this function is capable of:<br>
+ * <ul>
+ * <li>Object2camera transformation and perspective.
+ * <li>Clipping.
+ * <li>Whatever else DrawPolygon can do.
+ * </ul>
+ * To disable the use of one of the components, set it to NULL.
+ */
+struct G3DPolygonMesh
+{
+
+  /// Number of vertices.
+  int num_vertices;
+
+  /// Number of polygons.
+  int num_polygons;
+
+  /// Pointer to array of polygons
+  csPolygonDPM* polygons;
+
+  /// Texture for all polygons.  If this is NULL, each polygon has it's
+  /// own texture handle in the txt_handle array.
+  iTextureHandle *master_txt_handle;
+
+  /// Pointer to an array of texture handles (one for for each polygon)
+  /// Only valid if master_txt_handle is NULL
+  iTextureHandle *txt_handle;
+
+  /// Transformation matrices for the texture
+  G3DTexturePlane *plane;
+
+  /// The plane equation in camera space of this polygon. @@@ BAD NAME
+  G3DPolyNormal *normal;
+
+  /// Handle to lighted textures (texture + lightmap)
+  iPolygonTexture *poly_texture;
+
+  /// Apply fogging?
+  bool do_fog;
+
+  /// Do clipping tests?
+  bool do_clip;
+
+  /// Consider polygon vertices in anti-clockwise order if true.
+  bool do_mirror;
+
+  /// Type of vertices supplied.
+  enum
+  {
+    /// Must apply transformation and perspective.
+    VM_WORLDSPACE,
+    /// Must apply perspective.
+    VM_VIEWSPACE
+  } vertex_mode;
+
+  /// The mesh vertex array
+  csVector3 *vertices;
+
+  /// Information for fogging the vertices.
+  G3DFogInfo* vertex_fog;
+};
+
+/**
  * Fog structure.
  */
 struct csFog
@@ -372,7 +447,7 @@ struct csFog
   float blue;
 };
 
-SCF_VERSION (iGraphics3D, 2, 0, 2);
+SCF_VERSION (iGraphics3D, 2, 0, 3);
 
 /**
  * This is the standard 3D graphics interface.
@@ -464,6 +539,11 @@ struct iGraphics3D : public iPlugIn
    * Draw a triangle mesh using features similar to DrawPolygonFX.
    */
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh) = 0;
+
+  /**
+   * Draw a triangle mesh using features similar to DrawPolygon.
+   */
+  virtual void DrawPolygonMesh (G3DPolygonMesh& mesh) = 0;
 
   /**
    * Initiate a volumetric fog object. This function will be called
