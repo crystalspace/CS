@@ -29,7 +29,7 @@ class csOctree;
 class csOctreeNode;
 class csBspTree;
 class csThing;
-struct iVFS;
+struct iCacheManager;
 struct iFile;
 
 #define OCTREE_FFF 0
@@ -339,27 +339,17 @@ public:
   void Statistics ();
 
   /**
-   * Cache this entire octree to disk (VFS).
+   * Cache this entire octree to the cache manager.
    */
-  void Cache (iVFS* vfs, const char* name);
+  void Cache (iCacheManager* cache_mgr);
 
   /**
-   * Read this entire octree from disk (VFS).
+   * Read this entire octree from cache manager.
    * Returns false if not cached, or cache not valid.
    */
-  bool ReadFromCache (iVFS* vfs, const char* name,
+  bool ReadFromCache (iCacheManager* cache_mgr,
   	csPolygonInt** polygons, int num);
-
-  /**
-   * Cache the PVS to VFS.
-   */
-  void CachePVS (iVFS* vfs, const char* name);
-
-  /**
-   * Read the PVS from VFS.
-   * Return false if not cached, or cache not valid.
-   */
-  bool ReadFromCachePVS (iVFS* vfs, const char* name);
 };
 
 #endif // __CS_OCTREE_H__
+

@@ -214,19 +214,6 @@ struct LightHeader
   long dyn_cnt;             // Number of dynamic maps
 };
 
-void CacheName (
-  char *buf,
-  char *prefix,
-  int id,
-  unsigned long ident,
-  char *suffix)
-{
-  if (id == 0)
-    sprintf (buf, "%s%lu%s", prefix, ident, suffix);
-  else
-    sprintf (buf, "lm/%s%d_%lu%s", prefix, id, ident, suffix);
-}
-
 bool csLightMap::ReadFromCache (
   iCacheManager* cache_mgr,
   int id,

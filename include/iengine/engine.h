@@ -63,6 +63,7 @@ struct iMeshFactoryList;
 struct iProgressMeter;
 struct iRegionList;
 struct iLoaderContext;
+struct iCacheManager;
 
 /**
  * Flag for GetNearbyLights().
@@ -172,7 +173,7 @@ struct iDrawFuncCallback : public iBase
 };
 
 
-SCF_VERSION (iEngine, 0, 7, 4);
+SCF_VERSION (iEngine, 0, 7, 5);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -661,6 +662,20 @@ struct iEngine : public iBase
    * This function will also remove the object from the region it may be in.
    */
   virtual bool RemoveObject (iBase* object) = 0;
+
+  /**
+   * Set the cache manager that the engine will use. If this is not
+   * done then the engine will use its own cache manager based on VFS.
+   * This will do an incref on the given cache manager and a decref
+   * on the old one. The engine will release the cache manager at
+   * destruction time.
+   */
+  virtual void SetCacheManager (iCacheManager* cache_mgr) = 0;
+
+  /**
+   * Get the cache manager that the engine is currently using.
+   */
+  virtual iCacheManager* GetCacheManager () = 0;
 };
 
 #endif // __IENGINE_ENGINE_H__

@@ -830,7 +830,7 @@ csEngine::csEngine (iBase *iParent) :
   rad_debug = NULL;
   nextframe_pending = 0;
   virtual_clock = NULL;
-  own_cache_mgr = NULL;
+  cache_mgr = NULL;
 
   cbufcube = new csCBufferCube (1024);
   InitCuller ();
@@ -894,11 +894,7 @@ csEngine::~csEngine ()
   if (camera_hack) camera_hack->DecRef ();
   camera_hack = NULL;
 
-  if (own_cache_mgr)
-  {
-    object_reg->Unregister (own_cache_mgr, "crystalspace.engine.cachemgr");
-    own_cache_mgr->DecRef ();
-  }
+  if (cache_mgr) cache_mgr->DecRef ();
 }
 
 bool csEngine::Initialize (iObjectRegistry *object_reg)
@@ -1345,10 +1341,15 @@ bool csEngine::Prepare (iProgressMeter *meter)
   return true;
 }
 
+void csEngine::SetCacheManager (iCacheManager* cache_mgr)
+{
+  if (cache_mgr) cache_mgr->IncRef ();
+  if (csEngine::cache_mgr) csEngine::cache_mgr->DecRef ();
+  csEngine::cache_mgr = cache_mgr;
+}
+
 iCacheManager* csEngine::GetCacheManager ()
 {
-  iCacheManager* cache_mgr = CS_QUERY_REGISTRY_TAG_INTERFACE (
-  	object_reg, "crystalspace.engine.cachemgr", iCacheManager);
   if (!cache_mgr)
   {
     char buf[512];
@@ -1357,10 +1358,7 @@ iCacheManager* csEngine::GetCacheManager ()
       strcat (buf, "cache");
     else
       strcat (buf, "/cache");
-    own_cache_mgr = new csVfsCacheManager (object_reg, buf);
-    object_reg->Register (own_cache_mgr, "crystalspace.engine.cachemgr");
-    cache_mgr = own_cache_mgr;
-    cache_mgr->IncRef ();
+    cache_mgr = new csVfsCacheManager (object_reg, buf);
   }
   return cache_mgr;
 }
@@ -1622,9 +1620,6 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
   if (do_relight) Report ("Updating VFS....");
   if (!VFS->Sync()) Warn ("Error updating lighttable cache!");
   if (do_relight) Report ("DONE!");
-
-  // Release the cache manager again.
-  cm->DecRef ();
 
   delete lit;
 }

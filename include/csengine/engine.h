@@ -444,18 +444,11 @@ private:
   char* SplitRegionName (const char* name, iRegion*& region, bool& global);
 
   /**
-   * Get the current cache from the object registry. If there is none
-   * we create a VFS cache for the 'current VFS directory/cache' and
-   * register that with the object registry.
-   */
-  iCacheManager* GetCacheManager ();
-
-  /**
    * The following variable is only set if the engine had to create its
    * own cache manager. In that case the engine is also responsible
    * for cleaning this up.
    */
-  iCacheManager* own_cache_mgr;
+  iCacheManager* cache_mgr;
 
 public:
   /**
@@ -1050,11 +1043,16 @@ public:
   virtual iCollection* FindCollection (const char* name,
   	iRegion* region = NULL);
 
-  //--------------------- iConfig interface implementation --------------------
+  //----------------------- iCacheManager implementation ---------------------
+
+  virtual void SetCacheManager (iCacheManager* cache_mgr);
+  virtual iCacheManager* GetCacheManager ();
+
+  //--------------------- iConfig interface implementation -------------------
 
   csEngineConfig scfiConfig;
 
-  //----------------Begin-Multi-Context-Support------------------------------
+  //----------------Begin-Multi-Context-Support-------------------------------
 
   /// Point engine to rendering context
   virtual void SetContext (iGraphics3D* g3d);

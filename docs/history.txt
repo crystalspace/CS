@@ -1,5 +1,16 @@
 The history order is reversed so that new features are at the top.
 
+7-Mar-2002
+	- Fixed another occurance of an initializer in a cpp file.
+	  This is not legal.
+	- The cache manager is no longer registered with the object
+	  registry. Instead I added iEngine::GetCacheManager() and
+	  SetCacheManager(). This is a more explicit and easier way
+	  to handle this. So if you want to cache something in the
+	  context of the engine just ask the cache manager from the
+	  engine. If you don't use SetCacheManager() then the engine
+	  will still use the vfs cache manager by default.
+	- Octree is now also saved on the cache manager.
 6-Mar-2002
 	- Matt Reda made the iso engine explicitly remove all mesh factories 
 	  at iso engine destruction for clarity.

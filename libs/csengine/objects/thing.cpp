@@ -744,25 +744,29 @@ void csThing::BuildStaticTree (const char *name, int mode)
       150 /*15*/,
       mode);
 
-  csString str ("vis/octree_");
-  str += name;
-
   csEngine *w = csEngine::current_engine;
+  iCacheManager* cache_mgr = w->GetCacheManager ();
+
   bool recalc_octree = true;
-  if (!csEngine::do_force_revis && w->VFS->Exists ((const char *)str))
+  if (!csEngine::do_force_revis)
   {
     if (cachename)
     {
-      csEngine *w = csEngine::current_engine;
-      w->VFS->PushDir ();
-      w->VFS->ChDir (cachename);
+      char buf[100];
+      sprintf (buf, "%s_%s", cachename, name);
+      cache_mgr->SetCurrentScope (buf);
+    }
+    else
+    {
+      char buf[100];
+      sprintf (buf, "defO_%s", name);
+      cache_mgr->SetCurrentScope (buf);
     }
 
     recalc_octree = false;
     csEngine::current_engine->Report ("Loading bsp/octree...");
     recalc_octree = !((csOctree *)static_tree)->ReadFromCache (
-        w->VFS,
-        (const char *)str,
+        cache_mgr,
         GetPolygonArray ().GetArray (),
         GetPolygonArray ().Length ());
     if (recalc_octree)
@@ -776,11 +780,7 @@ void csThing::BuildStaticTree (const char *name, int mode)
           mode);
     }
 
-    if (cachename)
-    {
-      csEngine *w = csEngine::current_engine;
-      w->VFS->PopDir ();
-    }
+    cache_mgr->SetCurrentScope (NULL);
   }
 
   if (recalc_octree)
@@ -789,18 +789,21 @@ void csThing::BuildStaticTree (const char *name, int mode)
     static_tree->Build (GetPolygonArray ());
     if (cachename)
     {
-      csEngine *w = csEngine::current_engine;
-      w->VFS->PushDir ();
-      w->VFS->ChDir (cachename);
+      char buf[100];
+      sprintf (buf, "%s_%s", cachename, name);
+      cache_mgr->SetCurrentScope (buf);
+    }
+    else
+    {
+      char buf[100];
+      sprintf (buf, "defO_%s", name);
+      cache_mgr->SetCurrentScope (buf);
     }
 
     csEngine::current_engine->Report ("Caching bsp/octree...");
-    ((csOctree *)static_tree)->Cache (w->VFS, (const char *)str);
-    if (cachename)
-    {
-      csEngine *w = csEngine::current_engine;
-      w->VFS->PopDir ();
-    }
+    ((csOctree *)static_tree)->Cache (cache_mgr);
+
+    cache_mgr->SetCurrentScope (NULL);
   }
 
   csEngine::current_engine->Report ("Compress vertices...");

@@ -30,6 +30,7 @@
 #include "csengine/thing.h"
 #include "csutil/memfile.h"
 #include "iutil/vfs.h"
+#include "iutil/cache.h"
 
 //---------------------------------------------------------------------------
 #define PLANE_X 0
@@ -1016,7 +1017,7 @@ void csOctree::Cache (csOctreeNode *node, iFile *cf)
   WriteByte (cf, 255);          // No more children.
 }
 
-void csOctree::Cache (iVFS *vfs, const char *name)
+void csOctree::Cache (iCacheManager* cache_mgr)
 {
   csMemFile m;
   iFile *mf = SCF_QUERY_INTERFACE_FAST ((&m), iFile);
@@ -1026,7 +1027,8 @@ void csOctree::Cache (iVFS *vfs, const char *name)
   WriteLong (mf, (long)bsp_num);
   WriteLong (mf, (long)mode);
   Cache ((csOctreeNode *)root, mf);
-  vfs->WriteFile (name, m.GetData (), m.GetSize ());
+  cache_mgr->CacheData ((void*)(m.GetData ()), m.GetSize (),
+  	"octree", NULL, 0);
   mf->DecRef ();
 }
 
@@ -1194,20 +1196,20 @@ bool csOctree::ReadFromCache (
 }
 
 bool csOctree::ReadFromCache (
-  iVFS *vfs,
-  const char *name,
+  iCacheManager* cache_mgr,
   csPolygonInt **polygons,
   int num)
 {
-  iFile *cf = vfs->Open (name, VFS_FILE_READ);
-  if (!cf) return false;        // File doesn't exist
+  iDataBuffer *data = cache_mgr->ReadCache ("octree", NULL, 0);
+  if (!data) return false;	// File doesn't exist
+
+  csMemFile* cf = new csMemFile (*(char**)data, data->GetSize ());
   char buf[10];
   ReadString (cf, buf, 4);
   if (strncmp (buf, "OCTR", 4))
   {
     csEngine::current_engine->Warn (
-        "Cached octree '%s' not valid! Will be ignored.",
-        name);
+        "Cached octree not valid! Will be ignored.");
     cf->DecRef ();
     return false;               // Bad format!
   }
@@ -1244,3 +1246,4 @@ bool csOctree::ReadFromCache (
   cf->DecRef ();
   return rc;
 }
+
