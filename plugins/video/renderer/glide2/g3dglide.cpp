@@ -70,6 +70,7 @@
 // Interface table definition
 //
 
+
 IMPLEMENT_FACTORY (csGraphics3DGlide2x)
 
 EXPORT_CLASS_TABLE (glide23d)
@@ -81,6 +82,9 @@ IMPLEMENT_IBASE (csGraphics3DGlide2x)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics3D)
 IMPLEMENT_IBASE_END
+
+
+#define GLIDE_FX_VERTSIZE 10
 
 // Error Message handling
 void sys_fatalerror( char* thestr, int hRes=0 )
@@ -384,6 +388,10 @@ csGraphics3DGlide2x::csGraphics3DGlide2x(iBase* iParent) :
   m_piSystem = NULL;
   config = new csIniFile ("glide2x.cfg");
   m_pCamera = NULL;
+  m_thTex = NULL;
+  m_verts = NULL;
+  m_vertsize = 0;
+
   // default
   m_Caps.ColorModel = G3DCOLORMODEL_RGB;
   m_Caps.CanClip = false;
@@ -416,6 +424,8 @@ csGraphics3DGlide2x::~csGraphics3DGlide2x()
 {
   GlideLib_grGlideShutdown();
 
+  if ( m_verts )
+    delete [] m_verts;
   if (m_pTextureCache)
     CHKB (delete m_pTextureCache);
   if (m_pLightmapCache)
@@ -805,6 +815,7 @@ void csGraphics3DGlide2x::RenderPolygonSinglePass (GrVertex * verts, int num, bo
 void csGraphics3DGlide2x::RenderPolygonMultiPass (GrVertex * verts, int num, bool haslight,TextureHandler*text,TextureHandler*light,bool is_transparent)
 {
   int i;
+
   for(i=0;i<num;i++)
     {
       verts[i].tmuvtx[0].sow *= text->width*verts[i].oow;
@@ -1070,7 +1081,7 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
   }
       
   RenderPolygon(verts,poly.num,lm_exists,thTex,thLm,is_transparent);
-  
+
   if(is_colorkeyed)
     GlideLib_grChromakeyMode(GR_CHROMAKEY_DISABLE);
   
@@ -1083,9 +1094,31 @@ void csGraphics3DGlide2x::DrawPolygon(G3DPolygonDP& poly)
   delete[] verts;
 }
 
-void csGraphics3DGlide2x::StartPolygonFX(iTextureHandle * /*handle*/,
-  UInt mode)
+void csGraphics3DGlide2x::StartPolygonFX(iTextureHandle *handle,  UInt mode)
 {
+  csHighColorCacheData* tcache=NULL;
+  csTextureMMGlide* txt_mm = (csTextureMMGlide*)handle->GetPrivateObject ();
+
+  m_pTextureCache->Add(handle);
+  tcache = txt_mm->GetHighColorCacheData();
+
+//  ASSERT( tcache );
+  m_thTex = (TextureHandler *)tcache->pData;
+    
+  GlideLib_grTexSource(m_thTex->tmu->tmu_id, m_thTex->loadAddress, GR_MIPMAPLEVELMASK_BOTH, &m_thTex->info);
+
+  if(!m_iMultiPass)
+    {
+      GlideLib_grTexCombine(m_TMUs[0].tmu_id,
+			    GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE,
+			    GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
+			    FXFALSE,FXFALSE);
+    }
+
+  if ( !m_verts ) {
+    m_verts = new GrVertex[ GLIDE_FX_VERTSIZE ];
+    m_vertsize = GLIDE_FX_VERTSIZE;
+  }
   m_mixmode = mode;
   m_alpha   = float (mode & CS_FX_MASK_ALPHA) / 255.;
   m_gouraud = rstate_gouraud && ((mode & CS_FX_GOURAUD) != 0);
@@ -1093,90 +1126,68 @@ void csGraphics3DGlide2x::StartPolygonFX(iTextureHandle * /*handle*/,
 
 void csGraphics3DGlide2x::FinishPolygonFX()
 {
+  if(!m_iMultiPass)
+    {
+      GlideLib_grTexCombine(m_TMUs[0].tmu_id,
+			    GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_LOCAL,
+			    GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
+			    FXFALSE,FXFALSE);
+    }
+  m_thTex = NULL;
 }
 
 void csGraphics3DGlide2x::DrawPolygonFX(G3DPolygonDPFX& poly)
 {
   //This implementation is pretty wrong, because it does not take into account all the
-  //possible mixmodes. Also performace could be improved pretty much, if the setup
-  //stuff for the renderer would move into StartPolygonFX. - Thomas Hieber 07/18/1999
-  csHighColorCacheData* tcache=NULL;
+  //possible mixmodes. - Thomas Hieber 07/18/1999
 
-  if (poly.num < 3)
-    return;
-
-  csTextureMMGlide* txt_mm = (csTextureMMGlide*)poly.txt_handle->GetPrivateObject ();
-
-  m_pTextureCache->Add(poly.txt_handle);
-  tcache = txt_mm->GetHighColorCacheData();
-
-//  ASSERT( tcache );
-        
-  TextureHandler *thTex = (TextureHandler *)tcache->pData;
-
-  if(thTex)
+  if (poly.num >= 3 && m_thTex)
   {
-    CHK(GrVertex *verts = new GrVertex[poly.num]);
-    
+    if ( poly.num  > m_vertsize ){
+      if ( m_verts ) delete m_verts;
+      CHK(m_verts = new GrVertex[poly.num]);
+      m_vertsize = poly.num;
+    }
+
     float x, y;
     for(int i=0; i<poly.num; i++)
     {
       x = poly.vertices[i].sx;
       y = poly.vertices[i].sy;
-      verts[i].x = x + SNAP;
-      verts[i].y = y + SNAP;
+      m_verts[i].x = x + SNAP;
+      m_verts[i].y = y + SNAP;
       x-=m_nHalfWidth;
       y-=m_nHalfHeight;
       if(m_gouraud)
       {
-        verts[i].r = poly.vertices[i].r*255;
-        verts[i].g = poly.vertices[i].g*255;
-        verts[i].b = poly.vertices[i].b*255;
+        m_verts[i].r = poly.vertices[i].r*255;
+        m_verts[i].g = poly.vertices[i].g*255;
+        m_verts[i].b = poly.vertices[i].b*255;
       }
       else
       {
-        verts[i].r = 255;
-        verts[i].g = 255;
-        verts[i].b = 255;
+        m_verts[i].r = 255;
+        m_verts[i].g = 255;
+        m_verts[i].b = 255;
       }
-      verts[i].oow = poly.vertices[i].z;
-      verts[i].x -= SNAP;
-      verts[i].y -= SNAP;
-      verts[i].tmuvtx[1].sow = verts[i].tmuvtx[0].sow = poly.vertices[i].u*thTex->width*verts[i].oow;
-      verts[i].tmuvtx[1].tow = verts[i].tmuvtx[0].tow = poly.vertices[i].v*thTex->height*verts[i].oow;
-      verts[i].a = poly.vertices[i].z;
+      m_verts[i].oow = poly.vertices[i].z;
+      m_verts[i].x -= SNAP;
+      m_verts[i].y -= SNAP;
+      m_verts[i].tmuvtx[1].sow = m_verts[i].tmuvtx[0].sow = poly.vertices[i].u*m_thTex->width*m_verts[i].oow;
+      m_verts[i].tmuvtx[1].tow = m_verts[i].tmuvtx[0].tow = poly.vertices[i].v*m_thTex->height*m_verts[i].oow;
+      m_verts[i].a = poly.vertices[i].z;
     }
     
-    GlideLib_grTexSource(thTex->tmu->tmu_id, thTex->loadAddress,
-      GR_MIPMAPLEVELMASK_BOTH, &thTex->info);
-  if(poly.use_fog){
-      printf( "\n *** Using fog in fx ***" );
+    if(poly.use_fog){
       GlideLib_grFogMode( GR_FOG_WITH_ITERATED_ALPHA );
       GlideLib_grFogColorValue( 0 );
-  }
-    
-    if(!m_iMultiPass)
-    {
-      GlideLib_grTexCombine(m_TMUs[0].tmu_id,
-        GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE,
-        GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
-        FXFALSE,FXFALSE);
-    }
-
-    GlideLib_grDrawPlanarPolygonVertexList(poly.num, verts);
-
-    if(!m_iMultiPass)
-    {
-      GlideLib_grTexCombine(m_TMUs[0].tmu_id,
-        GR_COMBINE_FUNCTION_SCALE_OTHER, GR_COMBINE_FACTOR_LOCAL,
-        GR_COMBINE_FUNCTION_ZERO, GR_COMBINE_FACTOR_NONE,
-        FXFALSE,FXFALSE);
     }
     
-  if(poly.use_fog){
+    GlideLib_grDrawPlanarPolygonVertexList(poly.num, m_verts);
+
+    if(poly.use_fog){
       GlideLib_grFogMode( GR_FOG_DISABLE );
-  }
-    delete[] verts;
+    }
   }
 }
 

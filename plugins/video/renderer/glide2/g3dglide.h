@@ -47,6 +47,11 @@ private:
   GlideTextureCache *m_pTextureCache;
   /// the lightmap cache.
   GlideLightmapCache *m_pLightmapCache;
+  /// texturehandler for FX polygon drawing
+  TextureHandler *m_thTex;
+  /// vertex array for FX polygon drawing
+  GrVertex *m_verts;
+  int m_vertsize;
 
   csTextureManagerGlide* txtmgr; 
   /// Does require multipass rendering for lightmap (if TRUE, then there is only one TMU!)
