@@ -1,6 +1,4 @@
-#ifndef __NO_CRYSTALSPACE__
 #include "cssysdef.h"
-#endif
 #include "csphyzik/rigidbod.h"
 #include "csphyzik/ctvector.h"
 #include "csphyzik/contact.h"

@@ -18,9 +18,7 @@
 
 */
 
-#ifndef __NO_CRYSTALSPACE__
 #include "cssysdef.h"
-#endif
 #include "csphyzik/refframe.h"
 
 ctReferenceFrame::ctReferenceFrame 

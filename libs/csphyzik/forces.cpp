@@ -18,9 +18,7 @@
 
 */
 
-#ifndef __NO_CRYSTALSPACE__
 #include "cssysdef.h"
-#endif
 #include "csphyzik/forces.h"
 #include "csphyzik/phyzent.h"
 #include "csphyzik/refframe.h"
@@ -119,8 +117,7 @@ ctVector3 ctSpringF::apply_F( ctDynamicEntity &pe )
 	  d = a1 - a2;
 	else
 	{
-	  Debug::log( CT_DEBUG_LEVEL, 
-		      "ctSpringF: body applied not part of coupling\n" );
+	  log( "ctSpringF: body applied not part of coupling\n" );
 	  return ctVector3(0,0,0);
 	}
 				

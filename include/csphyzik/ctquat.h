@@ -33,10 +33,8 @@ class ctQuaternion : public csQuaternion {
   ctQuaternion (ctVector3 x) 
     : csQuaternion ( csVector3(x[0], x[1], x[2]) ) {}
 
-#ifdef __CRYSTALSPACE__
   ctQuaternion(csVector3 x) 
     : csQuaternion ( csVector3(x[0], x[1], x[2]) ) {}
-#endif
 
   ctQuaternion(csQuaternion q) 
     : csQuaternion ( q.r, q.x, q.y, q.z ) {}

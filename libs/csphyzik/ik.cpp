@@ -18,9 +18,7 @@
 
 */
 
-#ifndef __NO_CRYSTALSPACE__
 #include "cssysdef.h"
-#endif
 #include "csphyzik/ik.h"
 #include "csphyzik/articula.h"
 #include "csphyzik/joint.h"

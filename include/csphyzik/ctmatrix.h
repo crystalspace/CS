@@ -280,13 +280,9 @@ public:
     {
       for( int j = 0; j < dimen; j++ )
       {
-#ifdef __CRYSTALSPACE__
-        Debug::logf( CT_DEBUG_LEVEL, "%lf :: ", rows[i][j] ); 
-#endif
+        logf( "%f :: ", rows[i][j] ); 
       }
-#ifdef __CRYSTALSPACE__
-        Debug::logf( CT_DEBUG_LEVEL, "\n" );
-#endif
+      logf( "\n" );
     }
   }
 };
@@ -586,24 +582,12 @@ public:
     for ( int i = 0; i < dimen; i++ )
     {
       for ( int j = 0; j < dimen; j++ )
-        DEBUGLOGF( "%lf :: ", rows[i][j] ); 
+        DEBUGLOGF( "%f :: ", rows[i][j] ); 
       DEBUGLOG( "\n" );
     }
   }
 };
 
-
-#ifndef __CRYSTALSPACE__
-inline ctMatrix3 ctVector3::operator* ( const ctVectorTranspose3 &pv )
-{ 
-  ctMatrix3 Mret;
-  for ( int idr = 0; idr < 3; idr++ )
-    for ( int idc = 0; idc < 3; idc++ )
-      Mret[idr][idc] = (*this)[idr]*pv[idc];
-
-  return Mret;
-}
-#endif
 
 inline void ctMatrix3::set ( real p00, real p01, real p02,
 			     real p10, real p11, real p12,

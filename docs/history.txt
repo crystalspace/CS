@@ -40,6 +40,9 @@ The history order is reversed so that new features are at the top.
 	- Removed CsPrintf() in engine.
 	- Eric Sunshine removed a bunch of Glide references from documentation,
 	  sources, headers, and makefiles.
+	- Fixed a few dependencies on csengine in csphyzik (related to
+	  debugging mostly). Also removed the conditional CRYSTALSPACE
+	  define.
 4-Jul-2001
 	- Added iCamera::SetTransform() which should be used to directly
 	  set the transform. It is illegal to assign to the result of

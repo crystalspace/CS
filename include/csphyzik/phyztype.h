@@ -1,11 +1,6 @@
 #ifndef PHYZTYPE_H
 #define PHYZTYPE_H
 
-//!me check with CS team to see if there is a CS define I can use
-#ifndef __NO_CRYSTALSPACE__
-#define __CRYSTALSPACE__
-#endif
-
 typedef double real;
 typedef double coord;
 typedef float ctangle;
