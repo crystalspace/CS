@@ -1545,6 +1545,7 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
   int num_vertices;
 
   csLightMapped *lmi = GetLightMapInfo ();
+  bool rectangle_frust;
 
   // Calculate the new frustum for this polygon.
   if ((GetTextureType () == POLYTXT_LIGHTMAP)
@@ -1558,6 +1559,7 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
 
     // We will use the "responsability grid" rectangle instead of polygon
     // since we need to calculate the lighing for the whole lightmap.
+    rectangle_frust = true;
     // Bounding rectangle always has 4 vertices
     num_vertices = 4;
     if (4 > VectorArray.Limit ())
@@ -1569,6 +1571,7 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
   }
   else
   {
+    rectangle_frust = false;
     num_vertices = GetVertices ().GetNumVertices ();
     if (num_vertices > VectorArray.Limit ())
       VectorArray.SetLimit (num_vertices);
@@ -1633,6 +1636,30 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
 
   // Update the lightmap given light and shadow frustums in new_lview.
   FillLightMap (new_lview);
+
+  // If we aren't finished with the new_lview,
+  // we should clip it to the actual polygon now
+  if (rectangle_frust
+   && (po || (!new_lview.dynamic && csSector::do_radiosity)))
+  {
+    num_vertices = GetVertices ().GetNumVertices ();
+    if (num_vertices > VectorArray.Limit ())
+      VectorArray.SetLimit (num_vertices);
+    poly = VectorArray.GetArray ();
+
+    int j;
+    if (lview->mirror)
+      for (j = 0 ; j < num_vertices ; j++)
+        poly[j] = Vwor (num_vertices - j - 1) - center;
+    else
+      for (j = 0 ; j < num_vertices ; j++)
+        poly[j] = Vwor (j) - center;
+
+    delete new_light_frustum;
+    new_light_frustum = light_frustum->Intersect (poly, num_vertices);
+    new_lview.light_frustum = new_light_frustum;
+    if (!new_light_frustum) return;
+  }
 
   if (po)
     po->CheckFrustum (new_lview);
