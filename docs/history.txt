@@ -10,6 +10,15 @@ The history order is reversed so that new features are at the top.
 	- Added -planes option to levtool to convert a map file that uses
 	  the plane addon so that the planes are integrated with the
 	  polygon itself.
+	- Updated API mod doc with regards to this new change.
+	- Syntax service loader no longer supports loading of planes. It now
+	  gives an error saying you must use levtool -planes.
+	- Removed all texture mapping plane related stuff from
+	  iThingEnvironment.
+	- Removed the plane loader and saver addon from the thing loader
+	  plugin.
+	- Removed iPolyTxtPlane interface and fixed thing plugin related to
+	  that. This should already speed up things a tiny bit.
 	- Andrew Craig made some more fixes to make CS compile again under
 	  windows.
 	- Eric Sunshine fixed problem with 10-Mar-2003 patch to bugplug.mak and

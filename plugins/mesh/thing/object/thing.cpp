@@ -1045,7 +1045,7 @@ void csThing::RemoveCurves ()
 
 void csThing::HardTransform (const csReversibleTransform &t)
 {
-  int i, j;
+  int i;
 
   for (i = 0; i < num_vertices; i++)
   {
@@ -1059,76 +1059,7 @@ void csThing::HardTransform (const csReversibleTransform &t)
       curve_vertices[i] = t.This2Other (curve_vertices[i]);
 
   //-------
-  // First we collect all planes from the set of polygons
-  // and transform each plane one by one. We actually create
-  // new planes and ditch the others (DecRef()) to avoid
-  // sharing planes with polygons that were not affected by
-  // this HardTransform().
-  csHashSet planes (8087);
-  for (i = 0; i < polygons.Length (); i++)
-  {
-    csPolygon3D *p = GetPolygon3D (i);
-    csPolyTexLightMap *lmi = p->GetLightMapInfo ();
-    if (lmi)
-    {
-      iPolyTxtPlane *pl = lmi->GetPolyTxtPlane ();
-      planes.Add (pl);
-    }
-  }
-
-  // As a special optimization we don't copy planes that have no
-  // name. This under the assumption that planes with no name
-  // cannot be shared (let's make this a rule!).
-  csHashIterator *hashit = new csHashIterator (planes.GetHashMap ());
-  while (hashit->HasNext ())
-  {
-    iPolyTxtPlane *pl = (iPolyTxtPlane *)hashit->Next ();
-    if (pl->QueryObject ()->GetName () == NULL)
-    {
-      // This is a non-shared plane.
-      pl->GetPrivateObject ()->HardTransform (t);
-    }
-    else
-    {
-      // This plane is potentially shared. We have to make a duplicate
-      // and modify all polygons to use this one. Note that this will
-      // mean that potentially two planes exist with the same name.
-      csRef<iPolyTxtPlane> new_pl (thing_type->
-        CreatePolyTxtPlane (pl->QueryObject ()->GetName ()));
-      csMatrix3 m;
-      csVector3 v;
-      pl->GetTextureSpace (m, v);
-      new_pl->SetTextureSpace (m, v);
-      new_pl->GetPrivateObject ()->HardTransform (t);
-      for (j = 0; j < polygons.Length (); j++)
-      {
-        csPolygon3D *p = GetPolygon3D (j);
-        csPolyTexLightMap *lmi = p->GetLightMapInfo ();
-        if (lmi && lmi->GetPolyTxtPlane () == pl)
-        {
-          lmi->SetTxtPlane (new_pl->GetPrivateObject ());
-	  lmi->GetPolyTex ()->SetPolygon (p);
-	  p->CreateBoundingTextureBox ();
-        }
-      }
-    }
-  }
-
-  delete hashit;
-  planes.DeleteAll ();
-
-  //-------
-  // Now transform the normal planes.
-  //-------
-  for (i = 0; i < polygons.Length (); i++)
-  {
-    csPolygon3D *p = GetPolygon3D (i);
-    csPlane3 new_plane;
-    t.This2Other (p->GetObjectPlane (), p->Vobj (0), new_plane);
-    p->GetObjectPlane () = new_plane;
-    p->GetWorldPlane () = new_plane;
-  }
-
+  // Now transform the polygons.
   //-------
   for (i = 0; i < polygons.Length (); i++)
   {
@@ -1521,10 +1452,10 @@ void csThing::PreparePolygonBuffer ()
     //CS_ASSERT (lmi != NULL);
     if (lmi)
     {
-      csPolyTxtPlane *txt_plane = lmi->GetTxtPlane ();
+      csPolyTxtPlane& txt_plane = lmi->GetTxtPlane ();
       csMatrix3 *m_obj2tex;
       csVector3 *v_obj2tex;
-      txt_plane->GetObjectToTexture (m_obj2tex, v_obj2tex);
+      txt_plane.GetObjectToTexture (m_obj2tex, v_obj2tex);
       polybuf->AddPolygon (
           poly->GetVertexIndices (),
           poly->GetVertexCount (),
@@ -2902,7 +2833,6 @@ csThingObjectType::csThingObjectType (
 
 csThingObjectType::~csThingObjectType ()
 {
-  ClearPolyTxtPlanes ();
   delete render_pol2d_pool;
   delete lightpatch_pool;
 }
@@ -2934,7 +2864,6 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
 
 void csThingObjectType::Clear ()
 {
-  ClearPolyTxtPlanes ();
   delete lightpatch_pool;
   delete render_pol2d_pool;
   lightpatch_pool = new csLightPatchPool ();
@@ -2948,38 +2877,6 @@ csPtr<iMeshObjectFactory> csThingObjectType::NewFactory ()
       cm, iMeshObjectFactory));
   cm->DecRef ();
   return csPtr<iMeshObjectFactory> (ifact);
-}
-
-csPtr<iPolyTxtPlane> csThingObjectType::CreatePolyTxtPlane (const char *name)
-{
-  csPolyTxtPlane *pl = new csPolyTxtPlane (this);
-  planes.Push (&(pl->scfiPolyTxtPlane));
-  if (name) pl->SetName (name);
-  return &(pl->scfiPolyTxtPlane);
-}
-
-iPolyTxtPlane *csThingObjectType::FindPolyTxtPlane (const char *name)
-{
-  return planes.FindByName (name);
-}
-
-void csThingObjectType::RemovePolyTxtPlane (iPolyTxtPlane *pl)
-{
-  int i;
-  for (i = 0; i < planes.Length (); i++)
-  {
-    iPolyTxtPlane *pli = planes[i];
-    if (pl == pli)
-    {
-      planes.Delete (i);
-      return ;
-    }
-  }
-}
-
-void csThingObjectType::ClearPolyTxtPlanes ()
-{
-  planes.DeleteAll ();
 }
 
 void csThingObjectType::Warn (const char *description, ...)

@@ -20,20 +20,12 @@
 #define __CS_POLYTMAP_H__
 
 #include "csgeom/transfrm.h"
-#include "csutil/csobject.h"
-#include "imesh/thing/polytmap.h"
-
-class csThingObjectType;
-
-
-SCF_VERSION (csPolyTxtPlane, 0, 0, 1);
 
 /**
  * This class represents a texture plane. This is a plane
- * that defines the orientation and offset of a texture. It can
- * be used by several polygons to let the textures fit perfectly.
+ * that defines the orientation and offset of a texture.
  */
-class csPolyTxtPlane : public csObject
+class csPolyTxtPlane
 {
   friend class csPolygon2D;
   friend class csPolygon3D;
@@ -50,12 +42,11 @@ private:
   /// Translation from world to texture space.
   csVector3 v_world2tex;
 
-  /// Destructor is private.
-  virtual ~csPolyTxtPlane ();
-
 public:
-  /// Constructor. Reference count is initialized to 1.
-  csPolyTxtPlane (csThingObjectType* thing_type);
+  /// Constructor.
+  csPolyTxtPlane ();
+  /// Destructor.
+  ~csPolyTxtPlane ();
 
   /**
    * Transform this plane from object space to world space using
@@ -126,39 +117,6 @@ public:
 
   /// Get the transformation from object to texture space.
   void GetTextureSpace (csMatrix3& tx_matrix, csVector3& tx_vector);
-
-  SCF_DECLARE_IBASE_EXT (csObject);
-
-  //----------------- iPolyTxtPlane interface implementation -----------------
-  struct PolyTxtPlane : public iPolyTxtPlane
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csPolyTxtPlane);
-
-    virtual iObject *QueryObject()
-    {
-      return scfParent;
-    }
-    virtual csPolyTxtPlane* GetPrivateObject ()
-    {
-      return (csPolyTxtPlane*)scfParent;
-    }
-    virtual void SetTextureSpace (const csVector3& v_orig,
-			const csVector3& v1, float len1,
-			const csVector3& v2, float len2)
-    {
-      scfParent->SetTextureSpace (v_orig, v1, len1, v2, len2);
-    }
-    virtual void SetTextureSpace (const csMatrix3& tx_matrix,
-  			const csVector3& tx_vector)
-    {
-      scfParent->SetTextureSpace (tx_matrix, tx_vector);
-    }
-    virtual void GetTextureSpace (csMatrix3& tx_matrix, csVector3& tx_vector)
-    {
-      scfParent->GetTextureSpace (tx_matrix, tx_vector);
-    }
-  } scfiPolyTxtPlane;
-  friend struct PolyTxtPlane;
 };
 
 #endif // __CS_POLYTMAP_H__

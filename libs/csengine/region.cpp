@@ -33,7 +33,6 @@
 #include "iengine/mesh.h"
 #include "imesh/thing/thing.h"
 #include "imesh/thing/curve.h"
-#include "imesh/thing/polytmap.h"
 
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csRegion)
@@ -175,23 +174,6 @@ void csRegion::DeleteAll ()
       engine->GetCameraPositions ()->Remove (o);
       ObjRemove (obj);
       copy[i] = NULL;
-    }
-  }
-
-  for (i = 0; i < copy.Length (); i++)
-  {
-    if (copy[i])
-    {
-      iObject *obj = copy[i];
-      csRef<iPolyTxtPlane> o (SCF_QUERY_INTERFACE (obj, iPolyTxtPlane));
-      if (!o) continue;
-      ObjRemove (obj);
-      copy[i] = NULL;
-
-      csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (
-          engine->GetThingType (),
-          iThingEnvironment));
-      te->RemovePolyTxtPlane (o);
     }
   }
 

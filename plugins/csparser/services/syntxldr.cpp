@@ -38,7 +38,6 @@
 #include "iengine/texture.h"
 #include "ivideo/material.h"
 #include "imesh/thing/thing.h"
-#include "imesh/thing/polytmap.h"
 #include "imesh/thing/portal.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/object.h"
@@ -603,7 +602,7 @@ bool csTextSyntaxService::ParseTextureMapping (
 	int &idx1, csVector2 &uv1,
 	int &idx2, csVector2 &uv2,
 	int &idx3, csVector2 &uv3,
-	char *plane, const char *polyname)
+	const char *polyname)
 {
   int cur_uvidx = 0;
 
@@ -673,14 +672,9 @@ bool csTextSyntaxService::ParseTextureMapping (
         len.x = 0;
         break;
       case XMLTOKEN_PLANE:
-        {
-          texspec &= ~CSTEX_UV;
-	  const char* v = child->GetContentsValue ();
-	  if (v) strcpy (plane, v);
-	  else plane[0] = 0;
-          len.x = 0;
-	}
-        break;
+	ReportError ("crystalspace.syntax.texture", child,
+                "<plane> for <texmap> no longer supported! Use levtool -planes to convert map!");
+        return false;
       case XMLTOKEN_UVSHIFT:
         texspec |= CSTEX_UV_SHIFT;
 	uv_shift.x = child->GetAttributeValueAsFloat ("u");
@@ -876,8 +870,6 @@ bool csTextSyntaxService::ParsePoly3d (
 
   csMatrix3 tx_matrix;
   csVector3 tx_vector (0, 0, 0);
-  char plane_name[100];
-  plane_name[0] = 0;
   csVector2 uv_shift (0, 0);
 
   bool do_mirror = false;
@@ -973,7 +965,7 @@ bool csTextSyntaxService::ParsePoly3d (
 		tx_uv_i1, tx_uv1,
 		tx_uv_i2, tx_uv2,
 		tx_uv_i3, tx_uv3,
-		plane_name, poly3d->GetName ()))
+		poly3d->GetName ()))
 	{
 	  return false;
 	}
@@ -1100,23 +1092,11 @@ bool csTextSyntaxService::ParsePoly3d (
       else poly3d->SetTextureSpace (tx_orig, tx1, tx_len.x);
     }
   }
-  else if (plane_name[0])
-  {
-    iPolyTxtPlane* pl = te->FindPolyTxtPlane (plane_name);
-    if (!pl)
-    {
-      ReportError ("crystalspace.syntax.polygon", node,
-        "Can't find plane '%s' for polygon '%s'",
-      	plane_name, poly3d->GetName ());
-      return false;
-    }
-    poly3d->SetTextureSpace (pl);
-  }
   else if (tx_len.x)
   {
     // If a length is given (with 'LEN') we will first see if the polygon
     // is coplanar with the X, Y, or Z plane. In that case we will use
-    // a standard plane. Otherwise we will just create a plane specific
+    // a standard offset. Otherwise we will just create a plane specific
     // for this case given the first two vertices.
     bool same_x = true, same_y = true, same_z = true;
     const csVector3& v = poly3d->GetVertex (0);
@@ -1129,45 +1109,18 @@ bool csTextSyntaxService::ParsePoly3d (
     }
     if (same_x)
     {
-      char buf[200];
-      sprintf (buf, "__X_%g,%g__", v.x, tx_len.x);
-      csRef<iPolyTxtPlane> pl (te->FindPolyTxtPlane (buf));
-      if (!pl)
-      {
-        pl = te->CreatePolyTxtPlane ();
-        pl->QueryObject()->SetName (buf);
-        pl->SetTextureSpace (csVector3 (v.x, 0, 0), csVector3 (v.x, 0, 1),
+      poly3d->SetTextureSpace (csVector3 (v.x, 0, 0), csVector3 (v.x, 0, 1),
 			     tx_len.x, csVector3 (v.x, 1, 0), tx_len.x);
-      }
-      poly3d->SetTextureSpace (pl);
     }
     else if (same_y)
     {
-      char buf[200];
-      sprintf (buf, "__Y_%g,%g__", v.y, tx_len.x);
-      csRef<iPolyTxtPlane> pl (te->FindPolyTxtPlane (buf));
-      if (!pl)
-      {
-        pl = te->CreatePolyTxtPlane ();
-        pl->QueryObject()->SetName (buf);
-        pl->SetTextureSpace (csVector3 (0, v.y, 0), csVector3 (1, v.y, 0),
+      poly3d->SetTextureSpace (csVector3 (0, v.y, 0), csVector3 (1, v.y, 0),
 			     tx_len.x, csVector3 (0, v.y, 1), tx_len.x);
-      }
-      poly3d->SetTextureSpace (pl);
     }
     else if (same_z)
     {
-      char buf[200];
-      sprintf (buf, "__Z_%g,%g__", v.z, tx_len.x);
-      csRef<iPolyTxtPlane> pl (te->FindPolyTxtPlane (buf));
-      if (!pl)
-      {
-        pl = te->CreatePolyTxtPlane ();
-        pl->QueryObject()->SetName (buf);
-        pl->SetTextureSpace (csVector3 (0, 0, v.z), csVector3 (1, 0, v.z),
+      poly3d->SetTextureSpace (csVector3 (0, 0, v.z), csVector3 (1, 0, v.z),
 			     tx_len.x, csVector3 (0, 1, v.z), tx_len.x);
-      }
-      poly3d->SetTextureSpace (pl);
     }
     else
       poly3d->SetTextureSpace (poly3d->GetVertex (0), poly3d->GetVertex (1),
@@ -1180,7 +1133,7 @@ bool csTextSyntaxService::ParsePoly3d (
   {
     if (poly3d->IsTextureMappingEnabled ())
     {
-      poly3d->GetPolyTxtPlane ()->GetTextureSpace (tx_matrix, tx_vector);
+      poly3d->GetTextureSpace (tx_matrix, tx_vector);
       // T = Mot * (O - Vot)
       // T = Mot * (O - Vot) + Vuv      ; Add shift Vuv to final texture map
       // T = Mot * (O - Vot) + Mot * Mot-1 * Vuv

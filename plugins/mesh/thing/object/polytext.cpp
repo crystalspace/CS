@@ -291,7 +291,7 @@ void csPolyTexture::FillLightMap (
   else
     ww = hh = 64;
 
-  csPolyTxtPlane *txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
+  csPolyTxtPlane& txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
 
   if (!shadow_bitmap)
   {
@@ -330,8 +330,8 @@ void csPolyTexture::FillLightMap (
     csVector3 poly[4];
     csPolygon3D *base_poly = polygon;
     int num_vertices = 4;
-    csMatrix3 m_t2w = txt_pl->m_world2tex.GetInverse ();
-    csVector3 &v_t2w = txt_pl->v_world2tex;
+    csMatrix3 m_t2w = txt_pl.m_world2tex.GetInverse ();
+    csVector3 &v_t2w = txt_pl.v_world2tex;
     csVector3 v;
     float inv_ww = 1.0f / float (ww);
     float inv_hh = 1.0f / float (hh);
@@ -383,8 +383,8 @@ void csPolyTexture::FillLightMap (
     //    T.y = m21 * F.x + m22 * F.y + m23 * F.z + TL.y
     //    L.x = m11*wl * F.x + m12*wl * F.y + m13*wl * F.z + TL.x*wl + ul
     //    L.y = m11*hl * F.x + m12*hl * F.y + m13*hl * F.z + TL.y*hl + vl
-    csMatrix3 &Mw2t = txt_pl->m_world2tex;
-    csVector3 &Vw2t = txt_pl->v_world2tex;
+    csMatrix3 &Mw2t = txt_pl.m_world2tex;
+    csVector3 &Vw2t = txt_pl.v_world2tex;
     csVector3 TL = Mw2t * (lightpos - Vw2t);
     float wl = float (ww) * inv_lightcell_size;
     float hl = float (hh) * inv_lightcell_size;
@@ -506,7 +506,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp)
   iMaterialHandle* mat_handle = polygon->GetMaterialHandle ();
   mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
 
-  csPolyTxtPlane *txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
+  csPolyTxtPlane& txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
   float cosfact = polygon->GetParent ()->GetCosinusFactor ();
   if (cosfact == -1) cosfact = cfg_cosinus_factor;
 
@@ -514,8 +514,8 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp)
   // ===>
   // Mtw * T = W - Vwt
   // Mtw * T + Vwt = W
-  csMatrix3 m_t2w = txt_pl->m_world2tex.GetInverse ();
-  csVector3 vv = txt_pl->v_world2tex;
+  csMatrix3 m_t2w = txt_pl.m_world2tex.GetInverse ();
+  csVector3 vv = txt_pl.v_world2tex;
 
   csVector3 v1, v2;
 
@@ -554,8 +554,8 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp)
 
       // T = Mwt * (W - Vwt)
       //v1 = pl->m_world2tex * (lp->vertices[mi] + lp->center - pl->v_world2tex);
-      v1 = txt_pl->m_world2tex * (lp->GetVertex (mi) + lightpos
-      	- txt_pl->v_world2tex);
+      v1 = txt_pl.m_world2tex * (lp->GetVertex (mi) + lightpos
+      	- txt_pl.v_world2tex);
       f_uv[i].x = (v1.x * ww - mapping->Imin_u) * inv_lightcell_size;
       f_uv[i].y = (v1.y * hh - mapping->Imin_v) * inv_lightcell_size;
       if (f_uv[i].y < miny) miny = f_uv[MinIndex = i].y;
@@ -813,9 +813,9 @@ void csPolyTexture::UpdateFromShadowBitmap (
   // ===>
   // Mtw * T = W - Vwt
   // Mtw * T + Vwt = W
-  csPolyTxtPlane *txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
-  csMatrix3 m_t2w = txt_pl->m_world2tex.GetInverse ();
-  csVector3 &v_t2w = txt_pl->v_world2tex;
+  csPolyTxtPlane& txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
+  csMatrix3 m_t2w = txt_pl.m_world2tex.GetInverse ();
+  csVector3 &v_t2w = txt_pl.v_world2tex;
 
   // Cosinus factor
   float cosfact = polygon->GetParent ()->GetCosinusFactor ();

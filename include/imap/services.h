@@ -166,7 +166,6 @@ struct iSyntaxService : public iBase
    * <li>uv_shift: contains UV_SHIFT value.
    * <li>idx? and uv?: if texture mapping is given explicitly by defining
    *     the u,v coordinate that belongs to vertex idx? of the polygon.
-   * <li>plane: is the name of a plane defining the texture transformation.
    * <li>polyname: name of polygon to which this texture description belongs.
    *     This is used to make errormessages more verbose.
    * </ul>
@@ -181,7 +180,7 @@ struct iSyntaxService : public iBase
 			     int &idx1, csVector2 &uv1,
 			     int &idx2, csVector2 &uv2,
 			     int &idx3, csVector2 &uv3,
-			     char *plane, const char *polyname) = 0;
+			     const char *polyname) = 0;
 
   /**
    * Parses a portal definition specification.

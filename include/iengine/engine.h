@@ -740,10 +740,9 @@ struct iEngine : public iBase
    * to that object that the engine itself keeps. This function works
    * for: iSector, iCollection, iMeshWrapper, iMeshFactoryWrapper,
    * iCameraPosition, iDynLight, iMaterialWrapper, and iTextureWrapper.
-   * In addition this function also knows about iPolyTxtPlane from the thing
-   * environment and will be able to clean those up too. Note that the object
-   * is only removed if the resulting ref count will become zero. So
-   * basically this function only releases the references that the engine holds.
+   * Note that the object is only removed if the resulting ref count will
+   * become zero. So basically this function only releases the references
+   * that the engine holds.
    * <p>
    * This function returns true if the engine recognized the object as
    * one on which it can operate.

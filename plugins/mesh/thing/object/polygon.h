@@ -29,6 +29,7 @@
 #include "portal.h"
 #include "thing.h"
 #include "polytext.h"
+#include "polytmap.h"
 #include "iengine/sector.h"
 #include "imesh/thing/polygon.h"
 
@@ -63,7 +64,7 @@ private:
   /**
    * The csPolyTxtPlane for this polygon.
    */
-  csPolyTxtPlane *txt_plane;
+  csPolyTxtPlane txt_plane;
 
   /**
    * This bool indicates if the lightmap is up-to-date (read from the
@@ -85,21 +86,7 @@ public:
   /**
    * Return the texture plane of this polygon.
    */
-  csPolyTxtPlane* GetTxtPlane () const { return txt_plane; }
-  /**
-   * Return the texture plane of this polygon.
-   */
-  iPolyTxtPlane* GetPolyTxtPlane () const;
-
-  /**
-   * Set the texture plane.
-   */
-  void SetTxtPlane (csPolyTxtPlane* txt_pl);
-
-  /**
-   * Create a new texture plane.
-   */
-  void NewTxtPlane (csThingObjectType* thing_type);
+  csPolyTxtPlane& GetTxtPlane () { return txt_plane; }
 
   /**
    * Get the lightmap belonging with this polygon.
@@ -480,7 +467,7 @@ public:
   /// Calculates the area of the polygon in object space.
   float GetArea ();
 
-  /**
+  /*
    * One of the SetTextureSpace functions should be called after
    * adding all vertices to the polygon (not before) and before
    * doing any processing on the polygon (not after)!
@@ -498,14 +485,6 @@ public:
    * do some optimizations. This polygon is not responsible for
    * cleaning this plane.
    */
-  void SetTextureSpace (csPolygon3D* copy_from);
-
-  /**
-   * This version takes the given plane. Using this function you
-   * can use the same plane for several polygons. This polygon
-   * is not responsible for cleaning this plane.
-   */
-  void SetTextureSpace (csPolyTxtPlane* txt_pl);
 
   /**
    * Set the texture space transformation given three vertices and
@@ -568,7 +547,11 @@ public:
    * The most general function. With these you provide the matrix
    * directly.
    */
-  void SetTextureSpace (csMatrix3 const&, csVector3 const&);
+  void SetTextureSpace (const csMatrix3&, const csVector3&);
+  /**
+   * Get txt mapping info.
+   */
+  void GetTextureSpace (csMatrix3&, csVector3&);
 
   /**
    * Disconnect a dynamic light from this polygon.
@@ -854,11 +837,6 @@ public:
     return (MixMode | Alpha);
   }
 
-  iPolyTxtPlane* GetPolyTxtPlane () const
-  {
-    return txt_info ? txt_info->GetPolyTxtPlane () : NULL;
-  }
-
   SCF_DECLARE_IBASE;
 
   //--------------- iPolygon3DStatic interface implementation ---------------
@@ -900,7 +878,6 @@ public:
 
     virtual void CreatePlane (const csVector3 &iOrigin,
       const csMatrix3 &iMatrix);
-    virtual bool SetPlane (const char *iName);
 
     virtual csFlags& GetFlags ()
     { return scfParent->flags; }
@@ -943,12 +920,14 @@ public:
     {
       scfParent->SetTextureSpace (v_orig, v1, len1, v2, len2);
     }
-    virtual void SetTextureSpace (csMatrix3 const& m, csVector3 const& v)
+    virtual void SetTextureSpace (const csMatrix3& m, const csVector3& v)
     {
       scfParent->SetTextureSpace (m, v);
     }
-    virtual void SetTextureSpace (iPolyTxtPlane* plane);
-
+    virtual void GetTextureSpace (csMatrix3& m, csVector3& v)
+    {
+      scfParent->GetTextureSpace (m, v);
+    }
     virtual void EnableTextureMapping (bool enabled)
     {
       scfParent->EnableTextureMapping (enabled);
@@ -977,10 +956,6 @@ public:
     virtual uint GetMixMode ()
     {
       return scfParent->GetMixMode ();
-    }
-    virtual iPolyTxtPlane* GetPolyTxtPlane () const
-    {
-      return scfParent->GetPolyTxtPlane ();
     }
     virtual bool IntersectSegment (const csVector3& start, const csVector3& end,
                           csVector3& isect, float* pr = NULL)

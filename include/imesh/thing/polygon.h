@@ -26,7 +26,6 @@
 struct iMaterialHandle;
 struct iMaterialWrapper;
 struct iPolygon3D;
-struct iPolyTxtPlane;
 struct iPolygonTexture;
 struct iPolyTexLightMap;
 struct iLight;
@@ -61,7 +60,7 @@ class csColor;
 #define CS_POLY_VISCULL	0x00000004
 
 
-SCF_VERSION (iPolygon3DStatic, 0, 0, 1);
+SCF_VERSION (iPolygon3DStatic, 0, 2, 0);
 
 /**
  * This is the interface to the static part of a 3D polygon.
@@ -118,8 +117,6 @@ struct iPolygon3DStatic : public iBase
   /// Create a private polygon texture mapping plane
   virtual void CreatePlane (const csVector3 &iOrigin,
     const csMatrix3 &iMatrix) = 0;
-  /// Set polygon texture mapping plane
-  virtual bool SetPlane (const char *iName) = 0;
 
   /// Set polygon flags (see CS_POLY_... values above)
   virtual csFlags& GetFlags () = 0;
@@ -177,12 +174,12 @@ struct iPolygon3DStatic : public iBase
    * The most general function. With these you provide the matrix
    * directly.
    */
-  virtual void SetTextureSpace (csMatrix3 const&, csVector3 const&) = 0;
+  virtual void SetTextureSpace (const csMatrix3&, const csVector3&) = 0;
 
   /**
-   * With this function you let this polygon share the given plane.
+   * Get the texture space information.
    */
-  virtual void SetTextureSpace (iPolyTxtPlane* plane) = 0;
+  virtual void GetTextureSpace (csMatrix3&, csVector3&) = 0;
 
   /**
    * Disable or enable texture mapping. Doesn't do anything if nothing
@@ -212,8 +209,6 @@ struct iPolygon3DStatic : public iBase
   virtual void SetMixMode (uint m) = 0;
   /// Gets the mode that is used for drawing.
   virtual uint GetMixMode () = 0;
-  /// Get the poly texture plane (or NULL if no texture mapping).
-  virtual iPolyTxtPlane* GetPolyTxtPlane () const = 0;
 
   /**
    * Intersect object-space segment with this polygon. Return

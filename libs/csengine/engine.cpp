@@ -65,7 +65,6 @@
 #include "iutil/plugin.h"
 #include "iutil/virtclk.h"
 #include "imesh/thing/curve.h"
-#include "imesh/thing/polytmap.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/portal.h"
 #include "ivideo/graph3d.h"
@@ -2884,24 +2883,6 @@ bool csEngine::RemoveObject (iBase *object)
 		meshwrap->QueryObject ());
       }
       meshes.Remove (meshwrap);
-      return true;
-    }
-  }
-  {
-    csRef<iPolyTxtPlane> ptp (SCF_QUERY_INTERFACE (object, iPolyTxtPlane));
-    if (ptp)
-    {
-      // Remove from region it might be in.
-      if (ptp->QueryObject ()->GetObjectParent ())
-      {
-	ptp->QueryObject ()->GetObjectParent ()->ObjRemove (
-		ptp->QueryObject ());
-      }
-
-      csRef<iThingEnvironment> te (SCF_QUERY_INTERFACE (
-          GetThingType (),
-          iThingEnvironment));
-      te->RemovePolyTxtPlane (ptp);
       return true;
     }
   }

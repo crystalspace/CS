@@ -35,7 +35,6 @@ struct iCurve;
 struct iMaterialWrapper;
 struct iMaterialList;
 struct iMovable;
-struct iPolyTxtPlane;
 
 /**
  * If CS_THING_FASTMESH is set then this thing will be drawn using
@@ -328,33 +327,18 @@ struct iThingState : public iBase
   virtual void Prepare () = 0;
 };
 
-SCF_VERSION (iThingEnvironment, 0, 2, 0);
+SCF_VERSION (iThingEnvironment, 0, 3, 0);
 
 /**
  * This interface is implemented by the iObjectType for things.
- * Using this interface you can access objects (planes and curve templates)
- * that are global to all things.
+ * Using this interface you can access some global information for things.
  */
 struct iThingEnvironment : public iBase
 {
   /**
-   * Reset the thing environment (clear all curves, polygon planes,
-   * and other stuff related to things).
+   * Reset the thing environment (clear all stuff related to things).
    */
   virtual void Clear () = 0;
-
-  /**
-   * Create a new texture mapping plane with the given name.
-   * If you don't use a name then there is no way to find the plane by name
-   * later.
-   */
-  virtual csPtr<iPolyTxtPlane> CreatePolyTxtPlane (const char* name = NULL) = 0;
-  /// Find a plane with the given name.
-  virtual iPolyTxtPlane* FindPolyTxtPlane (const char* name) = 0;
-  /// Remove the given polygon texture mapping plane.
-  virtual void RemovePolyTxtPlane (iPolyTxtPlane* pl) = 0;
-  /// Remove all polygon texture mapping planes.
-  virtual void ClearPolyTxtPlanes () = 0;
 
   /// Return the current lightmap cell size
   virtual int GetLightmapCellSize () const = 0;

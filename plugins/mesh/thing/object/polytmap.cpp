@@ -23,20 +23,8 @@
 #include "csgeom/textrans.h"
 
 //---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE_EXT(csPolyTxtPlane)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iPolyTxtPlane)
-  SCF_IMPLEMENTS_INTERFACE (csPolyTxtPlane);
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPolyTxtPlane::PolyTxtPlane)
-  SCF_IMPLEMENTS_INTERFACE(iPolyTxtPlane)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-csPolyTxtPlane::csPolyTxtPlane (csThingObjectType* thing_type) :
-  csObject()
+csPolyTxtPlane::csPolyTxtPlane ()
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolyTxtPlane);
-  thing_type->engine->AddToCurrentRegion (this);
 }
 
 csPolyTxtPlane::~csPolyTxtPlane ()
@@ -237,3 +225,4 @@ void csPolyTxtPlane::HardTransform (const csReversibleTransform &obj)
   m_obj2tex = m_world2tex;
   v_obj2tex = v_world2tex;
 }
+

@@ -20,10 +20,10 @@
 #include "polygon.h"
 #include "pol2d.h"
 #include "polytext.h"
-#include "polytmap.h"
 #include "lppool.h"
 #include "lghtmap.h"
 #include "portal.h"
+#include "polytmap.h"
 #include "iengine/camera.h"
 #include "iengine/texture.h"
 #include "iengine/material.h"
@@ -142,10 +142,10 @@ void csPolygon2D::DrawFilled (
   g3dpoly.poly_texture = poly->GetLightMapInfo ()->GetPolyTex ();
   g3dpoly.do_fullbright = poly->flags.Check (CS_POLY_LM_REFUSED);
 
-  csPolyTxtPlane *txt_plane = poly->GetLightMapInfo ()->GetTxtPlane ();
+  csPolyTxtPlane& txt_plane = poly->GetLightMapInfo ()->GetTxtPlane ();
   csMatrix3 m_cam2tex;
   csVector3 v_cam2tex;
-  txt_plane->WorldToCamera (icam->GetTransform (), m_cam2tex, v_cam2tex);
+  txt_plane.WorldToCamera (icam->GetTransform (), m_cam2tex, v_cam2tex);
   g3dpoly.plane.m_cam2tex = &m_cam2tex;
   g3dpoly.plane.v_cam2tex = &v_cam2tex;
   g3dpoly.normal = camera_plane;

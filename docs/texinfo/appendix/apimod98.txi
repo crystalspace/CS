@@ -103,6 +103,8 @@ can be put in a factory. Several functions like
 @code{iThingFactoryState}.
 
 @subheading Polygon Planes
+@cindex @code{iPolyTxtPlane}
+@cindex @code{iThingEnvironment}
 
 Polygon planes are removed. So it is no longer possible to use
 the plane addon loader to define texture mapping for a polygon outside
@@ -110,6 +112,16 @@ of the polygon itself. To fix this you must specify all texture mapping
 information in the @code{texmap} statement of the polygon. @file{map2cs}
 now correctly outputs polygons like this (no longer outputs planes) and
 @file{levtool} can convert old style maps to new format like this:
+
+@code{iThingEnvironment} no longer has code to maintain polygon texture
+mapping planes.
+
+The plane loader and saver addons have been removed from the thing
+loader plugin.
+
+Removed @code{iPolyTxtPlane} interface. Added
+@code{iPolygon3DStatic->GetTextureSpace()} function to get texture space
+definition for polygon.
 
 @example
 levtool -planes yourmap.zip

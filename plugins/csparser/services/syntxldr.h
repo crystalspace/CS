@@ -100,7 +100,7 @@ public:
 			     int &idx1, csVector2 &uv1,
 			     int &idx2, csVector2 &uv2,
 			     int &idx3, csVector2 &uv3,
-			     char *plane, const char *polyname);
+			     const char *polyname);
   virtual  bool ParsePortal (iDocumentNode* node, iLoaderContext* ldr_context,
 		  	   iPolygon3DStatic* poly_3d,
 		  	   csVector &flags, bool &mirror,

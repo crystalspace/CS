@@ -38,7 +38,6 @@
 #include "imesh/thing/thing.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/portal.h"
-#include "imesh/thing/polytmap.h"
 #include "imesh/thing/curve.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
@@ -105,28 +104,8 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csThingSaver::eiComponent)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-SCF_IMPLEMENT_IBASE (csPlaneLoader)
-  SCF_IMPLEMENTS_INTERFACE (iLoaderPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPlaneLoader::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_IBASE (csPlaneSaver)
-  SCF_IMPLEMENTS_INTERFACE (iSaverPlugin)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csPlaneSaver::eiComponent)
-  SCF_IMPLEMENTS_INTERFACE (iComponent)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 SCF_IMPLEMENT_FACTORY (csThingLoader)
 SCF_IMPLEMENT_FACTORY (csThingSaver)
-SCF_IMPLEMENT_FACTORY (csPlaneLoader)
-SCF_IMPLEMENT_FACTORY (csPlaneSaver)
 
 SCF_EXPORT_CLASS_TABLE (thingldr)
   SCF_EXPORT_CLASS (csThingLoader, "crystalspace.mesh.loader.factory.thing",
@@ -137,10 +116,6 @@ SCF_EXPORT_CLASS_TABLE (thingldr)
     "Crystal Space Thing Mesh Loader")
   SCF_EXPORT_CLASS (csThingSaver, "crystalspace.mesh.saver.thing",
     "Crystal Space Thing Mesh Saver")
-  SCF_EXPORT_CLASS (csPlaneLoader, "crystalspace.mesh.loader.thing.plane",
-    "Crystal Space Thing Plane Loader")
-  SCF_EXPORT_CLASS (csPlaneSaver, "crystalspace.mesh.saver.thing.plane",
-    "Crystal Space Thing Plane Saver")
 SCF_EXPORT_CLASS_TABLE_END
 
 #define MAXLINE 200 /* max number of chars per line... */
@@ -559,186 +534,5 @@ void csThingSaver::WriteDown (iBase* /*obj*/, iFile *file)
   sprintf (buf, "FACTORY ('%s')\n", name);
   str.Append (buf);
   file->Write ((const char*)str, str.Length ());
-}
-
-//---------------------------------------------------------------------------
-
-csPlaneLoader::csPlaneLoader (iBase* pParent)
-{
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-}
-
-csPlaneLoader::~csPlaneLoader ()
-{
-}
-
-bool csPlaneLoader::Initialize (iObjectRegistry* object_reg)
-{
-  csPlaneLoader::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  synldr = CS_QUERY_REGISTRY (object_reg, iSyntaxService);
-
-  xmltokens.Register ("clone", XMLTOKEN_CLONE);
-  xmltokens.Register ("orig", XMLTOKEN_ORIG);
-  xmltokens.Register ("firstlen", XMLTOKEN_FIRSTLEN);
-  xmltokens.Register ("first", XMLTOKEN_FIRST);
-  xmltokens.Register ("secondlen", XMLTOKEN_SECONDLEN);
-  xmltokens.Register ("second", XMLTOKEN_SECOND);
-  xmltokens.Register ("matrix", XMLTOKEN_MATRIX);
-  xmltokens.Register ("v", XMLTOKEN_V);
-  xmltokens.Register ("name", XMLTOKEN_NAME);
-  xmltokens.Register ("uvec", XMLTOKEN_UVEC);
-  xmltokens.Register ("vvec", XMLTOKEN_VVEC);
-  return true;
-}
-
-csPtr<iBase> csPlaneLoader::Parse (iDocumentNode* node,
-			     iLoaderContext* /*ldr_context*/,
-			     iBase* /*context*/)
-{
-  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
-  	iPluginManager));
-  csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.thing", iMeshObjectType));
-  if (!type)
-  {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.thing",
-    	iMeshObjectType);
-  }
-  if (!type)
-  {
-    synldr->ReportError (
-		"crystalspace.thingloader.setup.objecttype",
-		node, "Could not load the thing mesh object plugin!");
-    return NULL;
-  }
-  csRef<iThingEnvironment> te = SCF_QUERY_INTERFACE (type,
-  	iThingEnvironment);
-  csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
-  csRef<iPolyTxtPlane> ppl (te->CreatePolyTxtPlane ());
-
-  bool tx1_given = false, tx2_given = false;
-  csVector3 tx_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
-  float tx1_len = 0, tx2_len = 0;
-  csMatrix3 tx_matrix;
-  csVector3 tx_vector (0, 0, 0);
-  char name[255]; name[0] = 0;
-
-  csRef<iDocumentNodeIterator> it = node->GetNodes ();
-  while (it->HasNext ())
-  {
-    csRef<iDocumentNode> child = it->Next ();
-    if (child->GetType () != CS_NODE_ELEMENT) continue;
-    const char* value = child->GetValue ();
-    csStringID id = xmltokens.Request (value);
-    switch (id)
-    {
-      case XMLTOKEN_NAME:
-	strcpy (name, child->GetContentsValue () ?
-			child->GetContentsValue () : "");
-	ppl->QueryObject()->SetName (name);
-        break;
-      case XMLTOKEN_ORIG:
-        tx1_given = true;
-        synldr->ParseVector (child, tx_orig);
-        break;
-      case XMLTOKEN_FIRST:
-        tx1_given = true;
-        synldr->ParseVector (child, tx1);
-        break;
-      case XMLTOKEN_FIRSTLEN:
-	tx1_len = child->GetContentsValueAsFloat ();
-        tx1_given = true;
-        break;
-      case XMLTOKEN_SECOND:
-        tx2_given = true;
-        synldr->ParseVector (child, tx2);
-        break;
-      case XMLTOKEN_SECONDLEN:
-	tx2_len = child->GetContentsValueAsFloat ();
-        tx2_given = true;
-        break;
-      case XMLTOKEN_MATRIX:
-        synldr->ParseMatrix (child, tx_matrix);
-        break;
-      case XMLTOKEN_V:
-        synldr->ParseVector (child, tx_vector);
-        break;
-      case XMLTOKEN_UVEC:
-        tx1_given = true;
-        synldr->ParseVector (child, tx1);
-        tx1_len = tx1.Norm ();
-        tx1 += tx_orig;
-        break;
-      case XMLTOKEN_VVEC:
-        tx2_given = true;
-        synldr->ParseVector (child, tx2);
-        tx2_len = tx2.Norm ();
-        tx2 += tx_orig;
-        break;
-      default:
-        synldr->ReportBadToken (child);
-	return NULL;
-    }
-  }
-
-  if (tx1_given)
-    if (tx2_given)
-    {
-      if (!tx1_len)
-      {
-	synldr->ReportError (
-	  "crystalspace.planeloader.parse.badplane",
-          node, "Bad texture specification for PLANE '%s'", name);
-	tx1_len = 1;
-      }
-      if (!tx2_len)
-      {
-	synldr->ReportError (
-	  "crystalspace.planeloader.parse.badplane",
-          node, "Bad texture specification for PLANE '%s'", name);
-	tx2_len = 1;
-      }
-      if ((tx1-tx_orig) < SMALL_EPSILON)
-        printf ("Bad texture specification for PLANE '%s'\n", name);
-      else if ((tx2-tx_orig) < SMALL_EPSILON)
-        printf ("Bad texture specification for PLANE '%s'\n", name);
-      else ppl->SetTextureSpace (tx_orig, tx1, tx1_len, tx2, tx2_len);
-    }
-    else
-    {
-      synldr->ReportError (
-	  "crystalspace.planeloader.parse.badplane",
-          node, "Not supported!");
-      return NULL;
-    }
-  else
-    ppl->SetTextureSpace (tx_matrix, tx_vector);
-
-  return csPtr<iBase> (ppl);
-}
-
-//---------------------------------------------------------------------------
-
-csPlaneSaver::csPlaneSaver (iBase* pParent)
-{
-  SCF_CONSTRUCT_IBASE (pParent);
-  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-}
-
-csPlaneSaver::~csPlaneSaver ()
-{
-}
-
-bool csPlaneSaver::Initialize (iObjectRegistry* object_reg)
-{
-  csPlaneSaver::object_reg = object_reg;
-  reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
-  return true;
-}
-
-void csPlaneSaver::WriteDown (iBase* /*obj*/, iFile* /*file*/)
-{
 }
 

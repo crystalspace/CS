@@ -1271,15 +1271,6 @@ public:
  */
 class csThingObjectType : public iMeshObjectType
 {
-private:
-  /**
-   * List of planes. This vector contains objects of type
-   * csPolyTxtPlane*. Note that this vector only contains named
-   * planes. Default planes which are created for polygons
-   * are not in this list.
-   */
-  csRefArrayObject<iPolyTxtPlane> planes;
-
 public:
   iObjectRegistry* object_reg;
   bool do_verbose;	// Verbose error reporting.
@@ -1315,11 +1306,6 @@ public:
   /// New Factory.
   virtual csPtr<iMeshObjectFactory> NewFactory ();
 
-  csPtr<iPolyTxtPlane> CreatePolyTxtPlane (const char* name = NULL);
-  iPolyTxtPlane* FindPolyTxtPlane (const char* name);
-  void RemovePolyTxtPlane (iPolyTxtPlane* pl);
-  void ClearPolyTxtPlanes ();
-
   /// iThingEnvironment implementation.
   struct eiThingEnvironment : public iThingEnvironment
   {
@@ -1327,22 +1313,6 @@ public:
     virtual void Clear ()
     {
       scfParent->Clear ();
-    }
-    virtual csPtr<iPolyTxtPlane> CreatePolyTxtPlane (const char* name = NULL)
-    {
-      return scfParent->CreatePolyTxtPlane (name);
-    }
-    virtual iPolyTxtPlane* FindPolyTxtPlane (const char* name)
-    {
-      return scfParent->FindPolyTxtPlane (name);
-    }
-    virtual void RemovePolyTxtPlane (iPolyTxtPlane* pl)
-    {
-      scfParent->RemovePolyTxtPlane (pl);
-    }
-    virtual void ClearPolyTxtPlanes ()
-    {
-      scfParent->ClearPolyTxtPlanes ();
     }
     virtual int GetLightmapCellSize () const
     {
