@@ -56,6 +56,14 @@ The history order is reversed so that new features are at the top.
 	  Note that the performance is not very good when creating new
 	  rooms. This is something that will have to be looked into later.
 	  But at least it no longer crashes.
+	- Eric Sunshine eliminated another `overfull hbox' TeX warning from
+	  project.txi.
+	- Eric Sunshine updated the Apple/NeXT build instructions
+	  (CS/docs/texinfo/build/platform/next.txi) which were slightly
+	  outdated.  Also update the Apple/NeXT internal documentation
+	  (CS/docs/texinfo/internal/platform/next.txi), part of which had
+	  become obsolete following all of the major changes to the "system
+	  driver" (in preparation of the system driver's ultimate removal).
 	- Added NetBSD alias in vfs.cfg.
 22-Oct-2001
 	- Fixed a bug in the 'addghost' console command. It would fail
