@@ -539,7 +539,9 @@ resource 'STR#' (1025, purgeable) {
 	/* [4] */ "Unable to reserve a DrawSprocket drawing context.";
 	/* [5] */ "Fatal Error in Glide2xRender.shlb";
 	/* [6] */ "Fatal Error in OpenGL2D.shlb";
-	/* [7] */ "Fatal Error in OpenGLRender.shlb"
+	/* [7] */ "Fatal Error in OpenGLRender.shlb";
+	/* [8] */ "Out of Memory";
+	/* [9] */ "Fatal Error in Driver2D.shlb"
 	}
 };
 
