@@ -13,6 +13,8 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 21-Feb-2000
+	- Further sprites changes from Seth Galbraith. He changed
+	  3 pointers in csFrame into 2 ints.
 	- Eric Sunshine slightly reworked ImagePngFile::Load() load for the
 	  following reasons:
 	    - Eliminated compilation warnings about variables potentially
@@ -20,6 +22,10 @@ Short-term cleanups that need to be done:
 	    - Eliminated a memory leak.  Was leaking a PNG info structure.
 	    - No longer unnecessarily maintains, within the instance,
 	      transitory information which is only needed during Load() time.
+	- Fixed bug in csPoly2DPool and lightpatch pool which could cause
+	  crashes in some cases.
+	- Some small cleanup/changes to csTerrain and terrain engine.
+	- WalkTest now deletes csView at exit.
 20-Feb-2000
 	- csPolygonSet now also holds a pointer to the parent container and
 	  checks if the parent is NULL before being added to a parent. This
@@ -32,6 +38,8 @@ Short-term cleanups that need to be done:
 	  a number of times in various files.
 	- Eric Sunshine changed the NeXT 2D driver so that it understands
 	  --simdepth=16 (in addition to 15 and 32 which it already understood).
+	- Michael Dale Long did some updates and bugfixes to csConsole.
+	  Now does input history.
 19-Feb-2000
 	- Changed novice/average/expert menu in Blocks so that it is now
 	  one menu which you can rotate horizontally with arrow left/right

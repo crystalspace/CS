@@ -49,33 +49,24 @@ csTerrain::~csTerrain ()
   CHK (delete vbuf);
 }
 
-void csTerrain::classify( csVector3 *p, ddgColor3 *c)
+void csTerrain::classify (csVector3 *p, ddgColor3 *c)
 {
   // Steep normal
-  if (p->y < _beachalt) c->set(_beach); // Beach
-  else if (p->y < _grassalt) c->set(_grass); // Grass
-  else if (p->y < _treealt) c->set(_trees); // Trees
-  else if (p->y < _rockalt) c->set(_rock);  // Rock
-  else c->set(_snow);  // Snow
+  if      (p->y < _beachalt) c->set (_beach);
+  else if (p->y < _grassalt) c->set (_grass);
+  else if (p->y < _treealt)  c->set (_trees);
+  else if (p->y < _rockalt)  c->set (_rock);
+  else                       c->set (_snow);
 }
 
 static csRenderView *grview = NULL;
 // Perform coord transformation using CS instead of DDG.
-void transformer(csVector3 vin, csVector3 *vout)
+csVector3 transformer (csVector3 vin)
 {
   if (grview)
-  {
-    csVector3 csw1 = grview->World2Camera (vin);
-    vout->x = csw1.x;
-    vout->y = csw1.y;
-    vout->z = csw1.z;
-  }
+    return grview->World2Camera (vin);
   else
-  {
-    vout->x = vin.x;
-    vout->y = vin.y;
-    vout->z = vin.z;
-  }
+    return vin;
 }
 
 bool csTerrain::Initialize (const void* heightmap, unsigned long size)
@@ -83,24 +74,24 @@ bool csTerrain::Initialize (const void* heightmap, unsigned long size)
   grview = NULL;
   CHK (height = new ddgHeightMap ());
   if (height->readTGN (heightmap, size))
-	  height->generateHeights(257,257,5);
+	  height->generateHeights (257,257,5);
   CHK (mesh = new ddgTBinMesh (height));
   CHK (clipbox = new ddgBBox (csVector3(0,0,3),csVector3(640, 480, 15000)));
 
-  CHK (vbuf = new ddgVBuffer());
+  CHK (vbuf = new ddgVBuffer ());
 
-  vbuf->size(25000);
-  vbuf->renderMode(true,false,true);
-  vbuf->init();
+  vbuf->size (25000);
+  vbuf->renderMode (true, false, true);
+  vbuf->init ();
   float fov = 90.0;
   mesh->init (NULL, clipbox, fov);
 
-  _cliff.set (175,175,175);  // Cliff
-  _beach.set (200,200,50);  // Beach.
-  _grass.set (95,145,70);    // Grass
-  _trees.set (25,50,25);     // Trees
-  _rock.set (125,125,125);      // Rock
-  _snow.set (250,250,250);      // Snow
+  _cliff.set (175,175,175);
+  _beach.set (200,200,50);
+  _grass.set (95,145,70);
+  _trees.set (25,50,25);
+  _rock.set (125,125,125);
+  _snow.set (250,250,250);
 
   _cliffangle = 0.2; // up component of normal vector.
   _beachalt = 0;
@@ -125,7 +116,8 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
   poly.flat_color_g = 1;
   poly.flat_color_b = 1;
   poly.txt_handle = _textureMap->GetTextureHandle ();
-  // We are going to get texture coords from the terrain engine ranging from 0 to rows and 0 to cols
+  // We are going to get texture coords from the terrain engine
+  // ranging from 0 to rows and 0 to cols.
   // CS wants them to range from 0 to 1.
   float texscale  = 10.0 / height->rows();
   rview.g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, false /*use_z_buf*/);
@@ -135,24 +127,21 @@ void csTerrain::Draw (csRenderView& rview, bool /*use_z_buf*/)
 
   // See if viewpoint changed.
   {
-    static csVector3 p1, p2, p3, po1, po2, po3, pt1, pt2, pt3;
-    p1.Set (1,0,0);
-    transformer (p1,&pt1);
-    p2.Set (0,1,0);
-    transformer (p2,&pt2);
-    p3.Set (0,0,1);
-    transformer (p3,&pt3);
-    if (pt1.x != po1.x || pt1.y != po1.y || pt1.z != po1.z
-	||pt2.x != po2.x || pt2.y != po2.y || pt2.z != po2.z
-	||pt3.x != po3.x || pt3.y != po3.y || pt3.z != po3.z)
+    static csVector3 po1 (0, 0, 0), po2 (0, 0, 0), po3 (0, 0, 0);
+    csVector3 pt1, pt2, pt3;
+    pt1 = transformer (csVector3 (1, 0, 0));
+    pt2 = transformer (csVector3 (0, 1, 0));
+    pt3 = transformer (csVector3 (0, 0, 1));
+    if (pt1 != po1 || pt2 != po2 || pt3 != po3)
     {
       moved = true;
-      po1.x = pt1.x; po1.y = pt1.y; po1.z = pt1.z;
-      po2.x = pt2.x; po2.y = pt2.y; po2.z = pt2.z;
-      po3.x = pt3.x; po3.y = pt3.y; po3.z = pt3.z;
+      po1 = pt1;
+      po2 = pt2;
+      po3 = pt3;
     }
     mesh->dirty (moved);
   }
+
   modified = mesh->calculate ();
   // For each frame.
   if (modified)

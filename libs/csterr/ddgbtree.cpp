@@ -23,7 +23,7 @@
 #include "csterr/ddgtmesh.h"
 #include "csterr/ddgbtree.h"
 
-extern void transformer(csVector3 vin, csVector3 *vout);
+extern csVector3 transformer (csVector3 vin);
 
 // Constant used for identifying brothers.
 const	unsigned int ddgNINIT = 0xFFFFFFFF;
@@ -122,8 +122,8 @@ void ddgTBinTree::initWtoC( ddgTBinMesh * /*mesh*/)
 //	for(i = 0; i < 16; i++)
 //	_wtoc.m[i] = meshWtoC[i];
 
-	transformer( csVector3(0,0,0), &ev0 );
-	transformer( csVector3(0,1,0), &ev1 );
+	ev0 = transformer (csVector3 (0,0,0));
+	ev1 = transformer (csVector3 (0,1,0));
 	tmp = ev1 - ev0;
 	_unit = tmp;
 }
@@ -417,7 +417,7 @@ csVector3* ddgTBinTree::pos(ddgTriIndex tindex)
 	{
 		static csVector3 wpqr;
 		vertex(tindex,&wpqr);
-		transformer( wpqr, ptri );
+		*ptri = transformer (wpqr);
 		DDG_BSET(tri(tindex)->_state, ddgMTri::SF_COORD);
 	}
 	// Return the cache index to the transformed vertex.
@@ -585,7 +585,7 @@ unsigned short ddgTBinTree::priority(ddgTriIndex tvc)
 	if (!DDG_BGET(tri(tva)->_state, ddgMTri::SF_COORD))
 	{
         vertex(tva,&wpqr);
-		transformer( wpqr, pos(tva) );
+		*pos(tva) = transformer (wpqr);
 		DDG_BSET(tri(tva)->_state, ddgMTri::SF_COORD);
 	}
 
@@ -593,13 +593,13 @@ unsigned short ddgTBinTree::priority(ddgTriIndex tvc)
 	if (!DDG_BGET(tri(tv0)->_state, ddgMTri::SF_COORD))
 	{
         vertex(tv0,&wpqr);
-		transformer( wpqr, pos(tv0) );
+		*pos(tv0) = transformer (wpqr);
 		DDG_BSET(tri(tv0)->_state, ddgMTri::SF_COORD);
 	}
 	if (!DDG_BGET(tri(tv1)->_state, ddgMTri::SF_COORD))
 	{
         vertex(tv1,&wpqr);
-		transformer( wpqr, pos(tv1) );
+		*pos(tv1) = transformer (wpqr);
 		DDG_BSET(tri(tv1)->_state, ddgMTri::SF_COORD);
 	}
 

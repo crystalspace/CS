@@ -58,7 +58,10 @@ public:
     while (alloced)
     {
       PoolObj* n = alloced->next;
-      CHK (delete alloced->pol2d);
+      //CHK (delete alloced->pol2d); @@@ This free is not valid!
+      // We should use a ref count on the pool itself so that we
+      // now when all objects in the pool are freed and the
+      // 'alloced' list will be empty.
       CHK (delete alloced);
       alloced = n;
     }

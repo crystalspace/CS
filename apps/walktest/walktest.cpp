@@ -1115,7 +1115,10 @@ void start_console ()
 
 }
 
-void WalkTest::EndWorld() {}
+void WalkTest::EndWorld ()
+{
+  CHK (delete view); view = NULL;
+}
 
 void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
 {
