@@ -20,6 +20,12 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in csCameraPosition. It was using strdup() instead
 	  of csStrNew().
 	- Fixed two other strdup bugs in csws and cslexan.
+	- Fixed a bug in iPolygon3D::SetAlpha() (actually the bug is elsewhere
+	  but it reflects in that routine). The problem is that once alpha
+	  is set it is not possible to clear it. Also setting different
+	  values for alpha for the same polygon (i.e. changing alpha
+	  dynamically) will not work correctly as the new alpha value is
+	  simply or-ed on top of the previous one.
 4-Dec-2001
 	- Enabled aws in user.mak.
 	- Created a dummy thing object plugin. This plugin allows applications

@@ -100,8 +100,7 @@ struct iPolygon3D : public iBase
   /// Get the alpha transparency value for this polygon.
   virtual int GetAlpha () = 0;
   /**
-   * Set the alpha transparency value for this polygon (only if
-   * it is a portal).
+   * Set the alpha transparency value for this polygon.
    * Not all renderers support all possible values. 0, 25, 50,
    * 75, and 100 will always work but other values may give
    * only the closest possible to one of the above.
