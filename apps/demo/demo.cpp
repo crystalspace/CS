@@ -1502,16 +1502,9 @@ int main (int argc, char* argv[])
   // Create our main class.
   System = new Demo ();
 
-  // We want at least the minimal set of plugins
-  System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
-  System->RequestPlugin ("crystalspace.font.server.default:FontServer");
-  System->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
-  System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
-  System->RequestPlugin ("crystalspace.console.output.simple:Console.Output");
-
   // Initialize the main system. This will load all needed plug-ins
   // and initialize them.
-  if (!System->Initialize (argc, argv, NULL))
+  if (!System->Initialize (argc, argv, "/config/csdemo.cfg"))
   {
     System->Printf (MSG_FATAL_ERROR, "Error initializing system!\n");
     cleanup ();
