@@ -14,6 +14,9 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 30-Nov-1999
+	- Andrew Zabolotny added new halo support. iHaloRasterizer is gone.
+	  iHalo objects are created instead. Added halo support to MazeD
+	  (light setup dialog). Looks very nice.
 	- Eric Sunshine totally redesigned and rewrote iNetworkDriver and the
 	  Socket Network Driver from scratch.  The new design is far more
 	  abstract, simpler to use, and (hopefully) applicable to a wider
@@ -28,7 +31,11 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine eliminated a compilation warning in ddgbtree.cpp
 	- Eric Sunshine ported the Socket Network Driver to BeOS.  It is now
 	  fully functional on this platform.
+	- Thomas Hieber did some small fixes removal of warnings to
+	  Windows, OpenGL, D3D, sound, networking, and Mazed.
 29-Nov-1999
+	- Michael Dale Long added initial gravity code for CrystalClear and
+	  a temporary fix for a missing file from Andrew's halo changes.
 	- Andrew Zabolotny did the following changes:
 	    - Fully rewrote halo support in software renderer. The
 	      iHaloRasterizer interface has changed much, so it is
