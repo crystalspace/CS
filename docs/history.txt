@@ -1,5 +1,53 @@
 The history order has been reversed so that new features are at the top.
 
+18-Oct-2000
+	- Andrew Zabolotny did the following changes:
+	    - Fixed a small bug in csRect::Exclude() that was there for a
+	      very long time. Effectively it caused CSWS to do some extra
+	      work when resizing windows by dragging their bottom margin.
+	    - Fixed a bug in iG2D::DrawPixmap() when drawing
+	      alpha-transparent non-tiled textures.
+	    - Found and eliminated a clash between ex-cscmdRedraw and
+	      cscmdAreYouDefault. Ooops. I believe this caused a lot of
+	      unneeded redraws before.
+	    - Changed substantially the clipping subsystem in CSWS. Now it
+	      could be even faster, besides it allows now semi-transparent
+	      windows to be repainted correctly. Previously it did not care
+	      how many times the window redraws; not it allows every dirty
+	      window to repaint exactly once, thus excluding visual artifacts
+	      that existed before with semitransparent components.
+	      The current clipping algorithm is much more sophisticated
+	      and tries hardly to minimize the number of dirty regions;
+	      it tests for much more complex cases (e.g. a opaque button
+	      in a transparent window inserted into another component
+	      covering, say, a button inserted into desktop will completely
+	      avoid redrawing the desktop button).
+	    - Fixed all the X11 drivers so that the "csmcNone" mouse cursor
+	      is really empty. Previously it was an uninitialized 1x1
+	      pixmap, which sometimes was visible like a black pixel.
+	    - Had a flash about making clipped drawing in CSWS a lot
+	      faster. Now before every Draw() method being called, the
+	      Redraw() method caches a "visible region" which is
+	      effectively just a set of rectangles. Then every draw
+	      operations just clips against this set of rectangles (if
+	      we're lucky, we'll have just one rectangle in the visible
+	      region (e.g. for top windows), thus doing just one
+	      clip-against-rectangle operation) rather than clipping every
+	      graphic primitive against all childs, neightbours, parent's
+	      neighbours and so on in the window hierarchy. MazeD should
+	      gain a lot from this since for complex models it performs a
+	      lot of line and pixel drawing.
+	      As a side effect any drawing outside the ::Draw() method will
+	      not work (it will be "clipped away" because the visible
+	      region cache will be empty at that time). This is not a
+	      problem, and if turns to be so it could be solved (but I
+	      would prefer not to).
+17-Oct-2000
+	- Andrew Zabolotny fixed a rather inserious bug which caused
+	  out-of-bounds values to be accessed from the "shadows" array.
+	  However, the retrieved value was not used (when it's out of
+	  bounds). This was caught by recent addition of CS_ASSERT into
+	  csVector::Get().
 16-Oct-2000
 	- Martin Geisse fixed some compiler warnings.
 	- Martin updated the MSVC project files.
