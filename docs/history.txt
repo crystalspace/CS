@@ -12,6 +12,9 @@ The history order is reversed so that new features are at the top.
 	    - Added several missing entries to scf.cfg.
 	    - Fixed problem in CoreGraphics driver where it was not specifying
 	      its SCF dependency properly.
+	- Philip Wyett updated external MSVC app creation HOWTO. This version
+	  is far more indepth and explains each element in more deatil. The
+	  big writing with pictures version as it were! :)
 5-May-2003
 	- Eric Sunshine changed jobber.pl and snapshot.py to once again use
 	  /home/groups/c/cr/crystal as a working area rather than /tmp.  It
