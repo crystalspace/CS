@@ -23,10 +23,15 @@ The @code{iCollideSystem::Collide()} function now accepts
 @cindex @code{iTextureManager::UnregisterTexture()}
 @cindex @code{iTextureManager::UnregisterMaterial()}
 
-The functions @code{iTextureManager::UnregisterTexture()} and
-@code{iTextureManager::UnregisterMaterial()} have been removed.
-Instead use proper reference counting to remove textures and
-materials (i.e. @code{DecRef()}).
+The following deregistration functions have been removed.  Instead, use the
+normal @code{DecRef()} mechanism.
+
+@itemize @bullet
+@item
+@code{iTextureManager::UnregisterTexture()}
+@item
+@code{iTextureManager::UnregisterMaterial()}
+@end itemize
 
 @subheading iRegion
 @cindex @code{iRegion}
@@ -115,9 +120,17 @@ Added @code{iIsoEngine::GetMaterialList()} and removed all other
 material functions from @code{iIsoEngine} except the one to create a material
 from a @sc{vfs} path.
 
-Added @code{iIsoEngine::GetMeshFactories()} and removed
-@code{AddMeshFactory()}, @code{FindMeshFactory()}, and
-@code{RemoveMeshFactory()}.
+Added @code{iIsoEngine::GetMeshFactories()} and removed the following
+functions.
+
+@itemize
+@item
+@code{AddMeshFactory()}
+@item
+@code{FindMeshFactory()}
+@item
+@code{RemoveMeshFactory()}
+@end itemize
 
 @subheading Terrain Mesh Object
 @cindex @code{iTerrFuncState}

@@ -92,7 +92,8 @@ To find if some object has your data attached to it you can use the
 following code:
 
 @example
-MyOwnData* mydata = CS_GET_CHILD_OBJECT_FAST (mesh->QueryObject (), MyOwnData);
+MyOwnData* mydata =
+  CS_GET_CHILD_OBJECT_FAST(mesh->QueryObject(), MyOwnData);
 if (mydata)
 @{
   @dots{} (use mydata)
@@ -105,7 +106,8 @@ if (mydata)
 To remove your data you can use:
 
 @example
-MyOwnData* mydata = CS_GET_CHILD_OBJECT_FAST (mesh->QueryObject (), MyOwnData);
+MyOwnData* mydata =
+  CS_GET_CHILD_OBJECT_FAST(mesh->QueryObject(), MyOwnData);
 if (mydata)
 @{
   mesh->QueryObject ()->ObjRemove (mydata);

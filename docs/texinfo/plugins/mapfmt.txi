@@ -490,7 +490,7 @@ internal list first.  For usage of @samp{MAT_SET} see the description of
     @prodnext{@nonterm{start-forward}}@*
 @production{start-newsyntax, [ @nonterm{start-comp} @dots{} ]}
 @production{start-oldsyntax, @nonterm{sector-name} @COMMA{}
-	@nonter{coordinate}}@
+    @nonterm{coordinate}}@
 @production{start, @token{START}
     @LP{} @nonterm{start-oldsyntax} | @nonterm{start-newsyntax} @RP{}}
 

@@ -3,6 +3,12 @@ The history order is reversed so that new features are at the top.
 1-Jan-2001
 	- Fixed bug [497461] from sf.net. This bug prevented joystick
 	  button handling to work properly. Reported by J.F. Miller.
+	- Eric Sunshine fixed the following documentation-related problems:
+	    - Texinfo mark-up errors (misplaced @end itemize and mistyped
+	      @nonterm).
+	    - Overfull and underfull `hbox' warnings from TeX.
+	    - Invalid use of @c comment on first line of cs-unix.txi,
+	      cs-mac.txi, and cs-dos.txi.
 31-Dec-2001
 	- Got a patch from Tobias Brueckner <tobias.brueckner@gmx.net> which
 	  does the following:
