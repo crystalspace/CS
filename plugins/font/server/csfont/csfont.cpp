@@ -27,10 +27,10 @@
 #include "iutil/comp.h"
 #include "ivaria/reporter.h"
 
-#include "police.fnt"
-#include "courier.fnt"	// font (C) Andrew Zabolotny
-#include "tiny.fnt"	// font (C) Andrew Zabolotny
-#include "italic.fnt"	// font (C) Andrew Zabolotny
+#include "font_police.h"
+#include "font_courier.h"	// font (C) Andrew Zabolotny
+#include "font_tiny.h"		// font (C) Andrew Zabolotny
+#include "font_italic.h"	// font (C) Andrew Zabolotny
 
 CS_IMPLEMENT_PLUGIN
 

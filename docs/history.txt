@@ -22,6 +22,7 @@ The history order is reversed so that new features are at the top.
 	- Matze fixed a bug he introduced by implementing the custom
 	  header file scanning: header files haven't been scanned anymore so
 	  includes of includes have been missed in the dependency generation.
+	- Matze renamed the .fnt files to .h since they're really headers.
 22-May-2003
 	- res made the following changes:
 	    - when using the new renderer, the sector now stores the 
