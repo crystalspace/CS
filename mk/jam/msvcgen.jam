@@ -260,7 +260,7 @@ rule MsvcGenTarget
   Help msvc$(version)clean : "Remove built MSVC$(version) project files" ;
 }
 
-actions MsvcGen bind MSVCGEN_CONFIG
+actions MsvcGen bind MSVCGEN_CONFIG_FILES
 {
   $(JAM) $(MSVCGEN_JAMOPTIONS) \
     -sDO_MSVCGEN=yes \
