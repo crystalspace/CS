@@ -41,6 +41,10 @@ chronological order.
 	- Jorrit did more API documentation enhancements
 	  (iEngineSequenceManager) and also added a few constants
 	  instead of 0, 1, and 2 for AddConditionLightChange().
+	- Eric Sunshine fixed Doxygen configuration so that it properly
+	  propogates documentation to group members when only the first member
+	  is documented.  (This is common, for instance, when all elements of a
+	  group want the same documentation string.)
 10-Apr-2004
 	- Jorrit fixed a bug in spr3d with new renderer. It would try to
 	  tween vertices also for skeletal animation. That would cause

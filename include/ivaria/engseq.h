@@ -38,12 +38,14 @@ class csBox3;
 class csSphere;
 struct iSharedVariable;
 
+//@{
 /**
  * Operations for AddConditionLightChange().
  */
 #define CS_SEQUENCE_LIGHTCHANGE_NONE 0
 #define CS_SEQUENCE_LIGHTCHANGE_LESS 1
 #define CS_SEQUENCE_LIGHTCHANGE_GREATER 2
+//@}
 
 SCF_VERSION (iParameterESM, 0, 0, 1);
 
