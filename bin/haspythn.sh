@@ -9,7 +9,12 @@
 # piped to stderr.
 #
 
-SOURCES="/usr /usr/local /usr/local/python"
+PYTHONBIN=`which python 2>&1 | grep -v "[Nn]o"`
+if [ -n "${PYTHONBIN}" ]; then
+    SOURCES=`echo ${PYTHONBIN} | sed -e 's:/bin/python::'`
+fi
+
+SOURCES="${SOURCES} /usr /usr/local /usr/local/python"
 
 # Find the Python header and library directories.  In the event that multiple
 # header and library directories are located, choose the the final
