@@ -14,8 +14,8 @@ The Windows port of Crystal Space is currently maintained by Philip Wyett
 
 @menu
 * Win32 Intro:: Introduction
-* Win32 MSVC5:: Special Notes for @sc{msvc} 5
 * Win32 Required:: Required / Optional External Libraries
+* Win32 MSVC5:: Special Notes for @sc{msvc} 5
 * Win32 Compile:: Compiling Crystal Space
 * Win32 Rundemo:: Running the Demonstration Applications
 * Win32 Workspace:: Structure of the Workspace
@@ -23,7 +23,7 @@ The Windows port of Crystal Space is currently maintained by Philip Wyett
 * Win32 FAQ:: Frequently Asked Questions (@sc{faq})
 @end menu
 
-@node Win32 Intro, Win32 MSVC5, Win32, Win32
+@node Win32 Intro, Win32 Required, Win32, Win32
 @subsubsection Introduction
 
 In order to successfully compile the Crystal Space 3D Software Development Kit (SDK),
@@ -41,7 +41,7 @@ goto: @uref{http://lists.sourceforge.net/lists/listinfo/crystal-main}, and fill 
 form. Or alternatively you can email the Win32 port maintainer directly at:
 @email{philipwyett@@redeye-entertainment.co.uk} or @email{philipwyett@@redeye.go-legend.net}.
 
-@node Win32 Required, Win32 Compile, Win32 General, Win32
+@node Win32 Required, Win32 MSVC5, Win32 Intro, Win32
 @subsubsection Required / Optional External Libraries
 
 All the following libraries and Software Development Kits (SDK) unless stated are not
@@ -110,7 +110,7 @@ You need not compile all parts of Crystal Space. For example, if you don't
 want to use DirectX (DDRAW/D3D) for graphics or have Python scripting support, then you
 don't have to compile it. See the compilation instructions on how to remove the projects.
 
-@node Win32 MSVC5, Win32 Compile, Win32 General, Win32
+@node Win32 MSVC5, Win32 Compile, Win32 Required, Win32
 @subsubsection Special Notes for @sc{msvc} 5
 
 Building Crystal Space with Microsoft Visual C++ Version 5 (@sc{msvc}) is not
