@@ -523,7 +523,7 @@ static int total_cnt = 0;
 
     total_size += size+polsize;
     total_cnt++;
-    printf ("thing size=%d polysize=%d total=%d total_size=%d average_size=%d count=%d\n", size, polsize, size + polsize, total_size, total_size / total_cnt, total_cnt);
+    //printf ("thing size=%d polysize=%d total=%d total_size=%d average_size=%d count=%d\n", size, polsize, size + polsize, total_size, total_size / total_cnt, total_cnt);
   }
 
 }
