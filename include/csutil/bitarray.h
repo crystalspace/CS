@@ -113,7 +113,6 @@ public:
    explicit csBitArray(unsigned size)
    {
       Init(size);
-
       // Clear last bits
       Trim();
    }
@@ -295,6 +294,12 @@ public:
 
       Trim();
       return *this;
+   }
+   
+   /// return the full array
+   store_type* GetArrayBits()
+   {
+     return mpStore;
    }
 
    /// Gets quick access to the single-word (only useful when the bit array <= the word size of the machine.)
