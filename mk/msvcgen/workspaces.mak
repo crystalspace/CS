@@ -76,6 +76,7 @@ MSVC.WORKSPACE.TYPICAL.REJECT = \
   glshader_arb \
   glshader_cg \
   glshader_fixed \
+  glshader_ps1 \
   grp.+_(?!typical\.) \
   nullrender3d \
   shadermgr \

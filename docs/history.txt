@@ -35,6 +35,9 @@ chronological order.
 	  uninitialize variables in glfontcache.cpp
 	- Eric Sunshine eliminated a slew of compilation warnings from the new
 	  glshader_ps1 plugin.
+	- Eric Sunshine updated user.mak and shaderplugins/Jamfile so that the
+	  new glshader_ps1 plugin actually gets built.  Also augmented
+	  msvcgen/workspaces.mak to take this new plugin into account.
 1-Mar-2004
 	- res augmented the Win32 canvas to allow retrieval/setting of the
 	  window rectangle (via PerformExtension()).
