@@ -971,8 +971,8 @@ void CompressShadowFrustrums (csFrustrumList* list)
   else cc->MakeEmpty ();
 
   csShadowFrustrum* sf = list->GetLast ();
-  csSector* cur_sector;
-  int cur_draw_busy;
+  csSector* cur_sector = NULL;
+  int cur_draw_busy = 0;
   if (sf)
   {
     cur_sector = sf->sector;
