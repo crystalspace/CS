@@ -34,6 +34,9 @@ Short-term cleanups that need to be done:
 	  tweaking by someone who actually has access to the required tools.
 	- Eric Sunshine moved the binary packaging script for NeXT from
 	  CS/libs/cssys/next to CS/bin.
+	- Thomthee Besset" <Besset@sugar-land.dowell.slb.com> submitted a
+	  patch for several MSVC project files which remove obsolete COM junk
+	  from Release mode.
 3-Feb-2000
 	- Seth Galbraith changed sprite loading in csParser so that
 	  csSpriteTemplate::MergeTexels is now called to eliminate duplicate
