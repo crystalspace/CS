@@ -134,51 +134,30 @@ void csCamera::LookAt (const csVector3& v, const csVector3& up)
   csMatrix3 m; /* initialized to be the identity matrix */
   csVector3 w1, w2, w3 = v;
 
-#if 0
-  float r;
-  if ( (r=sqrt(v*v)) > SMALL_EPSILON )
+  float sqr;
+  sqr = v*v;
+  if (sqr > SMALL_EPSILON)
   {
-    w3 /= r;
+    w3 *= qisqrt (sqr);
     w1 = w3 % up;
-    if ( (r=sqrt(w1*w1)) < SMALL_EPSILON )
+    sqr = w1*w1;
+    if (sqr < SMALL_EPSILON)
     {
       w1 = w3 % csVector3(0,0,-1);
-      if ( (r=sqrt(w1*w1)) < SMALL_EPSILON )
+      sqr = w1*w1;
+      if (sqr < SMALL_EPSILON)
       {
        w1 = w3 % csVector3(0,-1,0);
-       r = sqrt(w1*w1);
+       sqr = w1*w1;
       }
     }
-    w1 /= r;
+    w1 *= qisqrt (sqr);
     w2 = w3 % w1;
 
     m.m11 = w1.x;  m.m12 = w2.x;  m.m13 = w3.x;
     m.m21 = w1.y;  m.m22 = w2.y;  m.m23 = w3.y;
     m.m31 = w1.z;  m.m32 = w2.z;  m.m33 = w3.z;
   }
-#else
-  float r;
-  if ( (r=qsqrt(v*v)) > SMALL_EPSILON )
-  {
-    w3 /= r;
-    w1 = w3 % up;
-    if ( (r=qsqrt(w1*w1)) < SMALL_EPSILON )
-    {
-      w1 = w3 % csVector3(0,0,-1);
-      if ( (r=qsqrt(w1*w1)) < SMALL_EPSILON )
-      {
-       w1 = w3 % csVector3(0,-1,0);
-       r = qsqrt(w1*w1);
-      }
-    }
-    w1 /= r;
-    w2 = w3 % w1;
-
-    m.m11 = w1.x;  m.m12 = w2.x;  m.m13 = w3.x;
-    m.m21 = w1.y;  m.m22 = w2.y;  m.m23 = w3.y;
-    m.m31 = w1.z;  m.m32 = w2.z;  m.m33 = w3.z;
-  }
-#endif
 
   SetT2O (m);
 }

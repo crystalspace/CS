@@ -33,12 +33,10 @@ float csVector3::Norm () const
 
 void csVector3::Normalize ()
 {
-  float invlen = qisqrt (x*x + y*y + z*z);
+  float sqlen = x*x + y*y + z*z;
+  if (sqlen < SMALL_EPSILON) return;
+  float invlen = qisqrt (sqlen);
   *this *= invlen;
-  //float len;
-  //len = this->Norm ();
-  //if (len > SMALL_EPSILON)
-    //*this /= len;
 }
 
 csVector3::csVector3 (const csDVector3& v)

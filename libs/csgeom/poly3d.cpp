@@ -533,11 +533,13 @@ csVector3 csPoly3D::ComputeNormal (csVector3* vertices, int num)
     i1 = i;
   }
 
-  float invd = qisqrt (ayz*ayz + azx*azx + axy*axy);
+  float sqd = ayz*ayz + azx*azx + axy*axy;
+  float invd;
+  if (sqd < SMALL_EPSILON)
+    invd = 1./SMALL_EPSILON;
+  else
+    invd = qisqrt (sqd);
   return csVector3 (ayz * invd, azx * invd, axy * invd);
-  //float d = sqrt (ayz*ayz + azx*azx + axy*axy);
-  //if (d < SMALL_EPSILON) d = SMALL_EPSILON;
-  //return csVector3 (ayz / d, azx / d, axy / d);
 }
 
 csPlane3 csPoly3D::ComputePlane (csVector3* vertices, int num_vertices)

@@ -189,12 +189,7 @@ static inline float __cdecl qisqrt (float x)
 
 #include <math.h>
 #define qsqrt(x)	sqrt(x)
-static inline float qisqrt(float x)
-{
-  float xs = sqrt (x);
-  if (ABS (xs) < .00001) xs = .00001;
-  return 1. / xs;
-}
+#define qisqrt(x)	(1./sqrt(x))
 
 #endif
 

@@ -917,8 +917,12 @@ void csPolygon3D::PlaneNormal (float* yz, float* zx, float* xy)
     i1 = i;
   }
 
-  float invd = qisqrt (ayz*ayz + azx*azx + axy*axy);
-  //if (d < SMALL_EPSILON) d = SMALL_EPSILON;
+  float sqd = ayz*ayz + azx*azx + axy*axy;
+  float invd;
+  if (sqd < SMALL_EPSILON)
+    invd = 1./SMALL_EPSILON;
+  else
+    invd = qisqrt (sqd);
 
   *yz = ayz * invd;
   *zx = azx * invd;

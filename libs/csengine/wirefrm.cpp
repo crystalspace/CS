@@ -216,7 +216,6 @@ void csWfPolygon::Prepare ()
   }
 
   float invd = qisqrt (A*A + B*B + C*C);
-  //if (d < SMALL_EPSILON) d = SMALL_EPSILON;
 
   A *= invd;
   B *= invd;

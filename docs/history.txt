@@ -1,5 +1,11 @@
 The history order has been reversed so that new features are at the top.
 
+7-Jan-2001
+	- Made usage of qisqrt() more sensible. First test if square
+	  is less than some amount then you don't have to do the entire
+	  qisqrt().
+	- By making use of the new qisqrt() I optimized csCamera::LookAt()
+	  a little more.
 6-Jan-2001
 	- Created snow and rain mesh object plugins (for the snow and rain
 	  particle systems).

@@ -160,11 +160,10 @@ void csMath3::Between (const csVector3& v1, const csVector3& v2,
     pct /= 100.;
   else
   {
-    float invdist = qisqrt((v1-v2)*(v1-v2));
+    float sqdist = (v1-v2)*(v1-v2);
+    if (sqdist < SMALL_EPSILON) { v = v1; return; }
+    float invdist = qisqrt (sqdist);
     pct = wid*invdist;
-    //float dist = sqrt((v1-v2)*(v1-v2));
-    //if (dist == 0) return;
-    //pct = wid/dist;
   }
   v = v1 + pct*(v2-v1);
 }
