@@ -163,10 +163,10 @@ bool run_event_tests(iObjectRegistry* object_reg)
   fprintf (stdout, "  (value: %u)\n", my_uint32);
   int64 my_int64 = 0;
   fprintf (stdout, "Searching for my_int64...%s", e->Find("my_int64", my_int64) ? "Success!" : "Failure!");
-  fprintf (stdout, "  (value: %lld)\n", my_int64);
+  fprintf (stdout, "  (value: %lld)\n", (long long)my_int64);
   uint64 my_uint64 = 0;
   fprintf (stdout, "Searching for my_uint64...%s", e->Find("my_uint64", my_uint64) ? "Success!" : "Failure!");
-  fprintf (stdout, "  (value: %llu)\n", my_uint64);
+  fprintf (stdout, "  (value: %llu)\n", (unsigned long long)my_uint64);
   float my_float= 0;
   fprintf (stdout, "Searching for my_float...%s", e->Find("my_float", my_float) ? "Success!" : "Failure!");
   fprintf (stdout, "  (value: %f)\n", my_float);
