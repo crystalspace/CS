@@ -1057,7 +1057,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Statistics:");
     CONPRI("  stats perftest coordshow");
     CONPRI("Special effects:");
-    CONPRI("  addbot delbot addskel addghost fire explosion spiral rain");
+    CONPRI("  addbot delbot addskel addghost fire explosion spiral frain rain");
     CONPRI("  snow fountain flame portal fs_inter fs_fadeout fs_fadecol");
     CONPRI("  fs_fadetxt fs_red fs_green fs_blue fs_whiteout fs_shadevert");
     CONPRI("Debugging:");
@@ -1756,12 +1756,29 @@ bool CommandHandler (const char *cmd, const char *arg)
     float speed = 0;
     if (arg) cnt = csScanStr (arg, "%s,%d,%f", txtname, &num, &speed);
     extern void add_particles_rain (iSector* sector, char* txtname,
-    	int num, float speed);
+    	int num, float speed, bool do_camera);
     if (cnt <= 2) speed = 2;
     if (cnt <= 1) num = 500;
     if (cnt <= 0) strcpy (txtname, "raindrop");
     add_particles_rain (Sys->view->GetCamera ()->GetSector (),
-    	txtname, num, speed);
+    	txtname, num, speed, false);
+  }
+  else if (!strcasecmp (cmd, "frain"))
+  {
+    char txtname[100];
+    int cnt = 0;
+    /* speed and num must be preset to prevent compiler warnings
+     * on some systems. */
+    int num = 0;
+    float speed = 0;
+    if (arg) cnt = csScanStr (arg, "%s,%d,%f", txtname, &num, &speed);
+    extern void add_particles_rain (iSector* sector, char* txtname,
+    	int num, float speed, bool do_camera);
+    if (cnt <= 2) speed = 2;
+    if (cnt <= 1) num = 500;
+    if (cnt <= 0) strcpy (txtname, "raindrop");
+    add_particles_rain (Sys->view->GetCamera ()->GetSector (),
+    	txtname, num, speed, true);
   }
   else if (!strcasecmp (cmd, "snow"))
   {

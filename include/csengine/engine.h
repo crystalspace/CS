@@ -819,6 +819,10 @@ public:
   virtual long GetAlphaRenderPriority () const { return render_priority_alpha; }
   /// Clear all render priorities.
   virtual void ClearRenderPriorities ();
+  /// Get the number of render priorities.
+  virtual int GetRenderPriorityCount () const;
+  /// Get the name of the render priority.
+  virtual const char* GetRenderPriorityName (long priority) const;
 
   iMeshObjectType* GetThingType ();
 

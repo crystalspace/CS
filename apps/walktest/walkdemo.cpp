@@ -83,7 +83,8 @@ extern void move_mesh (iMeshWrapper* sprite, iSector* where,
 //===========================================================================
 // Demo particle system (rain).
 //===========================================================================
-void add_particles_rain (iSector* sector, char* matname, int num, float speed)
+void add_particles_rain (iSector* sector, char* matname, int num, float speed,
+	bool do_camera)
 {
   // First check if the material exists.
   iMaterialWrapper* mat = Sys->view->GetEngine ()->GetMaterialList ()->
@@ -95,7 +96,10 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed)
   }
 
   csBox3 bbox;
-  sector->CalculateSectorBBox (bbox, true);
+  if (do_camera)
+    bbox.Set (-5, -5, -5, 5, 5, 5);
+  else
+    sector->CalculateSectorBBox (bbox, true);
 
   csRef<iMeshFactoryWrapper> mfw (Sys->view->GetEngine ()->
     CreateMeshFactory ("crystalspace.mesh.object.rain", "rain"));
@@ -104,9 +108,22 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed)
   csRef<iMeshWrapper> exp (
   	Sys->view->GetEngine ()->CreateMeshWrapper (mfw, "custom rain", sector,
 					  csVector3 (0, 0, 0)));
+  if (do_camera)
+  {
+    iEngine* e = Sys->view->GetEngine ();
+    int c = e->GetRenderPriorityCount ()-1;
+    // Create a new camera render priority if the last one isn't
+    // already in camera mode.
+    if (!e->GetRenderPriorityCamera (c))
+    {
+      c++;
+      e->RegisterRenderPriority ("rain", c, CS_RENDPRI_NONE, true);
+    }
+    exp->SetRenderPriority (c);
+    exp->GetFlags ().Set (CS_ENTITY_CAMERA);
+  }
 
   exp->SetZBufMode(CS_ZBUF_TEST);
-  {
   csRef<iParticleState> partstate (
   	SCF_QUERY_INTERFACE (exp->GetMeshObject (), iParticleState));
   partstate->SetMaterialWrapper (mat);
@@ -120,8 +137,6 @@ void add_particles_rain (iSector* sector, char* matname, int num, float speed)
   rainstate->SetLighting (false);
   rainstate->SetBox (bbox.Min (), bbox.Max ());
   rainstate->SetFallSpeed (csVector3 (0, -speed, 0));
-  }
-  printf("Rain mesh refcount is %d.\n",exp->GetRefCount());
 }
 
 //===========================================================================

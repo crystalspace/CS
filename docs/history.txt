@@ -8,6 +8,11 @@ The history order is reversed so that new features are at the top.
 	- ClassifyForClipTriangleMesh() in OpenGL renderer now uses bounding
 	  box to avoid too many classify tests on vertices. Doesn't seem
 	  to give a dramatic fps improvement though.
+	- Added iEngine->GetRenderPriorityCount() and GetRenderPriorityName()
+	  to be able to query the render priorities currently in the engine.
+	- Added 'frain' command to walktest to test a rain mesh object
+	  that follows the camera around (as opposed to 'rain' which just
+	  makes a rain mesh object that is in the current sector completely).
 13-Feb-2003
 	- Added another trivial case to csRect::ClipLine() making it a little
 	  bit safer again.

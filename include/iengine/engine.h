@@ -139,7 +139,7 @@ struct iSharedVariableList;
 #define CS_RENDPRI_FRONT2BACK 2
 /** @} */
 
-SCF_VERSION (iEngine, 0, 15, 0);
+SCF_VERSION (iEngine, 0, 16, 0);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -253,6 +253,10 @@ struct iEngine : public iBase
   virtual long GetAlphaRenderPriority () const = 0;
   /// Clear all render priorities.
   virtual void ClearRenderPriorities () = 0;
+  /// Get the number of render priorities.
+  virtual int GetRenderPriorityCount () const = 0;
+  /// Get the name of the render priority or NULL if none existant.
+  virtual const char* GetRenderPriorityName (long priority) const = 0;
 
   /**
    * Create a base material that can be used to give to the texture

@@ -989,6 +989,17 @@ void csEngine::ClearRenderPriorities ()
   RegisterRenderPriority ("alpha", 8, CS_RENDPRI_BACK2FRONT);
 }
 
+int csEngine::GetRenderPriorityCount () const
+{
+  return render_priorities.Length ();
+}
+
+const char* csEngine::GetRenderPriorityName (long priority) const
+{
+  if (priority < 0 && priority >= render_priorities.Length ()) return NULL;
+  return (const char*)render_priorities[priority];
+}
+
 void csEngine::ResetWorldSpecificSettings()
 {
   SetClearZBuf (default_clear_zbuf);
