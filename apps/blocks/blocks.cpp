@@ -81,22 +81,14 @@ Blocks::Blocks ()
   destinations[1][0] = csVector3 (7, 3, 0);
   destinations[2][0] = csVector3 (0, 3, 7);
   destinations[3][0] = csVector3 (-7, 3, 0);
-  destinations[0][1] = csVector3 (0, 5, -6);
-  destinations[1][1] = csVector3 (6, 5, 0);
-  destinations[2][1] = csVector3 (0, 5, 6);
-  destinations[3][1] = csVector3 (-6, 5, 0);
-  destinations[0][2] = csVector3 (0, 7, -5);
-  destinations[1][2] = csVector3 (5, 7, 0);
-  destinations[2][2] = csVector3 (0, 7, 5);
-  destinations[3][2] = csVector3 (-5, 7, 0);
-  destinations[0][3] = csVector3 (0, 7.5, -2);
-  destinations[1][3] = csVector3 (2, 7.5, 0);
-  destinations[2][3] = csVector3 (0, 7.5, 2);
-  destinations[3][3] = csVector3 (-2, 7.5, 0);
-  destinations[0][4] = csVector3 (0, 8, -.4);
-  destinations[1][4] = csVector3 (.4, 8, 0);
-  destinations[2][4] = csVector3 (0, 8, .4);
-  destinations[3][4] = csVector3 (-.4, 8, 0);
+  destinations[0][1] = csVector3 (0, 7, -5);
+  destinations[1][1] = csVector3 (5, 7, 0);
+  destinations[2][1] = csVector3 (0, 7, 5);
+  destinations[3][1] = csVector3 (-5, 7, 0);
+  destinations[0][2] = csVector3 (0, 8, -.4);
+  destinations[1][2] = csVector3 (.4, 8, 0);
+  destinations[2][2] = csVector3 (0, 8, .4);
+  destinations[3][2] = csVector3 (-.4, 8, 0);
   dest_move_right_dx[0] = 1; dest_move_right_dy[0] = 0;
   dest_move_right_dx[1] = 0; dest_move_right_dy[1] = 1;
   dest_move_right_dx[2] = -1; dest_move_right_dy[2] = 0;
@@ -760,7 +752,7 @@ void Blocks::start_horizontal_move (int dx, int dy)
   move_hor_dy = dy;
 }
 
-void Blocks::move_camera ()
+void Blocks::HandleCameraMovement ()
 {
   csVector3 pos = cam_move_dist*cam_move_src + (1-cam_move_dist)*cam_move_dest;
   view->GetCamera ()->SetPosition (pos);
@@ -773,27 +765,39 @@ void Blocks::eatkeypress (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
   {
     switch (key)
     {
-      case '0':
-        difficulty = NUM_BORING_SHAPE;
-	startup_screen = false;
-	newgame = true;
+      case CSKEY_UP:
+        old_cur_menu = cur_menu;
+        cur_menu = (cur_menu+1)%MENU_TOTAL;
+	menu_todo = 1;
+        break;
+      case CSKEY_DOWN:
+        old_cur_menu = cur_menu;
+        cur_menu = (cur_menu-1+MENU_TOTAL)%MENU_TOTAL;
+	menu_todo = 1;
+        break;
+      case CSKEY_ENTER:
+        switch (cur_menu)
+	{
+	  case MENU_NOVICE:
+            difficulty = NUM_EASY_SHAPE;
+	    startup_screen = false;
+	    newgame = true;
+	    break;
+          case MENU_AVERAGE:
+            difficulty = NUM_MEDIUM_SHAPE;
+	    startup_screen = false;
+	    newgame = true;
+	    break;
+          case MENU_EXPERT:
+            difficulty = NUM_HARD_SHAPE;
+	    startup_screen = false;
+	    newgame = true;
+	    break;
+	  case MENU_QUIT:
+	    System->Shutdown = true;
+	    break;
+	}
 	break;
-      case '1':
-        difficulty = NUM_EASY_SHAPE;
-	startup_screen = false;
-	newgame = true;
-	break;
-      case '2':
-        difficulty = NUM_MEDIUM_SHAPE;
-	startup_screen = false;
-	newgame = true;
-	break;
-      case '3':
-        difficulty = NUM_HARD_SHAPE;
-	startup_screen = false;
-	newgame = true;
-	break;
-      case CSKEY_ESC: System->Shutdown = true; break;
     }
     return;
   }
@@ -843,7 +847,7 @@ void Blocks::eatkeypress (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
       if (cam_move_dist) break;
       cam_move_dist = 1;
       cam_move_src = view->GetCamera ()->GetW2CTranslation ();
-      if (cur_ver_dest < 4) cur_ver_dest++;
+      if (cur_ver_dest < 2) cur_ver_dest++;
       cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
       cam_move_up = csVector3 (0, -1, 0);
       break;
@@ -1032,53 +1036,35 @@ void Blocks::updateScore (void)
   score += increase*increase;
 }
 
-void Blocks::move_cubes (time_t elapsed_time)
+void Blocks::HandleStartupMovement (time_t elapsed_time)
+{
+  float elapsed = (float)elapsed_time/1000.;
+  if (menu_todo)
+  {
+    float elapsed_menu = elapsed*1.5;
+    if (elapsed_menu > menu_todo) elapsed_menu = menu_todo;
+    menu_todo -= elapsed_menu;
+    SetupMenu (menu_todo, old_cur_menu, cur_menu);
+  }
+
+  float old_dyn_x = dynlight_x;
+  dynlight_x += dynlight_dx*elapsed;
+  if (dynlight_x > 4 || dynlight_x < -4)
+  {
+    dynlight_dx = -dynlight_dx;
+    dynlight_x = old_dyn_x;
+  }
+  dynlight->Move (demo_room, dynlight_x, dynlight_y, dynlight_z);
+  dynlight->Setup ();
+}
+
+void Blocks::HandleGameMovement (time_t elapsed_time)
 {
   int i;
   float elapsed = (float)elapsed_time/1000.;
   float elapsed_rot = 3 * elapsed * (M_PI/2);
   float elapsed_fall = elapsed*speed;
   float elapsed_move = elapsed*1.6;
-  float elapsed_cam_move = elapsed*2;
-
-  if (fog_density)
-  {
-    float elapsed_fog = elapsed*.8;
-    if (elapsed_fog > fog_density) elapsed_fog = fog_density;
-    fog_density -= elapsed_fog;
-    csSector* s;
-    if (startup_screen) s = demo_room;
-    else s = room;
-    if (fog_density)
-      s->SetFog (fog_density, csColor (0, 0, 0));
-    else
-      s->DisableFog ();
-    return;
-  }
-
-  if (startup_screen)
-  {
-    float old_dyn_x = dynlight_x;
-    dynlight_x += dynlight_dx*elapsed;
-    if (dynlight_x > 4 || dynlight_x < -4)
-    {
-      dynlight_dx = -dynlight_dx;
-      dynlight_x = old_dyn_x;
-    }
-    dynlight->Move (demo_room, dynlight_x, dynlight_y, dynlight_z);
-    dynlight->Setup ();
-    return;
-  }
-
-  if (cam_move_dist)
-  {
-    if (elapsed_cam_move > cam_move_dist) elapsed_cam_move = cam_move_dist;
-    cam_move_dist -= elapsed_cam_move;
-    move_camera ();
-  }
-
-  if (pause) return;
-  if (gameover) return;
 
   if (!move_down_todo)
   {
@@ -1178,11 +1164,51 @@ void Blocks::move_cubes (time_t elapsed_time)
   csPolygonSet::current_light_frame_number++;
 }
 
+void Blocks::HandleMovement (time_t elapsed_time)
+{
+  float elapsed = (float)elapsed_time/1000.;
+
+  if (fog_density)
+  {
+    float elapsed_fog = elapsed*.8;
+    if (elapsed_fog > fog_density) elapsed_fog = fog_density;
+    fog_density -= elapsed_fog;
+    csSector* s;
+    if (startup_screen) s = demo_room;
+    else s = room;
+    if (fog_density)
+      s->SetFog (fog_density, csColor (0, 0, 0));
+    else
+      s->DisableFog ();
+    return;
+  }
+
+  if (startup_screen)
+  {
+    HandleStartupMovement (elapsed_time);
+    return;
+  }
+
+  if (cam_move_dist)
+  {
+    float elapsed_cam_move = elapsed*2;
+    if (elapsed_cam_move > cam_move_dist) elapsed_cam_move = cam_move_dist;
+    cam_move_dist -= elapsed_cam_move;
+    HandleCameraMovement ();
+  }
+
+  if (transition) { HandleTransition (elapsed_time); return; }
+
+  if (pause) return;
+  if (gameover) return;
+
+  HandleGameMovement (elapsed_time);
+}
+
 void Blocks::InitTextures ()
 {
   if (world) world->Clear ();
 
-  // Maybe we shouldn't load the textures again if this is not the first time.
   Sys->set_pillar_texture (
     csLoader::LoadTexture (Sys->world, "pillar", "stone4.gif"));
   Sys->set_cube_texture (
@@ -1191,6 +1217,83 @@ void Blocks::InitTextures ()
     csLoader::LoadTexture (Sys->world, "raster", "clouds_thick1.jpg"));
   csLoader::LoadTexture (Sys->world, "room", "mystone2.gif");
   csLoader::LoadTexture (Sys->world, "clouds", "clouds.gif");
+
+  csLoader::LoadTexture (Sys->world, "menu_back", "back.gif");
+  csLoader::LoadTexture (Sys->world, "menu_novice", "novice.gif");
+  csLoader::LoadTexture (Sys->world, "menu_average", "average.gif");
+  csLoader::LoadTexture (Sys->world, "menu_expert", "expert.gif");
+  csLoader::LoadTexture (Sys->world, "menu_quit", "quit.gif");
+}
+
+void Blocks::SetupMenu (int menu)
+{
+  SetupMenu (0, 0, menu);
+  menu_todo = 0;
+}
+
+void Blocks::SetupMenu (float menu_transition, int old_menu, int new_menu)
+{
+  int i;
+  for (i = 0 ; i < MENU_TOTAL ; i++)
+  {
+    int old_curi = (i-old_menu+MENU_TOTAL)%MENU_TOTAL;
+    int new_curi = (i-new_menu+MENU_TOTAL)%MENU_TOTAL;
+    float curi = menu_transition * ((float)old_curi) +
+    	(1-menu_transition) * ((float)new_curi);
+    float angle = 2.*M_PI*curi/(float)MENU_TOTAL;
+    float y = 3. + sin (angle)*3.;
+    float z = 5. - cos (angle)*3.;
+    csVector3 v (0, y, z);
+    menus[i]->SetMove (demo_room, v);
+    menus[i]->Transform ();
+  }
+}
+
+void Blocks::CreateMenuEntry (csSector* sect, char* txt, int menu_nr)
+{
+  csTextureHandle* tm_back = world->GetTextures ()->GetTextureMM ("menu_back");
+  csTextureHandle* tm_front = world->GetTextures ()->GetTextureMM (txt);
+  csThing* thing = new csThing ();
+
+  thing->AddVertex (-1, .25, 0);
+  thing->AddVertex (1, .25, 0);
+  thing->AddVertex (1, -.25, 0);
+  thing->AddVertex (-1, -.25, 0);
+
+  csPolygon3D* p;
+  csMatrix3 tx_matrix;
+  csVector3 tx_vector;
+
+  p = thing->NewPolygon (tm_front);
+  p->AddVertex (0);
+  p->AddVertex (1);
+  p->AddVertex (3);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+  set_uv (p, 0, 0, 1, 0, 0, 1);
+
+  p = thing->NewPolygon (tm_front);
+  p->AddVertex (1);
+  p->AddVertex (2);
+  p->AddVertex (3);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+  set_uv (p, 1, 0, 1, 1, 0, 1);
+
+  p = thing->NewPolygon (tm_back);
+  p->AddVertex (3);
+  p->AddVertex (1);
+  p->AddVertex (0);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+  set_uv (p, 0, 0, 1, 0, 0, 1);
+
+  p = thing->NewPolygon (tm_back);
+  p->AddVertex (3);
+  p->AddVertex (2);
+  p->AddVertex (1);
+  p->SetTextureSpace (tx_matrix, tx_vector);
+  set_uv (p, 1, 0, 1, 1, 0, 1);
+
+  menus[menu_nr] = thing;
+  sect->AddThing (thing);
 }
 
 void Blocks::InitWorld ()
@@ -1291,12 +1394,19 @@ void Blocks::InitWorld ()
 
   float char_width = CUBE_DIM*4.;
   float offset_x = -char_width * (6/2)+CUBE_DIM*2;
-  Sys->start_demo_shape (SHAPE_DEMO_B, offset_x, 3, 4); offset_x += char_width;
-  Sys->start_demo_shape (SHAPE_DEMO_L, offset_x, 3, 4); offset_x += char_width;
-  Sys->start_demo_shape (SHAPE_DEMO_O, offset_x, 3, 4); offset_x += char_width;
-  Sys->start_demo_shape (SHAPE_DEMO_C, offset_x, 3, 4); offset_x += char_width;
-  Sys->start_demo_shape (SHAPE_DEMO_K, offset_x, 3, 4); offset_x += char_width;
-  Sys->start_demo_shape (SHAPE_DEMO_S, offset_x, 3, 4); offset_x += char_width;
+  start_demo_shape (SHAPE_DEMO_B, offset_x, 3, 4); offset_x += char_width;
+  start_demo_shape (SHAPE_DEMO_L, offset_x, 3, 4); offset_x += char_width;
+  start_demo_shape (SHAPE_DEMO_O, offset_x, 3, 4); offset_x += char_width;
+  start_demo_shape (SHAPE_DEMO_C, offset_x, 3, 4); offset_x += char_width;
+  start_demo_shape (SHAPE_DEMO_K, offset_x, 3, 4); offset_x += char_width;
+  start_demo_shape (SHAPE_DEMO_S, offset_x, 3, 4); offset_x += char_width;
+
+  CreateMenuEntry (demo_room, "menu_novice", MENU_NOVICE);
+  CreateMenuEntry (demo_room, "menu_average", MENU_AVERAGE);
+  CreateMenuEntry (demo_room, "menu_expert", MENU_EXPERT);
+  CreateMenuEntry (demo_room, "menu_back", MENU_HIGHSCORES);
+  CreateMenuEntry (demo_room, "menu_back", MENU_SETUP);
+  CreateMenuEntry (demo_room, "menu_quit", MENU_QUIT);
 
   Sys->world->Prepare ();
 }
@@ -1326,6 +1436,9 @@ void Blocks::StartDemo ()
 
   fog_density = 1;
   demo_room->SetFog (fog_density, csColor (0, 0, 0));
+
+  cur_menu = MENU_NOVICE;
+  SetupMenu (cur_menu);
 }
 
 void Blocks::StartNewGame ()
@@ -1347,7 +1460,7 @@ void Blocks::StartNewGame ()
 
   cam_move_up = csVector3 (0, -1, 0);
   view->SetSector (room);
-  Sys->move_camera ();
+  Sys->HandleCameraMovement ();
   view->SetRectangle (0, 0, Sys->FrameWidth, Sys->FrameHeight);
 
   fog_density = 1;
@@ -1405,7 +1518,7 @@ void Blocks::removePlane (int z)
       set_cube (x, y, z, false);
 }
 
-void Blocks::handleTransition (time_t elapsed_time)
+void Blocks::HandleTransition (time_t elapsed_time)
 {
   if (gameover) return;
   int i;
@@ -1417,7 +1530,7 @@ void Blocks::handleTransition (time_t elapsed_time)
     {
       transition = true;
       gone_z = i;
-      lower (elapsed_time);
+      HandleLoweringPlanes (elapsed_time);
       break;
     }
   }
@@ -1427,18 +1540,10 @@ void Blocks::handleTransition (time_t elapsed_time)
 
 
 
-void Blocks::lower (time_t elapsed_time)
+void Blocks::HandleLoweringPlanes (time_t elapsed_time)
 {
   float elapsed = (float)elapsed_time/1000.;
   float elapsed_fall = elapsed*speed;
-  float elapsed_cam_move = elapsed*1.6;
-
-  if (cam_move_dist)
-  {
-    if (elapsed_cam_move > cam_move_dist) elapsed_cam_move = cam_move_dist;
-    cam_move_dist -= elapsed_cam_move;
-    move_camera ();
-  }
 
   if (pause) return;
 
@@ -1516,14 +1621,9 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
   if (startup_screen)
   {
     if (newgame) StartDemo ();
-    move_cubes (elapsed_time);
+    HandleMovement (elapsed_time);
     if (!Gfx3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
     view->Draw ();
-    if (!Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-    Gfx2D->Write (100,  80, white, black, "0: boring");
-    Gfx2D->Write (100, 100, white, black, "1: novice");
-    Gfx2D->Write (100, 120, white, black, "2: normal");
-    Gfx2D->Write (100, 140, white, black, "3: expert");
     Gfx3D->FinishDraw ();
     Gfx3D->Print (NULL);
     return;
@@ -1532,9 +1632,7 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
   if (newgame) StartNewGame ();
 
   // This is where Blocks stuff really happens.
-  if (!transition) move_cubes (elapsed_time);
-  // This is where the transition is handled.
-  else handleTransition (elapsed_time);
+  HandleMovement (elapsed_time);
 
   // Tell Gfx3D we're going to display 3D things
   if (!Gfx3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;

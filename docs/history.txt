@@ -17,6 +17,7 @@ Short-term cleanups that need to be done:
 	- Fix to sprite modifications from Seth Galbraith.
 	- Fixed sprites so that they at least load again.
 	  But they are still completely wrong.
+	- Some improvements on Blocks. Added a 3D menu for starting.
 9-Feb-2000
 	- Andrew Zabolotny did some changes:
 	    - Renamed DEBUG to CS_DEBUG. On various systems many

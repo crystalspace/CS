@@ -68,7 +68,6 @@ enum BlShapeType
   SHAPE_DEMO_S
 };
 
-#define NUM_BORING_SHAPE (SHAPE_R4+1)
 #define NUM_EASY_SHAPE (SHAPE_T1+1)
 #define NUM_MEDIUM_SHAPE (SHAPE_U+1)
 #define NUM_HARD_SHAPE (SHAPE_FLATXX+1)
@@ -88,6 +87,15 @@ enum BlShapeType
 
 // Max cubes in a shape.
 #define MAX_CUBES 30
+
+// Menus.
+#define MENU_NOVICE 0
+#define MENU_AVERAGE 1
+#define MENU_EXPERT 2
+#define MENU_HIGHSCORES 3
+#define MENU_SETUP 4
+#define MENU_QUIT 5
+#define MENU_TOTAL 6
 
 struct CubeInfo
 {
@@ -120,6 +128,12 @@ private:
   csMatrix3 full_rotate_y_reverse;  
   csMatrix3 full_rotate_z;
   csMatrix3 full_rotate_z_reverse;
+
+  // For the menu.
+  csThing* menus[MENU_TOTAL];
+  int cur_menu;
+  int old_cur_menu;
+  float menu_todo;
 
   csVector3 view_origin;
 
@@ -246,6 +260,9 @@ public:
   void StartDemo ();
   void set_cube_room (csSector* s) { room = s; }
   void init_game ();
+  void CreateMenuEntry (csSector* sect, char* txt, int menu_nr);
+  void SetupMenu (int menu);
+  void SetupMenu (float menu_transition, int old_menu, int new_menu);
 
   // Handling of basic events and frame drawing.
   virtual void NextFrame (time_t elapsed_time, time_t current_time);
@@ -272,23 +289,24 @@ public:
   void set_pillar_texture (csTextureHandle* ct) { pillar_txt = ct; }
   void set_raster_texture (csTextureHandle* ct) { raster_txt = ct; }
 
-  // Handle movement of the game.
-  void move_cubes (time_t elapsed_time);
+  // Handle all time dependent movement of the game and menu.
+  // This function will call some of the Handle... routines below.
+  void HandleMovement (time_t elapsed_time);
+  // Is called when we are in transition mode instead of HandleMovement()
+  // (this happens when a plane is moving down).
+  void HandleTransition (time_t elapsed_time);
+  // Handle the movement of the camera.
+  void HandleCameraMovement ();
+  // Handle movement for the startup screen.
+  void HandleStartupMovement (time_t elapsed_time);
+  // Handle movement for the game screen.
+  void HandleGameMovement (time_t elapsed_time);
+  // Handle lowering of planes.
+  void HandleLoweringPlanes (time_t elapsed_time);
+
 
   // Update the score.
   void updateScore ();
-
-  // Is called when it transition mode instead of move_cubes().
-  void handleTransition (time_t elapsed_time);
-
-  /*
-   * This is called during a transition, similar to move_cubes(),
-   * which is called usually.
-   */
-  void lower (time_t elapsed_time);
-
-  // Handle the movement of the camera.
-  void move_camera ();
 
   // Conveniance functions.
   csMatrix3 create_rotate_x (float angle);

@@ -273,12 +273,12 @@ void csSpriteTemplate::GenerateLOD ()
   if (normal_mesh != NULL)
   {
     for (i = 0 ; i < num_texels ; i++)
-       texel_to_normal[i] = texel_to_normal[translate[i]];
+      texel_to_normal[i] = texel_to_normal[translate[i]];
   }
   if (vertex_mesh != NULL)
   {
     for (i = 0 ; i < num_texels ; i++)
-       texel_to_vertex[i] = texel_to_vertex[translate[i]];
+      texel_to_vertex[i] = texel_to_vertex[translate[i]];
   }
 
   CHK (delete [] translate);
