@@ -41,8 +41,6 @@ void awsKey::ComputeKeyID (const char* n, size_t len)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 awsPrefManager::awsPrefManager (iBase *iParent) :
-  n_win_defs(0),
-  n_skin_defs(0),
   def_skin(NULL),
   awstxtmgr(NULL),
   wmgr(NULL),
@@ -266,7 +264,8 @@ bool awsPrefManager::Load (const char *def_file)
     return false;
   }
 
-  unsigned int ncw = n_win_defs, ncs = n_skin_defs;
+  int ncw = win_defs.Length();
+  int ncs = skin_defs.Length();
 
   if (awsparse (wmgr))
   {
@@ -276,22 +275,21 @@ bool awsPrefManager::Load (const char *def_file)
 
   printf (
     "\tload successful (%i windows, %i skins loaded.)\n",
-    n_win_defs - ncw,
-    n_skin_defs - ncs);
+    win_defs.Length() - ncw,
+    skin_defs.Length() - ncs);
 
   return true;
 }
 
 bool awsPrefManager::SelectDefaultSkin (const char* skin_name)
 {
-  iAwsKeyContainer *skin = (iAwsKeyContainer *) skin_defs.GetFirstItem ();
   unsigned long id = NameToId (skin_name);
 
-  while (skin)
+  for (int i=0;i<skin_defs.Length(); i++)
   {
-    if (skin->Name () == id)
+    if (skin_defs[i]->Name () == id)
     {
-      def_skin = skin;
+      def_skin = skin_defs[i];
 
       // Set the AWS global palette
       SetupPalette ();
@@ -316,8 +314,6 @@ bool awsPrefManager::SelectDefaultSkin (const char* skin_name)
 
       return true;
     }
-
-    skin = (iAwsKeyContainer *)skin_defs.GetNextItem ();
   }
 
   return false;
@@ -541,36 +537,22 @@ bool awsPrefManager::GetString (
 
 iAwsComponentNode *awsPrefManager::FindWindowDef (const char *name)
 {
-  iAwsComponentNode *win = (iAwsComponentNode *)win_defs.GetFirstItem ();
-  iAwsComponentNode *firstwin = win;
   unsigned long id = NameToId (name);
 
-  while (win)
-  {
-    if (win && win->Name () == id) return win;
-
-    win = (iAwsComponentNode *)win_defs.GetNextItem ();
-    if (win == firstwin)
-      break;
-  }
+  for (int i=0;i<win_defs.Length();i++)
+    if (win_defs[i]->Name () == id)
+      return win_defs[i];
 
   return NULL;
 }
 
 iAwsKeyContainer *awsPrefManager::FindSkinDef (const char *name)
 {
-  iAwsKeyContainer *skn = (iAwsKeyContainer *)skin_defs.GetFirstItem ();
-  iAwsKeyContainer *firstskn = skn;
   unsigned long id = NameToId (name);
 
-  while (skn)
-  {
-    if (skn && skn->Name () == id) return skn;
-
-    skn = (iAwsKeyContainer *)skin_defs.GetNextItem ();
-    if (skn == firstskn)
-      break;
-  }
+  for (int i=0;i<skin_defs.Length();i++)
+    if (skin_defs[i]->Name () == id)
+      return skin_defs[i];
 
   return NULL;
 }

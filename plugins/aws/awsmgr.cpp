@@ -87,14 +87,7 @@ awsManager::~awsManager ()
     scfiEventHandler->DecRef ();
   }
 
-  void *p = component_factories.GetFirstItem ();
-  while ((p = component_factories.GetCurrentItem ()))
-  {
-    awsComponentFactoryMap* map = (awsComponentFactoryMap*) p;
-    map->factory->DecRef ();
-    component_factories.RemoveItem ();
-    //delete map;
-  }
+  component_factories.DeleteAll ();
 }
 
 bool awsManager::Initialize (iObjectRegistry *object_reg)
@@ -159,30 +152,23 @@ void awsManager::RegisterComponentFactory (
   iAwsComponentFactory *factory,
   const char *name)
 {
-  factory->IncRef ();
-  
-  awsComponentFactoryMap *cfm = new awsComponentFactoryMap;
-  cfm->factory = factory;
-  cfm->id = prefmgr->NameToId (name);
+  awsComponentFactoryMap cfm;
+  cfm.factory = factory;
+  cfm.id = prefmgr->NameToId (name);
 
-  component_factories.AddItem (cfm);
+  component_factories.Push (cfm);
 }
 
 iAwsComponentFactory *awsManager::FindComponentFactory (const char *name)
 {
-  void *p = component_factories.GetFirstItem ();
   unsigned long id = prefmgr->NameToId (name);
 
-  do
+  for (int i=0;i<component_factories.Length();i++)
   {
-    awsComponentFactoryMap *cfm = (awsComponentFactoryMap *)p;
-
-    if (cfm->id == id)
-      return cfm->factory;
-
-    p = component_factories.GetNextItem ();
-  } while (p != component_factories.PeekFirstItem ());
-
+    if (component_factories[i].id == id)
+      return component_factories[i].factory;
+  }
+  
   return NULL;
 }
 

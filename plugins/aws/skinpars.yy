@@ -14,7 +14,6 @@
 #include "cssysdef.h"
 #include "csgeom/csrect.h"
 #include "csutil/scfstr.h"
-#include "csutil/csdllist.h"
 #include "aws.h"
 #include "awsprefs.h"
 #include "awsparser.h"

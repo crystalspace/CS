@@ -23,6 +23,7 @@
 # include "iaws/awscnvs.h"
 # include "iutil/eventh.h"
 # include "iutil/comp.h"
+# include "csutil/array.h"
 # include "csgeom/csrect.h"
 # include "csgeom/csrectrg.h"
 # include "cstool/proctex.h"
@@ -108,12 +109,18 @@ private:
     */
   struct awsComponentFactoryMap
   {
-    iAwsComponentFactory *factory;
+    csRef<iAwsComponentFactory> factory;
     unsigned long id;
+    awsComponentFactoryMap ()
+	: id(0)
+    {}
+    awsComponentFactoryMap (const awsComponentFactoryMap& other)
+	: factory(other.factory), id(other.id)
+    {}
   };
 
   /// Contains the list of factory to ID mappings.
-  csDLinkList component_factories;
+  csArray<awsComponentFactoryMap> component_factories;
 
   /**
    * Defines a transition

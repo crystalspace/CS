@@ -22,18 +22,19 @@
 # define	TOKEN_IS	266
 # define	NEG	267
 
+#line 12 "plugins/aws/skinpars.yy"
 
 
 #include "cssysdef.h"
 #include "csgeom/csrect.h"
 #include "csutil/scfstr.h"
-#include "csutil/csdllist.h"
 #include "aws.h"
 #include "awsprefs.h"
 #include "awsparser.h"
 #include <stdio.h>
 
 
+#line 27 "plugins/aws/skinpars.yy"
 #ifndef YYSTYPE
 typedef union {
   char   *str;			/* For returning titles and handles to items. */
@@ -47,6 +48,7 @@ typedef union {
 # define YYSTYPE yystype
 # define YYSTYPE_IS_TRIVIAL 1
 #endif
+#line 38 "plugins/aws/skinpars.yy"
 
 
 extern int awslex(YYSTYPE *awslval);
@@ -141,11 +143,11 @@ static const short yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined. */
 static const short yyrline[] =
 {
-       0,    76,    77,    80,    81,    82,    83,    90,    95,   101,
-     108,   111,   113,   115,   117,   124,   133,   143,   149,   157,
-     160,   162,   164,   171,   182,   188,   195,   210,   213,   215,
-     217,   219,   223,   229,   236,   250,   260,   261,   262,   263,
-     264,   265,   266,   267
+       0,    75,    76,    79,    80,    81,    82,    89,    94,   100,
+     107,   110,   112,   114,   116,   123,   132,   142,   148,   156,
+     159,   161,   163,   170,   181,   187,   194,   209,   212,   214,
+     216,   218,   222,   228,   235,   249,   259,   260,   261,   262,
+     263,   264,   265,   266
 };
 #endif
 
@@ -305,6 +307,7 @@ static const short yycheck[] =
 #define YYPURE 1
 
 /* -*-C-*-  Note some compilers choke on comments on `#line' lines.  */
+#line 3 "/usr/share/bison/bison.simple"
 
 /* Skeleton output parser for bison,
 
@@ -617,6 +620,7 @@ yystpcpy (yydest, yysrc)
 # endif
 #endif
 
+#line 315 "/usr/share/bison/bison.simple"
 
 
 /* The user can define YYPARSE_PARAM as the name of an argument to be passed
@@ -1010,42 +1014,53 @@ yyreduce:
   switch (yyn) {
 
 case 4:
+#line 80 "plugins/aws/skinpars.yy"
 { static_awsparser->AddGlobalSkinDef(yyvsp[0].skin); ;
     break;}
 case 5:
+#line 81 "plugins/aws/skinpars.yy"
 { static_awsparser->AddGlobalWindowDef(yyvsp[0].comp); ;
     break;}
 case 6:
+#line 82 "plugins/aws/skinpars.yy"
 { yyerrok;      ;
     break;}
 case 7:
+#line 91 "plugins/aws/skinpars.yy"
 { yyval.key = static_awsparser->MapSourceToSink (yyvsp[-6].val, yyvsp[-3].str, yyvsp[0].str); free(yyvsp[-3].str); free(yyvsp[0].str); ;
     break;}
 case 8:
+#line 96 "plugins/aws/skinpars.yy"
 { awsKeyContainer* kc = new awsKeyContainer;
 		  if (yyvsp[0].key) kc->Add(yyvsp[0].key);
 		  yyval.keycont = kc;
 		;
     break;}
 case 9:
+#line 101 "plugins/aws/skinpars.yy"
 { awsKeyContainer* kc = yyvsp[-1].keycont;
 		  if (yyvsp[0].key) kc->Add(yyvsp[0].key);
 		  yyval.keycont = kc;
 		;
     break;}
 case 10:
+#line 109 "plugins/aws/skinpars.yy"
 {  yyval.key = new awsStringKey(yyvsp[-2].str, yyvsp[0].str); free(yyvsp[-2].str); free(yyvsp[0].str); ;
     break;}
 case 11:
+#line 111 "plugins/aws/skinpars.yy"
 {  yyval.key = new awsIntKey(yyvsp[-2].str, yyvsp[0].val); free(yyvsp[-2].str); ;
     break;}
 case 12:
+#line 113 "plugins/aws/skinpars.yy"
 {  yyval.key = new awsRGBKey(yyvsp[-6].str, yyvsp[-4].val, yyvsp[-2].val, yyvsp[0].val); free(yyvsp[-6].str); ;
     break;}
 case 13:
+#line 115 "plugins/aws/skinpars.yy"
 {  yyval.key = new awsRectKey(yyvsp[-12].str, csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); free(yyvsp[-12].str); ;
     break;}
 case 14:
+#line 117 "plugins/aws/skinpars.yy"
 { awsConnectionNode *cn = new awsConnectionNode();
                   iAwsKeyContainer* kc = (iAwsKeyContainer*) yyvsp[-1].keycont;
 		  cn->Consume (kc);
@@ -1054,6 +1069,7 @@ case 14:
 		;
     break;}
 case 15:
+#line 124 "plugins/aws/skinpars.yy"
 { awsComponentNode *cn = new awsComponentNode(yyvsp[-5].str, yyvsp[-3].str);
                   iAwsKeyContainer* kc = (iAwsKeyContainer*) yyvsp[-1].keycont;
 		  cn->Consume(kc);
@@ -1064,6 +1080,7 @@ case 15:
 		;
     break;}
 case 16:
+#line 133 "plugins/aws/skinpars.yy"
 { awsComponentNode *cn = new awsComponentNode(yyvsp[-3].str, "Window");
                   iAwsKeyContainer* kc = (iAwsKeyContainer*) yyvsp[-1].keycont;
 		  cn->Consume(kc);
@@ -1073,27 +1090,33 @@ case 16:
 		;
     break;}
 case 17:
+#line 144 "plugins/aws/skinpars.yy"
 { awsKeyContainer* keycontainer = new awsKeyContainer;
 		  keycontainer->Add(yyvsp[0].key);
 		  yyval.keycont = keycontainer;
 		;
     break;}
 case 18:
+#line 149 "plugins/aws/skinpars.yy"
 { awsKeyContainer* keycontainer = yyvsp[-1].keycont;
 		  keycontainer->Add(yyvsp[0].key);
 		  yyval.keycont = keycontainer;
 		;
     break;}
 case 19:
+#line 158 "plugins/aws/skinpars.yy"
 { yyval.key = new awsStringKey(yyvsp[-2].str, yyvsp[0].str); free(yyvsp[-2].str); free(yyvsp[0].str); ;
     break;}
 case 20:
+#line 160 "plugins/aws/skinpars.yy"
 { yyval.key = new awsIntKey(yyvsp[-2].str, yyvsp[0].val); free(yyvsp[-2].str); ;
     break;}
 case 21:
+#line 162 "plugins/aws/skinpars.yy"
 { yyval.key = new awsRectKey(yyvsp[-12].str, csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); free(yyvsp[-12].str); ;
     break;}
 case 22:
+#line 164 "plugins/aws/skinpars.yy"
 { awsConnectionNode *cn = new awsConnectionNode();
                   iAwsKeyContainer* kc = (iAwsKeyContainer*) yyvsp[-1].keycont;
 		  cn->Consume(kc);
@@ -1102,6 +1125,7 @@ case 22:
 		;
     break;}
 case 23:
+#line 171 "plugins/aws/skinpars.yy"
 { awsComponentNode *cn = new awsComponentNode(yyvsp[-5].str, yyvsp[-3].str);
                   iAwsKeyContainer* kc = (iAwsKeyContainer*) yyvsp[-1].keycont;
 		  cn->Consume(kc);
@@ -1112,18 +1136,21 @@ case 23:
 		;
     break;}
 case 24:
+#line 183 "plugins/aws/skinpars.yy"
 { awsKeyContainer* cnt = new awsKeyContainer;
 		cnt->Add(yyvsp[0].key);
 		yyval.keycont = cnt;
 	      ;
     break;}
 case 25:
+#line 188 "plugins/aws/skinpars.yy"
 { awsKeyContainer* cnt = yyvsp[-1].keycont;
 	        cnt->Add(yyvsp[0].key);
 	        yyval.keycont = cnt;
 	      ;
     break;}
 case 26:
+#line 196 "plugins/aws/skinpars.yy"
 { awsComponentNode *win = new awsComponentNode(yyvsp[-3].str, "Default");
                   iAwsKeyContainer* kc = (iAwsKeyContainer*) yyvsp[-1].keycont;
 		  win->Consume(kc);
@@ -1133,33 +1160,41 @@ case 26:
 		;
     break;}
 case 27:
+#line 211 "plugins/aws/skinpars.yy"
 { yyval.key = new awsStringKey(yyvsp[-2].str, yyvsp[0].str); free(yyvsp[-2].str); free(yyvsp[0].str); ;
     break;}
 case 28:
+#line 213 "plugins/aws/skinpars.yy"
 { yyval.key = new awsRGBKey(yyvsp[-6].str, yyvsp[-4].val, yyvsp[-2].val, yyvsp[0].val); free(yyvsp[-6].str); ;
     break;}
 case 29:
+#line 215 "plugins/aws/skinpars.yy"
 { yyval.key = new awsIntKey(yyvsp[-2].str, yyvsp[0].val); free(yyvsp[-2].str); ;
     break;}
 case 30:
+#line 217 "plugins/aws/skinpars.yy"
 { yyval.key = new awsPointKey(yyvsp[-6].str, csPoint(yyvsp[-3].val, yyvsp[-1].val)); free(yyvsp[-6].str); ;
     break;}
 case 31:
+#line 219 "plugins/aws/skinpars.yy"
 { yyval.key = new awsRectKey(yyvsp[-12].str, csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); free(yyvsp[-12].str); ;
     break;}
 case 32:
+#line 224 "plugins/aws/skinpars.yy"
 { awsKeyContainer* kc = new awsKeyContainer;
 		  kc->Add(yyvsp[0].key);
 		  yyval.keycont = kc;
 		;
     break;}
 case 33:
+#line 229 "plugins/aws/skinpars.yy"
 { awsKeyContainer* kc = yyvsp[-1].keycont;
 		  kc->Add(yyvsp[0].key);
 		  yyval.keycont = kc;
 		;
     break;}
 case 34:
+#line 237 "plugins/aws/skinpars.yy"
 { awsSkinNode *skin = new awsSkinNode(yyvsp[-3].str);
                   iAwsKeyContainer* kc = (iAwsKeyContainer*) yyvsp[-1].keycont;
                   skin->Consume(kc);
@@ -1169,6 +1204,7 @@ case 34:
 		;
     break;}
 case 35:
+#line 251 "plugins/aws/skinpars.yy"
 { int v = 0;
 		  if (!static_awsparser->GetConstantValue(yyvsp[0].str, v))
 		    static_awsparser->ReportError ("Constant %s is not defined.", yyvsp[0].str);
@@ -1177,31 +1213,40 @@ case 35:
 		;
     break;}
 case 36:
+#line 259 "plugins/aws/skinpars.yy"
 { yyval.val = yyvsp[0].val; ;
     break;}
 case 37:
+#line 260 "plugins/aws/skinpars.yy"
 { yyval.val = yyvsp[0].val; ;
     break;}
 case 38:
+#line 261 "plugins/aws/skinpars.yy"
 { yyval.val = yyvsp[-2].val + yyvsp[0].val; ;
     break;}
 case 39:
+#line 262 "plugins/aws/skinpars.yy"
 { yyval.val = yyvsp[-2].val - yyvsp[0].val; ;
     break;}
 case 40:
+#line 263 "plugins/aws/skinpars.yy"
 { yyval.val = yyvsp[-2].val * yyvsp[0].val; ;
     break;}
 case 41:
+#line 264 "plugins/aws/skinpars.yy"
 { yyval.val = yyvsp[-2].val / yyvsp[0].val; ;
     break;}
 case 42:
+#line 265 "plugins/aws/skinpars.yy"
 { yyval.val = -yyvsp[0].val; ;
     break;}
 case 43:
+#line 266 "plugins/aws/skinpars.yy"
 { yyval.val = yyvsp[-1].val; ;
     break;}
 }
 
+#line 705 "/usr/share/bison/bison.simple"
 
 
   yyvsp -= yylen;
@@ -1432,6 +1477,7 @@ yyreturn:
 #endif
   return yyresult;
 }
+#line 269 "plugins/aws/skinpars.yy"
 
 
 int

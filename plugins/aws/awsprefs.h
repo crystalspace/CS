@@ -21,9 +21,9 @@
 # include "iaws/aws.h"
 # include "csgeom/csrect.h"
 # include "csgeom/cspoint.h"
-# include "csutil/csdllist.h"
 # include "csutil/csvector.h"
 # include "csutil/scfstr.h"
+# include "csutil/refarr.h"
 # include "ivideo/graph2d.h"
 
 # include "awstex.h"
@@ -554,16 +554,10 @@ class awsPrefManager : public iAwsPrefManager
   csRef<iGraphics2D> g2d;
 
   /// list of window definitions
-  csDLinkList win_defs;
+  csRefArray<iAwsComponentNode> win_defs;
 
   /// list of skin definitions
-  csDLinkList skin_defs;
-
-  /// count of window defintions loaded
-  unsigned int n_win_defs;
-
-  /// count of skin defintions loaded
-  unsigned int n_skin_defs;
+  csRefArray<iAwsKeyContainer> skin_defs;
 
   /// currently selected skin
   iAwsKeyContainer *def_skin;
@@ -674,54 +668,41 @@ public:
   bool RemoveWindowDef (const char *name)
   {
     iAwsComponentNode *nd=FindWindowDef (name);
-    if(nd) 
-    {
-      nd->RemoveAll ();
-      win_defs.RemoveItem (nd);
-      nd->DecRef();
-      return true;
-    }
-    return false;
+    if (!nd)
+	return false;
+
+    nd->RemoveAll ();
+    win_defs.Delete (nd);
+    return true;
   }
 
   /// Removes all window definitions from the list
   void RemoveAllWindowDefs ()
   {
-    iAwsComponentNode *nd=(iAwsComponentNode*)win_defs.GetFirstItem();
-    while (nd)
-    {
-      nd->RemoveAll ();
-      win_defs.RemoveItem ();
-      nd->DecRef();
-      nd=(iAwsComponentNode*)win_defs.GetNextItem();
-    }
+    for (int i=0;i<win_defs.Length();i++)
+      win_defs[i]->RemoveAll ();
+    win_defs.DeleteAll ();
   }
 
   /// Completely remove a skin definition from the list (false if doesn't exist)
   bool RemoveSkinDef (const char *name)
   {
     iAwsKeyContainer *kc=FindSkinDef (name);
-    if(kc)
-    {
-      kc->RemoveAll ();
-      skin_defs.RemoveItem (kc);
-      kc->DecRef();
-      return true;
-    }
-    return false;
+    if(!kc)
+      return false;
+
+    kc->RemoveAll ();
+    skin_defs.Delete (kc);
+    
+    return true;
   }
 
   /// Removes all skin definitions from the list
   void RemoveAllSkinDefs ()
   {
-    iAwsKeyContainer *sd=(iAwsKeyContainer*)skin_defs.GetFirstItem();
-    while (sd)
-    {
-      sd->RemoveAll ();
-      skin_defs.RemoveItem ();
-      sd->DecRef();
-      sd=(iAwsKeyContainer*)skin_defs.GetNextItem();
-    }
+    for (int i=0;i<skin_defs.Length();i++)
+      skin_defs[i]->RemoveAll ();
+    skin_defs.DeleteAll ();
   }
 
 public:
@@ -729,20 +710,18 @@ public:
   /// Called by internal code to add a parsed out tree of window components.
   void AddWindowDef (iAwsComponentNode *win)
   {
-    if (!win) return ;
-    win->IncRef();
-    win_defs.AddItem (win);
-    n_win_defs++;
+    if (!win)
+      return ;
+
+    win_defs.Push (win);
   }
 
   /// Called by internal code to add a parsed out tree of skin defintions.
   void AddSkinDef (iAwsKeyContainer *skin)
   {
-    if (!skin) return ;
-    if( skin->Type() != KEY_SKIN) return;
-    skin->IncRef();
-    skin_defs.AddItem (skin);
-    n_skin_defs++;
+    if (!skin || skin->Type() != KEY_SKIN)
+      return ;
+    skin_defs.Push (skin);
   }
 
 public:
