@@ -670,6 +670,15 @@ void csGenmeshMeshObjectFactory::Invalidate ()
   polygons = NULL;
 }
 
+void csGenmeshMeshObjectFactory::HardTransform (
+    const csReversibleTransform& t)
+{
+  int i;
+  for (i = 0 ; i < num_mesh_vertices ; i++)
+    mesh_vertices[i] = t.This2Other (mesh_vertices[i]);
+  initialized = false;
+}
+
 csPtr<iMeshObject> csGenmeshMeshObjectFactory::NewInstance ()
 {
   csGenmeshMeshObject* cm = new csGenmeshMeshObject (this);

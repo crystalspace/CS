@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+11-Nov-2002
+	- Genmesh factories now support HardTransform().
 10-Nov-2002
 	- Fixed genmesh so it no longer crashes when there are no vertices.
 8-Nov-2002

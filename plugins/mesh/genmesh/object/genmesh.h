@@ -324,8 +324,8 @@ public:
   SCF_DECLARE_IBASE;
 
   virtual csPtr<iMeshObject> NewInstance ();
-  virtual void HardTransform (const csReversibleTransform&) {/*@@@ TODO*/ }
-  virtual bool SupportsHardTransform () const { return false; }
+  virtual void HardTransform (const csReversibleTransform& t);
+  virtual bool SupportsHardTransform () const { return true; }
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
 
