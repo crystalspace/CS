@@ -16,6 +16,26 @@ chronological order.
 	- Eric Sunshine moved definition of csSkinSlice above csSkin in
 	  csskin.h so that csSkinSlice in known before it is used in template
 	  instantiation.
+	- Jorrit greatly simplified iLODControl. Removed all functions
+	  that were not used anyway. Changed SetLOD() to set a distance
+	  based function.
+	- Jorrit also modified the loader to accept new <distance> keyword.
+	  So you can now say in a mesh object:
+	      <lod>
+	          <distance m="-.025" a="1"/>
+	      </lod>
+	  The 'm' and 'a' values are used in the function:
+	  	lod = m*distance+a
+	  The result is capped to [0,1]. 0 is worst quality, 1 is best.
+	  So in this case it means that if the object is (for example)
+	  10 units away then lod will be equal to 1.25 (or 1 capped which
+	  means highest quality). If the object is 30 units away then lod will
+	  be equal to 0.25.
+	- Jorrit changed the 3D sprite plugin to actually support these lod
+	  settings now. So it is now possible to control lod for a sprite
+	  based on distance. This is not very flexible yet. In future a lod
+	  manager will be added for increased flexibility (i.e. basing lod
+	  levels on hardware capabilities and desired speed).
 	- Keith Fulton added cal3d submesh attach and detach to viewmesh.
 	  Enhanced sprcal3d object and factory to enumerate submeshes,
 	  name them, attach certain ones by default on instance creation,

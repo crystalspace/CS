@@ -52,8 +52,6 @@
 #include "ivideo/material.h"
 #include "qint.h"
 
-#define ALL_LOD_FEATURES (CS_LOD_TRIANGLE_REDUCTION|CS_LOD_DISTANCE_REDUCTION)
-
 struct iObjectRegistry;
 struct iEngine;
 
@@ -303,16 +301,10 @@ private:
   int lighting_quality_config;
 
   /*
-   * Configuration value for template LOD. 0 is lowest detail, 1 is maximum.
-   * If 1 then the base mesh is used and no LOD reduction/computation
-   * is done.
+   * Values for the function <code>lod=m*distance+a</code> that is used
+   * to compute the actual LOD level for this object.
    */
-  float lod_level;
-
-  /*
-   * Current LOD features.
-   */
-  uint32 current_features;
+  float lod_m, lod_a;
 
   /**
    * The lod_level_config for this template.
@@ -597,7 +589,11 @@ public:
   /// For LOD.
   int GetLODPolygonCount (float lod) const;
   /// Default LOD level for this factory.
-  float GetLodLevel () const { return lod_level; }
+  void GetLod (float& m, float& a) const
+  {
+    m = lod_m;
+    a = lod_a;
+  }
 
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
   void GetRadius (csVector3& rad, csVector3 &cent);
@@ -930,52 +926,19 @@ public:
   struct LODControl : public iLODControl
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObjectFactory);
-    virtual uint32 GetLODFeatures () const
+    virtual void SetLOD (float m, float a)
     {
-      return scfParent->current_features;
+      scfParent->lod_m = m;
+      scfParent->lod_a = a;
     }
-    virtual void SetLODFeatures (uint32 mask, uint32 value)
+    virtual void GetLOD (float& m, float& a) const
     {
-      mask &= ALL_LOD_FEATURES;
-      scfParent->current_features = (scfParent->current_features & ~mask)
-      	| (value & mask);
+      m = scfParent->lod_m;
+      a = scfParent->lod_a;
     }
-    virtual void SetLOD (float lod) { scfParent->lod_level = lod; }
-    virtual float GetLOD () const { return scfParent->lod_level; }
     virtual int GetLODPolygonCount (float lod) const
     {
       return scfParent->GetLODPolygonCount (lod);
-    }
-    virtual uint32 GetAvailableLODFeatures () const
-    {
-      return ALL_LOD_FEATURES;
-    }
-    virtual uint32 GetAvailableDistanceFeatures () const
-    {
-      return CS_LOD_TRIANGLE_REDUCTION;
-    }
-    virtual uint32 GetDistanceReduction () const
-    {
-      return CS_LOD_TRIANGLE_REDUCTION;
-    }
-    virtual void SetDistanceReduction (uint32 mask, uint32 value)
-    {
-      (void)mask; (void)value;
-      // @@@ TODO
-    }
-    virtual void SetLODPriority (uint16 group)
-    {
-      (void)group;
-      // @@@ TODO
-    }
-    virtual uint16 GetLODPriority () const
-    {
-      return 0;
-    }
-    virtual void SetMinLODThreshold (float level, bool turnOff)
-    {
-      (void)level; (void)turnOff;
-      // @@@ TODO
     }
   } scfiLODControl;
   friend struct LODControl;
@@ -995,11 +958,9 @@ private:
 
 public:
   /**
-   * Configuration value for global LOD. 0 is lowest detail, 1 is maximum.
-   * If 1 then the base mesh is used and no LOD reduction/computation
-   * is done.
+   * Configuration values for global LOD (function <code>m*distance+a</code>).
    */
-  static float global_lod_level;
+  static float global_lod_m, global_lod_a;
 
 private:
   /**
@@ -1014,11 +975,10 @@ private:
   int lod_level_config;
 
   /**
-   * Configuration value for an individuals LOD. 0 is lowest detail,
-   * 1 is maximum.  If 1 then the base mesh is used and no LOD
-   * reduction/computation is done.
+   * Configuration values for an individuals LOD
+   * (function <code>m*distance+a</code>).
    */
-  float local_lod_level;
+  float local_lod_m, local_lod_a;
 
   /**
    * Quality setting for sprite lighting.
@@ -1038,9 +998,6 @@ private:
    *   </ul>
    */
   int lighting_quality_config;
-
-  uint32 current_features;
-
 
   /**
    * Setting to manipulate sprite animation speed
@@ -1099,7 +1056,7 @@ public:
    * Sets the local lighting quality for this sprite.  NOTE: you must use
    * SetLightingQualityConfig (CS_SPR_LIGHT_LOCAL) for the sprite to use this.
    */
-  void SetLocalLightingQuality(int lighting_quality)
+  void SetLocalLightingQuality (int lighting_quality)
   { local_lighting_quality = lighting_quality; }
 
   /**
@@ -1129,33 +1086,44 @@ public:
   { return lighting_quality_config; }
 
   /**
-   * Returns the lod level used by this sprite.
+   * Get the lod settings relevant for this sprite.
    */
-  float GetLodLevel () const
+  void GetRelevantLodSettings (float& m, float& a) const
   {
     switch (lod_level_config)
     {
-      case CS_SPR_LOD_GLOBAL:      return global_lod_level; break;
-      case CS_SPR_LOD_TEMPLATE:    return factory->GetLodLevel(); break;
-      case CS_SPR_LOD_LOCAL:       return local_lod_level; break;
+      case CS_SPR_LOD_GLOBAL:
+        m = global_lod_m;
+	a = global_lod_a;
+	break;
+      case CS_SPR_LOD_LOCAL:
+        m = local_lod_m;
+	a = local_lod_a;
+	break;
+      //case CS_SPR_LOD_TEMPLATE:
       default:
-	return factory->GetLodLevel();
+        factory->GetLod (m, a);
+	break;
     }
   }
 
   /**
-   * Sets the local lod level for this sprite.  NOTE: you must use
-   * SetLodLevelConfig (CS_SPR_LOD_LOCAL) for the sprite to use this.
+   * Returns the lod level used by this sprite.
    */
-  void SetLocalLodLevel (float lod_level)
-  { local_lod_level = lod_level; }
+  float GetLodLevel (float distance) const
+  {
+    float m, a;
+    GetRelevantLodSettings (m, a);
+    return m * distance + a;
+  }
 
-  /**
-   * Sets the global lod level for all csSprite3Ds.  NOTE: you must use
-   * SetLodLevelConfig(CS_SPR_LOD_GLOBAL) for the sprite to use this.
-   */
-  void SetGlobalLodLevel (float lod_level)
-  { global_lod_level = lod_level; }
+  /// Return true if LOD is enabled.
+  bool IsLodEnabled () const
+  {
+    float m, a;
+    GetRelevantLodSettings (m, a);
+    return ABS (m) > SMALL_EPSILON || ABS (a) < (1-SMALL_EPSILON);
+  }
 
   /**
    * Sets which lighting config variable this sprite will use.
@@ -1849,7 +1817,7 @@ public:
     }
     virtual bool IsLodEnabled () const
     {
-      return scfParent->GetLodLevel () < .99;
+      return scfParent->IsLodEnabled ();
     }
     virtual void SetBaseColor (const csColor& col)
     {
@@ -1895,52 +1863,20 @@ public:
   struct LODControl : public iLODControl
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObject);
-    virtual uint32 GetLODFeatures () const
+    virtual void SetLOD (float m, float a)
     {
-      return scfParent->current_features;
+      scfParent->SetLodLevelConfig (CS_SPR_LOD_LOCAL);
+      scfParent->local_lod_m = m;
+      scfParent->local_lod_a = a;
     }
-    virtual void SetLODFeatures (uint32 mask, uint32 value)
+    virtual void GetLOD (float& m, float& a) const
     {
-      mask &= ALL_LOD_FEATURES;
-      scfParent->current_features = (scfParent->current_features & ~mask)
-      	| (value & mask);
+      m = scfParent->local_lod_m;
+      a = scfParent->local_lod_a;
     }
-    virtual void SetLOD (float lod) { scfParent->local_lod_level = lod; }
-    virtual float GetLOD () const { return scfParent->local_lod_level; }
     virtual int GetLODPolygonCount (float lod) const
     {
       return scfParent->GetLODPolygonCount (lod);
-    }
-    virtual uint32 GetAvailableLODFeatures () const
-    {
-      return ALL_LOD_FEATURES;
-    }
-    virtual uint32 GetAvailableDistanceFeatures () const
-    {
-      return CS_LOD_TRIANGLE_REDUCTION;
-    }
-    virtual uint32 GetDistanceReduction () const
-    {
-      return CS_LOD_TRIANGLE_REDUCTION;
-    }
-    virtual void SetDistanceReduction (uint32 mask, uint32 value)
-    {
-      (void)mask; (void)value;
-      // @@@ TODO
-    }
-    virtual void SetLODPriority (uint16 group)
-    {
-      (void)group;
-      // @@@ TODO
-    }
-    virtual uint16 GetLODPriority () const
-    {
-      return 0;
-    }
-    virtual void SetMinLODThreshold (float level, bool turnOff)
-    {
-      (void)level; (void)turnOff;
-      // @@@ TODO
     }
   } scfiLODControl;
   friend struct LODControl;
@@ -1995,57 +1931,19 @@ public:
   struct LODControl : public iLODControl
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSprite3DMeshObjectType);
-    virtual uint32 GetLODFeatures () const
+    virtual void SetLOD (float m, float a)
     {
-      return ALL_LOD_FEATURES;
+      csSprite3DMeshObject::global_lod_m = m;
+      csSprite3DMeshObject::global_lod_a = a;
     }
-    virtual void SetLODFeatures (uint32 mask, uint32 value)
+    virtual void GetLOD (float& m, float& a) const
     {
-      (void)mask; (void)value;
-      // @@@ TODO
-    }
-    virtual void SetLOD (float lod)
-    {
-      csSprite3DMeshObject::global_lod_level = lod;
-    }
-    virtual float GetLOD () const
-    {
-      return csSprite3DMeshObject::global_lod_level;
+      m = csSprite3DMeshObject::global_lod_m;
+      a = csSprite3DMeshObject::global_lod_a;
     }
     virtual int GetLODPolygonCount (float /*lod*/) const
     {
       return 0;
-    }
-    virtual uint32 GetAvailableLODFeatures () const
-    {
-      return ALL_LOD_FEATURES;
-    }
-    virtual uint32 GetAvailableDistanceFeatures () const
-    {
-      return CS_LOD_TRIANGLE_REDUCTION;
-    }
-    virtual uint32 GetDistanceReduction () const
-    {
-      return CS_LOD_TRIANGLE_REDUCTION;
-    }
-    virtual void SetDistanceReduction (uint32 mask, uint32 value)
-    {
-      (void)mask; (void)value;
-      // @@@ TODO
-    }
-    virtual void SetLODPriority (uint16 group)
-    {
-      (void)group;
-      // @@@ TODO
-    }
-    virtual uint16 GetLODPriority () const
-    {
-      return 0;
-    }
-    virtual void SetMinLODThreshold (float level, bool turnOff)
-    {
-      (void)level; (void)turnOff;
-      // @@@ TODO
     }
   } scfiLODControl;
   friend struct LODControl;

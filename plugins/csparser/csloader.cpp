@@ -797,6 +797,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("culler", XMLTOKEN_CULLER);
   xmltokens.Register ("cullerp", XMLTOKEN_CULLERP);
   xmltokens.Register ("detail", XMLTOKEN_DETAIL);
+  xmltokens.Register ("distance", XMLTOKEN_DISTANCE);
   xmltokens.Register ("dynamic", XMLTOKEN_DYNAMIC);
   xmltokens.Register ("dither", XMLTOKEN_DITHER);
   xmltokens.Register ("diffuse", XMLTOKEN_DIFFUSE);
@@ -831,7 +832,6 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("key", XMLTOKEN_KEEPIMAGE);
   xmltokens.Register ("key", XMLTOKEN_KEY);
   xmltokens.Register ("layer", XMLTOKEN_LAYER);
-  xmltokens.Register ("level", XMLTOKEN_LEVEL);
   xmltokens.Register ("library", XMLTOKEN_LIBRARY);
   xmltokens.Register ("light", XMLTOKEN_LIGHT);
   xmltokens.Register ("lightmapcellsize", XMLTOKEN_LIGHTMAPCELLSIZE);
@@ -1343,7 +1343,8 @@ bool csLoader::LoadSounds (iDocumentNode* node)
 
 bool csLoader::LoadLodControl (iLODControl* lodctrl, iDocumentNode* node)
 {
-  float level = 1;
+  float lodm = 0;
+  float loda = 1;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -1354,8 +1355,9 @@ bool csLoader::LoadLodControl (iLODControl* lodctrl, iDocumentNode* node)
     csStringID id = xmltokens.Request (value);
     switch (id)
     {
-      case XMLTOKEN_LEVEL:
-	level = child->GetContentsValueAsFloat ();
+      case XMLTOKEN_DISTANCE:
+	lodm = child->GetAttributeValueAsFloat ("m");
+	loda = child->GetAttributeValueAsFloat ("a");
         break;
       default:
 	SyntaxService->ReportBadToken (child);
@@ -1363,7 +1365,7 @@ bool csLoader::LoadLodControl (iLODControl* lodctrl, iDocumentNode* node)
     }
   }
 
-  lodctrl->SetLOD (level);
+  lodctrl->SetLOD (lodm, loda);
 
   return true;
 }

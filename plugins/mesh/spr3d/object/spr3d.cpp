@@ -55,9 +55,6 @@ CS_IMPLEMENT_PLUGIN
 #define DEFAULT_LIGHTING CS_SPR_LIGHTING_LQ
 //#define DEFAULT_LIGHTING CS_SPR_LIGHTING_FAST
 
-// Set the default lod used.
-#define DEFAULT_LOD 1
-
 //--------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csSpriteFrame)
@@ -238,10 +235,10 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
   lighting_quality = DEFAULT_LIGHTING;
   lighting_quality_config = CS_SPR_LIGHT_GLOBAL;
 
-  lod_level = DEFAULT_LOD;
+  lod_m = 0;
+  lod_a = 1;
   lod_level_config = CS_SPR_LOD_GLOBAL;
   MixMode = CS_FX_COPY;
-  current_features = ALL_LOD_FEATURES;
 
   initialized = false;
 }
@@ -1045,8 +1042,8 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   MixMode = CS_FX_COPY;
   base_color.Set (0, 0, 0);
   initialized = false;
-  local_lod_level = 1;
-  current_features = ALL_LOD_FEATURES;
+  local_lod_m = 0;
+  local_lod_a = 1;
   speedfactor = 1;
   loopaction = true;
   fullstop = false;
@@ -1140,13 +1137,14 @@ void csSprite3DMeshObject::FixVertexColors ()
 {
   if (vertex_colors)
   {
-	int i;
+    int i;
     for (i = 0 ; i < factory->GetVertexCount (); i++)
       vertex_colors [i].Clamp (2., 2., 2.);
   }
 }
 
-float csSprite3DMeshObject::global_lod_level = DEFAULT_LOD;
+float csSprite3DMeshObject::global_lod_m = 0;
+float csSprite3DMeshObject::global_lod_a = 1;
 
 // Set the default lighting quality.
 int csSprite3DMeshObject::global_lighting_quality = DEFAULT_LIGHTING;
@@ -1166,7 +1164,8 @@ static int map (int* emerge_from, int idx, int num_verts)
 
 int csSprite3DMeshObject::GetVertexToLightCount ()
 {
-  if (GetLodLevel () < .99)
+  // @@@
+  if (GetLodLevel (0) < .99)
   {
     if (num_verts_for_lod == -1)
       return factory->GetVertexCount ();
@@ -1610,12 +1609,10 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 
   float fnum = 0.0f;
 
-  // level of detail is GetLodLevel() squared because the LOD
-  // decreases with distance squared.
   // GetLodLevel() is the distance at which you will see full detail
-  float level_of_detail = GetLodLevel() * GetLodLevel();
+  float level_of_detail = 1;
 
-  if (GetLodLevel () < .99)
+  if (IsLodEnabled ())
   {
     // reduce LOD based on distance from camera to center of sprite
     csBox3 obox;
@@ -1628,14 +1625,17 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
       wor_center = movable->GetFullTransform ().This2Other (obj_center);
     csVector3 cam_origin = camera->GetTransform ().GetOrigin ();
     float wor_sq_dist = csSquaredDist::PointPoint (cam_origin, wor_center);
-    level_of_detail /= MAX (wor_sq_dist, SMALL_EPSILON);
+    level_of_detail = GetLodLevel (qsqrt (wor_sq_dist));
 
     // reduce LOD based on field-of-view
     float aspect = 2 * (float) tan (camera->GetFOVAngle () * PI / 360);
     level_of_detail *= aspect;
+
+    if (level_of_detail < 0) level_of_detail = 0;
+    else if (level_of_detail >= 1) level_of_detail = 1;
   }
 
-  if (GetLodLevel () < .99 && level_of_detail < 1)
+  if (level_of_detail < 1)
   {
     // We calculate the number of vertices to use for this LOD
     // level. The integer part will be the number of vertices.
@@ -1654,6 +1654,8 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     num_verts_for_lod = factory->GetVertexCount ();
     m = factory->GetTexelMesh ();
   }
+
+  if (num_verts_for_lod <= 1) return false;
 
   int i;
 
@@ -2726,12 +2728,13 @@ csPtr<iMeshObjectFactory> csSprite3DMeshObjectType::NewFactory ()
   return csPtr<iMeshObjectFactory> (ifact);
 }
 
-#define NUM_OPTIONS 2
+#define NUM_OPTIONS 3
 
 static const csOptionDescription config_options [NUM_OPTIONS] =
 {
-  { 0, "sprlod", "Sprite LOD Level", CSVAR_FLOAT },
-  { 1, "sprlq", "Sprite Lighting Quality", CSVAR_LONG },
+  { 0, "sprlod_m", "Sprite LOD Level (m factor)", CSVAR_FLOAT },
+  { 1, "sprlod_a", "Sprite LOD Level (a factor)", CSVAR_FLOAT },
+  { 2, "sprlq", "Sprite Lighting Quality", CSVAR_LONG },
 };
 
 bool csSprite3DMeshObjectType::csSprite3DConfig::SetOption (int id,
@@ -2741,8 +2744,9 @@ bool csSprite3DMeshObjectType::csSprite3DConfig::SetOption (int id,
     return false;
   switch (id)
   {
-    case 0: csSprite3DMeshObject::global_lod_level = value->GetFloat (); break;
-    case 1: csSprite3DMeshObject::global_lighting_quality = value->GetLong ();
+    case 0: csSprite3DMeshObject::global_lod_m = value->GetFloat (); break;
+    case 1: csSprite3DMeshObject::global_lod_a = value->GetFloat (); break;
+    case 2: csSprite3DMeshObject::global_lighting_quality = value->GetLong ();
     	break;
     default: return false;
   }
@@ -2754,8 +2758,9 @@ bool csSprite3DMeshObjectType::csSprite3DConfig::GetOption (int id,
 {
   switch (id)
   {
-    case 0: value->SetFloat (csSprite3DMeshObject::global_lod_level); break;
-    case 1: value->SetLong (csSprite3DMeshObject::global_lighting_quality);
+    case 0: value->SetFloat (csSprite3DMeshObject::global_lod_m); break;
+    case 1: value->SetFloat (csSprite3DMeshObject::global_lod_a); break;
+    case 2: value->SetLong (csSprite3DMeshObject::global_lighting_quality);
     	break;
     default: return false;
   }

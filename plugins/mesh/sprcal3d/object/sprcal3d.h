@@ -278,57 +278,17 @@ public:
   struct LODControl : public iLODControl
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObjectFactory);
-    virtual uint32 GetLODFeatures () const
+    virtual void SetLOD (float, float)
     {
-      return ALL_LOD_FEATURES;
     }
-    virtual void SetLODFeatures (uint32 mask, uint32 value)
+    virtual void GetLOD (float& m, float& a) const
     {
-      (void)mask; (void)value;
-      // @@@ TODO
-    }
-    virtual void SetLOD (float lod)
-    {
-      //csSpriteCal3DMeshObject::global_lod_level = lod;
-    }
-    virtual float GetLOD () const
-    {
-      return 0; // csSpriteCal3DMeshObject::global_lod_level;
+      m = 0;
+      a = 1;
     }
     virtual int GetLODPolygonCount (float /*lod*/) const
     {
       return 0;
-    }
-    virtual uint32 GetAvailableLODFeatures () const
-    {
-      return ALL_LOD_FEATURES;
-    }
-    virtual uint32 GetAvailableDistanceFeatures () const
-    {
-      return CS_LOD_TRIANGLE_REDUCTION;
-    }
-    virtual uint32 GetDistanceReduction () const
-    {
-      return CS_LOD_TRIANGLE_REDUCTION;
-    }
-    virtual void SetDistanceReduction (uint32 mask, uint32 value)
-    {
-      (void)mask; (void)value;
-      // @@@ TODO
-    }
-    virtual void SetLODPriority (uint16 group)
-    {
-      (void)group;
-      // @@@ TODO
-    }
-    virtual uint16 GetLODPriority () const
-    {
-      return 0;
-    }
-    virtual void SetMinLODThreshold (float level, bool turnOff)
-    {
-      (void)level; (void)turnOff;
-      // @@@ TODO
     }
   } scfiLODControl;
   friend struct LODControl;
@@ -584,52 +544,11 @@ public:
   struct LODControl : public iLODControl
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObject);
-    virtual uint32 GetLODFeatures () const
-    {
-      return scfParent->current_features;
-    }
-    virtual void SetLODFeatures (uint32 mask, uint32 value)
-    {
-      mask &= ALL_LOD_FEATURES;
-      scfParent->current_features = (scfParent->current_features & ~mask)
-      	| (value & mask);
-    }
-    virtual void SetLOD (float lod) {  }
-    virtual float GetLOD () const { return 1; }
+    virtual void SetLOD (float, float) {  }
+    virtual void GetLOD (float& m, float& a) const { m = 0; a = 1; }
     virtual int GetLODPolygonCount (float lod) const
     {
       return scfParent->GetLODPolygonCount (lod);
-    }
-    virtual uint32 GetAvailableLODFeatures () const
-    {
-      return ALL_LOD_FEATURES;
-    }
-    virtual uint32 GetAvailableDistanceFeatures () const
-    {
-      return CS_LOD_TRIANGLE_REDUCTION;
-    }
-    virtual uint32 GetDistanceReduction () const
-    {
-      return CS_LOD_TRIANGLE_REDUCTION;
-    }
-    virtual void SetDistanceReduction (uint32 mask, uint32 value)
-    {
-      (void)mask; (void)value;
-      // @@@ TODO
-    }
-    virtual void SetLODPriority (uint16 group)
-    {
-      (void)group;
-      // @@@ TODO
-    }
-    virtual uint16 GetLODPriority () const
-    {
-      return 0;
-    }
-    virtual void SetMinLODThreshold (float level, bool turnOff)
-    {
-      (void)level; (void)turnOff;
-      // @@@ TODO
     }
   } scfiLODControl;
   friend struct LODControl;
@@ -710,57 +629,17 @@ public:
   struct LODControl : public iLODControl
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObjectType);
-    virtual uint32 GetLODFeatures () const
+    virtual void SetLOD (float, float)
     {
-      return ALL_LOD_FEATURES;
     }
-    virtual void SetLODFeatures (uint32 mask, uint32 value)
+    virtual void GetLOD (float& m, float& a) const
     {
-      (void)mask; (void)value;
-      // @@@ TODO
-    }
-    virtual void SetLOD (float lod)
-    {
-      //csSpriteCal3DMeshObject::global_lod_level = lod;
-    }
-    virtual float GetLOD () const
-    {
-      return 0; // csSpriteCal3DMeshObject::global_lod_level;
+      m = 0;
+      a = 1;
     }
     virtual int GetLODPolygonCount (float /*lod*/) const
     {
       return 0;
-    }
-    virtual uint32 GetAvailableLODFeatures () const
-    {
-      return ALL_LOD_FEATURES;
-    }
-    virtual uint32 GetAvailableDistanceFeatures () const
-    {
-      return CS_LOD_TRIANGLE_REDUCTION;
-    }
-    virtual uint32 GetDistanceReduction () const
-    {
-      return CS_LOD_TRIANGLE_REDUCTION;
-    }
-    virtual void SetDistanceReduction (uint32 mask, uint32 value)
-    {
-      (void)mask; (void)value;
-      // @@@ TODO
-    }
-    virtual void SetLODPriority (uint16 group)
-    {
-      (void)group;
-      // @@@ TODO
-    }
-    virtual uint16 GetLODPriority () const
-    {
-      return 0;
-    }
-    virtual void SetMinLODThreshold (float level, bool turnOff)
-    {
-      (void)level; (void)turnOff;
-      // @@@ TODO
     }
   } scfiLODControl;
   friend struct LODControl;
