@@ -43,7 +43,7 @@ csGLFontCache::csGLFontCache (csGraphics2DGLCommon* G2D) :
   csGLFontCache::G2D = G2D;
   statecache = G2D->statecache;
 
-  int maxtex = 257;
+  GLint maxtex = 257;
   glGetIntegerv (GL_MAX_TEXTURE_SIZE, &maxtex);
 
   texSize = G2D->config->GetInt ("Video.OpenGL.FontCache.TextureSize", 256);
@@ -406,10 +406,10 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
     verts2d.SetLength (numFloats + textLen * 8);
   }
   int bgVertOffset = (textLen + 1) * 8;
-  float* tcPtr;
-  float* vertPtr;
-  float* bgTcPtr;
-  float* bgVertPtr;
+  float* tcPtr = 0;
+  float* vertPtr = 0;
+  float* bgTcPtr = 0;
+  float* bgVertPtr = 0;
 
   float x1 = pen_x;
   float x2 = x1, y1 = 0, y2 = 0;
