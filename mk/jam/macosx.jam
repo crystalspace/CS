@@ -215,7 +215,7 @@ rule WrapFile
 #  LinkApplication exe : objects
 actions AppExe bind NEEDLIBS bind EXTRAOBJECTS
 {
-  $(MACOSX_ENVIRON)
+  $(MACOSX.ENVIRON)
   $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }
 
