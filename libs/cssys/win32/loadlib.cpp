@@ -158,7 +158,7 @@ void csPrintLibraryError (const char *iModule)
   while (ErrorMessages.Length () > 0)
   {
     str = (char*)ErrorMessages.Pop();
-    if (str != 0) fprintf (stderr, "  %s", str);
+    if (str != 0) fprintf (stderr, "  %s\n", str);
     delete[] str;
   }
 }

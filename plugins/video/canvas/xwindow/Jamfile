@@ -18,6 +18,7 @@ else
 
 Help xwin : "Crystal Space X Window Plugin" ;
 CompileGroups xwin :  drivers2d ;
+CompileGroups xwin :  softcanvas ;
 
 }
 

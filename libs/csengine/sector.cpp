@@ -114,389 +114,6 @@ void csSectorMeshList::FreeItem (iMeshWrapper* item)
 }
 
 //---------------------------------------------------------------------------
-
-#ifdef CS_USE_NEW_RENDERER
-
-SCF_IMPLEMENT_IBASE(csRenderMeshList)
-  SCF_IMPLEMENTS_INTERFACE (iSectorRenderMeshList)
-SCF_IMPLEMENT_IBASE_END
-
-/*bool csRenderMeshList::csRMLitem::operator == (const csRMLitem& other)
-{
-  return (CompareItems (this, &other) == 0); 
-}*/
-
-int csRenderMeshList::CompareItems (const csRMLitem* a, 
-				    const csRMLitem* b)
-{
-  long rpdiff = 
-    a->mw->GetRenderPriority() - b->mw->GetRenderPriority();
-  if (rpdiff != 0) return rpdiff;
-  
-  return ((uint8*)a->rm->material - (uint8*)b->rm->material);
-}
-
-bool csRenderMeshList::FindItem (int& index, csRMLitem* item)
-{
-  int lo = 0, hi = rendermeshes.Length() - 1;
-  int mid = 0;
-  while (lo <= hi)
-  {
-    mid = (lo + hi) / 2;
-    int c = CompareItems (item, &rendermeshes[mid]);
-    if (c == 0)
-    {
-      c = (uint8*)item->rm - (uint8*)(rendermeshes[mid].rm);
-    }
-    if (c == 0)
-    {
-      index = mid;
-      return true;
-    }
-    else if (c > 0)
-    {
-      lo = mid + 1;
-    }
-    else
-    {
-      hi = mid - 1;
-    }
-  }
-  index = lo;
-  return false;
-}
-
-void csRenderMeshList::SortRP (int Left, int Right, int order)
-{
-  csRMLitem t;
-
-  int i = Left, j = Right;
-  int x = (Left + Right) / 2;
-  do
-  {
-    csRMLitem& ix = rendermeshes[x];
-    int c = 0;
-    while ((i != x) && ((c = SortRPCompare (&rendermeshes[i], &ix, order)) < 0))
-      i++;
-    while ((j != x) && ((c = SortRPCompare (&rendermeshes[j], &ix, order)) > 0))
-      j--;
-    if (i < j)
-    {
-      if (c != 0) 
-	// don't swap equal elements.
-	// Makes debugging a little easier.
-      {
-	t = rendermeshes[j];
-	rendermeshes[j] = rendermeshes[i];
-	rendermeshes[i] = t;
-      }
-      if (x == i)
-        x = j;
-      else if (x == j)
-        x = i;
-    }
-    if (i <= j)
-    {
-      i++;
-      if (j > Left)
-        j--;
-    }
-  } while (i <= j);
-
-  if (j - Left < Right - i)
-  {
-    if (Left < j)
-      SortRP (Left, j, order);
-    if (i < Right)
-    {
-      SortRP (i, Right, order);
-    }
-  }
-  else
-  {
-    if (i < Right)
-      SortRP (i, Right, order);
-    if (Left < j)
-    {
-      SortRP (Left, j, order);
-    }
-  }
-}
-
-int csRenderMeshList::SortRPCompare (csRMLitem* a, csRMLitem* b, int order)
-{
-  if ((a->lastRPupd != currentFrame) || (a->lastView != currentView))
-  {
-    a->RP = a->mw->GetRenderPriority();
-    a->lastRPupd = currentFrame;
-    a->lastView = currentView;
-
-    if (RPsorting[a->RP] != CS_RENDPRI_NONE)
-    {
-      // we do this here as well because DrawTest() may update the transformation.
-      CheckVisibility (a);
-
-      UpdateZ (a);
-    }
-  }
-
-  // sorting will always start at a block w/ currentRP,
-  // however comparisons with items behind this block may happen.
-  if (a->RP != currentRP) return (a->RP - currentRP);
-
-  if ((b->lastRPupd != currentFrame) || (b->lastView != currentView))
-  {
-    b->RP = b->mw->GetRenderPriority();
-    b->lastRPupd = currentFrame;
-    b->lastView = currentView;
-
-    if (RPsorting[b->RP] != CS_RENDPRI_NONE)
-    {
-      // we do this here as well because DrawTest() may update the transformation.
-      CheckVisibility (b);
-
-      UpdateZ (b);
-    }
-  }
-
-  if (b->RP != currentRP) return (b->RP - currentRP);
-
-  float zdiff = a->zvalue - b->zvalue;
-  if (zdiff < 0)
-  {
-    return -order;
-  }
-  else if (zdiff > 0)
-  {
-    return order;
-  }
-  else
-  {
-    return 0;
-  }
-}
-
-void csRenderMeshList::CheckVisibility (csRMLitem* item)
-{
-/*  if (item->visobj->GetVisibilityNumber () != currentVisNr)
-  {
-    item->mwi->potvis = false;
-    return;
-  }*/
-  if ((item->mwi->lastFrame != currentFrame) || 
-    (item->mwi->lastView != currentView))
-  {
-    item->mwi->lastFrame = currentFrame;
-    item->mwi->lastView = currentView;
-    item->mwi->potvis = item->mw->GetMeshObject()->DrawTest (currentView, 
-      item->mw->GetMovable());
-  }
-}
-
-void csRenderMeshList::UpdateZ (csRMLitem* item)
-{
-  csVector3 rad, cent;
-  item->mw->GetRadius (rad, cent);
-
-  csReversibleTransform tr_o2c = *camtrans;
-  csVector3 tr_cent = item->rm->transform->Other2This (cent);
-  item->zvalue = tr_cent.z;
-}
-
-void csRenderMeshList::Add (iMeshWrapper* mw)
-{
-  csRef<iVisibilityObject> visobj = csPtr<iVisibilityObject>
-    (SCF_QUERY_INTERFACE (mw, iVisibilityObject));
-
-  int index;
-  csRMLitem item;
-  int n;
-  csRenderMesh** rm;
-
-  rm = mw->GetRenderMeshes (n);
-
-  csMWitem* mwi = (csMWitem*)mwrappers.Get ((csHashKey) mw);
-  if (!mwi)
-  {
-    mwi = new csMWitem ();
-    mwrappers.Put ((csHashKey) mw, (csHashObject)mwi);
-  }
-  
-  while (n-- > 0)
-  {
-    item.mw = mw;
-    item.mwi = mwi;
-    item.visobj = visobj;
-    item.rm = rm[n];
-
-    if (!FindItem (index, &item))
-    {
-      rendermeshes.Insert (index, item);
-      mwi->count++;
-    }
-  }
-}
-
-void csRenderMeshList::Remove (iMeshWrapper* mw)
-{
-  int index;
-  csRMLitem item;
-  int n;
-  csRenderMesh** rm;
-
-  rm = mw->GetRenderMeshes (n);
-
-  csMWitem* mwi = (csMWitem*)mwrappers.Get ((csHashKey) mw);
-  if (!mwi)
-  {
-    mwi = new csMWitem ();
-    mwrappers.Put ((csHashKey) mw, (csHashObject)mwi);
-  }
-  
-  while (n-- > 0)
-  {
-    item.mw = mw;
-    // visobj isn't considered in comparison
-    item.rm = rm[n];
-
-    if (FindItem (index, &item))
-    {
-      rendermeshes.DeleteIndex (index);
-      mwi->count--;
-    }
-  }
-  if (mwi->count == 0)
-  {
-    mwrappers.Delete ((csHashKey)mw, (csHashObject)mwi);
-    delete mwi;
-  }
-}
-
-void csRenderMeshList::Relink (iMeshWrapper* mw)
-{
-  int index;
-  csRMLitem item;
-  int n;
-  csRenderMesh** rm;
-
-  rm = mw->GetRenderMeshes (n);
-
-  csMWitem* mwi = (csMWitem*)mwrappers.Get ((csHashKey) mw);
-  if (!mwi)
-  {
-    mwi = new csMWitem ();
-    mwrappers.Put ((csHashKey) mw, (csHashObject)mwi);
-  }
-
-  while (n-- > 0)
-  {
-    item.mw = mw;
-    // visobj isn't considered in comparison
-    item.rm = rm[n];;
-
-    if (FindItem (index, &item))
-    {
-      int cindex = index;
-      // partial insertion sort
-      while ((cindex < (rendermeshes.Length() - 1)) &&
-	(CompareItems (&item, &rendermeshes[cindex]) > 0))
-      {
-	memcpy (&rendermeshes[cindex], &rendermeshes[cindex + 1],
-	  sizeof (csRMLitem));
-	cindex++;
-      }
-      while ((cindex > 0) &&
-	(CompareItems (&item, &rendermeshes[cindex]) < 0))
-      {
-	memcpy (&rendermeshes[cindex], &rendermeshes[cindex - 1],
-	  sizeof (csRMLitem));
-	cindex--;
-      }
-      if (index != cindex)
-      {
-	memcpy (&rendermeshes[index], &rendermeshes[cindex],
-	  sizeof (csRMLitem));
-      }
-    }
-    else
-    {
-      mwi->count++;
-      rendermeshes.Insert (index, item);
-    }
-  }
-}
-
-void csRenderMeshList::PrepareFrame (iRenderView* rview)
-{
-  checkedRPs.SetLength (sector->engine->GetRenderPriorityCount());
-  int i;
-  for (i = 0 ; i < checkedRPs.Length () ; i++)
-    checkedRPs[i] = false;
-  RPsorting.SetLength (checkedRPs.Length(), 0);
-  //currentVisNr = sector->culler->GetCurrentVisibilityNumber();
-  // @@@ This won't work as expected when the VC is suspended
-  currentFrame = sector->virtual_clock->GetCurrentTicks();
-  currentView = rview;
-  camtrans = &currentView->GetCamera ()->GetTransform ();
-}
-
-csRenderMeshList::csRenderMeshList (csSector* sector)
-{
-  SCF_CONSTRUCT_IBASE(0);
-
-  csRenderMeshList::sector = sector;
-}
-
-csRenderMeshList::~csRenderMeshList ()
-{
-}
-
-int csRenderMeshList::GetCount ()
-{
-  return rendermeshes.Length();
-}
-
-void csRenderMeshList::Get (int index, 
-			    iMeshWrapper*& mw, 
-			    iVisibilityObject*& visobj,
-			    csRenderMesh*& rm,
-			    bool* visible)
-{
-  csRMLitem& item = rendermeshes[index];
-
-  long RP = item.mw->GetRenderPriority();
-  if (RP > checkedRPs.Length ()) checkedRPs.SetLength (RP+1);
-  if (!checkedRPs[RP])
-  {
-    checkedRPs.Put (RP, true);
-
-    RPsorting[RP] = sector->engine->GetRenderPrioritySorting (RP);
-    // does it need sorting?
-    if (RPsorting[RP] != CS_RENDPRI_NONE)
-    {
-      currentRP = RP;
-      // do it.
-      SortRP (index, rendermeshes.Length() - 1,
-	(RPsorting[RP] == CS_RENDPRI_FRONT2BACK) ? 1 : -1);
-      // This might be another item now.
-      item = rendermeshes[index]; 
-    }
-
-    // @@@ do CS_ENTITY_CAMERA stuff
-  }
-  
-  // have we already checked visibility?
-  CheckVisibility (&item);
-
-  mw = item.mw;
-  visobj = item.visobj;
-  rm = item.rm;
-  if (visible) *visible = item.mwi->potvis;
-}
-
-#endif
-
-//---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE_EXT(csSector)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iReferencedObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iSector)
@@ -518,9 +135,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSector::csSector (csEngine *engine) :
   csObject()
-#ifdef CS_USE_NEW_RENDERER  
-    , rmeshes (this)
-#endif
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSector);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiReferencedObject);
@@ -599,18 +213,12 @@ void csSector::PrepareMesh (iMeshWrapper *mesh)
 {
   RenderQueues.Add (mesh);
   if (culler) RegisterMeshToCuller (mesh);
-#ifdef CS_USE_NEW_RENDERER
-  rmeshes.Add (mesh);
-#endif
 }
 
 void csSector::UnprepareMesh (iMeshWrapper *mesh)
 {
   RenderQueues.Remove (mesh);
   if (culler) UnregisterMeshToCuller (mesh);
-#ifdef CS_USE_NEW_RENDERER
-  rmeshes.Remove (mesh);
-#endif
 }
 
 void csSector::RelinkMesh (iMeshWrapper *mesh)
@@ -619,9 +227,6 @@ void csSector::RelinkMesh (iMeshWrapper *mesh)
   // priority was known!
   RenderQueues.RemoveUnknownPriority (mesh);
   RenderQueues.Add (mesh);
-#ifdef CS_USE_NEW_RENDERER
-  rmeshes.Relink (mesh);
-#endif
 }
 
 //----------------------------------------------------------------------
@@ -910,7 +515,6 @@ void csSector::PrepareDraw (iRenderView *rview)
 
   //culler->VisTest (rview);
 
-  rmeshes.PrepareFrame (rview);
 #else
   draw_busy++;
 
@@ -1235,16 +839,6 @@ void csSector::Draw (iRenderView *rview)
   }
 
   draw_busy--;
-#endif // CS_USE_NEW_RENDERER
-}
-
-
-iSectorRenderMeshList* csSector::GetRenderMeshes ()
-{
-#ifdef CS_USE_NEW_RENDERER
-  return &rmeshes;
-#else
-  return 0;
 #endif // CS_USE_NEW_RENDERER
 }
 

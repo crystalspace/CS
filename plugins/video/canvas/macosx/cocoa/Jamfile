@@ -9,4 +9,5 @@ LinkWith cocoa2d : canvascommon cssys csutil ;
 
 Help cocoa2d : "Crystal Space MacOS/X Cocoa 2D driver" ;
 CompileGroups cocoa2d :  drivers2d ;
+CompileGroups cocoa2d :  softcanvas ;
 }

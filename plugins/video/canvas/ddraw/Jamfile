@@ -10,6 +10,7 @@ ExternalLibs ddraw2d :  DIRECTX ;
 
 Help ddraw2d : "Crystal Space DirectDraw 2D driver" ;
 CompileGroups ddraw2d :  drivers2d ;
+CompileGroups ddraw2d :  softcanvas ;
 
 }
 

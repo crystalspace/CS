@@ -5,7 +5,8 @@ SubDir TOP ;
 
 # Define our compile groups
 RegisterCompileGroups sounddrivers soundloaders imageloaders netdrivers
-		      drivers2d drivers3d meshes walkall ;
+		      drivers2d drivers3d meshes walkall openglcanvas 
+		      softcanvas ;
 Help sounddrivers : "sound drivers compilegroup" ;
 Help soundloaders : "sound loaders compilegroup" ;
 Help imageloaders : "image loaders compilegroup" ;
@@ -14,6 +15,8 @@ Help drivers2d	  : "2d canvases compilegroup" ;
 Help drivers3d	  : "3d renderers compilegroup" ;
 Help meshes	  : "mesh plugin and loader compilegroup" ;
 Help walkall  	  : "walktest application and all required plugins" ;
+Help openglcanvas : "canvases suitable for the GL renderer" ;
+Help softcanvas   : "canvases suitable for the software renderer" ;
 
 # Create some clean targets
 CleanDir clean : out ;

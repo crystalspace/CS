@@ -37,19 +37,36 @@ uint32 csHashCompute (char const*);
  */
 uint32 csHashCompute (char const*, int length);
 
+template <class T>
+class csIntegralHashKeyHandler
+{
+public:
+  static uint32 ComputeHash (const T& key)
+  {
+    return (uint32)key;
+  }
+
+  static bool CompareKeys (const T& key1, const T& key2)
+  {
+    return (key1 == key2);
+  }
+};
+
 /**
  * A generic hash table class,
  * which grows dynamically and whose buckets are unsorted arrays.
  */
-template <class T> class csHash
+template <class T, class K = uint32, 
+  class KeyHandler = csIntegralHashKeyHandler<K> > 
+class csHash
 {
 protected:
   struct Element
   {
-    uint32 key;
+    K key;
     T value;
 
-    Element (uint32 key0, const T &value0) : key (key0), value (value0) {}
+    Element (K key0, const T &value0) : key (key0), value (value0) {}
     Element (const Element &other) : key (other.key), value (other.value) {}
   };
   csArray< csArray<Element> > Elements;
@@ -76,22 +93,24 @@ private:
 
     const int *p;
     for (p = Primes; *p && *p <= Elements.Length (); p++) ;
-    CS_ASSERT (*p);
     Modulo = *p;
+    CS_ASSERT (Modulo);
 
     int elen = Elements.Length ();
-    Elements.SetLength (*p, csArray<Element> (1, 7));
+    Elements.SetLength (Modulo, csArray<Element> (1, 7));
 
     for (int i = 0; i < elen; i++)
     {
-      csArray<Element> &src = Elements[i];
+      csArray<Element>& src = Elements[i];
       int slen = src.Length ();
-      for (int j = 0; j < slen; j++)
+      for (int j = slen - 1; j >= 0; j--)
       {
-        csArray<Element> &dst = Elements[src[j].key % Modulo];
-        if (& src != & dst)
+        const Element& srcElem = src[j];
+        csArray<Element>& dst = 
+	  Elements.Get (KeyHandler::ComputeHash (srcElem.key) % Modulo);
+        if (&src != &dst)
         {
-          dst.Push (src[j]);
+          dst.Push (srcElem);
           src.DeleteIndex (j);
         }
       }
@@ -125,9 +144,10 @@ public:
     GrowRate (o.GrowRate), MaxSize (o.MaxSize), Size (o.Size) {}
 
   /// Add an element to the hash table.
-  void Put (uint32 key, const T &value)
+  void Put (K key, const T &value)
   {
-    csArray<Element> &values = Elements[key % Modulo];
+    csArray<Element> &values = 
+      Elements[KeyHandler::ComputeHash (key) % Modulo];
     values.Push (Element (key, value));
     Size++;
     if (values.Length () > Elements.Length () / GrowRate
@@ -137,19 +157,22 @@ public:
   /// Get all the elements with the given key, or empty if there are none.
   csArray<T> GetAll (uint32 key) const
   {
-    const csArray<Element> &values = Elements[key % Modulo];
+    const csArray<Element> &values = 
+      Elements[KeyHandler::ComputeHash (key) % Modulo];
     csArray<T> ret (values.Length () / 2);
     for (int i = values.Length () - 1; i >= 0; i++)
-      if (values[i].key == key) ret.Push (values[i].value);
+      if (KeyHandler::Compare (values[i].key, key)) 
+	ret.Push (values[i].value);
     return ret;
   }
 
   /// Add an element to the hash table, overwriting if the key already exists.
-  void PutFirst (uint32 key, const T &value)
+  void PutFirst (K key, const T &value)
   {
-    csArray<Element> &values = Elements[key % Modulo];
+    csArray<Element> &values = 
+      Elements[KeyHandler::ComputeHash (key) % Modulo];
     for (int i = values.Length () - 1; i >= 0; i--)
-      if (values[i].key == key)
+      if (KeyHandler::Compare (values[i].key, key))
       {
         values[i].value = value;
         return;
@@ -162,11 +185,13 @@ public:
   }
 
   /// Get the first element matching the given key, or 0 if there is none.
-  const T& Get (uint32 key) const
+  const T& Get (K key) const
   {
-    const csArray<Element> &values = Elements[key % Modulo];
+    const csArray<Element> &values = 
+      Elements[KeyHandler::ComputeHash (key) % Modulo];
     for (int i = values.Length () - 1; i >= 0; i--)
-      if (values[i].key == key) return values[i].value;
+      if (KeyHandler::CompareKeys (values[i].key, key)) 
+	return values[i].value;
 
     static const T zero (0);
     return zero;
@@ -188,12 +213,13 @@ public:
   }
 
   /// Delete all the elements matching the given key.
-  bool DeleteAll (uint32 key)
+  bool DeleteAll (K key)
   {
     bool ret = false;
-    csArray<Element> &values = Elements[key % Modulo];
+    csArray<Element> &values = 
+      Elements[KeyHandler::ComputeHash (key) % Modulo];
     for (int i = values.Length () - 1; i >= 0; i--)
-      if (values[i].key == key)
+      if (KeyHandler::CompareKeys (values[i].key, key))
       {
         values.DeleteIndex (i);
         ret = true;
@@ -203,12 +229,14 @@ public:
   }
   
   /// Delete all the elements matching the given key and value.
-  bool Delete (uint32 key, const T &value)
+  bool Delete (K key, const T &value)
   {
     bool ret = false;
-    csArray<Element> &values = Elements[key % Modulo];
+    csArray<Element> &values = 
+      Elements[KeyHandler::ComputeHash (key) % Modulo];
     for (int i = values.Length () - 1; i >= 0; i--)
-      if (values[i].key == key && values[i].value == value)
+      if (KeyHandler::CompareKeys (values[i].key, key) && 
+	(values[i].value == value))
       {
         values.DeleteIndex (i);
         ret = true;
@@ -227,22 +255,27 @@ public:
   class Iterator
   {
   private:
-    const csHash<T> *hash;
-    uint32 key;
+    const csHash<T, K, KeyHandler>* hash;
+    K key;
     int bucket, size, element;
 
     void Seek ()
     {
-      do element++;
-        while (element < size && hash->Elements[bucket][element].key != key);
+      do 
+      {
+        element++;
+      }
+      while ((element < size) && 
+        !KeyHandler::CompareKeys (hash->Elements[bucket][element].key, key));
     }
 
   protected:
-    Iterator (const csHash<T> *hash0, uint32 key0)
-    : hash (hash0), key (key0), bucket (key % hash->Modulo),
+    Iterator (const csHash<T, K, KeyHandler>* hash0, K key0)
+    : hash (hash0), key (key0), 
+      bucket (KeyHandler::ComputeHash (key) % hash->Modulo),
       size (hash->Elements[bucket].Length ()) { Return (); }
 
-    friend class csHash<T>;
+    friend class csHash<T, K, KeyHandler>;
   public:
     Iterator (const Iterator &o)
     : hash (o.hash), bucket (o.bucket), size (o.size), element (o.element) {}
@@ -262,15 +295,15 @@ public:
     }
 
     /// Move the iterator back to the first element.
-    void Return () { element = 0; Seek (); }
+    void Return () { element = -1; Seek (); }
   };
-  friend class csHash<T>::Iterator;
+  friend class csHash<T, K, KeyHandler>::Iterator;
 
   /// An iterator class for the hash.
   class GlobalIterator
   {
   private:
-    const csHash<T> *hash;
+    const csHash<T, K, KeyHandler> *hash;
     int bucket, size, element;
 
     void Zero () { bucket = element = 0; }
@@ -293,14 +326,14 @@ public:
     }
 
   protected:
-    GlobalIterator (const csHash<T> *hash0) : hash (hash0) 
+    GlobalIterator (const csHash<T, K, KeyHandler> *hash0) : hash (hash0) 
     { 
       Zero (); 
       Init (); 
       FindItem ();
     }
 
-    friend class csHash<T>;
+    friend class csHash<T, K, KeyHandler>;
   public:
     GlobalIterator (const Iterator &o) : hash (o.hash), bucket (o.bucket),
       size (o.size), element (o.element) {}
@@ -322,7 +355,7 @@ public:
     }
 
     /// Get the next element's value and key.
-    const T& Next (uint32 &key)
+    const T& Next (K &key)
     {
       key = hash->Elements[bucket][element].key;
       return Next ();
@@ -331,11 +364,11 @@ public:
     /// Move the iterator back to the first element.
     void Return () { Zero (); Init (); }
   };
-  friend class csHash<T>::GlobalIterator;
+  friend class csHash<T, K, KeyHandler>::GlobalIterator;
 
   /// Return an iterator for the hash, to iterate only over the elements
   /// with the given key.
-  Iterator GetIterator (uint32 key) const
+  Iterator GetIterator (K key) const
   {
     return Iterator (this, key);
   }

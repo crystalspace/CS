@@ -46,6 +46,28 @@ chronological order.
         - Andreas Busch renamed CS_ZBUF_SPECIAL to CS_ZBUF_INVERT in python
 	  and perl5 modules to match latest renderer changes.
 	- res fixed the missing arguments to the SCF "symbol not found" errors.
+	- res made the following changes:
+	    - Added compilegroups "softcanvas" and "openglcanvas".
+	    - Added a few more dependendies to walkall: aforementioned
+	      softcanvas and openglcanvas and fontplex. When building with NR
+	      enabled, walkall will also depend on glrender3d, the shader and
+	      the renderloop plugins instead of gl3d.
+	    - Fixed a cut'n'paste error in softrender3d Jamfile.
+	    - The library error reporting on Win32 missed newlines.
+	    - cstool/csview.cpp and cstool/keyval.cpp unnecessarily included
+	      iengine/sector.h.
+	    - Made the type of the key in csHash<> templated as well and added
+	      support for "key handlers" which compute the actual hash of a 
+	      key and compare two keys. Overriding key handlers makes strings
+	      as keys possible, for example.
+	    - Fixed an off-by-one error in csHash<>::Iterator.
+	    - Changed the shader manager to emit a warning of no shader plugin
+	      was found.
+	    - In NR build, the sector doesn't cache the rendermeshes any more
+	      or does culling. This is the responsibility of the renderstep 
+	      now. Note 1: The generic RS has been updated, but is still 
+	      rather unoptimized. Note 2: The stencil RS hasn't been updated 
+	      yet.
 29-Aug-2003
 	- renej added support for using CS from Java. SWIG is needed since
 	  no generated files are in the CVS repository. Building is done

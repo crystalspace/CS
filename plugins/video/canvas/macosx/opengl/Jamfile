@@ -11,4 +11,5 @@ ExternalLibs glosx2d : GL ;
 
 Help glosx2d : "Crystal Space MacOS/X OpenGL 2D driver" ;
 CompileGroups glosx2d :  drivers2d ;
+CompileGroups glosx2d :  openglcanvas ;
 }

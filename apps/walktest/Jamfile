@@ -7,11 +7,11 @@ LinkWith walktest : csengine csgeom csgfx cssys cstool csutil ;
 
 CompileGroups walktest : walkall ;
 CompileGroups vfs : walkall ;
-CompileGroups gl3d : walkall ;
-#CompileGroups softcanvas : walkall ;
-#CompileGroups openglcanvas : walkall ;
+CompileGroups softcanvas : walkall ;
+CompileGroups openglcanvas : walkall ;
 CompileGroups effects : walkall ;
 CompileGroups csfont : walkall ;
+CompileGroups fontplex : walkall ;
 CompileGroups csconin : walkall ;
 CompileGroups simpcon : walkall ;
 CompileGroups rapid : walkall ;
@@ -37,6 +37,23 @@ CompileGroups stdpt : walkall ;
 CompileGroups ieplex : walkall ;
 CompileGroups motion : walkall ;
 CompileGroups gtreeldr : walkall ;
+if $(USE_NEW_RENDERER) = "yes"
+{
+  CompileGroups glrender3d : walkall ;
+  CompileGroups shadermgr : walkall ;
+  CompileGroups rendstep_std : walkall ;
+  CompileGroups rendloop_loader : walkall ;
+  CompileGroups glshader_arb : walkall ;
+  CompileGroups glshader_fixed : walkall ;
+  
+  #CompileGroups softrender3d : walkall ; # not yet ready for prime time.
+  #CompileGroups softshader : walkall ;
+}
+else
+{
+  CompileGroups gl3d : walkall ;
+  CompileGroups soft3d : walkall ;
+}
 
 SubVariant static ;
 Application walktest_static

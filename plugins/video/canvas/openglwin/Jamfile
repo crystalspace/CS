@@ -10,6 +10,7 @@ ExternalLibs glwin32 :  GL ;
 
 Help glwin32 : "Crystal Space GL/Win32 2D driver" ;
 CompileGroups glwin32 :  drivers2d ;
+CompileGroups glwin32 :  openglcanvas ;
 
 }
 

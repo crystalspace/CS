@@ -19,7 +19,6 @@
 
 #include "cssysdef.h"
 #include "cstool/keyval.h"
-#include "iengine/sector.h"
 
 //---------------------------------------------------------------------------
 

@@ -110,6 +110,15 @@ csShaderManager::~csShaderManager()
   if (scfiEventHandler) scfiEventHandler->DecRef();
 }
 
+void csShaderManager::Report (int severity, const char* msg, ...)
+{
+  va_list args;
+  va_start (args, msg);
+  csReportV (objectreg, severity, "crystalspace.graphics3d.shadermgr", 
+    msg, args);
+  va_end (args);
+}
+
 bool csShaderManager::Initialize(iObjectRegistry *objreg)
 {
   objectreg = objreg;
@@ -134,15 +143,19 @@ bool csShaderManager::Initialize(iObjectRegistry *objreg)
     for(i = 0; i < nmatches; ++i)
     {
       const char* classname = classlist->Get(i);
-      csRef<iShaderProgramPlugin> plugin = CS_LOAD_PLUGIN(plugin_mgr, classname, iShaderProgramPlugin);
+      csRef<iShaderProgramPlugin> plugin = 
+	CS_LOAD_PLUGIN (plugin_mgr, classname, iShaderProgramPlugin);
       if(plugin)
       {
-        csReport(objectreg, CS_REPORTER_SEVERITY_NOTIFY,
-	  "crystalspace.graphics3d.shadermgr", "Loaded plugin %s", classname);
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "Loaded plugin %s", classname);
         pluginlist.Push(plugin);
         plugin->Open();
       }
     }
+  }
+  else
+  {
+    Report (CS_REPORTER_SEVERITY_WARNING, "No shader plugins found!");
   }
 
   return true;
@@ -416,7 +429,7 @@ bool csShader::Load(iDocumentNode* node)
   return false;
 }
 
-bool csShader::Load(iDataBuffer* program)
+bool csShader::Load (iDataBuffer* program)
 {
   csRef<iDocumentSystem> xml (CS_QUERY_REGISTRY (objectreg, iDocumentSystem));
   if (!xml) xml = csPtr<iDocumentSystem> (new csTinyDocumentSystem ());
@@ -424,8 +437,8 @@ bool csShader::Load(iDataBuffer* program)
   const char* error = doc->Parse (program);
   if (error != 0)
   { 
-    csReport( objectreg, CS_REPORTER_SEVERITY_ERROR, 
-      "crystalspace.graphics3d.shadermanager", "XML error '%s'!", error);
+    parent->Report (CS_REPORTER_SEVERITY_ERROR, 
+      "Error parsing document: %s", error);
     return false;
   }
   return Load(doc->GetRoot()->GetNode("shader"));

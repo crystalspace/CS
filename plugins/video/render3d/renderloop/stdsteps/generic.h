@@ -24,6 +24,7 @@
 #include "csutil/csstring.h"
 #include "iengine/light.h"
 #include "iengine/renderloop.h"
+#include "iengine/viscull.h"
 #include "ivideo/rendersteps/irenderstep.h"
 #include "ivideo/rendersteps/igeneric.h"
 #include "ivideo/rendersteps/ilightiter.h"
@@ -77,8 +78,23 @@ private:
   csZBufMode zmode;
   csRef<iStringSet> strings;
 
-  inline void RenderMeshes (iGraphics3D* g3d, iShaderWrapper* shader, 
-    csRenderMesh** meshes, int num);
+  // @@@ Veeery rough
+  class ViscullCallback : public iVisibilityCullerListner
+  {
+    iGraphics3D* g3d;
+    csStringID shadertype;
+    iRenderView* rview;
+  public:
+    SCF_DECLARE_IBASE;
+
+    ViscullCallback (iGraphics3D* g3d, csStringID shadertype, 
+      iRenderView* rview);
+    virtual ~ViscullCallback () {}
+
+    void ObjectVisible (iVisibilityObject *visobject, 
+      iMeshWrapper *mesh);
+  };
+
 public:
   SCF_DECLARE_IBASE;
 
@@ -97,6 +113,9 @@ public:
 
   virtual void SetZBufMode (csZBufMode zmode);
   virtual csZBufMode GetZBufMode ();
+
+  inline static void RenderMeshes (iGraphics3D* g3d, iShaderWrapper* shader, 
+    csRenderMesh** meshes, int num);
 };
 
 

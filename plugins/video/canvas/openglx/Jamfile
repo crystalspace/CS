@@ -10,6 +10,7 @@ ExternalLibs glx2d :  GLX ;
 
 Help glx2d : "Crystal Space GL/X 2D driver" ;
 CompileGroups glx2d :  drivers2d ;
+CompileGroups glx2d :  openglcanvas ;
 
 }
 

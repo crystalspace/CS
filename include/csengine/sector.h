@@ -93,99 +93,6 @@ public:
   virtual void FreeItem (iMeshWrapper* item);
 };
 
-#ifdef CS_USE_NEW_RENDERER
-/**
- * A list of render meshes for a sector.
- * This list is sorted by material and renderpriority.
- */
-class csRenderMeshList : public iSectorRenderMeshList
-{
-  // a rendermesh list item
-  //  A mesh wrapper item. Used to store data on a per-MW basis.
-  struct csMWitem
-  {
-    int count;
-
-    // when was visibility checked last?
-    csTicks lastFrame;
-    // for what view?
-    iRenderView* lastView;
-    // potentially visible?
-    bool potvis;
-
-    csMWitem()
-    {
-      count = 0;
-      lastFrame = (csTicks)-1;
-      lastView = 0;
-    }
-  };
-
-  struct csRMLitem
-  {
-    iMeshWrapper* mw;
-    iVisibilityObject* visobj;
-    csRenderMesh* rm;
-    csMWitem* mwi;
-
-    // the renderpriority of this mesh
-    long RP;
-    // the Z value, needed for f2b/b2f sorting
-    float zvalue;
-    // when was the RP stuff updated last?
-    csTicks lastRPupd;
-    // for what view?
-    iRenderView* lastView;
-
-    // needed for csArray
-    //inline bool operator == (const csRMLitem& other);
-  };
-
-  csArray<csRMLitem> rendermeshes;
-  csHashMap mwrappers;
-  csSector* sector;
-  //uint32 currentVisNr;
-  csTicks currentFrame;
-  csArray<bool> checkedRPs;
-  iRenderView* currentView;
-  const csReversibleTransform* camtrans;
-  // the RP currently sorted - this stored here so the 'uninteresting'
-  // items can be skipped quickly.
-  long currentRP;
-  // caching RP sorting
-  csArray<int> RPsorting;
-
-  static int CompareItems (const csRMLitem* a, 
-    const csRMLitem* b);
-  bool FindItem (int& index, csRMLitem* item);
-  
-  void SortRP (int Left, int Right, int order);
-  int SortRPCompare (csRMLitem* a, csRMLitem* b, int order);
-
-  void CheckVisibility (csRMLitem* item);
-  void UpdateZ (csRMLitem* item);
-public:
-  /// Add all rendermeshes of a mesh wrapper.
-  void Add (iMeshWrapper* mw);
-  /// Add all rendermeshes of a mesh wrapper.
-  void Remove (iMeshWrapper* mw);
-  /// Resort all rendermeshes from this mesh wrapper.
-  void Relink (iMeshWrapper* mw);
-
-  void PrepareFrame (iRenderView* rview);
-
-  SCF_DECLARE_IBASE;
-
-  csRenderMeshList(csSector* sector);
-  virtual ~csRenderMeshList ();
-
-  virtual int GetCount ();
-  virtual void Get (int index, 
-    iMeshWrapper*& mw, iVisibilityObject*& visobj, csRenderMesh*& rm,
-    bool* visible);
-};
-#endif
-
 SCF_VERSION (csSector, 0, 0, 2);
 
 /**
@@ -222,7 +129,6 @@ private:
   csRef<iGraphics3D> g3d;
   csRef<iShaderManager> shmgr;
 
-  csRenderMeshList rmeshes;
 #endif
 
   /**
@@ -416,7 +322,6 @@ public:
    * Draw the sector in the given view and with the given transformation.
    */
   void Draw (iRenderView* rview);
-  virtual iSectorRenderMeshList* GetRenderMeshes ();
 
   //----------------------------------------------------------------------
   // Utility Functions
@@ -638,8 +543,6 @@ public:
       { scfParent->Draw (rview); }
     virtual void PrepareDraw (iRenderView* rview)
     { scfParent->PrepareDraw (rview); }
-    virtual iSectorRenderMeshList* GetRenderMeshes ()
-    { return scfParent->GetRenderMeshes (); }
     virtual void SetSectorCallback (iSectorCallback* cb)
     {
       scfParent->SetSectorCallback (cb);

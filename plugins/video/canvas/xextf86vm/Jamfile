@@ -10,6 +10,7 @@ ExternalLibs xext86vm :  XFREE86VM ;
 
 Help xext86vm : "Crystal Space X-Extension Video Mode Plugin" ;
 CompileGroups xext86vm :  drivers2d ;
+CompileGroups xext86vm :  softcanvas ;
 
 }
 

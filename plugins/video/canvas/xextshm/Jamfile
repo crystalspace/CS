@@ -10,6 +10,7 @@ ExternalLibs xextshm :  X11 ;
 
 Help xextshm : "Crystal Space X-Extension Shared Memory Plugin" ;
 CompileGroups xextshm :  drivers2d ;
+CompileGroups xextshm :  softcanvas ;
 
 }
 

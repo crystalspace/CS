@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include <limits.h>
 #include "cssys/csendian.h"
 #include "qint.h"
 #include "thing.h"
@@ -285,7 +286,7 @@ void csThingStatic::PrepareLMLayout ()
 {
   if (lmprepared) return;
 
-  csHash<csStaticPolyGroup*> polysSorted;
+  csHash<csStaticPolyGroup*, iMaterialWrapper*> polysSorted;
 
   int i;
   for (i = 0; i < static_polygons.Length (); i++)
@@ -295,17 +296,14 @@ void csThingStatic::PrepareLMLayout ()
 
     iMaterialWrapper* mat = sp->GetMaterialWrapper ();
 
-    // @@@ Problems w/ 64 bit !!!
-    uint32 hashKey = (uint32)mat;
-    csStaticPolyGroup* lp = polysSorted.Get (hashKey);
-
+    csStaticPolyGroup* lp = polysSorted.Get (mat);
     if (lp == 0)
     {
       lp = new csStaticPolyGroup;
       lp->material = mat;
       lp->numLitPolys = 0;
       lp->totalLumels = 0;
-      polysSorted.Put (hashKey, lp);
+      polysSorted.Put (mat, lp);
     }
 
     csPolyLightMapMapping* lm = sp->GetLightMapMapping ();
@@ -326,7 +324,7 @@ void csThingStatic::PrepareLMLayout ()
    */
   csArray<csStaticPolyGroup*> polys;
   {
-    csHash<csStaticPolyGroup*>::GlobalIterator polyIt = 
+    csHash<csStaticPolyGroup*, iMaterialWrapper*>::GlobalIterator polyIt = 
       polysSorted.GetIterator ();
 
     while (polyIt.HasNext ())
@@ -414,7 +412,7 @@ void csThingStatic::DistributePolyLMs (const csStaticPolyGroup& inputPolys,
   {
     int totalLumels;
     int maxlmw, maxlmh;
-    uint minLMArea;
+    int minLMArea;
   };
 
   // Polys that couldn't be fit onto a SLM are processed again.
@@ -430,7 +428,7 @@ void csThingStatic::DistributePolyLMs (const csStaticPolyGroup& inputPolys,
   inputQueues[0].totalLumels = 0;
   inputQueues[0].maxlmw = 0;
   inputQueues[0].maxlmh = 0;
-  inputQueues[0].minLMArea = (uint)~0;
+  inputQueues[0].minLMArea = INT_MAX;
   inputQueues[1].material = inputPolys.material;
   // Sort polys and filter out oversized polys on the way
   for (i = 0; i < inputPolys.polys.Length(); i++)
@@ -488,7 +486,7 @@ void csThingStatic::DistributePolyLMs (const csStaticPolyGroup& inputPolys,
       inputQueues[curQueue ^ 1].totalLumels = 0;
       inputQueues[curQueue ^ 1].maxlmw = 0;
       inputQueues[curQueue ^ 1].maxlmh = 0;
-      inputQueues[curQueue ^ 1].minLMArea = (uint)~0;
+      inputQueues[curQueue ^ 1].minLMArea = INT_MAX;
 
       while (inputQueues[curQueue].polys.Length () > 0)
       {
@@ -1187,8 +1185,8 @@ void csThingStatic::FillRenderMeshes (
 	csDirtyAccessArray<csRenderMesh*>& rmeshes,
 	const csArray<RepMaterial>& repMaterials)
 {
-  csHashMap material_polys;
-  csHashSet materials;
+  csHash<csPolygon3DStatic*, iMaterialWrapper*> material_polys;
+  csHash<iMaterialWrapper*, iMaterialWrapper*> materials;
 
   int num_verts = 0, num_indices = 0, max_vc = 0;
   int i;
@@ -1197,9 +1195,10 @@ void csThingStatic::FillRenderMeshes (
   {
     csPolygon3DStatic* poly = static_polygons.Get (i);
 
-    materials.Add ((csHashObject)poly->GetMaterialWrapper ());
-    material_polys.Put ((csHashKey)poly->GetMaterialWrapper (),
-      (csHashObject)poly);
+    iMaterialWrapper* mat = poly->GetMaterialWrapper ();
+    if (materials.Get (mat) == 0)
+      materials.Put (mat, mat);
+    material_polys.Put (mat, poly);
 
     int pvc = poly->GetVertexCount ();
 
@@ -1236,10 +1235,11 @@ void csThingStatic::FillRenderMeshes (
 
   int vindex = 0, iindex = 0;
 
-  csGlobalHashIterator matIt (materials.GetHashMap ());
+  csHash<iMaterialWrapper*, iMaterialWrapper*>::GlobalIterator matIt =
+    materials.GetIterator ();
   while (matIt.HasNext ())
   {
-    iMaterialWrapper* mat = (iMaterialWrapper*)matIt.Next ();
+    iMaterialWrapper* mat = matIt.Next ();
 
     csRenderMesh* rm = new csRenderMesh;
 
@@ -1251,17 +1251,19 @@ void csThingStatic::FillRenderMeshes (
 
     rm->indexstart = iindex;
 
-    csHashIterator polyIt  (&material_polys, (csHashKey)mat);
+    csHash<csPolygon3DStatic*, iMaterialWrapper*>::Iterator polyIt =
+      material_polys.GetIterator (mat);
     while (polyIt.HasNext ())
     {
-      csPolygon3DStatic* static_data = (csPolygon3DStatic*)polyIt.Next ();
+      csPolygon3DStatic* static_data = polyIt.Next ();
 
       int* poly_indices = static_data->GetVertexIndices ();
 
       csVector3 polynormal;
       if (!smoothed)
       {
-	// hmm...
+	// hmm... It seems that both polynormal and obj_normals[] need to be inverted.
+	//  Don't know why, just found it out empirical.
 	polynormal = -static_data->GetObjectPlane().Normal();
       }
 
@@ -1284,7 +1286,7 @@ void csThingStatic::FillRenderMeshes (
 	if (smoothed)
 	{
 	  CS_ASSERT (obj_normals != 0);
-	  *normals++ = obj_normals[vidx];
+	  *normals++ = -obj_normals[vidx];
 	}
 	else
 	  *normals++ = polynormal;
@@ -1693,13 +1695,14 @@ void csThing::Prepare ()
 	recognized that it was removed and re-added.
        */
       int i;
-      csHashSet staticPolys;
-      csPolygon3DStatic *ps;
+      csHash<csPolygon3DStatic*, csPolygon3DStatic*> staticPolys;
+      csPolygon3DStatic* ps;
 
       for (i = 0 ; i < static_data->static_polygons.Length () ; i++)
       {
 	ps = static_data->static_polygons.Get (i);
-	staticPolys.Add ((csHashObject)ps);
+	if (staticPolys.Get (ps) == 0)
+	  staticPolys.Add (ps);
       }
 
       i = 0;
@@ -1708,9 +1711,9 @@ void csThing::Prepare ()
       {
 	p = polygons.Get (i);
 	ps = p->GetStaticData ();
-	if (staticPolys.In ((csHashObject)ps))
+	if (staticPolys.Get (ps) != 0)
 	{
-	  staticPolys.Delete ((csHashObject)ps);
+	  staticPolys.Delete (ps);
 	  i++;
 	}
 	else
@@ -1719,12 +1722,14 @@ void csThing::Prepare ()
 	  polygons.DeleteIndex (i);
 	}
       }
-      csGlobalHashIterator spIt (staticPolys.GetHashMap ());
+      
+      csHash<csPolygon3DStatic*, csPolygon3DStatic*>::GlobalIterator spIt =
+        staticPolys.GetIterator ();
 
       while (spIt.HasNext ())
       {
 	p = static_data->thing_type->blk_polygon3d.Alloc ();
-	ps = (csPolygon3DStatic*)spIt.Next ();
+	ps = spIt.Next ();
 	p->SetStaticData (ps);
 	p->SetParent (this);
 	polygons.Push (p);
@@ -2386,6 +2391,11 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
   	clip_z_plane) == false)
     return false;
 
+  if (renderMeshes.Length() == 0)
+  {
+    PrepareRenderMeshes ();
+  }
+
   for (i = 0; i < renderMeshes.Length(); i++)
   {
     csRenderMesh* rm = renderMeshes[i];
@@ -2668,7 +2678,7 @@ void csThing::PrepareLMs ()
   csThingObjectType* thing_type = static_data->thing_type;
   iTextureManager* txtmgr = thing_type->G3D->GetTextureManager ();
 
-  csHash<PolyGroupSLM> superLMs;
+  csHash<PolyGroupSLM, csThingStatic::StaticSuperLM*> superLMs;
 
   int i;
   for (i = 0; i < static_data->litPolys.Length(); i++)
@@ -2676,20 +2686,16 @@ void csThing::PrepareLMs ()
     const csThingStatic::csStaticLitPolyGroup& slpg = 
       *(static_data->litPolys[i]);
 
-    //csPolygon3D
-
     csRef<iSuperLightmap> SLM;
 
-    // @@@ 64-bit portability!
-    uint32 hashKey = (uint32)slpg.staticSLM;
-    PolyGroupSLM pgSLM = superLMs.Get (hashKey);
+    PolyGroupSLM pgSLM = superLMs.Get (slpg.staticSLM);
 
     if (!pgSLM.slmCreated)
     {
       pgSLM.SLM = txtmgr->CreateSuperLightmap (slpg.staticSLM->width, 
         slpg.staticSLM->height);;
       pgSLM.slmCreated = true;
-      superLMs.Put (hashKey, pgSLM);
+      superLMs.Put (slpg.staticSLM, pgSLM);
     }
 
     // SLM creation failed for some reason. The polys will be drawn unlit.

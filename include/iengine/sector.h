@@ -68,34 +68,6 @@ struct iSectorCallback : public iBase
   virtual void Traverse (iSector* sector, iBase* context) = 0;
 };
 
-SCF_VERSION (iSectorRenderMeshList, 0, 0, 1);
-
-/**
- * For NR:
- * A list of rendermeshes in a sector.
- */
-struct iSectorRenderMeshList : public iBase
-{
-  /// Get the number of RMs in this list.
-  virtual int GetCount () = 0;
-  /**
-   * Get an RM in the list.
-   * \param index Which rendermesh to retrieve.
-   * \param mw The mesh wrapper that belongs to this object.
-   * \param visobj The mesh wrapper's visibility object. Returned
-   *  for convenience.
-   * \param rm The actual meshobject.
-   * \param visible Whether the object is potentially visible.
-   *  Note: this is what the mesh object 'believes', not the result
-   *  of a proper visibility culling test.
-   * \remark Sorting according to the renderpriorities is done
-   *  'on the way', it's not needed to call PrioritySort().
-   */
-  virtual void Get (int index, 
-    iMeshWrapper*& mw, iVisibilityObject*& visobj, csRenderMesh*& rm,
-    bool* visible) = 0;
-};
-
 SCF_VERSION (iSector, 0, 5, 2);
 
 /**
@@ -216,8 +188,6 @@ struct iSector : public iBase
    * Must be called before any rendermesh is requested.
    */
   virtual void PrepareDraw (iRenderView* rview) = 0;
-
-  virtual iSectorRenderMeshList* GetRenderMeshes () = 0;
 
   /**
    * Set the sector callback. This will call IncRef() on the callback

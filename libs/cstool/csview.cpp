@@ -24,7 +24,6 @@
 #include "ivideo/graph3d.h"
 #include "cstool/csview.h"
 #include "iengine/camera.h"
-#include "iengine/sector.h"
 #include "iengine/engine.h"
 
 SCF_IMPLEMENT_IBASE (csView)

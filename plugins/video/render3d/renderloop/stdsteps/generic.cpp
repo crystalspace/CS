@@ -29,6 +29,7 @@
 #include "iengine/mesh.h"
 #include "iengine/material.h"
 #include "ivideo/material.h"
+#include "imesh/object.h"
 
 #include "generic.h"
 
@@ -139,11 +140,15 @@ csPtr<iRenderStep> csGenericRenderStepFactory::Create ()
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE(csGenericRenderStep);
-  SCF_IMPLEMENTS_INTERFACE(iRenderStep);
-  SCF_IMPLEMENTS_INTERFACE(iGenericRenderStep);
-  SCF_IMPLEMENTS_INTERFACE(iLightRenderStep);
-SCF_IMPLEMENT_EMBEDDED_IBASE_END;
+SCF_IMPLEMENT_IBASE(csGenericRenderStep)
+  SCF_IMPLEMENTS_INTERFACE(iRenderStep)
+  SCF_IMPLEMENTS_INTERFACE(iGenericRenderStep)
+  SCF_IMPLEMENTS_INTERFACE(iLightRenderStep)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_IBASE(csGenericRenderStep::ViscullCallback)
+  SCF_IMPLEMENTS_INTERFACE(iVisibilityCullerListner)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csGenericRenderStep::csGenericRenderStep (
   iObjectRegistry* object_reg)
@@ -208,57 +213,12 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector)
 
   g3d->SetZMode (zmode);
 
-  iSectorRenderMeshList* meshes = sector->GetRenderMeshes ();
-  int meshnum = meshes->GetCount();
-  CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, meshnum);
-  int numSSM = 0;
-  iShaderWrapper* shader = 0;
-  //iLightList* lights = sector->GetLights();
+  iVisibilityCuller* viscull = sector->GetVisibilityCuller ();
+  // @@@ Don't alloc/dealloc every frame!
+  ViscullCallback* callback = new ViscullCallback (g3d, shadertype, rview);
+  viscull->VisTest (rview, callback);
+  delete callback;
 
-  int i;
-
-  for (i = 0; i < meshnum; i++)
-  {
-    iMeshWrapper* mw;
-    iVisibilityObject* visobj;
-    csRenderMesh* mesh;
-    bool visible;
-    // @@@Objects outside the light's influence radius are 'lit' as well!
-    //if (!meshes->GetVisible (i, mw, visobj, mesh)) break;
-    meshes->Get (i, mw, visobj, mesh, &visible);
-    if (!visible) continue;
-    /*
-    @@@!!! That should of course NOT be necessary,
-    but otherwise there's some corruption (at least w/ genmesh).
-    Seems that it has some side effect we have to find out.
-    */
-    int n;
-    mw->GetRenderMeshes(n);
-
-    if (!mesh) continue;
-
-    mesh->material->Visit(); // @@@ here?
-    iShaderWrapper* meshShader = mesh->material->GetMaterialHandle()->GetShader(shadertype);
-
-    if (meshShader != shader)
-    {
-      // @@@ Need error reporter
-      if (shader != 0)
-      {
-        RenderMeshes (g3d, shader, sameShaderMeshes, numSSM);
-      }
-
-      shader = meshShader;
-      numSSM = 0;
-    }
-    sameShaderMeshes[numSSM++] = mesh;
-  }
-  if (numSSM != 0)
-  {
-    // @@@ Need error reporter
-    if (shader != 0)
-      RenderMeshes (g3d, shader, sameShaderMeshes, numSSM);
-  }
   if (zOffset)
     g3d->DisableZOffset ();
 };
@@ -299,3 +259,56 @@ csZBufMode csGenericRenderStep::GetZBufMode ()
   return zmode;
 }
 
+csGenericRenderStep::ViscullCallback::ViscullCallback (iGraphics3D* g3d, 
+						       csStringID shadertype,
+						       iRenderView* rview)
+{
+  SCF_CONSTRUCT_IBASE(0);
+  ViscullCallback::g3d = g3d;
+  ViscullCallback::shadertype = shadertype;
+  ViscullCallback::rview = rview;
+}
+
+void csGenericRenderStep::ViscullCallback::ObjectVisible (
+  iVisibilityObject *visobject, iMeshWrapper *mesh)
+{
+  if (!mesh->GetMeshObject ()->DrawTest (rview, mesh->GetMovable ())) return;
+
+  int num;
+  csRenderMesh** meshes = mesh->GetRenderMeshes (num);
+  CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, num);
+  int numSSM = 0;
+  iShaderWrapper* shader = 0;
+
+  for (int n = 0; n < num; n++)
+  {
+    csRenderMesh* mesh = meshes[n];
+
+    iShaderWrapper* meshShader = 
+      mesh->material->GetMaterialHandle()->GetShader(shadertype);
+    if (meshShader != shader)
+    {
+      // @@@ Need error reporter
+      if (shader != 0)
+      {
+        csGenericRenderStep::RenderMeshes (g3d, shader, sameShaderMeshes, 
+	  numSSM);
+      }
+
+      shader = meshShader;
+      numSSM = 0;
+    }
+    sameShaderMeshes[numSSM++] = mesh;
+  }
+  if (numSSM != 0)
+  {
+    // @@@ Need error reporter
+    if (shader != 0)
+    {
+      csGenericRenderStep::RenderMeshes (g3d, shader, sameShaderMeshes, 
+        numSSM);
+    }
+  }
+
+  
+}

@@ -132,7 +132,10 @@ public:
   /// Private variable to get the variable without virtual call
   inline csShaderVariable* privateGetVariable (int namehash);
 
-/// Create a shaderprogram
+  /// Report a message.
+  void Report (int severity, const char* msg, ...);
+
+  /// Create a shaderprogram
   virtual csPtr<iShaderProgram> CreateShaderProgram(const char* type);
 
   /// Prepare all created shaders

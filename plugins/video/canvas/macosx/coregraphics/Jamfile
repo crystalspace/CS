@@ -9,6 +9,7 @@ LinkWith cgdriver2d : canvascommon osxcanvascommon cssys csutil ;
 
 Help cgdriver2d : "Crystal Space MacOS/X CoreGraphics 2D driver" ;
 CompileGroups cgdriver2d :  drivers2d ;
+CompileGroups cgdriver2d :  softcanvas ;
 
 }
 
