@@ -62,7 +62,7 @@ public:
   }
 
   virtual csCollisionPair* GetCollisionPairs ();
-  virtual int GetCollisionPairCount ();
+  virtual size_t GetCollisionPairCount ();
   virtual void ResetCollisionPairs ();
 
   virtual void SetOneHitOnly (bool o)

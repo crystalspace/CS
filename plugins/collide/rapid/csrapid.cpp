@@ -80,7 +80,7 @@ csCollisionPair* csRapidCollideSystem::GetCollisionPairs ()
   return csRapidCollider::GetCollisions ();
 }
 
-int csRapidCollideSystem::GetCollisionPairCount ()
+size_t csRapidCollideSystem::GetCollisionPairCount ()
 {
   return csRapidCollider::numHits;
 }
