@@ -1546,6 +1546,7 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
 
   csLightMapped *lmi = GetLightMapInfo ();
   bool rectangle_frust;
+  bool fill_lightmap = true;
 
   // Calculate the new frustum for this polygon.
   if ((GetTextureType () == POLYTXT_LIGHTMAP)
@@ -1567,10 +1568,14 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
     poly = VectorArray.GetArray ();
 
     if (!lmi->tex->GetLightmapBounds (lview, poly))
-      return;
+    {
+      fill_lightmap = false;
+      goto poly_frust;
+    }
   }
   else
   {
+poly_frust:
     rectangle_frust = false;
     num_vertices = GetVertices ().GetNumVertices ();
     if (num_vertices > VectorArray.Limit ())
@@ -1635,7 +1640,8 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
   }
 
   // Update the lightmap given light and shadow frustums in new_lview.
-  FillLightMap (new_lview);
+  if (fill_lightmap)
+    FillLightMap (new_lview);
 
   // If we aren't finished with the new_lview,
   // we should clip it to the actual polygon now
