@@ -2107,6 +2107,7 @@ defaulthalo:
 
 void Cs2Xml::ConvertDir (const char* vfspath, bool backup)
 {
+  if (strstr (vfspath, "/cache/") != NULL) return;
   vfs->PushDir ();
   vfs->ChDir (vfspath);
   csRef<iStrVector> files (vfs->FindFiles ("."));
