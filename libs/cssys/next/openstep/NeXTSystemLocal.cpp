@@ -18,10 +18,11 @@
 //	are shared between MacOS/X Server, OpenStep, and NextStep.
 //
 //-----------------------------------------------------------------------------
-#import "NeXTSystemDriver.h"
-#import "NeXTDelegate.h"
-#import "NeXTMenu.h"
-#import "csutil/inifile.h"
+#include "sysdef.h"
+#include "NeXTSystemDriver.h"
+#include "NeXTDelegate.h"
+#include "NeXTMenu.h"
+#include "csutil/inifile.h"
 extern "Objective-C" {
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSDPSContext.h>

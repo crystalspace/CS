@@ -15,14 +15,14 @@
 //	Generate a menu from an INI file definition.
 //
 //-----------------------------------------------------------------------------
-#import "NeXTMenu.h"
+#include "sysdef.h"
+#include "NeXTMenu.h"
+#include "csutil/inifile.h"
 extern "Objective-C" {
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSMenu.h>
 #import <AppKit/NSMenuItem.h>
 }
-#import "sysdef.h"
-#import "csutil/inifile.h"
 
 static NSMenu* build_menu( char const* section, csIniFile const& );
 

@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -20,9 +20,10 @@
 //	Window events (such as application termination) are also handled.
 //
 //-----------------------------------------------------------------------------
-#import "NeXTDelegate.h"
-#import "NeXTSystemDriver.h"
-#import "csinput/csevent.h"
+#include "sysdef.h"
+#include "NeXTDelegate.h"
+#include "NeXTSystemDriver.h"
+#include "csinput/csevent.h"
 extern "Objective-C" {
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSCursor.h>

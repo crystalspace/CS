@@ -17,7 +17,6 @@
 //	NeXT-specific hardware & operating/system drivers for CrystalSpace.
 //
 //-----------------------------------------------------------------------------
-#include "sysdef.h"
 #include "cssys/system.h"
 #include "csinput/csinput.h"
 #include "NeXTSystemInterface.h"
