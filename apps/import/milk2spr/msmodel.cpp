@@ -21,6 +21,8 @@
 
 #include "cssysdef.h"
 #include "msmodel.h"
+#include "csutil/scfstr.h"
+#include "csutil/xmltiny.h"
 
 
 bool MsModel::IsFileMsModel(const char* msfile)
@@ -772,19 +774,67 @@ bool MsModel::WriteSPR(const char* spritename)
       inv[i] = inv[i].GetInverse();
     }
   }
-  
-  fprintf(f, "LIBRARY \n(\n");
+  csRef<iDocumentSystem> xml (csPtr<iDocumentSystem> (
+    	new csTinyDocumentSystem ()));
+  csRef<iDocument> doc = xml->CreateDocument ();
+  csRef<iDocumentNode> root = doc->CreateRoot ();
+  csRef<iDocumentNode> library = root->CreateNodeBefore (
+    	CS_NODE_ELEMENT, NULL);
+  library->SetValue ("library");
+  //fprintf(f, "LIBRARY \n(\n");
   // begin hard work now
-  fprintf(f, "TEXTURES (\n");
-  fprintf(f, "  TEXTURE '%s' ( FILE(/lib/std/%s))\n",material,materialFile);
-  fprintf(f, ")\n");
-  fprintf(f, "MATERIALS (\n");
-  fprintf(f, "  MATERIAL '%s' ( TEXTURE('%s'))\n",material,material);
-  fprintf(f, ")\n");
-  fprintf(f, "MESHFACT '%s' \n(\n", spritename);
-  fprintf(f, "  PLUGIN ('crystalspace.mesh.loader.factory.sprite.3d')\n");
-  fprintf(f, "  PARAMS \n  (\n");
-  fprintf(f, "    MATERIAL ('%s')\n", material);
+  csRef<iDocumentNode> textures;
+  textures = library->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  textures->SetValue ("textures");
+  csRef<iDocumentNode> texture;
+  texture = textures->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  texture->SetValue ("texture");
+  texture->SetAttribute("name",material);
+  csRef<iDocumentNode> file;
+  file = texture->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  file->SetValue ("file");
+  csRef<iDocumentNode> text;
+  text = file->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text->SetValue (materialFile);
+  //fprintf(f, "TEXTURES (\n");
+  //fprintf(f, "  TEXTURE '%s' ( FILE(/lib/std/%s))\n",material,materialFile);
+  //fprintf(f, ")\n");
+  
+  csRef<iDocumentNode> materials;
+  materials = library->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  materials->SetValue ("materials");
+  csRef<iDocumentNode> materialnode;
+  materialnode = materials->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  materialnode->SetValue ("material");
+  materialnode->SetAttribute("name",material);
+  texture = materialnode->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  texture->SetValue ("texture");
+  text = texture->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text->SetValue (material);
+  //fprintf(f, "MATERIALS (\n");
+  //fprintf(f, "  MATERIAL '%s' ( TEXTURE('%s'))\n",material,material);
+  //fprintf(f, ")\n");
+  
+  csRef<iDocumentNode> meshfact;
+  meshfact = library->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  meshfact->SetValue ("meshfact");
+  meshfact->SetAttribute("name",spritename);
+  csRef<iDocumentNode> plugin;
+  plugin = meshfact->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  plugin->SetValue ("plugin");
+  text = plugin->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text->SetValue ("crystalspace.mesh.loader.factory.sprite.3d");
+  csRef<iDocumentNode> params;
+  params = meshfact->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  params->SetValue ("params");
+  materialnode = params->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  materialnode->SetValue ("material");
+  text = materialnode->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text->SetValue (material);
+  //fprintf(f, "MESHFACT '%s' \n(\n", spritename);
+  //fprintf(f, "  PLUGIN ('crystalspace.mesh.loader.factory.sprite.3d')\n");
+  //fprintf(f, "  PARAMS \n  (\n");
+  //fprintf(f, "    MATERIAL ('%s')\n", material);
   
   if(frames!=NULL)
   {
@@ -793,7 +843,11 @@ bool MsModel::WriteSPR(const char* spritename)
     {
       if(frames[i]!=NULL)
       {
-        fprintf(f, "    FRAME '%d' \n    (\n", i);
+        csRef<iDocumentNode> frame;
+        frame = params->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+        frame->SetValue ("frame");
+        frame->SetAttributeAsInt("name",i);
+        //fprintf(f, "    FRAME '%d' \n    (\n", i);
         struct Frame* currentFrame = frames[i];
         while(currentFrame!=NULL)
         {
@@ -801,19 +855,30 @@ bool MsModel::WriteSPR(const char* spritename)
           {
             currentFrame->vertex->position = inv[currentFrame->vertex->boneIndex]*currentFrame->vertex->position;
           }
-          fprintf(f, "      V (%f,%f,%f:%f,%f)\n", currentFrame->vertex->position.x, 
-                                                   currentFrame->vertex->position.y, 
-                                                   currentFrame->vertex->position.z, 
-                                                   currentFrame->vertex->u, 
-                                                   currentFrame->vertex->v);
+          csRef<iDocumentNode> v;
+          v = frame->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+          v->SetValue ("v");
+          v->SetAttributeAsFloat("x",currentFrame->vertex->position.x);
+          v->SetAttributeAsFloat("y",currentFrame->vertex->position.y);
+          v->SetAttributeAsFloat("z",currentFrame->vertex->position.z);
+          v->SetAttributeAsFloat("u",currentFrame->vertex->u);
+          v->SetAttributeAsFloat("v",currentFrame->vertex->v);
+          //fprintf(f, "      V (%f,%f,%f:%f,%f)\n", currentFrame->vertex->position.x, 
+          //                                         currentFrame->vertex->position.y, 
+          //                                         currentFrame->vertex->position.z, 
+          //                                         currentFrame->vertex->u, 
+          //                                         currentFrame->vertex->v);
           currentFrame = currentFrame->frame;
         }
-        fprintf(f, "    )\n");
+        //fprintf(f, "    )\n");
       }
     }
   }
-  
-  fprintf(f, "    ACTION 'default' (");  
+  csRef<iDocumentNode> action;
+  action = params->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  action->SetValue ("action");
+  action->SetAttribute("name","default");
+  //fprintf(f, "    ACTION 'default' (");  
   if(frames!=NULL)
   {
     int i;
@@ -821,47 +886,87 @@ bool MsModel::WriteSPR(const char* spritename)
     {
       if(frames[i]!=NULL)
       {
-        fprintf(f, "F('%d',%d) ",i,(int)(frameDuration*1000.0));
+        csRef<iDocumentNode> f;
+        f = action->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+        f->SetValue ("f");
+        f->SetAttributeAsInt("name",i);
+        f->SetAttributeAsInt("delay",(int)(frameDuration*1000.0));
+        //fprintf(f, "F('%d',%d) ",i,(int)(frameDuration*1000.0));
       }
     }
   }
-  fprintf(f, " )\n");
+  //fprintf(f, " )\n");
   
   struct TriangleList* currentTri = triangleList;
   while(currentTri !=NULL)
   {
-    fprintf(f, "    TRIANGLE (%ld,%ld,%ld)\n",currentTri->triangle->index1, 
-                                              currentTri->triangle->index2, 
-                                              currentTri->triangle->index3);
+    csRef<iDocumentNode> t;
+    t = params->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    t->SetValue ("t");
+    t->SetAttributeAsInt("v1",currentTri->triangle->index1);
+    t->SetAttributeAsInt("v2",currentTri->triangle->index2);
+    t->SetAttributeAsInt("v3",currentTri->triangle->index3);
+    //fprintf(f, "    TRIANGLE (%ld,%ld,%ld)\n",currentTri->triangle->index1, 
+    //                                          currentTri->triangle->index2, 
+    //                                          currentTri->triangle->index3);
     currentTri = currentTri ->triangleList;
   }
   
 
   if(nbJoints>0)
   {
-    fprintf(f,"    SKELETON 'skeleton' ( \n");
+    csRef<iDocumentNode> skeleton;
+    skeleton = params->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    skeleton->SetValue ("skeleton");
+    skeleton->SetAttribute("name","skeleton");
+    //fprintf(f,"    SKELETON 'skeleton' ( \n");
     int i;
     for(i = 0;i<nbJoints;i++)
     {
       //find out if it's a root joint.
       if(joints[i]->parent==-1)
       {
-        printJoint(joints[i],f);
+        printJoint(joints[i],skeleton);
       }
     }
-    fprintf(f,"    )\n");
+    //fprintf(f,"    )\n");
   }
 
-  fprintf(f, "  )\n)\n");
+  //fprintf(f, "  )\n)\n");
   
   //loading the motions.
   if(nbJoints > 0 )
   {
-    fprintf(f, "ADDON (\n");
-    fprintf(f, "  PLUGIN ('crystalspace.motion.loader.default')\n");
-    fprintf(f, "  PARAMS (\n");
-    fprintf(f, "    MOTION 'default' (\n");  
-    fprintf(f, "      DURATION '%f' ( LOOP() )\n",((float)nbFrames)*frameDuration); 
+    csRef<iDocumentNode> addon;
+    addon = library->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    addon->SetValue ("addon");
+    plugin = addon->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    plugin->SetValue ("plugin");
+    text = plugin->CreateNodeBefore (CS_NODE_TEXT, NULL);
+    text->SetValue ("crystalspace.motion.loader.default");
+    params = addon->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    params->SetValue ("params");
+    csRef<iDocumentNode> motion;
+    motion = params->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    motion->SetValue ("motion");
+    motion->SetAttribute("name","default");
+    csRef<iDocumentNode> duration;
+    duration = motion->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    duration->SetValue ("duration");
+    csRef<iDocumentNode> time;
+    time = duration->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    time->SetValue ("time");
+    text = time->CreateNodeBefore (CS_NODE_TEXT, NULL);
+    text->SetValueAsFloat ( ((float)nbFrames)*frameDuration);
+    csRef<iDocumentNode> loop;
+    loop = duration->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+    loop->SetValue ("loop");
+    //fprintf(f, "ADDON (\n");
+    //fprintf(f, "  PLUGIN ('crystalspace.motion.loader.default')\n");
+    //fprintf(f, "  PARAMS (\n");
+    //fprintf(f, "    MOTION 'default' (\n");  
+    //fprintf(f, "      DURATION '%f' ( LOOP() )\n",((float)nbFrames)*frameDuration); 
+   
     int i, j, k;
     for(i = 0; i < nbJoints;i++)
     {
@@ -872,7 +977,11 @@ bool MsModel::WriteSPR(const char* spritename)
         bool* rotUsed = new bool[joints[i]->nbRotationKeys];
         for(k = 0;k < joints[i]->nbRotationKeys;k++) rotUsed[k] = false;
         
-        fprintf(f, "      BONE '%s' (\n",joints[i]->name); 
+        csRef<iDocumentNode> bone;
+        bone = motion->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+        bone->SetValue ("bone");
+        bone->SetAttribute("name",joints[i]->name);
+        //fprintf(f, "      BONE '%s' (\n",joints[i]->name); 
         for(j = 0;j < joints[i]->nbPositionKeys;j++)
         {
           bool found = false;
@@ -886,15 +995,39 @@ bool MsModel::WriteSPR(const char* spritename)
               csReversibleTransform transy = orig[i]*csReversibleTransform(matrixy,-matrixy.GetInverse()*joints[i]->positionKeys[j].data);
               csQuaternion qy = csQuaternion(transy.GetO2T());
               csVector3 vy = - transy.GetO2T() * transy.GetO2TTranslation();
-              fprintf(f, "        FRAME '%f' ( POS(%f,%f,%f) ROT(Q(%f,%f,%f,%f)))\n",
-                      joints[i]->positionKeys[j].time*frameDuration, 
-                      vy.x,
-                      vy.y,
-                      vy.z,
-                      qy.x,
-                      qy.y,
-                      qy.z,
-                      qy.r);
+              
+              csRef<iDocumentNode> frame;
+              frame = bone->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+              frame->SetValue ("frame");
+              time = frame->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+              time->SetValue ("time");
+              text = time->CreateNodeBefore (CS_NODE_TEXT, NULL);
+              text->SetValueAsFloat (joints[i]->positionKeys[j].time*frameDuration);
+              csRef<iDocumentNode> pos;
+              pos = frame->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+              pos->SetValue ("pos");
+              pos->SetAttributeAsFloat("x",vy.x);
+              pos->SetAttributeAsFloat("y",vy.y);
+              pos->SetAttributeAsFloat("z",vy.z);
+              csRef<iDocumentNode> rot;
+              rot = frame->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+              rot->SetValue ("rot");
+              csRef<iDocumentNode> q;
+              q = rot->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+              q->SetValue ("q");
+              q->SetAttributeAsFloat("x",qy.x);
+              q->SetAttributeAsFloat("y",qy.y);
+              q->SetAttributeAsFloat("z",qy.z);
+              q->SetAttributeAsFloat("r",qy.r);
+              //fprintf(f, "        FRAME '%f' ( POS(%f,%f,%f) ROT(Q(%f,%f,%f,%f)))\n",
+              //        joints[i]->positionKeys[j].time*frameDuration, 
+              //        vy.x,
+              //        vy.y,
+              //        vy.z,
+              //        qy.x,
+              //        qy.y,
+              //        qy.z,
+              //        qy.r);
               rotUsed[k]=true;
               found = true;
               break; //There can only match 1
@@ -902,11 +1035,24 @@ bool MsModel::WriteSPR(const char* spritename)
           }
           if(!found)
           {
-            fprintf(f, "        FRAME '%f' ( POS(%f,%f,%f))\n",
-                    joints[i]->positionKeys[j].time*frameDuration, 
-                    joints[i]->positionKeys[j].data.x,
-                    joints[i]->positionKeys[j].data.y,
-                    joints[i]->positionKeys[j].data.z);
+            csRef<iDocumentNode> frame;
+            frame = bone->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+            frame->SetValue ("frame");
+            time = frame->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+            time->SetValue ("time");
+            text = time->CreateNodeBefore (CS_NODE_TEXT, NULL);
+            text->SetValueAsFloat (joints[i]->positionKeys[j].time*frameDuration);
+            csRef<iDocumentNode> pos;
+            pos = frame->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+            pos->SetValue ("pos");
+            pos->SetAttributeAsFloat("x",joints[i]->positionKeys[j].data.x);
+            pos->SetAttributeAsFloat("y",joints[i]->positionKeys[j].data.y);
+            pos->SetAttributeAsFloat("z",joints[i]->positionKeys[j].data.z);
+            //fprintf(f, "        FRAME '%f' ( POS(%f,%f,%f))\n",
+            //        joints[i]->positionKeys[j].time*frameDuration, 
+            //        joints[i]->positionKeys[j].data.x,
+            //        joints[i]->positionKeys[j].data.y,
+            //        joints[i]->positionKeys[j].data.z);
           }
         }
         for(k = 0;k < joints[i]->nbRotationKeys;k++)
@@ -917,32 +1063,57 @@ bool MsModel::WriteSPR(const char* spritename)
                                   csYRotMatrix3(-joints[i]->rotationKeys[k].data.y) * 
                                   csXRotMatrix3(joints[i]->rotationKeys[k].data.x);
             csQuaternion qy = csQuaternion(matrixy);
-            fprintf(f, "        FRAME '%f' ( ROT(Q(%f,%f,%f,%f)))\n",
-                    joints[i]->rotationKeys[k].time*frameDuration, 
-                    qy.x,
-                    qy.y,
-                    qy.z,
-                    qy.r);
+            
+            csRef<iDocumentNode> frame;
+            frame = bone->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+            frame->SetValue ("frame");
+            time = frame->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+            time->SetValue ("time");
+            text = time->CreateNodeBefore (CS_NODE_TEXT, NULL);
+            text->SetValueAsFloat (joints[i]->rotationKeys[j].time*frameDuration);
+            csRef<iDocumentNode> rot;
+            rot = frame->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+            rot->SetValue ("rot");
+            csRef<iDocumentNode> q;
+            q = rot->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+            q->SetValue ("q");
+            q->SetAttributeAsFloat("x",qy.x);
+            q->SetAttributeAsFloat("y",qy.y);
+            q->SetAttributeAsFloat("z",qy.z);
+            q->SetAttributeAsFloat("r",qy.r);
+            //fprintf(f, "        FRAME '%f' ( ROT(Q(%f,%f,%f,%f)))\n",
+            //        joints[i]->rotationKeys[k].time*frameDuration, 
+            //        qy.x,
+            //        qy.y,
+            //        qy.z,
+            //        qy.r);
           }
         }
-        fprintf(f, "      )\n");
+        //fprintf(f, "      )\n");
       } 
     }
-    fprintf(f, "    )\n");
-    fprintf(f, "  )\n");
-    fprintf(f, ")\n");
+    //fprintf(f, "    )\n");
+    //fprintf(f, "  )\n");
+    //fprintf(f, ")\n");
   }
   
-  fprintf(f, ")\n");
+  //fprintf(f, ")\n");
+  iString* string = new scfString();
+  doc->Write(string);
+  fprintf(f,string->GetData());
   fclose(f);
   return true;
 }
 
-void MsModel::printJoint(struct Joint* joint,FILE* f)
+void MsModel::printJoint(struct Joint* joint,csRef<iDocumentNode> parent)
 {
-  fprintf(f, "      LIMB '%s' ( \n" , joint->name);
+  csRef<iDocumentNode> child;
+  child = parent->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  child->SetValue("limb");
+  child->SetAttribute("name",joint->name);
+  //fprintf(f, "      LIMB '%s' ( \n" , joint->name);
   
-  bool vertices=false;
+  //bool vertices=false;
   if(frames!=NULL)
   {
     int i;
@@ -956,15 +1127,21 @@ void MsModel::printJoint(struct Joint* joint,FILE* f)
         {
           if(currentFrame->vertex->boneIndex == joint->index)
           {
-            if(!vertices)
-            {
-               fprintf(f, "        VERTICES(%ld",vertexCount);
-            }
-            else
-            {
-               fprintf(f, "\n          ,%ld",vertexCount);
-            }
-            vertices = true;
+            csRef<iDocumentNode> v;
+            v = child->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+            v->SetValue("v");
+            csRef<iDocumentNode> text;
+            text = v->CreateNodeBefore (CS_NODE_TEXT, NULL);
+            text->SetValueAsInt (vertexCount);
+            //if(!vertices)
+            //{
+            //   fprintf(f, "        VERTICES(%ld",vertexCount);
+            //}
+            //else
+            //{
+            //   fprintf(f, "\n          ,%ld",vertexCount);
+            //}
+            //vertices = true;
           }
           currentFrame = currentFrame->frame;
           vertexCount++;
@@ -976,26 +1153,86 @@ void MsModel::printJoint(struct Joint* joint,FILE* f)
       }
     }
   }
-  if(vertices)
-  {
-    fprintf(f, ")\n");
-  }
+  //if(vertices)
+  //{
+  //  fprintf(f, ")\n");
+  //}
+  csRef<iDocumentNode> transform;
+  transform = child->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  transform->SetValue("transform");
   
-  fprintf(f, "        TRANSFORM( MATRIX( %f, %f, %f, %f, %f, %f, %f, %f, %f ) ",
-          joint->transform->matrix.m11, joint->transform->matrix.m12, joint->transform->matrix.m13, 
-          joint->transform->matrix.m21, joint->transform->matrix.m22, joint->transform->matrix.m23, 
-          joint->transform->matrix.m31, joint->transform->matrix.m32, joint->transform->matrix.m33);
-
-  fprintf(f, "V( %f, %f, %f  )" ,         
-          joint->transform->move.x, joint->transform->move.y, joint->transform->move.z);
-  fprintf(f, " )\n");
+  csRef<iDocumentNode> matrix;
+  matrix = transform->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  matrix->SetValue("matrix");
+  
+  csRef<iDocumentNode> mxx;
+  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  mxx->SetValue("m11");
+  csRef<iDocumentNode> text;
+  text = mxx->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text->SetValueAsFloat (joint->transform->matrix.m11);
+  
+  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  mxx->SetValue("m12");
+  text = mxx->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text->SetValueAsFloat (joint->transform->matrix.m12);
+  
+  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  mxx->SetValue("m13");
+  text = mxx->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text->SetValueAsFloat (joint->transform->matrix.m13);
+  
+  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  mxx->SetValue("m21");
+  text = mxx->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text->SetValueAsFloat (joint->transform->matrix.m21);
+  
+  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  mxx->SetValue("m22");
+  text = mxx->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text->SetValueAsFloat (joint->transform->matrix.m22);
+  
+  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  mxx->SetValue("m23");
+  text = mxx->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text->SetValueAsFloat (joint->transform->matrix.m23);
+  
+  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  mxx->SetValue("m31");
+  text = mxx->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text->SetValueAsFloat (joint->transform->matrix.m31);
+  
+  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  mxx->SetValue("m32");
+  text = mxx->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text->SetValueAsFloat (joint->transform->matrix.m32);
+  
+  mxx = matrix->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  mxx->SetValue("m33");
+  text = mxx->CreateNodeBefore (CS_NODE_TEXT, NULL);
+  text->SetValueAsFloat (joint->transform->matrix.m33);
+  
+  csRef<iDocumentNode> v;
+  v = transform->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+  v->SetValue("v");
+  v->SetAttributeAsFloat("x",joint->transform->move.x);
+  v->SetAttributeAsFloat("y",joint->transform->move.y);
+  v->SetAttributeAsFloat("z",joint->transform->move.z);
+  
+  //fprintf(f, "        TRANSFORM( MATRIX( %f, %f, %f, %f, %f, %f, %f, %f, %f ) ",
+  //        joint->transform->matrix.m11, joint->transform->matrix.m12, joint->transform->matrix.m13, 
+  //        joint->transform->matrix.m21, joint->transform->matrix.m22, joint->transform->matrix.m23, 
+  //        joint->transform->matrix.m31, joint->transform->matrix.m32, joint->transform->matrix.m33);
+  //fprintf(f, "V( %f, %f, %f  )" ,         
+  //        joint->transform->move.x, joint->transform->move.y, joint->transform->move.z);
+  //fprintf(f, " )\n");
   int i;
   for(i=0;joint->children[i]!=-1;i++)
   {
-    printJoint(joints[joint->children[i]],f);
+    printJoint(joints[joint->children[i]],child);
   }
   
-  fprintf(f, "      )\n");
+  //fprintf(f, "      )\n");
 }
 
 void MsModel::transform(csReversibleTransform* trans, int boneIndex,int parent)
@@ -1009,45 +1246,4 @@ void MsModel::transform(csReversibleTransform* trans, int boneIndex,int parent)
   {
     transform(trans,joints[joints[boneIndex]->children[i]]->index,boneIndex);
   }
-}
-
-void AngleMatrix (const csVector3 angles, csMatrix3* matrix )
-{
-  float angle;
-  float sr, sp, sy, cr, cp, cy;
-  
-  angle = angles[2];
-  sy = sin(angle);
-  cy = cos(angle);
-  angle = angles[1];
-  sp = sin(angle);
-  cp = cos(angle);
-  angle = angles[0];
-  sr = sin(angle);
-  cr = cos(angle);
-  
-  // matrix = (Z * Y) * X
-  /**matrix[0][0] = cp*cy;
-  *matrix[1][0] = cp*sy;
-  *matrix[2][0] = -sp;
-  *matrix[0][1] = sr*sp*cy+cr*-sy;
-  *matrix[1][1] = sr*sp*sy+cr*cy;
-  *matrix[2][1] = sr*cp;
-  *matrix[0][2] = (cr*sp*cy+-sr*-sy);
-  *matrix[1][2] = (cr*sp*sy+-sr*cy);
-  *matrix[2][2] = cr*cp;
-  *matrix[0][3] = 0.0;
-  *matrix[1][3] = 0.0;
-  *matrix[2][3] = 0.0;*/
-  matrix->Set(
-  cp*cy,
-  cp*sy,
-  -sp,
-  sr*sp*cy+cr*-sy,
-  sr*sp*sy+cr*cy,
-  sr*cp,
-  (cr*sp*cy+-sr*-sy),
-  (cr*sp*sy+-sr*cy),
-  cr*cp
-  );
 }

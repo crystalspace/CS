@@ -19,6 +19,7 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+
 #ifndef __MSMODEL_H__
 #define __MSMODEL_H__
 
@@ -32,6 +33,9 @@
 #define FRAME_DURATION_DEFAULT  1.0
 
 typedef double scalar_t;       // Scalar value,
+
+struct iDocumentNode;
+
 
 struct Vertex              // Vertex
 {
@@ -131,7 +135,7 @@ private:
   
   float frameDuration;
   
-  void printJoint(struct Joint* joint, FILE* f);
+  void printJoint(struct Joint* joint, csRef<iDocumentNode> parent);
   void transform(csReversibleTransform* trans, int boneIndex,int parent);
   
 protected:
