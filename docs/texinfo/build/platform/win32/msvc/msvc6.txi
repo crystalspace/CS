@@ -27,21 +27,21 @@ stated are not required.  However, if you choose not to install them, at
 compile time you must follow the documented instructions of how to unload these
 projects from the Crystal Space build process.
 
-@subsubheading Winlibs - Required
+@subsubheading msvc_libs - Required
 
 Before you attempt to compile Crystal Space, you must download
-and install @file{winlibs}.  Winlibs is a package containing all
+and install @file{winlibs}.  msvc_libs is a package containing all
 third party header, pre-built library and dll files used by Crystal
 Space, i.e. @file{zlib.dll}, @file{libjpeg.dll}, @file{png.dll} and
-@file{xmlparse.dll}.  The latest version of the winlibs package
-@file{winlibs0.19h.zip} can be downloaded from:
+@file{xmlparse.dll}.  The latest version of the msvc_libs package
+@file{msvc_libs_0.19.zip} can be downloaded from:
 
 @noindent
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/winlibs0.19h.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc_libs_0.19.zip}
 or
-@uref{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/winlibs0.19h.zip}
+@uref{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/msvc_libs_0.19.zip}
 
-Once you have downloaded the winlbs package, extract it too your @file{CS\}
+Once you have downloaded the msvc_libs package, extract it too your @file{CS\}
 root directory.
 
 @subsubheading OpenGL
