@@ -35,7 +35,7 @@
 #include "iutil/document.h"
 #include "ivideo/rendermesh.h"
 
-#define SHADOW_CULL 1
+//#define SHADOW_CULL 1
 
 #include "stencil.h"
 
