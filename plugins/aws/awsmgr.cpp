@@ -238,7 +238,8 @@ awsManager::Print(iGraphics3D *g3d)
 {
   if (updatestore_dirty)
   {
-   g3d->DrawPixmap(canvas.GetTextureWrapper()->GetTextureHandle(), 
+  
+    g3d->DrawPixmap(canvas.GetTextureWrapper()->GetTextureHandle(), 
   		  0,0,512,480,//g3d->GetWidth(), g3d->GetHeight(),
 		  0,0,512,480,0);
 
@@ -259,15 +260,30 @@ awsManager::Print(iGraphics3D *g3d)
   else
   {
     int i;
+    iGraphics2D *g2d = g3d->GetDriver2D();
+
     for(i=0; i<updatestore.Count(); ++i)
     {
 
       csRect r(updatestore.RectAt(i));
 
       g3d->DrawPixmap(canvas.GetTextureWrapper()->GetTextureHandle(), 
-  		  r.xmin,r.ymin,r.xmax,r.ymax,
+      		  r.xmin,r.ymin,r.xmax,r.ymax,
 		  r.xmin,r.ymin,r.xmax,r.ymax,
                   0);
+
+    }
+
+    // Debug code
+    for(i=0; i<updatestore.Count(); ++i)
+    {
+
+      csRect r(updatestore.RectAt(i));
+     
+      g2d->DrawLine(r.xmin, r.ymin, r.xmax, r.ymin, GetPrefMgr()->GetColor(AC_WHITE));
+      g2d->DrawLine(r.xmin, r.ymin, r.xmin, r.ymax, GetPrefMgr()->GetColor(AC_WHITE));
+      g2d->DrawLine(r.xmin, r.ymax, r.xmax, r.ymax, GetPrefMgr()->GetColor(AC_WHITE));
+      g2d->DrawLine(r.xmax, r.ymin, r.xmax, r.ymax, GetPrefMgr()->GetColor(AC_WHITE));
 
     }
   }
@@ -284,7 +300,7 @@ awsManager::Redraw()
    
    ptG3D->BeginDraw(CSDRAW_2DGRAPHICS);
    
-   ptG2D->SetClipRect(0,0,512,512);
+   //ptG2D->SetClipRect(0,0,512,512);
 
    if (redraw_tag%2) ptG2D->DrawBox( 0,  0,25, 25, GetPrefMgr()->GetColor(AC_SHADOW));
    else              ptG2D->DrawBox( 0,  0,25, 25, GetPrefMgr()->GetColor(AC_HIGHLIGHT));
@@ -381,7 +397,7 @@ awsManager::RedrawWindow(awsWindow *win, csRect &dirtyarea)
 
      /// Clip the window to it's intersection with the dirty rectangle
      clip.Intersect(dirtyarea);
-     ptG2D->SetClipRect(clip.xmin, clip.ymin, clip.xmax, clip.ymax);
+     //ptG2D->SetClipRect(clip.xmin, clip.ymin, clip.xmax, clip.ymax);
 
      /// Tell the window to draw
      win->OnDraw(clip);
@@ -403,7 +419,7 @@ awsManager::RecursiveDrawChildren(awsComponent *cmp, csRect &dirtyarea)
 
      csRect clip(child->Frame());
      clip.Intersect(dirtyarea);
-     ptG2D->SetClipRect(clip.xmin, clip.ymin, clip.xmax, clip.ymax);
+     //ptG2D->SetClipRect(clip.xmin, clip.ymin, clip.xmax, clip.ymax);
 
      // Draw the child
      child->OnDraw(clip);
@@ -523,7 +539,7 @@ awsManager::HandleEvent(iEvent& Event)
           // If the window contains the mouse, it becomes new top.
           if (win->Frame().Contains(Event.Mouse.x, Event.Mouse.y))
           {
-            win->Raise();
+            //win->Raise();
             return win->HandleEvent(Event);
           }
           else

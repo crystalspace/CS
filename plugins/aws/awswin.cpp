@@ -37,7 +37,8 @@ SCF_IMPLEMENT_IBASE_END
 
 awsWindow::awsWindow():above(NULL), below(NULL), 
   frame_style(fsNormal), 
-  frame_options(foControl | foZoom | foMin | foClose | foTitle | foGrip | foRoundBorder)
+  frame_options(foControl | foZoom | foMin | foClose | foTitle | foGrip | foRoundBorder),
+  resizing_mode(false), moving_mode(false)
 {
 
 }
@@ -282,16 +283,6 @@ awsWindow::OnMouseMove(int button, int x, int y)
         //printf("aws-debug: deltas for move: %d, %d\n", delta_x, delta_y);
 
     csRect dirty2(Frame());
-
-    /*dirty2.xmin-=-1;
-    dirty2.ymin-=-1;
-    dirty2.xmax+=-1;
-    dirty2.ymax+=-1;
-
-    dirty1.xmin-=-1;
-    dirty1.ymin-=-1;
-    dirty1.xmax+=-1;
-    dirty1.ymax+=-1;*/
 
     // Mark changed pos
     WindowManager()->Mark(dirty1);
