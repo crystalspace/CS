@@ -65,7 +65,7 @@
 # Everything.
 MSVC.WORKSPACES += ALL
 MSVC.WORKSPACE.ALL.NAME = all
-MSVC.WORKSPACE.ALL.REJECT = grp.+-(?!all\.)
+MSVC.WORKSPACE.ALL.REJECT = grp.+_(?!all\.)
 
 # What the typical user will need. Presently, everything but the new renderer.
 MSVC.WORKSPACES += TYPICAL
@@ -76,7 +76,7 @@ MSVC.WORKSPACE.TYPICAL.REJECT = \
   glshader_arb \
   glshader_cg \
   glshader_fixed \
-  grp.+-(?!typical\.) \
+  grp.+_(?!typical\.) \
   shadermgr \
   softrender3d \
   softshader \
@@ -88,7 +88,7 @@ MSVC.WORKSPACE.TYPICAL.REJECT = \
 MSVC.WORKSPACES += NEWRENDERER
 MSVC.WORKSPACE.NEWRENDERER.NAME = newrenderer
 MSVC.WORKSPACE.NEWRENDERER.REJECT = \
-  grp.+-(?!newrenderer\.) \
+  grp.+_(?!newrenderer\.) \
   gl3d \
   soft3d
 
@@ -97,7 +97,7 @@ MSVC.WORKSPACES += WALKALL
 MSVC.WORKSPACE.WALKALL.NAME = walkall
 MSVC.WORKSPACE.WALKALL.ACCEPT = \
   appwalktest \
-  grp.+-walkall\. \
+  grp.+_walkall\. \
   libcsgeom \
   libcsgfx \
   libcstool \
