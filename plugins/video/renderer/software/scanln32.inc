@@ -52,7 +52,7 @@ void Scan32::SCANFUNC (int xx, unsigned char* d,
   unsigned long shifter_h = Scan::shf_h;
   unsigned long ander_w = Scan::and_w;
   unsigned long ander_h = Scan::and_h;
-  unsigned char* srcTex = Scan::tmap;
+  ULong* srcTex = (ULong*)Scan::tmap;
 # endif /*SCANMAP*/
   unsigned long *z_buffer = z_buf; (void)z_buffer;
   unsigned long *lastZbuf = z_buffer + xx-1; (void)lastZbuf;
