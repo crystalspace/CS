@@ -27,6 +27,8 @@
 #include "cssys/djgpp/doshelp.h"
 
 class SysSystemDriver;
+struct iObjectRegistry;
+struct iEvent;
 
 /**
  * Implementation class for iDosHelper.
@@ -49,10 +51,10 @@ public:
 class SysSystemDriver : public csSystemDriver, public iEventPlug
 {
 public:
-  SysSystemDriver ();
+  SysSystemDriver (iObjectRegistry* object_reg);
   virtual ~SysSystemDriver ();
 
-  virtual void NextFrame ();
+  virtual bool HandleEvent (iEvent& ev);
 
   /// Open the system
   virtual bool Open ();

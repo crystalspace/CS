@@ -16,38 +16,37 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_OBJREG_H__
-#define __CS_OBJREG_H__
-
 #include <stdarg.h>
 #include <stdio.h>
-#include "csutil/scf.h"
-#include "iutil/objreg.h"
-#include "csutil/csvector.h"
+#include <stdlib.h>
 
-/**
- * This is an implementation of iObjectRegistry.
- */
-class csObjectRegistry : public iObjectRegistry
+#include "cssysdef.h"
+#include "cssys/system.h"
+#include "csutil/virtclk.h"
+#include "iutil/virtclk.h"
+
+SCF_IMPLEMENT_IBASE (csVirtualClock)
+  SCF_IMPLEMENTS_INTERFACE (iVirtualClock)
+SCF_IMPLEMENT_IBASE_END
+
+csVirtualClock::csVirtualClock ()
 {
-private:
-  csVector registry;
-  csVector tags;
-  // True when this object is being cleared; prevents external changes.
-  bool clearing;
+  SCF_CONSTRUCT_IBASE (NULL);
+  CurrentTime = csTicks (-1);
+  ElapsedTime = csTicks (0);
+}
 
-public:
-  csObjectRegistry ();
-  /// Client must explicitly call Clear().
-  virtual ~csObjectRegistry () {}
+csVirtualClock::~csVirtualClock ()
+{
+}
 
-  SCF_DECLARE_IBASE;
-  virtual void Clear ();
-  virtual bool Register (iBase* obj, char const* tag = NULL);
-  virtual void Unregister (iBase* obj, char const* tag = NULL);
-  virtual iBase* Get (char const* tag);
-  virtual iBase* Get (scfInterfaceID id, int version);
-};
-
-#endif // __CS_OBJREG_H__
+void csVirtualClock::Advance ()
+{
+  csTicks last = CurrentTime;
+  CurrentTime = csGetTicks ();
+  if (last == csTicks(-1))
+    ElapsedTime = 0;
+  else
+    ElapsedTime = CurrentTime - last;
+}
 

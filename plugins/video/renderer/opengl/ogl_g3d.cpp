@@ -36,7 +36,6 @@
 #include "csgeom/plane3.h"
 #include "ogl_g3d.h"
 #include "ogl_txtcache.h"
-#include "isys/system.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"

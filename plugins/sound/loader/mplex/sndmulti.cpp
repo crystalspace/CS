@@ -21,7 +21,6 @@
 #include "isound/loader.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "isys/system.h"
 #include "isys/plugin.h"
 #include "iutil/event.h"
 #include "iutil/comp.h"

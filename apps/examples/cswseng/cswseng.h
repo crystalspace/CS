@@ -25,7 +25,6 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "ivideo/graph3d.h"
-#include "isys/system.h"
 #include "imap/parser.h"
 
 struct iSector;

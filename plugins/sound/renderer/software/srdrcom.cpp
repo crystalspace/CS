@@ -22,7 +22,6 @@
 #include <stdio.h>
 
 #include "cssysdef.h"
-#include "isys/system.h"
 #include "isys/plugin.h"
 #include "iutil/cfgfile.h"
 #include "iutil/event.h"

@@ -30,7 +30,6 @@
 #include "ivideo/vbufmgr.h"
 #include "iengine/material.h"
 #include "iengine/rview.h"
-#include "isys/system.h"
 #include "ivideo/txtmgr.h"
 #include "igraphic/image.h"
 #include "iutil/objreg.h"

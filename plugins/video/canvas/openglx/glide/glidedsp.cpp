@@ -23,7 +23,6 @@
 #include "../iogldisp.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "isys/system.h"
 
 SCF_IMPLEMENT_FACTORY(csOpenGLGlideDisp)
 

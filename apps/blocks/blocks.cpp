@@ -47,6 +47,7 @@
 #include "iutil/event.h"
 #include "iutil/object.h"
 #include "iutil/objreg.h"
+#include "iutil/virtclk.h"
 #include "inetwork/driver.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"

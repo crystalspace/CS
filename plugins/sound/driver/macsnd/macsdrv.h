@@ -27,7 +27,6 @@
 #include "isound/driver.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "isys/system.h"
 
 class csSoundDriverMac : public iSoundDriver
 {

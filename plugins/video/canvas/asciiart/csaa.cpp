@@ -24,7 +24,6 @@
 #include "csaa.h"
 #include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"
-#include "isys/system.h"
 #include "iutil/cfgfile.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"

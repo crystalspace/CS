@@ -20,7 +20,6 @@
 #include "video/canvas/directxcommon/directdetection.h"
 #include "csgeom/csrect.h"
 #include "g2d_dd8.h"
-#include "isys/system.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include "cssys/win32/winhelp.h"

@@ -23,7 +23,6 @@
 #include "csutil/cscolor.h"
 #include "csutil/scanstr.h"
 #include "iengine/engine.h"
-#include "isys/system.h"
 #include "isys/plugin.h"
 #include "isys/vfs.h"
 #include "igraphic/image.h"

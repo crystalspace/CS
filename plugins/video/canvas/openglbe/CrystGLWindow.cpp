@@ -22,7 +22,6 @@
 #include "cssysdef.h"
 #include "iutil/event.h"
 #include "ivideo/graph2d.h"
-#include "isys/system.h"
 #include "CrystGLWindow.h"
 #include "cssys/be/behelp.h"
 #include "iutil/objreg.h"

@@ -18,7 +18,6 @@
 */
 #include "cssysdef.h"
 #include "imgplex.h"
-#include "isys/system.h"
 #include "isys/plugin.h"
 #include "iutil/strvec.h"
 #include "csgfx/csimage.h"

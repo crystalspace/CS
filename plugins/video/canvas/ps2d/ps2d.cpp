@@ -20,7 +20,6 @@
 #include "cssysdef.h"
 #include "ps2d.h"
 #include "iutil/eventq.h"
-#include "isys/system.h"
 
 #include "SDL/SDL.h"
 #include <fakegl.h>

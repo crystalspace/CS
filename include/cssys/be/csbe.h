@@ -29,6 +29,8 @@
 #include "cssys/be/behelp.h"
 
 class SysSystemDriver;
+struct iObjectRegistry;
+struct iEvent;
 
 /**
  * Implementation class for iBeHelper.
@@ -98,12 +100,12 @@ protected:
 public:
   SCF_DECLARE_IBASE_EXT(csSystemDriver);
 
-  SysSystemDriver();
+  SysSystemDriver(iObjectRegistry* object_reg);
   ~SysSystemDriver();
 
-  // Implementation of iSystem.
+  // Implementation of the system.
   virtual bool Initialize(int argc, char const* const argv[]);
-  virtual void NextFrame();
+  virtual bool HandleEvent(iEvent& ev);
 
   // Implementation of iEventPlug.
   virtual unsigned int GetPotentiallyConflictingEvents();

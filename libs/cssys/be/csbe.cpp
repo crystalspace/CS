@@ -51,8 +51,8 @@ enum
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-SysSystemDriver::SysSystemDriver() :
-  csSystemDriver(), running(false), event_outlet(0),
+SysSystemDriver::SysSystemDriver(iObjectRegistry* object_reg) :
+  csSystemDriver(object_reg), running(false), event_outlet(0),
   shift_down(false), alt_down(false), ctrl_down(false),
   real_mouse(true), mouse_moved(false), mouse_point(0,0)
 {
@@ -60,7 +60,7 @@ SysSystemDriver::SysSystemDriver() :
   for (i = CSBE_MOUSE_BUTTON_COUNT; i-- > 0; )
     button_state[i] = false;
   BeHelper* behelper = new BeHelper (this);
-  object_reg.Register (behelper, "SystemHelper");
+  object_reg->Register (behelper, "SystemHelper");
 }
 
 
@@ -116,7 +116,7 @@ SysSystemDriver::~SysSystemDriver()
 //	Only instantiate a BApplication object if one has not already been
 //	instantiated.  This allows a BeOS-specific Crystal Space client to
 //	easily employ a custom BApplication subclass by instantiating it prior
-//	to calling iSystem::Initialize().
+//	to calling system::Initialize().
 // *3*
 //	Sets the system driver as the application's preferred message handler
 //	so that it can intercept common BeOS messages and forward appropriate
@@ -130,7 +130,7 @@ bool SysSystemDriver::Initialize (int argc, char const* const argv[])
   if (strlen(path) > 0)
     chdir(path);
 
-  iEventQueue* q = CS_QUERY_REGISTRY(&object_reg, iEventQueue);
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
     event_outlet = q->CreateEventOutlet(this);
 
@@ -178,28 +178,27 @@ bool SysSystemDriver::RunBeApp()
 }
 
 
-//-----------------------------------------------------------------------------
-// This method is called by csSystemDriver::Loop() in the main thread for each
-// animation frame.  It processes messages which have been sent from the
-// subthread running the BApplication before invoking its superclass'
-// implementation of NextFrame().
-//-----------------------------------------------------------------------------
-void SysSystemDriver::NextFrame()
+bool SysSystemDriver::HandleEvent (iEvent& e)
 {
-  if (message_queue.Lock())
+  if (csSystemDriver::HandleEvent (e))
+    return true;
+  if (e.Type == csevBroadcast && e.Command.Code == cscmdPreProcess)
   {
-    BMessage* m;
-    while ((m = message_queue.NextMessage()) != 0)
+    if (message_queue.Lock())
     {
-      DispatchMessage(m);
-      delete m;
+      BMessage* m;
+      while ((m = message_queue.NextMessage()) != 0)
+      {
+        DispatchMessage(m);
+        delete m;
+      }
+      message_queue.Unlock();
     }
-    message_queue.Unlock();
+    CheckMouseMoved();
+    return true;
   }
-  CheckMouseMoved();
-  superclass::NextFrame();
+  return false;
 }
-
 
 //-----------------------------------------------------------------------------
 // iEventPlug Implementation.

@@ -25,7 +25,6 @@
 #include "csutil/rng.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/vbufmgr.h"
-#include "isys/system.h"
 #include "iengine/camera.h"
 #include "iengine/rview.h"
 #include "iengine/movable.h"

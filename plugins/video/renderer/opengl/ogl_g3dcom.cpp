@@ -38,7 +38,6 @@
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
-#include "isys/system.h"
 #include "isys/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/virtclk.h"

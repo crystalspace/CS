@@ -23,7 +23,6 @@
 #include "cssysdef.h"
 #include "raw.h"
 #include "csgeom/csrect.h"
-#include "isys/system.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include "cssys/djgpp/doshelp.h"

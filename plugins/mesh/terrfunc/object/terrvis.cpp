@@ -23,7 +23,6 @@
 #include "csgeom/poly2d.h"
 #include "csgeom/vector3.h"
 #include "csutil/garray.h"
-#include "isys/system.h"
 #include "terrvis.h"
 #include "qint.h"
 #include "qsqrt.h"

@@ -315,7 +315,7 @@ enum
 
   /**
    * This event is sent when a graphics context is being destroyed.
-   * Usually this event is accompanyed by an iSystem->StartShutdown()
+   * Usually this event is accompanyed by a shutdown
    * but there is one exception: when a dynamic texture is closed
    * (a dynamic texture is a graphics context as well).
    * <pre>
@@ -332,7 +332,7 @@ enum
    *<pre>
    * <2 spaces><switch - 18 positions><space><switch description>{default value}
    *</pre>
-   * The help should be displayed through iSystem::Printf (CS_MSG_STDOUT, ...).
+   * The help should be displayed to standard output.
    */
   cscmdCommandLineHelp,
 

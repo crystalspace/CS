@@ -24,12 +24,14 @@
 #include "cssys/system.h"
 #include "ivideo/graph2d.h"
 
+struct iObjectRegistry;
+
 // PS2 version.
 class SysSystemDriver : public csSystemDriver
 {
 public:
   // Constructor
-  SysSystemDriver ();
+  SysSystemDriver (iObjectRegistry* object_reg);
 };
 
 #endif // __UNIX_H__

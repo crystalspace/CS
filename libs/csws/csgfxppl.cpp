@@ -24,7 +24,6 @@
 #include "csws/csmouse.h"
 #include "csutil/util.h"
 #include "iutil/objreg.h"
-#include "isys/system.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "ivideo/graph2d.h"

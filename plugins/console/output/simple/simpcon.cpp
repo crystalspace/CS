@@ -32,7 +32,6 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivaria/reporter.h"
-#include "isys/system.h"
 #include "isys/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"

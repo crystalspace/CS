@@ -22,7 +22,6 @@
 #include "tcache.h"
 #include "soft_g3d.h"
 #include "soft_txt.h"
-#include "isys/system.h"
 #include "ivaria/reporter.h"
 // @@@ The following include needs a cleanup. It is not very good that
 // the 3D rendering is accessing something private from the thing mesh

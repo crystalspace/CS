@@ -20,7 +20,6 @@
 
 #include "cssysdef.h"
 #include "csutil/scf.h"
-#include "isys/system.h"
 #include "ivaria/reporter.h"
 #include "iutil/objreg.h"
 

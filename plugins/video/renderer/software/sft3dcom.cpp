@@ -29,7 +29,6 @@
 #include "scan.h"
 #include "tcache.h"
 #include "soft_txt.h"
-#include "isys/system.h"
 #include "ivideo/graph2d.h"
 #include "imesh/thing/lightmap.h"	//@@@!!!
 #include "sft3dcom.h"

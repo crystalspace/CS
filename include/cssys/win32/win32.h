@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998,1999 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -34,6 +34,7 @@
 #include "csutil/csinput.h"
 
 class SysSystemDriver;
+struct iObjectRegistry;
 
 /**
  * Implementation class for iWin32Helper.
@@ -58,10 +59,10 @@ public:
 class SysSystemDriver : public csSystemDriver, public iEventPlug
 {
 public:
-  SysSystemDriver ();
+  SysSystemDriver (iObjectRegistry* object_reg);
   virtual ~SysSystemDriver ();
   
-  virtual void NextFrame ();
+  virtual bool HandleEvent(iEvent&);
 
   /// Returns the HINSTANCE of the program
   HINSTANCE GetInstance() const;

@@ -23,7 +23,6 @@
 #include "video/canvas/directxcommon/directdetection.h"
 #include "csgeom/csrect.h"
 #include "csutil/util.h"
-#include "isys/system.h"
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"

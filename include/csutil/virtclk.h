@@ -16,38 +16,35 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_OBJREG_H__
-#define __CS_OBJREG_H__
+#ifndef __CS_VIRTCLK_H_
+#define __CS_VIRTCLK_H_
 
-#include <stdarg.h>
-#include <stdio.h>
 #include "csutil/scf.h"
-#include "iutil/objreg.h"
-#include "csutil/csvector.h"
+#include "iutil/virtclk.h"
 
 /**
- * This is an implementation of iObjectRegistry.
+ * This is an implementation of a virtual clock. Using this
+ * clock you can easily keep track of elapsed and current time
+ * in a virtual setting.
  */
-class csObjectRegistry : public iObjectRegistry
+class csVirtualClock : public iVirtualClock
 {
 private:
-  csVector registry;
-  csVector tags;
-  // True when this object is being cleared; prevents external changes.
-  bool clearing;
+  // Elapsed time between last two frames and absolute time in milliseconds
+  csTicks ElapsedTime, CurrentTime;
 
 public:
-  csObjectRegistry ();
-  /// Client must explicitly call Clear().
-  virtual ~csObjectRegistry () {}
+  csVirtualClock ();
+  virtual ~csVirtualClock ();
 
   SCF_DECLARE_IBASE;
-  virtual void Clear ();
-  virtual bool Register (iBase* obj, char const* tag = NULL);
-  virtual void Unregister (iBase* obj, char const* tag = NULL);
-  virtual iBase* Get (char const* tag);
-  virtual iBase* Get (scfInterfaceID id, int version);
+
+  virtual void Advance ();
+  virtual void Suspend () { }
+  virtual void Resume () { CurrentTime = csTicks (-1); }
+  virtual csTicks GetElapsedTicks () const { return ElapsedTime; }
+  virtual csTicks GetCurrentTicks () const { return CurrentTime; }
 };
 
-#endif // __CS_OBJREG_H__
+#endif // __CS_VIRTCLK_H_
 

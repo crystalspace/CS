@@ -31,18 +31,18 @@
 #define	MAX_ARGS	25
 
 class iMacGraphics;
+struct iObjectRegistry;
 
 class SysSystemDriver : public csSystemDriver, public iEventPlug
 {
 public:
-				 SysSystemDriver();
+			SysSystemDriver(iObjectRegistry* object_reg);
 	virtual		~SysSystemDriver();
 
 	virtual void Close();
 
 	virtual bool Initialize ( int argc, const char* const argv[]);
 	virtual void Loop ();
-//	virtual void NextFrame ();
 
 	virtual void Alert( const char* s );
 	virtual void Warn( const char* s );

@@ -38,6 +38,7 @@
 #include "iutil/eventq.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/virtclk.h"
 #include "isys/vfs.h"
 #include "ivaria/conout.h"
 #include "inetwork/driver.h"
@@ -51,7 +52,7 @@ void csSystemDriver::ReportSys (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (&object_reg, iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
   {
     rep->ReportV (severity, "crystalspace.system", msg, arg);
@@ -288,19 +289,13 @@ bool csPluginList::RecurseSort (csSystemDriver *iSys, int row, char *order,
 //--------------------------------------------------- The System Driver -----//
 
 SCF_IMPLEMENT_IBASE (csSystemDriver)
-  SCF_IMPLEMENTS_INTERFACE (iSystem)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPluginManager)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVirtualClock)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iComponent)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::PluginManager)
   SCF_IMPLEMENTS_INTERFACE (iPluginManager)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::VirtualClock)
-  SCF_IMPLEMENTS_INTERFACE (iVirtualClock)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::eiComponent)
@@ -311,25 +306,18 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::eiEventHandler)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csSystemDriver::csSystemDriver () :
+csSystemDriver::csSystemDriver (iObjectRegistry* object_reg) :
   EventQueue(0), Plugins (8, 8), OptionList (16, 16)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPluginManager);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVirtualClock);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiEventHandler);
 
+  csSystemDriver::object_reg = object_reg;
   Shutdown = false;
-  CurrentTime = csTicks (-1);
 
-  object_reg.Register (&scfiPluginManager, NULL);
-  object_reg.Register (&scfiVirtualClock, NULL);
-
-  //@@@ We temporarily register iSystem with the object registry too.
-  // That allows us to remove the usage of iSystem everywhere except in
-  // a few places where this is still needed. This is only transitionary.
-  object_reg.Register (this, "System");
+  object_reg->Register (&scfiPluginManager, NULL);
 }
 
 csSystemDriver::~csSystemDriver ()
@@ -351,39 +339,29 @@ csSystemDriver::~csSystemDriver ()
      
   if (EventQueue != 0)
     EventQueue->DecRef();
-
-  // Explicitly clear the object registry before its destruction since some
-  // objects being cleared from it may need to query it for other objects, and
-  // such queries can fail (depending upon the compiler) if they are made while
-  // the registry itself it being destroyed.  Furthermore, such objects may may
-  // SCF queries as they are destroyed, so this must occur before SCF is
-  // finalized (see below).
-  object_reg.Clear();
-
-  iSCF::SCF->Finish();
 }
 
 bool csSystemDriver::Initialize (int argc, const char* const argv[])
 {
-  EventQueue = CS_QUERY_REGISTRY (&object_reg, iEventQueue);
+  EventQueue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   EventQueue->IncRef();
 
   ReportSys (CS_REPORTER_SEVERITY_DEBUG, "*** Initializing system driver!\n");
 
   // Register some generic pseudo-plugins.  (Some day these should probably
   // become real plugins.)
-  iKeyboardDriver* k = new csKeyboardDriver (&object_reg);
-  iMouseDriver*    m = new csMouseDriver    (&object_reg);
-  iJoystickDriver* j = new csJoystickDriver (&object_reg);
-  object_reg.Register (k, NULL);
-  object_reg.Register (m, NULL);
-  object_reg.Register (j, NULL);
+  iKeyboardDriver* k = new csKeyboardDriver (object_reg);
+  iMouseDriver*    m = new csMouseDriver    (object_reg);
+  iJoystickDriver* j = new csJoystickDriver (object_reg);
+  object_reg->Register (k, NULL);
+  object_reg->Register (m, NULL);
+  object_reg->Register (j, NULL);
   j->DecRef();
   m->DecRef();
   k->DecRef();
 
   // Collect all options from command line
-  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (&object_reg,
+  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
   CommandLine->Initialize (argc, argv);
 
@@ -429,7 +407,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[])
   }
 
   // Now load and initialize all plugins
-  iConfigManager* Config = CS_QUERY_REGISTRY (&object_reg, iConfigManager);
+  iConfigManager* Config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
   iConfigIterator *plugin_list = Config->Enumerate ("System.Plugins.");
   if (plugin_list)
   {
@@ -475,9 +453,14 @@ bool csSystemDriver::Open ()
   ReportSys (CS_REPORTER_SEVERITY_DEBUG, "*** Opening the drivers now!\n");
 
   // Start listening for events.  This class is interested in cscmdQuit, but
-  // subclasses may be interested in any event, so listen for all types except
-  // for the special one which sends cscmdPreProcess/cscmdPostProcess.
-  EventQueue->RegisterListener(&scfiEventHandler, ~CSMASK_Nothing);
+  // subclasses may be interested in other broadcasts.
+  EventQueue->RegisterListener (&scfiEventHandler,
+  	CSMASK_Nothing | CSMASK_Broadcast);
+
+  //// Start listening for events.  This class is interested in cscmdQuit, but
+  //// subclasses may be interested in any event, so listen for all types except
+  //// for the special one which sends cscmdPreProcess/cscmdPostProcess.
+  //EventQueue->RegisterListener (&scfiEventHandler, ~CSMASK_Nothing);
 
   // Now pass the open event to all plugins
   csEvent Event (csGetTicks (), csevBroadcast, cscmdSystemOpen);
@@ -498,29 +481,17 @@ void csSystemDriver::Close ()
   EventQueue->RemoveListener(&scfiEventHandler);
 }
 
-void csSystemDriver::AdvanceVirtualTimeClock ()
-{
-  csTicks last = CurrentTime;
-  CurrentTime = csGetTicks ();
-  if (last == csTicks(-1))
-    ElapsedTime = 0;
-  else
-    ElapsedTime = CurrentTime - last;
-}
-
-void csSystemDriver::NextFrame ()
-{
-  // Update elapsed time first
-  AdvanceVirtualTimeClock ();
-
-  // Process the event queue.
-  EventQueue->Process();
-}
-
 void csSystemDriver::Loop ()
 {
+  iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  iEventQueue* ev = CS_QUERY_REGISTRY (object_reg, iEventQueue);
+  CS_ASSERT (vc != NULL);
+  CS_ASSERT (ev != NULL);
   while (!Shutdown)
-    NextFrame ();
+  {
+    vc->Advance ();
+    ev->Process ();
+  }
 }
 
 bool csSystemDriver::HandleEvent (iEvent& e)
@@ -535,7 +506,7 @@ bool csSystemDriver::HandleEvent (iEvent& e)
 
 void csSystemDriver::QueryOptions (iComponent *iObject)
 {
-  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (&object_reg,
+  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
 
   iConfig *Config = SCF_QUERY_INTERFACE (iObject, iConfig);
@@ -598,12 +569,10 @@ void csSystemDriver::QueryOptions (iComponent *iObject)
 
 void csSystemDriver::RequestPlugin (const char *iPluginName)
 {
-  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (&object_reg,
+  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (object_reg,
   	iCommandLineParser);
   CommandLine->AddOption ("plugin", iPluginName);
 }
-
-//-------------------------------- iSystem interface for csSystemDriver -----//
 
 iBase *csSystemDriver::LoadPlugin (const char *iClassID, const char *iFuncID,
   const char *iInterface, int iVersion)
@@ -615,7 +584,7 @@ iBase *csSystemDriver::LoadPlugin (const char *iClassID, const char *iFuncID,
   else
   {
     int index = Plugins.Push (new csPlugin (p, iClassID, iFuncID));
-    if (p->Initialize (&object_reg))
+    if (p->Initialize (object_reg))
     {
       iBase *ret;
       if (iInterface)
@@ -640,7 +609,7 @@ bool csSystemDriver::RegisterPlugin (const char *iClassID,
   const char *iFuncID, iComponent *iObject)
 {
   int index = Plugins.Push (new csPlugin (iObject, iClassID, iFuncID));
-  if (iObject->Initialize (&object_reg))
+  if (iObject->Initialize (object_reg))
   {
     QueryOptions (iObject);
     iObject->IncRef ();
@@ -729,7 +698,7 @@ bool csSystemDriver::UnloadPlugin (iComponent *iObject)
     config->DecRef ();
   }
 
-  object_reg.Unregister ((iBase *)iObject, NULL);
+  object_reg->Unregister ((iBase *)iObject, NULL);
   return Plugins.Delete (idx);
 }
 

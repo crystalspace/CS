@@ -34,7 +34,6 @@
 #include "csutil/scfstrv.h"
 #include "csutil/databuf.h"
 #include "csutil/csstring.h"
-#include "isys/system.h"
 
 CS_IMPLEMENT_PLUGIN
 

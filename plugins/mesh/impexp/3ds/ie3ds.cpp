@@ -28,7 +28,6 @@
 #include "csutil/datastrm.h"
 #include "cstool/mdldata.h"
 #include "imesh/mdldata.h"
-#include "isys/system.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/databuff.h"

@@ -414,7 +414,7 @@ bool ceCswsEngineApp::Initialize ()
   Console = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_CONSOLE, iConsoleOutput);
   if (Console)
   {
-    // Tell the console to shut up so that iSystem::Printf() won't clobber CSWS
+    // Tell the console to shut up so that Printf() won't clobber CSWS
     Console->SetVisible (false);
     Console->AutoUpdate (false);
   }

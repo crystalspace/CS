@@ -21,7 +21,6 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "ivaria/reporter.h"
-#include "isys/system.h"
 #include "csgeom/csrect.h"
 #include "xextshm.h"
 

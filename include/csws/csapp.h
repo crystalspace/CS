@@ -43,6 +43,8 @@ struct iKeyboardDriver;
 struct iMouseDriver;
 struct iObjectRegistry;
 struct iPluginManager;
+struct iVirtualClock;
+struct iEventQueue;
 
 /**
  * Application's background styles
@@ -128,6 +130,10 @@ protected:
 public:
   /// The object registry.
   iObjectRegistry* object_reg;
+  /// The virtual clock.
+  iVirtualClock* vc;
+  /// The event queue.
+  iEventQueue* event_queue;
   /// The plugin manager.
   iPluginManager* plugin_mgr;
   /// The virtual file system

@@ -19,7 +19,6 @@
 #include <soundserver.h>
 #include "cssysdef.h"
 #include "artsrend.h"
-#include "isys/system.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 

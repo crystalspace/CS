@@ -22,7 +22,6 @@
 #include "cssys/system.h"
 #include "cssys/csshlib.h"
 #include "cstool/initapp.h"
-#include "isys/system.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
@@ -43,6 +42,8 @@
 #include "csutil/cfgmgr.h"
 #include "csutil/cfgacc.h"
 #include "csutil/prfxcfg.h"
+#include "csutil/objreg.h"
+#include "csutil/virtclk.h"
 #include "iutil/eventq.h"
 #include "iutil/evdefs.h"
 #include "iutil/virtclk.h"
@@ -90,9 +91,14 @@ bool csInitializer::InitializeSCF ()
   strcat (scfconfigpath, "scf.cfg");
   csConfigFile scfconfig (scfconfigpath);
   scfInitialize (&scfconfig);
-
-  global_sys = new SysSystemDriver ();
   return true;
+}
+
+iObjectRegistry* csInitializer::CreateObjectRegistry ()
+{
+  csObjectRegistry* object_reg = new csObjectRegistry ();
+  global_sys = new SysSystemDriver (object_reg);
+  return object_reg;
 }
 
 iPluginManager* csInitializer::CreatePluginManager (
@@ -103,7 +109,6 @@ iPluginManager* csInitializer::CreatePluginManager (
 
 iEventQueue* csInitializer::CreateEventQueue (iObjectRegistry* object_reg)
 {
-  //return CS_QUERY_REGISTRY (object_reg, iEventQueue);
   // Register the shared event queue.
   iEventQueue* q = new csEventQueue (object_reg);
   object_reg->Register (q, NULL);
@@ -113,7 +118,10 @@ iEventQueue* csInitializer::CreateEventQueue (iObjectRegistry* object_reg)
 
 iVirtualClock* csInitializer::CreateVirtualClock (iObjectRegistry* object_reg)
 {
-  return CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  csVirtualClock* vc = new csVirtualClock ();
+  object_reg->Register (vc, NULL);
+  vc->DecRef ();
+  return vc;
 }
 
 iCommandLineParser* csInitializer::CreateCommandLineParser (
@@ -134,11 +142,6 @@ iConfigManager* csInitializer::CreateConfigManager (
   Config->DecRef ();
   cfg->DecRef ();
   return Config;
-}
-
-iObjectRegistry* csInitializer::CreateObjectRegistry ()
-{
-  return global_sys->GetObjectRegistry ();
 }
 
 bool csInitializer::SetupConfigManager (iObjectRegistry* object_reg,
@@ -388,6 +391,17 @@ void csInitializer::DestroyApplication (iObjectRegistry* object_reg)
     q->RemoveListener (installed_event_handler);
   }
   delete global_sys;
+
+  // Explicitly clear the object registry before its destruction since some
+  // objects being cleared from it may need to query it for other objects, and
+  // such queries can fail (depending upon the compiler) if they are made while
+  // the registry itself it being destroyed.  Furthermore, such objects may may
+  // SCF queries as they are destroyed, so this must occur before SCF is
+  // finalized (see below).
+  object_reg->Clear ();
+  object_reg->DecRef ();
+
+  iSCF::SCF->Finish();
 }
 
 bool csInitializeApplication (iObjectRegistry* object_reg, bool use_reporter,

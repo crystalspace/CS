@@ -23,7 +23,6 @@
 #include "csutil/scf.h"
 #include "csutil/util.h"
 #include "stdrep.h"
-#include "isys/system.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/objreg.h"

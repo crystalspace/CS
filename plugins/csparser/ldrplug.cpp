@@ -19,7 +19,6 @@
 
 #include "cssysdef.h"
 #include "csloader.h"
-#include "isys/system.h"
 #include "imap/reader.h"
 
 struct csLoaderPluginRec

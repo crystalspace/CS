@@ -23,7 +23,6 @@
 #include "inf_txt.h"
 #include "csgfx/quantize.h"
 #include "csutil/scanstr.h"
-#include "isys/system.h"
 #include "igraphic/image.h"
 
 //-------------------------------------------------------- csTextureHandleInfinite ---//

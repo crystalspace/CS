@@ -34,7 +34,6 @@
 #include "cssys/djgpp/djgpp.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
-#include "isys/system.h"
 #include "inputq.h"
 #include "djkeysys.h"
 #include "djmousys.h"
@@ -69,7 +68,8 @@ SCF_IMPLEMENT_IBASE_EXT (SysSystemDriver)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
 SCF_IMPLEMENT_IBASE_EXT_END
 
-SysSystemDriver::SysSystemDriver () : csSystemDriver ()
+SysSystemDriver::SysSystemDriver (iObjectRegistry* object_reg)
+	: csSystemDriver (object_reg)
 {
   // Sanity check
   if (sizeof (event_queue [0]) != 12)
@@ -88,7 +88,7 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   EnablePrintf = true;
 
   DosHelper* doshelper = new DosHelper (this);
-  object_reg.Register (doshelper, "SystemHelper");
+  object_reg->Register (doshelper, "SystemHelper");
 
   EventOutlet = NULL;
 }
@@ -99,53 +99,59 @@ SysSystemDriver::~SysSystemDriver ()
     EventOutlet->DecRef ();
 }
 
-void SysSystemDriver::NextFrame ()
+bool SysSystemDriver::HandleEvent (iEvent& e)
 {
-  if (!EventOutlet)
+  if (csSystemDriver::HandleEvent (e))
+    return true;
+  if (e.Type == csevBroadcast && e.Command.Code == cscmdPreProcess)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY(&object_reg, iEventQueue);
-    if (q != 0) EventOutlet = q->CreateEventOutlet (this);
-  }
-
-  bool ExtKey = false;
-  // Fill in events ...
-  while (event_queue_tail != event_queue_head)
-  {
-    switch (event_queue [event_queue_tail].Type)
+    if (!EventOutlet)
     {
-      case 1:
-      {
-        int ScanCode = event_queue [event_queue_tail].Keyboard.ScanCode;
-        bool Down = (ScanCode < 0x80);
+      iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+      if (q != 0) EventOutlet = q->CreateEventOutlet (this);
+    }
 
-        if ((ScanCode == 0xe0) || (ScanCode == 0xe1))
-          ExtKey = true;
-        else
+    bool ExtKey = false;
+    // Fill in events ...
+    while (event_queue_tail != event_queue_head)
+    {
+      switch (event_queue [event_queue_tail].Type)
+      {
+        case 1:
         {
-          // handle keypad '/'
-          if (ExtKey && (ScanCode == 0x35))
-            ScanCode = 0x6f;
+          int ScanCode = event_queue [event_queue_tail].Keyboard.ScanCode;
+          bool Down = (ScanCode < 0x80);
 
-          ScanCode = ScanCodeToChar [ScanCode & 0x7F];
-          if (ScanCode)
-            EventOutlet->Key (ScanCode, -1, Down);
+          if ((ScanCode == 0xe0) || (ScanCode == 0xe1))
+            ExtKey = true;
+          else
+          {
+            // handle keypad '/'
+            if (ExtKey && (ScanCode == 0x35))
+              ScanCode = 0x6f;
+
+            ScanCode = ScanCodeToChar [ScanCode & 0x7F];
+            if (ScanCode)
+              EventOutlet->Key (ScanCode, -1, Down);
+          }
+          break;
         }
-        break;
-      }
-      case 2:
-      {
-        int Button = event_queue [event_queue_tail].Mouse.Button;
-        bool Down = event_queue [event_queue_tail].Mouse.Down;
-        int x = event_queue [event_queue_tail].Mouse.x;
-        int y = event_queue [event_queue_tail].Mouse.y;
+        case 2:
+        {
+          int Button = event_queue [event_queue_tail].Mouse.Button;
+          bool Down = event_queue [event_queue_tail].Mouse.Down;
+          int x = event_queue [event_queue_tail].Mouse.x;
+          int y = event_queue [event_queue_tail].Mouse.y;
 
-        EventOutlet->Mouse (Button, Down, x, y);
-        break;
-      }
-    } /* endswitch */
-    event_queue_tail = (event_queue_tail + 1) & EVENT_QUEUE_MASK;
-  } /* endwhile */
-  csSystemDriver::NextFrame ();
+          EventOutlet->Mouse (Button, Down, x, y);
+          break;
+        }
+      } /* endswitch */
+      event_queue_tail = (event_queue_tail + 1) & EVENT_QUEUE_MASK;
+    } /* endwhile */
+    return true;
+  }
+  return false;
 }
 
 bool SysSystemDriver::Open ()

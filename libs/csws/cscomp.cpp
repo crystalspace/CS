@@ -33,7 +33,6 @@
 #include "csws/cswsutil.h"
 #include "csws/csskin.h"
 #include "csws/cswsaux.h"
-#include "isys/system.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
 #include "ivaria/reporter.h"

@@ -19,7 +19,6 @@
 */
 
 #include "cssysdef.h"
-#include "isys/system.h"
 #include "isound/listener.h"
 #include "isound/data.h"
 #include "srdrsrc.h"

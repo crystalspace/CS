@@ -36,7 +36,6 @@
 #include "igeom/clip2d.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/objreg.h"
-#include "isys/system.h"
 
 #include "meta.h"
 

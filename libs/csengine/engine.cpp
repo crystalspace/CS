@@ -58,6 +58,7 @@
 #include "iutil/databuff.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
+#include "iutil/virtclk.h"
 #include "imap/reader.h"
 #include "imesh/lighting.h"
 #include "ivaria/reporter.h"

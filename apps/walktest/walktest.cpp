@@ -65,6 +65,7 @@
 #include "iutil/csinput.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/virtclk.h"
 #include "isound/wrapper.h"
 #include "imesh/terrfunc.h"
 #include "imesh/object.h"

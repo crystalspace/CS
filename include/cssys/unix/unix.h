@@ -22,12 +22,14 @@
 #include "csutil/scf.h"
 #include "cssys/system.h"
 
+struct iObjectRegistry;
+
 // Unix version.
 class SysSystemDriver : public csSystemDriver
 {
 public:
   // Constructor
-  SysSystemDriver ();
+  SysSystemDriver (iObjectRegistry* object_reg);
 };
 
 #endif // __UNIX_H__

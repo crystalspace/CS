@@ -21,7 +21,6 @@
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "cssys/os2/csos2.h"
-#include "isys/system.h"
 
 #undef SEVERITY_ERROR
 #define INCL_DOS
@@ -30,7 +29,8 @@
 
 //== class SysSystemDriver =====================================================
 
-SysSystemDriver::SysSystemDriver () : csSystemDriver ()
+SysSystemDriver::SysSystemDriver (iObjectRegistry* object_reg)
+	: csSystemDriver (object_reg)
 {
   // Lower the priority of the main thread
   DosSetPriority (PRTYS_THREAD, PRTYC_IDLETIME, PRTYD_MAXIMUM, 0);
@@ -38,7 +38,7 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   _uflags (_UF_SBRK_MODEL, _UF_SBRK_ARBITRARY);
 
   Os2Helper* os2helper = new Os2Helper (this);
-  object_reg.Register (os2helper, "SystemHelper");
+  object_reg->Register (os2helper, "SystemHelper");
 }
 
 void csSleep (int SleepTime)

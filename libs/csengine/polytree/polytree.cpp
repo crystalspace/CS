@@ -24,7 +24,6 @@
 #include "csengine/engine.h"
 #include "cssys/csendian.h"
 #include "isys/vfs.h"
-#include "isys/system.h"
 
 csPolygonTreeNode::~csPolygonTreeNode ()
 {

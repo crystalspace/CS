@@ -29,7 +29,6 @@
 #include "bugplug.h"
 #include "spider.h"
 #include "shadow.h"
-#include "isys/system.h"
 #include "isys/plugin.h"
 #include "isys/vfs.h"
 #include "iutil/event.h"

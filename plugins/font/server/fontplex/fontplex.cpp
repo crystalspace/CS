@@ -19,7 +19,6 @@
 
 #include <stdlib.h>
 #include "cssysdef.h"
-#include "isys/system.h"
 #include "isys/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"

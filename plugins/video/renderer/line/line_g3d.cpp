@@ -29,7 +29,6 @@
 #include "imesh/thing/polygon.h"	//@@@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "isys/system.h"
 #include "isys/plugin.h"
 #include "iutil/cfgfile.h"
 #include "iutil/cmdline.h"

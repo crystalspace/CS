@@ -22,7 +22,6 @@
 #include "csfont.h"
 #include "isys/vfs.h"
 #include "isys/plugin.h"
-#include "isys/system.h"
 #include "csutil/util.h"
 #include "csutil/csvector.h"
 #include "iutil/objreg.h"

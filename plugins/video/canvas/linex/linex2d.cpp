@@ -25,7 +25,6 @@
 #include "csutil/scf.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "isys/system.h"
 #include "isys/plugin.h"
 #include "iutil/cfgmgr.h"
 #include "iutil/cmdline.h"

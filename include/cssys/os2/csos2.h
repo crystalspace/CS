@@ -25,6 +25,7 @@
 #include "cssys/os2/os2help.h"
 
 class SysSystemDriver;
+struct iObjectRegistry;
 
 /**
  * Implementation class for iOs2Helper.
@@ -57,7 +58,7 @@ class SysSystemDriver : public csSystemDriver
 
 public:
   /// Initialize system-dependent data
-  SysSystemDriver ();
+  SysSystemDriver (iObjectRegistry* object_reg);
 
   /// Perform extension function from Os2Helper.
   void StartGUI ();

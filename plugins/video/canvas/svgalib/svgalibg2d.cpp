@@ -22,7 +22,6 @@
 #include "svga.h"
 #include "csgeom/csrect.h"
 #include "csutil/csinput.h"
-#include "isys/system.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"

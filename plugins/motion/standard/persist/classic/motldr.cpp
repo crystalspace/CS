@@ -19,7 +19,6 @@
 #include "cssysdef.h"
 #include "motldr.h"
 #include "iengine/motion.h"
-#include "isys/system.h"
 #include "isys/plugin.h"
 #include "isys/vfs.h"
 #include "iutil/eventh.h"

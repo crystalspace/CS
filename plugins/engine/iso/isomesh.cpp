@@ -30,7 +30,6 @@
 #include "ivideo/txtmgr.h"
 #include "iengine/material.h"
 #include "imesh/object.h"
-#include "isys/system.h"
 #include "qint.h"
 
 #include "iengine/movable.h"

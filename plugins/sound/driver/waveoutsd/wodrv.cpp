@@ -23,7 +23,6 @@
 #include <mmsystem.h>
 
 #include "csutil/scf.h"
-#include "isys/system.h"
 #include "isound/renderer.h"
 #include "iutil/cfgfile.h"
 #include "iutil/objreg.h"

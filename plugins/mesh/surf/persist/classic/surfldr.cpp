@@ -25,7 +25,6 @@
 #include "imesh/object.h"
 #include "iengine/mesh.h"
 #include "iengine/engine.h"
-#include "isys/system.h"
 #include "isys/plugin.h"
 #include "imesh/surf.h"
 #include "ivideo/graph3d.h"

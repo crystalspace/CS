@@ -27,7 +27,6 @@
 #include "iutil/cfgfile.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
-#include "isys/system.h"
 #include "igraphic/image.h"
 #include "ivaria/reporter.h"
 #include "qint.h"

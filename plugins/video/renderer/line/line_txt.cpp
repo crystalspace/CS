@@ -28,7 +28,6 @@
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
-#include "isys/system.h"
 #include "igraphic/image.h"
 
 #define RESERVED_COLOR(c) ((c == 0) || (c == 255))

@@ -22,7 +22,6 @@
 #include "csutil/csinput.h"
 #include "csgeom/csrect.h"
 #include "csutil/cfgacc.h"
-#include "isys/system.h"
 #include "isys/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"

@@ -21,7 +21,6 @@
 #include <stdio.h>
 #include "cssysdef.h"
 #include "video/canvas/common/graph2d.h"
-#include "isys/system.h"
 #include "oglFont.h"
 
 CS_IMPLEMENT_PLUGIN

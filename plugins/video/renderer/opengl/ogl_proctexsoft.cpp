@@ -28,7 +28,6 @@
 #include "iutil/objreg.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "isys/system.h"
 #include "isys/plugin.h"
 #include "ivaria/reporter.h"
 #include "ivideo/sproctxt.h"

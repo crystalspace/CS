@@ -18,7 +18,6 @@
 
 #include "cssysdef.h"
 #include "protex3d.h"
-#include "isys/system.h"
 #include "ivideo/graph2d.h"
 #include "soft_txt.h"
 #include "tcache.h"

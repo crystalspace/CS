@@ -24,11 +24,9 @@
 #include "ogl_txtcache.h"
 #include "ogl_txtmgr.h"
 #include "ogl_g3dcom.h"
-#include "isys/system.h"
 #include "imesh/thing/lightmap.h"	//@@@!!!
 #include "imesh/thing/polygon.h"	//@@@!!!
 #include "ivideo/graph3d.h"
-#include "isys/system.h"
 
 // need definitions of R24(), G24(), and B24()
 #ifndef NORMAL_LIGHT_LEVEL

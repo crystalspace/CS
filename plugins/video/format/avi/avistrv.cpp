@@ -18,7 +18,6 @@
 
 #include "cssysdef.h"
 #include "avistrv.h"
-#include "isys/system.h"
 #include "isys/plugin.h"
 #include "ivideo/texture.h"
 #include "iengine/texture.h"

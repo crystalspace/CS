@@ -22,7 +22,6 @@
 #include "csutil/scanstr.h"
 #include "csws/csmouse.h"
 #include "csws/csapp.h"
-#include "isys/system.h"
 #include "ivaria/reporter.h"
 
 #define MOUSE_TEXTURE_NAME	"csws::Mouse"

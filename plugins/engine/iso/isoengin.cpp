@@ -29,7 +29,6 @@
 #include "isoworld.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "isys/system.h"
 #include "isys/plugin.h"
 #include "isys/vfs.h"
 #include "iutil/cfgmgr.h"

@@ -1,5 +1,34 @@
 The history order is reversed so that new features are at the top.
 
+9-Oct-2001
+	- Removed iSystem::GetObjectRegistry().
+	- The object registry is now a parameter to the system driver and
+	  is no longer created by the system driver itself. Instead
+	  csInitializer::CreateObjectRegistry() will now create the object
+	  registry.
+	- Moved the cleanup of the object registry to
+	  csInitializer::DestroyApplication(). Also moved the cleanup of
+	  SCF to there.
+	- Added Clear() to the iObjectRegistry interface.
+	- Several system drivers performed some special code right before
+	  NextFrame() was being handled (Win32, BeOS, ...). This special
+	  code has now moved to an event handler in the system driver instead.
+	  The system driver will now listen to cscmdPreProcess and perform
+	  the functionality that used to be in NextFrame().
+	- Removed NextFrame() from iSystem, csSystemDriver and all subclasses
+	  of csSystemDriver (SysSystemDriver for all platforms). In case
+	  you needed to explicitely call this function (in CS only CSWS did
+	  this) then you can call iVirtualClock::Advance() followed by
+	  iEventQueue::Process().
+	- csApp now calls Advance()/Process().
+	- The result of this is that the iSystem interface has become empty.
+	  So it can finally be removed!!! In addition CS_GET_SYSTEM is now
+	  also gone.
+	- Moved the virtual clock implementation in the system driver to
+	  a seperate csVirtualClock in csutil. The system driver no longer
+	  creates and manages the virtual clock. The already existing
+	  csInitializer::CreateVirtualClock() will now create and register
+	  the virtual clock.
 8-Oct-2001
 	- Moved the creation of the config manager and the command line
 	  parser from the system driver to the respective csInitializer

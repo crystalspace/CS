@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "csutil/util.h"
+#include "cstool/initapp.h"
 #include "cssys/sysdriv.h"
 #include "isys/vfs.h"
 #include "isys/plugin.h"
@@ -514,9 +515,17 @@ static bool execute (char *command)
 
 int main (int argc, char *argv [])
 {
-  csSystemDriver sys;
-  sys.Initialize (argc, argv);
-  iObjectRegistry* object_reg = sys.GetObjectRegistry ();
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment ();
+  if (!object_reg) return -1;
+
+  if (!csInitializer::RequestPlugins (object_reg, argc, argv,
+  	CS_REQUEST_VFS,
+	CS_REQUEST_END))
+    return -1;
+
+  if (!csInitializer::Initialize (object_reg))
+    return -1;
+
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   VFS = CS_QUERY_PLUGIN_ID (plugin_mgr, CS_FUNCID_VFS, iVFS);
   if (!VFS)

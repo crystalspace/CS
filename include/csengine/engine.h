@@ -30,7 +30,6 @@
 #include "ivideo/graph3d.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "isys/system.h"
 #include "iengine/engine.h"
 #include "iengine/collectn.h"
 #include "iengine/campos.h"

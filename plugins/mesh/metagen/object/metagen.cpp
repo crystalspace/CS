@@ -34,7 +34,6 @@
 #include "iengine/light.h"
 #include "igeom/clip2d.h"
 #include "iutil/cfgmgr.h"
-#include "isys/system.h"
 #include "qsqrt.h"
 #include "metagen.h"
 

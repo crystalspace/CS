@@ -110,7 +110,6 @@ int cspace_initialize(lua_State *L);
     return SCF_CONSTRUCT_VERSION(version0, version1, version2);
   }
 
-#include "isys/system.h"
 #include "isys/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"

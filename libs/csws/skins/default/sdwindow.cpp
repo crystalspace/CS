@@ -23,7 +23,6 @@
 #include "csws/cswstex.h"
 #include "csws/cswsutil.h"
 #include "csws/sdefault.h"
-#include "isys/system.h"
 #include "ivaria/reporter.h"
 #include "qint.h"
 

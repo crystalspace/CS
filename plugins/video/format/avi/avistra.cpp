@@ -18,7 +18,6 @@
 
 #include "cssysdef.h"
 #include "avistra.h"
-#include "isys/system.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include <ctype.h>

@@ -22,7 +22,6 @@
 #include "cssys/csendian.h"
 #include "video/canvas/common/scrshot.h"
 #include "csgeom/csrect.h"
-#include "isys/system.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include "qint.h"

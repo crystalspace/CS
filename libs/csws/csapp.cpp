@@ -37,7 +37,6 @@
 #include "csws/cswsaux.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "isys/system.h"
 #include "isys/vfs.h"
 #include "ivideo/txtmgr.h"
 #include "iutil/event.h"
@@ -119,6 +118,8 @@ csApp::csApp (iObjectRegistry *r, csSkin &Skin)
   InFrame = false;
   ImageLoader = NULL;
   object_reg = r;
+  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  event_queue = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   LastMouseContainer = NULL;
 
@@ -533,7 +534,6 @@ void csApp::StartFrame ()
   InFrame = true;
 
   csTicks elapsed_time;
-  iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   elapsed_time = vc->GetElapsedTicks ();
   CurrentTime = vc->GetCurrentTicks ();
 
@@ -704,8 +704,8 @@ bool csApp::HandleEvent (iEvent &Event)
 
 void csApp::FlushEvents ()
 {
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  sys->NextFrame ();
+  vc->Advance ();
+  event_queue->Process ();
 }
 
 void csApp::WindowList ()

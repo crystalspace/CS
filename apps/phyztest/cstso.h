@@ -6,7 +6,6 @@
 #include "csphyzik/ctcat.h"
 #include "cstool/collider.h"
 #include "ivaria/collider.h"
-#include "isys/system.h"
 
 struct iMeshWrapper;
 struct iEngine;

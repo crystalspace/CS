@@ -23,7 +23,6 @@
 #include "csutil/scf.h"
 #include "csutil/util.h"
 #include "reporter.h"
-#include "isys/system.h"
 
 CS_IMPLEMENT_PLUGIN
 

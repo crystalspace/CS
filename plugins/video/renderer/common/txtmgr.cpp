@@ -26,7 +26,6 @@
 #include "igraphic/image.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
-#include "isys/system.h"
 #include "ivideo/graph2d.h"
 
 //---------------------------------------------------------- csTextureHandle -----//

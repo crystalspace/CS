@@ -23,7 +23,6 @@
 #include <initguid.h>
 
 #include "csutil/scf.h"
-#include "isys/system.h"
 #include "iutil/cfgfile.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"

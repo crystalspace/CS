@@ -22,7 +22,6 @@
 #include "iutil/strvec.h"
 #include "csutil/csstring.h"
 #include "csutil/typedvec.h"
-#include "isys/system.h"
 #include "isys/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"

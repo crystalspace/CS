@@ -40,7 +40,6 @@
 #include "ossdrv.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "isys/system.h"
 #include "isound/listener.h"
 #include "isound/source.h"
 #include "isound/renderer.h"

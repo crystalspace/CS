@@ -22,7 +22,6 @@
 #include "cssysdef.h"
 #include "soft_g3d.h"
 #include "protex3d.h"
-#include "isys/system.h"
 #include "isys/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"

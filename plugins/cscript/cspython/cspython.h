@@ -23,7 +23,6 @@
 #include "ivaria/script.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "isys/system.h"
 #include "csutil/csinput.h"
 #include "csutil/csvector.h"
 

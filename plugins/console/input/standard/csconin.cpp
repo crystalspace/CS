@@ -21,7 +21,6 @@
 #include "csconin.h"
 #include "csutil/util.h"
 #include "ivaria/conout.h"
-#include "isys/system.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 

@@ -30,7 +30,6 @@
 #include "sndrdr.h"
 #include "sndsrc.h"
 #include "sndhdl.h"
-#include "isys/system.h"
 
 
 //#define REFRESH_RATE    10

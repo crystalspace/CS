@@ -24,7 +24,6 @@
 #include "protex2d.h"
 #include "qint.h"
 #include "scrshot.h"
-#include "isys/system.h"
 #include "isys/plugin.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"

@@ -96,8 +96,8 @@ SCF_IMPLEMENT_IBASE_EXT (SysSystemDriver)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
 SCF_IMPLEMENT_IBASE_EXT_END
 
-SysSystemDriver::SysSystemDriver()
-                 : csSystemDriver ()
+SysSystemDriver::SysSystemDriver(iObjectRegistry* object_reg)
+                 : csSystemDriver (object_reg)
 {
     unsigned int        i;
     ProcessSerialNumber theCurrentProcess;
@@ -278,7 +278,6 @@ void SysSystemDriver::Alert(const char* s)
     iGraphics2D *   theG2D = NULL;
     iMacGraphics *  theiG2D = NULL;
 
-    iObjectRegistry* object_reg = GetObjectRegistry ();
     iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
     theG2D = CS_QUERY_PLUGIN( plugin_mgr, iGraphics2D );
 
@@ -313,7 +312,6 @@ void SysSystemDriver::Warn(const char* s)
     iGraphics2D *   theG2D = NULL;
     iMacGraphics *  theiG2D = NULL;
 
-    iObjectRegistry* object_reg = GetObjectRegistry ();
     iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
     theG2D = CS_QUERY_PLUGIN( plugin_mgr, iGraphics2D );
 
@@ -441,8 +439,6 @@ void SysSystemDriver::Loop ()
   EventLoopTimerRef theTimer = NULL;
 #endif
 
-  iObjectRegistry* object_reg = GetObjectRegistry ();
-
   if (!EventOutlet)
   {
     iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
@@ -538,14 +534,6 @@ void SysSystemDriver::Loop ()
     mG2D = NULL;
   }
 }
-
-#if 0
-void SysSystemDriver::NextFrame ()
-{
-	csSystemDriver::NextFrame();
-}
-#endif
-
 
 void SysSystemDriver::DispatchEvent( EventRecord *theEvent, iMacGraphics* piG2D )
 {

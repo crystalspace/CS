@@ -20,7 +20,6 @@
 #include "csutil/scf.h"
 #include "glbe2d.h"
 #include "CrystGLWindow.h"
-#include "isys/system.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 #include <Screen.h>

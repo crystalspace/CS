@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -425,7 +425,8 @@ SCF_IMPLEMENT_IBASE_EXT (SysSystemDriver)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
 SCF_IMPLEMENT_IBASE_EXT_END
 
-SysSystemDriver::SysSystemDriver () : csSystemDriver ()
+SysSystemDriver::SysSystemDriver (iObjectRegistry* object_reg)
+	: csSystemDriver (object_reg)
 {
   System = this;
 
@@ -452,7 +453,7 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   m_hCursor = LoadCursor (0, IDC_ARROW);
 
   Win32Helper* winhelper = new Win32Helper (this);
-  object_reg.Register (winhelper, "SystemHelper");
+  object_reg->Register (winhelper, "SystemHelper");
 }
 
 SysSystemDriver::~SysSystemDriver ()
@@ -474,7 +475,7 @@ bool SysSystemDriver::Open ()
   if (!csSystemDriver::Open ())
     return false;
 
-  CreateEventOutlet (&object_reg, this);
+  CreateEventOutlet (object_reg, this);
 
 #ifdef DO_DINPUT_KEYBOARD
   DWORD dwThreadId;
@@ -507,23 +508,29 @@ void SysSystemDriver::Close ()
 #endif
 }
 
-void SysSystemDriver::NextFrame ()
+bool SysSystemDriver::HandleEvent (iEvent& e)
 {
-  MSG msg;
-  while (PeekMessage (&msg, NULL, 0, 0, PM_NOREMOVE))
+  if (csSystemDriver::HandleEvent (e))
+    return true;
+  if (e.Type == csevBroadcast && e.Command.Code == cscmdPreProcess)
   {
-    if (!GetMessage (&msg, NULL, 0, 0))
+    MSG msg;
+    while (PeekMessage (&msg, NULL, 0, 0, PM_NOREMOVE))
     {
-      CreateEventOutlet (&object_reg, this);
-      EventOutlet->Broadcast (cscmdQuit);
-      return;
+      if (!GetMessage (&msg, NULL, 0, 0))
+      {
+        CreateEventOutlet (object_reg, this);
+        EventOutlet->Broadcast (cscmdQuit);
+        return true;
+      }
+
+      TranslateMessage (&msg);
+      DispatchMessage (&msg);
     }
 
-    TranslateMessage (&msg);
-    DispatchMessage (&msg);
+    return true;
   }
-
-  csSystemDriver::NextFrame ();
+  return false;
 }
 
 #if 0
@@ -657,7 +664,7 @@ long FAR PASCAL SysSystemDriver::WindowProc (HWND hWnd, UINT message,
     case WM_ACTIVATE:
       if (System)
       {
-	CreateEventOutlet (&(System->object_reg), System);
+	CreateEventOutlet (System->object_reg, System);
         EventOutlet->Broadcast (cscmdFocusChanged,
           (void *)(LOWORD (wParam) != WA_INACTIVE));
       }
@@ -673,7 +680,7 @@ long FAR PASCAL SysSystemDriver::WindowProc (HWND hWnd, UINT message,
       int key = (scancode < MAX_SCANCODE) ? ScanCodeToChar [scancode] : 0;
       if (key || (wParam >= ' '))
       {
-	CreateEventOutlet (&(System->object_reg), System);
+	CreateEventOutlet (System->object_reg, System);
         EventOutlet->Key (key, wParam, true);
         LastCharCode [scancode] = wParam;
       }
@@ -694,7 +701,7 @@ long FAR PASCAL SysSystemDriver::WindowProc (HWND hWnd, UINT message,
       if ((scancode < MAX_SCANCODE) && LastCharCode [scancode])
       {
         int key = (scancode < MAX_SCANCODE) ? ScanCodeToChar [scancode] : 0;
-	CreateEventOutlet (&(System->object_reg), System);
+	CreateEventOutlet (System->object_reg, System);
         EventOutlet->Key (key, LastCharCode [scancode], false);
         LastCharCode [scancode] = 0;
       }
@@ -705,7 +712,7 @@ long FAR PASCAL SysSystemDriver::WindowProc (HWND hWnd, UINT message,
     case WM_RBUTTONDOWN:
     case WM_MBUTTONDOWN:
       SetCapture (hWnd);
-      CreateEventOutlet (&(System->object_reg), System);
+      CreateEventOutlet (System->object_reg, System);
       EventOutlet->Mouse ((message == WM_LBUTTONDOWN) ? 1 :
         (message == WM_RBUTTONDOWN) ? 2 : 3, true,
         short (LOWORD (lParam)), short (HIWORD (lParam)));
@@ -714,14 +721,14 @@ long FAR PASCAL SysSystemDriver::WindowProc (HWND hWnd, UINT message,
     case WM_RBUTTONUP:
     case WM_MBUTTONUP:
       ReleaseCapture ();
-      CreateEventOutlet (&(System->object_reg), System);
+      CreateEventOutlet (System->object_reg, System);
       EventOutlet->Mouse ((message == WM_LBUTTONUP) ? 1 :
         (message == WM_RBUTTONUP) ? 2 : 3, false,
         short (LOWORD (lParam)), short (HIWORD (lParam)));
       return TRUE;
     case WM_MOUSEMOVE:
       SetCursor (System->m_hCursor);
-      CreateEventOutlet (&(System->object_reg), System);
+      CreateEventOutlet (System->object_reg, System);
       EventOutlet->Mouse (0, false,
         short (LOWORD (lParam)), short (HIWORD (lParam)));
       return TRUE;

@@ -26,7 +26,6 @@
 #include "sndrdr.h"
 #include "sndsrc.h"
 #include "sndhdl.h"
-#include "isys/system.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
 

@@ -20,7 +20,6 @@
 #define __CS_FREEFONT_H__
 
 #include "ivideo/fontserv.h"
-#include "isys/system.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/csvector.h"

@@ -24,7 +24,6 @@
  */
 
 #include "csutil/scf.h"
-#include "isys/system.h"
 
 struct iMaterialHandle;
 struct iFile;

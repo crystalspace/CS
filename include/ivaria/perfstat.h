@@ -65,14 +65,13 @@ struct iPerfStats : public iBase
   /// Is there currently a subsection?
   virtual bool IsSubsection () = 0;
   /**
-   * Print this sections current summary stats, where sysflags is CS_MSG_STDOUT
-   * etc. as defined in iSystem.h
+   * Print this sections current summary stats, where sysflags is for the
+   * reporter.
    */
   virtual void PrintSectionStats (int sysflags) = 0;
 
   /**
-   * Print the subsections current stats, where sysflags is CS_MSG_STDOUT etc
-   * as defined in iSystem.h
+   * Print the subsections current stats, where sysflags is for the reporter.
    */
   virtual void PrintSubsectionStats (int sysflags) = 0;
 

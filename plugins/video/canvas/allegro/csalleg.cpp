@@ -24,7 +24,6 @@
 #include "csutil/csinput.h"
 #include "csgeom/csrect.h"
 #include "csutil/csstring.h"
-#include "isys/system.h"
 #include "allegro.h"
 #include "cssys/djgpp/doshelp.h"
 #include "iutil/eventq.h"

@@ -26,15 +26,12 @@
 #include "csutil/csstrvec.h"
 #include "csutil/csobjvec.h"
 #include "csutil/typedvec.h"
-#include "csutil/objreg.h"
-#include "isys/system.h"
 #include "isys/vfs.h"
 #include "isys/plugin.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/config.h"
 #include "iutil/objreg.h"
-#include "iutil/virtclk.h"
 
 struct iGraphics3D;
 struct iGraphics2D;
@@ -58,7 +55,7 @@ class csPluginList;
  * interface. The iBase interface is supposed to be implemented
  * in SysSystemDriver which should be derived from csSystemDriver.
  */
-class csSystemDriver : public iSystem
+class csSystemDriver : public iBase
 {
   friend class csPluginList;
   friend class SysSystemDriver;
@@ -138,16 +135,13 @@ private:
   // Query all options supported by given plugin and place into OptionList
   void QueryOptions (iComponent *iObject);
 
-  // Elapsed time between last two frames and absolute time in milliseconds
-  csTicks ElapsedTime, CurrentTime;
-  
 private:
   // Shared event queue.
   iEventQueue* EventQueue;
 
 protected:
   // The object registry.
-  csObjectRegistry object_reg;
+  iObjectRegistry* object_reg;
 
 private: //@@@
   /// Print something to the reporter.
@@ -166,7 +160,7 @@ private: //@@@
 
 public:
   /// Initialize system-dependent data
-  csSystemDriver ();
+  csSystemDriver (iObjectRegistry* object_reg);
   /// Deinitialize system-dependent parts
   virtual ~csSystemDriver ();
 
@@ -199,14 +193,6 @@ public:
   void RequestPlugin (const char *iPluginName);
 
 private:
-  /**
-   * SysSystemDriver::Loop calls this method once per frame.
-   * This method can be called manually as well if you don't use the
-   * Loop method. System drivers may override this method to pump events
-   * from system event queue into Crystal Space event queue.
-   */
-  virtual void NextFrame ();
-
   /// Handle an event.
   virtual bool HandleEvent(iEvent&);
 
@@ -231,27 +217,8 @@ private:
   /// Get the specified plugin from the plugin manager.
   iBase* GetPlugin (int idx);
 
-protected:
-  /// Advance the engine's virtual-time clock.
-  void AdvanceVirtualTimeClock ();
-
-  /// Suspend the engine's virtual-time clock.
-  void SuspendVirtualTimeClock() {}
-  /// Resume the engine's virtual-time clock.
-  void ResumeVirtualTimeClock() { CurrentTime = csTicks(-1); }
-  /// Query the elapsed time between last frames and absolute time.
-  void GetElapsedTime (csTicks &oElapsedTime, csTicks &oCurrentTime) const
-  { oElapsedTime = ElapsedTime; oCurrentTime = CurrentTime; }
-
 public:
   SCF_DECLARE_IBASE;
-
-  /**************************** iSystem interface ****************************/
-
-  /// Get the object registry.
-  virtual iObjectRegistry* GetObjectRegistry () { return &object_reg; }
-
-  //------------------------------------------------------------------
 
   class PluginManager : public iPluginManager
   {
@@ -295,29 +262,6 @@ public:
     }
   } scfiPluginManager;
   friend class PluginManager;
-
-  //------------------------------------------------------------------
-
-  class VirtualClock : public iVirtualClock
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csSystemDriver);
-    virtual void Advance () { scfParent->AdvanceVirtualTimeClock (); }
-    virtual void Suspend () { scfParent->SuspendVirtualTimeClock (); }
-    virtual void Resume () { scfParent->ResumeVirtualTimeClock (); }
-    virtual csTicks GetElapsedTicks () const
-    {
-      csTicks oElapsedTime, oCurrentTime;
-      scfParent->GetElapsedTime (oElapsedTime, oCurrentTime);
-      return oElapsedTime;
-    }
-    virtual csTicks GetCurrentTicks () const
-    {
-      csTicks oElapsedTime, oCurrentTime;
-      scfParent->GetElapsedTime (oElapsedTime, oCurrentTime);
-      return oCurrentTime;
-    }
-  } scfiVirtualClock;
-  friend class VirtualClock;
 
   //------------------------------------------------------------------
 
