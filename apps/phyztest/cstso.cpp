@@ -30,7 +30,7 @@ csRigidSpaceTimeObj::csRigidSpaceTimeObj( iCollideSystem* cdsys, csMeshWrapper *
  // col = pcollide;
   sprt = psprt;
   rb = prb;
-  iPolygonMesh* mesh = QUERY_INTERFACE (sprt, iPolygonMesh);
+  iPolygonMesh* mesh = QUERY_INTERFACE (sprt->GetMeshObject(), iPolygonMesh);
   col = new csCollider (*sprt, cdsys, mesh);
   mesh->DecRef ();
   what_type = ST_RIGID;

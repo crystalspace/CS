@@ -15,6 +15,9 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine eliminated several compilation warnings from MSVC
 	  (reported by Martin Geisse) in sft3dcom.cpp and avistrv.cpp about
 	  variables possibly used uninitialized.
+	- Eric Sunshine fixed a crasher in Phyztest which occurred when the
+	  tumbling block was launched.  QUERY_INTERFACE() was being called on
+	  the wrong object.
 18-Feb-2001
 	- Eric Sunshine eliminated a compilation warning in levtool.cpp on
 	  BeOS.
