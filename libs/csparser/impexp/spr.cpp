@@ -53,9 +53,9 @@ int converter::spr_write ( FILE *fileout ) {
   int i1;
   int i2;
   int i3;
-  int i4;
+//  int i4;
   int iface;
-  int ivert;
+//  int ivert;
   int j;
   int line;
 

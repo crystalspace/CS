@@ -189,7 +189,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
         break;
       case CS_TOKEN_GRID:
 	{
-	  int lod, bx, by;
+	  int bx, by;
 	  ScanStr (pParams, "%d,%d", &bx, &by);
           iTerrainState->SetGridResolution (bx, by);
         }
