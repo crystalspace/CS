@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+6-Sep-2002
+	- Fixed cs2xml so it correctly translates AMBIENT inside
+	  SETTINGS (while still keeping support for AMBIENT
+	  inside MATERIAL).
+	- Fixed cs2xml for UP, FORWARD, and FARPLANE inside START.
 5-Sep-2002
 	- Fixed a very subtle bug in the csRef assignement operators.
 	  It is very important FIRST to assign the new value to the

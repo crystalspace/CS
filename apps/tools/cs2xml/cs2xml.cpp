@@ -60,6 +60,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (ACCEL)
   CS_TOKEN_DEF (AGING)
   CS_TOKEN_DEF (ALLMATERIAL)
+  CS_TOKEN_DEF (AMBIENT)
   CS_TOKEN_DEF (ATTACH)
   CS_TOKEN_DEF (BASECOLOR)
   CS_TOKEN_DEF (BLOCKS)
@@ -90,10 +91,12 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (F)
   CS_TOKEN_DEF (FADE)
   CS_TOKEN_DEF (FALLSPEED)
+  CS_TOKEN_DEF (FARPLANE)
   CS_TOKEN_DEF (FILE)
   CS_TOKEN_DEF (FIRST)
   CS_TOKEN_DEF (FLATTEN)
   CS_TOKEN_DEF (FOG)
+  CS_TOKEN_DEF (FORWARD)
   CS_TOKEN_DEF (FRAME)
   CS_TOKEN_DEF (GENERATE)
   CS_TOKEN_DEF (GRID)
@@ -158,6 +161,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (TYPE)
   CS_TOKEN_DEF (UV)
   CS_TOKEN_DEF (UVA)
+  CS_TOKEN_DEF (UP)
   CS_TOKEN_DEF (V)
   CS_TOKEN_DEF (VERTEX)
   CS_TOKEN_DEF (VERTICES)
@@ -494,6 +498,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (ACCEL)
     CS_TOKEN_TABLE (AGING)
     CS_TOKEN_TABLE (ALLMATERIAL)
+    CS_TOKEN_TABLE (AMBIENT)
     CS_TOKEN_TABLE (ATTACH)
     CS_TOKEN_TABLE (BASECOLOR)
     CS_TOKEN_TABLE (BLOCKS)
@@ -524,10 +529,12 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (F)
     CS_TOKEN_TABLE (FADE)
     CS_TOKEN_TABLE (FALLSPEED)
+    CS_TOKEN_TABLE (FARPLANE)
     CS_TOKEN_TABLE (FILE)
     CS_TOKEN_TABLE (FIRST)
     CS_TOKEN_TABLE (FLATTEN)
     CS_TOKEN_TABLE (FOG)
+    CS_TOKEN_TABLE (FORWARD)
     CS_TOKEN_TABLE (FRAME)
     CS_TOKEN_TABLE (GENERATE)
     CS_TOKEN_TABLE (GRID)
@@ -585,6 +592,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (TYPE)
     CS_TOKEN_TABLE (UV)
     CS_TOKEN_TABLE (UVA)
+    CS_TOKEN_TABLE (UP)
     CS_TOKEN_TABLE (V)
     CS_TOKEN_TABLE (VERTEX)
     CS_TOKEN_TABLE (VERTICES)
@@ -681,6 +689,30 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    if (name && *name) child->SetAttribute ("name", name);
 	    child->SetAttributeAsInt ("start", rangeStart);
 	    child->SetAttributeAsInt ("end", rangeEnd);
+	  }
+	  break;
+        case CS_TOKEN_AMBIENT:
+	  {
+	    if (!strcmp (parent_token, "settings"))
+	    {
+	      csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	      child->SetValue (tokname);
+	      float x, y, z;
+	      csScanStr (params, "%f,%f,%f", &x, &y, &z);
+	      child->SetAttributeAsFloat ("red", x);
+	      child->SetAttributeAsFloat ("green", y);
+	      child->SetAttributeAsFloat ("blue", z);
+	      if (name && *name) child->SetAttribute ("name", name);
+	    }
+	    else
+	    {
+	      float f;
+	      csScanStr (params, "%f", &f);
+	      csRef<iDocumentNode> child = CreateValueNodeAsFloat (
+	    	  parent, tokname, f);
+	      if (name && *name) child->SetAttribute ("name", name);
+	    }
 	  }
 	  break;
         case CS_TOKEN_SOLID:
@@ -840,8 +872,24 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    CreateValueNodeAsFloat (child, "end", end);
 	  }
 	  break;
+        case CS_TOKEN_FARPLANE:
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name && *name) child->SetAttribute ("name", name);
+	    float a, b, c, d;
+	    csScanStr (params, "%f,%f,%f,%f", &a, &b, &c, &d);
+	    child->SetAttributeAsFloat ("a", a);
+	    child->SetAttributeAsFloat ("b", b);
+	    child->SetAttributeAsFloat ("c", c);
+	    child->SetAttributeAsFloat ("d", d);
+	  }
+	  break;
         case CS_TOKEN_C:
         case CS_TOKEN_W:
+        case CS_TOKEN_FORWARD:
+        case CS_TOKEN_UP:
         case CS_TOKEN_EULER:
         case CS_TOKEN_TOPLEFT:
         case CS_TOKEN_DIRECTION:
