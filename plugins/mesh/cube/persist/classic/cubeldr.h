@@ -28,6 +28,7 @@
 struct iEngine;
 struct iPluginManager;
 struct iObjectRegistry;
+struct iSyntaxService;
 
 /**
  * Cube factory loader.
@@ -37,6 +38,7 @@ class csCubeFactoryLoader : public iLoaderPlugin
 private:
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
+  iSyntaxService *synldr;
 
 public:
   SCF_DECLARE_IBASE;
@@ -69,6 +71,7 @@ class csCubeFactorySaver : public iSaverPlugin
 private:
   iPluginManager* plugin_mgr;
   iObjectRegistry* object_reg;
+  iSyntaxService *synldr;
 
 public:
   SCF_DECLARE_IBASE;

@@ -28,6 +28,7 @@
 #include "isys/system.h"
 #include "isys/plugin.h"
 #include "imesh/cube.h"
+#include "imap/services.h"
 #include "ivideo/graph3d.h"
 #include "qint.h"
 #include "iutil/strvec.h"
@@ -41,15 +42,6 @@
 CS_IMPLEMENT_PLUGIN
 
 CS_TOKEN_DEF_START
-  CS_TOKEN_DEF (ADD)
-  CS_TOKEN_DEF (ALPHA)
-  CS_TOKEN_DEF (COPY)
-  CS_TOKEN_DEF (KEYCOLOR)
-  CS_TOKEN_DEF (TILING)
-  CS_TOKEN_DEF (MULTIPLY2)
-  CS_TOKEN_DEF (MULTIPLY)
-  CS_TOKEN_DEF (TRANSPARENT)
-
   CS_TOKEN_DEF (FACTORY)
   CS_TOKEN_DEF (MATERIAL)
   CS_TOKEN_DEF (MIXMODE)
@@ -114,69 +106,24 @@ csCubeFactoryLoader::csCubeFactoryLoader (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  synldr = NULL;
 }
 
 csCubeFactoryLoader::~csCubeFactoryLoader ()
 {
+  SCF_DEC_REF (synldr);
 }
 
 bool csCubeFactoryLoader::Initialize (iObjectRegistry* object_reg)
 {
   csCubeFactoryLoader::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  return true;
-}
+  synldr = CS_QUERY_PLUGIN (plugin_mgr, iSyntaxService);
+  if (!synldr)
+    synldr = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.syntax.loader.service.text", 
+			     CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
 
-static UInt ParseMixmode (char* buf)
-{
-  CS_TOKEN_TABLE_START (modes)
-    CS_TOKEN_TABLE (COPY)
-    CS_TOKEN_TABLE (MULTIPLY2)
-    CS_TOKEN_TABLE (MULTIPLY)
-    CS_TOKEN_TABLE (ADD)
-    CS_TOKEN_TABLE (ALPHA)
-    CS_TOKEN_TABLE (TRANSPARENT)
-    CS_TOKEN_TABLE (KEYCOLOR)
-    CS_TOKEN_TABLE (TILING)
-  CS_TOKEN_TABLE_END
-
-  char* name;
-  long cmd;
-  char* params;
-
-  UInt Mixmode = 0;
-
-  while ((cmd = csGetObject (&buf, modes, &name, &params)) > 0)
-  {
-    if (!params)
-    {
-      printf ("Expected parameters instead of '%s'!\n", buf);
-      return 0;
-    }
-    switch (cmd)
-    {
-      case CS_TOKEN_COPY: Mixmode |= CS_FX_COPY; break;
-      case CS_TOKEN_MULTIPLY: Mixmode |= CS_FX_MULTIPLY; break;
-      case CS_TOKEN_MULTIPLY2: Mixmode |= CS_FX_MULTIPLY2; break;
-      case CS_TOKEN_ADD: Mixmode |= CS_FX_ADD; break;
-      case CS_TOKEN_ALPHA:
-	Mixmode &= ~CS_FX_MASK_ALPHA;
-	float alpha;
-        csScanStr (params, "%f", &alpha);
-	Mixmode |= CS_FX_SETALPHA(alpha);
-	break;
-      case CS_TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
-      case CS_TOKEN_KEYCOLOR: Mixmode |= CS_FX_KEYCOLOR; break;
-      case CS_TOKEN_TILING: Mixmode |= CS_FX_TILING; break;
-    }
-  }
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
-  {
-    printf ("Token '%s' not found while parsing the modes!\n",
-      csGetLastOffender ());
-    return 0;
-  }
-  return Mixmode;
+  return synldr;
 }
 
 iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine,
@@ -235,7 +182,16 @@ iBase* csCubeFactoryLoader::Parse (const char* string, iEngine* engine,
 	}
 	break;
       case CS_TOKEN_MIXMODE:
-        cubeLook->SetMixMode (ParseMixmode (params));
+	{
+	  UInt mixmode;
+	  if (!synldr->ParseMixmode (params, mixmode))
+	  {
+	    cubeLook->DecRef ();
+            fact->DecRef ();
+            return NULL;
+	  }
+	  cubeLook->SetMixMode (mixmode);
+	}
 	break;
       case CS_TOKEN_SHIFT:
 	{
@@ -264,39 +220,26 @@ csCubeFactorySaver::csCubeFactorySaver (iBase* pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
+  synldr = NULL;
 }
 
 csCubeFactorySaver::~csCubeFactorySaver ()
 {
+  SCF_DEC_REF (synldr);
 }
 
 bool csCubeFactorySaver::Initialize (iObjectRegistry* object_reg)
 {
   csCubeFactorySaver::object_reg = object_reg;
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  return true;
+  if (!synldr)
+    synldr = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.syntax.loader.service.text", 
+			     CS_FUNCID_SYNTAXSERVICE, iSyntaxService);
+
+  return synldr;
 }
 
 #define MAXLINE 100 /* max number of chars per line... */
-
-static void WriteMixmode(iStrVector *str, UInt mixmode)
-{
-  str->Push(csStrNew("  MIXMODE ("));
-  if (mixmode&CS_FX_COPY) str->Push(csStrNew(" COPY ()"));
-  if (mixmode&CS_FX_ADD) str->Push(csStrNew(" ADD ()"));
-  if (mixmode&CS_FX_MULTIPLY) str->Push(csStrNew(" MULTIPLY ()"));
-  if (mixmode&CS_FX_MULTIPLY2) str->Push(csStrNew(" MULTIPLY2 ()"));
-  if (mixmode&CS_FX_KEYCOLOR) str->Push(csStrNew(" KEYCOLOR ()"));
-  if (mixmode&CS_FX_TILING) str->Push(csStrNew(" TILING ()"));
-  if (mixmode&CS_FX_TRANSPARENT) str->Push(csStrNew(" TRANSPARENT ()"));
-  if (mixmode&CS_FX_ALPHA)
-  {
-    char buf[MAXLINE];
-    sprintf (buf, "ALPHA (%g)", float(mixmode&CS_FX_MASK_ALPHA)/255.);
-    str->Push(csStrNew(buf));
-  }
-  str->Push (csStrNew(")"));
-}
 
 void csCubeFactorySaver::WriteDown (iBase* obj, iStrVector * str,
   iEngine* /*engine*/)
@@ -312,9 +255,7 @@ void csCubeFactorySaver::WriteDown (iBase* obj, iStrVector * str,
   }
 
   if(cubelook->GetMixMode() != CS_FX_COPY)
-  {
-    WriteMixmode(str, cubelook->GetMixMode());
-  }
+    str->Push(csStrNew(synldr->MixmodeToText (cubelook->GetMixMode (), 0)));
 
   char buf[MAXLINE];
   sprintf(buf, "MATERIAL (%s)\n", cubelook->GetMaterialWrapper()->
