@@ -5240,6 +5240,7 @@ iEffectTechnique* csGraphics3DOGLCommon::GetStockTechnique( G3DTriangleMesh& mes
 
 void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 {
+  int i, l;
   if (!mesh.mat_handle)
   {
     // If there is no material (which is legal) we temporarily use
@@ -5317,7 +5318,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     }
 
     // Go through all the modes and select the first one that is appropriate.
-    int i;
     for (i = 0 ; i < 3 ; i++)
     {
       char c = clip_modes[i];
@@ -5381,8 +5381,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       }
     }
   }
-
-  int i;
 
   //===========
   // Update work tables.
@@ -5650,7 +5648,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
 
     if( pass->GetLayerCount() > maxlayers ) maxlayers = pass->GetLayerCount();
-    for( int l=0; l<pass->GetLayerCount(); l++ )
+    for( l=0; l<pass->GetLayerCount(); l++ )
     {
       iEffectLayer* layer = pass->GetLayer(l);
 
@@ -5879,7 +5877,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   }
   if (ARB_multitexture && (ARB_texture_env_combine || EXT_texture_env_combine))
   {
-    for( int l=maxlayers-1; l>=0; l-- )
+    for( l=maxlayers-1; l>=0; l-- )
     {
       glActiveTextureARB( GL_TEXTURE0_ARB+l );
       glClientActiveTextureARB( GL_TEXTURE0_ARB+l );
