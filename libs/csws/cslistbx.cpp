@@ -538,20 +538,30 @@ bool csListBox::HandleEvent (csEvent &Event)
           }
           return false;
         case CSKEY_HOME:
-          if (((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0) && (deltax != 0))
+          if ((Event.Key.ShiftKeys & CSMASK_CTRL) && (deltax != 0))
           {
             deltax = 0;
             PlaceItems ();
             return true;
-          } /* endif */
+          }
+          else if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0)
+          {
+            SendCommand (cscmdListBoxTrack, (void *)NextChild (first));
+            return true;
+          }
           return false;
         case CSKEY_END:
-          if (((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0) && (deltax != maxdeltax))
+          if ((Event.Key.ShiftKeys & CSMASK_CTRL) && (deltax != maxdeltax))
           {
             deltax = maxdeltax;
             PlaceItems ();
             return true;
-          } /* endif */
+          }
+          else if ((Event.Key.ShiftKeys & CSMASK_ALLSHIFTS) == 0)
+          {
+            SendCommand (cscmdListBoxTrack, (void *)PrevChild (first));
+            return true;
+          }
           return false;
         case '/':
           if ((ListBoxStyle & CSLBS_MULTIPLESEL)

@@ -18,10 +18,12 @@
 
 */
 
+#include <stdarg.h>
+#include <math.h>
+
 #include "sysdef.h"
 #include "csphyzik/mathutil.h"
 #include "csphyzik/math3d.h"
-#include <math.h>
 
 #define VEC_X_NORM_THRESHOLD 0.05
 
