@@ -70,9 +70,6 @@ bool csMovableSectorList::FreeItem (void *item)
 {
   iSector *Sector = (iSector*)item;
 
-  // @@@ NOT IMPLEMENTED YET.
-  CS_ASSERT (false);
-
   Sector->DecRef ();
   return true;
 }
@@ -160,6 +157,7 @@ void csMovable::ClearSectors ()
   if (parent == NULL)
   {
     object->RemoveFromSectors ();
+    sectors.DeleteAll ();
     sectors.SetLength (0);
   }
 }

@@ -106,7 +106,7 @@ void csLight::Light::SetCenter (const csVector3& pos)
 iSector *csLight::Light::GetSector ()
   { return &scfParent->GetSector ()->scfiSector; }
 void csLight::Light::SetSector (iSector* sector)
-  { scfParent->SetSector (sector->GetPrivateObject ()); }
+  { scfParent->SetSector (sector ? sector->GetPrivateObject () : NULL); }
 float csLight::Light::GetRadius ()
   { return scfParent->GetRadius (); }
 float csLight::Light::GetSquaredRadius ()

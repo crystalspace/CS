@@ -9,6 +9,9 @@ The history order is reversed so that new features are at the top.
 	  is NULL it will simply do nothing.
 	- Fixed a memory leak on dynamic and static lights in the object
 	  iterator in the engine.
+	- Fixed a significant memory leak on sectors. Every time a
+	  mesh would move to a different sector a ref count would
+	  be increased without it being decreased ever.
 16-Nov-2001
 	- Removed csDebuggingGraph::AddInterface() and instead added
 	  a 'bool scf' parameter to AddObject().
