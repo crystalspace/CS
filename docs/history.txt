@@ -3,6 +3,10 @@ The history order has been reversed so that new features are at the top.
 31-Oct-2000
 	- Philip Wyett fixed the CSWS VC project file after Andrew's
 	  changes.
+	- Eric Sunshine fixed a number of compilation problems throughouth
+	  the project which were reported by Visual C++.
+	- Eric Sunshine fixed 'simple' so that it once again works correctly
+	  with csConsole following Andrew's changes.
 30-Oct-2000
 	- Two fixes to csws. Andrew: you forgot SYSDEF_ALLOCA and
 	  also default parameters cannot be repeated in the cpp file.
