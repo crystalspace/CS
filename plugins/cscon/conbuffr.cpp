@@ -22,12 +22,13 @@
 
 csConsoleBuffer::csConsoleBuffer(int length, int size)
 {
+  
   buffer = NULL;
   SetLength(length);
   SetPageSize(size);
   empty = new csString(" ");
 
-	 // Initialize the state variables
+ // Initialize the state variables
   current_line = display_top = 0;
   display_bottom = page_size;
 }
@@ -45,6 +46,7 @@ csConsoleBuffer::~csConsoleBuffer()
 
 void csConsoleBuffer::NewLine(bool snap)
 {
+//    printf("*** top = %d, bottom = %d, size = %d\n", display_top, display_bottom, GetPageSize());
   // Assign the empty display string to avoid NULL pointer ugliness
   if(buffer[current_line]==NULL)
     buffer[current_line] = empty;
@@ -74,13 +76,18 @@ void csConsoleBuffer::NewLine(bool snap)
   }
 
   if(snap&&((current_line>=display_bottom)||(current_line<=display_top))) {
+
+    display_top++;
+    display_bottom++;
+    
+    /*
     display_top = current_line - page_size + 1;
     if(display_top<0) {
       display_top = 0;
       display_bottom = page_size;
     } else
       display_bottom = current_line + 1;
-
+    */
     // Invalidate all the lines now visible to scroll properly
     int i;
     for(i=display_top;i<=display_bottom;i++)
@@ -167,13 +174,25 @@ void csConsoleBuffer::Clear()
 void csConsoleBuffer::SetPageSize(int size)
 {
   // Set the page size and force a snap to the current line
+  display_bottom = display_top + size;
+  if ( current_line > display_bottom )
+  {
+    display_bottom = current_line;
+    display_top = display_bottom - size;
+    if ( display_top < 0 ){
+      display_top = 0;
+      display_bottom = size;
+    }
+  }
   page_size = size;
+  /*
   display_top = current_line - size + 1;
   if(display_top<0) {
     display_top = 0;
     display_bottom = page_size;
   } else
     display_bottom = current_line + 1;
+  */
 }
 
 void csConsoleBuffer::SetTopLine(int line)

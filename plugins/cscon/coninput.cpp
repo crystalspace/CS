@@ -32,6 +32,7 @@ csConsoleInput::csConsoleInput(iBase *base)
   buffer = new csConsoleBuffer(4096, 4096);
   piConsole = NULL;
   cursor = 0;
+  history = 0;
 }
 
 csConsoleInput::~csConsoleInput()
@@ -52,7 +53,6 @@ bool csConsoleInput::Initialize(iSystem *system)
 
 bool csConsoleInput::HandleEvent(csEvent &event)
 {
-
   if(event.Type==csevKeyDown) {
     csString *line;
     int cx, cy;
@@ -71,7 +71,7 @@ bool csConsoleInput::HandleEvent(csEvent &event)
 	}
 	break;
     case CSKEY_RIGHT:
-      if(cursor<buffer->GetLine(history)->Length()) {
+      if( buffer->GetLine(history) && cursor<buffer->GetLine(history)->Length()) {
 	cursor++;
 	if(piConsole) {
 	  piConsole->GetCursorPos(cx, cy);
@@ -153,12 +153,12 @@ bool csConsoleInput::HandleEvent(csEvent &event)
 	  break;
 	case CSKEY_BACKSPACE:
 	  line = buffer->WriteLine();
-	  // Delete the last character in the current line
-	  if(cursor>1)
-	    line->DeleteAt(cursor-1);
-	  else if (cursor==1)
-	    buffer->DeleteLine(buffer->GetCurLine());
-	  else if (cursor==0) {
+          // Delete the last character in the current line
+          if(cursor>1)
+            line->DeleteAt(cursor-1);
+          else if (cursor==1)
+            buffer->DeleteLine(buffer->GetCurLine());
+          else if (cursor==0) {
 	    echo = false;
 	    // This gets decremented to zero below
 	    cursor = 1;
@@ -195,7 +195,7 @@ bool csConsoleInput::HandleEvent(csEvent &event)
     piSystem->Printf(MSG_WARNING, "csConsoleInput:  Received an unknown event!\n");
   }
 #endif // CS_DEBUG
-  
+ 
   // Just in case the application adds us into the input loop
   return false;
 

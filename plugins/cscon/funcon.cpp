@@ -72,7 +72,6 @@ void funConsole::Draw3D(csRect *rect)
   int i;
   long int zBuf;
   G3DPolygonDPFX poly;
-
   if ( !border_computed ){
     // determine what space left to draw the actual console
     memset( &bordersize, 0, sizeof(bordersize) );
@@ -264,6 +263,8 @@ void funConsole::SetPosition( int x, int y, int width, int height )
     size.ymax = size.ymax - bordersize.ymax + deco.p2by + deco.by;
     //    printf("%d %d %d %d %d %d %d\n", bordersize.xmin, deco.p2lx,   deco.lx, size.xmin, size.xmax, size.ymin, size.ymax );
     //    printf("%d %d %d %d\n", outersize.xmin, outersize.xmax, outersize.ymin, outersize.ymax );
+    // call again with the final size
+    csConsole::SetPosition ( size.xmin, size.ymin, size.Width(), size.Height() );
   }
 }
 

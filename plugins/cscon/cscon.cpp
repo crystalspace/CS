@@ -277,7 +277,6 @@ void csConsole::Draw(csRect *area)
       curText.SetAt(cx, '\0');
       cx_pix = piG2D->GetTextWidth(font, curText.GetData());
     }
-
     cy_pix = (cy * height) + size.ymin;
     cx_pix += size.xmin;
 
@@ -377,9 +376,22 @@ void csConsole::SetPosition(int x, int y, int width, int height)
   // Invalidate the entire new area of the console
   invalid.Set(size); 
 
-  // Reset cursor coordinates
-  cx = cy = 0;
-
+  // Update cursor coordinates
+  cy = MIN( cy, buffer->GetPageSize () );
+  // now check how many chars do fit in the current width
+  const csString *text = buffer->GetLine(cy);
+  if(text==NULL) {
+    cx = 0;
+  } else {
+    csString curText(*text);
+    curText.SetSize(cx);
+    curText.SetAt(cx, '\0');
+    while ( cx && piG2D->GetTextWidth(font, curText.GetData()) > size.Width() )
+    {
+      curText.SetSize(--cx);
+      curText.SetAt(cx, '\0');
+    }
+  }
 }
 
 void csConsole::Invalidate(csRect &area)
