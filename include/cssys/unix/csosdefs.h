@@ -22,14 +22,6 @@
 
 #include <math.h>
 
-// Needed for Memory-Mapped IO function below.
-#include <unistd.h>
-#include <sys/mman.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-//////////////////////////////////////////////
-
 #ifdef CS_SYSDEF_PROVIDE_SOFTWARE2D
 #  define CS_SOFTWARE_2D_DRIVER get_software_2d_driver ()
    static inline char* get_software_2d_driver ()
@@ -50,6 +42,13 @@
 
 
 #ifdef CS_SYSDEF_PROVIDE_HARDWARE_MMIO
+
+// Needed for Memory-Mapped IO functions below.
+#include <unistd.h>
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 // Defines that this platform supports hardware memory-mapped i/o
 #define CS_HAS_MEMORY_MAPPED_IO 1
