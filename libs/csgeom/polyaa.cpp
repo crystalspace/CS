@@ -188,6 +188,9 @@ void __poly_fill (csVector2 *iVertices, int iVertexCount)
 void csAntialiasedPolyFill (csVector2 *iVertices, int iVertexCount,
   void *iArg, csAAPFCBPixel iPutPixel, csAAPFCBBox iDrawBox)
 {
+  // if nothing to do, exit
+  if(iVertexCount <= 0) return;
+
   PutPixel = iPutPixel;
   DrawBox = iDrawBox;
   Arg = iArg;
