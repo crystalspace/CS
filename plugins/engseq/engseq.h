@@ -346,7 +346,7 @@ public:
 		  const csBox3* box, const csSphere* sphere);
   void AddConditionMeshClick (iMeshWrapper* mesh);
   void AddConditionLightChange (iLight *whichlight, 
-				int oper,csColor& col);
+				int oper, const csColor& col);
   void AddConditionManual ();
 
   void SetEnabled (bool en) { enabled = en; }

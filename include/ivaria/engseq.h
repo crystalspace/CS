@@ -352,7 +352,7 @@ struct iSequenceTrigger : public iBase
    * whenever a light changes.
    */
   virtual void AddConditionLightChange (iLight *whichlight, 
-				        int oper,csColor& col) = 0;
+				        int oper, const csColor& col) = 0;
 
   /**
    * Condition: manual trigger. Call this to set add a trigger

@@ -1370,7 +1370,7 @@ void csSequenceTrigger::AddConditionMeshClick (iMeshWrapper* mesh)
 }
 
 void csSequenceTrigger::AddConditionLightChange (iLight *whichlight, 
-						 int oper,csColor& col)
+						 int oper, const csColor& col)
 {
   csTriggerLightCallback* trig = new csTriggerLightCallback (this,
 							     oper, col);
