@@ -409,7 +409,7 @@ void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())        \
   else                                                                 \
   {                                                                    \
     int i;                                                             \
-    for (i=0; i < lastEntry; i++)                                      \
+    for (i=lastEntry-1; i >= 0; i--)                                   \
       a[i] ();                                                         \
     free (a);                                                          \
    }                                                                   \
