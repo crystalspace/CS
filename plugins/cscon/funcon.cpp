@@ -68,8 +68,9 @@ bool funConsole::Initialize(iSystem *system)
 
 void funConsole::Draw3D(csRect *rect)
 {
-  bool ztest, zfill, btext, bgour;
+  bool btext, bgour;
   int i;
+  long int zBuf;
   G3DPolygonDPFX poly;
 
   if ( !border_computed ){
@@ -85,14 +86,11 @@ void funConsole::Draw3D(csRect *rect)
     SetPosition( outersize.xmin, outersize.ymin, outersize.Width(), outersize.Height() );
   }
 
-  ztest = G3D->GetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE);
-  zfill = G3D->GetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE);
+  zBuf = G3D->GetRenderState (G3DRENDERSTATE_ZBUFFERMODE);
   btext = G3D->GetRenderState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE);
   bgour = G3D->GetRenderState (G3DRENDERSTATE_GOURAUDENABLE);
 
-  G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, false );
-  // we draw our data in there
-  G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true );
+  G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILL );
 
   int height = G3D->GetHeight()-1;
 
@@ -169,8 +167,7 @@ void funConsole::Draw3D(csRect *rect)
   // draw the left decoration
   DrawBorder( outersize.xmin, height-p2size.ymin+deco.p2ty, bordersize.xmin, p2size.Height()+deco.p2by+deco.p2ty, deco.border[7], 4 );
   
-  G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERTESTENABLE, ztest );
-  G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, zfill );
+  G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zBuf );
   G3D->SetRenderState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE, btext);
   G3D->SetRenderState (G3DRENDERSTATE_GOURAUDENABLE, bgour);
 
