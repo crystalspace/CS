@@ -163,6 +163,10 @@ public:
     {
       return scfParent->GetMaterialHandle ();
     }
+    virtual iObject* QueryObject ()
+    {
+      return scfParent;
+    }
     virtual void Visit () { scfParent->Visit (); }
     virtual iMaterial* GetMaterial ()
     {

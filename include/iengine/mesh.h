@@ -31,6 +31,7 @@ struct iMeshFactoryWrapper;
 struct iRenderView;
 struct iMovable;
 struct iLight;
+struct iObject;
 
 /// A callback function for MeshWrapper::Draw().
 typedef void (csDrawCallback) (iMeshWrapper* spr, iRenderView* rview,
@@ -46,6 +47,8 @@ struct iMeshWrapper : public iBase
 {
   /// Get the iMeshObject.
   virtual iMeshObject* GetMeshObject () = 0;
+  /// Get the iObject for this mesh object.
+  virtual iObject *QueryObject() = 0;
 
   /**
    * Update lighting as soon as the object becomes visible.
@@ -136,6 +139,8 @@ struct iMeshFactoryWrapper : public iBase
 {
   /// UGLY!!!@@@
   virtual csMeshFactoryWrapper* GetPrivateObject () = 0;
+  /// Get the iObject for this mesh factory.
+  virtual iObject *QueryObject() = 0;
   /// Get the iMeshObjectFactory.
   virtual iMeshObjectFactory* GetMeshObjectFactory () = 0;
 };

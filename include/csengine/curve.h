@@ -277,6 +277,7 @@ public:
   {
     DECLARE_EMBEDDED_IBASE (csCurve);
     virtual csCurve* GetOriginalObject () { return (csCurve*)scfParent; }
+    virtual iObject *QueryObject() {return scfParent;}
     virtual iCurveTemplate* GetParentTemplate ();
     virtual void SetMaterial (iMaterialWrapper* mat);
     virtual iMaterialWrapper* GetMaterial ();
@@ -325,8 +326,10 @@ public:
   struct CurveTemplate : public iCurveTemplate
   {
     DECLARE_EMBEDDED_IBASE (csCurveTemplate);
-    virtual void SetName (const char* name) { scfParent->SetName (name); }
-    virtual const char* GetName () const { return scfParent->GetName (); }
+    virtual iObject *QueryObject()
+    {
+      return scfParent;
+    }
     virtual void SetMaterial (iMaterialWrapper* mat);
     virtual iMaterialWrapper* GetMaterial ();
     virtual iCurve* MakeCurve ();

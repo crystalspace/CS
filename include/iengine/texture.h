@@ -27,6 +27,7 @@ struct iImage;
 struct iTextureHandle;
 struct iTextureManager;
 struct iTextureWrapper;
+struct iObject;
 
 /// A callback function for when a csTextureWrapper is used.
 typedef void (csTextureCallback) (iTextureWrapper* wrap, void* data);
@@ -42,6 +43,9 @@ struct iTextureWrapper : public iBase
 {
   /// @@@temporary: return the private csTextureWrapper object
   virtual csTextureWrapper *GetPrivateObject() const = 0;
+
+  /// Get the iObject for this texture
+  virtual iObject *QueryObject() = 0;
 
   /// Get the texture handle
   virtual iTextureHandle *GetTextureHandle() const = 0;

@@ -599,6 +599,9 @@ public:
    */
   void ShineLights (csRegion* region = NULL);
 
+  /// Query the iObject for the engine.
+  virtual iObject *QueryObject();
+
   /**
    * Prepare the engine. This function must be called after
    * you loaded/created the world. It will prepare all lightmaps

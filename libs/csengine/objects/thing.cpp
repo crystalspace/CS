@@ -2447,7 +2447,7 @@ void csThing::MergeTemplate (iThingState* tpl,
     if (pt->GetMaterial ())
       mat = pt->GetMaterial ()->GetPrivateObject (); //@@@
     p = NewPolygon (mat); //@@@
-    p->SetName (pt->GetName ());
+    p->SetName (pt->QueryObject()->GetName ());
     iMaterialWrapper* wrap = pt->GetMaterial ();
     if (!wrap && default_material)
       p->SetMaterial (default_material->GetPrivateObject ());
@@ -2471,7 +2471,7 @@ void csThing::MergeTemplate (iThingState* tpl,
   {
     iCurve* orig_curve = tpl->GetCurve (i);
     iCurve* p = CreateCurve (orig_curve->GetParentTemplate ());
-    p->SetName (orig_curve->GetName ());
+    p->QueryObject()->SetName (orig_curve->QueryObject()->GetName ());
     if (orig_curve->GetMaterial ())
       p->SetMaterial (orig_curve->GetMaterial ());
     else

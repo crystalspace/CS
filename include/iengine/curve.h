@@ -24,6 +24,7 @@
 struct iCurveTemplate;
 struct iMaterialWrapper;
 class csCurve;
+struct iObject;
 
 SCF_VERSION (iCurve, 0, 0, 1);
 
@@ -34,16 +35,14 @@ struct iCurve : public iBase
 {
   /// Get the original curve (@@@UGLY).
   virtual csCurve* GetOriginalObject () = 0;
+  /// Get the iObject for this curve.
+  virtual iObject *QueryObject() = 0;
   /// Get the parent curve template.
   virtual iCurveTemplate* GetParentTemplate () = 0;
   /// Set the material wrapper.
   virtual void SetMaterial (iMaterialWrapper* mat) = 0;
   /// Get the material wrapper.
   virtual iMaterialWrapper* GetMaterial () = 0;
-  /// Set the name of this curve.
-  virtual void SetName (const char* name) = 0;
-  /// Get the name of this curve.
-  virtual const char* GetName () const = 0;
   /// Set a control point.
   virtual void SetControlPoint (int idx, int control_id) = 0;
 };
@@ -55,10 +54,8 @@ SCF_VERSION (iCurveTemplate, 0, 0, 2);
  */
 struct iCurveTemplate : public iBase
 {
-  /// Set the name of this curve template.
-  virtual void SetName (const char* name) = 0;
-  /// Get the name of the curve template.
-  virtual const char* GetName () const = 0;
+  /// Get the iObject for this curve template.
+  virtual iObject *QueryObject() = 0;
   /// Set the material wrapper.
   virtual void SetMaterial (iMaterialWrapper* mat) = 0;
   /// Get the material wrapper.

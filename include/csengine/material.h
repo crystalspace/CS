@@ -158,6 +158,10 @@ public:
     {
       return (csMaterialWrapper*)scfParent;
     }
+    virtual iObject *QueryObject()
+    {
+      return scfParent;
+    }
     virtual iMaterialHandle* GetMaterialHandle ()
     {
       return scfParent->GetMaterialHandle ();

@@ -48,6 +48,7 @@ struct iGraphics3D;
 struct iClipper2D;
 struct iPolyTxtPlane;
 struct iCurveTemplate;
+struct iObject;
 
 SCF_VERSION (iEngine, 0, 1, 21);
 
@@ -63,6 +64,9 @@ struct iEngine : public iPlugIn
    * complete.
    */
   virtual csEngine *GetCsEngine () = 0;
+
+  /// Get the iObject for the engine.
+  virtual iObject *QueryObject() = 0;
 
   /**
    * Prepare the engine. This function must be called after

@@ -24,6 +24,7 @@
 class csMaterialWrapper;
 struct iMaterial;
 struct iMaterialHandle;
+struct iObject;
 
 SCF_VERSION (iMaterialWrapper, 0, 0, 4);
 
@@ -36,6 +37,8 @@ struct iMaterialWrapper : public iBase
 {
   /// @@@Ugly.
   virtual csMaterialWrapper* GetPrivateObject () = 0;
+  /// Get the iObject for this material.
+  virtual iObject *QueryObject() = 0;
   /// Get the material handle.
   virtual iMaterialHandle* GetMaterialHandle () = 0;
   /// Visit this material.

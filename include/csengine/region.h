@@ -80,6 +80,12 @@ public:
   {
     DECLARE_EMBEDDED_IBASE (csRegion);
 
+    /// Query the iObject.
+    virtual iObject *QueryObject()
+    {
+      return scfParent;
+    }
+
     /**
      * Clear this region without removing the entities in it. The entities
      * will simply get unconnected from this region.

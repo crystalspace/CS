@@ -1065,7 +1065,7 @@ Nag to Jorrit about this feature if you want it.\n");
 	  ScanStr (params, "%s", cname);
 	  iCurveTemplate* ct = engine->FindCurveTemplate (cname/* @@@ Onlyregion?*/);
 	  iCurve* p = thing_state->CreateCurve (ct);
-	  p->SetName (name);
+	  p->QueryObject()->SetName (name);
           if (!ct->GetMaterial ())
 	    p->SetMaterial (info.default_material);
         }
@@ -1391,7 +1391,7 @@ iBase* csBezierLoader::Parse (const char* string, iEngine* engine,
     {
       case CS_TOKEN_NAME:
         ScanStr (params, "%s", name);
-	tmpl->SetName (name);
+	tmpl->QueryObject()->SetName (name);
         break;
       case CS_TOKEN_MATERIAL:
         ScanStr (params, "%s", str);

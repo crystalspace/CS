@@ -382,6 +382,10 @@ public:
     {
       return scfParent->GetMeshObject ();
     }
+    virtual iObject *QueryObject()
+    {
+      return scfParent;
+    }
     virtual void DeferUpdateLighting (int flags, int num_lights)
     {
       scfParent->DeferUpdateLighting (flags, num_lights);
@@ -494,6 +498,10 @@ public:
     virtual iMeshObjectFactory* GetMeshObjectFactory ()
     {
       return scfParent->GetMeshObjectFactory ();
+    }
+    virtual iObject *QueryObject()
+    {
+      return scfParent;
     }
   } scfiMeshFactoryWrapper;
 };

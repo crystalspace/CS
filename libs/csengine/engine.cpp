@@ -635,6 +635,11 @@ void csEngine::Clear ()
   ClearRenderPriorities ();
 }
 
+iObject *csEngine::QueryObject ()
+{
+  return this;
+}
+
 void csEngine::RegisterRenderPriority (const char* name, long priority)
 {
   int i;

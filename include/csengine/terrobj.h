@@ -117,6 +117,10 @@ public:
     {
       return scfParent->GetTerrainObject ();
     }
+    virtual iObject *QueryObject()
+    {
+      return scfParent;
+    }
     virtual void UpdateLighting (iLight** lights, int num_lights)
     {
       (void)lights; (void)num_lights;
@@ -170,6 +174,10 @@ public:
     virtual iTerrainObjectFactory* GetTerrainObjectFactory ()
     {
       return scfParent->GetTerrainObjectFactory ();
+    }
+    virtual iObject *QueryObject()
+    {
+      return scfParent;
     }
   } scfiTerrainFactoryWrapper;
 };

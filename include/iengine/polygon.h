@@ -34,6 +34,7 @@ struct iPortal;
 struct iSector;
 struct iThing;
 struct iPolyTexType;
+struct iObject;
 
 class csPolygon3D;
 class csVector3;
@@ -63,11 +64,8 @@ struct iPolygon3D : public iBase
   /// Used by engine to retrieve internal object structure
   virtual csPolygon3D *GetPrivateObject () = 0;
 
-  /// Get polygon name
-  virtual const char *GetName () const = 0;
-  /// Set polygon name
-  virtual void SetName (const char *iName) = 0;
-
+  /// Get the iObject for this polygon.
+  virtual iObject *QueryObject() = 0;
   /**
    * Get the thing (container) that this polygon belongs to.
    * The reference counter on iThing is NOT incremented.

@@ -122,6 +122,7 @@ public:
     DECLARE_EMBEDDED_IBASE (csTextureWrapper);
 
     virtual csTextureWrapper *GetPrivateObject() const;
+    virtual iObject *QueryObject();
     virtual iTextureHandle *GetTextureHandle() const;
     virtual void SetKeyColor (int red, int green, int blue);
     virtual void GetKeyColor (int &red, int &green, int &blue) const;

@@ -27,6 +27,7 @@ class csTerrainWrapper;
 struct iLight;
 struct iTerrainObject;
 struct iTerrainObjectFactory;
+struct iObject;
 
 SCF_VERSION (iTerrainWrapper, 0, 0, 1);
 
@@ -41,6 +42,8 @@ struct iTerrainWrapper : public iBase
 
   /// Get the iTerrainObject.
   virtual iTerrainObject* GetTerrainObject () = 0;
+  /// Get the iObject for this terrain.
+  virtual iObject *QueryObject() = 0;
 
   /**
    * Light object according to the given array of lights (i.e.
@@ -64,6 +67,8 @@ struct iTerrainFactoryWrapper : public iBase
 {
   /// Get the iTerrainFactory.
   virtual iTerrainObjectFactory* GetTerrainObjectFactory () = 0;
+  /// Get the iObject for this terrain factory.
+  virtual iObject *QueryObject() = 0;
 };
 
 #endif // __IENGINE_TERRAIN_H__

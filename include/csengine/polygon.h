@@ -1217,8 +1217,7 @@ public:
     DECLARE_EMBEDDED_IBASE (csPolygon3D);
 
     virtual csPolygon3D *GetPrivateObject () { return scfParent; }
-    virtual const char *GetName () const { return scfParent->GetName (); }
-    virtual void SetName (const char *iName) { scfParent->SetName (iName); }
+    virtual iObject *QueryObject() {return scfParent;}
     virtual iThing *GetParent ();
     virtual iLightMap *GetLightMap ()
     {

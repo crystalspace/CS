@@ -25,6 +25,7 @@
 class csLight;
 class csColor;
 struct iSector;
+struct iObject;
 
 /// Light level that is used when there is no light on the texture.
 #define DEFAULT_LIGHT_LEVEL 20
@@ -40,6 +41,8 @@ struct iLight : public iBase
 {
   /// Get private pointer to light object. UGLY
   virtual csLight* GetPrivateObject () = 0;
+  /// Get the iObject for this light.
+  virtual iObject *QueryObject() = 0;
   /// Get the position of this light.
   virtual csVector3& GetCenter () = 0;
   /// Get the squared radius.

@@ -42,6 +42,9 @@ SCF_VERSION (iRegion, 0, 1, 5);
  */
 struct iRegion : public iBase
 {
+  /// Get the iObject for this region.
+  virtual iObject *QueryObject() = 0;
+
   /**
    * Clear this region without removing the entities in it. The entities
    * will simply get unconnected from this region.

@@ -152,6 +152,11 @@ iTextureHandle *csTextureWrapper::TextureWrapper::GetTextureHandle() const
   return scfParent->GetTextureHandle();
 }
 
+iObject *csTextureWrapper::TextureWrapper::QueryObject()
+{
+  return scfParent;
+}
+
 void csTextureWrapper::TextureWrapper::SetKeyColor (int red, int green, int blue)
 {
   scfParent->SetKeyColor (red, green, blue);
