@@ -19,6 +19,10 @@
 #ifndef __CS_CMDLINE_H__
 #define __CS_CMDLINE_H__
 
+/**\file
+ * iCommandLineParser implementation
+ */
+
 #include "csextern.h"
 #include "iutil/cmdline.h"
 #include "parray.h"

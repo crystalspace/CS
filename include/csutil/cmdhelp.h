@@ -19,6 +19,10 @@
 #ifndef __CS_CMDHELP_H__
 #define __CS_CMDHELP_H__
 
+/**\file
+ * Command line parsing helper
+ */
+
 #include "csextern.h"
 
 struct iObjectRegistry;

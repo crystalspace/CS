@@ -19,6 +19,10 @@
 #ifndef __CS_CFGACC_H__
 #define __CS_CFGACC_H__
 
+/**\file
+ * Convenience class that can be used to deal with the sytem config manager
+ */
+
 #include "csextern.h"
 #include "array.h"
 #include "iutil/cfgmgr.h"

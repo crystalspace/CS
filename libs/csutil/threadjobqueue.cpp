@@ -99,6 +99,29 @@ void csThreadJobQueue::PullAndRun (iJob* job)
   if (jobEnqueued) job->Run();
 }
 
+void csThreadJobQueue::Unqueue (iJob* job, bool waitIfCurrent)
+{
+  CS_ASSERT (job != 0);
+  sharedData.jobXS->LockWait();
+  bool jobEnqueued;
+  {
+    csScopedMutexLock fifoLock (sharedData.fifoXS);
+    jobEnqueued = sharedData.jobFifo->Delete (job);
+  }
+  if (!jobEnqueued && waitIfCurrent)
+  {
+    while (currentJob == job)
+    {
+      sharedData.jobXS->Release();
+      // wait for the job completion
+      csScopedMutexLock jobLock (jobFinishMutex);
+      sharedData.jobFinish->Wait (jobFinishMutex);
+      sharedData.jobXS->LockTry();
+    }
+  }
+  sharedData.jobXS->Release();
+}
+
 //---------------------------------------------------------------------------
 
 csThreadJobQueue::QueueRunnable::QueueRunnable (

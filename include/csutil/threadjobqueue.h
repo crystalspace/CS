@@ -20,11 +20,18 @@
 #ifndef __CS_CSUTIL_THREADJOBQUEUE_H__
 #define __CS_CSUTIL_THREADJOBQUEUE_H__
 
+/**\file
+ * iJobQueue implementation that lets the jobs run in a thread.
+ */
+
 #include "csextern.h"
 #include "iutil/job.h"
 #include "fifo.h"
 #include "thread.h"
 
+/**
+ * iJobQueue implementation that lets the jobs run in a thread.
+ */
 class CS_CSUTIL_EXPORT csThreadJobQueue : public iJobQueue
 {
   typedef csFIFO<csRef<iJob> > JobFifo;
@@ -62,6 +69,7 @@ public:
 
   virtual void Enqueue (iJob* job);
   virtual void PullAndRun (iJob* job);
+  virtual void Unqueue (iJob* job, bool waitIfCurrent = true);
 };
 
 #endif // __CS_CSUTIL_THREADJOBQUEUE_H__

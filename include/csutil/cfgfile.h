@@ -19,6 +19,10 @@
 #ifndef __CS_UTIL_CFGFILE_H__
 #define __CS_UTIL_CFGFILE_H__
 
+/**\file
+ * iConfigFile implementation for configurations stored in VFS files.
+ */
+
 #include "csextern.h"
 #include "iutil/cfgfile.h"
 #include "iutil/vfs.h"

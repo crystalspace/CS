@@ -20,6 +20,10 @@
 #ifndef __CS_ARCHIVE_H__
 #define __CS_ARCHIVE_H__
 
+/**\file
+ * ZIP archive support
+ */
+
 #include <stdio.h>
 #include "csextern.h"
 #include "zip.h"

@@ -20,6 +20,10 @@
 #ifndef __CS_REFCOUNT_H__
 #define __CS_REFCOUNT_H__
 
+/**\file
+ * Reference Counting Interface
+ */
+
 #include "csextern.h"
 
 /**

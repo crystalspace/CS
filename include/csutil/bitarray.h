@@ -26,6 +26,10 @@
 #ifndef __CS_BITARRAY_H__
 #define __CS_BITARRAY_H__
 
+/**\file
+ * A one-dimensional array of bits, similar to STL bitset.
+ */
+
 #include "csextern.h"
 
 /**

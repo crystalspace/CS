@@ -19,6 +19,10 @@
 #ifndef __CS_CFGMGR_H__
 #define __CS_CFGMGR_H__
 
+/**\file
+ * iConfigManager implementation
+ */
+
 #include "csextern.h"
 #include "iutil/cfgmgr.h"
 #include "refarr.h"

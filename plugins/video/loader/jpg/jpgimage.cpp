@@ -433,8 +433,10 @@ bool ImageJpgFile::dither = true;
 
 ImageJpgFile::JpegLoader::~JpegLoader()
 {
-  if (decompStarted) jpeg_finish_decompress(&cinfo);
-  decompStarted = false;
+  if (setjmp (jerr.setjmp_buffer))
+  {
+    return;
+  }
   if (decompCreated) jpeg_destroy_decompress (&cinfo);
   decompCreated = false;
 }
@@ -498,7 +500,6 @@ bool ImageJpgFile::JpegLoader::InitOk()
   /* ==== Step 5: Start decompressor */
 
   jpeg_start_decompress (&cinfo);
-  decompStarted = true;
   /* We may need to do some setup of our own at this point before reading
    * the data.  After jpeg_start_decompress() we have the correct scaled
    * output image dimensions available, as well as the output colormap
@@ -518,7 +519,6 @@ bool ImageJpgFile::JpegLoader::InitOk()
 bool ImageJpgFile::JpegLoader::LoadData ()
 {
   CS_ASSERT (decompCreated);
-  CS_ASSERT (decompStarted);
 
   int row_stride;		/* physical row width in output buffer */
 
@@ -533,8 +533,6 @@ bool ImageJpgFile::JpegLoader::LoadData ()
       Report (object_reg, CS_REPORTER_SEVERITY_WARNING,
 	"%s\n", errmsg);
     }
-    if (decompStarted) jpeg_finish_decompress(&cinfo);
-    decompStarted = false;
     if (decompCreated) jpeg_destroy_decompress (&cinfo);
     decompCreated = false;
     return false;
@@ -621,7 +619,6 @@ bool ImageJpgFile::JpegLoader::LoadData ()
   /* ==== Step 7: Finish decompression */
 
   jpeg_finish_decompress(&cinfo);
-  decompStarted = false;
   /* We can ignore the return value since suspension is not possible
    * with the buffer data source.
    */
@@ -629,7 +626,7 @@ bool ImageJpgFile::JpegLoader::LoadData ()
   /* ==== Step 8: Release JPEG decompression object */
   /* This is an important step since it will release a good deal of memory. */
   jpeg_destroy_decompress(&cinfo);
-  decompStarted = false;
+  decompCreated = false;
 
   /* At this point you may want to check to see whether any corrupt-data
    * warnings occurred (test whether jerr.pub.num_warnings is nonzero).

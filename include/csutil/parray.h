@@ -20,6 +20,10 @@
 #ifndef __CS_PTRARR_H__
 #define __CS_PTRARR_H__
 
+/**\file
+ * Pointer Array
+ */
+
 //-----------------------------------------------------------------------------
 // Note *1*: The explicit "this->" is needed by modern compilers (such as gcc
 // 3.4.x) which distinguish between dependent and non-dependent names in

@@ -119,6 +119,10 @@ csCommonImageFile::csCommonImageFile (iObjectRegistry* object_reg, int format)
 
 csCommonImageFile::~csCommonImageFile()
 {
+#ifdef THREADED_LOADING
+  if (loadJob.IsValid())
+    jobQueue->Unqueue (loadJob);
+#endif
 }
 
 bool csCommonImageFile::Load (csRef<iDataBuffer> source)

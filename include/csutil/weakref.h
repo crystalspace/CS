@@ -20,6 +20,10 @@
 #ifndef __CS_WEAKREF_H__
 #define __CS_WEAKREF_H__
 
+/**\file
+ * Weak Reference
+ */
+
 #include "csextern.h"
 #include "csutil/ref.h"
 

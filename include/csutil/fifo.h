@@ -20,17 +20,32 @@
 #ifndef __CS_CSUTIL_FIFO_H__
 #define __CS_CSUTIL_FIFO_H__
 
+/**\file
+ * A FIFO.
+ */
+
 #include "array.h"
 
+/**
+ * A FIFO implemented on top of csArray<>, but faster than using just
+ * a single array.
+ */
 template <class T, class ElementHandler = csArrayElementHandler<T>,
 	   class MemoryAllocator = csArrayMemoryAllocator<T> >
 class csFIFO
 {
   csArray<T, ElementHandler, MemoryAllocator> a1, a2;
 public:
+  /**
+   * Construct the FIFO. See csArray<> documentation for meaning of
+   * parameters.
+   */
   csFIFO (size_t icapacity = 0, size_t ithreshold = 0) 
     :  a1 (icapacity, ithreshold), a2 (icapacity, ithreshold) { }
-  
+
+  /**
+   * Return and remove the first element.
+   */
   T PopTop ()
   {
     CS_ASSERT ((a1.Length() > 0) || (a2.Length() > 0));
@@ -46,21 +61,30 @@ public:
     return a2.Pop();
   }
 
+  /**
+   * Push an element onto the FIFO.
+   */
   void Push (T const& what)
   {
     a1.Push (what);
   }
 
+  /// Return number of elements.
   size_t Length()
   {
     return a1.Length() + a2.Length();
   }
 
+  /**
+   * Linearly search for an item and delete it.
+   * \returns Whether the item was found and subsequently deleled.
+   */
   bool Delete (T const& what)
   {
     return (a1.Delete (what) || a2.Delete (what));
   }
 
+  /// Delete all items.
   void DeleteAll ()
   {
     a1.DeleteAll();

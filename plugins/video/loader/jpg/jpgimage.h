@@ -99,12 +99,11 @@ private:
 
     struct my_error_mgr jerr;
     struct jpeg_decompress_struct cinfo;
-    bool decompStarted;
     bool decompCreated;
   public:
     JpegLoader (int Format, iObjectRegistry* p, iDataBuffer* source) 
       : csCommonImageFileLoader (Format), dataSource (source),
-      decompStarted (false), decompCreated (false)
+      decompCreated (false)
     { object_reg = p; };
     virtual ~JpegLoader();
     bool InitOk();

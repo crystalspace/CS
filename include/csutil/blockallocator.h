@@ -19,6 +19,10 @@
 #ifndef __CSUTIL_BLKALLOC_H__
 #define __CSUTIL_BLKALLOC_H__
 
+/**\file
+ * Generic Memory Block Allocator
+ */
+
 #include "csextern.h"
 #include "array.h"
 

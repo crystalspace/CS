@@ -21,6 +21,10 @@
 #ifndef __CSUTIL_ARRAY_H__
 #define __CSUTIL_ARRAY_H__
 
+/**\file
+ * Generic Array Template
+ */
+
 // Hack: Work around problems caused by #defining 'new'.
 #if defined(CS_EXTENSIVE_MEMDEBUG) || defined(CS_MEMORY_TRACKER)
 # undef new

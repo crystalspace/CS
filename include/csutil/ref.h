@@ -20,6 +20,10 @@
 #ifndef __CS_REF_H__
 #define __CS_REF_H__
 
+/**\file
+ * Smart Pointers
+ */
+
 #include "csextern.h"
 
 #define CS_VOIDED_PTR 0xffffffff

@@ -19,6 +19,10 @@
 #ifndef __CS_UTIL_HASH_H__
 #define __CS_UTIL_HASH_H__
 
+/**\file
+ * A generic hash table
+ */
+
 #include "csextern.h"
 #include "array.h"
 
