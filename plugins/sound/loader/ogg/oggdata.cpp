@@ -96,6 +96,7 @@ csOggSoundData::csOggSoundData (iBase *parent, uint8 *data, size_t len)
   current_section = 0;
   fmt.Bits = 16;
   fmt.Channels = 2;
+  memset (&vf, 0, sizeof(vf));
 }
 
 csOggSoundData::~csOggSoundData ()
