@@ -112,7 +112,7 @@ and orientation of the mesh objects for each frame.  Here is an example of an
 
 @example
 char Name[64];  // Name of the 'tag'.
-Vec3 Postition; // Relative position of tag.
+Vec3 Position; // Relative position of tag.
 Vec3x3 Rotation;// Direction tag faces relative to rest of model.
 @end example
 
@@ -140,7 +140,7 @@ mesh object, then you may not have these tags.
 
 This section will tell you if there are any special issues to worry about.
 Currently these are the known issues.  If I come across anything else I will
-ammend this section.
+amend this section.
 
 @itemize @bullet
 @item
