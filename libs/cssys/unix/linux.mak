@@ -14,7 +14,7 @@ PLUGINS+=video/canvas/svgalib
 #PLUGINS+=video/canvas/ggi 
 
 # uncomment the following to build sound drivers
-#PLUGINS+=cssnddrv/oss cssndrdr/software
+#PLUGINS+=sound/driver/oss sound/renderer/software
 
 # uncomment some of the following if you have a special MESA version that uses some 
 # of the following hardware/software renderers
