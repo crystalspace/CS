@@ -4,7 +4,7 @@ DESCRIPTION.terrbig = Large terrain plugin
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make terrbig     Make the $(DESCRIPTION.terrbig)$"
+  $(NEWLINE)echo $"  make terrbig      Make the $(DESCRIPTION.terrbig)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
