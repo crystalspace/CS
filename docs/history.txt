@@ -31,6 +31,12 @@ The history order is reversed so that new features are at the top.
 	  clamps the x,y values given to the height function to avoid
 	  crashing. Thanks to Joseph Miller for pointing me to the bug
 	  and suggesting a fix (which I didn't use).
+	- Partially fixed a bug in Dynavis which causes lots of potential
+	  loss in occlusion. The problem happend with occluders which
+	  go beyond the screen at the right side. This fix should
+	  improve performance of Dynavis levels a bit. Note that the
+	  fix is not complete. I only fixed a few common trivial cases.
+	  The hard general case hasn't been fixed yet.
 10-Dec-2002
 	- Fixed a bug I introduced yesterday in parsing of HardMove.
 	  The transform was inverted.

@@ -791,7 +791,20 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     //------
     // Lines on the far right can just be dropped since they
     // will have no effect on the coverage buffer.
+    // However we must mark the right most tiles as dirty.
     //------
+
+    // First we need to clip vertically for marking the vertical
+    // row of tiles right at the end of the screen.
+    if (y1 < 0) y1 = 0;
+    if (y2 >= height) y2 = height-1;
+
+    // First calculate tile coordinates of x1,y1 and x2,y2.
+    int tile_y1 = y1 >> 6;
+    int tile_y2 = (y2-1) >> 6;
+    int t;
+    for (t = tile_y1 ; t <= tile_y2 ; t++)
+      MarkTileDirty (width_po2 >> 5, t);
     return;
   }
   else if (x1 == x2)
@@ -870,7 +883,15 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
     //------
     // Lines on the far right can just be dropped since they
     // will have no effect on the coverage buffer.
+    // However we must mark the right most tiles as dirty.
     //------
+
+    // First calculate tile coordinates of x1,y1 and x2,y2.
+    int tile_y1 = y1 >> 6;
+    int tile_y2 = (y2-1) >> 6;
+    int t;
+    for (t = tile_y1 ; t <= tile_y2 ; t++)
+      MarkTileDirty (width_po2 >> 5, t);
     return;
   }
 
@@ -994,6 +1015,17 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
   // screen (to the right). If that's the case we first do a small loop to
   // skip that initial part. @@@ Not efficient!
   //------
+
+
+
+//@@@@@@@@@@@ There is a bug in the following code (and beyond) which
+// causes quality degration. The reason is that when a line goes beyond
+// the right side the right most tiles (one beyond that actually) should
+// be marked as dirty. The code above handles that correctly but the
+// code below doesn't.
+
+
+
 //if (dy > 0 && x >= (width<<16))printf ("      SKIP CLIP-RIGHT\n");
   while (dy > 0 && x >= (width<<16))
   {
@@ -1345,7 +1377,10 @@ void csTiledCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
     csBits64 fvalue;
     fvalue.Empty ();
     csCoverageTile* tile = GetTile (dirty_left[ty], ty);
-    for (tx = dirty_left[ty] ; tx <= dirty_right[ty] ; tx++)
+//printf ("ty=%d dirty_left=%d dirty_right=%d\n", ty, dirty_left[ty], dirty_right[ty]); fflush (stdout);
+    int dr = dirty_right[ty];
+    if (dr >= (width_po2 >> 5)) dr = (width_po2 >> 5)-1;
+    for (tx = dirty_left[ty] ; tx <= dr ; tx++)
     {
       tile->Flush (fvalue, max_depth);
       tile++;
@@ -1373,7 +1408,9 @@ void csTiledCoverageBuffer::InsertOutline (csVector2* verts, int num_verts,
     csBits64 fvalue;
     fvalue.Empty ();
     csCoverageTile* tile = GetTile (dirty_left[ty], ty);
-    for (tx = dirty_left[ty] ; tx <= dirty_right[ty] ; tx++)
+    int dr = dirty_right[ty];
+    if (dr >= (width_po2 >> 5)) dr = (width_po2 >> 5)-1;
+    for (tx = dirty_left[ty] ; tx <= dr ; tx++)
     {
       tile->Flush (fvalue, max_depth);
       tile++;
