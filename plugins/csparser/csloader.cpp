@@ -185,6 +185,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (CAMERA)
   CS_TOKEN_DEF (CENTER)
   CS_TOKEN_DEF (CLEARZBUF)
+  CS_TOKEN_DEF (CLEARSCREEN)
   CS_TOKEN_DEF (COLLECTION)
   CS_TOKEN_DEF (COLOR)
   CS_TOKEN_DEF (CONVEX)
@@ -2026,6 +2027,7 @@ bool csLoader::LoadSettings (char* buf)
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (AMBIENT)
     CS_TOKEN_TABLE (CLEARZBUF)
+    CS_TOKEN_TABLE (CLEARSCREEN)
     CS_TOKEN_TABLE (LIGHTMAPCELLSIZE)
     CS_TOKEN_TABLE (MAXLIGHTMAPSIZE)
   CS_TOKEN_TABLE_END
@@ -2051,6 +2053,13 @@ bool csLoader::LoadSettings (char* buf)
         bool yesno;
 	csScanStr (params, "%b", &yesno);
 	Engine->SetClearZBuf (yesno);
+        break;
+      }
+      case CS_TOKEN_CLEARSCREEN:
+      {
+        bool yesno;
+	csScanStr (params, "%b", &yesno);
+	Engine->SetClearScreen (yesno);
         break;
       }
       case CS_TOKEN_LIGHTMAPCELLSIZE:
