@@ -14,6 +14,10 @@ The history order is reversed so that new features are at the top.
 	  Mingw).
 	- Jorrit fixed two wrong message id's in the csparser. It was
 	  complaining about 'addon' while it had nothing to do with that.
+	- Eric Sunshine fixed cssys/win32/csosdefs.h so that CS_WIN32_ARGC and
+	  CS_WIN32_ARGV are defined always (previously they were not defined
+	  for Cygwin).  This fixes problem on Cygwin where win32.cpp was
+	  utilizing these macros.
 9-Jul-2003
 	- Jorrit fixed PlaceMesh() so that it now uses
 	  engine->GetNearbyObjects(). That makes it a lot more efficient

@@ -480,10 +480,6 @@ static inline void* fast_mem_copy (void *dest, const void *src, int count)
 // just to avoid windows.h inclusion
 #define csSW_SHOWNORMAL 1
 
-#ifdef __CYGWIN32__
-#define CS_IMPLEMENT_PLATFORM_APPLICATION
-#else
-
 #if defined(COMP_BC)
   #define CS_WIN32_ARGC _argc
   #define CS_WIN32_ARGV _argv
@@ -491,6 +487,10 @@ static inline void* fast_mem_copy (void *dest, const void *src, int count)
   #define CS_WIN32_ARGC __argc
   #define CS_WIN32_ARGV __argv
 #endif
+
+#ifdef __CYGWIN32__
+#define CS_IMPLEMENT_PLATFORM_APPLICATION
+#else
 
 /*
  if the EXE is compiled as a GUI app,
