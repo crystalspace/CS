@@ -1330,8 +1330,10 @@ bool csDynaVis::VisTest (iRenderView* rview,
     for (i = 0 ; i < visobj_vector.Length () ; i++)
     {
       csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];
-      if (visobj_wrap->history->history_frame_cnt == 1)
+      if (visobj_wrap->history->history_frame_cnt == history_frame_cnt-1)
       {
+	visobj_wrap->history->history_frame_cnt = history_frame_cnt;
+        //visobj->SetVisibilityNumber (current_visnr);
         viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh);
       }
     }
@@ -2635,7 +2637,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
 	if (vispix)
 	{
 	  visobj_wrap->last_visible_vistestnr = current_vistest_nr;
-          visobj_wrap->history->history_frame_cnt = 1;	//@@@
+          visobj_wrap->history->history_frame_cnt = history_frame_cnt;	//@@@
         }
       }
     }

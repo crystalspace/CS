@@ -40,6 +40,9 @@ chronological order.
 	  feature to see how culling performs. After enabling this you can
 	  walk around and see which objects are visible and which objects
 	  are not.
+	- Jorrit fixed the exact visibility culler in Dynavis again so that
+	  you can now also freeze the Dynavis culling result instead
+	  of the exact culling result.
 2-Nov-2003
 	- Eric Sunshine performed project-wide spelling corrections:
 	    seperate    --> separate
