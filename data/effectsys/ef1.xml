@@ -10,7 +10,7 @@
 				<sourceblend>one</sourceblend>
 				<destinationblend>zero</destinationblend>
 				<vertexcolor>mesh</vertexcolor>
-				<vertexprogram>/effect/ms.nvv</vertexprogram>
+				<vertexprogram>/effect/ms.avp</vertexprogram>
 				<vertexprogramconstant number="4">color</vertexprogramconstant>
 				<vertexprogramconstant number="5">multiple</vertexprogramconstant>
 				<layer>
