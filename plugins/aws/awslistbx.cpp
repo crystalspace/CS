@@ -440,7 +440,7 @@ awsListBoxFactory::awsListBoxFactory(iAws *wmgr):awsComponentFactory(wmgr)
   RegisterConstant("lbtTree", awsListBox::ctTree);
   RegisterConstant("lbtList",  awsListBox::ctList);
 
-  RegisterConstant("signalListBoxSelected",  awsListBox::signalSelected);
+  RegisterConstant("signalListBoxSelectionChanged",  awsListBox::signalSelected);
   RegisterConstant("signalListBoxScrolled",  awsListBox::signalScrolled);
 }
 

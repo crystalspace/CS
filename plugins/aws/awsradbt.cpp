@@ -135,6 +135,7 @@ awsRadButton::HandleEvent(iEvent& Event)
     {
       is_on=false;
       Invalidate();
+      Broadcast(signalClicked);
     }
     return true;
     break;

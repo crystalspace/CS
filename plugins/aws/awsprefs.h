@@ -17,7 +17,7 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
-#include "aws/iaws.h"
+#include "iaws/iaws.h"
 #include "csgeom/csrect.h"
 #include "csgeom/cspoint.h"
 #include "csutil/csdllist.h"

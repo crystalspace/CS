@@ -347,7 +347,7 @@ awsManager::Redraw()
    
    ptG3D->BeginDraw(CSDRAW_2DGRAPHICS);
    
-   //ptG2D->SetClipRect(0,0,proctex_width, proctex_width);
+   ptG2D->SetClipRect(0,0,proctex_width, proctex_width);
 
    //if (redraw_tag%2) ptG2D->DrawBox( 0,  0,25, 25, GetPrefMgr()->GetColor(AC_SHADOW));
    //else              ptG2D->DrawBox( 0,  0,25, 25, GetPrefMgr()->GetColor(AC_HIGHLIGHT));
@@ -393,6 +393,10 @@ awsManager::Redraw()
       { 
         if (DEBUG_MANAGER) printf("aws-debug: window is dirty, redraw.\n");
 
+        // Setup our dirty gathering rect.
+        csRect cr, crf;
+        cr.MakeEmpty();
+                  
         for(i=0; i<dirty.Count(); ++i)
         {
           
@@ -401,7 +405,7 @@ awsManager::Redraw()
           csRect dr(dirty.RectAt(i));
 
           // Find out if we need to erase.
-         /* if (!UsingDefaultContext || updatestore_dirty)
+         /* if (!UsingDefaultContext)
           {
             csRect lo(dr);
             lo.Subtract(curwin->Frame());
@@ -410,13 +414,20 @@ awsManager::Redraw()
               ptG2D->DrawBox(dr.xmin-1, dr.ymin-1, dr.xmax+1, dr.ymax+1, erasefill);
           }*/
           
-          
-          RedrawWindow(curwin, dr);
-        }
-      }
+          if (dr.Intersects(curwin->Frame())
+            cr.Union(dr);
+                
+        } // end gather all dirty rects that touch this window.
+
+        // Get the intersection between the window and the clip rect.
+
+        RedrawWindow(curwin, dr);
+
+      } // end if this window is dirty
 
       curwin=curwin->WindowAbove();
-   }
+
+   } // end iterate all windows
   
    //int i;
 
@@ -430,9 +441,12 @@ awsManager::Redraw()
           ptG2D->DrawLine(dr.xmax, dr.ymin, dr.xmax, dr.ymax, GetPrefMgr()->GetColor(AC_WHITE));
    }*/
    
+   ptG2D->SetClipRect(0,0,proctex_width, proctex_width);
+
    // This only needs to happen when drawing to the default context.
    if (UsingDefaultContext)
-   {     
+   {
+     
      ptG3D->FinishDraw ();
      ptG3D->Print(&bounds);
 
