@@ -20,66 +20,56 @@
 #ifndef __CS_INET_H__
 #define __CS_INET_H__
 
-#ifndef OS_WIN32
-#define SOCKET int
-#define closesocket close
-#define socket_error -1 
-#else
-#include <winsock.h>
-#define socket_error SOCKET_ERROR
-#endif
-
 #include "iutil/comp.h"
 #include "iutil/objreg.h"
 #include "inetwork/driver2.h"
 #include "inetwork/socket2.h"
 
-class csNetworkSocket2;
-class csNetworkDriver2;
+#ifndef OS_WIN32
+#define SOCKET int
+#else
+#include <winsock.h>
+#endif
+
 class csNetworkSocket2 : public iNetworkSocket2
 {
  public:
   SCF_DECLARE_IBASE;
 
-  csNetworkSocket2 (iBase *parent, int socket_type);	// constructor
-  virtual ~csNetworkSocket2();	// distructor
-	
-  virtual int LastError();															
-  virtual int LastOSError();														
-  virtual bool IsConnected();														
-  virtual int SetSocketBlock( bool block );										
-  virtual int SetSocketReuse( bool reuse );											
-  virtual int Connect( char *host, int port );										
-  virtual int Send( char *buff, size_t size );									
-  virtual int Recv( char *buff, size_t size );										
-  virtual int Close();															
-  virtual int Disconnect();														
-  virtual int WaitForConnection( int source, int port, int que );					
-  virtual iNetworkSocket2 *Accept();												
-  
-  virtual int ReadLine( char *buff, size_t size );									
-  virtual char *RemoteName();														
-  
+  csNetworkSocket2 (iBase* parent, int socket_type, SOCKET fd = (SOCKET)-1);
+  virtual ~csNetworkSocket2();
+
+  virtual int LastError() const;
+  virtual bool IsConnected() const;
+  virtual int SetSocketBlock( bool block );
+  virtual int SetSocketReuse( bool reuse );
+  virtual int Connect( char const* host, int port );
+  virtual int Send( char const* buff, size_t size );
+  virtual int Recv( char* buff, size_t size );
+  virtual int Close();
+  virtual int Disconnect();
+  virtual int WaitForConnection( int source, int port, int que );
+  virtual iNetworkSocket2* Accept();
+
+  virtual int ReadLine( char* buff, size_t size );
+  virtual char const* RemoteName() const;
+
  private:
-  SOCKET socketfd;	// socket descriptor
+  SOCKET socketfd;
   int proto_type;
   int last_error;
-  char *read_buffer;
+  char* read_buffer;
   int buffer_size;
+  int buffer_nread;
   bool socket_ready;
   bool connected;
   bool blocking;
-  fd_set fd_maskset;
-  SOCKET fd_list[1];
   struct sockaddr_in local_addr;
   struct sockaddr_in remote_addr;
-  struct hostent *host_ent;
-  socklen_t sin_size;
-  socklen_t addr_len;
 
-  virtual int set( SOCKET socket_fd, bool bConnected, struct sockaddr_in saddr );
-  virtual int SELECT( int fds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds );
-  virtual int IOCTL( SOCKET socketfd, long cmd, u_long *argp );
+  virtual int SELECT( int fds, fd_set* readfds, fd_set* writefds,
+    fd_set* exceptfds );
+  virtual int IOCTL( SOCKET socketfd, long cmd, u_long* argp );
 };
 
 class csNetworkDriver2 : public iNetworkDriver2
@@ -87,21 +77,18 @@ class csNetworkDriver2 : public iNetworkDriver2
  friend class csNetworkSocket2;
 
  public:
-  csNetworkDriver2 (iBase *parent);	// constructor
-  virtual ~csNetworkDriver2();	// distructor
-
- public:
   SCF_DECLARE_IBASE;
-  virtual iNetworkSocket2 *CreateSocket (int socket_type);						
-  virtual int LastError();														
+
+  csNetworkDriver2 (iBase* parent);
+  virtual ~csNetworkDriver2();
+
+  virtual iNetworkSocket2* CreateSocket (int socket_type);
+  virtual int LastError() const;
 
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE (csNetworkDriver2);
-    virtual bool Initialize (iObjectRegistry *)
-    {
-      return true;
-    }
+    virtual bool Initialize (iObjectRegistry*) { return true; }
   } scfiComponent;
 
   private:

@@ -1,16 +1,76 @@
+Crystal Space detailed change log.
+http://crystal.sourceforge.net/
+
 The history order is reversed so that new features are at the top.
 
 28-Mar-2003
 	- Removed internal csPolyTxtPlane class from thing and merged
 	  functionality with csPolyTexLightMap.
 	- Moved some static data to the static part of csPolygon3D.
-	- Philip Wyett added cg and mtex shader plugins to user.mak
+	- Philip Wyett made the following changes:
+	    - Added cg and mtex shader plugins to user.mak.
 	    - Fixed 'DDLERROR (glrender3d): ./glrender3d.so: undefined symbol
 	      gluBuild2DMipmaps' by linking plugin with GLU.
 	    - Changed includes, which were not consistant to 'Cg'.
+	- Eric Sunshine fixed the following problems with the ensocket driver.
+	  These problems were identified via simple visual inspection (not via
+	  testing).
+	    - Fixed bug: In non-blocking mode, csNetworkSocket2::Recv() would
+	      ignore the requested number of bytes and always read only a
+	      single byte.
+	    - Fixed bug: csNetworkSocket2 constructor was setting socket_ready
+	      to true even if socket set up failed.
+	    - Fixed bug: Closing the socket failed to clear socket_ready.
+	    - Fixed bug: csNetworkDriver2 constructor was setting last_error to
+	      wrong error code if if WSAStartup() failed.
+	    - Fixed numerous problems where the "last error" code was being
+	      mismanaged, which made it almost completely pointless for clients
+	      to call csNetworkSocket2::LastError() since the result was
+	      usually incorrect.
+	    - Fixed bug: csNetworkSocket2::Send() was not honoring contract;
+	      failed to return -1 in all cases upon error.
+	    - Fixed several problems with incorrect checking of return codes
+	      from socket functions; was mixing up -1, 0, 1 as return codes.
+	    - Fixed bugs where csNetworkSocket2 read/write methods immediately
+	      reported failure for datagram sockets if the socket was not
+	      "connected", even though these operations are valid for
+	      non-connected datagram sockets.
+	    - Fixed bug: csNetworkSocket2::Accept() was leaking a file
+	      descriptor.
+	    - Fixed bug: csNetworkSocket2:Connect() ignored requests to connect
+	      a datagram socket even though this operation is valid.
+	    - Fixed bug: In blocking mode, csNetworkSocket2::ReadLine() failed
+	      to respect then buffer size specified by the client, and would
+	      happily trash memory beyond the end of the supplied buffer.
+	    - Fixed bug: In non-blocking mode, csNetworkSocket2::ReadLine()
+	      would only read a single byte of data per invocation.  Now it
+	      consumes as much data as available (up to end-of-line) before
+	      returning.
+	    - Eliminated unnecessary copying of received "line" in
+	      csNetworkSocket2::ReadLine().
+	    - Performed some refactoring of the code to simplify and eliminate
+	      redundancy.
+	    - Purged unnecessary junk from headers which polluted the global
+	      namespace.
+	    - Repaired a lot of Doxygen comment problems in headers.
+	    - Added missing `const' qualifiers.
+	    - Eliminated the convoluted and obfuscated fd_maskset and fd_list[]
+	      instance variables and related logic from csNetworkSocket2.
+	      These were an unnecessary complication.
+	    - Eliminated the unnecessary sin_size, addr_len, and host_ent
+	      instance variables.
+	    - Fixed bugs reported by David van Laatum <david@daboyz.dyndns.org>
+	      where csNetworkSocket2 methods were not taking EWOULDBLOCK into
+	      account for non-blocking connections.  Instead, EWOULDBLOCK was
+	      being interpreted as a "disconnect" error.
+	    - Applied behavioral change, from David van Laatum: Accepted
+	      connections now inherit the blocking mode of the parent rather
+	      than being set to block unconditionally.  (This matches the
+	      behavior of the older `socket' driver in
+	      CS/plugins/net/driver/socket.)
 27-Mar-2003
-	- Paul Garceau modified win32gcc.mak to eliminate the use of 
-	  deprecated "dllwrap" for generation of "plugins"
+	- Paul Garceau modified win32gcc.mak to eliminate the use of deprecated
+	  "dllwrap" for generation of "plugins"
         - Jonathan Tarbox int64 support added to iEvents
 	- Several fixes to make CS compile again, at least on mingw.
 	- Changed map2cs so it no longer outputs planes using the plane
@@ -18,9 +78,9 @@ The history order is reversed so that new features are at the top.
 	  every polygon.
 	- Removed -splitpoly and -analyzep from levtool since those are not
 	  useful.
-	- Added -planes option to levtool to convert a map file that uses
-	  the plane addon so that the planes are integrated with the
-	  polygon itself.
+	- Added -planes option to levtool to convert a map file that uses the
+	  plane addon so that the planes are integrated with the polygon
+	  itself.
 	- Updated API mod doc with regards to this new change.
 	- Syntax service loader no longer supports loading of planes. It now
 	  gives an error saying you must use levtool -planes.
