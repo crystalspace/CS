@@ -15,7 +15,8 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: csarts csartsclean csartsinstall csartstest
 
-all apps: csarts csartstest
+all apps: csarts 
+#csartstest
 
 csartsinstall csarts csartstest:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -82,7 +83,7 @@ LIB.CSARTS.COMMON = -lartsflow -lartsflow_idl -lmcop
 # additional libs we need to link the csarts plugin
 LIB.LINK.CSARTS =-L$(MCOP.LIBDIR) $(LIB.CSARTS.COMMON) -lsoundserver_idl -lstdc++
 
-DEP.CSARTS = CSGEOM CSUTIL CSSYS CSUTIL CSARTS.IDL
+DEP.CSARTS = CSGEOM CSTOOL CSUTIL CSSYS CSUTIL CSARTS.IDL
 LIB.CSARTS = $(foreach d,$(DEP.CSARTS),$($d.LIB))
 
 ARTS.CXX = libtool --mode=compile g++

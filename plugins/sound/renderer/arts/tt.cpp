@@ -4,6 +4,7 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "csutil/cfgfile.h"
+#include "cstool/initapp.h"
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
 #include "iutil/plugin.h"
@@ -21,6 +22,8 @@
 
 struct termios neu;
 struct termios save;
+
+CS_IMPLEMENT_APPLICATION
 
 int kbhit(void)
 {
@@ -79,34 +82,22 @@ void init ()
 
 int main(int argc, const char* const args[])
 {
-  SysSystemDriver sys;
-  sys.RequestPlugin ("crystalspace.kernel.vfs:VFS");
-  sys.RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
-  sys.RequestPlugin ("crystalspace.sound.loader.multiplexer:SoundLoader");
-  sys.RequestPlugin ("crystalspace.sound.loader.aiff:System.Plugins.SoundAIFF");
-  sys.RequestPlugin ("crystalspace.sound.loader.au:System.Plugins.SoundAU");
-  sys.RequestPlugin ("crystalspace.sound.loader.iff:System.Plugins.SoundIFF");
-  sys.RequestPlugin ("crystalspace.sound.loader.wav:System.Plugins.SoundWAV");
-  sys.RequestPlugin ("crystalspace.sound.render.arts:SoundRender");
+  iObjectRegistry *oreg = csInitializer::CreateEnvironment (argc, args);
+  csInitializer::RequestPlugins (
+				 oreg,
+				 CS_REQUEST_VFS,
+				 CS_REQUEST_PLUGIN ("crystalspace.sound.loader.multiplexer", iSoundLoader),
+				 CS_REQUEST_PLUGIN ("crystalspace.sound.render.arts", iSoundRender),
+				 CS_REQUEST_END
+				 );
 
-  sys.RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
-
-  //  Arts::Dispatcher *dispatcher = new Arts::Dispatcher;
-
-  if (!sys.Initialize (argc, args, NULL))
-  {
-    printf ("Error initializing system !");
-    return -1;
-  }
-
-  iObjectRegistry* object_reg = sys.GetObjectRegistry ();
 
   // get a soundloader
-  csRef<iSoundLoader> pLoader (CS_QUERY_REGISTRY (object_reg, iSoundLoader));
+  csRef<iSoundLoader> pLoader (CS_QUERY_REGISTRY (oreg, iSoundLoader));
   // we read the soundata the CS way, that is through VFS
-  csRef<iVFS> pVFS (CS_QUERY_REGISTRY (object_reg, iVFS));
+  csRef<iVFS> pVFS (CS_QUERY_REGISTRY (oreg, iVFS));
   // well, since we want to try our renderer, we should request it now
-  csRef<iSoundRender> pSR (CS_QUERY_REGISTRY (object_reg, iSoundRender));
+  csRef<iSoundRender> pSR (CS_QUERY_REGISTRY (oreg, iSoundRender));
 
   // load the sound
   csRef<iDataBuffer> db (pVFS->ReadFile (args[1]));
@@ -118,10 +109,11 @@ int main(int argc, const char* const args[])
   csRef<iSoundHandle> sh (pSR->RegisterSound (sd));
 
   // ok, we want to take it to the max, so we need to operate on a soundsource
-  csRef<iSoundSource> ss (sh->CreateSource (SOUND3D_RELATIVE));
+  //  csRef<iSoundSource> ss (sh->CreateSource (SOUND3D_RELATIVE));
+  csRef<iSoundSource> ss (sh->Play (true));
 
   csVector3 pos (0, 0, 1);
-
+  ss->Play (true);
   init ();
   while (1)
   {
@@ -154,6 +146,7 @@ int main(int argc, const char* const args[])
   }
   tcsetattr(0,TCSANOW,&save);
 
-  return 1;
+  csInitializer::DestroyApplication (oreg);
+  return 0;
 }
 
