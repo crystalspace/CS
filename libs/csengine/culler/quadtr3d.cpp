@@ -431,6 +431,11 @@ int csQuadTree3D::insert_polygon_func (csQuadTree3D* pObj,
   /// So we are sure that a part of the node is covered.
   int old_node_state = node_state;
   // so it overlaps a bit.
+
+  // if only testing and this is empty we already know a certain change.
+  if(node_state == CS_QUAD3D_EMPTY && info.test_only)
+    return CS_QUAD3D_CERTAINCHANGE;
+
   if(node_state == CS_QUAD3D_EMPTY && node_pos->depth < pObj->max_depth)
   {
     // mark children as empty now, since they should be empty, and

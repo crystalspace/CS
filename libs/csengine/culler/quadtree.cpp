@@ -330,6 +330,11 @@ int csQuadTree :: insert_polygon_func (csQuadTree* pObj,
   { 
     int old_node_state = node_state;
     // so it overlaps a bit.
+
+    // if only testing, and empty we already know a certain change now.
+    if(node_state == CS_QUAD_EMPTY && info.test_only)
+      return CS_QUAD_CERTAINCHANGE;
+
     if(node_state == CS_QUAD_EMPTY && node_pos->depth < pObj->max_depth)
     {
       // mark children as empty now, since they should be empty, and
