@@ -157,7 +157,7 @@ Simple::~Simple ()
 @{
 @}
 
-bool Simple::Initialize (iObjectRegistry* object_reg)
+bool Simple::Initialize ()
 @{
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,

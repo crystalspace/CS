@@ -383,7 +383,7 @@ We additionally change the last part of @code{Initialize()} to
 this:
 
 @example
-bool Simple::Initialize (int argc, const char* const argv[])
+bool Simple::Initialize ()
 @{
   @dots{}
 
