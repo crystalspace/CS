@@ -102,9 +102,6 @@ public:
    */
   CLights* theDynLight;
 
-  /// Polygon to be hilighted (debugging).
-  static csPolygon3D* hilight;
-
 private:
   /// A table of indices into the vertices of the parent csPolygonSet (container).
   int* vertices_idx;
@@ -764,9 +761,11 @@ public:
    * In addition to the checking above this routine will return false
    * if it can find a shadow frustrum which totally obscures the light
    * frustrum. In this case it makes no sense to continue lighting the
-   * polygon.
+   * polygon.<br>
+   * This function will also discard all shadow frustrums which start at
+   * the same plane as the given plane.
    */
-  bool MarkRelevantShadowFrustrums (csLightView& lview);
+  bool MarkRelevantShadowFrustrums (csLightView& lview, csPlane& plane);
 
   /**
    * Check visibility of this polygon with the given csLightView

@@ -239,9 +239,9 @@ void csPolygon3D::SetPortal (csPortal* prt)
 void csPolygon3D::SplitWithPlane (csVector3* front, int& front_n,
 				  csVector3* back, int& back_n, csPlane& plane)
 {
-  csVector3 ptA, ptB;
+  csVector3 ptB;
   float sideA, sideB;
-  ptA = Vwor (num_vertices - 1);
+  csVector3 ptA = Vwor (num_vertices - 1);
   sideA = plane.Classify (ptA);
 
   front_n = back_n = 0;
@@ -331,7 +331,7 @@ bool csPolygon3D::IsTransparent ()
 bool csPolygon3D::SamePlane (csPolygonInt* p)
 {
   if (((csPolygon3D*)p)->plane == plane) return true;
-  return ((csPolygon3D*)p)->plane->Close (plane);
+  return ((csPolygon3D*)p)->plane->NearlyEqual (plane);
 }
 
 int csPolygon3D::Classify (csPolygonInt* spoly)
@@ -1106,8 +1106,8 @@ bool csPolygon3D::IntersectRay (const csVector3& start, const csVector3& end)
   // every edge of the polygon. With the plane normal of that plane we
   // can then check if the end of the ray is on the same side for all
   // these planes.
-  csVector3 normal, relend;
-  relend = end;
+  csVector3 normal;
+  csVector3 relend = end;
   relend -= start;
 
   int i, i1;
@@ -1146,6 +1146,12 @@ void csPolygon3D::InitLightmaps (csPolygonSet* owner, bool do_cache, int index)
 void csPolygon3D::FillLightmap (csLightView& lview)
 {
   if (orig_poly) return;
+
+  if (lview.callback)
+  {
+    lview.callback (&lview, CALLBACK_POLYGON, (void*)this);
+    return;
+  }
 
   if (uv_coords || CheckFlags (CS_POLY_FLATSHADING))
   {
@@ -1244,7 +1250,7 @@ void csPolygon3D::FillLightmap (csLightView& lview)
   }
 }
 
-bool csPolygon3D::MarkRelevantShadowFrustrums (csLightView& lview)
+bool csPolygon3D::MarkRelevantShadowFrustrums (csLightView& lview, csPlane& plane)
 {
   // @@@ Currently this function only checks if a shadow frustrum is inside
   // the light frustrum. There is no checking done if shadow frustrums obscure
@@ -1255,42 +1261,51 @@ bool csPolygon3D::MarkRelevantShadowFrustrums (csLightView& lview)
   csShadowFrustrum* sf = lview.shadows.GetFirst ();
   while (sf)
   {
-    // Assume that the shadow frustrum is relevant.
-    sf->relevant = true;
-
-    // Check if any of the vertices of the shadow polygon is inside the light frustrum.
-    // If that is the case then the shadow frustrum is indeed relevant.
-    contains = false;
-    for (i = 0 ; i < sf->GetNumVertices () ; i++)
-      if (lview.light_frustrum->Contains (sf->GetVertex (i))) { contains = true; break; }
-    if (!contains)
+    // First check if the plane of the shadow frustrum is close to the plane
+    // of the polygon (the input parameter 'plane'). If so then we discard the
+    // frustrum as not relevant.
+    if (csMath3::PlanesClose (*sf->GetBackPlane (), plane))
     {
-      // All vertices of the shadow polygon are outside the light frustrum. In this
-      // case it is still possible that the light frustrum is completely inside the
-      // shadow frustrum.
-      count = 0;
-      for (i = 0 ; i < lview.light_frustrum->GetNumVertices () ; i++)
-        if (sf->Contains (lview.light_frustrum->GetVertex (i))) count++;
-      if (count == 0)
-      {
-        // All vertices of the light frustrum (polygon we are trying to light)
-	// are outside of the shadow frustrum. In this case the shadow frustrum is
-	// not relevant.
+      sf->relevant = false;
+    }
+    else
+    {
+      // Assume that the shadow frustrum is relevant.
+      sf->relevant = true;
 
-	// @@@ WARNING!!! THIS IS NOT TRUE. There are cases where
-	// it is still possible to have an overlap. We need to
-	// continue the testing here!!!
-	sf->relevant = false;
-      }
-      else if (count == lview.light_frustrum->GetNumVertices ())
+      // Check if any of the vertices of the shadow polygon is inside the light frustrum.
+      // If that is the case then the shadow frustrum is indeed relevant.
+      contains = false;
+      for (i = 0 ; i < sf->GetNumVertices () ; i++)
+        if (lview.light_frustrum->Contains (sf->GetVertex (i))) { contains = true; break; }
+      if (!contains)
       {
-        // All vertices of the light frustrum are inside the shadow frustrum. This
-	// is a special case. Now we know that the light frustrum is totally invisible
-	// and we stop the routine and return false here.
-	return false;
+        // All vertices of the shadow polygon are outside the light frustrum. In this
+        // case it is still possible that the light frustrum is completely inside the
+        // shadow frustrum.
+        count = 0;
+        for (i = 0 ; i < lview.light_frustrum->GetNumVertices () ; i++)
+          if (sf->Contains (lview.light_frustrum->GetVertex (i))) count++;
+        if (count == 0)
+        {
+          // All vertices of the light frustrum (polygon we are trying to light)
+	  // are outside of the shadow frustrum. In this case the shadow frustrum is
+	  // not relevant.
+
+	  // @@@ WARNING!!! THIS IS NOT TRUE. There are cases where
+	  // it is still possible to have an overlap. We need to
+	  // continue the testing here!!!
+	  sf->relevant = false;
+        }
+        else if (count == lview.light_frustrum->GetNumVertices ())
+        {
+          // All vertices of the light frustrum are inside the shadow frustrum. This
+	  // is a special case. Now we know that the light frustrum is totally invisible
+	  // and we stop the routine and return false here.
+	  return false;
+        }
       }
     }
-
     sf = sf->next;
   }
   return true;
@@ -1381,9 +1396,14 @@ void csPolygon3D::CalculateLighting (csLightView* lview)
       // Mark all shadow frustrums in 'new_lview' which are relevant. i.e.
       // which are inside the light frustrum and are not obscured (shadowed)
       // by other shadow frustrums.
+      // We also give the polygon plane to MarkRelevantShadowFrustrums so that
+      // all shadow frustrums which start at the same plane are discarded as well.
       // FillLightmap() will use this information and csPortalCS::CalculateLighting()
       // will also use it!!
-      if (MarkRelevantShadowFrustrums (new_lview))
+      csPlane poly_plane = *GetPolyPlane ();
+      poly_plane.DD += poly_plane.norm * center;	// First translate plane to center of frustrum.
+      poly_plane.Invert ();
+      if (MarkRelevantShadowFrustrums (new_lview, poly_plane))
       {
         // Update the lightmap given the light and shadow frustrums in new_lview.
         FillLightmap (new_lview);
@@ -1657,46 +1677,11 @@ void PreparePolygonQuick (G3DPolygonDPQ* g3dpoly, csVector2* orig_triangle, bool
 
 //---------------------------------------------------------------------------
 
-// For debugging
-csPolygon3D* csPolygon3D::hilight = NULL;
-bool do_coord_check;
-csVector2 coord_check_vector;
-
 void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* plane, bool mirror,
 	bool use_z_buf, csVector2* orig_triangle)
 {
   int i;
   bool debug = false;
-
-  // If do_coord_check is true we are in a debugging mode. Here we don't
-  // draw the polygon but check if the given coordinate is inside the
-  // polygon. If so we dump all information about the polygon.
-  if (do_coord_check)
-  {
-    CHK (csPolygon2D* pp = new csPolygon2D (max_vertices));
-    if (mirror)
-      for (i = 0 ; i < num_vertices ; i++)
-        pp->AddVertex  (vertices[num_vertices-i-1]);
-    else
-      for (i = 0 ; i < num_vertices ; i++)
-        pp->AddVertex  (vertices[i]);
-    if (csMath2::InPoly2D(coord_check_vector, pp->GetVertices (),
-    	pp->GetNumVertices (), &pp->GetBoundingBox ()) != CS_POLY_OUT)
-    {
-      csPolygonSet* ps = (csPolygonSet*)(poly->GetParent ());
-      CsPrintf (MSG_DEBUG_0, "Hit polygon '%s/%s'\n",
-        csNameObject::GetName(*ps), csNameObject::GetName(*poly));
-      Dumper::dump (this, "csPolygon2D");
-      Dumper::dump (poly);
-      debug = true;
-      csPolygon3D::hilight = poly;
-    }
-
-    CHK (delete pp);
-    if (!debug) return;
-    // If debug we go to the rest of the processing and
-    // call a debugging function in Graph3D.
-  }
 
   if (use_z_buf)
   {
@@ -1811,17 +1796,6 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
                   csNameObject::GetName(*((csSector*)poly->GetParent ())),
                   csNameObject::GetName(*poly));
       }
-  }
-
-  if (csPolygon3D::hilight == poly)
-  {
-    ITextureManager* txtmgr;
-    IGraphics2D* g2d;
-    g3d->GetTextureManager (&txtmgr);
-    g3d->Get2dDriver (&g2d);
-    int white;
-    txtmgr->FindRGB (255, 255, 255, white);
-    Draw (g2d, white);
   }
 }
 
