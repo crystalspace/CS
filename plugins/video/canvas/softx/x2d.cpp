@@ -968,7 +968,7 @@ bool csGraphics2DXLib::SetMouseCursor (int iShape, ITextureHandle* hBitmap)
   } /* endif */
 }
 
-Bool CheckKeyPress (Display *dpy, XEvent *event, XPointer arg)
+static Bool CheckKeyPress (Display *dpy, XEvent *event, XPointer arg)
 {
   XEvent *curevent = (XEvent *)arg;
   if ((event->type == KeyPress)

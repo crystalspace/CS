@@ -465,7 +465,7 @@ unsigned char* csGraphics2DGlideX::GetPixelAtGlide (int x, int y)
   return NULL;
 }
 
-Bool CheckKeyPress (Display *dpy, XEvent *event, XPointer arg)
+static Bool CheckKeyPress (Display *dpy, XEvent *event, XPointer arg)
 {
   XEvent *curevent = (XEvent *)arg;
   if ((event->type == KeyPress)
