@@ -39,12 +39,12 @@
 static int bcenter, gcenter, rcenter;
 static long gdist, rdist, cdist;
 static long cbinc, cginc, crinc;
-static unsigned long *gdp, *rdp, *cdp;
+static uint32 *gdp, *rdp, *cdp;
 static unsigned char *grgbp, *rrgbp, *crgbp;
-static long gstride, rstride;
-static long rx, gx, bx;
-static long rxsqr, gxsqr, bxsqr;
-static long rcolormax, gcolormax, bcolormax;
+static int32 gstride, rstride;
+static int32 rx, gx, bx;
+static int32 rxsqr, gxsqr, bxsqr;
+static int32 rcolormax, gcolormax, bcolormax;
 static int cindex;
 
 static void maxfill (uint32 *, long, long, long);
@@ -286,10 +286,10 @@ static int greenloop (int restart)
   int detect;
   int g;
   int first;
-  long txsqr = gxsqr + gxsqr;
+  int32 txsqr = gxsqr + gxsqr;
   static int here, min, max;
-  static long ginc, gxx, gcdist;        /* "gc" variables maintain correct */
-  static unsigned long *gcdp;           /* values for bcenter position, */
+  static int32 ginc, gxx, gcdist;       /* "gc" variables maintain correct */
+  static uint32 *gcdp;                  /* values for bcenter position, */
   static unsigned char *gcrgbp;         /* despite modifications by blueloop */
 
   /* to gdist, gdp, grgbp. */
@@ -363,14 +363,14 @@ static int greenloop (int restart)
 static int blueloop (int restart)
 {
   int detect;
-  register unsigned long *dp;
+  register uint32 *dp;
   register unsigned char *rgbp;
-  register unsigned long bdist, bxx;
+  register uint32 bdist, bxx;
   register int b, i = cindex;
-  register long txsqr = bxsqr + bxsqr;
+  register int32 txsqr = bxsqr + bxsqr;
   register int lim;
   static int here, min, max;
-  static long binc;
+  static int32 binc;
 
   if (restart)
   {

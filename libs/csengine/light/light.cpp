@@ -107,14 +107,14 @@ const char* csLight::GenerateUniqueID ()
       mf.Write (sector->GetName (), strlen (sector->GetName ()));
   }
 
-  long l;
-  l = convert_endian ((long)QInt ((center.x * 1000)+.5));
+  int32 l;
+  l = convert_endian ((int32)QInt ((center.x * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((long)QInt ((center.y * 1000)+.5));
+  l = convert_endian ((int32)QInt ((center.y * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((long)QInt ((center.z * 1000)+.5));
+  l = convert_endian ((int32)QInt ((center.z * 1000)+.5));
   mf.Write ((char*)&l, 4);
-  l = convert_endian ((long)QInt ((dist * 1000)+.5));
+  l = convert_endian ((int32)QInt ((dist * 1000)+.5));
   mf.Write ((char*)&l, 4);
 
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());

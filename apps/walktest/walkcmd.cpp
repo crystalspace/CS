@@ -156,7 +156,7 @@ void LoadRecording (iVFS* vfs, const char* fName)
   if (!cf) return;
   Sys->recording.DeleteAll ();
   Sys->recording.SetLength (0);
-  long l;
+  int32 l;
   cf->Read ((char*)&l, sizeof (l));
   l = convert_endian (l);
   csRecordedCameraFile camint;

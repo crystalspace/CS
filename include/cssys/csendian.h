@@ -105,18 +105,18 @@ static inline float little_endian_float (float f)
 */
 
 /// Convert a float to a cross-platform 32-bit format (no endianess adjustments!)
-static inline long float2long (float f)
+static inline int32 float2long (float f)
 {
   int exp;
-  long mant = QRound (frexp (f, &exp) * 0x1000000);
-  long sign = mant & 0x80000000;
+  int32 mant = QRound (frexp (f, &exp) * 0x1000000);
+  int32 sign = mant & 0x80000000;
   if (mant < 0) mant = -mant;
   if (exp > 63) exp = 63; else if (exp < -64) exp = -64;
   return sign | ((exp & 0x7f) << 24) | (mant & 0xffffff);
 }
 
 /// Convert a 32-bit cross-platform float to native format (no endianess adjustments!)
-static inline float long2float (long l)
+static inline float long2float (int32 l)
 {
   int exp = (l >> 24) & 0x7f;
   if (exp & 0x40) exp = exp | ~0x7f;
