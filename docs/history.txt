@@ -34,6 +34,8 @@ Short-term cleanups that need to be done:
 	- Fixed serious bugs with sprites by using csPoly3D and csPoly2D
 	  instead of the csVector subclasses.  Now sprites don't crash but
 	  they are still displayed the wrong way.
+	- Eric Sunshine eliminated more compilation warnings from the Irix
+	  compiler.
 14-Feb-2000
 	- Fixed a bug in highscore handling of Blocks.
 	- Fixed rotation center of a few shapes in Blocks.
