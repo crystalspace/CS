@@ -55,6 +55,8 @@ class csGraphics2DOS2GL : public csGraphics2DGLCommon
   bool UpdatePalette;
   /// Use native mouse cursor, if possible?
   bool HardwareCursor;
+  /// Allow window resize?
+  bool AllowResize;
 
   /// Window position in percents
   int WindowX, WindowY;
@@ -75,12 +77,13 @@ public:
   virtual void SetRGB (int i, int r, int g, int b);
 
   virtual bool BeginDraw ();
-  virtual void FinishDraw ();
 
   virtual bool SetMousePosition (int x, int y);
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 
   virtual bool HandleEvent (iEvent &Event);
+
+  virtual void AllowCanvasResize (bool iAllow);
 
 private:
   static void KeyboardHandlerStub (void *Self, unsigned char ScanCode,
@@ -89,6 +92,7 @@ private:
     int ShiftFlags);
   static void FocusHandlerStub (void *Self, bool Enable);
   static void TerminateHandlerStub (void *Self);
+  static void ResizeHandlerStub (void *Self);
 };
 
 #endif // __GLOS2_H__

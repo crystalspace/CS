@@ -90,6 +90,7 @@ typedef void (*tMouseHandler) (void *param, int Button, bool Down, int x, int y,
   int ShiftFlags);
 typedef void (*tTerminateHandler) (void *param);
 typedef void (*tFocusHandler) (void *param, bool Enable);
+typedef void (*tResizeHandler) (void *param);
 
 // GL Context bit flags currently supported by OpenGL wrapper
 #define GLCF_RGBA	0x80000000	// want RGBA context
@@ -146,6 +147,7 @@ private:
   bool fRedrawDisabled;			// Set between VRN_DISABLED and VRN_ENABLED
   long MouseButtonMask;			// Current mouse button states
   bool MouseCaptured;			// Mouse captured flag
+  bool AllowResize;			// Allow window to resize
 
   tKeyboardHandler hKeyboard;           // Keyboard handler if not NULL
   void *paramKeyboard;                  // Parameter passed to keyboard handler
@@ -155,6 +157,8 @@ private:
   void *paramFocus;                     // Parameter passed to focus handler
   tMouseHandler hMouse;                 // Called on mouse events if not NULL
   void *paramMouse;                     // Parameter passed to mouse handler
+  tResizeHandler hResize;		// Window resize handler
+  void *paramResize;
   HPAL hpal;				// GPI palette handle
   HGC hgc;				// GL PM context
   int ScreenW, ScreenH;			// Screen size
@@ -185,6 +189,12 @@ public:
   void Select ()
   {
     pglMakeCurrent (glAB, hgc, hwndCL);
+  }
+
+  /// Allow window to be resized?
+  void AllowWindowResize (bool iAllow)
+  {
+    AllowResize = iAllow;
   }
 
   /// Show the window
@@ -288,6 +298,13 @@ public:
   {
     hFocus = Handler;
     paramFocus = param;
+  }
+
+  /// Set resize event handler
+  inline void SetResizeHandler (tResizeHandler Handler, void *param)
+  {
+    hResize = Handler;
+    paramResize = param;
   }
 
   /// Return if window is paused

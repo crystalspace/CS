@@ -104,7 +104,7 @@ class csFreeTypeServer : public iFontServer
     }
   };
 
- protected:
+protected:
   csFontVector fonts;
   TT_Engine engine;
   TT_UShort platformID, encodingID;
@@ -115,7 +115,7 @@ class csFreeTypeServer : public iFontServer
 
   bool CreateGlyphBitmaps (FT *font, int size);
 
- public:
+public:
   DECLARE_IBASE;
 
   csFreeTypeServer (iBase *pParent);
@@ -150,12 +150,10 @@ class csFreeTypeServer : public iFontServer
    * Return a pointer to a bitmap containing a rendered character (by current
    * font).  NULL if error occured.
    */
-  virtual unsigned char* GetCharBitmap (int fontId, unsigned char c);
+  virtual unsigned char* GetGlyphBitmap (int fontId, unsigned char c, int &oW, int &oH);
 
-  /// Return width of a char. Returns false if values could not be determined.
-  virtual int GetCharWidth (int fontId, unsigned char c);
-  /// Return height of a char. Returns false if values could not be determined.
-  virtual int GetCharHeight (int fontId, unsigned char c);
+  /// Return character size in pixels. Returns false if values could not be determined.
+  virtual bool GetGlyphSize (int fontId, unsigned char c, int &oW, int &oH);
   /*
    * Return maximum height of a char.  Returns false if values could not be
    * determined.

@@ -155,6 +155,8 @@ public:
   /// Called on every frame by system driver
   virtual bool HandleEvent (iEvent &Event);
 
+  virtual void AllowCanvasResize (bool iAllow);
+
   void EnterFullScreen ();
   void LeaveFullScreen ();
 

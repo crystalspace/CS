@@ -487,8 +487,10 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
   if (!VFS)
     VFS = QUERY_PLUGIN_ID (this, CS_FUNCID_VFS, iVFS);
   G3D = QUERY_PLUGIN_ID (this, CS_FUNCID_VIDEO, iGraphics3D);
-  if (G3D) 
+  if (G3D)
     (G2D = G3D->GetDriver2D ())->IncRef ();
+  else
+    G2D = QUERY_PLUGIN_ID (this, CS_FUNCID_CANVAS, iGraphics2D);
   Sound = QUERY_PLUGIN_ID (this, CS_FUNCID_SOUND, iSoundRender);
   NetDrv = QUERY_PLUGIN_ID (this, CS_FUNCID_NETDRV, iNetworkDriver);
   NetMan = QUERY_PLUGIN_ID (this, CS_FUNCID_NETMAN, iNetworkManager);
@@ -506,13 +508,17 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
 
 bool csSystemDriver::Open (const char *Title)
 {
-  if (G3D && !G3D->Open (Title))
+  if ((G3D && !G3D->Open (Title))
+   || (!G3D && G2D && !G2D->Open (Title)))
     return false;
   // Query frame width/height/depth as it possibly has been adjusted after open
-  FrameWidth = G2D->GetWidth ();
-  FrameHeight = G2D->GetHeight ();
-  Depth = G2D->GetPixelBytes ();
-  Depth *= 8;
+  if (G2D)
+  {
+    FrameWidth = G2D->GetWidth ();
+    FrameHeight = G2D->GetHeight ();
+    Depth = G2D->GetPixelBytes ();
+    Depth *= 8;
+  }
 
   if (Sound)
     if (!Sound->Open ())

@@ -378,12 +378,12 @@ bool csGraphics2DOS2DIVE::Open (const char *Title)
       break;
     case 2:
       _DrawPixel = DrawPixel16;
-      _WriteChar = WriteChar16;
+      _WriteString = WriteString16;
       _GetPixelAt = GetPixelAt16;
       break;
     case 4:
       _DrawPixel = DrawPixel32;
-      _WriteChar = WriteChar32;
+      _WriteString = WriteString32;
       _GetPixelAt = GetPixelAt32;
       break;
     default:

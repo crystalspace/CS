@@ -1298,10 +1298,10 @@ void csComponent::Rect3D (int xmin, int ymin, int xmax, int ymax, int darkindx,
   if ((xmax <= xmin) || (ymax <= ymin))
     return;
 
-  Line (xmin + 1, ymax - 1, xmax - 2, ymax - 1, darkindx);
-  Line (xmax - 1, ymax - 1, xmax - 1, ymin, darkindx);
-  Line (xmax - 2, ymin, xmin, ymin, lightindx);
-  Line (xmin, ymin + 1, xmin, ymax - 1, lightindx);
+  Line (xmin + 1, ymax - 1, xmax - 1, ymax - 1, darkindx);
+  Line (xmax - 1, ymax, xmax - 1, ymin + 1, darkindx);
+  Line (xmax, ymin, xmin, ymin, lightindx);
+  Line (xmin, ymin + 1, xmin, ymax, lightindx);
 }
 
 void csComponent::ObliqueRect3D (int xmin, int ymin, int xmax, int ymax,
@@ -1309,12 +1309,12 @@ void csComponent::ObliqueRect3D (int xmin, int ymin, int xmax, int ymax,
 {
   if ((xmax <= xmin) || (ymax <= ymin))
     return;
-  Line (xmax - 1, ymin + 1, xmax - 1, ymax - cornersize - 1, darkindx);
-  Line (xmax - 1, ymax - cornersize, xmax - cornersize, ymax - 1, darkindx);
-  Line (xmax - cornersize - 1, ymax - 1, xmin + 1, ymax - 1, darkindx);
-  Line (xmin, ymax - 1, xmin, ymin + cornersize, lightindx);
-  Line (xmin, ymin + cornersize - 1, xmin + cornersize - 1, ymin, lightindx);
-  Line (xmin + cornersize, ymin, xmax - 1, ymin, lightindx);
+  Line (xmax - 1, ymin + 1, xmax - 1, ymax - cornersize, darkindx);
+  Line (xmax, ymax - cornersize, xmax - cornersize, ymax, darkindx);
+  Line (xmax - cornersize, ymax - 1, xmin + 1, ymax - 1, darkindx);
+  Line (xmin, ymax, xmin, ymin + cornersize, lightindx);
+  Line (xmin, ymin + cornersize, xmin + cornersize, ymin, lightindx);
+  Line (xmin + cornersize, ymin, xmax, ymin, lightindx);
 }
 
 void csComponent::SetState (int mask, bool enable)

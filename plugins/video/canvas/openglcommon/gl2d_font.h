@@ -21,7 +21,16 @@
 #define __CS_GL2D_FONT_H__
 
 #include <GL/gl.h>
+#include "csutil/csvector.h"
 #include "ifontsrv.h"
+
+// Define the following macro to use "font-on-a-texture" approach.
+// Otherwise we will use glBitmap()
+// Currently this is defined in csosdefs.h for platforms with
+// buggy OpenGL's.
+//#define OPENGL_BITMAP_FONT
+
+class GLFontInfo;
 
 /**
   This class contains
@@ -30,48 +39,38 @@
   in a FontDef struct (see graph2d.h), and the server will add it to
   the list of fonts.  Destruction of the server will free up all the
   bitmaps currently in use.
-  */
-
+*/
 class csGraphics2DOpenGLFontServer
 {
-  protected:
-  struct GLGlyph 
+protected:
+  // The font cache array
+  class csFontVector : public csVector
   {
-    GLuint hTexture; // the texture where we find this character in
-    float x, y, width, texwidth; // location and size of the character
-  };
-  
-  class GLFontInfo
-  {
-    friend class csGraphics2DOpenGLFontServer;
-    public:
-    
-      GLFontInfo (){}
-      ~GLFontInfo ();
-
-      GLGlyph glyphs[256];
-      float height, texheight;
-      bool one_texture;
-  };
-  
-  /// number of fonts currently stored here
-  int mFont_Count, mMax_Font_Count;
-
-  /**
-   * each font needs some extra information connected to how it is stored
-   * internally
-   */
-  GLFontInfo **mFont_Information_Array;
-  iFontServer *pFontServer;
+  public:
+    csFontVector (int iLimit, int iDelta) : csVector (iLimit, iDelta)
+    { }
+    GLFontInfo *Get (int iIndex)
+    { return (GLFontInfo *)csVector::Get (iIndex); }
+  } FontCache;
+  // The font server
+  iFontServer *FontServer;
   
   /// the current clipping rect
   int ClipX1, ClipY1, ClipX2, ClipY2;
+
+#ifndef OPENGL_BITMAP_FONT
+  // Auxiliary routine for "font-on-a-texture" approach
+  bool csGraphics2DOpenGLFontServer::ClipRect (float x, float y,
+    float &x1, float &y1, float &x2, float &y2, 
+    float &tx1, float &ty1, float &tx2, float &ty2);
+#endif
+
 public:
   /**
    * The maximal number of fonts that can be registered.
    * Additional fonts must be added via AddFont()
    */
-  csGraphics2DOpenGLFontServer (int MaxFonts, iFontServer *pFR);
+  csGraphics2DOpenGLFontServer (iFontServer *pFR);
 
   /// Destructor cleans up all the OpenGL mess we left around
   ~csGraphics2DOpenGLFontServer ();
@@ -83,19 +82,14 @@ public:
    */
   void AddFont (int fontId);
 
-  /// Check how many fonts are stored in here
-  int CountFonts () const { return mFont_Count; }
-
   /**
    * Draw a string using OpenGL at x,y.  It is assumed you have
    * set up the render state using glColor.
    */
-
-  void Write (int x, int y, int bg, const char *text, int Font);
+  void Write (int x, int y, const char *text, int Font);
 
   void SetClipRect (int x1, int y1, int x2, int y2)
-  { ClipX1=x1; ClipY1=y1; ClipX2=x2; ClipY2=y2; }   
-  bool ClipRect (float x, float y, float &x1, float &y1,float &x2,float &y2,float &tx1,float &ty1,float &tx2,float &ty2);
+  { ClipX1 = x1; ClipY1 = y1; ClipX2 = x2; ClipY2 = y2; }   
 };
 
 #endif // __CS_GL2D_FONT_H__

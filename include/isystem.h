@@ -83,6 +83,8 @@
 #define CS_FUNCID_VFS		"VFS"
 /// Functionality ID for the video driver
 #define CS_FUNCID_VIDEO		"VideoDriver"
+/// Canvas plugin funcID (AKA 2D graphics driver)
+#define CS_FUNCID_CANVAS	"VideoCanvas"
 /// Sound renderer
 #define CS_FUNCID_SOUND		"SoundRender"
 /// Font server

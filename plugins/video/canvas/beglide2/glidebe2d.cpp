@@ -258,7 +258,7 @@ void csGraphics2DBeGlide::ApplyDepthInfo(color_space this_color_space)
   		BlueMask  = 0x1f;
   		
   		_DrawPixel = DrawPixel16;
-  		_WriteChar = WriteChar16;
+  		_WriteString = WriteString16;
   		_GetPixelAt= GetPixelAt16;
 
   		pfmt.PixelBytes = 2;
@@ -278,7 +278,7 @@ void csGraphics2DBeGlide::ApplyDepthInfo(color_space this_color_space)
   		BlueMask  = 0x1f;
   		
   		_DrawPixel = DrawPixel16;
-  		_WriteChar = WriteChar16;
+  		_WriteString = WriteString16;
   		_GetPixelAt= GetPixelAt16;
 
   		pfmt.PixelBytes = 2;
@@ -299,7 +299,7 @@ void csGraphics2DBeGlide::ApplyDepthInfo(color_space this_color_space)
   		BlueMask  = 0xff;
   		
   		_DrawPixel = DrawPixel32;
-  		_WriteChar = WriteChar32;
+  		_WriteString = WriteString32;
   		_GetPixelAt= GetPixelAt32;
 
   		pfmt.PixelBytes = 4;

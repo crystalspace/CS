@@ -42,6 +42,13 @@ class csGraphics2DGLCommon : public csGraphics2D, public iEventPlug
   /// hold the CS fonts in an OpenGL-friendly format
   csGraphics2DOpenGLFontServer *LocalFontServer;
 
+  /// Decompose a color ID into r,g,b components
+  void DecomposeColor (int iColor, GLubyte &oR, GLubyte &oG, GLubyte &oB);
+  /// Same but uses floating-point format
+  void DecomposeColor (int iColor, float &oR, float &oG, float &oB);
+  /// Set up current GL RGB color from a packed color format
+  void setGLColorfromint (int color);
+
 public:
   /// The event plug object
   iEventOutlet *EventOutlet;
@@ -78,11 +85,17 @@ public:
 
   virtual void Close ();
 
+  /**
+   * This routine should be called before any draw operations.
+   * It should return true if graphics context is ready.
+   */
+  virtual bool BeginDraw ();
+
   virtual void SetClipRect (int xmin, int ymin, int xmax, int ymax);
   // the remaining functions here do not need to be overridden when
   // inheriting from this class
 
-  virtual void Clear(int color);
+  virtual void Clear (int color);
   virtual void SetRGB (int i, int r, int g, int b);
 
   /// Draw a line
@@ -94,11 +107,6 @@ public:
 
   /// Write a text string into the back buffer
   virtual void Write (int x, int y, int fg, int bg, const char *text);
-  /// Write a single character.
-  virtual void WriteChar (int x, int y, int fg, int bg, char c);
-
-  /// Figure out GL RGB color from a packed color format
-  void setGLColorfromint(int color);
 
   /**
    * Get address of video RAM at given x,y coordinates.
@@ -124,6 +132,8 @@ public:
   /// Enable or disable double buffering; returns success status
   virtual bool DoubleBuffer (bool Enable) 
   { is_double_buffered = Enable; return true; }
+
+  virtual bool PerformExtension (const char* iCommand, ...);
 
   //------------------------- iEventPlug interface ---------------------------//
 

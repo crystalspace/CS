@@ -39,6 +39,13 @@ On @sc{win9x} edit your @samp{c:\autoexec.bat} and add the following entry.
 SET PATH=c:\mingw32\bin;c:\mingw32\lib;%PATH%
 @end example
 @item
+Also if you're going to develop with mingw32 you should add the following line:
+@example
+set C_INCLUDE_PATH=c:\mingw32\i386-mingw32msvc\include
+@end example
+to autoexec.bat since otherwise the makedep tool won't know where to look for
+mingw32's system include files, and will emmit a lot of warnings.
+@item
 Now reboot your computer.
 @end itemize
 
@@ -56,5 +63,7 @@ make clean depend all
 
 @subsubheading Customizing
 
-Specifics for the win32gcc port you find in @file{CS\libs\cssys\win32\win32gcc.mak}. Check the the following variables: @samp{LIBS.GL3D.SYSTEM, LIBS.SOCKET.SYSTEM LIBS.SOUND.SYSTEM}. Adjust them to match your systems libraries.
+Specifics for the win32gcc port you find in @file{CS\libs\cssys\win32\win32gcc.mak}.
+Check the the following variables: @samp{LIBS.GL3D.SYSTEM, LIBS.SOCKET.SYSTEM
+LIBS.SOUND.SYSTEM}. Adjust them to match your systems libraries.
 In @file{CS\mk\user.mak} you define what plugins to compile.

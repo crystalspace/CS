@@ -232,13 +232,13 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
   if (pfmt.PixelBytes == 2)
   {
     _DrawPixel = DrawPixel16;
-    _WriteChar = WriteChar16;
+    _WriteString = WriteString16;
     _GetPixelAt = GetPixelAt16;
   }
   else if (pfmt.PixelBytes == 4)
   {
     _DrawPixel = DrawPixel32;
-    _WriteChar = WriteChar32;
+    _WriteString = WriteString32;
     _GetPixelAt = GetPixelAt32;
   } /* endif */
 
@@ -327,20 +327,11 @@ bool csGraphics2DXLib::Open(const char *Title)
   if (cmap)
     XSetWindowColormap (dpy, window, cmap);
 
-  // Now communicate fully to the window manager our wishes using the non-mapped
-  // leader_window to form a window_group
-  XSizeHints normal_hints;
-  normal_hints.flags = PMinSize | PMaxSize | PSize | PResizeInc;
-  normal_hints.width = Width;
-  normal_hints.height = Height;
-  normal_hints.width_inc = 1;
-  normal_hints.height_inc = 1;
-  normal_hints.min_width = 320;
-  normal_hints.min_height = 200;
-  normal_hints.max_width = display_width;
-  normal_hints.max_height = display_height;
-  XSetWMNormalHints (dpy, wm_window, &normal_hints);
+  // Allow window resizes
+  AllowCanvasResize (true);
 
+  // Now communicate to the window manager our wishes using the non-mapped
+  // leader_window to form a window_group
   XWMHints wm_hints;
   wm_hints.flags = InputHint | StateHint | WindowGroupHint;
   wm_hints.input = True;
@@ -391,6 +382,12 @@ bool csGraphics2DXLib::Open(const char *Title)
     if (event.type == Expose)
       break;
   }
+
+  // Now disable window resizes.
+  // Note that if we do this before expose event, with some window managers
+  // (e.g. Window Maker) it will be unable to resize the window.
+  AllowCanvasResize (false);
+
   if (!AllocateMemory ())
   {
 #ifdef DO_SHM
@@ -843,6 +840,12 @@ bool csGraphics2DXLib::PerformExtension (const char* iCommand, ...)
       LeaveFullScreen ();
     else
       EnterFullScreen ();
+    return true;
+  }
+  else if (!strcasecmp (iCommand, "flush"))
+  {
+    XSync (dpy, False);
+    return true;
   }
 
   return false;
@@ -1082,6 +1085,31 @@ bool csGraphics2DXLib::SetMouseCursor (csMouseCursorID iShape)
   } /* endif */
 }
 
+void csGraphics2DXLib::AllowCanvasResize (bool iAllow)
+{
+  XSizeHints normal_hints;
+  normal_hints.flags = PMinSize | PMaxSize | PSize | PResizeInc;
+  normal_hints.width = Width;
+  normal_hints.height = Height;
+  normal_hints.width_inc = 2;
+  normal_hints.height_inc = 2;
+  if (iAllow)
+  {
+    normal_hints.min_width = 320;
+    normal_hints.min_height = 200;
+    normal_hints.max_width = display_width;
+    normal_hints.max_height = display_height;
+  }
+  else
+  {
+    normal_hints.min_width =
+    normal_hints.max_width = Width;
+    normal_hints.min_height =
+    normal_hints.max_height = Height;
+  }
+  XSetWMNormalHints (dpy, wm_window, &normal_hints);
+}
+
 static Bool CheckKeyPress (Display* /*dpy*/, XEvent *event, XPointer arg)
 {
   XEvent *curevent = (XEvent *)arg;
@@ -1281,9 +1309,7 @@ bool csGraphics2DXLib::HandleEvent (iEvent &Event)
     }
 
   if (parent_resize)
-  {
     XResizeWindow (dpy, window, newWidth, newHeight);
-  }
 
   if (resize)
     if (!ReallocateMemory ())

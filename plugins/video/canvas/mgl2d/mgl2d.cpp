@@ -154,13 +154,13 @@ bool csGraphics2DMGL::Open (const char *Title)
   if (pfmt.PixelBytes == 2)
   {
     _DrawPixel = DrawPixel16;
-    _WriteChar = WriteChar16;
+    _WriteString = WriteString16;
     _GetPixelAt = GetPixelAt16;
   }
   else if (pfmt.PixelBytes == 4)
   {
     _DrawPixel = DrawPixel32;
-    _WriteChar = WriteChar32;
+    _WriteString = WriteString32;
     _GetPixelAt = GetPixelAt32;
   } /* endif */
 

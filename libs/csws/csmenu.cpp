@@ -353,15 +353,15 @@ void csMenuItem::Draw ()
     if (((csMenu *)parent)->IsMenuBar ())
     {
       int x = bound.Width () / 2;
-      Line (x, 0, x, bound.Height () - 1, CSPAL_MENUITEM_DARK3D);
+      Line (x, 0, x, bound.Height (), CSPAL_MENUITEM_DARK3D);
       x++;
-      Line (x, 0, x, bound.Height () - 1, CSPAL_MENUITEM_LIGHT3D);
+      Line (x, 0, x, bound.Height (), CSPAL_MENUITEM_LIGHT3D);
     } else
     {
       int y = bound.Height () / 2;
-      Line (0, y, bound.Width () - 1, y, CSPAL_MENUITEM_DARK3D);
+      Line (0, y, bound.Width (), y, CSPAL_MENUITEM_DARK3D);
       y++;
-      Line (0, y, bound.Width () - 1, y, CSPAL_MENUITEM_LIGHT3D);
+      Line (0, y, bound.Width (), y, CSPAL_MENUITEM_LIGHT3D);
     } /* endif */
   } /* endif */
 
@@ -436,11 +436,11 @@ void csMenu::Draw ()
         CSPAL_MENU_2DARK3D);
       break;
     case csmfsBar:
-      Line (0, 0, bound.Width () - 1, 0, CSPAL_MENU_2LIGHT3D);
-      Line (0, 1, bound.Width () - 1, 1, CSPAL_MENU_LIGHT3D);
-      Line (0, bound.Height () - 2, bound.Width () - 1, bound.Height () - 2,
+      Line (0, 0, bound.Width (), 0, CSPAL_MENU_2LIGHT3D);
+      Line (0, 1, bound.Width (), 1, CSPAL_MENU_LIGHT3D);
+      Line (0, bound.Height () - 2, bound.Width (), bound.Height () - 2,
         CSPAL_MENU_DARK3D);
-      Line (0, bound.Height () - 1, bound.Width () - 1, bound.Height () - 1,
+      Line (0, bound.Height () - 1, bound.Width (), bound.Height () - 1,
         CSPAL_MENU_2DARK3D);
       break;
     case csmfs3D:
@@ -460,10 +460,10 @@ void csMenu::Draw ()
       if (int (cur->SendCommand (cscmdMenuItemGetStyle)) & CSMIS_NEWCOLUMN)
       {
         Line (cur->bound.xmin - 2, BorderHeight,
-          cur->bound.xmin - 2, bound.Height () - BorderHeight - 1,
+          cur->bound.xmin - 2, bound.Height () - BorderHeight,
           CSPAL_MENU_LIGHT3D);
         Line (cur->bound.xmin - 1, BorderHeight,
-          cur->bound.xmin - 1, bound.Height () - BorderHeight - 1,
+          cur->bound.xmin - 1, bound.Height () - BorderHeight,
           CSPAL_MENU_DARK3D);
       } /* endif */
       if (cur->next == focused)

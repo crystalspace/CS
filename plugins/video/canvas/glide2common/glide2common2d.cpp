@@ -68,7 +68,7 @@ bool csGraphics2DGlideCommon::Initialize (iSystem *pSystem)
   
   Depth = 16;
 
-  _WriteChar = WriteCharGlide;
+  _WriteString = WriteStringGlide;
 
   return true;
 }
@@ -229,9 +229,9 @@ void csGraphics2DGlideCommon::DrawPixel (int x, int y, int color)
   }
 }
 
-void csGraphics2DGlideCommon::WriteCharGlide (csGraphics2D *This, int x, int y, int fg, int bg, char c)
+void csGraphics2DGlideCommon::WriteStringGlide (csGraphics2D *This, int x, int y, int fg, int bg, char c)
 {
-  This->WriteChar16 (This, x,y,fg,bg,c);
+  This->WriteString16 (This, x,y,fg,bg,c);
 }
 
 unsigned char* csGraphics2DGlideCommon::GetPixelAt (int x, int y)

@@ -172,6 +172,6 @@ endif # ifeq ($(MAKESECTION),confighelp)
 #---------------------------------------------------------------- configure ---#
 ifeq ($(ROOTCONFIG),config)
 
-SYSCONFIG=bin\win32conf.bat
+SYSCONFIG=bin\win32conf.bat msvc
 
 endif # ifeq ($(ROOTCONFIG),config)

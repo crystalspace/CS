@@ -29,6 +29,7 @@ csRadioButton::csRadioButton (csComponent *iParent, int iButtonID, int iButtonSt
   : csButton (iParent, cscmdNothing, iButtonStyle, csbfsNone)
 {
   id = iButtonID;
+  SetState (CSS_TRANSPARENT, true);
   SetRadioButtonState (false);
   SetSuggestedSize (0, 0);
 }

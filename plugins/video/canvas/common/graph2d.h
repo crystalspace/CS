@@ -127,12 +127,11 @@ public:
   /// (*) Set a color index to given R,G,B (0..255) values
   virtual void SetRGB (int i, int r, int g, int b);
   /// Write a text string into the back buffer
-  virtual void Write (int x, int y, int fg, int bg, const char *text);
+  virtual void Write (int x, int y, int fg, int bg, const char *text)
+  { _WriteString (this, x, y, fg, bg, text); }
   /// Write a single character
-  void (*_WriteChar) (csGraphics2D *This, int x, int y, int fg, int bg, char c);
-  /// Same but exposed through iGraphics2D interface
-  virtual void WriteChar (int x, int y, int fg, int bg, char c)
-  { _WriteChar (this, x, y, fg, bg, c); }
+  void (*_WriteString) (csGraphics2D *This, int x, int y, int fg, int bg,
+    const char *text);
   /// Get the width of a string if it would be drawn with given font
   virtual int GetTextWidth (int Font, const char *text);
   /// Get the height of given font
@@ -247,6 +246,8 @@ public:
   (int width, int height, void *buffer, bool alone_hint, 
    csPixelFormat *pfmt = NULL, csRGBpixel *palette = NULL, int pal_size = 0);
 
+  /// Enable/disable canvas resize
+  virtual void AllowCanvasResize (bool /*iAllow*/) { }
 
 protected:
   /**
@@ -258,21 +259,24 @@ protected:
   /// Draw a pixel in 8-bit modes
   static void DrawPixel8 (csGraphics2D *This, int x, int y, int color);
   /// Write a character in 8-bit modes
-  static void WriteChar8 (csGraphics2D *This, int x, int y, int fg, int bg, char c);
+  static void WriteString8 (csGraphics2D *This, int x, int y, int fg, int bg,
+    const char *text);
   /// Return address of a 8-bit pixel
   static unsigned char *GetPixelAt8 (csGraphics2D *This, int x, int y);
 
   /// Draw a pixel in 16-bit modes
   static void DrawPixel16 (csGraphics2D *This, int x, int y, int color);
   /// Write a character in 16-bit modes
-  static void WriteChar16 (csGraphics2D *This, int x, int y, int fg, int bg, char c);
+  static void WriteString16 (csGraphics2D *This, int x, int y, int fg, int bg,
+    const char *text);
   /// Return address of a 16-bit pixel
   static unsigned char *GetPixelAt16 (csGraphics2D *This, int x, int y);
 
   /// Draw a pixel in 32-bit modes
   static void DrawPixel32 (csGraphics2D *This, int x, int y, int color);
   /// Write a character in 32-bit modes
-  static void WriteChar32 (csGraphics2D *This, int x, int y, int fg, int bg, char c);
+  static void WriteString32 (csGraphics2D *This, int x, int y, int fg, int bg,
+    const char *text);
   /// Return address of a 32-bit pixel
   static unsigned char *GetPixelAt32 (csGraphics2D *This, int x, int y);
 };

@@ -139,7 +139,7 @@ struct csImageArea
   { x = sx; y = sy; w = sw; h = sh; data = NULL; }
 };
 
-SCF_VERSION (iGraphics2D, 0, 0, 4);
+SCF_VERSION (iGraphics2D, 1, 0, 0);
 
 /**
  * This is the interface for 2D renderer. The 2D renderer is responsible
@@ -260,9 +260,6 @@ struct iGraphics2D : public iPlugIn
   /// Write a text string into the back buffer
   virtual void Write (int x, int y, int fg, int bg, const char *str) = 0;
 
-  /// Write a single character.
-  virtual void WriteChar (int x, int y, int fg, int bg, char c) = 0;
-
   /// Gets the ID of current font.
   virtual int GetFontID () = 0;
 
@@ -307,9 +304,12 @@ struct iGraphics2D : public iPlugIn
   virtual iImage *ScreenShot () = 0;
 
   /// Create an Off Screen Canvas
-  virtual iGraphics2D *CreateOffScreenCanvas 
-  (int width, int height, void *buffer, bool alone_hint, 
-   csPixelFormat *ipfmt, csRGBpixel *palette = NULL, int pal_size = 0) = 0;
+  virtual iGraphics2D *CreateOffScreenCanvas (int width, int height,
+     void *buffer, bool alone_hint, csPixelFormat *ipfmt,
+     csRGBpixel *palette = NULL, int pal_size = 0) = 0;
+
+  /// Enable/disable canvas resizing
+  virtual void AllowCanvasResize (bool iAllow) = 0;
 };
 
 #endif // __IGRAPH2D_H__

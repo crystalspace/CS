@@ -239,6 +239,9 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
 
   virtual bool PerformExtension (const char * /*iCommand*/, ...)
   { return false; }
+
+  virtual void AllowCanvasResize (bool /*iAllow*/)
+  {}
 };
 
 

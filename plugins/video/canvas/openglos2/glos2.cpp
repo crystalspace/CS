@@ -173,6 +173,7 @@ bool csGraphics2DOS2GL::Open (const char *Title)
   glW->SetMouseHandler (MouseHandlerStub, this);
   glW->SetTerminateHandler (TerminateHandlerStub, this);
   glW->SetFocusHandler (FocusHandlerStub, this);
+  glW->SetResizeHandler (ResizeHandlerStub, this);
 
   // Bind OpenGL context to window
   rq.Parm.BindCtx.glW = glW;
@@ -218,9 +219,9 @@ bool csGraphics2DOS2GL::Open (const char *Title)
   if (FullScreen)
     glW->Command (cmdFullScreen);
 
-  UpdatePalette = FALSE;
+  UpdatePalette = false;
+  AllowCanvasResize (false);
 
-  glViewport (0, 0, Width, Height);
   if (!csGraphics2DGLCommon::Open (Title))
     return false;
 
@@ -274,7 +275,7 @@ void csGraphics2DOS2GL::SetRGB (int i, int r, int g, int b)
     return;
   GLPalette[i] = b | g << 8 | r << 16;
   UpdatePalette = TRUE;
-  csGraphics2D::SetRGB (i, r, g, b);
+  csGraphics2DGLCommon::SetRGB (i, r, g, b);
 }
 
 bool csGraphics2DOS2GL::BeginDraw ()
@@ -285,14 +286,7 @@ bool csGraphics2DOS2GL::BeginDraw ()
     UpdatePalette = FALSE;
   }
 
-  glViewport (0, 0, Width, Height);
-
-  return csGraphics2D::BeginDraw ();
-}
-
-void csGraphics2DOS2GL::FinishDraw ()
-{
-  csGraphics2D::FinishDraw ();
+  return csGraphics2DGLCommon::BeginDraw ();
 }
 
 bool csGraphics2DOS2GL::SetMousePosition (int x, int y)
@@ -361,6 +355,11 @@ bool csGraphics2DOS2GL::SetMouseCursor (csMouseCursorID iShape)
   } /* endswitch */
 }
 
+void csGraphics2DOS2GL::AllowCanvasResize (bool iAllow)
+{
+  glW->AllowWindowResize (AllowResize = iAllow);
+}
+
 void csGraphics2DOS2GL::MouseHandlerStub (void *Self, int Button, bool Down,
   int x, int y, int ShiftFlags)
 {
@@ -398,4 +397,17 @@ void csGraphics2DOS2GL::TerminateHandlerStub (void *Self)
   csGraphics2DOS2GL *This = (csGraphics2DOS2GL *)Self;
   This->EventOutlet->Broadcast (cscmdContextClose, (iGraphics2D *)This);
   This->EventOutlet->Broadcast (cscmdQuit);
+}
+
+void csGraphics2DOS2GL::ResizeHandlerStub (void *Self)
+{
+  csGraphics2DOS2GL *This = (csGraphics2DOS2GL *)Self;
+  if (This->Width != This->glW->BufferWidth ()
+   || This->Height != This->glW->BufferHeight ())
+  {
+    This->Width = This->glW->BufferWidth ();
+    This->Height = This->glW->BufferHeight ();
+    This->EventOutlet->Broadcast (cscmdContextResize, (iGraphics2D *)This);
+    This->SetClipRect (0, 0, This->Width, This->Height);
+  }
 }

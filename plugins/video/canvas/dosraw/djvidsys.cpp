@@ -176,19 +176,25 @@ VideoSystem::VideoSystem ()
 
   // Query VESA info
   VESAInformation vi;
+  memset (&vi, 0, sizeof (vi));
+  memcpy (vi.Signature, "VBE2", 4);
+  dosmemput (&vi, sizeof (vi), __tb);
+
   __dpmi_regs regs;
   regs.x.ax = 0x4f00;
   regs.x.es = __tb >> 4;
   regs.x.di = 0;
-  dosmemput ("VBE2", 4, __tb);
   __dpmi_int (0x10, &regs);
+
   if (regs.x.ax == 0x004f)
   {
-#ifdef CS_DEBUG
-    printf ("VESA VBE2 BIOS detected\n");
-#endif
     // Retrieve mode info structure from lower megabyte of dos memory.
     dosmemget (__tb, sizeof (VESAInformation), &vi);
+#ifdef CS_DEBUG
+    // Do "printf" *after* dosmemget since printf() uses __tb
+    printf ("VESA VBE2 BIOS detected\n");
+#endif
+
     VESAversion = vi.Version;
     VideoRAM = vi.VideoRAM * 64;
     // now get the list of supported VESA modes

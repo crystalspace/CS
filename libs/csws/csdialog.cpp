@@ -43,19 +43,19 @@ void csDialog::Draw ()
     case csdfsNone:
       break;
     case csdfsHorizontal:
-      Line (0, 0, bound.Width () - 1, 0, CSPAL_DIALOG_2LIGHT3D);
-      Line (0, 1, bound.Width () - 1, 1, CSPAL_DIALOG_LIGHT3D);
-      Line (0, bound.Height () - 2, bound.Width () - 1, bound.Height () - 2,
+      Line (0, 0, bound.Width (), 0, CSPAL_DIALOG_2LIGHT3D);
+      Line (0, 1, bound.Width (), 1, CSPAL_DIALOG_LIGHT3D);
+      Line (0, bound.Height () - 2, bound.Width (), bound.Height () - 2,
         CSPAL_DIALOG_DARK3D);
-      Line (0, bound.Height () - 1, bound.Width () - 1, bound.Height () - 1,
+      Line (0, bound.Height () - 1, bound.Width (), bound.Height () - 1,
         CSPAL_DIALOG_2DARK3D);
       break;
     case csdfsVertical:
-      Line (0, 0, 0, bound.Height () - 1, CSPAL_DIALOG_2LIGHT3D);
-      Line (1, 0, 1, bound.Height () - 1, CSPAL_DIALOG_LIGHT3D);
-      Line (bound.Width () - 2, 0, bound.Width () - 2, bound.Height () - 1,
+      Line (0, 0, 0, bound.Height (), CSPAL_DIALOG_2LIGHT3D);
+      Line (1, 0, 1, bound.Height (), CSPAL_DIALOG_LIGHT3D);
+      Line (bound.Width () - 2, 0, bound.Width () - 2, bound.Height (),
         CSPAL_DIALOG_DARK3D);
-      Line (bound.Width () - 1, 0, bound.Width () - 1, bound.Height () - 1,
+      Line (bound.Width () - 1, 0, bound.Width () - 1, bound.Height (),
         CSPAL_DIALOG_2DARK3D);
       break;
     case csdfsAround:

@@ -79,16 +79,10 @@ public:
    * Return a pointer to a bitmap containing a rendered character (by current
    * font).  NULL if error occured.
    */
-  virtual unsigned char* GetCharBitmap (int fontId, unsigned char c);
+  virtual unsigned char* GetGlyphBitmap (int fontId, unsigned char c, int &oW, int &oH);
 
-  /**
-   * Return width and height of a char.  Returns false if values could not be
-   * determined.
-   */
-  virtual int GetCharWidth (int fontId, unsigned char c);
-
-  /// Get width of a single character
-  virtual int GetCharHeight (int fontId, unsigned char c);
+  /// Return character size in pixels. Returns false if values could not be determined.
+  virtual bool GetGlyphSize (int fontId, unsigned char c, int &oW, int &oH);
 
   /// Get maximal font height
   virtual int GetMaximumHeight (int fontId);

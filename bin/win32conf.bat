@@ -5,19 +5,54 @@
   rem *** language" is so poor that we can only hope the user have the
   rem *** configuration we are expecting.
 
-  echo ### Testing whenever you have (the right version of) NASM installed ...
+  echo ###------------------------------------------------------------
+  echo ### To successfully compile Crystal Space on Windows32 platform
+  echo ### you should have the following utilites/toolsets installed
+  echo ### on your system:
+  echo ###
+
+  if /%1/ == /mingw32/ goto mingw32
+  if /%1/ == /msvc/ goto msvc
+  goto nothing
+
+:mingw32
+  echo ### MinGW32 not earlier than 2.95.2 (try gcc -v)
+  echo ### zlib/libpng/libjpeg ($(lib)-win32-bin-$(version).zip)
+  goto nothing
+
+:msvc
+  echo ### Microsoft Visual C command-line compiler
+  echo ### zlib/libpng/libjpeg (win32libs.zip)
+  goto nothing
+
+:nothing
+  echo ### makedep (optional)
+  echo ### nasm (optional, nasm-0.98E-bin-w32.zip)
+  echo ### GNU make (GNU.make-win32-bin-0.79.1.zip)
+  echo ### GNU diff utilites (GNU.diffut-win32-bin-2.7.1.zip)
+  echo ### GNU file utilites, sed, grep (GNU.tools-win32-bin-0.0.1.zip)
+  echo ### GNU text utilites (GNU.textut-win32-bin-1.19.zip)
+  echo ### GNU shell utilites (GNU.shut-win32-bin-1.12.zip)
+  echo ###------------------------------------------------------------
+  echo ###      ... press any alphanumeric key to continue ...
+  echo.
+  pause >nul
+
+  echo int main () {} >conftest.cpp
   echo %%xdefine TEST >conftest.asm
+
+  echo ### Testing whenever you have (the right version of) NASM installed ...
   nasm -f win32 conftest.asm -o conftest.o
   if not exist conftest.o goto nonasm
 
-  del conftest.o
+  del conftest.o >nul
   echo $$$ O.K., setting NASM.INSTALLED to "yes"
   echo NASM.INSTALLED = yes>>config.tmp
 
 :nonasm
 
   echo ### Checking whenever you have makedep already compiled and installed ...
-  makedep -h >conftest.o
+  makedep conftest.cpp -fconftest.o -c
   if not exist conftest.o goto nomakedep
 
   del conftest.o >nul
@@ -25,7 +60,7 @@
   echo MAKEDEP.INSTALLED = yes>>config.tmp
 
 :nomakedep
-  del conftest.asm
+  del conftest.* >nul
 
   type bin\win32conf.var >>config.tmp
 

@@ -45,7 +45,6 @@ public:
   
 	virtual void	SetRGB(int i, int r, int g, int b);
  
-	virtual bool	BeginDraw();
 	virtual void	FinishDraw();
 
 	virtual void	ActivateWindow( WindowPtr theWindow, bool active );

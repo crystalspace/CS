@@ -145,8 +145,8 @@ int NeXTDriver2D::determine_bits_per_sample( int simulate_depth )
 //-----------------------------------------------------------------------------
 void NeXTDriver2D::setup_rgb_15()
     {
-    _DrawPixel  = DrawPixel16;
-    _WriteChar  = WriteChar16;
+    _DrawPixel = DrawPixel16;
+    _WriteString = WriteString16;
     _GetPixelAt = GetPixelAt16;
     }
 
@@ -156,8 +156,8 @@ void NeXTDriver2D::setup_rgb_15()
 //-----------------------------------------------------------------------------
 void NeXTDriver2D::setup_rgb_32()
     {
-    _DrawPixel  = DrawPixel32;
-    _WriteChar  = WriteChar32;
+    _DrawPixel = DrawPixel32;
+    _WriteString = WriteString32;
     _GetPixelAt = GetPixelAt32;
     }
 

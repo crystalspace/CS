@@ -1,19 +1,19 @@
 /*
  * Copyright (C) 1998 by Jorrit Tyberghein
- * 
- * This library is free software; you can redistribute it and/or modify it 
+ *
+ * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Library General Public License as published
  * by the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
 #include <stdarg.h>
@@ -51,11 +51,11 @@
 
 // uncomment the 'USE_MULTITEXTURE 1' define to enable code for
 // multitexture support - this is independent of the extension detection,
-// but  it may rely on the extension module to supply proper function 
+// but  it may rely on the extension module to supply proper function
 // prototypes for the ARB_MULTITEXTURE functions
 //#define USE_MULTITEXTURE 1
 
-// Whether or not we should try  and use OpenGL extensions. This should be 
+// Whether or not we should try  and use OpenGL extensions. This should be
 // removed eventually, when all platforms have been updated.
 //#define USE_EXTENSIONS 1
 
@@ -113,7 +113,7 @@ static const unsigned int FOGTABLE_SIZE = 64;
 // (distance*density) value represented by the texel at the center of
 // the fog table.  The fog calculation is:
 // alpha = 1.0 - exp( -(density*distance) / FOGTABLE_MEDIANDISTANCE)
-// 
+//
 static const double FOGTABLE_MEDIANDISTANCE = 10.0;
 static const double FOGTABLE_MAXDISTANCE = FOGTABLE_MEDIANDISTANCE * 2.0;
 static const double FOGTABLE_DISTANCESCALE = 1.0 / FOGTABLE_MAXDISTANCE;
@@ -295,7 +295,7 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
 
   m_config_options.do_extra_bright = config->GetYesNo ("OpenGL", "EXTRA_BRIGHT", false);
   // determine what blend mode to use when combining lightmaps with
-  // their  underlying textures.  This mode is set in the Opengl 
+  // their  underlying textures.  This mode is set in the Opengl
   // configuration  file
   struct
   {
@@ -382,9 +382,9 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   glTexImage2D (GL_TEXTURE_2D, 0, 4, FOGTABLE_SIZE, 1, 0,
 		GL_RGBA, GL_UNSIGNED_BYTE, transientfogdata);
 
-  delete[]transientfogdata;
+  delete [] transientfogdata;
 
-  glGetIntegerv(GL_MAX_TEXTURE_SIZE, &max_texture_size);
+  glGetIntegerv (GL_MAX_TEXTURE_SIZE, &max_texture_size);
 
   int max_cache_size = 1024*1024*16; // 32mb combined cache
   texture_cache = new OpenGLTextureCache (max_cache_size, 24);
@@ -398,34 +398,16 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
     //SysPrintf (MSG_DEBUG_0, "openGL error string: %s\n", gluErrorString (errtest));
     SysPrintf (MSG_DEBUG_0, "openGL error: %d\n", errtest);
   }
-  glClearColor (0., 0., 0., 0.);
-  glClearDepth (-1.0);
-
-  // if the user tries to draw lines, text, etc. before calling
-  // BeginDraw() they will not see anything since the transforms are
-  // not set up correctly until you call BeginDraw().  However,
-  // the engine initializer likes to print out console messages
-  // on the screen before any 'normal' drawing has been done, so
-  // here we set up the transforms so that initialization text will
-  // appear on the screen.
-  glMatrixMode (GL_PROJECTION);
-  glLoadIdentity ();
-  glOrtho (0., (GLdouble) width, 0., (GLdouble) height, -1.0, 1.0);
-  // glViewport has moved to the 2D canvas drivers.
-  //glViewport(0,0,width,height);
-
-  glMatrixMode (GL_MODELVIEW);
-  glLoadIdentity ();
 
   // if blend style is 'auto' try to determine which mode to use by drawing on the
   // frame buffer.  We check the results to see if the OpenGL driver provides good
   // support for multipledouble (2*SRC*DST) blend mode; if not, fallback to the
   // normal multiply blend mode
-  if (strcmp(lightmapstyle, "auto") == 0)
+  if (strcmp (lightmapstyle, "auto") == 0)
   {
     GLenum srcblend, dstblend;
 
-    Guess_BlendMode(&srcblend, &dstblend);
+    Guess_BlendMode (&srcblend, &dstblend);
 
     m_config_options.m_lightmap_src_blend = srcblend;
     m_config_options.m_lightmap_dst_blend = dstblend;
@@ -433,8 +415,8 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
 
   end_draw_poly ();
 
-  glCullFace(GL_FRONT);
-  glEnable(GL_CULL_FACE);
+  glCullFace (GL_FRONT);
+  glEnable (GL_CULL_FACE);
 
   return true;
 }
@@ -456,7 +438,7 @@ void csGraphics3DOGLCommon::SharedOpen (csGraphics3DOGLCommon *d)
 {
   CommonOpen ();
   ARB_multitexture = d->ARB_multitexture;
-  m_config_options.do_multitexture_level =  
+  m_config_options.do_multitexture_level =
     d->m_config_options.do_multitexture_level;
   m_config_options.do_extra_bright = d->m_config_options.do_extra_bright;
   m_config_options.m_lightmap_src_blend = d->m_config_options.m_lightmap_src_blend;
@@ -522,21 +504,11 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
 {
   // if 2D graphics is not locked, lock it
   if ((DrawFlags & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))
-      && (!(DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))))
+   && (!(DrawMode & (CSDRAW_2DGRAPHICS | CSDRAW_3DGRAPHICS))))
   {
     if (!G2D->BeginDraw ())
       return false;
 
-    glMatrixMode (GL_PROJECTION);
-    glLoadIdentity ();
-    glOrtho (0., (GLdouble) width, 0., (GLdouble) height, -1.0, 10.0);
-    // glViewport has moved to the 2D canvas drivers.
-    //glViewport(0,0,width,height);
-
-    glMatrixMode (GL_MODELVIEW);
-    glLoadIdentity ();
-    glColor3f (1., 0., 0.);
-    glClearColor (0., 0., 0., 0.);
     dbg_current_polygon = 0;
   }
 
@@ -635,9 +607,9 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   if (ABS (Dc) < SMALL_D)
   {
     // The Dc component of the plane normal is too small. This means
-    // that  the plane of the polygon is almost perpendicular to the 
-    // eye of the viewer. In this case, nothing much can be seen of 
-    // the plane anyway so we just take one value for the entire 
+    // that  the plane of the polygon is almost perpendicular to the
+    // eye of the viewer. In this case, nothing much can be seen of
+    // the plane anyway so we just take one value for the entire
     // polygon.
     M = 0;
     N = 0;
@@ -664,7 +636,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   // the texture in the texture cache (if this is not already the case).
   CacheTexture (tex);
 
-  // @@@ The texture transform matrix is currently written as 
+  // @@@ The texture transform matrix is currently written as
   // T = M*(C-V)
   // (with V being the transform vector, M the transform matrix, and C
   // the position in camera space coordinates. It would be better (more
@@ -883,8 +855,8 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     u_over_sz = (J1 * sx + J2 * sy + J3);
     v_over_sz = (K1 * sx + K2 * sy + K3);
     // we must communicate the perspective correction (1/z) for
-    // textures by using homogenous coordinates in either texture 
-    // space or in object (vertex) space.  We do it in texture 
+    // textures by using homogenous coordinates in either texture
+    // space or in object (vertex) space.  We do it in texture
     // space.
     // glTexCoord4f(u_over_sz,v_over_sz,one_over_sz,one_over_sz);
     // glVertex3f(poly.vertices[i].sx, poly.vertices[i].sy,
@@ -914,7 +886,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
 
 
   // next draw the lightmap over the texture.  The two are blended
-  // together. If a lightmap exists, extract the proper 
+  // together. If a lightmap exists, extract the proper
   // data (GL handle, plus texture coordinate bounds)
   if (thelightmap && m_renderstate.lighting)
   {
@@ -925,7 +897,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     glEnable (GL_TEXTURE_2D);
 
     // Here we set the Z buffer depth function to GL_EQUAL to make
-    // sure that the lightmap only overwrites those areas where the 
+    // sure that the lightmap only overwrites those areas where the
     // Z buffer was updated in the previous pass. This makes sure
     // that  intersecting polygons are properly lighted.
     if (z_buf_mode == CS_ZBUF_FILL)
@@ -1061,9 +1033,9 @@ void csGraphics3DOGLCommon::DrawPolygonZFill (G3DPolygonDP & poly)
   if (ABS (Dc) < SMALL_D)
   {
     // The Dc component of the plane normal is too small. This means
-    // that  the plane of the polygon is almost perpendicular to the 
-    // eye of the viewer. In this case, nothing much can be seen of 
-    // the plane anyway so we just take one value for the entire 
+    // that  the plane of the polygon is almost perpendicular to the
+    // eye of the viewer. In this case, nothing much can be seen of
+    // the plane anyway so we just take one value for the entire
     // polygon.
     M = 0;
     N = 0;
@@ -1445,7 +1417,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     // of the modelview matrix.
 
     const csMatrix3 &orientation = o2c.GetO2T();
-    
+
     matrixholder[0] = orientation.m11;
     matrixholder[1] = orientation.m21;
     matrixholder[2] = orientation.m31;
@@ -1459,7 +1431,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     matrixholder[10] = orientation.m33;
 
 
-    matrixholder[3] = matrixholder[7] = matrixholder[11] = 
+    matrixholder[3] = matrixholder[7] = matrixholder[11] =
     matrixholder[12] = matrixholder[13] = matrixholder[14] = 0.0;
 
     matrixholder[15] = 1.0;
@@ -1494,9 +1466,9 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
   for (i = 0 ; i < 16 ; i++)
     matrixholder[i] = 0.0;
-  
+
   matrixholder[0] = matrixholder[5] = 1.0;
-  
+
   matrixholder[11] = +1.0/aspect;
   matrixholder[14] = -matrixholder[11];
 
@@ -1513,7 +1485,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       else
 	I = I * FOGTABLE_DISTANCESCALE;
 
-      fog_intensities[i] = I; 
+      fog_intensities[i] = I;
       // @@@ To avoid this copy we better structure this differently
       // inside G3DTriangleMesh.
       fog_color_verts[i].red = mesh.vertex_fog[i].r;
@@ -1530,7 +1502,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   if (m_gouraud && work_colors)
   {
     glEnableClientState (GL_COLOR_ARRAY);
-    
+
     // special hack for transparent meshes
     if (mesh.fxmode & CS_FX_ALPHA)
     {
@@ -1562,7 +1534,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     }
     glColor4f (flat_r, flat_g, flat_b, m_alpha);
   }
-  
+
   glEnableClientState (GL_VERTEX_ARRAY);
   glEnableClientState (GL_TEXTURE_COORD_ARRAY);
   glVertexPointer (3, GL_FLOAT, 0, & work_verts[0]);
@@ -1644,7 +1616,7 @@ void csGraphics3DOGLCommon::CacheTexture (iPolygonTexture *texture)
   if (m_renderstate.lighting)
     lightmap_cache->cache_lightmap (texture);
 }
-  
+
 void csGraphics3DOGLCommon::CacheLightedTexture (iPolygonTexture* /*texture*/)
 {
 }
@@ -1865,9 +1837,9 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   if (ABS (Dc) < SMALL_D)
   {
     // The Dc component of the plane normal is too small. This means
-    // that the plane of the polygon is almost perpendicular to the 
-    // eye of the viewer. In this case, nothing much can be seen of 
-    // the plane anyway so we just take one value for the entire 
+    // that the plane of the polygon is almost perpendicular to the
+    // eye of the viewer. In this case, nothing much can be seen of
+    // the plane anyway so we just take one value for the entire
     // polygon.
     M = 0;
     N = 0;
@@ -1894,7 +1866,7 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   // the texture in the texture cache (if this is not already the case).
   CacheTexture (tex);
 
-  // @@@ The texture transform matrix is currently written as 
+  // @@@ The texture transform matrix is currently written as
   // T = M*(C-V)
   // (with V being the transform vector, M the transform matrix, and C
   // the position in camera space coordinates. It would be better (more
@@ -2113,11 +2085,11 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
   glEnable (GL_TEXTURE_2D);
   glColor4f (1.,1.,1.,1.);
   csglBindTexture (GL_TEXTURE_2D, texturehandle);
-  
+
   int bitmapwidth = 0, bitmapheight = 0;
   hTex->GetMipMapDimensions (0, bitmapwidth, bitmapheight);
 
-  // convert texture coords given above to normalized (0-1.0) texture 
+  // convert texture coords given above to normalized (0-1.0) texture
   // coordinates
   float ntx1,nty1,ntx2,nty2;
   ntx1 = (_tx      ) / bitmapwidth;

@@ -617,7 +617,7 @@ HRESULT csGraphics2DDDraw6::InitSurfaces ()
   else if (Depth == 16)
   {
     _DrawPixel = DrawPixel16;
-    _WriteChar = WriteChar16;
+    _WriteString = WriteString16;
     _GetPixelAt = GetPixelAt16;
 
     // Set pixel format
@@ -627,7 +627,7 @@ HRESULT csGraphics2DDDraw6::InitSurfaces ()
   else if (Depth == 32)
   {
     _DrawPixel = DrawPixel32;
-    _WriteChar = WriteChar32;
+    _WriteString = WriteString32;
     _GetPixelAt = GetPixelAt32;
   
     // calculate CS's pixel format structure.

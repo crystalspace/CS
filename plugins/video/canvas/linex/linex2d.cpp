@@ -47,6 +47,7 @@ csGraphics2DLineXLib::csGraphics2DLineXLib (iBase *iParent) :
   memset (&MouseCursor, 0, sizeof (MouseCursor));
   leader_window = window = 0;
   EventOutlet = NULL;
+  xfont = NULL;
 }
 
 bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
@@ -105,7 +106,7 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
   else
   {
     CsPrintf (MSG_FATAL_ERROR, "FATAL: Current screen depth not supported (8, 15, 16 or 32 bpp only)\n");
-    exit (1);
+    return false;
   }
 
   pfmt.RedMask = vinfo.red_mask;
@@ -135,13 +136,13 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
   if (pfmt.PixelBytes == 2)
   {
     _DrawPixel = DrawPixel16;
-    _WriteChar = WriteChar16;
+    _WriteString = WriteString16;
     _GetPixelAt = GetPixelAt16;
   }
   else if (pfmt.PixelBytes == 4)
   {
     _DrawPixel = DrawPixel32;
-    _WriteChar = WriteChar32;
+    _WriteString = WriteString32;
     _GetPixelAt = GetPixelAt32;
   } /* endif */
 
@@ -175,6 +176,15 @@ bool csGraphics2DLineXLib::Open(const char *Title)
   // Open your graphic interface
   if (!csGraphics2D::Open (Title))
     return false;
+
+  // Load font or substitute
+  xfont = XLoadQueryFont (dpy, "-*-helvetica-bold-r-*-*-12-*-*-*-*-*-*-*");
+  if (!xfont)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "FATAL: Cannot query font helvetica, size 14\n");
+    return false;
+  }
+  FontH = xfont->ascent + xfont->descent;
 
   // Create window
   XSetWindowAttributes swa;
@@ -224,20 +234,11 @@ bool csGraphics2DLineXLib::Open(const char *Title)
   if (cmap)
     XSetWindowColormap (dpy, window, cmap);
 
-  // Now communicate fully to the window manager our wishes using the non-mapped
-  // leader_window to form a window_group
-  XSizeHints normal_hints;
-  normal_hints.flags = PMinSize | PMaxSize | PSize | PResizeInc;
-  normal_hints.width = Width;
-  normal_hints.height = Height;
-  normal_hints.width_inc = 1;
-  normal_hints.height_inc = 1;
-  normal_hints.min_width = 320;
-  normal_hints.min_height = 200;
-  normal_hints.max_width = display_width;
-  normal_hints.max_height = display_height;
-  XSetWMNormalHints (dpy, wm_window, &normal_hints);
+  // Allow window resizes
+  AllowCanvasResize (true);
 
+  // Now communicate to the window manager our wishes using the non-mapped
+  // leader_window to form a window_group
   XWMHints wm_hints;
   wm_hints.flags = InputHint | StateHint | WindowGroupHint;
   wm_hints.input = True;
@@ -288,14 +289,18 @@ bool csGraphics2DLineXLib::Open(const char *Title)
       break;
   }
 
-  if (!AllocateMemory())
+  // Now disable window resizes.
+  // Note that if we do this before expose event, with some window managers
+  // (e.g. Window Maker) it will be unable to resize the window.
+  AllowCanvasResize (false);
+
+  if (!AllocateMemory ())
     return false;
 
   Clear (0);
 
-  if (FullScreen) {
-    EnterFullScreen();
-  }
+  if (FullScreen)
+    EnterFullScreen ();
 
   return true;
 }
@@ -312,6 +317,8 @@ bool csGraphics2DLineXLib::AllocateMemory ()
 
   if (!Memory)
     return false;
+
+  XSetFont (dpy, gc_back, xfont->fid);
 
   return true;
 }
@@ -366,6 +373,11 @@ void csGraphics2DLineXLib::Close ()
   {
     XDestroyWindow (dpy, leader_window);
     leader_window = 0;
+  }
+  if (xfont)
+  {
+    XFreeFont (dpy, xfont);
+    xfont = NULL;
   }
   csGraphics2D::Close ();
 }
@@ -431,6 +443,12 @@ bool csGraphics2DLineXLib::PerformExtension (const char *iCommand, ...)
       LeaveFullScreen ();
     else
       EnterFullScreen ();
+    return true;
+  }
+  else if (!strcasecmp (iCommand, "flush"))
+  {
+    XSync (dpy, False);
+    return true;
   }
 
   return true;
@@ -475,16 +493,35 @@ void csGraphics2DLineXLib::DrawLine (float x1, float y1, float x2, float y2, int
 
 void csGraphics2DLineXLib::Write (int x, int y, int fg, int bg, const char *text)
 {
+  if (bg >= 0)
+    DrawBox (x, y, XTextWidth (xfont, text, strlen (text)), FontH, bg);
   XSetForeground (dpy, gc_back, fg);
-  XSetBackground (dpy, gc_back, bg);
-  XDrawString (dpy, back, gc_back, x, y, text, strlen (text));
+  XSetBackground (dpy, gc_back, fg); // fg is not an error
+  XDrawString (dpy, back, gc_back, x, y + xfont->ascent, text, strlen (text));
+}
+
+int csGraphics2DLineXLib::GetTextWidth (int Font, const char *text)
+{
+  return XTextWidth (xfont, text, strlen (text));
+}
+
+int csGraphics2DLineXLib::GetTextHeight (int /*Font*/)
+{
+  return FontH;
 }
 
 void csGraphics2DLineXLib::Clear (int color)
 {
   XSetForeground (dpy, gc_back, color);
   XSetBackground (dpy, gc_back, color);
-  XFillRectangle (dpy, back, gc_back, 0, 0, Width-1, Height-1);
+  XFillRectangle (dpy, back, gc_back, 0, 0, Width, Height);
+}
+
+void csGraphics2DLineXLib::DrawBox (int x, int y, int w, int h, int color)
+{
+  XSetForeground (dpy, gc_back, color);
+  XSetBackground (dpy, gc_back, color);
+  XFillRectangle (dpy, back, gc_back, x, y, w, h);
 }
 
 void csGraphics2DLineXLib::SetRGB (int i, int r, int g, int b)
@@ -529,6 +566,31 @@ bool csGraphics2DLineXLib::SetMouseCursor (csMouseCursorID iShape)
   } /* endif */
 }
 
+void csGraphics2DLineXLib::AllowCanvasResize (bool iAllow)
+{
+  XSizeHints normal_hints;
+  normal_hints.flags = PMinSize | PMaxSize | PSize | PResizeInc;
+  normal_hints.width = Width;
+  normal_hints.height = Height;
+  normal_hints.width_inc = 1;
+  normal_hints.height_inc = 1;
+  if (iAllow)
+  {
+    normal_hints.min_width = 320;
+    normal_hints.min_height = 200;
+    normal_hints.max_width = display_width;
+    normal_hints.max_height = display_height;
+  }
+  else
+  {
+    normal_hints.min_width =
+    normal_hints.max_width = Width;
+    normal_hints.min_height =
+    normal_hints.max_height = Height;
+  }
+  XSetWMNormalHints (dpy, wm_window, &normal_hints);
+}
+
 static Bool CheckKeyPress (Display* /*dpy*/, XEvent *event, XPointer arg)
 {
   XEvent *curevent = (XEvent *)arg;
@@ -557,8 +619,8 @@ bool csGraphics2DLineXLib::HandleEvent (iEvent &Event)
   bool down;
   bool resize = false;
   bool parent_resize = false;
-  int newWidth;
-  int newHeight;
+  int newWidth = 0;
+  int newHeight = 0;
 
   if ((Event.Type == csevBroadcast)
    && (Event.Command.Code == cscmdCommandLineHelp)

@@ -125,8 +125,8 @@ void csButton::Draw ()
         rvy = bound.Height () - 1;
         for (int i = 3; i < aw; i++, dx--)
         {
-          Line (dx, i, bound.Width () - 4, i, CSPAL_BUTTON_BACKGROUND);
-          Line (3, rvy - i, bound.Width () - dx - 1, rvy - i, CSPAL_BUTTON_BACKGROUND);
+          Line (dx, i, bound.Width () - 3, i, CSPAL_BUTTON_BACKGROUND);
+          Line (3, rvy - i, bound.Width () - dx, rvy - i, CSPAL_BUTTON_BACKGROUND);
         } /* endfor */
         Box (3, aw, bound.Width () - 3, bound.Height () - aw, CSPAL_BUTTON_BACKGROUND);
         areaw = bound.Width () - 6; areah = bound.Height () - 6;

@@ -43,7 +43,6 @@ public:
   virtual bool Initialize(iSystem *pSystem);
 
   virtual void Print (csRect *area = NULL);
-  virtual bool BeginDraw ();
   
   virtual void SetRGB(int i, int r, int g, int b);
  

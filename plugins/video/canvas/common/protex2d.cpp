@@ -77,7 +77,7 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
 
     // Initialize pointers to default drawing methods
     _DrawPixel = DrawPixel8;
-    _WriteChar = WriteChar8;
+    _WriteString = WriteString8;
     _GetPixelAt = GetPixelAt8;
 
     Palette = palette;
@@ -100,7 +100,7 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
       // 16bit shared software or hardware
       Depth = 16;
       _DrawPixel = DrawPixel16;
-      _WriteChar = WriteChar16;
+      _WriteString = WriteString16;
       _GetPixelAt = GetPixelAt16;
 
       // Here we are in a software context while sharing the texture manager
@@ -126,7 +126,7 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
       // 32bit shared software or hardware
       Depth = 32;
       _DrawPixel = DrawPixel32;
-      _WriteChar = WriteChar32;
+      _WriteString = WriteString32;
       _GetPixelAt = GetPixelAt32;
 
       destroy_memory = true;

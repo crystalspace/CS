@@ -161,8 +161,10 @@ glWindow::glWindow (long Width, long Height, long ContextFlags)
   hTerminate = NULL;
   hMouse = NULL;
   hFocus = NULL;
+  hResize = NULL;
   fSwapBuffers = false;
   fRedrawDisabled = false;
+  AllowResize = true;
   hpal = NULLHANDLE;
   ScreenW = WinQuerySysValue (HWND_DESKTOP, SV_CXSCREEN);
   ScreenH = WinQuerySysValue (HWND_DESKTOP, SV_CYSCREEN);
@@ -441,6 +443,12 @@ MRESULT glWindow::ClientMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgParm2
       unsigned short flags = SHORT1FROMMP (MsgParm1);
       if ((flags & (KC_CHAR | KC_SCANCODE)) == KC_CHAR && flags == 0x7f)
         MsgParm1 = MPARAM (int (MsgParm1) | 0x6f000000 | KC_SCANCODE);
+      // Also ESC does not set KC_CHAR flag...
+      if ((flags & KC_SCANCODE) && ((SHORT2FROMMP (MsgParm1) >> 8) == 1))
+      {
+        flags |= KC_CHAR;
+        MsgParm2 = MPARAM (int (MsgParm2) | 0x1b000000);
+      }
       if (hKeyboard && (flags & (KC_SCANCODE | KC_CHAR)))
       {
         unsigned short ScanCode = (flags & KC_SCANCODE) ? SHORT2FROMMP (MsgParm1) : 0;
@@ -544,6 +552,9 @@ MRESULT glWindow::FrameMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgParm2)
       if (swp->fl & (SWP_MAXIMIZE | SWP_MINIMIZE | SWP_RESTORE))
         FullScreen (false);
 
+      if (!AllowResize)
+        swp->fl &= ~SWP_SIZE;
+
       if (fFullScreen)
       {
         r.xLeft = 0;
@@ -564,6 +575,7 @@ MRESULT glWindow::FrameMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgParm2)
           }
         }
       }
+
       if ((swp->fl & SWP_SIZE) && !fMinimized)
       {
         WinQueryWindowPos (hwndFR, &oldpos);
@@ -632,13 +644,15 @@ MRESULT glWindow::FrameMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgParm2)
         WinCalcFrameRect (hwndFR, &r, TRUE);
 
         r.xRight -= r.xLeft;
-        if (r.xRight < BufferW / 2 && r.xRight > 0)
-          r.xRight = BufferW / 2;
+        if (r.xRight < 320 && r.xRight > 0)
+          r.xRight = 320;
+        BufferW = r.xRight;
         r.xRight += r.xLeft;
 
         r.yTop -= r.yBottom;
-        if (r.yTop < BufferH / 2 && r.yTop > 0)
-          r.yTop = BufferH / 2;
+        if (r.yTop < 200 && r.yTop > 0)
+          r.yTop = 200;
+        BufferH = r.yTop;
         r.yTop += r.yBottom;
 
         WinCalcFrameRect (hwndFR, &r, FALSE);
@@ -658,6 +672,9 @@ MRESULT glWindow::FrameMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgParm2)
         else if (cTS)
           swp->y = oldpos.y + oldpos.cy - swp->cy;
       }
+
+      if (hResize && (swp->fl & SWP_SIZE))
+        hResize (paramResize);
       return res;
     }
     case WM_ACTIVATE:
@@ -712,6 +729,7 @@ bool glWindow::Resize (long Width, long Height, bool Center)
     if (!WinCalcFrameRect (hwndFR, &r, FALSE))
       return false;
   }
+
   return WinSetWindowPos (hwndFR, NULLHANDLE, r.xLeft, r.yBottom,
     r.xRight - r.xLeft, r.yTop - r.yBottom,
     SWP_SIZE | SWP_MOVE);
@@ -719,6 +737,13 @@ bool glWindow::Resize (long Width, long Height, bool Center)
 
 bool glWindow::AdjustAspectRatio (long *Width, long *Height)
 {
+  if (!AllowResize)
+  {
+    *Width = BufferW;
+    *Height = BufferH;
+    return true;
+  }
+
   if (!fAspect || fFullScreen)
     return true;
   ULONG K = ((*Width << 16) / BufferW + (*Height << 16) / BufferH) / 2;

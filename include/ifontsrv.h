@@ -27,7 +27,7 @@ enum CS_FONTPROPERTY
   CS_FONTSIZE
 };
 
-SCF_VERSION (iFontServer, 0, 0, 1);
+SCF_VERSION (iFontServer, 1, 0, 0);
 
 /**
  * A font server interface.  Serves up fonts.
@@ -60,12 +60,11 @@ struct iFontServer : public iPlugIn
    * Return a pointer to a bitmap containing a rendered character (by current
    * font).  NULL if error occured.
    */
-  virtual unsigned char* GetCharBitmap (int fontId, unsigned char c) = 0;
+  virtual unsigned char* GetGlyphBitmap (int fontId, unsigned char c,
+    int &oW, int &oH) = 0;
 
-  /// Return width of a char. Returns false if values could not be determined.
-  virtual int GetCharWidth (int fontId, unsigned char c) = 0;
-  /// Return width of a char. Returns false if values could not be determined.
-  virtual int GetCharHeight (int fontId, unsigned char c) = 0;
+  /// Return character size in pixels. Returns false if values could not be determined.
+  virtual bool GetGlyphSize (int fontId, unsigned char c, int &oW, int &oH) = 0;
 
   /**
    * Return the maximum height of the glyphs.  Return -1 if it could not be

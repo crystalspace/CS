@@ -332,23 +332,6 @@ void csGraphics2DOpenGL::Print( csRect *area )
 	glFlush ();
 }
 
-bool csGraphics2DOpenGL::BeginDraw()
-{
-  csGraphics2D::BeginDraw ();
-  if (FrameBufferLocked != 1)
-    return true;
-
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glOrtho(0.,(GLdouble)Width,0.,(GLdouble)Height,-1.0,100.0);
-  glMatrixMode (GL_MODELVIEW);
-  glLoadIdentity ();
-
-  glViewport (0, 0, Width, Height);
-
-  return true;
-}
-
 void csGraphics2DOpenGL::FinishDraw()
 {
   csGraphics2D::FinishDraw ();

@@ -655,6 +655,12 @@ MRESULT diveWindow::ClientMessage (ULONG Message, MPARAM MsgParm1, MPARAM MsgPar
       unsigned short flags = SHORT1FROMMP (MsgParm1);
       if ((flags & (KC_CHAR | KC_SCANCODE)) == KC_CHAR && flags == 0x7f)
         MsgParm1 = MPARAM (int (MsgParm1) | 0x6f000000 | KC_SCANCODE);
+      // Also ESC does not set KC_CHAR flag...
+      if ((flags & KC_SCANCODE) && ((SHORT2FROMMP (MsgParm1) >> 8) == 1))
+      {
+        flags |= KC_CHAR;
+        MsgParm2 = MPARAM (int (MsgParm2) | 0x1b000000);
+      }
       if (hKeyboard && (flags & (KC_SCANCODE | KC_CHAR)))
       {
         unsigned short ScanCode = (flags & KC_SCANCODE) ? SHORT2FROMMP (MsgParm1) : 0;

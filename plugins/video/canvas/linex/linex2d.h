@@ -63,6 +63,10 @@ class csGraphics2DLineXLib : public csGraphics2D, public iEventPlug
   // Window colormap
   Colormap cmap;
 
+  // The font
+  XFontStruct *xfont;
+  int FontH;
+
   // Hardware mouse cursor or software emulation?
   bool do_hwmouse;
   /// Mouse cursors (if hardware mouse cursors are used)  
@@ -105,6 +109,9 @@ public:
   virtual void DrawLine (float x1, float y1, float x2, float y2, int color);
   virtual void Clear (int color);
   virtual void Write (int x, int y, int fg, int bg, const char *text);
+  virtual void DrawBox (int x, int y, int w, int h, int color);
+  virtual int GetTextWidth (int Font, const char *text);
+  virtual int GetTextHeight (int Font);
 
   virtual bool PerformExtension (const char* iCommand, ...);
 
@@ -116,6 +123,8 @@ public:
 
   /// Called on every frame by system driver
   virtual bool HandleEvent (iEvent &Event);
+
+  virtual void AllowCanvasResize (bool iAllow);
 
   /// helper function which allocates buffers
   bool AllocateMemory ();

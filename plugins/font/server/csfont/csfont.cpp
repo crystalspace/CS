@@ -86,25 +86,21 @@ bool csDefaultFontServer::GetFontProperty (int fontId,
   return succ;
 }
 
-unsigned char *csDefaultFontServer::GetCharBitmap (int fontId, unsigned char c)
+unsigned char *csDefaultFontServer::GetGlyphBitmap (int fontId, unsigned char c,
+  int &oW, int &oH)
 { 
-  return &(FontList [fontId].FontBitmap [c * FontList [fontId].BytesPerChar]); 
+  oW = FontList [fontId].IndividualWidth ?
+    FontList [fontId].IndividualWidth [c] : FontList [fontId].Width;
+  oH = FontList [fontId].Height;
+  return FontList [fontId].FontBitmap + c * FontList [fontId].BytesPerChar;
 }
 
-int csDefaultFontServer::GetCharWidth (int fontId, unsigned char c)
+bool csDefaultFontServer::GetGlyphSize (int fontId, unsigned char c, int &oW, int &oH)
 {
-  int width;
-  if (FontList [fontId].IndividualWidth)
-    width = FontList [fontId].IndividualWidth [c];
-  else
-    width = FontList [fontId].Width;
-
-  return width;
-}
-
-int csDefaultFontServer::GetCharHeight (int fontId, unsigned char /*c*/)
-{ 
-  return FontList [fontId].Height; 
+  oW = FontList [fontId].IndividualWidth ?
+    FontList [fontId].IndividualWidth [c] : FontList [fontId].Width;
+  oH = FontList [fontId].Height;
+  return true;
 }
 
 int csDefaultFontServer::GetMaximumHeight (int fontId)

@@ -255,14 +255,6 @@ class csOpenGLProcSoftware2D : public iGraphics2D
     g2d->Write (x, y, ConvertColour (fg), cbg, str);
   }
 
-  virtual void WriteChar (int x, int y, int fg, int bg, char c)
-  { 
-    int cbg; 
-    if (bg == -1) cbg = bg;
-    else cbg = ConvertColour (bg);
-    g2d->WriteChar (x, y, ConvertColour (fg), cbg, c);
-  }
-
   virtual int GetFontID ()
   { return g2d->GetFontID (); }
 
@@ -319,5 +311,8 @@ class csOpenGLProcSoftware2D : public iGraphics2D
 
   virtual bool PerformExtension (const char * /*iCommand*/, ...)
   { return false; }
+
+  virtual void AllowCanvasResize (bool /*iAllow*/)
+  {}
 };
 #endif // _OGL_PROCEXSOFT_H_

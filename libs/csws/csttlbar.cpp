@@ -55,10 +55,10 @@ void csTitleBar::Draw ()
   if ((bdy > 2) && (tx > 8 + bound.Height ()))
     for (int by = 1 + bdy / 2; by < bound.Height () - 2; by += 4)
     {
-      Line (8, by, tx - 8, by, indx + 2);
-      Line (8, by + 1, tx - 8, by + 1, indx + 3);
-      Line (tx + tw + 7, by, bound.Width () - 9, by, indx + 2);
-      Line (tx + tw + 7, by + 1, bound.Width () - 9, by + 1, indx + 3);
+      Line (8, by, tx - 7, by, indx + 2);
+      Line (8, by + 1, tx - 7, by + 1, indx + 3);
+      Line (tx + tw + 7, by, bound.Width () - 8, by, indx + 2);
+      Line (tx + tw + 7, by + 1, bound.Width () - 8, by + 1, indx + 3);
     }
 
   csComponent::Draw ();

@@ -294,7 +294,7 @@ bool csGraphics2DMac::Initialize( iSystem* piSystem )
   		pfmt.complete ();
 
 		_DrawPixel = DrawPixel32;
-		_WriteChar = WriteChar32;
+		_WriteString = WriteString32;
 		_GetPixelAt = GetPixelAt32;
 	} else if ( Depth == 16 ) {
 		mColorTable = NULL;			// No color table needed
@@ -306,7 +306,7 @@ bool csGraphics2DMac::Initialize( iSystem* piSystem )
   		pfmt.complete ();
 
 		_DrawPixel = DrawPixel16;
-		_WriteChar = WriteChar16;
+		_WriteString = WriteString16;
 		_GetPixelAt = GetPixelAt16;
 	} else {
 		/*

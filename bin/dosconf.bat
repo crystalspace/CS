@@ -20,9 +20,10 @@
   echo ###------------------------------------------------------------
   echo ### The configuration script expects the following tools to be
   echo ### installed on your system:
-  echo ### nasm (optional)
+  echo ###
   echo ### makedep (optional)
-  echo ### libdl (optional, for dynamic loader support, djgppdl-0.1.0.zip)
+  echo ### nasm (optional, nasm-0.98E-bin-dos.zip)
+  echo ### libdl (optional, for dynamic loader support, dxe2-djgpp-0.1.1.zip)
   echo ### sleep (GNU shell utilites, shl112b.zip)
   echo ### cmp (GNU diff utilites, dif271b.zip)
   echo ### cp (GNU file utilites, fil316b.zip)
@@ -75,7 +76,7 @@
 :nonasm
 
   echo ### Checking whenever you have makedep already compiled and installed ...
-  makedep -h >conftest.o
+  makedep conftest.cpp -fconftest.o -c
   if not exist conftest.o goto nomakedep
 
   del conftest.o >nul

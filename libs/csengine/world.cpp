@@ -678,6 +678,9 @@ bool csWorld::HandleEvent (iEvent &Event)
           camera_hack = current_camera;
         }
 
+        // Allow context resizing since we handle cscmdContextResize
+        G2D->AllowCanvasResize (true);
+
         StartWorld ();
 
         return true;

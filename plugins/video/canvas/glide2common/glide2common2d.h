@@ -117,7 +117,7 @@ public:
   /// Draw a pixel
   virtual void DrawPixel (int x, int y, int color);
   /// Write a single character
-  static void WriteCharGlide (csGraphics2D *This, int x, int y, int fg, int bg, char c);
+  static void WriteStringGlide (csGraphics2D *This, int x, int y, int fg, int bg, const char *text);
 
   virtual bool BeginDraw();
   virtual void FinishDraw();

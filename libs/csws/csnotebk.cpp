@@ -437,7 +437,7 @@ void csNotebook::Draw ()
                 pos + h - bw, col + CSPAL_NOTEBOOK_TAB_UNSEL);
               Line (tabx, pos, tabx + w - 2 + selected, pos,
                 col + (thin ? CSPAL_NOTEBOOK_TAB_UNSELB1 : CSPAL_NOTEBOOK_TAB_UNSELB2));
-              Line (tabx, pos + 1, tabx, pos + h - 1,
+              Line (tabx, pos + 1, tabx, pos + h,
                 col + (thin ? CSPAL_NOTEBOOK_TAB_UNSELB1 : CSPAL_NOTEBOOK_TAB_UNSELB2));
               Line (tabx + 1, pos + h - 1, tabx + w - 2 + selected, pos + h - 1,
                 col + CSPAL_NOTEBOOK_TAB_UNSELB1);
@@ -445,36 +445,36 @@ void csNotebook::Draw ()
               {
                 Line (tabx + 1, pos + 1, tabx + w - 2 + selected, pos + 1,
                   col + CSPAL_NOTEBOOK_TAB_UNSELB3);
-                Line (tabx + 1, pos + 2, tabx + 1, pos + h - 2,
+                Line (tabx + 1, pos + 2, tabx + 1, pos + h - 1,
                   col + CSPAL_NOTEBOOK_TAB_UNSELB3);
                 Line (tabx + 2, pos + h - 2, tabx + w - 2 + selected, pos + h - 2,
                   col + CSPAL_NOTEBOOK_TAB_UNSELB2);
               }
               if (!selected)
-                Line (tabx + w - 2, pos, tabx + w - 2, pos + h - 1,
+                Line (tabx + w - 2, pos, tabx + w - 2, pos + h,
                   CSPAL_NOTEBOOK_TAB_UNSELB2);
               break;
             case CSNBS_TABPOS_RIGHT:
               w = tabw;
               Box (tabx + 1 - selected, pos + bw, tabx + w - bw,
                 pos + h - bw, col + CSPAL_NOTEBOOK_TAB_UNSEL);
-              Line (tabx + 1 - selected, pos, tabx + w - 1, pos,
+              Line (tabx + 1 - selected, pos, tabx + w, pos,
                 col + (thin ? CSPAL_NOTEBOOK_TAB_UNSELB1 : CSPAL_NOTEBOOK_TAB_UNSELB2));
-              Line (tabx + w - 1, pos + 1, tabx + w - 1, pos + h - 1,
+              Line (tabx + w - 1, pos + 1, tabx + w - 1, pos + h,
                 col + CSPAL_NOTEBOOK_TAB_UNSELB1);
-              Line (tabx + 1 - selected, pos + h - 1, tabx + w - 2, pos + h - 1,
+              Line (tabx + 1 - selected, pos + h - 1, tabx + w - 1, pos + h - 1,
                 col + CSPAL_NOTEBOOK_TAB_UNSELB1);
               if (!thin)
               {
-                Line (tabx + 1 - selected, pos + 1, tabx + w - 2, pos + 1,
+                Line (tabx + 1 - selected, pos + 1, tabx + w - 1, pos + 1,
                   col + CSPAL_NOTEBOOK_TAB_UNSELB3);
                 Line (tabx + w - 2, pos + 2, tabx + w - 2, pos + h - 2,
-                  col + CSPAL_NOTEBOOK_TAB_UNSELB3);
-                Line (tabx + 1 - selected, pos + h - 2, tabx + w - 2, pos + h - 2,
+                  col + CSPAL_NOTEBOOK_TAB_UNSELB2);
+                Line (tabx + 1 - selected, pos + h - 2, tabx + w - 1, pos + h - 2,
                   col + CSPAL_NOTEBOOK_TAB_UNSELB2);
               }
               if (!selected && (style & CSNBS_PAGEFRAME))
-                Line (tabx + 1, pos, tabx + 1, pos + h - 1,
+                Line (tabx + 1, pos, tabx + 1, pos + h,
                   CSPAL_NOTEBOOK_TAB_UNSELB1);
               break;
             case CSNBS_TABPOS_TOP:
@@ -485,17 +485,17 @@ void csNotebook::Draw ()
                 Line (pos + w - h + 1, taby + i,
                   pos + w - h + i + 1 - bw, taby + i,
                   col + CSPAL_NOTEBOOK_TAB_UNSEL);
-              Line (pos, taby, pos, taby + h - 2,
+              Line (pos, taby, pos, taby + h - 1,
                 col + (thin ? CSPAL_NOTEBOOK_TAB_UNSELB1 : CSPAL_NOTEBOOK_TAB_UNSELB2));
               Line (pos + 1, taby, pos + w - h + 1, taby,
                 col + (thin ? CSPAL_NOTEBOOK_TAB_UNSELB1 : CSPAL_NOTEBOOK_TAB_UNSELB2));
-              Line (pos + w - h + 2, taby + 1, pos + w - 1, taby + h - 2,
+              Line (pos + w - h + 1, taby + 1, pos + w - 1, taby + h - 1,
                 col + CSPAL_NOTEBOOK_TAB_UNSELB1);
               if (!thin)
               {
-                Line (pos + 1, taby + 1, pos + 1, taby + h - 2, col + CSPAL_NOTEBOOK_TAB_UNSELB3);
+                Line (pos + 1, taby + 1, pos + 1, taby + h - 1, col + CSPAL_NOTEBOOK_TAB_UNSELB3);
                 Line (pos + 2, taby + 1, pos + w - h + 1, taby + 1, col + CSPAL_NOTEBOOK_TAB_UNSELB3);
-                Line (pos + w - h + 2, taby + 2, pos + w - 2, taby + h - 2,
+                Line (pos + w - h + 1, taby + 2, pos + w - 2, taby + h - 1,
                   col + CSPAL_NOTEBOOK_TAB_UNSELB2);
               }
               break;
@@ -507,17 +507,17 @@ void csNotebook::Draw ()
                 Line (pos + w - h + 1, taby + h - 1 - i,
                   pos + w - h + i + 1 - bw, taby + h - 1 - i,
                   col + CSPAL_NOTEBOOK_TAB_UNSEL);
-              Line (pos, taby + h - 1, pos, taby + 1,
+              Line (pos, taby + 1, pos, taby + h - 1,
                 col + (thin ? CSPAL_NOTEBOOK_TAB_UNSELB1 : CSPAL_NOTEBOOK_TAB_UNSELB2));
-              Line (pos + 1, taby + h - 1, pos + w - h + 1, taby + h - 1,
+              Line (pos, taby + h - 1, pos + w - h + 1, taby + h - 1,
                 col + (thin ? CSPAL_NOTEBOOK_TAB_UNSELB1 : CSPAL_NOTEBOOK_TAB_UNSELB1));
-              Line (pos + w - h + 2, taby + h - 2, pos + w - 1, taby + 1,
+              Line (pos + w - h + 1, taby + h - 1, pos + w - 1, taby + 1,
                 col + CSPAL_NOTEBOOK_TAB_UNSELB1);
               if (!thin)
               {
-                Line (pos + 1, taby + h - 2, pos + 1, taby + 1, col + CSPAL_NOTEBOOK_TAB_UNSELB3);
-                Line (pos + 2, taby + h - 2, pos + w - h + 1, taby + h - 2, col + CSPAL_NOTEBOOK_TAB_UNSELB2);
-                Line (pos + w - h + 2, taby + h - 3, pos + w - 2, taby + 1,
+                Line (pos + 1, taby + 1, pos + 1, taby + h - 2, col + CSPAL_NOTEBOOK_TAB_UNSELB3);
+                Line (pos + 1, taby + h - 2, pos + w - h + 1, taby + h - 2, col + CSPAL_NOTEBOOK_TAB_UNSELB2);
+                Line (pos + w - h + 1, taby + h - 2, pos + w - 2, taby + 1,
                   col + CSPAL_NOTEBOOK_TAB_UNSELB2);
               }
               break;

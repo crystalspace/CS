@@ -93,7 +93,6 @@ public:
   virtual void Close ();
 
   virtual void Print (csRect *area = NULL);
-  virtual bool BeginDraw ();
 
   virtual bool PerformExtension (const char* iCommand, ...);
 

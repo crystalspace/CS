@@ -26,6 +26,8 @@
 
 // The 2D graphics driver used by OpenGL renderer
 #define OPENGL_2D_DRIVER "crystalspace.graphics2d.glos2"
+// OpenGL/2 does not support alpha-mapped textures correctly
+#define OPENGL_BITMAP_FONT
 
 // The 2D graphics driver used by software renderer on this platform
 #ifdef SYSDEF_SOFTWARE2D

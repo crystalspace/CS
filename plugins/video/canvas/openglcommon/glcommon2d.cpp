@@ -73,26 +73,37 @@ csGraphics2DGLCommon::~csGraphics2DGLCommon ()
 
 bool csGraphics2DGLCommon::Open (const char *Title)
 {
-  if (glGetString (GL_RENDERER))
-    CsPrintf (MSG_INITIALIZATION, "OpenGL renderer:\n%s\n", glGetString (GL_RENDERER));
-  if (glGetString (GL_VERSION))
-    CsPrintf (MSG_INITIALIZATION, "Version %s", glGetString(GL_VERSION));
-  CsPrintf (MSG_INITIALIZATION, "\n");
+  if (!csGraphics2D::Open (Title))
+    return false;
+
+  const char *renderer = (const char *)glGetString (GL_RENDERER);
+  const char *version = (const char *)glGetString (GL_VERSION);
+  if (renderer || version)
+  CsPrintf (MSG_INITIALIZATION, "OpenGL renderer: %s version %s\n",
+    renderer ? renderer : "unknown", version ? version : "unknown");
 
   CsPrintf (MSG_INITIALIZATION, "Using %s mode at resolution %dx%d.\n",
 	     FullScreen ? "full screen" : "windowed", Width, Height);
 
-  if (!csGraphics2D::Open (Title))
-    return false;
+  // Choose the fastest mode for 2D operations.
+  // The 3D driver will (if present) switch these depending on opengl.cfg
+  glDisable (GL_DITHER);
+  glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
+
+  glClearColor (0., 0., 0., 0.);
+  glClearDepth (-1.0);
+
+  glMatrixMode (GL_MODELVIEW);
+  glLoadIdentity ();
 
   // load font 'server'
   if (LocalFontServer == NULL)
   {
     int nFonts = FontServer->GetFontCount ();
-    LocalFontServer = new csGraphics2DOpenGLFontServer (nFonts, FontServer);
+    LocalFontServer = new csGraphics2DOpenGLFontServer (FontServer);
     for (int fontindex = 0; fontindex < nFonts; fontindex++)
       LocalFontServer->AddFont (fontindex);
-    LocalFontServer->SetClipRect (0, Height, Width, 0);  
+    LocalFontServer->SetClipRect (0, 0, Width, Height);
   }
 
   Clear (0);
@@ -106,32 +117,73 @@ void csGraphics2DGLCommon::Close(void)
   LocalFontServer = NULL;
 }
 
+bool csGraphics2DGLCommon::BeginDraw ()
+{
+  if (!csGraphics2D::BeginDraw ())
+    return false;
+  if (FrameBufferLocked != 1)
+    return true;
+
+  glMatrixMode (GL_PROJECTION);
+  glLoadIdentity ();
+  glOrtho (0, Width, 0, Height, -1.0, 10.0);
+  glViewport (0, 0, Width, Height);
+
+  glMatrixMode (GL_MODELVIEW);
+  glLoadIdentity ();
+  glColor3f (1., 0., 0.);
+  glClearColor (0., 0., 0., 0.);
+
+  return true;
+}
+
 void csGraphics2DGLCommon::SetClipRect (int xmin, int ymin, int xmax, int ymax)
 {
   csGraphics2D::SetClipRect (xmin, ymin, xmax, ymax);
   if (LocalFontServer)
-    LocalFontServer->SetClipRect (xmin, Height - ymin, xmax, Height - ymax);
+    LocalFontServer->SetClipRect (xmin, Height - ymax, xmax, Height - ymin);
+}
+
+void csGraphics2DGLCommon::DecomposeColor (int iColor,
+  GLubyte &oR, GLubyte &oG, GLubyte &oB)
+{
+  switch (pfmt.PixelBytes)
+  {
+    case 1: // paletted colors
+      oR = Palette [iColor].red;
+      oG = Palette [iColor].green;
+      oB = Palette [iColor].blue;
+      break;
+    case 2: // 16bit color
+    case 4: // truecolor
+      oR = ((iColor & pfmt.RedMask  ) >> pfmt.RedShift  ) << (8 - pfmt.RedBits  );
+      oG = ((iColor & pfmt.GreenMask) >> pfmt.GreenShift) << (8 - pfmt.GreenBits);
+      oB = ((iColor & pfmt.BlueMask ) >> pfmt.BlueShift ) << (8 - pfmt.BlueBits );
+      break;
+  }
+}
+
+void csGraphics2DGLCommon::DecomposeColor (int iColor,
+  float &oR, float &oG, float &oB)
+{
+  GLubyte r, g, b;
+  DecomposeColor (iColor, r, g, b);
+  oR = r / 255.0;
+  oG = g / 255.0;
+  oB = b / 255.0;
+}
+
+void csGraphics2DGLCommon::setGLColorfromint (int color)
+{
+  GLubyte r, g, b;
+  DecomposeColor (color, r, g, b);
+  glColor3ub (r, g, b);
 }
 
 void csGraphics2DGLCommon::Clear (int color)
 {
   float r, g, b;
-  switch (pfmt.PixelBytes)
-  {
-    case 1: // paletted colors
-      r = float (Palette [color].red  ) / 255;
-      g = float (Palette [color].green) / 255;
-      b = float (Palette [color].blue ) / 255;
-      break;
-    case 2: // 16bit color
-    case 4: // truecolor
-      r = float (color & pfmt.RedMask  ) / pfmt.RedMask;
-      g = float (color & pfmt.GreenMask) / pfmt.GreenMask;
-      b = float (color & pfmt.BlueMask ) / pfmt.BlueMask;
-      break;
-    default:
-      return;
-  }
+  DecomposeColor (color, r, g, b);
   glClearColor (r, g, b, 0.0);
   glClear (GL_COLOR_BUFFER_BIT);
 }
@@ -139,25 +191,6 @@ void csGraphics2DGLCommon::Clear (int color)
 void csGraphics2DGLCommon::SetRGB (int i, int r, int g, int b)
 {
   csGraphics2D::SetRGB (i, r, g, b);
-}
-
-void csGraphics2DGLCommon::setGLColorfromint (int color)
-{
-  switch (pfmt.PixelBytes)
-  {
-    case 1: // paletted colors
-      glColor3ub (Palette [color].red, Palette [color].green, Palette [color].blue);
-      break;
-    case 2: // 16bit color
-    case 4: // truecolor
-      glColor3f (
-        float (color & pfmt.RedMask  ) / pfmt.RedMask,
-        float (color & pfmt.GreenMask) / pfmt.GreenMask,
-        float (color & pfmt.BlueMask ) / pfmt.BlueMask);
-      break;
-    default:
-      return;
-  }
 }
 
 void csGraphics2DGLCommon::DrawLine (
@@ -172,17 +205,23 @@ void csGraphics2DGLCommon::DrawLine (
     glDisable (GL_ALPHA_TEST);
     setGLColorfromint (color);
 
-    glBegin (GL_LINES);
-    glVertex2f (x1, Height - 1 - y1);
-    glVertex2f (x2, Height - 1 - y2);
+    // This is a workaround for a hard-to-really fix problem with OpenGL:
+    // whole Y coordinates are "rounded" up, this leads to one-pixel-shift
+    // compared to software line drawing. This is not exactly a bug (because
+    // this is an on-the-edge case) but it's different, thus we'll slightly
+    // shift whole coordinates down.
+    if (QInt (y1) == y1) { y1 += 0.05; }
+    if (QInt (y2) == y2) { y2 += 0.05; }
 
+    glBegin (GL_LINES);
+    glVertex2f (x1, Height - y1);
+    glVertex2f (x2, Height - y2);
     glEnd ();
   }
 }
 
 void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
 {
-
   if ((x > ClipX2) || (y > ClipY2))
     return;
   if (x < ClipX1)
@@ -204,19 +243,11 @@ void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
   setGLColorfromint (color);
 
   glBegin (GL_QUADS);
-//    glVertex2i (x, Height - y - 1);
-//    glVertex2i (x + w - 1, Height - y - 1);
-//    glVertex2i (x + w - 1, Height - (y + h - 1) - 1);
-//    glVertex2i (x, Height - (y + h - 1) - 1);
-
-// This works with cswstest:
   glVertex2i (x, y);
   glVertex2i (x + w, y);
-  glVertex2i (x + w, y -h);
+  glVertex2i (x + w, y - h);
   glVertex2i (x, y - h);
-
   glEnd ();
-
 }
 
 void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
@@ -237,21 +268,15 @@ void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
 
 void csGraphics2DGLCommon::Write (int x, int y, int fg, int bg, const char *text)
 {
-
+  glDisable (GL_TEXTURE_2D);
   glDisable (GL_BLEND);
   glDisable (GL_DEPTH_TEST);
 
-  setGLColorfromint(fg);
-  LocalFontServer->Write (x,  Height - y - FontServer->GetCharHeight (Font, 'T'),
-			  bg, text, Font);
-}
+  if (bg >= 0)
+    DrawBox (x, y, GetTextWidth (Font, text), GetTextHeight (Font), bg);
 
-void csGraphics2DGLCommon::WriteChar (int x, int y, int fg, int bg, char c)
-{
-  char text[2];
-  text[0] = c;
-  text[1] = 0;
-  Write (x, y, fg, bg, text);
+  setGLColorfromint (fg);
+  LocalFontServer->Write (x, Height - 1 - y, text, Font);
 }
 
 // This variable is usually NULL except when doing a screen shot:
@@ -271,7 +296,7 @@ csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
     return NULL;
 
   // Convert to Opengl co-ordinate system
-  y = Height-y-w;
+  y = Height - (y + h);
 
   if (x < 0)
   { w += x; x = 0; }
@@ -288,9 +313,8 @@ csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
   if (!Area)
     return NULL;
   int actual_width = pfmt.PixelBytes * w;
-  char *dest = Area->data = new char [actual_width * h];
-  for (int i=0;i<actual_width*h;i++)
-    dest[i]=0;
+  GLubyte *dest;
+  Area->data = (char *)dest = new GLubyte [actual_width * h];
   if (!dest)
   {
     delete Area;
@@ -301,10 +325,8 @@ csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
   glDisable (GL_DEPTH_TEST);
   glDisable (GL_DITHER);
   glDisable (GL_ALPHA_TEST);
-  //glReadBuffer (GL_FRONT);
-  glReadPixels (x, y, w, h,
-    pfmt.PixelBytes == 1 ? GL_COLOR_INDEX : GL_RGBA,
-    GL_UNSIGNED_BYTE, Area->data);
+  glReadPixels (x, y, w, h, pfmt.PixelBytes == 1 ? GL_COLOR_INDEX : GL_RGBA,
+    GL_UNSIGNED_BYTE, dest);
 
   return Area;
 }
@@ -319,10 +341,9 @@ void csGraphics2DGLCommon::RestoreArea (csImageArea *Area, bool Free)
   if (Area)
   {
     glRasterPos2i (Area->x, Area->y);
-    glDrawPixels (Area->w, Area->h, 
-		  pfmt.PixelBytes == 1 ? GL_COLOR_INDEX : GL_RGBA,
-		  GL_UNSIGNED_BYTE, Area->data);
-    glFlush();
+    glDrawPixels (Area->w, Area->h, pfmt.PixelBytes == 1 ? GL_COLOR_INDEX : GL_RGBA,
+      GL_UNSIGNED_BYTE, Area->data);
+    glFlush ();
     if (Free)
       FreeArea (Area);
   } /* endif */
@@ -366,3 +387,16 @@ iImage *csGraphics2DGLCommon::ScreenShot ()
 
   return ss;
 }
+
+bool csGraphics2DGLCommon::PerformExtension (const char* iCommand, ...)
+{
+  if (!strcasecmp (iCommand, "flush"))
+  {
+    glFlush ();
+    glFinish ();
+    return true;
+  }
+
+  return false;
+}
+

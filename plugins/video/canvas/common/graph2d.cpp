@@ -61,7 +61,7 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
   pfmt.PixelBytes = 1;
   // Initialize pointers to default drawing methods
   _DrawPixel = DrawPixel8;
-  _WriteChar = WriteChar8;
+  _WriteString = WriteString8;
   _GetPixelAt = GetPixelAt8;
   // Mark all slots in palette as free
   for (int i = 0; i < 256; i++)
@@ -182,6 +182,13 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
 
   int fx1 = QInt (x1), fx2 = QInt (x2),
       fy1 = QInt (y1), fy2 = QInt (y2);
+
+  // Adjust the farthest margin
+  if (fx1 < fx2) { if (float (fx2) == x2) fx2--; }
+  else if (fx1 > fx2) { if (float (fx1) == x1) fx1--; }
+  if (fy1 < fy2) { if (float (fy2) == y2) fy2--; }
+  else if (fy1 > fy2) { if (float (fy1) == y1) fy1--; }
+
   if (fy1 == fy2)
   {
     if (fx2 - fx1)
@@ -213,7 +220,7 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
   else if (abs (fx2 - fx1) > abs (fy2 - fy1))
   {
     // Transform floating-point format to 16.16 fixed-point
-    int fy1 = QInt16 (y1), fy2 = QInt16 (y2);
+    fy1 = QInt16 (y1); fy2 = QInt16 (y2);
 
     if (fx1 > fx2)
     {
@@ -222,17 +229,29 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
     }
 
     // delta Y can be negative
-    int deltay = (fy2 - fy1) / (fx2 - fx1);
-    for (int x = fx1, y = fy1; x <= fx2; x++)
-    {
-      DrawPixel (x, y >> 16, color);
-      y += deltay;
+    int deltay = QInt16 ((y2 - y1) / (x2 - x1));
+
+#define H_LINE(pixtype)						\
+    for (int x = fx1, y = fy1 + deltay / 2; x <= fx2; x++)	\
+    {								\
+      pixtype *p = (pixtype *)(Memory +				\
+        (x * sizeof (pixtype) + LineAddress [y >> 16]));	\
+      *p = color; y += deltay;					\
     }
+
+    switch (pfmt.PixelBytes)
+    {
+      case 1: H_LINE (uint8); break;
+      case 2: H_LINE (uint16); break;
+      case 4: H_LINE (uint32); break;
+    } /* endswitch */
+
+#undef H_LINE
   }
   else
   {
     // Transform floating-point format to 16.16 fixed-point
-    int fx1 = QInt16 (x1), fx2 = QInt16 (x2);
+    fx1 = QInt16 (x1); fx2 = QInt16 (x2);
 
     if (fy1 > fy2)
     {
@@ -241,12 +260,24 @@ void csGraphics2D::DrawLine (float x1, float y1, float x2, float y2, int color)
     }
 
     // delta X can be negative
-    int deltax = int (fx2 - fx1) / int (fy2 - fy1);
-    for (int x = fx1, y = fy1; y <= fy2; y++)
-    {
-      DrawPixel (x >> 16, y, color);
-      x += deltax;
+    int deltax = QInt16 ((x2 - x1) / (y2 - y1));
+
+#define V_LINE(pixtype)						\
+    for (int x = fx1 + deltax / 2, y = fy1; y <= fy2; y++)	\
+    {								\
+      pixtype *p = (pixtype *)(Memory +				\
+        ((x >> 16) * sizeof (pixtype) + LineAddress [y]));	\
+      *p = color; x += deltax;					\
     }
+
+    switch (pfmt.PixelBytes)
+    {
+      case 1: V_LINE (uint8); break;
+      case 2: V_LINE (uint16); break;
+      case 4: V_LINE (uint32); break;
+    } /* endswitch */
+
+#undef V_LINE
   }
 }
 #endif
@@ -295,25 +326,16 @@ void csGraphics2D::DrawBox (int x, int y, int w, int h, int color)
   } /* endswitch */
 }
 
-void csGraphics2D::Write (int x, int y, int fg, int bg, const char *text)
-{
-  for (; *text; ++text)
-  {
-    WriteChar(x, y, fg, bg, *text);
-    x += FontServer->GetCharWidth ( Font, (unsigned char)*text );
-  }
-}
-
-#define WRITECHAR_NAME WriteChar8
-#define WRITECHAR_PIXTYPE UByte
+#define WR_NAME WriteString8
+#define WR_PIXTYPE UByte
 #include "writechr.inc"
 
-#define WRITECHAR_NAME WriteChar16
-#define WRITECHAR_PIXTYPE UShort
+#define WR_NAME WriteString16
+#define WR_PIXTYPE UShort
 #include "writechr.inc"
 
-#define WRITECHAR_NAME WriteChar32
-#define WRITECHAR_PIXTYPE ULong
+#define WR_NAME WriteString32
+#define WR_PIXTYPE ULong
 #include "writechr.inc"
 
 void csGraphics2D::SetClipRect (int xmin, int ymin, int xmax, int ymax)
@@ -451,7 +473,7 @@ void csGraphics2D::FreeArea (csImageArea *Area)
   if (Area)
   {
     if (Area->data)
-      delete[] Area->data;
+      delete [] Area->data;
     delete Area;
   } /* endif */
 }
