@@ -388,9 +388,6 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
       Printf (MSG_WARNING,
 	"WARNING: Failed to load configuration file `%s'\n", iConfigName);
   
-  // Add system driver configuration
-  AddConfig("/config/system.cfg");
-
   // Collect all options from command line
   CollectOptions (argc, argv);
 
@@ -658,7 +655,9 @@ void csSystemDriver::CollectOptions (int argc, const char* const argv[])
 void csSystemDriver::SetSystemDefaults (iConfigManager *Config)
 {
   // First look in .cfg file
-  csConfigAccess cfg(this, "/config/video.cfg");
+  csConfigAccess cfg;
+  cfg.AddConfig(this, "/config/video.cfg");
+  cfg.AddConfig(this, "/config/system.cfg");
 
   FrameWidth = Config->GetInt ("Video.ScreenWidth", 640);
   FrameHeight = Config->GetInt ("Video.ScreenHeight", 480);
