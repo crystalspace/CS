@@ -79,8 +79,9 @@ void csGraphics2DGLX::Report (int severity, const char* msg, ...)
 
 bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
 {
-  dispdriver = NULL;
   const char *strDriver;
+  dispdriver = NULL;
+  xvis = NULL;
 
   if (!csGraphics2DGLCommon::Initialize (object_reg))
     return false;

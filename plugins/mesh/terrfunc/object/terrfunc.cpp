@@ -134,6 +134,8 @@ float HeightMapData::GetHeight (float x, float y)
   int ix = int (x*(w-1));
   int iy = int (y*(h-1));
   int idx = iy * iw + ix;
+  if (idx >= iw*ih)
+    return hshift;
   float col00, col01, col10, col11;
   col00 = float (p[idx].red + p[idx].green + p[idx].blue)/3.;
   if (ix < iw-1)
