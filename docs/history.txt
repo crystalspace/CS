@@ -38,6 +38,7 @@ chronological order.
 	- Jorrit did a small optimization to Dynavis by keeping the
 	  camera transform local. Avoids a few virtual calls and also avoids
 	  having to pass the camera along as a parameter.
+	- Jorrit fixed a MSVC6 compatibility error with sprcal3d.
 28-Jun-2004
 	- Eric Sunshine fixed csApplicationFramework destructor so that it does
 	  not bomb out if csApplicationFramework::Main() was not called.

@@ -194,12 +194,16 @@ public:
   void SetBasePath(const char *path);
   void RescaleFactory(float factor);
   bool LoadCoreSkeleton(iVFS *vfs,const char *filename);
-  int  LoadCoreAnimation(iVFS *vfs,const char *filename,const char *name,int type,float base_vel,
-                         float min_vel,float max_vel,int min_interval,int max_interval,int idle_pct, bool lock);
-  int LoadCoreMesh(iVFS *vfs,const char *filename,const char *name,bool attach,iMaterialWrapper *defmat);
-  int LoadCoreMorphTarget(iVFS *vfs,int mesh_index,const char *filename,const char *name);
+  int  LoadCoreAnimation(iVFS *vfs,const char *filename,const char *name,
+  	int type,float base_vel, float min_vel,float max_vel,int min_interval,
+	int max_interval,int idle_pct, bool lock);
+  int LoadCoreMesh(iVFS *vfs,const char *filename,const char *name,
+  	bool attach,iMaterialWrapper *defmat);
+  int LoadCoreMorphTarget(iVFS *vfs,int mesh_index,const char *filename,
+  	const char *name);
   int AddMorphAnimation(const char *name);
-  bool AddMorphTarget(int morphanimation_index,const char *mesh_name, const char *morphtarget_name);
+  bool AddMorphTarget(int morphanimation_index,const char *mesh_name,
+  	const char *morphtarget_name);
   bool AddCoreMaterial(iMaterialWrapper *mat);
   void BindMaterials();
 
@@ -439,8 +443,9 @@ public:
     {
       return &scfParent->calCoreModel;
     }
-
   } scfiSpriteCal3DFactoryState;
+  friend struct SpriteCal3DFactoryState;
+
   struct LODControl : public iLODControl
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObjectFactory);
