@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -12,7 +12,7 @@
 //-----------------------------------------------------------------------------
 // NeXTMenu.cpp
 //
-//	Generate a menu from the INI style configuration file NeXTMenu.cfg.
+//	Generate a menu from an INI file definition.
 //
 //-----------------------------------------------------------------------------
 #import "NeXTMenu.h"
@@ -23,30 +23,12 @@ extern "Objective-C" {
 }
 #import "sysdef.h"
 #import "csutil/inifile.h"
-#undef interface // This COM macro interferes with Objective-C's @interface.
 
 static NSMenu* build_menu( char const* section, csIniFile const& );
 
 #define STR_SWITCH(X) { char const* switched_str__=(X); if (0) {}
 #define STR_CASE(X) else if (strcmp(switched_str__,(#X)) == 0)
 #define STR_SWITCH_END }
-
-struct NeXTParamData
-    {
-    csIniFile const& config;
-    void* data;
-    NeXTParamData( csIniFile const& c, void* d ) : config(c), data(d) {}
-    };
-
-//-----------------------------------------------------------------------------
-// Import the NeXTMenu.cfg file which defines the menu for this platform.
-// Uses pre-processor search-path to locate correct configuration file.
-//-----------------------------------------------------------------------------
-static char const MENU_CONFIG[] =
-#include "NeXTMenu.cfg"
-;
-size_t const MENU_SIZE = sizeof(MENU_CONFIG) / sizeof(MENU_CONFIG[0]);
-
 
 //-----------------------------------------------------------------------------
 // OpenStep 4.2 --> MacOS/X Server compatibility
@@ -74,27 +56,28 @@ static void menu_add_separator( NSMenu* m )
 //-----------------------------------------------------------------------------
 // menu_add_item
 //	Looks up the named section in csIniFile.  Pays particular attention to
-//	keys TYPE, TITLE, SHORTCUT, ACTION, & TARGET.  Adds a menu item to the
-//	menu based upon the attributes of these keys.  TYPE, if present, may
-//	specify "separator" in which case the menu item is a "separator".
-//	Otherwise, TITLE, SHORTCUT, & ACTION are used to generate the new menu
-//	item.  TARGET, if present, may be either "application" which stands for
-//	NSApp, or "delegate" which stands for [NSApp delegate].  If TARGET is
-//	not specified then the item's action is sent to the first-responder.
+//	keys "type", "title", "shortcut", "action", & "target".  Adds a menu
+//	item to the menu based upon the attributes of these keys.  "type", if
+//	present, may specify "separator" in which case the menu item is a
+//	"separator".  Otherwise, "title", "shortcut", & "action" are used to
+//	generate the new menu item.  "target", if present, may be either
+//	"application" which stands for NSApp, or "delegate" which stands for
+//	[NSApp delegate].  If "target" is not specified then the item's action
+//	is sent to the first-responder.
 //-----------------------------------------------------------------------------
 static void menu_add_item( NSMenu* menu, char const* key,
     csIniFile const& config )
     {
     char const* section = [[NSString stringWithFormat:@"Item.%s",key] cString];
 
-    char const* type = config.GetStr( section, "TYPE", 0 );
+    char const* type = config.GetStr( section, "type", 0 );
     if (type != 0 && strcmp( type, "separator" ) == 0)
 	menu_add_separator( menu );
     else
 	{
-	char const* title    = config.GetStr( section, "TITLE",    "" );
-	char const* shortcut = config.GetStr( section, "SHORTCUT", "" );
-	char const* action   = config.GetStr( section, "ACTION",   0  );
+	char const* title    = config.GetStr( section, "title",    "" );
+	char const* shortcut = config.GetStr( section, "shortcut", "" );
+	char const* action   = config.GetStr( section, "action",   0  );
 
 	SEL cmd = 0;
 	if (action != 0)
@@ -105,7 +88,7 @@ static void menu_add_item( NSMenu* menu, char const* key,
 		keyEquivalent:[NSString stringWithCString:shortcut]];
 	[item setKeyEquivalentModifierMask:NSCommandKeyMask];
 
-	char const* target = config.GetStr( section, "TARGET", 0 );
+	char const* target = config.GetStr( section, "target", 0 );
 	if (target != 0)
 	    {
 	    STR_SWITCH (target)
@@ -123,7 +106,7 @@ static void menu_add_item( NSMenu* menu, char const* key,
 // menu_add_submenu
 //	Looks up the named section in csIniFile.  Recursively calls
 //	build_menu() to generate the submenu.  Pays particular attention to
-//	key TYPE which, if present, may be one of "apple", "window", or
+//	key "type" which, if present, may be one of "apple", "window", or
 //	"services".  A TYPE qualification means that the menu should be
 //	configured as the NSApplication's Apple, Window, or Services menu,
 //	respectively.
@@ -139,7 +122,7 @@ static void menu_add_submenu( NSMenu* menu, char const* key,
 		[menu addItemWithTitle:[sub title] action:0 keyEquivalent:@""];
 	[menu setSubmenu:sub forItem:item];
 
-	char const* type = config.GetStr( section, "TYPE", 0 );
+	char const* type = config.GetStr( section, "type", 0 );
 	if (type != 0)
 	    {
 	    STR_SWITCH (type)
@@ -156,26 +139,20 @@ static void menu_add_submenu( NSMenu* menu, char const* key,
 
 
 //-----------------------------------------------------------------------------
-// menu_iterator
-//	The "menu" section iterator.  Called by csIniFile for each entry in a
-//	menu section.  Pays particular attention to keys MENU & ITEM.  For
-//	each MENU, adds a new submenu to the parent menu.  For each ITEM, adds
-//	a new menu item.
+// menu_add
+//	Called for each entry in a menu section.  Pays particular attention to
+//	keys "menu" & "item".  For each "menu", adds a new submenu to the
+//	parent menu.  For each "item", adds a new menu item.
 //-----------------------------------------------------------------------------
-static bool menu_iterator( csSome param, char* key, size_t size, csSome data )
+static void menu_add( NSMenu* menu, char const* key, char const* value,
+    csIniFile const& config )
     {
-    NeXTParamData const* param_data = (NeXTParamData const*)param;
-    NSMenu* const menu = (NSMenu*)param_data->data;
-    char const* value = (char const*)data;
-
     STR_SWITCH (key)
-	STR_CASE (MENU)
-	    menu_add_submenu( menu, value, param_data->config );
-	STR_CASE (ITEM)
-	    menu_add_item( menu, value, param_data->config );
+	STR_CASE (menu)
+	    menu_add_submenu( menu, value, config );
+	STR_CASE (item)
+	    menu_add_item( menu, value, config );
     STR_SWITCH_END
-
-    return false;	// false ==> continue enumeration
     }
 
 
@@ -183,17 +160,20 @@ static bool menu_iterator( csSome param, char* key, size_t size, csSome data )
 // build_menu
 //	Looks up the named section in csIniFile.  Enumerates over each entry
 //	in the section to build the menu.  Pays particular attention to key
-//	TITLE which is used to set the menu's title.
+//	"title" which is used to set the menu's title.
 //-----------------------------------------------------------------------------
-static NSMenu* build_menu( char const* section, csIniFile const& config )
+static NSMenu* build_menu( char const* key, csIniFile const& config )
     {
     NSMenu* m = 0;
+    char const* section = [[NSString stringWithFormat:@"Menu.%s",key] cString];
     if (config.SectionExists( section ))
 	{
-	char const* title = config.GetStr( section, "TITLE", "" );
+	char const* title = config.GetStr( section, "title", "" );
 	m = [[NSMenu alloc] initWithTitle:[NSString stringWithCString:title]];
-	NeXTParamData const param( config, m );
-	config.EnumData(section, menu_iterator, REINTERPRET_CAST(void*)&param);
+	csIniFile::DataIterator iterator( config.EnumData(section) );
+	while (iterator.NextItem())
+	    menu_add( m, iterator.GetName(),
+		(char const*)iterator.GetData(), config);
 	}
     return m;
     }
@@ -203,15 +183,9 @@ static NSMenu* build_menu( char const* section, csIniFile const& config )
 // NeXTMenuGenerate
 //	Generate a menu from the configuration information in NeXTMenu.cfg.
 //-----------------------------------------------------------------------------
-NSMenu* NeXTMenuGenerate()
+NSMenu* NeXTMenuGenerate( char const* menu_ident, csIniFile const& config )
     {
-    NSMenu* menu = 0;
-    csIniFile config;
-    if (!config.Load( MENU_CONFIG, MENU_SIZE ))
-	printf( "Error parsing menu configuration\n%s\n", MENU_CONFIG );
-    else
-	menu = build_menu( "Menu.main", config );
-    return menu;
+    return build_menu( menu_ident, config );
     }
 
 #undef STR_SWITCH_END

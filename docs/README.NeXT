@@ -2,8 +2,8 @@
     Crystal Space for MacOS/X Server, OpenStep, NextStep
 
     This document was written by Eric Sunshine <sunshine@sunshineco.com>
-    Copyright (C)1999 by Eric Sunshine
-    1999/12/23
+    Copyright (C)1999,2000 by Eric Sunshine
+    2000/02/13
 
     Also see INSTALL.NeXT for installation details.
 ===============================================================================
@@ -470,11 +470,6 @@ This is a list of items which are planned for future releases of this project.
 -------
 This is a list of known problems with the current release of this project.
 
-    o Alt-c in WalkTest does not work.  I thought that the Window Server might
-      be eating it but disabling dead-key processing did not solve the problem.
-    o Using the -nolight option causes WalkTest to crash very early in
-      csScan_CalcBlendTables().  This seems to be an issue with other ports
-      as well, though.  It may not be NeXT-specific.
     o Keyboard events generated with the "alt" modifier are not correctly
       translated to Crystal Space events.  The reason is that NextStep "cooks"
       the key-code completely into some other character prior to sending the
@@ -491,10 +486,17 @@ This is a list of known problems with the current release of this project.
 
 9. History
 ----------
+2000/02/13 (15r001+CVS)
+    Moved main menu configuration information for all Apple/NeXT platforms
+        to the new configuration file "next.cfg" which is loaded at run-time.
+        Removed the NeXTMenu.cfg files which hard-coded menu configuration
+        into the application at compile-time.
+    Rewrote NeXTMenu.cpp to load menu configuration from the new configuration
+        file.  Menu related keywords in configuration are now lower-case
+        rather than upper-case as they were in NeXTMenu.cfg.
+
 1999/12/23 (15r001+CVS)
-    Disabled dead-key processing (DPSSetDeadKeysEnabled).  I was hoping that
-        this would fix the problem of alt-c not working in WalkTest, but it did
-        not.
+    Disabled dead-key processing (DPSSetDeadKeysEnabled).
     Worked around NextStep compiler bug where it was not emitting
         implementations for methods which were not actually defined within the
         class declaration.  Work around was to define all methods within

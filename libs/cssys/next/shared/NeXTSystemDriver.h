@@ -22,6 +22,7 @@
 #include "csinput/csinput.h"
 #include "NeXTSystemInterface.h"
 @class NeXTDelegate;
+class csIniFile;
 
 //-----------------------------------------------------------------------------
 // NeXT-specific keyboard and mouse drivers.
@@ -42,8 +43,10 @@ private:
     NeXTDelegate* controller;	// Application & Window delegate.
     long ticks;			// Time of previous call to step_frame().
     int simulated_depth;	// Simulated depth, either 15 or 32.
+    csIniFile* next_config;	// Platform-specific configuration options.
 
     void init_ticks() { ticks = Time(); }
+    void init_menu();
     void init_system();
     void shutdown_system();
     void step_frame();
@@ -54,7 +57,8 @@ private:
 public:
     NeXTSystemDriver();
     virtual ~NeXTSystemDriver();
-    virtual bool Initialize( int argc, char* argv[], char const* cfgfile );
+    virtual bool Initialize( int argc, char const* const argv[],
+	char const* cfgfile );
     virtual void SetSystemDefaults( csIniFile* );
     virtual void Help();
     virtual void Loop ();

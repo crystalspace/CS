@@ -2,7 +2,7 @@
 #define __NeXT_NeXTMenu_h
 //=============================================================================
 //
-//	Copyright (C)1999 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -14,11 +14,12 @@
 //-----------------------------------------------------------------------------
 // NeXTMenu.h
 //
-//	Generate a menu from the INI style configuration file NeXTMenu.cfg.
+//	Generate a menu from an INI file definition.
 //
 //-----------------------------------------------------------------------------
 @class NSMenu;
+class csIniFile;
 
-NSMenu* NeXTMenuGenerate();
+NSMenu* NeXTMenuGenerate( char const* menu_ident, csIniFile const& );
 
 #endif // __NeXT_NeXTMenu_h

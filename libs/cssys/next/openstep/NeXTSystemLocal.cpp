@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999,2000 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -21,6 +21,7 @@
 #import "NeXTSystemDriver.h"
 #import "NeXTDelegate.h"
 #import "NeXTMenu.h"
+#import "csutil/inifile.h"
 extern "Objective-C" {
 #import <AppKit/NSApplication.h>
 #import <AppKit/NSDPSContext.h>
@@ -61,10 +62,26 @@ void NeXTSystemDriver::init_system()
     NSApp = [NSApplication sharedApplication];
     controller = [[NeXTDelegate alloc] initWithDriver:this];
     [NSApp setDelegate:controller];
-    NSMenu* const menu = NeXTMenuGenerate();
-    [menu setTitle:[[NSProcessInfo processInfo] processName]];
-    [NSApp setMainMenu:menu];
     [pool release];
+    }
+
+
+//-----------------------------------------------------------------------------
+// init_menu
+//	Generate application menu based upon platform configuration.
+//-----------------------------------------------------------------------------
+void NeXTSystemDriver::init_menu()
+    {
+    char const* style =
+	next_config->GetStr( "Platform." OS_NEXT_DESCRIPTION, "menu", 0);
+    if (style != 0)
+	{
+	NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+	NSMenu* const menu = NeXTMenuGenerate( style, *next_config );
+	[menu setTitle:[[NSProcessInfo processInfo] processName]];
+	[NSApp setMainMenu:menu];
+	[pool release];
+	}
     }
 
 

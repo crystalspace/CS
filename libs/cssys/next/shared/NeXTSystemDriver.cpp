@@ -38,8 +38,8 @@ IMPLEMENT_EMBEDDED_IBASE_END
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-NeXTSystemDriver::NeXTSystemDriver() : csSystemDriver(), 
-    initialized(false), controller(0), ticks(0), simulated_depth(0)
+NeXTSystemDriver::NeXTSystemDriver() : csSystemDriver(), initialized(false),
+    controller(0), ticks(0), simulated_depth(0), next_config(0)
     {
     CONSTRUCT_IBASE(0);
     CONSTRUCT_EMBEDDED_IBASE(scfiNeXTSystemDriver);
@@ -55,15 +55,19 @@ NeXTSystemDriver::~NeXTSystemDriver()
     {
     if (initialized)
 	shutdown_system();
+    delete next_config;
     }
 
 
 //-----------------------------------------------------------------------------
 // Initialize
 //-----------------------------------------------------------------------------
-bool NeXTSystemDriver::Initialize(int argc, char* argv[], char const* cfgfile)
+bool NeXTSystemDriver::Initialize(int argc, char const* const argv[],
+    char const* cfgfile)
     {
+    next_config = new csIniFile( "next.cfg" );
     init_system();
+    init_menu();
     init_ticks();
     initialized = true;
     return superclass::Initialize( argc, argv, cfgfile );
