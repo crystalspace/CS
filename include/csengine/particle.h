@@ -440,6 +440,7 @@ protected:
   float *part_age;
   float speed, opening, azimuth, elevation, fall_time;
   float time_left; // from previous update
+  int next_oldest;
 
   int FindOldest();
   void RestartParticle(int index, float pre_move);

@@ -609,6 +609,7 @@ csFountainParticleSystem :: csFountainParticleSystem(csObject* theParent,
     RestartParticle(i, (fall_time / float(number)) * float(number-i));
   }
   time_left = 0.0;
+  next_oldest = 0;
 }
 
 csFountainParticleSystem :: ~csFountainParticleSystem()
@@ -655,15 +656,9 @@ void csFountainParticleSystem :: RestartParticle(int index, float pre_move)
 
 int csFountainParticleSystem :: FindOldest()
 {
-  float max_age = 0.0;
-  int index = 0;
-  for(int i=0; i<amt; i++)
-    if(part_age[i] > max_age)
-    {
-      max_age = part_age[i];
-      index = i;
-    }
-  return index;
+  int ret = next_oldest;
+  next_oldest = (next_oldest + 1 ) % amt;
+  return ret;
 }
 
 void csFountainParticleSystem :: Update(time_t elapsed_time)
