@@ -119,7 +119,7 @@ Crystal Space contains a plugin providing physics through @sc{ode}. You can get
 the latest version at:
 
 @noindent
-@uref{http://opende.sourceforge.net/download.html}
+@uref{http://www.ode.org/}
 
 @subheading Ogg/Vorbis libraries
 @cindex Ogg/Vorbis
