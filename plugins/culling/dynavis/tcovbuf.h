@@ -304,6 +304,7 @@ private:
    */
   void MarkTileDirty (int tx, int ty)
   {
+    CS_ASSERT (ty >= 0 && ty < num_tile_rows);
     if (tx < dirty_left[ty]) dirty_left[ty] = tx;
     if (tx > dirty_right[ty]) dirty_right[ty] = tx;
   }

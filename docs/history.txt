@@ -3,6 +3,9 @@ The history order is reversed so that new features are at the top.
 8-Feb-2003
 	- Reverted the changes of res for packed rgb struct since they
 	  don't appear to work on linux (png image loader crashes).
+	- Fixed a memory overwrite bug in the tiled coverage buffer of
+	  Dynavis. This could cause crashes at exit or even during running.
+	  Added an assert to protect for future equivalent bugs.
 7-Feb-2003
 	- Fixed levtool so that by default it now gives usage information
 	  instead of the -list option. That way people will not forget

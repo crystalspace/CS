@@ -729,7 +729,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
 //printf ("draw line %d,%d - %d,%d (yfurther=%d)\n", x1, y1, x2, y2, yfurther);
   y2 += yfurther;
 
-  if (y2 < 0 || y1 >= height)
+  if (y2 <= 0 || y1 >= height)
   {
     //------
     // Totally outside screen vertically.
