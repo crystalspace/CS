@@ -380,11 +380,6 @@ private:
   void SetupDummyPVS (csOctreeNode* node);
 
   /**
-   * Classify a point with respect to this tree.
-   */
-  bool ClassifyPoint (csOctreeNode* node, const csVector3& p);
-
-  /**
    * Classify a polygon with respect to this tree.
    */
   int ClassifyPolygon (csOctreeNode* node, const csPoly3D& poly);
@@ -501,18 +496,6 @@ public:
 
   /// Print statistics about this octree.
   void Statistics ();
-
-  /**
-   * Classify a point with respect to this tree.
-   * Return true if the point is in solid space or false otherwise.
-   * This routine is not exact. In badly formed worlds it is possible
-   * that it will generate a bad result (i.e. say solid if it isn't
-   * solid space).
-   */
-  bool ClassifyPoint (const csVector3& p)
-  {
-    return ClassifyPoint ((csOctreeNode*)root, p);
-  }
 
   /**
    * Take a 3D polygon and classify it with respect to this tree.

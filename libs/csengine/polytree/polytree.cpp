@@ -18,6 +18,7 @@
 
 #include "sysdef.h"
 #include "csengine/polytree.h"
+#include "csengine/polygon.h"
 #include "csengine/treeobj.h"
 #include "cssys/csendian.h"
 #include "ivfs.h"
@@ -211,5 +212,64 @@ bool csPolygonTree::ReadBool (iFile* cf)
   char c;
   cf->Read ((char*)&c, 1);
   return (bool)c;
+}
+
+struct CPTraverseData
+{
+  bool is_solid;
+  csVector3 pos;
+  csVector3 test_points[6];
+  bool tested[6];
+  int num_tested;
+};
+
+void* ClassifyPointTraverse (csSector*, csPolygonInt** polygons,
+	int /*num*/, void* vdata)
+{
+  // Only for csPolygon3D.
+  if (polygons[0]->GetType () != 1) return (void*)1;
+  csPolygon3D* p = (csPolygon3D*)polygons[0];
+  csPlane3* wplane = p->GetPolyPlane ();
+
+  CPTraverseData* data = (CPTraverseData*)vdata;
+  int i;
+  for (i = 0 ; i < 6 ; i++)
+    if (!data->tested[i])
+    {
+      bool is = p->IntersectRay (data->pos, data->test_points[i]);
+      if (is)
+      {
+        data->tested[i] = true;
+	data->num_tested++;
+	if (!csMath3::Visible (data->pos, *wplane) &&
+                ABS (wplane->Classify (data->pos)) >= SMALL_EPSILON)
+	{
+	  // We can see the polygon from 'pos'. So we are in open
+	  // space.
+	  data->is_solid = false;
+	  return NULL;
+	}
+	// We tested all points.
+	if (data->num_tested >= 6) return NULL;
+      }
+    }
+}
+
+bool csPolygonTree::ClassifyPoint (const csVector3& p)
+{
+  CPTraverseData data;
+  data.is_solid = true;
+  data.pos = p;
+  data.test_points[0] = p+csVector3 (1, 0, 0);
+  data.test_points[1] = p+csVector3 (-1, 0, 0);
+  data.test_points[2] = p+csVector3 (0, 1, 0);
+  data.test_points[3] = p+csVector3 (0, -1, 0);
+  data.test_points[4] = p+csVector3 (0, 0, 1);
+  data.test_points[5] = p+csVector3 (0, 0, -1);
+  int i;
+  for (i = 0 ; i < 6 ; i++) data.tested[i] = false;
+  data.num_tested = 0;
+  Front2Back (p, ClassifyPointTraverse, (void*)&data, NULL, NULL);
+  return data.is_solid;
 }
 

@@ -248,7 +248,7 @@ void csOctree::ProcessTodo (csOctreeNode* node)
   }
 }
 
-void SplitOptPlane (csPolygonInt* np, csPolygonInt** npF, csPolygonInt** npB,
+static void SplitOptPlane (csPolygonInt* np, csPolygonInt** npF, csPolygonInt** npB,
 	int xyz, float xyz_val)
 {
   if (!np)
@@ -283,12 +283,13 @@ void SplitOptPlane (csPolygonInt* np, csPolygonInt** npF, csPolygonInt** npB,
   }
 }
 
-float randflt ()
+static float randflt ()
 {
   return ((float)rand ()) / (float)RAND_MAX;
 }
 
-void AddPolygonTo2DBSP (const csPlane3& plane, csBspTree2D* bsp2d,
+#if 0
+static void AddPolygonTo2DBSP (const csPlane3& plane, csBspTree2D* bsp2d,
 	csPolygon3D* p)
 {
   // We know the octree can currently only contain csPolygon3D
@@ -326,14 +327,16 @@ void AddPolygonTo2DBSP (const csPlane3& plane, csBspTree2D* bsp2d,
     bsp2d->Add (seg2);
   }
 }
+#endif
 
+#if 0
 struct TestSolidData
 {
   csVector2 pos;
   bool is_solid;
 };
 
-void* TestSolid (csSegment2** segments, int num, void* data)
+static void* TestSolid (csSegment2** segments, int num, void* data)
 {
   if (num == 0) return NULL; // Continue.
   TestSolidData* d = (TestSolidData*)data;
@@ -342,13 +345,14 @@ void* TestSolid (csSegment2** segments, int num, void* data)
   else d->is_solid = false;
   return (void*)1;	// Stop recursion.
 }
+#endif
 
 // Given an array of csPolygonInt (which we know to be csPolygon3D
 // in this case) fill three other arrays with x, y, and z values
 // for all the vertices of those polygons that are in the given box.
 // @@@@ UGLY CODE!!! EXPERIMENTAL ONLY!
 // If this works good it should be cleaned up a lot.
-void GetVertexComponents (csPolygonInt** polygons, int num, const csBox3& box,
+static void GetVertexComponents (csPolygonInt** polygons, int num, const csBox3& box,
 	float* xarray, int& num_xar,
 	float* yarray, int& num_yar,
 	float* zarray, int& num_zar)
@@ -382,7 +386,7 @@ void GetVertexComponents (csPolygonInt** polygons, int num, const csBox3& box,
   }
 }
 
-int compare_float (const void* v1, const void* v2)
+static int compare_float (const void* v1, const void* v2)
 {
   float f1 = *(float*)v1;
   float f2 = *(float*)v2;
@@ -391,7 +395,7 @@ int compare_float (const void* v1, const void* v2)
   else return 0;
 }
 
-int RemoveDoubles (float* array, int num_ar, float* new_array)
+static int RemoveDoubles (float* array, int num_ar, float* new_array)
 {
   int i;
   int num = 0;
@@ -1121,37 +1125,8 @@ bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee)
   // On this plane we now find the largest possible area that will
   // be used. This corresponds with the projection on the plane of
   // the outer set of planes between the occludee and the box.
-#if 1
   csBox2 plane_area;
-//printf ("\n--------\n");
-//printf ("box=(%f,%f,%f)-(%f,%f,%f)\n",
-//box.MinX (), box.MinY (), box.MinZ (),
-//box.MaxX (), box.MaxY (), box.MaxZ ());
-//printf ("occludee=(%f,%f,%f)-(%f,%f,%f)\n",
-//occludee.MinX (), occludee.MinY (), occludee.MinZ (),
-//occludee.MaxX (), occludee.MaxY (), occludee.MaxZ ());
-//printf ("box_center=(%f,%f,%f) occludee_center=(%f,%f,%f)\n",
-//box_center.x, box_center.y, box_center.z,
-//occludee_center.x, occludee_center.y, occludee_center.z);
-//printf ("plane_nr=%d plane_pos=%f\n", plane_nr, plane_pos);
   CalcBBoxFromBoxes (box, occludee, plane_nr, plane_pos, plane_area);
-#else
-  csPlane3 planes[8];
-  int num_planes;
-  num_planes = csMath3::OuterPlanes (occludee, box, planes);
-  csPlane2 planes2d[8]; // The lines making up the 2D outline.
-  for (int i = 0 ; i < num_planes ; i++)
-    csIntersect3::PlaneAxisPlane (planes[i], plane_nr, plane_pos, planes2d[i]);
-  // @@@ This routine is not ideal. We would like to be able to have
-  // a convex 2D polygon for the projection of the outer planes on the
-  // axis aligned plane but I'm not sure how to do this efficiently. For
-  // now we just calculate a bounding box in 2D which may in some cases
-  // slightly overestimate the lit area (but not much).
-  csBox2 plane_area;
-  if (!CalcBBoxFromLines (planes2d, num_planes, plane_area)) return false;
-#endif
-//printf ("plane_area=%f,%f %f,%f\n", plane_area.MinX (), plane_area.MinY (),
-	//plane_area.MaxX (), plane_area.MaxY ());
 
   // From the calculated plane area we can now calculate a scale to get
   // to a c-buffer size of 1024x1024. We also allocate this c-buffer here.
@@ -1194,13 +1169,6 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
       int j;
       for (j = 0 ; j < occludee->CountChildren ()+1 ; j++)
         printf ("-");
-      //const csBox3& lb = leaf->GetBox ();
-      //const csBox3& ob = occludee->GetBox ();
-      //printf ("\nleaf=%f,%f,%f %f,%f,%f\noccludee=%f,%f,%f %f,%f,%f\n",
-      	//lb.MinX (), lb.MinY (), lb.MinZ (),
-      	//lb.MaxX (), lb.MaxY (), lb.MaxZ (),
-      	//ob.MinX (), ob.MinY (), ob.MinZ (),
-      	//ob.MaxX (), ob.MaxY (), ob.MaxZ ());
     }
     fflush (stdout);
     if (rc) visible = true;
@@ -1289,27 +1257,95 @@ void csOctree::BuildPVS (csThing* thing)
   BuildPVS (thing, (csOctreeNode*)root);
 }
 
-bool csOctree::ClassifyPoint (csOctreeNode* node, const csVector3& p)
+static void SplitOptPlane2 (const csPoly3D* np, csPoly3D& inputF, const csPoly3D** npF,
+	csPoly3D& inputB, const csPoly3D** npB,
+	int xyz, float xyz_val)
 {
-  //@@@@@@@@@@@@@@@@
-  return false;
+  if (!np)
+  {
+    *npF = NULL;
+    *npB = NULL;
+    return;
+  }
+  int rc = 0;
+  switch (xyz)
+  {
+    case 0: rc = np->ClassifyX (xyz_val); break;
+    case 1: rc = np->ClassifyY (xyz_val); break;
+    case 2: rc = np->ClassifyZ (xyz_val); break;
+  }
+  if (rc == POL_SPLIT_NEEDED)
+  {
+    switch (xyz)
+    {
+      case 0: np->SplitWithPlaneX (inputF, inputB, xyz_val); break;
+      case 1: np->SplitWithPlaneY (inputF, inputB, xyz_val); break;
+      case 2: np->SplitWithPlaneZ (inputF, inputB, xyz_val); break;
+    }
+    *npF = &inputF;
+    *npB = &inputB;
+  }
+  else if (rc == POL_BACK)
+  {
+    *npF = NULL;
+    *npB = np;
+  }
+  else
+  {
+    *npF = np;
+    *npB = NULL;
+  }
 }
 
 int csOctree::ClassifyPolygon (csOctreeNode* node, const csPoly3D& poly)
 {
-#if 0
   if (node->GetMiniBsp ())
   {
     csBspTree* bsp = node->GetMiniBsp ();
-    return bsp->ClassifyPolygon (poly);
+    int rc = bsp->ClassifyPolygon (poly);
+    if (rc == 1)
+    {
+      // @@@ Should we test all points of the polygon here?
+      if (!ClassifyPoint (poly[0])) rc = 0;
+    }
+    return rc;
   }
-  @@@
+  if (node->IsLeaf ())
+  {
+    // @@@ Should we test all points of the polygon here?
+    if (ClassifyPoint (poly[0])) return 1;
+    else return 0;
+  }
+
   const csVector3& center = node->GetCenter ();
-    case 0: rc = np->ClassifyX (xyz_val); break;
-    case 1: rc = np->ClassifyY (xyz_val); break;
-    case 2: rc = np->ClassifyZ (xyz_val); break;
-    //@@@@@@@@@@@@@@@@
-#endif
+
+  csPoly3D inputF, inputB, inputFF, inputFB, inputBF, inputBB;
+  const csPoly3D* npF, * npB, * npFF, * npFB, * npBF, * npBB;
+  csPoly3D input[8];
+  const csPoly3D* nps[8];
+  SplitOptPlane2 (&poly, inputF, &npF, inputB, &npB, 0, center.x);
+  SplitOptPlane2 (npF, inputFF, &npFF, inputFB, &npFB, 1, center.y);
+  SplitOptPlane2 (npB, inputBF, &npBF, inputBB, &npBB, 1, center.y);
+  SplitOptPlane2 (npFF, input[OCTREE_FFF], &nps[OCTREE_FFF],
+  	input[OCTREE_FFB], &nps[OCTREE_FFB], 2, center.z);
+  SplitOptPlane2 (npFB, input[OCTREE_FBF], &nps[OCTREE_FBF],
+  	input[OCTREE_FBB], &nps[OCTREE_FBB], 2, center.z);
+  SplitOptPlane2 (npBF, input[OCTREE_BFF], &nps[OCTREE_BFF],
+  	input[OCTREE_BFB], &nps[OCTREE_BFB], 2, center.z);
+  SplitOptPlane2 (npBB, input[OCTREE_BBF], &nps[OCTREE_BBF],
+  	input[OCTREE_BBB], &nps[OCTREE_BBB], 2, center.z);
+  int i;
+  bool found_open = false, found_solid = false;
+  for (i = 0 ; i < 8 ; i++)
+    if (node->children[i])
+    {
+      int rc = ClassifyPolygon ((csOctreeNode*)node->children[i], *nps[i]);
+      if (rc == -1) return rc;
+      if (rc == 0) found_open = true;
+      if (rc == 1) found_solid = true;
+      if (found_solid && found_open) return -1;
+    }
+  if (found_solid) return 1;
   return 0;
 }
 

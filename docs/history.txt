@@ -1,6 +1,12 @@
 The history order has been reversed so that new features are at the top.
 
 15-May-2000
+	- Added const version of csPoly3D::operator[].
+	- Added csPoly3D::SplitWithPlaneXYZ().
+	- Implemented csPolygonTree::ClassifyPoint() and csBspTree/
+	  csOctree::ClassifyPolygon. This functions respectively test a
+	  point/polygon against the tree. The test returns wether or not
+	  the object is in solid space.
 	- Eric Sunshine cobbled things back together just enough so that the
 	  project can once again be built on Unix following phase one of
 	  Alex's merge of the new terrain code.  For now terrain functionality
@@ -8,6 +14,10 @@ The history order has been reversed so that new features are at the top.
 	  will probably need to adjust include paths in the csparser and
 	  csengine projects to refer to libs/csterr.
 	- Eric Sunshine eliminated compilation warnings in octree.cpp.
+	- Wouter Wijngaards added a temporary bugfix for radiosity. This
+	  fix only avoids the bug but does not really solve it. It makes
+	  radiosity (and lighting) a bit slower but at least it doesn't
+	  crash anymore.
 14-May-2000
 	- Added csPoly3D::ClassifyXYZ() routines.
 	- Started work on new optimization for PVS.

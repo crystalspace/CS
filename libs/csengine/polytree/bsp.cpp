@@ -627,16 +627,38 @@ bool csBspTree::ReadFromCache (iFile* cf,
   return rc;
 }
 
-bool csBspTree::ClassifyPoint (csBspNode* node, const csVector3& p)
-{
-  //@@@@@@@@@@@@@@@@
-  return false;
-}
-
 int csBspTree::ClassifyPolygon (csBspNode* node, const csPoly3D& poly)
 {
-  //@@@@@@@@@@@@@@@@
-  return 0;
+  if (!node->front && !node->back)
+  {
+    // Leaf.
+    // If we come here then we know that the entire polygon is in
+    // this node. In that case we test one of the vertices to see if
+    // it is solid or not.
+    // @@@ Should we test all points here?
+    if (ClassifyPoint (poly[0]))
+      return 1;
+    else
+      return 0;
+  }
+  int c = poly.Classify (node->splitter);
+  switch (c)
+  {
+    case POL_SAME_PLANE:
+      //@@@ Should we test all points here?
+      if (ClassifyPoint (poly[0]))
+        return 1;
+      else
+        return 0;
+      break;
+    case POL_FRONT:
+      return ClassifyPolygon (node->front, poly);
+    case POL_BACK:
+      return ClassifyPolygon (node->back, poly);
+    case POL_SPLIT_NEEDED:
+      return -1;
+  }
 }
 
 //---------------------------------------------------------------------------
+

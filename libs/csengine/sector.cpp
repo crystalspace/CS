@@ -235,7 +235,7 @@ void csSector::UseStaticTree (int mode, bool octree)
   if (csWorld::do_not_force_revis) recalc_pvs = false;
   if (recalc_pvs)
   {
-#   if 0
+#   if 1
     if (octree)
     {
       CsPrintf (MSG_INITIALIZATION, "Build PVS...\n");

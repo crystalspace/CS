@@ -173,11 +173,6 @@ private:
   	csPolygonInt** polygons, int num);
 
   /**
-   * Classify a point with respect to this tree.
-   */
-  bool ClassifyPoint (csBspNode* node, const csVector3& p);
-
-  /**
    * Classify a polygon with respect to this tree.
    */
   int ClassifyPolygon (csBspNode* node, const csPoly3D& poly);
@@ -252,18 +247,6 @@ public:
 
   /// Read this tree from cache.
   bool ReadFromCache (iFile* cf, csPolygonInt** polygons, int num);
-
-  /**
-   * Classify a point with respect to this tree.
-   * Return true if the point is in solid space or false otherwise.
-   * This routine is not exact. In badly formed worlds it is possible
-   * that it will generate a bad result (i.e. say solid if it isn't
-   * solid space).
-   */
-  bool ClassifyPoint (const csVector3& p)
-  {
-    return ClassifyPoint ((csBspNode*)root, p);
-  }
 
   /**
    * Take a 3D polygon and classify it with respect to this tree.

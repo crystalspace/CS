@@ -151,7 +151,7 @@ bool csPoly3D::ProjectZPlane (const csVector3& point, float plane_z,
 }
 
 
-int csPoly3D::Classify (const csPlane3& pl)
+int csPoly3D::Classify (const csPlane3& pl) const
 {
   int i;
   int front = 0, back = 0;
@@ -169,7 +169,7 @@ int csPoly3D::Classify (const csPlane3& pl)
   return POL_SPLIT_NEEDED;
 }
 
-int csPoly3D::ClassifyX (float x)
+int csPoly3D::ClassifyX (float x) const
 {
   int i;
   int front = 0, back = 0;
@@ -185,7 +185,7 @@ int csPoly3D::ClassifyX (float x)
   return POL_SPLIT_NEEDED;
 }
 
-int csPoly3D::ClassifyY (float y)
+int csPoly3D::ClassifyY (float y) const
 {
   int i;
   int front = 0, back = 0;
@@ -201,7 +201,7 @@ int csPoly3D::ClassifyY (float y)
   return POL_SPLIT_NEEDED;
 }
 
-int csPoly3D::ClassifyZ (float z)
+int csPoly3D::ClassifyZ (float z) const
 {
   int i;
   int front = 0, back = 0;
@@ -215,6 +215,234 @@ int csPoly3D::ClassifyZ (float z)
   if (back == 0) return POL_FRONT;
   if (front == 0) return POL_BACK;
   return POL_SPLIT_NEEDED;
+}
+
+void csPoly3D::SplitWithPlane (csPoly3D& poly1, csPoly3D& poly2,
+				  const csPlane3& split_plane) const
+{
+  poly1.MakeEmpty ();
+  poly2.MakeEmpty ();
+
+  csVector3 ptB;
+  float sideA, sideB;
+  csVector3 ptA = vertices[num_vertices - 1];
+  sideA = split_plane.Classify (ptA);
+  if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
+
+  for (int i = -1 ; ++i < num_vertices ; )
+  {
+    ptB = vertices[i];
+    sideB = split_plane.Classify (ptB);
+    if (ABS (sideB) < SMALL_EPSILON) sideB = 0;
+    if (sideB > 0)
+    {
+      if (sideA < 0)
+      {
+	// Compute the intersection point of the line
+	// from point A to point B with the partition
+	// plane. This is a simple ray-plane intersection.
+	csVector3 v = ptB; v -= ptA;
+	float sect = - split_plane.Classify (ptA) / ( split_plane.GetNormal () * v ) ;
+	v *= sect; v += ptA;
+	poly1.AddVertex (v);
+	poly2.AddVertex (v);
+      }
+      poly2.AddVertex (ptB);
+    }
+    else if (sideB < 0)
+    {
+      if (sideA > 0)
+      {
+	// Compute the intersection point of the line
+	// from point A to point B with the partition
+	// plane. This is a simple ray-plane intersection.
+	csVector3 v = ptB; v -= ptA;
+	float sect = - split_plane.Classify (ptA) / ( split_plane.GetNormal () * v );
+	v *= sect; v += ptA;
+	poly1.AddVertex (v);
+	poly2.AddVertex (v);
+      }
+      poly1.AddVertex (ptB);
+    }
+    else
+    {
+      poly1.AddVertex (ptB);
+      poly2.AddVertex (ptB);
+    }
+    ptA = ptB;
+    sideA = sideB;
+  }
+}
+
+void csPoly3D::SplitWithPlaneX (csPoly3D& poly1, csPoly3D& poly2,
+				  float x) const
+{
+  poly1.MakeEmpty ();
+  poly2.MakeEmpty ();
+
+  csVector3 ptB;
+  float sideA, sideB;
+  csVector3 ptA = vertices[num_vertices - 1];
+  sideA = ptA.x - x;
+  if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
+
+  for (int i = -1 ; ++i < num_vertices ; )
+  {
+    ptB = vertices[i];
+    sideB = ptB.x - x;
+    if (ABS (sideB) < SMALL_EPSILON) sideB = 0;
+    if (sideB > 0)
+    {
+      if (sideA < 0)
+      {
+	// Compute the intersection point of the line
+	// from point A to point B with the partition
+	// plane. This is a simple ray-plane intersection.
+	csVector3 v = ptB; v -= ptA;
+	float sect = - (ptA.x - x) / v.x;
+	v *= sect; v += ptA;
+	poly1.AddVertex (v);
+	poly2.AddVertex (v);
+      }
+      poly2.AddVertex (ptB);
+    }
+    else if (sideB < 0)
+    {
+      if (sideA > 0)
+      {
+	// Compute the intersection point of the line
+	// from point A to point B with the partition
+	// plane. This is a simple ray-plane intersection.
+	csVector3 v = ptB; v -= ptA;
+	float sect = - (ptA.x - x) / v.x;
+	v *= sect; v += ptA;
+	poly1.AddVertex (v);
+	poly2.AddVertex (v);
+      }
+      poly1.AddVertex (ptB);
+    }
+    else
+    {
+      poly1.AddVertex (ptB);
+      poly2.AddVertex (ptB);
+    }
+    ptA = ptB;
+    sideA = sideB;
+  }
+}
+
+void csPoly3D::SplitWithPlaneY (csPoly3D& poly1, csPoly3D& poly2,
+				  float y) const
+{
+  poly1.MakeEmpty ();
+  poly2.MakeEmpty ();
+
+  csVector3 ptB;
+  float sideA, sideB;
+  csVector3 ptA = vertices[num_vertices - 1];
+  sideA = ptA.y - y;
+  if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
+
+  for (int i = -1 ; ++i < num_vertices ; )
+  {
+    ptB = vertices[i];
+    sideB = ptB.y - y;
+    if (ABS (sideB) < SMALL_EPSILON) sideB = 0;
+    if (sideB > 0)
+    {
+      if (sideA < 0)
+      {
+	// Compute the intersection point of the line
+	// from point A to point B with the partition
+	// plane. This is a simple ray-plane intersection.
+	csVector3 v = ptB; v -= ptA;
+	float sect = - (ptA.y - y) / v.y;
+	v *= sect; v += ptA;
+	poly1.AddVertex (v);
+	poly2.AddVertex (v);
+      }
+      poly2.AddVertex (ptB);
+    }
+    else if (sideB < 0)
+    {
+      if (sideA > 0)
+      {
+	// Compute the intersection point of the line
+	// from point A to point B with the partition
+	// plane. This is a simple ray-plane intersection.
+	csVector3 v = ptB; v -= ptA;
+	float sect = - (ptA.y - y) / v.y;
+	v *= sect; v += ptA;
+	poly1.AddVertex (v);
+	poly2.AddVertex (v);
+      }
+      poly1.AddVertex (ptB);
+    }
+    else
+    {
+      poly1.AddVertex (ptB);
+      poly2.AddVertex (ptB);
+    }
+    ptA = ptB;
+    sideA = sideB;
+  }
+}
+
+void csPoly3D::SplitWithPlaneZ (csPoly3D& poly1, csPoly3D& poly2,
+				  float z) const
+{
+  poly1.MakeEmpty ();
+  poly2.MakeEmpty ();
+
+  csVector3 ptB;
+  float sideA, sideB;
+  csVector3 ptA = vertices[num_vertices - 1];
+  sideA = ptA.z - z;
+  if (ABS (sideA) < SMALL_EPSILON) sideA = 0;
+
+  for (int i = -1 ; ++i < num_vertices ; )
+  {
+    ptB = vertices[i];
+    sideB = ptB.z - z;
+    if (ABS (sideB) < SMALL_EPSILON) sideB = 0;
+    if (sideB > 0)
+    {
+      if (sideA < 0)
+      {
+	// Compute the intersection point of the line
+	// from point A to point B with the partition
+	// plane. This is a simple ray-plane intersection.
+	csVector3 v = ptB; v -= ptA;
+	float sect = - (ptA.z - z) / v.z;
+	v *= sect; v += ptA;
+	poly1.AddVertex (v);
+	poly2.AddVertex (v);
+      }
+      poly2.AddVertex (ptB);
+    }
+    else if (sideB < 0)
+    {
+      if (sideA > 0)
+      {
+	// Compute the intersection point of the line
+	// from point A to point B with the partition
+	// plane. This is a simple ray-plane intersection.
+	csVector3 v = ptB; v -= ptA;
+	float sect = - (ptA.z - z) / v.z;
+	v *= sect; v += ptA;
+	poly1.AddVertex (v);
+	poly2.AddVertex (v);
+      }
+      poly1.AddVertex (ptB);
+    }
+    else
+    {
+      poly1.AddVertex (ptB);
+      poly2.AddVertex (ptB);
+    }
+    ptA = ptB;
+    sideA = sideB;
+  }
 }
 
 

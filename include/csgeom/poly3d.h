@@ -90,6 +90,14 @@ public:
   }
 
   /**
+   * Get the specified vertex.
+   */
+  csVector3& operator[] (int i) const
+  {
+    return vertices[i];
+  }
+
+  /**
    * Get the first vertex.
    */
   csVector3* GetFirst ()
@@ -194,16 +202,29 @@ public:
    * is completely back of the given plane it returnes POL_BACK. Otherwise it
    * returns POL_SPLIT_NEEDED.
    */
-  int Classify (const csPlane3& pl);
+  int Classify (const csPlane3& pl) const;
 
   /// Same as Classify() but for X plane only.
-  int ClassifyX (float x);
+  int ClassifyX (float x) const;
 
   /// Same as Classify() but for Y plane only.
-  int ClassifyY (float y);
+  int ClassifyY (float y) const;
 
   /// Same as Classify() but for Z plane only.
-  int ClassifyZ (float z);
+  int ClassifyZ (float z) const;
+
+  /// Split this polygon with the given plane (A,B,C,D).
+  void SplitWithPlane (csPoly3D& front, csPoly3D& back,
+  	const csPlane3& split_plane) const;
+
+  /// Split this polygon to the x-plane.
+  void SplitWithPlaneX (csPoly3D& front, csPoly3D& back, float x) const;
+
+  /// Split this polygon to the y-plane.
+  void SplitWithPlaneY (csPoly3D& front, csPoly3D& back, float y) const;
+
+  /// Split this polygon to the z-plane.
+  void SplitWithPlaneZ (csPoly3D& front, csPoly3D& back, float z) const;
 };
 
 /**
