@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+9-Jun-2001
+	- Fixed a crash in terrain engine where dx/dy for the height
+	  function would go slightly out of bounds.
 8-Jun-2001
 	- Added iMeshObjectType::GetFeatures(), also added iMeshObject
 	  GetLODFeatures(), SetLODFeatures(), GetLOD(), SetLOD(), and
