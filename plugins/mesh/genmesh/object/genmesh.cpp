@@ -925,6 +925,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
       csVector3* vbuf = (csVector3*)vertex_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
       memcpy (vbuf, mesh_vertices, sizeof (csVector3)*num_mesh_vertices);
       vertex_buffer->Release ();
+      mesh_vertices_dirty_flag = false;
     }
 	return vertex_buffer;
   }
@@ -935,6 +936,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
       csVector2* tbuf = (csVector2*)texel_buffer->Lock (iRenderBuffer::CS_BUF_LOCK_NORMAL);
       memcpy (tbuf, mesh_texels, sizeof (csVector2)*num_mesh_vertices);
       texel_buffer->Release ();
+      mesh_texels_dirty_flag = false;
     }
     return texel_buffer;
   }
@@ -945,6 +947,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
       csVector3 *nbuf = (csVector3*)normal_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
       memcpy (nbuf, mesh_normals, sizeof (csVector3)*num_mesh_vertices);
       normal_buffer->Release ();
+      mesh_normals_dirty_flag = false;
     }
     return normal_buffer;
   }
@@ -955,6 +958,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
       csColor *cbuf = (csColor*)color_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
       memcpy (cbuf, mesh_colors, sizeof (csColor)*num_mesh_vertices);
       color_buffer->Release();
+      mesh_colors_dirty_flag = false;
     }
     return color_buffer;
   }
@@ -969,6 +973,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
         ibuf[i * 3 + 2] = mesh_triangles[i].c;
       }
       index_buffer->Release ();
+      mesh_triangle_dirty_flag = false;
     }
     return index_buffer;
   }
