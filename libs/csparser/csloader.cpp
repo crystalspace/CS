@@ -5092,7 +5092,78 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
 }
 
 //---------------------------------------------------------------------------
+csThing * csLoader::LoadThing (csEngine* engine, const char* fname)
+{
+  Engine = engine;
 
+  iDataBuffer *databuff = System->VFS->ReadFile (fname);
+
+  if (!databuff || !databuff->GetSize ())
+  {
+    if (databuff) databuff->DecRef ();
+    CsPrintf (MSG_FATAL_ERROR, "Could not open thing file file \"%s\" on VFS!\n", fname);
+    return NULL;
+  }
+
+  CS_TOKEN_TABLE_START (tokens)
+    CS_TOKEN_TABLE (THING)
+  CS_TOKEN_TABLE_END
+
+  char *name, *data;
+  char *buf = **databuff;
+
+  if (csGetObject (&buf, tokens, &name, &data))
+  {
+    if (!data)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
+
+    csThing * thng = load_thing( name, buf, NULL, false, false );
+    return thng;
+  }
+  databuff->DecRef ();
+  return NULL;
+}
+
+//---------------------------------------------------------------------------
+csThing * csLoader::LoadThingTemplate (csEngine* engine, const char* fname)
+{
+  Engine = engine;
+
+  iDataBuffer *databuff = System->VFS->ReadFile (fname);
+
+  if (!databuff || !databuff->GetSize ())
+  {
+    if (databuff) databuff->DecRef ();
+    CsPrintf (MSG_FATAL_ERROR, "Could not open thing file file \"%s\" on VFS!\n", fname);
+    return NULL;
+  }
+
+  CS_TOKEN_TABLE_START (tokens)
+    CS_TOKEN_TABLE (THING)
+  CS_TOKEN_TABLE_END
+
+  char *name, *data;
+  char *buf = **databuff;
+
+  if (csGetObject (&buf, tokens, &name, &data))
+  {
+    if (!data)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
+
+    csThing * thng = load_thing( name, buf, NULL, false, true );
+    return thng;
+  }
+  databuff->DecRef ();
+  return NULL;
+}
+
+//---------------------------------------------------------------------------
 bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
 {
   CS_TOKEN_TABLE_START (commands)

@@ -243,6 +243,16 @@ public:
    */
   static csSpriteTemplate* LoadSpriteTemplate (csEngine*, const char* fname);
 
+  /**
+   * Load a thing from a file.
+   */
+  static csThing* LoadThing (csEngine*, const char* fname);
+
+  /**
+   * Load a thing template from a file.
+   */
+  static csThing* LoadThingTemplate (csEngine*, const char* fname);
+
   /// Load a image and return an iImage object
   static iImage* LoadImage (const char* name)
   { return load_image (name); }
