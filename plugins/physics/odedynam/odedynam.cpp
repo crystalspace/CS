@@ -598,7 +598,7 @@ csODEDynamicSystem::csODEDynamicSystem ()
   //TODO: QUERY for collidesys
 
   worldID = dWorldCreate ();
-  spaceID = dHashSpaceCreate ();
+  spaceID = dHashSpaceCreate (0);
   dWorldSetCFM (worldID,1e-5);
   move_cb = (iDynamicsMoveCallback*)new csODEDefaultMoveCallback ();
 }
