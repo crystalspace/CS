@@ -83,6 +83,8 @@ cctest - The CrystalClear test application.  This is under heavy development.
 		ENTER - "Space jump", you can jump into the air and jump again
 	                 multiple times, since you no longer move in the 
 			 exact direction you are looking, but along the floor.
+		SPACE - Create a ccActor containing a csSprite3D.  Currently 
+	                only a test, will eventually act as a rocket.
 		Mouse - Moves viewpoint according to mouse motions (Freelook)
 		Left button - Move forward
 		Right button - Release mouse capture while held down
@@ -108,9 +110,9 @@ follows.  Each class can be subclassed, either in C++ code or by scripts from
 a CrystalClear scripting plugin, depending on the scripting language and it's
 plugin.
 
-Entity
+Entity - Initial implementation complete
  |
- |-Actor
+ |-Actor - Initial implementation started:  Can control display of sprites.
  |  |
  |  +-Pawn
  |
