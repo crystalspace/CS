@@ -14,6 +14,11 @@ chronological order.
 	  resulting in various crashes when lights were removed from a sector.
 	  Now, csSpriteCal3DMeshObject properly uses the light manager's
 	  GetRelevantLights() function.
+	- Jorrit added a new 'colorsectors' command to BugPlug (default assigned
+	  to ctrl-shift-c). This command will set dynamic ambient of all
+	  sectors to a different color (max 14 different colors). This is
+	  useful for debugging complex portal based levels so you can easily
+	  see what object belongs to what sector.
 24-Feb-2004
         - Fritz Elfert fixed conversion of bezier mesh factories in map2cs
           and re-enabled them (With wrong cvs log-message: "Before big

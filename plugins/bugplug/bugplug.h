@@ -129,6 +129,7 @@ class csShadow;
 #define DEBUGCMD_DEBUGCMD   	1047	// Send a debug command to a plugin
 #define DEBUGCMD_MEMORYDUMP   	1048	// Memory dump
 #define DEBUGCMD_UNPREPARE   	1049	// Unprepare all things
+#define DEBUGCMD_COLORSECTORS  	1050	// Give all sectors a different color
 
 /**
  * For key mappings.

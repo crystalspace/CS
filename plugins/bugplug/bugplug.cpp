@@ -1259,6 +1259,34 @@ bool csBugPlug::EatKey (iEvent& event)
 	  }
 	}
         break;
+      case DEBUGCMD_COLORSECTORS:
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
+	    	"Color all sectors...");
+	{
+	  csColor color_table[14];
+	  color_table[0].Set (255, 0, 0);
+	  color_table[1].Set (0, 255, 0);
+	  color_table[2].Set (0, 0, 255);
+	  color_table[3].Set (255, 255, 0);
+	  color_table[4].Set (255, 0, 255);
+	  color_table[5].Set (0, 255, 255);
+	  color_table[6].Set (255, 255, 255);
+	  color_table[7].Set (128, 0, 0);
+	  color_table[8].Set (0, 128, 0);
+	  color_table[9].Set (0, 0, 128);
+	  color_table[10].Set (128, 128, 0);
+	  color_table[11].Set (128, 0, 128);
+	  color_table[12].Set (0, 128, 128);
+	  color_table[13].Set (128, 128, 128);
+	  int i;
+	  iSectorList* sl = Engine->GetSectors ();
+	  for (i = 0 ; i < sl->GetCount () ; i++)
+	  {
+	    iSector* s = sl->Get (i);
+	    s->SetDynamicAmbientLight (color_table[i%14]);
+	  }
+	}
+        break;
       case DEBUGCMD_SHADOWDEBUG:
 	// swap the default shadow volume material shader to/from a version
 	// better visualizing the volume.
@@ -1750,6 +1778,7 @@ int csBugPlug::GetCommandCode (const char* cmdstr, char* args)
   if (!strcmp (cmd, "debugcmd"))	return DEBUGCMD_DEBUGCMD;
   if (!strcmp (cmd, "memorydump"))	return DEBUGCMD_MEMORYDUMP;
   if (!strcmp (cmd, "unprepare"))	return DEBUGCMD_UNPREPARE;
+  if (!strcmp (cmd, "colorsectors"))	return DEBUGCMD_COLORSECTORS;
 
   return DEBUGCMD_UNKNOWN;
 }
