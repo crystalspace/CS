@@ -214,6 +214,12 @@ void ConstructModelTask::doTask()
   csRef<iMeshWrapper> meshwrapper = engine->CreateMeshWrapper (
     factory, model->getURLstr().c_str(), sector, csVector3(0, 0, 0));
 
+  csRef<iSprite3DFactoryState> fac3d = SCF_QUERY_INTERFACE(
+    meshwrapper->GetMeshObject()->GetFactory(),
+    iSprite3DFactoryState);
+
+  if(fac3d.IsValid()) fac3d->MergeNormals();
+
   NormalizeModel (meshwrapper, true, true, model->getModelDatatype());
 
   model->GetCSinterface()->SetMeshWrapper(meshwrapper);
