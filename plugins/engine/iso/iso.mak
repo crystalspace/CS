@@ -52,7 +52,7 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: iso isoclean isocleandep
 
-iso: $(OUT.ISO) $(ISO)
+iso: $(OUTDLL) $(OUT.ISO) $(ISO)
 
 $(OUT.ISO)/%$O: $(DIR.ISO)/%.cpp
 	$(DO.COMPILE.CPP)
