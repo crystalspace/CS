@@ -237,6 +237,8 @@ class csColor(_object):
     def __imul__(*args): return _cspace.csColor___imul__(*args)
     def __iadd__(*args): return _cspace.csColor___iadd__(*args)
     def __isub__(*args): return _cspace.csColor___isub__(*args)
+    def __eq__(*args): return _cspace.csColor___eq__(*args)
+    def __ne__(*args): return _cspace.csColor___ne__(*args)
     def Add(*args): return _cspace.csColor_Add(*args)
     def Subtract(*args): return _cspace.csColor_Subtract(*args)
     def __add__(*args): return _cspace.csColor___add__(*args)
@@ -271,6 +273,12 @@ class csColor4(csColor):
         _swig_setattr(self, csColor4, 'this', _cspace.new_csColor4(*args))
         _swig_setattr(self, csColor4, 'thisown', 1)
     def Set(*args): return _cspace.csColor4_Set(*args)
+    def assign(*args): return _cspace.csColor4_assign(*args)
+    def __imul__(*args): return _cspace.csColor4___imul__(*args)
+    def __iadd__(*args): return _cspace.csColor4___iadd__(*args)
+    def __isub__(*args): return _cspace.csColor4___isub__(*args)
+    def __eq__(*args): return _cspace.csColor4___eq__(*args)
+    def __ne__(*args): return _cspace.csColor4___ne__(*args)
     def __del__(self, destroy=_cspace.delete_csColor4):
         try:
             if self.thisown: destroy(self)
