@@ -27,7 +27,7 @@ endif
 # Default list of plugins to build
 # Note that you'll link all plugins into executable in the case of static build
 ifndef PLUGINS
-  PLUGINS=$(DETECTED_PLUGINS) csclear
+  PLUGINS=cscon csclear $(DETECTED_PLUGINS)
 endif
 
 # Should we use NASM for assembly?
