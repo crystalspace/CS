@@ -24,6 +24,9 @@ chronological order.
 	    - Fixed crash in csInputDefinition for input strings like "-".
 	    - Un-deprecated some csString methods.
 	    - Removed the rather useless StdAfx.cpp file of the Opcode plugin.
+	- Jorrit disabled VBO again as it causes a significant slowdown on his
+	  card. Probably because this card doesn't really support VBO so the
+	  driver emulates it or so?
 5-Apr-2005
 	- res replaced use of printf() and relatives with csPrintf() and 
 	  relatives and use of sprintf() with use of csStrings.
