@@ -56,7 +56,6 @@ extern int awslineno;
 /// This is the parser parameter
 #define YYPARSE_PARAM windowmgr
 
-
 #ifndef YYDEBUG
 # define YYDEBUG 0
 #endif
@@ -142,11 +141,11 @@ static const short yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined. */
 static const short yyrline[] =
 {
-       0,    77,    78,    81,    82,    83,    84,    91,    96,   102,
-     109,   112,   114,   116,   118,   126,   134,   144,   150,   158,
-     161,   163,   165,   173,   183,   189,   196,   211,   214,   216,
-     218,   220,   224,   230,   237,   251,   260,   261,   262,   263,
-     264,   265,   266,   267
+       0,    76,    77,    80,    81,    82,    83,    90,    95,   101,
+     108,   111,   113,   115,   117,   125,   135,   146,   152,   160,
+     163,   165,   167,   175,   187,   193,   200,   216,   219,   221,
+     223,   225,   229,   235,   242,   257,   267,   268,   269,   270,
+     271,   272,   273,   274
 };
 #endif
 
@@ -1020,7 +1019,7 @@ case 6:
 { yyerrok;      ;
     break;}
 case 7:
-{ yyval.key = static_awsparser->MapSourceToSink (yyvsp[-6].val, yyvsp[-3].str, yyvsp[0].str); ;
+{ yyval.key = static_awsparser->MapSourceToSink (yyvsp[-6].val, yyvsp[-3].str, yyvsp[0].str); free(yyvsp[-3].str); free(yyvsp[0].str); ;
     break;}
 case 8:
 { awsKeyContainer* kc = new awsKeyContainer;
@@ -1035,42 +1034,45 @@ case 9:
 		;
     break;}
 case 10:
-{  yyval.key = new awsStringKey(yyvsp[-2].str, yyvsp[0].str); ;
+{  yyval.key = new awsStringKey(yyvsp[-2].str, yyvsp[0].str); free(yyvsp[-2].str); free(yyvsp[0].str); ;
     break;}
 case 11:
-{  yyval.key = new awsIntKey(yyvsp[-2].str, yyvsp[0].val); ;
+{  yyval.key = new awsIntKey(yyvsp[-2].str, yyvsp[0].val); free(yyvsp[-2].str); ;
     break;}
 case 12:
-{  yyval.key = new awsRGBKey(yyvsp[-6].str, yyvsp[-4].val, yyvsp[-2].val, yyvsp[0].val); ;
+{  yyval.key = new awsRGBKey(yyvsp[-6].str, yyvsp[-4].val, yyvsp[-2].val, yyvsp[0].val); free(yyvsp[-6].str); ;
     break;}
 case 13:
-{  yyval.key = new awsRectKey(yyvsp[-12].str, csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); ;
+{  yyval.key = new awsRectKey(yyvsp[-12].str, csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); free(yyvsp[-12].str); ;
     break;}
 case 14:
 { awsConnectionNode *cn = new awsConnectionNode();
-              iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(yyvsp[-1].keycont, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(yyvsp[-1].keycont, iAwsKeyContainer);
 		  cn->Consume (kc);
-              kc->DecRef();
+                  kc->DecRef();
 		  delete yyvsp[-1].keycont;
 		  yyval.key = cn;
 		;
     break;}
 case 15:
 { awsComponentNode *cn = new awsComponentNode(yyvsp[-5].str, yyvsp[-3].str);
-              iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(yyvsp[-1].keycont, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(yyvsp[-1].keycont, iAwsKeyContainer);
 		  cn->Consume(kc);
-              kc->DecRef();
+                  kc->DecRef();
 		  delete yyvsp[-1].keycont;
 		  yyval.key = cn;
+		  free(yyvsp[-5].str);
+		  free(yyvsp[-3].str);
 		;
     break;}
 case 16:
 { awsComponentNode *cn = new awsComponentNode(yyvsp[-3].str, "Window");
-              iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(yyvsp[-1].keycont, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(yyvsp[-1].keycont, iAwsKeyContainer);
 		  cn->Consume(kc);
-              kc->DecRef();
+                  kc->DecRef();
 		  delete yyvsp[-1].keycont;
 		  yyval.key = cn;
+		  free(yyvsp[-3].str);
 		;
     break;}
 case 17:
@@ -1086,30 +1088,32 @@ case 18:
 		;
     break;}
 case 19:
-{ yyval.key = new awsStringKey(yyvsp[-2].str, yyvsp[0].str); ;
+{ yyval.key = new awsStringKey(yyvsp[-2].str, yyvsp[0].str); free(yyvsp[-2].str); free(yyvsp[0].str); ;
     break;}
 case 20:
-{ yyval.key = new awsIntKey(yyvsp[-2].str, yyvsp[0].val); ;
+{ yyval.key = new awsIntKey(yyvsp[-2].str, yyvsp[0].val); free(yyvsp[-2].str); ;
     break;}
 case 21:
-{ yyval.key = new awsRectKey(yyvsp[-12].str, csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); ;
+{ yyval.key = new awsRectKey(yyvsp[-12].str, csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); free(yyvsp[-12].str); ;
     break;}
 case 22:
 { awsConnectionNode *cn = new awsConnectionNode();
-              iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(yyvsp[-1].keycont, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(yyvsp[-1].keycont, iAwsKeyContainer);
 		  cn->Consume(kc);
-              kc->DecRef();
+                  kc->DecRef();
 		  delete yyvsp[-1].keycont;
 		  yyval.key=cn;
 		;
     break;}
 case 23:
 { awsComponentNode *cn = new awsComponentNode(yyvsp[-5].str, yyvsp[-3].str);
-              iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(yyvsp[-1].keycont, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(yyvsp[-1].keycont, iAwsKeyContainer);
 		  cn->Consume(kc);
-              kc->DecRef();
+                  kc->DecRef();
 		  delete yyvsp[-1].keycont;
 		  yyval.key=cn;
+		  free(yyvsp[-5].str);
+		  free(yyvsp[-3].str);
 		;
     break;}
 case 24:
@@ -1126,27 +1130,28 @@ case 25:
     break;}
 case 26:
 { awsComponentNode *win = new awsComponentNode(yyvsp[-3].str, "Default");
-              iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(yyvsp[-1].keycont, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(yyvsp[-1].keycont, iAwsKeyContainer);
 		  win->Consume(kc);
-              kc->DecRef();
+                  kc->DecRef();
 		  delete yyvsp[-1].keycont;
 		  yyval.comp = win;
+		  free(yyvsp[-3].str);
 		;
     break;}
 case 27:
-{ yyval.key = new awsStringKey(yyvsp[-2].str, yyvsp[0].str); ;
+{ yyval.key = new awsStringKey(yyvsp[-2].str, yyvsp[0].str); free(yyvsp[-2].str); free(yyvsp[0].str); ;
     break;}
 case 28:
-{ yyval.key = new awsRGBKey(yyvsp[-6].str, yyvsp[-4].val, yyvsp[-2].val, yyvsp[0].val); ;
+{ yyval.key = new awsRGBKey(yyvsp[-6].str, yyvsp[-4].val, yyvsp[-2].val, yyvsp[0].val); free(yyvsp[-6].str); ;
     break;}
 case 29:
-{ yyval.key = new awsIntKey(yyvsp[-2].str, yyvsp[0].val); ;
+{ yyval.key = new awsIntKey(yyvsp[-2].str, yyvsp[0].val); free(yyvsp[-2].str); ;
     break;}
 case 30:
-{ yyval.key = new awsPointKey(yyvsp[-6].str, csPoint(yyvsp[-3].val, yyvsp[-1].val)); ;
+{ yyval.key = new awsPointKey(yyvsp[-6].str, csPoint(yyvsp[-3].val, yyvsp[-1].val)); free(yyvsp[-6].str); ;
     break;}
 case 31:
-{ yyval.key = new awsRectKey(yyvsp[-12].str, csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); ;
+{ yyval.key = new awsRectKey(yyvsp[-12].str, csRect(yyvsp[-9].val, yyvsp[-7].val, yyvsp[-3].val, yyvsp[-1].val)); free(yyvsp[-12].str); ;
     break;}
 case 32:
 { awsKeyContainer* kc = new awsKeyContainer;
@@ -1162,11 +1167,12 @@ case 33:
     break;}
 case 34:
 { awsSkinNode *skin = new awsSkinNode(yyvsp[-3].str);
-              iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(yyvsp[-1].keycont, iAwsKeyContainer);
-              skin->Consume(kc);
-              kc->DecRef();
-              delete yyvsp[-1].keycont;
+                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE(yyvsp[-1].keycont, iAwsKeyContainer);
+                  skin->Consume(kc);
+                  kc->DecRef();
+                  delete yyvsp[-1].keycont;
 		  yyval.skin = skin;
+		  free(yyvsp[-3].str);
 		;
     break;}
 case 35:
@@ -1174,6 +1180,7 @@ case 35:
 		  if (!static_awsparser->GetConstantValue(yyvsp[0].str, v))
 		    static_awsparser->ReportError ("Constant %s is not defined.", yyvsp[0].str);
 		  yyval.val = v;
+		  free(yyvsp[0].str);
 		;
     break;}
 case 36:

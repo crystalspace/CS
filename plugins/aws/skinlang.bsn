@@ -45,7 +45,6 @@ extern int awslineno;
 /// This is the parser parameter
 #define YYPARSE_PARAM windowmgr
 
-
 %}
 
 %token <val>  TOKEN_NUM
@@ -90,7 +89,7 @@ line:            '\n'
 
 connection_item:
 	exp '-' '>' TOKEN_ATTR ':' ':' TOKEN_ATTR
-		{ $$ = static_awsparser->MapSourceToSink ($1, $4, $7); }
+		{ $$ = static_awsparser->MapSourceToSink ($1, $4, $7); free($4); free($7); }
 ;
 
 connection_item_list:
@@ -108,36 +107,39 @@ connection_item_list:
 
 component_item:
 	TOKEN_ATTR ':' TOKEN_STR
-		{  $$ = new awsStringKey($1, $3); }
+		{  $$ = new awsStringKey($1, $3); free($1); free($3); }
 	| TOKEN_ATTR ':' exp
-		{  $$ = new awsIntKey($1, $3); }
+		{  $$ = new awsIntKey($1, $3); free($1); }
 	| TOKEN_ATTR ':' exp ',' exp ',' exp
-		{  $$ = new awsRGBKey($1, $3, $5, $7); }
+		{  $$ = new awsRGBKey($1, $3, $5, $7); free($1); }
 	| TOKEN_ATTR ':' '(' exp ',' exp ')' '-' '(' exp ',' exp ')'
-		{  $$ = new awsRectKey($1, csRect($4, $6, $10, $12)); }
+		{  $$ = new awsRectKey($1, csRect($4, $6, $10, $12)); free($1); }
 	| TOKEN_CONNECT	'{' connection_item_list '}'
 		{ awsConnectionNode *cn = new awsConnectionNode();
-              iAwsKeyContainer* kc = SCF_QUERY_INTERFACE($3, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE($3, iAwsKeyContainer);
 		  cn->Consume (kc);
-              kc->DecRef();
+                  kc->DecRef();
 		  delete $3;
 		  $$ = cn;
 		}
 	| TOKEN_COMPONENT TOKEN_STR TOKEN_IS TOKEN_STR '{' component_item_list '}'
 		{ awsComponentNode *cn = new awsComponentNode($2, $4);
-              iAwsKeyContainer* kc = SCF_QUERY_INTERFACE($6, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE($6, iAwsKeyContainer);
 		  cn->Consume(kc);
-              kc->DecRef();
+                  kc->DecRef();
 		  delete $6;
 		  $$ = cn;
+		  free($2);
+		  free($4);
 		}
 	| TOKEN_WINDOW TOKEN_STR '{' component_item_list '}'
 		{ awsComponentNode *cn = new awsComponentNode($2, "Window");
-              iAwsKeyContainer* kc = SCF_QUERY_INTERFACE($4, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE($4, iAwsKeyContainer);
 		  cn->Consume(kc);
-              kc->DecRef();
+                  kc->DecRef();
 		  delete $4;
 		  $$ = cn;
+		  free($2);
 		}
 ;
 
@@ -157,26 +159,28 @@ component_item_list:
 
 window_item:
 	TOKEN_ATTR ':' TOKEN_STR
-		{ $$ = new awsStringKey($1, $3); }
+		{ $$ = new awsStringKey($1, $3); free($1); free($3); }
 	| TOKEN_ATTR ':' exp
-		{ $$ = new awsIntKey($1, $3); }
+		{ $$ = new awsIntKey($1, $3); free($1); }
 	| TOKEN_ATTR ':' '(' exp ',' exp ')' '-' '(' exp ',' exp ')'
-		{ $$ = new awsRectKey($1, csRect($4, $6, $10, $12)); }
+		{ $$ = new awsRectKey($1, csRect($4, $6, $10, $12)); free($1); }
 	| TOKEN_CONNECT '{' connection_item_list '}'
 		{ awsConnectionNode *cn = new awsConnectionNode();
-              iAwsKeyContainer* kc = SCF_QUERY_INTERFACE($3, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE($3, iAwsKeyContainer);
 		  cn->Consume(kc);
-              kc->DecRef();
+                  kc->DecRef();
 		  delete $3;
 		  $$=cn;
 		}
         | TOKEN_COMPONENT TOKEN_STR TOKEN_IS TOKEN_STR '{' component_item_list '}'
 		{ awsComponentNode *cn = new awsComponentNode($2, $4);
-              iAwsKeyContainer* kc = SCF_QUERY_INTERFACE($6, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE($6, iAwsKeyContainer);
 		  cn->Consume(kc);
-              kc->DecRef();
+                  kc->DecRef();
 		  delete $6;
 		  $$=cn;
+		  free($2);
+		  free($4);
 		}
 ;
 
@@ -196,11 +200,12 @@ window_item_list:
 window:
 	TOKEN_WINDOW TOKEN_STR  '{' window_item_list '}'
 		{ awsComponentNode *win = new awsComponentNode($2, "Default");
-              iAwsKeyContainer* kc = SCF_QUERY_INTERFACE($4, iAwsKeyContainer);
+                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE($4, iAwsKeyContainer);
 		  win->Consume(kc);
-              kc->DecRef();
+                  kc->DecRef();
 		  delete $4;
 		  $$ = win;
+		  free($2);
 		}
 ;
 
@@ -210,15 +215,15 @@ window:
 
 skin_item:
 	TOKEN_ATTR ':' TOKEN_STR
-		{ $$ = new awsStringKey($1, $3); }
+		{ $$ = new awsStringKey($1, $3); free($1); free($3); }
 	| TOKEN_ATTR ':' exp ',' exp ',' exp
-		{ $$ = new awsRGBKey($1, $3, $5, $7); }
+		{ $$ = new awsRGBKey($1, $3, $5, $7); free($1); }
 	| TOKEN_ATTR ':' exp
-		{ $$ = new awsIntKey($1, $3); }
+		{ $$ = new awsIntKey($1, $3); free($1); }
 	| TOKEN_ATTR ':' '(' exp ',' exp ')'
-		{ $$ = new awsPointKey($1, csPoint($4, $6)); }
+		{ $$ = new awsPointKey($1, csPoint($4, $6)); free($1); }
 	| TOKEN_ATTR ':' '(' exp ',' exp ')' '-' '(' exp ',' exp ')'
-		{ $$ = new awsRectKey($1, csRect($4, $6, $10, $12)); }
+		{ $$ = new awsRectKey($1, csRect($4, $6, $10, $12)); free($1); }
 ;
 
 skin_item_list:
@@ -237,11 +242,12 @@ skin_item_list:
 skin:
 	TOKEN_SKIN TOKEN_STR '{' skin_item_list '}'
 		{ awsSkinNode *skin = new awsSkinNode($2);
-              iAwsKeyContainer* kc = SCF_QUERY_INTERFACE($4, iAwsKeyContainer);
-              skin->Consume(kc);
-              kc->DecRef();
-              delete $4;
+                  iAwsKeyContainer* kc = SCF_QUERY_INTERFACE($4, iAwsKeyContainer);
+                  skin->Consume(kc);
+                  kc->DecRef();
+                  delete $4;
 		  $$ = skin;
+		  free($2);
 		}
 ;
 
@@ -254,6 +260,7 @@ constant_item:
 		  if (!static_awsparser->GetConstantValue($1, v))
 		    static_awsparser->ReportError ("Constant %s is not defined.", $1);
 		  $$ = v;
+		  free($1);
 		}
 ;
 

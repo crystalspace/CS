@@ -964,7 +964,9 @@ iAwsComponent *awsComponentFactory::Create ()
 
 void awsComponentFactory::Register (const char *name)
 {
+  // The WindowManager will take over our ref
   wmgr->RegisterComponentFactory (this, name);
+  DecRef ();
 }
 
 void awsComponentFactory::RegisterConstant (const char *name, int value)
