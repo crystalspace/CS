@@ -64,6 +64,10 @@ public:
   csVector3 (float x, float y, float z = 0)
    { csVector3::x = x; csVector3::y = y; csVector3::z = z; }
 
+  /// Copy Constructor.
+  csVector3 ( const csVector3& other )
+   { csVector3::x = other.x; csVector3::y = other.y; csVector3::z = other.z; }
+
   /// Add two vectors.
   inline friend csVector3 operator+ (const csVector3& v1, const csVector3& v2)
   { return csVector3(v1.x+v2.x, v1.y+v2.y, v1.z+v2.z); }

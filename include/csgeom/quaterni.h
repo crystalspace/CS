@@ -93,7 +93,7 @@ public:
   void Normalize() {
     if(x*x + y*y + z*z > .999) {
       // Severe problems...
-      real len = x*x + y*y + z*z;
+      double len = x*x + y*y + z*z;
       x /= len;
       y /= len;
       z /= len;
