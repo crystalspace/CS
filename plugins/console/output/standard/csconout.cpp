@@ -346,8 +346,7 @@ void csConsoleOutput::Draw2D (csRect *area)
     {
       // Make a copy of the text
       csString curText (*text);
-      curText.SetCapacity (cx);
-      curText.SetAt (cx, '\0');
+      curText.Truncate(cx);
       font->GetDimensions (curText.GetData (), cx_pix, fh);
     }
     cy_pix = (cy * height) + size.ymin;
@@ -433,16 +432,14 @@ void csConsoleOutput::SetPosition(int x, int y, int width, int height)
   else
   {
     csString curText (*text);
-    curText.SetCapacity (cx);
-    curText.SetAt (cx, '\0');
+    curText.Truncate (cx);
     while (cx)
     {
       int fw, fh;
       font->GetDimensions (curText.GetData (), fw, fh);
       if (fw <= size.Width ())
         break;
-      curText.SetCapacity (--cx);
-      curText.SetAt (cx, '\0');
+      curText.Truncate (--cx);
     }
   }
 }
