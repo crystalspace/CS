@@ -1854,8 +1854,9 @@ void LevTool::Main ()
 
   //---------------------------------------------------------------
 
-  if (!TestValidXML (doc))
-    return;
+  if (op != OP_TRANSLATE)
+    if (!TestValidXML (doc))
+      return;
 
   csRef<iDocumentSystem> newsys;
   if (outputDS)

@@ -761,38 +761,6 @@ void csRenderView::SetFrustum (float lx, float rx, float ty, float by)
   frustum[3].norm.Normalize ();
 }
 
-void csRenderView::TestSphereFrustum (
-  csRenderContext *ctxt,
-  const csVector3 &center,
-  float radius,
-  bool &inside,
-  bool &outside)
-{
-  float dist;
-  csPlane3 *frust = ctxt->frustum;
-  outside = true;
-  inside = true;
-
-  dist = frust[0].norm * center;
-  if (dist < radius) inside = false;
-  if ((-dist) <= radius)
-  {
-    dist = frust[1].norm * center;
-    if (dist < radius) inside = false;
-    if ((-dist) <= radius)
-    {
-      dist = frust[2].norm * center;
-      if (dist < radius) inside = false;
-      if ((-dist) <= radius)
-      {
-        dist = frust[3].norm * center;
-        if (dist < radius) inside = false;
-        if ((-dist) <= radius) outside = false;
-      }
-    }
-  }
-}
-
 void csRenderView::TestSphereFrustumWorld (
   csRenderContext *ctxt,
   const csVector3 &center,
@@ -826,14 +794,14 @@ void csRenderView::TestSphereFrustumWorld (
 }
 
 bool csRenderView::TestBSphere (
-  const csReversibleTransform &o2c,
+  const csReversibleTransform &w2c,
   const csSphere &sphere)
 {
   //------
   // First transform bounding sphere from object space to camera space
   // by using the given transform (if needed).
   //------
-  csSphere tr_sphere = o2c.Other2This (sphere);
+  csSphere tr_sphere = w2c.Other2This (sphere);
   const csVector3 &tr_center = tr_sphere.GetCenter ();
   float radius = tr_sphere.GetRadius ();
 
@@ -868,9 +836,9 @@ bool csRenderView::TestBSphere (
   bool outside, inside;
   if (!fully_inside)
   {
-    TestSphereFrustum (
+    TestSphereFrustumWorld (
       ctxt,
-      tr_center,
+      sphere.GetCenter (),
       radius,
       inside,
       outside);
@@ -995,80 +963,6 @@ bool csRenderView::ClipBSphere (
   return true;
 }
 
-bool csRenderView::ClipBBox (
-  const csBox3 &cbox,
-  int &clip_portal,
-  int &clip_plane,
-  int &clip_z_plane)
-{
-  //------
-  // Test against far plane if needed.
-  //------
-  csPlane3 *far_plane = ctxt->icamera->GetFarPlane ();
-  if (far_plane)
-  {
-    // Ok, so this is not really far plane clipping - we just dont draw this
-    // object if no point of the camera_bounding box is further than the D
-    // part of the farplane.
-    if (cbox.SquaredOriginDist () > far_plane->D () * far_plane->D ())
-      return false;
-  }
-
-  //------
-  // Test if there is a chance we must clip to current portal.
-  //------
-  uint32 outClipMask;
-  if (!csIntersect3::BoxFrustum (cbox, ctxt->frustum, 0xf, outClipMask))
-    return false;	// Not visible.
-  if (outClipMask == 0)
-    clip_portal = CS_CLIP_NOT;
-  else
-    clip_portal = CS_CLIP_NEEDED;
-
-  //------
-  // Test if there is a chance we must clip to the z-plane.
-  //------
-  clip_z_plane = CS_CLIP_NOT;
-
-  int cntz = 0;
-  int i;
-  for (i = 0; i < 8; i++)
-  {
-    csVector3 c = cbox.GetCorner (i);
-    if (c.z < SMALL_D) cntz++;
-  }
-
-  if (cntz == 8) return false;        // Object not visible.
-  if (cntz > 0) clip_z_plane = CS_CLIP_NEEDED;
-
-  //------
-  // Test if there is a chance we must clip to current plane.
-  //------
-  clip_plane = CS_CLIP_NOT;
-  if (ctxt->do_clip_plane)
-  {
-    bool mirror = GetCamera ()->IsMirrored ();
-    int cnt = 0;
-    for (i = 0; i < 8; i++)
-    {
-      csVector3 c = cbox.GetCorner (i);
-      if (!mirror)
-      {
-        if (ctxt->clip_plane.Classify (c) > 0) cnt++;
-      }
-      else
-      {
-        if (ctxt->clip_plane.Classify (c) < 0) cnt++;
-      }
-    }
-
-    if (cnt == 8) return false;       // Object not visible.
-    if (cnt > 0) clip_plane = CS_CLIP_NEEDED;
-  }
-
-  return true;
-}
-
 void csRenderView::SetupClipPlanes ()
 {
   csPlane3* frust = ctxt->frustum;
@@ -1163,81 +1057,6 @@ bool csRenderView::ClipBBox (
     clip_plane = CS_CLIP_NEEDED;
   else
     clip_plane = CS_CLIP_NOT;
-
-  return true;
-}
-
-bool csRenderView::ClipBBox (
-  const csBox2 &sbox,
-  const csBox3 &cbox,
-  int &clip_portal,
-  int &clip_plane,
-  int &clip_z_plane)
-{
-  //------
-  // Test against far plane if needed.
-  //------
-  csPlane3 *far_plane = ctxt->icamera->GetFarPlane ();
-  if (far_plane)
-  {
-    // Ok, so this is not really far plane clipping - we just dont draw this
-    // object if no point of the camera_bounding box is further than the D
-    // part of the farplane.
-    if (cbox.SquaredOriginDist () > far_plane->D () * far_plane->D ())
-      return false;
-  }
-
-  //------
-  // Test if there is a chance we must clip to current portal.
-  //------
-  int i;
-  int box_class;
-  box_class = ctxt->iview->ClassifyBox (sbox);
-  if (box_class == -1) return false;  // Not visible.
-  if (box_class == 0)
-    clip_portal = CS_CLIP_NEEDED;
-  else
-    clip_portal = CS_CLIP_NOT;
-
-  //------
-  // Test if there is a chance we must clip to the z-plane.
-  //------
-  clip_z_plane = CS_CLIP_NOT;
-
-  int cntz = 0;
-  for (i = 0; i < 8; i++)
-  {
-    csVector3 c = cbox.GetCorner (i);
-    if (c.z < SMALL_D) cntz++;
-  }
-
-  if (cntz == 8) return false;        // Object not visible.
-  if (cntz > 0) clip_z_plane = CS_CLIP_NEEDED;
-
-  //------
-  // Test if there is a chance we must clip to current plane.
-  //------
-  clip_plane = CS_CLIP_NOT;
-  if (ctxt->do_clip_plane)
-  {
-    bool mirror = GetCamera ()->IsMirrored ();
-    int cnt = 0;
-    for (i = 0; i < 8; i++)
-    {
-      csVector3 c = cbox.GetCorner (i);
-      if (!mirror)
-      {
-        if (ctxt->clip_plane.Classify (c) > 0) cnt++;
-      }
-      else
-      {
-        if (ctxt->clip_plane.Classify (c) < 0) cnt++;
-      }
-    }
-
-    if (cnt == 8) return false;       // Object not visible.
-    if (cnt > 0) clip_plane = CS_CLIP_NEEDED;
-  }
 
   return true;
 }

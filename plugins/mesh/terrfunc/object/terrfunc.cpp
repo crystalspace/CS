@@ -1650,62 +1650,12 @@ void csTerrFuncObject::RecomputeLighting (int lod, int bx, int by)
   }
 }
 
-static void Perspective (const csVector3& v, csVector2& p, float fov,
-    	float sx, float sy)
+bool csTerrFuncObject::BBoxVisible (iRenderView* rview, const csBox3& bbox,
+	int& clip_portal, int& clip_plane, int& clip_z_plane,
+	csPlane3* planes, uint32 frustum_mask)
 {
-  float iz = fov / v.z;
-  p.x = v.x * iz + sx;
-  p.y = v.y * iz + sy;
-}
-
-bool csTerrFuncObject::BBoxVisible (const csBox3& bbox,
-    	iRenderView* rview, iCamera* camera,
-	int& clip_portal, int& clip_plane, int& clip_z_plane)
-{
-  csReversibleTransform& camtrans = camera->GetTransform ();
-  float fov = camera->GetFOV ();
-  float sx = camera->GetShiftX ();
-  float sy = camera->GetShiftY ();
-
-  // first compute camera and screen space bounding boxes.
-  csBox3 cbox;
-  cbox.StartBoundingBox (camtrans * bbox.GetCorner (0));
-  cbox.AddBoundingVertexSmart (camtrans * bbox.GetCorner (1));
-  cbox.AddBoundingVertexSmart (camtrans * bbox.GetCorner (2));
-  cbox.AddBoundingVertexSmart (camtrans * bbox.GetCorner (3));
-  cbox.AddBoundingVertexSmart (camtrans * bbox.GetCorner (4));
-  cbox.AddBoundingVertexSmart (camtrans * bbox.GetCorner (5));
-  cbox.AddBoundingVertexSmart (camtrans * bbox.GetCorner (6));
-  cbox.AddBoundingVertexSmart (camtrans * bbox.GetCorner (7));
-
-  // if the entire bounding box is behind the camera, we're done.
-  if ((cbox.MinZ () < 0) && (cbox.MaxZ () < 0))
-    return false;
-
-  // Transform from camera to screen space.
-  csBox2 sbox;
-  if (cbox.MinZ () <= 0)
-  {
-    // Bbox is very close to camera.
-    // Just return a maximum bounding box.
-    sbox.Set (-10000, -10000, 10000, 10000);
-  }
-  else
-  {
-    csVector2 oneCorner;
-    Perspective (cbox.Max (), oneCorner, fov, sx, sy);
-    sbox.StartBoundingBox (oneCorner);
-    csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
-    Perspective (v, oneCorner, fov, sx, sy);
-    sbox.AddBoundingVertexSmart (oneCorner);
-    Perspective (cbox.Min (), oneCorner, fov, sx, sy);
-    sbox.AddBoundingVertexSmart (oneCorner);
-    v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
-    Perspective (v, oneCorner, fov, sx, sy);
-    sbox.AddBoundingVertexSmart (oneCorner);
-  }
-
-  return rview->ClipBBox (sbox, cbox, clip_portal, clip_plane, clip_z_plane);
+  return rview->ClipBBox (planes, frustum_mask, bbox,
+  	clip_portal, clip_plane, clip_z_plane);
 }
 
 void csTerrFuncObject::TestVisibility (iRenderView* rview)
@@ -1803,7 +1753,8 @@ bool csTerrFuncObject::DrawTest (iRenderView*, iMovable*, uint32)
   return true;
 }
 
-void csTerrFuncObject::QuadDivDraw (iRenderView* rview, csZBufMode zbufMode)
+void csTerrFuncObject::QuadDivDraw (iRenderView* rview, csZBufMode zbufMode,
+	csPlane3* planes, uint32 frustum_mask)
 {
   qd_framenum++;
   iGraphics3D* pG3D = rview->GetGraphics3D ();
@@ -1828,14 +1779,14 @@ void csTerrFuncObject::QuadDivDraw (iRenderView* rview, csZBufMode zbufMode)
         if (!block.node->IsVisible ()) continue;
       }
       int clip_portal, clip_plane, clip_z_plane;
-      if (BBoxVisible (block.bbox, rview, pCamera, clip_portal, clip_plane,
-      	clip_z_plane))
+      if (BBoxVisible (rview, block.bbox, clip_portal, clip_plane,
+      	clip_z_plane, planes, frustum_mask))
       {
         block.quaddiv_visible = true;
         block.qd_portal = clip_portal;
         block.qd_plane = clip_plane;
         block.qd_z_plane = clip_z_plane;
-        block.PrepareFrame( origin, qd_framenum, this );
+        block.PrepareFrame (origin, qd_framenum, this);
       }
     }
   }
@@ -1869,16 +1820,21 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   if (do_vis_test)
     TestVisibility (rview);
 
-  if(quaddiv_enabled)
+  // @@@ BUG! Ignores movable!!!
+  iCamera* pCamera = rview->GetCamera ();
+  csReversibleTransform& camtrans = pCamera->GetTransform ();
+
+  uint32 frustum_mask;
+  csPlane3 planes[10];
+  rview->SetupClipPlanes (camtrans, planes, frustum_mask);
+
+  if (quaddiv_enabled)
   {
-    QuadDivDraw(rview, zbufMode);
+    QuadDivDraw (rview, zbufMode, planes, frustum_mask);
     return true;
   }
 
   iGraphics3D* pG3D = rview->GetGraphics3D ();
-  iCamera* pCamera = rview->GetCamera ();
-
-  csReversibleTransform& camtrans = pCamera->GetTransform ();
   const csVector3& origin = camtrans.GetOrigin ();
   pG3D->SetObjectToCamera (&camtrans);
   pG3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zbufMode );
@@ -1896,8 +1852,8 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
         if (!block.node->IsVisible ()) continue;
       }
       int clip_portal, clip_plane, clip_z_plane;
-      if (BBoxVisible (block.bbox, rview, pCamera, clip_portal, clip_plane,
-      	clip_z_plane))
+      if (BBoxVisible (rview, block.bbox, clip_portal, clip_plane,
+      	clip_z_plane, planes, frustum_mask))
       {
         csVector3& bc = block.center;
         int lod = 0;

@@ -10,6 +10,20 @@ chronological order.
 	- Jorrit removed ClipBSphere() from iRenderView.
 	- Jorrit added a private implementation of ClipBSphere() to
 	  csRenderView which is used by the portal container.
+	- Jorrit cleaned up a few more routines in csRenderView. Changed
+	  TestBSphere() to use the new clip planes internally. It now expects
+	  a sphere in world space.
+	- Jorrit changed GetRenderMeshes() in partgen/particle.cpp to
+	  use CalculateClipSettings().
+	- Jorrit modified terrfunc so it uses the same ClipBBox() routine
+	  that is also used by the NR terrain engine.
+	- Jorrit removed the now unused version of iRenderView->ClipBBox()
+	  that is based on screen and camera space bbox. These are not
+	  used any more.
+	- Jorrit changed levtool so that it no longer validates the input
+	  file (checks if it is a <world> file) if -inds or -outds is
+	  used. By doing that the tool can be used to convert mesh factories
+	  and other type of XML files too.
 26-Apr-2004
 	- Eric Sunshine fixed bugs in cross-product functions of csVector4 and
 	  csDVector4 where it was accessing 'x' component of wrong vector.

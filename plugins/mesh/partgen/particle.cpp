@@ -500,60 +500,16 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num,
   num = 0;
   SetupObject ();
 
+  rview->CalculateClipSettings (frustum_mask, ClipPortal, ClipPlane, ClipZ);
+
   // get the object-to-camera transformation
   iCamera *camera = rview->GetCamera ();
   csReversibleTransform trans = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())
     trans /= movable->GetFullTransform ();
-
-  // build a bounding box in camera space
-  csBox3 cbox;
-  int i;
-  for (i=0; i<8; i++)
-    cbox.AddBoundingVertexSmart (trans * Bounds.GetCorner (i));
-  if (cbox.MaxZ () < 0)
-  {
-    num = 0;
-    return 0;
-  }
-    
-
-  // transform from camera to screen space
-  csBox2 sbox;
-
-  if (cbox.MinZ () <= 0)
-  {
-    sbox.Set (-CS_BOUNDINGBOX_MAXVALUE, -CS_BOUNDINGBOX_MAXVALUE,
-      +CS_BOUNDINGBOX_MAXVALUE, +CS_BOUNDINGBOX_MAXVALUE);
-  }
-  else
-  {
-    sbox.StartBoundingBox ();
-    float fov = camera->GetFOV ();
-    float shift_x = camera->GetShiftX ();
-    float shift_y = camera->GetShiftY ();
-
-    for (i=0; i<8; i++)
-    {
-      csVector3 cv = cbox.GetCorner (i);
-      int inv_z = QInt (fov / cv.z);
-      int sx = QInt (cv.x * inv_z + shift_x);
-      int sy = QInt (cv.y * inv_z + shift_y);
-      sbox.AddBoundingVertex (sx, sy);
-    }
-  }
-
-  // Test visibility of bounding box with the clipper
-  if (!rview->ClipBBox (sbox, cbox, ClipPortal, ClipPlane, ClipZ))
-  {
-    num = 0;
-    return 0;
-  }
-
   
   csBox3 box;
   SetupParticles (trans, vertices, box);
-
 
   if (Lighting && light_mgr)
   {
@@ -561,7 +517,6 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num,
       ->GetRelevantLights (LogParent, -1, false);
     UpdateLighting (relevant_lights, movable);
   }
-
   
   // some generic setup
   //@@@?if (VisCallback) VisCallback->BeforeDrawing (this, rview);

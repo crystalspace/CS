@@ -270,8 +270,9 @@ public:
    * Test if this bounding box is visible in the given clipper.
    * Computed flags are for DrawTriangleMesh.
    */
-  bool BBoxVisible (const csBox3& bbox, iRenderView* rview, iCamera* camera,
-	int& clip_portal, int& clip_plane, int& clip_z_plane);
+  bool BBoxVisible (iRenderView* rview, const csBox3& bbox,
+	int& clip_portal, int& clip_plane, int& clip_z_plane,
+	csPlane3* planes, uint32 frustum_mask);
 
   /// retrieve a vertexbuffer from the manager if not done already
   void SetupVertexBuffer (csRef<iVertexBuffer> &vbuf1, iVertexBuffer** vbuf2);
@@ -421,7 +422,8 @@ public:
   void InitQuadDiv();
 
   /** Draw the quaddivisor terrain */
-  void QuadDivDraw (iRenderView* rview, csZBufMode zbufMode);
+  void QuadDivDraw (iRenderView* rview, csZBufMode zbufMode,
+  	csPlane3* planes, uint32 frustum_mask);
 
   void SetDirLight (const csVector3& pos, const csColor& col)
   {

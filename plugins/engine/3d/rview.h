@@ -73,10 +73,8 @@ private:
   /**
    * Given a csRenderContext (with frustum) and a bounding sphere calculate if
    * the sphere is fully inside and fully outside that frustum.
+   * Works in world space.
    */
-  static void TestSphereFrustum (csRenderContext* frust,
-    const csVector3& center, float radius, bool& inside, bool& outside);
-
   static void TestSphereFrustumWorld (csRenderContext* frust,
     const csVector3& center, float radius, bool& inside, bool& outside);
 
@@ -294,20 +292,16 @@ public:
 
 
   /**
-   * Test if the given bounding sphere (in object space coordinates)
+   * Test if the given bounding sphere (in world space coordinates)
    * is visibile in this render view. The transformation will
-   * transform object to camera space.
+   * transform world to camera space.
    */
-  virtual bool TestBSphere (const csReversibleTransform& o2c,
+  virtual bool TestBSphere (const csReversibleTransform& w2c,
     const csSphere& sphere);
 
   virtual void CalculateClipSettings (uint32 frustum_mask,
     int &clip_portal, int &clip_plane, int &clip_z_plane);
 
-  virtual bool ClipBBox (const csBox2& sbox, const csBox3& cbox,
-        int& clip_portal, int& clip_plane, int& clip_z_plane);
-  virtual bool ClipBBox (const csBox3& cbox,
-        int& clip_portal, int& clip_plane, int& clip_z_plane);
   virtual bool ClipBBox (csPlane3* planes, uint32& frustum_mask,
   	const csBox3& obox,
         int& clip_portal, int& clip_plane, int& clip_z_plane);

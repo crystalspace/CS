@@ -95,7 +95,7 @@ public:
   iCamera* icamera;
   /// The 2D polygon describing how everything drawn inside should be clipped.
   iClipper2D* iview;
-  /// The frustum corresponding with iview.
+  ///// The frustum corresponding with iview.
   csPlane3 frustum[5];
 
   /// A set of clip planes for this context in world space.
@@ -234,32 +234,12 @@ struct iRenderView : public iBase
     int &clip_portal, int &clip_plane, int &clip_z_plane) = 0;
 
   /**
-   * Test if the given bounding sphere (in object space coordinates)
-   * is visibile in this render view. The optional will
-   * transform object to camera space.
+   * Test if the given bounding sphere (in world space coordinates)
+   * is visible in this render view. The optional will
+   * transform world to camera space.
    */
-  virtual bool TestBSphere (const csReversibleTransform& o2c,
+  virtual bool TestBSphere (const csReversibleTransform& w2c,
   	const csSphere& sphere) = 0;
-
-  /**
-   * Check if the screen bounding box of an object is visible in
-   * this render view. If true is returned (visible) then clip_plane,
-   * clip_z_plane, and clip_portal will be set to the right value depending
-   * on wether or not clipping is wanted. This function also does far
-   * plane clipping.
-   */
-  virtual bool ClipBBox (const csBox2& sbox, const csBox3& cbox,
-      	int& clip_portal, int& clip_plane, int& clip_z_plane) = 0;
-
-  /**
-   * Check if the camera bounding box of an object is visible in this
-   * render view. If true is returned (visible) then clip_plane,
-   * clip_z_plane, and clip_portal will be set to the right value depending
-   * on wether or not clipping is wanted. This function also does far
-   * plane clipping.
-   */
-  virtual bool ClipBBox (const csBox3& cbox,
-      	int& clip_portal, int& clip_plane, int& clip_z_plane) = 0;
 
   /**
    * Check if the object space bounding box of an object is visible in this
