@@ -9,6 +9,8 @@ The history order has been reversed so that new features are at the top.
 	  right.
 	- Added a new surface mesh plugin which will make a surface for
 	  DrawTriangleMesh.
+	- Added HardTransform(), GetWorldBoundingBox() and
+	  GetTransformedBoundingBox() to iMeshWrapper.
 19-Apr-2001
 	- Martin Geisse did further work on csparser.
 	- Martin also rewrote the DECLARE_TYPED_VECTOR macro to be really

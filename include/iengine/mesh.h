@@ -95,7 +95,7 @@ class csFlags;
 typedef void (csDrawCallback) (iMeshWrapper* spr, iRenderView* rview,
 	void* callbackData);
 
-SCF_VERSION (iMeshWrapper, 0, 0, 6);
+SCF_VERSION (iMeshWrapper, 0, 0, 7);
 
 /**
  * This interface corresponds to the object in the engine
@@ -199,6 +199,32 @@ struct iMeshWrapper : public iBase
    * Get the Z-buf drawing mode.
    */
   virtual csZBufMode GetZBufMode () = 0;
+
+  /**
+   * Do a hard transform of this object.
+   * This transformation and the original coordinates are not
+   * remembered but the object space coordinates are directly
+   * computed (world space coordinates are set to the object space
+   * coordinates by this routine). Note that some implementations
+   * of mesh objects will not change the orientation of the object but
+   * only the position.
+   */
+  virtual void HardTransform (const csReversibleTransform& t) = 0;
+
+  /**
+   * Get the bounding box of this object in world space.
+   * This routine will cache the bounding box and only recalculate it
+   * if the movable changes.
+   */
+  virtual void GetWorldBoundingBox (csBox3& cbox) = 0;
+
+  /**
+   * Get the bounding box of this object after applying a transformation to it.
+   * This is really a very inaccurate function as it will take the bounding
+   * box of the object in object space and then transform this bounding box.
+   */
+  virtual void GetTransformedBoundingBox (const csReversibleTransform& trans,
+  	csBox3& cbox) = 0;
 };
 
 SCF_VERSION (iMeshFactoryWrapper, 0, 0, 3);

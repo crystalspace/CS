@@ -381,6 +381,19 @@ public:
     {
       return scfParent->GetZBufMode ();
     }
+    virtual void HardTransform (const csReversibleTransform& t)
+    {
+      scfParent->HardTransform (t);
+    }
+    virtual void GetWorldBoundingBox (csBox3& cbox)
+    {
+      scfParent->GetWorldBoundingBox (cbox);
+    }
+    virtual void GetTransformedBoundingBox (const csReversibleTransform& trans,
+  	csBox3& cbox)
+    {
+      scfParent->GetTransformedBoundingBox (trans, cbox);
+    }
   } scfiMeshWrapper;
   friend struct MeshWrapper;
 
