@@ -1,24 +1,28 @@
 @c -*-texinfo-*-
-@node csClear
-@subsection csClear
-@cindex csClear
+@node CrystalClear
+@subsection CrystalClear
+@cindex CrystalClear
 @cindex Crystal Clear
-@cindex Plug-In, csClear
+@cindex Plug-In, CrystalClear
 
-@strong{Warning}: This document is out of date.  More recent documentation
-is available in the plain-text file @file{csclear.txt}.  Merge these two
-documents and then rmeove @file{csclear.txt}.
+This section covers the Crystal Space Common Layered Entertainment Animation 
+Resource, or the CrystalClear Project.  The CrystalClear Project is an effort
+to build an open framework for manipulating 3D graphics content using the
+Crystal Space 3D Engine.  It primarily focuses on games but aims to be useful
+in other contexts as well.
 
-This section covers the Crystal Space Common Layered Animation Resource, or
-the CrystalClear Project. The goal of the CrystalClear project is to help
-speed development of 3D games based on the Crystal Space engine, by Jorrit
-Tyberghein and others. The ability to replace a component library of the
-system with another allows for 3D games of even different genres to share
-code in a consistent way. By using the LGPL, this opens the way for allowing
-even commercial games to be developed with the CrystalClear libraries, and at
-the author's option, be given back to the community without necessarily
-compromising the source of the game itself, should the author choose to not
-to release the source.
+CrystalClear is designed to provide a modular framework for Crystal Space plugins
+to be able to interact with each other in an abstract manner.  This way, behavioral
+modifications can be made by modifying or replacing a given plugin, at the developers
+discretion.  The ability to mix and match plugins in this manner should prove to be
+very powerful.
+
+CrystalClear is currently under heavy development.  This means interfaces and 
+implementations may change without warning in CVS.  Even so, you may find that
+CrystalClear is a suitable alternative to 'reinventing the wheel'.  One of the goals
+of the project is to bring developers of similar (and not so similar) 3D games and
+other applications together to help, in a sense, solve each others problems and
+ultimately speed development of their respective applications.
 
 There may be other libraries that are not officially part of the CrystalClear
 project, but are CrystalClear compliant and may be used interchangeably with
@@ -27,7 +31,7 @@ own licensing terms; you will need to check with the documentation of those
 libraries.
 
 More information on the CrystalClear project can be found at @*
-@uref{http://php.indiana.edu/~mdlong/crystalclear}
+@uref{http://crystalclear.sourceforge.net/}
 
 It is recommended that you join the mailing lists for both CrystalClear and
 Crystal Space itself if you wish to become actively involved with the
@@ -39,42 +43,139 @@ code. It should build along with the rest of CS unless you specify otherwise.
 
 More code is on the way, just be patient.  Or if you don't want to be
 patient, look at the layers specification on the CrystalClear homepage and
-start implementing the libraries for it, or help with existing libraries.
+start implementing the plugins for it, or help with existing plugins.
 
-@node csClear structure
+@node CrystalClear structure
 @subsubsection Structure of CrystalClear
 
-Currently, the CrystalClear code consists of the following:
+@emph{Layer 0:  Crystal Space Engine}
 
-@table @emph
-@item The Entity layer
-@table @code
-@item EntityManager (ccentman)
-The ccEntityManager is the standard implementation for the IEntityManager
-interface. It controls loading and keeping track of Entities, which are
-high level interfaces for game @samp{entities} such as monsters,
-player-characters, etc.
+@samp{The Crystal Space Engine}
+This is the core layer of any CrystalClear compliant game.  It is the actual
+3D graphics renderer, among other things.  Since Crystal Space is platform
+independent, all CrystalClear compliant games should try to support all the
+platforms CS supports.
 
-@item Entities
-Entities will be game player characters, npcs, and objects.  They
-will be part of the game application and interact directly with the
-engine. See @file{entity.txt} for a sketch of the Entity hierachy.
-@end table
+@emph{Layer 1:  The Entity Layer}
 
-@item The Impulse Layer
-@table @code
-@item ImpulseManager (ccinman)
-The ccImpulsemanager is the standard implementation for the
-IImpulseManager interface. It controls various ImpulseHandlers and routes
-messages, called impulses, to them.
+@samp{iEntityManager}
+This interface and it's implementation is the core of the Entity layer, and
+will manage the preparation of entities for rendering and associating them
+with data that can be used by the upper layers.
 
-@item ccinput
-The ccInputPlugin converts keyboard and mouse csEvents into CrystalClear
-impulses. The developer may choose to use csEvents directly, but this is
-provided to allow a consistent messaging interface.
+@samp{iEntity}
+The iEntity interface and it's subclasses represent CrystalClear Entities.
+An entity will be anything that can be rendered and manipulated in a 3D
+world.  It can load it's data from a file, like a model or a sound, or it can
+render it dynamically, like a status bar.  It will be responsible for animating
+the model, etc. as needed.  It will provide a high level interface to the engine 
+for plugins to work with.
 
-@item ccphysic
-The ccPhysicsPlugin is a low level collision ImpulseTarget. Responds to
-collision impulses, currently only in a limited fashion.
-@end table
-@end table
+@emph{Layer 2:  The Impulse Layer}
+
+@samp{iImpulseManager}
+This interface and it's implementation will provide the core for the Impulse layer.  
+It provides a more efficient point-to-point communication system than the csEvent model. 
+The idea behind impulses will be to provide information on what is going on the game to those 
+ImpulseTargets who are "interested" (i.e. registered to received) in the information.
+
+@samp{iImpulse}
+This interface is implemented by the ImpulseManager, and is returned to allow
+impulses to be fired.  Each impulse has a class ID which is a MD5 "reduced
+hash" integer code, and a subclass ID which is a UUID, which is required
+to prevent the possibility of a impulse clash (which in the best case scenario would
+cause a fatal execution error).  They also have a subclass of ccTagData which
+allows any needed information to be passed with the impulse.
+
+@samp{iImpulseTarget}
+This interface allows the plugin implementing it to receive impulses it
+registers for.  The implementations of this interface will live mostly in
+layers 3 and 4.
+
+@emph{Layer 3:  The CrystalClear PlugIn Layer}
+
+Here are some of the planned plugins for CrystalClear.
+
+@samp{ccInput Plugin}
+Translates input csEvents to "CrystalClear Input Impulses".  Also provides
+some useful console management, generating command impulses when a command is
+requested.  This plugin is implemented.
+
+@samp{ccPhysics Plugin}
+Handles low level collision impulses.  Will provide gravity
+and reasonable collision response.  A rough initial implementation is available.
+
+@samp{Scripting}
+Handles interface between CrystalClear Impulses and
+Entities and a given scripting language.  CrystalScript's Python implementation
+will be the first Scripting plugin for CrystalClear.  A Java implementation is
+also planned.
+
+@samp{Artificial Intelligence}
+This plugin will be a collection of high level AI routines to help different 
+characters interact with their environment (which could include some automated
+player character interactions) with some intelligence in their actions.
+
+@samp{Networking}
+Various networking paradigms could be written as 
+a plugin and used by a CrystalClear compliant game to achieve networked game
+play.  The NetSpace project (@uref{http://ns.weblink.org/}) is planning on
+using CrystalClear for the basis of it's virtual world framework.
+
+@emph{Layer 4:  The CrystalClear Application Layer}
+
+This will vary from game to game.  It will contain the game specific logic that 
+is compiled in for speed, rather than scripted.  It will also contain the base 
+Entity implementations since they will need direct access to the engine which
+the plugins won't have.  An Entity library is available for providing a default
+version of the implementations.
+
+@node CrystalClear Entity Structure
+@subsubsection Structure of CrystalClear Entity Library (csclearlib)
+
+Here's a quick over view of the CrystalClear Entity hierarchy.  The tree 
+shows the inheritance chain, and a more detailed description of each subclass
+follows.  Each class can be subclassed, either in C++ code or by scripts from
+a CrystalClear scripting plugin, depending on the scripting language and it's
+plugin.
+
+@emph{iEntity}
+
+Has basic get/set coordinates member functions.  Can only be moved around in a
+limited fashion, i.e. no high level movement functions builtin at this level.
+
+@emph{iActor}
+
+A subclass of iEntity that can be moved around in space and in direction.
+Has member functions for manipulating direction, smooth movement, etc.	
+
+@emph{iEffect}
+
+A subclass of iEntity used for pecial effects, such as smoke or fire.  Possibly could be 
+used for data display and user interface.  HUDs, menus, consoles, 
+etc.  Any special effects that need a lot of mobility should be 
+Actors instead.
+
+@emph{iPathFinder}
+
+A subclass of iEntity used as pathfinder.
+This entity will have a role in AI.
+
+@emph{iTrigger} 
+
+A subclass of iEntity that is used as a marker point.
+Can respond to other Entity's interaction.  Could 
+also be used to create paths and starting points.
+
+@emph{iPawn}
+
+A subclass of iActor that can be used for players, monsters, etc. 
+A Player/Non-player character. Other Actors that can be picked up an used by a Pawn.  This 
+includes weapons, armor, and "subparts" of an Actor that
+can be removed and dropped, as well as things such as 
+ammo boxes, which would always exist separate from a Pawn.
+
+@emph{iFrameActor}
+
+A subclass of iActor that can be used for framed sprite (3D model) animation.
+Skeletal animation will be a function of iPawn.

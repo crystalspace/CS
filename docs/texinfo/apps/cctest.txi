@@ -3,47 +3,51 @@
 @section CCtest
 @cindex Applications, CCtest
 
-The CrystalClear test application.  @xref{csClear}.  This is under heavy
-development.  Currently you can load a level, and move around.  There is now
-limited collision detection, as well.
+The CrystalClear test application.  @xref{CrystalClear}  This is under heavy development.
+Currently you can load a level, and move around.  There is now limited collision 
+detection, as well.
 
-There are two sets of controls:
+The controls:
 
-@table @emph
-@item Traditional:
-
-@table @kbd
+@table control
 @item Arrow keys:
 Up/Down move forward and backwards, left/right turn in those
 directions.
 
 @item Page Up/Dn:
 Look up/down.
-@end table
 
-@item Mouse look: (Right handed)
+@item Mouse look:
+The mouse is captured when you click on the window with any mouse button.
 
-@table @kbd
-@item s
+@item s:
 Move forward
 
-@item x
+@item x:
 Move backwards
 
-@item a
+@item a:
 Strafe left
 
-@item d
+@item d:
 Strafe right
 
-@item Mouse
+@item Mouse:
 Moves viewpoint according to mouse motions (Freelook)
 
-@item Left button
+@item Left button:
 Move forward
 
-@item Right button
-Release mouse capture while held down. The mouse is recaptured when
-it is released and it goes back over the window.
-@end table
+@item Right button:
+Move backwards
+
+@item Escape:
+Release mouse capture.
+
+@item Space:
+Fire a rocket
+
+@item Enter:
+Jump.  Press multiple times to "space jump".
+
 @end table
