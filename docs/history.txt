@@ -51,6 +51,7 @@ chronological order.
 	  think everything worked out OK, but I'm not really proficient with 
 	  flex or yacc, so if something doesn't appear to work, please let me
 	  know (or fix it!).
+	- Rhad fixed a bounds issue in partedit.
 21-Oct-2003
 	- Rhad added UI for Initial Speed and Initial Acceleration to partedit.
 	- Eric Sunshine made the following configuration-related changes:

@@ -146,9 +146,9 @@ void PartEdit::SetupFrame ()
         estate->reg_number=0;
         s->UpdateEmitterStateDisplay();
       }
-      if (estate->particle_max_age<0)
+      if (estate->particle_max_age<1)
       {
-        estate->particle_max_age=0;
+        estate->particle_max_age=1;
         s->UpdateEmitterStateDisplay();
       }
       memcpy(&state_emitter,estate,sizeof(EmitterState));
