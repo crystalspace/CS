@@ -225,6 +225,18 @@ struct iRender3D : public iBase
    */
   virtual int GetClipType () = 0;
 
+  /// Set near clip plane.
+  virtual void SetNearPlane (const csPlane3& pl) = 0;
+
+  /// Reset near clip plane (i.e. disable it).
+  virtual void ResetNearPlane () = 0;
+
+  /// Get near clip plane.
+  virtual const csPlane3& GetNearPlane () = 0;
+
+  /// Return true if we have near plane.
+  virtual bool HasNearPlane () = 0;
+
   /// Get a stringhash to be used by our streamsources etc.
   virtual csStringSet* GetStringContainer () = 0;
 };
