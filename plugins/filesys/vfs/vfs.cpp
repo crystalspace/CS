@@ -762,8 +762,8 @@ const char *VfsNode::GetValue (const csVFS *Parent, const char *VarName)
   iConfigFileNew *Config = Parent->config;
 
   // Now look in "VFS.Solaris" section, for example
-  csString Keyname("VFS." CS_PLATFORM_NAME ".");
-  Keyname += VarName;
+  csString Keyname;
+  Keyname << "VFS." CS_PLATFORM_NAME "." << VarName;
   value = Config->GetStr (Keyname, NULL);
   if (value)
     return value;
@@ -772,9 +772,8 @@ const char *VfsNode::GetValue (const csVFS *Parent, const char *VarName)
   const char *alias = Config->GetStr ("VFS.Alias." CS_PLATFORM_NAME, NULL);
   // If there is one, look into that section too
   if (alias) {
-    Keyname = alias;
-    Keyname += '.';
-    Keyname += VarName;
+    Keyname.Clear();
+    Keyname << alias << '.' << VarName;
     value = Config->GetStr (Keyname, NULL);
   }
   if (value)

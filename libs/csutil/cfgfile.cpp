@@ -381,22 +381,15 @@ bool csConfigFile::SaveNow(const char *file, iVFS *vfs) const
       for (b=strchr(a,'\n'); b!=NULL; b=strchr(a,'\n'))
       {
         *b = 0;
-        Filedata += "; ";
-        Filedata += a;
-        Filedata += '\n';
+        Filedata << "; " << a << '\n';
         *b = '\n';
         a = b+1;
       }
-      Filedata += "; ";
-      Filedata += a;
-      Filedata += '\n';
+      Filedata << "; " << a << '\n';
     }
 
     // write key line
-    Filedata += n->GetName();
-    Filedata += " = ";
-    Filedata += n->GetStr();
-    Filedata += '\n';
+    Filedata << n->GetName() << " = " << n->GetStr() << '\n';
   }
 
   if (vfs) {
@@ -560,8 +553,8 @@ void csConfigFile::LoadFromBuffer(char *Filedata, bool overwrite)
       if (*Filedata == ' ') Filedata++;
 
       if (CurrentComment.Length() > 0)
-        CurrentComment += '\n';
-      CurrentComment += Filedata;
+        CurrentComment << '\n';
+      CurrentComment << Filedata;
     } else {
       // this is a key. Find equal sign
       t = strchr(Filedata, '=');
