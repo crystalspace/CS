@@ -93,6 +93,8 @@ g_error csPGVideoDriver::Init ()
 
 void csPGVideoDriver::Close ()
 {
+  Gfx3D = 0;
+  ImageIO = 0;
 }
 
 g_error csPGVideoDriver::SetMode (int16 x, int16 y, int16 bpp, __u32 flags) 

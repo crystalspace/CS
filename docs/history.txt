@@ -18,6 +18,8 @@ chronological order.
 	- Anders Stenberg reimplemented the PicoGUI video driver. Now it should 
 	  be hardware accelerated and generally cleaner. Logical operations 
 	  aren't supported yet though, and there are some redraw issues.
+	- DeSigna fixed up an exit crasher in PGUI plugin caused by a
+	  reference held past DestroyApplication. 
 29-Aug-2003
 	- renej added support for using CS from Java. SWIG is needed since
 	  no generated files are in the CVS repository. Building is done
