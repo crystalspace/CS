@@ -179,11 +179,10 @@ public:
   virtual bool IsValid() const;
 
   /// Set this shader's name
-  virtual void SetName( const char* name ) 
+  virtual void SetName( const char* newname ) 
   {
-    delete csShader::name;
-    csShader::name = new char[strlen(name)+1];
-    strcpy(csShader::name, name);
+    delete[] name;
+    name = csStrNew(newname);
   }
   /// Retrieve name of shader
   virtual const char* GetName() { return name; }
@@ -451,8 +450,11 @@ public:
 
   virtual int GetHash() const { return NameHash; }
 
-  virtual void SetName(const char* n)
-    { delete[] Name; Name = csStrNew (n); }
+  virtual void SetName(const char* newname)
+  {
+    delete[] Name;
+    Name = csStrNew(newname);
+  }
   virtual const char* GetName() const { return Name; }
 
   virtual bool GetValue(int& value) const
