@@ -48,6 +48,8 @@ The history order is reversed so that new features are at the top.
 	  outside its directory. Also added transparency.
 	- Fixed fire proc texture.
 	- Luca Pancallo fixed 3ds2lev for real.
+	- Fixed a bug in things when polygons were split. This caused
+	  mazedex to crash.
 	- Martin Geisse removed some of the typed vector macros which were
 	  not really needed. Martin also added documenation about typed
 	  vectors.

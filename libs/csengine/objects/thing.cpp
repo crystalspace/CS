@@ -3266,10 +3266,10 @@ void csThing::ReplaceMaterials (iMaterialList* matList, const char* prefix)
 
 void csThing::AddPortalPolygon (csPolygon3D* poly)
 {
-#ifdef CS_DEBUG
   int idx = portal_polygons.Find (poly);
-  CS_ASSERT (idx == -1);
-#endif
+  //@@@???CS_ASSERT (idx == -1);
+  if (idx == -1) return;
+ 
   CS_ASSERT (poly->GetPortal () != NULL);
   CS_ASSERT (poly->GetParent () == this);
   portal_polygons.Push (poly);
@@ -3278,7 +3278,9 @@ void csThing::AddPortalPolygon (csPolygon3D* poly)
 void csThing::RemovePortalPolygon (csPolygon3D* poly)
 {
   int idx = portal_polygons.Find (poly);
-  CS_ASSERT (idx != -1);
+  //@@@???CS_ASSERT (idx != -1);
+  if (idx != -1) return;
+
   CS_ASSERT (poly->GetPortal () == NULL || poly->GetParent () != this);
   portal_polygons.Delete (idx);
 }
