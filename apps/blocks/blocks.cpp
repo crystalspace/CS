@@ -580,7 +580,11 @@ void Blocks::add_pillar (int x, int y)
   engine->things.Push (pillar);
   pillar->SetName ("pillar");
   pillar->GetMovable ().SetSector (room);
-  pillar->MergeTemplate (pillar_tmpl, pillar_mat, 1);
+  iThingState* thing_state = QUERY_INTERFACE (pillar_tmpl, iThingState);
+  iMaterialWrapper* imat = QUERY_INTERFACE (pillar_mat, iMaterialWrapper);
+  pillar->MergeTemplate (thing_state, imat);
+  imat->DecRef ();
+  thing_state->DecRef ();
   csVector3 v ( (x-(player1->zone_dim)/2)*CUBE_DIM, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM);
   pillar->HardTransform (csTransform (csMatrix3 (), v));
@@ -595,7 +599,11 @@ void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
   engine->things.Push (vrast);
   vrast->SetName ("vrast");
   vrast->GetMovable ().SetSector (room);
-  vrast->MergeTemplate (vrast_tmpl, raster_mat, 1);
+  iThingState* thing_state = QUERY_INTERFACE (vrast_tmpl, iThingState);
+  iMaterialWrapper* imat = QUERY_INTERFACE (raster_mat, iMaterialWrapper);
+  vrast->MergeTemplate (thing_state, imat);
+  imat->DecRef ();
+  thing_state->DecRef ();
   vrast->GetMovable ().SetSector (room);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
@@ -611,7 +619,11 @@ void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
   engine->things.Push (hrast);
   hrast->SetName ("hrast");
   hrast->GetMovable ().SetSector (room);
-  hrast->MergeTemplate (hrast_tmpl, raster_mat, 1);
+  iThingState* thing_state = QUERY_INTERFACE (hrast_tmpl, iThingState);
+  iMaterialWrapper* imat = QUERY_INTERFACE (raster_mat, iMaterialWrapper);
+  hrast->MergeTemplate (thing_state, imat);
+  imat->DecRef ();
+  thing_state->DecRef ();
   hrast->GetMovable ().SetSector (room);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
@@ -704,7 +716,11 @@ csThing* Blocks::create_cube_thing (float dx, float dy, float dz,
   	(dx-shift_rotate.x)*CUBE_DIM,
   	(dz-shift_rotate.z)*CUBE_DIM,
 	(dy-shift_rotate.y)*CUBE_DIM);
-  cube->MergeTemplate (tmpl, cube_mat, 1, &shift, NULL);
+  iThingState* thing_state = QUERY_INTERFACE (tmpl, iThingState);
+  iMaterialWrapper* imat = QUERY_INTERFACE (cube_mat, iMaterialWrapper);
+  cube->MergeTemplate (thing_state, imat, &shift, NULL);
+  imat->DecRef ();
+  thing_state->DecRef ();
   cube->SetMovingOption (CS_THING_MOVE_OCCASIONAL); // @@@ should be OFTEN!
 
   csPolygon3D* p;

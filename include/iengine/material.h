@@ -22,8 +22,9 @@
 #include "csutil/scf.h"
 
 class csMaterialWrapper;
+struct iMaterial;
 
-SCF_VERSION (iMaterialWrapper, 0, 0, 3);
+SCF_VERSION (iMaterialWrapper, 0, 0, 4);
 
 /**
  * This class represents a material wrapper which holds
@@ -38,6 +39,8 @@ struct iMaterialWrapper : public iBase
   virtual iMaterialHandle* GetMaterialHandle () = 0;
   /// Visit this material.
   virtual void Visit () = 0;
+  /// Get the original material.
+  virtual iMaterial* GetMaterial () = 0;
 };
 
 #endif // __IENGINE_MATERIAL_H__

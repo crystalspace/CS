@@ -53,6 +53,7 @@ struct iGraphics3D;
 struct iRenderView;
 struct iMovable;
 struct iFrustumView;
+struct iMaterialWrapper;
 class Dumper;
 
 /**
@@ -75,22 +76,6 @@ struct csThingBBox
 {
   int i1, i2, i3, i4, i5, i6, i7, i8;
 };
-
-/**
- * If CS_THING_VISTREE is set then an octree will be calculated for the
- * polygons in this thing. In this case the thing will implement a
- * fully working iVisibilityCuller which the sector can use.
- */
-#define CS_THING_VISTREE 1
-
-/**
- * The following flags affect movement options for a thing. See
- * SetMovingOption() for more info.
- */
-#define CS_THING_MOVE_NEVER 0
-#define CS_THING_MOVE_OFTEN 1
-#define CS_THING_MOVE_OCCASIONAL 2
-
 
 /**
  * A Thing is a set of polygons. A thing can be used for the
@@ -514,22 +499,20 @@ public:
   void Merge (csThing* other);
 
   /**
-   * Add polygons and vertices from the specified template. Replace the
-   * materials if they match one in the matList.
+   * Add polygons and vertices from the specified thing (seen as template).
    */
-  void MergeTemplate (csThing* tpl, csMaterialList* matList,
-  	const char* prefix, 
-	csMaterialWrapper* default_material = NULL,
-  	float default_texlen = 1,
+  void MergeTemplate (iThingState* tpl,
+  	iMaterialWrapper* default_material = NULL,
 	csVector3* shift = NULL, csMatrix3* transform = NULL);
 
   /**
-   * Add polygons and vertices from the specified thing (seen as template).
+   * Replace the materials in this thing with new materials that are
+   * prefixed by some name. For example, if a polygon in this thing uses
+   * a material 'blabla' and the prefix is 'pref' then the new material
+   * that will be used is called 'pref_blabla'. If that material cannot
+   * be found then the original material will be used.
    */
-  void MergeTemplate (csThing* tpl,
-  	csMaterialWrapper* default_material = NULL,
-  	float default_texlen = 1,
-	csVector3* shift = NULL, csMatrix3* transform = NULL);
+  void ReplaceMaterials (csMaterialList* matList, const char* prefix);
 
   /// Set parent template.
   void SetTemplate (csThing *t)
@@ -769,35 +752,6 @@ public:
 
   /**
    * Control how this thing will be moved.
-   * There are currently three options.
-   * <ul>
-   *   <li>CS_THING_MOVE_NEVER: this option is set for a thing that cannot
-   *       move at all. In this case the movable will be ignored and only
-   *       hard transforms can be used to move a thing with this flag. This
-   *       setting is both efficient for memory (object space coordinates are
-   *       equal to world space coordinates so only one array is kept) and
-   *       render speed (only the camera transform is needed). This option
-   *       is very useful for static geometry like walls.
-   *       This option is default.
-   *   <li>CS_THING_MOVE_OCCASIONAL: this option is set for a thing that
-   *       is movable but doesn't move all the time usually. Setting this
-   *       option means that the world space vertices will be cached (taking
-   *       up more memory that way) but the coordinates will be recalculated
-   *       only at rendertime (and cached at that time). This option has
-   *       the same speed efficiency as MOVE_NEVER when the object doesn't
-   *       move but more memory is used as all the vertices are duplicated.
-   *       Use this option for geometry that is not too big (in number of
-   *       vertices) and only moves occasionally like doors of elevators.
-   *   <li>CS_THING_MOVE_OFTEN: this option is set for a thing that moves
-   *       very often (i.e. almost every frame). Setting this option means
-   *       that the object->world and camera transformations will be combined
-   *       at render time. It has the same memory efficiency as MOVE_NEVER
-   *       but the transforms need to be combined every frame (if the object
-   *       is visible). Use this option for geometry that moves a lot. Also
-   *       very useful for objects that often move and have lots of vertices
-   *       since in that case combining the transforms ones is a lot more
-   *       efficient than doing two transforms on every vertex.
-   * </ul>
    */
   void SetMovingOption (int opt);
 
@@ -900,6 +854,38 @@ public:
     { scfParent->CacheLightMaps (); }
     virtual void CheckFrustum (iFrustumView* fview)
     { scfParent->CheckFrustum (fview); }
+    virtual unsigned GetFlags () { return scfParent->flags.Get (); }
+    virtual void SetFlags (unsigned iMask, unsigned iValue)
+    { scfParent->flags.Set (iMask, iValue); }
+    virtual int GetMovingOption ()
+    { return scfParent->GetMovingOption (); }
+    virtual void SetMovingOption (int opt)
+    { scfParent->SetMovingOption (opt); }
+    virtual const csVector3& GetCurvesCenter () const
+    { return scfParent->curves_center; }
+    virtual void SetCurvesCenter (const csVector3& cen)
+    { scfParent->curves_center = cen; }
+    virtual float GetCurvesScale ()
+    { return scfParent->curves_scale; }
+    virtual void SetCurvesScale (float scale)
+    { scfParent->curves_scale = scale; }
+    virtual int GetNumCurves ()
+    { return scfParent->GetNumCurves (); }
+    virtual int GetNumCurveVertices ()
+    { return scfParent->GetNumCurveVertices (); }
+    virtual csVector3& CurveVertex (int i)
+    { return scfParent->CurveVertex (i); }
+    virtual csVector3* GetCurveVertices ()
+    { return scfParent->GetCurveVertices (); }
+    virtual csVector2& CurveTexel (int i)
+    { return scfParent->CurveTexel (i); }
+    virtual iCurve* GetCurve (int idx);
+    virtual void MergeTemplate (iThingState* tpl,
+  	iMaterialWrapper* default_material = NULL,
+	csVector3* shift = NULL, csMatrix3* transform = NULL)
+    {
+      scfParent->MergeTemplate (tpl, default_material, shift, transform);
+    }
   } scfiThingState;
   friend struct ThingState;
  

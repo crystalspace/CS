@@ -2377,78 +2377,53 @@ void csThing::Merge (csThing* other)
   delete [] merge_vertices;
 }
 
-
-void csThing::MergeTemplate (csThing* tpl,
-	csMaterialWrapper* default_material, float default_texlen,
+void csThing::MergeTemplate (iThingState* tpl,
+	iMaterialWrapper* default_material,
 	csVector3* shift, csMatrix3* transform)
 {
-  (void)default_texlen;
   int i, j;
   int* merge_vertices;
 
-  flags.SetAll (tpl->flags.Get ());
-  SetZBufMode (tpl->GetZBufMode ());
+  flags.SetAll (tpl->GetFlags ());
+  //@@@ OBSOLETE: SetZBufMode (tpl->GetZBufMode ());
   SetMovingOption (tpl->GetMovingOption ());
 
   //TODO should merge? take averages or something?
-  curves_center = tpl->curves_center;
-  curves_scale = tpl->curves_scale;
-  ParentTemplate = tpl;
+  curves_center = tpl->GetCurvesCenter ();
+  curves_scale = tpl->GetCurvesScale ();
+  //@@@ TEMPORARY
+  iThing* ith = QUERY_INTERFACE (tpl, iThing);
+  ParentTemplate = ith->GetPrivateObject ();
+  ith->DecRef ();
 
-  merge_vertices = new int [tpl->GetNumVertices ()+1];
-  for (i = 0 ; i < tpl->GetNumVertices () ; i++)
+  merge_vertices = new int [tpl->GetVertexCount ()+1];
+  for (i = 0 ; i < tpl->GetVertexCount () ; i++)
   {
     csVector3 v;
-    v = tpl->Vobj (i);
+    v = tpl->GetVertex (i);
     if (transform) v = *transform * v;
     if (shift) v += *shift;
     merge_vertices[i] = AddVertex (v);
   }
 
-  for (i = 0 ; i < tpl->polygons.Length () ; i++)
+  for (i = 0 ; i < tpl->GetPolygonCount () ; i++)
   {
-    csPolygon3D* pt = tpl->GetPolygon3D (i);
+    iPolygon3D* pt = tpl->GetPolygon (i);
     csPolygon3D* p;
-    p = NewPolygon (pt->GetMaterialWrapper ());
-    p->SetName (pt->GetName());
-    if (!pt->GetMaterialWrapper ()) p->SetMaterial (default_material);
-    int* idx = pt->GetVertices ().GetVertexIndices ();
-    for (j = 0 ; j < pt->GetVertices ().GetNumVertices () ; j++)
+    csMaterialWrapper* mat = NULL;
+    if (pt->GetMaterial ())
+      mat = pt->GetMaterial ()->GetPrivateObject (); //@@@
+    p = NewPolygon (mat); //@@@
+    p->SetName (pt->GetName ());
+    iMaterialWrapper* wrap = pt->GetMaterial ();
+    if (!wrap && default_material)
+      p->SetMaterial (default_material->GetPrivateObject ());
+    int* idx = pt->GetVertexIndices ();
+    for (j = 0 ; j < pt->GetVertexCount () ; j++)
       p->AddVertex (merge_vertices[idx[j]]);
 
-    p->flags.SetAll (pt->flags.Get ());
-    p->SetTextureType (pt->GetTextureType ());
-
-    csPolyTexFlat* txtflat_src = pt->GetFlatInfo ();
-    if (txtflat_src)
-    {
-      csPolyTexFlat* txtflat_dst = p->GetFlatInfo ();
-      txtflat_dst->Setup (p);
-      csVector2 *uv_coords = txtflat_src->GetUVCoords ();
-      if (uv_coords)
-        for (j = 0; j < pt->GetNumVertices (); j++)
-          txtflat_dst->SetUV (j, uv_coords[j].x, uv_coords[j].y);
-    }
-
-    csPolyTexGouraud* txtgour_src = pt->GetGouraudInfo ();
-    if (txtgour_src)
-    {
-      csPolyTexGouraud* txtgour_dst = p->GetGouraudInfo ();
-      txtgour_dst->Setup (p);
-      csColor* col = txtgour_src->GetColors ();
-      if (col)
-        for (j = 0; j < pt->GetNumVertices (); j++)
-          txtgour_dst->SetColor (j, col[j]);
-    }
-
-    csMatrix3 m;
-    csVector3 v (0);
-    csPolyTexLightMap* txtlmi_src = pt->GetLightMapInfo ();
-    if (txtlmi_src)
-    {
-      txtlmi_src->GetTxtPlane ()->GetTextureSpace (m, v);
-    }
-    p->SetTextureSpace (m, v);
+    p->flags.SetAll (pt->GetFlags ());
+    p->CopyTextureType (pt);
   }
 
   for (i = 0; i < tpl->GetNumCurveVertices (); i++)
@@ -2456,38 +2431,28 @@ void csThing::MergeTemplate (csThing* tpl,
 
   for (i = 0; i < tpl->GetNumCurves (); i++)
   {
-    csCurveTemplate* pt = tpl->GetCurve (i)->GetParentTemplate ();
-    csCurve* p = pt->MakeCurve ();
+    iCurveTemplate* pt = tpl->GetCurve (i)->GetParentTemplate ();
+    iCurve* p = pt->MakeCurve ();
     p->SetName (pt->GetName ());
-    p->SetParent (this);
+    p->GetOriginalObject ()->SetParent (this);
 
-    if (!pt->GetMaterialWrapper ()) p->SetMaterialWrapper (default_material);
-    for (j = 0 ; j < pt->NumVertices () ; j++)
+    if (!pt->GetMaterial ()) p->SetMaterial (default_material);
+    for (j = 0 ; j < pt->GetNumVertices () ; j++)
       p->SetControlPoint (j, pt->GetVertex (j));
-    AddCurve (p);
+    AddCurve (p->GetOriginalObject ());
   }
 
   delete [] merge_vertices;
 }
 
-void csThing::MergeTemplate (csThing* tpl,
-	csMaterialList* matList, const char* prefix,
-	csMaterialWrapper* default_material, float default_texlen,
-	csVector3* shift, csMatrix3* transform)
+void csThing::ReplaceMaterials (csMaterialList* matList, const char* prefix)
 {
   int i;
-  const char *txtname;
-  char *newname=NULL;
-    
-  MergeTemplate (tpl, default_material, default_texlen,
-    shift, transform);
-    
-  // Now replace the materials.
   for (i = 0; i < GetNumPolygons (); i++)
   {
     csPolygon3D *p = GetPolygon3D (i);
-    txtname = p->GetMaterialWrapper ()->GetName ();
-    newname = new char [strlen (prefix) + strlen (txtname) + 2];
+    const char* txtname = p->GetMaterialWrapper ()->GetName ();
+    char* newname = new char [strlen (prefix) + strlen (txtname) + 2];
     sprintf (newname, "%s_%s", prefix, txtname);
     csMaterialWrapper *th = matList->FindByName (newname);
     if (th != NULL)
@@ -2500,9 +2465,8 @@ void csThing::MergeTemplate (csThing* tpl,
 
 iPolygon3D *csThing::eiThing::GetPolygon (int idx)
 {
-  iPolygon3D* ip = QUERY_INTERFACE (scfParent->GetPolygon3D (idx), iPolygon3D);
-  ip->DecRef ();
-  return ip;
+  csPolygon3D* p = scfParent->GetPolygon3D (idx);
+  return &(p->scfiPolygon3D);
 }
 
 iPolygon3D *csThing::eiThing::CreatePolygon (const char *iName)
@@ -2523,11 +2487,16 @@ bool csThing::eiThing::CreateKey (const char *iName, const char *iValue)
 
 //---------------------------------------------------------------------------
 
+iCurve *csThing::ThingState::GetCurve (int idx)
+{
+  csCurve* c = scfParent->GetCurve (idx);
+  return &(c->scfiCurve);
+}
+
 iPolygon3D *csThing::ThingState::GetPolygon (int idx)
 {
-  iPolygon3D* ip = QUERY_INTERFACE (scfParent->GetPolygon3D (idx), iPolygon3D);
-  ip->DecRef ();
-  return ip;
+  csPolygon3D* p = scfParent->GetPolygon3D (idx);
+  return &(p->scfiPolygon3D);
 }
 
 iPolygon3D *csThing::ThingState::CreatePolygon (const char *iName)
@@ -2553,7 +2522,7 @@ iMeshObjectFactory* csThing::MeshObject::GetFactory ()
 iMeshObject* csThing::MeshObjectFactory::NewInstance ()
 {
   csThing* thing = new csThing ();
-  thing->MergeTemplate (scfParent, NULL, 1);
+  thing->MergeTemplate (&(scfParent->scfiThingState), NULL);
   return &thing->scfiMeshObject;
 }
 

@@ -1141,7 +1141,7 @@ public:
 
   /// @@@ Temporary until things move to their own mesh plugin system.
   csThingObjectType* thing_type;
-  iMeshObjectType* GetThingType ()
+  virtual iMeshObjectType* GetThingType ()
   {
     return (iMeshObjectType*)thing_type;
   }

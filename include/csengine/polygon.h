@@ -80,40 +80,6 @@ struct csPolygonLightInfo
 /*---------------------------------------------------------------------------*/
 
 /**
- * Polygon has no texture mapping.
- * This flag is meaningful only for flat-colored polygons
- * since it saves a bit of memory.
- */
-#define POLYTXT_NONE		0
-
-/**
- * Flat shaded texture.
- * Polygons with this texturing type will always have same lighting
- * value across entire polygon. If the CS_POLY_LIGHTING flag is not
- * set in parent polygon object, the polygon will be painted using
- * the original texture or flat color; otherwise a single lighting
- * value will be computed (depending on the angle the light falls
- * on the polygon) and will be applied to every pixel.
- */
-#define POLYTXT_FLAT		1
-
-/**
- * Gouraud shaded texture.
- * With software rendering these textures will be painted without
- * perspective correction. Instead you can defined a color (with
- * r/g/b values in range 0..2) for every polygon vertex, and these
- * colors will be interpolated across scanlines.
- */
-#define POLYTXT_GOURAUD		2
-
-/**
- * Texture type is lightmapped.
- * These polygons are painted perspective-correct even with software
- * rendering and are used usually for walls and big objects.
- */
-#define POLYTXT_LIGHTMAP	3
-
-/**
  * Kind of texturing that is used for a 3D polygon.
  * This is the base class with subclasses depending on the kind
  * of texturing that is used for a polygon. Also this class contains
@@ -419,11 +385,6 @@ public:
 #define CS_POLY_SPLIT		0x20000000
 
 /**
- * If this flag is set then this polygon is used for collision detection.
- */
-#define CS_POLY_COLLDET		0x10000000
-
-/**
  * This is our main 3D polygon class. Polygons are used to construct the
  * outer hull of sectors and the faces of 3D things.
  * Polygons can be transformed in 3D (usually they are transformed so
@@ -581,6 +542,13 @@ public:
    */
   int GetTextureType ()
   { return txt_info->GetTextureType (); }
+
+  /**
+   * Copy texture type settings from another polygon.
+   * (this will not copy the actual material that is used, just the
+   * information on how to apply that material to the polygon).
+   */
+  void CopyTextureType (iPolygon3D* other_polygon);
 
   /**
    * Get the general texture type information structure.
@@ -1219,82 +1187,69 @@ public:
   {
     DECLARE_EMBEDDED_IBASE (csPolygon3D);
 
-    /// Used by engine to retrieve internal object structure
-    virtual csPolygon3D *GetPrivateObject ()
-    { return scfParent; }
-
-    /// Get polygon name
-    virtual const char *GetName () const
-    { return scfParent->GetName (); }
-    /// Set polygon name
-    virtual void SetName (const char *iName)
-    { scfParent->SetName (iName); }
-
-    /// Get the thing (container) that this polygon belongs to.
+    virtual csPolygon3D *GetPrivateObject () { return scfParent; }
+    virtual const char *GetName () const { return scfParent->GetName (); }
+    virtual void SetName (const char *iName) { scfParent->SetName (iName); }
     virtual iThing *GetParent ();
-    /// Get the lightmap associated with this polygon
     virtual iLightMap *GetLightMap ()
     {
       csPolyTexLightMap *lm = scfParent->GetLightMapInfo ();
       return lm ? lm->GetLightMap () : (iLightMap*)NULL;
     }
-    /// Get the handle to the polygon texture object
-    virtual iPolygonTexture *GetTexture ()
-    { return scfParent->GetTexture(); }
-    /// Get the material handle for the texture manager.
+    virtual iPolygonTexture *GetTexture () { return scfParent->GetTexture(); }
     virtual iMaterialHandle *GetMaterialHandle ()
     { return scfParent->GetMaterialHandle (); }
-    /// Set material.
     virtual void SetMaterial (iMaterialWrapper* mat)
     {
       scfParent->SetMaterial (
         ((csMaterialWrapper::MaterialWrapper*)(mat))->scfParent);
     }
+    virtual iMaterialWrapper* GetMaterial ()
+    {
+      // @@@ Not efficient. In future we need to store iMaterialWrapper
+      // directly.
+      if (!scfParent->GetMaterialWrapper ()) return NULL;
+      else
+      {
+        iMaterialWrapper* wrap = QUERY_INTERFACE (
+	  scfParent->GetMaterialWrapper (), iMaterialWrapper);
+        wrap->DecRef ();
+	return wrap;
+      }
+    }
 
-    /// Query number of vertices in this polygon
     virtual int GetVertexCount ()
     { return scfParent->vertices.GetNumVertices (); }
-    /// Get the given polygon vertex coordinates in object space
+    virtual int* GetVertexIndices ()
+    { return scfParent->vertices.GetVertexIndices (); }
     virtual csVector3 &GetVertex (int idx)
     { return scfParent->Vobj (idx); }
-    /// Get the given polygon vertex coordinates in world space
     virtual csVector3 &GetVertexW (int idx)
     { return scfParent->Vwor (idx); }
-    /// Get the given polygon vertex coordinates in camera space
     virtual csVector3 &GetVertexC (int idx)
     { return scfParent->Vcam (idx); }
-    /// Create a polygon vertex given his index in parent polygon set
     virtual int CreateVertex (int idx)
     { return scfParent->AddVertex (idx); }
-    /// Create a polygon vertex and add it to parent object
     virtual int CreateVertex (const csVector3 &iVertex)
     { return scfParent->AddVertex (iVertex); }
 
-    /// Get the alpha transparency value for this polygon.
     virtual int GetAlpha ()
     { return scfParent->GetAlpha (); }
-    /// Set the alpha transparency value for this polygon.
     virtual void SetAlpha (int iAlpha)
     { scfParent->SetAlpha (iAlpha); }
 
-    /// Create a private polygon texture mapping plane
     virtual void CreatePlane (const csVector3 &iOrigin,
       const csMatrix3 &iMatrix);
-    /// Set polygon texture mapping plane
     virtual bool SetPlane (const char *iName);
 
-    /// Get the flags for this polygon
     virtual unsigned GetFlags ()
     { return scfParent->flags.Get (); }
-    /// Set any number of flags for this polygon
     virtual void SetFlags (unsigned iMask, unsigned iValue)
     { scfParent->flags.Set (iMask, iValue); }
 
-    /// Set Gouraud vs lightmap polygon lighting
     virtual void SetLightingMode (bool iGouraud)
     { scfParent->SetTextureType(iGouraud ? POLYTXT_GOURAUD:POLYTXT_LIGHTMAP); }
 
-    /// Create a portal object pointing to given sector
     virtual iPortal *CreatePortal (iSector *iTarget)
     {
       scfParent->SetCSPortal (iTarget->GetPrivateObject ());
@@ -1305,11 +1260,42 @@ public:
       return scfParent->GetPortal ();
     }
 
-    ///
-    virtual void SetTextureSpace (csVector3& v_orig, csVector3& v1, float len1)
+    virtual void SetTextureSpace (
+  	const csVector3& p1, const csVector2& uv1,
+  	const csVector3& p2, const csVector2& uv2,
+  	const csVector3& p3, const csVector2& uv3)
     {
-      scfParent->SetTextureSpace (v_orig, v1, len1);
+      scfParent->SetTextureSpace (p1, uv1, p2, uv2, p3, uv3);
     }
+    virtual void SetTextureSpace (csVector3& v_orig, csVector3& v1, float l1)
+    {
+      scfParent->SetTextureSpace (v_orig, v1, l1);
+    }
+    virtual void SetTextureSpace (
+        const csVector3& v_orig,
+        const csVector3& v1, float len1,
+        const csVector3& v2, float len2)
+    {
+      scfParent->SetTextureSpace (v_orig, v1, len1, v2, len2);
+    }
+    virtual void SetTextureSpace (csMatrix3 const& m, csVector3 const& v)
+    {
+      scfParent->SetTextureSpace (m, v);
+    }
+
+    virtual void SetTextureType (int type)
+    {
+      scfParent->SetTextureType (type);
+    }
+    virtual int GetTextureType ()
+    {
+      return scfParent->GetTextureType ();
+    }
+    virtual void CopyTextureType (iPolygon3D* other_polygon)
+    {
+      scfParent->CopyTextureType (other_polygon);
+    }
+
     virtual const csPlane3& GetWorldPlane ()
     {
       return scfParent->plane->GetWorldPlane ();
@@ -1325,6 +1311,14 @@ public:
     virtual bool IsTransparent ()
     {
       return scfParent->IsTransparent ();
+    }
+    virtual float GetCosinusFactor ()
+    {
+      return scfParent->GetCosinusFactor ();
+    }
+    virtual void SetCosinusFactor (float cosfact)
+    {
+      scfParent->SetCosinusFactor (cosfact);
     }
   } scfiPolygon3D;
   friend struct eiPolygon3D;

@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -31,6 +31,7 @@
 #include "csengine/rview.h"
 #include "csobject/csobject.h"
 #include "ivideo/graph3d.h"
+#include "iengine/curve.h"
 
 struct iMaterialHandle;
 class csBspContainer;
@@ -152,10 +153,7 @@ public:
 
 public:
   ///
-  csCurve (csCurveTemplate* parent_tmpl) : csObject (),
-    cstxt (NULL),	parent_template (parent_tmpl), lightpatches(NULL), 
-    _o2w (NULL), _uv2World (NULL), _uv2Normal (NULL), parent  (NULL),
-	  lightmap (NULL), lightmap_up_to_date (false) {} 
+  csCurve (csCurveTemplate* parent_tmpl);
 
   /// Destructor
   virtual ~csCurve ();
@@ -264,6 +262,24 @@ public:
   virtual void HardTransform (const csReversibleTransform& trans);
   
   CSOBJTYPE;
+  DECLARE_IBASE_EXT (csObject);
+
+  //----------------------- iCurve interface implementation -----------------
+  struct Curve : public iCurve
+  {
+    DECLARE_EMBEDDED_IBASE (csCurve);
+    virtual csCurve* GetOriginalObject () { return (csCurve*)scfParent; }
+    virtual iCurveTemplate* GetParentTemplate ();
+    virtual void SetMaterial (iMaterialWrapper* mat);
+    virtual iMaterialWrapper* GetMaterial ();
+    virtual void SetName (const char* name) { scfParent->SetName (name); }
+    virtual const char* GetName () const { return scfParent->GetName (); }
+    virtual void SetControlPoint (int idx, int control_id)
+    {
+      scfParent->SetControlPoint (idx, control_id);
+    }
+  } scfiCurve;
+  friend struct Curve;
 };
 
 /**
@@ -277,6 +293,8 @@ protected:
 public:
   ///
   csCurveTemplate();
+  ///
+  virtual ~csCurveTemplate () { }
 
   ///
   virtual csCurve* MakeCurve () = 0;
@@ -293,6 +311,24 @@ public:
   void SetMaterialWrapper (csMaterialWrapper* h) { cstxt = h; }
 
   CSOBJTYPE;
+  DECLARE_IBASE_EXT (csObject);
+
+  //------------------ iCurveTemplate interface implementation --------------
+  struct CurveTemplate : public iCurveTemplate
+  {
+    DECLARE_EMBEDDED_IBASE (csCurveTemplate);
+    virtual void SetName (const char* name) { scfParent->SetName (name); }
+    virtual const char* GetName () const { return scfParent->GetName (); }
+    virtual void SetMaterial (iMaterialWrapper* mat);
+    virtual iMaterialWrapper* GetMaterial ();
+    virtual iCurve* MakeCurve ();
+    virtual int GetNumVertices () const { return scfParent->NumVertices (); }
+    virtual int GetVertex (int idx) const
+    {
+      return scfParent->GetVertex (idx);
+    }
+  } scfiCurveTemplate;
+  friend struct CurveTemplate;
 };
 
 /**

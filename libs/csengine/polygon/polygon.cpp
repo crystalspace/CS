@@ -313,6 +313,44 @@ void csPolygon3D::SetTextureType (int type)
   }
 }
 
+void csPolygon3D::CopyTextureType (iPolygon3D* ipt)
+{
+  int j;
+  csPolygon3D* pt = ipt->GetPrivateObject ();
+  SetTextureType (pt->GetTextureType ());
+
+  csPolyTexFlat* txtflat_src = pt->GetFlatInfo ();
+  if (txtflat_src)
+  {
+    csPolyTexFlat* txtflat_dst = GetFlatInfo ();
+    txtflat_dst->Setup (this);
+    csVector2 *uv_coords = txtflat_src->GetUVCoords ();
+    if (uv_coords)
+      for (j = 0; j < pt->GetNumVertices (); j++)
+        txtflat_dst->SetUV (j, uv_coords[j].x, uv_coords[j].y);
+  }
+
+  csPolyTexGouraud* txtgour_src = pt->GetGouraudInfo ();
+  if (txtgour_src)
+  {
+    csPolyTexGouraud* txtgour_dst = GetGouraudInfo ();
+    txtgour_dst->Setup (this);
+    csColor* col = txtgour_src->GetColors ();
+    if (col)
+      for (j = 0; j < pt->GetNumVertices (); j++)
+        txtgour_dst->SetColor (j, col[j]);
+  }
+
+  csMatrix3 m;
+  csVector3 v (0);
+  csPolyTexLightMap* txtlmi_src = pt->GetLightMapInfo ();
+  if (txtlmi_src)
+  {
+    txtlmi_src->GetTxtPlane ()->GetTextureSpace (m, v);
+  }
+  SetTextureSpace (m, v);
+}
+
 void csPolygon3D::Reset ()
 {
   vertices.MakeEmpty ();

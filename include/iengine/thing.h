@@ -29,6 +29,24 @@ struct iMovable;
 struct iPolygon3D;
 struct iGraphics3D;
 struct iFrustumView;
+struct iCurve;
+struct iMaterialWrapper;
+
+/**
+ * If CS_THING_VISTREE is set then an octree will be calculated for the
+ * polygons in this thing. In this case the thing will implement a
+ * fully working iVisibilityCuller which the sector can use.
+ */
+#define CS_THING_VISTREE 1
+
+/**
+ * The following flags affect movement options for a thing. See
+ * SetMovingOption() for more info.
+ */
+#define CS_THING_MOVE_NEVER 0
+#define CS_THING_MOVE_OFTEN 1
+#define CS_THING_MOVE_OCCASIONAL 2
+
 
 SCF_VERSION (iThing, 0, 0, 4);
 
@@ -84,7 +102,7 @@ struct iThing : public iBase
   virtual iMovable* GetMovable () = 0;
 };
 
-SCF_VERSION (iThingState, 0, 0, 1);
+SCF_VERSION (iThingState, 0, 0, 2);
 
 /**
  * This is the state interface to access the internals of a thing
@@ -140,6 +158,88 @@ struct iThingState : public iBase
    * @@@ Does this belong here?
    */
   virtual void CheckFrustum (iFrustumView* fview) = 0;
+
+  /// Get the flags for this thing.
+  virtual unsigned GetFlags () = 0;
+  /// Set any number of flags for this thing.
+  virtual void SetFlags (unsigned iMask, unsigned iValue) = 0;
+
+  /**
+   * Get the moving option.
+   */
+  virtual int GetMovingOption () = 0;
+
+  /**
+   * Control how this thing will be moved.
+   * There are currently three options.
+   * <ul>
+   *   <li>CS_THING_MOVE_NEVER: this option is set for a thing that cannot
+   *       move at all. In this case the movable will be ignored and only
+   *       hard transforms can be used to move a thing with this flag. This
+   *       setting is both efficient for memory (object space coordinates are
+   *       equal to world space coordinates so only one array is kept) and
+   *       render speed (only the camera transform is needed). This option
+   *       is very useful for static geometry like walls.
+   *       This option is default.
+   *   <li>CS_THING_MOVE_OCCASIONAL: this option is set for a thing that
+   *       is movable but doesn't move all the time usually. Setting this
+   *       option means that the world space vertices will be cached (taking
+   *       up more memory that way) but the coordinates will be recalculated
+   *       only at rendertime (and cached at that time). This option has
+   *       the same speed efficiency as MOVE_NEVER when the object doesn't
+   *       move but more memory is used as all the vertices are duplicated.
+   *       Use this option for geometry that is not too big (in number of
+   *       vertices) and only moves occasionally like doors of elevators.
+   *   <li>CS_THING_MOVE_OFTEN: this option is set for a thing that moves
+   *       very often (i.e. almost every frame). Setting this option means
+   *       that the object->world and camera transformations will be combined
+   *       at render time. It has the same memory efficiency as MOVE_NEVER
+   *       but the transforms need to be combined every frame (if the object
+   *       is visible). Use this option for geometry that moves a lot. Also
+   *       very useful for objects that often move and have lots of vertices
+   *       since in that case combining the transforms ones is a lot more
+   *       efficient than doing two transforms on every vertex.
+   * </ul>
+   */
+  virtual void SetMovingOption (int opt) = 0;
+
+  /**
+   * Get the center of the curves.
+   */
+  virtual const csVector3& GetCurvesCenter () const = 0;
+  /**
+   * Set the center of the curves.
+   */
+  virtual void SetCurvesCenter (const csVector3& cen) = 0;
+
+  /**
+   * Get the scale of the curves.
+   */
+  virtual float GetCurvesScale () = 0;
+  /**
+   * Set the scale of the curves.
+   */
+  virtual void SetCurvesScale (float scale) = 0;
+
+  /// Get the number of curves.
+  virtual int GetNumCurves () = 0;
+  /// Get the curve.
+  virtual iCurve* GetCurve (int idx) = 0;
+  /// Get the number of curve vertices.
+  virtual int GetNumCurveVertices () = 0;
+  /// Get the specified curve vertex.
+  virtual csVector3& CurveVertex (int i) = 0;
+  /// Get the curve vertices.
+  virtual csVector3* GetCurveVertices () = 0;
+  /// Get the specified curve texture coordinate (texel).
+  virtual csVector2& CurveTexel (int i) = 0;
+
+  /**
+   * Add polygons and vertices from the specified thing (seen as template).
+   */
+  virtual void MergeTemplate (iThingState* tpl,
+  	iMaterialWrapper* default_material = NULL,
+	csVector3* shift = NULL, csMatrix3* transform = NULL) = 0;
 };
 
 #endif

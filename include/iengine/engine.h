@@ -35,6 +35,7 @@ struct iThing;
 struct iSprite;
 struct iMeshWrapper;
 struct iMeshFactoryWrapper;
+struct iMeshObjectType;
 struct iMaterialWrapper;
 struct iTextureWrapper;
 struct iTerrainWrapper;
@@ -45,7 +46,7 @@ struct iView;
 struct iGraphics3D;
 struct iClipper2D;
 
-SCF_VERSION (iEngine, 0, 1, 15);
+SCF_VERSION (iEngine, 0, 1, 16);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -311,6 +312,9 @@ struct iEngine : public iPlugIn
    */
   virtual iTerrainWrapper* CreateTerrainObject (iTerrainFactoryWrapper* factory,
   	const char* name, iSector* sector) = 0;
+
+  /// @@@ Temporary function until things are moved to a plugin.
+  virtual iMeshObjectType* GetThingType () = 0;
 };
 
 #endif // __IENGINE_ENGINE_H__

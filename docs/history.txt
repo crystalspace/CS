@@ -1,5 +1,43 @@
 The history order has been reversed so that new features are at the top.
 
+4-Apr-2001
+	- Started work on thing loader and saver. Although things haven't
+	  moved to a plugin yet it is already possible to make real
+	  plugins from the loader and saver.
+	- Moved the CS_THING_... flags from csThing header to iThingState
+	  header.
+	- Extended iThingState with GetFlags(), SetFlags(), SetMovingOption(),
+	  GetMovingOption(),  GetCurvesScale(), SetCurvesScale(),
+	  GetCurvesCenter(), SetCurvesCenter(), CurveVertex(), CurveTexel(),
+	  GetNumCurveVertices(), GetCurveVertices(), GetNumCurves(),
+	  GetCurve(), and MergeTemplate().
+	- Extended iPolygon3D with GetMaterial(), GetVertexIndices(),
+	  GetTextureType(), SetTextureType(), GetCosinusFactor(),
+	  SetCosinusFactor(), and a few additional versions of
+	  SetTextureSpace().
+	- Added new csPolygon3D::CopyTextureType() (and also added this to
+	  iPolygon3D). This function will copy the texture information from
+	  a given polygon to this polygon. Note that the material itself
+	  is not copied. Only the information on how to apply the texture
+	  mapping.
+	- Extended iMaterialWrapper with GetMaterial().
+	- Moved the POLYTXT_... flags from csPolygon3D header to iPolygon3D
+	  header.
+	- Also moved CS_POLY_COLLDET.
+	- Added iEngine::GetThingType().
+	- Added iCurve and iCurveTemplate SCF interfaces and let csCurve
+	  and csCurveTemplate implement them.
+	- Removed 'default_texlen' from csThing::MergeTemplate() since it
+	  wasn't working.
+	- Removed the csThing::MergeTemplate() version which also replaced
+	  materials. Instead added new csThing::ReplaceMaterials() function
+	  which does the same thing (except merge). So where you would
+	  use MergeTemplate() in the past (the version that replaces
+	  materials) you will now use the other MergeTemplate() and then
+	  call ReplaceMaterials().
+	- Changed csThing::MergeTemplate() to work on SCF interfaces
+	  (iThingState, iMaterialWrapper, ...).
+	- The thing loader compiles now but is far from complete and usable.
 3-Apr-2001
 	- Norman Kramer fixed a warning about explicit initialization
 	  of iBase in copy constructor of csCamera.

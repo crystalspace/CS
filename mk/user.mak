@@ -35,6 +35,7 @@ PLUGINS += mesh/object/snow     mesh/loader/snow
 PLUGINS += mesh/object/rain     mesh/loader/rain
 PLUGINS += mesh/object/spiral   mesh/loader/spiral
 PLUGINS += mesh/object/ball     mesh/loader/ball
+PLUGINS +=                      mesh/loader/thing
 PLUGINS += terrain/object/ddg   terrain/loader/ddg
 PLUGINS.DYNAMIC += video/renderer/line video/renderer/null video/renderer/inf
 PLUGINS.DYNAMIC += sound/loader

@@ -162,6 +162,10 @@ public:
       return scfParent->GetMaterialHandle ();
     }
     virtual void Visit () { scfParent->Visit (); }
+    virtual iMaterial* GetMaterial ()
+    {
+      return scfParent->GetMaterial ();
+    }
   } scfiMaterialWrapper;
 };
 

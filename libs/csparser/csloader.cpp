@@ -1103,18 +1103,20 @@ void csLoader::load_thing_part (csThing* thing, PSLoadInfo& info,
           csThing* t = (csThing*)Engine->thing_templates.FindByName (str);
           if (!t)
           {
-            CsPrintf (MSG_FATAL_ERROR, "Couldn't find thing template '%s'!\n", str);
+            CsPrintf (MSG_FATAL_ERROR, "Couldn't find thing template '%s'!\n",
+	      str);
             fatal_exit (0, false);
           }
+	  iThingState* thing_state = QUERY_INTERFACE (t, iThingState);
+          thing->MergeTemplate (thing_state,
+	  	&(info.default_material->scfiMaterialWrapper));
+	  thing_state->DecRef ();
 	  if (info.use_mat_set)
-          {
-            thing->MergeTemplate (t, Engine->GetMaterials (),
-	    	info.mat_set_name, info.default_material, info.default_texlen);
-            info.use_mat_set = false;
+	  {
+	    thing->ReplaceMaterials (Engine->GetMaterials (),
+	      info.mat_set_name);
+	    info.use_mat_set = false;
 	  }
-          else
-            thing->MergeTemplate (t, info.default_material,
-	    	info.default_texlen);
           csLoaderStat::polygons_loaded += t->GetNumPolygons ();
         }
         break;
@@ -1133,16 +1135,16 @@ void csLoader::load_thing_part (csThing* thing, PSLoadInfo& info,
             CsPrintf (MSG_FATAL_ERROR, "Couldn't find thing '%s'!\n", str);
             fatal_exit (0, false);
           }
+	  iThingState* thing_state = QUERY_INTERFACE (t, iThingState);
+          thing->MergeTemplate (thing_state,
+	  	&(info.default_material->scfiMaterialWrapper));
+	  thing_state->DecRef ();
 	  if (info.use_mat_set)
-          {
-            thing->MergeTemplate (t->GetPrivateObject (),
-	    	Engine->GetMaterials (), info.mat_set_name,
-		info.default_material, info.default_texlen);
-            info.use_mat_set = false;
+	  {
+	    thing->ReplaceMaterials (Engine->GetMaterials (),
+	      info.mat_set_name);
+	    info.use_mat_set = false;
 	  }
-          else
-            thing->MergeTemplate (t->GetPrivateObject (),
-	    	info.default_material, info.default_texlen);
           csLoaderStat::polygons_loaded += t->GetPrivateObject ()->GetNumPolygons ();
         }
         break;
@@ -3272,7 +3274,7 @@ bool csLoader::LoadMeshObjectFactory (csMeshFactoryWrapper* stemp, char* buf)
 	  iMeshObjectFactory* fact = type->NewFactory ();
 	  stemp->SetMeshObjectFactory (fact);
 	  fact->DecRef ();
-	  iSprite3DFactoryState* state = QUERY_INTERFACE (fact, iSprite3DFactoryState);
+	  //iSprite3DFactoryState* state = QUERY_INTERFACE (fact, iSprite3DFactoryState);
 	  csCrossBuild_SpriteTemplateFactory builder;
 	  builder.CrossBuild (fact, *filedata);
 //	  state->DecRef ();

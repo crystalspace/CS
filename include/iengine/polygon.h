@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -33,16 +33,57 @@ struct iThing;
 
 class csPolygon3D;
 class csVector3;
+class csVector2;
 class csMatrix3;
 class csColor;
+
+/**
+ * Polygon has no texture mapping.
+ * This flag is meaningful only for flat-colored polygons
+ * since it saves a bit of memory.
+ */
+#define POLYTXT_NONE		0
+
+/**
+ * Flat shaded texture.
+ * Polygons with this texturing type will always have same lighting
+ * value across entire polygon. If the CS_POLY_LIGHTING flag is not
+ * set in parent polygon object, the polygon will be painted using
+ * the original texture or flat color; otherwise a single lighting
+ * value will be computed (depending on the angle the light falls
+ * on the polygon) and will be applied to every pixel.
+ */
+#define POLYTXT_FLAT		1
+
+/**
+ * Gouraud shaded texture.
+ * With software rendering these textures will be painted without
+ * perspective correction. Instead you can defined a color (with
+ * r/g/b values in range 0..2) for every polygon vertex, and these
+ * colors will be interpolated across scanlines.
+ */
+#define POLYTXT_GOURAUD		2
+
+/**
+ * Texture type is lightmapped.
+ * These polygons are painted perspective-correct even with software
+ * rendering and are used usually for walls and big objects.
+ */
+#define POLYTXT_LIGHTMAP	3
 
 /**
  * If CS_POLY_LIGHTING is set for a polygon then the polygon will be lit.
  * It is set by default.
  */
-#define CS_POLY_LIGHTING	0x00000001
+#define CS_POLY_LIGHTING 0x00000001
 
-SCF_VERSION (iPolygon3D, 0, 1, 6);
+/**
+ * If this flag is set then this polygon is used for collision detection.
+ */
+#define CS_POLY_COLLDET	0x00000002
+
+
+SCF_VERSION (iPolygon3D, 0, 1, 7);
 
 /**
  * This is the interface to 3D polygons.
@@ -70,9 +111,13 @@ struct iPolygon3D : public iBase
   virtual iMaterialHandle *GetMaterialHandle () = 0;
   /// Set the material for this polygon.
   virtual void SetMaterial (iMaterialWrapper* mat) = 0;
+  /// Get the material for this polygon.
+  virtual iMaterialWrapper* GetMaterial () = 0;
 
   /// Query number of vertices in this polygon
   virtual int GetVertexCount () = 0;
+  /// Get the vertex indices array.
+  virtual int* GetVertexIndices () = 0;
   /// Get the given polygon vertex coordinates in object space
   virtual csVector3 &GetVertex (int idx) = 0;
   /// Get the given polygon vertex coordinates in world space
@@ -116,8 +161,65 @@ struct iPolygon3D : public iBase
    */
   virtual iPortal* GetPortal () = 0;
 
-  /// Set texture space mapping (if using lightmapping) for this polygon.
-  virtual void SetTextureSpace (csVector3& v_orig, csVector3& v1, float len1) = 0;
+  /**
+   * Set the texture space transformation given three vertices and
+   * their uv coordinates.
+   */
+  virtual void SetTextureSpace (
+  	const csVector3& p1, const csVector2& uv1,
+  	const csVector3& p2, const csVector2& uv2,
+  	const csVector3& p3, const csVector2& uv3) = 0;
+
+  /**
+   * Calculate the matrix using two vertices (which are preferably on the
+   * plane of the polygon and are possibly (but not necessarily) two vertices
+   * of the polygon). The first vertex is seen as the origin and the second
+   * as the u-axis of the texture space coordinate system. The v-axis is
+   * calculated on the plane of the polygon and orthogonal to the given
+   * u-axis. The length of the u-axis and the v-axis is given as the 'len1'
+   * parameter.
+   *<p>
+   * For example, if 'len1' is equal to 2 this means that texture will be
+   * tiled exactly two times between vertex 'v_orig' and 'v1'.
+   *<p>
+   * I hope this explanation is clear since I can't seem to make it
+   * any clearer :-)
+   */
+  virtual void SetTextureSpace (csVector3& v_orig, csVector3& v1, float l1) = 0;
+
+  /**
+   * Calculate the matrix using 'v1' and 'len1' for the u-axis and
+   * 'v2' and 'len2' for the v-axis.
+   */
+  virtual void SetTextureSpace (
+    const csVector3& v_orig,
+    const csVector3& v1, float len1,
+    const csVector3& v2, float len2) = 0;
+
+  /**
+   * The most general function. With these you provide the matrix
+   * directly.
+   */
+  virtual void SetTextureSpace (csMatrix3 const&, csVector3 const&) = 0;
+
+  /**
+   * Set type of texturing to use for this polygon (one of
+   * the POLYTXT_??? flags). POLYTXT_LIGHTMAP is default.
+   * This function is guaranteed not to do anything if the type is
+   * already correct.
+   */
+  virtual void SetTextureType (int type) = 0;
+  /**
+   * Copy texture type settings from another polygon.
+   * (this will not copy the actual material that is used, just the
+   * information on how to apply that material to the polygon).
+   */
+  virtual void CopyTextureType (iPolygon3D* other_polygon) = 0;
+
+  /**
+   * Get the polygon texture type (one of POLYTXT_XXX values).
+   */
+  virtual int GetTextureType () = 0;
 
   /// Get world space plane.
   virtual const csPlane3& GetWorldPlane () = 0;
@@ -130,6 +232,15 @@ struct iPolygon3D : public iBase
    * Return true if this polygon or the texture it uses is transparent.
    */
   virtual bool IsTransparent () = 0;
+
+  /**
+   * Get cosinus factor.
+   */
+  virtual float GetCosinusFactor () = 0;
+  /**
+   * Set cosinus factor.
+   */
+  virtual void SetCosinusFactor (float cosfact) = 0;
 };
 
 SCF_VERSION (iPolygonTexture, 1, 0, 0);

@@ -37,6 +37,22 @@ IMPLEMENT_CSOBJTYPE (csCurveTemplate,csPObject);
 IMPLEMENT_CSOBJTYPE (csBezierCurve,csCurve);
 IMPLEMENT_CSOBJTYPE (csBezierTemplate,csCurveTemplate);
 
+IMPLEMENT_IBASE_EXT (csCurve)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iCurve)
+IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csCurve::Curve)
+  IMPLEMENTS_INTERFACE (iCurve)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+IMPLEMENT_IBASE_EXT (csCurveTemplate)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iCurveTemplate)
+IMPLEMENT_IBASE_EXT_END
+
+IMPLEMENT_EMBEDDED_IBASE (csCurveTemplate::CurveTemplate)
+  IMPLEMENTS_INTERFACE (iCurveTemplate)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 csCurveTesselated::csCurveTesselated (int num_v, int num_t)
 {
   num_vertices = num_v;
@@ -869,9 +885,49 @@ void csBezierCurve::HardTransform (const csReversibleTransform& trans)
 
 //------------------------------------------------------------------
 
+csCurve::csCurve (csCurveTemplate* parent_tmpl) : csObject (),
+    cstxt (NULL), parent_template (parent_tmpl), lightpatches (NULL), 
+    _o2w (NULL), _uv2World (NULL), _uv2Normal (NULL), parent (NULL),
+    lightmap (NULL), lightmap_up_to_date (false)
+{
+  CONSTRUCT_EMBEDDED_IBASE (scfiCurve);
+} 
+
+iCurveTemplate* csCurve::Curve::GetParentTemplate ()
+{
+  return &(scfParent->GetParentTemplate ()->scfiCurveTemplate);
+}
+
+void csCurve::Curve::SetMaterial (iMaterialWrapper* mat)
+{
+  scfParent->SetMaterialWrapper (mat->GetPrivateObject ());
+}
+
+iMaterialWrapper* csCurve::Curve::GetMaterial ()
+{
+  return &(scfParent->GetMaterialWrapper ()->scfiMaterialWrapper);
+}
+
 csCurveTemplate::csCurveTemplate () : csPObject ()
 {
+  CONSTRUCT_EMBEDDED_IBASE (scfiCurveTemplate);
   csEngine::current_engine->AddToCurrentRegion (this);
+}
+
+void csCurveTemplate::CurveTemplate::SetMaterial (iMaterialWrapper* mat)
+{
+  scfParent->SetMaterialWrapper (mat->GetPrivateObject ());
+}
+
+iMaterialWrapper* csCurveTemplate::CurveTemplate::GetMaterial ()
+{
+  return &(scfParent->GetMaterialWrapper ()->scfiMaterialWrapper);
+}
+
+iCurve* csCurveTemplate::CurveTemplate::MakeCurve ()
+{
+  csCurve* curve = scfParent->MakeCurve ();
+  return &(curve->scfiCurve);
 }
 
 //------------------------------------------------------------------
