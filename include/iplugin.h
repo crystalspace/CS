@@ -21,8 +21,10 @@
 
 #include "csutil/scf.h"
 
-scfInterface iSystem;
+struct iSystem;
 class csEvent;
+
+SCF_VERSION (iPlugIn, 0, 0, 1);
 
 /**
  * This is the general plug-in interface for CS.
@@ -30,7 +32,7 @@ class csEvent;
  * During Initialize() call plug-in should do all initialization stuff,
  * such as registering with the system driver and so on.
  */
-SCF_INTERFACE (iPlugIn, 0, 0, 1) : public iBase
+struct iPlugIn : public iBase
 {
   /// Initialize the plugin, and return success status
   virtual bool Initialize (iSystem *iSys) = 0;

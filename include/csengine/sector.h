@@ -37,7 +37,7 @@ class Dumper;
 class csPolygonTree;
 class csPolygon2DQueue;
 class csProgressPulse;
-scfInterface iGraphics3D;
+struct iGraphics3D;
 
 /**
  * A sector is a convex hull of polygons. It is

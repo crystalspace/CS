@@ -26,7 +26,7 @@ class csSector;
 class csPolygon2D;
 class csPolygon3D;
 class csStatLight;
-scfInterface iTextureHandle;
+struct iTextureHandle;
 
 /**
  * This class represents a portal. It belongs to some polygon

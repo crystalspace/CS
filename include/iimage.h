@@ -25,7 +25,15 @@ struct RGBPixel;
 struct Filter3x3;
 struct Filter5x5;
 
-SCF_INTERFACE (iImageFile, 0, 0, 1) : public iBase
+SCF_VERSION (iImageFile, 0, 0, 1);
+
+/**
+ * The iImageFile interface is used to work with image files
+ * (what you expected?). Crystal Space supports loading of images in
+ * GIF, JPEG, PNG, PCX, TIFF etc formats, you can work with any image
+ * through this interface.
+ */
+struct iImageFile : public iBase
 {
   ///
   virtual RGBPixel *GetImageData () = 0;

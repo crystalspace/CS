@@ -33,7 +33,7 @@
 #include "igraph3d.h"
 #include "iplugin.h"
 
-scfInterface iGraphics2D;
+struct iGraphics2D;
 class OpenGLTextureCache;
 class OpenGLLightmapCache;
 

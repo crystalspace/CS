@@ -19,7 +19,9 @@
 //-----------------------------------------------------------------------------
 #include "csutil/scf.h"
 
-SCF_INTERFACE (iNeXTSystemDriver, 0, 0, 1) : public iBase
+SCF_VERSION (iNeXTSystemDriver, 0, 0, 1);
+
+struct iNeXTSystemDriver : public iBase
     {
     virtual int GetSimulatedDepth() const = 0;
     };

@@ -30,9 +30,11 @@ enum SoundBufferPlayMethod
   SoundBufferPlay_DestroyAtEnd,
 };
 
-scfInterface iSoundSource;
+struct iSoundSource;
 
-SCF_INTERFACE (iSoundBuffer, 0, 0, 1) : public iBase
+SCF_VERSION (iSoundBuffer, 0, 0, 1);
+
+struct iSoundBuffer : public iBase
 {
   /// Play the sound
   virtual void Play (SoundBufferPlayMethod playMethod = SoundBufferPlay_Normal) = 0;

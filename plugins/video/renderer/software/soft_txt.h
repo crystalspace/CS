@@ -24,7 +24,7 @@
 #include "itexture.h"
 
 class csTextureManagerSoftware;
-scfInterface iImageFile;
+struct iImageFile;
 
 /// The internal texture mapping modes.
 #define TXT_GLOBAL	0	// Textures are mapped with a single palette

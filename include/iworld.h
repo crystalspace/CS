@@ -25,11 +25,13 @@
 
 class csWorld;
 
+SCF_VERSION (iWorld, 0, 0, 1);
+
 /**
  * This interface is supposed to be exposed to plugins and other
  * SCF modules that need access to the world internals.
  */
-SCF_INTERFACE (iWorld, 0, 0, 1) : public iPlugIn
+struct iWorld : public iPlugIn
 {
   /// KLUDGE: this shouldn't be used when iWorld interface will be complete
   virtual csWorld *GetCsWorld () = 0;

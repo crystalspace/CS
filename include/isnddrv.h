@@ -23,14 +23,16 @@
 
 #include "csutil/scf.h"
 
-scfInterface iSoundRender;
+struct iSoundRender;
+
+SCF_VERSION (iSoundDriver, 0, 0, 1);
 
 /**
  * This is the sound render interface for CS.
  * All sound renders must implement this interface.
  * The standard implementation is ISoundDriver.
  */
-SCF_INTERFACE (iSoundDriver, 0, 0, 1) : public iBase
+struct iSoundDriver : public iBase
 {
   /// Open the sound render
   virtual bool Open (ISoundRender *render, int frequency, bool bit16, bool stereo) = 0;

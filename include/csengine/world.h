@@ -49,10 +49,10 @@ class csCBuffer;
 class csQuadtree;
 class csPoly2DPool;
 class csLightPatchPool;
-scfInterface iHaloRasterizer;
-scfInterface iGraphics3D;
-scfInterface iSystem;
-scfInterface iVFS;
+struct iHaloRasterizer;
+struct iGraphics3D;
+struct iSystem;
+struct iVFS;
 
 /**
  * Flag for GetNearbyLights().
@@ -566,7 +566,7 @@ public:
 
   //--------------------- iConfig interface implementation --------------------
 
-  scfInterface csWorldConfig : public iConfig
+  struct csWorldConfig : public iConfig
   {
     DECLARE_EMBEDDED_IBASE (csWorld);
     virtual int GetOptionCount ();

@@ -32,7 +32,7 @@
 #include "cs3d/glide2/glcache.h"
 #include "iglide2d.h"
 
-//scfInterface iTextureHandle;
+//struct iTextureHandle;
 //class OpenGLTextureCache;
 
 /** Basic OpenGL version of the 2D driver class

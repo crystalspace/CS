@@ -25,8 +25,8 @@
 #include "csengine/csspr2d.h"
 #include "igraph3d.h"
 
-scfInterface iGraphics2D;
-scfInterface iSystem;
+struct iGraphics2D;
+struct iSystem;
 
 // Maximal number of primitives which can be drawn IN ONE FRAME
 #define MAX_CSWS_PIPELINE_LENGTH 16384

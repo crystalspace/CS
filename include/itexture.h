@@ -6,10 +6,12 @@
 
 struct csHighColorCacheData;
 
+SCF_VERSION (iTextureHandle, 0, 0, 1);
+
 /** 
  * A texture handle as returned by iTextureManager.
  */
-SCF_INTERFACE (iTextureHandle, 0, 0, 1) : public iBase
+struct iTextureHandle : public iBase
 {
   /// Set the transparent color.
   virtual void SetTransparent (int red, int green, int blue) = 0;

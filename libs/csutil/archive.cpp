@@ -673,8 +673,10 @@ bool csArchive::IsDeleted (const char *name) const
 
 void csArchive::UnpackTime (ush zdate, ush ztime, tm & rtime) const
 {
+  memset (&rtime, 0, sizeof (rtime));
+
   rtime.tm_year = (((zdate >> 9) & 0x7f) + 80);
-  rtime.tm_mon = ((zdate >> 5) & 0x0f);
+  rtime.tm_mon = ((zdate >> 5) & 0x0f) - 1;
   rtime.tm_mday = (zdate & 0x1f);
 
   rtime.tm_hour = ((ztime >> 11) & 0x1f);
@@ -685,7 +687,7 @@ void csArchive::UnpackTime (ush zdate, ush ztime, tm & rtime) const
 void csArchive::PackTime (tm & ztime, ush & rdate, ush & rtime) const
 {
   rdate = (((ztime.tm_year - 80) & 0x7f) << 9)
-        | ((ztime.tm_mon & 0x0f) << 5)
+        | (((ztime.tm_mon & 0x0f) + 1) << 5)
         | (ztime.tm_mday & 0x1f);
   rtime = ((ztime.tm_hour & 0x1f) << 11)
         | ((ztime.tm_min & 0x3f) << 5)

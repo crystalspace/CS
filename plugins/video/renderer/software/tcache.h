@@ -29,8 +29,8 @@ class csTextureManagerSoftware;
 class csTextureMMSoftware;
 class csTexture;
 
-scfInterface iPolygonTexture;
-scfInterface iLightMap;
+struct iPolygonTexture;
+struct iLightMap;
 struct csPixelFormat;
 
 /// Structure used by the texture cache routines.

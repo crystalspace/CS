@@ -23,7 +23,9 @@
 
 #include "csutil/scf.h"
 
-SCF_INTERFACE (iOS2SystemDriver, 0, 0, 1) : public iBase
+SCF_VERSION (iOS2SystemDriver, 0, 0, 1);
+
+struct iOS2SystemDriver : public iBase
 {
   /// Get user settings
   virtual void GetExtSettings (int &oWindowX, int &oWindowY,

@@ -28,7 +28,7 @@
 #include "csengine/rview.h"
 #include "csobject/csobj.h"
 
-scfInterface iTextureHandle;
+struct iTextureHandle;
 
 /**
  * Vertex resulting from a tesselated curve.

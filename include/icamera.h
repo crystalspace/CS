@@ -21,8 +21,10 @@
 
 #include "csutil/scf.h"
 
+SCF_VERSION (iCamera, 0, 0, 1);
+
 /// temporary - subject to change
-SCF_INTERFACE (iCamera, 0, 0, 1) : public iBase
+struct iCamera : public iBase
 {
   ///
   virtual float GetAspect () = 0;

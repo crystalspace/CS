@@ -5,8 +5,10 @@
 #include "csutil/scf.h"
 #include "cssys/win32/iddetect.h"
 
+SCF_VERSION (iGraphics2DDDraw3, 0, 0, 1);
+
 /// iGraphics2DDDraw3 interface -- for win32 DDraw-specific properties.
-SCF_INTERFACE (iGraphics2DDDraw3, 0, 0, 1) : public iBase
+struct iGraphics2DDDraw3 : public iBase
 {
   ///
   virtual void GetDirectDrawDriver (LPDIRECTDRAW* lplpDirectDraw) = 0;

@@ -23,7 +23,15 @@
 
 struct csHighColorCacheData;
 
-SCF_INTERFACE (iLightMap, 0, 0, 1) : public iBase
+SCF_VERSION (iLightMap, 0, 0, 1);
+
+/**
+ * The lightmap interface.
+ * A lightmap is similar to a texture but contains just intensities,
+ * 256 levels from 0 to 255. This map is overlaid onto the texture
+ * to obtain darker or brighter portions of texture.
+ */
+struct iLightMap : public iBase
 {
   ///
   virtual unsigned char *GetMap (int nMap) = 0;

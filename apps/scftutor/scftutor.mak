@@ -69,11 +69,11 @@ scftutclean:
 	-$(RM) $(ZOO.EXE) $(DOG.DLL) $(WORM.DLL) $(OBJ.ZOO) $(OBJ.DOG) $(OBJ.WORM)
 
 ifdef DO_DEPEND
-depend: $(OUTOS)csscftut.dep
-$(OUTOS)csscftut.dep: $(SRC.REGSVR)
+depend: $(OUTOS)scftut.dep
+$(OUTOS)scftut.dep: $(SRC.REGSVR)
 	$(DO.DEP)
 else
--include $(OUTOS)csscftut.dep
+-include $(OUTOS)scftut.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -42,8 +42,8 @@ class csLightPatch;
 class Dumper;
 class csPolyTexture;
 class csPolygonSet;
-scfInterface iGraphics2D;
-scfInterface iGraphics3D;
+struct iGraphics2D;
+struct iGraphics3D;
 
 /**
  * If CS_POLY_MIPMAP is set for a polygon then mipmapping will be used.

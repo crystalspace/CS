@@ -25,10 +25,10 @@
 
 #include "csutil/scf.h"
 
-scfInterface iPolygonTexture;
-scfInterface iLightMap;
-scfInterface iTextureHandle;
-scfInterface iPolygonTexture;
+struct iPolygonTexture;
+struct iLightMap;
+struct iTextureHandle;
+struct iPolygonTexture;
 
 ///
 struct csHighColorCacheData

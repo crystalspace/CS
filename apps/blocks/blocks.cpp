@@ -47,10 +47,8 @@ csView* view = NULL;
 
 //------------------------------ We need the VFS plugin and the 3D engine -----
 
-REGISTER_STATIC_CLASS (csVFS, "crystalspace.kernel.vfs",
-  "Crystal Space Virtual File System plug-in")
-REGISTER_STATIC_CLASS (csWorld, "crystalspace.kernel.engine",
-  "Crystal Space 3D Engine plug-in")
+REGISTER_STATIC_LIBRARY (vfs)
+REGISTER_STATIC_LIBRARY (engine)
 
 //-----------------------------------------------------------------------------
 

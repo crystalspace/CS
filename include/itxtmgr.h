@@ -27,8 +27,10 @@ class csMatrix3;
 class csVector3;
 class csRect;
 
-scfInterface iImageFile;
-scfInterface iTextureHandle;
+struct iImageFile;
+struct iTextureHandle;
+
+SCF_VERSION (iTextureManager, 0, 0, 1);
 
 /**
  * This is the standard texture manager interface.
@@ -40,7 +42,7 @@ scfInterface iTextureHandle;
  * lookup tables related to the textures. Mipmap creation is
  * also done in this class.
  */
-SCF_INTERFACE (iTextureManager, 0, 0, 1) : public iBase
+struct iTextureManager : public iBase
 {
   /**
    * Initialize the texture system. This function must be called

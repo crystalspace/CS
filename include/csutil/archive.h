@@ -25,16 +25,21 @@
 #include "csutil/zip.h"
 #include "csutil/csstrvec.h"
 
+// Ugly Win32 hack
+#ifdef DeleteFile
+#  undef DeleteFile
+#endif
+
 /**
- * csArchive class that can be used to work with standard .ZIP format files.
+ * This class can be used to work with standard ZIP archives.
  * Constructor accepts a file name - if such a file is not found, it is
  * created. After this you can examine archive directory, read files,
  * delete or write files in archive.
  * <p>
- * Operation which changes archive file will be postponed until write_archive()
- * will be called. Before calling write_archive() you can do any number of
+ * Operations which changes archive file will be deferred until Flush()
+ * method is called. Before calling Flush() you can do any number of
  * deletions and writes, but read operations will not be affected by
- * these until write_archive() will be called.
+ * these until Flush() will be called.
  * <p>
  * Known quirks:
  * <ul>
@@ -125,18 +130,18 @@ public:
   /// Close the archive.
   ~csArchive ();
 
-  /// Show a directory listing of the archive.
+  /// Type a directory listing of the archive to the console.
   void Dir () const;
 
   /**
    * Create a new file in the archive. If the file already exists
    * it will be overwritten. Calling NewFile twice with same filename
-   * without calling Flush() between will cause unpredictable results.
-   *
+   * without calling Flush() inbetween will cause unpredictable results.
+   * <p>
    * Returns NULL if not succesful. Otherwise it returns a pointer
    * that can be passed to 'Write' routine. You won't see any changes
    * to archive until 'Flush' will be called.
-   *
+   * <p>
    * 'size' is the _advisory_ file size. There is no problem if you will
    * write more or less bytes, its just a matter of performance - if you
    * set the right size, archive manager will have to allocate memory
@@ -147,7 +152,7 @@ public:
 
   /**
    * Delete a file from the archive. You won't see any changes
-   * to archive until 'write_archive' will be called.
+   * to archive until 'Flush' will be called.
    */
   bool DeleteFile (const char *name);
 

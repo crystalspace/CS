@@ -41,7 +41,7 @@
 
 class TextureCache;
 
-scfInterface iGraphics2D;
+struct iGraphics2D;
 class TextureCache;
 class TextureCache16;
 class csIniFile;
@@ -433,7 +433,7 @@ public:
   };
 
   ///------------ iHaloRasterizer interface implementation ------------------
-  scfInterface csSoftHalo : public iHaloRasterizer
+  struct csSoftHalo : public iHaloRasterizer
   {
     DECLARE_EMBEDDED_IBASE (csGraphics3DSoftware);
     virtual csHaloHandle CreateHalo (float r, float g, float b);
@@ -441,7 +441,7 @@ public:
     virtual void DrawHalo (csVector3* pCenter, float fIntensity, csHaloHandle haloInfo);
     virtual bool TestHalo (csVector3* pCenter);
   } scfiHaloRasterizer;
-  friend scfInterface csSoftHalo;
+  friend struct csSoftHalo;
 
   /// Create a halo of the specified color. This must be destroyed using DestroyHalo.
   virtual csHaloHandle CreateHalo (float r, float g, float b);
@@ -455,7 +455,7 @@ public:
   virtual bool TestHalo (csVector3* pCenter);
 
   ///------------------- iConfig interface implementation -------------------
-  scfInterface csSoftConfig : public iConfig
+  struct csSoftConfig : public iConfig
   {
     DECLARE_EMBEDDED_IBASE (csGraphics3DSoftware);
     virtual int GetOptionCount ();
@@ -463,7 +463,7 @@ public:
     virtual bool SetOption (int id, csVariant* value);
     virtual bool GetOption (int id, csVariant* value);
   } scfiConfig;
-  friend scfInterface csSoftConfig;
+  friend struct csSoftConfig;
 };
 
 #endif // __SOFT_G3D_H__

@@ -62,7 +62,7 @@ Here is an example of an interface:
 </p>
 
 <pre>
-struct IDog
+struct iDog
 {
   virtual bool IsAlive () = 0;
   virtual char *GetName () = 0;
@@ -89,7 +89,7 @@ Now let's write <i>a particular implementation</i> of the above interface.
 <pre>
 #include "idog.h"
 
-class MyDog : public IDog
+class MyDog : public iDog
 {
   ... member functions/variables go here ...
 
@@ -136,7 +136,7 @@ Here is how we do it:
 </p>
 
 <pre>
-static IDog *Create_IDog ()
+static iDog *Create_iDog ()
 {
   return new MyDog ();
 }
@@ -144,15 +144,15 @@ static IDog *Create_IDog ()
 
 <p>
 Okay, we did it. Now back to the client: to work with a object that implements
-the IDog interface we need to load the shared library, get a pointer to
+the iDog interface we need to load the shared library, get a pointer to
 Create_MyDog function, call it and get a new MyDog object. Further we work
-with this pointer as if it were pointing an IDog object:
+with this pointer as if it were pointing an iDog object:
 </p>
 
 <pre>
 handle = LoadLibrary ("libdog.so");
-IDog (*Create_IDog) () = GetLibrarySymbol ("Create_IDog");
-IDog *dog = Create_IDog ();
+iDog (*Create_iDog) () = GetLibrarySymbol ("Create_IDog");
+iDog *dog = Create_iDog ();
 printf ("Doggy's name is %s\n", dog->GetName ());
 dog->Barf (100);
 ...
@@ -175,15 +175,9 @@ it (inline macros defined in "csscf.h" are enough).
 </p>
 
 <p>
-The SCF header file provides a macro called "scfInterface" that expands to
-"struct". You should use this "keyword" whenever you define an interface,
-because the header files will be easier to understand.
-<p>
-
-<p>
 To simplify things, all exported classes are supposed to be derived from
-some basical interface called IBase. Thus, any interface is supposed to
-implement some basical functionality. Currently IBase defines three interface
+some basical interface called iBase. Thus, any interface is supposed to
+implement some basical functionality. Currently iBase defines three interface
 functions:
 </p>
 
@@ -195,7 +189,7 @@ functions:
   <dd>Call this function to decrement the object's reference count. When
   reference count reaches zero, the object is automatically deleted
   (if it is not an interface embedded within another object, see below).
-  <dt>IBase *QueryInterface (const char *iItfName, int iVersion);
+  <dt>iBase *QueryInterface (const char *iItfName, int iVersion);
   <dd>This method will return a pointer to an interface or to an embedded
   interface (see the description of embedded interfaces below).
 </dl>
@@ -204,12 +198,12 @@ functions:
 To simplify things even more, "csscf.h" file provides several macros that
 provide default declaration and default implementation of these three methods.
 DECLARE_IBASE macro will declare above three methods within any class definition
-that is derived from IBase. The IMPLEMENT_IBASE will add the default
+that is derived from iBase. The IMPLEMENT_IBASE will add the default
 implementation of these function to your module. Example:
 </p>
 
 <pre>
-scfInterface ITest : public IBase
+struct iTest : public iBase
 {
   ...
 };
@@ -266,7 +260,7 @@ increment reference count for Object and ClassFactory.
 You also should call the CONSTRUCT_IBASE(Parent) inside your class constructor,
 this macro will initialize scfRefCount to zero and scfParent to the value you
 pass to this macro. In fact, constructor of any class should receive at least
-one argument (IBase *) which should then be passed to CONSTRUCT_IBASE macro.
+one argument (iBase *) which should then be passed to CONSTRUCT_IBASE macro.
 </p>
 
 <h2>Classes implementing multiple interfaces</h2>
@@ -298,7 +292,7 @@ public:
 };
 
 <p>
-When implementing the methods imposed by IBase interface you should use
+When implementing the methods imposed by iBase interface you should use
 IMPLEMENT_INTERFACE() macro once for each implemented interface:
 </p>
 
@@ -347,17 +341,17 @@ Note that you don't need to use some "special" names for classes; use anything
 you want (i.e. the "My" prefix is not required; you could name above class
 "GraphixThreeDeeImplementation", this is true for embedded classes as well).
 But most macros that have the word "EMBEDDED" within their names (see below)
-relies on embedded object names to be scf##InterfaceName, that is, scfIBase,
-scfITest, scfIGraphics3D and so on.
+relies on embedded object names to be scf##InterfaceName, that is, scfiBase,
+scfiTest, scfiGraphics3D and so on.
 </p>
 
 <p>
-When you declare the IBase methods within an embedded class, you can use
+When you declare the iBase methods within an embedded class, you can use
 the DECLARE_EMBEDDED_IBASE(OuterClass) macro instead of DECLARE_IBASE.
 In this case the scfParent member will be of "OuterClass *" type rather than
-"IBase *"; this will allow member class to talk with his parent directly,
+"iBase *"; this will allow member class to talk with his parent directly,
 thus allowing for direct member variables/functions access. In fact,
-DECLARE_IBASE macro expands to DECLARE_EMBEDDED_IBASE(IBase).
+DECLARE_IBASE macro expands to DECLARE_EMBEDDED_IBASE(iBase).
 </p>
 
 <p>
@@ -382,7 +376,7 @@ member variables to appropiate values (zero and "this"). Here is how we do it:
 </p>
 
 <pre>
-MyGraphics3D::MyGraphics3D (IBase *iParent)
+MyGraphics3D::MyGraphics3D (iBase *iParent)
 {
   CONSTRUCT_IBASE (iParent);
   CONSTRUCT_EMBEDDED_IBASE (IHalo);
@@ -394,26 +388,27 @@ MyGraphics3D::MyGraphics3D (IBase *iParent)
 <p>
 You should not call CONSTRUCT_IBASE within embedded object's constructor
 (in fact, it can not have a constructor at all) since all work needed to
-initialize IBase fields is done in carrier object's constructor.
+initialize iBase fields is done in carrier object's constructor.
 </p>
 
 <h2>Interface versions</h2>
 
 <p>
-Unlike COM, SCF supports interface versions. That is, a shared library could
+Unlike COM, SCF supports interface versions. That is, a shared class could
 implement verion 0.3.6 of given interface, and if client requests that interface
 of a version lower or equal than 0.3.6, a correct interface pointer is returned.
-Inside each "i###.h" file you define a macro called VERSION_I### that defines
-the current version of given interface. To correctly support different versions
-of interfaces you should follow the following guidelines:
+For this to work you need to define inside each "i###.h" file a constant called
+VERSION_i### that defines the current version of given interface. To correctly
+support different versions of interfaces you should follow the following
+guidelines:
 </p>
 
 <ul>
   <li>Do not insert new methods into existing interfaces. Instead, you should
   append them after last defined method.
   <li>If your change made the interface invalid for clients that expect
-  older versions of interfaces, increase the major version number, and
-  set minor and micro versions to zero.
+  older versions of interfaces (for example, you broke the previous rule),
+  increase the major version number, and set minor and micro versions to zero.
   <li>If your changes are relatively minor, but you do a major release,
   increase the minor version number and drop the micro version to zero.
   <li>If you're in developement process, and did a minor change to the
@@ -436,25 +431,14 @@ use this function.
 </p>
 
 <p>
-For easier definition of versioned interfaces you can use the SCF_INTERFACE
-macro instead of scfInterface. This way:
+For easier definition of versioned interfaces you can use the SCF_VERSION
+macro. This way:
 </p>
 
 <pre>
-SCF_INTERFACE (MyGraphics3D, 0, 0, 1) : public IBase
-{
-  ...
-}
-</pre>
+SCF_VERSION (MyGraphics3D, 0, 0, 1);
 
-<p>
-The above is equivalent to
-</p>
-
-<pre>
-#define VERSION_MyGraphics3D SCF_VERSION (0, 0, 1)
-
-scfInterface MyGraphics3D : public IBase
+struct MyGraphics3D : public iBase
 {
   ...
 }
@@ -516,7 +500,7 @@ if (!halo)
 <p>
 Here is a completely working example. It implements an shared class that
 has a base and an embedded interface. Here are the interface files for the
-IDog interface (the base interface of our class) and the IName interface (the
+iDog interface (the base interface of our class) and the iName interface (the
 interface embedded into our class):
 </p>
 
@@ -525,9 +509,9 @@ interface embedded into our class):
 #include "csscf.h"
 
 // the version number of our interface
-#define VERSION_IDog SCF_VERSION (0, 0, 1)
+SCF_VERSION (iDog, 0, 0, 1)
 
-scfInterface IDog : public IBase
+struct iDog : public iBase
 {
   virtual void Walk () = 0;
   virtual void Barf (char *iWhat) = 0;
@@ -539,9 +523,9 @@ scfInterface IDog : public IBase
 #include "csscf.h"
 
 // the version number of our interface
-#define VERSION_IName SCF_VERSION (0, 0, 1)
+SCF_VERSION (iName, 0, 0, 1);
 
-scfInterface IName : public IBase
+struct iName : public iBase
 {
   virtual char *GetName () = 0;
   virtual void SetName (char *iName) = 0;
@@ -560,25 +544,25 @@ Now here is the implementation of a class that provides both above interfaces:
 #include &lt;string.h&gt;
 #include &lt;stdlib.h&gt;
 
-class csDog : public IDog
+class csDog : public iDog
 {
   char *Name;
 
   // Embedded interface
-  class csName : public IName
+  class csName : public iName
   {
   public:
     DECLARE_EMBEDDED_IBASE (csDog);
 
     virtual char *GetName ();
     virtual void SetName (char *iName);
-  } scfIName;
+  } scfiName;
   friend class csName;
 
 public:
   DECLARE_IBASE;
 
-  csDog (IBase *iParent);
+  csDog (iBase *iParent);
   virtual void Walk ();
   virtual void Barf (char *iWhat);
 };
@@ -586,14 +570,14 @@ public:
 //--------------- implementation ----------------
 
 IMPLEMENT_IBASE (csDog)
-  IMPLEMENTS_INTERFACE (IDog)
-  IMPLEMENTS_EMBEDDED_INTERFACE (IName)
+  IMPLEMENTS_INTERFACE (iDog)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iName)
 IMPLEMENT_IBASE_END
 
-csDog::csDog (IBase *iParent)
+csDog::csDog (iBase *iParent)
 {
   CONSTRUCT_IBASE (iParent);
-  CONSTRUCT_EMBEDDED_IBASE (scfIName);
+  CONSTRUCT_EMBEDDED_IBASE (scfiName);
   Name = NULL;
 }
 
@@ -607,10 +591,10 @@ void csDog::Barf (char *iWhat)
   printf ("I'm %s: barf, barf, %s\n", Name, iWhat);
 }
 
-// IName interface for dog
+// iName interface for dog
 
 IMPLEMENT_EMBEDDED_IBASE (csDog::csName)
-  IMPLEMENTS_INTERFACE (IName)
+  IMPLEMENTS_INTERFACE (iName)
 IMPLEMENT_IBASE_END
 
 char *csDog::csName::GetName ()
@@ -657,14 +641,14 @@ int main ()
   csIniFile config ("scf.cfg");
   scfInitialize (&config);
 
-  IDog *dog = CREATE_INSTANCE (csDog, IDog);
+  iDog *dog = CREATE_INSTANCE (csDog, iDog);
   if (!dog)
     fprintf (stderr, "No csDog shared class!\n");
   else
   {
-    IName *name = QUERY_INTERFACE (dog, IName);
+    iName *name = QUERY_INTERFACE (dog, iName);
     if (!name)
-      fprintf (stderr, "dog does not support IName interface!\n");
+      fprintf (stderr, "dog does not support iName interface!\n");
     else
     {
       name->SetName ("Droopy");

@@ -22,25 +22,29 @@
 #include "csutil/scf.h"
 #include "csgeom/math3d.h"
 
-scfInterface iLightMap;
-scfInterface iPolygonTexture;
-scfInterface iTextureContainer;
-scfInterface iTextureMap;
-scfInterface iTextureHandle;
+struct iLightMap;
+struct iPolygonTexture;
+struct iTextureContainer;
+struct iTextureMap;
+struct iTextureHandle;
 
 // forward declarations
-scfInterface iPolygon3D;
-scfInterface iPolygonTexture;
+struct iPolygon3D;
+struct iPolygonTexture;
+
+SCF_VERSION (iPolygonSet, 0, 0, 1);
 
 /// temporary - subject to change
-SCF_INTERFACE (iPolygonSet, 0, 0, 1) : public iBase
+struct iPolygonSet : public iBase
 {
   ///
   virtual const char *GetObjectName () = 0;
 };
 
+SCF_VERSION (iPolygon3D, 0, 0, 1);
+
 /// temporary - subject to change
-SCF_INTERFACE (iPolygon3D, 0, 0, 1) : public iBase
+struct iPolygon3D : public iBase
 {
   ///
   virtual const char *GetObjectName () = 0;
@@ -58,8 +62,10 @@ SCF_INTERFACE (iPolygon3D, 0, 0, 1) : public iBase
   virtual iLightMap *GetLightMap () = 0;
 };
 
+SCF_VERSION (iPolygonTexture, 0, 0, 1);
+
 /// temporary - subject to change
-SCF_INTERFACE (iPolygonTexture, 0, 0, 1) : public iBase
+struct iPolygonTexture : public iBase
 {
   ///
   virtual iTextureHandle *GetTextureHandle () = 0;

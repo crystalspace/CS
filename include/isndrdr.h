@@ -29,12 +29,14 @@
  * The standard implementation is ISoundDriver.
  */
 
-scfInterface iSoundListener;
-scfInterface iSoundSource;
-scfInterface iSoundBuffer;
+struct iSoundListener;
+struct iSoundSource;
+struct iSoundBuffer;
 class csSoundData;
 
-SCF_INTERFACE (iSoundRender, 0, 0, 1) : public iBase
+SCF_VERSION (iSoundRender, 0, 0, 1);
+
+struct iSoundRender : public iBase
 {
 public:
   /// Open the sound render

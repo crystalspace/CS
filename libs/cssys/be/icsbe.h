@@ -27,7 +27,9 @@
 class BMessage;
 class iTextureHandle;
 
-SCF_INTERFACE (iBeLibSystemDriver, 0, 0, 1) : public iBase
+SCF_VERSION (iBeLibSystemDriver, 0, 0, 1);
+
+struct iBeLibSystemDriver : public iBase
 {
   virtual void ProcessUserEvent (BMessage*) = 0;
   virtual bool SetMouseCursor (csMouseCursorID shape, iTextureHandle*) = 0;

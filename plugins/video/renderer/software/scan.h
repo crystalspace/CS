@@ -28,7 +28,7 @@
 class csTexture;
 class csTextureMMSoftware;
 class csGraphics3DSoftware;
-scfInterface iPolygonTexture;
+struct iPolygonTexture;
 typedef unsigned char RGB8map[256];	// do we need entire soft_txt.h?
 
 //---//---//---//---//---//---//---//---//---//---//---//---// Constants //---//

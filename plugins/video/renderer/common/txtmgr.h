@@ -31,7 +31,7 @@ class ImageColorInfo;
 class csTextureMM;
 class csTextureManager;
 class csTexture;
-scfInterface iImageFile;
+struct iImageFile;
 
 #define MIPMAP_UGLY 0
 #define MIPMAP_DEFAULT 1

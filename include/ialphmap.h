@@ -20,9 +20,11 @@
 #ifndef __IALPHAIMAGE_H__
 #define __IALPHAIMAGE_H__
 
+SCF_VERSION (iAlphaMapFile, 0, 0, 1);
+
 #include "csutil/scf.h"
 
-SCF_INTERFACE (iAlphaMapFile, 0, 0, 1) : public iBase
+struct iAlphaMapFile : public iBase
 {
   ///
   virtual UByte *GetAlphaMapData () = 0;

@@ -187,6 +187,11 @@ IMPLEMENT_IBASE_END
 
 IMPLEMENT_FACTORY (csWorld)
 
+EXPORT_CLASS_TABLE (engine)
+  EXPORT_CLASS_DEP (csWorld, "crystalspace.engine.core",
+    "Crystal Space 3D Engine", "crystalspace.kernel., crystalspace.graphics3d.")
+EXPORT_CLASS_TABLE_END
+
 csWorld::csWorld (iBase *iParent) : csObject (), start_vec (0, 0, 0)
 {
   CONSTRUCT_IBASE (iParent);

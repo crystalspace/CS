@@ -29,7 +29,7 @@ class csTextureHandle;
 class csPolygon3D;
 class CLights;
 class csThingTemplate;
-scfInterface iGraphics3D;
+struct iGraphics3D;
 
 /**
  * If CS_ENTITY_CONVEX is set then this entity is convex (what did

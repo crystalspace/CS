@@ -53,7 +53,9 @@ enum SoundEnvironment
   ENVIRONMENT_PSYCHOTIC
 };
 
-SCF_INTERFACE (iSoundListener, 0, 0, 1) : public iBase
+SCF_VERSION (iSoundListener, 0, 0, 1);
+
+struct iSoundListener : public iBase
 {
   /// Set direction of listener (front and top 3d vectors)
   virtual void SetDirection (float fx, float fy, float fz, float tx, float ty, float tz) = 0;

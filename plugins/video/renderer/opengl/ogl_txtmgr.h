@@ -23,7 +23,7 @@
 #include "cs3d/common/txtmgr.h"
 #include "itexture.h"
 
-scfInterface iImageFile;
+struct iImageFile;
 
 // Colors are encoded in a 16-bit short using the following
 // distribution (only for 8-bit mode):

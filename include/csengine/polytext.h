@@ -29,7 +29,7 @@ class csPolyPlane;
 class csLightMap;
 class csLightPatch;
 class Dumper;
-scfInterface iTextureHandle;
+struct iTextureHandle;
 struct LightInfo;
 
 /// The default sub-texture size.

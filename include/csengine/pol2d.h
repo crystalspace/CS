@@ -28,8 +28,8 @@ class csPolygon3D;
 class csPolyPlane;
 class csClipper;
 class csRenderView;
-scfInterface iGraphics2D;
-scfInterface iGraphics3D;
+struct iGraphics2D;
+struct iGraphics3D;
 
 /**
  * The following class represents a 2D polygon (the 2D coordinates are

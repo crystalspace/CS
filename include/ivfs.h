@@ -23,8 +23,9 @@
 #include "csutil/scf.h"
 #include "iplugin.h"
 
-// forward declaration
-scfInterface iStrVector;
+// forward declarations
+struct iStrVector;
+struct tm;
 
 /// Composite path divider
 #define VFS_PATH_DIVIDER        ','
@@ -55,8 +56,10 @@ scfInterface iStrVector;
 /// An error occured during reading or writing data
 #define VFS_STATUS_IOERROR	5
 
+SCF_VERSION (iFile, 0, 0, 1);
+
 /// A replacement for FILE type in the virtual file space
-SCF_INTERFACE (iFile, 0, 0, 1) : public iBase
+struct iFile : public iBase
 {
   /// Query file name (in VFS)
   virtual const char *GetName () = 0;
@@ -81,10 +84,12 @@ SCF_INTERFACE (iFile, 0, 0, 1) : public iBase
   virtual char *GetAllData () = 0;
 };
 
-//Hack for Win32
+// Ugly Win32 hack
 #ifdef DeleteFile
-#undef DeleteFile
+#  undef DeleteFile
 #endif
+
+SCF_VERSION (iVFS, 0, 0, 2);
 
 /**
  * The Virtual Filesystem Class is intended to be the only way for Crystal
@@ -110,7 +115,7 @@ SCF_INTERFACE (iFile, 0, 0, 1) : public iBase
  * only a list of file names; no fancy things like file size, time etc
  * (file size can be determined after opening it for reading).
  */
-SCF_INTERFACE (iVFS, 0, 0, 1) : public iPlugIn
+struct iVFS : public iPlugIn
 {
   /// Initialize the Virtual File System plugin
   virtual bool Initialize (iSystem *iSys) = 0;
@@ -161,6 +166,11 @@ SCF_INTERFACE (iVFS, 0, 0, 1) : public iPlugIn
 
   /// Save current configuration back into configuration file
   virtual bool SaveMounts (const char *FileName) = 0;
+
+  /// Query file date/time
+  virtual bool GetFileTime (const char *FileName, tm &ztime) const = 0;
+  /// Set file date/time
+  virtual bool SetFileTime (const char *FileName, tm &ztime) = 0;
 };
 
 #endif // __IVFS_H__

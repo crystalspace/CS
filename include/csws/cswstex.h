@@ -23,8 +23,8 @@
 #include "csgfxldr/csimage.h"
 #include "csutil/csvector.h"
 
-scfInterface iTextureHandle;
-scfInterface iTextureManager;
+struct iTextureHandle;
+struct iTextureManager;
 
 /**
  * Texture representation within the windowing system.

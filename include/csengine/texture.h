@@ -24,8 +24,8 @@
 #include "csgfxldr/boxfilt.h"
 #include "igraph2d.h"
 
-scfInterface iTextureHandle;
-scfInterface iImageFile;
+struct iTextureHandle;
+struct iImageFile;
 
 /**
  * csTextureHandle represents a texture and its link

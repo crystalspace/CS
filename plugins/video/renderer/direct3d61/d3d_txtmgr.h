@@ -24,7 +24,7 @@
 #include "itexture.h"
 
 class csTextureManagerDirect3D;
-scfInterface iImageFile;
+struct iImageFile;
 
 // Colors are encoded in a 16-bit short using the following
 // distribution (only for 8-bit mode):

@@ -23,12 +23,14 @@
 
 #include "csutil/scf.h"
 
+SCF_VERSION (iNetworkManager, 0, 0, 1);
+
 /**
  * This is the network manager interface for CS.
  * All network drivers must implement this interface.
  * The standard implementation is csNetworkManagerNull.
  */
-SCF_INTERFACE (iNetworkManager, 0, 0, 1) : public iBase
+struct iNetworkManager : public iBase
 {
   /// Open the network manager (should not be called by user)
   virtual bool Open () = 0;

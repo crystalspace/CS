@@ -48,12 +48,14 @@ struct csOptionDescription
   csVariantType type;	// Type to use for this option.
 };
 
+SCF_VERSION (iConfig, 0, 0, 1);
+
 /**
  * Interface to a configurator object. If a SCF module
  * has an object implementing this interface then this can
  * be used to query/set configuration options.
  */
-SCF_INTERFACE (iConfig, 0, 0, 1) : public iBase
+struct iConfig : public iBase
 {
   ///
   virtual int GetOptionCount () = 0;

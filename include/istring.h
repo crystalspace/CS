@@ -22,8 +22,10 @@
 
 #include "csutil/scf.h"
 
+SCF_VERSION (iString, 0, 0, 1);
+
 /// This is a SCF-compatible interface for csString
-SCF_INTERFACE (iString, 0, 0, 1) : public iBase
+struct iString : public iBase
 {
   /// Set string capacity to NewSize characters (plus one for ending NULL)
   virtual void SetSize (size_t NewSize) = 0;

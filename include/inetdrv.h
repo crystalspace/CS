@@ -71,12 +71,14 @@ struct csNetworkCaps
 /// This is a connection handle
 typedef unsigned int csNetHandle;
 
+SCF_VERSION (iNetworkDriver, 0, 0, 1);
+
 /**
  * This is the network interface for CS.
  * All network drivers must implement this interface.
  * The standard implementation is csNetworkDriverNull.
  */
-SCF_INTERFACE (iNetworkDriver, 0, 0, 1) : public iBase
+struct iNetworkDriver : public iBase
 {
 public:
 

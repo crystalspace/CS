@@ -28,6 +28,49 @@
 // frog is always statically linked
 REGISTER_STATIC_LIBRARY (Frog)
 
+// This function will clone given object, do something with him
+// and finally destroy
+void Clone (iBase *iObject)
+{
+  printf ("--- cloning the object\n");
+  iFactory *factory = QUERY_INTERFACE (iObject, iFactory);
+  if (!factory)
+  {
+    fprintf (stderr, "Object does not support the iFactory interface!\n");
+    return;
+  }
+  printf ("Class description: %s\n", factory->QueryDescription ());
+
+  // Create a new instance of the class
+  iBase *newobj = (iBase *)factory->CreateInstance ();
+
+  // Release the factory interface of the parent - we don't need it anymore
+  factory->DecRef ();
+
+  if (!newobj)
+  {
+    fprintf (stderr, "Failed to create a object of the same type!\n");
+    return;
+  }
+
+  // Since the refcount of a object returned by iFactory::CreateInstance
+  // is zero, we should increment it
+  newobj->IncRef ();
+
+  // Check if the object supports the iName interface
+  iName *name = QUERY_INTERFACE (newobj, iName);
+  if (name)
+  {
+    printf ("Name of the object is [%s], setting name to [Clone]\n",
+      name->GetName ());
+    name->SetName ("Clone");
+    name->DecRef ();
+  }
+
+  // Delete the clone
+  newobj->DecRef ();
+}
+
 int main ()
 {
 #if 0
@@ -57,6 +100,9 @@ int main ()
       printf ("Dog's name is %s\n", name->GetName ());
       name->DecRef ();
     }
+
+    Clone (dog);
+
     dog->DecRef ();
   }
 
@@ -80,6 +126,8 @@ int main ()
       worm2->DecRef ();
     }
 
+    Clone (worm);
+
     worm->DecRef ();
   }
 
@@ -101,6 +149,8 @@ int main ()
       printf ("Frog's name is %s\n", name->GetName ());
       name->DecRef ();
     }
+
+    Clone (frog);
 
     frog->DecRef ();
   }

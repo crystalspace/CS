@@ -24,7 +24,9 @@
 
 #include "csutil/scf.h"
 
-SCF_INTERFACE (iDosSystemDriver, 0, 0, 1) : public iBase
+SCF_VERSION (iDosSystemDriver, 0, 0, 1);
+
+struct iDosSystemDriver : public iBase
 {
   /// Enable or disable text-mode CsPrintf
   virtual void EnablePrintf (bool Enable) = 0;

@@ -182,6 +182,11 @@ public:
   /// Initialize the Virtual File System
   virtual bool Initialize (iSystem *iSys);
 
+  /// Query file local date/time
+  virtual bool GetFileTime (const char *FileName, tm &ztime) const;
+  /// Set file local date/time
+  virtual bool SetFileTime (const char *FileName, tm &ztime);
+
   /// Read and set the VFS config file
   bool ReadConfig (csIniFile *Config);
 

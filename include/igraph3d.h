@@ -27,10 +27,10 @@ class csMatrix3;
 class csVector3;
 class csRect;
 
-scfInterface iGraphics2D;
-scfInterface iPolygonTexture;
-scfInterface iTextureManager;
-scfInterface iTextureHandle;
+struct iGraphics2D;
+struct iPolygonTexture;
+struct iTextureManager;
+struct iTextureHandle;
 
 #define CS_FOG_FRONT		0
 #define CS_FOG_BACK		1
@@ -333,13 +333,15 @@ struct csFog
   float blue;
 };
 
+SCF_VERSION (iGraphics3D, 0, 0, 1);
+
 /**
  * This is the standard 3D graphics interface.
  * All 3D graphics rasterizer servers for Crystal Space
  * should implement this interface, as well as the iGraphics2D interface.
  * The standard implementation is csGraphics3DSoftware.
  */
-SCF_INTERFACE (iGraphics3D, 0, 0, 1) : public iPlugIn
+struct iGraphics3D : public iPlugIn
 {
   /// Initialize the 3D graphics system.
   virtual bool Initialize (iSystem *pSystem) = 0;

@@ -39,7 +39,7 @@ class csSkeleton;
 class csSkeletonState;
 class csSprite3D;
 class csBspContainer;
-scfInterface iTextureHandle;
+struct iTextureHandle;
 
 /**
  * A frame for 3D sprite animation.

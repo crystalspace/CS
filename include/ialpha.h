@@ -21,10 +21,12 @@
 
 #include "csutil/scf.h"
 
+SCF_VERSION (iAlphaMapHandle, 0, 0, 1);
+
 /** 
  * An alpha-map handle.
  */
-SCF_INTERFACE (iAlphaMapHandle, 0, 0, 1) : public iBase
+struct iAlphaMapHandle : public iBase
 {
 };
 

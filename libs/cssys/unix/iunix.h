@@ -23,7 +23,9 @@
 
 typedef void (*LoopCallback) (void *param);
 
-SCF_INTERFACE (iUnixSystemDriver, 0, 0, 1) : public iBase
+SCF_VERSION (iUnixSystemDriver, 0, 0, 1);
+
+struct iUnixSystemDriver : public iBase
 {
   /// Get user settings
   virtual void GetExtSettings (int &oSimDepth, bool &oUseSHM, bool &oHardwareCursor) = 0;

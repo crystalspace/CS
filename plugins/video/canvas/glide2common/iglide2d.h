@@ -21,13 +21,15 @@
 
 #include "csutil/scf.h"
 
+SCF_VERSION (iGraphics2DGlide, 0, 0, 1);
+
 /**
  * iGraphics2DGlide interface -- for Glide-specific properties.
  * This interface should be implemented by each 2D Glide driver
  * in order for 3D driver to be able to query for specific
  * properties of the 2D driver.
  */
-SCF_INTERFACE (iGraphics2DGlide, 0, 0, 1) : public iBase
+struct iGraphics2DGlide : public iBase
 {
 #if defined(OS_WIN32)
   /// Query the handle of window

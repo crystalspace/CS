@@ -21,11 +21,13 @@
 
 #include "csutil/scf.h"
 
-scfInterface iSystem;
+struct iSystem;
+
+SCF_VERSION (iScript, 0, 0, 1);
 
 /**
  */
-SCF_INTERFACE (iScript, 0, 0, 1) : public iBase
+struct iScript : public iBase
 {
   virtual bool Initialize (iSystem *iSys) = 0;
   virtual bool RunText(const char *iStr)=0;

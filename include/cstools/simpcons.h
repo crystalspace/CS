@@ -23,7 +23,7 @@
 #include "cssys/console.h"
 #include "csutil/scf.h"
 
-scfInterface iTextureManager;
+struct iTextureManager;
 
 class csRect;
 class csIniFile;

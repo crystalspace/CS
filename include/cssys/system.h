@@ -35,12 +35,12 @@ class csMouseDriver;
 class csConsole;
 class csIniFile;
 
-scfInterface iGraphics3D;
-scfInterface iGraphics2D;
-scfInterface iNetworkDriver;
-scfInterface iNetworkManager;
-scfInterface iSoundRender;
-scfInterface iConfig;
+struct iGraphics3D;
+struct iGraphics2D;
+struct iNetworkDriver;
+struct iNetworkManager;
+struct iSoundRender;
+struct iConfig;
 
 /**
  * This is the interface to operating system.<p>
@@ -389,6 +389,10 @@ public:
   virtual const char *GetOptionCL (const char *iName, int iIndex = 0);
   /// Query a filename specified on the commandline (that is, without leading '-')
   virtual const char *GetNameCL (int iIndex = 0);
+  /// Add a command-line option to the command-line option array
+  virtual void AddOptionCL (const char *iName, const char *iValue);
+  /// Add a command-line name to the command-line names array
+  virtual void AddNameCL (const char *iName);
 };
 
 // Shortcuts for compatibility

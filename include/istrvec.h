@@ -22,8 +22,10 @@
 
 #include "csutil/scf.h"
 
+SCF_VERSION (iStrVector, 0, 0, 1);
+
 /// This is a SCF-compatible interface for csStrVector
-SCF_INTERFACE (iStrVector, 0, 0, 1) : public iBase
+struct iStrVector : public iBase
 {
   /// Query array length
   virtual int Length () const = 0;

@@ -26,7 +26,7 @@
 #include "igraph2d.h"
 
 class AlphaMapFile;
-scfInterface iAlphaMapHandle;
+struct iAlphaMapHandle;
 
 /**
  * csAlphaMapHandle implements IAlphaMapHandle.

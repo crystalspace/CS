@@ -18,6 +18,8 @@
 */
 
 #include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #define SYSDEF_PATH
 #define SYSDEF_DIR
@@ -236,6 +238,14 @@ public:
   bool Delete (const char *Suffix);
   // Does file exists?
   bool Exists (const char *Suffix);
+  // Query date/time
+  bool GetFileTime (const char *Suffix, tm &ztime) const;
+  // Set date/time
+  bool SetFileTime (const char *Suffix, tm &ztime);
+
+private:
+  // Find a file either on disk or in archive - in this node only
+  bool FindFile (const char *Suffix, char *RealPath, csArchive *&Archive) const;
 };
 
 // The global archive cache
@@ -895,7 +905,7 @@ iFile *VfsNode::Open (int Mode, const char *FileName)
   return f;
 }
 
-bool VfsNode::Delete (const char *Suffix)
+bool VfsNode::FindFile (const char *Suffix, char *RealPath, csArchive *&Archive) const
 {
   // Look through all RPathV's for file or directory
   for (int i = 0; i < RPathV.Length (); i++)
@@ -905,11 +915,10 @@ bool VfsNode::Delete (const char *Suffix)
     {
       // rpath is a directory
       size_t rl = strlen (rpath);
-      size_t sl = strlen (Suffix);
-      char fname [MAXPATHLEN];
-      memcpy (fname, rpath, rl);
-      memcpy (fname + rl, Suffix, sl + 1);
-      if (unlink (fname) == 0)
+      memcpy (RealPath, rpath, rl);
+      strcpy (RealPath + rl, Suffix);
+      Archive = NULL;
+      if (access (RealPath, F_OK) == 0)
         return true;
     }
     else
@@ -929,51 +938,81 @@ bool VfsNode::Delete (const char *Suffix)
 
       VfsArchive *a = (VfsArchive *)ArchiveCache [idx];
       a->UpdateTime ();
-      if (a->DeleteFile (Suffix))
+      if (a->FileExists (Suffix, NULL))
+      {
+        Archive = a;
+        strcpy (RealPath, Suffix);
         return true;
+      }
     }
   }
   return false;
 }
 
+bool VfsNode::Delete (const char *Suffix)
+{
+  char fname [MAXPATHLEN + 1];
+  csArchive *a;
+  if (!FindFile (Suffix, fname, a))
+    return false;
+
+  if (a)
+    return a->DeleteFile (fname);
+  else
+    return (unlink (fname) == 0);
+}
+
 bool VfsNode::Exists (const char *Suffix)
 {
-  // Look through all RPathV's for file or directory
-  for (int i = 0; i < RPathV.Length (); i++)
+  char fname [MAXPATHLEN + 1];
+  csArchive *a;
+  return FindFile (Suffix, fname, a);
+}
+
+bool VfsNode::GetFileTime (const char *Suffix, tm &ztime) const
+{
+  char fname [MAXPATHLEN + 1];
+  csArchive *a;
+  if (!FindFile (Suffix, fname, a))
+    return false;
+
+  if (a)
   {
-    char *rpath = (char *)RPathV [i];
-    if (rpath [strlen (rpath) - 1] == PATH_SEPARATOR)
-    {
-      // rpath is a directory
-      size_t rl = strlen (rpath);
-      size_t sl = strlen (Suffix);
-      char fname [MAXPATHLEN];
-      memcpy (fname, rpath, rl);
-      memcpy (fname + rl, Suffix, sl + 1);
-      return (access (fname, F_OK) == 0);
-    }
-    else
-    {
-      // rpath is an archive
-      int idx = ArchiveCache.FindKey (rpath);
-      // archive not in cache?
-      if (idx < 0)
-      {
-        // does file rpath exist?
-        if (access (rpath, F_OK) != 0)
-          continue;
-
-        idx = ArchiveCache.Length ();
-        CHK (ArchiveCache.Push (new VfsArchive (rpath, System)));
-      }
-
-      VfsArchive *a = (VfsArchive *)ArchiveCache [idx];
-      a->UpdateTime ();
-      size_t size;
-      return a->FileExists (Suffix, &size);
-    }
+    void *e = a->FindName (fname);
+    if (!e)
+      return false;
+    a->GetFileTime (e, ztime);
   }
-  return false;
+  else
+  {
+    struct stat st;
+    if (stat (fname, &st))
+      return false;
+    ztime = *localtime (&st.st_mtime);
+  }
+  return true;
+}
+
+bool VfsNode::SetFileTime (const char *Suffix, tm &ztime)
+{
+  char fname [MAXPATHLEN + 1];
+  csArchive *a;
+  if (!FindFile (Suffix, fname, a))
+    return false;
+
+  if (a)
+  {
+    void *e = a->FindName (fname);
+    if (!e)
+      return false;
+    a->SetFileTime (e, ztime);
+  }
+  else
+  {
+    // not supported for now since there's no portable way of doing that - A.Z.
+    return false;
+  }
+  return true;
 }
 
 // ------------------------------------------------------------ VfsVector --- //
@@ -1013,6 +1052,11 @@ IMPLEMENT_IBASE (csVFS)
 IMPLEMENT_IBASE_END
 
 IMPLEMENT_FACTORY (csVFS)
+
+EXPORT_CLASS_TABLE (vfs)
+  EXPORT_CLASS (csVFS, "crystalspace.kernel.vfs",
+    "Crystal Space Virtual File System")
+EXPORT_CLASS_TABLE_END
 
 csVFS::csVFS (iBase *iParent) : dirstack (8, 8)
 {
@@ -1478,3 +1522,32 @@ bool csVFS::SaveMounts (const char *FileName)
   return config->Save (FileName);
 }
 
+bool csVFS::GetFileTime (const char *FileName, tm &ztime) const
+{
+  if (!FileName)
+    return false;
+
+  VfsNode *node;
+  char suffix [VFS_MAX_PATH_LEN + 1];
+  PreparePath (FileName, false, node, suffix, sizeof (suffix));
+
+  bool success = node ? node->GetFileTime (suffix, ztime) : false;
+
+  ArchiveCache.CheckUp ();
+  return success;
+}
+
+bool csVFS::SetFileTime (const char *FileName, tm &ztime)
+{
+  if (!FileName)
+    return false;
+
+  VfsNode *node;
+  char suffix [VFS_MAX_PATH_LEN + 1];
+  PreparePath (FileName, false, node, suffix, sizeof (suffix));
+
+  bool success = node ? node->SetFileTime (suffix, ztime) : false;
+
+  ArchiveCache.CheckUp ();
+  return success;
+}

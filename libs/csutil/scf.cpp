@@ -18,6 +18,7 @@
 */
 
 #define SYSDEF_PATH
+#define SYSDEF_ALLOCA
 #include "sysdef.h"
 #include "cssys/csshlib.h"
 #include "csutil/scf.h"
@@ -123,7 +124,6 @@ int scfLibraryVector::CompareKey (csSome Item, csConstSome Key, int) const
   return (strcmp (((scfSharedLibrary *)Item)->LibraryName, (char *)Key));
 }
 
-
 #endif // CS_STATIC_LINKED
 
 /// This structure contains everything we need to know about a particular class
@@ -134,6 +134,8 @@ public:
 
   // Class identifier
   char *ClassID;
+  // The dependency list
+  char *Dependencies;
   // Information about this class
   const scfClassInfo *ClassInfo;
 #ifndef CS_STATIC_LINKED
@@ -144,7 +146,8 @@ public:
 #endif
 
   // Create the factory for a class located in a shared library
-  scfFactory (const char *iClassID, const char *iLibraryName);
+  scfFactory (const char *iClassID, const char *iLibraryName,
+    const char *iDepend);
   // Create the factory for a class located in client module
   scfFactory (const scfClassInfo *iClassInfo);
   // Free the factory object (but not objects created by this factory)
@@ -155,6 +158,8 @@ public:
   virtual void TryUnload ();
   /// Query class description string
   virtual const char *QueryDescription ();
+  /// Query class dependency strings
+  virtual const char *QueryDependencies ();
 };
 
 /// This class holds a number of scfFactory structures
@@ -173,11 +178,13 @@ public:
 
 //------------------------------------------ Class factory implementation ----//
 
-scfFactory::scfFactory (const char *iClassID, const char *iLibraryName)
+scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
+  const char *iDepend)
 {
   CONSTRUCT_IBASE (NULL);
   ClassID = strnew (iClassID);
   ClassInfo = NULL;
+  Dependencies = strnew (iDepend);
 #ifndef CS_STATIC_LINKED
   LibraryName = strnew (iLibraryName);
   Library = NULL;
@@ -193,6 +200,7 @@ scfFactory::scfFactory (const scfClassInfo *iClassInfo)
   CONSTRUCT_IBASE (NULL);
   ClassID = strnew (iClassInfo->ClassID);
   ClassInfo = iClassInfo;
+  Dependencies = iClassInfo->Dependencies;
 #ifndef CS_STATIC_LINKED
   LibraryName = NULL;
   Library = NULL;
@@ -213,6 +221,7 @@ scfFactory::~scfFactory ()
     Library->DecRef ();
   CHK (delete [] LibraryName);
 #endif
+  CHK (delete [] Dependencies);
   CHK (delete [] ClassID);
 }
 
@@ -288,6 +297,11 @@ const char *scfFactory::QueryDescription ()
     return NULL;
 }
 
+const char *scfFactory::QueryDependencies ()
+{
+  return Dependencies;
+}
+
 //-------------------------------------------------- Client SCF functions ----//
 
 // This is the registry for all class factories
@@ -299,7 +313,12 @@ static bool SortClassRegistry = false;
 // This is the iterator used to enumerate configuration file entries
 static bool ConfigIterator (csSome, char *Name, size_t, csSome Data)
 {
-  scfRegisterClass (Name, (char *)Data);
+  char *text = (char *)Data;
+  char *copy = (char *)alloca (strlen (text) + 1);
+  strcpy (copy, text);
+  char *depend = strchr (copy, ':');
+  if (depend) *depend++ = 0;
+  scfRegisterClass (Name, copy, depend);
   return false;
 }
 #endif
@@ -367,7 +386,8 @@ void scfUnloadUnusedModules ()
   }
 }
 
-bool scfRegisterClass (const char *iClassID, const char *iLibraryName)
+bool scfRegisterClass (const char *iClassID, const char *iLibraryName,
+  const char *Dependencies)
 {
 #ifndef CS_STATIC_LINKED
   // We can be called during initialization
@@ -377,7 +397,7 @@ bool scfRegisterClass (const char *iClassID, const char *iLibraryName)
   if (ClassRegistry->FindKey (iClassID) >= 0)
     return false;
   // Create a factory and add it to class registry
-  CHK (ClassRegistry->Push (new scfFactory (iClassID, iLibraryName)));
+  CHK (ClassRegistry->Push (new scfFactory (iClassID, iLibraryName, Dependencies)));
   SortClassRegistry = true;
   return true;
 #else
@@ -386,7 +406,7 @@ bool scfRegisterClass (const char *iClassID, const char *iLibraryName)
 #endif
 }
 
-bool scfRegisterClass (scfClassInfo *iClassInfo)
+bool scfRegisterStaticClass (scfClassInfo *iClassInfo)
 {
   // We can be called during initialization
   if (!ClassRegistry)
@@ -407,7 +427,7 @@ bool scfRegisterClassList (scfClassInfo *iClassInfo)
     scfInitialize ();
 
   while (iClassInfo->ClassID)
-    if (!scfRegisterClass (iClassInfo++))
+    if (!scfRegisterStaticClass (iClassInfo++))
       return false;
   return true;
 }
@@ -439,4 +459,22 @@ const char *scfGetClassDescription (const char *iClassID)
   } /* endif */
 
   return NULL;
+}
+
+const char *scfGetClassDependencies (const char *iClassID)
+{
+  int idx = ClassRegistry->FindKey (iClassID);
+
+  if (idx >= 0)
+  {
+    iFactory *cf = (iFactory *)ClassRegistry->Get (idx);
+    return cf->QueryDependencies ();
+  } /* endif */
+
+  return NULL;
+}
+
+bool scfClassRegistered (const char *iClassID)
+{
+  return (ClassRegistry->FindKey (iClassID) >= 0);
 }

@@ -23,7 +23,9 @@
 
 #define WINDOWCLASSNAME "Crystal"
 
-SCF_INTERFACE(iWin32SystemDriver, 0, 0, 1) : public iBase
+SCF_VERSION (iWin32SystemDriver, 0, 0, 1);
+
+struct iWin32SystemDriver : public iBase
 {
   /// Returns the HINSTANCE of the program
   virtual HINSTANCE GetInstance() const = 0;

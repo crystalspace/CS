@@ -26,8 +26,10 @@ class csVector3;
 /// This is a handle to a halo
 typedef void *csHaloHandle;
 
+SCF_VERSION (iHaloRasterizer, 0, 0, 1);
+
 /// iHaloRasterizer: used to render halos (aka "light globes").
-SCF_INTERFACE (iHaloRasterizer, 0, 0, 1) : public iBase
+struct iHaloRasterizer : public iBase
 {
   /// Create a halo of the specified color and return a handle
   virtual csHaloHandle CreateHalo (float r, float g, float b) = 0;

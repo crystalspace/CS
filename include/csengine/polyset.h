@@ -44,7 +44,7 @@ class csRenderView;
 class csFrustrumList;
 class csPolygon3D;
 class csCurve;
-scfInterface iPolygonSet;
+struct iPolygonSet;
 
 /**
  * This structure keeps the indices of the vertices which

@@ -22,10 +22,12 @@
 
 #include "csutil/scf.h"
 
+SCF_VERSION (iAlphaMapManager, 0, 0, 1);
+
 /**
  *
  */
-SCF_INTERFACE (iAlphaMapManager, 0, 0, 1) : public iBase
+struct iAlphaMapManager : public iBase
 {
 };
 

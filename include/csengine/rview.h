@@ -31,8 +31,8 @@ class csPolygon3D;
 class csRenderView;
 class csLightView;
 struct csFog;
-scfInterface iGraphics3D;
-scfInterface iGraphics2D;
+struct iGraphics3D;
+struct iGraphics2D;
 
 /// A callback function for csWorld::DrawFunc().
 typedef void (csDrawFunc) (csRenderView* rview, int type, void* entity);

@@ -33,7 +33,7 @@
 #include "csinput/csevent.h"
 #include "csinput/cseventq.h"
 
-scfInterface iSystem;
+struct iSystem;
 
 /**
  * This is the lowest-level interface to keyboard.<p>

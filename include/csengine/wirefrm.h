@@ -23,8 +23,8 @@
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
 
-scfInterface iGraphics3D;
-scfInterface iTextureManager;
+struct iGraphics3D;
+struct iTextureManager;
 class csCamera;
 
 #define PLANE_VERTEX_RADIUS .1

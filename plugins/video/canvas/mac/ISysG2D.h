@@ -5,8 +5,10 @@
 #include <Events.h>
 #include "csutil/scf.h"
 
+SCF_VERSION (iMacGraphicsInfo, 0, 0, 1);
+
 /// iMacGraphicsInfo interface -- for Mac-specific properties.
-SCF_INTERFACE (iMacGraphicsInfo, 0, 0, 1) : public iBase
+struct iMacGraphicsInfo : public iBase
 {
     virtual void ActivateWindow( WindowPtr theWindow, bool active ) = 0;
     ///

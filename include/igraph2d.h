@@ -126,12 +126,14 @@ struct csImageArea
   { x = sx; y = sy; w = sw; h = sh; data = NULL; }
 };
 
+SCF_VERSION (iGraphics2D, 0, 0, 2);
+
 /**
  * This is the interface for 2D renderer. The 2D renderer is responsible
  * for all 2D operations such as creating the window, switching pages,
  * returning pixel format and so on.
  */
-SCF_INTERFACE (iGraphics2D, 0, 0, 2) : public iPlugIn
+struct iGraphics2D : public iPlugIn
 {
   /// Open the device.
   virtual bool Open (const char *Title) = 0;

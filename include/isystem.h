@@ -41,7 +41,9 @@
 #define LOAD_PLUGIN(Object,ClassID,Interface)				\
   (Interface *)Object->LoadPlugIn (ClassID, #Interface, VERSION_##Interface)
 
-scfInterface iPlugIn;
+struct iPlugIn;
+
+SCF_VERSION (iSystem, 0, 0, 2);
 
 /**
  * This interface serves as a way for plug-ins to query Crystal Space about settings,
@@ -59,7 +61,7 @@ scfInterface iPlugIn;
  * If the plugin won't register as a basical driver, it won't be called by
  * the engine otherwise than for the cases where plugin registered himself.
  */
-SCF_INTERFACE (iSystem, 0, 0, 1) : public iBase
+struct iSystem : public iBase
 {
   /// returns the configuration.
   virtual void GetSettings (int &oWidth, int &oHeight, int &oDepth, bool &oFullScreen) = 0;
@@ -115,6 +117,13 @@ SCF_INTERFACE (iSystem, 0, 0, 1) : public iBase
   virtual const char *GetOptionCL (const char *iName, int iIndex = 0) = 0;
   /// Query a filename specified on the commandline (that is, without leading '-')
   virtual const char *GetNameCL (int iIndex = 0) = 0;
+  /// Add a command-line option to the command-line option array
+  virtual void AddOptionCL (const char *iName, const char *iValue) = 0;
+  /// Add a command-line name to the command-line names array
+  virtual void AddNameCL (const char *iName) = 0;
+  /// A shortcut for requesting to load a plugin (before Initialize())
+  void RequestPlugin (const char *iPluginName)
+  { AddOptionCL ("plugin", iPluginName); }
 };
 
 #endif

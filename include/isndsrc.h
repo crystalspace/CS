@@ -21,9 +21,11 @@
 #if !defined(__ISOUNDSOURCE_H__)
 #define __ISOUNDSOURCE_H__
 
-scfInterface iSoundBuffer;
+struct iSoundBuffer;
 
-SCF_INTERFACE (iSoundSource, 0, 0, 1) : public iBase
+SCF_VERSION (iSoundSource, 0, 0, 1);
+
+struct iSoundSource : public iBase
 {
   /// Set position of sound object
   virtual void SetPosition (float x, float y, float z) = 0;
