@@ -59,6 +59,9 @@ public:
   /// Mark a section of the screen clean.
   virtual void       Unmark(csRect &rect)=0;
 
+  /// Tell the system to rebuild the update store
+  virtual void       InvalidateUpdateStore()=0;
+
   /// Capture all mouse events until release is called, no matter where the mouse is
   virtual void       CaptureMouse()=0;
 
