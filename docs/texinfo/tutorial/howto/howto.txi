@@ -13,6 +13,7 @@ find a short subsection with all the include files you need to use the example
 code.
 
 @menu
+* HOWTO Smart Pointers:: Correctly Using Smart Pointers
 * HOWTO Collision Detection:: Doing Collision Detection
 * HOWTO Mesh LightAnim:: Mesh Lighting and Animation
 * HOWTO Mesh Movement:: Mesh Movement
@@ -30,6 +31,7 @@ code.
 * HOWTO Use custom font:: Using a Custom Font
 @end menu
 
+@importss{tutorial,howto,smartptr.txi}
 @importss{tutorial,howto,colldet.txi}
 @importss{tutorial,howto,meshanim.txi}
 @importss{tutorial,howto,meshmove.txi}

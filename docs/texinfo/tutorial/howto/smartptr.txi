@@ -1,0 +1,203 @@
+@c -*-texinfo-*-
+@node HOWTO Smart Pointers, HOWTO Pixmaps, HOWTO Pseudo DynLight, HOWTO
+@subsection Correctly Using Smart Pointers
+@cindex @code{csPtr}
+@cindex @code{csRef}
+@cindex @code{IncRef}
+@cindex @code{DecRef}
+@cindex Smart Pointers
+
+Smart pointers are a new feature in Crystal Space 0.95. The purpose of
+smart pointers is to make it easier to manage reference counting.
+So instead of manually taking care of calling @code{IncRef} and
+@code{DecRef} on your objects you use smart pointers (@code{csRef}) and
+let those take care.
+
+@subsubheading How to Use Smart Pointers
+
+This is easy. For example, often you want to keep track of a few
+common objects in your main class (like the pointer to the engine and
+so on). To do this you just declare in your main class:
+
+@example
+class MyClass
+@{
+  csRef<iEngine> engine;
+  @dots{}
+@}
+@end example
+
+Smart pointers don't need to be initialized. So there is no need
+to do @code{engine = NULL} in the constructor of your class.
+There is also no need to clean them up. The reference to the engine
+will be cleaned up automatically when the instance of @code{MyClass}
+is deleted.
+
+To fill the engine smart pointer with a pointer to the engine you
+can use the following code (assuming the engine plugin is loaded):
+
+@example
+  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine->CreateSector (); @dots{}
+@end example
+
+So that's it. I will show you how this would be written before smart
+pointers existed:
+
+@example
+class MyClass
+@{
+  iEngine* engine;
+  @dots{}
+@}
+
+MyClass::MyClass ()
+@{
+  engine = NULL;
+@}
+
+MyClass::~MyClass ()
+@{
+  if (engine) engine->DecRef ();
+@}
+
+  @dots{}
+  engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  engine->CreateSector (); @dots{}
+  @dots{}
+@end example
+
+The advantage doesn't seem huge but in general it is a LOT easier
+to use smart pointers. Especially when you have multiple exit points
+(error handling). The nice thing about smart pointers is that you can
+use them exactly like you would use a normal pointer (i.e. you can
+do things like @code{engine->CreateSector ()}).
+
+Here is another very common example on how you can use smart pointers:
+
+@example
+  csRef<iMeshWrapper> sprite (engine->CreateMeshWrapper (@dots{}));
+  csRef<iSprite3DState> state (SCF_QUERY_INTERFACE (
+  	sprite->GetMeshObject (), iSprite3DState));
+  state->SetAction ("default");
+@end example
+
+@subsubheading What About csPtr?
+
+@code{csPtr} is a companion class which helps in the transition from
+the old (pre-smart pointer) API to the new one. Basically the idea is
+that all functions that used to return a pointer that the caller
+had to @code{DecRef} will now return a @code{csPtr}. A @code{csPtr}
+is basically a simple pointer container. It just represents the
+pointer itself. @code{csPtr} will not do any @code{IncRef} or @code{DecRef}.
+It just stores the pointer. There are two ways to use the result of a
+function that returns a @code{csPtr}:
+
+@example
+  // Declaration of function.
+  struct iEngine
+  @{
+    virtual csPtr<iLight> CreateLight (@dots{}) = 0;
+    @dots{}
+  @}
+
+  // First way to use this function (old style API):
+  iLight* light = engine->CreateLight (@dots{});
+  // Use 'light' pointer.
+  @dots{}
+  // DecRef() when ready.
+  if (light) light->DecRef ();
+
+  // Second way to use this function (new style API):
+  csRef<iLight> light (engine->CreateLight (@dots{}));
+  // Use 'light' pointer.
+  @dots{}
+@end example
+
+So when a @code{csPtr} is assigned to a @code{csRef} the pointer
+will be transfered into the @code{csRef} without an additional
+@code{IncRef} (i.e. the @code{csRef} inherits the reference from the
+@code{csPtr}). On the other hand when the @code{csPtr} is simply
+assigned to the normal pointer then nothing special will happen so
+the caller is responsible for calling @code{DecRef} manually.
+
+By using @code{csPtr} we are able to make the API smart pointer aware
+without sacrificing API compatibility.
+
+Another way to use @code{csPtr} is as follows:
+
+@example
+  csRef<iView> view;
+  view = csPtr<iView> (new csView (@dots{}));
+@end example
+
+When making a new object (@code{new csView}) there is automatically
+one reference already. So when assigning that to a @code{csRef} you
+need to encapsulate the pointer in a @code{csPtr} first so that no
+additional @code{IncRef} is called. The following code would have
+caused a memory leak because there would be two references to the
+view:
+
+@example
+  csRef<iView> view;
+  view = new csView (@dots{});	// Don't do this!
+@end example
+
+@em{WARNING} Only use @code{csPtr} in the situations described above!
+@em{Never} use a @code{csPtr} to store something. @em{Never} pass
+@code{csPtr} instances as parameters to some other function.
+
+@subsubheading What About STRICT_SMART_POINTERS?
+
+In @file{mk/user.mak} there is an option @samp{STRICT_SMART_POINTERS}.
+This option is currently no by default. When you set this to yes then
+it is no longer possible to assign @code{csPtr} to normal pointers.
+The only thing you can do with @code{csPtr} then is to assign it to
+a @code{csRef}. Since that is the intended use it is highly recommended
+that this flag is set to yes. Since Crystal Space itself is not yet
+smart pointer clean right now it has to be set to no.
+
+In future it is possible that @code{csPtr} is removed. Making sure
+you set that flag to yes will ensure that your code will not break
+when we make that change.
+
+@subsubheading Warnings!
+
+Due to the way the current implementation of
+@code{csInitializer::DestroyApplication()} works, you MUST make sure that
+all your references to Crystal Space objects are released BEFORE calling
+@code{DestroyApplication}. So the following code is not good:
+
+@example
+int main (int argc, char* argv[])
+@{
+  @dots{}
+  csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
+  	iPluginManager));
+  @dots{}
+  csInitializer::DestroyApplication (object_reg);
+  return 0;
+@}
+@end example
+
+The reason this doesn't work is that the @samp{plugin_mgr} reference
+will only be cleaned up after @code{DestroyApplication} is called.
+To fix this you can use several techniques. Manually setting
+@samp{plugin_mgr} to NULL right before calling @code{DestroyApplication}
+is one way. Another way is to put the initialization into another
+routine so that @samp{plugin_mgr} is created in another scope.
+
+For the same reason it is also not good to call @code{DestroyApplication}
+from within the destructor of your main class. If you do that then
+when your main instance is deleted, first @code{DestroyApplication} is
+called and only then are the smart pointers released which your
+main instances may have.
+
+@subsubheading Include Files
+
+The include files useful for this section are:
+
+@example
+#include "csutil/ref.h"
+@end example
+
