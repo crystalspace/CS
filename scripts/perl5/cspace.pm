@@ -6508,8 +6508,10 @@ package cspace::iSpriteCal3DSocket;
 *GetSecondaryCount = *cspacec::iSpriteCal3DSocket_GetSecondaryCount;
 *GetSecondaryMesh = *cspacec::iSpriteCal3DSocket_GetSecondaryMesh;
 *GetSecondaryTransform = *cspacec::iSpriteCal3DSocket_GetSecondaryTransform;
+*SetSecondaryTransform = *cspacec::iSpriteCal3DSocket_SetSecondaryTransform;
 *AttachSecondary = *cspacec::iSpriteCal3DSocket_AttachSecondary;
 *DetachSecondary = *cspacec::iSpriteCal3DSocket_DetachSecondary;
+*FindSecondary = *cspacec::iSpriteCal3DSocket_FindSecondary;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
