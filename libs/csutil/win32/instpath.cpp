@@ -19,7 +19,7 @@
 #include "cssysdef.h"
 #include "csutil/sysfunc.h"
 #include "csutil/syspath.h"
-#include "csutil/win32/shellstuff.h"
+#include "libs/csutil/win32/shellstuff.h"
 #include <windows.h>
 #include <shlobj.h>
 #include <winreg.h>
@@ -69,7 +69,7 @@ static inline bool GetRegistryInstallPath (const HKEY parentKey,
   return false;
 }
 
-// ensures that the path as no trailing path delimiter
+// ensures that the path has no trailing path delimiter
 static inline char* NewPathWOTrailingDelim (const char *path)
 {
   char *newPath = csExpandPath (path);
