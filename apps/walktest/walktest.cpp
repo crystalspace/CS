@@ -559,12 +559,16 @@ void WalkTest::DrawFrame (time_t elapsed_time, time_t current_time)
   csSimpleConsole* scon = (csSimpleConsole*)System->Console;
   if (!scon->IsActive ())
   {
+    MyAppDrawFrame1();
+
     if (cslogo)
     {
       unsigned w = cslogo->Width()  * FRAME_WIDTH  / 640;
       unsigned h = cslogo->Height() * FRAME_HEIGHT / 480;
       cslogo->Draw (Gfx3D, FRAME_WIDTH - 2 - (w * 151) / 256 , 2, w, h);
     }
+
+   MyAppDrawFrame2();
 
     // White-board for debugging purposes.
     if (do_covtree_dump)
