@@ -19,6 +19,7 @@
 #define CS_SYSDEF_PROVIDE_ALLOCA
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
+#include "csgeom/poly2d.h"
 #include "haze.h"
 #include "iengine/movable.h"
 #include "iengine/rview.h"
@@ -790,6 +791,25 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
   ComputeHullOutline(hull, layer_scale, campos, tr_o2c, fov, shx, shy,
     layer_num, layer_poly, layer_pts, layer_uvs);
   if(layer_num <= 0) return false;
+
+  // additional test if origin inside the outline
+  csVector2* incheck = new csVector2[layer_num];
+  for(i=0; i<layer_num; i++) 
+  {
+    incheck[i].x = layer_pts[layer_num-1 - i].x;
+    incheck[i].y = layer_pts[layer_num-1 - i].y;
+  }
+  csVector2 checkpt( scr_orig.x, scr_orig.y );
+  if(!csPoly2D::In(incheck, layer_num, checkpt))
+  {
+    // origin not inside outline.
+    delete[] incheck;
+    delete[] layer_poly;
+    delete[] layer_pts;
+    delete[] layer_uvs;
+    return false;
+  }
+  delete[] incheck;
 
   // draw triangles from orig to layer 0
   csVector3 tri_pts[3];
