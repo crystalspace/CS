@@ -13,17 +13,28 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+9-Nov-1999
+	- Eric Sunshine removed many, many obsolete COM references from
+	  documentation and source code comments.
 8-Nov-1999
 	- Eric Sunshine reverse-engineered Andrew Zabolotny's SCF changes and
 	  was able to recreate some missing files which Andrew forgot to
 	  commit to the CVS repository.  Eric's recreations are minimal, yet
 	  sufficient to allow the project to compile.  Hopefully Andrew will
 	  check in the "real" files when he has the opportunity to do so.
+	- Eric Sunshine canonicalized the line terminator in many of the new
+	  TeX documents.
 7-Nov-1999
 	- Eric Sunshine re-engineered the Python detection code in haspyth.sh
 	  so that it deals gracefully with the case where multiple Python
 	  header and library directories are found.  Problem was reported by
 	  Donald Ryan Willhoit <willhoit@mail1.andrew.cmu.edu>.
+5-Nov-1999
+	- Andrew Zabolotny converted much of Crystal Space over from COM to
+	  SCF (the Shared Class Facility).  This was an enormous task.  About
+	  70 or 80% of the conversion has been completed, although many
+	  drivers and platform-specific code is still broken and needs to be
+	  converted by the particular port maintainer.
 3-Nov-1999
 	- Jorrit eliminated initialization of four function pointers in OpenGL
 	  driver because gcc fails on them.
