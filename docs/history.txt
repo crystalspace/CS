@@ -33,6 +33,10 @@ The history order is reversed so that new features are at the top.
 	      Please use this style for all new makefiles (either by copying
 	      from an existing makefile which has been converted, or by
 	      consulting CS/mk/template.mak).
+	- Eric Sunshine fixed problem in jamcache.m4 in which
+	  CS_JAMCONFIG_OUTPUT()'s filter was using a non-portable sed
+	  expression which failed with some sed implementations (such as the
+	  one shipped with MacOS/X).
 27-Apr-2003
 	- Philip Wyett fixed the DDS plugin compilation under MSVC, by
 	  replacing struct with static (don't ask) and giving the the array an

@@ -37,4 +37,4 @@ AC_DEFUN([CS_JAMCONFIG_PROPERTY],
 ])])
 AC_DEFUN([CS_JAMCONFIG_OUTPUT],
      [CS_TEXT_CACHE_OUTPUT([cs_jamconfig_text], [$1],
-	 [sed 's/\${\([[a-zA-Z_]]\+\)}/$(\1)/g;s/\\/\\\\/g'])])
+	 [sed 's/\${\([[a-zA-Z_][a-zA-Z_]]*\)}/$(\1)/g;s/\\/\\\\/g'])])
