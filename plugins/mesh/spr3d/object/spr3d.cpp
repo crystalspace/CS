@@ -1806,6 +1806,7 @@ csRenderMesh** csSprite3DMeshObject::GetRenderMeshes (int& n,
   n = 1;
   rmesh->object2camera = tr_o2c;
   rmesh->camera_origin = camera_origin;
+  rmesh->camera_transform = &camera->GetTransform();
   rmesh->mixmode = MixMode;
   rmesh->indexstart = 0;
   rmesh->indexend = final_num_triangles * 3;

@@ -1654,6 +1654,7 @@ csRenderMesh** csSpriteCal3DMeshObject::GetRenderMeshes (int &n,
     rm->do_mirror = camera->IsMirrored ();
     rm->object2camera = tr_o2c;
     rm->camera_origin = camera_origin;
+    rm->camera_transform = &camera->GetTransform();
     rm->geometryInstance = this;
   }
   currentMovable = movable;

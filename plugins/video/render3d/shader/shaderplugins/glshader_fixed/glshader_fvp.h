@@ -34,6 +34,7 @@ public:
   enum TEXGENMODE
   {
     TEXGEN_NONE = 0,
+    TEXGEN_REFLECT_SPHERE,
     TEXGEN_REFLECT_CUBE
   };
   enum TexMatrixOpType

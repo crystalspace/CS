@@ -2873,6 +2873,7 @@ csRenderMesh **csThing::GetRenderMeshes (int &num, iRenderView* rview,
     csRenderMesh* rm = renderMeshes[i];
     rm->object2camera = tr_o2c;
     rm->camera_origin = camera_origin;
+    rm->camera_transform = &icam->GetTransform();
     rm->clip_portal = clip_portal;
     rm->clip_plane = clip_plane;
     rm->clip_z_plane = clip_z_plane;

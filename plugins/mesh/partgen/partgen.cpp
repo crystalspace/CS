@@ -436,6 +436,7 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
   rm->material = m;
   rm->object2camera = csReversibleTransform ();
   rm->camera_origin = vertices[0];
+  rm->camera_transform = &camera->GetTransform();
 
   n = 1;
   return &rm;

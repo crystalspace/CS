@@ -647,6 +647,7 @@ csRenderMesh** csParticlesObject::GetRenderMeshes (int& n, iRenderView* rview,
   mesh->material = matwrap;
   mesh->object2camera = tr_o2c;
   mesh->camera_origin = camera_origin;
+  mesh->camera_transform = &cam->GetTransform();
   mesh->indexstart = 0;
   mesh->indexend = vertnum;
   mesh->variablecontext = 

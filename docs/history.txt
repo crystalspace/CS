@@ -16,6 +16,9 @@ chronological order.
 	- Jorrit added iRenderLoopManager->Load(). The function was already in
 	  csRenderLoopManager but not in the interface.
 	- Jorrit changed csbench to use the new function.
+	- Erotoman added camera_transform in csRenderMesh. This helps to fix incorrect
+	  cube environment map of moving objects.
+	- Erotoman added spherical environment map in glshader_fixed (not fully working)
 21-Jun-2004
 	- Jorrit attempted to add new tests to csbench to try out a shader
 	  with various techniques. Not sure if it works correctly yet though.

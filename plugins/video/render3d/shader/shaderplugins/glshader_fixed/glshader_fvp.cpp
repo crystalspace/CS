@@ -195,7 +195,7 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
       statecache->Enable_GL_TEXTURE_GEN_T ();
       statecache->Enable_GL_TEXTURE_GEN_R ();
 
-      const csReversibleTransform *t = &mesh->object2camera;
+      const csReversibleTransform *t = mesh->camera_transform;
       const csMatrix3 &orientation = t->GetO2T();
 
       float mAutoTextureMatrix[16];
@@ -224,7 +224,50 @@ void csGLShaderFVP::SetupState (const csRenderMesh *mesh,
       statecache->SetMatrixMode (GL_TEXTURE);
       glLoadMatrixf (mAutoTextureMatrix);
     }
-    if (layers[i].texMatrixOps.Length() > 0)
+	else
+    if (layers[i].texgen == TEXGEN_REFLECT_SPHERE)
+    {
+      //setup for environmental spheremapping
+      glTexGeni (GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
+      glTexGeni (GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP);
+
+      statecache->Enable_GL_TEXTURE_GEN_S ();
+      statecache->Enable_GL_TEXTURE_GEN_T ();
+
+	  //TODO 
+	  // need a correct texture matrix
+
+	  /*
+      const csReversibleTransform *t = mesh->camera_transform;
+      const csMatrix3 &orientation = t->GetO2T();
+
+      float mAutoTextureMatrix[16];
+
+	  mAutoTextureMatrix[0] = orientation.m11; 
+      mAutoTextureMatrix[1] = orientation.m12; 
+      mAutoTextureMatrix[2] = orientation.m13;
+
+      mAutoTextureMatrix[4] = orientation.m21;
+      mAutoTextureMatrix[5] = orientation.m22;
+      mAutoTextureMatrix[6] = orientation.m23;
+
+      mAutoTextureMatrix[8] = orientation.m31; 
+      mAutoTextureMatrix[9] = orientation.m32; 
+      mAutoTextureMatrix[10] = orientation.m33;
+
+      mAutoTextureMatrix[3] =
+        mAutoTextureMatrix[7] = mAutoTextureMatrix[11] = 0.0f;
+      mAutoTextureMatrix[12] =
+        mAutoTextureMatrix[13] = mAutoTextureMatrix[14] = 0.0f;
+      mAutoTextureMatrix[15] = 1.0f;  
+
+      statecache->SetMatrixMode (GL_TEXTURE);
+      glLoadMatrixf (mAutoTextureMatrix);
+	  */
+    }
+
+
+	if (layers[i].texMatrixOps.Length() > 0)
     {
       statecache->SetMatrixMode (GL_TEXTURE);
 
@@ -532,6 +575,14 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
                     if (layers.Length ()<=layer)
                       layers.SetLength (layer+1);
                     layers[layer].texgen = TEXGEN_REFLECT_CUBE;
+                  }
+				  else
+                  if (!strcasecmp(str, "sphere"))
+                  {
+                    int layer = child->GetAttributeValueAsInt ("layer");
+                    if (layers.Length ()<=layer)
+                      layers.SetLength (layer+1);
+                    layers[layer].texgen = TEXGEN_REFLECT_SPHERE;
                   }
                 }
               }

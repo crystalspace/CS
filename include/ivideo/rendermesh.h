@@ -133,6 +133,9 @@ struct csCoreRenderMesh
   /// Transform to use for this mesh (object->camera)
   csReversibleTransform object2camera;
 
+  /// Camera transform
+  csOrthoTransform *camera_transform;
+
   /// Material used for this mesh
   //iMaterialHandle* mathandle;
   // @@@ FIXME: SW needs it

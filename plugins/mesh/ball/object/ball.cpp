@@ -735,6 +735,7 @@ csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num, iRenderView* rview,
   meshPtr->material = mater;
   meshPtr->object2camera = tr_o2c;
   meshPtr->camera_origin = camera_origin;
+  meshPtr->camera_transform = &camera->GetTransform();
   if (rmCreated)
   {
     meshPtr->variablecontext = svcontext;
