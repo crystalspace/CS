@@ -141,6 +141,9 @@ public:
     awsWindow *WindowBelow()
     { return below; }
 
+    /// Does some additional setup for windows, including linking into the window hierarchy.
+    virtual bool Setup(iAws *_wmgr, awsComponentNode *settings);
+
 public:
     /// Event triggered when a window is about to be raised
     virtual void OnRaise();

@@ -38,6 +38,23 @@ awsWindow::~awsWindow()
 
 }
 
+bool 
+awsWindow::Setup(iAws *_wmgr, awsComponentNode *settings)
+{
+  if (!awsComponent::Setup(_wmgr, settings)) return false;
+
+  // Link into the current window hierarchy, at the top.
+  if (WindowManager()->GetTopWindow()==NULL)
+    WindowManager()->SetTopWindow(this);
+  else
+  {
+    LinkAbove(WindowManager()->GetTopWindow());
+    WindowManager()->SetTopWindow(this);
+  }
+
+  return true;
+}
+
 
 void 
 awsWindow::SetRedrawTag(unsigned int tag)
@@ -199,7 +216,8 @@ awsWindow::OnDraw(csRect clip)
       lo    = WindowManager()->GetPrefMgr()->GetColor(AC_SHADOW),
       lo2   = WindowManager()->GetPrefMgr()->GetColor(AC_SHADOW2),
       fill  = WindowManager()->GetPrefMgr()->GetColor(AC_FILL),
-      black = WindowManager()->GetPrefMgr()->GetColor(AC_BLACK);
+      black = WindowManager()->GetPrefMgr()->GetColor(AC_BLACK),
+      white = WindowManager()->GetPrefMgr()->GetColor(AC_WHITE);
 
   
   switch(frame_style)
@@ -237,7 +255,7 @@ awsWindow::OnDraw(csRect clip)
         g2d->DrawLine(Frame().xmin+i, Frame().ymin+i, Frame().xmax-i, Frame().ymin+i,  topleft[i]);
         g2d->DrawLine(Frame().xmin+i, Frame().ymin+i, Frame().xmin+i, Frame().ymax-i,  topleft[i]);
         g2d->DrawLine(Frame().xmin+i, Frame().ymax-i, Frame().xmax-i, Frame().ymax-i, botright[i]);
-        g2d->DrawLine(Frame().xmax-1, Frame().ymin+i, Frame().xmax-i, Frame().ymax-i, botright[i]);
+        g2d->DrawLine(Frame().xmax-i, Frame().ymin+i, Frame().xmax-i, Frame().ymax-i, botright[i]);
       }
       
     } 

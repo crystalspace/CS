@@ -18,7 +18,7 @@ const bool DEBUG_KEYS = false;
 const bool DEBUG_INIT = true;
 
 /// The gradient step for the slightly darker and lighter versions of the highlight and shadow.
-const unsigned char GRADIENT_STEP=15;
+const unsigned char GRADIENT_STEP=25;
 
 /***************************************************************************************************************
 *   This constructor converts the text-based name into a fairly unique numeric ID.  The ID's are then used for *
