@@ -62,6 +62,9 @@ The history order is reversed so that new features are at the top.
 	  - Added wrappings for iString and csString. The one for csString is
 	    commented out until work can be done to fix it.
 	- Oktal made the following changes to the Perl scripting plugin:
+	  - Fixed broken Get() and Set() functions in the iScriptObject
+	    implementation; now using the generally accepted convention for
+	    accessing object properties in Perl.
 	  - Got rid of the functions for manipuating void* pointers within
 	    the scripting language since that is difficult in Perl, and
 	    shouldn't be neccessary (use iScriptObject instead.) Now the
