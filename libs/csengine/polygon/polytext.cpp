@@ -367,7 +367,6 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
   txt_handle->GetMipMapDimensions (0, ww, hh);
 
   csPolyTxtPlane *txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
-  csPolyPlane *pl = polygon->GetPlane ();
   float cosfact = polygon->GetCosinusFactor ();
   if (cosfact == -1) cosfact = cfg_cosinus_factor;
 
@@ -377,22 +376,6 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
   // Mtw * T + Vwt = W
   csMatrix3 m_t2w = txt_pl->m_world2tex.GetInverse ();
   csVector3 &v_t2w = txt_pl->v_world2tex;
-
-  // From: Ax+By+Cz+D = 0
-  // From: T = Mwt * (W - Vwt)
-  // ===>
-  // Mtw * T + Vwt = W
-  // Get 'w' from 'u' and 'v' (using u,v,w plane).
-  float A = pl->GetWorldPlane ().A ();
-  float B = pl->GetWorldPlane ().B ();
-  float C = pl->GetWorldPlane ().C ();
-  float D = pl->GetWorldPlane ().D ();
-  float txt_A = A * m_t2w.m11 + B * m_t2w.m21 + C * m_t2w.m31;
-  float txt_B = A * m_t2w.m12 + B * m_t2w.m22 + C * m_t2w.m32;
-  float txt_C = A * m_t2w.m13 + B * m_t2w.m23 + C * m_t2w.m33;
-  float txt_D = A * txt_pl->v_world2tex.x +
-                B * txt_pl->v_world2tex.y +
-                C * txt_pl->v_world2tex.z + D;
 
   float inv_ww = 1.0 / ww;
   float inv_hh = 1.0 / hh;
@@ -528,8 +511,6 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
       int rv = i << lightcell_shift;
 
       csVector3 v (float (ru + Imin_u) * inv_ww, float (rv + Imin_v) * inv_hh, 0);
-      if (ABS (txt_C) > SMALL_EPSILON)
-        v.z = - (txt_D + txt_A * v.x + txt_B * v.y) / txt_C;
       v = v_t2w + m_t2w * v;
 
       float d = csSquaredDist::PointPoint (lightpos, v);
@@ -582,7 +563,6 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
   txt_handle->GetMipMapDimensions (0, ww, hh);
 
   csPolyTxtPlane* txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
-  csPolyPlane* pl = polygon->GetPlane ();
   float cosfact = polygon->GetCosinusFactor ();
   if (cosfact == -1) cosfact = cfg_cosinus_factor;
 
@@ -592,20 +572,6 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
   // Mtw * T + Vwt = W
   csMatrix3 m_t2w = txt_pl->m_world2tex.GetInverse();
   csVector3 vv = txt_pl->v_world2tex;
-
-  // From: Ax+By+Cz+D = 0
-  // From: T = Mwt * (W - Vwt)
-  // ===>
-  // Mtw * T + Vwt = W
-  // Get 'w' from 'u' and 'v' (using u,v,w plane).
-  float A = pl->GetWorldPlane ().A ();
-  float B = pl->GetWorldPlane ().B ();
-  float C = pl->GetWorldPlane ().C ();
-  float D = pl->GetWorldPlane ().D ();
-  float txt_A = A*m_t2w.m11 + B*m_t2w.m21 + C*m_t2w.m31;
-  float txt_B = A*m_t2w.m12 + B*m_t2w.m22 + C*m_t2w.m32;
-  float txt_C = A*m_t2w.m13 + B*m_t2w.m23 + C*m_t2w.m33;
-  float txt_D = A*txt_pl->v_world2tex.x + B*txt_pl->v_world2tex.y + C*txt_pl->v_world2tex.z + D;
 
   csVector3 v1, v2;
 
@@ -757,10 +723,7 @@ b:      if (scanL2 == MinIndex) goto finish;
 
         v1.x = (float)(ru + Imin_u) * invww;
         v1.y = (float)(rv + Imin_v) * invhh;
-        if (ABS (txt_C) < SMALL_EPSILON)
-          v1.z = 0;
-        else
-          v1.z = - (txt_D + txt_A*v1.x + txt_B*v1.y) / txt_C;
+        v1.z = 0;
         v2 = vv + m_t2w * v1;
 
 	// Check if the point on the polygon is shadowed. To do this
