@@ -60,7 +60,6 @@ DemoSequenceManager::DemoSequenceManager (Demo* demo)
   do_fade = false;
   fade_value = 0;
   suspended = true;
-  suspend_time = seqmgr->GetMainTime ();
   suspend_one_frame = false;
   main_sequence = NULL;
 }
@@ -68,6 +67,13 @@ DemoSequenceManager::DemoSequenceManager (Demo* demo)
 DemoSequenceManager::~DemoSequenceManager ()
 {
   Clear ();
+  int i;
+  for (i = 0 ; i < paths.Length () ; i++)
+  {
+    csNamedPath* np = (csNamedPath*)paths[i];
+    delete np;
+  }
+  paths.DeleteAll ();
   if (seqmgr) seqmgr->DecRef ();
   if (main_sequence) main_sequence->DecRef ();
 }
@@ -76,12 +82,6 @@ void DemoSequenceManager::Clear ()
 {
   seqmgr->Clear ();
   int i;
-  for (i = 0 ; i < paths.Length () ; i++)
-  {
-    csNamedPath* np = (csNamedPath*)paths[i];
-    delete np;
-  }
-  paths.DeleteAll ();
   for (i = 0 ; i < pathForMesh.Length () ; i++)
   {
     PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
@@ -117,7 +117,6 @@ void DemoSequenceManager::Suspend ()
   {
     suspended = true;
     seqmgr->Suspend ();
-    suspend_time = seqmgr->GetMainTime ();
   }
 }
 
@@ -133,6 +132,13 @@ void DemoSequenceManager::Resume ()
 void DemoSequenceManager::Restart (const char* sequenceFileName)
 {
   Clear ();
+  int i;
+  for (i = 0 ; i < paths.Length () ; i++)
+  {
+    csNamedPath* np = (csNamedPath*)paths[i];
+    delete np;
+  }
+  paths.DeleteAll ();
   if (main_sequence) { main_sequence->DecRef (); main_sequence = NULL; }
   do_fade = false;
   fade_value = 0;
@@ -154,7 +160,7 @@ void DemoSequenceManager::TimeWarp (cs_time dt, bool restart)
 
   if (seqmgr->GetMainTime () + dt <= main_start_time)
   {
-    seqmgr->Clear ();
+    Clear ();
     seqmgr->RunSequence (0, main_sequence);
     main_start_time = seqmgr->GetMainTime ();
     return;
@@ -163,7 +169,7 @@ void DemoSequenceManager::TimeWarp (cs_time dt, bool restart)
   if (restart)
   {
     dt = seqmgr->GetMainTime () + dt - main_start_time;
-    seqmgr->Clear ();
+    Clear ();
     seqmgr->RunSequence (0, main_sequence);
     main_start_time = seqmgr->GetMainTime ();
     seqmgr->TimeWarp (dt, false);
@@ -320,14 +326,15 @@ void DemoSequenceManager::ControlPaths (iCamera* camera, cs_time elapsed_time)
   if (suspend_one_frame) { Suspend (); suspend_one_frame = false; }
 }
 
-void DemoSequenceManager::DebugPositionObjects (iCamera* camera)
+void DemoSequenceManager::DebugPositionObjects (iCamera* camera,
+    cs_time debug_time)
 {
   int i = 0;
   int len = pathForMesh.Length ();
   while (i < len)
   {
     PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
-    float r = float (suspend_time - pfm->start_path_time)
+    float r = float (debug_time - pfm->start_path_time)
     	/ float (pfm->total_path_time);
     if (r >= 0 && r <= 1)
     {
@@ -491,9 +498,8 @@ void DemoSequenceManager::DebugDrawPaths (iCamera* camera,
     PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
     bool hi = (pfm->path == selnp);
 
-    // Fetch the current time, make sure we take account of suspension.
+    // Fetch the current time.
     cs_time ct = current_time;
-    if (suspended) ct = suspend_time;
 
     // Calculate where we are on this path at the moment.
     // r should be between 0 and 1.
@@ -587,7 +593,7 @@ void DemoSequenceManager::SelectNextPath (char* hilight)
     PathForMesh* pfm = (PathForMesh*)pathForMesh[i];
     if (pfm->path == np)
     {
-      if (i != pathForMesh.Length ()-1)
+      if (i < pathForMesh.Length ()-1)
       {
         pfm = (PathForMesh*)pathForMesh[i+1];
 	strcpy (hilight, pfm->path->GetName ());

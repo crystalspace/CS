@@ -9,6 +9,21 @@ The history order is reversed so that new features are at the top.
 	  ('<' key) will now restart the entire sequence manager which
 	  means that child sequences will be correctly respawned. This
 	  does not happen with the ',' key though.
+	- Several small enhancements to csdemo:
+	    - Fix with time warping again. Paths were not correctly cleaned
+	      up.
+	    - Slowed down entire demo 50% because speed was a bit too fast
+	      to see everything good. However, this does mean that some
+	      parts of the demo are a bit too slow now. So I will have
+	      to do some path modifying again or else add extra stuff
+	      to look at at those slow moments.
+	    - Added '/' key to restart sequence manager and go back to the
+	      same point in time. This is useful to get all paths running
+	      ok again.
+	    - The forward/up vector editor now correctly sets all objects
+	      to the time of the point you are editing.
+	    - Added new shuttle model from Michael Voase.
+	    - Added new station model from Thomas Hieber (as yet untextured).
 27-Apr-2001
 	- Martin did some further work on csparser and csengine.
 	- Philip Wyett added csdemo.cfg to makefile inorder that it is

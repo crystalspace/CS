@@ -147,7 +147,13 @@ void Demo::SetupFactories ()
   //=====
   // Load all factories.
   //=====
+  LoadFactory ("shuttle", "/data/demo/objects/shuttle",
+  	"crystalspace.mesh.object.sprite.3d",
+	"crystalspace.mesh.loader.factory.sprite.3d");
   LoadFactory ("fighter", "/data/demo/objects/fighter",
+  	"crystalspace.mesh.object.sprite.3d",
+	"crystalspace.mesh.loader.factory.sprite.3d");
+  LoadFactory ("station", "/data/demo/objects/tho_station",
   	"crystalspace.mesh.object.sprite.3d",
 	"crystalspace.mesh.loader.factory.sprite.3d");
   LoadFactory ("ss1_dummy", "/data/demo/objects/ss1_dummy",
@@ -212,6 +218,7 @@ void Demo::SetupMaterials ()
   LoadMaterial ("stars", "/data/demo/textures/stars.png");
   LoadMaterial ("starcross", "/data/demo/textures/starcross2.jpg");
   LoadMaterial ("fighter", "/data/demo/textures/camo.png");
+  LoadMaterial ("shuttle", "/data/demo/textures/alien.jpg");
 }
 
 static void SetTexSpace (iPolygon3D* poly, 
@@ -527,6 +534,23 @@ void Demo::SetupObjects ()
   tail->SetZBufMode (CS_ZBUF_TEST);
   spr3d->AddChild (tail);
 
+  spr3d = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("shuttle"), "Shuttle",
+  	NULL, csVector3 (0));
+  spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
+  spr3d->SetZBufMode (CS_ZBUF_USE);
+  spr3d->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+  s3d = QUERY_INTERFACE (spr3d->GetMeshObject (), iSprite3DState);
+  s3d->SetBaseColor (csColor (.15, .15, .15));
+  s3d->DecRef ();
+  tail = LoadObject ("ShuttleTail",
+  	"/data/demo/objects/shuttletail",
+  	"crystalspace.mesh.object.fire",
+	"crystalspace.mesh.loader.fire",
+	NULL, csVector3 (0));
+  tail->SetZBufMode (CS_ZBUF_TEST);
+  spr3d->AddChild (tail);
+
   // Create laser.
   spr3d = engine->CreateMeshObject (
   	engine->FindMeshFactory ("laser"), "LaserBeam1",
@@ -560,6 +584,16 @@ void Demo::SetupObjects ()
   s3d->SetLighting (false);
   s3d->SetBaseColor (csColor (.1, .1, 1));
   s3d->DecRef ();
+
+  //=====
+  // Setup the space station.
+  //=====
+
+  spr3d = engine->CreateMeshObject (
+  	engine->FindMeshFactory ("station"), "Station2",
+  	NULL, csVector3 (0));
+  spr3d->SetRenderPriority (engine->GetRenderPriority ("object"));
+  spr3d->SetZBufMode (CS_ZBUF_USE);
 
   //=====
   // Setup the space station.
@@ -637,7 +671,7 @@ void Demo::SetupObjects ()
   s2d->CreateRegularVertices (4, true);
   s2d->DecRef ();
   part = QUERY_INTERFACE (spr2d->GetMeshObject (), iParticle);
-  part->ScaleBy (5);
+  part->ScaleBy (3);
   part->DecRef ();
 
   spr2d = engine->CreateMeshObject (
@@ -649,7 +683,7 @@ void Demo::SetupObjects ()
   s2d->CreateRegularVertices (4, true);
   s2d->DecRef ();
   part = QUERY_INTERFACE (spr2d->GetMeshObject (), iParticle);
-  part->ScaleBy (5);
+  part->ScaleBy (3);
   part->DecRef ();
 }
 
@@ -826,7 +860,20 @@ void Demo::NextFrame ()
   if (map_enabled < MAP_EDIT_FORWARD)
     seqmgr->ControlPaths (view->GetCamera (), elapsed_time);
   else if (map_enabled == MAP_EDIT_FORWARD)
-    seqmgr->DebugPositionObjects (view->GetCamera ());
+  {
+    cs_time debug_time;
+    cs_time start, total;
+    csNamedPath* np = seqmgr->GetSelectedPath (map_selpath, start, total);
+    if (np)
+    {
+      float r = np->GetTimeValue (map_selpoint);
+      np->Calculate (r);
+      debug_time = start + total * r;
+    }
+    else
+      debug_time = 0;	// Not possible!
+    seqmgr->DebugPositionObjects (view->GetCamera (), debug_time);
+  }
 
   engine->NextFrame (current_time);
 
@@ -1538,10 +1585,13 @@ bool Demo::HandleEvent (iEvent &Event)
           seqmgr->TimeWarp (-20);
 	  break;
         case '>':
-          seqmgr->TimeWarp (1500);
+          seqmgr->TimeWarp (2500);
 	  break;
         case '<':
-          seqmgr->TimeWarp (-1500, true);
+          seqmgr->TimeWarp (-2500, true);
+	  break;
+        case '/':
+          seqmgr->TimeWarp (0, true);
 	  break;
         case 'm':
 	  map_enabled++;

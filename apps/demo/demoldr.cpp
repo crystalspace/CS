@@ -55,6 +55,8 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (V)
 CS_TOKEN_DEF_END
 
+#define SPEED_FACTOR 1
+
 //-----------------------------------------------------------------------------
 
 DemoSequenceLoader::DemoSequenceLoader (Demo* demo,
@@ -137,6 +139,7 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
 	cs_time t;
 	float angle_speed;
 	ScanStr (params, "%d,%s,%f", &t, meshName, &angle_speed);
+	t = cs_time (float (t) * SPEED_FACTOR);
         RotatePartOp* op = new RotatePartOp (meshName, t, angle_speed);
 	seq->AddOperation (cur_time, op);
 	op->DecRef ();
@@ -190,6 +193,7 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
 	char pathName[100];
 	cs_time t;
 	ScanStr (params, "%d,%s,%s", &t, meshName, pathName);
+	t = cs_time (float (t) * SPEED_FACTOR);
 	char* name = meshName;
 	if (!strcmp ("camera", meshName)) name = NULL;
         PathOp* op = new PathOp (t, name, pathName);
@@ -209,6 +213,7 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
 	float start, end;
 	cs_time t;
 	ScanStr (params, "%d,%f,%f,%d", &t, &start, &end);
+	t = cs_time (float (t) * SPEED_FACTOR);
         FadeOp* op = new FadeOp (start, end, t);
 	seq->AddOperation (cur_time, op);
 	op->DecRef ();
@@ -218,6 +223,7 @@ void DemoSequenceLoader::LoadSequence (char* buf, iSequence* seq)
       {
 	cs_time delay;
         ScanStr (params, "%d", &delay);
+	delay = cs_time (float (delay) * SPEED_FACTOR);
 	cur_time += delay;
 	break;
       }

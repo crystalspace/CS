@@ -93,7 +93,6 @@ private:
   bool suspended;
   bool suspend_one_frame;
   cs_time main_start_time;
-  cs_time suspend_time;
 
   //=====
   // For fading.
@@ -174,9 +173,10 @@ public:
 
   /**
    * Correctly position all objects (including the camera)
-   * while in suspended mode.
+   * while in suspended mode. The 'debug_time' will be used
+   * to calculate where all objects are.
    */
-  void DebugPositionObjects (iCamera* camera);
+  void DebugPositionObjects (iCamera* camera, cs_time debug_time);
 
   /**
    * For debugging, draw all active paths on screen. Draw the
