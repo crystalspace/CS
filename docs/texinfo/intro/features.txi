@@ -3,6 +3,10 @@
 @section Feature List
 @cindex Features
 
+@emph{Last updated by Chris Forno, @email{jcore@@arbornet.org} on 2002-06-19.
+Please feel free to add comments or email me if any of the information is
+incorrect or out-of-date.}
+
 The first feature to mention here is that Crystal Space is an Open Source
 project (or a Free Software project, depending on your religion). It is
 released under the GNU Lesser General Public License (GNU LGPL). @xref{License}.
