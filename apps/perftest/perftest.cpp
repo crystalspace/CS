@@ -34,11 +34,15 @@ PerfTest::PerfTest ()
 {
   draw_3d = true;
   draw_2d = true;
+  myG3D = NULL;
+  myVFS = NULL;
   ImageLoader = NULL;
 }
 
 PerfTest::~PerfTest ()
 {
+  DEC_REF (myG3D);
+  DEC_REF (myVFS);
   if (ImageLoader) ImageLoader->DecRef();
 }
 
@@ -50,9 +54,9 @@ void cleanup ()
 
 iMaterialHandle* PerfTest::LoadMaterial (char* file)
 {
-  iTextureManager* txtmgr = G3D->GetTextureManager ();
+  iTextureManager* txtmgr = myG3D->GetTextureManager ();
   iImage* image;
-  iDataBuffer *buf = VFS->ReadFile (file);
+  iDataBuffer *buf = myVFS->ReadFile (file);
   if (!buf || !buf->GetSize ())
   {
     Printf (MSG_FATAL_ERROR, "Error loading texture '%s'!\n", file);
@@ -89,8 +93,20 @@ bool PerfTest::Initialize (int argc, const char* const argv[],
     return false;
   }
 
+  myG3D = QUERY_PLUGIN(this, iGraphics3D);
+  if (!myG3D) {
+    Printf (MSG_FATAL_ERROR, "No iGraphics3D loader plugin!\n");
+    return false;
+  }
+
+  myVFS = QUERY_PLUGIN(this, iVFS);
+  if (!myVFS) {
+    Printf (MSG_FATAL_ERROR, "No iVFS loader plugin!\n");
+    return false;
+  }
+
   // Setup the texture manager
-  iTextureManager* txtmgr = G3D->GetTextureManager ();
+  iTextureManager* txtmgr = myG3D->GetTextureManager ();
   txtmgr->SetVerbose (true);
 
   // Initialize the texture manager
@@ -149,20 +165,20 @@ void PerfTest::NextFrame ()
   GetElapsedTime (elapsed_time, current_time);
 
   // Tell 3D driver we're going to display 3D things.
-  if (!G3D->BeginDraw (draw_3d ? CSDRAW_3DGRAPHICS : CSDRAW_2DGRAPHICS)) 
+  if (!myG3D->BeginDraw (draw_3d ? CSDRAW_3DGRAPHICS : CSDRAW_2DGRAPHICS)) 
     return;
 
   // Setup if needed.
   if (needs_setup)
   {
-    current_tester->Setup (G3D, this);
+    current_tester->Setup (myG3D, this);
     last_time = current_time;
   }
 
   // Do the test frame.
   if (current_tester)
   {
-    current_tester->Draw (G3D);
+    current_tester->Draw (myG3D);
     if (current_time-last_time >= 10000)
     {
       Printf (MSG_INITIALIZATION, "%f FPS\n",
@@ -173,7 +189,7 @@ void PerfTest::NextFrame ()
       if (current_tester)
       {
         needs_setup = true;
-	current_tester->Setup (G3D, this);
+	current_tester->Setup (myG3D, this);
       }
       else
       {
@@ -182,7 +198,7 @@ void PerfTest::NextFrame ()
 	  draw_3d = false;
 	  current_tester = new LineTester2D ();
 	  needs_setup = true;
-	  current_tester->Setup (G3D, this);
+	  current_tester->Setup (myG3D, this);
 	}
 	else
 	  Shutdown = true;
@@ -193,7 +209,7 @@ void PerfTest::NextFrame ()
   // Start drawing 2D graphics.
   if (needs_setup)
   {
-    if (!G3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+    if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
     if (Console) Console->Clear ();
     last_time = current_time;
     char desc[255];
@@ -203,9 +219,9 @@ void PerfTest::NextFrame ()
   }
 
   // Drawing code ends here.
-  G3D->FinishDraw ();
+  myG3D->FinishDraw ();
   // Print the final output.
-  G3D->Print (NULL);
+  myG3D->Print (NULL);
 }
 
 bool PerfTest::HandleEvent (iEvent &Event)

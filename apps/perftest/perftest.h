@@ -52,6 +52,8 @@ private:
   // Load a material.
   iMaterialHandle* LoadMaterial (char* file);
   iImageIO *ImageLoader;
+  iGraphics3D *myG3D;
+  iVFS *myVFS;
 
 public:
   PerfTest ();
