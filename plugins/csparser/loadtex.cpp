@@ -41,11 +41,18 @@ iImage* csLoader::LoadImage (const char* name, int Format)
 
   if (Format & CS_IMGFMT_INVALID)
   {
-    if (Engine) {
+    if (Engine)
+    {
       Format = Engine->GetTextureFormat ();
-    } else if (G3D) {
+    }
+    else if (G3D)
+    {
       Format = G3D->GetTextureManager()->GetTextureFormat();
-    } else return NULL;
+    }
+    else
+    {
+      Format = CS_IMGFMT_TRUECOLOR;
+    }
   }
 
   iImage *ifile = NULL;
@@ -82,24 +89,33 @@ iImage* csLoader::LoadImage (const char* name, int Format)
 iTextureHandle *csLoader::LoadTexture (const char *fname, int Flags,
 	iTextureManager *tm)
 {
-  if (!tm)
+  if (!tm && G3D)
   {
-    if (!G3D)
-      return NULL;
     tm = G3D->GetTextureManager();
   }
+  int Format;
+  if (tm)
+    Format = tm->GetTextureFormat ();
+  else
+    Format = CS_IMGFMT_TRUECOLOR;
 
-  iImage *Image = LoadImage(fname, tm->GetTextureFormat());
+  iImage *Image = LoadImage (fname, Format);
   if (!Image)
     return NULL;
 
-  iTextureHandle *TexHandle = tm->RegisterTexture (Image, Flags);
-  if (!TexHandle)
+  iTextureHandle *TexHandle;
+  if (tm)
   {
-    ReportError (
+    TexHandle = tm->RegisterTexture (Image, Flags);
+    if (!TexHandle)
+    {
+      ReportError (
 	      "crystalspace.maploader.parse.texture",
 	      "Cannot create texture from '%s'!", fname);
+    }
   }
+  else
+    TexHandle = NULL;
 
   return TexHandle;
 }
@@ -109,9 +125,11 @@ iTextureWrapper *csLoader::LoadTexture (const char *name, const char *fname,
 {
   if (!Engine)
     return NULL;
-  
+
   iTextureHandle *TexHandle = LoadTexture(fname, Flags, tm);
-  if (!TexHandle)
+  // Only return an error if we have a texture manager. Otherwise
+  // we will work with a NULL texture handle.
+  if (tm && !TexHandle)
     return NULL;
 
   iTextureWrapper *TexWrapper =

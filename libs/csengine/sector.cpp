@@ -387,7 +387,8 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
     {
       csMeshWrapper* mesh = (csMeshWrapper*)meshes[i];
       // @@@ UGLY!!!
-      iThingState* ith = SCF_QUERY_INTERFACE_FAST (mesh->GetMeshObject (), iThingState);
+      iThingState* ith = SCF_QUERY_INTERFACE_FAST (mesh->GetMeshObject (),
+      	iThingState);
       if (ith)
       {
         csThing* sp = (csThing*)(ith->GetPrivateObject ());

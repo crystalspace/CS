@@ -1777,7 +1777,7 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
         break;
       case CS_TOKEN_MESHOBJ:
         {
-	  iMeshWrapper* mesh = Engine->CreateMeshObject(name);
+	  iMeshWrapper* mesh = Engine->CreateMeshObject (name);
           if (!LoadMeshObject (mesh, params))
 	  {
       	    ReportError (

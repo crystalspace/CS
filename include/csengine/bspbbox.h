@@ -214,10 +214,11 @@ private:
   csPolygonStub* base_stub;
 
   /**
-   * If true then this object is transformed to camera space.
-   * i.e. cam_vertices will be valid.
+   * This number indicates the number of the camera we used to transform
+   * the camera vertices with. It is used to check if the current camera
+   * vertices are still valid.
    */
-  bool is_cam_transf;
+  int camera_nr;
 
   /// Bounding box for this object.
   csBox3 world_bbox;
@@ -308,13 +309,17 @@ public:
   csPolygonInt** GetPolygons () { return base_stub->GetPolygons (); }
 
   /// Transform the vertices of this container from world to camera.
-  void World2Camera (const csTransform& trans);
+  void World2Camera (const csTransform& trans, int cur_camera_nr);
 
   /// Return true if this object is already transformed to camera space.
-  bool IsTransformed () { return is_cam_transf; }
+  bool IsTransformed (int cur_camera_nr)
+  {
+    if (cur_camera_nr != camera_nr) return false;
+    return (cam_vertices.GetVertexCount () == vertices.GetVertexCount ());
+  }
 
   /// Clear camera transformation.
-  void ClearTransform () { is_cam_transf = false; }
+  void ClearTransform () { camera_nr = -1; }
 
   /**
    * Split the given stub with a plane and return

@@ -52,8 +52,16 @@ csTextureWrapper::csTextureWrapper (iTextureHandle *ith) :
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
 
-  (handle = ith)->IncRef ();
-  flags = ith->GetFlags ();
+  handle = ith;
+  if (handle)
+  {
+    ith->IncRef ();
+    flags = ith->GetFlags ();
+  }
+  else
+  {
+    flags = 0;
+  }
   UpdateKeyColorFromHandle ();
 
   // @@@ ?????

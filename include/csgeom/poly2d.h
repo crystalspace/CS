@@ -133,7 +133,7 @@ public:
   /**
    * Set the number of vertices.
    */
-  void SetGetVertexCount (int n)
+  void SetVertexCount (int n)
   {
     MakeRoom (n);
     num_vertices = n;

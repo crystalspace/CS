@@ -126,7 +126,7 @@ public:
   /**
    * Set the number of vertices.
    */
-  void SetGetVertexCount (int n) { MakeRoom (n); num_vertices = n; }
+  void SetVertexCount (int n) { MakeRoom (n); num_vertices = n; }
 
   /**
    * Add a vertex (3D) to the polygon.

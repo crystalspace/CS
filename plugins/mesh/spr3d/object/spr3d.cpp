@@ -183,9 +183,9 @@ void csSprite3DMeshObjectFactory::AddVertices (int num)
 
   for (frame = 0; frame < frames.Length(); frame++)
   {
-    normals.Get (frame)->SetGetVertexCount (GetNormalCount () + num);
-    texels.Get (frame)->SetGetVertexCount (GetTexelCount () + num);
-    vertices.Get (frame)->SetGetVertexCount (GetVertexCount () + num);
+    normals.Get (frame)->SetVertexCount (GetNormalCount () + num);
+    texels.Get (frame)->SetVertexCount (GetTexelCount () + num);
+    vertices.Get (frame)->SetVertexCount (GetVertexCount () + num);
   }
 }
 
@@ -328,9 +328,9 @@ csSpriteFrame* csSprite3DMeshObjectFactory::AddFrame ()
 
   if (frames.Length() > 0)
   {
-    nr->SetGetVertexCount (GetNormalCount  ());
-    tx->SetGetVertexCount (GetTexelCount   ());
-    vr->SetGetVertexCount (GetVertexCount ());
+    nr->SetVertexCount (GetNormalCount  ());
+    tx->SetVertexCount (GetTexelCount   ());
+    vr->SetVertexCount (GetVertexCount ());
   }
 
   frames.Push (fr);

@@ -106,15 +106,21 @@ iMaterialWrapper* csProcTexture::Initialize (iSystem * system,
 {
   SetName (name);
   Initialize (system);
-  tex->Register (txtmgr);
-  tex->GetTextureHandle ()->Prepare ();
+  if (txtmgr)
+  {
+    tex->Register (txtmgr);
+    tex->GetTextureHandle ()->Prepare ();
+  }
   //PrepareAnim ();
   iMaterial* material = engine->CreateBaseMaterial (tex);
   iMaterialWrapper* mat = engine->GetMaterialList ()->NewMaterial (material);
   mat->QueryObject ()->SetName (name);
   material->DecRef ();
-  mat->Register (txtmgr);
-  mat->GetMaterialHandle ()->Prepare ();
+  if (txtmgr)
+  {
+    mat->Register (txtmgr);
+    mat->GetMaterialHandle ()->Prepare ();
+  }
   return mat;
 }
 

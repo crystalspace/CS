@@ -167,7 +167,7 @@ csWfPolygon::~csWfPolygon ()
   if (vertices) delete [] vertices;
 }
 
-void csWfPolygon::SetGetVertexCount (int n)
+void csWfPolygon::SetVertexCount (int n)
 {
   num_vertices = n;
   delete [] vertices;

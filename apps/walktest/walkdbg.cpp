@@ -166,7 +166,7 @@ void draw_map (csRenderView* /*rview*/, int type, void* entity)
     int j;
     csWfPolygon* po = wf->AddPolygon ();
     po->SetVisColor (wf->GetYellow ());
-    po->SetGetVertexCount (poly->GetVertices ().GetVertexCount ());
+    po->SetVertexCount (poly->GetVertices ().GetVertexCount ());
     for (j = 0 ; j < poly->GetVertices ().GetVertexCount () ; j++)
       po->SetVertex (j, poly->Vwor (j));
     po->Prepare ();

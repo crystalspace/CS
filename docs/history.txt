@@ -1,5 +1,23 @@
 The history order is reversed so that new features are at the top.
 
+9-Jul-2001
+	- Added csThing::IntersectSegmentFull() which does the same
+	  thing as IntersectSegment() except that the latter doesn't (anymore)
+	  test objects in the visibility tree.
+	  iVisibilityCuller::IntersectSegment() (implemented by csThing)
+	  will actually call IntersectSegmentFull().
+	- Renamed proctex.cpp in simplept to sproctex.cpp. Due to a limitation
+	  in the makefile system we cannot have source files that have
+	  the same name even if they are in seperate sub-projects.
+	- Renamed csPoly3D::SetGetVertexCount() to SetVertexCount().
+	- Renamed csPoly2D::SetGetVertexCount() to SetVertexCount().
+	- Renamed csWfPolygon::SetGetVertexCount() to SetVertexCount().
+	- Fixed a signficant bug in the transformation of bounding boxes
+	  in the octree. It could happen that it was not updated enough.
+	  Now it uses the camera number to see if it needs updating those
+	  vertices and it will also make sure the number of vertices in the
+	  camera array is the same as the number of vertices in the object
+	  array.
 8-Jul-2001
 	- Fixed a bug in the destructor of the emit particle system
 	  which could cause crashes at exit.
@@ -39,7 +57,72 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug with map2cs where it would put the MOVEABLE()
 	  keyword outside the PARAMS() block. It must go inside the
 	  PARAMS() block instead.
+	- Martin Geisse added a simple tutorial application, called simplept.
+	  It should demonstrate how to create a procedural texture and let
+	  the engine render into it (and by this it should finally replace
+	  the unmaintained ptlab application). Currently there is still a
+	  crasher at shutdown for opengl.
+	- Michael Voasse did the following:
+	    - Improved HitBeamObject() somewhat in terrfunc. I have fixed
+	      the endless loop situation so that it doesn't hang the engine
+	      when used in certain circumstances. It should be fairly acurate
+	      now with two small caveats. The first being sometimes the
+	      method will fail to hit a triangle even though it is obvious
+	      that a triangle is intersecting the beam. Secondly, due to the
+	      first failure, the other side of an object is sometimes
+	      intersected. I have changed the routine so that it tries to
+	      find the closest intersection, but sometimes it just plain
+	      fails. I have no idea why at this stage, further investigation
+	      is required.
+	    - Changed HitBeamObject() in cube to detect intersection only on
+	      the bounding box. Since the cube is a box anyways, checking the
+	      individual triangles is not necesary. Since the orientation of a
+	      cube cannot be changed using HardTransform(), only the
+	      translation, this should be adequate. Note: If someone DOES
+	      change HardTransform() in cube, then they WILL need to change
+	      the HitBeamObject() method as well.
+	    - Changed the HitBeamObject() in ball to find the closest
+	      intersection. This seems to work rather well, but is
+	      somewhat slower than the original.
+	- Philip Wyett removed new simlept due to a very bad memory problem.
+	  Note: This took my Dual PIII with a 1Gb of RAM down
+	  to a low memory alert inside a minute and a half on Win2K. :-/
+	- Philip also fixed includes in proctex.cpp and simplept.cpp.
+	- Philip added several include files and libs from the lib3ds
+	  project to make sure the ie3ds importer builds on VC.
+	- Martin Geisse did the following:
+	    - Added iEngine::GetContext () which returns the current renderer.
+	    - Fixed a bug in camera code with MoveWorldUnrestricted() and
+	      MoveUnrestricted(). The camera number was not correctly
+	      updated.
+	    - Replaced lots of SCF_QUERY_INTERFACE calls in the engine with
+	      SCF_QUERY_INTERFACE_FAST.
+	    - Added Insert() to growing arrays.
+	    - Added csModelDataVertices to the model data structures. It can
+	      be used to keep a list of vertices.
+	    - Model data objects don't store their vertices directly anymore.
+	      Instead, they keep a pointer to a 'default vertex set' of type
+	      iModelDataVertices.
+	    - Added csModelDataAction, which is intended to be a set of key
+	      frames, but it is currently unused.
+	    - Added missing bounds check to the Insert() method of growing
+	      arrays.
+7-Jul-2001
+	- Richard D. Shank updated the 3ds model converter. It requires a
+	  post release 1.1.0 of lib3ds.
+	- Martin Geisse continued to change phyztest to use engine objects
+	  through SCF interfaces.
 6-Jul-2001
+	- Christopher Nelson fixed two silly problems in AWS.
+	- Philip Wyett did the following to AWS:
+	  Function param mod for VC.
+	  Chris: The only errors in AWS now are in the mouse
+	  and key fuctions in "awswin.cpp" which should
+	  have boolean returns but are not yet finished.
+	- Christopher Nelson fixed boolean non-returns to make all the
+	  compilers happy (in the AWS plugin).
+	- Martin Geisse changed phyztest, ptlab, and walktest in many cases
+	  to use engine objects through SCF interfaces.
 	- Fixed a bug in Blocks with the vertical raster lines. Some of
 	  them were visible from the wrong side.
 	- Converted Blocks, Demosky, Bumptest, Metademo, Pysimple,

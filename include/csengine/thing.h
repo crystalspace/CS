@@ -689,6 +689,23 @@ public:
 	float* pr = NULL, bool only_portals = false);
 
   /**
+   * Intersect object-space segment with polygons of this set. Return
+   * polygon it intersects with (or NULL) and the intersection point
+   * in object coordinates.<p>
+   *
+   * If 'pr' != NULL it will also return a value between 0 and 1
+   * indicating where on the 'start'-'end' vector the intersection
+   * happened.<p>
+   *
+   * This version is similar to IntersectSegment() but it will also test
+   * polygons of all objects which are registered to the visibility culler
+   * of this thing (if there is any).
+   */
+  csPolygon3D* IntersectSegmentFull (const csVector3& start, 
+	const csVector3& end, csVector3& isect,
+	float* pr = NULL);
+
+  /**
    * Check frustum visibility on this thing.
    */
   void RealCheckFrustum (iFrustumView* lview, iMovable* movable);

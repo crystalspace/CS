@@ -576,6 +576,7 @@ struct ISectData
   csSegment3 seg;
   csVector3 isect;
   float r;
+  bool only_local;	// If true we only consider polygons in the culler mesh
 };
 
 /*
@@ -615,7 +616,7 @@ static void* IntersectSegmentTestPol (csThing* thing,
       		idata->isect, &(idata->r)))
         return (void*)p;
     }
-    else if (polygon[i]->GetType () == 3)
+    else if ((!idata->only_local) && polygon[i]->GetType () == 3)
     {
       csBspPolygon* bsppol = (csBspPolygon*)polygon[i];
       csVisObjInfo* obj = bsppol->GetOriginator ();
@@ -650,6 +651,52 @@ static void* IntersectSegmentTestPol (csThing* thing,
   return NULL;
 }
 
+csPolygon3D* csThing::IntersectSegmentFull (const csVector3& start, 
+  const csVector3& end, csVector3& isect, float* pr)
+{
+  if (static_tree)
+  {
+    // Version with culler.
+    ISectData idata;
+    idata.only_local = false;
+    idata.seg.Set (start, end);
+    void* rc = static_tree->Front2Back (start, IntersectSegmentTestPol,
+      (void*)&idata, IntersectSegmentCull, (void*)&idata);
+    if (rc)
+    {
+      if (pr) *pr = idata.r;
+      isect = idata.isect;
+      return (csPolygon3D*)rc;
+    }
+    return NULL;
+  }
+  else
+  {
+    // Version without culler.
+    int i;
+    float r, best_r = 2000000000.;
+    csVector3 cur_isect;
+    csPolygon3D* best_p = NULL;
+    // @@@ This routine is not very optimal. Especially for things
+    // with large number of polygons.
+    for (i = 0 ; i < polygons.Length () ; i++)
+    {
+      csPolygon3D* p = polygons.Get (i);
+      if (p->IntersectSegment (start, end, cur_isect, &r))
+      {
+        if (r < best_r)
+        {
+	  best_r = r;
+	  best_p = p;
+	  isect = cur_isect;
+        }
+      }
+    }
+    if (pr) *pr = best_r;
+    return best_p;
+  }
+}
+
 csPolygon3D* csThing::IntersectSegment (const csVector3& start, 
   const csVector3& end, csVector3& isect, float* pr, bool only_portals)
 {
@@ -680,6 +727,7 @@ csPolygon3D* csThing::IntersectSegment (const csVector3& start,
   {
     // Version with culler.
     ISectData idata;
+    idata.only_local = true;
     idata.seg.Set (start, end);
     void* rc = static_tree->Front2Back (start, IntersectSegmentTestPol,
       (void*)&idata, IntersectSegmentCull, (void*)&idata);
@@ -954,11 +1002,11 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
       {
 	// Since we have a csBspPolygon we know that the poly tree object
 	// is a csPolyTreeBBox instance.
-        if (!tbb->IsTransformed ())
+        if (!tbb->IsTransformed (icam->GetCameraNumber ()))
 	{
 	  // The bbox of this object has not yet been transformed
 	  // to camera space.
-	  tbb->World2Camera (camtrans);
+	  tbb->World2Camera (camtrans, icam->GetCameraNumber ());
 	}
 
 	// Culling.
@@ -2584,7 +2632,7 @@ iMeshObjectFactory* csThing::MeshObject::GetFactory () const
 iPolygon3D* csThing::VisCull::IntersectSegment (const csVector3& start, 
   const csVector3& end, csVector3& isect, float* pr)
 {
-  csPolygon3D* p = scfParent->IntersectSegment (start, end, isect, pr);
+  csPolygon3D* p = scfParent->IntersectSegmentFull (start, end, isect, pr);
   if (p)
     return &(p->scfiPolygon3D);
   else

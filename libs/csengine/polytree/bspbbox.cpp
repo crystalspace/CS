@@ -442,6 +442,10 @@ bool csBspPolygon::ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
   float r;
   bool zs, z1s;
 
+  CS_ASSERT (
+    GetParent ()->GetCameraVertices ().GetVertexCount () ==
+    GetParent ()->GetVertices ().GetVertexCount ());
+
   // Assume maximum 100 vertices! (@@@ HARDCODED LIMIT)
   static csVector3 verts[100];
   bool vis[100];
@@ -453,7 +457,7 @@ bool csBspPolygon::ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
   csVector3* vertices = GetParent ()->GetCameraVertices ().GetVertices ();
   cnt_vis = 0;
   for (i = 0 ; i < polygon.GetVertexCount () ; i++)
-    if (vertices[polygon[i]].z >= 0) cnt_vis++;
+    if (vertices[polygon[i]].z >= 0) { cnt_vis++; break; }
   if (cnt_vis == 0) return false;
 
   // Perform backface culling.
@@ -485,7 +489,7 @@ bool csBspPolygon::ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
   for (i = 0 ; i < num_vertices ; i++)
   {
     //vis[i] = csMath3::Visible (Vcam (i), *portal_plane);
-    vis[i] = portal_plane->Classify (vertices[polygon[i]]) <= SMALL_EPSILON;
+    vis[i] = portal_plane->Classify (vertices[polygon[i]]) <= -SMALL_EPSILON;
     if (vis[i]) cnt_vis++;
   }
 
@@ -498,28 +502,29 @@ bool csBspPolygon::ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
   num_verts = 0;
 
   i1 = num_vertices-1;
+  z1s = vis[i1];
   for (i = 0 ; i < num_vertices ; i++)
   {
-    zs = !vis[i];
-    z1s = !vis[i1];
+    zs = vis[i];
 
-    if (z1s && !zs)
+    if (!z1s && zs)
     {
       csIntersect3::Plane (vertices[polygon[i1]], vertices[polygon[i]],
       	*portal_plane, verts[num_verts], r);
       num_verts++;
       verts[num_verts++] = vertices[polygon[i]];
     }
-    else if (!z1s && zs)
+    else if (z1s && !zs)
     {
       csIntersect3::Plane (vertices[polygon[i1]], vertices[polygon[i]],
       	*portal_plane, verts[num_verts], r);
       num_verts++;
     }
-    else if (!z1s && !zs)
+    else if (z1s && zs)
     {
       verts[num_verts++] = vertices[polygon[i]];
     }
+    z1s = zs;
     i1 = i;
   }
 
@@ -845,7 +850,7 @@ csPolyTreeBBox::csPolyTreeBBox ()
   first_stub = NULL;
   base_stub = (csPolygonStub*)stub_pool.Alloc (&stub_fact);
   base_stub->IncRef (); // Make sure this object is locked.
-  is_cam_transf = false;
+  camera_nr = -1;
 }
 
 csPolyTreeBBox::~csPolyTreeBBox ()
@@ -884,13 +889,13 @@ void csPolyTreeBBox::LinkStub (csPolygonStub* ps)
   ps->object = this;
 }
 
-void csPolyTreeBBox::World2Camera (const csTransform& trans)
+void csPolyTreeBBox::World2Camera (const csTransform& trans, int cur_camera_nr)
 {
   int i;
-  cam_vertices.SetGetVertexCount (vertices.GetVertexCount ());
+  cam_vertices.SetVertexCount (vertices.GetVertexCount ());
   for (i = 0 ; i < vertices.GetVertexCount () ; i++)
     cam_vertices[i] = trans.Other2This (vertices[i]);
-  is_cam_transf = true;
+  camera_nr = cur_camera_nr;
 }
 
 void csPolyTreeBBox::Update (const csBox3& object_bbox, const csTransform& o2w,
@@ -901,6 +906,7 @@ void csPolyTreeBBox::Update (const csBox3& object_bbox, const csTransform& o2w,
   const csBox3& b = object_bbox;
   csVector3Array& va = GetVertices ();
   va.MakeEmpty ();
+  camera_nr = -1;
 
   // Clear the polygons from the base stub.
   base_stub->Initialize ();
@@ -1007,6 +1013,7 @@ void csPolyTreeBBox::Update (const csBox3& world_bbox, csVisObjInfo* originator)
 
   csVector3Array& va = GetVertices ();
   va.MakeEmpty ();
+  camera_nr = -1;
 
   // Identity transformation.
   csTransform trans;

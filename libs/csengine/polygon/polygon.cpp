@@ -1189,7 +1189,8 @@ bool csPolygon3D::ClipToPlane (csPlane3* portal_plane, const csVector3& v_w2c,
   }
 
   // If there is no portal polygon then everything is ok.
-  if (!portal_plane) {
+  if (!portal_plane)
+  {
     // Copy the vertices to verts.
     for (i = 0 ; i < num_vertices ; i++) verts[i] = Vcam (i);
     pverts = verts;

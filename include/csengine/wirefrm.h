@@ -154,7 +154,7 @@ public:
   virtual ~csWfPolygon ();
 
   ///
-  void SetGetVertexCount (int n);
+  void SetVertexCount (int n);
   ///
   int GetVertexCount () { return num_vertices; }
   ///
