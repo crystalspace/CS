@@ -146,7 +146,7 @@ public:
   /**
    * Get the current position.
    */
-  const csVector3& GetPosition () { return obj.GetOrigin (); }
+  const csVector3& GetPosition () const { return obj.GetOrigin (); }
 
   /**
    * Set the transformation matrix for this entity.
