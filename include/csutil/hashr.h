@@ -21,6 +21,9 @@
  * Reversible hash.
  */
 
+#ifndef __CS_UTIL_HASHR_H__
+#define __CS_UTIL_HASHR_H__
+
 #include "csextern.h"
 #include "hash.h"
  
@@ -78,3 +81,4 @@ public:
   }
 };
 
+#endif // __CS_UTIL_HASHR_H__

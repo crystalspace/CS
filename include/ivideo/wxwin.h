@@ -19,6 +19,8 @@
 #ifndef _CS_IVIDEO_WXWIN_H_
 #define _CS_IVIDEO_WXWIN_H_
 
+struct wxWindow;
+
 SCF_VERSION(iWxWindow, 0, 0, 0)
 
 struct iWxWindow : public iBase 
