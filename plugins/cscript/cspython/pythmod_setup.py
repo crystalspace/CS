@@ -23,9 +23,9 @@ while i < len(sys.argv) and sys.argv[i] != '--':
     i += 1
 i += 1 # skip '--'
 if sys.argv[i] == '--':
-    lib_dir = []
+    lib_dir = ''
 else:
-    libs_dir = sys.argv[i] ; i += 1
+    lib_dir = sys.argv[i] ; i += 1
 libs = []
 while i < len(sys.argv) and sys.argv[i] != '--':
     libs.append(sys.argv[i])

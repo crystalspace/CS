@@ -181,7 +181,7 @@ $(PYTHMOD.INSTALLDIR):
 
 ifeq ($(PYTHON.DISTUTILS),yes)
 $(PYTHMOD): $(PYTHMOD.INSTALLDIR) $(SRC.PYTHMOD) $(LIB.PYTHMOD)
-	$(PYTHON) $(SRCDIR)/plugins/cscript/cspython/pythmod_setup.py $(SWIG.OUTDIR) $(SRCDIR) $(SRCDIR)/include ./include $(OUT) -- $(PYTHMOD.LIBS.PLATFORM) -- build -q --build-base=$(PYTHMOD.BUILDBASE) install -q --install-lib=$(PYTHMOD.INSTALLDIR)
+	$(PYTHON) $(SRCDIR)/plugins/cscript/cspython/pythmod_setup.py $(SWIG.OUTDIR) $(SRCDIR) $(SRCDIR)/include ./include $(OUT) -- $(OUT) $(PYTHMOD.LIBS.PLATFORM) -- build -q --build-base=$(PYTHMOD.BUILDBASE) install -q --install-lib=$(PYTHMOD.INSTALLDIR)
 else
 $(PYTHMOD):
 	@echo $(DESCRIPTION.pythmod)" not supported: distutils not available!"
