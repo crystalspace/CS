@@ -1192,17 +1192,12 @@ bool csGLRender3D::ActivateTexture (iTextureHandle *txthandle, int unit)
 
 bool csGLRender3D::ActivateTexture (iMaterialHandle *mathandle, int layer, int unit)
 {
+  // @@@ deal with multiple textures
   iTextureHandle* txthandle = 0;
   csMaterialHandle* mathand = (csMaterialHandle*)mathandle;
   if(layer == 0)
   {
     txthandle = mathand->GetTexture();
-    if (!txthandle)
-      return false;
-  } else if(layer > 0 && layer <= mathand->GetTextureLayerCount() )
-  {
-    csTextureLayer* matlayer = mathand->GetTextureLayer(layer-1);
-    txthandle = matlayer->txt_handle;
     if (!txthandle)
       return false;
   } else return false;

@@ -43,6 +43,19 @@
 /// Default material `reflection' parameter
 #define CS_DEFMAT_REFLECTION  0.0f
 
+#ifdef CS_USE_NEW_RENDERER
+  /// Name string for the material "diffuse" shader var
+  #define CS_MATERIAL_VARNAME_DIFFUSE		"mat diffuse"
+  /// Name string for the material "ambient" shader var
+  #define CS_MATERIAL_VARNAME_AMBIENT		"mat ambient"
+  /// Name string for the material "reflection" shader var
+  #define CS_MATERIAL_VARNAME_REFLECTION	"mat reflection"
+  /// Name string for the material "flat color" shader var
+  #define CS_MATERIAL_VARNAME_FLATCOLOR		"mat flatcolor"
+  /// Name string for the material "diffuse" texture
+  #define CS_MATERIAL_TEXTURE_DIFFUSE		"tex diffuse"
+#endif
+
 struct iEffectDefinition;
 struct iTextureHandle;
 struct csRGBpixel;
@@ -91,6 +104,7 @@ struct iMaterial : public iShaderBranch
   virtual iShaderWrapper* GetShader (csStringID type) = 0;
 #endif
 
+#ifndef CS_USE_NEW_RENDERER
   /**
    * Set the material's effect.
    */
@@ -100,12 +114,26 @@ struct iMaterial : public iShaderBranch
    * Get the effect from the material.
    */
   virtual iEffectDefinition *GetEffect () = 0;
+#endif
 
   /**
    * Get the base texture from the material.
    */
   virtual iTextureHandle *GetTexture () = 0;
 
+#ifdef CS_USE_NEW_RENDERER
+  /**
+   * Get a texture from the material.
+   */
+  virtual iTextureHandle* GetTexture (csStringID name) = 0;
+
+  /**
+   * Set a texture of the material.
+   */
+  virtual void SetTexture (csStringID name, iTextureHandle* texture) = 0;
+#endif
+
+#ifndef CS_USE_NEW_RENDERER
   /**
    * Get the number of texture layers. The base
    * texture is not counted in this.
@@ -116,12 +144,14 @@ struct iMaterial : public iShaderBranch
    * Get a texture layer.
    */
   virtual csTextureLayer* GetTextureLayer (int idx) = 0;
+#endif
 
   /**
    * Get the flat color. If the material has a texture assigned, this
    * will return the mean texture color.
    */
-  virtual void GetFlatColor (csRGBpixel &oColor, bool useTextureMean=1) = 0;
+  virtual void GetFlatColor (csRGBpixel &oColor, 
+    bool useTextureMean = true) = 0;
   /**
    * Set the flat shading color.
    */

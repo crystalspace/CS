@@ -50,6 +50,8 @@ chronological order.
 	- Fixed a bad bug in the copy constructor of csArray. It would not
 	  initialize capacity to 0 which could cause very bad results
 	  and crashes in CS.
+	- res started to change NR materials to store parameters (e.g. diffuse
+	  value) in shader variables.
 6-Aug-2003
 	- Jorrit fixed a compile error in freefnt2 font server related to the
 	  csRefArray->csArray change.

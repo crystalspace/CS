@@ -289,6 +289,7 @@ struct iEngine : public iBase
    */
   virtual csPtr<iMaterial> CreateBaseMaterial (iTextureWrapper* txt) = 0;
 
+#ifndef CS_USE_NEW_RENDERER
   /**
    * Create a base material that can be used to give to the texture
    * manager. This version also supports texture layers.
@@ -296,6 +297,7 @@ struct iEngine : public iBase
    */
   virtual csPtr<iMaterial> CreateBaseMaterial (iTextureWrapper* txt,
   	int num_layers, iTextureWrapper** wrappers, csTextureLayer* layers) = 0;
+#endif
 
   /// Create a texture from a file.
   virtual iTextureWrapper* CreateTexture (const char *name,

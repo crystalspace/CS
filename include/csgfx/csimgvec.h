@@ -55,7 +55,7 @@ public:
   /**
   * Get Image operator[]
   */
-  virtual csRef<iImage> operator[](int index) ;
+  virtual void SetImage (int index, iImage* img);
   /**
   * Get Image Count
   */

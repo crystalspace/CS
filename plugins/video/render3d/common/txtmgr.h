@@ -226,21 +226,6 @@ public:
 class csMaterialHandle : public iMaterialHandle
 {
 protected:
-  /// A texture.
-  csRef<iTextureHandle> texture;
-  /// Numer of texture layers.
-  int num_texture_layers;
-  /// Texture layers.
-  csTextureLayer texture_layers[4];
-  /**
-   * Flags that indicate if the texture layer needs translating
-   * relative to the base texture.
-   */
-  bool texture_layer_translate[4];
-  /// The flat color of the material
-  csRGBpixel flat_color;
-  /// Material reflection parameters
-  float diffuse, ambient, reflection;
   /// Original material.
   csRef<iMaterial> material;
   /// Parent texture manager
@@ -260,14 +245,6 @@ public:
   /// Get the material.
   iMaterial* GetMaterial () { return material; }
 
-  /// Get the number of texture layers.
-  int GetTextureLayerCount () { return num_texture_layers; }
-  /// Get a texture layer.
-  csTextureLayer* GetTextureLayer (int idx) { return &texture_layers[idx]; }
-  /// Returns true if texture layer needs translation.
-  bool TextureLayerTranslated (int idx)
-  { return texture_layer_translate[idx]; }
-
   //--------------------- iMaterialHandle implementation ----------------------
   SCF_DECLARE_IBASE;
 
@@ -280,20 +257,25 @@ public:
   /**
    * Get a texture from the material.
    */
-  virtual iTextureHandle *GetTexture () { return texture; }
+  virtual iTextureHandle *GetTexture ();
 
   /**
    * Get the flat color. If the material has a texture assigned, this
    * will return the mean texture color.
    */
-  virtual void GetFlatColor (csRGBpixel &oColor) { oColor = flat_color; }
+  virtual void GetFlatColor (csRGBpixel &oColor) 
+  { 
+    material->GetFlatColor (oColor);
+  }
 
   /**
    * Get light reflection parameters for this material.
    */
   virtual void GetReflection (float &oDiffuse, float &oAmbient,
     float &oReflection)
-  { oDiffuse = diffuse; oAmbient = ambient; oReflection = reflection; }
+  { 
+    material->GetReflection (oDiffuse, oAmbient, oReflection);
+  }
 
   /**
    * Prepare this material. The material wrapper (remembered during
@@ -335,6 +317,9 @@ protected:
 public:
   /// Pixel format.
   csPixelFormat pfmt;
+
+  csStringID nameDiffuseTexture;
+
 
   SCF_DECLARE_IBASE;
 

@@ -110,16 +110,16 @@ csGLTextureHandle::csGLTextureHandle (csRef<iImageVector> image, int flags, int 
   images = image;
   int i=0;
   for (i=0; i < images->Length(); i++)
-    (*images)[i]->IncRef();
+    images->GetImage (i)->IncRef();
 
   this->flags = flags;
   transp = false;
   transp_color.red = transp_color.green = transp_color.blue = 0;
 
-  if ((*images)[0]->HasKeycolor ())
+  if (images->GetImage (0)->HasKeycolor ())
   {
     int r,g,b;
-    (*images)[0]->GetKeycolor (r,g,b);
+    images->GetImage (0)->GetKeycolor (r,g,b);
     SetKeyColor (r, g, b);
   }
   cachedata = 0;
@@ -232,7 +232,7 @@ bool csGLTextureHandle::FindFormatType ()
     {
       if (!transp)
       {
-	if (!((*images)[0]->GetFormat () & CS_IMGFMT_ALPHA))
+	if (!(images->GetImage (0)->GetFormat () & CS_IMGFMT_ALPHA))
 	{
 	  sourceFormat = GL_RGB;
 	  // Again determine the formatidx and possible change it if we
@@ -266,8 +266,8 @@ bool csGLTextureHandle::FindFormatType ()
 	  != targetFormat; i++);
 	formatidx = i;
 
-	int pixels = (*images)[0]->GetWidth () * (*images)[0]->GetHeight ();
-	csRGBpixel *_src = (csRGBpixel *)(*images)[0]->GetImageData ();
+	int pixels = images->GetImage (0)->GetWidth () * images->GetImage (0)->GetHeight ();
+	csRGBpixel *_src = (csRGBpixel *)images->GetImage (0)->GetImageData ();
 
 	while (pixels--)
 	{
@@ -281,9 +281,9 @@ bool csGLTextureHandle::FindFormatType ()
 	// Now we draw borders inside all keycolored areas.
 	// This removes the halos of keycolor when using bilinear filtering
 	int h, rows, w, cols;
-	h = rows = (*images)[0]->GetHeight ();
-	w = (*images)[0]->GetWidth();
-	_src = (csRGBpixel *)(*images)[0]->GetImageData ();
+	h = rows = images->GetImage (0)->GetHeight ();
+	w = images->GetImage (0)->GetWidth();
+	_src = (csRGBpixel *)images->GetImage (0)->GetImageData ();
 	while (rows--)
 	{
 	  cols = w;
@@ -373,40 +373,29 @@ void csGLTextureHandle::GetKeyColor (uint8 &red, uint8 &green, uint8 &blue)
   blue = transp_color.blue;
 }
 
-bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh)
+bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &w, int &h)
 {
-  if(cachedata)
+  if (mipmap < vTex.Length ())
   {
-    //csGLTexture *real_tex = (csGLTexture*) cachedata;
-
-    mw = orig_width >> mipmap;
-    mh = orig_height >> mipmap;
-    // real_tex size has to be multiple of 2
-    //mw = real_tex->get_width() >> mipmap;
-    //mh = real_tex->get_height() >> mipmap;
+    w = vTex[mipmap]->get_width () << txtmgr->texture_downsample;
+    h = vTex[mipmap]->get_height () << txtmgr->texture_downsample;
+    return true;
   }
-  else
-  if(images.IsValid() && (*images)[0].IsValid())
-  {
-    // Dunno if this is right, but it seems to work.
-    mw = vTex[0]->get_width () >> mipmap;
-    mh = vTex[0]->get_height () >> mipmap;
-  }
-  else
-    return false;
-
-  return true; 
+  return false;
 }
 
 void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh)
 {
-  if(images.IsValid() && (*images)[0].IsValid())
+  if(images.IsValid() && images->GetImage (0).IsValid())
   {
-    mw = (*images)[0]->GetWidth() << txtmgr->texture_downsample;
-    mh = (*images)[0]->GetHeight() << txtmgr->texture_downsample;
+    //mw = images->GetImage (0)->GetWidth() << txtmgr->texture_downsample;
+    //mh = images->GetImage (0)->GetHeight() << txtmgr->texture_downsample;
+    mw = orig_width;
+    mh = orig_height;
   }
 }
 
+// Check the two below for correctness
 bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh, int &md)
 {
   if(cachedata)
@@ -418,8 +407,7 @@ bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh, int &
     mh = real_tex->get_height() >> mipmap;
     md = real_tex->get_depth() >> mipmap;
   }
-  else
-  if(images.IsValid() && (*images)[0].IsValid())
+  else if(images.IsValid() && images->GetImage (0).IsValid())
   {
     // TODO: implement to get size from image array
   }
@@ -431,10 +419,10 @@ bool csGLTextureHandle::GetMipMapDimensions (int mipmap, int &mw, int &mh, int &
 
 void csGLTextureHandle::GetOriginalDimensions (int& mw, int& mh, int &md)
 {
-  if(images.IsValid() && (*images)[0].IsValid())
+  if (images.IsValid() && images->GetImage (0).IsValid())
   {
-    mw = (*images)[0]->GetWidth();
-    mh = (*images)[0]->GetHeight();
+    mw = images->GetImage (0)->GetWidth();
+    mh = images->GetImage (0)->GetHeight();
     md = images->Length();
   }
 }
@@ -485,17 +473,17 @@ void csGLTextureHandle::AdjustSizePo2 ()
   int i;
   for(i = 0; i < images->Length(); i++)
   {
-    orig_width  = (*images)[i]->GetWidth();
-    orig_height = (*images)[i]->GetHeight();
+    orig_width  = images->GetImage (i)->GetWidth();
+    orig_height = images->GetImage (i)->GetHeight();
 
     int newwidth  = orig_width;
     int newheight = orig_height;
 
     if (!csIsPowerOf2(newwidth))
-      newwidth = csFindNearestPowerOf2 ((*images)[i]->GetWidth ()) / 2;
+      newwidth = csFindNearestPowerOf2 (orig_width) / 2;
 
     if (!csIsPowerOf2 (newheight))
-      newheight = csFindNearestPowerOf2 ((*images)[i]->GetHeight ()) / 2;
+      newheight = csFindNearestPowerOf2 (orig_height) / 2;
 
     // downsample textures, if requested, but not 2D textures
     if (!(flags & (CS_TEXTURE_2D)))
@@ -508,9 +496,9 @@ void csGLTextureHandle::AdjustSizePo2 ()
     if (newwidth > txtmgr->max_tex_size) newwidth = txtmgr->max_tex_size;
     if (newheight > txtmgr->max_tex_size) newheight = txtmgr->max_tex_size;
 
-    if (newwidth != (*images)[i]->GetWidth () || newheight != (*images)[i]->GetHeight ())
+    if (newwidth != orig_width || newheight != orig_height)
     {
-      (*images)[i]->Rescale (newwidth, newheight);
+      images->GetImage (i)->Rescale (newwidth, newheight);
     }
   }
 }
@@ -535,7 +523,7 @@ void csGLTextureHandle::CreateMipMaps()
 
   size = 0;
   //  printf ("push 0\n");
-  csGLTexture* ntex = NewTexture ((*images)[0], false);
+  csGLTexture* ntex = NewTexture (images->GetImage (0), false);
   ntex->d = images->Length();
   ntex->components = csGLTextureManager::glformats[formatidx].components;
   vTex.Push (ntex);
@@ -551,13 +539,13 @@ void csGLTextureHandle::CreateMipMaps()
       csPtr<iImageVector> (new csImageVector()); 
   csArray<int> nMipmaps;
 
-  int w = (*prevImages)[0]->GetWidth ();
-  int h = (*prevImages)[0]->GetHeight ();
+  int w = prevImages->GetImage (0)->GetWidth ();
+  int h = prevImages->GetImage (0)->GetHeight ();
   int nTex = 0;
 
   for (i=0; i < prevImages->Length(); i++)
   {
-      nMipmaps.Push ((*prevImages)[i]->HasMipmaps());
+      nMipmaps.Push (prevImages->GetImage (i)->HasMipmaps());
   }
   
   while (w != 1 || h != 1)
@@ -568,12 +556,12 @@ void csGLTextureHandle::CreateMipMaps()
       csRef<iImage> cimg;
       if (nMipmaps[i] != 0)
       {
-	cimg = (*images)[i]->MipMap (nTex, tc);
+	cimg = prevImages->GetImage (i)->MipMap (nTex, tc);
 	nMipmaps[i]--;
       }
       else
       {
-        cimg = (*prevImages)[i]->MipMap (1, tc);
+        cimg = prevImages->GetImage (i)->MipMap (1, tc);
       }
       if (txtmgr->sharpen_mipmaps)
       {
@@ -585,21 +573,21 @@ void csGLTextureHandle::CreateMipMaps()
       }
       else
       {
-	(*thisImages)[i] = cimg;
+	thisImages->SetImage (i, cimg);
       }
     }
 
-    csGLTexture* ntex = NewTexture ((*thisImages)[0], true);
+    csGLTexture* ntex = NewTexture (thisImages->GetImage (0), true);
     ntex->d = thisImages->Length();
     vTex.Push (ntex);
     DG_LINK (this, ntex);
 
     transform (thisImages, ntex);
-    w = (*thisImages)[0]->GetWidth ();
-    h = (*thisImages)[0]->GetHeight ();
+    w = thisImages->GetImage (0)->GetWidth ();
+    h = thisImages->GetImage (0)->GetHeight ();
     for (i=0; i < thisImages->Length(); i++)
     {
-      (*prevImages)[i] = (*thisImages)[i];
+      prevImages->SetImage (i, thisImages->GetImage (i));
     }
   }
 }
@@ -607,7 +595,7 @@ void csGLTextureHandle::CreateMipMaps()
 
 bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
 {
-  iImage* Image = (*ImageVector)[0];
+  iImage* Image = ImageVector->GetImage (0);
   uint8 *h;
   uint8 *&image_data = tex->get_image_data ();
   //csRGBpixel *data = (csRGBpixel *)Image->GetImageData ();
@@ -628,7 +616,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
       image_data = new uint8 [n * d];
       for (j=0; j < d; j++)
       {
-        data = (csRGBpixel *)(*ImageVector)[j]->GetImageData();
+        data = (csRGBpixel *)ImageVector->GetImage (j)->GetImageData();
         h = (uint8*)data;
         h += i;
         for (i=0; i<n; i++, h += 4)
@@ -639,7 +627,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
       image_data = new uint8 [n*d];
       for (j=0; j < d; j++)
       {
-        data = (csRGBpixel *)(*ImageVector)[j]->GetImageData();
+        data = (csRGBpixel *)ImageVector->GetImage (j)->GetImageData();
         for (i=0; i<n; i++, data++)
           *image_data++ = data->Intensity ();
       }
@@ -648,7 +636,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
       image_data = new uint8 [n*d];
       for (j=0; j < d; j++)
       {
-        data = (csRGBpixel *)(*ImageVector)[j]->GetImageData();
+        data = (csRGBpixel *)ImageVector->GetImage (j)->GetImageData();
         for (i=0; i<n; i++, data++)
           *image_data++ = data->Luminance ();
       }
@@ -657,7 +645,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
       image_data = new uint8 [n*2*d];
       for (j=0; j < d; j++)
       {
-        data = (csRGBpixel *)(*ImageVector)[j]->GetImageData();
+        data = (csRGBpixel *)ImageVector->GetImage (j)->GetImageData();
         for (i=0; i<n; i++, data++)
         {
           *image_data++ = data->Luminance ();
@@ -673,7 +661,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
 	  h = image_data = new uint8 [n*nCompo*d];
           for (j=0; j<d; j++)
           {
-            data = (csRGBpixel *)(*ImageVector)[j]->GetImageData();
+            data = (csRGBpixel *)ImageVector->GetImage (j)->GetImageData();
 	    for (i=0; i<n; i++, data++, h+=nCompo)
 	      memcpy (h, data, nCompo);
           }
@@ -682,7 +670,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
 	  h = image_data = new uint8 [n*d];
           for (j=0; j < d; j++)
           {
-            data = (csRGBpixel *)(*ImageVector)[j]->GetImageData();
+            data = (csRGBpixel *)ImageVector->GetImage (j)->GetImageData();
 	    for (i=0; i<n; i++, data++)
 	      *h++ = (data->red & 0xe0) | (data->green & 0xe0)>>5
                | (data->blue >> 6);
@@ -694,7 +682,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
 	    unsigned short *ush = (unsigned short *)image_data;
             for (j=0; j < d; j++)
             {
-              data = (csRGBpixel *)(*ImageVector)[j]->GetImageData();
+              data = (csRGBpixel *)ImageVector->GetImage (j)->GetImageData();
 	      for (i=0; i<n; i++, data++)
 	        *ush++ = ((unsigned short)(data->red & 0xf0))<<8
                 | ((unsigned short)(data->green & 0xf0))<<4
@@ -709,7 +697,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
 	    unsigned short *ush = (unsigned short *)image_data;
             for (j=0; j < d; j++)
             {
-              data = (csRGBpixel *)(*ImageVector)[j]->GetImageData();
+              data = (csRGBpixel *)ImageVector->GetImage (j)->GetImageData();
 	      for (i=0; i<n; i++, data++)
 	      *ush++ = ((unsigned short)(data->red & 0xf8))<<8
 	    	  | ((unsigned short)(data->green & 0xf8))<<3
@@ -724,7 +712,7 @@ bool csGLTextureHandle::transform (iImageVector *ImageVector, csGLTexture *tex)
 	    unsigned short *ush = (unsigned short *)image_data;
             for (j=0; j < d; j++)
             {
-              data = (csRGBpixel *)(*ImageVector)[j]->GetImageData();
+              data = (csRGBpixel *)ImageVector->GetImage (j)->GetImageData();
 	      for (i=0; i<n; i++, data++)
 	        *ush++ = ((unsigned short)(data->red & 0xf8))<<8
 		  | ((unsigned short)(data->green & 0xfc))<<3
@@ -763,36 +751,13 @@ SCF_IMPLEMENT_IBASE_END
 csGLMaterialHandle::csGLMaterialHandle (iMaterial* m, csGLTextureManager *parent)
 {
   SCF_CONSTRUCT_IBASE (0);
-
-  num_texture_layers = 0;
   material = m;
-  if (material != 0)
-  {
-    texture = material->GetTexture ();
-    material->GetReflection (diffuse, ambient, reflection);
-    material->GetFlatColor (flat_color);
-    num_texture_layers = material->GetTextureLayerCount ();
-    if (num_texture_layers > CS_MATERIAL_MAX_TEXTURE_LAYERS) num_texture_layers = CS_MATERIAL_MAX_TEXTURE_LAYERS;
-    int i;
-    for (i = 0 ; i < num_texture_layers ; i++)
-    {
-      texture_layers[i] = *(material->GetTextureLayer (i));
-      texture_layer_translate[i] =
-	texture_layers[i].uscale != 1 ||
-	texture_layers[i].vscale != 1 ||
-	texture_layers[i].ushift != 0 ||
-	texture_layers[i].vshift != 0;
-    }
-  }
   texman = parent;
 }
 
 csGLMaterialHandle::csGLMaterialHandle (iTextureHandle* t, csGLTextureManager *parent)
 {
   SCF_CONSTRUCT_IBASE (0);
-  num_texture_layers = 0;
-  diffuse = 0.7; ambient = 0; reflection = 0;
-  texture = t;
   texman = parent;
 }
 
@@ -807,9 +772,21 @@ void csGLMaterialHandle::FreeMaterial ()
   material = 0;
 }
 
-void csGLMaterialHandle::Prepare ()
+iTextureHandle* csGLMaterialHandle::GetTexture ()
 {
   if (material)
+  {
+    return material->GetTexture (texman->nameDiffuseTexture);
+  }
+  else
+  {
+    return 0;
+  }
+}
+
+void csGLMaterialHandle::Prepare ()
+{
+/*  if (material)
   {
     if (texture != material->GetTexture())
     {
@@ -817,7 +794,7 @@ void csGLMaterialHandle::Prepare ()
     }
     material->GetReflection (diffuse, ambient, reflection);
     material->GetFlatColor (flat_color);
-  }
+  }*/
 }
 
 /*
@@ -882,6 +859,8 @@ csGLTextureManager::csGLTextureManager (iObjectRegistry* object_reg,
   SCF_CONSTRUCT_IBASE (0);
   csGLTextureManager::object_reg = object_reg;
   verbose = false;
+
+  nameDiffuseTexture = iR3D->strings->Request (CS_MATERIAL_TEXTURE_DIFFUSE);
 
   glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
 

@@ -43,6 +43,8 @@
 #if defined(CS_USE_NEW_RENDERER)
 #include "iengine/renderloop.h"
 #include "csengine/renderloop.h"
+#include "ivideo/shader/shader.h"
+#include "iutil/strset.h"
 #endif
 
 class csPoly2DPool;
@@ -309,6 +311,10 @@ public:
   csRef<iGraphics2D> G2D;
   /// The graphics loader
   csRef<iImageIO> ImageLoader;
+#ifdef CS_USE_NEW_RENDERER
+  csRef<iStringSet> Strings;
+  csRef<iShaderManager> ShaderManager;
+#endif // CS_USE_NEW_RENDERER
   /**
    * The following variable is only set if the engine had to create its
    * own cache manager. In that case the engine is also responsible
@@ -763,8 +769,10 @@ public:
    * Create a base material.
    */
   virtual csPtr<iMaterial> CreateBaseMaterial (iTextureWrapper* txt);
+#ifndef CS_USE_NEW_RENDERER
   virtual csPtr<iMaterial> CreateBaseMaterial (iTextureWrapper* txt,
   	int num_layers, iTextureWrapper** wrappers, csTextureLayer* layers);
+#endif
 
   virtual iSharedVariableList* GetVariableList () const;
   virtual iMaterialList* GetMaterialList () const;

@@ -28,7 +28,7 @@
 #include "csutil/ref.h"
 struct iImage;
 
-SCF_VERSION (iImageVector, 0, 1, 1);
+SCF_VERSION (iImageVector, 0, 2, 0);
 
 struct iImageVector : public iBase
 {
@@ -49,9 +49,9 @@ struct iImageVector : public iBase
   */
   virtual csRef<iImage> GetImage(int index) = 0;
   /**
-  * Get Image operator[]
+  * Set Image at specified index
   */
-  virtual csRef<iImage> operator[](int index) = 0;
+  virtual void SetImage (int index, iImage* img) = 0;
   /**
   * Get Image Count
   */

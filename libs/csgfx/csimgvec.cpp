@@ -53,10 +53,9 @@ csRef<iImage> csImageVector::GetImage(int index)
   return r;
 }
 
-csRef<iImage> csImageVector::operator[](int index)
+void csImageVector::SetImage (int index, iImage* img)
 {
-  csRef<iImage> r = image[index];
-  return r;
+  image.Put (index, img);
 }
 
 int csImageVector::Length()

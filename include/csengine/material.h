@@ -28,6 +28,7 @@
 #include "ivideo/effects/efdef.h"
 
 #ifdef CS_USE_NEW_RENDERER
+  #include "csengine/engine.h"
   #include "csutil/symtable.h"
 #endif
 
@@ -37,13 +38,53 @@ struct iTextureManager;
 SCF_VERSION (csMaterialWrapper, 0, 0, 1);
 
 /**
+ * A hash that stores ref-counted objects, exactly one
+ * object per hash key.
+ */
+template <class T>
+class csRefHash : csHashMap
+{
+public:
+  csRefHash ()
+  { }
+
+  ~csRefHash ()
+  {
+    csGlobalHashIterator it (this);
+
+    while (it.HasNext ())
+    {
+      T* obj = (T*)it.Next ();
+      if (obj != 0) obj->DecRef ();
+    }
+  }
+
+  void Put (csHashKey key, T* object)
+  {
+    T* oldobj = (T*)csHashMap::Get (key);
+    if (oldobj != 0) oldobj->DecRef ();
+    Delete (key, (csHashObject)oldobj);
+    if (object != 0) object->IncRef ();
+    csHashMap::Put (key, (csHashObject)object);
+  }
+
+  T* Get (csHashKey key) const
+  {
+    return (T*)csHashMap::Get (key);
+  }
+};
+
+/**
  * A material class.
  */
 class csMaterial : public iMaterial
 {
 private:
+  friend class csEngine;
+
   /// flat shading color
   csRGBcolor flat_color;
+#ifndef CS_USE_NEW_RENDERER
   /// the texture of the material (can be 0)
   csRef<iTextureWrapper> texture;
   /// Number of texture layers (currently maximum 4).
@@ -62,23 +103,45 @@ private:
   
   /// The effect associated with this material
   iEffectDefinition* effect;
+#endif
 
 #ifdef CS_USE_NEW_RENDERER
   /// Shader assoiciated with material
   csHashMap* shaders;
 
   csSymbolTable symtab;
+
+  csEngine* engine;
+
+  csStringID nameDiffuseParam;
+  csStringID nameAmbientParam;
+  csStringID nameReflectParam;
+  csStringID nameFlatColorParam;
+  csStringID nameDiffuseTexture;
+
+  csRefHash<iTextureHandle> texHandles;
+  csRefHash<iTextureWrapper> texWrappers;
+
+  iShaderVariable* GetVar (csStringID name, bool create = false);
 #endif
 
 public:
   /**
    * create an empty material
    */
-  csMaterial ();
+  csMaterial (
+#ifdef CS_USE_NEW_RENDERER
+    csEngine* engine
+#endif
+    );
   /**
    * create a material with only the texture given.
    */
-  csMaterial (iTextureWrapper *txt);
+  csMaterial (
+#ifdef CS_USE_NEW_RENDERER
+    csEngine* engine,
+#endif
+    iTextureWrapper *txt);
 
   /**
    * destroy material
@@ -86,31 +149,38 @@ public:
   virtual ~csMaterial ();
 
   /// Get the flat shading color
-  csRGBcolor& GetFlatColor () { return flat_color; }
+  csRGBcolor& GetFlatColor ();
 
   /// Get diffuse reflection constant for the material
-  float GetDiffuse () const { return diffuse; }
+  float GetDiffuse ();
   /// Set diffuse reflection constant for the material
-  void SetDiffuse (float val) { diffuse = val; }
+  void SetDiffuse (float val);
 
   /// Get ambient lighting for the material
-  float GetAmbient () const { return ambient; }
+  float GetAmbient ();
   /// Set ambient lighting for the material
-  void SetAmbient (float val) { ambient = val; }
+  void SetAmbient (float val);
 
   /// Get reflection of the material
-  float GetReflection () const { return reflection; }
+  float GetReflection ();
   /// Set reflection of the material
-  void SetReflection (float val) { reflection = val; }
+  void SetReflection (float val);
 
+#ifndef CS_USE_NEW_RENDERER
   /// Get the texture (if none 0 is returned)
-  iTextureWrapper *GetTextureWrapper () const { return texture; }
+  iTextureWrapper* GetTextureWrapper () const { return texture; }
   /// Set the texture (pass 0 to set no texture)
-  void SetTextureWrapper (iTextureWrapper *tex);
+  void SetTextureWrapper (iTextureWrapper* tex);
 
   /// Add a texture layer (currently only one supported).
   void AddTextureLayer (iTextureWrapper* txtwrap, uint mode,
         float uscale, float vscale, float ushift, float vshift);
+#else
+  /// Get a texture (if none 0 is returned)
+  iTextureWrapper* GetTextureWrapper (csStringID name) const;
+  /// Set a texture (pass 0 to set no texture)
+  void SetTextureWrapper (csStringID name, iTextureWrapper* tex);
+#endif
 
   //--------------------- iMaterial implementation ---------------------
 
@@ -134,31 +204,45 @@ public:
   virtual void SelectSymbolTable (int i) {}
 #endif
 
+#ifndef CS_USE_NEW_RENDERER
   /// Set effect.
   virtual void SetEffect (iEffectDefinition *ed);
   /// Get effect.
   virtual iEffectDefinition *GetEffect ();
+#endif
   /// Get texture.
   virtual iTextureHandle* GetTexture ();
+#ifdef CS_USE_NEW_RENDERER
+  /**
+   * Get a texture from the material.
+   */
+  virtual iTextureHandle *GetTexture (csStringID name);
+  /**
+   * Set a texture of the material.
+   */
+  virtual void SetTexture (csStringID name, iTextureHandle* texture);
+#endif
+#ifndef CS_USE_NEW_RENDERER
   /// Get num texture layers.
   virtual int GetTextureLayerCount ();
   /// Get a texture layer.
   virtual csTextureLayer* GetTextureLayer (int idx);
+#endif
   /// Get flat color.
-  virtual void GetFlatColor (csRGBpixel &oColor, bool useTextureMean=1);
+  virtual void GetFlatColor (csRGBpixel &oColor, bool useTextureMean = true);
   /// Set the flat shading color
-  virtual void SetFlatColor (const csRGBcolor& col) { flat_color = col; }
+  virtual void SetFlatColor (const csRGBcolor& col);
   /// Get reflection values (diffuse, ambient, reflection).
   virtual void GetReflection (float &oDiffuse, float &oAmbient,
     float &oReflection);
   /// Set reflection values (diffuse, ambient, reflection).
   virtual void SetReflection (float oDiffuse, float oAmbient,
-    float oReflection)
-  {
-    diffuse = oDiffuse;
-    ambient = oAmbient;
-    reflection = oReflection;
-  }
+    float oReflection);
+
+  /**
+   * Visit all textures.
+   */
+  void Visit ();
 
   SCF_DECLARE_IBASE;
 
@@ -168,11 +252,27 @@ public:
     SCF_DECLARE_EMBEDDED_IBASE (csMaterial);
     virtual iTextureWrapper *GetTextureWrapper ()
     {
-      return scfParent->texture;
+#ifdef CS_USE_NEW_RENDERER
+      return scfParent->GetTextureWrapper (
+	scfParent->nameDiffuseTexture);
+#else
+      return scfParent->GetTextureWrapper ();
+#endif
     }
+#ifndef CS_USE_NEW_RENDERER
     virtual iTextureWrapper* GetTextureWrapper (int idx)
     {
       return scfParent->texture_layer_wrappers[idx];
+    }
+#else
+    virtual iTextureWrapper* GetTextureWrapper (csStringID name)
+    {
+      return scfParent->GetTextureWrapper (name);
+    }
+#endif
+    virtual void Visit ()
+    {
+      scfParent->Visit ();
     }
   } scfiMaterialEngine;
   friend struct MaterialEngine;
@@ -187,6 +287,8 @@ class csMaterialWrapper : public csObject
 private:
   /// The corresponding iMaterial.
   csRef<iMaterial> material;
+  /// The corresponding iMaterialEngine.
+  csRef<iMaterialEngine> matEngine;
   /// The handle as returned by iTextureManager.
   csRef<iMaterialHandle> handle;
 

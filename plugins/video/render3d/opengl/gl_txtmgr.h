@@ -258,21 +258,6 @@ public:
 class csGLMaterialHandle : public iMaterialHandle
 {
 protected:
-  /// A texture.
-  csRef<iTextureHandle> texture;
-  /// Numer of texture layers.
-  int num_texture_layers;
-  /// Texture layers.
-  csTextureLayer texture_layers[CS_MATERIAL_MAX_TEXTURE_LAYERS];
-  /**
-   * Flags that indicate if the texture layer needs translating
-   * relative to the base texture.
-   */
-  bool texture_layer_translate[CS_MATERIAL_MAX_TEXTURE_LAYERS];
-  /// The flat color of the material
-  csRGBpixel flat_color;
-  /// Material reflection parameters
-  float diffuse, ambient, reflection;
   /// Original material.
   csRef<iMaterial> material;
   /// Parent texture manager
@@ -293,14 +278,6 @@ public:
   /// Get the material.
   iMaterial* GetMaterial () { return material; }
 
-  /// Get the number of texture layers.
-  int GetTextureLayerCount () const { return num_texture_layers; }
-  /// Get a texture layer.
-  csTextureLayer* GetTextureLayer (int idx) { return &texture_layers[idx]; }
-  /// Returns true if texture layer needs translation.
-  bool TextureLayerTranslated (int idx) const
-  { return texture_layer_translate[idx]; }
-
   //--------------------- iMaterialHandle implementation ----------------------
   SCF_DECLARE_IBASE;
 
@@ -313,20 +290,25 @@ public:
   /**
    * Get a texture from the material.
    */
-  virtual iTextureHandle *GetTexture () { return texture; }
+  virtual iTextureHandle *GetTexture ();
 
   /**
    * Get the flat color. If the material has a texture assigned, this
    * will return the mean texture color.
    */
-  virtual void GetFlatColor (csRGBpixel &oColor) { oColor = flat_color; }
+  virtual void GetFlatColor (csRGBpixel &oColor) 
+  { 
+    material->GetFlatColor (oColor);
+  }
 
   /**
    * Get light reflection parameters for this material.
    */
   virtual void GetReflection (float &oDiffuse, float &oAmbient,
     float &oReflection)
-  { oDiffuse = diffuse; oAmbient = ambient; oReflection = reflection; }
+  { 
+    material->GetReflection (oDiffuse, oAmbient, oReflection);
+  }
 
   /**
    * Prepare this material. The material wrapper (remembered during
@@ -386,6 +368,8 @@ public:
   float texture_filter_anisotropy;
   /// what bpp should textures have?
   int texture_bits;
+
+  csStringID nameDiffuseTexture;
 
   static formatDescription glformats [];
 

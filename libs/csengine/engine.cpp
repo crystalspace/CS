@@ -849,6 +849,18 @@ bool csEngine::HandleEvent (iEvent &Event)
 #else
             NeedPO2Maps = false;
             MaxAspectRatio = 4096;
+
+	    Strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+	      object_reg, "crystalspace.renderer.stringset", iStringSet);
+	    ShaderManager = CS_QUERY_REGISTRY(object_reg, iShaderManager);
+	    if (!ShaderManager)
+	    {
+	      csRef<iPluginManager> plugin_mgr (
+		CS_QUERY_REGISTRY (object_reg, iPluginManager));
+	      ShaderManager = csPtr<iShaderManager>
+		(CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.render3d.shadermanager", iShaderManager));
+	      object_reg->Register (ShaderManager, "iShaderManager");
+	    }
 #endif // CS_USE_NEW_RENDERER
             frame_width = G3D->GetWidth ();
             frame_height = G3D->GetHeight ();
@@ -2787,7 +2799,11 @@ iMaterialWrapper *csEngine::CreateMaterial (
   const char *iName,
   iTextureWrapper *texture)
 {
+#ifdef CS_USE_NEW_RENDERER
+  csMaterial *mat = new csMaterial (this, texture);
+#else
   csMaterial *mat = new csMaterial (texture);
+#endif
   iMaterialWrapper *wrapper = materials->NewMaterial (mat);
   wrapper->QueryObject ()->SetName (iName);
   mat->DecRef ();
@@ -2829,14 +2845,20 @@ iSector *csEngine::CreateSector (const char *iName)
 
 csPtr<iMaterial> csEngine::CreateBaseMaterial (iTextureWrapper *txt)
 {
+#ifdef CS_USE_NEW_RENDERER
+  csMaterial *mat = new csMaterial (this);
+  if (txt) mat->SetTextureWrapper (mat->nameDiffuseTexture, txt);
+#else
   csMaterial *mat = new csMaterial ();
   if (txt) mat->SetTextureWrapper (txt);
+#endif
 
   csRef<iMaterial> imat (SCF_QUERY_INTERFACE (mat, iMaterial));
   mat->DecRef ();
   return csPtr<iMaterial> (imat);
 }
 
+#ifndef CS_USE_NEW_RENDERER
 csPtr<iMaterial> csEngine::CreateBaseMaterial (
   iTextureWrapper *txt,
   int num_layers,
@@ -2862,6 +2884,7 @@ csPtr<iMaterial> csEngine::CreateBaseMaterial (
   mat->DecRef ();
   return csPtr<iMaterial> (imat);
 }
+#endif
 
 iTextureList *csEngine::GetTextureList () const
 {

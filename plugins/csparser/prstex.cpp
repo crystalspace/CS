@@ -292,6 +292,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     }
   }
 
+  // @@@ some more comments
   if ((!type || (*type == 0)) && (filename[0] == 0))
   {
     strcpy (filename, txtname);
@@ -501,6 +502,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
       case XMLTOKEN_REFLECTION:
 	reflection = child->GetContentsValueAsFloat ();
         break;
+#ifndef CS_USE_NEW_RENDERER
       case XMLTOKEN_EFFECT:
         {
           csRef<iEffectServer> efs = CS_QUERY_REGISTRY(object_reg, iEffectServer);
@@ -590,6 +592,7 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
 	  num_txt_layer++;
 	}
         break;
+#endif
 #ifdef CS_USE_NEW_RENDERER
       case XMLTOKEN_SHADER:
         {
@@ -625,18 +628,20 @@ iMaterialWrapper* csLoader::ParseMaterial (iLoaderContext* ldr_context,
     }
   }
 
+#ifdef CS_USE_NEW_RENDERER
+  csRef<iMaterial> material = Engine->CreateBaseMaterial (texh);
+#else
   csRef<iMaterial> material = Engine->CreateBaseMaterial (texh,
   	num_txt_layer, txt_layers, layers);
+#endif
   if (col_set)
     material->SetFlatColor (col);
-#ifdef CS_USE_NEW_RENDERER
-  else
-    material->SetFlatColor (csRGBcolor(255,255,255));
-#endif
   material->SetReflection (diffuse, ambient, reflection);
 
+#ifndef CS_USE_NEW_RENDERER
   if(efdef.IsValid())
     material->SetEffect(efdef);
+#endif
 
   iMaterialWrapper *mat = Engine->GetMaterialList ()->NewMaterial (material);
  
@@ -766,12 +771,12 @@ iTextureWrapper* csLoader::ParseCubemap (iLoaderContext* ldr_context,
     }
   }
 
-  cubetextures->AddImage(north, 0);
-  cubetextures->AddImage(south, 1);
-  cubetextures->AddImage(east, 2);
-  cubetextures->AddImage(west, 3);
-  cubetextures->AddImage(top, 4);
-  cubetextures->AddImage(bottom, 5);
+  cubetextures->AddImage (north);
+  cubetextures->AddImage (south);
+  cubetextures->AddImage (east);
+  cubetextures->AddImage (west);
+  cubetextures->AddImage (top);
+  cubetextures->AddImage (bottom);
 
   csRef<iTextureHandle> itex (tm->RegisterTexture(cubetextures,0, iTextureHandle::CS_TEX_IMG_CUBEMAP));
 
@@ -815,7 +820,7 @@ iTextureWrapper* csLoader::ParseTexture3D (iLoaderContext* ldr_context,
 	      return 0;
 	    }
       image = LoadImage(fname, Format);
-      imagevec->AddImage(image, imagecount);
+      imagevec->AddImage(image);
       imagecount++;
 
       break;

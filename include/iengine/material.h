@@ -20,6 +20,7 @@
 #define __CS_IENGINE_MATERIAL_H__
 
 #include "csutil/scf.h"
+#include "iutil/strset.h"
 
 /**\file
  */
@@ -95,10 +96,22 @@ struct iMaterialEngine : public iBase
    */
   virtual iTextureWrapper *GetTextureWrapper () = 0;
 
+#ifndef CS_USE_NEW_RENDERER
   /**
    * Get a texture used by a texture layer.
    */
   virtual iTextureWrapper* GetTextureWrapper (int idx) = 0;
+#else
+  /**
+   * Get a texture.
+   */
+  virtual iTextureWrapper* GetTextureWrapper (csStringID name) = 0;
+#endif
+
+  /**
+   * Visit all textures.
+   */
+  virtual void Visit () = 0;
 };
 
 SCF_VERSION (iMaterialList, 0, 0, 1);

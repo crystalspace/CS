@@ -212,28 +212,14 @@ csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
   SCF_CONSTRUCT_IBASE (0);
   DG_ADDI (this, 0);
   DG_TYPE (this, "csMaterialHandle");
-  num_texture_layers = 0;
   material = m;
   if (material != 0)
   {
-    texture = material->GetTexture ();
+    csRef<iTextureHandle> texture = GetTexture ();
+    // @@@ really, all textures should be linked
     if (texture)
     {
       DG_LINK (this, texture);
-    }
-    material->GetReflection (diffuse, ambient, reflection);
-    material->GetFlatColor (flat_color);
-    num_texture_layers = material->GetTextureLayerCount ();
-    if (num_texture_layers > 4) num_texture_layers = 4;
-    int i;
-    for (i = 0 ; i < num_texture_layers ; i++)
-    {
-      texture_layers[i] = *(material->GetTextureLayer (i));
-      texture_layer_translate[i] =
-	texture_layers[i].uscale != 1 ||
-	texture_layers[i].vscale != 1 ||
-	texture_layers[i].ushift != 0 ||
-	texture_layers[i].vshift != 0;
     }
   }
   texman = parent;
@@ -244,13 +230,7 @@ csMaterialHandle::csMaterialHandle (iTextureHandle* t, csTextureManager *parent)
   SCF_CONSTRUCT_IBASE (0);
   DG_ADDI (this, 0);
   DG_TYPE (this, "csMaterialHandle");
-  num_texture_layers = 0;
-  diffuse = 0.7; ambient = 0; reflection = 0;
-  texture = t;
-  if (texture != 0)
-  {
-    DG_LINK (this, texture);
-  }
+  // @@@ Need iMaterial, or a shader branch or so!!!
   texman = parent;
 }
 
@@ -263,6 +243,7 @@ csMaterialHandle::~csMaterialHandle ()
 
 void csMaterialHandle::FreeMaterial ()
 {
+  csRef<iTextureHandle> texture = GetTexture ();
   if (texture)
   {
     DG_UNLINK (this, texture);
@@ -270,9 +251,21 @@ void csMaterialHandle::FreeMaterial ()
   material = 0;
 }
 
-void csMaterialHandle::Prepare ()
+iTextureHandle* csMaterialHandle::GetTexture ()
 {
   if (material)
+  {
+    return material->GetTexture (texman->nameDiffuseTexture);
+  }
+  else
+  {
+    return 0;
+  }
+}
+
+void csMaterialHandle::Prepare ()
+{
+/*  if (material)
   {
     if (texture != material->GetTexture())
     {
@@ -285,7 +278,7 @@ void csMaterialHandle::Prepare ()
     }
     material->GetReflection (diffuse, ambient, reflection);
     material->GetFlatColor (flat_color);
-  }
+  }*/
 }
 
 //------------------------------------------------------------ csTexture -----//
@@ -313,6 +306,8 @@ csTextureManager::csTextureManager (iObjectRegistry* object_reg,
   verbose = false;
 
   pfmt = *iG2D->GetPixelFormat ();
+
+  nameDiffuseTexture = 0; // @@@ !!!
 }
 
 csTextureManager::~csTextureManager()
