@@ -12,14 +12,20 @@
 //-----------------------------------------------------------------------------
 // NeXTTime.cpp
 //
-//	Implement NeXT-specific clock function.  Returns milliseconds since
-//	first invocation.
+//	Clock related functionality for MacOS/X, MacOS/X Server 1.0 (Rhapsody),
+//	OpenStep, and NextStep.
 //
 //-----------------------------------------------------------------------------
 #include "cssysdef.h"
 #include <libc.h>
+#include <unistd.h>
 #include <sys/time.h>
 
+//-----------------------------------------------------------------------------
+// csGetTicks
+//	Implement NeXT-specific clock function.  Returns milliseconds since
+//	first invocation.
+//-----------------------------------------------------------------------------
 csTicks csGetTicks()
 {
   struct timezone z = { 0, 0 };
@@ -33,4 +39,13 @@ csTicks csGetTicks()
     base = r.tv_sec;
     return 0;
   }
+}
+
+
+//-----------------------------------------------------------------------------
+// csSleep
+//-----------------------------------------------------------------------------
+void csSleep( int msecs )
+{
+  usleep(msecs * 1000);
 }

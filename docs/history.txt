@@ -89,13 +89,22 @@ The history order is reversed so that new features are at the top.
 	  NeXTAssistant:
 	    - Now suspends and resumes the virtual time clock using the new
 	      iVirtualClock object which is available via the object registry,
-	      rather than invoking csSystem's newly protected
+	      rather than invoking csSystemDriver's newly protected
 	      SuspendVirtualTimeClock() and ResumeVirtualTimeClock() methods.
-	    - Since csSystem::NextFrame() is now private,
+	    - Since csSystemDriver::NextFrame() is now private,
 	      NeXTAssistant::advance_state() now advances the state of the
 	      engine manually by invoking iVirtualClock::Advance() and
 	      iEventQueue::Process(), thus duplicating the two bits of
-	      remaining functionality in csSystem::NextFrame().
+	      remaining functionality in csSystemDriver::NextFrame().
+	- Eric Sunshine added an Apple/NeXT-specific implementation of
+	  csSleep() so that applications once again link on Apple/NeXT
+	  platforms.  This is needed now that the default implementation in
+	  csSystemDriver::Sleep() has been removed.  Ultimately, however, this
+	  function needs to be eliminated since it is an improper way to
+	  release the CPU on platforms which employ a native black-box run-loop
+	  mechanism.  It also causes the native user environment to incorrectly
+	  hang, and is therefore a bad-thing.
+	- Eric Sunshined added a implementation of csSleep() to the BeOS port.
 4-Oct-2001
 	- Removed support for old and obsolete 'debug_level' in system
 	  driver.
