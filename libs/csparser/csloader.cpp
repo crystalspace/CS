@@ -1059,7 +1059,7 @@ csStatLight* csLoader::load_statlight (char* buf)
           break;
         case TOKEN_HALO:
           halo = true;
-          haloIntensity = 0.15; haloCross = 6.0;
+          haloIntensity = 2.0; haloCross = 0.45;
           ScanStr (params, "%f,%f", &haloIntensity, &haloCross);
           break;
         case TOKEN_ATTENUATION:
