@@ -61,8 +61,8 @@ csSurfMeshObject::csSurfMeshObject (iMeshObjectFactory* factory)
   MixMode = 0;
   vis_cb = NULL;
   surf_vertices = NULL;
-  mesh.vertex_colors[0] = NULL;
-  mesh.texels[0] = NULL;
+  surf_colors = NULL;
+  surf_texels = NULL;
   mesh.triangles = NULL;
   mesh.vertex_fog = NULL;
   corner[0] = corner[1] = corner[2] = corner[3] = csVector3(0,0,0);
@@ -81,8 +81,8 @@ csSurfMeshObject::~csSurfMeshObject ()
   if (vis_cb) vis_cb->DecRef ();
   if (vbuf) vbuf->DecRef ();
   delete[] surf_vertices;
-  delete[] mesh.vertex_colors[0];
-  delete[] mesh.texels[0];
+  delete[] surf_colors;
+  delete[] surf_texels;
   delete[] mesh.triangles;
   delete[] mesh.vertex_fog;
 }
@@ -200,12 +200,11 @@ void csSurfMeshObject::GenerateSurface (G3DTriangleMesh& mesh)
   num_surf_vertices = num_vertices;
   surf_vertices = new csVector3[num_vertices];
   memcpy (surf_vertices, vertices, sizeof(csVector3)*num_vertices);
-  mesh.texels[0] = new csVector2[num_vertices];
-  memcpy (mesh.texels[0], uvverts, sizeof(csVector2)*num_vertices);
-  mesh.vertex_colors[0] = new csColor[num_vertices];
-  csColor* colors = mesh.vertex_colors[0];
+  surf_texels = new csVector2[num_vertices];
+  memcpy (surf_texels, uvverts, sizeof(csVector2)*num_vertices);
+  surf_colors = new csColor[num_vertices];
   for (i = 0 ; i < num_vertices ; i++)
-    colors[i].Set (1, 1, 1);
+    surf_colors[i].Set (1, 1, 1);
   mesh.vertex_fog = new G3DFogInfo[num_vertices];
   mesh.num_triangles = num_triangles;
   mesh.triangles = new csTriangle[num_triangles];
@@ -243,13 +242,13 @@ void csSurfMeshObject::SetupObject ()
   {
     initialized = true;
     delete[] surf_vertices;
-    delete[] mesh.vertex_colors[0];
-    delete[] mesh.texels[0];
+    delete[] surf_colors;
+    delete[] surf_texels;
     delete[] mesh.triangles;
     delete[] mesh.vertex_fog;
     surf_vertices = NULL;
-    mesh.vertex_colors[0] = NULL;
-    mesh.texels[0] = NULL;
+    surf_colors = NULL;
+    surf_texels = NULL;
     mesh.triangles = NULL;
     mesh.vertex_fog = NULL;
 
@@ -323,7 +322,7 @@ void csSurfMeshObject::UpdateLighting (iLight** lights, int num_lights,
   SetupObject ();
 
   int i, l;
-  csColor* colors = mesh.vertex_colors[0];
+  csColor* colors = surf_colors;
 
   // Set all colors to ambient light (@@@ NEED TO GET AMBIENT!)
   for (i = 0 ; i < num_surf_vertices ; i++)
@@ -405,7 +404,8 @@ bool csSurfMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   mesh.use_vertex_color = true;
   mesh.fxmode = MixMode | CS_FX_GOURAUD;
   CS_ASSERT (!vbuf->IsLocked ());
-  vbufmgr->LockBuffer (vbuf, surf_vertices, num_surf_vertices, 0);
+  vbufmgr->LockBuffer (vbuf, surf_vertices, surf_texels,
+  	surf_colors, num_surf_vertices, 0);
   rview->CalculateFogMesh (g3d->GetObjectToCamera (), mesh);
   g3d->DrawTriangleMesh (mesh);
   vbufmgr->UnlockBuffer (vbuf);

@@ -44,10 +44,12 @@ endif
 
 INC.NULL3D = $(wildcard plugins/video/renderer/null/*.h) \
   plugins/video/renderer/common/txtmgr.h \
-  plugins/video/renderer/common/vbufmgr.h
+  plugins/video/renderer/common/vbufmgr.h \
+  plugins/video/renderer/common/polybuf.h
 SRC.NULL3D = $(wildcard plugins/video/renderer/null/*.cpp) \
   plugins/video/renderer/common/txtmgr.cpp \
-  plugins/video/renderer/common/vbufmgr.cpp
+  plugins/video/renderer/common/vbufmgr.cpp \
+  plugins/video/renderer/common/polybuf.cpp
 OBJ.NULL3D = $(addprefix $(OUT),$(notdir $(SRC.NULL3D:.cpp=$O)))
 DEP.NULL3D = CSGFX CSUTIL CSSYS CSGEOM CSUTIL
 CFG.NULL3D = data/config/null3d.cfg

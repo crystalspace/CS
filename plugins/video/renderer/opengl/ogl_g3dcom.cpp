@@ -260,7 +260,7 @@ bool csGraphics3DOGLCommon::NewInitialize ()
     return false;
 
   txtmgr = new csTextureManagerOpenGL (object_reg, G2D, config, this);
-  vbufmgr = new csVertexBufferManager (object_reg);
+  vbufmgr = new csPolArrayVertexBufferManager (object_reg);
 
   m_renderstate.dither = config->GetBool ("Video.OpenGL.EnableDither", false);
   z_buf_mode = CS_ZBUF_NONE;
@@ -412,8 +412,8 @@ void csGraphics3DOGLCommon::PerfTest ()
   mesh.vertex_fog = NULL;
   mesh.triangles = new csTriangle [mesh.num_triangles];
   csVector3* vertices = new csVector3 [num_vertices];
-  mesh.texels[0] = new csVector2 [num_vertices];
-  mesh.vertex_colors[0] = new csColor [num_vertices];
+  csVector2* texels = new csVector2 [num_vertices];
+  csColor* colors = new csColor [num_vertices];
 
   float zx, zy, z;
   // First we calculate the z which will bring the top-left vertex
@@ -433,8 +433,8 @@ void csGraphics3DOGLCommon::PerfTest ()
     {
       fx = float (x) / float (res) - .5;
       vertices[i].Set (10.*fx, 10.*fy, z);
-      mesh.texels[0][i].Set (0, 0);
-      mesh.vertex_colors[0][i].Set (1, 0, 0);
+      texels[i].Set (0, 0);
+      colors[i].Set (1, 0, 0);
       i++;
     }
   }
@@ -489,7 +489,8 @@ void csGraphics3DOGLCommon::PerfTest ()
   }
 
   iVertexBuffer* vbuf = GetVertexBufferManager ()->CreateBuffer (0);
-  GetVertexBufferManager ()->LockBuffer (vbuf, vertices, num_vertices, 0);
+  GetVertexBufferManager ()->LockBuffer (vbuf, vertices, texels,
+  	colors, num_vertices, 0);
   mesh.buffers[0] = vbuf;
 
   if (compute_outer && !GLCaps.need_screen_clipping)
@@ -2596,8 +2597,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   // point to an array of camera vertices.
   //===========
   csVector3* f1 = mesh.buffers[0]->GetVertices ();
-  csVector2* uv1 = mesh.texels[0];
-  csColor* col1 = mesh.vertex_colors[0];
+  csVector2* uv1 = mesh.buffers[0]->GetTexels ();
+  csColor* col1 = mesh.buffers[0]->GetColors ();
   if (!col1) mesh.do_morph_colors = false;
   csVector3* work_verts;
   csVector2* work_uv_verts;
@@ -2609,8 +2610,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     float tr = mesh.morph_factor;
     float remainder = 1 - tr;
     csVector3* f2 = mesh.buffers[1]->GetVertices ();
-    csVector2* uv2 = mesh.texels[1];
-    csColor* col2 = mesh.vertex_colors[1];
+    csVector2* uv2 = mesh.buffers[1]->GetTexels ();
+    csColor* col2 = mesh.buffers[1]->GetColors ();
     for (i = 0 ; i < num_vertices ; i++)
     {
       tr_verts[i] = tr * f2[i] + remainder * f1[i];

@@ -53,9 +53,12 @@ private:
   uint32 current_features;
 
   csVector3* surf_vertices;
+  csVector2* surf_texels;
+  csColor* surf_colors;
   int num_surf_vertices;
   iVertexBuffer* vbuf;
   G3DTriangleMesh mesh;
+
   bool initialized;
   csBox3 object_bbox;
   csVector3 surface_normal;

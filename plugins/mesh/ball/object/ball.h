@@ -31,6 +31,8 @@ struct iMaterialWrapper;
 struct iVertexBuffer;
 struct iObjectRegistry;
 class csBallMeshObjectFactory;
+class csColor;
+class G3DFogInfo;
 
 #define ALL_FEATURES (CS_OBJECT_FEATURE_LIGHTING)
 
@@ -57,9 +59,13 @@ private:
 
   int verts_circle;
   iVertexBuffer* vbuf;
+
   G3DTriangleMesh top_mesh;
   csVector3* ball_vertices;
+  csVector2* ball_texels;
+  csColor* ball_colors;
   int num_ball_vertices;
+
   csVector3* top_normals;
   bool initialized;
   csBox3 object_bbox;

@@ -202,8 +202,6 @@ void csCubeMeshObject::SetupObject ()
       vbuf = g3d->GetVertexBufferManager ()->CreateBuffer (0);
     }
     mesh.buffers[0] = vbuf;
-    mesh.texels[0] = uv;
-    mesh.vertex_colors[0] = colors;
     mesh.morph_factor = 0;
     mesh.num_vertices_pool = 1;
     mesh.num_triangles = 12;
@@ -345,7 +343,7 @@ bool csCubeMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   mesh.use_vertex_color = true;
   mesh.fxmode = factory->GetMixMode () | CS_FX_GOURAUD;
   CS_ASSERT (!vbuf->IsLocked ());
-  vbufmgr->LockBuffer (vbuf, vertices, 8, 0);
+  vbufmgr->LockBuffer (vbuf, vertices, uv, colors, 8, 0);
   rview->CalculateFogMesh (g3d->GetObjectToCamera (), mesh);
   g3d->DrawTriangleMesh (mesh);
   vbufmgr->UnlockBuffer (vbuf);

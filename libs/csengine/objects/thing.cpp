@@ -1545,8 +1545,6 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
 
     mesh.mat_handle = c->GetMaterialHandle ();
     mesh.buffers[0] = vbuf;
-    mesh.texels[0] = tess->GetTxtCoords ();
-    mesh.vertex_colors[0] = tess->GetColors ();
     mesh.num_triangles = tess->GetTriangleCount ();
     mesh.triangles = tess->GetTriangles ();
     mesh.clip_portal = clip_portal;
@@ -1563,8 +1561,8 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
     }
 
     CS_ASSERT (!vbuf->IsLocked ());
-    vbufmgr->LockBuffer (vbuf, tess->GetVertices (),
-    	tess->GetVertexCount (), 0);
+    vbufmgr->LockBuffer (vbuf, tess->GetVertices (), tess->GetTxtCoords (),
+    	tess->GetColors (), tess->GetVertexCount (), 0);
     rview->CalculateFogMesh (obj_cam, mesh);
     rview->GetGraphics3D ()->DrawTriangleMesh (mesh);
     vbufmgr->UnlockBuffer (vbuf);

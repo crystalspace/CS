@@ -315,13 +315,13 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
   // if any of those are needed. When this is done 'verts' will
   // point to an array of camera vertices.
   csVector3* f1 = mesh.buffers[0]->GetVertices ();
-  csVector2* uv1 = mesh.texels[0];
+  csVector2* uv1 = mesh.buffers[0]->GetTexels ();
   csVector3* work_verts;
   csVector2* work_uv_verts;
   csColor* work_col;
   csColor* col1 = NULL;
   if (mesh.use_vertex_color)
-    col1 = mesh.vertex_colors[0];
+    col1 = mesh.buffers[0]->GetColors ();
 
   if (mesh.num_vertices_pool > 1)
   {
@@ -329,10 +329,10 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
     float tween_ratio = mesh.morph_factor;
     float remainder = 1 - tween_ratio;
     csVector3* f2 = mesh.buffers[1]->GetVertices ();
-    csVector2* uv2 = mesh.texels[1];
+    csVector2* uv2 = mesh.buffers[1]->GetTexels ();
     csColor* col2 = NULL;
     if (mesh.use_vertex_color)
-      col2 = mesh.vertex_colors[1];
+      col2 = mesh.buffers[1]->GetColors ();
     if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
       for (i = 0 ; i < num_vertices ; i++)
       {

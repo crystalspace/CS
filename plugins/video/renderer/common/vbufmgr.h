@@ -24,6 +24,9 @@
 #include "ivideo/vbufmgr.h"
 
 struct iObjectRegistry;
+class csVector3;
+class csVector2;
+class csColor;
 
 /**
  * A general vertex buffer.
@@ -33,6 +36,8 @@ class csVertexBuffer : public iVertexBuffer
 protected:
   /// The pointer to the vertices.
   csVector3* verts;
+  csVector2* texels;
+  csColor* colors;
   /// The number of vertices.
   int num_verts;
   /// Priority.
@@ -60,14 +65,42 @@ public:
 
   /// Get buffer.
   virtual csVector3* GetVertices () const { return verts; }
+  /// Get the current array of texels.
+  virtual csVector2* GetTexels () const { return texels; }
+  /// Get the current array of colors.
+  virtual csColor* GetColors () const { return colors; }
   /// Get number of vertices.
   virtual int GetVertexCount () const { return num_verts; }
   /// Set buffer.
-  void SetVertices (csVector3* verts, int num_verts)
+  void SetBuffers (csVector3* verts, csVector2* texels,
+  	csColor* colors, int num_verts)
   {
     csVertexBuffer::verts = verts;
+    csVertexBuffer::texels = texels;
+    csVertexBuffer::colors = colors;
     csVertexBuffer::num_verts = num_verts;
   }
+
+  SCF_DECLARE_IBASE;
+};
+
+/**
+ * A general polygon buffer.
+ */
+class csPolygonBuffer : public iPolygonBuffer
+{
+protected:
+  /// The vertex buffer manager.
+  iVertexBufferManager* mgr;
+
+public:
+  ///
+  csPolygonBuffer (iVertexBufferManager* mgr);
+  ///
+  virtual ~csPolygonBuffer ();
+
+  // AddPolygon and ClearPolygons are not implemented here. That should
+  // go in subclass.
 
   SCF_DECLARE_IBASE;
 };
@@ -102,8 +135,14 @@ public:
   virtual iVertexBuffer* CreateBuffer (int priority);
   virtual void ChangePriority (iVertexBuffer* buf, int new_priority);
   virtual bool LockBuffer (iVertexBuffer* buf,
-  	csVector3* verts, int num_verts, int buf_number);
+  	csVector3* verts,
+	csVector2* texels,
+	csColor* colors,
+	int num_verts, int buf_number);
   virtual void UnlockBuffer (iVertexBuffer* buf);
+
+  // CreatePolygonBuffer() is not implemented here. Must go to
+  // subclass!
 };
 
 #endif // __VBUFMGR_H__

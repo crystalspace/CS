@@ -299,7 +299,7 @@ void MeshTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
   mesh.fxmode = CS_FX_COPY;
   mesh.morph_factor = 0;
   mesh_vertices = new csVector3 [num_mesh_vertices];
-  mesh.texels[0] = new csVector2 [num_mesh_vertices];
+  mesh_texels = new csVector2 [num_mesh_vertices];
   mesh.mat_handle = perftest->GetMaterial (0);
   vbuf = g3d->GetVertexBufferManager ()->CreateBuffer (0);
   int i;
@@ -314,7 +314,7 @@ void MeshTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
       	w * float (x-NUM_MULTIPOLTEST/2) / float (NUM_MULTIPOLTEST/2),
       	h * float (y-NUM_MULTIPOLTEST/2) / float (NUM_MULTIPOLTEST/2) + h/2,
 	1.);
-      mesh.texels[0][i].Set (
+      mesh_texels[i].Set (
         float (x) / float (NUM_MULTIPOLTEST),
         float (y) / float (NUM_MULTIPOLTEST/2)
         );
@@ -343,7 +343,7 @@ void MeshTester::Draw (iGraphics3D* g3d)
   g3d->SetClipper (NULL, CS_CLIPPER_NONE);
   g3d->SetPerspectiveAspect (1);//g3d->GetHeight ());
   g3d->GetVertexBufferManager ()->LockBuffer (vbuf, mesh_vertices,
-  	num_mesh_vertices, 0);
+  	mesh_texels, NULL, num_mesh_vertices, 0);
   g3d->DrawTriangleMesh (mesh);
   g3d->GetVertexBufferManager ()->UnlockBuffer (vbuf);
 }
@@ -352,7 +352,7 @@ Tester* MeshTester::NextTester ()
 {
   delete [] mesh.triangles;
   delete [] mesh_vertices;
-  delete [] mesh.texels[0];
+  delete [] mesh_texels;
   vbuf->DecRef ();
   return new PixmapTester ();
 }

@@ -24,6 +24,24 @@
 #include "csutil/util.h"
 #include "qint.h"
 
+//--------------------------------------------- csPolygonBuffer -----//
+
+SCF_IMPLEMENT_IBASE (csPolygonBuffer)
+  SCF_IMPLEMENTS_INTERFACE (iPolygonBuffer)
+SCF_IMPLEMENT_IBASE_END
+
+csPolygonBuffer::csPolygonBuffer (iVertexBufferManager* mgr)
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  csPolygonBuffer::mgr = mgr;
+}
+
+csPolygonBuffer::~csPolygonBuffer ()
+{
+}
+
+//---------------------------------------------- csVertexBuffer -----//
+
 SCF_IMPLEMENT_IBASE (csVertexBuffer)
   SCF_IMPLEMENTS_INTERFACE (iVertexBuffer)
 SCF_IMPLEMENT_IBASE_END
@@ -55,6 +73,10 @@ csVertexBufferManager::csVertexBufferManager (iObjectRegistry* object_reg)
 
 csVertexBufferManager::~csVertexBufferManager()
 {
+  // We don't clear our vertex buffers and polygon buffers here
+  // because they should already be gone by the time we come here.
+  // @@@ Maybe an assert here to check if that's the case?
+  // CS_ASSERT (buffers.Length () == 0);
 }
 
 void csVertexBufferManager::RemoveVBuf (iVertexBuffer* buf)
@@ -79,11 +101,13 @@ void csVertexBufferManager::ChangePriority (iVertexBuffer* buf,
 }
 
 bool csVertexBufferManager::LockBuffer (iVertexBuffer* buf,
-  	csVector3* verts, int num_verts, int buf_number)
+  	csVector3* verts, csVector2* texels,
+	csColor* colors,
+	int num_verts, int buf_number)
 {
   (void)buf_number;
   csVertexBuffer* vbuf = (csVertexBuffer*)buf;
-  vbuf->SetVertices (verts, num_verts);
+  vbuf->SetBuffers (verts, texels, colors, num_verts);
   vbuf->SetLock (true);
   return true;
 }

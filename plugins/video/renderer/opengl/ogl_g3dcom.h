@@ -35,7 +35,7 @@
 #include "csutil/cfgacc.h"
 #include "video/renderer/common/dtmesh.h"
 #include "video/renderer/common/dpmesh.h"
-#include "video/renderer/common/vbufmgr.h"
+#include "video/renderer/common/polybuf.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/poly3d.h"
 #include "ogl_txtmgr.h"
@@ -475,7 +475,7 @@ public:
   /// The texture manager
   csTextureManagerOpenGL* txtmgr;
   /// The vertex buffer manager.
-  csVertexBufferManager* vbufmgr;
+  csPolArrayVertexBufferManager* vbufmgr;
 
   /// The lightmap cache.
   OpenGLLightmapCache* lightmap_cache;

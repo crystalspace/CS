@@ -1099,6 +1099,8 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   }
   if (!vertex_colors) AddVertexColor (0, csColor (0, 0, 0));
   vbuf_verts = verts;
+  vbuf_texels = real_uv_verts;
+  vbuf_colors = vertex_colors;
   vbuf_num_vertices = num_verts_for_lod;
 
   // @@@ The priority of the vertex buffer should be a parameter for the sprite.
@@ -1106,18 +1108,16 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     vbuf = g3d->GetVertexBufferManager ()->CreateBuffer (1);
 
   g3dmesh.buffers[0] = vbuf;
-  g3dmesh.texels[0] = real_uv_verts;
-  g3dmesh.vertex_colors[0] = vertex_colors;
   if (do_tween)
   {
     vbuf_tween_verts = real_tween_verts;
+    vbuf_tween_texels = real_uv_verts;
+    vbuf_tween_colors = vertex_colors;
     if (!vbuf_tween)
       vbuf_tween = g3d->GetVertexBufferManager ()->CreateBuffer (0);
     g3dmesh.buffers[1] = vbuf_tween;
     g3dmesh.morph_factor = tween_ratio;
     g3dmesh.num_vertices_pool = 2;
-    g3dmesh.texels[1] = real_uv_verts;
-    g3dmesh.vertex_colors[1] = vertex_colors;
   }
   else
   {
@@ -1157,11 +1157,13 @@ bool csSprite3DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   iVertexBufferManager* vbufmgr = g3d->GetVertexBufferManager ();
 
   CS_ASSERT (!vbuf->IsLocked ());
-  vbufmgr->LockBuffer (vbuf, vbuf_verts, vbuf_num_vertices, 0);
+  vbufmgr->LockBuffer (vbuf, vbuf_verts, vbuf_texels,
+  	vbuf_colors, vbuf_num_vertices, 0);
   if (vbuf_tween_verts)
   {
     CS_ASSERT (!vbuf_tween->IsLocked ());
-    vbufmgr->LockBuffer (vbuf_tween, vbuf_tween_verts, vbuf_num_vertices, 0);
+    vbufmgr->LockBuffer (vbuf_tween, vbuf_tween_verts,
+    	vbuf_tween_texels, vbuf_tween_colors, vbuf_num_vertices, 0);
   }
 
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);

@@ -26,7 +26,7 @@
 #include "csgeom/transfrm.h"
 #include "video/renderer/common/dtmesh.h"
 #include "video/renderer/common/dpmesh.h"
-#include "video/renderer/common/vbufmgr.h"
+#include "video/renderer/common/polybuf.h"
 #include "video/canvas/common/graph2d.h"
 #include "inf_txt.h"
 #include "iutil/config.h"
@@ -112,7 +112,7 @@ public:
   /// The texture manager.
   csTextureManagerInfinite* texman;
   /// The vertex buffer manager.
-  csVertexBufferManager* vbufmgr;
+  csPolArrayVertexBufferManager* vbufmgr;
 
   /// The System interface.
   iObjectRegistry* object_reg;

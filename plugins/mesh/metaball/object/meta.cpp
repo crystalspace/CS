@@ -91,8 +91,8 @@ csMetaBall::~csMetaBall ()
   delete [] meta_balls;
   delete [] mesh.triangles;
   delete [] mesh_vertices;
-  delete [] mesh.texels[0];
-  delete [] mesh.vertex_colors[0];
+  delete [] mesh_texels;
+  delete [] mesh_colors;
   initialize = false;
 }
 
@@ -137,14 +137,14 @@ bool csMetaBall::Initialize (iObjectRegistry* object_reg)
     mesh.num_vertices_pool = 1;
     mesh.triangles = new csTriangle[int(max_vertices/3)];
     mesh_vertices = new csVector3[max_vertices];
-    mesh.texels[0] = new csVector2[max_vertices];
-    mesh.vertex_colors[0] = new csColor[max_vertices];
+    mesh_texels = new csVector2[max_vertices];
+    mesh_colors = new csColor[max_vertices];
 	int i;
     for (i = 0; i < max_vertices; i++)
     {
       mesh_vertices[i].Set(0,0,0);
-      mesh.texels[0][i].Set(0,0);
-      mesh.vertex_colors[0][i].Set(1,1,1);
+      mesh_texels[i].Set(0,0);
+      mesh_colors[i].Set(1,1,1);
     }
     InitTables();
     mesh.do_fog = false;
@@ -456,9 +456,9 @@ void csMetaBall::NextFrame(csTicks)
         n += rv * c;
       }
       n = n.Unit();
-	  mesh.texels[0][m].x = map (n.x);
-	  mesh.texels[0][m].y = map (n.y);
-	  csColor &c = mesh.vertex_colors[0][m];
+	  mesh_texels[m].x = map (n.x);
+	  mesh_texels[m].y = map (n.y);
+	  csColor &c = mesh_colors[m];
 	  c.red = c.blue = c.green = l; // Default lighting. Not real perty yet.
 	}
   }
@@ -506,7 +506,8 @@ bool csMetaBall::Draw( iRenderView* rview, iMovable* /* movable */,
   G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
   mesh.fxmode = MixMode | CS_FX_GOURAUD;
   CS_ASSERT (!vbuf->IsLocked ());
-  vbufmgr->LockBuffer (vbuf, mesh_vertices, num_mesh_vertices, 0);
+  vbufmgr->LockBuffer (vbuf, mesh_vertices, mesh_texels,
+  	mesh_colors, num_mesh_vertices, 0);
   rview->CalculateFogMesh (G3D->GetObjectToCamera (), mesh);
   G3D->DrawTriangleMesh(mesh);
   vbufmgr->UnlockBuffer (vbuf);

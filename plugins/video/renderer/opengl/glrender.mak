@@ -69,12 +69,14 @@ INC.GL3D = $(wildcard plugins/video/renderer/opengl/*.h) \
   plugins/video/renderer/common/txtmgr.h \
   plugins/video/renderer/common/dtmesh.h \
   plugins/video/renderer/common/dpmesh.h \
-  plugins/video/renderer/common/vbufmgr.h
+  plugins/video/renderer/common/vbufmgr.h \
+  plugins/video/renderer/common/polybuf.h
 SRC.GL3D = $(wildcard plugins/video/renderer/opengl/*.cpp) \
   plugins/video/renderer/common/txtmgr.cpp \
   plugins/video/renderer/common/dtmesh.cpp \
   plugins/video/renderer/common/dpmesh.cpp \
-  plugins/video/renderer/common/vbufmgr.cpp
+  plugins/video/renderer/common/vbufmgr.cpp \
+  plugins/video/renderer/common/polybuf.cpp
 OBJ.GL3D = $(addprefix $(OUT),$(notdir $(SRC.GL3D:.cpp=$O)))
 DEP.GL3D = CSGEOM CSUTIL CSSYS CSUTIL
 CFG.GL3D = data/config/opengl.cfg

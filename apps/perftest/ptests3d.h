@@ -145,6 +145,7 @@ private:
   G3DTriangleMesh mesh;
   int num_mesh_vertices;
   csVector3* mesh_vertices;
+  csVector2* mesh_texels;
   iVertexBuffer* vbuf;
 
 public:

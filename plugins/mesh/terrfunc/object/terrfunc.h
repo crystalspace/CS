@@ -46,6 +46,8 @@ class csTerrBlock
 public:
   iVertexBuffer* vbuf[LOD_LEVELS];	// Vertex buffer for every LOD level.
   csVector3* mesh_vertices[LOD_LEVELS];
+  csVector2* mesh_texels[LOD_LEVELS];
+  csColor* mesh_colors[LOD_LEVELS];
   int num_mesh_vertices[LOD_LEVELS];
   G3DTriangleMesh mesh[LOD_LEVELS];	// Mesh with four LOD levels.
   csVector3* normals[LOD_LEVELS];	// Array of normals for the LOD levels.
@@ -125,7 +127,8 @@ private:
    * Clear a mesh and initialize it for new usage (call before
    * SetupBaseMesh() or ComputeLODLevel() (as dest)).
    */
-  void InitMesh (G3DTriangleMesh& mesh, csVector3*& mesh_vertices);
+  void InitMesh (G3DTriangleMesh& mesh, csVector3*& mesh_vertices,
+  	csVector2*& mesh_texels, csColor*& mesh_colors);
 
   /**
    * Setup the base mesh (lod level 0). This will basically
@@ -133,7 +136,8 @@ private:
    * intervals (gridx/gridy resolution).
    */
   void SetupBaseMesh (G3DTriangleMesh& mesh,
-  	csVector3*& mesh_vertices, int& num_mesh_vertices, int bx, int by);
+  	csVector3*& mesh_vertices, csVector2*& mesh_texels,
+	csColor*& mesh_colors, int& num_mesh_vertices, int bx, int by);
 
   /**
    * Setup the visibility tree.
@@ -168,8 +172,10 @@ private:
    */
   void ComputeLODLevel (
 	const G3DTriangleMesh& source, csVector3* source_vertices,
+	csVector2* source_texels, csColor* source_colors,
 	int num_source_vertices,
 	G3DTriangleMesh& dest, csVector3*& dest_vertices,
+	csVector2*& dest_texels, csColor*& dest_colors,
 	int& num_dest_vertices,
 	float maxcost, int& del_tri, int& tot_tri);
 

@@ -30,7 +30,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/halo.h"
 #include "isys/plugin.h"
-#include "video/renderer/common/vbufmgr.h"
+#include "video/renderer/common/polybuf.h"
 
 class csReversibleTransform;
 struct iGraphics2D;
@@ -84,7 +84,7 @@ public:
   /// The texture manager.
   csTextureManagerNull* texman;
   /// The vertex buffer manager.
-  csVertexBufferManager* vbufmgr;
+  csPolArrayVertexBufferManager* vbufmgr;
 
   /// The System interface.
   iObjectRegistry* object_reg;

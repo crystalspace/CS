@@ -47,12 +47,14 @@ INC.INF3D = $(wildcard plugins/video/renderer/inf/*.h \
   plugins/video/renderer/common/dtmesh.h \
   plugins/video/renderer/common/dpmesh.h \
   plugins/video/renderer/common/vbufmgr.h \
+  plugins/video/renderer/common/polybuf.h \
   $(INC.COMMON.DRV2D))
 SRC.INF3D = $(wildcard plugins/video/renderer/inf/*.cpp \
   plugins/video/renderer/common/txtmgr.cpp \
   plugins/video/renderer/common/dtmesh.cpp \
   plugins/video/renderer/common/dpmesh.cpp \
   plugins/video/renderer/common/vbufmgr.cpp \
+  plugins/video/renderer/common/polybuf.cpp \
   $(SRC.COMMON.DRV2D))
 OBJ.INF3D = $(addprefix $(OUT),$(notdir $(SRC.INF3D:.cpp=$O)))
 DEP.INF3D = CSGEOM CSGFX CSUTIL CSSYS CSUTIL

@@ -443,7 +443,7 @@ bool csGraphics3DSoftwareCommon::NewOpen ()
   texman->SetPixelFormat (pfmt);
 
   // Create the vertex buffer manager.
-  vbufmgr = new csVertexBufferManager (object_reg);
+  vbufmgr = new csPolArrayVertexBufferManager (object_reg);
 
   tcache = new csTextureCacheSoftware (texman);
   const char *cache_size = config->GetStr

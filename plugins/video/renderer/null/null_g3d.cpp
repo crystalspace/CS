@@ -100,7 +100,7 @@ bool csGraphics3DNull::Initialize (iObjectRegistry *object_reg)
     return false;
 
   texman = new csTextureManagerNull (object_reg, G2D, config);
-  vbufmgr = new csVertexBufferManager (object_reg);
+  vbufmgr = new csPolArrayVertexBufferManager (object_reg);
   iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
   sys->CallOnEvents (&scfiPlugin, CSMASK_Broadcast);
 

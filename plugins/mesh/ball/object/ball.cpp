@@ -63,8 +63,8 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   vis_cb = NULL;
   top_normals = NULL;
   ball_vertices = NULL;
-  top_mesh.vertex_colors[0] = NULL;
-  top_mesh.texels[0] = NULL;
+  ball_colors = NULL;
+  ball_texels = NULL;
   top_mesh.triangles = NULL;
   top_mesh.vertex_fog = NULL;
   shapenr = 0;
@@ -86,8 +86,8 @@ csBallMeshObject::~csBallMeshObject ()
   if (vbuf) vbuf->DecRef ();
   delete[] top_normals;
   delete[] ball_vertices;
-  delete[] top_mesh.vertex_colors[0];
-  delete[] top_mesh.texels[0];
+  delete[] ball_colors;
+  delete[] ball_texels;
   delete[] top_mesh.triangles;
   delete[] top_mesh.vertex_fog;
 }
@@ -397,12 +397,11 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
   num_ball_vertices = num_vertices;
   ball_vertices = new csVector3[num_vertices];
   memcpy (ball_vertices, vertices, sizeof(csVector3)*num_vertices);
-  mesh.texels[0] = new csVector2[num_vertices];
-  memcpy (mesh.texels[0], uvverts, sizeof(csVector2)*num_vertices);
-  mesh.vertex_colors[0] = new csColor[num_vertices];
-  csColor* colors = mesh.vertex_colors[0];
+  ball_texels = new csVector2[num_vertices];
+  memcpy (ball_texels, uvverts, sizeof(csVector2)*num_vertices);
+  ball_colors = new csColor[num_vertices];
   for (i = 0 ; i < num_vertices ; i++)
-    colors[i].Set (1, 1, 1);
+    ball_colors[i].Set (1, 1, 1);
   mesh.vertex_fog = new G3DFogInfo[num_vertices];
   mesh.num_triangles = num_triangles;
   mesh.triangles = new csTriangle[num_triangles];
@@ -428,15 +427,15 @@ void csBallMeshObject::SetupObject ()
     }
     delete[] top_normals;
     delete[] ball_vertices;
-    delete[] top_mesh.vertex_colors[0];
-    delete[] top_mesh.texels[0];
+    delete[] ball_colors;
+    delete[] ball_texels;
     delete[] top_mesh.triangles;
     delete[] top_mesh.vertex_fog;
     top_normals = NULL;
     ball_vertices = NULL;
     top_mesh.buffers[0] = vbuf;
-    top_mesh.vertex_colors[0] = NULL;
-    top_mesh.texels[0] = NULL;
+    ball_colors = NULL;
+    ball_texels = NULL;
     top_mesh.triangles = NULL;
     top_mesh.vertex_fog = NULL;
 
@@ -502,7 +501,7 @@ void csBallMeshObject::UpdateLighting (iLight** lights, int num_lights,
   SetupObject ();
 
   int i, l;
-  csColor* colors = top_mesh.vertex_colors[0];
+  csColor* colors = ball_colors;
 
   // Set all colors to ambient light (@@@ NEED TO GET AMBIENT!)
   for (i = 0 ; i < num_ball_vertices ; i++)
@@ -582,7 +581,7 @@ bool csBallMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   top_mesh.fxmode = MixMode | CS_FX_GOURAUD;
   CS_ASSERT (!vbuf->IsLocked ());
   g3d->GetVertexBufferManager ()->LockBuffer (vbuf,
-  	ball_vertices, num_ball_vertices, 0);
+  	ball_vertices, ball_texels, ball_colors, num_ball_vertices, 0);
   rview->CalculateFogMesh (g3d->GetObjectToCamera (), top_mesh);
   g3d->DrawTriangleMesh (top_mesh);
   g3d->GetVertexBufferManager ()->UnlockBuffer (vbuf);

@@ -58,10 +58,14 @@ class csMetaBall : public iMeshObject
   MetaParameters mp;
   iObjectRegistry *object_reg;
   iMaterialWrapper *th;
+
   iVertexBuffer* vbuf;
   csVector3* mesh_vertices;
+  csVector2* mesh_texels;
+  csColor* mesh_colors;
   int num_mesh_vertices;
   G3DTriangleMesh mesh;
+
   MetaBall *meta_balls;
   char frame;
 //------------- MeshObject Data

@@ -24,7 +24,7 @@
 #include "soft_txt.h"
 #include "video/renderer/common/dtmesh.h"
 #include "video/renderer/common/dpmesh.h"
-#include "video/renderer/common/vbufmgr.h"
+#include "video/renderer/common/polybuf.h"
 #include "csutil/cfgacc.h"
 #include "scan.h"
 #include "ivideo/halo.h"
@@ -33,7 +33,7 @@
 #include "ivideo/graph3d.h"
 
 class csTextureCacheSoftware;
-class csVertexBufferManager;
+class csPolArrayVertexBufferManager;
 struct iConfigFile;
 
 // Maximum number of fog tables in indexed (8-bit) modes.  This is maximum
@@ -222,7 +222,7 @@ public:
   /// The texture manager.
   csTextureManagerSoftware* texman;
   /// The vertex buffer manager.
-  csVertexBufferManager* vbufmgr;
+  csPolArrayVertexBufferManager* vbufmgr;
 
   /// The texture cache.
   csTextureCacheSoftware *tcache;
