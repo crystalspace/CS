@@ -63,6 +63,15 @@ chronological order.
 	  files are now kept up to date by a daily cron job, and because Eric
 	  fixed all other build problems (at least on Unix) which plagued the
 	  module.
+	- Eric Sunshine eliminated a number of compilation warnings and errors
+	  from the CS libraries reported by Borland C++Builder.  It seems that
+	  even the most recent version of C++Builder still fails to implement
+	  some of the newer extensions to the C++ specification.  For instance,
+	  csRef<iFoo> is illegal if iFoo has been seen only as a forward
+	  declaration (this problem impacts all older C++ compilers).  The
+	  compiler also seems to have trouble parsing normal, valid C++ in a
+	  number of cases.  Issues reported by Randall Foreman
+	  <rrforeman@comcast.net>.
 24-Nov-2003
 	- Eric Sunshine performed minor clean up of the new cslibs test in
 	  configure.ac.  Now wraps cslibs-config invocations in AC_RUN_LOG().

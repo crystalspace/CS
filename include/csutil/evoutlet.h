@@ -22,9 +22,7 @@
 
 #include "cssys/csunicode.h"
 #include "iutil/event.h"
-struct iJoystickDriver;
-struct iKeyboardDriver;
-struct iMouseDriver;
+#include "iutil/csinput.h"
 struct iObjectRegistry;
 class csEventQueue;
 

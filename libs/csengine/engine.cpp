@@ -2010,7 +2010,7 @@ char* csEngine::SplitRegionName (const char* name, iRegion*& region,
   region = 0;
   global = false;
 
-  char* p = strchr (name, '/');
+  char* p = (char*)strchr (name, '/');
   if (!p) return (char*)name;
   if (*name == '*' && *(name+1) == '/')
   {

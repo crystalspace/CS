@@ -20,6 +20,7 @@
 #define __CS_UTIL_CFGFILE_H__
 
 #include "iutil/cfgfile.h"
+#include "iutil/vfs.h"
 #include "csutil/array.h"
 
 class csConfigNode;

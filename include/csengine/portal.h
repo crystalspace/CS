@@ -28,6 +28,7 @@
 #include "csgeom/transfrm.h"
 #include "iengine/sector.h"
 #include "iengine/portal.h"
+#include "ivideo/texture.h"
 
 class csPortalContainer;
 

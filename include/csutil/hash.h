@@ -289,7 +289,7 @@ public:
       size(hash->Elements[bucket].Length ())
       { Reset (); }
 
-    friend class csHash<T, K, KeyHandler>;
+    friend class csHash;
   public:
     /// Copy constructor.
     Iterator (const Iterator &o) :
@@ -334,7 +334,7 @@ public:
     /// Move the iterator back to the first element.
     void Reset () { element = 0; Seek (); }
   };
-  friend class csHash<T, K, KeyHandler>::Iterator;
+  friend class Iterator;
 
   /// An iterator class for the hash.
   class GlobalIterator
@@ -370,7 +370,7 @@ public:
       FindItem ();
     }
 
-    friend class csHash<T, K, KeyHandler>;
+    friend class csHash;
   public:
     /// Copy constructor.
     GlobalIterator (const Iterator &o) :
@@ -421,7 +421,7 @@ public:
     /// Move the iterator back to the first element.
     void Reset () { Zero (); Init (); }
   };
-  friend class csHash<T, K, KeyHandler>::GlobalIterator;
+  friend class GlobalIterator;
 
   /**
    * Return an iterator for the hash, to iterate only over the elements
@@ -474,9 +474,9 @@ public:
     { }
 
   public:
-    friend class csSet<T, KeyHandler>;
+    friend class csSet;
   };
-  friend class csSet<T, KeyHandler>::GlobalIterator;
+  friend class GlobalIterator;
 
   /**
    * Construct a new empty set.

@@ -398,7 +398,7 @@ void InternalScanPluginDir (iStringArray*& messages,
 
       const char* fileName = files.Request (id);
 
-      char* ext = strrchr (fileName, '.');
+      const char* ext = strrchr (fileName, '.');
       // ignore .csplugins, there are checked explicitly.
       if ((strcasecmp (ext, ".dll") == 0))
       {

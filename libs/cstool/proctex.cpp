@@ -160,20 +160,20 @@ iEventHandler* csProcTexture::SetupProcEventHandler (
   return proceh;
 }
 
-struct ProcCallback : public iTextureCallback
+struct csProcTexCallback : public iTextureCallback
 {
   csRef<csProcTexture> pt;
   SCF_DECLARE_IBASE;
-  ProcCallback () { SCF_CONSTRUCT_IBASE (0); }
-  virtual ~ProcCallback () { SCF_DESTRUCT_IBASE(); }
+  csProcTexCallback () { SCF_CONSTRUCT_IBASE (0); }
+  virtual ~csProcTexCallback () { SCF_DESTRUCT_IBASE(); }
   virtual void UseTexture (iTextureWrapper*);
 };
 
-SCF_IMPLEMENT_IBASE (ProcCallback)
+SCF_IMPLEMENT_IBASE (csProcTexCallback)
   SCF_IMPLEMENTS_INTERFACE (iTextureCallback)
 SCF_IMPLEMENT_IBASE_END
 
-void ProcCallback::UseTexture (iTextureWrapper*)
+void csProcTexCallback::UseTexture (iTextureWrapper*)
 {
   if (!pt->PrepareAnim ()) return;
   pt->visible = true;
@@ -208,7 +208,7 @@ bool csProcTexture::Initialize (iObjectRegistry* object_reg)
   tex->QueryObject ()->SetName (GetName ());
   if (use_cb)
   {
-    struct ProcCallback* cb = new struct ProcCallback ();
+    csProcTexCallback* cb = new csProcTexCallback ();
     cb->pt = this;
     tex->SetUseCallback (cb);
     cb->DecRef ();

@@ -160,7 +160,7 @@ static const char* ParseModifiers (const char* str, csKeyModifiers& modifiers)
   do
   {
     ismask = false;
-    char* sep = strpbrk (name, "+-");
+    char const* sep = strpbrk (name, "+-");
     if (!sep) break;
     // Hack: don't run "PAD+"/"PAD-" through the modifier check
     if (*(sep + 1) == 0) break;

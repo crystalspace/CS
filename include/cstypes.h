@@ -77,7 +77,7 @@ typedef long long int64;
 /// specify 64 bit unsigned integer constant
 #define CONST_UINT64(x) x ## ULL
 #else
-# ifdef COMP_VC
+# if defined(COMP_VC) || defined(COMP_BC) || defined(__BORLANDC__)
 /// unsigned 64 bit integer
 typedef unsigned __int64 uint64;
 /// signed 64 bit integer

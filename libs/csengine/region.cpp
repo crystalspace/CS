@@ -372,7 +372,7 @@ iSector *csRegion::Region::FindSector (const char *iName)
 
 iMeshWrapper *csRegion::Region::FindMeshObject (const char *Name)
 {
-  char* p = strchr (Name, ':');
+  char const* p = strchr (Name, ':');
   if (p)
   {
     char* cname = csStrNew (Name);

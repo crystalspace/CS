@@ -59,7 +59,7 @@ static DWORD STDAPICALLTYPE MyGetLPN (LPCSTR lpszShortPath, LPSTR lpszLongPath,
   {
     char buf[MAX_PATH];
     const char* pos = nextpos;
-    char* bs = strchr (pos, '\\');
+    char* bs = (char*)strchr (pos, '\\');
     if (bs)
     {
       strncpy (buf, pos, (bs - pos));
@@ -76,7 +76,7 @@ static DWORD STDAPICALLTYPE MyGetLPN (LPCSTR lpszShortPath, LPSTR lpszLongPath,
     else
     {
       BUFCAT ("\\");
-      char* bufEnd = strchr (lpszLongPath, 0);
+      char* bufEnd = (char*)strchr (lpszLongPath, 0);
       strncpy (bufEnd, buf, bufRemain - 1);
       bufEnd[bufRemain - 1] = 0;
 

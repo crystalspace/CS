@@ -27,6 +27,7 @@
 #include "csutil/garray.h"
 #include "csengine/movable.h"
 #include "csengine/impmesh.h"
+#include "csengine/meshlod.h"
 #include "imesh/object.h"
 #include "imesh/lighting.h"
 #include "iengine/mesh.h"
@@ -42,8 +43,6 @@ struct iSharedVariable;
 class csMeshWrapper;
 class csMeshFactoryWrapper;
 class csLight;
-class csStaticLODMesh;
-class csStaticLODFactoryMesh;
 
 /**
  * General list of meshes. This class implements iMeshList.

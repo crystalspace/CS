@@ -1015,7 +1015,7 @@ csMeshList::~csMeshList ()
 
 iMeshWrapper* csMeshList::FindByNameWithChild (const char *Name) const
 {
-  char* p = strchr (Name, ':');
+  char const* p = strchr (Name, ':');
   if (!p) return list.FindByName (Name);
 
   int i;

@@ -23,15 +23,15 @@
 #include "csutil/ref.h"
 #include "cstool/proctex.h"
 #include "csgeom/vector3.h"
+#include "iengine/engine.h"
+#include "iengine/rview.h"
 
-struct iEngine;
 struct iLoader;
 struct iGraphics3D;
 struct iKeyboardDriver;
 struct iSector;
 struct iVFS;
 struct iEvent;
-struct iRenderView;
 struct iTextureHandle;
 struct iObjectRegistry;
 struct iVirtualClock;

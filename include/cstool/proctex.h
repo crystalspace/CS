@@ -24,6 +24,9 @@
 #include "csutil/csobject.h"
 #include "itexture/iproctex.h"
 #include "iengine/texture.h"
+#include "iutil/event.h"
+#include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
 #include "qint.h"
 
 struct iTextureWrapper;
@@ -31,11 +34,8 @@ struct iMaterialWrapper;
 struct iEngine;
 
 struct iObjectRegistry;
-struct iGraphics2D;
-struct iGraphics3D;
 struct iTextureManager;
 struct iTextureWrapper;
-struct iEventHandler;
 
 class ProcEventHandler;
 
@@ -45,7 +45,7 @@ class ProcEventHandler;
  */
 class csProcTexture : public csObject
 {
-  friend struct ProcCallback;
+  friend struct csProcTexCallback;
   friend class ProcEventHandler;
 
 private:

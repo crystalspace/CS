@@ -347,7 +347,7 @@ bool csIsPowerOf2 (int n)
 void csFindReplace(char *dest, const char *src, const char *search,
   const char *replace, int max)
 {
-  char *found = 0;
+  const char *found;
   const char *srcpos = src;
   char *destpos = dest;
   int searchlen = strlen(search);
