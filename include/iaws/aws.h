@@ -114,7 +114,7 @@ public:
   virtual void       InvalidateUpdateStore()=0;
 
   /// Capture all mouse events until release is called, no matter where the mouse is
-  virtual void       CaptureMouse()=0;
+  virtual void       CaptureMouse(iAwsComponent *comp)=0;
 
   /// Release the mouse events to go where they normally would.
   virtual void       ReleaseMouse()=0;
@@ -162,8 +162,12 @@ public:
   /// Returns the current flags
   virtual unsigned int GetFlags()=0;
   
-  /// return object registry
+  /// Return object registry
   virtual iObjectRegistry *GetObjectRegistry ()=0;
+
+  /// Returns true if all windows are presently hidden
+  virtual bool AllWindowsHidden()=0;
+
 };
 
 
