@@ -144,41 +144,42 @@ W - Wishlist (the build also works without this feature)
     shared.  We should provide rules to copy the generated files back to the
     source tree upon explicit request so that they can be committed to the CVS
     respository if desired.
-[*] The MSVC-generated project file for csutil is missing all of the sources
-    (and headers) from the cssys directory.
-[*] Make handling of files in subdirs more robust (this is a about handling
-    files for a single target): It should be possible to reference files in
-    parent subdirs (ie. ../bla/blup.cpp). Also it should be possible to have
-    several files with same name in different subdirs.
-[*] Improve handling of rc files on Win32. Jam should know about them and you
-    should be able to specify them like normal source files. (Caveats:
-    mingw/cygwin only allow 1 rc file per plugin/application, creating a
-    correct version resource file is hard when doing it purely in Jam, but I
-    don't want to rely on external shell scripts.)
-[*] External projects on Win32 and MacoSX shouldn't fail. The problem here is
-    that the shell scripts in libs/csutil/win32 and libs/csutil/macosx aren't
-    present in external projects. Should we collect scripts which are used by
-    the build system or should we try to avoid these in the Jamb uild (these 2
-    scripts can probably be solved by improving the Jam rules).
-[*] MacOSX rules should be aware of the struture of an application wrapper
-    instead of using external shell scripts for generating them. Probably we
-    also want some rules to add additional stuff into the application wrappers.
-[*] Re-work static plugin linking: This should not be an independent `mode',
-    and the intelligence should not be put globally into the Application and
-    Plugin rules.  Rather the Plugin rules should create a 2nd target where
-    they compile into a static library instead of a dynamic plugin.  For
-    linking a static application you should have to use a 2nd rule where you
-    have to specify which plugins you want to have linked into the application.
-[*] CS is using -fvtable-thunks flag on Win32 with gcc 2.x on MSYS.  This makes
-    CS libraries incompatible with other applications.  Someone should check if
-    we really need -fvtable-thunks in general or if we could specify it for the
-    `ddraw' plugin only.  (Eric says: Checking if -fvtable-thunks is needed is
-    the responsibility of the CS configure script, and indeed it has performed
-    this check for quite a long time now.  I now see evidence that the Jam
-    build utilizes this flag when unwarranted, thus I marked this item as
-    `done'.)
 [*] Auto-generated Bison & Flex files should be generated into the build
     directory rather than the source tree, since the source tree might be
     read-only or shared.  We should provide rules to copy the generated files
     back to the source tree upon explicit request so that they can be committed
     to the CVS respository if desired.
+[*] The MSVC-generated project file for csutil is missing all of the sources
+    (and headers) from the cssys directory.
+[*] Make handling of files in subdirs more robust (this is a about handling
+    files for a single target): It should be possible to reference files in
+    parent subdirs (i.e. ../bla/blup.cpp). Also it should be possible to have
+    several files with same name in different subdirs.
+[*] Improve handling of .rc files on Win32. Jam should know about them and you
+    should be able to specify them like normal source files. (Caveats:
+    mingw/cygwin only allow one .rc file per plugin/application, creating a
+    correct version resource file is hard when doing it purely in Jam, but I
+    don't want to rely on external shell scripts.)
+[*] External projects on Win32 and MacOS/X shouldn't fail. The problem here is
+    that the shell scripts in libs/csutil/win32 and libs/csutil/macosx aren't
+    present in external projects. Should we collect scripts which are used by
+    the build system or should we try to avoid these in the Jam build (these
+    two problems can probably be solved by improving the Jam rules).
+[*] MacOS/X rules should be aware of the structure of an application wrapper
+    instead of using external shell scripts for generating them.  We also
+    probably want some rules to insert additional stuff into the application
+    wrappers.
+[*] Re-work static plugin linking: This should not be an independent `mode',
+    and the intelligence should not be put globally into the Application and
+    Plugin rules.  Rather the Plugin rules should create a second target where
+    they compile into a static library instead of a dynamic plugin.  For
+    linking a static application you should use a second rule where you have to
+    specify which plugins you want to have linked into the application.
+[*] CS is using -fvtable-thunks flag on Win32 with gcc 2.x on MSYS.  This makes
+    CS libraries incompatible with other applications.  Someone should check if
+    we really need -fvtable-thunks in general or if we could specify it for the
+    `ddraw' plugin only.  (Eric says: Checking if -fvtable-thunks is needed is
+    the responsibility of the CS configure script, and indeed it has performed
+    this check for quite a long time now.  The problem seems to be that this
+    flag was hard-coded into win32.jam, despite the fact that the configure
+    script provided correct information.)
