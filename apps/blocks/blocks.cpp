@@ -553,11 +553,11 @@ again:
       add_cube (1, 0, 0, x, y, z);
       break;
     case SHAPE_T2:
-      add_cube (0, 0, 2, x, y, z);
       add_cube (0, 0, 1, x, y, z);
-      add_cube (-1, 0, 0, x, y, z);
       add_cube (0, 0, 0, x, y, z);
-      add_cube (1, 0, 0, x, y, z);
+      add_cube (-1, 0, -1, x, y, z);
+      add_cube (0, 0, -1, x, y, z);
+      add_cube (1, 0, -1, x, y, z);
       break;
     case SHAPE_FLAT:
       add_cube (0, 0, 0, x, y, z);
