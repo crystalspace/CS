@@ -17,6 +17,8 @@ chronological order.
 	      csStringBase::operator+=, csStringBase::operator<<().
 	    - Added ShrinkBestFit() and Empty() methods. The idea has to use
 	      the same names as in csArray<> as essentially the same is done.
+	- Peter Amstutz fixed the csvosa3dl plugin to remove the use
+	  of the obsolote csTextureLayer API
 12-Mar-2005
 	- res fixed csPrintfFormatter to actually properly handle argument
 	  number specification (like in %3$d to take the 3rd argument).
