@@ -1204,7 +1204,7 @@ void csGLTextureManager::UnsetTexture (GLenum target, GLuint texture)
   if (csGLGraphics3D::ext->CS_GL_ARB_multitexture)
   {
     int oldTU = -1;
-    for (int u = 0; u < statecache->maxLayers; u++)
+    for (int u = 0; u < CS_GL_MAX_LAYER; u++)
     {
       if (statecache->GetTexture (target, u) == texture)
       {
