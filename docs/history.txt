@@ -134,6 +134,10 @@ The history order is reversed so that new features are at the top.
 	  neglected to install its configuration file `bugplug.cfg' at `make
 	  install' time.  Second, it failed to add `bugplug.cfg' to the
 	  generated MSVC DSP file.
+	- Eric Sunshine fixed a couple problems with simpcon.mak.  First, it
+	  neglected to install its configuration file `simpcon.cfg' at `make
+	  install' time.  Second, it failed to add `simpcon.cfg' to the
+	  generated MSVC DSP file.
 24-Jun-2001
 	- 'Fixed' the lightmap overflow bug in software renderer. It is
 	  not really an elegant bug fix as I simply test for overflow

@@ -46,6 +46,9 @@ INC.SIMPCON = $(wildcard plugins/console/output/simple/*.h)
 SRC.SIMPCON = $(wildcard plugins/console/output/simple/*.cpp)
 OBJ.SIMPCON = $(addprefix $(OUT),$(notdir $(SRC.SIMPCON:.cpp=$O)))
 DEP.SIMPCON = CSUTIL CSSYS CSUTIL CSGEOM
+CFG.SIMPCON = data/config/simpcon.cfg
+
+TO_INSTALL.CONFIG += $(CFG.SIMPCON)
 
 MSVC.DSP += SIMPCON
 DSP.SIMPCON.NAME = simpcon
