@@ -24,6 +24,7 @@
 #include "csutil/cscolor.h"
 #include "ivideo/graph3d.h"
 
+class csColor;
 struct iMaterialWrapper;
 struct iSkeleton;
 struct iSkeletonState;
@@ -263,7 +264,7 @@ struct iSprite3DFactoryState : public iBase
   virtual void MergeNormals () = 0;
 };
 
-SCF_VERSION (iSprite3DState, 0, 0, 3);
+SCF_VERSION (iSprite3DState, 0, 0, 4);
 
 /**
  * This interface describes the API for the 2D sprite mesh object.
@@ -376,9 +377,17 @@ struct iSprite3DState : public iBase
    */
   virtual bool IsLodEnabled () = 0;
 
-  virtual void GetBaseColor (csColor& col) = 0;
-
+  /**
+   * Set the base color. This color will be added to the vertex
+   * colors of the sprite. If no lighting is used then this will
+   * be the color.
+   */
   virtual void SetBaseColor (const csColor& col) = 0;
+
+  /**
+   * Get the base color.
+   */
+  virtual void GetBaseColor (csColor& col) = 0;
 };
 
 #endif
