@@ -21,6 +21,8 @@
 #if !defined(__CSSOUNDBUFFER_H__)
 #define __CSSOUNDBUFFER_H__
 
+#include <types.h>	// For bool.
+
 /**
  * Wave class :<br>
  *    It's the 'sound' PCM stored data<br>
