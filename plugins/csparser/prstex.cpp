@@ -134,8 +134,7 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     if (t) return t;
   }
 
-  char filename[256];
-  strcpy (filename, txtname);
+  char filename[256] = "";
   csColor transp (0, 0, 0);
   bool do_transp = false;
   bool keep_image = false;
@@ -255,11 +254,16 @@ iTextureWrapper* csLoader::ParseTexture (iLoaderContext* ldr_context,
     }
   }
 
+  if ((!type || (*type == 0)) && (filename[0] == 0))
+  {
+    strcpy (filename, txtname);
+  }
+
   csRef<iLoaderPlugin> plugin;
 
   iTextureManager* tm = G3D ? G3D->GetTextureManager() : 0;
   int Format = tm ? tm->GetTextureFormat () : CS_IMGFMT_TRUECOLOR;
-  if (filename && (*filename != 0))
+  if (filename && (filename[0] != 0))
   {
     csRef<iImage> image = LoadImage (filename, Format);
     context.SetImage (image);

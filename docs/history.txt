@@ -37,6 +37,11 @@ The history order is reversed so that new features are at the top.
 	  errors.
 	- res added a script to package XML metadata into a Windows resource
 	  script.
+	- res changed the texture parser to only use the texture name as a
+	  source image file name if neither a <file> nor a <type> have been
+	  specified; previously, this was always done, with the result that
+	  the loader always tried to load an image with the texture name as 
+	  the filename, causing a confusing warning in flarge.
 11-Jun-2003
 	- Eric Sunshine removed an invocation of class_scfFinalize() from
 	  SCF_REGISTER_STATIC_CLASS() which should have been removed yesterday
