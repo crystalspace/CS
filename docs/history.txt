@@ -36,6 +36,65 @@ The history order is reversed so that new features are at the top.
   	      no other methods or fields were harmed during this
   	      procedure...
 	- Martin Geisse updated apimod19.txi with his latest changes.
+	- Martin also did the following:
+	    - Removed csTextureWrapper::GetPrivateObject().
+	    - Changed csMaterialList to derive from a typed vector.
+	    - Sectors are now stored in a typed vector too. This vector has
+	      its own interface, iSectorList. Removed all functions from
+	      iEngine which are already available through iSectorList.
+	- Martin made the following changes to the typed vector system:
+	    - Moved all macros to their own header file, typedvec.h.
+	    - Internally, an even more flexible macro is used that allows
+	      usage of a user-defined superclass for the vector.
+	    - Modified the vectors for SCF objects. The contained class no
+	      longer needs to be defined at the time the vector is declared.
+	      On the bad side, it is now a requirement that the contained
+	      class must be a subclass of iBase. It is no longer sufficient
+	      that the class has IncRef/DecRef methods. However, this should
+	      not be too much of a limitation.
+	    - Vectors for normal objects and for SCF objects again use the
+	      same concept in their macro hierarchy.
+	- Martin also added a new system of object vectors:
+	    - This system should finally replace csNamedObjVector. The common
+	      superclass for those vectors is currently called
+	      csNamedObjectVector and is kept in the same source/header
+	      files. It extends the macros for typed vectors to produce
+	      type-safe object vectors.
+	    - In addition, csNamedObjVector itself provides all methods
+	      that are safe even if you don't know the type of contained
+	      objects. In this case, the objects are exposed to the user as
+	      (iObject*) pointers. This way you can deal with object vectors
+	      that store objects of unknown type, although the range of
+	      possible operations is of course limited.
+	    - Finally, I re-implemented csTextureList using typed object
+	      vectors. Seems to work so far.
+	- To make sure our shift keys will not wear out too easily Philip
+	  Wyett did the following changes:
+		csPlugIn -> csPlugin
+		iPlugIn -> iPlugin
+		scfiPlugIn -> scfiPlugin
+		iLoaderPlugIn -> iLoaderPlugin
+		eiPlugIn -> eiPlugin
+	  This change is a change of PlugIn for Plugin in
+	  all instances inside the libs, plugins and apps.
+	  Work in progress...Hope will be finished today...
+	  Also removed  my commit log which for some reason
+	  appeared in some files :-/
+	- Philip also did some work on documentation:
+	    - Changed extlibs.txi to tell that winlibs is for those using
+	      the MSVC compiler ONLY. Have been meaning to do this for a
+	      while - finally done. :-)
+	    - Modified dirhier.txi (CS dir hierarchy) for the csparser
+	      change from library to plugin.
+	    - In resource.txi: removed link pointing at 3D downloads as
+	      a D/L location for CS releases.
+	    - In faq.txi: Removed Borland C++ compiler from FAQ, what
+	      do I need to compile Crystal Space. This port is
+	      broken / never used, so will be removed.
+	    - In feedback.txi: added ones own name to copyright section.
+	      Added Windows XP to feedback/bug reporting docs.
+	    - In cpyright.txi: added ones own name to copyright section.
+	      Added Windows XP to feedback/bug reporting docs.
 1-Jul-2001
 	- Eric Sunshine repaired the new cmdline.cpp and cmdline.h so that they
 	  compile error-free with the NextStep compiler.
