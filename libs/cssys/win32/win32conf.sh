@@ -43,6 +43,8 @@ BIN_DIR=bin
 # Check for python
 . ${BIN_DIR}/chkpythn.sh
 
+# Check for Perl
+. ${BIN_DIR}/chkperl.sh
 
 #------------------------------------------------------------------------------
 # Check if the compiler recognizes -fvtable-thunks.  As of gcc 3.x, this option

@@ -49,6 +49,8 @@ msg_result "${CXX}"
 # Check for Phyton.
 . ${BIN_DIR}/chkpythn.sh
 
+# Check for Perl.
+. ${BIN_DIR}/chkperl.sh
 
 #------------------------------------------------------------------------------
 # Check if the linker recognizes "-multiply_defined suppress".  This is
