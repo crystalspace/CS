@@ -102,6 +102,17 @@ actions GenerateStaticPluginBoilerplate
   echo '#include "cssysdef.h"' >> $(<)
   echo '#include "csutil/scf.h"' >> $(<)
   echo '' >> $(<)
+  echo '// Put static linking stuff into own section.' >> $(<)
+  echo '// The idea is that this allows the section to be swapped out but not' >> $(<)
+  echo '// swapped in again b/c something else in it was needed.' >> $(<)
+  echo '#if !defined(CS_DEBUG) && defined(CS_COMPILER_MSVC)' >> $(<)
+  echo '#pragma const_seg(".CSmetai")' >> $(<)
+  echo '#pragma comment(linker, "/section:.CSmetai,r")' >> $(<)
+  echo '#pragma code_seg(".CSmeta")' >> $(<)
+  echo '#pragma comment(linker, "/section:.CSmeta,er")' >> $(<)
+  echo '#pragma comment(linker, "/merge:.CSmetai=.CSmeta")' >> $(<)
+  echo '#endif' >> $(<)
+  echo '' >> $(<)
 }
 
 actions piecemeal GenerateStaticPluginRegistration

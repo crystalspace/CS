@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+21-Feb-2005
+	- res tweaked the VC7 project files to disable manifest generation on
+	  VC8 (yay forward compatibility).
+	- res made a small optimization to the static plugin registration;
+	  the metadata is put into a separate section on MSVC.
 20-Feb-2005
 	- res made the following changes:
 	    - Added a flag that is set via a variable indicating whether the

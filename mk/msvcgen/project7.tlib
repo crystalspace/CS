@@ -79,6 +79,7 @@ END -%]
 				AdditionalLibraryDirectories="[% composedirs('libdirs', []) %]"
 				IgnoreDefaultLibraryNames="LIBC,LIBCD,LIBCMT,LIBCMTD"
 				ProgramDatabaseFile="[% workbuild([my.doc.project.0,'.pdb']) %]"
+				GenerateManifest="FALSE"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCLibrarianTool"
