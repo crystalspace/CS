@@ -33,19 +33,19 @@ public:
 
   /// Create an empty scfString object
   scfString ()
-  { s = new csString (); }
+  { CONSTRUCT_IBASE (NULL); s = new csString (); }
 
   /// Create an scfString object and reserve space for iLength characters
   scfString (int iLength)
-  { s = new csString (iLength); }
+  { CONSTRUCT_IBASE (NULL); s = new csString (iLength); }
 
   /// Copy constructor
   scfString (const iString &copy)
-  { s = new csString (copy.GetData ()); }
+  { CONSTRUCT_IBASE (NULL); s = new csString (copy.GetData ()); }
 
   /// Yet another copy constructor
   scfString (const char *copy)
-  { s = new csString (copy); }
+  { CONSTRUCT_IBASE (NULL); s = new csString (copy); }
 
   /// Destroy a scfString object
   virtual ~scfString ();
