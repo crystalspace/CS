@@ -422,11 +422,7 @@ void ddgTBinTree::visibility(ddgTriIndex tvc, unsigned int level)
 			if (!tri(tva)->_state.flags.coord)
 			{
 				vertex(tva,wpqr);
-#ifdef DDG
 				_mesh->transform( wpqr, tri(tva)->_cpqr );
-#else
-				_mesh->_transform( wpqr, tri(tva)->_cpqr );
-#endif
 				tri(tva)->_state.flags.coord = true;
 			}
 			th.set(unit());
@@ -442,11 +438,7 @@ void ddgTBinTree::visibility(ddgTriIndex tvc, unsigned int level)
 			if (!tri(tv0)->_state.flags.coord)
 			{
 				vertex(tv0,wpqr);
-#ifdef DDG
 				_mesh->transform( wpqr, tri(tv0)->_cpqr );
-#else
-				_mesh->_transform( wpqr, tri(tva)->_cpqr );
-#endif
 				tri(tv0)->_state.flags.coord = true;
 			}
 			th.set(unit());
@@ -461,11 +453,7 @@ void ddgTBinTree::visibility(ddgTriIndex tvc, unsigned int level)
 			if (!tri(tv1)->_state.flags.coord)
 			{
 				vertex(tv1,wpqr);
-#ifdef DDG
 				_mesh->transform( wpqr, tri(tv1)->_cpqr );
-#else
-				_mesh->_transform( wpqr, tri(tv1)->_cpqr );
-#endif
 				tri(tv1)->_state.flags.coord = true;
 			}
 			th.set(unit());
@@ -567,11 +555,7 @@ unsigned short ddgTBinTree::priority(ddgTriIndex tvc)
 	if (!tri(tva)->_state.flags.coord)
 	{
         vertex(tva,wpqr);
-#ifdef DDG
 		_mesh->transform( wpqr, tri(tva)->_cpqr );
-#else
-		_mesh->_transform( wpqr, tri(tva)->_cpqr );
-#endif
 		tri(tva)->_state.flags.coord = true;
 	}
 
@@ -579,21 +563,13 @@ unsigned short ddgTBinTree::priority(ddgTriIndex tvc)
 	if (!tri(tv0)->_state.flags.coord)
 	{
         vertex(tv0,wpqr);
-#ifdef DDG
 		_mesh->transform( wpqr, tri(tv0)->_cpqr );
-#else
-		_mesh->_transform( wpqr, tri(tv0)->_cpqr );
-#endif;
 		tri(tv0)->_state.flags.coord = true;
 	}
 	if (!tri(tv1)->_state.flags.coord)
 	{
         vertex(tv1,wpqr);
-#ifdef DDG
 		_mesh->transform( wpqr, tri(tv1)->_cpqr );
-#else
-		_mesh->_transform( wpqr, tri(tv1)->_cpqr );
-#endif
 		tri(tv1)->_state.flags.coord = true;
 	}
 
