@@ -532,7 +532,7 @@ int csConfigManager::FindRemoved(const char *Name, iVFS *vfs) const
 void csConfigManager::RemoveDomain(csConfigDomain *d)
 {
   d->Remove();
-  if (Optimize && FindConfig(d->Cfg)==NULL) {
+  if (Optimize && d->Cfg && d->Cfg->GetFileName()!=NULL && FindConfig(d->Cfg)==NULL) {
     d->Cfg->IncRef();
     Removed.Push(d->Cfg);
   }
