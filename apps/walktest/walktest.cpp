@@ -640,6 +640,9 @@ int main (int argc, char* argv[])
       fatal_exit (0, false);
     }
 
+    // Load the standard library.
+    CSLoader::LoadLibrary (world, "standard", "standard.zip");
+
     //Find the Crystal Space logo and set the renderer Flag to for_2d, to allow 
     //the use in the 2D part.
     csTextureList *texlist = world->GetTextures ();
