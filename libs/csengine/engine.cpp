@@ -604,7 +604,7 @@ iEngine *csEngine:: current_iengine = NULL;
 bool csEngine:: use_new_radiosity = false;
 int csEngine:: max_process_polygons = 2000000000;
 int csEngine:: cur_process_polygons = 0;
-int csEngine:: lightcache_mode = CS_ENGINE_CACHE_READ;
+int csEngine:: lightcache_mode = CS_ENGINE_CACHE_READ | CS_ENGINE_CACHE_NOUPDATE;
 int csEngine:: lightmap_quality = 3;
 bool csEngine:: do_force_revis = false;
 bool csEngine:: do_rad_debug = false;
@@ -1281,7 +1281,16 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
     lightcache_mode &= ~CS_ENGINE_CACHE_READ;
   }
 
+  bool do_relight = false;
   if (!(lightcache_mode & CS_ENGINE_CACHE_READ))
+  {
+    if (!(lightcache_mode & CS_ENGINE_CACHE_NOUPDATE))
+      do_relight = true;
+    else if (lightcache_mode & CS_ENGINE_CACHE_WRITE)
+      do_relight = true;
+  }
+
+  if (do_relight)
   {
     Report ("Recalculation of lightmaps forced.");
     Report (
@@ -1306,9 +1315,6 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
   int light_count = 0;
   lit->Restart();
   while (lit->Fetch()) light_count++;
-
-  bool do_relight = false;
-  if (!(lightcache_mode & CS_ENGINE_CACHE_READ)) do_relight = true;
 
   int sn = 0;
   int num_meshes = meshes.Length();
@@ -1339,7 +1345,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
         if (do_relight)
           linfo->InitializeDefault ();
         else
-          linfo->ReadFromCache (cm, 0);               // ID?
+          linfo->ReadFromCache (cm);
       }
     }
 
@@ -1416,7 +1422,7 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
           s->GetMeshObject (), iLightingInfo));
       if (linfo)
       {
-        if (do_relight) linfo->WriteToCache (cm, 0);  // @@@ id
+        if (do_relight) linfo->WriteToCache (cm);
         linfo->PrepareLighting ();
       }
     }

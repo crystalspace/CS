@@ -183,8 +183,6 @@ private:
   static int last_thing_id;
   /// Last used polygon ID.
   unsigned long last_polygon_id;
-  /// Name of the cache to use for lightmapping.
-  char* cachename;
   /// Current visibility number.
   uint32 current_visnr;
 
@@ -481,7 +479,7 @@ private:
   void ComputeThingEdgeTable ();
 
   /// Generate a cachename based on geometry.
-  void GenerateCacheName ();  
+  char* GenerateCacheName ();  
 
 public:
   /**
@@ -887,27 +885,18 @@ public:
   /**
    * Read the lightmaps from the cache.
    */
-  bool ReadFromCache (iCacheManager* cache_mgr, int id);
+  bool ReadFromCache (iCacheManager* cache_mgr);
 
   /**
    * Cache the lightmaps for all polygons in this thing.
    */
-  bool WriteToCache (iCacheManager* cache_mgr, int id);
+  bool WriteToCache (iCacheManager* cache_mgr);
 
   /**
    * Prepare the lightmaps for all polys so that they are suitable
    * for the 3D rasterizer.
    */
   void PrepareLighting ();
-
-  /// Set the cache name for this thing.
-  void SetCacheName (const char* n)
-  {
-    delete[] cachename;
-    cachename = n ? csStrNew (n) : 0;
-  }
-  /// Get the cache name.
-  const char* GetCacheName ();
 
   /// Marks the whole object as it is affected by any light.
   void MarkLightmapsDirty ();
@@ -1241,25 +1230,17 @@ public:
     {
       scfParent->InitializeDefault ();
     }
-    virtual bool ReadFromCache (iCacheManager* cache_mgr, int id)
+    virtual bool ReadFromCache (iCacheManager* cache_mgr)
     {
-      return scfParent->ReadFromCache (cache_mgr, id);
+      return scfParent->ReadFromCache (cache_mgr);
     }
-    virtual bool WriteToCache (iCacheManager* cache_mgr, int id)
+    virtual bool WriteToCache (iCacheManager* cache_mgr)
     {
-      return scfParent->WriteToCache (cache_mgr, id);
+      return scfParent->WriteToCache (cache_mgr);
     }
     virtual void PrepareLighting ()
     {
       scfParent->PrepareLighting ();
-    }
-    virtual void SetCacheName (const char* cachename)
-    {
-      scfParent->SetCacheName (cachename);
-    }
-    virtual const char* GetCacheName () const
-    {
-      return scfParent->GetCacheName ();
     }
   } scfiLightingInfo;
   friend struct LightingInfo;

@@ -29,7 +29,7 @@ struct csTriangle;
 
 struct iMaterialWrapper;
 
-SCF_VERSION (iGeneralMeshState, 0, 0, 2);
+SCF_VERSION (iGeneralMeshState, 0, 0, 3);
 
 /**
  * This interface describes the API for the general mesh object.
@@ -68,6 +68,17 @@ struct iGeneralMeshState : public iBase
   virtual void SetShadowCasting (bool m) = 0;
   /// Is shadow casting enabled?
   virtual bool IsShadowCasting () const = 0;
+  /**
+   * Set shadow receiving on. By default this is disabled in which
+   * case the genmesh object will receive all lighting information
+   * dynamically but without shadows. If this is enabled then
+   * the lighting system resembles more the lighting system with
+   * things which static and pseudo-dynamic lighting. In this
+   * case there will be shadows on the genmesh instance.
+   */
+  virtual void SetShadowReceiving (bool m) = 0;
+  /// Is shadow receiving enabled?
+  virtual bool IsShadowReceiving () const = 0;
 };
 
 SCF_VERSION (iGeneralFactoryState, 0, 0, 2);

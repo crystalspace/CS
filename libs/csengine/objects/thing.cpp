@@ -181,7 +181,6 @@ csThing::csThing (iBase *parent) :
   polybuf = NULL;
 #endif // CS_USE_NEW_RENDERER
   polybuf_materials = NULL;
-  cachename = NULL;
 
   obj_normals = NULL;
   smoothed = false;
@@ -223,12 +222,11 @@ csThing::~csThing ()
   polygons.DeleteAll ();          // delete prior to portal_poly array !
   if (portal_polygons.Length ()) portal_polygons.DeleteAll ();
   CleanupThingEdgeTable ();
-  delete[] cachename;
 
   delete [] obj_normals;
 }
 
-void csThing::GenerateCacheName ()
+char* csThing::GenerateCacheName ()
 {
   csBox3 b;
   GetBoundingBox (b);
@@ -274,22 +272,13 @@ void csThing::GenerateCacheName ()
 
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
 
-  delete[] cachename;
-  cachename = new char[33];
+  char* cachename = new char[33];
   sprintf (cachename,
   	"%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
   	digest.data[0], digest.data[1], digest.data[2], digest.data[3],
   	digest.data[4], digest.data[5], digest.data[6], digest.data[7],
   	digest.data[8], digest.data[9], digest.data[10], digest.data[11],
   	digest.data[12], digest.data[13], digest.data[14], digest.data[15]);
-}
-
-const char* csThing::GetCacheName ()
-{
-  if (!cachename)
-  {
-    GenerateCacheName ();
-  }
   return cachename;
 }
 
@@ -525,7 +514,6 @@ void csThing::Prepare ()
 static int total_size = 0;
 static int total_cnt = 0;
     int size = sizeof (csThing);
-    size += cachename ? strlen (cachename)+3 : 0;
     int vtsize = sizeof (csVector3);
     size += vtsize * max_vertices;	// obj_verts;
     size += vtsize * num_cam_verts;	// cam_verts;
@@ -992,18 +980,11 @@ void csThing::BuildStaticTree (const char *name, int mode)
   csEngine *w = csEngine::current_engine;
   iCacheManager* cache_mgr = w->GetCacheManager ();
 
-  if (GetCacheName ())
-  {
-    char buf[100];
-    sprintf (buf, "%s_%s", GetCacheName (), name);
-    cache_mgr->SetCurrentScope (buf);
-  }
-  else
-  {
-    char buf[100];
-    sprintf (buf, "defO_%s", name);
-    cache_mgr->SetCurrentScope (buf);
-  }
+  char* cachename = GenerateCacheName ();
+  char buf[100];
+  sprintf (buf, "%s_%s", cachename, name);
+  cache_mgr->SetCurrentScope (buf);
+  delete[] cachename;
 
   bool recalc_octree = true;
   if (!csEngine::do_force_revis)
@@ -4220,21 +4201,12 @@ void csThing::InitializeDefault ()
     curves.Get (i)->InitializeDefaultLighting ();
 }
 
-bool csThing::ReadFromCache (iCacheManager* cache_mgr, int id)
+bool csThing::ReadFromCache (iCacheManager* cache_mgr)
 {
   Prepare ();
-  if (id == 0) id = thing_id;
-  if (GetCacheName ())
-  {
-    id = 0;
-    cache_mgr->SetCurrentScope (GetCacheName ());
-  }
-  else
-  {
-    char buf[20];
-    sprintf (buf, "def%d", id);
-    cache_mgr->SetCurrentScope (buf);
-  }
+  char* cachename = GenerateCacheName ();
+  cache_mgr->SetCurrentScope (cachename);
+  delete[] cachename;
 
   bool rc = false;
   csRef<iDataBuffer> db = cache_mgr->ReadCache ("thing_lm", NULL, ~0);
@@ -4254,20 +4226,11 @@ stop:
   return rc;
 }
 
-bool csThing::WriteToCache (iCacheManager* cache_mgr, int id)
+bool csThing::WriteToCache (iCacheManager* cache_mgr)
 {
-  if (id == 0) id = thing_id;
-  if (GetCacheName ())
-  {
-    id = 0;
-    cache_mgr->SetCurrentScope (GetCacheName ());
-  }
-  else
-  {
-    char buf[20];
-    sprintf (buf, "def%d", id);
-    cache_mgr->SetCurrentScope (buf);
-  }
+  char* cachename = GenerateCacheName ();
+  cache_mgr->SetCurrentScope (cachename);
+  delete[] cachename;
 
   int i;
   bool rc = false;

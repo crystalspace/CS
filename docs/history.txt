@@ -1,5 +1,39 @@
 The history order is reversed so that new features are at the top.
 
+30-Nov-2002
+	- Simplified the iLightingInfo interface. The concept of cache name
+	  is now removed (it was totally unused). This also removes about 52
+	  bytes of memory for every thing instance.
+	- Also removed the id variable with ReadFromCache() and WriteToCache()
+	  in iLightingInfo.
+	- Removed the 'lmcache' keyword in the standard loader.
+	- Genmesh now implements iShadowReceiver but the function is not
+	  implemented yet. Part of the plan to implement shadows on
+	  genmesh objects.
+	- Genmesh now implements iLightingInfo but all functions are not
+	  implemented yet.
+	- Added the ability to enable shadow receiving for genmeshes.
+	  At this moment this is not yet implemented but when it is
+	  implemented you will be able to use the same lighting system
+	  that is also present for things for genmeshes too. By default
+	  genmeshes will behave like all other objects (besides thing) and
+	  receive lighting information at runtime using
+	  DeferUpdateLighting(). When I finish implementing this new
+	  functionality you will be able to say that a genmesh should
+	  receive lighting information during the lighting recalculation
+	  phase. That also means that it will be able to support
+	  shadows (i.e. not only shadow casting, but shadows on the genmesh
+	  object itself).
+	  New 'localshadows' keyword. New SetShadowReceiving() function.
+	- Added new CS_ENGINE_CACHE_NOUPDATE flag for
+	  engine->SetLightingCacheMode(). This flag is on by default and it
+	  means that the lighting will not be updated when it is invalid
+	  or missing. If this flag is off then lighting will always be
+	  calculated even if CS_ENGINE_CACHE_WRITE is not set. This
+	  flag means that if you forget to specify -relight or -recalc
+	  on a level that doesn't have lighting you will simply get
+	  black lightmaps and no length recalculation phase. The only
+	  way to recalculate lighting is by using -relight or -recalc.
 29-Nov-2002
 	- Possibly fixed a bug in HardTransform for skeletal sprites. Instead
 	  of transforming all vertices only the vertices in the root are

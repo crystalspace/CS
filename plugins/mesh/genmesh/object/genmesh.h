@@ -25,6 +25,7 @@
 #include "csutil/refarr.h"
 #include "imesh/object.h"
 #include "imesh/genmesh.h"
+#include "imesh/lighting.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "ivideo/graph3d.h"
@@ -37,6 +38,7 @@ struct iMaterialWrapper;
 struct iObjectRegistry;
 struct iMovable;
 struct iShadowBlockList;
+struct iCacheManager;
 class csGenmeshMeshObjectFactory;
 class csColor;
 class G3DFogInfo;
@@ -57,7 +59,9 @@ private:
   csColor color;
   float current_lod;
   uint32 current_features;
+
   bool do_shadows;
+  bool do_shadow_rec;
 
   csColor* lit_mesh_colors;
 
@@ -116,10 +120,17 @@ public:
   void AddListener (iObjectModelListener* listener);
   void RemoveListener (iObjectModelListener* listener);
 
+  //----------------------- Shadow and lighting system ----------------------
+  void InitializeDefault ();
+  bool ReadFromCache (iCacheManager* cache_mgr);
+  bool WriteToCache (iCacheManager* cache_mgr);
+  void PrepareLighting ();
+
   void AppendShadows (iMovable* movable, iShadowBlockList* shadows,
     	const csVector3& origin);
+  void CastShadows (iMovable* movable, iFrustumView* fview);
 
-  //----------------------- iMeshObject implementation ------------------------
+  //----------------------- iMeshObject implementation ----------------------
   SCF_DECLARE_IBASE;
 
   virtual iMeshObjectFactory* GetFactory () const
@@ -189,6 +200,29 @@ public:
   }
   virtual iMaterialWrapper* GetMaterialWrapper () const { return material; }
 
+  //------------------------- iLightingInfo interface -------------------------
+  struct LightingInfo : public iLightingInfo
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
+    virtual void InitializeDefault ()
+    {
+      scfParent->InitializeDefault ();
+    }
+    virtual bool ReadFromCache (iCacheManager* cache_mgr)
+    {
+      return scfParent->ReadFromCache (cache_mgr);
+    }
+    virtual bool WriteToCache (iCacheManager* cache_mgr)
+    {
+      return scfParent->WriteToCache (cache_mgr);
+    }
+    virtual void PrepareLighting ()
+    {
+      scfParent->PrepareLighting ();
+    }
+  } scfiLightingInfo;
+  friend struct LightingInfo;
+
   //-------------------- iShadowCaster interface implementation ----------
   struct ShadowCaster : public iShadowCaster
   {
@@ -200,6 +234,17 @@ public:
     }
   } scfiShadowCaster;
   friend struct ShadowCaster;
+
+  //-------------------- iShadowReceiver interface implementation ----------
+  struct ShadowReceiver : public iShadowReceiver
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csGenmeshMeshObject);
+    virtual void CastShadows (iMovable* movable, iFrustumView* fview)
+    {
+      scfParent->CastShadows (movable, fview);
+    }
+  } scfiShadowReceiver;
+  friend struct ShadowReceiver;
 
   //------------------------- iGeneralMeshState implementation ----------------
   class GeneralMeshState : public iGeneralMeshState
@@ -232,6 +277,14 @@ public:
     virtual bool IsShadowCasting () const
     {
       return scfParent->do_shadows;
+    }
+    virtual void SetShadowReceiving (bool m)
+    {
+      scfParent->do_shadow_rec = m;
+    }
+    virtual bool IsShadowReceiving () const
+    {
+      return scfParent->do_shadow_rec;
     }
   } scfiGeneralMeshState;
   friend class GeneralMeshState;

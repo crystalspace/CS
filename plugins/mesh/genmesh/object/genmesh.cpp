@@ -43,8 +43,10 @@ SCF_IMPLEMENT_IBASE (csGenmeshMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShadowCaster)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iShadowReceiver)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iGeneralMeshState)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iLightingInfo)
 SCF_IMPLEMENT_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::ObjectModel)
@@ -55,12 +57,20 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::ShadowCaster)
   SCF_IMPLEMENTS_INTERFACE (iShadowCaster)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::ShadowReceiver)
+  SCF_IMPLEMENTS_INTERFACE (iShadowReceiver)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::PolyMesh)
   SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::GeneralMeshState)
   SCF_IMPLEMENTS_INTERFACE (iGeneralMeshState)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::LightingInfo)
+  SCF_IMPLEMENTS_INTERFACE (iLightingInfo)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 
@@ -71,6 +81,8 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygonMesh);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiGeneralMeshState);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowCaster);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiShadowReceiver);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightingInfo);
   csGenmeshMeshObject::factory = factory;
   logparent = NULL;
   initialized = false;
@@ -89,12 +101,31 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
   current_lod = 1;
   current_features = 0;
   do_shadows = true;
+  do_shadow_rec = false;
 }
 
 csGenmeshMeshObject::~csGenmeshMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
   delete[] lit_mesh_colors;
+}
+
+void csGenmeshMeshObject::InitializeDefault ()
+{
+}
+
+bool csGenmeshMeshObject::ReadFromCache (iCacheManager* cache_mgr)
+{
+  return true;
+}
+
+bool csGenmeshMeshObject::WriteToCache (iCacheManager* cache_mgr)
+{
+  return true;
+}
+
+void csGenmeshMeshObject::PrepareLighting ()
+{
 }
 
 void csGenmeshMeshObject::AppendShadows (iMovable* movable,
@@ -131,6 +162,10 @@ void csGenmeshMeshObject::AppendShadows (iMovable* movable,
   }
 
   delete[] vt_world;
+}
+
+void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
+{
 }
 
 void csGenmeshMeshObject::GetTransformedBoundingBox (long cameranr,

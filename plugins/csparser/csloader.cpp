@@ -683,7 +683,6 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("library", XMLTOKEN_LIBRARY);
   xmltokens.Register ("light", XMLTOKEN_LIGHT);
   xmltokens.Register ("lightmapcellsize", XMLTOKEN_LIGHTMAPCELLSIZE);
-  xmltokens.Register ("lmcache", XMLTOKEN_LMCACHE);
   xmltokens.Register ("lod", XMLTOKEN_LOD);
   xmltokens.Register ("material", XMLTOKEN_MATERIAL);
   xmltokens.Register ("materials", XMLTOKEN_MATERIALS);
@@ -2082,22 +2081,6 @@ bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iDocumentNode* node)
 	        child, "Error loading plugin '%s'!", plugname);
 	    return false;
 	  }
-	}
-        break;
-
-      case XMLTOKEN_LMCACHE:
-        {
-	  if (!mesh->GetMeshObject ())
-	  {
-            SyntaxService->ReportError (
-	      "crystalspace.maploader.parse.meshobject",
-	      child, "Only use 'lmcache' after 'params'!");
-	    return false;
-	  }
-	  csRef<iLightingInfo> li (SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
-	  	iLightingInfo));
-	  if (li)
-	    li->SetCacheName (child->GetContentsValue ());
 	}
         break;
       default:

@@ -136,6 +136,11 @@ struct iSharedVariableList;
  * Write the cache.
  */
 #define CS_ENGINE_CACHE_WRITE 2
+
+/**
+ * Do not calculate lighting if not up-to-date. On by default.
+ */
+#define CS_ENGINE_CACHE_NOUPDATE 4
 /** @} */
 
 /** \name RegisterRenderPriority() flags
@@ -457,6 +462,8 @@ struct iEngine : public iBase
    * <ul>
    * <li>#CS_ENGINE_CACHE_READ: Read the cache.
    * <li>#CS_ENGINE_CACHE_WRITE: Write the cache.
+   * <li>#CS_ENGINE_CACHE_NOUPDATE: Don't update lighting automatically
+   *     if it is not up-to-date. This is on by default.
    * </ul>
    */
   virtual void SetLightingCacheMode (int mode) = 0;
