@@ -403,8 +403,8 @@ private:
   csVector3* mesh_normals;
   csColor* mesh_colors;
   int num_mesh_vertices;
-#ifdef CS_USE_NEW_RENDERER
   csVector3* mesh_tri_normals;
+#ifdef CS_USE_NEW_RENDERER
   csTriangle* mesh_triangles;
   int num_mesh_triangles;
 
