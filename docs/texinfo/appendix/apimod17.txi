@@ -202,5 +202,37 @@ gone and is replaced with @sc{csPolyTexLightMap}.
 @subsection Sound Changes
 @cindex sound
 
-TODO
+Merged sound buffers into sound sources. We now have 3d and non-3d sound
+sources; non-3d sources are the former sound buffers. As a parameter of
+@samp{Renderer->CreateSource} you can tell whether you want a 3d or non-3d
+source.
+
+The sound loader is now a plugin and must be loaded as such. It uses the
+@code{iSoundLoader} interface. A loaded sound data block is represented by
+@code{iSoundData}.
+
+If you use standard CS libraries to load sounds, this is all. Otherwise you
+should also know how to load a sound without @code{csParser}:
+
+To load a sound the sound loader now needs some information describing the
+format of the sound. This information can be queried from the sound renderer.
+Also, a sound can be optionally be loaded as @samp{stream}. This is currently
+not useful for anything, but will instead affect performance and memory in a
+negative way. It is intended as a future option to load background music.
+All member functions of iSoundData are intended for private use (of course
+you may use them, but I don't think they are useful).
+To load a sound, you have to:
+@itemize @bullet
+@item
+Load the file buffer from the @sc{vfs}.
+
+@item
+Ask the sound renderer for the format descriptor (@code{csSoundFormat}
+struct).
+
+@item
+Pass both the file data and the format to the sound loader, using
+@samp{false} for streaming (default). After that, you may delete the file
+data.
+@end itemize
 

@@ -41,7 +41,7 @@ public:
 
   /// Load a sound from the VFS.
   virtual iSoundData *LoadSound(UByte *Buffer, ULong Size,
-    const csSoundFormat *Format);
+    const csSoundFormat *Format, bool Streamed);
 
   /// register a sound loader
   void RegisterFormatLoader(csSoundFormatLoader *Loader);
@@ -85,7 +85,7 @@ bool csSoundLoader::Initialize(iSystem *sys) {
 }
 
 iSoundData *csSoundLoader::LoadSound(UByte *Buffer, ULong Size,
-    const csSoundFormat *Format) {
+    const csSoundFormat *Format, bool Streamed) {
   iSoundData *SoundData;
 
   if (!Buffer || Size<1) return NULL;
@@ -93,7 +93,13 @@ iSoundData *csSoundLoader::LoadSound(UByte *Buffer, ULong Size,
   for (long i=0;i<FormatLoaders.Length();i++) {
     csSoundFormatLoader *Ldr=(csSoundFormatLoader*)(FormatLoaders.Get(i));
     SoundData=Ldr->Load(Buffer, Size, Format);
-    if (SoundData) return SoundData;
+    if (SoundData) {
+      if (!Streamed) {
+        iSoundData *Unstreamed = SoundData->Decode();
+        SoundData->DecRef();
+        return Unstreamed;
+      } else return SoundData;
+    }
   }
   return NULL;
 }

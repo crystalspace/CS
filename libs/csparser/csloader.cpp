@@ -4626,11 +4626,6 @@ csSoundDataObject* csLoader::load_sound(char* name, const char* filename)
     return NULL;
   }
 
-  /* decode sound data */
-  iSoundData *Old=Sound;
-  Sound=Old->Decode();
-  Old->DecRef();
-
   /* build wrapper object */
   csSoundDataObject* sndobj = new csSoundDataObject (Sound);
   sndobj->SetName (name);

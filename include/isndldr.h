@@ -22,9 +22,12 @@ public:
   /**
    * Load a sound from the VFS. The fields of the format descriptor may be
    * set to a negative number to let the sound loader choose a format.
+   * Set 'Streamed' to true to keep the sound data's original representation
+   * as streamed data. This is currently useless but should in the future be
+   * helpful to implement music. You should leave it false currently.
    */
   virtual iSoundData *LoadSound(UByte *Buffer, ULong Size,
-    const csSoundFormat *RequestFormat) = 0;
+    const csSoundFormat *RequestFormat, bool Streamed=false) = 0;
 };
 
 #endif
