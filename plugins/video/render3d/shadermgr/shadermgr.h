@@ -50,24 +50,31 @@ class csShaderWrapper : public iShaderWrapper
   csSymbolTable *symtab;
   iTextureManager *txtmgr;
 
+  int matnum;
+  csHashMap materials;
+
 public:
   SCF_DECLARE_IBASE;
 
   csShaderWrapper (iShader* shader0, iTextureManager* txtmgr0)
-  : shader (shader0), symtab (0), txtmgr (txtmgr0)
+  : shader (shader0), symtab (0), txtmgr (txtmgr0), matnum (1), materials (5)
     { SCF_CONSTRUCT_IBASE (shader); }
   virtual ~csShaderWrapper () {}
 
   virtual iShader* GetShader() { return shader; }
-  virtual void SelectMaterial(iMaterialHandle* mat) {
-    symtab = mat->QueryShaderBranch()->GetSymbolTable();
-    shader->SelectSymbolTable(txtmgr->GetMaterialIndex(mat));
+  virtual void SelectMaterial(iMaterial *mat) {
+    symtab = mat->GetSymbolTable();
+    int index = (int) materials.Get((csHashKey) mat);
+    if (! index)
+       materials.Put((csHashKey) mat, (csHashObject) (index = matnum++));
+    shader->SelectSymbolTable(index - 1);
   }
 
   virtual void AddChild(iShaderBranch *b) { shader->AddChild(b); }
   virtual void AddVariable(iShaderVariable *v) { shader->AddVariable(v); }
   virtual iShaderVariable* GetVariable(csStringID i) { return shader->GetVariable(i); }
   virtual csSymbolTable* GetSymbolTable() { return symtab; }
+  virtual csSymbolTable* GetSymbolTable(int i) { return symtab; }
   virtual void SelectSymbolTable(int i) {}
 };
 
@@ -164,6 +171,7 @@ public:
   virtual iShaderVariable* GetVariable(csStringID s)
     { return (iShaderVariable *) symtab.GetSymbol(s); }
   virtual csSymbolTable* GetSymbolTable() { return & symtab; }
+  virtual csSymbolTable* GetSymbolTable(int i) { return & symtab; }
   virtual void SelectSymbolTable(int i) {}
 
   /// Private variable to get the variable without virtual call
@@ -266,7 +274,8 @@ public:
 
   virtual void AddChild(iShaderBranch *b) {
     children.Push (b);
-    symtab->AddChild (b->GetSymbolTable ());
+    for (int i = 0; i < symtabs.Length (); i++)
+      symtabs[i].AddChild (b->GetSymbolTable (i));
   }
   virtual void AddVariable(iShaderVariable* variable) {
     for (int i = 0; i < symtabs.Length (); i++)
@@ -275,8 +284,12 @@ public:
   virtual iShaderVariable* GetVariable(csStringID s)
     { return (iShaderVariable *) symtab->GetSymbol (s); }
   virtual csSymbolTable* GetSymbolTable() { return symtab; }
+  virtual csSymbolTable* GetSymbolTable(int i) {
+    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
+    return & symtabs[i];
+  }
   virtual void SelectSymbolTable(int i) {
-    if (symtabs.Length () < i) symtabs.SetLength (i, csSymbolTable ());
+    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
     symtab = & symtabs[i];
     for (int i = 0; i < children.Length (); i++)
       children[i]->SelectSymbolTable (i);
@@ -345,7 +358,8 @@ public:
 
   virtual void AddChild(iShaderBranch *b) {
     children.Push (b);
-    symtab->AddChild (b->GetSymbolTable ());
+    for (int i = 0; i < symtabs.Length (); i++)
+      symtabs[i].AddChild (b->GetSymbolTable (i));
   }
   virtual void AddVariable(iShaderVariable* variable) {
     for (int i = 0; i < symtabs.Length (); i++)
@@ -354,8 +368,12 @@ public:
   virtual iShaderVariable* GetVariable(csStringID s)
     { return (iShaderVariable *) symtab->GetSymbol (s); }
   virtual csSymbolTable* GetSymbolTable() { return symtab; }
+  virtual csSymbolTable* GetSymbolTable(int i) {
+    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
+    return & symtabs[i];
+  }
   virtual void SelectSymbolTable(int i) {
-    if (symtabs.Length () < i) symtabs.SetLength (i, csSymbolTable ());
+    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
     symtab = & symtabs[i];
     for (int i = 0; i < children.Length (); i++)
       children[i]->SelectSymbolTable (i);
@@ -496,7 +514,8 @@ public:
 
   virtual void AddChild(iShaderBranch *b) {
     children.Push (b);
-    symtab->AddChild (b->GetSymbolTable ());
+    for (int i = 0; i < symtabs.Length (); i++)
+      symtabs[i].AddChild (b->GetSymbolTable (i));
   }
   virtual void AddVariable(iShaderVariable* variable) {
     for (int i = 0; i < symtabs.Length (); i++)
@@ -505,8 +524,12 @@ public:
   virtual iShaderVariable* GetVariable(csStringID s)
     { return (iShaderVariable *) symtab->GetSymbol (s); }
   virtual csSymbolTable* GetSymbolTable() { return symtab; }
+  virtual csSymbolTable* GetSymbolTable(int i) {
+    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
+    return & symtabs[i];
+  }
   virtual void SelectSymbolTable(int i) {
-    if (symtabs.Length () < i) symtabs.SetLength (i, csSymbolTable ());
+    if (symtabs.Length () <= i) symtabs.SetLength (i + 1, csSymbolTable ());
     symtab = & symtabs[i];
     for (int i = 0; i < children.Length (); i++)
       children[i]->SelectSymbolTable (i);

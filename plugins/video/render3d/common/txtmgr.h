@@ -305,9 +305,6 @@ public:
    * is associated with given material handle.
    */
   virtual void Prepare ();
-
-  virtual iShaderBranch* QueryShaderBranch ()
-  { return (iShaderBranch*)this; } // @@@ Evil cast?
 };
 
 /**
@@ -402,9 +399,6 @@ public:
    * material system is actually working.
    */
   virtual void FreeMaterials ();
-
-  virtual int GetMaterialIndex (iMaterialHandle *m)
-    { return materials.Find ((csMaterialHandle*)m); } // @@@ Evil cast?
 };
 
 #endif // __CS_TXTMGR_H__

@@ -15,6 +15,14 @@ The history order is reversed so that new features are at the top.
 	  plugin.
 	- res moved csEngine:: methods from engine/renderloop.cpp to 
 	  engine.cpp.
+	- Oktal made the following changes to the shader variable system:
+	    - Rewrote the SelectMaterial-related code to index materials based
+	      on their pointer address instead of their index in the txtmgr's
+	      array of material handles.
+	    - Added an overloaded function iShaderBranch::GetSymbolTable(int)
+	      to get an extension symbol table without selecting it.
+	    - Rewrote the implementations of iShaderBranch::AddChild to make
+	      it add children to all symbol tables, not just the selected one.
 18-Jul-2003
 	- Anders Stenberg fixed compile errors introduced by Oktal. New
 	  renderer should compile, although variable functionality is

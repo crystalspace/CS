@@ -113,6 +113,10 @@ struct iShaderBranch : public iBase
   /// Get the symbol table (used by the implementation to store the variables)
   virtual csSymbolTable* GetSymbolTable() = 0;
 
+  /// Get a symbol table from the array of symbol tables.
+  /// If there is only one symbol table, return that one.
+  virtual csSymbolTable* GetSymbolTable(int index) = 0;
+
   /// Select the current symbol table from the array of symbol tables.
   /// If there is only one symbol table, this is a no-op.
   virtual void SelectSymbolTable(int index) = 0;
@@ -191,7 +195,7 @@ struct iShaderWrapper : iShaderBranch
   virtual iShader* GetShader() = 0;
 
   /// Select the material we are about to act on.
-  virtual void SelectMaterial(iMaterialHandle *mat) = 0;
+  virtual void SelectMaterial(iMaterial *mat) = 0;
 };
 
 SCF_VERSION (iShaderTechnique, 0,0,1);
