@@ -750,9 +750,16 @@ void csSector::Draw (iRenderView *rview)
     r3d->DisableZOffset ();
     for (i = alllights.GetCount () - 1; i >= 0; i--) 
     {
+      csColor color = alllights.Get (i)->GetColor ();
+      float radius = alllights.Get (i)->GetRadius ();
+      radius *= radius;
       r3d->SetObjectToCamera (&rview->GetCamera ()->GetTransform ());
       r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
       	alllights.Get (i)->GetCenter ());
+      r3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE,
+      	csVector3 (color.red, color.green, color.blue));
+      r3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
+      	csVector3 (0, 0, radius));
       r3d->DisableColorWrite ();
       r3d->SetShadowState (CS_SHADOW_VOLUME_BEGIN);
       DrawShadow (rview, alllights.Get (i));

@@ -1116,7 +1116,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
   {
     if (mesh_tri_normals_dirty_flag)
     {
-       if (autonormals) // autonormalized 
+       if (autonormals) /* autonormalized */
       {
         trinormal_buffer = r3d->GetBufferManager ()->CreateBuffer (
           sizeof (csVector3)*(num_mesh_triangles*3+1), CS_BUF_STATIC);
@@ -1130,7 +1130,7 @@ iRenderBuffer *csGenmeshMeshObjectFactory::GetBuffer (csStringID name)
         tbuf[tbuf_index] = csVector3 (0,0,0);
         trinormal_buffer->Release ();
         mesh_tri_normals_dirty_flag = false;
-      } else {// computed without autonormal 
+      } else {/* computed without autonormal */
         trinormal_buffer = r3d->GetBufferManager ()->CreateBuffer (
           sizeof (csVector3)*(num_mesh_triangles*3+1), CS_BUF_STATIC);
         csVector3 *tbuf = (csVector3*)trinormal_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);

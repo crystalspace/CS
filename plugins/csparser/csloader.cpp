@@ -1612,9 +1612,7 @@ bool csLoader::HandleMeshParameter (iMeshWrapper* mesh, iDocumentNode* child,
 	return false;
       }
       if (!priority) priority = "wall";
-#ifndef CS_USE_NEW_RENDERER
       mesh->SetZBufMode (CS_ZBUF_FILL);
-#endif // CS_USE_NEW_RENDERER        
       break;
     case XMLTOKEN_ZUSE:
       if (!mesh)
@@ -1625,9 +1623,7 @@ bool csLoader::HandleMeshParameter (iMeshWrapper* mesh, iDocumentNode* child,
 	return false;
       }
       if (!priority) priority = "object";
-#ifndef CS_USE_NEW_RENDERER
       mesh->SetZBufMode (CS_ZBUF_USE);
-#endif // CS_USE_NEW_RENDERER
       break;
     case XMLTOKEN_ZNONE:
       if (!mesh)
@@ -1638,9 +1634,7 @@ bool csLoader::HandleMeshParameter (iMeshWrapper* mesh, iDocumentNode* child,
 	return false;
       }
       if (!priority) priority = "sky";
-#ifndef CS_USE_NEW_RENDERER
       mesh->SetZBufMode (CS_ZBUF_NONE);
-#endif // CS_USE_NEW_RENDERER
       break;
     case XMLTOKEN_ZTEST:
       if (!mesh)
@@ -1651,9 +1645,7 @@ bool csLoader::HandleMeshParameter (iMeshWrapper* mesh, iDocumentNode* child,
 	return false;
       }
       if (!priority) priority = "alpha";
-#ifndef CS_USE_NEW_RENDERER
       mesh->SetZBufMode (CS_ZBUF_TEST);
-#endif // CS_USE_NEW_RENDERER
       break;
     case XMLTOKEN_CAMERA:
       if (!mesh)

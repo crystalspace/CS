@@ -1,5 +1,6 @@
 <arbvp>
-<streammap stream="shadow normals" attribute="10" />
+<streammap stream="vertices" attribute="0" />
+<streammap stream="shadow normals" attribute="1" />
 <program>
 <![CDATA[!!ARBvp1.0
 #---------------------------------------
@@ -14,12 +15,11 @@ PARAM p[4]      = { state.matrix.projection };
 PARAM lightPos  = state.light[0].position;
 PARAM testDir   = { 0, 0, 0, 1 };
 # Per vertex inputs
-ATTRIB iPos     = vertex.position;
-ATTRIB iNorm    = vertex.attrib[10];
-# Per vertex outputsOUTPUT 
+ATTRIB iPos     = vertex.attrib[0];
+ATTRIB iNorm    = vertex.attrib[1];
+# Per vertex outputs
 OUTPUT oPos     = result.position;
-OUTPUT oTex0    = result.texcoord;
-# TemporariesTEMP tempPos;
+# Temporaries
 TEMP tempPos;
 TEMP tempNorm;
 TEMP lightDir;
@@ -43,7 +43,7 @@ SUB lightDir, lightPos, tempPos;
 
 # Find face direction
 DP3 faceTest.x, lightDir, tempNorm;
-SLT faceTest.y, faceTest.x, testDir.x;
+SGE faceTest.y, testDir.x, faceTest.x;
 
 # Find both extruded and non-extruded projections
 DP4 extrudedPos.x, p[0], -lightDir;

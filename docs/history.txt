@@ -38,6 +38,8 @@ The history order is reversed so that new features are at the top.
 	  * Better handling of passing matrices into CG
 	  * Fetching "global" textures directly from the engine by name
 	  * Effective code (totally unoptimized now)
+	- Anders Stenberg fixed stencil clipping for new renderer again.
+	  It should now work even with shadows.
 1-Feb-2003
 	- Marten Svanfeldt completly rewrote the renderbuffer manager using
 	  the VAR extension on Nvidia-cards

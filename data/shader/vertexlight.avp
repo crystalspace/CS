@@ -3,7 +3,10 @@
 <declare name="color" type="vector3" default="0,1,0.4"/>
 <variablemap variable="multiplyer" register="5"/>
 <variablemap variable="STANDARD_TIME" register="0"/>
-<!--<streammap stream="texture coordinates" attribute="10"/>-->
+<streammap stream="vertices" attribute="0" />
+<streammap stream="colors" attribute="1" />
+<streammap stream="normals" attribute="2" />
+<streammap stream="texture coordinates" attribute="3" />
 <program>
 <![CDATA[
 !!ARBvp1.0
@@ -11,20 +14,22 @@
 # Simple Vertex Lighting Program
 #---------------------------------------
 #Parameter definition
-PARAM mv[4]	= { state.matrix.modelview };
-PARAM mvi[4]	= { state.matrix.modelview.invtrans };
-PARAM p[4]	= { state.matrix.projection };
-PARAM color		= program.local[4];
-PARAM multiple	= program.local[5];
-PARAM time      = program.local[0];
-PARAM lightPos  = state.light[0].position;
-PARAM testcolor = { 1, 0, 0, 1 };
+PARAM mv[4]	     = { state.matrix.modelview };
+PARAM mvi[4]	 = { state.matrix.modelview.invtrans };
+PARAM p[4]	     = { state.matrix.projection };
+PARAM color		 = program.local[4];
+PARAM multiple	 = program.local[5];
+PARAM time       = program.local[0];
+PARAM lightPos   = state.light[0].position;
+PARAM lightColor = state.light[0].diffuse;
+PARAM lightAtten = state.light[0].attenuation;
+PARAM testcolor  = { 1, 0, 0, 1 };
 PARAM testvector = { 0, 0.5, 0, 1 };
 # Per vertex inputs
-ATTRIB iPos		= vertex.position;
-ATTRIB iCol0	= vertex.color;
-ATTRIB iTex0	= vertex.texcoord[0];
-ATTRIB iNorm	= vertex.normal;
+ATTRIB iPos		= vertex.attrib[0];
+ATTRIB iCol0	= vertex.attrib[1];
+ATTRIB iNorm	= vertex.attrib[2];
+ATTRIB iTex0	= vertex.attrib[3];
 # Outputs
 OUTPUT oPos		= result.position;
 OUTPUT oCol0	= result.color;
@@ -34,6 +39,7 @@ TEMP tempPos;
 TEMP tempColor;
 TEMP eyeNormal;
 TEMP lightDir;
+TEMP lightDist;
 
 #Transform vertex
 DP4 tempPos.x, mv[0], iPos;
@@ -53,13 +59,17 @@ MOV oTex0, iTex0;
 #Fix colors
 SUB lightDir, lightPos, tempPos;
 #Normalize the lightDir
-DP3 lightDir.w, lightDir, lightDir;
-RSQ lightDir.w, lightDir.w;           
-MUL lightDir.xyz, lightDir.w, lightDir;
+DP3 lightDist.x, lightDir, lightDir;
+RSQ lightDist.y, lightDist.x;
+MUL lightDir.xyz, lightDist.y, lightDir;
 
 DP3 tempColor, lightDir, eyeNormal;
-#ADD oCol0, tempColor, testcolor;
-MOV oCol0, tempColor;
+RCP lightDist.x, lightDist.x;
+MUL lightDist.x, lightDist.x, lightAtten.z;
+MUL tempColor, tempColor, lightDist.x;
+
+MUL oCol0, tempColor, lightColor;
+ 
 
 DP4 oPos.x, p[0], tempPos;
 DP4 oPos.y, p[1], tempPos;
