@@ -40,7 +40,7 @@ csFrustumView::csFrustumView () : light_frustum (NULL), callback (NULL),
   frustum_id = __last_frustum_id++;
 }
 
-csFrustumView::csFrustumView (csFrustumView &iCopy)
+csFrustumView::csFrustumView (const csFrustumView &iCopy)
 {
   // hehe. kind of a trick.
   memcpy (this, &iCopy, sizeof (csFrustumView));

@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+4-May-2000
+	- Eric Sunshine fixed several compilation problems throughout the
+	  project.
 3-May-2000
 	- Fixed bug in Blocks which caused the menu not to work
 	  properly (left/right arrows were gone).

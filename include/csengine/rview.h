@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef RVIEW_H
-#define RVIEW_H
+#ifndef __CS_RVIEW_H__
+#define __CS_RVIEW_H__
 
 #include "csgeom/math3d.h"
 #include "csgeom/frustrum.h"
@@ -70,12 +70,17 @@ public:
   csPlane3 incoming_plane;
   /// The outgoing plane (also of a portal).
   csPlane3 outgoing_plane;
-  /// If this is false then there is no incoming plane (the current sector has fog and is not being drawn through a portal).
+  /**
+   * If this is false then there is no incoming plane (the current sector has
+   * fog and is not being drawn through a portal).
+   */
   bool has_incoming_plane;
 
-  /// If this is false there is no outgoing plane.  The 'outgoing plane distance'
-  /// is then calculated by straight distance to a vertex instead of
-  /// projecting throught the outgoing plane
+  /**
+   * If this is false there is no outgoing plane.  The 'outgoing plane
+   * distance' is then calculated by straight distance to a vertex instead of
+   * projecting throught the outgoing plane
+   */
   bool has_outgoing_plane;
 
   /// The structure describing the fog.
@@ -156,21 +161,21 @@ public:
   bool added_fog_info;
 
   ///
-  csRenderView () : csCamera (), view (NULL), g3d (NULL), g2d (NULL),
-  	portal_polygon (NULL), do_clip_plane (false), do_clip_frustum (false),
-	callback (NULL), callback_data (NULL),
-	fog_info (NULL), added_fog_info (false) {}
+  csRenderView () :
+    csCamera (), view (NULL), g3d (NULL), g2d (NULL), portal_polygon (NULL),
+    do_clip_plane (false), do_clip_frustum (false), callback (NULL),
+    callback_data (NULL), fog_info (NULL), added_fog_info (false) {}
   ///
-  csRenderView (const csCamera& c) : csCamera (c), view (NULL), g3d (NULL), g2d (NULL),
-  	portal_polygon (NULL), do_clip_plane (false), do_clip_frustum (false),
-	callback (NULL), callback_data (NULL),
-	fog_info (NULL), added_fog_info (false) {}
+  csRenderView (const csCamera& c) :
+    csCamera (c), view (NULL), g3d (NULL), g2d (NULL), portal_polygon (NULL),
+    do_clip_plane (false), do_clip_frustum (false), callback (NULL),
+    callback_data (NULL), fog_info (NULL), added_fog_info (false) {}
   ///
-  csRenderView (const csCamera& c, csClipper* v, iGraphics3D* ig3d, iGraphics2D* ig2d) :
-	csCamera (c), view (v), g3d (ig3d), g2d (ig2d),
-	portal_polygon (NULL), do_clip_plane (false), do_clip_frustum (false),
-	callback (NULL), callback_data (NULL),
-	fog_info (NULL), added_fog_info (false) {}
+  csRenderView (const csCamera& c, csClipper* v, iGraphics3D* ig3d,
+    iGraphics2D* ig2d) :
+    csCamera (c), view (v), g3d (ig3d), g2d (ig2d), portal_polygon (NULL),
+    do_clip_plane (false), do_clip_frustum (false), callback (NULL),
+    callback_data (NULL), fog_info (NULL), added_fog_info (false) {}
 
   ///
   void SetView (csClipper* v) { view = v; }
@@ -227,7 +232,8 @@ public:
 
 public:
   /// Create empty frustum.
-  csShadowFrustum (csVector3& origin) : csFrustum (origin), next (NULL), prev (NULL), polygon (NULL) { }
+  csShadowFrustum (csVector3& origin) :
+    csFrustum (origin), next (NULL), prev (NULL), polygon (NULL) { }
 };
 
 /**
@@ -439,12 +445,10 @@ public:
   /// Constructor. frustum_id is generated each time a new object is created.
   csFrustumView ();
   /// Copy constructor. Everything is copied except the frustum ID
-  csFrustumView (csFrustumView &iCopy);
+  csFrustumView (const csFrustumView &iCopy);
 
   /// Destroy the object
   ~csFrustumView ();
 };
 
-
-#endif /*RVIEW_H*/
-
+#endif // __CS_RVIEW_H__
