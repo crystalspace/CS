@@ -37,6 +37,11 @@ The history order is reversed so that new features are at the top.
 	  Not fully operational yet and also not enabled by default.
 	- Eric Sunshine added to the user manual an `md32spr' tutorial written
 	  by Manjunath Sripadarao <msripada@@evl.uic.edu>.
+	- Keith Fulton added a separate socket vector to the sprite3d objects,
+	  which is copied from the factory at creation time and then is 
+	  independent.  The way sockets were only on factories, only one mesh 
+	  could be assigned to a socket across all parent meshes from a 
+	  certain factory.
 16-Dec-2002
 	- Completely removed the old octree culler. This has a great impact
 	  on the internal engine structure. It greatly simplifies both

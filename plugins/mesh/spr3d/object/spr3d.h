@@ -509,7 +509,7 @@ public:
   /// Create and add a new socket to the sprite.
   csSpriteSocket* AddSocket ();
   /// find a named socket into the sprite.
-  csSpriteSocket* FindSocket (const char * name);
+  csSpriteSocket* FindSocket (const char * name) const;
   /// find a socked based on the sprite attached to it
   csSpriteSocket* FindSocket (iMeshWrapper *mesh) const;
   /// Query the number of sockets
@@ -936,6 +936,12 @@ private:
    * Setting to indicate if the animation should be stopped.
    */
   bool fullstop;
+
+  /**
+   * Each mesh must have its own individual socket assignments,
+   * but the vector must be copied down from the factory at create time.
+   */
+  csSpriteSocketVector sockets;
 
 public:
 
@@ -1397,6 +1403,22 @@ public:
   void AddListener (iObjectModelListener* listener);
   void RemoveListener (iObjectModelListener* listener);
 
+  /// Create and add a new socket to the sprite.
+  csSpriteSocket* AddSocket ();
+  /// find a named socket into the sprite.
+  csSpriteSocket* FindSocket (const char * name) const;
+  /// find a socked based on the sprite attached to it
+  csSpriteSocket* FindSocket (iMeshWrapper *mesh) const;
+  /// Query the number of sockets
+  int GetSocketCount () const { return sockets.Length (); }
+  /// Query the socket number f
+  csSpriteSocket* GetSocket (int f) const
+  {
+    return (f < sockets.Length ())
+  	? (csSpriteSocket *)sockets [f]
+	: (csSpriteSocket*)NULL;
+  }
+
   ///------------------------ iMeshObject implementation ----------------------
   SCF_DECLARE_IBASE;
 
@@ -1627,6 +1649,36 @@ public:
     virtual void GetBaseColor (csColor& col) const
     {
       scfParent->GetBaseColor (col);
+    }
+    virtual iSpriteSocket* AddSocket ()
+    {
+      csRef<iSpriteSocket> ifr (
+      	SCF_QUERY_INTERFACE_SAFE (scfParent->AddSocket (),
+      	iSpriteSocket));
+      return ifr;	// DecRef is ok here.
+    }
+    virtual iSpriteSocket* FindSocket (const char* name) const
+    {
+      csRef<iSpriteSocket> ifr (SCF_QUERY_INTERFACE_SAFE (
+      	scfParent->FindSocket (name), iSpriteSocket));
+      return ifr;	// DecRef is ok here.
+    }
+    virtual iSpriteSocket* FindSocket (iMeshWrapper* mesh) const
+    {
+      csRef<iSpriteSocket> ifr (SCF_QUERY_INTERFACE_SAFE (
+      	scfParent->FindSocket (mesh), iSpriteSocket));
+      return ifr;	// DecRef is ok here.
+    }
+    virtual int GetSocketCount () const
+    {
+      return scfParent->GetSocketCount ();
+    }
+    virtual iSpriteSocket* GetSocket (int f) const
+    {
+      csRef<iSpriteSocket> ifr (
+      	SCF_QUERY_INTERFACE_SAFE (scfParent->GetSocket (f),
+      	iSpriteSocket));
+      return ifr;	// DecRef is ok here.
     }
   } scfiSprite3DState;
 

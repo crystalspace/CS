@@ -492,7 +492,7 @@ csSpriteSocket* csSprite3DMeshObjectFactory::AddSocket ()
   return socket;
 }
 
-csSpriteSocket* csSprite3DMeshObjectFactory::FindSocket (const char *n)
+csSpriteSocket* csSprite3DMeshObjectFactory::FindSocket (const char *n) const
 {
   int i;
   for (i = GetSocketCount () - 1; i >= 0; i--)
@@ -954,6 +954,18 @@ void csSprite3DMeshObject::SetFactory (csSprite3DMeshObjectFactory* tmpl)
   EnableTweening (tmpl->IsTweeningEnabled ());
   MixMode = tmpl->GetMixMode ();
   SetLodLevelConfig (factory->GetLodLevelConfig ());
+
+  // Copy the sockets list down to the mesh
+  iSpriteSocket *factory_socket,*new_socket;
+  int i;
+  for (i=0; i<tmpl->GetSocketCount(); i++)
+  {
+    factory_socket = tmpl->GetSocket(i);
+    new_socket = AddSocket();  // mesh now
+    new_socket->SetName (factory_socket->GetName() );
+    new_socket->SetTriangleIndex (factory_socket->GetTriangleIndex() );
+    new_socket->SetMeshWrapper (NULL);
+  }
 }
 
 void csSprite3DMeshObject::SetMaterial (iMaterialWrapper *material)
@@ -1203,6 +1215,33 @@ void csSprite3DMeshObject::RemoveListener (iObjectModelListener *listener)
   listeners.Delete (idx);
 }
 
+csSpriteSocket* csSprite3DMeshObject::AddSocket ()
+{
+  csSpriteSocket* socket = new csSpriteSocket();
+  sockets.Push (socket);
+  return socket;
+}
+
+csSpriteSocket* csSprite3DMeshObject::FindSocket (const char *n) const
+{
+  int i;
+  for (i = GetSocketCount () - 1; i >= 0; i--)
+    if (strcmp (GetSocket (i)->GetName (), n) == 0)
+      return GetSocket (i);
+
+  return NULL;
+}
+
+csSpriteSocket* csSprite3DMeshObject::FindSocket (iMeshWrapper *mesh) const
+{
+  int i;
+  for (i = GetSocketCount () - 1; i >= 0; i--)
+    if (GetSocket (i)->GetMeshWrapper() == mesh)
+      return GetSocket (i);
+
+  return NULL;
+}
+
 bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
   SetupObject ();
@@ -1313,86 +1352,91 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
         iMeshObjectFactory* mof = mfw->GetMeshObjectFactory();
         if (mof)
         {
-          // Find the socket in the parent
+	  // Find the parent mesh factory to get vertices
           csRef<iSprite3DFactoryState> sof (SCF_QUERY_INTERFACE (
               mof, iSprite3DFactoryState));
           if (sof)
-          {  
-            iSpriteSocket * socket = sof->FindSocket(mw);
-            if (socket)
-            {
-              // Get the index of the triange at that spot
-              int tri_index = socket->GetTriangleIndex();
-              csTriangle& tri = sof->GetTriangles()[tri_index];
+          {
+            // Find the socket in the parent mesh
+	    csRef<iSprite3DState> parent_sprite (SCF_QUERY_INTERFACE (
+              parent->GetMeshObject(), iSprite3DState));
+	    if (parent_sprite)
+	    {
+              iSpriteSocket * socket = parent_sprite->FindSocket(mw);
+              if (socket)
+              {
+                // Get the index of the triange at that spot
+                int tri_index = socket->GetTriangleIndex();
+                csTriangle& tri = sof->GetTriangles()[tri_index];
               
-              // This cast is crummy, but the only way to get at it.
-              csSprite3DMeshObject *cs = 
-                (csSprite3DMeshObject *)parent->GetMeshObject();
+                // This cast is crummy, but the only way to get at it.
+                csSprite3DMeshObject *cs = 
+                  (csSprite3DMeshObject *)parent->GetMeshObject();
               
-              int current_frame = cs->GetCurFrame();
-              csSpriteAction2* current_action = cs->GetCurAction();
+                int current_frame = cs->GetCurFrame();
+                csSpriteAction2* current_action = cs->GetCurAction();
               
-              csSpriteFrame* cf = 
-                current_action->GetCsFrame (current_frame);
+                csSpriteFrame* cf = 
+                  current_action->GetCsFrame (current_frame);
               
-              int idx = cf->GetAnmIndex();
-              csVector3 * current_verts = sof->GetVertices(idx);
+                int idx = cf->GetAnmIndex();
+                csVector3 * current_verts = sof->GetVertices(idx);
   
-              csVector3 spot_verts[3];
-              csVector3 center;
-              if (!cs->IsTweeningEnabled())
-              {
-                spot_verts[0] = current_verts[tri.a];
-                spot_verts[1] = current_verts[tri.b];
-                spot_verts[2] = current_verts[tri.c];
-                center = 
-                  (spot_verts[0] + spot_verts[1] + spot_verts[2]) / 3;
-              }
-              else
-              {
-                // Get the verts for the next frame
-                csSpriteFrame * nframe = NULL;
-                if (current_frame + 1 < current_action->GetFrameCount())
-                  nframe = current_action->GetCsFrame (current_frame + 1);
+                csVector3 spot_verts[3];
+                csVector3 center;
+                if (!cs->IsTweeningEnabled())
+                {
+                  spot_verts[0] = current_verts[tri.a];
+                  spot_verts[1] = current_verts[tri.b];
+                  spot_verts[2] = current_verts[tri.c];
+                  center = 
+                    (spot_verts[0] + spot_verts[1] + spot_verts[2]) / 3;
+                }
                 else
-                  nframe = current_action->GetCsFrame (0);
-                int nf_idx = nframe->GetAnmIndex();
-                csVector3 * next_verts = sof->GetVertices(nf_idx);
+                {
+                  // Get the verts for the next frame
+                  csSpriteFrame * nframe = NULL;
+                  if (current_frame + 1 < current_action->GetFrameCount())
+                    nframe = current_action->GetCsFrame (current_frame + 1);
+                  else
+                    nframe = current_action->GetCsFrame (0);
+                  int nf_idx = nframe->GetAnmIndex();
+                  csVector3 * next_verts = sof->GetVertices(nf_idx);
 
-                // Interpolate between them
-                float parent_tween_ratio = cs->GetTweenRatio();
-                float remainder = 1 - parent_tween_ratio;
+                  // Interpolate between them
+                  float parent_tween_ratio = cs->GetTweenRatio();
+                  float remainder = 1 - parent_tween_ratio;
     
-                // Lets look at the tween ratio also... Maybe this is the glitch
-                spot_verts[0] = 
-                  parent_tween_ratio * next_verts[tri.a] + 
-                  remainder * current_verts[tri.a];
+                  // Lets look at the tween ratio also... Maybe this is the glitch
+                  spot_verts[0] = 
+                    parent_tween_ratio * next_verts[tri.a] + 
+                    remainder * current_verts[tri.a];
 
-                spot_verts[1] = 
-                  parent_tween_ratio * next_verts[tri.b] + 
-                  remainder * current_verts[tri.b];
+                  spot_verts[1] = 
+                    parent_tween_ratio * next_verts[tri.b] + 
+                    remainder * current_verts[tri.b];
 
-                spot_verts[2] = 
-                  parent_tween_ratio * next_verts[tri.c] + 
-                  remainder * current_verts[tri.c];
+                  spot_verts[2] = 
+                    parent_tween_ratio * next_verts[tri.c] + 
+                    remainder * current_verts[tri.c];
   
               
-                // Create the center of the triangle for translation
-                center = 
-                  (spot_verts[0] + spot_verts[1] + spot_verts[2]) / 3;
-              }
+                  // Create the center of the triangle for translation
+                  center = 
+                    (spot_verts[0] + spot_verts[1] + spot_verts[2]) / 3;
+                }
               
-              // Get the normal to this triangle based on the verts
-              csVector3 ab = spot_verts[1] - spot_verts[0];
-              csVector3 bc = spot_verts[2] - spot_verts[1];
-              csVector3 normal = ab % bc;
+                // Get the normal to this triangle based on the verts
+                csVector3 ab = spot_verts[1] - spot_verts[0];
+                csVector3 bc = spot_verts[2] - spot_verts[1];
+                csVector3 normal = ab % bc;
               
-              csReversibleTransform trans = movable->GetFullTransform();
-              trans.SetOrigin(center);
-              trans.LookAt(normal, csVector3(0,1,0));
-              movable->SetTransform(trans);
-              movable->UpdateMove();
-              
+                csReversibleTransform trans = movable->GetFullTransform();
+                trans.SetOrigin(center);
+                trans.LookAt(normal, csVector3(0,1,0));
+                movable->SetTransform(trans);
+                movable->UpdateMove();
+	      }
             }
           }
         }

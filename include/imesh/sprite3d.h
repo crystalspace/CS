@@ -447,6 +447,12 @@ struct iSprite3DState : public iBase
    * Get the base color.
    */
   virtual void GetBaseColor (csColor& col) const = 0;
+
+  /// find a socked based on the sprite attached to it.
+  virtual iSpriteSocket* FindSocket (iMeshWrapper *mesh) const = 0;  
+
+  /// find a named socket into the sprite.
+  virtual iSpriteSocket* FindSocket (const char * name) const = 0;
 };
 
 #endif
