@@ -115,6 +115,25 @@ SCF_VERSION (iPolygonMesh, 0, 5, 0);
  * the other type of mesh will automatically generate the new format.
  * iPolygonMesh can use csPolygonMeshTools::Triangulate() and
  * csPolygonMeshTools::Polygonize() to help with that.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Almost all mesh objects have several implementations of this
+ *       interface.
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iObjectModel::GetPolygonMeshBase()
+ *   <li>iObjectModel::GetPolygonMeshColldet()
+ *   <li>iObjectModel::GetPolygonMeshViscull()
+ *   <li>iObjectModel::GetPolygonMeshShadows()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Collision detection plugins (iCollideSystem)
+ *   <li>Visibility culler plugins (iVisibilityCuller)
+ *   <li>Shadow stencil plugin
+ *   </ul>
  */
 struct iPolygonMesh : public iBase
 {

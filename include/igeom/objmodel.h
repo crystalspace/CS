@@ -78,6 +78,16 @@ SCF_VERSION (iObjectModel, 0, 3, 0);
  * space. It is a generic way to describe meshes in the engine. By using
  * this interface you can make sure your code works on all engine geometry.
  * The data returned by this class is in local object space.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>All mesh objects implement this interface.
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iMeshObject::GetObjectModel()
+ *   <li>iMeshObjectFactory::GetObjectModel()
+ *   </ul>
  */
 struct iObjectModel : public iBase
 {
