@@ -308,7 +308,6 @@ bool csReporterListener::HandleEvent (iEvent& event)
 
 	  int max_l = (sh-4-6-4-6) / (fh+6);
 	  if (l > max_l) l = max_l;
-	  //g2d->DrawBox (4, 4, sw-8, 6 + l*(fh+6)-4 + 6, g2d->FindRGB (255, 0, 0));
           int h = 0;
           int c = 0;
 	  for (i = 0 ; i < l ; i++)
@@ -328,13 +327,13 @@ bool csReporterListener::HandleEvent (iEvent& event)
               int chars;
               csString str;
               str.Format ("  %s", msg.GetData ());
-              while ((chars = fnt->GetLength (str.GetData (), sw-20)) <
+              while ((chars = fnt->GetLength (str.GetData (), sw-20)) - 2 <
                 (int) msg.Length ())
               {
                 str.Truncate (chars);
                 g2d->DrawBox (4, 4+h*(fh+6), sw-8, fh+6, bg[c]);
                 int linebreak = strrchr (str.GetData (), ' ')-str.GetData ();
-                if (linebreak>0)
+                if (linebreak > 1) // >1 accounts for two leading spaces in str
                 {
                   str.Truncate (linebreak);
                   g2d->Write (fnt, 4+6, 4+3+h*(fh+6), fg, bg[c], 

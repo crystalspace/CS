@@ -33,6 +33,13 @@ chronological order.
 	  <csutil/csstring.h> to enable this temporary transitional hack.
 	- Jorrit changed iTerrainFactoryState->SetMaterialMap() so that
 	  it uses a const csArray<>& instead of a csArray<> as a parameter.
+	- Eric Sunshine applied a simple fix to stdrep's
+	  csReporterListener::HandleEvent() to work around a bug where the line
+	  wrapping code would loop infinitely once it got to the last line in
+	  wrapped message if that line contained only a single word.  (A more
+	  correct fix would be to re-write this code completely, since it is
+	  unnecessarily obfuscated and convoluted, and about three times as
+	  long as it needs to be.)
 13-Apr-2004
 	- Jorrit changed the PreferClipPlane default to enabled for the new
 	  renderer. Now clipping planes are enabled by default and only
