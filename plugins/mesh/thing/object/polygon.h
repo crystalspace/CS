@@ -115,6 +115,7 @@ private:
 
   /// The object space plane equation (this is fixed).
   csPlane3 plane_obj;
+  bool plane_obj_need_update;
 
   /**
    * The material, this contains the texture handle,
@@ -325,7 +326,10 @@ public:
   /**
    * Return the object-space plane of this polygon.
    */
-  csPlane3& GetObjectPlane () { return plane_obj; }
+  csPlane3& GetObjectPlane () { 
+	  if(plane_obj_need_update) ComputeNormal();
+	  return plane_obj;
+  }
 
   /**
    * Get the vertices.
@@ -696,7 +700,7 @@ public:
 
     virtual const csPlane3& GetObjectPlane ()
     {
-      return scfParent->plane_obj;
+      return scfParent->GetObjectPlane();
     }
     virtual bool IsTransparent ()
     {

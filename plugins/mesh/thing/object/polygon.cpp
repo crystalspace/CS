@@ -79,6 +79,7 @@ csPolygon3DStatic::csPolygon3DStatic () : vertices(4)
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPolygon3DStatic);
   thing_static = 0;
+  plane_obj_need_update = true;
 
   material = 0;
   name = 0;
@@ -506,6 +507,7 @@ void csPolygon3DStatic::ComputeNormal ()
 
   // By default the world space normal is equal to the object space normal.
   plane_obj.Set (A, B, C, D);
+  plane_obj_need_update = false;
   thing_static->scfiObjectModel.ShapeChanged ();
 }
 
@@ -629,8 +631,8 @@ bool csPolygon3DStatic::Finish ()
     if ((lmw > max_lmw) || (lmh > max_lmh))
     {
       thing_static->thing_type->Notify ("Oversize lightmap (%dx%d > %dx%d) "
-        "for polygon '%s'", lmw, lmh, 
-	max_lmw, max_lmh, GetName());
+        "for polygon '%s'", lmw, lmh,
+    max_lmw, max_lmh, GetName());
     }
   }
 
@@ -803,6 +805,7 @@ void csPolygon3DStatic::SetTextureSpace (
 
 int csPolygon3DStatic::AddVertex (int v)
 {
+  plane_obj_need_update = true;
   if (v >= thing_static->GetVertexCount ())
   {
     thing_static->thing_type->Bug (
@@ -1180,7 +1183,7 @@ void csPolygon3D::Finish ()
           int(ambient.red * 255.0f),
           int(ambient.green * 255.0f),
           int(ambient.blue * 255.0f));
-  
+
       csThingObjectType* thing_type = thing->GetStaticData ()->thing_type;
       if (!thing_type->G3D->IsLightmapOK (txt_info))
       {
@@ -2093,7 +2096,7 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
   const csVector3 &center = light_frustum->GetOrigin ();
 
   // If plane is not visible then return (backface culling).
-  if (!csMath3::Visible (center, plane_wor)) 
+  if (!csMath3::Visible (center, plane_wor))
     if (do_smooth)
       maybeItsVisible = true;
     else
@@ -2135,7 +2138,7 @@ void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,
   if (calc_lmap)
     FillLightMapStatic (lview, lptq, vis);
 
-  if (maybeItsVisible) 
+  if (maybeItsVisible)
     return;
 
   csPortal *po = static_data->GetPortal ();
