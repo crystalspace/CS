@@ -6,6 +6,20 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+22-Aug-2004
+	- Eric Sunshine fixed bug in csString::Replace(csString const&) where
+	  it failed to take into account the case where the replacement
+	  csString might be the same as the string on which Replace() was
+	  invoked, thus resulting in "undefined" behavior. This problem
+	  impacted other clients of Replace(), such as operator=(). For
+	  instance, `csString s("foo"); s = s;' resulted incorrectly in 'foo'
+	  being cleared.
+	- Eric Sunshine added more sanity checks to csString to detect and
+	  properly handle near-pathalogical cases such as `s = s.GetData()' and
+	  `s = s.GetData() + n'.
+	- Eric Sunshine fixed bug in csString::Replace(char const*,count) where
+	  it was documented as accepting -1 for `count', but did not correctly
+	  handle the case.
 21-Aug-2004
         - Philip Wyett made the following changes:
           - Fixed attempts to load "crystalspace.graphics3d.shader.soft"
