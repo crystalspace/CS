@@ -131,3 +131,10 @@ STDMETHODIMP csGraphics3DDirect3DDx5Factory::LockServer(BOOL bLock)
   
   return S_OK;
 }
+
+// our main entry point...should be called when we're loaded.
+STDAPI DllInitialize()
+{
+  csCoInitialize(0);
+  return S_OK;
+}
