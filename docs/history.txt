@@ -34,6 +34,8 @@ The history order is reversed so that new features are at the top.
 	  plugins.
 	- Removed the obsolete support for libraries (regions should be
 	  used instead).
+	- Fixed cs.i for scripting plugins. Regenerated SWIG files for
+	  Python plugin and manually tried to fix cslua plugin.
 	- Eric Sunshine fixed a nasty plugin-leak in SCF which was introduced
 	  when iBase was substituted for csBase as the base class of
 	  scfSharedLibrary.  The specific problem was that, although SCF

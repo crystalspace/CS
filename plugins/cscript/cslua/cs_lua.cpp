@@ -8200,74 +8200,6 @@ wrap_iEngine_GetTextureFormat(lua_State *L)
 	return 1;
 }
 
-#define iEngine_SelectLibrary(_swigobj,_swigarg0)  (_swigobj->SelectLibrary(_swigarg0))
-static int
-wrap_iEngine_SelectLibrary(lua_State *L)
-{
-    iEngine * _arg0;
-    char * _arg1;
-
-{
-	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
-		_arg0 = NULL;
-	} else if(lua_isuserdata(L, 1)) {
-		_arg0 = (iEngine *)lua_touserdata(L, 1);
-	} else {
-		lua_error(L, "error in parameter type, `userdata' expected (user*)");
-		_arg0 = NULL;
-	}
-}
-{
-	if((lua_isnull(L, 2)) || (lua_isnil(L, 2))) {
-		_arg1 = NULL;
-	} else if(lua_isstring(L, 2)) {
-		_arg1 = (char *)lua_tostring(L, 2);
-	} else {
-		lua_error(L, "error in parameter type, `char *' expected");
-		_arg1 = NULL;
-	}
-}
-	lua_settop(L, 0);
-    iEngine_SelectLibrary(_arg0,_arg1);
-	return 0;
-}
-
-#define iEngine_DeleteLibrary(_swigobj,_swigarg0)  (_swigobj->DeleteLibrary(_swigarg0))
-static int
-wrap_iEngine_DeleteLibrary(lua_State *L)
-{
-    bool  _result;
-    iEngine * _arg0;
-    char * _arg1;
-
-{
-	if( (lua_isnull(L, 1)) || (lua_isnil(L, 1)) ) {
-		_arg0 = NULL;
-	} else if(lua_isuserdata(L, 1)) {
-		_arg0 = (iEngine *)lua_touserdata(L, 1);
-	} else {
-		lua_error(L, "error in parameter type, `userdata' expected (user*)");
-		_arg0 = NULL;
-	}
-}
-{
-	if((lua_isnull(L, 2)) || (lua_isnil(L, 2))) {
-		_arg1 = NULL;
-	} else if(lua_isstring(L, 2)) {
-		_arg1 = (char *)lua_tostring(L, 2);
-	} else {
-		lua_error(L, "error in parameter type, `char *' expected");
-		_arg1 = NULL;
-	}
-}
-	lua_settop(L, 0);
-    _result = (bool )iEngine_DeleteLibrary(_arg0,_arg1);
-{
-	lua_pushnumber(L, (double)_result);
-}
-	return 1;
-}
-
 #define iEngine_DeleteAll(_swigobj)  (_swigobj->DeleteAll())
 static int
 wrap_iEngine_DeleteAll(lua_State *L)
@@ -9220,8 +9152,6 @@ cspace_initialize(lua_State *L)
 	lua_setglobal(L, "iSectorList_tag");
 
 	lua_register(L, "iEngine_GetTextureFormat", wrap_iEngine_GetTextureFormat);
-	lua_register(L, "iEngine_SelectLibrary", wrap_iEngine_SelectLibrary);
-	lua_register(L, "iEngine_DeleteLibrary", wrap_iEngine_DeleteLibrary);
 	lua_register(L, "iEngine_DeleteAll", wrap_iEngine_DeleteAll);
 	lua_register(L, "iEngine_CreateTexture", wrap_iEngine_CreateTexture);
 	lua_register(L, "iEngine_CreateCameraPosition", wrap_iEngine_CreateCameraPosition);

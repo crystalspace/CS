@@ -665,10 +665,6 @@ FindByName(name)
 
 GetTextureFormat()
 
-SelectLibrary(iName)
-
-DeleteLibrary(iName)
-
 DeleteAll()
 
 CreateTexture(iName,iFileName,iTransp,iFlags)

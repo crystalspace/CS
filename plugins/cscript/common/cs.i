@@ -391,8 +391,6 @@ struct iSectorList : public iBase
 struct iEngine : public iBase
 {
   virtual int GetTextureFormat () = 0;
-  virtual void SelectLibrary (const char *iName) = 0;
-  virtual bool DeleteLibrary (const char *iName) = 0;
   virtual void DeleteAll () = 0;
   virtual iTextureWrapper* CreateTexture (const char *iName,
   	const char *iFileName, csColor *iTransp, int iFlags) = 0;
