@@ -1,15 +1,27 @@
 The history order has been reversed so that new features are at the top.
 
+5-Sep-2000
+	- Eric Sunshine made the following changes to spoofdir.php:
+	    - The $indexfile[] array is now specified as a set of regular-
+	      expressions rather than a fixed set of filenames.
+	    - Case-sensitivity can now be specified individually for each
+	      regular-expression in the configuration section rather than
+	      always being assumed case-sensitive.  Currently applies to
+	      $ignore[] and $indexfile[] arrays.
+	    - Now much more strict about canonicalization of filenames prior
+	      to matching.
 4-Sep-2000
-	- Brandon Ehle did some maintenance to the python scripting stuff.
+	- Brandon Ehle did some maintenance to the Python scripting stuff.
 	  Need to wait for next SWIG release for everything to fall in place.
 	- Added more information to the object list of levtool app.
-	- Added a detail window to show the individual polygons and curves
-	  of a thing or sector.
-	- 'Levtool' recalculated lighting every time a new level was
-	  loaded. No longer...
-	- Eric Sunshine did several changes to the cvs snapshot utilities:
-	    - Major overhaul.  (Also renamed from cvssnap.php to spoofdir.php.)
+	- Added a detail window to show the individual polygons and curves of
+	  a thing or sector.
+	- 'Levtool' recalculated lighting every time a new level was loaded.
+	  No longer does so.
+	- Eric Sunshine made several changes to the PHP script which allows
+	  browsing of the FTP space from HTTP space.
+	    - Major overhaul.
+	    - Renamed from cvssnap.php to spoofdir.php.
 	    - Now very general in nature, highly configurable, and generates
 	      much more aesthetically pleasing directory listings.
 	    - Now capable of providing virtual HTTP access to any directory
@@ -22,15 +34,15 @@ The history order has been reversed so that new features are at the top.
 		http://crystal.sourceforge.net/cvs-snapshots/
 	      and
 		http://crystal.sourceforge.net/docs/
-	      and any of their subdirectories for an example of how this
-	      works and how useful it can be.
-	    - Overhauled index.php at http://crystal.sourceforge.net/.
-	      Added many missing links; particularly for documentation.
+	      and any of their subdirectories for an example of how this works
+	      and how useful it can be.
+	    - Overhauled index.php at http://crystal.sourceforge.net/.  Added
+	      many missing links; particularly for documentation.
 	    - Eliminated old dirlist.php which vended the docs/download
-	      directory. spoofdir.php now handles this functionality plus
+	      directory.  spoofdir.php now handles this functionality plus
 	      much more.
-	    - Eliminated build_fake and cousins since spoofdir.php can now
-	      handle this functionality as well.
+	    - Eliminated Frank's 'build_fake' and cousins since spoofdir.php
+	      can now handle this functionality as well.
 2-Sep-2000
 	- Fixed bug in csWorld::Clear() where that function would forget
 	  to clear the texture cache in G3D. This could result in crashes
@@ -1038,44 +1050,44 @@ The history order has been reversed so that new features are at the top.
 6-Aug-2000
 	- Samuel Humphreys did the following:
            - Added a new plugin called perfstat, and updated walktest so
-	     that it could 'benefit' from its functionality. Perfstat is 
-	     basically a nested statistics gatherer which can print out 
-	     formatted results to a file. It also prints out system info 
-	     as the header. This is meant to be a tool mostly to test the 
-             drivers. The nested bit means it will also gather 
-	     seperate statistics for a configurable 'subsection' of the 
+	     that it could 'benefit' from its functionality. Perfstat is
+	     basically a nested statistics gatherer which can print out
+	     formatted results to a file. It also prints out system info
+	     as the header. This is meant to be a tool mostly to test the
+             drivers. The nested bit means it will also gather
+	     seperate statistics for a configurable 'subsection' of the
              main section it is gathering statistics for.
 	     Walktest has a max of three nested perfstats with the
              recsubperf command (see below).
-           - Changes to walktest:  
-  	    - Perfstat now takes care of fps calculations according 
-              to user specifiable resolution. Defaults to 10 frames per 
+           - Changes to walktest:
+  	    - Perfstat now takes care of fps calculations according
+              to user specifiable resolution. Defaults to 10 frames per
 	      update.
-            - The demo playing and recording now pauses when you switch 
+            - The demo playing and recording now pauses when you switch
 	      to console
-            - Suitable commands are now recorded too, like fire missile, 
-	      addskel addlight etc. A couple of macros are defined in 
+            - Suitable commands are now recorded too, like fire missile,
+	      addskel addlight etc. A couple of macros are defined in
 	      walkcmd.cpp as a convenience.
 	    - Modified commands:
-	       loadrec <file> can take an optional name argument to specify a 
-	               <file>.rec to use as its demo file, otherwise it 
+	       loadrec <file> can take an optional name argument to specify a
+	               <file>.rec to use as its demo file, otherwise it
 		       defaults to 'record' as before.
 	        saverec <file> can take an optional name argument to specify
                        a <file>.rec to save to.
 	        play   has optional arguments, otherwise works as before.
-	        play <file> This outputs summary statistics for the demo 
+	        play <file> This outputs summary statistics for the demo
                        played to <file>.rps (Recorded Performance Statistics).
-	        play res, x, <file> The 'res'(olution) option tells perfstat 
-		        to record statistics every 'x' frames and output 
+	        play res, x, <file> The 'res'(olution) option tells perfstat
+		        to record statistics every 'x' frames and output
                         to <file>.rps
 	        play break, x  The break option when compiled in debug mode
-                        will trip off a signal trap on the 'x'th frame. 
-                        Useful once you take note of the frame number of 
+                        will trip off a signal trap on the 'x'th frame.
+                        Useful once you take note of the frame number of
                         something interesting in a <file>.rps
             - New command:
-	        recsubperf <name> Once a recording has begun this command 
-                        is used to record the statistics of a subsection 
-                        of the demo and is reported as such in the outputted 
+	        recsubperf <name> Once a recording has begun this command
+                        is used to record the statistics of a subsection
+                        of the demo and is reported as such in the outputted
                         <file>.rps when played back. To finish the subsection
                         call the command again without an argument.
 			Stands for 'rec(ord)sub(section)perf(ormance)'
@@ -1546,7 +1558,7 @@ The history order has been reversed so that new features are at the top.
 	    - Propagated Normans changes to regain the title on GLX windows.
             - Fixed the multi-context support in the engine which broke after
 	      the recent changes to the engine.
-            - Added the emission of cscmdContextClose events from the GL and 
+            - Added the emission of cscmdContextClose events from the GL and
               software proc textures.
 	    - Fixed the GL proc texture bug which created new proc textures
 	      each time PrepareTextures was called.
@@ -1830,7 +1842,7 @@ The history order has been reversed so that new features are at the top.
 	  more reliable for TestPolygon.
 	- Norman Kramer fixed csFrustum::Classify(): corrected the
 	  CS_FRUST_PART, still in #if 0 - i guess jorrit want to double
-	  check this :) 
+	  check this :)
 	- Fixed csFrustrum::Classify() again!!
 	- Changed lightmap caching to make it more robust and system
 	  independent. This means that the format has changed completely.
