@@ -694,11 +694,7 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	    test_poly[j] = p->Vwor (j)-quad3d->GetCenter ();
 	  csBox3 bbox;
           po = p->GetPortal ();
-	  int rc;
-	  if (po)
-	    rc = quad3d->TestPolygon (test_poly, p->GetNumVertices (), bbox);
-	  else
-	    rc = quad3d->InsertPolygon (test_poly, p->GetNumVertices (), bbox);
+	  int rc = quad3d->InsertPolygon (test_poly, p->GetNumVertices (), bbox);
 	  visible = (rc != CS_QUAD3D_NOCHANGE);
 	}
       }
@@ -715,24 +711,12 @@ void* csPolygonSet::TestQueuePolygonArray (csPolygonInt** polygon, int num,
           po = p->GetPortal ();
 	  if (d->world->IsPVSOnly ())
             visible = true;
-          else if (csSector::do_portals && po)
-          {
-	    if (covtree)
-              visible = covtree->TestPolygon (clip->GetVertices (),
+	  if (covtree)
+            visible = covtree->InsertPolygon (clip->GetVertices (),
 		    clip->GetNumVertices (), clip->GetBoundingBox ());
-	    else
-              visible = c_buffer->TestPolygon (clip->GetVertices (),
+	  else
+            visible = c_buffer->InsertPolygon (clip->GetVertices (),
 		    clip->GetNumVertices ());
-          }
-          else
-          {
-	    if (covtree)
-              visible = covtree->InsertPolygon (clip->GetVertices (),
-		    clip->GetNumVertices (), clip->GetBoundingBox ());
-	    else
-              visible = c_buffer->InsertPolygon (clip->GetVertices (),
-		    clip->GetNumVertices ());
-          }
         }
       }
 

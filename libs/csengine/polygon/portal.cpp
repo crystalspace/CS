@@ -24,6 +24,9 @@
 #include "csengine/world.h"
 #include "csengine/tranman.h"
 #include "csengine/stats.h"
+#include "csengine/cbuffer.h"
+#include "csengine/quadtr3d.h"
+#include "csengine/covtree.h"
 #include "itexture.h"
 
 IMPLEMENT_IBASE (csPortal)
@@ -90,6 +93,40 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
 	csRenderView& rview)
 {
   if (!sector) CompleteSector ();
+
+  // Initialize the 2D/3D culler. We only traverse through portals
+  // after the culler has been used in the previous sector so this is
+  // safe to do here.
+  if (rview.world->GetEngineMode () == CS_ENGINE_FRONT2BACK)
+  {
+    csCBuffer* c_buffer = rview.world->GetCBuffer ();
+    csCoverageMaskTree* covtree = rview.world->GetCovtree ();
+    csQuadTree3D* quad3d = rview.world->GetQuad3D ();
+    if (c_buffer)
+    {
+      c_buffer->Initialize ();
+      c_buffer->InsertPolygon (new_clipper->GetVertices (), new_clipper->GetNumVertices (), true);
+    }
+    else if (quad3d)
+    {
+      csVector3 corners[4];
+      rview.InvPerspective (csVector2 (0, 0), 1, corners[0]);
+      corners[0] = rview.Camera2World (corners[0]);
+      rview.InvPerspective (csVector2 (rview.world->frame_width-1, 0), 1, corners[1]);
+      corners[1] = rview.Camera2World (corners[1]);
+      rview.InvPerspective (csVector2 (rview.world->frame_width-1, rview.world->frame_height-1), 1, corners[2]);
+      corners[2] = rview.Camera2World (corners[2]);
+      rview.InvPerspective (csVector2 (0, rview.world->frame_height-1), 1, corners[3]);
+      corners[3] = rview.Camera2World (corners[3]);
+      quad3d->SetMainFrustum (rview.GetOrigin (), corners);
+      quad3d->MakeEmpty ();
+    }
+    else if (covtree)
+    {
+      covtree->MakeEmpty ();
+      covtree->UpdatePolygonInverted (new_clipper->GetVertices (), new_clipper->GetNumVertices ());
+    }
+  }
 
   if (sector->draw_busy >= 5)
     return false;
