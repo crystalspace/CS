@@ -7,6 +7,14 @@ The history order is reversed so that new features are at the top.
 	- Moved the kdtree code from Dynavis and Frustvis to csgeom. That
 	  way the code can be shared and used for other purposes too.
 	- Removed '.cvsignore' and thus 'lib3ds' dir as it's not needed.
+	- Eric Sunshine applied a patch suggested by Ben Thomas
+	  <ben.thomas@wickedstudios.com> to work around a problem where
+	  cssysdef.h including <windef.h> (but not <windows.h>) coupled with
+	  use of ZLIB_DLL in CS/include/win32/volatile.h was causing
+	  compilation errors when zlib/zconf.h was included since the FAR macro
+	  was not defined.  The work-around was to remove ZLIB_DLL from
+	  volatile.h.  This macro is only needed when building the zlib.dll
+	  itself, thus it was superfluous for volatile.h to define it.
 6-Mar-2003
 	- Reworked the notion of curve templates. The iCurveTemplate has
 	  been removed and it's functionality has moved to iCurve itself.

@@ -35,16 +35,15 @@
 #endif
 
 #if !defined (COMP_GCC)
-  #define DO_MMX
-  #define ZLIB_DLL
+#  define DO_MMX
 #endif
 
-// if you don't want to use direct input, comment this out
+// If you don't want to use direct input, comment this out
 // keyboard handler will default to window message handling.
 #if defined(COMP_GCC)
-//#	define DO_DINPUT_KEYBOARD
+//#  define DO_DINPUT_KEYBOARD
 #else
-#	undef DO_DINPUT_KEYBOARD
+#  undef DO_DINPUT_KEYBOARD
 #endif
 
 #define CS_RGBCOLOR_SANE
