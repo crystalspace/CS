@@ -4248,16 +4248,15 @@ uint prev_mixmode = ~0;
   csVector2* total_texels = polbuf->GetTotalTexels ();
   csVector2* total_lumels = polbuf->GetTotalLumels ();
 
-  TrianglesNode *t = polbuf->GetFirst ();
+  csTrianglesPerMaterial *t = polbuf->GetFirst ();
   vbman->LockBuffer (vb, total_verts, total_texels, NULL,
       total_verts_count, 0);
+  bool something_was_drawn = false;
   while (t != NULL)
   {
-    csTrianglesPerMaterial* tpm = t->info;
-
     // Clear the vertex arrays in the polygon buffer since they are only
     // needed while building the polygon buffer. Not later.
-    tpm->ClearVertexArray ();
+    t->ClearVertexArray ();
 
     trimesh.mat_handle = polbuf->GetMaterialPolygon (t);
     if (!setup)
@@ -4301,9 +4300,10 @@ uint prev_mixmode = ~0;
         }
       }
     }
-    trimesh.triangles = tpm->triangles.GetArray ();
-    trimesh.num_triangles = tpm->numTriangles;
-    EffectDrawTriangleMesh (trimesh, false);
+    trimesh.triangles = t->triangles.GetArray ();
+    trimesh.num_triangles = t->numTriangles;
+    bool drawn = EffectDrawTriangleMesh (trimesh, false);
+    something_was_drawn |= drawn;
     t = t->next;
   }
   vbman->UnlockBuffer (vb);
@@ -4319,10 +4319,17 @@ uint prev_mixmode = ~0;
       break;
   }
 
+  if (!something_was_drawn)
+  {
+    RestoreDTMTransforms ();
+    RestoreDTMClipping ();
+    return;
+  }
+
   trimesh.use_vertex_color = false;
   trimesh.mat_handle = NULL;
   SetupDTMEffect (trimesh);
-  TrianglesSuperLightmapNode *sln = polbuf->GetFirstTrianglesSLM ();
+  csTrianglesPerSuperLightmap *sln = polbuf->GetFirstTrianglesSLM ();
   if (m_renderstate.lighting && sln)
   {
     vbman->LockBuffer (vb, total_verts, total_lumels, NULL,
@@ -4331,15 +4338,13 @@ uint prev_mixmode = ~0;
     bool modified = false;
     while (sln != NULL)
     {
-      csTrianglesPerSuperLightmap* tplm = sln->info;
-
-      lightmap_cache->Cache (tplm, dirty, &modified);
-      if (!tplm->cacheData->IsUnlit ())
+      lightmap_cache->Cache (sln, dirty, &modified);
+      if (!sln->cacheData->IsUnlit ())
       {
-        trimesh.triangles = tplm->triangles.GetArray ();
-        trimesh.num_triangles = tplm->numTriangles;
+        trimesh.triangles = sln->triangles.GetArray ();
+        trimesh.num_triangles = sln->numTriangles;
 
-        EffectDrawTriangleMesh (trimesh, false, tplm->cacheData->Handle);
+        EffectDrawTriangleMesh (trimesh, false, sln->cacheData->Handle);
       }
       sln = sln->prev;
     }
@@ -4994,7 +4999,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 #endif
 }
 
-void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
+bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
   G3DTriangleMesh& mesh, bool setup,
   GLuint lightmap, csVector2* lightmapcoords)
 {
@@ -5002,8 +5007,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
   {
     // Because EffectDrawTriangleMesh doesn't seem to work properly with
     // fog I switch back to OldDrawTriangleMesh in case of fog.
-    OldDrawTriangleMesh (mesh, setup);
-    return;
+    return OldDrawTriangleMesh (mesh, setup);
   }
 
   if (!lightmap)
@@ -5012,8 +5016,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
     {
       // If there is no material (which is legal) we temporarily use
       // OldDrawTriangleMesh().
-      OldDrawTriangleMesh (mesh, setup);
-      return;
+      return OldDrawTriangleMesh (mesh, setup);
     }
   }
   int i, l;
@@ -5021,8 +5024,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
   if (setup) SetupDTMEffect (mesh);
   if (!ci.technique)
   {
-    OldDrawTriangleMesh (mesh, setup); // Should never get here.
-    return;
+    return OldDrawTriangleMesh (mesh, setup); // Should never get here.
   }
 
   FlushDrawPolygon ();
@@ -5150,7 +5152,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       }
     }
     triangles = clipped_triangles->GetArray ();
-    if (num_triangles <= 0) return; // Nothing to do!
+    if (num_triangles <= 0) return false; // Nothing to do!
   }
 
   //===========
@@ -5403,11 +5405,10 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
     RestoreDTMTransforms ();
   }
 
-  //glPopClientAttrib();
-  //glPopAttrib();
+  return true;
 }
 
-void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
+bool csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
 		bool setup)
 {
 #if CS_DEBUG
@@ -5537,7 +5538,7 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
       work_fog = clipped_fog->GetArray ();
     }
     triangles = clipped_triangles->GetArray ();
-    if (num_triangles <= 0) return; // Nothing to do!
+    if (num_triangles <= 0) return false; // Nothing to do!
   }
 
   //===========
@@ -5838,6 +5839,7 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
     //mesh.vertex_mode == G3DTriangleMesh::VM_VIEWSPACE);
 
   SetMirrorMode (false);
+  return true;
 }
 
 void csGraphics3DOGLCommon::FogDrawTriangleMesh (G3DTriangleMesh& mesh,

@@ -1,5 +1,14 @@
 The history order is reversed so that new features are at the top.
 
+31-Jan-2003
+	- Another small optimization in the super lightmap cache. This time
+	  avoid virtual function calls.
+	- Another small optimization. If nothing was drawn during the
+	  unlit texture mapping then no lightmaps are drawn either (for
+	  DrawPolygonMesh).
+	- Cleaned up super lightmap code a little more.
+	- Started work on new optimization in the super lightmap cache. Not
+	  operational yet.
 30-Jan-2003
 	- Greatly modified the DrawPolygonMesh and polygon buffer
 	  code in the OpenGL renderer. This is still very experimental

@@ -31,17 +31,6 @@
 #include "ogl_txtcache.h"
 
 
-TrianglesNode::TrianglesNode ()
-{
-  info = NULL;
-  next = NULL;
-}
-
-TrianglesNode::~TrianglesNode ()
-{
-  delete info;
-}
-
 TrianglesList::TrianglesList ()
 {
   first = NULL;
@@ -52,13 +41,13 @@ TrianglesList::~TrianglesList ()
 {
   while (first)
   {
-    TrianglesNode* aux = first->next;
+    csTrianglesPerMaterial* aux = first->next;
     delete first;
     first = aux;
   }
 }
 
-void TrianglesList::Add (TrianglesNode* t)
+void TrianglesList::Add (csTrianglesPerMaterial* t)
 {
   if (first == NULL)
   {
@@ -86,6 +75,7 @@ csTriangleArrayPolygonBuffer::~csTriangleArrayPolygonBuffer ()
 csTrianglesPerMaterial::csTrianglesPerMaterial()
 {
   numTriangles = 0;
+  next = NULL;
 }
 
 csTrianglesPerMaterial::~csTrianglesPerMaterial ()
@@ -107,24 +97,34 @@ csTrianglesPerSuperLightmap::csTrianglesPerSuperLightmap()
   cacheData = NULL;
   isUnlit = false;
   initialized = false;
+  prev = NULL;
+  suplm_data = NULL;
 }
 
 csTrianglesPerSuperLightmap::~csTrianglesPerSuperLightmap ()
 {
   if (cacheData) cacheData->Clear();
   delete region;
+  delete[] suplm_data;
 }
 
-
-TrianglesSuperLightmapNode::TrianglesSuperLightmapNode()
+void csTrianglesPerSuperLightmap::CalculateSuplmData ()
 {
-  info = NULL;
-  prev = NULL;
-}
-
-TrianglesSuperLightmapNode::~TrianglesSuperLightmapNode()
-{
-  delete info;
+  if (suplm_data) return;
+  int i;
+  suplm_width = 0;
+  suplm_height = 0;
+  for (i = 0 ; i < rectangles.Length () ; i++)
+  {
+    //iLightMap* lm = sln->lightmaps[i]->GetLightMap();
+    //int lmwidth = lm->GetWidth ();
+    //int lmheigth = lm->GetHeight ();
+    const csRect& r = rectangles[i];
+    if (r.xmax > suplm_width) suplm_width = r.xmax;
+    if (r.ymax > suplm_height) suplm_height = r.ymax;
+  }
+printf ("%dx%d\n", suplm_width, suplm_height); fflush (stdout);
+  suplm_data = new uint8[suplm_width * suplm_height * 4];
 }
 
 TrianglesSuperLightmapList::TrianglesSuperLightmapList ()
@@ -139,13 +139,13 @@ TrianglesSuperLightmapList::~TrianglesSuperLightmapList ()
 {
   while (last)
   {
-    TrianglesSuperLightmapNode* aux = last->prev;
+    csTrianglesPerSuperLightmap* aux = last->prev;
     delete last;
     last = aux;
   }
 }
 
-void TrianglesSuperLightmapList::Add (TrianglesSuperLightmapNode* t)
+void TrianglesSuperLightmapList::Add (csTrianglesPerSuperLightmap* t)
 {
   if (first == NULL) first = t;
   t->prev = last;
@@ -178,26 +178,25 @@ csTrianglesPerSuperLightmap* csTriangleArrayPolygonBuffer::
   int lm_width = piLM->GetWidth();
   int lm_height = piLM->GetHeight();
 
-  TrianglesSuperLightmapNode* curr = superLM.last;
+  csTrianglesPerSuperLightmap* curr = superLM.last;
   while (curr)
   {
-    if (curr->info->region->Alloc (lm_width, lm_height, rect))
-      return curr->info;
+    if (curr->region->Alloc (lm_width, lm_height, rect))
+      return curr;
     curr = curr->prev;
   }
 
   //We haven't found any, let's create a new one
 
-  curr = new TrianglesSuperLightmapNode();
-  curr->info = new csTrianglesPerSuperLightmap ();
+  curr = new csTrianglesPerSuperLightmap ();
 
-  if (!curr->info->region->Alloc (lm_width, lm_height, rect))
+  if (!curr->region->Alloc (lm_width, lm_height, rect))
   {
     return NULL;
   }
 
   superLM.Add (curr);
-  return curr->info;
+  return curr;
 }
 
 int csTriangleArrayPolygonBuffer::AddSingleVertex (csTrianglesPerMaterial* pol,
@@ -345,6 +344,8 @@ void csTriangleArrayPolygonBuffer::AddTriangles (csTrianglesPerMaterial* pol,
 
   triSuperLM->rectangles.Push (rect);
   triSuperLM->lightmaps.Push (poly_texture);
+  iLightMap* lm = poly_texture->GetLightMap ();
+  triSuperLM->lm_info.Push (lm->GetMapData ());
 }
 
 void csTriangleArrayPolygonBuffer::MarkLightmapsDirty()
@@ -363,10 +364,10 @@ void csTriangleArrayPolygonBuffer::AddPolygon (int* verts, int num_verts,
 if (verts == NULL)
 {
 int cnt_mat = 0;
-TrianglesNode* t = GetFirst ();
+csTrianglesPerMaterial* t = GetFirst ();
 while (t) { cnt_mat++; t = t->next; }
 int cnt_lm = 0;
-TrianglesSuperLightmapNode* sln = GetFirstTrianglesSLM ();
+csTrianglesPerSuperLightmap* sln = GetFirstTrianglesSLM ();
 while (sln) { cnt_lm++; sln = sln->prev; }
 printf ("vtcnt=%d cnt_mat=%d cnt_lm=%d   ", GetVertexCount (), cnt_mat, cnt_lm);
 sln = GetFirstTrianglesSLM ();
@@ -376,19 +377,19 @@ while (sln)
 	int tot_area = 0;
 	int maxx = 0;
 	int maxy = 0;
-	for (i = 0 ; i < sln->info->rectangles.Length () ; i++)
+	for (i = 0 ; i < sln->rectangles.Length () ; i++)
 	{
-          iLightMap* lm = sln->info->lightmaps[i]->GetLightMap();
+          iLightMap* lm = sln->lightmaps[i]->GetLightMap();
           int lmwidth = lm->GetWidth ();
           int lmheigth = lm->GetHeight ();
-	  const csRect& r = sln->info->rectangles[i];
+	  const csRect& r = sln->rectangles[i];
 	  if (r.xmax > maxx) maxx = r.xmax;
 	  if (r.ymax > maxy) maxy = r.ymax;
 	  int area = lmwidth * lmheigth;
 	  tot_area += area;
 	  //printf ("%dx%d  %dx%d\n", lmwidth, lmheigth, r.xmax-r.xmin, r.ymax-r.ymin);
 	}
-	printf ("    num=%d maxx=%d maxy=%d tot_area=%d smallest=%d\n", sln->info->rectangles.Length (), maxx, maxy, tot_area, maxx*maxy);
+	printf ("    num=%d maxx=%d maxy=%d tot_area=%d smallest=%d\n", sln->rectangles.Length (), maxx, maxy, tot_area, maxx*maxy);
 	sln = sln->prev;
 }
 fflush (stdout);
@@ -439,9 +440,7 @@ return;
     csTrianglesPerMaterial* pol = new csTrianglesPerMaterial ();
     AddTriangles (pol, triSuperLM, verts, num_verts, m_obj2tex, v_obj2tex,
       poly_texture, mat_index, cur_tri_num * 3);
-    TrianglesNode* tNode = new TrianglesNode ();
-    tNode->info = pol;
-    polygons.Add (tNode);
+    polygons.Add (pol);
 
     matCount ++;
   }
@@ -449,7 +448,7 @@ return;
   {
     // We can add the triangles in the last PolygonPerMaterial
     // as long they share the same material.
-    AddTriangles (polygons.last->info, triSuperLM, verts, num_verts, m_obj2tex,
+    AddTriangles (polygons.last, triSuperLM, verts, num_verts, m_obj2tex,
       v_obj2tex, poly_texture, mat_index, cur_tri_num * 3);
   }
 

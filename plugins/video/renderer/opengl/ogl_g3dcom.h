@@ -748,10 +748,11 @@ public:
   virtual void DrawTriangleMesh (G3DTriangleMesh& mesh);
   /**
    * If setup == true then this function will call SetupDTM...()
-   * and RestoreDTM...().
+   * and RestoreDTM...(). Returns false if the mesh was clipped away
+   * completely.
    */
-  void OldDrawTriangleMesh (G3DTriangleMesh& mesh, bool setup = true);
-  void EffectDrawTriangleMesh (G3DTriangleMesh& mesh, bool setup = true,
+  bool OldDrawTriangleMesh (G3DTriangleMesh& mesh, bool setup = true);
+  bool EffectDrawTriangleMesh (G3DTriangleMesh& mesh, bool setup = true,
     GLuint lightmap = 0, csVector2* lightmapcoords = 0);
   void FogDrawTriangleMesh (G3DTriangleMesh& mesh, bool setup = true);
 

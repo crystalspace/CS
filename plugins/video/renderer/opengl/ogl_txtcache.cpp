@@ -373,34 +373,38 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
 
   csRect* rectangleArray = s->rectangles.GetArray();
   const csRefArray<iPolygonTexture>& lmArray = s->lightmaps;
-  //iPolygonTexture** lmArray = s->lightmaps.GetArray();
+  const csGrowingArray<csRGBpixel*>& lmInfo = s->lm_info;
 
   int i;
   int numLightmaps = s->lightmaps.Length ();
   if (s->cacheData)
   {
-//printf ("s=%p in cache dirty=%d initialized=%d!\n", s, dirty, s->initialized); fflush (stdout);
-    //The data is already in cache, let's see
+    // The data is already in cache, let's see
     // if we need to recalculate the lightmaps
-    // due the effect of dynamic lights
+    // due the effect of dynamic lights.
 
     if (dirty || !s->initialized)
     {
       GLuint SLMHandle = s->cacheData->Handle;
       csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, SLMHandle);
+
+#if 0
+      char buf[256*256*4];
+      s->CalculateSuplmData ();
+          glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0,
+            s->suplm_width, s->suplm_height, GL_RGBA, GL_UNSIGNED_BYTE, buf);
+#else
       for (i = 0; i < numLightmaps; i++)
       {
         if (lmArray[i]->RecalculateDynamicLights ())
         {
-          iLightMap* lm = lmArray[i]->GetLightMap();
-          int lmwidth = lm->GetWidth();
-          int lmheight = lm->GetHeight();
-          csRGBpixel* lm_data = lm->GetMapData();
+          csRGBpixel* lm_data = lmInfo[i];
           csRect& r = rectangleArray[i];
           glTexSubImage2D (GL_TEXTURE_2D, 0, r.xmin, r.ymin,
-            lmwidth, lmheight, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
+            r.xmax-r.xmin, r.ymax-r.ymin, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
         }
       }
+#endif
       s->initialized = true;
     }
 
@@ -419,7 +423,6 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
     suplm[cur_lm].Clear ();
     index = cur_lm;
   }
-  s->initialized = false;
   //Fill the superLightmap
   suplm[index].cacheData = new csSLMCacheData ();
   //We're going to fill the whole super lightmap, so we don't give
@@ -430,17 +433,21 @@ void OpenGLLightmapCache::Cache (csTrianglesPerSuperLightmap* s, bool dirty,
   superLMData->Handle = SLMHandle = suplm[index].Handle;
   s->slId = index;
   csGraphics3DOGLCommon::statecache->SetTexture (GL_TEXTURE_2D, SLMHandle);
+#if 0
+      char buf[256*256*4];
+      s->CalculateSuplmData ();
+          glTexSubImage2D (GL_TEXTURE_2D, 0, 0, 0,
+            s->suplm_width, s->suplm_height, GL_RGBA, GL_UNSIGNED_BYTE, buf);
+#else
   for (i = 0; i < numLightmaps; i++)
   {
     if (dirty) lmArray[i]->RecalculateDynamicLights();
-    iLightMap* lm = lmArray[i]->GetLightMap();
-    int lmwidth = lm->GetWidth ();
-    int lmheigth = lm->GetHeight ();
-    csRGBpixel* lm_data = lm->GetMapData ();
+    csRGBpixel* lm_data = lmInfo[i];
     csRect& r = rectangleArray[i];
     glTexSubImage2D (GL_TEXTURE_2D, 0, r.xmin, r.ymin,
-      lmwidth, lmheigth, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
+      r.xmax-r.xmin, r.ymax-r.ymin, GL_RGBA, GL_UNSIGNED_BYTE, lm_data);
   }
+#endif
   s->initialized = true;
 }
 

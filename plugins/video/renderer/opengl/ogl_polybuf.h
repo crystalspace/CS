@@ -49,6 +49,7 @@ typedef csVertexIndexArrayNode* csIndexVertex;
 class csTrianglesPerMaterial
 {
 public:
+  csTrianglesPerMaterial * next;
   int matIndex;
   int numTriangles;
 
@@ -59,7 +60,6 @@ public:
   csGrowingArray<csTriangle> triangles;
 
   csTrianglesPerMaterial ();
-  //csTrianglesPerMaterial (int numVertex);
 
   ~csTrianglesPerMaterial ();
 
@@ -70,47 +70,41 @@ public:
 };
 
 
-class TrianglesNode
-{
-public:
-  csTrianglesPerMaterial *info;
-  TrianglesNode * next;
-  TrianglesNode ();
-  ~TrianglesNode ();
-};
-
 class TrianglesList
 {
 public:
-  TrianglesNode* first;
-  TrianglesNode* last;
+  csTrianglesPerMaterial* first;
+  csTrianglesPerMaterial* last;
 
   TrianglesList ();
   ~TrianglesList ();
   int GetLastMaterial ()
   {
     if (last == NULL) return -1;
-    return last->info->matIndex;
+    return last->matIndex;
   }
-  void Add (TrianglesNode* t);
-  TrianglesNode* GetLast () { return last; }
+  void Add (csTrianglesPerMaterial* t);
+  csTrianglesPerMaterial* GetLast () { return last; }
 };
 
 /**
- * This class stores triangles thatcould share the same superlightmap
+ * This class stores triangles that could share the same superlightmap
  */
 class csTrianglesPerSuperLightmap
 {
 public:
+  csTrianglesPerSuperLightmap* prev;
+
   /// triangles which shares the same superlightmap
   csGrowingArray<csTriangle> triangles;
 
   /// The lightmaps in the superlightmap
   csRefArray<iPolygonTexture> lightmaps;
+  csGrowingArray<csRGBpixel*> lm_info;
 
   csGrowingArray<csRect> rectangles;
 
-  //SuperLightmap Id.
+  // SuperLightmap Id.
   int slId;
 
   csSubRectangles* region;
@@ -118,7 +112,6 @@ public:
   int numTriangles;
 
   csTrianglesPerSuperLightmap();
-  //csTrianglesPerSuperLightmap(int numVertex);
   ~csTrianglesPerSuperLightmap();
 
   /// Pointer to the cache data
@@ -127,17 +120,13 @@ public:
 
   // Checks if the superlightmap is initialized or not
   bool initialized;
-};
 
-/** Simple single list node*/
-class TrianglesSuperLightmapNode
-{
-public:
-  TrianglesSuperLightmapNode* prev;
-  csTrianglesPerSuperLightmap * info;
+  // Cache for the combined super lightmaps.
+  uint8* suplm_data;
+  int suplm_width, suplm_height;
 
-  TrianglesSuperLightmapNode ();
-  ~TrianglesSuperLightmapNode ();
+  // Calculate the combined super lightmap cache.
+  void CalculateSuplmData ();
 };
 
 /**
@@ -151,13 +140,13 @@ public:
 class TrianglesSuperLightmapList
 {
 public:
-  TrianglesSuperLightmapNode* first;
-  TrianglesSuperLightmapNode* last;
+  csTrianglesPerSuperLightmap* first;
+  csTrianglesPerSuperLightmap* last;
 
   TrianglesSuperLightmapList ();
   ~TrianglesSuperLightmapList ();
-  void Add (TrianglesSuperLightmapNode* t);
-  TrianglesSuperLightmapNode* GetLast () { return last; }
+  void Add (csTrianglesPerSuperLightmap* t);
+  csTrianglesPerSuperLightmap* GetLast () { return last; }
 
   // Dirty due dynamic lights, needs recalculating.
   bool dirty;
@@ -230,24 +219,15 @@ public:
 
   bool HaveUnlitPolys() {return unlitPolysSL != NULL;};
 
-  TrianglesNode* GetFirst () { return polygons.first; }
-  TrianglesSuperLightmapNode* GetFirstTrianglesSLM () { return superLM.last; }
-
-  int GetUVCount (TrianglesSuperLightmapNode* t);
-  int GetUVCount (TrianglesNode* t);
+  csTrianglesPerMaterial* GetFirst () { return polygons.first; }
+  csTrianglesPerSuperLightmap* GetFirstTrianglesSLM () { return superLM.last; }
 
   /// Gets the number of materials of the mesh
   virtual int GetMaterialCount() const { return matCount;}
 
-  /// Gets the Lightmap cache data for a given node (by super lightmap)
-  csSLMCacheData* GetCacheData(TrianglesSuperLightmapNode* t);
-
-  /// Gets the number of lightmaps for a given node (per super lightmap)
-  int GetLightmapCount(TrianglesSuperLightmapNode* t);
-
   /// Gets the material handler for a given node (by material)
-  iMaterialHandle* GetMaterialPolygon(TrianglesNode* t)
-  { return (iMaterialHandle*)(materials[t->info->matIndex]);}
+  iMaterialHandle* GetMaterialPolygon(csTrianglesPerMaterial* t)
+  { return (iMaterialHandle*)(materials[t->matIndex]);}
 
   /// Constructor
   csTriangleArrayPolygonBuffer (iVertexBufferManager* mgr);
@@ -268,10 +248,6 @@ public:
   {
     return materials[idx];
   }
-
-  /// Gets the fog indices
-
-  int *GetFogIndices(TrianglesSuperLightmapNode* tSL);
 
   /// Gets the unlit polygons
   csTrianglesPerSuperLightmap* GetUnlitPolys(){ return unlitPolysSL;};
