@@ -219,7 +219,7 @@ void ComputeInitial() {
    for (i=0;i<nverts;i++)
    {
 	   //let apply here blunt integration (this is for first-timesteps only)
-	   velocities[i] = velocities1[i] + 0.5*forces[i]*(dt/density); 
+	   velocities[i] = velocities1[i] + 0.5f * forces[i] * (dt/density); 
 	     vertices[i]+= velocities1[i]*dt;
 	  
 	      forces3[i] = density*gravity;              //clean what is going to be the new timestep buffer 
