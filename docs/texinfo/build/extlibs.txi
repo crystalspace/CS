@@ -23,7 +23,10 @@ contains all headers, pre-built library files, and dynamic link libraries in
 pre-compiled form from the following location on the Crystal Space server:
 
 @noindent
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc_libs_0.92g.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc_libs_0.92h.zip}
+
+@noindent
+@uref{ftp://62.188.48.183/crystal_space/support/win32/msvc_libs_0.92h.zip}
 
 Microsoft Visual C++ 7 and @sc{dos} users can download a single package which
 contains all headers, pre-built library files, and dynamic link libraries in
@@ -31,11 +34,20 @@ pre-compiled form from the following location on the Crystal Space server:
 
 @noindent
 @ifnottex
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.92d.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/msvc7_libs_0.92e.zip}
 @end ifnottex
 @iftex
 @code{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc7/}@*
-@code{msvc7_libs_0.92d.zip}
+@code{msvc7_libs_0.92e.zip}
+@end iftex
+
+@noindent
+@ifnottex
+@uref{ftp://62.188.48.183/crystal_space/support/win32/msvc7/msvc7_libs_0.92e.zip}
+@end ifnottex
+@iftex
+@code{ftp://62.188.48.183/crystal_space/support/win32/msvc7/}@*
+@code{msvc7_libs_0.92e.zip}
 @end iftex
 
 @subheading zlib
@@ -48,7 +60,7 @@ You can download @code{zlib} from:
 
 @noindent
 @uref{ftp://ftp.uu.net/graphics/png/src}@code{/zlib-?????.tar.gz}@*
-(as of this writing the current latest version is @file{zlib-1.1.3.tar.gz})
+(as of this writing the current latest version is @file{zlib-1.1.4.tar.gz})
 
 After downloading you must put the contents of that package in
 @file{CS/libs/zlib}. It is possible to put the library somewhere else as well
