@@ -121,6 +121,9 @@ protected:
   ///
   iObjectRegistry *object_reg;
 
+  /// list of registered clients
+  csVector vClients;
+
 public:
   /// Initialize the vertex buffer manager
   csVertexBufferManager (iObjectRegistry* object_reg);
@@ -140,6 +143,9 @@ public:
 	csColor* colors,
 	int num_verts, int buf_number);
   virtual void UnlockBuffer (iVertexBuffer* buf);
+
+  virtual void AddClient (iVertexBufferManagerClient *client);
+  virtual void RemoveClient (iVertexBufferManagerClient *client);
 
   // CreatePolygonBuffer() is not implemented here. Must go to
   // subclass!
