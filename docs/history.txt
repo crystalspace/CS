@@ -27,6 +27,10 @@ chronological order.
 	  to clear the sequence manager manually.
 	- Jorrit fixed fog in OpenGL (for DrawPolygonMesh). It would fail for
 	  triangles that required clipping.
+	- Jorrit replaced a DeleteAll() in portalcontainer with Empty().
+	  DeleteAll() completely reinitializes the array but we want to keep
+	  the internal array size the same to avoid reallocating all the time.
+	- Jorrit fixed the bug with software renderer fog.
 16-Oct-2003
 	- Jorrit fixed a big memory leak related to the engine sequence
 	  manager. There are actually three fixes to solve this bug:

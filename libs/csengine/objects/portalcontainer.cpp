@@ -222,7 +222,7 @@ void csPortalContainer::WorldToCamera (iCamera*,
   int i;
   for (i = 0 ; i < world_vertices.Length () ; i++)
     camera_vertices[i] = camtrans.Other2This (world_vertices[i]);
-  camera_planes.DeleteAll ();
+  camera_planes.Empty ();
   for (i = 0 ; i < portals.Length () ; i++)
   {
     csPortal* prt = portals[i];
@@ -755,11 +755,10 @@ void csPortalContainer::DrawOnePortal (
 
   // If we have fog or the portal is z-filled we need to keep the
   // camera plane because recursive rendering may cause it to change.
-  csPlane3 keep_plane;
+  csPlane3 keep_plane = camera_plane;;
   float keep_camera_z = 0;	// Also keep z-coordinate of vertex 0.
   if (is_this_fog || po->flags.Check (CS_PORTAL_ZFILL))
   {
-    keep_plane = camera_plane;
     keep_camera_z = camera_vertices[po->GetVertexIndices ()[0]].z;
   }
 
