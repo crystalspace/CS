@@ -275,7 +275,6 @@ fi
 if test -n "$show_libs"; then
     #if users specified no lib, output all
     if test -z "$the_libs"; then
-	addlib "-lcsengine"
         addlib "-lcsws"
         addlib "-lcsgfx"
         addlib "-lcsgeom"
