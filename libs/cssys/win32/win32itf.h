@@ -26,11 +26,11 @@
 SCF_INTERFACE(iWin32SystemDriver, 0, 0, 1) : public iBase
 {
   /// Returns the HINSTANCE of the program
-  HINSTANCE GetInstance() const = 0;
+  virtual HINSTANCE GetInstance() const = 0;
   /// Returns true if the program is 'active', false otherwise.
-  bool GetIsActive() const = 0;
+  virtual bool GetIsActive() const = 0;
   /// Gets the nCmdShow of the WinMain().
-  int GetCmdShow() const = 0;
+  virtual int GetCmdShow() const = 0;
 };
 
 #endif // __CS_WIN32ITF_H__
