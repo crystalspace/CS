@@ -24,6 +24,9 @@ Short-term cleanups that need to be done:
 	  why there should be four. This is left-over from a long time ago.
 	  This optimization means we save 4800 bytes for every lightmapped
 	  polygon with a 16x16 lightmap.
+	- Changes to Map2CS from Thomas Hieber (new lightscale option).
+	- Norman Kramer added a farplane to csCamera object such that
+	  everything is clipped to that plane. Default is no clipping.
 1-Jan-2000
 	- My computer is still working :-)
 	  And so is Crystal Space.
@@ -32,6 +35,11 @@ Short-term cleanups that need to be done:
 	  lightmaps for the four mipmap levels.
 	- Removed another 12 bytes from csLightMap.
 	- Small optimization in coverage mask tree.
+	- Seth Galbraith did some changes on map2cs so that textures
+	  with no data are not saved. If no texture is found then a new
+	  texture is created (with no data) with the name from the map
+	  file.
+	- Seth also updated DJGPP help system with some correct links.
 31-Dec-1999
 	- First significant memory optimization in csPolyTxtPlane. The
 	  camera transformation fields are removed and calculated only
