@@ -1009,15 +1009,11 @@ void csSprite3D::Draw (csRenderView& rview)
   // test against far plane if needed
   if (rview.UseFarPlane ())
   {
-    // we cull the whole sprite if all corners of the bbox are behind the farplane.
-    // it would be enough to test if the minimum z-value is in front of the farplane but only if the view vector
-    // is perpendicular on the farplane - so we test all corners (in the worst case) to not depend on that.
-    int i;
-    for (i=0; i < 8; i++)
-      if (rview.GetFarPlane ()->Classify (bbox3.GetCorner (i)) > SMALL_EPSILON)
-        break;
-    if (i==8)
-      return;	
+    // ok, so this is not really a far plane clipping - we just dont draw this sprite
+    // if no point of the camera_bounding box is closer than the D part of the farplane
+    
+    if (camera_bbox.SquaredOriginDist () > rview.GetFarPlane ()->D ()*rview.GetFarPlane ()->D ())
+       return;	
   }
   
   // Test if we need and should clip to the current portal.
