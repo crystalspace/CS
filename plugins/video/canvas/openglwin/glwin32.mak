@@ -32,6 +32,7 @@ ifeq ($(MAKESECTION),postdefines)
 ifeq ($(USE_PLUGINS),yes)
   GLWIN32 = $(OUTDLL)/glwin32$(DLL)
   LIB.GLWIN32 = $(foreach d,$(DEP.GLWIN32),$($d.LIB))
+  LIB.GLWIN32.LFLAGS = $(GL.LFLAGS)
   TO_INSTALL.DYNAMIC_LIBS += $(GLWIN32)
 else
   GLWIN32 = $(OUT)/$(LIB_PREFIX)glwin32$(LIB)
@@ -69,7 +70,9 @@ $(OUT)/%$O: plugins/video/canvas/openglcommon/%.cpp
 	$(DO.COMPILE.CPP) $(GL.CFLAGS)
 
 $(GLWIN32): $(OBJ.GLWIN32) $(LIB.GLWIN32)
-	$(DO.PLUGIN) $(GL.LFLAGS)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(LIB.GL3D.LFLAGS) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 clean: glwin32clean
 glwin32clean:
@@ -78,7 +81,7 @@ glwin32clean:
 ifdef DO_DEPEND
 depend: $(OUTOS)/glwin32.dep
 $(OUTOS)/glwin32.dep: $(SRC.GLWIN32)
-	$(DO.DEP) $(GL.CFLAGS)
+	$(DO.DEP1) $(GL.CFLAGS) $(DO.DEP2)
 else
 -include $(OUTOS)/glwin32.dep
 endif

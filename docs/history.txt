@@ -3,7 +3,9 @@ The history order is reversed so that new features are at the top.
 30-Jan-2003
 	- Matthias Braun made plugin makefiles using the CFLAGS from external
 	  libraries (3ds, mikmod, ogg/vorbis, openal, ode plugins)
-
+	- Eric Sunshine fixed problem in the various OpenGL renderer and canvas
+	  plugins in which GL.LFLAGS was being applied to the `ar' invocation
+	  for static builds.
 29-Jan-2003
 	- Matthias Braun fixed ogg loader crash when sound hasn't been
 	  initialized.
@@ -17,27 +19,6 @@ The history order is reversed so that new features are at the top.
 	  behaving well in case polygons go beyond the Z-plane. Fixed this
 	  now.
 28-Jan-2003
-	- Keith Fulton did the following:
-	    - Fixed opposite logic bug in binary sprite saver which was
-	      saving the opposite setting for tweening from what was
-	      actually set.
-	- Philip Wyett did the following:
-	    - Changed so release build is now the default one loaded
-	      when you open csall.dsw. This will hopefully help those
-	      who are unsure and build the for developers only
-	      extensive memory debug build.
-	      Note:
-	      Those who already have builds should be sure to delete
-	      csall.ncb and .opt from 'CS\mk\visualc' or the change will
-	      not take effect.
-	- Matthias Braun did the following:
-	    - Fixed make install rules I introduced yesterday.
-	    - Added message to make install.
-	    - Only build oss driver if soundcard.h is available.
-	    - Only build xfree86vm plugin if that extension has been
-	      detected.
-	- Philip Wyett did the following:
-	    - Fixed crasher in g2d.cpp under MSVC and Cygwin.
 	- Removed iGLStateCache. Instead csGLStateCache is used. This is
 	  possible because csGLStateCache doesn't do any memory allocation
 	  in any of its methods. This means that the functions of
@@ -106,7 +87,46 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine updated the CS version number in csver.h, version.txi,
 	  and configure.ac (configure) in prepration for the 0.96 release.
 	  Also rebuilt the documentation with the new version number.
+	- Keith Fulton fixed opposite logic bug in binary sprite saver which
+	  was saving the opposite setting for tweening from what was actually
+	  set.
+	- Philip Wyett did the following:
+	    - Changed so release build is now the default one loaded when you
+	      open csall.dsw.  This will hopefully help those who are unsure
+	      and build the for developers only extensive memory debug build.
+	      Note: Those who already have builds should be sure to delete
+	      csall.ncb and .opt from 'CS\mk\visualc' or the change will not
+	      take effect.
+	- Matthias Braun did the following:
+	    - Fixed make install rules I introduced yesterday.
+	    - Added message to make install.
+	    - Only build oss driver if soundcard.h is available.
+	    - Only build xfree86vm plugin if that extension has been detected.
+	- Philip Wyett fixed crasher in g2d.cpp under MSVC and Cygwin.  (And
+	  then Eric Sunshine reverted the fix since it treated the symptom
+	  rather than the cause, and it broke several other facilities.)
 27-Jan-2003
+	- Restored number of super lightmaps in OpenGL to 10 again. Apparently
+	  16 was too much for cards with less texture memory. We have to find
+	  a better way to discover how many super lightmaps we can really
+	  use.
+	- Made sure that csTinyXmlNode->GetContentsValueAsInt() and
+	  GetContentsValueAsFloat() now return 0 if the contents is actually
+	  illegal. Previously they would simply return a random value.
+	- Fixed a bug in the OpenGL renderer with EffectDrawTriangleMesh.
+	  That function was enabling and disabling several client states by
+	  using the OpenGL functions directly but that is illegal since the
+	  OpenGL renderer itself keeps a cached state of this. So you should
+	  always go through the cache instead. This fixes a bug where
+	  enabling DrawPolygonMesh for the car in the street of flarge would
+	  cause the snow to become too bright.
+	- The OpenGL polygon buffer now stores an array of triangles for fog.
+	  Not operational yet.
+	- Completely removed the slow general EnableState/DisableState
+	  functions in the OpenGL state cache and replaced them with specific
+	  enable/disable functions for various states. The hashmap is thus
+	  no longer needed. This change gives a small but noticable performance
+	  increase.
 	- 'res' did the following:
 	    - Some sequences reference themselves. Added comments to
 	      world file about that fact (and only those comments this
@@ -147,27 +167,6 @@ The history order is reversed so that new features are at the top.
 	      default cvs tree i.e. isotest and isomap.
 	      Members of the team working here just search for @@@ to
 	      find where the temporary modifications have been made.
-	- Restored number of super lightmaps in OpenGL to 10 again. Apparently
-	  16 was too much for cards with less texture memory. We have to find
-	  a better way to discover how many super lightmaps we can really
-	  use.
-	- Made sure that csTinyXmlNode->GetContentsValueAsInt() and
-	  GetContentsValueAsFloat() now return 0 if the contents is actually
-	  illegal. Previously they would simply return a random value.
-	- Fixed a bug in the OpenGL renderer with EffectDrawTriangleMesh.
-	  That function was enabling and disabling several client states by
-	  using the OpenGL functions directly but that is illegal since the
-	  OpenGL renderer itself keeps a cached state of this. So you should
-	  always go through the cache instead. This fixes a bug where
-	  enabling DrawPolygonMesh for the car in the street of flarge would
-	  cause the snow to become too bright.
-	- The OpenGL polygon buffer now stores an array of triangles for fog.
-	  Not operational yet.
-	- Completely removed the slow general EnableState/DisableState
-	  functions in the OpenGL state cache and replaced them with specific
-	  enable/disable functions for various states. The hashmap is thus
-	  no longer needed. This change gives a small but noticable performance
-	  increase.
 26-Jan-2003
 	- Norman Kramer did the following added updates to cspython by
 	  Rene Jager <renej.frog@yucom.be>:
