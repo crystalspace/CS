@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+9-Nov-2003
+	- Rhad added functions to handle reversing some operations with
+	  particle emitters.  These take care of some simple situations where
+	  previously the entire emitter or emitgen3d had to be recreated to
+	  alter certain settings.
+	    - iEmitState::RemoveAge reverses iEmitState::AddAge
+	    - iEmitMix::RemoveEmitter reverses iEmitMix::AddEmitter
+	    - iEmitMix::AdjustEmitterWeight allows for adjusting the weight
+	      of an existing emitter beneath a mix without recreating the 
+	      entire mix, or removing and re-adding the sub emitter.
 8-Nov-2003
 	- Andreas Busch added missing awstut.cfg
 	- Wouter fixed a typo in csfxscr fullscreen header file, and 

@@ -89,10 +89,18 @@ struct iEmitMix : public iEmitGen3D
 {
   /// add a weighted emitter to the mix
   virtual void AddEmitter(float weight, iEmitGen3D* emit) = 0;
+  /** removes an emitter from the mix given a zero based emitter number.
+   *  Use GetEmitterCount() and GetContent() to enumerate through the mix and find the index of an emitter.
+   */
+  virtual void RemoveEmitter(int num) = 0;
   /// get the total weight in this mix
   virtual float GetTotalWeight() = 0;
   /// get the number of emitters in this mix
   virtual int GetEmitterCount() = 0;
+  /** adjust the weight of an emitter given a zero based emitter number
+   *  Use GetEmitterCount() and GetContent() to enumerate through the mix and find the index of an emitter.
+   */
+  virtual void AdjustEmitterWeight(int num,float weight) = 0;
   /// get content, returns emitters and their weight by a number (0..number-1)
   virtual void GetContent(int num, float& weight, iEmitGen3D*& emit) = 0;
 };
@@ -238,6 +246,9 @@ struct iEmitState : public iBase
   /// get the settings of aging moment i (0..number-1)
   virtual void GetAgingMoment(int i, int& time, csColor& color, float &alpha,
     float& swirl, float& rotspeed, float& scale) = 0;
+  /// remove an aging moment
+  virtual void RemoveAge(int time, const csColor& color, float alpha,
+        float swirl, float rotspeed, float scale) = 0;
   /// replace the settings for the age at the timepoint given.
   virtual void ReplaceAge(int time, const csColor& color, float alpha,
     float swirl, float rotspeed, float scale) = 0;

@@ -105,8 +105,10 @@ public:
   virtual ~csEmitMix ();
   virtual void GetValue (csVector3& value, csVector3 &given);
   virtual void AddEmitter (float weight, iEmitGen3D* emit);
+  virtual void RemoveEmitter(int num);
   virtual float GetTotalWeight () {return totalweight;}
   virtual int GetEmitterCount () {return nr;}
+  virtual void AdjustEmitterWeight(int num,float weight);
   virtual void GetContent (int num, float& weight, iEmitGen3D*& emit);
 };
 
@@ -347,6 +349,9 @@ public:
   /// add an age
   void AddAge (int time, const csColor& color, float alpha,
         float swirl, float rotspeed, float scale);
+  /// remove an aging moment
+  void RemoveAge(int time, const csColor& color, float alpha,
+        float swirl, float rotspeed, float scale);
   /// get aging data
   void GetAgingMoment (int i, int& time, csColor& color, float &alpha,
         float& swirl, float& rotspeed, float& scale);
@@ -470,6 +475,9 @@ public:
     virtual void AddAge (int time, const csColor& color, float alpha,
         float swirl, float rotspeed, float scale)
     { scfParent->AddAge (time, color, alpha, swirl, rotspeed, scale);}
+    virtual void RemoveAge (int time, const csColor& color, float alpha,
+        float swirl, float rotspeed, float scale)
+    { scfParent->RemoveAge (time, color, alpha, swirl, rotspeed, scale);}
     virtual void GetAgingMoment (int i, int& time, csColor& color, float &alpha,
         float& swirl, float& rotspeed, float& scale)
     {scfParent->GetAgingMoment (i, time, color, alpha, swirl, rotspeed, scale);}

@@ -318,6 +318,51 @@ void csEmitMix::AddEmitter (float weight, iEmitGen3D* emit)
   totalweight += weight;
 }
 
+void csEmitMix::RemoveEmitter(int num)
+{
+  int i;
+  struct part *p = list,*pp=NULL;
+  if(num >= nr) return;
+
+  // Find the entry to remove and the previous entry in the linked list
+  for (i=0;i<num;i++)
+  {
+    pp=p;
+    p = p->next;
+  }
+
+  // If this is the first entry, set the second entry as the head of the list
+  if (!pp)
+    list=p->next;
+  else
+    pp->next=p->next; // Otherwise remove this entry from the list by adjusting linkage
+
+  // Drop our reference
+  p->emit=NULL;
+  // Remove the weight from the mix total
+  totalweight-=p->weight;
+  // Decrease the count of total mix elements by 1
+  nr--;
+}
+
+void csEmitMix::AdjustEmitterWeight(int num,float weight)
+{
+  int i;
+  struct part *p = list;
+  if(num >= nr) return;
+  
+  // Find the emitter for which to adjust weight
+  for (i=0;i<num;i++)
+    p = p->next;
+
+  // Reduce old weight from total and add new weight
+  totalweight-=p->weight;
+  totalweight+=weight;
+
+  // Set new emitter weight
+  p->weight=weight;
+}
+
 void csEmitMix::GetContent(int num, float& weight, iEmitGen3D*& emit)
 {
   struct part *p = list;
@@ -880,6 +925,39 @@ void csEmitMeshObject::AddAge(int time, const csColor& color, float alpha,
   np->scale = scale;
 }
 
+void csEmitMeshObject::RemoveAge(int time, const csColor& color, float alpha,
+        float swirl, float rotspeed, float scale)
+{
+  bool found=false;
+  csEmitAge *p = aging, *prevp = 0;
+  // Find the aging moment to remove and the aging moment entry prior to it
+  while(p && (p->time <= time))
+  {
+    // Compare all elements.  We don't stop multiple entries with the same time from being added, so we have to check all parts for match.
+    if (p->time == time && p->alpha == alpha && p->swirl == swirl && p->rotspeed == rotspeed && p->scale == scale &&
+      p->color.blue == color.blue && p->color.red == color.red && p->color.green == color.green)
+    {
+      found=true;
+      break;
+    }
+    prevp = p;
+    p=p->next;
+  }
+  if (!found)
+    return;
+
+  // Unlink
+  if (!prevp)
+    aging=p->next;
+  else
+    prevp->next=p->next;
+
+  // Decrease total aging moment count
+  nr_aging_els--;
+
+  // Delete aging moment structure
+  delete p;
+}
 
 void csEmitMeshObject::GetAgingMoment(int i, int& time, csColor& color,
   float &alpha, float& swirl, float& rotspeed, float& scale)
