@@ -17,7 +17,24 @@ awsManager::Initialize(iSystem *sys)
   return true;
 }
 
-void 
-awsManager::Load(const char *defs_file)
+iAwsPrefs *
+awsManager::GetPrefMgr()
 {
+   return prefmgr;
+}
+ 
+void
+awsManager::SetPrefMgr(iAwsPrefs *pmgr)
+{
+   if (prefmgr && pmgr)
+   {
+      prefmgr->DecRef();
+      prefmgr=pmgr;
+      prefmgr->IncRef();
+   }
+   else if (pmgr)
+   {
+      prefmgr=pmgr;
+      prefmgr->IncRef();
+   }
 }

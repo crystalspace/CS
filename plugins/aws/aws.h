@@ -30,10 +30,20 @@ windowing system.  It supports simple skinning via the .skn defintions, and crea
 class awsComponent
 {
 public:
+    awsComponent();
+    virtual ~awsComponent();
+
+    /// This is the function that components use to set themselves up.  All components MUST implement this function.
+    virtual bool Setup(iAws *wmgr)=0;
+
+
 };
 
 class awsManager : public iAws
 {
+   /// Handle to the preference manager.
+   iAwsPrefs *prefmgr;
+
 public:
     DECLARE_IBASE;
 
@@ -41,15 +51,19 @@ public:
     virtual ~awsManager();
     
     bool Initialize(iSystem *sys);
+   
+    /// Get a pointer to the preference manager
+    virtual iAwsPrefs *GetPrefMgr();
 
-    virtual void Load(const char *defs_file);
+    /// Set the preference manager used by the window system
+    virtual void       SetPrefMgr(iAwsPrefs *pmgr);
 
   // Implement iPlugIn interface.
   struct eiPlugIn : public iPlugIn
   {
     DECLARE_EMBEDDED_IBASE(awsManager);
     virtual bool Initialize(iSystem* p) { return scfParent->Initialize(p); }
-    virtual bool HandleEvent(iEvent&) { return false; }
+    virtual bool HandleEvent(iEvent&)   { return false; }
   } scfiPlugIn;
 };
  

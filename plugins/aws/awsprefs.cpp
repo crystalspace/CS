@@ -2,7 +2,8 @@
 #include "csutil/scfstr.h"
 #include "awsprefs.h"
 #include <stdio.h>
-
+#include <string.h>
+ 
 extern int awsparse(void *prefscont);
 extern FILE *awsin;
 unsigned long aws_adler32(unsigned long adler,  const unsigned char *buf,  unsigned int len);
@@ -17,14 +18,14 @@ awsKey::awsKey(iString *n)
 {
   if (n) {
     name = aws_adler32(aws_adler32(0, NULL, 0), (unsigned char *)n->GetData(), n->Length());
-    delete n;
+    n->DecRef();
   }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-awsPrefManager::awsPrefManager(iBase *iParent):n_win_defs(0), n_skin_defs(0)
+awsPrefManager::awsPrefManager(iBase *iParent):n_win_defs(0), n_skin_defs(0), def_skin(0)
 {
   CONSTRUCT_IBASE (iParent);
 }
@@ -32,6 +33,17 @@ awsPrefManager::awsPrefManager(iBase *iParent):n_win_defs(0), n_skin_defs(0)
 awsPrefManager::~awsPrefManager()
 {
 }
+
+unsigned long 
+awsPrefManager::NameToId(char *n)
+{
+ if (n) {
+    return aws_adler32(aws_adler32(0, NULL, 0), (unsigned char *)n, strlen(n));
+ }
+ else 
+    return 0;
+}
+
 
 void 
 awsPrefManager::Load(const char *def_file)
@@ -52,6 +64,95 @@ awsPrefManager::Load(const char *def_file)
   
   fclose(awsin);
 
+}
+
+bool
+awsPrefManager::SelectDefaultSkin(char *skin_name)
+{
+ awsSkinNode *skin = (awsSkinNode *)skin_defs.GetFirstItem();
+ unsigned long id  = NameToId(skin_name);
+
+ while(skin)
+ {
+    if (skin->Name() == id) {
+      def_skin=skin;
+      return true;
+    }
+
+    skin = (awsSkinNode *)skin_defs.GetNextItem();
+}
+
+ return false;
+}
+
+bool
+awsPrefManager::LookupIntKey(char *name, int &val)
+{
+   return LookupIntKey(NameToId(name),val);
+}
+
+bool
+awsPrefManager::LookupIntKey(unsigned long id, int &val)
+{
+   awsKey *k = ((awsKeyContainer *)def_skin)->Find(id);
+
+   if (k)
+   {
+     if (k->Type() == KEY_INT) 
+     {
+       val = ((awsIntKey *)k)->Value();
+       return true;
+     }
+   }
+    
+   return false;
+}
+
+bool
+awsPrefManager::LookupStringKey(char *name, iString *&val)
+{
+   return LookupStringKey(NameToId(name),val);
+}
+
+bool
+awsPrefManager::LookupStringKey(unsigned long id, iString *&val)
+{
+    awsKey *k = ((awsKeyContainer *)def_skin)->Find(id);
+
+    if (k)
+    {
+      if (k->Type() == KEY_STR) 
+      {
+        val = ((awsStringKey *)k)->Value();
+        return true;
+      }
+    }
+
+    return false;
+}
+
+bool
+awsPrefManager::LookupRectKey(char *name, csRect &val)
+{
+    return LookupRectKey(NameToId(name),val);
+}
+
+
+bool
+awsPrefManager::LookupRectKey(unsigned long id, csRect &val)
+{
+    awsKey *k = ((awsKeyContainer *)def_skin)->Find(id);
+
+    if (k)
+    {
+      if (k->Type() == KEY_RECT) 
+      {
+        val = ((awsRectKey *)k)->Value();
+        return true;
+      }
+    }
+
+    return false;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -140,6 +140,9 @@ public:
   /// Looks up a key based on it's name.
   awsKey *Find(iString *name);
 
+  /// Looks up a key based on it's ID.
+  awsKey *Find(unsigned long id);
+
   /// Adds an item to the container
   void Add(awsKey *key) 
   { children.AddItem(key); }
@@ -208,22 +211,52 @@ class awsPrefManager : public iAwsPrefs
   /// count of skin defintions loaded
   unsigned int n_skin_defs;
 
+  /// Currently selected skin 
+  awsSkinNode *def_skin;
+
 public:
     DECLARE_IBASE;
 
     awsPrefManager(iBase *iParent);
     virtual ~awsPrefManager();
 
+    /// Invokes the parser to load a definitions file.
     virtual void Load(const char *def_file);
 
+    /// Maps a name to an id
+    virtual unsigned long NameToId(char *name);
+    
+    /// Select which skin is the default for components, the skin must be loaded.  True on success, false otherwise.
+    virtual bool SelectDefaultSkin(char *skin_name);
+
+    /// Lookup the value of an int key by name (from the skin def)
+    virtual bool LookupIntKey(char *name, int &val); 
+
+    /// Lookup the value of an int key by id (from the skin def)
+    virtual bool LookupIntKey(unsigned long id, int &val); 
+
+    /// Lookup the value of a string key by name (from the skin def)
+    virtual bool LookupStringKey(char *name, iString *&val); 
+
+    /// Lookup the value of a string key by id (from the skin def)
+    virtual bool LookupStringKey(unsigned long id, iString *&val); 
+
+    /// Lookup the value of a rect key by name (from the skin def)
+    virtual bool LookupRectKey(char *name, csRect &rect); 
+
+    /// Lookup the value of a rect key by id (from the skin def)
+    virtual bool LookupRectKey(unsigned long id, csRect &rect); 
+
 public:
-    /// This function is called by internal code to add a parsed out tree of window components.
+    /// Called by internal code to add a parsed out tree of window components.
     void AddWindowDef(awsComponentNode *win)
     { win_defs.AddItem(win); n_win_defs++; }
 
-    /// This function is called by internal code to add a parsed out tree of skin defintions.
+    /// Called by internal code to add a parsed out tree of skin defintions.
     void AddSkinDef(awsSkinNode *skin)
     { skin_defs.AddItem(skin); n_skin_defs++; }
+
+    
 };
  
 #endif

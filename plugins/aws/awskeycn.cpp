@@ -7,12 +7,17 @@
 
 extern unsigned long aws_adler32(unsigned long adler,  const unsigned char *buf,  unsigned int len);
 
+
 awsKey *
 awsKeyContainer::Find(iString *n)
 {
-   void *p = children.GetFirstItem();
+ return Find(aws_adler32(aws_adler32(0, NULL, 0), (unsigned char *)n->GetData(), n->Length()));
+}
 
-   unsigned long idname = aws_adler32(aws_adler32(0, NULL, 0), (unsigned char *)n->GetData(), n->Length());
+awsKey *
+awsKeyContainer::Find(unsigned long idname)
+{
+   void *p = children.GetFirstItem();
 
    while(p) 
    {
