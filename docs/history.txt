@@ -15,6 +15,8 @@ chronological order.
 	- Jorrit extended the profiler so that the token is also remembered
 	  now. Additionally added a way to clear the profile data. Added
 	  a 'profclear' command to bugplug (assigned to 'ctrl-shift-p').
+	- Jorrit added the ability to the profiler to remember minimum and
+	  maximum elapsed time.
 1-Feb-2005
 	- Jorrit reverted a bug fix in engine->GetNearbyObjects() and
 	  GetNearbyMeshes() that was done on 15-Jan. The problem is that this

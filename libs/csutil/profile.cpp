@@ -46,7 +46,8 @@ csProfiler::~csProfiler ()
 
 void csProfiler::RegisterProfilePoint (const char* token,
 	const char* file, int line,
-  	uint32* ptr_count, uint32* ptr_time)
+  	uint32* ptr_count, uint32* ptr_time,
+	uint32* ptr_timemin, uint32* ptr_timemax)
 {
   csProfileInfo info;
   info.token = token;
@@ -54,6 +55,8 @@ void csProfiler::RegisterProfilePoint (const char* token,
   info.line = line;
   info.ptr_count = ptr_count;
   info.ptr_time = ptr_time;
+  info.ptr_timemin = ptr_timemin;
+  info.ptr_timemax = ptr_timemax;
   profile_info.Push (info);
 }
 
@@ -65,7 +68,8 @@ void csProfiler::Dump ()
   {
     const csProfileInfo& pi = profile_info[i];
     if (*pi.ptr_count > 0)
-      printf ("%d %d %g %s/%s %d\n", *pi.ptr_count, *pi.ptr_time,
+      printf ("%d %d(%d/%d) %g %s/%s %d\n", *pi.ptr_count, *pi.ptr_time,
+        *pi.ptr_timemin, *pi.ptr_timemax,
     	float (*pi.ptr_time) / float (*pi.ptr_count),
     	pi.token, pi.file, pi.line);
   }
@@ -80,6 +84,8 @@ void csProfiler::Reset ()
     const csProfileInfo& pi = profile_info[i];
     *pi.ptr_count = 0;
     *pi.ptr_time = 0;
+    *pi.ptr_timemin = 1000000000;
+    *pi.ptr_timemax = 0;
   }
 }
 

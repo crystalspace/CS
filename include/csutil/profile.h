@@ -33,7 +33,8 @@ struct iProfiler : public iBase
 {
   virtual void RegisterProfilePoint (const char* token,
   	const char* file, int line,
-  	uint32* ptr_count, uint32* ptr_time) = 0;
+  	uint32* ptr_count, uint32* ptr_time,
+	uint32* ptr_timemin, uint32* ptr_timemax) = 0;
   virtual void Dump () = 0;
   virtual void Reset () = 0;
 };
@@ -45,6 +46,8 @@ struct csProfileInfo
   int line;
   uint32* ptr_count;
   uint32* ptr_time;
+  uint32* ptr_timemin;
+  uint32* ptr_timemax;
 };
 
 class csProfiler : public iProfiler
@@ -59,7 +62,8 @@ public:
   SCF_DECLARE_IBASE;
   virtual void RegisterProfilePoint (const char* token,
   	const char* file, int line,
-  	uint32* ptr_count, uint32* ptr_time);
+  	uint32* ptr_count, uint32* ptr_time,
+	uint32* ptr_timemin, uint32* ptr_timemax);
   virtual void Dump ();
   virtual void Reset ();
 };
@@ -92,6 +96,8 @@ if (profiler) profiler->Dump (); \
 static bool tok##__prof__init = false; \
 static uint32 tok##__prof__cnt = 0; \
 static uint32 tok##__prof__time = 0; \
+static uint32 tok##__prof__timemin = 1000000000; \
+static uint32 tok##__prof__timemax = 0; \
 if (!tok##__prof__init) \
 { \
   tok##__prof__init = true; \
@@ -102,15 +108,20 @@ if (!tok##__prof__init) \
     obj_reg->Register (profiler, "iProfiler"); \
   } \
   if (profiler) \
-    profiler->RegisterProfilePoint (#tok,__FILE__, __LINE__, &tok##__prof__cnt, &tok##__prof__time); \
+    profiler->RegisterProfilePoint (#tok,__FILE__, __LINE__, &tok##__prof__cnt, &tok##__prof__time, &tok##__prof__timemin, &tok##__prof__timemax); \
 } \
-static uint32 tok##__prof__starttime; \
+uint32 tok##__prof__starttime; \
 CS_PROFTIME(tok##__prof__starttime)
 
 #define CS_PROFSTOP(tok) \
-static uint32 tok##__prof__endtime; \
-CS_PROFTIME(tok##__prof__endtime); \
-tok##__prof__time += tok##__prof__endtime-tok##__prof__starttime; \
+{ \
+uint32 prof__endtime; \
+CS_PROFTIME(prof__endtime); \
+uint32 prof__dt = prof__endtime - tok##__prof__starttime; \
+if (prof__dt < tok##__prof__timemin) tok##__prof__timemin = prof__dt; \
+if (prof__dt > tok##__prof__timemax) tok##__prof__timemax = prof__dt; \
+tok##__prof__time += prof__dt; \
+} \
 tok##__prof__cnt++
 
 #else
