@@ -63,6 +63,12 @@ The history order has been reversed so that new features are at the top.
 	  operators for these objects.
 	- Eric Sunshine eliminated several compilation warnings in
 	  csSector::IntersectSphere().
+	- Eric Sunshine commented out several bits of code in `levtool' which
+	  broke following major changes by Jorrit to the engine.  This quick
+	  patch allows the application to compile cleanly without crashing the
+	  build process, despite the fact that the application is in need of a
+	  major overhaul.  Also added CSGFX to the dependency list in
+	  levtool.mak.
 16-Apr-2001
 	- Added iEngine::CreateSectorWallsMesh().
 	- Fixed simplep (plugin version of simple) so that it works
