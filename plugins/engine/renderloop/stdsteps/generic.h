@@ -92,7 +92,7 @@ private:
     SCF_DECLARE_IBASE;
 
     ViscullCallback (iRenderView* rview, iObjectRegistry* objreg);
-    virtual ~ViscullCallback () {}
+    virtual ~ViscullCallback ();
 
     void ObjectVisible (iVisibilityObject *visobject, 
       iMeshWrapper *mesh);

@@ -113,12 +113,12 @@ csTargetRenderStepFactory::csTargetRenderStepFactory (
   iObjectRegistry* object_reg)
 {
   SCF_CONSTRUCT_IBASE(0);
-
   csTargetRenderStepFactory::object_reg = object_reg;
 }
 
 csTargetRenderStepFactory::~csTargetRenderStepFactory ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 csPtr<iRenderStep> csTargetRenderStepFactory::Create ()
@@ -138,13 +138,13 @@ csTargetRenderStep::csTargetRenderStep (
   iObjectRegistry* object_reg)
 {
   SCF_CONSTRUCT_IBASE(0);
-
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   target = "";
 }
 
 csTargetRenderStep::~csTargetRenderStep ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csTargetRenderStep::Perform (iRenderView* rview, iSector* sector)

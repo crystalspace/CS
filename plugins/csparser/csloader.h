@@ -364,7 +364,7 @@ private:
 
 public:
   csLoaderStatus ();
-  virtual ~csLoaderStatus () { }
+  virtual ~csLoaderStatus ();
 
   SCF_DECLARE_IBASE;
   virtual bool IsReady () { return ready; }

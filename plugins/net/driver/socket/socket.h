@@ -103,6 +103,7 @@ public:
   csSocketListener(iBase* p, csNetworkSocket s, unsigned short port,
     bool blockingListener, bool blockingConnection, bool reliable,
     unsigned long mcastaddress);
+  virtual ~csSocketListener();
   virtual csPtr<iNetworkConnection> Accept();
   virtual void Terminate() { superclass::Terminate(); }
   virtual csNetworkDriverError GetLastError() const

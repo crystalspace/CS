@@ -50,23 +50,33 @@ csSoundSourceOpenAL::csSoundSourceOpenAL(csSoundRenderOpenAL *rdr,
   alSourcei (source, AL_LOOPING, AL_FALSE);
 
   // Initialize the format
-  if (f->Bits == 8) {
-    if (f->Channels == 2) {
+  if (f->Bits == 8)
+  {
+    if (f->Channels == 2)
+    {
       format = AL_FORMAT_STEREO8;
-    } else {
+    }
+    else
+    {
       format = AL_FORMAT_MONO8;
     }
-  } else {
-    if (f->Channels == 2) {
+  }
+  else
+  {
+    if (f->Channels == 2)
+    {
       format = AL_FORMAT_STEREO16;
-    } else {
+    }
+    else
+    {
       format = AL_FORMAT_MONO16;
     }
   }
 
 
   // Generate and fill the buffer if this is static data
-  if (hdl->Data->IsStatic ()) {
+  if (hdl->Data->IsStatic ())
+  {
     ALuint buffer;
     alGenBuffers (1, &buffer);
     int datalen = hdl->Data->GetStaticSampleCount () * f->Bits/8 * f->Channels;
@@ -75,10 +85,7 @@ csSoundSourceOpenAL::csSoundSourceOpenAL(csSoundRenderOpenAL *rdr,
   } 
   // Otherwise buffers are generated on the fly
 
-  // Set static bool
   Static = SoundHandle->Data->IsStatic();
-
-  // 
   SourcePlaying=false;
 
   // Set 3d Mode
@@ -87,7 +94,6 @@ csSoundSourceOpenAL::csSoundSourceOpenAL(csSoundRenderOpenAL *rdr,
 
   // Unlock the OpenAL mutex
   SoundRender->mutex_OpenAL->Release();
-
 }
 
 csSoundSourceOpenAL::~csSoundSourceOpenAL() 
@@ -153,8 +159,9 @@ csSoundSourceOpenAL::~csSoundSourceOpenAL()
 
     SoundRender->mutex_OpenAL->Release();
   }
-}
 
+  SCF_DESTRUCT_IBASE();
+}
 
 void csSoundSourceOpenAL::SetPosition(csVector3 v)
 {
@@ -460,8 +467,6 @@ void csSoundSourceOpenAL::WatchBufferEnd()
     "Aborted on double-unqueued buffer %d! Check www.openal.org for a new OpenAL version!",use_buffer);
 #endif
   SoundRender->mutex_OpenAL->Release();
-
-
 }
 
 void csSoundSourceOpenAL::Write(void *Data, unsigned long NumBytes) 
@@ -529,10 +534,6 @@ void csSoundSourceOpenAL::Write(void *Data, unsigned long NumBytes)
     Report (CS_REPORTER_SEVERITY_WARNING,
     "Aborted on double-unqueued buffer %d! Check www.openal.org for a new OpenAL version!",use_buffer);
 #endif
-
-
-
-
 
   // Create a new buffer to send this data in
   alGenBuffers (1, &use_buffer);

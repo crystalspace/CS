@@ -34,6 +34,7 @@ csArtsHandle::csArtsHandle (csArtsRenderer *pRend)
 
 csArtsHandle::~csArtsHandle ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csArtsHandle::IsStatic()

@@ -65,6 +65,7 @@ void csBinaryDocAttributeIterator::SetTo (csBdNode* node,
 
 csBinaryDocAttributeIterator::~csBinaryDocAttributeIterator()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csBinaryDocAttributeIterator::HasNext ()
@@ -178,6 +179,7 @@ csBinaryDocAttribute::~csBinaryDocAttribute ()
 {
   CleanData ();
   delete vstr; 
+  SCF_DESTRUCT_IBASE();
 }
 
 void csBinaryDocAttribute::CleanData ()
@@ -424,7 +426,6 @@ SCF_IMPLEMENT_IBASE_END
 csBinaryDocNodeIterator::csBinaryDocNodeIterator ()
 {
   SCF_CONSTRUCT_IBASE (0);
-
   value = 0;
 }
 
@@ -457,6 +458,7 @@ void csBinaryDocNodeIterator::SetTo (csBdNode* node,
 csBinaryDocNodeIterator::~csBinaryDocNodeIterator ()
 {
   delete[] value;
+  SCF_DESTRUCT_IBASE();
 }
 
 void csBinaryDocNodeIterator::FastForward()
@@ -728,7 +730,6 @@ SCF_IMPLEMENT_IBASE_END
 csBinaryDocNode::csBinaryDocNode ()
 {
   SCF_CONSTRUCT_IBASE (0);
-
   vstr = 0;
   vsptr = 0;
 }
@@ -737,6 +738,7 @@ csBinaryDocNode::~csBinaryDocNode ()
 {
   CleanData();
   delete vstr;
+  SCF_DESTRUCT_IBASE();
 }
 
 void csBinaryDocNode::SetTo (csBdNode* ptr,
@@ -1457,6 +1459,7 @@ csBinaryDocument::~csBinaryDocument ()
     attrPool = attr->pool_next;
     delete attr;
   }
+  SCF_DESTRUCT_IBASE();
 }
 
 csBinaryDocNode* csBinaryDocument::GetPoolNode ()

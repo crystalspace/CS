@@ -32,6 +32,7 @@ awsParmList::awsParmList ()
 
 awsParmList::~awsParmList ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 awsParmList::parmItem * awsParmList::FindParm (const char *_name, int type)

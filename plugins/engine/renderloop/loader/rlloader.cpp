@@ -48,12 +48,12 @@ SCF_IMPLEMENT_FACTORY(csRenderLoopLoader);
 csRenderLoopLoader::csRenderLoopLoader (iBase *p)
 {
   SCF_CONSTRUCT_IBASE (p);
-
   init_token_table (tokens);
 }
 
 csRenderLoopLoader::~csRenderLoopLoader ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csRenderLoopLoader::Initialize(iObjectRegistry *object_reg)

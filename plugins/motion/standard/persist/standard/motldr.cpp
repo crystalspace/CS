@@ -86,6 +86,8 @@ csMotionLoader::csMotionLoader(iBase *iParent)
 
 csMotionLoader::~csMotionLoader()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csMotionLoader::Initialize (iObjectRegistry* object_reg)
@@ -331,6 +333,8 @@ csMotionSaver::csMotionSaver( iBase* base )
 
 csMotionSaver::~csMotionSaver()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 void csMotionSaver::WriteDown ( iBase* /* obj */, iFile* /* file */)

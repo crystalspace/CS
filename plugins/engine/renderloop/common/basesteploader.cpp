@@ -33,6 +33,7 @@ csBaseRenderStepLoader::csBaseRenderStepLoader (iBase *p)
 
 csBaseRenderStepLoader::~csBaseRenderStepLoader ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csBaseRenderStepLoader::Initialize(iObjectRegistry *object_reg)

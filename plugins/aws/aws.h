@@ -379,12 +379,16 @@ public:
 private:
     awsManager *parent;
 public:
+    SCF_DECLARE_IBASE;
     EventHandler(awsManager * parent)
     {
       SCF_CONSTRUCT_IBASE(0);
       EventHandler::parent = parent;
     }
-    SCF_DECLARE_IBASE;
+    virtual ~EventHandler()
+    {
+      SCF_DESTRUCT_IBASE();
+    }
     virtual bool HandleEvent (iEvent &) { return false; }
   }
   *scfiEventHandler;

@@ -41,9 +41,9 @@ SCF_IMPLEMENT_IBASE(csSoundSourceEAX)
   SCF_IMPLEMENTS_INTERFACE(iSoundSource)
 SCF_IMPLEMENT_IBASE_END;
 
-csSoundSourceEAX::csSoundSourceEAX(iBase *piBase) {
+csSoundSourceEAX::csSoundSourceEAX(iBase *piBase)
+{
   SCF_CONSTRUCT_IBASE(piBase);
-
   EaxKsPropertiesSet = 0;
   Buffer3D = 0;
   Buffer2D = 0;
@@ -51,22 +51,25 @@ csSoundSourceEAX::csSoundSourceEAX(iBase *piBase) {
 
 }
 
-csSoundSourceEAX::~csSoundSourceEAX() {
-
+csSoundSourceEAX::~csSoundSourceEAX()
+{
   if(EaxKsPropertiesSet)
   {
     EaxKsPropertiesSet->Release();
     EaxKsPropertiesSet = 0;
   }
-
-
-  if (Buffer3D) Buffer3D->Release();
-  if (Buffer2D) {
+  if (Buffer3D)
+    Buffer3D->Release();
+  if (Buffer2D)
+  {
     Buffer2D->Stop();
     Buffer2D->Release();
   }
-  if (Renderer) Renderer->DecRef();
-  if (SoundHandle) SoundHandle->DecRef();
+  if (Renderer)
+    Renderer->DecRef();
+  if (SoundHandle)
+    SoundHandle->DecRef();
+  SCF_DESTRUCT_IBASE();
 }
 
 void csSoundSourceEAX::Report (int severity, const char* msg, ...)
@@ -86,7 +89,8 @@ void csSoundSourceEAX::Report (int severity, const char* msg, ...)
 }
 
 bool csSoundSourceEAX::Initialize(csSoundRenderEAX *srdr,
-        csSoundHandleEAX *shdl, int mode3d, long NumSamples) {
+        csSoundHandleEAX *shdl, int mode3d, long NumSamples)
+  {
   HRESULT r;
 
   srdr->IncRef();
@@ -99,7 +103,6 @@ bool csSoundSourceEAX::Initialize(csSoundRenderEAX *srdr,
   SampleBytes = SoundHandle->Data->GetFormat()->Channels *
                 SoundHandle->Data->GetFormat()->Bits/8;
   BufferBytes = NumSamples * SampleBytes;
-
 
   DSBUFFERDESC dsbd;
   WAVEFORMATEX wfxFormat;
@@ -120,17 +123,17 @@ bool csSoundSourceEAX::Initialize(csSoundRenderEAX *srdr,
   wfxFormat.cbSize = 0;
 
   r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &Buffer2D, 0);
-  if (r != DS_OK) {
+  if (r != DS_OK)
+  {
     Report (CS_REPORTER_SEVERITY_WARNING,
       "cannot create secondary sound buffer "
       "for sound source (%s).\n", srdr->GetError(r));
     return false;
   }
 
-
-
   r = Buffer2D->QueryInterface(IID_IDirectSound3DBuffer, (void **) &Buffer3D);
-  if (r != DS_OK) {
+  if (r != DS_OK)
+  {
     Report (CS_REPORTER_SEVERITY_WARNING,
       "cannot query 3D buffer interface "
       "for sound source (%s).\n", srdr->GetError(r));
@@ -138,7 +141,7 @@ bool csSoundSourceEAX::Initialize(csSoundRenderEAX *srdr,
   }
 
   //give the sound source a eax-property-set
-  r = Buffer3D->QueryInterface(IID_IKsPropertySet, (void**) EaxKsPropertiesSet);
+  r = Buffer3D->QueryInterface(IID_IKsPropertySet, (void**)EaxKsPropertiesSet);
   if (r != DS_OK) 
   {
 	  Report (CS_REPORTER_SEVERITY_WARNING,
@@ -148,14 +151,14 @@ bool csSoundSourceEAX::Initialize(csSoundRenderEAX *srdr,
   }
   else
   {
-
     //default Properties
-    EAXBUFFERPROPERTIES BufferProperties ={0, 0, 0, 0, 0.0f, 0, 0.25f, 0.5f, 0.0, 1, 1.0f, 0x700000};
+    EAXBUFFERPROPERTIES BufferProperties =
+      {0, 0, 0, 0, 0.0f, 0, 0.25f, 0.5f, 0.0, 1, 1.0f, 0x700000};
 
     //set the Defaultproperties
     r = EaxKsPropertiesSet->Set(DSPROPSETID_EAX_BufferProperties,
-                            DSPROPERTY_EAXBUFFER_ALLPARAMETERS, 0, 0, &BufferProperties,
-                            sizeof(EAXBUFFERPROPERTIES));
+	DSPROPERTY_EAXBUFFER_ALLPARAMETERS, 0, 0, &BufferProperties,
+	sizeof(EAXBUFFERPROPERTIES));
 
     if (r != DS_OK)
       Report (CS_REPORTER_SEVERITY_WARNING,
@@ -168,10 +171,13 @@ bool csSoundSourceEAX::Initialize(csSoundRenderEAX *srdr,
   SetVelocity(csVector3(0,0,0));
   Looped = false;
 
-  if (Static) {
+  if (Static)
+  {
     void *buf = SoundHandle->Data->GetStaticData();
     Write(buf, BufferBytes);
-  } else {
+  }
+  else
+  {
     ClearBuffer();
   }
 
@@ -192,11 +198,13 @@ void csSoundSourceEAX::SetVelocity(csVector3 v)
   if (Buffer3D) Buffer3D->SetVelocity(v.x, v.y, v.z, DS3D_DEFERRED);
 }
 
-csVector3 csSoundSourceEAX::GetPosition() {
+csVector3 csSoundSourceEAX::GetPosition()
+{
   return Position;
 }
 
-csVector3 csSoundSourceEAX::GetVelocity() {
+csVector3 csSoundSourceEAX::GetVelocity()
+{
   return Velocity;
 }
 
@@ -213,30 +221,39 @@ float csSoundSourceEAX::GetVolume()
   return (float)(dsvol-DSBVOLUME_MIN)/(float)(DSBVOLUME_MAX-DSBVOLUME_MIN);
 }
 
-void csSoundSourceEAX::SetMode3D(int mode3D) {
+void csSoundSourceEAX::SetMode3D(int mode3D)
+{
   DWORD Mode = (mode3D == SOUND3D_ABSOLUTE) ? DS3DMODE_NORMAL :
     (mode3D == SOUND3D_RELATIVE) ? DS3DMODE_HEADRELATIVE :  DS3DMODE_DISABLE;
 
   HRESULT r = Buffer3D->SetMode(Mode, DS3D_DEFERRED);
-  if (r != DS_OK) {
+  if (r != DS_OK)
+  {
     Report (CS_REPORTER_SEVERITY_WARNING,
       "cannot set secondary sound buffer 3d mode "
       "for sound source (%s)\n.", Renderer->GetError(r));
-  } else Renderer->SetDirty();
+  }
+  else
+    Renderer->SetDirty();
 }
 
-int csSoundSourceEAX::GetMode3D() {
+int csSoundSourceEAX::GetMode3D()
+  {
   DWORD Mode;
   HRESULT r = Buffer3D->GetMode(&Mode);
-  if (r != DS_OK) {
+  if (r != DS_OK)
+  {
     Report (CS_REPORTER_SEVERITY_WARNING,
       "cannot get secondary sound buffer 3d mode "
       "for sound source (%s)\n.", Renderer->GetError(r));
     return false;
   }
-  if (Mode == DS3DMODE_NORMAL) return SOUND3D_ABSOLUTE;
-  else if (Mode == DS3DMODE_HEADRELATIVE) return SOUND3D_RELATIVE;
-  else return SOUND3D_DISABLE;
+  if (Mode == DS3DMODE_NORMAL)
+    return SOUND3D_ABSOLUTE;
+  else if (Mode == DS3DMODE_HEADRELATIVE)
+    return SOUND3D_RELATIVE;
+  else
+    return SOUND3D_DISABLE;
 }
 
 void csSoundSourceEAX::Play(unsigned long PlayMethod)
@@ -257,27 +274,27 @@ void csSoundSourceEAX::Stop()
   if (!Static) ClearBuffer();
 }
 
-void csSoundSourceEAX::SetFrequencyFactor(float factor) {
+void csSoundSourceEAX::SetFrequencyFactor(float factor)
+{
   Buffer2D->SetFrequency(BaseFrequency * factor);
 }
 
-float csSoundSourceEAX::GetFrequencyFactor() {
+float csSoundSourceEAX::GetFrequencyFactor()
+{
   DWORD frq;
   Buffer2D->GetFrequency(&frq);
   return (frq/BaseFrequency);
 }
 
-
-
-bool csSoundSourceEAX::IsPlaying() {
+bool csSoundSourceEAX::IsPlaying()
+{
   DWORD r;
   Buffer2D->GetStatus(&r);
   return (r & DSBSTATUS_PLAYING);
 }
 
-
-
-void csSoundSourceEAX::Write(void *Data, unsigned long NumBytes) {
+void csSoundSourceEAX::Write(void *Data, unsigned long NumBytes)
+{
   void *Pointer1 = 0, *Pointer2 = 0;
   DWORD Length1, Length2;
 
@@ -298,12 +315,14 @@ void csSoundSourceEAX::Write(void *Data, unsigned long NumBytes) {
   if (ResetPlayPosition) Buffer2D->SetCurrentPosition(0);
 }
 
-void csSoundSourceEAX::WriteMute(unsigned long NumBytes) {
+void csSoundSourceEAX::WriteMute(unsigned long NumBytes)
+{
   void *Pointer1 = 0, *Pointer2 = 0;
   DWORD Length1, Length2;
 
   bool ResetPlayPosition = false;
-  if (WriteCursor == -1) {
+  if (WriteCursor == -1)
+  {
     ResetPlayPosition = true;
     WriteCursor = 0;
   }

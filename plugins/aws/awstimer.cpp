@@ -50,6 +50,7 @@ awsTimer::~awsTimer ()
     if (eq)
       eq->RemoveListener (&scfiEventHandler);
   }
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiEventHandler);
 }
 
 bool awsTimer::Setup ()

@@ -69,7 +69,7 @@ struct csPGInputHandler : public iEventHandler
 {
   SCF_DECLARE_IBASE;
   csPGInputHandler () { SCF_CONSTRUCT_IBASE (0); }
-  virtual ~csPGInputHandler () {}
+  virtual ~csPGInputHandler () { SCF_DESTRUCT_IBASE(); }
   bool HandleEvent (iEvent &ev);
 };
 

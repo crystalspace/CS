@@ -67,6 +67,7 @@ csBaseProctexType::csBaseProctexType (iBase *p)
 
 csBaseProctexType::~csBaseProctexType ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csBaseProctexType::Initialize(iObjectRegistry *object_reg)
@@ -87,6 +88,8 @@ csBaseProctexLoader::csBaseProctexLoader(iBase *p)
 
 csBaseProctexLoader::~csBaseProctexLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csBaseProctexLoader::Initialize(iObjectRegistry *object_reg)

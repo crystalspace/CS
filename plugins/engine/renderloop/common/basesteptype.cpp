@@ -33,6 +33,7 @@ csBaseRenderStepType:: csBaseRenderStepType (iBase *p)
 
 csBaseRenderStepType::~csBaseRenderStepType ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csBaseRenderStepType::Initialize(iObjectRegistry *object_reg)

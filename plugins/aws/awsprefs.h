@@ -96,7 +96,9 @@ public:
 
   /// Simple destructor does nothing
   virtual ~awsKey ()
-  { };
+  {
+    SCF_DESTRUCT_IBASE();
+  };
 
   /// Pure virtual function Type returns the type of key
   virtual uint8 Type () = 0;

@@ -86,7 +86,10 @@ public:
     indices_name = strings->Request ("indices");
     texcoords_name = strings->Request ("texture coordinates");
   }
-  virtual ~csFullscreenQuad () {}
+  virtual ~csFullscreenQuad ()
+  {
+    SCF_DESTRUCT_IBASE();
+  }
 
   iRenderBuffer* GetRenderBuffer(csStringID name)
   {
@@ -179,12 +182,12 @@ csFullScreenQuadRenderStepFactory::csFullScreenQuadRenderStepFactory (
   iObjectRegistry* object_reg)
 {
   SCF_CONSTRUCT_IBASE(0);
-
   csFullScreenQuadRenderStepFactory::object_reg = object_reg;
 }
 
 csFullScreenQuadRenderStepFactory::~csFullScreenQuadRenderStepFactory ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 csPtr<iRenderStep> csFullScreenQuadRenderStepFactory::Create ()
@@ -219,6 +222,7 @@ csFullScreenQuadRenderStep::csFullScreenQuadRenderStep (
 csFullScreenQuadRenderStep::~csFullScreenQuadRenderStep ()
 {
   delete fullquad;
+  SCF_DESTRUCT_IBASE();
 }
 
 void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector)

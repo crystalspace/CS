@@ -60,6 +60,8 @@ csSoundDriverCoreAudio::~csSoundDriverCoreAudio()
 {
     if (isPlaying)
         Close();
+    SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+    SCF_DESTRUCT_IBASE();
 }
 
 

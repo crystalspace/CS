@@ -68,7 +68,9 @@ csMotionTemplate::csMotionTemplate()
 
 csMotionTemplate::~csMotionTemplate()
 {
-  if (name) free (name);
+  if (name)
+    free (name);
+  SCF_DESTRUCT_IBASE();
 }
 
 void csMotionTemplate::SetName (const char* newname)
@@ -234,7 +236,9 @@ csMotionController::csMotionController(iSkeletonBone *Tskel)
 csMotionController::~csMotionController()
 {
   stack.DeleteAll();
-  if(bonecache) free(bonecache);
+  if (bonecache)
+    free(bonecache);
+  SCF_DESTRUCT_IBASE();
 }
 
 void csMotionController::SetMotion(iMotionTemplate *motion)
@@ -440,6 +444,8 @@ csMotionManager::csMotionManager(iBase *iParent)
 csMotionManager::~csMotionManager()
 {
   motions.DeleteAll();
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csMotionManager::Initialize (iObjectRegistry* object_reg)

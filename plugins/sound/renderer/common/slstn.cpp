@@ -26,7 +26,6 @@ SCF_IMPLEMENT_IBASE_END;
 csSoundListener::csSoundListener()
 {
   SCF_CONSTRUCT_IBASE(0);
-
   SetPosition(csVector3(0,0,0));
   SetVelocity(csVector3(0,0,0));
   SetDirection(csVector3(0,0,1), csVector3(0,1,0));
@@ -35,6 +34,11 @@ csSoundListener::csSoundListener()
   SetHeadSize(1.0);
   SetRollOffFactor(1.0);
   SetEnvironment(ENVIRONMENT_GENERIC);
+}
+
+csSoundListener::~csSoundListener()
+{
+  SCF_DESTRUCT_IBASE();
 }
 
 void csSoundListener::SetDirection (const csVector3 &f, const csVector3 &t)

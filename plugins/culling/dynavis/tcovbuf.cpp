@@ -87,7 +87,8 @@ void csCoverageTile::PushLine (int x1, int y1, int x2, int y2, int dx)
   CS_ASSERT (y2 < NUM_TILEROW);
   CS_ASSERT (x1+ABS (y2-y1)*dx >= 0);
   CS_ASSERT (x1+ABS (y2-y1)*dx < (NUM_TILECOL<<16));
-  CS_ASSERT (x2-ABS (y1-y2)*dx >= 0); //@@@ VERY SUSPICIOUS! These asserts are triggerred in some cases!
+  //@@@ VERY SUSPICIOUS! These asserts are triggerred in some cases!
+  CS_ASSERT (x2-ABS (y1-y2)*dx >= 0);
   CS_ASSERT (x2-ABS (y1-y2)*dx < (NUM_TILECOL<<16));
   csLineOperation& op = AddOperation ();
   op.op = OP_LINE;
@@ -246,7 +247,7 @@ void csCoverageTile::FlushForFullConstFValue (csTileCol&, float)
   // nothing to do here.
 }
 
-void csCoverageTile::FlushNoDepthConstFValue (csTileCol& fvalue, float maxdepth)
+void csCoverageTile::FlushNoDepthConstFValue(csTileCol& fvalue, float maxdepth)
 {
   int i;
 
@@ -270,7 +271,7 @@ void csCoverageTile::FlushNoDepthConstFValue (csTileCol& fvalue, float maxdepth)
   tile_full = fulltest.IsFull ();
 }
 
-void csCoverageTile::FlushGeneralConstFValue (csTileCol& fvalue, float maxdepth)
+void csCoverageTile::FlushGeneralConstFValue(csTileCol& fvalue, float maxdepth)
 {
   int i;
 
@@ -1238,6 +1239,8 @@ csTiledCoverageBuffer::~csTiledCoverageBuffer ()
   delete[] tiles;
   delete[] dirty_left;
   delete[] dirty_right;
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csTiledCoverageBuffer::Setup (int w, int h)
@@ -1420,7 +1423,8 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
   bool outside = !r.ClipLineSafe (x1, y1, x2, y2);
 
   // @@@ Is the below good?
-  if (!outside && y1 == y2) return;  // Return if clipping results in one pixel.
+  if (!outside && y1 == y2)
+    return;  // Return if clipping results in one pixel.
   y2 += yfurther;
 
   if (outside)
@@ -1536,7 +1540,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
       csCoverageTile* tile = GetTile (0, tile_y1);
       if (tile_y1 == tile_y2)
       {
-        tile->PushVLine (0, old_y1 & (NUM_TILEROW-1), (y1-1) & (NUM_TILEROW-1));
+        tile->PushVLine(0, old_y1 & (NUM_TILEROW-1), (y1-1) & (NUM_TILEROW-1));
         MarkTileDirty (0, tile_y1);
       }
       else
@@ -1575,7 +1579,7 @@ void csTiledCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
       csCoverageTile* tile = GetTile (0, tile_y1);
       if (tile_y1 == tile_y2)
       {
-        tile->PushVLine (0, y2 & (NUM_TILEROW-1), (old_y2-1) & (NUM_TILEROW-1));
+        tile->PushVLine(0, y2 & (NUM_TILEROW-1), (old_y2-1) & (NUM_TILEROW-1));
         MarkTileDirty (0, tile_y1);
       }
       else
@@ -2033,7 +2037,8 @@ bool csTiledCoverageBuffer::TestPolygon (csVector2* verts, int num_verts,
     fvalue.Empty ();
     csCoverageTile* tile = GetTile (dirty_left[ty], ty);
     int dr = dirty_right[ty];
-    if (dr >= (width_po2 >> SHIFT_TILECOL)) dr = (width_po2 >> SHIFT_TILECOL)-1;
+    if (dr >= (width_po2 >> SHIFT_TILECOL))
+      dr = (width_po2 >> SHIFT_TILECOL)-1;
     for (tx = dirty_left[ty] ; tx <= dr ; tx++)
     {
       // Even if we found a visible tile we need to continue to clear
@@ -2069,7 +2074,8 @@ void csTiledCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
     fvalue.Empty ();
     csCoverageTile* tile = GetTile (dirty_left[ty], ty);
     int dr = dirty_right[ty];
-    if (dr >= (width_po2 >> SHIFT_TILECOL)) dr = (width_po2 >> SHIFT_TILECOL)-1;
+    if (dr >= (width_po2 >> SHIFT_TILECOL))
+      dr = (width_po2 >> SHIFT_TILECOL)-1;
     for (tx = dirty_left[ty] ; tx <= dr ; tx++)
     {
       tile->Flush (fvalue, max_depth);
@@ -2103,7 +2109,8 @@ void csTiledCoverageBuffer::InsertOutline (
     fvalue.Empty ();
     csCoverageTile* tile = GetTile (dirty_left[ty], ty);
     int dr = dirty_right[ty];
-    if (dr >= (width_po2 >> SHIFT_TILECOL)) dr = (width_po2 >> SHIFT_TILECOL)-1;
+    if (dr >= (width_po2 >> SHIFT_TILECOL))
+      dr = (width_po2 >> SHIFT_TILECOL)-1;
     for (tx = dirty_left[ty] ; tx <= dr ; tx++)
     {
       tile->Flush (fvalue, max_depth);
@@ -2382,7 +2389,7 @@ static float rnd (int totrange, int leftpad, int rightpad)
 #define COV_ASSERT(test,msg) \
   if (!(test)) \
   { \
-    str.Format ("csTiledCoverageBuffer failure (%d,%s): %s\n", int(__LINE__), \
+    str.Format("csTiledCoverageBuffer failure (%d,%s): %s\n", int(__LINE__), \
     	#msg, #test); \
     return csPtr<iString> (rc); \
   }
@@ -2424,4 +2431,3 @@ csTicks csTiledCoverageBuffer::Debug_Benchmark (int /*num_iterations*/)
   csTicks end = csGetTicks ();
   return end-start;
 }
-

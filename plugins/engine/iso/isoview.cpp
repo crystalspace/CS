@@ -56,6 +56,7 @@ csIsoView::~csIsoView ()
 {
   delete rview;
   delete fakecam;
+  SCF_DESTRUCT_IBASE();
 }
 
 void csIsoView::W2S(const csVector3& world, csVector2& screen) const

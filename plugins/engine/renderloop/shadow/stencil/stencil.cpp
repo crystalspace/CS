@@ -88,6 +88,7 @@ csStencilShadowCacheEntry::csStencilShadowCacheEntry (
 csStencilShadowCacheEntry::~csStencilShadowCacheEntry ()
 {
   delete closedMesh;
+  SCF_DESTRUCT_IBASE();
 }
 
 void csStencilShadowCacheEntry::SetActiveLight (iLight *light, 
@@ -466,6 +467,7 @@ csStencilShadowStep::csStencilShadowStep (csStencilShadowType* type) :
 
 csStencilShadowStep::~csStencilShadowStep ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csStencilShadowStep::Report (int severity, const char* msg, ...)
@@ -758,6 +760,7 @@ csStencilShadowStep::ShadowDrawVisCallback::ShadowDrawVisCallback ()
 
 csStencilShadowStep::ShadowDrawVisCallback::~ShadowDrawVisCallback ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csStencilShadowStep::ShadowDrawVisCallback::ObjectVisible (
@@ -782,6 +785,7 @@ csStencilShadowFactory::csStencilShadowFactory (iObjectRegistry* object_reg,
 
 csStencilShadowFactory::~csStencilShadowFactory ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 csPtr<iRenderStep> csStencilShadowFactory::Create ()

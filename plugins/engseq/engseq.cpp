@@ -68,8 +68,9 @@ protected:
   virtual ~OpStandard () { }
 
 public:
-  OpStandard () { SCF_CONSTRUCT_IBASE (0); }
   SCF_DECLARE_IBASE;
+  OpStandard () { SCF_CONSTRUCT_IBASE (0); }
+  virtual ~OpStandard() { SCF_DESTRUCT_IBASE(); }
   virtual void CleanupSequences () { }
 };
 
@@ -86,8 +87,9 @@ protected:
   virtual ~CondStandard () { }
 
 public:
-  CondStandard () { SCF_CONSTRUCT_IBASE (0); }
   SCF_DECLARE_IBASE;
+  CondStandard () { SCF_CONSTRUCT_IBASE (0); }
+  virtual ~CondStandard() { SCF_DESTRUCT_IBASE(); }
 };
 
 SCF_IMPLEMENT_IBASE (CondStandard)
@@ -138,12 +140,11 @@ public:
   csColor start_col, end_col;
   float start_density, end_density;
 
-  FadeFogInfo ()
-  {
-    SCF_CONSTRUCT_IBASE (0);
-  }
-  virtual ~FadeFogInfo () { }
   SCF_DECLARE_IBASE;
+  FadeFogInfo ()
+  { SCF_CONSTRUCT_IBASE (0); }
+  virtual ~FadeFogInfo ()
+  { SCF_DESTRUCT_IBASE(); }
 
   virtual void Do (float time, iBase*)
   {
@@ -432,12 +433,11 @@ public:
   csRef<iLight> light;
   csColor start_col, end_col;
 
-  FadeLightInfo ()
-  {
-    SCF_CONSTRUCT_IBASE (0);
-  }
-  virtual ~FadeLightInfo () { }
   SCF_DECLARE_IBASE;
+  FadeLightInfo ()
+  { SCF_CONSTRUCT_IBASE (0); }
+  virtual ~FadeLightInfo ()
+  { SCF_DESTRUCT_IBASE(); }
 
   virtual void Do (float time, iBase*)
   {
@@ -533,12 +533,11 @@ public:
   csRef<iSector> sector;
   csColor start_col, end_col;
 
-  FadeAmbientLightInfo ()
-  {
-    SCF_CONSTRUCT_IBASE (0);
-  }
-  virtual ~FadeAmbientLightInfo () { }
   SCF_DECLARE_IBASE;
+  FadeAmbientLightInfo ()
+  { SCF_CONSTRUCT_IBASE (0); }
+  virtual ~FadeAmbientLightInfo ()
+  { SCF_DESTRUCT_IBASE(); }
 
   virtual void Do (float time, iBase*)
   {
@@ -625,12 +624,11 @@ public:
   csColor start_col, end_col;
   float start_density, end_density;
 
-  FadeMeshColorInfo ()
-  {
-    SCF_CONSTRUCT_IBASE (0);
-  }
-  virtual ~FadeMeshColorInfo () { }
   SCF_DECLARE_IBASE;
+  FadeMeshColorInfo ()
+  { SCF_CONSTRUCT_IBASE (0); }
+  virtual ~FadeMeshColorInfo ()
+  { SCF_DESTRUCT_IBASE(); }
 
   virtual void Do (float time, iBase*)
   {
@@ -697,12 +695,11 @@ public:
   csVector3 offset;
   csReversibleTransform start_transform;
 
-  RotateInfo ()
-  {
-    SCF_CONSTRUCT_IBASE (0);
-  }
-  virtual ~RotateInfo () { }
   SCF_DECLARE_IBASE;
+  RotateInfo ()
+  { SCF_CONSTRUCT_IBASE (0); }
+  virtual ~RotateInfo ()
+  { SCF_DESTRUCT_IBASE(); }
 
   virtual void Do (float time, iBase*)
   {
@@ -830,12 +827,11 @@ public:
   csVector3 start_pos;
   csVector3 offset;
 
-  MoveLightInfo ()
-  {
-    SCF_CONSTRUCT_IBASE (0);
-  }
-  virtual ~MoveLightInfo () { }
   SCF_DECLARE_IBASE;
+  MoveLightInfo ()
+  { SCF_CONSTRUCT_IBASE (0); }
+  virtual ~MoveLightInfo ()
+  { SCF_DESTRUCT_IBASE(); }
 
   virtual void Do (float time, iBase*)
   {
@@ -855,12 +851,11 @@ public:
   csVector3 start_pos;
   csVector3 offset;
 
-  MoveInfo ()
-  {
-    SCF_CONSTRUCT_IBASE (0);
-  }
-  virtual ~MoveInfo () { }
   SCF_DECLARE_IBASE;
+  MoveInfo ()
+  { SCF_CONSTRUCT_IBASE (0); }
+  virtual ~MoveInfo ()
+  { SCF_DESTRUCT_IBASE(); }
 
   virtual void Do (float time, iBase*)
   {
@@ -1082,13 +1077,16 @@ private:
   int idx;
 
 public:
+  SCF_DECLARE_IBASE;
   esmPar (int idx)
   {
     SCF_CONSTRUCT_IBASE (0);
     esmPar::idx = idx;
   }
-  virtual ~esmPar () { }
-  SCF_DECLARE_IBASE;
+  virtual ~esmPar ()
+  {
+    SCF_DESTRUCT_IBASE();
+  }
   virtual iBase* GetValue (iBase* params = 0) const
   {
     // The following cast is in theory unsafe but in this case it is
@@ -1113,13 +1111,16 @@ private:
   csRef<iBase> value;
 
 public:
+  SCF_DECLARE_IBASE;
   constantPar (iBase* value)
   {
     SCF_CONSTRUCT_IBASE (0);
     constantPar::value = value;
   }
-  virtual ~constantPar () { }
-  SCF_DECLARE_IBASE;
+  virtual ~constantPar ()
+  {
+    SCF_DESTRUCT_IBASE();
+  }
   virtual iBase* GetValue (iBase* params = 0) const
   {
     (void)params;
@@ -1141,13 +1142,16 @@ private:
   csRef<iBase> value;
 
 public:
+  SCF_DECLARE_IBASE;
   sharedvarPar (iBase* value)
   {
     SCF_CONSTRUCT_IBASE (0);
     sharedvarPar::value = value;
   }
-  virtual ~sharedvarPar () { }
-  SCF_DECLARE_IBASE;
+  virtual ~sharedvarPar ()
+  {
+    SCF_DESTRUCT_IBASE();
+  }
   virtual iBase* GetValue (iBase* params = 0) const
   {
     (void)params;
@@ -1198,6 +1202,7 @@ csSequenceWrapper::csSequenceWrapper (csEngineSequenceManager* eseqmgr,
 
 csSequenceWrapper::~csSequenceWrapper ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSequenceWrapper);
 }
 
 iEngineSequenceParameters* csSequenceWrapper::CreateBaseParameterBlock ()
@@ -1439,6 +1444,8 @@ private:
   uint32 framenr;
 
 public:
+  SCF_DECLARE_IBASE;
+
   csTriggerSectorCallback (csSequenceTrigger* trigger,
 	bool insideonly, const csBox3* box, const csSphere* sphere)
   {
@@ -1465,9 +1472,10 @@ public:
     }
     framenr = 0;
   }
-  virtual ~csTriggerSectorCallback () { }
-
-  SCF_DECLARE_IBASE;
+  virtual ~csTriggerSectorCallback ()
+  {
+    SCF_DESTRUCT_IBASE();
+  }
 
   virtual void Traverse (iSector* /*sector*/, iBase* context)
   {
@@ -1523,6 +1531,8 @@ private:
   unsigned int framenr;
 
 public:
+  SCF_DECLARE_IBASE;
+
   csTriggerLightCallback (csSequenceTrigger* trigger,
 	int oper, const csColor& col)
   {
@@ -1532,9 +1542,10 @@ public:
     trigger_color = col;
     framenr = 0;
   }
-  virtual ~csTriggerLightCallback () { }
-
-  SCF_DECLARE_IBASE;
+  virtual ~csTriggerLightCallback ()
+  {
+    SCF_DESTRUCT_IBASE();
+  }
 
   float AverageColor (const csColor& col)
   {
@@ -1651,6 +1662,7 @@ csSequenceTrigger::csSequenceTrigger (csEngineSequenceManager* eseqmgr)
 csSequenceTrigger::~csSequenceTrigger ()
 {
   ClearConditions ();
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiSequenceTrigger);
 }
 
 void csSequenceTrigger::AddConditionInSector (iSector* sector,
@@ -1873,7 +1885,7 @@ csEngineSequenceManager::csEngineSequenceManager (iBase *iParent)
   scfiEventHandler = 0;
   object_reg = 0;
   global_framenr = 1;
-debug_eseqmgr = this;//@@@@@@@@@@@@@
+  debug_eseqmgr = this;//@@@@@@@@@@@@@
 }
 
 csEngineSequenceManager::~csEngineSequenceManager ()
@@ -1885,6 +1897,8 @@ csEngineSequenceManager::~csEngineSequenceManager ()
       q->RemoveListener (scfiEventHandler);
     scfiEventHandler->DecRef ();
   }
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csEngineSequenceManager::Initialize (iObjectRegistry *r)

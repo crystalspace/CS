@@ -123,6 +123,7 @@ csModSoundData::~csModSoundData ()
     Player_Free (module);
   if(buf) free(buf);
   delete mod_reader;
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csModSoundData::Initialize (const csSoundFormat *fmt)
@@ -332,6 +333,12 @@ public:
   {
     SCF_CONSTRUCT_IBASE (parent);
     SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
+  }
+
+  virtual ~csModLoader ()
+  {
+    SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+    SCF_DESTRUCT_IBASE();
   }
 
   virtual csPtr<iSoundData> LoadSound (void *Buffer, uint32 Size)

@@ -61,6 +61,9 @@ csArtsRenderer::csArtsRenderer (iBase *pParent)
 csArtsRenderer::~csArtsRenderer ()
 {
   delete dispatcher;
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiSoundRender);
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csArtsRenderer::Initialize (iObjectRegistry *object_reg)

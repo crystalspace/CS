@@ -53,6 +53,7 @@ csIsoGrid::~csIsoGrid ()
   delete[] grid;
   delete groundmap;
   delete[] fakelights;
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csIsoGrid::Contains(const csVector3& pos)
@@ -332,7 +333,7 @@ struct ResetSpriteLight : public iIsoCellTraverseCallback
 {
   SCF_DECLARE_IBASE;
   ResetSpriteLight () { SCF_CONSTRUCT_IBASE (0); }
-  virtual ~ResetSpriteLight () { }
+  virtual ~ResetSpriteLight () { SCF_DESTRUCT_IBASE(); }
   virtual void Traverse (iIsoSprite* spr);
 };
 
@@ -360,7 +361,7 @@ struct SetSpriteColor : public iIsoCellTraverseCallback
   const csColor* col;
   SCF_DECLARE_IBASE;
   SetSpriteColor () { SCF_CONSTRUCT_IBASE (0); }
-  virtual ~SetSpriteColor () { }
+  virtual ~SetSpriteColor () { SCF_DESTRUCT_IBASE(); }
   virtual void Traverse (iIsoSprite* spr);
 };
 
@@ -394,7 +395,7 @@ struct SetSpriteStaticColor : public iIsoCellTraverseCallback
   const csColor* col;
   SCF_DECLARE_IBASE;
   SetSpriteStaticColor () { SCF_CONSTRUCT_IBASE (0); }
-  virtual ~SetSpriteStaticColor () { }
+  virtual ~SetSpriteStaticColor () { SCF_DESTRUCT_IBASE(); }
   virtual void Traverse (iIsoSprite* spr);
 };
 

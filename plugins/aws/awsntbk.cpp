@@ -673,6 +673,8 @@ awsNotebookButtonBar::~awsNotebookButtonBar ()
   if (sink) sink->DecRef ();
   if (prev_slot) prev_slot->DecRef ();
   if (next_slot) next_slot->DecRef ();
+
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiAwsClientRect);
 }
 
 bool awsNotebookButtonBar::Setup (iAws *_wmgr, iAwsComponentNode *settings)

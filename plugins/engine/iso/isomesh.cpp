@@ -358,7 +358,9 @@ csIsoMeshSprite::csIsoMeshSprite (iBase *iParent)
 
 csIsoMeshSprite::~csIsoMeshSprite ()
 {
-  if (mesh) mesh->DecRef();
+  if (mesh)
+    mesh->DecRef();
+  SCF_DESTRUCT_IBASE();
 }
 
 
@@ -559,7 +561,9 @@ csIsoMeshFactoryWrapper::csIsoMeshFactoryWrapper ()
 
 csIsoMeshFactoryWrapper::~csIsoMeshFactoryWrapper ()
 {
-  if (meshFact) meshFact->DecRef ();
+  if (meshFact)
+    meshFact->DecRef ();
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMeshFactoryWrapper);
 }
 
 void csIsoMeshFactoryWrapper::SetMeshObjectFactory (
@@ -594,6 +598,12 @@ csIsoMeshFactoryList::csIsoMeshFactoryList ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshFactoryList);
 }
 
+csIsoMeshFactoryList::~csIsoMeshFactoryList ()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMeshFactoryList);
+  SCF_DESTRUCT_IBASE();
+}
+
 int csIsoMeshFactoryList::MeshFactoryList::GetCount () const
   { return scfParent->Length (); }
 iMeshFactoryWrapper *csIsoMeshFactoryList::MeshFactoryList::Get (int n) const
@@ -610,4 +620,3 @@ int csIsoMeshFactoryList::MeshFactoryList::Find (iMeshFactoryWrapper *obj) const
   { return scfParent->Find (obj); }
 iMeshFactoryWrapper *csIsoMeshFactoryList::MeshFactoryList::FindByName (const char *Name) const
   { return scfParent->FindByName (Name); }
-

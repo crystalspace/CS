@@ -204,6 +204,11 @@ csNetworkManager::~csNetworkManager ()
     UnregisterConnectedSocket (enconnections.Get (0));
   while (enlisteners.Length () > 0)
     UnregisterListeningSocket (enlisteners.Get (0));
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiEventPlug);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiEventHandler);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 void csNetworkManager::RegisterConnection (iNetworkConnection *conn, iNetworkPacket *packet)

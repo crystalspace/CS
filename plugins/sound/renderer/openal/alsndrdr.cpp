@@ -102,6 +102,9 @@ bool csSoundRenderOpenAL::Initialize(iObjectRegistry *r)
 csSoundRenderOpenAL::~csSoundRenderOpenAL()
 {
   Close ();
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csSoundRenderOpenAL::Open()

@@ -63,6 +63,8 @@ csFreeType2Server::~csFreeType2Server ()
   {
     FT_Done_FreeType (library);
   }
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 void csFreeType2Server::Report (int severity, const char* msg, ...)
@@ -223,8 +225,7 @@ csFreeType2Font::csFreeType2Font (const char *filename,
 
 csFreeType2Font::~csFreeType2Font ()
 {
-  int i;
-  for (i = DeleteCallbacks.Length () - 1; i >= 0; i--)
+  for (int i = DeleteCallbacks.Length () - 1; i >= 0; i--)
   {
     iFontDeleteNotify* delnot = DeleteCallbacks[i];
     delnot->BeforeDelete (this);
@@ -235,6 +236,7 @@ csFreeType2Font::~csFreeType2Font ()
   }
   fontdata = 0;
   delete [] name;
+  SCF_DESTRUCT_IBASE();
 }
 
 void csFreeType2Font::SetSize (int iSize)

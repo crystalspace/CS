@@ -105,6 +105,7 @@ public:
     // vector. Otherwise we delete the vector.
     if (vistest_objects_inuse) *vistest_objects_inuse = false;
     else delete vector;
+    SCF_DESTRUCT_IBASE();
   }
 
   virtual iVisibilityObject* Next()
@@ -223,6 +224,9 @@ csDynaVis::~csDynaVis ()
   delete tcovbuf;
   delete model_mgr;
   delete write_queue;
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csDynaVis::Initialize (iObjectRegistry *object_reg)
@@ -1334,7 +1338,7 @@ bool csDynaVis::VisTest (iRenderView* rview,
 # ifdef CS_DEBUG
   if (do_state_dump)
   {
-    printf ("==============================================================\n");
+    printf ("=============================================================\n");
     printf ("origin %g,%g,%g lx=%g rx=%g ty=%g by=%g\n",
     	trans.GetOrigin ().x, trans.GetOrigin ().y, trans.GetOrigin ().z,
 	lx, rx, ty, by);
@@ -1359,7 +1363,7 @@ bool csDynaVis::VisTest (iRenderView* rview,
   data.rview = rview;
   data.dynavis = this;
   data.viscallback = viscallback;
-  kdtree->Front2Back (data.pos, VisTest_Front2Back, (void*)&data, frustum_mask);
+  kdtree->Front2Back(data.pos, VisTest_Front2Back, (void*)&data, frustum_mask);
 
   do_state_dump = false;
 
@@ -2122,7 +2126,8 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
     }
 
     char buf[200];
-    sprintf (buf, "FR%c COV%c HIS%c WQ%c VPT%c IS%c CO%c OS%c #visobj=%d #visnode=%d",
+    sprintf (buf,
+        "FR%c COV%c HIS%c WQ%c VPT%c IS%c CO%c OS%c #visobj=%d #visnode=%d",
         do_cull_frustum ? '+' : '-',
 	do_cull_coverage == COVERAGE_OUTLINE ? 'o' :
 	do_cull_coverage == COVERAGE_POLYGON ? 'p' :
@@ -2227,12 +2232,12 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
         if (visobj_wrap->last_visible_vistestnr == current_vistest_nr)
 	{
 	  // Only render outline if visible.
-          const csReversibleTransform& camtrans = debug_camera->GetTransform ();
+          const csReversibleTransform& camtrans = debug_camera->GetTransform();
 	  iMovable* movable = visobj->GetMovable ();
 	  csReversibleTransform movtrans = movable->GetFullTransform ();
 	  csReversibleTransform trans = camtrans / movtrans;
 
-	  csVector3 campos_object = movtrans.Other2This (camtrans.GetOrigin ());
+	  csVector3 campos_object = movtrans.Other2This (camtrans.GetOrigin());
 	  visobj_wrap->model->UpdateOutline (campos_object);
 	  const csOutlineInfo& outline_info = visobj_wrap->model
 	  	->GetOutlineInfo ();
@@ -2419,6 +2424,7 @@ public:
   virtual ~DynavisRenderObject ()
   {
     delete tcovbuf;
+    SCF_DESTRUCT_IBASE();
   }
 
   void RenderOutline (const outline& ol, iBugPlug* bugplug)
@@ -2514,8 +2520,8 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     }
     else
     {
-      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
-    	"BugPlug not found!");
+      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+        "crystalspace.dynavis", "BugPlug not found!");
     }
     return true;
   }
@@ -2534,7 +2540,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     }
     else
     {
-      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
+      csReport(object_reg, CS_REPORTER_SEVERITY_NOTIFY, "crystalspace.dynavis",
     	"BugPlug not found!");
     }
     return true;
@@ -2675,7 +2681,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     	"View mode %s",
 	cfg_view_mode == VIEWMODE_STATS ? "statistics only" :
 	cfg_view_mode == VIEWMODE_STATSOVERLAY ? "statistics and map" :
-	cfg_view_mode == VIEWMODE_CLEARSTATSOVERLAY ? "statistics and map (c)" :
+	cfg_view_mode == VIEWMODE_CLEARSTATSOVERLAY ? "statistics and map(c)" :
 	cfg_view_mode == VIEWMODE_OUTLINES ? "outlines" :
 	"?");
     return true;
@@ -2750,7 +2756,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
 	  (iobj && iobj->GetName ()) ? iobj->GetName () : "?",
 	  visobj_wrap->history->reason == INVISIBLE_PARENT ? "invis parent" :
 	  visobj_wrap->history->reason == INVISIBLE_FRUSTUM ? "invis frustum" :
-	  visobj_wrap->history->reason == INVISIBLE_TESTRECT ? "invis testrect" :
+	  visobj_wrap->history->reason == INVISIBLE_TESTRECT?"invis testrect" :
 	  visobj_wrap->history->reason == VISIBLE ? "vis" :
 	  visobj_wrap->history->reason == VISIBLE_INSIDE ? "vis inside" :
 	  visobj_wrap->history->reason == VISIBLE_HISTORY ? "vis history" :
@@ -2789,4 +2795,3 @@ csTicks csDynaVis::Debug_Benchmark (int num_iterations)
 
   return rc;
 }
-

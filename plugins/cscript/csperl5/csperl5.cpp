@@ -95,6 +95,8 @@ csPerl5::~csPerl5 ()
 {
   perl_destruct (my_perl);
   perl_free (my_perl);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csPerl5::Initialize (iObjectRegistry *objreg)
@@ -280,6 +282,8 @@ csPerl5::Object::Object (const csPerl5 *p, SV *s)
 csPerl5::Object::~Object ()
 {
   SvREFCNT_dec (self);
+
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPerl5::Object* csPerl5::Query (iScriptObject *obj) const

@@ -26,6 +26,7 @@ class csSoundListener : public iSoundListener
 public:
   SCF_DECLARE_IBASE;
   csSoundListener();
+  virtual ~csSoundListener();
 
   virtual void SetDirection (const csVector3 &Front, const csVector3 &Top);
   virtual void SetPosition (const csVector3 &pos);

@@ -39,6 +39,7 @@ csSoundHandle::~csSoundHandle()
 {
   CS_ASSERT(Registered == false);
   ReleaseSoundData();
+  SCF_DESTRUCT_IBASE();
 }
 
 void csSoundHandle::ReleaseSoundData()

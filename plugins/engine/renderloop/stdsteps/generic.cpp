@@ -115,12 +115,12 @@ csGenericRenderStepFactory::csGenericRenderStepFactory (
   iObjectRegistry* object_reg)
 {
   SCF_CONSTRUCT_IBASE(0);
-
   csGenericRenderStepFactory::object_reg = object_reg;
 }
 
 csGenericRenderStepFactory::~csGenericRenderStepFactory ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 csPtr<iRenderStep> csGenericRenderStepFactory::Create ()
@@ -158,6 +158,7 @@ csGenericRenderStep::csGenericRenderStep (
 
 csGenericRenderStep::~csGenericRenderStep ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
@@ -307,6 +308,11 @@ csGenericRenderStep::ViscullCallback::ViscullCallback (iRenderView *rview,
 {
   SCF_CONSTRUCT_IBASE(0);
   ViscullCallback::rview = rview;
+}
+
+csGenericRenderStep::ViscullCallback::~ViscullCallback()
+{
+  SCF_DESTRUCT_IBASE();
 }
 
 void csGenericRenderStep::ViscullCallback::ObjectVisible (

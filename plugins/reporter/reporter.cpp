@@ -38,16 +38,17 @@ public:
   int idx;
 
 public:
+  SCF_DECLARE_IBASE;
+
   csReporterIterator ()
   {
     SCF_CONSTRUCT_IBASE (0);
     idx = 0;
   }
 
-  SCF_DECLARE_IBASE;
-
   virtual ~csReporterIterator ()
   {
+    SCF_DESTRUCT_IBASE();
   }
 
   virtual bool HasNext ()
@@ -102,6 +103,8 @@ csReporter::csReporter (iBase *iParent)
 csReporter::~csReporter ()
 {
   Clear (-1);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csReporter::Initialize (iObjectRegistry *object_reg)

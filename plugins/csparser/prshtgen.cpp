@@ -45,6 +45,7 @@ struct PrsHeightMapData : public iGenerateImageFunction
   }
   virtual ~PrsHeightMapData ()
   {
+    SCF_DESTRUCT_IBASE();
   }
   float GetHeight (float dx, float dy);
   float GetSlope (float dx, float dy);

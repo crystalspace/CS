@@ -40,6 +40,7 @@ csIsoWorld::~csIsoWorld ()
     delete p;
     p = np;
   }
+  SCF_DESTRUCT_IBASE();
 }
 
 void csIsoWorld::AddSprite(iIsoSprite *sprite)

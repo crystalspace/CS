@@ -45,6 +45,8 @@ csSpider::csSpider ()
 csSpider::~csSpider ()
 {
   CS_ASSERT (wrap == 0);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSpider::DrawTest (iRenderView* rview, iMovable*)

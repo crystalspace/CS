@@ -167,6 +167,7 @@ csRapidCollider::~csRapidCollider ()
   }
 
   CD_contact->DecRef ();
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csRapidCollider::Collide (csRapidCollider &otherCollider,

@@ -101,6 +101,11 @@ csLoaderStatus::csLoaderStatus ()
   //mutex = csMutex::Create (true);
 }
 
+csLoaderStatus::~csLoaderStatus ()
+{
+  SCF_DESTRUCT_IBASE ();
+}
+
 //---------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE(StdLoaderContext);
@@ -121,6 +126,7 @@ StdLoaderContext::StdLoaderContext (iEngine* Engine,
 
 StdLoaderContext::~StdLoaderContext ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 iSector* StdLoaderContext::FindSector (const char* name)
@@ -236,6 +242,7 @@ ThreadedLoaderContext::ThreadedLoaderContext (iEngine* Engine,
 
 ThreadedLoaderContext::~ThreadedLoaderContext ()
 {
+  SCF_DESTRUCT_IBASE ();
 }
 
 iSector* ThreadedLoaderContext::FindSector (const char* name)
@@ -715,13 +722,14 @@ csLoader::csLoader (iBase *p)
 {
   SCF_CONSTRUCT_IBASE(p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-
   object_reg = 0;
 }
 
 csLoader::~csLoader()
 {
   loaded_plugins.DeleteAll ();
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 #define GET_PLUGIN(var, intf, msgname)				\
@@ -1455,6 +1463,7 @@ public:
     delete[] vertices;
     delete[] polygons;
     delete[] vertex_indices;
+    SCF_DESTRUCT_IBASE();
   }
 
   SCF_DECLARE_IBASE;
@@ -3829,6 +3838,7 @@ public:
   virtual ~csMissingSectorCallback ()
   {
     delete[] sectorname;
+    SCF_DESTRUCT_IBASE();
   }
   
   virtual bool Traverse (iPortal* portal, iBase* /*context*/)

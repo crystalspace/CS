@@ -18,7 +18,9 @@ public:
     SCF_CONSTRUCT_IBASE(0);
   }
   virtual ~awsLayoutManager ()
-  { }
+  {
+    SCF_DESTRUCT_IBASE();
+  }
 
   SCF_DECLARE_IBASE;
 

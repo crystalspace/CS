@@ -31,6 +31,8 @@ awsSinkManager::awsSinkManager (iBase *p)
 
 awsSinkManager::~awsSinkManager ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool awsSinkManager::Initialize (iObjectRegistry *)
@@ -94,6 +96,7 @@ awsSink::awsSink () : parm(0), sink_err(0)
 
 awsSink::~awsSink ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 unsigned long awsSink::GetTriggerID (const char *_name)
@@ -143,6 +146,7 @@ awsSource::awsSource () : owner(0)
 
 awsSource::~awsSource ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 iAwsComponent *awsSource::GetComponent ()
@@ -199,6 +203,7 @@ awsSlot::awsSlot ()
 
 awsSlot::~awsSlot ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void awsSlot::Connect (

@@ -47,6 +47,7 @@ awsComponent::~awsComponent ()
   }
 
   Unlink ();
+  SCF_DESTRUCT_IBASE();
 }
 
 csRect awsComponent::Frame ()
@@ -1080,7 +1081,7 @@ awsComponentFactory::awsComponentFactory (iAws *_wmgr)
 
 awsComponentFactory::~awsComponentFactory ()
 {
-  // Do nothing.
+  SCF_DESTRUCT_IBASE();
 }
 
 iAwsComponent *awsComponentFactory::Create ()

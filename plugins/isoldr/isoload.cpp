@@ -160,6 +160,7 @@ StdIsoLoaderContext::StdIsoLoaderContext (iIsoEngine* Engine)
 
 StdIsoLoaderContext::~StdIsoLoaderContext ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 iSector* StdIsoLoaderContext::FindSector (const char* /*name*/)
@@ -736,7 +737,7 @@ bool csIsoLoader::ParseTile2D (iDocumentNode* node, const char* /*prefix*/)
     {
       for(x=QInt(start.x); x<end.x; x++)
       {
-//        ReportNotify("Tiling at %d %d %d %f %f %f",x,y,z,start.x,start.y,start.z);
+// ReportNotify("Tiling at %d %d %d %f %f %f",x,y,z,start.x,start.y,start.z);
 
         sprite = Engine->CreateFloorSprite(csVector3(x,y,z), 1.0, 1.0);
         sprite->SetMaterialWrapper(mat_wrap);
@@ -807,7 +808,8 @@ bool csIsoLoader::ParseTile2D (iDocumentNode* node, const char* /*prefix*/)
   return true;
 }
 
-bool csIsoLoader::ParseMaterialList (iDocumentNode* node, const char* /*prefix*/)
+bool csIsoLoader::ParseMaterialList (iDocumentNode* node,
+  const char* /*prefix*/)
 {
   char* tag = "crystalspace.iso.loader.parsemateriallist";
 
@@ -1090,6 +1092,8 @@ csIsoLoader::csIsoLoader(iBase *p)
 
 csIsoLoader::~csIsoLoader()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csIsoLoader::Initialize(iObjectRegistry *object_Reg)

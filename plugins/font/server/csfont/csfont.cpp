@@ -90,6 +90,8 @@ csDefaultFontServer::csDefaultFontServer (iBase *pParent) : object_reg(0)
 
 csDefaultFontServer::~csDefaultFontServer()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 csPtr<iFont> csDefaultFontServer::LoadFont (const char *filename)
@@ -583,13 +585,11 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
     }
     n++;
   }
-
 }
 
 csDefaultFont::~csDefaultFont ()
 {
-  int i;
-  for (i = DeleteCallbacks.Length () - 1; i >= 0; i--)
+  for (int i = DeleteCallbacks.Length () - 1; i >= 0; i--)
   {
     iFontDeleteNotify* delnot = DeleteCallbacks[i];
     delnot->BeforeDelete (this);
@@ -603,6 +603,7 @@ csDefaultFont::~csDefaultFont ()
     delete Glyphs[j];
   }
 
+  SCF_DESTRUCT_IBASE();
 }
 
 void csDefaultFont::SetSize (int iSize)

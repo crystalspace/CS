@@ -84,9 +84,12 @@ csSoundLoaderMultiplexer::csSoundLoaderMultiplexer(iBase *iParent)
 
 csSoundLoaderMultiplexer::~csSoundLoaderMultiplexer()
 {
-  if (list) list->DeleteAll ();
+  if (list)
+    list->DeleteAll ();
   list = 0;
   plugin_mgr = 0;
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csSoundLoaderMultiplexer::Initialize(iObjectRegistry *object_reg)

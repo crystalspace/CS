@@ -3,11 +3,12 @@
 
 awsKeyFactory::awsKeyFactory ()
 {
-    SCF_CONSTRUCT_IBASE(0);
+  SCF_CONSTRUCT_IBASE(0);
 }
 
 awsKeyFactory::~awsKeyFactory ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void awsKeyFactory::Initialize (const char* name, const char* component_type)
@@ -15,8 +16,6 @@ void awsKeyFactory::Initialize (const char* name, const char* component_type)
   awsComponentNode* n = new awsComponentNode (name, component_type);
   base = SCF_QUERY_INTERFACE(n, iAwsComponentNode);
   CS_ASSERT(base);
-
-
   // we have a ref for n and one for base we don't want the one for n though
   n->DecRef();
 }
@@ -179,4 +178,3 @@ awsConnectionNode *awsConnectionNodeFactory::GetThisNode ()
 {
   return base;
 }
-

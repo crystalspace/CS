@@ -39,6 +39,7 @@ csBinaryDocumentSystem::csBinaryDocumentSystem(iBase* parent)
 
 csBinaryDocumentSystem::~csBinaryDocumentSystem ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 csRef<iDocument> csBinaryDocumentSystem::CreateDocument ()

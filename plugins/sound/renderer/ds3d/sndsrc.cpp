@@ -57,6 +57,7 @@ csSoundSourceDS3D::~csSoundSourceDS3D()
   }
   Renderer = 0;
   SoundHandle = 0;
+  SCF_DESTRUCT_IBASE();
 }
 
 void csSoundSourceDS3D::Report (int severity, const char* msg, ...)

@@ -98,6 +98,7 @@ public:
   virtual ~csVisibilityObjectWrapper ()
   {
     history->DecRef ();
+    SCF_DESTRUCT_IBASE();
   }
 
   void MarkInvisible (csVisReason reason)

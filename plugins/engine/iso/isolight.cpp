@@ -46,6 +46,7 @@ csIsoLight::~csIsoLight ()
 {
   delete[] vismap;
   delete fakelight;
+  SCF_DESTRUCT_IBASE();
 }
 
 void csIsoLight::SetGrid(iIsoGrid *grid)
@@ -207,7 +208,7 @@ struct LightFunc : public iIsoCellTraverseCallback
   iIsoLight* light;
   SCF_DECLARE_IBASE;
   LightFunc () { SCF_CONSTRUCT_IBASE (0); }
-  virtual ~LightFunc () { }
+  virtual ~LightFunc () { SCF_DESTRUCT_IBASE(); }
   virtual void Traverse (iIsoSprite* spr);
 };
 

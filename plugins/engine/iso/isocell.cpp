@@ -39,6 +39,7 @@ csIsoCell::csIsoCell (iBase *iParent)
 static void deletenode(csIsoCellNode* node, void * /*data*/)
 {
   delete node;
+  SCF_DESTRUCT_IBASE();
 }
 
 csIsoCell::~csIsoCell ()

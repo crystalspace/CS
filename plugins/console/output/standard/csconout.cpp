@@ -90,6 +90,8 @@ csConsoleOutput::~csConsoleOutput ()
     scfiEventHandler->DecRef ();
   }
   delete buffer;
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csConsoleOutput::Initialize (iObjectRegistry *object_reg)

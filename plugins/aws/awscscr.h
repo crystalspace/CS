@@ -43,13 +43,17 @@ public:
   rG3D(g3d)
   {
     SCF_CONSTRUCT_IBASE (0);
-
     g2d->IncRef ();
     g3d->IncRef ();
   }
 
   /// Destruct, release references
-  virtual ~awsScreenCanvas () { rG2D->DecRef (); rG3D->DecRef (); }
+  virtual ~awsScreenCanvas ()
+  {
+    rG2D->DecRef ();
+    rG3D->DecRef ();
+    SCF_DESTRUCT_IBASE();
+  }
   virtual void Animate (csTicks current_time)
   {
     (void)current_time; /* do nothing */
@@ -67,4 +71,5 @@ public:
     (void)Alpha;        /* do nothing */
   }
 };
+
 #endif // __CS_AWS_CSCR_H__

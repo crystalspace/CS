@@ -56,6 +56,8 @@ csWriteQueue::~csWriteQueue ()
     delete free_elements;
     free_elements = el;
   }
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
+  SCF_DESTRUCT_IBASE ();
 }
 
 void csWriteQueue::Initialize ()

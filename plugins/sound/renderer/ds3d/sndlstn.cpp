@@ -44,10 +44,12 @@ csSoundListenerDS3D::~csSoundListenerDS3D()
 {
   if (Renderer) Renderer = 0;
   if (Listener) Listener->Release();
-  if (PrimaryBuffer) {
+  if (PrimaryBuffer)
+  {
     PrimaryBuffer->Stop();
     PrimaryBuffer->Release();
   }
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csSoundListenerDS3D::Initialize(csSoundRenderDS3D* srdr) 
@@ -61,12 +63,13 @@ bool csSoundListenerDS3D::Initialize(csSoundRenderDS3D* srdr)
   dsbd.dwBufferBytes = 0;
   dsbd.lpwfxFormat = 0;
 
-  csRef<iReporter> reporter = CS_QUERY_REGISTRY (Renderer->object_reg,
-    iReporter);
+  csRef<iReporter> reporter =
+    CS_QUERY_REGISTRY (Renderer->object_reg, iReporter);
 
   HRESULT r;
   r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &PrimaryBuffer, 0);
-  if (r != DS_OK) {
+  if (r != DS_OK)
+  {
     if (reporter)
       reporter->Report (CS_REPORTER_SEVERITY_WARNING,
       "crystalspace.sound.ds3d", "DS3D listener: "
@@ -74,8 +77,10 @@ bool csSoundListenerDS3D::Initialize(csSoundRenderDS3D* srdr)
     return false;
   }
 
-  r = PrimaryBuffer->QueryInterface(IID_IDirectSound3DListener, (void **) &Listener);
-  if (r != DS_OK) {
+  r = PrimaryBuffer->QueryInterface(IID_IDirectSound3DListener,
+    (void **) &Listener);
+  if (r != DS_OK)
+  {
     if (reporter)
       reporter->Report (CS_REPORTER_SEVERITY_WARNING,
       "crystalspace.sound.ds3d",

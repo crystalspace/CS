@@ -33,32 +33,36 @@ SCF_IMPLEMENT_IBASE(csSoundListenerEAX)
 	SCF_IMPLEMENTS_INTERFACE(iSoundListener)
 SCF_IMPLEMENT_IBASE_END;
 
-csSoundListenerEAX::csSoundListenerEAX(iBase *piBase) {
+csSoundListenerEAX::csSoundListenerEAX(iBase *piBase)
+{
   SCF_CONSTRUCT_IBASE(piBase);
   PrimaryBuffer = 0;
   Listener = 0;
   Renderer = 0;
-
-	EaxKsPropertiesSet = 0;
+  EaxKsPropertiesSet = 0;
 }
 
-csSoundListenerEAX::~csSoundListenerEAX() {
-
-	if(EaxKsPropertiesSet)
-	{
-		EaxKsPropertiesSet->Release();
-		EaxKsPropertiesSet = 0;
-	}
+csSoundListenerEAX::~csSoundListenerEAX()
+{
+  if(EaxKsPropertiesSet)
+  {
+    EaxKsPropertiesSet->Release();
+    EaxKsPropertiesSet = 0;
+  }
 
   if (Renderer) Renderer->DecRef();
   if (Listener) Listener->Release();
-  if (PrimaryBuffer) {
+  if (PrimaryBuffer)
+  {
     PrimaryBuffer->Stop();
     PrimaryBuffer->Release();
   }
+
+  SCF_DESTRUCT_IBASE();
 }
 
-bool csSoundListenerEAX::Initialize(csSoundRenderEAX *srdr) {
+bool csSoundListenerEAX::Initialize(csSoundRenderEAX *srdr)
+{
   srdr->IncRef();
   Renderer = srdr;
 
@@ -73,7 +77,8 @@ bool csSoundListenerEAX::Initialize(csSoundRenderEAX *srdr) {
 
   HRESULT r;
   r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &PrimaryBuffer, 0);
-  if (r != DS_OK) {
+  if (r != DS_OK)
+  {
     if (reporter)
       reporter->Report (CS_REPORTER_SEVERITY_WARNING,
         "crystalspace.sound.eax", "EAX listener: "
@@ -82,7 +87,8 @@ bool csSoundListenerEAX::Initialize(csSoundRenderEAX *srdr) {
   }
 
   r = PrimaryBuffer->QueryInterface(IID_IDirectSound3DListener, (void **) &Listener);
-  if (r != DS_OK) {
+  if (r != DS_OK)
+  {
     if (reporter)
       reporter->Report (CS_REPORTER_SEVERITY_WARNING,
         "crystalspace.sound.eax", "EAX listener: Cannot query listener"
@@ -90,28 +96,29 @@ bool csSoundListenerEAX::Initialize(csSoundRenderEAX *srdr) {
     return false;
   }
 
-	r = PrimaryBuffer->QueryInterface(IID_IKsPropertySet, (void**) &EaxKsPropertiesSet);
-	ULONG support = 0;
-	if(SUCCEEDED(r) && EaxKsPropertiesSet)
-	{
-		r = EaxKsPropertiesSet->QuerySupport(DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ALLPARAMETERS, &support);
-		if(!SUCCEEDED(r) || (support&(KSPROPERTY_SUPPORT_GET|KSPROPERTY_SUPPORT_SET))
-				!= (KSPROPERTY_SUPPORT_GET|KSPROPERTY_SUPPORT_SET))
-		{
-			if (reporter)
-                          reporter->Report (CS_REPORTER_SEVERITY_WARNING,
-                            "crystalspace.sound.eax",
-                            "EAX listener : this device don't support EAX 2.0\nSo only DirectSound3D will be used.");
-			EaxKsPropertiesSet->Release();
-			EaxKsPropertiesSet = 0;
-		}
-	}
-	else {
-		if (reporter)
-                   reporter->Report (CS_REPORTER_SEVERITY_WARNING,
-                     "crystalspace.sound.eax",
-                     "EAX listener : cannot get properties, this device may not support EAX\nSo only DirectSound3D will be used.");
-             }
+  r = PrimaryBuffer->QueryInterface(IID_IKsPropertySet, (void**) &EaxKsPropertiesSet);
+  ULONG support = 0;
+  if(SUCCEEDED(r) && EaxKsPropertiesSet)
+  {
+    r = EaxKsPropertiesSet->QuerySupport(DSPROPSETID_EAX_ListenerProperties, DSPROPERTY_EAXLISTENER_ALLPARAMETERS, &support);
+    if(!SUCCEEDED(r) || (support&(KSPROPERTY_SUPPORT_GET|KSPROPERTY_SUPPORT_SET))
+		    != (KSPROPERTY_SUPPORT_GET|KSPROPERTY_SUPPORT_SET))
+    {
+      if (reporter)
+        reporter->Report (CS_REPORTER_SEVERITY_WARNING,
+	 "crystalspace.sound.eax",
+	  "EAX listener : this device don't support EAX 2.0\nSo only DirectSound3D will be used.");
+      EaxKsPropertiesSet->Release();
+      EaxKsPropertiesSet = 0;
+    }
+  }
+  else
+  {
+    if (reporter)
+       reporter->Report (CS_REPORTER_SEVERITY_WARNING,
+	 "crystalspace.sound.eax",
+	 "EAX listener : cannot get properties, this device may not support EAX\nSo only DirectSound3D will be used.");
+  }
 
   SetPosition(csVector3(0,0,0));
   SetVelocity(csVector3(0,0,0));
@@ -126,43 +133,50 @@ bool csSoundListenerEAX::Initialize(csSoundRenderEAX *srdr) {
   return true;
 }
 
-void csSoundListenerEAX::SetPosition(const csVector3 &v) {
+void csSoundListenerEAX::SetPosition(const csVector3 &v)
+{
   Dirty = true;
   csSoundListener::SetPosition(v);
   Listener->SetPosition( v.x, v.y, v.z, DS3D_DEFERRED);
 }
 
-void csSoundListenerEAX::SetDirection(const csVector3 &f, const csVector3 &t) {
+void csSoundListenerEAX::SetDirection(const csVector3 &f, const csVector3 &t)
+{
   Dirty = true;
   csSoundListener::SetDirection(f, t);
   Listener->SetOrientation(f.x, f.y, f.z,t.x, t.y, t.z,DS3D_DEFERRED);
 }
 
-void csSoundListenerEAX::SetHeadSize(float size) {
+void csSoundListenerEAX::SetHeadSize(float size)
+{
 //  Dirty = true;
   csSoundListener::SetHeadSize(size);
 // @@@
 }
 
-void csSoundListenerEAX::SetVelocity(const csVector3 &v) {
+void csSoundListenerEAX::SetVelocity(const csVector3 &v)
+{
   Dirty = true;
   csSoundListener::SetVelocity(v);
   Listener->SetVelocity(v.x, v.y, v.z, DS3D_DEFERRED);
 }
 
-void csSoundListenerEAX::SetDopplerFactor(float factor) {
+void csSoundListenerEAX::SetDopplerFactor(float factor)
+{
   Dirty = true;
   csSoundListener::SetDopplerFactor(factor);
   Listener->SetDopplerFactor(factor, DS3D_DEFERRED);
 }
 
-void csSoundListenerEAX::SetDistanceFactor(float factor) {
+void csSoundListenerEAX::SetDistanceFactor(float factor)
+{
   Dirty = true;
   csSoundListener::SetDistanceFactor(factor);
   Listener->SetDistanceFactor(factor, DS3D_DEFERRED);
 }
 
-void csSoundListenerEAX::SetRollOffFactor(float factor) {
+void csSoundListenerEAX::SetRollOffFactor(float factor)
+{
   Dirty = true;
   csSoundListener::SetRollOffFactor(factor);
   Listener->SetRolloffFactor(factor, DS3D_DEFERRED);
@@ -173,7 +187,7 @@ struct s2eaxEnv_type
 {
 	csSoundEnvironment senv;
 	DWORD eaxenv;
-} s2eaxEnv[MAX_s2eaxEnv]=
+} s2eaxEnv[MAX_s2eaxEnv] =
 {
 	{ENVIRONMENT_GENERIC,         {EAX_ENVIRONMENT_GENERIC}},
 	{ENVIRONMENT_PADDEDCELL,      {EAX_ENVIRONMENT_PADDEDCELL}},
@@ -202,38 +216,40 @@ struct s2eaxEnv_type
 	{ENVIRONMENT_PSYCHOTIC,       {EAX_ENVIRONMENT_PSYCHOTIC}}
 };
 
-void csSoundListenerEAX::SetEnvironment(csSoundEnvironment env) {
-
+void csSoundListenerEAX::SetEnvironment(csSoundEnvironment env)
+{
   Environment = env;
 
-	if(EaxKsPropertiesSet)
-	{
-		DWORD preset={EAX_ENVIRONMENT_GENERIC};
+  if(EaxKsPropertiesSet)
+  {
+    DWORD preset={EAX_ENVIRONMENT_GENERIC};
 
-		int i;
-		for(i=0; i<MAX_s2eaxEnv; i++)
-		{
-			if(s2eaxEnv[i].senv==env)
-			{
-				preset = s2eaxEnv[i].eaxenv;
-				break;
-			}
-		}
+    int i;
+    for(i=0; i<MAX_s2eaxEnv; i++)
+    {
+      if(s2eaxEnv[i].senv==env)
+      {
+	preset = s2eaxEnv[i].eaxenv;
+	break;
+      }
+    }
 
-		EaxKsPropertiesSet->Set(DSPROPSETID_EAX_ListenerProperties,
-			DSPROPERTY_EAXLISTENER_ENVIRONMENT,
-			0,
-			0,
-			&preset,
-			sizeof(DWORD));
-	}
+    EaxKsPropertiesSet->Set(DSPROPSETID_EAX_ListenerProperties,
+	DSPROPERTY_EAXLISTENER_ENVIRONMENT,
+	0,
+	0,
+	&preset,
+	sizeof(DWORD));
+  }
 }
 
 
 
 
-void csSoundListenerEAX::Prepare() {
-  if (!Dirty) return;
+void csSoundListenerEAX::Prepare()
+{
+  if (!Dirty)
+    return;
   Listener->CommitDeferredSettings();
   Dirty = false;
 }

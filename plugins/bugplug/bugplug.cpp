@@ -186,6 +186,9 @@ csBugPlug::~csBugPlug ()
     scfiEventHandler->DecRef ();
   }
   delete[] captureFormat;
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiBugPlug);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csBugPlug::Initialize (iObjectRegistry *object_reg)

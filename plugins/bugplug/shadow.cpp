@@ -52,6 +52,8 @@ csShadow::csShadow ()
 csShadow::~csShadow ()
 {
   CS_ASSERT (wrap == 0);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csShadow::DrawTest (iRenderView* rview, iMovable*)

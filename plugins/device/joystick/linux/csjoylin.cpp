@@ -63,6 +63,9 @@ csLinuxJoystick::csLinuxJoystick (iBase *parent):
 csLinuxJoystick::~csLinuxJoystick ()
 {
   Close ();
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventPlug);
+  SCF_DESTRUCT_IBASE(0);
 }
 
 bool csLinuxJoystick::Initialize (iObjectRegistry *oreg)

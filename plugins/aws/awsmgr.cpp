@@ -89,8 +89,9 @@ awsManager::~awsManager ()
 
     scfiEventHandler->DecRef ();
   }
-
   component_factories.DeleteAll ();
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool awsManager::Initialize (iObjectRegistry *object_reg)

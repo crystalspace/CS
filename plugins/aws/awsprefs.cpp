@@ -70,6 +70,7 @@ awsPrefManager::awsPrefManager (iBase *iParent) :
 awsPrefManager::~awsPrefManager ()
 {
   delete awstxtmgr;
+  SCF_DESTRUCT_IBASE();
 }
 
 bool awsPrefManager::Setup (iObjectRegistry *obj_reg)

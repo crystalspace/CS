@@ -133,6 +133,8 @@ csSoundRenderSoftware::~csSoundRenderSoftware()
     scfiEventHandler->DecRef ();
   }
   Close();
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csSoundRenderSoftware::Open()

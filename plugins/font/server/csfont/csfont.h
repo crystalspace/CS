@@ -56,7 +56,10 @@ public:
     else
       csParasiticDataBuffer::size = size;
   }
-  virtual ~csParasiticDataBuffer () {};
+  virtual ~csParasiticDataBuffer ()
+  {
+    SCF_DESTRUCT_IBASE();
+  }
 
   /// Query the buffer size
   virtual size_t GetSize () const

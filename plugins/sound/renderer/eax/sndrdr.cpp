@@ -85,6 +85,9 @@ csSoundRenderEAX::~csSoundRenderEAX()
   if (q != 0)
     q->RemoveListener (&scfiEventHandler);
   Close();
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csSoundRenderEAX::Open()

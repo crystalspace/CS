@@ -109,10 +109,18 @@ public:
     virtual bool Initialize (iObjectRegistry*) { return true; }
   } scfiComponent;
 
-  csSoundLoader_WAV(iBase *p) {
+  csSoundLoader_WAV(iBase *p)
+  {
     SCF_CONSTRUCT_IBASE(p);
     SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   }
+
+  virtual ~csSoundLoader_WAV()
+  {
+    SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+    SCF_DESTRUCT_IBASE();
+  }
+
   virtual csPtr<iSoundData> LoadSound(void *Buffer, uint32 Size);
 };
 

@@ -55,12 +55,12 @@ SCF_IMPLEMENT_IBASE_END
 csTinyDocWrapper::csTinyDocWrapper (csRef<iDocument> doc)
 {
   SCF_CONSTRUCT_IBASE (0);
-
   tinydoc = doc;
 }
 
 csTinyDocWrapper::~csTinyDocWrapper ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csTinyDocWrapper::Clear ()
@@ -154,13 +154,13 @@ SCF_IMPLEMENT_IBASE_END
 csTinyXMLPlugin::csTinyXMLPlugin(iBase* parent)
 {
   SCF_CONSTRUCT_IBASE(parent);
-
   tiny = new csTinyDocumentSystem ();
 }
 
 csTinyXMLPlugin::~csTinyXMLPlugin()
 {
   delete tiny;
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csTinyXMLPlugin::Initialize (iObjectRegistry* objreg)

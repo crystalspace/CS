@@ -151,4 +151,5 @@ csOPCODECollider::~csOPCODECollider ()
 
   delete[] indexholder;
   delete[] vertholder;
+  SCF_DESTRUCT_IBASE ();
 }

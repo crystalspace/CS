@@ -73,6 +73,8 @@ csSoundDriverWaveOut::~csSoundDriverWaveOut()
       q->RemoveListener (scfiEventHandler);
     scfiEventHandler->DecRef ();
   }
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csSoundDriverWaveOut::Initialize (iObjectRegistry *r)

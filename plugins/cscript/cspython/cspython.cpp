@@ -55,6 +55,8 @@ csPython::~csPython()
   Mode=CS_REPORTER_SEVERITY_BUG;
   Py_Finalize();
   object_reg=0;
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 extern "C" {

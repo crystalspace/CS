@@ -127,6 +127,8 @@ csFontServerMultiplexor::csFontServerMultiplexor (iBase *pParent)
 
 csFontServerMultiplexor::~csFontServerMultiplexor ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csFontServerMultiplexor::Initialize (iObjectRegistry *object_reg)
@@ -389,19 +391,19 @@ csFontPlexer::~csFontPlexer ()
 {
   delete order;
 
-  int i;
-  for (i = DeleteCallbacks.Length () - 1; i >= 0; i--)
+  for (int i = DeleteCallbacks.Length () - 1; i >= 0; i--)
   {
     iFontDeleteNotify* delnot = DeleteCallbacks[i];
     delnot->BeforeDelete (this);
   }
+
+  SCF_DESTRUCT_IBASE();
 }
 
 void csFontPlexer::SetSize (int iSize)
 {
   size = iSize;
-  int i;
-  for (i = 0; i < order->Length (); i++)
+  for (int i = 0; i < order->Length (); i++)
   {
     if ((*order)[i].loaded && (*order)[i].font)
     {

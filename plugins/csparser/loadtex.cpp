@@ -187,6 +187,7 @@ TextureLoaderContext::TextureLoaderContext ()
 
 TextureLoaderContext::~TextureLoaderContext ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void TextureLoaderContext::SetFlags (int Flags)
@@ -251,6 +252,7 @@ csBaseTextureLoader::csBaseTextureLoader (iBase *p)
 
 csBaseTextureLoader::~csBaseTextureLoader ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csBaseTextureLoader::Initialize(iObjectRegistry *object_reg)

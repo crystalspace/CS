@@ -75,6 +75,9 @@ csNetworkDriver2::~csNetworkDriver2()
 #ifdef WINSOCK
   WSACleanup();
 #endif
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 int csNetworkDriver2::LastError() const
@@ -133,6 +136,7 @@ csNetworkSocket2::~csNetworkSocket2 ()
 {
   if (read_buffer)
     free(read_buffer);
+  SCF_DESTRUCT_IBASE();
 }
 
 int csNetworkSocket2::LastError () const

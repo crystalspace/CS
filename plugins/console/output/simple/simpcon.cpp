@@ -100,6 +100,9 @@ csSimpleConsole::~csSimpleConsole ()
   console_font = 0;
   G3D = 0;
   G2D = 0;
+
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csSimpleConsole::Initialize (iObjectRegistry *object_reg)

@@ -43,6 +43,7 @@ csXmlReadDocumentSystem::csXmlReadDocumentSystem ()
 
 csXmlReadDocumentSystem::~csXmlReadDocumentSystem ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 csRef<iDocument> csXmlReadDocumentSystem::CreateDocument ()
@@ -73,6 +74,11 @@ csXmlReadAttributeIterator::csXmlReadAttributeIterator (TrDocumentNode* parent)
     return;
   }
   current = 0;
+}
+
+csXmlReadAttributeIterator::~csXmlReadAttributeIterator()
+{
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csXmlReadAttributeIterator::HasNext ()
@@ -125,6 +131,12 @@ csXmlReadNodeIterator::csXmlReadNodeIterator (
       current = parent->FirstChild ();
     }
   }
+}
+
+csXmlReadNodeIterator::~csXmlReadNodeIterator ()
+{
+  delete[] value;
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csXmlReadNodeIterator::HasNext ()
@@ -186,6 +198,7 @@ csXmlReadNode::csXmlReadNode (csXmlReadDocument* doc)
 
 csXmlReadNode::~csXmlReadNode ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 csRef<iDocumentNode> csXmlReadNode::GetParent ()
@@ -391,6 +404,7 @@ csXmlReadDocument::~csXmlReadDocument ()
     delete pool;
     pool = n;
   }
+  SCF_DESTRUCT_IBASE();
 }
 
 void csXmlReadDocument::Clear ()

@@ -27,7 +27,8 @@ SCF_IMPLEMENT_IBASE (csOggSoundData)
   SCF_IMPLEMENTS_INTERFACE (iSoundData)
 SCF_IMPLEMENT_IBASE_END
 
-static size_t cs_ogg_read (void *ptr, size_t size, size_t nmemb, void *datasource)
+static size_t cs_ogg_read (void *ptr, size_t size, size_t nmemb,
+  void *datasource)
 {
   csOggSoundData::datastore *ds = (csOggSoundData::datastore*)datasource;
   size_t br = MIN (size*nmemb, ds->length - ds->pos);
@@ -104,13 +105,15 @@ csOggSoundData::~csOggSoundData ()
   ov_clear (&vf);
   free(buf);
   delete ds;
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csOggSoundData::Initialize(const csSoundFormat *fmt)
 {
   if (!ogg_ok)
   {
-    ogg_ok = ov_open_callbacks(ds, &vf, 0, 0, *(ov_callbacks*)GetCallbacks ()) == 0;
+    ogg_ok =
+      ov_open_callbacks(ds, &vf, 0, 0, *(ov_callbacks*)GetCallbacks ()) == 0;
     vorbis_info *vi=ov_info(&vf,-1);
     this->fmt.Channels = vi->channels;
     this->fmt.Freq = vi->rate;
@@ -128,7 +131,8 @@ bool csOggSoundData::IsOgg (void *Buffer, size_t len)
   datastore *dd = new datastore ((uint8*)Buffer, len, false);
   OggVorbis_File f;
   memset (&f, 0, sizeof(OggVorbis_File));
-  bool ok = ov_open_callbacks(dd, &f, 0, 0, *(ov_callbacks*)GetCallbacks ()) == 0;
+  bool ok = 
+    ov_open_callbacks(dd, &f, 0, 0, *(ov_callbacks*)GetCallbacks ()) == 0;
   ov_clear (&f);
   delete dd;
   return ok;
@@ -213,12 +217,18 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE (csOggLoader);
     virtual bool Initialize (iObjectRegistry *){return true;}
-  }scfiComponent;
+  } scfiComponent;
 
   csOggLoader (iBase *parent)
   {
     SCF_CONSTRUCT_IBASE (parent);
     SCF_CONSTRUCT_EMBEDDED_IBASE (scfiComponent);
+  }
+
+  virtual ~csOggLoader ()
+  {
+    SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+    SCF_DESTRUCT_IBASE();
   }
 
   virtual csPtr<iSoundData> LoadSound (void *Buffer, uint32 Size)
@@ -241,5 +251,3 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csOggLoader::eiComponent)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csOggLoader);
-
-

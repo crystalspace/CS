@@ -78,6 +78,8 @@ csOPCODECollideSystem::csOPCODECollideSystem (iBase *pParent)
 csOPCODECollideSystem::~csOPCODECollideSystem ()
 {
   delete[] pairs;
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csOPCODECollideSystem::Initialize (iObjectRegistry* iobject_reg)

@@ -121,6 +121,9 @@ csODEDynamics::csODEDynamics (iBase* parent)
 
 csODEDynamics::~csODEDynamics ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiODEDynamicState);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csODEDynamics::Initialize (iObjectRegistry* object_reg)
@@ -784,6 +787,9 @@ csODEDynamicSystem::~csODEDynamicSystem ()
   dSpaceDestroy (spaceID);
   dWorldDestroy (worldID);
   if (move_cb) move_cb->DecRef ();
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiODEDynamicSystemState);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiDynamicSystem);
 }
 
 
@@ -1007,6 +1013,7 @@ csODEBodyGroup::~csODEBodyGroup ()
   {
     ((csODERigidBody *)(iRigidBody*)bodies[i])->UnsetGroup ();
   }
+  SCF_DESTRUCT_IBASE();
 }
 
 void csODEBodyGroup::AddBody (iRigidBody *body)
@@ -1047,12 +1054,13 @@ csODERigidBody::csODERigidBody (csODEDynamicSystem* sys) : geoms (1,4)
 
 csODERigidBody::~csODERigidBody ()
 {
-
   DestroyGeoms (geoms);
 
   if (move_cb) move_cb->DecRef ();
   if (coll_cb) coll_cb->DecRef ();
   dBodyDestroy (bodyID);
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiRigidBody);
 }
 
 
@@ -1562,7 +1570,9 @@ csODEJoint::csODEJoint (csODEDynamicSystem *sys)
 
 csODEJoint::~csODEJoint ()
 {
-  if (jointID) { dJointDestroy (jointID); }
+  if (jointID)
+    dJointDestroy (jointID);
+  SCF_DESTRUCT_IBASE();
 }
 
 void csODEJoint::Attach (iRigidBody *b1, iRigidBody *b2)
@@ -1835,6 +1845,7 @@ csODEDefaultMoveCallback::csODEDefaultMoveCallback ()
 
 csODEDefaultMoveCallback::~csODEDefaultMoveCallback ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csODEDefaultMoveCallback::Execute (iMeshWrapper* mesh,

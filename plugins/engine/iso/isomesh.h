@@ -109,7 +109,7 @@ public:
 
   /// constructor
   csIsoMeshFactoryList ();
-  virtual ~csIsoMeshFactoryList () { }
+  virtual ~csIsoMeshFactoryList ();
 
   class MeshFactoryList : public iMeshFactoryList
   {

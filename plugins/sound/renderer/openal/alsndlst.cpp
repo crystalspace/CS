@@ -36,6 +36,7 @@ csSoundListenerOpenAL::csSoundListenerOpenAL(csSoundRenderOpenAL *p)
 
 csSoundListenerOpenAL::~csSoundListenerOpenAL() 
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csSoundListenerOpenAL::SetPosition(const csVector3 &v) {

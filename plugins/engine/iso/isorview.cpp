@@ -39,6 +39,7 @@ csIsoRenderView::csIsoRenderView (iBase *iParent)
 csIsoRenderView::~csIsoRenderView ()
 {
   delete[] buckets;
+  SCF_DESTRUCT_IBASE();
 }
 
 void csIsoRenderView::CreateBuckets(int num)

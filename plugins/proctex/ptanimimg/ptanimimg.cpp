@@ -55,6 +55,7 @@ csAnimateProctexLoader::csAnimateProctexLoader (iBase *p)
 
 csAnimateProctexLoader::~csAnimateProctexLoader ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csAnimateProctexLoader::Initialize(iObjectRegistry *object_reg)

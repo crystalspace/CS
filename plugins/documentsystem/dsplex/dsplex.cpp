@@ -42,12 +42,12 @@ SCF_IMPLEMENT_IBASE_END
 csPlexDocument::csPlexDocument (csRef<csMplexDocumentSystem> aPlexer)
 {
   SCF_CONSTRUCT_IBASE (0);
-
   plexer = aPlexer;
 }
 
 csPlexDocument::~csPlexDocument ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csPlexDocument::Clear ()
@@ -265,6 +265,7 @@ csMplexDocumentSystem::csMplexDocumentSystem(iBase* parent)
 
 csMplexDocumentSystem::~csMplexDocumentSystem ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 csRef<iDocument> csMplexDocumentSystem::CreateDocument ()

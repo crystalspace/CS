@@ -396,6 +396,7 @@ csMMapDataBuffer::~csMMapDataBuffer ()
   {
     UnMemoryMapFile (&mapping);
   }
+  SCF_DESTRUCT_IBASE();
 }
 
 #endif
@@ -510,6 +511,8 @@ DiskFile::~DiskFile ()
   if (file)
     fclose (file);
   delete [] fName;
+
+  SCF_DESTRUCT_IBASE();
 }
 
 void DiskFile::MakeDir (const char *PathBase, const char *PathSuffix)
@@ -845,6 +848,8 @@ ArchiveFile::~ArchiveFile ()
   if (fh)
     Archive->Writing--;
   Archive->DecRef ();
+
+  SCF_DESTRUCT_IBASE();
 }
 
 size_t ArchiveFile::Read (char *Data, size_t DataSize)
@@ -1479,6 +1484,8 @@ csVFS::~csVFS ()
   CS_ASSERT (ArchiveCache);
   delete ArchiveCache;
   ArchiveCache = 0;
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 static void add_final_delimiter(csString& s)

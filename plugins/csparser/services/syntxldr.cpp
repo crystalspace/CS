@@ -141,6 +141,9 @@ csTextSyntaxService::csTextSyntaxService (iBase *parent)
 
 csTextSyntaxService::~csTextSyntaxService ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csTextSyntaxService::Initialize (iObjectRegistry* object_reg)

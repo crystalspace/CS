@@ -163,6 +163,10 @@ csReporterListener::~csReporterListener ()
       q->RemoveListener (scfiEventHandler);
     scfiEventHandler->DecRef ();
   }
+
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiReporterListener);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csReporterListener::Initialize (iObjectRegistry* r)

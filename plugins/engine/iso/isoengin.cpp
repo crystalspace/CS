@@ -97,6 +97,8 @@ csIsoEngine::~csIsoEngine ()
   }
   materials.scfiMaterialList.RemoveAll ();
   meshfactories.scfiMeshFactoryList.RemoveAll();
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csIsoEngine::Initialize (iObjectRegistry* p)

@@ -55,6 +55,9 @@ csRapidCollideSystem::csRapidCollideSystem (iBase *pParent)
 
 csRapidCollideSystem::~csRapidCollideSystem ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiDebugHelper);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 csPtr<iCollider> csRapidCollideSystem::CreateCollider (iPolygonMesh* mesh)
@@ -132,6 +135,10 @@ struct TriPolygonMesh : public iPolygonMesh
     triangle.b = 1;
     triangle.c = 2;
     flags.Set (CS_POLYMESH_TRIANGLEMESH);
+  }
+  virtual ~TriPolygonMesh ()
+  {
+    SCF_DESTRUCT_IBASE();
   }
 
   virtual int GetVertexCount () { return 3; }

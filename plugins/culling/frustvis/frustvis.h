@@ -71,6 +71,7 @@ public:
   }
   virtual ~csFrustVisObjectWrapper ()
   {
+    SCF_DESTRUCT_IBASE();
   }
 
   SCF_DECLARE_IBASE;

@@ -7,42 +7,73 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 7-Nov-2003
-	- res reverted the behaviour of setting the alpha of keycolored 
-	  pixels of textures in GL: just drop the alpha of KCed pixels to 0,
-	  but don't raise the alpha of non-KCed pixels to 255, which gave
-	  problems with alpha transparency in AWS (which sets a keycolor on
-	  all images.)
+	- res reverted the behaviour of setting the alpha of keycolored pixels
+	  of textures in GL: just drop the alpha of KCed pixels to 0, but don't
+	  raise the alpha of non-KCed pixels to 255, which gave problems with
+	  alpha transparency in AWS (which sets a keycolor on all images.)
 	- Chris Matuszewski changed AWS component transitions to use a delay
-	  parameter specified in csTicks instead of using a step_size parameter.
-	  This approach has the benefit of making the transitions take the same
-	  amount of time on computers with different processor speeds.
+	  parameter specified in csTicks instead of using a step_size
+	  parameter.  This approach has the benefit of making the transitions
+	  take the same amount of time on computers with different processor
+	  speeds.
 	- Jorrit implemented the silhouette splatting optimization in Dynavis.
 	  With this optimization, outlines that are partially behind the view
 	  plane are now splatted to the view plane instead of simply discarded.
 	  At some spots this optimization can really help a lot.
 	- Jorrit added a 'toggle_splatting' command to Dynavis. Assigned the
 	  ctrl-d 8 key to that command.
-	- Jorrit enhanced the Dynavis debug mode so that it now shows which
-	  of the optimizations are enabled and which are disabled.
+	- Jorrit enhanced the Dynavis debug mode so that it now shows which of
+	  the optimizations are enabled and which are disabled.
 	- res updated a comment in ogl_txtmgr.cpp. Just dropping the alpha of
 	  keycolored pixels to 0 and leaving other pixels as is is indeed the
 	  desired behaviour.
-	- res added a paragraph about iGraphics2D::WriteBaseline() to 
+	- res added a paragraph about iGraphics2D::WriteBaseline() to
 	  apimod98.txi.
-	- res fixed a crash in the fixed function shader programs. A shader 
+	- res fixed a crash in the fixed function shader programs. A shader
 	  variable wasn't properly set up.
-	- res added a fix from Marten to 
-	  csShaderVariableContextHelper::FillVariableList().
-	  Previously, not all provided variables were actually filled.
+	- res added a fix from Marten to
+	  csShaderVariableContextHelper::FillVariableList().  Previously, not
+	  all provided variables were actually filled.
 	- Jorrit removed the first technique from ambient.xml. The second
 	  technique is more compatible and works fast enough everywhere.
-	- Wouter added a new technique to the NR terrain shader
-	  splatting_bump, that avoid bumpmapping and lighting to
-	  make it work on 2 texture units graphics cards.
+	- Wouter added a new technique to the NR terrain shader splatting_bump,
+	  that avoid bumpmapping and lighting to make it work on 2 texture
+	  units graphics cards.
+	- Eric Sunshine added SCF_DESTRUCT_IBASE() invocations for each of the
+	  corresponding SCF_CONSTRUCT_IBASE() invocations in methods in the
+	  following locations:
+	    CS/plugins/aws
+	    CS/plugins/bugplug
+	    CS/plugins/collide
+	    CS/plugins/console
+	    CS/plugins/cscript
+	    CS/plugins/csparser
+	    CS/plugins/cssaver
+	    CS/plugins/culling
+	    CS/plugins/device
+	    CS/plugins/documentsystem
+	    CS/plugins/engine
+	    CS/plugins/engseq
+	    CS/plugins/filesys
+	    CS/plugins/font
+	    CS/plugins/isoldr
+	    CS/plugins/motion
+	    CS/plugins/movierecorder
+	    CS/plugins/net
+	    CS/plugins/perfstat
+	    CS/plugins/physics
+	    CS/plugins/picogui
+	    CS/plugins/proctex
+	    CS/plugins/reporter
+	    CS/plugins/sequence
+	    CS/plugins/sound
+	    CS/plugins/stdrep
+	  The only remaining directories which need to be converted are
+	  CS/plugins/mesh and CS/plugins/video.
 6-Nov-2003
 	- res bumped the version of the iGraphics2D interface and updated
-	  some doxygen comments in include/graph2d.h. (Basically the 
-	  differences between his local copy he forgot to commit and 
+	  some doxygen comments in include/graph2d.h. (Basically the
+	  differences between his local copy he forgot to commit and
 	  Eric Sunshine's recent update to this file to fix compilation.)
 	- res made the csShadowIterator destructor virtual.
 	- Eric Sunshine added an ugly hack to jobber.pl to work around
@@ -70,7 +101,7 @@ chronological order.
 	  cut objects as opposed to balanced tree.
 	- res changed the fire proctex to set an alpha of 255 on the output
 	  image, instead of 0.
-	- res removed the superfluous 'texture' parameter from 
+	- res removed the superfluous 'texture' parameter from
 	  csGLStateCache::GetTexture().
 	- res fixed the GL renderer to properly deal with keycolored procedural
 	  textures.
@@ -84,7 +115,7 @@ chronological order.
           a param.
 	- res added a 'flags' parameter to iGraphics2D::Write(). At the moment
 	  you can specify flags to write on a baseline and disable font glyph
-	  antialiasing. As the functionality of WriteBaseline() is now 
+	  antialiasing. As the functionality of WriteBaseline() is now
 	  provided by Write(), so it has been marked as deprecated.
 	- res added SCF_DESTRUCT macros to the common and glwin32 canvas code.
 	- res updated a comment in ogl_txtmgr.cpp.
@@ -189,7 +220,7 @@ chronological order.
 	      from the source tree (which, after all, is the purpose of a
 	      "maintainerclean" target).
 	    - csperl5clean now also cleans Swig-generated files.
-	- Wouter fixed unused int i in awsmgr, and a printf format error 
+	- Wouter fixed unused int i in awsmgr, and a printf format error
 	  in a dynavis debug statement.
 3-Nov-2003
 	- Chris Matuszewski added some explicit type casts to stop msvc6 from

@@ -106,12 +106,12 @@ csLightIterRenderStepFactory::csLightIterRenderStepFactory (
   iObjectRegistry* object_reg)
 {
   SCF_CONSTRUCT_IBASE(0);
-
   csLightIterRenderStepFactory::object_reg = object_reg;
 }
 
 csLightIterRenderStepFactory::~csLightIterRenderStepFactory ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 csPtr<iRenderStep> csLightIterRenderStepFactory::Create ()
@@ -132,14 +132,13 @@ csLightIterRenderStep::csLightIterRenderStep (
   iObjectRegistry* object_reg)
 {
   SCF_CONSTRUCT_IBASE(0);
-
   csLightIterRenderStep::object_reg = object_reg;
-
   initialized = false;
 }
 
 csLightIterRenderStep::~csLightIterRenderStep ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csLightIterRenderStep::InitVariables ()

@@ -92,6 +92,8 @@ csFancyConsole::~csFancyConsole ()
       q->RemoveListener (scfiEventHandler);
     scfiEventHandler->DecRef ();
   }
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csFancyConsole::Initialize (iObjectRegistry *object_reg)

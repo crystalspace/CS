@@ -104,6 +104,8 @@ csMovieRecorder::~csMovieRecorder ()
     object_reg->Register(realVirtualClock, "iVirtualClock");
     scfiVirtualClock->DecRef ();
   }
+
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csMovieRecorder::Initialize (iObjectRegistry* iobject_reg)

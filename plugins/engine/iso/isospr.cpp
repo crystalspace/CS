@@ -47,6 +47,7 @@ csIsoSprite::csIsoSprite (iBase *iParent)
 
 csIsoSprite::~csIsoSprite ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 int csIsoSprite::GetVertexCount() const

@@ -81,12 +81,14 @@ SCF_IMPLEMENT_FACTORY (csPhysicsLoader)
 
 csPhysicsLoader::csPhysicsLoader (iBase* pParent)
 {
-  SCF_CONSTRUCT_IBASE (pParent)
+  SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 }
 
 csPhysicsLoader::~csPhysicsLoader ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csPhysicsLoader::Initialize (iObjectRegistry* object_reg)

@@ -57,12 +57,12 @@ SCF_IMPLEMENT_IBASE_END
 csXmlReadDocWrapper::csXmlReadDocWrapper (csRef<iDocument> doc)
 {
   SCF_CONSTRUCT_IBASE (0);
-
   xmlreaddoc = doc;
 }
 
 csXmlReadDocWrapper::~csXmlReadDocWrapper ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csXmlReadDocWrapper::Clear ()
@@ -173,13 +173,13 @@ SCF_IMPLEMENT_IBASE_END
 csXmlReadXMLPlugin::csXmlReadXMLPlugin(iBase* parent)
 {
   SCF_CONSTRUCT_IBASE(parent);
-
   xmlread = new csXmlReadDocumentSystem ();
 }
 
 csXmlReadXMLPlugin::~csXmlReadXMLPlugin()
 {
   delete xmlread;
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csXmlReadXMLPlugin::Initialize (iObjectRegistry* objreg)

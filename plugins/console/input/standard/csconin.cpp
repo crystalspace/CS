@@ -74,6 +74,10 @@ csConsoleInput::~csConsoleInput ()
     Console->RegisterWatcher (0);
     Console->DecRef ();
   }
+
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiConsoleWatcher);
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csConsoleInput::Initialize (iObjectRegistry *object_reg)

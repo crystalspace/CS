@@ -91,6 +91,9 @@ inline bool csPicoGUIServer::Initialize (iObjectRegistry *objreg)
 
 csPicoGUIServer::~csPicoGUIServer ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiEventHandler);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csPicoGUIServer::HandleEvent (iEvent &ev)
@@ -112,7 +115,8 @@ bool csPicoGUIServer::HandleEvent (iEvent &ev)
     pgserver_mainloop_stop ();
     pgserver_shutdown ();
   }
-  else if (ev.Command.Code == cscmdPostProcess && pgserver_mainloop_is_running ())
+  else if (ev.Command.Code == cscmdPostProcess &&
+    pgserver_mainloop_is_running ())
   {
     pgserver_mainloop_iteration ();
     return true;

@@ -141,12 +141,16 @@ public:
   private:
     csSoundRenderSoftware* parent;
   public:
+    SCF_DECLARE_IBASE;
     EventHandler (csSoundRenderSoftware* parent)
     {
       SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
-    SCF_DECLARE_IBASE;
+    virtual ~EventHandler ()
+    {
+      SCF_DESTRUCT_IBASE();
+    }
     virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
   } * scfiEventHandler;
 };

@@ -86,6 +86,8 @@ csPerfStats::~csPerfStats ()
   delete [] file_name;
   delete [] margin;
   delete frame;
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csPerfStats::Initialize (iObjectRegistry *object_reg)

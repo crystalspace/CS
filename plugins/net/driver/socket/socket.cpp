@@ -198,6 +198,9 @@ csSocketConnection::~csSocketConnection ()
                     (char *) & mreq, sizeof (mreq)) < 0)
       LastError = CS_NET_ERR_CANNOT_SET_OPTION;
   }
+
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiNetworkSocket);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csSocketConnection::Send(const char* data, size_t nbytes)
@@ -351,6 +354,12 @@ csSocketListener::csSocketListener(iBase* p, csNetworkSocket s,
     CloseSocket();
 }
 
+csSocketListener::~csSocketListener()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiNetworkSocket);
+  SCF_DESTRUCT_IBASE();
+}
+
 csPtr<iNetworkConnection> csSocketListener::Accept()
 {
   iNetworkConnection* connection = 0;
@@ -410,8 +419,17 @@ csSocketDriver::csSocketDriver(iBase* p) : LastError(CS_NET_ERR_NO_ERROR)
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
 }
-csSocketDriver::~csSocketDriver() {}
-void csSocketDriver::ClearError() { LastError = CS_NET_ERR_NO_ERROR; }
+csSocketDriver::~csSocketDriver()
+{
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
+}
+
+void csSocketDriver::ClearError()
+{
+  LastError = CS_NET_ERR_NO_ERROR;
+}
 
 void csSocketDriver::Open()
 {

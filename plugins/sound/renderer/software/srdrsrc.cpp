@@ -49,6 +49,7 @@ csSoundSourceSoftware::csSoundSourceSoftware(csSoundRenderSoftware *srdr,
 
 csSoundSourceSoftware::~csSoundSourceSoftware()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csSoundSourceSoftware::Play(unsigned long pMethod)

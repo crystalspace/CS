@@ -147,13 +147,16 @@ public:
   private:
     csMovieRecorder* parent;
   public:
+    SCF_DECLARE_IBASE;
     EventHandler (csMovieRecorder* parent)
     {
       SCF_CONSTRUCT_IBASE (0);
       EventHandler::parent = parent;
     }
-    virtual ~EventHandler () { }
-    SCF_DECLARE_IBASE;
+    virtual ~EventHandler ()
+    {
+      SCF_DESTRUCT_IBASE();
+    }
     virtual bool HandleEvent (iEvent& ev)
     {
       return parent->HandleEvent (ev);
@@ -170,13 +173,16 @@ public:
   private:
     csMovieRecorder* parent;
   public:
+    SCF_DECLARE_IBASE;
     VirtualClock (csMovieRecorder* parent)
     {
       SCF_CONSTRUCT_IBASE (0);
       VirtualClock::parent = parent;
     }
-    virtual ~VirtualClock() { }
-    SCF_DECLARE_IBASE;
+    virtual ~VirtualClock()
+    {
+      SCF_DESTRUCT_IBASE();
+    }
     virtual void Advance ()
     {
       parent->ClockAdvance();

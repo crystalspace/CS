@@ -44,6 +44,7 @@ csSequence::csSequence (iSequenceManager* seqmgr) : first (0), last (0)
 csSequence::~csSequence ()
 {
   Clear ();
+  SCF_DESTRUCT_IBASE();
 }
 
 void csSequence::Clear ()
@@ -214,6 +215,8 @@ csSequenceManager::~csSequenceManager ()
   }
   Clear ();
   main_sequence->DecRef ();
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiComponent);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csSequenceManager::Initialize (iObjectRegistry *r)

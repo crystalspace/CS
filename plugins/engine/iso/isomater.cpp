@@ -49,6 +49,7 @@ csIsoMaterial::csIsoMaterial (iTextureHandle* w) :
 
 csIsoMaterial::~csIsoMaterial ()
 {
+  SCF_DESTRUCT_IBASE();
 }
 
 void csIsoMaterial::SetEffect (iEffectDefinition *ed)
@@ -135,6 +136,8 @@ csIsoMaterialWrapper::csIsoMaterialWrapper (iMaterialHandle *ith) :
 
 csIsoMaterialWrapper::~csIsoMaterialWrapper ()
 {
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiIsoMaterialWrapperIndex);
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
 }
 
 void csIsoMaterialWrapper::SetMaterialHandle (iMaterialHandle *m)
@@ -182,6 +185,8 @@ csIsoMaterialList::csIsoMaterialList () :
 csIsoMaterialList::~csIsoMaterialList ()
 {
   DeleteAll ();
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMaterialList);
+  SCF_DESTRUCT_IBASE();
 }
 
 int csIsoMaterialList::GetNewIndex()

@@ -80,6 +80,11 @@ public:
     reason = LAST_REASON;
     has_vpt_point = false;
   }
+
+  virtual ~csVisibilityObjectHistory()
+  {
+    SCF_DESTRUCT_IBASE();
+  }
 };
 
 #endif // __CS_DYNHISTMGR_H__

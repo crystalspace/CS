@@ -36,7 +36,7 @@ private:
 
 public:
   csXmlReadAttributeIterator (TrDocumentNode* parent);
-  virtual ~csXmlReadAttributeIterator () { }
+  virtual ~csXmlReadAttributeIterator ();
 
   SCF_DECLARE_IBASE;
 
@@ -67,6 +67,7 @@ public:
 
   virtual ~csXmlReadAttribute ()
   {
+    SCF_DESTRUCT_IBASE();
   }
 
   SCF_DECLARE_IBASE;
@@ -115,7 +116,7 @@ private:
 public:
   csXmlReadNodeIterator (csXmlReadDocument* doc,
 	TrDocumentNodeChildren* parent, const char* value);
-  virtual ~csXmlReadNodeIterator () { delete[] value; }
+  virtual ~csXmlReadNodeIterator ();
 
   SCF_DECLARE_IBASE;
 

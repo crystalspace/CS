@@ -48,13 +48,12 @@ private:
   csRefArray<par> params;
 
 public:
-  csEngineSequenceParameters ()
-  {
-    SCF_CONSTRUCT_IBASE (0);
-  }
-  virtual ~csEngineSequenceParameters () { }
-
   SCF_DECLARE_IBASE;
+
+  csEngineSequenceParameters ()
+  { SCF_CONSTRUCT_IBASE (0); }
+  virtual ~csEngineSequenceParameters ()
+  { SCF_DESTRUCT_IBASE(); }
 
   virtual int GetParameterCount () const
   {
@@ -632,12 +631,16 @@ public:
   private:
     csEngineSequenceManager* parent;
   public:
+    SCF_DECLARE_IBASE;
     EventHandler (csEngineSequenceManager* p)
     {
       SCF_CONSTRUCT_IBASE (0);
       parent = p;
     }
-    SCF_DECLARE_IBASE;
+    virtual ~EventHandler ()
+    {
+      SCF_DESTRUCT_IBASE ();
+    }
     virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
   } * scfiEventHandler;
 };

@@ -90,8 +90,11 @@ public:
     // If the vistest_objects_inuse pointer is not 0 we set the
     // bool to false to indicate we're no longer using the base
     // vector. Otherwise we delete the vector.
-    if (vistest_objects_inuse) *vistest_objects_inuse = false;
-    else delete vector;
+    if (vistest_objects_inuse)
+      *vistest_objects_inuse = false;
+    else
+      delete vector;
+    SCF_DESTRUCT_IBASE();
   }
 
   virtual iVisibilityObject* Next()
@@ -167,6 +170,8 @@ csFrustumVis::~csFrustumVis ()
     visobj_vector.DeleteIndex (0);
   }
   delete kdtree;
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
 }
 
 bool csFrustumVis::Initialize (iObjectRegistry *object_reg)
@@ -710,7 +715,8 @@ static bool FrustTestSphere_Front2Back (csKDTree* treenode,
       {
 	if (data->viscallback)
 	{
-	  data->viscallback->ObjectVisible (visobj_wrap->visobj, visobj_wrap->mesh);
+	  data->viscallback->ObjectVisible (
+	    visobj_wrap->visobj, visobj_wrap->mesh);
 	}
 	else
 	{
@@ -1127,4 +1133,3 @@ void csFrustumVis::CastShadows (iFrustumView* fview)
   }
   shadows->RestoreRegion (prev_region);
 }
-

@@ -65,6 +65,9 @@ csWindowsJoystick::csWindowsJoystick (iBase *parent) :
 csWindowsJoystick::~csWindowsJoystick ()
 {
   Close ();
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+  SCF_DESTRUCT_EMBEDDED_IBASE(scfiEventPlug);
+  SCF_DESTRUCT_IBASE();
 }
 
 bool csWindowsJoystick::Initialize (iObjectRegistry* oreg)
