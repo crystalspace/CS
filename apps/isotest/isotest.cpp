@@ -185,20 +185,34 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   scenelight->SetRadius(4.0);
   scenelight->SetColor(csColor(0.0, 0.4, 1.0));
 
-  // add a light for the player
+  // add a light for the player, above players head.
   light = engine->CreateLight();
-  light->SetPosition(startpos+csVector3(0,1,0));
+  light->SetPosition(startpos+csVector3(0,5,0));
   light->SetGrid(grid);
   light->SetRadius(5.0);
   light->SetColor(csColor(1.0, 0.4, 0.2));
+
+  // make a bump to cast shadows
   for(my=0; my<multy; my++)
     for(mx=0; mx<multx; mx++)
-      grid->SetGroundValue(5, 15, mx, my, 0.8);
+      grid->SetGroundValue(5, 15, mx, my, 4.0);
+  sprite = engine->CreateFloorSprite(csVector3(15,4,5), 1.0, 1.0);
+  sprite->SetMaterialHandle(math2);
+  world->AddSprite(sprite);
+  for(my=0; my<4; my++)
+  {
+    sprite = engine->CreateXWallSprite(csVector3(15,my,5), 1.0, 1.0);
+    sprite->SetMaterialHandle(math2);
+    world->AddSprite(sprite);
+    sprite = engine->CreateZWallSprite(csVector3(16,my,5), 1.0, 1.0);
+    sprite->SetMaterialHandle(math2);
+    world->AddSprite(sprite);
+  }
 
-  bool res = grid->GroundHitBeam(csVector3(10,1,5), csVector3(15,-2,8));
-  printf("Hitbeam gave %d\n", (int)res);
-  res = grid->GroundHitBeam(csVector3(10,1,5), csVector3(20,0,10));
-  printf("Hitbeam gave %d\n", (int)res);
+  //bool res = grid->GroundHitBeam(csVector3(10,1,5), csVector3(15,-2,8));
+  //printf("Hitbeam gave %d\n", (int)res);
+  //res = grid->GroundHitBeam(csVector3(10,1,5), csVector3(20,0,10));
+  //printf("Hitbeam gave %d\n", (int)res);
 
   txtmgr->PrepareTextures ();
   txtmgr->PrepareMaterials ();
@@ -247,7 +261,7 @@ void IsoTest::NextFrame ()
   {
     player->MovePosition(playermotion);
     view->MoveScroll(playermotion); 
-    light->SetPosition(player->GetPosition()+csVector3(0,1,0));
+    light->SetPosition(player->GetPosition()+csVector3(0,5,0));
   }
 
   // Tell 3D driver we're going to display 3D things.

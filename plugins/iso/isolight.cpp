@@ -255,11 +255,11 @@ float csIsoLight::MaxRadius() const
       return radius;
       break;
     case CSISO_ATTN_INVERSE:
-      return 999999.0;
+      return radius*100.;
       break;
     case CSISO_ATTN_REALISTIC:
     default:
-      return 999999.0;
+      return radius*10.;
       break;
   };
 }

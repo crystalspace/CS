@@ -120,6 +120,29 @@ iIsoSprite* csIsoEngine::CreateFrontSprite(const csVector3& pos, float w,
   return spr;
 }
 
+iIsoSprite* csIsoEngine::CreateZWallSprite(const csVector3& pos, float w,
+  float h)
+{
+  iIsoSprite *spr = new csIsoSprite(this);
+  spr->AddVertex(csVector3(0, 0, 0), 0, 0);
+  spr->AddVertex(csVector3(0, h, 0), 1, 0);
+  spr->AddVertex(csVector3(0, h, w), 1, 1);
+  spr->AddVertex(csVector3(0, 0, w), 0, 1);
+  spr->SetPosition(pos);
+  return spr;
+}
+
+iIsoSprite* csIsoEngine::CreateXWallSprite(const csVector3& pos, float w,
+  float h)
+{
+  iIsoSprite *spr = new csIsoSprite(this);
+  spr->AddVertex(csVector3(0, 0, 0), 0, 0);
+  spr->AddVertex(csVector3(0, h, 0), 1, 0);
+  spr->AddVertex(csVector3(w, h, 0), 1, 1);
+  spr->AddVertex(csVector3(w, 0, 0), 0, 1);
+  spr->SetPosition(pos);
+  return spr;
+}
 
 iIsoLight* csIsoEngine::CreateLight()
 {

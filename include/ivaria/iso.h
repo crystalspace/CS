@@ -74,6 +74,12 @@ struct iIsoEngine : public iPlugIn
   /// (convenience) create new front-facing sprite (for objects).
   virtual iIsoSprite* CreateFrontSprite(const csVector3& pos, float w, 
     float h) = 0;
+  /// (convenience) create new wall along z sprite (along x in grids).
+  virtual iIsoSprite* CreateZWallSprite(const csVector3& pos, float w, 
+    float h) = 0;
+  /// (convenience) create new wall along x sprite (along y in grids).
+  virtual iIsoSprite* CreateXWallSprite(const csVector3& pos, float w, 
+    float h) = 0;
 };
 
 

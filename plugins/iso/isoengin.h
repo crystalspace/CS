@@ -68,6 +68,11 @@ public:
     float h);
   virtual iIsoSprite* CreateFrontSprite(const csVector3& pos, float w, 
     float h);
+  virtual iIsoSprite* CreateZWallSprite(const csVector3& pos, float w,
+    float h);
+  virtual iIsoSprite* CreateXWallSprite(const csVector3& pos, float w,
+    float h);
+
 
 };
 
