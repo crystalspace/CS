@@ -38,9 +38,9 @@
 /**
  * Base implementation of a generic event handler.
  * \par
- * This class provides a base object which does absolutely nothting with the
+ * This class provides a base object which does absolutely nothing with the
  * events that are sent to it. In order to properly use, you must derive a
- * class from this one and override the specific \c On... trigger methods you
+ * class from this one and override the specific \c OnFoo() trigger methods you
  * are interested in processing.
  * \remarks
  * Although this class is derived from iEventHandler, you should not attempt
@@ -92,7 +92,7 @@ public:
    * the bitwise "or" operator (`|').
    * \see iEventQueue::RegisterListener()
    */
-  bool RegisterQueue (iEventQueue* queue, unsigned int trigger = -1);
+  bool RegisterQueue (iEventQueue* queue, unsigned int trigger = UINT_MAX);
 
 private:
   // This contains an array of trigger functions which are used to dispatch

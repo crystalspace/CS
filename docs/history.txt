@@ -12,6 +12,10 @@ chronological order.
 	  considerably optimized the bit-logic in it. This gains us a few
 	  fps in general. More optimizations to Dynavis will hopefully
 	  follow soon...
+	- Eric Sunshine upgraded csConfigManager to use csRef<> instead of
+	  managing reference counts manually.  Also upgraded and clarified
+	  Doxygen comments.
+	- Eric Sunshine fixed some minor problems in csbaseeventh.h.
 27-Oct-2003
 	- res fixed a few warnings occuring with GCC.
 	- res fixed cssaver plugin so it compiles with NR.

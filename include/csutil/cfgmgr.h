@@ -24,9 +24,9 @@
 #include "csutil/array.h"
 
 /**
- * A configuration manager makes a number of individual configuration files
- * appear to be a single configuration object.  See the description of the SCF
- * interface iConfigManager for full details.
+ * A configuration manager makes a number of individual iConfigFile objects
+ * appear to be a single configuration object.  See the description of the
+ * iConfigManager interface for full details.
  */
 class csConfigManager : public iConfigManager
 {
@@ -35,53 +35,89 @@ public:
 
   /**
    * Create a new config manager object. If 'Optimize' is set to 'true', then
-   * the config manager will enable some optimizations, which you may or may
-   * not want: <ul>
-   * <li> When a config file is added via Add(name, vfs), the config manager
-   * first looks through all registered config files. If a file with the same
-   * name and vfs pointer are found, it is added a second time, so the file is
-   * not loaded twice.
-   * <li> When a config file is removed, the config manager keeps a reference
-   * to it until Flush() is called. If you add the file again in the meantime
-   * with Add(name, vfs), this reference is used instead.
+   * the configuration manager will enable some optimizations, which you may or
+   * may not want:
+   * <ul>
+   * <li> When an iConfigFile is added via AddDomain(name, vfs), the
+   *      configuration manager first looks through all registered iConfigFile
+   *      objects. If an object with the same * name and VFS pointer are found,
+   *      it is added a second time, so the file is * not loaded twice.
+   * <li> When an iConfigFile is removed, the configuration manager keeps a
+   *      reference * to it until Flush() is called. If you add the iConfigFile
+   *      again in the meantime * with AddDomain(name, vfs), this reference is
+   *      used instead.
    * </ul>
    */
   csConfigManager(iConfigFile *DynamicDomain, bool Optimize);
-  /// Delete this config manager.
+  /// Destroy configuration manager.
   virtual ~csConfigManager();
 
-  /// add a configuration domain
+  /**
+   * Add a configuration domain.  The configuration manager invokes IncRef()
+   * upon the incoming iConfigFile.
+   */
   virtual void AddDomain(iConfigFile*, int priority);
-  /// add a configuration domain
-  virtual iConfigFile *AddDomain(char const* path, iVFS*, int priority);
-  /// remove a configuration domain
+  /**
+   * Add a configuration domain by loading it from a file.  The new iConfigFile
+   * object which represents the loaded file is also returned.  If you want to
+   * hold onto the iConfigFile even after it is removed from this object or
+   * after the configuration manager is destroyed, be sure to invoke IncRef()
+   * or assign it to a csRef<>.  The incoming iVFS* may be null, in which case
+   * the path is assumed to point at a file in the pyhysical filesystem, rather
+   * than at a file in the virtual filesystem.
+   */
+  virtual iConfigFile* AddDomain(char const* path, iVFS*, int priority);
+  /**
+   * Remove a configuration domain.  If registered, the configuration manager
+   * will relinquish its reference to the domain by invoking DecRef() on it to
+   * balance the IncRef() it performed when the domain was added.  If the
+   * domain is not registered, the RemoveDomain() request is ignored.  It is
+   * not legal to remove the dynamic domain.
+   */
   virtual void RemoveDomain(iConfigFile*);
-  /// remove a configuration domain
+  /// Remove a configuration domain.
   virtual void RemoveDomain(char const* path);
-  /// return a pointer to a single config domain
+  /**
+   * Find the iConfigFile object for a registered domain.  Returns null if the
+   * domain is not registered.
+   */
   virtual iConfigFile* LookupDomain(char const* path) const;
-  /// set the priority of a config domain
+  /// Set the priority of a configuration domain.
   virtual void SetDomainPriority(char const* path, int priority);
-  /// set the priority of a config domain
+  /**
+   * Set the priority of a registered configuration domain.  If the domain is
+   * not registered, the request is ignored.
+   */
   virtual void SetDomainPriority(iConfigFile*, int priority);
-  /// return the priority of a config domain
+  /**
+   * Return the priority of a configuration domain.  If the domain is not
+   * registered, PriorityMedium is returned.
+   */
   virtual int GetDomainPriority(char const* path) const;
-  /// return the priority of a config domain
+  /**
+   * Return the priority of a configuration domain.  If the domain is not
+   * registered, PriorityMedium is returned.
+   */
   virtual int GetDomainPriority(iConfigFile*) const;
 
   /**
-   * Change the dynamic domain. The given config object must already be
-   * registered with AddDomain(). Returns false if this is not the case.
+   * Change the dynamic domain.  The domain must already have been registered
+   * with AddDomain() before calling this method.  If the domain is not
+   * registered, then false is returned.
    */
   virtual bool SetDynamicDomain(iConfigFile*);
-  /// return a pointer to the dynamic config domain
+  /** 
+   * Return a pointer to the dynamic configuration domain.  The returned
+   * pointer will remain valid as long as the domain is registered with the
+   * configuration manager.
+   */
   virtual iConfigFile *GetDynamicDomain() const;
-  /// set the priority of the dynamic config domain
+  /// Set the priority of the dynamic configuration domain.
   virtual void SetDynamicDomainPriority(int priority);
-  /// return the priority of the dynamic config domain
+  /// Return the priority of the dynamic configuration domain.
   virtual int GetDynamicDomainPriority() const;
 
-  /// flush all removed config files (only required in optimize mode)
+  /// flush all removed configuration files (only required in optimize mode)
   virtual void FlushRemoved();
 
   /**
@@ -97,8 +133,10 @@ public:
   virtual iVFS* GetVFS () const;
 
   /**
-   * Set config file name. You can use this if you want Save()
-   * to write to another file. This will set the dirty flag.
+   * Set config file name. You can use this if you want Save() to write to
+   * another file. The incoming iVFS can be null, in which case the filename
+   * represents a file in the physical fileysstem. This will set the dirty
+   * flag.
    */
   virtual void SetFileName (const char*, iVFS*);
 
@@ -123,13 +161,13 @@ public:
 
   /**
    * Save configuration to the same place from which it was loaded.  Returns
-   * true if the save operation succeeded.
+   * true if the save operation succeeded, else false.
    */
   virtual bool Save ();
 
   /**
    * Save configuration into the given file (on VFS or on the physical
-   * filesystem).  If the second parameter is skipped, the file will be written
+   * filesystem).  If the iVFS parameter is null, the file will be written
    * to the physical filesystem, otherwise it is stored on given VFS
    * filesystem.  This method does not change the internally stored file name.
    */
@@ -138,9 +176,7 @@ public:
   /// Delete all options and rewind all iterators.
   virtual void Clear ();
 
-  /**
-   * FlushRemoved() and delete all domains.
-   */
+  /// FlushRemoved() and delete all domains.
   void CleanUp ();
 
   /**

@@ -27,7 +27,7 @@
 class csConfigDomain
 {
 public:
-  iConfigFile *Cfg;
+  csRef<iConfigFile> Cfg;
   int Pri;
   csConfigDomain *Prev, *Next;
 
@@ -36,11 +36,12 @@ public:
     Next = Where->Next;
     Prev = Where;
     Where->Next = this;
-    if (Next) Next->Prev = this;
+    if (Next != 0)
+      Next->Prev = this;
   }
   void InsertPriority(csConfigDomain *Where)
   {
-    if (!Where->Next)
+    if (Where->Next == 0)
       InsertAfter(Where);
     else if (Pri < Where->Next->Pri)
       InsertAfter(Where);
@@ -49,21 +50,21 @@ public:
   }
   void Remove()
   {
-    if (Next) Next->Prev = Prev;
-    if (Prev) Prev->Next = Next;
+    if (Next != 0)
+      Next->Prev = Prev;
+    if (Prev != 0)
+      Prev->Next = Next;
     Prev = Next = 0;
   }
   csConfigDomain(iConfigFile *c, int p)
   {
     Cfg = c;
-    if (Cfg) Cfg->IncRef();
     Pri = p;
     Prev = Next = 0;
   }
   ~csConfigDomain()
   {
     Remove();
-    if (Cfg) Cfg->DecRef();
   }
 };
 
@@ -75,7 +76,7 @@ public:
 class csConfigManagerIterator : public iConfigIterator
 {
 private:
-  csConfigManager *Config;
+  csRef<csConfigManager> Config;
   csConfigDomain *CurrentDomain;
   csRef<iConfigIterator> CurrentIterator;
   char *Subsection;
@@ -115,14 +116,12 @@ public:
   {
     SCF_CONSTRUCT_IBASE(0);
     Config = cfg;
-    Config->IncRef();
     CurrentDomain = Config->LastDomain;
     Subsection = csStrNew(sub);
   }
   virtual ~csConfigManagerIterator()
   {
     Config->RemoveIterator(this);
-    Config->DecRef();
     delete[] Subsection;
     ClearIterated();
   }
@@ -157,9 +156,11 @@ public:
       }
     }
     // move to next domain (which actually means previous domain!)
-    if (CurrentDomain->Prev == 0) return false;
+    if (CurrentDomain->Prev == 0)
+      return false;
     CurrentDomain = CurrentDomain->Prev;
-    if (CurrentDomain->Cfg == 0) return false;
+    if (CurrentDomain->Cfg == 0)
+      return false;
     CurrentIterator = CurrentDomain->Cfg->Enumerate(Subsection);
     return Next();
   }
@@ -214,10 +215,9 @@ csConfigManager::csConfigManager(iConfigFile *dyn, bool opt)
 csConfigManager::~csConfigManager()
 {
   // save our config.
-  if (!Save()) {
-    printf("Couldn't save config to '%s'.\n",
+  if (!Save())
+    printf("Error saving configuration '%s'.\n",
 	    DynamicDomain->Cfg->GetFileName());
-  }
   CleanUp ();
 }
 
@@ -245,7 +245,8 @@ void csConfigManager::AddDomain(iConfigFile *Config, int Priority)
   }
 }
 
-iConfigFile *csConfigManager::AddDomain(char const* path, iVFS* vfs, int priority)
+iConfigFile* csConfigManager::AddDomain(
+  char const* path, iVFS* vfs, int priority)
 {
   if (Optimize)
   {
@@ -259,45 +260,43 @@ iConfigFile *csConfigManager::AddDomain(char const* path, iVFS* vfs, int priorit
     int n = FindRemoved(path);
     if (n != -1)
     {
-      iConfigFile *cfg = Removed[n];
+      iConfigFile* cfg = Removed[n];
       AddDomain(cfg, priority);
       FlushRemoved(n);
       return cfg;
     }
   }
 
-  iConfigFile *cfg = new csConfigFile(path, vfs);
+  csRef<iConfigFile> cfg = csPtr<iConfigFile>(new csConfigFile(path, vfs));
   AddDomain(cfg, priority);
-  cfg->DecRef();
-  return cfg;
+  return cfg; // Safe since we still hold a reference.
 }
 
 void csConfigManager::RemoveDomain(iConfigFile *cfg)
 {
   // prevent removal of dynamic domain
-  if (cfg == DynamicDomain->Cfg) return;
+  if (cfg == 0 || cfg == DynamicDomain->Cfg)
+    return;
   csConfigDomain *d = FindConfig(cfg);
-  if (d) RemoveDomain(d);
+  if (d != 0)
+    RemoveDomain(d);
 }
 
 void csConfigManager::RemoveDomain(char const *path)
 {
-  csConfigDomain *d = FindConfig(path);
-  // prevent removal of dynamic domain
-  if (d == 0 || d == DynamicDomain) return;
-  RemoveDomain(d);
+  RemoveDomain(FindConfig(path));
 }
 
 iConfigFile* csConfigManager::LookupDomain(char const *path) const
 {
   csConfigDomain *d = FindConfig(path);
-  return d ? d->Cfg : 0;
+  return d != 0 ? d->Cfg : 0;
 }
 
 void csConfigManager::SetDomainPriority(char const* path, int priority)
 {
   csConfigDomain *d = FindConfig(path);
-  if (d)
+  if (d != 0)
   {
     d->Pri = priority;
     d->Remove();
@@ -308,7 +307,7 @@ void csConfigManager::SetDomainPriority(char const* path, int priority)
 void csConfigManager::SetDomainPriority(iConfigFile *cfg, int priority)
 {
   csConfigDomain *d = FindConfig(cfg);
-  if (d)
+  if (d != 0)
   {
     d->Pri = priority;
     d->Remove();
@@ -319,19 +318,20 @@ void csConfigManager::SetDomainPriority(iConfigFile *cfg, int priority)
 int csConfigManager::GetDomainPriority(char const *path) const
 {
   csConfigDomain *d = FindConfig(path);
-  return d ? d->Pri : (int)PriorityMedium;
+  return d != 0 ? d->Pri : (int)PriorityMedium;
 }
 
 int csConfigManager::GetDomainPriority(iConfigFile *cfg) const
 {
   csConfigDomain *d = FindConfig(cfg);
-  return d ? d->Pri : (int)PriorityMedium;
+  return d != 0 ? d->Pri : (int)PriorityMedium;
 }
 
 bool csConfigManager::SetDynamicDomain(iConfigFile *cfg)
 {
   csConfigDomain *d = FindConfig(cfg);
-  if (!d) return false;
+  if (!d)
+    return false;
   DynamicDomain = d;
   return true;
 }
@@ -387,7 +387,8 @@ bool csConfigManager::Save (const char *iFileName, iVFS *vfs)
 void csConfigManager::Clear()
 {
   for (csConfigDomain *d=DynamicDomain; d!=0; d=d->Next)
-    if (d->Cfg) d->Cfg->Clear();
+    if (d->Cfg)
+      d->Cfg->Clear();
 }
 
 csPtr<iConfigIterator> csConfigManager::Enumerate(const char *Subsection)
@@ -400,14 +401,16 @@ csPtr<iConfigIterator> csConfigManager::Enumerate(const char *Subsection)
 bool csConfigManager::KeyExists(const char *Key) const
 {
   for (csConfigDomain *d=LastDomain; d!=0; d=d->Prev)
-    if (d->Cfg && d->Cfg->KeyExists(Key)) return true;
+    if (d->Cfg && d->Cfg->KeyExists(Key))
+      return true;
   return false;
 }
 
 bool csConfigManager::SubsectionExists(const char *Subsection) const
 {
   for (csConfigDomain *d=LastDomain; d!=0; d=d->Prev)
-    if (d->Cfg && d->Cfg->SubsectionExists(Subsection)) return true;
+    if (d->Cfg && d->Cfg->SubsectionExists(Subsection))
+      return true;
   return false;
 }
 
@@ -447,7 +450,8 @@ const char *csConfigManager::GetComment(const char *Key) const
 {
   for (csConfigDomain *d=LastDomain; d!=0; d=d->Prev) {
     const char *c = d->Cfg ? d->Cfg->GetComment(Key) : 0;
-    if (c) return c;
+    if (c != 0)
+      return c;
   }
   return 0;
 }
@@ -480,7 +484,8 @@ bool csConfigManager::SetComment (const char *Key, const char *Text)
 {
   if (!DynamicDomain->Cfg->SetComment(Key, Text)) return false;
   for (csConfigDomain *d=DynamicDomain->Next; d!=0; d=d->Next)
-    if (d->Cfg) d->Cfg->SetComment(Key, 0);
+    if (d->Cfg)
+      d->Cfg->SetComment(Key, 0);
   return true;
 }
 
@@ -494,7 +499,8 @@ const char *csConfigManager::GetEOFComment() const
 {
   for (csConfigDomain *d=LastDomain; d!=0; d=d->Prev) {
     const char *c = d->Cfg ? d->Cfg->GetEOFComment() : 0;
-    if (c) return c;
+    if (c != 0)
+      return c;
   }
   return 0;
 }
@@ -503,20 +509,24 @@ void csConfigManager::SetEOFComment(const char *Text)
 {
   DynamicDomain->Cfg->SetEOFComment(Text);
   for (csConfigDomain *d=DynamicDomain->Next; d!=0; d=d->Next)
-    if (d->Cfg) d->Cfg->SetEOFComment(0);
+    if (d->Cfg)
+      d->Cfg->SetEOFComment(0);
 }
 
 void csConfigManager::ClearKeyAboveDynamic(const char *Key)
 {
   for (csConfigDomain *d=DynamicDomain->Next; d!=0; d=d->Next)
-    if (d->Cfg) d->Cfg->DeleteKey(Key);
+    if (d->Cfg)
+      d->Cfg->DeleteKey(Key);
 }
 
 csConfigDomain *csConfigManager::FindConfig(iConfigFile *cfg) const
 {
-  if (!cfg) return 0;
+  if (!cfg)
+    return 0;
   for (csConfigDomain *d=FirstDomain; d!=0; d=d->Next)
-    if (d->Cfg == cfg) return d;
+    if (d->Cfg == cfg)
+      return d;
   return 0;
 }
 
