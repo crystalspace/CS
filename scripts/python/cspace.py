@@ -3999,6 +3999,29 @@ _cspace.iEngine_swigregister(iEnginePtr)
 
 iEngine_scfGetVersion = _cspace.iEngine_scfGetVersion
 
+class iCameraSectorListener(iBase):
+    __swig_setmethods__ = {}
+    for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
+    __setattr__ = lambda self, name, value: _swig_setattr(self, iCameraSectorListener, name, value)
+    __swig_getmethods__ = {}
+    for _s in [iBase]: __swig_getmethods__.update(_s.__swig_getmethods__)
+    __getattr__ = lambda self, name: _swig_getattr(self, iCameraSectorListener, name)
+    def __init__(self): raise RuntimeError, "No constructor defined"
+    def __repr__(self):
+        return "<C iCameraSectorListener instance at %s>" % (self.this,)
+    def NewSector(*args): return _cspace.iCameraSectorListener_NewSector(*args)
+    def __del__(self, destroy=_cspace.delete_iCameraSectorListener):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+class iCameraSectorListenerPtr(iCameraSectorListener):
+    def __init__(self, this):
+        _swig_setattr(self, iCameraSectorListener, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, iCameraSectorListener, 'thisown', 0)
+        _swig_setattr(self, iCameraSectorListener,self.__class__,iCameraSectorListener)
+_cspace.iCameraSectorListener_swigregister(iCameraSectorListenerPtr)
+
 class iCamera(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -4036,6 +4059,8 @@ class iCamera(iBase):
     def InvPerspective(*args): return _cspace.iCamera_InvPerspective(*args)
     def OnlyPortals(*args): return _cspace.iCamera_OnlyPortals(*args)
     def GetOnlyPortals(*args): return _cspace.iCamera_GetOnlyPortals(*args)
+    def AddCameraSectorListener(*args): return _cspace.iCamera_AddCameraSectorListener(*args)
+    def RemoveCameraSectorListener(*args): return _cspace.iCamera_RemoveCameraSectorListener(*args)
     def __del__(self, destroy=_cspace.delete_iCamera):
         try:
             if self.thisown: destroy(self)
