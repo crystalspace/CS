@@ -14,6 +14,7 @@ The history order is reversed so that new features are at the top.
 	  the CAMERA option set.
 	- Fixed a bad bug in the isotest maze generator. However the way
 	  the maze is used now it will not cause harm since width==height.
+	- Fixed another related bug in isotest maze generator.
 11-Jul-2001
 	- Removed csLight::CorrectForNoColor() since it is obsolete.
 	- Added a virtual destructor to mdldata.h.

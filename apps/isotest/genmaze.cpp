@@ -37,7 +37,7 @@ csGenMaze::~csGenMaze()
 void csGenMaze::InitMaze()
 {
   for(int y=0; y<height; y++)
-    for(int x=0; x<height; x++)
+    for(int x=0; x<width; x++)
     {
       GetNode(x,y).visited = false;
       for(int i=0; i<4; i++)
