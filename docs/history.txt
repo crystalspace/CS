@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-May-2004
+	- Eric Sunshine changed pubapi.dox so that it no longer excludes
+	  $(TOP)/include/csutil/win32 and csutil/unix.  In the past, these were
+	  excluded because Doxygen complained about finding multiple
+	  declarations of SysSytemDriver (one per platform); however
+	  SysSytemDriver was finally eradicated on 23-Jul-2003, so it is no
+	  longer necessary to make this exlusion.  Furthermore, these
+	  directories may contain useful classes which the user might wish to
+	  use (such as csWin32RegistryConfig).
 1-May-2004
 	- Jorrit added a new data/terrainf/world which is a variant of
 	  data/terrain/world that uses the fixed shaders. Keep in mind that you
