@@ -498,7 +498,7 @@ considered them 1-based.  It now uniformly treats joystick numbers as
 1-based. This is consistent with button numbers for joysticks and mice, which
 are also 1-based.
 
-@subheading iGraphics2D Alpha Color Support
+@subheading @code{iGraphics2D} Alpha Color Support
 
 @samp{iGraphics2D} now supports an alpha channel. @code{iGraphics2D::FindRGB()}
 accepts an optional alpha value (0 being completely transparent, and
@@ -514,5 +514,61 @@ but an alpha component of 0.
 
 The @file{csutil/garray.h} file, containing the class 
 @code{csDirtyAccessArray<>}, has been deprecated in favor of the more sensible
-file name @file{csutil/dirtyaccessarray.h}. Functional changes have not been
-made.
+file name @file{csutil/dirtyaccessarray.h}. No functional changes have been
+made to the class.
+
+@subheading @code{csList<>::Iterator} Normalization
+
+The behavior of @code{csList<>::Iterator} has been normalized so that it
+functions identically to all other iterators in Crystal Space.  In the past, a
+newly created @code{csList<>::Iterator} already pointed at the first element in
+the container.  This differed from all other iterator implementations, in which
+the first element, like all other elements, is accessed by an invocation of
+@code{Next()}.
+
+Old code which accessed the elements of a @code{csList<>::Iterator} required a
+non-standard idiom, such as:
+
+@example
+csList<sometype> list = @dots{};
+csList<sometype>::Iterator it(list);
+if (it.HasCurrent()) @{
+  do_something(*it);         // First value.
+  while (it.HasNext()) @{
+    do_something(it.Next()); // Remaining values.
+  @}
+@}
+@end example
+
+@noindent
+Or, the slightly less complicated, though still somewhat convoluted:
+
+@example
+csList<sometype>::Iterator it(list);
+while (it.HasCurrent()) @{
+  do_something(*it);
+  it.Next();
+@}
+@end example
+
+Following normalization, @code{csList<>::Iterator} now works like all other
+iterators throughout the toolkit.  In particular, for forward iteration, all
+elements can be accessed via the standard @code{HasNext()} / @code{Next()}
+idiom:
+
+@example
+csList<sometype>::Iterator it(list);
+while (it.HasNext()) @{
+  do_something(it.Next());
+@}
+@end example
+
+@noindent
+Likewise, for backward iteration, the @code{HasPrevious()} / @code{Previous()}
+idiom works in the obvious and expected inverse fashion.
+
+Finally, @code{csList<>::Iterator::Next()} and @code{Previous()} now return
+references to contained elements, rather than pointers.  This makes the
+interface of @code{csList<>::Iterator} internally consistent, as well as
+consistent with all other iterators throughout the toolkit, in which these
+methods return references.
