@@ -1,4 +1,4 @@
-BUILDDIR=$(HOME)/debian/crystal
+BUILDDIR=$(HOME)/local/debian/crystal
 DATE=$(shell date '+%Y%m%d')
 VERSION=0.96
 TAG=R0_96_001
