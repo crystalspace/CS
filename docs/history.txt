@@ -25,6 +25,12 @@ chronological order.
 	  system that I tested with this improves performance from 10
 	  to 40 fps! The explo particle systems seems broken though.
 	  I have to investigate that.
+	- Eric Sunshine generalized the Python SDK check from configure.ac and
+	  moved it to the project-agnostic mk/autoconf/checkpython.m4 under the
+	  name CS_CHECK_PYTHON(). There is also a convenience macro,
+	  CS_EMIT_CHECK_PYTHON(), which emits the build properties expected by
+	  the Jam system. These macros are now suitable for use by external
+	  projects.
 13-May-2004
 	- Eric Sunshine generalized the CS_EMIT_PACKAGEINFO() macro in
 	  packageinfo.m4 so that it can work with any suitable emitter macro,
