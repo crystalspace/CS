@@ -323,7 +323,7 @@ void csMeshWrapper::RemoveMeshFromStaticLOD (iMeshWrapper* mesh)
 {
   if (!static_lod) return;	// No static lod, nothing to do here.
   int lod;
-  for (lod = 0 ; lod < CS_STATIC_LOD_LEVELS ; lod++)
+  for (lod = 0 ; lod < static_lod->GetLODCount () ; lod++)
   {
     csArray<iMeshWrapper*>& meshes_for_lod = static_lod->GetMeshesForLOD (lod);
     meshes_for_lod.Delete (mesh);
@@ -348,7 +348,7 @@ void csMeshWrapper::DrawInt (iRenderView *rview)
   DrawIntFull (rview);
 }
 
-bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
+float csMeshWrapper::GetSquaredDistance (iRenderView *rview)
 {
   iCamera* camera = rview->GetCamera ();
   // calculate distance from camera to mesh
@@ -362,8 +362,13 @@ bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
     wor_center = movable.GetFullTransform ().This2Other (obj_center);
   csVector3 cam_origin = camera->GetTransform ().GetOrigin ();
   float wor_sq_dist = csSquaredDist::PointPoint (cam_origin, wor_center);
-  float dist = min_imposter_distance->Get ();
+  return wor_sq_dist;
+}
 
+bool csMeshWrapper::CheckImposterRelevant (iRenderView *rview)
+{
+  float wor_sq_dist = GetSquaredDistance (rview);
+  float dist = min_imposter_distance->Get ();
   return (wor_sq_dist > dist*dist);
 }
 
@@ -423,10 +428,25 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview)
     meshobj->Draw (rview, &movable.scfiMovable, zbufMode);
   }
 
-  for (i = 0; i < children.GetCount (); i++)
+  if (static_lod)
   {
-    iMeshWrapper *spr = children.Get (i);
-    spr->Draw (rview);
+    // If we have static lod we only draw the children for the right LOD level.
+    float distance = qsqrt (GetSquaredDistance (rview));
+    float lod = static_lod->GetLODValue (distance);
+    printf ("distance=%g lod=%g\n", distance, lod); fflush (stdout);
+    csArray<iMeshWrapper*>& meshes = static_lod->GetMeshesForLOD (lod);
+    for (i = 0 ; i < meshes.Length () ; i++)
+    {
+      meshes[i]->Draw (rview);
+    }
+  }
+  else
+  {
+    for (i = 0; i < children.GetCount (); i++)
+    {
+      iMeshWrapper *spr = children.Get (i);
+      spr->Draw (rview);
+    }
   }
 }
 
@@ -436,8 +456,8 @@ bool csMeshWrapper::DrawImposter (iRenderView *rview)
   if (!imposter_mesh)
   {
       return false;
-
   }
+
   // Check for imposter already ready
   if (!imposter_mesh->GetImposterReady())
       return false;
@@ -935,7 +955,9 @@ void csMeshMeshList::FreeItem (iMeshWrapper* item)
 
   item->SetParentContainer (0);
   item->GetMovable ()->SetParent (0);
+
   mesh->RemoveMeshFromStaticLOD (item);
+
   csMeshList::FreeItem (item);
 }
 

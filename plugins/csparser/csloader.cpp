@@ -669,7 +669,7 @@ csPtr<iMeshWrapper> csLoader::LoadMeshObject (const char* fname)
     }
     mesh = Engine->CreateMeshWrapper (
     	meshobjnode->GetAttributeValue ("name"));
-    if (LoadMeshObject (ldr_context, mesh, meshobjnode))
+    if (LoadMeshObject (ldr_context, mesh, 0, meshobjnode))
     {
       AddToRegion (ldr_context, mesh->QueryObject ());
     }
@@ -836,6 +836,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("light", XMLTOKEN_LIGHT);
   xmltokens.Register ("lightmapcellsize", XMLTOKEN_LIGHTMAPCELLSIZE);
   xmltokens.Register ("lod", XMLTOKEN_LOD);
+  xmltokens.Register ("lodlevel", XMLTOKEN_LODLEVEL);
   xmltokens.Register ("material", XMLTOKEN_MATERIAL);
   xmltokens.Register ("materials", XMLTOKEN_MATERIALS);
   xmltokens.Register ("matrix", XMLTOKEN_MATRIX);
@@ -851,6 +852,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("node", XMLTOKEN_NODE);
   xmltokens.Register ("nolighting", XMLTOKEN_NOLIGHTING);
   xmltokens.Register ("noshadows", XMLTOKEN_NOSHADOWS);
+  xmltokens.Register ("nullmesh", XMLTOKEN_NULLMESH);
   xmltokens.Register ("params", XMLTOKEN_PARAMS);
   xmltokens.Register ("paramsfile", XMLTOKEN_PARAMSFILE);
   xmltokens.Register ("plugin", XMLTOKEN_PLUGIN);
@@ -896,6 +898,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("size", XMLTOKEN_SIZE);
   xmltokens.Register ("slope", XMLTOKEN_SLOPE);
   xmltokens.Register ("solid", XMLTOKEN_SOLID);
+  xmltokens.Register ("staticlod", XMLTOKEN_STATICLOD);
   xmltokens.Register ("value", XMLTOKEN_VALUE);
 
   xmltokens.Register ("alphamodifier1", XMLTOKEN_ALPHAMODIFIER1);
@@ -1201,7 +1204,7 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node)
           {
 	    csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (
 			    child->GetAttributeValue ("name"));
-            if (!LoadMeshObject (ldr_context, mesh, child))
+            if (!LoadMeshObject (ldr_context, mesh, 0, child))
 	    {
 	      // Error is already reported.
 	      return false;
@@ -1894,12 +1897,52 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 }
 
 bool csLoader::HandleMeshParameter (iLoaderContext* ldr_context,
-	iMeshWrapper* mesh, iDocumentNode* child,
+	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* child,
 	csStringID id, bool& handled, const char*& priority)
 {
   handled = true;
   switch (id)
   {
+    case XMLTOKEN_STATICLOD:
+      {
+        if (!mesh)
+	{
+	  SyntaxService->ReportError (
+	  	  "crystalspace.maploader.load.meshobject",
+	  	  child, "First specify the parent factory with 'factory'!");
+	  return false;
+	}
+	iLODControl* lodctrl = mesh->CreateStaticLOD ();
+	if (!LoadLodControl (lodctrl, child))
+	  return false;
+      }
+      break;
+    case XMLTOKEN_LODLEVEL:
+      {
+        if (!mesh)
+	{
+	  SyntaxService->ReportError (
+	  	  "crystalspace.maploader.load.meshobject",
+	  	  child, "First specify the parent factory with 'factory'!");
+	  return false;
+	}
+        if (!parent)
+	{
+	  SyntaxService->ReportError (
+	  	  "crystalspace.maploader.load.meshobject", child,
+		  "Mesh must be part of a hierarchical mesh for <lodlevel>!");
+	  return false;
+	}
+        if (!parent->GetStaticLOD ())
+	{
+	  SyntaxService->ReportError (
+	  	  "crystalspace.maploader.load.meshobject", child,
+		  "Parent mesh must use <staticlod>!");
+	  return false;
+	}
+	parent->AddMeshToStaticLOD (child->GetContentsValueAsInt (), mesh);
+      }
+      break;
     case XMLTOKEN_LOD:
       {
         if (!mesh)
@@ -2240,7 +2283,8 @@ iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iLoaderContext* ldr_context,
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     bool handled;
-    if (!HandleMeshParameter (ldr_context, mesh, child, id, handled, priority))
+    if (!HandleMeshParameter (ldr_context, mesh, 0, child, id,
+    	handled, priority))
       return 0;
     if (!handled) switch (id)
     {
@@ -2396,7 +2440,7 @@ bool csLoader::LoadPolyMeshInSector (iLoaderContext* ldr_context,
 }
 
 bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
-	iMeshWrapper* mesh, iDocumentNode* node)
+	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* node)
 {
   if (!Engine) return false;
 
@@ -2413,7 +2457,8 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
     const char* value = child->GetValue ();
     csStringID id = xmltokens.Request (value);
     bool handled;
-    if (!HandleMeshParameter (ldr_context, mesh, child, id, handled, priority))
+    if (!HandleMeshParameter (ldr_context, mesh, parent, child, id,
+    	handled, priority))
       return false;
     if (!handled) switch (id)
     {
@@ -2435,7 +2480,7 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
         {
 	  csRef<iMeshWrapper> sp = Engine->CreateMeshWrapper (
 			  child->GetAttributeValue ("name"));
-          if (!LoadMeshObject (ldr_context, sp, child))
+          if (!LoadMeshObject (ldr_context, sp, mesh, child))
 	  {
 	    // Error is already reported.
 	    return false;
@@ -2447,6 +2492,51 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
           mesh->GetChildren ()->Add (sp);
         }
+        break;
+
+      case XMLTOKEN_NULLMESH:
+        {
+	  if (plug)
+	  {
+            SyntaxService->ReportError (
+	        "crystalspace.maploader.load.plugin",
+                child, "Don't specify the plugin if you use <nullmesh>!");
+	    return false;
+	  }
+	  if (mesh->GetMeshObject ())
+	  {
+            SyntaxService->ReportError (
+	      "crystalspace.maploader.parse.mesh", child,
+	      "Please don't use <params> in combination with <nullmesh>!");
+	    return false;
+	  }
+	  csRef<iPluginManager> plugin_mgr =
+	  	CS_QUERY_REGISTRY (object_reg, iPluginManager);
+	  csRef<iMeshObjectType> type = CS_QUERY_PLUGIN_CLASS (
+		plugin_mgr, "crystalspace.mesh.object.nullmesh",
+		iMeshObjectType);
+	  if (!type)
+	    type = CS_LOAD_PLUGIN (plugin_mgr,
+	    	"crystalspace.mesh.object.nullmesh", iMeshObjectType);
+	  if (!type)
+	  {
+            SyntaxService->ReportError (
+	        "crystalspace.maploader.load.plugin",
+                child, "Could not find the nullmesh plugin!");
+	    return false;
+	  }
+	  csRef<iMeshObjectFactory> fact = type->NewFactory ();
+	  csRef<iMeshObject> mo = fact->NewInstance ();
+	  mesh->SetMeshObject (mo);
+	  mo->SetLogicalParent (mesh);
+	  csBox3 b;
+	  if (!SyntaxService->ParseBox (child, b))
+	    return false;
+	  csRef<iNullMeshState> nullmesh = SCF_QUERY_INTERFACE (
+		mo, iNullMeshState);
+	  if (nullmesh)
+	    nullmesh->SetBoundingBox (b);
+	}
         break;
 
       case XMLTOKEN_PARAMS:
@@ -3656,7 +3746,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	    return 0; // @@@ Leak
 	  }
 	  csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (meshname);
-          if (!LoadMeshObject (ldr_context, mesh, child))
+          if (!LoadMeshObject (ldr_context, mesh, 0, child))
 	  {
 	    // Error is already reported.
 	    return 0; // @@@ Leak
@@ -3698,7 +3788,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 		meshname, secname ? secname : "<noname>");
 	    return 0;
 	  }
-          if (!LoadMeshObject (ldr_context, mesh, child))
+          if (!LoadMeshObject (ldr_context, mesh, 0, child))
 	  {
 	    // Error is already reported.
 	    return 0;

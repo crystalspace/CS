@@ -125,7 +125,7 @@ bool csNullmeshMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 
 void csNullmeshMeshObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
 {
-  bbox.Set (-radius, -radius, -radius, radius, radius, radius);
+  bbox = box;
 }
 
 bool csNullmeshMeshObject::HitBeamOutline (const csVector3& /*start*/,

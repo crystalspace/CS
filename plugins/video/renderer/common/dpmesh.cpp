@@ -162,7 +162,7 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
   if (mesh.vertex_mode == G3DPolygonMesh::VM_WORLDSPACE)
   {
     for (i = 0 ; i < num_vertices ; i++)
-      (*tr_verts)[i] = o2c * f1[i];
+      tr_verts->Put (i, o2c * f1[i]);
     work_verts = tr_verts->GetArray();
   }
   else
@@ -176,12 +176,15 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
     if (work_verts[i].z >= SMALL_Z)
     {
       float iz = aspect / work_verts[i].z;
-      (*persp)[i].x = work_verts[i].x * iz + width2;
-      (*persp)[i].y = work_verts[i].y * iz + height2;
-      (*visible)[i] = true;
+      csVector2& p = persp->GetExtend (i);
+      p.x = work_verts[i].x * iz + width2;
+      p.y = work_verts[i].y * iz + height2;
+      visible->Put (i, true);
     }
     else
-      (*visible)[i] = false;
+    {
+      visible->Put (i, false);
+    }
   }
 
   csMatrix3 m_cam2tex;

@@ -9,6 +9,61 @@ chronological order.
 12-Aug-2003
 	- Jorrit fixed a compile error in the OpenGL Windows canvas after the
 	  changes from res yesterday.
+	- Jorrit fixed nullmesh so that the bounding box returned is actually
+	  the box given to it and not calculated from the radius.
+	- Jorrit fixed a bug in thing->GetPortalPolygon(). It would not
+	  call Prepare() with the result that you could get crashes if
+	  that function was called before the thing was ever rendered.
+	- Jorrit added csArray::GetExtend(). This is the same as Get() except
+	  that it will automatically grow the array if it is not big enough
+	  to get the item.
+	- Jorrit fixed a bug in the software renderer introduced yesterday. The
+	  problem was that the DrawTriangleMesh implementation uses Get() and
+	  assumed that the array would grow automatically.
+	- Jorrit fixed another equivalent bug in DrawPolygonMesh for the
+	  software renderer.
+	- Jorrit added the <nullmesh> keyword in the parser. This is a short-cut
+	  to create a null mesh. Use it like this:
+	    <nullmesh>
+	        <min x="12.8" y="-1" z="11" />
+		<max x="13.2" y="3" z="13" />
+	    </nullmesh>
+	  A null mesh is a mesh that is not visible. It is useful as a place
+	  holder in a hierarchical mesh.
+	- Jorrit completed implementation of static lod in the engine.
+	  To use this you basically create a hierarchical mesh object with
+	  the parent mesh using the null mesh (i.e. with 'nullmesh'). Here
+	  is a pseudo-example:
+		<meshobj name="lodobject">
+		  <nullmesh>
+		    <min x="12.8" y="-1" z="11" />
+		    <max x="13.2" y="3" z="13" />
+		  </nullmesh>
+		  <staticlod>
+		    <distance m="-.01" a=".7" />
+		  </staticlod>
+		  <meshobj name="lowdetail">
+		    <lodlevel>0</lodlevel>
+		    ...
+		  </meshobj>
+		  <meshobj name="mediumdetail">
+		    <lodlevel>1</lodlevel>
+		    ...
+		  </meshobj>
+		  <meshobj name="highdetail">
+		    <lodlevel>2</lodlevel>
+		    ...
+		  </meshobj>
+		</meshobj>
+	  One of the important new keywords is <staticlod> which you use in the
+	  parent mesh to indicate that this mesh is only going to render
+	  the children that are in the right lod level. The other new
+	  keyword is <lodlevel> which you use in the children to indicate
+	  to which lod level they go. You can place multiple objects in the
+	  same lod level. By doing that you can replace an entire forest
+	  of trees with a single object.
+	  The definition of the nullmesh is important. The bounding box
+	  should be larger then all objects that are inside it.
 11-Aug-2003
         - Philip Wyett changed #include "cal3d/cal3d" to
           #include <cal3d/cal3d.h> and dropped below other includes fixing

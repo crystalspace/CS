@@ -2523,6 +2523,7 @@ iPolygon3D *csThing::ThingState::GetPolygon (const char *name)
 
 iPolygon3D *csThing::ThingState::GetPortalPolygon (int idx) const
 {
+  scfParent->Prepare ();
   csPolygon3D *p = (scfParent->polygons.Get (
 		  scfParent->static_data->portal_polygons[idx]));
   return &(p->scfiPolygon3D);

@@ -228,6 +228,18 @@ public:
     return root[n];
   }
 
+  /**
+   * Get an item from the array. If the number of elements in this
+   * array is too small the array will be automatically extended.
+   */
+  T& GetExtend (int n)
+  {
+    CS_ASSERT (n >= 0);
+    if (n >= count)
+      SetLength (n+1);
+    return root[n];
+  }
+
   /// Get an element (non-const).
   T& operator [] (int n)
   {

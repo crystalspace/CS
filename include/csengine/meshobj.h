@@ -404,6 +404,11 @@ public:
 #endif
 
   /**
+   * Calculate the squared distance between the camera and the object.
+   */
+  float GetSquaredDistance (iRenderView *rview);
+
+  /**
    * Get the movable instance for this object.
    * It is very important to call GetMovable().UpdateMove()
    * after doing any kind of modification to this movable

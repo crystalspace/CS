@@ -27,6 +27,8 @@ SCF_IMPLEMENT_IBASE_END
 csStaticLODMesh::csStaticLODMesh ()
 {
   SCF_CONSTRUCT_IBASE (0);
+  lod_m = 0;
+  lod_a = 1;
 }
 
 csStaticLODMesh::~csStaticLODMesh ()
@@ -35,14 +37,19 @@ csStaticLODMesh::~csStaticLODMesh ()
 
 void csStaticLODMesh::SetLOD (float m, float a)
 {
+  lod_m = m;
+  lod_a = a;
 }
 
 void csStaticLODMesh::GetLOD (float& m, float& a) const
 {
+  m = lod_m;
+  a = lod_a;
 }
 
 int csStaticLODMesh::GetLODPolygonCount (float lod) const
 {
+  // @@@ Not implemented yet.
   return 0;
 }
 

@@ -101,11 +101,6 @@ class csFlags;
 #define CS_ENTITY_NOLIGHTING 32
 /** @} */
 
-/**
- * A mesh supports 10 static lod levels.
- */
-#define CS_STATIC_LOD_LEVELS 10
-
 SCF_VERSION (iMeshDrawCallback, 0, 0, 1);
 
 /**
@@ -126,7 +121,7 @@ struct iMeshDrawCallback : public iBase
 };
 
 
-SCF_VERSION (iMeshWrapper, 0, 6, 0);
+SCF_VERSION (iMeshWrapper, 0, 7, 0);
 
 /**
  * A mesh wrapper is an engine-level object that wraps around an actual
@@ -428,6 +423,18 @@ struct iMeshWrapper : public iBase
    * can control the static LOD of this object.
    */
   virtual iLODControl* GetStaticLOD () = 0;
+
+  /**
+   * Set a given child mesh at a specific lod level. Note that a mesh
+   * can be at several lod levels at once.
+   */
+  virtual void AddMeshToStaticLOD (int lod, iMeshWrapper* mesh) = 0;
+
+  /**
+   * Remove a child mesh from all lod levels. The mesh is not removed
+   * from the list of child meshes however.
+   */
+  virtual void RemoveMeshFromStaticLOD (iMeshWrapper* mesh) = 0;
 
 #ifdef CS_USE_NEW_RENDERER
   /**

@@ -147,6 +147,7 @@ enum
   XMLTOKEN_LIGHT,
   XMLTOKEN_LIGHTMAPCELLSIZE,
   XMLTOKEN_LOD,
+  XMLTOKEN_LODLEVEL,
   XMLTOKEN_MATERIAL,
   XMLTOKEN_MATERIALS,
   XMLTOKEN_MATRIX,
@@ -162,6 +163,7 @@ enum
   XMLTOKEN_NODE,
   XMLTOKEN_NOLIGHTING,
   XMLTOKEN_NOSHADOWS,
+  XMLTOKEN_NULLMESH,
   XMLTOKEN_PARAMS,
   XMLTOKEN_PARAMSFILE,
   XMLTOKEN_PLUGIN,
@@ -181,6 +183,7 @@ enum
   XMLTOKEN_SOUND,
   XMLTOKEN_SOUNDS,
   XMLTOKEN_START,
+  XMLTOKEN_STATICLOD,
   XMLTOKEN_T,
   XMLTOKEN_TEXTURE,
   XMLTOKEN_TEXTURES,
@@ -561,13 +564,15 @@ private:
    * Handle various common mesh object parameters.
    */
   bool HandleMeshParameter (iLoaderContext* ldr_context,
-  	iMeshWrapper* mesh, iDocumentNode* child,
+  	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* child,
 	csStringID id, bool& handled, const char*& priority);
   /**
    * Load the mesh object from the map file.
+   * The parent is not 0 if this mesh is going to be part of a hierarchical
+   * mesh.
    */
   bool LoadMeshObject (iLoaderContext* ldr_context,
-  	iMeshWrapper* mesh, iDocumentNode* node);
+  	iMeshWrapper* mesh, iMeshWrapper* parent, iDocumentNode* node);
   /**
    * Load the polymesh object from the map file.
    */

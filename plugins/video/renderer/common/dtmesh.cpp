@@ -414,7 +414,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
     if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
     {
       for (i = 0 ; i < num_vertices ; i++)
-        (*tr_verts)[i] = o2c * f1[i];
+        tr_verts->Put (i, o2c * f1[i]);
       work_verts = tr_verts->GetArray ();
     }
     else
@@ -428,10 +428,11 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
   {
     if (work_verts[i].z >= SMALL_Z)
     {
-      (*z_verts)[i] = 1. / work_verts[i].z;
+      z_verts->Put (i, 1. / work_verts[i].z);
       float iz = aspect * (*z_verts)[i];
-      (*persp)[i].x = work_verts[i].x * iz + width2;
-      (*persp)[i].y = work_verts[i].y * iz + height2;
+      csVector2& p = persp->GetExtend (i);
+      p.x = work_verts[i].x * iz + width2;
+      p.y = work_verts[i].y * iz + height2;
     }
   }
 
