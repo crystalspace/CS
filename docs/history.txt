@@ -1,10 +1,9 @@
 The history order is reversed so that new features are at the top.
 
 18-Oct-2001
-	- M Voase did the following
-	  - Shifted water and fire proctex down to the basement.
+	- Michael Voase shifted water and fire proctex down to the basement.
 	- Removed usage of cs_snprintf in cfgfile.cpp and
-	  plugldr.cpp because it causes linking errors.
+	  plugldr.cpp because it causes linking errors on Linux.
 	- csInitializer::SetupConfigManager() will now first check the
 	  registry for iVFS. If that fails it will trey CS_QUERY_PLUGIN.
 	  If that fails it will try to load VFS and register it.
@@ -41,10 +40,20 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in csThing::AppendShadows(). If there was a portal
 	  in the thing it would ignore all polygons as shadows that
 	  came after that portal. Thanks to Norman Kramer for spotting this.
-	- Matze Braun fixed bugs with cs-config - The script now also works
+	- Matze Braun fixed bugs with cs-config.  The script now also works
 	  when CS is not installed.
 	- Matze also did another cygwin fix.
 	- Matze also fixed a cs-config bug for multiple builds
+	- Eric Sunshine made the following changes to the cs-config generation
+	  facility:
+	    - Now works with older /bin/test programs which do not understand
+	      the -e test.
+	    - The package version information is now gleaned automatically
+	      from CS/include/csver.h rather than being hardcoded into the
+	      cs-config/genscript.sh script.
+	  Unfortunately, cs-config still has a number of shortcomings on some
+	  platforms, and will require some more work before it can be useful
+	  on those platforms.
 17-Oct-2001
 	- M Voase did the following
 	  - Small typo fix to data/walktest.cfg. This just fixes up

@@ -1,8 +1,8 @@
 #is it a source distribution?
-if test -e "$prefix/Makefile"; then
+if test -r "$prefix/Makefile"; then
 #	look for the lib files...
 #	a more or less dirty hack...
-	if test -e "$prefix/lib/libcssys.a"; then
+	if test -r "$prefix/lib/libcssys.a"; then
 	    libdir="$prefix/lib"
 	else
 	    #Thanks go to Jorge for this script magic...
@@ -183,4 +183,3 @@ fi
 echo $other_flags $lib_L_flags $ord_libs
 
 exit 0
-
