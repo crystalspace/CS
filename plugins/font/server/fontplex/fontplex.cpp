@@ -72,7 +72,6 @@ bool csFontServerMultiplexor::Initialize (iObjectRegistry *object_reg)
     {
       errorcount = 0;	
       csRef<iFontServer> fs (SCF_QUERY_INTERFACE (b, iFontServer));
-      fs->IncRef ();	// To prevent smart pointer release.
       fontservers.Push (fs);
     }
   }
@@ -90,7 +89,7 @@ csPtr<iFont> csFontServerMultiplexor::LoadFont (const char *filename)
   int i;
   for (i = 0; i < fontservers.Length (); i++)
   {
-    csRef<iFont> font (fontservers.Get (i)->LoadFont (filename));
+    csRef<iFont> font (fontservers[i]->LoadFont (filename));
     if (font)
       return csPtr<iFont> (font);
   }
@@ -101,7 +100,7 @@ int csFontServerMultiplexor::GetFontCount ()
 {
   int i, count = 0;
   for (i = 0; i < fontservers.Length (); i++)
-    count += fontservers.Get (i)->GetFontCount ();
+    count += fontservers[i]->GetFontCount ();
   return count;
 }
 
@@ -110,9 +109,9 @@ iFont *csFontServerMultiplexor::GetFont (int iIndex)
   int i;
   for (i = 0; i < fontservers.Length (); i++)
   {
-    int count = fontservers.Get (i)->GetFontCount ();
+    int count = fontservers[i]->GetFontCount ();
     if (iIndex < count)
-      return fontservers.Get (iIndex)->GetFont (iIndex);
+      return fontservers[iIndex]->GetFont (iIndex);
     iIndex -= count;
   }
   return 0;

@@ -22,7 +22,8 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/dbghelp.h"
-#include "csutil/csvector.h"
+#include "csutil/array.h"
+#include "csutil/parray.h"
 #include "csutil/hashmap.h"
 #include "csutil/scf.h"
 #include "igeom/objmodel.h"
@@ -123,7 +124,7 @@ class csDynaVis : public iVisibilityCuller
 {
 public:
   // List of objects to iterate over (after VisTest()).
-  csVector vistest_objects;
+  csArray<iVisibilityObject*> vistest_objects;
   bool vistest_objects_inuse;	// If true the vector is in use.
 
 private:
@@ -131,7 +132,7 @@ private:
   csRef<iBugPlug> bugplug;
   csKDTree* kdtree;
   csTiledCoverageBuffer* tcovbuf;
-  csVector visobj_vector;
+  csPDelArray<csVisibilityObjectWrapper> visobj_vector;
   csObjectModelManager* model_mgr;
   csWriteQueue* write_queue;
   int scr_width, scr_height;	// Screen dimensions.

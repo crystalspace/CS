@@ -25,7 +25,7 @@
 #include "ivideo/fontserv.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "csutil/csvector.h"
+#include "csutil/refarr.h"
 
 /**
  * Font server multiplexor plug-in.
@@ -46,16 +46,8 @@
  */
 class csFontServerMultiplexor : public iFontServer
 {
-  class csFontServerVector : public csVector
-  {
-  public:
-    virtual ~csFontServerVector ()
-    { DeleteAll (); }
-    virtual bool FreeItem (void* Item)
-    { ((iFontServer *)Item)->DecRef (); return true; }
-    iFontServer *Get (int idx)
-    { return (iFontServer *)csVector::Get (idx); }
-  } fontservers;
+private:
+  csRefArray<iFontServer> fontservers;
 
 public:
   SCF_DECLARE_IBASE;

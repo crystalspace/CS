@@ -23,7 +23,7 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/objmodel.h"
 #include "csutil/cscolor.h"
-#include "csutil/csvector.h"
+#include "csutil/parray.h"
 #include "csutil/refarr.h"
 #include "imesh/object.h"
 #include "imesh/haze.h"
@@ -180,25 +180,6 @@ public:
 
 
 /**
- * haze layer vector
- */
-class csHazeLayerVector : public csVector
-{
-public:
-  /// construct
-  csHazeLayerVector(int ilimit = 8, int ithreshold = 16)
-    : csVector(ilimit, ithreshold) {}
-  /// destroy
-  virtual ~csHazeLayerVector() {DeleteAll ();}
-  /// delete correctly
-  virtual bool FreeItem(void* Item)
-  { delete (csHazeLayer*)Item; return true; }
-  /// get a layer
-  csHazeLayer* GetLayer(int nr) {return (csHazeLayer*)Get(nr);}
-};
-
-
-/**
  * Haze mesh object.
  */
 class csHazeMeshObject : public iMeshObject
@@ -237,7 +218,7 @@ private:
   /// haze data
   csVector3 origin, directional;
   /// vector of csHazeLayer
-  csHazeLayerVector layers;
+  csPDelArray<csHazeLayer> layers;
 
   /**
    * Setup this object. This function will check if setup is needed.
@@ -383,16 +364,16 @@ public:
       scfParent->layers.Push(lay); }
     virtual void SetLayerHull(int layer, iHazeHull* hull)
     { if(hull) hull->IncRef();
-      if(scfParent->layers.GetLayer(layer)->hull)
-        scfParent->layers.GetLayer(layer)->hull->DecRef();
-      scfParent->layers.GetLayer(layer)->hull = hull;
+      if(scfParent->layers[layer]->hull)
+        scfParent->layers[layer]->hull->DecRef();
+      scfParent->layers[layer]->hull = hull;
     }
     virtual iHazeHull* GetLayerHull(int layer) const
-    { return scfParent->layers.GetLayer(layer)->hull; }
+    { return scfParent->layers[layer]->hull; }
     virtual void SetLayerScale(int layer, float scale)
-    { scfParent->layers.GetLayer(layer)->scale = scale; }
+    { scfParent->layers[layer]->scale = scale; }
     virtual float GetLayerScale(int layer) const
-    { return scfParent->layers.GetLayer(layer)->scale; }
+    { return scfParent->layers[layer]->scale; }
   } scfiHazeState;
   friend class HazeState;
 };
@@ -408,7 +389,7 @@ private:
   /// haze state info
   csVector3 origin, directional;
   /// vector of csHazeLayer
-  csHazeLayerVector layers;
+  csPDelArray<csHazeLayer> layers;
   iBase* logparent;
 
 public:
@@ -423,7 +404,7 @@ public:
   /// Get mixmode.
   uint GetMixMode () const { return MixMode; }
   /// Get the layers vector
-  csHazeLayerVector* GetLayers() {return &layers;}
+  csPDelArray<csHazeLayer>* GetLayers() {return &layers;}
   /// get the origin
   const csVector3& GetOrigin() const {return origin;}
   /// get the directional
@@ -463,16 +444,16 @@ public:
       scfParent->layers.Push(lay); }
     virtual void SetLayerHull(int layer, iHazeHull* hull)
     { if(hull) hull->IncRef();
-      if(scfParent->layers.GetLayer(layer)->hull)
-        scfParent->layers.GetLayer(layer)->hull->DecRef();
-      scfParent->layers.GetLayer(layer)->hull = hull;
+      if(scfParent->layers[layer]->hull)
+        scfParent->layers[layer]->hull->DecRef();
+      scfParent->layers[layer]->hull = hull;
     }
     virtual iHazeHull* GetLayerHull(int layer) const
-    { return scfParent->layers.GetLayer(layer)->hull; }
+    { return scfParent->layers[layer]->hull; }
     virtual void SetLayerScale(int layer, float scale)
-    { scfParent->layers.GetLayer(layer)->scale = scale; }
+    { scfParent->layers[layer]->scale = scale; }
     virtual float GetLayerScale(int layer) const
-    { return scfParent->layers.GetLayer(layer)->scale; }
+    { return scfParent->layers[layer]->scale; }
   } scfiHazeFactoryState;
   friend class HazeFactoryState;
 

@@ -24,6 +24,27 @@ for each given day, however, are in normal (ascending) chronological order.
 	    - Replaced vClipped in awsMultiLineEdit with
 	      csPDelArray<csString>.
 	    - Replaced vText in awsMultiLineEdit with csPDelArray<csString>.
+	- Jorrit replaced various occurances of csVector:
+	    - Replaced 'visobj_vector' in Dynavis with
+	      csPDelArray<csVisibilityObjectWrapper>.
+	    - Replaced 'vector' in csDynVisObjIt with
+	      csArray<iVisibilityObject*>.
+	    - Replaced 'vistest_objects' in Dynavis with
+	      csArray<iVisibilityObject*>.
+	    - Replaced 'visobj_vector' in Frustvis with
+	      csPDelArray<csFrustVisObjectWrapper>.
+	    - Replaced 'vector' in csFrustVisObjIt with
+	      csArray<iVisibilityObject*>.
+	    - Replaced 'vistest_objects' in Frustvis with
+	      csArray<iVisibilityObject*>.
+	    - Replaced 'DeleteCallbacks' in csfont with
+	      csRefArray<iFontDeleteNotify>.
+	    - Replaced 'DeleteCallbacks' in freefnt2 with
+	      csRefArray<iFontDeleteNotify>.
+	    - Replaced 'fontservers' in fontplex with csRefArray<iFontServer>.
+	    - Replaced 'layers' in haze with csPDelArray<csHazeLayer>.
+	    - Replaced 'particles' in csParticleSystem with
+	      csRefArray<iParticle>.
 29-Jul-2003
 	- Jorrit made scfStringArray actually work by adding the needed
 	  SCF_CONSTRUCT stuff.

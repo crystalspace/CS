@@ -23,6 +23,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "csutil/csvector.h"
+#include "csutil/refarr.h"
 #include "csutil/util.h"
 #include "csutil/cfgacc.h"
 
@@ -92,7 +93,7 @@ public:
   // current glyph set
   GlyphSet *current;
   // The list of delete callbacks
-  csVector DeleteCallbacks;
+  csRefArray<iFontDeleteNotify> DeleteCallbacks;
   //
   FT_Face face;
   FT_Library instance;

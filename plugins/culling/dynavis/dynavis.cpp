@@ -24,6 +24,7 @@
 #include "csutil/util.h"
 #include "csutil/scfstr.h"
 #include "csutil/garray.h"
+#include "csutil/array.h"
 #include "csgeom/frustum.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/math3d.h"
@@ -81,14 +82,15 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 class csDynVisObjIt : public iVisibilityObjectIterator
 {
 private:
-  csVector* vector;
+  csArray<iVisibilityObject*>* vector;
   int position;
   bool* vistest_objects_inuse;
 
 public:
   SCF_DECLARE_IBASE;
 
-  csDynVisObjIt (csVector* vector, bool* vistest_objects_inuse)
+  csDynVisObjIt (csArray<iVisibilityObject*>* vector,
+  	bool* vistest_objects_inuse)
   {
     SCF_CONSTRUCT_IBASE (0);
     csDynVisObjIt::vector = vector;
@@ -108,7 +110,7 @@ public:
   virtual iVisibilityObject* Next()
   {
     if (position < 0) return 0;
-    iVisibilityObject* vo = (iVisibilityObject*)(vector->Get (position));
+    iVisibilityObject* vo = vector->Get (position);
     position++;
     if (position == vector->Length ())
       position = -1;
@@ -195,8 +197,7 @@ csDynaVis::~csDynaVis ()
 {
   while (visobj_vector.Length () > 0)
   {
-    csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
-    	visobj_vector[0];
+    csVisibilityObjectWrapper* visobj_wrap = visobj_vector[0];
     iVisibilityObject* visobj = visobj_wrap->visobj;
     visobj_wrap->model->GetModel ()->RemoveListener (
 		      (iObjectModelListener*)visobj_wrap);
@@ -205,7 +206,6 @@ csDynaVis::~csDynaVis ()
     model_mgr->ReleaseObjectModel (visobj_wrap->model);
     kdtree->RemoveObject (visobj_wrap->child);
     visobj->DecRef ();
-    delete visobj_wrap;
     visobj_vector.Delete (0);
   }
   delete kdtree;
@@ -286,7 +286,7 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
   int i;
   for (i = 0 ; i < visobj_vector.Length () ; i++)
   {
-    if (((csVisibilityObjectWrapper*)visobj_vector[i])->visobj == visobj)
+    if (visobj_vector[i]->visobj == visobj)
     {
       CS_ASSERT (false);
     }
@@ -340,8 +340,7 @@ void csDynaVis::UnregisterVisObject (iVisibilityObject* visobj)
   int i;
   for (i = 0 ; i < visobj_vector.Length () ; i++)
   {
-    csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
-      visobj_vector[i];
+    csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];
     if (visobj_wrap->visobj == visobj)
     {
       update_queue.Delete (visobj_wrap);
@@ -356,7 +355,6 @@ void csDynaVis::UnregisterVisObject (iVisibilityObject* visobj)
       // To easily recognize that the vis wrapper has been deleted:
       visobj_wrap->dynavis = (csDynaVis*)0xdeadbeef;
 #endif
-      delete visobj_wrap;
       visobj_vector.Delete (i);
       return;
     }
@@ -1177,8 +1175,7 @@ bool csDynaVis::VisTest (iRenderView* rview)
     int i;
     for (i = 0 ; i < visobj_vector.Length () ; i++)
     {
-      csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
-        visobj_vector[i];
+      csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];
       iVisibilityObject* visobj = visobj_wrap->visobj;
       if (visobj_wrap->history->history_frame_cnt == history_frame_cnt-1)
       {
@@ -1263,7 +1260,7 @@ bool csDynaVis::VisTest (iRenderView* rview)
 struct VisTestPlanes_Front2BackData
 {
   uint32 current_visnr;
-  csVector* vistest_objects;
+  csArray<iVisibilityObject*>* vistest_objects;
   // During VisTest() we use the current frustum as five planes.
   // Associated with this frustum we also have a clip mask which
   // is maintained recursively during VisTest() and indicates the
@@ -1325,12 +1322,12 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (csPlane3* planes,
   UpdateObjects ();
   current_visnr++;
 
-  csVector* v;
+  csArray<iVisibilityObject*>* v;
   if (vistest_objects_inuse)
   {
     // Vector is already in use by another iterator. Allocate a new vector
     // here.
-    v = new csVector ();
+    v = new csArray<iVisibilityObject*> ();
   }
   else
   {
@@ -1358,7 +1355,7 @@ struct VisTestBox_Front2BackData
 {
   uint32 current_visnr;
   csBox3 box;
-  csVector* vistest_objects;
+  csArray<iVisibilityObject*>* vistest_objects;
 };
 
 static bool VisTestBox_Front2Back (csKDTree* treenode, void* userdata,
@@ -1409,12 +1406,12 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csBox3& box)
   UpdateObjects ();
   current_visnr++;
 
-  csVector* v;
+  csArray<iVisibilityObject*>* v;
   if (vistest_objects_inuse)
   {
     // Vector is already in use by another iterator. Allocate a new vector
     // here.
-    v = new csVector ();
+    v = new csArray<iVisibilityObject*> ();
   }
   else
   {
@@ -1441,7 +1438,7 @@ struct VisTestSphere_Front2BackData
   uint32 current_visnr;
   csVector3 pos;
   float sqradius;
-  csVector* vistest_objects;
+  csArray<iVisibilityObject*>* vistest_objects;
 };
 
 static bool VisTestSphere_Front2Back (csKDTree* treenode, void* userdata,
@@ -1492,12 +1489,12 @@ csPtr<iVisibilityObjectIterator> csDynaVis::VisTest (const csSphere& sphere)
   UpdateObjects ();
   current_visnr++;
 
-  csVector* v;
+  csArray<iVisibilityObject*>* v;
   if (vistest_objects_inuse)
   {
     // Vector is already in use by another iterator. Allocate a new vector
     // here.
-    v = new csVector ();
+    v = new csArray<iVisibilityObject*> ();
   }
   else
   {
@@ -1528,7 +1525,7 @@ struct IntersectSegment_Front2BackData
   float r;
   iMeshWrapper* mesh;
   iPolygon3D* polygon;
-  csVector* vector;	// If not-null we need all objects.
+  csArray<iVisibilityObject*>* vector;	// If not-null we need all objects.
   bool accurate;
 };
 
@@ -1700,7 +1697,7 @@ csPtr<iVisibilityObjectIterator> csDynaVis::IntersectSegment (
   data.r = 10000000000.;
   data.mesh = 0;
   data.polygon = 0;
-  data.vector = new csVector ();
+  data.vector = new csArray<iVisibilityObject*> ();
   data.accurate = accurate;
   kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
 
@@ -2037,8 +2034,7 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
 
       for (i = 0 ; i < visobj_vector.Length () ; i++)
       {
-        csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
-    	  visobj_vector[i];
+        csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];
         int col = reason_cols[visobj_wrap->history->reason];
         const csBox3& b = visobj_wrap->child->GetBBox ();
         g3d->DrawLine (
@@ -2084,8 +2080,7 @@ void csDynaVis::Debug_Dump (iGraphics3D* g3d)
       int i;
       for (i = 0 ; i < visobj_vector.Length () ; i++)
       {
-	csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
-	  visobj_vector[i];
+	csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];
 	iVisibilityObject* visobj = visobj_wrap->visobj;
         if (visobj->GetVisibilityNumber () == current_visnr)
 	{
@@ -2329,8 +2324,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
       int i;
       for (i = 0 ; i < visobj_vector.Length () ; i++)
       {
-        csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
-          visobj_vector[i];
+        csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];
         iVisibilityObject* visobj = visobj_wrap->visobj;
 	csBox3 box;
 	CalculateVisObjBBox (visobj, box);
@@ -2455,8 +2449,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     int i;
     for (i = 0 ; i < visobj_vector.Length () ; i++)
     {
-      csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
-        visobj_vector[i];
+      csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];
       iVisibilityObject* visobj = visobj_wrap->visobj;
       iMovable* movable = visobj->GetMovable ();
       iPolygonMesh* polymesh = visobj->GetObjectModel ()
@@ -2468,8 +2461,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     excul->VisTest ();
     for (i = 0 ; i < visobj_vector.Length () ; i++)
     {
-      csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
-        visobj_vector[i];
+      csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];
       iPolygonMesh* polymesh = visobj_wrap->visobj->GetObjectModel ()
       	->GetPolygonMeshViscull ();
       visobj_wrap->history->history_frame_cnt = 0;	//@@@
@@ -2559,8 +2551,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     int i;
     for (i = 0 ; i < visobj_vector.Length () ; i++)
     {
-      csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
-        visobj_vector[i];
+      csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];
       iVisibilityObject* visobj = visobj_wrap->visobj;
       iMovable* movable = visobj->GetMovable ();
       iPolygonMesh* polymesh = visobj->GetObjectModel ()
@@ -2578,8 +2569,7 @@ bool csDynaVis::Debug_DebugCommand (const char* cmd)
     int tot_poly = 0;
     for (i = 0 ; i < visobj_vector.Length () ; i++)
     {
-      csVisibilityObjectWrapper* visobj_wrap = (csVisibilityObjectWrapper*)
-        visobj_vector[i];
+      csVisibilityObjectWrapper* visobj_wrap = visobj_vector[i];
       iPolygonMesh* polymesh = visobj_wrap->visobj->GetObjectModel ()
       	->GetPolygonMeshViscull ();
       if (polymesh)

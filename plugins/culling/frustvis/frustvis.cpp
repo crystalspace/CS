@@ -70,14 +70,15 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 class csFrustVisObjIt : public iVisibilityObjectIterator
 {
 private:
-  csVector* vector;
+  csArray<iVisibilityObject*>* vector;
   int position;
   bool* vistest_objects_inuse;
 
 public:
   SCF_DECLARE_IBASE;
 
-  csFrustVisObjIt (csVector* vector, bool* vistest_objects_inuse)
+  csFrustVisObjIt (csArray<iVisibilityObject*>* vector,
+  	bool* vistest_objects_inuse)
   {
     SCF_CONSTRUCT_IBASE (0);
     csFrustVisObjIt::vector = vector;
@@ -97,7 +98,7 @@ public:
   virtual iVisibilityObject* Next()
   {
     if (position < 0) return 0;
-    iVisibilityObject* vo = (iVisibilityObject*)(vector->Get (position));
+    iVisibilityObject* vo = vector->Get (position);
     position++;
     if (position == vector->Length ())
       position = -1;
@@ -156,8 +157,7 @@ csFrustumVis::~csFrustumVis ()
 {
   while (visobj_vector.Length () > 0)
   {
-    csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
-    	visobj_vector[0];
+    csFrustVisObjectWrapper* visobj_wrap = visobj_vector[0];
     iVisibilityObject* visobj = visobj_wrap->visobj;
     visobj->GetObjectModel ()->RemoveListener (
 		      (iObjectModelListener*)visobj_wrap);
@@ -165,7 +165,6 @@ csFrustumVis::~csFrustumVis ()
     movable->RemoveListener ((iMovableListener*)visobj_wrap);
     kdtree->RemoveObject (visobj_wrap->child);
     visobj->DecRef ();
-    delete visobj_wrap;
     visobj_vector.Delete (0);
   }
   delete kdtree;
@@ -232,7 +231,7 @@ void csFrustumVis::RegisterVisObject (iVisibilityObject* visobj)
   int i;
   for (i = 0 ; i < visobj_vector.Length () ; i++)
   {
-    if (((csFrustVisObjectWrapper*)visobj_vector[i])->visobj == visobj)
+    if (visobj_vector[i]->visobj == visobj)
     {
       CS_ASSERT (false);
     }
@@ -275,8 +274,7 @@ void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
   int i;
   for (i = 0 ; i < visobj_vector.Length () ; i++)
   {
-    csFrustVisObjectWrapper* visobj_wrap = (csFrustVisObjectWrapper*)
-      visobj_vector[i];
+    csFrustVisObjectWrapper* visobj_wrap = visobj_vector[i];
     if (visobj_wrap->visobj == visobj)
     {
       update_queue.Delete (visobj_wrap);
@@ -290,7 +288,6 @@ void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
       // To easily recognize that the vis wrapper has been deleted:
       visobj_wrap->frustvis = (csFrustumVis*)0xdeadbeef;
 #endif
-      delete visobj_wrap;
       visobj_vector.Delete (i);
       return;
     }
@@ -459,7 +456,7 @@ bool csFrustumVis::VisTest (iRenderView* rview)
 struct FrustTestPlanes_Front2BackData
 {
   uint32 current_visnr;
-  csVector* vistest_objects;
+  csArray<iVisibilityObject*>* vistest_objects;
   // During VisTest() we use the current frustum as five planes.
   // Associated with this frustum we also have a clip mask which
   // is maintained recursively during VisTest() and indicates the
@@ -522,12 +519,12 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (csPlane3* planes,
   UpdateObjects ();
   current_visnr++;
 
-  csVector* v;
+  csArray<iVisibilityObject*>* v;
   if (vistest_objects_inuse)
   {
     // Vector is already in use by another iterator. Allocate a new vector
     // here.
-    v = new csVector ();
+    v = new csArray<iVisibilityObject*> ();
   }
   else
   {
@@ -555,7 +552,7 @@ struct FrustTestBox_Front2BackData
 {
   uint32 current_visnr;
   csBox3 box;
-  csVector* vistest_objects;
+  csArray<iVisibilityObject*>* vistest_objects;
 };
 
 static bool FrustTestBox_Front2Back (csKDTree* treenode, void* userdata,
@@ -606,12 +603,12 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csBox3& box)
   UpdateObjects ();
   current_visnr++;
 
-  csVector* v;
+  csArray<iVisibilityObject*>* v;
   if (vistest_objects_inuse)
   {
     // Vector is already in use by another iterator. Allocate a new vector
     // here.
-    v = new csVector ();
+    v = new csArray<iVisibilityObject*> ();
   }
   else
   {
@@ -638,7 +635,7 @@ struct FrustTestSphere_Front2BackData
   uint32 current_visnr;
   csVector3 pos;
   float sqradius;
-  csVector* vistest_objects;
+  csArray<iVisibilityObject*>* vistest_objects;
 };
 
 static bool FrustTestSphere_Front2Back (csKDTree* treenode,
@@ -690,12 +687,12 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csSphere& sphere)
   UpdateObjects ();
   current_visnr++;
 
-  csVector* v;
+  csArray<iVisibilityObject*>* v;
   if (vistest_objects_inuse)
   {
     // Vector is already in use by another iterator. Allocate a new vector
     // here.
-    v = new csVector ();
+    v = new csArray<iVisibilityObject*> ();
   }
   else
   {
@@ -726,7 +723,7 @@ struct IntersectSegment_Front2BackData
   float r;
   iMeshWrapper* mesh;
   iPolygon3D* polygon;
-  csVector* vector;	// If not-null we need all objects.
+  csArray<iVisibilityObject*>* vector;	// If not-null we need all objects.
   bool accurate;
 };
 
@@ -895,7 +892,7 @@ csPtr<iVisibilityObjectIterator> csFrustumVis::IntersectSegment (
   data.r = 10000000000.;
   data.mesh = 0;
   data.polygon = 0;
-  data.vector = new csVector ();
+  data.vector = new csArray<iVisibilityObject*> ();
   data.accurate = accurate;
   kdtree->Front2Back (start, IntersectSegment_Front2Back, (void*)&data, 0);
 

@@ -24,7 +24,7 @@
 #include "ivideo/fontserv.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
-#include "csutil/csvector.h"
+#include "csutil/refarr.h"
 #include "csutil/parray.h"
 #include "iutil/plugin.h"
 
@@ -50,13 +50,14 @@ public:
   uint8 **GlyphBitmap;
   uint8 **GlyphAlphaBitmap;
   csDefaultFontServer *Parent;
-  csVector DeleteCallbacks;
+  csRefArray<iFontDeleteNotify> DeleteCallbacks;
 
   SCF_DECLARE_IBASE;
 
   /// Create the font object
   csDefaultFont (csDefaultFontServer *parent, const char *name, int first,
-    int glyphs, int width, int height, int baseline, uint8 *bitmap, uint8 *individualwidth, uint8 *alpha=0);
+    int glyphs, int width, int height, int baseline, uint8 *bitmap,
+    uint8 *individualwidth, uint8 *alpha=0);
 
   /// Destroy the font object
   virtual ~csDefaultFont ();

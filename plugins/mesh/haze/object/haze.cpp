@@ -448,12 +448,12 @@ csHazeMeshObject::csHazeMeshObject (csHazeMeshObjectFactory* factory)
   /// copy the factory settings
   origin = factory->GetOrigin();
   directional = factory->GetDirectional();
-  csHazeLayerVector *factlayers = factory->GetLayers();
+  csPDelArray<csHazeLayer> *factlayers = factory->GetLayers();
   int i;
   for(i=0; i<factlayers->Length(); i++)
   {
-    csHazeLayer *p = new csHazeLayer (factlayers->GetLayer(i)->hull,
-      factlayers->GetLayer(i)->scale);
+    csHazeLayer *p = new csHazeLayer (factlayers->Get(i)->hull,
+      factlayers->Get(i)->scale);
     layers.Push(p);
   }
 }
@@ -471,9 +471,9 @@ void csHazeMeshObject::SetupObject ()
     csVector3 pos;
 	int l, i;
     for(l=0; l<layers.Length(); l++)
-      for(i=0; i<layers.GetLayer(l)->hull->GetVerticeCount(); i++)
+      for(i=0; i<layers[l]->hull->GetVerticeCount(); i++)
       {
-	layers.GetLayer(l)->hull->GetVertex(pos, i);
+	layers[l]->hull->GetVertex(pos, i);
         bbox.AddBoundingVertex( pos );
       }
     initialized = true;
@@ -805,8 +805,8 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
   ProjectO2S(tr_o2c, fov, shx, shy, origin, scr_orig);
 
   // get hull 0 outline in screenspace
-  iHazeHull *hull = layers.GetLayer(0)->hull;
-  float layer_scale = layers.GetLayer(0)->scale;
+  iHazeHull *hull = layers[0]->hull;
+  float layer_scale = layers[0]->scale;
   int layer_num = 0;
   int *layer_poly = 0;
   csVector3* layer_pts = 0;
@@ -877,8 +877,8 @@ bool csHazeMeshObject::Draw (iRenderView* rview, iMovable* movable,
   for(curlay = 1; curlay < layers.Length(); curlay++)
   {
     // get hull [curlay] outline in screenspace
-    iHazeHull *hull2 = layers.GetLayer(curlay)->hull;
-    float layer_scale2 = layers.GetLayer(curlay)->scale;
+    iHazeHull *hull2 = layers[curlay]->hull;
+    float layer_scale2 = layers[curlay]->scale;
     int layer_num2 = 0;
     int *layer_poly2 = 0;
     csVector3* layer_pts2 = 0;

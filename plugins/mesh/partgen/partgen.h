@@ -25,7 +25,6 @@
 #include "csgeom/objmodel.h"
 #include "csutil/refarr.h"
 #include "csutil/cscolor.h"
-#include "csutil/csvector.h"
 #include "ivideo/graph3d.h"
 #include "imesh/object.h"
 #include "imesh/partsys.h"
@@ -53,7 +52,7 @@ protected:
   /// Object space radius.
   csVector3 radius;
   /// iParticle ptrs to the particles.
-  csVector particles;
+  csRefArray<iParticle> particles;
   /// Self destruct and when.
   bool self_destruct;
   csTicks time_to_live; // msec
@@ -114,13 +113,13 @@ public:
   inline int GetNumParticles () const { return particles.Length();}
   /// Get a particle.
   inline iParticle* GetParticle (int idx) const
-  { return (iParticle*)particles[idx]; }
+  { return particles[idx]; }
   /// Remove all particles.
   void RemoveParticles ();
 
   /// Add a new particle, increases num_particles. Do a DecRef yourself.
   inline void AppendParticle (iParticle *part)
-  { particles.Push(part); part->IncRef(); }
+  { particles.Push(part); }
 
   /**
    * Add an rectangle shaped sprite2d particle. Pass along half w and h.

@@ -325,9 +325,8 @@ csDefaultFont::~csDefaultFont ()
   int i;
   for (i = DeleteCallbacks.Length () - 1; i >= 0; i--)
   {
-    iFontDeleteNotify* delnot = (iFontDeleteNotify*)(DeleteCallbacks.Get (i));
+    iFontDeleteNotify* delnot = DeleteCallbacks[i];
     delnot->BeforeDelete (this);
-    delnot->DecRef ();
   }
 
   Parent->NotifyDelete (this);
@@ -513,22 +512,16 @@ int csDefaultFont::GetLength (const char *text, int maxwidth)
 
 void csDefaultFont::AddDeleteCallback (iFontDeleteNotify* func)
 {
-  DeleteCallbacks.Push ((void *)func);
-  func->IncRef ();
+  DeleteCallbacks.Push (func);
 }
 
 bool csDefaultFont::RemoveDeleteCallback (iFontDeleteNotify* func)
 {
-  int i;
-  for (i = DeleteCallbacks.Length () - 1; i >= 0; i--)
+  int idx = DeleteCallbacks.Find (func);
+  if (idx != -1)
   {
-    iFontDeleteNotify* delnot = (iFontDeleteNotify*)(DeleteCallbacks.Get (i));
-    if (delnot == func)
-    {
-      DeleteCallbacks.Delete (i);
-      func->DecRef ();
-      return true;
-    }
+    DeleteCallbacks.Delete (func);
+    return true;
   }
   return false;
 }
