@@ -386,7 +386,6 @@ static int count_cull_node_vis;
 // @@@ This routine need to be cleaned up!!! It probably needs to
 // be part of the class.
 
-bool debug_pvs = false; // @@@ TEMPORARY TO TEST PVS
 bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
 	const csVector3& pos, void* data)
 {
@@ -396,7 +395,6 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
   int i;
   csOctree* otree = (csOctree*)tree;
   csOctreeNode* onode = (csOctreeNode*)node;
-if (debug_pvs) return onode->visible;
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
   csQuadtree* quadtree = csWorld::current_world->GetQuadtree ();
   csCoverageMaskTree* covtree = csWorld::current_world->GetCovtree ();
@@ -423,13 +421,12 @@ if (debug_pvs) return onode->visible;
       if (top && cam[i].y >= cam[i].z * rview->topy) top = false;
       if (bot && cam[i].y <= cam[i].z * rview->boty) bot = false;
     }
-    if (left || right || top || bot) { onode->visible = false; return false; }
+    if (left || right || top || bot) return false;
 
     if (num_z_0 == num_array)
     {
       // Node behind camera.
       count_cull_node_notvis_behind++;
-      onode->visible = false;
       return false;
     }
     persp.MakeEmpty ();
@@ -474,7 +471,7 @@ if (debug_pvs) return onode->visible;
       }
     }
 
-    if (!persp.ClipAgainst (rview->view)) { onode->visible = false; return false; }
+    if (!persp.ClipAgainst (rview->view)) return false;
 
     // c-buffer test.
     bool vis;
@@ -490,7 +487,6 @@ if (debug_pvs) return onode->visible;
     if (!vis)
     {
       count_cull_node_notvis_cbuffer++;
-      onode->visible = false;
       return false;
     }
   }
@@ -512,7 +508,6 @@ if (debug_pvs) return onode->visible;
     for (i = 0 ; i < num_indices ; i++)
       cam[indices[i]] = rview->Other2This (pset->Vwor (indices[i]));
   }
-  onode->visible = true;
   return true;
 }
 

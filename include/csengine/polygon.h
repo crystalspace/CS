@@ -29,6 +29,7 @@
 #include "csengine/polyset.h"
 #include "csengine/portal.h"
 #include "csengine/polytext.h"
+#include "csengine/octree.h"
 #include "ipolygon.h"
 
 class csSector;
@@ -424,6 +425,12 @@ private:
   csPolygon3D* orig_poly;
 
   /**
+   * Visibility number. If equal to csOctreeNode::pvs_cur_vis_nr then
+   * this object is visible.
+   */
+  ULong pvs_vis_nr;
+
+  /**
    * Precompute the plane normal. Normally this is done automatically by
    * set_texture_space but if needed you can call this function again when
    * something has changed.
@@ -734,6 +741,12 @@ public:
    * Return true if this polygon or the texture it uses is transparent.
    */
   bool IsTransparent ();
+
+  /// Return true if node is visible according to PVS.
+  bool IsVisible () { return pvs_vis_nr == csOctreeNode::pvs_cur_vis_nr; }
+
+  /// Mark visible (used by PVS).
+  void MarkVisible () { pvs_vis_nr = csOctreeNode::pvs_cur_vis_nr; }
 
   /**
    * Get the cosinus factor. This factor is used

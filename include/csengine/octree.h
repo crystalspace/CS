@@ -21,11 +21,14 @@
 
 #include "csgeom/math3d.h"
 #include "csgeom/box.h"
+#include "csutil/garray.h"
 #include "csengine/polytree.h"
 #include "csengine/bsp.h"
+#include "csengine/arrays.h"
 
 class csPolygonInt;
 class csOctree;
+class csOctreeNode;
 class csBspTree;
 class Dumper;
 
@@ -37,6 +40,31 @@ class Dumper;
 #define OCTREE_BFB 5
 #define OCTREE_BBF 6
 #define OCTREE_BBB 7
+
+/**
+ * A visibility info node for one octree node.
+ * This node represents a visible octree node and possibly
+ * all visible polygons (if the node is a leaf).
+ */
+class csOctreeVisible
+{
+private:
+  // The visible node.
+  csOctreeNode* node;
+  // The visible polygons.
+  csPolygonArray polygons;
+  
+public:
+  /// Set octree node.
+  void SetOctreeNode (csOctreeNode* onode) { node = onode; }
+  /// Get octree node.
+  csOctreeNode* GetOctreeNode () { return node; }
+  /// Get the polygon array.
+  csPolygonArray& GetPolygons () { return polygons; }
+};
+
+/// A growing array for the PVS information (visible octree/polygons).
+TYPEDEF_GROWING_ARRAY (csPVS, csOctreeVisible);
 
 /**
  * An octree node.
@@ -72,10 +100,25 @@ private:
   /// Number of vertices in minibsp_verts.
   int minibsp_numverts;
 
+  /**
+   * A growing array for the PVS information.
+   * This list contains all octree nodes and polygons that
+   * are visible from this node.
+   */
+  csPVS pvs;
+  /**
+   * Visibility number. If equal to csOctreeNode::pvs_cur_vis_nr then
+   * this object is visible.
+   */
+  ULong pvs_vis_nr;
+
 public:
-  // Visible. @@@ This is a temporary variable to try out
-  // what a PVS could gain us.
-  bool visible;
+  /**
+   * Current visibility number. All objects (i.e. octree
+   * nodes and polygons) which have the same number as this one
+   * are visible. All others are not.
+   */
+  static ULong pvs_cur_vis_nr;
 
 private:
   /// Make an empty octree node.
@@ -103,6 +146,12 @@ public:
   /// Return true if node is empty.
   bool IsEmpty ();
 
+  /// Return true if node is visible according to PVS.
+  bool IsVisible () { return pvs_vis_nr == pvs_cur_vis_nr; }
+
+  /// Mark visible (used by PVS).
+  void MarkVisible () { pvs_vis_nr = pvs_cur_vis_nr; }
+
   /// Return true if node is leaf.
   bool IsLeaf () { return leaf; }
 
@@ -126,6 +175,9 @@ public:
 
   /// Return type (NODE_???).
   int Type () { return NODE_OCTREE; }
+
+  /// Get the PVS.
+  csPVS& GetPVS () { return pvs; }
 };
 
 /**
@@ -226,6 +278,14 @@ public:
   {
     node->bbox.GetConvexOutline (pos, array, num_array);
   }
+
+  /**
+   * Update with PVS. This routine will take the given position
+   * and locate the octree leaf node for that position. Then it
+   * will get the PVS for that node and mark all visible octree
+   * nodes and polygons.
+   */
+  void MarkVisibleFromPVS (const csVector3& pos);
 
   /**
    * Build vertex tables for minibsp leaves. These tables are

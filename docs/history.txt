@@ -32,11 +32,16 @@ Short-term cleanups that need to be done:
 	  Now #import is only used for NeXT-specific headers.
 	- Change from Wyatt Miler to allow csSoundRenderA3D::PlayEphemeral()
 	  to accept a bool flag for looping the sound. Defaults to false.
+	- Received patch from Rene Dudfield <illumen@yahoo.com> for initial
+	  networking support to Blocks.
 	- Eric Sunshine fixed a problem with 'make depend' on NeXT (with
 	  pointers from Andrew).  The problem prevented the .dep files from
 	  operating correctly.
 	- Eric Sunshine fixed a problem in pixtype.inc which was causing
 	  incorrect colors to display in 32-bit RGB mode on NeXT.
+	- Andrew Zabolotny added a TYPEDEF_GROWING_ARRAY to csutil.
+	- Wyatt Miler is busy adding sound to Blocks.
+	- Started work on PVS.
 27-Feb-2000
 	- Eric Sunshine fixed a bug in polytext.cpp where a recent "patch"
 	  following Andrew's "Big Change" broke CleanIfDirty().  The 'src' and

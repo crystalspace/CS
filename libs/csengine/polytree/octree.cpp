@@ -27,6 +27,8 @@
 
 //---------------------------------------------------------------------------
 
+ULong csOctreeNode::pvs_cur_vis_nr = 1;
+
 csOctreeNode::csOctreeNode ()
 {
   int i;
@@ -35,6 +37,7 @@ csOctreeNode::csOctreeNode ()
   minibsp = NULL;
   minibsp_verts = NULL;
   leaf = false;
+  pvs_vis_nr = 0;
 }
 
 csOctreeNode::~csOctreeNode ()
@@ -458,6 +461,53 @@ void* csOctree::Front2Back (csOctreeNode* node, const csVector3& pos,
   __TRAVERSE__ ((7-cur_idx) ^ 4);
   __TRAVERSE__ (7-cur_idx);
   return rc;
+}
+
+void csOctree::MarkVisibleFromPVS (const csVector3& pos)
+{
+  // First locate the leaf this position is in.
+  csOctreeNode* node = (csOctreeNode*)root;
+  while (node)
+  {
+    if (node->IsLeaf ()) break;
+    const csVector3& center = node->GetCenter ();
+    if (pos.x < center.x)
+      if (pos.y < center.y)
+        if (pos.z < center.z)
+	  node = (csOctreeNode*)node->children[OCTREE_BBB];
+	else
+	  node = (csOctreeNode*)node->children[OCTREE_BBF];
+      else
+        if (pos.z < center.z)
+	  node = (csOctreeNode*)node->children[OCTREE_BFB];
+	else
+	  node = (csOctreeNode*)node->children[OCTREE_BFF];
+    else
+      if (pos.y < center.y)
+        if (pos.z < center.z)
+	  node = (csOctreeNode*)node->children[OCTREE_FBB];
+	else
+	  node = (csOctreeNode*)node->children[OCTREE_FBF];
+      else
+        if (pos.z < center.z)
+	  node = (csOctreeNode*)node->children[OCTREE_FFB];
+	else
+	  node = (csOctreeNode*)node->children[OCTREE_FFF];
+  }
+
+  // Mark all objects in the world as invisible.
+  csOctreeNode::pvs_cur_vis_nr++;
+
+  csPVS& pvs = node->GetPVS ();
+  int i;
+  // Here we mark all octree nodes as visible.
+  // The polygons from the pvs are only marked visible
+  // when we actually traverse to an octree node.
+  for (i = 0 ; i < pvs.GetLimit () ; i++)
+  {
+    csOctreeVisible& ovis = pvs[i];
+    ovis.GetOctreeNode ()->MarkVisible ();
+  }
 }
 
 void csOctree::Statistics ()
