@@ -704,8 +704,10 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   // the amount of code that goes between glBegin/glEnd. This
   // is from an OpenGL high-performance FAQ.
   // @@@ HARDCODED LIMIT OF 64 VERTICES!
-  float ar_u[64], ar_v[64];
-  float ar_x[64], ar_y[64], ar_w[64];
+  GLfloat glverts[4*64];
+  GLfloat gltxt[2*64];
+  int vtidx = 0;
+  int txtidx = 0;
   for (i = 0; i < poly.num; i++)
   {
     sx = poly.vertices[i].sx - width2;
@@ -724,18 +726,22 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
 
     // modified to use homogenous object space coordinates instead
     // of homogenous texture space coordinates
-    ar_u[i] = u_over_sz * sz;
-    ar_v[i] = v_over_sz * sz;
-    ar_x[i] = poly.vertices[i].sx * sz;
-    ar_y[i] = poly.vertices[i].sy * sz;
-    ar_w[i] = sz;
+    gltxt[txtidx++] = u_over_sz * sz;
+    gltxt[txtidx++] = v_over_sz * sz;
+    glverts[vtidx++] = poly.vertices[i].sx * sz;
+    glverts[vtidx++] = poly.vertices[i].sy * sz;
+    glverts[vtidx++] = -1.0;
+    glverts[vtidx++] = sz;
   }
 
+  GLfloat* p_gltxt, * p_glverts;
+  p_gltxt = gltxt;
+  p_glverts = glverts;
   glBegin (GL_TRIANGLE_FAN);
-  for (i = 0; i < poly.num; i++)
+  for (i = 0 ; i < poly.num ; i++)
   {
-    glTexCoord2f (ar_u[i], ar_v[i]);
-    glVertex4f (ar_x[i], ar_y[i], -1, ar_w[i]);
+    glTexCoord2fv (p_gltxt); p_gltxt += 2;
+    glVertex4fv (p_glverts); p_glverts += 4;
   }
   glEnd ();
 #else

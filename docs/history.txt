@@ -13,6 +13,9 @@ The history order has been reversed so that new features are at the top.
 	  glVertex,glNormal, glTexCoords, ...  calls between glBegin/glEnd.
 	  So I changed DrawPolygon so that it first calculates and copies the
 	  results in a few arrays.
+	- Did another optimization in addition to the above one by using
+	  glVertex4fv instead of glVertex4f (similar to glTexCoord2). According
+	  to the same FAQ this should also improve matters.
 	- Fixed a bug in csString as reported by George Yohng
 	  <yohng@drivex.dosware.8m.com>.
 	- Got a new patch from Travis McIntosh.  This patch finished
