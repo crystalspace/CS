@@ -74,6 +74,7 @@ SCF_VERSION (iMovable, 0, 1, 2);
  * Main ways to get pointers to this interface:
  *   <ul>
  *   <li>iMeshWrapper::GetMovable()
+ *   <li>iLight::GetMovable()
  *   </ul>
  * Main users of this interface:
  *   <ul>

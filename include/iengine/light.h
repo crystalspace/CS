@@ -39,6 +39,7 @@ struct iCrossHalo;
 struct iNovaHalo;
 struct iFlareHalo;
 struct iLightingInfo;
+struct iMovable;
 
 /** \name Light flags
  * @{ */
@@ -59,26 +60,30 @@ struct iLightingInfo;
 
 /** \name Light Dynamic Types
  * @{ */
-/**
- * A fully static light. Unless you are using shaders/renderloop that treat
- * all lights as dynamic this light cannot move and cannot change color.
- * Shadows are accurate and precalculated (if you use lightmaps).
- */
-#define CS_LIGHT_DYNAMICTYPE_STATIC	1
 
-/**
- * A pseudo-dynamic light. Unless you are using shaders/renderloop that treat
- * all lights as dynamic this light cannot move but it can change color.
- * Shadows are accurate and precalculated (if you use lightmaps).
- */
-#define CS_LIGHT_DYNAMICTYPE_PSEUDO	2
+enum csLightDynamicType
+{
+  /**
+   * A fully static light. Unless you are using shaders/renderloop that treat
+   * all lights as dynamic this light cannot move and cannot change color.
+   * Shadows are accurate and precalculated (if you use lightmaps).
+   */
+  CS_LIGHT_DYNAMICTYPE_STATIC = 1, 
+ 
+  /**
+   * A pseudo-dynamic light. Unless you are using shaders/renderloop that treat
+   * all lights as dynamic this light cannot move but it can change color.
+   * Shadows are accurate and precalculated (if you use lightmaps).
+   */
+  CS_LIGHT_DYNAMICTYPE_PSEUDO = 2,
 
-/**
- * A fully dynamic light.
- * No shadows are calculated unless you use a shader/renderloop
- * that does that in hardware.
- */
-#define CS_LIGHT_DYNAMICTYPE_DYNAMIC	3
+  /**
+   * A fully dynamic light.
+   * No shadows are calculated unless you use a shader/renderloop
+   * that does that in hardware.
+   */
+  CS_LIGHT_DYNAMICTYPE_DYNAMIC = 3
+};
 /** @} */
 
 /// Light level that is used when there is no light on the texture.
@@ -97,17 +102,43 @@ struct iLightingInfo;
  *   <li> using clq attenuation vector (prefered for lighting with new renderer)
  * </ul>
  * @{ */
-/// no attenuation: light * 1
-#define CS_ATTN_NONE      0
-/// linear attenuation: light * (radius - distance) / radius
-#define CS_ATTN_LINEAR    1
-/// inverse attenuation: light * (radius / distance)
-#define CS_ATTN_INVERSE   2
-/// realistic attenuation: light * (radius^2 / distance^2)
-#define CS_ATTN_REALISTIC 3
-/// using clq attenuation 
-#define CS_ATTN_CLQ 4
+enum csLightAttenuationMode
+{
+  /// no attenuation: light * 1
+  CS_ATTN_NONE = 0,
+  /// linear attenuation: light * (radius - distance) / radius
+  CS_ATTN_LINEAR = 1,
+  /// inverse attenuation: light * (radius / distance)
+  CS_ATTN_INVERSE = 2,
+  /// realistic attenuation: light * (radius^2 / distance^2)
+  CS_ATTN_REALISTIC = 3,
+  /// using clq attenuation 
+  CS_ATTN_CLQ = 4
+};
 /** @} */
+
+/**
+ * Type of lightsource. 
+ * There are currently three types of lightsources:
+ * <ul>
+ *   <li> Point lights - have a position. Shines in all directions.
+ *   <li> Directional lights - have a direction and radius. Shines along it's
+ *                             major axis.
+ *   <li> Spot lights - have both position and direction. Shines with full
+ *                      strength along major axis and out to the hotspot angle.
+ *                      Between hotspot and outer angle it will falloff, outside
+ *                      outer angle there shines no light.
+ * </ul>
+ */
+enum csLightType
+{
+  /// Point light
+  CS_LIGHT_POINTLIGHT,
+  /// Directional light
+  CS_LIGHT_DIRECTIONAL,
+  /// Spot light
+  CS_LIGHT_SPOTLIGHT
+};
 
 SCF_VERSION (iLightCallback, 0, 2, 1);
 
@@ -165,7 +196,7 @@ struct iLightCallback : public iBase
 };
 
 
-SCF_VERSION (iLight, 0, 0, 9);
+SCF_VERSION (iLight, 0, 1, 0);
 
 /**
  * The iLight interface is the SCF interface for the csLight class.
@@ -225,21 +256,45 @@ struct iLight : public iBase
    * <li>#CS_LIGHT_DYNAMICTYPE_DYNAMIC
    * </ul>
    */
-  virtual int GetDynamicType () const = 0;
+  virtual csLightDynamicType GetDynamicType () const = 0;
 
   /// Get the position of this light.
-  virtual const csVector3& GetCenter () = 0;
+  virtual const csVector3 GetCenter () = 0;
   /// Set the position of this light.
   virtual void SetCenter (const csVector3& pos) = 0;
 
   /// Get the sector for this light.
   virtual iSector *GetSector () = 0;
 
+  /// Get the movable for this light.
+  virtual iMovable *GetMovable () = 0;
+
   /// Get the color of this light.
   virtual const csColor& GetColor () = 0;
   /// Set the color of this light.
   virtual void SetColor (const csColor& col) = 0;
   
+  /// Get the light type of this light.
+  virtual csLightType GetType () const = 0;
+  /// Set the light type of this light.
+  virtual void SetType (csLightType type) = 0;
+
+  /// Get the light direction. Used for directional and spotlight.
+  virtual const csVector3& GetDirection () const = 0;
+  /// Set the light direction. Used for directional and spotlight.
+  virtual void SetDirection (const csVector3& v) = 0;
+
+  /**
+   * Get the spotlight fall-off coefficients. First is cosine of
+   * hotspot angle, second cosine of outer angle.
+   */
+  virtual const csVector2& GetSpotFalloff () const = 0;
+  /**
+   * Set the spotlight fall-off coefficients. First is cosine of
+   * hotspot angle, second cosine of outer angle.
+   */
+  virtual void SetSpotFalloff (const csVector2& v) = 0;
+
   /** 
    * Get the influence radius of the light
    */
@@ -256,7 +311,7 @@ struct iLight : public iBase
   virtual void SetInfluenceRadius (float radius) = 0;
 
   /// Return current attenuation mode.
-  virtual int GetAttenuation () = 0;
+  virtual csLightAttenuationMode GetAttenuation () = 0;
   /**
    * Set attenuation mode. The following values are possible 
    * (default is #CS_ATTN_LINEAR):
@@ -268,7 +323,7 @@ struct iLight : public iBase
    * <li>#CS_ATTN_CLQ: use attenuation vector
    * </ul>
    */
-  virtual void SetAttenuation (int a) = 0;
+  virtual void SetAttenuation (csLightAttenuationMode a) = 0;
 
   /**
   * Set attenuation vector 
@@ -290,8 +345,8 @@ struct iLight : public iBase
    * \param radius Radius where the light is \p brightness bright
    * \param brightness Brightness of the light at \p radius
    */
-  virtual void CalculateAttenuationVector (int atttype, float radius = 1.0f,
-    float brightness = 1.0f) = 0;
+  virtual void CalculateAttenuationVector (csLightAttenuationMode atttype, 
+    float radius = 1.0f, float brightness = 1.0f) = 0;
 
   /**
    * Get the distance for a given light brightness.

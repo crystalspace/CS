@@ -23,6 +23,15 @@ chronological order.
 	  specific information useful for tools. I plan to use this to
 	  add meta data for pvscalc.
 	- Jorrit added initialization of alphaType in the map loader.
+	- Marten did following engine changes:
+	    - Extended csMovable to be able to use it with lights and
+	      cameras as well as meshes.
+	    - Changed iLight/csLight to provide a movable.
+	    - Extended iLight/csLight with support for directional
+	      and spotlight as well as the old pointlight.
+	    - Changed some iLight-related defines into enums.
+	- Marten made it possible to load lights as a part of a meshobject
+	  hierarchy.
 15-Feb-2005
 	- Jorrit added csIntersect3::IntersectPolygon() to intersect
 	  a polygon with a segment.

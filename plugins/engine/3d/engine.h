@@ -965,7 +965,7 @@ public:
   /// Create a static/pseudo-dynamic light.
   virtual csPtr<iLight> CreateLight (const char* name,
   	const csVector3& pos, float radius,
-  	const csColor& color, int dyntype = CS_LIGHT_DYNAMICTYPE_STATIC);
+  	const csColor& color, csLightDynamicType dyntype = CS_LIGHT_DYNAMICTYPE_STATIC);
   /// Find a static/pseudo-dynamic light by ID.
   virtual iLight* FindLightID (const char* light_id) const;
   /// Find a static/pseudo-dynamic light by name.

@@ -1042,6 +1042,8 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("cullerp", XMLTOKEN_CULLERP);
   xmltokens.Register ("default", XMLTOKEN_DEFAULT);
   xmltokens.Register ("detail", XMLTOKEN_DETAIL);
+  xmltokens.Register ("direction", XMLTOKEN_DIRECTION);
+  xmltokens.Register ("directional", XMLTOKEN_DIRECTIONAL);
   xmltokens.Register ("distance", XMLTOKEN_DISTANCE);
   xmltokens.Register ("dynamic", XMLTOKEN_DYNAMIC);
   xmltokens.Register ("dither", XMLTOKEN_DITHER);
@@ -1108,6 +1110,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("paramsfile", XMLTOKEN_PARAMSFILE);
   xmltokens.Register ("plugin", XMLTOKEN_PLUGIN);
   xmltokens.Register ("plugins", XMLTOKEN_PLUGINS);
+  xmltokens.Register ("pointlight", XMLTOKEN_POINTLIGHT);
   xmltokens.Register ("position", XMLTOKEN_POSITION);
   xmltokens.Register ("polymesh", XMLTOKEN_POLYMESH);
   xmltokens.Register ("portal", XMLTOKEN_PORTAL);
@@ -1124,6 +1127,8 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("shift", XMLTOKEN_SHIFT);
   xmltokens.Register ("sound", XMLTOKEN_SOUND);
   xmltokens.Register ("sounds", XMLTOKEN_SOUNDS);
+  xmltokens.Register ("spotlight", XMLTOKEN_SPOTLIGHT);
+  xmltokens.Register ("spotlightfalloff", XMLTOKEN_SPOTLIGHTFALLOFF);
   xmltokens.Register ("start", XMLTOKEN_START);
   xmltokens.Register ("t", XMLTOKEN_T);
   xmltokens.Register ("texture", XMLTOKEN_TEXTURE);
@@ -3192,7 +3197,18 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
           mesh->GetChildren ()->Add (sp);
         }
         break;
-
+      case XMLTOKEN_LIGHT:
+        {
+          iLight * light = ParseStatlight (ldr_context, child);
+          if (light)
+          {
+            light->GetMovable ()->SetParent (mesh->GetMovable ());
+          }
+          else
+          {
+            goto error;
+          }
+        }
       case XMLTOKEN_NULLMESH:
         {
 	  if (plug)
@@ -4042,16 +4058,20 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   csVector3 pos;
 
   csVector3 attenvec (0, 0, 0);
+  csVector2 spotlightfalloff (1,1);
+  csVector3 direction;
+  csLightType type = CS_LIGHT_POINTLIGHT;
+
   float distbright = 1;
 
   float influenceRadius = 0;
   bool influenceOverride = false;
 
-  int attenuation = CS_ATTN_LINEAR;
+  csLightAttenuationMode attenuation = CS_ATTN_LINEAR;
   float dist = 0;
 
   csColor color;
-  int dyn;
+  csLightDynamicType dyn;
   struct csHaloDef
   {
     int type;
@@ -4319,6 +4339,37 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	  attenuation = CS_ATTN_CLQ;
         }
         break;
+      case XMLTOKEN_TYPE:
+        {
+          const char* t = child->GetContentsValue ();
+          if (t)
+          {
+            if (!strcasecmp (t, "point"))
+              type = CS_LIGHT_POINTLIGHT;
+            else if (!strcasecmp (t, "directional"))
+              type = CS_LIGHT_DIRECTIONAL;
+            else if (!strcasecmp (t, "spotlight"))
+              type = CS_LIGHT_SPOTLIGHT;
+            else
+            {
+              SyntaxService->ReportBadToken (child);
+              return 0;
+            }
+          }
+        }
+        break;
+      case XMLTOKEN_DIRECTION:
+        {
+          if (!SyntaxService->ParseVector (child, direction))
+            return 0;
+        }
+        break;
+      case XMLTOKEN_SPOTLIGHTFALLOFF:
+        {
+          if (!SyntaxService->ParseVector (child, spotlightfalloff))
+            return 0;
+        }
+        break;
       default:
 	SyntaxService->ReportBadToken (child);
 	return 0;
@@ -4336,6 +4387,9 @@ iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
   csRef<iLight> l = Engine->CreateLight (lightname, pos,
   	dist, color, dyn);
   AddToRegion (ldr_context, l->QueryObject ());
+  l->SetType (type);
+  l->SetDirection (direction);
+  l->SetSpotFalloff (spotlightfalloff);
 
   switch (halo.type)
   {

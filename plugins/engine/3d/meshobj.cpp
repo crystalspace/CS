@@ -251,7 +251,7 @@ void csMeshWrapper::AddToSectorPortalLists ()
     csMeshWrapper* prev = this;
     csMeshWrapper* m = csParent;
     while (m) { prev = m; m = m->GetCsParent (); }
-    const iSectorList *sectors = prev->GetCsMovable ().GetSectors ();
+    const iSectorList *sectors = (prev->GetCsMovable ()).csMovable::GetSectors ();
     for (i = 0; i < sectors->GetCount (); i++)
     {
       iSector *ss = sectors->Get (i);
@@ -275,7 +275,7 @@ void csMeshWrapper::ClearFromSectorPortalLists (iSector* sector)
     }
     else
     {
-      const iSectorList *sectors = prev->GetCsMovable ().GetSectors ();
+      const iSectorList *sectors = (prev->GetCsMovable ()).csMovable::GetSectors ();
       for (i = 0; i < sectors->GetCount (); i++)
       {
         iSector *ss = sectors->Get (i);
@@ -534,11 +534,7 @@ csRenderMesh** csMeshWrapper::GetRenderMeshes (int& n, iRenderView* rview,
   {
     i--;
     iMeshDrawCallback* cb = draw_cb_vector.Get (i);
-    if (!cb->BeforeDrawing (&scfiMeshWrapper, rview)) 
-    {
-      n = 0;
-      return 0;
-    }
+    if (!cb->BeforeDrawing (&scfiMeshWrapper, rview)) return 0;
   }
 
   /*draw_test = meshobj->DrawTest (rview, &movable.scfiMovable);
@@ -885,7 +881,7 @@ float csMeshWrapper::GetSquaredDistance (iRenderView *rview)
 void csMeshWrapper::GetFullBBox (csBox3& box)
 {
   GetObjectModel ()->GetObjectBoundingBox (box);
-  iMovable* mov = &movable.scfiMovable;
+  iMovable* mov = &movable;
   while (mov)
   {
     if (!mov->IsTransformIdentity ())
@@ -1378,7 +1374,7 @@ void csMeshMeshList::PrepareMesh (iMeshWrapper* child)
   }
 
   child->SetParentContainer (&mesh->scfiMeshWrapper);
-  cchild->GetCsMovable ().SetParent (&mesh->GetCsMovable ().scfiMovable);
+  (cchild->GetCsMovable ()).csMovable::SetParent (&mesh->GetCsMovable ());
   // Readd our child to sectors if it happens to be a portal container.
   cchild->AddToSectorPortalLists ();
 }
@@ -1394,7 +1390,7 @@ void csMeshMeshList::FreeMesh (iMeshWrapper* item)
 
   for (int i = 0 ; i < mesh->GetCsMovable().GetSectors()->GetCount() ; i++)
   {
-    iSector* isector = mesh->GetCsMovable ().GetSectors ()->Get (i);
+    iSector* isector = (mesh->GetCsMovable ()).csMovable::GetSectors ()->Get (i);
     csSector* sector = ((csSector::eiSector*)isector)->GetPrivateObject ();
     sector->UnprepareMesh (item);
   }

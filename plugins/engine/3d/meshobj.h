@@ -377,7 +377,7 @@ public:
   // For iVisibilityObject.
   virtual iMovable* GetMovable () const
   {
-    return (iMovable*)&(movable.scfiMovable);
+    return (iMovable*)&movable;
   }
 
   /// Set parent container for this object.
@@ -688,7 +688,7 @@ public:
     }
     virtual iMovable* GetMovable () const
     {
-      return &(scfParent->movable.scfiMovable);
+      return &(scfParent->movable);
     }
     virtual void PlaceMesh ()
     {

@@ -69,6 +69,8 @@ public:
   virtual bool WriteMatrix (iDocumentNode* node, csMatrix3* m);
   virtual bool ParseVector (iDocumentNode* node, csVector3 &v);
   virtual bool WriteVector (iDocumentNode* node, csVector3* v);
+  virtual bool ParseVector (iDocumentNode* node, csVector2 &v);
+  virtual bool WriteVector (iDocumentNode* node, csVector2* v);
   virtual bool ParseBox (iDocumentNode* node, csBox3 &v);
   virtual bool WriteBox (iDocumentNode* node, csBox3* v);
   virtual bool ParseColor (iDocumentNode* node, csColor &c);

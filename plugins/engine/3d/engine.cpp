@@ -3007,7 +3007,7 @@ csPtr<iLight> csEngine::CreateLight (
   const csVector3 &pos,
   float radius,
   const csColor &color,
-  int dyntype)
+  csLightDynamicType dyntype)
 {
   csLight *light = new csLight (
       pos.x, pos.y, pos.z,
@@ -3301,9 +3301,9 @@ csPtr<iMeshWrapper> csEngine::LoadMeshWrapper (
   imw->DecRef (); // the ref is now stored in the MeshList
   if (sector)
   {
-    meshwrap->GetCsMovable ().SetSector (sector);
-    meshwrap->GetCsMovable ().SetPosition (pos);
-    meshwrap->GetCsMovable ().UpdateMove ();
+    (meshwrap->GetCsMovable ()).csMovable::SetSector (sector);
+    (meshwrap->GetCsMovable ()).csMovable::SetPosition (pos);
+    (meshwrap->GetCsMovable ()).csMovable::UpdateMove ();
   }
 
   csRef<iLoaderContext> elctxt (CreateLoaderContext (0, true));
@@ -3426,9 +3426,9 @@ csPtr<iMeshWrapper> csEngine::CreateMeshWrapper (
   GetMeshes ()->Add (&(meshwrap->scfiMeshWrapper));
   if (sector)
   {
-    meshwrap->GetCsMovable ().SetSector (sector);
-    meshwrap->GetCsMovable ().SetPosition (pos);
-    meshwrap->GetCsMovable ().UpdateMove ();
+    (meshwrap->GetCsMovable ()).csMovable::SetSector (sector);
+    (meshwrap->GetCsMovable ()).csMovable::SetPosition (pos);
+    (meshwrap->GetCsMovable ()).csMovable::UpdateMove ();
   }
 
   mesh->SetLogicalParent (&(meshwrap->scfiMeshWrapper));

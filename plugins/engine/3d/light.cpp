@@ -47,16 +47,18 @@ csLight::csLight (
   float x, float y, float z,
   float d,
   float red, float green, float blue,
-  int dyntype) :
+  csLightDynamicType dyntype) :
     csObject()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLight);
   light_id = 0;
-  center.x = x;
-  center.y = y;
-  center.z = z;
+  movable.scfParent = (iBase*)(csObject*)this;
+  movable.SetLight (this);
+  movable.SetPosition (csVector3 (x,y,z));
 
   dynamic_type = dyntype;
+  type = CS_LIGHT_POINTLIGHT;
+
   if (dynamic_type != CS_LIGHT_DYNAMICTYPE_DYNAMIC)
     flags.SetAll (CS_LIGHT_THINGSHADOWS);
 
@@ -76,6 +78,8 @@ csLight::csLight (
   influenceValid = true;
   inv_dist = 1 / d;
   attenuationvec = csVector3(0, 1/d, 0); // inverse linear falloff
+  direction = csVector3(1,0,0);
+  spotlight_falloff = csVector2(1,1);
 
   if (ABS (influenceRadius) < SMALL_EPSILON)
     CalculateInfluenceRadius ();
@@ -129,6 +133,7 @@ const char* csLight::GenerateUniqueID ()
   csMemFile mf;
 
   mf.Write ("light", 5);
+  iSector* sector = GetSector ();
   if (sector)
   {
     if (sector->QueryObject ()->GetName ())
@@ -137,6 +142,7 @@ const char* csLight::GenerateUniqueID ()
   }
 
   int32 l;
+  csVector3 center = GetCenter ();
   l = csConvertEndian ((int32)csQint ((center.x * 1000)+.5));
   mf.Write ((char*)&l, 4);
   l = csConvertEndian ((int32)csQint ((center.y * 1000)+.5));
@@ -183,8 +189,9 @@ float csLight::GetBrightnessAtDistance (float d)
   return 0;
 }
 
-void csLight::SetCenter (const csVector3 &pos)
+void csLight::OnSetPosition ()
 {
+  csVector3 pos = GetCenter ();
   int i = light_cb_vector.Length ()-1;
   while (i >= 0)
   {
@@ -193,11 +200,10 @@ void csLight::SetCenter (const csVector3 &pos)
     i--;
   }
 
-  center = pos;
   lightnr++;
 }
 
-void csLight::SetSector (iSector* sector)
+void csLight::OnSetSector (iSector *sector)
 {
   int i = light_cb_vector.Length ()-1;
   while (i >= 0)
@@ -207,7 +213,6 @@ void csLight::SetSector (iSector* sector)
     i--;
   }
 
-  csLight::sector = sector;
   lightnr++;
 }
 
@@ -232,7 +237,7 @@ void csLight::SetColor (const csColor& col)
   }
 }
 
-void csLight::SetAttenuation (int a)
+void csLight::SetAttenuation (csLightAttenuationMode a)
 {
   float dist;
   if (!GetDistanceForBrightness (1.0f, dist))
@@ -303,7 +308,7 @@ void csLight::SetInfluenceRadius (float radius)
   influenceRadiusSq = radius*radius;
   inv_dist = 1.0 / influenceRadius;
 
-  int oldatt = attenuation;
+  csLightAttenuationMode oldatt = attenuation;
   CalculateAttenuationVector (attenuation, radius, 
     1.0f / influenceIntensityFraction);
   attenuation = oldatt;
@@ -326,7 +331,7 @@ void csLight::CalculateInfluenceRadius ()
   influenceValid = true;
 }
 
-void csLight::CalculateAttenuationVector (int atttype, float radius,
+void csLight::CalculateAttenuationVector (csLightAttenuationMode atttype, float radius,
   float brightness)
 {
   if (brightness < EPSILON)
@@ -493,13 +498,13 @@ void csLight::CalculateLighting ()
         this, dynamic_type == CS_LIGHT_DYNAMICTYPE_DYNAMIC));
   lview.SetUserdata (lpi);
 
-  ctxt->SetNewLightFrustum (new csFrustum (center));
+  ctxt->SetNewLightFrustum (new csFrustum (GetCenter ()));
   ctxt->GetLightFrustum ()->MakeInfinite ();
 
   if (dynamic_type == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
   {
     csRef<iMeshWrapperIterator> it = csEngine::current_engine
-    	->GetNearbyMeshes (sector, center, GetInfluenceRadius ());
+    	->GetNearbyMeshes (GetSector (), GetCenter (), GetInfluenceRadius ());
     while (it->HasNext ())
     {
       iMeshWrapper* m = it->Next ();
@@ -515,7 +520,7 @@ void csLight::CalculateLighting ()
   }
   else
   {
-    sector->CheckFrustum ((iFrustumView *) &lview);
+    GetSector ()->CheckFrustum ((iFrustumView *) &lview);
     lpi->FinalizeLighting ();
   }
 }
@@ -535,7 +540,7 @@ void csLight::CalculateLighting (iMeshWrapper *th)
       this, dynamic_type == CS_LIGHT_DYNAMICTYPE_DYNAMIC));
   lview.SetUserdata (lpi);
 
-  ctxt->SetNewLightFrustum (new csFrustum (center));
+  ctxt->SetNewLightFrustum (new csFrustum (GetCenter ()));
   ctxt->GetLightFrustum ()->MakeInfinite ();
 
   lview.CallObjectFunction (th, true);

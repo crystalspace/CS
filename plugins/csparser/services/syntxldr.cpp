@@ -292,6 +292,21 @@ bool csTextSyntaxService::WriteVector (iDocumentNode* node, csVector3* v)
   return true;
 }
 
+
+bool csTextSyntaxService::ParseVector (iDocumentNode* node, csVector2 &v)
+{
+  v.x = node->GetAttributeValueAsFloat ("x");
+  v.y = node->GetAttributeValueAsFloat ("y");
+  return true;
+}
+
+bool csTextSyntaxService::WriteVector (iDocumentNode* node, csVector2* v)
+{
+  node->SetAttributeAsFloat("x", v->x);
+  node->SetAttributeAsFloat("y", v->y);
+  return true;
+}
+
 bool csTextSyntaxService::ParseColor (iDocumentNode* node, csColor &c)
 {				      
   c.red = node->GetAttributeValueAsFloat ("red");

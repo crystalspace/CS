@@ -50,6 +50,12 @@ bool csMovableSectorList::PrepareSector (iSector* sector)
   CS_ASSERT (movable != 0);
   csMeshWrapper *mw = movable->GetMeshWrapper ();
   if (mw) mw->MoveToSector (sector);
+
+  csLight *l = movable->GetLight ();
+  if (l) l->OnSetSector (sector);
+  // Make sure camera and light only is in one sector
+  CS_ASSERT (!(movable->GetLight () && Length () > 0));
+  CS_ASSERT (!(movable->GetCamera () && Length () > 0));
   return true;
 }
 
@@ -92,19 +98,16 @@ iSector *csMovableSectorList::FindByName (const char *Name) const
 //---------------------------------------------------------------------------
 SCF_IMPLEMENT_IBASE(csMovable)
   SCF_IMPLEMENTS_INTERFACE(iBase)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iMovable)
-SCF_IMPLEMENT_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csMovable::eiMovable)
   SCF_IMPLEMENTS_INTERFACE(iMovable)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
+SCF_IMPLEMENT_IBASE_END
 
 csMovable::csMovable ()
 {
   SCF_CONSTRUCT_IBASE (0);
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMovable);
   parent = 0;
-  object = 0;
+  meshobject = 0;
+  lightobject = 0;
+  cameraobject = 0;
   updatenr = 0;
   sectors.SetMovable (this);
   is_identity = true;
@@ -117,9 +120,8 @@ csMovable::~csMovable ()
   {
     i--;
     iMovableListener *ml = listeners[i];
-    ml->MovableDestroyed (&scfiMovable);
+    ml->MovableDestroyed (this);
   }
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiMovable);
   SCF_DESTRUCT_IBASE ();
 }
 
@@ -137,11 +139,12 @@ void csMovable::SetTransform (const csMatrix3 &matrix)
 void csMovable::MovePosition (const csVector3 &rel)
 {
   obj.Translate (rel);
+  if (lightobject) lightobject->OnSetPosition ();
 }
 
 void csMovable::Transform (const csMatrix3 &matrix)
 {
-  obj.SetT2O (matrix * obj.GetT2O ());
+  obj.SetT2O (matrix * obj.GetT2O ());  
 }
 
 void csMovable::SetSector (iSector *sector)
@@ -154,7 +157,7 @@ void csMovable::SetSector (iSector *sector)
 
 void csMovable::ClearSectors ()
 {
-  if (object) object->RemoveFromSectors ();
+  if (meshobject) meshobject->RemoveFromSectors ();
   if (parent == 0)
   {
     sectors.DeleteAll ();
@@ -178,14 +181,15 @@ void csMovable::UpdateMove ()
   updatenr++;
   is_identity = obj.IsIdentity ();
 
-  if (object) object->UpdateMove ();
+  if (meshobject) meshobject->UpdateMove ();
+  if (lightobject) lightobject->OnSetPosition ();
 
   size_t i = listeners.Length ();
   while (i > 0)
   {
     i--;
     iMovableListener *ml = listeners[i];
-    ml->MovableChanged (&scfiMovable);
+    ml->MovableChanged (this);
   }
 }
 
@@ -197,101 +201,4 @@ csReversibleTransform csMovable::GetFullTransform () const
     return parent->GetFullTransform ();
   else
     return GetTransform () * parent->GetFullTransform ();
-}
-
-//--------------------------------------------------------------------------
-iMovable *csMovable::eiMovable::GetParent () const
-{
-  return scfParent->parent;
-}
-
-void csMovable::eiMovable::SetSector (iSector *sector)
-{
-  scfParent->SetSector (sector);
-}
-
-void csMovable::eiMovable::ClearSectors ()
-{
-  scfParent->ClearSectors ();
-}
-
-iSectorList *csMovable::eiMovable::GetSectors ()
-{
-  return scfParent->GetSectors ();
-}
-
-bool csMovable::eiMovable::InSector () const
-{
-  return scfParent->InSector ();
-}
-
-void csMovable::eiMovable::SetPosition (iSector *home, const csVector3 &v)
-{
-  scfParent->SetPosition (home, v);
-}
-
-void csMovable::eiMovable::SetPosition (const csVector3 &v)
-{
-  scfParent->SetPosition (v);
-}
-
-const csVector3 &csMovable::eiMovable::GetPosition () const
-{
-  return scfParent->GetPosition ();
-}
-
-const csVector3 csMovable::eiMovable::GetFullPosition () const
-{
-  return scfParent->GetFullPosition ();
-}
-
-void csMovable::eiMovable::SetTransform (const csMatrix3 &matrix)
-{
-  scfParent->SetTransform (matrix);
-}
-
-void csMovable::eiMovable::SetTransform (const csReversibleTransform &t)
-{
-  scfParent->SetTransform (t);
-}
-
-csReversibleTransform &csMovable::eiMovable::GetTransform ()
-{
-  return scfParent->GetTransform ();
-}
-
-csReversibleTransform csMovable::eiMovable::GetFullTransform () const
-{
-  return scfParent->GetFullTransform ();
-}
-
-void csMovable::eiMovable::MovePosition (const csVector3 &v)
-{
-  scfParent->MovePosition (v);
-}
-
-void csMovable::eiMovable::Transform (const csMatrix3 &matrix)
-{
-  scfParent->Transform (matrix);
-}
-
-void csMovable::eiMovable::AddListener (
-  iMovableListener *listener)
-{
-  scfParent->AddListener (listener);
-}
-
-void csMovable::eiMovable::RemoveListener (iMovableListener *listener)
-{
-  scfParent->RemoveListener (listener);
-}
-
-void csMovable::eiMovable::UpdateMove ()
-{
-  scfParent->UpdateMove ();
-}
-
-long csMovable::eiMovable::GetUpdateNumber () const
-{
-  return scfParent->GetUpdateNumber ();
 }

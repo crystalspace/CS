@@ -687,7 +687,7 @@ struct iEngine : public iBase
    */
   virtual csPtr<iLight> CreateLight (const char* name, const csVector3& pos,
   	float radius, const csColor& color,
-	int dyntype = CS_LIGHT_DYNAMICTYPE_STATIC) = 0;
+	csLightDynamicType dyntype = CS_LIGHT_DYNAMICTYPE_STATIC) = 0;
 
   /** Find a static/pseudo-dynamic light by name.
    * \param Name the engine name of the desired light

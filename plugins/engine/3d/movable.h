@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000 by Jorrit Tyberghein
+                  2005 by Marten Svanfeldt
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -28,6 +29,8 @@ class csVector3;
 class csMatrix3;
 class csMovable;
 class csMeshWrapper;
+class csLight;
+class csCamera;
 
 /// A list of sectors as the movable uses it
 class csMovableSectorList : public iSectorList, public csRefArrayObject<iSector>
@@ -61,7 +64,7 @@ public:
  * through portals). This class itself does not have geometry.
  * It is only responsible for managing movement.
  */
-class csMovable : public iBase
+class csMovable : public iMovable
 {
 private:
   /// World to object transformation.
@@ -83,9 +86,19 @@ private:
   iMovable* parent;
 
   /**
-   * Object on which this movable operates.
+   * Meshobject on which this movable operates.
    */
-  csMeshWrapper* object;
+  csMeshWrapper* meshobject;
+
+  /**
+   * Light on which this movable operates. 
+   */
+  csLight* lightobject;
+
+  /**
+   * Camera on which this movable operates.
+   */
+  csCamera* cameraobject;
 
   /// Update number.
   long updatenr;
@@ -99,21 +112,53 @@ public:
   /// Destructor.
   virtual ~csMovable ();
 
-  /// Set object on which this movable operates.
+  /// Set meshobject on which this movable operates.
   void SetMeshWrapper (csMeshWrapper* obj)
-  { object = obj; }
+  { 
+    meshobject = obj; 
+  }
 
-  /// Get the object on which we operate.
-  csMeshWrapper* GetMeshWrapper ()
-  { return object; }
+  /// Get the meshobject on which we operate.
+  csMeshWrapper* GetMeshWrapper () const
+  { 
+    return meshobject; 
+  }
+
+  /// Set light on which this movable operates.
+  void SetLight (csLight* obj)
+  { 
+    lightobject = obj; 
+  }
+
+  /// Get the light on which we operate.
+  csLight* GetLight () const
+  { 
+    return lightobject; 
+  }
+
+  /// Set camera on which this movable operates.
+  void SetCamera (csCamera* obj)
+  { 
+    cameraobject = obj; 
+  }
+
+  /// Get the camera on which we operate.
+  csCamera* GetCamera () const
+  { 
+    return cameraobject; 
+  }
 
   /// Set the parent movable.
   void SetParent (iMovable* par)
-  { parent = par; }
+  { 
+    parent = par; 
+  }
 
   /// Get the parent movable.
   iMovable* GetParent () const
-  { return parent; }
+  { 
+    return parent; 
+  }
 
   /**
    * Initialize the list of sectors to one sector where
@@ -255,48 +300,6 @@ public:
   }
 
   SCF_DECLARE_IBASE;
-
-  //------------------------- iMovable interface -------------------------------
-  struct eiMovable : public iMovable
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csMovable);
-    virtual iMovable* GetParent () const;
-    virtual void SetParent (iMovable* parent)
-    {
-      scfParent->SetParent (parent);
-    }
-    virtual void SetSector (iSector* sector);
-    virtual void ClearSectors ();
-    virtual iSectorList *GetSectors ();
-    virtual bool InSector () const;
-    virtual void SetPosition (iSector* home, const csVector3& v);
-    virtual void SetPosition (const csVector3& v);
-    virtual const csVector3& GetPosition () const;
-    virtual const csVector3 GetFullPosition () const;
-    virtual void SetTransform (const csMatrix3& matrix);
-    virtual void SetTransform (const csReversibleTransform& t);
-    virtual csReversibleTransform& GetTransform ();
-    virtual csReversibleTransform GetFullTransform () const;
-    virtual void MovePosition (const csVector3& v);
-    virtual void Transform (const csMatrix3& matrix);
-    virtual void AddListener (iMovableListener* listener);
-    virtual void RemoveListener (iMovableListener* listener);
-    virtual void UpdateMove ();
-    virtual long GetUpdateNumber () const;
-    virtual bool IsTransformIdentity () const
-    {
-      return scfParent->IsTransformIdentity ();
-    }
-    virtual bool IsFullTransformIdentity () const
-    {
-      return scfParent->IsFullTransformIdentity ();
-    }
-    virtual void TransformIdentity ()
-    {
-      scfParent->TransformIdentity ();
-    }
-  } scfiMovable;
-  friend struct eiMovable;
 };
 
 #endif // __CS_MOVABLE_H__

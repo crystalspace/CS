@@ -109,6 +109,16 @@ struct iSyntaxService : public iBase
   virtual bool WriteVector (iDocumentNode* node, csVector3* v) = 0;
 
   /**
+   * Parse a vector description. Returns true if successful.
+   */
+  virtual bool ParseVector (iDocumentNode* node, csVector2 &v) = 0;
+
+  /**
+   * Write a vector description. Returns true if successful.
+   */
+  virtual bool WriteVector (iDocumentNode* node, csVector2* v) = 0;
+
+  /**
    * Parse a box description. Returns true if successful.
    */
   virtual bool ParseBox (iDocumentNode* node, csBox3 &v) = 0;
