@@ -22,6 +22,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/frustum.h"
 #include "csengine/camera.h"
+#include "csutil/csvector.h"
 #include "irview.h"
 
 class csMatrix3;
@@ -296,153 +297,130 @@ public:
 
 /**
  * This class is a csFrustum especially used for the lighting calculations.
- * It represents a shadow. It extends csFrustum by adding 'next' and 'prev' for
- * living in a linked list and it adds the 'polygon' member so that we can find
- * for which polygon this frustum was generated.
+ * It represents a shadow. It extends csFrustum by adding the notion of
+ * a 'shadow' originator.
  */
-class csShadowFrustum : public csFrustum
+class csShadowFrustum: public csFrustum
 {
-public:
-  /// Linked list.
-  csShadowFrustum* next, * prev;
-
-  /**
-   * Polygon which generated this shadow.
-   */
-  csPolygon3D* polygon;
-
-  /**
-   * Current sector when adding this frustum. This is useful to find
-   * all shadow frustums added in the same recursion level for one sector
-   * (together with draw_busy below).
-   */
-  csSector* sector;
-
-  /**
-   * draw_busy value of the sector when adding this
-   * frustum. This is useful to find all shadow frustums added
-   * in the same recursion level for one sector.
-   */
-  int draw_busy;
-
-  /**
-   * If true then this frustum is relevant. This is
-   * a temporary variable which is used during the lighting
-   * calculation process. It may change value several times during
-   * the life time of a shadow frustum.
-   */
+private:
+  csPolygon3D* shadow_polygon;
   bool relevant;
-
 public:
   /// Create empty frustum.
-  csShadowFrustum (csVector3& origin) :
-    csFrustum (origin), next (NULL), prev (NULL), polygon (NULL) { }
+  csShadowFrustum () :
+    csFrustum (csVector3 (0), &csPooledVertexArrayPool::default_pool),
+    shadow_polygon (NULL) { }
+  /// Create empty frustum.
+  csShadowFrustum (const csVector3& origin) :
+    csFrustum (origin, &csPooledVertexArrayPool::default_pool),
+    shadow_polygon (NULL) { }
+  /// Copy constructor.
+  csShadowFrustum (const csShadowFrustum& orig);
+  /// Set shadow polygon @@@ UGLY!
+  void SetShadowPolygon (csPolygon3D* sp) { shadow_polygon = sp; }
+  /// Get shadow polygon @@@ UGLY
+  csPolygon3D* GetShadowPolygon () { return shadow_polygon; }
+  /// Mark shadow as relevant or not.
+  void MarkRelevant (bool rel = true) { relevant = rel; }
+  /// Is shadow relevant?
+  bool IsRelevant () { return relevant; }
+};
+
+class csShadowBlockList;
+class csShadowBlock;
+
+/**
+ * An iterator to iterate over a list of shadows.
+ * This iterator can work in two directions and also supports
+ * deleting the current element in the iterator.
+ */
+class csShadowIterator
+{
+  friend class csShadowBlockList;
+  friend class csShadowBlock;
+
+private:
+  csShadowBlock* first_cur;
+  csShadowBlock* cur;
+  int i, cur_num;
+  bool onlycur;
+  int dir;	// 1 or -1 for direction.
+  inline csShadowIterator (csShadowBlock* cur, bool onlycur, int dir);
+
+public:
+  /// Return true if there are further elements to process.
+  bool HasNext ()
+  {
+    return cur != NULL && i < cur_num && i >= 0;
+  }
+  /// Return the next element.
+  csShadowFrustum* Next ();
+  /// Reset the iterator to start again from initial setup.
+  inline void Reset ();
+  /// Delete the last element returned.
+  void DeleteCurrent ();
+  /// Return the shadow list for the 'current' element.
+  csShadowBlock* GetCurrentShadowBlock ();
+  /// Return the shadow list for the 'next' element.
+  csShadowBlock* GetNextShadowBlock () { return cur; }
 };
 
 /**
- * A list of frustums.
+ * A single block of shadows. This block will use IncRef()/DecRef()
+ * on the shadow frustums so that it is possible and legal to put a single
+ * shadow in several blocks.
  */
-class csFrustumList
+class csShadowBlock
 {
+  friend class csShadowBlockList;
+  friend class csShadowIterator;
+
 private:
-  csShadowFrustum* first, * last;
+  csShadowBlock* next, * prev;
+  csVector shadows;
+  csSector* sector;
+  int draw_busy;
 
 public:
-  /// Create an empty list.
-  csFrustumList () : first (NULL), last (NULL) { }
+  /// Create a new empty list for a sector.
+  csShadowBlock (csSector* sector, int draw_busy, int max_shadows = 30, int delta = 30);
+  /// Create a new empty list.
+  csShadowBlock (int max_shadows = 30, int delta = 30);
 
-  /// Destroy the list but do not destroy the individual elements!
-  virtual ~csFrustumList () { }
+  /// Destroy the list and release all shadow references.
+  virtual ~csShadowBlock ();
 
-  /// Destroy all frustums in the list.
-  void DeleteFrustums ()
+  /// Dereference all shadows in the list.
+  void DeleteShadows ()
   {
-    csShadowFrustum* sf;
-    while (first)
+    int i;
+    for (i = 0 ; i < shadows.Length () ; i++)
     {
-      sf = first->next;
-      first->DecRef ();
-      first = sf;
+      csShadowFrustum* sf = (csShadowFrustum*)shadows[i];
+      sf->DecRef ();
     }
-    last = NULL;
+    shadows.DeleteAll ();
   }
 
-  /// Clear the list (make empty but don't delete elements).
-  void Clear () { first = last = NULL; }
+  /// Add a new frustum and return a reference.
+  csShadowFrustum* AddShadow (const csVector3& origin);
+  /// Copy and add a new frustum and return a reference.
+  csShadowFrustum* AddShadow (csShadowFrustum* sf);
+  /// Add a new frustum (without copy).
+  void AddShadowNoCopy (csShadowFrustum* sf);
+  /// Unlink a shadow frustum from the list and dereference it.
+  void UnlinkShadow (int idx);
 
-  /// Get the first element in this list (or NULL if empty).
-  csShadowFrustum* GetFirst () { return first; }
-
-  /// Get the last element in this list (or NULL if empty).
-  csShadowFrustum* GetLast () { return last; }
-
-  /**
-   * Append a list to this one. Note that you
-   * should not do any modifications on the other list
-   * after this is done.
-   */
-  void AppendList (csFrustumList* list)
+  /// Get the number of shadows in this list.
+  int GetNumShadows ()
   {
-    if (last)
-    {
-      last->next = list->GetFirst ();
-      if (list->GetFirst ()) list->GetFirst ()->prev = last;
-      if (list->GetLast ()) last = list->GetLast ();
-    }
-    else
-    {
-      first = list->GetFirst ();
-      last = list->GetLast ();
-    }
+    return shadows.Length ();
   }
 
-  /**
-   * Set the last element in this list. This basicly has
-   * the effect of truncating the list to some specific element.
-   * Note that this function only works if the frustum is actually
-   * part of the list. No checking is done. The elements which
-   * are clipped of the list are unchanged (not deleted). You
-   * can relink or delete them if you want. If the given frustum
-   * is NULL then this function has the same effect as making
-   * the list empty.
-   */
-  void SetLast (csShadowFrustum* frust)
+  /// Get the specified shadow.
+  csShadowFrustum* GetShadow (int idx)
   {
-    if (frust)
-    {
-      frust->next = NULL;
-      last = frust;
-    }
-    else { first = last = NULL; }
-  }
-
-  /// Add a new frustum to the front of the list.
-  void AddFirst (csShadowFrustum* fr)
-  {
-    fr->prev = NULL;
-    fr->next = first;
-    if (first) first->prev = fr;
-    first = fr;
-    if (!last) last = fr;
-  }
-
-  /// Add a new frustum to the back of the list.
-  void AddLast (csShadowFrustum* fr)
-  {
-    fr->next = NULL;
-    fr->prev = last;
-    if (last) last->next = fr;
-    last = fr;
-    if (!first) first = fr;
-  }
-
-  /// Unlink a shadow frustum from the list.
-  void Unlink (csShadowFrustum* sf)
-  {
-    if (sf->next) sf->next->prev = sf->prev;
-    else last = sf->prev;
-    if (sf->prev) sf->prev->next = sf->next;
-    else first = sf->next;
+    return (csShadowFrustum*)(idx < shadows.Length () ? shadows[idx] : NULL);
   }
 
   /**
@@ -450,12 +428,114 @@ public:
    */
   void Transform (csTransform* trans)
   {
-    csShadowFrustum* sf = first;
-    while (sf)
+    int i;
+    for (i = 0 ; i < shadows.Length () ; i++)
+      ((csShadowFrustum*)shadows[i])->Transform (trans);
+  }
+
+  /// Get iterator to iterate over all shadows in this block.
+  csShadowIterator* GetShadowIterator (bool reverse = false)
+  {
+    return new csShadowIterator (this, true, reverse ? -1 : 1);
+  }
+
+  /// Get Sector.
+  csSector* GetSector () { return sector; }
+  /// Get draw_busy for sector.
+  int GetDrawBusy () { return draw_busy; }
+};
+
+inline csShadowIterator::csShadowIterator (csShadowBlock* cur, bool onlycur,
+	int dir)
+{
+  csShadowIterator::cur = cur;
+  csShadowIterator::onlycur = onlycur;
+  csShadowIterator::dir = dir;
+  first_cur = cur;
+  Reset ();
+}
+
+inline void csShadowIterator::Reset ()
+{
+  cur = first_cur;
+  if (cur) cur_num = cur->GetNumShadows ();
+  if (dir == 1) i = 0;
+  else i = cur_num-1;
+}
+
+/**
+ * A list of shadow blocks.
+ */
+class csShadowBlockList
+{
+private:
+  csShadowBlock* first;
+  csShadowBlock* last;
+
+public:
+  /// Create a new empty list.
+  csShadowBlockList () : first (NULL), last (NULL) { }
+  /// Destroy the list and all shadow blocks in it.
+  ~csShadowBlockList ()
+  {
+    DeleteAllShadows ();
+  }
+
+  /// Append a shadow block to this list.
+  void AppendShadowBlock (csShadowBlock* slist)
+  {
+    slist->next = NULL;
+    if (!last)
     {
-      sf->Transform (trans);
-      sf = sf->next;
+      first = last = slist;
+      slist->prev = NULL;
     }
+    else
+    {
+      slist->prev = last;
+      last->next = slist;
+      last = slist;
+    }
+  }
+
+  /// Remove the last shadow block from this list.
+  void RemoveLastShadowBlock ()
+  {
+    if (last)
+    {
+      last = last->prev;
+      if (last) last->next = NULL;
+      else first = NULL;
+    }
+  }
+
+  /// Clear first and last pointers without deleting anything!
+  void Clear () { first = last = NULL; }
+
+  /// Destroy all shadow lists and shadows in the list.
+  void DeleteAllShadows ()
+  {
+    while (first)
+    {
+      first->DeleteShadows ();
+      csShadowBlock* todel = first;
+      first = first->next;
+      delete todel;
+    }
+    last = NULL;
+  }
+
+  csShadowBlock* GetFirstShadowBlock () { return first; }
+  csShadowBlock* GetLastShadowBlock () { return last; }
+  csShadowBlock* GetNextShadowBlock (csShadowBlock* s) { return s->next; }
+  csShadowBlock* GetPreviousShadowBlock (csShadowBlock* s) { return s->prev; }
+
+  /**
+   * Return an iterator to iterate over all shadows in this list.
+   */
+  csShadowIterator* GetShadowIterator (bool reverse = false)
+  {
+    return new csShadowIterator (first, false, reverse ? -1 : 1);
   }
 };
 
@@ -468,16 +548,16 @@ typedef void (csFrustumViewNodeFunc)(csOctreeNode* node, csFrustumView* lview);
 /**
  * The structure for registering cleanup actions.  You can register with any
  * frustumlist object any number of cleanup routines.  For this you create
- * such a structure and pass it to RegisterCleanup () method of csFrsutumList.
- * You can derive a subclass from csFrustrumViewCleanup and keep all
+ * such a structure and pass it to RegisterCleanup () method of csFrustumList.
+ * You can derive a subclass from csFrustumViewCleanup and keep all
  * additional data there.
  */
-struct csFrustrumViewCleanup
+struct csFrustumViewCleanup
 {
   // Pointer to next cleanup action in chain
-  csFrustrumViewCleanup *next;
+  csFrustumViewCleanup *next;
   // The routine that is called for cleanup
-  void (*action) (csFrustumView *, csFrustrumViewCleanup *);
+  void (*action) (csFrustumView *, csFrustumViewCleanup *);
 };
 
 /**
@@ -491,7 +571,7 @@ class csFrustumView
 {
 public:
   /// The head of cleanup actions
-  csFrustrumViewCleanup *cleanup;
+  csFrustumViewCleanup *cleanup;
 
   /// Data for the functions below.
   void* userdata;
@@ -549,7 +629,8 @@ public:
    * expanded with every traversal through a portal but it needs
    * to be restored to original state again before returning.
    */
-  csFrustumList shadows;
+  csShadowBlockList* shadows;
+  bool shared;
 
   /**
    * A callback function. If this is set then no actual
@@ -575,19 +656,22 @@ public:
   unsigned int process_thing_mask, process_thing_value;
 
 public:
-  /// Constructor. frustum_id is generated each time a new object is created.
+  /// Constructor.
   csFrustumView ();
-  /// Copy constructor. Everything is copied except the frustum ID
+  /// Copy constructor. Everything is copied.
   csFrustumView (const csFrustumView &iCopy);
 
   /// Destroy the object
   ~csFrustumView ();
 
   /// Register a cleanup action to be called from destructor
-  void RegisterCleanup (csFrustrumViewCleanup *action)
+  void RegisterCleanup (csFrustumViewCleanup *action)
   { action->next = cleanup; cleanup = action; }
   /// Deregister a cleanup action
-  bool DeregisterCleanup (csFrustrumViewCleanup *action);
+  bool DeregisterCleanup (csFrustumViewCleanup *action);
+
+  /// Start new shadow list for this frustum.
+  void StartNewShadowBlock ();
 };
 
 #endif // __CS_RVIEW_H__

@@ -180,14 +180,15 @@ public:
   void ShineDynLightMap (csLightPatch* lp);
 
   /// Get the bounding rectangle of the whole lightmap in world space
-  bool GetLightmapBounds (csFrustumView *lview, csVector3 *bounds);
+  bool GetLightmapBounds (const csVector3& lightpos, bool mirror,
+  	csVector3 *bounds);
 
   /// Get the coverage matrix for the associated lightmap
   void GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &cm);
 
   /// Process lighting for all delayed polygon lightmaps
   static void ProcessDelayedLightmaps (csFrustumView *lview,
-    csFrustrumViewCleanup *lighting_info);
+    csFrustumViewCleanup *lighting_info);
 
   /// Collect all relevant shadows from this frustum that covers this lightmap
   bool CollectShadows (csFrustumView *lview, csPolygon3D *poly);

@@ -1177,14 +1177,14 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
   csFrustumView new_lview = *lview;
   new_lview.light_frustum = NULL;
   csVector3 poly[40];
-  csVector3& center = lview->light_frustum->GetOrigin ();
+  const csVector3& center = lview->light_frustum->GetOrigin ();
   int num_vert = 4;
   int num_vertices = destpoly3d->GetVertices ().GetNumVertices ();
   int j;
   if(dest)
   {
     if( !destpoly3d->GetLightMapInfo()->GetPolyTex()->
-      GetLightmapBounds(lview, poly) )
+      GetLightmapBounds(center, lview->mirror, poly) )
       /// empty intersection or lightmap has already been seen by frustum.
       return;
   }

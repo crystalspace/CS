@@ -1,5 +1,6 @@
 /*
     Copyright (C) 1998 by Ayal Zwi Pinkus
+    Copyright (C) 2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -364,7 +365,8 @@ void csCurve::ShineDynLight (csLightPatch* lp)
 
   csDynLight *light = lp->light;
 
-  csShadowFrustum* sf = lp->shadows.GetFirst ();
+  csShadowIterator* shadow_it = lp->shadows.GetShadowIterator ();
+  bool has_shadows = shadow_it->HasNext ();
 
   csColor color = light->GetColor() * NORMAL_LIGHT_LEVEL;
 
@@ -395,18 +397,23 @@ void csCurve::ShineDynLight (csLightPatch* lp)
         continue;
 
       // if we have any shadow frustrumsq
-      if (sf != NULL)
+      if (has_shadows)
       {
-        csShadowFrustum* csf;
-        for(csf=sf; csf != NULL; csf=csf->next)
-        {
+        shadow_it->Reset ();
+	bool shad = false;
+	while (shadow_it->HasNext ())
+	{
+          csShadowFrustum* csf = shadow_it->Next ();
           // is this point in shadow
           if (csf->Contains(pos - csf->GetOrigin()))
+	  {
+	    shad = true;
             break;
+	  }
         }
                   
         // if it was found in shadow skip it
-        if (csf != NULL)
+        if (shad)
           continue;
       }
 
@@ -442,6 +449,8 @@ void csCurve::ShineDynLight (csLightPatch* lp)
       }
     }
   }
+
+  delete shadow_it;
 }
 
 void csCurve::GetCoverageMatrix (csFrustumView& lview, 
@@ -450,7 +459,8 @@ void csCurve::GetCoverageMatrix (csFrustumView& lview,
   csVector3 pos;
   int uv;
 
-  csShadowFrustum* sf = lview.shadows.GetFirst ();
+  csShadowIterator* shadow_it = lview.shadows->GetShadowIterator ();
+  bool has_shadows = shadow_it->HasNext ();
   
   int lm_width = lightmap->GetWidth ();
   int lm_height = lightmap->GetHeight ();
@@ -471,11 +481,13 @@ void csCurve::GetCoverageMatrix (csFrustumView& lview,
         continue;
 
       // if we have any shadow frustrums
-      if (sf != NULL)
+      if (has_shadows)
       {
         csShadowFrustum* csf;
-        for(csf=sf; csf != NULL; csf=csf->next)
-        {
+	shadow_it->Reset ();
+	while (shadow_it->HasNext ())
+	{
+	  csf = shadow_it->Next ();
           // is this point in shadow
           if (csf->Contains(pos - csf->GetOrigin()))
             break;
@@ -489,6 +501,8 @@ void csCurve::GetCoverageMatrix (csFrustumView& lview,
       cm.coverage[uv] = 1.0;
     }
   }
+
+  delete shadow_it;
 }
 
 void csCurve::CalculateLighting (csFrustumView& lview)
@@ -509,16 +523,17 @@ void csCurve::CalculateLighting (csFrustumView& lview)
     lp->Initialize (4);
 
     // Copy shadow frustums.
-    csShadowFrustum* sf, * copy_sf;
-    sf = lview.shadows.GetFirst ();
-    while (sf)
+    csShadowFrustum* sf;
+    csShadowIterator* shadow_it = lview.shadows->GetShadowIterator ();
+    lp->shadows.DeleteShadows ();
+    while (shadow_it->HasNext ())
     {
+      sf = shadow_it->Next ();
       //if (sf->relevant) @@@: It would be nice if we could optimize earlier 
-      //                       to determine relative shadow frustums in curves
-      copy_sf = new csShadowFrustum (*sf);
-      lp->shadows.AddLast (copy_sf);
-      sf = sf->next;
+      //                       to determine relevant shadow frustums in curves
+      lp->shadows.AddShadow (sf);
     }
+    delete shadow_it;
 
     lp->light_frustum = new csFrustum(*lview.light_frustum);
 
@@ -647,6 +662,27 @@ void csCurve::CalculateLighting (csFrustumView& lview)
     }
 
     delete shadow_matrix;
+  }
+}
+
+void csCurve::HardTransform (const csReversibleTransform& trans)
+{
+  return;//@@@
+  if (_uv2World)
+  {
+    int lm_width = lightmap->GetWidth ();
+    int lm_height = lightmap->GetHeight ();
+    int uv;
+    // transform our uv2World buffer
+    for (int ui=0; ui < lm_width; ui++)
+    {
+      for (int vi=0; vi < lm_height; vi++)
+      {
+        uv = vi*lm_width + ui;
+
+        _uv2World[uv] = trans.Other2This (_uv2World[uv]);
+      }
+    }
   }
 }
 
@@ -826,6 +862,16 @@ void csBezierCurve::Normal (csVector3& vec, double u, double v)
   vec = csBezier2::GetNormal (controls, u, v);
 }
 
+void csBezierCurve::HardTransform (const csReversibleTransform& trans)
+{
+  csCurve::HardTransform (trans);
+  valid_bbox = false;
+  int i, j;
+  for (i = 0 ; i < 3 ; i++)
+    for (j = 0 ; j < 3 ; j++)
+      points[i][j] = trans.This2Other (points[i][j]);
+}
+
 //------------------------------------------------------------------
 
 csCurveTemplate::csCurveTemplate () : csPObject ()
@@ -863,3 +909,4 @@ csCurve* csBezierTemplate::MakeCurve ()
   p->SetMaterialWrapper (cstxt);
   return p;
 }
+

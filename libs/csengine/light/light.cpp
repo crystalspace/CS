@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -350,7 +350,7 @@ void csLightPatch::RemovePatch ()
   if (polygon) polygon->UnlinkLightpatch (this);
   if (curve) curve->UnlinkLightPatch (this);
   if (light) light->UnlinkLightpatch (this);
-  shadows.DeleteFrustums ();
+  shadows.DeleteShadows ();
   if (light_frustum)
   {
     delete light_frustum;

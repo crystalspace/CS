@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998-2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -581,7 +581,7 @@ void csPolygon3D::ObjectToWorld (const csReversibleTransform& t)
 void csPolygon3D::HardTransform (const csReversibleTransform& t)
 {
   csPlane3 new_plane;
-  t.This2Other (plane->GetObjectPlane (), Vwor (0), new_plane);
+  t.This2Other (plane->GetObjectPlane (), Vobj (0), new_plane);
   plane->GetObjectPlane () = new_plane;
   plane->GetWorldPlane () = new_plane;
 
@@ -1617,17 +1617,14 @@ void csPolygon3D::FillLightMap (csFrustumView& lview)
     lp->Initialize (lview.light_frustum->GetNumVertices ());
 
     // Copy shadow frustums.
-    csShadowFrustum* sf, * copy_sf;
-    sf = lview.shadows.GetFirst ();
-    while (sf)
+    csShadowIterator* shadow_it = lview.shadows->GetShadowIterator ();
+    while (shadow_it->HasNext ())
     {
-      if (sf->relevant)
-      {
-        copy_sf = new csShadowFrustum (*sf);
-        lp->shadows.AddLast (copy_sf);
-      }
-      sf = sf->next;
+      csShadowFrustum* sf = shadow_it->Next ();
+      if (sf->IsRelevant ())
+        lp->shadows.AddShadow (sf);
     }
+    delete shadow_it;
 
     int i, mi;
     for (i = 0 ; i < lp->num_vertices ; i++)
@@ -1664,7 +1661,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview,
   // each other.
   int i, i1, j, j1;
 
-  csShadowFrustum* sf = lview.shadows.GetFirst ();
+  csShadowIterator* shadow_it = lview.shadows->GetShadowIterator ();
   csFrustum *lf = lview.light_frustum;
 
   // Precalculate the normals for csFrustum::BatchClassify.
@@ -1678,23 +1675,24 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview,
   }
 
   // For every shadow frustum...
-  while (sf)
+  while (shadow_it->HasNext ())
   {
+    csShadowFrustum* sf = shadow_it->Next ();
     // First check if the plane of the shadow frustum is close to the plane
     // of the polygon (the input parameter 'plane'). If so then we discard the
     // frustum as not relevant.
     if (csMath3::PlanesClose (*sf->GetBackPlane (), plane))
-      sf->relevant = false;
+      sf->MarkRelevant (false);
     else
     {
-      csPolygon3D* sfp = sf->polygon;
+      csPolygon3D* sfp = sf->GetShadowPolygon ();
       switch (csFrustum::BatchClassify (
         lf_verts, lf_normals, lf->GetNumVertices (),
         sf->GetVertices (), sf->GetNumVertices ()))
       {
         case CS_FRUST_PARTIAL:
         case CS_FRUST_INSIDE:
-          sf->relevant = true;
+          sf->MarkRelevant ();
 	  // If partial then we first test if the light and shadow
 	  // frustums are adjacent. If so then we ignore the shadow
 	  // frustum as well (not relevant).
@@ -1722,27 +1720,28 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview,
 		      (d1.z < -EPSILON && d2.z > EPSILON) ||
 		      (d1.z > EPSILON && d2.z < -EPSILON))
 		{
-		  sf->relevant = false;
+		  sf->MarkRelevant (false);
 		  break;
 		}
 	      }
-	      if (!sf->relevant) break;
+	      if (!sf->IsRelevant ()) break;
 	      j1 = j;
 	      a1 = a;
 	    }
-	    if (!sf->relevant) break;
+	    if (!sf->IsRelevant ()) break;
 	    i1 = i;
 	  }
 	  break;
         case CS_FRUST_OUTSIDE:
-          sf->relevant = false;
+          sf->MarkRelevant (false);
           break;
         case CS_FRUST_COVERED:
+	  delete shadow_it;
           return false;
       }
     }
-    sf = sf->next;
   }
+  delete shadow_it;
   return true;
 }
 
@@ -1758,7 +1757,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview)
 void csPolygon3D::CalculateLighting (csFrustumView *lview)
 {
   csFrustum* light_frustum = lview->light_frustum;
-  csVector3& center = light_frustum->GetOrigin ();
+  const csVector3& center = light_frustum->GetOrigin ();
 
   // If plane is not visible then return (backface culling).
   if (!csMath3::Visible (center, plane->GetWorldPlane ())) return;
@@ -1801,7 +1800,7 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
       VectorArray.SetLimit (4);
     poly = VectorArray.GetArray ();
 
-    fill_lightmap = lmi->tex->GetLightmapBounds (lview, poly);
+    fill_lightmap = lmi->tex->GetLightmapBounds (center, lview->mirror, poly);
   }
   else
   {
@@ -1931,7 +1930,8 @@ void csPolygon3D::CalculateDelayedLighting (csFrustumView *lview)
     VectorArray.SetLimit (4);
   csVector3 *poly = VectorArray.GetArray ();
 
-  lmi->tex->GetLightmapBounds (lview, poly);
+  lmi->tex->GetLightmapBounds (lview->light_frustum->GetOrigin (),
+  	lview->mirror, poly);
 
   new_light_frustum = light_frustum->Intersect (poly, num_vertices);
 

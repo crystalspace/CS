@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998,2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -41,20 +41,20 @@
 // before csPolyTexture::GetLightmapBounds for details.
 // A object of this type is inserted into original polygon, so that no extra
 // storage except that provided by csObject is required.
-class csDelayedLightingInfo : public csFrustrumViewCleanup
+class csDelayedLightingInfo : public csFrustumViewCleanup
 {
   struct LightViewInfo
   {
     // The view frustum
     csFrustumView *frustum;
-    // The old value of csFrustrumViewCleanup "next" field
-    csFrustrumViewCleanup *old_next;
+    // The old value of csFrustumViewCleanup "next" field
+    csFrustumViewCleanup *old_next;
     // The list of shadow frustums
-    csVector shadows;
+    csShadowBlock shadows;
     // The list of polygons that are still unlit; if NULL we have no more shares
     csPolygon3D *unlit_poly;
 
-    LightViewInfo (csFrustumView *frust, csFrustrumViewCleanup *next,
+    LightViewInfo (csFrustumView *frust, csFrustumViewCleanup *next,
       csPolygon3D *orig_poly)
       : shadows (32, 32)
     {
@@ -87,26 +87,29 @@ class csDelayedLightingInfo : public csFrustrumViewCleanup
     }
 
     int GetShadowCount ()
-    { return shadows.Length (); }
+    { return shadows.GetNumShadows (); }
 
     csShadowFrustum *GetShadow (int idx)
-    { return (csShadowFrustum *)(idx < shadows.Length () ? shadows.Get (idx) : NULL); }
+    { return shadows.GetShadow (idx); }
+
+    csShadowIterator* GetShadowIterator ()
+    {
+      return shadows.GetShadowIterator ();
+    }
 
     ~LightViewInfo ()
     {
-      for (int i = 0; i < shadows.Length (); i++)
-        GetShadow (i)->DecRef ();
+      shadows.DeleteShadows ();
     }
 
     void CheckShadow (csShadowFrustum *frust, int count)
     {
-      if (!frust->relevant)
+      if (!frust->IsRelevant ())
         return;
       for (int i = 0; i < count; i++)
         if (GetShadow (i) == frust)
           return;
-      frust->IncRef ();
-      shadows.Push (frust);
+      shadows.AddShadowNoCopy (frust);
     }
   };
 
@@ -126,6 +129,11 @@ public:
   // Get Nth shadow frustum
   csShadowFrustum *GetShadow (int idx)
   { return lvlist.Get (lvlist.Length () - 1)->GetShadow (idx); }
+  // Get iterator to iterate over all shadows.
+  csShadowIterator* GetShadowIterator ()
+  {
+    return lvlist.Get (lvlist.Length () - 1)->GetShadowIterator ();
+  }
 
   // Collect a reference from given frustum to our lightmap
   bool Collect (csFrustumView *lview, csPolygon3D *poly);
@@ -201,13 +209,14 @@ bool csDelayedLightingInfo::Collect (csFrustumView *lview, csPolygon3D *poly)
   CS_ASSERT (cur_poly);
 
   // Check if any shadow frustums we have now have not been seen in the past
-  csShadowFrustum *csf = lview->shadows.GetFirst ();
-  int ns = lvi->shadows.Length ();
-  while (csf)
+  csShadowIterator* shadow_it = lview->shadows->GetShadowIterator ();
+  int ns = lvi->shadows.GetNumShadows ();
+  while (shadow_it->HasNext ())
   {
+    csShadowFrustum* csf = shadow_it->Next ();
     lvi->CheckShadow (csf, ns);
-    csf = csf->next;
   }
+  delete shadow_it;
   return !lvi->unlit_poly;
 }
 
@@ -361,7 +370,7 @@ void csPolyTexture::InitLightMaps ()
 }
 
 void csPolyTexture::ProcessDelayedLightmaps (csFrustumView *lview,
-  csFrustrumViewCleanup *lighting_info)
+  csFrustumViewCleanup *lighting_info)
 {
   csDelayedLightingInfo *dli = (csDelayedLightingInfo *)lighting_info;
 
@@ -392,7 +401,8 @@ void csPolyTexture::ProcessDelayedLightmaps (csFrustumView *lview,
  * is going to be destroyed, so that all lightmaps which's lighting was
  * postponed can be processeed at least now.
  */
-bool csPolyTexture::GetLightmapBounds (csFrustumView *lview, csVector3 *bounds)
+bool csPolyTexture::GetLightmapBounds (const csVector3& lightpos, bool mirror,
+	csVector3 *bounds)
 {
   csPolyTxtPlane *txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
   csMatrix3 m_t2w = txt_pl->m_world2tex.GetInverse ();
@@ -400,7 +410,6 @@ bool csPolyTexture::GetLightmapBounds (csFrustumView *lview, csVector3 *bounds)
 
   int lmw = lm->rwidth;
   int lmh = lm->rheight;
-  csVector3 &lightpos = lview->light_frustum->GetOrigin ();
 
   int ww, hh;
   mat_handle->GetTexture ()->GetMipMapDimensions (0, ww, hh);
@@ -420,7 +429,7 @@ bool csPolyTexture::GetLightmapBounds (csFrustumView *lview, csVector3 *bounds)
 
     v = (m_t2w * v + v_t2w) - lightpos;
 
-    bounds [lview->mirror ? 3 - i : i] = v;
+    bounds [mirror ? 3 - i : i] = v;
   } /* endfor */
 
   // If the lightmap is shared, take care to fill lightmap only
@@ -603,26 +612,32 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
   // Now subtract all shadow polygons from the coverage matrix.
   // At the same time, add the overlapping shadows to the coverage matrix.
   int nsf;
+  csShadowIterator* shadow_it;
   csShadowFrustum *csf;
   if (dli)
   {
     nsf = dli->GetShadowCount () + dli->GetUnlitPolyCount ();
-    csf = dli->GetShadow (0);
+    shadow_it = dli->GetShadowIterator ();
   }
   else
   {
     nsf = 0;
-    csf = lview.shadows.GetFirst ();
-    while (csf) { if (csf->relevant) nsf++; csf = csf->next; }
-    csf = lview.shadows.GetFirst ();
+    shadow_it = lview.shadows->GetShadowIterator ();
+    while (shadow_it->HasNext ())
+    {
+      csf = shadow_it->Next ();
+      if (csf->IsRelevant ()) nsf++;
+    }
+    shadow_it->Reset ();
   }
 
   ALLOC_STACK_ARRAY (sfc, csPolygonClipper *, nsf);
-  for (i = 0; i < nsf; i++, csf = (dli ? dli->GetShadow (i) : csf->next))
+  for (i = 0; i < nsf; i++)
   {
+    csf = shadow_it->Next ();
     if (!dli)
-      while (!csf->relevant)
-        csf = csf->next;
+      while (!csf->IsRelevant ())
+        csf = shadow_it->Next ();
 
     // MAX_OUTPUT_VERTICES should be far too enough
     csVector2 s2d [MAX_OUTPUT_VERTICES];
@@ -699,6 +714,7 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
 #endif
 
   } /* endfor */
+  delete shadow_it;
 
   // Free all shadow frustums
   for (i = 0; i < nsf; i++)
@@ -1020,16 +1036,17 @@ b:      if (scanL2 == MinIndex) goto finish;
 
 	// Check if the point on the polygon is shadowed. To do this
 	// we traverse all shadow frustums and see if it is contained in any of them.
-	csShadowFrustum* shadow_frust;
-	shadow_frust = lp->shadows.GetFirst ();
+	csShadowIterator* shadow_it = lp->shadows.GetShadowIterator ();
 	bool shadow = false;
-	while (shadow_frust)
+	while (shadow_it->HasNext ())
 	{
-	  if (shadow_frust->relevant && shadow_frust->polygon != polygon)
+	  csShadowFrustum* shadow_frust = shadow_it->Next ();
+	  if (shadow_frust->IsRelevant () &&
+	  	shadow_frust->GetShadowPolygon () != polygon)
 	    if (shadow_frust->Contains (v2-shadow_frust->GetOrigin ()))
 	    { shadow = true; break; }
-	  shadow_frust = shadow_frust->next;
 	}
+	delete shadow_it;
 
 	if (!shadow)
 	{

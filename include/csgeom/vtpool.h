@@ -38,7 +38,8 @@ public:
   virtual csVector3* GetVertexArray (int n) = 0;
 
   /**
-   * Free an array of n vertices.
+   * Free an array of n vertices. Implementations of FreeVertexArray()
+   * are guaranteed to check if 'ar' == NULL and do nothing in that case.
    */
   virtual void FreeVertexArray (csVector3* ar, int n) = 0;
 };
@@ -48,9 +49,15 @@ public:
  * This implementation is rather trival. It will just do 'new' and
  * 'delete' to get the vertex arrays.
  */
-class csDefaultVertexArrayPool
+class csDefaultVertexArrayPool : public csVertexArrayPool
 {
 public:
+  /// A singleton instance of this pool.
+  static csDefaultVertexArrayPool default_pool;
+
+public:
+  csDefaultVertexArrayPool ();
+
   /**
    * Fetch a new array of n vertices.
    * Return NULL on failure.
@@ -72,9 +79,10 @@ public:
 /**
  * This is another implementation of csVertexArrayPool. This
  * one takes vertices from a big pool. Note that 'FreeVertexArray'
- * does not work here. The unused vertices are lost.
+ * only works to delete the last allocated array. i.e. you can only
+ * allocate and delete array in a stack fashion.
  */
-class csPooledVertexArrayPool
+class csStackedVertexArrayPool : public csVertexArrayPool
 {
 private:
   csVector3* pool;
@@ -82,15 +90,15 @@ private:
 
 public:
   /// Allocate a vertex array pool with max maxn vertices.
-  csPooledVertexArrayPool (int maxn)
+  csStackedVertexArrayPool (int maxn)
   {
-    csPooledVertexArrayPool::maxn = maxn;
+    csStackedVertexArrayPool::maxn = maxn;
     lastn = 0;
     pool = new csVector3[maxn];
   }
 
   /// Destroy pool and all vertex arrays in it.
-  virtual ~csPooledVertexArrayPool ()
+  virtual ~csStackedVertexArrayPool ()
   {
     delete[] pool;
   }
@@ -109,8 +117,9 @@ public:
   /**
    * Free an array of n vertices.
    */
-  virtual void FreeVertexArray (csVector3*, int)
+  virtual void FreeVertexArray (csVector3* ar, int n)
   {
+    if (ar == pool+lastn-n) lastn -= n;
   }
 
   /**
@@ -120,6 +129,47 @@ public:
   {
     lastn = 0;
   }
+};
+
+/**
+ * This is another implementation of csVertexArrayPool. This
+ * one takes vertices from a big pool. It allows random allocation
+ * and free of arrays but it less efficient than csStackedVertexArrayPool.
+ */
+class csPooledVertexArrayPool : public csVertexArrayPool
+{
+public:
+  /// A singleton instance of this pool.
+  static csPooledVertexArrayPool default_pool;
+
+private:
+  struct PoolEl
+  {
+    PoolEl* next;
+    int n;	// Number of vertices.
+    csVector3 first_vertex;
+  };
+  // For all common number of vertices there are specific pools.
+  PoolEl* pool[6];      // For sizes 3, 4, 5, 6, 7, and 8.
+  PoolEl* miscpool;	// For all other sizes.
+
+public:
+  /// Allocate a vertex array pool.
+  csPooledVertexArrayPool ();
+
+  /// Destroy pool and all vertex arrays in it.
+  virtual ~csPooledVertexArrayPool ();
+
+  /**
+   * Fetch a new array of n vertices.
+   * Return NULL on failure.
+   */
+  virtual csVector3* GetVertexArray (int n);
+
+  /**
+   * Free an array of n vertices.
+   */
+  virtual void FreeVertexArray (csVector3* ar, int n);
 };
 
 #endif // __VTPOOL_H__

@@ -236,9 +236,12 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
   if (!sector) CompleteSector ();
   if (sector->draw_busy > csSector::cfg_reflections) return;
 
+  //@@@@@@@@@@@@@@@@ DANGEROUS! CHECK!
   csFrustumView new_lview = lview;
   if (lview.light_frustum)
     new_lview.light_frustum = new csFrustum (*lview.light_frustum);
+  //@@@@@@@@
+  new_lview.StartNewShadowBlock ();
 
   // If copied_frustums is true we copied the frustums and we need to delete them
   // later.
@@ -258,20 +261,29 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
     // We know that csPolygon3D::CalculateLighting() called
     // csPolygon3D::MarkRelevantShadowFrustums() some time before
     // calling this function so the 'relevant' flags are still valid.
-    new_lview.shadows.Clear ();	// Don't delete elements.
-    csShadowFrustum* sf, * copy_sf;
-    sf = lview.shadows.GetFirst ();
-    while (sf)
+
+    // @@@ THIS IS A VERY INEFFICIENT OPERATION! IS THERE ANOTHER WAY!
+    csShadowBlock* slist = lview.shadows->GetFirstShadowBlock ();
+    while (slist)
     {
-      if (sf->relevant)
+      csShadowBlock* copy_slist = new csShadowBlock (slist->GetSector (),
+      	slist->GetDrawBusy ());
+      new_lview.shadows->AppendShadowBlock (copy_slist);
+
+      csShadowIterator* shadow_it = slist->GetShadowIterator ();
+      while (shadow_it->HasNext ())
       {
-        copy_sf = new csShadowFrustum (*sf);
-        new_lview.shadows.AddLast (copy_sf);
+        csShadowFrustum* sf = shadow_it->Next ();
+        if (sf->IsRelevant ())
+          copy_slist->AddShadow (sf);
       }
-      sf = sf->next;
+      delete shadow_it;
+      copy_slist->Transform (&warp_wor);
+
+      slist = lview.shadows->GetNextShadowBlock (slist);
     }
+
     copied_frustums = true;
-    new_lview.shadows.Transform (&warp_wor);
 
     if (alpha)
     {
@@ -297,26 +309,34 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
     if (new_lview.r < SMALL_EPSILON && new_lview.g < SMALL_EPSILON && new_lview.b < SMALL_EPSILON)
       return;
   }
-  else if (lview.shadows.GetFirst ())
+  else
   {
     // There is no space warping. In this case we still want to
     // remove all non-relevant shadow frustums if there are any.
     // We know that csPolygon3D::CalculateLighting() called
     // csPolygon3D::MarkRelevantShadowFrustums() some time before
     // calling this function so the 'relevant' flags are still valid.
-    new_lview.shadows.Clear ();	// Don't delete elements.
-    csShadowFrustum* sf, * copy_sf;
-    sf = lview.shadows.GetFirst ();
-    while (sf)
+    csShadowBlock* slist = lview.shadows->GetFirstShadowBlock ();
+    while (slist)
     {
-      if (sf->relevant)
+      copied_frustums = true; // Only set to true here
+
+      csShadowBlock* copy_slist = new csShadowBlock (slist->GetSector (),
+      	slist->GetDrawBusy ());
+      new_lview.shadows->AppendShadowBlock (copy_slist);
+
+      csShadowIterator* shadow_it = slist->GetShadowIterator ();
+      while (shadow_it->HasNext ())
       {
-        copy_sf = new csShadowFrustum (*sf);
-        new_lview.shadows.AddLast (copy_sf);
+        csShadowFrustum* sf = shadow_it->Next ();
+        if (sf->IsRelevant ())
+          copy_slist->AddShadowNoCopy (sf);
+          //@@@copy_slist->AddShadow (sf);
       }
-      sf = sf->next;
+      delete shadow_it;
+
+      slist = lview.shadows->GetNextShadowBlock (slist);
     }
-    copied_frustums = true;
   }
 
   sector->RealCheckFrustum (new_lview);
@@ -327,8 +347,7 @@ void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
   if (copied_frustums)
   {
     // Delete all copied frustums.
-    new_lview.shadows.DeleteFrustums ();
-    new_lview.shadows.Clear ();
+    new_lview.shadows->DeleteAllShadows ();
   }
 }
 

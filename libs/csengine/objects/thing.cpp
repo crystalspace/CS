@@ -123,6 +123,9 @@ csThing::csThing (csEngine* engine, bool is_sky, bool is_template) :
   if (is_sky) flags.Set (CS_ENTITY_ZFILL);
   movable.SetObject (this);
   engine->AddToCurrentRegion (this);
+  movablenr = -1;
+  cached_movable = NULL;
+  cfg_moving = CS_THING_MOVE_NEVER;
 
   static_tree = NULL;
 }
@@ -133,8 +136,8 @@ csThing::~csThing ()
     engine->UnlinkSky (this);
   else
     engine->UnlinkThing (this);
-  delete [] wor_verts;
-  delete [] obj_verts;
+  if (wor_verts == obj_verts) delete [] obj_verts;
+  else { delete [] wor_verts; delete [] obj_verts; }
   delete [] curve_vertices;
   delete [] curve_texels;
   delete bbox;
@@ -147,6 +150,74 @@ csThing::~csThing ()
     vinf->visobj->DecRef ();
     delete vinf;
   }
+}
+
+void csThing::SetMovingOption (int opt)
+{
+  cfg_moving = opt;
+  switch (cfg_moving)
+  {
+    case CS_THING_MOVE_NEVER:
+      if (wor_verts != obj_verts)
+        delete[] wor_verts;
+      wor_verts = obj_verts;
+      break;
+
+    case CS_THING_MOVE_OCCASIONAL:
+      if ((wor_verts == NULL || wor_verts == obj_verts) && max_vertices)
+      {
+        wor_verts = new csVector3[max_vertices];
+        memcpy (wor_verts, obj_verts, max_vertices*sizeof (csVector3));
+      }
+      movablenr = -1; // @@@ Is this good?
+      cached_movable = NULL;
+      break;
+
+    case CS_THING_MOVE_OFTEN:
+      if (wor_verts != obj_verts)
+        delete[] wor_verts;
+      wor_verts = obj_verts;
+      break;
+  }
+}
+
+void csThing::WorUpdate ()
+{
+  int i;
+  switch (cfg_moving)
+  {
+    case CS_THING_MOVE_NEVER:
+      return;
+
+    case CS_THING_MOVE_OCCASIONAL:
+      if (cached_movable && cached_movable->GetUpdateNumber () != movablenr)
+      {
+        movablenr = cached_movable->GetUpdateNumber ();
+	csReversibleTransform movtrans = cached_movable->GetFullTransform ();
+        for (i = 0 ; i < num_vertices ; i++)
+          wor_verts[i] = movtrans.This2Other (obj_verts[i]);
+        for (i = 0 ; i < polygons.Length () ; i++)
+        {
+          csPolygon3D* p = GetPolygon3D (i);
+          p->ObjectToWorld (movtrans);
+        }
+        UpdateCurveTransform ();
+      }
+      break;
+
+    case CS_THING_MOVE_OFTEN:
+      return;
+  }
+}
+
+void csThing::UpdateMove ()
+{
+  //@@@ Still needed?
+  if (!bbox) CreateBoundingBox ();
+  //@@@ Is this the good way?
+  cached_movable = &movable.scfiMovable;
+  //@@@ TEMPORARY
+  WorUpdate ();
 }
 
 void csThing::Prepare (csSector* sector)
@@ -189,11 +260,15 @@ int csThing::AddCurveVertex (csVector3& v, csVector2& t)
 
 int csThing::AddVertex (float x, float y, float z)
 {
-  if (!wor_verts)
+  if (!obj_verts)
   {
     max_vertices = 10;
-    wor_verts = new csVector3 [max_vertices];
     obj_verts = new csVector3 [max_vertices];
+    // Only if we occasionally move do we use the world vertex cache.
+    if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
+      wor_verts = new csVector3 [max_vertices];
+    else
+      wor_verts = obj_verts;
   }
   while (num_vertices >= max_vertices)
   {
@@ -201,28 +276,33 @@ int csThing::AddVertex (float x, float y, float z)
       max_vertices *= 2;
     else
       max_vertices += 10000;
-    csVector3* new_wor_verts = new csVector3 [max_vertices];
     csVector3* new_obj_verts = new csVector3 [max_vertices];
-    memcpy (new_wor_verts, wor_verts, sizeof (csVector3)*num_vertices);
     memcpy (new_obj_verts, obj_verts, sizeof (csVector3)*num_vertices);
-
-    delete [] wor_verts;
     delete [] obj_verts;
-
-    wor_verts = new_wor_verts;
     obj_verts = new_obj_verts;
+
+    if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
+    {
+      csVector3* new_wor_verts = new csVector3 [max_vertices];
+      memcpy (new_wor_verts, wor_verts, sizeof (csVector3)*num_vertices);
+      delete [] wor_verts;
+      wor_verts = new_wor_verts;
+    }
+    else
+      wor_verts = obj_verts;
   }
 
   // By default all vertices are set with the same object space and world space.
-  wor_verts[num_vertices].Set (x, y, z);
   obj_verts[num_vertices].Set (x, y, z);
+  if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
+    wor_verts[num_vertices].Set (x, y, z);
   num_vertices++;
   return num_vertices-1;
 }
 
 int csThing::AddVertexSmart (float x, float y, float z)
 {
-  if (!wor_verts) { AddVertex (x, y, z); return 0; }
+  if (!obj_verts) { AddVertex (x, y, z); return 0; }
   int i;
   for (i = 0 ; i < num_vertices ; i++)
     if (ABS (x-obj_verts[i].x) < SMALL_EPSILON &&
@@ -302,9 +382,13 @@ void csThing::CompressVertices ()
   // After this new_idx in the vt table will be the new index
   // of the vector.
   csVector3* new_obj = new csVector3 [count_unique];
-  csVector3* new_wor = new csVector3 [count_unique];
   new_obj[0] = obj_verts[vt[0].orig_idx];
-  new_wor[0] = wor_verts[vt[0].orig_idx];
+  csVector3* new_wor;
+  if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
+  {
+    new_wor = new csVector3 [count_unique];
+    new_wor[0] = wor_verts[vt[0].orig_idx];
+  }
   vt[0].new_idx = 0;
   j = 1;
   for (i = 1 ; i < num_vertices ; i++)
@@ -312,7 +396,8 @@ void csThing::CompressVertices ()
     if (vt[i].new_idx == i)
     {
       new_obj[j] = obj_verts[vt[i].orig_idx];
-      new_wor[j] = wor_verts[vt[i].orig_idx];
+      if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
+        new_wor[j] = wor_verts[vt[i].orig_idx];
       vt[i].new_idx = j;
       j++;
     }
@@ -325,10 +410,15 @@ void csThing::CompressVertices ()
   qsort (vt, num_vertices, sizeof (CompressVertex), compare_vt_orig);
 
   // Replace the old vertex tables.
-  delete [] wor_verts;
   delete [] obj_verts;
-  wor_verts = new_wor;
   obj_verts = new_obj;
+  if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
+  {
+    delete [] wor_verts;
+    wor_verts = new_wor;
+  }
+  else
+    wor_verts = obj_verts;
   num_vertices = max_vertices = count_unique;
 
   // Now we can remap the vertices in all polygons.
@@ -459,12 +549,24 @@ void csThing::HardTransform (const csReversibleTransform& t)
   for (i = 0 ; i < num_vertices ; i++)
   {
     obj_verts[i] = t.This2Other (obj_verts[i]);
-    wor_verts[i] = obj_verts[i];
+    if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
+      wor_verts[i] = obj_verts[i];
   }
+
+  curves_center = t.This2Other (curves_center);
+  if (curve_vertices)
+    for (i = 0 ; i < num_curve_vertices ; i++)
+      curve_vertices[i] = t.This2Other (curve_vertices[i]);
+
   for (i = 0 ; i < polygons.Length () ; i++)
   {
     csPolygon3D* p = GetPolygon3D (i);
     p->HardTransform (t);
+  }
+  for (i = 0 ; i < curves.Length () ; i++)
+  {
+    csCurve* c = GetCurve (i);
+    c->HardTransform (t);
   }
 }
 
@@ -574,23 +676,25 @@ void csThing::DrawPolygonArray (csPolygonInt** polygon, int num,
   iCamera* icam = d->GetCamera ();
   const csReversibleTransform& camtrans = icam->GetTransform ();
   
+  // Setup clip and far plane.
+  csPlane3 clip_plane, *pclip_plane;
+  bool do_clip_plane = d->GetClipPlane (clip_plane);
+  if (do_clip_plane) pclip_plane = &clip_plane;
+  else pclip_plane = NULL;
+  csPlaneClip plclip;
+  bool do_plclip;
+  if (icam->GetFarPlane (clip_plane)) { do_plclip = true; plclip = clip_plane; }
+  else do_plclip = false;
+
   for (i = 0 ; i < num ; i++)
   {
     if (polygon[i]->GetType () != 1) continue;
     p = (csPolygon3D*)polygon[i];
     if (p->flags.Check (CS_POLY_NO_DRAW)) continue;
     p->CamUpdate ();
-    csPlane3 clip_plane, *pclip_plane;
-    bool do_clip_plane = d->GetClipPlane (clip_plane);
-    if (do_clip_plane) pclip_plane = &clip_plane;
-    else pclip_plane = NULL;
     if (p->ClipToPlane (pclip_plane,
 	 	camtrans.GetOrigin (), verts, num_verts)) //@@@Use pool for verts?
     {
-      csPlaneClip plclip;
-      bool do_plclip;
-      if (icam->GetFarPlane (clip_plane)) { do_plclip = true; plclip = clip_plane; }
-      else do_plclip = false;
       if (!do_plclip || plclip.ClipPolygon (verts, num_verts))
       {
         clip = (csPolygon2D*)(render_pool->Alloc ());
@@ -929,9 +1033,10 @@ void csThing::GetCameraMinMaxZ (float& minz, float& maxz)
 // and also more correct in that a convex 3D object has no internal
 // shadowing while a convex outline may have no correspondance to internal
 // shadows.
-csFrustumList* csThing::GetShadows (csSector* sector, csVector3& origin)
+csShadowBlock* csThing::GetShadows (csVector3& origin)
 {
-  csFrustumList* list = new csFrustumList ();
+  csShadowBlock* list = new csShadowBlock (movable.GetSector (0),
+  	polygons.Length ());
   csShadowFrustum* frust;
   int i, j;
   csPolygon3D* p;
@@ -944,15 +1049,12 @@ csFrustumList* csThing::GetShadows (csSector* sector, csVector3& origin)
     if (ABS (clas) < EPSILON) continue;
     if ((clas <= 0) != cw) continue;
 
-    frust = new csShadowFrustum (origin);
-    frust->sector = sector;
-    frust->draw_busy = sector->draw_busy;
-    list->AddFirst (frust);
+    frust = list->AddShadow (origin);
     csPlane3 pl = p->GetPlane ()->GetWorldPlane ();
     pl.DD += origin * pl.norm;
     pl.Invert ();
     frust->SetBackPlane (pl);
-    frust->polygon = p;
+    frust->SetShadowPolygon (p);	//@@@ TO BE AVOIDED. Engine doesn't know about polygons
     for (j = 0 ; j < p->GetVertices ().GetNumVertices () ; j++)
       frust->AddVertex (p->Vwor (j)-origin);
   }
@@ -1307,22 +1409,9 @@ void csThing::SetConvex (bool c)
   	if (obj_verts[i].z > maxz) maxz = obj_verts[i].z;
       }
     obj_verts[center_idx].Set ((minx+maxx)/2, (miny+maxy)/2, (minz+maxz)/2);
-    wor_verts[center_idx].Set ((minx+maxx)/2, (miny+maxy)/2, (minz+maxz)/2);
+    if (cfg_moving == CS_THING_MOVE_OCCASIONAL)
+      wor_verts[center_idx].Set ((minx+maxx)/2, (miny+maxy)/2, (minz+maxz)/2);
   }
-}
-
-void csThing::UpdateMove ()
-{
-  int i;
-  if (!bbox) CreateBoundingBox ();
-  for (i = 0 ; i < num_vertices ; i++)
-    wor_verts[i] = movable.GetTransform ().This2Other (obj_verts[i]);
-  for (i = 0 ; i < polygons.Length () ; i++)
-  {
-    csPolygon3D* p = GetPolygon3D (i);
-    p->ObjectToWorld (movable.GetTransform ());
-  }
-  UpdateCurveTransform ();
 }
 
 void csThing::MoveToSector (csSector* s)
@@ -1355,11 +1444,12 @@ void csThing::RemoveFromSectors ()
 void csThing::UpdateCurveTransform()
 {
   // since obj has changed (possibly) we need to tell all of our curves
+  csReversibleTransform movtrans = movable.GetFullTransform ();
   for (int i = 0 ; i < GetNumCurves () ; i++)
   {
     csCurve* c = curves.Get (i);
  
-    csReversibleTransform o2w = movable.GetTransform ().GetInverse();
+    csReversibleTransform o2w = movtrans.GetInverse();
     c->SetObject2World (&o2w);
   }
 }
@@ -1407,7 +1497,7 @@ csPolygon3D* csThing::IntersectSphere (csVector3& center, float radius, float* p
 /// The list of fog vertices
 static DECLARE_GROWING_ARRAY (fog_verts, G3DFogInfo);
 
-void csThing::DrawCurves (iRenderView* rview)
+bool csThing::DrawCurves (iRenderView* rview, iMovable* movable)
 {
   bool use_z_buf = !flags.Check (CS_ENTITY_ZFILL);
 
@@ -1419,12 +1509,13 @@ void csThing::DrawCurves (iRenderView* rview)
 
   // Calculate tesselation resolution
   csVector3 wv = curves_center;
-  csVector3 world_coord = movable.GetTransform ().This2Other (wv);
+  csReversibleTransform movtrans = movable->GetFullTransform ();
+  csVector3 world_coord = movtrans.This2Other (wv);
   csVector3 camera_coord = camtrans.Other2This (world_coord);
 
   if (camera_coord.z >= SMALL_Z)
   {
-    res=(int)(curves_scale/camera_coord.z);
+    //res=(int)(curves_scale/camera_coord.z);
   }
   else
     res=1000; // some big tesselation value...
@@ -1432,7 +1523,7 @@ void csThing::DrawCurves (iRenderView* rview)
   // Create the combined transform of object to camera by
   // combining object to world and world to camera.
   csReversibleTransform obj_cam = camtrans;
-  obj_cam /= movable.GetTransform ();
+  obj_cam /= movtrans;
   rview->GetGraphics3D ()->SetObjectToCamera (&obj_cam);
   rview->GetGraphics3D ()->SetClipper (rview->GetClipper ()->GetClipPoly (),
   	rview->GetClipper ()->GetNumVertices ());
@@ -1530,20 +1621,23 @@ void csThing::DrawCurves (iRenderView* rview)
     //else
       rview->GetGraphics3D ()->DrawTriangleMesh (mesh);
   }
+
+  return true;//@@@ RETURN correct vis info
 }
 
-void csThing::Draw (iRenderView* rview)
+bool csThing::Draw (iRenderView* rview, iMovable* movable)
 {
-  if (flags.Check (CS_ENTITY_INVISIBLE)) return;
+  if (flags.Check (CS_ENTITY_INVISIBLE)) return false;
   if (flags.Check (CS_ENTITY_CAMERA))
   {
     csOrthoTransform& trans = rview->GetCamera ()->GetTransform ();
     csVector3 old = trans.GetO2TTranslation ();
     trans.SetO2TTranslation (csVector3 (0));
-    DrawInt (rview);
+    bool rc = DrawInt (rview, movable);
     trans.SetO2TTranslation (old);
+    return rc;
   }
-  else DrawInt (rview);
+  else return DrawInt (rview, movable);
 }
 
 static int count_cull_node_notvis_behind;
@@ -1761,11 +1855,12 @@ void* csThing::DrawPolygons (csThing* /*thing*/,
   return NULL;
 }
 
-void csThing::DrawInt (iRenderView* rview)
+bool csThing::DrawInt (iRenderView* rview, iMovable* movable)
 {
   bool use_z_buf = !flags.Check (CS_ENTITY_ZFILL);
   iCamera* icam = rview->GetCamera ();
   const csReversibleTransform& camtrans = icam->GetTransform ();
+  csReversibleTransform movtrans = movable->GetFullTransform ();
 
   draw_busy++;
 
@@ -1810,7 +1905,7 @@ void csThing::DrawInt (iRenderView* rview)
     //@@@@@ EDGESif (rview.GetCallback ()) rview.CallCallback (CALLBACK_THING, (void*)this);
     Stats::polygons_considered += polygons.Length ();
 
-    DrawCurves (rview);
+    DrawCurves (rview, movable);
 
     int res=1;
 
@@ -1819,7 +1914,7 @@ void csThing::DrawInt (iRenderView* rview)
     if (num_vertices>0)
     {
       csVector3 wv = wor_verts[0];
-      csVector3 world_coord = movable.GetTransform ().This2Other (wv);
+      csVector3 world_coord = movtrans.This2Other (wv);
       csVector3 camera_coord = camtrans.Other2This (world_coord);
   
       if (camera_coord.z > 0.0001)
@@ -1838,13 +1933,15 @@ void csThing::DrawInt (iRenderView* rview)
   }
 
   draw_busy--;
+  return true;	// @@@@ RETURN correct vis info
 }
 
-void csThing::DrawFoggy (iRenderView* d)
+bool csThing::DrawFoggy (iRenderView* d, iMovable* movable)
 {
   draw_busy++;
   iCamera* icam = d->GetCamera ();
   const csReversibleTransform& camtrans = icam->GetTransform ();
+  csReversibleTransform movtrans = movable->GetFullTransform ();
   UpdateTransformation (camtrans);
   csPolygon3D* p;
   csVector3* verts;
@@ -1930,6 +2027,7 @@ void csThing::DrawFoggy (iRenderView* d)
   }
 
   draw_busy--;
+  return true;	// @@@@ RETURN correct vis info
 }
 
 void csThing::RegisterVisObject (iVisibilityObject* visobj)
@@ -2114,7 +2212,7 @@ void csThing::RealCheckFrustum (csFrustumView& lview)
     
     if (!lview.dynamic)
     {
-      csReversibleTransform o2w = movable.GetTransform ().GetInverse();
+      csReversibleTransform o2w = movable.GetFullTransform ().GetInverse();
       c->SetObject2World (&o2w);
     }
     

@@ -1175,6 +1175,7 @@ csThing* CreatePortalThing (const char* name, csSector* room,
     	csMaterialWrapper* tm, csPolygon3D*& portalPoly)
 {
   csThing* thing = new csThing (Sys->engine);
+  thing->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
   Sys->engine->things.Push (thing);
   thing->SetName (name);
   thing->GetMovable ().SetSector (room);

@@ -580,12 +580,11 @@ void Blocks::add_pillar (int x, int y)
   engine->things.Push (pillar);
   pillar->SetName ("pillar");
   pillar->GetMovable ().SetSector (room);
-  pillar->flags.Set (CS_ENTITY_MOVEABLE, 0);
   pillar->MergeTemplate (pillar_tmpl, room, pillar_mat, 1);
-  pillar->GetMovable ().SetSector (room);
   csVector3 v ( (x-(player1->zone_dim)/2)*CUBE_DIM, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM);
-  pillar->GetMovable ().SetPosition (room, v);
+  pillar->HardTransform (csTransform (csMatrix3 (), v));
+  pillar->GetMovable ().SetSector (room);
   pillar->GetMovable ().UpdateMove ();
 }
 
@@ -596,14 +595,12 @@ void Blocks::add_vrast (int x, int y, float dx, float dy, float rot_z)
   engine->things.Push (vrast);
   vrast->SetName ("vrast");
   vrast->GetMovable ().SetSector (room);
-  vrast->flags.Set (CS_ENTITY_MOVEABLE, 0);
   vrast->MergeTemplate (vrast_tmpl, room, raster_mat, 1);
   vrast->GetMovable ().SetSector (room);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
   csMatrix3 rot = create_rotate_y (rot_z);
-  vrast->GetMovable ().Transform (rot);
-  vrast->GetMovable ().SetPosition (room, v);
+  vrast->HardTransform (csTransform (rot, v));
   vrast->GetMovable ().UpdateMove ();
 }
 
@@ -614,14 +611,12 @@ void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
   engine->things.Push (hrast);
   hrast->SetName ("hrast");
   hrast->GetMovable ().SetSector (room);
-  hrast->flags.Set (CS_ENTITY_MOVEABLE, 0);
   hrast->MergeTemplate (hrast_tmpl, room, raster_mat, 1);
   hrast->GetMovable ().SetSector (room);
   csVector3 v ((x-(player1->zone_dim)/2)*CUBE_DIM+dx, 0,
 	       (y-(player1->zone_dim)/2)*CUBE_DIM+dy);
   csMatrix3 rot = create_rotate_y (rot_z);
-  hrast->GetMovable ().Transform (rot);
-  hrast->GetMovable ().SetPosition (room, v);
+  hrast->HardTransform (csTransform (rot, v));
   hrast->GetMovable ().UpdateMove ();
 }
 
@@ -705,7 +700,7 @@ csThing* Blocks::create_cube_thing (float dx, float dy, float dz,
   engine->things.Push (cube);
   cube->SetName ("cubexxx");
   cube->GetMovable ().SetSector (room);
-  cube->flags.Set (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
+  cube->SetMovingOption (CS_THING_MOVE_OCCASIONAL); // @@@ Change to often when that works!
   csVector3 shift (
   	(dx-shift_rotate.x)*CUBE_DIM,
   	(dz-shift_rotate.z)*CUBE_DIM,
@@ -1846,6 +1841,7 @@ void Blocks::CreateMenuEntry (const char* mat, int menu_nr)
 {
   csMaterialWrapper* tm_front = engine->GetMaterials ()->FindByName (mat);
   csThing* thing = new csThing (engine);
+  thing->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
   engine->things.Push (thing);
 
   thing->AddVertex (-1, .25, 0);
@@ -1878,6 +1874,7 @@ csThing* Blocks::CreateMenuArrow (bool left)
 {
   csMaterialWrapper* tm_front = engine->GetMaterials ()->FindByName ("menu_back");
   csThing* thing = new csThing (engine);
+  thing->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
   engine->things.Push (thing);
 
   float pointx;

@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2000-2001 by Andrew Zabolotny
+    Copyright (C) 2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -30,6 +31,8 @@ csFrustumView::csFrustumView () : light_frustum (NULL), callback (NULL),
   callback_data (NULL)
 {
   memset (this, 0, sizeof (csFrustumView));
+  shadows = new csShadowBlockList ();
+  shared = false;
 }
 
 csFrustumView::csFrustumView (const csFrustumView &iCopy)
@@ -38,23 +41,25 @@ csFrustumView::csFrustumView (const csFrustumView &iCopy)
   memcpy (this, &iCopy, sizeof (csFrustumView));
   // Leave cleanup actions alone to original copy
   cleanup = NULL;
+  shared = true;
 }
 
 csFrustumView::~csFrustumView ()
 {
   while (cleanup)
   {
-    csFrustrumViewCleanup *next = cleanup->next;
+    csFrustumViewCleanup *next = cleanup->next;
     cleanup->action (this, cleanup);
     cleanup = next;
   }
-  delete light_frustum;
+  if (light_frustum) light_frustum->DecRef ();
+  if (!shared) delete shadows;
 }
 
-bool csFrustumView::DeregisterCleanup (csFrustrumViewCleanup *action)
+bool csFrustumView::DeregisterCleanup (csFrustumViewCleanup *action)
 {
-  csFrustrumViewCleanup **pcur = &cleanup;
-  csFrustrumViewCleanup *cur = cleanup;
+  csFrustumViewCleanup **pcur = &cleanup;
+  csFrustumViewCleanup *cur = cleanup;
   while (cur)
   {
     if (cur == action)
@@ -66,6 +71,154 @@ bool csFrustumView::DeregisterCleanup (csFrustrumViewCleanup *action)
     cur = cur->next;
   }
   return false;
+}
+
+void csFrustumView::StartNewShadowBlock ()
+{
+  if (!shared) delete shadows;
+  shadows = new csShadowBlockList ();
+  shared = false;
+}
+
+//---------------------------------------------------------------------------
+
+csShadowBlock::csShadowBlock (csSector* sect, int draw_busy,
+	int max_shadows, int delta) : shadows (max_shadows, delta)
+{
+  sector = sect;
+  draw_busy = draw_busy;
+}
+
+csShadowBlock::csShadowBlock (int max_shadows, int delta) :
+	shadows (max_shadows, delta)
+{
+  sector = NULL;
+  draw_busy = -1;
+}
+
+csShadowBlock::~csShadowBlock ()
+{
+  DeleteShadows ();
+}
+
+csShadowFrustum* csShadowBlock::AddShadow (const csVector3& origin)
+{
+  csShadowFrustum* sf = new csShadowFrustum (origin);
+  shadows.Push (sf);
+  return sf;
+}
+
+csShadowFrustum* csShadowBlock::AddShadow (csShadowFrustum* origsf)
+{
+  csShadowFrustum* sf = new csShadowFrustum (*origsf);
+  shadows.Push (sf);
+  return sf;
+}
+
+void csShadowBlock::AddShadowNoCopy (csShadowFrustum* sf)
+{
+  sf->IncRef ();
+  shadows.Push (sf);
+}
+
+void csShadowBlock::UnlinkShadow (int idx)
+{
+  csShadowFrustum* sf = (csShadowFrustum*)shadows[idx];
+  sf->DecRef ();
+  shadows.Delete (idx);
+}
+
+//---------------------------------------------------------------------------
+
+csShadowFrustum::csShadowFrustum (const csShadowFrustum& orig)
+	: csFrustum ((const csFrustum&)orig)
+{
+  this->shadow_polygon = orig.shadow_polygon;
+  this->relevant = orig.relevant;
+}
+
+//---------------------------------------------------------------------------
+
+csShadowFrustum* csShadowIterator::Next ()
+{
+  if (!cur) return NULL;
+  csShadowFrustum* s;
+  if (i >= 0 && i < cur_num)
+    s = cur->GetShadow (i);
+  else
+    s = NULL;
+  i += dir;
+  if (i < 0 || i >= cur_num)
+  {
+    if (onlycur) cur = NULL;
+    else if (dir == 1) cur = cur->next;
+    else cur = cur->prev;
+    if (cur) cur_num = cur->GetNumShadows ();
+    if (dir == 1) i = 0;
+    else i = cur_num-1;
+  }
+  return s;
+}
+
+csShadowBlock* csShadowIterator::GetCurrentShadowBlock ()
+{
+  if (dir == -1)
+  {
+    if (i < cur_num-1) return cur;
+    else if (onlycur || !cur->next) return NULL;
+    else return cur->next;
+  }
+  else
+  {
+    if (i > 0) return cur;
+    else if (onlycur || !cur->prev) return NULL;
+    else return cur->prev;
+  }
+}
+
+void csShadowIterator::DeleteCurrent ()
+{
+  if (dir == -1)
+  {
+    if (i < cur_num-1)
+    {
+      // Delete the previous element in the current list.
+      cur->UnlinkShadow (i+1);
+      cur_num--;
+    }
+    else if (onlycur || !cur || !cur->next)
+    {
+      // We are at the very first element of the iterator. Nothing to do.
+      return;
+    }
+    else
+    {
+      // We are the first element of this list (last since we do reverse)
+      // so we delete the last element (first) of the previous (next) list.
+      cur->next->UnlinkShadow (0);
+    }
+  }
+  else
+  {
+    if (i > 0)
+    {
+      // Delete the previous element in the current list.
+      i--;
+      cur->UnlinkShadow (i);
+      cur_num--;
+    }
+    else if (onlycur || !cur || !cur->prev)
+    {
+      // We are at the very first element of the iterator. Nothing to do.
+      return;
+    }
+    else
+    {
+      // We are the first element of this list so we delete the last
+      // element of the previous list.
+      cur->prev->UnlinkShadow (cur->prev->GetNumShadows ()-1);
+    }
+  }
 }
 
 //---------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 /*
-    Copyright (C) 1998,2000 by Ivan Avramovic <ivan@avramovic.com>
-    Copyright (C) 2000 by Jorrit Tyberghein
+    Copyright (C) 2000-2001 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Ivan Avramovic <ivan@avramovic.com>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -983,7 +983,7 @@ void csLoader::load_thing_part (csThing* thing, csSector* sec, PSLoadInfo& info,
 	  CsPrintf (MSG_FATAL_ERROR, "MOVEABLE flag only for top-level thing!\n");
 	  fatal_exit (0, false);
 	}
-        else thing->flags.Set (CS_ENTITY_MOVEABLE);
+        else thing->SetMovingOption (CS_THING_MOVE_OCCASIONAL);
         break;
       case CS_TOKEN_DETAIL:
         if (!isParent)

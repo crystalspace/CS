@@ -21,10 +21,9 @@
 
 #include "csgeom/transfrm.h"
 #include "csobject/pobject.h"
-#include "csengine/rview.h"
+#include "csengine/bsp.h"
 #include "csengine/movable.h"
 #include "csengine/tranman.h"
-#include "csengine/bsp.h"
 #include "csutil/flags.h"
 #include "csutil/cscolor.h"
 #include "csutil/csvector.h"
@@ -34,6 +33,8 @@
 #include "ipolmesh.h"
 #include "iviscull.h"
 #include "imeshobj.h"
+#include "irview.h"
+#include "itranman.h"
 
 class csSector;
 class csEngine;
@@ -46,6 +47,9 @@ class csPolygonInt;
 class csPolygonTree;
 class csPolygon2D;
 class csPolygon2DQueue;
+class csFrustumList;
+class csFrustumView;
+class csShadowBlock;
 struct csVisObjInfo;
 struct iGraphics3D;
 struct iRenderView;
@@ -82,63 +86,55 @@ struct csThingBBox
 #define CS_ENTITY_CONVEX 1
 
 /**
- * If CS_ENTITY_MOVEABLE is set then this entity can move.
- * This is used by several optimizations in the 3D Engine.
- * This flag is false by default (it is assumed that most Things
- * will not move).
- */
-#define CS_ENTITY_MOVEABLE 2
-
-/**
  * If CS_ENTITY_DETAIL is set then this entity is a detail
  * object. A detail object is treated as a single object by
  * the engine. The engine can do several optimizations on this.
  * In general you should use this flag for small and detailed
  * objects. Detail objects are not included in BSP or octrees.
  */
-#define CS_ENTITY_DETAIL 4
+#define CS_ENTITY_DETAIL 2
 
 /**
  * If CS_ENTITY_CAMERA is set then this entity will be always
  * be centerer around the same spot relative to the camera. This
  * is useful for skyboxes or skydomes.
  */
-#define CS_ENTITY_CAMERA 8
+#define CS_ENTITY_CAMERA 4
 
 /**
  * If CS_ENTITY_ZFILL is set then this thing will be rendered with
  * ZFILL instead of fully using the Z-buffer. This is useful for
  * things that make the outer walls of a sector.
  */
-#define CS_ENTITY_ZFILL 16
+#define CS_ENTITY_ZFILL 8
 
 /**
  * If CS_ENTITY_INVISIBLE is set then this thing will not be rendered.
  * It will still cast shadows and be present otherwise. Use the
  * CS_ENTITY_NOSHADOWS flag to disable shadows.
  */
-#define CS_ENTITY_INVISIBLE 32
+#define CS_ENTITY_INVISIBLE 16
 
 /**
  * If CS_ENTITY_NOSHADOWS is set then this thing will not cast
  * shadows. Lighting will still be calculated for it though. Use the
  * CS_ENTITY_NOLIGHTING flag to disable that.
  */
-#define CS_ENTITY_NOSHADOWS 64
+#define CS_ENTITY_NOSHADOWS 32
 
 /**
  * If CS_ENTITY_NOLIGHTING is set then this thing will not be lit.
  * It may still cast shadows though. Use the CS_ENTITY_NOSHADOWS flag
  * to disable that.
  */
-#define CS_ENTITY_NOLIGHTING 128
+#define CS_ENTITY_NOLIGHTING 64
 
 /**
  * If CS_ENTITY_VISTREE is set then an octree will be calculated for the
  * polygons in this thing. In this case the thing will implement a
  * fully working iVisibilityCuller which the sector can use.
  */
-#define CS_ENTITY_VISTREE 256
+#define CS_ENTITY_VISTREE 128
 
 /**
  * If CS_ENTITY_BACK2FRONT is set then all objects with the same
@@ -148,7 +144,16 @@ struct csThingBBox
  * be rendered later. This flag is important if you want to have
  * alpha transparency rendered correctly.
  */
-#define CS_ENTITY_BACK2FRONT 512
+#define CS_ENTITY_BACK2FRONT 256
+
+/**
+ * The following flags affect movement options for a thing. See
+ * SetMovingOption() for more info.
+ */
+#define CS_THING_MOVE_NEVER 0
+#define CS_THING_MOVE_OFTEN 1
+#define CS_THING_MOVE_OCCASIONAL 2
+
 
 /**
  * A Thing is a set of polygons. A thing can be used for the
@@ -166,7 +171,7 @@ struct csThingBBox
  * oriented such that they are visible from the outside.<p>
  *
  * Things can also be used for volumetric fog. In that case
- * the Thing must be convex.
+ * the Thing must be convex.<p>
  *
  * If you add a static tree (octree/BSP trees) to a thing it can
  * be used as a visibility culler (i.e. it implements iVisibilityCuller).
@@ -182,14 +187,33 @@ private:
   /// Maximal number of vertices
   int max_vertices;
 
-  /// Vertices in world space.
-  csVector3* wor_verts;
   /// Vertices in object space.
   csVector3* obj_verts;
+  /**
+   * Vertices in world space.
+   * It is possible that this array is equal to obj_verts. In that
+   * case this is a thing that never moves.
+   */
+  csVector3* wor_verts;
   /// Vertices in camera space.
   csVector3* cam_verts;
   /// Camera space vertices.
   csTransformedSet cam_verts_set;
+  /**
+   * This number indicates the last value of the movable number.
+   * This thing can use this to check if the world space coordinates
+   * need to be updated.
+   */
+  long movablenr;
+  /**
+   * The last movable used to move this object.
+   */
+  iMovable* cached_movable;
+  /**
+   * How is moving of this thing controlled? This is one of the
+   * CS_THING_MOVE_... flags above.
+   */
+  int cfg_moving;
 
   /// The array of polygons forming the outside of the set
   csPolygonArray polygons;
@@ -355,7 +379,7 @@ private:
   void UpdateCurveTransform ();
 
   /// Internal draw function.
-  void DrawInt (iRenderView* rview);
+  bool DrawInt (iRenderView* rview, iMovable* movable);
 
   /// Move this thing to the specified sector. Can be called multiple times.
   void MoveToSector (csSector* s);
@@ -426,11 +450,15 @@ public:
    */
   void CompressVertices ();
 
-  /// Return the world space vector for the vertex.
-  csVector3& Vwor (int idx) { return wor_verts[idx]; }
-
   /// Return the object space vector for the vertex.
   csVector3& Vobj (int idx) { return obj_verts[idx]; }
+
+  /**
+   * Return the world space vector for the vertex.
+   * Make sure you recently called WorUpdate(). Otherwise it is
+   * possible that this coordinate will not be valid.
+   */
+  csVector3& Vwor (int idx) { return wor_verts[idx]; }
 
   /**
    * Return the camera space vector for the vertex.
@@ -638,18 +666,18 @@ public:
   /**
    * Draw this thing given a view and transformation.
    */
-  void Draw (iRenderView* rview);
+  bool Draw (iRenderView* rview, iMovable* movable);
 
   /**
    * Draw all curves in this thing given a view and transformation.
    */
-  void DrawCurves (iRenderView* rview);
+  bool DrawCurves (iRenderView* rview, iMovable* movable);
 
   /**
    * Draw this thing as a fog volume (only when fog is enabled for
    * this thing).
    */
-  void DrawFoggy (iRenderView* rview);
+  bool DrawFoggy (iRenderView* rview, iMovable* movable);
 
   //----------------------------------------------------------------------
   // Lighting
@@ -733,12 +761,12 @@ public:
 
   /**
    * Return a list of shadow frustums which extend from
-   * this polygon set. The origin is the position of the light.
+   * this thing. The origin is the position of the light.
    * Note that this function uses camera space coordinates and
-   * thus assumes that this polygon set is transformed to the
+   * thus assumes that this thing is transformed to the
    * origin of the light.
    */
-  csFrustumList* GetShadows (csSector* sector, csVector3& origin);
+  csShadowBlock* GetShadows (csVector3& origin);
 
   //----------------------------------------------------------------------
   // Transformation
@@ -779,6 +807,9 @@ public:
     cam_verts = cam_verts_set.GetVertexArray ()->GetVertices ();
   }
 
+  /// Make sure the world vertices are up-to-date.
+  void WorUpdate ();
+
   /**
    * Do a hard transform of the object vertices.
    * This transformation and the original coordinates are not
@@ -807,6 +838,45 @@ public:
    * correctly updated.
    */
   csMovable& GetMovable () { return movable; }
+
+  /**
+   * Control how this thing will be moved.
+   * There are currently three options.
+   * <ul>
+   *   <li>CS_THING_MOVE_NEVER: this option is set for a thing that cannot
+   *       move at all. In this case the movable will be ignored and only
+   *       hard transforms can be used to move a thing with this flag. This
+   *       setting is both efficient for memory (object space coordinates are
+   *       equal to world space coordinates so only one array is kept) and
+   *       render speed (only the camera transform is needed). This option
+   *       is very useful for static geometry like walls.
+   *       This option is default.
+   *   <li>CS_THING_MOVE_OCCASIONAL: this option is set for a thing that
+   *       is movable but doesn't move all the time usually. Setting this
+   *       option means that the world space vertices will be cached (taking
+   *       up more memory that way) but the coordinates will be recalculated
+   *       only at rendertime (and cached at that time). This option has
+   *       the same speed efficiency as MOVE_NEVER when the object doesn't
+   *       move but more memory is used as all the vertices are duplicated.
+   *       Use this option for geometry that is not too big (in number of
+   *       vertices) and only moves occasionally like doors of elevators.
+   *   <li>CS_THING_MOVE_OFTEN: this option is set for a thing that moves
+   *       very often (i.e. almost every frame). Setting this option means
+   *       that the object->world and camera transformations will be combined
+   *       at render time. It has the same memory efficiency as MOVE_NEVER
+   *       but the transforms need to be combined every frame (if the object
+   *       is visible). Use this option for geometry that moves a lot. Also
+   *       very useful for objects that often move and have lots of vertices
+   *       since in that case combining the transforms ones is a lot more
+   *       efficient than doing two transforms on every vertex.
+   * </ul>
+   */
+  void SetMovingOption (int opt);
+
+  /**
+   * Get the moving option.
+   */
+  int GetMovingOption () { return cfg_moving; }
 
   /**
    * Return true if this thing is a sky object.
@@ -926,10 +996,17 @@ public:
   {
     DECLARE_EMBEDDED_IBASE (csThing);
     virtual iMeshObjectFactory* GetFactory ();
-    virtual bool DrawTest (iRenderView* /*rview*/, iMovable* /*movable*/) { return true; }
+    virtual bool DrawTest (iRenderView* /*rview*/, iMovable* /*movable*/)
+    {
+      //@@@ For now!
+      return true;
+    }
     virtual void UpdateLighting (iLight** /*lights*/, int /*num_lights*/,
       	iMovable* /*movable*/) { }
-    virtual bool Draw (iRenderView* /*rview*/, iMovable* /*movable*/) { return true; }
+    virtual bool Draw (iRenderView* rview, iMovable* movable)
+    {
+      return scfParent->Draw (rview, movable);
+    }
     virtual void SetVisibleCallback (csMeshCallback* /*cb*/, void* /*cbData*/) { }
     virtual csMeshCallback* GetVisibleCallback () { return NULL; }
     virtual void GetObjectBoundingBox (csBox3& /*bbox*/, int /*type = CS_BBOX_NORMAL*/)

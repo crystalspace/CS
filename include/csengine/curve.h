@@ -268,6 +268,9 @@ public:
 
   ///
   void CacheLightMaps (csThing* owner, int index);
+
+  /// Do a hard transform on this curve.
+  virtual void HardTransform (const csReversibleTransform& trans);
   
   CSOBJTYPE;
 };
@@ -370,6 +373,9 @@ public:
   virtual bool IsLightable ();
   virtual void PosInSpace (csVector3& vec, double u, double v);
   virtual void Normal (csVector3& vec, double u, double v);
+
+  /// Do a hard transform on this curve.
+  virtual void HardTransform (const csReversibleTransform& trans);
 
   CSOBJTYPE;
 };

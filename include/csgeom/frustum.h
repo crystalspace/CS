@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 1998 by Jorrit Tyberghein
+  Copyright (C) 1998-2001 by Jorrit Tyberghein
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -21,6 +21,7 @@
 
 #include "cstypes.h"
 #include "csgeom/math3d.h"
+#include "csgeom/vtpool.h"
 
 class csTransform;
 
@@ -51,6 +52,8 @@ class csTransform;
 class csFrustum
 {
 private:
+  /// Reference to the pool which is used to allocate new vertex arrays.
+  csVertexArrayPool* pool;
 
   /// The origin of this frustum
   csVector3 origin;
@@ -94,10 +97,17 @@ private:
   void ExtendVertexArray (int num);
 
 public:
+
   /// Create a new empty frustum.
-  csFrustum (const csVector3& o) : origin (o), vertices (NULL),
-    num_vertices (0), max_vertices (0), backplane (NULL),
-    wide (false), mirrored (false), ref_count (1)
+  csFrustum (const csVector3& o) : pool (&csDefaultVertexArrayPool::default_pool),
+  	origin (o), vertices (NULL), num_vertices (0), max_vertices (0),
+	backplane (NULL), wide (false), mirrored (false), ref_count (1)
+  { }
+
+  /// Create a new empty frustum with another pool.
+  csFrustum (const csVector3& o, csVertexArrayPool* pl) : pool (pl),
+  	origin (o), vertices (NULL), num_vertices (0), max_vertices (0),
+	backplane (NULL), wide (false), mirrored (false), ref_count (1)
   { }
 
   /**
@@ -114,10 +124,13 @@ public:
   virtual ~csFrustum ();
 
   /// Set the origin of this frustum.
-  void SetOrigin (csVector3& o) { origin = o; }
+  void SetOrigin (const csVector3& o) { origin = o; }
 
   /// Get the origin of this frustum.
   csVector3& GetOrigin () { return origin; }
+
+  /// Get the origin of this frustum.
+  const csVector3& GetOrigin () const { return origin; }
 
   /**
    * Enable/disable mirroring.
@@ -274,7 +287,7 @@ public:
   /// Increment reference counter
   void IncRef () { ref_count++; }
   /// Decrement reference counter
-  void DecRef () { if (!--ref_count) delete this; }
+  void DecRef () { if (ref_count == 1) delete this; else ref_count--; }
 };
 
 #endif // __CSFRUSTRUM_H__

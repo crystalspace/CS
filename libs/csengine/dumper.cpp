@@ -117,6 +117,7 @@ void Dumper::dump (csPolygon3D* p)
       portal->GetSector()->GetName ());
     CsPrintf (MSG_DEBUG_0, "    Alpha=%d\n", p->GetAlpha ());
   }
+#if 0
   if (p->thing->cam_verts == NULL)
   {
     int i;
@@ -133,6 +134,7 @@ void Dumper::dump (csPolygon3D* p)
     	p->Vwor (i).x, p->Vwor (i).y, p->Vwor (i).z,
     	p->Vcam (i).x, p->Vcam (i).y, p->Vcam (i).z);
   }
+#endif
   if (p->GetTextureType () == POLYTXT_LIGHTMAP)
   {
     csPolyTexLightMap* lmi = p->GetLightMapInfo ();

@@ -395,7 +395,7 @@ private:
   csDynLight* light;
 
   /// List of shadow frustums.
-  csFrustumList shadows;
+  csShadowBlock shadows;
 
   /// frustum of where the visible light hits (for use with curves)
   csFrustum *light_frustum;

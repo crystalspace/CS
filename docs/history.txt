@@ -1,5 +1,12 @@
 The history order has been reversed so that new features are at the top.
 
+4-Mar-2001
+	- Finalized the first rewrite of the data structures that are used
+	  in CheckFrustum. A further rewrite and conversion to SCF will
+	  follow in the near future.
+	- Added support for HardTransform() to curved surfaces but it doesn't
+	  work yet. The curve in flarge is thus currently not looking very
+	  well.
 1-Mar-2001
 	- Brandon Ehle added modifications for Lua scripting language:
 	  The SWIGLua modifications were fairly easy, so here's the "goop."

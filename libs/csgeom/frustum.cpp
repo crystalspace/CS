@@ -1,5 +1,5 @@
 /*
-  Copyright (C) 1998 by Jorrit Tyberghein
+  Copyright (C) 1998-2001 by Jorrit Tyberghein
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Library General Public
@@ -21,7 +21,7 @@
 #include "csgeom/transfrm.h"
 
 csFrustum::csFrustum (const csVector3& o, csVector3* verts, int num_verts,
-  csPlane3* backp)
+  csPlane3* backp) : pool (&csDefaultVertexArrayPool::default_pool)
 {
   origin = o;
   num_vertices = num_verts;
@@ -32,7 +32,7 @@ csFrustum::csFrustum (const csVector3& o, csVector3* verts, int num_verts,
 
   if (verts)
   {
-    vertices = new csVector3 [max_vertices];
+    vertices = pool->GetVertexArray (max_vertices);
     memcpy (vertices, verts, sizeof (csVector3) * num_vertices);
   }
   else
@@ -43,6 +43,7 @@ csFrustum::csFrustum (const csVector3& o, csVector3* verts, int num_verts,
 
 csFrustum::csFrustum (const csFrustum &copy)
 {
+  pool = copy.pool;
   origin = copy.origin;
   num_vertices = copy.num_vertices;
   max_vertices = copy.max_vertices;
@@ -52,7 +53,7 @@ csFrustum::csFrustum (const csFrustum &copy)
 
   if (copy.vertices)
   {
-    vertices = new csVector3 [max_vertices];
+    vertices = pool->GetVertexArray (max_vertices);
     memcpy (vertices, copy.vertices, sizeof (csVector3) * num_vertices);
   }
   else
@@ -63,12 +64,18 @@ csFrustum::csFrustum (const csFrustum &copy)
 
 csFrustum::~csFrustum ()
 {
+  if (ref_count != 1)
+  {
+    printf ("###### Ref_count wrong!\n");
+    DEBUG_BREAK;
+  }
   Clear ();
 }
 
 void csFrustum::Clear ()
 {
-  delete [] vertices; vertices = NULL;
+  pool->FreeVertexArray (vertices, max_vertices);
+  vertices = NULL;
   num_vertices = max_vertices = 0;
   delete backplane; backplane = NULL;
   wide = false;
@@ -88,11 +95,11 @@ void csFrustum::RemoveBackPlane ()
 
 void csFrustum::ExtendVertexArray (int num)
 {
-  csVector3* new_vertices = new csVector3 [max_vertices+num];
+  csVector3* new_vertices = pool->GetVertexArray (max_vertices+num);
   if (vertices)
   {
     memcpy (new_vertices, vertices, sizeof (csVector3)*num_vertices);
-    delete [] vertices;
+    pool->FreeVertexArray (vertices, max_vertices);
   }
   vertices = new_vertices;
   max_vertices += num;

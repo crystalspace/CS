@@ -787,6 +787,13 @@ public:
   void CamUpdate () { thing->CamUpdate (); }
 
   /**
+   * Before calling a series of Vwor() you should call
+   * WorUpdate() first to make sure that the world vertex set
+   * is up-to-date.
+   */
+  void WorUpdate () { thing->WorUpdate (); }
+
+  /**
    * Set the material for this polygon.
    * This material handle will only be used as soon as 'Finish()'
    * is called. So you can safely wait preparing the materials
