@@ -31,6 +31,9 @@ chronological order.
 	    csRef<iFoo> f = ...;
 	    csRef<iBase> b(f);
 	    b = f;
+	- res disabled Eric's new copy constructor, as it caused problems on 
+	  VC7. Specifically, MSVC7 doesn't seem to call that constructor,
+	  messing up reference counting.
 13-Mar-2004
 	- John Harger fixed the nVidia part of the PS1 plugin so that it will
 	  use the correct texture target on a 'tex' instruction.

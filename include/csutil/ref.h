@@ -154,11 +154,21 @@ public:
   /**
    * Smart pointer copy constructor.
    */
+  csRef (csRef const& other) : obj (other)
+  {
+    CSREF_TRACK_INCREF (obj, this);
+  }
+
+  /**
+   * Smart pointer copy constructor.
+   */
+  /*
   template <class T2>
   csRef (csRef<T2> const& other) : obj (other)
   {
     CSREF_TRACK_INCREF (obj, this);
   }
+  */
 
   /**
    * Smart pointer destructor.  Invokes DecRef() upon the underlying object.
