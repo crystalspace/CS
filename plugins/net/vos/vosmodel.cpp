@@ -32,6 +32,7 @@
 #include "cstool/mdltool.h"
 #include "csutil/databuf.h"
 #include "igeom/objmodel.h"
+#include "iutil/plugin.h"
 
 #include "csvosa3dl.h"
 #include "vosmodel.h"
@@ -146,7 +147,7 @@ void ConstructModelTask::doTask()
   csRef<iModelConverter> modconv;
   csRef<iCrossBuilder> xbuild;
   CS_QUERY_REGISTRY_PLUGIN(modconv, object_reg, "crystalspace.modelconverter.multiplexer", iModelConverter);
-  CS_QUERY_REGISTRY_PLUGIN(xbuild, object_reg, "crystalspace.mesh.crossbuilder", iCrossBuilder); 
+  CS_QUERY_REGISTRY_PLUGIN(xbuild, object_reg, "crystalspace.mesh.crossbuilder", iCrossBuilder);
 
   // Check they were loaded
   if (!modconv || !xbuild)

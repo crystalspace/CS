@@ -36,6 +36,7 @@
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "ivaria/dynamics.h"
+#include "ivaria/reporter.h"
 
 #ifndef M_PI
 # ifdef PI
@@ -44,49 +45,6 @@
 #  define M_PI 3.141592
 # endif
 #endif
-
-
-/** Use this macro to query the object registry, loading a plugin if needed.
-    If an object with a given interface exists in an object registry,
-    get that object from the registry. If the registry query fails,
-    try to load a plugin and get the interface from there. If that succeeds,
-    the interface is added to the registry for future use.
-
-    Example use:
-@code
-    csRef<iDynamics> dynamicSystem;
-    CS_QUERY_REGISTRY_PLUGIN(dynamicSystem, object_reg, "crystalspace.dynamics.ode", iDynamics);
-@endcode
-
-        @param obj          csRef to hold object
-        @param Interface    The interface class to find
-        @param object_reg   Your object registry
-        @param scfID        The SCF identifier string for the implementation to load from a plugin.
-        @param interfaceClassName   The interface class name as a string; this
-                            is used as a "tag" in the object registry. For
-                            example, if Interface is iDynamics, this string
-                            should be "iDynamics".
-    @todo This probably ought to be made more thread-safe by locking the
-            object registry if possible.
-*/
-#define CS_QUERY_REGISTRY_PLUGIN(obj, object_reg, scfID, Interface) \
-{ \
-    obj = CS_QUERY_REGISTRY(object_reg, Interface);  \
-    if(!obj.IsValid()) {  \
-        csRef<iPluginManager> mgr = CS_QUERY_REGISTRY(object_reg, iPluginManager); \
-        if(!mgr.IsValid()) { \
-            LOG("csVosA3DL", 1, "Error loading plugin for \"" << scfID \
-                << "\": Could not get plugin manager from object registry!"); \
-        }  \
-        LOG("csVosA3DL", 2,"Loading plugin for \"" << scfID << "\"..."); \
-        obj = CS_LOAD_PLUGIN(mgr, scfID, Interface); \
-        if(!obj.IsValid()) { \
-            LOG("csVosA3DL", 1, "Error loading plugin " << scfID \
-                << " with interface \"" << #Interface << "!"); \
-        } \
-        object_reg->Register(obj, #Interface); \
-    } \
-}
 
 class csVosA3DL : public iComponent, public iEventHandler,
     public iVosA3DL, public iVosApi
