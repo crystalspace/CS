@@ -19,15 +19,22 @@ Short-term cleanups that need to be done:
 		LTrim() - Trims all whitespace from left side of string.
 		RTrim() - Trims all whitespace from right side of string.
 		Trim() - Does both LTrim() and RTrim().
-		Collapse() - Does Trim(), then collapses any interior whitespace, i.e.
-     	            "  Hi   There    " becomes "Hi There".
+		Collapse() - Does Trim(), then collapses any interior
+		whitespace to a single space.
 		Also added a Format() function to provide printf capabilities,
 		but it is disabled because the function needed to do the
 		operation safely (vsnprintf) is not available on all the
 		platforms CS supports.
 	    - Used new csString functionality to enhance cctest's console.
-	    - Fixed a minor compile bug in cspython that cropped up a while back.
-	- Gary Haussmann removed extraneous include of ext_w32.h file in OpenGL.
+	    - Fixed a minor compile bug in cspython that cropped up a while
+	      back.
+	- Gary Haussmann removed extraneous include of ext_w32.h in OpenGL.
+	- Eric Sunshine eliminated several compilation warnings from
+	  ogl_halo.cpp.
+	- Eric Sunshine added the line renderer to the default list of 3D
+	  renderers built on BeOS.
+	- Eric Sunshine fixed bug in parsing of submenu from next.cfg which
+	  prevented application menu from displaying on MacOS/X Server.
 22-Feb-2000
 	- Gary Haussmann fixed another mipmap bug in the OpenGL rasterizer.
 	  The problem was that the maximum mipmap level required is actually
