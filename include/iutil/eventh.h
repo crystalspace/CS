@@ -16,8 +16,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IUTIL_EVENTH_H__
-#define __IUTIL_EVENTH_H__
+#ifndef __CS_IUTIL_EVENTH_H__
+#define __CS_IUTIL_EVENTH_H__
 
 /**\file
  */
@@ -52,4 +52,4 @@ struct iEventHandler : public iBase
 
 /** @} */
 
-#endif // __IUTIL_EVENTH_H__
+#endif // __CS_IUTIL_EVENTH_H__

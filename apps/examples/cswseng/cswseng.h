@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CSWSENG_H
-#define CSWSENG_H
+#ifndef __CSWSENG_H__
+#define __CSWSENG_H__
 
 #include <stdarg.h>
 #include "csws/csws.h"
@@ -111,5 +111,5 @@ public:
   virtual bool HandleEvent (iEvent& Event);
 };
 
-#endif // CSWSENG_H
+#endif // __CSWSENG_H__
 

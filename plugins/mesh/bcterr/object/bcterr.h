@@ -833,5 +833,5 @@ public:
 extern csVector3 BezierCompute ( float u, csVector3* temp);
 extern csVector3 BezierControlCompute (float u, csVector3* cntrl, int width);
 
-#endif
+#endif // __CS_BCTERR_H__
 

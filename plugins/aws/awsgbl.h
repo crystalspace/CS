@@ -1,5 +1,5 @@
-#ifndef __AWS_GRIDBAG_LAYOUT__
-# define __AWS_GRIDBAG_LAYOUT__
+#ifndef __CS_AWS_GRIDBAG_LAYOUT_H__
+#define __CS_AWS_GRIDBAG_LAYOUT_H__
 
 # include "iaws/aws.h"
 # include "awslayot.h"
@@ -305,4 +305,4 @@ protected:
    */
   void ArrangeGrid (iAwsComponent *parent);
 };
-#endif
+#endif // __CS_AWS_GRIDBAG_LAYOUT_H__

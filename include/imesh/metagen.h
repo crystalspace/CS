@@ -19,8 +19,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMESH_METAGEN_H__
-#define __IMESH_METAGEN_H__
+#ifndef __CS_IMESH_METAGEN_H__
+#define __CS_IMESH_METAGEN_H__
 
 #include "csutil/scf.h"
 
@@ -104,4 +104,4 @@ struct iMetaGen : iBase
   virtual float GetSplinterSize() = 0;
 };
 
-#endif //  __IMESH_METAGEN_H__
+#endif // __CS_IMESH_METAGEN_H__

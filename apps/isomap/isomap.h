@@ -16,8 +16,8 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef ISOMAP_H
-#define ISOMAP_H
+#ifndef __ISOMAP_H__
+#define __ISOMAP_H__
 
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -102,5 +102,5 @@ public:
   void Report (int severity, const char* msg, ...);
 };
 
-#endif
+#endif // __ISOMAP_H__
 

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __LEVTOOL_H
-#define __LEVTOOL_H
+#ifndef __LEVTOOL_H__
+#define __LEVTOOL_H__
 
 #include <stdarg.h>
 #include "igeom/polymesh.h"
@@ -393,5 +393,5 @@ public:
   void Main ();
 };
 
-#endif // __LEVTOOL_H
+#endif // __LEVTOOL_H__
 

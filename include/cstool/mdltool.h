@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __MDLTOOL_H__
-#define __MDLTOOL_H__
+#ifndef __CS_MDLTOOL_H__
+#define __CS_MDLTOOL_H__
 
 #include "csutil/intarray.h"
 
@@ -175,4 +175,4 @@ struct csModelDataTools
 	csIntArray* PolyVertices);
 };
 
-#endif // __MDLTOOL_H__
+#endif // __CS_MDLTOOL_H__

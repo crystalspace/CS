@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef ITHING_H
-#define ITHING_H
+#ifndef __ITHING_H__
+#define __ITHING_H__
 
 #include "contain.h"
 
@@ -76,5 +76,5 @@ protected:
   CMapEntity* m_pOriginalEntity;
 };
 
-#endif
+#endif // __ITHING_H__
 

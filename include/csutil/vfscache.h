@@ -16,8 +16,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSUTIL_VFSCACHE_H__
-#define __CSUTIL_VFSCACHE_H__
+#ifndef __CS_UTIL_VFSCACHE_H__
+#define __CS_UTIL_VFSCACHE_H__
 
 /**\file
  * VFS Cache Manager
@@ -89,5 +89,5 @@ public:
   	const uint32* id = NULL);
 };
 
-#endif // __CSUTIL_VFSCACHE_H__
+#endif // __CS_UTIL_VFSCACHE_H__
 

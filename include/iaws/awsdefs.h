@@ -1,5 +1,3 @@
-#ifndef __AWS_DEFINITIONS__
-#define __AWS_DEFINITIONS__
 /**************************************************************************
     Copyright (C) 2001 by Christopher Nelson
 
@@ -17,6 +15,8 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
+#ifndef __CS_AWS_DEFINITIONS_H__
+#define __CS_AWS_DEFINITIONS_H__
 
 /**\file 
  * AWS Definitions
@@ -92,4 +92,4 @@ const unsigned int AWS_ERR_SINK_NO_TRIGGERS         = 2;
 
 /** @} */
 
-#endif
+#endif // __CS_AWS_DEFINITIONS_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSDIALOG_H__
-#define __CSDIALOG_H__
+#ifndef __CS_CSDIALOG_H__
+#define __CS_CSDIALOG_H__
 
 /**\file
  * Crystal Space Windowing System: dialog window class
@@ -168,4 +168,4 @@ protected:
 
 /** @} */
 
-#endif // __CSDIALOG_H__
+#endif // __CS_CSDIALOG_H__

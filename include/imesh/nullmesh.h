@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMESH_NULLMESH_H__
-#define __IMESH_NULLMESH_H__
+#ifndef __CS_IMESH_NULLMESH_H__
+#define __CS_IMESH_NULLMESH_H__
 
 #include "csutil/scf.h"
 
@@ -36,5 +36,5 @@ struct iNullMeshState : public iBase
   virtual float GetRadius () const = 0;
 };
 
-#endif
+#endif // __CS_IMESH_NULLMESH_H__
 

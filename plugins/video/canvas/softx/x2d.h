@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __X2D_H__
-#define __X2D_H__
+#ifndef __CS_X2D_H__
+#define __CS_X2D_H__
 
 #include "video/canvas/common/graph2d.h"
 #include "iutil/event.h"
@@ -126,4 +126,4 @@ public:
 
 };
 
-#endif // __X2D_H__
+#endif // __CS_X2D_H__

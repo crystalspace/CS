@@ -1,5 +1,5 @@
-#ifndef __AWSCMPT_H__
-# define __AWSCMPT_H__
+#ifndef __CS_AWS_CMPT_H__
+#define __CS_AWS_CMPT_H__
 
 /**************************************************************************
     Copyright (C) 2000-2001 by Christopher Nelson
@@ -420,4 +420,4 @@ public:
   // Gets the real 3d context (not one of the proctex contexts)
   iGraphics3D *realG3D () { return rG3D; }
 };
-#endif // __AWSCMPT_H__
+#endif // __CS_AWS_CMPT_H__

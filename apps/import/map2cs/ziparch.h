@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef ZIPARCH_H
-#define ZIPARCH_H
+#ifndef __ZIPARCH_H__
+#define __ZIPARCH_H__
 
 #include "contain.h"
 #include "texarch.h"
@@ -59,4 +59,4 @@ protected:
   CZipFile* m_pZipFile;
 };
 
-#endif
+#endif // __ZIPARCH_H__

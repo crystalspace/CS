@@ -7,8 +7,8 @@
 //
 
 
-#ifndef __GLOSXDRIVER2D_H__
-#define __GLOSXDRIVER2D_H__
+#ifndef __CS_GLOSXDRIVER2D_H__
+#define __CS_GLOSXDRIVER2D_H__
 
 #include "OSXDriver2D.h"
 
@@ -71,4 +71,4 @@ protected:
 
 #endif // __cplusplus
 
-#endif // __GLOSXDRIVER2D_H__
+#endif // __CS_GLOSXDRIVER2D_H__

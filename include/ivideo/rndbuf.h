@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVIDEO_RNDBUF_H__
-#define __IVIDEO_RNDBUF_H__
+#ifndef __CS_IVIDEO_RNDBUF_H__
+#define __CS_IVIDEO_RNDBUF_H__
 
 /** \file 
  * Render buffer interface
@@ -246,4 +246,4 @@ public:
 
 /** @} */
 
-#endif //  __IVIDEO_RNDBUF_H__
+#endif // __CS_IVIDEO_RNDBUF_H__

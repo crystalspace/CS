@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVARIA_REPORTER_H__
-#define __IVARIA_REPORTER_H__
+#ifndef __CS_IVARIA_REPORTER_H__
+#define __CS_IVARIA_REPORTER_H__
 
 #include <stdarg.h>
 #include "csutil/scf.h"
@@ -262,5 +262,5 @@ public:
 #define csReport csReporterHelper::Report
 #define csReportV csReporterHelper::ReportV
 
-#endif // __IVARIA_REPORTER_H__
+#endif // __CS_IVARIA_REPORTER_H__
 

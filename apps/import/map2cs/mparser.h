@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef MPARSER_H
-#define MPARSER_H
+#ifndef __MPARSER_H__
+#define __MPARSER_H__
 
 /**
   * Defines, how many bytes will be read ahead. This will allow you
@@ -191,4 +191,4 @@ protected:
   int   m_CurrentLine;
 };
 
-#endif
+#endif // __MPARSER_H__

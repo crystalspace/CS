@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _ARTS_SOUNDRENDERER_H_
-#define _ARTS_SOUNDRENDERER_H_
+#ifndef __CS_ARTS_SOUNDRENDERER_H__
+#define __CS_ARTS_SOUNDRENDERER_H__
 
 #include "isound/renderer.h"
 #include "isound/listener.h"
@@ -152,6 +152,6 @@ public:
 
 };
 
-#endif
+#endif // __CS_ARTS_SOUNDRENDERER_H__
 
 

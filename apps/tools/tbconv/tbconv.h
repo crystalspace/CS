@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __TBTOOL_H
-#define __TBTOOL_H
+#ifndef __TBTOOL_H__
+#define __TBTOOL_H__
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -50,4 +50,4 @@ private:
   csVector3 scale;
 };
 
-#endif
+#endif // __TBTOOL_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __DD3G2D_H__
-#define __DD3G2D_H__
+#ifndef __CS_DD3G2D_H__
+#define __CS_DD3G2D_H__
 
 #include <windows.h>
 #include <ddraw.h>
@@ -109,4 +109,4 @@ protected:
   void Refresh (RECT &rect);
 };
 
-#endif
+#endif // __CS_DD3G2D_H__

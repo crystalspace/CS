@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISOGRID_H__
-#define __ISOGRID_H__
+#ifndef __CS_ISOGRID_H__
+#define __CS_ISOGRID_H__
 
 #include "ivaria/iso.h"
 #include "csgeom/box.h"
@@ -183,4 +183,4 @@ public:
 
 };
 
-#endif
+#endif // __CS_ISOGRID_H__

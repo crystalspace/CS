@@ -53,5 +53,5 @@ public:
   	iCommandLineParser* cmdline = NULL);
 };
 
-#endif //__CS_CMDHELP_H__
+#endif // __CS_CMDHELP_H__
 

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SNDHDL_H__
-#define __SNDHDL_H__
+#ifndef __CS_SNDHDLSOFTWARE_H__
+#define __CS_SNDHDLSOFTWARE_H__
 
 #include "../common/shdl.h"
 
@@ -36,4 +36,4 @@ public:
   virtual csPtr<iSoundSource> CreateSource(int Mode3d);
 };
 
-#endif // __SNDHDL_H__
+#endif // __CS_SNDHDLSOFTWARE_H__

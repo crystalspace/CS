@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef DEMOSKY_H
-#define DEMOSKY_H
+#ifndef __DEMOSKY_H__
+#define __DEMOSKY_H__
 
 #include <stdarg.h>
 #include "csgeom/math2d.h"
@@ -113,5 +113,5 @@ public:
   void Update(csTicks elapsed_time);
 };
 
-#endif // DEMOSKY_H
+#endif // __DEMOSKY_H__
 

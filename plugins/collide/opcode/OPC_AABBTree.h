@@ -17,8 +17,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include Guard
-#ifndef __OPC_AABBTREE_H__
-#define __OPC_AABBTREE_H__
+#ifndef __CS_OPC_AABBTREE_H__
+#define __CS_OPC_AABBTREE_H__
 
 	//! TO BE DOCUMENTED
 	#define IMPLEMENT_TREE(baseclass, volume)																			\
@@ -86,4 +86,4 @@
 				udword				mTotalNbNodes;		//!< Number of nodes in the tree.
 	};
 
-#endif // __OPC_AABBTREE_H__
+#endif // __CS_OPC_AABBTREE_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __UTIL_H__
-#define __UTIL_H__
+#ifndef __CS_UTIL_H__
+#define __CS_UTIL_H__
 
 #include <stdio.h>
 
@@ -139,4 +139,4 @@ static inline int csLog2 (int n)
 void csFindReplace (char *dest, const char *src, const char *search,
   const char *replace, int max);
 
-#endif // __UTIL_H__
+#endif // __CS_UTIL_H__

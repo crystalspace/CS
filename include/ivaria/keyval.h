@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_KEYVAL_H__
-#define __IENGINE_KEYVAL_H__
+#ifndef __CS_IVARIA_KEYVAL_H__
+#define __CS_IVARIA_KEYVAL_H__
 
 #include "csutil/scf.h"
 
@@ -49,4 +49,4 @@ struct iKeyValuePair : public iBase
   virtual void SetValue (const char* value) = 0;
 };
 
-#endif
+#endif // __CS_IVARIA_KEYVAL_H__

@@ -231,5 +231,5 @@ public:
   inline csHashMap *GetHashMap () {return &map;}
 };
 
-#endif //__CS_HASHMAP_H__
+#endif // __CS_HASHMAP_H__
 

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSOSDEFS_H__
-#define __CSOSDEFS_H__
+#ifndef __CS_CSOSDEFS_H__
+#define __CS_CSOSDEFS_H__
 
 #if defined(COMP_VC)
   #pragma warning(disable:4291)   // no matching operator delete found
@@ -541,4 +541,4 @@ DllMain (HINSTANCE hinstDLL, DWORD fdwReason, LPVOID /*lpvReserved*/) \
 }
 
 #endif // !CS_STATIC_LINKED
-#endif // __CSOSDEFS_H__
+#endif // __CS_CSOSDEFS_H__

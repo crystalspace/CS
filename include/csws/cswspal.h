@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSWSPAL_H__
-#define __CSWSPAL_H__
+#ifndef __CS_CSWSPAL_H__
+#define __CS_CSWSPAL_H__
 
 /**\file
  * Crystal Space Windowing System: CSWS palette definition
@@ -521,4 +521,4 @@ extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 
 /** @} */
 
-#endif // __CSWSPAL_H__
+#endif // __CS_CSWSPAL_H__

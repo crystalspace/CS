@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMESH_MDLCONV_H__
-#define __IMESH_MDLCONV_H__
+#ifndef __CS_IMESH_MDLCONV_H__
+#define __CS_IMESH_MDLCONV_H__
 
 #include "csutil/scf.h"
 
@@ -61,4 +61,4 @@ struct iModelConverter : public iBase
   virtual csPtr<iDataBuffer> Save (iModelData*, const char *Format) = 0;
 };
 
-#endif // __IMESH_MDLCONV_H__
+#endif // __CS_IMESH_MDLCONV_H__

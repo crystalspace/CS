@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __STUPID__TEST__
-#define __STUPID__TEST__
+#ifndef __CS_STUPID_TEST_H__
+#define __CS_STUPID_TEST_H__
 
 #define STUPID_TEST
 #define BOUNDARIES_OF_STUPID_TEST_U_MIN  0
@@ -25,4 +25,4 @@
 #define BOUNDARIES_OF_STUPID_TEST_U_MAX  -65536
 #define BOUNDARIES_OF_STUPID_TEST_U_MAX  -65536
 
-#endif
+#endif // __CS_STUPID_TEST_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVARIA_PERFSTAT_H__
-#define __IVARIA_PERFSTAT_H__
+#ifndef __CS_IVARIA_PERFSTAT_H__
+#define __CS_IVARIA_PERFSTAT_H__
 
 #include "csutil/scf.h"
 
@@ -83,4 +83,4 @@ struct iPerfStats : public iBase
   virtual void DebugSetBreak (int frame_num) = 0;
 };
 
-#endif // __IVARIA_PERFSTAT_H__
+#endif // __CS_IVARIA_PERFSTAT_H__

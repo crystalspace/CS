@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMESH_SPIRAL_H__
-#define __IMESH_SPIRAL_H__
+#ifndef __CS_IMESH_SPIRAL_H__
+#define __CS_IMESH_SPIRAL_H__
 
 #include "csutil/scf.h"
 
@@ -41,5 +41,5 @@ struct iSpiralState : public iBase
   virtual const csVector3& GetSource () const = 0;
 };
 
-#endif
+#endif // __CS_IMESH_SPIRAL_H__
 

@@ -61,4 +61,4 @@ public:
     csMeshWrapper *GetParent () { return parent_mesh; }
 };
 
-#endif
+#endif // __CS_IMPMESH_H__

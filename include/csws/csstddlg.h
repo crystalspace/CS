@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSSTDDLG_H__
-#define __CSSTDDLG_H__
+#ifndef __CS_CSSTDDLG_H__
+#define __CS_CSSTDDLG_H__
 
 /**\file
  * Crystal Space Windowing System: Standard dialogs
@@ -150,4 +150,4 @@ extern void csQueryColorDialog (csWindow *iColorDialog, float &oR, float &oG, fl
 
 /** @} */
 
-#endif // __CSSTDDLG_H__
+#endif // __CS_CSSTDDLG_H__

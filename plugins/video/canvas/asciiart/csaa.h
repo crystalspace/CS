@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSAA_H__
-#define __CSAA_H__
+#ifndef __CS_CSAA_H__
+#define __CS_CSAA_H__
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
@@ -71,4 +71,4 @@ public:
   { return 1; }
 };
 
-#endif // __CSAA_H__
+#endif // __CS_CSAA_H__

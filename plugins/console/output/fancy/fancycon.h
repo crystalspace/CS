@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __FANCYCON_H__
-#define __FANCYCON_H__
+#ifndef __CS_FANCYCON_H__
+#define __CS_FANCYCON_H__
 
 #include "ivaria/conout.h"
 #include "iutil/eventh.h"
@@ -139,4 +139,4 @@ public:
   } * scfiEventHandler;
 };
 
-#endif // __FANCYCON_H__
+#endif // __CS_FANCYCON_H__

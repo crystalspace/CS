@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __OPENGLGLIDEDISP_H__
-#define __OPENGLGLIDEDISP_H__
+#ifndef __CS_OPENGLGLIDEDISP_H__
+#define __CS_OPENGLGLIDEDISP_H__
 
 #include "csutil/scf.h"
 #include "video/canvas/openglx/iogldisp.h"
@@ -34,4 +34,4 @@ class csOpenGLGlideDisp : public iOpenGLDisp
       virtual bool Initialize( iObjectRegistry *object_reg );
 };
 
-#endif // __OPENGLGLIDEDISP_H__
+#endif // __CS_OPENGLGLIDEDISP_H__

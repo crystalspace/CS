@@ -4,8 +4,8 @@
 #include <d3d.h>
 #include <d3dcaps.h>
 
-#ifndef __IDDETECT_H__
-#define __IDDETECT_H__
+#ifndef __CS_IDDETECT_H__
+#define __CS_IDDETECT_H__
 
 extern const IID IID_IDirectDetectionInternal;
 
@@ -31,4 +31,4 @@ interface IDirectDetectionInternal
     STDMETHOD_(bool, GetHardware)() = 0;
 };
 
-#endif
+#endif // __CS_IDDETECT_H__

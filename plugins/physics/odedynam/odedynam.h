@@ -17,8 +17,8 @@
 */
 
 
-#ifndef __GAME_ODEDYNAMICS_H__
-#define __GAME_ODEDYNAMICS_H__
+#ifndef __CS_ODEDYNAMICS_H__
+#define __CS_ODEDYNAMICS_H__
 
 #include "csgeom/vector3.h"
 #include "csutil/csobjvec.h"
@@ -507,5 +507,5 @@ public:
   void Execute (iSkeletonBone* bone, csOrthoTransform& t);
 };
 
-#endif // __GAME_ODEDYNAMICS_H__
+#endif // __CS_ODEDYNAMICS_H__
 

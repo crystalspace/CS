@@ -15,8 +15,8 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef __CSSYS_SOCKETS_H__
-#define __CSSYS_SOCKETS_H__
+#ifndef __CS_CSSYS_SOCKETS_H__
+#define __CS_CSSYS_SOCKETS_H__
 
 /** \file
  *      For TCP/IP sockets definitions.  Specifically, should define the
@@ -73,5 +73,5 @@ typedef unsigned int csNetworkSocket;
 #  define CS_NET_SOCKET_INVALID ((csNetworkSocket)~0)
 #endif
 
-#endif
+#endif // __CS_CSSYS_SOCKETS_H__
 

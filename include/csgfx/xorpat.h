@@ -20,8 +20,8 @@
 /**\file
  */
 
-#ifndef __XORPAT_H__
-#define __XORPAT_H__
+#ifndef __CS_XORPAT_H__
+#define __CS_XORPAT_H__
 
 /**
  * Create an iImage with a nice XOR pattern.
@@ -30,5 +30,5 @@
 extern csPtr<iImage> csCreateXORPatternImage(int width, int height,
 					     int recdepth);
 
-#endif
+#endif // __CS_XORPAT_H__
 

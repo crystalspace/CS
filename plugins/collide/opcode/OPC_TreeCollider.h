@@ -17,8 +17,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include Guard
-#ifndef __OPC_TREECOLLIDER_H__
-#define __OPC_TREECOLLIDER_H__
+#ifndef __CS_OPC_TREECOLLIDER_H__
+#define __CS_OPC_TREECOLLIDER_H__
 
 	class //OPCODE_API
        	AABBTreeCollider : public Collider {
@@ -236,5 +236,5 @@
 							bool			CheckTemporalCoherence(Pair* cache);
 	};
 
-#endif // __OPC_TREECOLLIDER_H__
+#endif // __CS_OPC_TREECOLLIDER_H__
 

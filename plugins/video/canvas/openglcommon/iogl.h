@@ -1,6 +1,3 @@
-#ifndef _CS_OPENGLINTERFACE_H_
-#define _CS_OPENGLINTERFACE_H_
-
 /*
     Copyright (C) 2001 by Norman Krämer
 
@@ -18,6 +15,9 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
+#ifndef __CS_OPENGLINTERFACE_H__
+#define __CS_OPENGLINTERFACE_H__
 
 #include "csutil/scf.h"
 
@@ -38,4 +38,4 @@ struct iOpenGLInterface : public iBase
   virtual void *GetProcAddress (const char *funcname) = 0;
 };
 
-#endif
+#endif // __CS_OPENGLINTERFACE_H__

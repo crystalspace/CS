@@ -18,8 +18,8 @@
 
 */
 
-#ifndef __CSBUTTON_H__
-#define __CSBUTTON_H__
+#ifndef __CS_CSBUTTON_H__
+#define __CS_CSBUTTON_H__
 
 /**\file
  * Crystal Space Windowing System: button class
@@ -287,4 +287,4 @@ protected:
 
 /** @} */
 
-#endif // __CSBUTTON_H__
+#endif // __CS_CSBUTTON_H__

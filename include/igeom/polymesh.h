@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IGEOM_POLYMESH_H__
-#define __IGEOM_POLYMESH_H__
+#ifndef __CS_IGEOM_POLYMESH_H__
+#define __CS_IGEOM_POLYMESH_H__
 
 #include "csutil/scf.h"
 
@@ -71,5 +71,5 @@ struct iPolygonMesh : public iBase
 
 /** @} */
 
-#endif // __IGEOM_POLYMESH_H__
+#endif // __CS_IGEOM_POLYMESH_H__
 

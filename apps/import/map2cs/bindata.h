@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef BINDATA_H
-#define BINDATA_H
+#ifndef __BINDATA_H__
+#define __BINDATA_H__
 
 /**
   *
@@ -53,5 +53,5 @@ protected:
   int   m_Size;
 };
 
-#endif
+#endif // __BINDATA_H__
 

@@ -19,8 +19,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_SRDRCOM_H__
-#define __CS_SRDRCOM_H__
+#ifndef __CS_SRDRCOMSOFTWARE_H__
+#define __CS_SRDRCOMSOFTWARE_H__
 
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
@@ -150,4 +150,4 @@ public:
   } * scfiEventHandler;
 };
 
-#endif // __CS_SRDRCOM_H__
+#endif // __CS_SRDRCOMSOFTWARE_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IGRAPHIC_IMAGEIO_H__
-#define __IGRAPHIC_IMAGEIO_H__
+#ifndef __CS_IGRAPHIC_IMAGEIO_H__
+#define __CS_IGRAPHIC_IMAGEIO_H__
 
 /**\file
  * Image input/output interface
@@ -109,4 +109,4 @@ struct iImageIO : public iBase
 
 /** @} */
 
-#endif // __IGRAPHIC_IMAGEIO_H__
+#endif // __CS_IGRAPHIC_IMAGEIO_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_PORTAL_H__
-#define __IENGINE_PORTAL_H__
+#ifndef __CS_THING_PORTAL_H__
+#define __CS_THING_PORTAL_H__
 
 #include "csutil/scf.h"
 #include "iutil/objref.h"
@@ -246,4 +246,4 @@ struct iPortal : public iReference
 
 };
 
-#endif // __IENGINE_PORTAL_H__
+#endif // __CS_THING_PORTAL_H__

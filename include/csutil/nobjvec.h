@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __NOBJVEC_H__
-#define __NOBJVEC_H__
+#ifndef __CS_NOBJVEC_H__
+#define __CS_NOBJVEC_H__
 
 #include "csutil/csobjvec.h"
 #include "csutil/typedvec.h"
@@ -267,4 +267,4 @@ inline iObject *csNamedObjectVector::operator[] (int n) const
     return o;	// This will release a reference but that's ok in this case.
   }
 
-#endif // __NOBJVEC_H__
+#endif // __CS_NOBJVEC_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IUTIL_CMDLINE_H__
-#define __IUTIL_CMDLINE_H__
+#ifndef __CS_IUTIL_CMDLINE_H__
+#define __CS_IUTIL_CMDLINE_H__
 
 /**\file
  */
@@ -55,4 +55,4 @@ struct iCommandLineParser : public iBase
 
 /** @} */
 
-#endif // __IUTIL_CMDLINE_H__
+#endif // __CS_IUTIL_CMDLINE_H__

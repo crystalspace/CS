@@ -16,13 +16,13 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __wglext_h_
-#define __wglext_h_
+#ifndef __CS_WGLEXT_H_
+#define __CS_WGLEXT_H_
 
 typedef const char* (APIENTRY * csPFNWGLGETEXTENSIONSSTRINGARBPROC) (HDC hdc);
 typedef BOOL (APIENTRY * csPFNWGLSWAPINTERVALEXTPROC) (int interval);
 typedef int (APIENTRY * csPFNWGLGETSWAPINTERVALEXTPROC) ();
 
-#endif
+#endif // __CS_WGLEXT_H_
 
 

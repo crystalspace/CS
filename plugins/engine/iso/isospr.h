@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISOSPR_H__
-#define __ISOSPR_H__
+#ifndef __CS_ISOSPR_H__
+#define __CS_ISOSPR_H__
 
 #include "ivaria/iso.h"
 #include "ivideo/graph3d.h"
@@ -91,4 +91,4 @@ public:
 
 };
 
-#endif
+#endif // __CS_ISOSPR_H__

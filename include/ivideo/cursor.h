@@ -23,8 +23,8 @@
 
 */
 
-#ifndef __IVIDEO_CURSOR_H__
-#define __IVIDEO_CURSOR_H__
+#ifndef __CS_IVIDEO_CURSOR_H__
+#define __CS_IVIDEO_CURSOR_H__
 
 /**\file
  * Mouse cursor IDs
@@ -67,4 +67,4 @@ typedef enum _csMouseCursorID
 
 /** @} */
 
-#endif // __IVIDEO_CURSOR_H__
+#endif // __CS_IVIDEO_CURSOR_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMESH_STARS_H__
-#define __IMESH_STARS_H__
+#ifndef __CS_IMESH_STARS_H__
+#define __CS_IMESH_STARS_H__
 
 #include "csutil/scf.h"
 
@@ -61,5 +61,5 @@ struct iStarsState : public iBase
   virtual float GetMaxDistance () const = 0;
 };
 
-#endif
+#endif // __CS_IMESH_STARS_H__
 

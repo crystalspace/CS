@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS2XML_H
-#define __CS2XML_H
+#ifndef __CS2XML_H__
+#define __CS2XML_H__
 
 #include <stdarg.h>
 #include "csutil/ref.h"
@@ -295,5 +295,5 @@ public:
   void Main ();
 };
 
-#endif // __CS2XML_H
+#endif // __CS2XML_H__
 

@@ -1,5 +1,5 @@
-#ifndef __AWS_SINK_TEST_H
-#define __AWS_SINK_TEST_H
+#ifndef __AWS_SINK_TEST_H__
+#define __AWS_SINK_TEST_H__
 
 #include "iaws/aws.h"
 #include "iutil/string.h"
@@ -36,5 +36,5 @@ public:
   void SetWindowManager(iAws *_wmgr);
 };
 
-#endif
+#endif // __AWS_SINK_TEST_H__
 

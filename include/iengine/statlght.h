@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_STATLGHT_H__
-#define __IENGINE_STATLGHT_H__
+#ifndef __CS_IENGINE_STATLGHT_H__
+#define __CS_IENGINE_STATLGHT_H__
 
 /**\file
  */
@@ -57,5 +57,5 @@ struct iStatLight : public iBase
 
 /** @} */
 
-#endif // __IENGINE_STATLGHT_H__
+#endif // __CS_IENGINE_STATLGHT_H__
 

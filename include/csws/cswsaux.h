@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSWSAUX_H__
-#define __CSWSAUX_H__
+#ifndef __CS_CSWSAUX_H__
+#define __CS_CSWSAUX_H__
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,4 +28,4 @@
 #include "csver.h"
 #include "csutil/util.h"
 
-#endif // __CSWSAUX_H__
+#endif // __CS_CSWSAUX_H__

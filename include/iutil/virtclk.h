@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IUTIL_VIRTCLK_H__
-#define __IUTIL_VIRTCLK_H__
+#ifndef __CS_IUTIL_VIRTCLK_H__
+#define __CS_IUTIL_VIRTCLK_H__
 
 /**\file
  */
@@ -65,4 +65,4 @@ struct iVirtualClock : public iBase
   virtual csTicks GetCurrentTicks () const = 0;
 };
 
-#endif // __IUTIL_VIRTCLK_H__
+#endif // __CS_IUTIL_VIRTCLK_H__

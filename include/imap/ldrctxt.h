@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMAP_LDRCTXT_H__
-#define __IMAP_LDRCTXT_H__
+#ifndef __CS_IMAP_LDRCTXT_H__
+#define __CS_IMAP_LDRCTXT_H__
 
 /**\file
  */
@@ -66,5 +66,5 @@ struct iLoaderContext : public iBase
 
 /** @} */
 
-#endif
+#endif // __CS_IMAP_LDRCTXT_H__
 

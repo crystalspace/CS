@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __TRIANGLE_H__
-#define __TRIANGLE_H__
+#ifndef __CS_SPRTRI_H__
+#define __CS_SPRTRI_H__
 
 #include "ivideo/graph3d.h"
 #include "csgeom/math3d.h"
@@ -179,4 +179,4 @@ public:
 };
 
 
-#endif /*__TRIANGLE_H__*/
+#endif // __CS_SPRTRI_H__

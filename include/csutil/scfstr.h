@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SCFSTR_H__
-#define __SCFSTR_H__
+#ifndef __CS_SCFSTR_H__
+#define __CS_SCFSTR_H__
 
 #include "iutil/string.h"
 #include "csutil/csstring.h"
@@ -120,4 +120,4 @@ public:
   virtual bool CompareNoCase (const iString *iStr) const;
 };
 
-#endif // __SCFSTR_H__
+#endif // __CS_SCFSTR_H__

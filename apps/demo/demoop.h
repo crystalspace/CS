@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef DEMOOP_H
-#define DEMOOP_H
+#ifndef __DEMOOP_H__
+#define __DEMOOP_H__
 
 #include <stdarg.h>
 #include "csutil/scf.h"
@@ -160,5 +160,5 @@ public:
   virtual void Do (csTicks dt, iBase* params);
 };
 
-#endif // DEMOOP_H
+#endif // __DEMOOP_H__
 

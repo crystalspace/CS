@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CONTAIN_H
-#define CONTAIN_H
+#ifndef __CONTAIN_H__
+#define __CONTAIN_H__
 
 #include "csutil/csvector.h"
 
@@ -102,4 +102,4 @@ CS_DECLARE_TYPED_VECTOR(CCharVector,             char);
   int i;  \
    for (i=0;i<Num;i++) (DEST).Push(new TYPE(*((SRC)[i])));}
 
-#endif
+#endif // __CONTAIN_H__

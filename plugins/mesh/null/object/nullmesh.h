@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _NULLMESH_H_
-#define _NULLMESH_H_
+#ifndef __CS_NULLMESH_H__
+#define __CS_NULLMESH_H__
 
 #include "csgeom/vector3.h"
 #include "csgeom/transfrm.h"
@@ -198,5 +198,5 @@ public:
   } scfiComponent;
 };
 
-#endif // _NULLMESH_H_
+#endif // __CS_NULLMESH_H__
 

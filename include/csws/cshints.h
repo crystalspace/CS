@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSHINTS_H__
-#define __CSHINTS_H__
+#ifndef __CS_CSHINTS_H__
+#define __CS_CSHINTS_H__
 
 /**\file
  * Crystal Space Windowing System: floating hints class
@@ -122,4 +122,4 @@ private:
 
 /** @} */
 
-#endif // __CSHINTS_H__
+#endif // __CS_CSHINTS_H__

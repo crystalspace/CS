@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef TEXPLANE_H
-#define TEXPLANE_H
+#ifndef __TEXPLANE_H__
+#define __TEXPLANE_H__
 
 #include "texfile.h"
 
@@ -174,5 +174,5 @@ protected:
   CMapTexturedPlane* m_pMirrorPlane;
 };
 
-#endif
+#endif // __TEXPLANE_H__
 

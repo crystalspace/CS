@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVIDEO_RENDER3D_H__
-#define __IVIDEO_RENDER3D_H__
+#ifndef __CS_IVIDEO_RENDER3D_H__
+#define __CS_IVIDEO_RENDER3D_H__
 
 
 #include "csutil/scf.h"
@@ -352,5 +352,5 @@ struct iRender3D : public iBase
 
 /** @} */
 
-#endif // __IVIDEO_RENDER3D_H__
+#endif // __CS_IVIDEO_RENDER3D_H__
 

@@ -60,8 +60,8 @@
   1999-05-03 lpd Original version.
  */
 
-#ifndef __CS_MD5_H__
-#define __CS_MD5_H__
+#ifndef __CS_CSMD5_H__
+#define __CS_CSMD5_H__
 
 /**
  * This is an encapsulation of a C-implementation of MD5 digest algorithm by
@@ -108,4 +108,4 @@ public:
   static Digest Encode(const void*, int nbytes);
 };
 
-#endif // __CS_MD5_H__
+#endif // __CS_CSMD5_H__

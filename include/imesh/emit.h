@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMESH_EMIT_H__
-#define __IMESH_EMIT_H__
+#ifndef __CS_IMESH_EMIT_H__
+#define __CS_IMESH_EMIT_H__
 
 #include "csutil/scf.h"
 
@@ -240,5 +240,5 @@ struct iEmitState : public iBase
 
 };
 
-#endif
+#endif // __CS_IMESH_EMIT_H__
 

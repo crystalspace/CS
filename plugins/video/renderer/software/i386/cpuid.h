@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CPUID_H__
-#define __CPUID_H__
+#ifndef __CS_CPUID_H__
+#define __CS_CPUID_H__
 
 /*
     80x86 processor family feature bits.
@@ -47,4 +47,4 @@
 */
 extern "C" void csDetectCPU (int *Family, char Vendor[13], int *Features);
 
-#endif // __CPUID_H__
+#endif // __CS_CPUID_H__

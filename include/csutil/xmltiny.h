@@ -16,8 +16,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSUTIL_XMLTINY_H__
-#define __CSUTIL_XMLTINY_H__
+#ifndef __CS_UTIL_XMLTINY_H__
+#define __CS_UTIL_XMLTINY_H__
 
 #include "iutil/document.h"
 
@@ -49,5 +49,5 @@ public:
   void Free (csTinyXmlNode* n);
 };
 
-#endif // __CSUTIL_XMLTINY_H__
+#endif // __CS_UTIL_XMLTINY_H__
 

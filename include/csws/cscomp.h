@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSCOMP_H__
-#define __CSCOMP_H__
+#ifndef __CS_CSCOMP_H__
+#define __CS_CSCOMP_H__
 
 /**\file
  * Crystal Space Windowing System: Component interface
@@ -867,4 +867,4 @@ private:
 
 /** @} */
 
-#endif // __CSCOMP_H__
+#endif // __CS_CSCOMP_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IGEOM_CLIP2D_H__
-#define __IGEOM_CLIP2D_H__
+#ifndef __CS_IGEOM_CLIP2D_H__
+#define __CS_IGEOM_CLIP2D_H__
 
 /**\file
  */
@@ -147,5 +147,5 @@ struct iClipper2D : public iBase
 
 /** @} */
 
-#endif
+#endif // __CS_IGEOM_CLIP2D_H__
 

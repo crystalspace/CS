@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __GMTRIANGLE_H__
-#define __GMTRIANGLE_H__
+#ifndef __CS_GMTRIANGLE_H__
+#define __CS_GMTRIANGLE_H__
 
 #include "ivideo/graph3d.h"
 #include "csgeom/math3d.h"
@@ -128,5 +128,5 @@ public:
   csTriangleVertex& GetVertex (int idx) { return vertices[idx]; }
 };
 
-#endif /*__GMTRIANGLE_H__*/
+#endif // __CS_GMTRIANGLE_H__
 

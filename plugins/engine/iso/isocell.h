@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISOCELL_H__
-#define __ISOCELL_H__
+#ifndef __CS_ISOCELL_H__
+#define __CS_ISOCELL_H__
 
 #include "csutil/scf.h"
 #include "ivaria/iso.h"
@@ -69,4 +69,4 @@ public:
 
 };
 
-#endif
+#endif // __CS_ISOCELL_H__

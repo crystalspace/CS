@@ -5,8 +5,8 @@
 // Ported to Crystal Space by Norman Krämer <norman@users.sourceforge.net>
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __GRIDLAYOUT_G__
-#define __GRIDLAYOUT_G__
+#ifndef __CS_CSGRIDLAYOUT_H__
+#define __CS_CSGRIDLAYOUT_H__
 
 /**
  * \addtogroup csws_layout
@@ -48,4 +48,4 @@ public:
 
 /** @} */
 
-#endif // __GRIDLAYOUT_G__
+#endif // __CS_CSGRIDLAYOUT_H__

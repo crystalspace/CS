@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVIDEO_TXTMGR_H__
-#define __IVIDEO_TXTMGR_H__
+#ifndef __CS_IVIDEO_TXTMGR_H__
+#define __CS_IVIDEO_TXTMGR_H__
 
 /**\file
  * Texture manager interface
@@ -181,4 +181,4 @@ struct iTextureManager : public iBase
 
 /** @} */
 
-#endif // __IVIDEO_TXTMGR_H__
+#endif // __CS_IVIDEO_TXTMGR_H__

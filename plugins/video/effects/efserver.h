@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __EFFECTSERVER_H__
-#define __EFFECTSERVER_H__
+#ifndef __CS_EFFECTSERVER_H__
+#define __CS_EFFECTSERVER_H__
 
 #include "cstypes.h"
 #include "csutil/scf.h"
@@ -67,4 +67,4 @@ public:
   SCF_DECLARE_IBASE;
 };
 
-#endif // __EFFECTSERVER_H__
+#endif // __CS_EFFECTSERVER_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_CAMPOS_H__
-#define __IENGINE_CAMPOS_H__
+#ifndef __CS_IENGINE_CAMPOS_H__
+#define __CS_IENGINE_CAMPOS_H__
 
 /**\file
  */
@@ -141,5 +141,5 @@ struct iCameraPositionList : public iBase
 
 /** @} */
 
-#endif
+#endif // __CS_IENGINE_CAMPOS_H__
 

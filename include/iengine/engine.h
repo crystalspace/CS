@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_ENGINE_H__
-#define __IENGINE_ENGINE_H__
+#ifndef __CS_IENGINE_ENGINE_H__
+#define __CS_IENGINE_ENGINE_H__
 
 /**\file 
  * Crystal Space 3D Engine Interface
@@ -797,4 +797,4 @@ struct iEngine : public iBase
 
 /** @} */
 
-#endif // __IENGINE_ENGINE_H__
+#endif // __CS_IENGINE_ENGINE_H__

@@ -1,6 +1,3 @@
-#ifdef _CSGLEXT_
-#undef _CSGLEXT_
-
 /*
     Copyright (C) 2001 by Norman Krämer
 
@@ -18,6 +15,9 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
+#ifdef _CSGLEXT_
+#undef _CSGLEXT_
 
 /**********************************************************************
  * Begin system-specific stuff.

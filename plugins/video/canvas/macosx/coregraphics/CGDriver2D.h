@@ -10,8 +10,8 @@
 // This code must be callable from the ObjC delegate.  Since that uses the standard C compiler, it doesn't like
 // C++ classes, so we create a C API to some functions of this object
 
-#ifndef __CGDRIVER2D_H__
-#define __CGDRIVER2D_H__
+#ifndef __CS_CGDRIVER2D_H__
+#define __CS_CGDRIVER2D_H__
 
 
 #include "OSXDriver2D.h"
@@ -66,4 +66,4 @@ protected:
 
 #endif // __cplusplus
 
-#endif // __CGDRIVER2D_H__
+#endif // __CS_CGDRIVER2D_H__

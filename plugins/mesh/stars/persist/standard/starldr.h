@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _STARLDR_H_
-#define _STARLDR_H_
+#ifndef __CS_STARLDR_H__
+#define __CS_STARLDR_H__
 
 #include "imap/reader.h"
 #include "imap/writer.h"
@@ -164,5 +164,5 @@ public:
   } scfiComponent;
 };
 
-#endif // _STARLDR_H_
+#endif // __CS_STARLDR_H__
 

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __GL_TEXTURECACHE_H__
-#define __GL_TEXTURECACHE_H__
+#ifndef __CS_OGL_TEXTURECACHE_H__
+#define __CS_OGL_TEXTURECACHE_H__
 
 #include "csutil/scf.h"
 #include "csgeom/csrect.h"
@@ -207,5 +207,5 @@ public:
   bool IsLightmapOK (iPolygonTexture *polytex);
 };
 
-#endif // __GL_TEXTURECACHE_H__
+#endif // __CS_OGL_TEXTURECACHE_H__
 

@@ -1,5 +1,5 @@
-#ifndef __AWS_FLEXIBLE_PARAMETER_LIST__
-# define __AWS_FLEXIBLE_PARAMETER_LIST__
+#ifndef __CS_AWS_FLEXIBLE_PARAMETER_LIST_H__
+#define __CS_AWS_FLEXIBLE_PARAMETER_LIST_H__
 
 # include "iaws/awsparm.h"
 # include "csgeom/csrect.h"
@@ -117,4 +117,4 @@ public:
   /// Clears the parameter list
   virtual void Clear ();
 };
-#endif
+#endif // __CS_AWS_FLEXIBLE_PARAMETER_LIST_H__

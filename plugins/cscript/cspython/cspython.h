@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSPYTHON_H__
-#define __CSPYTHON_H__
+#ifndef __CS_CSPYTHON_H__
+#define __CS_CSPYTHON_H__
 
 #include "ivaria/script.h"
 #include "iutil/eventh.h"
@@ -54,7 +54,7 @@ public:
 };
 
 void InitPytocs();
-#endif // __CSPYTHON_H__
+#endif // __CS_CSPYTHON_H__
 
 
 

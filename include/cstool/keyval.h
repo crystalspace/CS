@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __KEYVAL_H__
-#define __KEYVAL_H__
+#ifndef __CS_KEYVAL_H__
+#define __CS_KEYVAL_H__
 
 #include "csgeom/vector3.h"
 #include "csutil/csobject.h"
@@ -65,4 +65,4 @@ private:
   char *m_Value;
 };
 
-#endif // __KEYVAL_H__
+#endif // __CS_KEYVAL_H__

@@ -6,8 +6,8 @@
 //  Copyright (c) 2001 Matt Reda. All rights reserved.
 //
 
-#ifndef __OSXDELEGATE2D_OPENGL_H__
-#define __OSXDELEGATE2D_OPENGL_H__
+#ifndef __CS_OSXDELEGATE2D_OPENGL_H__
+#define __CS_OSXDELEGATE2D_OPENGL_H__
 
 // C interface to a OSXDelegate2D category for creating an OpenGL context
 
@@ -26,4 +26,4 @@ DEL2D_FUNC(void, updateOpenGLContext)(OSXDelegate2D delegate);
 
 #endif // __cplusplus
 
-#endif // __OSXDELEGATE2D_OPENGL_H__
+#endif // __CS_OSXDELEGATE2D_OPENGL_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SARRAY_H__
-#define __SARRAY_H__
+#ifndef __CS_SARRAY_H__
+#define __CS_SARRAY_H__
 
 /**\file
  */
@@ -142,4 +142,4 @@ inline void csStaticArray::TakeOver (void *NewData, int NewSize, bool DeleteOld)
     Size = NewSize;
   }
 
-#endif // __SARRAY_H__
+#endif // __CS_SARRAY_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __OBJPOOL_H__
-#define __OBJPOOL_H__
+#ifndef __CS_OBJPOOL_H__
+#define __CS_OBJPOOL_H__
 
 /**
  * This macro defines a 'pool' class for the given type. The pool class 
@@ -89,4 +89,4 @@ public:
   }
 };
 
-#endif // __OBJPOOL_H__
+#endif // __CS_OBJPOOL_H__

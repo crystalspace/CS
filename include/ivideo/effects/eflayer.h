@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IEFFECTLAYER_H__
-#define __IEFFECTLAYER_H__
+#ifndef __CS_IVIDEO_EFFECTLAYER_H__
+#define __CS_IVIDEO_EFFECTLAYER_H__
 
 /**\file
  * Effect layer interface
@@ -72,4 +72,4 @@ struct iEffectLayer : public iBase
 
 /** @} */
 
-#endif // __IEFFECTLAYER_H__
+#endif // __CS_IVIDEO_EFFECTLAYER_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSUTIL_BINDER_H__
-#define __CSUTIL_BINDER_H__
+#ifndef __CS_UTIL_BINDER_H__
+#define __CS_UTIL_BINDER_H__
 
 #include "iutil/event.h"
 #include "csutil/csevent.h"
@@ -88,4 +88,4 @@ class csInputBinder : public iEventHandler
     bool UnbindAll();
 };
 
-#endif // __CSUTIL_BINDER_H__
+#endif // __CS_UTIL_BINDER_H__

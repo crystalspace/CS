@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSUTIL_CSINPUTS_H__
-#define __CSUTIL_CSINPUTS_H__
+#ifndef __CS_UTIL_CSINPUTS_H__
+#define __CS_UTIL_CSINPUTS_H__
 
 /**\file 
  * Crystal Space input library
@@ -111,4 +111,4 @@ extern bool csGetMouseDesc (int button, int shift, char *buf,
 extern bool csGetJoyDesc (int button, int shift, char *buf,
   bool use_shift = true);
 
-#endif // __CSUTIL_CSINPUTS_H__
+#endif // __CS_UTIL_CSINPUTS_H__

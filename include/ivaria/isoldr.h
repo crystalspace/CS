@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVARIA_ISOLDR_H__
-#define __IVARIA_ISOLDR_H__
+#ifndef __CS_IVARIA_ISOLDR_H__
+#define __CS_IVARIA_ISOLDR_H__
 
 #include "csutil/scf.h"
 
@@ -32,4 +32,4 @@ struct iIsoLoader : public iBase
   virtual bool LoadMapFile (const char* filename) = 0;
 };
 
-#endif
+#endif // __CS_IVARIA_ISOLDR_H__

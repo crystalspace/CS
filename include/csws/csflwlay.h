@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __FLOWLAYOUT_G__
-#define __FLOWLAYOUT_G__
+#ifndef __CS_CSFLOWLAYOUT_H__
+#define __CS_CSFLOWLAYOUT_H__
 
 /**
  * \addtogroup csws_layout
@@ -110,4 +110,4 @@ public:
 
 /** @} */
 
-#endif // __FLOWLAYOUT_G__
+#endif // __CS_CSFLOWLAYOUT_H__

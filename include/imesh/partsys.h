@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMESH_PARTSYS_H__
-#define __IMESH_PARTSYS_H__
+#ifndef __CS_IMESH_PARTSYS_H__
+#define __CS_IMESH_PARTSYS_H__
 
 #include "csutil/scf.h"
 
@@ -78,5 +78,5 @@ struct iParticleState : public iBase
 
 };
 
-#endif
+#endif // __CS_IMESH_PARTSYS_H__
 

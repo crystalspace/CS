@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __FPU80X86_H__
-#define __FPU80X86_H__
+#ifndef __CS_FPU80X86_H__
+#define __CS_FPU80X86_H__
 
 #if defined(PROC_X86) && defined(COMP_GCC)
 
@@ -74,4 +74,4 @@ static inline unsigned int csControl87(unsigned int, unsigned int) { return 0; }
 
 #endif
 
-#endif // __FPU80X86_H__
+#endif // __CS_FPU80X86_H__

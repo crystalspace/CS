@@ -1,5 +1,5 @@
-#ifndef _CRYSTAL_SNPRINTF_H_
-#define _CRYSTAL_SNPRINTF_H_
+#ifndef __CS_SNPRINTF_H__
+#define __CS_SNPRINTF_H__
 
 #include <stdarg.h>
 
@@ -16,4 +16,4 @@ extern int cs_vsnprintf(char *, size_t, const char *, va_list)
 //}
 #endif
 
-#endif
+#endif // __CS_SNPRINTF_H__

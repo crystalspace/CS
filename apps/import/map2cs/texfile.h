@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef TEXFILE_H
-#define TEXFILE_H
+#ifndef __TEXFILE_H__
+#define __TEXFILE_H__
 
 #include "bindata.h"
 #include "csgfx/csimage.h"
@@ -149,5 +149,5 @@ protected:
   bool m_Stored;
 };
 
-#endif
+#endif // __TEXFILE_H__
 

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSOSDEFS_H__
-#define __CSOSDEFS_H__
+#ifndef __CS_CSOSDEFS_H__
+#define __CS_CSOSDEFS_H__
 
 #include <math.h>
 
@@ -95,4 +95,4 @@ int main (int argc, char* argv[]) \
 }
 #endif // !CS_STATIC_LINKED && CS_UNIX_PLUGIN_REQUIRES_MAIN
 
-#endif // __CSOSDEFS_H__
+#endif // __CS_CSOSDEFS_H__

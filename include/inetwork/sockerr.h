@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __INETWORK_SOCKETERR__
-#define __INETWORK_SOCKETERR__
+#ifndef __CS_INETWORK_SOCKETERR_H__
+#define __CS_INETWORK_SOCKETERR_H__
 
 enum csNetworkSocketType
 {
@@ -60,4 +60,4 @@ enum csNetworkSocketError
   CS_NET_SOCKET_CANNOT_CONNECT
 };
 
-#endif
+#endif // __CS_INETWORK_SOCKETERR_H__

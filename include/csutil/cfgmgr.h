@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CFGMGR_H__
-#define __CFGMGR_H__
+#ifndef __CS_CFGMGR_H__
+#define __CS_CFGMGR_H__
 
 #include "iutil/cfgmgr.h"
 #include "csutil/csvector.h"
@@ -210,4 +210,4 @@ private:
   void RemoveDomain(class csConfigDomain *cfg);
 };
 
-#endif // __CFGMGR_H__
+#endif // __CS_CFGMGR_H__

@@ -18,8 +18,8 @@
 */
 
 
-#ifndef __CS_RGB_VECTOR__
-#define __CS_RGB_VECTOR__
+#ifndef __CS_RGB_VECTOR_H__
+#define __CS_RGB_VECTOR_H__
 
 #include "csvector.h"
 
@@ -69,4 +69,4 @@ public:
 
 };
 
-#endif
+#endif // __CS_RGB_VECTOR_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IEFFECTDEFINITION_H__
-#define __IEFFECTDEFINITION_H__
+#ifndef __CS_IVIDEO_EFFECTDEFINITION_H__
+#define __CS_IVIDEO_EFFECTDEFINITION_H__
 
 /**\file
  * Effect definition interface
@@ -74,4 +74,4 @@ struct iEffectDefinition : public iBase
 
 /** @} */
 
-#endif // __IEFFECTDEFINITION_H__
+#endif // __CS_IVIDEO_EFFECTDEFINITION_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __TYPEDVEC_H__
-#define __TYPEDVEC_H__
+#ifndef __CS_TYPEDVEC_H__
+#define __CS_TYPEDVEC_H__
 
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
@@ -434,4 +434,4 @@ public:
   NAME (int ilimit = 8, int ithreshold = 16) :				\
     NAME##_Helper (ilimit, ithreshold) {}
 
-#endif // __TYPEDVEC_H__
+#endif // __CS_TYPEDVEC_H__

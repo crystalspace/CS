@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMESH_EXPLODE_H__
-#define __IMESH_EXPLODE_H__
+#ifndef __CS_IMESH_EXPLODE_H__
+#define __CS_IMESH_EXPLODE_H__
 
 #include "csutil/scf.h"
 
@@ -82,5 +82,5 @@ struct iExplosionState : public iBase
   virtual void AddLight (iEngine*, iSector*, csTicks fade = 200) = 0;
 };
 
-#endif
+#endif // __CS_IMESH_EXPLODE_H__
 

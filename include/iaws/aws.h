@@ -1,5 +1,3 @@
-#ifndef __IAWS_AWS_H__
-#define __IAWS_AWS_H__
 /**************************************************************************
     Copyright (C) 2001 by Christopher Nelson
 
@@ -17,6 +15,8 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
+#ifndef __CS_IAWS_AWS_H__
+#define __CS_IAWS_AWS_H__
 
 /**\file 
  * Advanced Windowing System
@@ -934,4 +934,4 @@ struct iAwsConnectionNodeFactory : public iBase
 
 /* @} */
 
-#endif // __IAWS_AWS_H__
+#endif // __CS_IAWS_AWS_H__

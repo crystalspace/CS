@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IUTIL_STRING_H__
-#define __IUTIL_STRING_H__
+#ifndef __CS_IUTIL_STRING_H__
+#define __CS_IUTIL_STRING_H__
 
 /**\file
  * String interface
@@ -153,4 +153,4 @@ struct iString : public iBase
 
 /** @} */
 
-#endif // __IUTIL_STRING_H__
+#endif // __CS_IUTIL_STRING_H__

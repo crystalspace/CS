@@ -639,5 +639,5 @@ public:
 };
 
 
-#endif /*__DMATH3D_H__*/
+#endif // __DMATH3D_H__
 

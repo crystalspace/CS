@@ -20,8 +20,8 @@
     "arithmetic sequence" (using subtraction).
 */
 
-#ifndef __RNG_H__
-#define __RNG_H__
+#ifndef __CS_RNG_H__
+#define __CS_RNG_H__
 
 #include "cstypes.h"
 
@@ -71,4 +71,4 @@ private:
   float RANMAR ();
 };
 
-#endif // __RNG_H__
+#endif // __CS_RNG_H__

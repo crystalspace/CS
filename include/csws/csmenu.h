@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSMENU_H__
-#define __CSMENU_H__
+#ifndef __CS_CSMENU_H__
+#define __CS_CSMENU_H__
 
 /**\file
  * Crystal Space Windowing System: menu class
@@ -322,4 +322,4 @@ private:
 
 /** @} */
 
-#endif // __CSMENU_H__
+#endif // __CS_CSMENU_H__

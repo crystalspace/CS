@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSUTIL_CFGFILE_H__
-#define __CSUTIL_CFGFILE_H__
+#ifndef __CS_UTIL_CFGFILE_H__
+#define __CS_UTIL_CFGFILE_H__
 
 #include "iutil/cfgfile.h"
 #include "csutil/csvector.h"
@@ -183,4 +183,4 @@ private:
   virtual bool SaveNow(const char *Filename, iVFS *vfs) const;
 };
 
-#endif // __CSUTIL_CFGFILE_H__
+#endif // __CS_UTIL_CFGFILE_H__

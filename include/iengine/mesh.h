@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_MESH_H__
-#define __IENGINE_MESH_H__
+#ifndef __CS_IENGINE_MESH_H__
+#define __CS_IENGINE_MESH_H__
 
 /**\file
  */
@@ -508,5 +508,5 @@ struct iMeshFactoryList : public iBase
 
 /** @} */
 
-#endif // __IENGINE_MESH_H__
+#endif // __CS_IENGINE_MESH_H__
 

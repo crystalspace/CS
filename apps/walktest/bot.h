@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_BOT_H__
-#define __CS_BOT_H__
+#ifndef __BOT_H__
+#define __BOT_H__
 
 #include "csgeom/math3d.h"
 #include "csengine/meshobj.h"
@@ -64,4 +64,4 @@ public:
   void set_bot_sector (iSector* s) { f_sector = s; }
 };
 
-#endif // __CS_BOT_H__
+#endif // __BOT_H__

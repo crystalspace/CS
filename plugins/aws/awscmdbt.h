@@ -1,5 +1,5 @@
-#ifndef __AWS_COMMAND_BUTTON_H__
-#define __AWS_COMMAND_BUTTON_H__
+#ifndef __CS_AWS_COMMAND_BUTTON_H__
+#define __CS_AWS_COMMAND_BUTTON_H__
 
 /**************************************************************************
     Copyright (C) 2000-2001 by Christopher Nelson
@@ -111,5 +111,5 @@ public:
   virtual iAwsComponent *Create ();
 };
 
-#endif
+#endif // __CS_AWS_COMMAND_BUTTON_H__
 

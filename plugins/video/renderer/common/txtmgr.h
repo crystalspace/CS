@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __TXTMGR_H__
-#define __TXTMGR_H__
+#ifndef __CS_TXTMGR_H__
+#define __CS_TXTMGR_H__
 
 #include "csutil/csvector.h"
 #include "csutil/typedvec.h"
@@ -393,4 +393,4 @@ public:
   virtual void FreeMaterials ();
 };
 
-#endif // __TXTMGR_H__
+#endif // __CS_TXTMGR_H__

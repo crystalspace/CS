@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _ODIVX_H_
-#define _ODIVX_H_
+#ifndef __CS_ODIVX_H__
+#define __CS_ODIVX_H__ 
 
 #include "ivideo/codec.h"
 #include "plugins/video/format/avi/iavicdec.h"
@@ -45,4 +45,4 @@ class csOpenDivX : public iAVICodec
   virtual bool Encode (void *indata, char *outdata, uint32 &outlength);
 };
 
-#endif
+#endif // __CS_ODIVX_H__

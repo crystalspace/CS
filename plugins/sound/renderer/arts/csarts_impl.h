@@ -1,5 +1,5 @@
-#ifndef CS_ARTS_H_
-#define CS_ARTS_H_
+#ifndef __CS_ARTS_H__
+#define __CS_ARTS_H__
 
 #include "csarts.h"
 #include <stdsynthmodule.h>
@@ -126,4 +126,4 @@ class csSoundModule_impl : public csSoundModule_skel, public StdSynthModule
 
 };
 
-#endif
+#endif // __CS_ARTS_H__

@@ -1,5 +1,5 @@
-#ifndef __N_TERRAIN_RENDERER__
-#define __N_TERRAIN_RENDERER__
+#ifndef __CS_N_TERRAIN_RENDERER__
+#define __CS_N_TERRAIN_RENDERER__
 
 #include "csutil/scf.h"
 #include "csgeom/sphere.h"
@@ -504,4 +504,4 @@ public:
   } scfiComponent;
 };
 
-#endif
+#endif // __CS_N_TERRAIN_RENDERER__

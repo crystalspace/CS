@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _SPR2D_UV_ANIMATION_
-#define _SPR2D_UV_ANIMATION_
+#ifndef __CS_SPR2D_UV_ANIMATION_H__
+#define __CS_SPR2D_UV_ANIMATION_H__
 
 #include "imesh/sprite2d.h"
 #include "csutil/csvector.h"
@@ -156,4 +156,4 @@ class csSprite2DUVAnimation : public iSprite2DUVAnimation
 
 };
 
-#endif
+#endif // __CS_SPR2D_UV_ANIMATION_H__

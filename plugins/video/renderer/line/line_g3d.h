@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __LINE_G3D_H__
-#define __LINE_G3D_H__
+#ifndef __CS_LINE_G3D_H__
+#define __CS_LINE_G3D_H__
 
 // csGraphics3DLine line rasterizer class.
 
@@ -317,4 +317,4 @@ public:
   friend struct eiLineConfig;
 };
 
-#endif // __LINE_G3D_H__
+#endif // __CS_LINE_G3D_H__

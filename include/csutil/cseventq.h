@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSEVENTQ_H__
-#define __CSEVENTQ_H__
+#ifndef __CS_CSEVENTQ_H__
+#define __CS_CSEVENTQ_H__
 
 /**\file 
  * Event Queue interface
@@ -170,4 +170,4 @@ public:
   virtual bool IsEmpty() { return evqHead == evqTail; }
 };
 
-#endif // __CSEVENTQ_H__
+#endif // __CS_CSEVENTQ_H__

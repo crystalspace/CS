@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMESH_FIRE_H__
-#define __IMESH_FIRE_H__
+#ifndef __CS_IMESH_FIRE_H__
+#define __CS_IMESH_FIRE_H__
 
 #include "csutil/scf.h"
 
@@ -65,5 +65,5 @@ struct iFireState : public iBase
   virtual float GetTotalTime () const = 0;
 };
 
-#endif
+#endif // __CS_IMESH_FIRE_H__
 

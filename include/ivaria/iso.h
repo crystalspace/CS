@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IISO_H__
-#define __IISO_H__
+#ifndef __CS_IVARIA_ISO_H__
+#define __CS_IVARIA_ISO_H__
 
 #include "csutil/scf.h"
 #include "csutil/cscolor.h"
@@ -548,4 +548,4 @@ struct iIsoMaterialWrapperIndex: public iBase
   /// Set the index -- use with caution!
   virtual void SetIndex(int i) = 0;
 };
-#endif
+#endif // __CS_IVARIA_ISO_H__

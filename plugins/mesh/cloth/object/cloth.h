@@ -14,8 +14,8 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
  */
 
-#ifndef __CLOTH_H__
-#define __CLOTH_H__
+#ifndef __CS_CLOTH_H__
+#define __CS_CLOTH_H__
 
 #include <stdarg.h>
 #include "csgeom/math2d.h"
@@ -571,4 +571,4 @@ inline void     Update(uint /* msec */ )
 // 
 // 
 
-#endif				// __CLOTH_H__
+#endif // __CS_CLOTH_H__

@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSSOUNDLISTENEREAX_H__
-#define __CSSOUNDLISTENEREAX_H__
+#ifndef __CS_SOUNDLISTENEREAX_H__
+#define __CS_SOUNDLISTENEREAX_H__
 
 #include "../common/slstn.h"
 
@@ -56,4 +56,4 @@ private:
   bool Dirty;
 };
 
-#endif
+#endif // __CS_SOUNDLISTENEREAX_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSRADBUT_H__
-#define __CSRADBUT_H__
+#ifndef __CS_CSRADBUT_H__
+#define __CS_CSRADBUT_H__
 
 /**\file
  * Crystal Space Windowing System: radio button class
@@ -91,4 +91,4 @@ protected:
 
 /** @} */
 
-#endif // __CSRADBUT_H__
+#endif // __CS_CSRADBUT_H__

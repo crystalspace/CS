@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_LIGHT_H__
-#define __IENGINE_LIGHT_H__
+#ifndef __CS_IENGINE_LIGHT_H__
+#define __CS_IENGINE_LIGHT_H__
 
 /**\file
  */
@@ -331,5 +331,5 @@ struct iLightIterator : public iBase
 
 /** @} */
 
-#endif // __IENGINE_LIGHT_H__
+#endif // __CS_IENGINE_LIGHT_H__
 

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSWSTEX_H__
-#define __CSWSTEX_H__
+#ifndef __CS_CSWSTEX_H__
+#define __CS_CSWSTEX_H__
 
 /**
  * \addtogroup csws
@@ -135,4 +135,4 @@ public:
 
 /** @} */
 
-#endif // __CSWSTEX_H__
+#endif // __CS_CSWSTEX_H__

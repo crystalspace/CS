@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSAPP_H__
-#define __CSAPP_H__
+#ifndef __CS_CSAPP_H__
+#define __CS_CSAPP_H__
 
 /**\file 
  * Crystal Space Windowing System: Application class interface
@@ -496,4 +496,4 @@ protected:
 
 /** @} */
 
-#endif // __CSAPP_H__
+#endif // __CS_CSAPP_H__

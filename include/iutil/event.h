@@ -17,8 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IUTIL_EVENT_H__
-#define __IUTIL_EVENT_H__
+#ifndef __CS_IUTIL_EVENT_H__
+#define __CS_IUTIL_EVENT_H__
 
 #include "iutil/evdefs.h"
 #include "csutil/scf.h"
@@ -321,4 +321,4 @@ struct iEventCord : public iBase
 /** @} */
 
 
-#endif // __IUTIL_EVENT_H__
+#endif // __CS_IUTIL_EVENT_H__

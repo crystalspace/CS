@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISOLOAD_H__
-#define __ISOLOAD_H__
+#ifndef __CS_ISOLOAD_H__
+#define __CS_ISOLOAD_H__
 
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
@@ -172,4 +172,4 @@ public:
 
 };
 
-#endif
+#endif // __CS_ISOLOAD_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSISO_MATERIAL_H__
-#define __CSISO_MATERIAL_H__
+#ifndef __CS_ISO_MATERIAL_H__
+#define __CS_ISO_MATERIAL_H__
 
 #include "csgfx/rgbpixel.h"
 #include "csutil/csobject.h"
@@ -326,4 +326,4 @@ public:
   } scfiMaterialList;
 };
 
-#endif // __CSISO_MATERIAL_H__
+#endif // __CS_ISO_MATERIAL_H__

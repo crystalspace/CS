@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSCWHEEL_H__
-#define __CSCWHEEL_H__
+#ifndef __CS_CSCWHEEL_H__
+#define __CS_CSCWHEEL_H__
 
 /**\file
  * Crystal Space Windowing System: color wheel class
@@ -68,4 +68,4 @@ public:
 
 /** @} */
 
-#endif // __CSCWHEEL_H__
+#endif // __CS_CSCWHEEL_H__

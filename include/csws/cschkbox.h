@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSCHKBOX_H__
-#define __CSCHKBOX_H__
+#ifndef __CS_CSCHKBOX_H__
+#define __CS_CSCHKBOX_H__
 
 /**\file
  * Crystal Space Windowing System: check box button class
@@ -112,4 +112,4 @@ protected:
 
 /** @} */
 
-#endif // __CSCHKBOX_H__
+#endif // __CS_CSCHKBOX_H__

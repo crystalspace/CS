@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMESH_BCTERR_H_
-#define __IMESH_BCTERR_H_
+#ifndef __CS_IMESH_BCTERR_H__
+#define __CS_IMESH_BCTERR_H__
 
 #include "csutil/scf.h"
 
@@ -127,5 +127,5 @@ struct iBCTerrFactoryState : public iBase
   virtual void SetSystemDistance (float start, float new_dist) = 0;
 };
 
-#endif // __IMESH_BCTERR_H_
+#endif // __CS_IMESH_BCTERR_H__
 

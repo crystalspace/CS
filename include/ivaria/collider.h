@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_COLLIDER_H__
-#define __IENGINE_COLLIDER_H__
+#ifndef __CS_IVARIA_COLLIDER_H__
+#define __CS_IVARIA_COLLIDER_H__
 
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
@@ -145,5 +145,5 @@ struct iCollideSystem : public iBase
 	csReversibleTransform** transforms) = 0;
 };
 
-#endif // __IENGINE_COLLIDER_H__
+#endif // __CS_IVARIA_COLLIDER_H__
 

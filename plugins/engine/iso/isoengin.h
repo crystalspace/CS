@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISOENGIN_H__
-#define __ISOENGIN_H__
+#ifndef __CS_ISOENGIN_H__
+#define __CS_ISOENGIN_H__
 
 #include "ivaria/iso.h"
 #include "isomater.h"
@@ -122,4 +122,4 @@ public:
 
 };
 
-#endif
+#endif // __CS_ISOENGIN_H__

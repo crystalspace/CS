@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef MCURVE_H
-#define MCURVE_H
+#ifndef __MCURVE_H__
+#define __MCURVE_H__
 
 #include "contain.h"
 
@@ -100,5 +100,5 @@ protected:
   csString             m_Name;
 };
 
-#endif
+#endif // __MCURVE_H__
 

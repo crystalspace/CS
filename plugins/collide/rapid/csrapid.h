@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _RAPID_H_
-#define _RAPID_H_
+#ifndef __CS_RAPID_H__
+#define __CS_RAPID_H__
 
 #include "ivaria/collider.h"
 #include "iutil/eventh.h"
@@ -114,5 +114,5 @@ public:
   } scfiDebugHelper;
 };
 
-#endif // _RAPID_H_
+#endif // __CS_RAPID_H__
 

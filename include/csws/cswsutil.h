@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSWSUTIL_H__
-#define __CSWSUTIL_H__
+#ifndef __CS_CSWSUTIL_H__
+#define __CS_CSWSUTIL_H__
 
 /**
  * \addtogroup csws
@@ -99,4 +99,4 @@ extern csPixmap *NewBitmap (csApp *app, char *texturename, int tx, int ty,
 
 /** @} */
 
-#endif // __CSWSUTIL_H__
+#endif // __CS_CSWSUTIL_H__

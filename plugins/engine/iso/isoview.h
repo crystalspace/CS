@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISOVIEW_H__
-#define __ISOVIEW_H__
+#ifndef __CS_ISOVIEW_H__
+#define __CS_ISOVIEW_H__
 
 #include "ivaria/iso.h"
 #include "iengine/camera.h"
@@ -170,4 +170,4 @@ public:
 };
 
 
-#endif
+#endif // __CS_ISOVIEW_H__

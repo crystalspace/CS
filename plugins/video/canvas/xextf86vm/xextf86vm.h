@@ -17,8 +17,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __XEXTF86VM_H__
-#define __XESTF86VM_H__
+#ifndef __CS_XEXTF86VM_H__
+#define __CS_XESTF86VM_H__
+
 #include <stdarg.h>
 #include "csutil/scf.h"
 #include "iutil/eventh.h"
@@ -103,4 +104,4 @@ public:
 
 };
 
-#endif // __XWINDOW_H__
+#endif // __CS_XEXTF86VM_H__

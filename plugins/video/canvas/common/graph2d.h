@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __GRAPH2D_H__
-#define __GRAPH2D_H__
+#ifndef __CS_GRAPH2D_H__
+#define __CS_GRAPH2D_H__
 
 #include <stdarg.h>
 #include "csutil/scf.h"
@@ -421,4 +421,4 @@ protected:
   friend struct NativeWindow;
 };
 
-#endif // __GRAPH2D_H__
+#endif // __CS_GRAPH2D_H__

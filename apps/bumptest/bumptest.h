@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef BUMPTEST_H
-#define BUMPTEST_H
+#ifndef __BUMPTEST_H__
+#define __BUMPTEST_H__
 
 #include <stdarg.h>
 #include "csgeom/math2d.h"
@@ -75,5 +75,5 @@ public:
   void Report (int severity, const char* msg, ...);
 };
 
-#endif // BUMPTEST_H
+#endif // __BUMPTEST_H__
 

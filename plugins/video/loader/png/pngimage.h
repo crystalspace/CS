@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef PNGIMAGE_H
-#define PNGIMAGE_H
+#ifndef __CS_PNGIMAGE_H__
+#define __CS_PNGIMAGE_H__
 
 #include "csgfx/csimage.h"
 #include "igraphic/imageio.h"
@@ -69,4 +69,4 @@ private:
   bool Load (uint8* iBuffer, uint32 iSize);
 };
 
-#endif // PNGIMAGE_H
+#endif // __CS_PNGIMAGE_H__

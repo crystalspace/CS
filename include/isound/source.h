@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISOUND_SOURCE_H__
-#define __ISOUND_SOURCE_H__
+#ifndef __CS_ISOUND_SOURCE_H__
+#define __CS_ISOUND_SOURCE_H__
 
 #include "csutil/scf.h"
 #include "csgeom/vector3.h"
@@ -76,4 +76,4 @@ struct iSoundSource : public iBase
   virtual csVector3 GetVelocity() = 0;
 };
 
-#endif // __ISOUND_SOURCE_H__
+#endif // __CS_ISOUND_SOURCE_H__

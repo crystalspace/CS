@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMAP_PARSER_H__
-#define __IMAP_PARSER_H__
+#ifndef __CS_IMAP_PARSER_H__
+#define __CS_IMAP_PARSER_H__
 
 /**\file 
  * Geometry loader interface
@@ -132,5 +132,5 @@ struct iLoader : public iBase
 
 /** } */
 
-#endif // __IMAP_PARSER_H__
+#endif // __CS_IMAP_PARSER_H__
 

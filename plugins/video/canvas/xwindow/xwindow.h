@@ -17,10 +17,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef __CS_XWINDOW_H__
+#define __CS_XWINDOW_H__
 
-
-#ifndef __XWINDOW_H__
-#define __XWINDOW_H__
 #include <stdarg.h>
 #include "csutil/scf.h"
 #include "iutil/eventh.h"
@@ -157,4 +156,4 @@ public:
 
 };
 
-#endif // __XWINDOW_H__
+#endif // __CS_XWINDOW_H__

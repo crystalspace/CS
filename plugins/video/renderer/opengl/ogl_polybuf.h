@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __OGL_POLYBUF_H__
-#define __OGL_POLYBUF_H__
+#ifndef __CS_OGL_POLYBUF_H__
+#define __CS_OGL_POLYBUF_H__
 
 #include "csgeom/vector3.h"
 #include "csgeom/plane3.h"
@@ -349,5 +349,5 @@ public:
   virtual iPolygonBuffer* CreatePolygonBuffer ();
 };
 
-#endif // __POLYBUF_H__
+#endif // __CS_OGL_POLYBUF_H__
 

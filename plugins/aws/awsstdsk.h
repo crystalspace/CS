@@ -1,5 +1,5 @@
-#ifndef __AWS_STANDARD_SINK__
-# define __AWS_STANDARD_SINK__
+#ifndef __CS_AWS_STANDARD_SINK_H__
+#define __CS_AWS_STANDARD_SINK_H__
 
 /************************************************************************************
   This sink provides the ability to trigger certain standard mechanisms in components,
@@ -50,4 +50,4 @@ public:
   awsStandardSink (iAws *_wmgr);
   virtual ~awsStandardSink ();
 };
-#endif
+#endif // __CS_AWS_STANDARD_SINK_H__

@@ -1,5 +1,5 @@
-#ifndef __IGLSTATES_H__
-#define __IGLSTATES_H__
+#ifndef __CS_IGLSTATES_H__
+#define __CS_IGLSTATES_H__
 
 #include "csutil/scf.h" 
 
@@ -62,4 +62,4 @@ public:
 #undef IMPLEMENT_CACHED_PARAMETER_2
 #undef IMPLEMENT_CACHED_PARAMETER_3
 
-#endif
+#endif // __CS_IGLSTATES_H__

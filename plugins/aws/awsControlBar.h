@@ -1,8 +1,8 @@
 // awsControlBar.h: interface for the awsControlBar class.
 //
 //////////////////////////////////////////////////////////////////////
-#ifndef __AWSCONTROLBASE_H__
-#define __AWSCONTROLBASE_H__
+#ifndef __CS_AWS_CONTROLBAR_H__
+#define __CS_AWS_CONTROLBAR_H__
 
 #include "awscomp.h"
 #include "awsPanel.h"
@@ -105,5 +105,5 @@ public:
   iAwsComponent* Create();
 };
 
-#endif
+#endif // __CS_AWS_CONTROLBAR_H__
 

@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISOUND_RENDERER_H__
-#define __ISOUND_RENDERER_H__
+#ifndef __CS_ISOUND_RENDERER_H__
+#define __CS_ISOUND_RENDERER_H__
 
 #include "isound/source.h"
 
@@ -62,4 +62,4 @@ public:
   virtual void MixingFunction () = 0;
 };
 
-#endif // __ISOUND_RENDERER_H__
+#endif // __CS_ISOUND_RENDERER_H__

@@ -1,5 +1,5 @@
-#ifndef __AWSCSCR_H__
-# define __AWSCSCR_H__
+#ifndef __CS_AWS_CSCR_H__
+#define __CS_AWS_CSCR_H__
 
 /**************************************************************************
     Copyright (C) 2000-2001 by Christopher Nelson
@@ -68,4 +68,4 @@ public:
     (void)Alpha;        /* do nothing */
   }
 };
-#endif // __AWSCSCR_H__
+#endif // __CS_AWS_CSCR_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SLSTN_H__
-#define __SLSTN_H__
+#ifndef __CS_SLSTN_H__
+#define __CS_SLSTN_H__
 
 #include "isound/listener.h"
 
@@ -52,4 +52,4 @@ protected:
   csSoundEnvironment Environment;
 };
 
-#endif // __SLSTN_H__
+#endif // __CS_SLSTN_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef SCANSTR_H
-#define SCANSTR_H
+#ifndef __CS_SCANSTR_H__
+#define __CS_SCANSTR_H__
 
 /**\file
  */
@@ -52,4 +52,4 @@
  */
 int csScanStr (const char* in, const char* format, ...);
 
-#endif // SCANSTR_H
+#endif // __CS_SCANSTR_H__

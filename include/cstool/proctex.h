@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __PROCTEX_H__
-#define __PROCTEX_H__
+#ifndef __CS_PROCTEX_H__
+#define __CS_PROCTEX_H__
 
 #include <stdarg.h>
 #include "csutil/csobject.h"
@@ -161,5 +161,5 @@ public:
 };
 
 
-#endif // __PROCTEX_H__
+#endif // __CS_PROCTEX_H__
 

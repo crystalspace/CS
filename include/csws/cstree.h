@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSTREE_H__
-#define __CSTREE_H__
+#ifndef __CS_CSTREE_H__
+#define __CS_CSTREE_H__
 
 /**\file
  * Crystal Space Windowing System: tree box class
@@ -546,4 +546,4 @@ protected:
 
 /** @} */
 
-#endif // __CSTREE_H__
+#endif // __CS_CSTREE_H__

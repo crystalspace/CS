@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSWS_H__
-#define __CSWS_H__
+#ifndef __CS_CSWS_H__
+#define __CS_CSWS_H__
 
 /**
  * \addtogroup csws
@@ -147,4 +147,4 @@ struct iEvent;
 
 /** @} */
 
-#endif // __CSWS_H__
+#endif // __CS_CSWS_H__

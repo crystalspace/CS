@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __UNIX_H__
-#define __UNIX_H__
+#ifndef __CS_UNIX_H__
+#define __CS_UNIX_H__
 
 #include "csutil/scf.h"
 #include "cssys/system.h"
@@ -32,4 +32,4 @@ public:
   SysSystemDriver (iObjectRegistry* object_reg);
 };
 
-#endif // __UNIX_H__
+#endif // __CS_UNIX_H__

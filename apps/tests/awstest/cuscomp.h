@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _AWSCOMP_H_
-#define _AWSCOMP_H_
+#ifndef __AWSCOMP_H__
+#define __AWSCOMP_H__
 
 #include "iaws/awsecomp.h"
 
@@ -44,4 +44,4 @@ public:
   iAwsComponent* Create();
 };
 
-#endif
+#endif // __AWSCOMP_H__

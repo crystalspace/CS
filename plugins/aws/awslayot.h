@@ -1,5 +1,5 @@
-#ifndef __AWS_LAYOUT__
-# define __AWS_LAYOUT__
+#ifndef __CS_AWS_LAYOUT_H__
+#define __CS_AWS_LAYOUT_H__
 
 # include "iaws/aws.h"
 # include "csutil/scanstr.h"
@@ -40,4 +40,4 @@ public:
   /// Lays out components properly
   virtual void LayoutComponents () = 0;
 };
-#endif
+#endif // __CS_AWS_LAYOUT_H__

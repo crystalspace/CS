@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_SHAREVAR_H__
-#define __IENGINE_SHAREVAR_H__
+#ifndef __CS_IENGINE_SHAREVAR_H__
+#define __CS_IENGINE_SHAREVAR_H__
 
 /**\file
  */
@@ -77,4 +77,4 @@ struct iSharedVariableList : public iBase
   virtual iSharedVariable *New() const = 0;
 };
 
-#endif
+#endif // __CS_IENGINE_SHAREVAR_H__

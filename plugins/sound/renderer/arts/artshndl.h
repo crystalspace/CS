@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _ARTSHANDLE_H_
-#define _ARTSHANDLE_H_
+#ifndef __CS_ARTSHANDLE_H__
+#define __CS_ARTSHANDLE_H__
 
 #include "isound/handle.h"
 #include "isound/source.h"
@@ -97,4 +97,4 @@ class csArtsHandle : public iSoundHandle, public iSoundSource
 
 };
 
-#endif
+#endif // __CS_ARTSHANDLE_H__

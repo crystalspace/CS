@@ -1,5 +1,5 @@
-#ifndef __AWSCSPT_H__
-# define __AWSCSPT_H__
+#ifndef __CS_AWS_CSPT_H__
+#define __CS_AWS_CSPT_H__
 
 /**************************************************************************
     Copyright (C) 2000-2001 by Christopher Nelson
@@ -73,4 +73,4 @@ public:
                 iGraphics3D *g3d = NULL,
                 uint8 Alpha = 0);
 };
-#endif // __AWSCSPT_H__
+#endif // __CS_AWS_CSPT_H__

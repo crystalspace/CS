@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SVGA_H__
-#define __SVGA_H__
+#ifndef __CS_SVGA_H__
+#define __CS_SVGA_H__
 
 #include <vga.h>
 #include <vgagl.h>
@@ -73,4 +73,4 @@ public:
   { return 150; }
 };
 
-#endif // __SVGA_H__
+#endif // __CS_SVGA_H__

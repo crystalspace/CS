@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef BRUSH_H
-#define BRUSH_H
+#ifndef __BRUSH_H__
+#define __BRUSH_H__
 
 #include "contain.h"
 
@@ -152,5 +152,5 @@ protected:
   CMapBrushBoundingBox    m_BoundingBox;
 };
 
-#endif
+#endif // __BRUSH_H__
 

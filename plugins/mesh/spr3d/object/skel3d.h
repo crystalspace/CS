@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef SKEL3D_H
-#define SKEL3D_H
+#ifndef __CS_SKEL3D_H__
+#define __CS_SKEL3D_H__
 
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
@@ -433,4 +433,4 @@ public:
   } scfiSkeletonState;
 };
 
-#endif /*SKEL3D_H*/
+#endif // __CS_SKEL3D_H__

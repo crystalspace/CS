@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef MAPSTD_H
-#define MAPSTD_H
+#ifndef __MAPSTD_H__
+#define __MAPSTD_H__
 
 #include <stdio.h>
 
@@ -28,4 +28,4 @@
 #include "csutil/csstring.h"
 #include "dmath3d.h"
 
-#endif
+#endif // __MAPSTD_H__

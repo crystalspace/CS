@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSKEYACC_H__
-#define __CSKEYACC_H__
+#ifndef __CS_CSKEYACC_H__
+#define __CS_CSKEYACC_H__
 
 /**\file
  * Crystal Space Windowing System: keyboard accelerator class
@@ -74,4 +74,4 @@ public:
 
 /** @} */
 
-#endif // __CSKEYACC_H__
+#endif // __CS_CSKEYACC_H__

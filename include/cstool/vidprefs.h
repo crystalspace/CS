@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSVIDPREFS_H__
-#define __CSVIDPREFS_H__
+#ifndef __CS_VIDPREFS_H__
+#define __CS_VIDPREFS_H__
 
 #include "cstypes.h"
 #include "csutil/ref.h"
@@ -110,5 +110,5 @@ public:
   void SelectMode ();
 };
 
-#endif // __CSVIDPREFS_H__
+#endif // __CS_VIDPREFS_H__
 

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_VISCULL_H__
-#define __IENGINE_VISCULL_H__
+#ifndef __CS_IENGINE_VISCULL_H__
+#define __CS_IENGINE_VISCULL_H__
 
 /**\file
  */
@@ -223,5 +223,5 @@ struct iVisibilityObject : public iBase
 
 /** @} */
 
-#endif // __IENGINE_VISCULL_H__
+#endif // __CS_IENGINE_VISCULL_H__
 

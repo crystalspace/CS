@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSSKIN_H__
-#define __CSSKIN_H__
+#ifndef __CS_CSSKIN_H__
+#define __CS_CSSKIN_H__
 
 /**\file
  * Crystal Space Windowing System: Skin interface
@@ -354,4 +354,4 @@ public:
 
 /** @} */
 
-#endif // __CSSKIN_H__
+#endif // __CS_CSSKIN_H__

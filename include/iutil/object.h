@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IOBJECT_OBJECT_H__
-#define __IOBJECT_OBJECT_H__
+#ifndef __CS_IOBJECT_OBJECT_H__
+#define __CS_IOBJECT_OBJECT_H__
 
 /**\file
  */
@@ -167,4 +167,4 @@ struct iDataObject : public iBase
 };
 /** @} */
 
-#endif
+#endif // __CS_IOBJECT_OBJECT_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _SNOWLDR_H_
-#define _SNOWLDR_H_
+#ifndef __CS_SNOWLDR_H__
+#define __CS_SNOWLDR_H__
 
 #include "imap/reader.h"
 #include "imap/writer.h"
@@ -164,4 +164,4 @@ public:
   friend struct eiComponent;
 };
 
-#endif // _SNOWLDR_H_
+#endif // __CS_SNOWLDR_H__

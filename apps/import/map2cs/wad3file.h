@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef WAD3FILE_H
-#define WAD3FILE_H
+#ifndef __WAD3FILE_H__
+#define __WAD3FILE_H__
 
 #include "contain.h"
 #include "texarch.h"
@@ -91,4 +91,4 @@ protected:
   int         m_Numlumps;
 };
 
-#endif
+#endif // __WAD3FILE_H__

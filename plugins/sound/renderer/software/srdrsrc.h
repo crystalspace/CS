@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSSOUNDBUFFERSOFTWARE_H__
-#define __CSSOUNDBUFFERSOFTWARE_H__
+#ifndef __CS_SOUNDBUFFERSOFTWARE_H__
+#define __CS_SOUNDBUFFERSOFTWARE_H__
 
 #include "isound/source.h"
 
@@ -94,4 +94,4 @@ protected:
   void Restart();
 };
 
-#endif
+#endif //  __CS_SOUNDBUFFERSOFTWARE_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __STATEHANDLER_H__
-#define __STATEHANDLER_H__
+#ifndef __CS_STATEHANDLER_H__
+#define __CS_STATEHANDLER_H__
 
 #include "csutil/strset.h"
 #include "ivideo/effects/efvector4.h"
@@ -73,5 +73,5 @@ public:
   csStringID GetNextState();
 };
 
-#endif // __STATEHANDLER_H__
+#endif // __CS_STATEHANDLER_H__
 

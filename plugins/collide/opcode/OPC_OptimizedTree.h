@@ -17,8 +17,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include Guard
-#ifndef __OPC_OPTIMIZEDTREE_H__
-#define __OPC_OPTIMIZEDTREE_H__
+#ifndef __CS_OPC_OPTIMIZEDTREE_H__
+#define __CS_OPC_OPTIMIZEDTREE_H__
 
 	//! Common interface for a node of an implicit tree
 	#define IMPLEMENT_IMPLICIT_NODE(baseclass, volume)													\
@@ -172,5 +172,5 @@
 						Point				mExtentsCoeff;
 	};
 
-#endif // __OPC_OPTIMIZEDTREE_H__
+#endif // __CS_OPC_OPTIMIZEDTREE_H__
 

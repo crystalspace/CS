@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __I_SHADCAST_H__
-#define __I_SHADCAST_H__
+#ifndef __CS_IENGINE_SHADCAST_H__
+#define __CS_IENGINE_SHADCAST_H__
 
 /**\file
  */
@@ -65,5 +65,5 @@ struct iShadowReceiver : public iBase
 
 /** @} */
 
-#endif // __I_SHADCAST_H__
+#endif // __CS_IENGINE_SHADCAST_H__
 

@@ -1,8 +1,8 @@
 // awsMenu.h: interface for the awsMenu class.
 //
 //////////////////////////////////////////////////////////////////////
-#ifndef __AWSMENU_H__
-#define __AWSMENU_H__
+#ifndef __CS_AWS_MENU_H__
+#define __CS_AWS_MENU_H__
 
 #include "aws/awsControlBar.h"
 #include "aws/awstimer.h"
@@ -275,5 +275,5 @@ public:
   iAwsComponent* Create();
 };
 
-#endif 
+#endif // __CS_AWS_MENU_H__
 

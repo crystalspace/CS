@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSREFCOUNT_H__
-#define __CSREFCOUNT_H__
+#ifndef __CS_REFCOUNT_H__
+#define __CS_REFCOUNT_H__
 
 /**
  * This is a class which provides basic reference-counting semantics.  It can
@@ -61,4 +61,4 @@ public:
   int GetRefCount () const { return ref_count; }
 };
 
-#endif // __CSREFCOUNT_H__
+#endif // __CS_REFCOUNT_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSSPINBX_H__
-#define __CSSPINBX_H__
+#ifndef __CS_CSSPINBX_H__
+#define __CS_CSSPINBX_H__
 
 /**\file
  * Crystal Space Windowing System: spin box class
@@ -161,4 +161,4 @@ private:
 
 /** @} */
 
-#endif // __CSSPINBX_H__
+#endif // __CS_CSSPINBX_H__

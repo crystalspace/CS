@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSCONOUT_H__
-#define __CSCONOUT_H__
+#ifndef __CS_CSCONOUT_H__
+#define __CS_CSCONOUT_H__
 
 #include "ivaria/conout.h"
 #include "iutil/eventh.h"
@@ -209,4 +209,4 @@ private:
   int fg, bg;
 };
 
-#endif // __CSCONOUT_H__
+#endif // __CS_CSCONOUT_H__

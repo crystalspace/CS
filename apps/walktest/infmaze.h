@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef INFMAZE_H
-#define INFMAZE_H
+#ifndef __INFMAZE_H__
+#define __INFMAZE_H__
 
 #include "csgeom/math3d.h"
 #include "imesh/thing/portal.h"
@@ -110,5 +110,5 @@ struct InfPortalCS : public iPortalCallback
   virtual bool Traverse (iPortal* portal, iBase* context);
 };
 
-#endif //INFMAZE_H
+#endif // __INFMAZE_H__
 

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef GIFIMAGE_H
-#define GIFIMAGE_H
+#ifndef __CS_GIFIMAGE_H__
+#define __CS_GIFIMAGE_H__
 
 #include "csgfx/csimage.h"
 #include "igraphic/imageio.h"
@@ -68,4 +68,4 @@ private:
   bool Load (uint8* iBuffer, uint32 iSize);
 };
 
-#endif
+#endif // __CS_GIFIMAGE_H__

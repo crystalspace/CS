@@ -261,4 +261,4 @@ public:
 
 /** @} */
 
-#endif // __CS_MATH_H__
+#endif // __CS_MATH2D_H__

@@ -16,8 +16,8 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef __EFFECTLAYER_H__
-#define __EFFECTLAYER_H__
+#ifndef __CS_EFFECTLAYER_H__
+#define __CS_EFFECTLAYER_H__
 
 #include "ivideo/effects/eflayer.h"
 #include "statehdr.h"
@@ -69,4 +69,4 @@ public:
   { return csStateHandler::GetNextState (); }
 };
 
-#endif // __EFFECTLAYER_H__
+#endif // __CS_EFFECTLAYER_H__

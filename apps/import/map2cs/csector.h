@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CSECTOR_H
-#define CSECTOR_H
+#ifndef __CSECTOR_H__
+#define __CSECTOR_H__
 
 #include "isector.h"
 
@@ -72,5 +72,5 @@ protected:
 protected:
 }; //CCSSector
 
-#endif
+#endif // __CSECTOR_H__
 

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SPARSE3D_H__
-#define __SPARSE3D_H__
+#ifndef __CS_SPARSE3D_H__
+#define __CS_SPARSE3D_H__
 
 /**
  * General 3D sparse matrix class. This is an abstract class.
@@ -113,4 +113,4 @@ public:
   virtual void Del (int x, int y, int z);
 };
 
-#endif // __SPARSE3D_H__
+#endif // __CS_SPARSE3D_H__

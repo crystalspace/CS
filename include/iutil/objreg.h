@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IUTIL_OBJREG_H__
-#define __IUTIL_OBJREG_H__
+#ifndef __CS_IUTIL_OBJREG_H__
+#define __CS_IUTIL_OBJREG_H__
 
 /**\file
  */
@@ -133,5 +133,5 @@ struct iObjectRegistryIterator : public iBase
 
 /** @} */
 
-#endif
+#endif // __CS_IUTIL_OBJREG_H__
 

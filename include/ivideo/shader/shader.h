@@ -18,8 +18,8 @@
 */
 
 
-#ifndef __SHADER_H__
-#define __SHADER_H__
+#ifndef __CS_IVIDEO_SHADER_H__
+#define __CS_IVIDEO_SHADER_H__
 
 #include "csutil/ref.h"
 #include "csutil/scf.h"
@@ -246,4 +246,4 @@ struct iShaderProgramPlugin : iBase
   virtual void Open() = 0;
 };
 
-#endif //__SHADER_H__
+#endif // __CS_IVIDEO_SHADER_H__

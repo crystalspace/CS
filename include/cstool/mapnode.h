@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __MAPNODE_H__
-#define __MAPNODE_H__
+#ifndef __CS_MAPNODE_H__
+#define __CS_MAPNODE_H__
 
 #include "csgeom/vector3.h"
 #include "csutil/csobject.h"
@@ -115,4 +115,4 @@ protected:
   csRef<iMapNode> CurrentNode;
 };
 
-#endif // __MAPNODE_H__
+#endif // __CS_MAPNODE_H__

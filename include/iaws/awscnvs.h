@@ -1,5 +1,3 @@
- #ifndef __AWSCNVS_H__
- #define __AWSCNVS_H__
 /**************************************************************************
     Copyright (C) 2000-2001 by Christopher Nelson
 
@@ -17,6 +15,8 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
+#ifndef __CS_AWSCNVS_H__
+#define __CS_AWSCNVS_H__
 
 #include "cstool/proctex.h"
 #include "ivideo/graph2d.h"
@@ -47,5 +47,5 @@ public:
 
 /** @} */
 
-#endif // __AWSCNVS_H__
+#endif // __CS_AWSCNVS_H__
 

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __GL_SYSRBUFMGR_H__
-#define __GL_SYSRBUFMGR_H__
+#ifndef __CS_GL_SYSRBUFMGR_H__
+#define __CS_GL_SYSRBUFMGR_H__
 
 #include "csutil/strhash.h"
 #include "ivideo/rndbuf.h"
@@ -93,4 +93,4 @@ public:
 
 };
 
-#endif //  __GL_SYSRBUFMGR_H__
+#endif //  __CS_GL_SYSRBUFMGR_H__

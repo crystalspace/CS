@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __EFFECTPASS_H__
-#define __EFFECTPASS_H__
+#ifndef __CS_EFFECTPASS_H__
+#define __CS_EFFECTPASS_H__
 
 #include "csutil/refarr.h"
 #include "csutil/hashmap.h"
@@ -91,6 +91,6 @@ public:
   }
 };
 
-#endif // __EFFECTPASS_H__
+#endif // __CS_EFFECTPASS_H__
 
 

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __TCACHE_H__
-#define __TCACHE_H__
+#ifndef __CS_TCACHE_H__
+#define __CS_TCACHE_H__
 
 #include "cstypes.h"
 #include "csutil/scf.h"
@@ -199,4 +199,4 @@ public:
   void dump (csGraphics3DSoftwareCommon *iG3D);
 };
 
-#endif // __TCACHE_H__
+#endif // __CS_TCACHE_H__

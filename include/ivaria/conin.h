@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVARIA_CONIN_H__
-#define __IVARIA_CONIN_H__
+#ifndef __CS_IVARIA_CONIN_H__
+#define __CS_IVARIA_CONIN_H__
 
 #include "csutil/scf.h"
 
@@ -87,4 +87,4 @@ struct iConsoleInput : public iBase
   virtual bool HandleEvent (iEvent&) = 0;
 };
 
-#endif // __IVARIA_CONIN_H__
+#endif // __CS_IVARIA_CONIN_H__

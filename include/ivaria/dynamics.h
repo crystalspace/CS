@@ -17,8 +17,8 @@
 */
 
 
-#ifndef __GAME_DYNAMICS_H__
-#define __GAME_DYNAMICS_H__
+#ifndef __CS_IVARIA_DYNAMICS_H__
+#define __CS_IVARIA_DYNAMICS_H__
 
 #include "csutil/scf.h"
 #include "csutil/ref.h"
@@ -359,5 +359,5 @@ struct iJoint : public iBase
   virtual csVector3 GetMaximumAngle () = 0;
 };
 
-#endif // __GAME_DYNAMICS_H__
+#endif // __CS_IVARIA_DYNAMICS_H__
 

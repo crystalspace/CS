@@ -40,5 +40,5 @@ public:
   } scfiComponent;
 };
 
-#endif
+#endif // __CS_CSSAVER_H__
 

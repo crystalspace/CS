@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSFONT_H__
-#define __CSFONT_H__
+#ifndef __CS_CSFONT_H__
+#define __CS_CSFONT_H__
 
 #include "ivideo/fontserv.h"
 #include "iutil/eventh.h"
@@ -192,4 +192,4 @@ public:
   friend struct eiComponent;
 };
 
-#endif // __CSFONT_H__
+#endif // __CS_CSFONT_H__

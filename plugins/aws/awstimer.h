@@ -16,8 +16,8 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#ifndef _AWSTIMER_H_
-# define _AWSTIMER_H_
+#ifndef __CS_AWS_TIMER_H__
+#define __CS_AWS_TIMER_H__
 
 # include "awsslot.h"
 # include "iutil/eventh.h"
@@ -66,4 +66,4 @@ public:
   }
   scfiEventHandler;
 };
-#endif
+#endif // __CS_AWS_TIMER_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_GENMAZE_H__
-#define __CS_GENMAZE_H__
+#ifndef __GENMAZE_H__
+#define __GENMAZE_H__
 
 ///
 /// node for csGenMaze
@@ -111,4 +111,4 @@ public:
 };
 
 
-#endif
+#endif // __GENMAZE_H__

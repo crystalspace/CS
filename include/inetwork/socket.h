@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __INETWORK_SOCKET_H__
-#define __INETWORK_SOCKET_H__
+#ifndef __CS_INETWORK_SOCKET_H__
+#define __CS_INETWORK_SOCKET_H__
 
 #include "inetwork/driver.h"
 #include "cssys/sockets.h"
@@ -39,4 +39,4 @@ struct iNetworkSocket: public iBase
   virtual csNetworkSocket GetSocket() const = 0;
 };
 
-#endif // __INETWORK_SOCKET_H__
+#endif // __CS_INETWORK_SOCKET_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SOFT_TXT_H__
-#define __SOFT_TXT_H__
+#ifndef __CS_SOFT_TXT_H__
+#define __CS_SOFT_TXT_H__
 
 #include "csutil/debug.h"
 #include "video/renderer/common/txtmgr.h"
@@ -243,4 +243,4 @@ public:
   virtual csPtr<iTextureHandle> RegisterTexture (iImage* image, int flags);
 };
 
-#endif // __SOFT_TXT_H__
+#endif // __CS_SOFT_TXT_H__

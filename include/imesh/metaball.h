@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMESH_METABALL_H__
-#define __IMESH_METABALL_H__
+#ifndef __CS_IMESH_METABALL_H__
+#define __CS_IMESH_METABALL_H__
 
 #include "csutil/scf.h"
 
@@ -78,4 +78,4 @@ struct iMetaBallState : public iBase
   virtual iMaterialWrapper* GetMaterial () = 0;
 };
 
-#endif //  __IMESH_METABALL_H__
+#endif // __CS_IMESH_METABALL_H__

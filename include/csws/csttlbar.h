@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSTTLBAR_H__
-#define __CSTTLBAR_H__
+#ifndef __CS_CSTTLBAR_H__
+#define __CS_CSTTLBAR_H__
 
 /**
  * \addtogroup csws_comps_title
@@ -46,4 +46,4 @@ public:
 
 /** @} */
 
-#endif // __CSTTLBAR_H__
+#endif // __CS_CSTTLBAR_H__

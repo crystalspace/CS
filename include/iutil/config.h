@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IUTIL_CONFIG_H__
-#define __IUTIL_CONFIG_H__
+#ifndef __CS_IUTIL_CONFIG_H__
+#define __CS_IUTIL_CONFIG_H__
 
 /**\file
  */
@@ -157,4 +157,4 @@ struct iConfig : public iBase
 };
 /** @} */
 
-#endif // __IUTIL_CONFIG_H__
+#endif // __CS_IUTIL_CONFIG_H__

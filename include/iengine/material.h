@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_MATERIAL_H__
-#define __IENGINE_MATERIAL_H__
+#ifndef __CS_IENGINE_MATERIAL_H__
+#define __CS_IENGINE_MATERIAL_H__
 
 #include "csutil/scf.h"
 
@@ -146,4 +146,4 @@ struct iMaterialList : public iBase
 
 /** @} */
 
-#endif // __IENGINE_MATERIAL_H__
+#endif // __CS_IENGINE_MATERIAL_H__

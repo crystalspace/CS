@@ -1,5 +1,5 @@
-#ifndef __IMAP_SAVER_H__
-#define __IMAP_SAVER_H__
+#ifndef __CS_IMAP_SAVER_H__
+#define __CS_IMAP_SAVER_H__
 
 #include "csutil/scf.h"
 
@@ -23,5 +23,5 @@ struct iSaver : public iBase {
   virtual iString* SaveMapFile()=0;
 };
 
-#endif
+#endif // __CS_IMAP_SAVER_H__
 

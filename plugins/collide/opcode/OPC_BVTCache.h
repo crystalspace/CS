@@ -17,8 +17,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include Guard
-#ifndef __OPC_BVTCACHE_H__
-#define __OPC_BVTCACHE_H__
+#ifndef __CS_OPC_BVTCACHE_H__
+#define __CS_OPC_BVTCACHE_H__
 
 	//! This structure holds cached information used by the algorithm.
 	//! Two model pointers and two colliding primitives are cached. Model pointers are assigned
@@ -66,5 +66,5 @@
 #endif // __MESHMERIZER_H__
 	};
 
-#endif // __OPC_BVTCACHE_H__
+#endif // __CS_OPC_BVTCACHE_H__
 

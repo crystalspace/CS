@@ -27,8 +27,8 @@
 -------------------------------------------------------------------------
 */
 
-#ifndef __OPCODE_PLUGIN_H__
-#define __OPCODE_PLUGIN_H__
+#ifndef __CS_OPCODE_PLUGIN_H__
+#define __CS_OPCODE_PLUGIN_H__
 
 #include "iutil/comp.h"
 #include "csgeom/vector3.h"
@@ -145,4 +145,4 @@ public:
   } scfiComponent;
 };
 
-#endif // __OPCODE_PLUGIN_H__
+#endif // __CS_OPCODE_PLUGIN_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMESH_LIGHTING_H__
-#define __IMESH_LIGHTING_H__
+#ifndef __CS_IMESH_LIGHTING_H__
+#define __CS_IMESH_LIGHTING_H__
 
 #include "csutil/scf.h"
 
@@ -92,5 +92,5 @@ struct iLightingInfo : public iBase
   virtual void StaticLightChanged (iStatLight* statlight) = 0;
 };
 
-#endif // __IMESH_LIGHTING_H__
+#endif // __CS_IMESH_LIGHTING_H__
 

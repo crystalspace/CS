@@ -23,8 +23,8 @@
  * utilizing the NO_* macros, while stop a complete build
  */
 
-#ifndef __CSS_H__
-#define __CSS_H__
+#ifndef __CS_CSS_H__
+#define __CS_CSS_H__
 
 #ifndef CS_INCLUDE_NOTHING
 
@@ -339,4 +339,4 @@
 
 #endif // CS_INCLUDE_NOTHING
 
-#endif // __CSS_H__
+#endif // __CS_CSS_H__

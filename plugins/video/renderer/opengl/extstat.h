@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _CSEXT_STATIC_H_
-#define _CSEXT_STATIC_H_
+#ifndef __CS_EXT_STATIC_H__
+#define __CS_EXT_STATIC_H__
 
 /**
  * If your opengl implementation does not have a facility to dynamically (at runtime that is)
@@ -35,4 +35,4 @@
 //#define CSGL_EXT_STATIC_ASSERTION_ARB_texture_env_combine
 //#define CSGL_EXT_STATIC_ASSERTION_SGIS_generate_mipmap
 
-#endif
+#endif // __CS_EXT_STATIC_H__

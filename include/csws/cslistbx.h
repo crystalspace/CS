@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSLISTBX_H__
-#define __CSLISTBX_H__
+#ifndef __CS_CSLISTBX_H__
+#define __CS_CSLISTBX_H__
 
 /**\file
  * Crystal Space Windowing System: list box class
@@ -426,4 +426,4 @@ protected:
 
 /** @} */
 
-#endif // __CSLISTBX_H__
+#endif // __CS_CSLISTBX_H__

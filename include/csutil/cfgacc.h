@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CFGACC_H__
-#define __CFGACC_H__
+#ifndef __CS_CFGACC_H__
+#define __CS_CFGACC_H__
 
 #include "csutil/csvector.h"
 #include "iutil/cfgmgr.h"
@@ -55,4 +55,4 @@ private:
   csVector ConfigFiles;
 };
 
-#endif
+#endif // __CS_CFGACC_H__

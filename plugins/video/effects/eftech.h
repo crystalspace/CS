@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __EFFECTTECHNIQUE_H__
-#define __EFFECTTECHNIQUE_H__
+#ifndef __CS_EFFECTTECHNIQUE_H__
+#define __CS_EFFECTTECHNIQUE_H__
 
 #include "csutil/scf.h"
 #include "csutil/refarr.h"
@@ -54,4 +54,4 @@ public:
   uint32 GetClientFlags();
 };
 
-#endif // __EFFECTTECHNIQUE_H__
+#endif // __CS_EFFECTTECHNIQUE_H__

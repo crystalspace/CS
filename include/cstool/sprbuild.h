@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SPRBUILD_H__
-#define __SPRBUILD_H__
+#ifndef __CS_SPRBUILD_H__
+#define __CS_SPRBUILD_H__
 
 #include "csutil/csstring.h"
 
@@ -123,4 +123,4 @@ public:
   bool Build (iModelDataObject *Input, iSprite3DFactoryState *Output);
 };
 
-#endif // __SPRBUILD_H__
+#endif // __CS_SPRBUILD_H__

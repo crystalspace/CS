@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _I_CS_SYNTAX_SERVICE_H_
-#define _I_CS_SYNTAX_SERVICE_H_
+#ifndef __CS_SYNTAX_SERVICE_H__
+#define __CS_SYNTAX_SERVICE_H__
 
 
 #include "imap/services.h"
@@ -166,4 +166,4 @@ public:
   } scfiDebugHelper;
 };
 
-#endif
+#endif // __CS_SYNTAX_SERVICE_H__

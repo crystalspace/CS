@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMESH_SNOW_H__
-#define __IMESH_SNOW_H__
+#ifndef __CS_IMESH_SNOW_H__
+#define __CS_IMESH_SNOW_H__
 
 #include "csutil/scf.h"
 
@@ -57,5 +57,5 @@ struct iSnowState : public iBase
   virtual float GetSwirl () const = 0;
 };
 
-#endif
+#endif // __CS_IMESH_SNOW_H__
 

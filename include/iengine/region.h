@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_REGION_H__
-#define __IENGINE_REGION_H__
+#ifndef __CS_IENGINE_REGION_H__
+#define __CS_IENGINE_REGION_H__
 
 /**\file
  */
@@ -137,4 +137,4 @@ struct iRegionList : public iBase
 
 /** @} */
 
-#endif // __IENGINE_REGION_H__
+#endif // __CS_IENGINE_REGION_H__

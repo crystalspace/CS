@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __LINEX2D_H__
-#define __LINEX2D_H__
+#ifndef __CS_LINEX2D_H__
+#define __CS_LINEX2D_H__
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
@@ -171,4 +171,4 @@ public:
   } scfiComponent;
 };
 
-#endif // __LINEX2D_H__
+#endif // __CS_LINEX2D_H__

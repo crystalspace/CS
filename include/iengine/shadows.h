@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __I_SHADOWS_H__
-#define __I_SHADOWS_H__
+#ifndef __CS_IENGINE_SHADOWS_H__
+#define __CS_IENGINE_SHADOWS_H__
 
 /**\file
  */
@@ -190,5 +190,5 @@ struct iShadowBlockList : public iBase
 
 /** @} */
 
-#endif // __I_SHADOWS_H__
+#endif // __CS_IENGINE_SHADOWS_H__
 

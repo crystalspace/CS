@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __GLCOMMON2D_H__
-#define __GLCOMMON2D_H__
+#ifndef __CS_GLCOMMON2D_H__
+#define __CS_GLCOMMON2D_H__
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
@@ -162,4 +162,4 @@ public:
   { return 150; }
 };
 
-#endif
+#endif // __CS_GLCOMMON2D_H__

@@ -1,5 +1,5 @@
-#ifndef __AWSPARSER_H__
-#define __AWSPARSER_H__
+#ifndef __CS_AWS_PARSER_H__
+#define __CS_AWS_PARSER_H__
 
 #include "iutil/vfs.h"
 
@@ -40,5 +40,5 @@ protected:
   awsPrefManager* prefmgr;
 };
 
-#endif
+#endif // __CS_AWS_PARSER_H__
 

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __GL_RENDER3D_H__
-#define __GL_RENDER3D_H__
+#ifndef __CS_GL_RENDER3D_H__
+#define __CS_GL_RENDER3D_H__
 
 
 #include "csgeom/csrect.h"
@@ -410,5 +410,5 @@ public:
 
 };
 
-#endif // __GL_RENDER3D_H__
+#endif // __CS_GL_RENDER3D_H__
 

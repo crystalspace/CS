@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __TOKEN_H__
-#define __TOKEN_H__
+#ifndef __CS_TOKEN_H__
+#define __CS_TOKEN_H__
 
 /**\file
  */
@@ -31,4 +31,4 @@ extern int csGetToken_int (char** buf);
 /// Skip a token
 extern void csSkipToken (char** buf, char* tok, char* msg = NULL);
 
-#endif // __TOKEN_H__
+#endif // __CS_TOKEN_H__

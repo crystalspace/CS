@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ARCHIVE_H__
-#define __ARCHIVE_H__
+#ifndef __CS_ARCHIVE_H__
+#define __CS_ARCHIVE_H__
 
 #include <stdio.h>
 #include "csutil/zip.h"
@@ -231,4 +231,4 @@ inline void csArchive::SetFileTime (void *entry, const csFileTime &ztime)
   } /* endif */
 }
 
-#endif // __ARCHIVE_H__
+#endif // __CS_ARCHIVE_H__

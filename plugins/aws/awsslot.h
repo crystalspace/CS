@@ -1,5 +1,5 @@
-#ifndef __AWS_SLOT_H__
-# define __AWS_SLOT_H__
+#ifndef __CS_AWS_SLOT_H__
+#define __CS_AWS_SLOT_H__
 
 /**************************************************************************
     Copyright (C) 2000-2001 by Christopher Nelson
@@ -231,4 +231,4 @@ public:
   /// Emit a signal to activate all necessary triggers.
   virtual void Emit (iAwsSource &source, unsigned long signal);
 };
-#endif
+#endif // __CS_AWS_SLOT_H__

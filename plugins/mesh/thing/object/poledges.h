@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _CS_POLEDGES_H
-#define _CS_POLEDGES_H
+#ifndef __CS_POLEDGES_H__
+#define __CS_POLEDGES_H__
 
 #include "csutil/hashmap.h"
 

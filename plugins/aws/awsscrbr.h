@@ -1,5 +1,5 @@
-#ifndef __AWS_SCROLL_BAR_H__
-# define __AWS_SCROLL_BAR_H__
+#ifndef __CS_AWS_SCROLL_BAR_H__
+#define __CS_AWS_SCROLL_BAR_H__
 
 /**************************************************************************
     Copyright (C) 2000-2001 by Christopher Nelson
@@ -239,5 +239,5 @@ public:
   virtual iAwsComponent *Create ();
 };
 
-#endif
+#endif // __CS_AWS_SCROLL_BAR_H__
 

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __HALOGEN_H__
-#define __HALOGEN_H__
+#ifndef __CS_HALOGEN_H__
+#define __CS_HALOGEN_H__
 
 /**\file
  */
@@ -39,4 +39,4 @@ extern uint8 *csGenerateHalo (int iSize, float iFactor, float iCross);
 extern uint8 *csGenerateNova (int iSize, int iSeed, int iNumSpokes,
   float iRoundness);
 
-#endif // __HALOGEN_H__
+#endif // __CS_HALOGEN_H__

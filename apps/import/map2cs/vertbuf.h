@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef VERTBUF_H
-#define VERTBUF_H
+#ifndef __VERTBUF_H__
+#define __VERTBUF_H__
 
 #include "contain.h"
 
@@ -72,5 +72,5 @@ protected:
   CVector3Vector    m_Vertices;
 };
 
-#endif
+#endif // __VERTBUF_H__
 

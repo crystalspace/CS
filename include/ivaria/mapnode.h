@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_MAPNODE_H__
-#define __IENGINE_MAPNODE_H__
+#ifndef __CS_IVARIA_MAPNODE_H__
+#define __CS_IVARIA_MAPNODE_H__
 
 #include "csutil/scf.h"
 
@@ -46,4 +46,4 @@ struct iMapNode : public iBase
   virtual iSector *GetSector () const = 0;
 };
 
-#endif
+#endif // __CS_IVARIA_MAPNODE_H__

@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef TEXMAN_H
-#define TEXMAN_H
+#ifndef __TEXMAN_H__
+#define __TEXMAN_H__
 
 #include "contain.h"
 
@@ -74,5 +74,5 @@ protected:
   CTextureArchiveVector   m_TextureArchives;
 };
 
-#endif
+#endif // __TEXMAN_H__
 

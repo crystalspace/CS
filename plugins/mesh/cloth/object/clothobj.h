@@ -16,8 +16,8 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. 
  */
 
-#ifndef __CLOTHOBJ_H__
-#define __CLOTHOBJ_H__
+#ifndef __CS_CLOTHOBJ_H__
+#define __CS_CLOTHOBJ_H__
 
 #include <stdarg.h>
 #include "csgeom/math2d.h"
@@ -444,4 +444,4 @@ class           StuffMeshObjectType:public iMeshObjectType
     } scfiComponent;
 };
 
-#endif				// __CLOTHPLG_H__
+#endif // __CS_CLOTHOBJ_H__

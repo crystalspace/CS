@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.      
 */
 
-#ifndef __CSVECTOR_H__
-#define __CSVECTOR_H__
+#ifndef __CS_CSVECTOR_H__
+#define __CS_CSVECTOR_H__
 
 #include "cstypes.h"
 
@@ -232,4 +232,4 @@ inline void csVector::QuickSort (int Mode)
     QuickSort (0, count - 1, Mode);
 }
 
-#endif // __CSVECTOR_H__
+#endif // __CS_CSVECTOR_H__

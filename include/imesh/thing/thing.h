@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_THING_H__
-#define __IENGINE_THING_H__
+#ifndef __CS_IMESH_THING_H__
+#define __CS_IMESH_THING_H__
 
 #include "csutil/scf.h"
 #include "csutil/flags.h"
@@ -329,4 +329,4 @@ struct iThingEnvironment : public iBase
   virtual int GetDefaultLightmapCellSize () const = 0;
 };
 
-#endif
+#endif // __CS_IMESH_THING_H__

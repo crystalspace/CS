@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CSFEDIT_H
-#define CSFEDIT_H
+#ifndef __CSFEDIT_H__
+#define __CSFEDIT_H__
 
 #include <stdarg.h>
 #include "csgeom/math2d.h"
@@ -252,5 +252,5 @@ public:
 };
 
 
-#endif // CSFEDIT_H
+#endif // __CSFEDIT_H__
 

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _I_SYNTAXSERVICE_H_
-#define _I_SYNTAXSERVICE_H_
+#ifndef __CS_IMAP_SYNTAXSERVICE_H__
+#define __CS_IMAP_SYNTAXSERVICE_H__
 
 /**\file
  */
@@ -225,5 +225,5 @@ struct iSyntaxService : public iBase
 
 /** @} */
 
-#endif
+#endif // __CS_IMAP_SYNTAXSERVICE_H__
 

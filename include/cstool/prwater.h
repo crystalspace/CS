@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __PROCWATERTEX_H__
-#define __PROCWATERTEX_H__
+#ifndef __CS_PROCWATERTEX_H__
+#define __CS_PROCWATERTEX_H__
 
 #include "csutil/cscolor.h"
 #include "cstool/proctex.h"
@@ -68,5 +68,5 @@ public:
   void PressAt (int sx, int sy, int rad, int val);
 };
 
-#endif // __PROCWATERTEX_H__
+#endif // __CS_PROCWATERTEX_H__
 

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSSHLIB_H__
-#define __CSSHLIB_H__
+#ifndef __CS_CSSHLIB_H__
+#define __CS_CSSHLIB_H__
 
 typedef void *csLibraryHandle;
 
@@ -76,4 +76,4 @@ extern csLibraryHandle csFindLoadLibrary (const char *iPrefix,
  */
 extern void csPrintLibraryError (const char *iModule);
 
-#endif // __CSSHLIB_H__
+#endif // __CS_CSSHLIB_H__

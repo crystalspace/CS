@@ -1,5 +1,5 @@
-#ifndef SGIIMAGE_H
-#define SGIIMAGE_H
+#ifndef __CS_SGIIMAGE_H__
+#define __CS_SGIIMAGE_H__
 
 #include "csgfx/csimage.h"
 #include "igraphic/imageio.h"
@@ -54,4 +54,4 @@ private:
   bool Load (uint8* iBuffer, uint32 iSize);
 };
 
-#endif
+#endif // __CS_SGIIMAGE_H__

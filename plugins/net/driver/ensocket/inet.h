@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _INET_
-#define _INET_
+#ifndef __CS_INET_H__
+#define __CS_INET_H__
 
 #ifndef OS_WIN32
 #define SOCKET int
@@ -108,4 +108,4 @@ class csNetworkDriver2 : public iNetworkDriver2
     int last_error;
 };
 
-#endif // _INET_
+#endif // __CS_INET_H__

@@ -16,8 +16,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSUTIL_NULCACHE_H__
-#define __CSUTIL_NULCACHE_H__
+#ifndef __CS_UTIL_NULCACHE_H__
+#define __CS_UTIL_NULCACHE_H__
 
 /**\file
  * 'Null' Cache Manager
@@ -73,5 +73,5 @@ public:
   	const uint32* id = NULL);
 };
 
-#endif // __CSUTIL_NULCACHE_H__
+#endif // __CS_UTIL_NULCACHE_H__
 

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISORVIEW_H__
-#define __ISORVIEW_H__
+#ifndef __CS_ISORVIEW_H__
+#define __CS_ISORVIEW_H__
 
 #include "ivaria/iso.h"
 
@@ -100,4 +100,4 @@ public:
   csIsoRenderBucket *next;
 };
 
-#endif
+#endif // __CS_ISORVIEW_H__

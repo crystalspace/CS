@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSEVENT_H__
-#define __CSEVENT_H__
+#ifndef __CS_CSEVENT_H__
+#define __CS_CSEVENT_H__
 
 #include "iutil/event.h"
 
@@ -58,4 +58,4 @@ public:
   SCF_DECLARE_IBASE;
 };
 
-#endif // __CSEVENT_H__
+#endif // __CS_CSEVENT_H__

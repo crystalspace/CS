@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMESH_TERRBIG_H
-#define __IMESG_TERRBIG_H
+#ifndef __CS_IMESH_TERRBIG_H__
+#define __CS_IMESH_TERRBIG_H__
 
 #include "csutil/scf.h"
 
@@ -52,4 +52,4 @@ struct iTerrBigState : public iBase
   virtual void SetMaterialsList(iMaterialWrapper **matlist, unsigned int nMaterials) = 0;
 };
 
-#endif
+#endif // __CS_IMESH_TERRBIG_H__

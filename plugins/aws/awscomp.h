@@ -1,5 +1,5 @@
-#ifndef __AWS_COMPONENT_H__
-#define __AWS_COMPONENT_H__
+#ifndef __CS_AWS_COMPONENT_H__
+#define __CS_AWS_COMPONENT_H__
 
 /**************************************************************************
     Copyright (C) 2000-2001 by Christopher Nelson
@@ -432,7 +432,7 @@ public:
   int Push (iAwsComponent* comp); 
 };
 
-#endif
+#endif // __CS_AWS_COMPONENT_H__
 
 
 

@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef IPORTAL_H
-#define IPORTAL_H
+#ifndef __IPORTAL_H__
+#define __IPORTAL_H__
 
 #include "mpolyset.h"
 
@@ -72,4 +72,4 @@ protected:
   CISector* m_pSector;
 };
 
-#endif //MPOLYSET_H
+#endif // __IPORTAL_H__

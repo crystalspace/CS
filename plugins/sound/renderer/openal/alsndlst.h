@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SNDLSTN_H__
-#define __SNDLSTN_H__
+#ifndef __CS_SNDLSTNOPENAL_H__
+#define __CS_SNDLSTNOPENAL_H__
 
 #include "../common/slstn.h"
 
@@ -48,4 +48,4 @@ private:
   ALfloat orientation[6];
 };
 
-#endif
+#endif // __CS_SNDLSTNOPENAL_H__

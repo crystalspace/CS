@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef MPOLY_H
-#define MPOLY_H
+#ifndef __MPOLY_H__
+#define __MPOLY_H__
 
 #include "contain.h"
 
@@ -173,5 +173,5 @@ protected:
   CMapBrush* m_pBrush;
 };
 
-#endif
+#endif // __MPOLY_H__
 

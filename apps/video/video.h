@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef VIDEO_H
-#define VIDEO_H
+#ifndef __VIDEO_H__
+#define __VIDEO_H__
 
 #include <stdarg.h>
 #include "csgeom/math2d.h"
@@ -68,5 +68,5 @@ public:
   void Report (int severity, const char* msg, ...);
 };
 
-#endif // VIDEO_H
+#endif // __VIDEO_H__
 

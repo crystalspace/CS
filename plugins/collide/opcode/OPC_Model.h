@@ -17,8 +17,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include Guard
-#ifndef __OPC_MODEL_H__
-#define __OPC_MODEL_H__
+#ifndef __CS_OPC_MODEL_H__
+#define __CS_OPC_MODEL_H__
 
 	//! Model creation structure
 	struct //OPCODE_API
@@ -123,5 +123,5 @@
 						bool				mQuantized;		//!< Compressed/uncompressed tree
 	};
 
-#endif //__OPC_MODEL_H__
+#endif // __CS_OPC_MODEL_H__
 

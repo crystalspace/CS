@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSCOLOR_H__
-#define __CSCOLOR_H__
+#ifndef __CS_CSCOLOR_H__
+#define __CS_CSCOLOR_H__
 
 /**
  * A class used to represent a color in RGB space.
@@ -95,4 +95,4 @@ inline csColor operator+ (const csColor& s1, const csColor& s2)
 inline csColor operator- (const csColor& s1, const csColor& s2)
 { csColor c (s1); c -= s2; return c; }
 
-#endif // __CSCOLOR_H__
+#endif // __CS_CSCOLOR_H__

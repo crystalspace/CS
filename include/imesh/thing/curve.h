@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_CURVE_H__
-#define __IENGINE_CURVE_H__
+#ifndef __CS_THING_CURVE_H__
+#define __CS_THING_CURVE_H__
 
 #include "csutil/scf.h"
 
@@ -70,5 +70,5 @@ struct iCurveTemplate : public iBase
   virtual void SetVertex (int idx, int vt) = 0;
 };
 
-#endif // __IENGINE_CURVE_H__
+#endif // __CS_THING_CURVE_H__
 

@@ -20,8 +20,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __MEMORY_H__
-#define __MEMORY_H__
+#ifndef __CS_MEMORY_H__
+#define __CS_MEMORY_H__
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
@@ -72,4 +72,4 @@ protected:
 #endif
 };
 
-#endif // __MEMORY_H__
+#endif // __CS_MEMORY_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SDEFAULT_H__
-#define __SDEFAULT_H__
+#ifndef __CS_SDEFAULT_H__
+#define __CS_SDEFAULT_H__
 
 /**
  * \addtogroup csws_skins
@@ -177,4 +177,4 @@ public:
 
 /** @} */
 
-#endif // __SDEFAULT_H__
+#endif // __CS_SDEFAULT_H__

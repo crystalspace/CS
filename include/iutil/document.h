@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IUTIL_DOCUMENT_H__
-#define __IUTIL_DOCUMENT_H__
+#ifndef __CS_IUTIL_DOCUMENT_H__
+#define __CS_IUTIL_DOCUMENT_H__
 
 /**\file
  * Document Interface
@@ -322,4 +322,4 @@ struct iDocumentSystem : public iBase
 
 /** @} */
 
-#endif // __IUTIL_DOCUMENT_H__
+#endif // __CS_IUTIL_DOCUMENT_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSWSGRID_H__
-#define __CSWSGRID_H__
+#ifndef __CS_CSGRID_H__
+#define __CS_CSGRID_H__
 
 /**\file
  * Crystal Space Windowing System: grid class
@@ -466,4 +466,4 @@ public:
 
 /** @} */
 
-#endif
+#endif // __CS_CSGRID_H__

@@ -1,5 +1,5 @@
-#ifndef _AWS_MULTILINE_EDIT_H_
-#define _AWS_MULTILINE_EDIT_H_
+#ifndef __CS_AWS_MULTILINE_EDIT_H__
+#define __CS_AWS_MULTILINE_EDIT_H__
 /*
     Copyright (C) 2002 by Norman Krämer
   
@@ -251,4 +251,4 @@ public:
   virtual iAwsComponent *Create ();
 };
 
-#endif
+#endif // __CS_AWS_MULTILINE_EDIT_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SHDL_H__
-#define __SHDL_H__
+#ifndef __CS_SHDL_H__
+#define __CS_SHDL_H__
 
 #include "isound/handle.h"
 struct iSoundData;
@@ -59,4 +59,4 @@ public:
   virtual void ResetStream();
 };
 
-#endif // __SHDL_H__
+#endif // __CS_SHDL_H__

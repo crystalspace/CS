@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _GENMESH_H_
-#define _GENMESH_H_
+#ifndef __CS_GENMESH_H__
+#define __CS_GENMESH_H__
 
 #include "csgeom/vector3.h"
 #include "csgeom/transfrm.h"
@@ -625,5 +625,5 @@ public:
   } scfiComponent;
 };
 
-#endif // _GENMESH_H_
+#endif // __CS_GENMESH_H__
 

@@ -9,8 +9,8 @@
 // For setting mouse cursor
 #include "ivideo/cursor.h"
 
-#ifndef __OSXDELEGATE2D_H__
-#define __OSXDELEGATE2D_H__
+#ifndef __CS_OSXDELEGATE2D_H__
+#define __CS_OSXDELEGATE2D_H__
 
 #include <OpenGL/OpenGL.h>
 
@@ -101,4 +101,4 @@ DEL2D_FUNC(void, focusChanged)(OSXDelegate2D delegate, bool focused, bool should
 
 #endif // __cplusplus
 
-#endif // __OSXDELEGATE2D_H__
+#endif // __CS_OSXDELEGATE2D_H__

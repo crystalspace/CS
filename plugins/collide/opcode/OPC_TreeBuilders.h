@@ -17,8 +17,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include Guard
-#ifndef __OPC_TREEBUILDERS_H__
-#define __OPC_TREEBUILDERS_H__
+#ifndef __CS_OPC_TREEBUILDERS_H__
+#define __CS_OPC_TREEBUILDERS_H__
 
 	//! Tree splitting rules
 	enum SplittingRules
@@ -136,5 +136,5 @@
 		const						udword		mNbTriangles;		//!< Total number of triangles.
 	};
 
-#endif // __OPC_TREEBUILDERS_H__
+#endif // __CS_OPC_TREEBUILDERS_H__
 

@@ -5,8 +5,8 @@
 // Permission is granted to use this code for any purpose, as long as this
 // copyright message remains intact.
 
-#ifndef _csBitArray2D_H
-#define _csBitArray2D_H
+#ifndef __CS_BITARRAY2D_H__
+#define __CS_BITARRAY2D_H__
 
 #include "bitarray.h"
 
@@ -192,4 +192,4 @@ public:
    }
 };
 
-#endif
+#endif // __CS_BITARRAY2D_H__

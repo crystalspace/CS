@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_VIEW_H__
-#define __IENGINE_VIEW_H__
+#ifndef __CS_IVARIA_VIEW_H__
+#define __CS_IVARIA_VIEW_H__
 
 #include "csutil/scf.h"
 
@@ -67,4 +67,4 @@ struct iView : public iBase
   virtual void Draw () = 0;
 };
 
-#endif
+#endif // __CS_IVARIA_VIEW_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __GRIDBAGLAYOUT_G__
-#define __GRIDBAGLAYOUT_G__
+#ifndef __CS_CSGRIDBAGLAYOUT_H__
+#define __CS_CSGRIDBAGLAYOUT_H__
 
 /**\file
  */
@@ -356,4 +356,4 @@ protected:
 
 /** @} */
 
-#endif // __GRIDBAGLAYOUT_G__
+#endif // __CS_CSGRIDBAGLAYOUT_H__

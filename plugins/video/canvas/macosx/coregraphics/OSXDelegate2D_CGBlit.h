@@ -6,8 +6,8 @@
 //  Copyright (c) 2001 Matt Reda. All rights reserved.
 //
 
-#ifndef __OSXDELEGATE2D_CGBLIT_H__
-#define __OSXDELEGATE2D_CGBLIT_H__
+#ifndef __CS_OSXDELEGATE2D_CGBLIT_H__
+#define __CS_OSXDELEGATE2D_CGBLIT_H__
 
 // C interface to a OSXDelegate2D category for using CG to blit to a window
 
@@ -23,4 +23,4 @@ DEL2D_FUNC(bool, blitToWindow)(OSXDelegate2D delegate, unsigned char *buffer, in
 
 #endif // __cplusplus
 
-#endif // __OSXDELEGATE2D_CGBLIT_H__
+#endif // __CS_OSXDELEGATE2D_CGBLIT_H__

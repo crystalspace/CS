@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVARIA_CONOUT_H__
-#define __IVARIA_CONOUT_H__
+#ifndef __CS_IVARIA_CONOUT_H__
+#define __CS_IVARIA_CONOUT_H__
 
 #include <stdarg.h>
 #include "iutil/eventh.h"
@@ -170,4 +170,4 @@ struct iConsoleOutput : public iBase
   virtual bool PerformExtensionV (const char *iCommand, va_list) = 0;
 };
 
-#endif // __IVARIA_CONOUT_H__
+#endif // __CS_IVARIA_CONOUT_H__

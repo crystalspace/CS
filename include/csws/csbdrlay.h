@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __BORDERLAYOUT_G__
-#define __BORDERLAYOUT_G__
+#ifndef __CS_CSBORDERLAYOUT_H__
+#define __CS_CSBORDERLAYOUT_H__
 
 #include "cslayout.h"
 
@@ -175,4 +175,4 @@ class csBorderLayout : public csLayout2
 
 /** @} */
 
-#endif // __BORDERLAYOUT_G__
+#endif // __CS_CSBORDERLAYOUT_H__

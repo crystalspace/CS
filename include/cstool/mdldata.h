@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __MDLDATA_H__
-#define __MDLDATA_H__
+#ifndef __CS_MDLDATA_H__
+#define __CS_MDLDATA_H__
 
 #include "imesh/mdldata.h"
 #include "csutil/garray.h"
@@ -324,4 +324,4 @@ public:
   void RegisterMaterials (iMaterialList *ml);
 };
 
-#endif // __MDLDATA_H__
+#endif // __CS_MDLDATA_H__

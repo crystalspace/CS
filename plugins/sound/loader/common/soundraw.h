@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SOUNDRAW_H__
-#define __SOUNDRAW_H__
+#ifndef __CS_SOUNDRAW_H__
+#define __CS_SOUNDRAW_H__
 
 #include "isound/data.h"
 
@@ -47,4 +47,4 @@ private:
   csSoundFormat Format;
 };
 
-#endif
+#endif // __CS_SOUNDRAW_H__

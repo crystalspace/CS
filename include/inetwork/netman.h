@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __INETWORK_NETMAN_H__
-#define __INETWORK_NETMAN_H__
+#ifndef __CS_INETWORK_NETMAN_H__
+#define __CS_INETWORK_NETMAN_H__
 
 #include "csutil/scf.h"
 
@@ -99,5 +99,5 @@ struct iNetworkManager : public iBase
   virtual bool SendToAll (iNetworkPacket *) = 0;
 };
 
-#endif
+#endif // __CS_INETWORK_NETMAN_H__
 

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SYSG2D_H__
-#define __SYSG2D_H__
+#ifndef __CS_OGLG2D_H__
+#define __CS_OGLG2D_H__
 
 #include <GL/gl.h>
 #include "wglext.h"
@@ -127,4 +127,4 @@ protected:
   csPFNWGLGETSWAPINTERVALEXTPROC wglGetSwapIntervalEXT;
 };
 
-#endif
+#endif // __CS_OGLG2D_H__

@@ -18,10 +18,10 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SCANCODE_H__
-#define __SCANCODE_H__
+#ifndef __CS_SCANCODE_H__
+#define __CS_SCANCODE_H__
 
 // This array can be used to translate scancodes into Crystal Space codes
 extern unsigned short ScanCodeToChar [128];
 
-#endif // __SCANCODE_H__
+#endif // __CS_SCANCODE_H__

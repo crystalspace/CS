@@ -1,5 +1,5 @@
-#ifndef __AWS_SCRIPT_UTILITY__
-# define __AWS_SCRIPT_UTILITY__
+#ifndef __CS_AWS_SCRIPT_UTILITY_H__
+#define __CS_AWS_SCRIPT_UTILITY_H__
 
 # include "csutil/csvector.h"
 
@@ -25,5 +25,5 @@ public:
   void Execute (const char *action, void *owner, iAwsParmList* parmlist);
 };
 
-#endif
+#endif // __CS_AWS_SCRIPT_UTILITY_H__
 

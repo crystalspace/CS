@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __QINT_H__
-#define __QINT_H__
+#ifndef __CS_QINT_H__
+#define __CS_QINT_H__
 
 #if defined (CS_IEEE_DOUBLE_FORMAT)
 
@@ -215,4 +215,4 @@ inline long QInt24 (float inval)
 
 #endif /* CS_IEEE_DOUBLE_FORMAT */
 
-#endif // __QINT_H__
+#endif // __CS_QINT_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __EFFECTDEFINITION_H__
-#define __EFFECTDEFINITION_H__
+#ifndef __CS_EFFECTDEFINITION_H__
+#define __CS_EFFECTDEFINITION_H__
 
 #include "csutil/scf.h"
 #include "cstypes.h"
@@ -89,4 +89,4 @@ public:
   csBasicVector GetAllVariableNames();
 };
 
-#endif // __EFFECTDEFINITION_H__
+#endif // __CS_EFFECTDEFINITION_H__

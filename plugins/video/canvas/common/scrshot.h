@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SCRSHOT_H__
-#define __SCRSHOT_H__
+#ifndef __CS_SCRSHOT_H__
+#define __CS_SCRSHOT_H__
 
 #include "ivideo/graph2d.h"
 #include "igraphic/image.h"
@@ -89,4 +89,4 @@ public:
   { transp = 0; strength = 0; return 0; }
 };
 
-#endif // __SCRSHOT_H__
+#endif // __CS_SCRSHOT_H__

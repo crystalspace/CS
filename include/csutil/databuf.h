@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __DATABUF_H__
-#define __DATABUF_H__
+#ifndef __CS_DATABUF_H__
+#define __CS_DATABUF_H__
 
 #include "iutil/databuff.h"
 
@@ -55,4 +55,4 @@ public:
   { return Data; }
 };
 
-#endif // __DATABUF_H__
+#endif // __CS_DATABUF_H__

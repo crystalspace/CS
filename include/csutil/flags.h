@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _CS_FLAGS_H
-#define _CS_FLAGS_H
+#ifndef __CS_FLAGS_H__
+#define __CS_FLAGS_H__
 
 /**
  * Set of flags which can be accessed through masks.
@@ -68,5 +68,5 @@ public:
   { return (flags & mask) == mask; }
 };
 
-#endif /*_CS_FLAGS_H*/
+#endif // __CS_FLAGS_H__
 

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVARIA_SCRIPT_H__
-#define __IVARIA_SCRIPT_H__
+#ifndef __CS_IVARIA_SCRIPT_H__
+#define __CS_IVARIA_SCRIPT_H__
 
 #include "csutil/scf.h"
 
@@ -40,7 +40,7 @@ struct iScript : public iBase
   virtual bool Store(const char* name, void* data, void* tag) = 0;
 };
 
-#endif // __IVARIA_SCRIPT_H__
+#endif // __CS_IVARIA_SCRIPT_H__
 
 
 

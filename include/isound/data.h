@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISOUND_DATA_H__
-#define __ISOUND_DATA_H__
+#ifndef __CS_ISOUND_DATA_H__
+#define __CS_ISOUND_DATA_H__
 
 #include "csutil/scf.h"
 
@@ -67,4 +67,4 @@ struct iSoundData : public iBase
   virtual void *ReadStreamed(long &NumSamples) = 0;
 };
 
-#endif // __ISOUND_DATA_H__
+#endif // __CS_ISOUND_DATA_H__

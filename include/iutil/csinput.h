@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IUTIL_STDINPUT_H__
-#define __IUTIL_STDINPUT_H__
+#ifndef __CS_IUTIL_STDINPUT_H__
+#define __CS_IUTIL_STDINPUT_H__
 
 /**\file 
  * Crystal Space input library.
@@ -135,4 +135,4 @@ struct iJoystickDriver : public iBase
 
 /** @} */
 
-#endif // __IUTIL_STDINPUT_H__
+#endif // __CS_IUTIL_STDINPUT_H__

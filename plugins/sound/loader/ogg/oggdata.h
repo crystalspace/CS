@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _CS_OGG_SOUNDDATA_H_
-#define _CS_OGG_SOUNDDATA_H_
+#ifndef __CS_OGG_SOUNDDATA_H__
+#define __CS_OGG_SOUNDDATA_H__
 
 /**
  * iSoundData implementation for ogg bitdata. Hmm, sounds ogg.
@@ -103,4 +103,4 @@ class csOggSoundData : public iSoundData
   static bool IsOgg (void *Buffer, size_t len);
 };
 
-#endif
+#endif // __CS_OGG_SOUNDDATA_H__

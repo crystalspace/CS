@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSSOUNDSOURCEEAX_H__
-#define __CSSOUNDSOURCEEAX_H__
+#ifndef __CS_SOUNDSOURCEEAX_H__
+#define __CS_SOUNDSOURCEEAX_H__
 
 #include "isound/source.h"
 #include <eax.h>
@@ -94,4 +94,4 @@ private:
   long WriteCursor;
 };
 
-#endif
+#endif // __CS_SOUNDSOURCEEAX_H__

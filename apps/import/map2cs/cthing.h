@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CTHING_H
-#define CTHING_H
+#ifndef __CTHING_H__
+#define __CTHING_H__
 
 #include "ithing.h"
 
@@ -47,4 +47,4 @@ public:
   virtual bool WriteAsPart(CIWorld* pIWorld, CISector* pISector);
 };
 
-#endif
+#endif // __CTHING_H__

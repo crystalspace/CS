@@ -1,5 +1,5 @@
-#ifndef __AWS_H__
-# define __AWS_H__
+#ifndef __CS_AWS_H__
+#define __CS_AWS_H__
 
 /**************************************************************************
     Copyright (C) 2000-2001 by Christopher Nelson
@@ -356,5 +356,5 @@ public:
   *scfiEventHandler;
 };
 
-#endif
+#endif // __CS_AWS_H__
 

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSCONIN_H__
-#define __CSCONIN_H__
+#ifndef __CS_CSCONIN_H__
+#define __CS_CSCONIN_H__
 
 #include "ivaria/conin.h"
 #include "ivaria/conout.h"
@@ -119,4 +119,4 @@ public:
   friend struct eiConsoleWatcher;
 };
 
-#endif // __CSCONIN_H__
+#endif // __CS_CSCONIN_H__

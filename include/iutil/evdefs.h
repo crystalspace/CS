@@ -32,8 +32,8 @@
  * \addtogroup event_handling
  * @{ */
 
-#ifndef __IUTIL_EVDEFS_H__
-#define __IUTIL_EVDEFS_H__
+#ifndef __CS_IUTIL_EVDEFS_H__
+#define __CS_IUTIL_EVDEFS_H__
 
 /// System Events
 // take care not to define more than 32 event types
@@ -418,4 +418,4 @@ enum
 
 /** @} */
 
-#endif // __IUTIL_EVDEFS_H__
+#endif // __CS_IUTIL_EVDEFS_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_POLYGON_H__
-#define __IENGINE_POLYGON_H__
+#ifndef __CS_THING_POLYGON_H__
+#define __CS_THING_POLYGON_H__
 
 #include "csutil/scf.h"
 #include "csgeom/plane3.h"
@@ -356,4 +356,4 @@ struct iPolygonTexture : public iBase
   virtual void SetCacheData (int idx, void *d) = 0;
 };
 
-#endif // __IENGINE_POLYGON_H__
+#endif // __CS_THING_POLYGON_H__

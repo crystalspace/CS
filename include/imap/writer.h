@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMAP_WRITER_H__
-#define __IMAP_WRITER_H__
+#ifndef __CS_IMAP_WRITER_H__
+#define __CS_IMAP_WRITER_H__
 
 #include "csutil/scf.h"
 
@@ -43,5 +43,6 @@ struct iSaverPlugin : public iBase
 
 /** } */
 
-#endif
+#endif // __CS_IMAP_WRITER_H__
+
 

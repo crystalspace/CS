@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSENGINE_RDRPRIOR_H__
-#define __CSENGINE_RDRPRIOR_H__
+#ifndef __CS_ENGINE_RDRPRIOR_H__
+#define __CS_ENGINE_RDRPRIOR_H__
 
 struct iMeshWrapper;
 struct iRenderView;
@@ -76,5 +76,5 @@ public:
   void Sort (iRenderView* rview, int priority);
 };
 
-#endif // __CSENGINE_RDRPRIOR_H__
+#endif // __CS_ENGINE_RDRPRIOR_H__
 

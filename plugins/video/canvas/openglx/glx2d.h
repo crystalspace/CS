@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __GLX2D_H__
-#define __GLX2D_H__
+#ifndef __CS_GLX2D_H__
+#define __CS_GLX2D_H__
 
 #include "csutil/scf.h"
 #include "video/canvas/openglcommon/glcommon2d.h"
@@ -106,4 +106,4 @@ public:
   } scfiOpenGLInterface;
 };
 
-#endif // __GLX2D_H__
+#endif // __CS_GLX2D_H__

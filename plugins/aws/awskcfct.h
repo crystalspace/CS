@@ -5,8 +5,8 @@
  * to bypass the definitions files.  This may be useful in some instances, and since it's
  * been requested, I've decided to make it available.
  */
-#ifndef __AWS_KEY_FACTORY__
-# define __AWS_KEY_FACTORY__
+#ifndef __CS_AWS_KEY_FACTORY_H__
+#define __CS_AWS_KEY_FACTORY_H__
 
 # include "iaws/aws.h"
 # include "awsprefs.h"
@@ -105,4 +105,4 @@ public:
   friend class awsKeyFactory;
  };
 
-#endif
+#endif // __CS_AWS_KEY_FACTORY_H__

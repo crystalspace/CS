@@ -17,8 +17,8 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSREF_H__
-#define __CSREF_H__
+#ifndef __CS_REF_H__
+#define __CS_REF_H__
 
 template <class T> class csRef;
 
@@ -243,4 +243,4 @@ public:
   { return (obj != 0); }
 };
 
-#endif // __CSREF_H__
+#endif // __CS_REF_H__

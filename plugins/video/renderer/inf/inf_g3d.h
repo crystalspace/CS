@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __INF_G3D_H__
-#define __INF_G3D_H__
+#ifndef __CS_INF_G3D_H__
+#define __CS_INF_G3D_H__
 
 // csGraphics3DInfinite infinite rasterizer class.
 
@@ -359,4 +359,4 @@ public:
   virtual bool SetMouseCursor (csMouseCursorID) { return true; }
 };
 
-#endif // __INF_G3D_H__
+#endif // __CS_INF_G3D_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _INETWORK_DRIVER2__
-#define _INETWORK_DRIVER2__
+#ifndef __CS_INETWORK_DRIVER2_H__
+#define __CS_INETWORK_DRIVER2_H__
 
 #include "csutil/scf.h"
 
@@ -43,4 +43,4 @@ struct iNetworkDriver2 : public iBase
   virtual int LastError() = 0;
 };
 
-#endif
+#endif // __CS_INETWORK_DRIVER2_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef PICVIEW_H
-#define PICVIEW_H
+#ifndef __PICVIEW_H__
+#define __PICVIEW_H__
 
 #include <stdarg.h>
 #include "csws/csws.h"
@@ -105,5 +105,5 @@ public:
   virtual bool HandleEvent (iEvent& Event);
 };
 
-#endif // PICVIEW_H
+#endif // __PICVIEW_H__
 

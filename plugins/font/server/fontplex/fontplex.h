@@ -19,8 +19,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __FONTPLEX_H__
-#define __FONTPLEX_H__
+#ifndef __CS_FONTPLEX_H__
+#define __CS_FONTPLEX_H__
 
 #include "ivideo/fontserv.h"
 #include "iutil/eventh.h"
@@ -94,4 +94,4 @@ public:
   } scfiComponent;
 };
 
-#endif // __FONTPLEX_H__
+#endif // __CS_FONTPLEX_H__

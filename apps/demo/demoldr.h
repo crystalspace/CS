@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef DEMOLDR_H
-#define DEMOLDR_H
+#ifndef __DEMOLDR_H__
+#define __DEMOLDR_H__
 
 #include <stdarg.h>
 #include "csgeom/math2d.h"
@@ -65,5 +65,5 @@ public:
   iSequence* GetSequence (const char* name);
 };
 
-#endif // DEMOLDR_H
+#endif // __DEMOLDR_H__
 

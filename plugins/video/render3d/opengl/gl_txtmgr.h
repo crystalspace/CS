@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef GL_TXTMGR_H
-#define GL_TXTMGR_H
+#ifndef __CS_GL_TXTMGR_H__
+#define __CS_GL_TXTMGR_H__
 
 #include "csutil/scf.h"
 #include "ivideo/texture.h"
@@ -216,4 +216,4 @@ csGLTextureManager::formatDescription var[] = {
 {(GLenum)0, NULL, (GLenum)0, 0, 0, (GLenum)0, 0}};
 
 
-#endif // GL_TXTMGR_H
+#endif // __CS_GL_TXTMGR_H__

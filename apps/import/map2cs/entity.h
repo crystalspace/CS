@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef ENTITY_H
-#define ENTITY_H
+#ifndef __ENTITY_H__
+#define __ENTITY_H__
 
 #include "brush.h"
 
@@ -164,5 +164,5 @@ protected:
   void AddKeyValuePair(const char* Key, const char* Value);
 };
 
-#endif
+#endif // __ENTITY_H__
 

@@ -1,8 +1,8 @@
 // awsPanel.h: interface for the awsPanel class.
 //
 //////////////////////////////////////////////////////////////////////
-#ifndef __AWS_PANEL_H__
-#define __AWS_PANEL_H__
+#ifndef __CS_AWS_PANEL_H__
+#define __CS_AWS_PANEL_H__
 
 #include "awscomp.h"
 #include "csgeom/csrectrg.h"
@@ -72,5 +72,5 @@ public:
   static const int fsToolbar;
 };
 
-#endif
+#endif // __CS_AWS_PANEL_H__
 

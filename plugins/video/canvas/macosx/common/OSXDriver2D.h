@@ -11,8 +11,8 @@
 // compiler, it doesn't like C++ classes, so we create a C API to some functions of
 // this object
 
-#ifndef __OSXDRIVER2D_H__
-#define __OSXDRIVER2D_H__
+#ifndef __CS_OSXDRIVER2D_H__
+#define __CS_OSXDRIVER2D_H__
 
 #if defined(__cplusplus)
 
@@ -148,4 +148,4 @@ DRV2D_FUNC(void, ShowMouse)(OSXDriver2D driver);
 
 #endif // __cplusplus
 
-#endif // __OSXDRIVER2D_H__
+#endif // __CS_OSXDRIVER2D_H__

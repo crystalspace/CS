@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVIDEO_VBUFMGR_H__
-#define __IVIDEO_VBUFMGR_H__
+#ifndef __CS_IVIDEO_VBUFMGR_H__
+#define __CS_IVIDEO_VBUFMGR_H__
 
 #ifndef CS_USE_NEW_RENDERER
 
@@ -245,5 +245,5 @@ struct iVertexBufferManager : public iBase
 
 /** @} */
 
-#endif // __IVIDEO_VBUFMGR_H__
+#endif // __CS_IVIDEO_VBUFMGR_H__
 

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _IAVICDEC_H_
-#define _IAVICDEC_H_
+#ifndef __CS_IAVICDEC_H__
+#define __CS_IAVICDEC_H__
 
 #include "csutil/scf.h"
 #include "ivideo/codec.h"
@@ -36,4 +36,4 @@ struct iAVICodec : public iBase
   virtual bool Encode (void *indata, char *outdata, uint32 &outlength) = 0;
 };
 
-#endif
+#endif // __CS_IAVICDEC_H__

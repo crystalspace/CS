@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMPPRCTX_H__
-#define __IMPPRCTX_H__
+#ifndef __CS_IMPPRCTX_H__
+#define __CS_IMPPRCTX_H__
 
 #include <stdarg.h>
 #include "csutil/ref.h"
@@ -60,5 +60,5 @@ public:
   virtual void Animate (csTicks current_time);
 };
 
-#endif // __SIMPLE1_H__
+#endif // __CS_IMPPRCTX_H__
 

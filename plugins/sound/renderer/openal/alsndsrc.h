@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SNDSRC_H__
-#define __SNDSRC_H__
+#ifndef __CS_SNDSRCOPENAL_H__
+#define __CS_SNDSRCOPENAL_H__
 
 #include "isound/source.h"
 
@@ -68,4 +68,4 @@ private:
   int mode;
 };
 
-#endif
+#endif // __CS_SNDSRCOPENAL_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SFT3DCOM_H__
-#define __SFT3DCOM_H__
+#ifndef __CS_SFT3DCOM_H__
+#define __CS_SFT3DCOM_H__
 
 #include "csutil/scf.h"
 #include "csgeom/transfrm.h"
@@ -502,4 +502,4 @@ public:
   } * scfiEventHandler;
 };
 
-#endif // __SFT3DCOM_H__
+#endif // __CS_SFT3DCOM_H__

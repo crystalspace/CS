@@ -26,8 +26,8 @@
  * make sure this really is the problem.
  */
 
-#ifndef __QSQRT_H__
-#define __QSQRT_H__
+#ifndef __CS_QSQRT_H__
+#define __CS_QSQRT_H__
 
 /**
  * \addtogroup floating_point
@@ -207,4 +207,4 @@ static inline float qisqrt(float x) { return (float)(1.0 / sqrt(x)); }
 
 #endif
 
-#endif // __QSQRT_H__
+#endif // __CS_QSQRT_H__

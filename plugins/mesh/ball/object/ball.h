@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _BALL_H_
-#define _BALL_H_
+#ifndef __CS_BALL_H__
+#define __CS_BALL_H__
 
 #include "csgeom/vector3.h"
 #include "csgeom/transfrm.h"
@@ -405,4 +405,4 @@ public:
   } scfiComponent;
 };
 
-#endif // _BALL_H_
+#endif // __CS_BALL_H__

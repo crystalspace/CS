@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef PERF_H
-#define PERF_H
+#ifndef __PERFTEST_H__
+#define __PERFTEST_H__
 
 class PerfTest;
 struct iMaterialHandle;
@@ -82,5 +82,5 @@ public:
   }
 };
 
-#endif // PERF_H
+#endif // __PERFTEST_H__
 

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __EFFECTDATA_H__
-#define __EFFECTDATA_H__
+#ifndef __CS_EFFECTDATA_H__
+#define __CS_EFFECTDATA_H__
 
 #include "csutil/scf.h"
 #include "csutil/csvector.h"
@@ -169,4 +169,4 @@ SCF_IMPLEMENT_IBASE(csOpenGlEffectPassData)
   SCF_IMPLEMENTS_INTERFACE(csOpenGlEffectPassData)
 SCF_IMPLEMENT_IBASE_END
 
-#endif //__EFFECTDATA_H__
+#endif // __CS_EFFECTDATA_H__

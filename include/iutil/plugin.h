@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IUTIL_PLUGIN_H__
-#define __IUTIL_PLUGIN_H__
+#ifndef __CS_IUTIL_PLUGIN_H__
+#define __CS_IUTIL_PLUGIN_H__
 
 /**\file
  */
@@ -95,4 +95,4 @@ struct iPluginManager : public iBase
 
 /** @} */
 
-#endif // __IUTIL_PLUGIN_H__
+#endif // __CS_IUTIL_PLUGIN_H__

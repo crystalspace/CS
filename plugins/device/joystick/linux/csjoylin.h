@@ -1,5 +1,5 @@
-#ifndef _CS_LINUX_JOYSTICK_
-#define _CS_LINUX_JOYSTICK_
+#ifndef __CS_LINUX_JOYSTICK__
+#define __CS_LINUX_JOYSTICK__
 /*
     Copyright (C) 2002 by Norman Krämer
   
@@ -84,4 +84,4 @@ class csLinuxJoystick : public iComponent
 
 };
 
-#endif
+#endif // __CS_LINUX_JOYSTICK__

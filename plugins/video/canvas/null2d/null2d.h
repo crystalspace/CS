@@ -45,4 +45,4 @@ public:
   virtual bool SetMouseCursor (csMouseCursorID iShape);
 };
 
-#endif // __CS_SDL2D_H__
+#endif // __CS_NULL2D_H__

@@ -30,8 +30,8 @@
  *              Convert to C++.
  */
 
-#ifndef __INV_CMAP_H__
-#define __INV_CMAP_H__
+#ifndef __CS_INV_CMAP_H__
+#define __CS_INV_CMAP_H__
 
 /**\file 
  * Compute an inverse colormap
@@ -89,4 +89,4 @@ extern void csInverseColormap (int colors, csRGBpixel *colormap,
   int rbits, int gbits, int bbits, uint8 *&rgbmap,
   uint32 *dist_buf = NULL);
 
-#endif // __INV_CMAP_H__
+#endif // __CS_INV_CMAP_H__

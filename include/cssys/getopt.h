@@ -17,8 +17,8 @@
    write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-#ifndef __GETOPT_H__
-#define __GETOPT_H__
+#ifndef __CS_GETOPT_H__
+#define __CS_GETOPT_H__
 
 /**\file
  * Declarations for getopt
@@ -124,4 +124,4 @@ extern int _getopt_internal (int argc, char *const *argv,
 		             const struct getopt_option *longopts, int *longind,
 			     int long_only);
 
-#endif // __GETOPT_H__
+#endif // __CS_GETOPT_H__

@@ -20,8 +20,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef IWORLD_H
-#define IWORLD_H
+#ifndef __IWORLD_H__
+#define __IWORLD_H__
 
 #include "contain.h"
 
@@ -150,5 +150,5 @@ protected:
   int              m_Indent;
 }; //CCSWorld
 
-#endif
+#endif // __IWORLD_H__
 

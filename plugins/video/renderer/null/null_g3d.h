@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __NULL_G3D_H__
-#define __NULL_G3D_H__
+#ifndef __CS_NULL_G3D_H__
+#define __CS_NULL_G3D_H__
 
 // csGraphics3DNull line rasterizer class.
 
@@ -286,4 +286,4 @@ public:
   } * scfiEventHandler;
 };
 
-#endif // __NULL_G3D_H__
+#endif // __CS_NULL_G3D_H__

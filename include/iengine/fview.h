@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_FVIEW_H__
-#define __IENGINE_FVIEW_H__
+#ifndef __CS_IENGINE_FVIEW_H__
+#define __CS_IENGINE_FVIEW_H__
 
 /**\file
  */
@@ -193,5 +193,5 @@ struct iFrustumView : public iBase
 
 /** @} */
 
-#endif
+#endif // __CS_IENGINE_FVIEW_H__
 

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _AVI_AUDIOSTREAM_H_
-#define _AVI_AUDIOSTREAM_H_
+#ifndef __CS_AVI_AUDIOSTREAM_H__
+#define __CS_AVI_AUDIOSTREAM_H__
 
 #include "ivideo/codec.h"
 #include "csavi.h"
@@ -61,4 +61,4 @@ class csAVIStreamAudio : public iAudioStream
   virtual void GetStreamDescription (csAudioStreamDescription &desc);
 };
 
-#endif
+#endif // __CS_AVI_AUDIOSTREAM_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IEFFECTCLIENT_H__
-#define __IEFFECTCLIENT_H__
+#ifndef __CS_IVIDEO_EFFECTCLIENT_H__
+#define __CS_IVIDEO_EFFECTCLIENT_H__
 
 /**\file
  * Effect client interface
@@ -48,4 +48,4 @@ public:
 
 /** @} */
 
-#endif // __IEFFECTCLIENT_H__
+#endif // __CS_IVIDEO_EFFECTCLIENT_H__

@@ -1,8 +1,8 @@
 // awsTabCtrl.h: interface for the awsTabCtrl class.
 //
 //////////////////////////////////////////////////////////////////////
-#ifndef __AWSTABCTRL_H__
-#define __AWSTABCTRL_H__
+#ifndef __CS_AWS_TABCTRL_H__
+#define __CS_AWS_TABCTRL_H__
 
 #include "awscomp.h"
 #include "awsscrbr.h"
@@ -215,5 +215,5 @@ protected:
   void SetTopBottom (bool to_top);
 };
 
-#endif
+#endif // __CS_AWS_TABCTRL_H__
 

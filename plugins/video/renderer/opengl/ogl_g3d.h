@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef GRAPH3D_OPENGL_H
-#define GRAPH3D_OPENGL_H
+#ifndef __CS_GRAPH3D_OPENGL_H__
+#define __CS_GRAPH3D_OPENGL_H__
 
 // GRAPH3D.H
 // csGraphics3DOpenGL OpenGL rasterizer class.
@@ -39,4 +39,4 @@ public:
 
 };
 
-#endif
+#endif // __CS_GRAPH3D_OPENGL_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMAP_LOADER_H__
-#define __IMAP_LOADER_H__
+#ifndef __CS_IMAP_LOADER_H__
+#define __CS_IMAP_LOADER_H__
 
 #include "csutil/scf.h"
 
@@ -54,5 +54,5 @@ struct iBinaryLoaderPlugin : public iBase
 
 /** } */
 
-#endif
+#endif // __CS_IMAP_LOADER_H__
 

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMESH_HAZE_H__
-#define __IMESH_HAZE_H__
+#ifndef __CS_IMESH_HAZE_H__
+#define __CS_IMESH_HAZE_H__
 
 #include "csutil/scf.h"
 #include "csutil/garray.h"
@@ -164,5 +164,5 @@ struct iHazeState : public iHazeFactoryState
 {
 };
 
-#endif
+#endif // __CS_IMESH_HAZE_H__
 

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_IMPOSTER_H__
-#define __IENGINE_IMPOSTER_H__
+#ifndef __CS_IENGINE_IMPOSTER_H__
+#define __CS_IENGINE_IMPOSTER_H__
 
 
 /**\file
@@ -73,4 +73,4 @@ struct iImposter : public iBase
   virtual bool WouldUseImposter(csReversibleTransform& pov) const = 0;
 };
 
-#endif
+#endif // __CS_IENGINE_IMPOSTER_H__

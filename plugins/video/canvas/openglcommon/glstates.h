@@ -1,5 +1,5 @@
-#ifndef __GLSTATES_H__
-#define __GLSTATES_H__
+#ifndef __CS_GLSTATES_H__
+#define __CS_GLSTATES_H__
 
 #if defined(CS_OPENGL_PATH)
 #include CS_HEADER_GLOBAL(CS_OPENGL_PATH,gl.h)
@@ -117,4 +117,4 @@ public:
 #undef IMPLEMENT_CACHED_PARAMETER_2
 #undef IMPLEMENT_CACHED_PARAMETER_3
 
-#endif
+#endif // __CS_GLSTATES_H__

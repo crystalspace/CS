@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVIDEO_XEXTF86VM_H__
-#define __IVIDEO_XEXTF86VM_H__
+#ifndef __CS_IVIDEO_XEXTF86VM_H__
+#define __CS_IVIDEO_XEXTF86VM_H__
 
 /**\file
  */
@@ -52,4 +52,4 @@ struct iXExtF86VM : public iBase
   virtual void GetDimensions (int &w, int &h) = 0;
 };
 
-#endif // __IVIDEO_XEXTF86VM_H__
+#endif // __CS_IVIDEO_XEXTF86VM_H__

@@ -56,8 +56,8 @@
  * University of Illinois, Urbana-Champaign.
  */
 
-#ifndef CS_CTYPE_H
-#define CS_CTYPE_H
+#ifndef __CS_CSCTYPE_H__
+#define __CS_CSCTYPE_H__
 
 /**\file
  */
@@ -104,4 +104,4 @@ extern "C" {
 }
 #endif
 
-#endif	/* !CS_CTYPE_H */
+#endif	// __CS_CSCTYPE_H__

@@ -1,5 +1,5 @@
-#ifndef __AWS_PREFERENCES_H__
-# define __AWS_PREFERENCES_H__
+#ifndef __CS_AWS_PREFERENCES_H__
+#define __CS_AWS_PREFERENCES_H__
 
 /**************************************************************************
     Copyright (C) 2000-2001 by Christopher Nelson
@@ -808,5 +808,5 @@ public:
   virtual iAwsConnectionNodeFactory *CreateConnectionNodeFactory ();
 };
 
-#endif
+#endif // __CS_AWS_PREFERENCES_H__
 

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CS_OBB_PRIV_H
-#define CS_OBB_PRIV_H
+#ifndef __CS_OBB_PRIV_H__
+#define __CS_OBB_PRIV_H__
 
 #include "csgeom/box.h"
 #include "csgeom/matrix3.h"
@@ -124,5 +124,5 @@ public:
   void Diameter (csOBBLine3& line, float eps);
 };
 
-#endif
+#endif // __CS_OBB_PRIV_H__
 

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __DATASTRM_H__
-#define __DATASTRM_H__
+#ifndef __CS_DATASTRM_H__
+#define __CS_DATASTRM_H__
 
 struct iDataBuffer;
 
@@ -94,4 +94,4 @@ public:
   void SkipWhitespace ();
 };
 
-#endif // __DATASTRM_H__
+#endif // __CS_DATASTRM_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSPOINT_H__
-#define __CSPOINT_H__
+#ifndef __CS_CSPOINT_H__
+#define __CS_CSPOINT_H__
 
 /**\file 
  * 2D point object.
@@ -53,5 +53,5 @@ struct csPoint
 
 /** @} */
 
-#endif
+#endif // __CS_CSPOINT_H__
 

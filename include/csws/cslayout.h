@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSLAYOUT_H__
-#define __CSLAYOUT_H__
+#ifndef __CS_CSLAYOUT_H__
+#define __CS_CSLAYOUT_H__
 
 /**
  * \addtogroup csws_layout
@@ -196,4 +196,4 @@ class csLayout2 : public csLayout
 
 /** @} */
 
-#endif // __CSLAYOUT_H__
+#endif // __CS_CSLAYOUT_H__

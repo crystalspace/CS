@@ -255,4 +255,4 @@ public:
   } scfiComponent;
 };
 
-#endif // __CS_FREEFONT_H__
+#endif // __CS_FREEFONT2_H__

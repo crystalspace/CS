@@ -1,5 +1,5 @@
-#ifndef AWSTEST_H
-#define AWSTEST_H
+#ifndef __AWSTEST_H__
+#define __AWSTEST_H__
 
 #include <stdarg.h>
 #include "csgeom/math2d.h"
@@ -65,4 +65,4 @@ public:
   bool HandleEvent (iEvent &Event);
 };
 
-#endif // AWSTEST_H
+#endif // __AWSTEST_H__

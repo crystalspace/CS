@@ -18,8 +18,8 @@
 
 
 
-#ifndef __GLEXTENSIONMANAGER_H__
-#define __GLEXTENSIONMANAGER_H__
+#ifndef __CS_GLEXTENSIONMANAGER_H__
+#define __CS_GLEXTENSIONMANAGER_H__
 
 
 
@@ -9056,5 +9056,5 @@ public:
   }
 };
 
-#endif // __GLEXTENSIONMANAGER_H__
+#endif // __CS_GLEXTENSIONMANAGER_H__
 

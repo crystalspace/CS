@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_COLLECTN_H__
-#define __IENGINE_COLLECTN_H__
+#ifndef __CS_IENGINE_COLLECTN_H__
+#define __CS_IENGINE_COLLECTN_H__
 
 /**\file
  */
@@ -86,5 +86,5 @@ struct iCollectionList : public iBase
   virtual iCollection *FindByName (const char *Name) const = 0;
 };
 
-#endif // __IENGINE_COLLECTN_H__
+#endif // __CS_IENGINE_COLLECTN_H__
 

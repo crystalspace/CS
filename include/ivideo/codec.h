@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVIDEO_CODEC_H__
-#define __IVIDEO_CODEC_H__
+#ifndef __CS_IVIDEO_CODEC_H__
+#define __CS_IVIDEO_CODEC_H__
 
 /**\file
  */
@@ -286,4 +286,4 @@ struct csCodecDescription
   uint16 encodeinput;
 };
 
-#endif // __IVIDEO_CODEC_H__
+#endif // __CS_IVIDEO_CODEC_H__

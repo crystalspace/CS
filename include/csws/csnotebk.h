@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSNOTEBK_H__
-#define __CSNOTEBK_H__
+#ifndef __CS_CSNOTEBK_H__
+#define __CS_CSNOTEBK_H__
 
 /**\file
  * Crystal Space Windowing System: notebook class
@@ -236,4 +236,4 @@ protected:
 
 /** @} */
 
-#endif // __CSNOTEBK_H__
+#endif // __CS_CSNOTEBK_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMGMULTIPLEX_H__
-#define __IMGMULTIPLEX_H__
+#ifndef __CS_IMGMULTIPLEX_H__
+#define __CS_IMGMULTIPLEX_H__
 
 #include "csgfx/csimage.h"
 #include "igraphic/imageio.h"
@@ -62,4 +62,4 @@ class csMultiplexImageIO : public iImageIO
   } scfiComponent;
 };
 
-#endif // __IMGMULTIPLEX_H__
+#endif // __CS_IMGMULTIPLEX_H__

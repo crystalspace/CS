@@ -4,8 +4,8 @@
 // Created by mreda on Sun Nov 11 2001.
 // Copyright (c) 2001 Matt Reda. All rights reserved.
 
-#ifndef __CASNDDRV_H__
-#define __CASNDDRV_H__
+#ifndef __CS_CASNDDRV_H__
+#define __CS_CASNDDRV_H__
 
 #include <CoreAudio/CoreAudio.h>
 
@@ -83,4 +83,4 @@ protected:
     bool isPlaying;				// Boolean to indicate if playback is going
 };
 
-#endif // __CASNDDRV_H__
+#endif // __CS_CASNDDRV_H__

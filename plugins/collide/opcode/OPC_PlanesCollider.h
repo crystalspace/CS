@@ -17,8 +17,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include Guard
-#ifndef __OPC_PLANESCOLLIDER_H__
-#define __OPC_PLANESCOLLIDER_H__
+#ifndef __CS_OPC_PLANESCOLLIDER_H__
+#define __CS_OPC_PLANESCOLLIDER_H__
 
 	struct //OPCODE_API
        	PlanesCache : VolumeCache {
@@ -109,4 +109,4 @@
 							BOOL			InitQuery(PlanesCache& cache, const Plane* planes, udword nb_planes, const Matrix4x4* worldm=null);
 	};
 
-#endif // __OPC_PLANESCOLLIDER_H__
+#endif // __CS_OPC_PLANESCOLLIDER_H__

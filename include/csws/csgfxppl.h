@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSGFXPPL_H__
-#define __CSGFXPPL_H__
+#ifndef __CS_CSGFXPPL_H__
+#define __CS_CSGFXPPL_H__
 
 /**\file
  * Crystal Space Windowing System: Graphics Pipeline class
@@ -208,4 +208,4 @@ private:
 
 /** @} */
 
-#endif // __CSGFXPPL_H__
+#endif // __CS_CSGFXPPL_H__

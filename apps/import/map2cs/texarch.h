@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef TEXARCH_H
-#define TEXARCH_H
+#ifndef __TEXARCH_H__
+#define __TEXARCH_H__
 
 class CTextureFile;
 
@@ -45,4 +45,4 @@ public:
   virtual bool Open(const char* filename) = 0;
 };
 
-#endif
+#endif // __TEXARCH_H__

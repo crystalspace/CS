@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_MOVABLE_H__
-#define __IENGINE_MOVABLE_H__
+#ifndef __CS_IENGINE_MOVABLE_H__
+#define __CS_IENGINE_MOVABLE_H__
 
 /**\file
  */
@@ -228,4 +228,4 @@ struct iMovable : public iBase
 
 /** @} */
 
-#endif
+#endif // __CS_IENGINE_MOVABLE_H__

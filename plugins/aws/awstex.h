@@ -1,5 +1,5 @@
-#ifndef __AWS_TEXTURE_MANAGER__
-# define __AWS_TEXTURE_MANAGER__
+#ifndef __CS_AWS_TEXTURE_MANAGER_H__
+#define __CS_AWS_TEXTURE_MANAGER_H__
 
 # include "csutil/csvector.h"
 
@@ -91,4 +91,4 @@ public:
   /** Retrieves the texture manager that we are currently using */
   iTextureManager *GetTextureManager () { return txtmgr; }
 };
-#endif
+#endif // __CS_AWS_TEXTURE_MANAGER_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __PROCPLASMATEX_H__
-#define __PROCPLASMATEX_H__
+#ifndef __CS_PROCPLASMATEX_H__
+#define __CS_PROCPLASMATEX_H__
 
 #include "csutil/cscolor.h"
 #include "cstool/proctex.h"
@@ -65,5 +65,5 @@ public:
   virtual void Animate (csTicks current_time);
 };
 
-#endif // __PROCPLASMATEX_H__
+#endif // __CS_PROCPLASMATEX_H__
 

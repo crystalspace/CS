@@ -17,8 +17,8 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSREFARR_H__
-#define __CSREFARR_H__
+#ifndef __CS_REFARR_H__
+#define __CS_REFARR_H__
 
 #include "csutil/ref.h"
 
@@ -225,5 +225,5 @@ public:
   }
 };
 
-#endif // __CSREFARR_H__
+#endif // __CS_REFARR_H__
 

@@ -17,8 +17,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include Guard
-#ifndef __OPC_AABBCOLLIDER_H__
-#define __OPC_AABBCOLLIDER_H__
+#ifndef __CS_OPC_AABBCOLLIDER_H__
+#define __CS_OPC_AABBCOLLIDER_H__
 
 	struct // OPCODE_API
        	AABBCache : VolumeCache {
@@ -94,4 +94,4 @@
 							BOOL			InitQuery(AABBCache& cache, const CollisionAABB& box);
 	};
 
-#endif // __OPC_AABBCOLLIDER_H__
+#endif // __CS_OPC_AABBCOLLIDER_H__

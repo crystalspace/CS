@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSENDIAN_H__
-#define __CSENDIAN_H__
+#ifndef __CS_CSENDIAN_H__
+#define __CS_CSENDIAN_H__
 
 #include <math.h>
 #include "cstypes.h"
@@ -225,4 +225,4 @@ inline void set_le_float32 (void *buff, float f)
 inline void set_le_float16 (void *buff, float f)
 { set_le_short (buff, float2short (f)); }
 
-#endif // __CSENDIAN_H__
+#endif // __CS_CSENDIAN_H__

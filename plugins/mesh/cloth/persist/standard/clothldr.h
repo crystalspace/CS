@@ -1,6 +1,6 @@
 
-#ifndef _CLOTHLDR_H_
-#define _CLOTHLDR_H_
+#ifndef __CS_CLOTHLDR_H__
+#define __CS_CLOTHLDR_H__
 
 #include "imap/reader.h"
 #include "imap/writer.h"
@@ -163,4 +163,4 @@ public:
 };
 */
 
-#endif
+#endif // __CS_CLOTHLDR_H__

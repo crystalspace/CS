@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SNDRDR_H__
-#define __SNDRDR_H__
+#ifndef __CS_SNDRDROPENAL_H__
+#define __CS_SNDRDROPENAL_H__
 
 #include "isound/renderer.h"
 #include "isound/data.h"
@@ -97,4 +97,4 @@ private:
 };
 
 
-#endif // __CS_SNDRDR_H__
+#endif // __CS_SNDRDROPENAL_H__

@@ -1,5 +1,5 @@
-#ifndef __AWS_NOTEBOOK_H__
-#define __AWS_NOTEBOOK_H__
+#ifndef __CS_AWS_NOTEBOOK_H__
+#define __CS_AWS_NOTEBOOK_H__
 
 /*
     Copyright (C) 2002 by Norman Krämer
@@ -374,4 +374,4 @@ public:
   virtual iAwsComponent *Create ();
 };
 
-#endif
+#endif // __CS_AWS_NOTEBOOK_H__

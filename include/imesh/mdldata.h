@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMESH_MDLDATA_H__
-#define __IMESH_MDLDATA_H__
+#ifndef __CS_IMESH_MDLDATA_H__
+#define __CS_IMESH_MDLDATA_H__
 
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
@@ -416,4 +416,4 @@ struct iModelData : public iBase
   virtual void RegisterMaterials (iMaterialList *ml) = 0;
 };
 
-#endif // __IMESH_MDLDATA_H__
+#endif // __CS_IMESH_MDLDATA_H__

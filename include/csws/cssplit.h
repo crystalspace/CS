@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSSLIDER_H__
-#define __CSSLIDER_H__
+#ifndef __CS_CSSPLIT_H__
+#define __CS_CSSPLIT_H__
 
 /**\file
  */
@@ -81,4 +81,4 @@ public:
 
 /** @} */
 
-#endif // __CSSLIDER_H__
+#endif // __CS_CSSPLIT_H__

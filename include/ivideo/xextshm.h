@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVIDEO_XEXTSHM_H__
-#define __IVIDEO_XEXTSHM_H__
+#ifndef __CS_IVIDEO_XEXTSHM_H__
+#define __CS_IVIDEO_XEXTSHM_H__
 
 /**\file
  */
@@ -44,4 +44,4 @@ struct iXExtSHM : public iBase
 
 };
 
-#endif // __IVIDEO_XWINDOW_H__
+#endif // __CS_IVIDEO_XEXTSHM_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_MOTION_H__
-#define __IENGINE_MOTION_H__
+#ifndef __CS_IENGINE_MOTION_H__
+#define __CS_IENGINE_MOTION_H__
 
 /**\file
  */
@@ -148,5 +148,5 @@ struct iMotionManager : public iBase
 
 /** @} */
 
-#endif
+#endif // __CS_IENGINE_MOTION_H__
 

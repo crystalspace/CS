@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __OGL3DCOM_H__
-#define __OGL3DCOM_H__
+#ifndef __CS_OGL3DCOM_H__
+#define __CS_OGL3DCOM_H__
 
 // csGraphics3DOGLCommon OpenGL rasterizer class.
 
@@ -844,4 +844,4 @@ public:
   } * scfiEventHandler;
 };
 
-#endif // __OGL3DCOM_H__
+#endif // __CS_OGL3DCOM_H__

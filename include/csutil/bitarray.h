@@ -5,8 +5,8 @@
 // Permission is granted to use this code for any purpose, as long as this
 // copyright message remains intact.
 
-#ifndef _csBitArray_H
-#define _csBitArray_H
+#ifndef __CS_BITARRAY_H__
+#define __CS_BITARRAY_H__
 
 #include <memory.h>
 #include <assert.h>
@@ -310,4 +310,4 @@ public:
    }
 };
 
-#endif
+#endif // __CS_BITARRAY_H__

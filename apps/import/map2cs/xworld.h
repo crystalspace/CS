@@ -30,8 +30,8 @@
   for the whole project
  */
 
-#ifndef XWORLD_H
-#define XWORLD_H
+#ifndef __XWORLD_H__
+#define __XWORLD_H__
 
 #include "iworld.h"
 #include "ithing.h"
@@ -109,5 +109,5 @@ protected:
 protected:
 }; //CXmlWorld
 
-#endif
+#endif // __XWORLD_H__
 

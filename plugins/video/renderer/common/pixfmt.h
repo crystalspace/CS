@@ -8,8 +8,8 @@
 */
 
 
-#ifndef __PIXFMT_H
-#define __PIXFMT_H
+#ifndef __CS_PIXFMT_H__
+#define __CS_PIXFMT_H__
 
 // Whether the renderer uses ARGB or ABGR should not be tied directly to
 // the endianness of the platform.  But in order not to break code that
@@ -27,5 +27,5 @@
 #endif
 
 
-#endif
+#endif // __CS_PIXFMT_H__
 

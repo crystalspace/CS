@@ -178,5 +178,5 @@ private:
   void SoftUnMemoryMapFile(emulatedMmioInfo *platform);
 };
 
-#endif
+#endif // __CS_MEMORY_MAPPED_IO__
 

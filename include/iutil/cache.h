@@ -16,8 +16,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IUTIL_CACHE_H__
-#define __IUTIL_CACHE_H__
+#ifndef __CS_IUTIL_CACHE_H__
+#define __CS_IUTIL_CACHE_H__
 
 #include "csutil/scf.h"
 
@@ -103,5 +103,5 @@ struct iCacheManager : public iBase
   	const uint32* id = NULL) = 0;
 };
 
-#endif // __IUTIL_CACHE_H__
+#endif // __CS_IUTIL_CACHE_H__
 

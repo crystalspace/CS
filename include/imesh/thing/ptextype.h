@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_PTEXTYPE_H__
-#define __IENGINE_PTEXTYPE_H__
+#ifndef __CS_THING_PTEXTYPE_H__
+#define __CS_THING_PTEXTYPE_H__
 
 #include "csutil/scf.h"
 
@@ -167,4 +167,4 @@ struct iPolyTexLightMap : public iBase
   virtual iPolyTxtPlane* GetPolyTxtPlane () const = 0;
 };
 
-#endif // __IENGINE_PTEXTYPE_H__
+#endif // __CS_THING_PTEXTYPE_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _CS_MOD_SOUNDDATA_H_
-#define _CS_MOD_SOUNDDATA_H_
+#ifndef __CS_MOD_SOUNDDATA_H__
+#define __CS_MOD_SOUNDDATA_H__
 
 /**
  * iSoundData implementation for mod bitdata using mikmod.
@@ -108,4 +108,4 @@ class csModSoundData : public iSoundData
   static bool IsMod (void *Buffer, size_t len);
 };
 
-#endif
+#endif // __CS_MOD_SOUNDDATA_H__

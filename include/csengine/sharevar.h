@@ -110,4 +110,4 @@ public:
   } scfiSharedVariableList;
 };
 
-#endif // __CS_SharedVar_H__
+#endif // __CS_SHAREVAR_H__

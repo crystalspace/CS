@@ -1,5 +1,3 @@
-#ifndef __AWS_FLEXIBLE_PARAMETER_LIST_INTERFACE__
-#define __AWS_FLEXIBLE_PARAMETER_LIST_INTERFACE__
 /**************************************************************************
     Copyright (C) 2001 by Christopher Nelson
 
@@ -17,6 +15,8 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
+#ifndef __CS_AWS_FLEXIBLE_PARAMETER_LIST_INTERFACE_H__
+#define __CS_AWS_FLEXIBLE_PARAMETER_LIST_INTERFACE_H__
 
 #include "csgeom/csrect.h"
 #include "csgeom/cspoint.h"
@@ -80,5 +80,5 @@ struct iAwsParmList : public iBase
   virtual void Clear()=0;
 };
 
-#endif
+#endif // __CS_AWS_FLEXIBLE_PARAMETER_LIST_INTERFACE_H__
 

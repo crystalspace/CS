@@ -1,5 +1,5 @@
-#ifndef __AWS_BAR_CHART_H__
-#define __AWS_BAR_CHART_H__
+#ifndef __CS_AWS_BAR_CHART_H__
+#define __CS_AWS_BAR_CHART_H__
 
 /**************************************************************************
     Copyright (C) 2000-2001 by Christopher Nelson
@@ -144,4 +144,4 @@ public:
   /// Returns a newly created component of the type this factory handles.
   virtual iAwsComponent *Create ();
 };
-#endif
+#endif // __CS_AWS_BAR_CHART_H__

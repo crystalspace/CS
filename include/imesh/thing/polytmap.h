@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_POLYTMAP_H__
-#define __IENGINE_POLYTMAP_H__
+#ifndef __CS_THING_POLYTMAP_H__
+#define __CS_THING_POLYTMAP_H__
 
 #include "csutil/scf.h"
 
@@ -50,5 +50,5 @@ struct iPolyTxtPlane : public iBase
   virtual void GetTextureSpace (csMatrix3& tx_matrix, csVector3& tx_vector) = 0;
 };
 
-#endif // __IENGINE_POLYTMAP_H__
+#endif // __CS_THING_POLYTMAP_H__
 

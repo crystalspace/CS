@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __MOTION_H__
-#define __MOTION_H__
+#ifndef __CS_MOTION_H__
+#define __CS_MOTION_H__
 
 #include "iengine/motion.h"
 #include "iutil/eventh.h"
@@ -258,5 +258,5 @@ public:
 
 iSkeletonBone *csFindBone( iSkeletonBone *bone, unsigned int hash );
 
-#endif
+#endif // __CS_MOTION_H__
 

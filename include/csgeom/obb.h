@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef CS_OBB_H
-#define CS_OBB_H
+#ifndef __CS_OBB_H__
+#define __CS_OBB_H__
 
 /**\file 
  */
@@ -151,5 +151,5 @@ public:
 
 /** @} */
 
-#endif
+#endif // __CS_OBB_H__
 

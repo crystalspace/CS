@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISOMESH_H__
-#define __ISOMESH_H__
+#ifndef __CS_ISOMESH_H__
+#define __CS_ISOMESH_H__
 
 #include "ivaria/iso.h"
 #include "csutil/csobject.h"
@@ -198,5 +198,5 @@ public:
   friend struct MeshFactoryWrapper;
 };
 
-#endif
+#endif // __CS_ISOMESH_H__
 

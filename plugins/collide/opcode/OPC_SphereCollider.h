@@ -17,8 +17,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include Guard
-#ifndef __OPC_SPHERECOLLIDER_H__
-#define __OPC_SPHERECOLLIDER_H__
+#ifndef __CS_OPC_SPHERECOLLIDER_H__
+#define __CS_OPC_SPHERECOLLIDER_H__
 
 	struct // OPCODE_API
        	SphereCache : VolumeCache {
@@ -92,4 +92,4 @@
 							BOOL			InitQuery(SphereCache& cache, const Sphere& sphere, const Matrix4x4* worlds=null, const Matrix4x4* worldm=null);
 	};
 
-#endif // __OPC_SPHERECOLLIDER_H__
+#endif // __CS_OPC_SPHERECOLLIDER_H__

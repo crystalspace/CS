@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __GL_TEXTURECACHE_H__
-#define __GL_TEXTURECACHE_H__
+#ifndef __CS_GL_TEXTURECACHE_H__
+#define __CS_GL_TEXTURECACHE_H__
 
 #include "csutil/scf.h"
 #include "csgeom/csrect.h"
@@ -94,5 +94,5 @@ protected:
 #define DEFAULT_SUPER_LM_SIZE 256
 #define DEFAULT_SUPER_LM_NUM 10
 
-#endif // __GL_TEXTURECACHE_H__
+#endif // __CS_GL_TEXTURECACHE_H__
 

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __EFVECTOR4_H__
-#define __EFVECTOR4_H__
+#ifndef __CS_IVIDEO_EFVECTOR4_H__
+#define __CS_IVIDEO_EFVECTOR4_H__
 
 /**\file
  * Effect 4-component vector
@@ -63,4 +63,4 @@ struct csEffectVector4
 
 /** @} */
 
-#endif // __EFVECTOR4_H__
+#endif // __CS_IVIDEO_EFVECTOR4_H__

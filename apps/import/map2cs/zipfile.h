@@ -1,5 +1,5 @@
-#ifndef ZIPFILE_H
-#define ZIPFILE_H
+#ifndef __ZIPFILE_H__
+#define __ZIPFILE_H__
 
 #include "csutil/archive.h"
 
@@ -34,5 +34,5 @@ public:
   bool WriteArchive() {return Flush();}
 };
 
-#endif
+#endif // __ZIPFILE_H__
 

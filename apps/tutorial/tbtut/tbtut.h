@@ -64,4 +64,4 @@ private:
   iSector* room;
 };
 
-#endif
+#endif // __TBTUT_H__

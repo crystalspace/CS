@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef PK3FILE_H
-#define PK3FILE_H
+#ifndef __PK3FILE_H__
+#define __PK3FILE_H__
 
 #include "contain.h"
 #include "ziparch.h"
@@ -40,4 +40,4 @@ public:
 protected:
 };
 
-#endif
+#endif // __PK3FILE_H__

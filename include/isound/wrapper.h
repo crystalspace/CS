@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISOUND_WRAPPER_H__
-#define __ISOUND_WRAPPER_H__
+#ifndef __CS_ISOUND_WRAPPER_H__
+#define __CS_ISOUND_WRAPPER_H__
 
 #include "csutil/scf.h"
 
@@ -38,4 +38,4 @@ struct iSoundWrapper : public iBase
   virtual iObject *QueryObject () = 0;
 };
 
-#endif // __ISOUND_WRAPPER_H__
+#endif // __CS_ISOUND_WRAPPER_H__

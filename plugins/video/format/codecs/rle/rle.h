@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _CSRLECODEC_H_
-#define _CSRLECODEC_H_
+#ifndef __CS_CSRLECODEC_H__
+#define __CS_CSRLECODEC_H__
 
 #include "ivideo/codec.h"
 #include "plugins/video/format/avi/iavicdec.h"
@@ -42,4 +42,4 @@ class csRLECodec : public iAVICodec
   virtual bool Decode (char *indata, uint32 inlength, void *&outdata);
   virtual bool Encode (void *indata, char *outdata, uint32 &outlength);
 };
-#endif
+#endif // __CS_CSRLECODEC_H__

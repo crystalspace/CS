@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __DIRECTDETECTION_H__
-#define __DIRECTDETECTION_H__
+#ifndef __CS_DIRECTDETECTION_H__
+#define __CS_DIRECTDETECTION_H__
 
 #if WINVER >= 0x0500
   #define DIRECTINPUT_VERSION 0x0800
@@ -141,4 +141,4 @@ public:
   DirectDetectionDevice * Devices; // list of devices
 };
 
-#endif // End of __DIRECTDETECTION_H__
+#endif // __CS_DIRECTDETECTION_H__

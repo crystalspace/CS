@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __INETWORK_SOCKET2__
-#define __INETWORK_SOCKET2__
+#ifndef __CS_INETWORK_SOCKET2_H__
+#define __CS_INETWORK_SOCKET2_H__
 
 #include "csutil/scf.h"
 
@@ -146,4 +146,4 @@ struct iNetworkSocket2 : public iBase
 	*/
 };
 
-#endif
+#endif // __CS_INETWORK_SOCKET2_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_ANIM2D_H__
-#define __CS_ANIM2D_H__
+#ifndef __CS_CSANIM2D_H__
+#define __CS_CSANIM2D_H__
 
 #include "csutil/csvector.h"
 #include "cstool/cspixmap.h"
@@ -95,4 +95,4 @@ private:
   csPixmap *CurrentFrame;
 };
 
-#endif // __CS_ANIM2D__
+#endif // __CS_CSANIM2D_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_LIGHTMAP_H__
-#define __IENGINE_LIGHTMAP_H__
+#ifndef __CS_THING_LIGHTMAP_H__
+#define __CS_THING_LIGHTMAP_H__
 
 #include "csutil/scf.h"
 struct csRGBpixel;
@@ -53,5 +53,5 @@ struct iLightMap : public iBase
   virtual long GetSize () = 0;
 };
 
-#endif
+#endif // __CS_THING_LIGHTMAP_H__
 

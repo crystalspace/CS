@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_VIRTCLK_H_
-#define __CS_VIRTCLK_H_
+#ifndef __CS_VIRTCLK_H__
+#define __CS_VIRTCLK_H__
 
 #include "csutil/scf.h"
 #include "iutil/virtclk.h"
@@ -62,5 +62,5 @@ public:
   virtual csTicks GetCurrentTicks () const { return CurrentTime; }
 };
 
-#endif // __CS_VIRTCLK_H_
+#endif // __CS_VIRTCLK_H__
 

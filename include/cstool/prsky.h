@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __PROCSKYTEX_H__
-#define __PROCSKYTEX_H__
+#ifndef __CS_PROCSKYTEX_H__
+#define __CS_PROCSKYTEX_H__
 
 #include "csgeom/math3d.h"
 #include "csgfx/rgbpixel.h"
@@ -200,4 +200,4 @@ public:
   void SetFirstSky(csProcSkyTexture *s) {firstsky = s;}
 };
 
-#endif // __PROCSKYTEX_H__
+#endif // __CS_PROCSKYTEX_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISOUND_LOADER_H__
-#define __ISOUND_LOADER_H__
+#ifndef __CS_ISOUND_LOADER_H__
+#define __CS_ISOUND_LOADER_H__
 
 #include "csutil/scf.h"
 #include "csutil/ref.h"
@@ -36,4 +36,4 @@ struct iSoundLoader : public iBase
   virtual csPtr<iSoundData> LoadSound(void *Data, unsigned long Size) const = 0;
 };
 
-#endif // __ISOUND_LOADER_H__
+#endif // __CS_ISOUND_LOADER_H__

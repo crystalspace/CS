@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMESH_GENMESH_H__
-#define __IMESH_GENMESH_H__
+#ifndef __CS_IMESH_GENMESH_H__
+#define __CS_IMESH_GENMESH_H__
 
 #include "csutil/scf.h"
 
@@ -157,5 +157,5 @@ struct iGeneralFactoryState : public iBase
   virtual void GenerateBox (const csBox3& box) = 0;
 };
 
-#endif
+#endif // __CS_IMESH_GENMESH_H__
 

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef ISOTEST_H
-#define ISOTEST_H
+#ifndef __ISOTEST_H__
+#define __ISOTEST_H__
 
 #include <stdarg.h>
 #include "csgeom/math2d.h"
@@ -89,5 +89,5 @@ public:
   void Report (int severity, const char* msg, ...);
 };
 
-#endif // ISOTEST_H
+#endif // __ISOTEST_H__
 

@@ -17,8 +17,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include Guard
-#ifndef __OPC_VOLUMECOLLIDER_H__
-#define __OPC_VOLUMECOLLIDER_H__
+#ifndef __CS_OPC_VOLUMECOLLIDER_H__
+#define __CS_OPC_VOLUMECOLLIDER_H__
 
 	struct //OPCODE_API
        	VolumeCache {
@@ -145,5 +145,5 @@
 							}
 	};
 
-#endif // __OPC_VOLUMECOLLIDER_H__
+#endif // __CS_OPC_VOLUMECOLLIDER_H__
 

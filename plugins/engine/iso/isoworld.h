@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISOWORLD_H__
-#define __ISOWORLD_H__
+#ifndef __CS_ISOWORLD_H__
+#define __CS_ISOWORLD_H__
 
 #include "ivaria/iso.h"
 
@@ -53,4 +53,4 @@ public:
   virtual void Draw(iIsoRenderView *rview);
 };
 
-#endif
+#endif // __CS_ISOWORLD_H__

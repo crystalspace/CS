@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSILINE_H__
-#define __CSILINE_H__
+#ifndef __CS_CSILINE_H__
+#define __CS_CSILINE_H__
 
 /**\file
  * Crystal Space Windowing System: input line class
@@ -126,4 +126,4 @@ protected:
 
 /** @} */
 
-#endif // __CSILINE_H__
+#endif // __CS_CSILINE_H__

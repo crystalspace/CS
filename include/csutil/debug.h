@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_UTIL_DEBUG__
-#define __CS_UTIL_DEBUG__
+#ifndef __CS_UTIL_DEBUG_H__
+#define __CS_UTIL_DEBUG_H__
 
 // Enable the following define to have the DG_... macros.
 //#define CS_USE_GRAPHDEBUG
@@ -159,5 +159,5 @@ public:
   	bool reset_mark = true);
 };
 
-#endif //__CS_UTIL_DEBUG__
+#endif //__CS_UTIL_DEBUG_H__
 

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __WENTITY_H
-#define __WENTITY_H
+#ifndef __WENTITY_H__
+#define __WENTITY_H__
 
 #include "csutil/dataobj.h"
 #include "csgeom/vector3.h"
@@ -81,5 +81,5 @@ public:
   virtual void NextFrame (float elapsed_time);
 };
 
-#endif // __WENTITY_H
+#endif // __WENTITY_H__
 

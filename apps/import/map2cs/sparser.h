@@ -20,8 +20,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef SPARSER_H
-#define SPARSER_H
+#ifndef __SPARSER_H__
+#define __SPARSER_H__
 
 /**
   * Defines, how many bytes will be read ahead. This will allow you
@@ -226,4 +226,4 @@ protected:
   int   m_CurrentLine;
 };
 
-#endif
+#endif // __SPARSER_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef DEMOSEQ_H
-#define DEMOSEQ_H
+#ifndef __DEMOSEQ_H__
+#define __DEMOSEQ_H__
 
 #include <stdarg.h>
 #include "csgeom/math2d.h"
@@ -272,5 +272,5 @@ public:
   float GetFPS ();
 };
 
-#endif // DEMOSEQ_H
+#endif // __DEMOSEQ_H__
 

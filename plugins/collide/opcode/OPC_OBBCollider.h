@@ -17,8 +17,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include Guard
-#ifndef __OPC_OBBCOLLIDER_H__
-#define __OPC_OBBCOLLIDER_H__
+#ifndef __CS_OPC_OBBCOLLIDER_H__
+#define __CS_OPC_OBBCOLLIDER_H__
 
 	struct // OPCODE_API
        	OBBCache : VolumeCache 	{
@@ -121,4 +121,4 @@
 							BOOL			InitQuery(OBBCache& cache, const OBB& box, const Matrix4x4* worldb=null, const Matrix4x4* worldm=null);
 	};
 
-#endif // __OPC_OBBCOLLIDER_H__
+#endif // __CS_OPC_OBBCOLLIDER_H__

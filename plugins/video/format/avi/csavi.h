@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _CSAVI_H_
-#define _CSAVI_H_
+#ifndef __CS_CSAVI_H__
+#define __CS_CSAVI_H__
 
 #include "ivideo/codec.h"
 #include "iutil/eventh.h"
@@ -338,4 +338,4 @@ class csAVIFormat : public iStreamFormat
     { return scfParent->Initialize(p); }
   } scfiComponent;
 };
-#endif
+#endif // __CS_CSAVI_H__

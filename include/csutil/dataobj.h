@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __DATAOBJ_H_
-#define __DATAOBJ_H_
+#ifndef __CS_DATAOBJ_H_
+#define __CS_DATAOBJ_H_
 
 #include "csutil/csobject.h"
 
@@ -66,4 +66,4 @@ public:
   } scfiDataObject;
 };
 
-#endif /* __DATAOBJ_H_ */
+#endif // __CS_DATAOBJ_H__

@@ -1,5 +1,16 @@
 The history order is reversed so that new features are at the top.
 
+23-Dec-2002
+	- Andreas Busch cleaned up ifndef's in header files and renamed some
+	  defines to be more CS coding-style compliant. All core-CS header files
+	  are now __CS__FILENAME_or_DESCRIPTION_H__ defined, main include files
+	  have an extra prefix for their belonging library to avoid conflicts
+	  with defines in other files. i.e.:
+	   includes/iaws/aws.h -> __CS_IAWS_AWS_H__
+	   plugins/aws/aws.h   -> __CS_AWS_H__
+	  Applications do not have a CS__-prefix at all. -> __AWS_H__
+	  (The various TXTMGR implementations need to use the same define
+	   at the moment. see renderer/txtmgr.h,render3d/txtmgr.h,aws/av3dtxtm.h) 
 21-Dec-2002
 	- Eric Sunshine removed the NextStep, OpenStep, and MacOS/X Server 1.0
 	  (Rhapsody) ports of Crystal Space.  Implementation files which were

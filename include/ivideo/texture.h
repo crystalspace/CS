@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVIDEO_TEXTURE_H__
-#define __IVIDEO_TEXTURE_H__
+#ifndef __CS_IVIDEO_TEXTURE_H__
+#define __CS_IVIDEO_TEXTURE_H__
 
 /**\file
  * Texture handle interface
@@ -115,4 +115,4 @@ struct iTextureHandle : public iBase
 
 /** @} */
 
-#endif // __IVIDEO_TEXTURE_H__
+#endif // __CS_IVIDEO_TEXTURE_H__

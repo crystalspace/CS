@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef MPOLYSET_H
-#define MPOLYSET_H
+#ifndef __MPOLYSET_H__
+#define __MPOLYSET_H__
 
 #include "contain.h"
 
@@ -116,4 +116,4 @@ protected:
   CMapPolygonVector m_Polygon;
 };
 
-#endif //MPOLYSET_H
+#endif // __MPOLYSET_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSOBJVEC_H__
-#define __CSOBJVEC_H__
+#ifndef __CS_CSOBJVEC_H__
+#define __CS_CSOBJVEC_H__
 
 #include "csutil/csvector.h"
 
@@ -40,4 +40,4 @@ public:
   virtual bool FreeItem (csSome Item);
 };
 
-#endif // __CSOBJVEC_H__
+#endif // __CS_CSOBJVEC_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SNDLOAD_H__
-#define __SNDLOAD_H__
+#ifndef __CS_SNDLOAD_H__
+#define __CS_SNDLOAD_H__
 
 // Some helper functions for the sound loaders
 class csSndFunc {
@@ -31,4 +31,4 @@ public:
   static short int ulaw2linear(unsigned char ulawbyte);
 };
 
-#endif // __SNDLOAD_H__
+#endif // __CS_SNDLOAD_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _AVI_VIDEOSTREAM_H_
-#define _AVI_VIDEOSTREAM_H_
+#ifndef __CS_AVI_VIDEOSTREAM_H__
+#define __CS_AVI_VIDEOSTREAM_H__
 
 #include "ivideo/codec.h"
 #include "csavi.h"
@@ -87,4 +87,4 @@ class csAVIStreamVideo : public iVideoStream
   virtual iMaterialHandle* NextFrameGetMaterial ();
 };
 
-#endif
+#endif // __CS_AVI_VIDEOSTREAM_H__

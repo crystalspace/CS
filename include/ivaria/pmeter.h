@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVARIA_PMETER_H__
-#define __IVARIA_PMETER_H__
+#ifndef __CS_IVARIA_PMETER_H__
+#define __CS_IVARIA_PMETER_H__
 
 #include <stdarg.h>
 #include "csutil/scf.h"
@@ -77,5 +77,5 @@ struct iProgressMeter : public iBase
   virtual int GetGranularity () const = 0;
 };
 
-#endif // __IVARIA_PMETER_H__
+#endif // __CS_IVARIA_PMETER_H__
 

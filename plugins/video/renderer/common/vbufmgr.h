@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __VBUFMGR_H__
-#define __VBUFMGR_H__
+#ifndef __CS_VBUFMGR_H__
+#define __CS_VBUFMGR_H__
 
 #include "csutil/csvector.h"
 #include "csutil/typedvec.h"
@@ -174,5 +174,5 @@ public:
   // subclass!
 };
 
-#endif // __VBUFMGR_H__
+#endif // __CS_VBUFMGR_H__
 

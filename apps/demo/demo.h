@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef DEMO_H
-#define DEMO_H
+#ifndef __DEMO_H__
+#define __DEMO_H__
 
 #include <stdarg.h>
 #include "csgeom/math2d.h"
@@ -96,4 +96,4 @@ public:
   void ShowError (const char* msg, ...);
 };
 
-#endif // DEMO_H
+#endif // __DEMO_H__

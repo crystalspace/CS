@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSSCRBAR_H__
-#define __CSSCRBAR_H__
+#ifndef __CS_CSSCRBAR_H__
+#define __CS_CSSCRBAR_H__
 
 /**\file
  * Crystal Space Windowing System: scroll bar class
@@ -187,4 +187,4 @@ protected:
 
 /** @} */
 
-#endif // __CSSCRBAR_H__
+#endif // __CS_CSSCRBAR_H__

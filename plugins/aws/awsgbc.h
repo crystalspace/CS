@@ -1,5 +1,5 @@
-#ifndef __AWS_GRIDBAG_CONSTRAINTS__
-# define __AWS_GRIDBAG_CONSTRAINTS__
+#ifndef __CS_AWS_GRIDBAG_CONSTRAINTS_H__
+#define __CS_AWS_GRIDBAG_CONSTRAINTS_H__
 
 struct awsGridBagConstraints
 {
@@ -284,4 +284,4 @@ public:
 
   awsGridBagConstraints *Clone ();
 };
-#endif
+#endif // __CS_AWS_GRIDBAG_CONSTRAINTS_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVARIA_SEQUENCE_H__
-#define __IVARIA_SEQUENCE_H__
+#ifndef __CS_IVARIA_SEQUENCE_H__
+#define __CS_IVARIA_SEQUENCE_H__
 
 #include "csutil/scf.h"
 
@@ -216,5 +216,5 @@ struct iSequenceManager : public iBase
   	iBase* params = NULL) = 0;
 };
 
-#endif // __IVARIA_SEQUENCE_H__
+#endif // __CS_IVARIA_SEQUENCE_H__
 

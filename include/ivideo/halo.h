@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVIDEO_HALO_H__
-#define __IVIDEO_HALO_H__
+#ifndef __CS_IVIDEO_HALO_H__
+#define __CS_IVIDEO_HALO_H__
 
 /**\file
  * Halo interface
@@ -67,4 +67,4 @@ struct iHalo : public iBase
 
 /** @} */
 
-#endif
+#endif // __CS_IVIDEO_HALO_H__

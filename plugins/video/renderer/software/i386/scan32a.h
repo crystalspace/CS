@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SCAN32A_H__
-#define __SCAN32A_H__
+#ifndef __CS_SCAN32A_H__
+#define __CS_SCAN32A_H__
 
 #define NO_scan_map_zfil
 #define NO_mmx_scan_map_zfil
@@ -30,4 +30,4 @@
 #define NO_scan_fog
 #define NO_scan_fog_view
 
-#endif // __SCAN32A_H__
+#endif // __CS_SCAN32A_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef BMPIMAGE_H
-#define BMPIMAGE_H
+#ifndef __CS_BMPIMAGE_H__
+#define __CS_BMPIMAGE_H__
 
 #include "csgfx/csimage.h"
 #include "igraphic/imageio.h"
@@ -76,4 +76,4 @@ private:
   bool Load (uint8* iBuffer, uint32 iSize);
 };
 
-#endif
+#endif // __CS_BMPIMAGE_H__

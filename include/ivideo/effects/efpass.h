@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IEFFECTPASS_H__
-#define __IEFFECTPASS_H__
+#ifndef __CS_IVIDEO_EFFECTPASS_H__
+#define __CS_IVIDEO_EFFECTPASS_H__
 
 /**\file
  * Effect pass interface
@@ -83,4 +83,4 @@ struct iEffectPass : public iBase
 
 /** @} */
 
-#endif // __IEFFECTPASS_H__
+#endif // __CS_IVIDEO_EFFECTPASS_H__

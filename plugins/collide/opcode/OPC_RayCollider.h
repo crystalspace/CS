@@ -17,8 +17,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include Guard
-#ifndef __OPC_RAYCOLLIDER_H__
-#define __OPC_RAYCOLLIDER_H__
+#ifndef __CS_OPC_RAYCOLLIDER_H__
+#define __CS_OPC_RAYCOLLIDER_H__
 
 	class //OPCODE_API
        	RayCollider : public Collider 	{
@@ -204,5 +204,5 @@
 							BOOL			InitQuery(const Ray& world_ray, const Matrix4x4* world=null, udword* faceid=null);
 	};
 
-#endif // __OPC_RAYCOLLIDER_H__
+#endif // __CS_OPC_RAYCOLLIDER_H__
 

@@ -162,4 +162,4 @@ public:
 /** @} */
 
 
-#endif //__CS_CSRECTREGION_H__
+#endif // __CS_CSRECTREGION_H__

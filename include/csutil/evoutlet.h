@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSUTIL_EVOUTLET_H__
-#define __CSUTIL_EVOUTLET_H__
+#ifndef __CS_UTIL_EVOUTLET_H__
+#define __CS_UTIL_EVOUTLET_H__
 
 #include "iutil/event.h"
 struct iJoystickDriver;
@@ -76,4 +76,4 @@ public:
   virtual void ImmediateBroadcast (int iCode, void *iInfo);
 };
 
-#endif // __CSUTIL_EVOUTLET_H__
+#endif // __CS_UTIL_EVOUTLET_H__

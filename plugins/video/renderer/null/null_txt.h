@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __NULL_TXT_H__
-#define __NULL_TXT_H__
+#ifndef __CS_NULL_TXT_H__
+#define __CS_NULL_TXT_H__
 
 #include "video/renderer/common/txtmgr.h"
 #include "igraphic/image.h"
@@ -172,4 +172,4 @@ public:
   virtual void UnregisterTexture (csTextureHandleNull* handle);
 };
 
-#endif // __NULL_TXT_H__
+#endif // __CS_NULL_TXT_H__

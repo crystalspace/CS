@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef JNG_H
-#define JNG_H
+#ifndef __CS_JNG_H__
+#define __CS_JNG_H__
 
 #include "csgfx/csimage.h"
 #include "igraphic/imageio.h"
@@ -109,4 +109,4 @@ private:
   bool Load (uint8* iBuffer, uint32 iSize);
 };
 
-#endif // JNG_H
+#endif // __CS_JNG_H__

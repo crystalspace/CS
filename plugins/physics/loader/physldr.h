@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _PHYSLDR_H
-#define _PHYSLDR_H
+#ifndef __CS_PHYSLDR_H__
+#define __CS_PHYSLDR_H__
 
 #include "imap/reader.h"
 #include "iutil/eventh.h"
@@ -76,4 +76,4 @@ private:
   csStringHash xmltokens;
 };
 
-#endif
+#endif // __CS_PHYSLDR_H__

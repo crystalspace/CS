@@ -3,8 +3,8 @@
   You can change these macros to suit your own needs.
   For a description of what each macro does, see mk/user.mak.
 */
-#ifndef __CS_VOLATILE_H__
-#define __CS_VOLATILE_H__
+#ifndef __CS_WIN32_VOLATILE_H__
+#define __CS_WIN32_VOLATILE_H__
 
 #define OS_WIN32
 #if !defined(CS_PLATFORM_NAME)
@@ -48,4 +48,4 @@
 #	undef DO_DINPUT_KEYBOARD
 #endif
 
-#endif // __CS_VOLATILE_H__
+#endif // __CS_WIN32_VOLATILE_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSMOUSE_H__
-#define __CSMOUSE_H__
+#ifndef __CS_CSMOUSE_H__
+#define __CS_CSMOUSE_H__
 
 /**\file
  * Crystal Space Windowing System: mouse support
@@ -146,4 +146,4 @@ private:
 
 /** @} */
 
-#endif // __CSMOUSE_H__
+#endif // __CS_CSMOUSE_H__

@@ -1,5 +1,5 @@
-#ifndef __AWS_BORDER_LAYOUT__
-#define __AWS_BORDER_LAYOUT__
+#ifndef __CS_AWS_BORDER_LAYOUT_H__
+#define __CS_AWS_BORDER_LAYOUT_H__
 
 #include "awslayot.h"
 
@@ -73,4 +73,4 @@ public:
 };
 
 
-#endif
+#endif // __CS_AWS_BORDER_LAYOUT_H__

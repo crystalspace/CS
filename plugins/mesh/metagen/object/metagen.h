@@ -20,8 +20,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __METAGEN_H__
-#define __METAGEN_H__
+#ifndef __CS_METAGEN_H__
+#define __CS_METAGEN_H__
 
 #include <stdarg.h>
 #include "csgeom/math2d.h"
@@ -344,4 +344,4 @@ public:
   } scfiComponent;
 };
 
-#endif // __METAGEN_H__
+#endif // __CS_METAGEN_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IENGINE_RVIEW_H__
-#define __IENGINE_RVIEW_H__
+#ifndef __CS_IENGINE_RVIEW_H__
+#define __CS_IENGINE_RVIEW_H__
 
 /**\file
  */
@@ -432,5 +432,5 @@ struct iRenderView : public iBase
 
 /** @} */
 
-#endif
+#endif // __CS_IENGINE_RVIEW_H__
 

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef COMMAND_H
-#define COMMAND_H
+#ifndef __COMMAND_H__
+#define __COMMAND_H__
 
 #include "ivideo/graph3d.h"
 #include "iutil/vfs.h"
@@ -112,4 +112,4 @@ public:
   static CmdHandler ExtraHandler;
 };
 
-#endif
+#endif // __COMMAND_H__

@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IGRAPHIC_IMAGE_H__
-#define __IGRAPHIC_IMAGE_H__
+#ifndef __CS_IGRAPHIC_IMAGE_H__
+#define __CS_IGRAPHIC_IMAGE_H__
 
 /**\file
  * Image interface
@@ -153,4 +153,4 @@ struct iImage : public iBase
 
 /** @} */
 
-#endif // __IGRAPHIC_IMAGE_H__
+#endif // __CS_IGRAPHIC_IMAGE_H__

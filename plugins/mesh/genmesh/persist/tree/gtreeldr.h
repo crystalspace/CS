@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _GTREELDR_H_
-#define _GTREELDR_H_
+#ifndef __CS_GTREELDR_H__
+#define __CS_GTREELDR_H__
 
 #include "imap/reader.h"
 #include "imap/writer.h"
@@ -348,5 +348,5 @@ public:
   csTriangle* GetTriangles () const { return triangles; }
 };
 
-#endif // _GTREELDR_H_
+#endif // __CS_GTREELDR_H__
 

@@ -1,5 +1,5 @@
-#ifndef __AWS_ITEM_VECTOR__
-# define __AWS_ITEM_VECTOR__
+#ifndef __CS_AWS_ITEM_VECTOR_H__
+#define __CS_AWS_ITEM_VECTOR_H__
 
 # include "csutil/csvector.h"
 
@@ -24,4 +24,4 @@ public:
   /// Set the sort column
   void SetSortCol (int sc)  { sortcol = sc; }
 };
-#endif
+#endif // __CS_AWS_ITEM_VECTOR_H__

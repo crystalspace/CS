@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSSCF_H__
-#define __CSSCF_H__
+#ifndef __CS_SCF_H__
+#define __CS_SCF_H__
 
 /**\file
  * Crystal Space Shared Class Facility (SCF)
@@ -823,4 +823,4 @@ SCF_VERSION (iSCF, 0, 0, 1);
 
 /* @} */
 
-#endif // __CSSCF_H__
+#endif // __CS_SCF_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMESH_FOUNTAIN_H__
-#define __IMESH_FOUNTAIN_H__
+#ifndef __CS_IMESH_FOUNTAIN_H__
+#define __CS_IMESH_FOUNTAIN_H__
 
 #include "csutil/scf.h"
 
@@ -73,5 +73,5 @@ struct iFountainState : public iBase
   virtual float GetFallTime () const = 0;
 };
 
-#endif
+#endif // __CS_IMESH_FOUNTAIN_H__
 

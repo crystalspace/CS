@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVIDEO_GRAPH3D_H__
-#define __IVIDEO_GRAPH3D_H__
+#ifndef __CS_IVIDEO_GRAPH3D_H__
+#define __CS_IVIDEO_GRAPH3D_H__
 
 /**\file
  * 3D graphics interface
@@ -775,5 +775,5 @@ struct iGraphics3D : public iBase
 
 /** @} */
 
-#endif // __IVIDEO_GRAPH3D_H__
+#endif // __CS_IVIDEO_GRAPH3D_H__
 

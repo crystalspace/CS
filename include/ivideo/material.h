@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVIDEO_MATERIAL_H__
-#define __IVIDEO_MATERIAL_H__
+#ifndef __CS_IVIDEO_MATERIAL_H__
+#define __CS_IVIDEO_MATERIAL_H__
 
 /**\file
  * Material interface
@@ -165,4 +165,4 @@ struct iMaterialHandle : public iBase
 
 /** @} */
 
-#endif // __IVIDEO_MATERIAL_H__
+#endif // __CS_IVIDEO_MATERIAL_H__

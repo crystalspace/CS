@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ISOLIGHT_H__
-#define __ISOLIGHT_H__
+#ifndef __CS_ISOLIGHT_H__
+#define __CS_ISOLIGHT_H__
 
 #include "csutil/csvector.h"
 #include "ivaria/iso.h"
@@ -156,4 +156,4 @@ public:
   }
 };
 
-#endif
+#endif // __CS_ISOLIGHT_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef ZIP_H
-#define ZIP_H
+#ifndef __CS_ZIP_H__
+#define __CS_ZIP_H__
 
 #if defined(__cplusplus) && !defined(COMP_BC)
 extern "C" {
@@ -141,4 +141,4 @@ typedef struct
 #      define E_OFFSET_START_CENTRAL_DIRECTORY  12
 #      define E_ZIPFILE_COMMENT_LENGTH          16
 
-#endif /* ZIP_H */
+#endif // __CS_ZIP_H__

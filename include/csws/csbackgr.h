@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSBACKGR_H__
-#define __CSBACKGR_H__
+#ifndef __CS_CSBACKGR_H__
+#define __CS_CSBACKGR_H__
 
 /**\file
  * Crystal Space Windowing System: background class
@@ -111,4 +111,4 @@ public:
 
 /** @} */
 
-#endif // __CSBACKGR_H__
+#endif // __CS_CSBACKGR_H__

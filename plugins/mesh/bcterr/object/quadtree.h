@@ -81,4 +81,4 @@ public:
 
 
 
-#endif
+#endif // __CS_BCQUAD_H__

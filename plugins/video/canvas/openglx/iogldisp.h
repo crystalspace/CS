@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IOGLDISP_H__
-#define __IOGLDISP_H__
+#ifndef __CS_IOGLDISP_H__
+#define __CS_IOGLDISP_H__
 
 #include "csutil/scf.h"
 #include "iutil/comp.h"
@@ -36,4 +36,4 @@ struct iOpenGLDisp : public iComponent
   virtual bool close() = 0;
 };
 
-#endif // __IOGLDISP_H__
+#endif // __CS_IOGLDISP_H__

@@ -18,8 +18,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ICS_SOUND_DRIVER_H__
-#define __ICS_SOUND_DRIVER_H__
+#ifndef __CS_ISOUND_DRIVER_H__
+#define __CS_ISOUND_DRIVER_H__
 
 #include "csutil/scf.h"
 
@@ -59,4 +59,4 @@ struct iSoundDriver : public iBase
   virtual bool ThreadAware (){ return false; }
 };
 
-#endif // __ICS_SOUND_DRIVER_H__
+#endif // __CS_ISOUND_DRIVER_H__

@@ -20,8 +20,8 @@
  * \file
  */
 
-#ifndef __OBJITER_H__
-#define __OBJITER_H__
+#ifndef __CS_OBJITER_H__
+#define __CS_OBJITER_H__
 
 #include "iutil/object.h"
 
@@ -88,4 +88,4 @@ inline bool csTypedObjectIterator::IsFinished () const
 inline bool csTypedObjectIterator::FindName (const char* name)
   { bool r = iter->FindName (name); FetchObject (); return r; }
 
-#endif // __OBJITER_H__
+#endif // __CS_OBJITER_H__

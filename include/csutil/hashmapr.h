@@ -64,5 +64,5 @@ class csHashIteratorReversible : public csHashIterator
   const char* GetKey ();
 };
 
-#endif //__CS_HASHMAPR_H__
+#endif // __CS_HASHMAPR_H__
 

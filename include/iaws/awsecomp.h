@@ -1,5 +1,3 @@
- #ifndef __AWS_EMBEDDED_COMPONENT_H__
- #define __AWS_EMBEDDED_COMPONENT_H__
 /**************************************************************************
     Copyright (C) 2001 by Christopher Nelson
 
@@ -17,6 +15,9 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 *****************************************************************************/
+#ifndef __CS_AWS_EMBEDDED_COMPONENT_H__
+#define __CS_AWS_EMBEDDED_COMPONENT_H__
+
 #include "iaws/aws.h"
 #include "iaws/awsparm.h"
 #include "iutil/event.h"
@@ -490,5 +491,5 @@ class awsEmbeddedComponentFactory : public iAwsComponentFactory
     }
 };
 
-#endif
+#endif // __CS_AWS_EMBEDDED_COMPONENT_H__
 

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSOBJ_H__
-#define __CSOBJ_H__
+#ifndef __CS_CSOBJECT_H__
+#define __CS_CSOBJECT_H__
 
 #include "cstypes.h"
 #include "csutil/util.h"
@@ -117,4 +117,4 @@ public:
   virtual void ObjReleaseOld (iObject *obj);
 };
 
-#endif // __CSOBJ_H__
+#endif // __CS_CSOBJECT_H__

@@ -17,8 +17,8 @@
 	  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSGEOM_TESSELAT_H__
-#define __CSGEOM_TESSELAT_H__
+#ifndef __CS_GEOM_TESSELAT_H__
+#define __CS_GEOM_TESSELAT_H__
 
 /**\file 
  */
@@ -131,4 +131,4 @@ public:
 
 /** @} */
 
-#endif // __CSGEOM_TESSELAT_H__
+#endif // __CS_GEOM_TESSELAT_H__

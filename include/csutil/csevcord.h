@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CSEVCORD__
-#define __CS_CSEVCORD__
+#ifndef __CS_CSEVCORD_H__
+#define __CS_CSEVCORD_H__
 
 #include "csutil/scf.h"
 #include "iutil/event.h"
@@ -85,4 +85,4 @@ public:
   virtual int GetSubcategory() const { return subcategory; }
 };
 
-#endif // ! __CS_CSEVCORD__
+#endif // __CS_CSEVCORD_H__

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __ICLOTHMESH_H__
-#define __ICLOTHMESH_H__
+#ifndef __CS_IMESH_CLOTHMESH_H__
+#define __CS_IMESH_CLOTHMESH_H__
 
 #include "csutil/scf.h"
 
@@ -138,5 +138,5 @@ struct iClothFactoryState : public iBase
   virtual void GenerateFabric ( uint Xsize , uint Ysize ) = 0;
 };
 
-#endif
+#endif // __CS_IMESH_CLOTHMESH_H__
 

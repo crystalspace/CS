@@ -18,8 +18,8 @@
 	  Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSQUEUE_H__
-#define __CSQUEUE_H__
+#ifndef __CS_CSQUEUE_H__
+#define __CS_CSQUEUE_H__
 
 /**\file
  * A thread safe general purpose queue.
@@ -131,5 +131,5 @@ void NAME::Resize ( int len ) \
   Unlock(); \
 }
 
-#endif // __CSQUEUE_H__
+#endif // __CS_CSQUEUE_H__
 

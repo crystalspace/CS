@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _TERRFLDR_H_
-#define _TERRFLDR_H_
+#ifndef __CS_TERRFLDR_H__
+#define __CS_TERRFLDR_H__
 
 #include "imap/reader.h"
 #include "iutil/eventh.h"
@@ -95,4 +95,4 @@ public:
   friend struct eiComponent;
 };
 
-#endif // _TERRFLDR_H_
+#endif // __CS_TERRFLDR_H__

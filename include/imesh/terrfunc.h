@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IMESH_TERRFUNC_H_
-#define __IMESH_TERRFUNC_H_
+#ifndef __CS_IMESH_TERRFUNC_H__
+#define __CS_IMESH_TERRFUNC_H__
 
 #include "csutil/scf.h"
 
@@ -157,5 +157,5 @@ struct iTerrFuncState : public iBase
   virtual int CollisionDetect (csTransform *p) = 0;
 };
 
-#endif // __IMESH_TERRFUNC_H_
+#endif // __CS_IMESH_TERRFUNC_H__
 

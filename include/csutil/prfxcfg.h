@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __PRFXCFG_H__
-#define __PRFXCFG_H__
+#ifndef __CS_PRFXCFG_H__
+#define __CS_PRFXCFG_H__
 
 #include "csutil/cfgfile.h"
 
@@ -47,4 +47,4 @@ private:
   char *Alias;
 };
 
-#endif
+#endif // __CS_PRFXCFG_H__

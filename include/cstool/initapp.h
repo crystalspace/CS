@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CSINITAPP_H__
-#define __CSINITAPP_H__
+#ifndef __CS_INITAPP_H__
+#define __CS_INITAPP_H__
 
 #include "cstypes.h"
 #include "iutil/evdefs.h"
@@ -227,4 +227,4 @@ public:
   static void DestroyApplication (iObjectRegistry*);
 };
 
-#endif // __CSINITAPP_H__
+#endif // __CS_INITAPP_H__

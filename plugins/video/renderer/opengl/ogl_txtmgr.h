@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef TXTMGR_OPENGL_H
-#define TXTMGR_OPENGL_H
+#ifndef __CS_TXTMGR_OPENGL_H__
+#define __CS_TXTMGR_OPENGL_H__
 
 #include "csutil/scf.h"
 #include "video/renderer/common/txtmgr.h"
@@ -219,4 +219,4 @@ csTextureManagerOpenGL::formatDescription var[] = {
 {(GLenum)0, NULL, (GLenum)0, 0, 0, (GLenum)0, 0}};
 
 
-#endif // TXTMGR_OPENGL_H
+#endif // __CS_TXTMGR_OPENGL_H__
