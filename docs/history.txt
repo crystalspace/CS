@@ -47,7 +47,7 @@ The history order is reversed so that new features are at the top.
 	  leaks an scfStrVector object.  The reference count on the returned
 	  object was incorrect; it should have been 1 but was actually 2.
 	- Eric Sunshine changed the Apple/NeXT plugin loading mechanism so that
-	  it now keeps track of currently plugins loaded.  This is necessary
+	  it now keeps track of currently loaded plugins.  This is necessary
 	  since plugins can only be unloaded in reverse order on Apple/NeXT,
 	  whereas SCF expects a platform to be able to unload plugins in any
 	  order.  This issue is further complicated by the fact that SCF
