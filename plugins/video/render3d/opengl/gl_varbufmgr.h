@@ -39,10 +39,17 @@ class csBuddyAllocator
 {
 private:
   //Private constants
+  /*
   static const int CS_ALLOC_GRANULARITY = 0; //Blocksizes in multiple of 4K
   static const int CS_BUDDY_SHIFT = (12+CS_ALLOC_GRANULARITY);
   static const int CS_BUDDY_ADD = ((1<<CS_BUDDY_SHIFT)-1);
-  
+  */
+  enum
+  {
+    CS_ALLOC_GRANULARITY = 0,
+    CS_BUDDY_SHIFT = 12+CS_ALLOC_GRANULARITY,
+    CS_BUDDY_ADD = (1<<CS_BUDDY_SHIFT)-1
+  };
   //helper functions
   int treeSize(int size);
   int ptoi(void* ptr);
