@@ -173,9 +173,9 @@ public: \
   inline TYPE* Pop () {return (TYPE*)csVector::Pop();}\
   bool Delete (int n) {return csVector::Delete(n);}\
   void DeleteAll () {csVector::DeleteAll();}\
-  bool Insert (int n, TYPE* Item) {return Insert(n, Item);}\
-  virtual bool FreeItem (TYPE* Item) {return FreeItem(Item);}\
-  virtual bool Equal (TYPE* Item, const TYPE* Key) const {return Equal(Item, Key);}\
+  bool Insert (int n, TYPE* Item) {return csVector::Insert(n, Item);}\
+  virtual bool FreeItem (TYPE* Item) {return csVector::FreeItem(Item);}\
+  virtual bool Equal (TYPE* Item, const TYPE* Key) const {return csVector::Equal(Item, Key);}\
 };
 
 #endif // __CSVECTOR_H__
