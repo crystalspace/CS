@@ -158,7 +158,8 @@ csPolygonTemplate::csPolygonTemplate (csThingTemplate* parent, char* name,
   vertices_idx = NULL;
   max_vertices = num_vertices = 0;
 
-  strcpy (csPolygonTemplate::name, name);
+  if (name) strcpy (csPolygonTemplate::name, name);
+  else csPolygonTemplate::name[0] = 0;
   csPolygonTemplate::texture = texture;
   csPolygonTemplate::parent = parent;
 
