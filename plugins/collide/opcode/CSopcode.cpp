@@ -186,10 +186,10 @@ bool csOPCODECollideSystem::Collide (
 	udword* indexholder1 = col2->indexholder;
 	
 	Point* current;
-        	int i;
+        unsigned int i;
 	int j;     
 	int size=(int)(udword(TreeCollider.GetNbPairs() ));
-	int oldN=0;
+	unsigned int oldN=0;
 	 if ( pairs ) {
 	csCollisionPair* temporal;
           temporal=new csCollisionPair[N_pairs + size ]	;

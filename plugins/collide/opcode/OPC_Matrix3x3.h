@@ -329,7 +329,7 @@
 		//! this = exp(a)
 				Matrix3x3&		Exp(const Matrix3x3& a)
 				{
-					const int NbTerms = 100;
+					const udword NbTerms = 100;
 					Matrix3x3 Term;	// next term in series
 					Matrix3x3 Temp;
 
