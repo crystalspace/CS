@@ -489,7 +489,7 @@ void CS_STATIC_VAR_DESTRUCTION_REGISTRAR_FUNCTION (void (*p)())        \
 CS_DECLARE_STATIC_VARIABLE_REGISTRATION                       \
 extern "C" {                                                  \
 static Type* getterFunc ();                                   \
-void getterFunc ## _kill ();                                  \
+static void getterFunc ## _kill ();                           \
 void getterFunc ## _kill ()                                   \
 {                                                             \
   delete getterFunc ();                                       \
@@ -537,7 +537,7 @@ static Type &getterFunc ();
 #define CS_IMPLEMENT_STATIC_CLASSVAR(Class,var,getterFunc,Type,initParam)   \
 Type *Class::var = 0;                                                       \
 extern "C" {                                                                \
-void Class ## _ ## getterFunc ## _kill ();                                  \
+static void Class ## _ ## getterFunc ## _kill ();                           \
 void Class ## _ ## getterFunc ## _kill ()                                   \
 {                                                                           \
   delete Class::getterFunc ();                                              \
@@ -560,7 +560,7 @@ Type* Class::getterFunc ()                                                  \
 #define CS_IMPLEMENT_STATIC_CLASSVAR_REF(Class,var,getterFunc,Type,initParam)   \
 Type *Class::var = 0;                                                       \
 extern "C" {                                                                \
-void Class ## _ ## getterFunc ## _kill ();                                  \
+static void Class ## _ ## getterFunc ## _kill ();                           \
 void Class ## _ ## getterFunc ## _kill ()                                   \
 {                                                                           \
   delete &Class::getterFunc ();                                             \
