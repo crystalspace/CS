@@ -100,6 +100,7 @@ TOKEN_DEF_START
   TOKEN_DEF (ACTION)
   TOKEN_DEF (ACTIVATE)
   TOKEN_DEF (ACTIVE)
+  TOKEN_DEF (ADD)
   TOKEN_DEF (ALPHA)
   TOKEN_DEF (ATTENUATION)
   TOKEN_DEF (BECOMING_ACTIVE)
@@ -115,6 +116,7 @@ TOKEN_DEF_START
   TOKEN_DEF (COLOR)
   TOKEN_DEF (COLORS)
   TOKEN_DEF (CONVEX)
+  TOKEN_DEF (COPY)
   TOKEN_DEF (COSFACT)
   TOKEN_DEF (CURVECENTER)
   TOKEN_DEF (CURVECONTROL)
@@ -139,6 +141,7 @@ TOKEN_DEF_START
   TOKEN_DEF (HEIGHT)
   TOKEN_DEF (IDENTITY)
   TOKEN_DEF (KEY)
+  TOKEN_DEF (KEYCOLOR)
   TOKEN_DEF (LEN)
   TOKEN_DEF (LIBRARY)
   TOKEN_DEF (LIGHT)
@@ -152,8 +155,11 @@ TOKEN_DEF_START
   TOKEN_DEF (MERGE_VERTICES)
   TOKEN_DEF (MIPMAP)
   TOKEN_DEF (MIRROR)
+  TOKEN_DEF (MIXMODE)
   TOKEN_DEF (MOVE)
   TOKEN_DEF (MOVEABLE)
+  TOKEN_DEF (MULTIPLY)
+  TOKEN_DEF (MULTIPLY2)
   TOKEN_DEF (NODE)
   TOKEN_DEF (ORIG)
   TOKEN_DEF (PLANE)
@@ -4669,12 +4675,64 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
 
 //---------------------------------------------------------------------------
 
+UInt ParseMixmode (char* buf)
+{
+  TOKEN_TABLE_START (modes)
+    TOKEN_TABLE (COPY)
+    TOKEN_TABLE (MULTIPLY)
+    TOKEN_TABLE (MULTIPLY2)
+    TOKEN_TABLE (ADD)
+    TOKEN_TABLE (ALPHA)
+    TOKEN_TABLE (TRANSPARENT)
+    TOKEN_TABLE (KEYCOLOR)
+  TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+
+  UInt Mixmode = 0;
+
+  while ((cmd = csGetObject (&buf, modes, &name, &params)) > 0)
+  {
+    if (!params)
+    {
+      CsPrintf (MSG_FATAL_ERROR, "Expected parameters instead of '%s'!\n", buf);
+      fatal_exit (0, false);
+    }
+    switch (cmd)
+    {
+      case TOKEN_COPY: Mixmode |= CS_FX_COPY; break;
+      case TOKEN_MULTIPLY: Mixmode |= CS_FX_MULTIPLY; break;
+      case TOKEN_MULTIPLY2: Mixmode |= CS_FX_MULTIPLY2; break;
+      case TOKEN_ADD: Mixmode |= CS_FX_ADD; break;
+      case TOKEN_ALPHA:
+	Mixmode &= ~CS_FX_MASK_ALPHA;
+	float alpha;
+	int ialpha;
+        ScanStr (params, "%f", &alpha);
+	ialpha = QInt (alpha*255.5);
+	Mixmode |= CS_FX_SETALPHA(ialpha);
+	break;
+      case TOKEN_TRANSPARENT: Mixmode |= CS_FX_TRANSPARENT; break;
+      case TOKEN_KEYCOLOR: Mixmode |= CS_FX_KEYCOLOR; break;
+    }
+  }
+  if (cmd == PARSERR_TOKENNOTFOUND)
+  {
+    CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing the modes!\n", csGetLastOffender ());
+    fatal_exit (0, false);
+  }
+  return Mixmode;
+}
+
 bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (VERTICES)
     TOKEN_TABLE (UV)
     TOKEN_TABLE (TEXNR)
+    TOKEN_TABLE (MIXMODE)
     TOKEN_TABLE (MOVE)
   TOKEN_TABLE_END
 
@@ -4686,6 +4744,7 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
   csLoaderStat::sprites_loaded++;
 
   csColoredVertices& verts = spr->GetVertices ();
+  char str[255];
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
@@ -4696,6 +4755,9 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
     }
     switch (cmd)
     {
+      case TOKEN_MIXMODE:
+        spr->SetMixmode (ParseMixmode (params));
+        break;
       case TOKEN_VERTICES:
         {
           float list[100];
@@ -4734,7 +4796,8 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
 
       case TOKEN_TEXNR:
         {
-          csTextureHandle* tex = World->GetTextures ()->FindByName (params);
+          ScanStr (params, "%s", str);
+          csTextureHandle* tex = World->GetTextures ()->FindByName (str);
           if (tex == NULL)
           {
             CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", params);
@@ -4757,6 +4820,7 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
 bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
 {
   TOKEN_TABLE_START (commands)
+    TOKEN_TABLE (MIXMODE)
     TOKEN_TABLE (TEMPLATE)
     TOKEN_TABLE (TEXNR)
     TOKEN_TABLE (MOVE)
@@ -4784,6 +4848,9 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
     }
     switch (cmd)
     {
+      case TOKEN_MIXMODE:
+        spr->SetMixmode (ParseMixmode (params));
+        break;
       case TOKEN_MOVE:
         {
           char* params2;
@@ -4833,7 +4900,8 @@ bool csLoader::LoadSprite (csSprite3D* spr, char* buf)
         break;
 
       case TOKEN_TEXNR:
-        spr->SetTexture (params, World->GetTextures ());
+        ScanStr (params, "%s", str);
+        spr->SetTexture (str, World->GetTextures ());
         // unset_texture ();
         break;
     }

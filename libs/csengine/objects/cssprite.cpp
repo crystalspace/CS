@@ -699,6 +699,24 @@ void csSprite::RemoveFromSectors ()
   }
 }
 
+/// The list of lights that hit the sprite
+static DECLARE_GROWING_ARRAY (light_worktable, csLight*);
+
+void csSprite::UpdateDeferedLighting (const csVector3& pos)
+{
+  if (defered_num_lights)
+  {
+    if (defered_num_lights > light_worktable.Limit ())
+      light_worktable.SetLimit (defered_num_lights);
+
+    csSector* sect = (csSector*)sectors[0];
+    int num_lights = csWorld::current_world->GetNearbyLights (sect,
+      pos, defered_lighting_flags,
+      light_worktable.GetArray (), defered_num_lights);
+    UpdateLighting (light_worktable.GetArray (), num_lights);
+  }
+}
+
 void csSprite::DeferUpdateLighting (int flags, int num_lights)
 {
   defered_num_lights = num_lights;
@@ -738,8 +756,6 @@ static DECLARE_GROWING_ARRAY (fog_verts, G3DFogInfo);
 static DECLARE_GROWING_ARRAY (obj_verts, csVector3);
 /// The list of tween vertices.
 static DECLARE_GROWING_ARRAY (tween_verts, csVector3);
-/// The list of lights that hit the sprite
-static DECLARE_GROWING_ARRAY (light_worktable, csLight*);
 
 csSprite3D::csSprite3D () : csSprite ()
 {
@@ -943,21 +959,6 @@ void csSprite3D::UpdateWorkTables (int max_size)
     fog_verts.SetLimit (max_size);
     obj_verts.SetLimit (max_size);
     tween_verts.SetLimit (max_size);
-  }
-}
-
-void csSprite3D::UpdateDeferedLighting ()
-{
-  if (defered_num_lights)
-  {
-    if (defered_num_lights > light_worktable.Limit ())
-      light_worktable.SetLimit (defered_num_lights);
-
-    csSector* sect = (csSector*)sectors[0];
-    int num_lights = csWorld::current_world->GetNearbyLights (sect,
-      GetW2TTranslation (), defered_lighting_flags,
-      light_worktable.GetArray (), defered_num_lights);
-    UpdateLighting (light_worktable.GetArray (), num_lights);
   }
 }
 
@@ -1224,7 +1225,7 @@ void csSprite3D::Draw (csRenderView& rview)
   }
 
   UpdateWorkTables (tpl->GetNumTexels());
-  UpdateDeferedLighting ();
+  UpdateDeferedLighting (GetW2TTranslation ());
 
   csFrame * cframe = cur_action->GetFrame (cur_frame);
 

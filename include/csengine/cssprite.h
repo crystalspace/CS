@@ -393,6 +393,9 @@ protected:
    */
   virtual void UpdatePolyTreeBBox () = 0;
 
+  /// Update defered lighting.
+  void UpdateDeferedLighting (const csVector3& pos);
+
 public:
   /// List of sectors where this sprite is.
   csNamedObjVector sectors;
@@ -511,9 +514,6 @@ class csSprite3D : public csSprite
 private:
   /// Set the size of internally used tables
   static void UpdateWorkTables (int max_size);
-
-  /// Update defered lighting.
-  void UpdateDeferedLighting ();
 
 public:
   /**

@@ -40,8 +40,39 @@ void csSprite2D::UpdatePolyTreeBBox ()
 {
 }
 
-void csSprite2D::UpdateLighting (csLight** /*lights*/, int /*num_lights*/)
+void csSprite2D::UpdateLighting (csLight** lights, int num_lights)
 {
+  defered_num_lights = 0;
+  csColor color (0, 0, 0);
+
+  csSector* sect = (csSector*)sectors[0];
+  if (sect)
+  {
+    int r, g, b;
+    sect->GetAmbientColor (r, g, b);
+    color.Set (r / 128.0, g / 128.0, b / 128.0);
+  }
+
+  int i;
+  for (i = 0 ; i < num_lights ; i++)
+  {
+    csColor light_color = lights[i]->GetColor () * (256. / NORMAL_LIGHT_LEVEL);
+    float sq_light_radius = lights[i]->GetSquaredRadius ();
+    // Compute light position.
+    csVector3 wor_light_pos = lights[i]->GetCenter ();
+    float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, position);
+    if (wor_sq_dist >= sq_light_radius) continue;
+    float wor_dist = sqrt (wor_sq_dist);
+    float cosinus = 1.;
+    cosinus /= wor_dist;
+    light_color *= cosinus * lights[i]->GetBrightnessAtDistance (wor_dist);
+    color.red += light_color.red;
+    color.green += light_color.green;
+    color.blue += light_color.blue;
+  }
+  color.Clamp (2, 2, 2);
+  for (i = 0 ; i < vertices.Length () ; i++)
+    vertices[i].color = color;
 }
 
 void csSprite2D::Draw (csRenderView& rview)
@@ -51,6 +82,8 @@ void csSprite2D::Draw (csRenderView& rview)
     CsPrintf (MSG_FATAL_ERROR, "Error! Trying to draw a 2D sprite with no texture!\n");
     fatal_exit (0, false);
   }
+
+  UpdateDeferedLighting (position);
 
   // Camera transformation for the single 'position' vector.
   csVector3 cam = rview.Other2This (position);
