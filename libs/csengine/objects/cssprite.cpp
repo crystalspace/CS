@@ -125,20 +125,18 @@ void csFrame::ComputeNormals (csTriangleMesh *mesh, csVector3* object_verts, int
     csVector3 bc = object_verts [tris[i].c] - object_verts [tris[i].b];
     tri_normals [i] = ab % bc;
     float norm = tri_normals[i].Norm ();
-    if (norm) tri_normals[i] /= norm;
+    if (norm)
+        tri_normals[i] /= norm;
   }
 
   // calculate vertex normals, by averaging connected triangle normals
   for (i = 0; i < num_vertices; i++)
   {
     csTriangleVertex &vt = tri_verts->GetVertex (i);
-    // if (vt.num_con_vertices)
     if (vt.num_con_triangles)
     {
-      // csVector3 &v = object_verts [i];
       csVector3 &n = normals [i];
-      // // for some strange reason we have to compute the normal reversed
-      // n = v - object_verts [vt.con_vertices [0]];
+      n = csVector3 (0,0,0);
       for (j = 0; j < vt.num_con_triangles; j++)
         n += tri_normals[vt.con_triangles[j]];
       float norm = n.Norm ();
