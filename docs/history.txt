@@ -53,6 +53,10 @@ chronological order.
 	  accepting only a single plugin name and interface. (bug #858626)
 	- PK implemented the iSaverPlugin for bezier mesh and fixed some bug in
 	  the other Savers.
+	- res fixed a crash with the terrain map after the recent shader
+	  conditions stuff.
+	- res fixed some memory leaks in xmlshader.
+	- res fixed a compile error in bintree.h.
 22-Sep-2004
 	- Jorrit changed the loader so that it only prints certain
 	  notifications if -verbose is given on the commandline. These

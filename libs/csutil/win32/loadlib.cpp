@@ -158,7 +158,7 @@ struct LazyUnloader
   LazyUnloader() {}
   ~LazyUnloader()
   {
-    for (int i = 0; i < modules.Length(); i++)
+    for (size_t i = 0; i < modules.Length(); i++)
     {
       FreeLibrary (modules[i]);
     }

@@ -859,13 +859,15 @@ void csShaderConditionResolver::AddToRealNode (csRealConditionNode* realNode,
   {
     /* There's a variant assigned, (!= csArrayItemNotFound)
        un-assign variant but assign condition */
-    csRealConditionNode* realTrueNode = new csRealConditionNode;
+    csRef<csRealConditionNode> realTrueNode;
+    realTrueNode.AttachNew (new csRealConditionNode);
     realNode->trueNode = realTrueNode;
     trueNode = NewNode ();
     realTrueNode->variant = realNode->variant;
     trueNode->nodes.Push (realTrueNode);
 
-    csRealConditionNode* realFalseNode = new csRealConditionNode;
+    csRef<csRealConditionNode> realFalseNode;
+    realFalseNode.AttachNew (new csRealConditionNode);
     realNode->falseNode = realFalseNode;
     falseNode = NewNode ();
     realFalseNode->variant = nextVariant++;
@@ -894,17 +896,20 @@ void csShaderConditionResolver::AddNode (csConditionNode* parent,
     CS_ASSERT_MSG ("No root but parent? Weird.", parent == 0);
     parent = GetRoot ();
 
-    csRealConditionNode* realNode = new csRealConditionNode;
+    csRef<csRealConditionNode> realNode;
+    realNode.AttachNew (new csRealConditionNode);
     realNode->condition = condition;
     parent->nodes.Push (realNode);
 
-    csRealConditionNode* realTrueNode = new csRealConditionNode;
+    csRef<csRealConditionNode> realTrueNode;
+    realTrueNode.AttachNew (new csRealConditionNode);
     realNode->trueNode = realTrueNode;
     realTrueNode->variant = nextVariant++;
     trueNode = NewNode ();
     trueNode->nodes.Push (realTrueNode);
 
-    csRealConditionNode* realFalseNode = new csRealConditionNode;
+    csRef<csRealConditionNode> realFalseNode;
+    realFalseNode.AttachNew (new csRealConditionNode);
     realNode->falseNode = realFalseNode;
     realFalseNode->variant = nextVariant++;
     falseNode = NewNode ();
@@ -1054,6 +1059,13 @@ csPtr<iShader> csXMLShaderCompiler::CompileShader (iDocumentNode *templ,
   csRef<csXMLShader> shader;
   shader.AttachNew (new csXMLShader (this, templ, forcepriority));
   shader->SetName (templ->GetAttributeValue ("name"));
+  if (do_verbose)
+  {
+    csString str;
+    shader->DumpStats (str);
+    Report(CS_REPORTER_SEVERITY_NOTIFY, 
+      "Shader %s: %s", shader->GetName (), str.GetData ());
+  }
 
   csRef<iShader> ishader (shader);
   return csPtr<iShader> (ishader);
@@ -1198,8 +1210,12 @@ csXMLShader::csXMLShader (csXMLShaderCompiler* compiler,
 
 csXMLShader::~csXMLShader ()
 {
-  if (filename) delete [] filename;
-  delete activeTech;
+  for (size_t i = 0; i < variants.Length(); i++)
+  {
+    delete variants[i].tech;
+  }
+
+  delete[] filename;
   delete resolver;
   delete[] vfsStartDir;
 }
@@ -1376,4 +1392,12 @@ bool csXMLShader::DeactivatePass (size_t ticket)
   bool ret = activeTech ? activeTech->DeactivatePass() : false; 
   activeTech = 0;
   return ret;
+}
+
+void csXMLShader::DumpStats (csString& str)
+{
+  if (resolver->GetVariantCount () == 0)
+    str.Replace ("unvarying");
+  else
+    str.Format ("%lu variations", resolver->GetVariantCount ());
 }

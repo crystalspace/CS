@@ -149,19 +149,18 @@ public:
   { return fail_reason.GetData(); }
 };
 
-struct csRealConditionNode
+struct csRealConditionNode : public csRefCount
 {
   csConditionID condition;
   size_t variant;
 
-  csRealConditionNode* trueNode;
-  csRealConditionNode* falseNode;
+  csRef<csRealConditionNode> trueNode;
+  csRef<csRealConditionNode> falseNode;
 
   csRealConditionNode ()
   {
     condition = csCondAlwaysTrue;
     variant = csArrayItemNotFound;
-    trueNode = falseNode = 0;
   }
 };
 
@@ -175,7 +174,7 @@ struct csRealConditionNode
  */
 struct csConditionNode
 {
-  csPDelArray<csRealConditionNode> nodes;
+  csRefArray<csRealConditionNode> nodes;
 };
 
 /**
@@ -215,6 +214,8 @@ public:
   void SetEvalParams (const csRenderMeshModes* modes,
     const csShaderVarStack* stacks);
   size_t GetVariant ();
+  size_t GetVariantCount () const
+  { return nextVariant; }
 };
 
 class csXMLShader : public iShader, public csObject
@@ -365,6 +366,8 @@ public:
     GetUsedSVContext().PopVariables (stacks); 
   }
 
+  /// Return some info on this shader
+  void DumpStats (csString& str);
 public:
   //Holders
   csXMLShaderCompiler* compiler;

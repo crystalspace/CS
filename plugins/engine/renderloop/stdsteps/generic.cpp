@@ -435,8 +435,8 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
       }
 #endif
       iShader* meshShader = hdl->GetShader (shadertype);
-      size_t newTicket = ticketHelper.GetTicket (
-	mesh->material->GetMaterial (), meshShader, mesh);
+      size_t newTicket = meshShader ? ticketHelper.GetTicket (
+	mesh->material->GetMaterial (), meshShader, mesh) : ~0;
       if ((meshShader != shader) || (newTicket != currentTicket))
       {
         // @@@ Need error reporter

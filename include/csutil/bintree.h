@@ -123,7 +123,7 @@ public:
   void PopulateWith (const csArray<uint32> &keys, const csArray<T> &values)
   {
     CS_ASSERT (! Root);
-    CS_ASSERT (totallen == values.Length ());
+    CS_ASSERT (keys.Length () == values.Length ());
     Root = Populate (keys, values);
   }
 
