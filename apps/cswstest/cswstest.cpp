@@ -462,7 +462,7 @@ void csWsTest::TreeDialog ()
       (void)new csTreeItem (i2, "NextStep");
       (void)new csTreeItem (i2, "OpenStep");
     i2 = new csTreeItem (i1, "Apple");
-      (void)new csTreeItem (i1, "Macintosh");
+      (void)new csTreeItem (i1, "MacOS/9");
       (void)new csTreeItem (i2, "MacOS/X Server");
       (void)new csTreeItem (i2, "MacOS/X");
       (void)new csTreeItem (i2, "Darwin");
@@ -484,7 +484,7 @@ void csWsTest::TreeDialog ()
       (void)new csTreeItem (i2, "glos2 (OpenGL/2 canvas)");
       (void)new csTreeItem (i2, "glx2d (GL/X)");
       (void)new csTreeItem (i2, "glwin32 (Windows OpenGL)");
-      (void)new csTreeItem (i2, "glmac (Macintosh OpenGL)");
+      (void)new csTreeItem (i2, "glmac (MacOS/9 OpenGL)");
       (void)new csTreeItem (i2, "glbe (BeOS OpenGL)");
     i2 = new csTreeItem (i1, "Glide");
       (void)new csTreeItem (i2, "unxglide (Glide on Linux, possibly on FreeBSD)");
