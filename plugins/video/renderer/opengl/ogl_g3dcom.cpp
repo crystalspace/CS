@@ -343,6 +343,7 @@ void csGraphics3DOGLCommon::PerfTest ()
   mesh.num_vertices_pool = 1;
   mesh.clip_portal = CS_CLIP_NEEDED;
   mesh.clip_plane = CS_CLIP_NOT;
+  mesh.clip_z_plane = CS_CLIP_NOT;
   mesh.use_vertex_color = true;
   mesh.do_fog = false;
   mesh.do_morph_texels = false;
@@ -824,7 +825,8 @@ void csGraphics3DOGLCommon::SetDimensions (int width, int height)
   frustum_valid = false;
 }
 
-void csGraphics3DOGLCommon::SetupClipPlanes ()
+void csGraphics3DOGLCommon::SetupClipPlanes (bool add_near_clip,
+	bool add_z_clip)
 {
   if (planes_init) return;
   planes_init = true;
@@ -847,21 +849,23 @@ void csGraphics3DOGLCommon::SetupClipPlanes ()
       glClipPlane ((GLenum)(GL_CLIP_PLANE0+i), plane_eq);
       i1 = i;
     }
-    if (do_near_plane)
+    if (add_near_clip)
     {
       plane_eq[0] = -near_plane.A ();
       plane_eq[1] = -near_plane.B ();
       plane_eq[2] = -near_plane.C ();
       plane_eq[3] = -near_plane.D ();
+      glClipPlane ((GLenum)(GL_CLIP_PLANE0+i), plane_eq);
+      i++;
     }
-    else
+    if (add_z_clip)
     {
       plane_eq[0] = 0;
       plane_eq[1] = 0;
       plane_eq[2] = 1;
       plane_eq[3] = -.001;
+      glClipPlane ((GLenum)(GL_CLIP_PLANE0+i), plane_eq);
     }
-    glClipPlane ((GLenum)(GL_CLIP_PLANE0+i), plane_eq);
   }
 }
 
@@ -1005,6 +1009,7 @@ void csGraphics3DOGLCommon::DebugDrawElements (iGraphics2D* g2d,
   glPushAttrib (GL_ENABLE_BIT|GL_COLOR_BUFFER_BIT|GL_CURRENT_BIT|
   	GL_DEPTH_BUFFER_BIT);
   glDisable (GL_DEPTH_TEST);
+  glDisable (GL_BLEND);
   num_tri3 /= 3;
   int i;
   float x1, y1, x2, y2, x3, y3;
@@ -2079,6 +2084,7 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     bool mirror,
     bool exact_clipping,
     bool plane_clipping,
+    bool z_plane_clipping,
     bool frustum_clipping)
 {
   // Make sure the frustum is ok.
@@ -2135,19 +2141,27 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
 
   // num_planes is the number of planes to test with. If there is no
   // near clipping plane then this will be equal to num_frust.
-  int num_planes;
+  int num_planes = num_frust;
   if (plane_clipping)
   {
   //@@@ If mirror???
     if (transform)
-      frustum_planes[num_frust] = o2c.This2OtherRelative (near_plane);
+      frustum_planes[num_planes] = o2c.This2OtherRelative (near_plane);
     else
-      frustum_planes[num_frust] = near_plane;
-    num_planes = num_frust+1;
+      frustum_planes[num_planes] = near_plane;
+    num_planes++;
   }
-  else
+  if (z_plane_clipping)
   {
-    num_planes = num_frust;
+    // @@@ In principle z-plane clipping can be done more efficiently.
+    // Currently we just do it the general way. Have to think about an
+    // easy way to optimize this.
+    if (transform)
+      frustum_planes[num_planes] = o2c.This2OtherRelative (
+      	csPlane3 (0, 0, -1, .001));
+    else
+      frustum_planes[num_planes] = csPlane3 (0, 0, -1, .001);
+    num_planes++;
   }
 
   csVector3 frust_origin;
@@ -2388,6 +2402,15 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   char how_clip = OPENGL_CLIP_NONE;
   bool use_lazy_clipping = false;
   bool do_plane_clipping = false;
+  bool do_z_plane_clipping = false;
+
+  // First we see how many additional planes we might need because of
+  // z-plane clipping and/or near-plane clipping. These additional planes
+  // will not be usable for portal clipping (if we're using OpenGL plane
+  // clipping).
+  int reserved_planes =
+  	int (do_near_plane && mesh.clip_plane != CS_CLIP_NOT) +
+	int (mesh.clip_z_plane != CS_CLIP_NOT);
 
   if (mesh.clip_portal != CS_CLIP_NOT)
   {
@@ -2424,7 +2447,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       // We cannot use p or P if the clipper has more vertices than the
       // number of hardware planes minus one (for the view plane).
       if ((c == 'p' || c == 'P') &&
-      		clipper->GetNumVertices () >= GLCaps.nr_hardware_planes-1)
+      		clipper->GetNumVertices ()
+		>= GLCaps.nr_hardware_planes-reserved_planes)
         continue;
       how_clip = c;
       break;
@@ -2436,29 +2460,42 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     }
   }
 
-  // Check for the near plane.
-  if (mesh.clip_plane != CS_CLIP_NOT)
+  // Check for the near-plane.
+  if (do_near_plane && mesh.clip_plane != CS_CLIP_NOT)
   {
-    // @@@@@@@@@@@@@@@@@@
-    // What about the case where geometry straddles both the Z=0 and
-    // near plane independently? We need two extra planes in that case.
-    // @@@@@@@@@@@@@@@@@@
-    if (do_near_plane)
+    do_plane_clipping = true;
+    // If we must do clipping to the near plane then we cannot use
+    // lazy clipping.
+    use_lazy_clipping = false;
+    // If we are doing plane clipping already then we don't have
+    // to do additional software plane clipping as the OpenGL plane
+    // clipper can do this too.
+    if (how_clip == 'p')
     {
-      do_plane_clipping = true;
-      // If we must do clipping to the near plane then we cannot use
-      // lazy clipping.
+      do_plane_clipping = false;
+    }
+  }
+
+  // Check for the z-plane.
+  if (mesh.clip_z_plane != CS_CLIP_NOT)
+  {
+    do_z_plane_clipping = true;
+    // If hardware requires clipping to the z-plane (because it
+    // crashes otherwise) we have to disable lazy clipping.
+    // @@@
+    if (true)
+    {
       use_lazy_clipping = false;
+    }
+    else
+    {
       // If we are doing plane clipping already then we don't have
       // to do additional software plane clipping as the OpenGL plane
       // clipper can do this too.
       if (how_clip == 'p')
       {
-        do_plane_clipping = false;
+        do_z_plane_clipping = false;
       }
-    }
-    else
-    {
     }
   }
 
@@ -2531,7 +2568,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   //===========
   // Here we perform lazy or software clipping if needed.
   //===========
-  if (how_clip == '0' || use_lazy_clipping || do_plane_clipping)
+  if (how_clip == '0' || use_lazy_clipping
+  	|| do_plane_clipping || do_z_plane_clipping)
   {
     ClipTriangleMesh (
 	num_triangles,
@@ -2547,6 +2585,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 	mesh.do_mirror,
 	!use_lazy_clipping,
 	do_plane_clipping,
+	do_z_plane_clipping,
 	how_clip == '0' || use_lazy_clipping);
     if (!use_lazy_clipping)
     {
@@ -2573,9 +2612,10 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   }
   else if (how_clip == 'p')
   {
-    SetupClipPlanes ();
+    SetupClipPlanes (do_near_plane && mesh.clip_plane != CS_CLIP_NOT,
+    	mesh.clip_z_plane != CS_CLIP_NOT);
     clip_planes_enabled = true;
-    for (i = 0 ; i <= frustum.GetNumVertices () ; i++)	// One extra!
+    for (i = 0 ; i < frustum.GetNumVertices ()+reserved_planes ; i++)
       glEnable ((GLenum)(GL_CLIP_PLANE0+i));
   }
 
@@ -2644,7 +2684,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   glLoadIdentity ();
 
   // With the back buffer procedural textures the orthographic projection
-  // matrix are inverted.
+  // matrix is inverted.
   if (inverted)
     glOrtho (0., (GLdouble) width, (GLdouble) height, 0., -1.0, 10.0);
   else
@@ -2899,7 +2939,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   if (stencil_enabled)
     glDisable (GL_STENCIL_TEST);
   if (clip_planes_enabled)
-    for (i = 0 ; i <= frustum.GetNumVertices () ; i++)	// One extra!
+    for (i = 0 ; i < frustum.GetNumVertices ()+reserved_planes ; i++)
       glDisable ((GLenum)(GL_CLIP_PLANE0+i));
 
   SetMirrorMode (false);

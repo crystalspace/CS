@@ -319,13 +319,15 @@ struct csTriangle
 
 
 /**
- * Clipping requirement for DrawTriangleMesh.
+ * Clipping requirement for DrawTriangleMesh (setting for clip_portal,
+ * clip_plane, or clip_z_plane).
  * No clipping required.
  */
 #define CS_CLIP_NOT 0
 
 /**
- * Clipping requirement for DrawTriangleMesh.
+ * Clipping requirement for DrawTriangleMesh (setting for clip_portal,
+ * clip_plane, or clip_z_plane).
  * Clipping may be needed. Depending on the type of the clipper
  * (one of the CS_CLIPPER_??? flags) the renderer has to clip or
  * not.
@@ -333,10 +335,10 @@ struct csTriangle
 #define CS_CLIP_NEEDED 1
 
 /**
- * Clipping requirement for DrawTriangleMesh.
+ * Clipping requirement for DrawTriangleMesh (setting for clip_portal).
  * Clipping is not needed for the current clipper but it might
- * be needed for the toplevel clipper. If used for 'clip_plane' then
- * this means we have to clip to Z=SMALL_Z.
+ * be needed for the toplevel clipper. This setting will never
+ * be used for clip_plane or clip_z_plane.
  */
 #define CS_CLIP_TOPLEVEL 2
 
@@ -373,6 +375,8 @@ struct G3DTriangleMesh
   int clip_portal;
   /// Clip to near plane? One of CS_CLIP_???.
   int clip_plane;
+  /// Clip to z plane? One of CS_CLIP_???.
+  int clip_z_plane;
 
   /// Use precalculated vertex color?
   bool use_vertex_color;

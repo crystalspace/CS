@@ -33,6 +33,23 @@ The history order is reversed so that new features are at the top.
 	  hierarchical mesh setup.
 	- Added iMeshWrapper::GetParentContainer() to get the parent
 	  (either iEngine or iMeshWrapper) from a mesh wrapper.
+	- Added clip_z_plane to G3DTriangleMesh. Clipping to the z-plane
+	  or to the (optional) near plane should be considered seperate.
+	  It is possible for an object to go beyond both planes independently.
+	- Extended csRenderView/iRenderView::ClipBBox() with a new
+	  clip_z_plane parameter.
+	- Fixed all mesh plugins to correctly fill the triangle mesh
+	  with the new clip_z_plane parameter from ClipBBox().
+	- The OpenGL renderer will now correctly look at the new clip_z_plane
+	  flag and handle it accordingly. The software renderer still ignores
+	  plane clipping though.
+	- Fixed a bug in OpenGL edge drawing. It was not disabling GL_BLEND
+	  before drawing the line.
+	- The OpenGL renderer will now always clip geometry to the z=0
+	  plane if needed (for DrawTriangleMesh). It appears that with this
+	  feature the need for screen clipping is no longer there. The
+	  flag is still in opengl.cfg though in case it IS still needed
+	  but it may be that everything is ok now.
 7-Jun-2001
 	- Justin Miller fixed a minor syntax error in csview.h.
 	- Wouter Wijngaards gave the start to implementing a visibility

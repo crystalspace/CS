@@ -284,14 +284,16 @@ bool csSurfMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   	movable->GetUpdateNumber (), fov, shiftx, shifty,
   	tr_o2c, sbox, cbox) < 0)
     return false;
-  int clip_portal, clip_plane;
-  if (rview->ClipBBox (sbox, cbox, clip_portal, clip_plane) == false)
+  int clip_portal, clip_plane, clip_z_plane;
+  if (rview->ClipBBox (sbox, cbox, clip_portal, clip_plane,
+  	clip_z_plane) == false)
     return false;
 
   iClipper2D* clipper; clipper = rview->GetClipper ();
   g3d->SetObjectToCamera (&tr_o2c);
   mesh.clip_portal = clip_portal;
   mesh.clip_plane = clip_plane;
+  mesh.clip_z_plane = clip_z_plane;
   mesh.do_mirror = camera->IsMirrored ();
   return true;
 }

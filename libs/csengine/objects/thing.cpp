@@ -1297,8 +1297,8 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
     csBox2 sbox;
     if (c->GetScreenBoundingBox (obj_cam, icam, cbox, sbox) < 0)
       continue;	// Not visible.
-    int clip_portal, clip_plane;
-    if (!rview->ClipBBox (sbox, cbox, clip_portal, clip_plane))
+    int clip_portal, clip_plane, clip_z_plane;
+    if (!rview->ClipBBox (sbox, cbox, clip_portal, clip_plane, clip_z_plane))
       continue;	// Not visible.
 
     // If we have a dirty lightmap recombine the curves and the shadow maps.
@@ -1327,6 +1327,7 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
     mesh.triangles = tess->GetTriangles ();
     mesh.clip_portal = clip_portal;
     mesh.clip_plane = clip_plane;
+    mesh.clip_z_plane = clip_z_plane;
     mesh.vertex_fog = fog_verts.GetArray ();
     bool gouraud = !!c->lightmap;
     mesh.fxmode = CS_FX_COPY | (gouraud ? CS_FX_GOURAUD : 0);

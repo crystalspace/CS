@@ -268,7 +268,7 @@ private:
   /// Make sure the stencil is correct for the current clipper.
   void SetupStencil ();
   /// Make sure the OpenGL clipping planes are correct for the current clipper.
-  void SetupClipPlanes ();
+  void SetupClipPlanes (bool add_near_clip, bool add_z_clip);
 
   /// Do a performance test to find out the best configuration for OpenGL.
   void PerfTest ();
@@ -291,6 +291,7 @@ private:
     bool mirror,
     bool exact_clipping,
     bool plane_clipping,	// Clip to the near plane
+    bool z_plane_clipping,	// Clip to the z plane
     bool frustum_clipping);	// Clip to the frustum planes
 
   /**

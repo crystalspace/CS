@@ -164,11 +164,14 @@ public:
   virtual void CalculateFogPolygon (G3DPolygonDPFX& ) {}
   virtual void CalculateFogMesh (const csTransform& , G3DTriangleMesh& ) {}
   virtual bool ClipBBox (const csBox2& /*sbox*/, const csBox3& /*cbox*/,
-          int& clip_portal, int& clip_plane) 
+          int& clip_portal, int& clip_plane, int& clip_z_plane) 
   {
-    /// could clip more efficiently
+    // could clip more efficiently
+    // @@@ WARNING! This is potentially unsafe. A mesh that must be clipped
+    // MUST be clipped!
     clip_portal = false;
     clip_plane = false;
+    clip_z_plane = false;
     return true;
   }
 

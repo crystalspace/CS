@@ -882,8 +882,9 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (GetScreenBoundingBox (camera->GetCameraNumber (),
   	movable->GetUpdateNumber (), fov, shiftx, shifty,
   	tr_o2c, bbox, bbox3) < 0) return false;	// Not visible.
-  int clip_portal, clip_plane;
-  if (rview->ClipBBox (bbox, bbox3, clip_portal, clip_plane) == false)
+  int clip_portal, clip_plane, clip_z_plane;
+  if (rview->ClipBBox (bbox, bbox3, clip_portal, clip_plane,
+  	clip_z_plane) == false)
     return false;
  
   UpdateWorkTables (factory->GetNumTexels());
@@ -1057,6 +1058,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   g3dmesh.use_vertex_color = !!vertex_colors;
   g3dmesh.clip_portal = clip_portal;
   g3dmesh.clip_plane = clip_plane;
+  g3dmesh.clip_z_plane = clip_z_plane;
   g3dmesh.do_mirror = camera->IsMirrored ();
   g3dmesh.do_morph_texels = false;
   g3dmesh.do_morph_colors = false;

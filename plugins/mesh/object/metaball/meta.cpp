@@ -192,12 +192,14 @@ bool csMetaBall::DrawTest( iRenderView* rview, iMovable* movable)
   if ( GetScreenBoundingBox( cam->GetCameraNumber(), 
 	movable->GetUpdateNumber(), fov, shftx,shfty, tr_o2c, sbox, cbox ) < 0)
 	return false;
-  int clip_portal, clip_plane;
-  if (rview->ClipBBox( sbox,cbox, clip_portal, clip_plane) == false )
-	return false;
+  int clip_portal, clip_plane, clip_z_plane;
+  if (rview->ClipBBox( sbox,cbox, clip_portal, clip_plane,
+  	clip_z_plane) == false )
+    return false;
   g3d->SetObjectToCamera( &tr_o2c );
   mesh->clip_portal = clip_portal;
   mesh->clip_plane = clip_plane;
+  mesh->clip_z_plane = clip_z_plane;
   mesh->do_mirror = cam->IsMirrored();
   return true;
 }

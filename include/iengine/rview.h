@@ -146,7 +146,7 @@ public:
   int draw_rec_level;
 };
 
-SCF_VERSION (iRenderView, 0, 1, 2);
+SCF_VERSION (iRenderView, 0, 1, 3);
 
 /**
  * This interface represents all information needed to render
@@ -261,12 +261,13 @@ struct iRenderView : public iBase
   	G3DTriangleMesh& mesh) = 0;
   /**
    * Check if the screen bounding box of an object is visible in
-   * this render view. If true is returned (visible) then clip_plane
-   * and clip_portal will be set to the right value depending on wether or
-   * not clipping is wanted. This function also does far plane clipping.
+   * this render view. If true is returned (visible) then clip_plane,
+   * clip_z_plane, and clip_portal will be set to the right value depending
+   * on wether or not clipping is wanted. This function also does far
+   * plane clipping.
    */
   virtual bool ClipBBox (const csBox2& sbox, const csBox3& cbox,
-      	int& clip_portal, int& clip_plane) = 0;
+      	int& clip_portal, int& clip_plane, int& clip_z_plane) = 0;
 
   /**
    * Get current sector.

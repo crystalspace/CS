@@ -191,7 +191,7 @@ private:
    * Computed flags are for DrawTriangleMesh.
    */
   bool BBoxVisible (const csBox3& bbox, iRenderView* rview, iCamera* camera,
-	int& clip_portal, int& clip_plane);
+	int& clip_portal, int& clip_plane, int& clip_z_plane);
 
 public:
   /// Constructor.

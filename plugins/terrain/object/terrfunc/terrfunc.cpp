@@ -1194,7 +1194,7 @@ static void Perspective (const csVector3& v, csVector2& p, float fov,
 
 bool csTerrFuncObject::BBoxVisible (const csBox3& bbox,
     	iRenderView* rview, iCamera* camera,
-	int& clip_portal, int& clip_plane)
+	int& clip_portal, int& clip_plane, int& clip_z_plane)
 {
   csReversibleTransform& camtrans = camera->GetTransform ();
   float fov = camera->GetFOV ();
@@ -1239,7 +1239,7 @@ bool csTerrFuncObject::BBoxVisible (const csBox3& bbox,
     sbox.AddBoundingVertexSmart (oneCorner);
   }
 
-  return rview->ClipBBox (sbox, cbox, clip_portal, clip_plane);
+  return rview->ClipBBox (sbox, cbox, clip_portal, clip_plane, clip_z_plane);
 }
 
 void csTerrFuncObject::TestVisibility (iRenderView* rview)
@@ -1276,8 +1276,9 @@ void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
       csTerrBlock& block = blocks[blidx];
       //CS_ASSERT (block.node != NULL);
       //if (!block.node->IsVisible ()) continue;
-      int clip_portal, clip_plane;
-      if (BBoxVisible (block.bbox, rview, pCamera, clip_portal, clip_plane))
+      int clip_portal, clip_plane, clip_z_plane;
+      if (BBoxVisible (block.bbox, rview, pCamera, clip_portal, clip_plane,
+      	clip_z_plane))
       {
         csVector3& bc = block.center;
         int lod = 0;
@@ -1293,6 +1294,7 @@ void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
         m->do_mirror = pCamera->IsMirrored ();
 	m->clip_portal = clip_portal;
 	m->clip_plane = clip_plane;
+	m->clip_z_plane = clip_z_plane;
 	rview->CalculateFogMesh (camtrans, *m);
         pG3D->DrawTriangleMesh (*m);
       }
