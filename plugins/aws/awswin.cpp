@@ -105,41 +105,49 @@ awsWindow::OnLower()
 bool 
 awsWindow::OnMouseDown(int button, int x, int y)
 {
+  return false;
 }
     
 bool 
 awsWindow::OnMouseUp(int button, int x, int y)
 {
+  return false;
 }
 
 bool 
 awsWindow::OnMouseMove(int button, int x, int y)
 {
+  return false;
 }
 
 bool 
 awsWindow::OnMouseExit()
 {
+  return false;
 }
 
 bool 
 awsWindow::OnMouseEnter()
 {
+  return false;
 }
 
 bool 
 awsWindow::OnKeypress(int key)
 {
+  return false;
 }
 
 bool 
 awsWindow::OnLostFocus()
 {
+  return false;
 }
 
 bool 
 awsWindow::OnGainFocus()
 {
+  return false;
 }
 
 void 
