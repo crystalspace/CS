@@ -1176,7 +1176,6 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 
 void csGLRender3D::SetShadowState (int state)
 {
-  return;
   switch (state)
   {
   case CS_SHADOW_VOLUME_BEGIN:
