@@ -346,7 +346,7 @@ bool csVARRenderBufferManager::ReclaimMemory()
   {
     if((*dynamicIt)->Discard())
       return true;
-    dynamicIt--;
+    --dynamicIt;
   }
 
   csList<csVARRenderBuffer*>::Iterator staticIt(staticList, true);
@@ -354,7 +354,7 @@ bool csVARRenderBufferManager::ReclaimMemory()
   {
     if((*staticIt)->Discard())
       return true;
-    staticIt--;
+    --staticIt;
   }
   return false;
 }

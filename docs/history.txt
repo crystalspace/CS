@@ -28,6 +28,11 @@ The history order is reversed so that new features are at the top.
 	  confusion around csYRotMatrix3 which works differently as to how
 	  CS works in general.
 	- Jorrit fixed csNodeIterator to the new iterator syntax.
+	- Jorrit changed the VERY inefficient post-increment/decrement
+	  operators in csList<T>::Iterator to use pre-increment/decrement
+	  instead. Otherwise you get a lot of unneeded object creation.
+	  Also added Next() as a synonym to ++ so that you can now
+	  use the standard while (HasNext()) { Next(); ...} construct too.
         - DeSigna corrected a range checking bug in csString::SubString(), 
 	  and made the second range argument a length instead of an index.
 4-June-2003

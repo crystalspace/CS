@@ -110,15 +110,22 @@ public:
       ptr = 0;
     }
 
-    inline Iterator operator++(int)
+    inline T* Next ()
+    {
+      csListElement* p;
+      ptr = ptr->next;
+      return &p->data;
+    }
+
+    inline Iterator& operator++()
     { 
       ptr = ptr->next;
-      return Iterator(ptr);
+      return *this;
     }
-    inline Iterator operator--(int)
+    inline Iterator& operator--()
     { 
       ptr = ptr->prev;
-      return Iterator(ptr);
+      return *this;
     }
   protected:
     friend class csList;
