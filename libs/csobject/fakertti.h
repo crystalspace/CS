@@ -27,7 +27,11 @@
 typedef const char* csIdStr;
 
 
-///
+/**
+ * A class that represents the dynamic type of an object.
+ * Under the pseudo RTTI system, this class represents the type of
+ * an object, which can be retrieved via the Type() or GetType() calls.
+ */
 class csIdType
 {
 private:
@@ -59,30 +63,30 @@ public:
   /// Get the base type of this type.
   const csIdType* GetBase() const { return base; }
 
-  ///
+  /// Returns the csIdStr of this object, which represents name of the class.
   csIdStr operator*() const { return entries[length]; }
 
-  ///
+  /// Compares whether one object's type is derived from the other.
   bool operator< (const csIdType& id) const 
   { return length < id.length && entries[length] == id.entries[length]; }
 
-  ///
+  /// Compares whether one object's type is derived from the other.
   bool operator<= (const csIdType& id) const 
   { return length <= id.length && entries[length] == id.entries[length]; }
 
-  ///
+  /// Compares whether one object's type is derived from the other.
   bool operator> (const csIdType& id) const 
   { return length > id.length && entries[id.length] == id.entries[id.length]; }
 
-  ///
+  /// Compares whether one object's type is derived from the other.
   bool operator>= (const csIdType& id) const
   { return length >= id.length && entries[id.length] == id.entries[id.length]; }
 
-  ///
+  /// Compares whether the two objects have the same dynamic type.
   bool operator==(const csIdType& id) const 
   { return length==id.length && entries[length]==id.entries[length]; }
 
-  ///
+  /// Compares whether neither object is derived from the other.
   bool operator!=(const csIdType& id) const 
   { return !(*this<=id) && !(id<=*this); }
 };

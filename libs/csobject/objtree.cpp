@@ -200,3 +200,32 @@ void csObjTree::CollapseTree()
   CHK(delete tempnodes[0]);
   CHK(delete[] tempnodes);
 }
+
+class csObjTreeCopy : public csObjTree
+{
+protected:
+  csObjTree* orig_tree;
+public:
+  csObjTreeCopy(csObjTree& objtree) 
+  : csObjTree(objtree), orig_tree(&objtree) {}
+
+  ~csObjTreeCopy()
+  { 
+    children = NULL;
+    subnodes = NULL;
+  }
+
+  void Update()
+  { *this = *orig_tree; }
+
+  virtual void ObjAdd(csObject* csobj)
+  { orig_tree->ObjAdd(csobj);  Update(); } 
+  virtual void ObjRelease(csObject* csobj)
+  { orig_tree->ObjRelease(csobj);  Update(); }
+};
+
+csObjTree* csObjTree::GetCopy()
+{
+  CHK(csObjTree* otree = new csObjTreeCopy(*this));
+  return otree;
+}

@@ -22,7 +22,10 @@
 
 #include "csobject/csobj.h"
 
-///
+/**
+ * A csObject which contains a name.
+ * This object is used to attach names to existing csObjects.
+ */
 class csNameObject : public csObject
 {
 protected:
@@ -32,10 +35,13 @@ protected:
 public:
   /// Initialize this object with name 'n'
   csNameObject(const char* n);
+
   /// Retrieve the name of a csObject, if one exists.
   static const char* GetName(csObject& csobj);
+
   /// Tag a name onto the given csobject.
   static void AddName(csObject& csobj, const char* name);
+
   ///
   const char* Name() const { return name; }
   

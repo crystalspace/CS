@@ -31,12 +31,15 @@
 
 // Note: this implementation of csObject doesn't include the 'name' field.
 // if a name is necessary, then a csNameObject can be created and attached.
-// Also, it doesn't include the CS_ID number.  I'm not sure about the
-// usefulnes of CS_ID... I've done plenty of CS debugging, but I've never
-// needed it.  OTOH, some sort of csIDObject can be attached if necessary
-// for debugging purposes.
 
-///
+/**
+ * A generic csObject class.
+ * Any csObject can have any number of csObject children attached to it
+ * via the csObject tree.  
+ * In order to make a class (let's call it newClass) that derives from 
+ * csObject, the class must contain "CSOBJTYPE;" in the declaration.  The
+ * corresponding .cpp file should contain "CSOBJTYPE(newClass,parentClass);"
+ */ 
 class csObject : public csBase
 {
   private:
@@ -56,6 +59,8 @@ class csObject : public csBase
     csObject();
     ///
     ~csObject();
+    ///
+    csObject(csObject& csobj);
 
     /// Returns the parent csObject.  Not required.
     virtual csObject* GetObjectParent() { return NULL; }
@@ -66,7 +71,7 @@ class csObject : public csBase
     /// Return an iterator referencing all objects of the given type
     csObjIterator ObjGet(const csIdType& objtype);
 
-    ///
+    /// Attach a new csObject to the tree
     void ObjAdd(csObject* obj);
 
     /// Removes the given object from the tree, without freeing the contents

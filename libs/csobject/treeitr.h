@@ -22,7 +22,18 @@
 
 #include "csobject/objtree.h"
 
-///
+/**
+ * An iterator for a node in a csObject tree.
+ * Used by the csObject::ObjGet() call.  This object behaves similar to
+ * a pointer, and is used to traverse through several csObjects in the
+ * tree.  
+ *  
+ * Example usage:
+ * csObjIterator i;
+ * *i;   (returns a csObject&)
+ * ++i;  (moves to the next csObject)
+ * i.IsNull() (returns true if i has reached the end of the list)
+ */
 class csObjIterator
 {
 protected:

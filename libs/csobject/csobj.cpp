@@ -33,6 +33,14 @@ csObject::csObject() : csBase(), objtree(NULL)
 csObject::~csObject() 
 { if (objtree) CHKB(delete objtree); }
 
+csObject::csObject(csObject& csobj) : csBase(), objtree(NULL)
+#ifdef __USE_CS_ID_CODE
+  , csid_value(csobj.csid_value)
+#endif
+{
+  if (csobj.objtree) objtree = csobj.objtree->GetCopy(); 
+}
+
 csObject* csObject::GetObject(const csIdType& objtype)
 {
   if (!objtree) return NULL;

@@ -24,7 +24,9 @@
 
 class csObject;
 
-///
+/**
+ * A tree of csObjects, used internally by the csObject class.
+ */
 class csObjTree
 {
 protected:
@@ -45,11 +47,25 @@ protected:
 
 public:
   
-  ///
+  /**
+   * Create a new object tree.
+   * If csobj is non-NULL, the object tree is started with the single object
+   * 'csobj' in it.
+   */
   csObjTree(csObject* csobj = NULL);
 
   ///
-  ~csObjTree();
+  virtual ~csObjTree();
+
+  /**
+   * Returns a csObjTree which points to the same data as this tree.
+   * The copy of the csObjTree functions the same as the original, except
+   * that the csObject data within is not freed when the csObjTree is 
+   * destroyed.  
+   * If the original tree is destroyed before the copy, then the data in the
+   * copy is no longer valid.
+   */
+  csObjTree* GetCopy();
 
   /**
    * Returns the tree node representing the given object type.
@@ -76,10 +92,10 @@ public:
   bool IsEmpty();
 
   /// Add the csObject to the tree.
-  void ObjAdd(csObject* csobj);
+  virtual void ObjAdd(csObject* csobj);
 
   /// Release the the csObject from the tree.
-  void ObjRelease(csObject* csobj);
+  virtual void ObjRelease(csObject* csobj);
 
   /// Returns the polymorphic type of this node
   const csIdType& GetType() const { return nodetype; }
