@@ -601,9 +601,13 @@ class GhostSpriteInfo : public csObject
 public:
   float dir;
   CSOBJTYPE;
+  DECLARE_OBJECT_INTERFACE;
 };
 
 IMPLEMENT_CSOBJTYPE (GhostSpriteInfo, csObject);
+
+IMPLEMENT_OBJECT_INTERFACE (GhostSpriteInfo)
+IMPLEMENT_OBJECT_INTERFACE_END
 
 // Recursive function to add limbs to a skeletal ghost. This also builds
 // the sprite template.
@@ -857,7 +861,7 @@ void move_ghost (csMeshWrapper* spr)
 
   // Turn around at random intervals.
   GhostSpriteInfo* gh_info = (GhostSpriteInfo*)
-  	spr->GetChild (GhostSpriteInfo::Type);
+  	spr->GetChild (OBJECT_TYPE_ID(GhostSpriteInfo));
   if (rand () % 40 == 1) gh_info->dir = -gh_info->dir;
 
   // OpenStep compiler bug prevents Transform(GetYRotation()), which is why

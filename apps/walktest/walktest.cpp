@@ -97,6 +97,11 @@ REGISTER_STATIC_LIBRARY (lvlload)
 //-----------------------------------------------------------------------------
 
 //ALLOCATE_OBJECT_TYPE (csMeshWrapper);
+ALLOCATE_OBJECT_TYPE (csWalkEntity);
+ALLOCATE_OBJECT_TYPE (GhostSpriteInfo);
+ALLOCATE_OBJECT_TYPE (csDoor);
+ALLOCATE_OBJECT_TYPE (csRotatingObject);
+ALLOCATE_OBJECT_TYPE (csLightObject);
 
 char WalkTest::map_dir [100];
 bool WalkTest::move_3d = false;
@@ -1333,6 +1338,11 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
     return false;
   }
   INITIALIZE_OBJECT_TYPE (StringServer, csMeshWrapper);
+  INITIALIZE_OBJECT_TYPE (StringServer, csWalkEntity);
+  INITIALIZE_OBJECT_TYPE (StringServer, GhostSpriteInfo);
+  INITIALIZE_OBJECT_TYPE (StringServer, csDoor);
+  INITIALIZE_OBJECT_TYPE (StringServer, csRotatingObject);
+  INITIALIZE_OBJECT_TYPE (StringServer, csLightObject);
   StringServer->DecRef ();
 
   // Find the level loader plugin

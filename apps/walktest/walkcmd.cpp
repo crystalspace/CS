@@ -584,14 +584,14 @@ void WalkTest::ParseKeyCmds ()
 
 void WalkTest::ActivateObject (csObject* src)
 {
-  csObjIterator it = src->GetIterator (csWalkEntity::Type, true);
-  while (!it.IsFinished ())
+  iObjectIterator *it = src->GetIterator (OBJECT_TYPE_ID (csWalkEntity));
+  while (!it->IsFinished ())
   {
-    csObject* obj = it.GetObj ();
-    csWalkEntity* wentity = (csWalkEntity*)obj;
+    csWalkEntity* wentity = (csWalkEntity*)it->GetTypedObj ();
     wentity->Activate ();
-    it.Next ();
+    it->Next ();
   }
+  it->DecRef ();
 }
 
 //===========================================================================
@@ -1658,10 +1658,9 @@ bool CommandHandler (const char *cmd, const char *arg)
     else
     {
       // See if the mesh exists.
-      csMeshWrapper* aspr = (csMeshWrapper *) Sys->engine->meshes.FindByName(name);
-      if (aspr && aspr->GetType () >= csMeshWrapper::Type)
+      iMeshWrapper *wrap = Sys->Engine->FindMeshObject (name);
+      if (wrap)
       {
-        csMeshWrapper* wrap = (csMeshWrapper*)aspr;
 	iSprite3DFactoryState* fstate = QUERY_INTERFACE (
 		wrap->GetMeshObject ()->GetFactory (),
 		iSprite3DFactoryState);

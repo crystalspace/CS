@@ -52,6 +52,13 @@ struct iConfigFile;
 struct iMaterialHandle;
 struct iLoader;
 
+// type information
+DECLARE_OBJECT_TYPE (csWalkEntity);
+DECLARE_OBJECT_TYPE (GhostSpriteInfo);
+DECLARE_OBJECT_TYPE (csDoor);
+DECLARE_OBJECT_TYPE (csRotatingObject);
+DECLARE_OBJECT_TYPE (csLightObject);
+
 // Several map modes.
 #define MAP_OFF 0
 #define MAP_OVERLAY 1
