@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- pvsvis.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.culling.pvsvis</name>
+        <implementation>csPVSVIS</implementation>
+        <description>PVS Visibility System</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

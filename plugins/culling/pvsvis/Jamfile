@@ -1,0 +1,8 @@
+SubDir TOP plugins culling pvsvis ;
+
+Description pvsvis : "PVS Visibility System" ;
+
+Plugin pvsvis
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith pvsvis : csgeom csutil ;

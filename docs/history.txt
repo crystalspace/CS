@@ -26,6 +26,11 @@ chronological order.
 	- Eric Sunshine renamed the Crystal Space Java package from
 	  "com.crystalspace" to "org.crystalspace3d" in order to reflect the
 	  new official Crystal Space domain name (crystalspace3d.org).
+	- Jorrit added a new PVS visibility culler ('Potentially Visible Set')
+	  which is going to be a visibility culler based on precalculation
+	  for static geometry. Currently pvsvis is just a complete copy
+	  of frustvis so no additional functionality is there. We also need
+	  a PVS calculation tool anyway which hasn't been started yet.
 17-Dec-2004
 	- Peter Amstutz updated the csvosa3dl plugin to compile with
 	  the current VOS CVS code.
