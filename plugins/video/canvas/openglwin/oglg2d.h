@@ -24,8 +24,11 @@
 #include "cs2d/common/graph2d.h"
 #include "cssys/win32/win32itf.h"
 #include "cs2d/openglwin/xsysg2d.h"
+#include "cs2d/openglwin/gl2d_font.h"
 
 class csTextureHandle;
+class csGraphics2DOpenGLFontServer;
+class OpenGLTextureCache;
 
 // the CLSID to create csGraphics2DWin32 instances.
 extern const CLSID CLSID_OpenGLGraphics2D;
@@ -55,7 +58,12 @@ class csGraphics2DOpenGL : public csGraphics2D
 private:
   // Calculate the OpenGL pixel format.
   void CalcPixelFormat ();
-  
+
+  static csGraphics2DOpenGLFontServer *LocalFontServer;
+
+  // my own private texture cache--for sprites!
+  static OpenGLTextureCache *texture_cache; 
+ 
 public:
   csGraphics2DOpenGL(ISystem* piSystem, bool bUses3D);
   virtual ~csGraphics2DOpenGL(void);
@@ -91,6 +99,9 @@ public:
   /// Draw a 2D sprite
   static void DrawSpriteGL (ITextureHandle *hTex, int sx, int sy, int sw, int sh,
     int tx, int ty, int tw, int th);
+
+  static void setGLColorfromint(int color);
+
   /**
    * Get address of video RAM at given x,y coordinates.
    * The OpenGL version of this function just returns NULL.
