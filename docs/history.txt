@@ -43,6 +43,14 @@ The history order is reversed so that new features are at the top.
 	    * some "Under Development" stuff was commented out
 	    * some things that are uncertain to work were commented out
 	    * added some convenience stuff, mostly choices for 0/1 integers
+	- res made the following changes to map2cs:
+	    * now uses the iDocumentSystem to output the converted level
+	    * when using manual sectors map2cs also wrote out the polys of the
+	      sector brush, which were rendered over the 'real' surfaces and
+	      causes heavy z-fighting
+	    * the size of textures in zip/pk3 files is now determined correctly
+	    * converted HalfLife textures are written out as PNG instead of BMP
+	- res changed csImageMemory so it isn't limited to truecolor images only
 4-Mar-2003
         - Andrew Craig fixed coordshow text drawing in walktest.  If you had 
           a long sector name it was often cut off.  

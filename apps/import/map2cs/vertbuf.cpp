@@ -27,6 +27,8 @@
 #include "iportal.h"
 #include "vertbuf.h"
 
+#include "dochelp.h"
+
 CVertexBuffer::CVertexBuffer()
 {
 }
@@ -102,23 +104,19 @@ int CVertexBuffer::GetIndex(CdVector3 Vertex) const
   return -1;
 }
 
-bool CVertexBuffer::WriteCS(CIWorld* pWorld)
+bool CVertexBuffer::WriteCS(csRef<iDocumentNode> node, CIWorld* pWorld)
 {
   assert(pWorld);
-
-  FILE* fd = pWorld->GetFile();
-  assert(fd);
 
   double ScaleFactor = pWorld->GetScalefactor();
 
   int i;
   for (i=0; i<m_Vertices.Length(); i++)
   {
-    pWorld->WriteIndent();
-    fprintf(fd, "<v x=\"%g\" y=\"%g\" z=\"%g\" />\n",
-            m_Vertices[i]->x*ScaleFactor,
-            m_Vertices[i]->z*ScaleFactor,
-            m_Vertices[i]->y*ScaleFactor);
+    DocNode v = CreateNode (node, "v");
+    v->SetAttributeAsFloat ("x", m_Vertices[i]->x*ScaleFactor);
+    v->SetAttributeAsFloat ("y", m_Vertices[i]->z*ScaleFactor);
+    v->SetAttributeAsFloat ("z", m_Vertices[i]->y*ScaleFactor);
   } //for vertex
 
   return true;

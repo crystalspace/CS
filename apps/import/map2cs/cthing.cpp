@@ -31,6 +31,8 @@
 #include "entity.h"
 #include "cworld.h"
 
+#include "dochelp.h"
+
 CCSThing::CCSThing(CMapEntity* pEntity)
   : CIThing(pEntity)
 {
@@ -40,7 +42,7 @@ CCSThing::~CCSThing()
 {
 }
 
-bool CCSThing::Write(CIWorld* pIWorld, CISector* pISector)
+bool CCSThing::Write(csRef<iDocumentNode> node, CIWorld* pIWorld, CISector* pISector)
 {
   if (!ContainsVisiblePolygons()) return true;
 
@@ -50,45 +52,28 @@ bool CCSThing::Write(CIWorld* pIWorld, CISector* pISector)
   CCSWorld*  pWorld  = (CCSWorld*)  pIWorld;
   CCSSector* pSector = (CCSSector*) pISector;
 
-  FILE*     fd           = pWorld->GetFile();
-  assert(fd);
+  DocNode meshobj = CreateNode (node, "meshobj");
+  meshobj->SetAttribute ("name", GetName());
+  CreateNode (meshobj, "plugin", "thing");
+  CreateNode (meshobj, "zuse");
 
-  pWorld->WriteIndent();
-  fprintf(fd, "<meshobj name=\"%s\">\n", GetName());
-  pWorld->Indent();
-
-  pWorld->WriteIndent();
-  fprintf(fd, "<plugin>thing</plugin>\n");
-  pWorld->WriteIndent();
-  fprintf(fd, "<zuse />\n");
-  pWorld->WriteIndent();
   if (IsSky())
-    fprintf(fd, "<priority>sky</priority>\n");
+    CreateNode (meshobj, "priority", "sky");
   else
-    fprintf(fd, "<priority>%s</priority>\n", 
+    CreateNode (meshobj, "priority",  
       m_pOriginalEntity->GetValueOfKey("priority", 
       m_pOriginalEntity->GetValueOfKey("mirror")?"mirror":"object"));
 
-  CCSWorld::WriteKeys(pWorld, m_pOriginalEntity);
+  CCSWorld::WriteKeys(node, pWorld, m_pOriginalEntity);
 
-  pWorld->WriteIndent();
-  fprintf(fd, "<params>\n");
-  pWorld->Indent();
+  DocNode params = CreateNode (meshobj, "params");
 
-  WriteAsPart(pWorld, pSector);
-
-  pWorld->Unindent();
-  pWorld->WriteIndent();
-  fprintf(fd, "</params>\n"); //PARAMS
-
-  pWorld->Unindent();
-  pWorld->WriteIndent();
-  fprintf(fd, "</meshobj>\n\n"); //MESHOBJ
+  WriteAsPart(params, pWorld, pSector);
 
   return true;
 }
 
-bool CCSThing::WriteAsPart(CIWorld* pIWorld, CISector* pISector)
+bool CCSThing::WriteAsPart(csRef<iDocumentNode> node, CIWorld* pIWorld, CISector* pISector)
 {
   if (!ContainsVisiblePolygons()) return true;
 
@@ -100,10 +85,8 @@ bool CCSThing::WriteAsPart(CIWorld* pIWorld, CISector* pISector)
 
 
   CMapFile* pMap         = pWorld->GetMap();
-  FILE*     fd           = pWorld->GetFile();
 
   assert(pMap);
-  assert(fd);
 
   int i, j;
 
@@ -114,14 +97,14 @@ bool CCSThing::WriteAsPart(CIWorld* pIWorld, CISector* pISector)
   //  fprintf(fd, "MOVEABLE ()\n");
   //}
 
-  pWorld->WriteIndent();
-  fprintf(fd, "<part name=\"part_%s\">\n", GetName());
+  DocNode part = CreateNode (node, "part");
+  part->SetAttribute ("name", 
+    csString().Format ("part_%s", GetName()));
 
   CVertexBuffer Vb;
   Vb.AddVertices(&m_Polygon);
 
-  pWorld->Indent();
-  Vb.WriteCS(pWorld);
+  Vb.WriteCS(part, pWorld);
 
   for (i=0; i<m_Polygon.Length(); i++)
   {
@@ -134,14 +117,10 @@ bool CCSThing::WriteAsPart(CIWorld* pIWorld, CISector* pISector)
 
       if (pTexture->IsVisible())
       {
-        pWorld->WritePolygon(pPolygon, pSector, false, Vb);
+        pWorld->WritePolygon(part, pPolygon, pSector, false, Vb);
       } //if texture is visible
     }
   }
-
-  pWorld->Unindent();
-  pWorld->WriteIndent();
-  fprintf(fd, "</part>\n");
 
   return true;
 }

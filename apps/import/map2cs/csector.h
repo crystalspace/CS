@@ -42,32 +42,32 @@ public:
     * Writes the sector and all contained things into the Crystal
     * Space worldfile.
     */
-  bool Write(CIWorld* pIWorld);
+  bool Write(csRef<iDocumentNode> node, CIWorld* pIWorld);
 
 protected:
   /// Write the worldspawn things as part
-  bool WriteWorldspawn(CIWorld* pWorld);
+  bool WriteWorldspawn(csRef<iDocumentNode> node, CIWorld* pWorld);
 
   /// Write the lights inside the sector
-  bool WriteLights(CIWorld* pWorld);
+  bool WriteLights(csRef<iDocumentNode> node, CIWorld* pWorld);
 
   /// Write the curves inside the sector
-  bool WriteCurves(CIWorld* pWorld);
+  bool WriteCurves(csRef<iDocumentNode> node, CIWorld* pWorld);
 
   /// Write all things inside the sector
-  bool WriteThings(CIWorld* pWorld);
+  bool WriteThings(csRef<iDocumentNode> node, CIWorld* pWorld);
 
   /// Write all nodes inside the sector
-  bool WriteNodes(CIWorld* pWorld);
+  bool WriteNodes(csRef<iDocumentNode> node, CIWorld* pWorld);
 
   /// Write all 3Dsprites inside the sector
-  bool WriteSprites(CIWorld* pWorld);
+  bool WriteSprites(csRef<iDocumentNode> node, CIWorld* pWorld);
 
   /// Write all 2Dsprites inside the sector
-  bool WriteSprites2D(CIWorld* pWorld);
+  bool WriteSprites2D(csRef<iDocumentNode> node, CIWorld* pWorld);
 
   /// Write all fog inside the sector
-  bool WriteFog(CIWorld* pWorld);
+  bool WriteFog(csRef<iDocumentNode> node, CIWorld* pWorld);
 
 protected:
 }; //CCSSector

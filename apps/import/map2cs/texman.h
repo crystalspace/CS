@@ -23,10 +23,12 @@
 #define __TEXMAN_H__
 
 #include "contain.h"
+#include "csutil/ref.h"
 
 class CMapFile;
 class CZipFile;
 class CTextureFile;
+struct iVFS;
 
 /**
   *
@@ -49,7 +51,7 @@ public:
   CTextureFile* GetTexture(const char* TextureName);
 
   /// Adds all textures to the given Zipfile
-  bool AddAllTexturesToZip(CZipFile* pZipfile);
+  bool AddAllTexturesToVFS(csRef<iVFS> VFS, const char* path);
 
   /// returns the Number of known textures
   int GetTextureCount() {return m_StoredTextures.Length();}

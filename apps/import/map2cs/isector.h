@@ -23,10 +23,12 @@
 #define __ISECTOR_H__
 
 #include "contain.h"
+#include "csutil/ref.h"
 
 class CMapBrush;
 class CMapPolygonSet;
 class CIWorld;
+struct iDocumentNode;
 
 /**
   * this class encapsulates a Sector in Crystal Space terminology. This means
@@ -71,7 +73,7 @@ public:
     * Writes the sector and all contained things into the Crystal
     * Space worldfile.
     */
-  virtual bool Write(CIWorld* pWorld) = 0;
+  virtual bool Write(csRef<iDocumentNode> node, CIWorld* pWorld) = 0;
 
 protected:
   typedef enum {SameOrientation, MirroredOrientation, AllOrientations} WallOrientation;

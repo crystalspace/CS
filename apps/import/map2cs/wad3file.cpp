@@ -21,6 +21,11 @@
 
 #include "cssysdef.h"
 #include "cssys/csendian.h"
+#include "csgfx/memimage.h"
+#include "csgfx/rgbpixel.h"
+#include "igraphic/imageio.h"
+#include "csutil/csstring.h"
+#include "iutil/databuff.h"
 #include "mapstd.h"
 #include "wad3file.h"
 #include "texfile.h"
@@ -61,6 +66,7 @@ void WriteDword(char*& p, unsigned long l)
 }
 
 int CreateBitmap(char*&      p,
+		 int&	     Size,
                  char*       pBits,
                  int         Width,
                  int         Height,
@@ -72,7 +78,7 @@ int CreateBitmap(char*&      p,
   int NumBmpBytes = OutputWidth * Height;
   int NumPalBytes = 256 * 4 /* sizeof RGBQUAD*/;
 
-  int Size = 54 + NumBmpBytes + NumPalBytes;
+  Size = 54 + NumBmpBytes + NumPalBytes;
 
   p = new char[Size];
   char* pBitmap = p;
@@ -131,7 +137,7 @@ bool WriteBitmap(const char* BmpFilename,
   if (!fd) return false;
 
   char* p;
-  int Size = CreateBitmap(p, pBits, Width, Height, pPalette);
+  int Size = CreateBitmap(p, Size, pBits, Width, Height, pPalette);
 
   bool ok = (fwrite(p, Size, 1, fd) != 1);
 
@@ -156,7 +162,9 @@ CWad3File::~CWad3File()
   delete []m_Lumpinfo;
 }
 
-bool CWad3File::Extract(const char* Texture, char*& Data, int& Size)
+extern iImageIO* ImageLoader;
+
+bool CWad3File::Extract(const char* Texture, char*& Data, int& Size, csString& fn)
 {
   miptex_t TexInfo;
   int      LumpNr;
@@ -167,13 +175,43 @@ bool CWad3File::Extract(const char* Texture, char*& Data, int& Size)
 
     Read(Buffer, m_Lumpinfo[LumpNr].size);
 
-    char* pBitmap = Buffer + TexInfo.offsets[0];
+    uint8 *wadpal = (uint8*)Buffer + TexInfo.offsets[3] + TexInfo.width * TexInfo.height / 64 + 2;
+    csRGBpixel pal[256];
 
-    Size = CreateBitmap(Data, pBitmap,
+    int i;
+    for (i=0;i<256;i++)
+    {
+      pal[i].red = *wadpal++;
+      pal[i].green = *wadpal++;
+      pal[i].blue = *wadpal++;
+    }
+
+    // try to compress the texture into a PNG first
+    csImageMemory mi (TexInfo.width, TexInfo.height, 
+      (void*)((uint8*)Buffer + TexInfo.offsets[0]),
+      false, CS_IMGFMT_PALETTED8, pal);
+    csRef<iDataBuffer> db = ImageLoader->Save (&mi, "image/png", "compress=100");
+    if (db)
+    {
+      Size = db->GetSize();
+      Data = new char[Size];
+      memcpy (Data, db->GetData(), Size);
+      db = NULL;
+      fn.Format ("%s.png", Texture);
+    }
+    else
+    {
+      // if this fails, fall back to BMP
+      char* pBitmap = Buffer + TexInfo.offsets[0];
+
+      Size = CreateBitmap(Data, Size, pBitmap,
                          TexInfo.width, TexInfo.height,
                          Buffer + TexInfo.offsets[3] + TexInfo.width * TexInfo.height / 64 + 2 );
 
+      fn.Format ("%s.bmp", Texture);
+    }
     delete [] Buffer;
+   
     return true;
   }
   else
@@ -186,12 +224,10 @@ bool CWad3File::ExtractToFile(const char* texturename)
 {
   char* pData;
   int   Size;
-  if (Extract(texturename, pData, Size))
+  csString fn;
+  if (Extract(texturename, pData, Size, fn))
   {
-    char texfilename[256];
-    sprintf (texfilename, "%s.bmp", texturename);
-
-    FILE* fd = fopen(texfilename, "wb");
+    FILE* fd = fopen(fn, "wb");
     if (!fd) return false;
 
     bool ok = (fwrite(pData, Size, 1, fd) != 1);
@@ -211,19 +247,19 @@ CTextureFile* CWad3File::CreateTexture(const char* texturename)
   CTextureFile* pTexture = NULL;
   char*         pData    = NULL;
   int           Size     = 0;
+  csString fn;
 
-  if (Extract(texturename, pData, Size))
+  if (Extract(texturename, pData, Size, fn))
   {
     pTexture = new CTextureFile;
 
-    char texfilename[256];
-    sprintf (texfilename, "%s.bmp", texturename);
-
     pTexture->SetTexturename (texturename);
-    pTexture->SetFilename    (texfilename);
+    pTexture->SetFilename    (fn);
     pTexture->SetOriginalData(pData, Size);
     if (*texturename == '{')
+    {
       pTexture->SetKeyColor (0, 0, 1);
+    }
 
     miptex_t Info;
     if (GetQtexInfo(texturename, &Info))

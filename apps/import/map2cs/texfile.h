@@ -24,9 +24,11 @@
 
 #include "bindata.h"
 #include "csgfx/csimage.h"
+#include "csutil/ref.h"
 
 class CMapFile;
 class CZipFile;
+struct iVFS;
 
 /**
   *
@@ -64,7 +66,7 @@ public:
   int GetOriginalHeight() {return m_OriginalHeight;}
 
   /// Adds this texture to the given Zip-File.
-  bool AddToZip(CZipFile* pZipfile);
+  bool AddToVFS(csRef<iVFS> VFS, const char* path);
 
   /// Sets information about the original file
   void SetOriginalData(char* Data, int Size);

@@ -23,9 +23,11 @@
 #define __CTHING_H__
 
 #include "ithing.h"
+#include "csutil/ref.h"
 
 class CCSWorld;
 class CCSSector;
+struct iDocumentNode;
 
 /**
   * This class will encapsulate a Thing to show up in a Crystal Space
@@ -41,10 +43,10 @@ public:
   virtual ~CCSThing();
 
   /// Write this thing as part of an sector
-  virtual bool Write(CIWorld* pIWorld, CISector* pISector);
+  virtual bool Write(csRef<iDocumentNode> node, CIWorld* pIWorld, CISector* pISector);
 
   /// Write only polygons without headings
-  virtual bool WriteAsPart(CIWorld* pIWorld, CISector* pISector);
+  virtual bool WriteAsPart(csRef<iDocumentNode> node, CIWorld* pIWorld, CISector* pISector);
 };
 
 #endif // __CTHING_H__

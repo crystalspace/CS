@@ -35,19 +35,12 @@
 
 CIWorld::CIWorld()
 {
-  m_fd     = NULL;
   m_pMap   = NULL;
-  m_Indent = 0;
   m_ScaleFactor = 1.0/40.0;
 }
 
 CIWorld::~CIWorld()
 {
-  if (m_fd)
-  {
-    fclose(m_fd);
-  }
-
   DELETE_VECTOR_MEMBERS(m_Sectors);
 
   DELETE_VECTOR_MEMBERS(m_TextureFileNames);
@@ -290,40 +283,12 @@ bool CIWorld::PrepareData(const char* filename, CMapFile* pMap)
 {
   m_pMap = pMap;
   m_ScaleFactor = pMap->GetConfigFloat("Map2CS.General.Scaling", 1.0/40.0);
-  m_Indent = 0;
-
-  m_fd = fopen(filename, "w");
-  if (!m_fd)
-  {
-    printf("Can't create temporary file %s! Aborting!", TEMPWORLD);
-    return false;
-  }
 
   BuildTexturelist();
   FindSectors();
   FindPortals();
   InsertThings();
 
-  return true;
-}
-
-void CIWorld::Indent()
-{
-  m_Indent++;
-}
-
-void CIWorld::Unindent()
-{
-  m_Indent--;
-}
-
-bool CIWorld::WriteIndent()
-{
-  int i;
-  for (i=0; i<m_Indent; i++)
-  {
-    fprintf(m_fd, "    ");
-  }
   return true;
 }
 

@@ -23,10 +23,12 @@
 #define __ITHING_H__
 
 #include "contain.h"
+#include "csutil/ref.h"
 
 class CMapPolygon;
 class CISector;
 class CIWorld;
+struct iDocumentNode;
 
 /**
   * This class will encapsulate a Thing to show up in a Crystal Space
@@ -54,7 +56,8 @@ public:
   const char* GetClassname();
 
   /// Write this thing as part of an sector
-  virtual bool Write(CIWorld* pWorld, CISector* pSector) = 0;
+  virtual bool Write(csRef<iDocumentNode> node, CIWorld* pWorld, 
+    CISector* pSector) = 0;
 
   /// Return true, if this thing is moveable
   bool IsMoveable();

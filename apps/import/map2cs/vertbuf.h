@@ -24,8 +24,11 @@
 
 #include "contain.h"
 
+#include "csutil/ref.h"
+
 class CMapPolygon;
 class CIWorld;
+struct iDocumentNode;
 
 /**
   */
@@ -65,7 +68,7 @@ public:
     * CS worldformat. (Maybe we should split up CVertexBuffer into
     * different classes for different formats too.)
     */
-  bool WriteCS(CIWorld* pWorld);
+  bool WriteCS(csRef<iDocumentNode> node, CIWorld* pWorld);
 
 protected:
   /// Array containing all vertices

@@ -61,7 +61,7 @@ public:
     * Extracts a bitmap to memory. You need to free Data by calling
     * delete [] Data afterwards!
     */
-  bool Extract(const char* texturename, char*& Data, int& Size);
+  bool Extract(const char* texturename, char*& Data, int& Size, csString& fn);
 
   /**
     * Extracts a texture from a wad file to a bmp file with the

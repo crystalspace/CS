@@ -20,6 +20,8 @@
 */
 
 #include "cssysdef.h"
+#include "csver.h"
+
 #include "mapstd.h"
 #include "map.h"
 #include "entity.h"
@@ -32,6 +34,8 @@
 #include "vertbuf.h"
 #include "mcurve.h"
 #include "sparser.h"
+
+#include "dochelp.h"
 
 #define TEMPWORLD "map2cs2.$$$"
 
@@ -137,73 +141,79 @@ void CCSWorld::GenerateDefaultsector()
   m_Sectors.Push(pSector);
 }
 
-bool CCSWorld::Write(const char* filename, CMapFile* pMap, const char * /*sourcename*/)
+bool CCSWorld::Write(csRef<iDocumentNode> root, CMapFile* pMap, const char * /*sourcename*/)
 {
   if (!PrepareData(TEMPWORLD, pMap)) return false;
 
   AllocateSkytextures();
 
-  fprintf(m_fd, "<world>\n");
+  time_t Time;
+  time (&Time);
+  struct tm *now = localtime (&Time);
+  char buf[128];
 
-  Indent();
-  WriteIndent();
+  sprintf (buf, "Created by map2cs " CS_VERSION " on "
+    "%04d-%02d-%02d %02d:%02d:%02d", now->tm_year+1900, 
+    now->tm_mon, now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
+
+  DocNode temp = root->CreateNodeBefore (CS_NODE_COMMENT);
+  temp->SetValue (buf);
+  DocNode world = CreateNode(root, "world");
 
   CMapEntity* pEntity = GetWorldspawn();
 
-  fprintf(m_fd, "<settings><clearzbuf>yes</clearzbuf></settings>\n\n");
-    
-  WriteIndent();
-  fprintf(m_fd, "<key name=\"map2cs_scaling\" value=\"%g\" />\n\n", m_ScaleFactor);
-
-  WritePlayerStart();
-  WriteTextures();
-
-  fprintf(m_fd, 
-    "\t<renderpriorities>\n"
-    "\t\t<priority name=\"sky\"><level>1</level><sort>NONE</sort><camera /></priority>\n"
-    "\t\t<priority name=\"mirror\"><level>2</level><sort>FRONT2BACK</sort></priority>\n"
-    "\t\t<priority name=\"wall\"><level>3</level><sort>NONE</sort></priority>\n"
-    "\t\t<priority name=\"object\"><level>4</level><sort>NONE</sort></priority>\n"
-    "\t\t<priority name=\"alpha\"><level>5</level><sort>BACK2FRONT</sort></priority>\n"
-    "\t</renderpriorities>\n"
-    "\n");  
-
-  WritePlugins();
-  WriteSounds();
-  WriteSpritesTemplate();
-  WriteScriptsTemplate();
-  WritePlanes();
-
-  WriteCurvetemplates();
-
-  WriteSkysector();
-  WriteSectors();
-
-  Unindent();
-
-  fprintf(m_fd, "</world>\n"); //End of "<world>"
-  fclose(m_fd);
-  m_fd = NULL;
-
-  remove(filename);
-
-  CZipFile Zip(filename);
-  Zip.AddFile(TEMPWORLD, "world");
-
-  if (!m_pMap->GetTextureManager()->AddAllTexturesToZip(&Zip))
+  CreateNode(CreateNode (world, "settings"), "clearzbuf", "yes");
+  
   {
-    printf("Can't add all textures to the woldfile Aborting!\n");
-    remove(TEMPWORLD);
-    return false;
+    DocNode scaling = CreateNode (world, "key");
+    scaling->SetAttribute ("name", "map2cs_scaling");
+    scaling->SetAttributeAsFloat ("value", m_ScaleFactor);
   }
 
-  if (!Zip.WriteArchive())
+  WritePlayerStart (world);
+  WriteTextures (world);
+
   {
-    printf("Can't create Archive '%s'! Aborting!\n", filename);
-    return false;
+    DocNode renderpriorities = CreateNode (world, "renderpriorities");
+
+    DocNode sky = CreateNode (renderpriorities, "priority");
+    sky->SetAttribute ("name", "sky");
+    CreateNode (sky, "level", "1");
+    CreateNode (sky, "sort", "NONE");
+    CreateNode (sky, "camera");
+
+    DocNode mirror = CreateNode (renderpriorities, "priority");
+    mirror->SetAttribute ("name", "mirror");
+    CreateNode (mirror, "level", "2");
+    CreateNode (mirror, "sort", "FRONT2BACK");
+
+    DocNode wall = CreateNode (renderpriorities, "priority");
+    wall->SetAttribute ("name", "wall");
+    CreateNode (wall, "level", "3");
+    CreateNode (wall, "sort", "NONE");
+
+    DocNode object = CreateNode (renderpriorities, "priority");
+    object->SetAttribute ("name", "object");
+    CreateNode (object, "level", "4");
+    CreateNode (object, "sort", "NONE");
+
+    DocNode alpha = CreateNode (renderpriorities, "priority");
+    alpha->SetAttribute ("name", "object");
+    CreateNode (alpha, "level", "5");
+    CreateNode (alpha, "sort", "BACK2FRONT");
   }
 
-  remove(TEMPWORLD);
+  WritePlugins (world);
+  WriteSounds (world);
+  WriteSpritesTemplate (world);
+  WriteScriptsTemplate (world);
+  WritePlanes (world);
+
+  WriteCurvetemplates (world);
+
+  WriteSkysector (world);
+  WriteSectors (world);
+
   return true;
 }
 
@@ -259,7 +269,7 @@ void CCSWorld::AllocateSkytextures()
   }
 }
 
-void CCSWorld::WriteSkysector()
+void CCSWorld::WriteSkysector(csRef<iDocumentNode> node)
 {
   CMapEntity* pEntity = GetWorldspawn();
   if (!pEntity) return;
@@ -271,72 +281,39 @@ void CCSWorld::WriteSkysector()
   if (pEntity->GetValueOfKey("skybox") ||
       pEntity->GetValueOfKey("skydome"))
   {
-    WriteIndent();
-    fprintf(m_fd, "<sector name=\"cs_skysector\">\n");
-    Indent();
+    DocNode sector = CreateNode (node, "sector");
+    sector->SetAttribute ("name", "cs_skysector");
 
-    WriteIndent();
-    fprintf(m_fd, "<meshobj name=\"sky\">\n");
-    Indent();
+    DocNode meshobj = CreateNode (sector, "meshobJ");
+    meshobj->SetAttribute ("name", "sky");
 
-    WriteIndent();
-    fprintf(m_fd, "<plugin>thing</plugin>\n");
-    WriteIndent();
-    fprintf(m_fd, "<znone />\n");
-    WriteIndent();
-    fprintf(m_fd, "<priority>sky</priority>\n");
+    CreateNode (meshobj, "plugin", "thing");
+    CreateNode (meshobj, "znone");
+    CreateNode (meshobj, "priority", "sky");
+    CreateNode (meshobj, "camera");
 
-    WriteIndent();
-    fprintf(m_fd, "<camera />\n");
+    DocNode params = CreateNode (meshobj, "params");
 
-    WriteIndent();
-    fprintf(m_fd, "<params>\n");
-    Indent();
-
-    /*WriteIndent();
-    fprintf(m_fd, "PART 'p1' (\n");
-    Indent();*/
-
-    WriteSky();
-
-    /*Unindent();
-    WriteIndent();
-    fprintf(m_fd, ")\n");*/
-
-    Unindent();
-    WriteIndent();
-    fprintf(m_fd, "</params>\n"); // END params
-
-    Unindent();
-    WriteIndent();
-    fprintf(m_fd, "</meshobj>\n"); // END meshobj
-
-    Unindent();
-    WriteIndent();
-    fprintf(m_fd, "</sector>\n\n"); // END sector
+    WriteSky(params);
   }
 }
 
-void CCSWorld::WriteSky()
+void CCSWorld::WriteSky(csRef<iDocumentNode> node)
 {
   CMapEntity* pEntity = GetWorldspawn();
   if (!pEntity) return;
 
   if (pEntity->GetValueOfKey("skybox"))
   {
-    WriteSkybox();
-    WriteIndent();
-    //fprintf(m_fd, "<moveable />\n");
+    WriteSkybox(node);
   }
   else if (pEntity->GetValueOfKey("skydome"))
   {
-    WriteSkydome();
-    WriteIndent();
-    //fprintf(m_fd, "<moveable />\n");
+    WriteSkydome(node);
   }
 }
 
-void CCSWorld::WriteSkydome()
+void CCSWorld::WriteSkydome(csRef<iDocumentNode> node)
 {
   CMapEntity* pEntity = GetWorldspawn();
   if (!pEntity) return;
@@ -347,6 +324,8 @@ void CCSWorld::WriteSkydome()
   CTextureManager* pTexMan  = m_pMap->GetTextureManager();
   CTextureFile*    pTexture = pTexMan->GetTexture(DomeName);
 
+/* @@@ TODO!
+  
   WriteIndent();
   //fprintf(m_fd, "CIRCLE (0,0,0:%g,0,%g,-12)\n", DomeRadius, DomeRadius);
   fprintf(m_fd, "<circle>0,0,0:%g,0,%g,-12</circle>\n", DomeRadius, DomeRadius);
@@ -358,10 +337,10 @@ void CCSWorld::WriteSkydome()
                 "<vertices>0,1,2,3,4,5,6,7,8,9,10,11</vertices></skydome>\n", DomeRadius);
   WriteIndent();
   fprintf(m_fd, "<skydome name=\"down\"><lighting>NO</lighting><radius>%g</radius> "
-                "<vertices>0,11,10,9,8,7,6,5,4,3,2,1</vertices></skydome>\n", -DomeRadius);
+                "<vertices>0,11,10,9,8,7,6,5,4,3,2,1</vertices></skydome>\n", -DomeRadius);*/
 }
 
-void CCSWorld::WriteSkybox()
+void CCSWorld::WriteSkybox(csRef<iDocumentNode> node)
 {
   CMapEntity* pEntity = GetWorldspawn();
   if (!pEntity) return;
@@ -369,90 +348,6 @@ void CCSWorld::WriteSkybox()
   CTextureManager* pTexMan  = m_pMap->GetTextureManager();
   const char* BoxName = pEntity->GetValueOfKey   ("skybox",    "sky");
   double      BoxSize = pEntity->GetNumValueOfKey("skyboxsize", 1600) / 2;
-
-  //The following code is pretty ugly, because to create a goodlooking
-  //skybox, we create a flatcolored box, that contains another (smaller)
-  //box with slightly overlapping sides.
-  //This is because CS has some precision problems on the sides, and so
-  //we will end up with lots of cracks between the boxes sides, which just
-  //looks ugly. So for now we accept significant overdraw, to avoid cracks.
-#if 0
-  static const struct {int x; int y; int z;} Vertices [] =
-  {{-1,-1,-1},
-   {-1,-1, 1},
-   {-1, 1,-1},
-   {-1, 1, 1},
-   { 1,-1,-1},
-   { 1,-1, 1},
-   { 1, 1,-1},
-   { 1, 1, 1}};
-
-  static struct
-  {
-    const char*   ext;
-    const char*   vertices;
-    CTextureFile* pTex;
-  }
-
-  ThingSides[] =
-  {
-    {"f", " 3, 7, 5, 1", NULL},
-    {"r", "15,14,12,13", NULL},
-    {"b", " 6, 2, 0, 4", NULL},
-    {"l", "10,11, 9, 8", NULL},
-    {"u", "18,22,23,19", NULL},
-    {"d", "17,21,20,16", NULL},
-  };
-
-  //assign texture pointers to the sides of the skybox
-  int s,v;
-  for (s=0; s<int(sizeof(ThingSides)/sizeof(ThingSides[0])); s++)
-  {
-    char name[255];
-    sprintf(name, "%s_%s", BoxName, ThingSides[s].ext);
-    ThingSides[s].pTex = pTexMan->GetTexture(name);
-  }
-
-
-  //Write the skyboxes vertices
-
-  double TweakFactor = 1.005;
-  for (v = 0; v<int(sizeof(Vertices)/sizeof(Vertices[0])); v++)
-  {
-    WriteIndent();
-    fprintf(m_fd, "<v x=\"%g\" y=\"%g\" z=\"%g\" />\n",
-                  BoxSize*Vertices[v].x*TweakFactor,
-                  BoxSize*Vertices[v].y*TweakFactor,
-                  BoxSize*Vertices[v].z);
-  }
-  for (v = 0; v<int(sizeof(Vertices)/sizeof(Vertices[0])); v++)
-  {
-    WriteIndent();
-    fprintf(m_fd, "<v x=\"%g\" y=\"%g\" z=\"%g\" />\n",
-                  BoxSize*Vertices[v].x,
-                  BoxSize*Vertices[v].y*TweakFactor,
-                  BoxSize*Vertices[v].z*TweakFactor);
-  }
-  for (v = 0; v<int(sizeof(Vertices)/sizeof(Vertices[0])); v++)
-  {
-    WriteIndent();
-    fprintf(m_fd, "<v x=\"%g\" y=\"%g\" z=\"%g\" />\n",
-                  BoxSize*Vertices[v].x*TweakFactor,
-                  BoxSize*Vertices[v].y,
-                  BoxSize*Vertices[v].z*TweakFactor);
-  }
-
-  //write the skyboxes polygons
-  for (s=0; s<int(sizeof(ThingSides)/sizeof(ThingSides[0])); s++)
-  {
-    WriteIndent();
-    fprintf(m_fd, "POLYGON '' (VERTICES (%s) MATERIAL ('%s') "
-                  "TEXTURE (LEN (%g)) LIGHTING (NO))\n",
-                  ThingSides[s].vertices,
-                  ThingSides[s].pTex->GetTexturename(),
-                  BoxSize * 2 * TweakFactor);
-  }
-#endif
 
   //Matze: This is my own version, I can't realize crackles so I'm using the
   // simple version here... If it's ok in all cases you can remove the above
@@ -465,18 +360,18 @@ void CCSWorld::WriteSkybox()
   static struct
   {
     const char*   ext;
-    const char*   vertices;
+    const char*   vertices[4];
     CTextureFile* pTex;
   }
 
   ThingSides[] =
   {
-    {"f", "<v>4</v><v>5</v><v>1</v><v>0</v>", NULL},
-    {"r", "<v>5</v><v>7</v><v>3</v><v>1</v>", NULL},
-    {"b", "<v>7</v><v>6</v><v>2</v><v>3</v>", NULL},
-    {"l", "<v>6</v><v>4</v><v>0</v><v>2</v>", NULL},
-    {"u", "<v>6</v><v>7</v><v>5</v><v>4</v>", NULL},
-    {"d", "<v>3</v><v>2</v><v>0</v><v>1</v>", NULL},
+    {"f", "4", "5", "1", "0", NULL},
+    {"r", "5", "7", "3", "1", NULL},
+    {"b", "7", "6", "2", "3", NULL},
+    {"l", "6", "4", "0", "2", NULL},
+    {"u", "6", "7", "5", "4", NULL},
+    {"d", "3", "2", "0", "1", NULL},
   };
 
   //assign texture pointers to the sides of the skybox
@@ -490,26 +385,42 @@ void CCSWorld::WriteSkybox()
  
   for (v = 0; v<int(sizeof(Vertices)/sizeof(Vertices[0])); v++)
   {
-    WriteIndent();
-    fprintf(m_fd, "<v x=\"%g\" y=\"%g\" z=\"%g\" />\n",  
-                  BoxSize*Vertices[v].x,
-                  BoxSize*Vertices[v].y,
-                  BoxSize*Vertices[v].z);
+    DocNode vertex = CreateNode (node, "v");
+    vertex->SetAttributeAsFloat ("x", BoxSize*Vertices[v].x);
+    vertex->SetAttributeAsFloat ("y", BoxSize*Vertices[v].y);
+    vertex->SetAttributeAsFloat ("z", BoxSize*Vertices[v].z);
   }
 
   //write the skyboxes polygons
   for (s=0; s<int(sizeof(ThingSides)/sizeof(ThingSides[0])); s++)
   {
-    WriteIndent();
-    fprintf(m_fd, "<p>%s" 
-      "<texmap>"
-      "<uv idx=\"0\" u=\"0.005\" v=\"0.005\" />"
-      "<uv idx=\"1\" u=\"0.995\" v=\"0.005\" />"
-      "<uv idx=\"2\" u=\"0.995\" v=\"0.955\" />"
-      "</texmap>"
-      "<material>%s</material><lighting>NO</lighting></p>\n",
-                  ThingSides[s].vertices,
-                  ThingSides[s].pTex->GetTexturename());
+    DocNode p = CreateNode (node, "p");
+
+    for (v = 0; v < 4; v++)
+    {
+      DocNode vertex = CreateNode (p, "v", ThingSides[s].vertices[v]);
+    }
+
+    DocNode texmap = CreateNode (p, "texmap");
+    
+    DocNode uv;
+    uv = CreateNode (texmap, "uv");
+    uv->SetAttributeAsInt ("idx", 0);
+    uv->SetAttributeAsFloat ("u", 0.005);
+    uv->SetAttributeAsFloat ("v", 0.005);
+
+    uv = CreateNode (texmap, "uv");
+    uv->SetAttributeAsInt ("idx", 1);
+    uv->SetAttributeAsFloat ("u", 0.995);
+    uv->SetAttributeAsFloat ("v", 0.005);
+
+    uv = CreateNode (texmap, "uv");
+    uv->SetAttributeAsInt ("idx", 2);
+    uv->SetAttributeAsFloat ("u", 0.995);
+    uv->SetAttributeAsFloat ("v", 0.995);
+
+    CreateNode (p, "material", ThingSides[s].pTex->GetTexturename());
+    CreateNode (p, "lighting", "no");
   }
 }
 
@@ -589,15 +500,13 @@ void CCSWorld::FindAdditionalTextures()
   }
 }
 
-bool CCSWorld::WriteTextures()
+bool CCSWorld::WriteTextures(csRef<iDocumentNode> node)
 {
   CMapEntity* pEntity = GetWorldspawn();
 
   FindAdditionalTextures();
 
-  WriteIndent();
-  fprintf(m_fd, "<textures>\n");
-  Indent();
+  DocNode textures = CreateNode (node, "textures");
 
   int i=0;
   for (i=0; i<m_pMap->GetTextureManager()->GetTextureCount(); i++)
@@ -605,82 +514,69 @@ bool CCSWorld::WriteTextures()
     CTextureFile* pTexture = m_pMap->GetTextureManager()->GetTexture(i);
     assert(pTexture);
 
-    WriteIndent();
-
     char replacename[255];
     const char *newtexfile;
     sprintf(replacename, "filename_%s", pTexture->GetTexturename());
     if ((newtexfile = pEntity->GetValueOfKey(replacename)))
       pTexture->SetStored (false);
       
-    fprintf(m_fd, "<texture name=\"%s\"><file>%s</file>",
-      pTexture->GetTexturename(),
-      newtexfile?newtexfile:pTexture->GetFilename());
+    DocNode texture = CreateNode (textures, "texture");
+    texture->SetAttribute ("name", pTexture->GetTexturename());
+    CreateNode (texture, "file", newtexfile?newtexfile:pTexture->GetFilename());
 
     if (pTexture->IsColorKeyed())
     {
       float r, g, b;
       pTexture->GetKeyColor(r, g, b);
 
-      fprintf(m_fd, " <transparent red=\"%g\" green=\"%g\" blue=\"%g\" />", r, g, b);
+      DocNode transparent = CreateNode (texture, "transparent");
+      transparent->SetAttributeAsFloat ("red", r);
+      transparent->SetAttributeAsFloat ("green", g);
+      transparent->SetAttributeAsFloat ("blue", b);
     }
 
     if (!pTexture->IsMipmapped())
     {
-      fprintf(m_fd, " <mipmap>no</mipmap>");
+      CreateNode (texture, "mipmapped", "no");
     }
-
-    fprintf(m_fd, "</texture>\n"); //End of TEXTURE (single line statement)
   }
-
-  Unindent();
-  WriteIndent();
-  fprintf(m_fd, "</textures>\n\n"); //End of "TEXTURES ("
 
   //-------------------------------------------------------------------
 
-  WriteIndent();
-  fprintf(m_fd, "<materials>\n");
-  Indent();
+  DocNode materials = CreateNode (node, "materials");
 
   for (i=0; i<m_pMap->GetTextureManager()->GetTextureCount(); i++)
   {
     CTextureFile* pTexture = m_pMap->GetTextureManager()->GetTexture(i);
     assert(pTexture);
 
-    WriteIndent();
-    fprintf(m_fd, "<material name=\"%s\"><texture>%s</texture></material>\n",
-                  pTexture->GetTexturename(),
-                  pTexture->GetTexturename());
+    DocNode material = CreateNode (materials, "material");
+    material->SetAttribute ("name", pTexture->GetTexturename());
+    CreateNode (material, "texture", pTexture->GetTexturename());
   }
 
-  Unindent();
-  WriteIndent();
-  fprintf(m_fd, "</materials>\n\n"); //End of "MATERIALS ("
-
   return true;
 }
 
-bool CCSWorld::WritePlugins()
+bool CCSWorld::WritePlugins(csRef<iDocumentNode> node)
 {
-  WriteIndent();
-  fprintf(m_fd, "<plugins>\n");
-  Indent();
+  DocNode plugins = CreateNode (node, "plugins");
 
-  WriteIndent(); fprintf(m_fd, "<plugin name=\"thing\">crystalspace.mesh.loader.thing</plugin>\n");
-  WriteIndent(); fprintf(m_fd, "<plugin name=\"thingFact\">crystalspace.mesh.loader.factory.thing</plugin>\n");
-  WriteIndent(); fprintf(m_fd, "<plugin name=\"plane\">crystalspace.mesh.loader.thing.plane</plugin>\n");
-  WriteIndent(); fprintf(m_fd, "<plugin name=\"bezier\">crystalspace.mesh.loader.thing.bezier</plugin>\n");
-
-  Unindent();
-  WriteIndent();
-  fprintf(m_fd, "</plugins>\n\n"); //End of "PLUGINS ("
+  DocNode plugin;
+  plugin = CreateNode (plugins, "plugin", "crystalspace.mesh.loader.thing");
+  plugin->SetAttribute ("name", "thing");
+  plugin = CreateNode (plugins, "plugin", "crystalspace.mesh.loader.factory.thing");
+  plugin->SetAttribute ("name", "thingFact");
+  plugin = CreateNode (plugins, "plugin", "crystalspace.mesh.loader.thing.plane");
+  plugin->SetAttribute ("name", "plane");
+  plugin = CreateNode (plugins, "plugin", "crystalspace.mesh.loader.thing.bezier");
+  plugin->SetAttribute ("name", "bezier");
 
   return true;
 }
 
 
-bool CCSWorld::WritePlayerStart()
+bool CCSWorld::WritePlayerStart(csRef<iDocumentNode> node)
 {
   int i;
 
@@ -704,7 +600,6 @@ bool CCSWorld::WritePlayerStart()
         if (pSector)
         {
           //The strings format matched
-          WriteIndent();
 	  CdVector3 forw(0,0,1);
 	  // rotate angle
 	  double angle = 0.0;
@@ -716,15 +611,24 @@ bool CCSWorld::WritePlayerStart()
 			       sin(angle), 0, cos(angle)) * forw;
 	  }
 	  
-          fprintf(m_fd, "<start><sector>%s</sector><position x=\"%g\" y=\"%g\" z=\"%g\" />"
-			"<up x=\"0\" y=\"1\" z=\"0\" /><forward x=\"%g\" y=\"%g\" z=\"%g\" />"
-			"</start>\n\n",
-                  pSector->GetName(),
-                  x*m_ScaleFactor,
-                  z*m_ScaleFactor,
-                  y*m_ScaleFactor,
-		  forw.x, forw.y, forw.z
-		  );
+          DocNode start = CreateNode (node, "start");
+	  CreateNode (start, "sector", pSector->GetName());
+
+	  DocNode attr;
+	  attr = CreateNode (start, "position");
+	  attr->SetAttributeAsFloat ("x", x*m_ScaleFactor);
+	  attr->SetAttributeAsFloat ("y", z*m_ScaleFactor);
+	  attr->SetAttributeAsFloat ("z", y*m_ScaleFactor);
+
+	  attr = CreateNode (start, "forward");
+	  attr->SetAttributeAsFloat ("x", forw.x);
+	  attr->SetAttributeAsFloat ("y", forw.y);
+	  attr->SetAttributeAsFloat ("z", forw.z);
+
+	  attr = CreateNode (start, "up");
+	  attr->SetAttributeAsFloat ("x", 0.0f);
+	  attr->SetAttributeAsFloat ("y", 1.0f);
+	  attr->SetAttributeAsFloat ("z", 0.0f);
           return true;
         }
         else
@@ -743,7 +647,7 @@ bool CCSWorld::WritePlayerStart()
   return true;
 }
 
-bool CCSWorld::WritePlanes()
+bool CCSWorld::WritePlanes(csRef<iDocumentNode> node)
 {
   int i;
   for (i=0; i<m_pMap->GetPlaneCount(); i++)
@@ -762,71 +666,57 @@ bool CCSWorld::WritePlanes()
       CdVector3 First  = pPlane->GetTextureCoordinates(1);
       CdVector3 Second = pPlane->GetTextureCoordinates(2);
 
-      WriteIndent();
-      fprintf(m_fd, "<addon>\n");
-      Indent ();
-      WriteIndent();
-      fprintf(m_fd, "<plugin>plane</plugin>\n");
-      WriteIndent();
-      fprintf(m_fd, "<params>\n");
-      Indent ();
-      WriteIndent();
-      fprintf(m_fd, "<name>%s</name>\n", TexName);
-      WriteVector("orig", Origin);
-      WriteVector("first", First);
-      WriteVector("second", Second);
-      WriteIndent();
-      fprintf(m_fd, "<firstlen>%g</firstlen>\n",
-              (First-Origin).Norm()*m_ScaleFactor);
-      WriteIndent();
-      fprintf(m_fd, "<secondlen>%g</secondlen>\n",
-              (Second-Origin).Norm()*m_ScaleFactor);
-      Unindent ();
-      WriteIndent();
-      fprintf(m_fd, "</params>\n");
-      Unindent ();
-      WriteIndent();
-      fprintf(m_fd, "</addon>\n"); //End of "PLANE ("
+      DocNode addon = CreateNode (node, "addon");
+      CreateNode (addon, "plugin", "plane");
+      DocNode params = CreateNode (addon, "params");
+      CreateNode (params, "name", TexName);
+      WriteVector(params, "orig", Origin);
+      WriteVector(params, "first", First);
+      WriteVector(params, "second", Second);
+      CreateNode (params, "firstlen",
+	(float)((First-Origin).Norm()*m_ScaleFactor));
+      CreateNode (params, "secondlen",
+	(float)((Second-Origin).Norm()*m_ScaleFactor));
     }
   }
-  fprintf(m_fd, "\n"); //End of planes section
   return true;
 }
 
-bool CCSWorld::WriteSectors()
+bool CCSWorld::WriteSectors(csRef<iDocumentNode> node)
 {
   int i;
   for (i=0; i<m_Sectors.Length(); i++)
   {
-    if (!m_Sectors[i]->Write(this)) return false;
+    if (!m_Sectors[i]->Write(node, this)) return false;
   }
   return true;
 }
 
-bool CCSWorld::WriteVertex(double x, double y, double z)
+bool CCSWorld::WriteVertex(csRef<iDocumentNode> node, double x, double y, 
+			   double z)
 {
-  WriteVector("v", x,y,z);
+  WriteVector(node, "v", x,y,z);
   return true;
 }
 
-bool CCSWorld::WriteVector(const char* name, double x, double y, double z)
+bool CCSWorld::WriteVector(csRef<iDocumentNode> node, const char* name, 
+			   double x, double y, double z)
 {
-  WriteIndent();
-  fprintf(m_fd, "<%s x=\"%g\" y=\"%g\" z=\"%g\" />\n",
-	  name,
-          x*m_ScaleFactor,
-          z*m_ScaleFactor,
-          y*m_ScaleFactor);
+  DocNode vector = CreateNode (node, name);
+  vector->SetAttributeAsFloat ("x", x*m_ScaleFactor);
+  vector->SetAttributeAsFloat ("y", z*m_ScaleFactor);
+  vector->SetAttributeAsFloat ("z", y*m_ScaleFactor);
   return true;
 }
 
-bool CCSWorld::WriteVector(const char* name, const CdVector3& v)
+bool CCSWorld::WriteVector(csRef<iDocumentNode> node, const char* name, 
+			   const CdVector3& v)
 {
-  return WriteVector(name, v.x, v.y, v.z);
+  return WriteVector(node, name, v.x, v.y, v.z);
 }
 
 
-bool CCSWorld::WriteCurvetemplates()
+bool CCSWorld::WriteCurvetemplates(csRef<iDocumentNode> node)
 {
   int i, c;
   for (i=0; i<m_pMap->GetNumEntities(); i++)
@@ -838,7 +728,7 @@ bool CCSWorld::WriteCurvetemplates()
       CTextureFile* pTexture = pCurve->GetTexture();
       if (pTexture->IsVisible())
       {
-        pCurve->Write(this);
+        //pCurve->Write(node, this);
       }
     }
   }
@@ -846,35 +736,32 @@ bool CCSWorld::WriteCurvetemplates()
   return true;
 }
 
-bool CCSWorld::WriteKeys(CIWorld* pWorld, CMapEntity* pEntity)
+bool CCSWorld::WriteKeys(csRef<iDocumentNode> node, CIWorld* pWorld, 
+			 CMapEntity* pEntity)
 {
   if (pEntity)
   {
-	int i;
+    int i;
     for (i=0; i<pEntity->GetNumberOfKeyValuePairs(); i++)
     {
       CMapKeyValuePair* pKV = pEntity->GetKeyValuePair(i);
-      pWorld->WriteIndent();
-      fprintf(pWorld->GetFile(), "<key name=\"%s\" value=\"%s\" />\n",
-              pKV->GetKey(), pKV->GetValue());
+      DocNode key = CreateNode (node, "key");
+      key->SetAttribute ("name", pKV->GetKey());
+      key->SetAttribute ("value", pKV->GetValue());
     }
-
-    fprintf(pWorld->GetFile(), "\n");
   }
   return true;
 }
 
-bool CCSWorld::WritePolygon(CMapPolygon* pPolygon, CCSSector* pSector,
-                            bool SectorPolygon, const CVertexBuffer& Vb)
+bool CCSWorld::WritePolygon(csRef<iDocumentNode> node, CMapPolygon* pPolygon, 
+			    CCSSector* pSector, bool SectorPolygon, 
+			    const CVertexBuffer& Vb)
 {
   const CMapTexturedPlane* pPlane   = pPolygon->GetBaseplane();
   CMapEntity*              pEntity  = pPolygon->GetEntity();
   int l;
 
-  WriteIndent();
-  fprintf(m_fd, "<p>\n");
-  
-  Indent();
+  DocNode poly = CreateNode (node, "p");
   if (SectorPolygon)
   {
     //Because for a sector we draw the _inside_ of the brush, we spit out the
@@ -882,8 +769,7 @@ bool CCSWorld::WritePolygon(CMapPolygon* pPolygon, CCSSector* pSector,
     //backface culling in the engine.
     for (l=pPolygon->GetVertexCount()-1; l>=0; l--)
     {
-      WriteIndent();
-      fprintf(m_fd, "<v>%d</v>\n", Vb.GetIndex(pPolygon->GetVertex(l)));
+      CreateNode (poly, "v", Vb.GetIndex(pPolygon->GetVertex(l)));
     }
   }
   else
@@ -891,82 +777,79 @@ bool CCSWorld::WritePolygon(CMapPolygon* pPolygon, CCSSector* pSector,
     //regular vertex order
     for (l=0; l<pPolygon->GetVertexCount(); l++)
     {
-      WriteIndent();
-      fprintf(m_fd, "<v>%d</v>\n", Vb.GetIndex(pPolygon->GetVertex(l)));
+      CreateNode (poly, "v", Vb.GetIndex(pPolygon->GetVertex(l)));
     }
   }
 
   CTextureFile* pTexture = pPlane->GetTexture();
+  bool Sky = false;
   if (!pTexture)
   {
-    int r, g, b;
+    //@@@ doesn't seem to be supported any more
+/*    int r, g, b;
     pPlane->GetColor(r,g,b);
     fprintf(m_fd, "<flatcol red=\"%g\" green=\"%g\" blue=\"%g\" />",
-                r/(float)255, g/(float)255, b/(float)255);
+                r/(float)255, g/(float)255, b/(float)255);*/
   }
   else
   {
     //print textureinfo
-    WriteIndent();
-    fprintf(m_fd, "<material>%s</material>\n", pTexture->GetTexturename());
-    WriteIndent();
-    fprintf(m_fd, "<texmap><plane>%s</plane></texmap>\n", pPolygon->GetBaseplane()->GetName());
+    CreateNode (poly, "material", pTexture->GetTexturename());
+    CreateNode (CreateNode (poly, "texmap"), "plane", 
+      pPolygon->GetBaseplane()->GetName());
+    Sky = (strcmp (pTexture->GetTexturename(), "sky") == 0);
   }
 
-  if (pEntity)
+  
+  Sky = Sky || (pEntity && pEntity->GetBoolValueOfKey("sky", false));
+  if (Sky)
   {
-    bool Sky = pEntity->GetBoolValueOfKey("sky", false);
-    if (Sky)
+    DocNode portal = CreateNode (poly, "portal");
+    CreateNode (portal, "sector", "cs_skysector");
+    CreateNode (portal, "clip");
+  } else if (pEntity)
+  {
+    //support for special rendering flags. Ideally, these properties would be
+    //assigned to surfaces instead of entities, but the Quake/ Half-Life map
+    //format doesn't have a really portable way to do so.
+    double Alpha  = pEntity->GetNumValueOfKey ("alpha",  100);
+    bool   Solid  = pEntity->GetBoolValueOfKey("solid",  true);
+    bool   Mirror = pEntity->GetBoolValueOfKey("mirror", false);
+    if (!pEntity->GetBoolValueOfKey("lighting", true))
     {
-      fprintf(m_fd, "<portal><sector>cs_skysector</sector><clip /></portal>");
+      //if the polygon is not supposed to be lighted...
+      CreateNode (poly, "lighting", "no");
     }
-    else
+
+    if (Alpha < 100)
     {
-      //support for special rendering flags. Ideally, these properties would be
-      //assigned to surfaces instead of entities, but the Quake/ Half-Life map
-      //format doesn't have a really portable way to do so.
-      double Alpha  = pEntity->GetNumValueOfKey ("alpha",  100);
-      bool   Solid  = pEntity->GetBoolValueOfKey("solid",  true);
-      bool   Mirror = pEntity->GetBoolValueOfKey("mirror", false);
-      if (!pEntity->GetBoolValueOfKey("lighting", true))
+      CreateNode (poly, "lighting", (float)Alpha);
+    }
+
+    if (Mirror || Alpha<100 || !Solid)
+    {
+      //We have a special case, where we need to turn this polygon into a portal.
+      const char* targetsector =
+        pEntity->GetValueOfKey("targetsector", pSector->GetName());
+
+      DocNode portal = CreateNode (poly, "portal");
+      CreateNode (portal, "sector", targetsector);
+      
+      if ( Mirror )
       {
-        //if the polygon is not supposed to be lighted...
-        fprintf(m_fd, "<lighting>no</lighting>");
+	CreateNode (portal, "mirror");
+	CreateNode (portal, "clip");
       }
-
-      if (Alpha < 100)
+      else
       {
-        fprintf(m_fd, "<alpha>%g</alpha>", Alpha);
+        if (Solid)
+        {
+  	  CreateNode (portal, "clip");
+        }
       }
-
-      if (Mirror || Alpha<100 || !Solid)
-      {
-        //We have a special case, where we need to turn this polygon into a portal.
-        const char* targetsector =
-          pEntity->GetValueOfKey("targetsector", pSector->GetName());
-
-	WriteIndent();
-        fprintf(m_fd, "<portal><sector>%s</sector>", targetsector);
-
-        if ( Mirror )
-        {
-          fprintf(m_fd, "<mirror /><clip />");
-        }
-        else
-        {
-          if (Solid)
-          {
-            fprintf(m_fd, " <clip />");
-          }
-        }
-	fprintf(m_fd, "</portal>\n");
-      } //if polygon is a portal of some special kind
-    } // if entity classname ==
+    } //if polygon is a portal of some special kind
   } // if there is a entity to define some special flags.
 
-  Unindent();
-      WriteIndent();
-  fprintf(m_fd, "</p>\n"); //End of Polygon
   return true;
 }
 
@@ -980,7 +863,7 @@ CISector* CCSWorld::CreateNewSector(CMapBrush* pBrush)
   return new CCSSector(pBrush);
 }
 
-void CCSWorld::WriteSpritesTemplate()
+void CCSWorld::WriteSpritesTemplate(csRef<iDocumentNode> node)
 {
   int i;
   char   mdlname[99] = "none";
@@ -1016,17 +899,14 @@ void CCSWorld::WriteSpritesTemplate()
       {
         char dummy;
         if (sscanf(modelnamevalue, "%s%c",mdlname, &dummy) == 1)
-        {
-          WriteIndent();
-          fprintf(m_fd, "<meshfact name=\"%s\">\n", csnamevalue);
-          Indent();
-          WriteIndent();
-          fprintf(m_fd, "<plugin>spr3d</plugin>\n");
-          WriteIndent();
+	{
+	  DocNode meshfact = CreateNode (node, "meshfact");
+	  meshfact->SetAttribute ("name", csnamevalue);
+	  CreateNode (meshfact, "plugin", "spr3d");
           //TODO: see if we can initalize .3ds files
-          fprintf(m_fd, "<file>/lib/models/%s.mdl</file>\n", mdlname);
-          WriteIndent();
-          fprintf(m_fd, "<material>%s</material>\n", csnamevalue);
+	  CreateNode (meshfact, "file", mdlname);
+          //fprintf(m_fd, "<file>/lib/models/%s.mdl</file>\n", mdlname);
+	  CreateNode (meshfact, "material", csnamevalue);
 
           //TODO: add loop for multiple actions, action2, action3, ...
           //search for all frames from base name would be better??
@@ -1034,35 +914,27 @@ void CCSWorld::WriteSpritesTemplate()
 
           if (sscanf(actionvalue, "%s%c",action, &dummy) == 1)
           {
-            WriteIndent();
-            fprintf(m_fd, "<action name=\"%s\">\n", actionvalue);
-            WriteIndent();
-            fprintf(m_fd, "(\n");
-            Indent();
+	    DocNode action = CreateNode (meshfact, "action");
+	    action->SetAttribute ("name", actionvalue);
 
             int i = 1;
             char frameaction[100];
             sprintf(frameaction, "action%d", i);
             while (pEntity->GetValueOfKey(frameaction))
             {
-              WriteIndent();
               actionvalue = pEntity->GetValueOfKey(frameaction);
               if (sscanf(actionvalue, "%s%c",frameaction, &dummy) == 1)
               {
-                fprintf(m_fd, "<f name=\"%s\" delay=\"100\" />\n", frameaction); //hardcode 100 for now
+		DocNode f = CreateNode (meshfact, "f");
+		f->SetAttribute ("name", frameaction);
+		f->SetAttributeAsInt ("delay", 100);//hardcode 100 for now
               }
               i++;
               sprintf(frameaction, "action%d", i);
             }
 
-            Unindent();
-            WriteIndent();
-            fprintf(m_fd, "</action>\n");
           }
 
-          Unindent();
-          WriteIndent();
-          fprintf(m_fd, ") \n\n");
         }
       }
     }
@@ -1071,7 +943,7 @@ void CCSWorld::WriteSpritesTemplate()
   return;
 }
 
-void CCSWorld::WriteScriptsTemplate()
+void CCSWorld::WriteScriptsTemplate(csRef<iDocumentNode> node)
 {
   int i;
 
@@ -1172,7 +1044,7 @@ void CCSWorld::WriteScriptsTemplate()
     //  SOUND 'track4' (FILE (track4.wav))
     //)
 //add filename.zip to vfs in lib/sounds
-void CCSWorld::WriteSounds()
+void CCSWorld::WriteSounds(csRef<iDocumentNode> node)
 {
   int i;
   char sfname[99] = "none";
@@ -1195,9 +1067,7 @@ void CCSWorld::WriteSounds()
 
   if (found == 1)
   {
-    WriteIndent();
-    fprintf(m_fd, "<sounds>\n");
-    Indent();
+    DocNode sounds = CreateNode (node, "sounds");
 
     for (i=0; i<m_pMap->GetNumEntities(); i++)
     {
@@ -1215,14 +1085,12 @@ void CCSWorld::WriteSounds()
           char dummy;
           if (sscanf(soundfileval, "%s%c",sfname, &dummy) == 1)
           {
-            WriteIndent();
-            fprintf(m_fd, "<sound name=\"%s\"><file>/lib/sounds/%s</file></sound>\n", sfname, sfname);
+	    DocNode sound = CreateNode (sounds, "sound");
+	    sound->SetAttribute ("name", sfname);
+	    CreateNode (sound, "file", sfname);
           }
         }
       }
     }//end for
-    Unindent();
-    WriteIndent();
-    fprintf(m_fd, "</sounds>\n");
   }
 }//end sounds

@@ -27,6 +27,8 @@
 #include "wad3file.h"
 #include "pk3file.h"
 
+#include "iutil/vfs.h"
+
 static const char* Q3Extensions[] =
 {
  "_hell",
@@ -104,14 +106,26 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
   strcpy(CleanedUpTextureName, TextureName);
   CleanupTexturename(CleanedUpTextureName);
 
+  char InternalName[200];
+  strncpy (InternalName, CleanedUpTextureName, sizeof(InternalName));
+
+  // clean out some chars like '/' etc.
   int i=0;
+  for (i=0; i<strlen(InternalName); i++)
+  {
+    if ((!isalnum(InternalName[i])) && (InternalName[i] != '_') && 
+      (InternalName[i] != '{') && (InternalName[i] != '~'))
+    {
+      InternalName[i] = '_';
+    }
+  }
 
   //First, we search in the array of already stored textures.
   for (i=0; i<m_StoredTextures.Length(); i++)
   {
     CTextureFile* pTexture = m_StoredTextures[i];
     assert(pTexture);
-    if (strcasecmp(pTexture->GetTexturename(), CleanedUpTextureName)==0)
+    if (strcasecmp(pTexture->GetTexturename(), InternalName)==0)
     {
       return pTexture;
     }
@@ -125,7 +139,7 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
     CTextureFile* pTexture = pTexArchive->CreateTexture(CleanedUpTextureName);
     if (pTexture)
     {
-      pTexture->SetTexturename(CleanedUpTextureName);
+      pTexture->SetTexturename(InternalName);
       m_StoredTextures.Push(pTexture);
       return pTexture;
     }
@@ -146,8 +160,8 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
     if (pTexture)
     {
       printf("Warning: texture '%s'('%s') is missing.\n         Using '%s' instead!\n",
-             TextureName, CleanedUpTextureName, defaultname);
-      pTexture->SetTexturename(CleanedUpTextureName);
+             TextureName, InternalName, defaultname);
+      pTexture->SetTexturename(InternalName);
       m_StoredTextures.Push(pTexture);
       return pTexture;
     }
@@ -158,7 +172,7 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
   printf("Warning: texture '%s'('%s') is missing.\n        Making a new null texture.\n",
     TextureName, CleanedUpTextureName);
   pTexture = new CTextureFile;
-  pTexture->SetTexturename (CleanedUpTextureName);
+  pTexture->SetTexturename (InternalName);
   pTexture->SetFilename    (CleanedUpTextureName);
   pTexture->SetOriginalData(NULL,0);
   pTexture->SetOriginalSize(256, 256);
@@ -166,7 +180,7 @@ CTextureFile* CTextureManager::GetTexture(const char* TextureName)
   return pTexture;
 }
 
-bool CTextureManager::AddAllTexturesToZip(CZipFile* pZipfile)
+bool CTextureManager::AddAllTexturesToVFS(csRef<iVFS> VFS, const char* path)
 {
   bool ok = true;
   int i;
@@ -180,7 +194,7 @@ bool CTextureManager::AddAllTexturesToZip(CZipFile* pZipfile)
     //visblocking and that are using some reserved names.).
     if (pTexture->IsVisible() && pTexture->IsStored())
     {
-      if (!pTexture->AddToZip(pZipfile))
+      if (!pTexture->AddToVFS(VFS, path))
       {
         ok = false;
       }

@@ -20,6 +20,8 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/csstring.h"
+
 #include "mapstd.h"
 #include "mcurve.h"
 #include "mparser.h"
@@ -27,6 +29,8 @@
 #include "mpoly.h"
 #include "texplane.h"
 #include "cworld.h"
+
+#include "dochelp.h"
 
 static int CurveCounter = 0;
 
@@ -108,7 +112,7 @@ bool CMapCurve::Read(CMapParser* pParser, CMapFile* pMap)
   return true;
 }
 
-bool CMapCurve::Write(CCSWorld* pWorld)
+bool CMapCurve::Write(csRef<iDocumentNode> node, CCSWorld* pWorld)
 {
   //Thomas Hieber, 16.5.2001: I know this method is wrong, but I don't know what format
   //                          CS expects curves after the change in the map format.
@@ -117,10 +121,8 @@ bool CMapCurve::Write(CCSWorld* pWorld)
   assert(pWorld);
 
   CMapFile* pMap         = pWorld->GetMap();
-  FILE*     fd           = pWorld->GetFile();
 
   assert(pMap);
-  assert(fd);
 
   CMapCurve*    pCurve   = this;
   CTextureFile* pTexture = pCurve->GetTexture();
@@ -132,11 +134,12 @@ bool CMapCurve::Write(CCSWorld* pWorld)
     {
       for (x=0; x<(pCurve->GetNumCols()-1)/2; x++)
       {
-        fprintf(fd, "    <addon><plugin>bezier</plugin>"
-	  "<params>"
-	  "<name>bezier_%s_%d_%d</name>"
-	  "<material>%s</material>",
-                    (const char*) m_Name, y, x, pTexture->GetTexturename());
+        DocNode addon = CreateNode (node, "addon");
+	CreateNode (addon, "plugin", "bezier");
+	DocNode params = CreateNode (addon, "params");
+	CreateNode (params, "name", 
+	  csString().Format ("bezier_%s_%d_%d", (const char*) m_Name, y, x));
+	CreateNode (params, "material", pTexture->GetTexturename());
 
         int numcols = pCurve->GetNumCols();
         int row1 = y*2+2;
@@ -146,14 +149,25 @@ bool CMapCurve::Write(CCSWorld* pWorld)
         int col2 = x*2+1;
         int col3 = x*2+2;
 
-        fprintf(fd, "<v>%3d</v><v>%3d</v><v>%3d</v><v>%3d</v><v>%3d</v><v>%3d</v><v>%3d</v><v>%3d</v><v>%3d</v></params></addon>\n",
-                    col1 + row1*numcols, col2 + row1*numcols, col3 + row1*numcols,
-                    col1 + row2*numcols, col2 + row2*numcols, col3 + row2*numcols,
-                    col1 + row3*numcols, col2 + row3*numcols, col3 + row3*numcols);
+        CreateNode (addon, "v", col1 + row1*numcols);
+        CreateNode (addon, "v", col2 + row1*numcols);
+        CreateNode (addon, "v", col3 + row1*numcols);
+
+        CreateNode (addon, "v", col1 + row2*numcols);
+        CreateNode (addon, "v", col2 + row2*numcols);
+        CreateNode (addon, "v", col3 + row2*numcols);
+
+        CreateNode (addon, "v", col1 + row3*numcols);
+        CreateNode (addon, "v", col2 + row3*numcols);
+        CreateNode (addon, "v", col3 + row3*numcols);
       }
     }
 
-    fprintf(fd, "    <meshfact name=\"curve_%s\"><plugin>thingFact</plugin><params>\n", (const char*) m_Name);
+    DocNode meshfact = CreateNode (node, "meshfact");
+    meshfact->SetAttribute ("name", 
+      csString().Format ("curve_%s", m_Name));
+    CreateNode (meshfact, "plugin", "thingFact");
+    DocNode params = CreateNode (meshfact, "params");
     int row, col;
     CdVector3 Center(0,0,0);
     double    NumVect = 0.0;
@@ -163,12 +177,12 @@ bool CMapCurve::Write(CCSWorld* pWorld)
       for (col=0; col<pCurve->GetNumCols(); col++)
       {
         CMapCurvePoint* pPoint = pCurve->GetPoint(row, col);
-        fprintf(fd, "      <curvecontrol x=\"%g\" y=\"%g\" z=\"%g\" u=\"%g\" v=\"%g\" />\n",
-                    pPoint->m_Pos.x*pWorld->GetScalefactor(),
-                    pPoint->m_Pos.z*pWorld->GetScalefactor(),
-                    pPoint->m_Pos.y*pWorld->GetScalefactor(),
-                    pPoint->m_u,
-                    pPoint->m_v);
+	DocNode cc = CreateNode (params, "curvecontrol");
+	cc->SetAttributeAsFloat ("x", pPoint->m_Pos.x*pWorld->GetScalefactor());
+	cc->SetAttributeAsFloat ("y", pPoint->m_Pos.z*pWorld->GetScalefactor());
+	cc->SetAttributeAsFloat ("z", pPoint->m_Pos.y*pWorld->GetScalefactor());
+	cc->SetAttributeAsFloat ("u", pPoint->m_u);
+	cc->SetAttributeAsFloat ("v", pPoint->m_v);
         NumVect += 1.0;
         Center  += pPoint->m_Pos;
       }
@@ -179,22 +193,22 @@ bool CMapCurve::Write(CCSWorld* pWorld)
       Center *= 1.0/NumVect;
     }
 
-    fprintf(fd, "      <curvecenter x=\"%g\" y=\"%g\" z=\"%g\" />\n",
-                Center.x*pWorld->GetScalefactor(),
-                Center.z*pWorld->GetScalefactor(),
-                Center.y*pWorld->GetScalefactor());
-    fprintf(fd, "      <curvescale>80</curvescale>\n");
+    DocNode cc = CreateNode (params, "curvecenter");
+    cc->SetAttributeAsFloat ("x", Center.x*pWorld->GetScalefactor());
+    cc->SetAttributeAsFloat ("y", Center.z*pWorld->GetScalefactor());
+    cc->SetAttributeAsFloat ("z", Center.y*pWorld->GetScalefactor());
+    CreateNode (params, "curvescale", 80);
 
     for (y=0; y<(pCurve->GetNumRows()-1)/2; y++)
     {
       for (x=0; x<(pCurve->GetNumCols()-1)/2; x++)
       {
-        fprintf(fd, "      <curve name=\"bez_%s_%d_%d\">bezier_%s_%d_%d</curve>\n",
-                    (const char*) m_Name, y, x, (const char*) m_Name, y, x);
+	csString tmp;
+	tmp.Format ("bez_%s_%d_%d", m_Name, y, x);
+	CreateNode (params, "curve", tmp)->SetAttribute ("name", tmp);
       }
     }
 
-    fprintf(fd, "    </params></addon>\n");
   }
 
   return true;

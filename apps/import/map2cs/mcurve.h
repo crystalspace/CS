@@ -23,6 +23,7 @@
 #define __MCURVE_H__
 
 #include "contain.h"
+#include "csutil/ref.h"
 
 //Some forward declarations needed in class declaration.
 class CMapParser;
@@ -30,6 +31,7 @@ class CMapTexturedPlane;
 class CMapFile;
 class CdVector3;
 class CCSWorld;
+struct iDocumentNode;
 
 class CMapCurvePoint
 {
@@ -79,7 +81,7 @@ public:
 
   CTextureFile* GetTexture() {return m_pTexture;}
 
-  bool Write(CCSWorld* pWorld);
+  bool Write(csRef<iDocumentNode> node, CCSWorld* pWorld);
 
 protected:
 

@@ -36,41 +36,36 @@ class csImageMemory : public csImageFile
   /// If true when these interfaces are destroyed the image is also.
   bool destroy_image;
 public:
-  /// Create a blank true colour image of these dimensions.
-  csImageMemory (int width, int height);
+  /**
+   * Create a blank image of these dimensions and the specified
+   * format.
+   * \param width Width of the image
+   * \param height Height of the image
+   * \param format Image format. Default: #CS_IMGFMT_TRUECOLOR
+   */
+  csImageMemory (int width, int height, int format = CS_IMGFMT_TRUECOLOR);
   /**
    * Create an iImage interface for this true colour buffer with
    * these dimensions. If destroy is set to true then the supplied buffer
    * will be destroyed when the interfaces are.
+   * \param width Width of the image
+   * \param height Height of the image
+   * \param buffer Data containing initial data
+   * \param destroy Destroy the buffer when the Image is destroyed
+   * \param format Image format. Data in \arg buffer must be in this format.
+   * Default: #CS_IMGFMT_TRUECOLOR
+   * \param palette Palett for indexed images.
    */
-  csImageMemory (int width, int height, csRGBpixel *buffer, bool destroy);
+  csImageMemory (int width, int height, void *buffer, bool destroy,
+    int format = CS_IMGFMT_TRUECOLOR, csRGBpixel *palette = NULL);
 
   virtual ~csImageMemory ();
 
-  /// Clears image to colour
+  /// Clears image to colour. Only works for truecolor images.
   void Clear (const csRGBpixel &colour);
 
   /// Rescale the image to the given size
   virtual void Rescale (int NewWidth, int NewHeight);
-
-  /// Qyery image format (see CS_IMGFMT_XXX above)
-  virtual int GetFormat ()
-  { return CS_IMGFMT_TRUECOLOR; }
-  /// Get image palette (or NULL if no palette)
-  virtual csRGBpixel *GetPalette ()
-  { return NULL; }
-  /// Get alpha map for 8-bit paletted image.
-  virtual uint8 *GetAlpha ()
-  { return NULL; }
-  /// Change image format
-  virtual void SetFormat (int /*iFormat*/)
-  {  }
-  /// Create yet another image and copy this one into the new image.
-  virtual csPtr<iImage> Clone ()
-  { return 0; }
-  /// Create another image holding a subimage of current image
-  virtual csPtr<iImage> Crop (int , int , int , int )
-  { return 0; }
 };
 
 

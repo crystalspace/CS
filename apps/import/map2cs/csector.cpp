@@ -20,6 +20,8 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/csstring.h"
+
 #include "mapstd.h"
 #include "brush.h"
 #include "mpoly.h"
@@ -34,7 +36,7 @@
 #include "csector.h"
 #include "cworld.h"
 
-
+#include "dochelp.h"
 
 static char* BuildMaterialKey (int i, CMapEntity* pEntity)
 {
@@ -116,38 +118,28 @@ CCSSector::~CCSSector()
 {
 }
 
-bool CCSSector::Write(CIWorld* pIWorld)
+bool CCSSector::Write(csRef<iDocumentNode> node, CIWorld* pIWorld)
 {
   assert(pIWorld);
   CCSWorld* pWorld  = (CCSWorld*)  pIWorld;
 
   CMapFile* pMap = pWorld->GetMap();
-  FILE*     fd   = pWorld->GetFile();
 
   assert(pMap);
-  assert(fd);
 
-  pWorld->WriteIndent();
-  fprintf(fd, "<sector name=\"%s\">\n", GetName());
-  pWorld->Indent();
+  DocNode sector = CreateNode (node, "sector");
+  sector->SetAttribute ("name", GetName());
 
-  pWorld->WriteIndent();
-  fprintf(fd, "<meshobj name=\"static\">\n");
-  pWorld->Indent();
-
-  pWorld->WriteIndent();
-  fprintf(fd, "<plugin>thing</plugin>\n");
-  pWorld->WriteIndent();
-  fprintf(fd, "<zuse />\n");
-  pWorld->WriteIndent();
-  fprintf(fd, "<priority>wall</priority>\n");
+  DocNode meshobj = CreateNode (sector, "meshobj");
+  meshobj->SetAttribute ("name", "static");
+  CreateNode (meshobj, "plugin", "thing");
+  CreateNode (meshobj, "zuse");
+  CreateNode (meshobj, "priority", "wall");
 
   CMapEntity* pEntity = m_pOriginalBrush->GetEntity();
-  CCSWorld::WriteKeys(pWorld, pEntity);
+  CCSWorld::WriteKeys(meshobj, pWorld, pEntity);
 
-  pWorld->WriteIndent();
-  fprintf(fd, "<params>\n");
-  pWorld->Indent();
+  DocNode params = CreateNode (meshobj, "params");
 
 //  if (pMap->GetConfigInt("Map2CS.General.UseBSP", 0))
 //  {
@@ -157,41 +149,32 @@ bool CCSSector::Write(CIWorld* pIWorld)
 
   if (m_IsDefaultsector && pWorld->NeedSkysector())
   {
-    /*pWorld->WriteIndent();
-    fprintf(fd, "PART 'p1' (\n");
-    pWorld->Indent();*/
-
-    pWorld->WriteSky();
-
-    /*pWorld->Unindent();
-    pWorld->WriteIndent();
-    fprintf(fd, ")\n");*/ //PART
+    pWorld->WriteSky(node);
   }
   else
   {
     if (m_Walls.Length() > 0 ||
         m_Portals.Length() > 0)
     {
-      pWorld->WriteIndent();
-      fprintf(fd, "<part name=\"p1\">\n");
-      pWorld->Indent();
+      DocNode part = CreateNode (params, "part");
+      part->SetAttribute ("name", "p1");
 
       int i, j, l;
 
       CVertexBuffer Vb;
       Vb.AddVertices(&m_Walls);
       Vb.AddVertices(&m_Portals);
-      Vb.WriteCS(pWorld);
+      Vb.WriteCS(part, pWorld);
 
-      for (i=0; i<m_Walls.Length(); i++)
+/*      for (i=0; i<m_Walls.Length(); i++)
       {
         CMapPolygonSet* pPolySet = m_Walls[i];
         for (j=0; j<pPolySet->GetPolygonCount(); j++)
         {
           CMapPolygon* pPolygon = pPolySet->GetPolygon(j);
-          pWorld->WritePolygon(pPolygon, this, true, Vb);
+          pWorld->WritePolygon(part, pPolygon, this, true, Vb);
         }
-      }
+      }*/
 
       for (i=0; i<m_Portals.Length(); i++)
       {
@@ -206,51 +189,30 @@ bool CCSSector::Write(CIWorld* pIWorld)
           //Because for a sector we draw the _inside_ of the brush, we spit out the
           //vertices in reverse order, so they will have proper orientation for
           //backface culling in the engine.
-          pWorld->WriteIndent();
-          fprintf(fd, "<p>\n");
-	  pWorld->Indent();
+	  DocNode p = CreateNode (part, "p");
           for (l=pPolygon->GetVertexCount()-1; l>=0; l--)
           {
-	      pWorld->WriteIndent();
-              fprintf(fd, "<v>%d</v>\n", Vb.GetIndex(pPolygon->GetVertex(l)));
+	    CreateNode (p, "v", (int)Vb.GetIndex(pPolygon->GetVertex(l)));
           }
 
           //print textureinfo
-          pWorld->WriteIndent();
-          fprintf(fd, "<material>%s</material>\n", pTexture->GetTexturename());
-          pWorld->WriteIndent();
-          fprintf(fd, "<texmap><plane>%s</plane></texmap>\n", pPolygon->GetBaseplane()->GetName());
-          pWorld->WriteIndent();
-          fprintf(fd, "<portal><sector>%s</sector></portal>\n", pPortal->GetTargetSector()->GetName());
-	  pWorld->Unindent();
-          pWorld->WriteIndent();
-          fprintf(fd, "</p>\n"); //End of Polygon
+	  CreateNode (p, "material", pTexture->GetTexturename());
+	  CreateNode (CreateNode (p, "texmap"), "plane", pPolygon->GetBaseplane()->GetName());
+	  CreateNode (CreateNode (p, "portal"), "sector", pPortal->GetTargetSector()->GetName());
         }
       }
-
-      pWorld->Unindent();
-      pWorld->WriteIndent();
-      fprintf(fd, "</part>\n"); //PART
     } //if contains any polygons
   }
 
-  WriteWorldspawn(pWorld);
+  WriteWorldspawn(params, pWorld);
 
-  pWorld->Unindent();
-  pWorld->WriteIndent();
-  fprintf(fd, "</params>\n"); //End of PARAMS
-
-  pWorld->Unindent();
-  pWorld->WriteIndent();
-  fprintf(fd, "</meshobj>\n"); //End of MESHOBJ
-
-  WriteFog(pWorld);
-  WriteLights(pWorld);
-  WriteCurves(pWorld);
-  WriteThings(pWorld);
-  WriteSprites(pWorld);
-  WriteSprites2D(pWorld);
-  WriteNodes (pWorld);
+  WriteFog(sector, pWorld);
+  WriteLights(sector, pWorld);
+  WriteCurves(sector, pWorld);
+  WriteThings(sector, pWorld);
+  WriteSprites(sector, pWorld);
+  WriteSprites2D(sector, pWorld);
+  WriteNodes (sector, pWorld);
 
 //  if (pMap->GetConfigInt("Map2CS.General.UseBSP", 0))
 //  {
@@ -258,20 +220,17 @@ bool CCSSector::Write(CIWorld* pIWorld)
 //    fprintf(fd, "CULLER('static')\n");
 //  }
 
-  pWorld->Unindent();
-  pWorld->WriteIndent();
-  fprintf(fd, "</sector>\n\n"); //End of SECTOR(
   return true;
 }
 
-bool CCSSector::WriteWorldspawn(CIWorld* pWorld)
+bool CCSSector::WriteWorldspawn(csRef<iDocumentNode> node, CIWorld* pWorld)
 {
   int i;
   for (i=0; i<m_Things.Length(); i++)
   {
     if (strcasecmp(m_Things[i]->GetClassname(), "worldspawn")==0)
     {
-      if (!((CCSThing*)m_Things[i])->WriteAsPart(pWorld, this))
+      if (!((CCSThing*)m_Things[i])->WriteAsPart(node, pWorld, this))
       {
         return false;
       }
@@ -280,14 +239,14 @@ bool CCSSector::WriteWorldspawn(CIWorld* pWorld)
   return true;
 }
 
-bool CCSSector::WriteThings(CIWorld* pWorld)
+bool CCSSector::WriteThings(csRef<iDocumentNode> node, CIWorld* pWorld)
 {
   int i;
   for (i=0; i<m_Things.Length(); i++)
   {
     if (strcasecmp(m_Things[i]->GetClassname(), "worldspawn")!=0)
     {
-      if (!m_Things[i]->Write(pWorld, this))
+      if (!m_Things[i]->Write(node, pWorld, this))
       {
         return false;
       }
@@ -296,18 +255,14 @@ bool CCSSector::WriteThings(CIWorld* pWorld)
   return true;
 }
 
-bool CCSSector::WriteLights(CIWorld* pWorld)
+bool CCSSector::WriteLights(csRef<iDocumentNode> node, CIWorld* pWorld)
 {
   assert(pWorld);
 
   CMapFile* pMap        = pWorld->GetMap();
-  FILE*     fd          = pWorld->GetFile();
   double    ScaleFactor = pWorld->GetScalefactor();
 
   assert(pMap);
-  assert(fd);
-
-  fprintf(fd, "\n");
 
   int i;
 
@@ -391,28 +346,31 @@ bool CCSSector::WriteLights(CIWorld* pWorld)
           //It looks like Crystal Space uses a different algo for lights,
           //so we will scale them up a bit. (Maybe the factor should be
           //configurable in the future)
-          pWorld->WriteIndent();
 
-          fprintf(fd, "<light>");
-          fprintf(fd, "<center x=\"%g\" y=\"%g\" z=\"%g\" />",
-                  origin.x*ScaleFactor,
-                  origin.z*ScaleFactor,
-                  origin.y*ScaleFactor);
-          fprintf(fd, "<radius>%g</radius>",radius*ScaleFactor*lightscale);
-          fprintf(fd, "<color red=\"%g\" green=\"%g\" blue=\"%g\" />",
-                  (r/255) * (radius/128),
-                  (g/255) * (radius/128),
-                  (b/255) * (radius/128));
+	  DocNode light = CreateNode (node, "light");
+	  DocNode center = CreateNode (light, "center");
+	  center->SetAttributeAsFloat ("x", origin.x*ScaleFactor);
+	  center->SetAttributeAsFloat ("y", origin.z*ScaleFactor);
+	  center->SetAttributeAsFloat ("z", origin.y*ScaleFactor);
+	  CreateNode (light, "radius", 
+	    (float)(radius*ScaleFactor*lightscale));
+	  DocNode color = CreateNode (light, "color");
+	  color->SetAttributeAsFloat ("red", (r/255) * (radius/128));
+	  color->SetAttributeAsFloat ("green", (g/255) * (radius/128));
+	  color->SetAttributeAsFloat ("blue", (b/255) * (radius/128));
+
           if (dynamic)
           {
-            fprintf(fd, "<dynamic />");
+            CreateNode (light, "dynamic");
           }
-          fprintf(fd, "<halo><type>cross</type><intensity>%g</intensity><cross>%g</cross></halo>",
-                  //(halo),
-                  (halointen),
-                  (halocross));
-          fprintf(fd, "<attenuation>%s</attenuation>",attenuation);
-          fprintf(fd, "</light>\n\n");
+	  {
+	    DocNode halo = CreateNode (light, "halo");
+	    CreateNode (halo, "type", "cross");
+	    CreateNode (halo, "intensity", (float)halointen);
+	    CreateNode (halo, "cross", (float)halointen);
+	  }
+
+	  CreateNode (light, "attenuation", attenuation);
         } //if (light is inside this sector)
       } // if (entity had origin)
     } //if (classname == "light")
@@ -421,12 +379,9 @@ bool CCSSector::WriteLights(CIWorld* pWorld)
 }
 
 /// Write all nodes inside the sector
-bool CCSSector::WriteNodes(CIWorld* pWorld)
+bool CCSSector::WriteNodes(csRef<iDocumentNode> node, CIWorld* pWorld)
 {
   assert(pWorld);
-
-  FILE* fd = pWorld->GetFile();
-  assert(fd);
 
   double ScaleFactor = pWorld->GetScalefactor();
 
@@ -438,33 +393,26 @@ bool CCSSector::WriteNodes(CIWorld* pWorld)
     CdVector3 Origin(0,0,0);
     pEntity->GetOrigin(Origin);
     if (strcmp(pEntity->GetValueOfKey("classname"),"cs_model")){
-    pWorld->WriteIndent();
-    fprintf(fd, "<node name=\"%s\">\n", pEntity->GetName());
-    pWorld->Indent();
-    CCSWorld::WriteKeys(pWorld, pEntity);
-    pWorld->WriteIndent();
-    fprintf(fd, "<position x=\"%g\" y=\"%g\" z=\"%g\" />\n",
-                Origin.x*ScaleFactor,
-                Origin.z*ScaleFactor,
-                Origin.y*ScaleFactor);
-    pWorld->Unindent();
-    pWorld->WriteIndent();
-    fprintf(fd, "</node>\n");
-	}
+      DocNode Node = CreateNode (node, "node");
+      Node->SetAttribute ("name", pEntity->GetName());
+      CCSWorld::WriteKeys(Node, pWorld, pEntity);
+      DocNode position = CreateNode (Node, "position");
+      position->SetAttributeAsFloat ("x", Origin.x*ScaleFactor);
+      position->SetAttributeAsFloat ("y", Origin.z*ScaleFactor);
+      position->SetAttributeAsFloat ("z", Origin.y*ScaleFactor);
+    }
   }
 
   return true;
 }
 
-bool CCSSector::WriteCurves(CIWorld* pWorld)
+bool CCSSector::WriteCurves(csRef<iDocumentNode> node, CIWorld* pWorld)
 {
   assert(pWorld);
 
   CMapFile* pMap         = pWorld->GetMap();
-  FILE*     fd           = pWorld->GetFile();
 
   assert(pMap);
-  assert(fd);
 
   int i, curve;
   for (i=0; i<pMap->GetNumEntities(); i++)
@@ -479,36 +427,22 @@ bool CCSSector::WriteCurves(CIWorld* pWorld)
         CTextureFile* pTexture = pCurve->GetTexture();
         if (pTexture->IsVisible())
         {
-          pWorld->WriteIndent();
-          fprintf(fd, "<meshobj name=\"%s_e%d_c%d\">\n",pEntity->GetName(), i, curve);
-          pWorld->Indent();
+	  DocNode meshobj = CreateNode (node, "meshobj");
+	  meshobj->SetAttribute ("name",
+	    csString().Format ("%s_e%d_c%d", pEntity->GetName(), i, curve));
+	  CreateNode (node, "plugin", "thing");
+	  CreateNode (node, "zuse");
+	  CreateNode (node, "priority", pEntity->GetValueOfKey("priority", "object"));
 
-          pWorld->WriteIndent();
-          fprintf(fd, "<plugin>thing</plugin>\n");
-          pWorld->WriteIndent();
-          fprintf(fd, "<zuse />\n");
-          pWorld->WriteIndent();
-	  fprintf(fd, "<priority>%s</priority>\n", pEntity->GetValueOfKey("priority", "object"));
+	  DocNode params = CreateNode (meshobj, "params");
+          CreateNode (params, "factory", 
+	    csString().Format ("curve_%s", pCurve->GetName()));
 
-          CCSWorld::WriteKeys(pWorld, pEntity);
-
-          pWorld->WriteIndent();
-          fprintf(fd, "<params>\n");
-          pWorld->Indent();
-
-          pWorld->WriteIndent();
-          fprintf(fd, "<factory>curve_%s</factory>\n", pCurve->GetName());
-
-          pWorld->Unindent();
-          pWorld->WriteIndent();
-          fprintf(fd, "</params>\n"); //PARAMS
-
-          pWorld->WriteIndent();
-          fprintf(fd, "<move><v x=\"0\" y=\"0\" z=\"0\" /></move>\n");
-
-          pWorld->Unindent();
-          pWorld->WriteIndent();
-          fprintf(fd, "</meshobj>\n\n"); //MESHOBJ
+	  DocNode move = CreateNode (meshobj, "move");
+	  DocNode v = CreateNode (move, "v");
+	  v->SetAttributeAsInt ("x", 0);
+	  v->SetAttributeAsInt ("y", 0);
+	  v->SetAttributeAsInt ("z", 0);
         }
       }
     }
@@ -533,8 +467,10 @@ bool CCSSector::WriteCurves(CIWorld* pWorld)
     //  TRANSPARENT ()  //=DST
     //  KEYCOLOR ()     // color 0 is transparent
 
-bool CCSSector::WriteSprites(CIWorld* pWorld)
+bool CCSSector::WriteSprites(csRef<iDocumentNode> node, CIWorld* pWorld)
 {
+  // @@@ check if this still works
+#if 0
   assert(pWorld);
 
   CMapFile* pMap        = pWorld->GetMap();
@@ -543,9 +479,6 @@ bool CCSSector::WriteSprites(CIWorld* pWorld)
   //const char*   modelscale = "1";   //df added matrix scaler
 
   assert(pMap);
-  assert(fd);
-
-  fprintf(fd, "\n");
 
   int i;
   char   mdlname[99] = "none";
@@ -706,6 +639,7 @@ bool CCSSector::WriteSprites(CIWorld* pWorld)
       }
     }
   }
+#endif
   return true;
 }
 
@@ -729,17 +663,13 @@ bool CCSSector::WriteSprites(CIWorld* pWorld)
 //  TRANSPARENT ()  //=DST
 //  KEYCOLOR ()     // color 0 is transparent
 
-bool CCSSector::WriteSprites2D(CIWorld* pWorld)
+bool CCSSector::WriteSprites2D(csRef<iDocumentNode> node, CIWorld* pWorld)
 {
   assert(pWorld);
 
   CMapFile* pMap        = pWorld->GetMap();
-  FILE*     fd          = pWorld->GetFile();
   double    ScaleFactor = pWorld->GetScalefactor();
   assert(pMap);
-  assert(fd);
-
-  fprintf(fd, "\n");
 
   int i;
 
@@ -844,7 +774,7 @@ bool CCSSector::WriteSprites2D(CIWorld* pWorld)
   return true;
 }
 
-bool CCSSector::WriteFog(CIWorld* pWorld)
+bool CCSSector::WriteFog(csRef<iDocumentNode> node, CIWorld* pWorld)
 {
 /*  assert(pWorld);
 

@@ -21,26 +21,41 @@
 #include "csgfx/rgbpixel.h"
 #include "csutil/debug.h"
 
-csImageMemory::csImageMemory (int width, int height)
-  : csImageFile (CS_IMGFMT_TRUECOLOR)
+csImageMemory::csImageMemory (int width, int height, int format)
+  : csImageFile (format)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   DG_TYPE (this, "csImageMemory");
   Width = width;
   Height = height;
-  Image = (void*) new csRGBpixel[Width*Height];
+  switch (format & CS_IMGFMT_MASK)
+  {
+  case CS_IMGFMT_PALETTED8:
+    Image = (void*) new uint8[Width*Height];
+    if (format & CS_IMGFMT_ALPHA)
+    {
+      Alpha =  new uint8[Width*Height];
+    }
+    Palette = new csRGBpixel[256];
+    break;
+  case CS_IMGFMT_TRUECOLOR:
+    Image = (void*) new csRGBpixel[Width*Height];
+    break;
+  }
   short_cut = true;
   destroy_image = true;
 }
 
-csImageMemory::csImageMemory (int width, int height, csRGBpixel *buffer, bool destroy)
-  : csImageFile (CS_IMGFMT_TRUECOLOR)
+csImageMemory::csImageMemory (int width, int height, void *buffer, bool destroy,
+			      int format, csRGBpixel *palette)
+  : csImageFile (format)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   DG_TYPE (this, "csImageMemory");
   Width = width;
   Height = height;
   Image = buffer;
+  Palette = palette;
   short_cut = false;
   destroy_image = destroy;
 }
@@ -48,11 +63,15 @@ csImageMemory::csImageMemory (int width, int height, csRGBpixel *buffer, bool de
 csImageMemory::~csImageMemory ()
 {
   if (!destroy_image)
+  {
     Image = NULL;
+    Palette = NULL;
+  }
 }
 
 void csImageMemory::Clear (const csRGBpixel &colour)
 {
+  if ((Format & CS_IMGFMT_MASK) != CS_IMGFMT_TRUECOLOR) return;
   uint32 *src = (uint32*) &colour;
   uint32 *dst = (uint32*)Image;
 
@@ -64,13 +83,13 @@ void csImageMemory::Clear (const csRGBpixel &colour)
 // short cut
 void csImageMemory::Rescale (int NewWidth, int NewHeight)
 {
-  if (short_cut)
+/*  if (short_cut)
   {
     Width = NewWidth;
     Height = NewHeight;
     delete [] (csRGBpixel *) Image;
     Image = (void*) new csRGBpixel[Width*Height];
   }
-  else
+  else*/
     csImageFile::Rescale (NewWidth, NewHeight);
 }

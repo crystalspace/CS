@@ -25,6 +25,7 @@
 #include "texfile.h"
 #include "zipfile.h"
 
+#include "igraphic/imageio.h"
 
 CZipArchive::CZipArchive()
 {
@@ -55,6 +56,8 @@ CTextureFile* CZipArchive::CreateTexture(const char* texturename)
   return NULL;
 }
 
+extern iImageIO* ImageLoader;
+
 CTextureFile* CZipArchive::ExtractTexture(const char* texturename, const char* texfilename)
 {
   CTextureFile* pTexture = NULL;
@@ -68,7 +71,14 @@ CTextureFile* CZipArchive::ExtractTexture(const char* texturename, const char* t
     pTexture->SetFilename    (texfilename);
     pTexture->SetOriginalData(TextureData.GetData(), TextureData.GetSize());
 
-    pTexture->SetOriginalSize(256, 256);
+    csRef<iImage> img (ImageLoader->Load ((uint8*)TextureData.GetData(), TextureData.GetSize(), 
+      CS_IMGFMT_ANY));
+    if (img)
+    {
+      pTexture->SetOriginalSize (img->GetWidth(), img->GetHeight());
+    }
+    else
+      pTexture->SetOriginalSize(256, 256);
   }
 
   return pTexture;

@@ -26,6 +26,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "igraphic/imageio.h"
+#include "iutil/vfs.h"
 
 static const char* InvisibleTextures[] =
 {
@@ -89,10 +90,16 @@ void CTextureFile::SetOriginalData(char* Data, int Size)
   }
 }
 
-bool CTextureFile::AddToZip(CZipFile* pZipfile)
+bool CTextureFile::AddToVFS(csRef<iVFS> VFS, const char* path)
 {
   if (m_OriginalData.GetSize() == 0) return true;
-  return pZipfile->AddData(&m_OriginalData, m_Filename);
+  VFS->PushDir();
+  VFS->ChDir (path);
+  bool res = VFS->WriteFile (m_Filename, (char*)m_OriginalData.GetData(),
+    m_OriginalData.GetSize());
+  VFS->PopDir ();
+  return res;
+//  return pZipfile->AddData(&m_OriginalData, m_Filename);
 }
 
 void CTextureFile::SetTexturename(const char* name)

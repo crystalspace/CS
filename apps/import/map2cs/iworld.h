@@ -24,6 +24,9 @@
 #define __IWORLD_H__
 
 #include "contain.h"
+#include "csutil/ref.h"
+
+struct iDocumentNode;
 
 class CMapFile;
 
@@ -45,10 +48,10 @@ public:
     * Writes the sector and all contained things into the Crystal
     * Space worldfile.
     */
-  virtual bool Write(const char* filename, CMapFile* pMap, const char * sourcename) = 0;
+  virtual bool Write(csRef<iDocumentNode> root, CMapFile* pMap, const char * sourcename) = 0;
 
   /// Get the filedescriptor of the file currently open for exporting
-  FILE*     GetFile() {return m_fd;}
+  //FILE*     GetFile() {return m_fd;}
 
   /// Get a pointer to the map to convert.
   CMapFile* GetMap()  {return m_pMap;}
@@ -75,10 +78,10 @@ public:
   CISector* GetSector(int n) {return m_Sectors[n];}
 
   /// Add another column of spaces before every line
-  void Indent();
+  //void Indent();
 
   /// Remove another column of spaces before every line
-  void Unindent();
+  //void Unindent();
 
   /// Writes the currently selected number of spaces for indenting
   bool WriteIndent();
@@ -138,7 +141,7 @@ protected:
   CCharVector      m_TextureFileNames;
 
   /// Store the descrptior of the worldfile here while writing
-  FILE*            m_fd;
+  //FILE*            m_fd;
 
   /// A Pointer to the map containing the data to be written
   CMapFile*        m_pMap;
@@ -147,7 +150,7 @@ protected:
   double           m_ScaleFactor;
 
   /// The current indent Level. (1=="  ", 2=="    "...)
-  int              m_Indent;
+  //int              m_Indent;
 }; //CCSWorld
 
 #endif // __IWORLD_H__

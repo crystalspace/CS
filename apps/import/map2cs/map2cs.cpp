@@ -26,18 +26,21 @@
 #include "map.h"
 #include "cworld.h"
 #include "wad3file.h"
-#include "csutil/scf.h"
 #include "iutil/plugin.h"
-#include "csutil/cfgfile.h"
-#include "cstool/initapp.h"
 #include "iutil/objreg.h"
-#include "igraphic/imageio.h"
+#include "iutil/document.h"
 #include "iutil/comp.h"
+#include "csutil/scf.h"
+#include "csutil/cfgfile.h"
+#include "csutil/xmltiny.h"
+#include "cstool/initapp.h"
+#include "igraphic/imageio.h"
+#include "iutil/vfs.h"
+#include "csver.h"
 
 CS_IMPLEMENT_APPLICATION
 
 //@@@ yup, global vars are ugly.
-bool IL_Loaded = false;
 iImageIO* ImageLoader = 0;
 
 void PrintSyntax()
@@ -66,10 +69,18 @@ int appMain (iObjectRegistry* object_reg, int argc, char *argv[])
   {
    ImageLoader = il;
   }
+  csRef<iVFS> VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  if (!VFS)
+  {
+    printf ("Couldn't load VFS!\n");
+    return 1;
+  }
 
-  printf("\nmap2cs version 0.97, Copyright (C) 1999-2000 by Thomas Hieber\n");
-  printf("                     Copyright (C) 1999-2003 by Jorrit Tyberghein "
-    "and others\n\n");
+  printf("\nmap2cs version 0.97\n");
+  printf("Copyright (C) 1999-2003 by Thomas Hieber and others\n");
+  printf("CrystalSpace version " CS_VERSION "\n");
+  printf("Copyright (C) 1999-2003 by Jorrit Tyberghein and others\n\n");
+
   printf("map2cs comes with ABSOLUTELY NO WARRANTY; for details see the file 'COPYING'\n");
   printf("This is free software, and you are welcome to redistribute it under certain\n");
   printf("conditions; see `COPYING' for details.\n\n");
@@ -111,8 +122,22 @@ int appMain (iObjectRegistry* object_reg, int argc, char *argv[])
   Map.CreatePolygons();
   printf("Writing world '%s'\n", worldfile);
 
+  csRef<iDocumentSystem> xml(csPtr <iDocumentSystem>
+    (new csTinyDocumentSystem()));
+  csRef <iDocument> doc = xml->CreateDocument();
+  csRef <iDocumentNode> root = doc->CreateRoot();
+
   CCSWorld World;
-  World.Write(worldfile, &Map, mapfile);
+  World.Write(root, &Map, mapfile);
+
+  remove (worldfile);
+  VFS->Mount ("/map2cs_temp", worldfile);
+  doc->Write(VFS, "/map2cs_temp/world");
+
+  Map.GetTextureManager()->AddAllTexturesToVFS (VFS,
+    "/map2cs_temp/");
+
+  VFS->Unmount ("/map2cs_temp", worldfile);
 
   printf("done.");
 
@@ -124,6 +149,13 @@ int main (int argc, char *argv[])
   // this is required for the image loader
   csRef<iObjectRegistry> object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return false;
+  if (!csInitializer::RequestPlugins (object_reg,
+	CS_REQUEST_VFS,
+	CS_REQUEST_IMAGELOADER,
+	CS_REQUEST_END))
+  {
+    return 1;
+  }
 
   int ret = appMain (object_reg, argc, argv);
   
