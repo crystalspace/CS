@@ -335,9 +335,9 @@ struct iEngine : public iBase
    * <ul>
    * <li>CS_TEXTURE_2D image will be used only for 2D drawing
    * <li>CS_TEXTURE_3D image will be textured onto 3D polygon
-   *     (*** usually the flag you want)
-   * <li>CS_TEXTURE_DITHER texture is dithered before use (?)
-   * <li>CS_TEXTURE_NOMIPMAP texture will not be mipmapped before use (?)
+   *     (this is almost always the flag you want)
+   * <li>CS_TEXTURE_DITHER texture will be dithered before use
+   * <li>CS_TEXTURE_NOMIPMAPS texture will not be mipmapped before use
    * </ul>
    * \note You will need to call iTextureWrapper::Register() and 
    * iTextureWrapper::GetTextureHandler()->Prepare() on you new texture
