@@ -20,25 +20,25 @@
 #include "cssysdef.h"
 #include "cssys/system.h"
 #include "apps/demosky/demosky.h"
-#include "csengine/sector.h"
-#include "csengine/engine.h"
-#include "csengine/csview.h"
-#include "csengine/camera.h"
-#include "csengine/light.h"
-#include "csengine/polygon.h"
-#include "csengine/meshobj.h"
-#include "csengine/texture.h"
-#include "csengine/thing.h"
 #include "csfx/proctex.h"
 #include "csfx/prsky.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
-#include "ivaria/conout.h"
 #include "ivideo/fontserv.h"
+#include "ivaria/conout.h"
 #include "imesh/sprite2d.h"
 #include "imesh/object.h"
-#include "iengine/mesh.h"
 #include "imap/parser.h"
+#include "iengine/mesh.h"
+#include "iengine/view.h"
+#include "iengine/engine.h"
+#include "iengine/sector.h"
+#include "iengine/polygon.h"
+#include "iengine/thing.h"
+#include "iengine/camera.h"
+#include "iengine/movable.h"
+
+#include "csengine/material.h"
 
 //------------------------------------------------- We need the 3D engine -----
 
@@ -64,9 +64,10 @@ Simple::Simple ()
 
 Simple::~Simple ()
 {
-  delete view;
-  if(font) font->DecRef();
-  if (LevelLoader) LevelLoader->DecRef();
+  if (view) view->DecRef ();;
+  if(font) font->DecRef ();
+  if (LevelLoader) LevelLoader->DecRef ();
+  if (engine) engine->DecRef ();
 
   delete sky;
   delete sky_f;
@@ -113,19 +114,17 @@ bool Simple::Initialize (int argc, const char* const argv[],
     return false;
 
   // Find the pointer to engine plugin
-  iEngine *Engine = QUERY_PLUGIN (this, iEngine);
-  if (!Engine)
+  engine = QUERY_PLUGIN (this, iEngine);
+  if (!engine)
   {
-    CsPrintf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
+    Printf (MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
-  engine = Engine->GetCsEngine ();
-  Engine->DecRef ();
 
   LevelLoader = QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
   if (!LevelLoader)
   {
-    CsPrintf (MSG_FATAL_ERROR, "No iLoader plugin!\n");
+    Printf (MSG_FATAL_ERROR, "No iLoader plugin!\n");
     abort ();
   }
 
@@ -170,17 +169,17 @@ bool Simple::Initialize (int argc, const char* const argv[],
   sky = new csProcSky();
   sky->SetAnimated(false);
   sky_f = new csProcSkyTexture(sky);
-  csMaterialWrapper* matf = sky_f->Initialize(this, engine, txtmgr, "sky_f");
+  csMaterialWrapper* matf = sky_f->Initialize(this, engine->GetCsEngine (), txtmgr, "sky_f");
   sky_b = new csProcSkyTexture(sky);
-  csMaterialWrapper* matb = sky_b->Initialize(this, engine, txtmgr, "sky_b");
+  csMaterialWrapper* matb = sky_b->Initialize(this, engine->GetCsEngine (), txtmgr, "sky_b");
   sky_l = new csProcSkyTexture(sky);
-  csMaterialWrapper* matl = sky_l->Initialize(this, engine, txtmgr, "sky_l");
+  csMaterialWrapper* matl = sky_l->Initialize(this, engine->GetCsEngine (), txtmgr, "sky_l");
   sky_r = new csProcSkyTexture(sky);
-  csMaterialWrapper* matr = sky_r->Initialize(this, engine, txtmgr, "sky_r");
+  csMaterialWrapper* matr = sky_r->Initialize(this, engine->GetCsEngine (), txtmgr, "sky_r");
   sky_u = new csProcSkyTexture(sky);
-  csMaterialWrapper* matu = sky_u->Initialize(this, engine, txtmgr, "sky_u");
+  csMaterialWrapper* matu = sky_u->Initialize(this, engine->GetCsEngine (), txtmgr, "sky_u");
   sky_d = new csProcSkyTexture(sky);
-  csMaterialWrapper* matd = sky_d->Initialize(this, engine, txtmgr, "sky_d");
+  csMaterialWrapper* matd = sky_d->Initialize(this, engine->GetCsEngine (), txtmgr, "sky_d");
   iMaterialWrapper* imatf = QUERY_INTERFACE (matf, iMaterialWrapper); imatf->DecRef ();
   iMaterialWrapper* imatb = QUERY_INTERFACE (matb, iMaterialWrapper); imatb->DecRef ();
   iMaterialWrapper* imatl = QUERY_INTERFACE (matl, iMaterialWrapper); imatl->DecRef ();
@@ -188,7 +187,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   iMaterialWrapper* imatu = QUERY_INTERFACE (matu, iMaterialWrapper); imatu->DecRef ();
   iMaterialWrapper* imatd = QUERY_INTERFACE (matd, iMaterialWrapper); imatd->DecRef ();
 
-  room = engine->CreateCsSector ("room");
+  room = engine->CreateSector ("room");
   iMeshWrapper* walls = engine->CreateSectorWallsMesh (room, "walls");
   iThingState* walls_state = QUERY_INTERFACE (walls->GetMeshObject (),
   	iThingState);
@@ -257,7 +256,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   walls_state->DecRef ();
 
   LevelLoader->LoadTexture ("seagull", "/lib/std/seagull.gif");
-  csMaterialWrapper *sg = engine->GetMaterials ()->FindByName("seagull");
+  iMaterialWrapper *sg = engine->GetMaterialList ()->FindByName("seagull");
   flock = new Flock(engine, 10, QUERY_INTERFACE(sg, iMaterialWrapper), 
     QUERY_INTERFACE(room, iSector));
 
@@ -269,8 +268,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = new csView (engine, G3D);
-  view->GetCamera ()->SetSector (&room->scfiSector);
+  view = engine->CreateView (G3D);
+  view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, 0));
   view->SetRectangle (0, 0, FrameWidth, FrameHeight);
 
@@ -348,7 +347,7 @@ bool Simple::HandleEvent (iEvent &Event)
 }
 
 //--- Flock -----------------------
-Flock::Flock(csEngine *engine, int num, iMaterialWrapper *mat, iSector *sector)
+Flock::Flock(iEngine *engine, int num, iMaterialWrapper *mat, iSector *sector)
 {
   printf("Creating flock of %d birds\n", num);
   nr = num;

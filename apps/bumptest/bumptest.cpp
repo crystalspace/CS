@@ -51,7 +51,6 @@
 #include "iengine/camera.h"
 #include "igraphic/loader.h"
 
-#include "csengine/texture.h"
 #include "csengine/material.h"
 
 //------------------------------------------------- We need the 3D engine -----
@@ -108,7 +107,7 @@ bool BumpTest::InitProcDemo ()
   //buf->DecRef();
   //VFS->DecRef();
   //imgloader->DecRef();
-  iImage *map = bptex->GetPrivateObject ()->GetImageFile();
+  iImage *map = bptex->GetImageFile();
   prBump = new csProcBump (map);
   //prBump->SetBumpMap(map);
   matBump = &(prBump->Initialize (this, engine->GetCsEngine (), txtmgr, "bumps"))->scfiMaterialWrapper;

@@ -24,30 +24,29 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 
-class csSector;
-struct iSector;
-class csView;
-class csEngine;
-class csDynLight;
-class csMaterialWrapper;
 class csProcSky;
 class csProcSkyTexture;
+class Flock;
+struct iSector;
+struct iSector;
+struct iView;
+struct iEngine;
+struct iDynLight;
+struct iMaterialWrapper;
 struct iPolygon3D;
 struct iFont;
 struct iMeshWrapper;
 struct iMaterialWrapper;
 struct iLoader;
 
-class Flock;
-
 class Simple : public SysSystemDriver
 {
   typedef SysSystemDriver superclass;
 private:
-  csSector* room;
-  csView* view;
-  csEngine* engine;
-  csMaterialWrapper* matPlasma;
+  iSector* room;
+  iView* view;
+  iEngine* engine;
+  iMaterialWrapper* matPlasma;
   iFont *font;
   iLoader *LevelLoader;
 
@@ -94,7 +93,7 @@ class Flock {
 
 public:
   /// create, nr , texture
-  Flock(csEngine *engine, int num, iMaterialWrapper *mat, iSector *sector);
+  Flock(iEngine *engine, int num, iMaterialWrapper *mat, iSector *sector);
   ///
   ~Flock();
   /// call each frame to move birds
