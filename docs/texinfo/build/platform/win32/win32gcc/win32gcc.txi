@@ -19,12 +19,12 @@ Download the following packages:
 
 @itemize @bullet
 @item
-Crystal Space MinGW package @file{cs_mingw_0.70.exe} from the Mingw32 support
+Crystal Space MinGW package @file{cs_mingw_0.90.exe} from the Mingw32 support
 directory at Linux Games.  This package contains all the recent MinGW package
 releases (i.e. all the files necessary to compile Crystal Space successfully).
 
 @noindent
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/mingw32/cs_mingw_0.70.exe}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/mingw32/cs_mingw_0.90.exe}
 
 @item
 @sc{nasm} (Netwide Assembler) for Windows @file{nasm-0.98e-bin-w32.zip}
@@ -75,7 +75,7 @@ SET PYTHONPATH=C:\mingw32\lib\python1.5
 @end example
 
 @noindent
-On Windows @sc{nt} and Windows 2000, use the System control panel to edit the
+On Windows @sc{nt, 2000} and @sc{XP}, use the System control panel to edit the
 environment variable.
 
 If you fail to do so, then the @file{makedep} tool will not know where to look

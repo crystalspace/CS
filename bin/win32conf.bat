@@ -16,12 +16,12 @@
   goto nothing
 
 :mingw32
-  echo ### - Crystal Space MinGW32 Package 0.4 or later
+  echo ### - Crystal Space MinGW32 Package 0.90 or later
   goto nothing
 
 :msvc
   echo ### Microsoft Visual C command-line compiler
-  echo ### zlib/libpng/libjpeg (win32libs.zip)
+  echo ### zlib/libpng/libjpeg (msvc_libs0.90.zip)
   goto nothing
 
 :nothing
