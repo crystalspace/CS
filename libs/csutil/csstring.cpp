@@ -270,3 +270,156 @@ csString &csString::Format(const char *format, ...)
 
 }
 #endif // DISABLED
+
+#define STR_FORMAT(TYPE,FMT,SZ) \
+csString csString::Format(TYPE v) \
+{ char s[SZ]; sprintf(s, #FMT, v); return csString ().Append (s); }
+  STR_FORMAT(short, %hd, 32)
+  STR_FORMAT(unsigned short, %hu, 32)
+  STR_FORMAT(int, %d, 32)
+  STR_FORMAT(unsigned int, %u, 32)
+  STR_FORMAT(long, %ld, 32)
+  STR_FORMAT(unsigned long, %lu, 32)
+  STR_FORMAT(float, %g, 64)
+  STR_FORMAT(double, %g, 64)
+#undef STR_FORMAT
+
+csString &csString::PadLeft (size_t iNewSize, char iChar)
+{
+  if (Size < iNewSize)
+  {
+    SetCapacity (iNewSize);
+    if (Size == 0) return *this;
+    const size_t toInsert = iNewSize - Size;
+
+    memmove (Data + toInsert, Data, Size);
+    size_t x;
+    for (x = 0; x < toInsert; x++)
+    {
+      Data [x] = iChar;
+    }
+    Data [iNewSize] = '\0';
+    Size = iNewSize;
+  }
+  return *this;
+}
+
+csString csString::AsPadLeft (size_t iNewSize, char iChar)
+{
+  csString newStr = Clone ();
+  newStr.PadLeft (iChar, iNewSize);
+  return newStr;
+}
+
+#define STR_PADLEFT(TYPE) \
+csString csString::PadLeft (TYPE v, size_t iNewSize, char iChar) \
+{ csString newStr; return newStr.Append (v).PadLeft (iNewSize, iChar); }
+  STR_PADLEFT(const csString&)
+  STR_PADLEFT(const char*)
+  STR_PADLEFT(char)
+  STR_PADLEFT(unsigned char)
+  STR_PADLEFT(short)
+  STR_PADLEFT(unsigned short)
+  STR_PADLEFT(int)
+  STR_PADLEFT(unsigned int)
+  STR_PADLEFT(long)
+  STR_PADLEFT(unsigned long)
+  STR_PADLEFT(float)
+  STR_PADLEFT(double)
+#if !defined(CS_USE_FAKE_BOOL_TYPE)
+  STR_PADLEFT(bool)
+#endif
+#undef STR_PADLEFT
+
+csString& csString::PadRight (size_t iNewSize, char iChar)
+{
+  if (Size < iNewSize)
+  {
+    SetCapacity (iNewSize);
+    size_t x;
+    for (x = Size; x < iNewSize; x++)
+      Data [x] = iChar;
+    Data [iNewSize] = '\0';
+    Size = iNewSize;
+  }
+  return *this;
+}
+
+csString csString::AsPadRight (size_t iNewSize, char iChar)
+{
+  csString newStr = Clone ();
+  newStr.PadRight (iChar, iNewSize);
+  return newStr;
+}
+
+#define STR_PADRIGHT(TYPE) \
+csString csString::PadRight (TYPE v, size_t iNewSize, char iChar) \
+{ csString newStr; return newStr.Append (v).PadRight (iNewSize, iChar); }
+  STR_PADRIGHT(const csString&)
+  STR_PADRIGHT(const char*)
+  STR_PADRIGHT(char)
+  STR_PADRIGHT(unsigned char)
+  STR_PADRIGHT(short)
+  STR_PADRIGHT(unsigned short)
+  STR_PADRIGHT(int)
+  STR_PADRIGHT(unsigned int)
+  STR_PADRIGHT(long)
+  STR_PADRIGHT(unsigned long)
+  STR_PADRIGHT(float)
+  STR_PADRIGHT(double)
+#if !defined(CS_USE_FAKE_BOOL_TYPE)
+  STR_PADRIGHT(bool)
+#endif
+#undef STR_PADRIGHT
+
+csString& csString::PadCenter (size_t iNewSize, char iChar)
+{
+  if (Size < iNewSize)
+  {
+    SetCapacity (iNewSize);
+    if (Size == 0) return *this;
+    const size_t toInsert = iNewSize - Size;
+
+    memmove (Data + toInsert / 2 + toInsert % 2, Data, Size);
+
+    size_t x;
+    for (x = 0; x < toInsert / 2 + toInsert % 2; x++)
+    {
+      Data [x] = iChar;
+    }
+    for (x = iNewSize - toInsert / 2; x < iNewSize; x++)
+    {
+      Data [x] = iChar;
+    }
+    Data [iNewSize] = '\0';
+    Size = iNewSize;
+  }
+  return *this;
+}
+
+csString csString::AsPadCenter (size_t iNewSize, char iChar)
+{
+  csString newStr = Clone ();
+  newStr.PadCenter (iChar, iNewSize);
+  return newStr;
+}
+
+#define STR_PADCENTER(TYPE) \
+csString csString::PadCenter (TYPE v, size_t iNewSize, char iChar) \
+{ csString newStr; return newStr.Append (v).PadCenter (iNewSize, iChar); }
+  STR_PADCENTER(const csString&)
+  STR_PADCENTER(const char*)
+  STR_PADCENTER(char)
+  STR_PADCENTER(unsigned char)
+  STR_PADCENTER(short)
+  STR_PADCENTER(unsigned short)
+  STR_PADCENTER(int)
+  STR_PADCENTER(unsigned int)
+  STR_PADCENTER(long)
+  STR_PADCENTER(unsigned long)
+  STR_PADCENTER(float)
+  STR_PADCENTER(double)
+#if !defined(CS_USE_FAKE_BOOL_TYPE)
+  STR_PADCENTER(bool)
+#endif
+#undef STR_PADCENTER

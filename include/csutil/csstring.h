@@ -29,10 +29,8 @@
 }
 
 /**
- * This is a "string" class with a primitive set of operators -
- * assign, concatenate, delete, compare. This is way less effective
- * than regular char[] so use it only if you're extremely lazy and
- * don't care about performance and code size.
+ * This is a "string" class with a range of useful operators and
+ * typesafe overloads.
  */
 class csString
 {
@@ -186,7 +184,7 @@ public:
   csString () : Data (NULL), Size (0), MaxSize (0) {}
 
   /// Create an csString object and reserve space for iLength characters
-  csString (int iLength) : Data (NULL), Size (0), MaxSize (0)
+  csString (size_t iLength) : Data (NULL), Size (0), MaxSize (0)
   { SetCapacity (iLength); }
 
   /// Copy constructor from existing csString.
@@ -219,6 +217,96 @@ public:
 
   /// Calls Trim() and collapses internal whitespace to a single space.
   csString &Collapse();
+
+#define STR_FORMAT(TYPE,FMT,SZ) \
+  static csString Format(TYPE v);
+  STR_FORMAT(short, %hd, 32)
+  STR_FORMAT(unsigned short, %hu, 32)
+  STR_FORMAT(int, %d, 32)
+  STR_FORMAT(unsigned int, %u, 32)
+  STR_FORMAT(long, %ld, 32)
+  STR_FORMAT(unsigned long, %lu, 32)
+  STR_FORMAT(float, %g, 64)
+  STR_FORMAT(double, %g, 64)
+#undef STR_FORMAT
+
+  /// Pad to specified size with leading chars
+  csString& PadLeft (size_t iNewSize, char iChar=' ');
+
+  /// Return a new string formatted with PadLeft
+  csString AsPadLeft (size_t iNewSize, char iChar=' ');
+
+  /// Return a new left-padded string representation of a basic type
+#define STR_PADLEFT(TYPE) \
+  static csString PadLeft (TYPE v, size_t iNewSize, char iChar=' ');
+  STR_PADLEFT(const csString&)
+  STR_PADLEFT(const char*)
+  STR_PADLEFT(char)
+  STR_PADLEFT(unsigned char)
+  STR_PADLEFT(short)
+  STR_PADLEFT(unsigned short)
+  STR_PADLEFT(int)
+  STR_PADLEFT(unsigned int)
+  STR_PADLEFT(long)
+  STR_PADLEFT(unsigned long)
+  STR_PADLEFT(float)
+  STR_PADLEFT(double)
+#if !defined(CS_USE_FAKE_BOOL_TYPE)
+  STR_PADLEFT(bool)
+#endif
+#undef STR_PADLEFT
+
+  /// Pad to specified size with trailing chars
+  csString& PadRight (size_t iNewSize, char iChar=' ');
+
+  /// Return a new string formatted with PadRight
+  csString AsPadRight (size_t iNewSize, char iChar=' ');
+
+  /// Return a new right-padded string representation of a basic type
+#define STR_PADRIGHT(TYPE) \
+  static csString PadRight (TYPE v, size_t iNewSize, char iChar=' ');
+  STR_PADRIGHT(const csString&)
+  STR_PADRIGHT(const char*)
+  STR_PADRIGHT(char)
+  STR_PADRIGHT(unsigned char)
+  STR_PADRIGHT(short)
+  STR_PADRIGHT(unsigned short)
+  STR_PADRIGHT(int)
+  STR_PADRIGHT(unsigned int)
+  STR_PADRIGHT(long)
+  STR_PADRIGHT(unsigned long)
+  STR_PADRIGHT(float)
+  STR_PADRIGHT(double)
+#if !defined(CS_USE_FAKE_BOOL_TYPE)
+  STR_PADRIGHT(bool)
+#endif
+#undef STR_PADRIGHT
+
+  /// Pad to specified size between chars (any remainder is prepended)
+  csString& PadCenter (size_t iNewSize, char iChar=' ');
+
+  /// Return a copy of this string formatted with PadCenter
+  csString AsPadCenter (size_t iNewSize, char iChar=' ');
+
+  /// Return a new left+right padded string representation of a basic type
+#define STR_PADCENTER(TYPE) \
+  static csString PadCenter (TYPE v, size_t iNewSize, char iChar=' ');
+  STR_PADCENTER(const csString&)
+  STR_PADCENTER(const char*)
+  STR_PADCENTER(char)
+  STR_PADCENTER(unsigned char)
+  STR_PADCENTER(short)
+  STR_PADCENTER(unsigned short)
+  STR_PADCENTER(int)
+  STR_PADCENTER(unsigned int)
+  STR_PADCENTER(long)
+  STR_PADCENTER(unsigned long)
+  STR_PADCENTER(float)
+  STR_PADCENTER(double)
+#if !defined(CS_USE_FAKE_BOOL_TYPE)
+  STR_PADCENTER(bool)
+#endif
+#undef STR_PADCENTER
 
   /// Assign a string to another
   csString &operator = (const csString &iStr)

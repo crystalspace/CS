@@ -36,7 +36,7 @@ public:
   { SCF_CONSTRUCT_IBASE (NULL); }
 
   /// Create an scfString object and reserve space for iLength characters
-  scfString (int iLength) : s(iLength)
+  scfString (size_t iLength) : s(iLength)
   { SCF_CONSTRUCT_IBASE (NULL); }
 
   /// Copy constructor
