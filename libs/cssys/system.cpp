@@ -1109,44 +1109,44 @@ IMPLEMENT_EMBEDDED_IBASE (csSystemDriver::csSCF)
   IMPLEMENTS_INTERFACE (iSCF)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-bool csSystemDriver::csSCF::ClassRegistered (const char *iClassID)
+bool csSystemDriver::csSCF::scfClassRegistered (const char *iClassID)
 {
-  return scfClassRegistered (iClassID);
+  return ::scfClassRegistered (iClassID);
 }
 
-void *csSystemDriver::csSCF::CreateInstance (const char *iClassID,
+void *csSystemDriver::csSCF::scfCreateInstance (const char *iClassID,
   const char *iInterfaceID, int iVersion)
 {
-  return scfCreateInstance (iClassID, iInterfaceID, iVersion);
+  return ::scfCreateInstance (iClassID, iInterfaceID, iVersion);
 }
 
-const char *csSystemDriver::csSCF::GetClassDescription (const char *iClassID)
+const char *csSystemDriver::csSCF::scfGetClassDescription (const char *iClassID)
 {
-  return scfGetClassDescription (iClassID);
+  return ::scfGetClassDescription (iClassID);
 }
 
-const char *csSystemDriver::csSCF::GetClassDependencies (const char *iClassID)
+const char *csSystemDriver::csSCF::scfGetClassDependencies (const char *iClassID)
 {
-  return scfGetClassDependencies (iClassID);
+  return ::scfGetClassDependencies (iClassID);
 }
 
-bool csSystemDriver::csSCF::RegisterClass (const char *iClassID,
+bool csSystemDriver::csSCF::scfRegisterClass (const char *iClassID,
   const char *iLibraryName, const char *Dependencies)
 {
-  return scfRegisterClass (iClassID, iLibraryName, Dependencies);
+  return ::scfRegisterClass (iClassID, iLibraryName, Dependencies);
 }
 
-bool csSystemDriver::csSCF::RegisterStaticClass (scfClassInfo *iClassInfo)
+bool csSystemDriver::csSCF::scfRegisterStaticClass (scfClassInfo *iClassInfo)
 {
-  return scfRegisterStaticClass (iClassInfo);
+  return ::scfRegisterStaticClass (iClassInfo);
 }
 
-bool csSystemDriver::csSCF::RegisterClassList (scfClassInfo *iClassInfo)
+bool csSystemDriver::csSCF::scfRegisterClassList (scfClassInfo *iClassInfo)
 {
-  return scfRegisterClassList (iClassInfo);
+  return ::scfRegisterClassList (iClassInfo);
 }
 
-bool csSystemDriver::csSCF::UnregisterClass (char *iClassID)
+bool csSystemDriver::csSCF::scfUnregisterClass (char *iClassID)
 {
-  return scfUnregisterClass (iClassID);
+  return ::scfUnregisterClass (iClassID);
 }

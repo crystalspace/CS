@@ -473,23 +473,23 @@ SCF_VERSION (iSCF, 0, 0, 1);
 struct iSCF : public iBase
 {
   /// Wrapper for scfClassRegistered ()
-  virtual bool ClassRegistered (const char *iClassID) = 0;
+  virtual bool scfClassRegistered (const char *iClassID) = 0;
   /// Wrapper for scfCreateInstance ()
-  virtual void *CreateInstance (const char *iClassID, const char *iInterfaceID,
+  virtual void *scfCreateInstance (const char *iClassID, const char *iInterfaceID,
     int iVersion) = 0;
   /// Wrapper for scfGetClassDescription ()
-  virtual const char *GetClassDescription (const char *iClassID) = 0;
+  virtual const char *scfGetClassDescription (const char *iClassID) = 0;
   /// Wrapper for scfGetClassDependencies ()
-  virtual const char *GetClassDependencies (const char *iClassID) = 0;
+  virtual const char *scfGetClassDependencies (const char *iClassID) = 0;
   /// Wrapper for scfRegisterClass ()
-  virtual bool RegisterClass (const char *iClassID, const char *iLibraryName,
+  virtual bool scfRegisterClass (const char *iClassID, const char *iLibraryName,
     const char *Dependencies = NULL) = 0;
   /// Wrapper for scfRegisterStaticClass ()
-  virtual bool RegisterStaticClass (scfClassInfo *iClassInfo) = 0;
+  virtual bool scfRegisterStaticClass (scfClassInfo *iClassInfo) = 0;
   /// Wrapper for scfRegisterClassList ()
-  virtual bool RegisterClassList (scfClassInfo *iClassInfo) = 0;
+  virtual bool scfRegisterClassList (scfClassInfo *iClassInfo) = 0;
   /// Wrapper for scfUnregisterClass ()
-  virtual bool UnregisterClass (char *iClassID) = 0;
+  virtual bool scfUnregisterClass (char *iClassID) = 0;
 };
 
 //--------------------------------------------- System-dependent defines -----//
