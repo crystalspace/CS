@@ -25,6 +25,15 @@ The history order is reversed so that new features are at the top.
 	      they appear as libgl.a, libglu.a, and libglx.a.
 	    - Moved config.guess, config.sub, and install-sh from CS/bin to
 	      CS/mk/autoconf.
+	- Eric Sunshine added missing forward reference for csPlane3 to
+	  ivaria/dynamics.h.  Ben Thomas <trickster@wickedstudios.com> noted
+	  this omission.
+	- Eric Sunshine applied a patch from Jochen Moench
+	  <jochen.moench@de.thalesgroup.com> to GLFontCache::Write() in
+	  gl2d_font.cpp to allow it to output the full range of 8-bit
+	  characters (by using unsigned rather than signed character indexes).
+	  Also important, this patch prevents negative-indexed accesses of the
+	  glyphs[] array.
 19-Mar-2003
 	- Eric Sunshine applied a patch to unix.mak to work around problem with
 	  recent Gentoo Linux in which some libc symbols were not resolved when
