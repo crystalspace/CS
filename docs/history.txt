@@ -64,6 +64,10 @@ chronological order.
 	      non-keypad keys.
 	- res fixed a few files to compile again after his latest changes.
 	- res reverted an accidential change to md32spr.
+	- DeSigna wrote the csShaderExpression class in csgfx for Dentoid's 
+	  csShaderVariables. It is not yet integrated into the XML parser's 
+	  syntxldr service or shader variables, and it is missing S-expression
+	  support.
 15-Oct-2003
 	- Eric Sunshine fixed a bug in RemoveDups from helper.jam.  It was
 	  trying to dereference a variable using an 8-bit character instead of
