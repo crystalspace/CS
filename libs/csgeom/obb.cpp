@@ -38,6 +38,17 @@ void csOBBFrozen::Copy (const csOBB& obb, const csReversibleTransform& trans)
   }
 }
 
+// Version to cope with z <= 0. This is wrong but it in the places where
+// it is used below the result is acceptable because it generates a
+// conservative result (i.e. a box or outline that is bigger then reality).
+static void PerspectiveWrong (const csVector3& v, csVector2& p, float fov,
+    	float sx, float sy)
+{
+  float iz = fov * 10;
+  p.x = v.x * iz + sx;
+  p.y = v.y * iz + sy;
+}
+
 static void Perspective (const csVector3& v, csVector2& p, float fov,
     	float sx, float sy)
 {
@@ -56,16 +67,9 @@ bool csOBBFrozen::ProjectOBB (
   min_z = p.z;
   max_z = p.z;
   if (p.z < .1)
-  {
-    // Conservative clipping to screen.
-    float iz = fov * 10;
-    v.x = p.x * iz + sx;
-    v.y = p.y * iz + sy;
-  }
+    PerspectiveWrong (p, v, fov, sx, sy);
   else
-  {
     Perspective (p, v, fov, sx, sy);
-  }
   sbox.StartBoundingBox (v);
   int i;
   for (i = 1; i < 8; i++)
@@ -75,28 +79,13 @@ bool csOBBFrozen::ProjectOBB (
     if (z < min_z) min_z = z;
     else if (z > max_z) max_z = z;
     if (z < .1)
-    {
-      float iz = fov * 10;
-      v.x = p.x * iz + sx;
-      v.y = p.y * iz + sy;
-    }
+      PerspectiveWrong (p, v, fov, sx, sy);
     else
-    {
       Perspective (p, v, fov, sx, sy);
-    }
-
     sbox.AddBoundingVertexSmart (v);
   }
 
-  if (max_z < 0.01) return false;
-  //if (min_z < 0.01)
-  //{
-    ////@@@ Is there a better solution to this?
-    //sbox.Set (-10000, -10000, 10000, 10000);
-    //return true;
-  //}
-
-  return true;
+  return max_z >= .01;
 }
 
 

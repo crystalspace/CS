@@ -894,6 +894,22 @@ public:
   bool ProjectOutline (const csTransform& trans, float fov, float sx, float sy,
   	csPoly2D& poly, float& min_z, float& max_z) const;
 
+  /**
+   * Project this box to the 2D outline given the view point
+   * transformation and also the field-of-view and shift values (for
+   * perspective correction). The minimum and maximum z are also
+   * calculated. If the box is fully behind the camera
+   * then false is returned and this function will not do anything.
+   * If the box is partially behind the camera you will get an outline
+   * that is conservatively correct (i.e. it will overestimate the box).
+   * In addition to the outline this function also returns the projected
+   * screen-space box. So it is a combination of ProjectBox() and
+   * ProjectOutline().
+   */
+  bool ProjectBoxAndOutline (const csTransform& trans, float fov,
+  	float sx, float sy, csBox2& sbox, csPoly2D& poly,
+	float& min_z, float& max_z) const;
+
   /// Compute the union of two bounding boxes.
   csBox3& operator+= (const csBox3& box);
   /// Compute the union of a point with this bounding box.

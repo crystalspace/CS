@@ -28,6 +28,18 @@ chronological order.
 	- Eric Sunshine documented SCF_DESTRUCT_IBASE() and
 	  SCF_DESTRUCT_EMBEDDED_IBASE() in scf.txi, plugin.txi, and
 	  apimod98.txi.
+	- Jorrit added csBox3::ProjectBoxAndOutline() which combines
+	  ProjectBox() and ProjectOutline() is one function.
+	- Jorrit fixed the exact visibility culler in Dynavis so that it works
+	  again. The exact visibility culler is a debug tool which allows you
+	  to calculate the maximum possible FPS possible at some point
+	  assuming a culler that does a perfect cull AND needs zero
+	  CPU time to does this perfect culling. Basically it uses a very
+	  slow system to calculate perfect visibility and then stores that
+	  information so that it is used every frame. You can also use this
+	  feature to see how culling performs. After enabling this you can
+	  walk around and see which objects are visible and which objects
+	  are not.
 2-Nov-2003
 	- Eric Sunshine performed project-wide spelling corrections:
 	    seperate    --> separate

@@ -692,6 +692,17 @@ float csBox3::SquaredOriginMaxDist () const
   return res;
 }
 
+// Version to cope with z <= 0. This is wrong but it in the places where
+// it is used below the result is acceptable because it generates a
+// conservative result (i.e. a box or outline that is bigger then reality).
+static void PerspectiveWrong (const csVector3& v, csVector2& p, float fov,
+    	float sx, float sy)
+{
+  float iz = fov * 10;
+  p.x = v.x * iz + sx;
+  p.y = v.y * iz + sy;
+}
+
 static void Perspective (const csVector3& v, csVector2& p, float fov,
     	float sx, float sy)
 {
@@ -734,63 +745,41 @@ bool csBox3::ProjectBox (const csTransform& trans, float fov,
 // @@@ In theory we can optimize here again by calling CalculatePointSegment
 // again for the new box and the 0,0,0 point. By doing that we could
 // avoid doing four perspective projections.
+
+  // If z < .1 we do conservative clipping. Not correct but it will generate
+  // a box that is bigger then the real one which is ok for testing culling.
   csVector2 oneCorner;
   if (cbox.Max ().z < .1)
-  {
-    // Conservative clipping. Not correct but it will generate a box that
-    // is bigger then the real one which is ok for testing culling.
-    float iz = fov * 10;
-    oneCorner.x = cbox.Max ().x * iz + sx;
-    oneCorner.y = cbox.Max ().y * iz + sy;
-  }
+    PerspectiveWrong (cbox.Max (), oneCorner, fov, sx, sy);
   else
-  {
     Perspective (cbox.Max (), oneCorner, fov, sx, sy);
-  }
   sbox.StartBoundingBox (oneCorner);
 
   csVector3 v (cbox.MinX (), cbox.MinY (), cbox.MaxZ ());
   if (v.z < .1)
-  {
-    float iz = fov * 10;
-    oneCorner.x = v.x * iz + sx;
-    oneCorner.y = v.y * iz + sy;
-  }
+    PerspectiveWrong (v, oneCorner, fov, sx, sy);
   else
-  {
     Perspective (v, oneCorner, fov, sx, sy);
-  }
   sbox.AddBoundingVertexSmart (oneCorner);
 
   if (cbox.Min ().z < .1)
-  {
-    float iz = fov * 10;
-    oneCorner.x = cbox.Min ().x * iz + sx;
-    oneCorner.y = cbox.Min ().y * iz + sy;
-  }
+    PerspectiveWrong (cbox.Min (), oneCorner, fov, sx, sy);
   else
-  {
     Perspective (cbox.Min (), oneCorner, fov, sx, sy);
-  }
   sbox.AddBoundingVertexSmart (oneCorner);
 
   v.Set (cbox.MaxX (), cbox.MaxY (), cbox.MinZ ());
   if (v.z < .1)
-  {
-    float iz = fov * 10;
-    oneCorner.x = v.x * iz + sx;
-    oneCorner.y = v.y * iz + sy;
-  }
+    PerspectiveWrong (v, oneCorner, fov, sx, sy);
   else
-  {
     Perspective (v, oneCorner, fov, sx, sy);
-  }
   sbox.AddBoundingVertexSmart (oneCorner);
 
   return true;
 }
 
-bool csBox3::ProjectOutline (const csTransform& trans, float fov, float sx, float sy,
+bool csBox3::ProjectOutline (const csTransform& trans, float fov,
+	float sx, float sy,
   	csPoly2D& poly, float& min_z, float& max_z) const
 {
   const csVector3& origin = trans.GetOrigin ();
@@ -813,15 +802,43 @@ bool csBox3::ProjectOutline (const csTransform& trans, float fov, float sx, floa
     if (i < num_array)
     {
       if (v.z < .1)
-      {
-        float iz = fov * 10;
-        poly[i].x = v.x * iz + sx;
-        poly[i].y = v.y * iz + sy;
-      }
+        PerspectiveWrong (v, poly[i], fov, sx, sy);
       else
-      {
         Perspective (v, poly[i], fov, sx, sy);
-      }
+    }
+  }
+  return max_z >= .1;
+}
+
+bool csBox3::ProjectBoxAndOutline (const csTransform& trans, float fov,
+	float sx, float sy, csBox2& sbox,
+  	csPoly2D& poly, float& min_z, float& max_z) const
+{
+  const csVector3& origin = trans.GetOrigin ();
+  int idx = CalculatePointSegment (origin);
+  const Outline &ol = outlines[idx];
+  int num_array = MIN (ol.num, 6);
+  poly.SetVertexCount (num_array);
+
+  min_z = 100000000.0;
+  max_z = 0;
+  sbox.StartBoundingBox ();
+  int i;
+  // We go to 8 so that we can calculate the correct min_z/max_z.
+  // If we only go to num_array we will only calculate min_z/max_z
+  // for the outine vertices.
+  for (i = 0 ; i < 8 ; i++)
+  {
+    csVector3 v = trans * GetCorner (ol.vertices[i]);
+    if (v.z > max_z) max_z = v.z;
+    if (v.z < min_z) min_z = v.z;
+    if (i < num_array)
+    {
+      if (v.z < .1)
+        PerspectiveWrong (v, poly[i], fov, sx, sy);
+      else
+        Perspective (v, poly[i], fov, sx, sy);
+      sbox.AddBoundingVertex (poly[i]);
     }
   }
   return max_z >= .1;
