@@ -43,9 +43,7 @@ public:
   CSOBJTYPE;
 
   virtual ~csWalkEntity ()
-  {
-    if (parent) parent->ObjRelease (this);
-  }
+  {}
 };
 
 /**
