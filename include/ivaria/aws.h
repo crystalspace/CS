@@ -19,6 +19,8 @@ struct  iGraphics2D;
 struct  iGraphics3D;
 struct  iEngine;
 struct  iTextureManager;
+
+const   bool aws_debug=false;  // set to true to turn on debugging printf's
        
 
 SCF_VERSION (iAws, 0, 0, 1);
@@ -62,7 +64,9 @@ public:
   /// Get the iGraphics3D interface so that components can use it.
   virtual iGraphics3D *G3D()=0; 
   
-
+  /// Instantiates a window based on a window definition.
+  virtual awsWindow *CreateWindowFrom(char *defname)=0;
+  
 };
 
 
