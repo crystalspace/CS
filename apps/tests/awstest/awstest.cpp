@@ -408,8 +408,8 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   if (test4) test4->Show();
   if (test5) test5->Show();
 
-  //if (test2) test2->Show();
-  s->SetTestWin(test2);
+  if (test2) test2->Show();
+  //s->SetTestWin(test2);
 
   /////////
 

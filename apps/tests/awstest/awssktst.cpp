@@ -91,7 +91,7 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
   iAwsComponent *comp = source->GetComponent();
 
   iAwsParmList *pl=0;
-  int parent;
+  void * parent;
 
   printf("awstest: Filling list box.\n");
 
@@ -137,7 +137,7 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
     comp->Execute("InsertItem", *pl);
 
     // Get the id of the last item for hierarchical support.
-    pl->GetInt("id", &parent);
+    pl->GetOpaque("id", &parent);
     pl->Clear();
 
     //////////////////////////
@@ -150,7 +150,7 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
     pl->AddBool("state1", true);
 
     pl->AddString("text2", new scfString("Daedalus"));
-    pl->AddInt("parent", parent);
+    pl->AddOpaque("parent", parent);
 
     // Add it into the list
     comp->Execute("InsertItem", *pl);
@@ -166,13 +166,13 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
     pl->AddBool("state1", false);
 
     pl->AddString("text2", new scfString("Temtor"));
-    pl->AddInt("parent", parent);
+    pl->AddOpaque("Opaque", parent);
 
     // Add it into the list
     comp->Execute("InsertItem", *pl);
 
     // Get the id of the last item for hierarchical support.
-    pl->GetInt("id", &parent);
+    pl->GetOpaque("id", &parent);
     pl->Clear();
 
     //////////////////////////
@@ -185,7 +185,7 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
     pl->AddBool("state1", false);
 
     pl->AddString("text2", new scfString("Johnny"));
-    pl->AddInt("parent", parent);
+    pl->AddOpaque("parent", parent);
 
     // Add it into the list
     comp->Execute("InsertItem", *pl);
@@ -221,7 +221,7 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
     comp->Execute("InsertItem", *pl);
 
     // Get the id of the last item for hierarchical support.
-    pl->GetInt("id", &parent);
+    pl->GetOpaque("id", &parent);
     pl->Clear();
 
     //////////////////////////
@@ -234,7 +234,7 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
     pl->AddBool("state1", true);
 
     pl->AddString("text2", new scfString("Tertullia"));
-    pl->AddInt("parent", parent);
+    pl->AddOpaque("parent", parent);
 
     // Add it into the list
     comp->Execute("InsertItem", *pl);
@@ -250,13 +250,13 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
     pl->AddBool("state1", false);
 
     pl->AddString("text2", new scfString("Gempus"));
-    pl->AddInt("parent", parent);
+    pl->AddOpaque("parent", parent);
 
     // Add it into the list
     comp->Execute("InsertItem", *pl);
 
     // Get the id of the last item for hierarchical support.
-    pl->GetInt("id", &parent);
+    pl->GetOpaque("id", &parent);
     pl->Clear();
 
     //////////////////////////
@@ -269,7 +269,7 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
     pl->AddBool("state1", false);
 
     pl->AddString("text2", new scfString("James"));
-    pl->AddInt("parent", parent);
+    pl->AddOpaque("parent", parent);
 
     // Add it into the list
     comp->Execute("InsertItem", *pl);
