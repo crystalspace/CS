@@ -445,7 +445,7 @@ bool csGraphics3DGlide3x::Open(const char* Title)
                 GR_COLORFORMAT_ARGB,GR_ORIGIN_LOWER_LEFT,2,1)))
     sys_fatalerror ("csGraphics3DGlide3x::Open() : Could not open Window !");
 
-  GlideLib_grGet (GR_WDEPTH_MIN_MAX, 2, m_wminmax );
+  GlideLib_grGet (GR_WDEPTH_MIN_MAX, 8, m_wminmax );
 
   GlideLib_grRenderBuffer (GR_BUFFER_BACKBUFFER);        // RENDER IN BACKBUFFER
   GlideLib_grColorMask (FXTRUE,FXFALSE);                 // DISABLE ALPHA BUFFER
@@ -699,7 +699,7 @@ void csGraphics3DGlide3x::RenderPolygonSinglePass (MyGrVertex * verts, int num, 
       FXFALSE,FXFALSE);
   }
  */
-
+  
   GlideLib_grDrawVertexArrayLinear ( GR_POLYGON, num, verts, m_vertstrulen );
 /*
   GlideLib_grColorCombine( GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE, 
@@ -707,7 +707,7 @@ void csGraphics3DGlide3x::RenderPolygonSinglePass (MyGrVertex * verts, int num, 
   GlideLib_grConstantColorValue ( 0xffffffff );
   for ( i=0; i < num; i++ )
     grDrawLine( &verts[i], &verts[ (i+1)%num ] );
-  */
+*/  
 }
 
 void csGraphics3DGlide3x::RenderPolygonMultiPass (MyGrVertex* verts, int num, 
@@ -820,6 +820,7 @@ void csGraphics3DGlide3x::SetupPolygon ( G3DPolygonDP& poly, float& J1, float& J
 void csGraphics3DGlide3x::DrawPolygon (G3DPolygonDP& poly)
 {
   if (poly.num < 3 || poly.normal.D () == 0.0) return;
+
   iPolygonTexture* pTex;
   iLightMap* piLM = NULL;
   csGlideCacheData* tcache = NULL;
@@ -1145,7 +1146,6 @@ void csGraphics3DGlide3x::DrawPolygonFX (G3DPolygonDPFX& poly)
       m_vertsize = poly.num;
     }
 
-//    float x, y;
     for (int i=0; i<poly.num; i++)
     {
       m_verts[i].x = poly.vertices[i].sx + SNAP;
@@ -1162,13 +1162,13 @@ void csGraphics3DGlide3x::DrawPolygonFX (G3DPolygonDPFX& poly)
         m_verts[i].g = 255;
         m_verts[i].b = 255;
       }
-      m_verts[i].oow = poly.vertices[i].z;
+      m_verts[i].oow = 1./poly.vertices[i].z;
       if ( m_renderstate.textured ){
         m_verts[i].tmuvtx[1].sow = m_verts[i].tmuvtx[0].sow = poly.vertices[i].u*m_thTex->width*m_verts[i].oow;
         m_verts[i].tmuvtx[1].tow = m_verts[i].tmuvtx[0].tow = poly.vertices[i].v*m_thTex->height*m_verts[i].oow;
       }
     }
-    
+
     if (poly.use_fog)
     {
 //      printf("wheres the fog mode from glide2 gone ?\n");
@@ -1180,6 +1180,15 @@ void csGraphics3DGlide3x::DrawPolygonFX (G3DPolygonDPFX& poly)
 
     if(poly.use_fog)
       GlideLib_grFogMode ( GR_FOG_DISABLE );
+    /*
+  GlideLib_grColorCombine( GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE, 
+                             GR_COMBINE_LOCAL_CONSTANT, GR_COMBINE_OTHER_NONE, FXFALSE );
+  GlideLib_grConstantColorValue ( 0xffff0000 );
+  grDepthMask( FXFALSE );
+  for ( int i=0; i < poly.num; i++ )
+    grDrawLine( &m_verts[i], &m_verts[ (i+1)%poly.num ] );
+  grDepthMask( FXTRUE );
+    */
   }
 }
 
@@ -1240,7 +1249,7 @@ bool csGraphics3DGlide3x::SetRenderState (G3D_RENDERSTATEOPTION option, long val
   {
     case G3DRENDERSTATE_ZBUFFERMODE:
       m_ZBufMode = value;
-
+      /*
       if (value & CS_ZBUF_TEST)
         GlideLib_grDepthMask (FXFALSE);
       else
@@ -1249,6 +1258,17 @@ bool csGraphics3DGlide3x::SetRenderState (G3D_RENDERSTATEOPTION option, long val
         GlideLib_grDepthBufferFunction (GR_CMP_ALWAYS);
       else 
         GlideLib_grDepthBufferFunction (GR_CMP_LEQUAL);
+      */
+
+      if (value & CS_ZBUF_FILL)
+        GlideLib_grDepthMask (FXTRUE);
+      else
+        GlideLib_grDepthMask (FXFALSE);    
+      if (value & CS_ZBUF_TEST)  
+        GlideLib_grDepthBufferFunction (GR_CMP_LEQUAL);
+      else 
+        GlideLib_grDepthBufferFunction (GR_CMP_ALWAYS);
+	
       break;
       
     case G3DRENDERSTATE_DITHERENABLE:
