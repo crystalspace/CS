@@ -85,6 +85,7 @@ void csThing::SetConvex (bool c)
 void csThing::Transform ()
 {
   int i;
+  if (!bbox) CreateBoundingBox ();
   for (i = 0 ; i < num_vertices ; i++)
     wor_verts[i] = obj.This2Other (obj_verts[i]);
   for (i = 0 ; i < num_polygon ; i++)
