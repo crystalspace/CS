@@ -489,8 +489,6 @@ void csMeshWrapper::AddChild (iMeshWrapper* child)
 {
   // First we increase reference on the mesh to make sure it will
   // not get deleted by unlinking it from it's previous parent.
-  // We will also keep this incremented because the parent mesh
-  // now holds an additional reference to this child.
   child->IncRef ();
 
   // First unlink the mesh from the engine or another parent.
@@ -503,6 +501,7 @@ void csMeshWrapper::AddChild (iMeshWrapper* child)
   child->GetPrivateObject ()->SetParentContainer (&scfiMeshWrapper);
   children.Push (child);
   child->GetMovable ()->SetParent (&movable.scfiMovable);
+  child->DecRef ();
 }
 
 void csMeshWrapper::RemoveChild (iMeshWrapper* child)
@@ -574,6 +573,7 @@ csMeshFactoryWrapper::csMeshFactoryWrapper ()
 
 csMeshFactoryWrapper::~csMeshFactoryWrapper ()
 {
+  printf ("freeing %s\n", GetName ());
   if (meshFact) meshFact->DecRef ();
 }
 
@@ -735,6 +735,7 @@ csMeshFactoryList::csMeshFactoryList ()
 bool csMeshFactoryList::FreeItem (csSome Item)
 {
   iMeshFactoryWrapper* mesh = (iMeshFactoryWrapper*)Item;
+  printf ("decrefing %s\n", ((csMeshFactoryWrapper*)mesh->GetPrivateObject ())->GetName ());
   mesh->DecRef ();
   Item = NULL;
   return true;
@@ -742,7 +743,9 @@ bool csMeshFactoryList::FreeItem (csSome Item)
 
 void csMeshFactoryList::AddMeshFactory (iMeshFactoryWrapper *mesh)
 {
+  printf ("+++++++++++++++++++++ adding %s\n", ((csMeshFactoryWrapper*)mesh->GetPrivateObject ())->GetName ());
   Push (mesh);
+  csMeshFactoryWrapper* mm = (csMeshFactoryWrapper*)mesh->GetPrivateObject ();
 }
 
 void csMeshFactoryList::RemoveMeshFactory (iMeshFactoryWrapper *mesh)
