@@ -42,21 +42,24 @@ public:
   void ReportError (const char* description, ...);
 
   void ParseGeneral (const char* parent_token,
-  	int indent, csParser* parser, csRef<iDocumentNode>& parent, char* buf);
+  	csParser* parser, csRef<iDocumentNode>& parent, char* buf);
 
   bool IsEmpty (const char* in);
   bool IsNumeric (const char* in);
   bool IsString (const char* in);
-  bool IsBoolean (const char* in);
+  bool IsBoolean (const char* in, bool& val);
   int IsNumberList (const char* in);
   char* ToLower (const char* in);
 
-  void ParseMatrix (csParser *parser, char *buf, int indent);
-  void WriteToken (int indent, const char* token, const char* name,
-  	bool shortform, bool newline);
-  void WriteVector3 (const char* params,
-  	const char* xname = "x", const char* yname = "y",
-	const char* zname = "z");
+  void CreateValueNode (csRef<iDocumentNode>& parent,
+  	const char* name, const char* value);
+  void CreateValueNodeAsInt (csRef<iDocumentNode>& parent,
+  	const char* name, int value);
+  void CreateValueNodeAsFloat (csRef<iDocumentNode>& parent,
+  	const char* name, float value);
+
+  void ParseMatrix (csParser *parser, csRef<iDocumentNode>& parent,
+  	char* buf);
 
 public:
   Cs2Xml (iObjectRegistry* object_reg);

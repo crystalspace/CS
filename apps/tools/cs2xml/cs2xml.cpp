@@ -40,38 +40,6 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
-static void Write (iFile* fout, const char* description, ...)
-{
-  va_list arg;
-  va_start (arg, description);
-
-  csString str;
-  str.FormatV (description, arg);
-
-  va_end (arg);
-
-  fout->Write (str.GetData (), str.Length ());
-}
-
-static void WriteStr (iFile* fout, const char* str)
-{
-  fout->Write (str, strlen (str));
-}
-
-static void PrintIndent (int cur_indent_level, char* msg, ...)
-{
-  int i = cur_indent_level;
-  while (i >= 8) { printf ("\t"); i -= 8; }
-  while (i > 0) { printf (" "); i--; }
-  va_list arg;
-  va_start (arg, msg);
-  vprintf (msg, arg);
-  va_end (arg);
-  fflush (stdout);
-}
-
-//-----------------------------------------------------------------------------
-
 void Cs2Xml::ReportError (const char* description, ...)
 {
   va_list arg;
@@ -107,6 +75,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (NUM)
   CS_TOKEN_DEF (ORIG)
   CS_TOKEN_DEF (ORIGIN)
+  CS_TOKEN_DEF (PORTAL)
   CS_TOKEN_DEF (POSITION)
   CS_TOKEN_DEF (PRIORITY)
   CS_TOKEN_DEF (RADIUS)
@@ -122,13 +91,16 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SECOND)
   CS_TOKEN_DEF (SHIFT)
   CS_TOKEN_DEF (T)
+  CS_TOKEN_DEF (TEXTURE)
   CS_TOKEN_DEF (TRANSPARENT)
   CS_TOKEN_DEF (TRIANGLE)
+  CS_TOKEN_DEF (TYPE)
   CS_TOKEN_DEF (UV)
   CS_TOKEN_DEF (V)
   CS_TOKEN_DEF (VERTEX)
   CS_TOKEN_DEF (VERTICES)
   CS_TOKEN_DEF (W)
+  CS_TOKEN_DEF (WARP)
 CS_TOKEN_DEF_END
 
 //-----------------------------------------------------------------------------
@@ -144,6 +116,7 @@ Cs2Xml::~Cs2Xml ()
 
 bool Cs2Xml::IsEmpty (const char* in)
 {
+  if (!in) return true;
   while (isspace (*in)) in++;
   if (*in == 0) return true;
   return false;
@@ -197,16 +170,15 @@ bool Cs2Xml::IsString (const char* in)
   return false;
 }
 
-bool Cs2Xml::IsBoolean (const char* in)
+bool Cs2Xml::IsBoolean (const char* in, bool& val)
 {
   while (isspace (*in)) in++;
-  if (!strncasecmp (in, "yes", 3)) in += 3;
-  else if (!strncasecmp (in, "true", 4)) in += 4;
-  else if (!strncasecmp (in, "on", 2)) in += 2;
-  else if (!strncasecmp (in, "1", 1)) in += 1;
-  else if (!strncasecmp (in, "false", 5)) in += 5;
-  else if (!strncasecmp (in, "off", 3)) in += 3;
-  else if (!strncasecmp (in, "0", 1)) in += 1;
+  if (!strncasecmp (in, "yes", 3)) { val = true; in += 3; }
+  else if (!strncasecmp (in, "true", 4)) { val = true; in += 4; }
+  else if (!strncasecmp (in, "on", 2)) { val = true; in += 2; }
+  else if (!strncasecmp (in, "no", 2)) { val = false; in += 2;} 
+  else if (!strncasecmp (in, "false", 5)) { val = false; in += 5;} 
+  else if (!strncasecmp (in, "off", 3)) { val = false; in += 3; }
   while (isspace (*in)) in++;
   if (*in == 0) return true;
   return false;
@@ -252,36 +224,41 @@ char* Cs2Xml::ToLower (const char* in)
   return rc;
 }
 
-void Cs2Xml::WriteToken (int indent, const char* token, const char* name,
-  	bool shortform, bool newline)
+void Cs2Xml::CreateValueNode (csRef<iDocumentNode>& parent,
+	const char* name, const char* value)
 {
-  if (shortform)
-  {
-    if (name == NULL)
-      PrintIndent (indent, "<%s ", token);
-    else
-      PrintIndent (indent, "<%s name='%s' ", token, name);
-  }
-  else
-  {
-    if (name == NULL)
-      PrintIndent (indent, "<%s>", token);
-    else
-      PrintIndent (indent, "<%s name='%s'>", token, name);
-  }
-  if (newline) PrintIndent (0, "\n");
+  csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+  child->SetValue (name);
+  csRef<iDocumentNode> text = child->CreateNodeBefore (
+		  CS_NODE_TEXT, NULL);
+  text->SetValue (value);
 }
 
-void Cs2Xml::WriteVector3 (const char* params,
-  	const char* xname, const char* yname,
-	const char* zname)
+void Cs2Xml::CreateValueNodeAsInt (csRef<iDocumentNode>& parent,
+	const char* name, int value)
 {
-  float x, y, z;
-  csScanStr (params, "%f,%f,%f", &x, &y, &z);
-  PrintIndent (0, "%s=%g %s=%g %s=%g", xname, x, yname, y, zname, z);
+  csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+  child->SetValue (name);
+  csRef<iDocumentNode> text = child->CreateNodeBefore (
+		  CS_NODE_TEXT, NULL);
+  text->SetValueAsInt (value);
 }
 
-void Cs2Xml::ParseMatrix (csParser *parser, char *buf, int indent)
+void Cs2Xml::CreateValueNodeAsFloat (csRef<iDocumentNode>& parent,
+	const char* name, float value)
+{
+  csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+  child->SetValue (name);
+  csRef<iDocumentNode> text = child->CreateNodeBefore (
+		  CS_NODE_TEXT, NULL);
+  text->SetValueAsFloat (value);
+}
+
+void Cs2Xml::ParseMatrix (csParser *parser, csRef<iDocumentNode>& parent,
+	char* buf)
 {
   CS_TOKEN_TABLE_START(commands)
     CS_TOKEN_TABLE (IDENTITY)
@@ -308,34 +285,32 @@ void Cs2Xml::ParseMatrix (csParser *parser, char *buf, int indent)
     switch (cmd)
     {
       case CS_TOKEN_IDENTITY:
-        WriteToken (indent, "scale", NULL, false, false);
-	PrintIndent (0, "1</%s>\n", "scale");
+        {
+	  csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+	  child->SetValue ("scale");
+	  child->SetAttributeAsFloat ("all", 1);
+	}
         break;
       case CS_TOKEN_ROT_X:
         csScanStr (params, "%f", &angle);
-        WriteToken (indent, "rotx", NULL, false, false);
-	PrintIndent (0, "%g</%s>\n", angle, "rotx");
+	CreateValueNodeAsFloat (parent, "rotx", angle);
         break;
       case CS_TOKEN_ROT_Y:
         csScanStr (params, "%f", &angle);
-        WriteToken (indent, "roty", NULL, false, false);
-	PrintIndent (0, "%g</%s>\n", angle, "roty");
+	CreateValueNodeAsFloat (parent, "roty", angle);
         break;
       case CS_TOKEN_ROT_Z:
         csScanStr (params, "%f", &angle);
-        WriteToken (indent, "rotz", NULL, false, false);
-	PrintIndent (0, "%g</%s>\n", angle, "rotz");
+	CreateValueNodeAsFloat (parent, "rotz", angle);
         break;
       case CS_TOKEN_ROT:
         csScanStr (params, "%F", list, &num);
         if (num == 3)
         {
-          WriteToken (indent, "rotx", NULL, false, false);
-	  PrintIndent (0, "%g</%s> ", list[0], "rotx");
-          WriteToken (indent, "rotz", NULL, false, false);
-	  PrintIndent (0, "%g</%s> ", list[2], "rotz");
-          WriteToken (indent, "roty", NULL, false, false);
-	  PrintIndent (0, "%g</%s>\n", list[1], "roty");
+	  CreateValueNodeAsFloat (parent, "rotx", list[0]);
+	  CreateValueNodeAsFloat (parent, "rotz", list[2]);
+	  CreateValueNodeAsFloat (parent, "roty", list[1]);
         }
         else
 	{
@@ -343,35 +318,49 @@ void Cs2Xml::ParseMatrix (csParser *parser, char *buf, int indent)
 	}
         break;
       case CS_TOKEN_SCALE_X:
-        csScanStr (params, "%f", &scaler);
-        WriteToken (indent, "scalex", NULL, false, false);
-	PrintIndent (0, "%g</%s>\n", scaler, "scalex");
+        {
+          csScanStr (params, "%f", &scaler);
+	  csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+	  child->SetValue ("scale");
+	  child->SetAttributeAsFloat ("x", scaler);
+	}
         break;
       case CS_TOKEN_SCALE_Y:
-        csScanStr (params, "%f", &scaler);
-        WriteToken (indent, "scaley", NULL, false, false);
-	PrintIndent (0, "%g</%s>\n", scaler, "scaley");
+        {
+          csScanStr (params, "%f", &scaler);
+	  csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+	  child->SetValue ("scale");
+	  child->SetAttributeAsFloat ("y", scaler);
+	}
         break;
       case CS_TOKEN_SCALE_Z:
-        csScanStr (params, "%f", &scaler);
-        WriteToken (indent, "scalez", NULL, false, false);
-	PrintIndent (0, "%g</%s>\n", scaler, "scalez");
+        {
+          csScanStr (params, "%f", &scaler);
+	  csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+	  child->SetValue ("scale");
+	  child->SetAttributeAsFloat ("z", scaler);
+	}
         break;
       case CS_TOKEN_SCALE:
         csScanStr (params, "%F", list, &num);
         if (num == 1)      // One scaler; applied to entire matrix.
 	{
-          WriteToken (indent, "scale", NULL, false, false);
-	  PrintIndent (0, "%g</%s>\n", list[0], "scale");
+	  csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+	  child->SetValue ("scale");
+	  child->SetAttributeAsFloat ("all", list[0]);
 	}
         else if (num == 3) // Three scalers; applied to X, Y, Z individually.
 	{
-          WriteToken (indent, "scalex", NULL, false, false);
-	  PrintIndent (0, "%g</%s> ", list[0], "scalex");
-          WriteToken (indent, "scaley", NULL, false, false);
-	  PrintIndent (0, "%g</%s> ", list[1], "scaley");
-          WriteToken (indent, "scalez", NULL, false, false);
-	  PrintIndent (0, "%g</%s>\n", list[2], "scalez");
+	  csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+	  child->SetValue ("scale");
+	  child->SetAttributeAsFloat ("x", list[0]);
+	  child->SetAttributeAsFloat ("y", list[1]);
+	  child->SetAttributeAsFloat ("z", list[2]);
 	}
         else
 	{
@@ -388,29 +377,22 @@ void Cs2Xml::ParseMatrix (csParser *parser, char *buf, int indent)
     csScanStr (orig_buf, "%F", list, &num);
     if (num == 1)
     {
-      WriteToken (indent, "scale", NULL, false, false);
-      PrintIndent (0, "%g</%s>\n", list[0], "scale");
+      csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+      child->SetValue ("scale");
+      child->SetAttributeAsFloat ("all", list[0]);
     }
     else if (num == 9)
     {
-      WriteToken (indent, "m11", NULL, false, false);
-      PrintIndent (0, "%g</%s> ", list[0], "m11");
-      WriteToken (0, "m12", NULL, false, false);
-      PrintIndent (0, "%g</%s> ", list[1], "m12");
-      WriteToken (0, "m13", NULL, false, false);
-      PrintIndent (0, "%g</%s>\n", list[2], "m13");
-      WriteToken (indent, "m21", NULL, false, false);
-      PrintIndent (0, "%g</%s> ", list[3], "m21");
-      WriteToken (0, "m22", NULL, false, false);
-      PrintIndent (0, "%g</%s> ", list[4], "m22");
-      WriteToken (0, "m23", NULL, false, false);
-      PrintIndent (0, "%g</%s>\n", list[5], "m23");
-      WriteToken (indent, "m31", NULL, false, false);
-      PrintIndent (0, "%g</%s> ", list[6], "m31");
-      WriteToken (0, "m32", NULL, false, false);
-      PrintIndent (0, "%g</%s> ", list[7], "m32");
-      WriteToken (0, "m33", NULL, false, false);
-      PrintIndent (0, "%g</%s>\n", list[8], "m33");
+      CreateValueNodeAsFloat (parent, "m11", list[0]);
+      CreateValueNodeAsFloat (parent, "m12", list[1]);
+      CreateValueNodeAsFloat (parent, "m13", list[2]);
+      CreateValueNodeAsFloat (parent, "m21", list[3]);
+      CreateValueNodeAsFloat (parent, "m22", list[4]);
+      CreateValueNodeAsFloat (parent, "m23", list[5]);
+      CreateValueNodeAsFloat (parent, "m31", list[6]);
+      CreateValueNodeAsFloat (parent, "m32", list[7]);
+      CreateValueNodeAsFloat (parent, "m33", list[8]);
     }
     else
     {
@@ -422,7 +404,7 @@ void Cs2Xml::ParseMatrix (csParser *parser, char *buf, int indent)
 }
 
 void Cs2Xml::ParseGeneral (const char* parent_token,
-	int indent, csParser* parser, csRef<iDocumentNode>& parent, char* buf)
+	csParser* parser, csRef<iDocumentNode>& parent, char* buf)
 {
   CS_TOKEN_TABLE_START (tokens)
     CS_TOKEN_TABLE (ACCEL)
@@ -446,6 +428,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (NUM)
     CS_TOKEN_TABLE (ORIG)
     CS_TOKEN_TABLE (ORIGIN)
+    CS_TOKEN_TABLE (PORTAL)
     CS_TOKEN_TABLE (POSITION)
     CS_TOKEN_TABLE (PRIORITY)
     CS_TOKEN_TABLE (RADIUS)
@@ -455,31 +438,50 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
     CS_TOKEN_TABLE (SECOND)
     CS_TOKEN_TABLE (SHIFT)
     CS_TOKEN_TABLE (T)
+    CS_TOKEN_TABLE (TEXTURE)
     CS_TOKEN_TABLE (TRANSPARENT)
     CS_TOKEN_TABLE (TRIANGLE)
+    CS_TOKEN_TABLE (TYPE)
     CS_TOKEN_TABLE (UV)
     CS_TOKEN_TABLE (V)
     CS_TOKEN_TABLE (VERTEX)
     CS_TOKEN_TABLE (VERTICES)
     CS_TOKEN_TABLE (W)
+    CS_TOKEN_TABLE (WARP)
   CS_TOKEN_TABLE_END
 
   char *name, *params;
   long cmd;
+  csRef<iDocumentNode> portal_node;
 
   while ((cmd = parser->GetObject (&buf, tokens, &name, &params))
   	!= CS_PARSERR_EOF)
   {
     char* tokname = ToLower (parser->GetUnknownToken ());
-    if (params == NULL || IsEmpty (params))
-    {
-      WriteToken (indent, tokname, name, true, false);
-      PrintIndent (0, "/>\n");
-    }
-    else
-    {
       switch (cmd)
       {
+        case CS_TOKEN_PORTAL:
+	  {
+	    if (!portal_node)
+	    {
+	      portal_node = parent->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+	      portal_node->SetValue ("portal");
+	    }
+	    char buf[2048];
+            csScanStr (params, "%s", buf);
+	    CreateValueNode (portal_node, "sector", buf);
+	  }
+	  break;
+        case CS_TOKEN_WARP:
+	  {
+	    if (!portal_node)
+	    {
+	      portal_node = parent->CreateNodeBefore (CS_NODE_ELEMENT, NULL);
+	      portal_node->SetValue ("portal");
+	    }
+            ParseGeneral ("portal", parser, portal_node, params);
+	  }
+	  break;
         case CS_TOKEN_COLOR:
 	  {
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
@@ -490,6 +492,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    child->SetAttributeAsFloat ("red", x);
 	    child->SetAttributeAsFloat ("green", y);
 	    child->SetAttributeAsFloat ("blue", z);
+	    if (name) child->SetAttribute ("name", name);
 	  }
 	  break;
         case CS_TOKEN_ACCEL:
@@ -501,7 +504,6 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
         case CS_TOKEN_ORIGIN:
         case CS_TOKEN_POSITION:
         case CS_TOKEN_SHIFT:
-        case CS_TOKEN_VERTEX:
 	  {
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	    	CS_NODE_ELEMENT, NULL);
@@ -511,6 +513,20 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	    child->SetAttributeAsFloat ("x", x);
 	    child->SetAttributeAsFloat ("y", y);
 	    child->SetAttributeAsFloat ("z", z);
+	    if (name) child->SetAttribute ("name", name);
+	  }
+	  break;
+        case CS_TOKEN_VERTEX:
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    child->SetValue ("v");
+	    float x, y, z;
+	    csScanStr (params, "%f,%f,%f", &x, &y, &z);
+	    child->SetAttributeAsFloat ("x", x);
+	    child->SetAttributeAsFloat ("y", y);
+	    child->SetAttributeAsFloat ("z", z);
+	    if (name) child->SetAttribute ("name", name);
 	  }
 	  break;
         case CS_TOKEN_V:
@@ -528,6 +544,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	      child->SetAttributeAsFloat ("z", z);
 	      child->SetAttributeAsFloat ("u", u);
 	      child->SetAttributeAsFloat ("v", v);
+	      if (name) child->SetAttribute ("name", name);
 	    }
 	    else if (!strcmp (parent_token, "polygon"))
 	    {
@@ -537,14 +554,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	      int num;
 	      csScanStr (params, "%D", list, &num);
 	      for (i = 0 ; i < num ; i++)
-	      {
-	        csRef<iDocumentNode> child = parent->CreateNodeBefore (
-	    	  CS_NODE_ELEMENT, NULL);
-	        child->SetValue ("v");
-		csRef<iDocumentNode> text = child->CreateNodeBefore (
-		  CS_NODE_TEXT, NULL);
-		text->SetValueAsInt (list[i]);
-	      }
+	        CreateValueNodeAsInt (parent, "v", list[i]);
 	    }
 	    else
 	    {
@@ -556,6 +566,7 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
 	      child->SetAttributeAsFloat ("x", x);
 	      child->SetAttributeAsFloat ("y", y);
 	      child->SetAttributeAsFloat ("z", z);
+	      if (name) child->SetAttribute ("name", name);
 	      break;
 	    }
 	  }
@@ -563,44 +574,75 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
         case CS_TOKEN_VERTICES:
 	  {
 	    // In this case we have a VERTICES from a POLYGON.
+	    int i;
 	    int list[100];
 	    int num;
 	    csScanStr (params, "%D", list, &num);
-	    int i;
-	    PrintIndent (indent, "<v>%d</v>", list[0]);
-	    for (i = 1 ; i < num ; i++)
+	    for (i = 0 ; i < num ; i++)
+	      CreateValueNodeAsInt (parent, "v", list[i]);
+	  }
+	  break;
+	case CS_TOKEN_TEXTURE:
+	  {
+	    if (!strcmp (parent_token, "polygon"))
 	    {
-	      PrintIndent (0, " <v>%d</v>", list[i]);
+	      csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	      child->SetValue ("texmap");
+	      if (name) child->SetAttribute ("name", name);
+              ParseGeneral ("texmap", parser, child, params);
 	    }
-	    PrintIndent (0, "\n");
+	    else if (!strcmp (parent_token, "material"))
+	    {
+	      char buf[2048];
+              csScanStr (params, "%s", buf);
+	      CreateValueNode (parent, "texture", buf);
+	    }
+	    else if (!strcmp (parent_token, "layer"))
+	    {
+	      char buf[2048];
+              csScanStr (params, "%s", buf);
+	      CreateValueNode (parent, "texture", buf);
+	    }
+	    else
+	    {
+	      csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	      child->SetValue ("texture");
+	      if (name) child->SetAttribute ("name", name);
+              ParseGeneral ("texture", parser, child, params);
+	    }
 	  }
 	  break;
         case CS_TOKEN_MATRIX:
 	  {
-	    WriteToken (indent, tokname, name, false, true);
-	    ParseMatrix (parser, params, indent+2);
-            PrintIndent (indent, "</%s>\n", tokname);
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name) child->SetAttribute ("name", name);
+	    ParseMatrix (parser, child, params);
 	  }
 	  break;
         case CS_TOKEN_FILE:
 	  {
 	    char filename[2048];
             csScanStr (params, "%s", filename);
-	    WriteToken (indent, tokname, name, false, false);
-	    PrintIndent (0, "%s", filename);
-            PrintIndent (0, "</%s>\n", tokname);
+	    CreateValueNode (parent, "file", filename);
 	  }
 	  break;
         case CS_TOKEN_T:
         case CS_TOKEN_TRIANGLE:
 	  {
-	    WriteToken (indent, "t", name, false, false);
 	    int list[100];
 	    int num;
 	    csScanStr (params, "%D", list, &num);
-	    PrintIndent (0, "<t1>%d</t1> <t2>%d</t2> <t3>%d</t3>",
-	    	list[0], list[1], list[2]);
-            PrintIndent (0, "</%s>\n", "t");
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    child->SetValue ("t");
+	    child->SetAttributeAsInt ("v1", list[0]);
+	    child->SetAttributeAsInt ("v2", list[1]);
+	    child->SetAttributeAsInt ("v3", list[2]);
+	    if (name) child->SetAttribute ("name", name);
 	  }
 	  break;
         case CS_TOKEN_AGING:
@@ -619,50 +661,85 @@ void Cs2Xml::ParseGeneral (const char* parent_token,
         case CS_TOKEN_RADIUS:
         case CS_TOKEN_RECTPARTICLES:
         case CS_TOKEN_ROT:
-        case CS_TOKEN_SCALE:
-        case CS_TOKEN_TRANSPARENT:
         case CS_TOKEN_UV:
         case CS_TOKEN_W:
-	  WriteToken (indent, tokname, name, true, false);
-	  PrintIndent (0, "/>\n");
-          break;
-        default:
-	  if (IsString (params))
 	  {
-	    WriteToken (indent, tokname, name, false, false);
-	    char* p = NULL;
-	    if (*params == '\'')
-	    {
-	      params++;
-	      p = strchr (params, '\'');
-	      if (p) *p = 0;
-	    }
-	    PrintIndent (0, "%s", params);
-	    if (p) *p = '\'';
-            PrintIndent (0, "</%s>\n", tokname);
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	  	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name) child->SetAttribute ("name", name);
+	    // @@@ TODO
 	  }
-	  else if (IsBoolean (params))
+          break;
+        case CS_TOKEN_TRANSPARENT:
 	  {
-	    WriteToken (indent, tokname, name, false, false);
-	    PrintIndent (0, "%s", params);
-	    PrintIndent (0, "</%s>\n", tokname);
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	  	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    if (name) child->SetAttribute ("name", name);
+	    float r, g, b;
+	    csScanStr (params, "%f,%f,%f", &r, &g, &b);
+	    child->SetAttributeAsFloat ("red", r);
+	    child->SetAttributeAsFloat ("green", g);
+	    child->SetAttributeAsFloat ("blue", b);
+	  }
+	  break;
+        case CS_TOKEN_SCALE:
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	  CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	    float x, y;
+	    csScanStr (params, "%f,%f", &x, &y);
+	    child->SetAttributeAsFloat ("x", x);
+	    child->SetAttributeAsFloat ("y", y);
+	  }
+	  break;
+	case CS_TOKEN_TYPE:
+	  {
+	    char buf[2048];
+            csScanStr (params, "%s", buf);
+	    char* tt = ToLower (buf);
+	    CreateValueNode (parent, tokname, tt);
+	    delete[] tt;
+	  }
+	  break;
+        default:
+	{
+	  bool val;
+	  if (IsEmpty (params))
+	  {
+	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
+	    	CS_NODE_ELEMENT, NULL);
+	    child->SetValue (tokname);
+	  }
+	  else if (IsString (params))
+	  {
+	    char buf[2048];
+            csScanStr (params, "%s", buf);
+	    CreateValueNode (parent, tokname, buf);
 	  }
 	  else if (IsNumeric (params))
 	  {
-	    WriteToken (indent, tokname, name, false, false);
-	    PrintIndent (0, "%s", params);
-	    PrintIndent (0, "</%s>\n", tokname);
+	    float f;
+	    csScanStr (params, "%f", &f);
+	    CreateValueNodeAsFloat (parent, tokname, f);
+	  }
+	  else if (IsBoolean (params, val))
+	  {
+	    CreateValueNode (parent, tokname, val ? "yes" : "no");
 	  }
 	  else
 	  {
 	    csRef<iDocumentNode> child = parent->CreateNodeBefore (
 	    	CS_NODE_ELEMENT, NULL);
 	    child->SetValue (tokname);
-            ParseGeneral (tokname, indent+2, parser, child, params);
+	    if (name) child->SetAttribute ("name", name);
+            ParseGeneral (tokname, parser, child, params);
 	  }
           break;
+        }
       }
-    }
     delete[] tokname;
   }
 }
@@ -725,7 +802,7 @@ void Cs2Xml::Main ()
       csRef<iDocumentNode> parent = root->CreateNodeBefore (
     	  CS_NODE_ELEMENT, NULL);
       parent->SetValue ("world");
-      ParseGeneral ("", 2, parser, parent, params);
+      ParseGeneral ("", parser, parent, params);
       doc->Write (vfs, "/this/test.xml");
     }
   }

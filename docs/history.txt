@@ -32,6 +32,12 @@ The history order is reversed so that new features are at the top.
 	  an iString. This GREATLY speeds up XML writing (from a minute to
 	  about a second :-)
 	- cs2xml now uses XML writing with TinyXML. Still not 100% operational.
+	- Added a warning in mk/user.mak with regards to the usage of
+	  USE_SHARED_LIBS.
+	- cs2xml now does a very good job of converting flarge to XML. I
+	  think it is nearly perfect now. It also translates TEXTURE to
+	  'texmap' (in case we're in a polygon) and it combines PORTAL
+	  and WARP keywords into 'portal' section.
 13-Aug-2002
 	- Implemented XML versions of LoadMap() and LoadSector() in the
 	  main loader.
