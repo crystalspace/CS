@@ -27,7 +27,6 @@
 #include <Sound.h>
 
 #include "cscom/com.h"
-#include "csengine/basic/csid.h"
 #include "isnddrv.h"
 
 extern const CLSID CLSID_MacSoundDriver;
