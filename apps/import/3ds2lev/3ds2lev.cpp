@@ -191,6 +191,7 @@ int main (int argc, char * argv[])
                " -l        Don't convert but list objects in 3ds file\n"
 	       " -c	   optimize (combine every two triangles into polys)\n"
                " -r x y z  Relocate objects (x,y,z = floats)\n"
+	       " -s x y t  Scale objects (x,y,z = floats)\n"
                " -pl       Make polygons lit\n"
                " -3        Output 3D sprite instead of level\n"
 	       " -tl       Make texture origin lower left (default)\n"
