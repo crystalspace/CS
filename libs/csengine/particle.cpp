@@ -457,9 +457,13 @@ void csRainParticleSystem :: Update(time_t elapsed_time)
       // constant another particle will appear in sight now.
       // @@@ rain only appears in box ceiling now, should appear on
       // opposite side of rain_dir... 
+
+      // @@@ also shifty will not work very nicely with slanted rain.
+      //   but perhaps it won't be too bad...
+      float shifty = rainbox.MinY() - part_pos[i].y;
       pos = GetRandomDirection( csVector3 (rainbox.MaxX() - rainbox.MinX(), 
         0.0f, rainbox.MaxZ() - rainbox.MinZ()), rainbox.Min() );
-      pos.y = rainbox.MaxY();
+      pos.y = rainbox.MaxY() - shifty;
       GetParticle(i)->SetPosition(pos);
       part_pos[i] = pos;
     }
