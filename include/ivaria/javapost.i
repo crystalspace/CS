@@ -140,11 +140,11 @@ csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 
 %}
 
+#ifndef CS_MINI_SWIG
 %{
     static JavaVM * _the_jvm = 0;
 %}
 
-#ifndef CS_MINI_SWIG
 %inline %{
 
 	struct _csJEventHandler : public iEventHandler
