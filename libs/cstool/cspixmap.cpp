@@ -61,7 +61,7 @@ void csSimplePixmap::DrawTiled (iGraphics3D* g3d, int sx, int sy,
 #ifndef CS_USE_NEW_RENDERER
   if (hTex) g3d->DrawPixmap
     (hTex, sx, sy, sw, sh, sx - orgx, sy - orgy, sw, sh, Alpha);
-#endif CS_USE_NEW_RENDERER
+#endif
 }
 
 int csSimplePixmap::Width () { return tw; }
