@@ -27,6 +27,10 @@ chronological order.
 	  a problem where its actions would emit warnings of the form:
 	    Copy ./out/docs/html/api
 	    rm: cannot remove `./out/docs/html/api': Is a directory
+	- Eric Sunshine fixed problem in jobber.pl where the shell was
+	  inadvertently interpreting $'s in Jamconfig creation code.  Also
+	  installed on shell.sf.net the new version of jobber.pl which utilizes
+	  Jam for its maintenance tasks, rather than GNU make.
 21-Apr-2004
 	- Jorrit fixed compilation of the engine plugin with OR after
 	  breaking it yesterday.

@@ -301,8 +301,9 @@ my $CAPTURED_OUTPUT = '';
 # needs to be configured, however the SourceForge shell machine does not have
 # compilers installed, thus we can not configure the project with the Autoconf
 # "configure" script.  Instead, we fake up project configuration by creating a
-# minimal Jamconfig and Jamfile.
-my $CONFIGURE = "cat << EOF > Jamconfig\n" .
+# minimal Jamconfig and Jamfile.  (Note that the quoted 'EOF' is intentaional.
+# It prevents the shell from interpreting embedded $ symbols.)
+my $CONFIGURE = "cat << 'EOF' > Jamconfig\n" .
     "CMD.C++ ?= \"g++\" ;\n" .
     "CMD.CC ?= \"gcc\" ;\n" .
     "CMD.DOXYGEN ?= \"doxygen\" ;\n" .
