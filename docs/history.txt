@@ -3,6 +3,9 @@ The history order has been reversed so that new features are at the top.
 10-Mar-2001
 	- Cleaned up layout in DDG loader and also made a small fix
 	  in csTerrainWrapper constructor declaration.
+	- Added interfaces iShadowSystem, iShadowCaster, and
+	  iShadowReceiver. These new interfaces will be the basis for
+	  a system to replace CheckFrustum.
 9-Mar-2001
 	- Fixed some include files in the Direct3D6.1 plugin which were
 	  not converted to the new structure.
