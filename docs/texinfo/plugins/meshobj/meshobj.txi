@@ -38,6 +38,10 @@ Crystal Space supports.
 * MeshObject Rain:: Rain Mesh Object
 * MeshObject Explo:: Explosion Mesh Object
 * MeshObject Spiral:: Spiral Mesh Object
+* MeshObject Haze:: Haze Mesh Object
+* MeshObject TerrFunc:: Terrain Mesh Object
+* MeshObject Thing:: Thing Mesh Object
+* MeshObject Metaball:: Metaball Mesh Object
 @end menu
 
 @importss{plugins,meshobj,concepts.txi}

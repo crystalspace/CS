@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject Spiral, , MeshObject Explo, MeshObject
+@node MeshObject Spiral, MeshObject Haze, MeshObject Explo, MeshObject
 @subsection Spiral Mesh Object
 @cindex MeshObject
 @cindex Spiral Particle System

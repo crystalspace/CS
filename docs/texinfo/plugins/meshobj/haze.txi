@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject Haze, MeshObject Spr3D, Writing MeshObjects, MeshObject
+@node MeshObject Haze, MeshObject TerrFunc, MeshObject Spiral, MeshObject
 @subsection Haze Mesh Object
 @cindex MeshObject
 @cindex Haze

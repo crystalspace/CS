@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject TerrFunc, MeshObject Spr3D, Writing MeshObjects, MeshObject
+@node MeshObject TerrFunc, MeshObject Thing, MeshObject Haze, MeshObject
 @subsection Terrain Mesh Object
 @cindex MeshObject
 @cindex Terrain Engine

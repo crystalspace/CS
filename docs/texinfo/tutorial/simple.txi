@@ -30,7 +30,7 @@ viewed online.  @xref{Where to Get}.
 @menu
 * Simple Basic Concepts:: Basic Crystal Space Concepts
 * Simple Minimum Requirements:: Minimum Application Requirements
-* Simple Main Structure::
+* Simple Header File::
 * Simple Event Handling:: Event Handling
 * Simple World:: Creating a ``World''
 * Simple Camera:: The Camera
@@ -189,7 +189,7 @@ get the application running. In the tutorial below we will use several of the
 functions from @code{csInitializer}. This class contains only static member
 functions.
 
-@node Simple Minimum Requirements, Simple Main Structure, Simple Basic Concepts, Tutorial Simple
+@node Simple Minimum Requirements, Simple Header File, Simple Basic Concepts, Tutorial Simple
 @subsection Minimum Application Requirements
 @cindex Tutorial Minimum Application Requirements
 @cindex Minimum Application Requirements, Tutorial
@@ -531,7 +531,7 @@ calling @code{csDefaultRunLoop()}. This function will only return when
 the application exits (which this example cannot yet do). Basically
 this function will start the loop to handle events.
 
-@node Simple Event Handling, Simple World, Simple Main Structure, Tutorial Simple
+@node Simple Event Handling, Simple World, Simple Header File, Tutorial Simple
 @subsection Event Handling
 @cindex Event Handling, Simple Tutorial
 @cindex Simple Tutorial Event Handling

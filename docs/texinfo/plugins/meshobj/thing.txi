@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node MeshObject Thing, MeshObject Spr3D, Writing MeshObjects, MeshObject
+@node MeshObject Thing, MeshObject Metaball, MeshObject TerrFunc, MeshObject
 @subsection Thing Mesh Object
 @cindex MeshObject
 @cindex Thing
