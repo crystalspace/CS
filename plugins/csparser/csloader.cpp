@@ -132,9 +132,8 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* name)
   if (mat)
     return mat;
 
-  loader->ReportNotify ("crystalspace.maploader", 
-    "Could not find material '%s'. "
-    "Creating new material using texture '%s'", name);
+  loader->ReportNotify ("Could not find material '%s'. "
+    "Creating new material using texture with that name", name);
   iTextureWrapper* tex = FindTexture (name);
   if (tex)
   {
@@ -186,8 +185,8 @@ iTextureWrapper* StdLoaderContext::FindTexture (const char* name)
 
   if (!result)
   {
-    loader->ReportNotify ("crystalspace.maploader", 
-      "Could not find texture '%s'. Attempting to load.", name);
+    loader->ReportNotify ("Could not find texture '%s'. Attempting to load.", 
+      name);
     csRef<iTextureWrapper> rc = loader->LoadTexture (name, name);
     result = rc;
   }

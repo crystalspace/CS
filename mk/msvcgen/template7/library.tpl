@@ -75,7 +75,7 @@
 				OptimizeForProcessor="1"
 				AdditionalOptions="%cflags%"
 				AdditionalIncludeDirectories="..\..,..\..\include\cssys\win32,..\..\include,..\..\libs,..\..\support,..\..\apps,..\..\plugins"
-				PreprocessorDefinitions="_DEBUG,_LIB,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG,CS_EXTENSIVE_MEMDEBUG,CS_STRICT_SMART_POINTERS"
+				PreprocessorDefinitions="_DEBUG,_LIB,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG,CS_STRICT_SMART_POINTERS"
 				MinimalRebuild="TRUE"
 				RuntimeLibrary="3"
 				PrecompiledHeaderFile=".\csdebug\temp\%project%/%project%.pch"
@@ -92,6 +92,54 @@
 			<Tool
 				Name="VCLibrarianTool"
 				OutputFile="csdebug\bin\libs\%project%_d.lib"
+				SuppressStartupBanner="TRUE"/>
+			<Tool
+				Name="VCMIDLTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="echo File is a lib, Copy skipped."/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG,CS_DEBUG"
+				Culture="1033"
+				AdditionalIncludeDirectories="..\..\include\cssys\win32,..\..\include"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+		</Configuration>
+		<Configuration
+			Name="ExtensiveMemDebug|Win32"
+			OutputDirectory=".\csmemdbg\bin\libs"
+			IntermediateDirectory=".\csmemdbg\temp\%project%"
+			ConfigurationType="4"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				OptimizeForProcessor="1"
+				AdditionalOptions="%cflags%"
+				AdditionalIncludeDirectories="..\..,..\..\include\cssys\win32,..\..\include,..\..\libs,..\..\support,..\..\apps,..\..\plugins"
+				PreprocessorDefinitions="_DEBUG,_LIB,WIN32,_WINDOWS,WIN32_VOLATILE,__CRYSTAL_SPACE__,CS_DEBUG,CS_EXTENSIVE_MEMDEBUG,CS_STRICT_SMART_POINTERS"
+				MinimalRebuild="TRUE"
+				RuntimeLibrary="3"
+				PrecompiledHeaderFile=".\csmemdbg\temp\%project%/%project%.pch"
+				AssemblerListingLocation=".\csmemdbg\temp\%project%/"
+				ObjectFile=".\csmemdbg\temp\%project%/"
+				ProgramDataBaseFileName=".\csmemdbg\temp\%project%/%project%.pdb"
+				BrowseInformation="1"
+				WarningLevel="4"
+				SuppressStartupBanner="TRUE"
+				DebugInformationFormat="4"
+				CompileAs="0"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="csmemdbg\bin\libs\%project%_d.lib"
 				SuppressStartupBanner="TRUE"/>
 			<Tool
 				Name="VCMIDLTool"/>
