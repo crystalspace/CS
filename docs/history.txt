@@ -23,6 +23,10 @@ chronological order.
  	  drivers (like ati radeon 7500 on win XP) corrupt the video
  	  memory if you don't. Fix from Robin Stanton.
 	- Wouter added SetDefaultFont to AwsPrefsManager.
+	- Committing updated versions of these scripts for 3ds max exporting.
+	  I've had these for two months and forgot to commit them (I thought
+	  it was done already.)  See Luca Pancallo (Talad on irc), director
+	  of Planeshift project with any questions about these--he wrote them.
 11-Nov-2003
 	- Eric Sunshine fixed MacOS/X application menu malfunction introduced
 	  on August 1, 2003 when configuration was changed so that OSXDelegate

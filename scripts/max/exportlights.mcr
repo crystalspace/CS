@@ -16,7 +16,7 @@
 -- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 --
 ------------------------------------------------------------
--- Version 02
+-- Version 05
 
 macroScript Export_Lights_PS
 category:"PlaneShift"
@@ -51,11 +51,17 @@ rollout Test1 "Export Lights" width:222 height:142
 		-- check frames number: 24 frames in total
 		maxframes = animationrange.end
 
-		if (animationrange.end != 23f) then
+		if (animationrange.end != 23f and animationrange.end != 47f) then
 		(
-			message = "You have to set the animation length to 24 frames total. \n Each frame is 1 hour of the day."
+			message = "You have to set the animation length to 24 frames (sun only) or to 48 (sun/rain). \n Each frame is 1 hour of the day."
 			messageBox message
 			return 1
+		)
+
+		if (animationrange.end == 23f) then
+		(
+			message = "You have set 24 frames in the animation, so full sun and heavy rain condition will have the same light settings. \n Export will now proceed."
+			messageBox message
 		)
 
 		-- get room name
@@ -92,6 +98,8 @@ rollout Test1 "Export Lights" width:222 height:142
 		yrelocate = 0
 		zrelocate = 0
 	
+		-- this indicates if only differences must be printed.
+		optimized = false
 
 		-- ////////////////////////
 		-- Main: program starts here
@@ -114,18 +122,20 @@ rollout Test1 "Export Lights" width:222 height:142
 		
 		format "lightsFound: %" lightsFound 
 
+
 		-- get lights information
 		lightColors = #()
 		lightInfo = #()
 
 		format "Dynamic Lights \n"
 		-- cycle on all frames of the animation
+		-- to find out which lights are dynamic
+		-- and to get their color info
 		fcount = 1
 		for curFrame=0 to maxframes do (
 			-- move to right frame
 			slidertime=curFrame
-			
-			-- outputs lights
+
 			lcount = 1
 			fLights = #()
 			for ll in lightsFound do
@@ -154,7 +164,6 @@ rollout Test1 "Export Lights" width:222 height:142
 		-- reset slider time (used mainly to avoid problem in getting last frame data)
 		slidertime=0
 
-		optimized = true
 		if (optimized) then
 		(
 			-- skip first hour, lights are the same as defined.
@@ -176,10 +185,10 @@ rollout Test1 "Export Lights" width:222 height:142
 						(
 							-- pseudo-dynamic ambient light
 							if (ll.name=="ambient") then
-								format " <color value=\"%\" object=\"%\" type=\"ambient\" r=\"%\" g=\"%\" b=\"%\" />\n" fcount roomname colors[1] colors[2] colors[3] to:outFile
+								format " <color value=\"%\" object=\"%\" type=\"ambient\" r=\"%\" g=\"%\" b=\"%\" />\n" (fcount-1) roomname colors[1] colors[2] colors[3] to:outFile
 							-- pseudo-dynamic light
 							else
-								format " <color value=\"%\" object=\"%\" type=\"light\" r=\"%\" g=\"%\" b=\"%\" />\n" fcount ll.name colors[1] colors[2] colors[3] to:outFile
+								format " <color value=\"%\" object=\"%%\" type=\"light\" r=\"%\" g=\"%\" b=\"%\" />\n" (fcount-1) ll.name roomname colors[1] colors[2] colors[3] to:outFile
 						)
 					)
 					lcount = lcount + 1
@@ -190,28 +199,35 @@ rollout Test1 "Export Lights" width:222 height:142
 		) else (
 
 			-- cycle on all frames of the animation
-			fcount = 0
-			for curFrame=0 to maxframes do (
-				-- move to right frame
-				slidertime=curFrame
-	
-				-- cycle on all objects in the scene
+			fcount = 1
+			for curFrame=0 to 23f do (
+
+				-- cycle on all lights found in the scene
+				lcount = 1
 				for obj in lightsFound do 
 				(
-					-- light multiplier
-					multiplier = obj.multiplier
-		
-					-- convert lights from 0-255 to 0-1
-					llred = ((obj.rgb.r)/255) * multiplier
-					llgreen = ((obj.rgb.g)/255) * multiplier
-					llblue = ((obj.rgb.b)/255) * multiplier
-	
-					-- pseudo-dynamic ambient light
-					if (obj.name=="ambient") then
-						format " <color value=\"%\" object=\"%\" type=\"ambient\" r=\"%\" g=\"%\" b=\"%\" />\n" fcount roomname llred llgreen llblue to:outFile
-					-- pseudo-dynamic light
-					else
-						format " <color value=\"%\" object=\"%\" type=\"light\" r=\"%\" g=\"%\" b=\"%\" />\n" fcount obj.name llred llgreen llblue to:outFile
+					colors = lightColors[fcount][lcount]
+					rainColors = #()
+
+					-- if light is dynamic
+					if (lightInfo.count>=lcount and lightInfo[lcount]=="dynamic") then
+					(
+						-- get rain values
+						if (maxframes == 47f ) then
+						(
+							rainColors = lightColors[fcount+24][lcount]
+						) else
+						(
+							rainColors = lightColors[fcount][lcount]
+						)
+						-- pseudo-dynamic ambient light
+						if (obj.name=="ambient") then
+							format " <color value=\"%\" object=\"%\" type=\"ambient\" r=\"%\" g=\"%\" b=\"%\" rain_r=\"%\" rain_g=\"%\" rain_b=\"%\" />\n" (fcount-1) roomname colors[1] colors[2] colors[3] rainColors[1] rainColors[2] rainColors[3] to:outFile
+						-- pseudo-dynamic light
+						else
+							format " <color value=\"%\" object=\"%%\" type=\"light\" r=\"%\" g=\"%\" b=\"%\" rain_r=\"%\" rain_g=\"%\" rain_b=\"%\" />\n" (fcount-1) obj.name roomname colors[1] colors[2] colors[3] rainColors[1] rainColors[2] rainColors[3] to:outFile
+					)
+					lcount = lcount + 1
 				)
 				fcount = fcount + 1
 			)
@@ -219,7 +235,6 @@ rollout Test1 "Export Lights" width:222 height:142
 
 		-- close lighting object
 		format "</lighting>\n" to:outFile
-
 		close outFile 
 	
 		message = "ALL DONE!"
@@ -232,3 +247,4 @@ gw = newRolloutFloater "Export Lights" 300 220
 addRollout Test1 gw 
 
 )
+

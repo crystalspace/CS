@@ -16,7 +16,7 @@
 -- Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 --
 ------------------------------------------------------------
--- Version 22
+-- Version 34
 
 macroScript Export_Level_CS
 category:"PlaneShift"
@@ -25,7 +25,7 @@ ButtonText:"Export Level CS"
 tooltip:"Export Level CS" Icon:#("Maxscript",1)
 (
 
-rollout Test1 "Export Level to CS" width:222 height:191
+rollout Test1 "Export Level to CS" width:222 height:211
 (
 	edittext edt3 "" pos:[17,32] width:192 height:21
 	label lbl1 "Export Level To:" pos:[21,7] width:142 height:20
@@ -33,6 +33,8 @@ rollout Test1 "Export Level to CS" width:222 height:191
 	label lbl6 "Scale:" pos:[58,72] width:40 height:20
 	edittext edtScale "" pos:[101,67] width:63 height:27
 	checkbox chkLights "Generate Fake lights for walktest" pos:[4,146] width:215 height:20 enabled:true
+	label lbl3 "Duration (msecs):" pos:[14,174] width:108 height:20
+	editText edtDuration "" pos:[126,173] width:76 height:22
 	on Test1 open do
 	(
 	   edt3.text = "D:\\Luca\\temple124"
@@ -234,7 +236,7 @@ rollout Test1 "Export Level to CS" width:222 height:191
 		-- ////////////////////////
 		-- Output Particle function
 		-- ////////////////////////
-		fn OutputParticle obj outFile =
+		fn OutputParticle obj allObjects outFile =
 		(
 				type = getUserProp obj "TYPE"
 				partMaterial = getUserProp obj "MATERIAL"
@@ -289,15 +291,21 @@ rollout Test1 "Export Level to CS" width:222 height:191
 				else if (type == "emit") then (
 					number = getUserProp obj "NUMBER"
 					regparticle = getUserProp obj "REGULARPARTICLES"
-					regparticle2 = tokenize regparticle ","
+					if (regparticle==undefined) then
+					(
+						rectparticle = getUserProp obj "RECTPARTICLES"
+						rectparticle2 = tokenize rectparticle ","
+					) else (
+						regparticle2 = tokenize regparticle ","
+					)
 					lighting = getUserProp obj "LIGHTING"
 					totaltime = getUserProp obj "TOTALTIME"
+					-- STARTPOS: STARTPOS1=EMITSPHERE  STARTPOS2=0,0.1
 					startpostype = getUserProp obj "STARTPOS1"
 					startpostype = lowercase startpostype
 					startpos = getUserProp obj "STARTPOS2"
 					index = findString startpos ","
-					startposp = substring startpos 1 (index-1)
-					startposq = substring startpos (index+1) -1
+					startposarray = tokenize startpos ","
 					-- STARTSPEED=EMITBOX(-1,-1,-1,1,1,1)
 					startspeed = getUserProp obj "STARTSPEED"
 					index = findString startspeed "("
@@ -315,23 +323,29 @@ rollout Test1 "Export Level to CS" width:222 height:191
 					attractor = getUserProp obj "ATTRACTOR"
 					-- search attractor position using attractor name found in ATTRACTOR entry
 					attractorobj=null
-					for attract in objects do if (attract.name==attractor) then attractorobj=attract
+					for attract in allObjects do if (attract.name==attractor) then attractorobj=attract
 					if (attractorobj==null) then ( format "NO OBJECT FOUND AS ATTRACTOR OF %" obj.name )
 					xattractorobj = (attractorobj.pos.x * xscale) + xrelocate
 					yattractorobj = (attractorobj.pos.y * yscale) + yrelocate
 					zattractorobj = (attractorobj.pos.z * zscale) + zrelocate
+					typeattractor = getUserProp attractorobj "TYPE"
 		
 					attractorforce = getUserProp obj "ATTRACTORFORCE"
 					aging0 = getUserProp obj "AGING0"
-					aging0 = tokenize aging0 ","
+					if (aging0!=undefined) then
+						aging0 = tokenize aging0 ","
 					aging1 = getUserProp obj "AGING1"
-					aging1 = tokenize aging1 ","
+					if (aging1!=undefined) then
+						aging1 = tokenize aging1 ","
 					aging2 = getUserProp obj "AGING2"
-					aging2 = tokenize aging2 ","
+					if (aging2!=undefined) then
+						aging2 = tokenize aging2 ","
 					aging3 = getUserProp obj "AGING3"
-					aging3 = tokenize aging3 ","
+					if (aging3!=undefined) then
+						aging3 = tokenize aging3 ","
 					aging4 = getUserProp obj "AGING4"
-					aging4 = tokenize aging4 ","
+					if (aging4!=undefined) then
+						aging4 = tokenize aging4 ","
 		
 					format "    <meshobj name=\"%\">\n" obj.name to:outFile
 					format "      <priority>alpha</priority>\n" to:outFile
@@ -350,411 +364,77 @@ rollout Test1 "Export Level to CS" width:222 height:191
 						format "	    <material>%</material>\n" partMaterial  to:outFile			
 	
 					format "	    <number>%</number> \n" number to:outFile
-					format "	    <regularparticles sides=\"%\" radius=\"%\" /> \n" regparticle2[1] regparticle2[2] to:outFile
+					if (regparticle==undefined) then
+					(
+						format "	    <rectparticles width=\"%\" height=\"%\" /> \n" rectparticle2[1] rectparticle2[2] to:outFile
+					) else (
+						format "	    <regularparticles sides=\"%\" radius=\"%\" /> \n" regparticle2[1] regparticle2[2] to:outFile
+					)
 					format "	    <lighting>%</lighting> \n" lighting to:outFile
 					format "	    <totaltime>%</totaltime> \n" totaltime to:outFile
-					format "	    <startpos><% x=\"%\" y=\"%\" z=\"%\" p=\"%\" q=\"%\" /></startpos>\n" startpostype xpart zpart ypart startposp startposq to:outFile
-					format "	    <startspeed><%><min x=\"%\" y=\"%\" z=\"%\" /> \n" startspeedtype startspeedarray[1] startspeedarray[2] startspeedarray[3] to:outFile
-					format "	    <max x=\"%\" y=\"%\" z=\"%\" /></%></startspeed> \n" startspeedarray[4] startspeedarray[5] startspeedarray[6] startspeedtype to:outFile
+					-- STARTPOS
+					if (startpostype=="emitsphere") then (
+						--pscaled = (startposarray[1]  * xscale) + xrelocate
+						--qscaled = (startposarray[2]  * yscale) + yrelocate
+						format "	    <startpos><% x=\"%\" y=\"%\" z=\"%\" p=\"%\" q=\"%\" /></startpos>\n" startpostype xpart zpart ypart startposarray[1] startposarray[2] to:outFile
+					) else if (startpostype=="emitfixed") then
+						format "	    <startpos><% x=\"%\" y=\"%\" z=\"%\" /></startpos>\n" startpostype xpart zpart ypart to:outFile
+					else if (startpostype=="emitbox") then
+					(
+						format "	    <startpos><%><min x=\"%\" y=\"%\" z=\"%\" /> \n" startpostype startposarray[1] startposarray[2] startposarray[3] to:outFile
+						format "	    <max x=\"%\" y=\"%\" z=\"%\" /></%></startpos> \n" startposarray[4] startposarray[5] startposarray[6] startpostype to:outFile
+					)
+					-- STARTSPEED
+					if (startspeedtype=="emitbox") then
+					(
+						format "	    <startspeed><%><min x=\"%\" y=\"%\" z=\"%\" /> \n" startspeedtype startspeedarray[1] startspeedarray[2] startspeedarray[3] to:outFile
+						format "	    <max x=\"%\" y=\"%\" z=\"%\" /></%></startspeed> \n" startspeedarray[4] startspeedarray[5] startspeedarray[6] startspeedtype to:outFile
+					) else if (startspeedtype=="emitfixed") then
+						format "	    <startspeed><% x=\"%\" y=\"%\" z=\"%\" /> </startspeed>\n" startspeedtype startspeedarray[1] startspeedarray[2] startspeedarray[3] to:outFile
 					format "	    <startaccel><% x=\"%\" y=\"%\" z=\"%\" /></startaccel>\n" startacctype startaccarray[1] startaccarray[2] startaccarray[3] to:outFile
 					format "	    <attractor> <emitfixed x=\"%\" y=\"%\" z=\"%\" /> </attractor>\n" xattractorobj zattractorobj yattractorobj to:outFile
 					format "	    <attractorforce>%</attractorforce>\n" attractorforce to:outFile
-					format "	    <aging> <time>%</time><color red=\"%\" green=\"%\" blue=\"%\" /> \n" aging0[1] aging0[2] aging0[3] aging0[4] to:outFile
-					format "	    <alpha>%</alpha><swirl>%</swirl><rotspeed>%</rotspeed><scale>%</scale></aging>\n" aging0[5] aging0[6] aging0[7] aging0[8] to:outFile
-					format "	    <aging> <time>%</time><color red=\"%\" green=\"%\" blue=\"%\" /> \n" aging0[1] aging1[2] aging1[3] aging1[4] to:outFile
-					format "	    <alpha>%</alpha><swirl>%</swirl><rotspeed>%</rotspeed><scale>%</scale></aging>\n" aging1[5] aging1[6] aging1[7] aging1[8] to:outFile
-					format "	    <aging> <time>%</time><color red=\"%\" green=\"%\" blue=\"%\" /> \n" aging2[1] aging2[2] aging2[3] aging2[4] to:outFile
-					format "	    <alpha>%</alpha><swirl>%</swirl><rotspeed>%</rotspeed><scale>%</scale></aging>\n" aging2[5] aging2[6] aging2[7] aging2[8] to:outFile
-					format "	    <aging> <time>%</time><color red=\"%\" green=\"%\" blue=\"%\" /> \n" aging3[1] aging3[2] aging3[3] aging3[4] to:outFile
-					format "	    <alpha>%</alpha><swirl>%</swirl><rotspeed>%</rotspeed><scale>%</scale></aging>\n" aging3[5] aging3[6] aging3[7] aging3[8] to:outFile
-					format "	    <aging> <time>%</time><color red=\"%\" green=\"%\" blue=\"%\" /> \n" aging4[1] aging4[2] aging4[3] aging4[4] to:outFile
-					format "	    <alpha>%</alpha><swirl>%</swirl><rotspeed>%</rotspeed><scale>%</scale></aging>\n" aging4[5] aging4[6] aging4[7] aging4[8] to:outFile
+					if (aging0!=undefined) then
+					(
+						format "	    <aging> <time>%</time><color red=\"%\" green=\"%\" blue=\"%\" /> \n" aging0[1] aging0[2] aging0[3] aging0[4] to:outFile
+						format "	    <alpha>%</alpha><swirl>%</swirl><rotspeed>%</rotspeed><scale>%</scale></aging>\n" aging0[5] aging0[6] aging0[7] aging0[8] to:outFile
+					)
+					if (aging1!=undefined) then
+					(					
+						format "	    <aging> <time>%</time><color red=\"%\" green=\"%\" blue=\"%\" /> \n" aging1[1] aging1[2] aging1[3] aging1[4] to:outFile
+						format "	    <alpha>%</alpha><swirl>%</swirl><rotspeed>%</rotspeed><scale>%</scale></aging>\n" aging1[5] aging1[6] aging1[7] aging1[8] to:outFile
+					)
+					if (aging2!=undefined) then
+					(	
+						format "	    <aging> <time>%</time><color red=\"%\" green=\"%\" blue=\"%\" /> \n" aging2[1] aging2[2] aging2[3] aging2[4] to:outFile
+						format "	    <alpha>%</alpha><swirl>%</swirl><rotspeed>%</rotspeed><scale>%</scale></aging>\n" aging2[5] aging2[6] aging2[7] aging2[8] to:outFile
+					)
+					if (aging3!=undefined) then
+					(
+						format "	    <aging> <time>%</time><color red=\"%\" green=\"%\" blue=\"%\" /> \n" aging3[1] aging3[2] aging3[3] aging3[4] to:outFile
+						format "	    <alpha>%</alpha><swirl>%</swirl><rotspeed>%</rotspeed><scale>%</scale></aging>\n" aging3[5] aging3[6] aging3[7] aging3[8] to:outFile
+					)
+					if (aging4!=undefined) then
+					(
+						format "	    <aging> <time>%</time><color red=\"%\" green=\"%\" blue=\"%\" /> \n" aging4[1] aging4[2] aging4[3] aging4[4] to:outFile
+						format "	    <alpha>%</alpha><swirl>%</swirl><rotspeed>%</rotspeed><scale>%</scale></aging>\n" aging4[5] aging4[6] aging4[7] aging4[8] to:outFile
+					)
 					format "      </params>\n" to:outFile
 					format "    </meshobj>\n" to:outFile
 				)
 		)
-	
+
 		-- ////////////////////////
-		-- Main: program starts here
+		-- Output Faces of a mesh
 		-- ////////////////////////
-
-		-- get room name
-		customPropNumber = fileProperties.findProperty #custom "roomname"
-		if (customPropNumber==0) then (
-			messageBox "Please click on File>File Properties and add a Custom Property called roomname with the name of the sector."
-			return 1
-		)
-		roomName = fileProperties.getPropertyValue #custom customPropNumber 
-	
-		if (roomName==undefined) then (
-		   format "ERROR: Please set a custom property named roomname"
-		   return 1
-		) else (
-		   format "Roomname: %\n" roomName
-		)
-	
-		-- output file
-		outFile = createFile filename		
-		
-		-- write header
-		
-		    format "<world>\n" to:outFile
-		
-		-- Check particles: cycle on all objects in the scene
-		for obj in objects do 
+		fn OutputMeshFaces obj outFile polyCombine verboseMode debug isportal istrasparent lighting colldet viscull =
 		(
-		    if ( (classOf obj)==Point) then (
-				type = getUserProp obj "TYPE"
-				format "Found Particle Object: %\n Type: %" obj.name type
-				if (type == "fire") then ( fireNeeded = true )
-				else if (type == "emit") then ( emitNeeded = true )
-				
-				-- check for additional materials
-				addMaterial = getUserProp obj "MATERIAL"
-				if (addMaterial != undefined) then
-					append partMaterials addMaterial
-			)
-		)
-	
-	
-		-- write materials		
-	    WriteMaterials outFile
-	
-		-- write plugins
-	    format "  <plugins>\n" to:outFile
-	    format "    <plugin name=\"thing\">crystalspace.mesh.loader.thing</plugin>\n" to:outFile
-	    format "    <plugin name=\"meshFact\">crystalspace.mesh.loader.factory.genmesh</plugin>\n" to:outFile
-	    format "    <plugin name=\"mesh\">crystalspace.mesh.loader.genmesh</plugin>\n" to:outFile
-	
-	  	if (fireNeeded) then (
-		    format "    <plugin name=\"fireFact\">crystalspace.mesh.loader.factory.fire</plugin>\n" to:outFile  
-			format "    <plugin name=\"fire\">crystalspace.mesh.loader.fire</plugin>\n" to:outFile  
-	  	)
-	  	if (emitNeeded) then (
-	    	format "    <plugin name=\"emitFact\">crystalspace.mesh.loader.factory.emit</plugin>\n" to:outFile 
-	    	format "    <plugin name=\"emit\">crystalspace.mesh.loader.emit</plugin>\n" to:outFile 
-	  	)
-	    format "  </plugins>\n\n" to:outFile
-	
-		-- write particles declarations
-	  	if (fireNeeded) then (
-		    format "    <meshfact name=\"fireFact\"><plugin>fireFact</plugin><params /></meshfact>\n\n" to:outFile
-	    )
-	  	if (emitNeeded) then (
-		    format "    <meshfact name=\"emitFact\"><plugin>emitFact</plugin><params /></meshfact>\n\n" to:outFile  
-	  	)
-	
-		-- search and write meshfacts
-		factoryMeshes = #()
-		for obj in objects do 
-		(
-			redefineFaces=#()
-	
-			-- Check for genmeshes factories
-			objName = obj.name
-			if (findString objName "_g_" !=undefined) then (
-				-- factory must have name like : _g_name_0
-				toks = tokenize objName "_"
-				if (toks.count == 4 and objName[objName.count-1] == "_" and objName[objName.count] == "0") then
-				(
-					append factoryMeshes obj
-					format "  <meshfact name=\"%\"><plugin>meshFact</plugin><params><numvt>%</numvt><numtri>%</numtri>\n" toks[3] (getNumTVerts obj) obj.numfaces to:outFile
-	
-					-- check texture
-					if (getNumTVerts obj==0) then
-					(
-						message = "Export aborted: No UV maps assigned to genmesh object: " + obj.name
-						messageBox message
-						close outFile 
-						return 1
-					)
-	
-					vertTInfo = #(getNumTVerts obj)
-					vertTInfo[1] = undefined
-		
-					-- cycle on all Faces of the object to get Tverts x,y,z positions
-					for i=1 to obj.numfaces do
-					(
-						-- get face
-						Tface = getTVFace obj i
-						face = getFace obj i
-		
-						-- get its 3 vertices
-						for h=1 to 3 do (
-					    	curVert=getVert obj face[h]
-							if (curVert==undefined) then
-								format "\n\nUNDEF: %\n\n" Tface[h]
-							if (debug) then
-								format " face: % curVert %: %\n" i Tface[h] curVert
-	
-							-- if the value is different we have a problem on Welded UV
-							if (vertTInfo[Tface[h]]!=undefined and vertTInfo[Tface[h]]!=curVert) then (
-	
-								message = "PROBLEM on object " + obj.name + ": welded UV on vertex " + (Tface[h] as String)
-								messageBox message
-								close outFile
-								return 1
-							)
-							vertTInfo[Tface[h]]=curVert
-						)
-					)
-	
-					-- cycle on all TVerts of the object
-					for i =1 to (getNumTVerts obj) do
-					(
-						-- get its 3 vertices as a point3
-						-- export in XZY format
-					    vert=vertTInfo[i]
-						xvert = (vert.x * xscale) + xrelocate
-						yvert = (vert.y * yscale) + yrelocate
-						zvert = (vert.z * zscale) + zrelocate
-			
-						Tvert = getTVert obj i
-			
-						format "      <v x=\"%\" y=\"%\" z=\"%\" u=\"%\" v=\"%\" /> \n" xvert zvert yvert Tvert[1] (1-Tvert[2]) i to:outFile
-					)
-	
-					-- cycle on all faces of object
-					for i =1 to obj.numFaces do
-					(
-						faceVerts=getTVface obj i
-						a = (faceVerts[1]-1) as Integer
-						b = (faceVerts[3]-1) as Integer
-						c = (faceVerts[2]-1) as Integer
-	
-						format "    <t v1=\"%\" v2=\"%\" v3=\"%\" />\n" a b c to:outFile
-				    )
-					
-					format "    <autonormals /></params></meshfact>\n" a b c to:outFile
-				)
-			)
-		)
-	
-		-- get ambient light
-		customPropNumber = fileProperties.findProperty #custom "red"
-		if (customPropNumber!=0) then
-			ambRed = fileProperties.getPropertyValue #custom customPropNumber
-		customPropNumber = fileProperties.findProperty #custom "green"
-		if (customPropNumber!=0) then
-			ambGreen = fileProperties.getPropertyValue #custom customPropNumber
-		customPropNumber = fileProperties.findProperty #custom "blue"
-		if (customPropNumber!=0) then
-			ambBlue = fileProperties.getPropertyValue #custom customPropNumber
-	
-		-- Setting for dynavis
-		format "  <settings>" to:outFile
-		if (ambRed!=undefined and ambGreen!=undefined and ambBlue!=undefined) then
-			format "<clearzbuf>yes</clearzbuf><ambient red=\"%\" green=\"%\" blue=\"%\" />" ambRed ambGreen ambBlue to:outFile
-		else
-		    format "<clearzbuf>yes</clearzbuf>" to:outFile
-	
-		-- Setting for lightmaps cell size
-		customPropNumber = fileProperties.findProperty #custom "lightmapsize"
-		if (customPropNumber!=0) then
-			lightmapsize = fileProperties.getPropertyValue #custom customPropNumber
-		if (lightmapsize!=undefined) then
-			format "<lightmapcellsize>%</lightmapcellsize>" lightmapsize to:outFile
-	
-		format "</settings>\n\n" to:outFile
-	
-	
-		-- start sector
-	    format "  <sector name=\"%\">\n" roomName to:outFile
-	
-		if (dynavis) then
-			format "    <cullerp>crystalspace.culling.dynavis</cullerp>\n" to:outFile
-	
-		format "IF YOU GET ANY ERROR convert to editable mesh and collapse stack of offending object\n"
-	
-	
-		lightsFound = #()
-		startingPos = null
-	
-	
-	
-		------------------------------------
-		-- cycle on all objects in the scene
-		------------------------------------ 
-		for obj in objects do 
-		(
-		
-		    -- skip groups for now
-			if ( (classOf obj)==Dummy) then (
-				format "Skipping Dummy Object: %\n" obj.name
-				continue
-			)
-		
-			-- store lights for later use
-			if ( (classOf obj)==Omnilight) then (
-			    append lightsFound obj
-				format "Found Omnilight Object: %\n" obj.name
-				continue
-			)
-		
-			-- store camera for later use
-			if ( (classOf obj)==Targetcamera) then (
-			    startingPos = obj
-				format "Found Targetcamera Object: %\n" obj.name
-				continue
-			)
-		
-			-- skip target camera
-			if ( (classOf obj)==Targetobject) then (
-				format "Skipping Targetobject Object: %\n" obj.name
-				continue
-			)
-		
-			-- convert particles
-			if ( (classOf obj)==Point) then (
-				format "Found particle Object: %\n" obj.name
-				OutputParticle obj outFile
-				continue
-			)
-		
-			-- converts all objects to Mesh, this reduces a lot of errors BUT takes too long
-			--converttomesh obj
-		
-			-- give warning about Polymesh
-			if ((classOf obj)==Poly_Mesh) then (
-				format "WARNING Object % is a PolyMesh, converting to Editable Mesh... \n" obj.name
-				converttomesh obj
-			)
-		
-			-- give warning about Editable_Poly
-			if ((classOf obj)==Editable_Poly) then (
-				format "WARNING Object % is a Editable_Poly, converting to Editable Mesh... \n" obj.name
-				converttomesh obj
-			)
-	
-	
-			-- manage genmeshes
-			isGenMesh = false
-			objName = obj.name
-			if (findString objName "_g_" != undefined) then (
-				isGenMesh = true
-				-- skip factories
-				toks = tokenize objName "_"
-				if (toks.count == 4 and objName[objName.count-1] == "_" and objName[objName.count] == "0") then
-					continue;
-	
-				format "    <meshobj name=\"%\">\n" obj.name to:outFile
-				-- check for no shadow setting
-				noshadows = getUserProp obj "NOSHADOWS"
-				if (noshadows=="yes") then
-					format "      <noshadows />\n" to:outFile
-				format "      <plugin>mesh</plugin>\n" obj.name to:outFile
-				format "      <params><factory>%</factory>\n" toks[3] to:outFile
-				format "      <material>%</material></params>\n" (getMatFilename obj.mat) to:outFile
-				-- search factory
-				genFactObj=null
-				format "factoryMeshes: %\n" factoryMeshes.count
-				for genFact in factoryMeshes do
-				(
-					genFactName = "_g_"+toks[3]+"_0"
-					if (genFact.name==genFactName) then genFactObj=genFact 
-				)
-				if (genFactObj==null) then (
-					message = "Export aborted: NO OBJECT FOUND AS GENMESH FACTORY OF " + obj.name
-					messageBox message
-					close outFile
-					return 1
-				)
-				-- calc distance from factory
-				--xMove = ((obj.pos.x-genFactObj.pos.x) * xscale) + xrelocate
-				--yMove = ((obj.pos.y-genFactObj.pos.y) * yscale) + yrelocate
-				--zMove = ((obj.pos.z-genFactObj.pos.z) * zscale) + zrelocate
-				xMove = (obj.pos.x * xscale) + xrelocate
-				yMove = (obj.pos.y * yscale) + yrelocate
-				zMove = (obj.pos.z * zscale) + zrelocate
-	
-				format "      <move><v x=\"%\" y=\"%\" z=\"%\" />\n" xMove zMove yMove to:outFile
-				rotvalues = quattoeuler obj.rotation order:2
-				rotx = (rotvalues.x * pi)/180
-				roty = (rotvalues.y * pi)/180
-				rotz = (rotvalues.z * pi)/180
-				format "      <matrix><rotx>%</rotx><roty>%</roty><rotz>%</rotz></matrix>\n" rotx roty rotz to:outFile
-				format "      </move>\n"  to:outFile
-				format "    </meshobj>\n" to:outFile
-				continue;
-	
-			)
-	
-		    -- output name of object and some info
-			format "\n\nFound Object Name: % Faces: %\n" obj.name obj.numfaces
-		
-		    --format "    ;Object Name: % Faces: %\n" obj.name obj.numfaces to:outFile 
-
-
-		
-		    format "    <meshobj name=\"%\">\n" obj.name to:outFile
-			format "      <plugin>thing</plugin>\n" to:outFile
-	
-			isportal=false
-	
-			-- handles transparent objects
-			if (findString obj.name "_t_" !=undefined) then (
-			  format "      <priority>alpha</priority>\n" to:outFile
-			  format "      <ztest />\n" to:outFile
-			)
-		    -- handles sky objects
-			else if (findString obj.name "_sky_" !=undefined) then (
-			  format "      <priority>sky</priority>\n" to:outFile
-			  format "      <zuse />\n" to:outFile
-			)
-		    -- handles zfill objects
-			else if (findString obj.name "_s_" !=undefined) then (
-			  format "      <priority>object</priority>\n" to:outFile
-			  format "      <zuse />\n" to:outFile
-			)
-		    -- handles portal objects
-			else if (findString obj.name "_p_" !=undefined) then (
-				format "      <priority>wall</priority>\n" to:outFile
-				isportal=true
-			)
-			else (
-			  format "      <priority>object</priority>\n" to:outFile
-			  format "      <zuse />\n" to:outFile
-			)
-	
-			-- check for no shadow setting
-			noshadows = getUserProp obj "NOSHADOWS"
-			if (noshadows=="yes") then
-				format "      <noshadows />\n" to:outFile
-	
-			-- check for no lightning setting
-			lighting = getUserProp obj "LIGHTING"
-			
-			-- check for colldet setting
-			colldet = getUserProp obj "COLLDET"
-	
-	
-			format "      <params>\n" to:outFile
-	
-			-- check for smooth setting
-			smooth = getUserProp obj "SMOOTH"
-			if (smooth=="yes") then
-				format "      <smooth />\n" to:outFile
-	
-	
-		   -- output vertexes of the object in XZY format
-		   for v in obj.verts do
-		   (
-		     xvert = (v.pos.x * xscale) + xrelocate
-			 yvert = (v.pos.y * yscale) + yrelocate
-			 zvert = (v.pos.z * zscale) + zrelocate
-		     format "      <v x=\"%\" y=\"%\" z=\"%\" />\n"  xvert zvert yvert to:outFile
-		   )
-	
-
-		   format "\n" to:outFile
-	
 		   -- list of faces already printed
 		   skiplist = #()
 		   numMat = 0
 	
 		   -- determine number of materials on object
-
-		   if (obj.mat == undefined) then (
+	 	   if (obj.mat == undefined) then (
 				message = "   OBJECT " +obj.name+ " HAS NO TEXTURE! Aborting export."
 				messageBox message
 				return 1
@@ -892,8 +572,10 @@ rollout Test1 "Export Level to CS" width:222 height:191
 						if (debug) then format "Vertex of first face: %\n" verts1
 		
 						-- search additional vertex
+	
 						for h=1 to 3 do
 						(
+
 							if (findItem verts1 verts2[h]==0) then
 								additionalVertex = h
 						)
@@ -952,7 +634,7 @@ rollout Test1 "Export Level to CS" width:222 height:191
 								append Tverts (getTVert obj textVert1[h])
 							
 							if (h==3 and (not addedAdd) ) then (
-								append verts verts2[additionalVertex]
+ 								append verts verts2[additionalVertex]
 								if (Tmapping) then	
 									append Tverts (getTVert obj textVert2[additionalVertex])	
 							)
@@ -960,8 +642,7 @@ rollout Test1 "Export Level to CS" width:222 height:191
 		
 						-- export in XZY format
 						if (debug) then format "POLY: %" verts
-		
-						a = verts[3] as Integer
+		 						a = verts[3] as Integer
 						b = verts[2] as Integer
 						c = verts[1] as Integer
 						d = verts[4] as Integer
@@ -971,7 +652,7 @@ rollout Test1 "Export Level to CS" width:222 height:191
 						    polyName = obj.name + "_"+ i as String;
 					    	format "      <p name=\"%\">" polyName to:outFile
 						) else
-							format "      <p>" to:outFile
+							format "<p>" to:outFile
 		
 						format "      <v>%</v><v>%</v><v>%</v><v>%</v> \n" (a-1) (b-1) (c-1) (d-1) to:outFile
 		
@@ -988,6 +669,11 @@ rollout Test1 "Export Level to CS" width:222 height:191
 						-- additional parameter to have right visibility culler on invisible objects
 						if (csinvisibletexture=="yes") then
 							format "      <viscull>yes</viscull>\n" to:outFile
+						
+						-- handles trasparent objects
+						if (istrasparent or viscull=="no") then (
+							format "      <viscull>no</viscull>\n" to:outFile
+						)
 	
 						-- handles portals
 						if (isportal) then (
@@ -1068,7 +754,20 @@ rollout Test1 "Export Level to CS" width:222 height:191
 					-- handles no lighting objects and invisible objects
 					if (lighting=="no" or csinvisibletexture=="yes") then
 						format "      <lighting>no</lighting>\n" to:outFile
-	
+
+					-- handles no collision detection objects
+					if (colldet=="no" or csinvisibletexture=="yes") then
+						format "      <colldet>no</colldet>\n" to:outFile
+					
+					-- additional parameter to have right visibility culler on invisible objects
+					if (csinvisibletexture=="yes") then (
+						format "      <viscull>yes</viscull>\n" to:outFile
+
+					-- handles trasparent objects
+					) else if (istrasparent or viscull=="no") then (
+						format "      <viscull>no</viscull>\n" to:outFile
+					)
+
 					-- no TVerts assigned
 				   if (getNumTVerts obj==0) then
 				   (
@@ -1081,20 +780,692 @@ rollout Test1 "Export Level to CS" width:222 height:191
 			        TVerts = getTVFace obj i
 					aTV = getTVert obj TVerts[1]
 					bTV = getTVert obj TVerts[3]
-					cTV = getTVert obj TVerts[2]
-	
+					cTV = getTVert obj TVerts[2] 	
 					format "      <texmap><uv idx=\"0\" u=\"%\" v=\"%\" /><uv idx=\"1\" u=\"%\" v=\"%\" /><uv idx=\"2\" u=\"%\" v=\"%\" /></texmap>\n" aTV[1] (1-aTV[2]) bTV[1] (1-bTV[2]) cTV[1] (1-cTV[2]) to:outFile
 					format "      </p>\n" to:outFile
 	
 				)
 			)
+		  )
+        )
+
+
+		-- ////////////////////////
+		-- Output culleronly polymesh
+		-- ////////////////////////
+		fn OutputCullerOnly obj outFile verboseMode debug =
+		(
+			-- cycle on all faces of object
+			for i =1 to obj.numFaces do
+			(
+					-- get its 3 vertices as a point3
+					-- export in XZY format
+				    verts=getface obj i
+					a = verts[1] as Integer
+					b = verts[3] as Integer
+					c = verts[2] as Integer
+	
+					if (verboseMode) then
+					(
+				    	format "      <t v1=\"%\" v2=\"%\" v3=\"%\" />\n" (a-1) (b-1) (c-1) to:outFile
+					) else (
+						format "<t v1=\"%\" v2=\"%\" v3=\"%\" />\n" (a-1) (b-1) (c-1) to:outFile
+					)
+			)
+		)
+
+		-- ////////////////////////
+		-- Defines if an object should have <colldet>
+		-- ////////////////////////
+		fn doesCollide obj groupsInfo =
+		(
+
+			-- check for colldet setting
+			colldetProp = getUserProp obj "COLLDET"
+
+			-- if it should not collide (e.g. water)			
+			if (colldetProp=="no") then
+				return false;
+
+			-- if is not in a group by defaults it collides
+			if ( not isGroupMember obj) then
+				return true;
+
+			-- check for colldet based on groups
+			
+		)
+
+
+		-- ////////////////////////
+		-- Main: program starts here
+		-- ////////////////////////
+	
+		-- get room name
+		customPropNumber = fileProperties.findProperty #custom "roomname"
+		if (customPropNumber==0) then (
+			messageBox "Please click on File>File Properties and add a Custom Property called roomname with the name of the sector."
+			return 1
+		)
+		roomName = fileProperties.getPropertyValue #custom customPropNumber 
+
+		if (roomName==undefined) then (
+		   messageBox "ERROR: Please set a custom property named roomname"
+		   return 1
+		) else (
+		   format "Roomname: %\n" roomName
+		)
+
+		-- output file
+		outFile = createFile filename
+
+		-- write header
+		
+		format "<world>\n" to:outFile
+
+
+		-- write variables tag
+		format " <variables>\n" to:outFile
+		format "  <variable name=\"lightning reset\"><color red=\"0\" green=\"0\" blue=\"0\"/></variable>\n" to:outFile
+		format " </variables>\n" to:outFile
+
+		-- create a new array with objects present in groups
+		allObjects = #()
+		emptyArray = #()
+		collvisInfo = #()
+
+
+		allObjects = emptyArray + objects
+		for obj in objects do
+		(
+		    -- search groups
+			if ( (classOf obj)==Dummy) then (
+				if (isOpenGroupHead obj) then
+				(
+					message = "   OBJECT " +obj.name+ " IS AN OPEN GROUP. Please use Group->Close on it.\n Export aborted."
+					messageBox message
+					return 1
+				)
+				format "Found Group Object: %\n" obj.name
+				-- search children of group
+				childrenObjs = obj.children
+				collDectName = ""
+				visCullName = ""
+				for child in childrenObjs do
+				(
+					if (findString child.name "_coll_" !=undefined) then (
+						collDectName = child.name
+					)
+					else if (findString child.name "_vis_" !=undefined) then (
+						visCullName = child.name
+					)
+					append allObjects child
+				)
+				-- add info
+				info = #(obj.name, collDectName, visCullName, 0)
+				append collvisInfo info
+			) else
+				continue
+		)
+
+		format "\nGROUPINFO: %\n" collvisInfo 
+
+		-- Check particles: cycle on all objects in the scene
+		for obj in allObjects do 
+		(
+		    if ( (classOf obj)==Point) then (
+				type = getUserProp obj "TYPE"
+				format "Found Particle Object: %\n Type: %" obj.name type
+				if (type == "fire") then ( fireNeeded = true )
+				else if (type == "emit") then ( emitNeeded = true )
+
+				-- check for additional materials
+				addMaterial = getUserProp obj "MATERIAL"
+				if (addMaterial != undefined) then
+					append partMaterials addMaterial
+			)
+		)
+
+
+		-- write materials		
+	    WriteMaterials outFile
+
+		-- write plugins
+	    format "  <plugins>\n" to:outFile
+	    format "    <plugin name=\"thing\">crystalspace.mesh.loader.thing</plugin>\n" to:outFile
+		format "    <plugin name=\"thingFact\">crystalspace.mesh.loader.factory.thing</plugin>\n" to:outFile
+	    format "    <plugin name=\"meshFact\">crystalspace.mesh.loader.factory.genmesh</plugin>\n" to:outFile
+	    format "    <plugin name=\"mesh\">crystalspace.mesh.loader.genmesh</plugin>\n" to:outFile
+
+	  	if (fireNeeded) then (
+		    format "    <plugin name=\"fireFact\">crystalspace.mesh.loader.factory.fire</plugin>\n" to:outFile  
+			format "    <plugin name=\"fire\">crystalspace.mesh.loader.fire</plugin>\n" to:outFile  
+	  	)
+	  	if (emitNeeded) then (
+	    	format "    <plugin name=\"emitFact\">crystalspace.mesh.loader.factory.emit</plugin>\n" to:outFile 
+	    	format "    <plugin name=\"emit\">crystalspace.mesh.loader.emit</plugin>\n" to:outFile 
+	  	)
+	    format "  </plugins>\n\n" to:outFile
+
+		-- write particles declarations
+	  	if (fireNeeded) then (
+		    format "    <meshfact name=\"fireFact\"><plugin>fireFact</plugin><params /></meshfact>\n\n" to:outFile
+	    )
+	  	if (emitNeeded) then (
+		    format "    <meshfact name=\"emitFact\"><plugin>emitFact</plugin><params /></meshfact>\n\n" to:outFile  
+	  	)
+
+		-- search and write meshfacts and thingfacts
+		factoryMeshes = #()
+		factoryThingMeshes = #()
+		for obj in allObjects do
+		(
+
+			-- Check for genmeshes factories
+			objName = obj.name
+			if (findString objName "_g_" !=undefined) then (
+				-- factory must have name like : _g_name_0
+				toks = tokenize objName "_"
+				if (toks.count == 4 and objName[objName.count-1] == "_" and objName[objName.count] == "0") then
+				(
+					append factoryMeshes obj
+					format "  <meshfact name=\"%\"><plugin>meshFact</plugin><params><numvt>%</numvt><numtri>%</numtri>\n" toks[3] (getNumTVerts obj) obj.numfaces to:outFile
+	
+					-- check texture
+					if (getNumTVerts obj==0) then
+					(
+						message = "Export aborted: No UV maps assigned to genmesh object: " + obj.name
+						messageBox message
+						close outFile 
+						return 1
+					)
+	
+					vertTInfo = #(getNumTVerts obj)
+					vertTInfo[1] = undefined
+		
+					-- cycle on all Faces of the object to get Tverts x,y,z positions
+					for i=1 to obj.numfaces do
+					(
+						-- get face
+						Tface = getTVFace obj i
+						face = getFace obj i
+		
+						-- get its 3 vertices
+						for h=1 to 3 do (
+					    	curVert=getVert obj face[h]
+							if (curVert==undefined) then
+								format "\n\nUNDEF: %\n\n" Tface[h]
+							if (debug) then
+								format " face: % curVert %: %\n" i Tface[h] curVert
+	
+							-- if the value is different we have a problem on Welded UV
+							if (vertTInfo[Tface[h]]!=undefined and vertTInfo[Tface[h]]!=curVert) then (
+	
+								message = "PROBLEM on object " + obj.name + ": welded UV on vertex " + (Tface[h] as String)
+								messageBox message
+								close outFile
+								return 1
+							)
+							vertTInfo[Tface[h]]=curVert
+						)
+					)
+	
+					-- cycle on all TVerts of the object
+					for i =1 to (getNumTVerts obj) do
+					(
+						-- get its 3 vertices as a point3
+						-- export in XZY format
+					    vert=vertTInfo[i]
+						xvert = (vert.x * xscale) + xrelocate
+						yvert = (vert.y * yscale) + yrelocate
+						zvert = (vert.z * zscale) + zrelocate
+			
+						Tvert = getTVert obj i
+			
+						format "      <v x=\"%\" y=\"%\" z=\"%\" u=\"%\" v=\"%\" /> \n" xvert zvert yvert Tvert[1] (1-Tvert[2]) i to:outFile
+					)
+	
+					-- cycle on all faces of object
+					for i =1 to obj.numFaces do
+					(
+						faceVerts=getTVface obj i
+						a = (faceVerts[1]-1) as Integer
+						b = (faceVerts[3]-1) as Integer
+						c = (faceVerts[2]-1) as Integer
+	
+						format "    <t v1=\"%\" v2=\"%\" v3=\"%\" />\n" a b c to:outFile
+				    )
+					
+					format "    <autonormals /></params></meshfact>\n" a b c to:outFile
+				)
+			)
+
+			-- check for thingFacts
+			if (findString objName "_f_" !=undefined) then (
+				-- factory must have name like : _f_name_0
+				toks = tokenize objName "_"
+				if (toks.count == 4 and objName[objName.count-1] == "_" and objName[objName.count] == "0") then
+				(
+					append factoryThingMeshes obj
+					format "  <meshfact name=\"%\"><plugin>thingFact</plugin><params>\n" toks[3] to:outFile
+
+					-- output vertexes of the object in XZY format
+					for v in obj.verts do
+					(
+						xvert = (v.pos.x * xscale) + xrelocate
+						yvert = (v.pos.y * yscale) + yrelocate
+						zvert = (v.pos.z * zscale) + zrelocate
+						format "      <v x=\"%\" y=\"%\" z=\"%\" />\n"  xvert zvert yvert to:outFile
+   					)
+
+					istrasparent=false
+					-- alpha, ztest and zuse not supported on meshfact
+					if (findString obj.name "_t_" !=undefined) then (
+					  --format "      <priority>alpha</priority>\n" to:outFile
+					  --format "      <ztest />\n" to:outFile
+					  istrasparent=true
+					)
+					else (
+					  --format "      <priority>object</priority>\n" to:outFile
+					  --format "      <zuse />\n" to:outFile
+					)
+
+					-- no shadow not supported on meshfact
+					noshadows = getUserProp obj "NOSHADOWS"
+					if (noshadows=="yes") then
+						format "      <noshadows />\n" to:outFile
+
+					-- check for no lighting setting
+					lighting = getUserProp obj "LIGHTING"
+
+					-- check for colldet based on groups
+					colldet = doesCollide obj collvisInfo
+					
+					-- check for viscull setting
+					viscull = getUserProp obj "VISCULL"
+
+					-- check for culleronly setting
+					culleronly = getUserProp obj "CULLERONLY"
+
+					 -- export faces of the mesh
+					 -- OutputMeshFaces obj outFile polyCombine verboseMode debug isportal istrasparent lighting colldet 
+					 OutputMeshFaces obj outFile polyCombine verboseMode debug false istrasparent lighting colldet viscull
+
+					format "    </params></meshfact>\n" to:outFile
+				)
+			)
+		)
+	
+		-- get ambient light
+		customPropNumber = fileProperties.findProperty #custom "red"
+		if (customPropNumber!=0) then
+			ambRed = fileProperties.getPropertyValue #custom customPropNumber
+		customPropNumber = fileProperties.findProperty #custom "green"
+		if (customPropNumber!=0) then
+			ambGreen = fileProperties.getPropertyValue #custom customPropNumber
+		customPropNumber = fileProperties.findProperty #custom "blue"
+		if (customPropNumber!=0) then
+			ambBlue = fileProperties.getPropertyValue #custom customPropNumber
+	
+		-- Setting for dynavis
+		format "  <settings>" to:outFile
+		if (ambRed!=undefined and ambGreen!=undefined and ambBlue!=undefined) then
+			format "<clearzbuf>yes</clearzbuf><ambient red=\"%\" green=\"%\" blue=\"%\" />" ambRed ambGreen ambBlue to:outFile
+		else
+		    format "<clearzbuf>yes</clearzbuf>" to:outFile
+	
+		-- Setting for lightmaps cell size
+		customPropNumber = fileProperties.findProperty #custom "lightmapsize"
+		if (customPropNumber!=0) then
+			lightmapsize = fileProperties.getPropertyValue #custom customPropNumber
+		if (lightmapsize!=undefined) then
+			format "<lightmapcellsize>%</lightmapcellsize>" lightmapsize to:outFile
+	
+		format "</settings>\n\n" to:outFile
+	
+	
+		-- start sector
+	    format "  <sector name=\"%\">\n" roomName to:outFile
+	
+		if (dynavis) then
+			format "    <cullerp>crystalspace.culling.dynavis</cullerp>\n" to:outFile
+	
+		format "IF YOU GET ANY ERROR convert to editable mesh and collapse stack of offending object\n"
+	
+	
+		lightsFound = #()
+		lightsThresholdValues = #()
+		lightsThresholdObjs = #()
+		startingPos = null
+
+		------------------------------------
+		-- cycle on all objects in the scene
+		------------------------------------ 
+		for obj in allObjects do 
+		(
+		
+		    -- skip groups for now
+			if ( (classOf obj)==Dummy) then (
+				format "Skipping Dummy Object: %\n" obj.name
+				continue
+			)
+		
+			-- store lights for later use
+			if ( (classOf obj)==Omnilight) then (
+			    append lightsFound obj
+				-- search threshold
+				turnonoff_r = getUserProp obj "TURNONOFF_R"
+				turnonoff_g = getUserProp obj "TURNONOFF_G"
+				turnonoff_b = getUserProp obj "TURNONOFF_B"
+				turnonoff_fade = getUserProp obj "TURNONOFF_FADE"
+				if (turnonoff_r==undefined) then (
+					--append lightsThreshold #("-1","-1","-1", "-1")
+				) else (
+					-- look if threshold is equal to other lights
+					found = false
+					pos = 1
+					for thr in lightsThresholdValues do (
+						if ( thr[1] == turnonoff_r and thr[2] == turnonoff_g and thr[3] == turnonoff_b) then
+						(
+							found = true;
+							exit;
+						)
+						pos = pos + 1
+					)
+					
+					-- add to the same array element
+					if (found) then
+					(
+						format "found equal at %" pos
+						elem = lightsThresholdObjs[pos]
+						append elem obj
+						lightsThresholdObjs[pos] = elem
+					-- add to a new element
+					) else (
+						format "adding new"
+						append lightsThresholdValues #(turnonoff_r, turnonoff_g, turnonoff_b)
+						append lightsThresholdObjs #(obj)
+					)
+				)
+				format "Found Omnilight Object: %\n" obj.name
+				continue
+			)
+
+			-- store camera for later use
+			if ( (classOf obj)==Targetcamera) then (
+			    startingPos = obj
+				format "Found Targetcamera Object: %\n" obj.name
+				continue
+			)
+		
+			-- skip target camera
+			if ( (classOf obj)==Targetobject) then (
+				format "Skipping Targetobject Object: %\n" obj.name
+				continue
+			)
+		
+			-- convert particles
+			if ( (classOf obj)==Point) then (
+				format "Found particle Object: %\n" obj.name
+				OutputParticle obj allObjects outFile
+				continue
+			)
+		
+			-- converts all objects to Mesh, this reduces a lot of errors BUT takes too long
+			--converttomesh obj
+
+			-- give warning about Polymesh
+			if ((classOf obj)==Poly_Mesh) then (
+				format "WARNING Object % is a PolyMesh, converting to Editable Mesh... \n" obj.name
+				converttomesh obj
+			)
+		
+			-- give warning about Editable_Poly
+			if ((classOf obj)==Editable_Poly) then (
+				format "WARNING Object % is a Editable_Poly, converting to Editable Mesh... \n" obj.name
+				converttomesh obj
+			)
+	
+	
+			-- manage genmeshes
+			isGenMesh = false
+			objName = obj.name
+			if (findString objName "_g_" != undefined) then (
+				isGenMesh = true
+				-- skip factories
+				toks = tokenize objName "_"
+				if (toks.count == 4 and objName[objName.count-1] == "_" and objName[objName.count] == "0") then
+					continue;
+
+				format "    <meshobj name=\"%\">\n" obj.name to:outFile
+				-- check for no shadow setting
+				noshadows = getUserProp obj "NOSHADOWS"
+				if (noshadows=="yes") then
+					format "      <noshadows />\n" to:outFile
+
+				format "      <plugin>mesh</plugin>\n" obj.name to:outFile
+				format "      <params><factory>%</factory>\n" toks[3] to:outFile
+				format "      <material>%</material>\n" (getMatFilename obj.mat) to:outFile
+				-- ALL genmeshes must have this to support light changes.
+				format "      <localshadows /></params>\n" to:outFile
+
+				-- search factory
+				genFactObj=null
+				format "factoryMeshes: %\n" factoryMeshes.count
+				for genFact in factoryMeshes do
+				(
+					genFactName = "_g_"+toks[3]+"_0"
+					if (genFact.name==genFactName) then genFactObj=genFact 
+				)
+				if (genFactObj==null) then (
+					message = "Export aborted: NO OBJECT FOUND AS GENMESH FACTORY OF " + obj.name
+					messageBox message
+					close outFile
+					return 1
+				)
+				-- calc distance from factory
+				--xMove = ((obj.pos.x-genFactObj.pos.x) * xscale) + xrelocate
+				--yMove = ((obj.pos.y-genFactObj.pos.y) * yscale) + yrelocate
+				--zMove = ((obj.pos.z-genFactObj.pos.z) * zscale) + zrelocate
+				xMove = (obj.pos.x * xscale) + xrelocate
+				yMove = (obj.pos.y * yscale) + yrelocate
+				zMove = (obj.pos.z * zscale) + zrelocate
+	
+				format "      <move><v x=\"%\" y=\"%\" z=\"%\" />\n" xMove zMove yMove to:outFile
+				rotvalues = quattoeuler obj.rotation order:2
+				rotx = (rotvalues.x * pi)/180
+				roty = (rotvalues.y * pi)/180
+				rotz = (rotvalues.z * pi)/180
+				format "      <matrix><rotx>%</rotx><roty>%</roty><rotz>%</rotz></matrix>\n" rotx roty rotz to:outFile
+				format "      </move>\n"  to:outFile
+				format "    </meshobj>\n" to:outFile
+				continue;
+	
+			)
+
+			-- manage thingmeshes
+			isThingMesh = false
+			objName = obj.name
+			if (findString objName "_f_" != undefined) then (
+				isThingMesh = true
+				-- skip factories
+				toks = tokenize objName "_"
+				if (toks.count == 4 and objName[objName.count-1] == "_" and objName[objName.count] == "0") then
+					continue;
+
+				format "    <meshobj name=\"%\">\n" obj.name to:outFile
+				-- check for no shadow setting
+				noshadows = getUserProp obj "NOSHADOWS"
+				if (noshadows=="yes") then
+					format "      <noshadows />\n" to:outFile
+
+				format "      <plugin>thing</plugin>\n" obj.name to:outFile
+				format "      <params><factory>%</factory><moveable />\n" toks[3] to:outFile
+
+				-- search factory
+				genFactObj=null
+				format "factoryThingMeshes: %\n" factoryThingMeshes.count
+				for genFact in factoryThingMeshes do
+				(
+					genFactName = "_f_"+toks[3]+"_0"
+					if (genFact.name==genFactName) then genFactObj=genFact 
+				)
+				if (genFactObj==null) then (
+					message = "Export aborted: NO OBJECT FOUND AS GENMESH FACTORY OF " + obj.name
+					messageBox message
+					close outFile
+					return 1
+				)
+				--format "genFactObj: %\n" genFactObj.name
+				--format "Obj: %\n" obj.name
+
+				-- change material if necessary
+				-- cycle on all faces of object
+				matReplaced = #()
+				for i =1 to obj.numFaces do
+				(
+					matIDOld = getFaceMatID genFactObj i
+					matIDNew = getFaceMatID obj i
+				    if ((classOf obj.mat)==Standardmaterial) then
+				    	currentNewMat = obj.mat
+					else
+						currentNewMat = obj.mat[matIDOld]
+				    if ((classOf genFactObj.mat)==Standardmaterial) then
+				    	currentOldMat = genFactObj.mat
+					else
+						currentOldMat = genFactObj.mat[matIDNew]
+
+					if (currentOldMat.name!=currentNewMat.name) then
+					(
+						-- check it has not been already replaced
+						oldMatName = getMatFilename currentOldMat
+						newMatName = getMatFilename currentNewMat
+						if (findItem matReplaced oldMatName==0) then (
+							format "<replacematerial old=\"%\" new=\"%\" />\n" oldMatName newMatName to:outFile
+							append matReplaced oldMatName
+							format "%\n" matReplaced
+						)
+					)
+				)
+				-- format "      <material>%</material></params>\n" (getMatFilename obj.mat) to:outFile NO MATERIAL CHANGE FOR NOW
+				format "      </params>\n" to:outFile
+
+				xMove = (obj.pos.x * xscale) + xrelocate
+				yMove = (obj.pos.y * yscale) + yrelocate
+				zMove = (obj.pos.z * zscale) + zrelocate
+	
+				format "      <move><v x=\"%\" y=\"%\" z=\"%\" />\n" xMove zMove yMove to:outFile
+				rotvalues = quattoeuler obj.rotation order:2
+				rotx = (rotvalues.x * pi)/180
+				roty = (rotvalues.y * pi)/180
+				rotz = (rotvalues.z * pi)/180
+				format "      <matrix><rotx>%</rotx><roty>%</roty><rotz>%</rotz></matrix>\n" rotx roty rotz to:outFile
+				format "      </move>\n"  to:outFile
+				format "    </meshobj>\n" to:outFile
+				continue;
+	
+			)
+
+			-- check for culleronly setting
+			culleronly = getUserProp obj "CULLERONLY"
+
+		    -- output name of object and some info
+			format "\n\nFound Object Name: % Faces: %\n" obj.name obj.numfaces
+		
+		    --format "    ;Object Name: % Faces: %\n" obj.name obj.numfaces to:outFile 
+
+			if (culleronly=="yes") then (
+				format "    <polymesh name=\"%\">\n" obj.name to:outFile
+			) else (
+			    format "    <meshobj name=\"%\">\n" obj.name to:outFile
+				format "      <plugin>thing</plugin>\n" to:outFile
+			)
+
+			isportal=false
+
+			istrasparent=false
+			-- handles transparent objects
+			if (findString obj.name "_t_" !=undefined) then (
+			  format "      <priority>alpha</priority>\n" to:outFile
+			  format "      <ztest />\n" to:outFile
+			  istrasparent=true
+			)
+		    -- handles sky objects
+			else if (findString obj.name "_sky_" !=undefined) then (
+			  format "      <priority>sky</priority>\n" to:outFile
+			  format "      <zuse />\n" to:outFile
+			)
+		    -- handles zfill objects
+			else if (findString obj.name "_s_" !=undefined) then (
+			  format "      <priority>object</priority>\n" to:outFile
+			  format "      <zuse />\n" to:outFile
+
+			)
+		    -- handles portal objects
+			else if (findString obj.name "_p_" !=undefined) then (
+			  format "      <priority>wall</priority>\n" to:outFile
+			  isportal=true
+			) 
+			else if (culleronly=="yes") then (
+				format "      <mesh>\n" to:outFile
+			)
+			else (
+			  format "      <priority>object</priority>\n" to:outFile
+			  format "      <zuse />\n" to:outFile
+			)
+
+			if (culleronly!="yes") then (
+			  format "      <params>\n" to:outFile
+			)
+
+			-- check for no shadow setting
+			noshadows = getUserProp obj "NOSHADOWS"
+			if (noshadows=="yes") then
+				format "      <noshadows />\n" to:outFile
+	
+			-- check for no lighting setting
+			lighting = getUserProp obj "LIGHTING"
+			
+			-- check for colldet setting
+			colldet = getUserProp obj "COLLDET"
+	
+			-- check for smooth setting
+			smooth = getUserProp obj "SMOOTH"
+			if (smooth=="yes") then
+				format "      <smooth />\n" to:outFile
+
+			-- check for viscull setting
+			viscull = getUserProp obj "VISCULL"
+	
+		   -- output vertexes of the object in XZY format
+		   for v in obj.verts do
+		   (
+		     xvert = (v.pos.x * xscale) + xrelocate
+			 yvert = (v.pos.y * yscale) + yrelocate
+			 zvert = (v.pos.z * zscale) + zrelocate
+		     format "      <v x=\"%\" y=\"%\" z=\"%\" />\n"  xvert zvert yvert to:outFile
+		   )
+
+		   format "\n" to:outFile
+
+		 -- export faces of the mesh
+		 if (culleronly=="yes") then (
+		 	OutputCullerOnly obj outFile verboseMode debug 
+		 ) else (
+			 OutputMeshFaces obj outFile polyCombine verboseMode debug isportal istrasparent lighting colldet viscull
 		 )
-	
+
 		 -- close params
-		 format "      </params>\n" to:outFile
-	
-		 -- close mesh object
-		 format "    </meshobj>\n" to:outFile
+		if (culleronly!="yes") then (
+		 	format "      </params>\n" to:outFile
+			 -- close mesh object
+			 format "    </meshobj>\n" to:outFile
+		) else (
+			 format "      </mesh>\n" to:outFile
+			 format "      <viscull />\n" to:outFile
+			 format "    </polymesh>\n" to:outFile
+		)
+
+
 	
 		 format "\n" to:outFile
 	
@@ -1105,9 +1476,9 @@ rollout Test1 "Export Level to CS" width:222 height:191
 		-- get info on dynamic lights
 		maxframes = animationrange.end
 	
-		if (maxframes != 23f and chkLights.checked) then
+		if (animationrange.end != 23f and animationrange.end != 47f) then
 		(
-			message = "You have to set the animation length to 24 frames total. \n Each frame is 1 hour of the day."
+			message = "You have to set the animation length to 24 frames (sun only) or to 48 (sun/rain). \n Each frame is 1 hour of the day."
 			messageBox message
 			return 1
 		)
@@ -1116,7 +1487,10 @@ rollout Test1 "Export Level to CS" width:222 height:191
 		
 		lightColors = #()
 		lightInfo = #()
-		if (chkLights.checked) then
+		-- if was performing this only if fakelight was checked
+		-- now we do it always
+		--if (chkLights.checked) then
+		if (true) then
 		(
 			format "Dynamic Lights \n"
 			-- cycle on all frames of the animation
@@ -1124,54 +1498,73 @@ rollout Test1 "Export Level to CS" width:222 height:191
 			for curFrame=0 to maxframes do (
 				-- move to right frame
 				slidertime=curFrame
-				
-				-- outputs lights
+
+				-- check which lights are dynamic
 				lcount = 1
 				fLights = #()
 				for ll in lightsFound do
 				(
-					format "Lights % \n" lcount
+					--format "Lights % \n" lcount
 					-- convert lights from 0-255 to 0-1
 					llred = ((ll.rgb.r)/255) * ll.multiplier
 					llgreen = ((ll.rgb.g)/255) * ll.multiplier
 					llblue = ((ll.rgb.b)/255) * ll.multiplier
-
+	
 					if (fcount!=1) then
 					(
 						--format "Comparing % with % \n" lightColors[fcount-1][lcount] #(llred,llgreen,llblue)
 						prevColor = lightColors[fcount-1][lcount]
 						if ( prevColor[1] != llred or prevColor[2] != llgreen or prevColor[3] != llblue) then
+						(
+						    format "light % changed on frame %" ll.name fcount
 							lightInfo[lcount] = "dynamic"
+						)
 					)
 					insertItem #(llred,llgreen,llblue) fLights lcount
-
+	
 					lcount = lcount + 1
 				)
 				insertItem fLights lightColors fcount
 				fcount = fcount + 1
 			)
-
+	
+			format "\n dynamic lights % \n" lightInfo
+			format "\n dynamic lights % \n" lightsFound
+			
 			-- debug only: REMOVE
 			--for item in lightColors do
 			--	format "% \n" item
 			
 			--format "lightInfo % % \n" lightInfo.count lightInfo
-
+	
 		)
-
+	
 		-- reset slider time (used mainly to avoid problem in getting last frame data)
 		slidertime=0
-
+	
 		-- outputs lights
 		lcount = 1
 		for ll in lightsFound do
 		(
+		
+			-- skip ambient light
+			if (ll.name=="ambient") then (
+				lcount = lcount + 1
+				continue
+			)
+
 		    --format " ;Light: % \n" ll.name to:outFile
-			format "    <light name=\"%\">\n" ll.name to:outFile
-	
+			format "    <light name=\"%%\">\n" ll.name roomname to:outFile
+
+			-- check threshold setting to flag light as dynamic
+			turnonoff_r = getUserProp ll "TURNONOFF_R"
+
 			if (lightInfo.count>=lcount and lightInfo[lcount]=="dynamic") then 
 				format "      <dynamic />\n " to:outFile
-		
+			else if (turnonoff_r!=undefined) then (
+				format "      <dynamic />\n " to:outFile
+			)
+
 			multiplier = ll.multiplier
 	
 			if (ll.useNearAtten==false and ll.useFarAtten==false) then
@@ -1208,23 +1601,78 @@ rollout Test1 "Export Level to CS" width:222 height:191
 			format "  <start name=\"%\"><sector>%</sector><position x=\"%\" y=\"%\" z=\"%\" /></start>\n" startingPos.name roomName xstart zstart ystart to:outFile
 		)
 
+		-- start sequences (if any)
+		format "   <sequences>\n" to:outFile
+
+		-- output lightning sequence
+		customPropNumber = fileProperties.findProperty #custom "lightning"
+		if (customPropNumber!=0) then (
+			lightning = fileProperties.getPropertyValue #custom customPropNumber 
+			if (lightning=="yes") then
+			(
+				format "     <sequence name=\"% lightning\"> \n" roomName to:outFile
+				format "      <setambient sector=\"%\" red=\"1.0\" green=\"1.0\" blue=\"1.5\" /> \n" roomName to:outFile
+				format "      <delay min=\"50\" max=\"100\" /> \n" to:outFile
+				format "      <setambient sector=\"%\" color_var=\"lightning reset\" /> \n" roomName to:outFile
+				format "      <delay min=\"50\" max=\"150\" /> \n" to:outFile
+				format "      <setambient sector=\"%\" red=\"1.0\" green=\"1.0\" blue=\"1.5\" /> \n" roomName to:outFile
+				format "      <delay min=\"50\" max=\"150\" /> \n" to:outFile
+				format "      <setambient sector=\"%\" color_var=\"lightning reset\" /> \n" roomName to:outFile
+				format "     </sequence> \n\n" to:outFile
+			)
+		)
+
+		-- debug output
+		format "   lightsThreshold: %\n\n\n" lightsThreshold
+		format "   lightsThresholdValues: %\n\n\n" lightsThresholdValues
+ 		format "   lightsThresholdObjs: %\n\n\n" lightsThresholdObjs
+
+
+		-- output threshold sequence
+		lcount = 1
+		for thr in lightsThresholdValues do
+		(
+			-- name sequence with first light
+			seqlightname = (lightsThresholdObjs[lcount][1]).name
+			
+			-- output turn on sequence
+			format "    <sequence name=\"light_%%_on\"> \n" seqlightname roomname to:outFile
+			-- for each light in this threshold
+			for ll in lightsThresholdObjs[lcount] do
+			(
+				duration = getUserProp ll "TURNONOFF_FADE"
+				-- convert lights from 0-255 to 0-1
+				llred = ((ll.rgb.r)/255) * ll.multiplier
+				llgreen = ((ll.rgb.g)/255) * ll.multiplier
+				llblue = ((ll.rgb.b)/255) * ll.multiplier
+				format "        <fadelight light=\"%%\" red=\"%\" green=\"%\" blue=\"%\" duration=\"%\" />\n" ll.name roomname llred llgreen llblue duration to:outFile
+			)
+			format "        <enable trigger=\"light_%%_off\" /> \n " seqlightname roomname to:outFile
+			format "    </sequence> \n " to:outFile
+
+			-- output turnoff sequence
+			format "    <sequence name=\"light_%%_off\"> \n " seqlightname roomname to:outFile
+			-- for each light in this threshold
+			for ll in lightsThresholdObjs[lcount] do
+			(
+				duration = getUserProp ll "TURNONOFF_FADE"
+				format "        <fadelight light=\"%%\" red=\"0\" green=\"0\" blue=\"0\" duration=\"%\" />\n" ll.name roomname duration to:outFile
+			)
+			format "        <enable trigger=\"light_%%_on\" /> \n " seqlightname roomname to:outFile
+			format "    </sequence> \n " to:outFile
+
+			lcount = lcount + 1
+		)
+
+
 		-- output Fake Sequence for testing dynamic lights
 		if (chkLights.checked) then
 		(
-			format "   <triggers>\n" to:outFile
-			format "     <trigger name=\"simulation\">\n" to:outFile
-			format "       <sectorvis sector=\"%\" />\n" roomName to:outFile
-			format "       <fire sequence=\"main\" />\n" to:outFile
-			format "     </trigger>\n" to:outFile
-			format "   </triggers>\n" to:outFile
-			format "   <sequences>\n" to:outFile
-			format "     <sequence name=\"main\">\n" to:outFile
+			format "     <sequence name=\"%seq\">\n" roomName to:outFile
 
-			-- skip first hour, lights are the same as defined.
-			format "       <delay>10000</delay>\n" to:outFile
 			-- for each hour of the day
-			fcount = 2
-			for fcount=2 to 24 do
+			fcount = 1
+			for fcount=1 to 24 do
 			(
 				-- for each light
 				lcount = 1
@@ -1234,22 +1682,72 @@ rollout Test1 "Export Level to CS" width:222 height:191
 					if (lightInfo.count>=lcount and lightInfo[lcount]=="dynamic") then
 					(
 						-- if light changed 
-						prevColor = lightColors[fcount-1][lcount]
+						if (fcount==1) then (
+							-- for first hour, read the lights at last frame and compare.
+							prevColor = lightColors[24][lcount]
+						) else
+							prevColor = lightColors[fcount-1][lcount]
+
 						colors = lightColors[fcount][lcount]
 						if ( prevColor[1] != colors[1] or prevColor[2] != colors[2] or prevColor[3] != colors[3]) then
-							format "       <fadelight light=\"%\" red=\"%\" green=\"%\" blue=\"%\" duration=\"10000\" />\n" ll.name colors[1] colors[2] colors[3] to:outFile
+						(
+							-- ambient light
+							if (ll.name=="ambient") then
+								format "       <fadeambient sector=\"%\" red=\"%\" green=\"%\" blue=\"%\" duration=\"%\" />\n" roomname colors[1] colors[2] colors[3] edtDuration.text to:outFile
+							else
+								format "       <fadelight light=\"%%\" red=\"%\" green=\"%\" blue=\"%\" duration=\"%\" />\n" ll.name roomname colors[1] colors[2] colors[3] edtDuration.text to:outFile
+						)
 					)
 					lcount = lcount + 1
 				)
-				format "       <delay>10000</delay>\n" to:outFile
-
+				format "       <delay time=\"%\" />\n" edtDuration.text to:outFile
+	
 				fcount = fcount + 1
 			)
-			format "       <enable trigger=\"simulation\" />\n" to:outFile
+			format "       <enable trigger=\"%trig\" />\n" roomName to:outFile
 			format "     </sequence>\n" to:outFile
-			format "   </sequences>\n" to:outFile
-
 		)
+
+		-- end sequences (if any)
+		format "   </sequences>\n" to:outFile
+
+		-- start triggers (if any)
+		format "   <triggers>\n" to:outFile
+		
+		-- output threshold triggers
+		lcount = 1
+		for thr in lightsThresholdValues do
+		(
+			-- name trigger with first light
+			triglightname = (lightsThresholdObjs[lcount][1]).name
+			
+			-- output turn off sequence
+			format "    <trigger name=\"light_%%_on\"> \n" triglightname roomname to:outFile
+			format "        <lightvalue light=\"crystal%\" operator=\"greater\" red=\"%\" green=\"%\" blue=\"%\" />\n" roomname thr[1] thr[2] thr[3] to:outFile
+			format "        <fire sequence=\"light_%%_off\" /> \n " triglightname roomname to:outFile
+			format "    </trigger> \n " to:outFile
+
+			-- output turn on sequence
+			format "    <trigger name=\"light_%%_off\"> \n " triglightname roomname to:outFile
+			format "        <lightvalue light=\"crystal%\" operator=\"less\" red=\"%\" green=\"%\" blue=\"%\" />\n" roomname thr[1] thr[2] thr[3] to:outFile
+
+			format "        <fire sequence=\"light_%%_on\" /> \n " triglightname roomname to:outFile
+			format "    </trigger> \n " to:outFile
+
+			lcount = lcount + 1
+		)
+
+		-- output Fake triggers for testing dynamic lights
+		if (chkLights.checked) then
+		(
+			format "     <trigger name=\"%trig\">\n" roomName to:outFile
+			format "       <sectorvis sector=\"%\" />\n" roomName to:outFile
+			format "       <fire sequence=\"%seq\" />\n" roomName to:outFile
+			format "     </trigger>\n" to:outFile
+		)
+
+		-- end triggers (if any)
+		format "   </triggers>\n" to:outFile
 
 		-- close world object
 		format "</world>\n" to:outFile
@@ -1261,8 +1759,8 @@ rollout Test1 "Export Level to CS" width:222 height:191
 	
 	)
 )
-
-gw = newRolloutFloater "Export Level" 300 220 
+gw = newRolloutFloater "Export Level" 300 240 
 addRollout Test1 gw 
 
 )
+

@@ -395,3 +395,4 @@ addRollout Test1 gw
 -- This means that some UV coords are shared on multiple vetexes
 -- Go in the UVUnwrap function and Unweld all the vertexes of the face found
 -------------------
+
