@@ -97,7 +97,7 @@ public:
    */
   static void AddObject (iObjectRegistry* object_reg,
   	void* object, bool scf, char* file, int linenr,
-  	char* description, ...) CS_GNUC_PRINTF (6, 7);
+  	char* description, ...);
 
   /**
    * Attach a new description to an object in the graph.

@@ -5,6 +5,8 @@ The history order is reversed so that new features are at the top.
 	  reorganizing the data a little.
 	- Fixed a bug in the the parsing of NODE keyword. Every node
 	  was added twice to the sector.
+	- Fixed definition of CS_GNUC_PRINTF in case an old gcc is used.
+	  Also fixed definition of CS_GNUC_SCANF.
 26-Nov-2001
 	- Added documentation for terrain engine.
 	- Extended documentation on the format of the plugin loaders by also
