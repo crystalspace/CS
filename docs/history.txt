@@ -26,6 +26,10 @@ The history order is reversed so that new features are at the top.
 	- Philip Wyett initialized counters to zero at decleration. This
 	  fixes compilation warning(s) and possibility of arbitary values.
 	    - Eliminated struct vs. class warning under MSVC in maya2spr.
+	- Norman Kraemer added a m4 script to find out about bison's version
+	- He also added a call to AC_CHECK_BISON in configure.ac to ensure
+	  only for bison 1.35 and above config vars will be emitted for make
+	  and jam configuration
 23-Apr-2003
 	- Removed iPluginManager->GetPluginCount() and GetPlugin() since
 	  those two functions cannot be used in a thread-safe way. The
