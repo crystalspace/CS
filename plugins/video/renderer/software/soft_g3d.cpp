@@ -1855,6 +1855,7 @@ static struct
 void csGraphics3DSoftware::StartPolygonFX (iTextureHandle* handle,
   UInt mode)
 {
+
   if (!rstate_gouraud || !do_lighting)
     mode &= ~CS_FX_GOURAUD;
 
@@ -1873,6 +1874,7 @@ void csGraphics3DSoftware::StartPolygonFX (iTextureHandle* handle,
   }
   else
     pqinfo.textured = false;
+    
 
   Scan.AlphaMask = txtmgr->alpha_mask;
   Scan.PaletteTable = txtmgr->lt_pal->pal_to_true;
@@ -1884,7 +1886,7 @@ void csGraphics3DSoftware::StartPolygonFX (iTextureHandle* handle,
   pqinfo.drawline = ScanProcPI [scan_index];
 
   csDrawPIScanlineGouraud *gouraud_proc = ScanProcPIG [scan_index];
-  if (mode & CS_FX_MASK_MIXMODE == CS_FX_COPY)
+  if ((mode & CS_FX_MASK_MIXMODE) == CS_FX_COPY)
     pqinfo.drawline_gouraud = gouraud_proc;
   else
   {
@@ -1960,8 +1962,9 @@ void csGraphics3DSoftware::FinishPolygonFX()
 
 void csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
 {
-  if (!pqinfo.drawline && !pqinfo.drawline_gouraud)
+  if (!pqinfo.drawline && !pqinfo.drawline_gouraud){
     return;
+    }
 
   //-----
   // Calculate constant du,dv,dz.
@@ -1984,8 +1987,9 @@ void csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
   }
 
   // Rejection of back-faced polygons
-  if ((last == poly.num) || (dd == 0))
+  if ((last == poly.num) || (dd == 0)){
     return;
+}
 
   float flat_r, flat_g, flat_b;
   if (pqinfo.textured)
@@ -1996,11 +2000,16 @@ void csGraphics3DSoftware::DrawPolygonFX (G3DPolygonDPFX& poly)
     flat_g = poly.flat_color_g;
     flat_b = poly.flat_color_b;
   }
+/*
   Scan.FlatColor =
     (QRound (flat_r * pfmt.RedMask) & pfmt.RedMask)
   | (QRound (flat_g * pfmt.GreenMask) & pfmt.GreenMask)
   | (QRound (flat_b * pfmt.BlueMask) & pfmt.BlueMask);
-
+*/
+  Scan.FlatColor =
+    ((QRound (flat_r) << pfmt.RedShift) & pfmt.RedMask)
+  | ((QRound (flat_g) << pfmt.GreenShift) & pfmt.GreenMask)
+  | ((QRound (flat_b) << pfmt.BlueShift) & pfmt.BlueMask);
   //-----
   // Get the values from the polygon for more conveniant local access.
   // Also look for the top-most and bottom-most vertices.
