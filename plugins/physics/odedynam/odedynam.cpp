@@ -694,9 +694,10 @@ int csODEDynamics::CollideMeshPlane (dGeomID mesh, dGeomID plane, int flags,
 
   csReversibleTransform mesht = GetGeomTransform (mesh);
  
+  int i;
   csBox3 box;
   box.StartBoundingBox ();
-  for (int i = 0; i < p->GetVertexCount(); i ++)
+  for (i = 0; i < p->GetVertexCount(); i ++)
   {
     box.AddBoundingVertex (vertex_table[i] / mesht);
   }
@@ -704,7 +705,7 @@ int csODEDynamics::CollideMeshPlane (dGeomID mesh, dGeomID plane, int flags,
   //Fast Check
   
   csVector3 current;
-  int i,j,k;
+  int j,k;
   bool planecut = false;
   current = box.GetCorner(0);
   float last = dGeomPlanePointDepth(plane,current.x,current.y,current.z);

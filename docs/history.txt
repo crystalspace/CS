@@ -26,6 +26,7 @@ chronological order.
 	  since MSVC6 emits bogus warning about "protected constructor" when
 	  csHash instantiates Iterator and GlobalIterator even though csHash is
 	  a friend of Iterator and GlobalIterator.
+	- Luca fixed a MSVC6 'for(int i=)' scope bug.
 4-Dec-2003
         - Steven Geens added a odedynam function for mesh<->plane collisions.
 3-Dec-2003
