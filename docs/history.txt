@@ -27,8 +27,8 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine corrected some confusion in objectivec.jam where .mm
 	  and .M were being registered within the CMD.OBJC block rather than
 	  the CMD.OBJC++ block.
-	- Philip made additions to 'Common problems' section of MSVC external
-          application tutorial.
+	- Philip Wyett made additions to 'Common problems' section of MSVC
+          external application tutorial.
 5-May-2003
 	- Eric Sunshine changed jobber.pl and snapshot.py to once again use
 	  /home/groups/c/cr/crystal as a working area rather than /tmp.  It
