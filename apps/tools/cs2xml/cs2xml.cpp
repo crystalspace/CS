@@ -2068,7 +2068,7 @@ bool Cs2Xml::ConvertFile (const char* vfspath, bool backup)
   // First make backup
   if (backup)
   {
-    char* newname = new char [strlen (vfspath)+4];
+    char* newname = new char [strlen (vfspath)+5];
     strcpy (newname, vfspath);
     strcat (newname, ".bak");
     vfs->WriteFile (newname, **buf, buf->GetSize ());
