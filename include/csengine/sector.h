@@ -546,11 +546,11 @@ public:
   class SectorList : public iSectorList
   {
     SCF_DECLARE_EMBEDDED_IBASE (csSectorList);
-    virtual int GetSectorCount ();
-    virtual iSector *GetSector (int idx);
+    virtual int GetSectorCount () const;
+    virtual iSector *GetSector (int idx) const;
     virtual void AddSector (iSector *sec);
     virtual void RemoveSector (iSector *sec);
-    virtual iSector *FindByName (const char *name);
+    virtual iSector *FindByName (const char *name) const;
   } scfiSectorList;
 };
 

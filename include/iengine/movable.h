@@ -25,9 +25,9 @@
 
 class csVector3;
 class csMatrix3;
-class csThing;
 struct iSector;
 struct iMovable;
+struct iSectorList;
 
 SCF_VERSION (iMovableListener, 0, 0, 1);
 
@@ -81,7 +81,7 @@ struct iMovable : public iBase
    * This will return the sectors of the parent if there
    * is a parent.
    */
-  virtual const csVector& GetSectors () const = 0;
+  virtual const iSectorList *GetSectors () const = 0;
 
   /**
    * Get the specified sector where this entity lives.

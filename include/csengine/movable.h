@@ -20,11 +20,34 @@
 #define __CS_MOVABLE_H__
 
 #include "csgeom/transfrm.h"
-#include "csutil/csvector.h"
+#include "csutil/typedvec.h"
 #include "iengine/movable.h"
+#include "iengine/sector.h"
 
 class csSector;
 class csObject;
+
+CS_DECLARE_TYPED_VECTOR_NODELETE (csMovableListenerVector, iMovableListener);
+CS_DECLARE_TYPED_VECTOR_NODELETE (csSectorVector, csSector);
+
+/// A list of sectors as the movable uses it
+class csMovableSectorList : public csSectorVector
+{
+public:
+  SCF_DECLARE_IBASE;
+
+  csMovableSectorList ();
+  csSector *FindByName (const char *name) const;
+  class SectorList : public iSectorList
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csMovableSectorList);
+    virtual int GetSectorCount () const;
+    virtual iSector *GetSector (int idx) const;
+    virtual void AddSector (iSector *sec);
+    virtual void RemoveSector (iSector *sec);
+    virtual iSector *FindByName (const char *name) const;
+  } scfiSectorList;
+};
 
 /**
  * This class represents an entity that can move in the engine.
@@ -39,9 +62,9 @@ private:
   /// World to object transformation.
   csReversibleTransform obj;
   /// List of sectors.
-  csVector sectors;
+  csMovableSectorList sectors;
   /// List of listeners to this movable.
-  csVector listeners;
+  csMovableListenerVector listeners;
   /// List of user-data for the listeners.
   csVector listener_userdata;
 
@@ -110,7 +133,7 @@ public:
    * This will return the sectors of the parent if there
    * is a parent.
    */
-  const csVector& GetSectors () const
+  const csMovableSectorList& GetSectors () const
   {
     if (parent) return parent->GetSectors ();
     else return sectors;
@@ -245,9 +268,9 @@ public:
       scfParent->ClearSectors ();
     }
     virtual void AddSector (iSector* sector);
-    virtual const csVector& GetSectors () const
+    virtual const iSectorList *GetSectors () const
     {
-      return scfParent->GetSectors ();
+      return &scfParent->GetSectors ().scfiSectorList;
     }
     virtual iSector* GetSector (int idx) const;
     virtual bool InSector () const

@@ -174,15 +174,15 @@ SCF_VERSION (iSectorList, 0, 0, 1);
 struct iSectorList : public iBase
 {
   /// Return the number of sectors in this list
-  virtual int GetSectorCount () = 0;
+  virtual int GetSectorCount () const = 0;
   /// Return a single sector
-  virtual iSector *GetSector (int idx) = 0;
+  virtual iSector *GetSector (int idx) const = 0;
   /// Add a sector
   virtual void AddSector (iSector *sec) = 0;
   /// Remove a sector
   virtual void RemoveSector (iSector *sec) = 0;
   /// Find a sector by name
-  virtual iSector *FindByName (const char *name) = 0;
+  virtual iSector *FindByName (const char *name) const = 0;
 };
 
 #endif // __IENGINE_SECTOR_H__

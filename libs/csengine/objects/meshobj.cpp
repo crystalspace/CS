@@ -177,10 +177,10 @@ void csMeshWrapper::RemoveFromSectors ()
   iEngine *e = SCF_QUERY_INTERFACE_FAST (parent, iEngine);
   if (!e) return;
   int i;
-  const csVector& sectors = movable.GetSectors ();
+  const csSectorVector& sectors = movable.GetSectors ();
   for (i = 0 ; i < sectors.Length () ; i++)
   {
-    csSector* ss = (csSector*)sectors[i];
+    csSector* ss = sectors[i];
     if (ss)
       ss->UnlinkMesh (this);
   }
@@ -193,10 +193,10 @@ void csMeshWrapper::SetRenderPriority (long rp)
   iEngine *e = SCF_QUERY_INTERFACE_FAST (parent, iEngine);
   if (!e) return;
   int i;
-  const csVector& sectors = movable.GetSectors ();
+  const csSectorVector& sectors = movable.GetSectors ();
   for (i = 0 ; i < sectors.Length () ; i++)
   {
-    csSector* ss = (csSector*)sectors[i];
+    csSector* ss = sectors[i];
     if (ss) ss->RelinkMesh (this);
   }
   e->DecRef ();

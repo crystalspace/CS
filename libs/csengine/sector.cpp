@@ -1267,9 +1267,9 @@ bool csSectorList::FreeItem (csSome Item)
   return true;
 }
 
-int csSectorList::SectorList::GetSectorCount ()
+int csSectorList::SectorList::GetSectorCount () const
   { return scfParent->Length (); }
-iSector *csSectorList::SectorList::GetSector (int idx)
+iSector *csSectorList::SectorList::GetSector (int idx) const
   { return scfParent->Get (idx); }
 void csSectorList::SectorList::AddSector (iSector *sec)
   { scfParent->Push (sec); }
@@ -1278,5 +1278,5 @@ void csSectorList::SectorList::RemoveSector (iSector *sec)
     int n = scfParent->Find (sec);
     if (n >= 0) scfParent->Delete (n); 
   }
-iSector *csSectorList::SectorList::FindByName (const char *name)
+iSector *csSectorList::SectorList::FindByName (const char *name) const
   { return scfParent->FindByName (name); }

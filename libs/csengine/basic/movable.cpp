@@ -26,6 +26,48 @@
 #include "csengine/engine.h"
 #include "iengine/sector.h"
 
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE (csMovableSectorList)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSectorList)
+SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csMovableSectorList::SectorList)
+  SCF_IMPLEMENTS_INTERFACE (iSectorList)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+csMovableSectorList::csMovableSectorList ()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiSectorList);
+}
+
+csSector *csMovableSectorList::FindByName (const char *name) const
+{
+  if (!name) return NULL;
+
+  for (int i=0; i<Length (); i++)
+  {
+    csSector *sec = Get(i);
+    if (sec->GetName ())
+      if (!strcmp (sec->GetName (), name))
+        return sec;
+  }
+  return NULL;
+}
+
+int csMovableSectorList::SectorList::GetSectorCount () const
+{ return scfParent->Length (); }
+iSector *csMovableSectorList::SectorList::GetSector (int idx) const
+{ return &scfParent->Get (idx)->scfiSector; }
+void csMovableSectorList::SectorList::AddSector (iSector *)
+{ }
+void csMovableSectorList::SectorList::RemoveSector (iSector *)
+{ }
+iSector *csMovableSectorList::SectorList::FindByName (const char *name) const
+{ return &scfParent->FindByName (name)->scfiSector; }
+
 //---------------------------------------------------------------------------
 
 SCF_IMPLEMENT_IBASE (csMovable)
@@ -52,7 +94,7 @@ csMovable::~csMovable ()
   int i;
   for (i = 0 ; i < listeners.Length () ; i++)
   {
-    iMovableListener* ml = (iMovableListener*)listeners[i];
+    iMovableListener* ml = listeners[i];
     void* ml_data = listener_userdata[i];
     ml->MovableDestroyed (&scfiMovable, ml_data);
   }
@@ -98,7 +140,7 @@ void csMovable::Transform (const csMatrix3& matrix)
 
 void csMovable::SetSector (csSector* sector)
 {
-  if (sectors.Length () == 1 && sector == (csSector*)sectors[0])
+  if (sectors.Length () == 1 && sector == sectors[0])
     return;
   ClearSectors ();
   AddSector (sector);
@@ -154,13 +196,13 @@ void csMovable::AddSector (csSector* sector)
 void csMovable::AddListener (iMovableListener* listener, void* userdata)
 {
   RemoveListener (listener);
-  listeners.Push ((csSome)listener);
+  listeners.Push (listener);
   listener_userdata.Push (userdata);
 }
 
 void csMovable::RemoveListener (iMovableListener* listener)
 {
-  int idx = listeners.Find ((csSome)listener);
+  int idx = listeners.Find (listener);
   if (idx == -1) return;
   listeners.Delete (idx);
   listener_userdata.Delete (idx);
@@ -188,7 +230,7 @@ void csMovable::UpdateMove ()
   int i;
   for (i = 0 ; i < listeners.Length () ; i++)
   {
-    iMovableListener* ml = (iMovableListener*)listeners[i];
+    iMovableListener* ml = listeners[i];
     void* ml_data = listener_userdata[i];
     ml->MovableChanged (&scfiMovable, ml_data);
   }
@@ -221,7 +263,7 @@ void csMovable::eiMovable::SetPosition (iSector* home, const csVector3& v)
 
 iSector* csMovable::eiMovable::GetSector (int idx) const
 {
-  csSector* sect = (csSector*)scfParent->GetSectors ()[idx];
+  csSector* sect = scfParent->GetSectors ()[idx];
   if (!sect) return NULL;
   return &sect->scfiSector;
 }

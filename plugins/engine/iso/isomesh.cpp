@@ -52,7 +52,7 @@ public:
   virtual void SetSector (iSector* ) { updatenumber++; }
   virtual void ClearSectors () { updatenumber++; }
   virtual void AddSector (iSector* ) { updatenumber++; }
-  virtual const csVector& GetSectors () const {return *(csVector*)0;}
+  virtual const iSectorList *GetSectors () const {return (iSectorList*)0;}
   virtual iSector* GetSector (int ) const {return 0;}
   virtual int GetSectorCount () const { return 0; }
   virtual bool InSector () const {return true;}

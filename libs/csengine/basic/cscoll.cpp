@@ -68,10 +68,10 @@ void csCollection::MoveToSector (csSector* s)
 void csCollection::RemoveFromSectors ()
 {
   int i;
-  const csVector& sectors = movable.GetSectors ();
+  const csSectorVector& sectors = movable.GetSectors ();
   for (i = 0 ; i < sectors.Length () ; i++)
   {
-    csSector* ss = (csSector*)sectors[i];
+    csSector* ss = sectors[i];
     if (ss)
       ss->UnlinkCollection (this);
   }
