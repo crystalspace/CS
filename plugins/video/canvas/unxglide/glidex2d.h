@@ -76,7 +76,7 @@ private:
   iEventOutlet *EventOutlet;
 
 public:
-  DECLARE_IBASE_EXT (csGraphics2DGlideCommon)
+  DECLARE_IBASE;
 
   csGraphics2DGlideX (iBase *iParent);
   virtual ~csGraphics2DGlideX ();
