@@ -35,6 +35,7 @@ chronological order.
 	    csplugincommon_w32 --> crystalspace_windows
 	- Eric Sunshine rewrote a bunch of outdated discussion in the Crystal
 	  Space manual.
+	- res removed the CSWS library.
 24-Mar-2005
 	- res removed a >= 0 comparison with an unsigned var from array.h.
 	- res fixed some wrong ref counting caused by iLoader->LoadTexture()

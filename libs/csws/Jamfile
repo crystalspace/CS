@@ -1,5 +1,0 @@
-SubDir TOP libs csws ;
-
-CsLibAddModule ;
-
-SubInclude TOP libs csws skins ;

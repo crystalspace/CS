@@ -91,7 +91,6 @@ CS_MASTER_HEADERS =
       csgfx
       csplugincommon
       cstool
-      csws
       iaws
       iengine
       igeom

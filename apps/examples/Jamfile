@@ -1,3 +1,0 @@
-SubDir TOP apps examples ;
-
-SubInclude TOP apps examples cswseng ;

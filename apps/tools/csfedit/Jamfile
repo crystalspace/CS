@@ -1,9 +1,0 @@
-SubDir TOP apps tools csfedit ;
-
-Description csfedit : "font editor" ;
-
-Application csfedit
-	: [ Wildcard *.cpp *.h ]
-;
-LinkWith csfedit : crystalspace ;
-

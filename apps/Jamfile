@@ -1,8 +1,6 @@
 SubDir TOP apps ;
 
-SubInclude TOP apps cswstest ;
 SubInclude TOP apps demo ;
-SubInclude TOP apps examples ;
 SubInclude TOP apps import ;
 SubInclude TOP apps isotest ;
 SubInclude TOP apps pysimp ;

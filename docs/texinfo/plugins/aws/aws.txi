@@ -9,9 +9,9 @@
 Conversion to Texinfo by F. Richter, @email{resqu@@gmx.ch}.}
 
 The Alternate Windowing System is a plugin designed to replace
-the old monolithic Crystal Space Windowing System (@sc{csws}). It utilizes an
-region optimal frame-thrower and can draw to either the default context,
-or to any user-supplied context (such as a procedural texture).
+the old monolithic (and removed) Crystal Space Windowing System (@sc{csws}). 
+It utilizes an region optimal frame-thrower and can draw to either the default 
+context, or to any user-supplied context (such as a procedural texture).
 @sc{aws} also supports a definition system and access to
 components via a @dfn{signal}/@dfn{slot} mechanism. All @sc{gui} aspects can be
 modified by the @sc{gui} designer in definition files without the

@@ -93,7 +93,6 @@ rm -rf "$RPM_BUILD_ROOT"
 %exclude %{_sysconfdir}/%{name}/awstut.cfg
 %exclude %{_sysconfdir}/%{name}/csbumptest.cfg
 %exclude %{_sysconfdir}/%{name}/csdemo.cfg
-%exclude %{_sysconfdir}/%{name}/cswstest.cfg
 %exclude %{_sysconfdir}/%{name}/g2dtest.cfg
 %exclude %{_sysconfdir}/%{name}/heightmapgen.cfg
 %exclude %{_sysconfdir}/%{name}/lighter.xml
@@ -120,7 +119,6 @@ rm -rf "$RPM_BUILD_ROOT"
 %{_sysconfdir}/%{name}/awstut.cfg
 %{_sysconfdir}/%{name}/csbumptest.cfg
 %{_sysconfdir}/%{name}/csdemo.cfg
-%{_sysconfdir}/%{name}/cswstest.cfg
 %{_sysconfdir}/%{name}/g2dtest.cfg
 %{_sysconfdir}/%{name}/heightmapgen.cfg
 %{_sysconfdir}/%{name}/lighter.xml

@@ -1,6 +1,5 @@
 SubDir TOP apps tools ;
 
-SubInclude TOP apps tools csfedit ;
 SubInclude TOP apps tools csfgen ;
 SubInclude TOP apps tools cslight ;
 SubInclude TOP apps tools docconv ;

@@ -1,4 +1,5 @@
 SubDir TOP libs ;
+SubDir TOP libs ;
 
 CSLIB.SOURCES = ;
 CSLIB.ROOT = $(SUBDIR_TOKENS) ;
@@ -66,7 +67,6 @@ SubInclude TOP libs csutil ;
 SubInclude TOP libs csgeom ;
 SubInclude TOP libs csgfx ;
 SubInclude TOP libs cstool ;
-SubInclude TOP libs csws ;
 SubInclude TOP libs csplugincommon ;
 
 SubDir TOP libs ;

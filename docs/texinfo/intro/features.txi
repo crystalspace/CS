@@ -103,7 +103,7 @@ The @file{sprcal3d} plugin is able to load Cal3D models.
 @xref{MeshObject SprCal3D}.
 
 @item
-Crystal Space native windowing system(s). @xref{AWS}. @xref{CSWS}.
+Crystal Space native windowing system(s). @xref{AWS}. 
 
 @item
 2D canvases (OpenGL, DirectDraw, X11, CoreGraphics, Cocoa, null, memory)

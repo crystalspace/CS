@@ -40,13 +40,6 @@ A @emph{TrueType} to Crystal Space font converter.
 @item csvid
 A test application for the Open DivX video plugin.
 
-@cindex @file{cswstest}
-@cindex Applications, @file{cswstest}
-@item cswstest
-This application tests the Crystal Space Windowing System (@sc{csws}), which
-is designed to provide a clean, effective and cross-platform base for creating
-CrystalSpace-related utilities. @xref{CSWS}.
-
 @cindex @file{g2dtest}
 @cindex Applications, @file{g2dtest}
 @item g2dtest

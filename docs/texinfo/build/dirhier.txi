@@ -156,13 +156,6 @@ Common sound renderer functionality.
 Common Microsoft Windows functionality.
 @end table
 
-@item CS/libs/csws
-The Crystal Space Windowing System which is platform-independent and works
-within a Crystal Space window.  @strong{Warning}: @emph{This module is heavily
-deprecated, unmaintained, and no longer developed.  Instead, use @sc{aws}.
-@xref{AWS}.}
-@end table
-
 @item CS/mk
 This directory contains support facilities for the configuration and build
 systems.

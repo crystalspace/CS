@@ -402,9 +402,9 @@ clients of those headers.
 @subheading Library Consolidation
 
 In order to simplify end-user documentation and client usage, the Crystal Space
-link libraries @file{csutil}, @file{csgeom}, @file{csgfx}, @file{cstool}, and
-@file{csws} have been merged into a single master library named
-@file{crystalspace} (i.e. @file{libcrystalspace.a} or @samp{crystalspace.lib}).
+link libraries @file{csutil}, @file{csgeom}, @file{csgfx}, and @file{cstool}
+have been merged into a single master library named @file{crystalspace} 
+(i.e. @file{libcrystalspace.a} or @samp{crystalspace.lib}).
 
 The tools @samp{cs-config} and @samp{jamtemplate} (@pxref{HOWTO CS Project}),
 documentation, and all other client-oriented utilities have been updated
@@ -472,8 +472,6 @@ Content of @file{CS/include/csplugincommon}.
 Content of @file{CS/include/cstool}.
 @item csutil.h
 Content of @file{CS/include/csutil}.
-@item csws.h
-Content of @file{CS/include/csws}.
 @item iaws.h
 Content of @file{CS/include/iaws}.
 @item iengine.h
@@ -1417,32 +1415,6 @@ for the opaque ``info'' member of @code{csevCommand}-type events.
 @code{iEventOutlet::ImmediateBroadcast()}
 @end itemize
 
-The heavily deprecated @sc{csws} module (Crystal Space Windowing System) has
-also been converted. Specifically, the following methods now deal with
-@samp{intptr_t} rather than @samp{void*} for all of @sc{csws}'s opaque data
-needs. @sc{csws} callback functions are likewise impacted.
-
-@itemize @bullet
-@item
-@code{csComponent::ForEach()}
-@item
-@code{csComponent::SendBroadcast()}
-@item
-@code{csComponent::SendCommand()}
-@item
-@code{csKeyboardAccelerator::Broadcast()}
-@item
-@code{csKeyboardAccelerator::Command()}
-@item
-@code{csListBoxItem::ForEachItem()}
-@item
-@code{csTimer::csTimer()}
-@item
-@code{csTreeBox::ForEachItem()}
-@item
-@code{csTreeItem::ForEachItem()}
-@end itemize
-
 The @sc{aws} plugin (Alternate Windowing System) and its interfaces have been
 been updated for 64-bit platform conformance.  Specifically, the following
 methods now deal with @samp{intptr_t} rather than @samp{void*} for all of
@@ -1517,3 +1489,7 @@ uniform float4x4 ModelViewProj : state.matrix.mvp
 Check the @file{data/shaders/} directory for further examples. For more
 detailed information, consult the Cg and @samp{ARB_vertex_program}
 documentations.
+
+@subheading @sc{csws} Removal
+
+The @sc{csws} library was removed. 

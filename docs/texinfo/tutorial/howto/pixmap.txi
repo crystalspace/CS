@@ -4,7 +4,6 @@
 @cindex @code{csSimplePixmap}
 @cindex loading images
 @cindex @sc{vfs}
-@cindex @sc{csws}
 @cindex @code{iImageIO}
 @cindex @code{iImage}
 

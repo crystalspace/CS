@@ -14,7 +14,6 @@ these facilities are broken down and the relationship between them.
 * csUtil:: Utility Module (@code{csUtil})
 * SCF:: Shared Class Facility (@sc{scf})
 * csGeom:: Geometry Module (@code{csGeom})
-* CSWS:: Crystal Space Windowing System (@sc{csws})
 @end menu
 
 This section presents a quick overview of the facilities provided by Crystal
@@ -45,15 +44,6 @@ and bounding boxes, 3D matrices and some other useful tools. @xref{csGeom}.
 @item csgfx
 Basic image support and graphical manipulation tools.
 
-@item csws
-A window system which integrates well with Crystal Space canvases. It is also
-platform independent since it performs all of its rendering using the abstract
-Crystal Space canvas interfaces. @xref{CSWS}.  @strong{Warning}: @emph{This
-module is heavily deprecated, unmaintained, and no longer developed.  Instead,
-use @sc{aws}.  @xref{AWS}.}
-@end table
-
 @imports{libs,csutil.txi}
 @imports{libs,scf.txi}
 @imports{libs,csgeom.txi}
-@imports{libs,csws.txi}
