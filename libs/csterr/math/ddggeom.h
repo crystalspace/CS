@@ -99,7 +99,7 @@ public:
 	/// Return distance between point and plane.
 	float distToPoint(const ddgVector3 p);
 	/// Returns positive if point is above plane, negative if below, 0 if on.
-	inline float ddgPlane::isPointAbovePlane( ddgVector3 *q)
+	inline float isPointAbovePlane( ddgVector3 *q)
 	{
 		return _normal.dot(q)+d();
 	}

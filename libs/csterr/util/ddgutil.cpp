@@ -17,11 +17,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 // For timing info.
-#if !defined(WIN32) || defined(COMP_GCC)
+#include "cssysdef.h"
+#if defined(OS_WIN32) || defined(OS_MACOS) || !defined(COMP_GCC)
+#include <time.h>
+#else
 #include <sys/types.h>
 #include <sys/times.h>
-#else
-#include <time.h>
 #endif
 #include "util/ddgutil.h"
 // ----------------------------------------------------------------------
