@@ -1432,10 +1432,6 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
     }
   }
 
-  glVertexPointer (4, GL_FLOAT, 0, queue.glverts);
-  glTexCoordPointer (2, GL_FLOAT, 0, queue.gltxt);
-  glDrawElements (GL_TRIANGLES, queue.num_triangles*3, GL_UNSIGNED_INT,
-  	  queue.tris);
   if (debug_edges)
     DebugDrawElements (G2D,
 	queue.num_triangles*3, queue.tris, queue.glverts,

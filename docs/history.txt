@@ -50,6 +50,8 @@ The history order is reversed so that new features are at the top.
 	  feature the need for screen clipping is no longer there. The
 	  flag is still in opengl.cfg though in case it IS still needed
 	  but it may be that everything is ok now.
+	- Fixed an EXTREMELY stupid bug in OpenGL renderer which caused
+	  all polygons to be rendered twice :-)
 	- Eric Sunshine changed the prototype of iSCF::QueryClassList() so that
 	  it now returns matches via an iStrVector object rather than a (char
 	  const**) which was free()'d by the caller.  It was necessary to
