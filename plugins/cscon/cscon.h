@@ -60,7 +60,7 @@ protected:
     int red;
     int green;
     int blue;
-  };
+  } structColor;
 
   //  Foreground and background colors
   Color fg_rgb;
