@@ -100,39 +100,60 @@ ImageBMPFile::ImageBMPFile (UByte* ptr, long filesize) : ImageFile ()
   status = IFE_BadFormat;
 
   if( !memcmp( ptr, BM, 2 ) && (*BISIZE(ptr)) == WinHSize && 
-	  (*BICOMP(ptr)) == BI_RGB 
-	)
-  {
-     set_dimensions( *BIWIDTH(ptr), *BIHEIGHT(ptr) );
+	  (*BICOMP(ptr)) == BI_RGB )
+    {
+         set_dimensions( *BIWIDTH(ptr), *BIHEIGHT(ptr) );
 
 	 RGBPixel *bufPtr = get_buffer();
-     UByte    *iPtr   = ptr + *BFOFFBITS(ptr);
+         UByte    *iPtr   = ptr + *BFOFFBITS(ptr);
 	 int       pixelIdx = 0;
+
+         const int bmp_width = (*BIWIDTH(ptr));
+         const int bmp_height = (*BIHEIGHT(ptr));
+         const int bmp_size = bmp_width*bmp_height;
+
+          // The last scanline in BMP corresponds to the top line in the image
+         int buffer_y = bmp_width*(bmp_height - 1), buffer_x = 0;
 
 	 if( (*BITCOUNT(ptr)) == _256Color && (*BICLRUSED(ptr)) && (*BICLRIMP(ptr)) )
 	 {
 	   char *pal = BIPALETTE(ptr);
 
-	   while( iPtr < ptr + filesize && pixelIdx < (*BIWIDTH(ptr)) * (*BIHEIGHT(ptr)) )
+	   while( iPtr < ptr + filesize && pixelIdx < bmp_size )
 	   {
 		  char *palEnt = PALENT(pal,*iPtr++);
 
-          bufPtr[pixelIdx].blue    = *palEnt;
-		  bufPtr[pixelIdx].green   = *(palEnt+1);
-		  bufPtr[pixelIdx].red     = *(palEnt+2);
+		  RGBPixel *buf = &bufPtr[buffer_y + buffer_x];
+		  buf->blue    = *palEnt;
+		  buf->green   = *(palEnt+1);
+		  buf->red     = *(palEnt+2);
+                  
+                  if(++buffer_x > bmp_width)
+                    {
+                      buffer_x = 0;
+                      buffer_y -= (bmp_width - 1);
+                    }
 
 		  pixelIdx++;
 	   }
-       status = IFE_OK;
+           status = IFE_OK;
 	 }
 	 else if( !(*BICLRUSED(ptr)) && !(*BICLRIMP(ptr)) &&
 	     (*BITCOUNT(ptr)) == TRUECOLOR24 )
 	 {
-	   while( iPtr < ptr + filesize && pixelIdx < (*BIWIDTH(ptr)) * (*BIHEIGHT(ptr)) )
+	   while( iPtr < ptr + filesize && pixelIdx < bmp_size )
 	   {
-          bufPtr[pixelIdx].blue    = *iPtr;
-		  bufPtr[pixelIdx].green   = *(iPtr+1);
-		  bufPtr[pixelIdx].red     = *(iPtr+2);
+	          RGBPixel *buf = &bufPtr[buffer_y + buffer_x];
+
+		  buf->blue    = *iPtr;
+		  buf->green   = *(iPtr+1);
+		  buf->red     = *(iPtr+2);
+
+                  if(++buffer_x > bmp_width)
+                    {
+                      buffer_x = 0;
+                      buffer_y -= (bmp_width - 1);
+                    }
 
 		  pixelIdx++;
 		  iPtr += 3;

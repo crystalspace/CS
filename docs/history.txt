@@ -25,6 +25,7 @@ Short-term cleanups that need to be done:
 	  can be optimized but I have to do some thinking about that :-)
 	- Fixed a bug with loading of sprite position from world file.
 	  This bug was recently introduced with VFS changes.
+	- Jonathan Hudson provided a fix for the upside-down BMP bug.
 15-Sep-1999
         - Ivan Avramovic fixed a few spots where "sysdef.h" was not included,
           but should have been.
