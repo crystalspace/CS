@@ -60,3 +60,64 @@ quality algorithm in which the distance between the light and every vertex
 is calculated. The default setting doesn't do this and just calculates the
 distance once to the center of the sprite.
 @end table
+
+@emph{Radiosity Settings}
+
+By default radiosity calculations are turned off, and the regular lighting
+is done. When radiosity is turned on, after the regular lighting calculation
+radiosity is computed. A number of parameters can be set:
+
+@table @code
+@item Radiosity.Enable=<yesno>
+yes to turn on radiosity precalculation. To recalculate
+radiosity run walktest -relight on the level. No to turn off.
+(default: no)
+
+@item Radiosity.StopPriority=<float>
+Internally radiosity computes a priority for each
+polygon. The priority is in the range of 0..256, where 0 means nothing
+to do. When the highest priority become lower then the stoppriority,
+radiosity calculation will stop. (Default: 0.1)
+
+@item Radiosity.StopImprovement=<float>
+When the highest priority becomes lower than
+the highest priority at the start of calculation divided by this value
+calculation will stop. (Default: 100.0)
+
+@item Radiosity.StopIterations=<number>
+After processing this many polygons the radiosity
+calculation will stop. This will prevent endless loops. If your level has 
+many polygons you may need to increase the value. (Default: 10000)
+
+@item Radiosity.SourcePatchSize=<number>
+This value will make radiosity calculation use
+the average of NxN size patches on source polygons when shooting light 
+from one polygon to another (but not on destination polygons). Increasing
+the value will speed up computation considerably, while reducing quality
+only slightly. Try values of 1..256, depending on the LightmapSize. 
+Use only powers of two. (Default: 16)
+
+@item Radiosity.ColourBleed=<float>
+This variable controls the amount of color emitted
+by a polygon. The colour is taken by examining the texture of the polygon.
+Thus a blue texture will reflect blueishly. Note that decreasing or
+increasing this value will increase the amount of lighting in the
+entire level by that amount. So 0.0 will be dark. And high values will
+create huge amounts of light (and use more calculation). Try 0.0-4.0. 
+(Default: 1.0)
+
+@item Radiosity.DoStaticSpecular=<yesno>
+yes will turn on specular lighting using
+radiosity. Since this is precalculation, only a static 'fake' specular
+effect can be given. Does not seem to give huge effects, but I left
+in the code so you can play with it :-). (Default: no)
+
+@item Radiosity.StaticSpecularAmount=<float>
+The amount of specular lighting to add
+when lighting. Try between 0 and 1. (Default: 0.70)
+
+@item Radiosity.StaticSpecularTightness=<number>
+tightness of the specular highlight.  a power of 2 of this variable is 
+used for speed. Thus try 0-10. (Default: 4)
+
+@end table
