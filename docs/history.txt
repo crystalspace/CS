@@ -13,6 +13,21 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+26-Nov-1999
+	- Andrew Zabolotny modified SCF so that object reference counts are
+	  initialized to 1 rather than 0.
+	- Eric Sunshine fixed a crasher in SCF which was introduced with
+	  Andrew's reference-count modification.  The problem was that the
+	  CONSTRUCT_IBASE macro was calling virtual IncRef() from within the
+	  object's own constructor, which requires a well-established virtual
+	  table pointer.  However, in most modern compilers, the vtable
+	  pointer is not established until the very end of the constructor,
+	  and in this case, resulted in a crash.
+	- Eric Sunshine fixed a conflict between user.mak and config.mak
+	  with regards to the PLUGINS variable.  user.mak considered it a
+	  representation of the user's choice of plug-ins, whereas config.mak
+	  considered it a representation of the auto-detected plug-ins.  Thus,
+	  the user's PLUGINS choice in user.mak was being ignored.
 25-Nov-1999
 	- Michael Ewert <mewert99@yahoo.com> supplied a new version of
 	  phyztest.cpp, the Phyziks test program.  This version is stable at
