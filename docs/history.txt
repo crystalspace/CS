@@ -13,6 +13,13 @@ chronological order.
 	  install Jam.  Finally, updated much outdated or incorrect information
 	  in the "Introduction" and "Build and Install" chapters.
 	- res fixed a VC6 compile error in chunklod.
+	- Eric Sunshine fixed a bug in the Swig rule (swig.jam), which was
+	  introduced with the large re-write of 15-Apr-2004, where it failed to
+	  respect the global SWIG.FLAGS, which might be set by the configure
+	  script, for example.  This problem manifested when the project was
+	  configured for the new renderer (--enable-new-renderer), for
+	  instance, since Swig did not know that it should generate code
+	  applicable to the new renderer.
 2-May-2004
 	- Eric Sunshine changed pubapi.dox so that it no longer excludes
 	  $(TOP)/include/csutil/win32 and csutil/unix.  In the past, these were

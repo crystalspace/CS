@@ -98,7 +98,8 @@ if $(CMD.SWIG)
       Depends $(othertargets) : $(target) ;
     }
 
-    SWIG.FLAGS on $(target) += -$(language) $(swigflags) -I$(swigincdirs) ;
+    SWIG.FLAGS on $(target) +=
+      $(SWIG.FLAGS) -$(language) $(swigflags) -I$(swigincdirs) ;
 
     # Allow Swig input file to reside in a location not indicated by $(SUBDIR).
     if $(swigfiledir) { SEARCH on $(swigfile) = $(swigfiledir) ; }
