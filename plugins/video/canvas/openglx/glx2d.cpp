@@ -291,7 +291,8 @@ void csGraphics2DGLX::Close(void)
 void csGraphics2DGLX::Print (csRect * /*area*/)
 {
   glXSwapBuffers (dpy,window);
-  glFlush (); // not needed?
+  //glFlush (); // not needed?
+  XSync (dpy, False);
 }
 
 bool csGraphics2DGLX::SetMousePosition (int x, int y)

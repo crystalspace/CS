@@ -59,6 +59,16 @@ The history order has been reversed so that new features are at the top.
 	  networking interfaces when socket-specific junk was added to
 	  inetdrv.h for NetSpace, thus corrupting and polluting the pure
 	  abstract interfaces defined therein.
+	- Fixed a problem with the OpenGL 2D X driver for very high
+	  framerates. Added XSync() to synchronize to the X server.
+	  I don't know if this means a slow-down on OpenGL systems
+	  that don't have such high performance (i.e. more than 100 FPS).
+	  This needs to be tested.
+	- Reverted a recent change that made csPolygonSet inherit first
+	  from iPolygonSet and then from csObject. This change had
+	  some bad consequences for some code that assumed csObject
+	  can be casted directly to csObject. This assumption could
+	  cause crashes in some cases.
 	- Eric Sunshine went on another cleaning spree and removed many, many
 	  old, unused, and perpetually unfinished files from the CS source
 	  tree, including the Amiga and WCC ports, and the aborted autoconf
