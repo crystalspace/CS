@@ -643,9 +643,7 @@ extern void* operator new[] (size_t s, void* filename, int line);
  * when it encounters client code invoking methods so tagged.
  */
 #ifndef CS_DEPRECATED_METHOD
-#  if defined(CS_COMPILER_GCC)
-#    define CS_DEPRECATED_METHOD		__attribute__ ((deprecated))
-#  elif defined(CS_COMPILER_MSVC)
+#  if defined(CS_COMPILER_MSVC)
 #    define CS_DEPRECATED_METHOD		/*__declspec(deprecated)*/
       /* Disabled: Unfortunately, MSVC is overzealous with warnings; 
 	 it even emits one when a deprecated method is overridden, e.g. when 
@@ -665,9 +663,7 @@ extern void* operator new[] (size_t s, void* filename, int line);
  * when it encounters client code using types so tagged.
  */
 #ifndef CS_DEPRECATED_TYPE
-#  if defined(CS_COMPILER_GCC)
-#    define CS_DEPRECATED_TYPE		__attribute__ ((deprecated))
-#  elif defined(CS_COMPILER_MSVC)
+#  if defined(CS_COMPILER_MSVC)
 #    define CS_DEPRECATED_TYPE
 #  else
 #    define CS_DEPRECATED_TYPE

@@ -2115,6 +2115,25 @@ AS_IF([test $cs_cv_sys_socket = yes],
 
 
 #------------------------------------------------------------------------------
+# Check how to ask compiler to declare deprecated functions and types about
+# which it should emit diagnostics.
+#------------------------------------------------------------------------------
+m4_define([cs_declare_deprecated], [__attribute__((deprecated))])
+AC_CACHE_CHECK([how to declare deprecations],
+    [cs_cv_prog_cxx_declare_deprecated],
+    [CS_BUILD_IFELSE(
+	[AC_LANG_PROGRAM([cs_declare_deprecated void f();], [])], [], [C++],
+	[cs_cv_prog_cxx_declare_deprecated="cs_declare_deprecated"],
+	[cs_cv_prog_cxx_declare_deprecated=''], [], [], [], [], [deprecated])])
+AS_IF([test -n "$cs_cv_prog_cxx_declare_deprecated"],
+    [CS_HEADER_PROPERTY([CS_DEPRECATED_METHOD],
+	[$cs_cv_prog_cxx_declare_deprecated])
+    CS_HEADER_PROPERTY([CS_DEPRECATED_TYPE],
+	[$cs_cv_prog_cxx_declare_deprecated])])
+
+
+
+#------------------------------------------------------------------------------
 # Check if C++ compiler understands new C++ `explicit' and 'typename' keywords.
 #------------------------------------------------------------------------------
 AC_CACHE_CHECK([for C++ `explicit' keyword], [cs_cv_cxx_explicit],

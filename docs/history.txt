@@ -19,6 +19,11 @@ chronological order.
 	  <cstypes.h> now fakes up `wchar_t' and `wint_t' if needed.
 	  (csunicode.h no longer fakes up `wchar_t' itself since this is now
 	  handled by <cstypes.h>.)
+	- Eric Sunshine added a check to configure.ac which figures out how to
+	  declare functions and types as deprecated so that the compiler will
+	  issue a suitable diagnostic. This fixes problems with older versions
+	  of gcc failing to understand `__attribute__((deprecated))', which was
+	  hard-coded into <cssysdef.h>.
 19-Mar-2005
 	- Erroroman fixed a bug in genmesh skelanimation exporter
 	- Erroroman added texture "ugly_woman.jpg" to flarge skeleton model.
