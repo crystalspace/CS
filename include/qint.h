@@ -19,88 +19,76 @@
 #ifndef __QINT_H__
 #define __QINT_H__
 
-#if !defined(OS_NEXT) && (defined(PROC_INTEL) || defined(PROC_M68K))
-#define CS_USE_FAST_FLOAT_TO_INT
-#else
-#undef  CS_USE_FAST_FLOAT_TO_INT
-#endif
+#if defined (PROC_INTEL) || defined (PROC_M68K) && !defined (OS_NEXT)
 
-#if !defined(CS_USE_FAST_FLOAT_TO_INT)
+// These are 'stolen' from someone (I don't remember who anymore). It
+// is a nice and fast way to convert a floating point number to int
+// (only tested on i386 and m68k type processors).
+// This constant is used for computing 'i=(int)(f+.5)'. 
+#define FIST_MAGIC1 ((((65536.0 * 65536.0 * 16.0) + (65536.0 * 0.5)) * 65536.0))
+// This constant is used for computing 'i=(int)(f*65536+.5)'. 
+#define FIST_MAGIC2 ((((65536.0 * 16.0) + (0.5)) * 65536.0))
+// This constant is used for computing 'i=(int)(f*65536+.5)'. 
+#define FIST_MAGIC3 ((((65536.0 * 16.0 / 256.0)+(0.5 / 256.0)) * 65536.0))
+
+static inline long QRound (float inval)
+{
+#if defined (COMP_GCC) && defined (PROC_INTEL)
+  long ret;
+  asm ("fistpl %0" : "=m" (ret) : "t" (inval) : "st");
+  return ret;
+#else
+  double dtemp = FIST_MAGIC1 + inval;
+  return ((*(long *)&dtemp) - 0x80000000);
+#endif
+}
+
+static inline long QInt (float inval)
+{
+#if defined (COMP_GCC) && defined (PROC_INTEL)
+  long ret;
+  asm ("fistpl %0" : "=m" (ret) : "t" (inval - 0.499999999) : "st");
+  return ret;
+#else
+  // .4997 is max number we can use; if we use for example .4998
+  // the routine will truncate 1.0 to 0.0 which is much worse than
+  // the 0.00005 precision loss we get (i.e. 0.99995 and above will QInt to 1)
+  double dtemp = FIST_MAGIC1 + (inval - 0.4997);
+  return ((*(long *)&dtemp) - 0x80000000);
+#endif
+}
+
+inline long QInt16 (float inval)
+{
+#if defined (COMP_GCC) && defined (PROC_INTEL)
+  long ret;
+  asm ("fistpl %0" : "=m" (ret) : "t" (inval * 0x10000) : "st");
+  return ret;
+#else
+  double dtemp = FIST_MAGIC2 + inval;
+  return ((*(long *)&dtemp) - 0x80000000);
+#endif
+}
+
+inline long QInt24 (float inval)
+{
+#if defined (COMP_GCC) && defined (PROC_INTEL)
+  long ret;
+  asm ("fistpl %0" : "=m" (ret) : "t" (inval * 0x1000000) : "st");
+  return ret;
+#else
+  double dtemp = FIST_MAGIC3 + inval;
+  return ((*(long *)&dtemp) - 0x80000000);
+#endif
+}
+    
+#else
 
 #define QRound(x) ((int)((x)+.5))
 #define QInt(x)   ((int)(x))
 #define QInt16(x) ((int)((x)*65536.))
-
-#else
-
-#ifdef PROC_INTEL
-/*
-//#pragma aux RoundToInt=\
-//        "fistp DWORD [eax]"\
-//        parm nomemory [eax] [8087]\
-//        modify exact [8087];
-*/
-
-// This is 'stolen' from someone (I don't remember who anymore). It
-// is a nice and fast way to convert a floating point number to int
-// (only works on a i386 type processor).
-// It is equivalent to 'i=(int)(f+.5)'. 
-#define FIST_MAGIC ((((65536.0 * 65536.0 * 16)+(65536.0 * 0.5))* 65536.0))
-inline long QuickRound (float inval)
-{
-  double dtemp = FIST_MAGIC + inval;
-  return ((*(long *)&dtemp) - 0x80000000);
-}
-
-inline long QuickInt (float inval)
-{
-  double dtemp = FIST_MAGIC + (inval-.4999);
-  return ((*(long *)&dtemp) - 0x80000000);
-}
-
-// This is my own invention derived from the previous one. This converts
-// a floating point number to a 16.16 fixed point integer. It is
-// equivalent to 'i=(int)(f*65536.)'.
-#define FIST_MAGIC2 ((((65536.0 * 16)+(0.5))* 65536.0))
-inline long QuickInt16 (float inval)
-{
-  double dtemp = FIST_MAGIC2 + inval;
-  return ((*(long *)&dtemp) - 0x80000000);
-}
-#endif //PROC_INTEL
-
-#ifdef PROC_M68K
-
-#define FIST_MAGIC ((((65536.0 * 65536.0 * 16)+(65536.0 * 0.5))* 65536.0))
-inline long QuickRound (float inval)
-{
-  double dtemp = FIST_MAGIC + inval;
-  return (*(((long *)&dtemp) + 1)) - 0x80000000;
-}
-    
-inline long QuickInt (float inval)
-{
-  double dtemp = FIST_MAGIC + (inval-.4999);
-  return (*(((long *)&dtemp) + 1)) - 0x80000000;
-}
-	
-#define FIST_MAGIC2 ((((65536.0 * 16)+(0.5))* 65536.0))
-inline long QuickInt16 (float inval)
-{
-  double dtemp = FIST_MAGIC2 + inval;
-  return (*(((long *)&dtemp) + 1)) - 0x80000000;
-}
-#endif
-
-#define QRound(x) QuickRound(x)
-#define QInt(x)   QuickInt(x)
-#define QInt16(x) QuickInt16(x)
-
-#endif // CS_USE_FAST_FLOAT_TO_INT
-
-// @@@ I don't know if there is a better way to convert
-// a floating point to 8:24 fixed point (one with constants
-// like the tricks above instead of the multiplication).
 #define QInt24(x) (QInt16(((x)*256.)))
+	
+#endif
 
 #endif // __QINT_H__
