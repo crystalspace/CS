@@ -84,7 +84,7 @@ use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber.pl';
-my $PROG_VERSION = '18';
+my $PROG_VERSION = '19';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000,2001,2002 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -261,14 +261,18 @@ my $MAKE = 'make';
 # needs to be configured, however the SourceForge shell machine does not have
 # compilers installed, thus we can not configure the project with the
 # "configure" script.  Instead, we fake up project configuration by creating a
-# minimal "config.mak"
+# minimal config.mak and Makefile.
 my $CONFIGURE = "cat << EOF > config.mak\n" .
     "TARGET = unix\n" .
     "TARGET_MAKEFILE = libs/cssys/unix/unix.mak\n" .
     "CMD.MKDIR = mkdir\n" .
     "CMD.MKDIRS = mkdir -p\n" .
     "PROC = UNKNOWN\n" .
-    "EOF\n";
+    "OS = UNIX\n" .
+    "MODE = optimize\n" .
+    "PERL = perl\n" .
+    "EOF\n" .
+    "sed 's/@SET_MAKE@//' < Makefile.in > Makefile\n";
 
 my @SCRIPT_OPTIONS = (
     'test!'     => \$TESTING,
