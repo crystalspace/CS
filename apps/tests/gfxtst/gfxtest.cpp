@@ -23,9 +23,9 @@
 #define SYSDEF_GETOPT
 #include "cssysdef.h"
 #include "csgfx/csimage.h"
-#include "csgfx/pngsave.h"
 #include "csutil/util.h"
 #include "csutil/cfgfile.h"
+#include "iutil/databuff.h"
 #include "igraphic/imageio.h"
 
 #include <string.h>
@@ -155,13 +155,17 @@ static bool output_picture (const char *fname, const char *suffix, iImage *ifile
   strcat (eol, ".png");
   printf ("Saving output file %s\n", outname);
 
-  return
 #if 1
-    csSavePNG (outname, ifile);
+  iDataBuffer *db = ImageLoader->Save (ifile, "image/png");
+  FILE *f = fopen (outname, "w+");
+  if (f)
+    fwrite (db->GetData (), 1, db->GetSize (), f);
+  fclose (f);
 #else
     SavePNM (outname, ifile->GetImageData (), ifile->GetWidth (), ifile->GetHeight (),
        (ifile->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR));
 #endif
+return true;
 }
 
 static bool display_picture (iImage *ifile)
