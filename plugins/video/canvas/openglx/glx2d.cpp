@@ -52,6 +52,7 @@ SCF_EXPORT_CLASS_TABLE_END
 
 #define DEF_OGLDISP "crystalspace.graphics2d.glx.disp.empty"
 #define XWIN_SCF_ID "crystalspace.window.x"
+
 // csGraphics2DGLX function
 csGraphics2DGLX::csGraphics2DGLX (iBase *iParent) :
   csGraphics2DGLCommon (iParent), cmap (0)
@@ -95,13 +96,13 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
     if (!dispdriver)
     {
       Report (CS_REPORTER_SEVERITY_WARNING,
-	      "Could not create an instance of %s ! Using NULL instead.",
-	      strDriver);
+        "Could not create an instance of %s ! Using NULL instead.",
+        strDriver);
     }
     else if (!dispdriver->open ())
     {
       Report (CS_REPORTER_SEVERITY_ERROR,
-	      "open of displaydriver %s failed!", strDriver);
+        "open of displaydriver %s failed!", strDriver);
       return false;
     }
   }
@@ -110,7 +111,7 @@ bool csGraphics2DGLX::Initialize (iObjectRegistry *object_reg)
   if (!xwin)
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
-	    "Could not create an instance of %s !", XWIN_SCF_ID);
+      "Could not create an instance of %s !", XWIN_SCF_ID);
     return false;
   }
 
@@ -164,11 +165,10 @@ bool csGraphics2DGLX::Open()
   if (!xwin->Open ())
   {
     Report (CS_REPORTER_SEVERITY_ERROR,
-	    "Failed to open the X-Window!");
+      "Failed to open the X-Window!");
     return false;
   }
   window = xwin->GetWindow ();
-
 
   // this makes the context we created in Initialize() the current
   // context, so that all subsequent OpenGL calls will set state and
@@ -197,7 +197,7 @@ void csGraphics2DGLX::Close(void)
   }
 
   if ( dispdriver ){
-      dispdriver->close();
+    dispdriver->close();
   }
 
   if (xwin)
@@ -206,22 +206,23 @@ void csGraphics2DGLX::Close(void)
 
 static const char *visual_class_name (int cls)
 {
-   switch (cls) {
-      case StaticColor:
-         return "StaticColor";
-      case PseudoColor:
-         return "PseudoColor";
-      case StaticGray:
-         return "StaticGray";
-      case GrayScale:
-         return "GrayScale";
-      case TrueColor:
-         return "TrueColor";
-      case DirectColor:
-         return "DirectColor";
-      default:
-         return "";
-   }
+  switch (cls)
+  {
+    case StaticColor:
+      return "StaticColor";
+    case PseudoColor:
+      return "PseudoColor";
+    case StaticGray:
+      return "StaticGray";
+    case GrayScale:
+      return "GrayScale";
+    case TrueColor:
+      return "TrueColor";
+    case DirectColor:
+      return "DirectColor";
+    default:
+      return "";
+  }
 }
 
 bool csGraphics2DGLX::CreateVisuals ()
@@ -247,7 +248,7 @@ bool csGraphics2DGLX::CreateVisuals ()
   if (!xvis)
   {
     Report (CS_REPORTER_SEVERITY_WARNING,
-    	"Could not find proper GLX visual");
+      "Could not find proper GLX visual");
 
     // what attribute was not supplied? we know that trying to get
     // all the attributes at once doesn't work.  provide more user info by
@@ -257,38 +258,39 @@ bool csGraphics2DGLX::CreateVisuals ()
     int generic_attributes [] = {GLX_RGBA, GLX_DOUBLEBUFFER, GLX_DEPTH_SIZE, 1, None};
     if (!(xvis=glXChooseVisual(dpy, screen_num, generic_attributes)) )
     {
-        Report (CS_REPORTER_SEVERITY_WARNING,
-        	"Graphics display does not support a generic visual with double buffer and depth buffer");
+      Report (CS_REPORTER_SEVERITY_WARNING,
+        "Graphics display does not support a generic visual with double buffer and depth buffer");
 		
-        int doublebuffer_attributes [] = {GLX_RGBA, GLX_DOUBLEBUFFER, None};
-        if (!(xvis=glXChooseVisual (dpy, screen_num, doublebuffer_attributes)))
-	{
-           Report (CS_REPORTER_SEVERITY_WARNING,
-	   "Graphics display does not provide double buffering");
+      int doublebuffer_attributes [] = {GLX_RGBA, GLX_DOUBLEBUFFER, None};
+      if (!(xvis=glXChooseVisual (dpy, screen_num, doublebuffer_attributes)))
+      {
+        Report (CS_REPORTER_SEVERITY_WARNING,
+          "Graphics display does not provide double buffering");
 
-           int depthbuffer_attributes [] = {GLX_RGBA, GLX_DEPTH_SIZE,1, None};
-           if (!(xvis=glXChooseVisual (dpy, screen_num, depthbuffer_attributes)))
-           {
-              Report (CS_REPORTER_SEVERITY_WARNING,
-        	"Graphics display does not support a depth buffer");
+        int depthbuffer_attributes [] = {GLX_RGBA, GLX_DEPTH_SIZE,1, None};
+          
+        if (!(xvis=glXChooseVisual (dpy, screen_num, depthbuffer_attributes)))
+        {
+          Report (CS_REPORTER_SEVERITY_WARNING,
+            "Graphics display does not support a depth buffer");
 
-              int color_attributes[] =
-              {GLX_RGBA, GLX_RED_SIZE,4, GLX_BLUE_SIZE,4,GLX_GREEN_SIZE,4,None};
+          int color_attributes[] =
+            { GLX_RGBA, GLX_RED_SIZE,4, GLX_BLUE_SIZE,4,GLX_GREEN_SIZE,4,None };
 
-              if (!(xvis=glXChooseVisual(dpy, screen_num, color_attributes)) )
-              {
-                Report (CS_REPORTER_SEVERITY_WARNING,
-             	"Graphics display does not support at least 12 bit color");
-                return false;
-	      }
-	   }
-	}
-     }
+          if (!(xvis=glXChooseVisual(dpy, screen_num, color_attributes)))
+          {
+            Report (CS_REPORTER_SEVERITY_WARNING,
+              "Graphics display does not support at least 12 bit color");
+            return false;
+          }
+        }
+      }
+    }
   }
 
   active_GLContext = glXCreateContext(dpy, xvis, 0, GL_TRUE);
   cmap = XCreateColormap (dpy, RootWindow (dpy, xvis->screen),
-			    xvis->visual, AllocNone);
+    xvis->visual, AllocNone);
 
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Video driver GL/X version %s",
     glXIsDirect (dpy, active_GLContext) ? "(direct renderer)" : "");
@@ -297,15 +299,15 @@ bool csGraphics2DGLX::CreateVisuals ()
 
   if (Depth == 24 || Depth == 32)
     pfmt.PixelBytes = 4;
-  else pfmt.PixelBytes = 2;
+  else
+    pfmt.PixelBytes = 2;
 
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Visual ID: %x, %dbit %sn",
-	    xvis->visualid, Depth,
-	    visual_class_name (xvis->c_class));
+    xvis->visualid, Depth, visual_class_name (xvis->c_class));
 
   int ctype, frame_buffer_depth, size_depth_buffer, level;
   glXGetConfig(dpy, xvis, GLX_RGBA, &ctype);
-//glXGetConfig(dpy, xvis, GLX_DOUBLEBUFFER, &double_buffer);
+  //glXGetConfig(dpy, xvis, GLX_DOUBLEBUFFER, &double_buffer);
   glXGetConfig(dpy, xvis, GLX_BUFFER_SIZE, &frame_buffer_depth);
   glXGetConfig(dpy, xvis, GLX_DEPTH_SIZE, &size_depth_buffer);
   glXGetConfig(dpy, xvis, GLX_LEVEL, &level);
@@ -320,6 +322,7 @@ bool csGraphics2DGLX::CreateVisuals ()
     glXGetConfig(dpy, xvis, GLX_GREEN_SIZE, &pfmt.GreenBits);
     glXGetConfig(dpy, xvis, GLX_BLUE_SIZE, &pfmt.BlueBits);
     glXGetConfig(dpy, xvis, GLX_ALPHA_SIZE, &alpha_bits);
+      
     int bit;
     bit=0; while (!(pfmt.RedMask & (1<<bit))) bit++; pfmt.RedShift = bit;
     bit=0; while (!(pfmt.GreenMask & (1<<bit))) bit++; pfmt.GreenShift = bit;
@@ -328,22 +331,22 @@ bool csGraphics2DGLX::CreateVisuals ()
 
   // Report Info
   Report (CS_REPORTER_SEVERITY_NOTIFY,
-  	"Frame buffer: %dbit ", frame_buffer_depth);
+    "Frame buffer: %dbit ", frame_buffer_depth);
+    
   if (ctype)
   {
     if (pfmt.RedMask > pfmt.BlueMask)
     {
-      Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"R%d:G%d:B%d:A%d, ",
-		pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits, alpha_bits);
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "R%d:G%d:B%d:A%d, ",
+        pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits, alpha_bits);
     }
     else
     {
-      Report (CS_REPORTER_SEVERITY_NOTIFY,
-		"B%d:G%d:R%d:A%d, ",
-		pfmt.BlueBits, pfmt.GreenBits, pfmt.RedBits, alpha_bits);
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "B%d:G%d:R%d:A%d, ",
+        pfmt.BlueBits, pfmt.GreenBits, pfmt.RedBits, alpha_bits);
     }
   }
+    
   Report (CS_REPORTER_SEVERITY_NOTIFY, "level %d, double buffered", level);
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Depth buffer: %dbit", size_depth_buffer);
 
@@ -381,6 +384,4 @@ void csGraphics2DGLX::AllowResize (bool iAllow)
   xwin->AllowResize (iAllow);
 }
 
-
 #undef XWIN_SCF_ID
-
