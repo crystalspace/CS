@@ -9,7 +9,7 @@
 # piped to stderr.
 #
 
-PYTHONBIN=`which python 2>&1 | grep -v "[Nn]o"`
+PYTHONBIN=`checkprog python`
 if [ -n "${PYTHONBIN}" ]; then
     SOURCES=`echo ${PYTHONBIN} | sed -e 's:/bin/python::'`
 fi

@@ -16,6 +16,9 @@ INSTALL_DIR=$2
 BIN_DIR=bin
 UNIX_DIR=libs/cssys/unix
 
+# Helper function for finding apps
+. ${BIN_DIR}/checkprog.sh
+
 # find out architecture
 . ${BIN_DIR}/arch.sh
 

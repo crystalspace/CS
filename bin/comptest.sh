@@ -16,11 +16,11 @@
 #------------------------------------------------------------------------------
 #Find a c++ compiler
 if [ -z "${CXX}" ]; then
-  [ -z "${CXX}" ] && CXX=`which g++ 2>&1 | grep -v "[Nn]o"`
-  [ -z "${CXX}" ] && CXX=`which gcc 2>&1 | grep -v "[Nn]o"`
-  [ -z "${CXX}" ] && CXX=`which egcs 2>&1 | grep -v "[Nn]o"`
-  [ -z "${CXX}" ] && CXX=`which c++ 2>&1 | grep -v "[Nn]o"`
-  [ -z "${CXX}" ] && CXX=`which cc 2>&1 | grep -v "[Nn]o"`
+  [ -z "${CXX}" ] && CXX=`checkprog g++`
+  [ -z "${CXX}" ] && CXX=`checkprog gcc`
+  [ -z "${CXX}" ] && CXX=`checkprog egcs`
+  [ -z "${CXX}" ] && CXX=`checkprog c++`
+  [ -z "${CXX}" ] && CXX=`checkprog cc`
   if [ -z "${CXX}" ]; then
     echo "$0: Cannot find an installed C++ compiler!" >&2
     exit 1
@@ -30,9 +30,9 @@ fi
 
 #Find a C compiler
 if [ -z "${CC}" ]; then
-  [ -z "${CC}" ] && CC=`which gcc 2>&1 | grep -v "[Nn]o"`
-  [ -z "${CC}" ] && CC=`which egcs 2>&1 | grep -v "[Nn]o"`
-  [ -z "${CC}" ] && CC=`which cc 2>&1 | grep -v "[Nn]o"`
+  [ -z "${CC}" ] && CC=`checkprog gcc`
+  [ -z "${CC}" ] && CC=`checkprog egcs`
+  [ -z "${CC}" ] && CC=`checkprog cc`
   if [ -z "${CC}" ]; then
     echo "$0: Cannot find an installed C compiler!" >&2
     exit 1

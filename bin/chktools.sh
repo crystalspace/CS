@@ -2,7 +2,7 @@
 # Checks for an installed nasm
 
 # Check if NASM is installed and if it has the right version
-NASMBIN=`which nasm 2>&1 | grep -v "[Nn]o"`
+NASMBIN=`checkprog nasm`
 
 if [ -n "${NASMBIN}" ]; then
   #create a dummy NASM program
@@ -14,7 +14,7 @@ if [ -n "${NASMBIN}" ]; then
 fi
 
 # Check if makedep is installed and is the right version
-[ -z "${MAKEDEP}" ] && MAKEDEP=`which makedep 2>&1 | grep -v "[Nn]o"`
+[ -z "${MAKEDEP}" ] && MAKEDEP=`checkprog makedep`
 if [ -n "${MAKEDEP}" ]; then
   echo "DEPEND_TOOL = mkdep"
   MAKEDEP_VERSION=`makedep -V | sed -e "s/.*Version *//"`
@@ -24,8 +24,8 @@ if [ -n "${MAKEDEP}" ]; then
 fi
 
 # do we have bison/flex
-BISONBIN=`which bison 2>&1 | grep -v "[Nn]o"`
-FLEXBIN=`which flex 2>&1 | grep -v "[Nn]o"`
+BISONBIN=`checkprog bison`
+FLEXBIN=`checkprog flex`
 if [ -n "${FLEXBIN}" ]; then
     echo "FLEXBIN = ${FLEXBIN}"
 fi
@@ -34,12 +34,12 @@ if [ -n "${BISONBIN}" ]; then
 fi
 
 # do we have swig < 1.3
-SWIGBIN=`which swig 2>&1 | grep -v "[Nn]o"`
+SWIGBIN=`checkprog swig`
 if [ -n "${SWIGBIN}" ]; then
     echo "SWIGBIN = ${SWIGBIN}"
 fi
 
-LUASWIGBIN=`which luaswig 2>&1 | grep -v "[Nn]o"`
+LUASWIGBIN=`checkprog luaswig`
 if [ -n "${SWIGBIN}" ]; then
     echo "LUASWIGBIN = ${LUASWIGBIN}"
 fi
