@@ -238,6 +238,7 @@ protected:
  */
 struct csGLVBOBufferSlot
 {
+public:
   csGLVBOBufferSlot()
     : vboTarget (GL_ARRAY_BUFFER_ARB), vboID (0), lastCachedVersion (0), offset (0),
     listIdx (0), next (0), prev (0), inUse (false), locked (false), indexBuffer (false)
