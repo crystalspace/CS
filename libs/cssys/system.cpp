@@ -630,13 +630,6 @@ bool csSystemDriver::HandleEvent (iEvent& e)
 
 void csSystemDriver::SetSystemDefaults (iConfigManager*)
 {
-  // First look in .cfg file
-  csConfigAccess cfg;
-  cfg.AddConfig (&object_reg, "/config/system.cfg");
-
-  // Now analyze command line
-  iCommandLineParser* CommandLine = CS_QUERY_REGISTRY (&object_reg,
-  	iCommandLineParser);
 }
 
 iConfigFile *csSystemDriver::OpenUserConfig(const char *ApplicationID,

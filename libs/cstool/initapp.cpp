@@ -114,9 +114,9 @@ bool csInitializer::RequestPlugins (iObjectRegistry* /*object_reg*/,
   char* plugName = va_arg (arg, char*);
   while (plugName != NULL)
   {
-    int scfId = va_arg (arg, scfInterfaceID);
-    int version = va_arg (arg, int);
     // scfId and version are unused for now.
+    // int scfId = va_arg (arg, scfInterfaceID);
+    // int version = va_arg (arg, int);
     global_sys->RequestPlugin (plugName);
     plugName = va_arg (arg, char*);
   }

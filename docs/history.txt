@@ -78,6 +78,10 @@ The history order is reversed so that new features are at the top.
 	- Removed Sleep() from csSystemDriver and iSystem. Instead there
 	  is now csSleep() which should be called instead.
 	- Eric Sunshine fixed some bugs in cygwin.mak.
+	- Eric Sunshine eliminated "unused variable" compilation warnings from
+	  csutil/parser.cpp, initapp.cpp, system.cpp.
+	- Eric Sunshine removed dead code from system.cpp which resulted after
+	  Jorrit's recent changes.
 4-Oct-2001
 	- Removed support for old and obsolete 'debug_level' in system
 	  driver.
