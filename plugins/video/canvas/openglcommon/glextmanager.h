@@ -5913,11 +5913,7 @@ typedef GLvoid (csAPIENTRY* csGLPRIMITIVERESTARTINDEXNV) (GLuint index);
 struct csGLExtensionManager
 {
 private:
-#ifdef CS_DEBUG
-  static const bool defaultReportMissingEntries = true;
-#else
-  static const bool defaultReportMissingEntries = false;
-#endif
+  static const bool defaultReportMissingEntries;
   iObjectRegistry* object_reg;
   csConfigAccess config;
   iOpenGLInterface* gl;
@@ -6258,6 +6254,11 @@ private:
 public:
   csGLExtensionManager (): object_reg(NULL)
   {
+#ifdef CS_DEBUG
+    defaultReportMissingEntries = true;
+#else
+    defaultReportMissingEntries = false;
+#endif
     CS_GL_version_1_2 = false;
     tested_CS_GL_version_1_2 = false;
     CS_GL_version_1_3 = false;

@@ -6,6 +6,9 @@ The history order is reversed so that new features are at the top.
 23-May-2003
 	- Jorrit fixed a bug with 3D sprites. If the factory was
 	  HardTransformed() the shape indicator was not changed.
+	- Jorrit fixed a bug in csGLExtensionManager. You cannot initialize
+	  variables in the struct/class definition. You must do it in the
+	  constructor. C++ is not Java.
 22-May-2003
 	- res made the following changes:
 	    - when using the new renderer, the sector now stores the 
