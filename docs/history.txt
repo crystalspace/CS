@@ -54,6 +54,8 @@ chronological order.
 	- Eric Sunshine added a `#define __STDC_FORMAT_MACROS' to cstypes.h to
 	  ensure that the various PRIx99 macros are properly defined (at least
 	  on platforms which provide them). This fixes a bunch of build errors.
+	- Eric Sunshine added a check for the PRIx99 macros to configure.ac.
+	  If available, CS_HAVE_C_FORMAT_MACROS is emitted to csconfig.h.
 3-Apr-2005
 	- Eric Sunshine updated csBlockAllocator<> so that it automatically
 	  destroys contained objects at its own destruction time rather than

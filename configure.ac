@@ -1966,7 +1966,7 @@ AC_C_BIGENDIAN(
 #------------------------------------------------------------------------------
 AC_CHECK_HEADERS([stdint.h],
     [CS_HEADER_PROPERTY([CS_HAVE_STDINT_H])
-    CS_CHECK_BUILD([if INT64_C is available], [cs_cv_c_int64],
+    CS_CHECK_BUILD([for INT64_C], [cs_cv_c_int64],
         [AC_LANG_PROGRAM(
             [[#define __STDC_CONSTANT_MACROS
             #define __STDC_LIMIT_MACROS
@@ -1997,6 +1997,23 @@ AC_CHECK_TYPE([intmax_t], [CS_HEADER_PROPERTY([CS_HAVE_INTMAX_T])], [],
     #ifdef HAVE_STDINT_H
     #include <stdint.h>
     #endif]])
+
+
+
+#------------------------------------------------------------------------------
+# Check if the PRIx99 printf()-formatting adjunct macros are available.
+#------------------------------------------------------------------------------
+AC_CHECK_HEADERS([inttypes.h])
+CS_CHECK_BUILD([for PRIx99 macros], [cs_cv_c_format_macros],
+    [AC_LANG_PROGRAM(
+        [[#include <stddef.h>
+	#define __STDC_FORMAT_MACROS
+	#if HAVE_INTTYPES_H
+        #include <inttypes.h>
+	#endif
+	]],
+        [char const* s = "widget %" PRIu32 " toggled";])],
+    [], [], [CS_HEADER_PROPERTY([CS_HAVE_C_FORMAT_MACROS])])
 
 
 
