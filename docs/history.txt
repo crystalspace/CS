@@ -6,6 +6,13 @@ The history order is reversed so that new features are at the top.
 	  are plain text XML files which do not require the -kb flag.  The user
 	  is still instructed to use -kb when adding MSVC6 and earlier project
 	  files, however.
+	- Zephie Greyvenstein <zephie.greyvenstein@btinternet.com> contributed
+	  a patch to fix a crash in md32spr when a direct reference to a shader
+	  function was used instead of a image file.  For instance if the
+	  shader function "/blah/blah/steam" was requested(which in turn
+	  created some effect using /blah/blah/steam1.tga and
+	  /blah/blah/steam2.tga) then point would be NULL(since there was no .
+	  extension).
 31-Oct-2002
 	- Optimized frustvis and dynavis by removing some SCF_QUERY_INTERFACE
 	  calls.
