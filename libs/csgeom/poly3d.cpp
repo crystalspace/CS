@@ -605,7 +605,7 @@ int csVector3Array::AddVertexSmart (float x, float y, float z)
   return num_vertices - 1;
 }
 
-csVector3 csPoly3D::ComputeNormal (csVector3 *vertices, int num)
+csVector3 csPoly3D::ComputeNormal (const csVector3 *vertices, int num)
 {
   float ayz = 0;
   float azx = 0;
@@ -639,12 +639,22 @@ csVector3 csPoly3D::ComputeNormal (csVector3 *vertices, int num)
   return csVector3 (ayz * invd, azx * invd, axy * invd);
 }
 
-csPlane3 csPoly3D::ComputePlane (csVector3 *vertices, int num_vertices)
+csVector3 csPoly3D::ComputeNormal (const csArray<csVector3>& poly)
+{
+  return ComputeNormal (&poly[0], poly.Length ());
+}
+
+csPlane3 csPoly3D::ComputePlane (const csVector3 *vertices, int num_vertices)
 {
   float D;
   csVector3 pl = ComputeNormal (vertices, num_vertices);
   D = -pl.x * vertices[0].x - pl.y * vertices[0].y - pl.z * vertices[0].z;
   return csPlane3 (pl, D);
+}
+
+csPlane3 csPoly3D::ComputePlane (const csArray<csVector3>& poly)
+{
+  return ComputePlane (&poly[0], poly.Length ());
 }
 
 float csPoly3D::GetArea () const

@@ -27,6 +27,7 @@
 
 #include "csextern.h"
 
+#include "csutil/array.h"
 #include "csgeom/math3d.h"
 
 // Values returned by classify.
@@ -253,7 +254,10 @@ public:
   void SplitWithPlaneZ (csPoly3D& front, csPoly3D& back, float z) const;
 
   /// Compute the normal of a polygon.
-  static csVector3 ComputeNormal (csVector3* vertices, int num);
+  static csVector3 ComputeNormal (const csVector3* vertices, int num);
+
+  /// Compute the normal of a polygon.
+  static csVector3 ComputeNormal (const csArray<csVector3>& poly);
 
   /// Compute the normal of this polygon.
   csVector3 ComputeNormal () const
@@ -262,7 +266,10 @@ public:
   }
 
   /// Compute the plane of a polygon.
-  static csPlane3 ComputePlane (csVector3* vertices, int num);
+  static csPlane3 ComputePlane (const csVector3* vertices, int num);
+
+  /// Compute the plane of a polygon.
+  static csPlane3 ComputePlane (const csArray<csVector3>& poly);
 
   /// Compute the plane of this polygon.
   csPlane3 ComputePlane () const
