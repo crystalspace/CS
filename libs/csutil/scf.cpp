@@ -25,7 +25,7 @@
 #include "csutil/util.h"
 #include "csutil/csvector.h"
 #include "csutil/csobjvec.h"
-#include "csutil/inifile.h"
+#include "csutil/cfgfile.h"
 
 #ifndef CS_STATIC_LINKED
 
@@ -323,7 +323,7 @@ static scfClassRegistry *ClassRegistry = NULL;
 // If this bool is true, we should sort the registery
 static bool SortClassRegistry = false;
 
-void scfInitialize (iConfigFile *iConfig)
+void scfInitialize (iConfigFileNew *iConfig)
 {
   if (!ClassRegistry)
     ClassRegistry = new scfClassRegistry ();
@@ -332,17 +332,17 @@ void scfInitialize (iConfigFile *iConfig)
     LibraryRegistry = new scfLibraryVector ();
   if (iConfig)
   {
-    iConfigDataIterator *iterator = iConfig->EnumData ("SCF.Registry");
+    iConfigIterator *iterator = iConfig->Enumerate ();
     if (iterator)
     {
       while (iterator->Next ())
       {
-        const char *data = (const char *)iterator->GetData ();
+        const char *data = iterator->GetStr ();
         char *val = (char *)alloca (strlen (data) + 1);
         strcpy (val, data);
         char *depend = strchr (val, ':');
         if (depend) *depend++ = 0;
-        scfRegisterClass (iterator->GetKey (), val, depend);
+        scfRegisterClass (iterator->GetKey (true), val, depend);
       }
       iterator->DecRef ();
     }

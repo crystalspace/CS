@@ -33,6 +33,7 @@
 #include "ievent.h"
 
 class csSkin;
+struct iConfigFile;
 
 /**
  * Application's background styles
