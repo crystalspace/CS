@@ -442,7 +442,7 @@ float* csSprite3D::z_verts = NULL;
 csVector2* csSprite3D::uv_verts = NULL;
 csVector2* csSprite3D::persp = NULL;
 bool* csSprite3D::visible = NULL;
-static int csSprite3D::max_light_worktable = 0;
+int csSprite3D::max_light_worktable = 0;
 csLight** csSprite3D::light_worktable = NULL;
 
 void csSprite3D::UpdateWorkTables (int max_size)
