@@ -267,7 +267,9 @@ void MultiTexture2Tester::Setup (iGraphics3D* g3d, PerfTest* perftest)
   int w = g3d->GetWidth ()-20;
   int h = g3d->GetHeight ()-20;
   int i = 0;
+#ifndef CS_USE_NEW_RENDERER
   int div = (NUM_MULTIPOLTEST*NUM_MULTIPOLTEST)/4;
+#endif
   for (y = 0 ; y < NUM_MULTIPOLTEST ; y++)
     for (x = 0 ; x < NUM_MULTIPOLTEST ; x++)
     {
