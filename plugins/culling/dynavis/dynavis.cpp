@@ -43,7 +43,7 @@
 #include "kdtree.h"
 #include "covbuf.h"
 #include "wqueue.h"
-//#include "exvis.h" // @@@ to be uncommented when file added to cvs.
+#include "exvis.h"
 
 CS_IMPLEMENT_PLUGIN
 
