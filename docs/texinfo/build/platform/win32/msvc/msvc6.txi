@@ -369,6 +369,16 @@ CS\libs\cssys\win32\libs\libjpeg.lib
 Note that the source code package generally already contains the files from the
 @file{include} and @file{libs} directories, so you may not have to bother with
 them.  The @sc{cvs} repository contains these files as well.
+
+@item
+Q. @emph{How can I reduce build times?}
+A. Build only the projects you will need ("unload" the rest).
+
+@item
+Q. @emph{How can I reduce build sizes?}
+A. Build only the projects you will need.
+A. Turning off precompiled headers tends to save a large amount of file space
+while increasing build times somewhat.
 @end itemize
 
 @subsubheading Linking
