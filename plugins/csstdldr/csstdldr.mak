@@ -1,21 +1,19 @@
-# The standard Crystal Space geometry loader
-ifneq (,$(findstring stdldr,$(PLUGINS)))
-
-# Library description
+# Plugin description
 DESCRIPTION.stdldr = Standard Crystal Space geometry loader plug-in
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
-# Library-specific help commands
-PLUGINHELP += $(NEWLINE)echo $"  make stdldr       Make the $(DESCRIPTION.stdldr)$"
+# Plugin-specific help commands
+PLUGINHELP += \
+  $(NEWLINE)echo $"  make stdldr       Make the $(DESCRIPTION.stdldr)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: stdldr
+.PHONY: stdldr stdldrclean
 
 all plugins: stdldr
 
@@ -26,33 +24,33 @@ stdldrclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # We need our own bison.simple file
 export BISON_SIMPLE = support/gnu/bison.sim
 
 ifeq ($(USE_SHARED_PLUGINS),yes)
-#  STDLDR = $(OUTDLL)stdldr$(DLL)
-  STDLDR = testldr$(EXE)
+  STDLDR = $(OUTDLL)stdldr$(DLL)
+# STDLDR = testldr$(EXE)
   DEP.STDLDR = $(CSUTIL.LIB) $(CSGEOM.LIB)
 else
-  STDLDR = $(OUT)$(LIB_PREFIX)stdldr$(LIB)
-#  DEP.EXE += $(STDLDR)
-#  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_STDLDR
+  STDLDR = $(OUT)$(LIB_PREFIX)stdld$(LIB)
+  DEP.EXE += $(STDLDR)
+  CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_STDLDR
 endif
 DESCRIPTION.$(STDLDR) = $(DESCRIPTION.stdldr)
 SRC.STDLDR = plugins/csstdldr/stdparse.cpp plugins/csstdldr/stdldr.cpp \
   plugins/csstdldr/test.cpp
 OBJ.STDLDR = $(addprefix $(OUT),$(notdir $(SRC.STDLDR:.cpp=$O)))
 
-#@@to be removed
+#@@@ to be removed
 DEP.STDLDR += $(CSSYS.LIB) $(CSENGINE.LIB) \
   $(CSUTIL.LIB) $(CSGEOM.LIB) $(CSOBJECT.LIB) $(CSTERR.LIB) $(CSGFXLDR.LIB)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 vpath %.cpp plugins/csstdldr
@@ -72,7 +70,7 @@ $(STDLDR): $(OBJ.STDLDR) $(DEP.STDLDR)
 #	$(DO.PLUGIN)
 
 stdldrclean:
-	-$(RM) $(OBJ.STDLDR) $(STDLDR)
+	-$(RM) $(STDLDR) $(OBJ.STDLDR) $(OUTOS)stdldr.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)stdldr.dep
@@ -83,5 +81,3 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
-
-endif # ifneq (,$(findstring stdldr,$(PLUGINS)))
