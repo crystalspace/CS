@@ -67,6 +67,9 @@ csLight::csLight (
 
   attenuation = CS_ATTN_LINEAR;
   lightnr = 0;
+#ifdef CS_USE_NEW_RENDERER
+  attenuationvec = csVector3(1,0,0); //default lightattenuation is kc = 1, kl=0,kq=0
+#endif
 }
 
 csLight::~csLight ()
