@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+8-Aug-2001
+	- Michael Voase did the following:
+	- csObject: Changed the vector used to CS_TYPED_VECTOR_DECREF()
+	  then changed the delete routines to feed the RefCount of an object
+	  as the FreeIt flag. This staunches cyclic reference runaways and
+	  prevents RefCounts on csObject's from going below zero. Also
+	  removed unecessary while() loop in csObjectIterator::Next(). This
+	  loop was never used. The engine now exit's *slightly* faster.
 7-Aug-2001
 	- Removed PerformExtension() in the Windows system driver. Instead
 	  the Windows system driver now creates an object Win32Helper which

@@ -25,7 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-CS_DECLARE_TYPED_VECTOR_NODELETE (csObjectContainer, iObject);
+CS_DECLARE_TYPED_VECTOR_DECREF (csObjectContainer, iObject);
 
 /*** Object Iterators ***/
 
@@ -51,7 +51,6 @@ public:
     if (Position < 0)
       return false;
 
-    while (1) {
       Position++;
       if (Position == Object->Children->Length ())
       {
@@ -59,7 +58,6 @@ public:
         return false;
       }
       return true;
-    }
   }
   virtual void Reset()
   {
@@ -113,6 +111,7 @@ csObject::csObject (iBase* pParent) : Children (NULL), Name (NULL)
 csObject::~csObject ()
 {
   ObjRemoveAll ();
+
   if (Children) delete Children;
   delete [] Name;
 
@@ -179,9 +178,8 @@ void csObject::ObjRemove (iObject *obj)
   int n = Children->Find (obj);
   if (n>=0)
   {
-    Children->Delete (n);
     obj->SetObjectParent (NULL);
-    obj->DecRef ();
+    Children->Delete (n, (bool)obj->GetRefCount());
   }
 }
 
@@ -193,8 +191,8 @@ void csObject::ObjReleaseOld (iObject *obj)
   int n = Children->Find (obj);
   if (n>=0)
   {
-    Children->Delete (n);
     obj->SetObjectParent (NULL);
+    Children->Delete (n, (bool)obj->GetRefCount());
   }
 }
 
@@ -203,12 +201,12 @@ void csObject::ObjRemoveAll ()
   if (!Children)
     return;
 
-  for (int i=0; i<Children->Length (); i++)
+  for (int i=0; i < Children->Length (); i++)
   {
-    Children->Get (i)->SetObjectParent (NULL);
-    Children->Get (i)->DecRef ();
+    iObject* child = Children->Get (i);
+    child->SetObjectParent (NULL);
+    Children->Delete (i, (bool)child->GetRefCount ());
   }
-  Children->DeleteAll ();
 }
 
 void csObject::ObjAddChildren (iObject *Parent)
