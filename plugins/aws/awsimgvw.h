@@ -52,32 +52,36 @@ public:
   awsImageView ();
   virtual ~awsImageView ();
 
+  /// Signal constants.
+  enum
+  {
+    /// An up and down motion for the button.
+    signalClicked    = 0x1,
+    /// A down motion for the button.
+    signalMouseDown  = 0x2,
+    /// An up motion for the button.
+    signalMouseUp    = 0x3,
+    /// A movement of the mouse.
+    signalMouseMoved = 0x4
+  };
+
   /// Frame styles.
-  static const int fsBump;
-  static const int fsSimple;
-  static const int fsRaised;
-  static const int fsSunken;
-  static const int fsFlat;
-  static const int fsNone;
-  static const int fsScaled;
-  static const int fsTiled;
-  static const int fsFixed;
-  static const int frameMask;
-  static const int imageMask;
+  enum
+  {
+    fsBump = 0x0,
+    fsSimple = 0x1,
+    fsRaised = 0x2,
+    fsSunken = 0x3,
+    fsFlat = 0x4,
+    fsNone = 0x5,
+    fsScaled = 0x8,
+    fsTiled = 0x10,
+    fsFixed = 0x20,
+    frameMask = 0x7,
+    imageMask = ~awsImageView::frameMask
+  };
 
-  /// An up and down motion for the button.
-  static const int signalClicked;
-
-  /// A down motion for the button.
-  static const int signalMouseDown;
-
-  /// An up motion for the button.
-  static const int signalMouseUp;
-
-  /// A movement of the mouse.
-  static const int signalMouseMoved;
-
-  /// Get's the texture handle and the title, plus style if there is one.
+  /// Get the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
   /// Gets properties.

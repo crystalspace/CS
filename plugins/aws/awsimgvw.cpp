@@ -28,24 +28,6 @@
 #include "csutil/csevent.h"
 #include "iutil/evdefs.h"
 
-const int awsImageView::signalClicked = 0x1;
-const int awsImageView::signalMouseDown = 0x2;
-const int awsImageView::signalMouseUp = 0x3;
-const int awsImageView::signalMouseMoved = 0x4;
-
-const int awsImageView::fsBump = 0x0;
-const int awsImageView::fsSimple = 0x1;
-const int awsImageView::fsRaised = 0x2;
-const int awsImageView::fsSunken = 0x3;
-const int awsImageView::fsFlat = 0x4;
-const int awsImageView::fsNone = 0x5;
-const int awsImageView::fsScaled = 0x8;
-const int awsImageView::fsTiled = 0x10;
-const int awsImageView::fsFixed = 0x20;
-const int awsImageView::frameMask = 0x7;
-const int awsImageView::imageMask = ~awsImageView::frameMask;
-
-
 awsImageView::awsImageView ()
   : is_down (false),
     mouse_is_over (false),

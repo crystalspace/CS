@@ -8,12 +8,6 @@
 
 #include <stdio.h>
 
-const int awsLabel:: signalClicked = 0x1;
-const int awsLabel:: signalFocused = 0x2;
-const int awsLabel:: alignLeft = 0x0;
-const int awsLabel:: alignRight = 0x1;
-const int awsLabel:: alignCenter = 0x2;
-
 awsLabel::awsLabel () :
   is_down(false),
   mouse_is_over(false),

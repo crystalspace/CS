@@ -7,48 +7,54 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 9-Jan-2004
-	- Jorrit fixed a warning in memimage.cpp. It was trying to delete
-	  a void* which is undefined.
+	- Jorrit fixed a warning in memimage.cpp.  It was trying to delete a
+	  void* which is undefined.
 	- Jorrit totally reverted the deletes in memimage.cpp. The superclass
 	  (csImageFile) was already doing those deletes.
 	- Marten made a first attempt to preliminary fix for re-entrant portals
 	  and disabled floating portals for new renderer.
-	- Jorrit reverted Marten's last portal fix as it causes totally new
-	  and much worse problems.
-	- Jorrit fixed the /temp path in vfs.cfg. It used ./data instead
-	  of @data.
-	- Jorrit fixed a bug in the generic renderloop step plugin. When
-	  render portals it was not flushing the list of meshes with the
-	  same shader.
-	- Jorrit fixed a bug in the csList::Iterator. It was always skipping
+	- Jorrit reverted Marten's last portal fix as it causes totally new and
+	  much worse problems.
+	- Jorrit fixed the /temp path in vfs.cfg.  It used ./data instead of
+	  @data.
+	- Jorrit fixed a bug in the generic renderloop step plugin.  When
+	  render portals it was not flushing the list of meshes with the same
+	  shader.
+	- Jorrit fixed a bug in the csList::Iterator.  It was always skipping
 	  the first element.
-	- Jorrit fixed the NR object handling in csSector so that it now uses
-	  a csArray instead of a csList to cache the visibility results and
-	  it also uses the render context instead of only the render view.
+	- Jorrit fixed the NR object handling in csSector so that it now uses a
+	  csArray instead of a csList to cache the visibility results and it
+	  also uses the render context instead of only the render view.
 	  Unfortunatelly this still doesn't fix the problems.
-	- Jorrit replaced DeleteAll() with Empty() in csRenderMeshList
-	  for more efficiency.
-	- Jorrit removed the sorting of the renderMeshListInfo structures
-	  in csRenderMeshList. This is not needed since they are already
-	  inserted sorted.
-	- Jorrit optimized csRenderMeshList->GetSortedMeshList() a bit more
-	  by avoiding the two iterator loops over the render priorities.
-	- Jorrit considerably optimized the generic render loop by avoiding
-	  an unneeded csArray for keeping the sorted meshes.
-	- Jorrit did another small optimization to avoid the construction
-	  of the dynDomain array if the material didn't change (in
+	- Jorrit replaced DeleteAll() with Empty() in csRenderMeshList for more
+	  efficiency.
+	- Jorrit removed the sorting of the renderMeshListInfo structures in
+	  csRenderMeshList.  This is not needed since they are already inserted
+	  sorted.
+	- Jorrit optimized csRenderMeshList->GetSortedMeshList() a bit more by
+	  avoiding the two iterator loops over the render priorities.
+	- Jorrit considerably optimized the generic render loop by avoiding an
+	  unneeded csArray for keeping the sorted meshes.
+	- Jorrit did another small optimization to avoid the construction of
+	  the dynDomain array if the material didn't change (in
 	  csGenericRenderStep::RenderMeshes).
-	- Jorrit changed the array parameter in iShaderProgram->SetupState()
-	  to const.
-	- Jorrit also changed the array parameter in iShader to const.
-	  To do that I had to move the adding of the dynamic domain to the
-	  caller.
-	- Jorrit reverted the optimization to avoid the construction of
-	  the dynDomain array. It was wrong.
-        - Matze changed bison and flex jam rules to build into the out directory
-          instaead of the source directory and added a rule to copy the
-          generated files.
+	- Jorrit changed the array parameter in iShaderProgram->SetupState() to
+	  const.
+	- Jorrit also changed the array parameter in iShader to const.  To do
+	  that I had to move the adding of the dynamic domain to the caller.
+	- Jorrit reverted the optimization to avoid the construction of the
+	  dynDomain array.  It was wrong.
+        - Matze changed bison and flex jam rules to build into the out
+	  directory instaead of the source directory and added a rule to copy
+	  the generated files.
 	- Marten made some more fixes to portals.
+	- Eric Sunshined applied a patch from Randall Foreman
+	  <eidpers@comcast.net> to allow AWS to be built with the Borland C++
+	  compiler.  Specifically, Borland did not like class-scoped 'static
+	  const int's being used in array declarations or 'case' statements.
+	  Now instead uses 'enum' to declare constants.
+	- Eric Sunshine made a bunch of Doxygen comment corrections in AWS
+	  headers.
 8-Jan-2004
 	- Jorrit moved include/ivideo/rendersteps directory to
 	  include/iengine/rendersteps. Apparently this was forgotten during
@@ -72,7 +78,7 @@ chronological order.
 	- res made the following changes:
 	  - Removed unused csRefHash class from csMaterial, changes csMaterial
 	    to store shaders in a csHash<> instead of a csHashMap.
-	  - Changed sprcal3d so the bounding box is properly updated when the 
+	  - Changed sprcal3d so the bounding box is properly updated when the
 	    mesh animates.
 	  - Added a 1-TU version of the OR lighting shader. Still has issues
 	    with transparency, tho.

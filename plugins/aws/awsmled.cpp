@@ -29,32 +29,6 @@
 #include "iaws/awsparm.h"
 #include "csutil/event.h"
 
-const int awsMultiLineEdit::MARK_ROWWRAP = 1;
-const int awsMultiLineEdit::MARK_ROW = 2;
-const int awsMultiLineEdit::MARK_COLUMN = 3;
-
-const int awsMultiLineEdit::fsBump = 0x0;
-const int awsMultiLineEdit::fsSimple = 0x1;
-const int awsMultiLineEdit::fsRaised = 0x2;
-const int awsMultiLineEdit::fsSunken = 0x3;
-const int awsMultiLineEdit::fsFlat = 0x4;
-const int awsMultiLineEdit::fsNone = 0x5;
-const int awsMultiLineEdit::meHScroll = 0x100;
-const int awsMultiLineEdit::meVScroll = 0x200;
-const int awsMultiLineEdit::meNormal = 0x400;
-const int awsMultiLineEdit::meBitmap = 0x800;
-
-const int awsMultiLineEdit::frameMask = 0x7;
-const int awsMultiLineEdit::styleMask = 0xff00;
-
-const int awsMultiLineEdit::signalPaste = 1;
-const int awsMultiLineEdit::signalCopy = 2;
-const int awsMultiLineEdit::signalCut = 3;
-const int awsMultiLineEdit::signalEnter = 4;
-const int awsMultiLineEdit::signalRowChanged = 5;
-const int awsMultiLineEdit::signalColChanged = 6;
-const int awsMultiLineEdit::signalLostFocus = 7;
-
 static iAwsSink *textbox_sink = 0;
 
 CS_IMPLEMENT_STATIC_VAR (GetTextBoxBlinkingCursorSlot, awsSlot,())

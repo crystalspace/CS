@@ -101,15 +101,21 @@ public:
   awsScrollBar ();
   virtual ~awsScrollBar ();
 
+  /// Signal constants.
+  enum
+  {
+    /// The value of the scroll bar changed.
+    signalChanged = 0x1,
+    /// The component becomes focused.
+    signalFocused = 0x2
+  };
+
   /// Scrollbar orientation.
-  static const int sboVertical;
-  static const int sboHorizontal;
-
-  /// The value of the scroll bar changed.
-  static const int signalChanged;
-
-  /// The component becomes focused.
-  static const int signalFocused;
+  enum
+  {
+    sboVertical = 0x0,
+    sboHorizontal = 0x1
+  };
 
   /// Trigger called when inc button is clicked.
   static void IncClicked (void *sk, iAwsSource *source);
@@ -126,7 +132,7 @@ public:
   /// Trigger called when area below/right of knob button is clicked.
   static void IncPageClicked (void *sk, iAwsSource *source);
 
-  /// Get's the texture handle and the title, plus style if there is one.
+  /// Get the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
   /// Gets properties.
@@ -212,7 +218,7 @@ public:
   awsSliderButton ();
   virtual ~awsSliderButton ();
 
-  /// Get's the texture handle and the title, plus style if there is one.
+  /// Get the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
   /// Get properties.

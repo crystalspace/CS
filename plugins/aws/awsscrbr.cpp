@@ -12,11 +12,6 @@
 
 #include <stdio.h>
 
-const int awsScrollBar:: signalChanged = 0x1;
-const int awsScrollBar:: signalFocused = 0x2;
-const int awsScrollBar:: sboVertical = 0x0;
-const int awsScrollBar:: sboHorizontal = 0x1;
-
 awsScrollBar::awsScrollBar () :
   is_down(false),
   mouse_is_over(false),

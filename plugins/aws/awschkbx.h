@@ -51,21 +51,27 @@ public:
   awsCheckBox ();
   virtual ~awsCheckBox ();
 
-  /// Align text to left.
-  static const int alignLeft;
+  /// Alignment constants.
+  enum
+  {
+    /// Align text to left.
+    alignLeft = 0x0,
+    /// Align text to right.
+    alignRight = 0x1,
+    /// Align text centered.
+    alignCenter = 0x2
+  };
 
-  /// Align text to right.
-  static const int alignRight;
+  /// Signal constants.
+  enum
+  {
+    /// An up and down motion for the button.
+    signalClicked = 0x1,
+    /// Component gained focus.
+    signalFocused = 0x2
+  };
 
-  /// Align text centered.
-  static const int alignCenter;
-
-  /// An up and down motion for the button.
-  static const int signalClicked;
-
-  static const int signalFocused;
-
-  /// Get's the texture handle and the title, plus style if there is one.
+  /// Get the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
   /// Gets properties.

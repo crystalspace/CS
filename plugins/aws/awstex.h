@@ -73,11 +73,11 @@ public:
   /// Destructor.
   ~awsTextureManager ();
 
-  /// Get's a reference to and iLoader.
+  /// Get a reference to and iLoader.
   void Initialize (iObjectRegistry *object_reg);
 
   /**
-   * Get's a texture.  If the texture is already cached, it returns
+   * Get a texture.  If the texture is already cached, it returns
    * the cached texture. If the texture has not been cached, and a
    * filename is specified, the file is loaded. If the file cannot be
    * found, or no file was specified, 0 is returned.
@@ -91,7 +91,7 @@ public:
     unsigned char key_b = 255);
 
   /**
-   * Get's a texture.  If the texture is already cached, it returns the
+   * Get a texture.  If the texture is already cached, it returns the
    * cached texture. If the texture has not been cached, and a filename
    * is specified, the file is loaded. If the file cannot be found, or no
    * file was specified, 0 is returned. This variety uses the id directly,

@@ -78,31 +78,36 @@ private:
    */
   void EnsureCursorToStartDistance (int dist);
 public:
+  /// Constructor.
   awsTextBox ();
+  /// Destructor.
   virtual ~awsTextBox ();
 
-  /// A "normal" textbox.  Is textured if there is a background texture.
-  static const int fsNormal;
+  /// Style constants.
+  enum
+  {
+    /// A "normal" textbox.  Is textured if there is a background texture.
+    fsNormal = 0x0,
+    /// A textbox whose background is defined entirely by the bitmap.
+    fsBitmap = 0x1
+  };
 
-  /// A textbox whose background is defined entirely by the bitmap.
-  static const int fsBitmap;
+  /// Signal constants.
+  enum
+  {
+    /// Occurs whenever text is changed.
+    signalChanged = 0x1,
+    /// Occurs whenever the component loses keyboard focus.
+    signalLostFocus = 0x2,
+    /// Occurs when the "enter" key is pressed.
+    signalEnterPressed = 0x3,
+    /// Occurs when the "tab" key is pressed.
+    signalTabPressed = 0x4,
+    /// Occurs when component becomes focused.
+    signalFocused = 0x5
+  };
 
-  /// Occurs whenever text is changed.
-  static const int signalChanged;
-
-  /// Occurs whenever the component loses keyboard focus.
-  static const int signalLostFocus;
-
-  /// Occurs when the "enter" key is pressed.
-  static const int signalEnterPressed;
-
-  /// Occures when the "tab" key is pressed.
-  static const int signalTabPressed;
-
-  /// Occures when component becomes focused.
-  static const int signalFocused;
-
-  /// Get's the texture handle and the title, plus style if there is one.
+  /// Get the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
   /// Get properties.

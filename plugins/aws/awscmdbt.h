@@ -46,7 +46,7 @@ protected:
   /// Icon position.
   int icon_align;
 
-  ///
+  /// Texture is stretched.
   bool stretched;
   
   /// Caption text for this component.
@@ -58,16 +58,24 @@ public:
   virtual ~awsCmdButton ();
 
   /// Icon positions.
-  static const int iconLeft;
-  static const int iconRight;
-  static const int iconTop;
-  static const int iconBottom;
+  enum
+  {
+    iconLeft = 0x0,
+    iconRight = 0x1,
+    iconTop = 0x2,
+    iconBottom = 0x3
+  };
 
-  /// An up and down motion for the button.
-  static const int signalClicked;
-  static const int signalFocused;
+  /// Signal constants.
+  enum
+  {
+    /// An up and down motion for the button.
+    signalClicked = 0x1,
+    /// Component gained focus.
+    signalFocused = 0x2
+  };
 
-  /// Get's the texture handle and the title, plus style if there is one.
+  /// Get the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
   /// Gets properties.

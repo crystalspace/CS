@@ -39,22 +39,27 @@ public:
   awsLabel ();
   virtual ~awsLabel ();
 
-  /// An up and down motion for the button.
-  static const int signalClicked;
+  /// Signal constants.
+  enum
+  {
+    /// An up and down motion for the button.
+    signalClicked = 0x1,
+    /// Component becomes focused.
+    signalFocused = 0x2
+  };
 
-  /// Component becomes focused.
-  static const int signalFocused;
+  /// Alignment constants.
+  enum
+  {
+    /// Align text to left.
+    alignLeft = 0x0,
+    /// Align text to right.
+    alignRight = 0x1,
+    /// Align text centered.
+    alignCenter = 0x2
+  };
 
-  /// Align text to left.
-  static const int alignLeft;
-
-  /// Align text to right.
-  static const int alignRight;
-
-  /// Align text centered.
-  static const int alignCenter;
-
-  /// Get's the texture handle and the title, plus style if there is one.
+  /// Get the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
   /// Get properties.

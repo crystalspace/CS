@@ -54,28 +54,31 @@ public:
   awsRadButton ();
   virtual ~awsRadButton ();
 
-  /// Align text to left.
-  static const int alignLeft;
+  /// Alignment constants.
+  enum
+  {
+    /// Align text to left.
+    alignLeft = 0x0,
+    /// Align text to right.
+    alignRight = 0x1,
+    /// Align text centered.
+    alignCenter = 0x2
+  };
 
-  /// Align text to right.
-  static const int alignRight;
+  /// Signal constants.
+  enum
+  {
+    /// An up and down motion for the button.
+    signalClicked = 0x1,
+    /// When this button is turned off.
+    signalTurnedOff = 0x2,
+    /// When this button is turned on.
+    signalTurnedOn = 0x3,
+    /// When this button is becomes focused.
+    signalFocused = 0x4
+  };
 
-  /// Align text centered.
-  static const int alignCenter;
-
-  /// An up and down motion for the button.
-  static const int signalClicked;
-
-  /// When this button is turned on.
-  static const int signalTurnedOn;
-
-  /// When this button is turned off.
-  static const int signalTurnedOff;
-
-  /// When this button is becomes focused.
-  static const int signalFocused;
-
-  /// Get's the texture handle and the title, plus style if there is one.
+  /// Get the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
   /// Gets properties.

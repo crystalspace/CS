@@ -327,12 +327,6 @@ iAwsComponent *awsNotebookPageFactory::Create ()
 
 /*********************** awsNotebookButton ***********************/
 
-const int awsNotebookButton::signalActivateTab = 1;
-const int awsNotebookButton::iconLeft = 0;
-const int awsNotebookButton::iconRight = 1;
-const int awsNotebookButton::iconTop = 2;
-const int awsNotebookButton::iconBottom = 3;
-
 awsNotebookButton::awsNotebookButton ():
   is_active(false),
   is_first(false),

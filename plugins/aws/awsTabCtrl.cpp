@@ -24,13 +24,6 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
 
-const int awsTab::signalActivateTab = 1;
-const int awsTab::signalDeactivateTab = 2;
-const int awsTab::iconLeft = 0;
-const int awsTab::iconRight = 1;
-const int awsTab::iconTop = 2;
-const int awsTab::iconBottom = 3;
-
 awsTab::awsTab ()
   : is_active (false),
     is_first (false),

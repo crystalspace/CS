@@ -52,29 +52,30 @@ public:
   virtual ~awsStatusBar();
 
   /// Frame Styles.
+  enum
+  {
+    /// A frame that's a bump.
+    fsBump = 0x0,
+    /// A simple frame.
+    fsSimple = 0x1,
+    /// A frame that looks like a raised button.
+    fsRaised = 0x2,
+    /// A frame that looks like a sunk button.
+    fsSunken = 0x3,
+    /// A frame that looks flat.
+    fsFlat = 0x4,
+    /// No frame at all.
+    fsNone = 0x5
+  };
 
-  /// A frame that's a bump.
-  static const int fsBump;
+  /// Signal constants.
+  enum
+  {
+    /// An up and down motion for the button.
+    signalClicked = 0x1
+  };
 
-  /// A simple frame.
-  static const int fsSimple;
-
-  /// A frame that looks like a sunk button.
-  static const int fsSunken;
-
-  /// A frame that looks like a raised button.
-  static const int fsRaised;
-
-  /// A frame that looks flat.
-  static const int fsFlat;
-
-  /// No frame at all.
-  static const int fsNone;
-
-  /// An up and down motion for the button.
-  static const int signalClicked;
-
-  /// Get's the texture handle and the title, plus style if there is one.
+  /// Get the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
   /// Gets properties.

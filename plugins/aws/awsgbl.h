@@ -33,21 +33,22 @@
 class awsGridBagLayout : public awsLayoutManager
 {
 public:
-  /**
-   * The maximum number of grid positions (both horizontally and
-   * vertically) that can be laid out by the grid bag layout.
-   */
-  static const int MAXGRIDSIZE;
+  /// Class constants.
+  enum
+  {
+    /**
+     * The maximum number of grid positions (both horizontally and
+     * vertically) that can be laid out by the grid bag layout.
+     */
+    MAXGRIDSIZE = 512,
 
-  /**
-   * The smallest grid that can be laid out by the grid bag layout.
-   */
-  static const int MINSIZE;
+    /// The smallest grid that can be laid out by the grid bag layout.
+    MINSIZE = 1,
 
-  /** 
-   * Preferred size of grid.
-   */
-  static const int PREFERREDSIZE;
+    /// Preferred size of grid.
+    PREFERREDSIZE = 2
+  };
+
 private:
   struct GridBagLayoutInfo
   {

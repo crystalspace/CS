@@ -96,7 +96,7 @@ public:
   /// A signal that tells the app it should update the rolling chart.
   static const int signalTimer;
 
-  /// Get's the texture handle and the title, plus style if there is one.
+  /// Get the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
   /// Gets properties.

@@ -240,7 +240,7 @@ public:
   /// set component deaf or "undeaf".
   virtual void SetDeaf (bool bDeaf);
 
-  /// Get's the unique id of this component.
+  /// Get the unique id of this component.
   virtual unsigned long GetID ();
 
   /**
@@ -316,10 +316,10 @@ public:
    */
   virtual void RemoveChild (iAwsComponent *child);
 
-  /// Get's the number of children.
+  /// Get the number of children.
   virtual int GetChildCount ();
 
-  /// Get's a specific child.
+  /// Get a specific child.
   virtual iAwsComponent *GetTopChild ();
 
   /// Returns the sibling above this one.
@@ -337,10 +337,10 @@ public:
   /// Add child to TabOrder.
   virtual bool AddToTabOrder (iAwsComponent *child);
 
-  /// Get's next child component in parent TabOrder.
+  /// Get next child component in parent TabOrder.
   virtual iAwsComponent *TabNext (iAwsComponent *child);
 
-  /// Get's previous child component in parent TabOrder.
+  /// Get previous child component in parent TabOrder.
   virtual iAwsComponent *TabPrev (iAwsComponent *child);
 
   /// Returns TabOrder length.
@@ -356,12 +356,12 @@ public:
   virtual bool HasChildren ();
 
   /**
-   * Get's this components idea of the window manager. Should be used
+   * Get this components idea of the window manager. Should be used
    * internally by the component ONLY, or by embedding classes.
    */
   virtual iAws *WindowManager ();
 
-  /// Get's the parent component of this component.
+  /// Get the parent component of this component.
   virtual iAwsComponent *Parent ();
 
   /**

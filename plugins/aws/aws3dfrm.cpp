@@ -22,19 +22,6 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 
-const int aws3DFrame::fsBump = _3dfsBump;
-const int aws3DFrame::fsSimple = _3dfsSimple;
-const int aws3DFrame::fsRaised = _3dfsRaised;
-const int aws3DFrame::fsSunken = _3dfsSunken;
-const int aws3DFrame::fsFlat = _3dfsFlat;
-const int aws3DFrame::fsNone = _3dfsNone;
-const int aws3DFrame::fsBevel = _3dfsBevel;
-const int aws3DFrame::fsThick = _3dfsThick;
-const int aws3DFrame::fsBitmap = _3dfsBitmap;
-const int aws3DFrame::fsSmallRaised = _3dfsSmallRaised;
-const int aws3DFrame::fsSmallSunken = _3dfsSmallSunken;
-const int aws3DFrame::fsMask = _3dfsMask;
-
 aws3DFrame::aws3DFrame ()
 {
 }

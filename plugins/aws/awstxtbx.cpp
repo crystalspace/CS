@@ -13,15 +13,6 @@
 
 #include <stdio.h>
 
-const int awsTextBox::fsNormal = 0x0;
-const int awsTextBox::fsBitmap = 0x1;
-
-const int awsTextBox::signalChanged = 0x1;
-const int awsTextBox::signalLostFocus = 0x2;
-const int awsTextBox::signalEnterPressed = 0x3;
-const int awsTextBox::signalTabPressed = 0x4;
-const int awsTextBox::signalFocused = 0x5;
-
 static iAwsSink *textbox_sink = 0;
 
 CS_IMPLEMENT_STATIC_VAR (GetTextBoxBlinkingCursorSlot, awsSlot,())

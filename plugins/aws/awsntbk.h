@@ -80,11 +80,20 @@ public:
   void SetFirst (bool what) { is_first=what; }
   void SetTop (bool what) { is_top=what; }
 
-  static const int signalActivateTab;
-  static const int iconLeft;
-  static const int iconRight;
-  static const int iconTop;
-  static const int iconBottom;
+  /// Signal constants.
+  enum
+  {
+    signalActivateTab = 1
+  };
+
+  // Icon placement constants.
+  enum
+  {
+    iconLeft = 0,
+    iconRight = 1,
+    iconTop = 2,
+    iconBottom = 3
+  };
 };
 
 class awsNotebookButtonFactory : public awsComponentFactory

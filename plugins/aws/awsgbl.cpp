@@ -25,10 +25,6 @@
 #include "awsgbc.h"
 #include "iaws/awsdefs.h"
 
-const int awsGridBagLayout::MAXGRIDSIZE = 512;
-const int awsGridBagLayout::MINSIZE = 1;
-const int awsGridBagLayout::PREFERREDSIZE = 2;
-
 const int MAXINT = 0xeffffff;
 
 inline int max (int i, int j)

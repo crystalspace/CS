@@ -11,15 +11,6 @@
 
 #include <stdio.h>
 
-const int awsStatusBar:: fsBump = 0x0;
-const int awsStatusBar:: fsSimple = 0x1;
-const int awsStatusBar:: fsRaised = 0x2;
-const int awsStatusBar:: fsSunken = 0x3;
-const int awsStatusBar:: fsFlat = 0x4;
-const int awsStatusBar:: fsNone = 0x5;
-
-const int awsStatusBar:: signalClicked = 0x1;
-
 //static iAwsSink *chart_sink = 0;
 
 CS_IMPLEMENT_STATIC_VAR (GetChartSlot, awsSlot,())

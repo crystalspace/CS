@@ -36,8 +36,6 @@ class awsMultiLineEdit : public awsComponent
 protected:
   struct mlEvent
   {
-    //csEvent e;
-    //csKeyEventData keyData;
     csInputDefinition inputDef;
     void (awsMultiLineEdit::*ring) ();
   };
@@ -133,33 +131,51 @@ protected:
   static void actGetText (void *owner, iAwsParmList* parmlist);
   static void actSetText (void *owner, iAwsParmList* parmlist);
   static void actClear (void *owner, iAwsParmList* parmlist);
+
 public:
-  static const int MARK_ROWWRAP;
-  static const int MARK_COLUMN;
-  static const int MARK_ROW;
+  /// Mark constants.
+  enum
+  {
+    MARK_ROWWRAP = 1,
+    MARK_ROW = 2,
+    MARK_COLUMN = 3
+  };
 
-  static const int fsBump;
-  static const int fsSimple;
-  static const int fsRaised;
-  static const int fsSunken;
-  static const int fsFlat;
-  static const int fsNone;
-  static const int meHScroll;
-  static const int meVScroll;
-  static const int meNormal;
-  static const int meBitmap;
-  static const int frameMask;
-  static const int styleMask;
+  /// Frame style constants.
+  enum
+  {
+    fsBump = 0x0,
+    fsSimple = 0x1,
+    fsRaised = 0x2,
+    fsSunken = 0x3,
+    fsFlat = 0x4,
+    fsNone = 0x5,
+    meHScroll = 0x100,
+    meVScroll = 0x200,
+    meNormal = 0x400,
+    meBitmap = 0x800
+  };
 
-  static const int signalPaste;
-  static const int signalCopy;
-  static const int signalCut;
-  static const int signalEnter;
-  static const int signalRowChanged;
-  static const int signalColChanged;
-  static const int signalLostFocus;
+  /// Mask constants.
+  enum
+  {
+    frameMask = 0x7,
+    styleMask = 0xff00
+  };
 
-  /// Get's the texture handle and the title, plus style if there is one.
+  /// Signal constants.
+  enum
+  {
+    signalPaste = 1,
+    signalCopy = 2,
+    signalCut = 3,
+    signalEnter = 4,
+    signalRowChanged = 5,
+    signalColChanged = 6,
+    signalLostFocus = 7
+  };
+
+  /// Get the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
   /// Get properties.

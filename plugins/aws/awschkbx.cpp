@@ -27,13 +27,6 @@
 #include "csutil/csevent.h"
 #include "iutil/evdefs.h"
 
-const int awsCheckBox::alignLeft = 0x0;
-const int awsCheckBox::alignRight = 0x1;
-const int awsCheckBox::alignCenter = 0x2;
-
-const int awsCheckBox::signalClicked = 0x1;
-const int awsCheckBox::signalFocused = 0x2;
-
 awsCheckBox::awsCheckBox ()
   : is_down (false),
     mouse_is_over (false),

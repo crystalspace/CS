@@ -27,14 +27,6 @@
 #include "csutil/csevent.h"
 #include "iutil/evdefs.h"
 
-const int awsCmdButton::iconLeft = 0x0;
-const int awsCmdButton::iconRight = 0x1;
-const int awsCmdButton::iconTop = 0x2;
-const int awsCmdButton::iconBottom = 0x3;
-
-const int awsCmdButton::signalClicked = 0x1;
-const int awsCmdButton::signalFocused = 0x2;
-
 awsCmdButton::awsCmdButton ()
   : is_down (false),
     mouse_is_over (false),

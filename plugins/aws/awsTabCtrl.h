@@ -83,12 +83,14 @@ public:
   void SetFirst (bool what) { is_first = what; }
   void SetTop (bool what) { is_top = what; }
 
-  static const int signalActivateTab;
-  static const int signalDeactivateTab;
-  static const int iconLeft;
-  static const int iconRight;
-  static const int iconTop;
-  static const int iconBottom;
+  enum  {
+    signalActivateTab = 1,
+    signalDeactivateTab = 2,
+    iconLeft = 0,
+    iconRight = 1,
+    iconTop = 2,
+    iconBottom = 3,
+  };
 };
 
 /**

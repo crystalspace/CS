@@ -27,6 +27,20 @@ struct iGraphics3D;
 struct iAws;
 struct iAwsComponent;
 
+/// These are frame styles supported by the 3d frame class and thus globally
+const int _3dfsBump = 0;
+const int _3dfsSimple = 1;
+const int _3dfsRaised = 2;
+const int _3dfsSunken = 3;
+const int _3dfsFlat = 4;
+const int _3dfsNone = 5;
+const int _3dfsBevel = 6;
+const int _3dfsThick = 7;
+const int _3dfsBitmap = 8;
+const int _3dfsSmallRaised = 9;
+const int _3dfsSmallSunken = 10;
+const int _3dfsMask  = 0x1f;
+
 /**
  * This class draws several different 3d frame types to avoid code duplication.
  */
@@ -71,18 +85,20 @@ protected:
 
   void DrawThickFrame (csRect frame);
 public:
-  static const int fsBump;
-  static const int fsSimple;
-  static const int fsRaised;
-  static const int fsSunken;
-  static const int fsFlat;
-  static const int fsNone;
-  static const int fsBevel;
-  static const int fsThick;
-  static const int fsBitmap;
-  static const int fsSmallRaised;
-  static const int fsSmallSunken;
-  static const int fsMask;
+  enum {
+    fsBump = _3dfsBump,
+    fsSimple = _3dfsSimple,
+    fsRaised = _3dfsRaised,
+    fsSunken = _3dfsSunken,
+    fsFlat = _3dfsFlat,
+    fsNone = _3dfsNone,
+    fsBevel = _3dfsBevel,
+    fsThick = _3dfsThick,
+    fsBitmap = _3dfsBitmap,
+    fsSmallRaised = _3dfsSmallRaised,
+    fsSmallSunken = _3dfsSmallSunken,
+    fsMask = _3dfsMask
+  };
 
   /// Creates a frame drawer.
   aws3DFrame ();
@@ -121,21 +137,5 @@ public:
   void SetBackgroundColor (int color);
   csRect GetInsets (int style);
 };
-
-/**
- * These are the frame styles supported by the 3d frame class and thus globally
- */
-const int _3dfsBump = 0;
-const int _3dfsSimple = 1;
-const int _3dfsRaised = 2;
-const int _3dfsSunken = 3;
-const int _3dfsFlat = 4;
-const int _3dfsNone = 5;
-const int _3dfsBevel = 6;
-const int _3dfsThick = 7;
-const int _3dfsBitmap = 8;
-const int _3dfsSmallRaised = 9;
-const int _3dfsSmallSunken = 10;
-const int _3dfsMask  = 0x1f;
 
 #endif // __CS_AWS_3DFRM_H__

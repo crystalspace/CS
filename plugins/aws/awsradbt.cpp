@@ -9,18 +9,6 @@
 
 #include <stdio.h>
 
-const int awsRadButton:: alignLeft = 0x0;
-const int awsRadButton:: alignRight = 0x1;
-const int awsRadButton:: alignCenter = 0x2;
-
-const int awsRadButton:: signalClicked   = 0x1;
-
-const int awsRadButton:: signalTurnedOff = 0x2;
-
-const int awsRadButton:: signalTurnedOn  = 0x3;
-
-const int awsRadButton:: signalFocused	 = 0x4;
-
 awsRadButton::awsRadButton () :
   is_down(false),
   mouse_is_over(false),
