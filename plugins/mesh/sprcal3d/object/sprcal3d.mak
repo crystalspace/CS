@@ -52,6 +52,7 @@ OUTDIRS += $(OUT.SPRCAL3D)
 MSVC.DSP += SPRCAL3D
 DSP.SPRCAL3D.NAME = sprcal3d
 DSP.SPRCAL3D.TYPE = plugin
+DSP.SPRCAL3D.LIBS = cal3d
 
 endif # ifeq ($(MAKESECTION),postdefines)
 

@@ -44,6 +44,8 @@ chronological order.
 	  from $(OUTDERIVED).  It was supposed to include only the one from
 	  $(OUTDERIVED).  Also simplified msvcgen special case; thus allowing
 	  removal of CSPYTHON_MSVC_EXCLUDE hack.
+	- res fixed sprcal3d.mak to include cal3d.lib in the generated VC 
+	  project.
 2-Feb-2004
 	- Eric Sunshine changed STREAMMAX and TEXTUREMAX constants in
 	  csXMLShaderCompiler::shaderPass from 'static const int' to 'enum'
