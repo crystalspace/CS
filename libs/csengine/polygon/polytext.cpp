@@ -231,8 +231,8 @@ static unsigned char *__mark;
 
 struct __rect
 {
-  float left, right;
-  float top, bottom;
+  int left, right;
+  int top, bottom;
 };
 
 static void (*__draw_func)(int, int, float);
@@ -275,8 +275,8 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
     max_depth = depth;
 
   // Calculate the complete are of visible rectangle
-  int height = QInt (visible.bottom - visible.top);
-  int width = QInt (visible.right - visible.left);
+  int height = visible.bottom - visible.top;
+  int width = visible.right - visible.left;
   int visarea = width * height;
 
   // Sanity check
@@ -302,7 +302,7 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
   {
     // this area is completely covered
 
-    int x = QInt (visible.left), y = QInt (visible.top);
+    int x = visible.left, y = visible.top;
     for (int i = 0 ; i < height; i++)
       for (int j = 0 ; j < width; j++)
         __draw_func (j + x, i + y, 1);
@@ -313,14 +313,14 @@ static void poly_fill (int n, csVector2 *p2d, __rect &visible)
 
   if (height == 1 && width == 1)
   {
-    __draw_func (QInt (visible.left), QInt (visible.top), a);
+    __draw_func (visible.left, visible.top, a);
 
     depth--;
     return;
   }
 
-  int sub_x = QInt (visible.left) + width / 2;
-  int sub_y = QInt (visible.top) + height / 2;
+  int sub_x = visible.left + width / 2;
+  int sub_y = visible.top + height / 2;
 
   // 0 -- horizontal
   // 1 -- vertical
@@ -691,7 +691,7 @@ void csPolyTexture::FillLightMap (csLightView& lview)
         if (dyn)
         {
           dl = NORMAL_LIGHT_LEVEL/light->GetRadius ();
-          l1 = l1 + QInt (lightness*QRound (cosinus * (NORMAL_LIGHT_LEVEL - d*dl)));
+          l1 = l1 + QInt (lightness * QRound (cosinus * (NORMAL_LIGHT_LEVEL - d*dl)));
           if (l1 > 255) l1 = 255;
           mapR[uv] = l1;
         }
@@ -701,19 +701,19 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 
           if (lview.r > 0)
           {
-            l1 = l1 + QInt (lightness*QRound (color.red * brightness));
+            l1 = l1 + QInt (lightness * QRound (color.red * brightness));
             if (l1 > 255) l1 = 255;
             mapR[uv] = l1;
           }
           if (lview.g > 0 && mapG)
           {
-            l2 = mapG[uv] + QInt (lightness*QRound (color.green * brightness));
+            l2 = mapG[uv] + QInt (lightness * QRound (color.green * brightness));
             if (l2 > 255) l2 = 255;
             mapG[uv] = l2;
           }
           if (lview.b > 0 && mapB)
           {
-            l3 = mapB[uv] + QInt (lightness*QRound (color.blue * brightness));
+            l3 = mapB[uv] + QInt (lightness * QRound (color.blue * brightness));
             if (l3 > 255) l3 = 255;
             mapB[uv] = l3;
           }
