@@ -24,6 +24,7 @@
 #include "gl2d_font.h"
 #include "iutil/event.h"
 #include "video/canvas/openglcommon/glstates.h"
+#include "video/canvas/openglcommon/glextmanager.h"
 
 class OpenGLTextureCache;
 class GLFontCache;
@@ -55,6 +56,10 @@ class csGraphics2DGLCommon : public csGraphics2D, public iEventPlug
   void setGLColorfromint (int color);
 
   uint8 *screen_shot;
+
+protected:
+  /// Extension manager
+  csGLExtensionManager ext;
 public:
   SCF_DECLARE_IBASE_EXT(csGraphics2D);
 

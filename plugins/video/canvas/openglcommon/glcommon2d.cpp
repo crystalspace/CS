@@ -103,6 +103,26 @@ bool csGraphics2DGLCommon::Open ()
       "Using %s mode at resolution %dx%d.",
   FullScreen ? "full screen" : "windowed", Width, Height);
 
+  ext.Open (object_reg);
+
+  if (version)
+  {
+    // initialize GL version pseudo-extensions
+    int n, vMajor, vMinor, vRelease;
+    n = sscanf (version, "%d.%d.%d", &vMajor, &vMinor, &vRelease);
+    if (n >= 2)
+    {
+      if ((vMajor >= 1) || ((vMajor == 1) && (vMinor >= 2)))
+      {
+	ext.InitGL_version_1_2 ();
+      }
+      if ((vMajor >= 1) || ((vMajor == 1) && (vMinor >= 3)))
+      {
+	ext.InitGL_version_1_3 ();
+      }
+    }
+  }
+
   glClearColor (0., 0., 0., 0.);
   glClearDepth (-1.0);
 
@@ -120,6 +140,7 @@ void csGraphics2DGLCommon::Close ()
   if (!is_open) return;
   delete FontCache;
   FontCache = NULL;
+  ext.Close ();
   csGraphics2D::Close ();
 }
 
@@ -587,6 +608,13 @@ bool csGraphics2DGLCommon::PerformExtensionV (char const* command, va_list args)
   {
     csGLStateCache** cache = va_arg (args, csGLStateCache**);
     *cache = statecache;
+    return true;
+  }
+  if (!strcasecmp (command, "getextmanager"))
+  {
+    csGLExtensionManager** extmgr = va_arg (args, csGLExtensionManager**);
+    *extmgr = &ext;
+    return true;
   }
   return false;
 }
@@ -608,3 +636,5 @@ bool csGraphics2DGLCommon::Resize (int width, int height)
   EventOutlet->Broadcast (cscmdContextResize, (iGraphics2D *)this);
   return true;
 }
+
+

@@ -287,85 +287,6 @@
       <ARG name="height" type="GLsizei" const="FALSE" pointer="FALSE" />
     </FUNCTION>
   </EXTENSION>
-  <EXTENSION name="GL_ARB_imaging" type="GL">
-    <TOKEN name="GL_CONSTANT_COLOR" value="32769" />
-    <TOKEN name="GL_ONE_MINUS_CONSTANT_COLOR" value="32770" />
-    <TOKEN name="GL_CONSTANT_ALPHA" value="32771" />
-    <TOKEN name="GL_ONE_MINUS_CONSTANT_ALPHA" value="32772" />
-    <TOKEN name="GL_BLEND_COLOR" value="32773" />
-    <TOKEN name="GL_FUNC_ADD" value="32774" />
-    <TOKEN name="GL_MIN" value="32775" />
-    <TOKEN name="GL_MAX" value="32776" />
-    <TOKEN name="GL_BLEND_EQUATION" value="32777" />
-    <TOKEN name="GL_FUNC_SUBTRACT" value="32778" />
-    <TOKEN name="GL_FUNC_REVERSE_SUBTRACT" value="32779" />
-    <TOKEN name="GL_CONVOLUTION_1D" value="32784" />
-    <TOKEN name="GL_CONVOLUTION_2D" value="32785" />
-    <TOKEN name="GL_SEPARABLE_2D" value="32786" />
-    <TOKEN name="GL_CONVOLUTION_BORDER_MODE" value="32787" />
-    <TOKEN name="GL_CONVOLUTION_FILTER_SCALE" value="32788" />
-    <TOKEN name="GL_CONVOLUTION_FILTER_BIAS" value="32789" />
-    <TOKEN name="GL_REDUCE" value="32790" />
-    <TOKEN name="GL_CONVOLUTION_FORMAT" value="32791" />
-    <TOKEN name="GL_CONVOLUTION_WIDTH" value="32792" />
-    <TOKEN name="GL_CONVOLUTION_HEIGHT" value="32793" />
-    <TOKEN name="GL_MAX_CONVOLUTION_WIDTH" value="32794" />
-    <TOKEN name="GL_MAX_CONVOLUTION_HEIGHT" value="32795" />
-    <TOKEN name="GL_POST_CONVOLUTION_RED_SCALE" value="32796" />
-    <TOKEN name="GL_POST_CONVOLUTION_GREEN_SCALE" value="32797" />
-    <TOKEN name="GL_POST_CONVOLUTION_BLUE_SCALE" value="32798" />
-    <TOKEN name="GL_POST_CONVOLUTION_ALPHA_SCALE" value="32799" />
-    <TOKEN name="GL_POST_CONVOLUTION_RED_BIAS" value="32800" />
-    <TOKEN name="GL_POST_CONVOLUTION_GREEN_BIAS" value="32801" />
-    <TOKEN name="GL_POST_CONVOLUTION_BLUE_BIAS" value="32802" />
-    <TOKEN name="GL_POST_CONVOLUTION_ALPHA_BIAS" value="32803" />
-    <TOKEN name="GL_HISTOGRAM" value="32804" />
-    <TOKEN name="GL_PROXY_HISTOGRAM" value="32805" />
-    <TOKEN name="GL_HISTOGRAM_WIDTH" value="32806" />
-    <TOKEN name="GL_HISTOGRAM_FORMAT" value="32807" />
-    <TOKEN name="GL_HISTOGRAM_RED_SIZE" value="32808" />
-    <TOKEN name="GL_HISTOGRAM_GREEN_SIZE" value="32809" />
-    <TOKEN name="GL_HISTOGRAM_BLUE_SIZE" value="32810" />
-    <TOKEN name="GL_HISTOGRAM_ALPHA_SIZE" value="32811" />
-    <TOKEN name="GL_HISTOGRAM_LUMINANCE_SIZE" value="32812" />
-    <TOKEN name="GL_HISTOGRAM_SINK" value="32813" />
-    <TOKEN name="GL_MINMAX" value="32814" />
-    <TOKEN name="GL_MINMAX_FORMAT" value="32815" />
-    <TOKEN name="GL_MINMAX_SINK" value="32816" />
-    <TOKEN name="GL_TABLE_TOO_LARGE" value="32817" />
-    <TOKEN name="GL_COLOR_MATRIX" value="32945" />
-    <TOKEN name="GL_COLOR_MATRIX_STACK_DEPTH" value="32946" />
-    <TOKEN name="GL_MAX_COLOR_MATRIX_STACK_DEPTH" value="32947" />
-    <TOKEN name="GL_POST_COLOR_MATRIX_RED_SCALE" value="32948" />
-    <TOKEN name="GL_POST_COLOR_MATRIX_GREEN_SCALE" value="32949" />
-    <TOKEN name="GL_POST_COLOR_MATRIX_BLUE_SCALE" value="32950" />
-    <TOKEN name="GL_POST_COLOR_MATRIX_ALPHA_SCALE" value="32951" />
-    <TOKEN name="GL_POST_COLOR_MATRIX_RED_BIAS" value="32952" />
-    <TOKEN name="GL_POST_COLOR_MATRIX_GREEN_BIAS" value="32953" />
-    <TOKEN name="GL_POST_COLOR_MATRIX_BLUE_BIAS" value="32954" />
-    <TOKEN name="GL_POST_COLOR_MATIX_ALPHA_BIAS" value="32955" />
-    <TOKEN name="GL_COLOR_TABLE" value="32976" />
-    <TOKEN name="GL_POST_CONVOLUTION_COLOR_TABLE" value="32977" />
-    <TOKEN name="GL_POST_COLOR_MATRIX_COLOR_TABLE" value="32978" />
-    <TOKEN name="GL_PROXY_COLOR_TABLE" value="32979" />
-    <TOKEN name="GL_PROXY_POST_CONVOLUTION_COLOR_TABLE" value="32980" />
-    <TOKEN name="GL_PROXY_POST_COLOR_MATRIX_COLOR_TABLE" value="32981" />
-    <TOKEN name="GL_COLOR_TABLE_SCALE" value="32982" />
-    <TOKEN name="GL_COLOR_TABLE_BIAS" value="32983" />
-    <TOKEN name="GL_COLOR_TABLE_FORMAT" value="32984" />
-    <TOKEN name="GL_COLOR_TABLE_WIDTH" value="32985" />
-    <TOKEN name="GL_COLOR_TABLE_RED_SIZE" value="32986" />
-    <TOKEN name="GL_COLOR_TABLE_GREEN_SIZE" value="32987" />
-    <TOKEN name="GL_COLOR_TABLE_BLUE_SIZE" value="32988" />
-    <TOKEN name="GL_COLOR_TABLE_ALPHA_SIZE" value="32989" />
-    <TOKEN name="GL_COLOR_TABLE_LUMINANCE_SIZE" value="32990" />
-    <TOKEN name="GL_COLOR_TABLE_INTENSITY_SIZE" value="32991" />
-    <TOKEN name="GL_IGNORE_BORDER" value="33104" />
-    <TOKEN name="GL_CONSTANT_BORDER" value="33105" />
-    <TOKEN name="GL_WRAP_BORDER" value="33106" />
-    <TOKEN name="GL_REPLICATE_BORDER" value="33107" />
-    <TOKEN name="GL_CONVOLUTION_BORDER_COLOR" value="33108" />
-  </EXTENSION>
   <EXTENSION name="GL_version_1_3" type="GL">
     <TOKEN name="GL_TEXTURE0" value="33984" />
     <TOKEN name="GL_TEXTURE1" value="33985" />
@@ -706,6 +627,85 @@
       <ARG name="level" type="GLint" const="FALSE" pointer="FALSE" />
       <ARG name="img" type="GLvoid" const="FALSE" pointer="TRUE" />
     </FUNCTION>
+  </EXTENSION>
+  <EXTENSION name="GL_ARB_imaging" type="GL">
+    <TOKEN name="GL_CONSTANT_COLOR" value="32769" />
+    <TOKEN name="GL_ONE_MINUS_CONSTANT_COLOR" value="32770" />
+    <TOKEN name="GL_CONSTANT_ALPHA" value="32771" />
+    <TOKEN name="GL_ONE_MINUS_CONSTANT_ALPHA" value="32772" />
+    <TOKEN name="GL_BLEND_COLOR" value="32773" />
+    <TOKEN name="GL_FUNC_ADD" value="32774" />
+    <TOKEN name="GL_MIN" value="32775" />
+    <TOKEN name="GL_MAX" value="32776" />
+    <TOKEN name="GL_BLEND_EQUATION" value="32777" />
+    <TOKEN name="GL_FUNC_SUBTRACT" value="32778" />
+    <TOKEN name="GL_FUNC_REVERSE_SUBTRACT" value="32779" />
+    <TOKEN name="GL_CONVOLUTION_1D" value="32784" />
+    <TOKEN name="GL_CONVOLUTION_2D" value="32785" />
+    <TOKEN name="GL_SEPARABLE_2D" value="32786" />
+    <TOKEN name="GL_CONVOLUTION_BORDER_MODE" value="32787" />
+    <TOKEN name="GL_CONVOLUTION_FILTER_SCALE" value="32788" />
+    <TOKEN name="GL_CONVOLUTION_FILTER_BIAS" value="32789" />
+    <TOKEN name="GL_REDUCE" value="32790" />
+    <TOKEN name="GL_CONVOLUTION_FORMAT" value="32791" />
+    <TOKEN name="GL_CONVOLUTION_WIDTH" value="32792" />
+    <TOKEN name="GL_CONVOLUTION_HEIGHT" value="32793" />
+    <TOKEN name="GL_MAX_CONVOLUTION_WIDTH" value="32794" />
+    <TOKEN name="GL_MAX_CONVOLUTION_HEIGHT" value="32795" />
+    <TOKEN name="GL_POST_CONVOLUTION_RED_SCALE" value="32796" />
+    <TOKEN name="GL_POST_CONVOLUTION_GREEN_SCALE" value="32797" />
+    <TOKEN name="GL_POST_CONVOLUTION_BLUE_SCALE" value="32798" />
+    <TOKEN name="GL_POST_CONVOLUTION_ALPHA_SCALE" value="32799" />
+    <TOKEN name="GL_POST_CONVOLUTION_RED_BIAS" value="32800" />
+    <TOKEN name="GL_POST_CONVOLUTION_GREEN_BIAS" value="32801" />
+    <TOKEN name="GL_POST_CONVOLUTION_BLUE_BIAS" value="32802" />
+    <TOKEN name="GL_POST_CONVOLUTION_ALPHA_BIAS" value="32803" />
+    <TOKEN name="GL_HISTOGRAM" value="32804" />
+    <TOKEN name="GL_PROXY_HISTOGRAM" value="32805" />
+    <TOKEN name="GL_HISTOGRAM_WIDTH" value="32806" />
+    <TOKEN name="GL_HISTOGRAM_FORMAT" value="32807" />
+    <TOKEN name="GL_HISTOGRAM_RED_SIZE" value="32808" />
+    <TOKEN name="GL_HISTOGRAM_GREEN_SIZE" value="32809" />
+    <TOKEN name="GL_HISTOGRAM_BLUE_SIZE" value="32810" />
+    <TOKEN name="GL_HISTOGRAM_ALPHA_SIZE" value="32811" />
+    <TOKEN name="GL_HISTOGRAM_LUMINANCE_SIZE" value="32812" />
+    <TOKEN name="GL_HISTOGRAM_SINK" value="32813" />
+    <TOKEN name="GL_MINMAX" value="32814" />
+    <TOKEN name="GL_MINMAX_FORMAT" value="32815" />
+    <TOKEN name="GL_MINMAX_SINK" value="32816" />
+    <TOKEN name="GL_TABLE_TOO_LARGE" value="32817" />
+    <TOKEN name="GL_COLOR_MATRIX" value="32945" />
+    <TOKEN name="GL_COLOR_MATRIX_STACK_DEPTH" value="32946" />
+    <TOKEN name="GL_MAX_COLOR_MATRIX_STACK_DEPTH" value="32947" />
+    <TOKEN name="GL_POST_COLOR_MATRIX_RED_SCALE" value="32948" />
+    <TOKEN name="GL_POST_COLOR_MATRIX_GREEN_SCALE" value="32949" />
+    <TOKEN name="GL_POST_COLOR_MATRIX_BLUE_SCALE" value="32950" />
+    <TOKEN name="GL_POST_COLOR_MATRIX_ALPHA_SCALE" value="32951" />
+    <TOKEN name="GL_POST_COLOR_MATRIX_RED_BIAS" value="32952" />
+    <TOKEN name="GL_POST_COLOR_MATRIX_GREEN_BIAS" value="32953" />
+    <TOKEN name="GL_POST_COLOR_MATRIX_BLUE_BIAS" value="32954" />
+    <TOKEN name="GL_POST_COLOR_MATIX_ALPHA_BIAS" value="32955" />
+    <TOKEN name="GL_COLOR_TABLE" value="32976" />
+    <TOKEN name="GL_POST_CONVOLUTION_COLOR_TABLE" value="32977" />
+    <TOKEN name="GL_POST_COLOR_MATRIX_COLOR_TABLE" value="32978" />
+    <TOKEN name="GL_PROXY_COLOR_TABLE" value="32979" />
+    <TOKEN name="GL_PROXY_POST_CONVOLUTION_COLOR_TABLE" value="32980" />
+    <TOKEN name="GL_PROXY_POST_COLOR_MATRIX_COLOR_TABLE" value="32981" />
+    <TOKEN name="GL_COLOR_TABLE_SCALE" value="32982" />
+    <TOKEN name="GL_COLOR_TABLE_BIAS" value="32983" />
+    <TOKEN name="GL_COLOR_TABLE_FORMAT" value="32984" />
+    <TOKEN name="GL_COLOR_TABLE_WIDTH" value="32985" />
+    <TOKEN name="GL_COLOR_TABLE_RED_SIZE" value="32986" />
+    <TOKEN name="GL_COLOR_TABLE_GREEN_SIZE" value="32987" />
+    <TOKEN name="GL_COLOR_TABLE_BLUE_SIZE" value="32988" />
+    <TOKEN name="GL_COLOR_TABLE_ALPHA_SIZE" value="32989" />
+    <TOKEN name="GL_COLOR_TABLE_LUMINANCE_SIZE" value="32990" />
+    <TOKEN name="GL_COLOR_TABLE_INTENSITY_SIZE" value="32991" />
+    <TOKEN name="GL_IGNORE_BORDER" value="33104" />
+    <TOKEN name="GL_CONSTANT_BORDER" value="33105" />
+    <TOKEN name="GL_WRAP_BORDER" value="33106" />
+    <TOKEN name="GL_REPLICATE_BORDER" value="33107" />
+    <TOKEN name="GL_CONVOLUTION_BORDER_COLOR" value="33108" />
   </EXTENSION>
   <EXTENSION name="GL_ARB_multitexture" type="GL">
     <TOKEN name="GL_TEXTURE0_ARB" value="33984" />

@@ -122,17 +122,10 @@ protected:
   bool hardwareAccelerated;
 
   /**
-   * try to get wglGetExtensionsStringARB() and retrieve the extensions 
-   * string
+   * Call the extension manager's InitializeExtension on all used
+   * WGL exts.
    */
   void CheckWGLExtensions ();
-
-  /// WGL_EXT_swap_control present?
-  bool HasWGL_EXT_swap_control;
-  /// Enable/disable VSYNC
-  csPFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
-  /// retrieve VSYNC status
-  csPFNWGLGETSWAPINTERVALEXTPROC wglGetSwapIntervalEXT;
 };
 
 #endif // __CS_OGLG2D_H__

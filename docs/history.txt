@@ -42,6 +42,15 @@ The history order is reversed so that new features are at the top.
 	      assumptions of the macros in the Perl API.
 	    - Fixed the incorrectly-defined function prototype of the xs_init
 	      function, which only worked by chance before 5.8.
+	- res made the following changes to the script-generated extension 
+	  manager (from scripts/python):
+	    - extension to be used now must be explicitly requested via 
+	      Init<ext> () (e.g. InitGL_ARB_multitexture ())
+	    - only check once for every extension
+	    - emit names of functions not found
+	    - use of extensions can be enabled/disabled via config.
+	- res changed the OpenGL canvases to use the extension manager (to ease
+	  use of OpenGL extensions)
 27-Apr-2003
 	- Philip Wyett fixed the DDS plugin compilation under MSVC, by
 	  replacing struct with static (don't ask) and giving the the array an
