@@ -55,7 +55,7 @@ void DrawZbuffer ()
   {
     int gi_pixelbytes = System->G2D->GetPixelBytes ();
 
-    uint32 *zbuf = (uint32*)Gfx3D->GetZBuffAt (0, y);
+    uint32 *zbuf = Gfx3D->GetZBuffAt (0, y);
 
     if (zbuf)
       if (gi_pixelbytes == 4)
