@@ -440,14 +440,14 @@ bool csCoverageBuffer::DrawPolygon (csVector2* verts, int num_verts,
   int xa[128], ya[128];
   int top_vt = 0;
   int bot_vt = 0;
-  xa[0] = QInt (verts[0].x);
-  ya[0] = QInt (verts[0].y);
+  xa[0] = QRound (verts[0].x);
+  ya[0] = QRound (verts[0].y);
   bbox.minx = bbox.maxx = xa[0];
   bbox.miny = bbox.maxy = ya[0];
   for (i = 1 ; i < num_verts ; i++)
   {
-    xa[i] = QInt (verts[i].x);
-    ya[i] = QInt (verts[i].y);
+    xa[i] = QRound (verts[i].x);
+    ya[i] = QRound (verts[i].y);
 
     if (xa[i] < bbox.minx) bbox.minx = xa[i];
     else if (xa[i] > bbox.maxx) bbox.maxx = xa[i];
@@ -541,7 +541,7 @@ bool csCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
 	float max_depth, bool negative)
 {
   csBox2Int bbox;
-  if (!DrawPolygon (verts, num_verts, bbox, 1))
+  if (!DrawPolygon (verts, num_verts, bbox, 0/*1*/)) //@@@ Shift?
     return false;
 
   // In this routine we render the polygon to the polygon buffer
@@ -594,7 +594,8 @@ bool csCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
     {
       first ^= *buf++;
       uint32 sb = *scr_buf;
-      if ((~sb) & first)
+      uint32 mod_mask = (~sb) & first;	// Which bits are modified.
+      if (mod_mask)
       {
         mod = true;
 	sb |= first;
@@ -602,8 +603,16 @@ bool csCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
 	if (!~sb) pc--;
 	//@@@ Optimize
 	depth_buf = &depth_buffer[(i<<(w_shift-2)) + (x>>2)];
-	if (max_depth > *depth_buf)
-	  *depth_buf = max_depth;
+	if ((mod_mask & 0xff) && max_depth > *depth_buf) *depth_buf = max_depth;
+	mod_mask >>= 8;
+        depth_buf += width_po2 >> 3;
+	if ((mod_mask & 0xff) && max_depth > *depth_buf) *depth_buf = max_depth;
+	mod_mask >>= 8;
+        depth_buf += width_po2 >> 3;
+	if ((mod_mask & 0xff) && max_depth > *depth_buf) *depth_buf = max_depth;
+	mod_mask >>= 8;
+        depth_buf += width_po2 >> 3;
+	if ((mod_mask & 0xff) && max_depth > *depth_buf) *depth_buf = max_depth;
       }
       else
       {
@@ -638,27 +647,58 @@ bool csCoverageBuffer::TestPolygon (csVector2* verts, int num_verts,
   
   for (i = startrow ; i <= endrow ; i++)
   {
-    if (!partcols[i])
-      continue;
-
     int buf_idx = (i<<w_shift) + startcol;
     buf = &buffer[buf_idx];
-    scr_buf = &scr_buffer[buf_idx];
 
     uint32 first = 0;
+    if (!partcols[i])
+    {
+      // If this row is totally full we only have to check
+      // the depth buffer.
+      for (x = startcol ; x <= endcol ; x++)
+      {
+        first ^= *buf++;
+	//@@@ Optimize
+	uint32 f = first;	// Only test where our polygon is rendering.
+	depth_buf = &depth_buffer[(i<<(w_shift-2)) + (x>>2)];
+	if ((f & 0xff) && min_depth <= *depth_buf) return true;
+	f >>= 8;
+        depth_buf += width_po2 >> 3;
+	if ((f & 0xff) && min_depth <= *depth_buf) return true;
+	f >>= 8;
+        depth_buf += width_po2 >> 3;
+	if ((f & 0xff) && min_depth <= *depth_buf) return true;
+	f >>= 8;
+        depth_buf += width_po2 >> 3;
+	if ((f & 0xff) && min_depth <= *depth_buf) return true;
+      }
+      continue;
+    }
+
+    scr_buf = &scr_buffer[buf_idx];
     for (x = startcol ; x <= endcol ; x++)
     {
       first ^= *buf++;
-      if ((~*scr_buf) & first)
+      uint32 empty_mask = (~*scr_buf) & first;
+      if (empty_mask)
       {
         return true;
       }
       else
       {
 	//@@@ Optimize
+	uint32 f = first;	// Only test where our polygon is rendering.
 	depth_buf = &depth_buffer[(i<<(w_shift-2)) + (x>>2)];
-	if (min_depth <= *depth_buf)
-	  return true;
+	if ((f & 0xff) && min_depth <= *depth_buf) return true;
+	f >>= 8;
+        depth_buf += width_po2 >> 3;
+	if ((f & 0xff) && min_depth <= *depth_buf) return true;
+	f >>= 8;
+        depth_buf += width_po2 >> 3;
+	if ((f & 0xff) && min_depth <= *depth_buf) return true;
+	f >>= 8;
+        depth_buf += width_po2 >> 3;
+	if ((f & 0xff) && min_depth <= *depth_buf) return true;
       }
       scr_buf++;
     }
@@ -666,13 +706,50 @@ bool csCoverageBuffer::TestPolygon (csVector2* verts, int num_verts,
   return false;
 }
 
+static uint32 keep_masks[33] =
+{
+  0xffffffff,
+  0xfffffffe,
+  0xfffffffc,
+  0xfffffff8,
+  0xfffffff0,
+  0xffffffe0,
+  0xffffffc0,
+  0xffffff80,
+  0xffffff00,
+  0xfffffe00,
+  0xfffffc00,
+  0xfffff800,
+  0xfffff000,
+  0xffffe000,
+  0xffffc000,
+  0xffff8000,
+  0xffff0000,
+  0xfffe0000,
+  0xfffc0000,
+  0xfff80000,
+  0xfff00000,
+  0xffe00000,
+  0xffc00000,
+  0xff800000,
+  0xff000000,
+  0xfe000000,
+  0xfc000000,
+  0xf8000000,
+  0xf0000000,
+  0xe0000000,
+  0xc0000000,
+  0x80000000,
+  0x00000000
+};
+
 bool csCoverageBuffer::TestRectangle (const csBox2& rect, float min_depth)
 {
   csBox2Int bbox;
-  bbox.minx = QInt (rect.MinX ());
-  bbox.miny = QInt (rect.MinY ());
-  bbox.maxx = QInt (rect.MaxX ());
-  bbox.maxy = QInt (rect.MaxY ());
+  bbox.minx = QRound (rect.MinX ());
+  bbox.miny = QRound (rect.MinY ());
+  bbox.maxx = QRound (rect.MaxX ());
+  bbox.maxy = QRound (rect.MaxY ());
 
   if (bbox.maxx < 0) return false;
   if (bbox.maxy < 0) return false;
@@ -694,21 +771,41 @@ bool csCoverageBuffer::TestRectangle (const csBox2& rect, float min_depth)
   
   for (i = startrow ; i <= endrow ; i++)
   {
-    if (!partcols[i])
-      continue;
-
-    int buf_idx = (i<<w_shift) + startcol;
-    scr_buf = &scr_buffer[buf_idx];
-
     uint32 first = ~0;
-    if (i == startcol)
+    if (i == startrow)
     {
-      //@@@ MASK
+      first &= keep_masks[bbox.miny & 0x1f];
     }
     if (i == endrow)
     {
-      //@@@ MASK
+      first &= ~keep_masks[(bbox.maxy & 0x1f)+1];
     }
+
+    if (!partcols[i])
+    {
+      // If this row is totally full we only have to check
+      // the depth buffer.
+      for (x = startcol ; x <= endcol ; x++)
+      {
+	//@@@ Optimize
+	uint32 f = first;	// Only test where our rectangle is rendering.
+	depth_buf = &depth_buffer[(i<<(w_shift-2)) + (x>>2)];
+	if ((f & 0xff) && min_depth <= *depth_buf) return true;
+	f >>= 8;
+        depth_buf += width_po2 >> 3;
+	if ((f & 0xff) && min_depth <= *depth_buf) return true;
+	f >>= 8;
+        depth_buf += width_po2 >> 3;
+	if ((f & 0xff) && min_depth <= *depth_buf) return true;
+	f >>= 8;
+        depth_buf += width_po2 >> 3;
+	if ((f & 0xff) && min_depth <= *depth_buf) return true;
+      }
+      continue;
+    }
+
+    int buf_idx = (i<<w_shift) + startcol;
+    scr_buf = &scr_buffer[buf_idx];
 
     for (x = startcol ; x <= endcol ; x++)
     {
@@ -719,12 +816,88 @@ bool csCoverageBuffer::TestRectangle (const csBox2& rect, float min_depth)
       else
       {
 	//@@@ Optimize
+	uint32 f = first;	// Only test where our polygon is rendering.
 	depth_buf = &depth_buffer[(i<<(w_shift-2)) + (x>>2)];
-	if (min_depth <= *depth_buf)
-	  return true;
+	if ((f & 0xff) && min_depth <= *depth_buf) return true;
+	f >>= 8;
+        depth_buf += width_po2 >> 3;
+	if ((f & 0xff) && min_depth <= *depth_buf) return true;
+	f >>= 8;
+        depth_buf += width_po2 >> 3;
+	if ((f & 0xff) && min_depth <= *depth_buf) return true;
+	f >>= 8;
+        depth_buf += width_po2 >> 3;
+	if ((f & 0xff) && min_depth <= *depth_buf) return true;
       }
       scr_buf++;
     }
+  }
+  return false;
+}
+
+bool csCoverageBuffer::TestPoint (const csVector2& point, float min_depth)
+{
+  int xi, yi;
+  xi = QRound (point.x);
+  yi = QRound (point.y);
+
+  if (xi < 0) return false;
+  if (yi < 0) return false;
+  if (xi >= width) return false;
+  if (yi >= height) return false;
+
+  uint32* scr_buf;
+  float* depth_buf;
+
+  int row = yi >> 5;
+  int col = xi;
+  
+  uint32 first = ~0;
+  first &= keep_masks[yi & 0x1f];
+  first &= ~(first<<1);	// Make sure only one bit is selected.
+  //first &= ~keep_masks[(yi & 0x1f)+1];
+  if (!partcols[row])
+  {
+    // If this row is totally full we only have to check
+    // the depth buffer.
+    //@@@ Optimize
+    uint32 f = first;	// Only test where our rectangle is rendering.
+    depth_buf = &depth_buffer[(row<<(w_shift-2)) + (col>>2)];
+    if ((f & 0xff) && min_depth <= *depth_buf) return true;
+    f >>= 8;
+    depth_buf += width_po2 >> 3;
+    if ((f & 0xff) && min_depth <= *depth_buf) return true;
+    f >>= 8;
+    depth_buf += width_po2 >> 3;
+    if ((f & 0xff) && min_depth <= *depth_buf) return true;
+    f >>= 8;
+    depth_buf += width_po2 >> 3;
+    if ((f & 0xff) && min_depth <= *depth_buf) return true;
+    return false;
+  }
+
+  int buf_idx = (row<<w_shift) + col;
+  scr_buf = &scr_buffer[buf_idx];
+
+  if ((~*scr_buf) & first)
+  {
+    return true;
+  }
+  else
+  {
+    //@@@ Optimize
+    uint32 f = first;	// Only test where our point is rendering.
+    depth_buf = &depth_buffer[(row<<(w_shift-2)) + (col>>2)];
+    if ((f & 0xff) && min_depth <= *depth_buf) return true;
+    f >>= 8;
+    depth_buf += width_po2 >> 3;
+    if ((f & 0xff) && min_depth <= *depth_buf) return true;
+    f >>= 8;
+    depth_buf += width_po2 >> 3;
+    if ((f & 0xff) && min_depth <= *depth_buf) return true;
+    f >>= 8;
+    depth_buf += width_po2 >> 3;
+    if ((f & 0xff) && min_depth <= *depth_buf) return true;
   }
   return false;
 }
@@ -845,151 +1018,295 @@ bool csCoverageBuffer::Debug_TestOneIteration (csString& str)
   poly[0].Set (-100, -100);
   poly[1].Set (7, 7);
   poly[2].Set (-100, -40);
-  COV_ASSERT (TestPolygon (poly, 3, 1.0) == true, t1);
+  COV_ASSERT (TestPolygon (poly, 3, 1.0) == true, t);
   poly[0].Set (1, 1);
   poly[1].Set (3, 1);
   poly[2].Set (2, 3);
-  COV_ASSERT (TestPolygon (poly, 3, 1.0) == false, t2);
+  COV_ASSERT (TestPolygon (poly, 3, 1.0) == false, t);
   poly[0].Set (633, 472);
   poly[1].Set (638, 475);
   poly[2].Set (635, 478);
-  COV_ASSERT (TestPolygon (poly, 3, 1.0) == true, t3);
+  COV_ASSERT (TestPolygon (poly, 3, 1.0) == true, t);
   poly[0].Set (100, 100);
   poly[1].Set (150, 101);
   poly[2].Set (150, 101);
   poly[3].Set (100, 105);
-  COV_ASSERT (TestPolygon (poly, 4, 1.0) == true, t4);
+  COV_ASSERT (TestPolygon (poly, 4, 1.0) == true, t);
   poly[0].Set (100, 0);
   poly[1].Set (150, 1);
   poly[2].Set (150, 1);
   poly[3].Set (100, 4);
-  COV_ASSERT (TestPolygon (poly, 4, 1.0) == false, t5);
+  COV_ASSERT (TestPolygon (poly, 4, 1.0) == false, t);
   poly[0].Set (160, 120);
   poly[1].Set (80, 240);
   poly[2].Set (160, 360);
   poly[3].Set (240, 240);
-  COV_ASSERT (InsertPolygon (poly, 4, 0.0) == true, i6);
+  COV_ASSERT (InsertPolygon (poly, 4, 0.0) == true, i);
   poly[0].Set (240, 120);
   poly[1].Set (320, 240);
   poly[2].Set (240, 360);
   poly[3].Set (160, 240);
-  COV_ASSERT (InsertPolygon (poly, 4, 0.0) == true, i7);
+  COV_ASSERT (InsertPolygon (poly, 4, 0.0) == true, i);
   poly[0].Set (330, 240);
   poly[1].Set (340, 241);
   poly[2].Set (339, 249);
   poly[3].Set (331, 248);
-  COV_ASSERT (TestPolygon (poly, 4, 1.0) == true, t8);
+  COV_ASSERT (TestPolygon (poly, 4, 1.0) == true, t);
   poly[0].Set (150, 230);
   poly[1].Set (250, 230);
   poly[2].Set (250, 250);
   poly[3].Set (150, 250);
-  COV_ASSERT (InsertPolygon (poly, 4, 0.0) == false, i9);
+  COV_ASSERT (InsertPolygon (poly, 4, 0.0) == false, i);
   poly[0].Set (160, 120);
   poly[1].Set (240, 120);
   poly[2].Set (320, 240);
   poly[3].Set (240, 360);
   poly[4].Set (160, 360);
-  COV_ASSERT (InsertPolygon (poly, 5, 0.0) == true, i10);
+  COV_ASSERT (InsertPolygon (poly, 5, 0.0) == true, i);
   poly[0].Set (330, 240);
   poly[1].Set (340, 241);
   poly[2].Set (339, 249);
   poly[3].Set (331, 248);
-  COV_ASSERT (TestPolygon (poly, 4, 1.0) == true, t11);
+  COV_ASSERT (TestPolygon (poly, 4, 1.0) == true, t);
   poly[0].Set (400, -200);
   poly[1].Set (410, -200);
   poly[2].Set (410, 1000);
   poly[3].Set (400, 1000);
-  COV_ASSERT (InsertPolygon (poly, 4, 0.0) == true, i12);
+  COV_ASSERT (InsertPolygon (poly, 4, 0.0) == true, i);
   poly[0].Set (420, -200);
   poly[1].Set (430, -200);
   poly[2].Set (430, 1000);
   poly[3].Set (420, 1000);
-  COV_ASSERT (InsertPolygon (poly, 4, 0.0) == true, i13);
+  COV_ASSERT (InsertPolygon (poly, 4, 0.0) == true, i);
   poly[0].Set (410, -200);
   poly[1].Set (420, -200);
   poly[2].Set (420, 1000);
   poly[3].Set (410, 1000);
-  COV_ASSERT (TestPolygon (poly, 4, 1.0) == true, t14);
+  COV_ASSERT (TestPolygon (poly, 4, 1.0) == true, t);
   poly[0].Set (410, -200);
   poly[1].Set (420, -200);
   poly[2].Set (420, 1000);
   poly[3].Set (410, 1000);
-  COV_ASSERT (InsertPolygon (poly, 4, 0.0) == true, i15);
+  COV_ASSERT (InsertPolygon (poly, 4, 0.0) == true, i);
   poly[0].Set (410, -200);
   poly[1].Set (420, -200);
   poly[2].Set (420, 1000);
   poly[3].Set (410, 1000);
-  COV_ASSERT (TestPolygon (poly, 4, 1.0) == false, t16);
+  COV_ASSERT (TestPolygon (poly, 4, 1.0) == false, t);
   COV_ASSERT (IsFull () == false, f17);
   poly[0].Set (-10000, -10000);
   poly[1].Set (10000, -10000);
   poly[2].Set (10000, 10000);
   poly[3].Set (-100000, 10000);
-  COV_ASSERT (TestPolygon (poly, 4, 1.0) == true, t17);
+  COV_ASSERT (TestPolygon (poly, 4, 1.0) == true, t);
   poly[0].Set (0, 0);
   poly[1].Set (640, 0);
   poly[2].Set (640, 120);
   poly[3].Set (0, 120);
-  COV_ASSERT (InsertPolygon (poly, 4, 0.0) == true, i18);
+  COV_ASSERT (InsertPolygon (poly, 4, 0.0) == true, i);
   poly[0].Set (0, 120);
   poly[1].Set (640, 120);
   poly[2].Set (640, 240);
   poly[3].Set (0, 240);
-  COV_ASSERT (InsertPolygon (poly, 4, 0.0) == true, i19);
+  COV_ASSERT (InsertPolygon (poly, 4, 0.0) == true, i);
   poly[0].Set (0, 240);
   poly[1].Set (640, 240);
   poly[2].Set (640, 360);
   poly[3].Set (0, 360);
-  COV_ASSERT (InsertPolygon (poly, 4, 0.0) == true, i20);
+  COV_ASSERT (InsertPolygon (poly, 4, 0.0) == true, i);
   COV_ASSERT (IsFull () == false, f21);
   poly[0].Set (0, 360);
   poly[1].Set (640, 360);
   poly[2].Set (640, 480);
   poly[3].Set (0, 480);
-  COV_ASSERT (InsertPolygon (poly, 4, 0.0) == true, i22);
+  COV_ASSERT (InsertPolygon (poly, 4, 0.0) == true, i);
   COV_ASSERT (IsFull () == true, f23);
   poly[0].Set (-10000, -10000);
   poly[1].Set (10000, -10000);
   poly[2].Set (10000, 10000);
   poly[3].Set (-100000, 10000);
-  COV_ASSERT (TestPolygon (poly, 4, 1.0) == false, t24);
+  COV_ASSERT (TestPolygon (poly, 4, 1.0) == false, t);
   poly[0].Set (330, 240);
   poly[1].Set (340, 241);
   poly[2].Set (339, 249);
   poly[3].Set (331, 248);
-  COV_ASSERT (TestPolygon (poly, 4, 1.0) == false, t25);
+  COV_ASSERT (TestPolygon (poly, 4, 1.0) == false, t);
 
   //============================
   // This part tests the depth buffer part as well.
   //============================
   Initialize ();
+  csBox2 bbox;
   poly[0].Set (160, 120);
   poly[1].Set (320, 120);
   poly[2].Set (320, 240);
   poly[3].Set (160, 240);
-  COV_ASSERT (InsertPolygon (poly, 4, 10.0) == true, i26);
+  COV_ASSERT (InsertPolygon (poly, 4, 10.0) == true, i);
   poly[0].Set (240, 180);
   poly[1].Set (380, 180);
   poly[2].Set (380, 300);
   poly[3].Set (240, 300);
-  COV_ASSERT (InsertPolygon (poly, 4, 20.0) == true, i27);
+  COV_ASSERT (InsertPolygon (poly, 4, 20.0) == true, i);
+
   poly[0].Set (170, 170);
   poly[1].Set (180, 170);
   poly[2].Set (180, 180);
-  COV_ASSERT (TestPolygon (poly, 3, 9.0) == true, t28);
-  COV_ASSERT (TestPolygon (poly, 3, 11.0) == false, t29);
+  COV_ASSERT (TestPolygon (poly, 3, 9.0) == true, t);
+  COV_ASSERT (TestPolygon (poly, 3, 11.0) == false, t);
+  bbox.Set (170, 170, 180, 180);
+  COV_ASSERT (TestRectangle (bbox, 9.0) == true, b);
+  COV_ASSERT (TestRectangle (bbox, 11.0) == false, b);
+
   poly[0].Set (235, 175);
   poly[1].Set (245, 180);
   poly[2].Set (240, 190);
-  COV_ASSERT (TestPolygon (poly, 3, 9.0) == true, t30);
-  COV_ASSERT (TestPolygon (poly, 3, 15.0) == false, t31);
-  COV_ASSERT (TestPolygon (poly, 3, 25.0) == false, t32);
+  COV_ASSERT (TestPolygon (poly, 3, 9.0) == true, t);
+  COV_ASSERT (TestPolygon (poly, 3, 15.0) == false, t);
+  COV_ASSERT (TestPolygon (poly, 3, 25.0) == false, t);
+  bbox.Set (235, 175, 245, 190);
+  COV_ASSERT (TestRectangle (bbox, 9.0) == true, b);
+  COV_ASSERT (TestRectangle (bbox, 15.0) == false, b);
+  COV_ASSERT (TestRectangle (bbox, 25.0) == false, b);
+  bbox.Set (235, 189, 245, 190);
+  COV_ASSERT (TestRectangle (bbox, 9.0) == true, b);
+  COV_ASSERT (TestRectangle (bbox, 15.0) == false, b);
+  COV_ASSERT (TestRectangle (bbox, 25.0) == false, b);
+  bbox.Set (235, 190, 245, 191);
+  COV_ASSERT (TestRectangle (bbox, 9.0) == true, b);
+  COV_ASSERT (TestRectangle (bbox, 15.0) == false, b);
+  COV_ASSERT (TestRectangle (bbox, 25.0) == false, b);
+  bbox.Set (235, 191, 245, 192);
+  COV_ASSERT (TestRectangle (bbox, 9.0) == true, b);
+  COV_ASSERT (TestRectangle (bbox, 15.0) == false, b);
+  COV_ASSERT (TestRectangle (bbox, 25.0) == false, b);
+  bbox.Set (235, 192, 245, 193);
+  COV_ASSERT (TestRectangle (bbox, 9.0) == true, b);
+  COV_ASSERT (TestRectangle (bbox, 15.0) == false, b);
+  COV_ASSERT (TestRectangle (bbox, 25.0) == false, b);
+  bbox.Set (235, 193, 245, 194);
+  COV_ASSERT (TestRectangle (bbox, 9.0) == true, b);
+  COV_ASSERT (TestRectangle (bbox, 15.0) == false, b);
+  COV_ASSERT (TestRectangle (bbox, 25.0) == false, b);
+
   poly[0].Set (315, 235);
   poly[1].Set (325, 234);
   poly[2].Set (314, 250);
-  COV_ASSERT (TestPolygon (poly, 3, 9.0) == true, t33);
-  COV_ASSERT (TestPolygon (poly, 3, 15.0) == true, t34);
-  COV_ASSERT (TestPolygon (poly, 3, 25.0) == false, t35);
+  COV_ASSERT (TestPolygon (poly, 3, 9.0) == true, t);
+  COV_ASSERT (TestPolygon (poly, 3, 15.0) == true, t);
+  COV_ASSERT (TestPolygon (poly, 3, 25.0) == false, t);
+  poly[0].Set (315, 130);
+  poly[1].Set (318, 240);
+  poly[2].Set (314, 290);
+  COV_ASSERT (TestPolygon (poly, 3, 9.0) == true, t);
+  COV_ASSERT (TestPolygon (poly, 3, 15.0) == true, t);
+  COV_ASSERT (TestPolygon (poly, 3, 25.0) == false, t);
+  poly[0].Set (-100, 140);
+  poly[1].Set (1000, 140);
+  poly[2].Set (1000, 370);
+  poly[3].Set (-100, 370);
+  COV_ASSERT (InsertPolygon (poly, 4, 25.0) == true, i);
+  poly[0].Set (170, 125);
+  poly[1].Set (180, 125);
+  poly[2].Set (175, 130);
+  COV_ASSERT (TestPolygon (poly, 3, 9.0) == true, t);
+  COV_ASSERT (TestPolygon (poly, 3, 11.0) == false, t);
+  poly[0].Set (170, 135);
+  poly[1].Set (180, 135);
+  poly[2].Set (175, 145);
+  COV_ASSERT (TestPolygon (poly, 3, 9.0) == true, t);
+  COV_ASSERT (TestPolygon (poly, 3, 11.0) == false, t);
+  COV_ASSERT (TestPolygon (poly, 3, 30.0) == false, t);
+  poly[0].Set (10, 200);
+  poly[1].Set (50, 220);
+  poly[2].Set (30, 300);
+  COV_ASSERT (TestPolygon (poly, 3, 9.0) == true, t);
+  COV_ASSERT (TestPolygon (poly, 3, 30.0) == false, t);
+  poly[0].Set (5, 150);
+  poly[1].Set (150, 150);
+  poly[2].Set (150, 360);
+  poly[3].Set (5, 360);
+  COV_ASSERT (InsertPolygon (poly, 4, 100.0) == false, i);
+  poly[0].Set (10, 200);
+  poly[1].Set (50, 220);
+  poly[2].Set (30, 300);
+  COV_ASSERT (TestPolygon (poly, 3, 9.0) == true, t);
+  COV_ASSERT (TestPolygon (poly, 3, 30.0) == false, t);
+
+  // The following routine tests if TestRectangle and InsertPolygon
+  // correctly match with each other at various locations.
+  int x, y;
+  for (x = 90 ; x <= 110 ; x++)
+    for (y = 90 ; y <= 110 ; y++)
+    {
+      Initialize ();
+      poly[0].Set (x, y);
+      poly[1].Set (x+20, y);
+      poly[2].Set (x+20, y+10);
+      poly[3].Set (x, y+10);
+      COV_ASSERT (InsertPolygon (poly, 4, 10.0) == true, i);
+
+      // First test an approaching object from above.
+      bbox.Set (x+5, y-2, x+15, y-1);
+      COV_ASSERT (TestRectangle (bbox, 9.0) == true, b);
+      COV_ASSERT (TestRectangle (bbox, 11.0) == true, b);
+      bbox.Set (x+5, y-1, x+15, y);
+      COV_ASSERT (TestRectangle (bbox, 9.0) == true, b);
+      COV_ASSERT (TestRectangle (bbox, 11.0) == true, b);
+      bbox.Set (x+5, y, x+15, y+1);
+      COV_ASSERT (TestRectangle (bbox, 9.0) == true, b);
+      COV_ASSERT (TestRectangle (bbox, 11.0) == false, b);
+      bbox.Set (x+5, y+1, x+15, y+2);
+      COV_ASSERT (TestRectangle (bbox, 9.0) == true, b);
+      COV_ASSERT (TestRectangle (bbox, 11.0) == false, b);
+      COV_ASSERT (TestPoint (csVector2 (x+5, y-1), 9.0) == true, p);
+      COV_ASSERT (TestPoint (csVector2 (x+5, y-1), 11.0) == true, p);
+      COV_ASSERT (TestPoint (csVector2 (x+5, y), 9.0) == true, p);
+      COV_ASSERT (TestPoint (csVector2 (x+5, y), 11.0) == false, p);
+      COV_ASSERT (TestPoint (csVector2 (x+5, y+1), 9.0) == true, p);
+      COV_ASSERT (TestPoint (csVector2 (x+5, y+1), 11.0) == false, p);
+
+      // Then test an approaching object from below.
+      bbox.Set (x+5, y+10, x+15, y+11);
+      COV_ASSERT (TestRectangle (bbox, 9.0) == true, b);
+      COV_ASSERT (TestRectangle (bbox, 11.0) == true, b);
+      bbox.Set (x+5, y+9, x+15, y+10);
+      COV_ASSERT (TestRectangle (bbox, 9.0) == true, b);
+      COV_ASSERT (TestRectangle (bbox, 11.0) == false, b);
+      COV_ASSERT (TestPoint (csVector2 (x+5, y+11), 9.0) == true, p);
+      COV_ASSERT (TestPoint (csVector2 (x+5, y+11), 11.0) == true, p);
+      COV_ASSERT (TestPoint (csVector2 (x+5, y+10), 9.0) == true, p);
+      COV_ASSERT (TestPoint (csVector2 (x+5, y+10), 11.0) == false, p);
+      COV_ASSERT (TestPoint (csVector2 (x+5, y+9), 9.0) == true, p);
+      COV_ASSERT (TestPoint (csVector2 (x+5, y+9), 11.0) == false, p);
+
+      // Then test an approaching object from the left.
+      bbox.Set (x-1, y+1, x, y+2);
+      COV_ASSERT (TestRectangle (bbox, 9.0) == true, b);
+      COV_ASSERT (TestRectangle (bbox, 11.0) == true, b);
+      bbox.Set (x, y+1, x+1, y+2);
+      COV_ASSERT (TestRectangle (bbox, 9.0) == true, b);
+      COV_ASSERT (TestRectangle (bbox, 11.0) == false, b);
+      COV_ASSERT (TestPoint (csVector2 (x-1, y+3), 9.0) == true, p);
+      COV_ASSERT (TestPoint (csVector2 (x-1, y+3), 11.0) == true, p);
+      COV_ASSERT (TestPoint (csVector2 (x, y+3), 9.0) == true, p);
+      COV_ASSERT (TestPoint (csVector2 (x, y+3), 11.0) == false, p);
+      COV_ASSERT (TestPoint (csVector2 (x+1, y+3), 9.0) == true, p);
+      COV_ASSERT (TestPoint (csVector2 (x+1, y+3), 11.0) == false, p);
+
+      // Then test an approaching object from the right.
+      bbox.Set (x+19, y+1, x+20, y+2);
+      COV_ASSERT (TestRectangle (bbox, 9.0) == true, b);
+      COV_ASSERT (TestRectangle (bbox, 11.0) == true, b);
+      bbox.Set (x+18, y+1, x+19, y+2);
+      COV_ASSERT (TestRectangle (bbox, 9.0) == true, b);
+      COV_ASSERT (TestRectangle (bbox, 11.0) == false, b);
+      COV_ASSERT (TestPoint (csVector2 (x+20, y+3), 9.0) == true, p);
+      COV_ASSERT (TestPoint (csVector2 (x+20, y+3), 11.0) == true, p);
+      COV_ASSERT (TestPoint (csVector2 (x+19, y+3), 9.0) == true, p);
+      COV_ASSERT (TestPoint (csVector2 (x+19, y+3), 11.0) == false, p);
+      COV_ASSERT (TestPoint (csVector2 (x+18, y+3), 9.0) == true, p);
+      COV_ASSERT (TestPoint (csVector2 (x+18, y+3), 11.0) == false, p);
+    }
 
   return true;
 }

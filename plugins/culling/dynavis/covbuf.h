@@ -151,6 +151,13 @@ public:
   bool TestRectangle (const csBox2& rect, float min_depth);
 
   /**
+   * Test a point with the coverage buffer.
+   * Function returns false if point was not visible (i.e.
+   * screen buffer would not have been modified).
+   */
+  bool TestPoint (const csVector2& point, float min_depth);
+
+  /**
    * Return true if entire screen buffer is full.
    */
   bool IsFull ();
