@@ -34,6 +34,7 @@
 #include "imesh/particle.h"
 #include "imesh/partsys.h"
 #include "imesh/fountain.h"
+#include "genmaze.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -370,6 +371,9 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   scenelight->SetRadius(5.0);
   scenelight->SetColor(csColor(0.0, 0.4, 1.0));
 
+  /// add maze grid
+  AddMazeGrid(world, 20, 20, math2, math1);
+
   // prepare texture manager
   txtmgr->PrepareTextures ();
   txtmgr->PrepareMaterials ();
@@ -380,6 +384,161 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
 
   return true;
 }
+
+
+// static helper
+static void AddWall(iIsoEngine *engine, iIsoWorld *world, iIsoGrid *grid,
+  int x, int y, int offx, int offy, int multx, int multy, 
+  float bot, float height, 
+  iMaterialWrapper *side, iMaterialWrapper *top)
+{
+  for(int my=0; my<multy; my++)
+    for(int mx=0; mx<multx; mx++)
+      grid->SetGroundValue(x, y, mx, my, height);
+  iIsoSprite *sprite = 0;
+  if(bot != height)
+  {
+    sprite = engine->CreateZWallSprite(csVector3(y+offy+0.999,bot,x+offy), 
+      1.0, height);
+    sprite->SetMaterialWrapper(side);
+    world->AddSprite(sprite);
+    sprite = engine->CreateXWallSprite(csVector3(y+offy,bot,x+offy), 
+      1.0, height);
+    sprite->SetMaterialWrapper(side);
+    world->AddSprite(sprite);
+  }
+  sprite = engine->CreateFloorSprite(csVector3(y+offy,height,x+offx), 1.0, 1.0);
+  sprite->SetMaterialWrapper(top);
+  world->AddSprite(sprite);
+}
+
+void IsoTest::AddMazeGrid(iIsoWorld *world, float posx, float posy,
+  iMaterialWrapper *floor, iMaterialWrapper *wall)
+{
+  int width = 40;
+  int height = 40;
+  /// create the maze
+  csGenMaze *maze = new csGenMaze(width, height);
+  //maze->SetStraightness(0.1);
+  //maze->SetCyclicalness(0.1);
+  // add some access points to the maze, at the top.
+  int x,y;
+  for(x=1; x<width; x+=3)
+    maze->MakeAccess(x, 0);
+  maze->GenerateMaze(0,0);
+
+  /// debug display
+#if 0
+  for(y=0; y<height; y++)
+  {
+    printf("X");
+    for(x=0; x<width; x++)
+    {
+      if(maze->GetNode(x,y).opening[0])
+        printf(" ");
+      else printf("X");
+      printf("X");
+    }
+    printf("\n");
+    for(x=0 ; x<width; x++)
+    {
+      if(maze->GetNode(x,y).opening[3])
+        printf(" ");
+      else printf("X");
+      printf(" ");
+    }
+    if(maze->GetNode(width-1,y).opening[1])
+      printf(" ");
+    else printf("X");
+    printf("\n");
+  }
+  printf("X");
+  for(x=0 ; x<width; x++)
+  {
+    if(maze->GetNode(x,height-1).opening[2])
+      printf(" ");
+    else printf("X");
+    printf("X");
+  }
+  printf("\n");
+#endif
+
+  // create a grid to display the maze in.
+  int gridw = width*2+1;
+  int gridh = height*2+1;
+  iIsoGrid *mazegrid = world->CreateGrid(gridw, gridh);
+  mazegrid->SetSpace(posy, posx, -1.0, +10.0);
+  int multx = 1;
+  int multy = 1;
+  mazegrid->SetGroundMult(multx, multy);
+
+  /*
+  iIsoSprite *sprite; int mx, my;
+  for(y=(int)posy; y<posy+gridh; y++)
+    for(x=(int)posx; x<posx+gridw; x++)
+    {
+      // put tiles on the floor
+      sprite = engine->CreateFloorSprite(csVector3(y,0,x), 1.0, 1.0);
+      sprite->SetMaterialWrapper(floor);
+      world->AddSprite(sprite);
+      for(my=0; my<multy; my++)
+        for(mx=0; mx<multx; mx++)
+          mazegrid->SetGroundValue(x-posx, y-posy, mx, my, 0.0);
+    }
+    */
+
+
+  // add a light
+  iIsoLight* scenelight = engine->CreateLight();
+  scenelight->SetPosition(csVector3(posy+height+0.5,10,posx+width+0.5));
+  scenelight->SetGrid(mazegrid);
+  scenelight->SetAttenuation(CSISO_ATTN_INVERSE);
+  scenelight->SetRadius(10.0 + width/2 + height/2);
+  scenelight->SetColor(csColor(0.0, 0.4, 1.0));
+
+  // add walls
+  
+#define ADDWALLFULL(x, y) AddWall(engine, world, mazegrid, x, y, (int)posx, \
+  (int)posy, multx, multy, 0.0, 2.0, wall, floor);
+#define ADDWALLEMPTY(x, y) AddWall(engine, world, mazegrid, x, y, (int)posx, \
+  (int)posy, multx, multy, 0.0, 0.0, wall, floor);
+
+  for(y=0; y<height; y++)
+  {
+    //printf("y=%d\n", y);
+    for(x=0; x<width; x++)
+    {
+      ADDWALLFULL(x*2, y*2)
+      if(maze->GetNode(x,y).opening[0])
+        ADDWALLEMPTY(x*2+1, y*2)
+      else ADDWALLFULL(x*2+1, y*2)
+    }
+    ADDWALLFULL(gridw-1, y*2)
+    for(x=0 ; x<width; x++)
+    {
+      if(maze->GetNode(x,y).opening[3])
+        ADDWALLEMPTY(x*2, y*2+1)
+      else ADDWALLFULL(x*2, y*2+1)
+      ADDWALLEMPTY(x*2+1, y*2+1)
+    }
+    if(maze->GetNode(width-1,y).opening[1])
+      ADDWALLEMPTY(gridw-1, y*2+1)
+    else ADDWALLFULL(gridw-1, y*2+1)
+  }
+
+  //printf("y=%d\n", y);
+  for(x=0; x<width; x++)
+  {
+    ADDWALLFULL(x*2, gridh-1)
+    if(maze->GetNode(x,height-1).opening[2])
+      ADDWALLEMPTY(x*2+1, gridh-1)
+    else ADDWALLFULL(x*2+1, gridh-1)
+  }
+  ADDWALLFULL(gridw-1, gridh-1)
+  
+}
+
+
 
 void IsoTest::NextFrame ()
 {

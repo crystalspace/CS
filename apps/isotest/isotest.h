@@ -32,6 +32,7 @@ struct iIsoSprite;
 struct iIsoLight;
 struct iLoader;
 struct iFont;
+struct iMaterialWrapper;
 
 class IsoTest : public SysSystemDriver
 {
@@ -68,6 +69,8 @@ public:
   virtual void NextFrame ();
   virtual bool HandleEvent (iEvent &Event);
   iIsoLight *GetLight () const {return light;}
+  void AddMazeGrid(iIsoWorld *world, float posx, float posy, 
+    iMaterialWrapper *floor, iMaterialWrapper *wall);
 };
 
 #endif // ISOTEST_H
