@@ -163,9 +163,6 @@ Thing and other mesh objects. @xref{MeshObject}, @xref{MeshObject Thing},
 Terrain engines. @xref{MeshObject TerrFunc}.
 
 @item
-Metaballs. @xref{MeshObject Metaball}.
-
-@item
 Particle systems (fire, explosions, rain, snow, spirals, fountain).
 @xref{MeshObject PartSys}.
 
