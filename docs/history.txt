@@ -5,6 +5,8 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine silenced some warning messages from ActiveState Perl
 	  during configuration process.
 	- Steven Geens made milk2spr add normals to the vertices.
+	- Andreas Busch modified the documentation for spr2d/spr3d/cal2cs 
+	  from old syntax to XML.
 11-Jan-2002
 	- Fixed a problem in genmesh where
 	  iObjectModel->GetPolygonMeshColldet() was not returning the

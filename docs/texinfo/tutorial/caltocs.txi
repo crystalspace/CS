@@ -269,13 +269,13 @@ Compile the Motion Manager (@var{motman} plugin) and Motion Loader
 @item
 Edit the mapfile of the map that you wish to place your characters in.  You 
 will want to add a line to load the library file containing your sprite to the 
-@sc{world} section of the mapfile with the @sc{library} command.
+@samp{world} section of the mapfile with the @samp{library} tag.
 
 Sample File:
 @example
-WORLD (
-  LIBRARY '/lev/flarge/test.csk' ()
-)
+<world>
+    <library>/lev/flarge/test.csk</library>
+</world>
 @end example
 
 Run @command{walktest} and make sure that the mapfile still loads correctly, 
@@ -286,19 +286,21 @@ Next, we are going to add your sprite to one of the sectors in your mapfile.
 
 Sample File:
 @example
-WORLD (
-  LIBRARY '/lev/flarge/test.csk' ()
-  SECTOR 'room' (
-    MESHOBJ 'test1' (
-      PLUGIN ('spr3d')
-      PARAMS (
-        FACTORY ('test')
-        ACTION ('default')
-      )
-      MOVE (V (0,0,0))
-    )
-  )
-)
+<world>
+    <library>/lev/flarge/test.csk</library>
+    <sector name="room">
+        <meshobj name="test1">
+            <plugin>spr3d</plugin>
+            <params>
+                <factory>test</factory>
+                <action>default</action>
+            </params>
+            <move>
+                <v x="0" y="0" z="0" />
+            </move>
+        </meshobj>
+    </sector>
+</world>
 @end example
 
 Run @command{walktest} and you should see your model in the mapfile.
@@ -308,7 +310,7 @@ Run @command{walktest} and you should see your model in the mapfile.
 outside the room or way too big or way too small.  
 
 @strong{Note:} Try playing with the @var{geomscale} setting in your model 
-config file, and the xyz coordinates in the @sc{move} macro in your mapfile. 
+config file, and the xyz coordinates in the @samp{move} macro in your mapfile. 
 @xref{Create Sprite Library}.
 
 @strong{Note:} @command{viewmesh} is a useful tool for tracking down problems 
@@ -316,24 +318,26 @@ with your sprite. @xref{View Library in Viewmesh}.
 @end quotation
 
 @item
-Lastly, we are going to animate your sprite with the @sc{apply_motion} line.
+Lastly, we are going to animate your sprite with the @samp{apply_motion} tag.
 
 Sample File:
 @example
-WORLD (
-  LIBRARY '/lev/flarge/test.csk' ()
-  SECTOR 'room' (
-    MESHOBJ 'test1' (
-      PLUGIN ('spr3d')
-      PARAMS (
-        FACTORY ('test')
-        ACTION ('default')
-        APPLY_MOTION ('test_0')
-      )
-      MOVE (V (0,0,0))
-    )
-  )
-)
+<world>
+    <library>/lev/flarge/test.csk</library>
+    <sector name="room">
+        <meshobj name="test1">
+            <plugin>spr3d</plugin>
+            <params>
+                <factory>test</factory>
+                <action>default</action>
+                <applymotion>test_0</applymotion>
+            </params>
+            <move>
+                <v x="0" y="0" z="0" />
+            </move>
+        </meshobj>
+    </sector>
+</world>
 @end example
 
 Run @command{walktest} and you should see your model animating in the mapfile.

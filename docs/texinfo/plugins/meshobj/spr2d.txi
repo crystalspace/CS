@@ -71,22 +71,26 @@ can access the material, blending mode (mixmode), and lighting settings.
 @subsubheading Factory Loader
 
 @table @code
-@item LIGHTING(boolean)
+@item <lighting>yes/no</lighting>
 Enable/disable lighting.
-@item MATERIAL(materialName)
+@item <material>materialname</material>
 Material to use for the polygon.
-@item MIXMODE(mode)
-Blending mode; one of @samp{ADD}, @samp{ALPHA}, @samp{COPY}, @samp{KEYCOLOR},
-@samp{MULTIPLY2}, @samp{MULTIPLY}, or @samp{TRANSPARENT}.
-@item UVANIMATION(FRAME (@dots{}) @dots{})
+@item <mixmode><mode /></mixmode>
+Blending mode; one of @samp{add}, @samp{alpha}, @samp{copy}, @samp{keycolor},
+@samp{multiply2}, @samp{multiply}, or @samp{transparent}.
+@item <uvanimation name=uvanimationname><frame @dots{}> @dots{}
 Define an uv animation, that is a sequence of frames which textures are all in
 one big texture.  Thus the animation is achieved by altering the (u,v)
 coordinates of the polygon defined by this sprite.
-@item FRAME(ms,vertices @dots{})
+@item <frame><duration><vertices @dots{}> @dots{}
 Defines a single frame within an uv animation by specifying its duration in
 milliseconds and the u,v coordinates to use.
 @itemize
-FRAME 'framename' (millisec, u,v coo list)
+<frame name="framename">
+ <duration>milliseconds</duration>
+ <v u="" v="" />
+ @dots{} u,v coo list
+</frame>
 @end itemize
 @end table
 
@@ -102,25 +106,28 @@ settings, and also the vertices of the 2D polygon controlled by this plugin.
 @subsubheading Object Loader
 
 @table @code
-@item FACTORY
+@item <factory>factoryname</factory>
 Name of the factory to use for creation of this instance.
-@item MIXMODE
-Blending mode, one of @samp{ADD}, @samp{ALPHA}, @samp{COPY}, @samp{KEYCOLOR},
-@samp{MULTIPLY2}, @samp{MULTIPLY}, or @samp{TRANSPARENT}.
-@item MATERIAL
+@item <mixmode><mode /></mixmode>
+Blending mode, one of @samp{add}, @samp{alpha}, @samp{copy}, @samp{keycolor},
+@samp{multiply2}, @samp{multiply}, or @samp{transparent}.
+@item <material>materialname</material>
 Material to use for the polygon.
-@item LIGHTING
+@item <lighting>yes/no</lighting>
 Enable/disable lighting.
-@item VERTICES
+@item vertices <v @dots{} />
 List of 2D vertices defining the polygon.
-@item UV
+@item <uv u="" v="" />
 List of texture mapping UV coordinates for the polygon.
-@item COLORS
+@item <color red="" green="" blue="" />
 List of rgb colors for the polygon.
-@item ANIMATE
+@item <animate>@dots{}
 Select an uv animation from the list of animations declared in the template
 @itemize
-ANIMATE ('ani name', timing, loop)
+<animate name="animationname">
+    <timing>milliseconds</timing>
+    <loop>yes/no</loop>
+</animate>
 @itemize
 @item
 timing > 0 : every <timing> milliseconds the next frame will be shown
@@ -139,47 +146,85 @@ loop : loop the animation or stop after last frame (and show the last frame)
 This is how our world file looks:
 
 @example
-WORLD (
-  TEXTURES (
-    TEXTURE 'blow' (FILE(blow.png))
-  )
-
-  MATERIALS (
-    MATERIAL 'explosion' (TEXTURE ('blow'))
-  )
-
-  MESHOBJ 'Explosion' (
-    PLUGIN ('crystalspace.mesh.loader.factory.sprite.2d')
-    PARAMS (
-      MATERIAL ('explosion')
-      UVANIMATION 'boom' (
-        FRAME 'f1' ( 100, 0, 0, 0.5, 0, 0.5, 0.5, 0, 0.5)
-        FRAME 'f2' ( 100, 0.5, 0, 1, 0, 1, 0.5, 0.5, 0.5)
-        FRAME 'f3' ( 100, 0, 0.5, 0.5, 0.5, 0.5, 1, 0, 1)
-        FRAME 'f4' ( 100, 0.5, 0.5, 1, 0.5, 1, 1, 0.5, 1)
-      )
-    )
-  )
-
-  sector 'space' (
-    ; define all the stuff in space
-    ; ...
-    ; and now one of the enemies right after we met him
-    MESHOBJ 'kaboom' (
-      PLUGIN ('crystalspace.mesh.loader.sprite.2d')
-      PARAMS (
-        FACTORY ('Explosion')
-        VERTICES (-1,1,1,1,1,-1,-1,-1)
-        UV (0,0,1,0,1,1,0,1)
-        COLORS (1,1,1,1,1,1,1,1,1,1,1,1)
-	LIGHTING (no)
-        ; show the animation, use the timings attached to
-	; the frames, loop
-        ANIMATE ('boom', 0, yes)
-      )
-      MOVE (0,0,0)
-    )
-  )  
-)
+<world>
+    <textures>
+        <texture name="blow">
+            <file>blow.png</file>
+        </texture>
+    </textures>
+    <materials>
+        <material name="explosion">
+            <texture>blow</texture>
+        </material>
+    </materials>
+    <meshobj name="Explosion">
+        <plugin>crystalspace.mesh.loader.factory.sprite.2d</plugin>
+        <params>
+            <material>explosion</material>
+            <uvanimation name="boom">
+                <frame name="first">
+                    <duration>100</duration>
+                    <v u="0" v="0" />
+                    <v u="0.5" v="0" />
+                    <v u="0.5" v="0.5" />
+                    <v u="0" v="0.5" />
+                </frame>
+                <frame name="second">
+                    <duration>100</duration>
+                    <v u="0.5" v="0" />
+                    <v u="1" v="0" />
+                    <v u="1" v="0.5" />
+                    <v u="0.5" v="0.5" />
+                </frame>
+                <frame name="third">
+                    <duration>100</duration>
+                    <v u="0" v="0.5" />
+                    <v u="0.5" v="0.5" />
+                    <v u="0.5" v="1" />
+                    <v u="0" v="1" />
+                </frame>
+                <frame name="fourth">
+                    <duration>100</duration>
+                    <v u="0.5" v="0.5" />
+                    <v u="1" v="0.5" />
+                    <v u="1" v="1" />
+                    <v u="0.5" v="1" />
+                </frame>
+            </uvanimation>
+        </params>
+    </meshobj>
+    <sector name="space">
+    <!-- define all the stuff in space
+         @dots{}
+         and now one of the enemies right after we met him -->
+        <meshobj name="Kaboom">
+	    <plugin>crystalspace.mesh.loader.sprite.2d</plugin>
+	    <params>
+		<v x="-1" y="1" />
+    	        <v x="1" y="1" />
+    		<v x="1" y="-1" />
+	        <v x="-1" y="-1" />
+		<uv u="0" v="0" />
+		<uv u="1" v="0" />
+	        <uv u="1" v="1" />
+		<uv u="0" v="1" />
+	        <color red="1" green="1" blue="1" />
+		<color red="1" green="1" blue="1" />
+	        <color red="1" green="1" blue="1" />
+		<color red="1" green="1" blue="1" />
+	        <lighting>no</lighting>
+		<!-- show the animation, use the timings attached to
+	    	     the frames, loop -->
+    	    	<animate name="boom">
+		    <timing>0</timing>
+	    	    <loop>yes</loop>
+		</animate>
+	    </params>
+	    <move>
+		<v x="0" y="0" z="0">
+	    </move>
+	</meshobj>
+    </sector>
+</world>
 
 @end example
