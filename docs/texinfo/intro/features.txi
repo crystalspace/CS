@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Feature List, Where to Get, UsingForProject, CS Introduction
+@node Feature List, Where to Get, DocGuide, CS Introduction
 @section Feature List
 @cindex Features
 

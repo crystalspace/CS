@@ -15,6 +15,9 @@ The history order is reversed so that new features are at the top.
 	  now. Also started added some of the new things to the documentation.
 	- Matze fixed console for win32 mingw and cygwin - they just don't need
 	  one.
+	- Eric Sunshine fixed a number of Texinfo errors and formatting
+	  problems in mapfmt.txi.  Also eliminated all underfull and overfull
+	  `hbox' warnings reported by TeX.
 21-Nov-2001
 	- Worked a bit on documentation. The 'intro' section in the
 	  tutorials was heavily outdated. It was still referring to

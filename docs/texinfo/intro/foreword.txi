@@ -37,7 +37,7 @@ not fully optimized yet. Performance is adequate provided you have a Pentium
 We also have a very active list of developers working to make Crystal Space as usable as
 possible.
 
-@node UsingForProject, Feature List, Current Status, CS Introduction
+@node UsingForProject, DocGuide, Current Status, CS Introduction
 @section Using Crystal Space For Your Project
 
 What if you want to use Crystal Space in your project?

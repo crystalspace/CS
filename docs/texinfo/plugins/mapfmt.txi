@@ -87,8 +87,6 @@
 @noindent
 @emph{Written by Eric Sunshine, @email{sunshine@@sunshineco.com}.}
 
-@strong{WARNING: This document needs updating!}
-
 The next couple sections of this document describe the format of the standard
 Crystal Space map file.  The first section describes the syntax of the file.
 The second section contains extra discussions and hints regarding the map file
@@ -223,7 +221,8 @@ points forward.
 @production{v, @nonterm{number}}@*
 @production{vector-2d, @nonterm{x} @COMMA{} @nonterm{z}}@*
 @production{vector-3d, @nonterm{x} @COMMA{} @nonterm{y} @COMMA{} @nonterm{z}}@*
-@production{vector-4d, @nonterm{x} @COMMA{} @nonterm{y} @COMMA{} @nonterm{z} @COMMA{} @nonterm{r} }@*
+@production{vector-4d, @nonterm{x} @COMMA{} @nonterm{y} @COMMA{}
+    @nonterm{z} @COMMA{} @nonterm{r} }@*
 @production{vertex-idx, @nonterm{integer}}@*
 @production{coordinate, @nonterm{vector-3d}}@*
 @production{coordinate-2d, @nonterm{vector-2d}}@*
@@ -239,9 +238,9 @@ points forward.
 @production{mesh-name, @nonterm{name}}@*
 @production{meshfact-name, @nonterm{name}}@*
 @production{library-name, @nonterm{name}}@*
-@production{file-name, @nonterm{name}}
-@production{region-name, @nonterm{name}}
-@production{plugin-name, @nonterm{name}}
+@production{file-name, @nonterm{name}}@*
+@production{region-name, @nonterm{name}}@*
+@production{plugin-name, @nonterm{name}}@*
 @production{plugin-shortname, @nonterm{name}}
 
 @subsubheading Attributes and Numbers
@@ -416,7 +415,7 @@ points forward.
 
 @subsubheading Mesh Objects
 @production{plugin, @token{PLUGIN} @LP{} @nonterm{string} @RP{}}@*
-@production{params, @token{PARAMS} @LP{} @nonterm{string} @RP{}}@*
+@production{params, @token{PARAMS} @LP{} @nonterm{string} @RP{}}
 
 @production{mesh-comp, @nonterm{plugin}}@*
     @prodnext{@nonterm{key}}@*
@@ -424,7 +423,7 @@ points forward.
     @prodnext{@nonterm{mesh}}@*
     @prodnext{@nonterm{move2}}@*
 @production{mesh, @token{MESHOBJ} @nonterm{mesh-name}
-    @LP{} [ @nonterm{mesh-comp} @dots{} ] @RP{}}@*
+    @LP{} [ @nonterm{mesh-comp} @dots{} ] @RP{}}
 
 @subsubheading Mesh Object Factories
 @production{meshfact-file, @token{FILE} @LP{} @nonterm{file-name} @RP{}}@*
@@ -433,7 +432,7 @@ points forward.
     @prodnext{@nonterm{meshfact-file}}@*
     @prodnext{@nonterm{material}}@*
 @production{meshfact, @token{MESHOBJ} @nonterm{meshfact-name}
-    @LP{} [ @nonterm{meshfact-comp} @dots{} ] @RP{}}@*
+    @LP{} [ @nonterm{meshfact-comp} @dots{} ] @RP{}}
 
 @subsubheading Nodes
 @production{position, @token{POSITION} @LP{} @nonterm{coordinate} @RP{}}@*
@@ -464,7 +463,6 @@ points forward.
     @token{MATERIALS} @LP{} [ @nonterm{materials-comp} @dots{} ] @RP{}}
 
 @subsubheading Material Groupings
-@noindent
 Sometimes you want things of the same type but with different materials on it.
 This is where material groupings come in handy.  The final name of a texture
 in a @samp{MAT_SET} expression will be `@var{mat-set-name_texture-name}'.  The
@@ -486,39 +484,36 @@ internal list first.  For usage of @samp{MAT_SET} see the description of
     @LP{} @nonterm{sector-name} @COMMA{} @nonterm{coordinate} @RP{}}
 
 @subsubheading For Loader Plug-Ins
-@production{plugin-spec, @token{PLUGIN}
-    @LP{} ( @nonterm{plugin-name} | @nonterm{plugin-shortname} ) @RP{}}
-@production{plugin-params, @token{PARAMS} @LP{} @dots{} @RP{} }
+@production{plugin-id, @nonterm{plugin-name} | @nonterm{plugin-shortname}}@*
+@production{plugin-spec, @token{PLUGIN} @LP{} @nonterm{plugin-id} @RP{}}@*
+@production{plugin-params, @token{PARAMS} @LP{} @dots{} @RP{}}@*
 @production{plugin-comp, @token{PLUGIN} @nonterm{plugin-shortname}
-    @LP{} @nonterm{plugin-name} @RP{}
-@production{plugins, @token{PLUGINS}
-    @LP{} [ @nonterm{plugin-comp} @dots{} ] @RP{}
+    @LP{} @nonterm{plugin-name} @RP{}}@*
+@production{plugins, @token{PLUGINS} 
+    @LP{} [ @nonterm{plugin-comp} @dots{} ] @RP{}}
 
 @subsubheading Add-ons
-@production{addon-comp, @nonterm{plugin-spec}}@*
-    @prodnext{@nonterm{plugin-params}}@*
-@production{addon, @token{ADDON}
-    @LP{} [ @nonterm{addon-comp} @dots{} ] @RP{}}
+@production{addon-comp,
+    @nonterm{plugin-spec} | @nonterm{plugin-params}}@*
+@production{addon, @token{ADDON} @LP{} [ @nonterm{addon-comp} @dots{} ] @RP{}}
 
 @subsubheading Sounds
-@production{sound-file, @token{FILE} @LP{} @nonterm{file-name} @RP{}
+@production{sound-file, @token{FILE} @LP{} @nonterm{file-name} @RP{}}@*
 @production{sound, @token{SOUND} [ @nonterm{file-name} ]
-    @LP{} [ @nonterm{sound-file} ] @RP{}}
-@production{sounds, @token{SOUNDS}
-    @LP{} [ @nonterm{sound} @dots{} ] @RP{}}
+    @LP{} [ @nonterm{sound-file} ] @RP{}}@*
+@production{sounds, @token{SOUNDS} @LP{} [ @nonterm{sound} @dots{} ] @RP{}}
 
 @subsubheading Current Region
 @production{region, @token{REGION} @LP{} [ @nonterm{region-name} ] @RP{}}
 
 @subsubheading Render Priorities
-@production{rendpri-value, @nonterm{integer}}
-@production{rendpri-setting, @token{BACK2FRONT}}@*
-    @prodnext{@token{FRONT2BACK}}@*
-    @prodnext{@token{NONE}}@*
+@production{rendpri-value, @nonterm{integer}}@*
+@production{rendpri-setting,
+    @token{BACK2FRONT} | @token{FRONT2BACK} | @token{NONE}}@*
 @production{rendpri-comp, @token{PRIORITY}
-    @LP{} @nonterm{rendpri-value} @COMMA{} @nonterm{rendpri-setting} @RP{} }
+    @LP{} @nonterm{rendpri-value} @COMMA{} @nonterm{rendpri-setting} @RP{}}@*
 @production{renderpriorities, @token{RENDERPRIORITIES}
-    @LP{} [ @nonterm{rendpri-comp} @dots{} ] @RP{} }
+    @LP{} [ @nonterm{rendpri-comp} @dots{} ] @RP{}}
 
 @subsubheading World
 @production{world-comp, @nonterm{textures}}@*
@@ -538,8 +533,8 @@ internal list first.  For usage of @samp{MAT_SET} see the description of
 @production{world, @token{WORLD} @LP{} [ @nonterm{world-comp} @dots{} ] @RP{}}
 
 @subsubheading Library File
-@production{library-comp, @nonterm{textures} | @nonterm{materials} |
-    @nonterm{meshfact}}@*
+@production{library-comp,
+    @nonterm{textures} | @nonterm{materials} | @nonterm{meshfact}}@*
 @production{library,
     @token{LIBRARY} @LP{} [ @nonterm{library-comp} @dots{} ] @RP{}}
 

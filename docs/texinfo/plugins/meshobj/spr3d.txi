@@ -72,14 +72,13 @@ Implements @samp{iConfig}
 
 @subsubheading Factory State Interface
 
-@samp{iSprite3DFactoryState} is the @sc{scf} interface that you can
-use to set/get settings for a 3D Sprite factory. The definition of this
-interface can be found in @file{CS/include/imesh/sprite3d.h} and that is
-also the include file you need to include in your applications to use this
-plugin.
-Using this interface you can access the material, triangles, vertices, texture
-coordinates, normals, frames, actions, skeletal structure, and various
-other configuration parameters for a 3D sprite factory.
+Use the @samp{iSprite3DFactoryState} @sc{scf} interface to access settings for
+a 3D sprite factory.  The definition of this interface can be found in
+@file{CS/include/imesh/sprite3d.h} and that is also the include file you need
+to include in your applications to use this plugin.  Using this interface you
+can access the material, triangles, vertices, texture coordinates, normals,
+frames, actions, skeletal structure, and various other configuration parameters
+for a 3D sprite factory.
 
 For frame based animation you need to access the @samp{iSpriteFrame} and
 @samp{iSpriteAction} interfaces (defined in @file{CS/include/imesh/sprite3d.h})

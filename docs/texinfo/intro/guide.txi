@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node DocGuide, Current Status, CS Introduction, CS Introduction
+@node DocGuide, Feature List, UsingForProject, CS Introduction
 @section A Guide to This Documentation
 
 In this section we guide you through some of the more useful sections

@@ -62,12 +62,11 @@ Implements @samp{iMeshObjectType}
 
 @subsubheading Factory State Interface
 
-@samp{iSprite2DFactoryState} is the @sc{scf} interface that you can use to
-set/get settings for a 2D sprite factory.  The definition of this interface can
-be found in @file{CS/include/imesh/sprite2d.h} and that is also the include
-file you need to include in your applications to use this plugin.
-Using this interface you can access the material, blending mode (mixmode),
-and lighting settings.
+Use the @sc{scf} interface @samp{iSprite2DFactoryState} to acccess settings for
+a 2D sprite factory.  The definition of this interface can be found in
+@file{CS/include/imesh/sprite2d.h} and that is also the include file you need
+to include in your applications to use this plugin.  Using this interface you
+can access the material, blending mode (mixmode), and lighting settings.
 
 @subsubheading Factory Loader
 

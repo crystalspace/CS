@@ -25,9 +25,9 @@ there you can always email the mailing lists. @xref{FAQ}, or
 
 @menu
 * HowToRead:: How To Read This Manual
-* DocGuide:: A Guide to This Documentation
 * Current Status::
 * UsingForProject:: Using Crystal Space For Your Project
+* DocGuide:: A Guide to This Documentation
 * Feature List::
 * Where to Get:: Where to Get Crystal Space
 * Mailing Lists::

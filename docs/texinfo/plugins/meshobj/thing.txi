@@ -106,7 +106,7 @@ you can more easily add new parts and even move around parts without having
 to change all vertex indices. Note that it is no problem to have duplicate
 vertices between different parts as they will be combined in a post-processing
 pass anyway. The table below describes everything which you can use in a
-single @sc{PART} which is also what you can use in the top level thing
+single @dfn{part} which is also what you can use in the top level thing
 definition.
 
 @itemize @bullet
