@@ -12,10 +12,10 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: csfont csfontclean
 plugins all: csfont
-csfontclean:
-	$(MAKE_CLEAN)
 csfont:
 	$(MAKE_TARGET) MAKE_DLL=yes
+csfontclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
@@ -29,7 +29,7 @@ ifeq ($(USE_SHARED_PLUGINS),yes)
 CSFONT=$(OUTDLL)csfont$(DLL)
 DEP.CSFONT=$(LIB.CSFONT)
 else
-CSFONT=$(OUT)$(LIB_PREFIX)csfont$(LIB)
+CSFONT=$(OUT)$(LIB_PREFIX)csfnt$(LIB)
 DEP.EXE+=$(CSFONT)
 CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_CSFONT
 endif
