@@ -1032,7 +1032,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Visibility:");
     CONPRI("  db_frustum farplane");
     CONPRI("Lights:");
-    CONPRI("  addlight dellight dellights");
+    CONPRI("  addlight dellight dellights addstlight");
     CONPRI("  clrlights setlight");
     CONPRI("Views:");
     CONPRI("  split_view unsplit_view toggle_view");
@@ -2153,6 +2153,29 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (rnd)
       AttachRandomLight (dyn);
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Dynamic light added.");
+  }
+  else if (!strcasecmp (cmd, "addstlight"))
+  {
+    RECORD_ARGS (cmd, arg);
+    csVector3 dir (0,0,0);
+    csVector3 pos = Sys->view->GetCamera ()->GetTransform ().This2Other (dir);
+    csRef<iStatLight> light;
+
+    float r, g, b, radius;
+    if (arg && csScanStr (arg, "%f,%f,%f,%f", &r, &g, &b, &radius) == 4)
+    {
+      light = Sys->view->GetEngine ()->CreateLight (0,
+        pos, radius, csColor (r, g, b), false);
+    }
+    else
+    {
+      light = Sys->view->GetEngine ()->CreateLight (0,
+        pos, 6, csColor (1, 1, 1), false);
+    }
+    iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
+    ll->Add (light->QueryLight ());
+    Sys->view->GetEngine ()->ForceRelight (light);
+    Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Static light added.");
   }
   else if (!strcasecmp (cmd, "dellight"))
   {

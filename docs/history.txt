@@ -13,6 +13,17 @@ The history order is reversed so that new features are at the top.
 	  and INC.SYS_CSSYS which already mentioned SRCDIR.  Problem was
 	  pointed out by Frank Richter.
 	- Jorrit clarified a comment with iEngine->Prepare().
+	- Jorrit added two versions iEngine->ForceRelight(). The first version
+	  relights all lightmaps in the engine. The second version updates
+	  the lightmaps for a given light (i.e. useful after adding
+	  a static or pseudo-dynamic light).
+	- Jorrit fixed a problem with the engine would always attempt
+	  to read precalc_info even if reading from the cache was disabled.
+	- Jorrit added a new 'addstlight' command to Walktest. This command
+	  adds a static light and uses the new ForceRelight() function to
+	  recalculate lighting. alt-l is assigned to this command by default.
+	- Jorrit fixed thing so that initializing lighting again will actually
+	  cause the lightmaps to be updated correctly.
 12-Jun-2003
 	- Jorrit clarified a comment with csColliderWrapper telling people that
 	  you must DecRef() the new collider wrapper after creating it.

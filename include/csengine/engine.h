@@ -560,6 +560,29 @@ public:
   virtual bool Prepare (iProgressMeter* meter = 0);
 
   /**
+   * Force a relight of all lighting. It is better to call this instead
+   * of calling engine->Prepare() again as engine->Prepare() will also do
+   * other stuff (like registering textures). Warning! This function can
+   * be very slow (depending on the number of lights and objects in the
+   * world).
+   * <p>
+   * The current flags set with SetLightingCacheMode() control if the
+   * lightmaps will be cached or not.
+   */
+  virtual void ForceRelight (iProgressMeter* meter);
+
+  /**
+   * Force a relight for the given light. This is useful to update the
+   * lightmaps after a static or pseudo-dynamic light has been added (don't
+   * use this for dynamic lights). If there are a lot of objects this function
+   * can be slow.
+   * <p>
+   * The current flags set with SetLightingCacheMode() control if the
+   * lightmaps will be cached or not.
+   */
+  virtual void ForceRelight (iStatLight* light, iProgressMeter* meter);
+
+  /**
    * Set the maximum number of polygons to process in
    * one frame. This is mainly useful for debugging.
    */

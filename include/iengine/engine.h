@@ -142,7 +142,7 @@ struct iRenderLoop;
 #define CS_RENDPRI_FRONT2BACK 2
 /** @} */
 
-SCF_VERSION (iEngine, 0, 17, 0);
+SCF_VERSION (iEngine, 0, 18, 0);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -168,6 +168,26 @@ struct iEngine : public iBase
    * calculate lighting if cache is not present.
    */
   virtual bool Prepare (iProgressMeter* meter = 0) = 0;
+
+  /**
+   * Force a relight of all lighting. It is better to call this instead
+   * of calling engine->Prepare() again as engine->Prepare() will also do
+   * other stuff (like registering textures).
+   * <p>
+   * The current flags set with SetLightingCacheMode() control if the
+   * lightmaps will be cached or not.
+   */
+  virtual void ForceRelight (iProgressMeter* meter = 0) = 0;
+
+  /**
+   * Force a relight for the given light. This is useful to update the
+   * lightmaps after a static or pseudo-dynamic light has been added (don't
+   * use this for dynamic lights).
+   * <p>
+   * The current flags set with SetLightingCacheMode() control if the
+   * lightmaps will be cached or not.
+   */
+  virtual void ForceRelight (iStatLight* light, iProgressMeter* meter = 0) = 0;
 
   /**
    * Prepare the textures. It will initialise all loaded textures

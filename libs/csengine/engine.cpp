@@ -1113,6 +1113,65 @@ bool csEngine::Prepare (iProgressMeter *meter)
   return true;
 }
 
+void csEngine::ForceRelight (iProgressMeter *meter)
+{
+#ifndef CS_USE_NEW_RENDERER
+  G3D->ClearCache ();
+#endif // CS_USE_NEW_RENDERER
+  int old_lightcache_mode = lightcache_mode;
+  lightcache_mode &= ~CS_ENGINE_CACHE_READ;
+  lightcache_mode &= ~CS_ENGINE_CACHE_NOUPDATE;
+  ShineLights (0, meter);
+  lightcache_mode = old_lightcache_mode;
+}
+
+void csEngine::ForceRelight (iStatLight* light, iProgressMeter *meter)
+{
+#ifndef CS_USE_NEW_RENDERER
+  G3D->ClearCache ();
+#endif // CS_USE_NEW_RENDERER
+
+  int sn;
+  int num_meshes = meshes.GetCount ();
+
+  for (sn = 0; sn < num_meshes; sn++)
+  {
+    iMeshWrapper *s = meshes.Get (sn);
+    //if (!region || region->IsInRegion (s->QueryObject ()))
+    //{
+      iLightingInfo* linfo = s->GetLightingInfo ();
+      if (linfo)
+      {
+        linfo->InitializeDefault ();
+      }
+    //}
+  }
+
+  ((csStatLight *)(light->GetPrivateObject ()))->CalculateLighting ();
+
+  iCacheManager* cm = GetCacheManager ();
+  for (sn = 0 ; sn < num_meshes ; sn++)
+  {
+    iMeshWrapper *s = meshes.Get (sn);
+    //if (!region || region->IsInRegion (s->QueryObject ()))
+    //{
+      iLightingInfo* linfo = s->GetLightingInfo ();
+      if (linfo)
+      {
+	if (lightcache_mode & CS_ENGINE_CACHE_WRITE)
+          linfo->WriteToCache (cm);
+        linfo->PrepareLighting ();
+      }
+    //}
+  }
+
+  if (!VFS->Sync())
+  {
+    Warn ("Error updating lighttable cache!");
+    Warn ("Perhaps disk full or no write permission?");
+  }
+}
+
 void csEngine::SetCacheManager (iCacheManager* cache_mgr)
 {
   csEngine::cache_mgr = cache_mgr;
@@ -1182,9 +1241,14 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
   }
 
   iCacheManager* cm = GetCacheManager ();
-  csRef<iDataBuffer> data (cm->ReadCache ("lm_precalc_info", 0, ~0));
+  csRef<iDataBuffer> data = 0;
+  if (lightcache_mode & CS_ENGINE_CACHE_READ)
+    data = cm->ReadCache ("lm_precalc_info", 0, ~0);
+
   if (!data)
+  {
     reason = "no 'lm_precalc_info' found in cache";
+  }
   else
   {
     // data, 0-terminated
@@ -1205,22 +1269,14 @@ void csEngine::ShineLights (iRegion *iregion, iProgressMeter *meter)
 
       int xi = QRound (xf);
 
-#define CHECK(keyw, cond, reas) \
-	else if (!strcmp (keyword, keyw)) \
-	{ \
-	  if (cond) \
-	  { \
-	    reason = reas " changed"; \
-	    break; \
-	  } \
-	}
-
-      if (false)
+      if (!strcmp (keyword, "LMVERSION"))
       {
+	if (xi != current.lm_version)
+	{
+	  reason = "lightmap format changed";
+	  break;
+	}
       }
-
-      CHECK ("LMVERSION", xi != current.lm_version, "lightmap format")
-#undef CHECK
     }
     delete ntData;
   }
