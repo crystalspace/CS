@@ -4,6 +4,10 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 21-Apr-2003
+	- Rhad modified csPosixCondition::Wait() to not pass through
+	  CS_SHOW_ERROR when a timeout is specified and expires. The
+	  original behavior caused a massive amount of non-informative
+	  debug output when the timeout was put to use.
 	- Eric Sunshine augmented configure.ac so that it emits PYTHON makefile
 	  and Jam variables.  This variable is now required by cspython.mak
 	  which uses it to invoke pythmod_setup.py.
