@@ -97,10 +97,13 @@ install-indep:
 	# Add here commands to install the indep part of the package into
 	# debian/<package>-doc.
 	#INSTALLDOC#
-	mkdir $(CURDIR)/debian/tmp
-	cd CS; $(MAKE) SUBMAKEFILES=mk/install.mak INSTALL_DIR=$(CURDIR)/debian/tmp/usr/lib/crystalspace install 
+#	mkdir $(CURDIR)/debian/tmp
+	mkdir -p $(CURDIR)/debian/tmp/usr/lib/crystalspace
+#	cd CS; $(MAKE) SUBMAKEFILES=mk/install.mak INSTALL_DIR=$(CURDIR)/debian/tmp/usr/lib/crystalspace install 
+	cd CS; cp -r docs $(CURDIR)/debian/tmp/usr/lib/crystalspace
+	find $(CURDIR)/debian/tmp/usr/lib/crystalspace -name CVS -type d | xargs rm -rf
 
-	dh_movefiles -i
+#	dh_movefiles -i
 
 install-arch:
 	dh_testdir
@@ -161,6 +164,8 @@ install-arch:
 		$(CURDIR)/debian/tmp/etc/crystalspace/config
 
 	dh_movefiles -a
+
+	-rmdir $(CURDIR)/debian/crystalspace/usr/lib/crystalspace/data/config
 
 	# Adding home made xpm
 	cp $(CURDIR)/xpm/*.xpm \
