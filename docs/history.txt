@@ -4,6 +4,9 @@ The history order is reversed so that new features are at the top.
 	- Thing mesh objects now implement iShadowCaster.
 	  csSector::CheckFrustum() will now use that instead of directly
 	  going to the thing.
+	- Further work on using iShadowCaster instead of iThingState.
+	  Also fixed a bug with checking of the flags for enabling
+	  and disabling shadows.
 29-Jun-2002
 	- Removed the dependency on iSector from iShadowBlock and
 	  iShadowBlockList. This means that it is now easier to use
