@@ -94,6 +94,9 @@ SRC.SYS_CSSYS=libs/cssys/unix/unix.cpp libs/cssys/unix/utiming.cpp \
 # The linker.
 #LINK=gcc
 
+# Use makedep to build dependencies
+DEPEND_TOOL=mkdep
+
 endif # ifeq ($(MAKESECTION),defines)
 
 #--------------------------------------------------------------- confighelp ---#

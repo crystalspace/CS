@@ -25,6 +25,9 @@
 #include "csws/csapp.h"
 #include "csws/csbutton.h"
 #include "csws/csstatic.h"
+#include "csws/csskin.h"
+
+#define SKIN ((csButtonSkin *)skinslice)
 
 csButton::csButton (csComponent *iParent, int iCommandCode,
   int iButtonStyle, csButtonFrameStyle iFrameStyle) : csComponent (iParent),
@@ -39,6 +42,7 @@ csButton::csButton (csComponent *iParent, int iCommandCode,
   if (FrameStyle == csbfsOblique)
     SetState (CSS_TRANSPARENT, true);
   id = iCommandCode;
+  ApplySkin (GetSkin ());
 }
 
 csButton::~csButton ()
@@ -79,149 +83,6 @@ void csButton::FreeBitmaps ()
   delImages = false;
   ImageNormal = NULL;
   ImagePressed = NULL;
-}
-
-void csButton::Draw ()
-{
-  int li, di;                   // light and dark colors
-  int areaw, areah;             // drawing area width and height
-
-  if (Pressed)
-  {
-    di = CSPAL_BUTTON_LIGHT3D;
-    li = CSPAL_BUTTON_DARK3D;
-  } else
-  {
-    di = CSPAL_BUTTON_DARK3D;
-    li = CSPAL_BUTTON_LIGHT3D;
-  } /* endif */
-
-  DefaultBorder = ((ButtonStyle & CSBS_NODEFAULTBORDER) == 0)
-    && ((parent->GetDefault () == this));
-
-  // Draw the frame
-  switch (FrameStyle)
-  {
-    case csbfsNone:
-      if (!GetState (CSS_TRANSPARENT))
-        Clear (CSPAL_BUTTON_BACKGROUND);
-      areaw = bound.Width (); areah = bound.Height ();
-      break;
-    case csbfsOblique:
-      if (bound.Height () >= 6)
-      {
-        int aw = bound.Height () / 3;
-        if (DefaultBorder)
-          ObliqueRect3D (0, 0, bound.Width (), bound.Height (), aw,
-            CSPAL_BUTTON_DEFFRAME, CSPAL_BUTTON_DEFFRAME);
-        else
-          ObliqueRect3D (0, 0, bound.Width (), bound.Height (), aw,
-            CSPAL_BUTTON_LIGHT3D, CSPAL_BUTTON_DARK3D);
-        ObliqueRect3D (1, 1, bound.Width () - 1, bound.Height () - 1, aw - 1, di, li);
-        ObliqueRect3D (2, 2, bound.Width () - 2, bound.Height () - 2, aw - 2, di, li);
-        int rvy = bound.Height ();
-        // Fill the button background
-        int dx = aw - 1;
-        rvy = bound.Height () - 1;
-        for (int i = 3; i < aw; i++, dx--)
-        {
-          Line (dx, i, bound.Width () - 3, i, CSPAL_BUTTON_BACKGROUND);
-          Line (3, rvy - i, bound.Width () - dx, rvy - i, CSPAL_BUTTON_BACKGROUND);
-        } /* endfor */
-        Box (3, aw, bound.Width () - 3, bound.Height () - aw, CSPAL_BUTTON_BACKGROUND);
-        areaw = bound.Width () - 6; areah = bound.Height () - 6;
-        break;
-      } // otherwise fallback to rectangular frame
-    case csbfsThickRect:
-      if (DefaultBorder)
-        Rect3D (0, 0, bound.Width (), bound.Height (),
-          CSPAL_BUTTON_DEFFRAME, CSPAL_BUTTON_DEFFRAME);
-      else
-        Rect3D (0, 0, bound.Width (), bound.Height (),
-          CSPAL_BUTTON_LIGHT3D, CSPAL_BUTTON_DARK3D);
-      Rect3D (1, 1, bound.Width () - 1, bound.Height () - 1, di, li);
-      Rect3D (2, 2, bound.Width () - 2, bound.Height () - 2, di, li);
-      Box (3, 3, bound.Width () - 3, bound.Height () - 3, CSPAL_BUTTON_BACKGROUND);
-      areaw = bound.Width () - 6; areah = bound.Height () - 6;
-      break;
-    case csbfsThinRect:
-      if (DefaultBorder)
-        Rect3D (0, 0, bound.Width (), bound.Height (),
-          CSPAL_BUTTON_DEFFRAME, CSPAL_BUTTON_DEFFRAME);
-      else
-        Rect3D (0, 0, bound.Width (), bound.Height (),
-          CSPAL_BUTTON_LIGHT3D, CSPAL_BUTTON_DARK3D);
-      Rect3D (1, 1, bound.Width () - 1, bound.Height () - 1, di, li);
-      Box (2, 2, bound.Width () - 2, bound.Height () - 2, CSPAL_BUTTON_BACKGROUND);
-      areaw = bound.Width () - 4; areah = bound.Height () - 4;
-      break;
-    case csbfsVeryThinRect:
-      if (Pressed)
-      {
-        Rect3D (0, 0, bound.Width (), bound.Height (), di, li);
-        areaw = bound.Width () - 2; areah = bound.Height () - 2;
-        Box (1, 1, bound.Width () - 1, bound.Height () - 1, CSPAL_BUTTON_BACKGROUND);
-      }
-      else
-      {
-        areaw = bound.Width (); areah = bound.Height ();
-        Clear (CSPAL_BUTTON_BACKGROUND);
-      } /* endif */
-      break;
-    default:
-      return;
-  } /* endswitch */
-
-  // Calculate image position
-  int imgx = 0, imgy = 0, imgw = 0, imgh = 0;
-  csPixmap *img = Pressed ? ImagePressed : ImageNormal;
-  if (img)
-  {
-    imgw = img->Width (); imgh = img->Height ();
-    if (imgw > areaw) imgw = areaw;
-    if (imgh > areah) imgh = areah;
-    imgx = (bound.Width () - imgw) / 2;
-    imgy = (bound.Height () - imgh) / 2;
-    if ((ButtonStyle & CSBS_SHIFT) && Pressed)
-    { imgx++; imgy++; }
-  } /* endif */
-
-  // Calculate text position
-  int txtx = 0, txty = 0;
-  if (text)
-  {
-    txtx = (bound.Width () - TextWidth (text)) / 2;
-    if (img)
-      switch (ButtonStyle & CSBS_TEXTPLACEMENT)
-      {
-        case CSBS_TEXTABOVE:
-          imgy += TextHeight () / 2;
-          txty = imgy - TextHeight () - 1;
-          break;
-        case CSBS_TEXTBELOW:
-          imgy -= TextHeight () / 2;
-          txty = imgy + img->Height () + 1;
-          break;
-      } /* endswitch */
-    else
-      txty = (bound.Height () - TextHeight ()) / 2;
-    if ((ButtonStyle & CSBS_SHIFT) && Pressed)
-    { txtx++; txty++; }
-  }
-
-  // Draw image
-  if (img)
-    Sprite2D (img, imgx, imgy, imgw, imgh);
-  // Draw text
-  if (text)
-  {
-    Text (txtx, txty, GetState (CSS_DISABLED) ? CSPAL_BUTTON_DTEXT :
-      CSPAL_BUTTON_TEXT, -1, text);
-    if (!GetState (CSS_DISABLED))
-      DrawUnderline (txtx, txty, text, underline_pos, CSPAL_BUTTON_TEXT);
-  }
-
-  csComponent::Draw ();
 }
 
 bool csButton::HandleEvent (iEvent &Event)
@@ -439,48 +300,5 @@ void csButton::SetState (int mask, bool enable)
 
 void csButton::SuggestSize (int &w, int &h)
 {
-  w = 0; h = 0;
-  if (ImagePressed)
-  {
-    w = ImagePressed->Width ();
-    h = ImagePressed->Height ();
-  } /* endif */
-  if (ImageNormal)
-  {
-    if (w < ImageNormal->Width ())
-      w = ImageNormal->Width ();
-    if (h < ImageNormal->Height ())
-      h = ImageNormal->Height ();
-  } /* endif */
-
-  if (text)
-  {
-    int tw = TextWidth (text) + 8;
-    int th = TextHeight () + 4;
-    if (tw > w) w = tw;
-    h += th;
-  } /* endif */
-
-  switch (FrameStyle)
-  {
-    case csbfsOblique:
-      h += 6;
-      w += (h / 3) * 2;
-      break;
-    case csbfsThickRect:
-      w += 6;
-      h += 6;
-      break;
-    case csbfsThinRect:
-      w += 4;
-      h += 4;
-      break;
-    case csbfsVeryThinRect:
-      w += 1;
-      h += 1;
-      break;
-    case csbfsNone:
-    default:
-      break;
-  } /* endswitch */
+  SKIN->SuggestSize (*this, w, h);
 }

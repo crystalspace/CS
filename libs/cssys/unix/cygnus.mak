@@ -135,6 +135,9 @@ endif
 # the availability of XSHM.
 DO_SHM=yes
 
+# Use makedep to build dependencies
+DEPEND_TOOL=mkdep
+
 endif # ifeq ($(MAKESECTION),defines)
 
 #--------------------------------------------------------------- confighelp ---#

@@ -22,6 +22,7 @@
 #include "csutil/scanstr.h"
 #include "csws/csmouse.h"
 #include "csws/csapp.h"
+#include "isystem.h"
 
 #define MOUSE_TEXTURE_NAME	"csws::Mouse"
 #define NO_VIRTUAL_POS		-999999
@@ -95,10 +96,30 @@ void csMouse::Undraw (int Page)
   }
 }
 
-void csMouse::NewPointer (char *id, char *posdef)
+void csMouse::ClearPointers ()
 {
+  Pointers.DeleteAll ();
+}
+
+void csMouse::NewPointer (const char *id, const char *posdef)
+{
+  static char *cursor_ids [] =
+  {
+    "Arrow", "Lens", "Cross", "Pen", "Move",
+    "SizeNWSE", "SizeNESW", "SizeNS", "SizeEW",
+    "Stop", "Wait", NULL
+  };
+
   int cID;
-  ScanStr (id, "%d", &cID);
+  for (cID = 0; ; cID++)
+    if (!cursor_ids [cID])
+    {
+      app->printf (MSG_WARNING, "WARNING: Unkown mouse cursor id (%s)\n", id);
+      return;
+    }
+    else if (!strcmp (id, cursor_ids [cID]))
+      break;
+
   int cX, cY, cW, cH, chX, chY;
   ScanStr (posdef, "%d,%d,%d,%d,%d,%d", &cX, &cY, &cW, &cH, &chX, &chY);
   Pointers.Push (new csMousePointer (app, this, cID, cX, cY, cW, cH, chX, chY));

@@ -138,8 +138,11 @@ ifndef DO.DEP
       # If mkdep is already installed, don't build it
       ifneq ($(MAKEDEP.INSTALLED),yes)
 dep: mkdep
+        MAKEDEP := ./makedep
+      else
+        MAKEDEP := makedep
       endif
-      DO.DEP1 = makedep $(MEM) $(subst $(CFLAGS.I),-I,$(CFLAGS.INCLUDE) )
+      DO.DEP1 = $(MAKEDEP) $(MEM) $(subst $(CFLAGS.I),-I,$(CFLAGS.INCLUDE) )
       DO.DEP2 = $(filter-out %.asm,$^) -o $(BUCK)O -p $(BUCK)\(OUT\) -r -c -f $@
       DO.DEP = $(DO.DEP1) $(DO.DEP2)
     else

@@ -218,6 +218,14 @@ bool csStatic::HandleEvent (iEvent &Event)
 
   switch (Event.Type)
   {
+    case csevBroadcast:
+      if ((Event.Command.Code == cscmdColorSchemeChanged)
+       && GetState (CSS_TRANSPARENT) && parent)
+      {
+        ResetPalette ();
+        SetColor (CSPAL_STATIC_BACKGROUND, parent->GetColor (0));
+      }
+      break;
     case csevCommand:
       switch (Event.Command.Code)
       {

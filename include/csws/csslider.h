@@ -19,38 +19,40 @@
 #ifndef __CSSLIDER_H__
 #define __CSSLIDER_H__
 
-/**
- * This is a slider control that draws vertical and/or horizontal lines in its parent canvas.
- * Look at csGrid to see it in action.
- */
-
 #include "csws/csbutton.h"
 
-enum {
+enum
+{
   /**
    * Sent to parent whenever the slider is moved.
    */
-  cscmdSliderPosChanged = 0x00000d00, // slider moved
-  cscmdSliderPosSet // slider has been set
+  cscmdSliderPosChanged = 0x00000d00,
+  /**
+   *
+   */
+  cscmdSliderPosSet
 };
 
+/**
+ * This is a slider control that draws vertical and/or horizontal lines
+ * in its parent canvas. Look at csGrid to see it in action.
+ */
 class csSlider : public csComponent
 {
- protected:
+protected:
   bool isSliding;
   bool isHorizontal;
   int mx, my; // last mouse position
 
- public:
+public:
+  csButton *handle;
+
   csSlider (csComponent *pParent);
 
   virtual void Draw ();
   virtual bool HandleEvent (iEvent &Event);
   bool SetRect (int xmin, int ymin, int xmax, int ymax);
   void GetLastMousePos (int &x, int &y){ x = mx; y = my; }
-
- public:
-  csButton *handle;
 };
 
-#endif
+#endif // __CSSLIDER_H__

@@ -73,9 +73,6 @@ public:
   /// Create dialog object
   csDialog (csComponent *iParent, csDialogFrameStyle iFrameStyle = csdfsNone);
 
-  /// Draw the button
-  virtual void Draw ();
-
   /// Handle input events
   virtual bool HandleEvent (iEvent &Event);
 
@@ -97,12 +94,21 @@ public:
   /// Return border width and height
   void GetBorderSize (int &w, int &h)
   { w = BorderWidth; h = BorderHeight; }
+  /// Set border width and height
+  void SetBorderSize (int w, int h);
 
   /// Fix dialog size when resizing
   virtual void FixSize (int &newW, int &newH);
 
+  /// Query dialog border style
+  inline csDialogFrameStyle GetFrameStyle ()
+  { return FrameStyle; }
   /// Change dialog border style
   void SetFrameStyle (csDialogFrameStyle iFrameStyle);
+
+  /// Get the name of the skip slice for this component
+  virtual char *GetSkinName ()
+  { return "Dialog"; }
 
 protected:
   /// Adjust focused control by switching back or forth if it is disabled

@@ -93,7 +93,7 @@ cspythonswigclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)cspython.dep
 $(OUTOS)cspython.dep: $(SRC.CSPYTHON)
-	$(DO.DEP)
+	$(DO.DEP1) $(CFLAGS.PYTHON) $(DO.DEP2)
 else
 -include $(OUTOS)cspython.dep
 endif

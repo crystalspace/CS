@@ -23,7 +23,6 @@
 #include "csutil/csbase.h"
 #include "cscomp.h"
 #include "csbutton.h"
-#include "cstheme.h"
 
 /// Window system menu button ID
 #define CSWID_BUTSYSMENU	0xC500
@@ -80,9 +79,7 @@ enum csWindowFrameStyle
 {
   cswfsNone,
   cswfsThin,
-  cswfs3D,
-  cswfsTexture,
-  cswfsTheme
+  cswfs3D
 };
 
 /**
@@ -107,7 +104,6 @@ enum
   cscmdWindowSetClient
 };
 
-
 /**
  * A csWindow object is a rectangular area of screen with border
  * which optionally contains a titlebar, a menubar and a client
@@ -127,46 +123,14 @@ protected:
   int TitlebarHeight;
   /// Menu height
   int MenuHeight;
-  /// Border Light Color index
-  int BorderLightColor;
-  /// Border Dark Color index
-  int BorderDarkColor;
-  /// Background Color index
-  int BackgroundColor;
-  /// Background Pixmap
-  csPixmap * BackgroundPixmap;
-  /// Border Pixmap
-  csPixmap * BorderPixmap;
-
-  /// Record if the theme is active for various pieces
-  struct ThemeWindowActive
-  {
-    unsigned int FrameStyle:1;
-    unsigned int BorderWidth:1;
-    unsigned int BorderHeight:1;
-    unsigned int BorderPixmap:1;
-    unsigned int TitlebarHeight:1;
-    unsigned int MenuHeight:1;
-    unsigned int CloseButton:1;
-    unsigned int HideButton:1;
-    unsigned int MaximizeButton:1;
-    unsigned int TitleBar:1;
-    unsigned int BorderLightColor:1;
-    unsigned int BorderDarkColor:1;
-    unsigned int BackgroundColor:1;
-    unsigned int BackgroundPixmap:1;
-  } ThemeActive;
 
 public:
   /// Create a window object
   csWindow (csComponent *iParent, char *iTitle, int iWindowStyle = CSWS_DEFAULTVALUE,
-    csWindowFrameStyle iFrameStyle = cswfsTheme);
+    csWindowFrameStyle iFrameStyle = cswfs3D);
 
   /// Rescale titlebar, menu etc before passing to original SetRect
   virtual bool SetRect (int xmin, int ymin, int xmax, int ymax);
-
-  /// Draw the window
-  virtual void Draw ();
 
   /// Handle input events
   virtual bool HandleEvent (iEvent &Event);
@@ -187,10 +151,8 @@ public:
   /// Same, but returns a readonly value
   virtual const char *GetText () const;
 
-  /// Handle a theme change event
-  virtual void ThemeChanged ();
-  /// Reset the window to use all theme values.
-  virtual void ResetTheme();
+  /// Override SetState method to change titlebar when window focused flag changes
+  virtual void SetState (int mask, bool enable);
 
   /// Set window border width and height
   void SetBorderSize (int w, int h);
@@ -199,7 +161,7 @@ public:
   { bw = BorderWidth; bh = BorderHeight; }
 
   /// Set title bar height and redraws the window
-  void SetTitleHeight (int iHeight);
+  void SetTitlebarHeight (int iHeight);
   /// Get window titlebar height
   int GetTitlebarHeight ()
   { return TitlebarHeight; }
@@ -215,34 +177,19 @@ public:
   /// Transform window size into client window size
   void WindowToClient (int &ClientW, int &ClientH);
 
-  /// Set background color of the window
-  void SetBackgroundColor (int Color);
-  /// Set background Pixmap of the window
-  void SetBackgroundPixmap (csPixmap *pixmap);
-  /// Get background color of the window
-  int GetBackgroundColor ();
-  /// Get background Pixmap of the window
-  csPixmap *GetBackgroundPixmap ();
+  /// Query window style bits
+  inline int GetWindowStyle ()
+  { return WindowStyle; }
 
-  /// Set BorderDarkColor
-  void SetBorderDarkColor (int Color);
-  /// Set BorderLightColor
-  void SetBorderLightColor (int Color);
-  /// Set BorderPixmap
-  void SetBorderPixmap (csPixmap * pixmap);
-  /// Get BorderDarkColor
-  int GetBorderDarkColor ();
-  /// Get BorderLightColor
-  int GetBorderLightColor ();
-  /// Get BorderPixmap
-  csPixmap *GetBorderPixmap ();
+  /// Change window frame style
+  void SetFrameStyle (csWindowFrameStyle iFrameStyle);
+  /// Query window frame style
+  inline csWindowFrameStyle GetFrameStyle ()
+  { return FrameStyle; }
 
-protected:
-  /// Set button bitmaps to one of those read from csws.cfg
-  void SetButtBitmap (csButton *button, char *id_n, char *id_p);
-
-  /// Override SetState method to change titlebar when window focused flag changes
-  virtual void SetState (int mask, bool enable);
+  /// Get the name of the skip slice for this component
+  virtual char *GetSkinName ()
+  { return "Window"; }
 };
 
 #endif // __CSWINDOW_H__

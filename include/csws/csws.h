@@ -119,6 +119,10 @@ struct iEvent;
 #include "cswstex.h"			// Windowing System textures
 #include "csapp.h"			// Windowing System application
 #include "cswsutil.h"			// Windowing System shortcuts and utilites
+#include "csskin.h"			// Windowing System skin management
+
+// Include all known skins here
+#include "sdefault.h"
 
 #endif // CSWS_INTERNAL
 

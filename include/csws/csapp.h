@@ -29,7 +29,8 @@
 #include "csutil/csstrvec.h"
 #include "iplugin.h"
 #include "ievent.h"
-#include "cstheme.h"
+
+class csSkin;
 
 /**
  * Application's background styles
@@ -58,8 +59,6 @@ class csApp : public csComponent
 protected:
   friend class csMouse;
 
-  /// The Application Theme
-  csTheme * theme;
   /// The graphics pipeline
   csGraphicsPipeline *GfxPpl;
   /// The mouse pointer
@@ -108,6 +107,8 @@ public:
   iSystem *System;
   /// The virtual file system
   iVFS *VFS;
+  /// The Windowing System configuration file
+  iConfigFile *Config;
   /// Application's adaptive palette
   int Pal [cs_Color_Last];
   /// The component that captured the mouse
@@ -116,27 +117,27 @@ public:
   csComponent *KeyboardOwner;
   /// The component that captured all focused events (mouse & keyboard)
   csComponent *FocusOwner;
+  /// The global skin repository
+  csSkin *skin;
   /// If this flag is set, there are still unrefreshed components
   bool RedrawFlag;
   /// This is set to TRUE each time top-level window list changes
   bool WindowListChanged;
+  /// Global "Insert" key state
+  bool InsertMode;
   /// Screen width and height (application can be actually smaller)
   int ScreenWidth, ScreenHeight;
 
-  /// Titlebar buttons definitions
-  csStrVector *titlebardefs;
-  /// Dialog buttons definitions
-  csStrVector *dialogdefs;
-  /// Global "Insert" key state
-  bool insert;
-
-  /// Initialize windowing system
-  csApp (iSystem *SysDriver);
+  /// Initialize windowing system by giving a system driver and a skin
+  csApp (iSystem *System, csSkin &Skin);
   /// Deinitialize windowing system
   virtual ~csApp ();
 
   /// Set up application layout (read configs, create windows, menus etc)
-  virtual bool InitialSetup ();
+  virtual bool Initialize (const char *iConfigName);
+
+  /// Set the skin of the application
+  void SetSkin (csSkin *Skin, bool DeleteOld = true);
 
   /// This is called once per frame by HandleEvent ()
   virtual void StartFrame ();
@@ -208,7 +209,7 @@ public:
   csComponent *CaptureFocus (csComponent *who)
   { csComponent *c = FocusOwner; FocusOwner = who; return c; }
 
-  /// Query shift key state
+  /// Query the current state of a key
   bool GetKeyState (int iKey);
 
   /// Query current time
@@ -221,11 +222,6 @@ public:
   /// Set window list size
   void SetWindowListSize (int iWidth, int iHeight)
   { WindowListWidth = iWidth; WindowListHeight = iHeight; }
-
-  /// Retrieve the Application Theme
-  csTheme * GetTheme();
-  /// Set the Application Theme (setting it to NULL creates a new default theme)
-  void SetTheme(csTheme * nTheme);
 
   /// Insert a child component
   virtual void Insert (csComponent *comp);
@@ -247,6 +243,9 @@ public:
 
   /// Handle a event if nobody eaten it.
   virtual bool PostHandleEvent (iEvent &Event);
+
+  /// Get the closest in window hierarchy skin object
+  virtual csSkin *GetSkin ();
 
 /*
  * The following methods are simple redirectors to csGraphicsPipeline
@@ -274,7 +273,7 @@ public:
 
   /// Draw a text string: if bg < 0 background is not drawn
   void pplText (int x, int y, int fg, int bg, int Font, int FontSize, const char *s)
-  { GfxPpl->Text (x, y, pplColor (fg), bg >= 0 ? pplColor (bg) : bg, Font, FontSize, s); }
+  { GfxPpl->Text (x, y, pplColor (fg), bg != -1 ? pplColor (bg) : bg, Font, FontSize, s); }
 
   /// Draw a (scaled) 2D sprite
   void pplSprite2D (csPixmap *s2d, int x, int y, int w, int h)
@@ -384,8 +383,8 @@ public:
   { return GfxPpl->G3D; }
 
 protected:
-  /// Initialize configuration data: load csws.cfg
-  virtual void LoadConfig ();
+  /// Initialize all skin slices with textures and colors etc
+  void InitializeSkin ();
   /// setup palette
   void SetupPalette ();
 };

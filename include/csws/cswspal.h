@@ -20,17 +20,51 @@
 #ifndef __CSWSPAL_H__
 #define __CSWSPAL_H__
 
+class csApp;
+
 /**
  * Control palette export structure
  */
 struct csPaletteExport
 {
   int *Palette;
-  int Length;
+  int Size;
+};
+
+/**
+ * This structure is used to change color scheme.
+ * The Color, Contrast and Blend values gives control over
+ * the overall palette look, besides the "BaseTone", which
+ * defines the "base" color for scheme. The "normal"
+ * values for Color,Contrast,Blend are 100, which means
+ * the respective parameters will get same value like
+ * in the "default" palette.
+ */
+struct csColorScheme
+{
+  /// Base tone for scheme (e.g. red, cyan, gray etc)
+  int BaseTone;
+  /// (H) The difference (-100..0..+100) between the base tone and other colors
+  int8 Color;
+  /// (L) Contrast (-100..0..+100) betweem base tone and bright/dark variants
+  int8 Contrast;
+  /// (S) The attraction factor (-100..0..+100) towards base tone
+  int8 Blend;
 };
 
 /// A global array containing CSWS palette for all component types
-extern csPaletteExport cswsPalette[];
+extern csPaletteExport *cswsPalette;
+/// Total number of palettes
+extern int cswsPaletteSize;
+
+/**
+ * Register a new color palette (returns the palette index).
+ * Registered palettes will be affected by color scheme changes;
+ * unregistered won't be.
+ */
+extern int csRegisterPalette (int *Palette, int Size);
+/// Change the global color scheme (or restore scheme if NULL passed)
+extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 
 /**
  * These are indices into cswsPalette for each component type
@@ -72,6 +106,8 @@ extern csPaletteExport cswsPalette[];
 /// Tree control palette index
 #define CSPAL_TREECTRL		        16
 
+/// The last palette index, user palettes should go at CSPAL_LAST + 1, + 2, ...
+#define CSPAL_LAST			16
 
 /**
  * csApp class color palette indices.<p>

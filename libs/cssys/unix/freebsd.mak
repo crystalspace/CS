@@ -94,6 +94,9 @@ SRC.SYS_CSSYS_DLL = libs/cssys/unix/dummy.cpp
 # The linker.
 #LINK=gcc
 
+# Use makedep to build dependencies
+DEPEND_TOOL=mkdep
+
 endif # ifeq ($(MAKESECTION),defines)
 
 #--------------------------------------------------------------- confighelp ---#

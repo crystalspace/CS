@@ -116,18 +116,15 @@ enum csButtonFrameStyle
  */
 class csButton : public csComponent
 {
+protected:
   // Button images in normal and pressed state
   csPixmap *ImageNormal, *ImagePressed;
   // Should images be automatically deleted?
   bool delImages;
   // Command code emmited when button is pressed
   int CommandCode;
-  // true if button was last painted with 'default' border
-  bool DefaultBorder;
   // Character number that should be underlined (-1 == none)
   int underline_pos;
-
-protected:
   /// Button style
   int ButtonStyle;
   // Button frame style
@@ -160,9 +157,6 @@ public:
   /// Delete image bitmaps if iDelete was true on SetBitmap
   void FreeBitmaps ();
 
-  /// Draw the button
-  virtual void Draw ();
-
   /// Handle external events
   virtual bool HandleEvent (iEvent &Event);
 
@@ -185,6 +179,22 @@ public:
 
   /// Set button pressed state
   virtual void SetPressed (bool state);
+
+  /// Get button style flags
+  inline int GetButtonStyle ()
+  { return ButtonStyle; }
+
+  /// Get button frame style
+  inline csButtonFrameStyle GetFrameStyle ()
+  { return FrameStyle; }
+
+  /// Get the character number to be underlined (hotkey)
+  inline int GetUnderlinePos ()
+  { return underline_pos; }
+
+  /// Get the name of the skip slice for this component
+  virtual char *GetSkinName ()
+  { return "Button"; }
 
 protected:
   /// Emulate a button press (generate command)

@@ -26,7 +26,6 @@
 #include <string.h>
 
 #include "version.h"
-#include "csutil/parser.h"
 #include "csutil/util.h"
 
 #endif // __CSWSAUX_H__

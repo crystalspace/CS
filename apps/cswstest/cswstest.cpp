@@ -31,7 +31,7 @@ class csWsTest : public csApp
 
 public:
   /// Initialize maze editor
-  csWsTest (iSystem *SysDriver);
+  csWsTest (iSystem *SysDriver, csSkin &Skin);
 
   /// Initialize maze editor
   virtual ~csWsTest ();
@@ -39,7 +39,7 @@ public:
   ///
   virtual bool HandleEvent (iEvent &Event);
 
-  virtual bool InitialSetup ();
+  virtual bool Initialize (const char *iConfigName);
 
   virtual void StartFrame ();
 
@@ -142,10 +142,11 @@ static int palette_csWsTest[] =
   cs_Color_White			// Start points
 };
 
-csWsTest::csWsTest (iSystem *SysDriver) : csApp (SysDriver)
+csWsTest::csWsTest (iSystem *System, csSkin &Skin) : csApp (System, Skin)
 {
-  SetPalette (palette_csWsTest, sizeof (palette_csWsTest) / sizeof (int));
-  pFontServer = QUERY_PLUGIN(SysDriver,iFontServer);
+  int pal = csRegisterPalette (palette_csWsTest, sizeof (palette_csWsTest) / sizeof (int));
+  SetPalette (pal);
+  pFontServer = QUERY_PLUGIN (System, iFontServer);
   if (pFontServer != NULL)
   {
     iLucidiaID = pFontServer->LoadFont("LucidiaTypewriterRegular","/fonts/LucidiaTypewriterRegular.ttf");
@@ -174,9 +175,9 @@ void csWsTest::StartFrame ()
 }
 
 
-bool csWsTest::InitialSetup ()
+bool csWsTest::Initialize (const char *iConfigName)
 {
-  if (!csApp::InitialSetup ())
+  if (!csApp::Initialize (iConfigName))
     return false;
 
   // CSWS apps are a lot more performant with a single-buffered canvas
@@ -337,16 +338,16 @@ bool csWsTest::InitialSetup ()
     but->SetText ("Theme"); but->SetRect (400, 75, 500, 95);
 
     but = new csButton (this, 9993);
-    but->SetText ("~Black background"); but->SetRect (20, 120, 190, 140);
+    but->SetText ("~Black scheme"); but->SetRect (20, 120, 190, 140);
 
     but = new csButton (this, 9992);
-    but->SetText ("~White background"); but->SetRect (20, 180, 190, 200);
+    but->SetText ("~White scheme"); but->SetRect (20, 180, 190, 200);
 
     but = new csButton (this, 9991);
-    but->SetText ("~Red background"); but->SetRect (20, 240, 190, 260);
+    but->SetText ("~Red scheme"); but->SetRect (20, 240, 190, 260);
 
     but = new csButton (this, 9990);
-    but->SetText ("~Alpha Background"); but->SetRect (20, 280, 190, 300);
+    but->SetText ("~Green scheme"); but->SetRect (20, 280, 190, 300);
   }
 
   return true;
@@ -480,10 +481,10 @@ void csWsTest::ThemeDialog ()
 {
   // create a window
   csComponent *window = new csThemeTestWindow (this, "Theme test",
-    CSWS_BUTSYSMENU | CSWS_TITLEBAR | CSWS_BUTHIDE | CSWS_BUTCLOSE |
-    CSWS_BUTMAXIMIZE | CSWS_TOOLBAR | CSWS_TBPOS_BOTTOM);
+    CSWS_BUTSYSMENU | CSWS_TITLEBAR | CSWS_BUTCLOSE);
   window->SetSize (400, 300);
   window->Center ();
+  window->Select ();
 }
 
 void csWsTest::NotebookDialog ()
@@ -659,39 +660,33 @@ bool csWsTest::HandleEvent (iEvent &Event)
           return true;
         }
         case 9993:
-        {
-          csThemeWindow * thwin = (csThemeWindow *) theme->GetThemeComponent("csWindow");
-          int Color = FindColor(0,0,0);
-          thwin->SetBackgroundColor(Color);
-          thwin->SetBackgroundPixmap(NULL);
-          thwin->BroadcastThemeChange();
+	{
+	  //black
+	  csColorScheme Scheme = { cs_Color_Black, 100, -50, 10 };
+          csSetColorScheme (this, Scheme);
           return true;
-        }
+	}
         case 9992:
-        {
-          csThemeWindow * thwin = (csThemeWindow *) theme->GetThemeComponent("csWindow");
-          int Color = FindColor(255,255,255);
-          thwin->SetBackgroundColor(Color);
-          thwin->SetBackgroundPixmap(NULL);
-          thwin->BroadcastThemeChange();
+	{
+	  //white
+	  csColorScheme Scheme = { cs_Color_White, 100, -50, 10 };
+          csSetColorScheme (this, Scheme);
           return true;
-        }
+	}
         case 9991:
-        {
-          csThemeWindow * thwin = (csThemeWindow *) theme->GetThemeComponent("csWindow");
-          int Color = FindColor(255,0,0);
-          thwin->SetBackgroundColor(Color);
-          thwin->SetBackgroundPixmap(NULL);
-          thwin->BroadcastThemeChange();
+	{
+	  //red
+	  csColorScheme Scheme = { cs_Color_Red_D, 100, 0, 10 };
+          csSetColorScheme (this, Scheme);
           return true;
-        }
+	}
         case 9990:
-        {
-          csThemeWindow * thwin = (csThemeWindow *) theme->GetThemeComponent("csWindow");
-          thwin->SetBackgroundPixmap(thwin->GetCloseButtonP());
-          thwin->BroadcastThemeChange();
+	{
+	  //green
+	  csColorScheme Scheme = { cs_Color_Green_D, 100, 0, 10 };
+          csSetColorScheme (this, Scheme);
           return true;
-        }
+	}
       }
       break;
 
@@ -754,30 +749,40 @@ drawline:
   return false;
 }
 
-//---------------------------------------------------------------------------
+//-----
 
-/*
- * Main function
- */
-int main (int argc, char* argv[])
+csThemeTestWindow::csThemeTestWindow (csComponent *iParent, char * iTitle,
+  int iWindowStyle) : csWindow (iParent, iTitle, iWindowStyle)
 {
-  SysSystemDriver System;
-
-  if (!System.Initialize (argc, argv, "/config/MazeD.cfg"))
-    return -1;
-
-  if (!System.Open ("Crystal Space Windowing System testbed"))
-    return -1;
-
-  // Create our application object
-  csWsTest cswstest_app (&System);
-
-  if (cswstest_app.InitialSetup ())
-    System.Loop ();
-
-  return 0;
+  SetState (CSS_TRANSPARENT, true);
+#if 0
+  csButton *but = new csButton (this, 0x8f000000);
+  but->SetText ("Select Background Color"); but->SetRect (20, 20, 190, 40);
+  but = new csButton (this, 0x8f000001);
+  but->SetText ("Select Dark Border Color"); but->SetRect (20, 40, 190, 60);
+  but = new csButton (this, 0x8f000002);
+  but->SetText ("Select Light Border Color"); but->SetRect (20, 60, 190, 80);
+  colordialog  = csColorDialog (this, "Theme Color Dialog", GetColor (CSPAL_WINDOW_BORDER));
+  colordialog->SetPos(240,40);
+#endif
 }
 
+void csThemeTestWindow::Draw()
+{
+  csWindow::Draw();
+  int d_font = GetFont();
+  int d_fsize = GetFontSize();
+  if ( ((csWsTest *)app)->iLucidiaID != -1)
+    SetFont(((csWsTest *)app)->iLucidiaID,false);
+  SetFontSize(12, false);
+  Text (BorderWidth+8, BorderHeight+100, CSPAL_WINDOW_LIGHT3D, -1,
+    "This is a font 12 test");
+  SetFontSize(8, false);
+  Text (BorderWidth+8, BorderHeight+140, CSPAL_WINDOW_LIGHT3D, -1,
+    "This is a font 8 test");
+  SetFont(d_font,false);
+  SetFontSize(d_fsize,false);
+}
 
 bool csThemeTestWindow::HandleEvent (iEvent &Event)
 {
@@ -794,9 +799,7 @@ bool csThemeTestWindow::HandleEvent (iEvent &Event)
             {
               int color;
               csQueryColorDialog (colordialog, color);
-              csThemeWindow * thwin = (csThemeWindow *)GetTheme();
-              thwin->SetBackgroundColor(color);
-              thwin->BroadcastThemeChange();
+	      //...
             }
             return true;
           case 0x8f000001:
@@ -804,9 +807,7 @@ bool csThemeTestWindow::HandleEvent (iEvent &Event)
             {
               int color;
               csQueryColorDialog (colordialog, color);;
-              csThemeWindow * thwin = (csThemeWindow *)GetTheme();
-              thwin->SetBorderDarkColor(color);
-              thwin->BroadcastThemeChange();
+	      //...
             }
             return true;
           case 0x8f000002:
@@ -814,9 +815,7 @@ bool csThemeTestWindow::HandleEvent (iEvent &Event)
             {
               int color;
               csQueryColorDialog (colordialog, color);
-              csThemeWindow * thwin = (csThemeWindow *)GetTheme();
-              thwin->SetBorderLightColor(color);
-              thwin->BroadcastThemeChange();
+	      //...
             }
             return true;
         }
@@ -826,30 +825,29 @@ bool csThemeTestWindow::HandleEvent (iEvent &Event)
   return csWindow::HandleEvent (Event);
 }
 
-csThemeTestWindow::csThemeTestWindow (csComponent *iParent,char * iTitle,int iWindowStyle) : csWindow (iParent,iTitle,iWindowStyle)
-{
-  SetState(CSS_TRANSPARENT,true);
-  csButton *but = new csButton (this, 0x8f000000);
-  but->SetText ("Select Background Color"); but->SetRect (20, 20, 190, 40);
-  but = new csButton (this, 0x8f000001);
-  but->SetText ("Select Dark Border Color"); but->SetRect (20, 40, 190, 60);
-  but = new csButton (this, 0x8f000002);
-  but->SetText ("Select Light Border Color"); but->SetRect (20, 60, 190, 80);
-  colordialog  = csColorDialog (this, "Theme Color Dialog",BackgroundColor);
-  colordialog->SetPos(240,40);
-}
+//---------------------------------------------------------------------------
 
-void csThemeTestWindow::Draw()
+// Define the skin for windowing system
+SKIN_DECLARE_DEFAULT (DefaultSkin);
+
+/*
+ * Main function
+ */
+int main (int argc, char* argv[])
 {
-  csWindow::Draw();
-  int d_font = GetFont();
-  int d_fsize = GetFontSize();
-  if ( ((csWsTest *)app)->iLucidiaID != -1)
-    SetFont(((csWsTest *)app)->iLucidiaID,false);
-  SetFontSize(12,false);
-  Text (BorderWidth+8, BorderHeight+100, BorderLightColor,-1, "This is a font 12 test");
-  SetFontSize(8,false);
-  Text (BorderWidth+8, BorderHeight+140, BorderLightColor, -1, "This is a font 8 test");
-  SetFont(d_font,false);
-  SetFontSize(d_fsize,false);
+  SysSystemDriver System;
+
+  if (!System.Initialize (argc, argv, "/config/wscs3d.cfg"))
+    return -1;
+
+  if (!System.Open ("Crystal Space Windowing System testbed"))
+    return -1;
+
+  // Create our application object
+  csWsTest app (&System, DefaultSkin);
+
+  if (app.Initialize ("/lib/csws/csws.cfg"))
+    System.Loop ();
+
+  return 0;
 }

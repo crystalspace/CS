@@ -26,10 +26,10 @@
 #include "csengine/cspixmap.h"
 #include "cswspal.h"
 #include "igraph2d.h"
-#include "cstheme.h"
 
 class csApp;
-class csStrVector;
+class csSkin;
+class csSkinSlice;
 
 /// Component state flags
 
@@ -49,6 +49,8 @@ class csStrVector;
 #define CSS_TRANSPARENT		0x00080000
 /// Component is modally executing
 #define CSS_MODAL		0x00100000
+/// Component is maximized (NEVER change this manually!)
+#define CSS_MAXIMIZED		0x00200000
 
 /**
  * csApp contains a static array with indexes of all colors
@@ -105,6 +107,8 @@ enum
  *       <li>0x00000A00 ... 0x00000AFF: csSpinBox class messages
  *       <li>0x00000B00 ... 0x00000BFF: csColorWheel class messages
  *       <li>0x00000C00 ... 0x00000CFF: csNotebook class messages
+ *       <li>0x00000D00 ... 0x00000DFF: csSlider class messages
+ *       <li>0x00000E00 ... 0x00000EFF: csTree class messages
  *     </ul>
  *   <li>0x80000000 ... 0xFFFFFFFF: Reserved for user class-specific messages
  * </ul>
@@ -195,7 +199,29 @@ enum
   ///
   cscmdRetry,
   ///
-  cscmdIgnore
+  cscmdIgnore,
+  /**
+   * This command tells every component that Windowing System's
+   * color scheme has been changed.
+   * <pre>
+   * IN:  nothing
+   * OUT: nothing
+   * </pre>
+   */
+  cscmdColorSchemeChanged,
+  /**
+   * Skin has changed (or some components of the skin).
+   * If the component is skinnable, it should query the
+   * respective skin slice from the skin object and store
+   * it into the 'skinslice' member variable for later use.
+   * Also the component is invalidated upon reception of
+   * this message.
+   * <pre>
+   * IN:  (csSkin *)skinslice
+   * OUT: nothing
+   * </pre>
+   */
+  cscmdSkinChanged
 };
 
 /**
@@ -248,8 +274,10 @@ protected:
   csRect clip;
   /// Component palette and palette length
   int *palette, palettesize;
-  /// false if palette points to static array, true if it is a copy
-  bool originalpalette;
+  /// Original component palette
+  int *originalpalette;
+  /// Original bound when window is maximized
+  csRect OrgBound;
   /// Window drag style (see CS_DRAG_XXX above)
   int DragStyle;
   /// Used on drag operations
@@ -264,12 +292,8 @@ protected:
   int Font;
   /// Current font size
   int FontSize;
-  /// true if window is maximized, false if not (OrgBound invalid in this case)
-  bool Maximized;
-  /// Original bound when window is maximized
-  csRect OrgBound;
-  /// Theme Component Name
-  char *ThemeID;
+  /// An array of 'clip children', i.e. components which are clipped inside our bounds
+  csVector clipchildren;
 
 public:
   /// The focused child window
@@ -280,12 +304,12 @@ public:
   csComponent *next, *prev;
   /// Parent component or NULL
   csComponent *parent;
-  /// An array of 'clip children', i.e. components which are clipped inside our bounds
-  csVector clipchildren;
   /// Top-level application object
   csApp *app;
-  /// Component Theme
-  csThemeComponent *theme;
+  /// Component skin slice
+  csSkinSlice *skinslice;
+  /// Abstract pointer for internal use by skin slice
+  csSome *skindata;
   /// Component ID, unique within its parrent's child ring
   unsigned int id;
   /// Component size/position rectangle
@@ -370,7 +394,10 @@ public:
 
   /// Same, but accepts the index into cswsPalette[] array
   void SetPalette (int iPaletteID)
-  { SetPalette (cswsPalette [iPaletteID].Palette, cswsPalette [iPaletteID].Length); }
+  { SetPalette (cswsPalette [iPaletteID].Palette, cswsPalette [iPaletteID].Size); }
+
+  /// Reset the palette of the component to the palette it had at startup
+  void ResetPalette ();
 
   /// Set a color value in palette (makes a copy of *palette if not already)
   void SetColor (int Index, int Color);
@@ -423,6 +450,8 @@ public:
 
   /// Send a command to this window and returns the Info field of iEvent object
   void *SendCommand (int CommandCode, void *Info = NULL);
+  /// Send a broadcast to this window and returns the Info field of iEvent object
+  void *SendBroadcast (int CommandCode, void *Info = NULL);
 
   /// Find the 'default' child
   csComponent *GetDefault ();
@@ -567,6 +596,12 @@ public:
   /// Find the maximal rectangle uncovered by child windows
   void FindMaxFreeRect (csRect &area);
 
+  /// Get the name of the skip slice for this component (if not NULL)
+  virtual char *GetSkinName ();
+
+  /// Get the closest in window hierarchy skin object
+  virtual csSkin *GetSkin ();
+
   /**
    * The following methods should be used for drawing.
    * All drawing routines below performs all required clipping.
@@ -640,7 +675,7 @@ public:
   { Box (0, 0, bound.Width (), bound.Height (), colindx); }
 
   /// Clear the Z-buffer in the given rectangle
-  void ClearZbuffer (int x1, int y1, int x2, int y2);
+  void ClearZbuffer (int xmin, int ymin, int xmax, int ymax);
 
   /// Clear the Z-buffer in the area covered by this component
   void ClearZbuffer ()
@@ -649,16 +684,11 @@ public:
   /// Draw a 3D polygon
   void Polygon3D (G3DPolygonDPFX &poly, UInt mode);
 
-  /// Retrieve the Component Theme
-  csThemeComponent *GetTheme ();
-  /// Set the Component Theme (setting it to NULL makes it look at the parent or app Theme)
-  void SetTheme (csThemeComponent *nTheme);
-  /// Get the name of the component in the Theme.
-  char *GetName () { return ThemeID; }
-  /// Handle a theme change event
-  virtual void ThemeChanged ();
-  /// Reset the window to use all theme values.
-  virtual void ResetTheme ();
+  ///-------------------------------------- Utility drawing functions ----------
+
+  /// Draw a underline under iText drawn at iX,iY with iColor
+  void DrawUnderline (int iX, int iY, const char *iText, int iUnderlinePos,
+    int iColor);
 
 protected:
   /**
@@ -677,9 +707,6 @@ protected:
    * This is used by labels, menuitems, static components etc.
    */
   static void PrepareLabel (const char *iLabel, char * &oLabel, int &oUnderlinePos);
-  /// Draw a underline under iText drawn at iX,iY with iColor
-  void DrawUnderline (int iX, int iY, const char *iText, int iUnderlinePos,
-    int iColor);
 
   /// Check if the keyboard event fits given hot key
   bool CheckHotKey (iEvent &iEvent, char iHotKey);
@@ -688,6 +715,9 @@ protected:
   static int WordLeft (const char *iText, int StartPos);
   /// Return position one word right from StartPos
   static int WordRight (const char *iText, int StartPos);
+
+  /// Apply a skin <b>only</b> to this component: returns true on success
+  bool ApplySkin (csSkin *Skin);
 
 private:
   static bool do_handle_event (csComponent *child, void *param);

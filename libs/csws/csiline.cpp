@@ -138,7 +138,7 @@ void csInputLine::Draw ()
   {
     int cx = GetCharX (cursorpos);
     if (cx < clip.xmax)
-      if (app->insert || (cursorpos == (int)strlen (text)))
+      if (app->InsertMode || (cursorpos == (int)strlen (text)))
         cursorrect.Set (cx - 1, texty - 1, cx + 1, texty + TextHeight () + 1);
       else
       {
@@ -148,7 +148,7 @@ void csInputLine::Draw ()
   } /* endif */
 
   // draw text
-  if (!app->insert && cursorvis && GetState (CSS_FOCUSED) && !Disabled)
+  if (!app->InsertMode && cursorvis && GetState (CSS_FOCUSED) && !Disabled)
   {
     if (sels == sele)
     {
@@ -185,7 +185,7 @@ void csInputLine::Draw ()
     Text (textx, texty, CSPAL_INPUTLINE_TEXT, -1, &text [firstchar]);
 
   // if cursor is in insert state, draw
-  if (app->insert && cursorvis && GetState (CSS_FOCUSED) && !Disabled)
+  if (app->InsertMode && cursorvis && GetState (CSS_FOCUSED) && !Disabled)
   {
     if (!cursorrect.IsEmpty ())
       Box (cursorrect.xmin, cursorrect.ymin, cursorrect.xmax,
@@ -330,7 +330,7 @@ do_key:   if ((Event.Key.Modifiers & (CSMASK_CTRL | CSMASK_ALT))
           char *tmp = (char *)alloca (maxlen + 1);
           strcpy (tmp, text);
           int sl = strlen (tmp);
-          if (app->insert)
+          if (app->InsertMode)
           {
             if (sl >= maxlen)
               return true;

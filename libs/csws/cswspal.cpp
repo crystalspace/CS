@@ -18,8 +18,12 @@
 */
 
 #include "cssysdef.h"
+#include "qint.h"
 #include "csws/cswspal.h"
 #include "csws/cscomp.h"
+#include "csws/csapp.h"
+#include "csws/cswsutil.h"
+#include "csws/csskin.h"
 
 // Application class default palette
 static int palette_csApp [] =
@@ -221,7 +225,7 @@ static int palette_csSlider [] =
 };
 
 // Pointers to all standard palettes
-csPaletteExport cswsPalette [] =
+static csPaletteExport defaultPalette [] =
 {
   { palette_csApp,         sizeof (palette_csApp)         / sizeof (int) },
   { palette_csButton,      sizeof (palette_csButton)      / sizeof (int) },
@@ -241,3 +245,108 @@ csPaletteExport cswsPalette [] =
   { palette_csTreeItem,    sizeof (palette_csTreeItem)    / sizeof (int) },
   { palette_csTreeCtrl,    sizeof (palette_csTreeCtrl)    / sizeof (int) }
 };
+
+csPaletteExport *cswsPalette = defaultPalette;
+int cswsPaletteSize = sizeof (defaultPalette) / sizeof (csPaletteExport);
+static int **savedPalette = NULL;
+
+int csRegisterPalette (int *Palette, int Size)
+{
+  int index = cswsPaletteSize++;
+  if (cswsPalette == defaultPalette)
+  {
+    // We're called for the first time, so we have to allocate a new palette
+    cswsPalette = (csPaletteExport *)malloc (
+      sizeof (csPaletteExport) * cswsPaletteSize);
+    memcpy (cswsPalette, &defaultPalette, index * sizeof (csPaletteExport));
+  }
+  else
+    cswsPalette = (csPaletteExport *)realloc (cswsPalette,
+      sizeof (csPaletteExport) * cswsPaletteSize);
+  cswsPalette [index].Palette = Palette;
+  cswsPalette [index].Size = Size;
+  return index;
+}
+
+static void csSavePalette ()
+{
+  if (savedPalette)
+    return;
+  savedPalette = new int * [cswsPaletteSize];
+  for (int i = 0; i < cswsPaletteSize; i++)
+  {
+    savedPalette [i] = new int [cswsPalette [i].Size];
+    memcpy (savedPalette [i], cswsPalette [i].Palette,
+      cswsPalette [i].Size * sizeof (int));
+  }
+}
+
+static void csFreePalette ()
+{
+  if (!savedPalette)
+    return;
+  for (int i = 0; i < cswsPaletteSize; i++)
+    delete [] savedPalette [i];
+  delete [] savedPalette;
+  savedPalette = NULL;
+}
+
+static void csRestorePalette ()
+{
+  if (!savedPalette)
+    return;
+  for (int i = 0; i < cswsPaletteSize; i++)
+    memcpy (cswsPalette [i].Palette, savedPalette [i],
+      cswsPalette [i].Size * sizeof (int));
+}
+
+void csSetColorScheme (csApp *iApp, csColorScheme &Scheme)
+{
+  if (!&Scheme)
+  {
+    csRestorePalette ();
+    csFreePalette ();
+    return;
+  }
+
+  csSavePalette ();
+
+  // Get the HLS for scheme's base tone
+  float sch_r, sch_g, sch_b;
+  csGetRGB (Scheme.BaseTone, iApp, sch_r, sch_g, sch_b);
+  float sch_h, sch_l, sch_s;
+  csRGB2HLS (sch_r, sch_g, sch_b, sch_h, sch_l, sch_s);
+
+  // Scheme color,contrast and blend values as floating-point values
+  float sch_color = Scheme.Color / 100.;
+  float sch_contrast = -Scheme.Contrast / 100.;
+  float sch_blend = Scheme.Blend / 100.;
+
+  for (int i = 0; i < cswsPaletteSize; i++)
+  {
+    int *pal = savedPalette [i];
+    for (int j = 0; j < cswsPalette [i].Size; j++)
+    {
+      float r, g, b;
+      csGetRGB (pal [j], iApp, r, g, b);
+      float h, l, s;
+      csRGB2HLS (r, g, b, h, l, s);
+
+      if (sch_s > 1/32.)
+        h = h + (sch_h - h) * sch_color;
+      l = l + (sch_l - l) * sch_contrast;
+      s = s + (sch_s - s) * sch_blend;
+
+      if (h < 0.) h += 1.; if (h > 1.) h -= 1.;
+      if (l < 0.) l = 0.; if (l > 1.) l = 1.;
+      if (s < 0.) s = 0.; if (s > 1.) s = 1.;
+
+      csHLS2RGB (h, l, s, r, g, b);
+
+      cswsPalette [i].Palette [j] =
+        iApp->FindColor (QInt (r * 255), QInt (g * 255), QInt (b * 255));
+    }
+  }
+  iApp->Invalidate (true);
+  iApp->SendBroadcast (cscmdColorSchemeChanged);
+}

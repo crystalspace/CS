@@ -32,25 +32,12 @@
 #include "csws/csdialog.h"
 #include "csws/csapp.h"
 #include "csws/cswsutil.h"
+#include "csws/csskin.h"
 #include "isystem.h"
 #include "ivfs.h"
 #include "itxtmgr.h"
 #include "ievent.h"
 #include "icfgfile.h"
-
-// Archive path of CSWS.CFG
-#define CSWS_CFG "csws.cfg"
-
-CS_TOKEN_DEF_START
-  CS_TOKEN_DEF (MOUSECURSOR)
-  CS_TOKEN_DEF (TITLEBUTTON)
-  CS_TOKEN_DEF (DIALOGBUTTON)
-  CS_TOKEN_DEF (TEXTURE)
-  CS_TOKEN_DEF (TRANSPARENT)
-  CS_TOKEN_DEF (FILE)
-  CS_TOKEN_DEF (MIPMAP)
-  CS_TOKEN_DEF (DITHER)
-CS_TOKEN_DEF_END
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//- csAppPlugIn //--
 
@@ -98,35 +85,23 @@ bool csApp::csAppPlugIn::HandleEvent (iEvent &Event)
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//-- csApp -//--
 
-#ifdef _MSC_VER
-#pragma warning (push)
-#pragma warning (disable:4355)
-//Avoid a warning about passing this before the constructor has been called
-#endif
-
-csApp::csApp (iSystem *SysDriver) : csComponent (NULL), scfiPlugIn (this)
+csApp::csApp (iSystem *System, csSkin &Skin)
+  : csComponent (NULL), scfiPlugIn (this)
 {
-
-#ifdef MSC_VER
-#pragma warning (pop)
-#endif
-
   app = this;			// so that all inserted windows will inherit it
   MouseOwner = NULL;		// no mouse owner
   KeyboardOwner = NULL;		// no keyboard owner
   FocusOwner = NULL;		// no focus owner
-  titlebardefs =
-  dialogdefs = NULL;
   RedrawFlag = true;
   WindowListChanged = false;
   LoopLevel = 0;
   BackgroundStyle = csabsSolid;
-  insert = true;
+  InsertMode = true;
   SetFontSize (12);
   GfxPpl = NULL;
   VFS = NULL;
   InFrame = false;
-  (System = SysDriver)->IncRef ();
+  (csApp::System = System)->IncRef ();
 
   OldMouseCursorID = csmcNone;
   MouseCursorID = csmcArrow;
@@ -135,7 +110,7 @@ csApp::csApp (iSystem *SysDriver) : csComponent (NULL), scfiPlugIn (this)
   state |= CSS_VISIBLE | CSS_SELECTABLE | CSS_FOCUSED;
 
   Mouse = new csMouse (this);
-  theme = NULL;
+  skin = &Skin;
 }
 
 csApp::~csApp ()
@@ -145,27 +120,24 @@ csApp::~csApp ()
   // Delete all children prior to shutting down the system
   DeleteAll ();
 
-  delete titlebardefs;
-  delete dialogdefs;
+  // Free the resources allocated by the skin
+  if (skin)
+    skin->Deinitialize ();
 
   delete Mouse;
   delete GfxPpl;
   if (VFS) VFS->DecRef ();
+  if (Config) Config->DecRef ();
   // Delete all textures prior to deleting the texture manager
   Textures.DeleteAll ();
 
   System->DecRef ();
 }
 
-bool csApp::InitialSetup ()
+bool csApp::Initialize (const char *iConfigName)
 {
   if (!System->RegisterPlugIn ("crystalspace.windowing.application", "CSWS", &scfiPlugIn))
     return false;
-
-  // Change to the directory on VFS where we keep our data
-  const char *DataDir = System->GetConfig ()->GetStr ("CSWS", "Library", NULL);
-  if (DataDir)
-    VFS->ChDir (DataDir);
 
   // Create the graphics pipeline
   GfxPpl = new csGraphicsPipeline (System);
@@ -177,11 +149,119 @@ bool csApp::InitialSetup ()
   WindowListWidth = ScreenWidth / 3;
   WindowListHeight = ScreenWidth / 6;
 
-  LoadConfig ();
-  // Compute and set the work palette (instead of console palette)
-  PrepareTextures ();
+  Config = System->CreateConfig (iConfigName);
+  if (!Config)
+  {
+    printf (MSG_FATAL_ERROR, "ERROR: CSWS config file `%s' not found\n", iConfigName);
+    fatal_exit (0, true);			// cfg file not found
+  }
 
+  // Now initialize all skin slices
+  InitializeSkin ();
   return true;
+}
+
+void csApp::SetSkin (csSkin *Skin, bool DeleteOld)
+{
+  if (DeleteOld)
+    delete skin;
+  skin = Skin;
+
+  // Now initialize all skin slices
+  InitializeSkin ();
+}
+
+csSkin *csApp::GetSkin ()
+{
+  return skin;
+}
+
+void csApp::InitializeSkin ()
+{
+  if (!skin)
+    return;
+
+  // Load all textures
+  char secname [50];
+  if (skin->Prefix)
+    strcat (strcpy (secname, skin->Prefix), "::Textures");
+  else
+    secname [0] = 0;
+
+  int i;
+  bool modified = false;
+
+  // First of all, scan through all loaded textures and unload unneeded textures
+  for (i = Textures.Length () - 1; i >= 0; i--)
+  {
+    csWSTexture *t = Textures.Get (i);
+    const char *tn = t->GetName ();
+    if (tn && !strncmp (tn, "csws::", 6))
+    {
+      // See if this texture should be loaded for the new skin
+      bool unload = true;
+      const char *fn1 = t->GetFileName ();
+      if (fn1)
+      {
+        if (secname [0])
+        {
+          const char *fn2 = Config->GetStr (secname, tn, NULL);
+          if (fn2 && !strcmp (fn1, fn2))
+            unload = false;
+        }
+        if (unload)
+        {
+          const char *fn2 = Config->GetStr ("Textures", tn, NULL);
+          if (fn2 && !strcmp (fn1, fn2))
+            unload = false;
+        }
+      }
+      if (unload)
+      {
+        Textures.Delete (i);
+        modified = true;
+      }
+    }
+  }
+
+  // Now load all textures from the skin-specific section
+  iConfigDataIterator *di = secname [0] ? Config->EnumData (secname) : NULL;
+  if (di)
+  {
+    while (di->Next ())
+      modified |= LoadTexture (di->GetKey (), (char *)di->GetData (), CS_TEXTURE_2D);
+    di->DecRef ();
+  }
+  // And now load the textures from the common-for-all-skins section
+  di = Config->EnumData ("Textures");
+  if (di)
+  {
+    while (di->Next ())
+      modified |= LoadTexture (di->GetKey (), (char *)di->GetData (), CS_TEXTURE_2D);
+    di->DecRef ();
+  }
+
+  // Load definitions for all mouse cursors
+  if (skin->Prefix)
+    strcat (strcpy (secname, skin->Prefix), "::MouseCursor");
+  else
+    secname [0] = 0;
+  di = Config->EnumData (secname);
+  if (!di)
+    di = Config->EnumData ("MouseCursor");
+  if (di)
+  {
+    Mouse->ClearPointers ();
+    while (di->Next ())
+      Mouse->NewPointer (di->GetKey (), (char *)di->GetData ());
+    di->DecRef ();
+  }
+
+  // Compute and set the work palette (instead of console palette)
+  if (modified)
+    PrepareTextures ();
+
+  skin->Initialize (this);
 }
 
 void csApp::printf (int mode, char* str, ...)
@@ -208,64 +288,70 @@ void csApp::ShutDown ()
 bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
   int iFlags)
 {
-  CS_TOKEN_TABLE_START (texcommands)
-    CS_TOKEN_TABLE (FILE)
-    CS_TOKEN_TABLE (TRANSPARENT)
-    CS_TOKEN_TABLE (MIPMAP)
-    CS_TOKEN_TABLE (DITHER)
-  CS_TOKEN_TABLE_END
+  if (Textures.FindTexture (iTexName))
+    return false;
 
-  const char *filename = iTexName;
-  char *buffer = strnew (iTexParams);
-  char *bufptr = buffer;
-  bool transp = false;
-  float tr = 0, tg = 0, tb = 0;
+  const char *filename = NULL;
+  float tr = -1, tg = -1, tb = -1;
 
-  int cmd;
-  char *name, *params;
-  while ((cmd = csGetObject (&bufptr, texcommands, &name, &params)) > 0)
-    switch (cmd)
-    {
-      case CS_TOKEN_FILE:
-        filename = params;
-        break;
-      case CS_TOKEN_TRANSPARENT:
-        transp = true;
-        ScanStr (params, "%f,%f,%f", &tr, &tg, &tb);
-        break;
-      case CS_TOKEN_MIPMAP:
-        if (strcasecmp (params, "yes") == 0)
-          iFlags &= ~CS_TEXTURE_NOMIPMAPS;
-        else if (strcasecmp (params, "no") == 0)
-          iFlags |= CS_TEXTURE_NOMIPMAPS;
-        else
-          printf (MSG_WARNING, "Warning! Invalid MIPMAP() value, 'yes' or 'no' expected\n");
-        break;
-      case CS_TOKEN_DITHER:
-        if (strcasecmp (params, "yes") == 0)
-          iFlags |= CS_TEXTURE_DITHER;
-        else if (strcasecmp (params, "no") == 0)
-          iFlags &= ~CS_TEXTURE_DITHER;
-        else
-          printf (MSG_WARNING, "Warning! Invalid MIPMAP() value, 'yes' or 'no' expected\n");
-        break;
-    }
-
-  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  while (*iTexParams)
   {
-    printf (MSG_WARNING, "Unknown texture parameter keyword detected: '%s'\n", bufptr);
-    delete [] buffer;
+    char tmp [100];
+    iTexParams += strspn (iTexParams, " \t");
+    size_t sl = strcspn (iTexParams, " \t");
+    const char *parm = iTexParams;
+    iTexParams += sl;
+    if (sl >= sizeof (tmp)) sl = sizeof (tmp) - 1;
+    memcpy (tmp, parm, sl);
+    tmp [sl] = 0;
+
+    if (!filename)
+      filename = strnew (tmp);
+    else if (!strncmp (tmp, "Key:", 4))
+    {
+      ScanStr (tmp + 4, "%f,%f,%f", &tr, &tg, &tb);
+    }
+    else if (!strncmp (tmp, "Dither:", 7))
+    {
+      if (!strcasecmp (tmp + 7, "yes"))
+        iFlags |= CS_TEXTURE_DITHER;
+      else if (!strcasecmp (tmp + 7, "no"))
+        iFlags &= ~CS_TEXTURE_DITHER;
+      else
+        printf (MSG_WARNING, "Texture `%s': invalid MIPMAP() value, 'yes' or 'no' expected\n", iTexName);
+    }
+    else if (!strncmp (tmp, "Mipmap:", 7))
+    {
+      if (!strcasecmp (tmp + 7, "yes"))
+        iFlags &= ~CS_TEXTURE_NOMIPMAPS;
+      else if (!strcasecmp (tmp + 7, "no"))
+        iFlags |= CS_TEXTURE_NOMIPMAPS;
+      else
+        printf (MSG_WARNING, "Texture `%s': invalid MIPMAP() value, 'yes' or 'no' expected\n", iTexName);
+    }
+    else
+    {
+      printf (MSG_WARNING, "Texture `%s': Unknown texture parameter: '%s'\n", iTexName, parm);
+      delete [] filename;
+      return false;
+    }
+  }
+
+  if (!filename)
+  {
+    printf (MSG_WARNING, "Texture `%s': No file name defined!\n", iTexName);
     return false;
   }
 
   // Now load the texture
   iDataBuffer *fbuffer = VFS->ReadFile (filename);
-  delete [] buffer;
   if (!fbuffer || !fbuffer->GetSize ())
   {
     printf (MSG_WARNING, "Cannot read image file \"%s\" from VFS\n", filename);
+    delete [] filename;
     return false;
   }
+  delete [] filename;
 
   iTextureManager *txtmgr = GfxPpl->G3D->GetTextureManager ();
   iImage *image = csImageLoader::Load (fbuffer->GetUint8 (), fbuffer->GetSize (),
@@ -274,68 +360,11 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
 
   csWSTexture *tex = new csWSTexture (iTexName, image, iFlags);
   image->DecRef ();
-  if (transp)
+  if (tb >= 0)
     tex->SetKeyColor (QInt (tr * 255.), QInt (tg * 255.), QInt (tb * 255.));
   Textures.Push (tex);
 
   return true;
-}
-
-void csApp::LoadConfig ()
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (MOUSECURSOR)
-    CS_TOKEN_TABLE (TITLEBUTTON)
-    CS_TOKEN_TABLE (DIALOGBUTTON)
-    CS_TOKEN_TABLE (TEXTURE)
-  CS_TOKEN_TABLE_END
-
-  if (!titlebardefs)
-    titlebardefs = new csStrVector (16, 16);
-  if (!dialogdefs)
-    dialogdefs = new csStrVector (16, 16);
-
-  //size_t cswscfglen;
-  iDataBuffer *cswscfg = VFS->ReadFile (CSWS_CFG);
-  if (!cswscfg)
-  {
-    printf (MSG_FATAL_ERROR, "ERROR: CSWS config file `%s' not found\n", CSWS_CFG);
-    fatal_exit (0, true);			// cfg file not found
-    return;
-  }
-
-  int cmd;
-  char *cfg = **cswscfg, *name, *params;
-  while ((cmd = csGetObject (&cfg, commands, &name, &params)) > 0)
-    switch (cmd)
-    {
-      case CS_TOKEN_MOUSECURSOR:
-      {
-        Mouse->NewPointer (name, params);
-        break;
-      }
-      case CS_TOKEN_TITLEBUTTON:
-      {
-        char *tmp = new char [strlen (name) + 1 + strlen (params) + 1];
-        sprintf (tmp, "%s %s", name, params);
-        titlebardefs->Push (tmp);
-        break;
-      }
-      case CS_TOKEN_DIALOGBUTTON:
-      {
-        char *tmp = new char [strlen (name) + 1 + strlen (params) + 1];
-        sprintf (tmp, "%s %s", name, params);
-        dialogdefs->Push (tmp);
-        break;
-      }
-      case CS_TOKEN_TEXTURE:
-        LoadTexture (name, params, CS_TEXTURE_2D);
-        break;
-      default:
-        printf (MSG_FATAL_ERROR, "Unknown token in "CSWS_CFG"! (%s)\n", cfg);
-        fatal_exit (0, false);			// Unknown token
-    }
-  cswscfg->DecRef ();
 }
 
 void csApp::PrepareTextures ()
@@ -507,7 +536,7 @@ bool csApp::HandleEvent (iEvent &Event)
 
   if ((Event.Type == csevKeyDown)
    && (Event.Key.Code == CSKEY_INS))
-    insert = !insert;
+    InsertMode = !InsertMode;
 
   // If mouse moves, reset mouse cursor to arrow
   if (Event.Type == csevMouseMove)
@@ -629,19 +658,4 @@ void csApp::Dismiss (int iCode)
     DismissCode = iCode;
     EventOutlet->Broadcast (cscmdQuitLoop);
   } /* endif */
-}
-
-void csApp::SetTheme (csTheme *nTheme)
-{
-  delete theme;
-  if (!nTheme)
-    nTheme = new csTheme (this);
-  theme = nTheme;
-}
-
-csTheme *csApp::GetTheme ()
-{
-  if (!theme)
-    theme = new csTheme (this);
-  return theme;
 }

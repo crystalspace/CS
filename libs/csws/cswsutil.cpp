@@ -34,6 +34,7 @@
 #include "cssys/csinput.h"
 #include "itxtmgr.h"
 #include "isystem.h"
+#include "icfgfile.h"
 
 #define MSGBOX_TEXTURE "csws::MessageBoxIcons"
 
@@ -417,38 +418,35 @@ void RectUnion (csObjVector &rect, csRect &result)
     Combinations (n, n, doRectUnion, &ru);
 }
 
-void FindCFGBitmap (iSystem *System, csStrVector &sv, char *id,
-  int *x, int *y, int *w, int *h)
+void ParseConfigBitmap (csApp *app, const char *prefix, const char *section,
+  const char *id, int &x, int &y, int &w, int &h)
 {
-  char temp[256];
-  *x = -1;
-  for (int i = 0; i < sv.Length (); i++)
+  char sec [50];
+  if (prefix)
+    strcat (strcpy (sec, prefix), "::");
+
+  const char *butdef = sec [0] ? app->Config->GetStr (sec, id, NULL) : NULL;
+  if (!butdef) butdef = app->Config->GetStr (section, id, NULL);
+  if (!butdef)
   {
-    char *butdef = (char *)(sv[i]);
-    if (strncmp (id, butdef, strlen (id)) == 0)
-    {
-      if (ScanStr (butdef, "%s %d,%d,%d,%d", &temp, x, y, w, h) < 0)
-      {
-        sprintf (temp, "%s: parse error in string: %s\n", id, butdef);
-        System->Printf (MSG_FATAL_ERROR, temp);
-        fatal_exit (0, false);
-      }
-      break;
-    }
-  } /* endfor */
-  if (*x < 0)
-  {
-    sprintf (temp, "Cannot find titlebar button definition %s\n", id);
-    System->Printf (MSG_FATAL_ERROR, temp);
+    app->printf (MSG_FATAL_ERROR, "Cannot find bitmap definition %s:%s\n",
+      section, id);
     fatal_exit (0, false);
-  } /* endif */
+  }
+
+  if (ScanStr (butdef, "%d,%d,%d,%d", &x, &y, &w, &h) != 4)
+  {
+    app->printf (MSG_FATAL_ERROR, "%s(%s): parse error in string: %s\n",
+      section, id, butdef);
+    fatal_exit (0, false);
+  }
 }
 
 // Multiply with this constant to convert from range -1/3..+1/3 to -PI...+PI
 #define CONST_F2A	(M_PI * 3.0)
 
 // HLS -> RGB
-void HLS2RGB (float h, float l, float s, float &r, float &g, float &b)
+void csHLS2RGB (float h, float l, float s, float &r, float &g, float &b)
 {
   float hr = (h > 2.0 / 3.0) ? h - 1.0 : h;
 
@@ -470,7 +468,7 @@ void HLS2RGB (float h, float l, float s, float &r, float &g, float &b)
 // RGB -> HLS
 // Phew! It took me two days until I figured how to do
 // the reverse transformation :-) -- A.Z.
-void RGB2HLS (float r, float g, float b, float &h, float &l, float &s)
+void csRGB2HLS (float r, float g, float b, float &h, float &l, float &s)
 {
   float max, mid, min, sign, delta;
   if (r > g)
@@ -525,6 +523,28 @@ void RGB2HLS (float r, float g, float b, float &h, float &l, float &s)
 }
 
 #undef CONST_F2A
+
+void csGetRGB (int iColor, csApp *iApp, float &r, float &g, float &b)
+{
+  iColor = iApp->pplColor (iColor);
+  csPixelFormat *pfmt = iApp->GetG2D ()->GetPixelFormat ();
+  csRGBpixel *palette = iApp->GetG2D ()->GetPalette ();
+  if (pfmt->PalEntries)
+  {
+    r = palette [iColor].red   / 255.;
+    g = palette [iColor].green / 255.;
+    b = palette [iColor].blue  / 255.;
+  }
+  else
+  {
+    int _r = ((iColor & pfmt->RedMask  ) >> pfmt->RedShift  ) << (8 - pfmt->RedBits  );
+    int _g = ((iColor & pfmt->GreenMask) >> pfmt->GreenShift) << (8 - pfmt->GreenBits);
+    int _b = ((iColor & pfmt->BlueMask ) >> pfmt->BlueShift ) << (8 - pfmt->BlueBits );
+    r = _r ? float (_r + (255 >> pfmt->RedBits  )) / 255. : 0.;
+    g = _g ? float (_g + (255 >> pfmt->GreenBits)) / 255. : 0.;
+    b = _b ? float (_b + (255 >> pfmt->BlueBits )) / 255. : 0.;
+  }
+}
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//-- File open dialog --//--
 
@@ -928,9 +948,9 @@ public:
   void UpdateInfo (bool UpdateSlider);
   void SetHLSmode (bool Enable);
   void HLS2RGB ()
-  { ::HLS2RGB (h, l, s, r, g, b); }
+  { ::csHLS2RGB (h, l, s, r, g, b); }
   void RGB2HLS ()
-  { ::RGB2HLS (r, g, b, h, l, s); }
+  { ::csRGB2HLS (r, g, b, h, l, s); }
 };
 
 cspColorDialog::cspColorDialog (csComponent *iParent) : csDialog (iParent)
@@ -991,20 +1011,8 @@ void cspColorDialog::UpdateInfo (bool UpdateSlider)
 
 void cspColorDialog::SetColor (int iColor)
 {
-  csPixelFormat *pfmt = app->GetG2D ()->GetPixelFormat ();
-  csRGBpixel *palette = app->GetG2D ()->GetPalette ();
-  if (pfmt->PalEntries)
-  {
-    r = float (palette [iColor].red) / 255;
-    g = float (palette [iColor].green) / 255;
-    b = float (palette [iColor].blue) / 255;
-  }
-  else
-  {
-    r = float ((iColor & pfmt->RedMask  ) >> pfmt->RedShift  ) / float ((1 << pfmt->RedBits  ) - 1);
-    g = float ((iColor & pfmt->GreenMask) >> pfmt->GreenShift) / float ((1 << pfmt->GreenBits) - 1);
-    b = float ((iColor & pfmt->BlueMask ) >> pfmt->BlueShift ) / float ((1 << pfmt->BlueBits ) - 1);
-  }
+  csGetRGB (iColor, app, r, g, b);
+
   RGB2HLS ();
   UpdateInfo (true);
 }

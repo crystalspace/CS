@@ -21,6 +21,9 @@
 #include "cssys/csinput.h"
 #include "csws/cswindow.h"
 #include "csws/csdialog.h"
+#include "csws/csskin.h"
+
+#define SKIN ((csDialogSkin *)skinslice)
 
 csDialog::csDialog (csComponent *iParent, csDialogFrameStyle iFrameStyle)
   : csComponent (iParent)
@@ -33,41 +36,8 @@ csDialog::csDialog (csComponent *iParent, csDialogFrameStyle iFrameStyle)
   SnapSizeToGrid = false;
   if (parent)
     parent->SendCommand (cscmdWindowSetClient, (void *)this);
+  ApplySkin (GetSkin ());
   SetFrameStyle (iFrameStyle);
-}
-
-void csDialog::Draw ()
-{
-  switch (FrameStyle)
-  {
-    case csdfsNone:
-      break;
-    case csdfsHorizontal:
-      Line (0, 0, bound.Width (), 0, CSPAL_DIALOG_2LIGHT3D);
-      Line (0, 1, bound.Width (), 1, CSPAL_DIALOG_LIGHT3D);
-      Line (0, bound.Height () - 2, bound.Width (), bound.Height () - 2,
-        CSPAL_DIALOG_DARK3D);
-      Line (0, bound.Height () - 1, bound.Width (), bound.Height () - 1,
-        CSPAL_DIALOG_2DARK3D);
-      break;
-    case csdfsVertical:
-      Line (0, 0, 0, bound.Height (), CSPAL_DIALOG_2LIGHT3D);
-      Line (1, 0, 1, bound.Height (), CSPAL_DIALOG_LIGHT3D);
-      Line (bound.Width () - 2, 0, bound.Width () - 2, bound.Height (),
-        CSPAL_DIALOG_DARK3D);
-      Line (bound.Width () - 1, 0, bound.Width () - 1, bound.Height (),
-        CSPAL_DIALOG_2DARK3D);
-      break;
-    case csdfsAround:
-      Rect3D (0, 0, bound.Width (), bound.Height (),
-        CSPAL_DIALOG_2DARK3D, CSPAL_DIALOG_2LIGHT3D);
-      Rect3D (1, 1, bound.Width () - 1, bound.Height () - 1,
-        CSPAL_DIALOG_DARK3D, CSPAL_DIALOG_LIGHT3D);
-      break;
-  } /* endswitch */
-  Box (BorderWidth, BorderHeight, bound.Width () - BorderWidth,
-    bound.Height () - BorderHeight, CSPAL_DIALOG_BACKGROUND);
-  csComponent::Draw ();
 }
 
 bool csDialog::HandleEvent (iEvent &Event)
@@ -261,22 +231,17 @@ void csDialog::FixSize (int &newW, int &newH)
   if (newH < minh) newH = minh;
 }
 
+void csDialog::SetBorderSize (int w, int h)
+{
+  BorderWidth = w;
+  BorderHeight = h;
+  csComponent::SetRect (bound);
+}
+
 void csDialog::SetFrameStyle (csDialogFrameStyle iFrameStyle)
 {
-  switch (FrameStyle = iFrameStyle)
-  {
-    case csdfsNone:
-      BorderWidth = 0; BorderHeight = 0;
-      break;
-    case csdfsHorizontal:
-      BorderWidth = 0; BorderHeight = 2;
-      break;
-    case csdfsVertical:
-      BorderWidth = 2; BorderHeight = 0;
-      break;
-    case csdfsAround:
-      BorderWidth = 2; BorderHeight = 2;
-      break;
-  } /* endswitch */
+  FrameStyle = iFrameStyle;
+  SKIN->SetBorderSize (*this);
+  csComponent::SetRect (bound);
   Invalidate ();
 }

@@ -128,7 +128,10 @@ private:
   void Undraw (int Page);
 
   /// This function sets up mouse cursor images
-  void NewPointer (char *id, char *posdef);
+  void NewPointer (const char *id, const char *posdef);
+
+  /// Remove all mouse cursors
+  void ClearPointers ();
 };
 
 #endif // __CSMOUSE_H__

@@ -30,18 +30,23 @@
 #include "csws/csapp.h"
 #include "csws/csmouse.h"
 #include "csws/cswsutil.h"
+#include "csws/csskin.h"
+#include "isystem.h"
 
 //--//--//--//--//--//--//--//--//--//--//--//--/ The csComponent class --//--//
 
 csComponent::csComponent (csComponent *iParent) : state (CSS_VISIBLE),
-  originalpalette (true), DragStyle (CS_DRAG_MOVEABLE), clipparent (NULL),
-  text (NULL), Font (csFontParent), FontSize (-1), Maximized (false), focused (NULL),
-  top (NULL), next (NULL), prev (NULL), parent (NULL), app (NULL), theme (NULL), id (0)
+  palette (NULL), originalpalette (NULL), DragStyle (CS_DRAG_MOVEABLE),
+  clipparent (NULL), text (NULL), Font (csFontParent), FontSize (-1),
+  focused (NULL), top (NULL), next (NULL), prev (NULL), parent (NULL),
+  app (NULL), skinslice (NULL), skindata (NULL), id (0)
 {
-  ThemeID = "csComponent";
   SetPalette (NULL, 0);
   if (iParent)
     iParent->Insert (this);
+  // The skin slice is set as soon as PreHandleEvent() is called
+  // for the first time. We cannot query skin slice since for now the
+  // GetSkinName() method (which is virtual) won't work due to C++ design.
 }
 
 csComponent::~csComponent ()
@@ -61,6 +66,40 @@ csComponent::~csComponent ()
     clipparent->DeleteClipChild (this);
   if (parent)
     parent->Delete (this);
+
+  // Tell skin slice to free its private data (if any)
+  // We'll reset the VISIBLE bit to avoid extra work in Reset()
+  state &= ~CSS_VISIBLE;
+  if (skinslice)
+    skinslice->Reset (*this);
+}
+
+char *csComponent::GetSkinName ()
+{
+  return NULL;
+}
+
+csSkin *csComponent::GetSkin ()
+{
+  return parent ? parent->GetSkin () : NULL;
+}
+
+bool csComponent::ApplySkin (csSkin *Skin)
+{
+  if (!Skin)
+    return false;
+
+  const char *skinname = GetSkinName ();
+  if (!skinname)
+    return true;	// we don't need a skin slice
+
+  int sliceidx = Skin->FindSortedKey (skinname);
+  if ((sliceidx < 0) && !skinslice)
+    return false;
+
+  if (sliceidx >= 0)
+    Skin->Get (sliceidx)->Apply (*this);
+  return true;
 }
 
 static bool do_delete (csComponent *child, void *param)
@@ -79,22 +118,30 @@ void csComponent::DeleteAll ()
 
 void csComponent::SetPalette (int *iPalette, int iPaletteSize)
 {
-  if (!originalpalette)
-    free (palette);
+  if (originalpalette != palette)
+    delete [] palette;
   palette = iPalette; palettesize = iPaletteSize;
-  originalpalette = true;
+  originalpalette = iPalette;
 }
 
 void csComponent::SetColor (int Index, int Color)
 {
-  if (originalpalette)
+  if (palette == originalpalette)
   {
-    void *temp = malloc (palettesize * sizeof (int));
+    int *temp = new int [palettesize];
     memcpy (temp, palette, palettesize * sizeof (int));
-    palette = (int *)temp;
-    originalpalette = false;
+    palette = temp;
   }
-  palette[Index] = Color;
+  palette [Index] = Color;
+}
+
+void csComponent::ResetPalette ()
+{
+  if (palette != originalpalette)
+  {
+    delete [] palette;
+    palette = originalpalette;
+  }
 }
 
 static bool set_app (csComponent *child, void *param)
@@ -400,14 +447,18 @@ bool csComponent::HandleEvent (iEvent &Event)
           ForEach (do_handle_event, &Event);
           return false;
         }
-        case cscmdThemeChange:
-          if (((csTheme *)Event.Command.Info) == GetTheme ()->GetTheme ())
-            ThemeChanged ();
+        case cscmdSkinChanged:
+        {
+	  const char *name = GetSkinName ();
+          if (name)
+            if (!ApplySkin ((csSkin *)Event.Command.Info))
+            {
+              app->System->Printf (MSG_FATAL_ERROR,
+                "The skin does not contain a slice for component `%s'\n", name);
+              abort ();
+            }
           break;
-        case cscmdThemeComponentChange:
-          if (((csThemeComponent *)Event.Command.Info) == GetTheme ())
-            ThemeChanged ();
-          break;
+        }
       }
       break;
     case csevCommand:
@@ -528,7 +579,7 @@ AbortDrag:
             Show ();
           return true;
         case cscmdMaximize:
-          if (!Maximized)
+          if (!GetState (CSS_MAXIMIZED))
             Maximize ();
           else
             Restore ();
@@ -615,7 +666,20 @@ void *csComponent::SendCommand (int CommandCode, void *Info)
     csEvent Event (0, csevCommand, CommandCode, Info);
     HandleEvent (Event);
     return Event.Command.Info;
-  } else
+  }
+  else
+    return Info;
+}
+
+void *csComponent::SendBroadcast (int CommandCode, void *Info)
+{
+  if (this)
+  {
+    csEvent Event (0, csevBroadcast, CommandCode, Info);
+    HandleEvent (Event);
+    return Event.Command.Info;
+  }
+  else
     return Info;
 }
 
@@ -807,7 +871,8 @@ void csComponent::Redraw ()
 
 void csComponent::Draw ()
 {
-  // no operation
+  if (skinslice)
+    skinslice->Draw (*this);
 }
 
 void csComponent::Show (bool focused)
@@ -924,9 +989,12 @@ void csComponent::Invalidate (csRect &area, bool fIncludeChildren,
   csRect dr;
   if (parent && GetState (CSS_TRANSPARENT))
   {
-    dr.Set (is.inv);
-    dr.Move (bound.xmin, bound.ymin);
-    parent->Invalidate (dr);
+    // Invalidate a rectangle in parent component as well (since
+    // we are semi-transparent) and all neightbour components
+    // that are below us in Z-order.
+    is.inv.Move (bound.xmin, bound.ymin);
+    parent->Invalidate (is.inv, true, this);
+    is.inv.Move (-bound.xmin, -bound.ymin);
   } /* endif */
 
   if (fIncludeChildren)
@@ -1669,14 +1737,14 @@ void csComponent::Center (bool iHoriz, bool iVert)
 
 bool csComponent::Maximize ()
 {
-  if (!Maximized && (DragStyle & CS_DRAG_SIZEABLE) && parent)
+  if (!GetState (CSS_MAXIMIZED) && (DragStyle & CS_DRAG_SIZEABLE) && parent)
   {
     OrgBound.Set (bound);
     csRect newbound (0, 0, parent->bound.Width (), parent->bound.Height ());
     // give a chance to parent window to limit "maximize" bounds
     parent->SendCommand (cscmdLimitMaximize, (void *)&newbound);
     SetRect (newbound);
-    Maximized = true;
+    SetState (CSS_MAXIMIZED, true);
     return true;
   } /* endif */
   return false;
@@ -1684,10 +1752,10 @@ bool csComponent::Maximize ()
 
 bool csComponent::Restore ()
 {
-  if (Maximized && (DragStyle & CS_DRAG_SIZEABLE))
+  if (GetState (CSS_MAXIMIZED) && (DragStyle & CS_DRAG_SIZEABLE))
   {
     csComponent::SetRect (OrgBound);
-    Maximized = false;
+    SetState (CSS_MAXIMIZED, false);
     return true;
   } /* endif */
   return false;
@@ -1728,32 +1796,4 @@ bool csComponent::CheckHotKey (iEvent &iEvent, char iHotKey)
   else
     Key = UPPERCASE (iEvent.Key.Char);
   return Key == iHotKey;
-}
-
-csThemeComponent *csComponent::GetTheme ()
-{
-  if (theme)
-    return theme;
-  if (parent)
-  {
-    csThemeComponent *tmp = parent->GetTheme ();
-    if (tmp)
-      return tmp->GetTheme ()->GetThemeComponent (GetName ());
-  }
-  return app->GetTheme ()->GetThemeComponent (GetName ());
-}
-
-void csComponent::SetTheme (csThemeComponent * nTheme)
-{
-  theme = nTheme;
-}
-
-void csComponent::ThemeChanged ()
-{
-  Invalidate ();
-}
-
-void csComponent::ResetTheme ()
-{
-  // No Op
 }

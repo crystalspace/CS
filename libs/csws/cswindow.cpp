@@ -24,8 +24,9 @@
 #include "csws/csapp.h"
 #include "csws/csdialog.h"
 #include "csws/cswsutil.h"
+#include "csws/csskin.h"
 
-#define TITLEBAR_TEXTURE_NAME	"csws::TitlebarButtons"
+#define SKIN ((csWindowSkin *)skinslice)
 
 #define ADD_SYSMENU_ENTRIES(menu)				\
   if (iWindowStyle & CSWS_BUTMAXIMIZE)				\
@@ -64,20 +65,19 @@ void csSysMenu::Hide ()
 csWindow::csWindow (csComponent *iParent, char *iTitle, int iWindowStyle,
   csWindowFrameStyle iFrameStyle) : csComponent (iParent)
 {
-  ThemeID = "csWindow";
   state |= CSS_SELECTABLE | CSS_TOPSELECT;
   DragStyle |= CS_DRAG_SIZEABLE;
-  FrameStyle = iFrameStyle;
   WindowStyle = iWindowStyle;
+  TitlebarHeight = 16;
+  MenuHeight = 16;
   SetPalette (CSPAL_WINDOW);
-  SetText(iTitle);
+  ApplySkin (GetSkin ());
+  SetFrameStyle (iFrameStyle);
 
   // Attach required handles & gadgets to window
   if (iWindowStyle & CSWS_BUTSYSMENU)
   {
-    csButton *bt = new csButton (this, cscmdWindowSysMenu, 0, csbfsNone);
-    SetButtBitmap (bt, "SYSMNUN", "SYSMNUP");
-    bt->id = CSWID_BUTSYSMENU;
+    csButton *bt = SKIN->CreateButton (*this, CSWID_BUTSYSMENU);
 
     csMenu *mn = new csSysMenu (this, csmfs3D, CSMS_DEFAULTVALUE, bt);
     ADD_SYSMENU_ENTRIES (mn);
@@ -85,6 +85,19 @@ csWindow::csWindow (csComponent *iParent, char *iTitle, int iWindowStyle,
     mn->Hide ();
     mn->id = CSWID_SYSMENU;
   } /* endif */
+  if (iWindowStyle & CSWS_BUTCLOSE)
+    SKIN->CreateButton (*this, CSWID_BUTCLOSE);
+  if (iWindowStyle & CSWS_BUTHIDE)
+    SKIN->CreateButton (*this, CSWID_BUTHIDE);
+  if (iWindowStyle & CSWS_BUTMAXIMIZE)
+    SKIN->CreateButton (*this, CSWID_BUTMAXIMIZE);
+  if (iWindowStyle & CSWS_TITLEBAR)
+  {
+    csComponent *tb = new csTitleBar (this, iTitle);
+    tb->id = CSWID_TITLEBAR;
+  }
+  else
+    SetText (iTitle);
   if (iWindowStyle & CSWS_MENUBAR)
   {
     csComponent *mn = new csMenu (this, csmfsBar, 0);
@@ -99,216 +112,13 @@ csWindow::csWindow (csComponent *iParent, char *iTitle, int iWindowStyle,
     tb->SetAutoGrid (2, 1, false);
     tb->SetState (CSS_SELECTABLE, false);
   } /* endif */
-
-  ResetTheme ();
-  // If the incoming FrameStyle was not the default then assume the user wanted the framestyle
-  // a specific way for a reason.
-  if (FrameStyle != cswfsTheme)
-    ThemeActive.FrameStyle = 0;
-  ThemeChanged ();
-}
-
-void csWindow::ResetTheme()
-{
-  // This should work for all situations of our bitfield struct.
-  memset (&ThemeActive, 0xff, sizeof (ThemeActive));
-  csComponent::ResetTheme ();
-}
-
-void csWindow::SetButtBitmap (csButton *button, char *id_n, char *id_p)
-{
-  if (!button)
-    return;
-
-  int tx,ty,tw,th;
-  FindCFGBitmap (app->System, *(app->titlebardefs), id_n, &tx, &ty, &tw, &th);
-  csPixmap *bmpn = new csPixmap (app->GetTexture (
-    TITLEBAR_TEXTURE_NAME), tx, ty, tw, th);
-  FindCFGBitmap (app->System, *(app->titlebardefs), id_p, &tx, &ty, &tw, &th);
-  csPixmap *bmpp = new csPixmap (app->GetTexture (
-    TITLEBAR_TEXTURE_NAME), tx, ty, tw, th);
-  button->SetBitmap (bmpn, bmpp);
 }
 
 bool csWindow::SetRect (int xmin, int ymin, int xmax, int ymax)
 {
   bool ret = csComponent::SetRect (xmin, ymin, xmax, ymax);
-
-  int d_xmin = BorderWidth, d_xmax = bound.Width () - BorderWidth;
-  int d_ymin = BorderHeight, d_ymax = BorderHeight + TitlebarHeight;
-  int butsize = TitlebarHeight;
-
-  // Place system menu button
-  csComponent *c = GetChild (CSWID_BUTSYSMENU);
-  if (c)
-  {
-    c->SetRect (d_xmin, d_ymin, d_xmin + butsize, d_ymax);
-    d_xmin += butsize;
-  } /* endif */
-  // Place close button
-  c = GetChild (CSWID_BUTCLOSE);
-  if (c)
-  {
-    c->SetRect (d_xmax - butsize, d_ymin, d_xmax, d_ymax);
-    d_xmax -= butsize;
-  } /* endif */
-  // Place maximize button
-  c = GetChild (CSWID_BUTMAXIMIZE);
-  if (c)
-  {
-    c->SetRect (d_xmax - butsize, d_ymin, d_xmax, d_ymax);
-    d_xmax -= butsize;
-  } /* endif */
-  // Place hide button
-  c = GetChild (CSWID_BUTHIDE);
-  if (c)
-  {
-    c->SetRect (d_xmax - butsize, d_ymin, d_xmax, d_ymax);
-    d_xmax -= butsize;
-  } /* endif */
-  // Place title bar
-  c = GetChild (CSWID_TITLEBAR);
-  if (c) c->SetRect (d_xmin, d_ymin, d_xmax, d_ymax);
-
-  // Now distribute the client rectangle
-  d_xmin = BorderWidth;
-  d_xmax = bound.Width () - BorderWidth;
-  if (WindowStyle & (CSWS_TITLEBAR | CSWID_BUTCLOSE | CSWID_BUTMAXIMIZE | CSWID_BUTHIDE))
-    d_ymin = d_ymax;
-  else
-    d_ymin = BorderHeight;
-  d_ymax = bound.Height () - BorderHeight;
-
-  // Place system menu (hidden by default)
-  c = GetChild (CSWID_SYSMENU);
-  if (c)
-    c->SetRect (d_xmin, d_ymin, d_xmin + c->bound.Width (),
-      d_ymin + c->bound.Height ());
-
-  // Place the menu bar
-  c = GetChild (CSWID_MENUBAR);
-  if (c)
-  {
-    int y = d_ymin + MenuHeight;
-    c->SetRect (d_xmin, d_ymin, d_xmax, y);
-    d_ymin = y;
-  } /* endif */
-
-  // Place the tool bar
-  c = GetChild (CSWID_TOOLBAR);
-  if (c)
-  {
-    if ((WindowStyle & CSWS_TBPOS_MASK) == CSWS_TBPOS_TOP
-     || (WindowStyle & CSWS_TBPOS_MASK) == CSWS_TBPOS_BOTTOM)
-      c->SetSize (d_xmax - d_xmin, 0);
-    else
-      c->SetSize (0, d_ymax - d_ymin);
-    int ToolbarW, ToolbarH;
-    c->SuggestSize (ToolbarW, ToolbarH);
-    switch (WindowStyle & CSWS_TBPOS_MASK)
-    {
-      case CSWS_TBPOS_TOP:
-      {
-        int tmp = d_ymin + ToolbarH;
-        c->SetRect (d_xmin, d_ymin, d_xmax, tmp);
-        d_ymin = tmp;
-        break;
-      }
-      case CSWS_TBPOS_BOTTOM:
-      {
-        int tmp = d_ymax - ToolbarH;
-        c->SetRect (d_xmin, tmp, d_xmax, d_ymax);
-        d_ymax = tmp;
-        break;
-      }
-      case CSWS_TBPOS_LEFT:
-      {
-        int tmp = d_xmin + ToolbarW;
-        c->SetRect (d_xmin, d_ymin, tmp, d_ymax);
-        d_xmin = tmp;
-        break;
-      }
-      case CSWS_TBPOS_RIGHT:
-      {
-        int tmp = d_xmax - ToolbarW;
-        c->SetRect (tmp, d_ymin, d_xmax, d_ymax);
-        d_xmax = tmp;
-        break;
-      }
-    } /* endswitch */
-  } /* endif */
-
-  // Place the client window
-  c = GetChild (CSWID_CLIENT);
-  if (c)
-  {
-    if (WindowStyle & CSWS_CLIENTBORDER)
-    {
-      d_xmin++; d_xmax--;
-      d_ymin++; d_ymax--;
-    } /* endif */
-    c->SetRect (d_xmin, d_ymin, d_xmax, d_ymax);
-  } /* endif */
+  SKIN->PlaceGadgets (*this);
   return ret;
-}
-
-void csWindow::Draw ()
-{
-  int bw = 0, bh = 0;
-  int li,di,back;
-
-  // Local copies of these variables to speed up things.
-  csThemeWindow *thwin = (csThemeWindow *)GetTheme ();
-  li = BorderLightColor;
-  di = BorderDarkColor;
-  back = BackgroundColor;
-  bw = BorderWidth;
-  bh = BorderHeight;
-
-  switch (FrameStyle)
-  {
-    case cswfsNone:
-      break;
-    case cswfsThin:
-      thwin->DrawBorder(*this,csthfsThin,bw,bh,di,di);
-      break;
-    case cswfs3D:
-    {
-      if ((BorderWidth >= 0) && (BorderHeight >= 0))
-      {
-        thwin->DrawBorder(*this,csthfsThin,bw,bh,li,di);
-      } /* endif */
-      if ((BorderWidth >= 1) && (BorderHeight >= 1))
-      {
-        thwin->DrawBorder(*this,csthfsThinRect,bw,bh,li,di);
-      } /* endif */
-      break;
-    }
-    case cswfsTexture:
-      thwin->DrawBorder(*this,csthfsTexture,bw,bh,li,di,BorderPixmap);
-      break;
-    case cswfsTheme:
-      CS_ASSERT (true);
-      break;
-    default:
-      //      fprintf(stderr,"Unknown Frame Style! %d\n",FrameStyle);
-      CS_ASSERT(true);
-  } /* endswitch */
-
-  if (!GetState (CSS_TRANSPARENT))
-    Box (bw, bh, bound.Width () - bw, bound.Height () - bh,back);
-  if (BackgroundPixmap != NULL)
-    Sprite2DTiledShifted (BackgroundPixmap, bw, bh,
-      bound.Width () - bw, bound.Height () - bh, 0, 0);
-
-  if (WindowStyle & CSWS_CLIENTBORDER)
-  {
-    csComponent *c = GetChild (CSWID_CLIENT);
-    if (c)
-      Rect3D (c->bound.xmin - 1, c->bound.ymin - 1, c->bound.xmax + 1,
-        c->bound.ymax + 1, li, di);
-  } /* endif */
-  csComponent::Draw ();
 }
 
 void csWindow::SetState (int mask, bool enable)
@@ -327,9 +137,7 @@ void csWindow::SetBorderSize (int w, int h)
 {
   BorderWidth = w;
   BorderHeight = h;
-  ThemeActive.BorderWidth = 0;
-  ThemeActive.BorderHeight = 0;
-  SetRect (bound.xmin, bound.ymin, bound.xmax, bound.ymax);
+  csComponent::SetRect (bound);
 }
 
 bool csWindow::HandleEvent (iEvent &Event)
@@ -418,7 +226,7 @@ void csWindow::FixSize (int &newW, int &newH)
 
 bool csWindow::Maximize ()
 {
-  if (!Maximized && (DragStyle & CS_DRAG_SIZEABLE) && parent)
+  if (!GetState (CSS_MAXIMIZED) && (DragStyle & CS_DRAG_SIZEABLE) && parent)
   {
     OrgBound.Set (bound);
     csRect newbound (- BorderWidth, - BorderHeight,
@@ -426,11 +234,9 @@ bool csWindow::Maximize ()
       parent->bound.Height () + BorderHeight);
     // give a chance to parent window to limit "maximize" bounds
     parent->SendCommand (cscmdLimitMaximize, (void *)&newbound);
-    SetRect(bound.xmin, bound.ymin, bound.xmax, bound.ymax);
-    Maximized = true;
-
-    csButton *bt = (csButton *)GetChild (CSWID_BUTMAXIMIZE);
-    SetButtBitmap (bt, "MAXOFFN", "MAXOFFP");
+    csComponent::SetRect (newbound);
+    SetState (CSS_MAXIMIZED, true);
+    SKIN->SetState (*this, CSS_MAXIMIZED, true);
     return true;
   } /* endif */
   return false;
@@ -440,25 +246,22 @@ bool csWindow::Restore ()
 {
   if (csComponent::Restore ())
   {
-    csButton *bt = (csButton *)GetChild (CSWID_BUTMAXIMIZE);
-    SetButtBitmap (bt, "MAXN", "MAXP");
+    SKIN->SetState (*this, CSS_MAXIMIZED, false);
     return true;
   } /* endif */
   return false;
 }
 
-void csWindow::SetTitleHeight (int iHeight)
+void csWindow::SetTitlebarHeight (int iHeight)
 {
   TitlebarHeight = iHeight;
-  ThemeActive.TitlebarHeight = 0;
-  SetRect (bound.xmin, bound.ymin, bound.xmax, bound.ymax);
+  csComponent::SetRect (bound);
 }
 
 void csWindow::SetMenuBarHeight (int iHeight)
 {
   MenuHeight = iHeight;
-  ThemeActive.MenuHeight = 0;
-  SetRect (bound.xmin, bound.ymin, bound.xmax, bound.ymax);
+  csComponent::SetRect (bound);
 }
 
 void csWindow::SetText (const char *iText)
@@ -516,79 +319,10 @@ void csWindow::WindowToClient (int &ClientW, int &ClientH)
   ClientH -= h;
 }
 
-void csWindow::ThemeChanged ()
+void csWindow::SetFrameStyle (csWindowFrameStyle iFrameStyle)
 {
-  int bw,bh;
-  csThemeWindow *thwin = (csThemeWindow *)GetTheme ();
-  CS_ASSERT (thwin != NULL);
-
-  if (ThemeActive.FrameStyle == 1)
-    FrameStyle = (csWindowFrameStyle)thwin->GetFrameStyle ();
-
-  if (ThemeActive.BorderLightColor == 1)
-    BorderLightColor = thwin->GetBorderLightColor ();
-  if (ThemeActive.BorderDarkColor == 1)
-    BorderDarkColor = thwin->GetBorderDarkColor ();
-  if (ThemeActive.BackgroundColor == 1)
-    BackgroundColor = thwin->GetBackgroundColor ();
-  if (ThemeActive.BorderWidth == 1)
-    BorderWidth = thwin->GetBorderWidth ();
-  if (ThemeActive.BorderHeight == 1)
-    BorderHeight = thwin->GetBorderHeight ();
-
-  if (ThemeActive.BorderWidth == 1 || ThemeActive.BorderHeight == 1)
-  {
-    // Preload with stored values. That allows texture style borders not be wacked.
-    bw = BorderWidth;
-    bh = BorderHeight;
-
-    switch (FrameStyle)
-    {
-      case cswfsNone:
-        break;
-      case cswfsThin:
-        thwin->GetBorderSize(*this,csthfsThin,bw,bh);
-        break;
-      case cswfs3D:
-      {
-        if ((BorderWidth >= 0) && (BorderHeight >= 0))
-          thwin->GetBorderSize (*this, csthfsThin, bw, bh);
-        if ((BorderWidth >= 1) && (BorderHeight >= 1))
-          thwin->GetBorderSize (*this, csthfsThinRect, bw, bh);
-        break;
-      }
-    case cswfsTexture:
-      thwin->GetBorderSize (*this, csthfsTexture, bw, bh);
-      break;
-    case cswfsTheme:
-      CS_ASSERT (true);
-      break;
-    } /* endswitch */
-    //    fprintf(stderr,"csWindow(%8p) bw = %d:%d bh = %d:%d FrameStyle = %d\n",this,BorderWidth,bw,BorderHeight,bh,FrameStyle);
-    if (ThemeActive.BorderWidth == 1) BorderWidth = bw;
-    if (ThemeActive.BorderWidth == 1) BorderHeight = bh;
-  }
-
-  if (ThemeActive.TitlebarHeight == 1)
-    TitlebarHeight = thwin->GetTitleBarHeight ();
-  if (ThemeActive.MenuHeight == 1)
-    MenuHeight = thwin->GetMenuHeight ();
-
-  if (WindowStyle & CSWS_BUTCLOSE && ThemeActive.CloseButton == 1)
-    thwin->GetCloseButton (this);
-  if (WindowStyle & CSWS_BUTHIDE && ThemeActive.HideButton == 1)
-    thwin->GetHideButton (this);
-  if (WindowStyle & CSWS_BUTMAXIMIZE && ThemeActive.MaximizeButton == 1)
-    thwin->GetMaximizeButton (this);
-  if (WindowStyle & CSWS_TITLEBAR && ThemeActive.TitleBar == 1)
-    thwin->GetTitleBar (this, GetText ());
-
-  if (ThemeActive.BorderPixmap == 1)
-    BorderPixmap = thwin->GetBorderPixmap ();
-  if (ThemeActive.BackgroundPixmap == 1)
-    BackgroundPixmap = thwin->GetBackgroundPixmap ();
-
-  // JAS:  This triggers a reset of the order matrix, heights, buttons, etc
-//  SetRect(bound.xmin, bound.ymin, bound.xmax, bound.ymax);
-  csComponent::ThemeChanged ();
+  FrameStyle = iFrameStyle;
+  SKIN->SetBorderSize (*this);
+  csComponent::SetRect (bound);
+  Invalidate ();
 }

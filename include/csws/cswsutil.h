@@ -153,13 +153,15 @@ extern void csQueryColorDialog (csWindow *iColorDialog, float &oR, float &oG, fl
 extern void RectUnion (csObjVector &rect, csRect &result);
 
 /// Find a bitmap definition in one of CSWS.CFG bitmap arrays
-extern void FindCFGBitmap (iSystem *System, csStrVector &sv, char *id,
-  int *x, int *y, int *w, int *h);
+extern void ParseConfigBitmap (csApp *app, const char *prefix,
+  const char *section, const char *id, int &x, int &y, int &w, int &h);
 
 /// Convert HLS to RGB
-extern void HLS2RGB (float h, float l, float s, float &r, float &g, float &b);
+extern void csHLS2RGB (float h, float l, float s, float &r, float &g, float &b);
 /// Convert RGB to HLS
-extern void RGB2HLS (float r, float g, float b, float &h, float &l, float &s);
+extern void csRGB2HLS (float r, float g, float b, float &h, float &l, float &s);
+/// Get a color's R,G,B components (iColor as returned by csApp::FindColor)
+extern void csGetRGB (int iColor, csApp *iApp, float &r, float &g, float &b);
 
 /// The short way to add a text button to a toolbar
 extern csButton *csNewToolbarButton (csComponent *iToolbar, int iCommand,

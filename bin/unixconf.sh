@@ -66,8 +66,8 @@ if [ -z "${CXX}" ]; then
 fi
 
 CXX=`basename ${CXX}`
-echo "CXX = ${CXX} -c"
 echo "CC = ${CXX} -c"
+echo "CXX = ${CXX} -c"
 echo "LINK = ${CXX}"
 
 # Create a dummy C++ program
@@ -125,6 +125,17 @@ if [ -n "${MAKEDEP}" ]; then
     echo "MAKEDEP.INSTALLED = yes"
   fi
 fi
+
+# Find out the system include paths for building makedep
+echo "#include <stdio.h>
+#include <stddef.h>
+#include <float.h>" >conftest.cpp
+
+${CXX} -c -H conftest.cpp &>conftest._
+bin/includes.awk conftest._
+
+# Remove dummy remains
+rm -f conftest.cpp conftest.o conftest._
 
 # Find the X11 directory
 if [ -d /usr/X11 ]; then

@@ -25,10 +25,10 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/csws
+vpath %.cpp libs/csws libs/csws/skins/default
 
 CSWS.LIB = $(OUT)$(LIB_PREFIX)csws$(LIB_SUFFIX)
-SRC.CSWS = $(wildcard libs/csws/*.cpp)
+SRC.CSWS = $(wildcard libs/csws/*.cpp libs/csws/skins/*/*.cpp)
 OBJ.CSWS = $(addprefix $(OUT),$(notdir $(SRC.CSWS:.cpp=$O)))
 TO_INSTALL.STATIC_LIBS += $(CSWS.LIB)
 TO_INSTALL.DATA += data/csws.zip
