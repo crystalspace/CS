@@ -272,6 +272,7 @@ class csColor4(csColor):
     def __init__(self, *args):
         _swig_setattr(self, csColor4, 'this', _cspace.new_csColor4(*args))
         _swig_setattr(self, csColor4, 'thisown', 1)
+    def Set(*args): return _cspace.csColor4_Set(*args)
     def __del__(self, destroy=_cspace.delete_csColor4):
         try:
             if self.thisown: destroy(self)
@@ -10386,6 +10387,37 @@ class csCollisionPairPtr(csCollisionPair):
         _swig_setattr(self, csCollisionPair,self.__class__,csCollisionPair)
 _cspace.csCollisionPair_swigregister(csCollisionPairPtr)
 
+class csIntersectingTriangle(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, csIntersectingTriangle, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, csIntersectingTriangle, name)
+    def __repr__(self):
+        return "<C csIntersectingTriangle instance at %s>" % (self.this,)
+    __swig_setmethods__["a"] = _cspace.csIntersectingTriangle_a_set
+    __swig_getmethods__["a"] = _cspace.csIntersectingTriangle_a_get
+    if _newclass:a = property(_cspace.csIntersectingTriangle_a_get, _cspace.csIntersectingTriangle_a_set)
+    __swig_setmethods__["b"] = _cspace.csIntersectingTriangle_b_set
+    __swig_getmethods__["b"] = _cspace.csIntersectingTriangle_b_get
+    if _newclass:b = property(_cspace.csIntersectingTriangle_b_get, _cspace.csIntersectingTriangle_b_set)
+    __swig_setmethods__["c"] = _cspace.csIntersectingTriangle_c_set
+    __swig_getmethods__["c"] = _cspace.csIntersectingTriangle_c_get
+    if _newclass:c = property(_cspace.csIntersectingTriangle_c_get, _cspace.csIntersectingTriangle_c_set)
+    def __init__(self, *args):
+        _swig_setattr(self, csIntersectingTriangle, 'this', _cspace.new_csIntersectingTriangle(*args))
+        _swig_setattr(self, csIntersectingTriangle, 'thisown', 1)
+    def __del__(self, destroy=_cspace.delete_csIntersectingTriangle):
+        try:
+            if self.thisown: destroy(self)
+        except: pass
+
+class csIntersectingTrianglePtr(csIntersectingTriangle):
+    def __init__(self, this):
+        _swig_setattr(self, csIntersectingTriangle, 'this', this)
+        if not hasattr(self,"thisown"): _swig_setattr(self, csIntersectingTriangle, 'thisown', 0)
+        _swig_setattr(self, csIntersectingTriangle,self.__class__,csIntersectingTriangle)
+_cspace.csIntersectingTriangle_swigregister(csIntersectingTrianglePtr)
+
 class iCollider(iBase):
     __swig_setmethods__ = {}
     for _s in [iBase]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -10427,6 +10459,8 @@ class iCollideSystem(iBase):
     def GetCollisionPairs(*args): return _cspace.iCollideSystem_GetCollisionPairs(*args)
     def GetCollisionPairCount(*args): return _cspace.iCollideSystem_GetCollisionPairCount(*args)
     def ResetCollisionPairs(*args): return _cspace.iCollideSystem_ResetCollisionPairs(*args)
+    def CollideRay(*args): return _cspace.iCollideSystem_CollideRay(*args)
+    def GetIntersectingTriangles(*args): return _cspace.iCollideSystem_GetIntersectingTriangles(*args)
     def SetOneHitOnly(*args): return _cspace.iCollideSystem_SetOneHitOnly(*args)
     def GetOneHitOnly(*args): return _cspace.iCollideSystem_GetOneHitOnly(*args)
     def __del__(self, destroy=_cspace.delete_iCollideSystem):
