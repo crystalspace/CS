@@ -176,6 +176,12 @@ csString &csString::Overwrite (size_t iPos, const csString &iStr)
 
 csString& csString::Replace (const csString& Str, size_t Count)
 {
+  if (this == &Str)
+  {
+    if (Count < Length())
+      Truncate(Count);
+    return *this;
+  }
   return Replace(Str.GetData(), Count);
 }
 
