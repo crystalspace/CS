@@ -32,6 +32,11 @@ The history order is reversed so that new features are at the top.
 	- Matze started to merge his jam build system:
 	    - Added configure-jam.ac file and changed autogen.sh to generate
 	      a configure-jam as well.
+	- res added a check to -plugin cmd line switch handler for 
+	  the plugin specified being registered in the class registry. 
+	  If not, 'crystalspace.utilities.' is added to the beginning of 
+	  plugin name. This makes it possible for lazy people to just 
+	  specify e.g. '-plugin=bugplug'.
 7-Apr-2003
         - Rhad changed MSVC specific CopyMemory to memcpy() in OpenAL
           sound renderer.  Increased default sound buffer to 1.0 seconds

@@ -247,7 +247,6 @@ bool csPluginLoader::LoadPlugins ()
     // Alternate videodriver
     char temp [100];
     cs_snprintf (temp, sizeof(temp), "crystalspace.graphics3d.%s", val);
-    //sprintf (temp, "crystalspace.graphics3d.%s", val);
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
     	"crystalspace.pluginloader.loadplugins",
     	"Using alternative 3D driver: %s", temp);
@@ -262,7 +261,9 @@ bool csPluginLoader::LoadPlugins ()
     {
       char temp [100];
       cs_snprintf (temp, sizeof(temp), "crystalspace.graphics2d.%s", val);
-      //sprintf (temp, "crystalspace.graphics2d.%s", val);
+      csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+    	  "crystalspace.pluginloader.loadplugins",
+    	  "Using alternative 2D canvas: %s", temp);
       CommandLine->ReplaceOption ("canvas", temp);
     }
   }
@@ -278,7 +279,19 @@ bool csPluginLoader::LoadPlugins ()
     char *tag = strchr (temp, ':');
     if (tag) *tag++ = 0;
     if (g3d_override && tag && !strcmp ("iGraphics3D", tag)) continue;
-    PluginList.Push (new csPluginLoadRec (tag, temp));
+    // If an ID isn't registered try to insert "crystalspace.utilities."
+    // at the beginning. That makes it possible to specfiy e.g. 
+    // '-plugin=bugplug' on the cmd line.
+    if (!iSCF::SCF->ClassRegistered (temp))
+    {
+      char temp2 [100];
+      cs_snprintf (temp2, sizeof(temp2), "crystalspace.utilities.%s", temp);
+      PluginList.Push (new csPluginLoadRec (tag, temp2));
+    }
+    else
+    {
+      PluginList.Push (new csPluginLoadRec (tag, temp));
+    }
   }
 
   // Now load and initialize all plugins
