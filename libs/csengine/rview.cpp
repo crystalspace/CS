@@ -37,17 +37,17 @@ csFrustumView::~csFrustumView ()
 {
   while (cleanup)
   {
-    CleanupAction *next = cleanup->next;
+    csFrustrumViewCleanup *next = cleanup->next;
     cleanup->action (this, cleanup);
     cleanup = next;
   }
   delete light_frustum;
 }
 
-bool csFrustumView::DeregisterCleanup (CleanupAction *action)
+bool csFrustumView::DeregisterCleanup (csFrustrumViewCleanup *action)
 {
-  CleanupAction **pcur = &cleanup;
-  CleanupAction *cur = cleanup;
+  csFrustrumViewCleanup **pcur = &cleanup;
+  csFrustrumViewCleanup *cur = cleanup;
   while (cur)
   {
     if (cur == action)

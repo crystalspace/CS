@@ -1,5 +1,12 @@
 The history order has been reversed so that new features are at the top.
 
+1-Jun-2000
+	- Eric Sunshine eliminated several compilation warning in the terrain
+	  library.
+	- Eric Sunshine eliminated several compilation problems throughout the
+	  project.
+	- Eric Sunshine worked around a NextStep compiler shortcoming where it
+	  failed to grok subclasses of csFrustumView::CleanupAction.
 31-May-2000
 	- Added a new allegro canvas driver from Burton Radonsxi
 	  <loth@pacificcoast.net>.  This allegro driver is developed on Linux

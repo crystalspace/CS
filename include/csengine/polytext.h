@@ -192,7 +192,7 @@ public:
 
   /// Process lighting for all delayed polygon lightmaps
   static void ProcessDelayedLightmaps (csFrustumView *lview,
-    csFrustumView::CleanupAction *lighting_info);
+    csFrustrumViewCleanup *lighting_info);
 
   /// Collect all relevant shadows from this frustum that covers this lightmap
   bool CollectShadows (csFrustumView *lview, csPolygon3D *poly);

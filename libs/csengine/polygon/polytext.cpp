@@ -41,20 +41,20 @@
 // before csPolyTexture::GetLightmapBounds for details.
 // A object of this type is inserted into original polygon, so that no extra
 // storage except that provided by csObject is required.
-class csDelayedLightingInfo : public csFrustumView::CleanupAction
+class csDelayedLightingInfo : public csFrustrumViewCleanup
 {
   struct LightViewInfo
   {
     // The view frustum
     csFrustumView *frustum;
-    // The old value of csFrustumView::CleanupAction "next" field
-    csFrustumView::CleanupAction *old_next;
+    // The old value of csFrustrumViewCleanup "next" field
+    csFrustrumViewCleanup *old_next;
     // The list of shadow frustums
     csVector shadows;
     // The list of polygons that are still unlit; if NULL we have no more shares
     csPolygon3D *unlit_poly;
 
-    LightViewInfo (csFrustumView *frust, csFrustumView::CleanupAction *next,
+    LightViewInfo (csFrustumView *frust, csFrustrumViewCleanup *next,
       csPolygon3D *orig_poly)
       : shadows (32, 32)
     {
@@ -419,7 +419,7 @@ void csPolyTexture::InitLightMaps ()
 }
 
 void csPolyTexture::ProcessDelayedLightmaps (csFrustumView *lview,
-  csFrustumView::CleanupAction *lighting_info)
+  csFrustrumViewCleanup *lighting_info)
 {
   csDelayedLightingInfo *dli = (csDelayedLightingInfo *)lighting_info;
 

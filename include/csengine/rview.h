@@ -363,6 +363,21 @@ typedef void (csFrustumViewFunc)(csObject* obj, csFrustumView* lview);
 typedef void (csFrustumViewNodeFunc)(csOctreeNode* node, csFrustumView* lview);
 
 /**
+ * The structure for registering cleanup actions.  You can register with any
+ * frustumlist object any number of cleanup routines.  For this you create
+ * such a structure and pass it to RegisterCleanup () method of csFrsutumList.
+ * You can derive a subclass from csFrustrumViewCleanup and keep all
+ * additional data there.
+ */
+struct csFrustrumViewCleanup
+{
+  // Pointer to next cleanup action in chain
+  csFrustrumViewCleanup *next;
+  // The routine that is called for cleanup
+  void (*action) (csFrustumView *, csFrustrumViewCleanup *);
+};
+
+/**
  * This structure represents all information needed for the frustum
  * visibility calculator.
  * @@@ This structure needs some cleanup. It contains too many
@@ -372,24 +387,8 @@ typedef void (csFrustumViewNodeFunc)(csOctreeNode* node, csFrustumView* lview);
 class csFrustumView
 {
 public:
-  /**
-   * The structure for registering cleanup actions.
-   * You can register with any frustumlist object any number
-   * of cleanup routines. For this you create such a structure
-   * and pass it to RegisterCleanup () method of csFrsutumList.
-   * You can derive a subclass from CleanupAction and keep all
-   * additional data there.
-   */
-  struct CleanupAction
-  {
-    // Pointer to next cleanup action in chain
-    CleanupAction *next;
-    // The routine that is called for cleanup
-    void (*action) (csFrustumView *, CleanupAction *);
-  };
-
   /// The head of cleanup actions
-  CleanupAction *cleanup;
+  csFrustrumViewCleanup *cleanup;
 
   /// Data for the functions below.
   void* userdata;
@@ -469,10 +468,10 @@ public:
   ~csFrustumView ();
 
   /// Register a cleanup action to be called from destructor
-  void RegisterCleanup (CleanupAction *action)
+  void RegisterCleanup (csFrustrumViewCleanup *action)
   { action->next = cleanup; cleanup = action; }
   /// Deregister a cleanup action
-  bool DeregisterCleanup (CleanupAction *action);
+  bool DeregisterCleanup (csFrustrumViewCleanup *action);
 };
 
 #endif // __CS_RVIEW_H__
