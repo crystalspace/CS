@@ -78,6 +78,19 @@ public:
     return attr->Value ();
   }
 
+  virtual int GetValueAsInt () const
+  {
+    return attr->IntValue ();
+  }
+
+  virtual float GetValueAsFloat () const
+  {
+    const char* val = attr->Value ();
+    float f;
+    sscanf (val, "%f", &f);
+    return f;
+  }
+
   virtual void SetName (const char* name)
   {
     attr->SetName (name);
@@ -86,6 +99,18 @@ public:
   virtual void SetValue (const char* value)
   {
     attr->SetValue (value);
+  }
+
+  virtual void SetValueAsInt (int v)
+  {
+    attr->SetIntValue (v);
+  }
+
+  virtual void SetValueAsFloat (float f)
+  {
+    char buf[100];
+    sprintf (buf, "%g", f);
+    attr->SetValue (buf);
   }
 };
 
@@ -129,10 +154,11 @@ public:
   virtual const char* GetType ();
   virtual void SetType (const char* type);
   virtual csRef<iXmlNode> GetParent ();
-  virtual csRef<iXmlNodeIterator> GetChildren ();
-  virtual csRef<iXmlNodeIterator> GetChildren (const char* type);
-  virtual void RemoveChild (const csRef<iXmlNode>& child);
-  virtual void RemoveChildren ();
+  virtual csRef<iXmlNodeIterator> GetNodes ();
+  virtual csRef<iXmlNodeIterator> GetNodes (const char* type);
+  virtual csRef<iXmlNode> GetNode (const char* type);
+  virtual void RemoveNode (const csRef<iXmlNode>& child);
+  virtual void RemoveNodes ();
   virtual csRef<iXmlNode> CreateNode (const char* type);
   virtual csRef<iXmlNode> CreateNodeBefore (const char* type,
   	const csRef<iXmlNode>& node);
@@ -143,6 +169,10 @@ public:
   virtual void MoveNodeAfter (const csRef<iXmlNode>& node,
   	const csRef<iXmlNode>& after);
   virtual csRef<iXmlAttributeIterator> GetAttributes ();
+  virtual csRef<iXmlAttribute> GetAttribute (const char* name);
+  virtual int GetAttributeValueAsInt (const char* name);
+  virtual float GetAttributeValueAsFloat (const char* name);
+  virtual const char* GetAttributeValue (const char* name);
   virtual void RemoveAttribute (const csRef<iXmlAttribute>& attr);
   virtual void RemoveAttributes ();
   virtual void SetAttribute (const char* name, const char* value);

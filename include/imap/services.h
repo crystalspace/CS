@@ -20,6 +20,7 @@
 #define _I_SYNTAXSERVICE_H_
 
 #include "csutil/scf.h"
+#include "csutil/ref.h"
 
 class csMatrix3;
 class csVector3;
@@ -31,13 +32,14 @@ struct iEngine;
 struct iMaterialWrapper;
 struct iThingState;
 struct iLoaderContext;
+struct iXmlNode;
 
 #define CSTEX_UV 1  // UV is given in texture description
 #define CSTEX_V1 2  // vector1 is given in texture description
 #define CSTEX_V2 4  // vector2 is given in texture description
 #define CSTEX_UV_SHIFT 8 // explicit (u,v) <-> vertex mapping is given in texture description
 
-SCF_VERSION (iSyntaxService, 1, 0, 0);
+SCF_VERSION (iSyntaxService, 1, 1, 0);
 
 /**
  * This component provides services for other loaders to easily parse
@@ -164,6 +166,82 @@ struct iSyntaxService : public iBase
    */
   virtual const char* MixmodeToText (uint mixmode, int indent,
   	bool newline=true) = 0;
+
+  //========================================================================
+  // New XML versions of all functions accepting char*. Soon these
+  // will be the only ones remaining.
+  //========================================================================
+
+  /**
+   * Parse a MATRIX description. Returns true if successful.
+   */
+  virtual bool ParseMatrix (iXmlNode* node, csMatrix3 &m) = 0;
+
+  /**
+   * Parse a VECTOR description. Returns true if successful.
+   */
+  virtual bool ParseVector (iXmlNode* node, csVector3 &v) = 0;
+
+  /**
+   * Parse a MIXMODE description. Returns true if successful.
+   */
+  virtual bool ParseMixmode (iXmlNode* node, uint &mixmode) = 0;
+
+  /**
+   * Parse a SHADING description. Returns true if successful.
+   */
+  virtual bool ParseShading (iXmlNode* node, int &shading) = 0;
+
+  /**
+   * Parse a texture description.
+   * <ul>
+   * <li>vref: is the array containing vertices which can be referenced
+   *     by indices in the description.
+   * <li>texspex: describes the data found for the texture transformation.
+   *     It consists of or'ed CSTEX_.
+   * <li>tx_orig, tx1, tx2, len: texture transformation is given by 3
+   *     points describing a 3d space (third vector is implicitly given to
+   *     be perpendicular on the 2 vectors described by the 3 points),
+   * <li>width and height of the texture.
+   * <li>tx_m and tx_v: if texture transformation is given explicitly by
+   *     matrix/vector.
+   * <li>uv_shift: contains UV_SHIFT value.
+   * <li>idx? and uv?: if texture mapping is given explicitly by defining
+   *     the u,v coordinate that belongs to vertex idx? of the polygon.
+   * <li>plane: is the name of a plane defining the texture transformation.
+   * <li>polyname: name of polygon to which this texture description belongs.
+   *     This is used to make errormessages more verbose.
+   * </ul>
+   */
+  virtual bool ParseTexture (iXmlNode* node,
+  			     const csVector3* vref, uint &texspec,
+			     csVector3 &tx_orig, csVector3 &tx1,
+			     csVector3 &tx2, csVector3 &len,
+			     csMatrix3 &tx_m, csVector3 &tx_v,
+			     csVector2 &uv_shift,
+			     int &idx1, csVector2 &uv1,
+			     int &idx2, csVector2 &uv2,
+			     int &idx3, csVector2 &uv3,
+			     char *plane, const char *polyname) = 0;
+
+  /**
+   * Parses a WARP () specification.
+   * flags: contains all flags found in the description.
+   */
+  virtual  bool ParseWarp (iXmlNode* node, csVector &flags, bool &mirror,
+  			   bool& warp, int& msv,
+			   csMatrix3 &m, csVector3 &before,
+			   csVector3 &after) = 0;
+
+
+  /**
+   * Parses a POLYGON.
+   */
+  virtual bool ParsePoly3d (iXmlNode* node,
+   			    iLoaderContext* ldr_context,
+  			    iEngine* engine, iPolygon3D* poly3d,
+			    float default_texlen,
+			    iThingState* thing_state, int vt_offset) = 0;
 };
 
 #endif

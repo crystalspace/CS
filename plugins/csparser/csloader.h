@@ -48,6 +48,7 @@ struct iPluginManager;
 struct iModelConverter;
 struct iCrossBuilder;
 struct iCameraPosition;
+struct iXmlNode;
 
 struct iObject;
 struct iThingState;
@@ -236,6 +237,120 @@ private:
 
   /// Load map from a memory buffer
   bool LoadMap (char* buf);
+
+  //========================================================================
+  // New XML versions of all functions accepting char*. Soon these
+  // will be the only ones remaining.
+  //========================================================================
+
+  /// Parse a quaternion definition
+  bool ParseQuaternion (iXmlNode* node, csQuaternion &q);
+  /// Parse a color definition
+  bool ParseColor (iXmlNode* node, csRGBcolor &c);
+  /// Parse a color definition
+  bool ParseColor (iXmlNode* node, csColor &c);
+
+  /// Parse a list of textures and add them to the engine.
+  bool ParseTextureList (iXmlNode* node);
+  /**
+   * Parse a list of materials and add them to the engine. If a prefix is
+   * given, all material names will be prefixed with the corresponding string.
+   */
+  bool ParseMaterialList (iXmlNode* node, const char* prefix = NULL);
+  /// Parse a texture definition and add the texture to the engine
+  iTextureWrapper* ParseTexture (char *name, iXmlNode* node);
+  /// Parse a proc texture definition and add the texture to the engine
+  iTextureWrapper* ParseProcTex (char *name, iXmlNode* node);
+  /// Parse a material definition and add the material to the engine
+  iMaterialWrapper* ParseMaterial (char *name, iXmlNode* node, const char* prefix = NULL);
+  /// Parse a collection definition and add the collection to the engine
+  iCollection* ParseCollection (char* name, iXmlNode* node);
+  /// Parse a camera position.
+  bool ParseStart (iXmlNode* node, iCameraPosition* campos);
+  /// Parse a static light definition and add the light to the engine
+  iStatLight* ParseStatlight (char* name, iXmlNode* node);
+  /// Parse a key definition and add the key to the given object
+  iKeyValuePair* ParseKey (iXmlNode* node, iObject* pParent);
+  /// Parse a map node definition and add the node to the given sector
+  iMapNode* ParseNode (char* name, iXmlNode* node, iSector* sec);
+  /// Parse a sector definition and add the sector to the engine
+  iSector* ParseSector (char* name, iXmlNode* node);
+
+  /// -----------------------------------------------------------------------
+
+  /// For heightgen.
+  csGenerateImageTexture* ParseHeightgenTexture (iXmlNode* node);
+  /// For heightgen.
+  csGenerateImageValue* ParseHeightgenValue (iXmlNode* node);
+  /// Parse and load a height texture
+  bool ParseHeightgen (iXmlNode* node);
+
+  /**
+   * Load a LOD control object.
+   */
+  bool LoadLodControl (iLODControl* lodctrl, iXmlNode* node);
+
+  /**
+   * Load a Mesh Object Factory from the map file.
+   * If the transformation pointer is given then this is for a hierarchical
+   * mesh object factory and the transformation will be filled in with
+   * the relative transform (from MOVE keyword).
+   */
+  bool LoadMeshObjectFactory (iMeshFactoryWrapper* meshFact, iXmlNode* node,
+  	csReversibleTransform* transf = NULL);
+
+  /**
+   * Load the mesh object from the map file.
+   */
+  bool LoadMeshObject (iMeshWrapper* mesh, iXmlNode* node);
+
+  /**
+   * Load the mesh object from the map file.
+   * This version will parse FACTORY statement to directly create
+   * a mesh from a factory.
+   */
+  iMeshWrapper* LoadMeshObjectFromFactory (iXmlNode* node);
+
+  /**
+   * Load a plugin in general.
+   */
+  bool LoadAddOn (iXmlNode* node, iBase* context);
+
+  /**
+   * Load the render priority section.
+   */
+  bool LoadRenderPriorities (iXmlNode* node);
+
+  /**
+   * Load the settings section.
+   */
+  bool LoadSettings (iXmlNode* node);
+
+  /**
+   * Load sounds from a SOUNDS(...) argument.
+   * This function is normally called automatically by the parser.
+   */
+  bool LoadSounds (iXmlNode* node);
+
+
+  /**
+   * Load all the plugin descriptions from the map file
+   * (the plugins are not actually loaded yet).
+   */
+  bool LoadPlugins (iXmlNode* node);
+
+  /**
+   * Load a library into given engine.<p>
+   * A library is just a map file that contains just mesh factories,
+   * thing templates, sounds and textures.
+   */
+  bool LoadLibrary (iXmlNode* node);
+
+  /// Load map from a memory buffer
+  bool LoadMap (iXmlNode* node);
+
+  //========================================================================
+  //========================================================================
 
   /**
    * Print an error about an unknown token. 'object' is the type of object

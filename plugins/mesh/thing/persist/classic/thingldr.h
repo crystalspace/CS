@@ -55,6 +55,13 @@ public:
   virtual iBase* Parse (const char* string, 
     iLoaderContext* ldr_context, iBase* context);
 
+  /// Parse a given node and return a new object for it.
+  virtual iBase* Parse (iXmlNode* node,
+    iLoaderContext* ldr_context, iBase* context)
+  {
+    return NULL;
+  }
+
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csThingLoader);
@@ -121,6 +128,13 @@ public:
   virtual iBase* Parse (const char* string, 
     iLoaderContext* ldr_context, iBase* context);
 
+  /// Parse a given node and return a new object for it.
+  virtual iBase* Parse (iXmlNode* node,
+    iLoaderContext* ldr_context, iBase* context)
+  {
+    return NULL;
+  }
+
   struct eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE(csPlaneLoader);
@@ -185,6 +199,13 @@ public:
   /// Parse a given string and return a new object for it.
   virtual iBase* Parse (const char* string, 
     iLoaderContext* ldr_context, iBase* context);
+
+  /// Parse a given node and return a new object for it.
+  virtual iBase* Parse (iXmlNode* node,
+    iLoaderContext* ldr_context, iBase* context)
+  {
+    return NULL;
+  }
 
   struct eiComponent : public iComponent
   {

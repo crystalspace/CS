@@ -23,6 +23,7 @@
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/util.h"
+#include "iutil/xml.h"
 #include "csgeom/matrix3.h"
 #include "csgeom/vector3.h"
 #include "csgeom/vector2.h"
@@ -1312,3 +1313,64 @@ const char* csTextSyntaxService::MixmodeToText (
 
   return text;
 }
+
+bool csTextSyntaxService::ParseMatrix (iXmlNode* node, csMatrix3 &m)
+{
+  csRef<iXmlNodeIterator> it = node->GetNodes ();
+  while (it->HasNext ())
+  {
+    csRef<iXmlNode> child = it->Next ();
+    const char* type = child->GetType ();
+  }
+  return true;
+}
+
+bool csTextSyntaxService::ParseVector (iXmlNode* node, csVector3 &v)
+{
+  v.x = node->GetAttributeValueAsFloat ("x");
+  v.y = node->GetAttributeValueAsFloat ("y");
+  v.z = node->GetAttributeValueAsFloat ("z");
+  return true;
+}
+
+bool csTextSyntaxService::ParseMixmode (iXmlNode* node, uint &mixmode)
+{
+  return true;
+}
+
+bool csTextSyntaxService::ParseShading (iXmlNode* node, int &shading)
+{
+  return true;
+}
+
+bool csTextSyntaxService::ParseTexture (
+	iXmlNode* node, const csVector3* vref, uint &texspec,
+	csVector3 &tx_orig, csVector3 &tx1, csVector3 &tx2, csVector3 &len,
+	csMatrix3 &tx_m, csVector3 &tx_v,
+	csVector2 &uv_shift,
+	int &idx1, csVector2 &uv1,
+	int &idx2, csVector2 &uv2,
+	int &idx3, csVector2 &uv3,
+	char *plane, const char *polyname)
+{
+  return true;
+}
+
+bool csTextSyntaxService::ParseWarp (
+	iXmlNode* node, csVector &flags, bool &mirror, bool &warp,
+	int& msv,
+	csMatrix3 &m, csVector3 &before, csVector3 &after)
+{
+  return true;
+}
+
+bool csTextSyntaxService::ParsePoly3d (
+        iXmlNode* node,
+	iLoaderContext* ldr_context,
+	iEngine* , iPolygon3D* poly3d,
+	float default_texlen,
+	iThingState* thing_state, int vt_offset)
+{
+  return true;
+}
+

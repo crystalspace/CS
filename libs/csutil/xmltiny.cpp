@@ -168,27 +168,34 @@ void csTinyXmlNode::SetType (const char* type)
   node->SetValue (type);
 }
 
-csRef<iXmlNodeIterator> csTinyXmlNode::GetChildren ()
+csRef<iXmlNodeIterator> csTinyXmlNode::GetNodes ()
 {
   csRef<iXmlNodeIterator> it;
   it.Take (new csTinyXmlNodeIterator (node, NULL));
   return it;
 }
 
-csRef<iXmlNodeIterator> csTinyXmlNode::GetChildren (const char* type)
+csRef<iXmlNodeIterator> csTinyXmlNode::GetNodes (const char* type)
 {
   csRef<iXmlNodeIterator> it;
   it.Take (new csTinyXmlNodeIterator (node, type));
   return it;
 }
 
-void csTinyXmlNode::RemoveChild (const csRef<iXmlNode>& child)
+csRef<iXmlNode> csTinyXmlNode::GetNode (const char* type)
+{
+  csRef<iXmlNode> child;
+  child.Take (new csTinyXmlNode (node->FirstChild (type)));
+  return child;
+}
+
+void csTinyXmlNode::RemoveNode (const csRef<iXmlNode>& child)
 {
   CS_ASSERT (child.IsValid ());
   node->RemoveChild (((csTinyXmlNode*)(iXmlNode*)child)->GetTiNode ());
 }
 
-void csTinyXmlNode::RemoveChildren ()
+void csTinyXmlNode::RemoveNodes ()
 {
   node->Clear ();
 }
@@ -233,6 +240,46 @@ csRef<iXmlAttributeIterator> csTinyXmlNode::GetAttributes ()
   csRef<iXmlAttributeIterator> it;
   it.Take (new csTinyXmlAttributeIterator (node));
   return it;
+}
+
+csRef<iXmlAttribute> csTinyXmlNode::GetAttribute (const char* name)
+{
+  csRef<iXmlAttributeIterator> it = GetAttributes ();
+  while (it->HasNext ())
+  {
+    csRef<iXmlAttribute> attr = it->Next ();
+    if (strcmp (name, attr->GetValue ()) == 0)
+      return attr;
+  }
+  csRef<iXmlAttribute> attr;
+  return attr;
+}
+
+const char* csTinyXmlNode::GetAttributeValue (const char* name)
+{
+  if (node->Type () == TiXmlNode::ELEMENT)
+  {
+    TiXmlElement* el = (TiXmlElement*)node;
+    return el->Attribute (name);
+  }
+  else
+  {
+    return NULL;
+  }
+}
+
+int csTinyXmlNode::GetAttributeValueAsInt (const char* name)
+{
+  csRef<iXmlAttribute> attr = GetAttribute (name);
+  if (!attr) return 0;
+  return attr->GetValueAsInt ();
+}
+
+float csTinyXmlNode::GetAttributeValueAsFloat (const char* name)
+{
+  csRef<iXmlAttribute> attr = GetAttribute (name);
+  if (!attr) return 0;
+  return attr->GetValueAsFloat ();
 }
 
 void csTinyXmlNode::RemoveAttribute (const csRef<iXmlAttribute>& attr)

@@ -57,10 +57,18 @@ struct iXmlAttribute : public iBase
   virtual const char* GetName () const = 0;
   /// Get value of this attribute.
   virtual const char* GetValue () const = 0;
+  /// Get value of this attribute as int.
+  virtual int GetValueAsInt () const = 0;
+  /// Get value of this attribute as float.
+  virtual float GetValueAsFloat () const = 0;
   /// Set name of this attribute.
   virtual void SetName (const char* name) = 0;
   /// Set value of this attribute.
   virtual void SetValue (const char* value) = 0;
+  /// Set int value of this attribute.
+  virtual void SetValueAsInt (int v) = 0;
+  /// Set float value of this attribute.
+  virtual void SetValueAsFloat (float f) = 0;
 };
 
 //===========================================================================
@@ -97,14 +105,16 @@ struct iXmlNode : public iBase
   //---------------------------------------------------------------------
   
   /// Get an iterator over all children.
-  virtual csRef<iXmlNodeIterator> GetChildren () = 0;
+  virtual csRef<iXmlNodeIterator> GetNodes () = 0;
   /// Get an iterator over all children of the specified type.
-  virtual csRef<iXmlNodeIterator> GetChildren (const char* type) = 0;
+  virtual csRef<iXmlNodeIterator> GetNodes (const char* type) = 0;
+  /// Get the first node of the given type.
+  virtual csRef<iXmlNode> GetNode (const char* type) = 0;
 
   /// Remove a child.
-  virtual void RemoveChild (const csRef<iXmlNode>& child) = 0;
+  virtual void RemoveNode (const csRef<iXmlNode>& child) = 0;
   /// Remove all children.
-  virtual void RemoveChildren () = 0;
+  virtual void RemoveNodes () = 0;
 
   /// Create a new node of the given type at the end.
   virtual csRef<iXmlNode> CreateNode (const char* type) = 0;
@@ -131,6 +141,14 @@ struct iXmlNode : public iBase
 
   /// Get an iterator over all attributes.
   virtual csRef<iXmlAttributeIterator> GetAttributes () = 0;
+  /// Get an attribute by name.
+  virtual csRef<iXmlAttribute> GetAttribute (const char* name) = 0;
+  /// Get an attribute value by name.
+  virtual const char* GetAttributeValue (const char* name) = 0;
+  /// Get an attribute value by name.
+  virtual int GetAttributeValueAsInt (const char* name) = 0;
+  /// Get an attribute value by name.
+  virtual float GetAttributeValueAsFloat (const char* name) = 0;
 
   /// Remove an attribute.
   virtual void RemoveAttribute (const csRef<iXmlAttribute>& attr) = 0;

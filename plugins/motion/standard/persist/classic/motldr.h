@@ -57,6 +57,13 @@ public:
   virtual iBase* Parse (const char* string, 
     iLoaderContext* ldr_context, iBase *context );
 
+  /// Parse a given node and return a new object for it.
+  virtual iBase* Parse (iXmlNode* node,
+    iLoaderContext* ldr_context, iBase* context)
+  {
+    return NULL;
+  }
+
   void Report (int severity, const char* msg, ...);
 
   struct eiComponent : public iComponent

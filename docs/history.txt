@@ -21,6 +21,23 @@ The history order is reversed so that new features are at the top.
 	- Fixed an error in mergeres.h by quoting the quotes.
 	- Steven Geens fixed the motion manager plugin. Motions will now
 	  work correctly if no key frame is defined for timeframe 0.
+	- Extended iLoaderPlugin with a new version of Parse() that accepts
+	  an iXmlNode instead of a string. This new version is not yet used.
+	  Put empty implementations of this Parse() in all mesh loaders. This
+	  function will provide the upgrade path to the new XML format. Once
+	  the upgrade is complete the old version will be removed.
+	- Internally extended the main loader plugin with new functions to
+	  parse from iXmlNode instead of char*. All these new functions are
+	  still empty and will be gradually implemented.
+	- Extended iSyntaxService with new functions that load from XML
+	  data instead of char* data. Some of these functions are actually
+	  implemented and should work. This is untested though.
+	- Added a few functions to iXmlNode and also changed the names
+	  which refered to 'children' so that they now specify 'nodes'.
+	  You can now access nodes by type and attributes by name more
+	  easily.
+	- Also added conveniance functions to iXmlAttribute to set values
+	  as int and float.
 7-Aug-2002
 	- Eric Sunshine fixed a couple problems with csconf.mak.  First, it was
 	  using " instead of $".  It was using the hardcoded path "out/"

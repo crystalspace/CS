@@ -33,6 +33,7 @@
 #include "csloader.h"
 
 #include "iutil/databuff.h"
+#include "iutil/xml.h"
 #include "imap/reader.h"
 #include "imap/ldrctxt.h"
 #include "imesh/lighting.h"
@@ -99,7 +100,8 @@ SCF_IMPLEMENT_IBASE(StdLoaderContext);
   SCF_IMPLEMENTS_INTERFACE(iLoaderContext);
 SCF_IMPLEMENT_IBASE_END;
 
-StdLoaderContext::StdLoaderContext (iEngine* Engine, bool ResolveOnlyRegion, csParser* parser)
+StdLoaderContext::StdLoaderContext (iEngine* Engine,
+	bool ResolveOnlyRegion, csParser* parser)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   StdLoaderContext::Engine = Engine;
@@ -3122,4 +3124,100 @@ iSector* csLoader::ParseSector (char* secname, char* buf)
     }
   return sector;
 }
+
+//========================================================================
+// New XML versions of all functions accepting char*. Soon these
+// will be the only ones remaining.
+//========================================================================
+
+bool csLoader::LoadMap (iXmlNode* node)
+{
+  if (!Engine) return false;
+  return true;
+}
+
+bool csLoader::LoadPlugins (iXmlNode* node)
+{
+  return true;
+}
+
+bool csLoader::LoadLibrary (iXmlNode* node)
+{
+  return true;
+}
+
+bool csLoader::LoadSounds (iXmlNode* node)
+{
+  return true;
+}
+
+bool csLoader::LoadLodControl (iLODControl* lodctrl, iXmlNode* node)
+{
+  return true;
+}
+
+bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp,
+	iXmlNode* node, csReversibleTransform* transf)
+{
+  return true;
+}
+
+iMeshWrapper* csLoader::LoadMeshObjectFromFactory (iXmlNode* node)
+{
+  return NULL;
+}
+
+bool csLoader::LoadMeshObject (iMeshWrapper* mesh, iXmlNode* node)
+{
+  return true;
+}
+
+bool csLoader::LoadAddOn (iXmlNode* node, iBase* context)
+{
+  return true;
+}
+
+bool csLoader::LoadSettings (iXmlNode* node)
+{
+  return true;
+}
+
+bool csLoader::LoadRenderPriorities (iXmlNode* node)
+{
+  return true;
+}
+
+iCollection* csLoader::ParseCollection (char* name, iXmlNode* node)
+{
+  return NULL;
+}
+
+bool csLoader::ParseStart (iXmlNode* node, iCameraPosition* campos)
+{
+  return true;
+}
+
+iStatLight* csLoader::ParseStatlight (char* name, iXmlNode* node)
+{
+  return NULL;
+}
+
+iKeyValuePair* csLoader::ParseKey (iXmlNode* node, iObject* pParent)
+{
+  return NULL;
+}
+
+iMapNode* csLoader::ParseNode (char* name, iXmlNode* node, iSector* sec)
+{
+  return NULL;
+}
+
+iSector* csLoader::ParseSector (char* secname, iXmlNode* node)
+{
+  return NULL;
+}
+
+
+//========================================================================
+//========================================================================
 
