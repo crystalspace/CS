@@ -17,7 +17,7 @@
 #include "iname.h"
 #include "idog.h"
 #include "iworm.h"
-#include "ifrog.h"
+//#include "ifrog.h"
 
 // for the case we're using static linking ...
 #ifdef CS_STATIC_LINKED
@@ -26,7 +26,7 @@
 #endif
 
 // frog is always statically linked
-REGISTER_STATIC_LIBRARY (Frog)
+//REGISTER_STATIC_LIBRARY (Frog)
 
 // This function will clone given object, do something with him
 // and finally destroy
@@ -70,7 +70,7 @@ void Clone (iBase *iObject)
   newobj->DecRef ();
 }
 
-int main ()
+int main(int argc,char *argv[])
 {
 #if 0
   // This method requires you register dlls with scfreg (or manually) in scf.cfg
@@ -131,7 +131,7 @@ int main ()
   }
 
   printf ("----------------\n");
-
+/*
   iFrog *frog = CREATE_INSTANCE ("test.frog", iFrog);
   if (!frog)
     fprintf (stderr, "No csFrog shared class!\n");
@@ -153,6 +153,7 @@ int main ()
 
     frog->DecRef ();
   }
-
+*/
   scfFinish ();
+  return 0;
 }
