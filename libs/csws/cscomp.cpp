@@ -103,7 +103,7 @@ bool csComponent::ApplySkin (csSkin *Skin)
   if (!skinname)
     return true;	// we don't need a skin slice
 
-  int sliceidx = Skin->FindSortedKey (skinname, csSkin::CompareKey);
+  int sliceidx = Skin->FindSortedKey (Skin->KeyCmp(skinname));
   if ((sliceidx < 0) && !skinslice)
     return false;
 
