@@ -10,7 +10,7 @@ include mk/user.mak
 include mk/common.mak
 -include config.mak
 
-.PHONY: doc api depend clean cleanlib cleandep
+.PHONY: doc api depend clean cleanlib cleandep distclean
 
 # Remove all standard suffixes to speed up make lookups
 .SUFFIXES:
@@ -44,13 +44,9 @@ endif
 
 .SUFFIXES: $O $(EXE) $(LIB) $(DLL) .S .c .cpp .h .asm .ash
 
-# Dynamically compute driver submakefiles
-DRIVER_SUBMAKEFILES=$(wildcard $(addsuffix /*.mak,$(addprefix libs/,$(DRIVERS))))
-include $(DRIVER_SUBMAKEFILES)
-
 # Define paths automatically searched for source files
 vpath %.c support/gnu
-vpath %.cpp support/com support/debug support/system
+vpath %.cpp support/debug
 
 # Directory for object files
 OUTBASE=out/
@@ -123,8 +119,11 @@ LIBS.EXE := $(sort $(LIBS.EXE))
 
 all: $(OUTDIRS)
 
+distclean: clean
+	-$(RM) config.mak include/volatile.h
+
 clean:
-	-$(RMDIR) out
+	-$(RMDIR) $(subst /,,$(OUTBASE))
 	-$(RM) debug.txt
 	-$(RM) precalc.zip
 
