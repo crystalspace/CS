@@ -20,6 +20,12 @@ chronological order.
 	- Jorrit reenabled the dynavis_debug target in the Dynavis jamfile
 	  after Matze applied some fixes to the metadata embedding code
 	  on windows.
+	- Eric Sunshine made some corrections to the keystroke classification
+	  (cooked versus raw) which is performed by OSXDelegate.  Most
+	  importantly, it now correctly cooks Return and Enter to CSKEY_ENTER;
+	  whereas previously it was incorrectly setting the raw code.  Updated
+	  full-screen toggle in OSXDriver2D to reflect the corrected raw/cooked
+	  classification performed by OSXDelegate.
 22-Oct-2003
 	- Jorrit fixed a bug in csMovableSectorList which did all the needed
 	  SCF stuff EXCEPT inherit from iBase. This is an old bug but for

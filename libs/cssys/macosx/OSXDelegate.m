@@ -255,7 +255,8 @@ ND_PROTO(void,flush_graphics_context)(OSXDelegateHandle handle)
 
 
 //-----------------------------------------------------------------------------
-// quit: -- Target of "Quit" menu item.  Terminate the application.
+// quit:
+//	Target of "Quit" menu item.  Terminate the application.
 //-----------------------------------------------------------------------------
 - (void)quit:(id)sender
 {
@@ -264,7 +265,8 @@ ND_PROTO(void,flush_graphics_context)(OSXDelegateHandle handle)
 
 
 //-----------------------------------------------------------------------------
-// localize:toView:x:y: -- Convert event location to view coordinate system.
+// localize:toView:x:y:
+//	Convert event location to view coordinate system.
 //-----------------------------------------------------------------------------
 - (BOOL)localize:(NSEvent*)event toView:(NSView*)view x:(int*)x y:(int*)y
 {
@@ -281,52 +283,62 @@ ND_PROTO(void,flush_graphics_context)(OSXDelegateHandle handle)
 //-----------------------------------------------------------------------------
 - (void)classifyFunctionKey:(unsigned int*)raw :(unsigned int*)cooked
 {
+  unsigned int k = (unsigned int)~0;
   switch (*raw)
   {
-    case K_LEFT:         *raw = CSKEY_LEFT;  break;
-    case K_RIGHT:        *raw = CSKEY_RIGHT; break;
-    case K_UP:           *raw = CSKEY_UP;    break;
-    case K_DOWN:         *raw = CSKEY_DOWN;  break;
-    case K_ED_PAGE_UP:   *raw = CSKEY_PGUP;  break;
-    case K_ED_PAGE_DOWN: *raw = CSKEY_PGDN;  break;
-    case K_ED_HOME:      *raw = CSKEY_HOME;  break;
-    case K_ED_END:       *raw = CSKEY_END;   break;
-    case K_ED_INSERT:    *raw = CSKEY_INS;   break;
-    case K_ED_DELETE:    *raw = CSKEY_DEL;   break;
-    case K_F1:           *raw = CSKEY_F1;    break;
-    case K_F2:           *raw = CSKEY_F2;    break;
-    case K_F3:           *raw = CSKEY_F3;    break;
-    case K_F4:           *raw = CSKEY_F4;    break;
-    case K_F5:           *raw = CSKEY_F5;    break;
-    case K_F6:           *raw = CSKEY_F6;    break;
-    case K_F7:           *raw = CSKEY_F7;    break;
-    case K_F8:           *raw = CSKEY_F8;    break;
-    case K_F9:           *raw = CSKEY_F9;    break;
-    case K_F10:          *raw = CSKEY_F10;   break;
-    case K_F11:          *raw = CSKEY_F11;   break;
-    case K_F12:          *raw = CSKEY_F12;   break;
+    case K_LEFT:         k = CSKEY_LEFT;  break;
+    case K_RIGHT:        k = CSKEY_RIGHT; break;
+    case K_UP:           k = CSKEY_UP;    break;
+    case K_DOWN:         k = CSKEY_DOWN;  break;
+    case K_ED_PAGE_UP:   k = CSKEY_PGUP;  break;
+    case K_ED_PAGE_DOWN: k = CSKEY_PGDN;  break;
+    case K_ED_HOME:      k = CSKEY_HOME;  break;
+    case K_ED_END:       k = CSKEY_END;   break;
+    case K_ED_INSERT:    k = CSKEY_INS;   break;
+    case K_ED_DELETE:    k = CSKEY_DEL;   break;
+    case K_F1:           k = CSKEY_F1;    break;
+    case K_F2:           k = CSKEY_F2;    break;
+    case K_F3:           k = CSKEY_F3;    break;
+    case K_F4:           k = CSKEY_F4;    break;
+    case K_F5:           k = CSKEY_F5;    break;
+    case K_F6:           k = CSKEY_F6;    break;
+    case K_F7:           k = CSKEY_F7;    break;
+    case K_F8:           k = CSKEY_F8;    break;
+    case K_F9:           k = CSKEY_F9;    break;
+    case K_F10:          k = CSKEY_F10;   break;
+    case K_F11:          k = CSKEY_F11;   break;
+    case K_F12:          k = CSKEY_F12;   break;
   }
-  *cooked = *raw;
+  if (k != (unsigned int)~0)
+  {
+    *raw = k;
+    *cooked = k;
+  }
 }
 
 
 //-----------------------------------------------------------------------------
 // classifyOtherKey::
-//	*NOTE* The so-called "backspace" key on the keyboard actually sends
-//	DEL, however Crystal Space would like to see it as CSKEY_BACKSPACE.
+//
+// *1* For the cooked code, Crystal Space applications would like to see
+//     everything that looks like a Return or Enter mapped to CSKEY_ENTER.
+// *2* The so-called "backspace" key on the keyboard actually sends DEL,
+//     however Crystal Space would like to see it as CSKEY_BACKSPACE.
+// *3* For 7-bit alphabetic characters, Crystal Space prefers that the raw
+//     code be lowercase.
 //-----------------------------------------------------------------------------
 - (void)classifyOtherKey:(unsigned int*)raw :(unsigned int*)cooked
 {
   switch (*raw)
   {
-    case K_ESCAPE:    *raw = CSKEY_ESC;       break;
-    case K_RETURN:    *raw = CSKEY_ENTER;     break;
-    case K_TAB:       *raw = CSKEY_TAB;       break;
-    case K_BACKSPACE: *raw = CSKEY_BACKSPACE; break;
-    case K_DELETE:    *raw = CSKEY_BACKSPACE; break; // *NOTE*
+    case K_ESCAPE:    *cooked = CSKEY_ESC;       break;
+    case K_RETURN:    *cooked = CSKEY_ENTER;     break;	// *1*
+    case K_TAB:       *cooked = CSKEY_TAB;       break;
+    case K_BACKSPACE: *cooked = CSKEY_BACKSPACE; break;
+    case K_DELETE:    *cooked = CSKEY_BACKSPACE; break; // *2*
     default:
       if (*raw <= 0x7f) // Is it 7-bit ASCII?
-	*raw = CS_DOWN_CASE[ *raw ];
+	*raw = CS_DOWN_CASE[ *raw ];			// *3*
       break;
   }
 }
@@ -337,25 +349,31 @@ ND_PROTO(void,flush_graphics_context)(OSXDelegateHandle handle)
 //-----------------------------------------------------------------------------
 - (void)classifyNumericPadKey:(unsigned int*)raw :(unsigned int*)cooked
 {
+  unsigned int k = (unsigned int)~0;
   switch (*raw)
   {
-    case K_KP_CENTER:    *raw = CSKEY_CENTER;                break;
-    case K_KP_LEFT:      *raw = CSKEY_LEFT;                  break;
-    case K_KP_UP:        *raw = CSKEY_UP;                    break;
-    case K_KP_RIGHT:     *raw = CSKEY_RIGHT;                 break;
-    case K_KP_DOWN:      *raw = CSKEY_DOWN;                  break;
-    case K_KP_PAGE_UP:   *raw = CSKEY_PGUP;                  break;
-    case K_KP_PAGE_DOWN: *raw = CSKEY_PGDN;                  break;
-    case K_KP_HOME:      *raw = CSKEY_HOME;                  break;
-    case K_KP_END:       *raw = CSKEY_END;                   break;
-    case K_KP_INSERT:    *raw = CSKEY_INS;                   break;
-    case K_KP_DELETE:    *raw = CSKEY_DEL;                   break;
-    case K_KP_MULTIPLY:  *raw = CSKEY_PADMULT;               break;
-    case K_KP_DIVIDE:    *raw = CSKEY_PADDIV;                break;
-    case K_KP_PLUS:      *raw = CSKEY_PADPLUS;               break;
-    case K_KP_MINUS:     *raw = CSKEY_PADMINUS;              break;
-    case K_KP_ENTER:     *raw = CSKEY_ENTER; *cooked = '\n'; break;
-  };
+    case K_KP_CENTER:    k = CSKEY_CENTER;   break;
+    case K_KP_LEFT:      k = CSKEY_LEFT;     break;
+    case K_KP_UP:        k = CSKEY_UP;       break;
+    case K_KP_RIGHT:     k = CSKEY_RIGHT;    break;
+    case K_KP_DOWN:      k = CSKEY_DOWN;     break;
+    case K_KP_PAGE_UP:   k = CSKEY_PGUP;     break;
+    case K_KP_PAGE_DOWN: k = CSKEY_PGDN;     break;
+    case K_KP_HOME:      k = CSKEY_HOME;     break;
+    case K_KP_END:       k = CSKEY_END;      break;
+    case K_KP_INSERT:    k = CSKEY_INS;      break;
+    case K_KP_DELETE:    k = CSKEY_DEL;      break;
+    case K_KP_MULTIPLY:  k = CSKEY_PADMULT;  break;
+    case K_KP_DIVIDE:    k = CSKEY_PADDIV;   break;
+    case K_KP_PLUS:      k = CSKEY_PADPLUS;  break;
+    case K_KP_MINUS:     k = CSKEY_PADMINUS; break;
+    case K_KP_ENTER:     k = CSKEY_ENTER;    break;
+  }
+  if (k != (unsigned int)~0)
+  {
+    *raw = k;
+    *cooked = k;
+  }
 }
 
 

@@ -6,7 +6,6 @@
 //  Copyright (c) 2001 Matt Reda. All rights reserved.
 //
 
-
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "iutil/cmdline.h"
@@ -56,7 +55,7 @@ OSXDriver2D::~OSXDriver2D()
         scfiEventHandler->DecRef();
     }
 
-    Close();					// Just in case it hasn't been called
+    Close();	// Just in case it hasn't been called
 
     OSXDelegate2D_delete(delegate);
 }
@@ -107,7 +106,8 @@ bool OSXDriver2D::Open()
         Initialize16();
     else
     {
-        fprintf(stderr, "Depth %d not supported in CGDriver2D yet", canvas->Depth);
+        fprintf(stderr, "Depth %d not supported in CGDriver2D yet",
+	    canvas->Depth);
         return false;
     }
 
@@ -118,8 +118,8 @@ bool OSXDriver2D::Open()
 
     // Create window
     if (OSXDelegate2D_openWindow(delegate, canvas->win_title,
-                                    canvas->Width, canvas->Height, canvas->Depth,
-                                    canvas->FullScreen, display, screen) == false)
+	canvas->Width, canvas->Height, canvas->Depth,
+	canvas->FullScreen, display, screen) == false)
         return false;
 
     return true;
@@ -160,14 +160,14 @@ bool OSXDriver2D::HandleEvent(iEvent &ev)
         if (ev.Command.Code == cscmdCommandLineHelp)
         {
             printf("Options for MacOS X 2D graphics drivers:\n"
-                   "  -screen=<num>      Screen number to display on (default=0)\n");
+             "  -screen=<num>      Screen number to display on (default=0)\n");
             handled = true;
         }
     }
     else if ((ev.Type == csevKeyboard) && 
             (csKeyEventHelper::GetEventType(&ev) == csKeyEventTypeDown))
     {
-        if ((csKeyEventHelper::GetRawCode(&ev) == CSKEY_ENTER) && 
+        if ((csKeyEventHelper::GetRawCode(&ev) == '\r') && 
             (csKeyEventHelper::GetModifiersBits(&ev) & CSMASK_ALT))
             handled = ToggleFullscreen();
     }
@@ -247,12 +247,15 @@ bool OSXDriver2D::EnterFullscreenMode()
     if (CGDisplaySwitchToMode(display, mode) == CGDisplayNoErr)
     {
         // Extract actual Width/Height/Depth
-        CFNumberGetValue((CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayWidth),
-                            kCFNumberLongType, &canvas->Width);
-        CFNumberGetValue((CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayHeight),
-                            kCFNumberLongType, &canvas->Height);
-        CFNumberGetValue((CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayBitsPerPixel), 
-                            kCFNumberLongType, &canvas->Depth);
+        CFNumberGetValue(
+	    (CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayWidth),
+	    kCFNumberLongType, &canvas->Width);
+        CFNumberGetValue(
+	    (CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayHeight),
+	    kCFNumberLongType, &canvas->Height);
+        CFNumberGetValue(
+	    (CFNumberRef) CFDictionaryGetValue(mode, kCGDisplayBitsPerPixel), 
+	    kCFNumberLongType, &canvas->Depth);
         
         // Fade back to original gamma
         FadeToGammaTable(display, originalGamma);
@@ -293,7 +296,7 @@ bool OSXDriver2D::ToggleFullscreen()
         inFullscreenMode = false;
     }
 
-    // Restore original dimensions - force resize by forcing AllowResize to true
+    // Restore original dimensions; force resize by forcing AllowResize to true
     canvas->FullScreen = !canvas->FullScreen;
     canvas->AllowResizing = true;
     canvas->Resize(origWidth, origHeight);
@@ -390,7 +393,8 @@ void OSXDriver2D::SaveGamma(CGDirectDisplayID disp, GammaTable &table)
 // Updates the screen and display members
 void OSXDriver2D::ChooseDisplay()
 {
-    csRef<iCommandLineParser> parser = CS_QUERY_REGISTRY(objectReg, iCommandLineParser);
+    csRef<iCommandLineParser> parser = 
+	CS_QUERY_REGISTRY(objectReg, iCommandLineParser);
     const char *s = parser->GetOption("screen");
     if (s != 0)
         screen = atoi(s);
@@ -406,7 +410,8 @@ void OSXDriver2D::ChooseDisplay()
     {
         CGDisplayErr err;
         CGDisplayCount numDisplays;
-        CGDirectDisplayID displayList[32];	// Who is going to have more than 32 displays??
+	// Who is going to have more than 32 displays??
+        CGDirectDisplayID displayList[32];
         
         err = CGGetActiveDisplayList(32, displayList, &numDisplays);
         if (err == CGDisplayNoErr)
@@ -416,13 +421,15 @@ void OSXDriver2D::ChooseDisplay()
             else
                 csReport(objectReg, CS_REPORTER_SEVERITY_WARNING, 
                         "crystalspace.canvas.osxdriver2d",
-                        "WARNING: Requested screen %d but only %d are available - using main display\n", 
+                        "WARNING: Requested screen %d but only %d are "
+			"available - using main display\n", 
                         screen, numDisplays);
         }
         else
             csReport(objectReg, CS_REPORTER_SEVERITY_WARNING, 
                     "crystalspace.canvas.osxdriver2d",
-                    "WARNING: Requested screen %d but unable to get screen list - using main display\n", screen);
+                    "WARNING: Requested screen %d but unable to get screen "
+		    "list - using main display\n", screen);
                     
         if (display == kCGDirectMainDisplay)
             screen = 0;
@@ -439,7 +446,8 @@ typedef void *OSXViewHandle;
 
 
 // C API to driver class
-DRV2D_FUNC(void, DispatchEvent)(OSXDriver2DHandle driver, OSXEventHandle ev, OSXViewHandle view)
+DRV2D_FUNC(void, DispatchEvent)(OSXDriver2DHandle driver, OSXEventHandle ev,
+    OSXViewHandle view)
 {
     ((OSXDriver2D *) driver)->DispatchEvent(ev, view);
 }
