@@ -12,7 +12,7 @@ chronological order.
 	  excluded because Doxygen complained about finding multiple
 	  declarations of SysSytemDriver (one per platform); however
 	  SysSytemDriver was finally eradicated on 23-Jul-2003, so it is no
-	  longer necessary to make this exlusion.  Furthermore, these
+	  longer necessary to make this exclusion.  Furthermore, these
 	  directories may contain useful classes which the user might wish to
 	  use (such as csWin32RegistryConfig).
 	- Eric Sunshine augmented crystal.m4 so that it applies
