@@ -35,8 +35,6 @@
 #define NORMAL_LIGHT_LEVEL 128
 #endif
 
-extern void csglBindTexture (GLenum target, GLuint handle);
-
 //----------------------------------------------------------------------------//
 
 /// Unload a texture cache element (common for both caches)
@@ -299,7 +297,7 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
 
   GLuint texturehandle;
   glGenTextures (1, &texturehandle);
-  csglBindTexture (GL_TEXTURE_2D, texturehandle);
+  glBindTexture (GL_TEXTURE_2D, texturehandle);
 
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
@@ -551,7 +549,7 @@ void OpenGLLightmapCache::Load(csGLCacheData *d)
 
   GLuint lightmaphandle;
   glGenTextures (1, &lightmaphandle);
-  csglBindTexture (GL_TEXTURE_2D, lightmaphandle);
+  glBindTexture (GL_TEXTURE_2D, lightmaphandle);
 
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

@@ -5,6 +5,12 @@ The history order is reversed so that new features are at the top.
 	  Pragma'ed C4291 out, for time being, will come back to this.
 	- Fixed a bad bug with lazy clipping in the OpenGL DrawTriangleMesh
 	  implementation. This would cause crashes on some cards (like ATI).
+	- OpenGL::DrawPolygonFX will now also use the DrawPolygon queue.
+	  This makes the code a lot simpler and also a lot faster if
+	  multiple texture passes are used (gouraud shading, fog, multiple
+	  texture layers). If only one pass is used the overhead of the
+	  queue makes DPFX slightly slower.
+	- Removed OpenGL::RealStartPolygonFX.
 15-May-2001
 	- Philip Wyett added the new cslexan to global build process.
 	  Philip also changed MSVC project file generation process to create

@@ -63,11 +63,13 @@ class csPolyQueue
 {
 public:
   bool use_fog;		// If true fog_color and fog_txt are used.
-  bool do_gouraud;	// If true glcol is used.
   iMaterialHandle* mat_handle;
   int alpha;
   UInt mixmode;
   csZBufMode z_buf_mode;
+  float flat_color_r;
+  float flat_color_g;
+  float flat_color_b;
 
   // For lightmap rendering.
   bool do_lightmaps;
@@ -217,10 +219,6 @@ private:
     bool transform,
     bool exact_clipping);
 
-  /// Start a series of DrawPolygonFX
-  void RealStartPolygonFX (iMaterialHandle* handle, UInt mode,
-  	bool use_fog);
-
 protected:
   friend class csOpenGLHalo;
 
@@ -318,28 +316,6 @@ protected:
     bool lighting; // Option variable: do texture lighting? (lightmaps)
     bool textured; // Option variable: render textures?
   } m_renderstate;
-
-  /// Should DrawPolygonFX use Gouraud shading?
-  bool  m_gouraud;
-  /// Mixing mode for DrawPolygonFX
-  UInt  m_mixmode;
-  /// Alpha value for DrawPolygonFX
-  float m_alpha;
-  /// Should DrawPolygonFX use texture?
-  bool  m_textured;
-
-  /// Values to check if we have to reinit StartPolygonFX.
-  bool dpfx_valid;
-  bool dpfx_use_fog;
-  iMaterialHandle* dpfx_mat_handle;
-  UInt dpfx_mixmode;
-  csZBufMode dpfx_z_buf_mode;
-
-  /**
-   * Pointer to material handle for DrawPolygonFX.
-   * This is NULL normally but not NULL if multi-texture is used.
-   */
-  csMaterialHandle* m_multimat;
 
   // load-time configuration options
   struct

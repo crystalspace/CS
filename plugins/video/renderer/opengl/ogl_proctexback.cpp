@@ -31,8 +31,6 @@ IMPLEMENT_IBASE_END;
 
 #define SysPrintf System->Printf
 
-extern void csglBindTexture (GLenum target, GLuint handle);
-
 csOpenGLProcBackBuffer::csOpenGLProcBackBuffer (iBase *parent) :
   csGraphics3DOGLCommon ()
 { 
@@ -139,7 +137,7 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
       glShadeModel (GL_FLAT);
       glEnable (GL_TEXTURE_2D);
       glColor4f (1.,1.,1.,1.);
-      csglBindTexture (GL_TEXTURE_2D, texturehandle);
+      glBindTexture (GL_TEXTURE_2D, texturehandle);
       do_quad = true;
     }
   }
@@ -226,7 +224,7 @@ void csOpenGLProcBackBuffer::Print (csRect *area)
     tex_data->Handle = 0;
     glGenTextures (1, &tex_data->Handle);
     // Texture is in tha cache, update texture directly. 
-    csglBindTexture (GL_TEXTURE_2D, tex_data->Handle);
+    glBindTexture (GL_TEXTURE_2D, tex_data->Handle);
     glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
