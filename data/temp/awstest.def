@@ -1,0 +1,69 @@
+skin "Normal Windows"
+{
+  Texture: 		"/lib/windows/texture.png"
+  WindowMin:		"/aws/minimize.png"
+  WindowZoom:		"/aws/zoom.png"
+  WindowClose:		"/aws/close.png"
+  HighlightColor: 	200,200,0
+  ShadowColor:    	64,64,0
+  FillColor:      	128,128,0
+  TextDisabledColor:	128,128,128
+  TextForeColor:	0,0,0
+  TextBackColor:        255,255,255
+  ButtonTextColor:	0,0,192
+}
+
+skin "Metal Windows"
+{
+  Texture: "/lib/windows/metal1.png"
+  Mouse:   "/lib/windows/mmouse.png"
+  Radiobuttons: "/lib/windows/metalrb.png"
+  Checkboxes:   "/lib/windows/metalcb.png"
+  Scrollbar:    "/lib/windows/metalsb.png"
+  Windowbuttons: "/lib/windows/metalwb.png"
+}
+
+window "Splash" from "Normal Window"
+{
+  Frame: (100,200)-(400,300)
+  Style: Normal
+
+}
+
+window "New User" from "Normal Window"
+{
+  Frame: (100, 200) - (400, 500)
+  Style: Bitmapped
+  Overlay: "/lib/windows/newuserovl.png"
+  Back:    "/lib/windows/newuserbck.png"
+  Overlayalpha: 192
+  Backalpha:    0
+
+  component "User Name" is "Textbox"
+  {
+    Frame: (10, 30) - (390, 45)
+    Style: NoFrame
+    Caption: "Name:"
+  }
+
+  component "User Sex Frame" is "3dFrame"
+  {
+    Frame: (10, 50) - (250,100)
+    Style: ThreeDee
+    Caption: "Sex"
+
+    component "Male" is "Radio Button"
+    {
+     Frame: (5, 5) - (200, 30)
+     Caption: "Male"
+    }
+
+    component "Female" is "Radio Button"
+    {
+     Frame: (5, 35) - (200, 50)
+     Caption: "Female"
+    }
+
+
+  }
+}
