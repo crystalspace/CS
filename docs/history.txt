@@ -25,6 +25,10 @@ The history order is reversed so that new features are at the top.
 	  than the platform-specific configuration.
 	- res completed the render loop loader. This includes that the default
 	  render steps have been moved to a plugin.
+	- res completely banished user.cfg from all spheres of 
+	  csInitializer::SetupConfigManager() and out of reach of mortal 
+	  beings. Also changed OS/X makefile to use the Unix platform
+	  configuration (in lack of a special OS/X variant.)
 10-Jun-2003
         - Philip Wyett eliminated signed/unsigned mismatch warning in
           function csString::SubString ().

@@ -125,7 +125,7 @@ SRC.SYS_CSSYS = $(wildcard $(addprefix $(SRCDIR)/, \
   $(SRCDIR)/libs/cssys/general/getopt.cpp \
   $(SRCDIR)/libs/cssys/general/printf.cpp \
   $(SRCDIR)/libs/cssys/general/sysroot.cpp \
-  $(SRCDIR)/libs/cssys/general/platformcfg.cpp \
+  $(SRCDIR)/libs/cssys/unix/platformconfig.cpp \
   $(CSTHREAD.SRC)
 INC.SYS_CSSYS = \
   $(wildcard $(addprefix $(SRCDIR)/,$(addsuffix /*.h,$(MACOSX.SOURCE_PATHS))))\
