@@ -7,6 +7,7 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 17-Oct-2003
+	- res added some files he forgot with his recent commit.
 	- Jorrit fixed the engine sequence manager a better way. With
 	  yesterday's fix it was essentially possible for the sequence
 	  manager to grow in memory forever since sequences that were once
@@ -39,6 +40,13 @@ chronological order.
 	  included in Objective-C code.
 	- Eric Sunshine upgraded the MacOS/X port to work with the updated key
 	  event functionality.
+	- res made a small cleanup in win32kbd.cpp.
+	- res made the following changes:
+	    - Moved csKeyEventHelper to from iutil/event.h to csutil/event.h.
+	    - Made csKeyEventData a 'dumb' struct (no construction logic.)
+	    - Some small documentation updates.
+	    - Disabled the workaround for glTexSubImage problems with some
+	      ATI drivers. Seems to work now.
 16-Oct-2003
 	- Jorrit fixed a big memory leak related to the engine sequence
 	  manager. There are actually three fixes to solve this bug:

@@ -24,6 +24,7 @@
 #include "csws/csnotebk.h"
 #include "csws/cswsutil.h"
 #include "csws/csskin.h"
+#include "csutil/event.h"
 
 //------------------------------------------------------------------------------
 

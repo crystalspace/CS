@@ -531,21 +531,6 @@ bool csWin32KeyboardDriver::Win32KeyToCSKey (LONG vKey, LONG keyFlags,
 	// Set up modifiers
 	ModifiersToKeyState (modifiersState, keystate);
 
-#if 0
-	if (lastDeadVk != 0)
-	{
-	  /*
-	    Urg. Windows saves the dead key state in a variable somewhere,
-	    when ToAscii()/ToUnicode() are called with one.
-	    So to get a properly composed char, we need to first call
-	    ToAscii() with the dead key, so the 
-	   */
-	  char outCh[2];
-	  ret = ToAscii (lastDeadVk, MapVirtualKey (lastDeadVk, 0) | 
-	    (keyFlags & 0x80000000), keystate, (PWORD)&outCh, 0);
-	}
-#endif
-
 	if (cswinIsWinNT ())
 	{
 	  ret = ToUnicode (vKey, keyFlags, keystate, wCh, 2, 0);

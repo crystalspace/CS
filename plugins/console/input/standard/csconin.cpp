@@ -26,6 +26,7 @@
 #include "ivaria/reporter.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
+#include "csutil/event.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -267,7 +268,8 @@ bool csConsoleInput::HandleEvent (iEvent &Event)
 	      utf32_char newChars[3];
 	      int newCharCount;
 
-	      csKeyEventData eventData (&Event);
+	      csKeyEventData eventData;
+	      csKeyEventHelper::GetEventData (&Event, eventData);
 	      if (keyLogicator->HandleKey (eventData, newChars,
 		sizeof (newChars) / sizeof (utf32_char), &newCharCount) ==
 		csComposeNoChar)

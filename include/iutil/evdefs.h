@@ -175,7 +175,7 @@ enum csKeyEventType
 /** @} */
 
 /**\name Modifier keys
- * \sa Keyboard events, Modifier key masks
+ * \sa \ref Keyboard, Modifier key masks
  * @{ */
 /// Modifier types
 enum

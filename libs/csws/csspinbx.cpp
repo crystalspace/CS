@@ -24,6 +24,7 @@
 #include "csws/cswsutil.h"
 #include "csws/cswsaux.h"
 #include "csutil/csinput.h"
+#include "csutil/event.h"
 
 // Spin box texture name
 #define SPINBOX_TEXTURE_NAME		"csws::SpinBox"

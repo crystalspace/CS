@@ -55,6 +55,7 @@
 #include "iutil/vfs.h"
 #include "iengine/material.h"
 #include "iengine/mesh.h"
+#include "csutil/event.h"
 
 CS_IMPLEMENT_APPLICATION
 

@@ -27,6 +27,7 @@
 #include "awsmled.h"
 #include "aws3dfrm.h"
 #include "iaws/awsparm.h"
+#include "csutil/event.h"
 
 const int awsMultiLineEdit::MARK_ROWWRAP = 1;
 const int awsMultiLineEdit::MARK_ROW = 2;
@@ -369,7 +370,8 @@ bool awsMultiLineEdit::HandleEvent (iEvent &Event)
     if ((Event.Type == csevKeyboard) && 
       (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown))
     {
-      csKeyEventData eventData (&Event);
+      csKeyEventData eventData;
+      csKeyEventHelper::GetEventData (&Event, eventData);
       utf32_char Char[2];
       int composedSize;
 

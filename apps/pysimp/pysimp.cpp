@@ -52,6 +52,7 @@
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
 #include "csutil/cmdhelp.h"
+#include "csutil/event.h"
 
 //------------------------------------------------- We need the 3D engine -----
 

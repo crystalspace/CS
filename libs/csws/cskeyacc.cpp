@@ -22,6 +22,7 @@
 #include "csws/cscomp.h"
 #include "csws/cskeyacc.h"
 #include "csws/csapp.h"
+#include "csutil/event.h"
 
 struct csAccElement
 {

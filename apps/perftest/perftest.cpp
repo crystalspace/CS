@@ -43,6 +43,7 @@
 #include "ivaria/reporter.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
+#include "csutil/event.h"
 
 CS_IMPLEMENT_APPLICATION
 

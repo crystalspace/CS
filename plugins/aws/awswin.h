@@ -27,6 +27,7 @@
 # include "awsPanel.h"
 # include "awscmdbt.h"
 # include "awsMenu.h"
+#include "csutil/event.h"
 
 /***************************************************************************************************************************
 *   This file details the interface of awsWindow awsComponents.  Windows, while they are just normal awsComponents, have some    *

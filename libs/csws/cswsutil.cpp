@@ -26,6 +26,7 @@
 #include "csutil/scanstr.h"
 #include "csutil/csstring.h"
 #include "ivaria/reporter.h"
+#include "csutil/event.h"
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--/ Window list --//--
 

@@ -45,6 +45,7 @@
 #include "igraphic/imageio.h"
 #include "ivaria/reporter.h"
 #include "iutil/plugin.h"
+#include "csutil/event.h"
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//--//- csAppPlugin //--
 

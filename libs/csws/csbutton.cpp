@@ -25,6 +25,7 @@
 #include "csws/csbutton.h"
 #include "csws/csstatic.h"
 #include "csws/csskin.h"
+#include "csutil/event.h"
 
 #define SKIN ((csButtonSkin *)skinslice)
 

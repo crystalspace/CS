@@ -50,6 +50,7 @@
 #include "ivaria/stdrep.h"
 #include "ivaria/iso.h"
 #include "ivaria/isoldr.h"
+#include "csutil/event.h"
 
 #include "iengine/material.h"
 

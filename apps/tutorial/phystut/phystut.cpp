@@ -50,6 +50,7 @@
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "csutil/cmdhelp.h"
+#include "csutil/event.h"
 
 #include "imesh/ball.h"
 #include "ivaria/dynamics.h"

@@ -27,6 +27,7 @@
 #include "csws/csapp.h"
 #include "csws/csskin.h"
 #include "csws/cswsutil.h"
+#include "csutil/event.h"
 
 #define TREEBOX_TEXTURE_NAME		"csws::TreeBox"
 

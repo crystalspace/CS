@@ -51,7 +51,7 @@ SCF_VERSION (iEvent, 0, 1, 1);
 // Event data structs. Defined outside of iEvent to allow SWIG to
 // handle the nested structs and union. Does not break any code.
 
-/**\page Keyboard events
+/**\page Keyboard Keyboard events
  * Keyboard events are emitted when the user does something with the keyboard -
  * presses down a key ("key down" events), holds it down (more "key down" 
  * events in a specific interval - "auto-repeat") and releases it ("key up".)
@@ -79,7 +79,8 @@ SCF_VERSION (iEvent, 0, 1, 1);
  * Keyboard event data is stored as properties of iEvent, accessible thorugh
  * iEvent->Find() and iEvent->Add().
  * <table>
- * <tr><th>Property Name</th><th>Type</th><th>Description</th></tr>
+ * <tr><td><b>Property Name</b></td><td><b>Type</b></td>
+ *  <td><b>Description</b></td></tr>
  * <tr><td>keyEventType</td><td>csKeyEventType (stored as uint8)</td>
  *  <td>Event type (up vs down)</td></tr>
  * <tr><td>keyCodeRaw</td><td>uint32</td><td>Raw key code</td></tr>
@@ -97,46 +98,6 @@ SCF_VERSION (iEvent, 0, 1, 1);
  * Also see iKeyComposer for informations about composing accented etc.
  * characters from dead and normal keys.
  */
-
-/**\name Keyboard event related
- * @{ */
-struct csKeyEventData;
-
-/**
- * Helper class to conveniently deal with keyboard events.
- */
-class csKeyEventHelper
-{
-public:
-  /// Retrieve the key's raw code.
-  static utf32_char GetRawCode (iEvent* event);
-  /// Retrieve the key's cooked code.
-  static utf32_char GetCookedCode (iEvent* event);
-  /// Retrieve the key's raw code.
-  static void GetModifiers (iEvent* event, csKeyModifiers& modifiers);
-  /// Retrieve the event type (key up or down.)
-  static csKeyEventType GetEventType (iEvent* event);
-  /**
-   * Retrieve whether a keyboard down event was caused by the initial press
-   * (not auto-repeat) or by having it held for a period of time (auto-repeat.)
-   */
-  static bool GetAutoRepeat (iEvent* event);
-  /// Retrieve the character type (dead or normal.)
-  static csKeyCharType GetCharacterType (iEvent* event);
-  /// Get all the information in one compact struct.
-  static bool GetEventData (iEvent* event, csKeyEventData& data);
-  /**
-   * Get a bitmask corresponding to the pressed modifier keys from the
-   * keyboard modifiers struct.
-   * \sa CSMASK_ALT etc.
-   */
-  static uint32 GetModifiersBits (const csKeyModifiers& modifiers);
-  /**
-   * Get a bitmask corresponding to the pressed modifier keys from the event.
-   * \sa CSMASK_ALT etc.
-   */
-  static uint32 GetModifiersBits (iEvent* event);
-};
 
 /**
  * Structure that collects the data a keyboard event carries.
@@ -158,30 +119,7 @@ struct csKeyEventData
   bool autoRepeat;
   /// Type of the key, if it is a character key
   csKeyCharType charType;
-  
-  /**
-   * Fill the structure with dummy data.
-   * If you construct a csKeyEventData this way, make sure to correctly
-   * set all members afterwards.
-   */
-  csKeyEventData ()
-  {
-    eventType = csKeyEventTypeDown;
-    codeRaw = codeCooked = 0;
-    memset (&modifiers, 0, sizeof (modifiers));
-    autoRepeat = false;
-    charType = csKeyCharTypeNormal;
-  }
-
-  /**
-   * Fill the structure with information from an event.
-   */
-  csKeyEventData (iEvent* event)
-  {
-    csKeyEventHelper::GetEventData (event, *this);
-  }
 };
-/** @} */
 
 /// Mouse event data in iEvent.
 struct csEventMouseData

@@ -39,6 +39,7 @@
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
 #include "igraphic/imageio.h"
+#include "csutil/event.h"
 
 CS_IMPLEMENT_APPLICATION
 

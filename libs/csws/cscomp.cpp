@@ -34,6 +34,7 @@
 #include "ivideo/material.h"
 #include "iengine/material.h"
 #include "ivaria/reporter.h"
+#include "csutil/event.h"
 
 //--//--//--//--//--//--//--//--//--//--//--//--/ The csComponent class --//--//
 

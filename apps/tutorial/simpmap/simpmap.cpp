@@ -53,6 +53,7 @@
 #include "ivaria/stdrep.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/debug.h"
+#include "csutil/event.h"
 
 CS_IMPLEMENT_APPLICATION
 

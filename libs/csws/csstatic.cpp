@@ -23,6 +23,7 @@
 #include "csws/csstatic.h"
 #include "csws/csapp.h"
 #include "csws/cswsaux.h"
+#include "csutil/event.h"
 
 csStatic::csStatic (csComponent *iParent, csComponent *iLink, const char *iText,
   csStaticStyle iStyle) : csComponent (iParent)

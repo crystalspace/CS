@@ -54,6 +54,7 @@
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "iutil/vfs.h"
+#include "csutil/event.h"
 
 CS_IMPLEMENT_APPLICATION
 

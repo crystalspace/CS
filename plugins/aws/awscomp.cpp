@@ -8,6 +8,7 @@
 #include "csutil/scfstr.h"
 #include "iaws/awsdefs.h"
 #include "ivideo/graph2d.h"
+#include "csutil/event.h"
 #include "awsgbl.h"
 #include "awsbl.h"
 
@@ -365,7 +366,8 @@ bool awsComponent::HandleEvent (iEvent &Event)
     {
       if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
       {
-	csKeyEventData eventData (&Event);
+	csKeyEventData eventData;
+	csKeyEventHelper::GetEventData (&Event, eventData);
         return OnKeyboard (eventData);
       }
       else

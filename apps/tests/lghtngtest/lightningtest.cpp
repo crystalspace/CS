@@ -52,6 +52,7 @@
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "csutil/cmdhelp.h"
+#include "csutil/event.h"
 
 #include "imesh/lghtng.h"
 #include "iutil/plugin.h"

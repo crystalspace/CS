@@ -62,6 +62,7 @@
 #include "iutil/vfs.h"
 #include "iutil/cache.h"
 #include "csutil/nulcache.h"
+#include "csutil/event.h"
 
 #include "iutil/plugin.h"
 #include "imap/writer.h"

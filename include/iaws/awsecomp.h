@@ -24,6 +24,7 @@
 #include "iaws/awsparm.h"
 #include "iutil/event.h"
 #include "iaws/awsdefs.h"
+#include "csutil/event.h"
 
 /**
  * Class used to create new AWS components.<p>
@@ -149,7 +150,8 @@ public:
         {
 	  if (csKeyEventHelper::GetEventType (&Event) == csKeyEventTypeDown)
 	  {
-	    csKeyEventData eventData (&Event);
+	    csKeyEventData eventData;
+	    csKeyEventHelper::GetEventData (&Event, eventData);
 	    return OnKeyboard (eventData);
 	  }
 	  else

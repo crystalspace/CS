@@ -23,6 +23,7 @@
 #include "csws/csdialog.h"
 #include "csws/csskin.h"
 #include "iutil/event.h"
+#include "csutil/event.h"
 
 #define SKIN ((csDialogSkin *)skinslice)
 

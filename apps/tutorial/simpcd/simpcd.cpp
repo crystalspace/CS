@@ -56,6 +56,7 @@
 #include "igeom/objmodel.h"
 #include "cstool/collider.h"
 #include "csutil/cmdhelp.h"
+#include "csutil/event.h"
 
 CS_IMPLEMENT_APPLICATION
 

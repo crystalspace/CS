@@ -25,6 +25,7 @@
 #include "csws/csscrbar.h"
 #include "csws/csapp.h"
 #include "csws/csskin.h"
+#include "csutil/event.h"
 
 // Amount of space at left and at right of each listbox item
 #define LISTBOXITEM_XSPACE              2

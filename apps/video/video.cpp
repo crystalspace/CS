@@ -55,6 +55,7 @@
 #include "ivaria/reporter.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
+#include "csutil/event.h"
 
 //------------------------------------------------- We need the 3D engine -----
 

@@ -58,6 +58,7 @@
 #  include "ivideo/rndbuf.h"
 #endif
 #include "cstool/csview.h"
+#include "csutil/event.h"
 
 #include "r3dtest.h"
 

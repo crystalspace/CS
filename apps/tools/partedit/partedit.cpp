@@ -51,6 +51,7 @@
 #include "ivaria/stdrep.h"
 #include "csutil/cmdhelp.h"
 #include "qsqrt.h"
+#include "csutil/event.h"
 
 #include "imesh/emit.h"
 #include "iutil/plugin.h"

@@ -39,6 +39,7 @@
 #include "iutil/event.h"
 #include "iutil/csinput.h"
 #include "iutil/virtclk.h"
+#include "csutil/event.h"
 
 extern WalkTest* Sys;
 

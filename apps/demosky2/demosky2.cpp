@@ -54,6 +54,7 @@
 #include "iutil/csinput.h"
 #include "iutil/virtclk.h"
 #include "iutil/vfs.h"
+#include "csutil/event.h"
 
 //------------------------------------------------- We need the 3D engine -----
 

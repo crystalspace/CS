@@ -22,6 +22,7 @@
 #include "csws/cswindow.h"
 #include "csws/csgrid.h"
 #include "csws/cssplit.h"
+#include "csutil/event.h"
 
 // The minimal width of the new grid view when we split a view horiz. or vert.
 #define MIN_GRIDVIEW_SIZE	8

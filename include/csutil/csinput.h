@@ -83,7 +83,6 @@ class csKeyboardDriver : public csInputDriver, public iKeyboardDriver
 {
 protected:
   /// Key state array.
-  //csArray<bool> KeyState;
   csHash<bool, utf32_char> keyStates;
   csKeyModifiers modifiersState;
 

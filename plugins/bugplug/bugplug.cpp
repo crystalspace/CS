@@ -27,6 +27,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/debug.h"
 #include "csutil/snprintf.h"
+#include "csutil/event.h"
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
 #include "csgeom/plane3.h"
@@ -734,7 +735,8 @@ bool csBugPlug::EatKey (iEvent& event)
       {
 	utf32_char composedChs[3];
 	int composedNum;
-	csKeyEventData eventData (&event);
+	csKeyEventData eventData;
+	csKeyEventHelper::GetEventData (&event, eventData);
 
 	keyComposer->HandleKey (eventData, composedChs, 
 	  sizeof (composedChs) / sizeof (utf32_char), &composedNum);

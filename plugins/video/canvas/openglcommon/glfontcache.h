@@ -36,8 +36,9 @@
   is stored in RAM, glyphs are written to it in RAM and the whole
   thing is uploaded at once.
   [res]
+  Update: As of Cat3.8, the problem seems to be fixed.
  */
-#define HACK_AROUND_WEIRD_ATI_TEXSUBIMAGE_PROBLEM
+//#define HACK_AROUND_WEIRD_ATI_TEXSUBIMAGE_PROBLEM
 
 class csGraphics2DGLCommon;
 

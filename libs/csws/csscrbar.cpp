@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "csws/csscrbar.h"
 #include "csws/csapp.h"
+#include "csutil/event.h"
 
 // Minimal scroll button size
 #define CSSB_MINIMAL_KNOBSIZE	(3+3+8)

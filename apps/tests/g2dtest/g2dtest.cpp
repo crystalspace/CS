@@ -46,6 +46,7 @@
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
+#include "csutil/event.h"
 
 CS_IMPLEMENT_APPLICATION
 

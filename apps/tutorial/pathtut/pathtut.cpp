@@ -54,6 +54,7 @@
 #include "csutil/cmdhelp.h"
 //Include the csPath include file
 #include "csgeom/path.h"
+#include "csutil/event.h"
 
 
 CS_IMPLEMENT_APPLICATION

@@ -49,6 +49,7 @@
 #include "ivaria/stdrep.h"
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
+#include "csutil/event.h"
 
 #define SET_BIT(var,mask,state) \
   var = (var & ~(mask)) | ((state) ? (mask) : 0);

@@ -22,6 +22,7 @@
 #include "iutil/event.h"
 #include "iutil/evdefs.h"
 #include "csutil/csevent.h"
+#include "csutil/event.h"
 
 struct csEvBind
 {

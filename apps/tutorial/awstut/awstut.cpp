@@ -26,6 +26,7 @@
 #include "cstool/csfxscr.h"
 #include "cstool/initapp.h"
 #include "qsqrt.h"
+#include "csutil/event.h"
 
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"

@@ -22,6 +22,7 @@
 #include "cssys/csuctransform.h"
 #include "iutil/event.h"
 #include "csutil/csevent.h"
+#include "csutil/event.h"
 #include "csutil/inpnames.h"
 
 #include <stdio.h>

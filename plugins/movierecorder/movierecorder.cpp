@@ -35,6 +35,7 @@
 #include "ivaria/reporter.h"
 #include "iengine/engine.h"
 #include "igraphic/image.h"
+#include "csutil/event.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -539,7 +540,7 @@ void csMovieRecorder::GetKeyCode (const char* keystring, struct keyBinding &key)
     dash = strchr (keystring, '-');
   }
 
-  key.code = -1;
+  key.code = 0;
   if (!strcmp (keystring, "tab")) key.code = CSKEY_TAB;
   else if (!strcmp (keystring, "space")) key.code = ' ';
   else if (!strcmp (keystring, "esc")) key.code = CSKEY_ESC;
@@ -567,7 +568,7 @@ void csMovieRecorder::GetKeyCode (const char* keystring, struct keyBinding &key)
   else if (!strcmp (keystring, "f10")) key.code = CSKEY_F10;
   else if (!strcmp (keystring, "f11")) key.code = CSKEY_F11;
   else if (!strcmp (keystring, "f12")) key.code = CSKEY_F12;
-  else if (*(keystring+1) != 0) key.code = -1;
+  else if (*(keystring+1) != 0) key.code = 0;
   else if ((*keystring >= 'A' && *keystring <= 'Z')
   	|| strchr ("!@#$%^&*()_+", *keystring))
   {

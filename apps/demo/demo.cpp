@@ -70,6 +70,7 @@
 #include "igraphic/imageio.h"
 #include "ivaria/reporter.h"
 #include "qsqrt.h"
+#include "csutil/event.h"
 
 CS_IMPLEMENT_APPLICATION
 
