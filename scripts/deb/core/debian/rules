@@ -65,13 +65,29 @@ build-arch: build-arch-stamp
 build-arch-stamp: configure-stamp
 
 	# Add here commands to compile the package.
+	# For arm, powerpc, s390
+ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), arm))
+	echo "CFLAGS.SYSTEM += -fsigned-char"  >> $(CURDIR)/CS/config.mak 
+endif
+ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), powerpc))
+	echo "CFLAGS.SYSTEM += -fsigned-char"  >> $(CURDIR)/CS/config.mak 
+endif
+ifeq ($(DEB_HOST_ARCH),$(findstring $(DEB_HOST_ARCH), s390))
+	echo "CFLAGS.SYSTEM += -fsigned-char"  >> $(CURDIR)/CS/config.mak 
+endif
 	# Compile static libs without -fPIC
-	cd $(CURDIR)/CS; $(MAKE) csengine  csgeom  csgfx  cssys  cstool  csutil  csws
+	# not yet usable
+#	cd $(CURDIR)/CS; $(MAKE) libs
 	# Force -fPIC as compiling/linking option
 	echo "CFLAGS.SYSTEM += -fPIC"  >> $(CURDIR)/CS/config.mak 
 	echo "LFLAGS.EXE += -fPIC"  >> $(CURDIR)/CS/config.mak 
 	echo "LFLAGS.DLL += -fPIC"  >> $(CURDIR)/CS/config.mak 
+	# Make dynamic version of libs
+	# not yet usable
+#	cd $(CURDIR)/CS; $(MAKE) libs USE_SHARED_LIBS=yes
 	# Build the rest
+	# Ok this is rather dirty but i didn't find where to put this for blocks (only for dyn lib in fact)
+	echo "LIBS.EXE += -lz"  >> $(CURDIR)/CS/config.mak 
 	cd $(CURDIR)/CS; $(MAKE) all
 	# should be too something like this $(MAKE) all USE_SHARED_LIBS=yes
 

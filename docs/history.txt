@@ -3,6 +3,12 @@ The history order is reversed so that new features are at the top.
 27-Feb-2003
 	- res fixed the "shifted alpha map" bug in the software renderer.
 26-Feb-2003
+	- Christian Bayle added some missing dependancy to enable to compile
+  	  libs as shared
+  	  Closed two debian bugs to compile and exec on all arch
+  	  Still problem with compile of libs as shared, because soname contains
+  	  path, and this doen't seems to me to be trivial to correct in build
+  	  system
 	- Eric Sunshine made the following changes to the configure script:
 	    - Fixed bug: The utility variable cs_optimize_flags was being
 	      constructed incorrectly, with the result that it was always
