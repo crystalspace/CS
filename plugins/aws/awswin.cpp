@@ -38,7 +38,7 @@ const int awsWindow:: foGrip = 0x20;
 const int awsWindow:: foRoundBorder = 0x0;			// default
 const int awsWindow:: foBeveledBorder = 0x40;
 const int awsWindow:: foNoBorder = 0x80;
-
+const int awsWindow:: foDontCaptureMouseMove = 0x100;
 
 
 const int grip_size = 16;
@@ -458,6 +458,13 @@ bool awsWindow::OnMouseMove (int button, int x, int y)
   else if (moving_mode)
     MoveTo(orig_x + x - down_x, orig_y + y - down_y);
 
+  //
+  //  If we are set to not capture mouse movements
+  //  return false here. 
+  //
+  if (frame_options & foDontCaptureMouseMove)
+    return false;
+ 
   return true;
 }
 
@@ -698,7 +705,7 @@ awsComponentFactory(wmgr)
   RegisterConstant ("wfoGrip", awsWindow::foGrip);
   RegisterConstant ("wfoRoundBorder", awsWindow::foRoundBorder);
   RegisterConstant ("wfoBeveledBorder", awsWindow::foBeveledBorder);
-
+  RegisterConstant ("wfoDontCaptureMouseMove", awsWindow::foDontCaptureMouseMove);
 
 }
 

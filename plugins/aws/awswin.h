@@ -143,6 +143,9 @@ public:
   /// Should draw no border
   static const int foNoBorder;
 
+  /// Should return false in the OnMouseMove event.
+  static const int foDontCaptureMouseMove;
+
   SCF_DECLARE_IBASE_EXT(awsComponent);
 
   /// This is a awsComponent of type window

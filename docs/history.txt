@@ -59,6 +59,10 @@ The history order is reversed so that new features are at the top.
 	  light also works.
 	- Jorrit fixed the bezier mesh so that removing a pseudo-dynamic
 	  light also works.
+        - DeSigna patched Gersh's awsWindow::OnMouseMove() to obey a
+	  new wfoDontCaptureMouseMove option, correcting some problems
+	  with the previous patch and transparent windows with
+	  mouse-capturing children.
 12-Jun-2003
 	- Jorrit clarified a comment with csColliderWrapper telling people that
 	  you must DecRef() the new collider wrapper after creating it.
