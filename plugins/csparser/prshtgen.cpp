@@ -106,7 +106,6 @@ float PrsHeightMapData::GetHeight (float x, float y)
   float col0010 = col00 * (1-dw) + col10 * dw;
   float col0111 = col01 * (1-dw) + col11 * dw;
   float col = col0010 * (1-dh) + col0111 * dh;
-  //printf("Heightmap x=%g y=%g height=%g\n", x, y, col * hm->hscale + hm->hshift);
   return col * hscale + hshift;
 }
 
@@ -165,7 +164,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
 	      ReportError (
 	        "crystalspace.maploader.parse.heightgen",
                 "bad flipx argument.");
-	      return false;
+	      return 0;
 	    }
 	  csRef<iDocumentNode> flipynode = child->GetNode ("flipy");
 	  if(flipynode)
@@ -174,7 +173,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
 	      ReportError (
 	        "crystalspace.maploader.parse.heightgen",
                 "bad flipy argument.");
-	      return false;
+	      return 0;
 	    }
 
 	  csRef<iImage> img (LoadImage (heightmap, CS_IMGFMT_TRUECOLOR));
@@ -221,7 +220,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
 	      ReportError (
 	        "crystalspace.maploader.parse.heightgen",
                 "bad flipx argument.");
-	      return false;
+	      return 0;
 	    }
 	  csRef<iDocumentNode> flipynode = child->GetNode ("flipy");
 	  if(flipynode)
@@ -230,7 +229,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (iDocumentNode* node)
 	      ReportError (
 	        "crystalspace.maploader.parse.heightgen",
                 "bad flipy argument.");
-	      return false;
+	      return 0;
 	    }
 	  csRef<iImage> img (LoadImage (heightmap, CS_IMGFMT_TRUECOLOR));
 	  if (!img) return 0;

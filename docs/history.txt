@@ -66,6 +66,10 @@ chronological order.
 	- Eric Sunshine fixed bug in csGraphics3DOGLCommon::DebugCommand()
 	  where it was incorrectly parsing the the incoming command string with
 	  the result that it failed to recognize commands with arguments.
+	- Eric Sunshine fixed bugs in csLoader::ParseHeightgenValue().  Was
+	  returning boolean values even though function is declared as
+	  returning csGenerateImageValue*.  Reported by Randall Foreman
+	  <eidpers@comcast.net>
 18-Dec-2003
 	- Jorrit added two new methods to iAwsComponent. One to set the
 	  preferred size and one to clear it again. This way one can forcibly
