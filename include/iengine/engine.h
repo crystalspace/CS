@@ -703,11 +703,14 @@ struct iEngine : public iBase
    * This routine returns an iterator to iterate over
    * all objects that are within a radius
    * of a given position. You can use #SCF_QUERY_INTERFACE to get
-   * any interface from the returned objects.<p>
+   * any interface from the returned objects. If crossPortals
+   * is true it will search through portals. Otherwise it will limit
+   * the search to the sector passed in.<p>
    * Assign to a csRef or use DecRef().
    */
   virtual csPtr<iObjectIterator> GetNearbyObjects (iSector* sector,
-    const csVector3& pos, float radius) = 0;
+    const csVector3& pos, float radius, bool crossPortals = true ) = 0;
+
 
   /**
    * This routine returns an iterator to iterate over

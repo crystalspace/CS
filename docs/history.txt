@@ -1,6 +1,10 @@
 The history order is reversed so that new features are at the top.
 
 21-Feb-2003
+  	- Andrew Craig changed iEngine->GetNearbyObjects() to take a bool
+          parameter crossPortals. If you want to limit the search to the
+          currentSector and not cross portals pass in false 
+          ( Default is true ).
 	- Wyatt Miler suggested a work around for what seems to be a
 	  gcc 3.1 compiler bug which triggers on MacOS/X (PowerPC) in
 	  the tiny XML parser.

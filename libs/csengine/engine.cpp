@@ -2054,7 +2054,7 @@ csPtr<iSectorIterator> csEngine::GetNearbySectors (
 
 void csEngine::GetNearbyObjectList (iSector* sector,
     const csVector3& pos, float radius, csPArray<iObject>& list,
-    csPArray<iSector>& visited_sectors)
+    csPArray<iSector>& visited_sectors, bool crossPortals)
 {
   iVisibilityCuller* culler = sector->GetVisibilityCuller ();
   csRef<iVisibilityObjectIterator> visit = culler->VisTest (
@@ -2069,59 +2069,62 @@ void csEngine::GetNearbyObjectList (iSector* sector,
     if (imw)
     {
       list.Push (imw->QueryObject ());
-      csRef<iThingState> st (
-      	SCF_QUERY_INTERFACE (imw->GetMeshObject (), iThingState));
-      if (st)
+      if ( crossPortals )
       {
-	// Check if there are portals and if they are near the position.
-	int pc = st->GetPortalCount ();
-	int j;
-	for (j = 0 ; j < pc ; j++)
-	{
-	  iPolygon3D* pp = st->GetPortalPolygon (j);
-	  const csPlane3& wor_plane = pp->GetWorldPlane ();
-	  // Can we see the portal?
-	  if (wor_plane.Classify (pos) < -0.001)
-	  {
-	    csVector3 poly[100];	//@@@ HARDCODE
-	    int k;
-	    for (k = 0 ; k < pp->GetVertexCount () ; k++)
-	    {
-	      poly[k] = pp->GetVertexW (k);
-	    }
-	    float sqdist_portal = csSquaredDist::PointPoly (
-		  pos, poly, pp->GetVertexCount (),
-		  wor_plane);
-	    if (sqdist_portal <= radius * radius)
-	    {
-	      // Also handle objects in the destination sector unless
-	      // it is a warping sector.
-	      iPortal* portal = pp->GetPortal ();
-	      portal->CompleteSector (NULL);
-	      CS_ASSERT (portal != NULL);
-	      if (sector != portal->GetSector () && portal->GetSector ()
-			      && !portal->GetFlags ().Check (CS_PORTAL_WARP))
-	      {
-	        int l;
-		bool already_visited = false;
-		for (l = 0 ; l < visited_sectors.Length () ; l++)
-		{
-		  if (visited_sectors[l] == portal->GetSector ())
-		  {
-		    already_visited = true;
-		    break;
-		  }
-		}
-		if (!already_visited)
-		{
-		  visited_sectors.Push (portal->GetSector ());
-		  GetNearbyObjectList (portal->GetSector (), pos, radius, list,
-		  	visited_sectors);
-		}
-	      }
-	    }
-	  }
-	}
+        csRef<iThingState> st (
+        	SCF_QUERY_INTERFACE (imw->GetMeshObject (), iThingState));
+        if (st)
+        {
+          // Check if there are portals and if they are near the position.
+          int pc = st->GetPortalCount ();
+          int j;
+          for (j = 0 ; j < pc ; j++)
+          {
+            iPolygon3D* pp = st->GetPortalPolygon (j);
+            const csPlane3& wor_plane = pp->GetWorldPlane ();
+            // Can we see the portal?
+            if (wor_plane.Classify (pos) < -0.001)
+            {
+              csVector3 poly[100];	//@@@ HARDCODE
+              int k;
+              for (k = 0 ; k < pp->GetVertexCount () ; k++)
+              {
+                poly[k] = pp->GetVertexW (k);
+              }
+              float sqdist_portal = csSquaredDist::PointPoly (
+                    pos, poly, pp->GetVertexCount (),
+                    wor_plane);
+              if (sqdist_portal <= radius * radius)
+              {
+                // Also handle objects in the destination sector unless
+                // it is a warping sector.
+                iPortal* portal = pp->GetPortal ();
+                portal->CompleteSector (NULL);
+                CS_ASSERT (portal != NULL);
+                if (sector != portal->GetSector () && portal->GetSector ()
+                                && !portal->GetFlags ().Check (CS_PORTAL_WARP))
+                {
+                  int l;
+                  bool already_visited = false;
+                  for (l = 0 ; l < visited_sectors.Length () ; l++)
+                  {
+                    if (visited_sectors[l] == portal->GetSector ())
+                    {
+                      already_visited = true;
+                      break;
+                    }
+                  }
+                  if (!already_visited)
+                  {
+                    visited_sectors.Push (portal->GetSector ());
+                    GetNearbyObjectList (portal->GetSector (), pos, radius, list,
+                                         visited_sectors);
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -2130,11 +2133,12 @@ void csEngine::GetNearbyObjectList (iSector* sector,
 csPtr<iObjectIterator> csEngine::GetNearbyObjects (
   iSector *sector,
   const csVector3 &pos,
-  float radius)
+  float radius,
+  bool crossPortals)
 {
   csPArray<iObject>* list = new csPArray<iObject>;
   csPArray<iSector> visited_sectors;
-  GetNearbyObjectList (sector, pos, radius, *list, visited_sectors);
+  GetNearbyObjectList (sector, pos, radius, *list, visited_sectors, crossPortals);
   csObjectListIt *it = new csObjectListIt (list);
   return csPtr<iObjectIterator> (it);
 }

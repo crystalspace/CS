@@ -436,7 +436,7 @@ private:
    */
   void GetNearbyObjectList (iSector* sector,
     const csVector3& pos, float radius, csPArray<iObject>& list,
-    csPArray<iSector>& visited_sectors);
+    csPArray<iSector>& visited_sectors, bool crossPortals = true);
 
   /**
    * Get/create the engine sequence manager.
@@ -751,7 +751,7 @@ public:
   virtual csPtr<iSectorIterator> GetNearbySectors (iSector* sector,
   	const csVector3& pos, float radius);
   virtual csPtr<iObjectIterator> GetNearbyObjects (iSector* sector,
-    const csVector3& pos, float radius);
+    const csVector3& pos, float radius, bool crossPortals = true);
   virtual csPtr<iObjectIterator> GetVisibleObjects (iSector* sector,
     const csVector3& pos);
   virtual csPtr<iObjectIterator> GetVisibleObjects (iSector* sector,
