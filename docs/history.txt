@@ -19,6 +19,13 @@ The history order is reversed so that new features are at the top.
 	  can have the same name even if they reside in different module
 	  directories.  This change can be used as a template for anyone else
 	  who wants to help augment the makefiles.
+	- Eric Sunshine worked around a problem in the configure script in
+	  which tests based upon CS_BUILD_IFELSE() (or its descendents) failed
+	  when run under Bash 1.14.  The culprit was the one-liner
+	  "cs_build_ok=yes break" which, although it works correctly with every
+	  other Bourne or compatible shell the world over, fails with Bash
+	  1.14.  In particular, Base 1.14 failed to set cs_build_ok to "yes"
+	  and instead left the old value ("no") in place.
 1-Mar-2003
 	- Greg Block changed the makefile for the xml documentsystem plugin to
 	  not override the values for the link flags to use when linking libxml
