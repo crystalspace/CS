@@ -541,11 +541,11 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
 
   // If the following flag becomes true in this routine then this means
   // that for portal clipping we will use stencil.
-  char clip_with_stencil = false;
+  bool clip_with_stencil = false;
   // If the following flag becomes true in this routine then this means
   // that for portal clipping we will use glClipPlane. This flag does
   // not say anything about z-plane and near plane clipping.
-  char clip_with_planes = false;
+  bool clip_with_planes = false;
   // If one of the following flags is true then this means
   // that we will have to do plane clipping using glClipPlane for the near
   // or z=0 plane.
@@ -558,7 +558,7 @@ void csGLGraphics3D::SetupClipper (int clip_portal,
   // clipping).
   int reserved_planes = int (do_plane_clipping) + int (do_z_plane_clipping);
 
-  if (clip_portal != CS_CLIP_NOT)
+  if (clip_portal != CS_CLIP_NOT && cliptype != CS_CLIPPER_OPTIONAL)
   {
     // Some clipping may be required.
     if (prefer_stencil)
