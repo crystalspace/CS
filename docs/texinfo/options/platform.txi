@@ -30,3 +30,4 @@ least used by CrystalSpace itself, so be wary of possible conflicts).
 @end menu
 
 @importss{options,platform,win32.txi}
+@importss{options,platform,unix.txi}

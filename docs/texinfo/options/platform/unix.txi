@@ -1,0 +1,13 @@
+@c -*-texinfo-*-
+@node Platform peruser unix,
+@subsection Storage of per-user configuration on Unix and Linux
+@cindex Unix per-user configuration
+
+On unix per-user data is stored in the home directory of the user. CS creates a
+hiddern directory named @file{.crystal} there. The actual name of the
+configuration file is generated from the @emph{unique application identifier}
+with an @file{.cfg} suffix.
+
+The configuration file format is the same as described in
+@ref{Configuration File}.
+

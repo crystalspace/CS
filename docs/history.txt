@@ -28,6 +28,7 @@ The history order is reversed so that new features are at the top.
 	    - Wrong parameters for *nix csGetPluginPaths().
 	    - Stupid bug where the name of the .csplugin instead of. dll file 
 	      was returned as the plugin path on Win32.
+	    - Matze wrote docu about per-user config on unix.
 18-Jun-2003
 	- Jorrit added a new 'do_logo' command to walktest. Assigned 'l' key
 	  to it. This command toggles the display of the logo.
