@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+1-Aug-2002
+	- Added == and != operators to compare csRef& and T* instances.
 31-Jul-2002
 	- Eric Sunshine performed the following tasks.
 	    - Changed csutil/ref.h and the csRef smart pointer template as

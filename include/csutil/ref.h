@@ -107,6 +107,37 @@ public:
     obj = newobj;	// if (obj == newobj).
   }
 
+  /// Test if the two references point to same object.
+  inline friend bool operator == (const csRef& r1, const csRef& r2)
+  {
+    return r1.obj == r2.obj;
+  }
+  /// Test if the two references point to different object.
+  inline friend bool operator != (const csRef& r1, const csRef& r2)
+  {
+    return r1.obj != r2.obj;
+  }
+  /// Test if object pointed to by reference is same as obj.
+  inline friend bool operator == (const csRef& r1, T* obj)
+  {
+    return r1.obj == obj;
+  }
+  /// Test if object pointed to by reference is different from obj.
+  inline friend bool operator != (const csRef& r1, T* obj)
+  {
+    return r1.obj != obj;
+  }
+  /// Test if object pointed to by reference is same as obj.
+  inline friend bool operator == (T* obj, const csRef& r1)
+  {
+    return r1.obj == obj;
+  }
+  /// Test if object pointed to by reference is different from obj.
+  inline friend bool operator != (T* obj, const csRef& r1)
+  {
+    return r1.obj != obj;
+  }
+
   /// Dereference underlying object.
   T* operator -> () const
   { return obj; }
