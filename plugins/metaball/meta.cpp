@@ -26,9 +26,6 @@
 #include "igraph2d.h"
 #include "csutil/inifile.h"
 #include "isystem.h"
-#include "csengine/pol2d.h"
-#include "csengine/polygon.h"
-
 
 IMPLEMENT_FACTORY (csMetaBalls)
 
@@ -41,7 +38,6 @@ IMPLEMENT_IBASE (csMetaBalls)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iMetaBalls)
 IMPLEMENT_IBASE_END
-
 
 #define MAP_RESOLUTION  256
 static float asin_table[2*MAP_RESOLUTION+1];
@@ -65,7 +61,6 @@ csMetaBalls::~csMetaBalls ()
   delete poly;
 }
 
-
 float csMetaBalls::map (float x)
 {
   return asin_table[(int)(MAP_RESOLUTION*(1+x))];
@@ -76,7 +71,6 @@ void csMetaBalls::InitTables(void)
   for (int i = -MAP_RESOLUTION, j = 0; i <= MAP_RESOLUTION; i++, j++)
   {
     float c = 1.0 * i / MAP_RESOLUTION;
-
     switch(env_mapping)
     {
       case TRUE_ENV_MAP:
@@ -89,7 +83,6 @@ void csMetaBalls::InitTables(void)
   }
 }
 
-    
 bool csMetaBalls::Initialize (iSystem *sys)
 {
   Sys = sys;
@@ -101,10 +94,9 @@ void csMetaBalls::SetContext (iGraphics3D *g3d)
   G3D = g3d;
 }
 
-
 void csMetaBalls::SetNumberMetaBalls (int number)
 {
-  if ((number < 1) || (number  == num_meta_balls))
+  if (number < 1 || number  == num_meta_balls)
     return;
   num_meta_balls = number;
   delete [] meta_balls;
@@ -221,22 +213,13 @@ void csMetaBalls::DrawSomething(void)
   }
 }
 
-
 bool csMetaBalls::Draw ()
 {
-  // Tell 3D driver we're going to display 3D things.
-
   alpha += mp.d_alpha;
-
   poly->txt_handle = th;
-
   G3D->StartPolygonFX(th, CS_FX_COPY | CS_FX_GOURAUD);
-
   G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
-
   DrawSomething();
-
   G3D->FinishPolygonFX();
-
   return true;
 }
