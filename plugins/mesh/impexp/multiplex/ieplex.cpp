@@ -39,7 +39,7 @@ public:
   csModelConverterMultiplexer (iBase *p);
 
   /// destructor
-  ~csModelConverterMultiplexer ();
+  virtual ~csModelConverterMultiplexer ();
 
   bool Initialize (iSystem *System);
   virtual int GetFormatCount ();

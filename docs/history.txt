@@ -51,6 +51,8 @@ The history order is reversed so that new features are at the top.
 	    - stdtex.zip: added blobby.jpg.
 	- Eric Sunshine eliminated an `implicit conversion of float to int'
 	  compilation warning from crossbld.cpp.
+	- Eric Sunshine eliminated a compilation warning from ieplex.cpp
+	  regarding non-virtual destructor.
 17-Jul-2001
 	- Worked around an internal compiler error (for MingW compiler) in
 	  recent changes to crossbld.cpp by completely rearranging the
