@@ -57,6 +57,7 @@ class csGenmeshMeshObject;
 class csColor;
 class csPolygonMesh;
 class G3DFogInfo;
+class csBSPTree;
 
 /**
  * An array giving shadow information for a pseudo-dynamic light.
@@ -501,6 +502,7 @@ public:
   uint buffers_version;
 
   bool back2front;
+  csBSPTree* back2front_tree;
 
   iObjectRegistry* object_reg;
   iBase* logparent;
@@ -538,8 +540,9 @@ public:
   void Invalidate ();
   void CalculateNormals ();
   void GenerateBox (const csBox3& box);
-  void SetBack2Front (bool b2f) { back2front = b2f; }
+  void SetBack2Front (bool b2f);
   bool IsBack2Front () const { return back2front; }
+  void BuildBack2FrontTree ();
 
   bool AddRenderBuffer (const char *name,
   	csRenderBufferComponentType component_type, int component_size);

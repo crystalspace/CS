@@ -21,6 +21,7 @@
 #include "csgeom/box.h"
 #include "csgeom/frustum.h"
 #include "csgeom/trimesh.h"
+#include "csgeom/bsptree.h"
 #include "csutil/csendian.h"
 #include "csutil/csmd5.h"
 #include "csutil/memfile.h"
@@ -1068,23 +1069,34 @@ csRenderMesh** csGenmeshMeshObject::GetRenderMeshes (
       	sizeof (unsigned int)*factory->GetTriangleCount()*3,
 	CS_BUF_DYNAMIC, CS_BUFCOMP_UNSIGNED_INT, 1, true);
     }
-    csShaderVariable* sv = svcontext->GetVariableAdd(
-    	csGenmeshMeshObjectFactory::index_name);
-    sv->SetValue (sorted_index_buffer);
-
     if (num_sorted_mesh_triangles != factory->GetTriangleCount ())
     {
       delete[] sorted_mesh_triangles;
       num_sorted_mesh_triangles = factory->GetTriangleCount ();
       sorted_mesh_triangles = new csTriangle [num_sorted_mesh_triangles];
     }
-    //... sort ... @@@
+
+    csBSPTree* back2front_tree = factory->back2front_tree;
+    if (!back2front_tree)
+    {
+      factory->BuildBack2FrontTree ();
+      back2front_tree = factory->back2front_tree;
+    }
+    const csDirtyAccessArray<int>& triidx = back2front_tree->Back2Front (
+    	tr_o2c.GetOrigin ());
+    CS_ASSERT (triidx.Length () == num_sorted_mesh_triangles);
+
     csTriangle* factory_triangles = factory->GetTriangles ();
     int i;
     for (i = 0 ; i < num_sorted_mesh_triangles ; i++)
-      sorted_mesh_triangles[i] = factory_triangles[i];
+      sorted_mesh_triangles[i] = factory_triangles[triidx[i]];
     sorted_index_buffer->CopyToBuffer (sorted_mesh_triangles,
     	sizeof (unsigned int)*num_sorted_mesh_triangles*3);
+
+    csShaderVariable* sv = svcontext->GetVariableAdd(
+    	csGenmeshMeshObjectFactory::index_name);
+    sv->SetAccessor (0);
+    sv->SetValue (sorted_index_buffer);
   }
 
   lastMeshPtr->inUse = true;
@@ -1340,6 +1352,7 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   polygons = 0;
   light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
   back2front = false;
+  back2front_tree = 0;
 
 #ifdef CS_USE_NEW_RENDERER
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
@@ -1393,6 +1406,8 @@ csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
   delete [] mesh_triangles;
 #endif
 
+  delete back2front_tree;
+
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiGeneralFactoryState);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiObjectModel);
 #ifndef CS_USE_NEW_RENDERER
@@ -1402,6 +1417,21 @@ csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiShaderVariableAccessor);
 #endif
   SCF_DESTRUCT_IBASE ();
+}
+
+void csGenmeshMeshObjectFactory::SetBack2Front (bool b2f)
+{
+  delete back2front_tree;
+  back2front_tree = 0;
+  back2front = b2f;
+}
+
+void csGenmeshMeshObjectFactory::BuildBack2FrontTree ()
+{
+  if (back2front_tree) return;
+  back2front_tree = new csBSPTree ();
+  back2front_tree->Build (GetTriangles (), GetTriangleCount (),
+  	GetVertices ());
 }
 
 void csGenmeshMeshObjectFactory::CalculateBBoxRadius ()

@@ -20,20 +20,16 @@
 #define __CS_BSPTREE_H__
 
 #include "csextern.h"
+#include "csutil/array.h"
+#include "csutil/garray.h"
+#include "csutil/hash.h"
 #include "csutil/blockallocator.h"
 
 struct iGraphics3D;
 class csBSPTree;
 
 /**
- * A callback function for visiting a BSP-tree node. If this function
- * returns true the traversal will continue. Otherwise Front2Back()
- * will stop.
- */
-typedef bool (csBSPTreeVisitFunc)(csBSPTree* treenode, void* userdata);
-
-/**
- * A BSP-tree is a binary tree that organizes 3D space.
+ * This BSP-tree is a binary tree that organizes a triangle mesh.
  * This tree will not split triangles. If a triangle needs to be split
  * then it will be put in the two nodes.
  */
@@ -41,15 +37,22 @@ class CS_CSGEOM_EXPORT csBSPTree
 {
 private:
   static csBlockAllocator<csBSPTree> tree_nodes;
+  static csDirtyAccessArray<int> b2f_array;
 
   csBSPTree* child1;		// If child1 is not 0 then child2 will
   csBSPTree* child2;		// also be not 0.
 
-  int split_poly;
+  csPlane3 split_plane;
+  csArray<int> splitters;
 
   int FindBestSplitter (csTriangle* triangles, csPlane3* planes,
-	int num_triangles, csVector3* vertices);
-
+	int num_triangles, csVector3* vertices,
+	const csArray<int>& triidx);
+  void Build (csTriangle* triangles, csPlane3* planes,
+	int num_triangles, csVector3* vertices,
+	const csArray<int>& triidx);
+  void Back2Front (const csVector3& pos, csDirtyAccessArray<int>& arr,
+  	csSet<int>& used_indices);
 public:
   /// Create a new empty BSP-tree.
   csBSPTree ();
@@ -66,10 +69,11 @@ public:
   	csVector3* vertices);
 
   /**
-   * Traverse the tree from front to back. Every node of the
-   * tree will be encountered.
+   * Traverse the tree from back to front. This will return an array
+   * containing the triangle indices in back2front order. The array
+   * will not contain double elements.
    */
-  void Front2Back (const csVector3& pos, csBSPTreeVisitFunc* func);
+  const csDirtyAccessArray<int>& Back2Front (const csVector3& pos);
 };
 
 #endif // __CS_BSPTREE_H__

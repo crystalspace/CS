@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Apr-2004
+	- Jorrit finished the implementation of csBSPTree.
+	- Jorrit implemented back2front for genmesh. This new feature works
+	  only in NR mode. OR will ignore this.
 5-Apr-2004
 	- Peter Amstutz added the iVosApi interface to the csvosa3dl plugin.
 	  This interface allows the application to access the underlying
