@@ -25,6 +25,7 @@
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
 #include "iengine/mesh.h"
+#include "iengine/material.h"
 #include "imesh/object.h"
 #include "imesh/terrfunc.h"
 #include "iutil/eventh.h"

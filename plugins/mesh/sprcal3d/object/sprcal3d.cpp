@@ -779,8 +779,8 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
   {
     if (factory->submeshes[meshId]->attach_by_default)
     {
-      AttachCoreMesh(factory->submeshes[meshId]->index,(int)factory->submeshes[
-      	meshId]->default_material);
+      AttachCoreMesh(factory->submeshes[meshId]->index,(int)(iMaterialWrapper*)
+		      factory->submeshes[meshId]->default_material);
     }
   }
   // To get an accurate bbox below, you must have the model standing in the default anim first
