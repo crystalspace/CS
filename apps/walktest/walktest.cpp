@@ -175,7 +175,7 @@ void select_object (csRenderView* rview, int type, void* entity)
     int i;
     csPolygon2D* polygon = (csPolygon2D*)entity;
     int num = polygon->GetNumVertices ();
-    CHK (csPolygon2D* pp = new csPolygon2D (num));
+    CHK (csPolygon2D* pp = new csPolygon2D ());
     if (rview->IsMirrored ())
       for (i = 0 ; i < num ; i++)
         pp->AddVertex  (polygon->GetVertices ()[num-i-1]);
@@ -858,9 +858,28 @@ int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt)
   if (csCollider::firstHit && hit)
     return 1;
 
-  // Check collision of with the things in this sector.
+  // Check collision with the things in this sector.
   csThing *tp = sp->GetFirstThing ();
   while (tp)
+  {
+    if (!tp->IsMerged ())
+    {
+      // TODO, if and when Things can move, their transform must be passed in.
+      csCollider::numHits=0;
+      csCollider::CollidePair(c,csColliderPointerObject::GetCollider(*tp),cdt);
+      hit += csCollider::numHits;
+
+      for (int i=0 ; i<csCollider::numHits ; i++)
+        our_cd_contact[num_our_cd++] = CD_contact[i];
+
+      if (csCollider::firstHit && hit)
+        return 1;
+    }
+    tp = (csThing*)(tp->GetNext ());
+    // TODO, should test which one is the closest.
+  }
+  tp = sp->GetStaticThing ();
+  if (tp)
   {
     // TODO, if and when Things can move, their transform must be passed in.
     csCollider::numHits=0;
@@ -872,9 +891,6 @@ int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt)
 
     if (csCollider::firstHit && hit)
       return 1;
-
-    tp = (csThing*)(tp->GetNext ());
-    // TODO, should test which one is the closest.
   }
 
   return hit;
@@ -1250,9 +1266,18 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
     csThing* tp = sp->GetFirstThing ();
     while (tp)
     {
+      if (!tp->IsMerged ())
+      {
+        CHK(csCollider* pCollider = new csCollider(tp));
+        csColliderPointerObject::SetCollider(*tp, pCollider, true);
+      }
+      tp = (csThing*)(tp->GetNext ());
+    }
+    tp = sp->GetStaticThing ();
+    if (tp)
+    {
       CHK(csCollider* pCollider = new csCollider(tp));
       csColliderPointerObject::SetCollider(*tp, pCollider, true);
-      tp = (csThing*)(tp->GetNext ());
     }
   }
   // Initialize all sprites for collision detection.
@@ -1510,8 +1535,7 @@ int main (int argc, char* argv[])
   }
 
   // Initialize collision detection system (even if disabled so that we can enable it later).
-  Sys->InitWorld(Sys->world,Sys->view->GetCamera());
-//  csBeing::InitWorld (Sys->world, Sys->view->GetCamera ());
+  Sys->InitWorld (Sys->world,Sys->view->GetCamera());
 
   Sys->Printf (MSG_INITIALIZATION, "--------------------------------------\n");
 
