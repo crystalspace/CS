@@ -3274,7 +3274,7 @@ wrap_iPolygon3D_GetVertex(lua_State *L)
 {_arg0 = (iPolygon3D *)LS_luaL_check_userdata(L, 1);}
 {_arg1 = ( int )luaL_check_long(L, 2);}
 	lua_settop(L, 0);
-    csVector3 & _result_ref = iPolygon3D_GetVertex(_arg0,_arg1);
+    const csVector3 & _result_ref = iPolygon3D_GetVertex(_arg0,_arg1);
     _result = (csVector3 *) &_result_ref;
 {LS_luaL_pushuserpointer(L, _result, csVector3_tag);}
 	return 1;
@@ -3291,7 +3291,7 @@ wrap_iPolygon3D_GetVertexW(lua_State *L)
 {_arg0 = (iPolygon3D *)LS_luaL_check_userdata(L, 1);}
 {_arg1 = ( int )luaL_check_long(L, 2);}
 	lua_settop(L, 0);
-    csVector3 & _result_ref = iPolygon3D_GetVertexW(_arg0,_arg1);
+    const csVector3 & _result_ref = iPolygon3D_GetVertexW(_arg0,_arg1);
     _result = (csVector3 *) &_result_ref;
 {LS_luaL_pushuserpointer(L, _result, csVector3_tag);}
 	return 1;
@@ -3308,7 +3308,7 @@ wrap_iPolygon3D_GetVertexC(lua_State *L)
 {_arg0 = (iPolygon3D *)LS_luaL_check_userdata(L, 1);}
 {_arg1 = ( int )luaL_check_long(L, 2);}
 	lua_settop(L, 0);
-    csVector3 & _result_ref = iPolygon3D_GetVertexC(_arg0,_arg1);
+    const csVector3 & _result_ref = iPolygon3D_GetVertexC(_arg0,_arg1);
     _result = (csVector3 *) &_result_ref;
 {LS_luaL_pushuserpointer(L, _result, csVector3_tag);}
 	return 1;

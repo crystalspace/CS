@@ -313,9 +313,9 @@ struct iPolygon3D : public iBase
 //iPolygonTexture *GetTexture ();
 //iTextureHandle *GetTextureHandle ();
   int GetVertexCount ();
-  csVector3 &GetVertex (int idx);
-  csVector3 &GetVertexW (int idx);
-  csVector3 &GetVertexC (int idx);
+  const csVector3 &GetVertex (int idx) const;
+  const csVector3 &GetVertexW (int idx) const;
+  const csVector3 &GetVertexC (int idx) const;
   %name(CreateVertexByIndex) int CreateVertex (int idx);
   int CreateVertex (const csVector3 &iVertex);
   int GetAlpha ();
