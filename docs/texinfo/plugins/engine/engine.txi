@@ -18,7 +18,6 @@ Currently only some separate documents about the engine are available:
 * Rendering Loop::
 * 3D Sprites::
 * Dynamic Worlds::
-* Level of Detail::
 @end menu
 
 @importss{plugins,engine,worldcmp.txi}
