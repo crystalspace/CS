@@ -2,6 +2,7 @@
 
 import types
 from string import *;
+import re
 
 try:
 	import cPickle
@@ -19,17 +20,16 @@ except:
 class Object:
 	"""Lowest level Unreal Object"""
 	def __init__(self, attrib):
-	        self.attrib=attrib.copy()
+	        self.attrib={}
 	        self.stack=[]
+	        self.Add(attrib)
 	def Add(self, attrib):
 		self.attrib.update(attrib)
 	def Push(self, child):
 		self.stack.append(child)
-
 class Actor(Object):
 	"""An actor object from Unreal"""
 	pass
-	
 class Info(Actor):
 	pass
 class ZoneInfo(Info):
@@ -39,7 +39,14 @@ class LevelInfo(ZoneInfo):
 class Light(Actor):
     	pass
 class PlayerStart(Actor):
-	pass
+    	"""Defines the starting location for an Unreal Map"""
+	def Add(self, attrib):
+		self.attrib.update(attrib)
+		if(attrib.has_key('Location')):
+			loc=re.match('X=(.*),Y=(.*),Z=(.*)').groups()
+	def Load(self, view):
+#		view.GetCamera().SetPosition(csVector3(loc[0],loc[1],loc[2]))
+		pass
 class Brush(Actor):
     	"""A geometry object from Unreal"""
     	def MakeGeom(self, vecs, room, tm):
@@ -90,13 +97,13 @@ class Map(Actor):
 	def Load(self):
 		system=GetSystem()
 		room=csSector(roomptr)
-#		view=csView(viewptr)
+		view=csView(viewptr)
 		tm=csTextureHandle(tmptr)
 		for x in self.stack:
 			if isinstance(x, Brush):
 				x.Load(room, tm)
-#			elif isinstance(x, PlayerStart):
-#				x.Load(view)	
+			elif isinstance(x, PlayerStart):
+				x.Load(view)	
 		g3d=system.Query_iGraphics3D()
 
 # The Map Reader

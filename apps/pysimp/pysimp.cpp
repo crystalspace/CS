@@ -107,6 +107,7 @@ bool PySimple::Initialize (int argc, char *argv[], const char *iConfigName)
 
 //TODO Python HACK
 	csSector *room=world->NewSector();
+  view = new csView (world, G3D);
 
 	is->Store("csTextureHandle *", "unrmap.tmptr", tm);
 	is->Store("csSector *", "unrmap.roomptr", room);
@@ -135,7 +136,6 @@ bool PySimple::Initialize (int argc, char *argv[], const char *iConfigName)
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = new csView (world, G3D);
   view->SetSector((csSector*)world->sectors[0]);
   view->GetCamera()->SetPosition (csVector3 (0, 0, 0));
   view->SetRectangle (2, 2, FrameWidth - 4, FrameHeight - 4);
