@@ -79,7 +79,14 @@ void Combinations (int m, int n, bool (*callback) (int *vector, int count,
   CHK (delete [] vector);
 }
 
-#if defined (OS_OS2) || defined (OS_WIN32)
+#ifdef COMP_BC
+static int __getcwd (char drive, char *buffer, int buffersize) {
+  _getdcwd(drive, buffer, buffersize);
+  return strlen(buffer);
+}
+#endif
+
+#if defined (OS_OS2) || defined (OS_WIN32) && !defined(COMP_BC)
 // We need a function to retrieve current working directory on specific drive
 
 static int __getcwd (char drive, char *buffer, int buffersize)
