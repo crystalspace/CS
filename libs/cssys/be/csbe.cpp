@@ -131,7 +131,7 @@ bool SysSystemDriver::Initialize (int argc, char const* const argv[],
   if (strlen(path) > 0)
     chdir(path);
 
-  iEventQueue* q = CS_QUERY_EVENT((&scfiObjectRegistry), iEventQueue);
+  iEventQueue* q = CS_QUERY_REGISTRY((&scfiObjectRegistry), iEventQueue);
   if (q != 0)
     event_outlet = q->CreateEventOutlet(this);
 
