@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+27-Oct-2001
+	- Markus Korth <mkorth@military.de> fixed a bug with
+	  unixconf.sh which would use -mcpu=486 instead of -mcpu=i486.
 26-Oct-2001
 	- Jorge Acereda fixed coredumps when passing options to the 
 	  software renderer.

@@ -100,7 +100,7 @@ echo "int main () {}" >conftest.cpp
 (echo "$CPU" | grep -s 686 >/dev/null && ${CXX} -c -mpentiumpro -march=i686 conftest.cpp && echo "CFLAGS.SYSTEM += -mpentiumpro -march=i686") || \
 (echo "$CPU" | grep -s [5-6]86 >/dev/null && ${CXX} -c -mcpu=pentium -march=i586 conftest.cpp && echo "CFLAGS.SYSTEM += -mcpu=pentium -march=i586") || \
 (echo "$CPU" | grep -s [5-6]86 >/dev/null && ${CXX} -c -mpentium -march=i586 conftest.cpp && echo "CFLAGS.SYSTEM += -mpentium -march=i586") || \
-(echo "$CPU" | grep -s [3-9]86 >/dev/null && ${CXX} -c -mcpu=i486 conftest.cpp && echo "CFLAGS.SYSTEM += -mcpu=486") || \
+(echo "$CPU" | grep -s [3-9]86 >/dev/null && ${CXX} -c -mcpu=i486 conftest.cpp && echo "CFLAGS.SYSTEM += -mcpu=i486") || \
 (echo "$CPU" | grep -s [3-9]86 >/dev/null && ${CXX} -c -m486 conftest.cpp && echo "CFLAGS.SYSTEM += -m486") || \
 (echo "$MACHINE" | grep -s alpha >/dev/null && ${CXX} -c -mieee conftest.cpp && echo "CFLAGS.SYSTEM += -mieee")
 
