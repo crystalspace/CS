@@ -195,8 +195,8 @@ void Dumper::dump (csSprite3D* s)
   dump (s->tpl);
   dump (&s->m_obj2world, "Object->world");
   dump (&s->v_obj2world, "Object->world");
-  int i;
 #if 0
+  int i;
   CsPrintf (MSG_DEBUG_0, "Last transformed frame:\n");
   for (i = 0 ; i < s->tpl->num_vertices ; i++)
     CsPrintf (MSG_DEBUG_0, "  V%d: tex:(%f,%f) cam:(%f,%f,%f) scr:(%f,%f) vis:%d\n",
