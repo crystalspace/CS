@@ -152,7 +152,7 @@ endif # ifeq ($(MAKESECTION),confighelp)
 #--------------------------------------------------------------- configure ---#
 ifeq ($(ROOTCONFIG),config)
 
-SYSCONFIG += sh bin/unixconf.sh linux $(INSTALL_DIR)>>config.tmp
+SYSCONFIG=sh bin/unixconf.sh linux $(INSTALL_DIR)>>config.tmp
 
 endif # ifeq ($(ROOTCONFIG),config)
 
