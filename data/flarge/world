@@ -7877,6 +7877,10 @@ WORLD (
     )
     POLYGON 'east' (
       VERTICES (7,6,4,5)
+      MATERIAL ('plasma')
+      MIXMODE (ADD ())
+      PORTAL ('corridor')
+      WARP (V(-25.6, 22.0, 12.6))
       TEXTURE (
         MATRIX (0,0,-0.2,0,-0.2,0,0.2,0,0)
         V (34,-14,16)
