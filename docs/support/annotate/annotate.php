@@ -32,6 +32,8 @@ if ($action=="") {
     if ($authorname=="" && $emailname=="")
 	die ("<br><h2>Please give name or email!</h2>\n");
     $newentry->date=time();
+    $newentry->addr=$REMOTE_ADDR;
+    $newentry->agent=$HTTP_USER_AGENT;
     $newentry->text=nl2br($texttext);
     $last =count($entries)-1;
     if (!($newentry->author == $entries[$last]->author &&
@@ -50,7 +52,7 @@ if ($action=="") {
 		"E-Mail: $emailname\n".
 		"Topic:  $theme\n".
 		"File:   $self\n".
-		"Time:   ".strftime("%a, %d %b %G (%H:%M)",$newentry->date)." (".$newentry->date.")\n".
+		"Time:   ".strftime("%a, %d %b %G (%H:%M UTC)",$newentry->date)." (".$newentry->date.")\n".
 		"Comment:\n".
 		stripslashes($texttext));
         }
@@ -70,12 +72,16 @@ class entry
     var $email;
     var $text;
     var $date;
+    var $addr;
+    var $agent;
 
     function entry()
     {
 	$this->author="";
 	$this->email="";
 	$this->text="";
+	$this->addr="";
+	$this->agent="";
 	$this->data=0;
     }
 
@@ -89,6 +95,8 @@ class entry
 	fputs ($h, "<author>".$this->author."</author>\n");
 	fputs ($h, "<email>".$this->email."</email>\n");
 	fputs ($h, "<date>".$this->date."</date>\n");
+	fputs ($h, "<ipaddr>".$this->addr."</ipaddr>\n");
+	fputs ($h, "<agent>".$this->agent."</agent>\n");
 	fputs ($h, "<?text ".$this->text ."?>\n");
 	fputs ($h, "</comment>\n");
     }
@@ -118,7 +126,7 @@ function printEntries()
 	print "<td align=\"right\"><b>\n";
 	if ($e->date != 0)
 	{
-	    print strftime("%a, %d %b %G (%H:%M)", $e->date) . " UTC<br>\n";
+	    print strftime("%a, %d %b %G (%H:%M UTC)", $e->date) . "<br>\n";
 	}
 	print "</b></td></tr>\n";
 	print "</table>\n";
@@ -190,19 +198,21 @@ function startElement($parser, $name, $attrs) {
 	case "comment":
 	    if ($name == "AUTHOR") {
 		$status="author";
-		$aentry->author = $xmlglobdata;
 	    }
 	    if ($name == "EMAIL") {
 		$status="email";
-		$aentry->email = $xmlglobdata;
 	    }
 	    if ($name == "DATE") {
 		$status="date";
-		$aentry->date = (int)$xmlglobdata;
+	    }
+	    if ($name == "IPADDR") {
+		$status ="ipaddr";
+	    }
+	    if ($name == "AGENT") {
+		$status = "agent";
 	    }
 	    if ($name == "TEXT") {
 		$status="text";
-		$aentry->text = $xmlglobdata;
 	    }
 	    break;
     }
@@ -236,6 +246,14 @@ function endElement($parser, $name) {
 	case "text":
 	    if ($name != "TEXT") { break; }
 	    $aentry->text = $xmlglobdata;
+	    $status="comment";
+	    break;
+	case "ipaddr":
+	    $aentry->addr = $xmlglobaldata;
+	    $status="comment";
+	    break;
+	case "agent":
+	    $anetry->agent = $xmlglobaldata;
 	    $status="comment";
 	    break;
     }
