@@ -289,22 +289,19 @@ awsManager::Print(iGraphics3D *g3d)
   UpdateStore();
   
   int i;
-  iGraphics2D *g2d = g3d->GetDriver2D();
-
   for(i=0; i<updatestore.Count(); ++i)
   {
-
     csRect r(updatestore.RectAt(i));
-
     g3d->DrawPixmap(canvas.GetTextureWrapper()->GetTextureHandle(), 
       		  r.xmin,r.ymin,r.xmax-r.xmin,r.ymax-r.ymin,
 		  r.xmin,r.ymin,r.xmax-r.xmin,r.ymax-r.ymin,
                   0);
-
   }
 
+/*
   // Debug code
-  /*for(i=0; i<updatestore.Count(); ++i)
+  iGraphics2D *g2d = g3d->GetDriver2D();
+  for(i=0; i<updatestore.Count(); ++i)
   {
     csRect r(updatestore.RectAt(i));
      
@@ -313,7 +310,8 @@ awsManager::Print(iGraphics3D *g3d)
     g2d->DrawLine(r.xmin, r.ymax, r.xmax, r.ymax, GetPrefMgr()->GetColor(AC_WHITE));
     g2d->DrawLine(r.xmax, r.ymin, r.xmax, r.ymax, GetPrefMgr()->GetColor(AC_WHITE));
 
-  }*/
+  }
+*/
 }
 
 void       
@@ -321,7 +319,7 @@ awsManager::Redraw()
 {
    static unsigned redraw_tag = 1;
    static csRect bounds(0,0,proctex_width,proctex_height);
-   int    erasefill = GetPrefMgr()->GetColor(AC_TRANSPARENT);
+   //int    erasefill = GetPrefMgr()->GetColor(AC_TRANSPARENT);
    int    i;
         
 
@@ -712,9 +710,7 @@ awsManager::RegisterCommonComponents()
 {
   // Components register themselves into the window manager.  Just creating a factory
   //  takes care of all the implementation details.  There's nothing else you need to do.
-
-  new awsCmdButtonFactory(this);
-
+  (void)new awsCmdButtonFactory(this);
 }
     
 
