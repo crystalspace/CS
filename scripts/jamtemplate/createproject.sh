@@ -57,8 +57,20 @@ CheckYesNo()
 }
 
 # Poor man's (portable) 'dirname' command.
-dirpart() {
+dirpart()
+{
     expr "$1" : '\(..*\)[/\\].*'
+}
+
+# Poor man's (portable) capitalization command.
+capitalize()
+{
+    echo "$1" | sed '
+	h;
+	s/\(.\).*/\1/;
+	y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/;
+	G;
+	s/\(.\)\n./\1/'
 }
 
 # Part 1: Interactive - Gather information
@@ -72,7 +84,7 @@ time by typing Ctrl-C.
 
 __EOF__
 
-cat << "__EOF__"
+cat << __EOF__
 **** Project
 Choose a project name.  We need a short form of the name for use in directory
 and file names.  The short name should be lowercase (though not strictly
@@ -96,7 +108,7 @@ The information about the author is mentioned in the README file and in the
 configuration script so that people see a support address when they invoke
 "./configure --help".  When asked for the copyright information, type the full
 copyright notice as you wish it to appear in the generated files. For instance:
-"Copyright (C)2004 by Duffer McFluffer"
+Copyright (C)2004 by Duffer McFluffer
 
 __EOF__
 ReadValueStrict AUTHOR "Author:"
@@ -120,6 +132,7 @@ echo "*Creating project: $PROJECTNAME"
 
 TEMPLATEDIR=`dirpart $0`
 CSDIR="$TEMPLATEDIR/../.."
+PROJECTNAMECAP=`capitalize $PROJECTNAME`
 
 Instantiate()
 {
@@ -127,8 +140,9 @@ Instantiate()
     TARGET="$2"
 
     # XXX We should somehow quote here...
-    cat "$SOURCE" | sed -e " \
+    cat "$SOURCE" | sed " \
 	s^#PROJECTNAME#^$PROJECTNAME^g;
+	s^#PROJECTNAMECAP#^$PROJECTNAMECAP^g;
 	s^#EMAIL#^$EMAIL^g; \
 	s^#HOMEPAGE#^$HOMEPAGE^g; \
 	s^#LONGNAME#^$LONGNAME^g; \
@@ -163,6 +177,9 @@ Instantiate "$TEMPLATEDIR/Jamfile.template" "$PROJECTNAME/Jamfile.in"
 Instantiate "$TEMPLATEDIR/Jamfile-src.template" "$PROJECTNAME/src/Jamfile"
 Instantiate "$TEMPLATEDIR/Jamrules.template" "$PROJECTNAME/Jamrules"
 Instantiate "$TEMPLATEDIR/main.template" "$PROJECTNAME/src/main.cpp"
+Instantiate "$TEMPLATEDIR/app.cpp.template" \
+	    "$PROJECTNAME/src/app$PROJECTNAME.cpp"
+Instantiate "$TEMPLATEDIR/app.h.template" "$PROJECTNAME/src/app$PROJECTNAME.h"
 Instantiate "$TEMPLATEDIR/projheader.template" \
 	    "$PROJECTNAME/src/$PROJECTNAME.h"
 Instantiate "$TEMPLATEDIR/README.template" "$PROJECTNAME/README"
@@ -183,12 +200,13 @@ cd "$PROJECTNAME"
 rm -rf autom4te.cache
 
 # Display notice
-cat << "__EOF__"
+cat << __EOF__
 
 *Generation successful.
 
 You should now examine the generated project and customize it as needed.  In
-particular, the files README and main.cpp will require modification.
+particular, the files README, app$PROJECTNAME.cpp, and app$PROJECTNAME.h will
+require modification.
 
 Have fun with Crystal Space.
 __EOF__

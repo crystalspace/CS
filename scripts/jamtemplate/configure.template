@@ -89,7 +89,11 @@ AS_IF([test $with_cel != no],
   [AC_MSG_ERROR([
 *** CEL could not be found. The latest version is always available from
 *** http://cel.sourceforge.net/
-])])])])
+])])
+AC_DEFINE([USE_CEL], [], [Define to enable CEL.])
+AC_DEFINE_UNQUOTED([CEL_PLUGIN_DIR], ["$CEL_PLUGIN_DIR"],
+  [Define with path to CEL plugins.])
+])])
 
 #----------------------------------------------------------------------------
 # Package configuration switches

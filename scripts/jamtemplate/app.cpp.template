@@ -1,0 +1,141 @@
+/*
+ * app#PROJECTNAME#.cpp
+ *
+ * Definition of App#PROJECTNAMECAP#, the main application object.
+ */
+
+#include "App#PROJECTNAMECAP#.h"
+#include <cstool/initapp.h>
+#include <csutil/csstring.h>
+#include <csutil/event.h>
+#include <csutil/sysfunc.h>
+#include <iutil/event.h>
+#include <iutil/eventq.h>
+#include <iutil/vfs.h>
+
+CS_IMPLEMENT_APPLICATION
+
+App#PROJECTNAMECAP#::App#PROJECTNAMECAP#() : csApplicationFramework()
+{
+  SetApplicationName("#PROJECTNAME#");
+}
+
+App#PROJECTNAMECAP#::~App#PROJECTNAMECAP#()
+{
+}
+
+void App#PROJECTNAMECAP#::ProcessFrame()
+{
+  if (g3d->BeginDraw(engine->GetBeginDrawFlags() | CSDRAW_3DGRAPHICS))
+  {
+    // Draw frame.
+  }
+}
+
+void App#PROJECTNAMECAP#::FinishFrame()
+{
+  g3d->FinishDraw();
+  g3d->Print(0);
+}
+
+bool App#PROJECTNAMECAP#::OnKeyboard(iEvent& ev)
+{
+  // We got a keyboard event.
+  if (csKeyEventHelper::GetEventType(&ev) == csKeyEventTypeDown)
+  {
+    // The user pressed a key (as opposed to releasing it).
+    utf32_char code = csKeyEventHelper::GetCookedCode(&ev);
+    if (code == CSKEY_ESC)
+    {
+      // The user pressed escape, so terminate the application.  The proper way
+      // to terminate a Crystal Space application is by broadcasting a
+      // cscmdQuit event.  That will cause the main run loop to stop.  To do
+      // so we retrieve the event queue from the object registry and then post
+      // the event.
+      csRef<iEventQueue> q =
+        CS_QUERY_REGISTRY(GetObjectRegistry(), iEventQueue);
+      if (q.IsValid())
+        q->GetEventOutlet()->Broadcast(cscmdQuit);
+    }
+  }
+  return false;
+}
+
+bool App#PROJECTNAMECAP#::OnInitialize(int argc, char* argv[])
+{
+  // Load application-specific configuration file.
+  if (!csInitializer::SetupConfigManager(GetObjectRegistry(),
+      "/my/vfs/path/App#PROJECTNAMECAP#.cfg", GetApplicationName()))
+    return ReportError("Failed to initialize configuration manager!");
+
+#ifdef USE_CEL
+  // Instruct SCF to also scan for CEL plugins.
+  csString cel_path = getenv("CEL");
+  if (!cel_path.IsEmpty())
+  {
+    iSCF::SCF->ScanPluginsPath(cel_path, false, "cel");
+    cel_path << PATH_SEPARATOR << "lib";
+    iSCF::SCF->ScanPluginsPath(cel_path, false, "cel");
+    cel_path << PATH_SEPARATOR << "cel";
+    iSCF::SCF->ScanPluginsPath(cel_path, false, "cel");
+  }
+#ifdef CEL_PLUGIN_DIR
+  iSCF::SCF->ScanPluginsPath(CEL_PLUGIN_DIR, false, "cel");
+#endif
+#endif
+
+  // RequestPlugins() will load all plugins we specify.  In addition it will
+  // also check if there are plugins that need to be loaded from the
+  // configuration system (both the application configuration and CS or global
+  // configurations).  It also supports specifying plugins on the command line
+  // via the --plugin= option.
+  if (!csInitializer::RequestPlugins(GetObjectRegistry(),
+	CS_REQUEST_VFS,
+	CS_REQUEST_OPENGL3D,
+	CS_REQUEST_ENGINE,
+	CS_REQUEST_FONTSERVER,
+	CS_REQUEST_IMAGELOADER,
+	CS_REQUEST_LEVELLOADER,
+	CS_REQUEST_REPORTER,
+	CS_REQUEST_REPORTERLISTENER,
+	CS_REQUEST_END))
+    return ReportError("Failed to initialize plugins!");
+
+  // Set up an event handler for the application.  Crystal Space is fully
+  // event-driven.  Everything (except for this initialization) happens in
+  // response to an event.
+  if (!RegisterQueue(GetObjectRegistry()))
+    return ReportError("Failed to set up event handler!");
+
+  return true;
+}
+
+void App#PROJECTNAMECAP#::OnExit()
+{
+}
+
+bool App#PROJECTNAMECAP#::Application()
+{
+  // Open the main system. This will open all the previously loaded plugins
+  // (i.e. all windows will be opened).
+  if (!OpenApplication(GetObjectRegistry()))
+    return ReportError("Error opening system!");
+
+  // Now get the pointer to various modules we need.  We fetch them from the
+  // object registry.  The RequestPlugins() call we did earlier registered all
+  // loaded plugins with the object registry.  It is also possible to load
+  // plugins manually on-demand.
+  g3d = CS_QUERY_REGISTRY(GetObjectRegistry(), iGraphics3D);
+  if (!g3d)
+    return ReportError("Failed to locate 3D renderer!");
+
+  engine = CS_QUERY_REGISTRY(GetObjectRegistry(), iEngine);
+  if (!engine)
+    return ReportError("Failed to locate 3D engine!");
+
+  // Start the default run/event loop.  This will return only when some code,
+  // such as OnKeyboard(), has asked the run loop to terminate.
+  Run();
+
+  return true;
+}

@@ -50,10 +50,10 @@ MsvcGenConfig CRYSTAL.LIBS.DEBUG :
 if $(CEL.DESIRED) = yes
 {
 MsvcGenConfig CEL.AVAILABLE : yes ;
-MsvcGenConfig CEL.CFLAGS ;
+MsvcGenConfig CEL.CFLAGS : "/D \"USE_CEL\"" ;
 MsvcGenConfig CEL.LFLAGS ;
 MsvcGenConfig CEL.LIBS : "libceltool.lib" ;
-MsvcGenConfig CEL.CFLAGS.DEBUG ;
+MsvcGenConfig CEL.CFLAGS.DEBUG : "/D \"USE_CEL\"" ;
 MsvcGenConfig CEL.LFLAGS.DEBUG ;
 MsvcGenConfig CEL.LIBS.DEBUG : "libceltool_d.lib" ;
 }

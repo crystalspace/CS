@@ -8,6 +8,11 @@ chronological order.
 
 22-Jun-2004
 	- Jorrit corrected the fps timings for csbench to use a constant.
+	- Eric Sunshine augmented jamtemplate so that it creates a
+	  well-commented full skeleton application object based upon
+	  csApplicationFramework and csBaseEventHandler.  The skeleton even
+	  properly instructs SCF to also scan for CEL plugins if the user chose
+	  to enable CEL support.
 21-Jun-2004
 	- Jorrit attempted to add new tests to csbench to try out a shader
 	  with various techniques. Not sure if it works correctly yet though.
