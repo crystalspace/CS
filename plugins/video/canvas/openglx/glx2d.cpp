@@ -157,8 +157,8 @@ bool csGraphics2DGLX::CreateContext (int *desired_attributes)
     cmap = XCreateColormap (dpy, RootWindow (dpy, active_GLVisual->screen),
 			    active_GLVisual->visual, AllocNone);
 
-    CsPrintf (MSG_INITIALIZATION, "Seized Visual ID %d\n", 
-	      active_GLVisual->visual->visualid);
+//    CsPrintf (MSG_INITIALIZATION, "Seized Visual ID %d\n", 
+//	      active_GLVisual->visual->visualid);
   }
   else
   {
@@ -195,8 +195,9 @@ bool csGraphics2DGLX::CreateContext (int *desired_attributes)
       int doublebuffer_attributes[] = {GLX_RGBA, GLX_DOUBLEBUFFER, None };
       if (!glXChooseVisual(dpy,screen_num,doublebuffer_attributes) )
 	CsPrintf(MSG_FATAL_ERROR,"Graphics display does not provide double buffering\n");
-      return false;
     }
+
+    return false;
   }
 
   return true;
