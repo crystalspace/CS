@@ -2,9 +2,9 @@
 @node NonLGPL, , License, CS Introduction
 @section Parts of CS covered under different licenses
 
-Some parts of CrystalSpace are NOT covered under @sc{LGPL} license, you might 
-have to consider this, depending on how you intend to distribute your finished 
-product.
+Some parts of CrystalSpace are @emph{not} covered under @sc{lgpl} license, you
+might have to consider this, depending on how you intend to distribute your
+finished product.
 
 @itemize @bullet
 @item 
@@ -28,11 +28,10 @@ usage consider using the @sc{opcode} plugin instead.
 @end itemize
 
 In addition, some plugins may need to link to external libraries covered 
-under a license other than the @sc{LGPL}.
+under a license other than the @sc{lgpl}.
 
 @itemize bullet
 @item
-@emph{None so far.}
+@emph{None yet.}
 
 @end itemize
-

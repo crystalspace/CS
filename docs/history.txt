@@ -29,6 +29,7 @@ The history order is reversed so that new features are at the top.
 	- Some further optimizations on csGlobalHashIterator.
 	- Several fixes to csArray::SetCapacity() and related.
 	- Anoter csArray::SetCapacity() fix.
+	- Eric Sunshine fixed some Texinfo mark-up errors reported by makeinfo.
 24-Apr-2003
 	- Eric Sunshine made the following changes:
 	    - Improved robustness of --with-x check for Darwin/Macintosh, since
