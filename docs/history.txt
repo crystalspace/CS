@@ -27,6 +27,8 @@ The history order is reversed so that new features are at the top.
 	  csutil and cssys.  Perhaps Matze could apply a better fix, since he
 	  probably has a better understanding of his own code.
 	- Eric Sunshine eliminated unportable `test -e' from cs-config/Jamfile.
+	- res changed the Win32 plugin paths to cause less recursive directory
+	  scanning.
 16-Jun-2003
 	- Oktal separated a multiple-argument %ignore directive into several
 	  single-argument ones, in perlpre.i, in order to support older

@@ -182,34 +182,33 @@ csPluginPath* csGetPluginPaths ()
 {
   csPluginPath* paths = new csPluginPath [5];
 
-  char* configpath = csGetConfigPath ();
-  char* temp = new char[MAX_PATH];
-  strncpy (temp, configpath, MAX_PATH);
-  strcat (temp, "\\lib");
-    
   char appPath [MAX_PATH + 1];
   GetModuleFileName (0, appPath, sizeof (appPath) - 1);
   char* slash = strrchr (appPath, '\\');
   if (slash) *slash = 0;
+  
+  char* configpath = csGetConfigPath ();
 
   int i = 0;
+
+  paths[i++].path = csStrNew (appPath);
+
+  char* temp = new char[MAX_PATH];
+  strncpy (temp, configpath, MAX_PATH);
+  strcat (temp, "\\lib");
+
   paths[i].scanRecursive = true;
   paths[i++].path = temp;
-  paths[i++].path = configpath;
+
   if (strcasecmp (configpath, appPath) != 0)
   {
-    paths[i].scanRecursive = true;
-    paths[i++].path = csStrNew (appPath);
+    paths[i++].path = configpath;
+  }
+  else
+  {
+    delete[] configpath;
   }
 
-  char curPath [MAX_PATH + 1];
-  GetFullPathName (".", sizeof (curPath), curPath, 0);
-  if ((strcasecmp (configpath, appPath) != 0) && 
-    (strcasecmp (configpath, curPath) != 0))
-  {
-    paths[i].scanRecursive = true;
-    paths[i++].path = csStrNew (curPath);
-  }
   paths[i++].path = 0;
 
   return paths;
