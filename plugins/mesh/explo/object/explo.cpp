@@ -101,6 +101,9 @@ csExploMeshObject::csExploMeshObject (iObjectRegistry* object_reg,
   number = 50;
   nr_sides = 3;
   part_radius = .1;
+  spread_pos = .6;
+  spread_speed = 2.;
+  spread_accel = 2.;
 }
 
 csExploMeshObject::~csExploMeshObject()

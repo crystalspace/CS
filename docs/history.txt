@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+1-Dec-2002
+	- Fixed initialization plugin in the explosion mesh object. This
+	  could cause crashes in some cases.
 30-Nov-2002
 	- Simplified the iLightingInfo interface. The concept of cache name
 	  is now removed (it was totally unused). This also removes about 52
