@@ -41,7 +41,7 @@ public:
   float z;
 
   /// Make a new vector, initialized to the zero vector.
-  csVector3 () { }; //{ x = y = z = 0; }
+  csVector3 () { x = y = z = 0; }
 
   /// Make a new vector and initialize with the given values.
   csVector3 (float x, float y, float z = 0)
