@@ -1221,7 +1221,7 @@ static bool CommandHandler (char *cmd, char *arg)
 #   if 0
     extern bool do_covtree_dump;
     do_covtree_dump = !do_covtree_dump;
-#   else
+//#   else
     extern bool debug_pvs;
     debug_pvs = !debug_pvs;
 #   endif
