@@ -9,6 +9,7 @@
 #include <csutil/csstring.h>
 #include <csutil/event.h>
 #include <csutil/sysfunc.h>
+#include <csutil/syspath.h>
 #include <iutil/event.h>
 #include <iutil/eventq.h>
 #include <iutil/vfs.h>
@@ -68,18 +69,20 @@ bool App#PROJECTNAMECAP#::OnInitialize(int argc, char* argv[])
 
 #ifdef USE_CEL
   // Instruct SCF to also scan for CEL plugins.
+  csPluginPaths cel_paths;
   csString cel_path = getenv("CEL");
   if (!cel_path.IsEmpty())
   {
-    iSCF::SCF->ScanPluginsPath(cel_path, false, "cel");
+    cel_paths.AddOnce(cel_path, false, "cel");
     cel_path << PATH_SEPARATOR << "lib";
-    iSCF::SCF->ScanPluginsPath(cel_path, false, "cel");
+    cel_paths.AddOnce(cel_path, false, "cel");
     cel_path << PATH_SEPARATOR << "cel";
-    iSCF::SCF->ScanPluginsPath(cel_path, false, "cel");
+    cel_paths.AddOnce(cel_path, false, "cel");
   }
 #ifdef CEL_PLUGIN_DIR
-  iSCF::SCF->ScanPluginsPath(CEL_PLUGIN_DIR, false, "cel");
+  cel_paths.AddOnce(CEL_PLUGIN_DIR, false, "cel");
 #endif
+  scfInitialize(&cel_paths);
 #endif
 
   // RequestPlugins() will load all plugins we specify.  In addition it will
