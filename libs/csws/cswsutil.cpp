@@ -652,7 +652,7 @@ void cspFileDialog::Reread ()
     strncpy (name, curp, sep - curp);
 #endif
     name [sep - curp] = 0;
-	System->Printf (MSG_INITIALIZATION, "Name of file query result %s\n", name);
+//  System->Printf (MSG_INITIALIZATION, "Name of file query result %s\n", name);
     CHK (csListBoxItem *lbi = new csListBoxItem (dp, name, CSFDI_PATHCOMPONENT));
     lbi->SetBitmap (fdspr [1], false);
     lbi->SetOffset (level * 6, 0);
@@ -667,7 +667,7 @@ void cspFileDialog::Reread ()
   DIR *dh;
   struct dirent *de;
 
-  System->Printf (MSG_INITIALIZATION, "Path is  %s**\n", path);
+// System->Printf (MSG_INITIALIZATION, "Path is [%s]\n", path);
 // prevent the extra '\' when evaluating root directory
 #if defined (OS_DOS) || defined (OS_WIN32)
   if (strlen(path) == 3) // root path
