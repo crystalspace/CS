@@ -55,16 +55,22 @@ private:
  public:
   /// Construct a bitmap.
   inline csHwrBitmap (hwrbitmap bitmap0, iGraphics3D* g3d, int shmid0 = 0)
-    : bitmap (bitmap0), shmid (shmid0) 
+    : bitmap (bitmap0), shmid (shmid0), pixmap (0), image (0)
   { 
     image = new csImageMemory (bitmap->w, bitmap->h, 
       CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA);
     memcpy (image->GetImageData (), bitmap->bits, 
       bitmap->w*bitmap->h*4);
-    csRef<iTextureHandle> tex = 
-      g3d->GetTextureManager ()->RegisterTexture (image, CS_TEXTURE_2D);
-    tex->Prepare ();
-    pixmap = new csSimplePixmap (tex);
+    csRef<iTextureHandle> tex;
+    if (g3d && g3d->GetTextureManager ())
+    {
+      tex = g3d->GetTextureManager ()->RegisterTexture (image, CS_TEXTURE_2D);
+      if (tex)
+      {
+        tex->Prepare ();
+        pixmap = new csSimplePixmap (tex);
+      }
+    }
     dirty = false;
   }
 
@@ -82,10 +88,14 @@ private:
   /// Get the CS bitmap (pixmap)
   inline csSimplePixmap* GetCSBitmap () 
   { 
-
-    csRef<iGraphics2D> g2d = pixmap->GetTextureHandle ()->GetCanvas ();
-    g2d->Blit (0, 0, bitmap->w, bitmap->h, bitmap->bits);
-    dirty = false;
+    if (dirty)
+    {
+      csRef<iGraphics2D> g2d = pixmap->GetTextureHandle ()->GetCanvas ();
+      g2d->BeginDraw ();
+      g2d->Blit (0, 0, bitmap->w, bitmap->h, bitmap->bits);
+      g2d->FinishDraw ();
+      dirty = false;
+    }
     return pixmap; 
   }
 

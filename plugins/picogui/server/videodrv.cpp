@@ -93,8 +93,6 @@ g_error csPGVideoDriver::Init ()
 
 void csPGVideoDriver::Close ()
 {
-  Gfx3D = 0;
-  ImageIO = 0;
 }
 
 g_error csPGVideoDriver::SetMode (int16 x, int16 y, int16 bpp, __u32 flags) 
@@ -145,7 +143,7 @@ void csPGVideoDriver::Free (hwrbitmap b)
 
 g_error csPGVideoDriver::GetSize (hwrbitmap b, int16 *w, int16 *h)
 {
-  hwrbitmap picobmp = ((csHwrBitmap*)b)->GetPicoBitmap ();
+  hwrbitmap picobmp = b?((csHwrBitmap*)b)->GetPicoBitmap ():0;
   if (picobmp)
   {
     *w = picobmp->w;
@@ -160,7 +158,7 @@ g_error csPGVideoDriver::GetSize (hwrbitmap b, int16 *w, int16 *h)
 void csPGVideoDriver::Pixel (hwrbitmap b, int16 x, int16 y, 
                              hwrcolor color, int16 logop)
 {
-  hwrbitmap picobmp = ((csHwrBitmap*)b)->GetPicoBitmap ();
+  hwrbitmap picobmp = b?((csHwrBitmap*)b)->GetPicoBitmap ():0;
   if (picobmp)
   {
     linear32_pixel (picobmp, x, y, color, logop);
@@ -173,7 +171,7 @@ void csPGVideoDriver::Pixel (hwrbitmap b, int16 x, int16 y,
 
 hwrcolor csPGVideoDriver::GetPixel (hwrbitmap b, int16 x, int16 y)
 {
-  hwrbitmap picobmp = ((csHwrBitmap*)b)->GetPicoBitmap ();
+  hwrbitmap picobmp = b?((csHwrBitmap*)b)->GetPicoBitmap ():0;
   if (picobmp)
   {
     linear32_getpixel (picobmp, x, y);
@@ -187,7 +185,7 @@ hwrcolor csPGVideoDriver::GetPixel (hwrbitmap b, int16 x, int16 y)
 void csPGVideoDriver::Rect (hwrbitmap b, int16 x1, int16 y1, 
                            int16 x2, int16 y2, hwrcolor color, int16 logop)
 {
-  hwrbitmap picobmp = ((csHwrBitmap*)b)->GetPicoBitmap ();
+  hwrbitmap picobmp = b?((csHwrBitmap*)b)->GetPicoBitmap ():0;
   if (picobmp)
   {
     linear32_rect (picobmp, x1, y1, x2, y2, color, logop);
@@ -201,7 +199,7 @@ void csPGVideoDriver::Rect (hwrbitmap b, int16 x1, int16 y1,
 void csPGVideoDriver::Slab (hwrbitmap b, int16 x, int16 y, 
                            int16 w, hwrcolor color, int16 logop)
 {
-  hwrbitmap picobmp = ((csHwrBitmap*)b)->GetPicoBitmap ();
+  hwrbitmap picobmp = b?((csHwrBitmap*)b)->GetPicoBitmap ():0;
   if (picobmp)
   {
     linear32_slab (picobmp, x, y, w, color, logop);
@@ -215,7 +213,7 @@ void csPGVideoDriver::Slab (hwrbitmap b, int16 x, int16 y,
 void csPGVideoDriver::Bar (hwrbitmap b, int16 x, int16 y, 
                            int16 h, hwrcolor color, int16 logop)
 {
-  hwrbitmap picobmp = ((csHwrBitmap*)b)->GetPicoBitmap ();
+  hwrbitmap picobmp = b?((csHwrBitmap*)b)->GetPicoBitmap ():0;
   if (picobmp)
   {
     linear32_bar (picobmp, x, y, h, color, logop);
@@ -229,7 +227,7 @@ void csPGVideoDriver::Bar (hwrbitmap b, int16 x, int16 y,
 void csPGVideoDriver::Line (hwrbitmap b, int16 x1, int16 y1, 
                            int16 x2, int16 y2, hwrcolor color, int16 logop)
 {
-  hwrbitmap picobmp = ((csHwrBitmap*)b)->GetPicoBitmap ();
+  hwrbitmap picobmp = b?((csHwrBitmap*)b)->GetPicoBitmap ():0;
   if (picobmp)
   {
     // @@@ Something is wrong with linear32_line. Borked headers?
@@ -246,8 +244,8 @@ void csPGVideoDriver::Blit (hwrbitmap db, int16 dx, int16 dy,
                             hwrbitmap sb, int16 sx, int16 sy, 
                             int16 logop)
 {
-  hwrbitmap srcpicobmp = ((csHwrBitmap*)sb)->GetPicoBitmap ();
-  hwrbitmap dstpicobmp = ((csHwrBitmap*)db)->GetPicoBitmap ();
+  hwrbitmap srcpicobmp = sb?((csHwrBitmap*)sb)->GetPicoBitmap ():0;
+  hwrbitmap dstpicobmp = db?((csHwrBitmap*)db)->GetPicoBitmap ():0;
   if (srcpicobmp && dstpicobmp)
   {
     linear32_blit (dstpicobmp, dx, dy, w, h, srcpicobmp, sx, sy, logop);
