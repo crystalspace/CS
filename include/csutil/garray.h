@@ -35,12 +35,14 @@
  * </ul>
  * Usage examples:
  * <pre>
- * DECLARE_GROWING_ARRAY (LightArray, csLight*);
- * DECLARE_GROWING_ARRAY (IntArray, int);
+ * TYPEDEF_GROWING_ARRAY (csLightArray, csLight*);
+ * TYPEDEF_GROWING_ARRAY (csIntArray, int);
+ * static csLightArray la;
+ * static csIntArray ia;
  * </pre>
  */
-#define DECLARE_GROWING_ARRAY(Name, Type)				\
-  class __##Name							\
+#define TYPEDEF_GROWING_ARRAY(Name, Type)				\
+  class Name								\
   {									\
     Type *root;								\
     int Limit;								\
@@ -68,10 +70,23 @@
     { memmove (&root [n], &root [n + 1], (Limit - n - 1) * sizeof (Type)); }\
     Type *GetArray ()							\
     { return root; }							\
-    __##Name ()								\
+    Name ()								\
     { Limit = 0; RefCount = 0; root = NULL; }				\
-    ~__##Name ()							\
+    ~Name ()								\
     { SetLimit (0); }							\
-  } Name
+  }
+
+/**
+ * This is a shortcut for above to declare a dummy class and a single
+ * instance of that class.
+ * <p>
+ * Usage examples:
+ * <pre>
+ * DECLARE_GROWING_ARRAY (la, csLight*);
+ * DECLARE_GROWING_ARRAY (ia, int);
+ * </pre>
+ */
+#define DECLARE_GROWING_ARRAY(Name, Type)				\
+  TYPEDEF_GROWING_ARRAY(__##Name,Type) Name
 
 #endif // __GARRAY_H__
