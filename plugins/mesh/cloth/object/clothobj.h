@@ -371,7 +371,6 @@ class StuffFactory : public iMeshObjectFactory
 	uint nverts = scfParent->num_vertices;
 	uint ntris  = scfParent->num_triangles;
 	int count;
-	printf(" %u \n",count++);
 			
 	float xindex=0.0;
 	float yindex=0.0;
@@ -388,8 +387,7 @@ class StuffFactory : public iMeshObjectFactory
 		 xindex+=2.0/Xsize;
 		 if ( ((i+1)%(Xsize+1))==0 ) { xindex=0.0; yindex+=2.0/Ysize;  };
 		 	 };	
-	 	printf(" on %u \n",count++);
-	
+	 		
         k=0;
    for (i=0;i<Xsize;i++) {
 	for (j=0;j<Ysize;j++) {

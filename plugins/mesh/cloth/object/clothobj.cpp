@@ -281,10 +281,51 @@ void csStuffObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
  bool csStuffObject::WantToDie () const { return false; };
  void csStuffObject::HardTransform (const csReversibleTransform &) {};
  bool csStuffObject::SupportsHardTransform () const { return false; };
- bool csStuffObject::HitBeamOutline (const csVector3 &, const csVector3 &, csVector3 &, float *)
-    { return false; };
- bool csStuffObject::HitBeamObject (const csVector3 &, const csVector3 &, csVector3 &, float *)
-     { return false; };
+ bool csStuffObject::HitBeamOutline (const csVector3& start,
+  const csVector3& end, csVector3& isect, float* pr)
+    { 
+  csSegment3 seg (start, end);
+  int i, max = mesh.num_triangles;
+  csTriangle *tr = mesh.triangles;
+  csVector3 *vrt = vertices;
+  for (i = 0 ; i < max ; i++)
+  {
+    if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
+    	vrt[tr[i].c], seg, isect))
+    {
+      if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
+		csSquaredDist::PointPoint (start, end));
+
+      return true;
+    }
+  }
+  return false;
+	};
+	
+ bool csStuffObject::HitBeamObject (const csVector3& start,
+  const csVector3& end, csVector3& isect, float* pr)
+  {
+	  // This is now closer to an outline hitting method. It will
+  // return as soon as it touches any triangle in the mesh, and
+  // will be a bit faster than its more accurate cousin (below).
+  
+  csSegment3 seg (start, end);
+  int i, max = mesh.num_triangles;
+  csTriangle *tr = mesh.triangles;
+  csVector3 *vrt = vertices;
+  for (i = 0 ; i < max ; i++)
+  {
+    if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
+    	vrt[tr[i].c], seg, isect))
+    {
+      if (pr) *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
+		csSquaredDist::PointPoint (start, end));
+      return true;
+    }
+  }
+  return false;
+  };
+  
  void csStuffObject::SetLogicalParent (iBase *) {};
  iBase *csStuffObject::GetLogicalParent () const { return NULL; };
  // iObjectModel *csStuffObject::GetObjectModel () { return NULL; };
