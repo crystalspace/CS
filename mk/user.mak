@@ -77,7 +77,6 @@ PLUGINS += video/effects
 
 PLUGINS.DYNAMIC += engine/iso
 PLUGINS.DYNAMIC += isoldr
-PLUGINS.DYNAMIC += cslexan
 PLUGINS.DYNAMIC += sequence
 PLUGINS.DYNAMIC += engseq
 #PLUGINS.DYNAMIC += cscript/cspython
