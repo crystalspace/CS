@@ -8,6 +8,9 @@ chronological order.
 
 11-Jul-2004
 	- Vincent Knecht added instructions for building RPMs in User Manual.
+	- Vincent Knecht ported note about removed plugins in apimod98.txi from
+	  HEAD branch to R0_98, with TeXinfo markup corrections pointed by Eric
+	  Sunshine.
 9-Jul-2004
 	- Vincent Knecht simplified and re-enabled levels relighting in cs.spec
 8-Jul-2004
