@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 
+#include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
 
 #include "csutil/objreg.h"
@@ -40,7 +41,8 @@ csRenderMeshList::~csRenderMeshList ()
 
 void csRenderMeshList::AddRenderMeshes (csRenderMesh** meshes, int num,
                                    long renderPriority,
-				   csZBufMode z_buf_mode)
+				   csZBufMode z_buf_mode, 
+				   const csBox3& bbox)
 {
   renderMeshListInfo* entry;
 
@@ -69,7 +71,27 @@ void csRenderMeshList::AddRenderMeshes (csRenderMesh** meshes, int num,
   for (int i = 0; i < num; ++i)
   {
     meshes[i]->z_buf_mode = z_buf_mode;
-    entry->meshList.Push (meshes[i]);
+    entry->meshList.Push (meshListEntry (meshes[i], bbox));
+  }
+}
+
+void csRenderMeshList::CullToSphere (const csSphere& sphere)
+{
+  csVector3 sphCenter (sphere.GetCenter ());
+  float sphSqRadius = sphere.GetRadius ();
+
+  for (int i = 0; i < renderList.Length(); i++)
+  {
+    renderMeshListInfo*& mli = renderList[i];
+    if (!mli) continue;
+
+    for (int j = mli->meshList.Length(); --j >= 0;)
+    {
+      const meshListEntry& entry = mli->meshList[j];
+      if (!csIntersect3::BoxSphere (entry.bbox, sphCenter,
+	sphSqRadius))
+	mli->meshList.DeleteIndex (j);
+    }
   }
 }
 
@@ -87,8 +109,12 @@ void csRenderMeshList::Empty ()
   }
 }
 
-static int SortMeshMaterial (csRenderMesh* const& m1, csRenderMesh* const& m2)
+int csRenderMeshList::SortMeshMaterial (meshListEntry const& me1, 
+					meshListEntry const& me2)
 {
+  const csRenderMesh* m1 = me1.rm;
+  const csRenderMesh* m2 = me2.rm;
+
   if (m1->portal != 0 && m2->portal == 0)
     return 1;
   else if (m2->portal != 0 && m1->portal == 0)
@@ -107,26 +133,34 @@ static int SortMeshMaterial (csRenderMesh* const& m1, csRenderMesh* const& m2)
   return 0;
 }
 
-static int SortMeshBack2Front(csRenderMesh* const& m1, csRenderMesh* const& m2)
+int csRenderMeshList::SortMeshBack2Front(meshListEntry const& me1, 
+					 meshListEntry const& me2)
 {
+  const csRenderMesh* m1 = me1.rm;
+  const csRenderMesh* m2 = me2.rm;
+
   const csReversibleTransform& t1 = m1->object2camera;
   const csReversibleTransform& t2 = m2->object2camera;
   if (t1.GetOrigin ().z < t2.GetOrigin().z)
     return -1;
   else if (t1.GetOrigin ().z > t2.GetOrigin().z)
     return 1;
-  return SortMeshMaterial (m1, m2);
+  return SortMeshMaterial (me1, me2);
 }
 
-static int SortMeshFront2Back(csRenderMesh* const& m1, csRenderMesh* const& m2)
+int csRenderMeshList::SortMeshFront2Back(meshListEntry const& me1, 
+					 meshListEntry const& me2)
 {
+  const csRenderMesh* m1 = me1.rm;
+  const csRenderMesh* m2 = me2.rm;
+
   const csReversibleTransform& t1 = m1->object2camera;
   const csReversibleTransform& t2 = m2->object2camera;
   if (t1.GetOrigin ().z < t2.GetOrigin().z)
     return 1;
   else if (t1.GetOrigin ().z > t2.GetOrigin().z)
     return -1;
-  return SortMeshMaterial (m1, m2);
+  return SortMeshMaterial (me1, me2);
 }
 
 int csRenderMeshList::SortMeshLists ()
@@ -166,7 +200,7 @@ void csRenderMeshList::GetSortedMeshes (csRenderMesh** meshes)
     {
       int numObjects = listEnt->meshList.Length ();
       for (int j = 0 ; j < numObjects ; j++)
-        *meshes++ = listEnt->meshList[j];
+	*meshes++ = listEnt->meshList[j].rm;
     }
   }
 }

@@ -299,8 +299,12 @@ public:
       meshes[i]->db_mesh_name = cmesh->GetName ();
 #endif
     if (num > 0)
+    {
+      csBox3 box;
+      cmesh->GetWorldBoundingBox (box);
       privMeshlist->AddRenderMeshes (meshes, num, cmesh->GetRenderPriority (),
-	  cmesh->GetZBufMode ());
+	  cmesh->GetZBufMode (), box);
+    }
   }
 
 private:

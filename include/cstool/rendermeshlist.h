@@ -24,11 +24,14 @@
 #include "csutil/array.h"
 #include "csutil/parray.h"
 #include "csutil/ref.h"
+#include "csgeom/box.h"
+#include "csgeom/sphere.h"
 #include "ivideo/graph3d.h"
 
 struct iEngine;
 struct iObjectRegistry;
 struct csRenderMesh;
+struct iMeshWrapper;
 
 /**
  * This class is used when we need to store, sort and then render a list of
@@ -53,7 +56,14 @@ public:
    * Add a new set of rendermeshes to the lists
    */
   void AddRenderMeshes (csRenderMesh** meshes, int num, long renderPriority,
-	csZBufMode z_buf_mode);
+	csZBufMode z_buf_mode, const csBox3& bbox);
+
+  /**
+   * Remove all rendermeshes that are outside the specified sphere.
+   * Note: the sphere's radius has to be the square of it's actual value.
+   * (For optimization purposes.)
+   */
+  void CullToSphere (const csSphere& sphere);
 
   /**
    * Sort the list of meshes by render priority and within every render
@@ -72,6 +82,15 @@ public:
   void Empty ();
 
 private:
+  struct meshListEntry
+  {
+    csRenderMesh* rm;
+    csBox3 bbox;
+
+    meshListEntry (csRenderMesh* mesh, const csBox3& bb) : 
+      rm(mesh), bbox(bb) {}
+  };
+
   /// This struct contains one entry in the RP infoqueue
   struct renderMeshListInfo 
   {
@@ -82,12 +101,16 @@ private:
     int sortingOption;
 
     /// list of rendermeshes
-    csArray <csRenderMesh*> meshList;
+    csArray<meshListEntry> meshList;
 
   };
 
   csPDelArray < renderMeshListInfo > renderList;
   iEngine* engine;
+
+  static int SortMeshMaterial (meshListEntry const& me1, meshListEntry const& me2);
+  static int SortMeshBack2Front (meshListEntry const& me1, meshListEntry const& me2);
+  static int SortMeshFront2Back (meshListEntry const& me1, meshListEntry const& me2);
 };
 
 #endif //__CS_RENDERMESHLIST_H__

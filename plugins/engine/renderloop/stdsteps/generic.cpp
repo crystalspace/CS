@@ -241,9 +241,43 @@ void csGenericRenderStep::RenderMeshes (iGraphics3D* g3d,
 void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   CS_SHADERVAR_STACK &stacks)
 {
+  Perform (rview, sector, 0, stacks);
+}
+
+void csGenericRenderStep::ToggleStepSettings (iGraphics3D* g3d, 
+					      bool settings)
+{
+  if (settings != currentSettings)
+  {
+    if (settings)
+    {
+      if (zOffset)
+	g3d->EnableZOffset ();
+      g3d->SetZMode (zmode);
+    }
+    else
+    {
+      if (zOffset)
+	g3d->DisableZOffset ();
+    }
+    currentSettings = settings;
+  }
+}
+
+void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
+				   iLight* light,
+                                   CS_SHADERVAR_STACK &stacks)
+{
   iGraphics3D* g3d = rview->GetGraphics3D();
 
   csRenderMeshList* meshlist = sector->GetVisibleMeshes (rview);
+  if (light != 0)
+  {
+    csSphere sphere;
+    sphere.SetCenter (light->GetCenter ());
+    sphere.SetRadius (light->GetInfluenceRadiusSq ());
+    meshlist->CullToSphere (sphere);
+  }
   int num = meshlist->SortMeshLists ();
   CS_ALLOC_STACK_ARRAY (csRenderMesh*, sameShaderMeshes, num);
   csArray<csRenderMesh> saveMeshes;
@@ -339,33 +373,6 @@ void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
   stacks[fogplane_name].Pop ();
 
   ToggleStepSettings (g3d, false);
-}
-
-void csGenericRenderStep::ToggleStepSettings (iGraphics3D* g3d, 
-					      bool settings)
-{
-  if (settings != currentSettings)
-  {
-    if (settings)
-    {
-      if (zOffset)
-	g3d->EnableZOffset ();
-      g3d->SetZMode (zmode);
-    }
-    else
-    {
-      if (zOffset)
-	g3d->DisableZOffset ();
-    }
-    currentSettings = settings;
-  }
-}
-
-void csGenericRenderStep::Perform (iRenderView* rview, iSector* sector,
-				   iLight* light,
-                                   CS_SHADERVAR_STACK &stacks)
-{
-  Perform (rview, sector, stacks);
 }
 
 void csGenericRenderStep::SetShaderType (const char* type)

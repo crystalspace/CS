@@ -51,6 +51,10 @@ chronological order.
 	  is set. This was done to allow the removal of the implicitly set
 	  OR compatibility shader.
 	- res virtualized some methods in the standard proctex plugin.
+	- res augmented csRenderMeshList with a method to remove all meshes
+	  outside a sphere.
+	- res changed the generic renderstep to not draw meshes that are 
+	  outside the influence of the light passed in.
 27-Mar-2004
 	- Anders Stenberg did the following NR changes:
 	    - Added the possibility to route Cg programs through
