@@ -49,11 +49,8 @@ csPtr<iConfigFile> csGetPlatformConfig(const char* key)
   }
 
   // create/read a config file
-  csRef<csConfigFile> configfile = csPtr<csConfigFile> (new csConfigFile);
-  if (!configfile->Load(fname)) {
-    fprintf(stderr, "couldn't create configfile '%s'.\n", fname);
-    return 0;
-  }
+  csRef<csConfigFile> configfile 
+      = csPtr<csConfigFile> (new csConfigFile(fname));
     
   return csPtr<iConfigFile> (configfile);
 }
