@@ -183,7 +183,7 @@ void PerfTest::NextFrame ()
 	  current_tester->Setup (G3D, this);
 	}
 	else
-	  StartShutdown ();
+	  Shutdown = true;
       }
     }
   }
@@ -192,7 +192,7 @@ void PerfTest::NextFrame ()
   if (needs_setup)
   {
     if (!G3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
-    Console->Clear ();
+    if (Console) Console->Clear ();
     last_time = current_time;
     char desc[255];
     current_tester->Description (desc);
@@ -213,7 +213,7 @@ bool PerfTest::HandleEvent (csEvent &Event)
 
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
-    StartShutdown ();
+    Shutdown = true;
     return true;
   }
   else if ((Event.Type == csevKeyDown) && (Event.Key.Code == ' '))
