@@ -28,6 +28,14 @@ chronological order.
 	- Jorrit reverted an earlier memory leak fix in the DDS loader
 	  because it causes walktest to crash. My guess is that this is not
 	  really a memory leak and that the image is cleaned up elsewhere.
+	- Eric Sunshine changed the 'outdir' argument of the Swig rule
+	  (swig.jam) so that it is used verbatim, rather than being interpreted
+	  as relative to $(LOCATE_TARGET). This allows more flexibility in
+	  placement of auxilliary generated files.
+	- Eric Sunshine augmented Perl and Python Jamfiles so that the *.pm and
+	  *.py files are emitted by Swig directly into $(LOCATE.TARGETS),
+	  rather than being copied there from $(LOCATE_TARGET) in a secondary
+	  step.
 21-Oct-2004
 	- Eric Sunshine made the following changes to the DDS image loader:
 	    - Fixed bug in dds::Loader::ReadHeader() where it could/would

@@ -7,6 +7,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   #--------
   local common = cs_pyth.cpp ;
   local cspacepy = [ DoSourceGrist cspace.py ] ;
+  MakeLocate $(cspacepy) : $(LOCATE.TARGETS) ;
 
   if ! [ Property build : projgen ]
   {
@@ -20,22 +21,21 @@ if $(PYTHON.AVAILABLE) = "yes"
 	-c++ -shadow :
 	[ ConcatDirs $(TOP) include ] :
 	[ ConcatDirs $(TOP) include ivaria ] :
-	$(SEARCH_SOURCE) [ ConcatDirs $(TOP) scripts python ] ;
+	$(SEARCH_SOURCE) [ ConcatDirs $(TOP) scripts python ] :
+	:
+	[ on $(cspacepy) GetVar LOCATE ] ;
       Depends cspythonclean : pythonswigclean ;
-      SEARCH on $(cspacepy) = $(LOCATE_TARGET) ;
     }
     else
     {
       SEARCH on $(common) = $(SEARCH_SOURCE) ;
-      SEARCH on $(cspacepy) = [ ConcatDirs $(TOP) scripts python ] ;
+      local frozenpy = $(cspacepy:G=frozencspacepy) ;
+      SEARCH on $(frozenpy) = [ ConcatDirs $(TOP) scripts python ] ;
+      Copy $(cspacepy) : $(frozenpy) ;
+      Depends $(cspacepy) : $(frozenpy) ;
     }
   }
-
-  local cspacepyfinal = $(cspacepy:G=final) ;
-  MakeLocate $(cspacepyfinal) : $(LOCATE.TARGETS) ;
-  Copy $(cspacepyfinal) : $(cspacepy) ;
-  Depends $(cspacepyfinal) : $(cspacepy) ;
-  Clean cspythonclean : $(cspacepyfinal) ;
+  Clean cspythonclean : $(cspacepy) ;
 
   rule InstallCSPythonPY
   {
@@ -43,7 +43,7 @@ if $(PYTHON.AVAILABLE) = "yes"
     local SUBDIR = [ on $(<) GetVar LOCATE ] ;
     InstallData $(<) : $(>) ;
   }
-  InstallCSPythonPY $(cspacepyfinal) : python ;
+  InstallCSPythonPY $(cspacepy) : python ;
 
 
   #--------
@@ -57,7 +57,7 @@ if $(PYTHON.AVAILABLE) = "yes"
     [ FDefines SWIG_GLOBAL ]
     $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) 
     $(COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED) ;
-  Depends cspython : $(cspacepyfinal) ;
+  Depends cspython : $(cspacepy) ;
 
 
   #--------
@@ -93,7 +93,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   CFlags pythmod : $(PLUGIN.CFLAGS) ;
   LFlags pythmod : $(PLUGIN.LFLAGS) $(LINKLIBS) ;
   NotFile pythmod ;
-  Depends pythmod : $(cspacepyfinal) ;
+  Depends pythmod : $(cspacepy) ;
   Depends pythmod : $(pythmod) ;
   Depends plugins : pythmod ;
   MakeLocate $(pythmod) : $(LOCATE.TARGETS) ;

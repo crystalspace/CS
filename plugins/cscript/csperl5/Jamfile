@@ -43,6 +43,7 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
   local targetdir ;
   local target = [ FGristFiles cswigpl5.inc ] ;
   local pmfile = [ FGristFiles cspace.pm ] ;
+  MakeLocate $(pmfile) : $(LOCATE.TARGETS) ;
 
   if $(CMD.SWIG)
   {
@@ -52,23 +53,22 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
       -c++ -shadow -const -module cspace :
       [ ConcatDirs $(TOP) include ] :
       [ ConcatDirs $(TOP) include ivaria ] :
-      [ ConcatDirs $(TOP) scripts perl5 ] ;
+      [ ConcatDirs $(TOP) scripts perl5 ] :
+      :
+      [ on $(pmfile) GetVar LOCATE ] ;
     Depends csperl5clean : perl5swigclean ;
     targetdir = $(LOCATE_TARGET) ;
-    SEARCH on $(pmfile) = $(targetdir) ;
   }
   else
   {
     targetdir = [ ConcatDirs $(TOP) scripts perl5 ] ;
     SEARCH on $(target) = $(targetdir) ;
-    SEARCH on $(pmfile) = $(targetdir) ;
+    local frozenpm = $(pmfile:G=frozenpm) ;
+    SEARCH on $(frozenpm) = $(targetdir) ;
+    Copy $(pmfile) : $(frozenpm) ;
+    Depends $(pmfile) : $(frozenpm) ;
   }
-
-  local pmfilefinal = $(pmfile:G=final) ;
-  MakeLocate $(pmfilefinal) : $(LOCATE.TARGETS) ;
-  Copy $(pmfilefinal) : $(pmfile) ;
-  Depends $(pmfilefinal) : $(pmfile) ;
-  Clean csperl5clean : $(pmfilefinal) ;
+  Clean csperl5clean : $(pmfile) ;
 
   local perlxs = [ FGristFiles csperlxs.c ] ;
   PerlEmbedGlueFile $(perlxs) ;
@@ -82,7 +82,7 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
     [ FIncludes $(targetdir) ]
     $(COMPILER.C++FLAGS.WARNING.NO_UNUSED)
     $(COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED) ;
-  Depends csperl5 : $(pmfilefinal) ;
+  Depends csperl5 : $(pmfile) ;
 
   rule InstallCSPerl5PM
   {
@@ -90,7 +90,7 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
     local SUBDIR = [ on $(<) GetVar LOCATE ] ;
     InstallData $(<) : $(>) ;
   }
-  InstallCSPerl5PM $(pmfilefinal) : perl5 ;
+  InstallCSPerl5PM $(pmfile) : perl5 ;
 
 
   # Note that '__EOF__' is purposely quoted to prevent shell from intrepreting

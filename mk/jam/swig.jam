@@ -82,11 +82,12 @@ if $(CMD.SWIG)
   ##   are copied to that directory.  If it contains two elements, then the
   ##   first element of `targets' is copied to the first element of
   ##   `frozentargdirs', and all remaining elements of `targets' are copied to
-  ##   the second element of `frozentargdirs'. `outdir', if provided, specifies
-  ##   a subdirectory relative to $(LOCATE_TARGET) in which Swig should place
-  ##   the language-specific support files. This might be useful, for instance,
-  ##   when Swig is in Java mode, and the .java files must be placed in a
-  ##   directory hierarchy which reflects the full package name.
+  ##   the second element of `frozentargdirs'. `outdir', if provided, is a list
+  ##   of path components which specify a subdirectory in which Swig should
+  ##   place the language-specific support files, rather than placing them in
+  ##   $(LOCATE_TARGET).  This might be useful, for instance, when Swig is in
+  ##   Java mode, and the .java files must be placed in a directory hierarchy
+  ##   which reflects the full package name.
   rule Swig
   {
     local target = $(1[1]) ;
@@ -108,7 +109,14 @@ if $(CMD.SWIG)
     MakeLocate $(target) : $(LOCATE_TARGET) ;
     if $(othertargets)
     {
-      MakeLocate $(othertargets) : $(LOCATE_TARGET) ;
+      if $(outdir)
+      {
+        MakeLocate $(othertargets) : $(outdir) ;
+      }
+      else
+      {
+        MakeLocate $(othertargets) : $(LOCATE_TARGET) ;
+      }
       # If any target, such as an install target, depends upon the other files,
       # we force them to be built with a dependency upon the target.
       Depends $(othertargets) : $(target) ;
@@ -116,7 +124,7 @@ if $(CMD.SWIG)
 
     SWIG.FLAGS on $(target) +=
       $(SWIG.FLAGS) -$(language) $(swigflags) -I$(swigincdirs)
-      -outdir [ ConcatDirs $(LOCATE_TARGET) $(outdir) ] ;
+      -outdir [ ConcatDirs $(outdir) ] ;
 
     # Allow Swig input file to reside at location other than $(SEARCH_SOURCE).
     if $(swigfiledir)
