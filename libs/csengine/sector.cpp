@@ -1089,11 +1089,26 @@ bool csSector::BlockingThings (csVector3& start, csVector3& end, csPolygon3D** p
   // Check all the things in the current sector.
   csVector3 isect2;
   csPolygon3D* p;
+  csPortal* po;
+  void* rc = NULL;
   csThing* sp = first_thing;
   while (sp)
   {
     p = sp->IntersectSegment (start, end, isect2);
-    if (p) { if (poly) *poly = p; return true; }
+    if (p)
+    {
+      po = p->GetPortal ();
+      if (po)
+      {
+        rc = (void*)po->BlockingThings (start, end, poly);
+        if (rc) return true;
+      }
+      else
+      {
+        if (poly) *poly = p;
+	return true;
+      }
+    }
     sp = (csThing*)(sp->GetNext ());
   }
 
@@ -1101,7 +1116,6 @@ bool csSector::BlockingThings (csVector3& start, csVector3& end, csPolygon3D** p
   BeamInfo beam;
   beam.start = start;
   beam.end = end;
-  void* rc = NULL;
 
   beam_busy++;
 
