@@ -59,7 +59,9 @@ $(OUT)/%$O: plugins/sound/loader/mod/%.cpp
 	$(DO.COMPILE.CPP) $(MIKMOD.CFLAGS)
 
 $(SNDMOD): $(OBJ.SNDMOD) $(LIB.SNDMOD)
-	$(DO.PLUGIN) $(MIKMOD.LFLAGS)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(MIKMOD.LFLAGS) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 clean: sndmodclean
 sndmodclean:

@@ -45,8 +45,8 @@ SRC.ODEDYNAM = $(wildcard plugins/physics/odedynam/*.cpp)
 OBJ.ODEDYNAM = $(addprefix $(OUT)/,$(notdir $(SRC.ODEDYNAM:.cpp=$O)))
 DEP.ODEDYNAM = CSGEOM CSUTIL CSSYS
 
-MSVC.DSP += odedynam
-DSP.ODEDYNAM.NAME = ODEDYNAM
+MSVC.DSP += ODEDYNAM
+DSP.ODEDYNAM.NAME = odedynam
 DSP.ODEDYNAM.TYPE = plugin
 DSP.ODEDYNAM.LIBS = ode
 
@@ -61,8 +61,15 @@ odedynam: $(OUTDIRS) $(ODEDYNAM)
 $(OUT)/%$O: plugins/physics/odedynam/%.cpp
 	$(DO.COMPILE.CPP) $(ODE.CFLAGS)
 
+<<<<<<< odedynam.mak
 $(ODEDYNAM): $(OBJ.ODEDYNAM) $(LIB.ODEDYNAM)
 	$(DO.PLUGIN) $(ODE.LFLAGS)
+=======
+$(ODEDYNAM): $(OBJ.ODEDYNAM) $(LIB.ODEDYNAM)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(ODE.LFLAGS) \
+	$(DO.PLUGIN.POSTAMBLE)
+>>>>>>> 1.8
 
 clean: odedynamclean
 odedynamclean:

@@ -78,7 +78,9 @@ ifeq ($(MAKESECTION),targets)
 sndoal: $(OUTDIRS) $(SNDOAL)
 
 $(SNDOAL): $(OBJ.SNDOAL) $(LIB.SNDOAL)
-	$(DO.PLUGIN) $(OPENAL.LFLAGS)
+	$(DO.PLUGIN.PREAMBLE) \
+	$(DO.PLUGIN.CORE) $(OPENAL.LFLAGS) \
+	$(DO.PLUGIN.POSTAMBLE)
 
 $(OUT)/%$O: plugins/sound/renderer/openal/%.cpp
 	$(DO.COMPILE.CPP) $(OPENAL.CFLAGS)
