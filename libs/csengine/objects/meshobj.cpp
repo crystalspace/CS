@@ -465,8 +465,14 @@ void csMeshWrapper::DrawIntFull (iRenderView *rview)
       {
 	meshobj->NextFrame (lt, movable.GetPosition ());
 	last_anim_time = lt;
-	if(GetParentContainer() != 0)
-	  GetParentContainer()->GetMeshObject()->PositionChild(meshobj,lt);
+        iMeshWrapper* lastparent = meshwrap;
+	iMeshWrapper* parent = GetParentContainer();
+	while(parent != 0)
+	{
+	  parent->GetMeshObject()->PositionChild(lastparent->GetMeshObject(),lt);
+	  lastparent = parent;
+	  parent = parent->GetParentContainer();
+	}
       }
     }
 
