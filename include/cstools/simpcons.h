@@ -26,7 +26,7 @@
 #include "csutil/scf.h"
 
 struct iTextureManager;
-
+struct iCursor;
 class csRect;
 class csIniFile;
 
@@ -142,6 +142,10 @@ public:
   virtual void SetFontID(int FontID) { console_font = FontID; }
   virtual int GetTopLine() const { /* Not supported */ return -1; }
   virtual void ScrollTo(int, bool = true) { /* Not supported */ }
+  virtual void GetCursorPos(int &, int &) const { /* Not supported */ }
+  virtual void SetCursorPos(int, int) { /* Not supported */ }
+  virtual int GetCursorStyle(bool &, iCursor ** = NULL) const { /* Not supported */ return -1; }
+  virtual void SetCursorStyle(int, bool = true, iCursor * = NULL) { /* Not supported */ }
 
 private:
   /// Time left until messages will scroll up

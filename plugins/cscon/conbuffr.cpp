@@ -25,6 +25,7 @@ csConsoleBuffer::csConsoleBuffer(int length, int size)
   buffer = NULL;
   SetLength(length);
   SetPageSize(size);
+  empty = new csString(" ");
 }
 
 csConsoleBuffer::~csConsoleBuffer()
@@ -34,14 +35,15 @@ csConsoleBuffer::~csConsoleBuffer()
     Clear();
     delete buffer;
     delete dirty;
+    delete empty;
   }
 }
 
 void csConsoleBuffer::NewLine(bool snap)
 {
-  // Create an "empty" display string to avoid NULL pointer ugliness
+  // Assign the empty display string to avoid NULL pointer ugliness
   if(buffer[current_line]==NULL)
-    buffer[current_line] = new csString(' ');
+    buffer[current_line] = empty;
   
   // Increment the current line and account for going past the end of the buffer
   current_line++;
@@ -67,13 +69,13 @@ void csConsoleBuffer::NewLine(bool snap)
     dirty[current_line] = true;
   }
 
-  if(snap&&((current_line>display_bottom)||(current_line<=display_top))) {
-    display_top = (current_line - page_size) % len;
+  if(snap&&((current_line>=display_bottom)||(current_line<=display_top))) {
+    display_top = current_line - page_size + 1;
     if(display_top<0) {
       display_top = 0;
       display_bottom = page_size;
     } else
-      display_bottom = current_line;
+      display_bottom = current_line + 1;
 
     // Invalidate all the lines now visible to scroll properly
     int i;
@@ -86,7 +88,7 @@ void csConsoleBuffer::NewLine(bool snap)
 csString *csConsoleBuffer::WriteLine()
 {
   // Prevent any NULL pointer ugliness
-  if(buffer[current_line]==NULL)
+  if(buffer[current_line]==NULL||(buffer[current_line]==empty))
     buffer[current_line] = new csString();
   dirty[current_line] = true;
   return buffer[current_line];
@@ -94,12 +96,13 @@ csString *csConsoleBuffer::WriteLine()
 
 const csString *csConsoleBuffer::GetLine(int line, bool &dirty_line)
 {
-  // Calculate the position of the line
-  int pos = (display_top + line) % len;
 
   // Tsk tsk...
-  if(pos>display_bottom)
+  if(line>display_bottom)
     return NULL;
+
+  // Calculate the position of the line
+  int pos = display_top + line;
 
   // Return the current dirty flag
   dirty_line = dirty[pos];
@@ -143,7 +146,8 @@ void csConsoleBuffer::Clear()
   // Go through each line and delete it's csString
   for(i = 0; i<len; i++) {
     if(buffer[i]) {
-      delete buffer[i];
+      if(buffer[i]!=empty)
+	delete buffer[i];
       buffer[i] = NULL;
       dirty[i] = true;
     }
@@ -159,12 +163,12 @@ void csConsoleBuffer::SetPageSize(int size)
 {
   // Set the page size and force a snap to the current line
   page_size = size;
-  display_top = current_line - size;
+  display_top = current_line - size + 1;
   if(display_top<0) {
     display_top = 0;
     display_bottom = page_size;
   } else
-    display_bottom = current_line;
+    display_bottom = current_line + 1;
 }
 
 void csConsoleBuffer::SetTopLine(int line)

@@ -47,7 +47,7 @@ private:
   int display_bottom;
   int current_line;
 
-  csString **buffer;
+  csString **buffer, *empty;
   bool *dirty;
 
 };

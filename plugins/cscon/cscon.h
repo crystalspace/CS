@@ -25,6 +25,7 @@
 
 struct iGraphics2D;
 struct iTextureManager;
+struct iCursor;
 class csConsoleBuffer;
 
 class csConsole : public iConsole
@@ -58,14 +59,20 @@ public:
   virtual void SetFontID(int FontID);
   virtual int GetTopLine() const;
   virtual void ScrollTo(int topline, bool snap = true);
+  virtual void GetCursorPos(int &x, int &y) const;
+  virtual void SetCursorPos(int x, int y);
+  virtual int GetCursorStyle(bool &flashing, iCursor **custom = NULL) const;
+  virtual void SetCursorStyle(int style, bool flashing = true, iCursor *custom = NULL);
 
 protected:
   csConsoleBuffer *buffer;
-  bool transparent, do_snap;
+  bool transparent, do_snap, flash_cursor, do_flash;
   iGraphics2D *piG2D;
   iSystem *piSystem;
   csRect size, invalid;
-  int font;
+  int font, cursor, cx, cy;
+  iCursor *custom_cursor;
+  int flash_time;
 
   typedef struct {
     int red;

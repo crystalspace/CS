@@ -25,6 +25,7 @@
 
 class csRect;
 struct iTextureManager;
+struct iCursor;
 
 /// These constants are for use with the ScrollTo() member function below
 enum ScrollConst
@@ -33,6 +34,14 @@ enum ScrollConst
   csConPageDown = -2,
   csConVeryTop = -3,
   csConVeryBottom = -4
+};
+
+enum CursorConst
+{
+  csConNoCursor = 0,
+  csConLineCursor,
+  csConBlockCursor,
+  csConCustomCursor
 };
 
 /**
@@ -109,6 +118,22 @@ struct iConsole : public iPlugIn
    * when a new line is printed
    */
   virtual void ScrollTo(int topline, bool snap = true) = 0;
+
+  /// Retrieve the cursor position in text coordinates
+  virtual void GetCursorPos(int &x, int &y) const = 0;
+  /// Set the cursor position in text coordinates
+  virtual void SetCursorPos(int x, int y) = 0;
+  /**
+   * Retrieve the cursor style, and if it's a custom cursor 
+   * and custom is not NULL, it will return the texture handle
+   * of the cursor.  Also returns whether the cursor flashes
+   */
+  virtual int GetCursorStyle(bool &flashing, iCursor **custom = NULL) const = 0;
+  /**
+   * Assign the cursor style, whether it flashes, and if custom,
+   * assign the iCursor object to use.
+   */
+  virtual void SetCursorStyle(int style, bool flashing = true, iCursor *custom = NULL) = 0;
 
 };
 

@@ -23,6 +23,9 @@
 #include "iplugin.h"
 #include "csutil/scf.h"
 
+struct iConsole;
+class csString;
+
 SCF_VERSION(iConsoleInput, 0, 0, 1);
 struct iConsoleInput : public iPlugIn
 {
@@ -33,13 +36,30 @@ struct iConsoleInput : public iPlugIn
   virtual bool HandleEvent(csEvent &Event) = 0;
 
   /// Return a line from the input buffer (-1 = current line)
-  virtual csString *GetInput(int line = -1) = 0;
+  virtual const csString *GetInput(int line = -1) const = 0;
 
   /// Return the current input line number
   virtual int GetCurLine() const = 0;
 
   /// Save the current line in history and create a new input line
   virtual void NewLine() = 0;
+
+  /// Retrieve the size of the history buffer
+  virtual int GetBufferSize() const = 0;
+
+  /// Set the size of the history buffer;
+  virtual void SetBufferSize(int size) = 0;
+
+  /// Clear the history buffer
+  virtual void Clear() = 0;
+
+  /// Returns true if the input is being echoed to a console
+  virtual bool GetEcho() const = 0;
+
+  /** Set console echo and optionally, the target console
+   * The console is queried from the system if NULL.
+   */
+  virtual void SetEcho(bool echo, iConsole *console = NULL) = 0;
 
 };
 
