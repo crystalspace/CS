@@ -45,7 +45,7 @@ TO_INSTALL.CONFIG += $(CFG.RLE)
 TO_INSTALL.DATA +=
 
 MSVC.DSP += RLE
-DSP.RLE.NAME = rle
+DSP.RLE.NAME = rlecodec
 DSP.RLE.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
