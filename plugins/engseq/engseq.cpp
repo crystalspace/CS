@@ -1314,12 +1314,18 @@ public:
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE_EXT(csSequenceWrapper)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iSequenceWrapper)
+SCF_IMPLEMENT_IBASE (csEngineSequenceParameters)
+  SCF_IMPLEMENTS_INTERFACE (iEngineSequenceParameters)
+SCF_IMPLEMENT_IBASE_END
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE_EXT (csSequenceWrapper)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iSequenceWrapper)
 SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csSequenceWrapper::SequenceWrapper)
-  SCF_IMPLEMENTS_INTERFACE(iSequenceWrapper)
+  SCF_IMPLEMENTS_INTERFACE (iSequenceWrapper)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csSequenceWrapper::csSequenceWrapper (csEngineSequenceManager* eseqmgr,
@@ -1332,6 +1338,22 @@ csSequenceWrapper::csSequenceWrapper (csEngineSequenceManager* eseqmgr,
 
 csSequenceWrapper::~csSequenceWrapper ()
 {
+}
+
+iEngineSequenceParameters* csSequenceWrapper::CreateParameterBlock ()
+{
+  params = csPtr<csEngineSequenceParameters> (new csEngineSequenceParameters ());
+  return params;
+}
+
+csPtr<iEngineSequenceParameters> csSequenceWrapper::GetParameterBlock ()
+{
+  if (!params) return NULL;
+  csEngineSequenceParameters* copyparams = new csEngineSequenceParameters ();
+
+  // Do the copy...
+
+  return csPtr<iEngineSequenceParameters> (copyparams);
 }
 
 void csSequenceWrapper::AddOperationSetPolygonMaterial (csTicks time,

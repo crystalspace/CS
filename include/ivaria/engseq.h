@@ -38,7 +38,7 @@ class csVector3;
 class csBox3;
 class csSphere;
 
-SCF_VERSION (iEngineSequenceParameters, 0, 0, 1);
+SCF_VERSION (iEngineSequenceParameters, 0, 0, 2);
 
 /**
  * An interface for passing on parameters to the engine sequence
@@ -60,9 +60,29 @@ struct iEngineSequenceParameters : public iBase
    * Get a parameter by name.
    */
   virtual iBase* GetParameter (const char* name) const = 0;
+
+  /**
+   * Get a parameter index by name.
+   */
+  virtual int GetParameterIdx (const char* name) const = 0;
+
+  /**
+   * Add a parameter.
+   */
+  virtual void AddParameter (const char* name, iBase* def_value = NULL) = 0;
+
+  /**
+   * Set a parameter by index.
+   */
+  virtual void SetParameter (int idx, iBase* value) = 0;
+
+  /**
+   * Set a parameter by name.
+   */
+  virtual void SetParameter (const char* name, iBase* value) = 0;
 };
 
-SCF_VERSION (iSequenceWrapper, 0, 1, 0);
+SCF_VERSION (iSequenceWrapper, 0, 1, 1);
 
 /**
  * A sequence wrapper. This objects holds the reference
@@ -83,6 +103,28 @@ struct iSequenceWrapper : public iBase
    * through the regular iSequence->AddOperation().
    */
   virtual iSequence* GetSequence () = 0;
+
+  /**
+   * Create a parameter block for this sequence wrapper. After
+   * creating this you can initialized the parameters (with names
+   * and optional default values). Later on you can use
+   * GetSequenceParameters() to get a copy of a parameter block to
+   * use for running a sequence.
+   */
+  virtual iEngineSequenceParameters* CreateParameterBlock () = 0;
+
+  /**
+   * Get a parameter block which you can then fill in and then
+   * give as a parameter running this sequence. This essentially
+   * creates a copy of the parameter block created with
+   * CreateParameterBlock(). Modifications on the parameter block
+   * returned by this function have no effect on the parameter block
+   * which is kept internally. You should only set the values
+   * of the given parameter block and not create/remove variables.
+   * This function returns NULL if there is no parameter block
+   * for this sequence.
+   */
+  virtual csPtr<iEngineSequenceParameters> GetParameterBlock () = 0; 
 
   /**
    * Operation: set a material on a mesh.

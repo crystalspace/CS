@@ -32,6 +32,30 @@ struct iObjectRegistry;
 class csEngineSequenceManager;
 
 /**
+ * Implementation of iEngineSequenceParameters.
+ */
+class csEngineSequenceParameters : public iEngineSequenceParameters
+{
+private:
+
+public:
+  csEngineSequenceParameters ()
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+  }
+
+  SCF_DECLARE_IBASE;
+
+  virtual int GetParameterCount () const { return 0; }
+  virtual iBase* GetParameter (int idx) const { return NULL; }
+  virtual iBase* GetParameter (const char* name) const { return NULL; }
+  virtual int GetParameterIdx (const char* name) const { return -1; }
+  virtual void AddParameter (const char* name, iBase* def_value = NULL) { }
+  virtual void SetParameter (int idx, iBase* value) { }
+  virtual void SetParameter (const char* name, iBase* value) { }
+};
+
+/**
  * Wrapper for a sequence. Implements iSequenceWrapper.
  */
 class csSequenceWrapper : public csObject
@@ -39,12 +63,17 @@ class csSequenceWrapper : public csObject
 private:
   csRef<iSequence> sequence;
   csEngineSequenceManager* eseqmgr;
+  csRef<csEngineSequenceParameters> params;
 
 public:
   csSequenceWrapper (csEngineSequenceManager* eseqmgr, iSequence* sequence);
   virtual ~csSequenceWrapper ();
 
   iSequence* GetSequence () { return sequence; }
+
+  iEngineSequenceParameters* CreateParameterBlock ();
+  csPtr<iEngineSequenceParameters> GetParameterBlock ();
+
   void AddOperationSetMaterial (csTicks time, iMeshWrapper* mesh,
 		  iMaterialWrapper* mat);
   void AddOperationSetPolygonMaterial (csTicks time, iPolygon3D* polygon,
@@ -143,6 +172,14 @@ public:
     virtual iSequence* GetSequence ()
     {
       return scfParent->GetSequence ();
+    }
+    virtual iEngineSequenceParameters* CreateParameterBlock ()
+    {
+      return scfParent->CreateParameterBlock ();
+    }
+    virtual csPtr<iEngineSequenceParameters> GetParameterBlock ()
+    {
+      return scfParent->GetParameterBlock ();
     }
     virtual void AddOperationSetPolygonMaterial (csTicks time,
     		  iPolygon3D* polygon, iMaterialWrapper* mat)

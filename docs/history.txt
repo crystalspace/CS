@@ -3,6 +3,8 @@ The history order is reversed so that new features are at the top.
 3-Oct-2002
 	- Finalized the implementation of the indexed operations in the
 	  engine sequence manager.
+	- Started work on actually being able to pass parameters to
+	  sequences.
 2-Oct-2002
 	- Cleaned up new thing smoothing code (code style, please people
 	  a tab == 8 spaces but indentation MUST be with 2 spaces!!!).
