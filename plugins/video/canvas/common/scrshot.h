@@ -67,7 +67,7 @@ public:
   virtual UByte *GetAlpha ()
   { return NULL; }
   /// Change image format
-  virtual void SetFormat (int iFormat)
+  virtual void SetFormat (int /*iFormat*/)
   { }
   /// Create yet another image and copy this one into the new image.
   virtual iImage *Clone ()

@@ -55,10 +55,13 @@ void csShadowMap::MipmapLightMap (int w, int h, int lms, csShadowMap* source,
   int lh = 1 + (h + lms - 1) / lms;
   int lw2 = (w2 + lms2 - 1) / lms2;
   int lh2 = (h2 + lms2 - 1) / lms2;
-  int u, v, uv, uv2;
+  int u, v;
 
-  uv = 0;
+  int uv = 0;
+  int uv2 = 0;
+
   for (v = 0; v < lh; v++)
+  {
     for (u = 0; u < lw; u++)
     {
       if (2 * u >= lw2 || 2 * v >= lh2)
@@ -69,10 +72,12 @@ void csShadowMap::MipmapLightMap (int w, int h, int lms, csShadowMap* source,
           uv2 = (lh2 - 1) * lw2 + 2 * u;
       }
       else
+      {
         uv2 = 2 * v * lw2 + 2 * u;
-
+      }
       map [uv++] = source->map [uv2];
     }
+  }
 
   light = source->light;
 }

@@ -209,6 +209,10 @@ void csTextureCacheSoftware::use_texture (iPolygonTexture* pt)
 void csTextureCacheSoftware::show_lightmap_grid (csBitSet *dirty,
   iPolygonTexture *pt, void *dst, csTextureManagerSoftware *texman)
 {
+  (void) dirty;
+  (void) pt;
+  (void) dst;
+  (void) texman;
 #if 0
   // not converted yet
 

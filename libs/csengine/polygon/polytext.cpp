@@ -896,8 +896,18 @@ void csPolyTexture::FillLightMap (csLightView& lview)
 void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
 {
   // @@@ DON'T NEED TO GO TO 'W', 'W_ORIG' SHOULD BE SUFFICIENT!
-  int lw = 1 + (w_orig + mipmap_size - 1) >> mipmap_shift;
-  int lh = 1 + (h + mipmap_size - 1) >> mipmap_shift;
+
+  //thieber: I added some parentheses, to change operator precedence.
+  //         originally the term looked like this:
+  //         1 + (w_orig + mipmap_size - 1) >> mipmap_shift;
+  //         in C++ that is the same as 
+  //         1 + w_orig + mipmap_size - 1 >> mipmap_shift;
+  //         So I assume, the version below is, what was really
+  //         intended. The autor of that routine should remove
+  //         this comment, when he has confirmed, that it is
+  //         correct, or add some own parentheses. Feb. 25th, 2000
+  int lw = 1 + ((w_orig + mipmap_size - 1) >> mipmap_shift);
+  int lh = 1 + ((h + mipmap_size - 1) >> mipmap_shift);
 
   int u, uv;
 
