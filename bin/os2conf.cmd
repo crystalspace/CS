@@ -171,7 +171,7 @@
       " be able to re-build automatically-generated documentation files"NL,
       " ('make doc' and 'make api' targets)";
 
-  call saycon ANSI.LGREEN"Checking for suitable version of installed makedep"
+  call saycon ANSI.LGREEN"Checking for suitable version of installed makedep ..."
   if (SysSearchPath("PATH", "makedep.exe") \= "") then
   do
     "makedep -V | rxqueue 2>nul"
@@ -183,8 +183,22 @@
         version = substr(var, verpos + length("VERSION "));
     end;
     if (version >= "0.0.1") then
+    do
       say 'DEPEND_TOOL.INSTALLED = yes';
+      call saycon ANSI.LCYAN||"      found"
+    end;
   end;
+
+  call saycon ANSI.LGREEN"Checking whenever OpenGL toolkit is installed ..."
+  if (SysSearchPath("LIBRARY_PATH", "opengl.lib") \= "") then
+  do
+    say 'DRIVERS.SYSTEM += cs2d/openglos2 cs3d/opengl';
+    call saycon ANSI.LCYAN||"      found"
+  end
+  else
+    call problem "low",
+      "OpenGL library has not been found along your LIBRARY_PATH. You"NL,
+      " won't be able to build OpenGL renderer and OpenGL 2D drivers for OS/2";
 
   /* Restore console color to gray */
   call outcon ANSI.LGRAY;
