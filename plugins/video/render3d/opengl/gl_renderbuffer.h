@@ -352,7 +352,6 @@ protected:
     else vertexBuffer.TouchSlot (slot);
   }
 
-
   struct csGLVBOBuffer
   {
     GLuint vboID;
@@ -453,9 +452,10 @@ protected:
     // List of slots
     slotList slots[VBO_NUMBER_OF_SLOTS];
   };
+  friend struct csGLVBOBuffer; // Borland: For access to VBO_NUMBER_OF_SLOTS.
 
-  csGLVBOBuffer vertexBuffer; //list of all VBO buffers for VB storage
-  csGLVBOBuffer indexBuffer; //list of all VBO buffers for IB storage
+  csGLVBOBuffer vertexBuffer; // List of all VBO buffers for VB storage.
+  csGLVBOBuffer indexBuffer;  // List of all VBO buffers for IB storage.
 
   void ParseByteSize (const char* sizeStr, size_t& size);
 

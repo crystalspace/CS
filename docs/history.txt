@@ -36,6 +36,9 @@ chronological order.
 	  Swig/Java bug where it generates incompatible return types for
 	  methods between base classes and subclasses. (For instance,
 	  `SWIGTYPE_void iFoo::Bar()' and `SWIGTYPE_p_void csFoo::Bar()'.)
+	- Eric Sunshine applied fix to opengl/gl_renderbuffer.h for Borland to
+	  make csGLVBOBufferManager::VBO_NUMBER_OF_SLOTS accessible to
+	  csGLVBOBufferManager::slotList.
 1-Feb-2005
 	- Jorrit reverted a bug fix in engine->GetNearbyObjects() and
 	  GetNearbyMeshes() that was done on 15-Jan. The problem is that this
