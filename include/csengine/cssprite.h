@@ -841,7 +841,7 @@ public:
    * If the sprite is not on-screen, the X and Y values are
    * not valid.
    */
-  float GetScreenBoundingBox (const csCamera& camtrans, csBox2& boundingBox);
+  float GetScreenBoundingBox (const csCamera& camtrans, csBox2& boundingBox, csBox3 &bbox3);
 
   /**
    * Draw this sprite given a camera transformation.
@@ -887,8 +887,8 @@ public:
     csSpriteAction *act;
     if ((act = tpl->FindAction (name)) != NULL)
     {
-      SetFrame (0);
       cur_action = act;
+      SetFrame (0);
       return true;
     }
     return false;
