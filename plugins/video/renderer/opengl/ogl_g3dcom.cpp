@@ -3553,13 +3553,24 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   glBindTexture (GL_TEXTURE_2D, texturehandle);
   float alpha = 1.0f - BYTE_TO_FLOAT (poly.mixmode & CS_FX_MASK_ALPHA);
   alpha = SetupBlend (poly.mixmode, alpha, tex_transp);
-  if (poly.mixmode & CS_FX_MASK_ALPHA)
+  if (ARB_texture_env_combine)
   {
-    float flat_r = 1.0, flat_g = 1.0, flat_b = 1.0;
-    glColor4f (flat_r, flat_g, flat_b, alpha);
+    float c[4] = {1.0, 1.0, 1.0, alpha};
+    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
+    glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_REPLACE);
+    glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_MODULATE);
+
+    glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_TEXTURE);
+    glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_TEXTURE);
+    glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE1_ALPHA_ARB, GL_CONSTANT_ARB);
+    glTexEnvfv (GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, c);
+    
   }
+  else if (poly.mixmode & CS_FX_MASK_ALPHA)
+    glColor4f (1.0, 1.0, 1.0, alpha);
   else
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
 
   csLMCacheData *lightmapcache_data = (csLMCacheData *)thelightmap->GetCacheData ();
   GLuint lightmaphandle = lightmapcache_data->Handle;
@@ -3570,6 +3581,19 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   glBindTexture (GL_TEXTURE_2D, lightmaphandle);
 
   SetGLZBufferFlags (z_buf_mode);
+
+  if (ARB_texture_env_combine)
+  {
+    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE_ARB);
+    glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE);
+    glTexEnvi (GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, GL_REPLACE);
+
+    glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_RGB_ARB, GL_TEXTURE);
+    glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE1_RGB_ARB, GL_PREVIOUS_ARB);
+    glTexEnvi (GL_TEXTURE_ENV, GL_SOURCE0_ALPHA_ARB, GL_PREVIOUS_ARB);
+
+    glTexEnvf (GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 2.0);
+  }
 
   float lm_scale_u = lightmapcache_data->lm_scale_u;
   float lm_scale_v = lightmapcache_data->lm_scale_v;
