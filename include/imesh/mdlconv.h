@@ -26,7 +26,7 @@ struct iDataBuffer;
 
 SCF_VERSION (iModelConverter, 0, 0, 1);
 
-struct iModelConverter
+struct iModelConverter : public iBase
 {
   /// Return the number of supported formats
   virtual int GetFormatCount () = 0;

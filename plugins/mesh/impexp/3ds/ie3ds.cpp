@@ -270,7 +270,7 @@ Lib3dsMesh *pCurMesh;
     if( !LoadMeshObjectData( pDataObject, pCurMesh) )
       return NULL;
 
-    pModelData->DecRef ();
+    pDataObject->DecRef ();
 
     // get the next mesh in the chain
     pCurMesh = pCurMesh->next;

@@ -35,11 +35,13 @@
 #include "imesh/object.h"
 #include "imesh/crossbld.h"
 #include "imesh/sprite3d.h"
+#include "imesh/mdlconv.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
 #include "imap/parser.h"
+#include "iutil/cmdline.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -172,6 +174,28 @@ iMaterialWrapper *Simple::LoadTexture (const char *name, const char *fn)
   return engine->GetMaterialList ()->FindByName (name);
 }
 
+iModelData *Simple::ImportModel (const char *fn)
+{
+  iDataBuffer *filebuf = vfs->ReadFile (fn);
+  if (!filebuf)
+  {
+    Printf (CS_MSG_FATAL_ERROR, "Error opening model file '%s' !\n", fn);
+    Cleanup ();
+    exit (1);
+  }
+
+  iModelData *mdl = converter->Load (filebuf->GetUint8 (), filebuf->GetSize ());
+  filebuf->DecRef ();
+  if (!mdl)
+  {
+    Printf (CS_MSG_FATAL_ERROR, "Invalid model file: '%s' !\n", fn);
+    Cleanup ();
+    exit (1);
+  }
+
+  return mdl;
+}
+
 //-----------------------------------------------------------------------------
 
 // The global system driver
@@ -192,6 +216,8 @@ Simple::~Simple ()
   if (loader) loader->DecRef();
   if (g3d) g3d->DecRef ();
   if (crossbuilder) crossbuilder->DecRef ();
+  if (converter) converter->DecRef ();
+  if (vfs) vfs->DecRef ();
 }
 
 void Cleanup ()
@@ -235,6 +261,20 @@ bool Simple::Initialize (int argc, const char* const argv[],
     abort ();
   }
 
+  converter = CS_QUERY_PLUGIN_ID (this, "Converter", iModelConverter);
+  if (!converter)
+  {
+    Printf (CS_MSG_FATAL_ERROR, "No iModelConverter plugin!\n");
+    abort ();
+  }
+
+  vfs = CS_QUERY_PLUGIN_ID (this, "VFS", iVFS);
+  if (!vfs)
+  {
+    Printf (CS_MSG_FATAL_ERROR, "No iVFS plugin!\n");
+    abort ();
+  }
+
   // Open the main system. This will open all the previously loaded plug-ins.
   if (!Open ("Simple Crystal Space Application"))
   {
@@ -265,21 +305,27 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
   room = engine->CreateSector ("room");
 
+  // -------------------------------------------------------------------------
+
+  const char *Filename = GetCommandLine ()->GetName (0);
+  iModelData *Model = Filename ? ImportModel (Filename) : CreateDefaultModel (tm2);
+
   iMeshObjectType *ThingType = engine->GetThingType ();
   iMeshObjectFactory *ThingFactory = ThingType->NewFactory ();
   iMeshFactoryWrapper *SpriteFactory = engine->CreateMeshFactory (
     "crystalspace.mesh.object.sprite.3d", "SpriteFactory");
 
-  iModelData *Model = CreateDefaultModel (tm2);
   iThingState *fState =
 	SCF_QUERY_INTERFACE (ThingFactory, iThingState);
   iSprite3DFactoryState *sState = SCF_QUERY_INTERFACE (
 	SpriteFactory->GetMeshObjectFactory (), iSprite3DFactoryState);
   sState->SetMaterialWrapper (tm);
-  crossbuilder->BuildThing (Model, fState, tm);
-  crossbuilder->BuildSpriteFactory (Model, sState);
+  iModelDataObject *mdo = CS_GET_CHILD_OBJECT (Model->QueryObject (), iModelDataObject);
+  crossbuilder->BuildThing (mdo, fState, tm);
+  crossbuilder->BuildSpriteFactory (mdo, sState);
   fState->DecRef ();
   sState->DecRef ();
+  mdo->DecRef ();
   Model->DecRef ();
 
   iMeshObject *ThingObject = ThingFactory->NewInstance ();
@@ -311,6 +357,8 @@ bool Simple::Initialize (int argc, const char* const argv[],
   sprState->SetLighting (false);
   sprState->DecRef ();
   sprState->SetAction ("action");
+
+  // -------------------------------------------------------------------------
 
   engine->SetAmbientLight (csColor (0.5, 0.5, 0.5));
 
@@ -400,6 +448,7 @@ int main (int argc, char* argv[])
   System->RequestPlugin ("crystalspace.engine.3d:Engine");
   System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
   System->RequestPlugin ("crystalspace.mesh.crossbuilder:CrossBuilder");
+  System->RequestPlugin ("crystalspace.modelconverter.3ds:Converter");
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.

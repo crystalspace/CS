@@ -25,16 +25,13 @@ public:
   csCrossBuilder (iBase *parent);
 
   /// Build a thing from a model file
-  virtual bool BuildThing (iModelData *Data, iThingState *tgt,
+  virtual bool BuildThing (iModelDataObject *Data, iThingState *tgt,
 	iMaterialWrapper *defMat) const;
 
   /// Build a sprite factory from a model file
-  virtual bool BuildSpriteFactory (iModelData *Data,
+  virtual bool BuildSpriteFactory (iModelDataObject *Data,
 	iSprite3DFactoryState *tgt) const;
 
-  /// Find the first object in a model data structure
-  iModelDataObject *FindObject (iModelData *Data) const;
-  
   class Plugin : public iPlugin
   {
   public:
@@ -68,33 +65,10 @@ csCrossBuilder::csCrossBuilder (iBase *parent)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiPlugin);
 }
 
-iModelDataObject *csCrossBuilder::FindObject (iModelData *Data) const
-{
-  iObjectIterator *it = Data->QueryObject ()->GetIterator ();
-  while (!it->IsFinished ())
-  {
-    iModelDataObject *mdo =
-      SCF_QUERY_INTERFACE_FAST (it->GetObject (), iModelDataObject);
-    if (mdo)
-    {
-      it->DecRef ();
-      return mdo;
-    }
-    it->Next ();
-  }
-  it->DecRef ();
-  return NULL;
-}
-
-bool csCrossBuilder::BuildThing (iModelData *Data, iThingState *tgt,
+bool csCrossBuilder::BuildThing (iModelDataObject *Object, iThingState *tgt,
   iMaterialWrapper *DefaultMaterial) const
 {
   int i;
-
-  // find the first object in the scene
-  iModelDataObject *Object = FindObject (Data);
-  if (!Object)
-    return false;
 
   // copy the vertices
   iModelDataVertices *Vertices = Object->GetDefaultVertices ();
@@ -187,13 +161,9 @@ static void BuildVertexArray (iModelDataPolygon* poly,
   }
 }
 
-bool csCrossBuilder::BuildSpriteFactory (iModelData *Data,
+bool csCrossBuilder::BuildSpriteFactory (iModelDataObject *Object,
 	iSprite3DFactoryState *tgt) const
 {
-  iModelDataObject *Object = FindObject (Data);
-  if (!Object)
-    return false;
-
   int i,j;
   iObjectIterator *it1;
   iMaterialWrapper *Material = NULL;

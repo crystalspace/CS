@@ -30,6 +30,7 @@ struct iView;
 struct iCrossBuilder;
 struct iThingState;
 struct iMaterialWrapper;
+struct iModelConverter;
 
 class Simple : public SysSystemDriver
 {
@@ -41,6 +42,8 @@ private:
   iSector* room;
   iView* view;
   iCrossBuilder* crossbuilder;
+  iModelConverter* converter;
+  iVFS *vfs;
  
 public:
   Simple ();
@@ -51,6 +54,7 @@ public:
   virtual bool HandleEvent (iEvent&);
   virtual void NextFrame ();
   iModelDataVertices *CreateDefaultModelVertexFrame ();
+  iModelData *ImportModel (const char *Filename);
   iModelData *CreateDefaultModel (iMaterialWrapper *OtherMaterial);
   iMaterialWrapper *LoadTexture (const char *Name, const char *Filename);
 };

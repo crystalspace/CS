@@ -21,17 +21,17 @@
 
 #include "csutil/scf.h"
 
-struct iModelData;
+struct iModelDataObject;
 struct iThingState;
 struct iSprite3DFactoryState;
 struct iMaterialWrapper;
 
 
-SCF_VERSION (iCrossBuilder, 0, 0, 1);
+SCF_VERSION (iCrossBuilder, 0, 1, 0);
 
 /**
  * The crossbuilder can be used to build things and sprite factories from
- * imported model files (iModelData).
+ * single objects of imported model files (iModelDataObject).
  */
 struct iCrossBuilder : public iBase
 {
@@ -39,11 +39,11 @@ struct iCrossBuilder : public iBase
    * Build a thing from a model file. The model data must have its materials
    * stored as material wrappers, otherwise the default material will be used.
    */
-  virtual bool BuildThing (iModelData *Data, iThingState *tgt,
+  virtual bool BuildThing (iModelDataObject *Data, iThingState *tgt,
 	iMaterialWrapper *DefaultMaterial = NULL) const = 0;
 
   /// Build a sprite factory from a model file
-  virtual bool BuildSpriteFactory (iModelData *Data,
+  virtual bool BuildSpriteFactory (iModelDataObject *Data,
 	iSprite3DFactoryState *tgt) const = 0;
 };
 
