@@ -21,6 +21,7 @@
 #include "cssys/sysfunc.h"
 #include "cspython.h"
 #include "csutil/csstring.h"
+#include "csutil/util.h"
 #include "ivaria/reporter.h"
 #include "iutil/objreg.h"
 
