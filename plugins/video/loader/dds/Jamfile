@@ -6,3 +6,5 @@ Plugin csddsimg
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith csddsimg : csgfx csutil ;
+
+CompileGroups csddsimg :  imageloaders ;
