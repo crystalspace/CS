@@ -49,6 +49,9 @@ struct iImageFile : public iBase
   virtual iImageFile *MipMap (int steps) = 0;
   ///
   virtual iImageFile *Blend (Filter3x3* filter) = 0;
+  ///
+  virtual iImageFile *Resize(int NewWidth, int NewHeight) = 0;
+
   /// Set image file name
   virtual void SetName (const char *iName) = 0;
   /// Get image file name

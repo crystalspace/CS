@@ -149,6 +149,10 @@ public:
   virtual int GetHeight ();
   ///
   virtual int GetSize ();
+
+  /// Resize the image to the given size
+  virtual iImageFile* Resize(int newwidth, int newheight);
+
   ///
   virtual iImageFile *MipMap (int steps, Filter3x3* filt1, Filter5x5* filt2);
   ///

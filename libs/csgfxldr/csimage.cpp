@@ -177,6 +177,31 @@ void csImageFile::set_dimensions (int w, int h)
   CHK (image = new RGBPixel [(w+1)*(h+1)]); 
 }
 
+iImageFile *csImageFile::Resize(int newwidth, int newheight)
+{
+  CHK (csImageFile* ifile = new csImageFile ());
+  ifile->set_dimensions (newwidth, newheight);
+  RGBPixel* newimage = ifile->get_buffer ();
+
+  //Get the new value of the image from the old value.
+  //This is probably the most simple way to implement resizing.
+  //maybe somebody will find a way to implement this in a faster/
+  //or better way. 
+  //You could probably avoid much divisions by creating a table of
+  //rows and columns.
+  //It might also pay off, to combine several pixels, when scaling 
+  //down, and not just picking a random pixel.
+  for (int y=0; y<newheight; y++)
+  {
+    int oldline = y*height/newheight;
+    for (int x=0; x<newwidth; x++)
+    {
+      newimage[y*newwidth+x] = image[oldline*width+(x*width/newwidth)];
+    }
+  }
+  return ifile;
+}
+
 const char* csImageFile::get_status_mesg() const
 {
   if (status & IFE_BadFormat) return "wrong data format";
