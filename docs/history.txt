@@ -6,6 +6,8 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+4-Jan-2005
+	- PK removed the csws dependency from the Viewmesh and Picview Jamfiles.
 2-Jan-2005
 	- res made some more fixes to GL text drawing, among it the use of
 	  a variable at a time it had no sensible value yet.
