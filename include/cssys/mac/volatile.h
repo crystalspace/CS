@@ -19,4 +19,6 @@
 #define DO_WAV			1
 #define DO_AU			1
 // #define DO_MMX		0
+
+#define PORT_BYTESEX_BIG_ENDIAN     1
 #endif // __VOLATILE_H__
