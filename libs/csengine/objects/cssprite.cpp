@@ -111,23 +111,43 @@ void csFrame::ComputeNormals (csTriangleMesh *mesh, csVector3* object_verts, int
   CHK (delete [] normals);
   CHK (normals = new csVector3 [num_vertices]);
   CHK (csTriangleVertices *tri_verts = new csTriangleVertices (mesh, object_verts, num_vertices));
-  for (int i = 0; i < num_vertices; i++)
+
+  int i, j;
+  csTriangle * tris = mesh->GetTriangles();
+  int num_triangles = mesh->GetNumTriangles();
+  CHK (csVector3 * tri_normals = new csVector3[num_triangles];)
+
+  // calculate triangle normals
+  // get the cross-product of 2 edges of the triangle and normalize it
+  for (i = 0; i < num_triangles; i++)
+  {
+    csVector3 ab = object_verts [tris[i].b] - object_verts [tris[i].a];
+    csVector3 bc = object_verts [tris[i].c] - object_verts [tris[i].b];
+    tri_normals [i] = ab % bc;
+    float norm = tri_normals[i].Norm ();
+    if (norm) tri_normals[i] /= norm;
+  }
+
+  // calculate vertex normals, by averaging connected triangle normals
+  for (i = 0; i < num_vertices; i++)
   {
     csTriangleVertex &vt = tri_verts->GetVertex (i);
-    if (vt.num_con_vertices)
+    // if (vt.num_con_vertices)
+    if (vt.num_con_triangles)
     {
-      csVector3 &v = object_verts [i];
+      // csVector3 &v = object_verts [i];
       csVector3 &n = normals [i];
-      // for some strange reason we have to compute the normal reversed
-      n = v - object_verts [vt.con_vertices [0]];
-      for (int j = 1 ; j < vt.num_con_vertices ; j++)
-        n += (v - object_verts [vt.con_vertices [j]]);
+      // // for some strange reason we have to compute the normal reversed
+      // n = v - object_verts [vt.con_vertices [0]];
+      for (j = 0; j < vt.num_con_triangles; j++)
+        n += tri_normals[vt.con_triangles[j]];
       float norm = n.Norm ();
       if (norm)
         n /= norm;
     }
   }
   CHK (delete tri_verts);
+  CHK (delete tri_normals);
 }
 
 void csFrame::ComputeBoundingBox (int num_vertices)
