@@ -393,7 +393,9 @@ void csPolygon3D::Finish ()
   if (!no_lighting && TEXW(tex)*TEXH(tex) < 1000000)
   {
     CHK (lightmap = new csLightMap ());
-    lightmap->Alloc (TEXW(tex), TEXH(tex), def_mipmap_size, this);
+    int r, g, b;
+    GetSector ()->GetAmbientColor (r, g, b);
+    lightmap->Alloc (TEXW(tex), TEXH(tex), def_mipmap_size, r, g, b);
     tex->SetMipmapSize (def_mipmap_size); tex->lm = lightmap;
   }
 }
@@ -1484,6 +1486,14 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
       {
         vtr = vbr;
         vbr = (vbr + 3 - 1) % 3;
+      }
+      else
+      {
+        // The last two vertices of the triangle have the same height.
+	// @@@ I think we should interpolate by 'x' here but this fix at
+	// least eliminates most errors.
+        vtl = vbl;
+        vbl = (vbl + 1) % 3;
       }
 
       // Now interpolate Z,U,V by Y
