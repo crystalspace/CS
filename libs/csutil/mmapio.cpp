@@ -1,25 +1,81 @@
+/*
+    Copyright (C) 2002 by Jorrit Tyberghein
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #define CS_SYSDEF_PROVIDE_HARDWARE_MMIO 1
 
 #include "cssysdef.h"
+#include "cssys/csmmap.h"
 #include "csutil/mmapio.h"
+#include "iutil/vfs.h"
+#include "csutil/ref.h"
 
-csMemoryMappedIO::csMemoryMappedIO(unsigned _block_size, char const *filename):
+csMemoryMappedIO::csMemoryMappedIO(unsigned _block_size, char const *filename, 
+                                   iVFS* vfs):
   block_size(_block_size)
 {
-  valid_mmio_object = MemoryMapFile(&platform, filename);
+  const char* realpath = NULL;
+  if (vfs)
+  {
+    csRef<iDataBuffer> rpath = vfs->GetRealPath (filename);
+    realpath = (char*)(rpath->GetData ());
+  }
+  else
+  {
+    realpath = filename;
+  }
+  valid_mmio_object = false;
+  if (realpath)
+  {
+   #ifdef CS_HAS_MEMORY_MAPPED_IO
+    valid_platform = MemoryMapFile(&platform, realpath);
+    if (!valid_platform)
+   #endif
+    {
+      valid_mmio_object = SoftMemoryMapFile(&emulatedPlatform, realpath);
+    }
+   #ifdef CS_HAS_MEMORY_MAPPED_IO
+    else
+      valid_mmio_object = true;
+   #endif
+  }
 }
 
 csMemoryMappedIO::~csMemoryMappedIO()
 {
-  UnMemoryMapFile(&platform);
+  if (valid_mmio_object)
+  {
+   #ifdef CS_HAS_MEMORY_MAPPED_IO
+    if (valid_platform)
+    {
+      UnMemoryMapFile(&platform);
+    }
+    else
+   #endif
+    {
+      SoftUnMemoryMapFile(&emulatedPlatform);
+    }
+  }
 }
 
 /////////////////////////////////////////// Software Support for Memory Mapping ///////////////////////////////////
 
-#ifndef CS_HAS_MEMORY_MAPPED_IO
-
 bool
-csMemoryMappedIO::MemoryMapFile(mmioInfo *_platform, char const *filename)
+csMemoryMappedIO::SoftMemoryMapFile(emulatedMmioInfo *_platform, char const *filename)
 {
   // Clear the page map
   page_map = NULL;
@@ -76,7 +132,7 @@ csMemoryMappedIO::MemoryMapFile(mmioInfo *_platform, char const *filename)
 }
 
 void
-csMemoryMappedIO::UnMemoryMapFile(mmioInfo *_platform)
+csMemoryMappedIO::SoftUnMemoryMapFile(emulatedMmioInfo *_platform)
 {
   if (_platform->hMappedFile)
     fclose(_platform->hMappedFile);
@@ -150,9 +206,59 @@ csMemoryMappedIO::CachePage(unsigned int page)
   page_map->SetBit(page);
     
   // Read the page from the file
-  fseek(platform.hMappedFile, page*cache_block_size*block_size, SEEK_SET);
-  fread(cp->data, block_size, cache_block_size, platform.hMappedFile);
+  fseek(emulatedPlatform.hMappedFile, page*cache_block_size*block_size, SEEK_SET);
+  fread(cp->data, block_size, cache_block_size, emulatedPlatform.hMappedFile);
 }
 
-
+void*
+csMemoryMappedIO::GetPointer(unsigned int index)
+{
+#ifdef CS_HAS_MEMORY_MAPPED_IO
+  if (valid_platform) 
+  {
+    return platform.data + (index*block_size);
+  }
+  else
 #endif
+  {
+    unsigned int page = index/cache_block_size;
+  
+    if (!valid_mmio_object) return NULL;
+
+    if (!(*page_map)[page])
+    {
+      #ifdef CS_DEBUG
+      ++misses;
+      #endif
+      CachePage(page);
+    }
+#ifdef CS_DEBUG
+    else ++hits;
+#endif
+
+    // This MUST come AFTER CachPage b/c CachePage might re-orient things.
+    CacheBlock *cp = cache[page % csmmioDefaultHashSize];
+
+    while(cp)
+    { 
+      if (cp->page==page)
+      {
+        // Decrease age     
+       ++cp->age;
+	      
+        return cp->data + ((index-cp->offset)*block_size);
+      }
+
+      cp=cp->next;
+    }
+
+    //Serious error! The page is marked as here, but we could not find it!
+    return NULL;
+  }
+}
+
+bool 
+csMemoryMappedIO::IsValid()
+{
+  return valid_mmio_object;
+}

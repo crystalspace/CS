@@ -211,57 +211,6 @@ struct mmioInfo
     unsigned int file_size;
 };
 
-// Fills in the mmioInfo struct by mapping in filename.
-// Returns true on success, false otherwise.
-inline bool MemoryMapFile(mmioInfo* info, char const* filename)
-{  
-  bool ok = false;
-  HANDLE file, mapping = INVALID_HANDLE_VALUE;
-  file = CreateFile(
-    filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-  if (file != INVALID_HANDLE_VALUE)
-  {
-    unsigned int const sz = GetFileSize(file, NULL);
-    if (sz != 0xFFFFFFFF)
-    {
-      mapping = CreateFileMapping(file, NULL, PAGE_READONLY, 0, 0, NULL);
-      if (mapping != NULL)
-      {
-	unsigned char* p =
-	  (unsigned char*)MapViewOfFile(mapping, FILE_MAP_READ, 0, 0, sz);
-	if (p != NULL)
-	{
-	  info->hMappedFile = file;
-	  info->hFileMapping = mapping;
-	  info->data = p;
-	  info->file_size = sz;
-	  ok = true;
-	}
-      }
-    }
-  }
-  if (!ok)
-  {
-    if (mapping != NULL)
-      CloseHandle(mapping);
-    if (file != INVALID_HANDLE_VALUE)
-      CloseHandle(file);
-  }
-  return ok;
-}
-
-inline void UnMemoryMapFile(mmioInfo* info)
-{
-  if (info->data != NULL)
-    UnmapViewOfFile(info->data);
-
-  if (info->hMappedFile != INVALID_HANDLE_VALUE)
-    CloseHandle(info->hMappedFile);
-
-  if (info->hFileMapping != INVALID_HANDLE_VALUE)
-    CloseHandle(info->hFileMapping);
-}
-
 #endif
 
 // The 2D graphics driver used by software renderer on this platform

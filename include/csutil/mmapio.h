@@ -1,13 +1,31 @@
+/*
+    Copyright (C) 2002 by Jorrit Tyberghein
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #ifndef __CS_MEMORY_MAPPED_IO__
 #define __CS_MEMORY_MAPPED_IO__
 
-#ifndef CS_HAS_MEMORY_MAPPED_IO
- #include "csutil/bitarray.h"
-#endif
-
 /**\file 
- * Support for Memory-Mapped IO
+ * Platform-independent Memory-Mapped IO
  */
+
+#include "csutil/bitarray.h"
+
+struct iVFS;
 
 /// \internal Default cache block size
 const unsigned csmmioDefaultCacheBlockSize = 256;
@@ -51,13 +69,12 @@ const unsigned csmmioDefaultHashSize = 211;//1559;
 */  
 class csMemoryMappedIO
 {
+private:
   /// Minimum size of a single block 
   unsigned int block_size;
   
   /// Set to true if this object is valid
   bool valid_mmio_object;
-
-#ifndef CS_HAS_MEMORY_MAPPED_IO
 
   /// Size of a cache block in block_size blocks (software emulation)
   unsigned cache_block_size;
@@ -106,7 +123,7 @@ private:
   CacheBlock *cache[csmmioDefaultHashSize];
 
   // Software specific mmioInfo struct, should only be defined for platforms w/o hardware mmio.
-  struct mmioInfo 
+  struct emulatedMmioInfo 
   {          
     /// Handle to the mapped file 
     FILE *hMappedFile;
@@ -116,86 +133,49 @@ private:
 
     /// File size
     unsigned int file_size;
-  } platform;
+  } emulatedPlatform;
   
-#else
-
+#ifdef CS_HAS_MEMORY_MAPPED_IO
   /// Holds information specific to the platform for hardware paging.
   mmioInfo platform;
-
-#endif // end else doesn't have memory-mapped i/o
-
+  
+  /// true if \code platform conatins valid data.
+  bool valid_platform;
+#endif
 public:
-  /** Block size is the size of blocks that you want to get from the file, filename is the name of the file to
-   * map.  Indexes will be resolved to absolute_index=index*block_size */
-  csMemoryMappedIO(unsigned _block_size, char const *filename);
+  /** 
+   * Block size is the size of blocks that you want to get from the file, filename is the name of the file to
+   * map. Indexes will be resolved to absolute_index=index*block_size. If you supply a VFS,
+   * \code filename is tried to be resolved to a native path. Otherwise, \code filename is
+   * used as is, hence it must already be a native path.
+   */
+  csMemoryMappedIO(unsigned _block_size, char const *filename, iVFS* vfs = NULL);
 
-  /** Destroys the mmapio object, closes open files, and releases memory.
+  /** 
+   * Destroys the mmapio object, closes open files, and releases memory.
    */
   csMemoryMappedIO::~csMemoryMappedIO();
 
-  /** This pointer will only be valid for a little while.  Read, at least until the next call to GetPointer.
+  /** 
+   * This pointer will only be valid for a little while.  Read, at least until the next call to GetPointer.
    * NEVER EVER EVER SAVE THIS POINTER.  You must recall this pointer when you want access to the data again.
    */
-  inline void *GetPointer(unsigned int index)
-  {
-#ifdef CS_HAS_MEMORY_MAPPED_IO
-    return (valid_mmio_object) ? platform.data + (index*block_size) : NULL;
-
-#else
-
-    unsigned int page = index/cache_block_size;
+  void *GetPointer(unsigned int index);
   
-    if (!valid_mmio_object) return NULL;
-
-    if (!(*page_map)[page])
-    {
-      #ifdef CS_DEBUG
-       ++misses;
-      #endif
-      CachePage(page);
-    }
-#ifdef CS_DEBUG
-    else ++hits;
-#endif
-
-    // This MUST come AFTER CachPage b/c CachePage might re-orient things.
-    CacheBlock *cp = cache[page % csmmioDefaultHashSize];
-
-    while(cp)
-    { 
-      if (cp->page==page)
-      {
-        // Decrease age     
-        ++cp->age;
-	      
-        return cp->data + ((index-cp->offset)*block_size);
-      }
-
-      cp=cp->next;
-    }
-
-  //Serious error! The page is marked as here, but we could not find it!
-  return NULL;
-  
-#endif
-
-  }
-
-#ifndef CS_HAS_MEMORY_MAPPED_IO
+  /**
+   * Returns true the memory was mapped successfully.
+   */
+  bool IsValid();
 
 private:
   /// Reads a cache-page in from the disk.
   void CachePage(unsigned int page);
 
   /// Maps file into memory
-  bool MemoryMapFile(mmioInfo *platform, char const *filename);
+  bool SoftMemoryMapFile(emulatedMmioInfo *platform, char const *filename);
 
   /// Unmaps file from memory
-  void UnMemoryMapFile(mmioInfo *platform);
-
-#endif
-
+  void SoftUnMemoryMapFile(emulatedMmioInfo *platform);
 };
 
 #endif

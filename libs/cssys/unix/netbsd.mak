@@ -111,6 +111,7 @@ SRC.SYS_CSSYS = \
   libs/cssys/unix/utiming.cpp \
   libs/cssys/unix/loadlib.cpp \
   libs/cssys/unix/instpath.cpp \
+  libs/cssys/unix/mmiounix.cpp \
   libs/cssys/general/sysroot.cpp \
   libs/cssys/general/findlib.cpp \
   libs/cssys/general/getopt.cpp \

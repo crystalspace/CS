@@ -50,7 +50,18 @@
 // Defines that this platform supports hardware memory-mapped i/o
 #define CS_HAS_MEMORY_MAPPED_IO 1
 
-#include "cssys/unix/mmiounix.h"
+// Unix specific memory mapped I/O platform dependent stuff
+struct mmioInfo
+{          
+    /// Handle to the mapped file 
+    int hMappedFile;
+
+    /// Base pointer to the data
+    unsigned char *data;
+
+    /// File size
+    unsigned int file_size;
+};
 
 #endif // memory-mapped I/O
 
