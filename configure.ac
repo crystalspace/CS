@@ -1665,8 +1665,8 @@ AC_CACHE_CHECK([for VOS], [cs_cv_libvos],
     [AS_IF([test -n "$PKGCONFIG"],
 	[AS_IF([AC_RUN_LOG([$PKGCONFIG --exists libmetaobject_a3dl])],
 	    [cs_cv_libvos=yes
-	    cs_cv_libvos_cflags=`AC_RUN_LOG(
-		[$PKGCONFIG --cflags libmetaobject_a3dl libmetaobject_misc])`
+	    cs_cv_libvos_cflags="-D_REENTRANT -fexceptions `AC_RUN_LOG(
+		[$PKGCONFIG --cflags libmetaobject_a3dl libmetaobject_misc])`"
 	    cs_cv_libvos_lflags=''
 	    cs_cv_libvos_libs=`AC_RUN_LOG(
 		[$PKGCONFIG --libs libmetaobject_a3dl libmetaobject_misc])`],
