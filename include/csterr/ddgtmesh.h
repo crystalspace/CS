@@ -394,10 +394,9 @@ public:
     ddgBBox *camBBox(void) { return _camBBox; }
     /// Return the half field of view.
     float tanHalfFOV(void) { return _tanHalfFOV; }
-#ifdef DDG
     /// Transform coordinate from world to camera space.
     void transform( ddgVector3 vin, ddgVector3 *vout );
-#else
+#ifndef DDG
 private:
 	/// A transform method.
 	void (*_transform)(ddgVector3 vin, ddgVector3 *vout);

@@ -86,7 +86,9 @@ ddgHeightMap *heightMap = 0;
 ddgTBinMesh::ddgTBinMesh( ddgHeightMap * h )
 {
 	heightMap = h;
+#ifndef DDG
 	_transform = NULL;
+#endif
 	_bintreeMax = 2*(heightMap->cols()-1)/(ddgTBinMesh_size) * (heightMap->rows()-1)/(ddgTBinMesh_size);
 	typedef ddgTBinTree *ddgTBinTreeP;
 	_bintree = new ddgTBinTreeP[_bintreeMax];
@@ -702,13 +704,16 @@ float ddgTBinMesh::height(float x, float z)
     // Find mesh height at this location.
 	return bt ? bt->treeHeight(r,c,x,z) : 0.0;
 }
-
 void ddgTBinMesh::transform( ddgVector3 vin, ddgVector3 *vout )
 {
+#ifdef DDG
     // Convert the world coordinates to camera coordinates.
     // Perform matrix multiplication.
     vout->v[0] = _wtoc[0]*vin[0]+_wtoc[4]*vin[1]+_wtoc[8]*vin[2]+_wtoc[12];
     vout->v[1] = _wtoc[1]*vin[0]+_wtoc[5]*vin[1]+_wtoc[9]*vin[2]+_wtoc[13];
     vout->v[2] = _wtoc[2]*vin[0]+_wtoc[6]*vin[1]+_wtoc[10]*vin[2]+_wtoc[14];
+#else
+	_transform(vin,vout);
+#endif
 }
 
