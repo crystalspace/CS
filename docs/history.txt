@@ -40,6 +40,10 @@ chronological order.
 	    $(CEL)/out/debug/libs
 	    $(CEL)/out/release/libs
 	    $(CEL)/libs
+	- Eric Sunshine updated jamtemplate/Jamfile-src.template so that it
+	  performs a wildcard for all of the common source and header
+	  extensions (C, C++, Objective-C), rather than searching only for
+	  *.cpp and *.h.
 28-Nov-2004
 	- Eric Sunshine made the new-renderer the default. Users wanting to use
 	  the old-renderer must select it manually.
