@@ -33,6 +33,7 @@
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "iutil/virtclk.h"
+#include "iutil/cmdline.h"
 #include "ivaria/reporter.h"
 
 #include "srdrcom.h"
@@ -93,12 +94,22 @@ bool csSoundRenderSoftware::Initialize (iObjectRegistry *r)
   // copy the system pointer
   object_reg = r;
 
-  // load the sound driver plug-in
+  // read the config file
+  Config.AddConfig(object_reg, "/config/sound.cfg");
+
+  // check for optional sound driver fro the commandline
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (r, iCommandLineParser));
+  const char *drv = cmdline->GetOption ("sounddriver");
+  if (!drv)
+  {
+    // load the sound driver plug-in
 #ifdef CS_SOUND_DRIVER
-  char *drv = CS_SOUND_DRIVER;   // "crystalspace.sound.driver.xxx"
+    drv = CS_SOUND_DRIVER;   // "crystalspace.sound.driver.xxx"
 #else
-  char *drv = "crystalspace.sound.driver.null";
+    drv = "crystalspace.sound.driver.null";
 #endif
+    drv = Config->GetStr ("Sound.Driver", drv);
+  }
 
   csRef<iPluginManager> plugin_mgr (
   	CS_QUERY_REGISTRY (object_reg, iPluginManager));
@@ -118,8 +129,6 @@ bool csSoundRenderSoftware::Initialize (iObjectRegistry *r)
     q->RegisterListener(scfiEventHandler,
       CSMASK_Command | CSMASK_Broadcast | CSMASK_Nothing);
 
-  // read the config file
-  Config.AddConfig(object_reg, "/config/sound.cfg");
   return true;
 }
 

@@ -35,7 +35,15 @@ PLUGINS += video/format/codecs/rle
 
 # Sound drivers.
 ifeq ($(OSS.AVAILABLE),yes)
-PLUGINS += sound/driver/oss sound/renderer/software
+PLUGINS += sound/driver/oss
+endif
+
+ifeq ($(ALSA.AVAILABLE),yes)
+PLUGINS += sound/driver/alsa
+endif
+
+ifeq ($(findstring yes,$(ALSA.AVAILABLE) $(OSS.AVAILABLE)),yes)
+PLUGINS += sound/renderer/software
 endif
 
 #----------------------------------------------------------------- defines ---#

@@ -1865,6 +1865,10 @@ AC_LANG_POP([C++])
 #------------------------------------------------------------------------------
 # Check for audio support.
 #------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# OpenSoundSystem support OSS
+#------------------------------------------------------------------------------
 AC_CHECK_HEADER([soundcard.h],
     [CS_HEADER_PROPERTY([CS_HAS_SOUNDCARD_H])
     cs_cv_header_soundcard_h=yes],
@@ -1879,6 +1883,12 @@ AC_CHECK_HEADER([soundcard.h],
 AS_IF([test $cs_cv_header_soundcard_h = yes],
     [CS_BUILD_PROPERTY([OSS.AVAILABLE], [yes])])
 
+#------------------------------------------------------------------------------
+# AdvancedLinuxSoundArchitecture ALSA
+#------------------------------------------------------------------------------
+CS_CHECK_LIB_WITH([asound],
+    [AC_LANG_PROGRAM([[#include <alsa/asoundlib.h>]], [])], [], [],
+    [CS_EMIT_BUILD_RESULT([cs_cv_libasound], [ALSA])])
 
 
 #------------------------------------------------------------------------------
