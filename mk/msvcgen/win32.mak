@@ -88,11 +88,9 @@ DSP.PLUGINS.TYPE = group
 DSP.PLUGINS.DEPEND = \
   $(patsubst plugin.%,%,$(filter plugin.%,$(MSVC.DSP.AUGMENTED)))
 
-# grplibs -- represents all static library projects (except for the special
-# projects cswin32exe and cswin32dll since the presence of those libraries
-# together in the same group-type project file results in linkage errors).
+# grplibs -- represents all static library projects.
 MSVC.DSP += LIBS
 DSP.LIBS.NAME = libs
 DSP.LIBS.TYPE = group
-DSP.LIBS.DEPEND = $(filter-out WIN32EXE WIN32DLL,\
+DSP.LIBS.DEPEND = \
   $(patsubst library.%,%,$(filter library.%,$(MSVC.DSP.AUGMENTED))))
