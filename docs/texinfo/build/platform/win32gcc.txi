@@ -3,7 +3,7 @@
 @subsection Windows - Using Mingw Compiler
 
 @noindent
-@emph{Updated by Norman Kr@"amer, @email{norman@@users.sourceforge.net}.}
+@emph{Updated by Philip Wyett, @email{philipwyett@@redeye-entertainment.co.uk}.}
 
 These instructions are for building Crystal Space with Mingw - a @sc{gnu}
 compiler for Windows.  There are many different versions of the @sc{gnu}
@@ -17,18 +17,14 @@ Download the following packages:
 
 @itemize @bullet
 @item
-All support files from the Mingw32 support directory at Linux Games@*
-@uref{ftp://ftp.linuxgames.com/crystal/support/mingw32/}
+Crystal Space MingW package 'cs_mingw_0.1.exe' from the Mingw32 support directory at Linux Games
+This package contains all the recent MingW package releases i.e. all the files necessary to compile
+Crystal Space successfully.@*
+@uref{http://www.3ddownloads.com/?directory=/linuxgames/crystal/support/mingw32/}
 
 @item
 @sc{nasm} (Netwide Assembler) for Windows@*
-@uref{ftp://ftp.linuxgames.com/crystal/nasm/nasm-0.98e-bin-w32.zip}
-
-@item
-Get the Mingw compiler itself, the most recently updated and well supported
-@sc{gcc} Windows compiler, @url{http://www.mingw.org/}.  @emph{Note}: Get the
-@emph{latest} release; either @file{*-msvcrt.exe} or @file{*-crtdll.exe}.  The
-first is optimized the latter is assured to work on all win32 platforms.
+@uref{http://www.3ddownloads.com/?directory=/linuxgames/crystal/nasm/nasm-0.98e-bin-w32.zip}
 @end itemize
 
 @subsubheading Installation
@@ -37,16 +33,14 @@ Follow these instructions to install the packages which you downloaded.
 
 @itemize @bullet
 @item
-First install the Mingw compiler.  Place it in @file{c:\mingw32}, for
-instance.  The following instructions assume that it has been installed there.
+First install the Mingw compiler.  The file is a self extracting executable and will
+create the 'mingw32' directory for you. So if you wish to install it to your
+c:\ drive as c:\mingw32\*, extract the archive to c:\.
+
+The following instructions assume you have the MingW package installed in c:\mingw32
 
 @item
 Unzip the @sc{nasm} archive files and copy the @file{.exe} files into
-@file{c:\mingw32\bin}.
-
-@item
-Unzip all files from the Mingw support package (downloaded from Linux Games)
-into @file{c:\}.  This will also overwrite the original @file{make} program in
 @file{c:\mingw32\bin}.
 
 @item
@@ -54,20 +48,12 @@ Adjust your @samp{PATH} environment variable.  On Windows 95 and 98 edit the
 @file{c:\autoexec.bat} file and add the following entry.
 
 @example
-SET PATH=c:\mingw32\bin;c:\mingw32\lib;%PATH%
+SET PATH=c:\mingw32\bin
 @end example
 
 @noindent
 On Windows @sc{nt} and Windows 2000, use the System control panel to edit the
 environment variable.
-
-@item
-Also if you plan to do development with Mingw32 you should add the following
-additional environment variable:
-
-@example
-set C_INCLUDE_PATH=c:\mingw32\i386-mingw32msvc\include
-@end example
 
 If you fail to do so, then the makedep tool will not know where to look for
 Mingw32's system include files, and will emit a lot of warnings.
