@@ -33,6 +33,7 @@
 #include "imesh/thing/thing.h"
 #include "imesh/object.h"
 #include "imesh/lighting.h"
+#include "isys/plugin.h"
 
 class csSector;
 class csEngine;
@@ -997,6 +998,8 @@ private:
   iSystem* System;
 
 public:
+  SCF_DECLARE_IBASE;
+
   /// Constructor.
   csThingObjectType (iBase*);
 
@@ -1006,15 +1009,21 @@ public:
   /// Register plugin with the system driver
   virtual bool Initialize (iSystem *pSystem);
 
-  //------------------------ iMeshObjectType implementation --------------
-  SCF_DECLARE_IBASE;
-
   /// New Factory.
   virtual iMeshObjectFactory* NewFactory ();
+
+  /// Get features.
   virtual uint32 GetFeatures () const
   {
     return ALL_FEATURES;
   }
+
+  struct eiPlugIn : public iPlugIn
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csThingObjectType);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent&) { return false; }
+  } scfiPlugIn;
 };
 
 #endif // __CS_THING_H__
