@@ -54,6 +54,8 @@ int csObjectRegistryTest::countRegisteredObjects()
 
 void csObjectRegistryTest::setUp()
 {
+  if (iSCF::SCF == 0)
+    scfInitialize (0);
   objreg = new csObjectRegistry();
 }
 

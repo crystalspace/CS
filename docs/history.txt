@@ -48,6 +48,10 @@ chronological order.
 	  change obsoletes the CS_EMIT_CHECK_PYTHON() macro, which is now
 	  deprecated.
 	- res made the GL font cache better handle large fonts.
+	- res changed the object registry to call scfInitialize() (as the 
+	  object registry relies on a valid iSCF::SCF).
+	- res changed the CppUnit autoconf check to also check whether the
+	  CppUnit version is recent enough.
 13-Jan-2004
 	- Eric Sunshine renamed the 'memory' plugin to 'memory2d' for the
 	  following reasons:
