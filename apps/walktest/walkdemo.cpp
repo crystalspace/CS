@@ -90,14 +90,14 @@ void add_particles (csSector* sector, const csVector3& center, char* txtname)
   }
 
   CHK (csParSysExplosion* exp = new csParSysExplosion (20,
-  	center, csVector3 (0, 0, 0), txt, 4, 0.15, .6, 2., 2.));
+  	center, csVector3 (0, 0, 0), txt, 6, 0.15, true, .6, 2., 2.));
   exp->MoveToSector (sector);
   exp->SetSelfDestruct (3000);
-  exp->SetMixmodes (CS_FX_SETALPHA (0.50));
+  exp->SetMixmode (CS_FX_SETALPHA (0.50));
   exp->SetChangeRotation(5.0);
   exp->SetChangeSize (1.25);
   exp->SetFadeSprites (500);
-  exp->SetColors( csColor(1,1,0) );
+  exp->SetColor( csColor(1,1,0) );
   exp->SetChangeColor( csColor(0,-1.0/3.2,0) );
   exp->AddLight (Sys->world, sector, 1000);
 }
@@ -755,7 +755,7 @@ void HandleDynLight (csDynLight* dyn)
       }
       dyn->Resize (es->radius);
       dyn->Setup ();
-      add_particles (dyn->GetSector (), dyn->GetCenter (), "white.gif");
+      add_particles (dyn->GetSector (), dyn->GetCenter (), "explo.jpg");
       break;
     }
     case DYN_TYPE_RANDOM:
