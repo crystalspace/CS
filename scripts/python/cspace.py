@@ -10093,6 +10093,7 @@ class iView(iBase):
     def UpdateClipper(*args): return _cspace.iView_UpdateClipper(*args)
     def GetClipper(*args): return _cspace.iView_GetClipper(*args)
     def Draw(*args): return _cspace.iView_Draw(*args)
+    def SetAutoResize(*args): return _cspace.iView_SetAutoResize(*args)
     def __del__(self, destroy=_cspace.delete_iView):
         try:
             if self.thisown: destroy(self)
@@ -10926,6 +10927,7 @@ class csView(iView):
     def ClearView(*args): return _cspace.csView_ClearView(*args)
     def AddViewVertex(*args): return _cspace.csView_AddViewVertex(*args)
     def RestrictClipperToScreen(*args): return _cspace.csView_RestrictClipperToScreen(*args)
+    def SetAutoResize(*args): return _cspace.csView_SetAutoResize(*args)
     def UpdateClipper(*args): return _cspace.csView_UpdateClipper(*args)
     def GetClipper(*args): return _cspace.csView_GetClipper(*args)
     def Draw(*args): return _cspace.csView_Draw(*args)
