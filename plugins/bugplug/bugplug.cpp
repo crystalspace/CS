@@ -67,7 +67,6 @@
 #include "iengine/movable.h"
 #include "iengine/camera.h"
 #include "iengine/light.h"
-#include "iengine/statlght.h"
 #include "iengine/region.h"
 #include "iengine/material.h"
 #include "cstool/csview.h"

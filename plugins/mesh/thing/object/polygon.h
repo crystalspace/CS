@@ -648,13 +648,13 @@ public:
   /**
    * Disconnect a dynamic light from this polygon.
    */
-  void DynamicLightDisconnect (iDynLight* dynlight);
+  void DynamicLightDisconnect (iLight* dynlight);
 
   /**
    * Disconnect a static light from this polygon.
    * Only works for pseudo-dynamic lights.
    */
-  void StaticLightDisconnect (iStatLight* statlight);
+  void StaticLightDisconnect (iLight* statlight);
 
   /**
    * Unlink a light patch from the light patch list.

@@ -35,8 +35,7 @@
 #include "qsqrt.h"
 #include "iengine/texture.h"
 #include "iengine/material.h"
-#include "iengine/dynlight.h"
-#include "iengine/statlght.h"
+#include "iengine/light.h"
 #include "iengine/shadows.h"
 #include "iengine/movable.h"
 #include "ivideo/texture.h"
@@ -1046,9 +1045,10 @@ csPolygon3D::~csPolygon3D ()
   {
     while (lightpatches)
     {
-      iDynLight* dl = lightpatches->GetLight ();
+      iLight* dl = lightpatches->GetLight ();
       if (dl)
-        dl->RemoveAffectedLightingInfo (&(thing->scfiLightingInfo));
+        dl->RemoveAffectedLightingInfo (
+		&(thing->scfiLightingInfo));
       thing->GetStaticData ()->thing_type->lightpatch_pool->Free (lightpatches);
     }
   }
@@ -1138,7 +1138,7 @@ void csPolygon3D::Finish ()
   }
 }
 
-void csPolygon3D::DynamicLightDisconnect (iDynLight* dynlight)
+void csPolygon3D::DynamicLightDisconnect (iLight* dynlight)
 {
   csLightPatch* lp = lightpatches;
   while (lp)
@@ -1150,12 +1150,12 @@ void csPolygon3D::DynamicLightDisconnect (iDynLight* dynlight)
   }
 }
 
-void csPolygon3D::StaticLightDisconnect (iStatLight* statlight)
+void csPolygon3D::StaticLightDisconnect (iLight* statlight)
 {
   if (!txt_info) return;
   csLightMap* lm = txt_info->GetLightMap ();
   if (!lm) return;
-  csShadowMap* sm = lm->FindShadowMap (statlight->QueryLight ());
+  csShadowMap* sm = lm->FindShadowMap (statlight);
   if (!sm) return;
   lm->DelShadowMap (sm);
   txt_info->light_version--;
@@ -1247,8 +1247,7 @@ void csPolygon3D::FillLightMapDynamic (iFrustumView* lview)
   iFrustumViewUserdata* fvud = lview->GetUserdata ();
   iLightingProcessInfo* lpi = (iLightingProcessInfo*)fvud;
   iLight* l = lpi->GetLight ();
-  csRef<iDynLight> dl = SCF_QUERY_INTERFACE (l, iDynLight);
-  lp->SetLight (dl);
+  lp->SetLight (l);
 
   csFrustum *light_frustum = ctxt->GetLightFrustum ();
   lp->Initialize (light_frustum->GetVertexCount ());

@@ -583,10 +583,10 @@ public:
   uint32 GetLightVersion() const
   { return light_version; }
 
-  void DynamicLightChanged (iDynLight* dynlight);
-  void DynamicLightDisconnect (iDynLight* dynlight);
-  void StaticLightChanged (iStatLight* statlight);
-  void StaticLightDisconnect (iStatLight* statlight);
+  void DynamicLightChanged (iLight* dynlight);
+  void DynamicLightDisconnect (iLight* dynlight);
+  void StaticLightChanged (iLight* statlight);
+  void StaticLightDisconnect (iLight* statlight);
 
   SCF_DECLARE_IBASE;
 
@@ -694,13 +694,13 @@ public:
     { scfParent->SetDynamicAmbientLight (color); }
     virtual const csColor& GetDynamicAmbientLight ()
     { return scfParent->GetDynamicAmbientLight (); }
-    virtual void DynamicLightChanged (iDynLight* dynlight)
+    virtual void DynamicLightChanged (iLight* dynlight)
     { scfParent->DynamicLightChanged (dynlight); }
-    virtual void DynamicLightDisconnect (iDynLight* dynlight)
+    virtual void DynamicLightDisconnect (iLight* dynlight)
     { scfParent->DynamicLightDisconnect (dynlight); }
-    virtual void StaticLightChanged (iStatLight* statlight)
+    virtual void StaticLightChanged (iLight* statlight)
     { scfParent->StaticLightChanged (statlight); }
-    virtual void StaticLightDisconnect (iStatLight* statlight)
+    virtual void StaticLightDisconnect (iLight* statlight)
     { scfParent->StaticLightDisconnect (statlight); }
   } scfiLightingInfo;
   friend struct LightingInfo;

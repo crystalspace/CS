@@ -36,7 +36,6 @@
 #include "iengine/campos.h"
 #include "iengine/mesh.h"
 #include "iengine/light.h"
-#include "iengine/statlght.h"
 #include "iengine/material.h"
 #include "igraphic/imageio.h"
 #include "imesh/object.h"
@@ -290,16 +289,16 @@ void ceCswsEngineApp::SetupDefaultWorld ()
   walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
 
   iLightList* ll = room->GetLights ();
-  csRef<iStatLight> light;
+  csRef<iLight> light;
   light = engine->CreateLight (0, csVector3(-3, 5, 0), 10,
   	csColor(1, 0, 0), false);
-  ll->Add (light->QueryLight ());
+  ll->Add (light);
   light = engine->CreateLight (0, csVector3(3, 5, 0), 10,
   	csColor(0, 0, 1), false);
-  ll->Add (light->QueryLight ());
+  ll->Add (light);
   light = engine->CreateLight (0, csVector3(0, 5, -3), 10,
   	csColor(0, 1, 0), false);
-  ll->Add (light->QueryLight ());
+  ll->Add (light);
 }
 
 bool ceCswsEngineApp::Initialize ()

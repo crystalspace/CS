@@ -41,8 +41,6 @@ struct csCoverageMatrix;
 struct iMaterialHandle;
 struct iMaterialWrapper;
 struct iCacheManager;
-struct iDynLight;
-struct iStatLight;
 struct iCamera;
 
 /**
@@ -198,9 +196,9 @@ public:
   void SetMaterial (iMaterialWrapper* h);
 
   /// @@@
-  void DynamicLightDisconnect (iDynLight* dynlight);
+  void DynamicLightDisconnect (iLight* dynlight);
   /// @@@
-  void StaticLightDisconnect (iStatLight* statlight);
+  void StaticLightDisconnect (iLight* statlight);
   /// Add a lightpatch to this curves list of light patches
   void AddLightPatch (csBezierLightPatch* lp);
   /// Remove a lightpatch from this curves list

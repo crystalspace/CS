@@ -35,7 +35,6 @@
 #include "iengine/light.h"
 #include "iengine/camera.h"
 #include "iengine/mesh.h"
-#include "iengine/statlght.h"
 #include "iengine/movable.h"
 #include "iengine/halo.h"
 #include "imesh/thing/thing.h"
@@ -238,19 +237,19 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
   walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
 
-  csRef<iStatLight> light;
+  csRef<iLight> light;
   iLightList* ll = room->GetLights ();
   light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10,
   	csColor (1, 0, 0), false);
-  ll->Add (light->QueryLight ());
+  ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (3, 5,  0), 10,
   	csColor (0, 0, 1), false);
-  ll->Add (light->QueryLight ());
+  ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (0, 5, -3), 10,
   	csColor (0, 1, 0), false);
-  ll->Add (light->QueryLight ());
+  ll->Add (light);
 
   engine->Prepare ();
 

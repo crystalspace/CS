@@ -838,27 +838,27 @@ void csSpriteCal3DMeshObject::GetObjectBoundingBox (csBox3& bbox, int type, csVe
   bbox = object_bbox;
 }
 
-void csSpriteCal3DMeshObject::DynamicLightChanged (iDynLight* dynlight)
+void csSpriteCal3DMeshObject::DynamicLightChanged (iLight* dynlight)
 {
   (void)dynlight;
   lighting_dirty = true;
 }
 
-void csSpriteCal3DMeshObject::DynamicLightDisconnect (iDynLight* dynlight)
+void csSpriteCal3DMeshObject::DynamicLightDisconnect (iLight* dynlight)
 {
-  affecting_lights.Delete (dynlight->QueryLight ());
+  affecting_lights.Delete (dynlight);
   lighting_dirty = true;
 }
 
-void csSpriteCal3DMeshObject::StaticLightChanged (iStatLight* statlight)
+void csSpriteCal3DMeshObject::StaticLightChanged (iLight* statlight)
 {
   (void)statlight;
   lighting_dirty = true;
 }
 
-void csSpriteCal3DMeshObject::StaticLightDisconnect (iStatLight* statlight)
+void csSpriteCal3DMeshObject::StaticLightDisconnect (iLight* statlight)
 {
-  affecting_lights.Delete (statlight->QueryLight ());
+  affecting_lights.Delete (statlight);
   lighting_dirty = true;
 }
 

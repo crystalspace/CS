@@ -603,7 +603,7 @@ public:
    * The current flags set with SetLightingCacheMode() controls if the
    * lightmaps will be cached or not.
    */
-  virtual void ForceRelight (iStatLight* light, iRegion* region);
+  virtual void ForceRelight (iLight* light, iRegion* region);
 
   /**
    * Remove a light and update all lightmaps. This function only works
@@ -614,7 +614,7 @@ public:
    * The current flags set with SetLightingCacheMode() controls if the
    * lightmaps will be cached or not.
    */
-  virtual void RemoveLight (iStatLight* light);
+  virtual void RemoveLight (iLight* light);
 
   /**
    * Set the maximum number of polygons to process in
@@ -799,7 +799,7 @@ public:
   /**
    * Return the first dynamic light in this engine.
    */
-  virtual iDynLight* GetFirstDynLight () const;
+  virtual iLight* GetFirstDynLight () const;
 
   /// Get all nearby lights.
   virtual int GetNearbyLights (iSector* sector, const csVector3& pos,
@@ -994,19 +994,19 @@ public:
   virtual csPtr<iCamera> CreateCamera ();
 
   /// Create a static/pseudo-dynamic light.
-  virtual csPtr<iStatLight> CreateLight (const char* name,
+  virtual csPtr<iLight> CreateLight (const char* name,
   	const csVector3& pos, float radius,
   	const csColor& color, bool pseudoDyn);
   /// Find a static/pseudo-dynamic light by ID.
-  virtual iStatLight* FindLightID (const char* light_id) const;
+  virtual iLight* FindLightID (const char* light_id) const;
   /// Find a static/pseudo-dynamic light by name.
-  virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false)
+  virtual iLight* FindLight (const char *Name, bool RegionOnly = false)
     const;
   /// Create a dynamic light.
-  virtual csPtr<iDynLight> CreateDynLight (const csVector3& pos, float radius,
+  virtual csPtr<iLight> CreateDynLight (const csVector3& pos, float radius,
   	const csColor& color);
   /// Remove a dynamic light.
-  virtual void RemoveDynLight (iDynLight*);
+  virtual void RemoveDynLight (iLight*);
 
   /// Create a mesh factory wrapper from a mesh plugin
   virtual csPtr<iMeshFactoryWrapper> CreateMeshFactory (const char* classId,

@@ -25,7 +25,6 @@
 #include "csutil/memfile.h"
 #include "iutil/vfs.h"
 #include "iutil/cache.h"
-#include "iengine/statlght.h"
 
 #define LMMAGIC	    "LM04" // must be 4 chars!
 
@@ -361,13 +360,12 @@ const char* csLightMap::ReadFromCache (
       return "File too short while reading pseudo-dynamic lightmap header!";
     size -= sizeof (LightSave);
 
-    iStatLight *il = engine->FindLightID (ls.light_id);
-    if (il)
+    iLight *light = engine->FindLightID (ls.light_id);
+    if (light)
     {
-      light = il->QueryLight ();
       csShadowMap *smap = NewShadowMap (light, w, h);
 
-      il->AddAffectedLightingInfo (li);
+      light->AddAffectedLightingInfo (li);
 
       if ((long) file->Read ((char*)(smap->array), lm_size) != lm_size)
         return "File too short while reading pseudo-dynamic lightmap data!";

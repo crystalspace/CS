@@ -168,6 +168,12 @@ public:
   {
     return 0;
   }
+
+  virtual int GetDynamicType () const { return CS_LIGHT_DYNAMICTYPE_DYNAMIC; }
+  virtual void AddAffectedLightingInfo (iLightingInfo*) { }
+  virtual void RemoveAffectedLightingInfo (iLightingInfo*) { }
+  virtual void Setup () { }
+  virtual iLight* GetNext () { return 0; }
 };
 
 #endif // __CS_ISOLIGHT_H__

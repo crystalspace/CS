@@ -39,8 +39,6 @@
 #include "igeom/clip2d.h"
 #include "iengine/engine.h"
 #include "iengine/light.h"
-#include "iengine/statlght.h"
-#include "iengine/dynlight.h"
 #include "iutil/objreg.h"
 #include "iutil/cache.h"
 #include "iutil/object.h"
@@ -329,10 +327,9 @@ bool csGenmeshMeshObject::ReadFromCache (iCacheManager* cache_mgr)
       {
     char lid[16];
     if (mf.Read (lid, 16) != 16) goto stop;
-    iStatLight *il = factory->engine->FindLightID (lid);
-    if (!il) goto stop;
-    iLight* l = il->QueryLight ();
-    il->AddAffectedLightingInfo (&scfiLightingInfo);
+    iLight *l = factory->engine->FindLightID (lid);
+    if (!l) goto stop;
+    l->AddAffectedLightingInfo (&scfiLightingInfo);
 
     csShadowArray* shadowArr = new csShadowArray();
     float* intensities = new float[num_lit_mesh_colors];
@@ -423,27 +420,27 @@ void csGenmeshMeshObject::PrepareLighting ()
 {
 }
 
-void csGenmeshMeshObject::DynamicLightChanged (iDynLight* dynlight)
+void csGenmeshMeshObject::DynamicLightChanged (iLight* dynlight)
 {
   (void)dynlight;
   lighting_dirty = true;
 }
 
-void csGenmeshMeshObject::DynamicLightDisconnect (iDynLight* dynlight)
+void csGenmeshMeshObject::DynamicLightDisconnect (iLight* dynlight)
 {
-  affecting_lights.Delete (dynlight->QueryLight ());
+  affecting_lights.Delete (dynlight);
   lighting_dirty = true;
 }
 
-void csGenmeshMeshObject::StaticLightChanged (iStatLight* statlight)
+void csGenmeshMeshObject::StaticLightChanged (iLight* statlight)
 {
   (void)statlight;
   lighting_dirty = true;
 }
 
-void csGenmeshMeshObject::StaticLightDisconnect (iStatLight* statlight)
+void csGenmeshMeshObject::StaticLightDisconnect (iLight* statlight)
 {
-  affecting_lights.Delete (statlight->QueryLight ());
+  affecting_lights.Delete (statlight);
   lighting_dirty = true;
 }
 
@@ -632,8 +629,7 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
   {
     if (!do_shadow_rec || li->IsDynamic ())
     {
-      csRef<iStatLight> sl = SCF_QUERY_INTERFACE (li, iStatLight);
-      sl->AddAffectedLightingInfo (&scfiLightingInfo);
+      li->AddAffectedLightingInfo (&scfiLightingInfo);
       if (!li->IsDynamic ()) affecting_lights.Add (li);
     }
   }
@@ -641,8 +637,7 @@ void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
   {
     if (!affecting_lights.In (li))
     {
-      csRef<iDynLight> dl = SCF_QUERY_INTERFACE (li, iDynLight);
-      dl->AddAffectedLightingInfo (&scfiLightingInfo);
+      li->AddAffectedLightingInfo (&scfiLightingInfo);
       affecting_lights.Add (li);
     }
     if (do_shadow_rec) return;
@@ -898,12 +893,8 @@ void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
   for (l = 0 ; l < num_lights ; l++)
   {
     iLight* li = lights[l];
-    csRef<iStatLight> sl = SCF_QUERY_INTERFACE (li, iStatLight);
-    if (sl)
-    {
-      sl->AddAffectedLightingInfo (&scfiLightingInfo);
-      affecting_lights.Add (li);
-    }
+    li->AddAffectedLightingInfo (&scfiLightingInfo);
+    affecting_lights.Add (li);
     UpdateLightingOne (trans, li);
   }
 

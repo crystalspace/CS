@@ -30,7 +30,6 @@
 
 struct iMaterialWrapper;
 struct iLight;
-struct iDynLight;
 struct iEngine;
 struct iSector;
 
@@ -72,8 +71,7 @@ protected:
   float drop_width, drop_height;
   bool lighted_particles;
 
-  csRef<iLight> light;
-  csRef<iDynLight> dynlight;
+  csRef<iLight> dynlight;
   int light_time;
   bool delete_light;
   iEngine* light_engine;

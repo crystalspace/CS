@@ -148,6 +148,45 @@ then you can do it like this:
   state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
 @end example
 
+@subheading Light Changes
+@cindex @code{iLight}
+@cindex @code{iStatLight}
+@cindex @code{iDynLight}
+
+The interfaces @code{iStatLight} and @code{iDynLight} have been removed
+and their functionality has been merged into @code{iLight} (this includes
+the function @code{iDynLight::Setup()}. There is now a new function
+@code{iLight::GetDynamicType()} which will return one of the following
+constants depending on the type of the light:
+@itemize
+@item
+@code{CS_LIGHT_DYNAMICTYPE_STATIC}: for static lights.
+@item
+@code{CS_LIGHT_DYNAMICTYPE_PSEUDO}: for pseudo-dynamic lights.
+@item
+@code{CS_LIGHT_DYNAMICTYPE_DYNAMIC}: for fully dynamic lights.
+@end itemize
+
+The following functions have been modified to work with @code{iLight}
+instead of @code{iStatLight} and @code{iDynLight}:
+
+@itemize
+@item
+@code{iEngine::CreateLight()}.
+@item
+@code{iEngine::FindLightID()}.
+@item
+@code{iEngine::FindLight()}.
+@item
+@code{iEngine::CreateDynLight()}.
+@item
+@code{iEngine::RemoveDynLight()}.
+@item
+@code{iEngine::GetFirstDynLight()}.
+@item
+@code{iEngine::ForceRelight()}.
+@end itemize
+
 @subheading Polygon Texture Mapping Changes
 @cindex @code{iPolyTexNone}
 @cindex @code{iPolyTexGouraud}

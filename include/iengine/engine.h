@@ -45,8 +45,6 @@ struct iSectorIterator;
 struct iObjectIterator;
 struct iLight;
 struct iLightIterator;
-struct iStatLight;
-struct iDynLight;
 struct iSprite;
 struct iMeshWrapperIterator;
 struct iMeshObject;
@@ -203,7 +201,7 @@ struct iEngine : public iBase
    * \param light The newly added light to shine
    * \param region If supplied, only affect objects in this region
    */
-  virtual void ForceRelight (iStatLight* light, iRegion* region = 0) = 0;
+  virtual void ForceRelight (iLight* light, iRegion* region = 0) = 0;
 
   /**
    * Remove a light and update all lightmaps. This function only works
@@ -215,7 +213,7 @@ struct iEngine : public iBase
    * lightmaps will be cached or not.
    * \param light the light to remove
    */
-  virtual void RemoveLight (iStatLight* light) = 0;
+  virtual void RemoveLight (iLight* light) = 0;
 
   /**
    * Prepare the textures. It will initialise all loaded textures
@@ -651,26 +649,27 @@ struct iEngine : public iBase
    * \param pseudoDyn create a pseudo-dynamic light 
    * (an unmoving light which can efficiently change intensity or color)
    */
-  virtual csPtr<iStatLight> CreateLight (const char* name, const csVector3& pos,
+  virtual csPtr<iLight> CreateLight (const char* name, const csVector3& pos,
   	float radius, const csColor& color, bool pseudoDyn) = 0;
 
   /** Find a static/pseudo-dynamic light by name.
    * \param Name the engine name of the desired light
    * \param RegionOnly (parameter presently unused)
    */
-  virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false)
+  virtual iLight* FindLight (const char *Name, bool RegionOnly = false)
     const = 0;
 
   /**
    * Find a static/pseudo-dynamic light by id. 
    * \param light_id a 16-byte MD5 checksum for the light.
    */
-  virtual iStatLight* FindLightID (const char* light_id) const = 0;
+  virtual iLight* FindLightID (const char* light_id) const = 0;
 
   /**
    * Create an iterator to iterate over all static lights of the engine.
    * Assign to a csRef.
-   * \param region only iterate over the lights in this region                     * (otherwise iterate over all lights)
+   * \param region only iterate over the lights in this region
+   * (otherwise iterate over all lights)
    */
   virtual csPtr<iLightIterator> GetLightIterator (iRegion* region = 0) = 0;
 
@@ -686,16 +685,16 @@ struct iEngine : public iBase
    * affect an object 
    * \param color the color of the light (also affects intensity)
    */
-  virtual csPtr<iDynLight> CreateDynLight (const csVector3& pos, float radius,
+  virtual csPtr<iLight> CreateDynLight (const csVector3& pos, float radius,
   	const csColor& color) = 0;
 
   /** Remove a dynamic light.
    * \param light light to remove
    */
-  virtual void RemoveDynLight (iDynLight* light) = 0;
+  virtual void RemoveDynLight (iLight* light) = 0;
 
   /// Return the first dynamic light in this engine.
-  virtual iDynLight* GetFirstDynLight () const = 0;
+  virtual iLight* GetFirstDynLight () const = 0;
 
   /**
    * Get the required flags for 3D->BeginDraw() which should be called
@@ -1057,7 +1056,7 @@ struct iEngine : public iBase
    * This will not clear the object but it will remove all references
    * to that object that the engine itself keeps. This function works
    * for: iSector, iCollection, iMeshWrapper, iMeshFactoryWrapper,
-   * iCameraPosition, iDynLight, iMaterialWrapper, and iTextureWrapper.
+   * iCameraPosition, iLight (dynamic only @@@), iMaterialWrapper, and iTextureWrapper.
    * Note that the object is only removed if the resulting ref count will
    * become zero. So basically this function only releases the references
    * that the engine holds.

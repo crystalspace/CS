@@ -4,7 +4,6 @@
 @cindex pseudo-dynamic lights
 @cindex dynamic lights
 @cindex static lights
-@cindex @code{iStatLight}
 @cindex @code{iLight}
 
 One little known feature in CS is the ability to have pseudo-dynamic
@@ -44,9 +43,9 @@ To create a pseudo-dynamic light from within an application you can
 use the following code:
 
 @example
-  csRef<iStatLight> light = engine->CreateLight ("DynLight",
+  csRef<iLight> light = engine->CreateLight ("DynLight",
   	csVector3 (23, 1, 5), 10, csColor (1, 0, 0), true);
-  sector->GetLights ()->AddLight (light->QueryLight ());
+  sector->GetLights ()->AddLight (light);
 @end example
 
 This will create exactly the same light as the one specified above.
@@ -55,9 +54,7 @@ At some point you may want to change the color of the light. You can
 do this with the following code:
 
 @example
-  iStatLight* light;
-  iLight* il = light->QueryLight ();
-  il->SetColor (csColor (0, 0, 1));
+  light->SetColor (csColor (0, 0, 1));
 @end example
 
 This will change the color of the light from red to blue.

@@ -44,17 +44,12 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csLight::Light)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csLight::csLight (
-  float x,
-  float y,
-  float z,
+  float x, float y, float z,
   float d,
-  float red,
-  float green,
-  float blue) :
+  float red, float green, float blue) :
     csObject()
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLight);
-  DG_TYPE (this, "csLight");
   light_id = 0;
   center.x = x;
   center.y = y;
@@ -101,7 +96,30 @@ csLight::~csLight ()
   delete halo;
   delete[] light_id;
 
+  csGlobalHashIterator it (lightinginfos.GetHashMap ());
+  while (it.HasNext ())
+  {
+    iLightingInfo* linfo = (iLightingInfo*)it.Next ();
+    linfo->DecRef ();
+  }
+  lightinginfos.DeleteAll ();
+
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiLight);
+}
+
+void csLight::AddAffectedLightingInfo (iLightingInfo* li)
+{
+  if (!lightinginfos.In (li))
+  {
+    lightinginfos.AddNoTest (li);
+    li->IncRef ();
+  }
+}
+
+void csLight::RemoveAffectedLightingInfo (iLightingInfo* li)
+{
+  lightinginfos.Delete (li);
+  li->DecRef ();
 }
 
 const char* csLight::GenerateUniqueID ()
@@ -410,41 +428,22 @@ iFlareHalo *csLight::Light::CreateFlareHalo ()
 }
 
 //---------------------------------------------------------------------------
-SCF_IMPLEMENT_IBASE_EXT(csStatLight)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iStatLight)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csStatLight::eiStaticLight)
-  SCF_IMPLEMENTS_INTERFACE(iStatLight)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csStatLight::csStatLight (
-  float x,
-  float y,
-  float z,
+  float x, float y, float z,
   float dist,
-  float red,
-  float green,
-  float blue,
+  float red, float green, float blue,
   bool dynamic) :
     csLight(x, y, z, dist, red, green, blue)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiStatLight);
-  DG_TYPE (this, "csStatLight");
   csStatLight::dynamic = dynamic;
+  dynamic_type = dynamic
+  	? CS_LIGHT_DYNAMICTYPE_PSEUDO
+	: CS_LIGHT_DYNAMICTYPE_STATIC;
   flags.SetAll (CS_LIGHT_THINGSHADOWS);
 }
 
 csStatLight::~csStatLight ()
 {
-  csGlobalHashIterator it (lightinginfos.GetHashMap ());
-  while (it.HasNext ())
-  {
-    iLightingInfo* linfo = (iLightingInfo*)it.Next ();
-    linfo->DecRef ();
-  }
-  lightinginfos.DeleteAll ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiStatLight);
 }
 
 static void object_light_func (iMeshWrapper *mesh, iFrustumView *lview,
@@ -501,16 +500,6 @@ void csStatLight::CalculateLighting (iMeshWrapper *th)
   lpi->FinalizeLighting ();
 }
 
-void csStatLight::AddAffectedLightingInfo (iLightingInfo* li)
-{
-  if (!dynamic) return ;
-  if (!lightinginfos.In (li))
-  {
-    lightinginfos.AddNoTest (li);
-    li->IncRef ();
-  }
-}
-
 void csStatLight::SetColor (const csColor &col)
 {
   csLight::SetColor (col);
@@ -518,46 +507,31 @@ void csStatLight::SetColor (const csColor &col)
   while (it.HasNext ())
   {
     iLightingInfo* linfo = (iLightingInfo*)it.Next ();
-    linfo->StaticLightChanged (&scfiStatLight);
+    linfo->StaticLightChanged (&scfiLight);
   }
 }
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE_EXT(csDynLight)
-  SCF_IMPLEMENTS_EMBEDDED_INTERFACE(iDynLight)
-SCF_IMPLEMENT_IBASE_EXT_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csDynLight::eiDynLight)
-  SCF_IMPLEMENTS_INTERFACE(iDynLight)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
 csDynLight::csDynLight (
-  float x,
-  float y,
-  float z,
+  float x, float y, float z,
   float dist,
-  float red,
-  float green,
-  float blue) :
+  float red, float green, float blue) :
     csLight(x, y, z, dist, red, green, blue)
 {
-  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiDynLight);
-  DG_TYPE (this, "csDynLight");
+  dynamic_type = CS_LIGHT_DYNAMICTYPE_DYNAMIC;
 }
 
 csDynLight::~csDynLight ()
 {
-  //csEngine::current_engine->RemoveDynLight (this);
   csGlobalHashIterator it (lightinginfos.GetHashMap ());
   while (it.HasNext ())
   {
     iLightingInfo* linfo = (iLightingInfo*)it.Next ();
-    linfo->DynamicLightDisconnect (&scfiDynLight);
+    linfo->DynamicLightDisconnect (&scfiLight);
     linfo->DecRef ();
   }
   lightinginfos.DeleteAll ();
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiDynLight);
 }
 
 void csDynLight::Setup ()
@@ -566,7 +540,7 @@ void csDynLight::Setup ()
   while (it.HasNext ())
   {
     iLightingInfo* linfo = (iLightingInfo*)it.Next ();
-    linfo->DynamicLightDisconnect (&scfiDynLight);
+    linfo->DynamicLightDisconnect (&scfiLight);
     linfo->DecRef ();
   }
   lightinginfos.DeleteAll ();
@@ -591,21 +565,6 @@ void csDynLight::Setup ()
   lpi->FinalizeLighting ();
 }
 
-void csDynLight::AddAffectedLightingInfo (iLightingInfo* li)
-{
-  if (!lightinginfos.In (li))
-  {
-    lightinginfos.AddNoTest (li);
-    li->IncRef ();
-  }
-}
-
-void csDynLight::RemoveAffectedLightingInfo (iLightingInfo* li)
-{
-  lightinginfos.Delete (li);
-  li->DecRef ();
-}
-
 void csDynLight::SetColor (const csColor &col)
 {
   csLight::SetColor (col);
@@ -614,7 +573,7 @@ void csDynLight::SetColor (const csColor &col)
   while (it.HasNext ())
   {
     iLightingInfo* linfo = (iLightingInfo*)it.Next ();
-    linfo->DynamicLightChanged (&scfiDynLight);
+    linfo->DynamicLightChanged (&scfiLight);
   }
 }
 

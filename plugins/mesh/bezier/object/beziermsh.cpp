@@ -32,8 +32,6 @@
 #include "iengine/material.h"
 #include "iengine/mesh.h"
 #include "iengine/camera.h"
-#include "iengine/statlght.h"
-#include "iengine/dynlight.h"
 #include "iengine/shadows.h"
 #include "csgeom/sphere.h"
 #include "csgeom/math3d.h"
@@ -277,12 +275,12 @@ void csBezierMesh::MarkLightmapsDirty ()
   light_version++;
 }
 
-void csBezierMesh::DynamicLightChanged (iDynLight* /*dynlight*/)
+void csBezierMesh::DynamicLightChanged (iLight* /*dynlight*/)
 {
   MarkLightmapsDirty ();
 }
 
-void csBezierMesh::DynamicLightDisconnect (iDynLight* dynlight)
+void csBezierMesh::DynamicLightDisconnect (iLight* dynlight)
 {
   MarkLightmapsDirty ();
   int i;
@@ -293,12 +291,12 @@ void csBezierMesh::DynamicLightDisconnect (iDynLight* dynlight)
   }
 }
 
-void csBezierMesh::StaticLightChanged (iStatLight* /*statlight*/)
+void csBezierMesh::StaticLightChanged (iLight* /*statlight*/)
 {
   MarkLightmapsDirty ();
 }
 
-void csBezierMesh::StaticLightDisconnect (iStatLight* statlight)
+void csBezierMesh::StaticLightDisconnect (iLight* statlight)
 {
   MarkLightmapsDirty ();
   int i;
@@ -986,18 +984,7 @@ void csBezierMesh::CastShadows (iFrustumView *lview, iMovable *movable)
   iLightingProcessInfo* lpi = (iLightingProcessInfo*)fvud;
   bool dyn = lpi->IsDynamic ();
 
-  if (!dyn)
-  {
-    csRef<iStatLight> sl = SCF_QUERY_INTERFACE (lpi->GetLight (),
-    	iStatLight);
-    sl->AddAffectedLightingInfo (&scfiLightingInfo);
-  }
-  else
-  {
-    csRef<iDynLight> dl = SCF_QUERY_INTERFACE (lpi->GetLight (),
-    	iDynLight);
-    dl->AddAffectedLightingInfo (&scfiLightingInfo);
-  }
+  lpi->GetLight ()->AddAffectedLightingInfo (&scfiLightingInfo);
 
   for (i = 0; i < GetCurveCount (); i++)
   {

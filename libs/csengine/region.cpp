@@ -140,7 +140,7 @@ void csRegion::DeleteAll ()
     if (copy[i])
     {
       iObject *obj = copy[i];
-      csRef<iStatLight> o (SCF_QUERY_INTERFACE (obj, iStatLight));
+      csRef<iLight> o (SCF_QUERY_INTERFACE (obj, iLight));
       if (!o) continue;
 
       engine->RemoveLight (o);

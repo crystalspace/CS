@@ -34,8 +34,6 @@
 #include "iengine/material.h"
 #include "iengine/mesh.h"
 #include "iengine/camera.h"
-#include "iengine/statlght.h"
-#include "iengine/dynlight.h"
 #include "iengine/shadows.h"
 #include "csgeom/sphere.h"
 #include "csgeom/math3d.h"
@@ -1645,12 +1643,12 @@ void csThing::MarkLightmapsDirty ()
   light_version++;
 }
 
-void csThing::DynamicLightChanged (iDynLight* /*dynlight*/)
+void csThing::DynamicLightChanged (iLight* /*dynlight*/)
 {
   MarkLightmapsDirty ();
 }
 
-void csThing::DynamicLightDisconnect (iDynLight* dynlight)
+void csThing::DynamicLightDisconnect (iLight* dynlight)
 {
   MarkLightmapsDirty ();
   int i;
@@ -1661,12 +1659,12 @@ void csThing::DynamicLightDisconnect (iDynLight* dynlight)
   }
 }
 
-void csThing::StaticLightChanged (iStatLight* /*statlight*/)
+void csThing::StaticLightChanged (iLight* /*statlight*/)
 {
   MarkLightmapsDirty ();
 }
 
-void csThing::StaticLightDisconnect (iStatLight* statlight)
+void csThing::StaticLightDisconnect (iLight* statlight)
 {
   MarkLightmapsDirty ();
   int i;
@@ -2502,16 +2500,8 @@ void csThing::CastShadows (iFrustumView *lview, iMovable *movable)
     	  lpi->GetLight ()));
       lpi->AttachUserdata (lptq);
     }
-    csRef<iStatLight> sl = SCF_QUERY_INTERFACE (lpi->GetLight (),
-    	iStatLight);
-    sl->AddAffectedLightingInfo (&scfiLightingInfo);
   }
-  else
-  {
-    csRef<iDynLight> dl = SCF_QUERY_INTERFACE (lpi->GetLight (),
-    	iDynLight);
-    dl->AddAffectedLightingInfo (&scfiLightingInfo);
-  }
+  lpi->GetLight ()->AddAffectedLightingInfo (&scfiLightingInfo);
 
   for (i = 0; i < polygons.Length (); i++)
   {

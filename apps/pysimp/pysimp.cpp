@@ -29,7 +29,6 @@
 #include "iengine/engine.h"
 #include "iengine/camera.h"
 #include "iengine/light.h"
-#include "iengine/statlght.h"
 #include "igraphic/imageio.h"
 #include "imesh/thing/polygon.h"
 #include "cstool/csview.h"
@@ -225,10 +224,10 @@ bool PySimple::Initialize (int argc, const char* const argv[],
       return 0;
   }
 
-  csRef<iStatLight> light;
+  csRef<iLight> light;
   light = engine->CreateLight (0, csVector3 (0, 5, 0), 10,
   	csColor (1, 0, 0), false);
-  room->GetLights ()->Add (light->QueryLight ());
+  room->GetLights ()->Add (light);
 
   engine->Prepare ();
 

@@ -25,7 +25,7 @@
 class csBezierLightPatchPool;
 class csCurve;
 class csFrustum;
-struct iDynLight;
+struct iLight;
 struct iShadowBlock;
 
 /**
@@ -55,7 +55,7 @@ private:
   csCurve* curve;
 
   /// Light that this light patch originates from.
-  iDynLight* light;
+  iLight* light;
 
   /// List of shadow frustums.
   csRef<iShadowBlock> shadows;
@@ -94,7 +94,7 @@ public:
   /**
    * Get the light that this light patch belongs too.
    */
-  iDynLight* GetLight () { return light; }
+  iLight* GetLight () { return light; }
 
   /// Set the shadow block.
   void SetShadowBlock (iShadowBlock* bl);
@@ -122,7 +122,7 @@ public:
   /// Set curve.
   void SetPolyCurve (csCurve* c) { curve = c; }
   /// Set light.
-  void SetLight (iDynLight* l) { light = l; }
+  void SetLight (iLight* l) { light = l; }
   /// Add to list.
   void AddList (csBezierLightPatch*& first)
   {

@@ -38,7 +38,6 @@
 #include "iengine/engine.h"
 #include "iengine/camera.h"
 #include "iengine/light.h"
-#include "iengine/statlght.h"
 #include "iengine/texture.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
@@ -907,23 +906,23 @@ bool ViewMesh::Initialize ()
   walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
   walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
 
-  csRef<iStatLight> light;
+  csRef<iLight> light;
   iLightList* ll = room->GetLights ();
   light = engine->CreateLight (0, csVector3 (-3, 10, 0), 10,
   	csColor (0.8f, 0.8f, 0.8f), false);
-  ll->Add (light->QueryLight ());
+  ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (3, 10,  0), 10,
   	csColor (0.8f, 0.8f, 0.8f), false);
-  ll->Add (light->QueryLight ());
+  ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (0, 10, -3), 10,
   	csColor (0.8f, 0.8f, 0.8f), false);
-  ll->Add (light->QueryLight ());
+  ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (0, 10,  3), 10,
   	csColor (0.8f, 0.8f, 0.8f), false);
-  ll->Add (light->QueryLight ());
+  ll->Add (light);
 
   engine->Prepare ();
   Printf (CS_REPORTER_SEVERITY_NOTIFY, "Created.");

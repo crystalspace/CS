@@ -28,8 +28,6 @@
 #include "csutil/refarr.h"
 #include "csengine/lview.h"
 #include "iengine/light.h"
-#include "iengine/statlght.h"
-#include "iengine/dynlight.h"
 
 class csLightMap;
 class csDynLight;
@@ -65,6 +63,9 @@ protected:
   /// The associated halo (if not 0)
   csHalo *halo;
 
+  /// The dynamic type of this light (one of CS_LIGHT_DYNAMICTYPE_...)
+  int dynamic_type;
+
   /// Attenuation type
   int attenuation;
   /// Attenuation vector in the format x=kc, y=kl, z=kq
@@ -93,6 +94,9 @@ protected:
    * List of light callbacks.
    */
   csRefArray<iLightCallback> light_cb_vector;
+
+  /// Set of meshes that we are currently affecting.
+  csHashSet lightinginfos;
 
   /// Get a unique ID for this light. Generate it if needed.
   const char* GenerateUniqueID ();
@@ -136,6 +140,11 @@ public:
    * update those lightmaps as that is a time-consuming process.
    */
   virtual ~csLight ();
+
+  int GetDynamicType () const { return dynamic_type; }
+
+  virtual void Setup () { }
+  virtual iLight* GetNext () { return 0; }//@@@ TEMPORARY
 
   /**
    * Set the kdtree child node used by this light (in the kdtree
@@ -263,6 +272,22 @@ public:
   float GetBrightnessAtDistance (float d);
 
   //----------------------------------------------------------------------
+  // Light influence stuff.
+  //----------------------------------------------------------------------
+
+  /**
+   * Add a lighting info to this dynamic light. This is usually
+   * called during Setup() by meshes that are hit by the
+   * light.
+   */
+  void AddAffectedLightingInfo (iLightingInfo* li);
+
+  /**
+   * Remove a lighting info from this light.
+   */
+  void RemoveAffectedLightingInfo (iLightingInfo* li);
+
+  //----------------------------------------------------------------------
   // Callbacks
   //----------------------------------------------------------------------
   void SetLightCallback (iLightCallback* cb)
@@ -295,6 +320,10 @@ public:
     virtual csLight* GetPrivateObject () { return scfParent; }
     virtual const char* GetLightID () { return scfParent->GetLightID (); }
     virtual iObject *QueryObject() { return scfParent; }
+    virtual int GetDynamicType () const
+    {
+      return scfParent->GetDynamicType ();
+    }
     virtual const csVector3& GetCenter () { return scfParent->GetCenter (); }
     virtual void SetCenter (const csVector3& pos)
     {
@@ -359,6 +388,15 @@ public:
     {
       return scfParent->lightnr;
     }
+    virtual void AddAffectedLightingInfo (iLightingInfo* li)
+    { scfParent->AddAffectedLightingInfo (li); }
+    virtual void RemoveAffectedLightingInfo (iLightingInfo* li)
+    { scfParent->RemoveAffectedLightingInfo (li); }
+
+    virtual void Setup ()
+    { scfParent->Setup (); }
+    virtual iLight* GetNext ()
+    { return scfParent->GetNext (); }
   } scfiLight;
   friend struct Light;
 };
@@ -380,9 +418,6 @@ private:
    * possibly lit by this light.
    */
   bool dynamic;
-
-  /// Set of meshes that we are currently affecting.
-  csHashSet lightinginfos;
 
 public:
   /**
@@ -420,9 +455,6 @@ public:
    */
   virtual void SetColor (const csColor& col);
 
-  /// Add affected mesh.
-  void AddAffectedLightingInfo (iLightingInfo* li);
-
   /**
    * Shine this light on all polygons visible from the light.
    * This routine will update the lightmaps of all polygons or
@@ -439,26 +471,6 @@ public:
    * Currently only works on thing meshes.
    */
   void CalculateLighting (iMeshWrapper* mesh);
-
-  //------------------------ iStatLight interface -----------------------------
-  SCF_DECLARE_IBASE_EXT (csLight);
-
-  /// iStatLight implementation.
-  struct eiStaticLight : public iStatLight
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csStatLight);
-
-    /// Used by the engine to retrieve internal static light object (ugly)
-    virtual csStatLight *GetPrivateObject ()
-    { return scfParent; }
-    virtual iObject *QueryObject ()
-    { return scfParent; }
-    virtual iLight *QueryLight ()
-    { return &scfParent->scfiLight; }
-    virtual void AddAffectedLightingInfo (iLightingInfo* li)
-    { scfParent->AddAffectedLightingInfo (li); }
-  } scfiStatLight;
-  friend struct eiStaticLight;
 };
 
 /**
@@ -471,9 +483,6 @@ class csDynLight : public csLight
 private:
   csDynLight* next;
   csDynLight* prev;
-
-  /// Set of meshes that we are currently affecting.
-  csHashSet lightinginfos;
 
 public:
   /**
@@ -498,7 +507,11 @@ public:
    * lightpatches list. This routine needs to be called whenever
    * the light moves.
    */
-  void Setup ();
+  virtual void Setup ();
+  virtual iLight* GetNext () //@@@ TEMPORARY
+  {
+    return next ? &(next->scfiLight) : 0;
+  }
 
   /**
    * Call this when the color of the light changes. This is more
@@ -506,55 +519,14 @@ public:
    */
   virtual void SetColor (const csColor& col);
 
-  /**
-   * Add a lighting info to this dynamic light. This is usually
-   * called during Setup() by meshes that are hit by the
-   * dynamic light.
-   */
-  void AddAffectedLightingInfo (iLightingInfo* li);
-
-  /**
-   * Remove a lighting info from this dynamic light.
-   */
-  void RemoveAffectedLightingInfo (iLightingInfo* li);
-
   ///
   void SetNext (csDynLight* n) { next = n; }
   ///
   void SetPrev (csDynLight* p) { prev = p; }
   ///
-  csDynLight* GetNext () { return next; }
+  csDynLight* GetCsNext () { return next; }
   ///
-  csDynLight* GetPrev () { return prev; }
-
-  //------------------------ iDynLight interface -----------------------------
-  SCF_DECLARE_IBASE_EXT (csLight);
-
-  /// iDynLight implementation.
-  struct eiDynLight : public iDynLight
-  {
-    SCF_DECLARE_EMBEDDED_IBASE (csDynLight);
-
-    /// Used by the engine to retrieve internal dyn light object (ugly)
-    virtual csDynLight* GetPrivateObject ()
-    { return scfParent; }
-    virtual void AddAffectedLightingInfo (iLightingInfo* li)
-    { scfParent->AddAffectedLightingInfo (li); }
-    virtual void RemoveAffectedLightingInfo (iLightingInfo* li)
-    { scfParent->RemoveAffectedLightingInfo (li); }
-    virtual void Setup ()
-    { scfParent->Setup (); }
-    virtual iObject *QueryObject ()
-    { return scfParent; }
-    virtual iLight *QueryLight ()
-    { return &(scfParent->scfiLight); }
-    virtual iDynLight* GetNext ()
-    {
-      csDynLight* n = scfParent->GetNext ();
-      return n ? &(n->scfiDynLight) : 0;
-    }
-  } scfiDynLight;
-  friend struct eiDynLight;
+  csDynLight* GetCsPrev () { return prev; }
 };
 
 

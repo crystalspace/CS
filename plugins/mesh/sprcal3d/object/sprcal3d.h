@@ -35,11 +35,9 @@
 #include "imesh/spritecal3d.h"
 #include "imesh/object.h"
 #include "imesh/lighting.h"
-#include "iengine/dynlight.h"
 #include "iengine/material.h"
 #include "iengine/light.h"
 #include "iengine/lod.h"
-#include "iengine/statlght.h"
 #include "iutil/config.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -592,10 +590,10 @@ public:
   csSpriteCal3DMeshObjectFactory* GetFactory3D () const { return factory; }
 
   // ------------------------------- Lighting --------------------------------
-  void DynamicLightChanged (iDynLight* dynlight);
-  void DynamicLightDisconnect (iDynLight* dynlight);
-  void StaticLightChanged (iStatLight* statlight);
-  void StaticLightDisconnect (iStatLight* statlight);
+  void DynamicLightChanged (iLight* dynlight);
+  void DynamicLightDisconnect (iLight* dynlight);
+  void StaticLightChanged (iLight* statlight);
+  void StaticLightDisconnect (iLight* statlight);
 
   //------------------------- iLightingInfo interface -------------------------
   struct LightingInfo : public iLightingInfo
@@ -623,19 +621,19 @@ public:
     {
       return scfParent->dynamic_ambient;;
     }
-    virtual void DynamicLightChanged (iDynLight* dynlight)
+    virtual void DynamicLightChanged (iLight* dynlight)
     {
       scfParent->DynamicLightChanged (dynlight);
     }
-    virtual void DynamicLightDisconnect (iDynLight* dynlight)
+    virtual void DynamicLightDisconnect (iLight* dynlight)
     {
       scfParent->DynamicLightDisconnect (dynlight);
     }
-    virtual void StaticLightChanged (iStatLight* statlight)
+    virtual void StaticLightChanged (iLight* statlight)
     {
       scfParent->StaticLightChanged (statlight);
     }
-    virtual void StaticLightDisconnect (iStatLight* statlight)
+    virtual void StaticLightDisconnect (iLight* statlight)
     {
       scfParent->StaticLightDisconnect (statlight);
     }

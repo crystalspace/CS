@@ -229,7 +229,6 @@
 	INTERFACE_APPLY(iSprite2DState)
 	INTERFACE_APPLY(iSprite3DState)
 	INTERFACE_APPLY(iSpriteCal3DState)
-	INTERFACE_APPLY(iStatLight)
 	INTERFACE_APPLY(iStream)
 	INTERFACE_APPLY(iStreamIterator)
 	INTERFACE_APPLY(iStreamFormat)
@@ -827,7 +826,6 @@ TYPEMAP_OUT_csWrapPtr
 
 %include "iengine/fview.h"
 %include "iengine/light.h"
-%include "iengine/statlght.h"
 %include "iengine/sector.h"
 %include "iengine/engine.h"
 %include "iengine/camera.h"

@@ -701,11 +701,11 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
     return;
 
   // Apply lighting BEFORE the very first frame
-  iDynLight* dyn = Engine->GetFirstDynLight ();
+  iLight* dyn = Engine->GetFirstDynLight ();
   while (dyn)
   {
-    extern void HandleDynLight (iDynLight*);
-    iDynLight* dn = dyn->GetNext ();
+    extern void HandleDynLight (iLight*);
+    iLight* dn = dyn->GetNext ();
     csRef<iDataObject> dao (
     	CS_GET_CHILD_OBJECT (dyn->QueryObject (), iDataObject));
     if (dao)

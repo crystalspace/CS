@@ -31,7 +31,7 @@
 #include "iengine/texture.h"
 #include "iengine/material.h"
 #include "iengine/shadows.h"
-#include "iengine/dynlight.h"
+#include "iengine/light.h"
 #include "iengine/movable.h"
 #include "csutil/debug.h"
 #include "ivideo/texture.h"
@@ -498,7 +498,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
   invhh = 1.0f / (float)hh;
 
   csRGBpixel* map = lm->GetRealMap ();
-  iDynLight *light = lp->GetLight ();
+  iLight *light = lp->GetLight ();
 #if defined(CS_DEBUG)
   long lm_size = lm->GetWidth () * lm->GetHeight (); // Used only for asserts.
 #endif
@@ -512,7 +512,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
   if (lp->GetLightFrustum ())
     lightpos = lp->GetLightFrustum ()->GetOrigin ();
   else
-    lightpos = light->QueryLight ()->GetCenter ();
+    lightpos = light->GetCenter ();
 
   // Calculate the uv's for all points of the frustum (the
   // frustum is actually a clipped version of the polygon).
@@ -537,7 +537,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
     }
   }
 
-  csColor color = light->QueryLight ()->GetColor () * CS_NORMAL_LIGHT_LEVEL;
+  csColor color = light->GetColor () * CS_NORMAL_LIGHT_LEVEL;
 
   int new_lw = lm->GetWidth ();
 
@@ -700,7 +700,7 @@ b:
         {
           d = csSquaredDist::PointPoint (lightpos, v2);
 
-          if (d >= light->QueryLight ()->GetInfluenceRadiusSq ()) continue;
+          if (d >= light->GetInfluenceRadiusSq ()) continue;
           d = qsqrt (d);
 
           float cosinus = (v2 - lightpos) *
@@ -712,8 +712,7 @@ b:
           else if (cosinus > 1)
             cosinus = 1;
 
-          float brightness = cosinus * light->QueryLight ()
-		->GetBrightnessAtDistance (d);
+          float brightness = cosinus * light->GetBrightnessAtDistance (d);
 
           if (color.red > 0)
           {
@@ -1574,8 +1573,8 @@ void csLightingPolyTexQueue::UpdateMaps (
   const csVector3 &lightpos,
   const csColor &lightcolor)
 {
-  csRef<iDynLight> dl = SCF_QUERY_INTERFACE (light, iDynLight);
-  if (dl) return; // No update maps for dynamic lights.
+  if (light->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
+    return; // No update maps for dynamic lights.
 
   int i;
   for (i = 0; i < polytxts.Length (); i++)

@@ -29,7 +29,6 @@ class Flock;
 struct iSector;
 struct iView;
 struct iEngine;
-struct iDynLight;
 struct iMaterialWrapper;
 struct iThingFactoryState;
 struct iFont;

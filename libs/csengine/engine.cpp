@@ -1023,7 +1023,7 @@ void csEngine::DeleteAll ()
 
   while (first_dyn_lights)
   {
-    csDynLight *dyn = first_dyn_lights->GetNext ();
+    csDynLight *dyn = first_dyn_lights->GetCsNext ();
     delete first_dyn_lights;
     first_dyn_lights = dyn;
   }
@@ -1273,7 +1273,7 @@ void csEngine::ForceRelight (iRegion* region, iProgressMeter *meter)
   lightcache_mode = old_lightcache_mode;
 }
 
-void csEngine::ForceRelight (iStatLight* light, iRegion* region)
+void csEngine::ForceRelight (iLight* light, iRegion* region)
 {
 #ifndef CS_USE_NEW_RENDERER
   G3D->ClearCache ();
@@ -1321,7 +1321,7 @@ void csEngine::ForceRelight (iStatLight* light, iRegion* region)
   }
 }
 
-void csEngine::RemoveLight (iStatLight* light)
+void csEngine::RemoveLight (iLight* light)
 {
 #ifndef CS_USE_NEW_RENDERER
   G3D->ClearCache ();
@@ -1339,8 +1339,7 @@ void csEngine::RemoveLight (iStatLight* light)
       linfo->StaticLightDisconnect (light);
     }
   }
-  light->QueryLight ()->GetSector ()->GetLights ()
-  	->Remove (light->QueryLight ());
+  light->GetSector ()->GetLights ()->Remove (light);
 }
 
 void csEngine::SetCacheManager (iCacheManager* cache_mgr)
@@ -1919,22 +1918,18 @@ void csEngine::RemoveHalo (csLight *Light)
   }
 }
 
-iStatLight *csEngine::FindLightID (const char* light_id) const
+iLight *csEngine::FindLightID (const char* light_id) const
 {
   for (int i = 0; i < sectors.GetCount (); i++)
   {
     iLight *l = sectors.Get (i)->GetLights ()->FindByID (light_id);
-    if (l)
-    {
-      csRef<iStatLight> sl (SCF_QUERY_INTERFACE (l, iStatLight));
-      if (sl) return sl;	// Smart pointer DecRef() is ok in this case.
-    }
+    if (l) return l;
   }
 
   return 0;
 }
 
-iStatLight *csEngine::FindLight (const char *name, bool regionOnly) const
+iLight *csEngine::FindLight (const char *name, bool regionOnly) const
 {
   // XXX: Need to implement region?
   (void)regionOnly;
@@ -1944,11 +1939,7 @@ iStatLight *csEngine::FindLight (const char *name, bool regionOnly) const
   for (i = 0; i < sectors.GetCount (); i++)
   {
     iLight *l = sectors.Get (i)->GetLights ()->FindByName (name);
-    if (l)
-    {
-      csRef<iStatLight> sl (SCF_QUERY_INTERFACE (l, iStatLight));
-      if (sl) return sl;	// Smart pointer DecRef() is ok in this case.
-    }
+    if (l) return l;
   }
 
   return 0;
@@ -1965,19 +1956,19 @@ void csEngine::AddDynLight (csDynLight *dyn)
 
 void csEngine::RemoveDynLight (csDynLight *dyn)
 {
-  if (dyn->GetNext ()) dyn->GetNext ()->SetPrev (dyn->GetPrev ());
-  if (dyn->GetPrev ())
-    dyn->GetPrev ()->SetNext (dyn->GetNext ());
+  if (dyn->GetCsNext ()) dyn->GetCsNext ()->SetPrev (dyn->GetCsPrev ());
+  if (dyn->GetCsPrev ())
+    dyn->GetCsPrev ()->SetNext (dyn->GetCsNext ());
   else if (dyn == first_dyn_lights)
-    first_dyn_lights = dyn->GetNext ();
+    first_dyn_lights = dyn->GetCsNext ();
   dyn->SetNext (0);
   dyn->SetPrev (0);
   dyn->DecRef ();
 }
 
-iDynLight* csEngine::GetFirstDynLight () const
+iLight* csEngine::GetFirstDynLight () const
 {
-  return first_dyn_lights ? &(first_dyn_lights->scfiDynLight) : 0;
+  return first_dyn_lights ? &(first_dyn_lights->scfiLight) : 0;
 }
 
 void csEngine::ControlMeshes ()
@@ -2421,7 +2412,7 @@ int csEngine::GetNearbyLights (
         }
       }
 
-      dl = dl->GetNext ();
+      dl = dl->GetCsNext ();
     }
   }
 
@@ -2493,7 +2484,7 @@ int csEngine::GetNearbyLights (
         }
       }
 
-      dl = dl->GetNext ();
+      dl = dl->GetCsNext ();
     }
   }
 
@@ -2964,7 +2955,7 @@ csPtr<iCamera> csEngine::CreateCamera ()
   return csPtr<iCamera> (&(new csCamera ())->scfiCamera);
 }
 
-csPtr<iStatLight> csEngine::CreateLight (
+csPtr<iLight> csEngine::CreateLight (
   const char *name,
   const csVector3 &pos,
   float radius,
@@ -2982,12 +2973,10 @@ csPtr<iStatLight> csEngine::CreateLight (
       pseudoDyn);
   if (name) light->SetName (name);
 
-  csRef<iStatLight> il (SCF_QUERY_INTERFACE (light, iStatLight));
-  light->DecRef ();
-  return csPtr<iStatLight> (il);
+  return csPtr<iLight> (&(light->scfiLight));
 }
 
-csPtr<iDynLight> csEngine::CreateDynLight (
+csPtr<iLight> csEngine::CreateDynLight (
   const csVector3 &pos,
   float radius,
   const csColor &color)
@@ -3002,12 +2991,12 @@ csPtr<iDynLight> csEngine::CreateDynLight (
       color.blue);
   AddDynLight (light);
 
-  return csPtr<iDynLight> (&(light->scfiDynLight));
+  return csPtr<iLight> (&(light->scfiLight));
 }
 
-void csEngine::RemoveDynLight (iDynLight *light)
+void csEngine::RemoveDynLight (iLight *light)
 {
-  RemoveDynLight (light->GetPrivateObject ());
+  RemoveDynLight ((csDynLight*)(light->GetPrivateObject ()));
 }
 
 csPtr<iMeshFactoryWrapper> csEngine::CreateMeshFactory (
@@ -3143,8 +3132,6 @@ iTextureWrapper* EngineLoaderContext::FindTexture (const char* name)
 
 iLight* EngineLoaderContext::FindLight(const char *name)
 {
-  // This function is necessary because Engine::FindLight returns iStatLight
-  // and not iLight.
   csRef<iLightIterator> li = Engine->GetLightIterator (
   	curRegOnly ? region : 0);
   iLight *light;
@@ -3456,8 +3443,8 @@ bool csEngine::RemoveObject (iBase *object)
     }
   }
   {
-    csRef<iDynLight> dl (SCF_QUERY_INTERFACE (object, iDynLight));
-    if (dl)
+    csRef<iLight> dl (SCF_QUERY_INTERFACE (object, iLight));
+    if (dl && dl->GetDynamicType () == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
     {
       // Remove from region it might be in.
       if (dl->QueryObject ()->GetObjectParent ())

@@ -24,7 +24,7 @@
 
 struct iMeshObject;
 struct iSector;
-struct iDynLight;
+struct iLight;
 struct iEngine;
 class csEngine;
 
@@ -47,7 +47,7 @@ public:
   /// Next bot.
   Bot* next;
   /// Optional dynamic light.
-  csRef<iDynLight> light;
+  csRef<iLight> light;
 
 public:
   /// Constructor.

@@ -55,7 +55,6 @@
 #include "iengine/halo.h"
 #include "iengine/campos.h"
 #include "iengine/light.h"
-#include "iengine/statlght.h"
 #include "iengine/mesh.h"
 #include "iengine/lod.h"
 #include "iengine/imposter.h"
@@ -186,8 +185,6 @@ iMeshWrapper* StdLoaderContext::FindMeshObject (const char* name)
 
 iLight* StdLoaderContext::FindLight (const char *name)
 {
-  // This function is necessary because Engine::FindLight returns iStatLight
-  // and not iLight.
   csRef<iLightIterator> li = Engine->GetLightIterator (
   	curRegOnly ? region : 0);
   iLight *light;
@@ -195,7 +192,7 @@ iLight* StdLoaderContext::FindLight (const char *name)
   while (li->HasNext ())
   {
     light = li->Next ();
-    if (!strcmp (light->GetPrivateObject ()->GetName (), name))
+    if (!strcmp (light->QueryObject ()->GetName (), name))
       return light;
   }
   return 0;
@@ -302,8 +299,6 @@ iMeshWrapper* ThreadedLoaderContext::FindMeshObject (const char* name)
 
 iLight* ThreadedLoaderContext::FindLight (const char *name)
 {
-  // This function is necessary because Engine::FindLight returns iStatLight
-  // and not iLight.
   csRef<iLightIterator> li = Engine->GetLightIterator (
   	curRegOnly ? region : 0);
   iLight *light;
@@ -311,7 +306,7 @@ iLight* ThreadedLoaderContext::FindLight (const char *name)
   while (li->HasNext ())
   {
     light = li->Next ();
-    if (!strcmp (light->GetPrivateObject ()->GetName (),name))
+    if (!strcmp (light->QueryObject ()->GetName (),name))
       return light;
   }
   return 0;
@@ -3510,7 +3505,7 @@ bool csLoader::ParseStart (iDocumentNode* node, iCameraPosition* campos)
   return true;
 }
 
-iStatLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
+iLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	iDocumentNode* node)
 {
   const char* lightname = node->GetAttributeValue ("name");
@@ -3803,18 +3798,18 @@ iStatLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
     else dist = color.blue;
   }
 
-  csRef<iStatLight> l = Engine->CreateLight (lightname, pos,
+  csRef<iLight> l = Engine->CreateLight (lightname, pos,
   	dist, color, dyn);
   AddToRegion (ldr_context, l->QueryObject ());
 
   switch (halo.type)
   {
     case 1:
-      l->QueryLight ()->CreateCrossHalo (halo.cross.Intensity,
+      l->CreateCrossHalo (halo.cross.Intensity,
       	halo.cross.Cross);
       break;
     case 2:
-      l->QueryLight ()->CreateNovaHalo (halo.nova.Seed, halo.nova.NumSpokes,
+      l->CreateNovaHalo (halo.nova.Seed, halo.nova.NumSpokes,
       	halo.nova.Roundness);
       break;
     case 3:
@@ -3826,7 +3821,7 @@ iStatLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
 	iMaterialWrapper* ifm3 = halo.flare.mat_spark3;
 	iMaterialWrapper* ifm4 = halo.flare.mat_spark4;
 	iMaterialWrapper* ifm5 = halo.flare.mat_spark5;
-        iFlareHalo* flare = l->QueryLight ()->CreateFlareHalo ();
+        iFlareHalo* flare = l->CreateFlareHalo ();
 	flare->AddComponent (0.0f, 1.2f, 1.2f, CS_FX_ADD, ifmc);
 	flare->AddComponent (0.3f, 0.1f, 0.1f, CS_FX_ADD, ifm3);
 	flare->AddComponent (0.6f, 0.4f, 0.4f, CS_FX_ADD, ifm4);
@@ -3846,22 +3841,22 @@ iStatLight* csLoader::ParseStatlight (iLoaderContext* ldr_context,
       }
       break;
   }
-  l->QueryLight ()->SetAttenuation (attenuation);
+  l->SetAttenuation (attenuation);
   if (attenuation == CS_ATTN_CLQ)
   {
     if (attenvec.IsZero())
     {
-      l->QueryLight ()->CalculateAttenuationVector 
+      l->CalculateAttenuationVector 
         (attenuation, dist, distbright);
     }
     else
     {
-      l->QueryLight ()->SetAttenuationVector (attenvec);
+      l->SetAttenuationVector (attenvec);
     }
   }
 #ifdef CS_USE_NEW_RENDERER
   if (influenceOverride)
-    l->QueryLight()->SetInfluenceRadius (influenceRadius);
+    l->SetInfluenceRadius (influenceRadius);
 #endif
 
   // Move the key-value pairs from 'Keys' to the light object
@@ -4308,12 +4303,9 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
         break;
       case XMLTOKEN_LIGHT:
         {
-	  iStatLight* sl = ParseStatlight (ldr_context, child);
-	  if (!sl)
-	  {
-	    goto error;
-	  }
-          sector->GetLights ()->Add (sl->QueryLight ());
+	  iLight* sl = ParseStatlight (ldr_context, child);
+	  if (!sl) goto error;
+          sector->GetLights ()->Add (sl);
 	  sl->DecRef ();
 	}
         break;

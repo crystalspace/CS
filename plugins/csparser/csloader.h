@@ -76,7 +76,6 @@ struct iMaterialWrapper;
 struct iMeshFactoryWrapper;
 struct iMeshWrapper;
 struct iSector;
-struct iStatLight;
 struct iKeyValuePair;
 struct iMapNode;
 struct iReporter;
@@ -501,7 +500,7 @@ private:
   /// Parse a camera position.
   bool ParseStart (iDocumentNode* node, iCameraPosition* campos);
   /// Parse a static light definition and add the light to the engine
-  iStatLight* ParseStatlight (iLoaderContext* ldr_context, iDocumentNode* node);
+  iLight* ParseStatlight (iLoaderContext* ldr_context, iDocumentNode* node);
   /// Parse a key definition and add the key to the given object
   iKeyValuePair* ParseKey (iDocumentNode* node, iObject* pParent);
   /// Parse a map node definition and add the node to the given sector

@@ -40,7 +40,6 @@
 #include "iengine/engine.h"
 #include "iengine/sector.h"
 #include "iengine/light.h"
-#include "iengine/statlght.h"
 #include "iengine/camera.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"

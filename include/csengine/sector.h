@@ -45,7 +45,6 @@ class csSector;
 class csStatLight;
 class csMeshWrapper;
 class csKDTree;
-struct iStatLight;
 struct iVisibilityCuller;
 struct iRenderView;
 struct iMeshWrapper;

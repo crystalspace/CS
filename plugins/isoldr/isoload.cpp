@@ -48,7 +48,6 @@
 #include "iengine/halo.h"
 #include "iengine/campos.h"
 #include "iengine/light.h"
-#include "iengine/statlght.h"
 #include "iengine/mesh.h"
 #include "ivaria/keyval.h"
 #include "ivideo/material.h"

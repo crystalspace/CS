@@ -19,7 +19,6 @@
 #include "cssysdef.h"
 #include "bot.h"
 #include "csengine/engine.h"
-#include "iengine/dynlight.h"
 #include "iengine/light.h"
 #include "iengine/sector.h"
 
@@ -98,8 +97,8 @@ void Bot::move (csTicks elapsed_time)
     UpdateLighting (lights, num_lights);
     if (light)
     {
-      light->QueryLight ()->SetSector (s);
-      light->QueryLight ()->SetCenter (new_p);
+      light->SetSector (s);
+      light->SetCenter (new_p);
       light->Setup ();
     }
   }

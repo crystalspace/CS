@@ -54,7 +54,6 @@
 #include "imesh/sprite3d.h"
 #include "imesh/thing/thing.h"
 #include "imesh/thing/polygon.h"
-#include "iengine/statlght.h"
 #include "ivaria/reporter.h"
 #include "igeom/clip2d.h"
 
@@ -2282,7 +2281,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     RECORD_ARGS (cmd, arg);
     csVector3 dir (0,0,0);
     csVector3 pos = Sys->view->GetCamera ()->GetTransform ().This2Other (dir);
-    csRef<iDynLight> dyn;
+    csRef<iLight> dyn;
 
     bool rnd;
     float r, g, b, radius, thing_shadows;
@@ -2291,8 +2290,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     {
       dyn = Sys->view->GetEngine ()->CreateDynLight (pos,
       	radius, csColor (r, g, b));
-      if (thing_shadows) dyn->QueryLight ()->
-      	GetFlags ().Set (CS_LIGHT_THINGSHADOWS, CS_LIGHT_THINGSHADOWS);
+      if (thing_shadows)
+        dyn->GetFlags ().Set (CS_LIGHT_THINGSHADOWS, CS_LIGHT_THINGSHADOWS);
       rnd = false;
     }
     else
@@ -2301,9 +2300,9 @@ bool CommandHandler (const char *cmd, const char *arg)
       	6, csColor (1, 1, 1));
       rnd = true;
     }
-    dyn->QueryLight ()->SetSector (Sys->view->GetCamera ()->GetSector ());
+    dyn->SetSector (Sys->view->GetCamera ()->GetSector ());
     dyn->Setup ();
-    extern void AttachRandomLight (iDynLight* light);
+    extern void AttachRandomLight (iLight* light);
     if (rnd)
       AttachRandomLight (dyn);
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Dynamic light added.");
@@ -2328,12 +2327,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     }
     else
     {
-      csRef<iStatLight> sl = SCF_QUERY_INTERFACE (l, iStatLight);
-      if (sl)
-      {
-        Sys->view->GetEngine ()->RemoveLight (sl);
-	Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Static light removed.");
-      }
+      Sys->view->GetEngine ()->RemoveLight (l);
+      Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Static light removed.");
     }
   }
   else if (!strcasecmp (cmd, "addstlight"))
@@ -2341,7 +2336,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     RECORD_ARGS (cmd, arg);
     csVector3 dir (0,0,0);
     csVector3 pos = Sys->view->GetCamera ()->GetTransform ().This2Other (dir);
-    csRef<iStatLight> light;
+    csRef<iLight> light;
 
     float r, g, b, radius;
     char name[255];
@@ -2357,13 +2352,13 @@ bool CommandHandler (const char *cmd, const char *arg)
         pos, 12, csColor (0, 0, 1), true);
     }
     iLightList* ll = Sys->view->GetCamera ()->GetSector ()->GetLights ();
-    ll->Add (light->QueryLight ());
+    ll->Add (light);
     Sys->view->GetEngine ()->ForceRelight (light);
     Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Static light added.");
   }
   else if (!strcasecmp (cmd, "dellight"))
   {
-    iDynLight* dyn;
+    iLight* dyn;
     if ((dyn = Sys->view->GetEngine ()->GetFirstDynLight ()) != 0)
     {
       Sys->view->GetEngine ()->RemoveDynLight (dyn);
@@ -2373,7 +2368,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   else if (!strcasecmp (cmd, "dellights"))
   {
     RECORD_CMD (cmd);
-    iDynLight* dyn;
+    iLight* dyn;
     while ((dyn = Sys->view->GetEngine ()->GetFirstDynLight ()) != 0)
     {
       Sys->view->GetEngine ()->RemoveDynLight (dyn);

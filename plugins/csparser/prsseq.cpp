@@ -28,7 +28,6 @@
 #include "iengine/engine.h"
 #include "iengine/region.h"
 #include "iengine/light.h"
-#include "iengine/statlght.h"
 #include "iengine/sharevar.h"
 #include "iengine/mesh.h"
 #include "imesh/thing/thing.h"
@@ -130,8 +129,8 @@ csPtr<iParameterESM> csLoader::ResolveOperationParameter (
     {
       case PARTYPE_LIGHT:
 	{
-	  iStatLight* l = Engine->FindLight (parname);
-	  if (l) value = l->QueryLight ();
+	  iLight* l = Engine->FindLight (parname);
+	  if (l) value = l;
 	}
         break;
       case PARTYPE_MESH:
@@ -300,7 +299,7 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	    error = true;
 	    return 0;
 	  }
-	  iStatLight* light = Engine->FindLight (lightname);
+	  iLight* light = Engine->FindLight (lightname);
 	  if (!light)
 	  {
 	    SyntaxService->ReportError (
@@ -310,7 +309,7 @@ csPtr<iEngineSequenceParameters> csLoader::CreateSequenceParameters (
 	    error = true;
 	    return 0;
 	  }
-	  params->SetParameter (idx, light->QueryLight ());
+	  params->SetParameter (idx, light);
 	  found_params++;
 	}
 	break;

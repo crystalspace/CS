@@ -28,8 +28,6 @@
 #include "ivideo/vbufmgr.h"
 #include "iengine/light.h"
 #include "iengine/engine.h"
-#include "iengine/dynlight.h"
-#include "iengine/statlght.h"
 #include "iengine/shadows.h"
 #include "iengine/camera.h"
 
@@ -220,7 +218,7 @@ void csCurve::SetMaterial (iMaterialWrapper *m)
   Material = m;
 }
 
-void csCurve::DynamicLightDisconnect (iDynLight* dynlight)
+void csCurve::DynamicLightDisconnect (iLight* dynlight)
 {
   csBezierLightPatch* lp = LightPatches;
   while (lp)
@@ -232,10 +230,10 @@ void csCurve::DynamicLightDisconnect (iDynLight* dynlight)
   }
 }
 
-void csCurve::StaticLightDisconnect (iStatLight* statlight)
+void csCurve::StaticLightDisconnect (iLight* statlight)
 {
   if (!LightMap) return;
-  csCurveShadowMap* sm = LightMap->FindShadowMap (statlight->QueryLight ());
+  csCurveShadowMap* sm = LightMap->FindShadowMap (statlight);
   if (!sm) return;
   LightMap->DelShadowMap (sm);
   light_version--;
@@ -285,12 +283,12 @@ void csCurve::ShineDynLight (csBezierLightPatch *lp)
   int lm_width = LightMap->GetWidth ();
   int lm_height = LightMap->GetHeight ();
 
-  iDynLight *light = lp->GetLight ();
+  iLight *light = lp->GetLight ();
 
   iShadowIterator *shadow_it = lp->GetShadowBlock ()->GetShadowIterator ();
   bool has_shadows = shadow_it->HasNext ();
 
-  csColor color = light->QueryLight ()->GetColor () * CS_NORMAL_LIGHT_LEVEL;
+  csColor color = light->GetColor () * CS_NORMAL_LIGHT_LEVEL;
 
   csRGBpixel *map = LightMap->GetRealMap ().GetArray ();
   csVector3 &center = lp->GetLightFrustum ()->GetOrigin ();
@@ -340,7 +338,7 @@ void csCurve::ShineDynLight (csBezierLightPatch *lp)
       }
 
       d = csSquaredDist::PointPoint (center, pos);
-      if (d >= light->QueryLight ()->GetInfluenceRadiusSq ()) continue;
+      if (d >= light->GetInfluenceRadiusSq ()) continue;
       d = qsqrt (d);
       normal = uv2Normal[uv];
 
@@ -352,8 +350,7 @@ void csCurve::ShineDynLight (csBezierLightPatch *lp)
       else if (cosinus > 1)
         cosinus = 1;
 
-      float brightness = cosinus * light->QueryLight ()->
-        GetBrightnessAtDistance (d);
+      float brightness = cosinus * light->GetBrightnessAtDistance (d);
 
       if (color.red > 0)
       {
@@ -569,8 +566,7 @@ void csCurve::CalculateLightingDynamic (iFrustumView *lview)
   AddLightPatch (lp);
 
   iLight* l = lpi->GetLight ();
-  csRef<iDynLight> dl = SCF_QUERY_INTERFACE (l, iDynLight);
-  lp->SetLight (dl);
+  lp->SetLight (l);
 
   // This light patch has exactly 4 vertices because it fits around our
   // LightMap

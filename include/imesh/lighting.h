@@ -22,8 +22,6 @@
 #include "csutil/scf.h"
 
 struct iCacheManager;
-struct iDynLight;
-struct iStatLight;
 
 SCF_VERSION (iLightingInfo, 0, 2, 0);
 
@@ -77,22 +75,22 @@ struct iLightingInfo : public iBase
    * be called by the lighting system whenever a dynamic light that
    * affects this mesh is changed in some way.
    */
-  virtual void DynamicLightChanged (iDynLight* dynlight) = 0;
+  virtual void DynamicLightChanged (iLight* dynlight) = 0;
 
   /**
    * Indicate that some dynamic light no longer affects this mesh.
    */
-  virtual void DynamicLightDisconnect (iDynLight* dynlight) = 0;
+  virtual void DynamicLightDisconnect (iLight* dynlight) = 0;
 
   /**
    * Indicate that some pseudo-dynamic light has changed color.
    */
-  virtual void StaticLightChanged (iStatLight* statlight) = 0;
+  virtual void StaticLightChanged (iLight* statlight) = 0;
 
   /**
    * Indicate that some pseudo-dynamic light no longer affects this mesh.
    */
-  virtual void StaticLightDisconnect (iStatLight* statlight) = 0;
+  virtual void StaticLightDisconnect (iLight* statlight) = 0;
 };
 
 #endif // __CS_IMESH_LIGHTING_H__

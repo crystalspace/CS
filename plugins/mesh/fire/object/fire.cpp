@@ -24,7 +24,6 @@
 #include "ivideo/material.h"
 #include "iengine/material.h"
 #include "iengine/light.h"
-#include "iengine/dynlight.h"
 #include "iengine/sector.h"
 #include "iengine/engine.h"
 #include "qsqrt.h"
@@ -149,8 +148,7 @@ csFireMeshObject::~csFireMeshObject()
 
 void csFireMeshObject::SetControlledLight (iLight *l)
 {
-  light = l;
-  dynlight = SCF_QUERY_INTERFACE_SAFE (light, iDynLight);
+  dynlight = l;
 }
 
 void csFireMeshObject::RestartParticle (int index, float pre_move)
@@ -210,14 +208,14 @@ void csFireMeshObject::Update (csTicks elapsed_time)
 {
   SetupObject ();
   csParticleSystem::Update (elapsed_time);
-  if (light)
+  if (dynlight)
   {
     light_time += elapsed_time;
     csColor newcol;
     newcol.red =   1.0 - 0.3*sin(light_time/10. + origin.Min().x);
     newcol.green = 0.7 - 0.3*sin(light_time/15. + origin.Min().y);
     newcol.blue =  0.3 + 0.3*sin(light_time/10. + origin.Min().z);
-    light->SetColor (newcol);
+    dynlight->SetColor (newcol);
   }
 
   float delta_t = elapsed_time / 1000.0f; // in seconds
@@ -242,10 +240,9 @@ void csFireMeshObject::Update (csTicks elapsed_time)
 
 void csFireMeshObject::AddLight (iEngine *engine, iSector *sec)
 {
-  if (light) return;
+  if (dynlight) return;
   dynlight = engine->CreateDynLight (origin.GetCenter(), 5, csColor (1, 1, 0));
-  light = SCF_QUERY_INTERFACE (dynlight, iLight);
-  light->SetSector (sec);
+  dynlight->SetSector (sec);
   dynlight->Setup ();
   delete_light = true;
   light_engine = engine;

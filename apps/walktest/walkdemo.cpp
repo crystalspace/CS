@@ -23,7 +23,6 @@
 #include "command.h"
 #include "ivaria/view.h"
 #include "ivaria/engseq.h"
-#include "iengine/dynlight.h"
 #include "iengine/light.h"
 #include "iengine/campos.h"
 #include "iengine/region.h"
@@ -931,14 +930,14 @@ bool do_bots = false;
 void add_bot (float size, iSector* where, csVector3 const& pos,
 	float dyn_radius)
 {
-  csRef<iDynLight> dyn;
+  csRef<iLight> dyn;
   if (dyn_radius)
   {
     float r, g, b;
     RandomColor (r, g, b);
     dyn = Sys->view->GetEngine ()->CreateDynLight (
     	pos, dyn_radius, csColor(r, g, b));
-    dyn->QueryLight ()->SetSector (where);
+    dyn->SetSector (where);
     dyn->Setup ();
   }
   iMeshFactoryWrapper* tmpl = Sys->view->GetEngine ()->GetMeshFactories ()
@@ -1022,19 +1021,19 @@ struct RandomLight
   float dyn_r1, dyn_g1, dyn_b1;
 };
 
-void HandleDynLight (iDynLight* dyn)
+void HandleDynLight (iLight* dyn)
 {
   LightStruct* ls = (LightStruct*)(csDataObject::GetData(dyn->QueryObject ()));
-  csRef<iLight> l (SCF_QUERY_INTERFACE (dyn, iLight));
   switch (ls->type)
   {
     case DYN_TYPE_MISSILE:
     {
-      MissileStruct* ms = (MissileStruct*)(csDataObject::GetData(dyn->QueryObject ()));
+      MissileStruct* ms = (MissileStruct*)(csDataObject::GetData(
+      	dyn->QueryObject ()));
       csVector3 v (0, 0, 2.5);
-      csVector3 old = l->GetCenter ();
+      csVector3 old = dyn->GetCenter ();
       v = old + ms->dir.GetT2O () * v;
-      iSector* s = l->GetSector ();
+      iSector* s = dyn->GetSector ();
       bool mirror = false;
       csVector3 old_v = v;
       s = s->FollowSegment (ms->dir, v, mirror);
@@ -1050,7 +1049,7 @@ void HandleDynLight (iDynLight* dyn)
 	    int i;
 	    if (do_bots)
 	      for (i = 0 ; i < 40 ; i++)
-            add_bot (1, l->GetSector (), l->GetCenter (), 0);
+            add_bot (1, dyn->GetSector (), dyn->GetCenter (), 0);
 	  }
 	  ms->sprite->GetMovable ()->ClearSectors ();
 	  Sys->view->GetEngine ()->GetMeshes ()->Remove (ms->sprite);
@@ -1065,7 +1064,8 @@ void HandleDynLight (iDynLight* dyn)
         delete ms;
         if (Sys->mySound)
         {
-          csRef<iSoundSource> sndsrc (Sys->wMissile_boom->CreateSource (SOUND3D_ABSOLUTE));
+          csRef<iSoundSource> sndsrc (
+	  	Sys->wMissile_boom->CreateSource (SOUND3D_ABSOLUTE));
           if (sndsrc)
           {
             sndsrc->SetPosition (v);
@@ -1079,12 +1079,12 @@ void HandleDynLight (iDynLight* dyn)
         csDataObject* esdata = new csDataObject (es);
         dyn->QueryObject ()->ObjAdd (esdata);
 	esdata->DecRef ();
-        add_particles_explosion (l->GetSector (), l->GetCenter (), "explo");
+        add_particles_explosion (dyn->GetSector (), dyn->GetCenter (), "explo");
         return;
       }
       else ms->dir.SetOrigin (v);
-      l->SetSector (s);
-      l->SetCenter (v);
+      dyn->SetSector (s);
+      dyn->SetCenter (v);
       dyn->Setup ();
       if (ms->sprite) move_mesh (ms->sprite, s, v);
       if (Sys->mySound && ms->snd) ms->snd->SetPosition (v);
@@ -1093,7 +1093,7 @@ void HandleDynLight (iDynLight* dyn)
     case DYN_TYPE_EXPLOSION:
     {
       ExplosionStruct* es = (ExplosionStruct*)(csDataObject::GetData(
-								     dyn->QueryObject ()));
+      	dyn->QueryObject ()));
       if (es->dir == 1)
       {
         es->radius += 3;
@@ -1112,25 +1112,26 @@ void HandleDynLight (iDynLight* dyn)
 	  return;
 	}
       }
-      l->SetInfluenceRadius (es->radius);
+      dyn->SetInfluenceRadius (es->radius);
       dyn->Setup ();
       break;
     }
     case DYN_TYPE_RANDOM:
     {
-      RandomLight* rl = (RandomLight*)(csDataObject::GetData(dyn->QueryObject ()));
+      RandomLight* rl = (RandomLight*)(csDataObject::GetData(
+      	dyn->QueryObject ()));
       rl->dyn_move += rl->dyn_move_dir;
       if (rl->dyn_move < 0 || rl->dyn_move > 2)
       	rl->dyn_move_dir = -rl->dyn_move_dir;
-      if (ABS (rl->dyn_r1-l->GetColor ().red) < .01 &&
-      	  ABS (rl->dyn_g1-l->GetColor ().green) < .01 &&
-	  ABS (rl->dyn_b1-l->GetColor ().blue) < .01)
+      if (ABS (rl->dyn_r1-dyn->GetColor ().red) < .01 &&
+      	  ABS (rl->dyn_g1-dyn->GetColor ().green) < .01 &&
+	  ABS (rl->dyn_b1-dyn->GetColor ().blue) < .01)
         RandomColor (rl->dyn_r1, rl->dyn_g1, rl->dyn_b1);
       else
-        l->SetColor (csColor ((rl->dyn_r1+7.*l->GetColor ().red)/8.,
-		(rl->dyn_g1+7.*l->GetColor ().green)/8.,
-		(rl->dyn_b1+7.*l->GetColor ().blue)/8.));
-      l->SetCenter (l->GetCenter () + csVector3 (0, rl->dyn_move_dir, 0));
+        dyn->SetColor (csColor ((rl->dyn_r1+7.*dyn->GetColor ().red)/8.,
+		(rl->dyn_g1+7.*dyn->GetColor ().green)/8.,
+		(rl->dyn_b1+7.*dyn->GetColor ().blue)/8.));
+      dyn->SetCenter (dyn->GetCenter () + csVector3 (0, rl->dyn_move_dir, 0));
       dyn->Setup ();
       break;
     }
@@ -1145,12 +1146,12 @@ void show_lightning ()
   {
     // This finds the light L1 (the colored light over the stairs) and
     // makes the lightning restore this color back after it runs.
-    iStatLight *light = Sys->view->GetEngine ()->FindLight("l1");
+    iLight *light = Sys->view->GetEngine ()->FindLight("l1");
     iSharedVariable *var = Sys->view->GetEngine ()->GetVariableList()
     	->FindByName("Lightning Restore Color");
     if (light && var)
     {
-      var->SetColor (light->GetPrivateObject ()->GetColor ());
+      var->SetColor (light->GetColor ());
     }
     seqmgr->RunSequenceByName ("seq_lightning", 0);
   }
@@ -1167,9 +1168,9 @@ void fire_missile ()
   csVector3 pos = Sys->view->GetCamera ()->GetTransform ().This2Other (dir);
   float r, g, b;
   RandomColor (r, g, b);
-  csRef<iDynLight> dyn (
+  csRef<iLight> dyn (
   	Sys->view->GetEngine ()->CreateDynLight (pos, 4, csColor (r, g, b)));
-  dyn->QueryLight ()->SetSector (Sys->view->GetCamera ()->GetSector ());
+  dyn->SetSector (Sys->view->GetCamera ()->GetSector ());
   dyn->Setup ();
 
   MissileStruct* ms = new MissileStruct;
@@ -1211,7 +1212,7 @@ void fire_missile ()
   }
 }
 
-void AttachRandomLight (iDynLight* light)
+void AttachRandomLight (iLight* light)
 {
   RandomLight* rl = new RandomLight;
   rl->type = DYN_TYPE_RANDOM;

@@ -427,7 +427,6 @@ if (!csInitializer::SetupEventHandler(
 @cindex iThingFactoryState
 @cindex iLight
 @cindex iLightList
-@cindex iStatLight
 @cindex iMeshWrapper
 
 Now we have a very exciting application which opens a black window and waits
@@ -497,20 +496,20 @@ bool Simple::Initialize ()
   walls_state->SetPolygonMaterial (CS_POLYRANGE_LAST, tm);
   walls_state->SetPolygonTextureMapping (CS_POLYRANGE_LAST, 3);
 
-  csRef<iStatLight> light;
+  csRef<iLight> light;
   iLightList* ll = room->GetLights ();
 
   light = engine->CreateLight (0, csVector3 (-3, 5, 0), 10,
         csColor (1, 0, 0), false);
-  ll->Add (light->QueryLight ());
+  ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (3, 5,  0), 10,
         csColor (0, 0, 1), false);
-  ll->Add (light->QueryLight ());
+  ll->Add (light);
 
   light = engine->CreateLight (0, csVector3 (0, 5, -3), 10,
         csColor (0, 1, 0), false);
-  ll->Add (light->QueryLight ());
+  ll->Add (light);
 
   engine->Prepare ();
   return true;
@@ -579,14 +578,12 @@ perpendicular to the u-axis.  The parameter 3 indicates that the texture will
 be scaled so that one texture tile is exactly 3x3 world units in size.
 
 Finally we create some lights in our room to make sure that we actually are
-able to see the walls.  The interface @samp{iStatLight} represents a static
-light which can not move and change intensity.  We create three such lights
+able to see the walls.  The interface @samp{iLight} represents a light.
+In this case we created some static lights which can not move and change
+intensity.  We create three such lights
 and add them to the room with @code{AddLight()}. Note that the list of lights
 in a sector is presented by an object implementing @code{iLightList}. To
-get this list you call @code{iSector::GetLights()}. Also note that this light
-list works with lights of type @code{iLight}. @code{iLight} is the base
-interface for all lights in Crystal Space. To get the @code{iLight} from an
-instance of @code{iStatLight} you can do @code{iStatLight::QueryLight()}.
+get this list you call @code{iSector::GetLights()}.
 
 When creating a light we use several parameters.
 First we have the name of the light. This is not used

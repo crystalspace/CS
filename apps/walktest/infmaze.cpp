@@ -27,7 +27,6 @@
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
 #include "iengine/light.h"
-#include "iengine/statlght.h"
 #include "iengine/material.h"
 
 #include "infmaze.h"
@@ -148,12 +147,12 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
   create_one_side (walls_fact_state, "c", t, t2, dx-s,dy+s,dz-s,
   		dx+s,dy+s,dz-s, dx+s,dy+s,dz+s,  dx-s,dy+s,dz+s, 0,-0.1f,0);
 
-  csRef<iStatLight> light (engine->CreateLight ("",
+  csRef<iLight> light (engine->CreateLight ("",
   	csVector3 (dx+rand2 (.9*s), dy+rand2 (.9*s), dz+rand2 (.9*s)),
 	1+rand1 (3),
   	csColor (rand1 (1), rand1 (1), rand1 (1)),
 	false));
-  room->GetLights ()->Add (light->QueryLight ());
+  room->GetLights ()->Add (light);
 
   InfRoomData* ird = new InfRoomData ();
   ird->x = x;

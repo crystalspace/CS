@@ -38,6 +38,7 @@ struct iObject;
 struct iCrossHalo;
 struct iNovaHalo;
 struct iFlareHalo;
+struct iLightingInfo;
 
 /** \name Light flags
  * @{ */
@@ -54,6 +55,30 @@ struct iFlareHalo;
  * is reset.
  */
 #define CS_LIGHT_ACTIVEHALO	0x80000000
+/** @} */
+
+/** \name Light Dynamic Types
+ * @{ */
+/**
+ * A fully static light. Unless you are using shaders/renderloop that treat
+ * all lights as dynamic this light cannot move and cannot change color.
+ * Shadows are accurate and precalculated (if you use lightmaps).
+ */
+#define CS_LIGHT_DYNAMICTYPE_STATIC	1
+
+/**
+ * A pseudo-dynamic light. Unless you are using shaders/renderloop that treat
+ * all lights as dynamic this light cannot move but it can change color.
+ * Shadows are accurate and precalculated (if you use lightmaps).
+ */
+#define CS_LIGHT_DYNAMICTYPE_PSEUDO	2
+
+/**
+ * A fully dynamic light.
+ * No shadows are calculated unless you use a shader/renderloop
+ * that does that in hardware.
+ */
+#define CS_LIGHT_DYNAMICTYPE_DYNAMIC	3
 /** @} */
 
 /// Light level that is used when there is no light on the texture.
@@ -161,6 +186,17 @@ struct iLight : public iBase
 
   /// Get the iObject for this light.
   virtual iObject *QueryObject() = 0;
+
+  /**
+   * Get the dynamic type of this light.
+   * Supported types:
+   * <ul>
+   * <li>#CS_LIGHT_DYNAMICTYPE_STATIC
+   * <li>#CS_LIGHT_DYNAMICTYPE_PSEUDO
+   * <li>#CS_LIGHT_DYNAMICTYPE_DYNAMIC
+   * </ul>
+   */
+  virtual int GetDynamicType () const = 0;
 
   /// Get the position of this light.
   virtual const csVector3& GetCenter () = 0;
@@ -286,6 +322,27 @@ struct iLight : public iBase
    * or position).
    */
   virtual uint32 GetLightNumber () const = 0;
+
+  /**
+   * Add a mesh to this light. This is usually
+   * called during Setup() by meshes that are hit by the
+   * light.
+   */
+  virtual void AddAffectedLightingInfo (iLightingInfo* li) = 0; 
+
+  /**
+   * Remove a mesh from this light.
+   */
+  virtual void RemoveAffectedLightingInfo (iLightingInfo* li) = 0; 
+
+  /**
+   * For a dynamic light you need to call this to do the actual
+   * lighting calculations.
+   */
+  virtual void Setup () = 0;
+
+  /// Get the next dynamic light in the list. @@@ TEMPORARY
+  virtual iLight* GetNext () = 0;
 };
 
 SCF_VERSION (iLightList, 0, 0, 2);

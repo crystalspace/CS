@@ -27,7 +27,6 @@ struct iMeshWrapper;
 struct iSector;
 struct iView;
 struct iEngine;
-struct iDynLight;
 struct iMaterialWrapper;
 struct iFont;
 struct iMeshWrapper;

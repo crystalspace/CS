@@ -26,7 +26,6 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
-#include "iengine/statlght.h"
 #include "iengine/light.h"
 
 #define Gfx3D Sys->myG3D

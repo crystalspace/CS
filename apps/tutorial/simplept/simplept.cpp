@@ -34,7 +34,6 @@
 #include "iengine/engine.h"
 #include "iengine/camera.h"
 #include "iengine/light.h"
-#include "iengine/statlght.h"
 #include "iengine/texture.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
@@ -396,10 +395,10 @@ bool Simple::Initialize ()
   CreatePolygon (walls_state, 0, 3, 7, 4, tm);
   CreatePolygon (walls_state, 7, 6, 5, 4, tm);
 
-  csRef<iStatLight> light;
+  csRef<iLight> light;
   light = engine->CreateLight (0, csVector3 (0, 0, 0), 20,
   	csColor (1, 1, 1), false);
-  room->GetLights ()->Add (light->QueryLight ());
+  room->GetLights ()->Add (light);
 
   engine->Prepare ();
   csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
