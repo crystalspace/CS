@@ -289,7 +289,7 @@ int csODEDynamics::CollideMeshBox (dGeomID mesh, dGeomID box, int flags,
 
   iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (mesh);
   CS_ASSERT (m);
-  csRef<iPolygonMesh> p (m->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet());
+  iPolygonMesh* p = m->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
   csVector3 *vertex_table = p->GetVertices ();
   csMeshedPolygon *polygon_list = p->GetPolygons ();
 
@@ -399,7 +399,7 @@ int csODEDynamics::CollideMeshCylinder (dGeomID mesh, dGeomID cyl, int flags,
 
   iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (mesh);
   CS_ASSERT (m);
-  csRef<iPolygonMesh> p (m->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet());
+  iPolygonMesh* p = m->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
   csVector3 *vertex_table = p->GetVertices ();
   csMeshedPolygon *polygon_list = p->GetPolygons ();
 
@@ -499,7 +499,7 @@ int csODEDynamics::CollideMeshSphere (dGeomID mesh, dGeomID sphere, int flags,
   dReal rad = dGeomSphereGetRadius (sphere);
   iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (mesh);
   CS_ASSERT (m);
-  csRef<iPolygonMesh> p (m->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet());
+  iPolygonMesh* p = m->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
   csVector3 *vertex_table = p->GetVertices ();
   csMeshedPolygon *polygon_list = p->GetPolygons ();
 
@@ -611,7 +611,7 @@ void csODEDynamics::GetAABB (dGeomID g, dReal aabb[6])
   csBox3 box;
   csReversibleTransform mesht = GetGeomTransform (g);
   iMeshWrapper *m = *(iMeshWrapper **)dGeomGetClassData (g);
-  csRef<iPolygonMesh> p (m->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet());
+  iPolygonMesh* p = m->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
   csVector3 *vertex_table = p->GetVertices ();
   box.StartBoundingBox ();
   for (int i = 0; i < p->GetVertexCount(); i ++)
@@ -923,7 +923,7 @@ bool csODERigidBody::AttachColliderMesh (iMeshWrapper *mesh,
   dGeomTransformSetGeom (id, gid);
 
   csOBB b;
-  csRef<iPolygonMesh> p (mesh->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet());
+  iPolygonMesh* p = mesh->GetMeshObject()->GetObjectModel()->GetPolygonMeshColldet();
   b.FindOBB (p->GetVertices(), p->GetVertexCount());
   dMassSetBox (&m, density, b.MaxX()-b.MinX(), b.MaxY()-b.MinY(), b.MaxZ()-b.MinZ());
 
