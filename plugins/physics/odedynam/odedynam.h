@@ -166,9 +166,9 @@ class csODERigidBody : public iRigidBody
 {
 private:
   dBodyID bodyID;
-  dBodyID bodyIDbackup;
   dGeomID groupID;
   csGeomList ids;
+  dJointID statjoint;
 
   csODEDynamicSystem* dynsys;
 
@@ -181,7 +181,7 @@ public:
   csODERigidBody (csODEDynamicSystem* sys);
   virtual ~csODERigidBody ();
 
-  dBodyID GetID() { return bodyID; }
+  inline dBodyID GetID() { return bodyID; }
 
   bool MakeStatic (void);
   bool MakeDynamic (void);

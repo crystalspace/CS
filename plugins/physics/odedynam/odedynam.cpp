@@ -274,8 +274,8 @@ csODERigidBody::csODERigidBody (csODEDynamicSystem* sys)
   SCF_INC_REF (dynsys);
 
   bodyID = dBodyCreate (dynsys->GetWorldID());
-  bodyIDbackup = 0;
   groupID = dCreateGeomGroup (dynsys->GetSpaceID());
+  statjoint = 0;
 
   mesh = NULL;
   bone = NULL;
@@ -284,35 +284,25 @@ csODERigidBody::csODERigidBody (csODEDynamicSystem* sys)
 csODERigidBody::~csODERigidBody ()
 {
   SCF_DEC_REF (dynsys);
-  if (bodyID == 0) {
-    dBodyDestroy (bodyIDbackup);
-  } else {
-    dBodyDestroy (bodyID);
-  }
+  dBodyDestroy (bodyID);
 }
 
 bool csODERigidBody::MakeStatic ()
 {
-  if (bodyID != 0) {
-    bodyIDbackup = bodyID;
-    bodyID = 0;
-    dBodyDisable (bodyIDbackup);
-    for (long i = 0; i < ids.Length(); i ++) {
-      dGeomSetBody (ids.Get(i), bodyID);
-    }
+  if (statjoint == 0)
+  {
+    statjoint = dJointCreateFixed (dynsys->GetWorldID(), 0);
+    dJointAttach (statjoint, bodyID, 0);
+    // TODO: when ODE has it: dBodySetGravityMode (bodyID, 0);
   }
   return true; 
 }
 
 bool csODERigidBody::MakeDynamic ()
 {
-  if (bodyID == 0) {
-    bodyID = bodyIDbackup;
-    bodyIDbackup = 0;
-    dBodyEnable (bodyID);
-    for (long i = 0; i < ids.Length(); i ++) {
-     dGeomSetBody (ids.Get(i), bodyID);
-    }
+  if (statjoint != 0) {
+    dJointDestroy (statjoint);
+    // TODO: when ODE has it: dBodySetGravityMode (bodyID, 1);
   }
   return true; 
 }
@@ -426,6 +416,7 @@ bool csODERigidBody::AttachColliderSphere (float radius, csVector3 offset,
   dBodySetMass (bodyID, &om);
 
   dGeomSetBody (id, bodyID);
+  ids.Push (id);
 
   float *f = new float[2];
   f[0] = friction;
@@ -619,15 +610,18 @@ void csODERigidBody::AttachBone (iSkeletonBone* b)
 
 void csODERigidBody::Update ()
 {
-  csOrthoTransform trans;
-  if (mesh || bone)
-    trans = GetTransform();
-  if (mesh)
+  if (bodyID)
   {
-    mesh->GetMovable ()->SetTransform (trans);
-    mesh->GetMovable ()->UpdateMove ();
+    csOrthoTransform trans;
+    if (mesh || bone)
+      trans = GetTransform();
+    if (mesh)
+    {
+      mesh->GetMovable ()->SetTransform (trans);
+      mesh->GetMovable ()->UpdateMove ();
+    }
+    if (bone)
+      bone->SetTransformation(trans);
   }
-  if (bone)
-    bone->SetTransformation(trans);
 }
 
