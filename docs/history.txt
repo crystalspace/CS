@@ -7,6 +7,9 @@ The history order has been reversed so that new features are at the top.
 	  it slower) I choose to just disable this feature.
 	- The dynamic lighting routine also accounts for space warping
 	  portals now.
+	- Removed a lot of the obsolete tokens in csparser.
+	- Fixed a bug in csThing::MergeTemplate(). The function did not
+	  correctly copy the flags from the template to the thing.
 15-Feb-2001
 	- Updated various parts of the documentation. The most important
 	  change is that the simple tutorial has been updated to the mesh

@@ -566,6 +566,8 @@ void csThing::MergeTemplate (csThing* tpl, csSector* sector,
   int i, j;
   int* merge_vertices;
 
+  flags.SetAll (tpl->flags.Get ());
+
   //TODO should merge? take averages or something?
   curves_center = tpl->curves_center;
   curves_scale = tpl->curves_scale;
