@@ -26,7 +26,6 @@
 #include "csutil/csuctransform.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/util.h"
-#include "csutil/sysfunc.h"
 #include "csgeom/math.h"
 
 /**\addtogroup csutil
@@ -798,7 +797,7 @@ class csPrintfFormatter
       + (sizeof(currentFormat.width) * 24) / 10 + 2 + strlen (precStr) + 2);
     sprintf (formatStr, "%%%s%d%s%s", flags, currentFormat.width, precStr,
       type);
-    char formattedStr[256];
+    char formattedStr[64];
     sprintf (formattedStr, formatStr, value);
 
     char* p = formattedStr;
