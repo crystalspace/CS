@@ -36,6 +36,8 @@ chronological order.
 	      compatibility.)
 	- Eric Sunshine fixed Texinfo mark-up errors, and spelling and
 	  grammatical errors in apimod100.txi.
+	- Marten fixed an error in the msvcgen where it set the libdir for
+	  release but not debug builds.
 12-Dec-2004
 	- Eric Sunshine worked around problem in csjava caused by new operator
 	  overrides in csColor and csColor4. Although modern C++ can deal with
