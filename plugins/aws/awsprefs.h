@@ -129,13 +129,14 @@ public:
 
 class awsRGBKey : public awsKey
 {
+public:
+
   /// The key's value
   struct RGB {
   	unsigned char red, green, blue;
   } rgb;
-
-public:
-  /// Constructs an integer key with the given name
+  
+	/// Constructs an integer key with the given name
   awsRGBKey(iString *name, unsigned char r, unsigned char g, unsigned char b):awsKey(name)
   { rgb.red=r; rgb.green=g; rgb.blue=b; }
 
