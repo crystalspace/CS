@@ -58,13 +58,12 @@
 #include "csgfx/rgbpixel.h"
 #include "qsqrt.h"
 
-#include "ogl_strings.h"
-
 #include "ivideo/effects/efserver.h"
 #include "ivideo/effects/efdef.h"
 #include "ivideo/effects/eftech.h"
 #include "ivideo/effects/efpass.h"
 #include "ivideo/effects/eflayer.h"
+#include "ivideo/effects/efstring.h"
 #include "effectdata.h"
 
 #define BYTE_TO_FLOAT(x) ((x) * (1.0 / 255.0))
@@ -1153,7 +1152,7 @@ void csGraphics3DOGLCommon::CommonOpen ()
       "crystalspace.video.effects.stdserver", iEffectServer);
     object_reg->Register (effectserver, "iEffectServer");
   }
-  csEffectStrings::InitStrings( effectserver );
+  //csEffectStrings::InitStrings( effectserver );
   InitStockEffects();
 }
 
@@ -5018,27 +5017,27 @@ csStringID csGraphics3DOGLCommon::GLBlendToString (GLenum blend)
   switch( blend )
   {
   case GL_ONE:
-    return csEffectStrings::one;
+    return effectserver->GetStandardStrings()->one;
   case GL_ZERO:
-    return csEffectStrings::zero;
+    return effectserver->GetStandardStrings()->zero;
   case GL_SRC_COLOR:
-    return csEffectStrings::source_color;
+    return effectserver->GetStandardStrings()->source_color;
   case GL_ONE_MINUS_SRC_COLOR:
-    return csEffectStrings::inverted_source_color;
+    return effectserver->GetStandardStrings()->inverted_source_color;
   case GL_DST_COLOR:
-    return csEffectStrings::destination_color;
+    return effectserver->GetStandardStrings()->destination_color;
   case GL_ONE_MINUS_DST_COLOR:
-    return csEffectStrings::inverted_destination_color;
+    return effectserver->GetStandardStrings()->inverted_destination_color;
   case GL_SRC_ALPHA:
-    return csEffectStrings::source_alpha;
+    return effectserver->GetStandardStrings()->source_alpha;
   case GL_ONE_MINUS_SRC_ALPHA:
-    return csEffectStrings::inverted_source_alpha;
+    return effectserver->GetStandardStrings()->inverted_source_alpha;
   case GL_DST_ALPHA:
-    return csEffectStrings::destination_alpha;
+    return effectserver->GetStandardStrings()->destination_alpha;
   case GL_ONE_MINUS_DST_ALPHA:
-    return csEffectStrings::inverted_destination_alpha;
+    return effectserver->GetStandardStrings()->inverted_destination_alpha;
   case GL_SRC_ALPHA_SATURATE:
-    return csEffectStrings::saturated_source_alpha;
+    return effectserver->GetStandardStrings()->saturated_source_alpha;
   default:
     return csInvalidStringID;
   }
@@ -5047,57 +5046,57 @@ csStringID csGraphics3DOGLCommon::GLBlendToString (GLenum blend)
 
 #define START_FX_SRCDST \
   pass = tech->CreatePass(); \
-  pass->SetStateString( csEffectStrings::blending, csEffectStrings::enabled ); \
-  pass->SetStateString( csEffectStrings::source_blend_mode, GLBlendToString( m_config_options.m_lightmap_src_blend ) ); \
-  pass->SetStateString( csEffectStrings::destination_blend_mode, GLBlendToString( m_config_options.m_lightmap_dst_blend ) ); \
+  pass->SetStateString( efstrings->blending, efstrings->enabled ); \
+  pass->SetStateString( efstrings->source_blend_mode, GLBlendToString( m_config_options.m_lightmap_src_blend ) ); \
+  pass->SetStateString( efstrings->destination_blend_mode, GLBlendToString( m_config_options.m_lightmap_dst_blend ) ); \
   layer = pass->CreateLayer(); \
-  layer->SetStateFloat( csEffectStrings::texture_source, 1 ); \
-  layer->SetStateString( csEffectStrings::texture_coordinate_source, csEffectStrings::mesh );
+  layer->SetStateFloat( efstrings->texture_source, 1 ); \
+  layer->SetStateString( efstrings->texture_coordinate_source, efstrings->mesh );
 
 #define START_FX_HALOOVF \
   pass = tech->CreatePass(); \
-  pass->SetStateString( csEffectStrings::blending, csEffectStrings::enabled ); \
-  pass->SetStateString( csEffectStrings::source_blend_mode, csEffectStrings::source_alpha ); \
-  pass->SetStateString( csEffectStrings::destination_blend_mode, csEffectStrings::one ); \
+  pass->SetStateString( efstrings->blending, efstrings->enabled ); \
+  pass->SetStateString( efstrings->source_blend_mode, efstrings->source_alpha ); \
+  pass->SetStateString( efstrings->destination_blend_mode, efstrings->one ); \
   layer = pass->CreateLayer(); \
-  layer->SetStateFloat( csEffectStrings::texture_source, 1 ); \
-  layer->SetStateString( csEffectStrings::texture_coordinate_source, csEffectStrings::mesh );
+  layer->SetStateFloat( efstrings->texture_source, 1 ); \
+  layer->SetStateString( efstrings->texture_coordinate_source, efstrings->mesh );
 
 #define START_FX_MULTIPLY \
   pass = tech->CreatePass(); \
-  pass->SetStateString( csEffectStrings::blending, csEffectStrings::enabled ); \
-  pass->SetStateString( csEffectStrings::source_blend_mode, csEffectStrings::zero ); \
-  pass->SetStateString( csEffectStrings::destination_blend_mode, csEffectStrings::source_color ); \
+  pass->SetStateString( efstrings->blending, efstrings->enabled ); \
+  pass->SetStateString( efstrings->source_blend_mode, efstrings->zero ); \
+  pass->SetStateString( efstrings->destination_blend_mode, efstrings->source_color ); \
   layer = pass->CreateLayer(); \
-  layer->SetStateFloat( csEffectStrings::texture_source, 1 ); \
-  layer->SetStateString( csEffectStrings::texture_coordinate_source, csEffectStrings::mesh );
+  layer->SetStateFloat( efstrings->texture_source, 1 ); \
+  layer->SetStateString( efstrings->texture_coordinate_source, efstrings->mesh );
 
 #define START_FX_MULTIPLY2 \
   pass = tech->CreatePass(); \
-  pass->SetStateString( csEffectStrings::blending, csEffectStrings::enabled ); \
-  pass->SetStateString( csEffectStrings::source_blend_mode, csEffectStrings::destination_color ); \
-  pass->SetStateString( csEffectStrings::destination_blend_mode, csEffectStrings::source_color ); \
+  pass->SetStateString( efstrings->blending, efstrings->enabled ); \
+  pass->SetStateString( efstrings->source_blend_mode, efstrings->destination_color ); \
+  pass->SetStateString( efstrings->destination_blend_mode, efstrings->source_color ); \
   layer = pass->CreateLayer(); \
-  layer->SetStateFloat( csEffectStrings::texture_source, 1 ); \
-  layer->SetStateString( csEffectStrings::texture_coordinate_source, csEffectStrings::mesh );
+  layer->SetStateFloat( efstrings->texture_source, 1 ); \
+  layer->SetStateString( efstrings->texture_coordinate_source, efstrings->mesh );
 
 #define START_FX_ADD \
   pass = tech->CreatePass(); \
-  pass->SetStateString( csEffectStrings::blending, csEffectStrings::enabled ); \
-  pass->SetStateString( csEffectStrings::source_blend_mode, csEffectStrings::one ); \
-  pass->SetStateString( csEffectStrings::destination_blend_mode, csEffectStrings::one ); \
+  pass->SetStateString( efstrings->blending, efstrings->enabled ); \
+  pass->SetStateString( efstrings->source_blend_mode, efstrings->one ); \
+  pass->SetStateString( efstrings->destination_blend_mode, efstrings->one ); \
   layer = pass->CreateLayer(); \
-  layer->SetStateFloat( csEffectStrings::texture_source, 1 ); \
-  layer->SetStateString( csEffectStrings::texture_coordinate_source, csEffectStrings::mesh );
+  layer->SetStateFloat( efstrings->texture_source, 1 ); \
+  layer->SetStateString( efstrings->texture_coordinate_source, efstrings->mesh );
 
 #define START_FX_ALPHA \
   pass = tech->CreatePass(); \
-  pass->SetStateString( csEffectStrings::blending, csEffectStrings::enabled ); \
-  pass->SetStateString( csEffectStrings::source_blend_mode, csEffectStrings::source_alpha ); \
-  pass->SetStateString( csEffectStrings::destination_blend_mode, csEffectStrings::inverted_source_alpha ); \
+  pass->SetStateString( efstrings->blending, efstrings->enabled ); \
+  pass->SetStateString( efstrings->source_blend_mode, efstrings->source_alpha ); \
+  pass->SetStateString( efstrings->destination_blend_mode, efstrings->inverted_source_alpha ); \
   layer = pass->CreateLayer(); \
-  layer->SetStateFloat( csEffectStrings::texture_source, 1 ); \
-  layer->SetStateString( csEffectStrings::texture_coordinate_source, csEffectStrings::mesh );
+  layer->SetStateFloat( efstrings->texture_source, 1 ); \
+  layer->SetStateString( efstrings->texture_coordinate_source, efstrings->mesh );
 
 
 // @@@ Should use writemask instead of blendmode
@@ -5105,58 +5104,58 @@ csStringID csGraphics3DOGLCommon::GLBlendToString (GLenum blend)
 //     --Anders Stenberg
 #define START_FX_TRANSPARENT \
   pass = tech->CreatePass(); \
-  pass->SetStateString( csEffectStrings::blending, csEffectStrings::enabled ); \
-  pass->SetStateString( csEffectStrings::source_blend_mode, csEffectStrings::zero ); \
-  pass->SetStateString( csEffectStrings::destination_blend_mode, csEffectStrings::one ); \
+  pass->SetStateString( efstrings->blending, efstrings->enabled ); \
+  pass->SetStateString( efstrings->source_blend_mode, efstrings->zero ); \
+  pass->SetStateString( efstrings->destination_blend_mode, efstrings->one ); \
   layer = pass->CreateLayer(); \
-  layer->SetStateFloat( csEffectStrings::texture_source, 1 ); \
-  layer->SetStateString( csEffectStrings::texture_coordinate_source, csEffectStrings::mesh );
+  layer->SetStateFloat( efstrings->texture_source, 1 ); \
+  layer->SetStateString( efstrings->texture_coordinate_source, efstrings->mesh );
 
 #define START_FX_COPY_ALPHA \
   pass = tech->CreatePass(); \
-  pass->SetStateString( csEffectStrings::blending, csEffectStrings::enabled ); \
-  pass->SetStateString( csEffectStrings::source_blend_mode, csEffectStrings::source_alpha ); \
-  pass->SetStateString( csEffectStrings::destination_blend_mode, csEffectStrings::inverted_source_alpha ); \
+  pass->SetStateString( efstrings->blending, efstrings->enabled ); \
+  pass->SetStateString( efstrings->source_blend_mode, efstrings->source_alpha ); \
+  pass->SetStateString( efstrings->destination_blend_mode, efstrings->inverted_source_alpha ); \
   layer = pass->CreateLayer(); \
-  layer->SetStateFloat( csEffectStrings::texture_source, 1 ); \
-  layer->SetStateString( csEffectStrings::texture_coordinate_source, csEffectStrings::mesh );
+  layer->SetStateFloat( efstrings->texture_source, 1 ); \
+  layer->SetStateString( efstrings->texture_coordinate_source, efstrings->mesh );
 
 #define START_FX_COPY_NOALPHA \
   pass = tech->CreatePass(); \
-  pass->SetStateString( csEffectStrings::blending, csEffectStrings::disabled ); \
+  pass->SetStateString( efstrings->blending, efstrings->disabled ); \
   layer = pass->CreateLayer(); \
-  layer->SetStateFloat( csEffectStrings::texture_source, 1 ); \
-  layer->SetStateString( csEffectStrings::texture_coordinate_source, csEffectStrings::mesh );
+  layer->SetStateFloat( efstrings->texture_source, 1 ); \
+  layer->SetStateString( efstrings->texture_coordinate_source, efstrings->mesh );
 
 #define SINGLETEXTURE_FOG \
   pass = tech->CreatePass(); \
-  pass->SetStateString( csEffectStrings::blending, csEffectStrings::enabled ); \
-  pass->SetStateString( csEffectStrings::source_blend_mode, csEffectStrings::source_alpha ); \
-  pass->SetStateString( csEffectStrings::destination_blend_mode, csEffectStrings::inverted_source_alpha ); \
-  pass->SetStateString( csEffectStrings::vertex_color_source, csEffectStrings::fog ); \
+  pass->SetStateString( efstrings->blending, efstrings->enabled ); \
+  pass->SetStateString( efstrings->source_blend_mode, efstrings->source_alpha ); \
+  pass->SetStateString( efstrings->destination_blend_mode, efstrings->inverted_source_alpha ); \
+  pass->SetStateString( efstrings->vertex_color_source, efstrings->fog ); \
   layer = pass->CreateLayer(); \
-  layer->SetStateString( csEffectStrings::texture_source, csEffectStrings::fog ); \
-  layer->SetStateString( csEffectStrings::texture_coordinate_source, csEffectStrings::fog );
+  layer->SetStateString( efstrings->texture_source, efstrings->fog ); \
+  layer->SetStateString( efstrings->texture_coordinate_source, efstrings->fog );
 
 #define MULTITEXTURE_FOG \
   layer = pass->CreateLayer(); \
-  layer->SetStateString( csEffectStrings::texture_source, csEffectStrings::fog ); \
-  layer->SetStateString( csEffectStrings::texture_coordinate_source, csEffectStrings::fog ); \
-  layer->SetStateString( csEffectStrings::constant_color_source, csEffectStrings::fog ); \
-  layer->SetStateString( csEffectStrings::color_source_1, csEffectStrings::constant_color ); \
-  layer->SetStateString( csEffectStrings::color_source_2, csEffectStrings::previous_layer_color ); \
-  layer->SetStateString( csEffectStrings::color_source_3, csEffectStrings::texture_color); \
-  layer->SetStateString( csEffectStrings::color_source_modifier_3, csEffectStrings::source_alpha); \
-  layer->SetStateString( csEffectStrings::color_operation, csEffectStrings::interpolate ); \
-  layer->SetStateString( csEffectStrings::alpha_source_1, csEffectStrings::previous_layer_alpha ); \
-  layer->SetStateString( csEffectStrings::alpha_operation, csEffectStrings::use_source_1 );
+  layer->SetStateString( efstrings->texture_source, efstrings->fog ); \
+  layer->SetStateString( efstrings->texture_coordinate_source, efstrings->fog ); \
+  layer->SetStateString( efstrings->constant_color_source, efstrings->fog ); \
+  layer->SetStateString( efstrings->color_source_1, efstrings->constant_color ); \
+  layer->SetStateString( efstrings->color_source_2, efstrings->previous_layer_color ); \
+  layer->SetStateString( efstrings->color_source_3, efstrings->texture_color); \
+  layer->SetStateString( efstrings->color_source_modifier_3, efstrings->source_alpha); \
+  layer->SetStateString( efstrings->color_operation, efstrings->interpolate ); \
+  layer->SetStateString( efstrings->alpha_source_1, efstrings->previous_layer_alpha ); \
+  layer->SetStateString( efstrings->alpha_operation, efstrings->use_source_1 );
 
 void csGraphics3DOGLCommon::InitStockEffects()
 {
   iEffectTechnique* tech;
   iEffectPass* pass;
   iEffectLayer* layer;
-
+  csEffectStrings* efstrings = effectserver->GetStandardStrings();
 
   ////////////////////////////////////////////
   // NO LIGHTMAPS, NO FOG
@@ -7309,6 +7308,8 @@ bool csGraphics3DOGLCommon::IsLightmapOK (iPolygonTexture* poly_texture)
 bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechnique* technique )
 {
   int p, l;
+  csEffectStrings* efstrings = effectserver->GetStandardStrings();
+
   for( p=0; p<technique->GetPassCount(); p++ )
   {
     csRef<csOpenGlEffectPassData> pass_data = new csOpenGlEffectPassData();
@@ -7319,79 +7320,79 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
 
     while(pass_state != csInvalidStringID )
     {
-      if (pass_state == csEffectStrings::blending )
+      if (pass_state == efstrings->blending )
       {
         pass_statestring = pass->GetStateString( pass_state );
-        if( pass_statestring == csEffectStrings::enabled)
+        if( pass_statestring == efstrings->enabled)
           pass_data->doblending = true;
-        else if( pass_statestring == csEffectStrings::disabled)
+        else if( pass_statestring == efstrings->disabled)
           pass_data->doblending = false;
         else
           return false;
 
       }
-      else if( pass_state == csEffectStrings::shade_mode )
+      else if( pass_state == efstrings->shade_mode )
       {
         pass_statestring = pass->GetStateString( pass_state );
-        if(pass_statestring == csEffectStrings::flat)
+        if(pass_statestring == efstrings->flat)
           pass_data->shade_state = GL_FLAT;
-        else if(pass_statestring == csEffectStrings::smooth)
+        else if(pass_statestring == efstrings->smooth)
           pass_data->shade_state = GL_SMOOTH;
         else
           return false;
       }
-      else if( pass_state == csEffectStrings::source_blend_mode )
+      else if( pass_state == efstrings->source_blend_mode )
       {
         pass_statestring = pass->GetStateString( pass_state );
-      if( pass_statestring == csEffectStrings::destination_color )
+      if( pass_statestring == efstrings->destination_color )
         pass_data->sblend = GL_DST_COLOR;
-      else if(pass_statestring == csEffectStrings::inverted_destination_color)
-          pass_data->sblend = GL_ONE_MINUS_DST_COLOR;
-      else if( pass_statestring == csEffectStrings::source_alpha )
+      else if(pass_statestring == efstrings->inverted_destination_color)
+        pass_data->sblend = GL_ONE_MINUS_DST_COLOR;
+      else if( pass_statestring == efstrings->source_alpha )
         pass_data->sblend = GL_SRC_ALPHA;
-      else if( pass_statestring == csEffectStrings::inverted_source_alpha )
+      else if( pass_statestring == efstrings->inverted_source_alpha )
         pass_data->sblend = GL_ONE_MINUS_SRC_ALPHA;
-      else if( pass_statestring == csEffectStrings::destination_alpha )
+      else if( pass_statestring == efstrings->destination_alpha )
         pass_data->sblend = GL_DST_ALPHA;
-      else if(pass_statestring == csEffectStrings::inverted_destination_alpha)
+      else if(pass_statestring == efstrings->inverted_destination_alpha)
         pass_data->sblend = GL_ONE_MINUS_DST_ALPHA;
-      else if( pass_statestring == csEffectStrings::saturated_source_alpha )
+      else if( pass_statestring == efstrings->saturated_source_alpha )
         pass_data->sblend = GL_SRC_ALPHA_SATURATE;
-      else if( pass_statestring == csEffectStrings::one )
+      else if( pass_statestring == efstrings->one )
         pass_data->sblend = GL_ONE;
-      else if( pass_statestring == csEffectStrings::zero )
+      else if( pass_statestring == efstrings->zero )
         pass_data->sblend = GL_ZERO;
       else return false;
       }
-      else if( pass_state == csEffectStrings::destination_blend_mode )
+      else if( pass_state == efstrings->destination_blend_mode )
       {
         pass_statestring = pass->GetStateString( pass_state );
-      if( pass_statestring == csEffectStrings::source_color )
+      if( pass_statestring == efstrings->source_color )
         pass_data->dblend = GL_SRC_COLOR;
-      else if( pass_statestring == csEffectStrings::inverted_source_color )
+      else if( pass_statestring == efstrings->inverted_source_color )
         pass_data->dblend = GL_ONE_MINUS_SRC_COLOR;
-      else if( pass_statestring == csEffectStrings::source_alpha )
+      else if( pass_statestring == efstrings->source_alpha )
         pass_data->dblend = GL_SRC_ALPHA;
-      else if( pass_statestring == csEffectStrings::inverted_source_alpha )
+      else if( pass_statestring == efstrings->inverted_source_alpha )
         pass_data->dblend = GL_ONE_MINUS_SRC_ALPHA;
-      else if( pass_statestring == csEffectStrings::destination_alpha )
+      else if( pass_statestring == efstrings->destination_alpha )
         pass_data->dblend = GL_DST_ALPHA;
-      else if(pass_statestring == csEffectStrings::inverted_destination_alpha)
+      else if(pass_statestring == efstrings->inverted_destination_alpha)
         pass_data->dblend = GL_ONE_MINUS_DST_ALPHA;
-      else if( pass_statestring == csEffectStrings::one )
+      else if( pass_statestring == efstrings->one )
         pass_data->dblend = GL_ONE;
-      else if( pass_statestring == csEffectStrings::zero )
+      else if( pass_statestring == efstrings->zero )
         pass_data->dblend = GL_ZERO;
       else return false;
-      break;
+   
       }
-      else if( (pass_state == csEffectStrings::vertex_color_source) )
+      else if( (pass_state == efstrings->vertex_color_source) )
       {
         pass_statestring = pass->GetStateString( pass_state );
-        if(pass_statestring == csEffectStrings::fog)
+        if(pass_statestring == efstrings->fog)
           pass_data->vcsource = ED_SOURCE_FOG;
         else if( pass->GetStateString( pass_state )
-          == csEffectStrings::mesh )
+          == efstrings->mesh )
           pass_data->vcsource = ED_SOURCE_MESH;
         else
         {
@@ -7399,7 +7400,7 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
             ED_SOURCE_USERARRAY((int)pass->GetStateString( pass_state )-1);
         }
       }
-      else if ( pass_state == csEffectStrings::nvvertex_program_gl )
+      else if ( pass_state == efstrings->nvvertex_program_gl )
       {
         if( (!NV_vertex_program) || !(glBindProgramNV && glGenProgramsNV
           && glDeleteProgramsNV && glLoadProgramNV))
@@ -7430,10 +7431,11 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
         if(strncasecmp(effectserver->RequestString(pass_state), "vertex program constant", 23) == 0)
         {
           //this is a vertexconstant
-          char* constname = (char*) effectserver->RequestString(pass_state);
+          const char* constname = (const char*) effectserver->RequestString(pass_state);
           if ( strlen(constname) < 24) return false; //must contain which constant
-          constname += 24;
-          int constnum = atoi(constname);
+          int constnum;
+          sscanf(constname, "vertex program constant %d", &constnum);
+
           if ( (constnum < 4) ||(constnum > 96) ) return false;
           
           int varnum = effect->GetVariableID(pass->GetStateString(pass_state), false);
@@ -7460,9 +7462,9 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
       csStringID layer_statestring;
       while(layer_state != csInvalidStringID )
       {
-        if( (layer_state == csEffectStrings::color_source_1) ||
-          (layer_state == csEffectStrings::color_source_2) ||
-          (layer_state == csEffectStrings::color_source_3) )
+        if( (layer_state == efstrings->color_source_1) ||
+          (layer_state == efstrings->color_source_2) ||
+          (layer_state == efstrings->color_source_3) )
         {
           if (!ARB_texture_env_combine && !EXT_texture_env_combine)
             return false;
@@ -7470,23 +7472,23 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
 
           //which texture-unit
           int tu = 0;
-          if(layer_state == csEffectStrings::color_source_1) tu = 0;
-          else if(layer_state == csEffectStrings::color_source_2) tu = 1;
-          else if(layer_state == csEffectStrings::color_source_3) tu = 2;
+          if(layer_state == efstrings->color_source_1) tu = 0;
+          else if(layer_state == efstrings->color_source_2) tu = 1;
+          else if(layer_state == efstrings->color_source_3) tu = 2;
           //which source
-          if( layer_statestring == csEffectStrings::vertex_color )
+          if( layer_statestring == efstrings->vertex_color )
             layer_data->colorsource[tu] = GL_PRIMARY_COLOR_ARB;
-          else if( layer_statestring == csEffectStrings::texture_color )
+          else if( layer_statestring == efstrings->texture_color )
             layer_data->colorsource[tu] = GL_TEXTURE;
-          else if( layer_statestring == csEffectStrings::constant_color )
+          else if( layer_statestring == efstrings->constant_color )
             layer_data->colorsource[tu] = GL_CONSTANT_ARB;
-          else if( layer_statestring == csEffectStrings::previous_layer_color )
+          else if( layer_statestring == efstrings->previous_layer_color )
             layer_data->colorsource[tu] = GL_PREVIOUS_ARB;
           else return false;
         }
-        else if( (layer_state == csEffectStrings::color_source_modifier_1) ||
-          (layer_state == csEffectStrings::color_source_modifier_2) ||
-          (layer_state == csEffectStrings::color_source_modifier_3) )
+        else if( (layer_state == efstrings->color_source_modifier_1) ||
+          (layer_state == efstrings->color_source_modifier_2) ||
+          (layer_state == efstrings->color_source_modifier_3) )
         {
           if (!ARB_texture_env_combine && !EXT_texture_env_combine)
             return false;
@@ -7494,94 +7496,94 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
 
           //tu to use..
           int tu = 0;
-          if(layer_state == csEffectStrings::color_source_modifier_1)
+          if(layer_state == efstrings->color_source_modifier_1)
             tu = 0;
-          else if(layer_state == csEffectStrings::color_source_modifier_2)
+          else if(layer_state == efstrings->color_source_modifier_2)
             tu = 1;
-          else if(layer_state == csEffectStrings::color_source_modifier_3)
+          else if(layer_state == efstrings->color_source_modifier_3)
             tu = 2;
 
-          if( layer_statestring == csEffectStrings::source_color )
+          if( layer_statestring == efstrings->source_color )
             layer_data->colormod[tu] = GL_SRC_COLOR;
-          else if( layer_statestring == csEffectStrings::inverted_source_color )
+          else if( layer_statestring == efstrings->inverted_source_color )
             layer_data->colormod[tu]  = GL_ONE_MINUS_SRC_COLOR;
-          else if( layer_statestring == csEffectStrings::source_alpha )
+          else if( layer_statestring == efstrings->source_alpha )
             layer_data->colormod[tu]  = GL_SRC_ALPHA;
-          else if( layer_statestring == csEffectStrings::inverted_source_alpha )
+          else if( layer_statestring == efstrings->inverted_source_alpha )
             layer_data->colormod[tu]  = GL_ONE_MINUS_SRC_ALPHA;
           else return false;
         }
-        else if( (layer_state == csEffectStrings::alpha_source_1) ||
-          (layer_state == csEffectStrings::alpha_source_2) ||
-          (layer_state == csEffectStrings::alpha_source_3) )
+        else if( (layer_state == efstrings->alpha_source_1) ||
+          (layer_state == efstrings->alpha_source_2) ||
+          (layer_state == efstrings->alpha_source_3) )
         {
           if (!ARB_texture_env_combine && !EXT_texture_env_combine)
             return false;
           layer_statestring = layer->GetStateString( layer_state );
 
           int tu = 0;
-          if( layer_state == csEffectStrings::alpha_source_1) tu = 0;
-          else if( layer_state == csEffectStrings::alpha_source_2) tu = 1;
-          else if( layer_state == csEffectStrings::alpha_source_3) tu = 2;
+          if( layer_state == efstrings->alpha_source_1) tu = 0;
+          else if( layer_state == efstrings->alpha_source_2) tu = 1;
+          else if( layer_state == efstrings->alpha_source_3) tu = 2;
 
-          if( layer_statestring == csEffectStrings::vertex_alpha )
+          if( layer_statestring == efstrings->vertex_alpha )
             layer_data->alphasource[tu] = GL_PRIMARY_COLOR_ARB;
-          else if( layer_statestring == csEffectStrings::texture_alpha )
+          else if( layer_statestring == efstrings->texture_alpha )
             layer_data->alphasource[tu] = GL_TEXTURE;
-          else if( layer_statestring == csEffectStrings::constant_alpha )
+          else if( layer_statestring == efstrings->constant_alpha )
             layer_data->alphasource[tu] = GL_CONSTANT_ARB;
-          else if( layer_statestring == csEffectStrings::previous_layer_alpha )
+          else if( layer_statestring == efstrings->previous_layer_alpha )
             layer_data->alphasource[tu] = GL_PREVIOUS_ARB;
           else return false;
         }
-        else if( (layer_state == csEffectStrings::alpha_source_modifier_1) ||
-          (layer_state == csEffectStrings::alpha_source_modifier_2) ||
-          (layer_state == csEffectStrings::alpha_source_modifier_3) )
+        else if( (layer_state == efstrings->alpha_source_modifier_1) ||
+          (layer_state == efstrings->alpha_source_modifier_2) ||
+          (layer_state == efstrings->alpha_source_modifier_3) )
         {
           if (!ARB_texture_env_combine && !EXT_texture_env_combine)
             return false;
           layer_statestring = layer->GetStateString( layer_state );
 
           int tu = 0;
-          if( layer_state == csEffectStrings::alpha_source_modifier_1)
+          if( layer_state == efstrings->alpha_source_modifier_1)
             tu = 0;
-          else if( layer_state == csEffectStrings::alpha_source_modifier_2)
+          else if( layer_state == efstrings->alpha_source_modifier_2)
             tu = 1;
-          else if( layer_state == csEffectStrings::alpha_source_modifier_3)
+          else if( layer_state == efstrings->alpha_source_modifier_3)
             tu = 2;
 
-          if( layer_statestring == csEffectStrings::source_alpha )
+          if( layer_statestring == efstrings->source_alpha )
             layer_data->alphamod[tu] = GL_SRC_ALPHA;
-          else if( layer_statestring == csEffectStrings::inverted_source_alpha )
+          else if( layer_statestring == efstrings->inverted_source_alpha )
             layer_data->alphamod[tu] = GL_ONE_MINUS_SRC_ALPHA;
           else return false;
         }
-        else if (layer_state == csEffectStrings::alpha_operation)
+        else if (layer_state == efstrings->alpha_operation)
         {
           if (!ARB_texture_env_combine && !EXT_texture_env_combine)
             return false;
           layer_statestring = layer->GetStateString( layer_state );
 
-          if( layer_statestring == csEffectStrings::use_source_1 )
+          if( layer_statestring == efstrings->use_source_1 )
             layer_data->alphap = GL_REPLACE;
-          else if( layer_statestring == csEffectStrings::multiply )
+          else if( layer_statestring == efstrings->multiply )
             layer_data->alphap = GL_MODULATE;
-          else if( layer_statestring == csEffectStrings::add )
+          else if( layer_statestring == efstrings->add )
             layer_data->alphap = GL_ADD;
-          else if( layer_statestring == csEffectStrings::add_signed )
+          else if( layer_statestring == efstrings->add_signed )
             layer_data->alphap = GL_ADD_SIGNED_ARB;
-          else if( layer_statestring == csEffectStrings::subtract )
+          else if( layer_statestring == efstrings->subtract )
             layer_data->alphap = GL_SUBTRACT_ARB;
-          else if( layer_statestring == csEffectStrings::interpolate )
+          else if( layer_statestring == efstrings->interpolate )
             layer_data->alphap = GL_INTERPOLATE_ARB;
-          else if( layer_statestring == csEffectStrings::dot_product )
+          else if( layer_statestring == efstrings->dot_product )
           {
             if(ARB_texture_env_dot3 || EXT_texture_env_dot3)
               layer_data->alphap = GL_DOT3_RGB_ARB;
             else
               return false;
           }
-          else if( layer_statestring == csEffectStrings::dot_product_to_alpha )
+          else if( layer_statestring == efstrings->dot_product_to_alpha )
           {
             if(ARB_texture_env_dot3 || EXT_texture_env_dot3)
               layer_data->alphap = GL_DOT3_RGBA_ARB;
@@ -7590,32 +7592,32 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
           }
           else return false;
         }
-        else if( (layer_state == csEffectStrings::color_operation) )
+        else if( (layer_state == efstrings->color_operation) )
         {
           if (!ARB_texture_env_combine && !EXT_texture_env_combine)
             return false;
           layer_statestring = layer->GetStateString( layer_state );
 
-          if( layer_statestring == csEffectStrings::use_source_1 )
+          if( layer_statestring == efstrings->use_source_1 )
             layer_data->colorp = GL_REPLACE;
-          else if( layer_statestring == csEffectStrings::multiply )
+          else if( layer_statestring == efstrings->multiply )
             layer_data->colorp = GL_MODULATE;
-          else if( layer_statestring == csEffectStrings::add )
+          else if( layer_statestring == efstrings->add )
             layer_data->colorp = GL_ADD;
-          else if( layer_statestring == csEffectStrings::add_signed )
+          else if( layer_statestring == efstrings->add_signed )
             layer_data->colorp = GL_ADD_SIGNED_ARB;
-          else if( layer_statestring == csEffectStrings::subtract )
+          else if( layer_statestring == efstrings->subtract )
             layer_data->colorp = GL_SUBTRACT_ARB;
-          else if( layer_statestring == csEffectStrings::interpolate )
+          else if( layer_statestring == efstrings->interpolate )
             layer_data->colorp = GL_INTERPOLATE_ARB;
-          else if( layer_statestring == csEffectStrings::dot_product )
+          else if( layer_statestring == efstrings->dot_product )
           {
             if(ARB_texture_env_dot3 || EXT_texture_env_dot3)
               layer_data->colorp = GL_DOT3_RGB_ARB;
             else
               return false;
           }
-          else if( layer_statestring == csEffectStrings::dot_product_to_alpha )
+          else if( layer_statestring == efstrings->dot_product_to_alpha )
           {
             if(ARB_texture_env_dot3 || EXT_texture_env_dot3)
               layer_data->colorp = GL_DOT3_RGBA_ARB;
@@ -7624,25 +7626,25 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
           }
 
         }
-        else if( (layer_state == csEffectStrings::texture_source) )
+        else if( (layer_state == efstrings->texture_source) )
         {
           if( (layer->GetStateString( layer_state ) == csInvalidStringID) &&
             (layer->GetStateFloat( layer_state ) == 0) &&
             layer->GetStateOpaque( layer_state ) == NULL )
             return false;
-          if( layer->GetStateString( layer_state) == csEffectStrings::fog)
+          if( layer->GetStateString( layer_state) == efstrings->fog)
             layer_data->inputtex = -1;
           else
             // @@@SUSPICIOUS. IS INT, BUT FUNCTION RETURNS FLAOT
             layer_data->inputtex = (int)layer->GetStateFloat(layer_state);
         }
-        else if(  (layer_state == csEffectStrings::texture_coordinate_source) )
+        else if(  (layer_state == efstrings->texture_coordinate_source) )
         {
           if( layer->GetStateString( layer_state )
-            == csEffectStrings::fog)
+            == efstrings->fog)
             layer_data->vcord_source = ED_SOURCE_FOG;
           if( layer->GetStateString( layer_state )
-            == csEffectStrings::mesh)
+            == efstrings->mesh)
             layer_data->vcord_source = ED_SOURCE_MESH;
           else
           {
@@ -7650,12 +7652,11 @@ bool csGraphics3DOGLCommon::Validate( iEffectDefinition* effect, iEffectTechniqu
               ED_SOURCE_USERARRAY((int)layer->GetStateFloat( layer_state )-1);
           }
         }
-        else if( (layer_state == csEffectStrings::constant_color_source) )
+        else if( (layer_state == efstrings->constant_color_source) )
         {
           layer_statestring = layer->GetStateString( layer_state );
-          if( layer_statestring != csEffectStrings::fog )
-            return false;
-          if( layer_statestring == csEffectStrings::fog)
+
+          if( layer_statestring == efstrings->fog)
             layer_data->ccsource = ED_SOURCE_FOG;
           else
             layer_data->ccsource = ED_SOURCE_NONE;
