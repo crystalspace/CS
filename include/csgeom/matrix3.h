@@ -105,8 +105,8 @@ public:
   /// Unary - operator.
   inline csMatrix3 operator- () const
   {
-   return csMatrix3(-m11,-m12,-m13,
-                    -m21,-m22,-m23,
+    return csMatrix3(-m11,-m12,-m13,
+                     -m21,-m22,-m23,
                     -m31,-m32,-m33);
   }
 

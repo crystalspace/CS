@@ -79,8 +79,7 @@ public:
   /// Unary - operator.
   inline csMatrix2 operator- () const
   {
-   return csMatrix2(-m11,-m12,
-                    -m21,-m22);
+    return csMatrix2(-m11,-m12, -m21,-m22);
   }
 
   /// Transpose this matrix.
