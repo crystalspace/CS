@@ -126,7 +126,7 @@ AC_DEFUN([CS_CHECK_PYTHON],
 #	actual task of emitting KEY/VALUE tuples. If EMITTER is omitted,
 #	CS_JAMCONFIG_PROPERTY is used. The following properties are emitted:
 #	PTYHON (the actual interpreter), PYTHON.AVAILABLE ("yes" or "no"),
-#	PYTHON.CFLAGS, PYTHON.LFLAGS, PYTHON.LIBS, and PYTHON.MODULE_EXT.
+#	PYTHON.CFLAGS, PYTHON.LFLAGS, and PYTHON.MODULE_EXT.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_EMIT_CHECK_PYTHON],
     [CS_CHECK_PYTHON([$1], [$2])
