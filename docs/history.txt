@@ -40,6 +40,8 @@ The history order has been reversed so that new features are at the top.
 	  changes.
 	- Update simple.txi and simple2.txi tutorials.
 	- Norman updated worldfmt.txi for TEX_SET_* to MAT_SET_* change.
+	- Did various other updates to the worldfmt.txi to reflect recent
+	  changes with materials, shading, ...
 28-Aug-2000
 	- Martin Geisse added movable.cpp to the MSVC project files.
 	- Norman Kramer added a 'const' modifier to csMovable.
