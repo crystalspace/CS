@@ -19,7 +19,7 @@
 #ifndef __QINT_H__
 #define __QINT_H__
 
-#if defined (PROC_INTEL) || defined (PROC_M68K) && !defined (OS_NEXT)
+#if (defined (PROC_INTEL) || defined (PROC_M68K)) && !defined (OS_NEXT)
 
 // These are 'stolen' from someone (I don't remember who anymore). It
 // is a nice and fast way to convert a floating point number to int
