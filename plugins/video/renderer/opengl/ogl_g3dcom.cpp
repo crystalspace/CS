@@ -1722,14 +1722,19 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
     glDisable (GL_TEXTURE_2D);
     csRGBpixel color;
     if (txt_handle)
+    {
       txt_handle->GetMeanColor (color.red, color.green, color.blue);
+      flat_r = BYTE_TO_FLOAT (color.red);
+      flat_g = BYTE_TO_FLOAT (color.green);
+      flat_b = BYTE_TO_FLOAT (color.blue);
+    }
     else if (mat_handle)
+    {
       mat_handle->GetFlatColor (color);
-    else
-      color.red = color.green = color.blue = 255;
-    flat_r = BYTE_TO_FLOAT (color.red);
-    flat_g = BYTE_TO_FLOAT (color.green);
-    flat_b = BYTE_TO_FLOAT (color.blue);
+      flat_r = BYTE_TO_FLOAT (color.red);
+      flat_g = BYTE_TO_FLOAT (color.green);
+      flat_b = BYTE_TO_FLOAT (color.blue);
+    }
   }
 
   SetGLZBufferFlags (queue.z_buf_mode);

@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+6-Feb-2002
+	- Matt Reda fixed a bug in the OpenGL renderer which caused
+	  fades (F5 in walktest and fade effect in csdemo) not to work
+	  correctly anymore.
 2-Feb-2002
 	- Toxe fixed a brand new bug in csMeshWrapper::HitBeam().
 1-Feb-2002

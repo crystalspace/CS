@@ -26,7 +26,7 @@ Bugs to fix:
 	[**] Shoot a missile in hole in flarge. The walls of the hole
 	     become lit ok then but revert to full bright after missile
 	     particles have disappeared. Only with OpenGL.
-	[V]  Fade effect no longer works in OpenGL (visible in csdemo and
+	[**] Fade effect no longer works in OpenGL (visible in csdemo and
 	     F5 key in walktest). May be related to the fact that a material
 	     without texture is used and this has recently changed.
 	[V]  It seems that pseudo-dynamic lighting is not working
