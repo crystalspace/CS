@@ -32,6 +32,7 @@
 #include "cstool/collider.h"
 #include "cstool/cspixmap.h"
 #include "ivaria/collider.h"
+#include "iengine/movable.h"
 
 extern WalkTest *Sys;
 

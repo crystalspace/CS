@@ -60,12 +60,13 @@
 #include "isound/wrapper.h"
 #include "imesh/terrfunc.h"
 #include "imesh/object.h"
+#include "iengine/movable.h"
+#include "iengine/campos.h"
 
 #include "csengine/wirefrm.h"
 #include "csengine/cbuffer.h"
 #include "csengine/stats.h"
 #include "csengine/light.h"
-#include "csengine/campos.h"
 
 #if defined(OS_DOS) || defined(OS_WIN32) || defined (OS_OS2)
 #  include <io.h>
@@ -1518,13 +1519,12 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     Create2DSprites ();
 
     // Look for the start sector in this map.
-    csEngine* engine = (csEngine*)Engine;
-    csCameraPosition *cp = (csCameraPosition *)engine->camera_positions.FindByName ("Start");
+    iCameraPosition *cp = Engine->FindCameraPosition ("Start");
     const char *room_name;
     if (cp)
     {
-      room_name = cp->Sector;
-      if (!cp->Load (view->GetCamera (), engine))
+      room_name = cp->GetSector ();
+      if (!cp->Load (view->GetCamera (), Engine))
         room_name = "room";
     }
     else

@@ -1,8 +1,11 @@
+
 #include "cssysdef.h"
 #include "csphyzik/phyziks.h"
 #include "cstso.h"
-#include "csengine/meshobj.h"
-#include "csengine/sector.h"
+#include "iengine/mesh.h"
+#include "iengine/movable.h"
+#include "imesh/object.h"
+#include "iengine/sector.h"
 #include "phyztest.h"
 #include "ivaria/polymesh.h"
 
@@ -24,7 +27,7 @@ csSpaceTimeObj::csSpaceTimeObj()
   //what_type = ST_SPACETIME; 
 }
 
-csRigidSpaceTimeObj::csRigidSpaceTimeObj( iCollideSystem* cdsys, csMeshWrapper *psprt, ctRigidBody *prb )
+csRigidSpaceTimeObj::csRigidSpaceTimeObj( iCollideSystem* cdsys, iMeshWrapper *psprt, ctRigidBody *prb )
 {
   space_time_continuum[continuum_end++] = this;
  // what_type = ST_SPACETIME; 
@@ -32,7 +35,7 @@ csRigidSpaceTimeObj::csRigidSpaceTimeObj( iCollideSystem* cdsys, csMeshWrapper *
   sprt = psprt;
   rb = prb;
   iPolygonMesh* mesh = SCF_QUERY_INTERFACE ( sprt->GetMeshObject(), iPolygonMesh);
-  col = new csColliderWrapper (*sprt, cdsys, mesh);
+  col = new csColliderWrapper (sprt->QueryObject (), cdsys, mesh);
   mesh->DecRef ();
   what_type = ST_RIGID;
 
@@ -77,7 +80,7 @@ void csRigidSpaceTimeObj::update_space()
     sto = space_time_continuum[i];
     new_p = sto->rb->get_pos();
 
-    sto->sprt->GetMovable ().SetPosition ( new_p );
+    sto->sprt->GetMovable ()->SetPosition ( new_p );
 
     M = sto->rb->get_R();   // get orientation for this link
     // ctMatrix3 and csMatrix3 not directly compatable yet
@@ -85,8 +88,8 @@ void csRigidSpaceTimeObj::update_space()
          M[1][0], M[1][1], M[1][2],
          M[2][0], M[2][1], M[2][2]);    // set orientation of mesh
    
- sto->sprt->GetMovable ().SetTransform(m);
-    sto->sprt->GetMovable ().UpdateMove ();
+ sto->sprt->GetMovable ()->SetTransform(m);
+    sto->sprt->GetMovable ()->UpdateMove ();
   }
 }
 
@@ -95,7 +98,7 @@ real csRigidSpaceTimeObj::collision_check()
 {
   csColliderWrapper *coli;
   //csMeshWrapper *sprt;
-  csSector* first_sector;
+  iSector* first_sector;
   //csThing* thng;
   ctMatrix3 M;
   csMatrix3 m;
@@ -114,8 +117,7 @@ real csRigidSpaceTimeObj::collision_check()
 
   for( int i = 0; i < continuum_end; i++ )
   {
-    first_sector = space_time_continuum[i]->sprt->GetMovable ().
-      GetSector (0)->GetPrivateObject ();
+    first_sector = space_time_continuum[i]->sprt->GetMovable ()->GetSector (0);
     // Start collision detection.
     coli = space_time_continuum[i]->col;
     iCollideSystem* cdsys = coli->GetCollideSystem ();
@@ -139,7 +141,7 @@ real csRigidSpaceTimeObj::collision_check()
     if ( first_sector )
     {
 //      thng = first_sector->GetMesh("walls");
-      coli->Collide(*first_sector, &tfm);
+      coli->Collide(first_sector->QueryObject (), &tfm);
       CD_contact = cdsys->GetCollisionPairs ();
     }
 

@@ -9,7 +9,7 @@
 #include "isys/system.h"
 
 class csEngine;
-class csMeshWrapper;
+struct iMeshWrapper;
 class ctRigidBody;
 class ctCollidingContact;
 class ctWorld;
@@ -41,7 +41,7 @@ public:
 			      ctWorld *time_world, csEngine *space_engine );
 
   csColliderWrapper *col;
-  csMeshWrapper *sprt;
+  iMeshWrapper *sprt;
   ctVector3 prev_pos;
   ctRigidBody *rb;
   
@@ -50,7 +50,7 @@ public:
 
   ctCollidingContact *contact;
 
-  csRigidSpaceTimeObj( iCollideSystem* cdsys, csMeshWrapper *psprt, ctRigidBody *prb );
+  csRigidSpaceTimeObj( iCollideSystem* cdsys, iMeshWrapper *psprt, ctRigidBody *prb );
 
 protected:
   static void update_space();

@@ -27,9 +27,10 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
+#include "iengine/statlght.h"
+#include "iengine/light.h"
 
 #include "csengine/wirefrm.h"
-#include "csengine/light.h"
 #include "csengine/octree.h"
 
 #define Gfx3D Sys->myG3D
@@ -178,7 +179,8 @@ void draw_map (csRenderView* /*rview*/, int type, void* entity)
     int i;
     for (i = 0 ; i < sector->GetLightCount () ; i++)
     {
-      csWfVertex* vt = wf->AddVertex (sector->GetLight (i)->GetCenter ());
+      csWfVertex* vt = wf->AddVertex (sector->scfiSector.GetLight (i)->
+        QueryLight ()->GetCenter ());
       vt->SetColor (wf->GetRed ());
     }
   }

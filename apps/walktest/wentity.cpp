@@ -19,9 +19,10 @@
 #include "cssysdef.h"
 #include "walktest/wentity.h"
 #include "walktest/walktest.h"
-#include "csengine/meshobj.h"
 #include "csgeom/matrix3.h"
 #include "iengine/light.h"
+#include "iengine/mesh.h"
+#include "iengine/movable.h"
 
 extern WalkTest* Sys;
 

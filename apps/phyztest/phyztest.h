@@ -24,10 +24,10 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 
-class csSector;
-class csView;
-class csEngine;
-class csDynLight;
+struct iSector;
+struct iView;
+struct iEngine;
+struct iDynLight;
 struct iCollideSystem;
 struct iFont;
 struct iLoader;
@@ -40,10 +40,10 @@ class Phyztest : public SysSystemDriver
 public:
   iFont *courierFont;
   int write_colour;
-  csSector* room;
-  csView* view;
-  csEngine* engine;
-  csDynLight* dynlight;
+  iSector* room;
+  iView* view;
+  iEngine* engine;
+  iDynLight* dynlight;
   float angle;
   int motion_flags;
   iCollideSystem* cdsys;

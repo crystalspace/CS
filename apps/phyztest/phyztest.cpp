@@ -19,11 +19,16 @@
 #include "cssysdef.h"
 #include "cssys/system.h"
 #include "apps/phyztest/phyztest.h"
-#include "csengine/sector.h"
+
 #include "csengine/engine.h"
-#include "csengine/camera.h"
-#include "csengine/light.h"
-#include "csengine/polygon.h"
+
+#include "iengine/camera.h"
+#include "iengine/engine.h"
+#include "iengine/material.h"
+#include "imesh/thing/polygon.h"
+#include "imesh/thing/thing.h"
+#include "ivaria/polymesh.h"
+
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
@@ -55,7 +60,7 @@ ctWorld phyz_world;
 Phyztest *System;
 
 // data for mass on spring demo
-csMeshWrapper *bot = NULL;
+iMeshWrapper *bot = NULL;
 ctRigidBody *rb_bot = NULL;
   
 // data for swinging chain demo
@@ -65,14 +70,14 @@ bool chain_added = false;
 class ChainLink
 {
 public:
-  ChainLink( csMeshWrapper *psprt, ctRigidBody *prb, ctArticulatedBody *pab )
+  ChainLink( iMeshWrapper *psprt, ctRigidBody *prb, ctArticulatedBody *pab )
   {
     sprt = psprt;
     rb = prb;
     ab = pab;   
   }
 
-  csMeshWrapper *sprt;         // mesh that represents a link
+  iMeshWrapper *sprt;         // mesh that represents a link
   ctRigidBody *rb;          // rigidbody object for this link
   ctArticulatedBody * ab;   // articulated body ( jointed body ) for this link
 };
@@ -96,17 +101,16 @@ ctRigidBody *add_test_body( ctVector3 ppos )
   return arb;
 }
 
-csMeshWrapper *add_test_mesh( csMeshFactoryWrapper *tmpl, csSector *aroom, csView *view )
+iMeshWrapper *add_test_mesh( iMeshFactoryWrapper *tmpl, iSector *aroom, iView *view )
 {
-  csMeshWrapper *tsprt;
+  iMeshWrapper *tsprt;
   
-  tsprt = tmpl->NewMeshObject (view->GetEngine ()->GetCsEngine ()->QueryCsObject ());
-  view->GetEngine ()->GetCsEngine ()->meshes.Push (tsprt);
-  tsprt->GetMovable ().SetSector (&aroom->scfiSector);
+  tsprt = view->GetEngine ()->CreateMeshObject (tmpl, NULL);
+  tsprt->GetMovable ()->SetSector (aroom);
   csXScaleMatrix3 m (2);
-  tsprt->GetMovable ().SetTransform (m);
-  tsprt->GetMovable ().SetPosition (csVector3( 0, 0, 0 ));    // only matters for root in chain demo
-  tsprt->GetMovable ().UpdateMove ();
+  tsprt->GetMovable ()->SetTransform (m);
+  tsprt->GetMovable ()->SetPosition (csVector3( 0, 0, 0 ));    // only matters for root in chain demo
+  tsprt->GetMovable ()->UpdateMove ();
 
   iSprite3DState* state = SCF_QUERY_INTERFACE (tsprt->GetMeshObject (), iSprite3DState);
   state->SetAction ("default");
@@ -133,14 +137,13 @@ Phyztest::Phyztest ()
 
 Phyztest::~Phyztest ()
 {
-  if (cdsys) cdsys->DecRef ();
-  delete view;
-  if (courierFont)
-    courierFont->DecRef ();
-  if (LevelLoader)
-    LevelLoader->DecRef ();
+  SCF_DEC_REF (cdsys);
+  SCF_DEC_REF (view);
+  SCF_DEC_REF (courierFont);
+  SCF_DEC_REF (LevelLoader);
   SCF_DEC_REF (myG2D);
   SCF_DEC_REF (myG3D);
+  SCF_DEC_REF (engine);
 }
 
 void Cleanup ()
@@ -169,14 +172,12 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
     abort ();
   }
 
-  iEngine *Engine = CS_QUERY_PLUGIN (this, iEngine);
-  if (!Engine)
+  engine = CS_QUERY_PLUGIN (this, iEngine);
+  if (!engine)
   {
     Printf (CS_MSG_FATAL_ERROR, "No iEngine plugin!\n");
     abort ();
   }
-  engine = Engine->GetCsEngine ();
-  Engine->DecRef ();
 
   LevelLoader = CS_QUERY_PLUGIN_ID (this, CS_FUNCID_LVLLOADER, iLoader);
   if (!LevelLoader)
@@ -225,9 +226,9 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
     return false;
   }
   LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
-  iMaterialWrapper* tm = engine->GetMaterials ()->FindByName ("stone");
+  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
  
-  room = engine->CreateSector ("room")->GetPrivateObject ();
+  room = engine->CreateSector ("room");
   iThingState* walls = SCF_QUERY_INTERFACE (engine->CreateSectorWallsMesh (room,
   	"walls")->GetMeshObject (), iThingState);
   csVector3 
@@ -290,17 +291,17 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
 
   walls->DecRef ();
 
-  csStatLight* light;
-  light = new csStatLight (-3, -4, 0, 10, 1, 0, 0, false);
+  iStatLight* light;
+  light = engine->CreateLight (NULL, csVector3 (-3, -4, 0), 10, csColor (1, 0, 0), false);
   room->AddLight (light);
-  light = new csStatLight (3, -4, 0, 10, 0, 0, 1, false);
+  light = engine->CreateLight (NULL, csVector3 (3, -4, 0), 10, csColor (0, 0, 1), false);
   room->AddLight (light);
-  light = new csStatLight (0, -4, -3, 10, 0, 1, 0, false);
+  light = engine->CreateLight (NULL, csVector3 (0, -4, -3), 10, csColor (0, 1, 0), false);
   room->AddLight (light);
 
-  csMeshWrapper *mw = room->GetMesh (0);
+  iMeshWrapper *mw = room->GetMesh (0);
   iPolygonMesh* mesh = SCF_QUERY_INTERFACE (mw->GetMeshObject (), iPolygonMesh);
-  (void)new csColliderWrapper(*mw, cdsys, mesh);
+  (void)new csColliderWrapper(mw->QueryObject (), cdsys, mesh);
   mesh->DecRef ();
 
   engine->Prepare ();
@@ -319,7 +320,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   // manually creating a camera and a clipper but it makes things a little
   // easier.
   view = new csView (engine, myG3D);
-  view->GetCamera ()->SetSector (&room->scfiSector);
+  view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 0, -4));
   view->SetRectangle (2, 2, FrameWidth - 4, FrameHeight - 4);
 
@@ -360,8 +361,7 @@ void Phyztest::NextFrame ()
     // Printf (CS_MSG_DEBUG_0, "adding chain\n");
     // use box template
 
-    csMeshFactoryWrapper* bxtmpl = (csMeshFactoryWrapper*)
-      view->GetEngine ()->GetCsEngine ()->mesh_factories.FindByName ("box");
+    iMeshFactoryWrapper* bxtmpl = view->GetEngine ()->FindMeshFactory ("box");
     if (!bxtmpl)
     {  
       Printf (CS_MSG_INITIALIZATION, "couldn't load template 'box'\n");
@@ -370,7 +370,7 @@ void Phyztest::NextFrame ()
 
     // root of chain.  invisible ( no mesh )
     // this body doesn't rotate or translate if it is rooted. 
-    csMeshWrapper *sprt;
+    iMeshWrapper *sprt;
     ctArticulatedBody *ab_parent;
     ctArticulatedBody *ab_child;
     // each link of chain has a rigid body 
@@ -419,17 +419,15 @@ void Phyztest::NextFrame ()
     if  ( bot == NULL )
     {
       // add a mesh
-      csMeshFactoryWrapper* tmpl = (csMeshFactoryWrapper*)
-	view->GetEngine ()->GetCsEngine ()->mesh_factories.FindByName ("box");
+      iMeshFactoryWrapper* tmpl = view->GetEngine ()->FindMeshFactory ("box");
       if (!tmpl)
       {     
 	Printf (CS_MSG_INITIALIZATION, "couldn't load template 'bot'\n");
 	return;
       }
 
-      bot = tmpl->NewMeshObject (view->GetEngine ()->GetCsEngine ()->QueryCsObject ());
-      view->GetEngine ()->GetCsEngine ()->meshes.Push (bot);
-      bot->GetMovable ().SetSector (&room->scfiSector);
+      bot = view->GetEngine ()->CreateMeshObject (tmpl, NULL);
+      bot->GetMovable ()->SetSector (room);
       iSprite3DState* state = SCF_QUERY_INTERFACE (bot->GetMeshObject (), iSprite3DState);
       state->SetAction ("default");
       state->DecRef ();
@@ -443,9 +441,9 @@ void Phyztest::NextFrame ()
     }
 
     csXScaleMatrix3 m (10);
-    bot->GetMovable ().SetTransform (m);
-    bot->GetMovable ().SetPosition (csVector3( 0, 0, 0 ));
-    bot->GetMovable ().UpdateMove ();
+    bot->GetMovable ()->SetTransform (m);
+    bot->GetMovable ()->SetPosition (csVector3( 0, 0, 0 ));
+    bot->GetMovable ()->UpdateMove ();
     rb_bot->set_m( 15.0 );
     rb_bot->set_pos (ctVector3 (0.0, 0.0, 0));
     rb_bot->set_v ( ctVector3( 0.4, 0.0, 0));
@@ -472,7 +470,7 @@ void Phyztest::NextFrame ()
 
   // evolve the physics world by time step.  Slowed down by 4x due to speed of demo objects
   //!me phyz_world.evolve( 0, 0.25*elapsed_time / 1000.0 );  //!me .25 needed to balance test samples..
-  csRigidSpaceTimeObj::evolve_system( 0, 0.25*elapsed_time / 1000.0, &phyz_world, engine );
+  csRigidSpaceTimeObj::evolve_system( 0, 0.25*elapsed_time / 1000.0, &phyz_world, engine->GetCsEngine () );
 
   // Add a boost
   if (rb_bot && GetKeyState (CSKEY_ENTER))
@@ -484,7 +482,7 @@ void Phyztest::NextFrame ()
   // !me phyz_world.evolve( 0, 0.25*elapsed_time / 1000.0 );  
 
   csRigidSpaceTimeObj::evolve_system
-    ( 0, 0.25*elapsed_time / 1000.0, &phyz_world, engine );
+    ( 0, 0.25*elapsed_time / 1000.0, &phyz_world, engine->GetCsEngine () );
 
 
 
@@ -493,7 +491,7 @@ void Phyztest::NextFrame ()
   {
     csVector3 new_p = rb_bot->get_pos();
     iLight* lights[2];
-    int num_lights = engine->GetNearbyLights (room, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
+    int num_lights = engine->GetCsEngine ()->GetNearbyLights (room->GetPrivateObject (), new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
     bot->UpdateLighting (lights, num_lights);  
   }
  
@@ -515,7 +513,7 @@ void Phyztest::NextFrame ()
         new_p = chain[i]->rb->get_pos();
 	//  Printf (CS_MSG_DEBUG_0, "chain pos %d = %f, %f, %f\n",
 	//            i, new_p.x, new_p.y, new_p.z);
-        chain[i]->sprt->GetMovable ().SetPosition ( new_p );
+        chain[i]->sprt->GetMovable ()->SetPosition ( new_p );
         
         M = chain[i]->rb->get_R();   // get orientation for this link
         // ctMatrix3 and csMatrix3 not directly compatable yet
@@ -526,10 +524,10 @@ void Phyztest::NextFrame ()
         M_scale.Identity();
         M_scale *= 0.5;
         m *= M_scale;
-        chain[i]->sprt->GetMovable ().SetTransform(m);
-	chain[i]->sprt->GetMovable ().UpdateMove ();
+        chain[i]->sprt->GetMovable ()->SetTransform(m);
+	chain[i]->sprt->GetMovable ()->UpdateMove ();
 
-        num_lights = engine->GetNearbyLights (room, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
+        num_lights = engine->GetCsEngine ()->GetNearbyLights (room->GetPrivateObject (), new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
         chain[i]->sprt->UpdateLighting (lights, num_lights); 
       }
     }

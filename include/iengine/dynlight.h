@@ -23,6 +23,8 @@
 #include "csutil/scf.h"
 
 class csDynLight;
+struct iObject;
+struct iLight;
 
 SCF_VERSION (iDynLight, 0, 0, 1);
 

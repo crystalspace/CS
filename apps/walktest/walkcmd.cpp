@@ -52,6 +52,7 @@
 #include "iengine/light.h"
 #include "ivaria/perfstat.h"
 #include "imesh/sprite3d.h"
+#include "iengine/statlght.h"
 
 #include "csengine/polygon.h"
 #include "csengine/radiosty.h"

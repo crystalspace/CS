@@ -21,6 +21,7 @@
 #include "walktest/walktest.h"
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/ptextype.h"
+#include "iengine/movable.h"
 
 extern WalkTest* Sys;
 

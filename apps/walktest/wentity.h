@@ -19,7 +19,6 @@
 #ifndef __WENTITY_H
 #define __WENTITY_H
 
-#include "csengine/movable.h"
 #include "csutil/dataobj.h"
 #include "csgeom/vector3.h"
 #include "csutil/cscolor.h"
@@ -27,7 +26,7 @@
 
 struct iLight;
 struct iMeshWrapper;
-
+struct iMovable;
 
 SCF_VERSION (csWalkEntity, 0, 0, 1);
 
