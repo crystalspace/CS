@@ -325,19 +325,42 @@ public:
     mpStore[GetIndex(pos)] ^= 1 << GetOffset(pos);
   }
 
-  /// Set the bit at position pos to the given value.
+  /// Set the bit at position \a pos to the given value.
   void Set (size_t pos, bool val)
   {
     val ? SetBit(pos) : ClearBit(pos);
   }
 
-  /// Returns true iff the bit at position pos is true.
+  /// Returns true if the bit at position \a pos is true.
   bool IsBitSet (size_t pos) const
   {
     CS_ASSERT (pos < mNumBits);
     return (mpStore[GetIndex(pos)] & (1 << GetOffset(pos))) != 0;
   }
 
+  /**
+   * Checks whether at least one of \a count bits is set from position 
+   * \a pos on.
+   */
+  bool AreSomeBitsSet (size_t pos, size_t count) const
+  {
+    CS_ASSERT (pos < mNumBits);
+    CS_ASSERT ((pos + count) < mNumBits);
+    
+    while (count > 0)
+    {
+      size_t index = GetIndex (pos);
+      size_t offset = GetOffset (pos);
+      size_t checkCount = MIN(count, cell_size - offset);
+            
+      store_type mask = ((1 << checkCount) - 1) << offset;
+      if (mpStore[index] & mask) return true;
+      pos += checkCount;
+      count -= checkCount;
+    }
+    return false;
+  }
+  
   /// Returns true iff all bits are false.
   bool AllBitsFalse() const
   {

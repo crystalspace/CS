@@ -50,9 +50,14 @@ protected:
 
   const char* programType;
 
+  char* debugFN;
+
   bool DefaultLoadProgram (const char* programStr, CGGLenum type,
     csArray<iShaderVariableContext*> &staticContexts);
   void DoDebugDump ();
+  void WriteAdditionalDumpInfo (const char* description, const char* content);
+  virtual const char ** GetProfileCompilerArgs (CGprofile profile) 
+  { return 0; }
 public:
   csShaderGLCGCommon (csGLShader_CG* shaderPlug, const char* type);
   virtual ~csShaderGLCGCommon ();

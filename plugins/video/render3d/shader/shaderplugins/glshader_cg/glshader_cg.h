@@ -44,6 +44,7 @@ public:
   csGLExtensionManager* ext;
   bool debugDump;
   char* dumpDir;
+  bool doNVVPrealign;
 
   SCF_DECLARE_IBASE;
   

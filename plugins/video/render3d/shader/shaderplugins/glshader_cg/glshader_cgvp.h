@@ -33,19 +33,29 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 class csShaderGLCGVP : public csShaderGLCGCommon
 {
-  struct matrixtrackerentry
+  struct CGMatrixTrackerEntry
   {
-    CGGLenum nvMatrix;
-    CGGLenum nvTransform;
+    CGGLenum cgMatrix;
+    CGGLenum cgTransform;
     CGparameter cgParameter;
   };
 
+  struct NVMatrixTrackerEntry
+  {
+    GLenum nvMatrix;
+    GLenum nvTransform;
+    GLuint nvParameter;
+  };
+
+  bool cgTrackMatrices;
+  csArray<CGMatrixTrackerEntry> cgMatrixTrackers;
   bool nvTrackMatrices;
-  csArray<matrixtrackerentry> matrixtrackers;
+  csArray<NVMatrixTrackerEntry> nvMatrixTrackers;
   csRef<iShaderProgram> override;
 public:
   csShaderGLCGVP (csGLShader_CG* shaderPlug) : 
-    csShaderGLCGCommon (shaderPlug, "cgvp") { }
+    csShaderGLCGCommon (shaderPlug, "cgvp"), cgTrackMatrices(false), 
+    nvTrackMatrices(false) { }
 
   /// Sets this program to be the one used when rendering
   virtual void Activate ();

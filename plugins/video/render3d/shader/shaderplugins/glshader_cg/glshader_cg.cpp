@@ -179,6 +179,12 @@ bool csGLShader_CG::Open()
   if (debugDump)
     dumpDir = csStrNew (config->GetStr ("Video.OpenGL.Shader.Cg.DebugDumpDir",
     "/tmp/cgdump/"));
+  doNVVPrealign = config->GetBool ("Video.OpenGL.Shader.Cg.NvVpRealign", true) &&
+    ext->CS_GL_NV_vertex_program;
+  csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
+    "crystalspace.graphics3d.shader.glcg",
+    "Realigning of NV vertex programs is %s.", 
+    doNVVPrealign ? "ON" : "OFF");
 
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (object_reg,
     iPluginManager);

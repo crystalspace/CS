@@ -19,6 +19,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 #include "cssysdef.h"
 
+#include "csutil/bitarray.h"
 #include "csutil/hashmap.h"
 #include "csutil/objreg.h"
 #include "csutil/ref.h"
@@ -50,15 +51,24 @@ void csShaderGLCGVP::Activate()
 
   csShaderGLCGCommon::Activate();
 
+  if (cgTrackMatrices)
+  {
+    for (int i = 0; i < cgMatrixTrackers.Length(); ++i)
+    {
+      const CGMatrixTrackerEntry& mt = cgMatrixTrackers[i];
+
+      cgGLSetStateMatrixParameter(mt.cgParameter, mt.cgMatrix, 
+	mt.cgTransform);
+    }
+  }
   if (nvTrackMatrices)
   {
-
-    for(int i = 0; i < matrixtrackers.Length(); ++i)
+    for (int i = 0; i < nvMatrixTrackers.Length(); ++i)
     {
-      const matrixtrackerentry& mt = matrixtrackers[i];
+      const NVMatrixTrackerEntry& mt = nvMatrixTrackers[i];
 
-      cgGLSetStateMatrixParameter(mt.cgParameter, mt.nvMatrix, 
-	mt.nvTransform);
+      shaderPlug->ext->glTrackMatrixNV (GL_VERTEX_PROGRAM_NV,
+	mt.nvParameter, mt.nvMatrix, mt.nvTransform);
     }
   }
 }
@@ -112,7 +122,14 @@ static bool TokenEquals (const char* token, size_t tokenLen, const char* cmp)
   return (tokenLen == strlen (cmp)) && (strncmp (token, cmp, tokenLen) == 0);
 }
 
+const CGGLenum CGMatrixMODELVIEW_PROJECTION = 
+  CG_GL_MODELVIEW_PROJECTION_MATRIX;
+const CGGLenum CGMatrixMODELVIEW = CG_GL_MODELVIEW_MATRIX;
+const CGGLenum CGMatrixPROJECTION = CG_GL_PROJECTION_MATRIX;
 
+const GLenum NVMatrixMODELVIEW_PROJECTION = GL_MODELVIEW_PROJECTION_NV;
+const GLenum NVMatrixMODELVIEW = GL_MODELVIEW;
+const GLenum NVMatrixPROJECTION = GL_PROJECTION;
 
 bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 {
@@ -206,6 +223,7 @@ bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 
       newProgram << line << '\n';
     }
+    WriteAdditionalDumpInfo ("VP after processing", newProgram);
 
     override = shaderPlug->arbplg->CreateProgram ("vp");
     if (!override)
@@ -237,45 +255,291 @@ bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
   }
   else
   {
-    CGparameter param = cgGetFirstLeafParameter (program, CG_PROGRAM);
-    while (param)
+    if (!shaderPlug->doNVVPrealign)
     {
-      const char* pname = cgGetParameterName (param);
-    #define TRACKERENTRY(Matrix, Modifier)		  \
-      matrixtrackerentry map;				  \
-      map.nvMatrix = (CGGLenum)Matrix;			  \
-      map.nvTransform = (CGGLenum)Modifier;		  \
-      map.cgParameter = param; \
-      matrixtrackers.Push (map);
-    #define NAMEDTRACKERENTRY(Name, Matrix, Modifier)	  \
-      if (!strcmp (pname, Name))			  \
-      {							  \
-	TRACKERENTRY (Matrix, Modifier)			  \
-      }							  \
-      else
-    #define NAMEDENTRIES(Basename, Matrix)		  \
-      NAMEDTRACKERENTRY (Basename, Matrix,		  \
-	CG_GL_MATRIX_IDENTITY)				  \
-      NAMEDTRACKERENTRY (Basename "I", Matrix,	  	  \
-	CG_GL_MATRIX_INVERSE)				  \
-      NAMEDTRACKERENTRY (Basename "T", Matrix,	  	  \
-	CG_GL_MATRIX_TRANSPOSE)				  \
-      NAMEDTRACKERENTRY (Basename "IT", Matrix,	  	  \
-	CG_GL_MATRIX_INVERSE_TRANSPOSE)			  
+      CGparameter param = cgGetFirstLeafParameter (program, CG_PROGRAM);
+      while (param)
+      {
+	const char* pname = cgGetParameterName (param);
+      #define TRACKERENTRY(Matrix, Modifier)		  \
+	CGMatrixTrackerEntry map;			  \
+	map.cgMatrix = CGMatrix ## Matrix;		  \
+	map.cgTransform = Modifier;			  \
+	map.cgParameter = param;			  \
+	cgMatrixTrackers.Push (map);
+      #define NAMEDTRACKERENTRY(Name, Matrix, Modifier)	  \
+	if (!strcmp (pname, Name))			  \
+	{						  \
+	  TRACKERENTRY (Matrix, Modifier)		  \
+	}						  \
+	else
+      #define NAMEDENTRIES(Basename, Matrix)		  \
+	NAMEDTRACKERENTRY (Basename, Matrix,		  \
+	  CG_GL_MATRIX_IDENTITY)			  \
+	NAMEDTRACKERENTRY (Basename "I", Matrix,	  \
+	  CG_GL_MATRIX_INVERSE)				  \
+	NAMEDTRACKERENTRY (Basename "T", Matrix,	  \
+	  CG_GL_MATRIX_TRANSPOSE)			  \
+	NAMEDTRACKERENTRY (Basename "IT", Matrix,	  \
+	  CG_GL_MATRIX_INVERSE_TRANSPOSE)			  
 
-    #define MATRIX_MAP(name, nvMatrix, arbMatrix)	  \
-      NAMEDENTRIES (# name, nvMatrix)
-    #include "cgvp_matrixmap.inc"
-      { /* last else */ }
+      #define MATRIX_MAP(name, nvMatrix, arbMatrix)	  \
+	NAMEDENTRIES (# name, nvMatrix)
+      #include "cgvp_matrixmap.inc"
+	{ /* last else */ }
 
-    #undef NAMEDENTRIES
-    #undef NAMEDTRACKERENTRY
-    #undef TRACKERENTRY
+      #undef NAMEDENTRIES
+      #undef NAMEDTRACKERENTRY
+      #undef TRACKERENTRY
 
-      param = cgGetNextLeafParameter (param);
+	param = cgGetNextLeafParameter (param);
+      }
+
+      cgTrackMatrices = (cgMatrixTrackers.Length() != 0);
     }
+    else
+    {
+      /*
+      * Realign float4x4 parameters on 4-register boundaries, keep all other
+      * variables were they are.
+      * @@@ PROBLEM: In complex VPs, it could happen that not enough registers
+      * are available for both aligning and keeping other regs were they are.
+      * Currently, this will likely result in load failure. Should be handled
+      * more gracefully.
+      */
 
-    nvTrackMatrices = true;
+      const char* compiledProgram = cgGetProgramString (program, 
+	CG_COMPILED_PROGRAM);
+          
+      csStringReader reader (compiledProgram);
+      csString newProgram;
+
+      GLint numTemps = 0;
+      if (shaderPlug->ext->CS_GL_ARB_vertex_program)
+      {
+	// VP2.0+ are more or less additions to ARB_v_p.
+	// So query the param count from there.
+	shaderPlug->ext->glGetProgramivARB (GL_VERTEX_PROGRAM_ARB, 
+	  GL_MAX_PROGRAM_PARAMETERS_ARB, &numTemps);
+      }
+      else
+      {
+	// Else: Guess.
+	numTemps = (progProf == CG_PROFILE_VP20) ? 96 : 256;
+      }
+      csBitArray usedSlots (numTemps);
+      csArray<NVMatrixTrackerEntry> matrixParams;
+
+      // Pass 1: collect which params we need to realign.
+      csString line;
+      bool nextPass = false;
+      while (reader.GetLine (line) && !nextPass)
+      {
+	size_t tokenLen;
+	const char* token = GetToken (line, " ", tokenLen);
+	if (!token) continue;
+
+	do
+	{
+	  if (TokenEquals (token, tokenLen, "#var"))
+	  {
+	    token = GetToken (token + tokenLen, " ", tokenLen);
+	    if (!token)
+	      break;
+	    bool isMatrix = TokenEquals (token, tokenLen, "float4x4");
+	    size_t varLen;
+	    const char* varName = GetToken (token + tokenLen, " ", varLen);
+	    if (!varName) break;
+
+	    token = GetToken (varName + varLen, " ", tokenLen);
+	    if (!token || (!TokenEquals (token, tokenLen, ":")))
+	      break;
+	    token = GetToken (token + tokenLen, " ", tokenLen);
+	    if (!token || (!TokenEquals (token, tokenLen, ":")))
+	      break;
+	    token = GetToken (token + tokenLen, " ", tokenLen);
+	    if (!token) break;
+
+	    int varIndex;
+	    if (sscanf (token, "c[%d]", &varIndex) != 1)
+	      break;
+
+	    int newIndex = 0;
+	    bool found = false;
+	    if (isMatrix)
+	    {
+	      // Align matrices on 4-register boundaries.
+	    #define TRACKERENTRY(Matrix, Modifier)		  \
+	      NVMatrixTrackerEntry map;				  \
+	      map.nvMatrix = NVMatrix ## Matrix;		  \
+	      map.nvTransform = Modifier;			  \
+	      map.nvParameter = varIndex;			  \
+	      matrixParams.Push (map);
+	    #define NAMEDTRACKERENTRY(Name, Matrix, Modifier)	  \
+	      if (TokenEquals (varName, varLen, Name))		  \
+	      {							  \
+		TRACKERENTRY (Matrix, Modifier)			  \
+	      }							  \
+	      else
+	    #define NAMEDENTRIES(Basename, Matrix)		  \
+	      NAMEDTRACKERENTRY (Basename, Matrix,		  \
+		GL_IDENTITY_NV)					  \
+	      NAMEDTRACKERENTRY (Basename "I", Matrix,	  	  \
+		GL_INVERSE_NV)					  \
+	      NAMEDTRACKERENTRY (Basename "T", Matrix,	  	  \
+		GL_TRANSPOSE_NV)				  \
+	      NAMEDTRACKERENTRY (Basename "IT", Matrix,	  	  \
+		GL_INVERSE_TRANSPOSE_NV)			  
+
+	    #define MATRIX_MAP(name, nvMatrix, arbMatrix)	  \
+	      NAMEDENTRIES (# name, nvMatrix)
+	    #include "cgvp_matrixmap.inc"
+	      { 
+		/* last else */ 
+		CGparameter param = cgGetNamedParameter (program, 
+		  varName);
+		if (cgIsParameterReferenced (param))
+		{
+		  for (int b = 0; b < 4; b++)
+		    usedSlots.SetBit (varIndex);
+		}
+	      }
+	    }
+	    else
+	    {
+	      csString nameOnly; nameOnly.Append (varName, varLen);
+	      CGparameter param = cgGetNamedParameter (program, 
+		nameOnly);
+	      if (cgIsParameterReferenced (param))
+		usedSlots.SetBit (varIndex);
+	    }
+	  }
+	  else if (TokenEquals (token, tokenLen, "#const"))
+	  {
+	    size_t varLen;
+	    const char* constName = GetToken (token + tokenLen, " ", varLen);
+	    if (!constName) break;
+
+	    int varIndex;
+	    if (sscanf (constName, "c[%d]", &varIndex) != 1)
+	      break;
+
+	    usedSlots.SetBit (varIndex);
+	  }
+	  else if (*token != '#')
+	  {
+	    const char* lineData = line.GetData();
+
+	    if (strncmp (lineData, "!!", 2) == 0)
+	      break;
+	    else
+	      // The end of the header with the var infos and so on.
+	      nextPass = true;
+	  }
+	} while(0);
+      }
+
+      // Pass 2: Realigning, rewriting of the VP code.
+      if (nextPass)
+      {
+	reader.Reset();
+
+	csHash<int, int> constRemap;
+
+	for (int m = 0; m < matrixParams.Length(); m++)
+	{
+	  NVMatrixTrackerEntry mte = matrixParams[m];
+	  int newIndex = 0;
+	  bool found = false;
+	  // Align matrices on 4-register boundaries.
+	  while (newIndex < numTemps)
+	  {
+	    if (!usedSlots.AreSomeBitsSet (newIndex, 4))
+	    {
+	      for (int b = 0; b < 4; b++)
+	      {
+		usedSlots.SetBit (newIndex + b);
+		constRemap.Put (mte.nvParameter + b, newIndex + b);
+	      }
+	      found = true;
+	      break;
+	    }
+	    newIndex += 4;
+	  }
+	  if (!found) return false;
+
+	  mte.nvParameter = newIndex;
+	  nvMatrixTrackers.Push (mte);
+	}
+
+	csString line;
+	while (reader.GetLine (line))
+	{
+	  size_t tokenLen;
+	  const char* token = GetToken (line, " ", tokenLen);
+	  if (!token) continue;
+
+	  do
+	  {
+	    if (*token != '#')
+	    {
+	      const char* lineData = line.GetData();
+
+	      if (strncmp (lineData, "!!", 2) == 0)
+		break;
+
+	      // Process a line of code
+
+	      csString newLine;
+
+	      while (lineData != 0)
+	      {
+		char* param = strstr (lineData, "c[");
+		if (param != 0)
+		{
+		  param += 2;
+		  newLine.Append (lineData, param - lineData);
+		  int varIndex;
+		  if (sscanf (param, "%d", &varIndex) != 1)
+		  {
+		    newLine.Replace (line);
+		    break;
+		  }
+		  if (constRemap.In (varIndex))
+		    newLine << constRemap.Get (varIndex, -1);
+		  else
+		    newLine << varIndex;
+		  lineData = strchr (param, ']');
+		}
+		else
+		{
+		  newLine << lineData;
+		  lineData = 0;
+		}
+	      }
+
+	      line.Replace (newLine);
+	    }
+	  } while(0);
+
+	  newProgram << line << '\n';
+	}
+
+	nvTrackMatrices = (nvMatrixTrackers.Length() != 0);
+
+	WriteAdditionalDumpInfo ("VP after processing", newProgram);
+      }
+
+      // Now overwrite the VP program with our manipulated version.
+      cgGLEnableProfile (progProf);
+      cgGLUnbindProgram (progProf);
+
+      shaderPlug->ext->glLoadProgramNV (GL_VERTEX_PROGRAM_NV, 
+	cgGLGetProgramID (program), newProgram.Length(), 
+	(GLubyte*)newProgram.GetData());
+
+      cgGLDisableProfile (progProf);
+    }
   }
 
   return true;

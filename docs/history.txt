@@ -25,6 +25,12 @@ chronological order.
 	  work correctly with msvcgen project generation.
 	- Jorrit modified the parser so that you can now nest libraries
 	  (i.e. include a library from another library).
+	- res added csBitArray::AreSomeBitsSet().
+	- res changed the Cg VP part to have a "special" path for NV VPs where
+	  the compiled VP is changed to have input matrices aligned on 
+	  4-register boundaries (as needed by TrackMatrixNV()). Can be turned
+	  off by disabling the "Video.OpenGL.Shader.Cg.NvVpRealign" config
+	  setting.
 5-Jun-2004
 	- res made the following changes:
 	    - Added the *f versions of floor and ceil to csdef.h.

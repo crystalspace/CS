@@ -49,6 +49,7 @@ csShaderGLCGCommon::csShaderGLCGCommon (csGLShader_CG* shaderPlug,
   program = 0;
   cg_profile = 0;
   entrypoint = 0;
+  debugFN = 0;
 
   init_token_table (xmltokens);
 }
@@ -59,6 +60,7 @@ csShaderGLCGCommon::~csShaderGLCGCommon ()
     cgDestroyProgram (program);
   delete[] cg_profile;
   delete[] entrypoint;
+  delete[] debugFN;
 }
 
 void csShaderGLCGCommon::Activate()
@@ -147,7 +149,8 @@ bool csShaderGLCGCommon::DefaultLoadProgram (const char* programStr,
     profile = cgGLGetLatestProfile (type);
 
   program = cgCreateProgram (shaderPlug->context, CG_SOURCE,
-    programStr, profile, entrypoint ? entrypoint : "main", 0);
+    programStr, profile, entrypoint ? entrypoint : "main", 
+    GetProfileCompilerArgs (profile));
 
   if (!program)
     return false;
@@ -258,23 +261,47 @@ void csShaderGLCGCommon::DoDebugDump ()
   output << cgGetProgramString (program, CG_COMPILED_PROGRAM);
   output << "\n";
 
-  static int programCounter = 0;
-  csString filename;
-  filename << shaderPlug->dumpDir << (programCounter++) << programType << 
-    ".txt";
+  if (!debugFN)
+  {
+    static int programCounter = 0;
+    csString filename;
+    filename << shaderPlug->dumpDir << (programCounter++) << programType << 
+      ".txt";
+    debugFN = csStrNew (filename);
+  }
 
   csRef<iVFS> vfs = CS_QUERY_REGISTRY (objectReg, iVFS);
-  if (!vfs->WriteFile (filename, output.GetData(), output.Length()))
+  if (!vfs->WriteFile (debugFN, output.GetData(), output.Length()))
   {
     csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
       "crystalspace.graphics3d.shader.glcg",
-      "Could not write '%s'", filename.GetData());
+      "Could not write '%s'", debugFN);
   }
   else
   {
     csReport (objectReg, CS_REPORTER_SEVERITY_NOTIFY, 
       "crystalspace.graphics3d.shader.glcg",
-      "Dumped Cg program info to '%s'", filename.GetData());
+      "Dumped Cg program info to '%s'", debugFN);
+  }
+}
+
+void csShaderGLCGCommon::WriteAdditionalDumpInfo (const char* description, 
+						  const char* content)
+{
+  if (!shaderPlug->debugDump || !debugFN) return;
+
+  csRef<iVFS> vfs = CS_QUERY_REGISTRY (objectReg, iVFS);
+  csRef<iDataBuffer> oldDump = vfs->ReadFile (debugFN, true);
+
+  csString output ((char*)oldDump->GetData());
+  output << description << ":\n";
+  output << content;
+  output << "\n";
+  if (!vfs->WriteFile (debugFN, output.GetData(), output.Length()))
+  {
+    csReport (objectReg, CS_REPORTER_SEVERITY_WARNING, 
+      "crystalspace.graphics3d.shader.glcg",
+      "Could not augment '%s'", debugFN);
   }
 }
 

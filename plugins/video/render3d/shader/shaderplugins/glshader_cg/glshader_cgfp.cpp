@@ -157,7 +157,8 @@ int csShaderGLCGFP::ResolveTextureBinding (const char* binding)
     CGparameter parameter = cgGetNamedParameter (program, binding);
     if (parameter)
     {
-      if (cgGetParameterBaseResource (parameter) == CG_TEXUNIT0)
+      if ((cgGetParameterBaseResource (parameter) == CG_TEXUNIT0) ||
+	(cgGetParameterBaseResource (parameter) == CG_TEX0))
       {
 	newTU = cgGetParameterResourceIndex (parameter);
       }
