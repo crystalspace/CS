@@ -467,7 +467,7 @@ bool csKeyboardDriver::GetKeyState (utf32_char codeRaw)
     return (GetModifierState (codeRaw) != 0);
   }
   else
-    return keyStates.Get (codeRaw);
+    return keyStates.Fetch (codeRaw, false);
 }
 
 uint32 csKeyboardDriver::GetModifierState (utf32_char codeRaw)

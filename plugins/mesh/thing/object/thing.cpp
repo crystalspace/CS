@@ -315,7 +315,7 @@ void csThingStatic::PrepareLMLayout ()
 
     iMaterialWrapper* mat = sp->GetMaterialWrapper ();
 
-    csStaticPolyGroup* lp = polysSorted.Get (mat, 0);
+    csStaticPolyGroup* lp = polysSorted.Fetch (mat, 0);
     if (lp == 0)
     {
       lp = new csStaticPolyGroup;
@@ -2726,7 +2726,7 @@ void csThing::PrepareLMs ()
     const csThingStatic::csStaticLitPolyGroup& slpg = 
       *(static_data->litPolys[i]);
 
-    const csRef<iSuperLightmap>* SLMptr = superLMs.Get (slpg.staticSLM);
+    const csRef<iSuperLightmap>* SLMptr = superLMs.Fetch (slpg.staticSLM);
     csRef<iSuperLightmap> SLM;
 
     if (SLMptr == 0)

@@ -29,6 +29,20 @@ chronological order.
 	    - Added missing Jamfile.
 	    - Added missing .csplugin meta-information file.
 	    - Fixed several compilation errors and warnings.
+	- Eric Sunshine renamed the csHash<>::Get() methods to Fetch(), and
+	  GetAll() to FetchAll().  This was done in order to force people to
+	  examine invocations of these methods and to adjust the code
+	  appropriately.  This was necessary because the recent changes to the
+	  Get() methods radically changed the return semantics but, in numerous
+	  cases, did not cause the compiler to emit a diagnostic.  The result
+	  of this situation was that the behavior of previously valid programs
+	  would silently change, usually by breaking.
+	- Eric Sunshine fixed a few cases where code had not been updated to
+	  reflect the new return semantics of csHash<>::Get() -- now renamed to
+	  Fetch().  The new name, Fetch(), made it possible to find and repair
+	  these otherwise difficult-to-diagnose bugs, the most notable of which
+	  was csKeyboardDriver::GetKeyState() which was returning bogus
+	  results.
 14-Mar-2004
 	- Keith Fulton committed Performance enhancements to sprcal3d
 	  giving about 3x FPS in debug mode in viewmesh for a cal3d model.

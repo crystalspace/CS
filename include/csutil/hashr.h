@@ -46,7 +46,7 @@ public:
    */
   const K* GetKey (const T& key) const
   {
-    return reverse.Get (key);
+    return reverse.Fetch (key);
   }
  
   /**
@@ -55,7 +55,7 @@ public:
    */
   const K& GetKey (const T& key, const K& fallback) const
   {
-    return reverse.Get (key, fallback);
+    return reverse.Fetch (key, fallback);
   }
 };
 

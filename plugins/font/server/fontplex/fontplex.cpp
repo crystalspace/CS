@@ -209,7 +209,7 @@ csPtr<iFont> csFontServerMultiplexor::LoadFont (const char *filename,
 {
   csString fontid;
   fontid.Format ("%d:%s", size, filename);
-  iFont* font = loadedFonts.Get ((const char*)fontid, 0);
+  iFont* font = loadedFonts.Fetch ((const char*)fontid, 0);
   if (font != 0)
   {
     return csPtr<iFont> (csRef<iFont> (font));

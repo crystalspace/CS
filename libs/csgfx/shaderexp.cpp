@@ -1181,7 +1181,8 @@ bool csShaderExpression::parse_xml_atom(oper_arg & arg, csStringID type, const c
 
       if (*tmp)
       {
-        DEBUG_PRINTF("Error parsing float at position %i.\n", tmp - val_str);
+        DEBUG_PRINTF("Error parsing float at position %d.\n",
+	  int(tmp - val_str));
 
         return false;
       }

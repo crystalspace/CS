@@ -65,8 +65,8 @@ csRefTracker::~csRefTracker ()
 
 csRefTracker::RefInfo& csRefTracker::GetObjRefInfo (void* obj)
 {
-  obj = aliases.Get (obj, obj);
-  RefInfo* info = trackedRefs.Get (obj, 0);
+  obj = aliases.Fetch (obj, obj);
+  RefInfo* info = trackedRefs.Fetch (obj, 0);
   if (info == 0)
   {
     info = riAlloc.Alloc();
@@ -109,7 +109,7 @@ void csRefTracker::TrackConstruction (void* object)
     Move the already tracked object to the "old data".
     The new one might just coincidentally be alloced at the same spot.
    */
-  RefInfo* oldRef = trackedRefs.Get (object, 0);
+  RefInfo* oldRef = trackedRefs.Fetch (object, 0);
   if (oldRef != 0)
   {
     OldRefInfo oldInfo = {object, oldRef};
@@ -201,7 +201,7 @@ void csRefTracker::MatchDecRef (void* object, int refCount, void* tag)
       Move the tracked object to the "old data". A new one might just 
       coincidentally be alloced at the same spot.
     */
-    RefInfo* oldRef = trackedRefs.Get (object, 0);
+    RefInfo* oldRef = trackedRefs.Fetch (object, 0);
     if (oldRef)
     {
       OldRefInfo oldInfo = {object, oldRef};

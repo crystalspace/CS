@@ -790,7 +790,7 @@ bool csXWindow::SetMouseCursor (iImage *image, csRGBcolor keycolor,
   // Check for cached cursor - we can only cache images with a name
   if (image->GetName())
   {
-    Cursor cur = cachedCursors.Get (image->GetName(), 0);
+    Cursor cur = cachedCursors.Fetch (image->GetName(), 0);
     if (cur) 
     {
       XDefineCursor (dpy, ctx_win, cur);
