@@ -42,10 +42,6 @@
 #include <console.h>
 
 
-void clrscr(void)
-{
-}
-
 /*
  *	FixupFilePath
  *
