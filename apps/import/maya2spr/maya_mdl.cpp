@@ -23,7 +23,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <conio.h>
 
 #include "cssysdef.h"
 #include "maya_mdl.h"

@@ -23,8 +23,6 @@
 #include "mayanode.h"
 #include "binarytree.h"
 
-#include <conio.h>
-
 
 void DAGNode::PrintStats(FILE *s,int level) 
 {
