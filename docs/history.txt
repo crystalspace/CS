@@ -46,7 +46,7 @@ The history order is reversed so that new features are at the top.
 	- Fixed an uninitialized variable in the OpenGL benchmark routine.
 	- Removed userData pointer in tinyxml node structure. We are not using
 	  it and the XML data is already taking way too much memory. So this
-	  is four bytes less memory for every XML node or attribute.
+	  is four bytes less memory for every XML node.
 2-Mar-2003
         - Rudolf Potucek updated makefiles in the apps/ directory to 
 	  remove vpath and generate object files in individual 
