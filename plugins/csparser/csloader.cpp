@@ -1836,7 +1836,7 @@ bool csLoader::HandleMeshParameter (iMeshWrapper* mesh, iDocumentNode* child,
         if (strcasecmp (child->GetAttributeValue ("enable"), "true") == 0)
           mesh->CastHardwareShadow (true);
         else if (strcasecmp (child->GetAttributeValue ("enable"), "false") == 0)
-          mesh->CastHardwareShadow (true);
+          mesh->CastHardwareShadow (false);
       }
       break;
 #endif
