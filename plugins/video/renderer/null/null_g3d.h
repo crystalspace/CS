@@ -31,6 +31,7 @@
 #include "ivideo/halo.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "ivideo/polyrender.h"
 #include "video/renderer/common/polybuf.h"
 
 class csReversibleTransform;

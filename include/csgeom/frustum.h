@@ -449,6 +449,8 @@ public:
   void IncRef () { ref_count++; }
   /// Decrement reference counter
   void DecRef () { if (ref_count == 1) delete this; else ref_count--; }
+  /// Get reference count
+  int GetRefCount () { return ref_count; }
 };
 
 /** @} */
