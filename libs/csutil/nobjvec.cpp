@@ -61,6 +61,7 @@ int csNamedObjectVector::GetIndexByName (const char *name) const
     iObject *o = Get (i);
     if (!o) continue;
     const char* oname = o->GetName ();
+    o->DecRef ();
     if (name == oname || (name && oname && !strcmp (oname, name)))
       return i;
   }
@@ -80,7 +81,11 @@ int csNamedObjectVector::Find (iObject *obj) const
   {
     iObject *o = Get (i);
     if (obj == o)
+    {
+      o->DecRef ();
       return i;
+    }
+    o->DecRef ();
   }
   return -1;
 }
@@ -89,9 +94,12 @@ int csNamedObjectVector::Compare (csSome Item1, csSome Item2, int)
 {
   iObject *obj1 = SCF_QUERY_INTERFACE_FAST (((iBase*)Item1), iObject);
   iObject *obj2 = SCF_QUERY_INTERFACE_FAST (((iBase*)Item2), iObject);
-
-  return (obj1->GetName () == obj2->GetName ()) ? 0
+  
+  int res = (obj1->GetName () == obj2->GetName ()) ? 0
        : strcmp (obj1->GetName (), obj2->GetName ());
+  obj1->DecRef ();
+  obj2->DecRef ();
+  return res;
 }
 
 int csNamedObjectVector::CompareKey (csSome Item, csConstSome Key, int)
@@ -99,6 +107,8 @@ int csNamedObjectVector::CompareKey (csSome Item, csConstSome Key, int)
   iObject *obj = SCF_QUERY_INTERFACE_FAST (((iBase*)Item), iObject);
   const char *name = (const char *)Key;
 
-  return (obj->GetName () == name) ? 0
+  int res = (obj->GetName () == name) ? 0
        : strcmp (obj->GetName (), name);
+  obj->DecRef ();
+  return res;
 }
