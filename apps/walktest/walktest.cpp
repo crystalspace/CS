@@ -103,7 +103,6 @@ SCF_REGISTER_STATIC_LIBRARY (engine)
 
 //-----------------------------------------------------------------------------
 
-char WalkTest::map_dir [100];
 bool WalkTest::move_3d = false;
 
 WalkTest::WalkTest () :
@@ -195,6 +194,9 @@ WalkTest::WalkTest () :
   split = -1;			// Not split
 
   canvas_exposed = true;
+
+  first_map = last_map = NULL;
+  num_maps = 0;
 }
 
 WalkTest::~WalkTest ()
@@ -230,6 +232,14 @@ WalkTest::~WalkTest ()
   SCF_DEC_REF (kbd);
   SCF_DEC_REF (CrossBuilder);
   SCF_DEC_REF (ModelConverter);
+
+  while (first_map)
+  {
+    csMapToLoad* map = first_map->next_map;
+    delete[] first_map->map_dir;
+    delete first_map;
+    first_map = map;
+  }
 }
 
 void WalkTest::Report (int severity, const char* msg, ...)
@@ -265,11 +275,28 @@ void WalkTest::SetDefaults ()
   if (!(val = cmdline->GetName ()))
     val = Config->GetStr ("Walktest.Settings.WorldFile");
 
-  // if an absolute path is given, copy it. Otherwise prepend "/lev/".
-  if (val[0] == '/')
-    strcpy (map_dir, val);
-  else
-    sprintf (map_dir, "/lev/%s", val);
+  int idx = 0;
+  while (val != NULL)
+  {
+    num_maps++;
+    idx++;
+    char map_dir[512];
+    // if an absolute path is given, copy it. Otherwise prepend "/lev/".
+    if (val[0] == '/')
+      strcpy (map_dir, val);
+    else
+      sprintf (map_dir, "/lev/%s", val);
+
+    csMapToLoad* map = new csMapToLoad;
+    map->map_dir = csStrNew (map_dir);
+    map->next_map = NULL;
+    if (last_map)
+      last_map->next_map = map;
+    else
+      first_map = map;
+    last_map = map;
+    val = cmdline->GetName (idx);
+  }
 
   if (cmdline->GetOption ("stats"))
   {
@@ -1485,51 +1512,63 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   else
   {
     // Load from a map file.
-    Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'...", map_dir);
+    if (num_maps == 1)
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'.", first_map->map_dir);
+    else if (num_maps > 1)
+      Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading multiple maps '%s', ...", first_map->map_dir);
 
     // Check the map and mount it if required.
-    char tmp [255];
-    sprintf (tmp, "%s/", map_dir);
-    if (!myVFS->Exists (map_dir))
+    int i;
+    csMapToLoad* map = first_map;
+    for (i = 0 ; i < num_maps ; i++)
     {
-      char *name = strrchr (map_dir, '/');
-      if (name)
+      char tmp [512];
+      sprintf (tmp, "%s/", map->map_dir);
+      if (!myVFS->Exists (map->map_dir))
       {
-        name++;
-        //sprintf (tmp, "$.$/data$/%s.zip, $.$/%s.zip, $(..)$/data$/%s.zip",
-        //  name, name, name);
-	const char *valfiletype = "";
-	valfiletype = cfg->GetStr ("Walktest.Settings.WorldZipType", "");
-	if (strcmp (valfiletype, "") ==0)
-	{
-	  valfiletype = "zip";
-	}
-	char* extension = strrchr (name, '.');
-	if (extension && !strcmp (extension+1, valfiletype))
-	{
-	  // The file already ends with the correct extension.
-          sprintf (tmp, "$.$/data$/%s, $.$/%s, $(..)$/data$/%s, %s",
-             name, name, name, name);
-	}
-	else
-	{
-	  // Add the extension.
-          sprintf (tmp, "$.$/data$/%s.%s, $.$/%s.%s, $(..)$/data$/%s.%s",
-             name, valfiletype, name, valfiletype, name, valfiletype);
-	}
-        myVFS->Mount (map_dir, tmp);
+        char *name = strrchr (map->map_dir, '/');
+        if (name)
+        {
+          name++;
+          //sprintf (tmp, "$.$/data$/%s.zip, $.$/%s.zip, $(..)$/data$/%s.zip",
+          //  name, name, name);
+	  const char *valfiletype = "";
+	  valfiletype = cfg->GetStr ("Walktest.Settings.WorldZipType", "");
+	  if (strcmp (valfiletype, "") ==0)
+	  {
+	    valfiletype = "zip";
+	  }
+	  char* extension = strrchr (name, '.');
+	  if (extension && !strcmp (extension+1, valfiletype))
+	  {
+	    // The file already ends with the correct extension.
+            sprintf (tmp, "$.$/data$/%s, $.$/%s, $(..)$/data$/%s, %s",
+               name, name, name, name);
+	  }
+	  else
+	  {
+	    // Add the extension.
+            sprintf (tmp, "$.$/data$/%s.%s, $.$/%s.%s, $(..)$/data$/%s.%s",
+               name, valfiletype, name, valfiletype, name, valfiletype);
+	  }
+          myVFS->Mount (map->map_dir, tmp);
+        }
       }
-    }
 
-    if (!myVFS->ChDir (map_dir))
-    {
-      Report (CS_REPORTER_SEVERITY_ERROR, "The directory on VFS for map file does not exist!");
-      return false;
-    }
+      if (!myVFS->ChDir (map->map_dir))
+      {
+        Report (CS_REPORTER_SEVERITY_ERROR, "The directory on VFS for map file does not exist!");
+        return false;
+      }
 
-    // Load the map from the file.
-    if (!LevelLoader->LoadMapFile ("world"))
-      return false;
+      // Load the map from the file.
+      if (num_maps > 1)
+        Report (CS_REPORTER_SEVERITY_NOTIFY, "  Loading map '%s'", map->map_dir);
+      if (!LevelLoader->LoadMapFile ("world", i == 0))	// Only clear for first map.
+        return false;
+
+      map = map->next_map;
+    }
 
     LoadLibraryData ();
     Inititalize2DTextures ();

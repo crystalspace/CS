@@ -120,6 +120,13 @@ public:
   }
 };
 
+struct csMapToLoad
+{
+  /// The startup directory on VFS with needed map file
+  char* map_dir;
+  csMapToLoad* next_map;
+};
+
 ///
 class WalkTest
 {
@@ -131,8 +138,9 @@ public:
 
   int FrameWidth, FrameHeight;
 
-  /// The startup directory on VFS with needed map file
-  static char map_dir [100];
+  /// All maps we want to load.
+  csMapToLoad* first_map, * last_map;
+  int num_maps;
   /// A script to execute at startup.
   char* auto_script;
 

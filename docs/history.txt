@@ -1,5 +1,23 @@
 The history order is reversed so that new features are at the top.
 
+21-Jul-2002
+	- Renamed new ogl_g3dext.hpp to ogl_g3dext.h.
+	- Added a new feature to walktest. You can now say:
+	    walktest room maze sydney
+	  and walktest will load all specified levels in memory.
+	  Sectors with the same name will be merged (so objects
+	  from same-named sectors in different map files will
+	  be joined in one sector). You can also define
+	  world files that connect to sectors in other world files.
+	  Using this technique you can easily make huge worlds
+	  from smaller zip files (easier for artists to manage).
+	  One problem at this moment: CS will try to find
+	  and recalculate all lightmap information from the
+	  last level given on the commandline. So if you do:
+	    walktest flarge room
+	  it will not be able to load lights from flarge cache
+	  but only the lights from room. I will try to find a
+	  solution for this later.
 19-Jul-2002
 	- Got a new tutorial from Hariharan Bhasker. This tutorial
 	  shows how to use the csPath class in csgeom to smoothly move
