@@ -18,6 +18,17 @@ Short-term cleanups that need to be done:
 	  Brandon totally botched it and completely broke the reference
 	  counting mechanism.  Furthermore, his changes were entirely
 	  unwarranted.
+	- Eric Sunshine fixed several bugs in the OpenGL driver which were
+	  introduced during the SCF conversion.  These bugs caused the
+	  application to crash whenever:
+	    a) Text was drawn.
+	    b) A line was drawn.
+	    c) A pixel was drawn.
+	    d) A 2D sprite (such as the CS logo) was drawn.
+	  This update fixes all known OpenGL-related crashes which were
+	  introduced with the SCF conversion (except for a termination-time
+	  crash which is of an entirely different nature).  It also re-
+	  enables text on the start-up console.
 17-Nov-1999
 	- Eric Sunshine performed the SCF conversion on the BeOS port.  He
 	  also reformatted, removed unused / unneeded code, and generally
