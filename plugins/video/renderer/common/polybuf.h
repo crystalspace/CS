@@ -33,7 +33,7 @@ public:
   csPlane3 normal;
   csMatrix3 m_obj2tex;
   csVector3 v_obj2tex;
-  iMaterialHandle* mat_handle;
+  int mat_index;
   iPolygonTexture* poly_texture;
 };
 
@@ -46,6 +46,8 @@ class csPolArrayPolygonBuffer : public csPolygonBuffer
 {
 protected:
   CS_DECLARE_GROWING_ARRAY (polygons, csPolArrayPolygon);
+  typedef iMaterialHandle* iMaterialHandleP;
+  CS_DECLARE_GROWING_ARRAY (materials, iMaterialHandleP);
 
   csVector3* vertices;
   int num_vertices;
@@ -67,9 +69,16 @@ public:
 
   virtual void AddPolygon (int* verts, int num_verts,
 	const csPlane3& poly_normal,
-  	iMaterialHandle* mat_handle,
+	int mat_index,
 	const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
 	iPolygonTexture* poly_texture);
+  virtual void AddMaterial (iMaterialHandle* mat_handle);
+  virtual int GetMaterialCount () const { return materials.Length (); }
+  virtual iMaterialHandle* GetMaterial (int idx) const
+  {
+    return materials[idx];
+  }
+  virtual void SetMaterial (int idx, iMaterialHandle* mat_handle);
   virtual void SetVertexArray (csVector3* verts, int num_verts);
   virtual void Clear ();
 };

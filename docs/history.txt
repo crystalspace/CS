@@ -2,6 +2,28 @@ The history order is reversed so that new features are at the top.
 
 27-Aug-2001
 	- Fixed a linking error in povie.mak.
+	- Did a new change to iPolygonBuffer. Materials for polygons are now
+	  treated indirectly. So AddPolygon() accepts an index into a table
+	  with materials instead of a material handle. In addition added
+	  the functions iPolygonBuffer::AddMaterial(), GetMaterial(),
+	  GetMaterialCount(), and SetMaterial() to operate on the material
+	  array. This change was done to make it easier to replace the material
+	  handles from the wrappers when needed. This replacing is needed
+	  in two cases:
+	    1. The material wrapper is registered/prepared again
+	       (possibly for another 3D renderer) so the handle has changed.
+	    2. The procedural software renderer for OpenGL also wants to
+	       replace material handles.
+	- Changed the treatment of DrawPolygonMesh (FASTMESH flag) in csThing
+	  by sorting the polygons on material first and then creating a
+	  material table. Also the material handles are correctly updated
+	  every time the thing is drawn which is how it should be.
+	- Renamed G3DTriangleMesh::fxmode to mixmode for consistency with
+	  other similar structures.
+	- Added G3DPolygonMesh::mixmode.
+	- Set G3DPolygonMesh::mixmode to CS_FX_COPY for now. This fixes a bug
+	  with the mixmode not being initialized correctly resulting
+	  (sometimes) in semi-transparent things.
 26-Aug-2001
 	- Removed G3DVertex class since this is equivalent to using
 	  csVector2 instead.

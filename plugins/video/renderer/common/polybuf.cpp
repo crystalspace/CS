@@ -38,7 +38,7 @@ csPolArrayPolygonBuffer::~csPolArrayPolygonBuffer ()
 
 void csPolArrayPolygonBuffer::AddPolygon (int* verts, int num_verts,
 	const csPlane3& poly_normal,
-  	iMaterialHandle* mat_handle,
+  	int mat_index,
 	const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
 	iPolygonTexture* poly_texture)
 {
@@ -49,7 +49,7 @@ void csPolArrayPolygonBuffer::AddPolygon (int* verts, int num_verts,
   pol.normal = poly_normal;
   pol.m_obj2tex = m_obj2tex;
   pol.v_obj2tex = v_obj2tex;
-  pol.mat_handle = mat_handle;
+  pol.mat_index = mat_index;
   pol.poly_texture = poly_texture;
   poly_texture->IncRef ();
   polygons.Push (pol);
@@ -63,6 +63,17 @@ void csPolArrayPolygonBuffer::SetVertexArray (csVector3* verts, int num_verts)
   memcpy (vertices, verts, num_verts * sizeof (csVector3));
 }
 
+void csPolArrayPolygonBuffer::AddMaterial (iMaterialHandle* mat_handle)
+{
+  materials.Push (mat_handle);
+}
+
+void csPolArrayPolygonBuffer::SetMaterial (int idx,
+	iMaterialHandle* mat_handle)
+{
+  materials[idx] = mat_handle;
+}
+
 void csPolArrayPolygonBuffer::Clear ()
 {
   int i;
@@ -73,6 +84,8 @@ void csPolArrayPolygonBuffer::Clear ()
     pol.poly_texture->DecRef ();
   }
   polygons.SetLength (0);
+
+  materials.SetLength (0);
 
   delete[] vertices; vertices = NULL;
   num_vertices = 0;

@@ -1485,7 +1485,7 @@ SCF_IMPLEMENT_IBASE(csLightArray)
  SCF_IMPLEMENTS_INTERFACE (iBase)
 SCF_IMPLEMENT_IBASE_END;
 
-int compare_light (const void* p1, const void* p2)
+static int compare_light (const void* p1, const void* p2)
 {
   LightAndDist* sp1 = (LightAndDist*)p1;
   LightAndDist* sp2 = (LightAndDist*)p2;

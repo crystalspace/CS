@@ -138,11 +138,13 @@ csThing::csThing (iBase* parent) : csObject (parent),
   curves_transf_ok = false;
 
   polybuf = NULL;
+  polybuf_materials = NULL;
 }
 
 csThing::~csThing ()
 {
   if (polybuf) polybuf->DecRef ();
+  delete[] polybuf_materials;
 
   if (wor_verts == obj_verts) delete [] obj_verts;
   else { delete [] wor_verts; delete [] obj_verts; }
@@ -553,6 +555,7 @@ csPolygon3D* csThing::NewPolygon (csMaterialWrapper* material)
 void csThing::AddPolygon (csPolygonInt* poly)
 {
   if (polybuf) { polybuf->DecRef (); polybuf = NULL; }
+  delete[] polybuf_materials; polybuf_materials = NULL;
   ((csPolygon3D *)poly)->SetParent (this);
   polygons.Push ((csPolygon3D *)poly);
   thing_edges_valid = false;
@@ -913,6 +916,22 @@ void csThing::DrawPolygonArray (csPolygonInt** polygon, int num,
   }
 }
 
+struct MatPol
+{
+  iMaterialWrapper* mat;
+  int mat_index;
+  csPolygon3D* poly;
+};
+
+static int compare_material (const void* p1, const void* p2)
+{
+  MatPol* sp1 = (MatPol*)p1;
+  MatPol* sp2 = (MatPol*)p2;
+  if (sp1->mat < sp2->mat) return -1;
+  else if (sp1->mat > sp2->mat) return 1;
+  return 0;
+}
+
 void csThing::PreparePolygonBuffer ()
 {
   if (polybuf) return;
@@ -921,9 +940,66 @@ void csThing::PreparePolygonBuffer ()
   polybuf = vbufmgr->CreatePolygonBuffer ();
   polybuf->SetVertexArray (obj_verts, num_vertices);
   int i;
+
+  //-----
+  // First collect all material wrappers and polygons.
+  //-----
+  MatPol* matpol = new MatPol [polygons.Length ()];
   for (i = 0 ; i < polygons.Length () ; i++)
   {
-    csPolygon3D* poly = GetPolygon3D (i);
+    matpol[i].poly = GetPolygon3D (i);
+    matpol[i].mat = &(matpol[i].poly->GetMaterialWrapper ()
+    	->scfiMaterialWrapper);
+  }
+
+  //-----
+  // Sort on material.
+  //-----
+  qsort (matpol, polygons.Length (), sizeof (MatPol), compare_material);
+
+  //-----
+  // Now count all different materials we have and add them to the polygon
+  // buffer. Also update the matpol structure with the index in the
+  // material table.
+  //-----
+  polybuf->AddMaterial (matpol[0].mat->GetMaterialHandle ());
+  matpol[0].mat_index = 0;
+  polybuf_material_count = 1;
+  for (i = 1 ; i < polygons.Length () ; i++)
+  {
+    if (matpol[i].mat != matpol[i-1].mat)
+    {
+      polybuf->AddMaterial (matpol[i].mat->GetMaterialHandle ());
+      matpol[i].mat_index = polybuf_material_count;
+      polybuf_material_count++;
+    }
+    else
+    {
+      matpol[i].mat_index = matpol[i-1].mat_index;
+    }
+  }
+
+  //-----
+  // Update our local material wrapper table.
+  //-----
+  polybuf_materials = new iMaterialWrapper* [polybuf_material_count];
+  polybuf_materials[0] = matpol[0].mat;
+  polybuf_material_count = 1;
+  for (i = 1 ; i < polygons.Length () ; i++)
+  {
+    if (matpol[i].mat != matpol[i-1].mat)
+    {
+      polybuf_materials[polybuf_material_count] = matpol[i].mat;
+      polybuf_material_count++;
+    }
+  }
+
+  //-----
+  // Now add the polygons to the polygon buffer sorted by material.
+  //-----
+  for (i = 0 ; i < polygons.Length () ; i++)
+  {
+    csPolygon3D* poly = matpol[i].poly;
     csPolyTexLightMap *lmi = poly->GetLightMapInfo ();
     // @@@ what if lmi == NULL?
     CS_ASSERT (lmi != NULL);
@@ -933,7 +1009,7 @@ void csThing::PreparePolygonBuffer ()
     txt_plane->GetObjectToTexture (m_obj2tex, v_obj2tex);
     polybuf->AddPolygon (poly->GetVertexIndices (),
       poly->GetVertexCount (), poly->GetPlane ()->GetObjectPlane (),
-      poly->GetMaterialHandle (), *m_obj2tex, *v_obj2tex,
+      matpol[i].mat_index, *m_obj2tex, *v_obj2tex,
       lmi->GetPolyTex ());
   }
 }
@@ -1030,16 +1106,17 @@ void csThing::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
   rview->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zMode);
 
   mesh.polybuf = polybuf;
-  for (i = 0 ; i < GetPolygonCount () ; i++)
+  for (i = 0 ; i < polybuf_material_count ; i++)
   {
-    csPolygon3D* p = GetPolygon3D (i);
-    p->GetMaterialWrapper ()->Visit ();
+    polybuf_materials[i]->Visit ();
+    polybuf->SetMaterial (i, polybuf_materials[i]->GetMaterialHandle ());
   }
 
   mesh.do_fog = false;
   mesh.do_mirror = icam->IsMirrored ();
   mesh.vertex_mode = G3DPolygonMesh::VM_WORLDSPACE;
   mesh.vertex_fog = NULL;
+  mesh.mixmode = CS_FX_COPY;
 
   // @@@ fog not supported yet.
 
@@ -1613,7 +1690,7 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
     mesh.clip_z_plane = clip_z_plane;
     mesh.vertex_fog = fog_verts.GetArray ();
     bool gouraud = !!c->LightMap;
-    mesh.fxmode = CS_FX_COPY | (gouraud ? CS_FX_GOURAUD : 0);
+    mesh.mixmode = CS_FX_COPY | (gouraud ? CS_FX_GOURAUD : 0);
     mesh.use_vertex_color = gouraud;
     if (mesh.mat_handle == NULL)
     {

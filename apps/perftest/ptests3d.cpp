@@ -296,7 +296,7 @@ void MeshTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
   mesh.do_morph_texels = false;
   mesh.do_morph_colors = false;
   mesh.vertex_mode = G3DTriangleMesh::VM_VIEWSPACE;
-  mesh.fxmode = CS_FX_COPY;
+  mesh.mixmode = CS_FX_COPY;
   mesh.morph_factor = 0;
   mesh_vertices = new csVector3 [num_mesh_vertices];
   mesh_texels = new csVector2 [num_mesh_vertices];

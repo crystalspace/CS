@@ -409,7 +409,7 @@ void csGraphics3DOGLCommon::PerfTest ()
   mesh.do_morph_texels = false;
   mesh.do_morph_colors = false;
   mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-  mesh.fxmode = CS_FX_GOURAUD;
+  mesh.mixmode = CS_FX_GOURAUD;
   mesh.morph_factor = 0;
   mesh.mat_handle = NULL;
   mesh.vertex_fog = NULL;
@@ -2796,7 +2796,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   //===========
   // Setup states
   //===========
-  UInt m_mixmode = mesh.fxmode;
+  UInt m_mixmode = mesh.mixmode;
   float m_alpha = 1.0f - BYTE_TO_FLOAT (m_mixmode & CS_FX_MASK_ALPHA);
   bool m_gouraud = m_renderstate.lighting && m_renderstate.gouraud &&
   	((m_mixmode & CS_FX_GOURAUD) != 0);
@@ -2845,7 +2845,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   if (do_gouraud)
   {
     // special hack for transparent meshes
-    if (mesh.fxmode & CS_FX_ALPHA)
+    if (mesh.mixmode & CS_FX_ALPHA)
     {
       if ((num_vertices*4) > rgba_verts.Limit ())
         rgba_verts.SetLimit (num_vertices*4);
@@ -2885,7 +2885,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   {
     glShadeModel (GL_SMOOTH);
     SetClientStates (CS_CLIENTSTATE_ALL);
-    if (mesh.fxmode & CS_FX_ALPHA)
+    if (mesh.mixmode & CS_FX_ALPHA)
       glColorPointer (4, GL_FLOAT, 0, & rgba_verts[0]);
     else
       glColorPointer (3, GL_FLOAT, 0, & work_colors[0]);
@@ -2983,7 +2983,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       glShadeModel (GL_SMOOTH);
       SetupBlend (CS_FX_MULTIPLY2, 0, false);
       SetClientStates (CS_CLIENTSTATE_ALL);
-      if (mesh.fxmode & CS_FX_ALPHA)
+      if (mesh.mixmode & CS_FX_ALPHA)
         glColorPointer (4, GL_FLOAT, 0, & rgba_verts[0]);
       else
         glColorPointer (3, GL_FLOAT, 0, & work_colors[0]);

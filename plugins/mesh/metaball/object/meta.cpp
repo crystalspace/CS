@@ -504,7 +504,7 @@ bool csMetaBall::Draw( iRenderView* rview, iMovable* /* movable */,
   iGraphics3D* G3D = rview->GetGraphics3D();
   iVertexBufferManager* vbufmgr = G3D->GetVertexBufferManager ();
   G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
-  mesh.fxmode = MixMode | CS_FX_GOURAUD;
+  mesh.mixmode = MixMode | CS_FX_GOURAUD;
   CS_ASSERT (!vbuf->IsLocked ());
   vbufmgr->LockBuffer (vbuf, mesh_vertices, mesh_texels,
   	mesh_colors, num_mesh_vertices, 0);

@@ -341,7 +341,7 @@ bool csCubeMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   factory->GetMaterialWrapper ()->Visit ();
   mesh.mat_handle = mat;
   mesh.use_vertex_color = true;
-  mesh.fxmode = factory->GetMixMode () | CS_FX_GOURAUD;
+  mesh.mixmode = factory->GetMixMode () | CS_FX_GOURAUD;
   CS_ASSERT (!vbuf->IsLocked ());
   vbufmgr->LockBuffer (vbuf, vertices, uv, colors, 8, 0);
   rview->CalculateFogMesh (g3d->GetObjectToCamera (), mesh);

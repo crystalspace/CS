@@ -403,7 +403,7 @@ bool csSurfMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   material->Visit ();
   mesh.mat_handle = mat;
   mesh.use_vertex_color = true;
-  mesh.fxmode = MixMode | CS_FX_GOURAUD;
+  mesh.mixmode = MixMode | CS_FX_GOURAUD;
   CS_ASSERT (!vbuf->IsLocked ());
   vbufmgr->LockBuffer (vbuf, surf_vertices, surf_texels,
   	surf_colors, num_surf_vertices, 0);

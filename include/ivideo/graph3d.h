@@ -393,7 +393,7 @@ struct G3DTriangleMesh
   } vertex_mode;
 
   /// DrawPolygonFX flag.
-  UInt fxmode;
+  UInt mixmode;
   float morph_factor;
   /**
    * Vertex buffers. Note that all vertex buffers used here MUST
@@ -424,6 +424,9 @@ struct G3DPolygonMesh
 
   // Apply fogging?
   bool do_fog;
+
+  /// Mixmode.
+  UInt mixmode;
 
   /// Clip to portal? One of CS_CLIP_???.
   int clip_portal;

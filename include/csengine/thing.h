@@ -171,6 +171,11 @@ private:
    * polygon buffer for the 3D renderer. This can be used by DrawPolygonMesh.
    */
   iPolygonBuffer* polybuf;
+  /**
+   * An array of materials that are used with the polygon buffer.
+   */
+  iMaterialWrapper** polybuf_materials;
+  int polybuf_material_count;
 
   /// A vector with all edges in this thing.
   CS_DECLARE_GROWING_ARRAY (thing_edges, csThingEdge);

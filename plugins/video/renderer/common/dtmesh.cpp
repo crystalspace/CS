@@ -404,7 +404,7 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
   G3DPolygonDPFX poly;
   memset (&poly, 0, sizeof(poly));
   poly.mat_handle = mesh.mat_handle;
-  poly.mixmode = mesh.fxmode;
+  poly.mixmode = mesh.mixmode;
 
   // Fill flat color if renderer decide to paint it flat-shaded
   iTextureHandle* txt_handle = mesh.mat_handle->GetTexture ();

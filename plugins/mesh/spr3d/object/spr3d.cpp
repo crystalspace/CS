@@ -1142,7 +1142,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
     g3dmesh.vertex_mode = G3DTriangleMesh::VM_VIEWSPACE;
   else
     g3dmesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-  g3dmesh.fxmode = MixMode | (vertex_colors ? CS_FX_GOURAUD : 0);
+  g3dmesh.mixmode = MixMode | (vertex_colors ? CS_FX_GOURAUD : 0);
 
   return true;
 }

@@ -96,6 +96,7 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
   csVector3 v_cam2tex;
 
   G3DPolygonDP poly;
+  poly.mixmode = mesh.mixmode;
   poly.use_fog = mesh.do_fog;
   poly.plane.m_cam2tex = &m_cam2tex;
   poly.plane.v_cam2tex = &v_cam2tex;
@@ -106,8 +107,10 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
   {
     const csPolArrayPolygon& pol = polbuf->GetPolygon (i);
     poly.num = pol.num_vertices;
-    poly.mat_handle = pol.mat_handle;
-    
+    CS_ASSERT (pol.mat_index >= 0 && pol.mat_index
+    	< polbuf->GetMaterialCount ());
+    poly.mat_handle = polbuf->GetMaterial (pol.mat_index);
+
     // Transform object to texture transform to
     // camera to texture transformation here.
     m_cam2tex = pol.m_obj2tex * o2c.GetT2O ();

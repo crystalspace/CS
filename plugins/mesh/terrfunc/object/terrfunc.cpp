@@ -973,7 +973,7 @@ void csTerrFuncObject::InitMesh (G3DTriangleMesh& mesh,
   mesh.do_morph_colors = false;
   mesh.do_fog = false;
   mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-  mesh.fxmode = CS_FX_GOURAUD;
+  mesh.mixmode = CS_FX_GOURAUD;
 }
 
 void csTerrFuncObject::SetupBaseMesh (G3DTriangleMesh& mesh,

@@ -63,7 +63,7 @@ struct iVertexBuffer : public iBase
   virtual int GetVertexCount () const = 0;
 };
 
-SCF_VERSION (iPolygonBuffer, 0, 0, 2);
+SCF_VERSION (iPolygonBuffer, 0, 0, 3);
 
 /**
  * This interface represents a black-box polygon buffer.
@@ -81,10 +81,14 @@ struct iPolygonBuffer : public iBase
   /**
    * Add a polygon to this buffer. The data pointed to by 'verts'
    * is copied so it can be discarded after calling AddPolygon.
+   * 'mat_index' is an index in the material table (initialized
+   * with AddMaterial()). It is best to add the polygons sorted by
+   * material as that will generate the most efficient representation
+   * on hardware.
    */
   virtual void AddPolygon (int* verts, int num_verts,
 	const csPlane3& poly_normal,
-  	iMaterialHandle* mat_handle,
+	int mat_index,
 	const csMatrix3& m_obj2tex, const csVector3& v_obj2tex,
 	iPolygonTexture* poly_texture) = 0;
 
@@ -94,7 +98,25 @@ struct iPolygonBuffer : public iBase
    */
   virtual void SetVertexArray (csVector3* verts, int num_verts) = 0;
 
-  /// Clear all polygons and vertex array.
+  /**
+   * Add a material.
+   */
+  virtual void AddMaterial (iMaterialHandle* mat_handle) = 0;
+  /**
+   * Get the number of materials.
+   */
+  virtual int GetMaterialCount () const = 0;
+  /**
+   * Get a material.
+   */
+  virtual iMaterialHandle* GetMaterial (int idx) const = 0;
+  /**
+   * Set a previously added material (this can be used to change
+   * a material handle).
+   */
+  virtual void SetMaterial (int idx, iMaterialHandle* mat_handle) = 0;
+
+  /// Clear all polygons, materials, and vertex array.
   virtual void Clear () = 0;
 };
 
