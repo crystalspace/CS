@@ -25,19 +25,33 @@ Direct3D.
 @node Win32 General, Win32 Compile, Win32, Win32
 @subsubsection General Information
 
-In addition to @file{zlib}, @file{libjpeg} and @file{libpng} you may also
-need the DirectX 6.1 @sc{sdk}. Otherwise you cannot compile this graphics
-module, so you can't use hardware acceleration with DirectX. But then you
-still need the DirectX 5.0 @sc{sdk}, which is included in @sc{msvc} 6.0.
-(note that @samp{SDK} is more than the runtime libraries usually bundles with
-games). Make sure that @sc{msvc} links to these new libraries, not to the
-older DirectX @sc{sdk} usually coming with @sc{msvc}. @sc{msvc} 6.0 also
-included the OpenGL @sc{sdk}, which you can use to build the OpenGL graphics
-module. Note that you can always use a higher version of DirectX.
+To compile Crystal Space for Windows, you'll need the
+@emph{Microsoft Developer Studio} or @emph{Microsoft Visual C++} version 6.
+You can try to compile it with version 5, but then you may get strange
+warnings which you should ignore. The problem is to find out which warnings
+are real problems and which are caused by this version conflict, so it is
+recommended to use version 6.
 
-If you are using @sc{msvc} 5.0, you will need the following: DirectX 5.0 or
-6.1 (no hardware accelerated graphics with 5.0) for graphics and sound,
-and optionally OpenGL for graphics.
+In addition to @file{zlib}, @file{libjpeg} and @file{libpng} you also need
+the DirectX @sc{SDK} and/or the OpenGL @sc{SDK} (Note that the @sc{SDK} is
+more than the runtime libraries usually bundles with games):
+
+@itemize @bullet
+@item
+DirectX 5.0 or higher is required. With this, you get sound output and
+non-accelerated graphics.
+
+@item
+DirectX 6.1 or higher allows hardware-accelerated 3d graphics.
+
+@item
+OpenGL also allows hardware acceleration, but you still need DirectX 5.0 or
+higher for the system driver and for sound output.
+@end itemize
+
+The DirectX 5.0 and OpenGL @sc{SDK}s are included in @sc{msvc} version 6. You
+still have to download DirectX 6.1 yourself. If you're using @sc{msvc}
+version 5, you have none of the above @sc{sdk}s, so you have to download them.
 
 If you just want to build Crystal Space using those @sc{api}s, but don't need
 any documentation or samples, you can get a minimum version of these
@@ -62,8 +76,9 @@ Make @samp{grpAll} your active project.
 Select menu @emph{Build/Rebuild All}.
 
 @item
-After a while the compilation should finish with almost no warnings and no
-errors.
+After a while the compilation should finish without warnings or errors.
+However, if you're using @sc{msvc} version 5, be prepared for some strange
+warnings. You can ignore them.
 @end enumerate
 
 @node Win32 Rundemo, Win32 Workspace, Win32 Compile, Win32
@@ -81,7 +96,7 @@ switch to the @emph{Debug} tab and enter the base CS directory as the
 working directory for debug sessions (for example, @file{c:\cs\}). Be sure
 to to this for @emph{Debug} and @emph{Release} builds. @*
 This is some sort of bug. We are currently looking for a way to add this to
-the CVS repository.
+the CVS repository, so you don't have to set the directory yourself.
 
 You can now continue with the next platform-independent step. The remaining
 Windows-specific sections are only important when you want to compile your
@@ -124,8 +139,40 @@ produce @file{.EXE} files.
 @node Win32 User App, Win32 FAQ, Win32 Workspace, Win32
 @subsubsection Compiling your own Program using CS
 
-@@@@@@
+I assume that you have set up @sc{msvc} projects before. If you want to create
+a project using Crystal Space, you have two possibilities how to do this:
+You can either create the project inside the CS workspace, or you can create
+a new workspace. Either way, you have to do the usual setup, like adding the
+source files. In addition to this, you must:
 
+@itemize @bullet
+@item
+Set the output path to the CS root directory. Any CS application must be
+executed in this directory. If you want to run it in another directory, you
+must move the files @file{scf.cfg} and @file{vfs.cfg}, the data directory and
+all plugins (@file{.DLL}) into this new directory.
+
+@item
+Set the include paths. Simply open one of the application projects coming
+with Crystal Space, for example @samp{Walktest},
+select @emph{Project Settings -> C/C++} and copy all command line options
+that look like this: @samp{/I "../../anything"}.
+
+@item
+Add the CS libraries. If you are using the CS workspace, simply add
+dependencies to the CS projects. Otherwise you have to link to the
+@file{.LIB} files. To do this, either add these files to the project like
+source files or add them as command line options in @emph{Project Settings ->
+C/C++}. Note that if you add them like source files, you may not correctly
+use the debug version of CS in debug builds and the release version in
+release builds.
+
+@item
+Add external libraries (@file{zlib}, @file{libjpeg}, @file{DirectX}, ...).
+They can be added just like the CS libraries, except that you cannot use
+project dependencies.
+@end itemize
+            
 @node Win32 FAQ, , Win32 User App, Win32
 @subsubsection Frequently Asked Questions (@sc{faq})
 
