@@ -396,10 +396,6 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
   else
     visobj_wrap->hint_closed = false;
 
-  visobj_wrap->use_outline_filler = (visobj_wrap->hint_closed
-  	|| visobj_wrap->model->CanUseOutlineFiller ())
-	&& !visobj_wrap->hint_goodoccluder;
-
   if (visobj_wrap->model->IsEmptyObject ())
   {
     visobj_wrap->hint_badoccluder = true;
@@ -412,6 +408,10 @@ void csDynaVis::RegisterVisObject (iVisibilityObject* visobj)
     visobj_wrap->hint_goodoccluder = visobj->GetCullerFlags ().Check (
   	CS_CULLER_HINT_GOODOCCLUDER);
   }
+
+  visobj_wrap->use_outline_filler = (visobj_wrap->hint_closed
+  	|| visobj_wrap->model->CanUseOutlineFiller ())
+	&& !visobj_wrap->hint_goodoccluder;
 
   visobj_vector.Push (visobj_wrap);
 }

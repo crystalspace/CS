@@ -373,12 +373,12 @@ void csSprite3DMeshObjectFactory::GenerateLOD ()
 
   csTriangleMeshLOD::CalculateLOD (new_mesh, verts, translate, emerge_from);
 
+  csVector2* new_texels = new csVector2 [GetVertexCount ()];
+  csVector3* new_vertices = new csVector3 [GetVertexCount ()];
+  csVector3* new_normals = new csVector3 [GetVertexCount ()];
   for (i = 0 ; i < (int)texels.Length () ; i++)
   {
     int j;
-    csVector2* new_texels = new csVector2 [GetVertexCount ()];
-    csVector3* new_vertices = new csVector3 [GetVertexCount ()];
-    csVector3* new_normals = new csVector3 [GetVertexCount ()];
     csPoly2D* tx = texels.Get (i);
     csPoly3D* vt = vertices.Get (i);
     csPoly3D* vn = normals.Get (i);
@@ -394,10 +394,10 @@ void csSprite3DMeshObjectFactory::GenerateLOD ()
       (*vt)[j] = new_vertices[j];
       (*vn)[j] = new_normals[j];
     }
-    delete [] new_texels;
-    delete [] new_vertices;
-    delete [] new_normals;
   }
+  delete [] new_texels;
+  delete [] new_vertices;
+  delete [] new_normals;
 
   for (i = 0 ; i < GetTriangleCount () ; i++)
   {
