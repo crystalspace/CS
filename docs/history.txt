@@ -22,6 +22,7 @@ Short-term cleanups that need to be done:
 	- Changed typedef for COMBOOL to 'int'.
 	- Started work on vertex based fogging for the engine, OpenGL,
 	  and software renderer.
+	- Xavier Trochu fixed a bug in csSprite3D::RemoveFromSector().
 22-Jul-1999
 	- Updated some docs (like the todo and faq).
 	- Added a callback to csSprite3D which is called just before the
