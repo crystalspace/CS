@@ -80,7 +80,12 @@ void csGraphics2DGLX::Initialize ()
 	GLX_GREEN_SIZE, 4,
 	None };
  
+  // find a visual that supports all the features we need
   active_GLVisual = glXChooseVisual(dpy, screen_num, desired_attributes);
+
+  // if a visual was found that we can use, make a graphics context which
+  // will be bound to the application window.  If a visual was not
+  // found, then try to figure out why it failed
   if (active_GLVisual)
   {
     active_GLContext = glXCreateContext(dpy,active_GLVisual,0,GL_TRUE);
@@ -90,9 +95,32 @@ void csGraphics2DGLX::Initialize ()
   }
   else
   {
-    CsPrintf (MSG_FATAL_ERROR, "FATAL: Could not find a GLX visual that "
-                               "supports at least 12 bit RGBA color, double buffering, and depth buffer\n");
-    exit (-1);
+    CsPrintf (MSG_FATAL_ERROR, "FATAL: Could not find proper GLX visual\n");
+ 
+    // what attribute was not supplied? we know that trying to get
+    // all the attributes at once doesn't work.  provide more user info by
+    // trying each of the pieces and seeing if any single piece is not provided 
+ 
+    // try to get a visual with 12 bit color
+    int color_attributes[] = { GLX_RGBA,GLX_RED_SIZE,4,GLX_BLUE_SIZE,4,GLX_GREEN_SIZE,4,None};
+    if (!glXChooseVisual(dpy, screen_num, color_attributes) )
+    {
+      CsPrintf(MSG_FATAL_ERROR, "Graphics display does not support at least 12 bit color\n");
+    }
+
+    // try to get visual with a depth buffer
+    int depthbuffer_attributes[] = {GLX_RGBA, GLX_DEPTH_SIZE,1, None};
+    if (!glXChooseVisual(dpy,screen_num,depthbuffer_attributes) )
+    {
+      CsPrintf(MSG_FATAL_ERROR,"Graphics display does not support a depth buffer\n");
+    }
+
+    // try to get a visual with double buffering
+    int doublebuffer_attributes[] = {GLX_RGBA, GLX_DOUBLEBUFFER, None};
+    if (!glXChooseVisual(dpy,screen_num,doublebuffer_attributes) )
+    {
+      CsPrintf(MSG_FATAL_ERROR,"Graphics display does not provide double buffering\n");
+    }
   }
  
   pfmt.RedMask = 0xf00;//visual->red_mask;
@@ -214,6 +242,11 @@ bool csGraphics2DGLX::Open(char *Title)
     }
   }
 
+  // this makes the context we created in Initialize() the current
+  // context, so that all subsequent OpenGL calls will set state and
+  // draw stuff on this context.  You could of couse make
+  // some more contexts and switch around between several of them...
+  // but we use only one here.
   glXMakeCurrent(dpy, window, active_GLContext);
 
   // Open your graphic interface
@@ -251,19 +284,7 @@ void csGraphics2DGLX::Close(void)
 
 void csGraphics2DGLX::Print (csRect *area)
 {
-/*
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glOrtho(0,Width,0,Height,-1,1);
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-  glBegin(GL_LINE_STRIP); glVertex2i(0,0); glVertex2i(20,20); glEnd();
-  glRasterPos2f(0.,0.);
-  glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-
-  UShort * src = (UShort *)Memory;
-  unsigned char* dst = (unsigned char*)real_Memory;
-  int i = Width*Height;
+/*  int i = Width*Height;
   while (i > 0)
   {
     *dst++ = (*src & 0xf00) >> 4;
@@ -276,7 +297,7 @@ void csGraphics2DGLX::Print (csRect *area)
 */
 //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glXSwapBuffers (dpy,window);
-  glFlush ();
+  glFlush (); // not needed?
 }
 
 bool csGraphics2DGLX::SetMousePosition (int x, int y)
