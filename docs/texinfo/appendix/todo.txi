@@ -157,14 +157,6 @@ Hierarchical objects.
 Spotlight support.
 
 @item
-Two adjacent polygons may not have correctly connected lightmaps. In other
-words: there may be a dark border when there should not be any. This
-probably needs to be solved by a second pass through all the lightmaps.
-
-@item
-Full radiosity on lightmaps.
-
-@item
 Continue cleaning up the language, the @sc{api}, and the interface to create
 the world.
 

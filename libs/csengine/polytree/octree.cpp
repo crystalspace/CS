@@ -52,8 +52,32 @@ csOctreeVisible* csPVS::Add ()
 {
   csOctreeVisible* ovis = new csOctreeVisible ();
   ovis->next = visible;
+  ovis->prev = NULL;
+  if (visible) visible->prev = ovis;
   visible = ovis;
   return ovis;
+}
+
+csOctreeVisible* csPVS::FindNode (csOctreeNode* onode)
+{
+  csOctreeVisible* ovis = visible;
+  while (ovis)
+  {
+    if (ovis->node == onode) return ovis;
+    ovis = ovis->next;
+  }
+  return NULL;
+}
+
+void csPVS::Delete (csOctreeVisible* ovis)
+{
+  if (ovis->prev)
+    ovis->prev->next = ovis->next;
+  else
+    visible = ovis->next;
+  if (ovis->next)
+    ovis->next->prev = ovis->prev;
+  delete ovis;
 }
 
 //---------------------------------------------------------------------------
@@ -81,9 +105,7 @@ csOctreeNode::~csOctreeNode ()
 {
   int i;
   for (i = 0 ; i < 8 ; i++)
-  {
     delete children[i];
-  }
   delete minibsp;
   delete [] minibsp_verts;
 }
@@ -532,11 +554,6 @@ static void SplitOptPlane (csPolygonInt* np, csPolygonInt** npF, csPolygonInt** 
 }
 
 #if 0
-static float randflt ()
-{
-  return ((float)rand ()) / (float)RAND_MAX;
-}
-
 static void AddPolygonTo2DBSP (const csPlane3& plane, csBspTree2D* bsp2d,
 	csPolygon3D* p)
 {
@@ -1101,6 +1118,12 @@ bool csOctree::CalculatePolygonShadow (
   return true;
 }
 
+// @@@ Put all these fields in a structure and pass them along?
+// Clipper to use before sending polygons/shadows to the c-buffer.
+static csClipper* box_clipper;
+// Max size used for this pass of PVS building.
+static csVector3 max_pvs_size;
+
 void csOctree::InsertShadowIntoCBuffer (csPoly2D& result_poly,
 	csCBuffer* cbuffer, const csVector2& scale, const csVector2& shift)
 {
@@ -1114,20 +1137,15 @@ void csOctree::InsertShadowIntoCBuffer (csPoly2D& result_poly,
     v.y *= scale.y;
   }
   // Then clip to cbuffer dimensions.
-  // @@@ WE NEED TO MAKE THIS CLIPPER EARLIER AND
-  // GIVE IT TO THIS ROUTINE!
-  csBox2 b (0, 0, 1024, 1024);
-  csClipper* clipper = new csBoxClipper (b);
   result_poly.MakeRoom (MAX_OUTPUT_VERTICES);
   int num_verts = result_poly.GetNumVertices ();
-  if (clipper->Clip (result_poly.GetVertices (), num_verts,
+  if (box_clipper->Clip (result_poly.GetVertices (), num_verts,
 	  result_poly.GetBoundingBox ()))
   {
     result_poly.SetNumVertices (num_verts);
     cbuffer->InsertPolygon (result_poly.GetVertices (),
   	  result_poly.GetNumVertices ());
   }
-  delete clipper;
 }
 
 void csOctree::BoxOccludeeShadowPolygons (const csBox3& /*box*/,
@@ -1238,7 +1256,7 @@ void csOctree::BoxOccludeeAddShadows (csOctreeNode* occluder,
     // of the polygons in the node.
     if (!occluder->PVSCanSee (occludee_center))
     {
- printf ("#");
+      printf ("#");
       if (BoxOccludeeShadowOutline (occluder_box, occludee,
 	cbuffer, scale, shift, plane_nr, plane_pos))
       return;
@@ -1391,13 +1409,34 @@ bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee)
   return !full;
 }
 
+void csOctree::DeleteNodeAndChildrenFromPVS (csPVS& pvs, csOctreeNode* occludee)
+{
+  if (!occludee) return;
+  pvs.Delete (occludee);
+  int i;
+  for (i = 0 ; i < 8 ; i++)
+    DeleteNodeAndChildrenFromPVS (pvs, (csOctreeNode*)occludee->children[i]);
+}
+
 void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
 	csOctreeNode* leaf)
 {
   if (!occludee) return;
   int i;
   bool visible = false;
-  if (occludee->GetBox ().In (leaf->GetCenter ()))
+  csVector3 dist;
+  leaf->GetBox ().ManhattanDistance (occludee->GetBox (), dist);
+  if (dist.x > max_pvs_size.x || dist.y  > max_pvs_size.y || dist.z > max_pvs_size.z)
+  {
+    // Node is too far away (max_pvs_size) so we don't test it
+    // in this pass.
+    return;
+  }
+  else if (!leaf->GetPVS ().FindNode (occludee))
+  {
+    // Node is not in PVS so it isn't visible.
+  }
+  else if (occludee->GetBox ().In (leaf->GetCenter ()))
     visible = true;
   else if (leaf->GetBox ().Adjacent (occludee->GetBox ()))
     // @@@ It would be nice if we could also include adjacent
@@ -1407,14 +1446,13 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
   else
   {
     bool rc = BoxCanSeeOccludee (leaf->GetBox (), occludee->GetBox ());
-    if (rc) printf ("+");
-    else
+    if (!rc)
     {
       int j;
       for (j = 0 ; j < occludee->CountChildren ()+1 ; j++)
         printf ("-");
+      fflush (stdout);
     }
-    fflush (stdout);
     if (rc) visible = true;
   }
 
@@ -1422,17 +1460,13 @@ void csOctree::BuildPVSForLeaf (csOctreeNode* occludee, csThing* thing,
   // the polygons in the node as well.
   // Also traverse to the children.
   if (visible)
-  {
-    csPVS& pvs = leaf->GetPVS ();
-    csOctreeVisible* ovis = pvs.Add ();
-    ovis->SetOctreeNode (occludee);
-
-    //@@@ PVS NOT YET IMPLEMENTED FOR POLYGONS
-    //if (occludee->IsLeaf ())
-      //BuildPVSForLeafPolygons (occludee, ovis, ...);
     for (i = 0 ; i < 8 ; i++)
       BuildPVSForLeaf ((csOctreeNode*)occludee->children[i],
       	thing, leaf);
+  else
+  {
+    csPVS& pvs = leaf->GetPVS ();
+    DeleteNodeAndChildrenFromPVS (pvs, occludee);
   }
 }
 
@@ -1482,9 +1516,7 @@ void csOctree::BuildPVS (csThing* thing,
     // extra smaller octree leafs so that our granularity
     // for the PVS is better. Those octree leafs are ignored
     // by the normal polygon/node traversal process.
-    csPVS& pvs = node->GetPVS ();
-    pvs.Clear ();
-printf ("*"); fflush (stdout);
+    printf ("*"); fflush (stdout);
     BuildPVSForLeaf ((csOctreeNode*)root, thing, node);
   }
   else
@@ -1498,7 +1530,42 @@ printf ("*"); fflush (stdout);
 
 void csOctree::BuildPVS (csThing* thing)
 {
+  // First setup a dummy PVS which will cause all the nodes in the
+  // world to be added as visible to every other node.
+  SetupDummyPVS ();
+
+  // First setup a clipper used for building the PVS.
+  // This clipper will be used to clip polygons/shadows before they are
+  // sent to the c-buffer.
+  csBox2 b (0, 0, 1024, 1024);
+  box_clipper = new csBoxClipper (b);
+
+  // Calculate a good initial size for the first pass of PVS building.
+  // In this first pass we only calculate PVS for leafs and occludee's
+  // that are close to each other. The reason is that we can then
+  // use that visibility information to optimize further passes of
+  // PVS building -> if B cannot see A then B can be considered completely
+  // solid when testing if C can see A.
+  max_pvs_size.Set (
+  	(bbox.MaxX ()-bbox.MinX ())/10.,
+  	(bbox.MaxY ()-bbox.MinY ())/10.,
+  	(bbox.MaxZ ()-bbox.MinZ ())/10.);
+
+  // Then build the PVS for real which will remove nodes from the
+  // PVS (hopefully).
+  CsPrintf (MSG_INITIALIZATION, "  Pass 1...\n");
   BuildPVS (thing, (csOctreeNode*)root);
+
+  // Now we do the second pass. Currently the second pass does the full
+  // PVS.
+  max_pvs_size.Set (
+  	(bbox.MaxX ()-bbox.MinX ())*2.,
+  	(bbox.MaxY ()-bbox.MinY ())*2.,
+  	(bbox.MaxZ ()-bbox.MinZ ())*2.);
+  CsPrintf (MSG_INITIALIZATION, "  Pass 2...\n");
+  BuildPVS (thing, (csOctreeNode*)root);
+
+  delete box_clipper;
 }
 
 static void SplitOptPlane2 (const csPoly3D* np, csPoly3D& inputF, const csPoly3D** npF,

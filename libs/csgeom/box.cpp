@@ -372,6 +372,19 @@ bool csBox3::Between (const csBox3& box1, const csBox3& box2) const
   return false;
 }
 
+void csBox3::ManhattanDistance (const csBox3& other, csVector3& dist) const
+{
+  if (other.MinX () >= MaxX ()) dist.x = other.MinX () - MaxX ();
+  else if (MinX () >= other.MaxX ()) dist.x = MinX () - other.MaxX ();
+  else dist.x = 0;
+  if (other.MinY () >= MaxY ()) dist.y = other.MinY () - MaxY ();
+  else if (MinY () >= other.MaxY ()) dist.y = MinY () - other.MaxY ();
+  else dist.y = 0;
+  if (other.MinZ () >= MaxZ ()) dist.z = other.MinZ () - MaxZ ();
+  else if (MinZ () >= other.MaxZ ()) dist.z = MinZ () - other.MaxZ ();
+  else dist.z = 0;
+}
+
 csBox3& csBox3::operator+= (const csBox3& box)
 {
   if (box.minbox.x < minbox.x) minbox.x = box.minbox.x;

@@ -536,6 +536,12 @@ public:
    */
   bool Between (const csBox3& box1, const csBox3& box2) const;
 
+  /**
+   * Calculate the minimum manhattan distance between this box
+   * and another one.
+   */
+  void ManhattanDistance (const csBox3& other, csVector3& dist) const;
+
   /// Compute the union of two bounding boxes.
   csBox3& operator+= (const csBox3& box);
   /// Compute the union of a point with this bounding box.

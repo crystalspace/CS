@@ -1,5 +1,15 @@
 The history order has been reversed so that new features are at the top.
 
+18-May-2000
+	- Frank O'Connor added __CRYSTAL_SPACE__ define to VC project
+	  file.
+	- Another small terrain update from Alex Pfaffe.
+	- Started work on multiple passes in PVS.
+	- Small optimization on PVS building speed.
+	- Added csBox3::ManhattanDistance.
+	- Implemented first version of multi-pass PVS calculation.
+	  It is not yet very useful though because quality isn't high
+	  enough right now.
 17-May-2000
 	- Thomas Riemer added scaffolding functions to allow loading world
 	  into NetSpace world.

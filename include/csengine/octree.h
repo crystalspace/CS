@@ -57,13 +57,16 @@ class csOctreeVisible
 private:
   // Next visibility entry.
   csOctreeVisible* next;
+  // Previous visibility entry.
+  csOctreeVisible* prev;
   // The visible polygons.
   csPolygonArrayNoFree polygons;
   // The visible node.
   csOctreeNode* node;
   
 public:
-  csOctreeVisible() : next (NULL), polygons (8, 16), node (NULL) {}
+  csOctreeVisible() : next (NULL), prev (NULL), polygons (8, 16),
+  	node (NULL) {}
   /// Set octree node.
   void SetOctreeNode (csOctreeNode* onode) { node = onode; }
   /// Get octree node.
@@ -91,6 +94,19 @@ public:
 
   /// Add a new visibility struct.
   csOctreeVisible* Add ();
+
+  /// Find the visibility struct for a node.
+  csOctreeVisible* FindNode (csOctreeNode* onode);
+
+  /// Delete a visibility struct.
+  void Delete (csOctreeVisible* ovis);
+
+  /// Delete a visibility struct.
+  void Delete (csOctreeNode* onode)
+  {
+    csOctreeVisible* ovis = FindNode (onode);
+    if (ovis) Delete (ovis);
+  }
 
   /// Get the first visibility struct.
   csOctreeVisible* GetFirst () { return visible; }
@@ -402,6 +418,12 @@ private:
    * Build PVS for this node.
    */
   void BuildPVS (csThing* thing, csOctreeNode* node);
+
+  /**
+   * Delete the given occludee and all children of that occludee
+   * from the given pvs.
+   */
+  void DeleteNodeAndChildrenFromPVS (csPVS& pvs, csOctreeNode* occludee);
 
   /**
    * Calculate masks for the sides of all nodes.
