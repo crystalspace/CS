@@ -4,15 +4,16 @@
 # Driver description
 DESCRIPTION.oglempty=Empty driver for Crystal Space GL/X 2D driver
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make oglempty     Make the $(DESCRIPTION.oglempty)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make oglempty     Make the $(DESCRIPTION.oglempty)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: oglempty
@@ -27,31 +28,31 @@ oglemptyclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # Local CFLAGS and libraries
-#LIBS._oglempty+=-L$(X11_PATH)/lib -lXext -lX11
+#LIBS._OGLEMPTY+=-L$(X11_PATH)/lib -lXext -lX11
 
 # The driver
 ifeq ($(USE_SHARED_PLUGINS),yes)
-  oglempty=$(OUTDLL)oglempty$(DLL)
-  LIBS.oglempty=$(LIBS._oglempty)
-#  LIBS.oglempty=$(LIBS._oglempty) $(CSUTIL.LIB) $(CSSYS.LIB)
-  DEP.oglempty=$(CSUTIL.LIB) $(CSSYS.LIB)
+  OGLEMPTY=$(OUTDLL)oglempty$(DLL)
+  LIBS.OGLEMPTY=$(LIBS._OGLEMPTY)
+#  LIBS.OGLEMPTY=$(LIBS._OGLEMPTY) $(CSUTIL.LIB) $(CSSYS.LIB)
+  DEP.OGLEMPTY=$(CSUTIL.LIB) $(CSSYS.LIB)
 else
-  oglempty=$(OUT)$(LIB_PREFIX)oglempty$(LIB)
-  DEP.EXE+=$(oglempty)
-  LIBS.EXE+=$(LIBS._oglempty) $(CSUTIL.LIB) $(CSSYS.LIB)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_oglempty
+  OGLEMPTY=$(OUT)$(LIB_PREFIX)oglempty$(LIB)
+  DEP.EXE+=$(OGLEMPTY)
+  LIBS.EXE+=$(LIBS._OGLEMPTY) $(CSUTIL.LIB) $(CSSYS.LIB)
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_OGLEMPTY
 endif
-DESCRIPTION.$(oglempty) = $(DESCRIPTION.oglempty)
-SRC.oglempty = $(wildcard plugins/video/canvas/openglx/empty/*.cpp)
-OBJ.oglempty = $(addprefix $(OUT),$(notdir $(SRC.oglempty:.cpp=$O)))
+DESCRIPTION.$(OGLEMPTY) = $(DESCRIPTION.oglempty)
+SRC.OGLEMPTY = $(wildcard plugins/video/canvas/openglx/empty/*.cpp)
+OBJ.OGLEMPTY = $(addprefix $(OUT),$(notdir $(SRC.OGLEMPTY:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: oglempty oglemptyclean
@@ -59,20 +60,20 @@ ifeq ($(MAKESECTION),targets)
 # Chain rules
 clean: oglemptyclean
 
-oglempty: $(OUTDIRS) $(oglempty)
+oglempty: $(OUTDIRS) $(OGLEMPTY)
 
 $(OUT)%$O: plugins/video/canvas/openglx/empty/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.oglempty)
+	$(DO.COMPILE.CPP) $(CFLAGS.OGLEMPTY)
  
-$(oglempty): $(OBJ.oglempty) $(DEP.oglempty)
-	$(DO.PLUGIN) $(LIBS.oglempty)
+$(OGLEMPTY): $(OBJ.OGLEMPTY) $(DEP.OGLEMPTY)
+	$(DO.PLUGIN) $(LIBS.OGLEMPTY)
 
 oglemptyclean:
-	$(RM) $(oglempty) $(OBJ.oglempty)
+	$(RM) $(OGLEMPTY) $(OBJ.OGLEMPTY) $(OUTOS)oglempty.dep
  
 ifdef DO_DEPEND
 dep: $(OUTOS)oglempty.dep
-$(OUTOS)oglempty.dep: $(SRC.oglempty)
+$(OUTOS)oglempty.dep: $(SRC.OGLEMPTY)
 	$(DO.DEP)
 else
 -include $(OUTOS)oglempty.dep

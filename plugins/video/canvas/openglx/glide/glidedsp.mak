@@ -4,18 +4,19 @@
 # Driver description
 DESCRIPTION.oglglide=Glide driver for Crystal Space GL/X 2D driver
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make oglglide     Make the $(DESCRIPTION.oglglide)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make oglglide     Make the $(DESCRIPTION.oglglide)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: oglglide
+.PHONY: oglglide oglglideclean
 
 all plugins glxdisp: oglglide
 
@@ -27,7 +28,7 @@ oglglideclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # Local CFLAGS and libraries
@@ -46,7 +47,7 @@ else
   oglglide=$(OUT)$(LIB_PREFIX)oglglide$(LIB)
   DEP.EXE+=$(oglglide)
   LIBS.EXE+=$(LIBS._oglglide) $(CSUTIL.LIB) $(CSSYS.LIB)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_oglglide
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_OGLGLIDE
 endif
 DESCRIPTION.$(oglglide) = $(DESCRIPTION.OGLGLIDE)
 SRC.OGLGLIDE = $(wildcard plugins/video/canvas/openglx/glide/*.cpp)
@@ -54,7 +55,7 @@ OBJ.OGLGLIDE = $(addprefix $(OUT),$(notdir $(SRC.OGLGLIDE:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: oglglide oglglideclean
@@ -71,7 +72,7 @@ $(oglglide): $(OBJ.OGLGLIDE) $(DEP.OGLGLIDE)
 	$(DO.PLUGIN) $(LIBS.OGLGLIDE)
 
 oglglideclean:
-	$(RM) $(oglglide) $(OBJ.OGLGLIDE)
+	$(RM) $(oglglide) $(OBJ.OGLGLIDE) $(OUTOS)oglglide.dep
  
 ifdef DO_DEPEND
 dep: $(OUTOS)oglglide.dep

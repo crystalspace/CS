@@ -4,18 +4,19 @@
 # Driver description
 DESCRIPTION.oglsvga=SVGA driver for Crystal Space GL/X 2D driver
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make oglsvga     Make the $(DESCRIPTION.oglsvga)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make oglsvga     Make the $(DESCRIPTION.oglsvga)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: oglsvga
+.PHONY: oglsvga oglsvgaclean
 
 all plugins glxdisp: oglsvga
 
@@ -27,7 +28,7 @@ oglsvgaclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 # Local CFLAGS and libraries
@@ -42,7 +43,7 @@ else
   oglsvga=$(OUT)$(LIB_PREFIX)oglsvga$(LIB)
   DEP.EXE+=$(oglsvga)
   LIBS.EXE+=$(LIBS._oglsvga) $(CSUTIL.LIB) $(CSSYS.LIB)
-  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_oglsvga
+  CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_OGLSVGA
 endif
 DESCRIPTION.$(oglsvga) = $(DESCRIPTION.OGLSVGA)
 SRC.OGLSVGA = $(wildcard plugins/video/canvas/openglx/svga/*.cpp)
@@ -50,7 +51,7 @@ OBJ.OGLSVGA = $(addprefix $(OUT),$(notdir $(SRC.OGLSVGA:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: oglsvga oglsvgaclean
@@ -65,7 +66,7 @@ $(oglsvga): $(OBJ.OGLSVGA) $(DEP.OGLSVGA)
 	$(DO.PLUGIN) $(LIBS.OGLSVGA)
 
 oglsvgaclean:
-	$(RM) $(oglsvga) $(OBJ.OGLSVGA)
+	$(RM) $(oglsvga) $(OBJ.OGLSVGA) $(OUTOS)oglsvga.dep
  
 ifdef DO_DEPEND
 dep: $(OUTOS)oglsvga.dep
