@@ -1,6 +1,6 @@
 //=============================================================================
 //
-//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2003 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -25,7 +25,7 @@
 #import <Foundation/NSAutoreleasePool.h>
 #import <Foundation/NSString.h>
 
-static NSMenu* build_menu(char const* section, OSXConfigHandle);
+static NSMenu* build_menu(char const* section, OSXConfigHandle, id);
 
 #define STR_SWITCH(X) { char const* switched_str__=(X); if (0) {
 #define STR_CASE(X) } else if (strcmp(switched_str__,(#X)) == 0) {
@@ -82,12 +82,14 @@ static void item_scan(OSXConfigHandle config, char const* section,
 //	attributes of these keys.  "type", if present, may specify "separator"
 //	in which case the menu item is a separator line.  Otherwise, "title",
 //	"shortcut", and "action" are used to generate the new menu item.
-//	"target", if present, may be either "application" which stands for
-//	NSApp, or "delegate" which stands for [NSApp delegate].  If "target" is
-//	not specified then the item's action is sent to the first-responder.
+//	"target", if present, may be "application" which stands for NSApp;
+//	"delegate" which stands for [NSApp delegate]; or "assistant" which
+//	stands for the internal Crystal Space OSXDelegate instance owned by
+//	iOSXAssistant.  If "target" is not specified then the item's action is
+//	sent to the first-responder.
 //-----------------------------------------------------------------------------
 static void menu_add_item(NSMenu* menu, char const* key,
-  OSXConfigHandle config)
+  OSXConfigHandle config, id assistant)
 {
   char const* type     = 0;
   char const* title    = "";
@@ -117,6 +119,8 @@ static void menu_add_item(NSMenu* menu, char const* key,
       STR_SWITCH (target)
 	STR_CASE (application)
 	  [item setTarget:NSApp];
+	STR_CASE (assistant)
+	  [item setTarget:assistant];
 	STR_CASE (delegate)
 	  [item setTarget:[NSApp delegate]];
       STR_SWITCH_END
@@ -135,9 +139,9 @@ static void menu_add_item(NSMenu* menu, char const* key,
 //	respectively.
 //-----------------------------------------------------------------------------
 static void menu_add_submenu(NSMenu* menu, char const* name,
-  OSXConfigHandle config)
+  OSXConfigHandle config, id assistant)
 {
-  NSMenu* const sub = build_menu(name, config);
+  NSMenu* const sub = build_menu(name, config, assistant);
   if (sub != 0)
   {
     char const* key = STR_APPENDD("OSX.Menu.", name, ".type");
@@ -175,13 +179,13 @@ static void menu_add_submenu(NSMenu* menu, char const* name,
 //	meaning, we ignore it by using STR_CASE_PREFIX instead of STR_CASE.
 //-----------------------------------------------------------------------------
 static void menu_add(NSMenu* menu, char const* key, char const* value,
-  OSXConfigHandle config)
+  OSXConfigHandle config, id assistant)
 {
   STR_SWITCH (key)
     STR_CASE_PREFIX (menu)		// *NOTE*
-      menu_add_submenu(menu, value, config);
+      menu_add_submenu(menu, value, config, assistant);
     STR_CASE_PREFIX (item)
-      menu_add_item(menu, value, config);
+      menu_add_item(menu, value, config, assistant);
   STR_SWITCH_END
 }
 
@@ -192,20 +196,20 @@ static void menu_add(NSMenu* menu, char const* key, char const* value,
 //	each entry in the section to build the menu.  Pays particular attention
 //	to key "title" which is used to set the menu's title.
 //-----------------------------------------------------------------------------
-static NSMenu* build_menu(char const* key, OSXConfigHandle config)
+static NSMenu* build_menu(
+  char const* key, OSXConfigHandle config, id assistant)
 {
   NSMenu* m = 0;
   char const* section = STR_APPENDD("OSX.Menu.", key, ".");
   if (OSXConfigFile_exists(config, section))
   {
-    OSXConfigIterator iterator =
-      OSXConfigFile_new_iterator(config, section);
+    OSXConfigIterator iterator = OSXConfigFile_new_iterator(config, section);
     char const* k_title = STR_APPEND(section, "title");
     char const* title = OSXConfigFile_lookup(config, k_title, "");
     m = [[NSMenu alloc] initWithTitle:[NSString stringWithCString:title]];
     while (OSXConfigFile_iterator_next(iterator))
       menu_add(m, OSXConfigFile_iterator_key(iterator),
-	OSXConfigFile_iterator_data(iterator), config);
+	OSXConfigFile_iterator_data(iterator), config, assistant);
     OSXConfigFile_dispose_iterator(iterator);
   }
   return m;
@@ -216,10 +220,11 @@ static NSMenu* build_menu(char const* key, OSXConfigHandle config)
 // OSXMenuGenerate
 //	Generate a menu from the configuration information in macosx.cfg.
 //-----------------------------------------------------------------------------
-NSMenu* OSXMenuGenerate(char const* menu_ident, OSXConfigHandle config)
+NSMenu* OSXMenuGenerate(
+  id assistant, char const* menu_ident, OSXConfigHandle config)
 {
   NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-  NSMenu* menu = build_menu(menu_ident, config);
+  NSMenu* menu = build_menu(menu_ident, config, assistant);
   [pool release];
   return menu;
 }

@@ -609,7 +609,7 @@ ND_PROTO(void,dispatch_event)
 - (void)initApplicationMenu:(OSXConfigHandle)config style:(char const*)style
 {
   NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-  NSMenu* const menu = OSXMenuGenerate(style, config);
+  NSMenu* const menu = OSXMenuGenerate(self, style, config);
   [menu setTitle:[[NSProcessInfo processInfo] processName]];
   [NSApp setMainMenu:menu];
   [pool release];

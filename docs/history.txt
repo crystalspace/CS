@@ -6,17 +6,24 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Nov-2003
+	- Eric Sunshine fixed MacOS/X application menu malfunction introduced
+	  on August 1, 2003 when configuration was changed so that OSXDelegate
+	  would no longer be registered as the application's delegate.  This
+	  caused problems with the Quit and Pause menu items because those
+	  items were still targeting the delegate, thus they became
+	  dysfunctional.
 10-Nov-2003
 	- Jorrit removed the blend2cs script from CS. It is made obsolete
 	  by the blend2cs project http://projects.blender.org/projects/blend2cs/
-	- Wouter fixed up the terrain texture caching to use the 
+	- Wouter fixed up the terrain texture caching to use the
 	  CacheManager. Instead of a cachedir, put cache="yes" to
 	  use caching.
 	- Jorrit did another optimization to Dynavis. This time the target was
 	  TestRectangle() in the coverage buffer. Optimized this routine by
 	  splitting the coverage buffer test and the depth test. Both tests
 	  can then be written a lot more efficient.
-	- Wouter changed the texture generation <heightmap> and <slope> 
+	- Wouter changed the texture generation <heightmap> and <slope>
 	  statements, as well as the terrfunc <heightmap> statement to
 	  accept a <flipx>yesno</flipx> and/or a <flipy> attribute.
 	  iTerrFuncState::SetHeightMap also has arguments to flipx or flipy.
@@ -26,8 +33,8 @@ chronological order.
 	  unused.
 	- Eric Sunshine corrected typographical errors in build/msvc6.txi and
 	  msvc7.txi.
-	- res tweaked the doxygen files to include paths relative to the 
-	  CS/include resp. CS directory. Also updated the layout of the 
+	- res tweaked the doxygen files to include paths relative to the
+	  CS/include resp. CS directory. Also updated the layout of the
 	  generated HTML files a bit.
 	- Chris Matuszewski fixed a bug in csIntersect3::IntersectTriangle that
 	  was causing it to fail in certain cases.  The new implementation

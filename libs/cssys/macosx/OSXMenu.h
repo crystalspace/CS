@@ -2,7 +2,7 @@
 #define __MACOSX_OSXMenu_h
 //=============================================================================
 //
-//	Copyright (C)1999-2001 by Eric Sunshine <sunshine@sunshineco.com>
+//	Copyright (C)1999-2003 by Eric Sunshine <sunshine@sunshineco.com>
 //
 // The contents of this file are copyrighted by Eric Sunshine.  This work is
 // distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
@@ -18,13 +18,14 @@
 //
 //-----------------------------------------------------------------------------
 #include "OSXConfigFile.h"
+#import <Foundation/NSObject.h>
 @class NSMenu;
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
-NSMenu* OSXMenuGenerate(char const* menu_ident, OSXConfigHandle);
+NSMenu* OSXMenuGenerate(id assistant, char const* menu_ident, OSXConfigHandle);
 
 #if defined(__cplusplus)
 }
