@@ -68,7 +68,6 @@ PLUGINS.DYNAMIC += console/output/fancy
 PLUGINS.DYNAMIC += dungeon
 #PLUGINS.DYNAMIC += font/server/freefont
 PLUGINS.DYNAMIC += font/server/fontplex
-PLUGINS.DYNAMIC += metaball
 
 #PLUGINS.DYNAMIC += csgame/gamecore
 

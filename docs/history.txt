@@ -66,6 +66,8 @@ The history order is reversed so that new features are at the top.
 	  core scf.h interface.
 	- Eric Sunshine repaired an outdated reference to the metaball plugin
 	  in metaball.cfg which prevented the plugin from loading.
+	- Eric Sunshine removed an out-of-date reference to the old MetaBall
+	  plugin from user.mak.
 7-Jun-2001
 	- Justin Miller fixed a minor syntax error in csview.h.
 	- Wouter Wijngaards gave the start to implementing a visibility
