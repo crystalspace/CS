@@ -15,6 +15,7 @@ Direct3D.
 
 @menu
 * Win32 General:: General Information
+* Win32 MSVC5:: Special Notes for @sc{msvc} 5
 * Win32 Compile:: Compiling CS
 * Win32 Rundemo:: Running the demo apps
 * Win32 Workspace:: Structure of the Workspace
@@ -22,15 +23,13 @@ Direct3D.
 * Win32 FAQ:: Frequently Asked Questions (@sc{faq})
 @end menu
 
-@node Win32 General, Win32 Compile, Win32, Win32
+@node Win32 General
 @subsubsection General Information
 
 To compile Crystal Space for Windows, you'll need the
 @emph{Microsoft Developer Studio} or @emph{Microsoft Visual C++} version 6.
-You can try to compile it with version 5, but then you may get strange
-warnings which you should ignore. The problem is to find out which warnings
-are real problems and which are caused by this version conflict, so it is
-recommended to use version 6.
+You can try to compile it with version 5, but this is unsupported and not
+recommended. @xref{Win32 MSVC5}.
 
 In addition to @file{zlib}, @file{libjpeg} and @file{libpng} you also need
 the DirectX @sc{sdk} and/or the OpenGL @sc{sdk} (Note that the @sc{sdk} is
@@ -39,27 +38,51 @@ more than the runtime libraries usually bundles with games):
 @itemize @bullet
 @item
 DirectX 5.0 or higher is required. With this, you get sound output and
-non-accelerated graphics.
+non-accelerated graphics. This is usually included in the @sc{msvc} package.
 
 @item
-DirectX 6.1 or higher allows hardware-accelerated 3d graphics.
+DirectX 6.1 or higher (including DirectX 8) allows hardware-accelerated 3d
+graphics.
 
 @item
-OpenGL also allows hardware acceleration, but you still need DirectX 5.0 or
-higher for the system driver and for sound output.
+OpenGL also allows hardware acceleration, but DirectX 5.0 is still required.
+OpenGL is usually included in the @sc{msvc} package.
 @end itemize
 
-The DirectX 5.0 and OpenGL @sc{sdk}s are included in @sc{msvc} version 6. You
-still have to download DirectX 6.1 yourself. If you're using @sc{msvc}
-version 5, you have none of the above @sc{sdk}s, so you have to download them.
-
-If you just want to build Crystal Space using those @sc{api}s, but don't need
-any documentation or samples, you can get a minimum version of these
-@sc{api}s from NooTe's homepage at (look at the @samp{Sources} section):
+If you don't have one of these @sc{sdk}s you can download them from NooTe's
+homepage. Note that these are only the requires libraries and headers, no
+documentation, samples or tools. Look at the @samp{Sources} section at
 
 @uref{http://www.multimania.com/noote/CrystalSpace}
 
-@node Win32 Compile, Win32 Rundemo, Win32 General, Win32
+After installing a new DirectX @sc{sdk}, you must also make sure that it is
+used. Select @emph{Tools -> Options -> Directories}. For both libraries and
+headers the new DirectX directoy must appear before the older version's
+directory. So if they are not in the list, add them. If they appear after the
+older directories, move them on top of the list.
+
+@node Win32 MSVC5
+@subsubsection Special Notes for @sc{msvc} 5
+
+Building Crystal Space with version 5 of @sc{msvc} is not recommended. If you
+want to try it anyway, you should read this:
+
+@itemize @bullet
+@item
+Version 5 doesn't include any supported DirectX @sc{sdk}, so you'll have to
+download them.
+
+@item
+You may get additional warnings which you should ignore. The problem is, you
+don't know which of the warnings you get are real problems and which of them
+are caused by this version conflict.
+
+@item
+If one of the projects crashes the linker, unload that project and hope that
+it wasn't an important one!
+@end itemize
+
+@node Win32 Compile
 @subsubsection Compiling CS
 
 To compile Crystal Space, you'll have to perform the following steps.
@@ -77,8 +100,6 @@ Select menu @emph{Build/Rebuild All}.
 
 @item
 After a while the compilation should finish without warnings or errors.
-However, if you're using @sc{msvc} version 5, be prepared for some strange
-warnings. You can ignore them.
 @end enumerate
 
 @node Win32 Rundemo, Win32 Workspace, Win32 Compile, Win32
@@ -105,13 +126,15 @@ own application using CS.
 @node Win32 Workspace, Win32 User App, Win32 Rundemo, Win32
 @subsubsection Structure of the Workspace
 
+@emph{NOTE:} If you find bugs in the @sc{msvc} project or workspace files
+coming with Crystal Space, don't send fixes for these files to the
+developers. These files are generated automatically, so your fixes would be
+useless. Better send a description of the bug to the mailing list.
+
 The Crystal Space workspace is divided into several projects.  They all exist
 as separate project files (@file{*.dsp}).  All of them are being bound
 together by a workspace @file{csall.dsw}.  This workspace will also ensure
 correct linking between the various projects.
-
-Currently the project files are created for @sc{ms} Visual C++ 6.0. You can
-use @sc{msvc} 5.0, but do this at your own risk. @xref{Win32 General}.
 
 The workspace uses a prefix system for naming the projects and grouping them.
 There are currently four prefixes in use.  The prefix @file{grp} is used to
@@ -129,9 +152,9 @@ The @emph{Plugins} are also programming libraries, but they use a special
 mechanism called @sc{scf} as their interface to your program. This
 separates their interface from the internals of the library and thus allows
 dynamic linking. In fact, some of the @emph{Libraries} also use @sc{scf}.
-The rule for the MSVC workspace is simple: The @emph{Plugins} are projects
-that build a dynamic library (@file{.DLL}). You can find more information
-in @ref{Plug-In Drivers}.
+The rule for the @sc{msvc} workspace is simple: The @emph{Plugins} are
+projects that build a dynamic library (@file{.DLL}). You can find more
+information in @ref{Plug-In Drivers}.
 
 The @emph{Applications} are programs using some of these libraries, so they
 produce @file{.EXE} files.
@@ -283,7 +306,7 @@ libraries added to the project at link time.
 OK, Now, it should link.  So you should have an executable file called
 @file{walktest.exe} in your src directory.  Let's run it!
 
-@subsubheading Miscellaneous
+@subsubheading Executing
 
 @itemize @bullet
 @item
@@ -299,6 +322,25 @@ an appropriate directory set (see above).  Make sure you have specified the
 level in @file{cryst.cfg} as @samp{WORLDFILE=} (also keep in mind, that your
 current directory is, where the executable sits.)
 
+@item
+Q. @emph{I get the following (or similar) errors:}
+
+@example
+WARNING: could not load plugin `crystalspace.graphics3d.software'
+WARNING: failed to initialize plugin `crystalspace.engine.core'
+FATAL: No iGraphics3D plug-in loaded!
+FATAL: No iGraphics2D plug-in loaded!
+Error initializing system!
+@end example
+
+A. You probably did not compile everything. The @file{.EXE} file is not
+enough! You also have to compile all plug-ins you want to use. In the above
+example the software renderer is missing.
+@end itemize
+
+@subsubheading Miscellaneous
+
+@itemize @bullet
 @item
 Q. @emph{I don't care about @sc{png} support, what can I do?}
 
