@@ -62,11 +62,8 @@ csImageMemory::csImageMemory (int width, int height, void *buffer, bool destroy,
 
 csImageMemory::~csImageMemory ()
 {
-  if (!destroy_image)
+  if (destroy_image)
   {
-    Image = 0;
-    Palette = 0;
-  } else {
     delete [] Image;
     delete [] Palette;
   }
@@ -87,14 +84,16 @@ void csImageMemory::Clear (const csRGBpixel &colour)
 // short cut
 void csImageMemory::Rescale (int NewWidth, int NewHeight)
 {
-/*  if (short_cut)
+#if 0
+  if (short_cut)
   {
     Width = NewWidth;
     Height = NewHeight;
     delete [] (csRGBpixel *) Image;
     Image = (void*) new csRGBpixel[Width*Height];
   }
-  else*/
+  else
+#endif
     csImageFile::Rescale (NewWidth, NewHeight);
 }
 
