@@ -60,6 +60,7 @@ chronological order.
 	- res updated cssaver for the new cubemap syntax.
 	- res added ability to walktest to optionally enable saver flag. Edit
 	  walktest.cfg or run with "-saveable".
+	- Jorrit did some small stuff on pvscalc.
 5-Feb-2005
 	- Mike Handverger fixed a bug in iDynamicSystem::AttachColliderMesh
           ODE needs number of tris * 3 to build the mesh data.

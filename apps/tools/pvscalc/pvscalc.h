@@ -62,6 +62,18 @@ private:
 	const csBox3& bbox, const csVector3& minsize,
 	bool minsize_only, int depth);
 
+  /// Sort all polygons on size.
+  void SortPolygonsOnSize ();
+
+  /**
+   * Given two boxes, calculate the best plane to use for projecting
+   * the area shadows on. If the boxes are adjacent or one box is enclosed
+   * in the other this function will return false. In that case the destination
+   * box is surely visible from the source box.
+   */
+  bool FindShadowPlane (const csBox3& source, const csBox3& dest,
+  	int& axis, float& where);
+
 public:
   PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs);
 

@@ -230,6 +230,115 @@ void PVSCalcSector::CollectGeometry (iMeshWrapper* mesh,
   }
 }
 
+struct poly_with_area
+{
+  size_t idx;
+  float area;
+};
+
+static int compare_polygons_on_size (const poly_with_area& p1,
+	const poly_with_area& p2)
+{
+  if (p1.area > p2.area) return -1;
+  else if (p1.area < p2.area) return 1;
+  else return 0;
+}
+
+void PVSCalcSector::SortPolygonsOnSize ()
+{
+  csArray<poly_with_area> polygons_with_area;
+  size_t i;
+  for (i = 0 ; i < polygons.Length () ; i++)
+  {
+    poly_with_area pwa;
+    pwa.idx = i;
+    pwa.area = polygons[i].GetArea ();
+  }
+  polygons_with_area.Sort (compare_polygons_on_size);
+  csArray<csPoly3D> sorted_polygons;
+  for (i = 0 ; i < polygons_with_area.Length () ; i++)
+    sorted_polygons[i] = polygons[polygons_with_area[i].idx];
+  polygons = sorted_polygons;
+}
+
+bool PVSCalcSector::FindShadowPlane (const csBox3& source, const csBox3& dest,
+  	int& axis, float& where)
+{
+  float sdx = dest.MinX () - source.MaxX ();
+  float sdy = dest.MinY () - source.MaxY ();
+  float sdz = dest.MinZ () - source.MaxZ ();
+  float dsx = source.MinX () - dest.MaxX ();
+  float dsy = source.MinY () - dest.MaxY ();
+  float dsz = source.MinZ () - dest.MaxZ ();
+  if (sdx > SMALL_EPSILON &&
+  	sdx > sdy &&
+	sdx > sdz &&
+	sdx > dsx &&
+	sdx > dsy &&
+	sdx > dsz)
+  {
+    axis = 0;
+    where = dest.MinX ();
+    return true;
+  }
+  if (dsx > SMALL_EPSILON &&
+  	dsx > sdx &&
+	dsx > sdy &&
+	dsx > sdz &&
+	dsx > dsy &&
+	dsx > dsz)
+  {
+    axis = 0;
+    where = dest.MaxX ();
+    return true;
+  }
+  if (sdy > SMALL_EPSILON &&
+  	sdy > sdx &&
+	sdy > sdz &&
+	sdy > dsx &&
+	sdy > dsy &&
+	sdy > dsz)
+  {
+    axis = 1;
+    where = dest.MinY ();
+    return true;
+  }
+  if (dsy > SMALL_EPSILON &&
+  	dsy > sdx &&
+	dsy > sdy &&
+	dsy > sdz &&
+	dsy > dsx &&
+	dsy > dsz)
+  {
+    axis = 1;
+    where = dest.MaxY ();
+    return true;
+  }
+  if (sdz > SMALL_EPSILON &&
+  	sdz > sdx &&
+	sdz > sdy &&
+	sdz > dsx &&
+	sdz > dsy &&
+	sdz > dsz)
+  {
+    axis = 2;
+    where = dest.MinZ ();
+    return true;
+  }
+  if (dsz > SMALL_EPSILON &&
+  	dsz > sdx &&
+	dsz > sdy &&
+	dsz > sdz &&
+	dsz > dsx &&
+	dsz > dsy)
+  {
+    axis = 1;
+    where = dest.MaxZ ();
+    return true;
+  }
+  return false;
+}
+
 void PVSCalcSector::Calculate ()
 {
   parent->ReportInfo ("Calculating PVS for '%s'!",
@@ -258,6 +367,8 @@ void PVSCalcSector::Calculate ()
 	allcount, staticcount,
 	allpcount, staticpcount);
   }
+
+  SortPolygonsOnSize ();
 
   parent->ReportInfo ("Total box (all geometry) %g,%g,%g  %g,%g,%g",
   	allbox.MinX (), allbox.MinY (), allbox.MinZ (),
