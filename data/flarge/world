@@ -98,6 +98,10 @@
             <file>/lib/std/seagull.gif</file>
         </texture>
     </textures>
+    <variables>
+	<variable name="Std Thing Angle" value="0.54321" />
+	<variable name="Std Thing Range" value="50.5" />
+    </variables>
     <materials>
         <material name="tree">
             <texture>tree</texture>
@@ -4859,6 +4863,7 @@
                 </matrix>
                 <v x="-2.5" y="-1" z="20" />
             </move>
+            <imposter active="yes" range="Std Thing Range" tolerance="Std Thing Angle" />
         </meshobj>
         <light>
             <center x="-1.5" y="3" z="17" />
