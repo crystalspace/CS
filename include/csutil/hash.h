@@ -212,19 +212,14 @@ public:
     return zero;
   }
 
-  /// Delete all the elements, returning false if there are none.
-  bool DeleteAll ()
+  /// Delete all the elements.
+  void DeleteAll ()
   {
-    bool ret = false;
-    int elen = Elements.Length ();
     Elements.SetLength (Modulo = InitModulo);
+    int elen = Elements.Length ();
     for (int i = 0; i < elen; i++)
-    {
-      if (Elements[i].Length ()) ret = true;
       Elements[i].Empty ();
-    }
     Size = 0;
-    return ret;
   }
 
   /// Delete all the elements matching the given key.

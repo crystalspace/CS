@@ -9,6 +9,13 @@ chronological order.
 12-Jan-2004
 	- Jorrit fixed a compile error with syntax services. You can't
 	  forward declare an enum (csZBufMode).
+	- Jorrit fixed a big bug in csHash::DeleteAll(). If the size of
+	  the bucket table happened to exceed the initial modulo size then
+	  DeleteAll() would simply crash. In fixing this function Jorrit
+	  also removed the 'bool' return value from DeleteAll(). This
+	  is useless. If application code needs to know if values are
+	  going to be deleted it can call GetSize() right before calling
+	  DeleteAll().
 11-Jan-2004
 	- Jorrit fixed a compile error and some warnings in the new particles
 	  system.
