@@ -69,6 +69,7 @@ class csDelayedLightingInfo : public csFrustrumViewCleanup
       while (poly)
       {
         if (!poly->flags.Check (CS_POLY_NO_DRAW))
+	{
           // orig_poly should be always invisible
           if (prev_poly)
           {
@@ -79,6 +80,7 @@ class csDelayedLightingInfo : public csFrustrumViewCleanup
           }
           else
             DEBUG_BREAK;
+        }
         else
           poly = (prev_poly = poly)->GetNextShare ();
       }
