@@ -51,7 +51,7 @@ csApplicationFramework::~csApplicationFramework ()
     Yes, it is. The order of destruction is first subclass (ie the application
     class, derived from csApplicationFramework) and then the superclass 
     (csApplicationFramework itself). All the subclasses csRef<>s are cleared in
-    the it's destructor, after that the csApplicationFramework destructor is
+    its destructor, after that the csApplicationFramework destructor is
     called, and csApplicationFramework itself has no csRef<>s. So it's safe to
     call DestroyApplication() here.
    */
