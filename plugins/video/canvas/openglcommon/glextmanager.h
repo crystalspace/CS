@@ -5913,7 +5913,7 @@ typedef GLvoid (csAPIENTRY* csGLPRIMITIVERESTARTINDEXNV) (GLuint index);
 struct csGLExtensionManager
 {
 private:
-  static const bool defaultReportMissingEntries;
+  static bool defaultReportMissingEntries;
   iObjectRegistry* object_reg;
   csConfigAccess config;
   iOpenGLInterface* gl;
