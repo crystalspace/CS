@@ -549,3 +549,52 @@ iImage *csImageFile::Clone ()
 
   return nimg;
 }
+
+iImage *csImageFile::Crop ( int x, int y, int width, int height )
+{
+  if ( x+width > Width || y+height > Height ) return NULL;
+  CHK (csImageFile* nimg = new csImageFile (Format));
+  nimg->Width = width;
+  nimg->Height = height;
+  nimg->fName = NULL;
+  nimg->Format = Format;
+  nimg->Image = NULL;
+  nimg->Palette = NULL;
+  nimg->Alpha = NULL;
+
+  int pixels = width * height;
+  int i;
+  if (Alpha)
+  {
+    nimg->Alpha = new UByte [pixels];
+    for ( i=0; i<height; i++ )
+      memcpy (nimg->Alpha + i*width, Alpha + (i+y)*Width + x, width);
+  }
+
+  if (Palette)
+  {
+    nimg->Palette = new RGBPixel [256];
+    memcpy (nimg->Palette, Palette, 256 * sizeof (RGBPixel));
+  }
+
+  if (Image)
+  {
+    switch (Format & CS_IMGFMT_MASK)
+    {
+      case CS_IMGFMT_NONE:
+        break;
+      case CS_IMGFMT_PALETTED8:
+        nimg->Image = new UByte [pixels];
+        for ( i=0; i<height; i++ )
+          memcpy ( (UByte*)nimg->Image + i*width, (UByte*)Image + (i+y)*Width + x, width);
+        break;
+      case CS_IMGFMT_TRUECOLOR:
+        nimg->Image = new RGBPixel [pixels];
+        for ( i=0; i<height; i++ )
+          memcpy ( (RGBPixel*)nimg->Image + i*width, (RGBPixel*)Image + (i+y)*Width + x, width * sizeof (RGBPixel));
+        break;
+    }
+  }
+
+  return nimg;
+}
