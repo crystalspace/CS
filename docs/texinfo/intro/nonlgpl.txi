@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node NonLGPL
+@node NonLGPL, , License, CS Introduction
 @section Parts of CS covered under different licenses
 
 Some parts of CrystalSpace are NOT covered under @sc{LGPL} license, you might 

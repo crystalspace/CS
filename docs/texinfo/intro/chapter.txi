@@ -38,6 +38,7 @@ answer there you can always email the mailing lists. @xref{FAQ}, or
 * Authors:: Documentation Authors & Contributors
 * Contributors:: Crystal Space Contributors
 * License:: GNU Library General Public License
+* NonLGPL:: Parts of CS covered under different licenses
 @end menu
 
 @imports{intro,foreword.txi}
