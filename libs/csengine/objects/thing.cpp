@@ -584,6 +584,7 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
     csCurve* p = pt->MakeCurve ();
     p->SetName(pt->GetName ());
     p->SetParent (this);
+    p->SetSector( GetSector() );
 
     if (!pt->GetTextureHandle ()) p->SetTextureHandle (default_texture);
     for (j = 0 ; j < pt->NumVertices () ; j++)

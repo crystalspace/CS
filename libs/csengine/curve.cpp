@@ -30,11 +30,11 @@
 #include "csengine/world.h"
 #include "csengine/lppool.h"
 
-static csBezierCache theBezierCache;
+static csBezier2 bezierCache;
 
 IMPLEMENT_CSOBJTYPE (csCurve,csObject);
 IMPLEMENT_CSOBJTYPE (csCurveTemplate,csObject);
-IMPLEMENT_CSOBJTYPE (csBezier,csCurve);
+IMPLEMENT_CSOBJTYPE (csBezierCurve,csCurve);
 IMPLEMENT_CSOBJTYPE (csBezierTemplate,csCurveTemplate);
 
 csCurveTesselated::csCurveTesselated (int num_v, int num_t)
@@ -64,8 +64,8 @@ void csCurveTesselated::UpdateColors (csLightMap* lightmap)
   UByte* mapR = map.GetRed ();
   UByte* mapG = map.GetGreen ();
   UByte* mapB = map.GetBlue ();
-  int lm_width = lightmap->GetWidth ()-2;
-  int lm_height = lightmap->GetWidth ()-2;
+  int lm_width = lightmap->GetWidth ();
+  int lm_height = lightmap->GetWidth ();
 
   int j;
   for (j = 0 ; j < GetNumTriangles () ; j++)
@@ -73,21 +73,21 @@ void csCurveTesselated::UpdateColors (csLightMap* lightmap)
     csTriangle& ct = triangles[j];
     int lm_idx;
     int cx, cy;
-    cx = QInt (controls[ct.a].x * lm_width);
-    cy = QInt (controls[ct.a].y * lm_height);
-    lm_idx = cy*(lm_width+2) + cx;
+    cx = QInt (controls[ct.a].x * (lm_width - 1));
+    cy = QInt (controls[ct.a].y * (lm_height - 1));
+    lm_idx = cy*lm_width + cx;
     colors[ct.a].red = ((float)mapR[lm_idx])/256.;
     colors[ct.a].green = ((float)mapG[lm_idx])/256.;
     colors[ct.a].blue = ((float)mapB[lm_idx])/256.;
-    cx = QInt (controls[ct.b].x * lm_width);
-    cy = QInt (controls[ct.b].y * lm_height);
-    lm_idx = cy*(lm_width+2) + cx;
+    cx = QInt (controls[ct.b].x * (lm_width - 1));
+    cy = QInt (controls[ct.b].y * (lm_height - 1));
+    lm_idx = cy*lm_width + cx;
     colors[ct.b].red = ((float)mapR[lm_idx])/256.;
     colors[ct.b].green = ((float)mapG[lm_idx])/256.;
     colors[ct.b].blue = ((float)mapB[lm_idx])/256.;
-    cx = QInt (controls[ct.c].x * lm_width);
-    cy = QInt (controls[ct.c].y * lm_height);
-    lm_idx = cy*(lm_width+2) + cx;
+    cx = QInt (controls[ct.c].x * (lm_width - 1));
+    cy = QInt (controls[ct.c].y * (lm_height - 1));
+    lm_idx = cy*lm_width + cx;
     colors[ct.c].red = ((float)mapR[lm_idx])/256.;
     colors[ct.c].green = ((float)mapG[lm_idx])/256.;
     colors[ct.c].blue = ((float)mapB[lm_idx])/256.;
@@ -97,7 +97,7 @@ void csCurveTesselated::UpdateColors (csLightMap* lightmap)
 }
 
 
-csCurveTesselated* csBezier::Tesselate (int res)
+csCurveTesselated* csBezierCurve::Tesselate (int res)
 {
   if (res<2)
     res=2;
@@ -113,7 +113,7 @@ csCurveTesselated* csBezier::Tesselate (int res)
   previous_tesselation = 
        new csCurveTesselated ((res+1)*(res+1), 2*res*res);
 
-  TDtDouble *controls[9] = 
+  double *controls[9] = 
   {
     cpt[0], cpt[1], cpt[2], cpt[3], cpt[4],
     cpt[5], cpt[6], cpt[7], cpt[8],
@@ -124,18 +124,13 @@ csCurveTesselated* csBezier::Tesselate (int res)
   for (i=0;i<=res;i++)
   for (j=0;j<=res;j++)
   {
-    TDtDouble point[5];
-    BezierPoint(point, controls, i, j,res,BinomiumMap());
     int idx = i+(res+1)*j;
     csVector3* vtx_coord = previous_tesselation->GetVertices ()+idx;
     csVector2* vtx_txtcoord = previous_tesselation->GetTxtCoords ()+idx;
     csVector2* vtx_control = previous_tesselation->GetControlPoints ()+idx;
-    vtx_coord->x = point[0];
-    vtx_coord->y = point[1];
-    vtx_coord->z = point[2];
+    *vtx_coord = csBezier2::GetPoint (controls, i, j,res);
     //
-    vtx_txtcoord->x    = point[3];
-    vtx_txtcoord->y    = point[4];
+    *vtx_txtcoord = csBezier2::GetTextureCoord (controls, i, j, res);
     //
     vtx_control->x      = ((float)i)/(float)res;
     vtx_control->y      = ((float)j)/(float)res;
@@ -145,10 +140,9 @@ csCurveTesselated* csBezier::Tesselate (int res)
   {
     for (j=0;j<res;j++)
     {
-      csTriangle& up = 
-	previous_tesselation->GetTriangle (2*(i+j*res));
-      csTriangle& down = 
-	previous_tesselation->GetTriangle (2*(i+j*res)+1);
+      csTriangle& up = previous_tesselation->GetTriangle (2*(i+j*res));
+      csTriangle& down = previous_tesselation->GetTriangle (2*(i+j*res)+1);
+      
       int tl = i+(res+1)*j;
       int tr = i+(res+1)*j+1;
 
@@ -224,7 +218,7 @@ float csCurve::GetScreenBoundingBox (const csTransform& obj2cam,
   return cbox.MaxZ ();
 }
 
-void csBezier::GetObjectBoundingBox (csBox3& bbox)
+void csBezierCurve::GetObjectBoundingBox (csBox3& bbox)
 {
   // @@@ This algo uses the control points to compute
   // the bounding box. Is this right?
@@ -375,9 +369,9 @@ void csCurve::ShineDynLight (csLightPatch* lp)
   float d;
   int ui, vi;
   int uv;
-  for (ui = 0 ; ui < lm_width - 1; ui++)
+  for (ui = 0 ; ui < lm_width; ui++)
   {
-    for (vi = 0 ; vi < lm_height - 1; vi++)
+    for (vi = 0 ; vi < lm_height; vi++)
     {
       uv = vi*lm_width + ui;
 
@@ -388,7 +382,7 @@ void csCurve::ShineDynLight (csLightPatch* lp)
         // No, skip it
         continue;
 
-      // if we have any shadow frustrums
+      // if we have any shadow frustrumsq
       if (sf != NULL)
       {
         csShadowFrustum* csf;
@@ -435,6 +429,53 @@ void csCurve::ShineDynLight (csLightPatch* lp)
         if (lval > 255) lval = 255;
         mapB[uv] = lval;
       }
+    }
+  }
+}
+
+void csCurve::GetCoverageMatrix (csFrustumView& lview, 
+                                 csCoverageMatrix &cm) const
+{
+  csVector3 pos;
+  int uv;
+
+  csShadowFrustum* sf = lview.shadows.GetFirst ();
+  
+  int lm_width = lightmap->GetWidth ();
+  int lm_height = lightmap->GetHeight ();
+
+  cm.height = lm_height;
+  cm.width = lm_width;
+
+  for (int ui = 0 ; ui < lm_width; ui++)
+  {
+    for (int vi = 0 ; vi < lm_height; vi++)
+    {
+      uv = vi*lm_width + ui;
+      pos = _uv2World[uv];
+
+      // is the point contained within the light frustrum? 
+      if (!lview.light_frustum->Contains(pos - lview.light_frustum->GetOrigin()))
+        // No, skip it
+        continue;
+
+      // if we have any shadow frustrums
+      if (sf != NULL)
+      {
+        csShadowFrustum* csf;
+        for(csf=sf; csf != NULL; csf=csf->next)
+        {
+          // is this point in shadow
+          if (csf->Contains(pos - csf->GetOrigin()))
+            break;
+        }
+              
+        // if it was found in shadow skip it
+        if (csf != NULL)
+          continue;
+      }
+
+      cm.coverage[uv] = 1.0;
     }
   }
 }
@@ -492,7 +533,6 @@ void csCurve::CalculateLighting (csFrustumView& lview)
     bool dyn = light->IsDynamic();
 
     UByte *mapR, *mapG, *mapB;
-    csShadowFrustum* sf = lview.shadows.GetFirst ();
     csShadowMap* smap;
 
     /* initialize color to something to avoid compiler warnings */
@@ -522,39 +562,29 @@ void csCurve::CalculateLighting (csFrustumView& lview)
 
     float cosfact = csPolyTexture::cfg_cosinus_factor;
 
+    // get our coverage matrix
+    csCoverageMatrix *shadow_matrix = new csCoverageMatrix(lm_width, lm_height);
+    GetCoverageMatrix(lview, *shadow_matrix);
+
     // calculate the static lightmap
     csVector3 pos;
     csVector3 normal;
     float d;
     int ui, vi;
     int uv;
-    for (ui = 0 ; ui < lm_width - 1; ui++)
+    for (ui = 0 ; ui < lm_width; ui++)
     {
-      for (vi = 0 ; vi < lm_height - 1; vi++)
+      for (vi = 0 ; vi < lm_height; vi++)
       {
         uv = vi*lm_width + ui;
-        pos = _uv2World[uv];
 
-        // is the point contained within the light frustrum? 
-        if (!lview.light_frustum->Contains(pos - lview.light_frustum->GetOrigin()))
-          // No, skip it
+        // is the point lit by our current light
+        if (shadow_matrix->coverage[uv] <= SMALL_EPSILON)
+          // No, go to next point then
           continue;
 
-        // if we have any shadow frustrums
-        if (sf != NULL)
-        {
-          csShadowFrustum* csf;
-          for(csf=sf; csf != NULL; csf=csf->next)
-          {
-            // is this point in shadow
-            if (csf->Contains(pos - csf->GetOrigin()))
-              break;
-          }
-                
-          // if it was found in shadow skip it
-          if (csf != NULL)
-            continue;
-        }
+        // what are the world coordinates of this texel
+        pos = _uv2World[uv];
 
         d = csSquaredDist::PointPoint (light->GetCenter (), pos);
         if (d >= light->GetSquaredRadius ()) continue;
@@ -564,8 +594,15 @@ void csCurve::CalculateLighting (csFrustumView& lview)
         float cosinus = (pos-light->GetCenter ())*normal;
         cosinus /= d;
         cosinus += cosfact;
-        if (cosinus < 0) cosinus = 0;
-        else if (cosinus > 1) cosinus = 1;
+
+        if (cosinus < 0) 
+        {
+          cosinus = 0;
+        }
+        else if (cosinus > 1) 
+        {
+          cosinus = 1;
+        }
 
         float brightness = cosinus * light->GetBrightnessAtDistance (d);
 
@@ -598,6 +635,8 @@ void csCurve::CalculateLighting (csFrustumView& lview)
         }
       }
     }
+
+    delete shadow_matrix;
   }
 }
 
@@ -613,9 +652,9 @@ void csCurve::SetObject2World (csReversibleTransform* o2w)
   if (_o2w && _uv2World) 
   {
     // untransform our buffers
-    for(int ui=0; ui < lm_width - 1; ui++)
+    for(int ui=0; ui < lm_width; ui++)
     {
-      for(int vi=0; vi < lm_height - 1; vi++)
+      for(int vi=0; vi < lm_height; vi++)
       {
         uv = vi*lm_width + ui;
 
@@ -632,9 +671,9 @@ void csCurve::SetObject2World (csReversibleTransform* o2w)
   if (_uv2World)
   {
     // transform our uv2World buffer
-    for(int ui=0; ui < lm_width - 1; ui++)
+    for(int ui=0; ui < lm_width; ui++)
     {
-      for(int vi=0; vi < lm_height - 1; vi++)
+      for(int vi=0; vi < lm_height; vi++)
       {
         uv = vi*lm_width + ui;
 
@@ -655,6 +694,26 @@ void csCurve::CacheLightMaps (csPolygonSet* owner, int index)
   lightmap->ConvertToMixingMode ();
 }
 
+float csCurve::GetArea()
+{
+  float area = 0.0;
+
+  // Tesselate at resolution 10000 to get the best approximation of area
+  csCurveTesselated* ct = Tesselate( 10000 );
+
+  csVector3 *vertex = ct->GetVertices ();
+  csTriangle t;
+
+  // loop through all of our triangles and sum thier areas
+  for(int i=0; i<ct->GetNumTriangles(); i++)
+  {
+    t = ct->GetTriangle(i);
+    area += ABS(csMath3::Area3 (vertex[t.a], vertex[t.b], vertex[t.c]) );
+  }
+
+  return area / 2.0;
+}
+
 void csCurve::CalcUVBuffers()
 {
   if (_uv2World)
@@ -673,16 +732,16 @@ void csCurve::CalcUVBuffers()
   int uv;
 
   // now loop over every texel in the lightmap
-  for (int ui = 0 ; ui < lm_width - 1; ui++)
+  for (int ui = 0 ; ui < lm_width; ui++)
   {
     // calculate the real u coordinate in texture space
-    u = ((float)ui)/(float)lm_width;
-    for (int vi = 0 ; vi < lm_height - 1; vi++)
+    u = ((float)ui + 0.5F)/(float)lm_width; // offset 0.5 for texel center
+    for (int vi = 0 ; vi < lm_height; vi++)
     {
       uv = vi*lm_width + ui;
 
       // calculate the real v coordinate in texture space
-      v = ((float)vi)/(float)lm_height;
+      v = ((float)vi + 0.5F)/(float)lm_height;// offset 0.5 for texel center
 
       // ask our curve to find the object space coordinate at u,v
       PosInSpace (_uv2World[uv], u, v);
@@ -699,7 +758,7 @@ void csCurve::CalcUVBuffers()
   }
 }
 
-csBezier::csBezier (csBezierTemplate* parent_tmpl) : csCurve (parent_tmpl) 
+csBezierCurve::csBezierCurve (csBezierTemplate* parent_tmpl) : csCurve (parent_tmpl) 
 {
   int i,j;
   for (i=0 ; i<3 ; i++)
@@ -713,12 +772,12 @@ csBezier::csBezier (csBezierTemplate* parent_tmpl) : csCurve (parent_tmpl)
   valid_bbox = false;
 }
 
-csBezier::~csBezier ()
+csBezierCurve::~csBezierCurve ()
 {
   delete previous_tesselation;
 }
 
-void csBezier::SetControlPoint (int index, int control_id)
+void csBezierCurve::SetControlPoint (int index, int control_id)
 {
   GetControlPoint(index) = parent->CurveVertex (control_id);
   GetTextureCoord(index) = parent->CurveTexel (control_id);
@@ -730,36 +789,28 @@ void csBezier::SetControlPoint (int index, int control_id)
 }
 
 
-bool csBezier::IsLightable ()
+bool csBezierCurve::IsLightable ()
 {
   return true;
 }
-void csBezier::PosInSpace (csVector3& vec, double u, double v)
+void csBezierCurve::PosInSpace (csVector3& vec, double u, double v)
 {
-  TDtDouble point[3];
-  TDtDouble *controls[9] = 
+  double *controls[9] = 
   {
     cpt[0], cpt[1], cpt[2], cpt[3], cpt[4],
     cpt[5], cpt[6], cpt[7], cpt[8],
   };
-  BezierPoint(point, controls,  u, v,bfact );
-  vec.x = point[0];
-  vec.y = point[1];
-  vec.z = point[2];
+  vec = csBezier2::GetPoint (controls,  u, v);
 }
 
-void csBezier::Normal (csVector3& vec, double u, double v)
+void csBezierCurve::Normal (csVector3& vec, double u, double v)
 {
-  TDtDouble point[3];
-  TDtDouble *controls[9] = 
+  double *controls[9] = 
   {
     cpt[0], cpt[1], cpt[2], cpt[3], cpt[4],
     cpt[5], cpt[6], cpt[7], cpt[8],
   };
-  BezierNormal(point, controls, u, v);
-  vec.x = point[0];
-  vec.y = point[1];
-  vec.z = point[2];
+  vec = csBezier2::GetNormal (controls, u, v);
 }
 
 //------------------------------------------------------------------
@@ -789,7 +840,7 @@ int csBezierTemplate::NumVertices ()
 
 csCurve* csBezierTemplate::MakeCurve ()
 {
-  csBezier* p = new csBezier (this);
+  csBezierCurve* p = new csBezierCurve (this);
   p->SetTextureHandle (cstxt);
   return p;
 }

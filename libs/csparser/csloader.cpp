@@ -2299,9 +2299,10 @@ csCurve* csLoader::load_bezier (char* polyname, char* buf,
 
   (void)default_lightx; (void)sec; (void)parent;
 
-  csBezier *poly3d = new csBezier (NULL);
-  poly3d->SetName (polyname);
-  poly3d->SetTextureHandle (default_texture);
+  csBezierCurve *curve = new csBezierCurve (NULL);
+  curve->SetName (polyname);
+  curve->SetTextureHandle (default_texture);
+  curve->SetSector(sec);
   csTextureHandle* tex = NULL;
 //TODO??  poly3d->SetSector(sec);
 //TODO??  poly3d->SetParent (parent);
@@ -2336,7 +2337,7 @@ csCurve* csLoader::load_bezier (char* polyname, char* buf,
           CsPrintf (MSG_WARNING, "Couldn't find texture named '%s'!\n", str);
           fatal_exit (0, true);
         }
-        poly3d->SetTextureHandle (tex);
+        curve->SetTextureHandle (tex);
         break;
       case TOKEN_TEXTURE:
         while ((cmd = csGetObject (&params, tex_commands, &name, &params2)) > 0)
@@ -2433,7 +2434,7 @@ csCurve* csLoader::load_bezier (char* polyname, char* buf,
     fatal_exit (0, false);
   }
 
-  return poly3d;
+  return curve;
 }
 
 
@@ -2514,7 +2515,7 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
         else if (strcasecmp (params, "no") == 0)
           flags &= ~CS_TEXTURE_DITHER;
         else
-          CsPrintf (MSG_WARNING, "Warning! Invalid DITHER() value, 'yes' or 'no' expected\n");
+          CsPrintf (MSG_WARNING, "Warning! Invalid MIPMAP() value, 'yes' or 'no' expected\n");
         break;
     }
   }

@@ -133,6 +133,82 @@ csPolygon3D* csPolyIt::Fetch ()
     thing->GetPolygon3D (polygon_idx) : sector->GetPolygon3D (polygon_idx);
 }
 
+//--------------------- csCurveIt -------------------------------------------
+
+csCurveIt::csCurveIt (csWorld* w) : world(w)
+{
+  Restart();
+}
+
+void csCurveIt::Restart ()
+{
+  sector_idx = -1;
+  thing = NULL;
+  curve_idx = 0;
+}
+
+csCurve* csCurveIt::Fetch ()
+{
+  csSector* sector;
+  if (sector_idx == -1)
+  {
+    sector_idx = 0;
+    thing = NULL;
+    curve_idx = -1;
+  }
+
+  if (sector_idx >= world->sectors.Length ()) return NULL;
+  sector = (csSector*)(world->sectors[sector_idx]);
+
+  // Try next polygon.
+  curve_idx++;
+
+  if (thing)
+  {
+    // We are busy scanning the things of this sector.
+    // See if the current thing has the indicated curve number.
+    // If not then we try the next thing.
+    while (thing && curve_idx >= thing->GetNumCurves ())
+    {
+      thing = (csThing*)(thing->GetNext ());
+      curve_idx = 0;
+    }
+    if (!thing)
+    {
+      // There are no more things left. Go to the next sector.
+      sector_idx++;
+      if (sector_idx >= world->sectors.Length ()) return NULL;
+      // Initialize iterator to start of sector and recurse.
+      thing = NULL;
+      curve_idx = -1;
+      return Fetch ();
+    }
+  }
+  else if (curve_idx >= sector->GetNumCurves ())
+  {
+    // We are not scanning things but we have no more polygons in
+    // this sector. Start scanning things.
+    curve_idx = -1;
+    thing = sector->GetFirstThing ();
+
+    // Recurse.
+    if (thing) return Fetch ();
+    
+    // No things. Go to next sector.
+    sector_idx++;
+    
+    if (sector_idx >= world->sectors.Length ()) return NULL;
+    
+    // Initialize iterator to start of sector and recurse.
+    thing = NULL;
+    
+    return Fetch ();
+  }
+
+  return thing ?
+    thing->GetCurve (curve_idx) : sector->GetCurve (curve_idx);
+}
+
 //---------------------------------------------------------------------------
 
 csLightIt::csLightIt (csWorld* w) : world(w)
@@ -398,7 +474,7 @@ void csWorld::Clear ()
   // Clear all object libraries
   Library = NULL;
   Libraries.DeleteAll ();
-
+  
   if (world_states)
   {
     world_states->DeleteAll ();
@@ -648,8 +724,8 @@ void csWorld::ShineLights ()
         sscanf (endkw, "%f", &xf);
         int xi = QRound (xf);
 
-#define CHECK(keyw,cond,reas)				\
-        else if (!strcmp (keyword, keyw))		\
+#define CHECK(keyw,cond,reas) \
+        else if (!strcmp (keyword, keyw)) \
         { if (cond) { reason = reas " changed"; break; } }
 
         if (false) {}

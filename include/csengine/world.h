@@ -112,6 +112,35 @@ public:
 };
 
 /**
+ * Iterator to iterate over all curves in the world.
+ * This iterator assumes there are no fundamental changes
+ * in the world while it is being used.
+ * If changes to the world happen the results are unpredictable.
+ */
+class csCurveIt
+{
+private:
+  // The world for this iterator.
+  csWorld* world;
+  // Current sector index.
+  int sector_idx;
+  // Current thing.
+  csThing* thing;
+  // Current polygon index.
+  int curve_idx;
+
+public:
+  /// Construct an iterator and initialize to start.
+  csCurveIt (csWorld* w);
+
+  /// Restart iterator.
+  void Restart ();
+
+  /// Get curve from iterator. Return NULL at end.
+  csCurve* Fetch ();
+};
+
+/**
  * Iterator to iterate over all static lights in the world.
  * This iterator assumes there are no fundamental changes
  * in the world while it is being used.

@@ -23,6 +23,7 @@
 #include "csgeom/vector3.h"
 #include "csutil/cscolor.h"
 #include "csengine/polygon.h"
+#include "csengine/curve.h"
 #include "csengine/polytext.h"
 #include "csengine/lghtmap.h"
 
@@ -111,84 +112,120 @@ public:
   }
 };
 
-
 /**
- *  A radiosity polygon, containing lightmap patches, the lumels.
+ *  A radiosity Element, containing lightmap patches, the lumels.
  *  Radiosity rendering specific info is kept here.
  */
-class csRadPoly : csObject {
-private:
-  csPolygon3D* polygon;
+class csRadElement : public csObject {
+protected:
   float area;
+  
   float total_unshot_light; // diffuse * area * avg_delta_level
+  
   csLightMap *csmap;
+  
   int width, height, size;
+  
   /// ptr to static lightmap of polygon
   csRGBLightMap *lightmap;
+  
   /// the change to this lightmap, unshot light.
   csRGBFloatLightMap *deltamap;
-  /// to convert lumels to world coords.
-  csVector3 lumel_origin, lumel_x_axis, lumel_y_axis;
+  
   /// the area of one lumel of the polygon
   float one_lumel_area;
+
   /// values for loop detection, last shooting priority and repeats
-  float last_shoot_priority; int num_repeats;
+  float last_shoot_priority; 
+  int num_repeats;
+
+protected:
+
+  /// return the texture handle
+  virtual csTextureHandle* GetTextureHandle() = 0;
+  
+  /// return the flat color value
+  virtual csColor GetFlatColor() const = 0;
+
+  // setup some necessary values
+  virtual void Setup() {};
+
+
 
 public:
-  csRadPoly(csPolygon3D *original);
-  ~csRadPoly();
+  csRadElement();
+  ~csRadElement();
 
-  /// for queueing of polys to shoot their light
+  /// for queueing of elements to shoot their light
   inline float GetPriority() { return total_unshot_light; }
-  /// get area size of polygon, precomputed
+
+  /// get area size of element, precomputed
   inline float GetArea() const { return area; }
-  /// get normal vector for polygon 
-  const csVector3& GetNormal() const {return polygon->GetPolyPlane()->Normal();}
-  /// Get diffuse reflection value for polygon. 0.55-0.75 is nice.
+  
+  /// Get diffuse reflection value for element. 0.55-0.75 is nice.
   inline float GetDiffuse() const { return 0.7; }
 
-  /// get original csPolgyon3D for this radpoly
-  inline csPolygon3D *GetPolygon3D() const { return polygon; }
   /// get width of lightmap and deltamap
   inline int GetWidth() const{ return width; }
+
   /// get height of lightmap and deltamap
   inline int GetHeight() const { return height; }
+  
   /// get size of lightmap and deltamap
   inline int GetSize() const { return size; }
+
   /// check if a delta lumel is zero
   inline bool DeltaIsZero(int suv)
   { return !(deltamap->GetRed()[suv] || deltamap->GetGreen()[suv] || 
       deltamap->GetBlue()[suv] ); }
+
+  /// return the sector of this element
+  virtual csSector* GetSector () const = 0;
+
+  /// return the normal at the point x, y
+  virtual const csVector3& GetNormal(int x, int y) const = 0;
+
+  /// return the average normal for this element
+  csVector3 GetAvgNormal() const;
+  
   /// check if a patch has zero delta
   bool DeltaIsZero(int suv, int w, int h);
+  
   /// Get avg texture colour for a patch.
   void GetTextureColour(int suv, int w, int h, csColor &avg,
     csRGBLightMap *texturemap);
+  
   /// Cap every delta in patch to value.
   void CapDelta(int suv, int w, int h, float max);
+  
   /// Get the summed delta of a patch
   void GetSummedDelta(int suv, int w, int h, csColor& sum);
+  
   /// get the delta map
   inline csRGBFloatLightMap* GetDeltaMap() { return deltamap; }
 
   /// Get last shooting priority of this radpoly
   inline float GetLastShootingPriority() { return last_shoot_priority;}
+  
   /// Set last shooting priority
   inline void SetLastShootingPriority(float val) {last_shoot_priority=val;}
+
   /// Get number of repeats shooting at the same priority for this poly.
   inline int GetNumRepeats() { return num_repeats; }
+  
   /// Increment the number of repeats of shooting at same priority by one.
   inline void IncNumRepeats() {num_repeats++;}
 
-  /// Get world coordinates for a lumel -- slow method
-  void GetLumelWorldCoords(csVector3& res, int x, int y);
-  /// Setup fast lumel to world coords - uses GetLumelWorldCoords
-  void SetupQuickLumel2World();
-  /// Quick getting lumel to world coords;
-  inline void QuickLumel2World(csVector3& res, float x, float y)
-  { res = lumel_origin + x* lumel_x_axis + y * lumel_y_axis; }
+  /// Get world coordinates for a lumel
+  virtual void Lumel2World(csVector3& res, int x, int y) = 0;
+  
   /// get area of one lumel in world space
   inline float GetOneLumelArea() const { return one_lumel_area; }
+
+
+  /// Populates the shadow coverage Matrix for this element
+  virtual void GetCoverageMatrix(csFrustumView* lview, 
+                                 csCoverageMatrix* shadow_matrix) = 0;
 
   /** 
    * computes new priority value, summing the light unshot.
@@ -196,11 +233,12 @@ public:
    * doing a list->Delete(this), beforehand.
    */
   void ComputePriority();
+  
   /** 
    * Add a fraction to delta map of lumel from given source RadPoly.
    * suv is index in src, ruv is index in maps of this poly.
    */
-  void AddDelta(csRadPoly *src, int suv, int ruv, float fraction, 
+  void AddDelta(csRadElement *src, int suv, int ruv, float fraction, 
     const csColor& filtercolor);
 
   /**
@@ -235,8 +273,103 @@ public:
    */
   csRGBLightMap *ComputeTextureLumelSized();
 
-  /// Get a RadPoly when you have a csPolygon3D (only type we attach to)
-  static csRadPoly* GetRadPoly(csPolygon3D &object);
+  /// Get a RadElement when you have a csPolygon3D or a csCurve
+  static csRadElement* GetRadElement(csPolygon3D &object);
+
+  /// Get a RadElement
+  static csRadElement* GetRadElement(csCurve &object);
+
+  CSOBJTYPE;
+};
+
+/**
+ *  A radiosity polygon, containing lightmap patches, the lumels.
+ *  Radiosity rendering specific info is kept here.
+ */
+class csRadPoly : public csRadElement 
+{
+private:
+  csPolygon3D* polygon;
+  csVector3 lumel_origin, lumel_x_axis, lumel_y_axis;
+
+protected:
+  /// return the texture handle for this polygon
+  virtual csTextureHandle* GetTextureHandle()
+  { return polygon->GetCsTextureHandle(); }
+
+  /// return the flat color for the polygons texture
+  virtual csColor GetFlatColor() const 
+  { return polygon->GetFlatColor(); }
+
+  // setup some necessary values
+  virtual void Setup();
+
+public:
+  csRadPoly(csPolygon3D *original);
+  ~csRadPoly();
+
+  /// get normal vector for polygon 
+  const csVector3& GetNormal(int x, int y) const 
+  { (void)x; (void)y; return polygon->GetPolyPlane()->Normal();}
+
+  /// get original csPolgyon3D for this radpoly
+  inline csPolygon3D *GetPolygon3D() const { return polygon; }
+
+  /// Get world coordinates for a lumel -- slow method
+  void CalcLumel2World(csVector3& res, int x, int y);
+
+  /// Get world coordinates for a lumel
+  virtual void Lumel2World(csVector3& res, int x, int y);
+
+  csSector* GetSector () const { return polygon->GetSector (); }
+
+  /// Populates the shadow coverage Matrix for this element
+  virtual void GetCoverageMatrix(csFrustumView* lview, 
+                                 csCoverageMatrix* shadow_matrix)
+  { GetPolygon3D()->GetLightMapInfo()->GetPolyTex()->
+                    GetCoverageMatrix(*lview, *shadow_matrix); }
+  CSOBJTYPE;
+};
+
+/**
+ *  A radiosity curve, containing lightmap patches, the lumels.
+ *  Radiosity rendering specific info is kept here.
+ */
+class csRadCurve : public csRadElement {
+private:
+  csCurve* curve;
+
+protected:
+  /// return the texture handle for this curve
+  virtual csTextureHandle* GetTextureHandle()
+  { return curve->cstxt; }
+
+  /// return the flat color for the polygons texture
+  virtual csColor GetFlatColor() const
+  {
+    /// @@@ I'm not sure why curves don't have a flat color, so for now 
+    /// @@@ just return a default color of mid-gray
+    return csColor(0.5, 0.5, 0.5);
+  }
+
+  virtual void Setup();
+
+public:
+  csRadCurve (csCurve* curve);
+  ~csRadCurve();
+
+  /// get normal vector for the Curve
+  virtual const csVector3& GetNormal(int x, int y) const;
+
+  /// Get world coordinates for a lumel
+  virtual void Lumel2World(csVector3& res, int x, int y);
+
+  csSector* GetSector () const { return curve->GetSector (); }
+
+  /// Populates the shadow coverage Matrix for this element
+  virtual void GetCoverageMatrix(csFrustumView* lview, 
+                                 csCoverageMatrix* shadow_matrix)
+  { curve->GetCoverageMatrix(*lview, *shadow_matrix); }
 
   CSOBJTYPE;
 };
@@ -247,31 +380,41 @@ public:
  */
 class csRadTree{
 private:
-  csRadPoly *element;
+  csRadElement *element;
+
   csRadTree *left, *right;
+  
   /// deletes this node which must have non-null left and right subtrees.
   void DelNode();
+  
   /// Returns Leftmost node in this tree, parent is also stored or NULL
   csRadTree* FindLeftMost(csRadTree*& parent);
+  
   /// Returns rightost node in this tree, parent is also stored or NULL
   csRadTree* FindRightMost(csRadTree*& parent);
+
 public:
   /// create a new node, with values
-  inline csRadTree(csRadPoly *n, csRadTree *l, csRadTree *r)
+  inline csRadTree(csRadElement *n, csRadTree *l, csRadTree *r)
   {element = n; left=l; right=r;}
+
   /// delete the tree, does not delete the elements.
   inline ~csRadTree() {if (left) delete left; if (right) delete right;}
 
-  /// Insert RadPoly into tree;
-  void Insert(csRadPoly *p);
-  /// Delete RadPoly from tree; returns new tree. does not delete element.
-  csRadTree* Delete(csRadPoly *p);
+  /// Insert RadElement into tree;
+  void Insert(csRadElement *e);
+
+  /// Delete RadElement from tree; returns new tree. does not delete element.
+  csRadTree* Delete(csRadElement *e);
+
   /// get element with highest priority. It is deleted, returns new tree.
-  csRadTree* PopHighest(csRadPoly*& p);
+  csRadTree* PopHighest(csRadElement*& e);
+
   /// get node priority
   inline float GetPriority() { return element->GetPriority(); }
+  
   /// traverse tree in in-order (from low to high), calling func(element).
-  void TraverseInOrder( void (*func)( csRadPoly * ) );
+  void TraverseInOrder( void (*func)( csRadElement * ) );
 };
 
 
@@ -288,20 +431,26 @@ private:
 public:
   /// create
   csRadList();
+  
   /// delete, also deletes all elements!
   ~csRadList();
 
   /// Insert an element
-  void InsertElement(csRadPoly *p);
+  void InsertElement(csRadElement *e);
+
   /// Delete an element
-  void DeleteElement(csRadPoly *p);
+  void DeleteElement(csRadElement *e);
+  
   /// get element with highest priority. It is also deleted.
-  csRadPoly *PopHighest();
+  csRadElement *PopHighest();
+
   /// print list on output
   void Print();
+  
   /// traverse in some order.
-  void Traverse( void (*func)( csRadPoly * ) ) 
+  void Traverse( void (*func)( csRadElement * ) ) 
   { if(tree) tree->TraverseInOrder(func); }
+
   /// get the number of elements in the list
   inline int GetNumElements() { return num; }
 };
@@ -367,7 +516,7 @@ private:
   /// lightness factor, built up to form_factor * diffuse * area.
   float factor;
   /// polys that are shooting / shot at.
-  csRadPoly *shoot_src, *shoot_dest;
+  csRadElement *shoot_src, *shoot_dest;
   /// lumels in worlds coords
   csVector3 src_lumel, dest_lumel;
   /// normals pointing towards shooting.
@@ -384,7 +533,7 @@ private:
   /// a lot of space.
   csRGBLightMap *texturemap;
   /// the shadows lying on the dest polygon, 1=full visible, 0=all shadow
-  csPolyTexture::csCoverageMatrix *shadow_matrix;
+  csCoverageMatrix *shadow_matrix;
   /// color from passing portals between source and dest polygon.
   csColor trajectory_color;
   /// color of source lumel for multiplying delta's with.
@@ -401,17 +550,17 @@ public:
   void DoRadiosity();
 
   /// get next best poly to shoot, or NULL if we should stop.
-  csRadPoly* FetchNext();
+  csRadElement* FetchNext();
   /// Start a sector frustum to shoot from the source. callback is used.
   void StartFrustum();
   /// found a destination polygon, test and process it
-  void ProcessDest(csRadPoly *dest, csFrustumView *lview);
+  void ProcessDest(csRadElement *dest, csFrustumView *lview);
   /// Shoot light from one polygon to another
-  void ShootRadiosityToPolygon(csRadPoly* dest);
+  void ShootRadiosityToElement(csRadElement* dest);
   /// Prepare to shoot from source poly
-  void PrepareShootSource(csRadPoly* src);
+  void PrepareShootSource(csRadElement* src);
   /// Prepare to shoot from source to dest, if false skip dest.
-  bool PrepareShootDest(csRadPoly* dest, csFrustumView *lview);
+  bool PrepareShootDest(csRadElement* dest, csFrustumView *lview);
   /// Prepare to shoot from a lumel
   void PrepareShootSourceLumel(int sx, int sy, int suv);
   /// Shoot it, dest lumel given.

@@ -19,78 +19,49 @@
 #include <math.h>
 #include "cssysdef.h"
 #include "csengine/bezier.h"
+#include "csgeom/vector3.h"
+#include "csgeom/vector2.h"
 
-//////////////////////////////////////////////
-//////////////////////////////////////////////
-// Cache interface
-//////////////////////////////////////////////
-//////////////////////////////////////////////
-#define BEZ_NR1 4
-#define BEZ_NR2 9
-#define BEZ_NR3 16
-#define BEZ_NR4 25
-#define BEZ_NR5 36
-#define BEZ_NR6 49
-#define BEZ_NR7 64
-#define BEZ_NR8 81
-#define BEZ_NR9 100
-
-#define BEZ_IND1 0
-#define BEZ_IND2 (BEZ_IND1+BEZ_NR1)
-#define BEZ_IND3 (BEZ_IND2+BEZ_NR2)
-#define BEZ_IND4 (BEZ_IND3+BEZ_NR3)
-#define BEZ_IND5 (BEZ_IND4+BEZ_NR4)
-#define BEZ_IND6 (BEZ_IND5+BEZ_NR5)
-#define BEZ_IND7 (BEZ_IND6+BEZ_NR6)
-#define BEZ_IND8 (BEZ_IND7+BEZ_NR7)
-#define BEZ_IND9 (BEZ_IND8+BEZ_NR8)
-#define BEZ_IND_ (BEZ_IND9+BEZ_NR9)
-
-#define BEZ_OFFS1 (BEZ_IND1*9)
-#define BEZ_OFFS2 (BEZ_IND2*9)
-#define BEZ_OFFS3 (BEZ_IND3*9)
-#define BEZ_OFFS4 (BEZ_IND4*9)
-#define BEZ_OFFS5 (BEZ_IND5*9)
-#define BEZ_OFFS6 (BEZ_IND6*9)
-#define BEZ_OFFS7 (BEZ_IND7*9)
-#define BEZ_OFFS8 (BEZ_IND8*9)
-#define BEZ_OFFS9 (BEZ_IND9*9)
-#define BEZ_OFFS_ (BEZ_IND_*9)
-
-#define BEZ_LUT_SIZE  BEZ_OFFS_ // Doubles
-
-// This should be approx. less than 82K
-TDtDouble bfactmap[BEZ_LUT_SIZE];
-TDtDouble bfactdumap[BEZ_LUT_SIZE];
-TDtDouble bfactdvmap[BEZ_LUT_SIZE];
-
-TDtInt bez_offsets[10] = 
+// Bezier offsets for calculating up to 10 control points
+int bezier_offsets[10] = 
 {
-  BEZ_OFFS1,
-  BEZ_OFFS2,
-  BEZ_OFFS3,
-  BEZ_OFFS4,
-  BEZ_OFFS5,
-  BEZ_OFFS6,
-  BEZ_OFFS7,
-  BEZ_OFFS8,
-  BEZ_OFFS9,
-  BEZ_OFFS_,
+  OFFSET_1,
+  OFFSET_2,
+  OFFSET_3,
+  OFFSET_4,
+  OFFSET_5,
+  OFFSET_6,
+  OFFSET_7,
+  OFFSET_8,
+  OFFSET_9,
+  OFFSET_10,
 };
 
+// An array of binomial coefficients for a 2nd degree polynomail
+double csBezier2::bincoeff[3] = {1,2,1};
 
-// Generate the Binomials
-static TDtDouble bez3bin[3] = {1,2,1};
+// This should be approx. less than 82K
+double csBezier2::bernsteinMap[LUT_SIZE];
+double csBezier2::bernsteinDuMap[LUT_SIZE];
+double csBezier2::bernsteinDvMap[LUT_SIZE];
 
-TDtDouble bfact(TDtDouble u, TDtInt j, TDtDouble v, TDtInt k)
+
+
+/// Evaulate the bernstien polynomial defined by the given j & k at u & v
+double csBezier2::BernsteinAt(double u, int j, double v, int k)
 {
-  return bez3bin[j]*bez3bin[k] *pow(u,j)*pow(1-u,2-j)*pow(v,k)*pow(1-v,2-k);
+  return bincoeff[j]*bincoeff[k] *pow(u,j)*pow(1-u,2-j)*pow(v,k)*pow(1-v,2-k);
 }
 
-static TDtDouble bfact_du(TDtDouble u, TDtInt j, TDtDouble v, TDtInt k)
+/**
+ * Evaluate the derivite of the Berstein polynomial defined by j & k with 
+ * respect to u at coordinates u, v
+ */
+double csBezier2::BernsteinDuAt(double u, int j, double v, int k)
 {
-  TDtDouble left=0;
-  TDtDouble right=0;
+  double left=0;
+  double right=0;
+
   if (j!=0)
   {
     left = j*pow(u,j-1)*pow(1-u,2-j);
@@ -99,14 +70,17 @@ static TDtDouble bfact_du(TDtDouble u, TDtInt j, TDtDouble v, TDtInt k)
   {
     right = pow(u,j)*(2-j)*pow(1-u,2-j-1);
   }
-  return bez3bin[j]*bez3bin[k] *pow(v,k)*pow(1-v,2-k) *( left - right );
+  return bincoeff[j] * bincoeff[k] * pow(v,k) * pow(1-v,2-k) * ( left - right );
 }
 
-
-static TDtDouble bfact_dv(TDtDouble u, TDtInt j, TDtDouble v, TDtInt k)
+/**
+ * Evaluate the derivite of the Berstein polynomial defined by j & k with 
+ * respect to v at coordinates u, v
+ */
+double csBezier2::BernsteinDvAt(double u, int j, double v, int k)
 {
-  TDtDouble left=0;
-  TDtDouble right=0;
+  double left=0;
+  double right=0;
 
   if (k!=0)
   {
@@ -116,136 +90,143 @@ static TDtDouble bfact_dv(TDtDouble u, TDtInt j, TDtDouble v, TDtInt k)
   {
     right = pow(v,k)*(2-k)*pow(1-v,2-k-1);
   }
-  return bez3bin[j]*bez3bin[k] *pow(u,j)*pow(1-u,2-j) *( left - right );
+  return bincoeff[j]*bincoeff[k] *pow(u,j)*pow(1-u,2-j) *( left - right );
 }
 
-
-
-
-// Call once!!!
-void BuildBezierLuts()
+csBezier2::csBezier2()
 {
-  TDtInt res;
-  TDtInt index=0;
+  int res;
+  int index=0;
   for (res=1;res<=9;res++)
   {
     // Test code
-    //TODO remove ? TDtInt indexshouldbe = bez_offsets[res-1];
-    
-    TDtInt i,j,k,l;
+    //TODO remove ? int indexshouldbe = bezier_offsets[res-1];
+  
+    int i,j,k,l;
     for (i=0;i<=res;i++)
     for (j=0;j<=res;j++)
     for (k=0;k<3;k++)
     for (l=0;l<3;l++)
     {
-      TDtDouble u=(1.0*i)/res, v=(1.0*j)/res;
-      bfactmap[index] = bfact(u,k,v,l);
-      bfactdumap[index] = bfact_du(u,k,v,l);
-      bfactdvmap[index] = bfact_dv(u,k,v,l);
+      double u=(1.0*i)/res, v=(1.0*j)/res;
+      bernsteinMap[index] = BernsteinAt (u,k,v,l);
+      bernsteinDuMap[index] = BernsteinDuAt (u,k,v,l);
+      bernsteinDvMap[index] = BernsteinDvAt (u,k,v,l);
       index++;
     }
   }
 }
 
-
-
-TDtDouble *BinomiumMap()
+csVector3 csBezier2::GetNormal(double** aControls, int u, 
+                                      int v, int resolution)
 {
-  return bfactmap;
-}
-
-
-void CrossProduct(TDtDouble *aDestination, TDtDouble* aSource1, TDtDouble* aSource2)
-{
-  aDestination[0] =   aSource1[1] * aSource2[2] - aSource1[2] * aSource2[1];
-  aDestination[1] = -(aSource1[0] * aSource2[2] - aSource1[2] * aSource2[0]);
-  aDestination[2] =   aSource1[0] * aSource2[1] - aSource1[1] * aSource2[0];
-}
-TDtDouble InProduct(TDtDouble* aSource1, TDtDouble* aSource2)
-{
-  TDtDouble result=0;
-  result += aSource1[0] * aSource2[0];
-  result += aSource1[1] * aSource2[1];
-  result += aSource1[2] * aSource2[2];
+  csVector3 result;
+  
+  // our normal is the cross product of the vector derivitives in the u & v
+  // directions
+  result = GetPoint (aControls,u,v,resolution,bernsteinDuMap) %
+           GetPoint (aControls,u,v,resolution,bernsteinDvMap);
+  
+  result.Normalize ();
+  
   return result;
 }
-void Normalize(TDtDouble* aVertex)
+
+csVector2 csBezier2::GetTextureCoord(double** aControls, int u, int v, 
+                                     int resolution, double *map)
 {
-  TDtDouble len;
-  len = sqrt(InProduct(aVertex,aVertex));
-  if (ABS (len) < 0.00001)
-    return;
-  aVertex[0] /= len;
-  aVertex[1] /= len;
-  aVertex[2] /= len;
-}  
+  if (!map)
+  {
+    map = bernsteinMap;
+  }
 
+  int j,k;
+  double *localmap = &map[bezier_offsets[resolution-1] + 9*(u + (resolution+1)*v) ];
 
-/* Formula:                      /2\  /2\
-// vtx = sum(j=0->2) sum(k=0->2) \j/  \k/ u^j(1-u)^(2-j) v^k(1-v)^(2-k) *P_jk
-*/
-void BezierNormal(TDtDouble *aResult, TDtDouble** aControls, TDtInt iu, TDtInt iv,TDtInt resolution)
-{
-  TDtDouble ddu[5], ddv[5];
-  BezierPoint(ddu,aControls,iu,iv,resolution,bfactdumap);
-  BezierPoint(ddv,aControls,iu,iv,resolution,bfactdvmap);
-  CrossProduct(aResult,ddu,ddv);
-  Normalize(aResult);
-}
-
-void BezierPoint(TDtDouble *aResult, TDtDouble** aControls, TDtInt iu, TDtInt iv, TDtInt resolution, 
-                          TDtDouble *map )
-{
-  TDtInt j,k;
-  TDtDouble *localmap = &map[bez_offsets[resolution-1] + 9*(iu + (resolution+1)*iv) ];
-
-  aResult[0] = aResult[1] = aResult[2] = aResult[3] = aResult[4] = 0;
+  csVector2 result(0,0);
 
   for (j=0;j<3;j++)
   {
     for (k=0;k<3;k++)
     {
-      TDtInt ctrlindex = j+3*k;
-      TDtDouble *ctrl = aControls[ ctrlindex ]; 
-      TDtDouble fact = localmap[ctrlindex];
-      aResult[0] += ctrl[0] * fact;
-      aResult[1] += ctrl[1] * fact;
-      aResult[2] += ctrl[2] * fact;
-      aResult[3] += ctrl[3] * fact;
-      aResult[4] += ctrl[4] * fact;
+      int ctrlindex = j+3*k;
+      double *ctrl = aControls[ ctrlindex ]; 
+      double fact = localmap[ctrlindex];
+      result.x += ctrl[3] * fact;
+      result.y += ctrl[4] * fact;
     }
   }
+
+  return result;
 }
 
 
-
-
-void BezierPoint(double *aResult, double** aControls, double u, double v,
-                          double (*func)(double, int, double, int) )
-
+csVector3 csBezier2::GetPoint(double** aControls, int u, int v, 
+                                     int resolution, double *map )
 {
-  aResult[0] = aResult[1] = aResult[2] = 0;
+  if (!map)
+  {
+    map = bernsteinMap;
+  }
+
+  int j,k;
+  double *localmap = &map[bezier_offsets[resolution-1] + 9*(u + (resolution+1)*v) ];
+
+  csVector3 result(0,0,0);
+
+  for (j=0;j<3;j++)
+  {
+    for (k=0;k<3;k++)
+    {
+      int ctrlindex = j+3*k;
+      double *ctrl = aControls[ ctrlindex ]; 
+      double fact = localmap[ctrlindex];
+      result.x += ctrl[0] * fact;
+      result.y += ctrl[1] * fact;
+      result.z += ctrl[2] * fact;
+      //aResult[3] += ctrl[3] * fact;
+      //aResult[4] += ctrl[4] * fact;
+    }
+  }
+
+  return result;
+}
+
+csVector3 csBezier2::GetPoint (double** aControls, double u, double v, 
+                               double (*f)(double, int, double, int) )
+{
+  if (!f)
+  {
+    f = BernsteinAt;
+  }
+
+  csVector3 result(0,0,0);
+
   int j,k;
   for (j=0;j<3;j++)
   {
     for (k=0;k<3;k++)
     {
-      int l;
       double *ctrl = aControls[j+3*k];
-      for (l=0;l<3;l++)
-      {
-        aResult[l] += ctrl[l] * func(u, j, v, k);
-      }
+      
+      result.x += ctrl[0] * f(u, j, v, k);
+      result.y += ctrl[1] * f(u, j, v, k);
+      result.z += ctrl[2] * f(u, j, v, k);
     }
   }
+
+  return result;
 }
 
-
-void BezierNormal(double *aResult, double** aControls, double u, double v)
+csVector3 csBezier2::GetNormal (double** aControls, double u, double v)
 {
-  double ddu[3], ddv[3];
-  BezierPoint(ddu,aControls,u,v,bfact_du);
-  BezierPoint(ddv,aControls,u,v,bfact_dv);
-  CrossProduct(aResult,ddu,ddv);
-  Normalize(aResult);
+  csVector3 result;
+  // our normal is the cross product of the vector derivitives in the u & v
+  // directions
+  result = GetPoint (aControls,u,v,BernsteinDuAt) %
+           GetPoint (aControls,u,v,BernsteinDvAt);
+  result.Normalize ();
+
+  return result;
 }
+

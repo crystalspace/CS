@@ -98,13 +98,22 @@ class csPolygonSet;
 class csThingTemplate;
 class csCurveTemplate;
 class csLightPatch;
+class csSector;
+class csRadCurve;
+struct csCoverageMatrix;
 
 /**
  * This is an abstract class for all curves in Crystal Space.
  */
 class csCurve : public csObject
 {
+  // allow csRadCurve to use our UV Buffers
+  friend csRadCurve;
+
 private:
+  // sector of this curve
+  csSector* sector;
+
   csTextureHandle* cstxt;
   // Pointer to the parent template.
   csCurveTemplate* parent_template;
@@ -116,7 +125,7 @@ private:
   // ShineDynLight)
   csReversibleTransform* _o2w;
 
-  /**
+  /*
    * Position Buffer: this is an array which coordinates u,v lightmap
    * pixel coordinates to the position on the curve in world space
    * coordinates.  
@@ -125,7 +134,7 @@ private:
    */
   csVector3* _uv2World;
 
-  /**
+  /*
    * Normal Buffer: this is an array which coordinates u,v lightmap
    * pixel coordinates to the normal of the curve  
    * i.e. in a 10x10 lightmap uv2Normal[5][5] is the normal vector which
@@ -143,17 +152,33 @@ public:
 
 public:
   ///
-  csCurve (csCurveTemplate* parent_tmpl) : csObject (), cstxt (NULL),
-  	parent_template (parent_tmpl), lightpatches(NULL), _o2w (NULL),
-	_uv2World (NULL), _uv2Normal (NULL), parent  (NULL),
-	lightmap (NULL), lightmap_up_to_date (false) {} 
-  ///
+  csCurve (csCurveTemplate* parent_tmpl) : csObject (), sector(NULL), 
+    cstxt (NULL),	parent_template (parent_tmpl), lightpatches(NULL), 
+    _o2w (NULL), _uv2World (NULL), _uv2Normal (NULL), parent  (NULL),
+	  lightmap (NULL), lightmap_up_to_date (false) {} 
+
+  /// Destructor
   virtual ~csCurve ();
 
+  /**
+   * Populate a coverage matrix which relates shadow information for this 
+   * curve's lightmap
+   */
+  void GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &cm) const;
 
+  /// return an approximation of the area of this curve
+  float GetArea();
+  
+  /// set the sector where this curve is located
+  void SetSector (csSector* s) { sector = s; }
+
+  /// return the sector where this curve is located
+  csSector* GetSector () const { return sector; }
+
+  /// Set the current object to world space transformation
   void SetObject2World (csReversibleTransform* o2w);
   
-  ///
+  /// Sets the parent polygonSet for this Curve
   void SetParent (csPolygonSet* p) { parent = p; }
 
   void MakeDirtyDynamicLights ();
@@ -301,7 +326,7 @@ public:
 /**
  * A specific curve implementation for Bezier curves.
  */
-class csBezier : public csCurve
+class csBezierCurve : public csCurve
 {
 private:
   /// The control points of this curve.
@@ -309,7 +334,7 @@ private:
   /// The texture coordinates of every control point.
   csVector2 texture_coords[3][3];
 
-  TDtDouble cpt[9][5];
+  double cpt[9][5];
 
   csCurveTesselated* previous_tesselation;
   int previous_resolution;
@@ -321,9 +346,9 @@ private:
 
 public:
   ///
-  csBezier (csBezierTemplate* parent_tmpl);
+  csBezierCurve (csBezierTemplate* parent_tmpl);
   ///
-  ~csBezier ();
+  ~csBezierCurve ();
 
   /// Tesselate this curve.
   virtual csCurveTesselated* Tesselate (int res);

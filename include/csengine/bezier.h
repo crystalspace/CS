@@ -19,36 +19,119 @@
 #ifndef __BEZIER_H__
 #define __BEZIER_H__
 
-#define TDtDouble double
-#define TDtFloat  float
-#define TDtInt    int
-#define TDtByte   unsigned char
+//////////////////////////////////////////////
+//////////////////////////////////////////////
+// Cache interface
+//////////////////////////////////////////////
+//////////////////////////////////////////////
+#define NR1 4
+#define NR2 9
+#define NR3 16
+#define NR4 25
+#define NR5 36
+#define NR6 49
+#define NR7 64
+#define NR8 81
+#define NR9 100
 
-// Must be called if bezier stuff is to be used!!!!
-void BuildBezierLuts();
-void BezierNormal(TDtDouble *aResult, TDtDouble** aControls, TDtInt iu, TDtInt iv,TDtInt resolution);
-void BezierPoint(TDtDouble *aResult, TDtDouble** aControls, TDtInt iu, TDtInt iv, TDtInt resolution, 
-                          TDtDouble *map );
+#define IND1  0
+#define IND2  (IND1+NR1)
+#define IND3  (IND2+NR2)
+#define IND4  (IND3+NR3)
+#define IND5  (IND4+NR4)
+#define IND6  (IND5+NR5)
+#define IND7  (IND6+NR6)
+#define IND8  (IND7+NR7)
+#define IND9  (IND8+NR8)
+#define IND10 (IND9+NR9)
 
+#define OFFSET_1  (IND1  * 9)
+#define OFFSET_2  (IND2  * 9)
+#define OFFSET_3  (IND3  * 9)
+#define OFFSET_4  (IND4  * 9)
+#define OFFSET_5  (IND5  * 9)
+#define OFFSET_6  (IND6  * 9)
+#define OFFSET_7  (IND7  * 9)
+#define OFFSET_8  (IND8  * 9)
+#define OFFSET_9  (IND9  * 9)
+#define OFFSET_10 (IND10 * 9)
 
-TDtDouble bfact(TDtDouble u, TDtInt j, TDtDouble v, TDtInt k);
-void BezierPoint(double *aResult, double** aControls, double u, double v,
-                          double (*func)(double, int, double, int) );
-void BezierNormal(double *aResult, double** aControls, double u, double v);
+#define LUT_SIZE  OFFSET_10 // Doubles
 
+class csVector3;
+class csVector2;
 
-TDtDouble *BinomiumMap();
-
-
-class csBezierCache
+class csBezier2
 {
- public:
-  csBezierCache();
+private:
+
+  // binary coefficients for a 2nd degree polynomial
+  static double bincoeff[3];
+  
+  // This should be approx. less than 82K
+  static double bernsteinMap[LUT_SIZE];
+  static double bernsteinDuMap[LUT_SIZE];
+  static double bernsteinDvMap[LUT_SIZE];
+
+public:
+
+  /// Constructor
+  csBezier2();
+
+  /// Evaulate the bernstien polynomial defined by the given j & k at u & v
+  static double BernsteinAt(double u, int j, double v, int k);
+
+  /**
+   * Evaluate the derivite of the Berstein polynomial defined by j & k with 
+   * respect to u at coordinates u, v
+   */
+  static double BernsteinDuAt(double u, int j, double v, int k);
+
+  /**
+   * Evaluate the derivite of the Berstein polynomial defined by j & k with 
+   * respect to v at coordinates u, v
+   */
+  static double BernsteinDvAt(double u, int j, double v, int k);
+
+  /**
+   * Find the normal at u, v where u, v are integers representing an index
+   * to a control point on the curve in the u and v directions respectively at
+   * the given resolution
+   *
+   * Formula:                      /2\/2\
+   * vtx = sum(j=0->2) sum(k=0->2) \j/\k/ u^j(1-u)^(2-j) v^k(1-v)^(2-k)*P_jk
+   */
+  static csVector3 GetNormal(double** aControls, int u, 
+                             int v, int resolution);
+
+  /**
+   * Find the normal at u,v where u and v a the parametric coordinates on the
+   * curve
+   */
+  static csVector3 GetNormal(double** aControls, double u, double v);
+
+  /**
+   * Find the point at u, v where u, v are integers representing an index
+   * to a control point on the curve in the u and v directions respectively at
+   * the given resolution
+   */
+  static csVector3 GetPoint(double** aControls, int u, int v, int resolution, 
+                            double *map = NULL);
+
+  /**
+   * Find the texture coordinates at u, v where u, v are integers 
+   * representing an index to a control point on the curve in the u and v 
+   * directions respectively at the given resolution
+   */
+  static csVector2 GetTextureCoord(double** aControls, int u, int v, 
+                                   int resolution, double *map = NULL);
+
+                            /**
+   * Find the point at u,v where u and v a the parametric coordinates on the
+   * curve
+   */
+  static csVector3 GetPoint(double** aControls, double u, double v, 
+                            double (*func)(double, int, double, int) = NULL );
 };
-inline csBezierCache::csBezierCache()
-{
-  BuildBezierLuts();
-}
-
 
 #endif

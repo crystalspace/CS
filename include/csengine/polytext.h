@@ -33,6 +33,26 @@ class Dumper;
 struct iTextureHandle;
 struct LightInfo;
 
+
+// a structure used to build the light coverage data
+struct csCoverageMatrix
+{
+  // The coverage array. Each float corresponds to a lightmap grid cell
+  // and contains the area of light cell that is covered by light.
+  float *coverage;
+  // The width and height of the coverage array
+  int width, height;
+
+  csCoverageMatrix (int w, int h)
+  { 
+    coverage = new float [ (width = w) * (height = h)]; 
+    memset (coverage, 0, w*h*sizeof(float)); 
+  }
+
+  ~csCoverageMatrix ()
+  { delete[]coverage; }
+};
+
 /**
  * This class represents a lighted texture for a polygon.
  */
@@ -168,21 +188,6 @@ public:
 
   /// Get the bounding rectangle of the whole lightmap in world space
   bool GetLightmapBounds (csFrustumView *lview, csVector3 *bounds);
-
-  // This is a private structure used while we build the light coverage data
-  struct csCoverageMatrix
-  {
-    // The coverage array. Each float corresponds to a lightmap grid cell
-    // and contains the area of light cell that is covered by light.
-    float *coverage;
-    // The width and height of the coverage array
-    int width, height;
-
-    csCoverageMatrix (int w, int h)
-    { coverage = new float [ (width = w) * (height = h)]; memset (coverage, 0, w*h*sizeof(float)); }
-    ~csCoverageMatrix ()
-    { delete[]coverage; }
-  };
 
   /// Get the coverage matrix for the associated lightmap
   void GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &cm);

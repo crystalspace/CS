@@ -338,63 +338,9 @@ void csPolyTexture::CreateBoundingTextureBox ()
 
 bool csPolyTexture::RecalculateDynamicLights ()
 {
-  if (!lm || !lm->dyn_dirty ) return false;
-
-  lm->dyn_dirty = false;
-
-  //---
-  // First copy the static lightmap to the real lightmap.
-  // Remember the real lightmap first so that we can see if
-  // there were any changes.
-  //---
-  long lm_size = lm->GetSize ();
-  csRGBLightMap& stmap = lm->GetStaticMap ();
-  csRGBLightMap& remap = lm->GetRealMap ();
-
-  memcpy (remap.GetMap (), stmap.GetMap (), 3 * lm_size);
-
-  //---
-  // Then add all pseudo-dynamic lights.
-  //---
-  csLight* light;
-  unsigned char* mapR, * mapG, * mapB;
-  float red, green, blue;
-  unsigned char* p, * last_p;
-  int l, s;
-
-  if (lm->first_smap)
-  {
-    csShadowMap* smap = lm->first_smap;
-
-    // Color mode.
-    do
-    {
-      mapR = remap.GetRed ();
-      mapG = remap.GetGreen ();
-      mapB = remap.GetBlue ();
-      light = smap->light;
-      red = light->GetColor ().red;
-      green = light->GetColor ().green;
-      blue = light->GetColor ().blue;
-      csLight::CorrectForNocolor (&red, &green, &blue);
-      p = smap->map;
-      last_p = p+lm_size;
-      do
-      {
-        s = *p++;
-        l = *mapR + QRound (red * s);
-        *mapR++ = l < 255 ? l : 255;
-        l = *mapG + QRound (green * s);
-        *mapG++ = l < 255 ? l : 255;
-        l = *mapB + QRound (blue * s);
-        *mapB++ = l < 255 ? l : 255;
-      }
-      while (p < last_p);
-
-      smap = smap->next;
-    }
-    while (smap);
-  }
+  // first combine the static and pseudo-dynamic lights
+  if (!lm || !lm->UpdateRealLightMap() )
+    return false;
 
   //---
   // Now add all dynamic lights.
@@ -552,7 +498,7 @@ bool csPolyTexture::CollectShadows (csFrustumView *lview, csPolygon3D *poly)
 
 static void __add_PutPixel (int x, int y, float area, void *arg)
 {
-  csPolyTexture::csCoverageMatrix *cm = (csPolyTexture::csCoverageMatrix *)arg;
+  csCoverageMatrix *cm = (csCoverageMatrix *)arg;
   if (x >= cm->width || y >= cm->height || x < 0 || y < 0)
   {
 #ifdef CS_DEBUG
@@ -566,7 +512,7 @@ static void __add_PutPixel (int x, int y, float area, void *arg)
 
 static void __add_DrawBox (int x, int y, int w, int h, void *arg)
 {
-  csPolyTexture::csCoverageMatrix *cm = (csPolyTexture::csCoverageMatrix *)arg;
+  csCoverageMatrix *cm = (csCoverageMatrix *)arg;
   if (x >= cm->width || y >= cm->height || x < 0 || y < 0 ||
       x + w > cm->width || y + h > cm->height || w < 0 || h < 0)
   {
@@ -588,7 +534,7 @@ static void __add_DrawBox (int x, int y, int w, int h, void *arg)
 
 static void __sub_PutPixel (int x, int y, float area, void *arg)
 {
-  csPolyTexture::csCoverageMatrix *cm = (csPolyTexture::csCoverageMatrix *)arg;
+  csCoverageMatrix *cm = (csCoverageMatrix *)arg;
   if (x >= cm->width || y >= cm->height || x < 0 || y < 0)
   {
 #ifdef CS_DEBUG
@@ -602,7 +548,7 @@ static void __sub_PutPixel (int x, int y, float area, void *arg)
 
 static void __sub_DrawBox (int x, int y, int w, int h, void *arg)
 {
-  csPolyTexture::csCoverageMatrix *cm = (csPolyTexture::csCoverageMatrix *)arg;
+  csCoverageMatrix *cm = (csCoverageMatrix *)arg;
   if (x >= cm->width || y >= cm->height || x < 0 || y < 0 ||
       x + w > cm->width || y + h > cm->height || w < 0 || h < 0)
   {
