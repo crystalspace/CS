@@ -25,11 +25,13 @@
 #include "csphyzik/debug.h"
 #include "csphyzik/contact.h"
 
-ctRigidBody::ctRigidBody()
+ctRigidBody::ctRigidBody() :
+  P(0), L(0)
 {
 }
 
-ctRigidBody::ctRigidBody( ctReferenceFrame &ref ) : ctDynamicEntity( ref )
+ctRigidBody::ctRigidBody( ctReferenceFrame &ref ) :
+  ctDynamicEntity( ref ), P(0), L(0)
 {
 
 }

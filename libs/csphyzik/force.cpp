@@ -23,13 +23,15 @@
 #include "csphyzik/refframe.h"
 #include "csphyzik/phyzent.h"
 
-ctForce::ctForce() : RF( ctReferenceFrame::universe() )
+ctForce::ctForce() :
+  RF( ctReferenceFrame::universe() ), direction(0), origin(0)
 {
 	RF.add_ref( RF );
 	magnitude = 1.0;
 }
 
-ctForce::ctForce( ctReferenceFrame &ref ) : RF( ref )
+ctForce::ctForce( ctReferenceFrame &ref ) :
+  RF( ref ), direction(0), origin(0)
 {
 	RF.add_ref( RF );
 }

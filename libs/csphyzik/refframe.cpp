@@ -21,8 +21,9 @@
 #include "sysdef.h"
 #include "csphyzik/refframe.h"
 
-ctReferenceFrame::ctReferenceFrame( coord px, coord py, coord pz, angle ppitch, angle proll, angle pyaw, ctReferenceFrame *ref )
+ctReferenceFrame::ctReferenceFrame( coord px, coord py, coord pz, angle ppitch, angle proll, angle pyaw, ctReferenceFrame *ref ): offset( px, py, pz )
 {
+  //!me what the hell is this.  Who writes this stuff?
   (void) ref;
   (void) pyaw;
   (void) proll;

@@ -40,7 +40,10 @@ public:
 	// static values
 	static double joint_friction;
 
-	ctJoint(){ 	q = qv = qa = 0; }
+	ctJoint() :
+    inboard_offset(0), outboard_offset(0), joint_axis(0)
+  { 	q = qv = qa = 0; }
+  
 	ctJoint( ctArticulatedBody *in, ctVector3 &in_offset, ctArticulatedBody *out, ctVector3 &out_offset );
 	
 	// add v and w (angular v) of the outboard link, contributed from joints state

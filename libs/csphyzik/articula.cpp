@@ -36,9 +36,10 @@ void ctArticulatedBody::set_joint_friction( double pfrict )
 	ctJoint::joint_friction = pfrict;
 
 }
-
+  	
 // constructor
-ctArticulatedBody::ctArticulatedBody()
+ctArticulatedBody::ctArticulatedBody() : 
+  r_fg(0)
 {
 	handle = NULL; inboard_joint = NULL; 
 	is_grounded = false;
@@ -47,7 +48,8 @@ ctArticulatedBody::ctArticulatedBody()
 }
 
 // construct with a handle
-ctArticulatedBody::ctArticulatedBody( ctRigidBody *phandle )
+ctArticulatedBody::ctArticulatedBody( ctRigidBody *phandle ) : 
+  r_fg(0)
 {
 	handle = phandle; inboard_joint = NULL; 
 	is_grounded = false;

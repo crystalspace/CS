@@ -26,12 +26,14 @@
 #include "csphyzik/solver.h"
 #include "csphyzik/debug.h"
 
-ctPhysicalEntity::ctPhysicalEntity() : RF( ctReferenceFrame::universe() )
+ctPhysicalEntity::ctPhysicalEntity() : 
+  RF( ctReferenceFrame::universe() ), v(0), w(0), F(0), T(0)
 {
   RF.add_ref( RF );
 }
 
-ctPhysicalEntity::ctPhysicalEntity( ctReferenceFrame &ref ) : RF( ref )
+ctPhysicalEntity::ctPhysicalEntity( ctReferenceFrame &ref ) :
+  RF( ref ), v(0), w(0), F(0), T(0)
 {
   RF.add_ref( RF );
 }
