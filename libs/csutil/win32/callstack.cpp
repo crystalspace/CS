@@ -474,22 +474,37 @@ csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc,
 
   symInit.Init ();
 
+  DWORD machineType;
   STACKFRAME64 frame;
   memset (&frame, 0, sizeof (frame));
-#ifdef CS_PROCESSOR_X86
+#if defined(CS_PROCESSOR_X86)
+#if (CS_PROCESSOR_SIZE == 32)
+  machineType = IMAGE_FILE_MACHINE_I386;
   frame.AddrPC.Offset = context.Eip;
   frame.AddrPC.Mode = AddrModeFlat;
   frame.AddrStack.Offset = context.Esp;
   frame.AddrStack.Mode = AddrModeFlat;
   frame.AddrFrame.Offset = context.Ebp;
   frame.AddrFrame.Mode = AddrModeFlat;
-#else
+#elif (CS_PROCESSOR_SIZE == 64)
+  // Reference: http://www.mcse.ms/archive108-2003-11-97141.html
+  machineType = IMAGE_FILE_MACHINE_IA64;
+  frame.AddrPC.Offset = context.StIIP;
+  frame.AddrPC.Mode = AddrModeFlat;
+  frame.AddrStack.Offset = context.IntSp;
+  frame.AddrStack.Mode = AddrModeFlat;
+  frame.AddrBStore.Offset = context.RsBSP;
+  frame.AddrBStore.Mode = AddrModeFlat;
+#else // CS_PROCESSOR_SIZE
+#error Do not know how to stack walk for your processor word size.
+#endif // CS_PROCESSOR_SIZE
+#else // CS_PROCESSOR_FOO
 #error Do not know how to stack walk for your platform.
-#endif
+#endif // CS_PROCESSOR_FOO
 
   int count = 0;
   cswinCallStack* stack = new cswinCallStack;
-  while (DbgHelp::StackWalk64 (IMAGE_FILE_MACHINE_I386, hProc,
+  while (DbgHelp::StackWalk64 (machineType, hProc,
     hThread, &frame, &context, 0, DbgHelp::SymFunctionTableAccess64, 
     DbgHelp::SymGetModuleBase64, 0))
   {
