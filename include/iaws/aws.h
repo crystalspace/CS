@@ -408,6 +408,9 @@ struct iAwsComponent : public iAwsSource
   /// Gets the minimum size that the component can be
   virtual csRect getMinimumSize()=0;
 
+  /// Gets the inset amounts that are needed to fit components properly.
+  virtual csRect getInsets()=0;
+
   /// Returns true if this window overlaps the given rect.
   virtual bool Overlaps(csRect &r)=0;
 
@@ -489,6 +492,10 @@ SCF_VERSION (iAwsWindow, 0, 0, 1);
 
 struct iAwsWindow : public iAwsComponent
 {
+
+  /// Returns the named TYPE of the component, like "Radio Button", etc.
+  virtual char *Type()=0;
+
   /// Sets the value of the redraw tag
   virtual void SetRedrawTag(unsigned int tag)=0;
 
@@ -527,6 +534,15 @@ struct iAwsWindow : public iAwsComponent
 
   /// Gets the engine view for this window
   virtual iView *GetEngineView()=0;
+
+  /// Gets the preferred size of the component
+  virtual csRect getPreferredSize()=0;
+
+  /// Gets the minimum size that the component can be
+  virtual csRect getMinimumSize()=0;
+
+  /// Gets the inset amounts that are needed to fit components properly.
+  virtual csRect getInsets()=0;
 };
 
 
