@@ -603,13 +603,13 @@ CS_EMIT_BUILD_FLAGS([[how to ignore unknown #pragma directives]],
 #------------------------------------------------------------------------------
 CS_EMIT_BUILD_FLAGS([how to enable C++ exceptions],
     [cs_cv_prog_cxx_enable_exceptions], [CS_CREATE_TUPLE([-fexceptions])],
-    [C++], [COMPILER.C++FLAGS.EXCEPTIONS.ENABLE], [])
+    [C++], [COMPILER.C++FLAGS.EXCEPTIONS.ENABLE])
 
 CS_EMIT_BUILD_FLAGS([how to disable C++ exceptions],
     [cs_cv_prog_cxx_disable_exceptions], [CS_CREATE_TUPLE([-fno-exceptions])],
     [C++], [COMPILER.C++FLAGS.EXCEPTIONS.DISABLE], [],
-	[CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS],
-	    [$cs_cv_prog_cxx_disable_exceptions], [+])])
+    [CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS],
+	[$cs_cv_prog_cxx_disable_exceptions], [+])])
 
 
 
@@ -723,6 +723,15 @@ CS_CHECK_BUILD_FLAGS([if -shared is accepted], [cs_cv_prog_link_shared],
 CS_CHECK_BUILD([if -soname is accepted], [cs_cv_prog_link_soname], [],
     [CS_CREATE_TUPLE([-Wl,-soname,foobar])], [C++],
     [CS_EMIT_BUILD_PROPERTY([PLUGIN.LFLAGS.USE_SONAME], [yes])])
+
+
+
+#------------------------------------------------------------------------------
+# Check if compiler recognizes -fPIC directive, which is needed by some
+# platforms when building plugin modules and shared libraries.
+#------------------------------------------------------------------------------
+CS_EMIT_BUILD_FLAGS([if -fPIC is accepted], [cs_cv_prog_cxx_fpic],
+   [CS_CREATE_TUPLE([-fPIC])], [C++], [COMPILER.CFLAGS.PIC])
 
 
 
@@ -1219,8 +1228,8 @@ AS_IF([test "$cs_cv_libz" = yes && test "$cs_cv_libjpeg" = yes],
 
 
 #------------------------------------------------------------------------------
-# Check for libmikmod.  In addition to the standard installed locations, we
-# also search CS/libs/libmikmod*.
+# Check for MikMod.  In addition to the standard installed locations, we also
+# search CS/libs/libmikmod*.
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([mikmod],
     [AC_LANG_PROGRAM(
@@ -1235,9 +1244,8 @@ CS_CHECK_LIB_WITH([mikmod],
 
 
 #------------------------------------------------------------------------------
-# Check for libogg/libvorbis/libvorbisfile.  In addition to the standard
-# installed locations, we also search CS/libs/libogg*, CS/libs/libvorbis.*,
-# CS/libs/libvorbisfile*.
+# Check for Ogg/Vorbis.  In addition to the standard installed locations, we
+# also search CS/libs/libogg*, CS/libs/libvorbis.*, CS/libs/libvorbisfile*.
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([ogg],
     [AC_LANG_PROGRAM(
@@ -1293,7 +1301,7 @@ AS_IF([test $cs_cv_lib3ds = yes],
 
 
 #------------------------------------------------------------------------------
-# Check for libode.  In addition to the standard installed locations, we also
+# Check for ODE.  In addition to the standard installed locations, we also
 # search CS/libs/libode*.  Also check if it is a sufficiently recent version.
 # Finally, the cs-win32libs package uses a slightly augmented libode in which
 # functions are exported as `extern "C"' to avoid name mangling problems which
@@ -1339,7 +1347,7 @@ AS_IF([test $cs_cv_libode_recent = yes],
 
 
 #------------------------------------------------------------------------------
-# Check for libopenal.
+# Check for OpenAL.
 #------------------------------------------------------------------------------
 # CS_AL_INCLUDE(CPP-MACRO,FALLBACK,HEADER)
 AC_DEFUN([CS_AL_INCLUDE],
@@ -1434,7 +1442,7 @@ AS_IF([test $cs_cv_libmingwex = yes],
 
 
 #------------------------------------------------------------------------------
-# Check for cal3d.
+# Check for Cal3D.
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([cal3d],
     [AC_LANG_PROGRAM([[#include <cal3d/cal3d.h>]],
@@ -2051,10 +2059,7 @@ AC_DEFUN([CS_CHECK_QSQRT],
     AC_REQUIRE([CS_CHECK_OPTIMIZE_FLAGS])
     AC_REQUIRE([CS_CHECK_FORCE_CPUSUBTYPE_ALL])
     AS_IF([test $ac_compiler_gnu = yes],
-	[AC_CACHE_CHECK([if $CXX recognizes -fPIC], [cs_cv_prog_cxx_fpic],
-	    [CS_BUILD_IFELSE([], [CS_CREATE_TUPLE([-fPIC])], [C++],
-	    [cs_cv_prog_cxx_fpic=-fPIC], [cs_cv_prog_cxx_fpic=no])])
-	AC_CACHE_CHECK([if csQsqrt() compiles], [cs_cv_cxx_qsqrt_ok],
+	[AC_CACHE_CHECK([if csQsqrt() compiles], [cs_cv_cxx_qsqrt_ok],
 	    [cs_qsqrt_cflags="$cs_optimize_flags"
 	    AS_IF([test $cs_cv_prog_cxx_fpic != no],
 		[cs_qsqrt_cflags="$cs_qsqrt_cflags $cs_cv_prog_cxx_fpic"])

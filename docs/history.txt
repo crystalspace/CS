@@ -17,6 +17,9 @@ chronological order.
 	  some platforms. Also changed the check to look for <divx/decore.h>
 	  rather than <decore.h> since ${prefix}/divx is the default
 	  installation location.
+	- Eric Sunshine upgraded unix.jam so that it respects the result of the
+	  configure.ac `-fPIC' check rather than being hard-coded to assume
+	  that all compilers understand this option.
 13-Oct-2004
 	- Eric Sunshine removed invocation of the non-portable
 	  CS_ALLOC_STACK_ARRAY() from isdir() in cssysdef.h since this is a

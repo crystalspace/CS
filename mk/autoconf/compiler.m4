@@ -45,36 +45,39 @@
 AC_DEFUN([CS_PROG_CC],[
     AC_PROG_CC
     AS_IF([test -n "$CC"],[
-	CS_JAMCONFIG_PROPERTY([CMD.CC], [$CC])
+	CS_EMIT_BUILD_PROPERTY([CMD.CC], [$CC])
 
 	CFLAGS=`echo "$CFLAGS" | sed 's/\-O.//g;s/\-g.//g'`
-	CS_JAMCONFIG_PROPERTY([COMPILER.CFLAGS], [$CPPFLAGS $CFLAGS], [+])
+	CS_EMIT_BUILD_PROPERTY([COMPILER.CFLAGS], [$CPPFLAGS $CFLAGS], [+])
     ])
 ])
 
 AC_DEFUN([CS_PROG_CXX],[
     AC_PROG_CXX
     AS_IF([test -n "$CXX"],[
-	CS_JAMCONFIG_PROPERTY([CMD.C++], [$CXX])
+	CS_EMIT_BUILD_PROPERTY([CMD.C++], [$CXX])
 
         CXXFLAGS=`echo "$CXXFLAGS" | sed 's/\-O.//g;s/-g.//g'`
-	CS_JAMCONFIG_PROPERTY([COMPILER.C++FLAGS], [$CPPFLAGS $CXXFLAGS], [+])
+	CS_EMIT_BUILD_PROPERTY([COMPILER.C++FLAGS], [$CPPFLAGS $CXXFLAGS], [+])
+
+	CS_EMIT_BUILD_FLAGS([if -fPIC is accepted], [cs_cv_prog_cxx_fpic],
+	   [CS_CREATE_TUPLE([-fPIC])], [C++], [COMPILER.CFLAGS.PIC])
     ])
 ])
 
 AC_DEFUN([CS_PROG_LINK],[
     AS_IF([test -n "$CXX"],
-	[CS_JAMCONFIG_PROPERTY([CMD.LINK], [AS_ESCAPE([$(CMD.C++)])])],
-	[CS_JAMCONFIG_PROPERTY([CMD.LINK], [AS_ESCAPE([$(CMD.CC)])])])
+	[CS_EMIT_BUILD_PROPERTY([CMD.LINK], [AS_ESCAPE([$(CMD.C++)])])],
+	[CS_EMIT_BUILD_PROPERTY([CMD.LINK], [AS_ESCAPE([$(CMD.CC)])])])
 
-    CS_JAMCONFIG_PROPERTY([COMPILER.LFLAGS], [$LDFLAGS], [+])
+    CS_EMIT_BUILD_PROPERTY([COMPILER.LFLAGS], [$LDFLAGS], [+])
 
     CS_CHECK_BUILD_FLAGS([if -shared is accepted], [cs_cv_prog_link_shared],
 	[CS_CREATE_TUPLE([-shared])], [C++],
-	[CS_JAMCONFIG_PROPERTY([PLUGIN.LFLAGS], [-shared], [+])], [],
+	[CS_EMIT_BUILD_PROPERTY([PLUGIN.LFLAGS], [-shared], [+])], [],
 	[], [], [], [nrecognize])
 
     CS_CHECK_BUILD([if -soname is accepted], [cs_cv_prog_link_soname], [],
 	[CS_CREATE_TUPLE([-Wl,-soname,foobar])], [C++],
-	[CS_JAMCONFIG_PROPERTY([PLUGIN.LFLAGS.USE_SONAME], [yes])])
+	[CS_EMIT_BUILD_PROPERTY([PLUGIN.LFLAGS.USE_SONAME], [yes])])
 ])
