@@ -517,9 +517,10 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   wc.cbClsExtra     = 0;
   wc.cbWndExtra     = 0;
 
-  bool bResult;
-  bResult = RegisterClass (&wc);
-  ASSERT (bResult);
+  bool bResult = false;
+  if (RegisterClass (&wc))
+    bResult = true;
+
   m_hCursor = LoadCursor (0, IDC_ARROW);
 
   iEventQueue* q = CS_QUERY_REGISTRY (registry, iEventQueue);
@@ -741,13 +742,13 @@ static void WinKeyTrans (WPARAM wParam, bool down, iEventOutlet* outlet)
 }
 #endif
 
-long FAR PASCAL Win32Assistant::WindowProc (HWND hWnd, UINT message,
+long WINAPI Win32Assistant::WindowProc (HWND hWnd, UINT message,
   WPARAM wParam, LPARAM lParam)
 {
   switch (message)
   {
     case WM_ACTIVATEAPP:
-      ApplicationActive = wParam;
+      if (wParam) { ApplicationActive = true; } else { ApplicationActive = false; }
 #ifndef DO_DINPUT_KEYBOARD
       memset (&LastCharCode, 0, sizeof (LastCharCode));
 #endif
@@ -775,7 +776,7 @@ long FAR PASCAL Win32Assistant::WindowProc (HWND hWnd, UINT message,
         {
 	  iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
           outlet->Key (key, wParam, true);
-          LastCharCode [scancode] = wParam;
+          LastCharCode [scancode] = (unsigned char) wParam;
         }
       }
       break;
