@@ -57,16 +57,20 @@ csTerrFuncObject::csTerrFuncObject (iSystem* pSys,
   initialized = false;
   blockx = 4;
   blocky = 4;
-  gridx[0] = 4; gridy[0] = 4;
-  gridx[1] = 3; gridy[1] = 3;
-  gridx[2] = 2; gridy[2] = 2;
-  gridx[3] = 1; gridy[3] = 1;
+  gridx[0] = 8; gridy[0] = 8;
+  gridx[1] = 6; gridy[1] = 6;
+  gridx[2] = 4; gridy[2] = 4;
+  gridx[3] = 3; gridy[3] = 3;
   topleft.Set (0, 0, 0);
   scale.Set (1, 1, 1);
   normals[0] = NULL;
   normals[1] = NULL;
   normals[2] = NULL;
   normals[3] = NULL;
+  trimesh[0] = NULL;
+  trimesh[1] = NULL;
+  trimesh[2] = NULL;
+  trimesh[3] = NULL;
   dirlight_numbers[0] = NULL;
   dirlight_numbers[1] = NULL;
   dirlight_numbers[2] = NULL;
@@ -79,6 +83,10 @@ csTerrFuncObject::csTerrFuncObject (iSystem* pSys,
   base_color.blue = 0;
   height_func = TerrFunc;
   normal_func = NULL;
+  block_centers = NULL;
+  lod_sqdist1 = 100*100;
+  lod_sqdist2 = 200*200;
+  lod_sqdist3 = 300*300;
 }
 
 csTerrFuncObject::~csTerrFuncObject ()
@@ -95,6 +103,7 @@ csTerrFuncObject::~csTerrFuncObject ()
   delete[] dirlight_numbers[2];
   delete[] dirlight_numbers[3];
   delete[] materials;
+  delete[] block_centers;
 }
 
 void csTerrFuncObject::LoadMaterialGroup (iEngine* engine, const char *pName,
@@ -170,6 +179,25 @@ void csTerrFuncObject::SetupObject ()
   {
     initialized = true;
     if (!materials) materials = new iMaterialWrapper* [blockx * blocky];
+
+    delete[] block_centers;
+    block_centers = new csVector3 [blockx * blocky];
+    int bx, by;
+    int blidx = 0;
+    for (by = 0 ; by < blocky ; by++)
+    {
+      float dy = (float (by)+.5) / float (blocky);
+      for (bx = 0 ; bx < blockx ; bx++, blidx++)
+      {
+        float dx = (float (bx)+.5) / float (blockx);
+	csVector3 tl = topleft;
+	tl.x += (float (bx) + .5)*scale.x;
+	tl.y += height_func (height_func_data, dx, dy)*scale.y;
+	tl.z += (float (by) + .5)*scale.z;
+	block_centers[blidx] = tl;
+      }
+    }
+    
     int lod;
     for (lod = 0 ; lod < 4 ; lod++)
     {
@@ -188,7 +216,7 @@ void csTerrFuncObject::SetupObject ()
     for (lod = 0 ; lod < 4 ; lod++)
     {
       G3DTriangleMesh* meshes = trimesh[lod];
-      int bx, by, gx, gy;
+      int gx, gy;
       for (by = 0 ; by < blocky ; by++)
         for (bx = 0 ; bx < blockx ; bx++)
 	{
@@ -300,6 +328,7 @@ void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
   iCamera* pCamera = rview->GetCamera ();
 
   csReversibleTransform& camtrans = pCamera->GetTransform ();
+  const csVector3& origin = camtrans.GetOrigin ();
   iClipper2D* pClipper = rview->GetClipper ();
   pG3D->SetObjectToCamera (&camtrans);
   pG3D->SetClipper (pClipper->GetClipPoly (), pClipper->GetNumVertices ());
@@ -309,12 +338,19 @@ void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
 
   int bx, by;
   int blidx = 0;
+  csVector3 tl = topleft;
   for (by = 0 ; by < blocky ; by++)
   {
     for (bx = 0 ; bx < blockx ; bx++, blidx++)
     {
-      RecomputeLighting (0, bx, by);
-      G3DTriangleMesh* meshes = trimesh[0];
+      csVector3& bc = block_centers[blidx];
+      int lod = 0;
+      //float sqdist = csSquaredDist::PointPoint (bc, origin);
+      //if (sqdist > lod_sqdist1) lod++;
+      //if (sqdist > lod_sqdist2) lod++;
+      //if (sqdist > lod_sqdist3) lod++;
+      RecomputeLighting (lod, bx, by);
+      G3DTriangleMesh* meshes = trimesh[lod];
       G3DTriangleMesh* m = &meshes[blidx];
       m->mat_handle[0] = materials[blidx]->GetMaterialHandle ();
       if (!m->mat_handle[0])
@@ -403,3 +439,4 @@ iTerrainObjectFactory* csTerrFuncObjectType::NewFactory()
   csTerrFuncObjectFactory *pFactory = new csTerrFuncObjectFactory (pSystem);
   return (iTerrainObjectFactory*)pFactory;
 }
+

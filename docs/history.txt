@@ -35,6 +35,9 @@ The history order has been reversed so that new features are at the top.
 	  Also LOD is not really implemented at the moment.
 	- Removed SKYDOME keyword from thing loader. Skydomes can now
 	  be done using the ball mesh plugin.
+	- Fixed an initialization bug in the new terrain engine. It should
+	  now work.
+	- Also started working a little on LOD support. Not finished yet.
 11-Apr-2001
 	- Norman Kramer fixed ptlab.
 	- Norman Kramer fixed the video app so that it works completely

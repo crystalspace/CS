@@ -48,6 +48,11 @@ private:
   csTerrainNormalFunction* normal_func;
   void* height_func_data;
   void* normal_func_data;
+  // Precomputed centers of blocks for LOD.
+  csVector3* block_centers;
+  float lod_sqdist1;
+  float lod_sqdist2;
+  float lod_sqdist3;
 
   // For directional lighting.
   bool do_dirlight;
