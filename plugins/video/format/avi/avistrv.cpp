@@ -61,8 +61,8 @@ bool csAVIStreamVideo::Initialize (const csAVIFormat::AVIHeader *ph,
   pChunk = new csAVIFormat::AVIDataChunk;
   pChunk->currentframe = -1;
   pChunk->currentframepos = NULL;
-  sprintf (pChunk->id, "%02dd", nStreamNumber);
-  pChunk->id[3] = '\0';
+  sprintf (pChunk->id, "%02dd%c", nStreamNumber, pf->compression == 0 ? 'b' : 'c');
+  pChunk->id[4] = '\0';
 
   nStream = nStreamNumber;
   if (pSystem) pSystem->DecRef ();
@@ -259,8 +259,25 @@ void csAVIStreamVideo::NextFrame ()
   }
 }
 
+//#define yuvmmx
+#ifdef yuvmmx
+extern "C"{
+void yuv2rgba_mmx (unsigned char* ybuffer, unsigned char* ubuffer, 
+		   unsigned char* vbuffer, unsigned char* outbuffer, 
+		   int width, int height);
+}
+#endif
 void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
 {
+#ifdef yuvmmx
+  unsigned char *ydata = (unsigned char *)data[0];
+  unsigned char *udata = (unsigned char *)data[1];
+  unsigned char *vdata = (unsigned char *)data[2];
+  csRGBpixel *pixel = (csRGBpixel *)memimage.GetImageData ();
+  yuv2rgba_mmx (ydata, udata, vdata, (unsigned char *)pixel, 
+		strdesc.width, strdesc.height);
+
+#else
 #define FIX_RANGE(x) (unsigned char)((x)>255.f ? 255 : (x) < 0.f ? 0 : (x))
 
   char *ydata = data[0];
@@ -319,6 +336,7 @@ void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
   }
 
 #undef FIX_RANGE
+#endif
 }
 
 void csAVIStreamVideo::rgb_channel_2_rgba_interleave (char *data[3])

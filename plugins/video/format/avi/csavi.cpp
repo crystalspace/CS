@@ -61,6 +61,7 @@ csAVIFormat::~csAVIFormat ()
     Unload ();
     pFile->DecRef ();
     delete [] pData;
+    if (pChunkList) delete pChunkList;
   }
 
   if (pSystem) pSystem->DecRef ();
@@ -98,6 +99,9 @@ bool csAVIFormat::Load (iFile *pVideoData)
     pFile->DecRef ();
     if (pData) 
       delete [] pData;
+    if (pChunkList) 
+      delete pChunkList;
+    pChunkList = NULL;
     pData = NULL;
     pFile = NULL;
   }
@@ -218,6 +222,18 @@ bool csAVIFormat::InitVideoData ()
 	    no_recl = true;
 	  else
 	    no_recl = false;
+
+	  // optionally we may find an idx1 list here
+	  if ((aviheader.flags & AVIHeader::HASINDEX) && pData + datalen > moviendpos+len_hcl)
+	  {
+	    memcpy (&movi, moviendpos, len_hcl);
+	    movi.Endian ();
+	    if (movi.Is (CHUNK_IDX1))
+	    {
+	      pChunkList = new ChunkList (startframepos - len_id);
+	      pChunkList->LoadList ((UByte*)(moviendpos + len_hcl), movi.size);
+	    }
+	  }
 	}
       }
       else
@@ -336,11 +352,11 @@ ULong csAVIFormat::CreateStream (StreamHeader *streamheader)
   return n;
 }
 
-bool csAVIFormat::HasChunk (ULong frameindex)
+bool csAVIFormat::HasChunk (ULong id, ULong frameindex)
 {
   bool bSucc = false;
   if (pChunkList)
-    bSucc = pChunkList->HasChunk (frameindex);
+    bSucc = pChunkList->HasChunk (id, frameindex);
   else
   {
     // bad, no chunklist. skip through the data and count it down
@@ -377,29 +393,20 @@ bool csAVIFormat::GetChunk (ULong frameindex, AVIDataChunk *pChunk)
   char *pp = NULL;
   ULong maxsize=0, n=0;
 
-  if (HasChunk (frameindex))
+  if (HasChunk (*(ULong*)pChunk->id, frameindex))
   {
     if (!pChunk->currentframepos)
       pChunk->currentframepos = startframepos;
     if (pChunkList)
     {
-      pp = pChunkList->GetPos (frameindex);
-      hcl ch;
-      memcpy (&ch, pp, len_hcl);
-      ch.Endian ();
-      if (!no_recl)
-      {
-	pp += len_hcl + len_id; 
-	// no we are positioned right before the first data chunk within the <rec> list
-	maxsize = AVI_EVEN(ch.size) - len_id;
-      }
-      else
-      {
-	maxsize = AVI_EVEN(ch.size) + len_id;
-      }
+      bool succ = pChunkList->GetPos (*(ULong*)pChunk->id, frameindex, 
+				      pp, pChunk->length);
+      pChunk->data = (csSome)(pp + len_hcl);
+      pChunk->currentframe = frameindex;
+      return succ;
     }
     else
-    {  
+    {  // no index list
       ULong startfrom = (frameindex < (ULong)pChunk->currentframe ? 0 
 			 : frameindex <= maxframe ? pChunk->currentframe : maxframe);
       pp = (frameindex < (ULong)pChunk->currentframe ? startframepos
@@ -443,7 +450,7 @@ bool csAVIFormat::GetChunk (ULong frameindex, AVIDataChunk *pChunk)
     {
       memcpy (&chunk, pp, len_hcl);
       chunk.Endian ();
-      if (!strncmp (pChunk->id, chunk.id, 3))
+      if (!strncmp (pChunk->id, chunk.id, 4))
       {
 	pChunk->data = pp + len_hcl;
 	pChunk->length = chunk.size;
@@ -517,3 +524,39 @@ iStream* csAVIFormat::streamiterator::GetNext ()
    return NULL;
 }
 
+
+void csAVIFormat::ChunkList::LoadList (UByte *data, ULong length)
+{
+  ULong i, nEntries = length / sizeof(indexentry);
+  indexentry *ie = (indexentry*)data;
+  int idx;
+
+  for (i = 0; i < nEntries; i++)
+  {
+    ie->Endian ();
+    idx = streamlist.FindKey ((csSome)ie->id);
+    if (idx == -1)
+      idx = streamlist.Push (new StreamIdx (ie->id));
+    streamlist.Get (idx)->Push (ie);
+    ie++;
+  }
+}
+
+bool csAVIFormat::ChunkList::HasChunk (ULong id, ULong idx)
+{
+  int i = streamlist.FindKey ((csSome)id);
+  return (i == -1 ? false : idx < (ULong)streamlist.Get (i)->Length ());
+}
+
+bool csAVIFormat::ChunkList::GetPos (ULong id, ULong idx, char *&pos, ULong &size)
+{
+  int i = streamlist.FindKey ((csSome)id);
+  if (i != -1)
+  {
+    indexentry *ie = streamlist.Get (i)->Get (idx);
+    pos = start + ie->offset;
+    size = ie->length;
+    return true;
+  }
+  return false;
+}

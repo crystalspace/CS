@@ -37,7 +37,11 @@ endif
 
 INC.CSAVI = $(wildcard plugins/video/format/avi/*.h)
 SRC.CSAVI = $(wildcard plugins/video/format/avi/*.cpp)
-OBJ.CSAVI = $(addprefix $(OUT),$(notdir $(SRC.CSAVI:.cpp=$O)))
+#SRC.CSAVI += $(wildcard plugins/video/format/avi/*.asm)
+OBJ.CSAVI = $(addprefix $(OUT),$(notdir $(subst .asm,$O,$(SRC.CSAVI:.cpp=$O))))
+
+NASMFLAGS.CSAVI = -i./plugins/video/renderer/software/i386/
+
 DEP.CSAVI = CSGFXLDR CSUTIL CSSYS
 CFG.CSAVI = 
 
@@ -54,6 +58,9 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: csavi csaviclean
 csavi: $(OUTDIRS) $(CSAVI)
+
+#$(OUT)%$O: plugins/video/format/avi/%.asm
+#	$(DO.COMPILE.ASM) $(NASMFLAGS.CSAVI)
 
 $(CSAVI): $(OBJ.CSAVI) $(LIB.CSAVI)
 	$(DO.PLUGIN)

@@ -48,10 +48,66 @@ class csAVIFormat : public iStreamFormat
   // @@@TODO: handle optional chunklists in AVI files
   class ChunkList
   {
+    enum { 
+      LIST     = 0x00000001, // the chunk is a list
+      KEYFRAME = 0x00000010, // frame is a keyframe
+      NOTIME   = 0x00000100, // dont use this frame for time calculations - it takes no time 
+                             // (palette change for example)
+      COMPUSE  = 0x0fff0000  // masks the bits used for compression
+    };
+
+    struct indexentry
+    {
+      ULong id;
+      ULong flags;
+      ULong offset;
+      ULong length;
+      void Endian ()
+      { 
+	id = little_endian_long (id); 
+	flags = little_endian_long (flags); 
+	offset = little_endian_long (offset); 
+	length = little_endian_long (length); 
+      }
+    };
+
+    class StreamIdx : public csVector
+    {
+    public:
+      ULong id;
+    public:
+      StreamIdx (ULong id) : csVector (8,8) {this->id = id;}
+      virtual ~StreamIdx (){}
+      virtual indexentry *Get (int idx)const {return (indexentry*)csVector::Get(idx); }
+    };
+
+    class StreamList : public csVector
+    {
+    public:
+      StreamList () : csVector (8, 8){}
+      virtual ~StreamList () {}
+      virtual int Compare (csSome Item1, csSome Item2, int) const
+      { 
+	StreamIdx *i1 = (StreamIdx*)Item1, *i2 = (StreamIdx*)Item2;
+        return (i1->id < i2->id ? -1 : i1->id > i2->id ? 1 : 0);
+      }
+      virtual int CompareKey (csSome Item1, csConstSome Item2, int) const
+      { 
+	StreamIdx *i1 = (StreamIdx*)Item1;
+	ULong id = (ULong)Item2;
+        return (i1->id < id ? -1 : i1->id > id ? 1 : 0);
+      }
+      virtual StreamIdx *Get (int idx)const {return (StreamIdx*)csVector::Get(idx); }
+      virtual bool FreeItem (csSome Item) { delete (StreamIdx*)Item; return true; }
+    };
+
+    StreamList streamlist;
+    char *start;
   public:
-    ChunkList () {}
-    bool HasChunk (ULong idx){(void)idx; return false;}
-    char *GetPos (ULong idx) {(void)idx; return NULL;}
+    ChunkList (char *start) {this->start = start;}
+    void LoadList (UByte *data, ULong length);
+    bool HasChunk (ULong id, ULong idx);
+    bool GetPos (ULong id, ULong idx, char *&pos, ULong &size);
   };
 
   friend class streamiterator;
@@ -60,7 +116,7 @@ class csAVIFormat : public iStreamFormat
 
   struct AVIDataChunk
   {
-    char id[4];
+    char id[5];
     SLong currentframe;
     char *currentframepos;
     void *data;
@@ -102,6 +158,14 @@ class csAVIFormat : public iStreamFormat
 
   struct AVIHeader
   {
+    enum { 
+      HASINDEX       = 0x00000010,
+      MUSTUSEINDEX   = 0x00000020,
+      ISINTERLEAVED  = 0x00000100,
+      TRUSTCKTYPE    = 0x00000800,
+      WASCAPTUREFILE = 0x00010000,
+      COPYRIGHTED    = 0x00020000
+    };
     ULong msecperframe; // milliseconds per frame
     ULong maxbytespersec; // max. transfer rate in bytes/sec
     ULong padsize;
@@ -243,7 +307,7 @@ class csAVIFormat : public iStreamFormat
   bool InitVideoData ();
   bool ValidateStreams ();
   ULong CreateStream (StreamHeader *streamheader);
-  bool HasChunk (ULong frameindex);
+  bool HasChunk (ULong id, ULong frameindex);
   bool GetChunk (ULong frameindex, AVIDataChunk *pChunk);
   UShort stream_number (const char c1, const char c2);
 
