@@ -32,10 +32,10 @@ from the following location:
 @uref{http://sourceforge.net/project/showfiles.php?group_id=649}
 
 @noindent
-Levels and data for Crystal Space can be downloaded via @sc{ftp} from
-sunsite.dk:
+Levels and data for Crystal Space's current stable release can be
+downloaded via @sc{ftp} from sunsite.dk:
 
-@uref{ftp://sunsite.dk/pub/projects/crystal/cs094/}
+@uref{ftp://sunsite.dk/pub/projects/crystal/cs096}
 
 @noindent
 Older release data and separate packages may also be found one directory up
@@ -82,12 +82,12 @@ all of the historical information and administrative information.
 @anchor{Documentation Resources}
 Documentation is included with the Crystal Space distribution.  A gateway to
 all documentation can be found in the file @file{CS/docs/README.html}.  You can
-also read the @cite{Crystal Space User's Manual} with your web browser by
-loading the file @file{CS/docs/html/index.html}, as well as the @cite{Crystal
-Space Public API Reference Manual} by viewing the file
+read the local copy of the @cite{Crystal Space User's Manual} with your
+web browser by loading the file @file{CS/docs/html/index.html}, or the
+@cite{Crystal Space Public API Reference Manual} by viewing the file 
 @file{CS/docs/pubapi/index.html}.
 
-Documentation is also available for online viewing.  The @cite{Crystal Space
+Documentation is available for online viewing.  The @cite{Crystal Space
 User's Manual} is available for online viewing at this location:
 
 @url{http://crystal.sourceforge.net/docs/online/manual/}
@@ -167,7 +167,7 @@ unsubscribing.
 
 @uref{http://lists.sourceforge.net/mailman/listinfo/crystal-cvs/}
 
-There is also a mailing list which keeps track of documentation annotations.
+There is a mailing list which keeps track of documentation annotations.
 This mailing list receives automated messages every time someone adds a comment
 to one of the pages of the online documentation.
 
