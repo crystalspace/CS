@@ -86,7 +86,13 @@ if $(PYTHON.AVAILABLE) = "yes"
   MakeLocate $(pythmod) : $(LOCATE_TARGET) ;
   Depends $(pythmod) : $(pythmodobj) ;
   LinkPlugin $(pythmod) : $(pythmodobj) ;
-  SystemInstallPlugin $(pythmod) ;
+
+  rule InstallPythmod
+  {
+    local plugindir = $(appdatadir) ; # Temporary override of global plugindir.
+    SystemInstallPlugin $(1) : $(2) ;
+  }
+  InstallPythmod $(pythmod) : python ;
 
   Always pythmodclean ;
   NotFile pythmodclean ;
