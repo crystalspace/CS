@@ -509,7 +509,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[],
     G2D = QUERY_PLUGIN_ID (this, CS_FUNCID_CANVAS, iGraphics2D);
   Sound = QUERY_PLUGIN_ID (this, CS_FUNCID_SOUND, iSoundRender);
   NetDrv = QUERY_PLUGIN_ID (this, CS_FUNCID_NETDRV, iNetworkDriver);
-  Console = QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsole);
+  Console = QUERY_PLUGIN_ID (this, CS_FUNCID_CONSOLE, iConsoleOutput);
   MotionMan = QUERY_PLUGIN_ID (this, CS_FUNCID_MOTION, iMotionManager);
 
   // Check if the minimal required drivers are loaded
@@ -1013,7 +1013,7 @@ iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iFuncID,
       if (ret)
       {
         QueryOptions (p);
-        return p;
+        return ret;
       }
     }
     Printf (MSG_WARNING, "WARNING: failed to initialize plugin `%s'\n", iClassID);

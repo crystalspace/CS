@@ -20,6 +20,7 @@
 #ifndef __IVARIA_CONOUT_H__
 #define __IVARIA_CONOUT_H__
 
+#include <stdarg.h>
 #include "isys/plugin.h"
 
 class csRect;
@@ -42,14 +43,14 @@ enum
   csConInsertCursor
 };
 
-SCF_VERSION (iConsole, 1, 0, 0);
+SCF_VERSION (iConsoleOutput, 2, 0, 0);
 
 /**
- * This is the Crystal Space Console interface. It is an output only system.
- * It can be used in conjunction with the iConsoleInput interface in iconinp.h
- * to form an interactive console.
+ * This is the Crystal Space Console interface.  It is an output only system.
+ * It can be used in conjunction with the iConsoleInput interface to form an
+ * interactive console.
  */
-struct iConsole : public iPlugIn
+struct iConsoleOutput : public iBase
 {
   /**
    * Put some text to the console. Console acts like a simple
@@ -141,10 +142,11 @@ struct iConsole : public iPlugIn
    */
   virtual void RegisterPlugin (iPlugIn *iClient) = 0;
 
-  /**
-   * Implement simple extension commands.
-   */
+  /// Implement simple extension commands.
   virtual bool ConsoleExtension (const char *iCommand, ...) = 0;
+
+  /// Implement simple extension commands.
+  virtual bool ConsoleExtension (const char *iCommand, va_list) = 0;
 };
 
-#endif // ! __IVARIA_CONOUT_H__
+#endif // __IVARIA_CONOUT_H__

@@ -51,13 +51,13 @@ extern WalkTest* Sys;
 csEngine* csCommandProcessor::engine = NULL;
 csCamera* csCommandProcessor::camera = NULL;
 iGraphics3D* csCommandProcessor::g3d = NULL;
-iConsole* csCommandProcessor::console = NULL;
+iConsoleOutput* csCommandProcessor::console = NULL;
 iSystem* csCommandProcessor::system = NULL;
 iFile* csCommandProcessor::script = NULL;
 // Additional command handler
 csCommandProcessor::CmdHandler csCommandProcessor::ExtraHandler = NULL;
 
-void csCommandProcessor::Initialize (csEngine* engine, csCamera* camera, iGraphics3D* g3d, iConsole* console, iSystem* system)
+void csCommandProcessor::Initialize (csEngine* engine, csCamera* camera, iGraphics3D* g3d, iConsoleOutput* console, iSystem* system)
 {
   csCommandProcessor::engine = engine;
   csCommandProcessor::camera = camera;

@@ -16,26 +16,25 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CSCON_H__
-#define __CS_CSCON_H__
+#ifndef __CSCONOUT_H__
+#define __CSCONOUT_H__
 
 #include "ivaria/conout.h"
-#include "csutil/scf.h"
+#include "isys/plugin.h"
 #include "csutil/csrect.h"
 #include "csgfxldr/rgbpixel.h"
 
 struct iGraphics2D;
 struct iGraphics3D;
-struct iTextureManager;
 class csConsoleBuffer;
 
-class csConsole : public iConsole
+class csConsoleOutput : public iConsoleOutput
 {
 public:
   DECLARE_IBASE;
 
-  csConsole (iBase *base);
-  virtual ~csConsole ();
+  csConsoleOutput (iBase *base);
+  virtual ~csConsoleOutput ();
 
   /// Initialize the console
   virtual bool Initialize (iSystem *);
@@ -142,14 +141,23 @@ public:
   virtual void RegisterPlugin (iPlugIn *iClient)
   { Client = iClient; }
 
-  /**
-   * Implement simple extension commands.
-   */
+  /// Implement simple extension commands.
   virtual bool ConsoleExtension (const char *iCommand, ...);
 
-protected:
-  virtual void GetPosition (int &x, int &y, int &width, int &height) const;
-  virtual void SetPosition (int x, int y, int width = -1, int height = -1);
+  /// Implement simple extension commands.
+  virtual bool ConsoleExtension (const char *iCommand, va_list);
+
+  // Implement iPlugIn interface.
+  struct eiPlugIn : public iPlugIn
+  {
+    DECLARE_EMBEDDED_IBASE(csConsoleOutput);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
+  } scfiPlugIn;
+
+private:
+  void GetPosition (int &x, int &y, int &width, int &height) const;
+  void SetPosition (int x, int y, int width = -1, int height = -1);
   void Invalidate (csRect &area);
   void DeleteText (int start, int end);
   void CacheColors ();
@@ -179,4 +187,4 @@ protected:
   int fg, bg;
 };
 
-#endif // ! __CS_CSCON_H__
+#endif // __CSCONOUT_H__

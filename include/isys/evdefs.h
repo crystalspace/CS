@@ -346,7 +346,7 @@ enum
    * This message is sent to the client associated with a console
    * when console visibility status changes.
    *<pre>
-   * IN: (iConsole *) the console object
+   * IN: (iConsoleOutput *) the console object
    *</pre>
    */
   cscmdConsoleStatusChange,

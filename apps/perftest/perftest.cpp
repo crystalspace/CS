@@ -232,7 +232,7 @@ int main (int argc, char* argv[])
   System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
   System->RequestPlugin ("crystalspace.font.server.default:FontServer");
   System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
-  System->RequestPlugin ("crystalspace.console.output.standard:Console");
+  System->RequestPlugin ("crystalspace.console.output.standard:Console.Output");
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.

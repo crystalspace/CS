@@ -18,22 +18,32 @@
 */
 
 #include "cssysdef.h"
+#include "csconin.h"
 #include "csutil/util.h"
-#include "simpinp.h"
 #include "ivaria/conout.h"
 #include "isys/system.h"
 #include "isys/event.h"
 
-IMPLEMENT_IBASE (csSimpleInput)
-  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_IBASE (csConsoleInput)
   IMPLEMENTS_INTERFACE (iConsoleInput)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csSimpleInput)
+IMPLEMENT_EMBEDDED_IBASE (csConsoleInput::eiPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_EMBEDDED_IBASE_END
 
-csSimpleInput::csSimpleInput (iBase *iParent) : History (16, 16)
+IMPLEMENT_FACTORY (csConsoleInput)
+
+EXPORT_CLASS_TABLE (csconin)
+  EXPORT_CLASS (csConsoleInput, "crystalspace.console.input.standard",
+    "Crystal Space standard input console")
+EXPORT_CLASS_TABLE_END
+
+csConsoleInput::csConsoleInput (iBase *iParent) : History (16, 16)
 {
   CONSTRUCT_IBASE (iParent);
+  CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   Callback = NULL;
   Console = NULL;
   Prompt = NULL;
@@ -47,7 +57,7 @@ csSimpleInput::csSimpleInput (iBase *iParent) : History (16, 16)
   MaxLines = 50;
 }
 
-csSimpleInput::~csSimpleInput ()
+csConsoleInput::~csConsoleInput ()
 {
   delete [] Prompt;
   if (Console)
@@ -57,16 +67,15 @@ csSimpleInput::~csSimpleInput ()
   }
 }
 
-bool csSimpleInput::Initialize (iSystem *iSys)
+bool csConsoleInput::Initialize (iSystem *iSys)
 {
-  // It is not needed to call System->CallOnEvents since application
-  // will usually pass events to us directly
+  // It is not necessary to call System->CallOnEvents since application
+  // will usually pass events to us directly.
   (void)iSys;
-
   return true;
 }
 
-bool csSimpleInput::HandleEvent (iEvent &Event)
+bool csConsoleInput::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {
@@ -174,7 +183,7 @@ bool csSimpleInput::HandleEvent (iEvent &Event)
   return false;
 }
 
-void csSimpleInput::Bind (iConsole *iCon)
+void csConsoleInput::Bind (iConsoleOutput *iCon)
 {
   if (Console)
   {
@@ -185,7 +194,7 @@ void csSimpleInput::Bind (iConsole *iCon)
   if (Console)
   {
     Console->IncRef ();
-    Console->RegisterPlugin (this);
+    Console->RegisterPlugin (&scfiPlugIn);
   }
   delete [] line;
   linemax = Console->GetMaxLineWidth ();
@@ -194,31 +203,31 @@ void csSimpleInput::Bind (iConsole *iCon)
   Refresh ();
 }
 
-const char *csSimpleInput::GetText (int iLine) const
+const char *csConsoleInput::GetText (int iLine) const
 {
   return ((iLine >= -1) && (iLine < History.Length ())) ?
          History.Get (iLine == -1 ? History.Length () - 1 : iLine) : NULL;
 }
 
-int csSimpleInput::GetCurLine () const
+int csConsoleInput::GetCurLine () const
 {
   return History.Length () - 1;
 }
 
-void csSimpleInput::SetBufferSize (int iSize)
+void csConsoleInput::SetBufferSize (int iSize)
 {
   MaxLines = (iSize >= 0) ? iSize : 0;
   while (History.Length () > MaxLines)
     History.Delete (0);
 }
 
-void csSimpleInput::Clear ()
+void csConsoleInput::Clear ()
 {
   History.DeleteAll ();
   Refresh ();
 }
 
-void csSimpleInput::SetPrompt (const char *iPrompt)
+void csConsoleInput::SetPrompt (const char *iPrompt)
 {
   delete [] Prompt;
   Prompt = strnew (iPrompt);
@@ -226,7 +235,7 @@ void csSimpleInput::SetPrompt (const char *iPrompt)
   Refresh ();
 }
 
-void csSimpleInput::Refresh ()
+void csConsoleInput::Refresh ()
 {
   if (!Console || !Console->GetVisible ()) return;
   Console->PutText (MSG_CONSOLE, "\r");

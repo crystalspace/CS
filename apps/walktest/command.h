@@ -25,7 +25,7 @@
 class csSystemDriver;
 class csEngine;
 class csCamera;
-struct iConsole;
+struct iConsoleOutput;
 struct iSystem;
 
 /**
@@ -45,7 +45,7 @@ private:
   /// The iSystem interface to use.
   static iSystem* system;
   /// The console.
-  static iConsole* console;
+  static iConsoleOutput* console;
 
   /**
    * If this variable is non-NULL there is a running script from
@@ -55,7 +55,7 @@ private:
 
 public:
   /// Call this first.
-  static void Initialize (csEngine* engine, csCamera* camera, iGraphics3D* g3d, iConsole* console, iSystem* system);
+  static void Initialize (csEngine* engine, csCamera* camera, iGraphics3D* g3d, iConsoleOutput* console, iSystem* system);
 
   /// This method can be set as a console input callback
   static void perform_callback (void *, const char *command);

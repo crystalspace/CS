@@ -2,7 +2,7 @@
 # to build the simple console plug-in.
 
 # Plug-in description
-DESCRIPTION.simpcon = Crystal Space simple console plug-in
+DESCRIPTION.simpcon = Crystal Space simple output console
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/simpcon
+vpath %.cpp plugins/console/output/simple
 
 ifeq ($(USE_PLUGINS),yes)
   SIMPCON = $(OUTDLL)simpcon$(DLL)
@@ -42,10 +42,10 @@ else
   TO_INSTALL.STATIC_LIBS += $(SIMPCON)
 endif
 
-INC.SIMPCON = $(wildcard plugins/simpcon/*.h)
-SRC.SIMPCON = $(wildcard plugins/simpcon/*.cpp)
+INC.SIMPCON = $(wildcard plugins/console/output/simple/*.h)
+SRC.SIMPCON = $(wildcard plugins/console/output/simple/*.cpp)
 OBJ.SIMPCON = $(addprefix $(OUT),$(notdir $(SRC.SIMPCON:.cpp=$O)))
-DEP.SIMPCON = CSGEOM CSSYS CSUTIL
+DEP.SIMPCON = CSSYS CSUTIL
 
 MSVC.DSP += SIMPCON
 DSP.SIMPCON.NAME = simpcon

@@ -20,7 +20,8 @@
 
 PLUGINS += video/renderer/software
 PLUGINS += filesys/vfs
-PLUGINS += simpcon
+PLUGINS += console/output/simple
+PLUGINS += console/input/standard
 PLUGINS += colldet/rapid
 PLUGINS += perfstat
 PLUGINS += font/server/csfont 
@@ -37,7 +38,8 @@ PLUGINS += mesh/object/ball     mesh/loader/ball
 PLUGINS += terrain/object/ddg   terrain/loader/ddg
 PLUGINS.DYNAMIC += video/renderer/line video/renderer/null video/renderer/inf
 PLUGINS.DYNAMIC += sound/loader
-PLUGINS.DYNAMIC += cscon
+PLUGINS.DYNAMIC += console/output/standard
+PLUGINS.DYNAMIC += console/output/fancy
 PLUGINS.DYNAMIC += csclear
 PLUGINS.DYNAMIC += dungeon
 PLUGINS.DYNAMIC += engine

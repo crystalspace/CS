@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Norman Krämer
+    Copyright (C) 2000 by Norman Krmer
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,83 +20,122 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include "cssysdef.h"
-#include "ivaria/conout.h"
+#include "fancycon.h"
 #include "ivideo/graph2d.h"
-#include "isys/system.h"
+#include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/material.h"
-#include "iengine/material.h"
 #include "isys/event.h"
+#include "isys/vfs.h"
 #include "csutil/csrect.h"
-#include "csutil/scf.h"
 #include "csutil/csstring.h"
 #include "csutil/cfgacc.h"
-#include "funcon.h"
-#include "conbuffr.h"
-#include "iutil/cfgfile.h"
 #include "csgfxldr/csimage.h"
 
-IMPLEMENT_IBASE(funConsole)
-  IMPLEMENTS_INTERFACE(iConsole)
-  IMPLEMENTS_INTERFACE(iPlugIn)
+IMPLEMENT_IBASE(csFancyConsole)
+  IMPLEMENTS_INTERFACE(iConsoleOutput)
+  IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)
 IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY(funConsole)
+IMPLEMENT_EMBEDDED_IBASE (csFancyConsole::eiPlugIn)
+  IMPLEMENTS_INTERFACE(iPlugIn)
+IMPLEMENT_EMBEDDED_IBASE_END
 
-funConsole::funConsole (iBase *base) : csConsole (NULL)
+IMPLEMENT_FACTORY(csFancyConsole)
+
+EXPORT_CLASS_TABLE (fancycon)
+  EXPORT_CLASS (csFancyConsole, "crystalspace.console.output.fancy",
+		"Crystal Space fancy output console")
+EXPORT_CLASS_TABLE_END
+
+csFancyConsole::csFancyConsole (iBase *p) :
+  System(0), VFS(0), base(0), G2D(0), G3D(0), border_computed(false),
+  pix_loaded(false), system_ready(false), auto_update(true), visible(true)
 {
-  CONSTRUCT_IBASE (base);
-  border_computed = false;
-  pix_loaded = false;
+  CONSTRUCT_IBASE (p);
+  CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
 }
 
-funConsole::~funConsole ()
+csFancyConsole::~csFancyConsole ()
 {
+  if (G2D)
+    G2D->DecRef ();
+  if (G3D)
+    G3D->DecRef ();    
+  if (base)
+    base->DecRef ();
   if (VFS)
     VFS->DecRef ();
+  if (System)
+    System->DecRef ();
 }
 
-bool funConsole::Initialize (iSystem *system) 
+bool csFancyConsole::Initialize (iSystem *system) 
 {
-  bool succ = csConsole::Initialize ( system );
+  (System = system)->IncRef();
 
-  outersize.Set ( size );
-  if (!G3D)
-    return false;
   VFS = QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
   if (!VFS)
     return false;
 
-  // Tell system driver that we want to handle broadcast events
-  if (!System->CallOnEvents (this, CSMASK_Broadcast))
+  csConfigAccess ini(System, "/config/fancycon.cfg");
+  char const* baseclass = ini->GetStr("FancyConsole.General.Superclass",
+    "crystalspace.console.output.standard");
+  base = LOAD_PLUGIN(System, baseclass, 0, iConsoleOutput);
+  if (!base)
     return false;
 
-  return succ;
+  G3D = QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
+  if (!G3D)
+    return false;
+  G2D = G3D->GetDriver2D ();
+  G2D->IncRef ();
+
+  // Tell system driver that we want to handle broadcast events
+  if (!System->CallOnEvents (&scfiPlugIn, CSMASK_Broadcast))
+    return false;
+
+  int x, y, w, h;
+  base->ConsoleExtension("GetPos", &x, &y, &w, &h);
+  outersize.Set (x, y, x + w, y + h);
+
+  return true;
 }
 
-bool funConsole::HandleEvent (iEvent &Event)
+bool csFancyConsole::HandleEvent (iEvent &Event)
 {
-  if (Event.Type == csevBroadcast
-   && Event.Command.Code == cscmdSystemOpen
-   && !pix_loaded)
+  switch (Event.Type)
   {
-    LoadPix ();
-    pix_loaded = true;
+    case csevBroadcast:
+      switch (Event.Command.Code)
+      {
+        case cscmdSystemOpen:
+          system_ready = true;
+	  if (!pix_loaded)
+	  {
+	    LoadPix ();
+	    pix_loaded = true;
+	  }
+          return true;
+        case cscmdSystemClose:
+          system_ready = false;
+          return true;
+      }
+      break;
   }
-  return csConsole::HandleEvent (Event);
+  return false;
 }
 
-void funConsole::PutText (int iMode, const char *iText)
+void csFancyConsole::PutText (int iMode, const char *iText)
 {
-  bool old_auto_update = auto_update;
-  auto_update = false;
-
-  csConsole::PutText (iMode, iText);
-
-  auto_update = old_auto_update;
+  base->AutoUpdate(false);
+  base->PutText (iMode, iText);
+  base->AutoUpdate(auto_update);
   if (auto_update && system_ready && G3D->BeginDraw (CSDRAW_2DGRAPHICS))
   {
-    G2D->Clear (bg);
+    int bgcolor;
+    base->ConsoleExtension("GetBackgroundColor", &bgcolor);
+    G2D->Clear (bgcolor);
     csRect rect2;
     Draw2D (&rect2);
 
@@ -109,7 +148,7 @@ void funConsole::PutText (int iMode, const char *iText)
   }
 }
 
-void funConsole::Draw3D (csRect *oArea)
+void csFancyConsole::Draw3D (csRect *oArea)
 {
   if (!visible) return;
 
@@ -122,13 +161,16 @@ void funConsole::Draw3D (csRect *oArea)
     // determine what space left to draw the actual console
     memset (&bordersize, 0, sizeof (bordersize));
     if (deco.border [0].mat)
-      deco.border [0].mat->GetTexture ()->GetMipMapDimensions(0, bordersize.xmin, bordersize.ymin);
-    if ( deco.border[2].mat )
-      deco.border [2].mat->GetTexture ()->GetMipMapDimensions(0, bordersize.xmax, bordersize.ymax);
+      deco.border [0].mat->GetTexture ()->GetMipMapDimensions(
+        0, bordersize.xmin, bordersize.ymin);
+    if (deco.border[4].mat)
+      deco.border [4].mat->GetTexture ()->GetMipMapDimensions(
+        0, bordersize.xmax, bordersize.ymax);
 
-    SetTransparency (true); // other wise 2D-part will overdraw all we paint here
+    SetTransparency (true); // Otherwise 2D-part will overdraw what we paint.
     border_computed = true;
-    SetPosition (outersize.xmin, outersize.ymin, outersize.Width (), outersize.Height ());
+    SetPosition (
+      outersize.xmin, outersize.ymin, outersize.Width (), outersize.Height ());
   }
 
   zBuf = G3D->GetRenderState (G3DRENDERSTATE_ZBUFFERMODE);
@@ -143,6 +185,12 @@ void funConsole::Draw3D (csRect *oArea)
   // do we draw gouraud/flat or with texture ?
  
   bool with_color = deco.bgnd.mat == NULL;
+
+  csRect size (outersize);
+  size.xmin +=  bordersize.xmin - deco.p2lx - deco.lx;
+  size.xmax += -bordersize.ymax + deco.p2rx + deco.rx;
+  size.ymin +=  bordersize.ymin - deco.p2ty - deco.ty;
+  size.ymax += -bordersize.ymax + deco.p2by + deco.by;
 
   poly.num = 4;
   poly.vertices [0].sx = size.xmin;
@@ -198,21 +246,29 @@ void funConsole::Draw3D (csRect *oArea)
     G3D->SetRenderState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE, true);
   
   // draw the top left decoration
-  DrawBorder (outersize.xmin, height-outersize.ymin, bordersize.xmin, bordersize.ymin, deco.border[0], 0);
+  DrawBorder (outersize.xmin, height-outersize.ymin, bordersize.xmin,
+    bordersize.ymin, deco.border[0], 0);
   // draw the top decoration
-  DrawBorder (p2size.xmin-deco.p2lx, height-outersize.ymin, p2size.Width()+deco.p2lx+deco.p2rx, bordersize.ymin,  deco.border[1], 1);
+  DrawBorder (p2size.xmin-deco.p2lx, height-outersize.ymin,
+    p2size.Width()+deco.p2lx+deco.p2rx, bordersize.ymin,  deco.border[1], 1);
   // draw the top right decoration
-  DrawBorder (p2size.xmax, height-outersize.ymin, bordersize.xmax, bordersize.ymin, deco.border[2], 0);
+  DrawBorder (p2size.xmax, height-outersize.ymin, bordersize.xmax,
+    bordersize.ymin, deco.border[2], 0);
   // draw the right decoration
-  DrawBorder (p2size.xmax, height-p2size.ymin+deco.p2ty, bordersize.xmax, p2size.Height()+deco.p2by+deco.p2ty, deco.border[3], 2);
+  DrawBorder (p2size.xmax, height-p2size.ymin+deco.p2ty, bordersize.xmax,
+    p2size.Height()+deco.p2by+deco.p2ty, deco.border[3], 2);
   // draw the bottom right decoration
-  DrawBorder (p2size.xmax, height-p2size.ymax, bordersize.xmax, bordersize.ymax, deco.border[4], 0);
+  DrawBorder (p2size.xmax, height-p2size.ymax, bordersize.xmax,
+    bordersize.ymax, deco.border[4], 0);
   // draw the bottom decoration
-  DrawBorder (p2size.xmin-deco.p2lx, height-p2size.ymax, p2size.Width()+deco.p2lx+deco.p2rx, bordersize.ymax, deco.border[5], 3);
+  DrawBorder (p2size.xmin-deco.p2lx, height-p2size.ymax,
+    p2size.Width()+deco.p2lx+deco.p2rx, bordersize.ymax, deco.border[5], 3);
   // draw the bottom left decoration
-  DrawBorder (outersize.xmin, height-p2size.ymax, bordersize.xmin, bordersize.ymax, deco.border[6], 0);
+  DrawBorder (outersize.xmin, height-p2size.ymax, bordersize.xmin,
+    bordersize.ymax, deco.border[6], 0);
   // draw the left decoration
-  DrawBorder (outersize.xmin, height-p2size.ymin+deco.p2ty, bordersize.xmin, p2size.Height()+deco.p2by+deco.p2ty, deco.border[7], 4);
+  DrawBorder (outersize.xmin, height-p2size.ymin+deco.p2ty, bordersize.xmin,
+    p2size.Height()+deco.p2by+deco.p2ty, deco.border[7], 4);
   
   G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zBuf);
   G3D->SetRenderState (G3DRENDERSTATE_TEXTUREMAPPINGENABLE, btext);
@@ -222,7 +278,7 @@ void funConsole::Draw3D (csRect *oArea)
     *oArea = outersize;
 }
 
-void funConsole::DrawBorder (int x, int y, int width, int height,
+void csFancyConsole::DrawBorder (int x, int y, int width, int height,
   ConDecoBorder &border, int align)
 {
   if (border.mat)
@@ -255,7 +311,6 @@ void funConsole::DrawBorder (int x, int y, int width, int height,
         w = width;
         break;
     }
-    //    printf("%d, %d,%d,%d,%d\n", align, x,y,w,height);
     
     if (!border.do_stretch)
     {
@@ -303,31 +358,32 @@ void funConsole::DrawBorder (int x, int y, int width, int height,
   }
 }
 
-void funConsole::SetPosition (int x, int y, int width, int height)
+void csFancyConsole::SetPosition (int x, int y, int width, int height)
 {
-  csConsole::SetPosition (x, y, width, height);
-
+  base->ConsoleExtension("SetPos", x, y, width, height);
+  base->ConsoleExtension("GetPos", &x, &y, &width, &height);
+  csRect size;
+  size.Set (x, y, x + width, y + height);
   outersize.Set (size);
   p2size.Set (size);
-  p2size.xmin = p2size.xmin + bordersize.xmin;// - deco.p2lx;
-  p2size.xmax = p2size.xmax - bordersize.xmax;// + deco.p2rx;
-  p2size.ymin = p2size.ymin + bordersize.ymin;// - deco.p2ty;
-  p2size.ymax = p2size.ymax - bordersize.ymax;// + deco.p2by;
+  p2size.xmin +=  bordersize.xmin; // - deco.p2lx;
+  p2size.xmax += -bordersize.xmax; // + deco.p2rx;
+  p2size.ymin +=  bordersize.ymin; // - deco.p2ty;
+  p2size.ymax += -bordersize.ymax; // + deco.p2by;
 
   if (border_computed)
   {
-    size.xmin = size.xmin + bordersize.xmin - deco.p2lx - deco.lx;
-    size.xmax = size.xmax - bordersize.ymax + deco.p2rx + deco.rx;
-    size.ymin = size.ymin + bordersize.ymin - deco.p2ty - deco.ty;
-    size.ymax = size.ymax - bordersize.ymax + deco.p2by + deco.by;
-    //    printf("%d %d %d %d %d %d %d\n", bordersize.xmin, deco.p2lx,   deco.lx, size.xmin, size.xmax, size.ymin, size.ymax );
-    //    printf("%d %d %d %d\n", outersize.xmin, outersize.xmax, outersize.ymin, outersize.ymax );
+    size.xmin +=  bordersize.xmin - deco.p2lx - deco.lx;
+    size.xmax += -bordersize.xmax + deco.p2rx + deco.rx;
+    size.ymin +=  bordersize.ymin - deco.p2ty - deco.ty;
+    size.ymax += -bordersize.ymax + deco.p2by + deco.by;
     // call again with the final size
-    csConsole::SetPosition (size.xmin, size.ymin, size.Width (), size.Height ());
+    base->ConsoleExtension(
+      "SetPos", size.xmin, size.ymin, size.Width(), size.Height());
   }
 }
 
-void funConsole::GetPosition (int &x, int &y, int &width, int &height) const
+void csFancyConsole::GetPosition(int &x, int &y, int &width, int &height) const
 {
   x = outersize.xmin;
   y = outersize.ymin;
@@ -335,13 +391,16 @@ void funConsole::GetPosition (int &x, int &y, int &width, int &height) const
   height = outersize.Height ();
 }
 
-void funConsole::LoadPix ()
+void csFancyConsole::LoadPix ()
 {
-  csConfigAccess ini(System, "/config/funcon.cfg");
+  csConfigAccess ini(System, "/config/fancycon.cfg");
 
-  const char* dir = ini->GetStr ("FunCon.General.Zip");
-  const char* mountdir = ini->GetStr ("FunCon.General.Mount");
-  if (VFS->Mount (mountdir, dir))
+  const char* dir = ini->GetStr ("FancyConsole.General.Archive");
+  const char* mountdir = ini->GetStr ("FancyConsole.General.Mount");
+  if (!dir || !mountdir)
+    System->Printf (MSG_WARNING,
+      "FancyConsole: Data resource location unknown\n");
+  else if (VFS->Mount (mountdir, dir))
   {
     VFS->PushDir ();
     VFS->ChDir (mountdir);
@@ -358,28 +417,27 @@ void funConsole::LoadPix ()
     PrepPix (ini, "Left", deco.border[7], false);
 
     // internal increase/decrease
-    deco.p2lx = ini->GetInt ("FunCon.General.p2lx");
-    deco.p2rx = ini->GetInt ("FunCon.General.p2rx");
-    deco.p2ty = ini->GetInt ("FunCon.General.p2ty");
-    deco.p2by = ini->GetInt ("FunCon.General.p2by");
-    deco.lx = ini->GetInt ("FunCon.General.lx");
-    deco.rx = ini->GetInt ("FunCon.General.rx");
-    deco.ty = ini->GetInt ("FunCon.General.ty");
-    deco.by = ini->GetInt ("FunCon.General.by");
+    deco.p2lx = ini->GetInt ("FancyConsole.General.p2lx");
+    deco.p2rx = ini->GetInt ("FancyConsole.General.p2rx");
+    deco.p2ty = ini->GetInt ("FancyConsole.General.p2ty");
+    deco.p2by = ini->GetInt ("FancyConsole.General.p2by");
+    deco.lx = ini->GetInt ("FancyConsole.General.lx");
+    deco.rx = ini->GetInt ("FancyConsole.General.rx");
+    deco.ty = ini->GetInt ("FancyConsole.General.ty");
+    deco.by = ini->GetInt ("FancyConsole.General.by");
 
     VFS->PopDir ();
     VFS->Unmount (mountdir, dir);
   }
   else
-    printf ("Couldn't mount %s on %s\n", dir, mountdir);
+    System->Printf (MSG_WARNING, "Could not mount %s on %s\n", dir, mountdir);
 }
 
-void funConsole::PrepPix (iConfigFile *ini, const char *sect,
+void csFancyConsole::PrepPix (iConfigFile *ini, const char *sect,
   ConDecoBorder &border, bool bgnd)
 {
   csString Keyname;
-
-  Keyname.Clear() << "FunCon." << sect << ".pic";
+  Keyname.Clear() << "FancyConsole." << sect << ".pic";
   const char* pix = ini->GetStr (Keyname, "");
 
   border.mat = NULL;
@@ -402,55 +460,90 @@ void funConsole::PrepPix (iConfigFile *ini, const char *sect,
     if (len)
     {
       iTextureManager *tm = G3D->GetTextureManager ();
-      iImage *image = csImageLoader::Load ((UByte *)data, len, tm->GetTextureFormat ());
+      iImage *image =
+        csImageLoader::Load ((UByte *)data, len, tm->GetTextureFormat ());
       if (image)
       {
-	iTextureHandle* txt = tm->RegisterTexture ( image, CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS );
+	iTextureHandle* txt =
+	  tm->RegisterTexture ( image, CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS );
 	iMaterialHandle* mat = tm->RegisterMaterial (txt);
 	border.mat = mat;
 	image->DecRef();
 
-        Keyname.Clear() << "FunCon." << sect << ".x";
+        Keyname.Clear() << "FancyConsole." << sect << ".x";
 	border.offx = ini->GetInt (Keyname, 0);
-        Keyname.Clear() << "FunCon." << sect << ".y";
+        Keyname.Clear() << "FancyConsole." << sect << ".y";
         border.offy = ini->GetInt (Keyname, 0);
 
-        Keyname.Clear() << "FunCon." << sect << ".do_keycolor";
+        Keyname.Clear() << "FancyConsole." << sect << ".do_keycolor";
 	border.do_keycolor = ini->GetBool (Keyname, false);
 	if (border.do_keycolor)
         {
 	  int r,g,b;
-          Keyname.Clear() << "FunCon." << sect << ".keycolor";
+          Keyname.Clear() << "FancyConsole." << sect << ".keycolor";
 	  const char *kc = ini->GetStr(Keyname, "0,0,0" );
 	  sscanf( kc, "%d,%d,%d", &r, &g, &b );
 	  border.kr=r; border.kg=g; border.kb=b;
-	  border.mat->GetTexture ()->SetKeyColor ( border.kr, border.kg, border.kb );
+	  border.mat->GetTexture ()->SetKeyColor(
+	    border.kr, border.kg, border.kb);
 	}
 
-        Keyname.Clear() << "FunCon." << sect << ".do_stretch";
+        Keyname.Clear() << "FancyConsole." << sect << ".do_stretch";
 	border.do_stretch = ini->GetBool (Keyname, false);
       }
-
       delete [] data;
     }
     else
-      printf ("couldnt read %s\n", pix);
+      System->Printf(MSG_WARNING, "Could not read %s\n", pix);
   }
 
-  Keyname.Clear() << "FunCon." << sect << ".do_alpha";
+  Keyname.Clear() << "FancyConsole." << sect << ".do_alpha";
   border.do_alpha = ini->GetBool (Keyname, false);
   if (border.do_alpha)
-    Keyname.Clear() << "FunCon." << sect << ".alpha";
+    Keyname.Clear() << "FancyConsole." << sect << ".alpha";
     border.alpha = ini->GetFloat (Keyname, 0.0);
   
   if (bgnd)
   {
     int r,g,b;
-    Keyname.Clear() << "FunCon." << sect << ".do_keycolor";
+    Keyname.Clear() << "FancyConsole." << sect << ".do_keycolor";
     border.do_keycolor = ini->GetBool (Keyname, false);
-    Keyname.Clear() << "FunCon." << sect << ".keycolor";
+    Keyname.Clear() << "FancyConsole." << sect << ".keycolor";
     const char *kc = ini->GetStr (Keyname, "1,1,1");
     sscanf (kc, "%d,%d,%d", &r, &g, &b);
     border.kr = r; border.kg = g; border.kb = b;
   }
+}
+
+bool csFancyConsole::ConsoleExtension (const char *iCommand, ...)
+{
+  va_list args;
+  va_start (args, iCommand);
+  bool rc = ConsoleExtension(iCommand, args);
+  va_end (args);
+  return rc;
+}
+
+bool csFancyConsole::ConsoleExtension (const char *iCommand, va_list args)
+{
+  bool rc = true;
+  if (!strcmp (iCommand, "GetPos"))
+  {
+    int *x = va_arg (args, int *);
+    int *y = va_arg (args, int *);
+    int *w = va_arg (args, int *);
+    int *h = va_arg (args, int *);
+    GetPosition (*x, *y, *w, *h);
+  }
+  else if (!strcmp (iCommand, "SetPos"))
+  {
+    int x = va_arg (args, int);
+    int y = va_arg (args, int);
+    int w = va_arg (args, int);
+    int h = va_arg (args, int);
+    SetPosition (x, y, w, h);
+  }
+  else
+    rc = base->ConsoleExtension(iCommand, args);
+  return rc;
 }

@@ -95,7 +95,7 @@
 /// Network driver
 #define CS_FUNCID_NETDRV	"NetDriver"
 /// Console
-#define CS_FUNCID_CONSOLE	"Console"
+#define CS_FUNCID_CONSOLE	"Console.Output"
 /// 3D engine
 #define CS_FUNCID_ENGINE	"Engine"
 /// Skeleton Animation

@@ -1,73 +1,69 @@
-DESCRIPTION.cscon = Crystal Space console plug-in
+DESCRIPTION.csconout = Crystal Space standard output console
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 PLUGINHELP += \
-  $(NEWLINE)echo $"  make cscon        Make the $(DESCRIPTION.cscon)$"
+  $(NEWLINE)echo $"  make csconout     Make the $(DESCRIPTION.csconout)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: cscon csconclean
-plugins all: cscon
+.PHONY: csconout csconoutclean
+plugins all: csconout
 
-cscon:
+csconout:
 	$(MAKE_TARGET) MAKE_DLL=yes
-csconclean:
+csconoutclean:
 	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/cscon
+vpath %.cpp plugins/console/output/standard
 
 ifeq ($(USE_PLUGINS),yes)
-  CSCON = $(OUTDLL)cscon$(DLL)
-  LIB.CSCON = $(foreach d,$(DEP.CSCON),$($d.LIB))
-  TO_INSTALL.DYNAMIC_LIBS += $(CSCON)
+  CSCONOUT = $(OUTDLL)csconout$(DLL)
+  LIB.CSCONOUT = $(foreach d,$(DEP.CSCONOUT),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(CSCONOUT)
 else
-  CSCON = $(OUT)$(LIB_PREFIX)cscon$(LIB)
-  DEP.EXE += $(CSCON)
-  SCF.STATIC += cscon
-  TO_INSTALL.STATIC_LIBS += $(CSCON)
+  CSCONOUT = $(OUT)$(LIB_PREFIX)csconout$(LIB)
+  DEP.EXE += $(CSCONOUT)
+  SCF.STATIC += csconout
+  TO_INSTALL.STATIC_LIBS += $(CSCONOUT)
 endif
 
-INC.CSCON = $(wildcard plugins/cscon/*.h)
-SRC.CSCON = $(wildcard plugins/cscon/*.cpp)
-OBJ.CSCON = $(addprefix $(OUT),$(notdir $(SRC.CSCON:.cpp=$O)))
-DEP.CSCON = CSGFXLDR CSUTIL CSSYS
-CFG.CSCON = data/config/funcon.cfg
+INC.CSCONOUT = $(wildcard plugins/console/output/standard/*.h)
+SRC.CSCONOUT = $(wildcard plugins/console/output/standard/*.cpp)
+OBJ.CSCONOUT = $(addprefix $(OUT),$(notdir $(SRC.CSCONOUT:.cpp=$O)))
+DEP.CSCONOUT = CSUTIL CSSYS
 
-TO_INSTALL.CONFIG += $(CFG.CSCON)
-TO_INSTALL.DATA += data/funcon.zip
-
-MSVC.DSP += CSCON
-DSP.CSCON.NAME = cscon
-DSP.CSCON.TYPE = plugin
+MSVC.DSP += CSCONOUT
+DSP.CSCONOUT.NAME = csconout
+DSP.CSCONOUT.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: cscon csconclean
-cscon: $(OUTDIRS) $(CSCON)
+.PHONY: csconout csconoutclean
+csconout: $(OUTDIRS) $(CSCONOUT)
 
-$(CSCON): $(OBJ.CSCON) $(LIB.CSCON)
+$(CSCONOUT): $(OBJ.CSCONOUT) $(LIB.CSCONOUT)
 	$(DO.PLUGIN)
 
-clean: csconclean
-csconclean:
-	-$(RM) $(CSCON) $(OBJ.CSCON)
+clean: csconoutclean
+csconoutclean:
+	-$(RM) $(CSCONOUT) $(OBJ.CSCONOUT)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)cscon.dep
-$(OUTOS)cscon.dep: $(SRC.CSCON)
+dep: $(OUTOS)csconout.dep
+$(OUTOS)csconout.dep: $(SRC.CSCONOUT)
 	$(DO.DEP)
 else
--include $(OUTOS)cscon.dep
+-include $(OUTOS)csconout.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -18,7 +18,7 @@
 
 #include "cssysdef.h"
 #include "csutil/csstring.h"
-#include "conbuffr.h"
+#include "conbuff.h"
 
 csConsoleBuffer::csConsoleBuffer (int length, int size)
 {
@@ -46,12 +46,11 @@ csConsoleBuffer::~csConsoleBuffer ()
 
 void csConsoleBuffer::NewLine (bool snap)
 {
-//    printf("*** top = %d, bottom = %d, size = %d\n", display_top, display_bottom, GetPageSize());
   // Assign the empty display string to avoid NULL pointer ugliness
   if (buffer[current_line] == NULL)
     buffer [current_line] = empty;
 
-  // Increment the current line and account for going past the end of the buffer
+  // Increment current line and account for going past the end of the buffer
   current_line++;
   if (current_line >= len)
   {

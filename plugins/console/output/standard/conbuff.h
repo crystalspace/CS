@@ -16,8 +16,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CONSOLEBUFFER_H__
-#define __CS_CONSOLEBUFFER_H__
+#ifndef __CS_CONBUFF_H__
+#define __CS_CONBUFF_H__
+
+#include <csutil/csstring.h>
 
 class csConsoleBuffer
 {
@@ -39,7 +41,8 @@ public:
   inline int GetPageSize() const { return page_size; }
   inline int GetTopLine() const { return display_top; }
   inline int GetCurLine() const { return current_line; }
-  inline bool IsLineEmpty(int line) const { return ((buffer[line]==NULL)||(buffer[line]->IsEmpty())||(buffer[line]==empty)); }
+  inline bool IsLineEmpty(int line) const
+    { return (buffer[line]==0||buffer[line]->IsEmpty()||buffer[line]==empty); }
 
 private:
 
@@ -51,7 +54,6 @@ private:
 
   csString **buffer, *empty;
   bool *dirty;
-
 };
 
-#endif // ! __CS_CONSOLEBUFFER_H__
+#endif // __CS_CONBUFF_H__

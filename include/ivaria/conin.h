@@ -20,13 +20,13 @@
 #ifndef __IVARIA_CONIN_H__
 #define __IVARIA_CONIN_H__
 
-#include "isys/plugin.h"
 #include "csutil/scf.h"
 
-struct iConsole;
+struct iEvent;
+struct iConsoleOutput;
 typedef void (*csConsoleExecCallback) (void *, const char *);
 
-SCF_VERSION (iConsoleInput, 0, 0, 1);
+SCF_VERSION (iConsoleInput, 1, 0, 0);
 
 /**
  * This is a plugin that can handle keyboard input and display
@@ -34,13 +34,14 @@ SCF_VERSION (iConsoleInput, 0, 0, 1);
  * and when user presses <Enter> can call some callback function
  * to execute the entered command.
  */
-struct iConsoleInput : public iPlugIn
+struct iConsoleInput : public iBase
 {
   /// Bind to a console
-  virtual void Bind (iConsole *iCon) = 0;
+  virtual void Bind (iConsoleOutput*) = 0;
 
   /// Set the command execution callback
-  virtual void ExecuteCallback (csConsoleExecCallback iCallback, void *iCallbackData) = 0;
+  virtual void ExecuteCallback (csConsoleExecCallback iCallback,
+    void *iCallbackData) = 0;
 
   /// Return a line from the input buffer (-1 = current line)
   virtual const char *GetText (int iLine = -1) const = 0;
@@ -59,6 +60,9 @@ struct iConsoleInput : public iPlugIn
 
   /// Set the prompt string
   virtual void SetPrompt (const char *iPrompt) = 0;
+
+  /// Handle a console-related event
+  virtual bool HandleEvent (iEvent&) = 0;
 };
 
-#endif // ! __IVARIA_CONIN_H__
+#endif // __IVARIA_CONIN_H__

@@ -1,5 +1,5 @@
 /*
-    Simple Console input
+    Standard Console Input
     Copyright (C) 1998-2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
@@ -17,17 +17,18 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SIMPINP_H__
-#define __SIMPINP_H__
+#ifndef __CSCONIN_H__
+#define __CSCONIN_H__
 
 #include "ivaria/conin.h"
+#include "isys/plugin.h"
 #include "csutil/csstrvec.h"
 
 /**
- * This is a simple command-line handler with history and
- * a connection to a iConsole for output.
+ * This is the standard command-line handler with history and
+ * a connection to a iConsoleOutput for output.
  */
-class csSimpleInput : iConsoleInput
+class csConsoleInput : iConsoleInput
 {
   // The command history
   csStrVector History;
@@ -38,7 +39,7 @@ class csSimpleInput : iConsoleInput
   csConsoleExecCallback Callback;
   void *CallbackData;
   // The console
-  iConsole *Console;
+  iConsoleOutput *Console;
   // The prompt
   char *Prompt;
   int PromptLen;
@@ -57,9 +58,9 @@ public:
   DECLARE_IBASE;
 
   /// Construct the object
-  csSimpleInput (iBase *iParent);
+  csConsoleInput (iBase *iParent);
   /// Destroy the object
-  virtual ~csSimpleInput ();
+  virtual ~csConsoleInput ();
 
   /// Initialize the plugin, and return success status
   virtual bool Initialize (iSystem *iSys);
@@ -68,11 +69,11 @@ public:
   virtual bool HandleEvent (iEvent &Event);
 
   /// Bind to a console
-  virtual void Bind (iConsole *iCon);
+  virtual void Bind (iConsoleOutput *iCon);
 
   /// Set the command execution callback
-  virtual void ExecuteCallback (csConsoleExecCallback iCallback, void *iCallbackData)
-  { Callback = iCallback; CallbackData = iCallbackData; }
+  virtual void ExecuteCallback (csConsoleExecCallback iCallback,
+    void *iCallbackData) { Callback=iCallback; CallbackData=iCallbackData; }
 
   /// Return a line from the input buffer (-1 = current line)
   virtual const char *GetText (int iLine = -1) const;
@@ -92,6 +93,14 @@ public:
 
   /// Set the prompt string
   virtual void SetPrompt (const char *iPrompt);
+
+  // Implement iPlugIn interface.
+  struct eiPlugIn : public iPlugIn
+  {
+    DECLARE_EMBEDDED_IBASE(csConsoleInput);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
+  } scfiPlugIn;
 };
 
-#endif // __SIMPINP_H__
+#endif // __CSCONIN_H__

@@ -40,7 +40,7 @@ struct iGraphics2D;
 struct iNetworkDriver;
 struct iSoundRender;
 struct iConfig;
-struct iConsole;
+struct iConsoleOutput;
 struct iConfigManager;
 struct iMotionManager;
 
@@ -259,7 +259,7 @@ public:
   /// Network driver
   iNetworkDriver* NetDrv;
   /// System console
-  iConsole *Console;
+  iConsoleOutput *Console;
   /// Motion manager
   iMotionManager *MotionMan;
 

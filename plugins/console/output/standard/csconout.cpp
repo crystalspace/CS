@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "cssysdef.h"
+#include "csconout.h"
+#include "conbuff.h"
 #include "ivaria/conout.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
@@ -28,29 +30,28 @@
 #include "ivideo/fontserv.h"
 #include "cssys/csevent.h"
 #include "csutil/csrect.h"
-#include "csutil/scf.h"
 #include "csutil/csstring.h"
-#include "cscon.h"
-#include "conbuffr.h"
 
-IMPLEMENT_IBASE(csConsole)
-  IMPLEMENTS_INTERFACE(iConsole)
-  IMPLEMENTS_INTERFACE(iPlugIn)
+IMPLEMENT_IBASE(csConsoleOutput)
+  IMPLEMENTS_INTERFACE(iConsoleOutput)
+  IMPLEMENTS_EMBEDDED_INTERFACE(iPlugIn)
 IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csConsole)
-DECLARE_FACTORY (funConsole)
+IMPLEMENT_EMBEDDED_IBASE (csConsoleOutput::eiPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_EMBEDDED_IBASE_END
 
-EXPORT_CLASS_TABLE (cscon)
-  EXPORT_CLASS (csConsole, "crystalspace.console.output.standard",
-		"Standard Console Plugin")
-  EXPORT_CLASS (funConsole, "crystalspace.console.output.funky",
-		"Funky Console Plugin")
+IMPLEMENT_FACTORY (csConsoleOutput)
+
+EXPORT_CLASS_TABLE (csconout)
+  EXPORT_CLASS (csConsoleOutput, "crystalspace.console.output.standard",
+		"Crystal Space standard output console")
 EXPORT_CLASS_TABLE_END
 
-csConsole::csConsole (iBase *base)
+csConsoleOutput::csConsoleOutput (iBase *base)
 {
   CONSTRUCT_IBASE (base);
+  CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   fg_rgb.Set (255, 255, 255);	// Foreground defaults to white
   bg_rgb.Set (0, 0, 0);		// Background defaults to black
   transparent = false;		// Default to no transparency
@@ -70,7 +71,7 @@ csConsole::csConsole (iBase *base)
   System = NULL;
 }
 
-csConsole::~csConsole ()
+csConsoleOutput::~csConsoleOutput ()
 {
   if (font)
     font->DecRef ();
@@ -83,7 +84,7 @@ csConsole::~csConsole ()
   delete buffer;
 }
 
-bool csConsole::Initialize (iSystem *system)
+bool csConsoleOutput::Initialize (iSystem *system)
 {
   (System = system)->IncRef ();
   G3D = QUERY_PLUGIN_ID (System, CS_FUNCID_VIDEO, iGraphics3D);
@@ -103,12 +104,11 @@ bool csConsole::Initialize (iSystem *system)
   flash_time = System->GetTime ();
 
   // We want to see broadcast events
-  System->CallOnEvents (this, CSMASK_Broadcast);
-
+  System->CallOnEvents (&scfiPlugIn, CSMASK_Broadcast);
   return true;
 }
 
-void csConsole::Clear (bool wipe)
+void csConsoleOutput::Clear (bool wipe)
 {
   if (wipe)
     // Clear the buffer 
@@ -124,12 +124,12 @@ void csConsole::Clear (bool wipe)
   clear_input = false;
 }
 
-void csConsole::SetBufferSize (int lines)
+void csConsoleOutput::SetBufferSize (int lines)
 {
   buffer->SetLength (lines);
 }
 
-void csConsole::PutText (int /*iMode*/, const char *text)
+void csConsoleOutput::PutText (int /*iMode*/, const char *text)
 {
   int i;
   csString *curline = NULL;
@@ -212,13 +212,13 @@ void csConsole::PutText (int /*iMode*/, const char *text)
   }
 }
 
-const char *csConsole::GetLine (int line) const
+const char *csConsoleOutput::GetLine (int line) const
 {
   return buffer->GetLine ((line == -1) ?
     (buffer->GetCurLine () - buffer->GetTopLine ()) : line)->GetData ();
 }
 
-void csConsole::DeleteText (int start, int end)
+void csConsoleOutput::DeleteText (int start, int end)
 {
   csString *text = buffer->WriteLine ();
   int length = text->Length ();
@@ -240,7 +240,7 @@ void csConsole::DeleteText (int start, int end)
   }
 }
 
-void csConsole::Draw2D (csRect *area)
+void csConsoleOutput::Draw2D (csRect *area)
 {
   if (!visible) return;
 
@@ -286,7 +286,8 @@ void csConsole::Draw2D (csRect *area)
       area->Union (line);
 
     // Write the line
-    G2D->Write (font, 1 + size.xmin, (i * height) + size.ymin, fg, -1, text->GetData ());
+    G2D->Write (font, 1 + size.xmin, (i * height) + size.ymin, fg, -1,
+      text->GetData ());
   }
 
   // Test for a change in the flash state
@@ -314,7 +315,8 @@ void csConsole::Draw2D (csRect *area)
     {
 #ifdef CS_DEBUG
       if (cx != 0)
-	System->Printf (MSG_WARNING, "csConsole:  Current line is empty but cursor x != 0!\n");
+	System->Printf (MSG_WARNING,
+	  "csConsoleOutput:  Current line is empty but cursor x != 0!\n");
 #endif // CS_DEBUG
       cx_pix = 1;
     }
@@ -337,14 +339,17 @@ void csConsole::Draw2D (csRect *area)
     switch (cursor)
     {
       case csConInsertCursor:
-        G2D->DrawLine (cx_pix + 1, cy_pix + (height-3), line.xmax, cy_pix + (height-3), fg);
+        G2D->DrawLine (cx_pix + 1, cy_pix + (height-3), line.xmax,
+	  cy_pix + (height-3), fg);
         break;
       case csConNormalCursor:
-        G2D->DrawBox (cx_pix + 1, cy_pix + 1, line.xmax - 1, cy_pix + (height - 1), fg);
+        G2D->DrawBox (cx_pix + 1, cy_pix + 1, line.xmax - 1,
+	  cy_pix + (height - 1), fg);
         break;
 #ifdef CS_DEBUG
       default:
-        System->Printf(MSG_WARNING, "csConsole:  Invalid cursor setting!\n");
+        System->Printf(MSG_WARNING,
+	  "csConsoleOutput:  Invalid cursor setting!\n");
 #endif // CS_DEBUG
     }
   }
@@ -356,7 +361,7 @@ void csConsole::Draw2D (csRect *area)
   invalid.MakeEmpty ();
 }
 
-void csConsole::CacheColors ()
+void csConsoleOutput::CacheColors ()
 {
   // Update the colors from the texture manager
   iTextureManager *txtmgr = G3D->GetTextureManager ();
@@ -364,7 +369,8 @@ void csConsole::CacheColors ()
   bg = txtmgr->FindRGB (bg_rgb.red, bg_rgb.green, bg_rgb.blue);
 }
 
-void csConsole::GetPosition(int &x, int &y, int &width, int &height) const
+void
+csConsoleOutput::GetPosition(int &x, int &y, int &width, int &height) const
 {
   x = size.xmin;
   y = size.ymin;
@@ -372,7 +378,7 @@ void csConsole::GetPosition(int &x, int &y, int &width, int &height) const
   height = size.Height();
 }
 
-void csConsole::SetPosition(int x, int y, int width, int height)
+void csConsoleOutput::SetPosition(int x, int y, int width, int height)
 {
   if (x >= 0)
     size.xmin = x;
@@ -420,16 +426,17 @@ void csConsole::SetPosition(int x, int y, int width, int height)
   }
 }
 
-void csConsole::Invalidate (csRect &area)
+void csConsoleOutput::Invalidate (csRect &area)
 {
-  // Make sure we only update within our rectangle, otherwise 2D driver may crash!
+  // Make sure we only update within our rectangle, otherwise 2D
+  // driver may crash!
   csRect console (size);
   console.Intersect (area);
   if (!console.IsEmpty ())
     invalid.Union (console);
 }
 
-void csConsole::SetFont (iFont *Font)
+void csConsoleOutput::SetFont (iFont *Font)
 {
   if (font)
     font->DecRef ();
@@ -443,47 +450,47 @@ void csConsole::SetFont (iFont *Font)
   buffer->SetPageSize (size.Height () / (fh + 2));
 }
 
-int csConsole::GetTopLine () const
+int csConsoleOutput::GetTopLine () const
 {
   return buffer->GetTopLine ();
 }
 
-void csConsole::ScrollTo(int top, bool snap)
+void csConsoleOutput::ScrollTo(int top, bool snap)
 {
   switch (top)
   {
     case csConPageUp:
-      buffer->SetTopLine (MAX (0, buffer->GetTopLine () - buffer->GetPageSize ()));
+      buffer->SetTopLine(MAX(0, buffer->GetTopLine() - buffer->GetPageSize()));
       break;
     case csConPageDown:
-      buffer->SetTopLine (buffer->GetTopLine () + buffer->GetPageSize ());
+      buffer->SetTopLine(buffer->GetTopLine () + buffer->GetPageSize ());
       break;
     case csConVeryTop:
-      buffer->SetTopLine (0);
+      buffer->SetTopLine(0);
       break;
     case csConVeryBottom:
-      buffer->SetTopLine (buffer->GetCurLine () - buffer->GetPageSize () + 1);
+      buffer->SetTopLine(buffer->GetCurLine () - buffer->GetPageSize () + 1);
       break;
     default:
-      buffer->SetTopLine (top);
+      buffer->SetTopLine(top);
       break;
   }
 
-  if ((buffer->GetCurLine () >= buffer->GetTopLine ())
-   && (buffer->GetCurLine () <= buffer->GetTopLine () + buffer->GetPageSize ()))
+  if ((buffer->GetCurLine () >= buffer->GetTopLine()) &&
+      (buffer->GetCurLine () <= buffer->GetTopLine() + buffer->GetPageSize()))
     cy = MAX (buffer->GetCurLine () - buffer->GetTopLine (), 0);
   else
     cy = -1;
   do_snap = snap;
 }
 
-void csConsole::GetCursorPos(int &x, int &y) const
+void csConsoleOutput::GetCursorPos(int &x, int &y) const
 {
   x = cx;
   y = cy;
 }
 
-void csConsole::SetCursorPos(int x, int y)
+void csConsoleOutput::SetCursorPos(int x, int y)
 {
   int max_x, max_y = buffer->GetPageSize ();
   const csString *curline = buffer->GetLine (cy);
@@ -506,7 +513,7 @@ void csConsole::SetCursorPos(int x, int y)
     cy = y;
 }
 
-void csConsole::SetCursorPos (int iCharNo)
+void csConsoleOutput::SetCursorPos (int iCharNo)
 {
   if (cy>-1)
   {
@@ -518,22 +525,28 @@ void csConsole::SetCursorPos (int iCharNo)
   }    
 }
 
-void csConsole::SetVisible (bool iShow)
+void csConsoleOutput::SetVisible (bool iShow)
 {
   visible = iShow;
   if (Client)
   {
-    csEvent e (System->GetTime (), csevBroadcast, cscmdConsoleStatusChange, this);
+    csEvent e(System->GetTime(),csevBroadcast,cscmdConsoleStatusChange,this);
     Client->HandleEvent (e);
   }
   invalid.Set (size);
 }
 
-bool csConsole::ConsoleExtension (const char *iCommand, ...)
+bool csConsoleOutput::ConsoleExtension (const char *iCommand, ...)
 {
   va_list args;
   va_start (args, iCommand);
+  bool rc = ConsoleExtension(iCommand, args);
+  va_end (args);
+  return rc;
+}
 
+bool csConsoleOutput::ConsoleExtension (const char *iCommand, va_list args)
+{
   bool rc = true;
   if (!strcmp (iCommand, "FlashTime"))
     flash_interval = va_arg (args, cs_time);
@@ -553,14 +566,22 @@ bool csConsole::ConsoleExtension (const char *iCommand, ...)
     int h = va_arg (args, int);
     SetPosition (x, y, w, h);
   }
+  else if (!strcmp (iCommand, "GetBackgroundColor"))
+  {
+    int *bgcolor = va_arg (args, int *);
+    *bgcolor = bg;
+  }
+  else if (!strcmp (iCommand, "GetForegroundColor"))
+  {
+    int *fgcolor = va_arg (args, int *);
+    *fgcolor = fg;
+  }
   else
     rc = false;
-
-  va_end (args);
   return rc;
 }
 
-bool csConsole::HandleEvent (iEvent &Event)
+bool csConsoleOutput::HandleEvent (iEvent &Event)
 {
   switch (Event.Type)
   {

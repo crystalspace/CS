@@ -23,37 +23,40 @@
 
 #include "cssysdef.h"
 #include "simpcon.h"
-#include "simpinp.h"
 #include "csutil/util.h"
 #include "csutil/csrect.h"
 #include "csutil/cfgacc.h"
 #include "cssys/csevent.h"
 #include "ivideo/graph2d.h"
+#include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
+#include "isys/evdefs.h"
 #include "isys/system.h"
 #include "iutil/cfgmgr.h"
 
-#define SIZE_LINE	256
+#define SIZE_LINE 256
 
 IMPLEMENT_IBASE (csSimpleConsole)
-  IMPLEMENTS_INTERFACE (iPlugIn)
-  IMPLEMENTS_INTERFACE (iConsole)
+  IMPLEMENTS_INTERFACE (iConsoleOutput)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
+IMPLEMENT_EMBEDDED_IBASE (csSimpleConsole::eiPlugIn)
+  IMPLEMENTS_INTERFACE (iPlugIn)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 IMPLEMENT_FACTORY (csSimpleConsole)
-DECLARE_FACTORY (csSimpleInput)
 
 EXPORT_CLASS_TABLE (simpcon)
   EXPORT_CLASS_DEP (csSimpleConsole, "crystalspace.console.output.simple",
-    "A simple console for Crystal Space applications",
+    "Crystal Space simple output console",
     "crystalspace.kernel., crystalspace.graphics3d., crystalspace.graphics2d.")
-  EXPORT_CLASS (csSimpleInput, "crystalspace.console.input.simple",
-    "A simple console input for Crystal Space applications")
 EXPORT_CLASS_TABLE_END
 
 csSimpleConsole::csSimpleConsole (iBase *iParent)
 {
   CONSTRUCT_IBASE (iParent);
+  CONSTRUCT_EMBEDDED_IBASE(scfiPlugIn);
   LineMessage = NULL;
   Line = NULL;
   LinesChanged = NULL;
@@ -119,7 +122,7 @@ bool csSimpleConsole::Initialize (iSystem *iSys)
     fontname = buf;
   iFontServer *fs = G2D->GetFontServer ();
   if (!fs)
-    System->Printf (MSG_FATAL_ERROR, "Console: No font server plug-in loaded!\n");
+    System->Printf(MSG_FATAL_ERROR,"Console: No font server plug-in loaded!\n");
   else
     console_font = fs->LoadFont (fontname);
   if (!console_font)
@@ -141,7 +144,7 @@ bool csSimpleConsole::Initialize (iSystem *iSys)
   CursorTime = System->GetTime ();
 
   // We want to see broadcast events
-  System->CallOnEvents (this, CSMASK_Broadcast);
+  System->CallOnEvents (&scfiPlugIn, CSMASK_Broadcast);
 
   return true;
 }
@@ -455,7 +458,7 @@ void csSimpleConsole::SetVisible (bool iShow)
   ConsoleMode = iShow ? CONSOLE_MODE : MESSAGE_MODE;
   if (Client)
   {
-    csEvent e (System->GetTime (), csevBroadcast, cscmdConsoleStatusChange, this);
+    csEvent e(System->GetTime(), csevBroadcast, cscmdConsoleStatusChange, this);
     Client->HandleEvent (e);
   }
   InvalidAll = true;

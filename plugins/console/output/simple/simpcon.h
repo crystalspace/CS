@@ -1,5 +1,5 @@
 /*
-    Simple Console
+    Simple Output Console
     Copyright (C) 1998-2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
@@ -17,33 +17,30 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SIMPCONS_H__
-#define __SIMPCONS_H__
+#ifndef __SIMPCON_H__
+#define __SIMPCON_H__
 
-#include "isys/system.h"
 #include "ivaria/conout.h"
-#include "ivideo/graph3d.h"
-#include "ivideo/graph2d.h"
+#include "isys/plugin.h"
 #include "ivideo/fontserv.h"
-#include "csutil/csbase.h"
-#include "csutil/scf.h"
 
 class csRect;
 struct iGraphics3D;
 struct iGraphics2D;
 
-/// Two possible console modes
-enum
-{
-  MESSAGE_MODE,
-  CONSOLE_MODE
-};
-
 /**
- * A simple console plugin.
+ * A simple output console plugin.
  */
-class csSimpleConsole : public iConsole
+class csSimpleConsole : public iConsoleOutput
 {
+private:
+  /// Two possible console modes
+  enum
+  {
+    MESSAGE_MODE,
+    CONSOLE_MODE
+  };
+
   /// Text foreground color
   int console_fg;
   /// RGB version of above
@@ -103,7 +100,7 @@ public:
   /// Intercept events
   virtual bool HandleEvent (iEvent &Event);
 
-  //-------------------------- iConsole interface ----------------------------//
+  //----------------------- iConsoleOutput interface ------------------------//
 
   /**
    * Put some text to the console. Console acts like a simple
@@ -204,11 +201,21 @@ public:
   virtual void RegisterPlugin (iPlugIn *iClient)
   { Client = iClient; }
 
-  /**
-   * Implement simple extension commands.
-   */
+  /// Implement simple extension commands.
   virtual bool ConsoleExtension (const char *iCommand, ...)
   { (void)iCommand; return false; }
+
+  /// Implement simple extension commands.
+  virtual bool ConsoleExtension (const char *iCommand, va_list args)
+  { (void)iCommand; (void)args; return false; }
+
+  // Implement iPlugIn interface.
+  struct eiPlugIn : public iPlugIn
+  {
+    DECLARE_EMBEDDED_IBASE(csSimpleConsole);
+    virtual bool Initialize (iSystem* p) { return scfParent->Initialize(p); }
+    virtual bool HandleEvent (iEvent& e) { return scfParent->HandleEvent(e); }
+  } scfiPlugIn;
 
 private:
   /// Time left until messages will scroll up
@@ -244,4 +251,4 @@ private:
   int LineCommandMax;
 };
 
-#endif // __SIMPCONS_H__
+#endif // __SIMPCON_H__
