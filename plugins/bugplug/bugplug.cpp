@@ -370,6 +370,10 @@ bool csBugPlug::EatKey (iEvent& event)
       {
         System->Printf (MSG_CONSOLE, "Press debug key...\n");
       }
+      else
+      {
+        System->Printf (MSG_CONSOLE, "Back to normal key processing.\n");
+      }
       return true;
     }
     if (cmd == DEBUGCMD_MOUSEENTER)
@@ -527,6 +531,12 @@ bool csBugPlug::EatKey (iEvent& event)
 	  {
 	    System->Printf (MSG_CONSOLE,
 	      "BugPlug found no terrains to work with!\n");
+	  }
+	  else
+	  {
+	    System->Printf (MSG_CONSOLE,
+	      "BugPlug %s terrain visibility checking!\n",
+	      enable_disable ? "enabled" : "disabled");
 	  }
 	}
 	else
