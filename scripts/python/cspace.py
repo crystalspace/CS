@@ -11337,6 +11337,27 @@ CS_LOAD_PLUGIN_ALWAYS = _cspace.CS_LOAD_PLUGIN_ALWAYS
 CS_FX_SETALPHA = _cspace.CS_FX_SETALPHA
 
 CS_FX_SETALPHA_INT = _cspace.CS_FX_SETALPHA_INT
+CSMASK_Nothing = (1 << csevNothing)
+CSMASK_FrameProcess = CSMASK_Nothing
+CSMASK_Keyboard = (1 << csevKeyboard)
+CSMASK_MouseMove = (1 << csevMouseMove)
+CSMASK_MouseDown = (1 << csevMouseDown)
+CSMASK_MouseUp = (1 << csevMouseUp)
+CSMASK_MouseClick = (1 << csevMouseClick)
+CSMASK_MouseDoubleClick = (1 << csevMouseDoubleClick)
+CSMASK_JoystickMove = (1 << csevJoystickMove)
+CSMASK_JoystickDown = (1 << csevJoystickDown)
+CSMASK_JoystickUp = (1 << csevJoystickUp)
+CSMASK_Command = (1 << csevCommand)
+CSMASK_Broadcast = (1 << csevBroadcast)
+
+CSMASK_Mouse = (CSMASK_MouseMove | CSMASK_MouseDown | CSMASK_MouseUp
+  | CSMASK_MouseClick | CSMASK_MouseDoubleClick)
+CSMASK_Joystick = (CSMASK_JoystickMove | CSMASK_JoystickDown
+  | CSMASK_JoystickUp)
+CSMASK_Input = (CSMASK_Keyboard | CSMASK_Mouse | CSMASK_Joystick)
+
+
 class _csPyEventHandler(iEventHandler):
     __swig_setmethods__ = {}
     for _s in [iEventHandler]: __swig_setmethods__.update(_s.__swig_setmethods__)
