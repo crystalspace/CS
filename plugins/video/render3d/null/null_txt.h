@@ -89,6 +89,9 @@ protected:
   /// Number of used colors in palette
   int palette_size;
 
+  /// Is already prepared.
+  bool prepared;
+
   /// The texture manager
   csTextureManagerNull *texman;
 

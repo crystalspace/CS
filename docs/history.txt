@@ -42,6 +42,9 @@ chronological order.
 	- Eric Sunshine fixed bug in the iEventOutlet %typemap(javacode)
 	  override which prevented the iEventOutlet::equals() method from
 	  being synthesized.
+	- Jorrit fixed null3d renderer to the Prepare changes that were
+	  done yesterday. I forgot to remember that the texture was already
+	  prepared which could have bad consequences.
 27-Jul-2004
 	- Peter Amstutz added the wxgl canvas (initially developed by
 	  Daniel Fryer) which makes it fairly easy to embed Crystal Space

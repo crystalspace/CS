@@ -77,6 +77,8 @@ csTextureHandleNull::csTextureHandleNull (csTextureManagerNull *txtmgr,
   pal2glob = 0;
   (texman = txtmgr)->IncRef ();
 
+  prepared = false;
+
   if (flags & CS_TEXTURE_3D)
     AdjustSizePo2 ();
 }
@@ -193,6 +195,8 @@ void csTextureHandleNull::remap_texture (csTextureManager *texman)
 
 void csTextureHandleNull::PrepareInt ()
 {
+  if (prepared) return;
+  prepared = true;
   CreateMipmaps ();
   remap_texture (texman);
 }

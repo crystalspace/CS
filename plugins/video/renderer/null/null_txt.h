@@ -92,6 +92,9 @@ protected:
   /// The texture manager
   csTextureManagerNull *texman;
 
+  /// Is already prepared.
+  bool prepared;
+
   /// Create a new texture object
   virtual csTexture *NewTexture (iImage *Image, bool ismipmap);
 
