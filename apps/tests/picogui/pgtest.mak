@@ -1,3 +1,7 @@
+# Application target only valid if module is listed in PLUGINS.
+ifneq (,$(findstring pgserver,$(PLUGINS) $(PLUGINS.DYNAMIC)))
+
+# Application description
 DESCRIPTION.pgtest = Crystal Space PicoGUI Test
 
 #------------------------------------------------------------- rootdefines ---#
@@ -74,3 +78,5 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
+
+endif # ifneq (,$(findstring pgserver,$(PLUGINS) $(PLUGINS.DYNAMIC)))

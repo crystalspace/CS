@@ -158,7 +158,9 @@ ifeq ($(FT2.AVAILABLE),yes)
 PLUGINS.DYNAMIC += font/server/freefnt2
 endif
 PLUGINS.DYNAMIC += aws
+ifeq ($(PGSERVER.AVAILABLE), yes)
 PLUGINS.DYNAMIC += picogui/server
+endif
 ifeq ($(VORBISFILE.AVAILABLE),yes)
 PLUGINS.DYNAMIC += sound/loader/ogg
 endif

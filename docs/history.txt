@@ -22,6 +22,10 @@ chronological order.
 	  reference held past DestroyApplication. 
 	- Anders Stenberg reenabled pixmap drawing with csPixmap derivates in
 	  the new renderer, which was disabled.
+        - Philip Wyett added test for PGSERVER.AVAILABLE in user.mak, so that
+          the Pico plugin is not built unless the library is on the build box.
+          Also added test to Pico test app 'pgtest', so that if the plugin
+          associated is not built the test app will also not be built.          
 29-Aug-2003
 	- renej added support for using CS from Java. SWIG is needed since
 	  no generated files are in the CVS repository. Building is done
