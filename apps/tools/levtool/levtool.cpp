@@ -1418,7 +1418,6 @@ void LevTool::Main ()
   vfs = CS_QUERY_REGISTRY (object_reg, iVFS);
 
   int op = OP_LIST;
-  int flag = 0;
 
   if (cmdline->GetOption ("help"))
   {

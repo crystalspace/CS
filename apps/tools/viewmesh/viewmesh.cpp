@@ -402,7 +402,8 @@ void ViewMesh::UpdateSpritePosition(csTicks elapsed)
     mov->MovePosition(v);
 
     v = mov->GetFullPosition();
-    if (abs(v.z) > 4.5)  // this should make the sprite loop.
+    float const absz = (v.z < 0 ? -v.z : v.z);
+    if (absz > 4.5)  // this should make the sprite loop.
     {
 	v.z = -v.z;
 	mov->SetPosition(v);
