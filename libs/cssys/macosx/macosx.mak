@@ -178,7 +178,7 @@ vpath %.mm $(SRCDIR)/libs/cssys $(filter-out $(SRCDIR)/libs/cssys/general/,$(sor
 # <cs-config>
 define DO.LINK.EXE
   sh $(SRCDIR)/libs/cssys/macosx/appwrap.sh $(notdir $(basename $@)) $(MACOSX.APP_DIR) $(MACOSX.APP_ICON) $(SRCDIR)/include/csver.h
-  $(NEWLINE)$(LINK) $(LFLAGS) $(LFLAGS.EXE) -o $(MACOSX.APP_EXE) $(^^) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
+  $(NEWLINE)$(LINK) $(LFLAGS) $(LFLAGS.EXE) -o $(MACOSX.APP_EXE) $(^^) $(L^) $(LIBS)
   touch $@
 endef
 # </cs-config>

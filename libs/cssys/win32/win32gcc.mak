@@ -198,7 +198,7 @@ DO.LINK.EXE = \
   $(COMPILE_RES) -i $(OUT)/$(@:$(EXE)=-rsrc.rc) --include-dir="$(SRCDIR)/include" \
     -o $(OUT)/$(@:$(EXE)=-rsrc.o) $(COMMAND_DELIM) \
   $(LINK) $(LFLAGS) $(LFLAGS.EXE) $(LFLAGS.@) $(^^) \
-    $(OUT)/$(@:$(EXE)=-rsrc.o) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
+    $(OUT)/$(@:$(EXE)=-rsrc.o) $(L^) $(LIBS)
 
 DO.LINK.CONSOLE.EXE = $(DO.LINK.EXE)
 

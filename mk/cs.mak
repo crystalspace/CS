@@ -97,7 +97,7 @@ CFLAGS.INCLUDE+=\
   
 CFLAGS=$(CFLAGS.D)__CRYSTAL_SPACE__ $(CFLAGS.GENERAL) $(CFLAGS.$(MODE))
 LFLAGS=$(LFLAGS.GENERAL) $(LFLAGS.$(MODE)) $(LFLAGS.L)$(OUT)
-LIBS=$(LIBS.EXE)
+LIBS=$(LIBS.EXE) $(LIBS.EXE.PLATFORM)
 
 ifeq ($(MAKE_DLL),yes)
   CFLAGS+=$(CFLAGS.DLL)
@@ -159,10 +159,10 @@ DO.SHARED.PLUGIN.CORE = \
 DO.SHARED.PLUGIN.POSTAMBLE =
 # How to link a console executable
 DO.LINK.CONSOLE.EXE = $(LINK) $(LFLAGS) $(LFLAGS.CONSOLE.EXE) $(LFLAGS.@) \
-  $(^^) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
+  $(^^) $(L^) $(LIBS)
 # How to link a graphical executable
 DO.LINK.EXE = $(LINK) $(LFLAGS) $(LFLAGS.EXE) $(LFLAGS.@) \
-  $(^^) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
+  $(^^) $(L^) $(LIBS)
 
 # How to do either a dynamic or static library (depending on MAKE_DLL)
 ifeq ($(MAKE_DLL),yes)
