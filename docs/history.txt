@@ -1,10 +1,25 @@
 The history order is reversed so that new features are at the top.
 
+31-Jul-2001
+	- Martin Geisse moved high-level model data manipulation functions
+	  out of the model data classes themselves and into their own
+	  namespace wrapper, csModelDataTools.
 30-Jul-2001
 	- Renamed csTime to csTicks and removed iSystem::GetTime().
 	  Now use the global csGetTicks() instead.
 	- Fixed a 'for (int i')' construction in mdldata.cpp so it compiles
 	  on linux.
+	- Martin Geisse made the following changes:
+	    - Added a flag to iModelData::MergeObjects() that prevents
+	      merging of objects with different textures. Also, merging
+	      objects with conflicting actions is prevented. Both features are
+	      still untested and thus commented out.
+	    - Added iModelData::SplitByTexture() to split objects with
+	      multiple different textures. Still commented out.
+	    - Added a macro that defines a 'typed object iterator'. This is
+	      a wrapper class for an iObjectIterator which only returns
+	      child objects with a specific interface.
+	    - Cleaned up the model data code using typed iterators.
 29-Jul-2001
 	- Eric Sunshine renamed csGetClicks() to csGetTicks().
 	- Eric Sunshine eliminated the now unnecessary inclusion of
@@ -25,6 +40,34 @@ The history order is reversed so that new features are at the top.
 	  cssys/system.h from cssys/general/printf.cpp.
 	- Eric Sunshine fixed a bug in csStaticArray::ReAlloc() where it was
 	  applying delete[] to a void pointer, which is an illegal operation.
+	- Michael Voasse writes the following (NOTE!! this comment has
+	  been proven to be untrue later):
+	  txtmgr.cpp: Removed bogus bug flag from the texture manager. The bug
+	  that I am seeing is due to more brain dead behaviour of my system.
+	  I am also suspending my activities on CS pending an audit of my
+	  system. If there is anyone out there running RH 6.2 Linux and you
+	  have a crash in the texture manager every time walktest exits, then
+	  you have the same problem as me.  If not, I would like to hear about
+	  it. Otherwise, for me, it is time to upgrade and I would recommend
+	  upgrading your system if it exhibits the same behaviour.
+	  To test this, first your system must be crashing at exit on
+	  walktest. If so, then go to:
+		CS/plugins/video/renderer/common/txtmgr.cpp
+	  on line 216 ( the third line in csMaterialHandle::
+	  ~csMaterialHandle()), comment out the line:
+		texman->DecRef();
+	  and recompile your 3D renderer (in my case the software renderer).
+	  If walktest now cleans up correctly upon exiting walktest, then you
+	  have the same problem too.
+	- Martin Geisse made the following changes:
+	    - Restructured the static array code. All static arrays now derive
+	      from a main class, csStaticArray, which contains most of the
+	      code. This should reduce executable size a bit.
+	    - Added some texture loading code to mdltest. It doesn't work
+	      yet so it is currently disabled.
+	    - Updated the SCF documentation and added documentation for
+	      csObject.
+	- Justin Miller added Format() to csString.
 27-Jul-2001
 	- Removed csSystemDriver::Warn() and Alert().
 	- Removed the console pointer in csSystemDriver.
@@ -55,6 +98,8 @@ The history order is reversed so that new features are at the top.
 	  taking a set of convex hulls, where each one fits inside the next
 	  one, and render them. It will compute the outline in linear time.
 	  For now this is the (untested but compiling) mesh object only.
+	- Wyatt Miler updated NeXTTime.cpp after a recent removal of
+	  csSystemDriver::Time().
 26-Jul-2001
 	- Removed iSystem::Printf() and iSystem::PrintfV(). The plan is now
 	  to use the reporter instead. To do this you can use the following
