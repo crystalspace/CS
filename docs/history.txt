@@ -117,6 +117,10 @@ The history order is reversed so that new features are at the top.
 	  complained about trying to paste `::' to a token.
 	- Jorrit updated history.txt in order to have the honor of update
 	  number 2000 of this file :-)
+	- Eric Sunshine changed csAppPlugin so that it now implements
+	  iEventHandler via embedding rather than multiple-inheritance.  This
+	  allows CSWS to once again operate correctly (not crash) on a certain
+	  nameless platform.
 14-Oct-2001
 	- The 'stdrep' plugin now depends on output console and
 	  reporter plugins in SCF. This means that it will be loaded

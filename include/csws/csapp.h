@@ -99,8 +99,9 @@ protected:
   bool InFrame;
 
   /// The iComponent interface
-  class csAppPlugin : public iComponent, public iEventHandler
+  class csAppPlugin : public iComponent
   {
+  public:
     SCF_DECLARE_IBASE;
     /// The parent application
     csApp *app;
@@ -108,10 +109,17 @@ protected:
     /// Initialize
     csAppPlugin (csApp *iParent);
 
-    /// Initialize the application plugin (called by system driver)
+    /// Initialize the application plugin
     virtual bool Initialize (iObjectRegistry *object_reg);
-    /// Handle a event and return true if processed; called by system driver
+    /// Handle a event and return true if processed
     virtual bool HandleEvent (iEvent &Event);
+
+    struct eiEventHandler : public iEventHandler
+    {
+      SCF_DECLARE_EMBEDDED_IBASE(csAppPlugin);
+      virtual bool HandleEvent(iEvent& e) { return scfParent->HandleEvent(e); }
+    } scfiEventHandler;
+    friend struct eiEventHandler;
   } *scfiPlugin;
   friend class csAppPlugin;
 

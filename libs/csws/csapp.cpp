@@ -51,12 +51,17 @@
 
 SCF_IMPLEMENT_IBASE (csApp::csAppPlugin)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
-  SCF_IMPLEMENTS_INTERFACE (iEventHandler)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iEventHandler)
 SCF_IMPLEMENT_IBASE_END
+
+SCF_IMPLEMENT_EMBEDDED_IBASE(csApp::csAppPlugin::eiEventHandler)
+  SCF_IMPLEMENTS_INTERFACE(iEventHandler)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csApp::csAppPlugin::csAppPlugin (csApp *iParent)
 {
   SCF_CONSTRUCT_IBASE (NULL);
+  SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
   app = iParent;
 }
 
@@ -71,7 +76,7 @@ bool csApp::csAppPlugin::Initialize (iObjectRegistry *object_reg)
   {
     app->EventOutlet = q->GetEventOutlet();
     // We want ALL the events! :)
-    q->RegisterListener (this, (unsigned int)(~0));
+    q->RegisterListener (&scfiEventHandler, (unsigned int)(~0));
   }
   return true;
 }
@@ -150,7 +155,7 @@ csApp::~csApp ()
 
   iEventQueue *eq = CS_QUERY_REGISTRY (object_reg, iEventQueue);
   if (eq)
-    eq->RemoveListener (scfiPlugin);
+    eq->RemoveListener (&scfiPlugin->scfiEventHandler);
   plugin_mgr->UnloadPlugin (scfiPlugin);
 
   // Delete all children prior to shutting down the system
