@@ -50,6 +50,7 @@
 #include "iutil/plugin.h"
 #include "iutil/vfs.h"
 #include "iengine/material.h"
+#include "iengine/mesh.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -426,8 +427,9 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
 
   /// create a mesh object
   const char* classId = "crystalspace.mesh.object.cube";
-  iMeshObjectFactory *mesh_fact = engine->CreateMeshFactory(classId, 
-    "cubeFact");
+  iMeshFactoryWrapper* mesh_wrap = engine->CreateMeshFactory (classId,
+  	"cubeFact");
+  iMeshObjectFactory *mesh_fact = mesh_wrap->GetMeshObjectFactory ();
 
   iCubeFactoryState* cubelook =
     SCF_QUERY_INTERFACE(mesh_fact, iCubeFactoryState);
@@ -444,11 +446,11 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   meshspr->SetPosition( csVector3(12 + 0.5, +0.5, 2+0.5) );
   world->AddSprite(meshspr);
   mesh_obj->DecRef ();
-  mesh_fact->DecRef ();
   meshspr->DecRef ();
   
   const char* fo_classId = "crystalspace.mesh.object.fountain";
-  mesh_fact = engine->CreateMeshFactory(fo_classId, "fountainFact");
+  mesh_wrap = engine->CreateMeshFactory(fo_classId, "fountainFact");
+  mesh_fact = mesh_wrap->GetMeshObjectFactory ();
 
   mesh_obj = mesh_fact->NewInstance();
   iParticleState *pastate = SCF_QUERY_INTERFACE(mesh_obj, iParticleState);
@@ -475,7 +477,6 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   meshspr->SetPosition( csVector3(10, 0, 8) );
   world->AddSprite(meshspr);
   mesh_obj->DecRef ();
-  mesh_fact->DecRef ();
   meshspr->DecRef ();
 
   // create second grid
