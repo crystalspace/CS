@@ -31,7 +31,6 @@
 #include "csutil/parray.h"
 
 class csSkin;
-class csSkinSlice;
 class csApp;
 class csComponent;
 class csButton;
@@ -40,73 +39,6 @@ class csDialog;
 class csListBox;
 class csListBoxItem;
 class csBackground;
-
-/**
- * This class defines the interface for a container of skins.
- * Most of the functionality you will want is already here; the
- * only method that you will sometimes want to override is the
- * constructor and the Initialize() method. In constructor you
- * should assign the appropiate value to the "Prefix" member
- * variable which is used to find the sections that refer
- * to the respective theme. Initialize() used to query all
- * kinds of resources from the application object when a
- * skin is initialized.
- *<p>
- * Generally there should be only one object of this class,
- * which is stored into the csApp object. However, you can use
- * a skin for some component and all his children if you wish,
- * but you will have to store the respective skin container
- * somewhere inside that component (and override his GetSkin()
- * method so that child components can use the skin when initialized).
- *<p>
- * The repository contains a number of objects that are responsible
- * for the exterior of the respective components (and which are called
- * `skins'). These objects are identified by a text string. After you change
- * the skin repository, you should call the Apply() method of the repository
- * so that the given objects and all components which are inserted into that
- * component (note that this does NOT have to do anything with class
- * hierarchy!) will receive the cscmdSkinChanged broadcast.
- */
-class csSkin : public csPDelArray<csSkinSlice>
-{
-  /// The application
-  csApp *app;
-
-public:
-  /// This is the prefix for section names in CSWS' configuration file
-  const char *Prefix;
-
-  /// Create the skin repository object
-  csSkin () : csPDelArray<csSkinSlice> (16, 16), Prefix (0) {}
-
-  virtual ~csSkin () { }
-
-  /// Compare a item from this array with some key
-  static int CompareKey (csSkinSlice* const& Item, void* Key);
-
-  /// Compare two items from this array
-  static int Compare (csSkinSlice* const& Item1, csSkinSlice* const& Item2);
-
-  /// Apply this skin to some component and all components inserted into it
-  void Apply (csComponent *iComp);
-
-  /// Initialize all skin slices with given application object
-  virtual void Initialize (csApp *iApp);
-
-  /// Free any resources allocated by the skin slices
-  virtual void Deinitialize ();
-
-  /// Utility function: get a skin-specific string from csws config file
-  const char *GetConfigStr (const char *iSection, const char *iKey, const char *iDefault);
-  /// Same but get a boolean value
-  bool GetConfigYesNo (const char *iSection, const char *iKey, bool iDefault);
-
-  /// Utility function: read background from given section with given key prefix
-  void Load (csBackground &oBack, const char *iSection, const char *iPrefix);
-
-private:
-  bool ReadGradient (const char *iText, csRGBcolor *color, int iNum);
-};
 
 /**
  * A `skin slice' is responsible for managing the external view of a
@@ -182,6 +114,73 @@ public:
 
   /// Draw the component we are responsible for
   virtual void Draw (csComponent &This) = 0;
+};
+
+/**
+ * This class defines the interface for a container of skins.
+ * Most of the functionality you will want is already here; the
+ * only method that you will sometimes want to override is the
+ * constructor and the Initialize() method. In constructor you
+ * should assign the appropiate value to the "Prefix" member
+ * variable which is used to find the sections that refer
+ * to the respective theme. Initialize() used to query all
+ * kinds of resources from the application object when a
+ * skin is initialized.
+ *<p>
+ * Generally there should be only one object of this class,
+ * which is stored into the csApp object. However, you can use
+ * a skin for some component and all his children if you wish,
+ * but you will have to store the respective skin container
+ * somewhere inside that component (and override his GetSkin()
+ * method so that child components can use the skin when initialized).
+ *<p>
+ * The repository contains a number of objects that are responsible
+ * for the exterior of the respective components (and which are called
+ * `skins'). These objects are identified by a text string. After you change
+ * the skin repository, you should call the Apply() method of the repository
+ * so that the given objects and all components which are inserted into that
+ * component (note that this does NOT have to do anything with class
+ * hierarchy!) will receive the cscmdSkinChanged broadcast.
+ */
+class csSkin : public csPDelArray<csSkinSlice>
+{
+  /// The application
+  csApp *app;
+
+public:
+  /// This is the prefix for section names in CSWS' configuration file
+  const char *Prefix;
+
+  /// Create the skin repository object
+  csSkin () : csPDelArray<csSkinSlice> (16, 16), Prefix (0) {}
+
+  virtual ~csSkin () { }
+
+  /// Compare a item from this array with some key
+  static int CompareKey (csSkinSlice* const& Item, void* Key);
+
+  /// Compare two items from this array
+  static int Compare (csSkinSlice* const& Item1, csSkinSlice* const& Item2);
+
+  /// Apply this skin to some component and all components inserted into it
+  void Apply (csComponent *iComp);
+
+  /// Initialize all skin slices with given application object
+  virtual void Initialize (csApp *iApp);
+
+  /// Free any resources allocated by the skin slices
+  virtual void Deinitialize ();
+
+  /// Utility function: get a skin-specific string from csws config file
+  const char *GetConfigStr (const char *iSection, const char *iKey, const char *iDefault);
+  /// Same but get a boolean value
+  bool GetConfigYesNo (const char *iSection, const char *iKey, bool iDefault);
+
+  /// Utility function: read background from given section with given key prefix
+  void Load (csBackground &oBack, const char *iSection, const char *iPrefix);
+
+private:
+  bool ReadGradient (const char *iText, csRGBcolor *color, int iNum);
 };
 
 /**
