@@ -72,6 +72,7 @@ Simple::Simple ()
   view = NULL;
   dyn = NULL;
   dynSys = NULL;
+  moveCallback = NULL;
 }
 
 Simple::~Simple ()
@@ -82,6 +83,7 @@ Simple::~Simple ()
     }
     dyn->DecRef ();
   }
+  if (moveCallback) moveCallback->DecRef ();
   if (boxFact) boxFact->DecRef ();
   if (ballFact) ballFact->DecRef ();
   if (vc) vc->DecRef ();
@@ -457,6 +459,11 @@ bool Simple::Initialize (int argc, const char* const argv[])
 
   dynSys->SetGravity (csVector3 (0,-7,0));
 
+  // Create a default move callback to apply to bodies.
+  // This moves and lights their attachments after each dynamics step.
+  // Custom implementations can be used to change this behavior.
+  moveCallback = dynSys->CreateDefaultMoveCallback ();
+
   CreateRoomSolids (csVector3 (0), csVector3 (5), 1);
 
   return true;
@@ -473,6 +480,7 @@ iRigidBody* Simple::CreateBox (void)
 
   // Create a body and attach the mesh.
   iRigidBody* rb = dynSys->CreateBody ();
+  rb->SetMoveCallback (moveCallback);
   rb->SetProperties (1, csVector3 (0), csMatrix3 ());
   rb->SetPosition (tc.GetOrigin ());
   rb->AttachMesh (mesh);
@@ -516,6 +524,7 @@ iRigidBody* Simple::CreateSphere (void)
 
   // Create a body and attach the mesh.
   iRigidBody* rb = dynSys->CreateBody ();
+  rb->SetMoveCallback (moveCallback);
   rb->SetProperties (radius.Norm()/2, csVector3 (0), csMatrix3 ());
   rb->SetPosition (tc.GetOrigin ());
   rb->AttachMesh (mesh);

@@ -30,6 +30,7 @@ struct iSkeletonBone;
 
 struct iDynamicSystem;
 struct iRigidBody;
+struct iDynamicsMoveCallback;
 struct iJoint;
 struct iPolygonMesh;
 
@@ -80,8 +81,21 @@ struct iDynamicSystem : public iBase
 
   /// Remove a joint from the simulation
   virtual void RemoveJoint (iJoint* joint) = 0;
+
+  virtual iDynamicsMoveCallback* CreateDefaultMoveCallback () = 0;
 };
 
+SCF_VERSION (iDynamicsMoveCallback, 0, 0, 1);
+
+/**
+ * This is the interface for a dynamics move callback.
+ * Set on iRigidBody, it can update attachments after each step.
+ */
+struct iDynamicsMoveCallback : public iBase
+{
+  virtual void Execute (iMeshWrapper* mesh, csOrthoTransform& t) = 0;
+  virtual void Execute (iSkeletonBone* bone, csOrthoTransform& t) = 0;
+};
 
 SCF_VERSION (iRigidBody, 0, 0, 1);
 
@@ -193,6 +207,9 @@ struct iRigidBody : public iBase
   virtual void AttachMesh (iMeshWrapper* mesh) = 0;
   /// Attach a bone to this body
   virtual void AttachBone (iSkeletonBone* bone) = 0;
+
+  /// Set a callback to be executed when this body moves
+  virtual void SetMoveCallback (iDynamicsMoveCallback* cb) = 0;
 
   /// Update transforms for mesh and/or bone
   virtual void Update () = 0;

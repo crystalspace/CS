@@ -158,6 +158,8 @@ public:
 
   iJoint* CreateJoint ();
   void RemoveJoint (iJoint* joint);
+
+  iDynamicsMoveCallback* CreateDefaultMoveCallback ();
 };
 
 /**
@@ -178,6 +180,7 @@ private:
 
   iMeshWrapper* mesh;
   iSkeletonBone* bone;
+  iDynamicsMoveCallback* move_cb;
 
 public:
   SCF_DECLARE_IBASE;
@@ -238,6 +241,7 @@ public:
 
   void AttachMesh (iMeshWrapper* mesh);
   void AttachBone (iSkeletonBone* bone);
+  void SetMoveCallback (iDynamicsMoveCallback* cb);
 
   void Update ();
 };
@@ -299,6 +303,22 @@ private:
   void BuildSlider (const csVector3 &axis, float min, float max);
   void BuildJoint ();
 
+};
+
+/**
+ * This is the implementation for a default dynamics move callback.
+ * It can update mesh and bone.
+ */
+class csODEDefaultMoveCallback : public iDynamicsMoveCallback
+{
+public:
+  SCF_DECLARE_IBASE;
+
+  csODEDefaultMoveCallback ();
+  virtual ~csODEDefaultMoveCallback ();
+
+  void Execute (iMeshWrapper* mesh, csOrthoTransform& t);
+  void Execute (iSkeletonBone* bone, csOrthoTransform& t);
 };
 
 #endif // __GAME_ODEDYNAMICS_H__

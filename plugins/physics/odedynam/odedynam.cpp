@@ -52,6 +52,10 @@ SCF_IMPLEMENT_IBASE (csODEJoint)
   SCF_IMPLEMENTS_INTERFACE (iJoint)
 SCF_IMPLEMENT_IBASE_END
 
+SCF_IMPLEMENT_IBASE (csODEDefaultMoveCallback)
+  SCF_IMPLEMENTS_INTERFACE (iDynamicsMoveCallback)
+SCF_IMPLEMENT_IBASE_END
+
 SCF_IMPLEMENT_FACTORY (csODEDynamics)
 
 SCF_EXPORT_CLASS_TABLE (odedynam)
@@ -275,6 +279,11 @@ const csVector3 csODEDynamicSystem::GetGravity () const
   return csVector3 (grav[0], grav[1], grav[2]);
 }
 
+iDynamicsMoveCallback* csODEDynamicSystem::CreateDefaultMoveCallback ()
+{
+  return (iDynamicsMoveCallback*)new csODEDefaultMoveCallback ();
+}
+
 void csODEDynamicSystem::Step (float stepsize)
 {
   dSpaceCollide (spaceID, this, &csODEDynamics::NearCallback);
@@ -296,10 +305,12 @@ csODERigidBody::csODERigidBody (csODEDynamicSystem* sys)
 
   mesh = NULL;
   bone = NULL;
+  move_cb = NULL;
 }
 
 csODERigidBody::~csODERigidBody ()
 {
+  if (move_cb) move_cb->DecRef ();
   SCF_DEC_REF (dynsys);
   dBodyDestroy (bodyID);
 }
@@ -312,7 +323,7 @@ bool csODERigidBody::MakeStatic ()
     dJointAttach (statjoint, bodyID, 0);
     dBodySetGravityMode (bodyID, 0);
   }
-  return true; 
+  return true;
 }
 
 bool csODERigidBody::MakeDynamic ()
@@ -321,7 +332,7 @@ bool csODERigidBody::MakeDynamic ()
     dJointDestroy (statjoint);
     dBodySetGravityMode (bodyID, 1);
   }
-  return true; 
+  return true;
 }
 
 bool csODERigidBody::AttachColliderMesh (iPolygonMesh *mesh,
@@ -671,22 +682,22 @@ void csODERigidBody::AttachBone (iSkeletonBone* b)
   bone = b;
 }
 
+void csODERigidBody::SetMoveCallback (iDynamicsMoveCallback* cb)
+{
+  if (cb) cb->IncRef ();
+  if (move_cb) move_cb->DecRef ();
+  move_cb = cb;
+}
+
 void csODERigidBody::Update ()
 {
-  if (bodyID && !statjoint)
+  if (bodyID && !statjoint && move_cb)
   {
     csOrthoTransform trans;
-    if (mesh || bone)
-      trans = GetTransform ();
-    if (mesh)
-    {
-      mesh->GetMovable ()->SetPosition (trans.GetOrigin ());
-      mesh->GetMovable ()->GetTransform ().SetT2O (trans.GetO2T ());
-      mesh->GetMovable ()->UpdateMove ();
-      mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
-    }
-    if (bone)
-      bone->SetTransformation (trans);
+    trans = GetTransform ();
+
+    if (mesh) move_cb->Execute (mesh, trans);
+    if (bone) move_cb->Execute (bone, trans);
   }
 }
 
@@ -928,4 +939,28 @@ void csODEJoint::BuildJoint ()
   } else {
     /* too unconstrained, don't create joint */
   }
+}
+
+csODEDefaultMoveCallback::csODEDefaultMoveCallback ()
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+}
+
+csODEDefaultMoveCallback::~csODEDefaultMoveCallback ()
+{
+}
+
+void csODEDefaultMoveCallback::Execute (iMeshWrapper* mesh,
+ csOrthoTransform& t)
+{
+  mesh->GetMovable ()->SetPosition (t.GetOrigin ());
+  mesh->GetMovable ()->GetTransform ().SetT2O (t.GetO2T ());
+  mesh->GetMovable ()->UpdateMove ();
+  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+}
+
+void csODEDefaultMoveCallback::Execute (iSkeletonBone* bone,
+  csOrthoTransform& t)
+{
+  bone->SetTransformation (t);
 }
