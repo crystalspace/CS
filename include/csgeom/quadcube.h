@@ -32,7 +32,7 @@ class csQuadcube
 
 private:
   /// The six quad-trees.
-  csQuadtree* quad[6];
+  csQuadtree* trees[6];
 
 public:
   /// Make the quad-cube for the box.
