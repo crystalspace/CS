@@ -5,16 +5,16 @@ The history order is reversed so that new features are at the top.
 
 8-Apr-2003
 	- Bart Boatwright (tulebast).
-	- Added csBaseEventHandler class.
-	- Added implicit reference cast definition for static class member
-	  functions.
-	- Added AttachNew() method to csRef<T>.
-	- Added RemoveAllListeners() method to iEventQueue and csEventQueue.
-	  Fix for potential memory leak should a user store a reference
-	  to the event queue in an event handler, or the user is relying
-	  on the queue to explicitly release an event handler.
-	- Modified csInitializer::DestroyApplication to call
-	  RemoveAllListeners() method of system event queue.
+	    - Added csBaseEventHandler class.
+	    - Added implicit reference cast definition for static class member
+	      functions.
+	    - Added AttachNew() method to csRef<T>.
+	    - Added RemoveAllListeners() method to iEventQueue and csEventQueue.
+	      Fix for potential memory leak should a user store a reference
+	      to the event queue in an event handler, or the user is relying
+	      on the queue to explicitly release an event handler.
+	    - Modified csInitializer::DestroyApplication to call
+	      RemoveAllListeners() method of system event queue.
 	- Philip Wyett eliminated some more MSVC compiler warnings.
 	    - Changed define logic in csendian.h and removed the
               unnecessary #endif
