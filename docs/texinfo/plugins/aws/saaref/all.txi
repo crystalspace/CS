@@ -10,7 +10,7 @@ properties.
 This is a list of signals sent by all components.
 
 @table @code
-@item signalCreated
+@item signalComponentCreated
 Occurs when a component is first created. This can be used to
 get a handle to the component to perform actions on it (like
 filling up a list box with items).

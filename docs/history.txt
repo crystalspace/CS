@@ -5,7 +5,9 @@ The history order is reversed so that new features are at the top.
 29-Jun-2003
 	- Luca fixed the inconcistency of properties read and written by
 	  Set/GetProperty in the awsScrollBar class. He updated the texinfo
-	  docs about scrollbar's properties too.
+	  docs about scrollbar's properties too. He also fixed a bug in the
+	  aws documentation about the signalComponentCreated (called wrongly
+	  signalCreated).
 28-Jun-2003
 	- DeSigna fixed a small logic error in csGetKeyDesc(), where
 	  a ?: conditional had its values the wrong way round.
