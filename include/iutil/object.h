@@ -35,7 +35,7 @@ struct iObjectIterator;
  */
 #define CS_GET_CHILD_OBJECT(object,Interface)			\
   csPtr<Interface> ((Interface*)(object)->GetChild(		\
-  scfGetID_##Interface(), VERSION_##Interface))
+  Interface##_scfGetID (), Interface##_VERSION))
 
 /**
  * You can use this macro to get a child object with the given name and
@@ -43,7 +43,7 @@ struct iObjectIterator;
  */
 #define CS_GET_NAMED_CHILD_OBJECT(object,Interface,name)		\
   csPtr<Interface> ((Interface*)(object)->GetChild			\
-  (scfGetID_##Interface (), VERSION_##Interface, name))
+  (Interface_scfGetID (), Interface##_VERSION, name))
 
 /**
  * This is the same as CS_GET_CHILD_OBJECT, but stops at the first object
@@ -51,7 +51,7 @@ struct iObjectIterator;
  */
 #define CS_GET_FIRST_NAMED_CHILD_OBJECT(object,Interface,name)		\
   csPtr<Interface> ((Interface*)(object)->GetChild			\
-  (scfGetID_##Interface (), VERSION_##Interface, name, true))
+  (Interface##_scfGetID (), Interface##_VERSION, name, true))
 
 
 SCF_VERSION (iObject, 0, 3, 0);

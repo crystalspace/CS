@@ -33,7 +33,7 @@ struct iConfigManager;
 
 // Utility macros to select what plugins you want to have loaded.
 #define CS_REQUEST_PLUGIN(Name,Interface) \
-  Name, #Interface, iSCF::SCF->GetInterfaceID(#Interface), VERSION_##Interface
+  Name, #Interface, iSCF::SCF->GetInterfaceID(#Interface), Interface##_VERSION
 #define CS_REQUEST_END \
   NULL
 #define CS_REQUEST_VFS \

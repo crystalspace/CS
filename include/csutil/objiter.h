@@ -35,7 +35,7 @@
   {									\
   protected:								\
     virtual void GetRequestedInterface (scfInterfaceID &id, int &ver) const	\
-    { id = scfGetID_##INTERFACE (); ver = VERSION_##INTERFACE; }	\
+    { id = INTERFACE##_scfGetID (); ver = INTERFACE##_VERSION; }	\
   public:								\
     inline NAME (iObject *Parent) : csTypedObjectIterator (Parent)	\
       { FetchObject (); }						\

@@ -65,6 +65,13 @@ cindex @code{SCF_DECLARE_FAST_INTERFACE}
 Fast interfaces are now default. Just use the
 normal query versions instead of the ones above.
 
+@subheading Internal @sc{scf} changes
+
+For Interfaces the @code{scfGetID_Interfacename} and the
+@code{VERSION_Interfacename} have been renamed to
+@code{Interfacename_scfGetID} and @code{Interfacename_VERSION} for making
+namespaces working nicely with them.
+
 @subheading @code{make} Targets 
 Some targets for the @code{make} process(all apps, some plugins) have changed. 
 In general, the name of a target is now equal to the name of the resulting 

@@ -336,11 +336,11 @@ void *Class::QueryInterface (scfInterfaceID iInterfaceID, int iVersion)	\
  * This is a common macro used in all IMPLEMENTS_XXX_INTERFACE macros
  */
 #define SCF_IMPLEMENTS_INTERFACE_COMMON(Interface,Object)		\
-  static scfInterfaceID scfID_##Interface = (scfInterfaceID)-1;		\
-  if (scfID_##Interface == (scfInterfaceID)-1)				\
-    scfID_##Interface = iSCF::SCF->GetInterfaceID (#Interface);		\
-  if (iInterfaceID == scfID_##Interface &&				\
-    scfCompatibleVersion (iVersion, VERSION_##Interface))		\
+  static scfInterfaceID Interface##_scfID = (scfInterfaceID)-1;		\
+  if (Interface##_scfID == (scfInterfaceID)-1)				\
+    Interface##_scfID = iSCF::SCF->GetInterfaceID (#Interface);		\
+  if (iInterfaceID == Interface##_scfID &&				\
+    scfCompatibleVersion (iVersion, Interface##_VERSION))		\
   {									\
     (Object)->IncRef ();						\
     return STATIC_CAST(Interface*, Object);				\
@@ -609,7 +609,7 @@ struct iStrVector;
  */
 #define SCF_CREATE_INSTANCE(ClassID,Interface)				\
   (Interface *)iSCF::SCF->CreateInstance (				\
-  ClassID, #Interface, VERSION_##Interface)
+  ClassID, #Interface, Interface##_VERSION)
 
 /**
  * SCF_VERSION can be used as a shorter way to define an interface version;
@@ -624,8 +624,8 @@ struct iStrVector;
  * </pre>
  */
 #define SCF_VERSION(Name,Major,Minor,Micro)				\
-  const int VERSION_##Name = SCF_CONSTRUCT_VERSION (Major, Minor, Micro); \
-inline static scfInterfaceID scfGetID_##Name ()				\
+  const int Name##_VERSION = SCF_CONSTRUCT_VERSION (Major, Minor, Micro); \
+inline static scfInterfaceID Name##_scfGetID ()				\
 {									\
   static scfInterfaceID ID = (scfInterfaceID)-1;			\
   if (ID == (scfInterfaceID)(-1))					\
@@ -639,7 +639,7 @@ inline static scfInterfaceID scfGetID_##Name ()				\
  */
 #define SCF_QUERY_INTERFACE(Object,Interface)				\
   csPtr<Interface> ((Interface *)(Object)->QueryInterface (		\
-  scfGetID_##Interface (), VERSION_##Interface))
+  Interface##_scfGetID (), Interface##_VERSION))
 
 /**
  * Shortcut macro to query given interface from given object.
@@ -648,7 +648,7 @@ inline static scfInterfaceID scfGetID_##Name ()				\
  */
 #define SCF_QUERY_INTERFACE_SAFE(Object,Interface)			\
   csPtr<Interface> ((Interface *)(iBase::QueryInterfaceSafe ((Object),	\
-  scfGetID_##Interface (), VERSION_##Interface)))
+  Interface##_scfGetID (), Interface##_VERSION)))
 
 /**
  * This function should be called to initialize client SCF library.

@@ -40,7 +40,7 @@ struct iComponent;
  */
 #define CS_QUERY_PLUGIN_CLASS(Object,ClassID,Interface)			\
   csPtr<Interface> ((Interface *)((Object)->QueryPlugin			\
-  (ClassID, #Interface, VERSION_##Interface)))
+  (ClassID, #Interface, Interface##_VERSION)))
 
 /**
  * Tell plugin manager driver to load a plugin.
@@ -50,7 +50,7 @@ struct iComponent;
  */
 #define CS_LOAD_PLUGIN(Object,ClassID,Interface)			\
   csPtr<Interface> ((Interface *)((Object)->LoadPlugin			\
-  (ClassID, #Interface, VERSION_##Interface)))
+  (ClassID, #Interface, Interface##_VERSION)))
 
 /**
  * Same as CS_LOAD_PLUGIN but don't bother asking for a interface.

@@ -41,7 +41,7 @@ extern char *csStrNew (const char *s);
  * Callback returns false for continuation and true to break the loop.
  */
 extern void csCombinations (int m, int n,
-  bool (*callback) (int *vec, int count,
+  bool (*callback) (int *vector, int count,
   void *arg), void *arg);
 
 /**
