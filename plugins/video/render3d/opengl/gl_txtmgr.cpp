@@ -261,7 +261,7 @@ bool csGLTextureHandle::FindFormatType ()
 {
   int i;
 
-  GLint sourceFormat = csGLTextureHandle::sourceFormat;
+  GLenum sourceFormat = csGLTextureHandle::sourceFormat;
   if (sourceFormat == GL_RGBA)
   {
     if (!transp)
@@ -1141,7 +1141,7 @@ void csGLTextureManager::read_config (iConfigFile *config)
     AlterTargetFormat (it->GetKey (true)+1, it->GetStr ());
 }
 
-void csGLTextureManager::AlterTargetFormatForBits (GLint target, int bits)
+void csGLTextureManager::AlterTargetFormatForBits (GLenum target, int bits)
 {
   int targetIdx;
   for (targetIdx = 0; (glformats[targetIdx].sourceFormat != target)

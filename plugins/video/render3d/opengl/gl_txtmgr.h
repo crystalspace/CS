@@ -480,7 +480,7 @@ private:
 
   csPixelFormat pfmt;
 
-  void AlterTargetFormatForBits (GLint target, int bits);
+  void AlterTargetFormatForBits (GLenum target, int bits);
   void AlterTargetFormat (const char *oldTarget, const char *newTarget);
 
   iObjectRegistry *object_reg;
