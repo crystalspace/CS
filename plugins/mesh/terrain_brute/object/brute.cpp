@@ -832,10 +832,10 @@ bool csTerrainObject::ReadCDLODFromCache ()
     return false;	// Mismatch.
   }
 
-  int32 cache_cd_res;
+  uint32 cache_cd_res;
   cf->Read ((char*)&cache_cd_res, 4);
   cache_cd_res = csConvertEndian (cache_cd_res);
-  if (cache_cd_res != cd_resolution)
+  if ((int)cache_cd_res != cd_resolution)
   {
     if (verbose)
       csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
@@ -844,8 +844,9 @@ bool csTerrainObject::ReadCDLODFromCache ()
     return false;	// Mismatch.
   }
 
-  cf->Read ((char*)&polymesh_tri_count, 4);
-  polymesh_tri_count = csConvertEndian (polymesh_tri_count);
+  uint32 ptc;
+  cf->Read ((char*)&ptc, 4);
+  polymesh_tri_count = (int)csConvertEndian (ptc);
   polymesh_triangles = new csTriangle [polymesh_tri_count];
 
   for (i = 0 ; i < polymesh_tri_count ; i++)
@@ -876,18 +877,22 @@ void csTerrainObject::WriteCDLODToCache ()
   char header[5];
   strcpy (header, CDLODMAGIC);
   mf->Write ((char const*) header, 4);
-  uint32 cd_res = csConvertEndian (cd_resolution);
+
+  uint32 cd_res = (uint32)cd_resolution;
+  cd_res = csConvertEndian (cd_res);
   mf->Write ((char const*) &cd_res, 4);
-  uint32 tri_count = csConvertEndian (polymesh_tri_count);
+
+  uint32 tri_count = (uint32)polymesh_tri_count;
+  tri_count = csConvertEndian (tri_count);
   mf->Write ((char const*) &tri_count, 4);
 
   int i;
   for (i = 0 ; i < polymesh_tri_count ; i++)
   {
     uint32 a, b, c;
-    a = csConvertEndian (polymesh_triangles[i].a);
-    b = csConvertEndian (polymesh_triangles[i].b);
-    c = csConvertEndian (polymesh_triangles[i].c);
+    a = (uint32)polymesh_triangles[i].a; a = csConvertEndian (a);
+    b = (uint32)polymesh_triangles[i].b; b = csConvertEndian (b);
+    c = (uint32)polymesh_triangles[i].c; c = csConvertEndian (c);
     mf->Write ((char const*) &a, 4);
     mf->Write ((char const*) &b, 4);
     mf->Write ((char const*) &c, 4);
