@@ -869,7 +869,6 @@ void csSpriteCal3DMeshObject::LightChanged (iLight*)
 
 void csSpriteCal3DMeshObject::LightDisconnect (iLight* light)
 {
-  affecting_lights.Delete (light);
   lighting_dirty = true;
 }
 
@@ -878,22 +877,16 @@ void csSpriteCal3DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
 {
   CalRenderer *pCalRenderer;
   pCalRenderer = calModel.getRenderer();
-
+  
   // begin the rendering loop
   if(!pCalRenderer->beginRendering())
   {
     return;
   }
-
+  
   int meshCount;
   meshCount = pCalRenderer->getMeshCount();
-
-  int num_lights = lights.Length ();
-  for (int l = 0; l < num_lights; l++)
-  {
-    affecting_lights.Add (lights[l]);
-  }
-
+  
   // loop through all meshes of the model
   int meshId;
   for(meshId = 0; meshId < meshCount; meshId++)
@@ -901,7 +894,7 @@ void csSpriteCal3DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
     // get the number of submeshes
     int submeshCount;
     submeshCount = pCalRenderer->getSubmeshCount(meshId);
-
+    
     // loop through all submeshes of the mesh
     int submeshId;
     for(submeshId = 0; submeshId < submeshCount; submeshId++)
@@ -909,21 +902,20 @@ void csSpriteCal3DMeshObject::UpdateLighting (const csArray<iLight*>& lights,
       // select mesh and submesh for further data access
       if(pCalRenderer->selectMeshSubmesh(meshId, submeshId))
       {
-	//UpdateLightingSubmesh (lights, num_lights, movable, pCalRenderer,
-	//  meshId, submeshId);
-	InitSubmeshLighting (meshId, submeshId, pCalRenderer, movable);
-	for (int l = 0; l < num_lights; l++)
-	{
-	  UpdateLightingSubmesh (lights[l], movable, pCalRenderer,
-	    meshId, submeshId);
-	}
+        int num_lights = lights.Length ();
+  
+        // Update Lighting for all relevant lights
+        InitSubmeshLighting (meshId, submeshId, pCalRenderer, movable);
+        for (int l = 0; l < num_lights; l++)
+        {
+          UpdateLightingSubmesh (lights[l], movable, pCalRenderer,
+            meshId, submeshId);
+        }
       }
     }
   }
-
+  
   pCalRenderer->endRendering();
-
-  return;
 }
 
 
@@ -1026,42 +1018,43 @@ void csSpriteCal3DMeshObject::UpdateLighting (iMovable* movable,
 {
   if (!lighting_dirty)
     return;
-
+  
   int meshCount;
   meshCount = pCalRenderer->getMeshCount();
-
-  csSet<iLight*>::GlobalIterator it (affecting_lights.GetIterator ());
-
-    // loop through all meshes of the model
-  int meshId;
-  for(meshId = 0; meshId < meshCount; meshId++)
+  
+  if (factory->light_mgr)
   {
-    // get the number of submeshes
-    int submeshCount;
-    submeshCount = pCalRenderer->getSubmeshCount(meshId);
-
-    // loop through all submeshes of the mesh
-    int submeshId;
-    for(submeshId = 0; submeshId < submeshCount; submeshId++)
+    const csArray<iLight*>& relevant_lights = factory->light_mgr
+      ->GetRelevantLights (logparent, -1, false);
+    int num_lights = relevant_lights.Length ();
+    
+    // loop through all meshes of the model 
+    int meshId;
+    for(meshId = 0; meshId < meshCount; meshId++)
     {
-      // select mesh and submesh for further data access
-      if(pCalRenderer->selectMeshSubmesh(meshId, submeshId))
+      // get the number of submeshes
+      int submeshCount;
+      submeshCount = pCalRenderer->getSubmeshCount(meshId);
+      
+      // loop through all submeshes of the mesh
+      int submeshId;
+      for(submeshId = 0; submeshId < submeshCount; submeshId++)
       {
-	//UpdateLightingSubmesh (lights, num_lights, movable, pCalRenderer,
-	//  meshId, submeshId);
-	InitSubmeshLighting (meshId, submeshId, pCalRenderer, movable);
-
-	it.Reset ();
-	while (it.HasNext ())
-	{
-	  iLight* light = it.Next ();
-	  UpdateLightingSubmesh (light, movable, pCalRenderer,
-	    meshId, submeshId);
-	}
+        // select mesh and submesh for further data access
+        if(pCalRenderer->selectMeshSubmesh(meshId, submeshId))
+        {
+          // Set submesh lighting
+          InitSubmeshLighting (meshId, submeshId, pCalRenderer, movable);
+          for (int i = 0; i < num_lights; i++)
+          {
+            UpdateLightingSubmesh (relevant_lights[i],
+              movable, pCalRenderer, meshId, submeshId);
+          }
+        }
       }
     }
   }
-
+  
   lighting_dirty = false;
 }
 

@@ -556,7 +556,6 @@ private:
   csArray<csColor*>         *meshes_colors;
   csArray<int>		     attached_ids;
   csArray<bool>             *is_initialized;
-  csSet<iLight*> affecting_lights;
   bool lighting_dirty;
   csColor dynamic_ambient;
 
