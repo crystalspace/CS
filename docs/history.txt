@@ -24,6 +24,19 @@ chronological order.
 	  script name; yet C/C++ functions accepting argc/argv[] always expect
 	  argv[0] to be the script/program name, thus the bare @ARGV was not
 	  interpreted as the Perl programmer would expect.
+	- Eric Sunshine changed behavior of Java `in' typemap for argc/argv[]
+	  in javapre.i so that it now automatically prepends a synthesized
+	  argv[0] to the incoming array since C/C++ functions accepting
+	  argc/argv[] expect argv[0] to be the program or script name, but
+	  Java's `main(String[] args)' array contains only program arguments.
+	  Unfortunately, there does not seem to be any way of determining the
+	  location of the .class file in which main() was invoked, so
+	  "./csjava" is used as argv[0]. The "./" notation is used purposely so
+	  that functions, such as csGetAppPath(), which interpret argv[0] will
+	  consider the "current working directory" as the location of the
+	  program. (This may not be the best solution for synthesizing argv[0],
+	  but it is better than sending a bogus argv[] array to the C/C++
+	  function.)
 25-Nov-2004
 	- Eric Sunshine enhanced SCF so that it now recognizes the --verbose
 	  command-line option. When enabled, it emits the following additional

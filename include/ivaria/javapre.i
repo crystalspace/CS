@@ -19,6 +19,7 @@
 #ifdef SWIGJAVA
 
 #include <stdio.h>
+#include <string.h>
 
 %javaconst(1);
 
@@ -291,15 +292,27 @@ ICONFIGMANAGER_JAVACODE
 // argc-argv handling
 %typemap(in) (int argc, char const * const argv[])
 {
-    $1 = jenv->GetArrayLength($input);
+    $1 = jenv->GetArrayLength($input) + 1; // +1 for synthesized argv[0].
     $2 = (char **) malloc(($1 + 1) * sizeof(char *));
+    /* C/C++ functions accepting argc/argv[] expect argv[0] to be the program
+       or script name, but Java's `main(String[] args)' array contains only
+       program arguments. We must, therefore, prepend our own argv[0] to the
+       incoming array. Unfortunately, there does not seem to be any way of
+       determining the location of the .class file in which main() was invoked,
+       so we instead just use "./csjava" as argv[0]. We purposely use the "./"
+       notation so that functions, such as csGetAppPath(), which interpret
+       argv[0] will consider the "current working directory" as the location of
+       the program. (This may not be the best solution for synthesizing
+       argv[0], but it is better than sending a bogus argv[] array to the C/C++
+       function.)
+    */
+    $2[0] = strdup("./csjava");
     /* make a copy of each string */
     int i;
-    for (i = 0; i < $1; ++i) {
-        jstring j_string = (jstring) jenv->GetObjectArrayElement($input, i);
+    for (i = 1; i < $1; ++i) {
+        jstring j_string = (jstring)jenv->GetObjectArrayElement($input, i - 1);
         const char * c_string = jenv->GetStringUTFChars(j_string, 0);
-        $2[i] = (char *) malloc(strlen(c_string + 1)*sizeof(const char *));
-        strcpy($2[i], c_string);
+        $2[i] = strdup(c_string);
         jenv->ReleaseStringUTFChars(j_string, c_string);
         jenv->DeleteLocalRef(j_string);
     }
