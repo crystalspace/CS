@@ -21,6 +21,7 @@
 #define CSPARTIC_H
 
 #include "csgeom/vector3.h"
+#include "csgeom/box.h"
 #include "csobject/csobject.h"
 #include "csutil/cscolor.h"
 #include "iparticl.h"
@@ -309,6 +310,44 @@ public:
   CSOBJTYPE;
 };
 
+
+/**
+ * A rain particle system. Particles start falling down.
+ * Since speed if fixed due to air friction, this is not a NewtonianPartSys.
+ */
+class csRainParticleSystem : public csParticleSystem {
+protected:
+  csBox3 rainbox;
+  csVector3 rain_dir;
+  csVector3 *part_pos;
+
+public:
+  /** creates a rain particle system given parameters.
+    * number : number of raindrops visible at one time
+    * txt: texture of raindrops. mixmode = mixmode used.
+    * lighted: the particles will be lighted if true.
+    * drop_width, drop_height: size of rectangular raindrops.
+    * rainbox_min and max: give the box in the world where it will rain.
+    *   raindrops will start ...
+    *   and when they exit this box they will disappear.
+    * fall_speed: the direction and speed of the falling raindrops.
+    *   You can make slanted rain this way. Although you would also want to
+    *   slant the particles in that case...
+    */
+  csRainParticleSystem(int number, csTextureHandle* txt, UInt mixmode,
+    bool lighted_particles, float drop_width, float drop_height, 
+    const csVector3& rainbox_min, const csVector3& rainbox_max,
+    const csVector3& fall_speed
+    );
+  virtual ~csRainParticleSystem();
+
+  /**
+   * Update and light is flickered as well. particles will be scaled.
+   */
+  virtual void Update (time_t elapsed_time);
+
+  CSOBJTYPE;
+};
 
 #endif //CSPARTIC_H
 

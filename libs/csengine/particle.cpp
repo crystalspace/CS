@@ -30,6 +30,7 @@ IMPLEMENT_CSOBJTYPE (csParticleSystem, csObject)
 IMPLEMENT_CSOBJTYPE (csNewtonianParticleSystem, csParticleSystem)
 IMPLEMENT_CSOBJTYPE (csSpiralParticleSystem, csNewtonianParticleSystem)
 IMPLEMENT_CSOBJTYPE (csParSysExplosion, csNewtonianParticleSystem)
+IMPLEMENT_CSOBJTYPE (csRainParticleSystem, csParticleSystem)
 IMPLEMENT_IBASE (csParticleSystem)
   IMPLEMENTS_INTERFACE(iParticle)
 IMPLEMENT_IBASE_END
@@ -297,7 +298,7 @@ void csNewtonianParticleSystem :: Update(time_t elapsed_time)
   csVector3 move;
   csParticleSystem::Update(elapsed_time);
   // time passed; together with CS 1 unit = 1 meter makes units right.
-  float delta_t = elapsed_time / 1000.0; // in seconds
+  float delta_t = elapsed_time / 1000.0f; // in seconds
   for(int i=0; i<particles.Length(); i++)
   {
     // notice that the ordering of the lines (1) and (2) makes the
@@ -401,3 +402,68 @@ void csParSysExplosion :: RemoveLight()
   light_sector = NULL;
   light_world = NULL;
 }
+
+
+//-- csRainParticleSystem --------------------------------------------------
+
+csRainParticleSystem :: csRainParticleSystem(int number, csTextureHandle* txt, 
+  UInt mixmode, bool lighted_particles, float drop_width, float drop_height,
+  const csVector3& rainbox_min, const csVector3& rainbox_max, 
+  const csVector3& fall_speed)
+  : csParticleSystem()
+{
+  part_pos = new csVector3[number];
+  rain_dir = fall_speed;
+  rainbox.Set(rainbox_min, rainbox_max);
+  /// spread particles evenly through box
+  csVector3 size = rainbox_max - rainbox_min;
+  csVector3 pos;
+  for(int i=0; i<number; i++)
+  {
+    AppendRectSprite(drop_width, drop_height, txt, lighted_particles);
+    GetParticle(i)->SetMixmode(mixmode);
+    pos = GetRandomDirection(rainbox.Min(), size) ;
+    GetParticle(i)->SetPosition(pos);
+    part_pos[i] = pos;
+  }
+}
+
+csRainParticleSystem :: ~csRainParticleSystem()
+{
+  delete[] part_pos;
+}
+
+void csRainParticleSystem :: Update(time_t elapsed_time)
+{
+  csParticleSystem::Update(elapsed_time);
+  float delta_t = elapsed_time / 1000.0f; // in seconds
+  // move particles;
+  csVector3 move, pos;
+  int i;
+  for(i=0; i<particles.Length(); i++)
+  {
+    move = rain_dir * delta_t;
+    part_pos[i] += move;
+    GetParticle(i)->SetPosition (part_pos[i]); 
+  }
+  // check if particles are out of the box.
+  for(i=0; i<particles.Length(); i++)
+  {
+    if(!rainbox.In(part_pos[i]))
+    {
+      // this particle has left the box.
+      // it will disappear.
+      // To keep the number of particles (and thus the raininess)
+      // constant another particle will appear in sight now.
+      // @@@ rain only appears in box ceiling now, should appear on
+      // opposite side of rain_dir... 
+      pos = GetRandomDirection( rainbox.Min(), csVector3 (
+        rainbox.MaxX() - rainbox.MinX(), 
+        rainbox.MaxY() - rainbox.MinY(), 0.0f) );
+      GetParticle(i)->SetPosition(pos);
+      part_pos[i] = pos;
+    }
+  }
+}
+
+
