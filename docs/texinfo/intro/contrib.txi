@@ -997,10 +997,10 @@ and helps with maintenance in general.
 In general he did lots of small fixes in @sc{cs}.
 
 @item
-Justin Miller (@email{dyad@@fuse.net})
+Justin Miller (@email{j5t@@gmx.net})
 
-Justin added @code{csString::Format()}. He also contributed to the
-documentation and sent a few fixes.
+Justin contributed numerous patches, some documentation, significant work on
+Dynamics (physics) including a demo app, and a lot of chatter on #CrystalSpace.
 
 @item
 Luca Pancallo (@email{lpancallo@@ptc.com})
