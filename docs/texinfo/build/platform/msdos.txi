@@ -16,82 +16,85 @@ should need to compile Crystal Space with @sc{djgpp}:
 
 @noindent
 @sc{djgpp} development kit@*
-@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2/djdev201.zip}
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2/djdev203.zip}
 
 @noindent
 @sc{djgpp} frequently asked questions@*
-@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2/faq210b.zip}
-
-@noindent
-@sc{djgpp} @sc{dpmi} provider@*
-@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2misc/csdpmi3b.zip}
-
-@noindent
-@sc{djgpp} @sc{gnu} C++ libraries@*
-@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/lgp271b.zip}
-
-@noindent
-@sc{djgpp} @sc{gnu} help system@*
-@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/txi390b.zip}
-
-@noindent
-@sc{djgpp} @sc{gnu} linker and assembler@*
-@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/bnu281b.zip}
-
-@noindent
-@sc{djgpp} @sc{gnu} C compiler@*
-@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/gcc281b.zip}
-
-@noindent
-@sc{djgpp} @sc{gnu} C++ compiler@*
-@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/gpp281b.zip}
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2/faq230b.zip}
 
 @noindent
 @sc{djgpp} @sc{gnu} make utility@*
-@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/mak375b.zip}
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/mak3791b.zip}
 
 @noindent
-@sc{djgpp} @sc{gnu} sed utility@*
-@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/sed302b.zip}
+@sc{djgpp} @sc{gnu} linker and assembler@*
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/bnu2112b.zip}
+
+@noindent
+@sc{djgpp} @sc{gnu} C compiler@*
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/gcc2953b.zip}
+
+@noindent
+@sc{djgpp} @sc{gnu} C++ compiler@*
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/gpp2953b.zip}
 
 @noindent
 @sc{djgpp} @sc{gnu} file utilities@*
-@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/fil316b.zip}
-
-@noindent
-@sc{djgpp} @sc{gnu} text utilities@*
-@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/txt122b.zip}
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/fil40b.zip}
 
 @noindent
 @sc{djgpp} @sc{gnu} shell utilities@*
-@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/shl112b.zip}
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/shl20jb.zip}
 
 @noindent
 @sc{djgpp} @sc{gnu} diff utilities@*
-@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/dif271b.zip}
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/dif272b.zip}
 
 @noindent
 Compiled zip, jpeg and png libraries@*
-@uref{ftp://ftp.linuxgames.com/crystal/support/doslibs.zip}@*
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/dos/doslibs_0.94.zip}@*
 @emph{These are needed if the ``original'' libraries don't work.
-@xref{MSDOS Bugs}.}
+Extract these files into your CS directory. This will result in
+a @sc{libs} directory in @sc{CS\libs\cssys\djgpp}.
 
 @noindent
 @sc{nasm} (Netwide Assembler) for @sc{dos}@*
-@uref{ftp://ftp.linuxgames.com/crystal/nasm/nasm-0.98e-bin-dos.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/nasm/nasm-0.98e-bin-dos.zip}
+Install this and add an entry to your PATH environment variable, so it can be found.
 
 @noindent
 @sc{libdxe} (Dynamic Library Loader) for @sc{djgpp}@*
-@uref{ftp://ftp.linuxgames.com:/crystal/support/dxe2_012.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/dos/dxe2_094.zip}
+Extract this into your @sc{djgpp} install directory and compile it @sc{djgpp\contrib\dxe2} by
+invoking
+@example
+make
+@end example
+and after that do a
+@example
+make install
+@end example
+
+@sc{djgpp} @sc{gnu} C++ libraries@*
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/lgp2953b.zip}
+
+@noindent
+@sc{djgpp} @sc{gnu} help system@*
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/txi40b.zip}
+
+@noindent
+@sc{djgpp} @sc{gnu} sed utility@*
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/sed3028b.zip}
+
+@noindent
+@sc{djgpp} @sc{gnu} text utilities@*
+@uref{ftp://ftp.simtel.net/pub/simtelnet/gnu/djgpp/v2gnu/txt20b.zip}
 
 @subsubheading Installation
 
 Follow these installation instructions:
 
 @itemize @bullet
-@item
-Unzip the compiled libraries into the same folder where you unzipped Crystal
-Space (@pxref{MSDOS Bugs}).
 
 @item
 Unzip @sc{nasm} somewhere.
@@ -111,8 +114,16 @@ SET DJGPP=c:\djgpp\djgpp.env
 @end example
 
 @item
-Now just go to the Crystal Space directory (@file{CS/}), run @samp{make} and
-follow the instructions.
+Now just go to the Crystal Space directory (@file{CS/}).
+If you want to
+@itemize 
+@item
+build dynamic executables where only needed code is loaded at runtime do 
+@samp{make djgpp} and after that @samp{make all}.
+@item 
+build static executables where all is compiled in (programs tend go get very big that way :)
+then do @samp{make djgpp USE_PLUGINS=no} and after that @samp{make all}.
+@end itemize
 @end itemize
 
 @subsubheading Allegro
@@ -125,14 +136,17 @@ following line to @file{CS/config.mak} after the configuration step.
 USE_ALLEGRO = yes
 @end example
 
-@anchor{MSDOS Bugs}
-@subsubheading Bugs
+@subsubheading additional Download location
 
 The pre-compiled libraries on the Crystal Space site didn't work for me, so I
 made my own.  You can download them from here:
 
 @uref{http://asp.planetquake.com/dl/dl.asp?simitar/doslibsb.zip}
+Note that this library does not follow the CS directory layout, so you have to extract it yourself
+into the @sc{CS/libs/cssys/djgpp} directory.
 
-Do not unzip the other compiled libraries into your Crystal Space directory.
-(Delete them if you already unzipped them.)  Unzip my version of the compiled
-libraries into your @sc{djgpp} directory.
+@subsubheading Platform
+
+I tested compilation on a WinNT4.0 sp6 system with cmd.exe as shell.
+Note that there are issues with djgpp and Win2k/WinXP. I did not try either so you are on 
+your own here, but be told there is a FAQ on www.delorie.com/djgpp regarding this issue.
