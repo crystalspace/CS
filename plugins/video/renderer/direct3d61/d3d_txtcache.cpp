@@ -484,9 +484,6 @@ void D3DLightMapCache::Load (csD3DCacheData *cached_lightmap)
   ddsd.dwWidth = lwidth;
   memcpy (&ddsd.ddpfPixelFormat, &csGraphics3DDirect3DDx6::m_ddsdLightmapSurfDesc.ddpfPixelFormat, sizeof(DDPIXELFORMAT));
   
-  ASSERT (!(lheight%2));
-  ASSERT (!(lwidth%2));
-  
   VERIFY_SUCCESS (m_lpDD->CreateSurface (&ddsd,
     &cached_lightmap->LightMap.lpsurf, NULL));
   
