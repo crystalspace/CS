@@ -23,39 +23,21 @@
 #include "csutil/csvector.h"
 
 class csCurve;
-
-/**
- * A dynamic array of curve surfaces.
- * This class is used in polygon set and in thing template classes
- * for storing the curves that are part of respective objects.
- */
-class csCurvesArray : public csVector
-{
-public:
-  /// Initialize the vector of curve surfaces
-  csCurvesArray (int iLimit, int iDelta) : csVector (iLimit, iDelta)
-  { }
-
-  /// Destroy the array and all curve surfaces inserted into this array
-  virtual ~csCurvesArray ();
-
-  /// Free a single element of the array
-  virtual bool FreeItem (csSome Item);
-
-  /// Search for a curve surface object by name
-  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
-
-  /// Get a curve surface by index
-  csCurve *Get (int iIndex) const
-  { return (csCurve *)csVector::Get (iIndex); }
-
-  /// Get the entire array of curve surfaces
-  csCurve **GetArray ()
-  { return (csCurve **)root; }
-};
-
+class csLightHalo;
 class csPolygonInt;
 class csPolygon3D;
+
+/// A dynamic array of csCurve objects
+BEGIN_TYPED_VECTOR (csCurvesArray, csCurve);
+  bool FreeTypedItem (csCurve* obj);
+  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
+FINISH_TYPED_VECTOR (csCurve);
+
+/// A dynamic array of csLightHalo objects
+BEGIN_TYPED_VECTOR (csHaloArray, csLightHalo);
+  bool FreeTypedItem (csLightHalo* obj);
+  virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
+FINISH_TYPED_VECTOR (csLightHalo);
 
 /**
  * An dynamic array of csPolygon3D objects.
@@ -84,29 +66,6 @@ public:
   /// Get the entire array of polygons as an array of pointers
   csPolygonInt **GetArray ()
   { return (csPolygonInt **)root; }
-};
-
-class csLightHalo;
-
-// Private class for keeping an array of halos
-class csHaloArray : public csVector
-{
-public:
-  // Constructor
-  csHaloArray () : csVector (16, 16) { }
-
-  // Destructor
-  virtual ~csHaloArray ();
-
-  // Free an item from array
-  virtual bool FreeItem (csSome Item);
-
-  // Find a halo by referenced light
-  virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const;
-
-  // Return an reference to Nth halo info
-  inline csLightHalo *Get (int n) const
-  { return (csLightHalo *)csVector::Get (n); }
 };
 
 #endif // __ARRAYS_H__

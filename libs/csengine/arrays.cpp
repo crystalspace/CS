@@ -25,14 +25,9 @@
 
 //-------------------------------------------------------+ csCurvesArray +----//
 
-csCurvesArray::~csCurvesArray ()
+bool csCurvesArray::FreeTypedItem (csCurve *Item)
 {
-  DeleteAll ();
-}
-
-bool csCurvesArray::FreeItem (csSome Item)
-{
-  delete (csCurve *)Item;
+  delete Item;
   return true;
 }
 
@@ -70,14 +65,9 @@ csPolygon3D *csPolygonArray::Get (int iIndex) const
 
 //---------------------------------------------------------+ csHaloArray +----//
 
-csHaloArray::~csHaloArray ()
+bool csHaloArray::FreeTypedItem (csLightHalo *Item)
 {
-  DeleteAll ();
-}
-
-bool csHaloArray::FreeItem (csSome Item)
-{
-  delete (csLightHalo *)Item;
+  delete Item;
   return true;
 }
 

@@ -228,17 +228,17 @@ inline void csVector::QuickSort (int Mode)
  * destruction. However, you must define FreeTypedItem() yourself.
  *
  * Usage:
- *   BEGIN_TYPED_VECTOR_EXT(NAME,TYPE)
+ *   BEGIN_TYPED_VECTOR(NAME,TYPE)
  *     user-defined FreeTypedItem() here
  *     any other user-defined methods
- *   END_TYPED_VECTOR_EXT(TYPE)
+ *   FINISH_TYPED_VECTOR(TYPE)
  *
  * Parameters:
  *   NAME - Name of the new vector class.
  *   TYPE - Data type to which this vector refer.
  *          The TYPE should be possible to cast to (void *) and back.
  */
-#define BEGIN_TYPED_VECTOR_EXT(NAME,TYPE)				\
+#define BEGIN_TYPED_VECTOR(NAME,TYPE)					\
   class NAME : private csVector						\
   {									\
   public:								\
@@ -260,9 +260,11 @@ inline void csVector::QuickSort (int Mode)
     inline int InsertSorted (TYPE *Item, int *oEqual = NULL, int Mode = 0) \
     { return csVector::InsertSorted ((csSome)Item, oEqual, Mode); }	\
     inline bool Replace (int n, TYPE *what, bool FreePrevious = true)	\
-    { return csVector::Replace(n, (csSome)what, FreePrevious); }
+    { return csVector::Replace(n, (csSome)what, FreePrevious); }	\
+    inline TYPE **GetArray ()						\
+    { return (TYPE**)root; }
 
-#define END_TYPED_VECTOR_EXT(TYPE)					\
+#define FINISH_TYPED_VECTOR(TYPE)					\
     virtual bool FreeItem (csSome Item)					\
     { return FreeTypedItem ((TYPE *)Item); }				\
   }
@@ -273,20 +275,20 @@ inline void csVector::QuickSort (int Mode)
  * on either Delete() or DeleteAll() or upon vector destruction.
  */
 #define DECLARE_TYPED_VECTOR(NAME,TYPE)					\
-  BEGIN_TYPED_VECTOR_EXT (NAME,TYPE)					\
+  BEGIN_TYPED_VECTOR (NAME,TYPE)					\
     inline bool FreeTypedItem (TYPE* obj)				\
     { delete obj; return true; }					\
-  END_TYPED_VECTOR_EXT (TYPE)
+  FINISH_TYPED_VECTOR (TYPE)
 
 /**
  * Declares a new vector type NAME as a subclass of csVector. Elements of
  * this vector are of type TYPE. The elements are not deleted by this vector.
  */
 #define DECLARE_TYPED_VECTOR_NODELETE(NAME,TYPE)			\
-  BEGIN_TYPED_VECTOR_EXT (NAME,TYPE)					\
+  BEGIN_TYPED_VECTOR (NAME,TYPE)					\
     inline bool FreeTypedItem (TYPE* obj)				\
     { return true; }							\
-  END_TYPED_VECTOR_EXT (TYPE)
+  FINISH_TYPED_VECTOR (TYPE)
 
 /**
  * This is a special version of typed vectors that contain SCF objects. The
