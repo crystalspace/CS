@@ -400,7 +400,7 @@ private:
   /// frustum of where the visible light hits (for use with curves)
   csFrustum *light_frustum;
 
-private:
+public:
   /**
    * Create an empty light patch (infinite frustum).
    */
@@ -412,7 +412,6 @@ private:
    */
   ~csLightPatch ();
 
-public:
   /**
    * Make room for the specified number of vertices and
    * initialize to start a new light patch.

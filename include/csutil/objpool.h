@@ -25,16 +25,18 @@
  * objects if possible to save time. For this reason, unused objects of the
  * given type should not be deleted but given to the pool.
  */
-#define DECLARE_OBJECT_POOL(name,type)					\
-class name : private csObjectPool {					\
+#define CS_DECLARE_OBJECT_POOL(name,type)				\
+class name : protected csObjectPool {					\
 private:								\
   virtual void* CreateItem ()						\
   { return new type (); }						\
   virtual void FreeItem (void* o)					\
   { type *obj = (type*)o; delete obj; }					\
 public:									\
-  type *Allocate ()							\
-  { return csObjectPool::Allocate (); }					\
+  virtual ~name ()							\
+  { for (int i=0; i<Num; i++) FreeItem (Objects[i]); }			\
+  type *Alloc ()							\
+  { return (type*)csObjectPool::Alloc (); }				\
   void Free (type *o)							\
   { csObjectPool::Free (o); }						\
 };
@@ -42,7 +44,7 @@ public:									\
 /// This is a helper class for DECLARE_OBJECT_POOL
 class csObjectPool
 {
-private:
+protected:
   csSome *Objects;
   int Num, Max;
 
@@ -56,14 +58,11 @@ public:
     Num = 0;
     Max = 16;
   }
-  ~csObjectPool ()
+  virtual ~csObjectPool ()
   {
-	int i;
-    for (i=0; i<Num; i++)
-      FreeItem (Objects[Num]);
     delete[] Objects;
   }
-  void *Allocate ()
+  void *Alloc ()
   {
     if (Num > 0) {
       Num--;
