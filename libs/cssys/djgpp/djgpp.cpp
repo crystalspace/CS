@@ -31,7 +31,7 @@
 #include <crt0.h>
 
 #include "cssysdef.h"
-#include "djgpp.h"
+#include "cssys/djgpp/djgpp.h"
 #include "csutil/inifile.h"
 #include "isystem.h"
 #include "inputq.h"
