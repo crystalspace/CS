@@ -31,6 +31,23 @@ The history order has been reversed so that new features are at the top.
 	- Updated apimod17.txi.
 	- Fixed WalkTest so that collision detection with moving things
 	  is now ok.
+	- Fixed a bad bug with STATBSP level caused by recent changes.
+	  The static thing could get corrupted in some cases. Also I forgot
+	  to add the static thing to the world.
+	- Andrew Zabolotny did the following:
+	    - Fixed all textures in MazeD and csws to be power of two.
+	      This includes notebook textures. Previous csws.zip had some
+	      strange dithering applied, and color wheel was broken (it
+	      was designed to be 129x129, and it was resized to 128x128
+	      which caused one scanline of garbage below the color wheel).
+	      Also the csws.zip archive is almost twice smaller now (all
+	      pngs were saved as truecolor, while 256 color format suffice
+	      for most PNGs except wheel).
+	    - Fixed an almost unnoticeable bug in csws listboxes which
+	      leads to directory listbox sometimes to have two focused
+	      items (when you switch directories).
+	    - Re-generated the color wheel bitmap to size 128x128 rather
+	      than 129x129. This leaded to small changes in code as well.
 30-Aug-2000
      	- Andrew Zabolotny:
 	    - Some fixes to MazeD. Now it works, but is unusabled due to

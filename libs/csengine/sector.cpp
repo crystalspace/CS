@@ -127,7 +127,6 @@ void csSector::UseStaticTree (int mode, bool /*octree*/)
   static_thing = new csThing (world);
   static_thing->SetName ("__static__");
 
-  static_thing->GetMovable ().SetSector (this);
   int i;
   i = 0;
   while (i < things.Length ())
@@ -143,8 +142,10 @@ void csSector::UseStaticTree (int mode, bool /*octree*/)
     }
     else i++;
   }
-  things.Push (static_thing);
+  static_thing->GetMovable ().SetSector (this);
+  static_thing->GetMovable ().UpdateMove ();
   static_thing->CreateBoundingBox ();
+  world->things.Push (static_thing);
 
   csBox3 bbox;
   static_thing->GetBoundingBox (bbox);
