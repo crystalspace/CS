@@ -1,8 +1,127 @@
 The history order has been reversed so that new features are at the top.
 
 31-Jan-2001
-	- Norman Kramer extended PLUGIN var to build AVI and optionally
-	  opendivx.
+	- Norman Kramer did further work on the video plugins:
+	    - Extended PLUGIN var to build AVI and optionally opendivx.
+	    - Added output of what is currently done when trying to load video.
+	- Philip Wyett altered path to file 'video.avi' to data directory.
+	- Andrew Zabolotny did the following changes to CS:
+	    - Now the toolbox toolbar tracks the active editor window
+	      (model or world) and changes accordingly. I have drawn a few
+	      more icons for MazeD in GIMP, and switched the toolbar
+	      texture format to truecolor PNG with alpha channel. Now
+	      toolbar icons can have (and some already have) semi-transparent
+	      parts :-)
+	    - CSWS buttons with pictures are grayed (pictures are displayed
+	      semi-transparent) when the buttons are disabled. Also they do
+	      not emit the cscmdRightButtonClick message when they are
+	      disabled (in MazeD this was manifesting as second-level
+	      toolbars popping up even from disabled buttons).
+	    - Floating hints will disappear properly even if some window
+	      has captured the focus (such as a dialog window). To do so
+	      they grab the mouse.
+	    - Rewrote much of the csTreeCtrl (treeview) control. The
+	      basical interface is very similar (except that I've renamed
+	      csTreeCtrl into csTreeBox); most of the changes are related
+	      to the internal implementation. Other features: a completely
+	      new look-and-feel; a extended, more flexible and less
+	      cumbersome API (and a simpler implementation). Also I have
+	      changed cswstest so that you can switch miscelaneous tree
+	      control styles at runtime and see them in effect instantly
+	      (like for notebook control).
+	    - Made the csLayout class to set the CSS_TRANSPARENT flag
+	      (again?) since otherwise the dialog background "under" the
+	      layout isn't drawn, and since the layout itself does not paint
+	      anything, you get an hall-of-mirrors like effect (when you
+	      move the window).
+	    - Dialogs with no children will SuggestSize 8x8 rather than
+	      2x2 like it did before. This allows for better identification
+	      of windows with wrongly set CSWS_TOOLBAR style bit set :-)
+	      (toolbar is a dialog too, so if you wrongly set this bit when
+	      creating the window, you'll get just a couple of thin black
+	      lines which are confusing, at least they were for me :-)
+	    - Changed a little the behaviour of csComponent::NextChild()
+	      and PrevChild(): now it returns the next/previous *visible*
+	      and selectable child rather than just selectable. This has
+	      the effect of not showing anymore the hidden windows when
+	      closing a visible window (per Jorrit's request). However, if
+	      there is nothing left than hidden window, a hidden window
+	      will be focused anyway (but not shown).
+	    - Changed a little listbox behaviour and look. No lightblue
+	      frame on the focused item anymore; when listbox is active,
+	      the focused item is denoted by a solid background, otherwise
+	      it is denoted with a thin frame of the same color.
+	    - Added a method csComponent::OtherToThis (csComponent, x&, y&)
+	      which will convert coordinates from coordinate system of
+	      other component to this component's coordinate system. This
+	      is faster than the using the LocalToGlobal -> GlobalToLocal
+	      pair if the `from' component is a child (or grandchild, or
+	      grandgrandchild etc) of `this' component.
+	    - Made the toolbars resizeable in MazeD. By default toolbars
+	      are now four buttons wide (rather than two like it was
+	      before), to reserve a little space for coming "world tree"
+	      and "material selector" toolbars.
+	    - Added a new kind of events: csevMouseClick. This is generated
+	      by mouse event manager (AKA mouse driver) when it detects that
+	      the mouse button has been pressed and then released within
+	      "DoubleClickTime" and the mouse haven't been moved further
+	      than "DoubleClickDist". That is, when you quickly press and
+	      release the mouse button twice in sequence, you will
+	      generate the next events:
+		csevMouseDown
+		csevMouseUp
+		csevMouseClick (at the same time with MouseUp)
+		* This event is emmited only if the mouse haven't moved too
+		* far between MouseDown and MouseUp and the time between
+		* them haven't exceeded some threshold value.
+		csevMouseDown
+		csevMouseDoubleClick (at the same with MouseDown)
+		* This event is also generated if the same conditions are true.
+		csevMouseUp
+		csevMouseClick (at the same time with MouseUp)
+		* Yet another mouse click event, if the conditions are met.
+	      You can notice a slight conceptual difference in Click and
+	      DoubleClick because Click is generated after mouse is
+	      released, and DoubleClick is generated when mouse is pressed.
+	      Well, this is so for historical reasons - most GUIs uses
+	      mouse this way.
+
+	      Also note that the behaviour of double clicks event has
+	      slightly changed: now DoubleClick is emmited *in addition*
+	      to MouseDown rather than *instead* like it was before. That is,
+	      you will *always* get all the MouseDown and MouseUp events
+	      disregarding whenever click and doubleclick events have
+	      occured; these events are additional and are introduced just
+	      to help the programmer to track these conditions; in general
+	      he could do it himself by using timer, remembering position etc.
+
+	      This has a slight impact on some seldom-encountered code
+	      sequences: if before to catch absolutely all mousedown
+	      events you had to catch both MouseDown and MouseDoubleClick
+	      events, now you have to catch just MouseDown and don't bother
+	      about MouseClick and MouseDoubleClick - the event you are
+	      looking for will be always emited. In fact, if you will
+	      leave the code as before, you will intercept now two
+	      events instead of one; while in most cases it doesn't matter,
+	      in some cases it can.
+	    - Added a small context menu to every toolbar in MazeD.
+	    - Started implementing world tree toolbar. Now it is one of the
+	      standard toolbars. It displays in a tree fashion the structure
+	      of the 3D world. At the "top" level there can be only sectors
+	      (AKA rooms), inside them you can nest things and sprites
+	      (but not rooms).
+	    - Remove ?= from assignment to CSSYS.OBJ since GNU Make 3.77
+	      doesn't expand the text after such an assignment. That is,
+	      "CSSYS.OBJ ?= $(...)" is treated literally, e.g. the text
+	      inside the brackets is not expanded. If someone really needs
+	      ?=, use ifndef instead -- although I don't see any assignments
+	      to CSSYS.OBJ, so I can't understand why somebody have put ?=
+	      there.
+	    - Removed "dep: ..." after last line of "clean:" target - it
+	      seems like traces of a CVS conflict introduced by someone in CVS.
+	- Eric Sunshine fixed cssys.mak to again support conditional setting
+	  of OBJ.CSSYS.  (This feature was disabled in the most recent
+	  revision).
 	- Eric Sunshine fixed video.mak so that the `vid' target only appears
 	  in the application list if the platform is also able to build
 	  video-related plugins.  Also fixed formatting of help message.
