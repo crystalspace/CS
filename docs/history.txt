@@ -19,6 +19,9 @@ The history order is reversed so that new features are at the top.
 	    - Fixed the global "clean" target so that it works correctly with
 	      the merged (msvc + msvc7) msvcgen makefile.
 	- Eric Sunshine added apps/import/caltocs to msvcgen/required.mak.
+	- Eric Sunshine fixed msvcgen templates so that they provide the
+	  resource compiler with sufficient information so that the headers
+	  #included by the .rc files can be found.
 4-Aug-2002
 	- Eric Sunshine made the following changes to mk/msvcgen/msvcgen.mak
 	  and msvc7gen.mak:
