@@ -303,11 +303,11 @@ public:
   /// Enables offsetting of Z values
   virtual void EnableZOffset ()
     { glPolygonOffset (-0.05, -2); 
-      statecache->EnableState (GL_POLYGON_OFFSET_FILL); }
+      statecache->Enable_GL_POLYGON_OFFSET_FILL (); }
 
   /// Disables offsetting of Z values
   virtual void DisableZOffset ()
-    { statecache->DisableState (GL_POLYGON_OFFSET_FILL); }
+    { statecache->Disable_GL_POLYGON_OFFSET_FILL (); }
 
   /// Controls shadow drawing
   virtual void SetShadowState (int state);
@@ -359,19 +359,19 @@ public:
 
   /// Enables light i
   virtual void EnableLight (int i)
-    { statecache->EnableState (GL_LIGHT0+i); }
+    { glEnable (GL_LIGHT0+i); }
 
   /// Disables light i
   virtual void DisableLight (int i)
-    { statecache->DisableState (GL_LIGHT0+i); }
+    { glDisable (GL_LIGHT0+i); }
 
   /// Enable vertex lighting
   virtual void EnablePVL ()
-    { statecache->EnableState (GL_LIGHTING); }
+    { statecache->Enable_GL_LIGHTING (); }
     
   /// Disable vertex lighting
   virtual void DisablePVL ()
-    { statecache->DisableState (GL_LIGHTING); }
+    { statecache->Disable_GL_LIGHTING (); }
 
   /// Get a stringhash to be used by our streamsources etc.
   csStringSet *GetStringContainer () 

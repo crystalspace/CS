@@ -27,7 +27,44 @@
 #endif
 
 #include "video/canvas/openglcommon/iglstates.h"
-#include "csutil/hashmap.h"
+
+#define IMPLEMENT_CACHED_BOOL( name ) \
+  bool enabled_##name; \
+  void Enable_##name () { \
+    if( !enabled_##name ) { \
+      enabled_##name = true;  \
+      glEnable( name ); \
+    } \
+  } \
+  void Disable_##name () { \
+    if( enabled_##name ) { \
+      enabled_##name = false;  \
+      glDisable( name ); \
+    } \
+  } \
+  bool IsEnabled_##name () const { \
+    return enabled_##name; \
+  }
+
+#define MAX_LAYER 16
+
+#define IMPLEMENT_CACHED_BOOL_LAYER( name ) \
+  bool enabled_##name[MAX_LAYER]; \
+  void Enable_##name (int l = 0) { \
+    if( !enabled_##name[l] ) { \
+      enabled_##name[l] = true;  \
+      glEnable( name ); \
+    } \
+  } \
+  void Disable_##name (int l = 0) { \
+    if( enabled_##name[l] ) { \
+      enabled_##name[l] = false;  \
+      glDisable( name ); \
+    } \
+  } \
+  bool IsEnabled_##name (int l = 0) const { \
+    return enabled_##name[l]; \
+  }
 
 #define IMPLEMENT_CACHED_PARAMETER_1( func, name, type1, param1 ) \
   type1 parameter_##param1; \
@@ -75,19 +112,8 @@
   }
 
 
-struct csOpenGLState
-{
-  GLenum state;
-  bool enabled;
-  int layer;
-  csOpenGLState( GLenum s, bool e, int l ) { state = s; enabled = e; layer = l; }
-};
-
 class csGLStateCache : public iGLStateCache
 {
-private:
-  /// Cached states
-  csHashMap statecache;
 public:
 
   SCF_DECLARE_IBASE;
@@ -102,19 +128,16 @@ public:
   /// Init cache
   void InitCache();
 
-  /// Enable state
-  void EnableState( GLenum state, int layer = 0 );
-
-  /// Disable state
-  void DisableState( GLenum state, int layer = 0 );
-
-  /// Toggle state
-  void ToggleState( GLenum state, int layer = 0 );
-
-  /// Get state
-  bool GetState( GLenum state, int layer = 0 );
-
   // Standardized caches
+  IMPLEMENT_CACHED_BOOL (GL_DEPTH_TEST)
+  IMPLEMENT_CACHED_BOOL (GL_BLEND)
+  IMPLEMENT_CACHED_BOOL (GL_DITHER)
+  IMPLEMENT_CACHED_BOOL (GL_STENCIL_TEST)
+  IMPLEMENT_CACHED_BOOL (GL_CULL_FACE)
+  IMPLEMENT_CACHED_BOOL (GL_POLYGON_OFFSET_FILL)
+  IMPLEMENT_CACHED_BOOL (GL_LIGHTING)
+  IMPLEMENT_CACHED_BOOL (GL_ALPHA_TEST)
+  IMPLEMENT_CACHED_BOOL_LAYER (GL_TEXTURE_2D)
   IMPLEMENT_CACHED_PARAMETER_2( glAlphaFunc, AlphaFunc, GLenum, alpha_func, GLclampf, alpha_ref )
   IMPLEMENT_CACHED_PARAMETER_2( glBlendFunc, BlendFunc, GLenum, blend_source, GLenum, blend_destination )
   IMPLEMENT_CACHED_PARAMETER_1( glCullFace, CullFace, GLenum, cull_mode )
@@ -132,6 +155,7 @@ public:
 
 };
 
+#undef IMPLEMENT_CACHED_BOOL
 #undef IMPLEMENT_CACHED_PARAMETER_1
 #undef IMPLEMENT_CACHED_PARAMETER_2
 #undef IMPLEMENT_CACHED_PARAMETER_3

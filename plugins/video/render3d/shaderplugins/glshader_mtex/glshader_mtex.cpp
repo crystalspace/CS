@@ -464,7 +464,7 @@ void csShaderGLMTEX::Activate(iShaderPass* current, csRenderMesh* mesh)
       texturehandle = cachedata->Handle;
 
       statecache->SetTexture(GL_TEXTURE_2D, texturehandle, i);
-      statecache->EnableState(GL_TEXTURE_2D, i);
+      statecache->Enable_GL_TEXTURE_2D (i);
       layer->doTexture = true;
     }
 
@@ -519,7 +519,7 @@ void csShaderGLMTEX::Deactivate(iShaderPass* current, csRenderMesh* mesh)
     ext->glActiveTextureARB (GL_TEXTURE0_ARB+i);
     ext->glClientActiveTextureARB (GL_TEXTURE0_ARB+i);
     if (i>0)
-      statecache->DisableState (GL_TEXTURE_2D, i);
+      statecache->Disable_GL_TEXTURE_2D (i);
     glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
   }
 }

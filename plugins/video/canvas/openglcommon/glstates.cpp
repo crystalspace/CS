@@ -27,15 +27,11 @@ SCF_IMPLEMENT_IBASE_END
 
 csGLStateCache::~csGLStateCache()
 {
-  csHashIterator cIterator (&statecache);
-  while (cIterator.HasNext())
-  {
-    delete (csOpenGLState*)cIterator.Next();
-  }
 }
 
 void csGLStateCache::InitCache()
 {
+  int i;
   glGetIntegerv( GL_ALPHA_TEST_FUNC, (GLint*)&parameter_alpha_func );
   glGetFloatv( GL_ALPHA_TEST_REF, &parameter_alpha_ref );
   glGetIntegerv( GL_BLEND_SRC, (GLint*)&parameter_blend_source );
@@ -50,83 +46,21 @@ void csGLStateCache::InitCache()
   glGetIntegerv( GL_STENCIL_FAIL, (GLint*)&parameter_stencil_fail );
   glGetIntegerv( GL_STENCIL_PASS_DEPTH_FAIL, (GLint*)&parameter_stencil_zfail );
   glGetIntegerv( GL_STENCIL_PASS_DEPTH_PASS, (GLint*)&parameter_stencil_zpass );
+  enabled_GL_DEPTH_TEST = glIsEnabled (GL_DEPTH_TEST);
+  enabled_GL_BLEND = glIsEnabled (GL_BLEND);
+  enabled_GL_DITHER = glIsEnabled (GL_DITHER);
+  enabled_GL_STENCIL_TEST = glIsEnabled (GL_STENCIL_TEST);
+  enabled_GL_CULL_FACE = glIsEnabled (GL_CULL_FACE);
+  enabled_GL_POLYGON_OFFSET_FILL = glIsEnabled (GL_POLYGON_OFFSET_FILL);
+  enabled_GL_LIGHTING = glIsEnabled (GL_LIGHTING);
+  enabled_GL_ALPHA_TEST = glIsEnabled (GL_ALPHA_TEST);
+  enabled_GL_TEXTURE_2D[0] = glIsEnabled (GL_TEXTURE_2D);
+  for (i = 1 ; i < MAX_LAYER ; i++)
+    enabled_GL_TEXTURE_2D[i] = enabled_GL_TEXTURE_2D[0];
 
   memset( texture1d, 0, 32*sizeof(GLuint) );
   memset( texture2d, 0, 32*sizeof(GLuint) );
 }
-
-void csGLStateCache::EnableState( GLenum state, int layer )
-{
-  csHashIterator cIterator( &statecache, state );
-  while (cIterator.HasNext())
-  {
-    csOpenGLState* glstate = (csOpenGLState*)cIterator.Next();
-    if( (glstate->state == state) && (glstate->layer == layer) )
-    {
-      if( !glstate->enabled )
-      {
-        glEnable (state);
-        glstate->enabled = true;
-      }
-      return;
-    }
-  }
-  statecache.Put (state, new csOpenGLState (state, true, layer));
-  glEnable( state );
-}
-
-void csGLStateCache::DisableState( GLenum state, int layer )
-{
-  csHashIterator cIterator( &statecache, state );
-  while( cIterator.HasNext() )
-  {
-    csOpenGLState* glstate =  (csOpenGLState*)cIterator.Next();
-    if( (glstate->state == state) && (glstate->layer == layer) )
-    {
-      if( glstate->enabled )
-      {
-        glDisable( state );
-        glstate->enabled = false;
-      }
-      return;
-    }
-  }
-  statecache.Put( state, new csOpenGLState( state, false, layer ) );
-  glDisable( state );
-}
-
-void csGLStateCache::ToggleState( GLenum state, int layer )
-{
-  csHashIterator cIterator( &statecache, state );
-  while( cIterator.HasNext() )
-  {
-    csOpenGLState* glstate =  (csOpenGLState*)cIterator.Next();
-    if( (glstate->state == state) && (glstate->layer == layer) )
-    {
-      if( glstate->enabled )
-        glDisable( state );
-      else
-        glEnable( state );
-      glstate->enabled = !glstate->enabled;
-      return;
-    }
-  }
-  statecache.Put( state, new csOpenGLState( state, true, layer ) );
-  glEnable( state );
-}
-
-bool csGLStateCache::GetState( GLenum state, int layer )
-{
-  csHashIterator cIterator( &statecache, state );
-  while( cIterator.HasNext() )
-  {
-    csOpenGLState* glstate = (csOpenGLState*)cIterator.Next();
-    if( (glstate->state == state) && (glstate->layer == layer) )
-      return glstate->enabled;
-  }
-  return false;
-}
-
 
 void csGLStateCache::SetTexture( GLenum target, GLuint texture, int layer )
 {

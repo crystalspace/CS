@@ -13,10 +13,15 @@ The history order is reversed so that new features are at the top.
 	  using the OpenGL functions directly but that is illegal since the
 	  OpenGL renderer itself keeps a cached state of this. So you should
 	  always go through the cache instead. This fixes a bug where
-	  enabling DrawPolygonMesh for the car in the street of flarge would cause
-	  the snow to become too bright.
+	  enabling DrawPolygonMesh for the car in the street of flarge would
+	  cause the snow to become too bright.
 	- The OpenGL polygon buffer now stores an array of triangles for fog.
 	  Not operational yet.
+	- Completely removed the slow general EnableState/DisableState
+	  functions in the OpenGL state cache and replaced them with specific
+	  enable/disable functions for various states. The hashmap is thus
+	  no longer needed. This change gives a small but noticable performance
+	  increase.
 26-Jan-2003
 	- Added a missing call to SetMirrored() in the old OpenGL renderer
 	  in EffectDrawTriangleMesh(). This fixes a few problems with

@@ -207,10 +207,10 @@ void csGraphics2DGLCommon::DrawLine (
   if (!ClipLine (x1, y1, x2, y2, ClipX1, ClipY1, ClipX2, ClipY2))
   {
     // prepare for 2D drawing--so we need no fancy GL effects!
-    bool gl_texture2d = glIsEnabled(GL_TEXTURE_2D);
+    bool gl_texture2d = statecache->IsEnabled_GL_TEXTURE_2D ();
     bool gl_alphaTest = glIsEnabled(GL_ALPHA_TEST);
-    if (gl_texture2d) statecache->DisableState (GL_TEXTURE_2D);
-    if (gl_alphaTest) statecache->DisableState (GL_ALPHA_TEST);
+    if (gl_texture2d) statecache->Disable_GL_TEXTURE_2D ();
+    if (gl_alphaTest) statecache->Disable_GL_ALPHA_TEST ();
     setGLColorfromint (color);
 
     // This is a workaround for a hard-to-really fix problem with OpenGL:
@@ -226,8 +226,8 @@ void csGraphics2DGLCommon::DrawLine (
     glVertex2f (x2, Height - y2);
     glEnd ();
 
-    if (gl_texture2d) statecache->EnableState (GL_TEXTURE_2D);
-    if (gl_alphaTest) statecache->EnableState (GL_ALPHA_TEST);
+    if (gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
+    if (gl_alphaTest) statecache->Enable_GL_ALPHA_TEST ();
   }
 }
 
@@ -248,8 +248,8 @@ void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
 
   y = Height - y;
   // prepare for 2D drawing--so we need no fancy GL effects!
-  bool gl_texture2d = glIsEnabled(GL_TEXTURE_2D);
-  if (gl_texture2d) statecache->DisableState (GL_TEXTURE_2D);
+  bool gl_texture2d = statecache->IsEnabled_GL_TEXTURE_2D ();
+  if (gl_texture2d) statecache->Disable_GL_TEXTURE_2D ();
   setGLColorfromint (color);
 
   glBegin (GL_QUADS);
@@ -259,7 +259,7 @@ void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
   glVertex2i (x, y - h);
   glEnd ();
 
-  if (gl_texture2d) statecache->EnableState (GL_TEXTURE_2D);
+  if (gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
 }
 
 void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
@@ -267,14 +267,14 @@ void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
   if ((x >= ClipX1) && (x < ClipX2) && (y >= ClipY1) && (y < ClipY2))
   {
     // prepare for 2D drawing--so we need no fancy GL effects!
-    bool gl_texture2d = glIsEnabled(GL_TEXTURE_2D);
-    if (gl_texture2d) statecache->DisableState (GL_TEXTURE_2D);
+    bool gl_texture2d = statecache->IsEnabled_GL_TEXTURE_2D ();
+    if (gl_texture2d) statecache->Disable_GL_TEXTURE_2D ();
     setGLColorfromint (color);
     glBegin (GL_POINTS);
     glVertex2i (x, Height - y);
     glEnd ();
 
-    if (gl_texture2d) statecache->EnableState (GL_TEXTURE_2D);
+    if (gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
   }
 }
 
@@ -282,8 +282,8 @@ void csGraphics2DGLCommon::DrawPixels (csPixelCoord* pixels,
 	int num_pixels, int color)
 {
   // prepare for 2D drawing--so we need no fancy GL effects!
-  bool gl_texture2d = glIsEnabled(GL_TEXTURE_2D);
-  if (gl_texture2d) statecache->DisableState (GL_TEXTURE_2D);
+  bool gl_texture2d = statecache->IsEnabled_GL_TEXTURE_2D ();
+  if (gl_texture2d) statecache->Disable_GL_TEXTURE_2D ();
   setGLColorfromint (color);
 
   int i;
@@ -298,7 +298,7 @@ void csGraphics2DGLCommon::DrawPixels (csPixelCoord* pixels,
       glVertex2i (x, Height - y);
     }
   }
-  if (gl_texture2d) statecache->EnableState (GL_TEXTURE_2D);
+  if (gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
 }
 
 void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
@@ -325,10 +325,10 @@ void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
   // Same for horizontal clipping.
   data += 4*(x-orig_x);
 
-  bool gl_texture2d = glIsEnabled(GL_TEXTURE_2D);
+  bool gl_texture2d = statecache->IsEnabled_GL_TEXTURE_2D ();
   bool gl_alphaTest = glIsEnabled(GL_ALPHA_TEST);
-  if (gl_texture2d) statecache->DisableState (GL_TEXTURE_2D);
-  if (gl_alphaTest) statecache->DisableState (GL_ALPHA_TEST);
+  if (gl_texture2d) statecache->Disable_GL_TEXTURE_2D ();
+  if (gl_alphaTest) statecache->Disable_GL_ALPHA_TEST ();
 
   glColor3f (0., 0., 0.);
   int j;
@@ -339,8 +339,8 @@ void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
     data += 4*orig_w;
   }
 
-  if (gl_texture2d) statecache->EnableState (GL_TEXTURE_2D);
-  if (gl_alphaTest) statecache->EnableState (GL_ALPHA_TEST);
+  if (gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
+  if (gl_alphaTest) statecache->Enable_GL_ALPHA_TEST ();
 }
 
 void csGraphics2DGLCommon::Write (iFont *font, int x, int y, int fg, int bg,
@@ -348,14 +348,14 @@ void csGraphics2DGLCommon::Write (iFont *font, int x, int y, int fg, int bg,
 {
   if (bg >= 0)
   {
-    bool gl_texture2d = glIsEnabled(GL_TEXTURE_2D);
-    if (gl_texture2d) statecache->DisableState (GL_TEXTURE_2D);
+    bool gl_texture2d = statecache->IsEnabled_GL_TEXTURE_2D ();
+    if (gl_texture2d) statecache->Disable_GL_TEXTURE_2D ();
 
     int fw, fh;
     font->GetDimensions (text, fw, fh);
     DrawBox (x, y, fw, fh, bg);
 
-    if (gl_texture2d) statecache->EnableState (GL_TEXTURE_2D);
+    if (gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
   }
 
   setGLColorfromint (fg);
@@ -404,11 +404,11 @@ csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
     delete Area;
     return NULL;
   }
-  bool gl_texture2d = glIsEnabled(GL_TEXTURE_2D);
+  bool gl_texture2d = statecache->IsEnabled_GL_TEXTURE_2D ();
   bool gl_alphaTest = glIsEnabled(GL_ALPHA_TEST);
-  if (gl_texture2d) statecache->DisableState (GL_TEXTURE_2D);
-  if (gl_alphaTest) statecache->DisableState (GL_ALPHA_TEST);
-  //csGLStates::DisableState (GL_DITHER);
+  if (gl_texture2d) statecache->Disable_GL_TEXTURE_2D ();
+  if (gl_alphaTest) statecache->Disable_GL_ALPHA_TEST ();
+  //csGLStates::Disable_GL_DITHER ();
   GLenum format, type;
   switch (pfmt.PixelBytes)
   {
@@ -432,18 +432,18 @@ csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
   }
   glReadPixels (x, y, w, h, format, type, dest);
 
-  if (gl_texture2d) statecache->EnableState (GL_TEXTURE_2D);
-  if (gl_alphaTest) statecache->EnableState (GL_ALPHA_TEST);
+  if (gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
+  if (gl_alphaTest) statecache->Enable_GL_ALPHA_TEST ();
   return Area;
 }
 
 void csGraphics2DGLCommon::RestoreArea (csImageArea *Area, bool Free)
 {
-  bool gl_texture2d = glIsEnabled(GL_TEXTURE_2D);
+  bool gl_texture2d = statecache->IsEnabled_GL_TEXTURE_2D ();
   bool gl_alphaTest = glIsEnabled(GL_ALPHA_TEST);
-  if (gl_texture2d) statecache->DisableState (GL_TEXTURE_2D);
-  if (gl_alphaTest) statecache->DisableState (GL_ALPHA_TEST);
-  //csGLStates::DisableState (GL_DITHER);
+  if (gl_texture2d) statecache->Disable_GL_TEXTURE_2D ();
+  if (gl_alphaTest) statecache->Disable_GL_ALPHA_TEST ();
+  //csGLStates::Disable_GL_DITHER ();
   if (Area)
   {
     GLenum format, type;
@@ -473,8 +473,8 @@ void csGraphics2DGLCommon::RestoreArea (csImageArea *Area, bool Free)
       FreeArea (Area);
   } /* endif */
 
-  if (gl_texture2d) statecache->EnableState (GL_TEXTURE_2D);
-  if (gl_alphaTest) statecache->EnableState (GL_ALPHA_TEST);
+  if (gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
+  if (gl_alphaTest) statecache->Enable_GL_ALPHA_TEST ();
 }
 
 csPtr<iImage> csGraphics2DGLCommon::ScreenShot ()

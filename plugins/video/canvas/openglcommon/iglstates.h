@@ -10,6 +10,16 @@
 #endif
 
 
+#define IMPLEMENT_CACHED_BOOL( name ) \
+  virtual void Enable_##name () = 0; \
+  virtual void Disable_##name () = 0; \
+  virtual bool IsEnabled_##name () const = 0;
+
+#define IMPLEMENT_CACHED_BOOL_LAYER( name ) \
+  virtual void Enable_##name (int l = 0) = 0; \
+  virtual void Disable_##name (int l = 0) = 0; \
+  virtual bool IsEnabled_##name (int l = 0) const = 0;
+
 #define IMPLEMENT_CACHED_PARAMETER_1( func, name, type1, param1 ) \
   virtual void Set##name (type1 param1, bool forced = false) = 0; \
   virtual void Get##name (type1 & param1) = 0;
@@ -31,19 +41,16 @@ public:
   /// Init cache
   virtual void InitCache() = 0;
 
-  /// Enable state
-  virtual void EnableState( GLenum state, int layer = 0 ) = 0;
-
-  /// Disable state
-  virtual void DisableState( GLenum state, int layer = 0 ) = 0;
-
-  /// Toggle state
-  virtual void ToggleState( GLenum state, int layer = 0 ) = 0;
-
-  /// Get state
-  virtual bool GetState( GLenum state, int layer = 0 ) = 0;
-
   // Standardized caches
+  IMPLEMENT_CACHED_BOOL (GL_DEPTH_TEST)
+  IMPLEMENT_CACHED_BOOL (GL_BLEND)
+  IMPLEMENT_CACHED_BOOL (GL_DITHER)
+  IMPLEMENT_CACHED_BOOL (GL_STENCIL_TEST)
+  IMPLEMENT_CACHED_BOOL (GL_CULL_FACE)
+  IMPLEMENT_CACHED_BOOL (GL_POLYGON_OFFSET_FILL)
+  IMPLEMENT_CACHED_BOOL (GL_LIGHTING)
+  IMPLEMENT_CACHED_BOOL (GL_ALPHA_TEST)
+  IMPLEMENT_CACHED_BOOL_LAYER (GL_TEXTURE_2D)
   IMPLEMENT_CACHED_PARAMETER_2( glAlphaFunc, AlphaFunc, GLenum, alpha_func, GLclampf, alpha_ref )
   IMPLEMENT_CACHED_PARAMETER_2( glBlendFunc, BlendFunc, GLenum, blend_source, GLenum, blend_destination )
   IMPLEMENT_CACHED_PARAMETER_1( glCullFace, CullFace, GLenum, cull_mode )
@@ -58,6 +65,7 @@ public:
   virtual GLuint GetTexture( GLenum target, GLuint texture, int layer = 0 ) = 0;
 };
 
+#undef IMPLEMENT_CACHED_BOOL
 #undef IMPLEMENT_CACHED_PARAMETER_1
 #undef IMPLEMENT_CACHED_PARAMETER_2
 #undef IMPLEMENT_CACHED_PARAMETER_3

@@ -199,36 +199,36 @@ void csGLRender3D::SetZMode (csZBufMode mode)
   {
   case CS_ZBUF_NONE:
     current_zmode = mode;
-    statecache->DisableState (GL_DEPTH_TEST);
+    statecache->Disable_GL_DEPTH_TEST ();
     break;
   case CS_ZBUF_FILL:
   case CS_ZBUF_FILLONLY:
     current_zmode = mode;
-    statecache->EnableState (GL_DEPTH_TEST);
+    statecache->Enable_GL_DEPTH_TEST ();
     statecache->SetDepthFunc (GL_ALWAYS);
     statecache->SetDepthMask (GL_TRUE);
     break;
   case CS_ZBUF_EQUAL:
     current_zmode = mode;
-    statecache->EnableState (GL_DEPTH_TEST);
+    statecache->Enable_GL_DEPTH_TEST ();
     statecache->SetDepthFunc (GL_EQUAL);
     statecache->SetDepthMask (GL_FALSE);
     break;
   case CS_ZBUF_TEST:
     current_zmode = mode;
-    statecache->EnableState (GL_DEPTH_TEST);
+    statecache->Enable_GL_DEPTH_TEST ();
     statecache->SetDepthFunc (GL_GREATER);
     statecache->SetDepthMask (GL_FALSE);
     break;
   case CS_ZBUF_INVERT:
     current_zmode = mode;
-    statecache->EnableState (GL_DEPTH_TEST);
+    statecache->Enable_GL_DEPTH_TEST ();
     statecache->SetDepthFunc (GL_LESS);
     statecache->SetDepthMask (GL_FALSE);
     break;
   case CS_ZBUF_USE:
     current_zmode = mode;
-    statecache->EnableState (GL_DEPTH_TEST);
+    statecache->Enable_GL_DEPTH_TEST ();
     statecache->SetDepthFunc (GL_GEQUAL);
     statecache->SetDepthMask (GL_TRUE);
     break;
@@ -311,9 +311,9 @@ float csGLRender3D::SetMixMode (uint mode, float m_alpha, bool txt_alpha)
   }
 
   if (enable_blending)
-    statecache->EnableState (GL_BLEND);
+    statecache->Enable_GL_BLEND ();
   else
-    statecache->DisableState (GL_BLEND);
+    statecache->Disable_GL_BLEND ();
 
   return m_alpha;
 }
@@ -363,7 +363,7 @@ void csGLRender3D::SetupStencil ()
     glPushMatrix ();
     glLoadIdentity ();
     // First set up the stencil area.
-    statecache->EnableState (GL_STENCIL_TEST);
+    statecache->Enable_GL_STENCIL_TEST ();
     
     //stencilclipnum++;
     //if (stencilclipnum>255)
@@ -379,7 +379,7 @@ void csGLRender3D::SetupStencil ()
     glColor4f (1, 0, 0, 0);
     statecache->SetShadeModel (GL_FLAT);
     SetZMode (CS_ZBUF_NONE);
-    statecache->DisableState (GL_TEXTURE_2D);
+    statecache->Disable_GL_TEXTURE_2D ();
     //glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
     glBegin (GL_TRIANGLE_FAN);
     int i;
@@ -388,7 +388,7 @@ void csGLRender3D::SetupStencil ()
                   /*2.0**/v[i].y/(float)viewheight-1.0);
     glEnd ();
     glColorMask (GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    //statecache->DisableState (GL_STENCIL_TEST);
+    //statecache->Disable_GL_STENCIL_TEST ();
     glPopMatrix ();
     glMatrixMode (GL_PROJECTION);
     glPopMatrix ();
@@ -578,7 +578,7 @@ void csGLRender3D::SetupClipper (int clip_portal,
     SetupStencil ();
     stencil_enabled = true;
     // Use the stencil area.
-    statecache->EnableState (GL_STENCIL_TEST);
+    statecache->Enable_GL_STENCIL_TEST ();
     statecache->SetStencilFunc (GL_EQUAL, stencilclipnum, (unsigned)-1);
     statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
   }
@@ -590,7 +590,7 @@ void csGLRender3D::SetupClipper (int clip_portal,
   {
     clip_planes_enabled = true;
     for (int i = 0; i < planes; i++)
-      statecache->EnableState ((GLenum)(GL_CLIP_PLANE0+i));
+      glEnable ((GLenum)(GL_CLIP_PLANE0+i));
   }*/
 }
 
@@ -701,7 +701,7 @@ bool csGLRender3D::Open ()
   txtmgr = new csGLTextureManager (object_reg, GetDriver2D (), config, this);
 
   glClearDepth (0.0);
-  statecache->EnableState (GL_CULL_FACE);
+  statecache->Enable_GL_CULL_FACE ();
   statecache->SetCullFace (GL_FRONT);
 
   return true;
@@ -741,10 +741,10 @@ bool csGLRender3D::BeginDraw (int drawflags)
       GLuint handle = ((csTxtCacheData *)render_target->GetCacheData ())
         ->Handle;
       statecache->SetShadeModel (GL_FLAT);
-      statecache->EnableState (GL_TEXTURE_2D);
+      statecache->Enable_GL_TEXTURE_2D ();
       glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
       statecache->SetTexture (GL_TEXTURE_2D, handle);
-      statecache->DisableState (GL_BLEND);
+      statecache->Disable_GL_BLEND ();
       SetZMode (CS_ZBUF_NONE);
 
       glBegin (GL_QUADS);
@@ -819,10 +819,10 @@ void csGLRender3D::FinishDraw ()
     if (rt_onscreen)
     {
       rt_onscreen = false;
-      statecache->EnableState (GL_TEXTURE_2D);
+      statecache->Enable_GL_TEXTURE_2D ();
       SetZMode (CS_ZBUF_NONE);
-      statecache->DisableState (GL_BLEND);
-      statecache->DisableState (GL_ALPHA_TEST);
+      statecache->Disable_GL_BLEND ();
+      statecache->Disable_GL_ALPHA_TEST ();
       int txt_w, txt_h;
       render_target->GetMipMapDimensions (0, txt_w, txt_h);
       csGLTextureHandle* tex_mm = (csGLTextureHandle *)
@@ -1036,14 +1036,14 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
       (csTxtCacheData *)gltxthandle->GetCacheData ();
 
     statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle);
-    statecache->EnableState (GL_TEXTURE_2D);
+    statecache->Enable_GL_TEXTURE_2D ();
 
     alpha = 1.0f - BYTE_TO_FLOAT (mymesh->mixmode & CS_FX_MASK_ALPHA);
     alpha = SetMixMode (mymesh->mixmode, alpha, 
       txthandle->GetKeyColor () || txthandle->GetAlphaMap ());
 
   } else {
-    statecache->DisableState (GL_TEXTURE_2D);
+    statecache->Disable_GL_TEXTURE_2D ();
 
     csRGBpixel color;
     if (mathandle)
@@ -1106,7 +1106,7 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
             (csTxtCacheData *)gltxthandle->GetCacheData ();
 
           statecache->SetTexture (GL_TEXTURE_2D, cachedata->Handle);
-          statecache->EnableState (GL_TEXTURE_2D);
+          statecache->EnableSta_GL_TEXTURE_2D ();
         } else continue;
 
         alpha = 1.0f - BYTE_TO_FLOAT (layer->mode & CS_FX_MASK_ALPHA);
@@ -1165,12 +1165,12 @@ void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
   {
     clip_planes_enabled = false;
     for (int i = 0; i < 6; i++)
-      statecache->DisableState ((GLenum)(GL_CLIP_PLANE0+i));
+      glDisable ((GLenum)(GL_CLIP_PLANE0+i));
   }
   if (stencil_enabled)
   {
     stencil_enabled = false;
-    statecache->DisableState (GL_STENCIL_TEST);
+    statecache->Disable_GL_STENCIL_TEST ();
   }
 }
 
@@ -1182,10 +1182,10 @@ void csGLRender3D::SetShadowState (int state)
     current_shadow_state = CS_SHADOW_VOLUME_BEGIN;
     glClearStencil (0);
     glClear (GL_STENCIL_BUFFER_BIT);
-    statecache->EnableState (GL_STENCIL_TEST);
+    statecache->Enable_GL_STENCIL_TEST ();
     glStencilFunc (GL_ALWAYS, 0, 127);
     glPolygonOffset (-0.1, -4); 
-    statecache->EnableState (GL_POLYGON_OFFSET_FILL);
+    statecache->Enable_GL_POLYGON_OFFSET_FILL ();
     break;
   case CS_SHADOW_VOLUME_PASS1:
     current_shadow_state = CS_SHADOW_VOLUME_PASS1;
@@ -1197,12 +1197,12 @@ void csGLRender3D::SetShadowState (int state)
     break;
   case CS_SHADOW_VOLUME_USE:
     current_shadow_state = CS_SHADOW_VOLUME_USE;
-    statecache->DisableState (GL_POLYGON_OFFSET_FILL);
+    statecache->Disable_GL_POLYGON_OFFSET_FILL ();
     glStencilFunc (GL_EQUAL, 0, 127);
     glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
     break;
   case CS_SHADOW_VOLUME_FINISH:
-    statecache->DisableState  (GL_STENCIL_TEST);
+    statecache->Disable_GL_STENCIL_TEST ();
     current_shadow_state = 0;
     break;
   }

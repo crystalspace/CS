@@ -957,9 +957,9 @@ bool csGraphics3DOGLCommon::NewOpen ()
   CommonOpen ();
 
   if (m_renderstate.dither)
-    statecache->EnableState (GL_DITHER);
+    statecache->Enable_GL_DITHER ();
   else
-    statecache->DisableState (GL_DITHER);
+    statecache->Disable_GL_DITHER ();
 
   if (config->GetBool ("Video.OpenGL.HintPerspectiveFast", false))
     glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST);
@@ -1075,9 +1075,9 @@ bool csGraphics3DOGLCommon::NewOpen ()
   }
 
   glCullFace (GL_FRONT);
-  statecache->EnableState (GL_CULL_FACE);
+  statecache->Enable_GL_CULL_FACE ();
   glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-  statecache->DisableState (GL_BLEND);
+  statecache->Disable_GL_BLEND ();
 
   // Now that we know what pixelformat we use, clue the texture manager in.
   txtmgr = new csTextureManagerOpenGL (object_reg, G2D, config, this);
@@ -1086,9 +1086,9 @@ bool csGraphics3DOGLCommon::NewOpen ()
   PerfTest ();
 
   glCullFace (GL_FRONT);
-  statecache->EnableState (GL_CULL_FACE);
+  statecache->Enable_GL_CULL_FACE ();
   glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-  statecache->DisableState (GL_BLEND);
+  statecache->Disable_GL_BLEND ();
 
   effectserver = CS_QUERY_REGISTRY(object_reg, iEffectServer);
   if( !effectserver )
@@ -1372,7 +1372,7 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
       GLuint handle = ((csTxtCacheData *)render_target->GetCacheData ())
       	->Handle;
       statecache->SetShadeModel (GL_FLAT);
-      statecache->EnableState (GL_TEXTURE_2D);
+      statecache->Enable_GL_TEXTURE_2D ();
       glColor4f (1.0f, 1.0f, 1.0f, 1.0f);
       statecache->SetTexture (GL_TEXTURE_2D, handle);
       SetupBlend (CS_FX_COPY, 0, false);
@@ -1434,10 +1434,10 @@ void csGraphics3DOGLCommon::FinishDraw ()
     if (rt_onscreen)
     {
       rt_onscreen = false;
-      statecache->EnableState (GL_TEXTURE_2D);
+      statecache->Enable_GL_TEXTURE_2D ();
       SetGLZBufferFlags (CS_ZBUF_NONE);
       SetupBlend (CS_FX_COPY, 0, false);
-      statecache->DisableState (GL_ALPHA_TEST);
+      statecache->Disable_GL_ALPHA_TEST ();
       int txt_w, txt_h;
       render_target->GetMipMapDimensions (0, txt_w, txt_h);
       csTextureHandleOpenGL* tex_mm = (csTextureHandleOpenGL *)
@@ -1538,8 +1538,8 @@ void csGraphics3DOGLCommon::DrawTriangleMeshEdges (G3DTriangleMesh& mesh)
 
   glPushAttrib (GL_ENABLE_BIT|GL_COLOR_BUFFER_BIT|GL_CURRENT_BIT|
     GL_DEPTH_BUFFER_BIT);
-  statecache->DisableState (GL_DEPTH_TEST);
-  statecache->DisableState (GL_BLEND);
+  statecache->Disable_GL_DEPTH_TEST ();
+  statecache->Disable_GL_BLEND ();
   for (i = 0 ; i < mesh.num_triangles ; i++)
   {
     int a = triangles[i].a;
@@ -1587,8 +1587,8 @@ void csGraphics3DOGLCommon::DebugDrawElements (iGraphics2D* g2d,
 {
   glPushAttrib (GL_ENABLE_BIT|GL_COLOR_BUFFER_BIT|GL_CURRENT_BIT|
     GL_DEPTH_BUFFER_BIT);
-  statecache->DisableState (GL_DEPTH_TEST);
-  statecache->DisableState (GL_BLEND);
+  statecache->Disable_GL_DEPTH_TEST ();
+  statecache->Disable_GL_BLEND ();
   num_tri3 /= 3;
   int i;
   float x1, y1, x2, y2, x3, y3;
@@ -1746,9 +1746,9 @@ float csGraphics3DOGLCommon::SetupBlend (uint mode,
   }
 
   if (enable_blending)
-    statecache->EnableState (GL_BLEND);
+    statecache->Enable_GL_BLEND ();
   else
-    statecache->DisableState (GL_BLEND);
+    statecache->Disable_GL_BLEND ();
 
   return m_alpha;
 }
@@ -1845,7 +1845,7 @@ void csGraphics3DOGLCommon::SetupStencil ()
   if (clipper && GLCaps.use_stencil)
   {
     // First set up the stencil area.
-    statecache->EnableState (GL_STENCIL_TEST);
+    statecache->Enable_GL_STENCIL_TEST ();
       glClearStencil (0);
     glClear (GL_STENCIL_BUFFER_BIT);
     statecache->SetStencilFunc (GL_ALWAYS, 1, 1);
@@ -1855,14 +1855,14 @@ void csGraphics3DOGLCommon::SetupStencil ()
     glColor4f (0, 0, 0, 0);
     statecache->SetShadeModel (GL_FLAT);
     SetGLZBufferFlags (CS_ZBUF_NONE);
-    statecache->DisableState (GL_TEXTURE_2D);
+    statecache->Disable_GL_TEXTURE_2D ();
     SetupBlend (CS_FX_TRANSPARENT, 0, false);
     glBegin (GL_TRIANGLE_FAN);
     int i;
     for (i = 0 ; i < nv ; i++)
       glVertex2f (v[i].x, v[i].y);
     glEnd ();
-    statecache->DisableState (GL_STENCIL_TEST);
+    statecache->Disable_GL_STENCIL_TEST ();
   }
 }
 
@@ -1905,21 +1905,21 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
 
   if (m_renderstate.textured && txt_handle)
   {
-    statecache->EnableState (GL_TEXTURE_2D);
+    statecache->Enable_GL_TEXTURE_2D ();
     if (txt_mm->GetKeyColor() && !(alpha < OPENGL_KEYCOLOR_MIN_ALPHA))
     {
-      statecache->EnableState (GL_ALPHA_TEST);
+      statecache->Enable_GL_ALPHA_TEST ();
       statecache->SetAlphaFunc (GL_GEQUAL, OPENGL_KEYCOLOR_MIN_ALPHA);
       SetupBlend (queue.mixmode, 1.0f, false);
     }
     else
     {
-      statecache->DisableState (GL_ALPHA_TEST);
+      statecache->Disable_GL_ALPHA_TEST ();
     }
   }
   else
   {
-    statecache->DisableState (GL_TEXTURE_2D);
+    statecache->Disable_GL_TEXTURE_2D ();
     csRGBpixel color;
     if (txt_handle)
     {
@@ -2032,7 +2032,7 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
     // then this is the right time to do this.
     if (gouraud)
     {
-      statecache->DisableState (GL_TEXTURE_2D);
+      statecache->Disable_GL_TEXTURE_2D ();
       statecache->SetShadeModel (GL_SMOOTH);
       SetupBlend (CS_FX_MULTIPLY2, 0, false);
 
@@ -2046,7 +2046,7 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
 
   if (queue.use_fog)
   {
-    statecache->EnableState (GL_TEXTURE_2D);
+    statecache->Enable_GL_TEXTURE_2D ();
     statecache->SetTexture (GL_TEXTURE_2D, m_fogtexturehandle);
     statecache->SetShadeModel (GL_SMOOTH);
     SetupBlend (CS_FX_ALPHA, 0, false);
@@ -2068,7 +2068,7 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
 
   if (txt_mm && txt_mm->GetKeyColor())
   {
-    statecache->DisableState (GL_ALPHA_TEST);
+    statecache->Disable_GL_ALPHA_TEST ();
   }
 }
 
@@ -2289,21 +2289,21 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
 
   if (m_renderstate.textured && txt_handle)
   {
-    statecache->EnableState (GL_TEXTURE_2D);
+    statecache->Enable_GL_TEXTURE_2D ();
     if (txt_mm->GetKeyColor() && !(alpha < OPENGL_KEYCOLOR_MIN_ALPHA))
     {
-      statecache->EnableState (GL_ALPHA_TEST);
+      statecache->Enable_GL_ALPHA_TEST ();
       statecache->SetAlphaFunc (GL_GEQUAL, OPENGL_KEYCOLOR_MIN_ALPHA);
       SetupBlend (poly.mixmode, 1.0f, false);
     }
     else
     {
-      statecache->DisableState (GL_ALPHA_TEST);
+      statecache->Disable_GL_ALPHA_TEST ();
     }
   }
   else
   {
-    statecache->DisableState (GL_TEXTURE_2D);
+    statecache->Disable_GL_TEXTURE_2D ();
     csRGBpixel color;
     if (txt_handle)
     {
@@ -2387,7 +2387,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
   if (multimat || do_lm || poly.use_fog)
   {
     SetGLZBufferFlagsPass2 (z_buf_mode, true);
-    statecache->EnableState (GL_TEXTURE_2D);
+    statecache->Enable_GL_TEXTURE_2D ();
   }
   else
   {
@@ -2571,7 +2571,7 @@ void csGraphics3DOGLCommon::DrawPolygonZFill (G3DPolygonDP & poly)
     O = -Cc * inv_Dc;
   }
 
-  statecache->DisableState (GL_TEXTURE_2D);
+  statecache->Disable_GL_TEXTURE_2D ();
   statecache->SetShadeModel (GL_FLAT);
   SetGLZBufferFlags (z_buf_mode);
   SetupBlend (CS_FX_TRANSPARENT, 0, false);
@@ -3287,7 +3287,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
   {
     // we need to texture and blend, with vertex color
     // interpolation
-    statecache->EnableState (GL_TEXTURE_2D);
+    statecache->Enable_GL_TEXTURE_2D ();
     statecache->SetTexture (GL_TEXTURE_2D, m_fogtexturehandle);
     SetupBlend (CS_FX_ALPHA, 0, false);
 
@@ -3299,7 +3299,7 @@ void csGraphics3DOGLCommon::DrawPolygonMesh (G3DPolygonMesh& mesh)
     glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
 
     if (!m_textured)
-      statecache->DisableState (GL_TEXTURE_2D);
+      statecache->Disable_GL_TEXTURE_2D ();
     if (!m_gouraud)
       statecache->SetShadeModel (GL_FLAT);
   }
@@ -4037,7 +4037,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
     SetupStencil ();
     stencil_enabled = true;
     // Use the stencil area.
-    statecache->EnableState (GL_STENCIL_TEST);
+    statecache->Enable_GL_STENCIL_TEST ();
     statecache->SetStencilFunc (GL_EQUAL, 1, 1);
     statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
   }
@@ -4047,7 +4047,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       mesh.clip_z_plane != CS_CLIP_NOT);
     clip_planes_enabled = true;
     for (i = 0 ; i < frustum.GetVertexCount ()+reserved_planes ; i++)
-      statecache->EnableState ((GLenum)(GL_CLIP_PLANE0+i));
+      glEnable ((GLenum)(GL_CLIP_PLANE0+i));
   }
 
   //===========
@@ -4108,17 +4108,17 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
         }
       }
       glBindProgramARB(GL_VERTEX_PROGRAM_ARB, pass_data->vertex_program);
-      statecache->EnableState( GL_VERTEX_PROGRAM_ARB );
+      glEnable( GL_VERTEX_PROGRAM_ARB );
     }
 
     if (pass_data->doblending)
     {
-      statecache->EnableState (GL_BLEND);
+      statecache->Enable_GL_BLEND ();
       statecache->SetBlendFunc (pass_data->sblend, pass_data->dblend);
     }
     else
     {
-      statecache->DisableState (GL_BLEND);
+      statecache->Disable_GL_BLEND ();
     }
 
     statecache->SetShadeModel (pass_data->shade_state);
@@ -4209,12 +4209,12 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       if (layer_data->inputtex==-1)
       {
         statecache->SetTexture (GL_TEXTURE_2D, m_fogtexturehandle);
-        statecache->EnableState (GL_TEXTURE_2D, l);
+        statecache->Enable_GL_TEXTURE_2D (l);
       }
       else if (layer_data->inputtex==-2)
       {
         statecache->SetTexture (GL_TEXTURE_2D, lightmap);
-        statecache->EnableState (GL_TEXTURE_2D, l);
+        statecache->Enable_GL_TEXTURE_2D (l);
       }
       else if (layer_data->inputtex==0)
       {
@@ -4241,7 +4241,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
         texturehandle = cachedata->Handle;
 
         statecache->SetTexture (GL_TEXTURE_2D, texturehandle, l);
-        statecache->EnableState (GL_TEXTURE_2D, l);
+        statecache->Enable_GL_TEXTURE_2D (l);
       }
 
       if (ARB_texture_env_combine || EXT_texture_env_combine)
@@ -4276,7 +4276,7 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
     glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
 
     if (pass_data->vertex_program > 0)
-      statecache->DisableState (GL_VERTEX_PROGRAM_ARB);
+      glDisable (GL_VERTEX_PROGRAM_ARB);
   }
 
   SetMirrorMode (false);
@@ -4289,16 +4289,16 @@ void csGraphics3DOGLCommon::EffectDrawTriangleMesh (
       glActiveTextureARB (GL_TEXTURE0_ARB+l);
       glClientActiveTextureARB (GL_TEXTURE0_ARB+l);
       if (l>0)
-        statecache->DisableState (GL_TEXTURE_2D, l);
+        statecache->Disable_GL_TEXTURE_2D (l);
       glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     }
   }
 
   if (stencil_enabled)
-    statecache->DisableState (GL_STENCIL_TEST);
+    statecache->Disable_GL_STENCIL_TEST ();
   if (clip_planes_enabled)
     for (i = 0 ; i < frustum.GetVertexCount ()+reserved_planes ; i++)
-      statecache->DisableState ((GLenum)(GL_CLIP_PLANE0+i));
+      glDisable ((GLenum)(GL_CLIP_PLANE0+i));
 
   if (setup_trans) RestoreDTMTransforms ();
 
@@ -4546,7 +4546,7 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
     SetupStencil ();
     stencil_enabled = true;
     // Use the stencil area.
-    statecache->EnableState (GL_STENCIL_TEST);
+    statecache->Enable_GL_STENCIL_TEST ();
     statecache->SetStencilFunc (GL_EQUAL, 1, 1);
     statecache->SetStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
   }
@@ -4556,7 +4556,7 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
       mesh.clip_z_plane != CS_CLIP_NOT);
     clip_planes_enabled = true;
     for (i = 0 ; i < frustum.GetVertexCount ()+reserved_planes ; i++)
-      statecache->EnableState ((GLenum)(GL_CLIP_PLANE0+i));
+      glEnable ((GLenum)(GL_CLIP_PLANE0+i));
   }
 
   //===========
@@ -4598,10 +4598,10 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
   if (m_textured)
   {
     statecache->SetTexture (GL_TEXTURE_2D, texturehandle);
-    statecache->EnableState (GL_TEXTURE_2D);
+    statecache->Enable_GL_TEXTURE_2D ();
   }
   else
-    statecache->DisableState (GL_TEXTURE_2D);
+    statecache->Disable_GL_TEXTURE_2D ();
 
   SetGLZBufferFlags (z_buf_mode);
 
@@ -4805,7 +4805,7 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
     // If we have to do gouraud shading we do it here.
     if (do_gouraud)
     {
-      statecache->DisableState (GL_TEXTURE_2D);
+      statecache->Disable_GL_TEXTURE_2D ();
       statecache->SetShadeModel (GL_SMOOTH);
       SetupBlend (CS_FX_MULTIPLY2, 0, false);
       SetClientStates (CS_CLIENTSTATE_ALL);
@@ -4826,7 +4826,7 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
   {
     // we need to texture and blend, with vertex color
     // interpolation
-    statecache->EnableState (GL_TEXTURE_2D);
+    statecache->Enable_GL_TEXTURE_2D ();
     statecache->SetTexture (GL_TEXTURE_2D, m_fogtexturehandle);
     SetupBlend (CS_FX_ALPHA, 0, false);
 
@@ -4838,7 +4838,7 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
     glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
 
     if (!m_textured)
-      statecache->DisableState (GL_TEXTURE_2D);
+      statecache->Disable_GL_TEXTURE_2D ();
     if (!m_gouraud)
       statecache->SetShadeModel (GL_FLAT);
   }
@@ -4849,10 +4849,10 @@ void csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
   // Disable/cleanup all clipping stuff.
   //===========
   if (stencil_enabled)
-    statecache->DisableState (GL_STENCIL_TEST);
+    statecache->Disable_GL_STENCIL_TEST ();
   if (clip_planes_enabled)
     for (i = 0 ; i < frustum.GetVertexCount ()+reserved_planes ; i++)
-      statecache->DisableState ((GLenum)(GL_CLIP_PLANE0+i));
+      glDisable ((GLenum)(GL_CLIP_PLANE0+i));
 
   if (debug_edges)
     DrawTriangleMeshEdges (mesh);
@@ -5053,27 +5053,27 @@ void csGraphics3DOGLCommon::SetGLZBufferFlags (csZBufMode flags)
   switch (flags)
   {
     case CS_ZBUF_NONE:
-      statecache->DisableState (GL_DEPTH_TEST);
+      statecache->Disable_GL_DEPTH_TEST ();
       //glDepthMask (GL_FALSE);@@@ Is this needed or not?
       break;
     case CS_ZBUF_FILL:
     case CS_ZBUF_FILLONLY:
-      statecache->EnableState (GL_DEPTH_TEST);
+      statecache->Enable_GL_DEPTH_TEST ();
       statecache->SetDepthFunc (GL_ALWAYS);
       statecache->SetDepthMask (GL_TRUE);
       break;
     case CS_ZBUF_EQUAL:
-      statecache->EnableState (GL_DEPTH_TEST);
+      statecache->Enable_GL_DEPTH_TEST ();
       statecache->SetDepthFunc (GL_EQUAL);
       statecache->SetDepthMask (GL_FALSE);
       break;
     case CS_ZBUF_TEST:
-      statecache->EnableState (GL_DEPTH_TEST);
+      statecache->Enable_GL_DEPTH_TEST ();
       statecache->SetDepthFunc (GL_GREATER);
       statecache->SetDepthMask (GL_FALSE);
       break;
     case CS_ZBUF_USE:
-      statecache->EnableState (GL_DEPTH_TEST);
+      statecache->Enable_GL_DEPTH_TEST ();
       statecache->SetDepthFunc (GL_GREATER);
       statecache->SetDepthMask (GL_TRUE);
       break;
@@ -5209,7 +5209,7 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
   else
     SetupBlend (CS_FX_COPY, 0, false);
 
-  statecache->EnableState (GL_TEXTURE_2D);
+  statecache->Enable_GL_TEXTURE_2D ();
   glColor4f (1.0, 1.0, 1.0, Alpha ? (1.0 - BYTE_TO_FLOAT (Alpha)) : 1.0);
   statecache->SetTexture (GL_TEXTURE_2D, texturehandle);
 
@@ -5270,19 +5270,19 @@ void csGraphics3DOGLCommon::Guess_BlendMode (GLenum *src, GLenum*dst)
     "Attempting to determine best blending mode to use.");
 
   // draw the polys
-  statecache->DisableState (GL_TEXTURE_2D);
-  statecache->DisableState (GL_DEPTH_TEST);
+  statecache->Disable_GL_TEXTURE_2D ();
+  statecache->Disable_GL_DEPTH_TEST ();
   statecache->SetShadeModel (GL_FLAT);
 
   // blend mode one
 
-  statecache->DisableState (GL_BLEND);
+  statecache->Disable_GL_BLEND ();
   glColor3fv (testcolor1);
   glBegin (GL_QUADS);
   glVertex2i (0,0); glVertex2i(5,0); glVertex2i(5,5); glVertex2i(0,5);
   glEnd ();
 
-  statecache->EnableState (GL_BLEND);
+  statecache->Enable_GL_BLEND ();
   statecache->SetBlendFunc (GL_DST_COLOR, GL_ZERO);
   glColor3fv (testcolor2);
   glBegin (GL_QUADS);
@@ -5293,13 +5293,13 @@ void csGraphics3DOGLCommon::Guess_BlendMode (GLenum *src, GLenum*dst)
 
   // blend mode two
 
-  statecache->DisableState (GL_BLEND);
+  statecache->Disable_GL_BLEND ();
   glColor3fv (testcolor1);
   glBegin (GL_QUADS);
   glVertex2i (0,0); glVertex2i (5,0); glVertex2i (5,5); glVertex2i (0,5);
   glEnd ();
 
-  statecache->EnableState (GL_BLEND);
+  statecache->Enable_GL_BLEND ();
   statecache->SetBlendFunc (GL_DST_COLOR, GL_SRC_COLOR);
   glColor3fv (testcolor2);
   glBegin (GL_QUADS);

@@ -343,11 +343,11 @@ void GLFontCache::Write (iFont *font, int x, int y, const char *text)
   glPushMatrix ();
   glTranslatef (x, y, 0);
 
-  statecache->EnableState (GL_TEXTURE_2D);
+  statecache->Enable_GL_TEXTURE_2D ();
   statecache->SetShadeModel (GL_FLAT);
   glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-  statecache->EnableState (GL_BLEND);
+  statecache->Enable_GL_BLEND ();
   statecache->SetBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 //  statecache->EnableState (GL_ALPHA_TEST);
 //  statecache->SetAlphaFunc (GL_EQUAL, 1.0);
@@ -399,7 +399,7 @@ void GLFontCache::Write (iFont *font, int x, int y, const char *text)
 
   glEnd ();
 
-  statecache->DisableState (GL_BLEND);
+  statecache->Disable_GL_BLEND ();
 //  statecache->DisableState (GL_ALPHA_TEST);
   glPopMatrix ();
 }
