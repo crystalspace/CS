@@ -39,13 +39,12 @@ else
   TO_INSTALL.STATIC_LIBS += $(WAV)
 endif
 
-INC.WAV = $(wildcard plugins/sound/loader/wav/*.h) $(wildcard plugins/sound/loader/common/*.h)
-SRC.WAV = $(wildcard plugins/sound/loader/wav/*.cpp) $(wildcard plugins/sound/loader/common/*.cpp)
+INC.WAV = $(wildcard plugins/sound/loader/wav/*.h) \
+  $(wildcard plugins/sound/loader/common/*.h)
+SRC.WAV = $(wildcard plugins/sound/loader/wav/*.cpp) \
+  $(wildcard plugins/sound/loader/common/*.cpp)
 OBJ.WAV = $(addprefix $(OUT),$(notdir $(SRC.WAV:.cpp=$O)))
 DEP.WAV = CSUTIL CSSYS CSUTIL
-CFG.WAV = data/config/sound.cfg
-
-TO_INSTALL.CONFIG += $(CFG.WAV)
 
 MSVC.DSP += WAV
 DSP.WAV.NAME = sndwav
@@ -76,4 +75,3 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
-

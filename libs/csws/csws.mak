@@ -31,9 +31,11 @@ CSWS.LIB = $(OUT)$(LIB_PREFIX)csws$(LIB_SUFFIX)
 INC.CSWS = $(wildcard include/csws/*.h)
 SRC.CSWS = $(wildcard libs/csws/*.cpp libs/csws/skins/*/*.cpp)
 OBJ.CSWS = $(addprefix $(OUT),$(notdir $(SRC.CSWS:.cpp=$O)))
+CFG.CSWS = data/config/csws.cfg
 
-TO_INSTALL.DATA += data/csws.zip
 TO_INSTALL.STATIC_LIBS += $(CSWS.LIB)
+TO_INSTALL.DATA += data/csws.zip
+TO_INSTALL.CONFIG += $(CFG.CSWS)
 
 MSVC.DSP += CSWS
 DSP.CSWS.NAME = csws

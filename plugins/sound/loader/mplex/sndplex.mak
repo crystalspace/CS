@@ -39,8 +39,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNDPLEX)
 endif
 
-INC.SNDPLEX = $(wildcard plugins/sound/loader/mplex/*.h) $(wildcard plugins/sound/loader/common/*.h)
-SRC.SNDPLEX = $(wildcard plugins/sound/loader/mplex/*.cpp) $(wildcard plugins/sound/loader/common/*.cpp)
+INC.SNDPLEX = $(wildcard plugins/sound/loader/mplex/*.h)
+SRC.SNDPLEX = $(wildcard plugins/sound/loader/mplex/*.cpp)
 OBJ.SNDPLEX = $(addprefix $(OUT),$(notdir $(SRC.SNDPLEX:.cpp=$O)))
 DEP.SNDPLEX = CSUTIL CSSYS CSUTIL
 CFG.SNDPLEX = data/config/sound.cfg
@@ -76,4 +76,3 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
-

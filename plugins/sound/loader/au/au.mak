@@ -39,13 +39,12 @@ else
   TO_INSTALL.STATIC_LIBS += $(AU)
 endif
 
-INC.AU = $(wildcard plugins/sound/loader/au/*.h) $(wildcard plugins/sound/loader/common/*.h)
-SRC.AU = $(wildcard plugins/sound/loader/au/*.cpp) $(wildcard plugins/sound/loader/common/*.cpp)
+INC.AU = $(wildcard plugins/sound/loader/au/*.h) \
+  $(wildcard plugins/sound/loader/common/*.h)
+SRC.AU = $(wildcard plugins/sound/loader/au/*.cpp) \
+  $(wildcard plugins/sound/loader/common/*.cpp)
 OBJ.AU = $(addprefix $(OUT),$(notdir $(SRC.AU:.cpp=$O)))
 DEP.AU = CSUTIL CSSYS CSUTIL
-CFG.AU = data/config/sound.cfg
-
-TO_INSTALL.CONFIG += $(CFG.AU)
 
 MSVC.DSP += AU
 DSP.AU.NAME = sndau
@@ -76,4 +75,3 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
-

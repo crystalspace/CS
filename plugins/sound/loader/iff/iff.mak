@@ -39,13 +39,12 @@ else
   TO_INSTALL.STATIC_LIBS += $(IFF)
 endif
 
-INC.IFF = $(wildcard plugins/sound/loader/iff/*.h) $(wildcard plugins/sound/loader/common/*.h)
-SRC.IFF = $(wildcard plugins/sound/loader/iff/*.cpp) $(wildcard plugins/sound/loader/common/*.cpp)
+INC.IFF = $(wildcard plugins/sound/loader/iff/*.h) \
+  $(wildcard plugins/sound/loader/common/*.h)
+SRC.IFF = $(wildcard plugins/sound/loader/iff/*.cpp) \
+  $(wildcard plugins/sound/loader/common/*.cpp)
 OBJ.IFF = $(addprefix $(OUT),$(notdir $(SRC.IFF:.cpp=$O)))
 DEP.IFF = CSUTIL CSSYS CSUTIL
-CFG.IFF = data/config/sound.cfg
-
-TO_INSTALL.CONFIG += $(CFG.IFF)
 
 MSVC.DSP += IFF
 DSP.IFF.NAME = sndiff
@@ -76,4 +75,3 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
-

@@ -18,8 +18,10 @@
 //	the platform-specific portion of the system driver.
 //
 //-----------------------------------------------------------------------------
+#define SYSDEF_PATH
 #include "cssysdef.h"
 #include "cssys/next/NeXTSystemDriver.h"
+#include "cssys/csshlib.h"
 #include "NeXTDelegate.h"
 #include "iutil/cfgfile.h"
 #include "csver.h"
@@ -74,6 +76,13 @@ bool NeXTSystemDriver::Initialize( int argc, char const* const argv[],
     bool ok = false;
     controller = NeXTDelegate_startup( this );
     event_outlet = CreateEventOutlet( &scfiEventPlug );
+
+    char path[ MAXPATHLEN ];
+    GetInstallPath( path, sizeof(path) );
+    strcat( path, OS_NEXT_PLUGIN_DIR );
+    csAddLibraryPath( OS_NEXT_PLUGIN_DIR );
+    csAddLibraryPath( path );
+
     if (superclass::Initialize( argc, argv, cfgfile ))
 	{
 	iConfigFile* next_config = CreateSeparateConfig("/config/next.cfg");

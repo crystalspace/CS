@@ -47,7 +47,8 @@ ifeq ($(MAKESECTION),roottargets)
 
 install:
 	@echo $(SEPARATOR)
-	@echo $"  Installing Crystal Space SDK into $(INSTALL_DIR)$"
+	@echo $"  Installing Crystal Space SDK$"
+	@echo $"  INSTALL_DIR=$(INSTALL_DIR)$"
 	@echo $(SEPARATOR)
 	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak install_all DO_INSTALL=yes
 
@@ -104,6 +105,13 @@ INSTALL_SCRIPTS.DIR = $(filter-out $(INSTALL_DIR), $(sort \
 INSTALL_SCRIPTS.DESTFILES = \
   $(addprefix $(INSTALL_DIR)/,$(sort $(INSTALL_SCRIPTS.FILES)))
 
+INSTALL_LIB.DIR = $(INSTALL_DIR)/lib
+ifeq ($(strip $(OUTDLL)),)
+  INSTALL_DLL.DIR = $(INSTALL_LIB.DIR)
+else
+  INSTALL_DLL.DIR = $(patsubst %/,%,$(INSTALL_DIR)/$(OUTDLL))
+endif
+
 endif # ifeq ($(DO_INSTALL),yes)
 
 endif # ifeq ($(MAKESECTION),postdefines)
@@ -121,10 +129,15 @@ ifeq ($(DO_INSTALL),yes)
   install_exe install_include install_root install_logfile install_docs \
   install_scripts install_all
 
-# Rule for creating installation directories.
-$(INSTALL_DIR) $(INSTALL_DIR)/bin $(INSTALL_DIR)/lib $(INSTALL_INCLUDE.DIR) \
+# Rules for creating installation directories.
+$(INSTALL_DIR) $(INSTALL_DIR)/bin $(INSTALL_LIB.DIR) $(INSTALL_INCLUDE.DIR) \
 $(INSTALL_DIR)/data $(INSTALL_DIR)/data/config:
 	$(MKDIR)
+
+ifneq ($(strip $(OUTDLL)),)
+$(INSTALL_DLL.DIR):
+	$(MKDIR)
+endif
 
 # Install log, itself, should also be deleted.
 install_logfile:
@@ -143,15 +156,15 @@ install_data: $(INSTALL_DIR)/data
 	  $(notdir $(TO_INSTALL.DATA))) >> $(INSTALL_LOG)
 
 # Install dynamic libraries (plug-in modules).
-install_dynamiclibs: $(INSTALL_DIR)/lib
-	$(CP) $(TO_INSTALL.DYNAMIC_LIBS) $(INSTALL_DIR)/lib
-	@echo $(addprefix $(INSTALL_DIR)/lib/, \
+install_dynamiclibs: $(INSTALL_DLL.DIR)
+	$(CP) $(TO_INSTALL.DYNAMIC_LIBS) $(INSTALL_DLL.DIR)
+	@echo $(addprefix $(INSTALL_DLL.DIR)/, \
 	  $(notdir $(TO_INSTALL.DYNAMIC_LIBS))) >> $(INSTALL_LOG)
 
 # Install static libraries.
-install_staticlibs: $(INSTALL_DIR)/lib
-	$(CP) $(TO_INSTALL.STATIC_LIBS) $(INSTALL_DIR)/lib
-	@echo $(addprefix $(INSTALL_DIR)/lib/, \
+install_staticlibs: $(INSTALL_LIB.DIR)
+	$(CP) $(TO_INSTALL.STATIC_LIBS) $(INSTALL_LIB.DIR)
+	@echo $(addprefix $(INSTALL_LIB.DIR)/, \
 	  $(notdir $(TO_INSTALL.STATIC_LIBS))) >> $(INSTALL_LOG)
 
 # Install executables.
@@ -199,13 +212,24 @@ install_scripts: $(INSTALL_DIR)/scripts $(INSTALL_SCRIPTS.DIR) \
   $(INSTALL_SCRIPTS.DESTFILES)
 
 # The Big Kafoozy!
+# ***NOTE***
+# Do not make the `install_all' target depend upon TO_INSTALL.DYNAMIC_LIBS.
+# The current makefile mechanism is incapable of correctly building out of date
+# or missing plugin modules once the `install' target has been invoked,
+# therefore the `install_all' target must not depend upon any plugin modules.
+# The technical reason for the inability to regenerate plugin modules at this
+# late stage is that such modules must be built with the MAKE_DLL makefile
+# variable set to `yes', yet by the time `install_all' is running, it is too
+# late to set the MAKE_DLL variable.  Furthermore, this variable must only be
+# set for plugin modules.  It can not be set for static libraries.  Therefore,
+# trying to use a blanket approach of globally enabling MAKE_DLL during the
+# installation process will not succeed.
 install_all: \
   $(TO_INSTALL.ROOT) \
   $(TO_INSTALL.CONFIG) \
   $(TO_INSTALL.DATA) \
   $(TO_INSTALL.EXE) \
   $(TO_INSTALL.STATIC_LIBS) \
-  $(TO_INSTALL.DYNAMIC_LIBS) \
   $(INSTALL_DIR) \
   install_data \
   install_config \
@@ -217,9 +241,11 @@ install_all: \
   install_scripts \
   install_root \
   install_logfile
-	@echo $"Installation complete.$"
-	@echo $"Now define CRYSTAL=$(INSTALL_DIR) in your environment to tell$"
-	@echo $"Crystal Space programs where to find their resource files.$"
+	@echo $"Installation complete$"
+	@echo $"---------------------$"
+	@echo $"Now set up the following definition in your environment to$"
+	@echo $"let Crystal Space programs know where their resources are.$"
+	@echo $"CRYSTAL=$(INSTALL_DIR)$"
 
 endif # ifeq ($(DO_INSTALL),yes)
 

@@ -41,9 +41,11 @@ endif
 
 INC.IMGPLEX = $(wildcard plugins/video/loader/mplex/*.h)
 SRC.IMGPLEX = $(wildcard plugins/video/loader/mplex/*.cpp)
-
 OBJ.IMGPLEX = $(addprefix $(OUT),$(notdir $(SRC.IMGPLEX:.cpp=$O)))
 DEP.IMGPLEX = CSUTIL CSSYS CSGFX CSUTIL
+CFG.IMGPLEX = data/config/imgplex.cfg
+
+TO_INSTALL.CONFIG += $(CFG.IMGPLEX)
 
 MSVC.DSP += IMGPLEX
 DSP.IMGPLEX.NAME = imgplex

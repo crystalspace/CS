@@ -8,6 +8,36 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed the makefile `clean' target so that it only
 	  strips the trailing slash (/) from the $(OUTBASE) and $(OUTDLL)
 	  variables rather than removing all slashes.
+	- Eric Sunshine fixed the makefile `install' target so that it now
+	  takes the makefile variable $(OUTDLL) into account when installing
+	  plugin modules.  Plugin modules are now installed into
+	  $(INSTALL_DIR)/$(OUTDLL) when $(OUTDLL) exists, rather than
+	  $(INSTALL_DIR)/lib.
+	- Eric Sunshine worked around a very nasty problem where the `install'
+	  target would try to build out-of-date or missing plugin modules using
+	  the wrong commands!  It would try building these modules using with
+	  the commands to build a static library.  This problem was caused by
+	  the `install_all' target depending upon the generated plugin module
+	  files.  Plugin modules must be built with the makefile variable
+	  MAKE_DLL set to `yes', and unfortunately, by the time the
+	  `install_all' target runs, it is already too late to set that
+	  variable.  Furthermore, there is no way to individually set that
+	  variable for each out-of-date or missing plugin module which must be
+	  built.  There is no simple solution to the problem of MAKE_DLL=yes
+	  not being set at the time that `install' runs, thus for now, I
+	  modified the `install' target so that it no longer depends upon the
+	  generated plugin module files.  It will still try to install all of
+	  the plugin modules, but it will no longer automatically build
+	  out-of-date or missing ones.
+	- Eric Sunshine fixed several problems with the new sound loader plugin
+	  makefiles.
+	- Eric Sunshine fixed a bug in imgplex.mak where it neglected to
+	  install its imgplex.cfg configuration file.
+	- Eric Sunshine fixed a bug in csws.mak where it neglected to install
+	  its csws.cfg configuration file.
+	- Eric Sunshine fixed the Apple/NeXT ports so that they are now capable
+	  of finding their plugin modules based upon the setting of the CRYSTAL
+	  environment variable.
 3-Jun-2001
 	- Eric Sunshine eliminated a couple compilation warnings in isoview.cpp
 	  regarding assignment of float to integer.
