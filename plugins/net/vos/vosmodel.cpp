@@ -165,8 +165,17 @@ void ConstructModelTask::doTask()
   csModelDataTools::MergeObjects (data, false);
 
   LOG ("ConstructModelTask", 2, "Creating factory");
-  csRef<iMeshFactoryWrapper> factory = xbuild->BuildSpriteFactoryHierarchy (
-          data, engine, metamat->GetMaterialWrapper());
+  csRef<iMeshFactoryWrapper> factory;
+  if(metamat.isValid()) {
+    factory = xbuild->BuildSpriteFactoryHierarchy (
+      data, engine, metamat->GetMaterialWrapper());
+  }
+  else
+  {
+    factory = xbuild->BuildSpriteFactoryHierarchy (
+      data, engine, csMetaMaterial::GetCheckerboard());
+  }
+
   if (!factory)
   {
     LOG ("ConstructModelTask", 2, "Could not build factory");
@@ -217,12 +226,19 @@ void csMetaModel::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   if(alreadyLoaded) return;
   else alreadyLoaded = true;
 
+  LOG("csMetaModel", 2, "entered setup for " << getURLstr());
+
   // Get material
-  vRef<A3DL::Material> m = getMaterial();
-  vRef<csMetaMaterial> mat = meta_cast<csMetaMaterial>(getMaterial());
-  LOG("csMetaModel", 2, "getting material " << mat.isValid());
-  mat->Setup(vosa3dl);
-  LOG("csMetaModel", 2, "setting up model");
+  vRef<csMetaMaterial> mat;
+  try {
+    vRef<A3DL::Material> m = getMaterial();
+    mat = meta_cast<csMetaMaterial>(getMaterial());
+    LOG("csMetaModel", 2, "getting material " << mat.isValid());
+    mat->Setup(vosa3dl);
+    LOG("csMetaModel", 2, "setting up model");
+  } catch(std::runtime_error& e) {
+    LOG("csMetaModel", 2, "Got error " << e.what());
+  }
 
   vRef<Property> property = getModelObj();
 
@@ -241,7 +257,50 @@ void csMetaModel::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
                               this, getURLstr(), sect->GetSector(),
                               databuf, property->getDataType()));
 
+  vRef<A3DL::Actor> actor = meta_cast<A3DL::Actor>(this);
+  if(actor.isValid()) actor->addActionListener(this);
+
   LOG("csMetaModel", 2, "calling csMetaObject3D::setup");
   csMetaObject3D::Setup(vosa3dl, sect);
 }
 
+class SetModelAnimTask : public Task
+{
+public:
+  vRef<csMetaModel> model;
+  char* action;
+  A3DL::ActionEvent::EventType evtype;
+
+  SetModelAnimTask(csMetaModel* m, const char* a, A3DL::ActionEvent::EventType et)
+    : model(m, true), evtype(et)
+    {
+      action = strdup(a);
+    }
+
+  virtual ~SetModelAnimTask()
+    {
+      free(action);
+    }
+
+  virtual void doTask()
+    {
+      csRef<iSprite3DState> spstate = SCF_QUERY_INTERFACE(
+        model->GetCSinterface()->GetMeshWrapper()->GetMeshObject (),
+        iSprite3DState);
+
+      if(evtype == A3DL::ActionEvent::SetActionCycle) {
+        spstate->SetAction (action);
+      } else if(evtype == A3DL::ActionEvent::DoActionOnce) {
+        spstate->SetOverrideAction (action);
+      }
+    }
+};
+
+void csMetaModel::notifyActionChange(const A3DL::ActionEvent& ae)
+{
+  LOG("csMetaModel", 2, "Got notifyActionChange with action " << ae.getAction());
+
+  vosa3dl->mainThreadTasks.push(
+    new SetModelAnimTask(this, ae.getAction().c_str(),
+                         ae.getEventType()));
+}

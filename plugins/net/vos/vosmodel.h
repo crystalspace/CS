@@ -25,11 +25,14 @@
 #define _VOSMODEL_H_
 
 #include <vos/metaobjects/a3dl/model.hh>
+#include <vos/metaobjects/a3dl/actor.hh>
 #include "inetwork/vosa3dl.h"
 #include "csvosa3dl.h"
 #include "vosobject3d.h"
 
-class csMetaModel : public virtual csMetaObject3D, public virtual A3DL::Model
+class csMetaModel : public virtual csMetaObject3D,
+                    public virtual A3DL::Model,
+                    public virtual A3DL::ActionListener
 {
 private:
   bool alreadyLoaded;
@@ -40,6 +43,7 @@ public:
     const std::string& type);
 
   virtual void Setup(csVosA3DL* vosa3dl, csVosSector* sect);
+  virtual void notifyActionChange(const A3DL::ActionEvent& ae);
 };
 
 #endif

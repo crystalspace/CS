@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Jun-2004
+	- Peter Amstutz added support for setting animation loops on
+	  models to the csvosa3dl plugin
+	- Peter Amstutz added code to support the iMozilla plugin in
+	  csvosa3dl (but #ifdef'd out since the iMozilla plugin has
+	  not been comitted yet).
 10-Jun-2004
 	- res fixed the OR renderers for the recent DrawSimpleMesh() changes.
 	- res fixed the Fixed FP plugin to reset the multitexturing setup on

@@ -21,18 +21,23 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+#undef IMOZILLA_SUPPORT // not commited to CS CVS yet
+
 #include "cssysdef.h"
 
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
-//#include "imap/loader.h"
 #include "igraphic/imageio.h"
 #include "iutil/vfs.h"
+
+#ifdef IMOZILLA_SUPPORT
+#include "itexture/imozilla.h"
+#endif
+
 #include "vostexture.h"
 
 using namespace VOS;
-
 
 class ConstructTextureTask : public Task
 {
@@ -103,6 +108,64 @@ void ConstructTextureTask::doTask()
   metatxt->texturewrapper = texture;
 }
 
+
+
+class ConstructMozTextureTask : public Task
+{
+public:
+  iObjectRegistry *object_reg;
+  std::string texturedata;
+  vRef<csMetaTexture> metatxt;
+
+  ConstructMozTextureTask(iObjectRegistry *objreg, csMetaTexture* mt);
+  virtual ~ConstructMozTextureTask();
+  virtual void doTask();
+};
+
+
+
+ConstructMozTextureTask::ConstructMozTextureTask(iObjectRegistry *objreg,
+                                           csMetaTexture* mt)
+  : object_reg(objreg), metatxt(mt, true)
+{
+}
+
+ConstructMozTextureTask::~ConstructMozTextureTask()
+{
+}
+
+void ConstructMozTextureTask::doTask()
+{
+#ifdef IMOZILLA_SUPPORT
+  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
+  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  csRef<iTextureManager> txtmgr = g3d->GetTextureManager();
+  csRef<iMozilla> moz = CS_QUERY_REGISTRY (object_reg, iMozilla);
+
+  if(!moz) {
+    LOG("ConstructMozTextureTask", 1, "No iMozilla plugin");
+    return;
+  }
+
+  csRef<iTextureFactory> tf = moz->NewFactory();
+  tf->SetSize(256, 256);
+  csRef<iTextureWrapper> tw = tf->Generate();
+  tw->Register(txtmgr);
+  tw->GetTextureHandle()->Prepare();
+
+  csRef<iMozillaFactory> mozfac = SCF_QUERY_INTERFACE((iTextureFactory*)tf,
+                                                      iMozillaFactory);
+  mozfac->Init(256, 256);
+
+  LOG("ConstructMozTextureTask", 1, "Loading " << texturedata);
+
+  mozfac->LoadURI(texturedata.c_str());
+
+  metatxt->texturewrapper = tw;
+#endif
+}
+
+
 csMetaTexture::csMetaTexture(VobjectBase* superobject)
     : A3DL::Texture(superobject), alreadyLoaded(false)
 {
@@ -118,61 +181,44 @@ void csMetaTexture::Setup(csVosA3DL* vosa3dl)
   else alreadyLoaded = true;
 
   vRef<Property> imagedata = getImage();
-  char cachefilename[256];
-  vRef<Site> site = imagedata->getSite();
-  /*snprintf(cachefilename, sizeof(cachefilename), "/csvosa3dl_cache/%s/%s",
-    site->getURL().getHost().c_str(),
-    imagedata->getSiteName().c_str());*/
-  snprintf(cachefilename, sizeof(cachefilename), "/tmp/%s_%s",
-           site->getURL().getHost().c_str(),
-           imagedata->getSiteName().c_str());
 
-  // VFS uses ':' as a seperator
-  for (int i=0; cachefilename[i]; i++)
-  {
-    if ((cachefilename[i] == ':'))
-        cachefilename[i] = '_';
+  if(imagedata->getDataType().substr(0, 5) == "text/") {
+    ConstructMozTextureTask* cmtt = new ConstructMozTextureTask(
+      vosa3dl->GetObjectRegistry(),
+      this);
+
+    cmtt->texturedata = "data:";
+    cmtt->texturedata += imagedata->getDataType();
+    cmtt->texturedata += ",";
+    cmtt->texturedata += imagedata->read();
+
+    vosa3dl->mainThreadTasks.push(cmtt);
   }
+  else
+  {
+    char cachefilename[256];
+    vRef<Site> site = imagedata->getSite();
+    /*snprintf(cachefilename, sizeof(cachefilename), "/csvosa3dl_cache/%s/%s",
+      site->getURL().getHost().c_str(),
+      imagedata->getSiteName().c_str());*/
+    snprintf(cachefilename, sizeof(cachefilename), "/tmp/%s_%s",
+             site->getURL().getHost().c_str(),
+             imagedata->getSiteName().c_str());
 
-  ConstructTextureTask* ctt = new ConstructTextureTask(
-                   vosa3dl->GetObjectRegistry(), getURLstr(),
-                   cachefilename, this);
-  imagedata->read(ctt->texturedata);
-  vosa3dl->mainThreadTasks.push(ctt);
+    // VFS uses ':' as a seperator
+    for (int i=0; cachefilename[i]; i++)
+    {
+      if ((cachefilename[i] == ':'))
+        cachefilename[i] = '_';
+    }
 
+    ConstructTextureTask* ctt = new ConstructTextureTask(
+      vosa3dl->GetObjectRegistry(), getURLstr(),
+      cachefilename, this);
+    imagedata->read(ctt->texturedata);
+    vosa3dl->mainThreadTasks.push(ctt);
+  }
   //addChildListener(this);
-
-#if 0    // this code will be replaced by code using the CrystalZilla (iMozilla) plugin for text (and html etc) rendering
-    if(p->getDataType() == "text/plain") {
-        texture = engine->CreateBlackTexture(p->getURL().getString().c_str(), 256, 256, 0, CS_TEXTURE_3D);
-        texture->Register(txtmgr);
-        texture->GetTextureHandle()->Prepare ();
-
-        g3d->SetRenderTarget (texture->GetTextureHandle(), false);
-
-        if(g3d->BeginDraw (CSDRAW_2DGRAPHICS))
-        {
-            csRef<iFont> font = g3d->GetDriver2D()->GetFontServer()->LoadFont(CSFONT_LARGE);
-            int fg = g3d->GetDriver2D()->FindRGB(255, 255, 255);
-            int bg = g3d->GetDriver2D()->FindRGB(0, 0, 0);
-
-            g3d->GetDriver2D()->Clear(bg);
-
-            string str = p->read();
-            string::size_type start, end;
-            int pos=4;
-            for(start = 0, end = 0; end < str.length(); end++) {
-                for(start = end; end < str.length() && str[end] != '\n'; end++);
-                g3d->GetDriver2D()->Write(font, 4, pos, fg, bg, str.substr(start, end - start).c_str());
-                pos += 14;
-                start = end;
-            }
-            g3d->GetDriver2D()->Write(font, 10, pos, fg, bg, str.substr(start, end).c_str());
-
-            g3d->FinishDraw ();
-        }
-    } else
-#endif
 }
 
 void csMetaTexture::notifyPropertyChange(const PropertyEvent& event)

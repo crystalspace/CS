@@ -66,6 +66,7 @@ public:
     VOS::VobjectBase* superobject, const std::string& type);
 
   friend class ConstructTextureTask;
+  friend class ConstructMozTextureTask;
 };
 
 #endif
