@@ -123,7 +123,10 @@ struct iSpriteCal3DFactoryState : public iBase
 				 int type,
 				 float base_velocity,
 				 float min_velocity,
-				 float max_velocity) = 0;
+				 float max_velocity,
+                 int min_interval,
+                 int max_interval,
+                 int idle_pct) = 0;
 
   /**
    * This loads a submesh which will attach to this skeleton.
@@ -252,6 +255,7 @@ struct iSpriteCal3DState : public iBase
   enum
   {
     C3D_ANIM_TYPE_NONE,
+    C3D_ANIM_TYPE_IDLE,
     C3D_ANIM_TYPE_TRAVEL,
     C3D_ANIM_TYPE_CYCLE,
     C3D_ANIM_TYPE_STYLE_CYCLE,
@@ -328,7 +332,7 @@ struct iSpriteCal3DState : public iBase
    * in velocity to the specified parm "vel".  The calling program is still
    * responsible for actually moving the sprite.
    */
-  virtual bool SetVelocity(float vel) = 0;
+  virtual bool SetVelocity(float vel,csRandomGen *rng=NULL) = 0;
 
   /**
    * This function sets the Level of Detail used by the sprite.  This is used to 
