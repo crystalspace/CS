@@ -223,7 +223,7 @@ awsScrollBar::SetProperty(char *name, void *parm)
 }
 
 void 
-awsScrollBar::IncClicked(void *sk, iAwsSource *source)
+awsScrollBar::IncClicked(void *sk, iAwsSource *)
 {
   awsScrollBar *sb = (awsScrollBar *)sk;
 
@@ -235,11 +235,10 @@ awsScrollBar::IncClicked(void *sk, iAwsSource *source)
 
   sb->Broadcast(signalChanged); 
   sb->Invalidate();
-  
 }
 
 void 
-awsScrollBar::DecClicked(void *sk, iAwsSource *source)
+awsScrollBar::DecClicked(void *sk, iAwsSource *)
 {
   awsScrollBar *sb = (awsScrollBar *)sk;
 
@@ -316,19 +315,19 @@ awsScrollBar::OnDraw(csRect clip)
 }
 
 bool 
-awsScrollBar::OnMouseDown(int button , int x , int y)
+awsScrollBar::OnMouseDown(int , int , int)
 {
   return false;
 }
 
 bool 
-awsScrollBar::OnMouseUp(int button, int x, int y)
+awsScrollBar::OnMouseUp(int ,int ,int)
 {
   return false;
 }
 
 bool
-awsScrollBar::OnMouseMove(int button, int x, int y)
+awsScrollBar::OnMouseMove(int ,int ,int)
 {
   return false;
 }

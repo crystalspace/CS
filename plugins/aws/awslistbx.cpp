@@ -540,7 +540,7 @@ awsListBox::GetSelectedItem(void *owner, iAwsParmList &parmlist)
 }
 
 void 
-awsListBox::ClearList(void *owner, iAwsParmList &parmlist)
+awsListBox::ClearList(void *owner, iAwsParmList &)
 {
   awsListBox *lb = (awsListBox *)owner;
 

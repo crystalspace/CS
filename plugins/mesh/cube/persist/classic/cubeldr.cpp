@@ -168,7 +168,7 @@ bool csCubeFactoryLoader::Initialize (iObjectRegistry* object_reg)
 }
 
 iBase* csCubeFactoryLoader::Parse (const char* string, iMaterialList* matlist,
-	iMeshFactoryList* factlist, iBase* /* context */)
+	iMeshFactoryList* , iBase* /* context */)
 {
   // @@@ Implement MIXMODE
   CS_TOKEN_TABLE_START (commands)
@@ -357,7 +357,7 @@ bool csCubeLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-iBase* csCubeLoader::Parse (const char* string, iMaterialList* matlist,
+iBase* csCubeLoader::Parse (const char* string, iMaterialList* ,
 	iMeshFactoryList* factlist, iBase*)
 {
   CS_TOKEN_TABLE_START (commands)
