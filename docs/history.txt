@@ -914,12 +914,12 @@ chronological order.
 	  pthread implementatons were lax about this requirement, more modern
 	  ones, such as NPTL, actually enforce it. We also now enforce this
 	  requirement.
-	- Eric Sunshine upgraded the CS_CHECK_PTHREAD() macro in checkpython.m4
-	  so that it also determines if "timed" mutexes are available, and
-	  figures out the actual constant representing such mutexes (usually
-	  either PTHREAD_MUTEX_TIMED or PTHREAD_MUTEX_TIMED_NP). If available,
-	  configure.ac now emits CS_PTHREAD_MUTEX_TIMED to csconfig.h with the
-	  appropriate value.
+	- Eric Sunshine upgraded the CS_CHECK_PTHREAD() macro in
+	  checkpthread.m4 so that it also determines if "timed" mutexes are
+	  available, and figures out the actual constant representing such
+	  mutexes (usually either PTHREAD_MUTEX_TIMED or
+	  PTHREAD_MUTEX_TIMED_NP). If available, configure.ac now emits
+	  CS_PTHREAD_MUTEX_TIMED to csconfig.h with the appropriate value.
 	- Eric Sunshine applied patch to sprcal3dldr from Brian DeVries
 	  <contingencyplan@gmail.com> which prevents meshes lacking skeletons
 	  from being accepted. This is necessary because sprcal3d is absolutely
