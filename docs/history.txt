@@ -44,6 +44,12 @@ chronological order.
 	      complete the 'Construct' methods for all element handlers.
 	    - Added various assignment operators using the same new code.
 	    - Moved destructor (DeleteAll() call) to csArrayBase.
+	- Jorrit optimized csRefArray considerably. Still slower than
+	  csArray<csRef<T> > though so we will probably ditch csRefArray
+	  in favor of the latter. Most likely csRefArray will remain as
+	  a subclass of csArray<csRef<T> > in order to provide a more efficient
+	  Push(T*) that avoids the extra IncRef() that happens with
+	  csArray<csRef<T> >.
 4-Aug-2003
 	- Oktal added the following to csutil:
 	    - A template class, csHash<T>, intended to replace csHashMap soon.

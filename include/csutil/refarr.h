@@ -23,20 +23,24 @@
 #include "csutil/arraybase.h"
 #include "csutil/ref.h"
 
+// hack: work around problems caused by #defining 'new'
+#ifdef CS_EXTENSIVE_MEMDEBUG
+# undef new
+#endif
+#include <new>
+
 template <class T>
 class csRefArrayElementHandler
 {
 public:
   static void Construct (T* address, T const& src)
   {
-    // Clear before setting. We don't know if the memory is properly 0.
-    memset (address, 0, sizeof (T));
-    *address = src;
+    new (static_cast<void*>(address)) T(src);
   }
 
   static void Destroy (T* address)
   {
-    *address = 0;	// Clear reference.
+    address->T::~T();
   }
 
   static void InitRegion (T* address, int count)
@@ -146,8 +150,8 @@ public:
   /// Push a element on 'top' of vector.
   int Push (T* what)
   {
-    SetLength (count + 1);
-    root [count - 1] = what;
+    SetLengthUnsafe (count + 1);
+    ElementHandler::Construct (root + count - 1, what);
     return (count - 1);
   }
 
@@ -311,6 +315,10 @@ public:
 
 #undef ElementHandler
 #undef ArraySuper
+
+#ifdef CS_EXTENSIVE_MEMDEBUG
+# define new CS_EXTENSIVE_MEMDEBUG_NEW
+#endif
 
 #endif // __CS_REFARR_H__
 
