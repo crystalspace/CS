@@ -32,6 +32,9 @@ chronological order.
 	- Eric Sunshine fixed bug in qsqrt() check in configure.ac where it
 	  would always fail if configuring outside the source directory because
 	  it failed to locate CS/include/qsqrt.h.
+	- Eric Sunshine fixed bugs in macosx.mak where it was prefixing one
+	  extra $(SRCDIR)/ to each of the paths mentioned by $(SRC.SYS_CSSYS)
+	  and $(INC.SYS_CSSYS).
 20-Oct-2003
         - Philip Wyett added 'joytest' to CS/ root .cvsignore file.
 	- Jorrit added thing.cfg.

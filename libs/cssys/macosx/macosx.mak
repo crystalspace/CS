@@ -118,11 +118,11 @@ LFLAGS.DLL = -bundle -framework AppKit -framework Foundation
 NASMFLAGS.SYSTEM =
 
 # System dependent source files included into csutil library
-SRC.SYS_CSSYS = $(wildcard $(addprefix $(SRCDIR)/, \
+SRC.SYS_CSSYS = $(wildcard \
   $(addsuffix /*.cpp,$(MACOSX.SOURCE_PATHS)) \
   $(addsuffix /*.c,$(MACOSX.SOURCE_PATHS)) \
   $(addsuffix /*.m,$(MACOSX.SOURCE_PATHS)) \
-  $(addsuffix /*.mm,$(MACOSX.SOURCE_PATHS)))) \
+  $(addsuffix /*.mm,$(MACOSX.SOURCE_PATHS))) \
   $(SRCDIR)/libs/cssys/general/apppath.cpp \
   $(SRCDIR)/libs/cssys/general/csprocessorcap.cpp \
   $(SRCDIR)/libs/cssys/general/findlib.cpp \
@@ -134,8 +134,7 @@ SRC.SYS_CSSYS = $(wildcard $(addprefix $(SRCDIR)/, \
   $(SRCDIR)/libs/cssys/general/sysroot.cpp \
   $(CSTHREAD.SRC)
 INC.SYS_CSSYS = \
-  $(wildcard $(addprefix $(SRCDIR)/,$(addsuffix /*.h,$(MACOSX.SOURCE_PATHS))))\
-  $(CSTHREAD.INC)
+  $(wildcard $(addsuffix /*.h,$(MACOSX.SOURCE_PATHS))) $(CSTHREAD.INC)
 
 # Where to put dynamic libraries on this system?
 OUTDLL =
