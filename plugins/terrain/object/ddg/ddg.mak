@@ -42,7 +42,7 @@ CFLAGS.DDG = $(CFLAGS.D)__CRYSTAL_SPACE__ $(CFLAGS.I)plugins/terrain/object/ddg
 # @@@@@ The following line is temporary until this makefile is fixed
 CFLAGS += $(CFLAGS.D)__CRYSTAL_SPACE__ $(CFLAGS.I)plugins/terrain/object/ddg
 
-DEP.DDG = CSGEOM CSUTIL
+DEP.DDG = CSGEOM CSUTIL CSSYS
 
 MSVC.DSP += DDG
 DSP.DDG.NAME = ddg
