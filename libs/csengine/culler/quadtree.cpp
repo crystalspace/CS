@@ -362,11 +362,11 @@ int csQuadTree :: TestPoint (const csVector2& point)
 }
 
 
-#if 0
 void csQuadTree :: Print(void)
 {
   printf("csQuadTree depth %d, statesize %d, root_state %d\n", 
     max_depth, state_size, root_state);
+#if 0
   if(states)
   for(int i=0; i<state_size; i++)
     printf("%2.2x ", states[i]);
@@ -380,8 +380,8 @@ void csQuadTree :: Print(void)
       for(int x=0;x<side;x++)
        ;
   }
-}
 #endif
+}
 
 /*
  * 2 bytes form a 4x4 rectangle.
