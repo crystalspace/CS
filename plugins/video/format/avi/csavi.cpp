@@ -426,6 +426,7 @@ bool csAVIFormat::HasChunk (ULong id, ULong frameindex)
     {
       char *pp = maxframepos;
       hcl ch;
+	  ch.size=0; // to stop MSVC moaning
       while (pp < moviendpos && maxframe <= frameindex)
       {
 	memcpy (&ch, pp, len_hcl);
@@ -475,6 +476,7 @@ bool csAVIFormat::GetChunk (ULong frameindex, AVIDataChunk *pChunk)
       if (!no_recl)
       {
 	hcl ch;
+	ch.size=0; // to stop MSVC moaning
 	while (startfrom <= frameindex)
 	{
 	  memcpy (&ch, pp, len_hcl);
@@ -490,6 +492,7 @@ bool csAVIFormat::GetChunk (ULong frameindex, AVIDataChunk *pChunk)
       else 
       { // no_recl == true
 	hcl ch;
+	ch.size=0; // to stop MSVC moaning
 	while (startfrom <= frameindex)
 	{
 	  memcpy (&ch, pp, len_hcl);
