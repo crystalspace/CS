@@ -482,7 +482,8 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
 {
   SCF_CONSTRUCT_IBASE(0);
 
-#if defined(CS_DEBUG)
+// Cygwin has problems with freopen()
+#if defined(CS_DEBUG) || defined(__CYGWIN__)
   console_window = true;
 #else
   console_window = false;
