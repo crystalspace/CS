@@ -20,6 +20,7 @@ The history order is reversed so that new features are at the top.
 	- Fixed the rapid fix from Rhad so that instead of comparing directly
 	  with 0 (which you should never do with floats!) it now uses an
 	  epsilon test instead.
+	- Replaced some code in Rapid with csVector3 instead of float[3].
 16-Apr-2003
 	- Rhad altered the rapid triangle collision test to ignore
 	  degenerate triangles.

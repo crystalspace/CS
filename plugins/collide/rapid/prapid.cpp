@@ -372,7 +372,7 @@ csCollisionPair *csRapidCollider::GetCollisions ()
   return CD_contact->GetArray ();
 }
 
-int project6 (csVector3 ax, csVector3 p1, csVector3 p2, csVector3 p3,
+static int project6 (csVector3 ax, csVector3 p1, csVector3 p2, csVector3 p3,
   csVector3 q1, csVector3 q2, csVector3 q3)
 {
   float P1 = ax * p1;
@@ -414,20 +414,6 @@ int project6 (csVector3 ax, csVector3 p1, csVector3 p2, csVector3 p3,
          else no check is done (which is less robust)
 */
 #define USE_EPSILON_TEST	1
-
-/* some macros */
-#define CROSS(dest, v1, v2)			\
-  dest [0] = v1 [1] * v2 [2] - v1 [2] * v2 [1];	\
-  dest [1] = v1 [2] * v2 [0] - v1 [0] * v2 [2];	\
-  dest [2] = v1 [0] * v2 [1] - v1 [1] * v2 [0];
-
-#define DOT(v1, v2)				\
-  (v1 [0] * v2 [0] + v1 [1] * v2 [1] + v1 [2] * v2 [2])
-
-#define SUB(dest, v1, v2)			\
-  dest [0] = v1 [0] - v2 [0];			\
-  dest [1] = v1 [1] - v2 [1];			\
-  dest [2] = v1 [2] - v2 [2];
 
 /* sort so that a <= b */
 #define SORT(a, b)				\
@@ -527,20 +513,20 @@ int project6 (csVector3 ax, csVector3 p1, csVector3 p2, csVector3 p3,
     }							\
   }
 
-int coplanar_tri_tri (float N[3],
+int coplanar_tri_tri (const csVector3& N,
   const csVector3 &V0, const csVector3 &V1, const csVector3 &V2,
   const csVector3 &U0, const csVector3 &U1, const csVector3 &U2)
 {
-  float A[3];
+  csVector3 A;
   short i0,i1;
   /* first project onto an axis-aligned plane, that maximizes the area */
   /* of the triangles, compute indices: i0,i1. */
-  A [0] = ABS  (N [0]);
-  A [1] = ABS  (N [1]);
-  A [2] = ABS  (N [2]);
-  if (A [0] > A [1])
+  A.x = ABS  (N.x);
+  A.y = ABS  (N.y);
+  A.z = ABS  (N.z);
+  if (A.x > A.y)
   {
-    if (A [0] > A [2])
+    if (A.x > A.z)
     {
       i0 = 1;			/* A[0] is greatest */
       i1 = 2;
@@ -553,7 +539,7 @@ int coplanar_tri_tri (float N[3],
   }
   else				/* A[0]<=A[1] */
   {
-    if (A [2] > A [1])
+    if (A.z > A.y)
     {
       i0 = 0;			/* A[2] is greatest */
       i1 = 1;
@@ -580,10 +566,11 @@ int coplanar_tri_tri (float N[3],
 int tri_contact(const csVector3 &V0, const csVector3 &V1, const csVector3 &V2,
                 const csVector3 &U0, const csVector3 &U1, const csVector3 &U2)
 {
-  float E1 [3], E2 [3];
-  float N1 [3], N2 [3], d1, d2;
+  csVector3 E1, E2;
+  csVector3 N1, N2;
+  float d1, d2;
   float du0, du1, du2, dv0, dv1, dv2;
-  float D [3];
+  csVector3 D;
   float isect1 [2], isect2 [2];
   float du0du1, du0du2, dv0dv1, dv0dv2;
   short index;
@@ -592,9 +579,9 @@ int tri_contact(const csVector3 &V0, const csVector3 &V1, const csVector3 &V2,
   float b, c, max;
 
   /* compute plane equation of triangle(V0,V1,V2) */
-  SUB (E1, V1, V0);
-  SUB (E2, V2, V0);
-  CROSS (N1, E1, E2);
+  E1 = V1 - V0;
+  E2 = V2 - V0;
+  N1 = E1 % E2;
   /* If V0 V1 V2 describes a degenerate triangle, then N1 will be 0,0,0
    *  We do not detect collisions on degenerate triangles.
    */
@@ -603,14 +590,14 @@ int tri_contact(const csVector3 &V0, const csVector3 &V1, const csVector3 &V2,
 	&& ABS (N1[2]) < SMALL_EPSILON)
       return 0;
 
-  d1 = -DOT (N1, V0);
+  d1 = -N1 * V0;
   /* plane equation 1: N1.X+d1=0 */
 
   /* put U0,U1,U2 into plane equation 1 to compute signed distances to
      the plane */
-  du0 = DOT (N1, U0) + d1;
-  du1 = DOT (N1, U1) + d1;
-  du2 = DOT (N1, U2) + d1;
+  du0 = (N1 * U0) + d1;
+  du1 = (N1 * U1) + d1;
+  du2 = (N1 * U2) + d1;
 
   /* coplanarity robustness check */
 #if USE_EPSILON_TEST
@@ -626,9 +613,9 @@ int tri_contact(const csVector3 &V0, const csVector3 &V1, const csVector3 &V2,
     return 0;			/* no intersection occurs */
 
   /* compute plane of triangle (U0,U1,U2) */
-  SUB (E1, U1, U0);
-  SUB (E2, U2, U0);
-  CROSS (N2, E1, E2);
+  E1 = U1 - U0;
+  E2 = U2 - U0;
+  N2 = E1 % E2;
   /* If U0 U1 U2 describes a degenerate triangle, then N2 will be 0,0,0
    *  We do not detect collisions on degenerate triangles.
    */
@@ -637,13 +624,13 @@ int tri_contact(const csVector3 &V0, const csVector3 &V1, const csVector3 &V2,
 	&& ABS (N2[2]) < SMALL_EPSILON)
       return 0;
 
-  d2 = -DOT (N2, U0);
+  d2 = -N2 * U0;
   /* plane equation 2: N2.X+d2=0 */
 
   /* put V0,V1,V2 into plane equation 2 */
-  dv0 = DOT (N2, V0) + d2;
-  dv1 = DOT (N2, V1) + d2;
-  dv2 = DOT (N2, V2) + d2;
+  dv0 = (N2 * V0) + d2;
+  dv1 = (N2 * V1) + d2;
+  dv2 = (N2 * V2) + d2;
 
 #if USE_EPSILON_TEST
   if (ABS  (dv0) < EPSILON) dv0 = 0.0;
@@ -659,7 +646,7 @@ int tri_contact(const csVector3 &V0, const csVector3 &V1, const csVector3 &V2,
     return 0;			/* no intersection occurs */
 
   /* compute direction of intersection line */
-  CROSS (D, N2, N1);
+  D = N2 % N1;
 
   /* compute and index to the largest component of D */
   max = ABS  (D [0]);
