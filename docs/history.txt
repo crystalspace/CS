@@ -15,6 +15,8 @@ The history order has been reversed so that new features are at the top.
 	- Modified the csSector versions of IntersectSphere() and
 	  IntersectSegment() to correctly use the movable of the things
 	  if relevant to map world space to object space.
+	- Eric Sunshine repaired the csgamtst.mak makefile.  Apparently it
+	  was just a verbatim copy of the pysimple makefile.
 5-Mar-2001
 	- Thomas Hieber did the following to the gamecore plugin:
 	    - Added to scf.cfg.
