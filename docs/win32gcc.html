@@ -1,0 +1,51 @@
+<html>
+
+<head>
+<title>Crystal Space installation with GCC for Windows</title>
+</head>
+
+<body>
+
+<h1>Crystal Space installation with GCC for Windows</h1>
+
+Written by <a href="mailto:sgalbrai@krl.org">Seth Galbraith</a>
+
+<p>
+
+Andrew Zabolotny, myself and others are working on instructions for using
+Crystal Space with a GNU compiler for windows, but it isn't easy because of
+the many different versions of the GNU Windows compiler and problems with
+some Windows header files containing non-standard code used by Microsoft.
+If you're interested in helping out with this project, contact me or one of
+the other Crystal Space developers.
+
+<h2>Files you will need</h2>
+
+<pre>
+<a href="ftp://go.cygnus.com/pub/sourceware.cygnus.com/pub/cygwin/latest/full.exe"
+>full.exe</a>               - Cygwin GNU Windows compiler
+<a href="ftp://ftp.linuxgames.com/crystal/support/winlibs14.zip"
+>winlibs14.zip</a>          - compiled zip, jpeg, and png libraries for Windows
+<a href="ftp://ftp.linuxgames.com/crystal/nasm/nasm-0.98e-bin-w32.zip"
+>nasm-0.98e-bin-w32.zip</a> - NASM (Netwide Assembler) for Windows
+</pre>
+
+<h2>Installation</h2>
+
+<ul>
+<li>Unzip the compiled libraries into the same folder where you
+    unzipped Crystal Space. (<a href="#bugs">See Bugs</a>.)
+<li>Unzip NASM somwhere.
+<li>Run the Cygwin full.exe installer.
+<li>To use GCC and NASM you need to make sure you have the
+    appropriate bin directories in your PATH.
+    Here's my own PATH as an example:
+<pre>
+SET PATH=C:\Cygnus\cygwin-b20\H-i586-cygwin32\bin;C:\nasm\bin\win32;%PATH%
+</pre>
+<li>Now just CD to your Crystal Space directory, run make and follow
+    the instructions.
+</ul>
+
+</body>
+</html>

@@ -35,6 +35,12 @@ Short-term cleanups that need to be done:
 	  csSoundBufferObject are now csSoundData and csSoundDataObject.
 	  You can construct 2D or 3D buffer from sound renderer and
 	  you can create a 3D buffer from a 2D buffer.
+	- Gary Haussman added externalmodels.txt which explains how to
+	  import models in a format foreign to Crystal Space (3DS, MD2, ...).
+	- Small fix to util.cpp for DOS (suggested by Seth Galbraith).
+	- Michael Dale Long fixed a problem for GCC 2.95.
+	- Fixed bug in new csPolygonClipper::ClassifyBox() routine.
+	- Some docs for DOS and Squawk from Seth Galbraith.
 22-Sep-1999
 	- Optimization for sprites. Sprites are now only clipped to the
 	  frustrum when really needed. This means they are clipped to the
@@ -70,6 +76,7 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed a problem which prevented the csGame library
 	  from compiling.  The problem was caused when csBox was broken out
 	  into its own header file.
+	- Robert Bate fixed the Mac port so it works with VFS.
 21-Sep-1999
 	- Jorrit reverted a fix on sprite lighting which Eric accidentally
 	  removed.

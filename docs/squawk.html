@@ -1,0 +1,246 @@
+<html>
+
+<head>
+<title>Squawk Crystal Space Application</title>
+</head>
+
+<body>
+
+<h1>Squawk Crystal Space Application</h1>
+
+Created by <a href="mailto:sgalbrai@krl.org">Seth Galbraith</a>, also known as
+<a href="http://www.planetquake.com/simitar/">&quot;The Serpent Lord&quot;</a>
+
+<ul>
+<li><a href="#about"  >What it's about</a>
+<li><a href="#control">Controls</a>
+<li><a href="#bugs"   >Known bugs</a>
+<li><a href="#history">History</a>
+<li><a href="#todo"   >Things remaining to be done</a>
+</ul>
+
+<hr>
+
+<h2><a name="#about"></a>What it's about</h2>
+
+I'm making a multiplayer action role-playing game.
+Currently this application just tests a few ideas:
+<ul>
+<li>multiple views for split-screen play
+<li>sky box environment map
+<li>animated 3d sprite character
+</ul>
+
+<hr>
+
+<h2><a name="#control"></a>Controls</h2>
+
+<pre>
+Esc  exit program
+
+1  show run action
+2  show stand action
+3  show pain action
+4  show death action
+5  show attack action
+6  show jump action
+</pre>
+
+<h3>Upper view</h3>
+
+<pre>
+up arrow     tilt camera up
+down arrow   tilt camera down
+left arrow   turn camera left
+right arrow  turn camera right
+</pre>
+
+<h3>Lower left view</h3>
+
+<pre>
+w  tilt camera up
+s  tilt camera down
+a  turn camera left
+d  turn camera right
+</pre>
+
+<h3>Lower right view</h3>
+
+<pre>
+i  tilt camera up
+k  tilt camera down
+j  turn camera left
+l  turn camera right
+</pre>
+
+<hr>
+
+<h2><a name="#bugs"></a>Known Bugs</h2>
+
+<ul>
+
+<li>Converting 24 bit images to 8 bit palettes is <em>very</em>
+slow and TXTMODE=24bit doesn't work for non-lightmapped polygons.
+The skybox uses 24 bit JPEG images again so it takes a <em>long</em>
+time to start in 16 or 8 bit.
+
+<li>The feild-of-view should be FrameHeight / 2 for the lower views,
+but this causes a Floating Point Exception when I try to look at the sprite.
+
+<li>The sprite is not centered correctly.  This looks
+like it's a bug in the convertor I used.
+
+<li>"attack" action causes a Floating Point Exception:
+<pre>
+_DrawPolygonFX__20csGraphics3DSoftwareR14G3DPolygonDPFX+1860, line 2130 of soft_g3d.cc
+_Draw__8csSectorR12csRenderView+4186, line 553 of sector.cc
+_Draw__7csWorldP11IGraphics3DP8csCameraP9csClipper+407, line 493 of world.cc7
+_NextFrame__9SqkSystemll+413, line 382 of squawk.cc
+_Loop__15SysSystemDriver+103, line 99 of djgpp.cc
+_main+256, line 404 of squawk.cc
+___crt1_startup+138
+</pre>
+
+</ul>
+
+<hr>
+
+<h2><a name="#history"></a>History</h2>
+
+<h3>September 21, 1999 Seth Galbraith</h3>
+<ul>
+<li>Jorrit fixed the bug where texture projection was always
+centered around the middle of the screen
+<li>I merged squawk.txt and history.txt into this document
+<li>Changed "room" to "skybox" throughout squawk.cpp
+<li>Added AddViewVertex method that takes relative coordinates
+<li>two views are now always linked like a single concave view
+<li>the other views are now always independent
+<li>version 15
+</ul>
+
+<h3>September 17, 1999 Seth Galbraith</h3>
+<ul>
+<li>centers of views adjusted depending on whether the views are linked
+<li>replaced sky box textures with big 512x512 JPEG images
+<li>version 14
+</ul>
+
+<h3>September 4, 1999 Seth Galbraith</h3>
+<ul>
+<li>converted all textures to 8 bit PNG format
+<li>disabled lighting and mipmapping for the sky box
+<li>version 13
+</ul>
+
+<h3>August 25, 1999  Seth Galbraith</h3>
+<ul>
+<li>load and display an animated 3d sprite
+<li>version 12
+</ul>
+
+<h3>August 4, 1999  Eric Sunshine</h3>
+<ul>
+<li>fixed problem with handling of texture manager; was allocating palette prior
+  to world->Prepare(), whereas it should have allocated done after
+<li>console now latches palette colors before and after world has been prepared;
+  thus allowing it to be used at any time, rather than only prior to world
+  preparation
+<li>background is now erased prior to activation of 3D views in order to clear
+  away console text which incorrectly appeared in gaps between views
+<li>version 11
+</ul>
+
+<h3>July 29, 1999  Seth Galbraith</h3>
+<ul>
+<li>space bar links and unlinks view controls
+<li>allocate palette before creating console
+<li>version 10
+</ul>
+
+<h3>July 27, 1999  Jorrit Tyberghein</h3>
+<ul>
+<li>load textures from squawk.zip
+<li>version 9
+</ul>
+
+<h3>July 26, 1999  Seth Galbraith</h3>
+<ul>
+<li>named sector (sectors must be named for lighting)
+<li>added console (palette is odd, font too big)
+<li>version 8
+</ul>
+
+<h3>July 24, 1999  Seth Galbraith</h3>
+<ul>
+<li>misc updates based on CVS changes
+<li>moved stuff around, then moved it back :-)
+<li>version 7
+</ul>
+
+<h3>July 23, 1999  Seth Galbraith</h3>
+<ul>
+<li>added terragen environment map textures
+<li>version 6
+</ul>
+
+<h3>July 21, 1999  Seth Galbraith</h3>
+<ul>
+<li>use configuration file "squawk.cfg"
+<li>added $(CSSCRIPT.LIB) to dependencies in squawk.mak
+<li>version 5
+</ul>
+
+<h3>July 21, 1999  Seth Galbraith</h3>
+<ul>
+<li>use configuration file "squawk.cfg"
+<li>added $(CSSCRIPT.LIB) to dependencies in squawk.mak
+<li>version 4
+</ul>
+
+<hr>
+
+<h2><a name="#todo"></a>Things remaining to be done</h2>
+
+<h3>Controls</h3>
+
+<ul>
+<li>Better keyboard and mouse handling
+<li>Multiple controls that can be used simultaneously
+<li>Control character rather than camera
+<li>Gamepad and Joystick support
+</ul>
+
+<h3>Cameras</h3>
+
+<ul>
+<li>Chase cameras that follow characters
+<li>Adjust FOV in split views
+<li>Create SqkView class which contains multiple views,
+eventually using a plain text file with information for
+configuring an arbitrary number of not necessarily convex views.
+(Probably described as a list of sqkViews which are described as
+a list of csViews which are described as a list of 2d coordinates.
+with an arbitrary number of each type of object allowed.)
+</ul>
+
+<h3>Content</h3>
+
+<ul>
+<li>A local environment to move around in
+<li>Better sprites (easiest to do if I can use .mdl format)
+<li>Create a Squawk or general Crystal Space skybox class
+<li>Make sky textures a command line and config option.
+The base name, the extension for each direction, and the
+file type extension could all be options.  For example:
+<pre>
+SKYNAME=snowy
+SKYEXT1=_up _dn _lt _rt _fr _bk
+SKYEXT2=.tga
+</pre>
+</ul>
+
+<hr>
+
+</body>
+</html>
