@@ -24,6 +24,7 @@
 #include "csgeom/pmtools.h"
 #include "csgeom/polymesh.h"
 #include "csgeom/poly3d.h"
+#include "csgeom/math3d.h"
 #include "igeom/polymesh.h"
 
 void csPolygonMeshTools::CalculateNormals (iPolygonMesh* mesh,
@@ -779,7 +780,7 @@ static bool In2D_X (const csVector3& v1, const csVector3& v2,
   return true;
 }
 
-bool csPolygonMeshTools::SortedIn (const csVector3& point,
+bool csPolygonMeshTools::SortedInPoint (const csVector3& point,
   	csVector3* vertices,
   	csTriangleMinMax* tris, int tri_count,
 	csPlane3* planes)
@@ -825,5 +826,36 @@ bool csPolygonMeshTools::SortedIn (const csVector3& point,
   // check if we can see that triangle (backface culling). If we can
   // then it means we are outside the object. Otherwise we are inside.
   return planes[nearest_idx].Classify (point) < 0;
+}
+
+bool csPolygonMeshTools::SortedInLine (
+	const csVector3& p1, const csVector3& p2,
+  	csVector3* vertices,
+  	csTriangleMinMax* tris, int tri_count,
+	csPlane3* planes)
+{
+  int i;
+  float minx = p1.x;
+  float maxx = minx;
+  if (p2.x < minx) minx = p2.x;
+  if (p2.x > maxx) maxx = p2.x;
+  csSegment3 seg (p1, p2);
+
+  for (i = 0 ; i < tri_count ; i++)
+  {
+    // Quick reject of triangles that are outside minx/maxx range.
+    if (tris[i].maxx < minx) continue;
+    if (tris[i].minx > maxx) continue;
+
+    // Try to intersect.
+    csVector3 isect;
+    if (csIntersect3::IntersectTriangle (vertices[tris[i].a],
+    	vertices[tris[i].b], vertices[tris[i].c], seg, isect))
+    {
+      return false;
+    }
+  }
+
+  return true;
 }
 
