@@ -13,6 +13,7 @@ actions DistClean
   rm -f Jamconfig
   rm -f Jamfile
   rm -f cache.mak
+  rm -f config.cache
   rm -f config.log
   rm -f config.mak
   rm -f config.status

@@ -8,6 +8,9 @@ The history order is reversed so that new features are at the top.
 	- Matze cleaned some jamrules.
 	- res fixed the swapped "enabled"/"disabled" in shadow debug
 	  toggle notification.
+	- Eric Sunshine fixed the Jam distclean target so that it once again
+	  removes config.cache.  I am not sure why this was changed yesterday
+	  to ignore config.cache, but it should not have been.
 12-Apr-2003
 	- Rhad fixed a couple potential deadlock and mutex issues in
 	  the ds3d sound renderer plugin. Also fixed similar issues in
