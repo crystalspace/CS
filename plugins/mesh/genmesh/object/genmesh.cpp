@@ -108,6 +108,9 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 
 csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
+#ifdef CS_USE_NEW_RENDERER 
+     : shaderVarAccessor(this)
+#endif
 {
   SCF_CONSTRUCT_IBASE (0);
 #ifdef CS_USE_NEW_RENDERER
@@ -150,6 +153,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
 
   g3d = CS_QUERY_REGISTRY (factory->object_reg, iGraphics3D);
   buffers_version = (uint)-1;
+  mesh_colors_dirty_flag = true;
 #endif
 }
 
@@ -544,8 +548,11 @@ void csGenmeshMeshObject::SetupObject ()
     sv->SetAccessor (&factory->shaderVarAccessor);
     sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::normal_name);
     sv->SetAccessor (&factory->shaderVarAccessor);
+
+    /*sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::color_name);
+    sv->SetAccessor (&factory->shaderVarAccessor);*/
     sv = dynDomain->GetVariableAdd (csGenmeshMeshObjectFactory::color_name);
-    sv->SetAccessor (&factory->shaderVarAccessor);
+    sv->SetAccessor (&shaderVarAccessor);
 #endif // CS_USE_NEW_RENDERER
   }
 }
@@ -599,6 +606,8 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   mesh.clip_plane = clip_plane;
   mesh.clip_z_plane = clip_z_plane;
   mesh.do_mirror = camera->IsMirrored ();
+
+  lighting_movable = movable;
 #endif
   return true;
 }
@@ -855,6 +864,10 @@ void csGenmeshMeshObject::UpdateLighting2 (iMovable* movable)
   // Clamp all vertex colors to 2.
   for (i = 0 ; i < factory->GetVertexCount () ; i++)
     colors[i].Clamp (2., 2., 2.);
+
+#ifdef CS_USE_NEW_RENDERER
+  mesh_colors_dirty_flag = true;
+#endif
 }
 
 void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
@@ -909,6 +922,10 @@ void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
   // Clamp all vertex colors to 2.
   for (i = 0 ; i < factory->GetVertexCount () ; i++)
     colors[i].Clamp (2., 2., 2.);
+
+#ifdef CS_USE_NEW_RENDERER
+  mesh_colors_dirty_flag = true;
+#endif
 }
 
 bool csGenmeshMeshObject::Draw (iRenderView* rview, iMovable* movable,
@@ -1121,6 +1138,28 @@ iObjectModel* csGenmeshMeshObject::GetObjectModel ()
 {
   return factory->GetObjectModel ();
 }
+
+#ifdef CS_USE_NEW_RENDERER
+void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
+{
+  if (var->Name == csGenmeshMeshObjectFactory::color_name)
+  {
+    UpdateLighting2 (lighting_movable);
+    if (mesh_colors_dirty_flag)
+    {
+      color_buffer = g3d->CreateRenderBuffer (
+        sizeof (csColor) * num_lit_mesh_colors, CS_BUF_STATIC,
+        CS_BUFCOMP_FLOAT, 3, false);
+      mesh_colors_dirty_flag = false;
+      color_buffer->CopyToBuffer (
+	do_lighting ? lit_mesh_colors : static_mesh_colors, 
+	sizeof (csColor) * num_lit_mesh_colors);
+    }
+    var->SetValue(color_buffer);
+    return;
+  }
+}
+#endif
 
 //----------------------------------------------------------------------
 
@@ -1509,7 +1548,7 @@ void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (csShaderVariable* va
     var->SetValue(normal_buffer);
     return;
   }
-  if (var->Name == color_name)
+  /*if (var->Name == color_name)
   {
     if (mesh_colors_dirty_flag)
     {
@@ -1521,7 +1560,7 @@ void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (csShaderVariable* va
     }
     var->SetValue(color_buffer);
     return;
-  }
+  }*/
   if (var->Name == index_name)
   {
     if (mesh_triangle_dirty_flag)

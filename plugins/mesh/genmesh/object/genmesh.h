@@ -86,9 +86,12 @@ private:
   csRenderMesh* meshPtr;
   csShaderVariableContext* dynDomain;
   csRef<iGraphics3D> g3d;
+  bool mesh_colors_dirty_flag;
 
   csReversibleTransform tr_o2c;
   uint buffers_version;
+  csRef<iRenderBuffer> color_buffer;
+  iMovable* lighting_movable;
 #endif
   csGenmeshMeshObjectFactory* factory;
   iBase* logparent;
@@ -400,6 +403,25 @@ public:
     virtual ~PolyMesh () { }
   } scfiPolygonMesh;
   friend struct PolyMesh;
+
+  //------------------ iShaderVariableAccessor implementation ------------
+#ifdef CS_USE_NEW_RENDERER
+  class ShaderVariableAccessor : public iShaderVariableAccessor
+  {
+  public:
+    csGenmeshMeshObject* parent;
+    ShaderVariableAccessor (csGenmeshMeshObject* p) : parent(p)
+    {}
+
+    virtual void PreGetValue (csShaderVariable* variable)
+    {
+      parent->PreGetShaderVariableValue (variable);
+    }
+  } shaderVarAccessor;
+  friend class ShaderVariableAccessor;
+
+  void PreGetShaderVariableValue (csShaderVariable* variable);
+#endif // CS_USE_NEW_RENDERER
 };
 
 /**
