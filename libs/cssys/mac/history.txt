@@ -7,6 +7,11 @@ Add Network support.
 Optimize everything.
 
 History:
+27-May-99
+	- Added fastsqrt.cpp to CSpace.mcp.
+	- Increased the memory partition for MazeD and CSWSTest so they would run.
+24-May-99
+	- Added consile support to the Mac OpenGL Driver.
 18-May-99
 	- Changing all of the projects to end in .mcp instead of .prj so MacCVS Pro will know that
 	  they are MetroWerks CodeWarrior Projects.
