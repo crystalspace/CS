@@ -559,8 +559,8 @@ Type &Class::getterFunc ()                                                      
 #ifdef CS_EXTENSIVE_MEMDEBUG
 extern void* operator new (size_t s, void* filename, int line);
 extern void* operator new[] (size_t s, void* filename, int line);
-#define NEW new ((void*)__FILE__, __LINE__)
-#define new NEW
+#define CS_EXTENSIVE_MEMDEBUG_NEW new ((void*)__FILE__, __LINE__)
+#define new CS_EXTENSIVE_MEMDEBUG_NEW
 #endif
 
 #ifdef CS_DEBUG

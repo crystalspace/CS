@@ -19,6 +19,10 @@
 #ifndef __CSUTIL_ARRAY_H__
 #define __CSUTIL_ARRAY_H__
 
+// hack: work around problems caused by #defining 'new'
+#ifdef CS_EXTENSIVE_MEMDEBUG
+# undef new
+#endif
 #include <new>
 
 /**
@@ -41,6 +45,7 @@ private:
   {
     new (static_cast<void*>(root + n)) T(src);
   }
+
   void DestroyElement (int n)
   {
     (root + n)->T::~T();
@@ -294,5 +299,9 @@ public:
       return false;
   }
 };
+
+#ifdef CS_EXTENSIVE_MEMDEBUG
+# define new CS_EXTENSIVE_MEMDEBUG_NEW
+#endif
 
 #endif
