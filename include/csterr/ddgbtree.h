@@ -85,26 +85,21 @@ public:
 	inline float	thick(void )	{return(_thick/4.0);}
 	///	set wedge thickness.
 	inline void	thick(float t )	{_thick = (unsigned short)(4 * t);}
-    /// Reset all but queue status.
-    inline void reset()
+	/// Reset priority delay to zero.
+	inline void resetPriorityDelay()
 	{
-		DDG_BCLEAR(_state, SF_COORD);
-		DDG_BCLEAR(_state, SF_VBUFFER);
-		decrPriorityDelay();
-		_vis = 0;
-		_cbufindex = 0;
+		DDG_BCLEAR(_state, SF_PRIORITY);
 	}
-
 	/// Set priority delay.  v should be a value from 0 to 15. 0 - invalid.
 	inline void setPriorityDelay(unsigned char v)
 	{
 		resetPriorityDelay();
 		_state += v;
 	}
-	/// Reset priority delay to zero.
-	inline void resetPriorityDelay()
+	/// Return priority delay.
+	inline unsigned char getPriorityDelay()
 	{
-		DDG_BCLEAR(_state, SF_PRIORITY);
+		return DDG_BGET(_state, SF_PRIORITY);
 	}
 	/// Decrement the delay by one.
 	inline void decrPriorityDelay()
@@ -114,10 +109,14 @@ public:
 			setPriorityDelay(v-1);
 		ddgAssert(getPriorityDelay()>=0 && getPriorityDelay() < 16);
 	}
-	/// Return priority delay.
-	inline unsigned char getPriorityDelay()
+    /// Reset all but queue status.
+    inline void reset()
 	{
-		return DDG_BGET(_state, SF_PRIORITY);
+		DDG_BCLEAR(_state, SF_COORD);
+		DDG_BCLEAR(_state, SF_VBUFFER);
+		decrPriorityDelay();
+		_vis = 0;
+		_cbufindex = 0;
 	}
 };
 
@@ -310,14 +309,14 @@ public:
 		return i/2;
 	}
 	/// Return the index of the left child.
-	static ddgTriIndex left(ddgTriIndex i)
-	{
-		return right(i)+1;
-	}
-	/// Return the index of the left child.
 	static ddgTriIndex right(ddgTriIndex i)
 	{
 		return i*2;
+	}
+	/// Return the index of the left child.
+	static ddgTriIndex left(ddgTriIndex i)
+	{
+		return right(i)+1;
 	}
 	/// Return the quad neighbour. If 0 there is no neighbour.
 	ddgTriIndex neighbour( ddgTriIndex i)
