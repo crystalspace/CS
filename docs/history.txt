@@ -46,6 +46,9 @@ chronological order.
 	      package name.
 	- Eric Sunshine eliminated TeX 'underfull hbox' warning from
 	  apimod98.txi.
+	- res added a workaround to csArray<>::Push() for the case an element 
+	  from the array itself was pushed. Under certain circumstance, bogus 
+	  data was pushed onto the array.
 18-Apr-2004
 	- Eric Sunshine fixed CS/bin/autogen.sh so that it returns the exit
 	  status of 'autoconf' as its own exit status. This allows invokers of

@@ -559,8 +559,24 @@ public:
   /// Push an element onto the tail end of the array. Returns index of element.
   int Push (T const& what)
   {
-    SetLengthUnsafe (count + 1);
-    ElementHandler::Construct (root + count - 1, what);
+    if (((&what >= root) && (&what < root + Length())) && 
+      (capacity < count + 1))
+    {
+      /*
+        Special case: An element from this very array is pushed, and a 
+	reallocation is needed. This could cause the passed ref to the
+	element to be pushed to be read from deleted memory. Work
+	around this.
+       */
+      int whatIndex = &what - root;
+      SetLengthUnsafe (count + 1);
+      ElementHandler::Construct (root + count - 1, root[whatIndex]);
+    }
+    else
+    {
+      SetLengthUnsafe (count + 1);
+      ElementHandler::Construct (root + count - 1, what);
+    }
     return count - 1;
   }
 
