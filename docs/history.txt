@@ -12,6 +12,14 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+28-Mar-2000
+	- Added csColor+= operator to add colors.
+	- Fixed bug in loader of new mixmode parameter (for sprites).
+	  MULTIPLY2 was not correctly parsed.
+	- Added new LIGHTING(yes/no) keyword for 2D sprites to enable
+	  or disable lighting. The COLORS keyword no longer disables
+	  lighting by default. Instead it allows you to define extra
+	  colors to add to lighting (if lighting is enabled).
 27-Mar-2000
 	- W.C.A. Wijngaards <wouterw@cs.vu.nl> made a small fix to line
 	  renderer.
@@ -75,6 +83,8 @@ Short-term cleanups that need to be done:
 	      (or four times per day).
 	    - Fixed a typographical error and added more content to
 	      authors.txi.
+	- Michael Dale Long did some fixes for recent change to
+	  DECLARE_TYPED_VECTOR and other minor changes to csclear.
 25-Mar-2000
 	- Optimized sprites a bit more.
 	- Changed curve drawing using new clipper routine to get

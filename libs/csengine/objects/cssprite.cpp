@@ -895,9 +895,7 @@ void csSprite3D::AddVertexColor (int i, const csColor& col)
     for (j = 0 ; j < tpl->GetNumTexels (); j++)
       vertex_colors[j].Set (0, 0, 0);
   }
-  vertex_colors [i].red += col.red;
-  vertex_colors [i].green += col.green;
-  vertex_colors [i].blue += col.blue;
+  vertex_colors [i] += col;
 }
 
 void csSprite3D::ResetVertexColors ()

@@ -53,20 +53,27 @@ public:
     if (green > g) green = g;
     if (blue > b) blue = b;
   }
-  /// Assign one color object to another
+  /// Assign one color object to another.
   csColor& operator= (const csColor& c)
   { red = c.red; green = c.green; blue = c.blue; return *this; }
-  /// Multiply this color by a scalar value
+  /// Multiply this color by a scalar value.
   csColor& operator*= (float f)
   { red *= f; green *= f; blue *= f; return *this; }
+  /// Add another color to this one.
+  csColor& operator+= (const csColor& c)
+  { red += c.red; green += c.green; blue += c.blue; return *this; }
 };
 
-/// Multiply a color by a scalar value
+/// Multiply a color by a scalar value.
 inline csColor operator* (const csColor& s, float f)
 { csColor c (s); c *= f; return c; }
 
-/// Multiply a scalar value by a color
+/// Multiply a scalar value by a color.
 inline csColor operator* (float f, const csColor& s)
 { csColor c (s); c *= f; return c; }
+
+/// Add two colors.
+inline csColor operator+ (const csColor& s1, const csColor& s2)
+{ csColor c (s1); c += s2; return c; }
 
 #endif // __CSCOLOR_H__

@@ -34,6 +34,7 @@ class csTextureHandle;
 struct csSprite2DVertex
 {
   csVector2 pos;
+  csColor color_init;
   csColor color;
   float u, v;
 };
@@ -86,8 +87,10 @@ public:
   /**
    * Set true if this sprite needs lighting (default).
    * Otherwise the given colors are used.
+   * If lighting is disabled then the color_init array
+   * is copied to the color array.
    */
-  void SetLighting (bool l) { lighting = l; }
+  void SetLighting (bool l);
 
   /// Return the value of the lighting flag.
   bool HasLighting () { return lighting; }

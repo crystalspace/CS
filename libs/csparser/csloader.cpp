@@ -4679,8 +4679,8 @@ UInt ParseMixmode (char* buf)
 {
   TOKEN_TABLE_START (modes)
     TOKEN_TABLE (COPY)
-    TOKEN_TABLE (MULTIPLY)
     TOKEN_TABLE (MULTIPLY2)
+    TOKEN_TABLE (MULTIPLY)
     TOKEN_TABLE (ADD)
     TOKEN_TABLE (ALPHA)
     TOKEN_TABLE (TRANSPARENT)
@@ -4735,6 +4735,7 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
     TOKEN_TABLE (MIXMODE)
     TOKEN_TABLE (MOVE)
     TOKEN_TABLE (COLORS)
+    TOKEN_TABLE (LIGHTING)
   TOKEN_TABLE_END
 
   char* name;
@@ -4770,6 +4771,8 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
 	  {
 	    verts[i].pos.x = list[i*2+0];
 	    verts[i].pos.y = list[i*2+1];
+	    verts[i].color_init.Set (0, 0, 0);
+	    verts[i].color.Set (0, 0, 0);
 	  }
         }
         break;
@@ -4787,6 +4790,13 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
 	  }
         }
         break;
+      case TOKEN_LIGHTING:
+        {
+          int do_lighting;
+          ScanStr (params, "%b", &do_lighting);
+          spr->SetLighting (do_lighting);
+        }
+        break;
       case TOKEN_COLORS:
         {
           float list[100];
@@ -4796,11 +4806,10 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
 	  verts.SetLength (num);
           for (i = 0 ; i < num ; i++)
 	  {
-	    verts[i].color.red = list[i*3+0];
-	    verts[i].color.green = list[i*3+1];
-	    verts[i].color.blue = list[i*3+2];
+	    verts[i].color_init.red = list[i*3+0];
+	    verts[i].color_init.green = list[i*3+1];
+	    verts[i].color_init.blue = list[i*3+2];
 	  }
-	  spr->SetLighting (false);
         }
         break;
       case TOKEN_MOVE:

@@ -41,6 +41,17 @@ void csSprite2D::UpdatePolyTreeBBox ()
 {
 }
 
+void csSprite2D::SetLighting (bool l)
+{
+  lighting = l;
+  if (!lighting)
+  {
+    int i;
+    for (i = 0 ; i < vertices.Length () ; i++)
+      vertices[i].color = vertices[i].color_init;
+  }
+}
+
 void csSprite2D::UpdateLighting (csLight** lights, int num_lights)
 {
   defered_num_lights = 0;
@@ -68,13 +79,13 @@ void csSprite2D::UpdateLighting (csLight** lights, int num_lights)
     float cosinus = 1.;
     cosinus /= wor_dist;
     light_color *= cosinus * lights[i]->GetBrightnessAtDistance (wor_dist);
-    color.red += light_color.red;
-    color.green += light_color.green;
-    color.blue += light_color.blue;
+    color += light_color;
   }
-  color.Clamp (2, 2, 2);
   for (i = 0 ; i < vertices.Length () ; i++)
-    vertices[i].color = color;
+  {
+    vertices[i].color = vertices[i].color_init + color;
+    vertices[i].color.Clamp (2, 2, 2);
+  }
 }
 
 void csSprite2D::Draw (csRenderView& rview)
