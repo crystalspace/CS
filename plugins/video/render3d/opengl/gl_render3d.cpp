@@ -1577,14 +1577,14 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
       csShaderVariable* radiusSV;
       if (string_point_radius<stacks.Length ()
           && stacks[string_point_radius].Length () > 0)
-        csShaderVariable* indexBufSV = stacks[string_point_radius].Top ();
+        radiusSV = stacks[string_point_radius].Top ();
       CS_ASSERT (radiusSV);
       radiusSV->GetValue (radius);
 
       csShaderVariable* scaleSV;
       if (string_point_scale<stacks.Length ()
           && stacks[string_point_scale].Length () > 0)
-        csShaderVariable* scaleSV = stacks[string_point_scale].Top ();
+        scaleSV = stacks[string_point_scale].Top ();
       CS_ASSERT (scaleSV);
       scaleSV->GetValue (scale);
 
