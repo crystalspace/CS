@@ -21,18 +21,20 @@ Short-term cleanups that need to be done:
 	  "MATRIX (ROT (ROT_X (1.0)))" even though existing levels use the
 	  form "MATRIX (ROT_X (1.0))".  In all fairness, there was actually
 	  nothing wrong with the parser.  It conformed to the specification
-	  stated in worldfmt.txt but, unfortunately, worldfmt lied.  For
-	  consistency, the syntax of the SCALE, SCALE_X, SCALE_Y, and SCALE_Z
-	  directives has also been changed to complement that of ROT, ROT_X,
-	  ROT_Y, and ROT_Z.  Scale is now specified as
-	  "MATRIX (SCALE_X (2.0))" rather than
-	  "MATRIX (SCALE (SCALE_X (2.0)))".  Finally, the recently added
-	  "MATRIX (ROT (1.0))" option (which rotated about Y) was dropped.
-	  Use the explicit form "MATRIX (ROT_Y (1.0))" instead.  Documentation
-	  in worldfmt.txt has been updated to reflect the new syntax.
+	  stated in worldfmt.txt but, unfortunately, worldfmt lied.
+	- Eric Sunshine changed the syntax of the SCALE, SCALE_X, SCALE_Y, and
+	  SCALE_Z directives to be consistent with ROT, ROT_X, ROT_Y, and
+	  ROT_Z.  Scale is now specified as "MATRIX (SCALE_X (2.0))" rather
+	  than "MATRIX (SCALE (SCALE_X (2.0)))".
+	- Eric Sunshine dropped the recently added "MATRIX (ROT (1.0))" option
+	  (which rotated about Y).  Use the explicit form
+	  "MATRIX (ROT_Y (1.0))" instead.
+	- Eric Sunshine updated worldfmt.txt to reflect the new MATRIX syntax.
 	- Eric Sunshine added csXScaleMatrix3, csYScaleMatrix3, and
 	  csZScaleMatrix3 classes to math3d.h which complement the existing
 	  cs[XYZ]RotMatrix3 classes.
+	- Eric Sunshine eliminated some compiler warnings in csEngine reported
+	  by Furqan Ullah <furqan@writeme.com>.
 1-Nov-1999
 	- Eric Sunshine eliminated some compiler warnings issued by
 	  VC++ 5.0.
