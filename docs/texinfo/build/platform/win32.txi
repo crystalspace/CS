@@ -23,7 +23,7 @@ Direct3D.
 * Win32 FAQ:: Frequently Asked Questions (@sc{faq})
 @end menu
 
-@node Win32 General
+@node Win32 General, Win32 MSVC5, Win32, Win32
 @subsubsection General Information
 
 To compile Crystal Space for Windows, you'll need the
@@ -61,7 +61,7 @@ headers the new DirectX directoy must appear before the older version's
 directory. So if they are not in the list, add them. If they appear after the
 older directories, move them on top of the list.
 
-@node Win32 MSVC5
+@node Win32 MSVC5, Win32 Compile, Win32 General, Win32
 @subsubsection Special Notes for @sc{msvc} 5
 
 Building Crystal Space with version 5 of @sc{msvc} is not recommended. If you
@@ -82,7 +82,7 @@ If one of the projects crashes the linker, unload that project and hope that
 it wasn't an important one!
 @end itemize
 
-@node Win32 Compile
+@node Win32 Compile, Win32 Rundemo, Win32 MSVC5, Win32
 @subsubsection Compiling CS
 
 To compile Crystal Space, you'll have to perform the following steps.
