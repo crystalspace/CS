@@ -497,6 +497,8 @@ void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
   SCF_IMPLEMENT_FACTORY_FINIS(Class)					\
   SCF_IMPLEMENT_FACTORY_CREATE(Class)
 
+#define SCF_STATIC_CLASS_CONTEXT      "*static*"
+
 /**
  * Automatically register a built-in class with SCF during startup.  When SCF
  * classes are statically linked (vs dynamic linking) they should be referenced
@@ -512,9 +514,10 @@ void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
   public:								\
     Class##_StaticInit__()						\
     {									\
-      scfInitialize(0);					\
+      scfInitialize(0);							\
       iSCF::SCF->RegisterClass(						\
-        CS_EXPORTED_NAME(Class,_Create), Ident, Desc, Dep);		\
+        CS_EXPORTED_NAME(Class,_Create), Ident, Desc, Dep,		\
+	SCF_STATIC_CLASS_CONTEXT);					\
     }									\
   } Class##_static_init__;
 
@@ -528,8 +531,8 @@ void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
   public:								\
     Module##_StaticInit()						\
     {									\
-      scfInitialize(0);					\
-      iSCF::SCF->RegisterClasses(MetaInfo);				\
+      scfInitialize(0);							\
+      iSCF::SCF->RegisterClasses(MetaInfo, SCF_STATIC_CLASS_CONTEXT);	\
     }									\
   } Module##_static_init__;
 
@@ -548,7 +551,7 @@ void* CS_EXPORTED_NAME(Class,_Create)(iBase *iParent)			\
   public:								\
     Class##_StaticInit()						\
     {									\
-      scfInitialize(0);					\
+      scfInitialize(0);							\
       iSCF::SCF->RegisterFactoryFunc(CS_EXPORTED_NAME(Class,_Create),#Class); \
     }									\
   } Class##_static_init__;
@@ -704,14 +707,16 @@ struct iSCF : public iBase
   /**
    * Read additional class descriptions from the given iDocument.  
    */
-  virtual void RegisterClasses (iDocument* metadata) = 0;
+  virtual void RegisterClasses (iDocument* metadata,
+    const char* context = 0) = 0;
 
   /**
    * A convenience wrapper for RegisterClasses(iDocument).  Assumes that the
    * string input argument is XML, which it wraps in an iDocument and then
    * passes to RegisterClasses(iDocument).
    */
-  virtual void RegisterClasses (char const* xml) = 0;
+  virtual void RegisterClasses (char const* xml,
+    const char* context = 0) = 0;
 
   /**
    * Read additional class descriptions from the given iDocument.  
