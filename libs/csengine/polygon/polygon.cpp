@@ -1615,6 +1615,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview,
   // @@@ Currently this function only checks if a shadow frustum is inside
   // the light frustum. There is no checking done if shadow frustums obscure
   // each other.
+  int i, i1, j, j1;
 
   csShadowFrustum* sf = lview.shadows.GetFirst ();
   csFrustum *lf = lview.light_frustum;
@@ -1627,6 +1628,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview,
       sf->relevant = false;
     else
     {
+      csPolygon3D* sfp = sf->polygon;
       switch (csFrustum::Classify (
         lf->GetVertices (), lf->GetNumVertices (),
         sf->GetVertices (), sf->GetNumVertices ()))
@@ -1634,7 +1636,45 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView& lview,
         case CS_FRUST_PARTIAL:
         case CS_FRUST_INSIDE:
           sf->relevant = true;
-          break;
+	  // If partial then we first test if the light and shadow
+	  // frustums are adjacent. If so then we ignore the shadow
+	  // frustum as well (not relevant).
+	  i1 = GetNumVertices ()-1;
+	  for (i = 0 ; i < GetNumVertices () ; i++)
+	  {
+	    j1 = sfp->GetNumVertices ()-1;
+	    float a1 = csMath3::Area3 (Vwor (i1), Vwor (i), sfp->Vwor (j1));
+	    for (j = 0 ; j < sfp->GetNumVertices () ; j++)
+	    {
+	      float a = csMath3::Area3 (Vwor (i1), Vwor (i), sfp->Vwor (j));
+	      if (ABS (a) < EPSILON && ABS (a1) < EPSILON)
+	      {
+		// The two points of the shadow frustum are on the same
+		// edge as the current light frustum edge we are examining.
+		// In this case we test if the orientation of the two edges
+		// is different. If so then the shadow frustum is not
+		// relevant.
+		csVector3 d1 = Vwor (i)-Vwor (i1);
+		csVector3 d2 = sfp->Vwor (j)-sfp->Vwor (j1);
+		if (  (d1.x < -EPSILON && d2.x > EPSILON) ||
+		      (d1.x > EPSILON && d2.x < -EPSILON) ||
+		      (d1.y < -EPSILON && d2.y > EPSILON) ||
+		      (d1.y > EPSILON && d2.y < -EPSILON) ||
+		      (d1.z < -EPSILON && d2.z > EPSILON) ||
+		      (d1.z > EPSILON && d2.z < -EPSILON))
+		{
+		  sf->relevant = false;
+		  break;
+		}
+	      }
+	      if (!sf->relevant) break;
+	      j1 = j;
+	      a1 = a;
+	    }
+	    if (!sf->relevant) break;
+	    i1 = i;
+	  }
+	  break;
         case CS_FRUST_OUTSIDE:
           sf->relevant = false;
           break;

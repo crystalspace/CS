@@ -1,38 +1,47 @@
 The history order has been reversed so that new features are at the top.
+
+31-Jul-2000
+	- Fixed a number of remaining black border problems with lighting.
+	  These were especially visible in the mazedex level but could
+	  occur everywhere.
 30-Jul-2000
 	- Samuel Humphreys did the following:
             - Little re-organisation of dtsimple, improved comments
             - Updated comments in dtsimp.cfg
             - Added ability to create csTextureHandles from preprepared
               iTextureHandles (in preparation for something new).
-            - Updated comments in csengine.cpp with regards multi-context support.
+            - Updated comments in csengine.cpp with regards multi-context
+	      support.
             - Added a conditional to the delete [] Scan.GlobalCMap to prevent
               destruction if this resource is shared in the software renderer
               texture manager.
 	    - Added a new function to the software texture cache which removes
               all cached_textures dependent on a texture handle
-            - Commented out last reference to proc textures within soft3dcom.cpp 
-	      as now protex3d.cpp takes care of uncaching and only when the proc 
-              texture is updated. Dtsimple suffers slight performance degradation,
-              ..perhaps add another proc_texture flag
-              i.e. CS_TEXTURE_PROC_UNCACHE_ALWAYS.. or would this be an unwanted
-              complication? An app which utilises and benefits from this is 
-              forthcoming.
+            - Commented out last reference to proc textures within
+	      soft3dcom.cpp as now protex3d.cpp takes care of uncaching and
+	      only when the proc texture is updated. Dtsimple suffers slight
+	      performance degradation, ..perhaps add another proc_texture flag
+              i.e. CS_TEXTURE_PROC_UNCACHE_ALWAYS.. or would this be an
+	      unwanted complication? An app which utilises and benefits from
+	      this is forthcoming.
             - Fixed minor bug in system.cpp which broke command line argument
               processing
-            - Added accessor to iTextureHandle to be able to retrieve which flags
-              have been set.
-	    - I believe this propagates the changes made to x2d.cpp to glx2d.cpp
-              which allows exit without pipe broken error (it works for me :).
+            - Added accessor to iTextureHandle to be able to retrieve which
+	      flags have been set.
+	    - I believe this propagates the changes made to x2d.cpp to
+	      glx2d.cpp which allows exit without pipe broken error (it
+	      works for me :).
 	    - Propagated Normans changes to regain the title on GLX windows.
-            - Fixed the multi-context support in the engine which broke after the
-              recent changes to the engine.
+            - Fixed the multi-context support in the engine which broke after
+	      the recent changes to the engine.
             - Added the emission of cscmdContextClose events from the GL and 
               software proc textures.
-	    - Fixed the GL proc texture bug which created new proc textures each
-              time PrepareTextures was called.
+	    - Fixed the GL proc texture bug which created new proc textures
+	      each time PrepareTextures was called.
             - dtsimple now responds to contextClose events, and exits without
 	      crashing.
+	- Norman Kramer fixed the glide canvases so that they work after
+	  Andrew's changes yesterday.
 28-Jul-2000
 	- Norman Kramer fixes the x2d canvas so that the title is set
 	  to the right window.
@@ -81,9 +90,16 @@ The history order has been reversed so that new features are at the top.
 	      FOR3D(yes|no). Using these two keywords you can achieve same
 	      effect as with older three. Besides, csstdldr plugin supports
 	      them for a long time.
+	    - Split the "int Type" field of csEvent into four: char Type,
+	      char Category, char SubCategory and char
+	      ReservedForGreatFutureExtensions. No application should be
+	      affected by this since Type is anyway effectively a 5-bit
+	      value...
 	- Fixed two bugs for compiling in Unix after Andrew's changes.
 	- Fixed embedded iPolygonMesh classes for both csPolygonSet
 	  and csSprite3D so that they are correctly specified now.
+	- Martin Geisse fixed a small bug in the docs as suggested in
+	  the mailing list.
 27-Jul-2000
 	- Martin Geisse converted some more docs to texinfo format
 	  (including the much asked for worldfmt.tex file).
