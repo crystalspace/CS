@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+6-Nov-2002
+	- Enabled tiled culling by default in Dynavis. This gives a big
+	  improvement in fps and it seems to work properly.
 5-Nov-2002
 	- Fixed an old bug in frustvis and dynavis with relation to frustum
 	  culling. The cause of the bug was that the kdtree node bounding
