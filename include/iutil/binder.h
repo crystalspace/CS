@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2002 by Mathew Sutcliffe <oktal@gmx.co.uk>
+    Copyright (C) 2003 by Mathew Sutcliffe <oktal@gmx.co.uk>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -26,8 +26,9 @@ struct iEventHandler;
 
 SCF_VERSION (iInputBinderPosition, 0, 0, 1);
 
-/// Represents the position of a mouse
-/// or joystick axis, shared between plugins.
+/**
+ * Represents the position of a mouse or joystick axis, shared between plugins.
+ */
 struct iInputBinderPosition : public iBase
 {
   /// Set the position; called by csInputBinder.
@@ -38,8 +39,10 @@ struct iInputBinderPosition : public iBase
 
 SCF_VERSION (iInputBinderBoolean, 0, 0, 1);
 
-/// Represents the up or down state of a keyboard key
-/// or a mouse or joystick button, shared between plugins.
+/**
+ * Represents the up or down state of a keyboard key or a mouse or joystick
+ * button, shared between plugins.
+ */
 struct iInputBinderBoolean : public iBase
 {
   /// Set the state; called by csInputBinder.
@@ -68,17 +71,17 @@ struct iInputBinder : public iBase
    * If toggle is true, one press activates and the second deactivates.
    * Otherwise, keydown activates and keyup deactivates.
    */
-  virtual void Bind (iEvent &ev, iInputBinderBoolean *var, bool toggle = false) = 0;
+  virtual void Bind (iEvent&, iInputBinderBoolean*, bool toggle = false) = 0;
 
   /**
    * Bind two int's to the x and y axes of a mouse or joystick.
    */
-  virtual void Bind (iEvent &ev, iInputBinderPosition *var) = 0;
+  virtual void Bind (iEvent&, iInputBinderPosition*) = 0;
 
   /**
    * Remove a binding.
    */
-  virtual bool Unbind (iEvent &ev) = 0;
+  virtual bool Unbind (iEvent&) = 0;
 
   /**
    * Remove all bindings.
