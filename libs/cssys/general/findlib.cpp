@@ -76,7 +76,9 @@ class callbackPrint : public iCallback
 public:
   virtual int File (const char *file)
   {
-    fprintf (stderr, "\t%s\n", file);
+    fprintf (stderr, "\t%s: ", file);
+    csPrintLibraryError (file);
+    fprintf (stderr, "\n");
     return CALLBACK_CONTINUE;
   }
 };
