@@ -85,7 +85,7 @@ Compiled zip, jpeg and png libraries@*
 
 @noindent
 @sc{libdxe} (Dynamic Library Loader) for @sc{DJGPP}@*
-@uref{ftp://ftp.linuxgames.com:/crystal/support/dxe2_010.zip}
+@uref{ftp://ftp.linuxgames.com:/crystal/support/dxe2_012.zip}
 
 @subsubheading Installation
 
