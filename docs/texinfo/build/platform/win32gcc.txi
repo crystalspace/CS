@@ -5,7 +5,7 @@
 @noindent
 @emph{Philip Wyett @email{philipwyett@@redeye-entertainment.co.uk}.}
 @noindent
-@emph{Last updated 20 June 2001}
+@emph{Last updated 26 June 2001}
 
 These instructions are for building Crystal Space with Mingw --- a @sc{gnu}
 compiler for Windows.  There are many different versions of the @sc{gnu}
@@ -19,25 +19,32 @@ Download the following packages:
 
 @itemize @bullet
 @item
-Crystal Space MingW package 'cs_mingw_0.20.exe' from the Mingw32 support
+Crystal Space MingW package 'cs_mingw_0.40.exe' from the Mingw32 support
 directory at Linux Games This package contains all the recent MingW package
 releases i.e.  all the files necessary to compile Crystal Space successfully.
 
 @iftex
 @noindent
-@uref{http://www.3ddownloads.com/?directory=}@*
-@uref{/linuxgames/crystal/support/mingw32/}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/}@*
+@uref{support/mingw32/cs_mingw_0.40.exe}
 @end iftex
 @ifnottex
 @noindent
-@uref{http://www.3ddownloads.com/?directory=/linuxgames/crystal/support/mingw32/}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/mingw32/cs_mingw_0.40.exe}
 @end ifnottex
 
 @item
 @sc{nasm} (Netwide Assembler) for Windows @samp{nasm-0.98e-bin-w32.zip}
 
+@iftex
 @noindent
-@uref{http://www.3ddownloads.com/?directory=/linuxgames/crystal/nasm/}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/}@*
+@uref{support/nasm/nasm-0.98e-bin-w32.zip}
+@end iftex
+@ifnottex
+@noindent
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/nasm/nasm-0.98e-bin-w32.zip}
+@end ifnottex
 @end itemize
 
 @subsubheading Installation

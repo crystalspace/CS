@@ -219,9 +219,17 @@ Before you attempt to run of the Crystal Space applications, you must download
 and install @emph{winlibs}.  Winlibs is a set of Dynamic Link Libraries
 (@sc{dll}), i.e. @samp{zlib.dll}, @samp{libjpeg.dll}, @samp{png.dll} and
 @samp{xmlparse.dll}.  The latest version of the winlibs package
-@samp{winlibs16.zip} can be downloaded from:
+@samp{winlibs0.19.zip} can be downloaded from:
 
-@uref{http://www.3ddownloads.com/?directory=/linuxgames/crystal/support/win32/}
+@iftex
+@noindent
+@uref{ftp://ftp.sunsite.dk/projects/crystal/}@*
+@uref{support/win32/winlibs0.19.zip}
+@end iftex
+@ifnottex
+@noindent
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/winlibs0.19.zip}
+@end ifnottex
 
 Once you have downloaded the winlbs package, extract it too your @samp{CS\}
 root directory.
