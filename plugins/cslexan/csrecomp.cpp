@@ -16,9 +16,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "cslex.h"
 #include <ctype.h>
 #include <string.h>
+#include "cssysdef.h"
+#include "cslex.h"
 
 IMPLEMENT_IBASE (csRegExpCompiler)
   IMPLEMENTS_INTERFACE (iRegExpCompiler)

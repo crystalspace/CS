@@ -17,6 +17,7 @@
 */
 
 #include <string.h>
+#include "cssysdef.h"
 #include "cslex.h"
 
 IMPLEMENT_IBASE (csRegExp)

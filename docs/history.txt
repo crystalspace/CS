@@ -4,6 +4,14 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine eliminated a couple compilation warnings in isoview.cpp
 	  regarding assignment of float to integer.
 	- Eric Sunshine eliminated several compilation errors from metasys.cpp.
+	- Eric Sunshine made the following changes to the cslexan plugin:
+	    - Renamed csrdparse.cpp and csrdparse.h to rdparse.cpp and
+	      rdparse.h, respectively, for DOS 8.3 conformance.
+	    - Added missing `#include "cssysdef.h"' to all .cpp files.
+	    - Removed inclusion of cssysdef.h from ivaria/lexan.h.  (This file
+	      should never be included by headers.)
+	    - Now compiles with compilers which do not natively support the C++
+	      `bool' type.
 1-Jun-2001
 	- Michael Voasse fixed a couple of additional bugs in motion
 	  manager. Changed csAppliedFrameVector from TYPED_VECTOR to

@@ -1,5 +1,5 @@
-#ifndef __CS_RE_RECURSIVE_DESCENT_PARSER__
-#define __CS_RE_RECURSIVE_DESCENT_PARSER__
+#ifndef __CS_RDPARSE_H__
+#define __CS_RDPARSE_H__
 
 /*****************************************************************************
     Copyright (C) 2001 by Christopher Nelson
@@ -30,7 +30,6 @@
  const unsigned int RE_COMP_ERR_MISSING_LEFT_BRACKET  = 4;
  const unsigned int RE_COMP_ERR_UNKNOWN_CHAR_CLASS    = 5;
 
-
  class csRESyntaxTree
  {
     unsigned int last_error;
@@ -47,4 +46,4 @@
     { return last_error; }
  };
 
-#endif
+#endif // __CS_RDPARSE_H__

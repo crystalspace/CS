@@ -1,5 +1,5 @@
-#ifndef __CSRENODE_H__
-#define __CSRENODE_H__
+#ifndef __CS_CSRENODE_H__
+#define __CS_CSRENODE_H__
 
 /*****************************************************************************
     Copyright (C) 2001 by Christopher Nelson
@@ -65,7 +65,7 @@
     virtual csRENode *Right()=0;
     
     /// Returns an acceptance match for this leaf (if node is a leaf)
-    virtual bool Accept(int )
+    virtual bool Accept(int)
     { return false; }    
 };
  
@@ -244,4 +244,4 @@
    } 
  };
 
-#endif 
+#endif // __CS_CSRENODE_H__
