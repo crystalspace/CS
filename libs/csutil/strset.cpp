@@ -24,6 +24,10 @@ struct csRegisteredString
 {
   csStringID ID;
   char *String;
+  csRegisteredString()
+  { String = NULL; }
+  ~csRegisteredString()
+  { delete [] String; }
 };
 
 csStringSet::csStringSet ()
