@@ -10,7 +10,7 @@
 ##    directoreis are relative to the current subdir specified with the SubDir
 ##    rule.
 ##    Implementation: The directories are simply added to the HDRS variable
-##    which is respected all jam rules.
+##    which is respected by all jam rules.
 rule IncludeDir
 {
   if $(>)
@@ -33,12 +33,12 @@ rule IncludeDir
 
 ##  SearchSubdir subdirectories
 ##    Description: Tells jam where to find additional sourcefiles. This is
-##    usefull when your target has files in subdirectories. In this case set
+##    useful when your target has files in subdirectories. In this case set
 ##    SearchSubdir to these subdirectories and just mention the sourcefiles
 ##    without path in your other rules.
 ##    Implementation: This rule sets the SEARCH_SOURCE variable to
 ##    $(SUBDIR)/subdir, so this rule will only work with rules which respect
-##    the SEARCH_SOURCE variable. (All CS rules do this)
+##    the SEARCH_SOURCE variable. (All CS rules do so.)
 rule SearchSubdir
 {
   SEARCH_SOURCE += $(SUBDIR)/$(<) ;
@@ -46,8 +46,8 @@ rule SearchSubdir
 
 ##  Wildcard [ dir : ] patterns
 ##    Create a list of files in a directory which match the pattern. You can
-##    optinally specify a subdirectory. The files will be returned with
-##    stripped pathnames. The difference to GLOB is that this rule respects
+##    optionally specify a subdirectory. The files will be returned with
+##    stripped pathnames. The difference from GLOB is that this rule respects
 ##    subdirectories which may have been entered with the SubDir rule.
 rule Wildcard
 {
@@ -78,7 +78,7 @@ if $(JAMVERSION) >= 2.5
 {
 
 ##  IsElem element : list
-##    Returns "true" if the elemnt is in the least. Otherwise nothing is
+##    Returns "true" if the elemnt is in the list. Otherwise nothing is
 ##    returned.
 rule IsElem
 {
