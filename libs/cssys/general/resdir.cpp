@@ -21,5 +21,5 @@
 
 char* csGetResourceDir (const char* argv0)
 {
-  return csGetAppDir();
+  return csGetAppDir(argv0);
 }
