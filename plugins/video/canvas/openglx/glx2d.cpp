@@ -264,7 +264,7 @@ bool csGraphics2DGLX::Open(const char *Title)
 
   Depth = active_GLVisual->depth;
 
-  if (Depth == 24 || Depth = 32)
+  if (Depth == 24 || Depth == 32)
     pfmt.PixelBytes = 4;
   else pfmt.PixelBytes = 2;
 
