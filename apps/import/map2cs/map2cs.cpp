@@ -18,8 +18,10 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-
 #include "cssysdef.h"
+
+#include <stdlib.h>
+
 #include "mapstd.h"
 #include "map.h"
 #include "cworld.h"
@@ -56,11 +58,24 @@ int main( int argc, char *argv[ ])
     PrintSyntax();
     return 1;
   }
-
-  const char* configfile = "data/config/map2cs.cfg";
+  
+  const char* configfile;
   if (argc==4)
   {
     configfile = argv[3];
+  }
+  else
+  {
+    char* filename = new char[255];
+    const char* crystal = getenv("CRYSTAL");
+    if (!crystal)
+    {
+      printf ("Couldn't find Crystal Space directory! Set CRYSTAL var!\n");
+      exit(1);
+    }
+    strcpy (filename, crystal);
+    strcat (filename, "/data/config/map2cs.cfg");
+    configfile=filename;
   }
   const char* mapfile   = argv[1];
   const char* worldfile = argv[2];

@@ -25,6 +25,11 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed a problem where both the engine and the Thing
 	  mesh plugin were publishing the crystalspace.mesh.object.thing class,
 	  which caused linking errors when attempting to load the plugin.
+	- Matze hacked map2cs, because it had a problem: It was using CS
+	  config files without loading vfs plugins etc...
+	  This hack doesn't use vfs files anymore now, but reads CRYSTAL var
+	  itself and composes $CRYSTAL/data/config/map2cs.cfg as config
+          path...
 24-Jan-2002
 	- Jorge Acereda relaxed a limit in 3ds2lev that made it crash
 	  with scenes with more than 100 textures.
