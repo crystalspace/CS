@@ -28,6 +28,7 @@ Short-term cleanups that need to be done:
 	- Continued work on PVS building. Started work on a new
 	  algorithm for computing the PVS. Not functional yet.
 	- Norman Kramer enabled gouraud shading in glide.
+	- Eric Sunshine added a TEXTURE keyword to the Metaballs config file.
 6-Mar-2000
 	- Started work on new csSprite superclass for csSprite3D (already
 	  done) and csSprite2D. csSprite3D now inherits from csSprite.
