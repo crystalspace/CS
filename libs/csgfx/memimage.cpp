@@ -62,19 +62,6 @@ csImageMemory::csImageMemory (int width, int height, void *buffer, bool destroy,
 
 csImageMemory::~csImageMemory ()
 {
-  if (destroy_image)
-  {
-    switch (Format & CS_IMGFMT_MASK)
-    {
-      case CS_IMGFMT_PALETTED8:
-        delete [] (uint8*)Image;
-	break;
-      case CS_IMGFMT_TRUECOLOR:
-        delete[] (csRGBpixel*)Image;
-	break;
-    }
-    delete [] Palette;
-  }
   SCF_DESTRUCT_IBASE ();
 }
 
