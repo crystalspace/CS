@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+13-Jul-2004
+	- Eric Sunshine changed cspace.i so that it no longer exports any
+	  va_list functions, such as csPrintfV(), PerformExtensionV(),
+	  PutTextV(), etc. This change was necessary because Swig emits code
+	  which is invalid on platforms on which va_list is implemented as a
+	  simple array. ISO C++ forbids array assignment, yet Swig-generated
+	  code attempts to assign a va_list to a va_list. These functions were
+	  not especially useful on the scripting side anyhow. Note that the
+	  corresponding var-arg (...) functions, such as csPrintf(),
+	  PerformExtension(), PutText(), are still exported.
 12-Jul-2004
 	- Vincent Knecht performed TeXinfo markup corrections pointed by
 	  Eric Sunshine in apimod98.txi.

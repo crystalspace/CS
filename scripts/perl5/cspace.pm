@@ -51,7 +51,6 @@ package cspace;
 *csPlatformStartup = *cspacec::csPlatformStartup;
 *csPlatformShutdown = *cspacec::csPlatformShutdown;
 *csPrintf = *cspacec::csPrintf;
-*csPrintfV = *cspacec::csPrintfV;
 *csFPutErr = *cspacec::csFPutErr;
 *csGetTicks = *cspacec::csGetTicks;
 *csSleep = *cspacec::csSleep;
@@ -7986,10 +7985,20 @@ package cspace::iEvent;
 *AddUInt8 = *cspacec::iEvent_AddUInt8;
 *AddInt16 = *cspacec::iEvent_AddInt16;
 *AddUInt16 = *cspacec::iEvent_AddUInt16;
+*AddInt32 = *cspacec::iEvent_AddInt32;
 *AddUInt32 = *cspacec::iEvent_AddUInt32;
 *AddFloat = *cspacec::iEvent_AddFloat;
 *AddDouble = *cspacec::iEvent_AddDouble;
+*AddBool = *cspacec::iEvent_AddBool;
 *Add = *cspacec::iEvent_Add;
+*RetrieveInt8 = *cspacec::iEvent_RetrieveInt8;
+*RetrieveUInt8 = *cspacec::iEvent_RetrieveUInt8;
+*RetrieveInt16 = *cspacec::iEvent_RetrieveInt16;
+*RetrieveUInt16 = *cspacec::iEvent_RetrieveUInt16;
+*RetrieveUInt32 = *cspacec::iEvent_RetrieveUInt32;
+*RetrieveFloat = *cspacec::iEvent_RetrieveFloat;
+*RetrieveDouble = *cspacec::iEvent_RetrieveDouble;
+*RetrieveBool = *cspacec::iEvent_RetrieveBool;
 *Retrieve = *cspacec::iEvent_Retrieve;
 *AttributeExists = *cspacec::iEvent_AttributeExists;
 *GetAttributeType = *cspacec::iEvent_GetAttributeType;
@@ -9007,6 +9016,260 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::csPixelCoord ##############
+
+package cspace::csPixelCoord;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_x_get = *cspacec::csPixelCoord_x_get;
+*swig_x_set = *cspacec::csPixelCoord_x_set;
+*swig_y_get = *cspacec::csPixelCoord_y_get;
+*swig_y_set = *cspacec::csPixelCoord_y_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csPixelCoord(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csPixelCoord($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csPixelFormat ##############
+
+package cspace::csPixelFormat;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_RedMask_get = *cspacec::csPixelFormat_RedMask_get;
+*swig_RedMask_set = *cspacec::csPixelFormat_RedMask_set;
+*swig_GreenMask_get = *cspacec::csPixelFormat_GreenMask_get;
+*swig_GreenMask_set = *cspacec::csPixelFormat_GreenMask_set;
+*swig_BlueMask_get = *cspacec::csPixelFormat_BlueMask_get;
+*swig_BlueMask_set = *cspacec::csPixelFormat_BlueMask_set;
+*swig_RedShift_get = *cspacec::csPixelFormat_RedShift_get;
+*swig_RedShift_set = *cspacec::csPixelFormat_RedShift_set;
+*swig_GreenShift_get = *cspacec::csPixelFormat_GreenShift_get;
+*swig_GreenShift_set = *cspacec::csPixelFormat_GreenShift_set;
+*swig_BlueShift_get = *cspacec::csPixelFormat_BlueShift_get;
+*swig_BlueShift_set = *cspacec::csPixelFormat_BlueShift_set;
+*swig_RedBits_get = *cspacec::csPixelFormat_RedBits_get;
+*swig_RedBits_set = *cspacec::csPixelFormat_RedBits_set;
+*swig_GreenBits_get = *cspacec::csPixelFormat_GreenBits_get;
+*swig_GreenBits_set = *cspacec::csPixelFormat_GreenBits_set;
+*swig_BlueBits_get = *cspacec::csPixelFormat_BlueBits_get;
+*swig_BlueBits_set = *cspacec::csPixelFormat_BlueBits_set;
+*swig_PalEntries_get = *cspacec::csPixelFormat_PalEntries_get;
+*swig_PalEntries_set = *cspacec::csPixelFormat_PalEntries_set;
+*swig_PixelBytes_get = *cspacec::csPixelFormat_PixelBytes_get;
+*swig_PixelBytes_set = *cspacec::csPixelFormat_PixelBytes_set;
+*complete = *cspacec::csPixelFormat_complete;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csPixelFormat(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csPixelFormat($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::csImageArea ##############
+
+package cspace::csImageArea;
+@ISA = qw( cspace );
+%OWNER = ();
+%ITERATORS = ();
+*swig_x_get = *cspacec::csImageArea_x_get;
+*swig_x_set = *cspacec::csImageArea_x_set;
+*swig_y_get = *cspacec::csImageArea_y_get;
+*swig_y_set = *cspacec::csImageArea_y_set;
+*swig_w_get = *cspacec::csImageArea_w_get;
+*swig_w_set = *cspacec::csImageArea_w_set;
+*swig_h_get = *cspacec::csImageArea_h_get;
+*swig_h_set = *cspacec::csImageArea_h_set;
+*swig_data_get = *cspacec::csImageArea_data_get;
+*swig_data_set = *cspacec::csImageArea_data_set;
+sub new {
+    my $pkg = shift;
+    my $self = cspacec::new_csImageArea(@_);
+    bless $self, $pkg if defined($self);
+}
+
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_csImageArea($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iOffscreenCanvasCallback ##############
+
+package cspace::iOffscreenCanvasCallback;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*FinishDraw = *cspacec::iOffscreenCanvasCallback_FinishDraw;
+*SetRGB = *cspacec::iOffscreenCanvasCallback_SetRGB;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iOffscreenCanvasCallback($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iGraphics2D ##############
+
+package cspace::iGraphics2D;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*Open = *cspacec::iGraphics2D_Open;
+*Close = *cspacec::iGraphics2D_Close;
+*GetWidth = *cspacec::iGraphics2D_GetWidth;
+*GetHeight = *cspacec::iGraphics2D_GetHeight;
+*GetPage = *cspacec::iGraphics2D_GetPage;
+*DoubleBuffer = *cspacec::iGraphics2D_DoubleBuffer;
+*GetDoubleBufferState = *cspacec::iGraphics2D_GetDoubleBufferState;
+*GetPixelFormat = *cspacec::iGraphics2D_GetPixelFormat;
+*GetPixelBytes = *cspacec::iGraphics2D_GetPixelBytes;
+*GetPalEntryCount = *cspacec::iGraphics2D_GetPalEntryCount;
+*GetPalette = *cspacec::iGraphics2D_GetPalette;
+*SetRGB = *cspacec::iGraphics2D_SetRGB;
+*FindRGB = *cspacec::iGraphics2D_FindRGB;
+*SetClipRect = *cspacec::iGraphics2D_SetClipRect;
+*GetClipRect = *cspacec::iGraphics2D_GetClipRect;
+*BeginDraw = *cspacec::iGraphics2D_BeginDraw;
+*FinishDraw = *cspacec::iGraphics2D_FinishDraw;
+*Print = *cspacec::iGraphics2D_Print;
+*Clear = *cspacec::iGraphics2D_Clear;
+*ClearAll = *cspacec::iGraphics2D_ClearAll;
+*DrawLine = *cspacec::iGraphics2D_DrawLine;
+*DrawBox = *cspacec::iGraphics2D_DrawBox;
+*ClipLine = *cspacec::iGraphics2D_ClipLine;
+*DrawPixel = *cspacec::iGraphics2D_DrawPixel;
+*DrawPixels = *cspacec::iGraphics2D_DrawPixels;
+*Blit = *cspacec::iGraphics2D_Blit;
+*GetPixelAt = *cspacec::iGraphics2D_GetPixelAt;
+*GetPixel = *cspacec::iGraphics2D_GetPixel;
+*SaveArea = *cspacec::iGraphics2D_SaveArea;
+*RestoreArea = *cspacec::iGraphics2D_RestoreArea;
+*FreeArea = *cspacec::iGraphics2D_FreeArea;
+*Write = *cspacec::iGraphics2D_Write;
+*WriteBaseline = *cspacec::iGraphics2D_WriteBaseline;
+*AllowResize = *cspacec::iGraphics2D_AllowResize;
+*Resize = *cspacec::iGraphics2D_Resize;
+*GetFontServer = *cspacec::iGraphics2D_GetFontServer;
+*PerformExtension = *cspacec::iGraphics2D_PerformExtension;
+*ScreenShot = *cspacec::iGraphics2D_ScreenShot;
+*GetNativeWindow = *cspacec::iGraphics2D_GetNativeWindow;
+*GetFullScreen = *cspacec::iGraphics2D_GetFullScreen;
+*SetFullScreen = *cspacec::iGraphics2D_SetFullScreen;
+*SetMousePosition = *cspacec::iGraphics2D_SetMousePosition;
+*SetMouseCursor = *cspacec::iGraphics2D_SetMouseCursor;
+*SetGamma = *cspacec::iGraphics2D_SetGamma;
+*GetGamma = *cspacec::iGraphics2D_GetGamma;
+*CreateOffscreenCanvas = *cspacec::iGraphics2D_CreateOffscreenCanvas;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iGraphics2D($self);
+        delete $OWNER{$self};
+    }
+}
+
+*scfGetVersion = *cspacec::iGraphics2D_scfGetVersion;
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::csFog ##############
 
 package cspace::csFog;
@@ -9685,166 +9948,20 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::csPixelCoord ##############
+############# Class : cspace::iNativeWindowManager ##############
 
-package cspace::csPixelCoord;
-@ISA = qw( cspace );
-%OWNER = ();
-%ITERATORS = ();
-*swig_x_get = *cspacec::csPixelCoord_x_get;
-*swig_x_set = *cspacec::csPixelCoord_x_set;
-*swig_y_get = *cspacec::csPixelCoord_y_get;
-*swig_y_set = *cspacec::csPixelCoord_y_set;
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csPixelCoord(@_);
-    bless $self, $pkg if defined($self);
-}
-
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_csPixelCoord($self);
-        delete $OWNER{$self};
-    }
-}
-
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::csPixelFormat ##############
-
-package cspace::csPixelFormat;
-@ISA = qw( cspace );
-%OWNER = ();
-%ITERATORS = ();
-*swig_RedMask_get = *cspacec::csPixelFormat_RedMask_get;
-*swig_RedMask_set = *cspacec::csPixelFormat_RedMask_set;
-*swig_GreenMask_get = *cspacec::csPixelFormat_GreenMask_get;
-*swig_GreenMask_set = *cspacec::csPixelFormat_GreenMask_set;
-*swig_BlueMask_get = *cspacec::csPixelFormat_BlueMask_get;
-*swig_BlueMask_set = *cspacec::csPixelFormat_BlueMask_set;
-*swig_RedShift_get = *cspacec::csPixelFormat_RedShift_get;
-*swig_RedShift_set = *cspacec::csPixelFormat_RedShift_set;
-*swig_GreenShift_get = *cspacec::csPixelFormat_GreenShift_get;
-*swig_GreenShift_set = *cspacec::csPixelFormat_GreenShift_set;
-*swig_BlueShift_get = *cspacec::csPixelFormat_BlueShift_get;
-*swig_BlueShift_set = *cspacec::csPixelFormat_BlueShift_set;
-*swig_RedBits_get = *cspacec::csPixelFormat_RedBits_get;
-*swig_RedBits_set = *cspacec::csPixelFormat_RedBits_set;
-*swig_GreenBits_get = *cspacec::csPixelFormat_GreenBits_get;
-*swig_GreenBits_set = *cspacec::csPixelFormat_GreenBits_set;
-*swig_BlueBits_get = *cspacec::csPixelFormat_BlueBits_get;
-*swig_BlueBits_set = *cspacec::csPixelFormat_BlueBits_set;
-*swig_PalEntries_get = *cspacec::csPixelFormat_PalEntries_get;
-*swig_PalEntries_set = *cspacec::csPixelFormat_PalEntries_set;
-*swig_PixelBytes_get = *cspacec::csPixelFormat_PixelBytes_get;
-*swig_PixelBytes_set = *cspacec::csPixelFormat_PixelBytes_set;
-*complete = *cspacec::csPixelFormat_complete;
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csPixelFormat(@_);
-    bless $self, $pkg if defined($self);
-}
-
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_csPixelFormat($self);
-        delete $OWNER{$self};
-    }
-}
-
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::csImageArea ##############
-
-package cspace::csImageArea;
-@ISA = qw( cspace );
-%OWNER = ();
-%ITERATORS = ();
-*swig_x_get = *cspacec::csImageArea_x_get;
-*swig_x_set = *cspacec::csImageArea_x_set;
-*swig_y_get = *cspacec::csImageArea_y_get;
-*swig_y_set = *cspacec::csImageArea_y_set;
-*swig_w_get = *cspacec::csImageArea_w_get;
-*swig_w_set = *cspacec::csImageArea_w_set;
-*swig_h_get = *cspacec::csImageArea_h_get;
-*swig_h_set = *cspacec::csImageArea_h_set;
-*swig_data_get = *cspacec::csImageArea_data_get;
-*swig_data_set = *cspacec::csImageArea_data_set;
-sub new {
-    my $pkg = shift;
-    my $self = cspacec::new_csImageArea(@_);
-    bless $self, $pkg if defined($self);
-}
-
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_csImageArea($self);
-        delete $OWNER{$self};
-    }
-}
-
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iOffscreenCanvasCallback ##############
-
-package cspace::iOffscreenCanvasCallback;
+package cspace::iNativeWindowManager;
 @ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
-*FinishDraw = *cspacec::iOffscreenCanvasCallback_FinishDraw;
-*SetRGB = *cspacec::iOffscreenCanvasCallback_SetRGB;
+*Alert = *cspacec::iNativeWindowManager_Alert;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_iOffscreenCanvasCallback($self);
+        cspacec::delete_iNativeWindowManager($self);
         delete $OWNER{$self};
     }
 }
@@ -9862,71 +9979,24 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iGraphics2D ##############
+############# Class : cspace::iNativeWindow ##############
 
-package cspace::iGraphics2D;
+package cspace::iNativeWindow;
 @ISA = qw( cspace cspace::iBase );
 %OWNER = ();
 %ITERATORS = ();
-*Open = *cspacec::iGraphics2D_Open;
-*Close = *cspacec::iGraphics2D_Close;
-*GetWidth = *cspacec::iGraphics2D_GetWidth;
-*GetHeight = *cspacec::iGraphics2D_GetHeight;
-*GetPage = *cspacec::iGraphics2D_GetPage;
-*DoubleBuffer = *cspacec::iGraphics2D_DoubleBuffer;
-*GetDoubleBufferState = *cspacec::iGraphics2D_GetDoubleBufferState;
-*GetPixelFormat = *cspacec::iGraphics2D_GetPixelFormat;
-*GetPixelBytes = *cspacec::iGraphics2D_GetPixelBytes;
-*GetPalEntryCount = *cspacec::iGraphics2D_GetPalEntryCount;
-*GetPalette = *cspacec::iGraphics2D_GetPalette;
-*SetRGB = *cspacec::iGraphics2D_SetRGB;
-*FindRGB = *cspacec::iGraphics2D_FindRGB;
-*SetClipRect = *cspacec::iGraphics2D_SetClipRect;
-*GetClipRect = *cspacec::iGraphics2D_GetClipRect;
-*BeginDraw = *cspacec::iGraphics2D_BeginDraw;
-*FinishDraw = *cspacec::iGraphics2D_FinishDraw;
-*Print = *cspacec::iGraphics2D_Print;
-*Clear = *cspacec::iGraphics2D_Clear;
-*ClearAll = *cspacec::iGraphics2D_ClearAll;
-*DrawLine = *cspacec::iGraphics2D_DrawLine;
-*DrawBox = *cspacec::iGraphics2D_DrawBox;
-*ClipLine = *cspacec::iGraphics2D_ClipLine;
-*DrawPixel = *cspacec::iGraphics2D_DrawPixel;
-*DrawPixels = *cspacec::iGraphics2D_DrawPixels;
-*Blit = *cspacec::iGraphics2D_Blit;
-*GetPixelAt = *cspacec::iGraphics2D_GetPixelAt;
-*GetPixel = *cspacec::iGraphics2D_GetPixel;
-*SaveArea = *cspacec::iGraphics2D_SaveArea;
-*RestoreArea = *cspacec::iGraphics2D_RestoreArea;
-*FreeArea = *cspacec::iGraphics2D_FreeArea;
-*Write = *cspacec::iGraphics2D_Write;
-*WriteBaseline = *cspacec::iGraphics2D_WriteBaseline;
-*AllowResize = *cspacec::iGraphics2D_AllowResize;
-*Resize = *cspacec::iGraphics2D_Resize;
-*GetFontServer = *cspacec::iGraphics2D_GetFontServer;
-*PerformExtension = *cspacec::iGraphics2D_PerformExtension;
-*PerformExtensionV = *cspacec::iGraphics2D_PerformExtensionV;
-*ScreenShot = *cspacec::iGraphics2D_ScreenShot;
-*GetNativeWindow = *cspacec::iGraphics2D_GetNativeWindow;
-*GetFullScreen = *cspacec::iGraphics2D_GetFullScreen;
-*SetFullScreen = *cspacec::iGraphics2D_SetFullScreen;
-*SetMousePosition = *cspacec::iGraphics2D_SetMousePosition;
-*SetMouseCursor = *cspacec::iGraphics2D_SetMouseCursor;
-*SetGamma = *cspacec::iGraphics2D_SetGamma;
-*GetGamma = *cspacec::iGraphics2D_GetGamma;
-*CreateOffscreenCanvas = *cspacec::iGraphics2D_CreateOffscreenCanvas;
+*SetTitle = *cspacec::iNativeWindow_SetTitle;
 sub DESTROY {
     return unless $_[0]->isa('HASH');
     my $self = tied(%{$_[0]});
     return unless defined $self;
     delete $ITERATORS{$self};
     if (exists $OWNER{$self}) {
-        cspacec::delete_iGraphics2D($self);
+        cspacec::delete_iNativeWindow($self);
         delete $OWNER{$self};
     }
 }
 
-*scfGetVersion = *cspacec::iGraphics2D_scfGetVersion;
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -10807,69 +10877,6 @@ sub ACQUIRE {
 }
 
 
-############# Class : cspace::iNativeWindowManager ##############
-
-package cspace::iNativeWindowManager;
-@ISA = qw( cspace cspace::iBase );
-%OWNER = ();
-%ITERATORS = ();
-*Alert = *cspacec::iNativeWindowManager_Alert;
-*AlertV = *cspacec::iNativeWindowManager_AlertV;
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_iNativeWindowManager($self);
-        delete $OWNER{$self};
-    }
-}
-
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iNativeWindow ##############
-
-package cspace::iNativeWindow;
-@ISA = qw( cspace cspace::iBase );
-%OWNER = ();
-%ITERATORS = ();
-*SetTitle = *cspacec::iNativeWindow_SetTitle;
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_iNativeWindow($self);
-        delete $OWNER{$self};
-    }
-}
-
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
 ############# Class : cspace::csStreamDescription ##############
 
 package cspace::csStreamDescription;
@@ -11499,6 +11506,88 @@ sub ACQUIRE {
 }
 
 
+############# Class : cspace::iConsoleWatcher ##############
+
+package cspace::iConsoleWatcher;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*ConsoleVisibilityChanged = *cspacec::iConsoleWatcher_ConsoleVisibilityChanged;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iConsoleWatcher($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
+############# Class : cspace::iConsoleOutput ##############
+
+package cspace::iConsoleOutput;
+@ISA = qw( cspace cspace::iBase );
+%OWNER = ();
+%ITERATORS = ();
+*PutText = *cspacec::iConsoleOutput_PutText;
+*GetLine = *cspacec::iConsoleOutput_GetLine;
+*Draw2D = *cspacec::iConsoleOutput_Draw2D;
+*Draw3D = *cspacec::iConsoleOutput_Draw3D;
+*Clear = *cspacec::iConsoleOutput_Clear;
+*SetBufferSize = *cspacec::iConsoleOutput_SetBufferSize;
+*GetTransparency = *cspacec::iConsoleOutput_GetTransparency;
+*SetTransparency = *cspacec::iConsoleOutput_SetTransparency;
+*GetFont = *cspacec::iConsoleOutput_GetFont;
+*SetFont = *cspacec::iConsoleOutput_SetFont;
+*GetTopLine = *cspacec::iConsoleOutput_GetTopLine;
+*ScrollTo = *cspacec::iConsoleOutput_ScrollTo;
+*GetCursorStyle = *cspacec::iConsoleOutput_GetCursorStyle;
+*SetCursorStyle = *cspacec::iConsoleOutput_SetCursorStyle;
+*SetVisible = *cspacec::iConsoleOutput_SetVisible;
+*GetVisible = *cspacec::iConsoleOutput_GetVisible;
+*AutoUpdate = *cspacec::iConsoleOutput_AutoUpdate;
+*SetCursorPos = *cspacec::iConsoleOutput_SetCursorPos;
+*GetMaxLineWidth = *cspacec::iConsoleOutput_GetMaxLineWidth;
+*RegisterWatcher = *cspacec::iConsoleOutput_RegisterWatcher;
+*PerformExtension = *cspacec::iConsoleOutput_PerformExtension;
+sub DESTROY {
+    return unless $_[0]->isa('HASH');
+    my $self = tied(%{$_[0]});
+    return unless defined $self;
+    delete $ITERATORS{$self};
+    if (exists $OWNER{$self}) {
+        cspacec::delete_iConsoleOutput($self);
+        delete $OWNER{$self};
+    }
+}
+
+sub DISOWN {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    delete $OWNER{$ptr};
+}
+
+sub ACQUIRE {
+    my $self = shift;
+    my $ptr = tied(%$self);
+    $OWNER{$ptr} = 1;
+}
+
+
 ############# Class : cspace::iStandardReporterListener ##############
 
 package cspace::iStandardReporterListener;
@@ -11998,90 +12087,6 @@ sub DESTROY {
 }
 
 *scfGetVersion = *cspacec::iJoint_scfGetVersion;
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iConsoleWatcher ##############
-
-package cspace::iConsoleWatcher;
-@ISA = qw( cspace cspace::iBase );
-%OWNER = ();
-%ITERATORS = ();
-*ConsoleVisibilityChanged = *cspacec::iConsoleWatcher_ConsoleVisibilityChanged;
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_iConsoleWatcher($self);
-        delete $OWNER{$self};
-    }
-}
-
-sub DISOWN {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    delete $OWNER{$ptr};
-}
-
-sub ACQUIRE {
-    my $self = shift;
-    my $ptr = tied(%$self);
-    $OWNER{$ptr} = 1;
-}
-
-
-############# Class : cspace::iConsoleOutput ##############
-
-package cspace::iConsoleOutput;
-@ISA = qw( cspace cspace::iBase );
-%OWNER = ();
-%ITERATORS = ();
-*PutText = *cspacec::iConsoleOutput_PutText;
-*PutTextV = *cspacec::iConsoleOutput_PutTextV;
-*GetLine = *cspacec::iConsoleOutput_GetLine;
-*Draw2D = *cspacec::iConsoleOutput_Draw2D;
-*Draw3D = *cspacec::iConsoleOutput_Draw3D;
-*Clear = *cspacec::iConsoleOutput_Clear;
-*SetBufferSize = *cspacec::iConsoleOutput_SetBufferSize;
-*GetTransparency = *cspacec::iConsoleOutput_GetTransparency;
-*SetTransparency = *cspacec::iConsoleOutput_SetTransparency;
-*GetFont = *cspacec::iConsoleOutput_GetFont;
-*SetFont = *cspacec::iConsoleOutput_SetFont;
-*GetTopLine = *cspacec::iConsoleOutput_GetTopLine;
-*ScrollTo = *cspacec::iConsoleOutput_ScrollTo;
-*GetCursorStyle = *cspacec::iConsoleOutput_GetCursorStyle;
-*SetCursorStyle = *cspacec::iConsoleOutput_SetCursorStyle;
-*SetVisible = *cspacec::iConsoleOutput_SetVisible;
-*GetVisible = *cspacec::iConsoleOutput_GetVisible;
-*AutoUpdate = *cspacec::iConsoleOutput_AutoUpdate;
-*SetCursorPos = *cspacec::iConsoleOutput_SetCursorPos;
-*GetMaxLineWidth = *cspacec::iConsoleOutput_GetMaxLineWidth;
-*RegisterWatcher = *cspacec::iConsoleOutput_RegisterWatcher;
-*PerformExtension = *cspacec::iConsoleOutput_PerformExtension;
-*PerformExtensionV = *cspacec::iConsoleOutput_PerformExtensionV;
-sub DESTROY {
-    return unless $_[0]->isa('HASH');
-    my $self = tied(%{$_[0]});
-    return unless defined $self;
-    delete $ITERATORS{$self};
-    if (exists $OWNER{$self}) {
-        cspacec::delete_iConsoleOutput($self);
-        delete $OWNER{$self};
-    }
-}
-
 sub DISOWN {
     my $self = shift;
     my $ptr = tied(%$self);
@@ -12981,6 +12986,8 @@ sub CS_NODE_DECLARATION () { $cspacec::CS_NODE_DECLARATION }
 sub CS_CHANGEABLE_NEVER () { $cspacec::CS_CHANGEABLE_NEVER }
 sub CS_CHANGEABLE_NEWROOT () { $cspacec::CS_CHANGEABLE_NEWROOT }
 sub CS_CHANGEABLE_YES () { $cspacec::CS_CHANGEABLE_YES }
+sub CS_WRITE_BASELINE () { $cspacec::CS_WRITE_BASELINE }
+sub CS_WRITE_NOANTIALIAS () { $cspacec::CS_WRITE_NOANTIALIAS }
 sub CSDRAW_2DGRAPHICS () { $cspacec::CSDRAW_2DGRAPHICS }
 sub CSDRAW_3DGRAPHICS () { $cspacec::CSDRAW_3DGRAPHICS }
 sub CSDRAW_CLEARZBUFFER () { $cspacec::CSDRAW_CLEARZBUFFER }
@@ -13097,8 +13104,6 @@ sub CS_MESHTYPE_LINES () { $cspacec::CS_MESHTYPE_LINES }
 sub CS_MESHTYPE_LINESTRIP () { $cspacec::CS_MESHTYPE_LINESTRIP }
 sub CS_MESHTYPE_POLYGON () { $cspacec::CS_MESHTYPE_POLYGON }
 sub csSimpleMeshScreenspace () { $cspacec::csSimpleMeshScreenspace }
-sub CS_WRITE_BASELINE () { $cspacec::CS_WRITE_BASELINE }
-sub CS_WRITE_NOANTIALIAS () { $cspacec::CS_WRITE_NOANTIALIAS }
 sub csmcNone () { $cspacec::csmcNone }
 sub csmcArrow () { $cspacec::csmcArrow }
 sub csmcLens () { $cspacec::csmcLens }
@@ -13111,6 +13116,9 @@ sub csmcSizeNS () { $cspacec::csmcSizeNS }
 sub csmcSizeEW () { $cspacec::csmcSizeEW }
 sub csmcStop () { $cspacec::csmcStop }
 sub csmcWait () { $cspacec::csmcWait }
+sub CS_ALERT_ERROR () { $cspacec::CS_ALERT_ERROR }
+sub CS_ALERT_WARNING () { $cspacec::CS_ALERT_WARNING }
+sub CS_ALERT_NOTE () { $cspacec::CS_ALERT_NOTE }
 sub CSFONT_LARGE () { $cspacec::CSFONT_LARGE }
 sub CSFONT_ITALIC () { $cspacec::CSFONT_ITALIC }
 sub CSFONT_COURIER () { $cspacec::CSFONT_COURIER }
@@ -13137,9 +13145,6 @@ sub CS_MATERIAL_TEXTURE_LAYER1 () { $cspacec::CS_MATERIAL_TEXTURE_LAYER1 }
 sub CS_MATERIAL_TEXTURE_LAYER2 () { $cspacec::CS_MATERIAL_TEXTURE_LAYER2 }
 sub CS_MATERIAL_TEXTURE_LAYER3 () { $cspacec::CS_MATERIAL_TEXTURE_LAYER3 }
 sub CS_MATERIAL_TEXTURE_LAYER4 () { $cspacec::CS_MATERIAL_TEXTURE_LAYER4 }
-sub CS_ALERT_ERROR () { $cspacec::CS_ALERT_ERROR }
-sub CS_ALERT_WARNING () { $cspacec::CS_ALERT_WARNING }
-sub CS_ALERT_NOTE () { $cspacec::CS_ALERT_NOTE }
 sub CS_POS_BY_FRAME () { $cspacec::CS_POS_BY_FRAME }
 sub CS_POS_BY_TIME () { $cspacec::CS_POS_BY_TIME }
 sub CS_DECODE_SPAN () { $cspacec::CS_DECODE_SPAN }
