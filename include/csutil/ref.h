@@ -154,7 +154,7 @@ public:
   /**
    * Smart pointer copy constructor.
    */
-  csRef (csRef const& other) : obj (other)
+  csRef (csRef const& other) : obj (other.obj)
   {
     CSREF_TRACK_INCREF (obj, this);
   }
@@ -264,6 +264,12 @@ public:
   /**
    * Assign another object to this smart pointer.
    */
+  csRef& operator = (csRef const& other)
+  {
+    this->operator=(other.obj);
+    return *this;
+  }
+  /*
   template <class T2>
   csRef& operator = (csRef<T2> const& other)
   {
@@ -271,6 +277,7 @@ public:
     this->operator=(p);
     return *this;
   }
+  */
 
   /// Test if the two references point to same object.
   inline friend bool operator == (const csRef& r1, const csRef& r2)
