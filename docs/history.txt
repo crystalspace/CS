@@ -55,7 +55,7 @@ The history order is reversed so that new features are at the top.
 	    - Since meta-information is now extensible, maintainers can choose
 	      to publish supplementary information about plugins (in addition
 	      to the SCF information already published).  For example, image
-	      loading plugins could publish "image indendification" information
+	      loading plugins could publish "image indentification" information
 	      which would allow the image loading multiplexor to selectively
 	      request image loading plugins on-demand, rather than requesting
 	      all plugins unconditionally, even if they are not needed.  Here
@@ -88,7 +88,7 @@ The history order is reversed so that new features are at the top.
 	      specification of the meta-information file for a module.  The
 	      value of this option is interpolated into template files via the
 	      new %metafile% variable.  msvcgen.mak now utilizes this flag with
-	      the value of the new INC.PROJECT makefile variable.  Augmented
+	      the value of the new INF.PROJECT makefile variable.  Augmented
 	      the MSVC6 and MSVC7 plugin template files (plugin.tpl) to make
 	      use of %metafile%.
 	    - Changed the file extension for plugins on MacOS/X from .csplugin
