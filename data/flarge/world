@@ -1940,6 +1940,8 @@ WORLD (
 	  SHIFT (0, 0, 0)
 	  MIXMODE (MULTIPLY ())
 	)
+      ZTEST ()
+      PRIORITY ('alpha')
       MOVE (V (15, 4, 14))
     )
     MESHOBJ 's_large1' (
