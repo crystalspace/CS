@@ -111,35 +111,6 @@ typedef int64_t int64;
 #endif // end of #if !defined(CS_BUILTIN_SIZED_TYPES)
 /** @} */
 
-/**\name Pointer-sized integer types.
- * These are signed and unsigned integer types with the same size as a
- * platform pointer. Use them in case you need to cast a pointer to an int
- * (although it's better to avoid such casts.)
- * @{ */
-#ifdef CS_PLATFORM_IS_64BITS
-/// Signed integer with the size of a pointer
-typedef int64 ptr_int;
-/// Unsigned integer with the size of a pointer
-typedef uint64 ptr_uint;
-#else
-#if defined(COMP_VC) && _MSC_VER >= 1300
-/*
-  Without that __w64 thingie, MSVC >= 7 will report a C4311 warning when
-  using ptr_(u)int as intended.
- */
-/// Signed integer with the size of a pointer
-typedef __w64 int32 ptr_int;
-/// Unsigned integer with the size of a pointer
-typedef __w64 uint32 ptr_uint;
-#else
-/// Signed integer with the size of a pointer
-typedef int32 ptr_int;
-/// Unsigned integer with the size of a pointer
-typedef uint32 ptr_uint;
-#endif
-#endif
-/** @} */
-
 /// Used for uniquely generated id numbers XXX: remove this sometime
 typedef uint32 CS_ID;
 

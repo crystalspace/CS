@@ -33,6 +33,9 @@ chronological order.
 	  1 fps to 150 fps :-)
 	- Jorrit fixed the bug with the internal ODE error. The problem was
 	  duplicate polygons in the polygon tree intersection routines.
+	- Matze removed the pointer sized integer types as it is very hacky and
+	  unnatural to do arithmetics with pointers. (I couldn't imagine a case
+	  where this would make real sense)
 17-Aug-2003
 	- Jorrit fixed a bug in csIntersect3::IntersectTriangle(). In
 	  some cases it would fail to register a hit.
