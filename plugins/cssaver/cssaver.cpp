@@ -166,7 +166,10 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
     SaveKeys (child, texWrap->QueryObject ());
 
     // TBD: Heightgen?
-    int texTarget = texHand->GetTextureTarget ();
+    int texTarget = iTextureHandle::CS_TEX_IMG_2D;
+#ifndef CS_USE_OLD_RENDERER
+    texTarget = texHand->GetTextureTarget ();
+#endif
     if (texTarget == iTextureHandle::CS_TEX_IMG_CUBEMAP)
     {
       child->SetValue ("cubemap"); // cubemap node
