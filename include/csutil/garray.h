@@ -156,6 +156,15 @@ public:
     return root[n];
   }
 
+  // This will work only for datatypes that have oprator ==
+  int Find (const T& what)
+  {
+    for ( int i = 0; i < count; i++ )
+      if (root[i] == what)
+        return i;
+    return -1;
+  }
+
   /// Push a element on 'top' of vector.
   int Push (const T& what)
   {
