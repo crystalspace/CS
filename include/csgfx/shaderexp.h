@@ -91,6 +91,8 @@ private:
 
   /// Compile a cons list into the oper_array.
   bool compile_cons(const cons *, int & acc_top);
+  /// Compile a MAKE-VECTOR pseudo-op
+  bool compile_make_vector(const cons *, int & acc_top, int acc);
 
   /// Evaluate away constant values 
   bool eval_const(cons *&);

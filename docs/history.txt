@@ -27,6 +27,12 @@ chronological order.
 	  Please use:
 		static int bla;
 	- res fixed a cut'n'paste error in the xwindow plugin.
+	- DeSigna:
+	  - Added support for MAKE-VECTOR to csShaderExpression.
+	  - Fixed a bug in the compiler, which wouldn't generate opcodes
+	    for single argument ops if the arg wasn't an atom.
+	  - Fixed a bug in the single-arg op dispatcher, to resolve accum
+	    references.
 17-Oct-2003
 	- res added some files he forgot with his recent commit.
 	- Jorrit fixed the engine sequence manager a better way. With

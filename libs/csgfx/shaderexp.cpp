@@ -66,9 +66,7 @@ enum {
   OP_FUNC_FRAME,
 
   // Pseudo-ops, special case weird stuff
-  OP_PS_MAKE_VEC2,
-  OP_PS_MAKE_VEC3,
-  OP_PS_MAKE_VEC4,
+  OP_PS_MAKE_VECTOR,
 
   OP_LIMIT,
 
@@ -142,9 +140,7 @@ static op_args_info optimize_arg_table[] = {
   { 0, 0, false }, // OP_FUNC_TIME
   { 0, 0, false }, // OP_FUNC_FRAME
 
-  { 2, 2, false }, // OP_PS_MAKE_VEC2
-  { 3, 3, false }, // OP_PS_MAKE_VEC2
-  { 4, 4, false }, // OP_PS_MAKE_VEC2
+  { 2, 4, false }, // OP_PS_MAKE_VECTOR
 
   { 0, 0, false }, //  OP_LIMIT
 };
@@ -181,9 +177,7 @@ csShaderExpression::csShaderExpression(iObjectRegistry * objr) :
     xmltokens.Register("time", OP_FUNC_TIME);
     xmltokens.Register("frame", OP_FUNC_FRAME);
 
-    xmltokens.Register("make-vec2", OP_PS_MAKE_VEC2);
-    xmltokens.Register("make-vec3", OP_PS_MAKE_VEC3);
-    xmltokens.Register("make-vec4", OP_PS_MAKE_VEC4);
+    xmltokens.Register("make-vector", OP_PS_MAKE_VECTOR);
 
     xmltokens.Register("atom", OP_XML_ATOM);
     xmltokens.Register("sexp", OP_XML_SEXP);
@@ -211,9 +205,7 @@ csShaderExpression::csShaderExpression(iObjectRegistry * objr) :
     sexptokens.Register("time", OP_FUNC_TIME);
     sexptokens.Register("frame", OP_FUNC_FRAME);
 
-    sexptokens.Register("make-vec2", OP_PS_MAKE_VEC2);
-    sexptokens.Register("make-vec3", OP_PS_MAKE_VEC3);
-    sexptokens.Register("make-vec4", OP_PS_MAKE_VEC4);
+    sexptokens.Register("make-vector", OP_PS_MAKE_VECTOR);
 
     /* for debugging, can be removed */
     mnemonics.Register("ADD", OP_ADD);
@@ -264,7 +256,7 @@ bool csShaderExpression::Parse(iDocumentNode * node, csSymbolTable * stab) {
     return false;
   }
   
-#if 1
+#if 0
   print_cons(head);
   printf("\n***************\n");
 #endif
@@ -277,7 +269,7 @@ bool csShaderExpression::Parse(iDocumentNode * node, csSymbolTable * stab) {
     return false;
   }
 
-#if 1
+#if 0
   print_cons(head);
   printf("\n***************\n");
 #endif
@@ -291,7 +283,9 @@ bool csShaderExpression::Parse(iDocumentNode * node, csSymbolTable * stab) {
     return false;
   }
 
+#if 0
   print_ops(opcodes);
+#endif
 
   opcodes.ShrinkBestFit();
 
@@ -703,6 +697,8 @@ bool csShaderExpression::eval_oper(int oper, oper_arg arg1, oper_arg & output) {
 
     if (!eval_variable(var, arg1))
       return false;
+  } else if (arg1.type == TYPE_ACCUM) {
+    arg1 = accstack.Get(arg1.acc);
   }
 
   switch (oper) {
@@ -941,11 +937,41 @@ bool csShaderExpression::eval_frame(oper_arg & output) const {
 }
 
 bool csShaderExpression::eval_selt12(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const {
-  return false;
+  if (arg1.type != TYPE_NUMBER || arg2.type != TYPE_NUMBER) {
+    DEBUG_PRINTF("Arguments to selt12 aren't numbers.\n");
+
+    return false;
+  }
+
+  output.type = TYPE_VECTOR4;
+  output.vec4.x = arg1.num;
+  output.vec4.y = arg2.num;
+
+  return true;
 }
 
 bool csShaderExpression::eval_selt34(const oper_arg & arg1, const oper_arg & arg2, oper_arg & output) const {
-  return false;
+  if (arg1.type != TYPE_NUMBER) {
+    DEBUG_PRINTF("Arguments to selt34 aren't numbers.\n");
+
+    return false;
+  }
+
+  output.type = TYPE_VECTOR4;
+  output.vec4.z = arg1.num;
+
+  if (arg2.type == TYPE_INVALID) 
+    return true;
+
+  if (arg2.type != TYPE_NUMBER) {
+    DEBUG_PRINTF("Arguments to selt34 aren't numbers.\n");
+
+    return false;
+  }
+
+  output.vec4.w = arg2.num;
+
+  return true;
 }
 
 bool csShaderExpression::eval_load(const oper_arg & arg1, oper_arg & output) const {
@@ -1112,6 +1138,10 @@ bool csShaderExpression::compile_cons(const cons * cell, int & acc_top) {
   if (this_acc > accstack_max)
     accstack_max = this_acc;
 
+  /* Special cases */
+  if (op == OP_PS_MAKE_VECTOR)
+    return compile_make_vector(cptr, acc_top, this_acc);
+
   if (!cptr) { /* zero arg func */
     oper tmp;
 
@@ -1146,6 +1176,13 @@ bool csShaderExpression::compile_cons(const cons * cell, int & acc_top) {
 	tmp.arg2.acc = this_acc + 1;
 
 	acc_top--;
+      } else if (!cptr->cdr) {
+	CS_ASSERT(acc_top > this_acc);
+	
+	tmp.arg1.type = TYPE_ACCUM;
+	tmp.arg1.acc = acc_top - 1;
+
+	tmp.arg2.type = TYPE_INVALID;
       } else {
 	/* don't want to emit any code yet, there is no 
 	   useful second argument */
@@ -1182,6 +1219,81 @@ bool csShaderExpression::compile_cons(const cons * cell, int & acc_top) {
     cptr = cptr->cdr;
   }
 
+  return true;
+}
+
+bool csShaderExpression::compile_make_vector(const cons * cptr, int & acc_top, int this_acc) {
+  oper tmp;
+  
+  tmp.opcode = OP_INT_SELT12;
+  tmp.acc = this_acc;
+  
+  if (cptr->car.type == TYPE_CONS) {
+    if (!compile_cons(cptr->car.cell, acc_top))
+      return false;
+    
+    tmp.arg1.type = TYPE_ACCUM;
+    tmp.arg1.acc = --acc_top;
+  } else {
+    tmp.arg1 = cptr->car;
+  }
+  
+  cptr = cptr->cdr;
+  
+  if (cptr->car.type == TYPE_CONS) {
+    if (!compile_cons(cptr->car.cell, acc_top))
+      return false;
+    
+    tmp.arg2.type = TYPE_ACCUM;
+    tmp.arg2.acc = --acc_top;
+  } else {
+    tmp.arg2 = cptr->car;
+  }
+  
+  opcodes.Push(tmp);
+  
+  cptr = cptr->cdr;
+  if (!cptr) {
+    acc_top++;
+    return true;
+  }
+  
+  tmp.opcode = OP_INT_SELT34;
+  tmp.acc = this_acc;
+  
+  if (cptr->car.type == TYPE_CONS) {
+    if (!compile_cons(cptr->car.cell, acc_top))
+      return false;
+    
+    tmp.arg1.type = TYPE_ACCUM;
+    tmp.arg1.acc = --acc_top;
+  } else {
+    tmp.arg1 = cptr->car;
+  }
+  
+  cptr = cptr->cdr;
+  if (!cptr) {
+    acc_top++;
+    
+    tmp.arg2.type = TYPE_INVALID;
+    opcodes.Push(tmp);
+    
+    return true;
+  }
+  
+  if (cptr->car.type == TYPE_CONS) {
+    if (!compile_cons(cptr->car.cell, acc_top))
+      return false;
+    
+    tmp.arg2.type = TYPE_ACCUM;
+    tmp.arg2.acc = --acc_top;
+  } else {
+    tmp.arg2 = cptr->car;
+  }
+  
+  acc_top++;
+  opcodes.Push(tmp);
+  
   return true;
 }
 
