@@ -8,7 +8,7 @@ DESCRIPTION.csfgen = TrueType to Crystal Space font converter
 ifeq ($(MAKESECTION),rootdefines)
 
 # Application-specific help commands
-APPHELP+=$(NEWLINE)echo $"  make csfgen         Make the $(DESCRIPTION.csfgen)$"
+APPHELP+=$(NEWLINE)echo $"  make csfgen       Make the $(DESCRIPTION.csfgen)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
