@@ -64,7 +64,7 @@
 #include "csutil/csbase.h"
 #include "csutil/csmd5.h"
 
-csMD5::csMD5(char *buffer = NULL)
+csMD5::csMD5(char *buffer)
 {
   if(buffer)
     SetBuffer(buffer);
