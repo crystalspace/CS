@@ -26,6 +26,7 @@
 #include "isys/system.h"
 #include "isound/renderer.h"
 #include "iutil/cfgfile.h"
+#include "isys/event.h"
 #include "wodrv.h"
 
 IMPLEMENT_FACTORY (csSoundDriverWaveOut)
@@ -58,6 +59,7 @@ csSoundDriverWaveOut::~csSoundDriverWaveOut()
 bool csSoundDriverWaveOut::Initialize (iSystem *iSys)
 {
   System = iSys;
+  System->CallOnEvents(this, csevCommand | csevBroadcast);
   Config.AddConfig(System, "/config/sound.cfg");
   return true;
 }
@@ -168,7 +170,30 @@ typedef struct {
   csSoundDriverWaveOut *Driver;
   HGLOBAL DataHandle;
   unsigned char *Data;
+  LPWAVEHDR WaveHeader;
 } SoundBlock;
+
+bool csSoundDriverWaveOut::HandleEvent(iEvent &e)
+{
+  if (e.Type == csevCommand || e.Type == csevBroadcast)
+    if (e.Command.Code == cscmdPreProcess)
+  {
+    // Delete all queued blocks
+    while (BlocksToDelete.Length())
+    {
+      SoundBlock *Block = (SoundBlock*)BlocksToDelete.Pop();
+      MMRESULT res;
+      res = waveOutUnprepareHeader(WaveOut, Block->WaveHeader, sizeof(WAVEHDR));
+      if (res != MMSYSERR_NOERROR) System->Printf(MSG_WARNING,
+        "cannot unprepare wave-out header (%s).\n", GetMMError(res));
+
+      GlobalUnlock(Block->DataHandle);
+      GlobalFree(Block->DataHandle);
+      delete Block;
+    }
+  }
+  return false;
+}
 
 void CALLBACK csSoundDriverWaveOut::waveOutProc(HWAVEOUT /*WaveOut*/,
   UINT uMsg, DWORD /*dwInstance*/, DWORD dwParam1, DWORD /*dwParam2*/)
@@ -187,18 +212,8 @@ void CALLBACK csSoundDriverWaveOut::waveOutProc(HWAVEOUT /*WaveOut*/,
 void csSoundDriverWaveOut::SoundProc(LPWAVEHDR OldHeader) {
   // get rid of the previous header
   if (OldHeader) {
-    // get the previous sound block
     SoundBlock *Block = (SoundBlock *)(OldHeader->dwUser);
-
-    // Free this block up
-    MMRESULT res;
-    res = waveOutUnprepareHeader(WaveOut, OldHeader, sizeof(WAVEHDR));
-    if (res != MMSYSERR_NOERROR) System->Printf(MSG_WARNING,
-      "cannot unprepare wave-out header (%s).\n", GetMMError(res));
-    
-    GlobalUnlock(Block->DataHandle);
-    GlobalFree(Block->DataHandle);
-    delete Block;
+    BlocksToDelete.Push(Block);
   }
 
   // look if sound proc is activated
@@ -224,6 +239,7 @@ void csSoundDriverWaveOut::SoundProc(LPWAVEHDR OldHeader) {
 
     // Set up various pointers
     LPWAVEHDR lpWaveHdr = (LPWAVEHDR)Block->Data;
+    Block->WaveHeader = lpWaveHdr;
     Memory = Block->Data + sizeof(WAVEHDR);
 
     // call the sound renderer mixing function

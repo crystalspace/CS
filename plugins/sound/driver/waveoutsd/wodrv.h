@@ -40,6 +40,7 @@ public:
 
   // implementation of interface for iPlugin
   virtual bool Initialize (iSystem *iSys);
+  virtual bool HandleEvent (iEvent &e);
   virtual bool Open(iSoundRender *render, int frequency, bool bit16, bool stereo);
   virtual void Close();
   virtual void LockMemory(void **mem, int *memsize);
@@ -77,6 +78,8 @@ protected:
   volatile bool SoundProcLocked;
   // number of sound blocks to write
   volatile int NumSoundBlocksToWrite;
+  // list of blocks to delete
+  csVector BlocksToDelete;
 
   // this function is called when a sound block is returned by wave-out
   static void CALLBACK waveOutProc(HWAVEOUT hwo, UINT uMsg, DWORD dwInstance,
