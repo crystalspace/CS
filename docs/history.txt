@@ -22,6 +22,8 @@ chronological order.
 	    - iVertexBufferManager added to NR build.
 	    - Added csShaderBranch to OR build.
 	- Jorrit improved error reporting in the renderloop loader plugin.
+	- Jorrit removed un unneeded dependency on iEngine from
+	  glshader_ffp.
 7-Sep-2003
 	- Jorrit performed a lot of changes to unify the new and old
 	  renderer branches:

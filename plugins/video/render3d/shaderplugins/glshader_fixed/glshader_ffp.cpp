@@ -28,7 +28,6 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/vector3.h"
 #include "csutil/xmltiny.h"
 
-#include "iengine/engine.h"
 #include "iutil/document.h"
 #include "iutil/comp.h"
 #include "iutil/plugin.h"
@@ -143,7 +142,6 @@ bool csGLShaderFFP::LoadLayer(mtexlayer* layer, iDocumentNode* node)
     return false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes();
-  csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
   while(it->HasNext())
   {
