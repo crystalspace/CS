@@ -45,11 +45,43 @@
     <xsl:apply-templates select="widget"/>
   </xsl:template>
 
-  <xsl:template match="widget[class[text()='QRadioButton' or text()='QRadioButton' or text()='QButtonGroup' or text()='QGroupBox' or text()='QCheckBox' or text()='QLineEdit' or text()='QLabel']]">
+
+  <xsl:template match="widget[class[text()='QPushButton' or text()='QRadioButton' or text()='QButtonGroup' or text()='QGroupBox' or text()='QCheckBox' or text()='QLineEdit' or text()='QLabel']]">
     <xsl:call-template name="spacer"/><xsl:call-template name="component_header"/>
     <xsl:call-template name="spacer"/><xsl:text>{</xsl:text>
     <xsl:apply-templates/>
     <xsl:call-template name="spacer"/><xsl:text>}</xsl:text>
+  </xsl:template>
+ 
+  <xsl:template match="widget[class[text()='QListBox']]">
+    <xsl:call-template name="spacer"/><xsl:call-template name="component_header"/>
+    <xsl:call-template name="spacer"/><xsl:text>{</xsl:text>
+    <!-- configure a awslistbox with a single column -->
+    <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>Type: lbtList</xsl:text>
+    <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>Highlight: "/aws/lbhi.png"</xsl:text>
+    <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>Columns: 1</xsl:text>
+    <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>DefaultSortCol: 0</xsl:text>
+    <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>Column0Width: </xsl:text><xsl:value-of select="property/geometry/rect/width"/>
+    <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>Column0Caption: "Column 0"</xsl:text>
+    <!-- we ignore scrollbar stuff since aws always creates a vertical one (currently) -->
+    <xsl:apply-templates/>
+    <xsl:call-template name="spacer"/><xsl:text>}</xsl:text>
+  </xsl:template>
+
+  <xsl:template match="widget[class[text()='QListView']]">
+    <xsl:call-template name="spacer"/><xsl:call-template name="component_header"/>
+    <xsl:call-template name="spacer"/><xsl:text>{</xsl:text>
+    <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>Highlight: "/aws/lbhi.png"</xsl:text>
+    <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>Columns: </xsl:text><xsl:value-of select="count(column)"/>
+    <xsl:call-template name="spacer"><xsl:with-param name="here" select="class"/></xsl:call-template><xsl:text>DefaultSortCol: 0</xsl:text>
+    <!-- we ignore scrollbar stuff since aws always creates a vertical one (currently) -->
+    <xsl:apply-templates/>
+    <xsl:call-template name="spacer"/><xsl:text>}</xsl:text>
+  </xsl:template>
+
+  <xsl:template match="column">
+    <xsl:call-template name="spacer"/><xsl:value-of select="concat('Column',count(preceding-sibling::node()[self::column]),'Width: ')"/><xsl:value-of select="round(number(../property/rect/width) div count(../column))"/>
+    <xsl:call-template name="spacer"/><xsl:value-of select="concat('Column',count(preceding-sibling::node()[self::column]),'Caption: ')"/><xsl:text>"</xsl:text><xsl:value-of select="property[name='text']/string"/><xsl:text>"</xsl:text>
   </xsl:template>
   
   <xsl:template match="property[name[text()='caption']]">
@@ -140,7 +172,8 @@
       <xsl:when test="class='QButtonGroup'">"Group Frame"</xsl:when>
       <xsl:when test="class='QGroupBox'">"Group Frame"</xsl:when>
       <xsl:when test="class='QCheckBox'">"Check Box"</xsl:when>
-      <xsl:when test="class='QLineEdit'">"Text Box"</xsl:when>
+      <xsl:when test="class='QListBox'">"List Box"</xsl:when>
+      <xsl:when test="class='QListView'">"List Box"</xsl:when>
       <xsl:when test="class='QLabel' and property/name='text'">"Label"</xsl:when>
       <xsl:when test="class='QLabel' and property/name='pixmap'">"Image View"</xsl:when>
       <xsl:otherwise><xsl:value-of select="class"/></xsl:otherwise>
@@ -153,6 +186,8 @@
       <xsl:when test="../class='QPushButton' or class='QPushButton'"><xsl:text>b</xsl:text></xsl:when>
       <xsl:when test="../class='QButtonGroup'"><xsl:text>g</xsl:text></xsl:when>
       <xsl:when test="../class='QGroupBox'"><xsl:text>g</xsl:text></xsl:when>
+      <xsl:when test="../class='QListBox'"><xsl:text>lb</xsl:text></xsl:when>
+      <xsl:when test="../class='QListView'"><xsl:text>lb</xsl:text></xsl:when>
       <xsl:when test="../class='QLabel' and ../property/name='pixmap'"><xsl:text>iv</xsl:text></xsl:when>
       <xsl:when test="../class='QLabel' and ../property/name='text'"><xsl:text>lbl</xsl:text></xsl:when>
     </xsl:choose>
