@@ -214,7 +214,7 @@ AC_DEFUN([CS_HEADER_OUTPUT], [CS_TEXT_CACHE_OUTPUT([cs_header_text], [$1])])
 #	Split LINE into individual tokens.  Tokens are delimited by DELIMITER,
 #	which is the space character if omitted.  OUTPUT-VARIABLES is a
 #	comma-delimited list of shell variables which should receive the
-#	extracted tokens.  If there are two few tokens to fill the output
+#	extracted tokens.  If there are too few tokens to fill the output
 #	variables, then the excess variables will be assigned the empty string.
 #	If there are too few output variables, then the excess tokens will be
 #	ignored.  If OUTPUT-VARIABLES is omitted, then the split tokens will be
