@@ -26,6 +26,7 @@
 #include "iengine/camera.h"
 #include "iengine/light.h"
 #include "iengine/statlght.h"
+#include "igraphic/imageio.h"
 #include "imesh/thing/polygon.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
@@ -33,6 +34,7 @@
 #include "ivideo/graph2d.h"
 #include "ivideo/natwin.h"
 #include "ivideo/txtmgr.h"
+#include "ivideo/fontserv.h"
 #include "ivaria/script.h"
 #include "imap/parser.h"
 #include "iutil/eventh.h"
@@ -68,7 +70,7 @@ PySimple::PySimple ()
 PySimple::~PySimple ()
 {
   SCF_DEC_REF (myG3D);
-  if(view)
+  if (view)
     delete view;
   if (LevelLoader)
     LevelLoader->DecRef();
@@ -80,7 +82,7 @@ void PySimple::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.application.pysimple", msg, arg);
   else
@@ -100,7 +102,9 @@ void PySimple::Help ()
 void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
-  delete System;
+  iObjectRegistry* object_reg = System->object_reg;
+  delete System; System = NULL;
+  csInitializer::DestroyApplication (object_reg);
 }
 
 static bool PyEventHandler (iEvent& ev)
@@ -122,22 +126,32 @@ static bool PyEventHandler (iEvent& ev)
   }
   else
   {
-    return System->PyHandleEvent (ev);
+    return System->HandleEvent (ev);
   }
 }
 
 bool PySimple::Initialize (int argc, const char* const argv[],
   const char *iConfigName)
 {
-  if (!superclass::Initialize (argc, argv, iConfigName))
-    return false;
+  object_reg = csInitializer::CreateEnvironment ();
+  if (!object_reg) return false;
 
-  iObjectRegistry* object_reg = GetObjectRegistry ();
-  
-  if (!csInitializeApplication (object_reg))
+  if (!csInitializer::RequestPlugins (object_reg, iConfigName, argc, argv,
+  	CS_REQUEST_VFS,
+	CS_REQUEST_SOFTWARE3D,
+	CS_REQUEST_ENGINE,
+	CS_REQUEST_FONTSERVER,
+	CS_REQUEST_IMAGELOADER,
+	CS_REQUEST_LEVELLOADER,
+	CS_REQUEST_END))
   {
-    Report (CS_REPORTER_SEVERITY_ERROR,
-    	"Couldn't init app! (perhaps some plugins are missing?");
+    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't init app!");
+    return false;
+  }
+
+  if (!csInitializer::Initialize (object_reg))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't init app!");
     return false;
   }
 
@@ -192,7 +206,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   // Open the main system. This will open all the previously loaded plug-ins.
   iNativeWindow* nw = myG3D->GetDriver2D ()->GetNativeWindow ();
   if (nw) nw->SetTitle ("Simple Crystal Space Python Application");
-  if (!Open ())
+  if (!csInitializer::OpenApplication (object_reg))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
     Cleanup ();
@@ -332,11 +346,11 @@ void PySimple::FinishFrame ()
   myG3D->Print (NULL);
 }
 
-bool PySimple::PyHandleEvent (iEvent &Event)
+bool PySimple::HandleEvent (iEvent &Event)
 {
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (GetObjectRegistry (), iEventQueue);
+    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
   }
@@ -354,14 +368,6 @@ int main (int argc, char* argv[])
   // Create our main class.
   System = new PySimple ();
 
-  // We want at least the minimal set of plugins
-  System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
-  System->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
-  System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
-  System->RequestPlugin ("crystalspace.font.server.default:FontServer");
-  System->RequestPlugin ("crystalspace.engine.3d:Engine");
-  System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
-
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!System->Initialize (argc, argv, NULL))
@@ -372,7 +378,7 @@ int main (int argc, char* argv[])
   }
 
   // Main loop.
-  System->Loop ();
+  csInitializer::MainLoop (System->object_reg);
 
   // Cleanup.
   Cleanup ();

@@ -26,6 +26,7 @@
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
+#include "iutil/virtclk.h"
 #include "iengine/sector.h"
 #include "iengine/engine.h"
 #include "iengine/camera.h"
@@ -44,15 +45,19 @@
 #include "ivideo/txtmgr.h"
 #include "ivideo/texture.h"
 #include "ivideo/material.h"
+#include "ivideo/fontserv.h"
+#include "igraphic/imageio.h"
 #include "imap/parser.h"
 #include "ivaria/reporter.h"
+#include "ivaria/stdrep.h"
+#include "csutil/cmdhelp.h"
 
 CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
 // The global system driver
-Simple *System;
+Simple *simple;
 
 Simple::Simple ()
 {
@@ -75,24 +80,77 @@ Simple::~Simple ()
 void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
-  delete System;
+  iObjectRegistry* object_reg = simple->object_reg;
+  delete simple; simple = NULL;
+  csInitializer::DestroyApplication (object_reg);
+}
+
+static bool SimpleEventHandler (iEvent& ev)
+{
+  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  {
+    simple->SetupFrame ();
+    return true;
+  }
+  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  {
+    simple->FinishFrame ();
+    return true;
+  }
+  else
+  {
+    return simple ? simple->HandleEvent (ev) : false;
+  }
 }
 
 bool Simple::Initialize (int argc, const char* const argv[],
   const char *iConfigName)
 {
-  if (!superclass::Initialize (argc, argv, iConfigName))
-    return false;
+  object_reg = csInitializer::CreateEnvironment ();
+  if (!object_reg) return false;
 
-  iObjectRegistry* object_reg = GetObjectRegistry ();
-  
-  if (!csInitializeApplication (object_reg))
+  if (!csInitializer::RequestPlugins (object_reg, iConfigName, argc, argv,
+  	CS_REQUEST_VFS,
+	CS_REQUEST_SOFTWARE3D,
+	CS_REQUEST_ENGINE,
+	CS_REQUEST_FONTSERVER,
+	CS_REQUEST_IMAGELOADER,
+	CS_REQUEST_LEVELLOADER,
+	CS_REQUEST_REPORTER,
+	CS_REQUEST_REPORTERLISTENER,
+	CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-	"crystalspace.application.simple2",
-	"couldn't init app! (perhaps some plugins are missing?)");
+    	"crystalspace.application.simple2",
+	"Can't initialize plugins!");
     return false;
   }
+
+  if (!csInitializer::Initialize (object_reg))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple2",
+	"Can't start application!");
+    return false;
+  }
+
+  if (!csInitializer::SetupEventHandler (object_reg, SimpleEventHandler))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple2",
+	"Can't initialize event handler!");
+    return false;
+  }
+
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  {
+    csCommandLineHelper::Help (object_reg);
+    exit (0);
+  }
+
+  // The virtual clock.
+  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
 
   // Find the pointer to engine plugin
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
@@ -136,7 +194,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   kbd->IncRef();
 
   // Open the main system. This will open all the previously loaded plug-ins.
-  if (!Open ())
+  if (!csInitializer::OpenApplication (object_reg))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple2",
@@ -307,12 +365,9 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
 bool Simple::HandleEvent (iEvent& Event)
 {
-  if (superclass::HandleEvent (Event))
-    return true;
-
   if (Event.Type == csevKeyDown && Event.Key.Code == CSKEY_ESC)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (GetObjectRegistry (), iEventQueue);
+    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
   }
@@ -320,12 +375,12 @@ bool Simple::HandleEvent (iEvent& Event)
   return false;
 }
 
-void Simple::NextFrame ()
+void Simple::SetupFrame ()
 {
-  superclass::NextFrame ();
   // First get elapsed time from the system driver.
   csTicks elapsed_time, current_time;
-  GetElapsedTime (elapsed_time, current_time);
+  elapsed_time = vc->GetElapsedTicks ();
+  current_time = vc->GetCurrentTicks ();
   
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.03 * 20);
@@ -351,7 +406,10 @@ void Simple::NextFrame ()
 
   // Tell the camera to render into the frame buffer.
   view->Draw ();
+}
 
+void Simple::FinishFrame ()
+{
   // Drawing code ends here.
   g3d->FinishDraw ();
   // Display the final output.
@@ -366,22 +424,13 @@ int main (int argc, char* argv[])
   srand (time (NULL));
 
   // Create our main class.
-  System = new Simple ();
-
-  // We want at least the minimal set of plugins
-  System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
-  //@@@ WHY IS THE FONTSERVER NEEDED FOR OPENGL AND NOT FOR SOFTWARE???
-  System->RequestPlugin ("crystalspace.font.server.default:FontServer");
-  System->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
-  System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
-  System->RequestPlugin ("crystalspace.engine.3d:Engine");
-  System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
+  simple = new Simple ();
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
-  if (!System->Initialize (argc, argv, NULL))
+  if (!simple->Initialize (argc, argv, NULL))
   {
-    csReport (System->GetObjectRegistry (), CS_REPORTER_SEVERITY_ERROR,
+    csReport (simple->object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.simple2",
     	"Error initializing system!");
     Cleanup ();
@@ -389,7 +438,7 @@ int main (int argc, char* argv[])
   }
 
   // Main loop.
-  System->Loop ();
+  csInitializer::MainLoop (simple->object_reg);
 
   // Cleanup.
   Cleanup ();

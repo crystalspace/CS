@@ -28,6 +28,7 @@ struct iKeyboardDriver;
 struct iSector;
 struct iView;
 struct iVirtualClock;
+struct iObjectRegistry;
 
 class Simple
 {

@@ -2,7 +2,6 @@
 #define AWSTEST_H
 
 #include <stdarg.h>
-#include "cssys/sysdriv.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "ivaria/aws.h"
@@ -17,12 +16,19 @@ struct iLoaderPlugin;
 struct iMeshWrapper;
 struct iLoader;
 struct iConsoleOutput;
+struct iObjectRegistry;
+struct iVirtualClock;
+struct iEvent;
+struct iGraphics3D;
+struct iGraphics2D;
 class csTransform;
 
-class awsTest : public SysSystemDriver
+class awsTest
 {
-  typedef SysSystemDriver superclass;
+public:
+  iObjectRegistry* object_reg;
 
+private:
   iEngine* engine;
   iAws *aws;
   iAwsPrefs *awsprefs;
@@ -33,6 +39,7 @@ class awsTest : public SysSystemDriver
   iVFS *myVFS;
   iConsoleOutput *myConsole;  
   iLoader* loader;
+  iVirtualClock* vc;
   
   iFont* font;
   int col_red, col_blue, col_white, col_black;
@@ -46,12 +53,13 @@ public:
   awsTest();
   virtual ~awsTest();
 
-  virtual bool Initialize(int argc, const char* const argv[], const char *iConfigName);
+  bool Initialize(int argc, const char* const argv[], const char *iConfigName);
 
   void Report (int severity, const char* msg, ...);
     
-  virtual void NextFrame();
-  virtual bool HandleEvent (iEvent &Event); 
+  void SetupFrame();
+  void FinishFrame();
+  bool HandleEvent (iEvent &Event); 
 };
 
 #endif // AWSTEST_H

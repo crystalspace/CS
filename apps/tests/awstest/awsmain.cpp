@@ -1,4 +1,5 @@
 #include "cssysdef.h"
+#include "cstool/initapp.h"
 #include "csutil/scf.h"
 #include "csutil/cfgfile.h"
 #include "ivaria/reporter.h"
@@ -31,8 +32,9 @@ main(int argc, char *argv[])
   }
  
   // Main loop.
-  System->Loop();
+  csInitializer::MainLoop (System->object_reg);
 
   delete System;
  return 0;
 }
+

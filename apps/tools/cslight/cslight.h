@@ -20,7 +20,6 @@
 #define __CSLIGHT_H__
 
 #include <stdarg.h>
-#include "cssys/sysdriv.h"
 #include "ivaria/pmeter.h"
 
 struct iEngine;
@@ -29,6 +28,9 @@ struct iGraphics3D;
 struct iGraphics2D;
 struct iFont;
 struct iTextureHandle;
+struct iObjectRegistry;
+struct iVirtualClock;
+struct iEvent;
 
 /**
  * Graphical progress meter.
@@ -89,9 +91,8 @@ public:
 /**
  * Main class.
  */
-class Lighter : public SysSystemDriver
+class Lighter
 {
-  typedef SysSystemDriver superclass;
 public:
   iEngine* engine;
   iLoader* loader;
@@ -103,12 +104,14 @@ public:
   int color_text;
   int color_done;
   int color_todo;
+  iObjectRegistry* object_reg;
+  iVirtualClock* vc;
  
 public:
   Lighter ();
   virtual ~Lighter ();
 
-  virtual bool Initialize (int argc, const char* const argv[],
+  bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
 
   void Report (int severity, const char* msg, ...);

@@ -20,11 +20,11 @@
 #define __MDLTEST_H__
 
 #include <stdarg.h>
-#include "cssys/sysdriv.h"
 #include "imesh/mdldata.h"
 
 struct iEngine;
 struct iGraphics3D;
+struct iGraphics2D;
 struct iKeyboardDriver;
 struct iLoader;
 struct iSector;
@@ -33,10 +33,15 @@ struct iCrossBuilder;
 struct iThingState;
 struct iMaterialWrapper;
 struct iModelConverter;
+struct iObjectRegistry;
+struct iVirtualClock;
+struct iEvent;
 
-class Simple : public SysSystemDriver
+class Simple
 {
-  typedef SysSystemDriver superclass;
+public:
+  iObjectRegistry* object_reg;
+
 private:
   iEngine* engine;
   iLoader* loader;
@@ -47,6 +52,7 @@ private:
   iModelConverter* converter;
   iVFS *vfs;
   iKeyboardDriver* kbd;
+  iVirtualClock* vc;
  
 public:
   Simple ();
@@ -54,10 +60,11 @@ public:
 
   void Report (int severity, const char* msg, ...);
 
-  virtual bool Initialize (int argc, const char* const argv[],
+  bool Initialize (int argc, const char* const argv[],
 	const char *iConfigName);
-  virtual bool HandleEvent (iEvent&);
-  virtual void NextFrame ();
+  bool HandleEvent (iEvent&);
+  void SetupFrame ();
+  void FinishFrame ();
   iModelDataVertices *CreateDefaultModelVertexFrame ();
   iModelData *ImportModel (const char *Filename);
   iModelData *CreateDefaultModel ();

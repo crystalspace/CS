@@ -20,18 +20,22 @@
 #define __VIEWMESH_H__
 
 #include <stdarg.h>
-#include "cssys/sysdriv.h"
 
 struct iEngine;
 struct iLoader;
 struct iGraphics3D;
+struct iEvent;
 struct iKeyboardDriver;
+struct iObjectRegistry;
+struct iVirtualClock;
 struct iSector;
 struct iView;
 
-class ViewMesh : public SysSystemDriver
+class ViewMesh
 {
-  typedef SysSystemDriver superclass;
+public:
+  iObjectRegistry* object_reg;
+
 private:
   iEngine* engine;
   iLoader* loader;
@@ -39,15 +43,17 @@ private:
   iKeyboardDriver* kbd;
   iSector* room;
   iView* view;
+  iVirtualClock* vc;
  
 public:
   ViewMesh ();
   virtual ~ViewMesh ();
 
-  virtual bool Initialize (int argc, const char* const argv[],
+  bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
-  virtual bool HandleEvent (iEvent&);
-  virtual void NextFrame ();
+  bool HandleEvent (iEvent&);
+  void SetupFrame ();
+  void FinishFrame ();
 
   void Report (int severity, const char* msg, ...);
 };

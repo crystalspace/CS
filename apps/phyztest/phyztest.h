@@ -20,7 +20,6 @@
 #define PHYZTEST_H
 
 #include <stdarg.h>
-#include "cssys/sysdriv.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "cstool/collider.h"
@@ -33,13 +32,18 @@ struct iCollideSystem;
 struct iFont;
 struct iLoader;
 struct iKeyboardDriver;
+struct iObjectRegistry;
+struct iVirtualClock;
+struct iGraphics3D;
+struct iGraphics2D;
+struct iVFS;
+struct iEvent;
 class csRigidSpaceTimeObj;
 
 enum TextAlignmentModes {ALIGN_LEFT,ALIGN_RIGHT,ALIGN_CENTER};
 
-class Phyztest : public SysSystemDriver
+class Phyztest
 {
-  typedef SysSystemDriver superclass;
 public:
   iFont* courierFont;
   int write_colour;
@@ -56,6 +60,8 @@ public:
   iKeyboardDriver* kbd;
   csColliderWrapper *room_collwrap;
   csRigidSpaceTimeObj *bot_sto;
+  iObjectRegistry* object_reg;
+  iVirtualClock* vc;
 
   void WriteShadow (int align, int x, int y, int fg, char *str,...);
   void Write (int align, int x, int y, int fg, int bg, char *str,...);
@@ -63,10 +69,11 @@ public:
   Phyztest ();
   virtual ~Phyztest ();
 
-  virtual bool Initialize (int argc, const char* const argv[],
+  bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
-  virtual void NextFrame ();
-  virtual bool HandleEvent (iEvent &Event);
+  void SetupFrame ();
+  void FinishFrame ();
+  bool HandleEvent (iEvent &Event);
 
   void Report (int severity, const char* msg, ...);
 };

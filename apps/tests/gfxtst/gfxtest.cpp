@@ -22,17 +22,20 @@
 #define CS_SYSDEF_PROVIDE_PATH
 #define CS_SYSDEF_PROVIDE_GETOPT
 #include "cssysdef.h"
+#include "cssys/system.h"
+#include "cstool/initapp.h"
 #include "csgfx/csimage.h"
-#include "cssys/sysdriv.h"
 #include "csutil/util.h"
 #include "csutil/cfgfile.h"
 #include "iutil/databuff.h"
 #include "iutil/objreg.h"
+#include "ivideo/graph3d.h"
 #include "ivaria/reporter.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
 #include "igraphic/imageio.h"
 #include "isys/plugin.h"
+#include "csutil/cmdhelp.h"
 
 #include <string.h>
 
@@ -429,16 +432,34 @@ int main (int argc, char *argv[])
   _wildcard (&argc, &argv);
 #endif
 
-  SysSystemDriver sys;
-  sys.RequestPlugin ("crystalspace.kernel.vfs:VFS");
-  sys.RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
-  sys.RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
-  if (!sys.Initialize (argc, argv, NULL))
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment ();
+  if (!object_reg) return -1;
+
+  if (!csInitializer::RequestPlugins (object_reg, NULL, argc, argv,
+  	CS_REQUEST_VFS,
+	CS_REQUEST_SOFTWARE3D,
+	CS_REQUEST_IMAGELOADER,
+	CS_REQUEST_END))
   {
-    csReport (sys.GetObjectRegistry (), CS_REPORTER_SEVERITY_ERROR,
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.graphics3d.gfxtest",
 	"Error initializing system !");
     return -1;
+  }
+
+  if (!csInitializer::Initialize (object_reg))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.graphics3d.gfxtest",
+	"Error initializing system !");
+    return -1;
+  }
+
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  {
+    csCommandLineHelper::Help (object_reg);
+    exit (0);
   }
 
   programname = argv [0];
@@ -533,7 +554,6 @@ int main (int argc, char *argv[])
   if (optind >= argc)
     return display_help ();
 
-  iObjectRegistry* object_reg = sys.GetObjectRegistry ();
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   ImageLoader = CS_QUERY_PLUGIN (plugin_mgr, iImageIO);

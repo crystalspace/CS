@@ -19,11 +19,15 @@
 #ifndef PERF_H
 #define PERF_H
 
-#include "cssys/sysdriv.h"
-
 class PerfTest;
 struct iMaterialHandle;
 struct iImageIO;
+struct iObjectRegistry;
+struct iVirtualClock;
+struct iGraphics3D;
+struct iGraphics2D;
+struct iVFS;
+struct iEvent;
 
 class Tester
 {
@@ -39,9 +43,10 @@ public:
 };
 
 
-class PerfTest : public SysSystemDriver
+class PerfTest
 {
-  typedef SysSystemDriver superclass;
+public:
+  iObjectRegistry* object_reg;
 
 private:
   bool draw_3d;
@@ -56,6 +61,7 @@ private:
   iImageIO *ImageLoader;
   iGraphics3D *myG3D;
   iVFS *myVFS;
+  iVirtualClock* vc;
 
 public:
   PerfTest ();
@@ -63,10 +69,11 @@ public:
 
   void Report (int severity, const char* msg, ...);
 
-  virtual bool Initialize (int argc, const char* const argv[],
+  bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
-  virtual void NextFrame ();
-  virtual bool HandleEvent (iEvent &Event);
+  void SetupFrame ();
+  void FinishFrame ();
+  bool HandleEvent (iEvent &Event);
   
   iMaterialHandle* GetMaterial (int idx)
   {

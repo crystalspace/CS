@@ -20,7 +20,6 @@
 #define __CS_PYSIMP_H__
 
 #include <stdarg.h>
-#include "cssys/sysdriv.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 
@@ -30,10 +29,12 @@ struct iEngine;
 struct iLoader;
 struct iKeyboardDriver;
 struct iVirtualClock;
+struct iObjectRegistry;
+struct iGraphics3D;
+struct iEvent;
 
-class PySimple : public SysSystemDriver
+class PySimple
 {
-  typedef SysSystemDriver superclass;
 public:
   csView* view;
   iEngine* engine;
@@ -42,17 +43,18 @@ public:
   iGraphics3D* myG3D;
   iKeyboardDriver* kbd;
   iVirtualClock* vc;
+  iObjectRegistry* object_reg;
 
 public:
   PySimple ();
   virtual ~PySimple ();
 
   void Help ();
-  virtual bool Initialize (int argc, const char* const argv[],
+  bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
   void SetupFrame ();
   void FinishFrame ();
-  bool PyHandleEvent (iEvent &Event);
+  bool HandleEvent (iEvent &Event);
 
   void Report (int severity, const char* msg, ...);
 };

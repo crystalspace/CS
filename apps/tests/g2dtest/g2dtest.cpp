@@ -23,7 +23,7 @@
 #define CS_SYSDEF_PROVIDE_ALLOCA
 #define CS_SYSDEF_PROVIDE_SOFTWARE2D
 #include "cssysdef.h"
-#include "cssys/sysdriv.h"
+#include "cssys/system.h"
 #include "csutil/csvector.h"
 #include "csutil/rng.h"
 #include "cstool/initapp.h"
@@ -36,6 +36,7 @@
 #include "iutil/comp.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/fontserv.h"
+#include "csutil/cmdhelp.h"
 #include "iutil/cmdline.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -45,7 +46,10 @@ CS_IMPLEMENT_APPLICATION
 
 #define APP_TITLE	"Graphics canvas plugin test"
 
-class G2DTestSystemDriver : public SysSystemDriver
+class G2DTestSystemDriver;
+G2DTestSystemDriver* Sys;
+
+class G2DTestSystemDriver
 {
   // Application states
   enum appState
@@ -87,11 +91,14 @@ class G2DTestSystemDriver : public SysSystemDriver
 
 public:
   iGraphics2D *myG2D;
+  iObjectRegistry* object_reg;
+
 public:
-  G2DTestSystemDriver ();
+  G2DTestSystemDriver (int argc, char* argv[]);
   virtual ~G2DTestSystemDriver ();
-  virtual void NextFrame ();
-  virtual bool HandleEvent (iEvent &Event);
+  void SetupFrame ();
+  void FinishFrame ();
+  bool HandleEvent (iEvent &Event);
 
 private:
   void SetFont (const char *fontID);
@@ -117,7 +124,7 @@ private:
   void DrawTextTest2 ();
 };
 
-G2DTestSystemDriver::G2DTestSystemDriver () : SysSystemDriver ()
+G2DTestSystemDriver::G2DTestSystemDriver (int argc, char* argv[])
 {
   state_sptr = 0;
   EnterState (stStartup);
@@ -125,14 +132,24 @@ G2DTestSystemDriver::G2DTestSystemDriver () : SysSystemDriver ()
   font = NULL;
   pfmt_init = false;
 
-  iEventQueue* q = CS_QUERY_REGISTRY(GetObjectRegistry (), iEventQueue);
+  object_reg = csInitializer::CreateEnvironment ();
+  if (!csInitializer::RequestPlugins (object_reg, NULL, argc, argv,
+  	CS_REQUEST_VFS,
+  	CS_REQUEST_FONTSERVER,
+	CS_REQUEST_END))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.g2dtest",
+        "Unable to init app!");
+    exit (0);
+  }
+
+  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
   if (q != 0)
   {
     EventOutlet = q->GetEventOutlet();
     EventOutlet->IncRef();
   }
-
-  RequestPlugin ("crystalspace.kernel.vfs:VFS");
 }
 
 G2DTestSystemDriver::~G2DTestSystemDriver ()
@@ -173,10 +190,8 @@ void G2DTestSystemDriver::LeaveState ()
   state_sptr--;
 }
 
-void G2DTestSystemDriver::NextFrame ()
+void G2DTestSystemDriver::SetupFrame ()
 {
-  SysSystemDriver::NextFrame ();
-
   if (!pfmt_init)
   {
     pfmt_init = true;
@@ -288,8 +303,6 @@ void G2DTestSystemDriver::NextFrame ()
         default:
           break;
       }
-      myG2D->FinishDraw ();
-      myG2D->Print (NULL);
       break;
     }
     case stPause:
@@ -316,6 +329,12 @@ void G2DTestSystemDriver::NextFrame ()
       }
       break;
   }
+}
+
+void G2DTestSystemDriver::FinishFrame ()
+{
+  myG2D->FinishDraw ();
+  myG2D->Print (NULL);
 }
 
 bool G2DTestSystemDriver::HandleEvent (iEvent &Event)
@@ -365,7 +384,7 @@ bool G2DTestSystemDriver::HandleEvent (iEvent &Event)
         }
       break;
   }
-  return SysSystemDriver::HandleEvent (Event);
+  return false;
 }
 
 int G2DTestSystemDriver::MakeColor (int r, int g, int b)
@@ -796,29 +815,50 @@ void G2DTestSystemDriver::DrawTextTest2 ()
   WriteCentered (0, 16*1, green, black, " Performance: %20.1f characters/second ", perf);
 }
 
+static bool G2DEventHandler (iEvent& ev)
+{
+  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  {
+    Sys->SetupFrame ();
+    return true;
+  }
+  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  {
+    Sys->FinishFrame ();
+    return true;
+  }
+  else
+  {
+    return Sys ? Sys->HandleEvent (ev) : false;
+  }
+}
+
 int main (int argc, char *argv[])
 {
-  G2DTestSystemDriver System;
-
-  // Request the font server
-  System.RequestPlugin ("crystalspace.font.server.default:" CS_FUNCID_FONTSERVER);
-
-  iObjectRegistry* object_reg = System.GetObjectRegistry ();
-
-  if (!System.Initialize (argc, argv, NULL))
+  G2DTestSystemDriver System (argc, argv);
+  Sys = &System;
+  iObjectRegistry* object_reg = System.object_reg;
+  if (!csInitializer::Initialize (object_reg))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.g2dtest",
-	"Unable to initialize system driver!");
+        "Unable to init app!");
     return -1;
   }
 
-  if (!csInitializeApplication (object_reg))
+  if (!csInitializer::SetupEventHandler (object_reg, G2DEventHandler))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-	    "crystalspace.application.g2dtest",
-	    "couldn't init app! (perhaps some plugins are missing!)");
-    return -1;
+    	"crystalspace.application.g2dtest",
+        "Unable to init app!");
+    return false;
+  }
+
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  {
+    csCommandLineHelper::Help (object_reg);
+    exit (0);
   }
 
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
@@ -850,7 +890,7 @@ int main (int argc, char *argv[])
     return -1;
   }
 
-  if (!System.Open ())
+  if (!csInitializer::OpenApplication (object_reg))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.g2dtest",
@@ -866,7 +906,7 @@ int main (int argc, char *argv[])
     return -1;
   }
 
-  System.Loop ();
+  csInitializer::MainLoop (object_reg);
   System.myG2D->Close();
   System.myG2D->DecRef ();
   return 0;

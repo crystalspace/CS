@@ -55,7 +55,24 @@ The history order is reversed so that new features are at the top.
 	- Converted picview application to use the new csInitializer system.
 	- Converted demosky application to use the new csInitializer system.
 	- Converted demosky2 application to use the new csInitializer system.
+	- Removed the metademo application since flarge also demonstrates
+	  the metaballs plugin.
 	- Converted isotest application to use the new csInitializer system.
+	- Converted mdltest application to use the new csInitializer system.
+	- Converted perftest application to use the new csInitializer system.
+	- Converted ptlab application to use the new csInitializer system.
+	- Converted phyztest application to use the new csInitializer system.
+	- Converted pysimple application to use the new csInitializer system.
+	- Converted video application to use the new csInitializer system.
+	- Converted awstest application to use the new csInitializer system.
+	- Converted g2dtest application to use the new csInitializer system.
+	- Converted gfxtest application to use the new csInitializer system.
+	- Converted viewmesh application to use the new csInitializer system.
+	- Converted simple2 application to use the new csInitializer system.
+	- Converted simpmap application to use the new csInitializer system.
+	- Converted simplept application to use the new csInitializer system.
+	- Converted cslight application to use the new csInitializer system.
+	- Converted csfedit application to use the new csInitializer system.
 4-Oct-2001
 	- Removed support for old and obsolete 'debug_level' in system
 	  driver.

@@ -23,11 +23,13 @@
 #include "cstool/csfxscr.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
+#include "csutil/cmdhelp.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/fontserv.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/natwin.h"
+#include "ivideo/fontserv.h"
 #include "ivaria/conout.h"
 #include "iengine/engine.h"
 #include "iengine/sector.h"
@@ -53,6 +55,7 @@
 #include "iengine/material.h"
 #include "ivaria/reporter.h"
 #include "iutil/eventq.h"
+#include "iutil/virtclk.h"
 #include "qsqrt.h"
 
 #include "csgeom/csrect.h"
@@ -84,6 +87,7 @@
   }
 
 
+extern awsTest *System;
 
 awsTest::awsTest()
 {
@@ -137,21 +141,64 @@ awsTest::~awsTest()
   SCF_DEC_REF (myConsole);
 }
 
+static bool AwsEventHandler (iEvent& ev)
+{
+  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
+  {
+    System->SetupFrame ();
+    return true;
+  }
+  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  {
+    System->FinishFrame ();
+    return true;
+  }
+  else
+  {
+    return System ? System->HandleEvent (ev) : false;
+  }
+}
+
 
 bool 
 awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
 {
-  if (!superclass::Initialize (argc, argv, iConfigName))
-    return false;
+  object_reg = csInitializer::CreateEnvironment ();
+  if (!object_reg) return false;
 
-  iObjectRegistry* object_reg = GetObjectRegistry ();
-  csInitializeApplication(object_reg);
+  if (!csInitializer::RequestPlugins (object_reg, iConfigName, argc, argv,
+	CS_REQUEST_END))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not init app!\n");
+    return false;
+  }
+
+  if (!csInitializer::Initialize (object_reg))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not init app!\n");
+    return false;
+  }
+
+  if (!csInitializer::SetupEventHandler (object_reg, AwsEventHandler))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Could not init app!\n");
+    return false;
+  }
+
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  {
+    csCommandLineHelper::Help (object_reg);
+    exit (0);
+  }
+
+  // The virtual clock.
+  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Load the engine plugin.
   Report(CS_REPORTER_SEVERITY_NOTIFY, "Loading engine...\n");
   engine = CS_LOAD_PLUGIN(plugin_mgr, "crystalspace.engine.3d", CS_FUNCID_ENGINE, iEngine);
-
       
   if (!engine)
   {
@@ -186,7 +233,7 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   iNativeWindow* nw = myG2D->GetNativeWindow ();
   if (nw) nw->SetTitle ("AWS Test Harness");
 
-  if (!Open ())
+  if (!csInitializer::OpenApplication (object_reg))
   {
     Report(CS_REPORTER_SEVERITY_ERROR, "Error opening system!\n");
     return false;
@@ -345,11 +392,9 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
 }
     
 void 
-awsTest::NextFrame()
+awsTest::SetupFrame()
 {
   static int counter=0;
-    
-  superclass::NextFrame ();
     
   iCamera* c = view->GetCamera();
   
@@ -357,7 +402,8 @@ awsTest::NextFrame()
   
   // First get elapsed time from the system driver.
   csTicks elapsed_time, current_time;
-  GetElapsedTime (elapsed_time, current_time);
+  elapsed_time = vc->GetElapsedTicks ();
+  current_time = vc->GetCurrentTicks ();
   
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.0) * (0.03 * 2);
@@ -380,22 +426,21 @@ awsTest::NextFrame()
   
   aws->Redraw();
   aws->Print(myG3D);
+}
   
-  // Drawing code ends here.
+void 
+awsTest::FinishFrame ()
+{
   myG3D->FinishDraw ();
-  // Print the final output.
   myG3D->Print (NULL);
 }
   
 bool 
 awsTest::HandleEvent (iEvent &Event)
 {
-  if (superclass::HandleEvent (Event))
-    return true;
-
   if (Event.Type == csevKeyDown && Event.Key.Code == CSKEY_ESC)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (GetObjectRegistry (), iEventQueue);
+    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
   }
@@ -408,7 +453,7 @@ awsTest::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.application.awstest", msg, arg);
   else

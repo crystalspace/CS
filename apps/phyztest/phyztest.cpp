@@ -30,20 +30,24 @@
 #include "imesh/thing/thing.h"
 #include "ivaria/polymesh.h"
 #include "ivaria/reporter.h"
+#include "ivaria/stdrep.h"
 #include "iutil/event.h"
 #include "iutil/objreg.h"
 #include "iutil/csinput.h"
 #include "iutil/eventq.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/virtclk.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/txtmgr.h"
 #include "ivideo/fontserv.h"
 #include "imesh/sprite3d.h"
 #include "imap/parser.h"
+#include "igraphic/imageio.h"
 #include "cstool/collider.h"
 #include "cstool/csview.h"
+#include "csutil/cmdhelp.h"
 #include "csphyzik/phyziks.h"
 #include "csgeom/math3d.h"
 #include "csengine/meshobj.h"
@@ -162,7 +166,7 @@ void Phyztest::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (System->GetObjectRegistry (), iReporter);
+  iReporter* rep = CS_QUERY_REGISTRY (System->object_reg, iReporter);
   if (rep)
     rep->ReportV (severity, "crystalspace.application.phyztest", msg, arg);
   else
@@ -176,22 +180,69 @@ void Phyztest::Report (int severity, const char* msg, ...)
 void Cleanup ()
 {
   csPrintf ("Cleaning up...\n");
-  delete System;
+  iObjectRegistry* object_reg = System->object_reg;
+  delete System; System = NULL;
+  csInitializer::DestroyApplication (object_reg);
 }
 
-bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConfigName)
+static bool PhyzEventHandler (iEvent& ev)
 {
-  if (!superclass::Initialize (argc, argv, iConfigName))
-    return false;
-
-  iObjectRegistry* object_reg = GetObjectRegistry ();
-  
-  if (!csInitializeApplication (object_reg))
+  if (ev.Type == csevBroadcast && ev.Command.Code == cscmdProcess)
   {
-    Report (CS_REPORTER_SEVERITY_ERROR, "couldn't init app! (perhaps some plugins are missing?)");
+    System->SetupFrame ();
+    return true;
+  }
+  else if (ev.Type == csevBroadcast && ev.Command.Code == cscmdFinalProcess)
+  {
+    System->FinishFrame ();
+    return true;
+  }
+  else
+  {
+    return System ? System->HandleEvent (ev) : false;
+  }
+}
+
+bool Phyztest::Initialize (int argc, const char* const argv[],
+	const char *iConfigName)
+{
+  object_reg = csInitializer::CreateEnvironment ();
+  if (!object_reg) return false;
+
+  if (!csInitializer::RequestPlugins (object_reg, iConfigName, argc, argv,
+  	CS_REQUEST_VFS,
+	CS_REQUEST_SOFTWARE3D,
+	CS_REQUEST_ENGINE,
+	CS_REQUEST_FONTSERVER,
+	CS_REQUEST_IMAGELOADER,
+	CS_REQUEST_LEVELLOADER,
+	CS_REQUEST_END))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't init app!");
     return false;
   }
 
+  if (!csInitializer::Initialize (object_reg))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't init app!");
+    return false;
+  }
+
+  if (!csInitializer::SetupEventHandler (object_reg, PhyzEventHandler))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Couldn't init app!");
+    return false;
+  }
+
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  {
+    csCommandLineHelper::Help (object_reg);
+    exit (0);
+  }
+
+  // The virtual clock.
+  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
 
   // Find the pointer to engine plugin
@@ -236,7 +287,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   kbd->IncRef ();
 
   // Open the main system. This will open all the previously loaded plug-ins.
-  if (!Open ())
+  if (!csInitializer::OpenApplication (object_reg))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Error opening system!");
     Cleanup ();
@@ -271,7 +322,7 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   if (!LevelLoader->LoadLibraryFile ("/lib/std/library"))
   {
     Report (CS_REPORTER_SEVERITY_NOTIFY, "LIBRARY NOT LOADED!...");
-    iEventQueue* q = CS_QUERY_REGISTRY (GetObjectRegistry (), iEventQueue);
+    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q) q->GetEventOutlet ()->Broadcast (cscmdQuit);
     return false;
   }
@@ -377,11 +428,11 @@ bool Phyztest::Initialize (int argc, const char* const argv[], const char *iConf
   return true;
 }
 
-void Phyztest::NextFrame ()
+void Phyztest::SetupFrame ()
 {
-  SysSystemDriver::NextFrame ();
   csTicks elapsed_time, current_time;
-  GetElapsedTime (elapsed_time, current_time);
+  elapsed_time = vc->GetElapsedTicks ();
+  current_time = vc->GetCurrentTicks ();
 
   int i;
   csMatrix3 m; 
@@ -625,21 +676,19 @@ void Phyztest::NextFrame ()
   WriteShadow (ALIGN_LEFT,10, 130, write_colour,"the spring object");
   WriteShadow (ALIGN_LEFT,10, 140, write_colour,"Press the <ENTER> key to add");
   WriteShadow (ALIGN_LEFT,10, 150, write_colour,"an impulse to the spring object");
+}
 
-  // Drawing code ends here.
+void Phyztest::FinishFrame ()
+{
   myG3D->FinishDraw ();
-  // Print the final output.
   myG3D->Print (NULL);
 }
 
 bool Phyztest::HandleEvent (iEvent &Event)
 {
-  if (superclass::HandleEvent (Event))
-    return true;
-
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
   {
-    iEventQueue* q = CS_QUERY_REGISTRY (GetObjectRegistry (), iEventQueue);
+    iEventQueue* q = CS_QUERY_REGISTRY (object_reg, iEventQueue);
     if (q) q->GetEventOutlet ()->Broadcast (cscmdQuit);
     return true;
   }
@@ -717,13 +766,6 @@ int main (int argc, char* argv[])
   // Create our main class.
   System = new Phyztest ();
 
-  // We want at least the minimal set of plugins
-  System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
-  System->RequestPlugin ("crystalspace.font.server.default:FontServer");
-  System->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
-  System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
-  System->RequestPlugin ("crystalspace.engine.3d:Engine");
-  System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
   if (!System->Initialize (argc, argv, NULL))
@@ -734,7 +776,7 @@ int main (int argc, char* argv[])
   }
 
   // Main loop.
-  System->Loop ();
+  csInitializer::MainLoop (System->object_reg);
 
   // Cleanup.
   Cleanup ();

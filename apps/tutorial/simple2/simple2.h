@@ -20,7 +20,6 @@
 #define __SIMPLE2_H__
 
 #include <stdarg.h>
-#include "cssys/sysdriv.h"
 
 struct iEngine;
 struct iLoader;
@@ -28,26 +27,29 @@ struct iGraphics3D;
 struct iKeyboardDriver;
 struct iSector;
 struct iView;
+struct iVirtualClock;
+struct iObjectRegistry;
 
-class Simple : public SysSystemDriver
+class Simple
 {
-  typedef SysSystemDriver superclass;
-private:
+public:
   iEngine* engine;
   iLoader* loader;
   iGraphics3D* g3d;
   iKeyboardDriver* kbd;
+  iVirtualClock* vc;
   iSector* room;
   iView* view;
+  iObjectRegistry* object_reg;
  
 public:
   Simple ();
   virtual ~Simple ();
 
-  virtual bool Initialize (int argc, const char* const argv[],
-    const char *iConfigName);
-  virtual bool HandleEvent (iEvent&);
-  virtual void NextFrame ();
+  bool Initialize (int argc, const char* const argv[], const char* config);
+  bool HandleEvent (iEvent&);
+  void SetupFrame ();
+  void FinishFrame ();
 };
 
 #endif // __SIMPLE2_H__

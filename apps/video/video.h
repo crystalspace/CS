@@ -20,7 +20,6 @@
 #define VIDEO_H
 
 #include <stdarg.h>
-#include "cssys/sysdriv.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "ivideo/codec.h"
@@ -33,12 +32,16 @@ struct iEngine;
 struct iKeyboardDriver;
 struct iObjectRegistry;
 struct iPluginManager;
+struct iVirtualClock;
+struct iGraphics3D;
+struct iEvent;
 
-class Video : public SysSystemDriver
+class Video
 {
-  typedef SysSystemDriver superclass;
-private:
+public:
   iObjectRegistry* object_reg;
+
+private:
   iPluginManager* plugin_mgr;
   iSector* room;
   iView* view;
@@ -48,6 +51,7 @@ private:
   iLoader *LevelLoader;
   iGraphics3D *myG3D;
   iKeyboardDriver* kbd;
+  iVirtualClock* vc;
 
   bool InitProcDemo ();
 
@@ -55,10 +59,11 @@ public:
   Video ();
   virtual ~Video ();
 
-  virtual bool Initialize (int argc, const char* const argv[],
+  bool Initialize (int argc, const char* const argv[],
     const char *iConfigName);
-  virtual void NextFrame ();
-  virtual bool HandleEvent (iEvent &Event);
+  void SetupFrame ();
+  void FinishFrame ();
+  bool HandleEvent (iEvent &Event);
 
   void Report (int severity, const char* msg, ...);
 };

@@ -19,7 +19,6 @@
 
 #define CS_SYSDEF_PROVIDE_PATH
 #include "cssysdef.h"
-#include "cssys/sysdriv.h"
 #include "csws/csws.h"
 #include "cstool/initapp.h"
 #include "apps/tools/csfedit/csfedit.h"
@@ -33,6 +32,7 @@
 #include "iutil/objreg.h"
 #include <sys/stat.h>
 #include "csgeom/csrect.h"
+#include "csutil/cmdhelp.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -1546,22 +1546,43 @@ CSWS_SKIN_DECLARE_DEFAULT (DefaultSkin);
  */
 int main (int argc, char* argv[])
 {
-  SysSystemDriver System;
+  iObjectRegistry* object_reg = csInitializer::CreateEnvironment ();
+  if (!object_reg) return -1;
 
-  if (!System.Initialize (argc, argv, "/config/cswstest.cfg"))
+  if (!csInitializer::RequestPlugins (object_reg,
+  		"/config/cswstest.cfg", argc, argv,
+	CS_REQUEST_END))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.csfedit",
+	"Can't initialize!");
     return -1;
+  }
 
-  iObjectRegistry* object_reg = System.GetObjectRegistry ();
-  
-  if (!csInitializeApplication (object_reg))
+  if (!csInitializer::Initialize (object_reg))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.csfedit",
+	"Can't initialize!");
     return -1;
+  }
+
+  // Check for commandline help.
+  if (csCommandLineHelper::CheckHelp (object_reg))
+  {
+    csCommandLineHelper::Help (object_reg);
+    exit (0);
+  }
 
   iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
   iNativeWindow* nw = g3d->GetDriver2D ()->GetNativeWindow ();
   if (nw) nw->SetTitle ("Crystal Space Font Editor");
 
-  if (!System.Open ())
+  if (!csInitializer::OpenApplication (object_reg))
+  {
+    csInitializer::DestroyApplication (object_reg);
     return -1;
+  }
 
   // Look for skin variant from config file
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
@@ -1575,7 +1596,7 @@ int main (int argc, char* argv[])
   CsfEdit app (object_reg, DefaultSkin);
 
   if (app.Initialize ())
-    System.Loop ();
+    csInitializer::MainLoop (object_reg);
 
   return 0;
 }
