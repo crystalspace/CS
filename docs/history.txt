@@ -27,6 +27,8 @@ The history order is reversed so that new features are at the top.
 	- Fixed the OpenGL renderer so that DrawPolygonMesh correctly
 	  replaces the texture handles when going to the software renderer
 	  for a procedural texture.
+	- Removed iWin32SystemDriver and merged the three functions
+	  (GetInstance(), GetIsActive(), and GetCmdShow()) with iWin32Helper.
 26-Aug-2001
 	- Removed G3DVertex class since this is equivalent to using
 	  csVector2 instead.

@@ -22,9 +22,10 @@
 #include <gl/gl.h>
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "cssys/win32/win32itf.h"
 #include "video/canvas/openglcommon/gl2d_font.h"
 #include "video/canvas/openglcommon/glcommon2d.h"
+
+struct iWin32Helper;
 
 /// Windows version.
 class csGraphics2DOpenGL : public csGraphics2DGLCommon
@@ -69,7 +70,7 @@ protected:
   HINSTANCE  m_hInstance;
   int m_nCmdShow;
   
-  iWin32SystemDriver* m_piWin32System;
+  iWin32Helper* m_piWin32System;
 
   bool m_bPalettized;
   bool m_bPaletteChanged;

@@ -22,7 +22,9 @@
 #include <stdarg.h>
 #include "csutil/scf.h"
 
-SCF_VERSION (iWin32Helper, 0, 0, 1);
+#define WINDOWCLASSNAME "Crystal"
+
+SCF_VERSION (iWin32Helper, 0, 0, 2);
 
 /**
  * This interface describes actions specific to the windows platform.
@@ -36,6 +38,13 @@ struct iWin32Helper : public iBase
    * Set a cursor.
    */
   virtual bool SetCursor (int cursor) = 0;
+
+  /// Returns the HINSTANCE of the program
+  virtual HINSTANCE GetInstance () const = 0;
+  /// Returns true if the program is 'active', false otherwise.
+  virtual bool GetIsActive () const = 0;
+  /// Gets the nCmdShow of the WinMain().
+  virtual int GetCmdShow () const = 0;
 };
 
 #endif // __WINHELP_H__

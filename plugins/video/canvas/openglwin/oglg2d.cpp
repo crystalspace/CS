@@ -25,6 +25,7 @@
 #include "isys/system.h"
 #include "iutil/objreg.h"
 #include "ivaria/reporter.h"
+#include "cssys/win32/winhelp.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -240,11 +241,9 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
   if (!csGraphics2DGLCommon::Initialize (object_reg))
     return false;
 
-  // QI for iWin32SystemDriver //
-  iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
-  m_piWin32System = SCF_QUERY_INTERFACE (sys, iWin32SystemDriver);
+  m_piWin32System = CS_QUERY_REGISTRY (object_reg, iWin32Helper);
   if (!m_piWin32System)
-      SystemFatalError ("csGraphics2DDDraw3::Open(QI) -- iSystem passed does not support iWin32SystemDriver.");
+      SystemFatalError ("csGraphics2DDDraw3::Open(QI) -- iSystem passed does not support iWin32Helper.");
   
   // Get the creation parameters //
   m_hInstance = m_piWin32System->GetInstance();

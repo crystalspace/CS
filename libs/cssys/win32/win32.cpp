@@ -413,7 +413,6 @@ DWORD WINAPI s_threadroutine (LPVOID param)
 #endif // DO_DINPUT_KEYBOARD
 
 SCF_IMPLEMENT_IBASE_EXT (SysSystemDriver)
-  SCF_IMPLEMENTS_INTERFACE (iWin32SystemDriver)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
 SCF_IMPLEMENT_IBASE_EXT_END
 
@@ -792,5 +791,20 @@ bool Win32Helper::SetCursor (int cursor)
   }
   sys->SetWinCursor (cur);
   return success;
+}
+
+HINSTANCE Win32Helper::GetInstance () const
+{
+  return sys->GetInstance ();
+}
+
+bool Win32Helper::GetIsActive () const
+{
+  return sys->GetIsActive ();
+}
+
+int Win32Helper::GetCmdShow () const
+{
+  return sys->GetCmdShow ();
 }
 

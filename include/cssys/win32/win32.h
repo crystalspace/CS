@@ -26,7 +26,6 @@
 #endif
 
 #include "csutil/scf.h"
-#include "cssys/win32/win32itf.h"
 #include "cssys/win32/winhelp.h"
 #include "iutil/event.h"
 #include <objbase.h>
@@ -50,19 +49,19 @@ public:
 
   SCF_DECLARE_IBASE;
   virtual bool SetCursor (int cursor);
+  virtual HINSTANCE GetInstance () const;
+  virtual bool GetIsActive () const;
+  virtual int GetCmdShow () const;
 };
 
 /// Windows system driver
-class SysSystemDriver :
-  public csSystemDriver, public iWin32SystemDriver, public iEventPlug
+class SysSystemDriver : public csSystemDriver, public iEventPlug
 {
 public:
   SysSystemDriver ();
   virtual ~SysSystemDriver ();
   
   virtual void NextFrame ();
-
-  /// Implementation of iWin32SystemDriver interface.
 
   /// Returns the HINSTANCE of the program
   HINSTANCE GetInstance() const;
