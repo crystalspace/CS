@@ -14,9 +14,9 @@
 # Always copied:
 # TO_INSTALL.INCLUDE: does not exist, the entire include/ hierarchy is copied
 #    to include/.  (max 3 levels deep now)
-# TO_INSTALL.DOCS: also does not exist, the docs/html dir is copied (all htm)
+# TO_INSTALL.DOCS: also does not exist, the docs/html dir is copied (all html)
 #    to docs/html, as well as all subdirs (2 deep) with gif, jpg, png; also
-#    docs/README.htm is copied, and docs/pubapi is copied (all htm, gif, css).
+#    docs/README.html is copied, and docs/pubapi is copied (all html, gif, css).
 # TO_INSTALL.SCRIPTS: does not exist. scripts/python is copied.
 #==============================================================================
 
@@ -77,12 +77,12 @@ INSTALL_INCLUDE.DESTFILES = $(addprefix $(INSTALL_DIR)/, \
   $(patsubst %/, %,$(sort $(INSTALL_INCLUDE.FILES))))
 
 # Install docs/html into INSTALL_DIR/docs/html, docs/pubapi to
-# INSTALL_DIR/docs/pubapi and copy docs/README.htm & docs/history.{txt|old}.
-INSTALL_DOCS.FILES = docs/README.htm docs/history.txt docs/history.old \
-  $(wildcard docs/html/*.htm \
+# INSTALL_DIR/docs/pubapi and copy docs/README.html & docs/history.{txt|old}.
+INSTALL_DOCS.FILES = docs/README.html docs/history.txt docs/history.old \
+  $(wildcard docs/html/*.html \
   docs/html/*/*.jpg docs/html/*/*.gif docs/html/*/*.png  \
   docs/html/*/*/*.jpg docs/html/*/*/*.gif docs/html/*/*/*.png \
-  docs/pubapi/*.htm docs/pubapi/*.gif docs/pubapi/*.css )
+  docs/pubapi/*.html docs/pubapi/*.gif docs/pubapi/*.css )
 INSTALL_DOCS.DIR1 = $(addprefix $(INSTALL_DIR)/, \
   $(patsubst %/,%,$(sort $(dir $(INSTALL_DOCS.FILES)))))
 
