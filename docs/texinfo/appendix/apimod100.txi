@@ -786,7 +786,7 @@ Fog is now calculated within the renderer.
 @end itemize
 
 The old methods for rendering (@code{Draw()} and @code{DrawTest()})
-have been removed from @code{iMeshObject} and @code{iParticle} interfaces.
+have been removed from @samp{iMeshObject} and @samp{iParticle} interfaces.
 
 Apart from these methods, the following classes and structs have been removed
 or have become private, and are no longer available to client code:
