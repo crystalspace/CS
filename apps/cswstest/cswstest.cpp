@@ -170,6 +170,7 @@ csWsTest::csWsTest (iObjectRegistry *object_reg, csSkin &Skin)
 
 csWsTest::~csWsTest ()
 {
+  csResetPalette();
 }
 
 bool csWsTest::Initialize ()

@@ -773,6 +773,8 @@ csGrid::~csGrid ()
   for (i = 0; i < vRegionStyles.Length (); i++)
     delete (csGridCell *)vRegionStyles.Get (i);
   //for (i=0; i<vViews.Length (); i++) delete (csGridView*)vViews.Get (i);
+
+  delete viewlayout;
 }
 
 void csGrid::Draw ()

@@ -291,6 +291,15 @@ int csRegisterPalette (int *Palette, int Size)
   return index;
 }
 
+void csResetPalette()
+{
+ if (cswsPalette != defaultPalette)
+ {
+   free(cswsPalette);
+ }
+ cswsPalette = defaultPalette;
+}
+
 static void csSavePalette ()
 {
   if (savedPalette)

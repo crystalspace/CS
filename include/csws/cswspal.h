@@ -130,6 +130,12 @@ extern int csRegisterPalette (int *Palette, int Size);
 extern void csSetColorScheme (csApp *iApp, csColorScheme &Scheme);
 
 /**
+ * Cleanup the global palette array when it is not needed anymore.
+ * Must be called to avoid memleaks.
+ */
+extern void csResetPalette (void);
+
+/**
  * \name Palette indices
  * These are indices into cswsPalette for each component type
  * @{ */
