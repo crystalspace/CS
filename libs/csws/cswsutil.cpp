@@ -204,7 +204,7 @@ csPixmap *NewBitmap (csApp *app, char *texturename, int tx, int ty,
 
 struct RectUnionRec
 {
-  csObjVector *rect;
+  cswsRectVector *rect;
   csRect *result;
 };
 
@@ -222,7 +222,7 @@ static bool doRectUnion (int *vector, int count, void *arg)
   return false;
 }
 
-void RectUnion (csObjVector &rect, csRect &result)
+void RectUnion (cswsRectVector &rect, csRect &result)
 {
   // Sort rectangles by area so that we can compute much less variants
   for (int i = 0; i < rect.Length (); i++)

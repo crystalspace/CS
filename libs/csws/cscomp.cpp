@@ -1290,7 +1290,7 @@ void csComponent::Invalidate (csRect &area, bool fIncludeChildren,
   } /* endif */
 }
 
-void csComponent::ClipChild (csObjVector &rect, csComponent *child)
+void csComponent::ClipChild (cswsRectVector &rect, csComponent *child)
 {
   if (!child->GetState (CSS_VISIBLE))
     return;
@@ -1366,7 +1366,7 @@ void csComponent::ClipChild (csObjVector &rect, csComponent *child)
   } /* endfor */
 }
 
-void csComponent::Clip (csObjVector &rect, csComponent *last, bool forchild)
+void csComponent::Clip (cswsRectVector &rect, csComponent *last, bool forchild)
 {
   int i; // for dumb compilers that don't understand ANSI C++ "for" scoping
 
@@ -1432,9 +1432,9 @@ void csComponent::Clip (csObjVector &rect, csComponent *last, bool forchild)
 }
 
 // The visible region cache
-csObjVector csComponent::visregion (8, 8);
+cswsRectVector csComponent::visregion (8, 8);
 
-void csComponent::FastClip (csObjVector &rect)
+void csComponent::FastClip (cswsRectVector &rect)
 {
   int dX = 0, dY = 0;
   LocalToGlobal (dX, dY);
@@ -1509,7 +1509,7 @@ void csComponent::Box (int xmin, int ymin, int xmax, int ymax, int colindx)
 {
   if ((xmin >= xmax) || (ymin >= ymax))
     return;
-  csObjVector rect (8, 4);
+  cswsRectVector rect (8, 4);
   csRect *bb = new csRect (xmin, ymin, xmax, ymax);
   if (!clip.IsEmpty ())
     bb->Intersect (clip);
@@ -1534,7 +1534,7 @@ void csComponent::Line (float x1, float y1, float x2, float y2, int colindx)
   * clip the rectangle against children & parents, then clip the line against
   * all resulting rectangles.
   */
-  csObjVector rect (8, 4);
+  cswsRectVector rect (8, 4);
   csRect *lb = new csRect (int (x1), int (y1), int (x2), int (y2));
   lb->Normalize ();
   lb->xmax += 1;
@@ -1567,7 +1567,7 @@ void csComponent::Pixel (int x, int y, int colindx)
   if (!dirty.Contains (x, y))
     return;
 
-  csObjVector rect (8, 4);
+  cswsRectVector rect (8, 4);
   csRect *lb = new csRect (x, y, x + 1, y + 1);
   if (!clip.IsEmpty ())
     lb->Intersect (clip);
@@ -1593,7 +1593,7 @@ void csComponent::Text (int x, int y, int fgindx, int bgindx, const char *s)
   * clip the rectangle against children & parents, then clip the string against
   * all resulting rectangles.
   */
-  csObjVector rect (8, 4);
+  cswsRectVector rect (8, 4);
   int fh, fw = GetTextSize (s, &fh);
   csRect tb (x, y, x + fw, y + fh);
   if (!clip.IsEmpty ())
@@ -1631,7 +1631,7 @@ void csComponent::Pixmap (csPixmap *s2d, int x, int y, int w, int h, uint8 Alpha
   * clip the rectangle against children & parents, then clip the pixmap against
   * all resulting rectangles.
   */
-  csObjVector rect (8, 4);
+  cswsRectVector rect (8, 4);
   csRect *sb = new csRect (x, y, x + w, y + h);
   if (!clip.IsEmpty ())
     sb->Intersect (clip);
@@ -1660,7 +1660,7 @@ void csComponent::Pixmap (csPixmap *s2d, int x, int y, int w, int h,
   * clip the rectangle against children & parents, then clip the pixmap against
   * all resulting rectangles.
   */
-  csObjVector rect (8, 4);
+  cswsRectVector rect (8, 4);
   csRect *sb = new csRect (x, y, x + w, y + h);
   if (!clip.IsEmpty ())
     sb->Intersect (clip);
@@ -1681,7 +1681,7 @@ void csComponent::Texture (iTextureHandle *tex, int x, int y, int w, int h,
   if (!tex)
     return;
 
-  csObjVector rect (8, 4);
+  cswsRectVector rect (8, 4);
   csRect *sb = new csRect (x, y, x + w, y + h);
   if (!clip.IsEmpty ())
     sb->Intersect (clip);
@@ -2130,7 +2130,7 @@ bool csComponent::Restore ()
 void csComponent::FindMaxFreeRect (csRect &area)
 {
   // Now compute maximal uncovered area of desktop
-  csObjVector rect (8, 4);
+  cswsRectVector rect (8, 4);
   rect.Push (new csRect (bound));
   Clip (rect, this);
 

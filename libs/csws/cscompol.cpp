@@ -53,7 +53,7 @@ void csComponent::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
   * clip the rectangle against children & parents, then clip the poly against
   * all resulting rectangles.
   */
-  csObjVector rect (8, 4);
+  cswsRectVector rect (8, 4);
   int i, x = QInt (poly.vertices[0].sx), y = QInt (poly.vertices[0].sy);
   csRect *lb = new csRect (x, y, x, y);
   for (i = 1; i < poly.num; i++)
@@ -189,7 +189,7 @@ void csComponent::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
 
 void csComponent::ClearZbuffer (int x1, int y1, int x2, int y2)
 {
-  csObjVector rect (8, 4);
+  cswsRectVector rect (8, 4);
   csRect *lb = new csRect (x1, y1, x2, y2);
   if (!clip.IsEmpty ())
     lb->Intersect (clip);
