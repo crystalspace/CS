@@ -17,6 +17,8 @@ The history order is reversed so that new features are at the top.
 	  defined with a trailing slash.
 	- Eric Sunshine removed the unmaintained and obsolete csphyziks library
 	  and phyztest programs.
+	- Eric Sunshine fixed bug in crystal.m4: enable_cstext versus
+	  enable_cstest.
 6-Aug-2002
 	- Extended iXmlNode with functions to create and move nodes
 	  and attributes. Added iXmlDocument as a representation of a document.
