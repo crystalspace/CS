@@ -21,6 +21,11 @@ The history order is reversed so that new features are at the top.
 	- Philip Wyett eliminated the makefile systems warnings introduced in
 	  changes earlier today. Also commented out and marked some unused
 	  variables.
+	- Eric Sunshine reverted Philip's incorrect changes to bugplug.mak and
+	  iso.mak.  Instead, fixed the problem correctly by eliminating the
+	  duplicate directory-creation rules from these two makefiles, and by
+	  upgrading the OUTDIRS creation rule in cs.mak to use MKDIRS rather
+	  than MKDIR.
 26-Mar-2003
 	- Fixed a bug with the new OpenPortal() implementation in OpenGL
 	  renderer.  It was not setting/restoring the stencil in all cases.

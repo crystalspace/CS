@@ -48,7 +48,7 @@ OBJ.BUGPLUG = $(addprefix $(OUT.BUGPLUG)/,$(notdir $(SRC.BUGPLUG:.cpp=$O)))
 DEP.BUGPLUG = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
 CFG.BUGPLUG = data/config/bugplug.cfg
 
-$(OUTDIRS) += $(OUT.BUGPLUG)
+OUTDIRS += $(OUT.BUGPLUG)
 
 TO_INSTALL.CONFIG += $(CFG.BUGPLUG)
 
@@ -70,9 +70,6 @@ $(OUT.BUGPLUG)/%$O: $(DIR.BUGPLUG)/%.cpp
 
 $(BUGPLUG): $(OBJ.BUGPLUG) $(LIB.BUGPLUG)
 	$(DO.PLUGIN)
-
-$(OUT.BUGPLUG):
-	$(MKDIRS)
 
 clean: bugplugclean
 bugplugclean:

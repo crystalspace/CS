@@ -256,7 +256,7 @@ $(OUT)/%$O: %.asm
 	$(DO.COMPILE.ASM)
 
 $(OUTDIRS):
-	$(MKDIR)
+	$(MKDIRS)
 
 # A makefile debugging facility.  Prints out the expansion of the named
 # variable.  For instance, to print the expansion of SRC.SOFT3D, invoke
