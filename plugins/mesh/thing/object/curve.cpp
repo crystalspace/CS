@@ -191,6 +191,8 @@ csCurve::csCurve (csCurveTemplate *parent_tmpl, csThingObjectType* thing_type) :
 
   // Call to make sure csBezier2 is properly initialized.
   csBezier2::Initialize ();
+
+  light_version = 0;
 }
 
 csCurve::~csCurve ()
@@ -225,12 +227,6 @@ void csCurve::SetMaterial (iMaterialWrapper *m)
   Material = m;
 }
 
-void csCurve::MakeDirtyDynamicLights ()
-{
-  LightmapUpToDate = false;
-  LightMap->MakeDirtyDynamicLights ();
-};
-
 void csCurve::DynamicLightDisconnect (iDynLight* dynlight)
 {
   csLightPatch* lp = LightPatches;
@@ -247,21 +243,22 @@ void csCurve::AddLightPatch (csLightPatch *lp)
 {
   lp->AddList (LightPatches);
   lp->SetPolyCurve (this);
-
-  /// set the dynamic lights to dirty
-  LightMap->MakeDirtyDynamicLights ();
 }
 
 void csCurve::UnlinkLightPatch (csLightPatch *lp)
 {
   lp->RemoveList (LightPatches);
-  LightMap->MakeDirtyDynamicLights ();
 }
 
 bool csCurve::RecalculateDynamicLights ()
 {
   // first combine the static and pseudo-dynamic lights
-  if (!LightMap || !LightMap->UpdateRealLightMap ()) return false;
+	// @@@@@@@@@@@@@@@@
+  if (!LightMap || !LightMap->UpdateRealLightMap (0, 0, 0, false,
+      ParentThing->GetLightVersion ()>light_version ))
+    return false;
+
+  light_version = ParentThing->GetLightVersion ();
 
   //---
   // Now add all dynamic lights.
@@ -587,8 +584,6 @@ void csCurve::CalculateLightingDynamic (iFrustumView *lview)
 
   lp->SetLightFrustum (
       new csFrustum (*lview->GetFrustumContext ()->GetLightFrustum ()));
-
-  MakeDirtyDynamicLights ();
 }
 
 void csCurve::InitializeDefaultLighting ()

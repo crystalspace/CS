@@ -186,6 +186,9 @@ public:
   /// This flag indicates whether the lightmap is up-to-date
   bool LightmapUpToDate;
 
+  /// Lighting version.
+  uint32 light_version;
+
 public:
 
   /// Constructor
@@ -211,8 +214,6 @@ public:
   /// Get the parent template used for this curve.
   inline csCurveTemplate* GetParentTemplate () const;
 
-  /// @@@
-  void MakeDirtyDynamicLights ();
   /// @@@
   void DynamicLightDisconnect (iDynLight* dynlight);
   /// Add a lightpatch to this curves list of light patches

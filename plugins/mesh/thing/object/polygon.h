@@ -68,11 +68,6 @@ struct csPolygonLightInfo
    * List of light patches for this polygon.
    */
   csLightPatch *lightpatches;
-
-  /**
-   * True if we have a dirty polygon due to dynamic lighting.
-   */
-  bool dyn_dirty;
 };
 
 /*---------------------------------------------------------------------------*/
@@ -356,7 +351,7 @@ private:
 
 public:
   /// Setup for the given polygon and material.
-  void Setup (csPolygon3D* poly3d, iMaterialWrapper* math);
+  void Setup (csPolygon3D* poly3d, csThing* thing, iMaterialWrapper* math);
 
   /// Return a type for the kind of texturing used.
   virtual int GetTextureType () { return POLYTXT_LIGHTMAP; }
@@ -939,22 +934,9 @@ public:
   void SetTextureSpace (csMatrix3 const&, csVector3 const&);
 
   /**
-   * A dynamic light has changed (this can be either an
-   * intensity/color change of a pseudo-dynamic light or else
-   * a real dynamic light change).
-   */
-  void MakeDirtyDynamicLights ();
-
-  /**
    * Disconnect a dynamic light from this polygon.
    */
   void DynamicLightDisconnect (iDynLight* dynlight);
-
-  /// Return true if polygon is dirty for dynamic lights.
-  bool IsDirty () { return light_info.dyn_dirty; }
-
-  /// Make clean again.
-  void MakeCleanDynamicLights () { light_info.dyn_dirty = false; }
 
   /**
    * Unlink a light patch from the light patch list.

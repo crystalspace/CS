@@ -435,7 +435,8 @@ void csPolygon2D::DrawFilled (
     const bool do_light = poly->flags.Check (CS_POLY_LIGHTING);
     if (do_light)
     {
-      if (unsplit->IsDirty ())
+      // Should check for changes here! Obsolete system@@@
+      if (true)
       {
         csLightPatch *lp = unsplit->GetLightpatches ();
         if (lp)
@@ -463,8 +464,6 @@ void csPolygon2D::DrawFilled (
           // UpdateVertexLighting() with no light and reset set to true.
           unsplit->UpdateVertexLighting (NULL, csColor (0, 0, 0), true, true);
         }
-
-        unsplit->MakeCleanDynamicLights ();
       }
     }
 

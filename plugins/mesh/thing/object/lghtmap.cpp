@@ -92,7 +92,6 @@ csLightMap::csLightMap ()
   first_smap = NULL;
   cachedata = NULL;
   delayed_light_info = NULL;
-  dyn_dirty = true;
   mean_recalc = true;
   max_static_color_values.Set(255,255,255);  // use slowest safest method by default
 }
@@ -500,11 +499,11 @@ void csLightMap::Cache (
 bool csLightMap::UpdateRealLightMap (float dyn_ambient_r,
                                      float dyn_ambient_g,
                                      float dyn_ambient_b,
-                                     bool  amb_dirty)
+                                     bool  amb_dirty,
+                                     bool  dyn_dirty)
 {
   if (!dyn_dirty && !amb_dirty) return false;
 
-  dyn_dirty = false;
   mean_recalc = true;
 
   csRGBpixel temp_max_color_values = max_static_color_values;
@@ -778,7 +777,7 @@ void csLightMap::GetMeanLighting (int &r, int &g, int &b)
 { 
   if (mean_recalc)
   {
-    UpdateRealLightMap ();
+    UpdateRealLightMap (0, 0, 0, false, false);
     CalcMeanLighting ();
     mean_recalc = false;
   }

@@ -55,10 +55,12 @@ csPolyTexture::csPolyTexture ()
   DG_TYPE (this, "csPolyTexture");
   lm = NULL;
   cache_data[0] = cache_data[1] = cache_data[2] = cache_data[3] = NULL;
+  thing = NULL;
   polygon = NULL;
   ipolygon = NULL;
   shadow_bitmap = NULL;
   ambient_version = 0;
+  light_version = 0;
 }
 
 csPolyTexture::~csPolyTexture ()
@@ -165,13 +167,14 @@ bool csPolyTexture::RecalculateDynamicLights ()
   csColor amb = polygon->GetParent()->GetDynamicAmbientLight();
 
   if (!lm->UpdateRealLightMap (amb.red,
-                               amb.green,
-                               amb.blue,
-                               polygon->GetParent()
-			       	->GetDynamicAmbientVersion()>ambient_version ))
-	return false;
+      amb.green,
+      amb.blue,
+      thing->GetDynamicAmbientVersion() != ambient_version,
+      thing->GetLightVersion () != light_version ))
+    return false;
 
-  ambient_version = polygon->GetParent()->GetDynamicAmbientVersion();
+  ambient_version = thing->GetDynamicAmbientVersion();
+  light_version = thing->GetLightVersion ();
 
   //---
   // Now add all dynamic lights.
@@ -915,21 +918,17 @@ void csPolyTexture::GetTextureBox (
   fMaxV = Fmax_v;
 }
 
-void csPolyTexture::SetPolygon (csPolygon3D *p)
+void csPolyTexture::SetPolygon (csPolygon3D *p, csThing* thing)
 {
   csRef<iPolygon3D> ipoly (SCF_QUERY_INTERFACE (p, iPolygon3D));
   ipolygon = ipoly;
   polygon = p;	// ipoly will DecRef here.
+  csPolyTexture::thing = thing;
 }
 
 bool csPolyTexture::DynamicLightsDirty ()
 {
-  return lm && lm->dyn_dirty;
-}
-
-void csPolyTexture::MakeDirtyDynamicLights ()
-{
-  if (lm) lm->MakeDirtyDynamicLights ();
+  return thing->GetLightVersion () != light_version;
 }
 
 iLightMap *csPolyTexture::GetLightMap ()

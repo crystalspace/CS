@@ -1,7 +1,17 @@
 The history order is reversed so that new features are at the top.
 
 16-Feb-2003
-	- Philipp Aumayr optimized font drawing code to use vertex arrays
+	- Significant optimization in the dynamic/pseudo-dynamic lighting
+	  system for things. In the past, when a dynamic light or
+	  pseudo-dynamic light hit a thing then all polygons would be
+	  marked as being dirty (so this would require a loop over all
+	  polygons, setting the polygon as dirty). Now this has been
+	  changed by adding a 'light_version' number to the thing and also
+	  a 'light_version' number to all polygons. This is similar to the
+	  'ambient_version' number that's already there. This saves a lot
+	  of flag setting overhead and significantly increases speed
+	  of pseudo-dynamic and dynamic lights for big levels.
+	- Philipp Aumayr optimized font drawing code to use vertex arrays.
 	- Philipp Aumayr extended gmeshldr to support general streams
 	  for new Renderer.
 15-Feb-2003

@@ -154,7 +154,8 @@ csThing::csThing (iBase *parent, csThingObjectType* thing_type) :
   obj_bbox_valid = false;
 
   dynamic_ambient.Set (0,0,0);
-  ambient_version = 0;
+  ambient_version = 1;
+  light_version = 1;
 
   center_idx = -1;
   ParentTemplate = NULL;
@@ -274,25 +275,17 @@ void csThing::MarkLightmapsDirty ()
   if (polybuf)
     polybuf->MarkLightmapsDirty ();
 #endif // CS_USE_NEW_RENDERER
+  light_version++;
 }
 
 void csThing::DynamicLightChanged (iDynLight* /*dynlight*/)
 {
-  int i;
-  for (i = 0 ; i < polygons.Length () ; i++)
-  {
-    csPolygon3D *p = GetPolygon3D (i);
-    p->MakeDirtyDynamicLights ();
-  }
-  for (i = 0; i < curves.Length (); i++)
-  {
-    csCurve *c = GetCurve (i);
-    c->MakeDirtyDynamicLights ();
-  }
+  MarkLightmapsDirty ();
 }
 
 void csThing::DynamicLightDisconnect (iDynLight* dynlight)
 {
+  MarkLightmapsDirty ();
   int i;
   for (i = 0 ; i < polygons.Length () ; i++)
   {
@@ -308,17 +301,7 @@ void csThing::DynamicLightDisconnect (iDynLight* dynlight)
 
 void csThing::StaticLightChanged (iStatLight* /*statlight*/)
 {
-  int i;
-  for (i = 0 ; i < polygons.Length () ; i++)
-  {
-    csPolygon3D *p = GetPolygon3D (i);
-    p->MakeDirtyDynamicLights ();
-  }
-  for (i = 0; i < curves.Length (); i++)
-  {
-    csCurve *c = GetCurve (i);
-    c->MakeDirtyDynamicLights ();
-  }
+  MarkLightmapsDirty ();
 }
 
 void csThing::CleanupThingEdgeTable ()
@@ -1180,7 +1163,7 @@ void csThing::HardTransform (const csReversibleTransform &t)
         if (lmi && lmi->GetPolyTxtPlane () == pl)
         {
           lmi->SetTxtPlane (new_pl->GetPrivateObject ());
-          lmi->Setup (p, p->GetMaterialWrapper ());
+          lmi->Setup (p, this, p->GetMaterialWrapper ());
         }
       }
     }

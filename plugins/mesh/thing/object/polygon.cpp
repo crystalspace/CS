@@ -127,9 +127,10 @@ csPolyTexLightMap::~csPolyTexLightMap ()
   if (txt_plane) txt_plane->DecRef ();
 }
 
-void csPolyTexLightMap::Setup (csPolygon3D *poly3d, iMaterialWrapper *mat)
+void csPolyTexLightMap::Setup (csPolygon3D *poly3d, csThing* thing,
+		iMaterialWrapper *mat)
 {
-  tex->SetPolygon (poly3d);
+  tex->SetPolygon (poly3d, thing);
   tex->SetMaterialHandle (mat->GetMaterialHandle ());
   tex->CreateBoundingTextureBox ();
 }
@@ -307,7 +308,6 @@ csPolygon3D::csPolygon3D (iMaterialWrapper *material) :
 
   light_info.cosinus_factor = -1;
   light_info.lightpatches = NULL;
-  light_info.dyn_dirty = true;
 
   SetTextureType (POLYTXT_LIGHTMAP);
 
@@ -361,7 +361,6 @@ csPolygon3D::csPolygon3D (csPolygon3D &poly) :
 
   light_info.cosinus_factor = poly.light_info.cosinus_factor;
   light_info.lightpatches = NULL;
-  light_info.dyn_dirty = false;
 
   VectorArray->IncRef ();
 #ifdef DO_HW_UVZ
@@ -868,7 +867,7 @@ void csPolygon3D::Finish ()
     return ;
   }
 
-  lmi->Setup (this, material);
+  lmi->Setup (this, thing, material);
   lmi->tex->SetLightMap (NULL);
   if (portal)
     portal->SetFilter (material->GetMaterialHandle ()->GetTexture ());
@@ -1124,15 +1123,6 @@ void csPolygon3D::SetTextureSpace (
     len2);
 }
 
-void csPolygon3D::MakeDirtyDynamicLights ()
-{
-  thing->MarkLightmapsDirty ();
-  light_info.dyn_dirty = true;
-
-  csPolyTexLightMap *lmi = GetLightMapInfo ();
-  if (lmi && lmi->tex) lmi->tex->MakeDirtyDynamicLights ();
-}
-
 void csPolygon3D::DynamicLightDisconnect (iDynLight* dynlight)
 {
   csLightPatch* lp = light_info.lightpatches;
@@ -1148,14 +1138,12 @@ void csPolygon3D::DynamicLightDisconnect (iDynLight* dynlight)
 void csPolygon3D::UnlinkLightpatch (csLightPatch *lp)
 {
   lp->RemoveList (light_info.lightpatches);
-  MakeDirtyDynamicLights ();
 }
 
 void csPolygon3D::AddLightpatch (csLightPatch *lp)
 {
   lp->AddList (light_info.lightpatches);
   lp->SetPolyCurve (this);
-  MakeDirtyDynamicLights ();
 }
 
 int csPolygon3D::AddVertex (int v)
