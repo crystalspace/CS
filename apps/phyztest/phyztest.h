@@ -31,6 +31,7 @@ class csDynLight;
 
 class Phyztest : public SysSystemDriver
 {
+  typedef SysSystemDriver superclass;
 public:
   csSector* room;
   csView* view;

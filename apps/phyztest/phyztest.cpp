@@ -135,7 +135,7 @@ void cleanup ()
 
 bool Phyztest::Initialize (int argc, char *argv[], const char *iConfigName)
 {
-  if (!csSystemDriver::Initialize (argc, argv, iConfigName))
+  if (!superclass::Initialize (argc, argv, iConfigName))
     return false;
 
   // Find the pointer to world plugin
@@ -259,7 +259,7 @@ csMatrix3 m;
 ctMatrix3 M;
 ctVector3 px;
 
-  SysSystemDriver::NextFrame (elapsed_time, current_time);
+  superclass::NextFrame (elapsed_time, current_time);
 
   // Now rotate the camera according to keyboard state
   float speed = (elapsed_time / 1000.) * (0.03 * 20);
@@ -417,7 +417,7 @@ ctVector3 px;
 
 bool Phyztest::HandleEvent (csEvent &Event)
 {
-  if (SysSystemDriver::HandleEvent (Event))
+  if (superclass::HandleEvent (Event))
     return true;
 
   if ((Event.Type == csevKeyDown) && (Event.Key.Code == CSKEY_ESC))
