@@ -121,7 +121,7 @@ csGLTextureHandle::csGLTextureHandle (iImage* image, int flags, int target,
   was_render_target = false;
   Handle = 0;
 
-  images = csPtr<csImageVector> (new csImageVector());
+  images = csPtr<iImageVector> (new csImageVector());
   //image->IncRef();
   images->AddImage(image);
 
