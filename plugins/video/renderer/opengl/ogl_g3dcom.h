@@ -39,7 +39,6 @@
 #include "video/renderer/common/polybuf.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/poly3d.h"
-#include "ogl_txtmgr.h"
 #include "ivideo/graph3d.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -49,9 +48,11 @@ struct iGraphics2D;
 class OpenGLTextureCache;
 class OpenGLLightmapCache;
 class csTextureHandleOpenGL;
+class csTextureManagerOpenGL;
 struct iClipper2D;
 struct iObjectRegistry;
 struct iPluginManager;
+struct iTextureManager;
 
 /// OpenGL capabilities
 struct csOpenGLCaps
@@ -472,6 +473,16 @@ protected:
   /// DrawFlags on last BeginDraw ()
   int DrawMode;
 
+  /// previous texmatrix and -vector and polyplane
+  csPlane3 prevPolyPlane;
+  csMatrix3 prevTexMatrix;
+  csVector3 prevTexVector;
+
+  // helpers for cam->tex conversion
+  float M, N, O;
+  float J1, J2, J3, K1, K2, K3;
+
+
   // declare all the extension function pointers
 # define _CSGLEXT_
 # define CSGL_FOR_ALL
@@ -484,7 +495,7 @@ static fType fName
   static bool ARB_multitexture;
   static bool ARB_texture_compression;
   static bool NV_vertex_array_range;
-
+  static bool ARB_texture_env_combine;
 
 public:
   SCF_DECLARE_IBASE;
@@ -681,8 +692,7 @@ public:
   { return G2D; }
 
   /// Get the iTextureManager.
-  virtual iTextureManager *GetTextureManager ()
-  { return txtmgr; }
+  virtual iTextureManager *GetTextureManager ();
 
   /// Get the vertex buffer manager.
   virtual iVertexBufferManager* GetVertexBufferManager ()

@@ -110,7 +110,7 @@ csGraphics3DOGLCommon* csGraphics3DOGLCommon::ogl_g3d = NULL;
 bool csGraphics3DOGLCommon::ARB_multitexture = false;
 bool csGraphics3DOGLCommon::ARB_texture_compression = false;
 bool csGraphics3DOGLCommon::NV_vertex_array_range = false;
-
+bool csGraphics3DOGLCommon::ARB_texture_env_combine = false;
 
 # define _CSGLEXT_
 # define CSGL_FOR_ALL
@@ -119,6 +119,11 @@ fType  csGraphics3DOGLCommon:: ## fName = (fType) NULL;
 # include "csglext.h"
 # undef CSGL_FUNCTION
 
+float sAc, sBc, sCc, sDc;
+csMatrix3 sM;
+csVector3 sV;
+
+long gleich = 0, ungleich = 0;
 
 csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   G2D (NULL), object_reg (NULL)
@@ -278,12 +283,12 @@ allFound = allFound && fName != NULL;
 		if (maxtextures > 1) 
 		{
 		  m_config_options.do_multitexture_level = maxtextures;
-		  DrawPolygonCall = &csGraphics3DOGLCommon::DrawPolygonMultiTexture;
 		  Report (CS_REPORTER_SEVERITY_NOTIFY,
 			  "Using multitexture extension with %d texture units", maxtextures);
 		} 
 		else 
 		{
+		  ARB_multitexture = false;
 		  Report (CS_REPORTER_SEVERITY_NOTIFY, "WARNING: driver supports multitexture"
 			  " extension but only allows one texture unit!");
 		}
@@ -309,6 +314,30 @@ allFound = allFound && fName != NULL;
 #             define CSGL_NV_vertex_array_range
 #             include "csglext.h"
 #             undef CSGL_NV_vertex_array_range
+	      if (!allFound)
+		Report (CS_REPORTER_SEVERITY_NOTIFY,
+			"Could not get all function addresse for %s", ext);
+	    }
+	    else if (!strcmp (ext, "GL_ARB_texture_env_combine") && !ARB_texture_env_combine)
+	    {
+	      bool &allFound = ARB_texture_env_combine;
+	      allFound = true;
+#             define _CSGLEXT_
+#             define CSGL_ARB_texture_env_combine
+#             include "csglext.h"
+#             undef CSGL_ARB_texture_env_combine
+	      if (!allFound)
+		Report (CS_REPORTER_SEVERITY_NOTIFY,
+			"Could not get all function addresse for %s", ext);
+	    }
+	    else if (!strcmp (ext, "GL_EXT_texture_env_combine") && !ARB_texture_env_combine)
+	    {
+	      bool &allFound = ARB_texture_env_combine;
+	      allFound = true;
+#             define _CSGLEXT_
+#             define CSGL_EXT_texture_env_combine
+#             include "csglext.h"
+#             undef CSGL_EXT_texture_env_combine
 	      if (!allFound)
 		Report (CS_REPORTER_SEVERITY_NOTIFY,
 			"Could not get all function addresse for %s", ext);
@@ -767,6 +796,9 @@ bool csGraphics3DOGLCommon::NewOpen ()
   // See if we find any OpenGL extensions, and set the corresponding
   // flags.
   InitGLExtensions ();
+
+  if (ARB_multitexture)
+    DrawPolygonCall = &csGraphics3DOGLCommon::DrawPolygonMultiTexture;
 
   if (m_renderstate.dither)
     glEnable (GL_DITHER);
@@ -1733,8 +1765,6 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
   if (poly.num < 3) return;
 
   int i;
-  float P1, P2, P3, P4;
-  float Q1, Q2, Q3, Q4;
 
   // count 'real' number of vertices
   int num_vertices = 1;
@@ -1766,85 +1796,95 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     lightmap_cache->FlushIfNeeded ();
     if (!CompatibleZBufModes (fog_queue.z_buf_mode, z_buf_mode))
       FlushDrawFog ();
+
+    //========
+    // Store information in the queue.
+    //========
+    queue.mat_handle = poly.mat_handle;
+    queue.mixmode = poly.mixmode;
+    queue.z_buf_mode = z_buf_mode;
+    queue.flat_color_r = flat_r;
+    queue.flat_color_g = flat_g;
+    queue.flat_color_b = flat_b;
   }
 
-  //========
-  // Store information in the queue.
-  //========
-  queue.mat_handle = poly.mat_handle;
-  queue.mixmode = poly.mixmode;
-  queue.z_buf_mode = z_buf_mode;
-  queue.flat_color_r = flat_r;
-  queue.flat_color_g = flat_g;
-  queue.flat_color_b = flat_b;
-
-  // Get the plane normal of the polygon. Using this we can calculate
-  // '1/z' at every screen space point.
-  float Ac, Bc, Cc, Dc, inv_Dc;
-  Ac = poly.normal.A ();
-  Bc = poly.normal.B ();
-  Cc = poly.normal.C ();
-  Dc = poly.normal.D ();
-
-  float M, N, O;
-  if (ABS (Dc) < SMALL_D)
+  // the following attempt to speed up only hits for about 10% in flarge, so maybe its prolly not woth it
+  // however, for highly triangulized cases it may be worth to rethink. - norman
+  //  if (prevPolyPlane.norm != poly.normal.norm || prevPolyPlane.DD != poly.normal.DD
+  //      || prevTexMatrix != *poly.plane.m_cam2tex || prevTexVector != *poly.plane.v_cam2tex)
   {
-    // The Dc component of the plane normal is too small. This means
-    // that  the plane of the polygon is almost perpendicular to the
-    // eye of the viewer. In this case, nothing much can be seen of
-    // the plane anyway so we just take one value for the entire
-    // polygon.
-    M = 0;
-    N = 0;
-    // For O choose the transformed z value of one vertex.
-    // That way Z buffering should at least work.
-    O = 1 / poly.z_value;
-  }
-  else
-  {
-    inv_Dc = 1 / Dc;
-    M = -Ac * inv_Dc * inv_aspect;
-    N = -Bc * inv_Dc * inv_aspect;
-    O = -Cc * inv_Dc;
-  }
+    //    prevPolyPlane = poly.normal;
+    //    prevTexMatrix = *poly.plane.m_cam2tex;
+    //    prevTexVector = *poly.plane.v_cam2tex;
 
-  // @@@ The texture transform matrix is currently written as
-  // T = M*(C-V)
-  // (with V being the transform vector, M the transform matrix, and C
-  // the position in camera space coordinates. It would be better (more
-  // suitable for the following calculations) if it would be written
-  // as T = M*C - V.
-  P1 = poly.plane.m_cam2tex->m11;
-  P2 = poly.plane.m_cam2tex->m12;
-  P3 = poly.plane.m_cam2tex->m13;
-  P4 = -(P1 * poly.plane.v_cam2tex->x
-	 + P2 * poly.plane.v_cam2tex->y
-	 + P3 * poly.plane.v_cam2tex->z);
-  Q1 = poly.plane.m_cam2tex->m21;
-  Q2 = poly.plane.m_cam2tex->m22;
-  Q3 = poly.plane.m_cam2tex->m23;
-  Q4 = -(Q1 * poly.plane.v_cam2tex->x
-	 + Q2 * poly.plane.v_cam2tex->y
-	 + Q3 * poly.plane.v_cam2tex->z);
+    // Get the plane normal of the polygon. Using this we can calculate
+    // '1/z' at every screen space point.
+    float Ac, Bc, Cc, Dc;
+    Ac = poly.normal.A ();
+    Bc = poly.normal.B ();
+    Cc = poly.normal.C ();
+    Dc = poly.normal.D ();
 
-  // Precompute everything so that we can calculate (u,v) (texture space
-  // coordinates) for every (sx,sy) (screen space coordinates). We make
-  // use of the fact that 1/z, u/z and v/z are linear in screen space.
-  float J1, J2, J3, K1, K2, K3;
-  if (ABS (Dc) < SMALL_D)
-  {
-    // The Dc component of the plane of the polygon is too small.
-    J1 = J2 = J3 = 0;
-    K1 = K2 = K3 = 0;
-  }
-  else
-  {
-    J1 = P1 * inv_aspect + P4 * M;
-    J2 = P2 * inv_aspect + P4 * N;
-    J3 = P3 + P4 * O;
-    K1 = Q1 * inv_aspect + Q4 * M;
-    K2 = Q2 * inv_aspect + Q4 * N;
-    K3 = Q3 + Q4 * O;
+    if (ABS (Dc) < SMALL_D)
+    {
+      // The Dc component of the plane normal is too small. This means
+      // that  the plane of the polygon is almost perpendicular to the
+      // eye of the viewer. In this case, nothing much can be seen of
+      // the plane anyway so we just take one value for the entire
+      // polygon.
+      M = 0;
+      N = 0;
+      // For O choose the transformed z value of one vertex.
+      // That way Z buffering should at least work.
+      O = 1 / poly.z_value;
+    }
+    else
+    {
+      float inv_Dc = 1 / Dc;
+      M = -Ac * inv_Dc * inv_aspect;
+      N = -Bc * inv_Dc * inv_aspect;
+      O = -Cc * inv_Dc;
+    }
+    
+    // @@@ The texture transform matrix is currently written as
+    // T = M*(C-V)
+    // (with V being the transform vector, M the transform matrix, and C
+    // the position in camera space coordinates. It would be better (more
+    // suitable for the following calculations) if it would be written
+    // as T = M*C - V.
+    float P1, P2, P3, P4;
+    float Q1, Q2, Q3, Q4;
+    P1 = poly.plane.m_cam2tex->m11;
+    P2 = poly.plane.m_cam2tex->m12;
+    P3 = poly.plane.m_cam2tex->m13;
+    P4 = -(P1 * poly.plane.v_cam2tex->x
+	   + P2 * poly.plane.v_cam2tex->y
+	   + P3 * poly.plane.v_cam2tex->z);
+    Q1 = poly.plane.m_cam2tex->m21;
+    Q2 = poly.plane.m_cam2tex->m22;
+    Q3 = poly.plane.m_cam2tex->m23;
+    Q4 = -(Q1 * poly.plane.v_cam2tex->x
+	   + Q2 * poly.plane.v_cam2tex->y
+	   + Q3 * poly.plane.v_cam2tex->z);
+    
+    // Precompute everything so that we can calculate (u,v) (texture space
+    // coordinates) for every (sx,sy) (screen space coordinates). We make
+    // use of the fact that 1/z, u/z and v/z are linear in screen space.
+    if (ABS (Dc) < SMALL_D)
+    {
+      // The Dc component of the plane of the polygon is too small.
+      J1 = J2 = J3 = 0;
+      K1 = K2 = K3 = 0;
+    }
+    else
+    {
+      J1 = P1 * inv_aspect + P4 * M;
+      J2 = P2 * inv_aspect + P4 * N;
+      J3 = P3 + P4 * O;
+      K1 = Q1 * inv_aspect + Q4 * M;
+      K2 = Q2 * inv_aspect + Q4 * N;
+      K3 = Q3 + Q4 * O;
+    }
   }
 
   float sx, sy, sz, one_over_sz, u_over_sz, v_over_sz;
@@ -3391,8 +3431,6 @@ void csGraphics3DOGLCommon::SetGLZBufferFlagsPass2 (csZBufMode flags,
 // multitexture
 void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
 {
-// work in progress - GJH
-#if USE_ARB_MULTITEXTURE
 
   // count 'real' number of vertices
   int num_vertices = 1;
@@ -3424,6 +3462,7 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
     DrawPolygonSingleTexture (poly);
     return;
   }
+  //  printf ("use multi\n");
   // OK, we're gonna draw a polygon with a dual texture
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
@@ -3455,12 +3494,8 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
     O = -Cc * inv_Dc;
   }
 
-  tex = poly.poly_texture;
   iTextureHandle* txt_handle = poly.mat_handle->GetTexture ();
   csTextureHandleOpenGL *txt_mm = (csTextureHandleOpenGL *) txt_handle->GetPrivateObject ();
-
-  // find lightmap information, if any
-  thelightmap = tex->GetLightMap ();
 
   // Initialize our static drawing information and cache
   // the texture in the texture cache (if this is not already the case).
@@ -3514,12 +3549,17 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   GLuint texturehandle = texturecache_data->Handle;
 
   // configure base texture for texure unit 0
-  float flat_r = 1.0, flat_g = 1.0, flat_b = 1.0;
   glActiveTextureARB (GL_TEXTURE0_ARB);
   glBindTexture (GL_TEXTURE_2D, texturehandle);
   float alpha = 1.0f - BYTE_TO_FLOAT (poly.mixmode & CS_FX_MASK_ALPHA);
   alpha = SetupBlend (poly.mixmode, alpha, tex_transp);
-  glColor4f (flat_r, flat_g, flat_b, alpha);
+  if (poly.mixmode & CS_FX_MASK_ALPHA)
+  {
+    float flat_r = 1.0, flat_g = 1.0, flat_b = 1.0;
+    glColor4f (flat_r, flat_g, flat_b, alpha);
+  }
+  else
+    glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
   csLMCacheData *lightmapcache_data = (csLMCacheData *)thelightmap->GetCacheData ();
   GLuint lightmaphandle = lightmapcache_data->Handle;
@@ -3566,11 +3606,7 @@ void csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   glActiveTextureARB (GL_TEXTURE1_ARB);
   glDisable (GL_TEXTURE_2D);
   glActiveTextureARB (GL_TEXTURE0_ARB);
-
-#else
-  (void) poly;
-  // multitexture not enabled -- how did we get into this shortcut?
-#endif
+  glTexEnvi (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 }
 
 float csGraphics3DOGLCommon::GetZBuffValue (int x, int y)
@@ -3806,3 +3842,7 @@ void csGraphics3DOGLCommon::Guess_BlendMode (GLenum *src, GLenum*dst)
   }
 }
 
+iTextureManager *csGraphics3DOGLCommon::GetTextureManager () 
+{ 
+  return txtmgr; 
+}

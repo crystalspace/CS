@@ -573,6 +573,7 @@ typedef void (csAPIENTRY * csPFNGLTEXTURECOLORMASKSGISPROC) (GLboolean red, GLbo
 #define CSGL_EXT_fog_coord
 #define CSGL_REND_screen_coordinates
 #define CSGL_EXT_coordinate_frame
+#define CSGL_ARB_texture_env_combine
 #define CSGL_EXT_texture_env_combine
 #define CSGL_APPLE_specular_vector
 #define CSGL_APPLE_transform_hint
@@ -1200,6 +1201,9 @@ CS_PREP_GL_FUNCTION (csPFNGLBINORMALPOINTEREXTPROC, glBinormalPointerEXT);
 #ifdef CSGL_EXT_texture_env_combine
 #endif
 
+#ifdef CSGL_ARB_texture_env_combine
+#endif
+
 #ifdef CSGL_APPLE_specular_vector
 #endif
 
@@ -1541,6 +1545,7 @@ CS_PREP_GL_FUNCTION (csPFNGLTEXTURECOLORMASKSGISPROC, glTextureColorMaskSGIS);
 #undef CSGL_EXT_fog_coord
 #undef CSGL_REND_screen_coordinates
 #undef CSGL_EXT_coordinate_frame
+#undef CSGL_ARB_texture_env_combine
 #undef CSGL_EXT_texture_env_combine
 #undef CSGL_APPLE_specular_vector
 #undef CSGL_APPLE_transform_hint
@@ -3617,125 +3622,248 @@ CS_PREP_GL_FUNCTION (csPFNGLTEXTURECOLORMASKSGISPROC, glTextureColorMaskSGIS);
 #ifndef GL_COMBINE_EXT                    
 #define GL_COMBINE_EXT                    0x8570
 #endif
+#ifndef GL_COMBINE_ARB                    
+#define GL_COMBINE_ARB                    GL_COMBINE_EXT
+#endif
 #ifndef GL_COMBINE_RGB_EXT                
 #define GL_COMBINE_RGB_EXT                0x8571
+#endif
+#ifndef GL_COMBINE_RGB_ARB                
+#define GL_COMBINE_RGB_ARB                GL_COMBINE_RGB_EXT
 #endif
 #ifndef GL_COMBINE_ALPHA_EXT              
 #define GL_COMBINE_ALPHA_EXT              0x8572
 #endif
+#ifndef GL_COMBINE_ALPHA_ARB              
+#define GL_COMBINE_ALPHA_ARB              GL_COMBINE_ALPHA_EXT
+#endif
 #ifndef GL_RGB_SCALE_EXT                  
 #define GL_RGB_SCALE_EXT                  0x8573
+#endif
+#ifndef GL_RGB_SCALE_ARB                  
+#define GL_RGB_SCALE_ARB                  GL_RGB_SCALE_EXT
 #endif
 #ifndef GL_ADD_SIGNED_EXT                 
 #define GL_ADD_SIGNED_EXT                 0x8574
 #endif
+#ifndef GL_ADD_SIGNED_ARB                 
+#define GL_ADD_SIGNED_ARB                 GL_ADD_SIGNED_EXT
+#endif
 #ifndef GL_INTERPOLATE_EXT                
 #define GL_INTERPOLATE_EXT                0x8575
+#endif
+#ifndef GL_INTERPOLATE_ARB                
+#define GL_INTERPOLATE_ARB                GL_INTERPOLATE_EXT
 #endif
 #ifndef GL_CONSTANT_EXT                   
 #define GL_CONSTANT_EXT                   0x8576
 #endif
+#ifndef GL_CONSTANT_ARB                   
+#define GL_CONSTANT_ARB                   GL_CONSTANT_EXT
+#endif
 #ifndef GL_PRIMARY_COLOR_EXT              
 #define GL_PRIMARY_COLOR_EXT              0x8577
+#endif
+#ifndef GL_PRIMARY_COLOR_ARB              
+#define GL_PRIMARY_COLOR_ARB              GL_PRIMARY_COLOR_EXT
 #endif
 #ifndef GL_PREVIOUS_EXT                   
 #define GL_PREVIOUS_EXT                   0x8578
 #endif
+#ifndef GL_PREVIOUS_ARB                   
+#define GL_PREVIOUS_ARB  GL_PREVIOUS_EXT                   
+#endif
 #ifndef GL_SOURCE0_RGB_EXT                
 #define GL_SOURCE0_RGB_EXT                0x8580
+#endif
+#ifndef GL_SOURCE0_RGB_ARB                
+#define GL_SOURCE0_RGB_ARB  GL_SOURCE0_RGB_EXT                
 #endif
 #ifndef GL_SOURCE1_RGB_EXT                
 #define GL_SOURCE1_RGB_EXT                0x8581
 #endif
+#ifndef GL_SOURCE1_RGB_ARB                
+#define GL_SOURCE1_RGB_ARB  GL_SOURCE1_RGB_EXT                
+#endif
 #ifndef GL_SOURCE2_RGB_EXT                
 #define GL_SOURCE2_RGB_EXT                0x8582
+#endif
+#ifndef GL_SOURCE2_RGB_ARB                
+#define GL_SOURCE2_RGB_ARB  GL_SOURCE2_RGB_EXT                
 #endif
 #ifndef GL_SOURCE3_RGB_EXT                
 #define GL_SOURCE3_RGB_EXT                0x8583
 #endif
+#ifndef GL_SOURCE3_RGB_ARB                
+#define GL_SOURCE3_RGB_ARB  GL_SOURCE3_RGB_EXT                
+#endif
 #ifndef GL_SOURCE4_RGB_EXT                
 #define GL_SOURCE4_RGB_EXT                0x8584
+#endif
+#ifndef GL_SOURCE4_RGB_ARB                
+#define GL_SOURCE4_RGB_ARB  GL_SOURCE4_RGB_EXT                
 #endif
 #ifndef GL_SOURCE5_RGB_EXT                
 #define GL_SOURCE5_RGB_EXT                0x8585
 #endif
+#ifndef GL_SOURCE5_RGB_ARB                
+#define GL_SOURCE5_RGB_ARB  GL_SOURCE5_RGB_EXT                
+#endif
 #ifndef GL_SOURCE6_RGB_EXT                
 #define GL_SOURCE6_RGB_EXT                0x8586
+#endif
+#ifndef GL_SOURCE6_RGB_ARB                
+#define GL_SOURCE6_RGB_ARB  GL_SOURCE6_RGB_EXT                
 #endif
 #ifndef GL_SOURCE7_RGB_EXT                
 #define GL_SOURCE7_RGB_EXT                0x8587
 #endif
+#ifndef GL_SOURCE7_RGB_ARB                
+#define GL_SOURCE7_RGB_ARB  GL_SOURCE7_RGB_EXT                
+#endif
 #ifndef GL_SOURCE0_ALPHA_EXT              
 #define GL_SOURCE0_ALPHA_EXT              0x8588
+#endif
+#ifndef GL_SOURCE0_ALPHA_ARB              
+#define GL_SOURCE0_ALPHA_ARB  GL_SOURCE0_ALPHA_EXT              
 #endif
 #ifndef GL_SOURCE1_ALPHA_EXT              
 #define GL_SOURCE1_ALPHA_EXT              0x8589
 #endif
+#ifndef GL_SOURCE1_ALPHA_ARB              
+#define GL_SOURCE1_ALPHA_ARB  GL_SOURCE1_ALPHA_EXT              
+#endif
 #ifndef GL_SOURCE2_ALPHA_EXT              
 #define GL_SOURCE2_ALPHA_EXT              0x858A
+#endif
+#ifndef GL_SOURCE2_ALPHA_ARB              
+#define GL_SOURCE2_ALPHA_ARB  GL_SOURCE2_ALPHA_EXT              
 #endif
 #ifndef GL_SOURCE3_ALPHA_EXT              
 #define GL_SOURCE3_ALPHA_EXT              0x858B
 #endif
+#ifndef GL_SOURCE3_ALPHA_ARB              
+#define GL_SOURCE3_ALPHA_ARB  GL_SOURCE3_ALPHA_EXT              
+#endif
 #ifndef GL_SOURCE4_ALPHA_EXT              
 #define GL_SOURCE4_ALPHA_EXT              0x858C
+#endif
+#ifndef GL_SOURCE4_ALPHA_ARB              
+#define GL_SOURCE4_ALPHA_ARB  GL_SOURCE4_ALPHA_EXT              
 #endif
 #ifndef GL_SOURCE5_ALPHA_EXT              
 #define GL_SOURCE5_ALPHA_EXT              0x858D
 #endif
+#ifndef GL_SOURCE5_ALPHA_ARB              
+#define GL_SOURCE5_ALPHA_ARB  GL_SOURCE5_ALPHA_EXT              
+#endif
 #ifndef GL_SOURCE6_ALPHA_EXT              
 #define GL_SOURCE6_ALPHA_EXT              0x858E
+#endif
+#ifndef GL_SOURCE6_ALPHA_ARB              
+#define GL_SOURCE6_ALPHA_ARB  GL_SOURCE6_ALPHA_EXT              
 #endif
 #ifndef GL_SOURCE7_ALPHA_EXT              
 #define GL_SOURCE7_ALPHA_EXT              0x858F
 #endif
+#ifndef GL_SOURCE7_ALPHA_ARB              
+#define GL_SOURCE7_ALPHA_ARB  GL_SOURCE7_ALPHA_EXT              
+#endif
 #ifndef GL_OPERAND0_RGB_EXT               
 #define GL_OPERAND0_RGB_EXT               0x8590
+#endif
+#ifndef GL_OPERAND0_RGB_ARB               
+#define GL_OPERAND0_RGB_ARB  GL_OPERAND0_RGB_EXT               
 #endif
 #ifndef GL_OPERAND1_RGB_EXT               
 #define GL_OPERAND1_RGB_EXT               0x8591
 #endif
+#ifndef GL_OPERAND1_RGB_ARB               
+#define GL_OPERAND1_RGB_ARB  GL_OPERAND1_RGB_EXT               
+#endif
 #ifndef GL_OPERAND2_RGB_EXT               
 #define GL_OPERAND2_RGB_EXT               0x8592
+#endif
+#ifndef GL_OPERAND2_RGB_ARB               
+#define GL_OPERAND2_RGB_ARB  GL_OPERAND2_RGB_EXT               
 #endif
 #ifndef GL_OPERAND3_RGB_EXT               
 #define GL_OPERAND3_RGB_EXT               0x8593
 #endif
+#ifndef GL_OPERAND3_RGB_ARB               
+#define GL_OPERAND3_RGB_ARB  GL_OPERAND3_RGB_EXT               
+#endif
 #ifndef GL_OPERAND4_RGB_EXT               
 #define GL_OPERAND4_RGB_EXT               0x8594
+#endif
+#ifndef GL_OPERAND4_RGB_ARB               
+#define GL_OPERAND4_RGB_ARB  GL_OPERAND4_RGB_EXT               
 #endif
 #ifndef GL_OPERAND5_RGB_EXT               
 #define GL_OPERAND5_RGB_EXT               0x8595
 #endif
+#ifndef GL_OPERAND5_RGB_ARB               
+#define GL_OPERAND5_RGB_ARB  GL_OPERAND5_RGB_EXT               
+#endif
 #ifndef GL_OPERAND6_RGB_EXT               
 #define GL_OPERAND6_RGB_EXT               0x8596
+#endif
+#ifndef GL_OPERAND6_RGB_ARB               
+#define GL_OPERAND6_RGB_ARB  GL_OPERAND6_RGB_EXT               
 #endif
 #ifndef GL_OPERAND7_RGB_EXT               
 #define GL_OPERAND7_RGB_EXT               0x8597
 #endif
+#ifndef GL_OPERAND7_RGB_ARB               
+#define GL_OPERAND7_RGB_ARB  GL_OPERAND7_RGB_EXT               
+#endif
 #ifndef GL_OPERAND0_ALPHA_EXT             
 #define GL_OPERAND0_ALPHA_EXT             0x8598
+#endif
+#ifndef GL_OPERAND0_ALPHA_ARB             
+#define GL_OPERAND0_ALPHA_ARB  GL_OPERAND0_ALPHA_EXT             
 #endif
 #ifndef GL_OPERAND1_ALPHA_EXT             
 #define GL_OPERAND1_ALPHA_EXT             0x8599
 #endif
+#ifndef GL_OPERAND1_ALPHA_ARB             
+#define GL_OPERAND1_ALPHA_ARB  GL_OPERAND1_ALPHA_EXT             
+#endif
 #ifndef GL_OPERAND2_ALPHA_EXT             
 #define GL_OPERAND2_ALPHA_EXT             0x859A
+#endif
+#ifndef GL_OPERAND2_ALPHA_ARB             
+#define GL_OPERAND2_ALPHA_ARB  GL_OPERAND2_ALPHA_EXT             
 #endif
 #ifndef GL_OPERAND3_ALPHA_EXT             
 #define GL_OPERAND3_ALPHA_EXT             0x859B
 #endif
+#ifndef GL_OPERAND3_ALPHA_ARB             
+#define GL_OPERAND3_ALPHA_ARB  GL_OPERAND3_ALPHA_EXT             
+#endif
 #ifndef GL_OPERAND4_ALPHA_EXT             
 #define GL_OPERAND4_ALPHA_EXT             0x859C
+#endif
+#ifndef GL_OPERAND4_ALPHA_ARB             
+#define GL_OPERAND4_ALPHA_ARB  GL_OPERAND4_ALPHA_EXT             
 #endif
 #ifndef GL_OPERAND5_ALPHA_EXT             
 #define GL_OPERAND5_ALPHA_EXT             0x859D
 #endif
+#ifndef GL_OPERAND5_ALPHA_ARB             
+#define GL_OPERAND5_ALPHA_ARB  GL_OPERAND5_ALPHA_EXT             
+#endif
 #ifndef GL_OPERAND6_ALPHA_EXT             
 #define GL_OPERAND6_ALPHA_EXT             0x859E
 #endif
+#ifndef GL_OPERAND6_ALPHA_ARB             
+#define GL_OPERAND6_ALPHA_ARB  GL_OPERAND6_ALPHA_EXT             
+#endif
 #ifndef GL_OPERAND7_ALPHA_EXT             
 #define GL_OPERAND7_ALPHA_EXT             0x859F
+#endif
+#ifndef GL_OPERAND7_ALPHA_ARB             
+#define GL_OPERAND7_ALPHA_ARB  GL_OPERAND7_ALPHA_EXT             
 #endif
 #ifndef GL_LIGHT_MODEL_SPECULAR_VECTOR_APPLE 
 #define GL_LIGHT_MODEL_SPECULAR_VECTOR_APPLE 0x85B0
