@@ -24,6 +24,7 @@ awsCmdButton::awsCmdButton():is_down(false), mouse_is_over(false),
                              frame_style(0), alpha_level(92),
                              caption(NULL)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
   tex[0]=tex[1]=tex[2]=NULL;
 }
 
@@ -421,6 +422,7 @@ SCF_IMPLEMENT_IBASE_END
 
 awsCmdButtonFactory::awsCmdButtonFactory(iAws *wmgr):awsComponentFactory(wmgr)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
   Register("Command Button");
   RegisterConstant("bfsNormal",  awsCmdButton::fsNormal);
   RegisterConstant("bfsToolbar", awsCmdButton::fsToolbar);

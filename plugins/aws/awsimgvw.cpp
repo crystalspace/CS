@@ -32,6 +32,7 @@ awsImageView::awsImageView():is_down(false), mouse_is_over(false),
                              frame_style(0), alpha_level(92)
 
 {
+  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 awsImageView::~awsImageView()
@@ -174,6 +175,7 @@ SCF_IMPLEMENT_IBASE_END
 
 awsImageViewFactory::awsImageViewFactory(iAws *wmgr):awsComponentFactory(wmgr)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
   Register("Image View");
   RegisterConstant("ivfsBump",  awsImageView::fsBump);
   RegisterConstant("ivfsSimple", awsImageView::fsSimple);

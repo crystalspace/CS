@@ -29,6 +29,7 @@ sink(NULL), dec_slot(NULL), inc_slot(NULL), knob_slot(NULL), tick_slot(NULL),
 value(0), max(1), min(0), amntvis(0),
 value_delta(0.1), value_page_delta(0.25)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
   SetFlag(AWSF_CMP_ALWAYSERASE);
   captured = false;
 }
@@ -747,6 +748,7 @@ SCF_IMPLEMENT_IBASE_EXT_END
 
 awsSliderButtonFactory::awsSliderButtonFactory(iAws *wmgr):awsCmdButtonFactory(wmgr)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
   Register("Slider Button");
 }
 

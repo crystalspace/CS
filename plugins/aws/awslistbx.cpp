@@ -14,7 +14,7 @@
 #include <stdio.h>
 
 SCF_IMPLEMENT_IBASE(awsListBox)
-SCF_IMPLEMENTS_INTERFACE(awsComponent)
+  SCF_IMPLEMENTS_INTERFACE(awsComponent)
 SCF_IMPLEMENT_IBASE_END
 
 const int awsListBox::fsBump   = 0x0;
@@ -102,6 +102,7 @@ frame_style(0), alpha_level(92), hi_alpha_level(128),
 control_type(0), ncolumns(1), sel(NULL), map(NULL),
 map_size(0), map_dirty(true), scroll_start(0), drawable_count(0)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
   actions.Register("InsertItem", &InsertItem);
   actions.Register("DeleteItem", &DeleteItem);
   actions.Register("GetSelectedItem", &GetSelectedItem);
@@ -1295,11 +1296,12 @@ awsListBox::OnAdded()
 
 /************************************* Command Button Factory ****************/
 SCF_IMPLEMENT_IBASE(awsListBoxFactory)
-SCF_IMPLEMENTS_INTERFACE(iAwsComponentFactory)
+  SCF_IMPLEMENTS_INTERFACE(iAwsComponentFactory)
 SCF_IMPLEMENT_IBASE_END
 
 awsListBoxFactory::awsListBoxFactory(iAws *wmgr):awsComponentFactory(wmgr)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
   Register("List Box");
   RegisterConstant("lbfsBump",  awsListBox::fsBump);
   RegisterConstant("lbfsSunken", awsListBox::fsSunken);

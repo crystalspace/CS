@@ -10,6 +10,8 @@ The history order is reversed so that new features are at the top.
 	  $(TEMP), if that doesn't exist it will try $(TMP). Otherwise it
 	  will use the temp dir in the Windows directory.
 	- Added fflush (stdout) to vshell so that it works on mingw correctly.
+	- Fixed several cases in AWS where SCF implementations were not
+	  calling SCF_CONSTRUCT_IBASE() from the constructor. This is BAD.
 12-Feb-2002
 	- Matt Reda moved the event-handling code in the OSX canvases 
 	  from the delegate to a new NSView-derived class.  The old code 

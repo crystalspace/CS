@@ -25,6 +25,7 @@ awsRadButton::awsRadButton():is_down(false), mouse_is_over(false),
                              alignment(0),
                              caption(NULL)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
   tex[0]=tex[1]=tex[2]=tex[3]=NULL;
   SetFlag(AWSF_CMP_ALWAYSERASE);
 }
@@ -310,6 +311,7 @@ SCF_IMPLEMENT_IBASE_END
 
 awsRadButtonFactory::awsRadButtonFactory(iAws *wmgr):awsComponentFactory(wmgr)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
   Register("Radio Button");
 
   RegisterConstant("rbAlignLeft",   awsRadButton::alignLeft);

@@ -24,7 +24,9 @@ const int awsGroupFrame::fsNone =0x5;
 const int awsGroupFrame::signalClicked=0x1;
 
 awsGroupFrame::awsGroupFrame():frame_style(0), alpha_level(96), bkg(NULL), caption(NULL)
-{}
+{
+  SCF_CONSTRUCT_IBASE (NULL);
+}
 
 awsGroupFrame::~awsGroupFrame()
 {}
@@ -191,6 +193,7 @@ SCF_IMPLEMENT_IBASE_END
 
 awsGroupFrameFactory::awsGroupFrameFactory(iAws *wmgr):awsComponentFactory(wmgr)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
   Register("Group Frame");
   RegisterConstant("gfsBump",  awsGroupFrame::fsBump);
   RegisterConstant("gfsSimple", awsGroupFrame::fsSimple);

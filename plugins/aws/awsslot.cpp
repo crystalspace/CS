@@ -82,7 +82,7 @@ awsSinkManager::CreateSink(void *parm)
 
 awsSink::awsSink(void *p):parm(p)
 {
-
+  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 awsSink::~awsSink() {}

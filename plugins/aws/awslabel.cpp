@@ -215,6 +215,7 @@ SCF_IMPLEMENT_IBASE_END
 
 awsLabelFactory::awsLabelFactory(iAws *wmgr):awsComponentFactory(wmgr)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
   Register("Label");
   RegisterConstant("signalLabelClicked",  awsLabel::signalClicked);
 

@@ -41,6 +41,7 @@ awsTextBox::awsTextBox(): mouse_is_over(false), has_focus(false), should_mask(0)
                           text(NULL), disallow(NULL), maskchar(NULL),
                           start(0), cursor(0), blink_timer(NULL), blink(true)
 {   
+  SCF_CONSTRUCT_IBASE (NULL);
 }
 
 awsTextBox::~awsTextBox()
@@ -395,6 +396,7 @@ SCF_IMPLEMENT_IBASE_END
 
 awsTextBoxFactory::awsTextBoxFactory(iAws *wmgr):awsComponentFactory(wmgr)
 {
+  SCF_CONSTRUCT_IBASE (NULL);
   Register("Text Box");
   RegisterConstant("tbfsNormal",  awsTextBox::fsNormal);
   RegisterConstant("tbfsBitmap",  awsTextBox::fsBitmap);
