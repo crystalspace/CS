@@ -2197,7 +2197,7 @@ csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf,
         {
           ScanStr (params, "%s", str);
 	  CHK (converter* filedata = new converter);
-	  if (filedata->ivcon (str) == ERROR)
+	  if (filedata->ivcon (str, true, true, NULL, VFS) == ERROR)
 	  {
 	    CsPrintf (MSG_FATAL_ERROR, "Error loading file model '%s'!\n", str);
 	    CHK (delete filedata);
@@ -4203,7 +4203,7 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf, csTexture
         {
           ScanStr (params, "%s", str);
 	  CHK (converter* filedata = new converter);
-	  if (filedata->ivcon (str) == ERROR)
+	  if (filedata->ivcon (str, true, true, NULL, VFS) == ERROR)
 	  {
 	    CsPrintf (MSG_FATAL_ERROR, "Error loading file model '%s'!\n", str);
 	    CHK (delete filedata);
