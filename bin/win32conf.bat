@@ -59,8 +59,11 @@
 :nomakedep
   del conftest.* >nul
 
+  rem *** The following is carefully tuned. Seemingly 'nonfunctional'
+  rem *** statements are not so. Leave them. They work around weird
+  rem *** configurations
   echo ### Checking if you use cmd.exe or some fancy shell...
-  echo $"testing$">conftest.1
+  echo testing>conftest.1
   make -f bin\win32conf.mak testecho
   cmp conftest.1 conftest.2
   if not errorlevel 1 goto noremovequote
