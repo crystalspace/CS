@@ -596,11 +596,12 @@ bool CCSWorld::WriteTextures()
     char replacename[255];
     const char *newtexfile;
     sprintf(replacename, "filename_%s", pTexture->GetTexturename());
-    if (newtexfile = pEntity->GetValueOfKey(replacename) )
+    if ((newtexfile = pEntity->GetValueOfKey(replacename)))
       pTexture->SetStored (false);
+      
     fprintf(m_fd, "TEXTURE '%s' (FILE ('%s')",
-                   pTexture->GetTexturename(),
-		   newtexfile?newtexfile:pTexture->GetFilename());
+      pTexture->GetTexturename(),
+      newtexfile?newtexfile:pTexture->GetFilename());
 
     if (pTexture->IsColorKeyed())
     {
