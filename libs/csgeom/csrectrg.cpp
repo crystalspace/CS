@@ -48,7 +48,7 @@ void csRectRegion::pushRect(csRect const &r)
 void csRectRegion::deleteRect(int i)
 {
   if (region_count > 0 && i >= 0 && i < --region_count)
-    memmove(region + i, region + i + 1, region_count - i);
+    memmove(region + i, region + i + 1, (region_count - i) * sizeof(region[0]));
 }
 
 void 
@@ -90,7 +90,7 @@ csRectRegion::fragmentContainedRect(csRect &r1t, csRect &r2t)
 
     pushRect(csRect(r1.xmin,   r1.ymin,   r2.xmin-1, r1.ymax));   //left
     pushRect(csRect(r2.xmax+1, r1.ymin,   r1.xmax,   r1.ymax));   //right
-    pushRect(csRect(r2.xmin,   r1.ymin,   r2.xmax,   r1.ymin-1)); //top
+    pushRect(csRect(r2.xmin,   r1.ymin,   r2.xmax,   r2.ymin-1)); //top
     pushRect(csRect(r2.xmin,   r2.ymax+1, r2.xmax,   r1.ymax));   //bottom
            
     return;
@@ -125,7 +125,7 @@ csRectRegion::fragmentContainedRect(csRect &r1t, csRect &r2t)
     // Three rects (top, left, bottom)  [rect on right side, middle]
     
     pushRect(csRect(r1.xmin, r1.ymin,   r1.xmax,   r2.ymin-1)); //top
-    pushRect(csRect(r1.xmin, r2.ymin,   r2.xmax-1, r2.ymax));   //left
+    pushRect(csRect(r1.xmin, r2.ymin,   r2.xmin-1, r2.ymax));   //left
     pushRect(csRect(r1.xmin, r2.ymax+1, r1.xmax,   r1.ymax));   //bot
   
     return;
@@ -159,7 +159,7 @@ csRectRegion::fragmentContainedRect(csRect &r1t, csRect &r2t)
     
     pushRect(csRect(r1.xmin,   r1.ymin, r1.xmax,   r2.ymin-1)); //top
     pushRect(csRect(r1.xmin,   r2.ymin, r2.xmin-1, r1.ymax));   //left
-    pushRect(csRect(r2.xmax+1, r2.ymin, r1.xmax,   r2.ymax));   //right
+    pushRect(csRect(r2.xmax+1, r2.ymin, r1.xmax,   r1.ymax));   //right
         
     return;
 
@@ -175,7 +175,7 @@ csRectRegion::fragmentContainedRect(csRect &r1t, csRect &r2t)
     // Two rects (left, right)          [rect in middle, vertically touches top and bottom sides]
     
     pushRect(csRect(r1.xmin,   r1.ymin, r2.xmin-1, r1.ymax)); //left
-    pushRect(csRect(r2.xmax+1, r2.ymin, r1.xmax,   r1.ymax)); //right
+    pushRect(csRect(r2.xmax+1, r1.ymin, r1.xmax,   r1.ymax)); //right
   
     return;
 
@@ -197,7 +197,7 @@ csRectRegion::fragmentContainedRect(csRect &r1t, csRect &r2t)
   case 13:
     // One rect (top)                   [rect on bottom, horizontally touches left and right sides]
     
-    pushRect(csRect(r1.xmin, r1.ymin, r2.xmax,   r2.ymin-1)); //top
+    pushRect(csRect(r1.xmin, r1.ymin, r1.xmax,   r2.ymin-1)); //top
   
     return;
 
@@ -218,35 +218,15 @@ csRectRegion::fragmentContainedRect(csRect &r1t, csRect &r2t)
     return;
   
   }
-
 }
 
 
 // The purpose of this function is to take r1 and fragment it around r2,
 // removing the area that overlaps.  This function can be used by either
-// Include() or Exclude(), since it simply fragments r1.
+// Include() or Exclude(), since it simply fragments r1 (but always checks
+// for swapping!)  For Exclusion, r2 is ALWAYS the excluding rect!
 void csRectRegion::fragmentRect(csRect &r1, csRect &r2, int mode)
-{
-  // We may have to fragment r1 into four pieces if r2 is totally inside r1
-  if (mode==MODE_EXCLUDE)
-  {
-    csRect tr1(r1), tr2(r2);
-
-    tr2.Exclude(tr1);
-
-    if (tr2.IsEmpty()) 
-    {
-      // It now becomes irritating.  Not only do we have to possibly split it into two
-      // rectangles, we may have to split it into as few as one.  Call a separate
-      // function to handle this business.
-
-      fragmentContainedRect(r2, r1);
-
-      return;
-    }
-      
-  }
-
+{  
   // We may have to fragment r1 into three pieces if an entire edge of r2 is
   // inside r1.
   if (r1.Intersects(r2)) 
@@ -262,7 +242,7 @@ void csRectRegion::fragmentRect(csRect &r1, csRect &r2, int mode)
      // mode we want to perform an optimal merge of the two, or remove parts of r1 from r2.
 
      csRect ri(r1);
-     ri.Intersect(r2);
+     ri.Intersect(r2);     
 
      if (mode==MODE_INCLUDE)
      {        
@@ -285,13 +265,8 @@ void csRectRegion::fragmentRect(csRect &r1, csRect &r2, int mode)
      }
      else
      {
-       // Perform fragment on r1
+       // Fragment inclusion rect around intersection (keep)
        fragmentContainedRect(r1, ri);
-
-       // Now fragment r2 and gather it for further consideration.
-       markForGather();
-       fragmentContainedRect(r2, ri);
-       gatherFragments();
      }
 
      return;
@@ -421,62 +396,80 @@ void csRectRegion::Include(csRect &nrect)
 }
 
 void 
-csRectRegion::Exclude(csRect &rect)
+csRectRegion::Exclude(csRect &nrect)
 {
   // Ignore an empty rect
-  if (rect.IsEmpty())
+  if (nrect.IsEmpty())
     return;
 
   // If there are no rects in the region, just leave.  
   if (region_count == 0)
     return;
 
-  // Otherwise, we have to see if this rect overlaps or touches any other.
   int i;
-  for(i = 0; i < region_count; i++)
-  {
-    csRect &r1 = region[i];
-    csRect r2(rect);
+  csRect rect(nrect);
 
-    // Check to see if these even touch
-    if (r2.Intersects(r1)==false)
-      continue;
-    
-    // If r1 totally contains rect, then we call the fragment contained rect function.
-    r2.Exclude(r1);
-    if (r2.IsEmpty())
+  /// Clear the fragment buffer
+  for(i=0; i<32; ++i)
+    fragment[i].MakeEmpty();
+
+    // Otherwise, we have to see if this rect overlaps or touches any other.
+    for(i = 0; i < region_count; i++)
     {
-      csRect rc1(region[i]);
+      csRect r1(region[i]);
+      csRect r2(rect);
+
+      // Check to see if these even touch
+      if (r2.Intersects(r1)==false)
+        continue;
+
+      // Check to see if the inclusion rect is totally dominated by the exclusion rect.
+      r1.Exclude(r2);
+      if (r1.IsEmpty())
+      {
+        deleteRect(i);
+        i=0;
+        continue;
+      }
+
+      // Check to see if the exclusion rect is totally dominated by the exclusion rect
+      r1.Set(region[i]);
+      r2.Exclude(r1);
+      if (r2.IsEmpty())
+      {
+        r2.Set(rect);
+        deleteRect(i);
+        fragmentContainedRect(r1, r2);
+        i=0;
+        continue;
+      }
+
+      r2.Set(rect);  
+      // This part is similiar to Include, except that we are trying to remove a portion.  Instead
+      //  of calling chopEdgeIntersection, we actually have to fragment rect1 and chop off an edge
+      //  of the excluding rect.  This code should be handled inside fragment rect.
+      
+      // Kill rect from list
       deleteRect(i);
-
-      fragmentContainedRect(rc1, rect);
-      continue;
-    }
-
-    // If rect totally contains r1, then we kill r1 from the list.
-    r2.Set(r1);
-    r2.Exclude(rect);
-
-    if (r2.IsEmpty())
-    {
-      // Kill from list
-      deleteRect(i);
-      // Iterate
-      continue;
-    }
-    
-    // This part is similiar to Include, except that we are trying to remove a portion.  Instead
-    //  of calling chopEdgeIntersection, we actually have to fragment rect1 and chop off an edge
-    //  of the excluding rect.  This code should be handled inside fragment rect.
-    
-    r2.Set(rect);
-
-    // Kill rect from list
-    deleteRect(i);
   
-    // Fragment it
-    fragmentRect(r1, r2, MODE_EXCLUDE);
-  } // end for
+      // Fragment it
+      fragmentRect(r1, r2, MODE_EXCLUDE);
+     
+    } // end for
+
+    // Check and see if we have fragments to consider
+    /*for(i=0; i<32; ++i)
+    {
+      if (!(fragment[i].IsEmpty()))
+      {
+        rect.Set(fragment[i]);
+        fragment[i].MakeEmpty();
+        no_fragments=false;
+        break;
+      }
+    }*/
+
+  //} while(!no_fragments);
 
 }
 
