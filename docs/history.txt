@@ -1,5 +1,22 @@
 The history order has been reversed so that new features are at the top.
 
+19-Nov-2000
+	- Martin Geisse did various documentation updates:
+	    - Moved sections from the 'concepts' and 'anatomy' chapters of
+	      the docs to the 'plugin' and 'libs' section.
+	    - Added the 'internals' chapter to the docs and moved the
+	      'makefile' section into it.
+	    - Restructured the plugins section of the docs.
+18-Nov-2000
+	- Implemented alpha-channel support for software renderer
+	  and DrawPixmap. This means that if you have a PNG image with
+	  an alpha channel then it will be used for transparency.
+	- Seth Galbraith fixed sqk1 world file for Squawk so that the
+	  texture seams are gone.
+17-Nov-2000
+	- Norman Kramer did the following change:
+	  VC doesnt like creating variable arrays on the stack. I changed
+	  it to use new/delete.
 16-Nov-2000
 	- Martin Geisse did some updates to documentation.
 	- Thomas Hieber provided the base implementation of gamecore
