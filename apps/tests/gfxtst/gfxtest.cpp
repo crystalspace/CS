@@ -23,6 +23,7 @@
 #define SYSDEF_GETOPT
 #include "cssysdef.h"
 #include "csgfx/csimage.h"
+#include "cssys/sysdriv.h"
 #include "csutil/util.h"
 #include "csutil/cfgfile.h"
 #include "iutil/databuff.h"
@@ -424,19 +425,13 @@ int main (int argc, char *argv[])
   _wildcard (&argc, &argv);
 #endif
 
-  // create the image loader. @@@ This is a quick hack that only works
-  // because the image loader doesn't ever use the system driver!
-  // If this changes then gfxtest needs a system driver too!
-  scfInitialize(new csConfigFile("scf.cfg"));
-  ImageLoader = CREATE_INSTANCE("crystalspace.graphic.image.io.multiplex", iImageIO);
-  if (!ImageLoader)
+  SysSystemDriver sys;
+  sys.RequestPlugin ("crystalspace.kernel.vfs:VFS");
+  sys.RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
+  sys.RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
+  if (!sys.Initialize (argc, argv, NULL))
   {
-    printf("could not load image loader");
-    return -1;
-  }
-  if (!ImageLoader->Initialize(NULL))
-  {
-    printf("could not initialize image loader");
+    sys.Printf (MSG_FATAL_ERROR, "Error initializing system !");
     return -1;
   }
 
@@ -532,14 +527,21 @@ int main (int argc, char *argv[])
   if (optind >= argc)
     return display_help ();
 
+  ImageLoader = QUERY_PLUGIN (&sys, iImageIO);
+  if (!ImageLoader)
+  {
+    printf("could not load image loader");
+    return -1;
+  }
   ImageLoader->SetDithering (opt.dither);
 
   for (; optind < argc; ++optind)
     if (!process_file (argv [optind]))
+    {
+      ImageLoader->DecRef();
       return -1;
-
+    }
   ImageLoader->DecRef();
-  scfFinish();
 
   return 0;
 }
