@@ -205,9 +205,9 @@ struct iEngine : public iPlugIn
   virtual iMaterialWrapper* CreateMaterial (const char *iName,
   	iTextureWrapper* texture) = 0;
   /// Create a named camera position object
-  virtual bool CreateCamera (const char *iName, const char *iSector,
-	const csVector3 &iPos, const csVector3 &iForward,
-	const csVector3 &iUpward) = 0;
+  virtual iCameraPosition* CreateCameraPosition (const char *iName,
+	const char *iSector, const csVector3 &iPos,
+	const csVector3 &iForward, const csVector3 &iUpward) = 0;
   /// Create a key/value pair object
   virtual bool CreateKey (const char *iName, const char *iValue) = 0;
   /// Create a texture plane
@@ -312,9 +312,8 @@ struct iEngine : public iPlugIn
    */
   virtual iCollection* FindCollection (const char* iName,
   	bool regionOnly = false) = 0;
-  /**
-   * Create a new collection.
-   */
+
+  /// Create a new collection.
   virtual iCollection* CreateCollection (const char* iName) = 0;
 
   /// Enable/disable the lighting cache.

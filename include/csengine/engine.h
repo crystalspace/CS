@@ -1025,7 +1025,7 @@ public:
   /// Register a material to be loaded during Prepare()
   virtual iMaterialWrapper* CreateMaterial (const char *iName, iTextureWrapper* texture);
   /// Create a named camera position object
-  virtual bool CreateCamera (const char *iName, const char *iSector,
+  virtual iCameraPosition* CreateCameraPosition (const char *iName, const char *iSector,
     const csVector3 &iPos, const csVector3 &iForward, const csVector3 &iUpward);
   /// Create a key/value pair object
   virtual bool CreateKey (const char *iName, const char *iValue);

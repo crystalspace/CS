@@ -23,7 +23,6 @@
 #include "csparser/csloader.h"
 #include "csparser/snddatao.h"
 
-#include "csengine/campos.h"
 #include "csengine/curve.h"
 #include "csengine/dumper.h"
 #include "csengine/engine.h"
@@ -1071,8 +1070,8 @@ bool csLoader::LoadMap (char* buf)
           char start_sector [100];
           csVector3 pos (0, 0, 0);
           ScanStr (params, "%s,%f,%f,%f", &start_sector, &pos.x, &pos.y, &pos.z);
-          Engine->GetCsEngine()->camera_positions.Push (new csCameraPosition ("Start",
-            start_sector, pos, csVector3 (0, 0, 1), csVector3 (0, 1, 0)));
+          Engine->CreateCameraPosition("Start", start_sector, pos,
+	    csVector3 (0, 0, 1), csVector3 (0, 1, 0));
           break;
         }
         case CS_TOKEN_KEY:

@@ -1745,17 +1745,19 @@ iMaterialWrapper* csEngine::CreateMaterial (const char *iName, iTextureWrapper* 
   return &wrapper->scfiMaterialWrapper;
 }
 
-bool csEngine::CreateCamera (const char *iName, const char *iSector,
+iCameraPosition *csEngine::CreateCameraPosition (const char *iName, const char *iSector,
   const csVector3 &iPos, const csVector3 &iForward, const csVector3 &iUpward)
 {
   csCameraPosition *cp = (csCameraPosition *)camera_positions.FindByName (iName);
   if (cp)
     cp->Set (iSector, iPos, iForward, iUpward);
   else
-    camera_positions.Push (new csCameraPosition (iName, iSector,
-      iPos, iForward, iUpward));
+  {
+    cp = new csCameraPosition (iName, iSector, iPos, iForward, iUpward);
+    camera_positions.Push (cp);
+  }
 
-  return true;
+  return &(cp->scfiCameraPosition);
 }
 
 bool csEngine::CreateKey (const char *iName, const char *iValue)
@@ -1978,7 +1980,11 @@ iCollection* csEngine::FindCollection (const char* iName, bool regionOnly)
 
 iCollection* csEngine::CreateCollection (const char* iName)
 {
-  csCollection *c = new csCollection(this);
+  csCollection *c = (csCollection *)collections.FindByName (iName);
+  if (c)
+    return &(c->scfiCollection);
+
+  c = new csCollection(this);
   c->SetName(iName);
   collections.Push(c);
   return &(c->scfiCollection);
