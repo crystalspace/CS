@@ -26,31 +26,6 @@
 class csTextureManagerInfinite;
 
 /**
- * In 8-bit modes we build a 32K inverse colormap for converting
- * RGB values into palette indices. The following macros defines
- * the number of bits to use for encoding R, G and B values.
- */
-#define RGB2PAL_BITS_R	5
-#define RGB2PAL_BITS_G	5
-#define RGB2PAL_BITS_B	5
-
-/**
- * Lookup table for alpha mapping. Converts two palette entries
- * to a new palette entry (alpha blended).
- * (used for display output of 8-bit).
- */
-struct csAlphaTables
-{
-  /// Alpha table for 50%
-  UByte alpha_map50 [256*256];
-  /// Alpha table for 25% and 75%
-  UByte alpha_map25 [256*256];
-};
-
-/// The prefered distances to use for the color matching.
-#define PREFERED_DIST	2000000
-
-/**
  * csTextureMMInfinite represents a texture and all its mipmapped
  * variants.
  */
