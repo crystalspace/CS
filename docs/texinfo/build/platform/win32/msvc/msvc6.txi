@@ -50,16 +50,6 @@ or@*
 Once you have downloaded the msvc_libs package, extract it too your @file{CS\}
 root directory.
 
-@subsubheading OpenGL
-
-The required headers and library files for compiling the Crystal Space OpenGL
-related plugins, are included within the Visual C++ 6 distribution.
-However, optionally you can also install and use Silicon Graphics own OpenGL
-Software Development Kit (@sc{sdk}) for Windows.  If you wish to do this, it
-can be obtained from:
-
-@uref{http://www.meer.net/~gold/OpenGL/sgi-opengl.html}
-
 @subsubheading DirectX - Required
 
 In order to compile Crystal Space at its minimum i.e. the software render,
@@ -111,7 +101,7 @@ and drag both paths you have entered to the top of the list.
 Crystal Space contains support for a Simple Direct Media Layer 2D canvas which
 can be used as an alternative to the default Direct Draw canvas for use with
 the Crystal Space software 3D renderer.  To compile the SDL2D canvas you must
-have the supported 1.2.1 development runtime for your version of @sc{msvc} be
+have the supported 1.2.2 development runtime for your version of @sc{msvc} be
 it 5 or 6.  Please remeber to add the @file{indlude} and @file{lib} directories
 to the global MSVC options, so @sc{msvc} can see them.
 
@@ -142,16 +132,6 @@ with Visual C++ requires you have @emph{BisonFlex} by
 @uref{http://www.fg-soup.com} installed on your system.  To download the
 version of @emph{BisonFlex} for your @emph{Visual C++} version, use the
 corresponding link below.
-
-For Visual C++ 5:
-
-@ifnottex
-@uref{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/bfwizard-1.5.zip}
-@end ifnottex
-@iftex
-@code{http://www.philipwyett.dsl.pipex.com/crystal_space/msvc/downloads/}@*
-@code{bfwizard-1.5.zip}
-@end iftex
 
 For Visual C++ 6:
 
@@ -363,8 +343,8 @@ Q. @emph{Where are the @file{zlib.h}, @file{png.h} and @file{jpeglib.h} files?}
 A. Those files are not part of the Crystal Space project, but they are
 required to build it.  You must get a version of the following packages, most
 of which can be easily found on the Internet.  You can download precompiled
-versions of these libraries or grab the source code and compile it yourself if
-you prefer.  @xref{External Libraries}.
+versions of these libraries i.e. @emph{msvc_libs} or grab the source code and
+compile it yourself if you prefer.  @xref{External Libraries}.
 
 The resources from these packages should be placed in the following locations.
 
@@ -381,9 +361,9 @@ CS\include\cssys\win32\png.h
 CS\include\cssys\win32\pngconf.h
 CS\include\cssys\win32\zconf.h
 CS\include\cssys\win32\zlib.h
-CS\libs\cssys\win32\lib\zlib.lib
-CS\libs\cssys\win32\lib\png.lib
-CS\libs\cssys\win32\lib\libjpeg.lib
+CS\libs\cssys\win32\libs\zlib.lib
+CS\libs\cssys\win32\libs\png.lib
+CS\libs\cssys\win32\libs\libjpeg.lib
 @end example
 
 Note that the source code package generally already contains the files from the
