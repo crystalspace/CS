@@ -231,8 +231,8 @@ void *Class::QueryInterface (uint32 iInterfaceID, int iVersion)		\
  * This is a common macro used in all IMPLEMENTS_XXX_INTERFACE macros
  */
 #define IMPLEMENTS_INTERFACE_COMMON(Interface,Object)			\
-  static uint32 scfID_##Interface = 0;					\
-  if (scfID_##Interface == 0)						\
+  static uint32 scfID_##Interface = (uint32)-1;				\
+  if (scfID_##Interface == (uint32)-1)					\
     scfID_##Interface = iSCF::SCF->GetInterfaceID (#Interface);		\
   if (iInterfaceID == scfID_##Interface &&				\
     scfCompatibleVersion (iVersion, VERSION_##Interface))		\
