@@ -110,10 +110,6 @@ protected:
   csVector2* texels;
   csColor* colors;
 
-  /// Setup the buffers for the particles.
-  void SetupBuffers (int part_sides);
-  int part_sides;	// Number of vertices per particle (for buffers).
-
   csRef<iRenderBuffer> vertex_buffer;
   csRef<iRenderBuffer> texel_buffer;
   csRef<iRenderBuffer> normal_buffer;
@@ -122,6 +118,10 @@ protected:
 
   csRef<iGraphics3D> g3d;
 #endif
+
+  /// Setup the buffers for the particles.
+  void SetupBuffers (int part_sides);
+  int part_sides;	// Number of vertices per particle (for buffers).
 
   bool initialized;
   /// Setup this object.

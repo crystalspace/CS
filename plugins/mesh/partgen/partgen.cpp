@@ -131,9 +131,9 @@ void csParticleSystem::SetupObject ()
 #endif
 }
 
-#ifdef CS_USE_NEW_RENDERER
 void csParticleSystem::SetupBuffers (int part_sides)
 {
+#ifdef CS_USE_NEW_RENDERER
   if (csParticleSystem::part_sides == part_sides) return;
   csParticleSystem::part_sides = part_sides;
 
@@ -200,8 +200,8 @@ void csParticleSystem::SetupBuffers (int part_sides)
   sv->SetValue (color_buffer);
   sv = svcontext->GetVariableAdd (index_name);
   sv->SetValue (index_buffer);
-}
 #endif
+}
 
 void csParticleSystem::RemoveParticles ()
 {
@@ -364,6 +364,7 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
 						  iMovable* movable,
 						  uint32 frustum_mask)
 {
+#ifdef CS_USE_NEW_RENDERER
   if (!DrawTest (rview, movable, frustum_mask))
   {
     n = 0;
@@ -436,6 +437,10 @@ csRenderMesh** csParticleSystem::GetRenderMeshes (int& n, iRenderView* rview,
  
   n = 1;
   return &rm;
+#else
+  n = 0;
+  return 0;
+#endif
 }
 
 bool csParticleSystem::Draw (iRenderView* rview, iMovable* movable,
