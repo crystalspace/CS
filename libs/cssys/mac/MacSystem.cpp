@@ -32,6 +32,7 @@
 #include <ToolUtils.h>
 #include <Windows.h>
 #include <InputSprocket.h>
+#include <Gestalt.h>
 #include <SIOUX.h>
 #include "cssysdef.h"
 #include "cstypes.h"
@@ -320,8 +321,10 @@ bool SysSystemDriver::Initialize (int argc, const char* const argv[], const char
     Handle          theMenuBar;
     MenuHandle      theMenu;
     Str255          theText;
+	long			response;
+	OSErr			theError;
 
-// WHM CW6 fix, remove the (char ***) for CW4
+	// WHM CW6 fix, remove the (char ***) for CW4
     argc = GetCommandLine( (char***) &argv );
     if ( ! csSystemDriver::Initialize ( argc, argv, iConfigName ))
         return false;
@@ -331,6 +334,7 @@ bool SysSystemDriver::Initialize (int argc, const char* const argv[], const char
      */
 
     theMenuBar = GetNewMBar( kMenuBarID );
+
     if ( theMenuBar ) {
         SetMenuBar( theMenuBar );
 
@@ -338,14 +342,28 @@ bool SysSystemDriver::Initialize (int argc, const char* const argv[], const char
          *  Add the items in the apple menu
          */
         theMenu = GetMenuHandle( kAppleMenuID );
+#if !TARGET_API_MAC_CARBON && !TARGET_API_MAC_OSX
         if ( theMenu ) {
             AppendResMenu( theMenu, 'DRVR' );
         }
+#endif
         strcpy( (char *)&theText[1], "About " );
         strcat(  (char *)&theText[1], (char *)&mAppName[1] );
         strcat(  (char *)&theText[1], "É" );
         theText[0] = strlen( (char *)&theText[1] );
         SetMenuItemText( theMenu, 1, theText );
+
+		/*
+		 *	On OSX, remove the quit and separator from the file menu.
+		 */
+		theError = Gestalt( gestaltSystemVersion, &response );
+		if ( (theError == noErr) && (response >= 0x00000A00) ) {
+	        theMenu = GetMenuHandle( kFileMenuID );
+	        if ( theMenu ) {
+	            DeleteMenuItem( theMenu, CountMenuItems( theMenu ) );
+	            DeleteMenuItem( theMenu, CountMenuItems( theMenu ) );
+	        }
+		}
 
         /*
          *  Disable the edit menu
