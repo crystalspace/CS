@@ -12,6 +12,29 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+21-Mar-2000
+	- Norman Kramer added lines to draw 3D part of console if available.
+	  (and made the console window smaller to enjoy the funky console
+	  a bit more :)
+	- Norman reincluded a method to determine the most recent clipping
+	  result. Andrew removed this in his latest batch of changes
+	  to the clipper.
+	- Norman temporarely disabled optimzed HW_UVZ support because it
+	  doesn't work any more after his last cvs update :(
+	- Norman also made the various imageloader objects global relative
+	  to the library. This way plugins can link the gfxlibrary and use
+	  the csImageLoader class. Before this they could link the lib and
+	  use it, but if the main prog they were loaded into had link this
+	  lib too, the program segfaulted at exit. (the static imageloaders
+	  objects were registered a few times and then the destructor was
+	  invoked on the same object more than once).
+	- Norman added a funky console plugin. It decorates the console
+	  with custom borders and background. Run cctest for example and
+	  replace in file cctest.cfg stdout plugin with xstdout (make
+	  sure you run scfreg before).
+	- Fixed a timing bug in WalkTest which caused movement to be
+	  very sluggish if you have very high framerates (> 100 FPS).
+	  This bug was introduced about 10 days ago.
 20-Mar-2000
 	- Michael Dale Long did a few changes to CrystalClear:
 	    - Major update to ccActor.  Sprite code should be fully

@@ -868,99 +868,98 @@ void DoGravity (csVector3& pos, csVector3& vel)
   int k;
   for ( k = 0; k < num_sectors ; k++)
   {
-	if (n[k]->terrains.Length () > 0)
-	{
-	  int i;
-	  for (i = 0 ; i < n[k]->terrains.Length () ; i++)
-		{
-		  csTerrain* terrain = (csTerrain*)n[k]->terrains[i];
-		  hits += terrain->CollisionDetect (&test);
-		}
-	}
+    if (n[k]->terrains.Length () > 0)
+    {
+      int i;
+      for (i = 0 ; i < n[k]->terrains.Length () ; i++)
+      {
+	csTerrain* terrain = (csTerrain*)n[k]->terrains[i];
+	hits += terrain->CollisionDetect (&test);
+      }
+    }
     if (hits)
-	{
-	  new_pos = test.GetOrigin ();
-	}
+    {
+      new_pos = test.GetOrigin ();
+    }
   }
   if (hits == 0)
   {
-	  csRAPIDCollider::CollideReset ();
+    csRAPIDCollider::CollideReset ();
 
-	  for ( ; num_sectors-- ; )
-		hits += CollisionDetect (Sys->body, n[num_sectors], &test);
+    for ( ; num_sectors-- ; )
+      hits += CollisionDetect (Sys->body, n[num_sectors], &test);
 
-	  for (int j=0 ; j<hits ; j++)
-	  {
+    for (int j=0 ; j<hits ; j++)
+    {
       csCdTriangle *wall = our_cd_contact[j].tr2;
       csVector3 n = ((wall->p3-wall->p2)%(wall->p2-wall->p1)).Unit();
       if (n*vel<0)
         continue;
       vel = -(vel%n)%n;
-	  }
+    }
 
-	  // We now know our (possible) velocity. Let's try to move up or down, if possible
-	  new_pos = pos+vel;
-	  test = csOrthoTransform (csMatrix3(), new_pos);
+    // We now know our (possible) velocity. Let's try to move up or down, if possible
+    new_pos = pos+vel;
+    test = csOrthoTransform (csMatrix3(), new_pos);
 
-	  num_sectors = FindSectors (new_pos, 4*Sys->legs->GetRadius(), 
-								 Sys->view->GetCamera()->GetSector(), n);
+    num_sectors = FindSectors (new_pos, 4*Sys->legs->GetRadius(), 
+		Sys->view->GetCamera()->GetSector(), n);
 
-	  num_our_cd = 0;
-	  csRAPIDCollider::SetFirstHit (false);
-	  csRAPIDCollider::numHits = 0;
-	  int hit = 0;
+    num_our_cd = 0;
+    csRAPIDCollider::SetFirstHit (false);
+    csRAPIDCollider::numHits = 0;
+    int hit = 0;
 
-	  csRAPIDCollider::CollideReset ();
+    csRAPIDCollider::CollideReset ();
 
-	  for ( ; num_sectors-- ; )
+    for ( ; num_sectors-- ; )
       hit += CollisionDetect (Sys->legs, n[num_sectors], &test);
     
-	  if (!hit)
-	  {
-		Sys->on_ground = false;
-		if (Sys->do_gravity && !Sys->move_3d)
-		  vel.y -= 0.004;
-	  }
-	  else
-	  {
+    if (!hit)
+    {
+      Sys->on_ground = false;
+      if (Sys->do_gravity && !Sys->move_3d)
+	vel.y -= 0.004;
+    }
+    else
+    {
       float max_y=-1e10;
       
-		for (int j=0 ; j<hit ; j++)
-		{
-		  csCdTriangle first  = *our_cd_contact[j].tr1;
-		  csCdTriangle second = *our_cd_contact[j].tr2;
+      for (int j=0 ; j<hit ; j++)
+      {
+	csCdTriangle first  = *our_cd_contact[j].tr1;
+	csCdTriangle second = *our_cd_contact[j].tr2;
 
-		  csVector3 n=((second.p3-second.p2)%(second.p2-second.p1)).Unit ();
+	csVector3 n=((second.p3-second.p2)%(second.p2-second.p1)).Unit ();
 
-		  if (n*csVector3(0,-1,0)<0.7)
-			continue;
+	if (n*csVector3(0,-1,0)<0.7) continue;
 
-		  csVector3 line[2];
+	csVector3 line[2];
 
-		  first.p1 += new_pos;
-		  first.p2 += new_pos;
-		  first.p3 += new_pos;
+	first.p1 += new_pos;
+	first.p2 += new_pos;
+	first.p3 += new_pos;
 
-		  if (FindIntersection (&first,&second,line))
-		  {
-			if (line[0].y>max_y)
-			  max_y=line[0].y;
-			if (line[1].y>max_y)
-			  max_y=line[1].y;
-		  }
-		}
+	if (FindIntersection (&first,&second,line))
+	{
+	  if (line[0].y>max_y)
+	    max_y=line[0].y;
+	  if (line[1].y>max_y)
+	    max_y=line[1].y;
+	}
+      }
 
-		float p = new_pos.y-max_y+OYL+0.01;
-		if (fabs(p)<DYL-0.01)
-		{
-		  if (max_y != -1e10)
-			new_pos.y = max_y-OYL-0.01;
+      float p = new_pos.y-max_y+OYL+0.01;
+      if (fabs(p)<DYL-0.01)
+      {
+	if (max_y != -1e10)
+	  new_pos.y = max_y-OYL-0.01;
 
-		  if (vel.y<0)
-			vel.y = 0;
-		}
-		Sys->on_ground = true;
-	  }
+	if (vel.y<0)
+	  vel.y = 0;
+      }
+      Sys->on_ground = true;
+    }
   }
   new_pos -= Sys->view->GetCamera ()->GetOrigin ();
   if (Sys->world->sectors.Length()==1)
@@ -997,7 +996,7 @@ void WalkTest::PrepareFrame (time_t elapsed_time, time_t current_time)
       player_spawned=true;
     }
 
-    for (int repeats = (elapsed_time + 12) / 25; repeats; repeats--)
+    for (int repeats = 0 ; repeats < (elapsed_time/25.0 + 0.5); repeats++)
     {
       if (move_3d)
       {
