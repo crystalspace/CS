@@ -59,6 +59,7 @@ int csSoundBufferDS3D::CreateSoundBuffer(ISoundRender * render, csSoundData * so
   renderDS3D = (csSoundRenderDS3D *)render;
 
   m_p3DAudioRenderer = renderDS3D->m_p3DAudioRenderer;
+  fFrequencyOrigin = sound->getFrequency();
   
   if (!m_p3DAudioRenderer)
     return(E_FAIL);
@@ -66,7 +67,7 @@ int csSoundBufferDS3D::CreateSoundBuffer(ISoundRender * render, csSoundData * so
   ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
   dsbd.dwSize = sizeof(DSBUFFERDESC);
   
-  dsbd.dwFlags = DSBCAPS_STATIC | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLPAN  | DSBCAPS_CTRL3D;
+  dsbd.dwFlags = DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLPAN  | DSBCAPS_CTRL3D;  
   
   WAVEFORMATEX    wfxFormat;
   wfxFormat.wFormatTag                    = WAVE_FORMAT_PCM;
@@ -165,10 +166,37 @@ STDMETHODIMP csSoundBufferDS3D::Play(SoundBufferPlayMethod playMethod)
 {
   if (m_pDS3DBuffer2D)
   {
-    if (playMethod == SoundBufferPlay_InLoop)
-      m_pDS3DBuffer2D->Play(0, 0, DSBPLAY_LOOPING);
-    else
+    switch(playMethod)
+    {
+    case SoundBufferPlay_Normal:
+      m_pDS3DBuffer2D->Stop();
       m_pDS3DBuffer2D->Play(0, 0, 0);
+      break;
+
+    case SoundBufferPlay_InLoop:
+      m_pDS3DBuffer2D->Stop();
+      m_pDS3DBuffer2D->Play(0, 0, DSBPLAY_LOOPING);
+      break;
+
+    case SoundBufferPlay_RestartInLoop:
+      m_pDS3DBuffer2D->Stop();
+      m_pDS3DBuffer2D->SetCurrentPosition(0);
+      m_pDS3DBuffer2D->Play(0, 0, DSBPLAY_LOOPING);
+      break;
+
+    case SoundBufferPlay_Restart:
+      m_pDS3DBuffer2D->Stop();
+      m_pDS3DBuffer2D->SetCurrentPosition(0);
+      m_pDS3DBuffer2D->Play(0, 0, 0);
+      break;
+    
+    case SoundBufferPlay_DestroyAtEnd:
+      break;
+
+    default:
+      return S_FALSE;
+      break;
+    }
   }
 
   return S_OK;
@@ -181,3 +209,58 @@ STDMETHODIMP csSoundBufferDS3D::Stop()
 
   return S_OK;
 }
+
+STDMETHODIMP csSoundBufferDS3D::SetVolume(float vol)
+{
+  fVolume = vol;
+
+  if (m_pDS3DBuffer2D)
+  {
+    long dsvol = DSBVOLUME_MIN + (DSBVOLUME_MAX-DSBVOLUME_MIN)*vol;
+    m_pDS3DBuffer2D->SetVolume(dsvol);
+  }
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundBufferDS3D::GetVolume(float &vol)
+{  
+  vol = fVolume;
+
+  if (m_pDS3DBuffer2D)
+  {
+    long dsvol=DSBVOLUME_MIN;
+    m_pDS3DBuffer2D->GetVolume(&dsvol);
+    vol = (float)(dsvol-DSBVOLUME_MIN)/(float)(DSBVOLUME_MAX-DSBVOLUME_MIN);
+  }
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundBufferDS3D::SetFrequencyFactor(float factor)
+{
+  fFrequencyFactor = factor;
+
+  if (m_pDS3DBuffer2D)
+  {
+    unsigned long dsfreq = fFrequencyOrigin*factor;
+    m_pDS3DBuffer2D->SetFrequency(dsfreq);
+  }
+
+  return S_OK;
+}
+
+STDMETHODIMP csSoundBufferDS3D::GetFrequencyFactor(float &factor)
+{
+  factor = fFrequencyFactor;
+
+  if (m_pDS3DBuffer2D)
+  {
+    unsigned long dsfreq;
+    m_pDS3DBuffer2D->GetFrequency(&dsfreq);
+    factor = (float)(dsfreq)/fFrequencyOrigin;
+  }
+  
+  return S_OK;
+}
+

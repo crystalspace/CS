@@ -76,6 +76,7 @@ STDMETHODIMP csSoundRenderDS3D::CreateSource(ISoundSource** ppv, csSoundData *sn
   }
   
   pNew->CreateSoundBuffer(this, snd);
+  pNew->SetVolume (1.0);
   
   return pNew->CreateSource(ppv);
 }
@@ -90,6 +91,7 @@ STDMETHODIMP csSoundRenderDS3D::CreateSoundBuffer(ISoundBuffer** ppv, csSoundDat
   }
 
   pNew->CreateSoundBuffer(this, snd);
+  pNew->SetVolume (1.0);
   
   return pNew->QueryInterface (IID_ISoundBuffer, (void**)ppv);
 }
@@ -116,7 +118,6 @@ STDMETHODIMP csSoundRenderDS3D::Open()
     Close();
     return(hr);
   }
-  
   
   DWORD dwLevel = DSSCL_NORMAL;
   if (FAILED(hr = m_p3DAudioRenderer->SetCooperativeLevel(GetForegroundWindow(), dwLevel)))
