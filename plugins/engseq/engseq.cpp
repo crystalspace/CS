@@ -1161,7 +1161,6 @@ void csSequenceWrapper::OverrideTimings(OpStandard *afterop,int ticks)
 {
   csSequenceOp *curr;
   int time_diff=0;
-  csTicks last_time;
 
   for (curr = sequence->GetFirstSequence(); curr; curr = curr->next)
   {
