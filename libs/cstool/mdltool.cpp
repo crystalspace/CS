@@ -718,6 +718,7 @@ void csModelDataTools::SplitObjectsByMaterial (iModelData *Scene)
       typestring = #t;
 
 #define CS_MDLTOOL_TRY_END					\
+      Object->DecRef ();					\
     }								\
   }
 
@@ -799,7 +800,8 @@ void csModelDataTools::Describe (iObject *obj, csString &out)
   Indention [Indent] = 0;
 
   csString s;
-  s << Indention << "object '" << obj->GetName () << "' [" << typestring << "] (\n";
+  s << Indention << "object '" << obj->GetName () << "' [" << typestring <<
+    "] [" << obj->GetRefCount () << "] (\n";
   s << contents;
   s << Indention << ") \n";
   out << s;

@@ -51,17 +51,17 @@ public:
     if (Position < 0)
       return false;
 
-      Position++;
-      if (Position == Object->Children->Length ())
-      {
-        Position = -1;
-        return false;
-      }
-      return true;
+    Position++;
+    if (Position == Object->Children->Length ())
+    {
+      Position = -1;
+      return false;
+    }
+    return true;
   }
   virtual void Reset()
   {
-    if (Object->Children == NULL)
+    if (Object->Children == NULL || Object->Children->Length () < 1)
       Position = -1;
     else
       Position = 0;
@@ -179,6 +179,7 @@ void csObject::ObjRemove (iObject *obj)
   if (n>=0)
   {
     obj->SetObjectParent (NULL);
+    /* @@@ why GetRefCount() ? */
     Children->Delete (n, (bool)obj->GetRefCount());
   }
 }
@@ -192,7 +193,7 @@ void csObject::ObjReleaseOld (iObject *obj)
   if (n>=0)
   {
     obj->SetObjectParent (NULL);
-    Children->Delete (n, (bool)obj->GetRefCount());
+    Children->Delete (n, false);
   }
 }
 
@@ -205,6 +206,7 @@ void csObject::ObjRemoveAll ()
   {
     iObject* child = Children->Get (i);
     child->SetObjectParent (NULL);
+    /* @@@ why GetRefCount() ? */
     Children->Delete (i, (bool)child->GetRefCount ());
   }
 }

@@ -27,6 +27,8 @@
 #include "imesh/mdlconv.h"
 #include "imesh/mdldata.h"
 
+#define MY_CLASSNAME	"crystalspace.modelconverter.multiplexer"
+
 CS_DECLARE_TYPED_VECTOR_NODELETE (csModelConverterVector, iModelConverter);
 CS_DECLARE_TYPED_VECTOR_NODELETE (csStringVector, csString);
 
@@ -70,7 +72,7 @@ SCF_IMPLEMENT_FACTORY (csModelConverterMultiplexer);
 
 SCF_EXPORT_CLASS_TABLE (ieplex)
   SCF_EXPORT_CLASS (csModelConverterMultiplexer,
-    "crystalspace.modelconverter.multiplexer",
+    MY_CLASSNAME,
     "Multiplexer for Model Converters")
 SCF_EXPORT_CLASS_TABLE_END
 
@@ -109,6 +111,8 @@ bool csModelConverterMultiplexer::Initialize (iObjectRegistry *object_reg)
   for (i = 0; i < nmatches; i++)
   {
     char const* classname = classlist->Get(i);
+    if (!strcasecmp (classname, MY_CLASSNAME)) continue;
+
     iModelConverter *ldr = CS_LOAD_PLUGIN (plugin_mgr, classname, 0, iModelConverter);
     if (ldr)
       Converters.Push(ldr);

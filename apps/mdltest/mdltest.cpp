@@ -508,7 +508,7 @@ int main (int argc, char* argv[])
   System->RequestPlugin ("crystalspace.engine.3d:Engine");
   System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
   System->RequestPlugin ("crystalspace.mesh.crossbuilder:CrossBuilder");
-  System->RequestPlugin ("crystalspace.modelconverter.3ds:Converter");
+  System->RequestPlugin ("crystalspace.modelconverter.multiplexer:Converter");
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
