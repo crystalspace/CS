@@ -1,6 +1,6 @@
 SubDir TOP scripts max ;
 
-InstallData [ Wildcard *.mcr *.mnu *.ms README ] : conversion max ;
+InstallData [ Wildcard *.mcr *.mnu *.ms *.txt ] README : conversion max ;
 InstallData [ Wildcard exporterguide : *.htm *.html ] :
   conversion max exporterguide ;
 InstallData [ Wildcard exporterguide pictures : *.jpg *.gif ] :
