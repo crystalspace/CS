@@ -475,7 +475,8 @@ class CSMutableArrayHelper:
 extern "C" {
 #endif
 
-SWIGRUNTIME(PyObject*) csWrapTypedObject(void* objectptr, const char *typetag,
+// Not `static' because it is published for use by other clients in same DLL.
+PyObject* csWrapTypedObject(void* objectptr, const char *typetag,
   int own)
 {
   swig_type_info *ti = SWIG_TypeQuery (typetag);

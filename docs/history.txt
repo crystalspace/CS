@@ -6,6 +6,14 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Mar-2005
+	- Eric Sunshine removed invocation of SWIGEXTERN() from definition of
+	  csWrapTypedObject() in pythpost.i since the meaning of SWIGEXTERN
+	  changed in Swig 1.3.24. Moreover, its use in earlier versions was
+	  superfluous since it attempted to export the symbol from the DLL, but
+	  the function is used only by other compilation units in the same
+	  DLL. Swig 1.3.24 issue reported by Michael D. Adams
+	  <mdmkolbe@gmail.com>.
 5-Mar-2005
 	- res added some terrain-related interfaces to cspace.i.
 	- res made more -ansi -pedantic compile fixes on Win32. 
