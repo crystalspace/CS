@@ -118,7 +118,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (FILE)
   CS_TOKEN_DEF (PARAMS)
   CS_TOKEN_DEF (MOVE)
-  CS_TOKEN_DEF (CLASS)
   CS_TOKEN_DEF (MESHOBJ)
   CS_TOKEN_DEF (ZFILL)
   CS_TOKEN_DEF (ZNONE)
@@ -912,7 +911,6 @@ bool csIsoLoader::ParseMeshFactory(char *buf, const char *prefix)
 {
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (FILE)
-    CS_TOKEN_TABLE (CLASS)
     CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (PARAMS)
     CS_TOKEN_TABLE (PLUGIN)
@@ -954,7 +952,7 @@ bool csIsoLoader::ParseMeshFactory(char *buf, const char *prefix)
         {
           if (!mfw)
           {
-            ReportError(tag,"Define CLASS & PLUGIN before PARAMS in %s.",
+            ReportError(tag,"Define PLUGIN before PARAMS in %s.",
               prefix);
             return false;
           }
