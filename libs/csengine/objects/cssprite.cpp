@@ -156,21 +156,21 @@ void csSpriteTemplate::AddVertices (int num)
     CHK (csVector3* new_normals = new csVector3 [num_normals + num]);
     for (vertex = 0; vertex < num_normals; vertex++)
       new_normals[vertex] = ((csVector3*)normals[frame])[vertex];
-    CHK (delete[] normals[frame]);
+    CHK (delete[] (csVector3*)normals[frame]);
     normals[frame] = new_normals;
     fr->SetNormals (new_normals);
 
     CHK (csVector2* new_texels = new csVector2 [num_texels + num]);
     for (vertex = 0; vertex < num_texels; vertex++)
       new_texels[vertex] = ((csVector2*)texels[frame])[vertex];
-    CHK (delete[] texels[frame]);
+    CHK (delete[] (csVector2*)texels[frame]);
     texels[frame] = new_texels;
     fr->SetTexels (new_texels);
 
     CHK (csVector3* new_vertices = new csVector3 [num_vertices + num]);
     for (vertex = 0; vertex < num_vertices; vertex++)
       new_vertices[vertex] = ((csVector3*)vertices[frame])[vertex];
-    CHK (delete[] vertices[frame]);
+    CHK (delete[] (csVector3*)vertices[frame]);
     vertices[frame] = new_vertices;
     fr->SetVertices (new_vertices);
   }
@@ -258,7 +258,7 @@ void csSpriteTemplate::GenerateLOD ()
     CHK (csVector2* new_texels = new csVector2 [num_texels]);
     for (int j = 0 ; j < num_texels ; j++)
       new_texels[translate[j]] = ((csVector2*)texels[i])[j];
-    CHK (delete [] texels[i]);
+    CHK (delete [] (csVector2*)texels[i]);
     texels[i] = new_texels;
   }
   if (skeleton) skeleton->RemapVertices (translate);
@@ -299,12 +299,9 @@ void csSpriteTemplate::ComputeBoundingBox ()
 csFrame* csSpriteTemplate::AddFrame ()
 {
   CHK (csFrame* fr = new csFrame ());
-  csVector3* nr = NULL;
-  csVector2* tx = NULL;
-  csVector3* vr = NULL;
-  CHK (nr = new csVector3 [num_normals ? num_normals : 1]);
-  CHK (tx = new csVector2 [num_texels ? num_texels : 1]);
-  CHK (vr = new csVector3 [num_vertices ? num_vertices : 1]);
+  CHK (csVector3* nr = new csVector3 [num_normals ? num_normals : 1]);
+  CHK (csVector2* tx = new csVector2 [num_texels ? num_texels : 1]);
+  CHK (csVector3* vr = new csVector3 [num_vertices ? num_vertices : 1]);
 
   frames.Push (fr);
   normals.Push (nr);
