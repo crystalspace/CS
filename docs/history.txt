@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+20-Jun-2003
+	- Marten fixed an error in the inline assembly in tcovbuf.cpp 
+	  which prevented it from compiling on msvc6
 19-Jun-2003
 	- Oktal made the following changes to the Perl plugin and module:
 	    - Got rid of all the warnings in the Perl plugin and module,

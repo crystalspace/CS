@@ -253,6 +253,7 @@ void csCoverageTile::Flush (csBits64& fvalue, float maxdepth)
         csBits64 allOnes; allOnes.Full ();
         csBits64 temp;
 #ifdef COMP_VC
+        int i = (int) &this->tile_full;
         __asm
         {
           // save state
@@ -299,7 +300,7 @@ fillCol:
 
           mov eax, [fvalue]
           movq [eax], mm1
-          //mov eax, [this+tile_full] //@@@ illegal
+          mov eax, [i] 
           mov [eax], dl
 
           // restore state
@@ -399,6 +400,7 @@ fillCol:
         csBits64 allOnes; allOnes.Full ();
         csBits64 temp;
     #ifdef COMP_VC
+        int i = (int) &this->tile_full;
         __asm
         {
           // save state
@@ -447,7 +449,7 @@ fillCol2:
 
           mov eax, [fvalue]
           movq [eax], mm1
-          //mov eax, [this+tile_full] //@@@ illegal
+          mov eax, i
           mov [eax], dl
 
           // restore state
