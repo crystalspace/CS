@@ -333,6 +333,8 @@ bool awsMenuEntry::OnMouseExit()
 awsMenuEntryFactory::awsMenuEntryFactory(iAws* wmgr) : awsComponentFactory(wmgr)
 {
   Register("Menu Entry");
+  RegisterConstant ("signalClicked", awsMenuEntry::signalClicked);
+  RegisterConstant ("signalSelected", awsMenuEntry::signalSelected);
 }
 
 awsMenuEntryFactory::~awsMenuEntryFactory()

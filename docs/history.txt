@@ -6,6 +6,9 @@ The history order is reversed so that new features are at the top.
 	- Fixed a crash at exit bug in cswstest.
 	- Fixed XML parsing of <forward> and <farplane> in
 	  <start> sectrion.
+	- Andrew Craig reported a bug in the AWS menu factory.
+	  The constants 'signalClicked' and 'signalSelected' were not
+	  registered.
 11-Sep-2002
 	- Further csPtr/csRef cleanups by removing the cast operator.
 	- Added a new STRICT_SMART_POINTERS flag in mk/user.mak. If this
