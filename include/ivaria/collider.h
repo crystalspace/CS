@@ -107,8 +107,12 @@ struct iCollideSystem : public iBase
    * Test if an object can move to a new position. The new position
    * vector will be modified to reflect the maximum new position that the
    * object could move to without colliding with something. This function
-   * will return true if the object could not move to the desired position
-   * and false if the object could move unhindered along the path.
+   * will return:
+   * <ul>
+   * <li>-1 if the object could not move at all (i.e. stuck at start position).
+   * <li>0 if the object could not move fully to the desired position.
+   * <li>1 if the object can move unhindered to the end position.
+   * </ul>
    * <p>
    * This function will reset the collision pair array. If there was a
    * collision along the way the array will contain the information for
@@ -119,7 +123,7 @@ struct iCollideSystem : public iBase
    * with 'num_colliders' elements for all the objects that we should
    * test against.
    */
-  virtual bool CollidePath (
+  virtual int CollidePath (
   	iCollider* collider, const csReversibleTransform* trans,
 	csVector3& newpos,
 	int num_colliders,

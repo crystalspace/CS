@@ -65,7 +65,6 @@
 
 #include "csgeom/vector3.h"
 #include "csgeom/matrix3.h"
-#include "ivaria/polymesh.h"
 
 /// A triangle, to be used in collision detection
 struct csCdTriangle
@@ -303,33 +302,5 @@ public:
     for (int i = 0; i < n; i++)
       moment (Moment::stack [t[i]]);
   }
-};
-
-/**
- * This is a class implementing iPolygonMesh which is used to
- * test collision detection along a path for a moving object. It
- * is made by taking the vertices of the bounding box and making
- * several triangles connected to the vertices of the same bounding
- * box at the new position.
- */
-class PathPolygonMesh : public iPolygonMesh
-{
-public:
-  csVector3 vertices[16];	// 2 times 8 vertices (for two bbox'es).
-
-  // 8 polygons for making rays between the two bounding boxes.
-  // 12 polygons for the source bbox and 12 polygons for the destination bbox.
-  csMeshedPolygon polygons[8+12+12];
-
-  PathPolygonMesh ();
-  virtual ~PathPolygonMesh ();
-
-  SCF_DECLARE_IBASE;
-
-  virtual int GetVertexCount () { return 16; }
-  virtual csVector3* GetVertices () { return vertices; }
-  virtual int GetPolygonCount () { return 8+12+12; }
-  virtual csMeshedPolygon* GetPolygons () { return polygons; }
-  virtual void Cleanup () { }
 };
 

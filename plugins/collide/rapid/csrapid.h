@@ -30,9 +30,6 @@
 class csRapidCollideSystem : public iCollideSystem
 {
 public:
-  // Pointer to global mesh for calculating path collision detection.
-  PathPolygonMesh* path_mesh;
-
   SCF_DECLARE_IBASE;
 
   /// Create the plugin object
@@ -55,7 +52,7 @@ public:
     csRapidCollider::SetFirstHit (o);
   }
 
-  virtual bool CollidePath (
+  virtual int CollidePath (
   	iCollider* collider, const csReversibleTransform* trans,
 	csVector3& newpos,
 	int num_colliders,

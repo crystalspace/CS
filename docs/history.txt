@@ -17,6 +17,9 @@ The history order is reversed so that new features are at the top.
 	- Added a first implementation of CollidePath() for the RAPID
 	  plugin. This implementation is not very optimal yet and it is
 	  also untested.
+	- Since the implementation of CollidePath() in RAPID plugin was
+	  SO extremely slow I reimplemented it completely. It appears that
+	  generating colliders at real-time is not an option at all.
 30-Dec-2001
 	- Fixed iPolygonMesh implementation in csThing so that it will
 	  check if the parent array of object-space vertices is still

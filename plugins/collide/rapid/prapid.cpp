@@ -61,6 +61,8 @@
 \**************************************************************************/
 
 #include "cssysdef.h"
+#include "qsqrt.h"
+#include "qint.h"
 #include "csutil/garray.h"
 #include "csgeom/transfrm.h"
 #include "rapcol.h"
@@ -103,6 +105,11 @@ csRapidCollider::csRapidCollider (iPolygonMesh* mesh)
   GeometryInitialize (mesh);
 }
 
+inline float min3 (float a, float b, float c)
+{ return (a < b ? (a < c ? a : (c < b ? c : b)) : (b < c ? b : c)); }
+inline float max3(float a, float b, float c)
+{ return (a > b ? (a > c ? a : (c > b ? c : b)) : (b > c ? b : c)); }
+
 void csRapidCollider::GeometryInitialize (iPolygonMesh* mesh)
 {
   m_pCollisionModel = NULL;
@@ -121,6 +128,7 @@ void csRapidCollider::GeometryInitialize (iPolygonMesh* mesh)
     tri_count += p.num_vertices - 2;
   }
 
+  csBox3 object_bbox;
   object_bbox.StartBoundingBox ();
   if (tri_count)
   {
@@ -145,6 +153,12 @@ void csRapidCollider::GeometryInitialize (iPolygonMesh* mesh)
     }
     m_pCollisionModel->BuildHierarchy ();
   }
+
+  float dx = object_bbox.MaxX () - object_bbox.MinX ();
+  float dy = object_bbox.MaxY () - object_bbox.MinY ();
+  float dz = object_bbox.MaxZ () - object_bbox.MinZ ();
+  smallest_box_dim = min3 (dx, dy, dz);
+  if (smallest_box_dim < .1) smallest_box_dim = .1;
 }
 
 csRapidCollider::~csRapidCollider ()
@@ -257,102 +271,98 @@ bool csRapidCollider::CollideArray (
   return false;
 }
 
-bool csRapidCollider::CollidePath (
+int csRapidCollider::CollidePath (
   	const csReversibleTransform* trans,
 	csVector3& newpos,
 	int num_colliders,
 	iCollider** colliders,
-	csReversibleTransform** transforms,
-	PathPolygonMesh* path_mesh)
+	csReversibleTransform** transforms)
 {
-  csReversibleTransform newtrans = *trans;
-  newtrans.SetOrigin (newpos);
+  // At initialization time (GeometryInitialize()) we calculated
+  // the smallest dimension of the object space bounding box (either
+  // x, y, or z space). We are going to use half this size to slowly
+  // move the object along its path. By using half the size we can
+  // be fairly sure that we will not miss anything.
 
-  int i;
-  for (i = 0 ; i < 8 ; i++)
+  csReversibleTransform test = *trans;
+  csVector3 start = test.GetOrigin ();
+  csVector3 end = newpos;
+  csVector3 testpos;
+  float step = 1. / (smallest_box_dim/2.);
+  float curdist = 0;
+  bool rc = false;
+  bool firsthit = true;
+  for (;;)
   {
-    path_mesh->vertices[i] = trans->This2Other (object_bbox.GetCorner (i));
-    path_mesh->vertices[i+8] = newtrans.This2Other (object_bbox.GetCorner (i));
+    testpos = start+curdist * (end-start);
+    test.SetOrigin (testpos);
+    CollideReset ();
+    numHits = 0;
+    rc = CollideArray (&test, num_colliders, colliders, transforms);
+    if (rc) break;
+    firsthit = false;
+
+    if (curdist >= 1) break;
+    curdist += step;
+    if (curdist > 1) curdist = 1;
   }
 
-  CollideReset ();
-  numHits = 0;
-
-  // @@@ This can be done more efficiently by making a specialized
-  // version of csRapidCollider constructor that works faster for this
-  // special case.
-  csRapidCollider* path_col = new csRapidCollider (path_mesh);
-  bool was_cd = path_col->CollideArray (NULL, num_colliders,
-  	colliders, transforms);
-  path_col->DecRef ();
-
-  if (was_cd)
+  if (rc)
   {
-    // There was a collision along the way.
-    // Now we are going to do a binary search using the path_col
-    // to find out in which segment we have to search for collisions.
-    csReversibleTransform oldtrans = *trans;
-    csVector3 start = trans->GetOrigin ();
-    csVector3 end = newpos;
-    while (csSquaredDist::PointPoint (start, end) > .1)
+    // We had a collision.
+    if (firsthit)
     {
-      csVector3 cent = (start+end)/2;
-      oldtrans.SetOrigin (start);
-      newtrans.SetOrigin (cent);
-      for (i = 0 ; i < 8 ; i++)
+      // The collision happened on the start point. In that case
+      // we cannot move at all. Return -1.
+      return -1;
+    }
+
+    // Here we try to find more exactly where the collision occured by
+    // doing a binary search.
+    end = testpos;
+    while (csSquaredDist::PointPoint (start, end) > .05)
+    {
+      testpos = (start+end) / 2;
+      test.SetOrigin (testpos);
+      CollideReset ();
+      numHits = 0;
+      rc = CollideArray (&test, num_colliders, colliders, transforms);
+      if (rc)
       {
-        path_mesh->vertices[i] = oldtrans.This2Other (
-		object_bbox.GetCorner (i));
-        path_mesh->vertices[i+8] = newtrans.This2Other (
-		object_bbox.GetCorner (i));
-      }
-      path_col = new csRapidCollider (path_mesh);
-      was_cd = path_col->CollideArray (NULL, num_colliders,
-      	colliders, transforms);
-      path_col->DecRef ();
-      if (was_cd)
-      {
-        // There was a collision in the left segment.
-	end = cent;
+        // Use left segment.
+        end = testpos;
       }
       else
       {
-        // There was a collision in the right segment.
-	start = cent;
+        // Use right segment.
+	start = testpos;
       }
     }
+    // We know that the object can move to the 'start' position safely
+    // because of the way we handle the binary search and the starting
+    // condition that firsthit == false.
+    newpos = start;
 
-    // start-end is now the first segment that we can find where
-    // the path between start and end (made by the moving bounding
-    // boxes) collides with geometry.
-    // Here we set the position we can move to to 'start' but first
-    // we calculate the collision detection information at 'end'.
+    // But first we set the collision detection array to the position
+    // which resulted in collision.
+    test.SetOrigin (end);
     CollideReset ();
     numHits = 0;
-    newpos = start;
-    newtrans.SetOrigin (end);
-    // In theory it is still possible that this will not collide with anything.
-    // This can happen because the bounding box of an object is bigger
-    // than the object and we used the bounding box for the tests above.
-    was_cd = CollideArray (&newtrans, num_colliders, colliders, transforms);
+    CollideArray (&test, num_colliders, colliders, transforms);
+
+    return 0;
   }
   else
   {
-    // There was no collision so we can move the entire way.
+    // There was no collision.
+    return 1;
   }
-
-  return was_cd;
 }
 
 csCollisionPair *csRapidCollider::GetCollisions ()
 {
   return CD_contact.GetArray ();
 }
-
-inline float min3 (float a, float b, float c)
-{ return (a < b ? (a < c ? a : (c < b ? c : b)) : (b < c ? b : c)); }
-inline float max3(float a, float b, float c)
-{ return (a > b ? (a > c ? a : (c > b ? c : b)) : (b > c ? b : c)); }
 
 int project6 (csVector3 ax, csVector3 p1, csVector3 p2, csVector3 p3,
   csVector3 q1, csVector3 q2, csVector3 q3)
@@ -1032,133 +1042,5 @@ const csVector3 &csRapidCollider::GetRadius() const
 const csCdBBox* csRapidCollider::GetBbox(void) const 
 {
   return m_pCollisionModel->GetTopLevelBox();
-}
-
-//---------------------------------------------------------------------------
-
-SCF_IMPLEMENT_IBASE (PathPolygonMesh)
-  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
-SCF_IMPLEMENT_IBASE_END
-
-PathPolygonMesh::PathPolygonMesh ()
-{
-  SCF_CONSTRUCT_IBASE (NULL);
-  int i;
-  for (i = 0 ; i < 8+12+12 ; i++)
-  {
-    polygons[i].num_vertices = 3;
-    polygons[i].vertices = new int[3];
-  }
-  int j = 0;
-  // Connecting rays.
-  polygons[j].vertices[0]   = BOX_CORNER_xyz;
-  polygons[j].vertices[1]   = BOX_CORNER_Xyz;
-  polygons[j++].vertices[2] = BOX_CORNER_xyz+8;
-  polygons[j].vertices[0]   = BOX_CORNER_xyz;
-  polygons[j].vertices[1]   = BOX_CORNER_xYz;
-  polygons[j++].vertices[2] = BOX_CORNER_xyz+8;
-  polygons[j].vertices[0]   = BOX_CORNER_xyz;
-  polygons[j].vertices[1]   = BOX_CORNER_xyZ;
-  polygons[j++].vertices[2] = BOX_CORNER_xyz+8;
-  polygons[j].vertices[0]   = BOX_CORNER_XYZ;
-  polygons[j].vertices[1]   = BOX_CORNER_xYZ;
-  polygons[j++].vertices[2] = BOX_CORNER_XYZ+8;
-  polygons[j].vertices[0]   = BOX_CORNER_XYZ;
-  polygons[j].vertices[1]   = BOX_CORNER_XyZ;
-  polygons[j++].vertices[2] = BOX_CORNER_XYZ+8;
-  polygons[j].vertices[0]   = BOX_CORNER_XYZ;
-  polygons[j].vertices[1]   = BOX_CORNER_XYz;
-  polygons[j++].vertices[2] = BOX_CORNER_XYZ+8;
-  polygons[j].vertices[0]   = BOX_CORNER_XYz;
-  polygons[j].vertices[1]   = BOX_CORNER_XYZ;
-  polygons[j++].vertices[2] = BOX_CORNER_XYz+8;
-  polygons[j].vertices[0]   = BOX_CORNER_XYz;
-  polygons[j].vertices[1]   = BOX_CORNER_Xyz;
-  polygons[j++].vertices[2] = BOX_CORNER_XYz+8;
-
-  // Source bbox.
-  polygons[j].vertices[0]   = BOX_CORNER_xyz;
-  polygons[j].vertices[1]   = BOX_CORNER_xYz;
-  polygons[j++].vertices[2] = BOX_CORNER_Xyz;
-  polygons[j].vertices[0]   = BOX_CORNER_Xyz;
-  polygons[j].vertices[1]   = BOX_CORNER_xYz;
-  polygons[j++].vertices[2] = BOX_CORNER_XYz;
-  polygons[j].vertices[0]   = BOX_CORNER_Xyz;
-  polygons[j].vertices[1]   = BOX_CORNER_XyZ;
-  polygons[j++].vertices[2] = BOX_CORNER_XYz;
-  polygons[j].vertices[0]   = BOX_CORNER_XYz;
-  polygons[j].vertices[1]   = BOX_CORNER_XYZ;
-  polygons[j++].vertices[2] = BOX_CORNER_XyZ;
-  polygons[j].vertices[0]   = BOX_CORNER_xYz;
-  polygons[j].vertices[1]   = BOX_CORNER_XYz;
-  polygons[j++].vertices[2] = BOX_CORNER_xYZ;
-  polygons[j].vertices[0]   = BOX_CORNER_xYZ;
-  polygons[j].vertices[1]   = BOX_CORNER_XYZ;
-  polygons[j++].vertices[2] = BOX_CORNER_XYz;
-  polygons[j].vertices[0]   = BOX_CORNER_XYZ;
-  polygons[j].vertices[1]   = BOX_CORNER_xYZ;
-  polygons[j++].vertices[2] = BOX_CORNER_XyZ;
-  polygons[j].vertices[0]   = BOX_CORNER_XyZ;
-  polygons[j].vertices[1]   = BOX_CORNER_xYZ;
-  polygons[j++].vertices[2] = BOX_CORNER_xyZ;
-  polygons[j].vertices[0]   = BOX_CORNER_xYz;
-  polygons[j].vertices[1]   = BOX_CORNER_xYZ;
-  polygons[j++].vertices[2] = BOX_CORNER_xyZ;
-  polygons[j].vertices[0]   = BOX_CORNER_xYz;
-  polygons[j].vertices[1]   = BOX_CORNER_xyZ;
-  polygons[j++].vertices[2] = BOX_CORNER_xyz;
-  polygons[j].vertices[0]   = BOX_CORNER_xyz;
-  polygons[j].vertices[1]   = BOX_CORNER_xyZ;
-  polygons[j++].vertices[2] = BOX_CORNER_Xyz;
-  polygons[j].vertices[0]   = BOX_CORNER_Xyz;
-  polygons[j].vertices[1]   = BOX_CORNER_xyZ;
-  polygons[j++].vertices[2] = BOX_CORNER_XyZ;
-
-  // Dest bbox.
-  polygons[j].vertices[0]   = BOX_CORNER_xyz+8;
-  polygons[j].vertices[1]   = BOX_CORNER_xYz+8;
-  polygons[j++].vertices[2] = BOX_CORNER_Xyz+8;
-  polygons[j].vertices[0]   = BOX_CORNER_Xyz+8;
-  polygons[j].vertices[1]   = BOX_CORNER_xYz+8;
-  polygons[j++].vertices[2] = BOX_CORNER_XYz+8;
-  polygons[j].vertices[0]   = BOX_CORNER_Xyz+8;
-  polygons[j].vertices[1]   = BOX_CORNER_XyZ+8;
-  polygons[j++].vertices[2] = BOX_CORNER_XYz+8;
-  polygons[j].vertices[0]   = BOX_CORNER_XYz+8;
-  polygons[j].vertices[1]   = BOX_CORNER_XYZ+8;
-  polygons[j++].vertices[2] = BOX_CORNER_XyZ+8;
-  polygons[j].vertices[0]   = BOX_CORNER_xYz+8;
-  polygons[j].vertices[1]   = BOX_CORNER_XYz+8;
-  polygons[j++].vertices[2] = BOX_CORNER_xYZ+8;
-  polygons[j].vertices[0]   = BOX_CORNER_xYZ+8;
-  polygons[j].vertices[1]   = BOX_CORNER_XYZ+8;
-  polygons[j++].vertices[2] = BOX_CORNER_XYz+8;
-  polygons[j].vertices[0]   = BOX_CORNER_XYZ+8;
-  polygons[j].vertices[1]   = BOX_CORNER_xYZ+8;
-  polygons[j++].vertices[2] = BOX_CORNER_XyZ+8;
-  polygons[j].vertices[0]   = BOX_CORNER_XyZ+8;
-  polygons[j].vertices[1]   = BOX_CORNER_xYZ+8;
-  polygons[j++].vertices[2] = BOX_CORNER_xyZ+8;
-  polygons[j].vertices[0]   = BOX_CORNER_xYz+8;
-  polygons[j].vertices[1]   = BOX_CORNER_xYZ+8;
-  polygons[j++].vertices[2] = BOX_CORNER_xyZ+8;
-  polygons[j].vertices[0]   = BOX_CORNER_xYz+8;
-  polygons[j].vertices[1]   = BOX_CORNER_xyZ+8;
-  polygons[j++].vertices[2] = BOX_CORNER_xyz+8;
-  polygons[j].vertices[0]   = BOX_CORNER_xyz+8;
-  polygons[j].vertices[1]   = BOX_CORNER_xyZ+8;
-  polygons[j++].vertices[2] = BOX_CORNER_Xyz+8;
-  polygons[j].vertices[0]   = BOX_CORNER_Xyz+8;
-  polygons[j].vertices[1]   = BOX_CORNER_xyZ+8;
-  polygons[j++].vertices[2] = BOX_CORNER_XyZ+8;
-}
-
-PathPolygonMesh::~PathPolygonMesh ()
-{
-  int i;
-  for (i = 0 ; i < 8 ; i++)
-  {
-    delete[] polygons[i].vertices;
-  }
 }
 

@@ -20,7 +20,6 @@
 #include "csrapid.h"
 #include "rapcol.h"
 #include "ivaria/polymesh.h"
-#include "prapid.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -47,12 +46,10 @@ csRapidCollideSystem::csRapidCollideSystem (iBase *pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
-  path_mesh = new PathPolygonMesh ();
 }
 
 csRapidCollideSystem::~csRapidCollideSystem ()
 {
-  delete path_mesh;
 }
 
 iCollider* csRapidCollideSystem::CreateCollider (iPolygonMesh* mesh)
@@ -70,7 +67,7 @@ bool csRapidCollideSystem::Collide (
   return col1->Collide (*col2, trans1, trans2);
 }
 
-bool csRapidCollideSystem::CollidePath (
+int csRapidCollideSystem::CollidePath (
   	iCollider* collider, const csReversibleTransform* trans,
 	csVector3& newpos,
 	int num_colliders,
@@ -79,7 +76,7 @@ bool csRapidCollideSystem::CollidePath (
 {
   csRapidCollider* thiscol = (csRapidCollider*)collider;
   return thiscol->CollidePath (trans, newpos,
-	num_colliders, colliders, transforms, path_mesh);
+	num_colliders, colliders, transforms);
 }
 
 csCollisionPair* csRapidCollideSystem::GetCollisionPairs ()
