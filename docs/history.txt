@@ -6,6 +6,9 @@ The history order is reversed so that new features are at the top.
 	  but not for DrawPolygonMesh.
 	- Fixed a bad bug with curved surfaces and pseudo-dynamic lighting.
 	  This caused crashes.
+	- Work around to a division by zero bug that sometimes happens in emit.
+	  Don't know what causes this and I don't understand the emit code
+	  so I cannot give a real fix.
 31-Jan-2003
 	- Another small optimization in the super lightmap cache. This time
 	  avoid virtual function calls.

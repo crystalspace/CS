@@ -826,6 +826,9 @@ void csEmitMeshObject::Update (csTicks elapsed_time)
           float(aboveage->time - belowage->time);
         oldscale = between*belowage->scale + (1.-between)*aboveage->scale;
       }
+      // Jorrit: @@@ This fix is needed or we sometimes get a division by zero!
+      if (ABS (oldscale) < .0001) oldscale = 1;
+
       GetParticle(i)->ScaleBy(1./oldscale); // reset the scale
       /// restart the particle
       int afterstart = (ages[i] + elapsed_time) % timetolive;
