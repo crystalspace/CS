@@ -18,7 +18,7 @@
 //	are shared between MacOS/X Server, OpenStep, and NextStep.
 //
 //-----------------------------------------------------------------------------
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "NeXTSystemDriver.h"
 #include "NeXTDelegate.h"
 #include "NeXTMenu.h"

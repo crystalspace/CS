@@ -21,7 +21,7 @@
 #include <stdarg.h>
 #include <math.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csphyzik/mathutil.h"
 #include "csphyzik/math3d.h"
 

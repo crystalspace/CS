@@ -26,7 +26,7 @@
 	
 ----------------------------------------------------------------*/
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/scf.h"
 #include "cssys/system.h"
 #include "csutil/csrect.h"

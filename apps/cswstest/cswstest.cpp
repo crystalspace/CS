@@ -17,7 +17,7 @@
 */
 
 #define SYSDEF_PATH
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/system.h"
 #include "csws/csws.h"
 

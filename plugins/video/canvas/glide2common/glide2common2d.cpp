@@ -17,7 +17,7 @@
 */
 
 #include <stdarg.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "glide2common2d.h"
 #include "csutil/scf.h"
 #include "cssys/csevent.h"

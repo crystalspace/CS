@@ -20,7 +20,7 @@
 #ifndef __CSRECT_H__
 #define __CSRECT_H__
 
-#include "types.h"
+#include "cstypes.h"
 #include "csutil/csbase.h"
 
 /**

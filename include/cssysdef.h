@@ -17,14 +17,14 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifdef __SYSDEFS_H__
-#error Do not include sysdef.h from header files please!
+#ifdef __CS_CSSYSDEFS_H__
+#error Do not include cssysdef.h from header files please!
 #else
-#define __SYSDEFS_H__
+#define __CS_CSSYSDEFS_H__
 
-#define OK_TO_INCLUDE_DEFS_IM_A_FRIEND
-#include "def.h"
-#undef OK_TO_INCLUDE_DEFS_IM_A_FRIEND
+#define CSDEF_FRIEND
+#include "csdef.h"
+#undef CSDEF_FRIEND
 
 /*
     This include file should be included from every source file.
@@ -338,4 +338,4 @@
 // Fatal exit routine (which can be replaced if neccessary)
 extern void (*fatal_exit) (int errorcode, bool canreturn);
 
-#endif // __SYSDEFS_H__
+#endif // __CS_CSSYSDEFS_H__

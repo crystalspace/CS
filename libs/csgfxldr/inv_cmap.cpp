@@ -33,7 +33,7 @@
  *              Changed API, added auto-allocation for arrays etc.
  */
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csgfxldr/inv_cmap.h"
 
 static int bcenter, gcenter, rcenter;

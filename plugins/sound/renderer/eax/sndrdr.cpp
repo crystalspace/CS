@@ -24,7 +24,7 @@
 #include "dsound.h"
 #include "eax.h"
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/scf.h"
 #include "sndrdr.h"
 #include "sndlstn.h"

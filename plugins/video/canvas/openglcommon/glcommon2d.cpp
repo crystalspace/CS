@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/sysdriv.h"
 #include "video/canvas/openglcommon/glcommon2d.h"
 #include "video/canvas/common/scrshot.h"

@@ -22,7 +22,7 @@
 #include <unistd.h>
 #include <signal.h>
 #include <string.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/inifile.h"
 #include "cssys/unix/unix.h"
 #include "cssys/system.h"

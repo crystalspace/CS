@@ -21,7 +21,7 @@
 
 #include <stdio.h>
 #include "csutil/scf.h"
-#include "types.h"
+#include "cstypes.h"
 
 class csSoundData;
 

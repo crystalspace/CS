@@ -21,7 +21,7 @@
 
 #include "csutil/scf.h"
 #include "itexture.h"
-#include "types.h"
+#include "cstypes.h"
 #include "csutil/util.h"
 
 /** 

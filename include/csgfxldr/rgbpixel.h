@@ -53,7 +53,7 @@
 #define RGBPIXEL_H
 
 #include <stdio.h>
-#include "types.h"
+#include "cstypes.h"
 
 /**
  * An RGB color. This class is used whenever we need just R, G and B

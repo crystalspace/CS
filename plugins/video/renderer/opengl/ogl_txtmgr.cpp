@@ -19,7 +19,7 @@
 #include <stdarg.h>
 #include <math.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/sysdriv.h"
 #include "ogl_g3d.h"
 #include "ogl_txtmgr.h"

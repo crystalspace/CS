@@ -3,7 +3,7 @@
     create and return another object with same interface.
 */
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "iworm.h"
 #include <stdio.h>
 #include <string.h>

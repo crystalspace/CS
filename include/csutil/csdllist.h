@@ -19,7 +19,7 @@
 #ifndef __CS_CSDLLIST_H__
 #define __CS_CSDLLIST_H__
 
-#include "types.h"
+#include "cstypes.h"
 
 /**
  * This structure should not need to be accessed directly.

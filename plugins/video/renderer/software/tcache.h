@@ -19,7 +19,7 @@
 #ifndef __TCACHE_H__
 #define __TCACHE_H__
 
-#include "types.h"
+#include "cstypes.h"
 #include "csutil/scf.h"
 #include "csutil/bitset.h"
 #include "ipolygon.h"

@@ -20,7 +20,7 @@
 // Glide Helper Class
 // Written by xtrochu and Nathaniel
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "gllib.h"
 #include "cssys/system.h"
 #include "csutil/inifile.h"

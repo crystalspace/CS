@@ -19,7 +19,7 @@
 
 #include <limits.h>
 #include <stdarg.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csos2.h"
 #include "scancode.h"
 #include "csutil/inifile.h"

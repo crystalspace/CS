@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csgeom/polyaa.h"
 #include "csengine/radiosty.h"
 #include "csengine/world.h"
@@ -31,7 +31,7 @@
 #include "csengine/rview.h"
 #include "csgeom/math3d.h"
 #include "csgeom/vector3.h"
-#include "csgeom/frustrum.h"
+#include "csgeom/frustum.h"
 #include "iimage.h"
 #include "ilghtmap.h"
 #include "itexture.h"

@@ -21,7 +21,7 @@
 // bleh, bleh, I am articula; I don't drink.... wine.....
 
 #ifndef __NO_CRYSTALSPACE__
-#include "sysdef.h"
+#include "cssysdef.h"
 #endif
 #include "csphyzik/articula.h"
 #include "csphyzik/joint.h"

@@ -10,7 +10,7 @@
 */
 
 #include <stdio.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/scf.h"
 #include "csutil/inifile.h"
 

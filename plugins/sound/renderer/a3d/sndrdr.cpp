@@ -27,7 +27,7 @@
 #include "ia3dapi.h"
 #include "ia3dutil.h"
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/scf.h"
 #include "ia3dapi.h"
 #include "sndrdr.h"

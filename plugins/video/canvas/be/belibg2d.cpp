@@ -21,7 +21,7 @@
 
 #include <sys/param.h>
 #include <Screen.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/scf.h"
 #include "belibg2d.h"
 #include "CrystWindow.h"

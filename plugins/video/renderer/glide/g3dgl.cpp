@@ -20,7 +20,7 @@
 // csGraphics3DGlide2x implementation file
 // Written by xtrochu and Nathaniel
 
-#include "sysdef.h"
+#include "cssysdef.h"
 
 #if defined(OS_WIN32)
 #include <windows.h>

@@ -17,7 +17,7 @@
 */
 
 #include <stdarg.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/scf.h"
 #include "cssys/unix/iunix.h"
 #include "cssys/csevent.h"

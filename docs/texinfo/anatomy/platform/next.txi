@@ -195,7 +195,7 @@ A header which works around Crystal Space's misuse of the deprecated
 @item csosdefs.h
 Implementation of platform-specific operating system functionality.  Allows
 Crystal Space to treat the operating system services abstractly.  Located in
-@file{CS/include/cssys/next} and included by @file{CS/include/sysdef.h}.
+@file{CS/include/cssys/next} and included by @file{CS/include/cssysdef.h}.
 @end table
 
 The @NeXT{} 2D graphics library in @file{CS/plugins/video/canvas/next}

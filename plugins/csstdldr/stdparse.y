@@ -19,7 +19,7 @@
 
 %{ /* Startup C++ code */
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "stdldr.h"
 #include "csutil/cscolor.h"
 #include "csgeom/math2d.h"

@@ -20,7 +20,7 @@
 #include <string.h>
 
 #define SYSDEF_CASE
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csws/cscomp.h"
 #include "csws/csmenu.h"
 #include "csws/csapp.h"

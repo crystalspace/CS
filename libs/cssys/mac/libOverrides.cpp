@@ -35,7 +35,7 @@
 #define SYSDEF_UNLINK
 #define SYSDEF_ACCESS
 #define SYSDEF_MKDIR
-#include "sysdef.h"
+#include "cssysdef.h"
 
 #include "Files.h"
 

@@ -20,8 +20,8 @@
 #include <math.h>
 #include <memory.h>
 
-#include "sysdef.h"
-#include "types.h"
+#include "cssysdef.h"
+#include "cstypes.h"
 #include "csgeom/math3d.h"
 #include "csgfxldr/bmpimage.h"
 #include "cssys/csendian.h"

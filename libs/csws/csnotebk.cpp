@@ -19,7 +19,7 @@
 
 #define SYSDEF_ALLOCA
 #define SYSDEF_CASE
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csws/csapp.h"
 #include "csws/csnotebk.h"
 #include "csws/cswsutil.h"

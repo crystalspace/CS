@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "srdrchan.h"
 
 Channel_ID Channel::lastID=1;

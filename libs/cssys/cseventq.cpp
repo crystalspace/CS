@@ -20,7 +20,7 @@
 */
 
 #include <stddef.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/cseventq.h"
 
 csEventQueue::csEventQueue (size_t iLength)

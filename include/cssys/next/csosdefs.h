@@ -17,7 +17,7 @@
 //	Platform-specific interface to common functionality.  Compatible
 //	with MacOS/X Server, OpenStep, and NextStep.
 //
-// *NOTE* This file is included by include/sysdef.h and must not be renamed.
+// *NOTE* This file is included by include/cssysdef.h and must not be renamed.
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------

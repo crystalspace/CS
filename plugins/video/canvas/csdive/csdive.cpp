@@ -19,7 +19,7 @@
 
 #include <stdarg.h>
 #include <limits.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/scf.h"
 #include "csutil/csrect.h"
 #include "cssys/csevent.h"

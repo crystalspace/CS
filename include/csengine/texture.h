@@ -19,7 +19,7 @@
 #ifndef __TEXTURE_H__
 #define __TEXTURE_H__
 
-#include "types.h"
+#include "cstypes.h"
 #include "csobject/csobject.h"
 #include "csobject/nobjvec.h"
 #include "igraph2d.h"

@@ -18,7 +18,7 @@
 */
 
 #include <stdio.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csws/cscomp.h"
 #include "csws/cskeyacc.h"
 #include "csws/csapp.h"

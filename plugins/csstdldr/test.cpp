@@ -12,7 +12,7 @@
 // comment them out with an #if 0 ... #endif.
 //
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/system.h"
 #include "csutil/inifile.h"
 #include "csengine/sector.h"

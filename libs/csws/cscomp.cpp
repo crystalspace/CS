@@ -19,7 +19,7 @@
 
 #include <stddef.h>
 #include <ctype.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csengine/cspixmap.h"
 #include "cssys/csevent.h"
 #include "cssys/csinput.h"

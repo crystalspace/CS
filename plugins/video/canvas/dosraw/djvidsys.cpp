@@ -29,7 +29,7 @@
  *   - Added hicolor support
  *   - Added support for 16 X-modes
  */
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "video/canvas/dosraw/djvidsys.h"
 
 static struct

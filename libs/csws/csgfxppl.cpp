@@ -18,7 +18,7 @@
 */
 
 #include <limits.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "qint.h"
 #include "csws/csgfxppl.h"
 #include "csutil/util.h"

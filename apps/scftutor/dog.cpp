@@ -2,7 +2,7 @@
     This program demonstrates an SCF object with an embedded interface.
 */
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "idog.h"
 #include "iname.h"
 #include <stdio.h>

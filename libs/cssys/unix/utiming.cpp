@@ -18,7 +18,7 @@
 
 #include <time.h>
 #include <sys/times.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/sysdriv.h"
 
 // This function should return milliseconds since some specific time

@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/csvector.h"
 #include "cssfxldr/common/snddata.h"
 #include "cssfxldr/funcs.h"

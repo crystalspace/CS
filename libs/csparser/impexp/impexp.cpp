@@ -20,7 +20,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csparser/impexp.h"
 
 // converter.cpp: implementation of the converter class.
@@ -41,6 +41,7 @@
 #include "csengine/cssprite.h"
 #include "csengine/thingtpl.h"
 #include "csutil/vfs.h"
+#include "csutil/inifile.h"
 #include "csutil/csstring.h"
 #include "cssys/csendian.h"
 

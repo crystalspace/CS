@@ -22,7 +22,7 @@
 #include <Dialogs.h>
 #include <TextUtils.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/scf.h"
 #include "video/canvas/openglmac/oglg2d.h"
 #include "cssys/mac/MacRSRCS.h"

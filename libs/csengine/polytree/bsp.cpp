@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csengine/polyint.h"
 #include "csengine/treeobj.h"
 #include "csengine/bsp.h"
@@ -658,6 +658,7 @@ int csBspTree::ClassifyPolygon (csBspNode* node, const csPoly3D& poly)
     case POL_SPLIT_NEEDED:
       return -1;
   }
+  return -1;
 }
 
 //---------------------------------------------------------------------------

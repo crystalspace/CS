@@ -43,7 +43,7 @@
 //	changes.)
 //
 //-----------------------------------------------------------------------------
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/csshlib.h"
 
 extern "C" {

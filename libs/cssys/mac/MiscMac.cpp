@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 
 /*------------------------------------------------------------------------------
 	Case insensitve strcmp

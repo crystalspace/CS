@@ -22,17 +22,13 @@
 #ifndef __IMPEXP_H__
 #define __IMPEXP_H__
 
-// for CS defs.h 
-#define OK_TO_INCLUDE_DEFS_IM_A_FRIEND
-
 #include <ctype.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "def.h"
-#include "csutil/inifile.h"
 #include "ivfs.h"
+class csIniFile;
 
 #if _MSC_VER > 1000
 #pragma once

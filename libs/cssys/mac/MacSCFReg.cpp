@@ -35,7 +35,7 @@
 #include <stdio.h>
 #include <SIOUX.h>
 #define SYSDEF_PATH
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/csshlib.h"
 #include "csutil/scf.h"
 #include "csutil/inifile.h"

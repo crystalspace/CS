@@ -20,7 +20,7 @@
 #ifndef __CS_BOX_H
 #define __CS_BOX_H
 
-#include "types.h"	// for bool
+#include "cstypes.h"	// for bool
 #include "vector2.h"
 #include "vector3.h"
 #include "segment.h"

@@ -25,7 +25,7 @@ extern "C"
 #include <png.h>
 }
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csgfxldr/pngimage.h"
 
 //---------------------------------------------------------------------------

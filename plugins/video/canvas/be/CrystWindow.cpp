@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/param.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "isystem.h"
 #include "video/canvas/be/CrystWindow.h"
 #include "cssys/be/icsbe.h"

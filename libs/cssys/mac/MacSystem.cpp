@@ -33,8 +33,8 @@
 #include <Windows.h>
 #include <InputSprocket.h>
 #include <SIOUX.h>
-#include "sysdef.h"
-#include "types.h"
+#include "cssysdef.h"
+#include "cstypes.h"
 #include "csutil/inifile.h"
 #include "csgeom/math3d.h"
 #include "cssys/system.h"

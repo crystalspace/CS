@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <glide.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/scf.h"
 #include "cssys/win32/win32itf.h"
 #include "isystem.h"

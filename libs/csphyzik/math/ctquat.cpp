@@ -18,7 +18,7 @@
 
 */
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csphyzik/ctvector.h"
 #include "csphyzik/ctmatrix.h"
 #include "csphyzik/ctquat.h"

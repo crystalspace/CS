@@ -20,7 +20,7 @@
 #ifndef __CSOBJ_H__
 #define __CSOBJ_H__
 
-#include "types.h"
+#include "cstypes.h"
 #include "csobject/fakertti.h"
 #include "csobject/objiter.h"
 #include "csutil/csbase.h"

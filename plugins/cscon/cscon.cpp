@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "iconsole.h"
 #include "icursor.h"
 #include "igraph2d.h"

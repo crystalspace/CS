@@ -9,7 +9,7 @@
 // copyright notice is retained.  Send comments to <sunshine@sunshineco.com>.
 //
 //=============================================================================
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "NeXTView.h"
 #include "NeXTDelegate.h"
 extern "Objective-C" {

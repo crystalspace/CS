@@ -18,7 +18,7 @@
 */
 
 #include <stdio.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "texmem.h"
 #include "isystem.h"
 

@@ -16,13 +16,13 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/bitset.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/polypool.h"
-#include "csgeom/frustrum.h"
+#include "csgeom/frustum.h"
 #include "csengine/dumper.h"
 #include "csengine/bsp.h"
 #include "csengine/bsp2d.h"

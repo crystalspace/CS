@@ -21,7 +21,7 @@
 #ifndef ___CS_MATH3D_D_H__
 #define ___CS_MATH3D_D_H__
 
-#include "types.h"
+#include "cstypes.h"
 
 #ifndef ABS
 #define ABS(x) ((x)<0?-(x):(x))

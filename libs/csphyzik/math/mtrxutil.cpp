@@ -21,7 +21,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csphyzik/phyztype.h"
 #include "csphyzik/mtrxutil.h"
 

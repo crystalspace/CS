@@ -16,8 +16,8 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "sysdef.h"
-#include "csgeom/frustrum.h"
+#include "cssysdef.h"
+#include "csgeom/frustum.h"
 #include "csgeom/transfrm.h"
 
 void csFrustum::Clear ()

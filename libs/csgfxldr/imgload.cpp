@@ -20,7 +20,7 @@
 #include <math.h>
 #include <assert.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "isystem.h"
 #include "csgfxldr/csimage.h"
 #include "csutil/util.h"

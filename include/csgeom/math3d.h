@@ -20,8 +20,8 @@
 #ifndef __CS_MATH3D_H__
 #define __CS_MATH3D_H__
 
-#ifndef __SYSDEFS_H__
-#error "sysdef.h must be included in EVERY source file!"
+#ifndef __CS_CSSYSDEFS_H__
+#error "cssysdef.h must be included in EVERY source file!"
 #endif
 
 #if defined(COMP_VC) && defined(DO_ASM)

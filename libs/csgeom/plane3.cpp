@@ -17,7 +17,7 @@
 */
 
 #include <math.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csgeom/plane3.h"
 #include "csgeom/math3d.h"
 

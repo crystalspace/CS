@@ -17,7 +17,7 @@
 */
 
 #include <stdarg.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/scf.h"
 #include "svgadsp.h"
 #include "video/canvas/openglx/iogldisp.h"

@@ -19,7 +19,7 @@
 
 /* This file is more or less a ripoff of Andrew Zabolotny's software halo renderer */
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #ifdef OS_WIN32
 #include <windows.h>
 #endif

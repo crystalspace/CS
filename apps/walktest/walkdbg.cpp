@@ -16,12 +16,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "walktest/walktest.h"
 #include "version.h"
 #include "qint.h"
 #include "cssys/system.h"
-#include "csgeom/frustrum.h"
+#include "csgeom/frustum.h"
 #include "csengine/dumper.h"
 #include "csengine/stats.h"
 #include "csengine/light.h"

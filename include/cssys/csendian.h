@@ -20,7 +20,7 @@
 #define __CSENDIAN_H__
 
 #include <math.h>
-#include "types.h"
+#include "cstypes.h"
 #include "qint.h"
 
 /*

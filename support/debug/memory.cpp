@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <strings.h>
 #include <ctype.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 
 #ifdef MEM_CHECK_EXTENSIVE
 #  undef MEM_CHECK_FILL

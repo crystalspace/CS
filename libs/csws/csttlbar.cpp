@@ -18,7 +18,7 @@
 */
 
 #include <string.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csws/cscomp.h"
 #include "csws/csttlbar.h"
 #include "cssys/csevent.h"

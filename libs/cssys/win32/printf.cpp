@@ -18,7 +18,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/system.h"
 
 #include <windows.h>

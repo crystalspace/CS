@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 
 union FastSqrtUnion
 {

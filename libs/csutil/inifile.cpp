@@ -22,8 +22,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "sysdef.h"
-#include "types.h"
+#include "cssysdef.h"
+#include "cstypes.h"
 #include "csutil/inifile.h"
 #include "csutil/csstrvec.h"
 #include "csutil/util.h"

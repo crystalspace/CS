@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/sysdriv.h"
 #include "video/canvas/common/graph2d.h"
 #include "csutil/util.h"

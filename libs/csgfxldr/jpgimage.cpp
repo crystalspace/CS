@@ -21,7 +21,7 @@
 #include <setjmp.h>
 #include <string.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csgfxldr/jpgimage.h"
 
 extern "C"

@@ -21,7 +21,7 @@
 #include <string.h>
 #include <limits.h>
 #include <malloc.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "libDIVE.h"
 
 static long MAX_PHYS_COLORS = -1;

@@ -31,7 +31,7 @@
 #include <math.h>
 #include <stdio.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/csendian.h"
 #include "csgfxldr/walimage.h"
 #include "walpal.h"

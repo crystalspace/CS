@@ -19,7 +19,7 @@
 */
 
 #include <math.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csgeom/math3d_d.h"
 #include "csgeom/math3d.h"
 

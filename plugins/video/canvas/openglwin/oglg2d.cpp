@@ -19,7 +19,7 @@
 #include <windows.h>
 #include <gl/gl.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/scf.h"
 #include "oglg2d.h"
 #include "isystem.h"

@@ -17,7 +17,7 @@
 */
 
 #include <OS.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csbe.h"
 
 //-----------------------------------------------------------------------------

@@ -58,7 +58,7 @@
   1999-05-03 lpd Original version.
  */
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/csmd5.h"
 
 // T-values were computed with this code:

@@ -25,7 +25,7 @@
 #define SYSDEF_TEMP
 #define SYSDEF_UNLINK
 #define SYSDEF_ACCESS
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/csendian.h"
 #include "csutil/util.h"
 #include "csutil/archive.h"

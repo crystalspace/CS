@@ -18,7 +18,7 @@
 //	See NeXTLocal2D.cpp for platform-specific implementation.
 //
 //-----------------------------------------------------------------------------
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "NeXTDriver2D.h"
 #include "NeXTFrameBuffer15.h"
 #include "NeXTFrameBuffer32.h"

@@ -17,7 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/csstrvec.h"
 #include "csutil/scanstr.h"
 #include "cssys/csevent.h"

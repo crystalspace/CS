@@ -18,7 +18,7 @@
 */
 
 #include <stdarg.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "qint.h"
 #include "csparser/csloader.h"
 #include "csutil/inifile.h"

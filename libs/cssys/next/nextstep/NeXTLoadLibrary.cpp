@@ -15,7 +15,7 @@
 //	NextStep-specific dynamic library loading and symbol lookup.
 //
 //-----------------------------------------------------------------------------
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/csshlib.h"
 
 extern "C" {

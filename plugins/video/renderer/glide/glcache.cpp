@@ -20,7 +20,7 @@
 // Hi-color texture/lightmap cache
 // An abstract class: derive the specific class from this class
 // Written by Dan Ogles
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/system.h"
 #include "gltex.h"
 #include "glcache.h"

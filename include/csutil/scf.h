@@ -26,11 +26,6 @@
 
 */
 
-// We'll use static_cast<> instead of old-style casts to protect
-// from declaring unimplemented interfaces in SCF classes, but
-// unfortunately we need to avoid static_cast <> () on NeXT
-#include "def.h"
-
 /// Use this macro to construct interface version numbers.
 #define SCF_CONSTRUCT_VERSION(Major,Minor,Micro) \
   ((Major << 24) | (Minor << 16) | Micro)

@@ -22,7 +22,7 @@
 
 #include <stdio.h>
 #include "csgfxldr/rgbpixel.h"
-#include "types.h"
+#include "cstypes.h"
 #include "iimage.h"
 
 /**

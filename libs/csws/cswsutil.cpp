@@ -19,7 +19,7 @@
 
 #define SYSDEF_PATH
 #define SYSDEF_DIR
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csws/cswsutil.h"
 #include "csws/csapp.h"
 #include "csws/csbutton.h"

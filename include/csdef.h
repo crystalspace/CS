@@ -16,15 +16,15 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_DEF_H__
-#define __CS_DEF_H__
-
-#if !defined(OK_TO_INCLUDE_DEFS_IM_A_FRIEND)
-#error You are not allowed to include this file! Use sysdef.h instead.
+#if !defined(CSDEF_FRIEND)
+#error You are not allowed to include this file! Use cssysdef.h instead.
 #endif
 
+#ifndef __CS_CSDEF_H__
+#define __CS_CSDEF_H__
+
 #include "platform.h"
-#include "types.h"
+#include "cstypes.h"
 #include "debug/memory.h"
 
 //---------------------------------------------------------------
@@ -178,4 +178,4 @@
 // This macro causes a crash. Can be useful for debugging.
 #define CRASH { int* a=0; *a = 1; }
 
-#endif // __CS_DEF_H__
+#endif // __CS_CSDEF_H__

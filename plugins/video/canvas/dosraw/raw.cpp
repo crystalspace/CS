@@ -20,7 +20,7 @@
 */
 
 #include <stdarg.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "video/canvas/dosraw/raw.h"
 #include "cssys/djgpp/idjgpp.h"
 #include "csutil/csrect.h"

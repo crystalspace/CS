@@ -20,7 +20,7 @@
 #define __CS_RVIEW_H__
 
 #include "csgeom/math3d.h"
-#include "csgeom/frustrum.h"
+#include "csgeom/frustum.h"
 #include "csengine/camera.h"
 
 class csClipper;

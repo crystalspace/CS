@@ -17,7 +17,7 @@
 */
 
 #include <Timer.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/system.h"
 
 // This function should return milliseconds since some specific

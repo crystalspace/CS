@@ -23,7 +23,7 @@
 
 #define SYSDEF_PATH
 #define SYSDEF_GETCWD
-#include "sysdef.h"
+#include "cssysdef.h"
 
 // return a random number from minRange to maxRange inclusive
 long RndNum(long minRange, long maxRange)

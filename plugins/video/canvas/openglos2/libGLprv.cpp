@@ -24,7 +24,7 @@
 #include <process.h>
 #include <signal.h>
 #include <stdlib.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "libGL.h"
 #include "libGLprv.h"
 

@@ -216,4 +216,4 @@ Polygon* Polygon::clip (Plane* p, bool rotated)
 	 }
 	 return poly;
  }
- */
+*/

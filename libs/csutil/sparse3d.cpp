@@ -18,7 +18,7 @@
 */
 
 #include <stdio.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/sparse3d.h"
 
 WideSparse3D::WideSparse3D ()

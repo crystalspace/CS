@@ -20,7 +20,7 @@
 #include <math.h>
 
 #define SYSDEF_ALLOCA
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "qint.h"
 #include "csgeom/vector2.h"
 #include "csgeom/polyaa.h"

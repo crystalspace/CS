@@ -18,7 +18,7 @@
 
 #include <stdarg.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "qint.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"

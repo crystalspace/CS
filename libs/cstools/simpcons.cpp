@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/system.h"
 #include "cssys/sysdriv.h"
 #include "cstools/simpcons.h"

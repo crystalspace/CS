@@ -18,7 +18,7 @@
 
 #include <stdarg.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/scf.h"
 #include "video/canvas/ggi/ggi2d.h"
 #include "cssys/unix/iunix.h"

@@ -7,6 +7,10 @@ The history order has been reversed so that new features are at the top.
 	  csOctree::ClassifyPolygon. This functions respectively test a
 	  point/polygon against the tree. The test returns wether or not
 	  the object is in solid space.
+	- Wouter Wijngaards added a temporary bugfix for radiosity. This
+	  fix only avoids the bug but does not really solve it. It makes
+	  radiosity (and lighting) a bit slower but at least it doesn't
+	  crash anymore.
 	- Eric Sunshine cobbled things back together just enough so that the
 	  project can once again be built on Unix following phase one of
 	  Alex's merge of the new terrain code.  For now terrain functionality
@@ -14,10 +18,16 @@ The history order has been reversed so that new features are at the top.
 	  will probably need to adjust include paths in the csparser and
 	  csengine projects to refer to libs/csterr.
 	- Eric Sunshine eliminated compilation warnings in octree.cpp.
-	- Wouter Wijngaards added a temporary bugfix for radiosity. This
-	  fix only avoids the bug but does not really solve it. It makes
-	  radiosity (and lighting) a bit slower but at least it doesn't
-	  crash anymore.
+	- Eric Sunshine renamed the following files and fixed references to
+	  them throughout the project:
+	      def.h        --> csdef.h
+	      sysdef.h     --> cssysdef.h
+	      types.h      --> cstypes.h
+	      frustrum.h   --> frustum.h
+	      frustrum.cpp --> frustum.cpp
+	- Eric Sunshine eliminated compilation warnings from csnsmgr.cpp.
+	- Eric Sunshine eliminated compilation warnings from octree.cpp,
+	  polytree.cpp and bsp.cpp.
 	- Implemented new 'TEXTURE' keyword for upcoming terrain engine.
 	  With this keyword you set the basename for all the textures
 	  used by the terrain. The base should be something like

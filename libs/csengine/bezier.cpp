@@ -17,7 +17,7 @@
 */
  
 #include <math.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csengine/bezier.h"
 
 //////////////////////////////////////////////

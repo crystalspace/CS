@@ -1,7 +1,7 @@
 #include <Files.h>
 #define SYSDEF_PATH
 #define SYSDEF_DIR
-#include "sysdef.h"
+#include "cssysdef.h"
 
 struct directory_scan {
 	char d_name[ MAXPATHLEN ];

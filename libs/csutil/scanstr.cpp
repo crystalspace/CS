@@ -19,7 +19,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/scanstr.h"
 
 #define CS_WHITE " \t\n\r\f"

@@ -19,7 +19,7 @@
 #include <math.h>
 #include <stdarg.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "soft_txt.h"
 #include "csgfxldr/inv_cmap.h"
 #include "csgfxldr/quantize.h"

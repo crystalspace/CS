@@ -22,7 +22,7 @@
 #include <stdlib.h>
 
 #define SYSDEF_ALLOCA
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "stdldr.h"
 #include "stdparse.h"
 #include "qint.h"

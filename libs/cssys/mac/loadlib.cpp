@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <CodeFragments.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/csshlib.h"
 
 

@@ -7,7 +7,7 @@
     at run time using scfRegisterClass()
 */
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "ifrog.h"
 #include "iname.h"
 #include <stdio.h>

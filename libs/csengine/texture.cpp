@@ -18,7 +18,7 @@
 
 #include <math.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csengine/texture.h"
 #include "csengine/world.h"
 #include "iimage.h"

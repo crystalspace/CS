@@ -33,7 +33,7 @@
 #include <sys/stat.h>
 #include <signal.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/scf.h"
 #include "ossdrv.h"
 #include "iplugin.h"

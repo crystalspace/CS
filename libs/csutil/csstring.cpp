@@ -21,7 +21,7 @@ extern "C" {
 #include <ctype.h>
 #include <stdarg.h>
 }
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/csstring.h"
 
 csString::~csString ()

@@ -18,7 +18,7 @@
 */
 
 #include <stdarg.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "dyntex2d.h"
 #include "csutil/scf.h"
 #include "isystem.h"

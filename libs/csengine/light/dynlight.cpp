@@ -44,7 +44,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csengine/dynlight.h"
 #include "csengine/world.h"
 #include "csutil/util.h"

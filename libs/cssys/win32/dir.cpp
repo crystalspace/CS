@@ -17,7 +17,7 @@
 */
 
 #define SYSDEF_DIR
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/system.h"
 #include "cssys/win32/win32.h"
 

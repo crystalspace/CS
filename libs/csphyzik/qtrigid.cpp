@@ -20,7 +20,7 @@
 
 #include <assert.h>
 #ifndef __NO_CRYSTALSPACE__
-#include "sysdef.h"
+#include "cssysdef.h"
 #endif
 #include "csphyzik/ctvector.h"
 #include "csphyzik/ctmatrix.h"

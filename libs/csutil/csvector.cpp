@@ -19,7 +19,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/csvector.h"
 
 csVector::csVector (int ilimit, int ithreshold)

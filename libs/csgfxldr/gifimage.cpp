@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csgfxldr/gifimage.h"
 
 //---------------------------------------------------------------------------

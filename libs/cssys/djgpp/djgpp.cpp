@@ -29,7 +29,7 @@
 #include <sys/nearptr.h>
 #include <sys/farptr.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "djgpp.h"
 #include "csutil/inifile.h"
 #include "isystem.h"

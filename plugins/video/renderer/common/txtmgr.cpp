@@ -19,7 +19,7 @@
 #include <math.h>
 #include <stdarg.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "txtmgr.h"
 #include "csutil/util.h"
 #include "csutil/inifile.h"

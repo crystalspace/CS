@@ -18,7 +18,7 @@
 */
 
 #define SYSDEF_CASE
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csws/csstatic.h"
 #include "csws/csapp.h"
 

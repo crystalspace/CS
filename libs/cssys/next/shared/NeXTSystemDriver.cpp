@@ -18,7 +18,7 @@
 //	platform-specific implementation.
 //
 //-----------------------------------------------------------------------------
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "NeXTSystemDriver.h"
 #include "version.h"
 #include "csutil/inifile.h"

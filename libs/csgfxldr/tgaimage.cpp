@@ -31,7 +31,7 @@
 #include <math.h>
 #include <stdio.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csgfxldr/tgaimage.h"
 
 //---------------------------------------------------------------------------

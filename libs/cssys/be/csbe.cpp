@@ -28,7 +28,7 @@
 #include <Beep.h>
 #include <View.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/system.h"
 #include "csbe.h"
 #include "csutil/util.h"

@@ -18,7 +18,7 @@
 
 #include <math.h>
 #define SYSDEF_ALLOCA
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "qint.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/polyclip.h"

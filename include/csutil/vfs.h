@@ -20,7 +20,6 @@
 #ifndef __CS_VFS_H__
 #define __CS_VFS_H__
 
-#include "def.h"
 #include "csstrvec.h"
 #include "ivfs.h"
 #include "iplugin.h"

@@ -1,4 +1,4 @@
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csphyzik/phyziks.h"
 #include "cstso.h"
 #include "csengine/cssprite.h"

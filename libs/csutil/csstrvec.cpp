@@ -18,7 +18,7 @@
 */
 
 #include <string.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/csstrvec.h"
 
 bool csStrVector::FreeItem (csSome Item)

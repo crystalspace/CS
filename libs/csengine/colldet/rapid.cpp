@@ -61,7 +61,7 @@
 
 \**************************************************************************/
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csengine/collider.h"
 #include "csengine/polyset.h"
 #include "csengine/cssprite.h"

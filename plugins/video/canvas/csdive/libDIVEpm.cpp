@@ -22,7 +22,7 @@
 #include <os2.h>
 #include <process.h>
 #include <signal.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "libDIVE.h"
 #include "libDIVEprv.h"
 

@@ -19,7 +19,7 @@
 
 #define INITGUID
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include <stdlib.h>
 #include <windows.h>
 #include <windowsx.h>

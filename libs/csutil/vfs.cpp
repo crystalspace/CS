@@ -26,7 +26,7 @@
 #define SYSDEF_ACCESS
 #define SYSDEF_MKDIR
 #define SYSDEF_UNLINK
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "version.h"
 #include "csutil/vfs.h"
 #include "csutil/archive.h"

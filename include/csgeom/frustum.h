@@ -19,7 +19,7 @@
 #ifndef __FRUSTRUM_H__
 #define __FRUSTRUM_H__
 
-#include "types.h"
+#include "cstypes.h"
 #include "csgeom/math3d.h"
 
 class csTransform;

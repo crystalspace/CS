@@ -17,7 +17,7 @@
 */
 
 #include <stdarg.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "video/canvas/beglide2/glidebe2d.h"
 #include "csutil/scf.h"
 #include "cssys/csevent.h"

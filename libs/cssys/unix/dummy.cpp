@@ -17,7 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "sysdef.h"
+#include "cssysdef.h"
 
 #if !defined(CS_STATIC_LINKED)
 // Dummy main function to satisfy the linker on Unix.

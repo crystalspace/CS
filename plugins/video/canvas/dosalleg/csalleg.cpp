@@ -18,7 +18,7 @@
 */
 
 #include <stdarg.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csalleg.h"
 #include "cssys/djgpp/idjgpp.h"
 #include "csutil/csrect.h"

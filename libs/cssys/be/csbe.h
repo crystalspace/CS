@@ -22,7 +22,6 @@
 #define __CS_CSBE_H__
 
 #include "csutil/scf.h"
-#include "def.h"
 #include "cssys/csinput.h"
 #include "cssys/system.h"
 #include "cssys/be/icsbe.h"

@@ -21,7 +21,7 @@
 
 #define SYSDEF_PATH
 #define SYSDEF_GETOPT
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csgfxldr/csimage.h"
 #include "csgfxldr/pngsave.h"
 

@@ -21,7 +21,7 @@
 #define __CSVECTOR_H__
 
 #include "csbase.h"
-#include "types.h"
+#include "cstypes.h"
 
 typedef void *csSome;
 typedef const void *csConstSome;

@@ -21,7 +21,7 @@
 
 #include "util/ddg.h"
 #ifdef CRYSTAL
-#include "types.h"
+#include "cstypes.h"
 #endif
 
 #ifdef WIN32

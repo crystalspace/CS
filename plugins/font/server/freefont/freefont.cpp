@@ -18,7 +18,7 @@
 
 #include <freetype.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/inifile.h"
 #include "csutil/csstrvec.h"
 #include "freefont.h"

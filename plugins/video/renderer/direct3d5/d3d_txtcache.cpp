@@ -21,7 +21,7 @@
 // Written by Dan Ogles
 // some modifications by Nathaniel
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include <windows.h>
 #include <stdlib.h>
 #include <ddraw.h>

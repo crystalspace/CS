@@ -21,7 +21,7 @@
 #define __CSPPULSE_H__
 
 #include "csutil/csbase.h"
-#include "types.h"
+#include "cstypes.h"
 
 /**
  * The csProgressPulse class provides a simple twirling textual cursor built

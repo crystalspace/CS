@@ -19,7 +19,7 @@
 
 #define SYSDEF_PATH
 #define SYSDEF_ALLOCA
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/csshlib.h"
 #include "csutil/scf.h"
 #include "csutil/util.h"

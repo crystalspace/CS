@@ -37,7 +37,6 @@
 #include "cssys/win32/win32itf.h"
 #include <objbase.h>
 
-#include "def.h"
 #if defined(COMP_VC) || defined(COMP_WCC)
 #include "cssys/csinput.h"
 #include "igraph2D.h"

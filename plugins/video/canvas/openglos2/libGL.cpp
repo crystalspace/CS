@@ -22,7 +22,7 @@
 #include <string.h>
 #include <limits.h>
 #include <malloc.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "GL/gl.h"
 #include "GL/pgl.h"
 #include "libGL.h"

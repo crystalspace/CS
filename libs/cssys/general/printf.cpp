@@ -25,7 +25,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/system.h"
 
 // to be called before all printf() calls

@@ -19,7 +19,7 @@
 #include <stdarg.h>
 #include <math.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "d3d_txtmgr.h"
 #include "d3d_g3d.h"
 #include "csutil/scanstr.h"

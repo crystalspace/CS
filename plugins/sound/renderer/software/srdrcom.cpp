@@ -21,7 +21,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "qint.h"
 #include "csutil/scf.h"
 #include "srdrcom.h"

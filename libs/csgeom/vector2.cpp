@@ -18,7 +18,7 @@
 */
 
 #include <math.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csgeom/vector2.h"
 
 //---------------------------------------------------------------------------

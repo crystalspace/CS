@@ -19,7 +19,7 @@
 */
 
 #ifndef __NO_CRYSTALSPACE__
-#include "sysdef.h"
+#include "cssysdef.h"
 #endif
 #include "csphyzik/phyzent.h"
 #include "csphyzik/solver.h"

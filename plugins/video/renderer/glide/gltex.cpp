@@ -19,7 +19,7 @@
 #include <stdarg.h>
 #include <math.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "isystem.h"
 
 #include "gltex.h"

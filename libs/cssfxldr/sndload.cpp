@@ -20,7 +20,7 @@
 #include <math.h>
 #include <assert.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssfxldr/common/snddata.h"
 #include "cssfxldr/sndload.h"
 #include "isystem.h"

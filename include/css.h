@@ -25,11 +25,6 @@
 
 #ifndef NOTHING
 
-//System
-#ifndef NO_SYS
-#include "sysdef.h"
-#endif
-
 //SCF
 #ifndef NO_CSSCF
 #include "csutil/scf.h"

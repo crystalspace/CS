@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/sysdriv.h"
 #include "qint.h"
 #include "csutil/scf.h"

@@ -21,7 +21,7 @@
 #include <math.h>
 #include <assert.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "isystem.h"
 #include "qint.h"
 #include "csgfxldr/csimage.h"

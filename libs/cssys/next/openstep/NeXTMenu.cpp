@@ -15,7 +15,7 @@
 //	Generate a menu from an INI file definition.
 //
 //-----------------------------------------------------------------------------
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "NeXTMenu.h"
 #include "csutil/inifile.h"
 extern "Objective-C" {

@@ -18,7 +18,7 @@
 */
 
 #include <math.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csgeom/math2d.h"
 #include "csgeom/box.h"
 #include "csgeom/poly2d.h"

@@ -21,7 +21,7 @@
 #if !defined(__CSSOUNDDATA_H__)
 #define __CSSOUNDDATA_H__
 
-#include <types.h>	// For bool.
+#include "cstypes.h"	// For bool.
 
 /**
  * Wave class :<br>

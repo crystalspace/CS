@@ -17,7 +17,7 @@
 */
 
 #include "csutil/scf.h"
-#include "types.h"
+#include "cstypes.h"
 
 #ifndef ITEXTURE_H
 #define ITEXTURE_H

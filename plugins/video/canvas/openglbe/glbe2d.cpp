@@ -20,7 +20,7 @@
 #include <stdarg.h>
 #include <sys/param.h>
 #include <Screen.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/scf.h"
 #include "glbe2d.h"
 #include "CrystGLWindow.h"

@@ -20,7 +20,7 @@
 //	Window events (such as application termination) are also handled.
 //
 //-----------------------------------------------------------------------------
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "NeXTDelegate.h"
 #include "NeXTSystemDriver.h"
 #include "cssys/csevent.h"

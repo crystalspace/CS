@@ -117,10 +117,10 @@ from the @code{csEngine} library.  The other way around is okay, however,
 since @code{csEngine} is at a higher level within the dependency hierarchy.
 
 @item
-@emph{Include @file{sysdef.h}}
+@emph{Include @file{cssysdef.h}}
 
-Always include @file{sysdef.h} in each source file as the very first file
-included.  @emph{Never} include @file{sysdef.h} in header files.
+Always include @file{cssysdef.h} in each source file as the very first file
+included.  @emph{Never} include @file{cssysdef.h} in header files.
 
 @item
 @emph{Avoid Global Objects With Constructors in Plug-In Modules}

@@ -24,7 +24,7 @@
 // Ported to COM by Dan Ogles on 8.26.98
 #define INITGUID
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include <windows.h>
 #include <stdlib.h>
 #include <ddraw.h>

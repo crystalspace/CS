@@ -77,7 +77,7 @@ public:
 In the source file @file{simple.cpp} we place the following:
 
 @example
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/system.h"
 #include "csutil/inifile.h"
 #include "apps/simple/simple.h"

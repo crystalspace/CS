@@ -15,7 +15,6 @@
 #include <d3d.h>
 #include <d3dcaps.h>
 
-#include "def.h"
 #include "iddetect.h"
 
 /// Description of DirectDraw device

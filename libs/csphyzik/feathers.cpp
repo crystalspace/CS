@@ -25,7 +25,7 @@
 
 
 #ifndef __NO_CRYSTALSPACE__
-#include "sysdef.h"
+#include "cssysdef.h"
 #endif
 #include "csphyzik/feathers.h"
 #include "csphyzik/articula.h"

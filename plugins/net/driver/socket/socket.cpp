@@ -18,7 +18,7 @@
 */
 
 #define SYSDEF_SOCKETS
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "socket.h"
 #include "isystem.h"
 #include "csutil/util.h"

@@ -24,7 +24,7 @@
 */
 
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csparser/impexp.h"
 
 // converter.cpp: implementation of the converter class.

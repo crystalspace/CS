@@ -19,7 +19,7 @@
 */
 
 #include <string.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssfxldr/common/snddata.h"
 #include "csparser/snddatao.h"
 

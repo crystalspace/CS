@@ -18,7 +18,7 @@
 */
 
 #define SYSDEF_ALLOCA
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csws/csiline.h"
 #include "csws/cstimer.h"
 #include "csws/csapp.h"

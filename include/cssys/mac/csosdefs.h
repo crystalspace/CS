@@ -1,7 +1,7 @@
 /*
     This header file contains all definitions needed for compatibility issues
     Most of them should be defined only if corresponding SYSDEF_XXX macro is
-    defined (see system/sysdef.h)
+    defined (see system/cssysdef.h)
  */
 #ifndef OSDEFS_H
 #define OSDEFS_H

@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csutil/scf.h"
 #include "macsdrv.h"
 #include "isystem.h"

@@ -19,7 +19,7 @@
 
 #include <stdarg.h>
 #include <stdlib.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "video/canvas/common/graph2d.h"
 #include "qint.h"
 #include "scrshot.h"

@@ -1,5 +1,5 @@
 #ifndef __NO_CRYSTALSPACE__
-#include "sysdef.h"
+#include "cssysdef.h"
 #endif
 #include "csphyzik/rigidbod.h"
 #include "csphyzik/ctvector.h"

@@ -18,7 +18,7 @@
 */
 
 #include <string.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csws/csradbut.h"
 #include "csws/csapp.h"
 #include "csws/cswsutil.h"

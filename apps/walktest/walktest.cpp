@@ -18,7 +18,7 @@
 
 #define SYSDEF_PATH
 #define SYSDEF_ACCESS
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "walktest/walktest.h"
 #include "walktest/infmaze.h"
 #include "walktest/hugeroom.h"
@@ -28,7 +28,7 @@
 #include "apps/support/command.h"
 #include "cstools/simpcons.h"
 #include "csparser/csloader.h"
-#include "csgeom/frustrum.h"
+#include "csgeom/frustum.h"
 #include "csengine/dumper.h"
 #include "csengine/campos.h"
 #include "csengine/csview.h"

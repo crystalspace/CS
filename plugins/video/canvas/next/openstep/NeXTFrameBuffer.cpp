@@ -16,7 +16,7 @@
 //	a raw Crystal Space frame buffer into a NeXT format frame buffer.
 //
 //-----------------------------------------------------------------------------
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "NeXTFrameBuffer.h"
 extern "Objective-C" {
 #import <Foundation/NSZone.h>

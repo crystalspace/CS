@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csengine/polytree.h"
 #include "csengine/polygon.h"
 #include "csengine/treeobj.h"
@@ -253,6 +253,7 @@ void* ClassifyPointTraverse (csSector*, csPolygonInt** polygons,
 	if (data->num_tested >= 6) return NULL;
       }
     }
+  return (void*)1;
 }
 
 bool csPolygonTree::ClassifyPoint (const csVector3& p)

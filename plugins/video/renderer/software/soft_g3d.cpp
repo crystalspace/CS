@@ -19,7 +19,7 @@
 #include <stdarg.h>
 
 #define SYSDEF_SOFTWARE2D
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "soft_g3d.h"
 #include "softex3d.h"
 #include "isystem.h"

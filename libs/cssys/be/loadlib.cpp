@@ -19,7 +19,7 @@
 
 #include <kernel/image.h>
 #include <sys/param.h>
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "cssys/csshlib.h"
 #include "csutil/csstring.h"
 

@@ -18,7 +18,7 @@
 
 #include <stdarg.h>
 
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "video/canvas/svgalib/svga.h"
 #include "cssys/unix/iunix.h"
 #include "csutil/csrect.h"

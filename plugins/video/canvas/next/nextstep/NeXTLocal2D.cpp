@@ -19,7 +19,7 @@
 //	OpenStep, and NextStep.
 //
 //-----------------------------------------------------------------------------
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "NeXTDriver2D.h"
 #include "NeXTDelegate.h"
 #include "NeXTFrameBuffer.h"

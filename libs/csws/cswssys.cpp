@@ -18,7 +18,7 @@
 */
 
 #define SYSDEF_ALLOCA
-#include "sysdef.h"
+#include "cssysdef.h"
 #include "csws/cswssys.h"
 #include "csws/csapp.h"
 #include "itxtmgr.h"
