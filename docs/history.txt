@@ -7,6 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 8-Feb-2004
+	- Vincent Knecht updated cs.spec so we can build RPMs from cs current
+	  snapshot. Building is done by jam now.
 	- Eric Sunshine corrected Reed Hedges' changes to evdefs.h so that they
 	  are correct for plain-C compilers.  This file is processed by non-C++
 	  compilers (as noted by the comment at the very top of the file), so
