@@ -27,14 +27,14 @@ struct csLoaderPluginRec
 {
   char* ShortName;
   char* ClassID;
-  csRef<iComponent> Component;
+  csRef<iBase> Component;
   csRef<iLoaderPlugin> Plugin;
   csRef<iBinaryLoaderPlugin> BinPlugin;
   csRef<iDocumentNode> defaults;
 
   csLoaderPluginRec (const char* shortName,
 	const char *classID,
-	iComponent* component,
+	iBase* component,
 	iLoaderPlugin *plugin,
 	iBinaryLoaderPlugin* binPlugin)
   {
@@ -78,7 +78,9 @@ void csLoader::csLoadedPluginVector::DeleteAll ()
     csLoaderPluginRec* rec = vector[i];
     if (rec->Component && plugin_mgr)
     {
-      plugin_mgr->UnloadPlugin (rec->Component);
+      csRef<iComponent> comp = SCF_QUERY_INTERFACE (rec->Component, iComponent);
+      if (comp)
+        plugin_mgr->UnloadPlugin (comp);
     }
     delete rec;
   }
@@ -108,11 +110,12 @@ bool csLoader::csLoadedPluginVector::GetPluginFromRec (
   if (!rec->Component)
   {
     rec->Component = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg,
-    	rec->ClassID, iComponent);
+    	rec->ClassID, iBase);
     if (!rec->Component)
     {
-      rec->Component = CS_LOAD_PLUGIN (plugin_mgr,
+      csRef<iComponent> comp = CS_LOAD_PLUGIN (plugin_mgr,
     	  rec->ClassID, iComponent);
+      rec->Component = comp;
     }
     if (rec->Component)
     {
