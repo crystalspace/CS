@@ -126,9 +126,9 @@ csSystemDriver::~csSystemDriver ()
   CHK (delete com_options);
 }
 
-bool csSystemDriver::Initialize (int argc, char *argv[], IConfig* cfg_engine)
+bool csSystemDriver::Initialize (int argc, char *argv[], IConfig* pconfig)
 {
-  csSystemDriver::cfg_engine = cfg_engine;
+  cfg_engine = pconfig;
   HRESULT hRes;
 
   SetSystemDefaults ();
