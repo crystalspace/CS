@@ -27,6 +27,7 @@
 #include "walktest/scon.h"
 #include "csparser/csloader.h"
 #include "csgeom/csrect.h"
+#include "csgeom/frustrum.h"
 #include "csengine/dumper.h"
 #include "csengine/csview.h"
 #include "csengine/stats.h"
@@ -460,6 +461,43 @@ unsigned int _control87(unsigned int newcw, unsigned int mask)
 }
 #endif
 
+#if 0
+
+void TestFrustrum ()
+{
+  csFrustrum* f1 = new csFrustrum (csVector3 (0,10,0));
+  csFrustrum* f2 = new csFrustrum (*f1);
+  f2->AddVertex (csVector3 (-3,15,3));
+  f2->AddVertex (csVector3 (3,15,3));
+  f2->AddVertex (csVector3 (0,15,-3));
+  csFrustrum* f3 = new csFrustrum (*f1);
+  f3->AddVertex (csVector3 (1,15,4));
+  f3->AddVertex (csVector3 (4,15,4));
+  f3->AddVertex (csVector3 (4,15,-2));
+  f3->AddVertex (csVector3 (1,15,-2));
+  Dumper::dump (f1, "f1");
+  Dumper::dump (f2, "f2");
+  Dumper::dump (f3, "f3");
+  csFrustrum* f4 = f1->Intersect (*f2);
+  csFrustrum* f5 = f2->Intersect (*f1);
+  csFrustrum* f6 = f2->Intersect (*f3);
+  csFrustrum* f7 = new csFrustrum (*f2);
+  f7->ClipToPlane (csVector3 (1,15,4), csVector3 (1,15,-2));
+  Dumper::dump (f4, "f4");
+  Dumper::dump (f5, "f5");
+  Dumper::dump (f6, "f6");
+  Dumper::dump (f7, "f7");
+  csFrustrum* f8 = new csFrustrum (*f1);
+  f8->AddVertex (csVector3 (27,15,3));
+  f8->AddVertex (csVector3 (33,15,3));
+  f8->AddVertex (csVector3 (30,15,-3));
+  csFrustrum* f9 = f8->Intersect (*f3);
+  Dumper::dump (f8, "f8");
+  Dumper::dump (f9, "f9");
+}
+
+#endif
+
 
 /*---------------------------------------------------------------------*
  * Main function
@@ -729,6 +767,7 @@ int main (int argc, char* argv[])
   if (Sys->auto_script)
     Command::start_script (Sys->auto_script);
 
+  TestFrustrum ();
   // The main loop.
   Sys->Loop ();
 
