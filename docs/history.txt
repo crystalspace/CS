@@ -7,12 +7,27 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 18-Sep-2003
-	- res reverted the change made to libs/cssys/win32/shellstuff.h that
-	  caused SHGetFolderPathW() to be used when present. The way this
-	  function was employed was borked: as the W in the name indicates,
-	  it returns it's data as a wide(i.e. wchar_t*) string. However, it 
-	  was stored in a standard char* string - thus the data returned 
-	  would've been useless.
+	- res reverted Paul's change made to libs/cssys/win32/shellstuff.h
+	  yesterday which caused SHGetFolderPathW() to be used when present.
+	  The way this function was employed was borked: as the W in the name
+	  indicates, it returns it's data as a wide(i.e. wchar_t*) string.
+	  However, it was stored in a standard char* string - thus the data
+	  returned would've been useless.
+	- Eric Sunshine updated the API documentation for csGetPluginMetadata()
+	  so that it clearly states how the function returns status
+	  information, and exactly how it signals normal and abnormal retrieval
+	  results.
+	- Eric Sunshine fixed all of the implementations of
+	  csGetPluginMetadata() so that they operate as documented.  In
+	  particular, they now return a valid csRef<iDocument> if and only if
+	  they successfully retrieve metadata for the plugin.  In the past, the
+	  implementations often incorrectly returned empty iDocuments which
+	  confused SCF since SCF was expecting an iDocument only if metadata
+	  had been retrieved.  This fixes the problem in which SCF would crash
+	  as a result of receiving an empty iDocument from the various
+	  platform-specific csGetPluginMetadata() implementations for non-CS
+	  shared libraries (.so, .dll, etc.) if they happened to reside in the
+	  same directories as CS plugins.
 17-Sep-2003
 	- Eric Sunshine documented cssys+csutil merge in apimod98.txi.
 	- Eric Sunshine documented csHash<> and csSet<> in apimod98.txi.
@@ -53,12 +68,14 @@ chronological order.
 	  respect $(SRCDIR) in all cases.
 	- Eric Sunshine eliminated hundreds of "macro redifinition" warnings
 	  from renderer/opengl/csglext.h.
-        - Mingw/Msys Build/Maintenance Update for Windows OS versions < 5.0
-          - Added exception processing to allow SHGetFolderPathW to be properly
-	    loaded for Unicode Processing as needed or requested by Windows OS
-	    for those Windows OS versions < 5.0 (NT4/Win98/Win98SE/Win95).
-          - Impact:  Reduce time and overhead required to open Canvas and
-                     start Renderer for Windows OS versions < 5.0.
+        - Paul Garceau performed a Mingw/Msys build/maintenance update for
+	  Windows OS versions < 5.0:
+	    - Added exception processing to allow SHGetFolderPathW to be
+	      properly loaded for Unicode Processing as needed or requested by
+	      Windows OS for those Windows OS versions < 5.0
+	      (NT4/Win98/Win98SE/Win95).
+	    - Impact: Reduce time and overhead required to open Canvas and
+	      start Renderer for Windows OS versions < 5.0.
 16-Sep-2003
 	- Jorrit fixed the thing plugin so that it now actually registers
 	  leaving portals to the sector.
@@ -2076,7 +2093,7 @@ chronological order.
 	  The reason is to avoid confusion.  csArrayCompareFunction is given
 	  pointers to the objects themselves (pointers) while the
 	  csArraySortCompareFunction is given pointers to pointers to the
-	  objects (i.e.  pointers inside the array to sort).
+	  objects (i.e. pointers inside the array to sort).
 	- Jorrit extended csArray::InsertSorted() with 'equal_index' parameter
 	  like was done yesterday with csPDelArray.
 	- Jorrit renamed csArraySortCompareFunction to
@@ -2693,7 +2710,7 @@ chronological order.
 	  1.52 of glrender.mak it was not able to find rule to build object
 	  files for files from renderer/common.
 	- Jorrit fixed win32.cpp for cygwin so that it uses the correct argc
-	  and argv (i.e.  with two underscores instead of one).
+	  and argv (i.e. with two underscores instead of one).
 	- Eric Sunshine reverted the reversion of glrender.mak and applied a
 	  small patch so that it can build files from the renderer/common
 	  directory.  Also patched gl_render3d.mak.

@@ -107,12 +107,23 @@ csRef<iStringArray> csScanPluginDirs (csPluginPaths* dirs,
 				    csRef<iStringArray>& plugins);
 
 /**
- * Query plugin metadata.
- * \remark \p fullPath should either be a string retrieved from 
- *   csScanPluginDir() or csScanPluginDirs(), or a fully qualified native
- *   path of the plugin binary, however the suffix should ALWAYS be 
- *   .csplugin, regardless of the actual file binary suffix. This will
- *   guarantee that this function will work as expected across all platforms.
+ * Retrive a plugin's metadata.
+ * \remark \p `fullPath' should be either a string returned from
+ * csScanPluginDir() or csScanPluginDirs(), or a fully qualified native path of
+ * the plugin module.  The path suffix should be either .csplugin if the plugin
+ * metadata is stored in an external .csplugin file, or it should be the
+ * standard suffix of shared libraries or bundles for the platform (for
+ * example, .so for Unix; .dll for Windows).  If metadata is retrieved
+ * successfully for the specified plugin module, metadata.IsValid() will return
+ * true, and the `metadata' argument will reference an iDocument containing the
+ * data.  If no metadata is located or an error occurrs while attempting to
+ * retrieve the metadata, metadata.IsValid() return false.  If some type of
+ * reportable error or warning is encountered, it will be returned from the
+ * function as an iString.  It is possible for a warning to be issued even if
+ * metadata was successfully retrieved.  Finally, if metadata.IsValid() returns
+ * false and the returned iString is empty, then that indicates simply that the
+ * specified path does not correspond to a Crystal Space plugin module.  This
+ * is a valid condition.
  */
 csRef<iString> csGetPluginMetadata (const char* fullPath, 
 				    csRef<iDocument>& metadata);

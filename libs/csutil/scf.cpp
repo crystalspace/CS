@@ -483,14 +483,16 @@ static void scfScanPlugins (csPluginPaths* pluginPaths, const char* context)
 	    "Error retrieving metadata for %s: %s\n",
 	    plugins->Get (j), msg->GetData ());
 	}
-	/* 
-	  Metadata may be 0 although no error has been returned,
-	  but metadata may be valid although an error has been returned :)
-	  This is the case where the plugin scanner recognized
-	  possible plugins which turned out not be such. 
-	  (This happens e.g. on Win32 where 3rd party DLLs are
-	    returned as well.)
-	  */
+	// It is possible for an error or warning message to be generated even
+	// when metadata is also obtained.  Likewise, it is possible for no
+	// metadata to be obtained yet also to have no error message.  The
+	// latter case is indicative of csScanPluginDir() returning "potential"
+	// plugins which turn out to not be Crystal Space plugins after all.
+	// For instance, on Windows, the scan might find a DLL which is not a
+	// Crystal Space DLL; that is, which does not contain embedded
+	// metadata.  This is a valid case, which we simply ignore since it is
+	// legal for non-CS libraries to exist alongside CS plugins in the
+	// scanned directories.
 	if (metadata)
 	{
 	  PrivateSCF->RegisterClasses (plugins->Get (j), metadata, 

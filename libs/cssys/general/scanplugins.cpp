@@ -42,36 +42,27 @@ static void AppendStrVecString (iStringArray*& strings, const char* str)
 csRef<iString> csGetPluginMetadata (const char* fullPath, 
 				    csRef<iDocument>& metadata)
 {
-  iString* result = 0;
+  csRef<iString> result;
+  metadata = 0;
 
-  if (!metadata)
-  {
-    /*
-      TinyXML documents hold references to the document system.
-      So we have to create a new csTinyDocumentSystem (). Using just
-      'csTinyDocumentSystem docsys' would result in a crash when the
-      documents try to DecRef() to already destructed document system.
-     */
-    csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
-      (new csTinyDocumentSystem ());
-    metadata = docsys->CreateDocument ();
-  }
-  
+  csRef<iDocumentSystem> docsys =
+    csPtr<iDocumentSystem>(new csTinyDocumentSystem ());
+  csRef<iDocument> doc = docsys->CreateDocument ();
+
   csPhysicalFile file (fullPath, "rb");
+  char const* errmsg = doc->Parse (&file);
 
-  char const* errmsg = metadata->Parse (&file);
-  if (errmsg != 0)
+  if (errmsg == 0)	// Parse successful.
+    metadata = doc;
+  else			// Parse failed.
   {
-    metadata = 0;
-
     csString errstr;
     errstr.Format ("Error parsing metadata from %s: %s",
       fullPath, errmsg);
-
-    result = new scfString (errstr);
+    result.AttachNew (new scfString (errstr));
   }
 
-  return csPtr<iString> (result);
+  return result;
 }
   
 // Scan a directory for .csplugin files

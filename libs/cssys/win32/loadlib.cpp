@@ -188,17 +188,16 @@ static void AppendWin32Error (const char* text,
 #if defined(CS_EMBED_PLUGIN_META)
 
 static csRef<iString> InternalGetPluginMetadata (const char* fullPath, 
-						 csRef<iDocument>& metadata,
-						 bool& metadataValid)
+						 csRef<iDocument>& metadata)
 {
-  iString* result = 0;
+  csRef<iString> result;
+  metadata = 0;
 
-  HMODULE hLibrary = LoadLibraryEx (fullPath, 0, 
-    LOADLIBEX_FLAGS | LOAD_LIBRARY_AS_DATAFILE);
+  HMODULE hLibrary =
+    LoadLibraryEx (fullPath, 0, LOADLIBEX_FLAGS | LOAD_LIBRARY_AS_DATAFILE);
   if (hLibrary != 0)
   {
-    HRSRC res = FindResource (hLibrary, MAKEINTRESOURCE (0x444d),
-      RT_RCDATA);
+    HRSRC res = FindResource (hLibrary, MAKEINTRESOURCE (0x444d), RT_RCDATA);
     if (res != 0)
     {
       HGLOBAL resDataHandle = LoadResource (hLibrary, res);
@@ -207,45 +206,33 @@ static csRef<iString> InternalGetPluginMetadata (const char* fullPath,
 	LPVOID resData = LockResource (resDataHandle);
 	if (resData != 0)
 	{
-	  if (!metadata)
-	  {
-	    /*
-	      TinyXML documents hold references to the document system.
-	      So we have to create a new csTinyDocumentSystem (). Using just
-	      'csTinyDocumentSystem docsys' would result in a crash when the
-	      documents try to DecRef() to already destructed document system.
-	    */
-	    csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
-	      (new csTinyDocumentSystem ());
-	    metadata = docsys->CreateDocument();
-	  }
-	  char const* errmsg = metadata->Parse ((char*)resData);
-	  if (errmsg != 0)
+	  csRef<iDocumentSystem> docsys =
+	    csPtr<iDocumentSystem>(new csTinyDocumentSystem ());
+	  csRef<iDocument> doc = docsys->CreateDocument();
+
+	  char const* errmsg = doc->Parse ((char const*)resData);
+	  if (errmsg == 0)	// Parse successful.
+	    metadata = doc;
+	  else			// Parse failed.
 	  {
 	    csString errstr;
 	    errstr.Format ("Error parsing metadata from '%s': %s",
 	      fullPath, errmsg);
-
-	    result = new scfString (errstr);
-	  }
-	  else
-	  {
-	    metadataValid = true;
+	    result.AttachNew(new scfString (errstr));
 	  }
 	}
       }
     }
-
     FreeLibrary (hLibrary);
   }
-  /*
-    No error messages are emitted - this simply may not be a plugin...
-    And "errors" would be confusing in this case.
-    We can't really determine whether a DLL is intended to be a CS plugin
-    or not.
-    */
 
-  return csPtr<iString> (result);
+  // We do not emit an error message for the case when the DLL contains no
+  // metadata since this is not considered an error condition.  This case can
+  // arise, for instance, if we are asked to extract metadata from a DLL which
+  // is not a CS plugin (a valid situation if non-CS DLLs are found by the
+  // plugin scanner in the same directories as CS plugins).
+
+  return result;
 }
 
 #endif
@@ -253,99 +240,72 @@ static csRef<iString> InternalGetPluginMetadata (const char* fullPath,
 csRef<iString> csGetPluginMetadata (const char* fullPath, 
 				    csRef<iDocument>& metadata)
 {
-  /*
-    @@@ There's a small inefficiency here.
-    This function, when given a filename of <blah>.dll or 
-    <blah>.csplugin, first checks <blah>.dll for embedded
-    metadata and then for the existence of a <blah>.csplugin
-    file. However, the csScanPluginDir() function already
-    emits a <blah>.csplugin file name when such a file was
-    found, <blah>.dll otherwise. This information can
-    probably be reused.
-   */
+  // @@@ There's a small inefficiency here.  This function, when given a
+  // filename of <blah>.dll or <blah>.csplugin, first checks <blah>.dll for
+  // embedded metadata and then for the existence of a <blah>.csplugin file.
+  // However, the csScanPluginDir() function already emits a <blah>.csplugin
+  // file name when such a file was found, <blah>.dll otherwise.  This
+  // information can probably be reused.
 
   CS_ALLOC_STACK_ARRAY (char, dllPath, strlen (fullPath) + 5);
   strcpy (dllPath, fullPath);
   char* dot = strrchr (dllPath, '.');
 
   bool isCsPlugin = (dot && (strcasecmp (dot, ".csplugin") == 0));
-
-  if ((!dot) || isCsPlugin || (strcasecmp (dot, ".dll") != 0))
+  if (!dot || isCsPlugin || strcasecmp (dot, ".dll") != 0)
   {
     if (isCsPlugin)
-    {
       strcpy (dot, ".dll");
-    }
     else
-    {
       strcat (dllPath, ".dll");
-    }
   }
 
-  bool metadataValid = false;
   csRef<iString> result;
+  metadata = 0;
 
 #if defined(CS_EMBED_PLUGIN_META)
-  result = InternalGetPluginMetadata (dllPath, metadata, metadataValid);
+  result = InternalGetPluginMetadata (dllPath, metadata);
 #endif
 
-  /* Check whether a .csplugin file exists as well */
-
-  /*
-    @@@ This makes the assumption that such might only exists if
-     this function was called with a <blah>.csplugin filename.
-   */
-
+  // Check whether a .csplugin file exists as well
+  // @@@ This makes the assumption that such might only exists if this function
+  // was called with a <blah>.csplugin filename.
   if (isCsPlugin)
   {
     csPhysicalFile file (fullPath, "rb");
 
     if (file.GetStatus() == VFS_STATUS_OK)
     {
-      if (metadataValid)
+      if (metadata.IsValid())
       {
 	csString errstr;
 	errstr.Format ("'%s' contains embedded metadata, "
 	  "but external '%s' exists as well. Ignoring the latter.",
 	  dllPath, fullPath);
-
 	result.AttachNew (new scfString (errstr));
       }
       else
       {
-	if (!metadata)
-	{
-	  csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
-	    (new csTinyDocumentSystem ());
-	  metadata = docsys->CreateDocument();
-	}
-	char const* errmsg = metadata->Parse (&file);
+        csRef<iDocumentSystem> docsys =
+	  csPtr<iDocumentSystem>(new csTinyDocumentSystem ());
+	csRef<iDocument> doc = docsys->CreateDocument();
 
-	if (errmsg != 0)
+	char const* errmsg = doc->Parse (&file);
+	if (errmsg == 0)	// Parse successful.
+	  metadata = doc;
+	else			// Parse failed.
 	{
 	  csString errstr;
 	  errstr.Format ("Error parsing metadata from '%s': %s",
 	    fullPath, errmsg);
-
 	  result.AttachNew (new scfString (errstr));
-	}
-	else
-	{
-	  metadataValid	= true;
 	}
       }
     }
   }
 
-  if (!metadataValid)
-  {
-    metadata = 0;
-  }
-
   return result;
 }
-
-extern char* csGetConfigPath ();
 
 inline static void AddLower (csStringHash& hash, const char* str)
 {

@@ -47,22 +47,19 @@ static void AppendStrVecString (iStringArray*& strings, const char* str)
 csRef<iString> csGetPluginMetadata (const char* fullPath, 
 				    csRef<iDocument>& metadata)
 {
-  iString* result = 0;
+  csRef<iString> result;
+  metadata = 0;
   bool conflict = false;
 
   int len = strlen (fullPath);
   csString cspluginPath (fullPath);
   cspluginPath.Truncate (len - 3);
-  cspluginPath += ".csplugin";
+  cspluginPath << ".csplugin";
 
-  if (!metadata)
-  {
-    // Since TinyXML documents maintain references to the document system, we
-    // must allocate the document system via the heap, rather than the stack.
-    csRef<iDocumentSystem> docsys = csPtr<iDocumentSystem>
-      (new csTinyDocumentSystem ());
-    metadata = docsys->CreateDocument ();
-  }
+  csRef<iDocumentSystem> docsys =
+    csPtr<iDocumentSystem>(new csTinyDocumentSystem ());
+  csRef<iDocument> doc = docsys->CreateDocument ();
+
   char const* errmsg = 0;
   bool usebfd = false;
   bfd *abfd = bfd_openr (fullPath, 0);
@@ -81,9 +78,11 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
             errmsg = "libbfd can't get '.crystal' section contents";
           else
           {
-            buf[size] = 0;
-            errmsg = metadata->Parse (buf);
             usebfd = true;
+            buf[size] = 0;
+            errmsg = doc->Parse (buf);
+	    if (errmsg == 0)		// Parse successful.
+	      metadata = doc;
           }
           free (buf);
         }
@@ -95,18 +94,27 @@ csRef<iString> csGetPluginMetadata (const char* fullPath,
   csPhysicalFile file (cspluginPath, "rb");
   if (file.GetStatus () == VFS_STATUS_OK)
   {
-    if (usebfd) conflict = true;
-    else errmsg = metadata->Parse (&file);
+    if (usebfd)
+      conflict = true;
+    else
+    {
+      errmsg = doc->Parse (&file);
+      if (errmsg == 0)			// Parse successful.
+	metadata = doc;
+    }
   }
 
   csString errstr;
-  if (conflict) errstr += csString().Format ("Warning: %s has embedded data and"
-    " .csplugin file, using embedded.%s", fullPath, errmsg ? "\n" : "");
-  if (errmsg) errstr += csString().Format ("Error parsing metadata in %s: %s",
-    usebfd ? fullPath : cspluginPath.GetData (), errmsg);
-  if (errstr.Length ()) result = new scfString (errstr);
+  if (conflict)
+    errstr << csString().Format ("Warning: %s has embedded data and"
+      " .csplugin file, using embedded.%s", fullPath, errmsg ? "\n" : "");
+  if (errmsg)
+    errstr << csString().Format ("Error parsing metadata in %s: %s",
+      usebfd ? fullPath : cspluginPath.GetData (), errmsg);
+  if (errstr.Length ())
+    result.AttachNew(new scfString (errstr));
 
-  return csPtr<iString> (result);
+  return result;
 }
   
 void InternalScanPluginDir (iStringArray*& messages,
