@@ -628,18 +628,18 @@ template, the following @code{csList<>} methods have been renamed:
 @code{HasPrev()} @result{} @code{HasPrevious()}
 @end itemize
 
-@subheading Default @code{csHash<>} (and @code{csHashReversible<>}) Hash Table Size
+@subheading Default @code{csHash<>} (and @code{csHashReversible<>}) Table Size
 
-The default hash table size and grow rate has been reduced from 257 resp. 64 
-to 23 resp. 5 to have hashes use less memory. If a hash is expected to contain 
-a large quantity of elements, those two parameters can be tweaked upon 
-construction of a @code{csHash<>} or @code{csHashReversible<>}.  Consult the 
-Public API Documentation of @code{csHash<>} for more information.
+The default hash table size and grow rate has been reduced from 257 and 64 to
+23 and 5, respectively, to have hashes use less memory.  If a hash is expected
+to contain a large quantity of elements, those two parameters can be tweaked
+upon construction of a @code{csHash<>} or @code{csHashReversible<>}.  Consult
+the Public @sc{api} Documentation of @code{csHash<>} for more information.
 
 @subheading @code{iTextureManager::FreeImages()} Removal
 
-The @code{iTextureManager::FreeImages()} was removed. It was used to release
-the iImage objects associated with textures with the purpose of freeing up
-memory. This happens automatically now; the images associated with a texture
-are released by the renderer as soon as the image data is converted into the
-internal texture format resp. uploaded to the graphics hardware.
+@code{iTextureManager::FreeImages()} has been removed.  It was used to release
+the @samp{iImage} objects associated with textures with the purpose of freeing
+up memory.  This happens automatically now; the images associated with a
+texture are released by the renderer as soon as the image data is converted
+into the internal texture format (that is, uploaded to the graphics hardware).
