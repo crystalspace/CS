@@ -24,6 +24,10 @@ IMPLEMENT_IBASE (csIsoLight)
   IMPLEMENTS_INTERFACE (iIsoLight)
 IMPLEMENT_IBASE_END
 
+IMPLEMENT_IBASE (csIsoFakeLight)
+  IMPLEMENTS_INTERFACE (iLight)
+IMPLEMENT_IBASE_END
+
 csIsoLight::csIsoLight (iBase *iParent)
 {
   CONSTRUCT_IBASE (iParent);
@@ -35,11 +39,13 @@ csIsoLight::csIsoLight (iBase *iParent)
   vismap = NULL;
   visw = vish = 0;
   recalc_vis = true;
+  fakelight = new csIsoFakeLight(this);
 }
 
 csIsoLight::~csIsoLight ()
 {
   delete[] vismap;
+  delete fakelight;
 }
 
 void csIsoLight::SetGrid(iIsoGrid *grid)
@@ -280,3 +286,7 @@ float csIsoLight::MaxRadius() const
   };
 }
 
+iLight* csIsoLight::GetFakeLight()
+{
+  return fakelight;
+}

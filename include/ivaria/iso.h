@@ -49,6 +49,7 @@ struct iIsoLight;
 struct G3DPolygonDPFX;
 struct iMeshObject;
 struct iCamera;
+struct iLight;
 
 SCF_VERSION (iIsoEngine, 0, 0, 1);
 
@@ -509,6 +510,8 @@ struct iIsoLight : public iBase
   virtual void ShineGrid() = 0;
   /// shine the light on a sprite, adding to all the vertex colors
   virtual void ShineSprite(iIsoSprite *sprite) = 0;
+  /// return an iLight interface that mostly works. For internal use.
+  virtual iLight* GetFakeLight() = 0;
 };
 
 SCF_VERSION (iIsoMaterialWrapperIndex, 0, 0, 1);

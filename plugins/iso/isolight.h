@@ -20,6 +20,9 @@
 #define __ISOLIGHT_H__
 
 #include "ivaria/iso.h"
+#include "iengine/light.h"
+
+class csIsoFakeLight;
 
 /**
  * iso light
@@ -44,6 +47,8 @@ private:
   bool recalc_vis;
   /// my flags
   csFlags flags;
+  /// fake iLight
+  csIsoFakeLight *fakelight;
 
 public:
   DECLARE_IBASE;
@@ -78,7 +83,42 @@ public:
   virtual void ShineGrid();
   virtual void ShineSprite(iIsoSprite *sprite);
   virtual csFlags& Flags() {return flags;}
+  virtual iLight* GetFakeLight();
 
+};
+
+
+/// class to fake a iLight interface
+class csIsoFakeLight : public iLight {
+  csIsoLight *isolight;
+
+public:
+  DECLARE_IBASE;
+
+  csIsoFakeLight(csIsoLight *par) {isolight = par;}
+  virtual ~csIsoFakeLight();
+
+  //------------ iLight ------------------------------------------
+  virtual csLight* GetPrivateObject () {return 0;}
+  virtual iObject *QueryObject() {return 0;}
+  virtual const csVector3& GetCenter () {return isolight->GetPosition();}
+  virtual void SetCenter (const csVector3& pos) {isolight->SetPosition(pos);}
+  virtual iSector *GetSector () {return 0;}
+  virtual void SetSector (iSector* ) {}
+  virtual float GetRadius () {return isolight->GetRadius();}
+  virtual float GetSquaredRadius () 
+  { return isolight->GetRadius()*isolight->GetRadius(); }
+  virtual float GetInverseRadius () {return 1./isolight->GetRadius();}
+  virtual void SetRadius (float r) {isolight->SetRadius(r);}
+  virtual const csColor& GetColor () {return isolight->GetColor();}
+  virtual void SetColor (const csColor& col) {isolight->SetColor(col);}
+  virtual int GetAttenuation () {return isolight->GetAttenuation();}
+  virtual void SetAttenuation (int a) {isolight->SetAttenuation(a);}
+  virtual iCrossHalo* CreateCrossHalo (float, float) {return 0;}
+  virtual iNovaHalo* CreateNovaHalo (int, int, float) {return 0;}
+  virtual iFlareHalo* CreateFlareHalo () {return 0;}
+  virtual float GetBrightnessAtDistance (float d)
+  { return isolight->GetAttenuation(d); }
 };
 
 #endif
