@@ -31,6 +31,7 @@
 #include "csengine/dumper.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/fastsqrt.h"
+#include "csutil/garray.h"
 #include "igraph3d.h"
 
 //--------------------------------------------------------------------------
@@ -316,6 +317,19 @@ csSpriteAction* csSpriteTemplate::FindAction (const char *n)
 
 CSOBJTYPE_IMPL (csSprite3D, csObject)
 
+/// Static vertex array.
+DECLARE_GROWING_ARRAY (static, tr_verts, csVector3)
+/// Static z array.
+DECLARE_GROWING_ARRAY (static, z_verts, float)
+/// Static uv array.
+DECLARE_GROWING_ARRAY (static, uv_verts, csVector2)
+/// The perspective corrected vertices.
+DECLARE_GROWING_ARRAY (static, persp, csVector2)
+/// Array which indicates which vertices are visible and which are not.
+DECLARE_GROWING_ARRAY (static, visible, bool)
+/// The list of lights that hit the sprite
+DECLARE_GROWING_ARRAY (static, light_worktable, csLight*)
+
 csSprite3D::csSprite3D () : csObject ()
 {
   v_obj2world.x = 0;
@@ -335,16 +349,29 @@ csSprite3D::csSprite3D () : csObject ()
   is_visible = false;
   camera_cookie = 0;
   tween_ratio = 0;
+
+  tr_verts.IncRef ();
+  z_verts.IncRef ();
+  uv_verts.IncRef ();
+  persp.IncRef ();
+  visible.IncRef ();
+  light_worktable.IncRef ();
 }
 
 csSprite3D::~csSprite3D ()
 {
+  light_worktable.DecRef ();
+  visible.DecRef ();
+  persp.DecRef ();
+  uv_verts.DecRef ();
+  z_verts.DecRef ();
+  tr_verts.DecRef ();
+
   while (dynamiclights) CHKB (delete dynamiclights);
   CHK (delete [] vertex_colors);
   CHK (delete skeleton_state);
   RemoveFromSectors ();
 }
-
 
 void csSprite3D::SetMove (float x, float y, float z)
 {
@@ -500,31 +527,15 @@ void csSprite3D::GenerateSpriteLOD (int num_vts)
   }
 }
 
-// @@@ The below arrays are never cleaned up.
-static int max_work_sprite_size = 0;
-csVector3* csSprite3D::tr_verts = NULL;
-float* csSprite3D::z_verts = NULL;
-csVector2* csSprite3D::uv_verts = NULL;
-csVector2* csSprite3D::persp = NULL;
-bool* csSprite3D::visible = NULL;
-int csSprite3D::max_light_worktable = 0;
-csLight** csSprite3D::light_worktable = NULL;
-
 void csSprite3D::UpdateWorkTables (int max_size)
 {
-  if (max_size > max_work_sprite_size)
+  if (max_size > tr_verts.GetLimit ())
   {
-    CHK (delete [] tr_verts);
-    CHK (delete [] z_verts);
-    CHK (delete [] uv_verts);
-    CHK (delete [] persp);
-    CHK (delete [] visible);
-    max_work_sprite_size = max_size;
-    CHK (tr_verts = new csVector3 [max_work_sprite_size]);
-    CHK (z_verts = new float [max_work_sprite_size]);
-    CHK (uv_verts = new csVector2 [max_work_sprite_size]);
-    CHK (persp = new csVector2 [max_work_sprite_size]);
-    CHK (visible = new bool [max_work_sprite_size]);
+    tr_verts.SetLimit (max_size);
+    z_verts.SetLimit (max_size);
+    uv_verts.SetLimit (max_size);
+    persp.SetLimit (max_size);
+    visible.SetLimit (max_size);
   }
 }
 
@@ -532,16 +543,14 @@ void csSprite3D::UpdateDeferedLighting ()
 {
   if (defered_num_lights)
   {
-    if (defered_num_lights > max_light_worktable)
-    {
-      CHK (delete [] light_worktable);
-      CHK (light_worktable = new csLight* [defered_num_lights]);
-      max_light_worktable = defered_num_lights;
-    }
+    if (defered_num_lights > light_worktable.GetLimit ())
+      light_worktable.SetLimit (defered_num_lights);
+
     csSector* sect = (csSector*)sectors[0];
     int num_lights = csWorld::current_world->GetNearbyLights (sect,
-      GetW2TTranslation (), defered_lighting_flags, light_worktable, defered_num_lights);
-    UpdateLighting (light_worktable, num_lights);
+      GetW2TTranslation (), defered_lighting_flags,
+      light_worktable.GetArray (), defered_num_lights);
+    UpdateLighting (light_worktable.GetArray (), num_lights);
   }
 }
 
@@ -800,7 +809,7 @@ void csSprite3D::Draw (csRenderView& rview)
   // If we have a skeleton then we let the skeleton do the transformation.
   // Otherwise we just transform all vertices.
   if (skeleton_state)
-    skeleton_state->Transform (tr_o2c, cframe, tr_verts);
+    skeleton_state->Transform (tr_o2c, cframe, tr_verts.GetArray ());
   else
   {
     if (tween_ratio)
@@ -1085,8 +1094,8 @@ csVector3* csSprite3D::GetObjectVerts (csFrame* fr)
   if (skeleton_state)
   {
     UpdateWorkTables (tpl->num_vertices);
-    skeleton_state->Transform (csTransform (), fr, tr_verts);
-    return tr_verts;
+    skeleton_state->Transform (csTransform (), fr, tr_verts.GetArray ());
+    return tr_verts.GetArray ();
   }
   else
     return fr->GetVertices ();

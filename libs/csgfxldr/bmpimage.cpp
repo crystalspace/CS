@@ -29,11 +29,11 @@
 
 bool RegisterBMP ()
 {
-  static BMPImageLoader loader;
-  return ImageLoader::Register (&loader);
+  static csBMPImageLoader loader;
+  return csImageLoader::Register (&loader);
 }
 
-csImageFile* BMPImageLoader::LoadImage (UByte* buf, ULong size)
+csImageFile* csBMPImageLoader::LoadImage (UByte* buf, ULong size)
 {
   CHK (ImageBMPFile* i = new ImageBMPFile(buf, size));
   if (i && (i->get_status() & IFE_BadFormat))
@@ -41,7 +41,7 @@ csImageFile* BMPImageLoader::LoadImage (UByte* buf, ULong size)
   return i;    
 }
 
-AlphaMapFile *BMPImageLoader::LoadAlphaMap(UByte* buf,ULong size)
+AlphaMapFile *csBMPImageLoader::LoadAlphaMap(UByte* buf,ULong size)
 {
   (void) buf;
   (void) size;

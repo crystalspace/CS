@@ -157,8 +157,8 @@ void Dumper::dump (csPolygonSet* p)
   CsPrintf (MSG_DEBUG_0, "========================================================\n");
   CsPrintf (MSG_DEBUG_0, "Dump sector '%s' id=%ld:\n", 
     p->GetName (), p->GetID ());
-  CsPrintf (MSG_DEBUG_0, "    num_vertices=%d max_vertices=%d num_polygon=%d max_polygon=%d\n",
-    p->num_vertices, p->max_vertices, p->num_polygon, p->max_polygon);
+  CsPrintf (MSG_DEBUG_0, "    num_vertices=%d max_vertices=%d polygons=%d\n",
+    p->num_vertices, p->max_vertices, p->GetNumPolygons ());
   CsPrintf (MSG_DEBUG_0, "This sector %s a BSP.\n", p->bsp ? "uses" : "doesn't use");
   int i;
 
@@ -172,10 +172,10 @@ void Dumper::dump (csPolygonSet* p)
     CsPrintf (MSG_DEBUG_0, "\n");
   }
   CsPrintf (MSG_DEBUG_0, "  Polygons:\n");
-  for (i = 0 ; i < p->num_polygon ; i++)
+  for (i = 0 ; i < p->GetNumPolygons () ; i++)
   {
     CsPrintf (MSG_DEBUG_0, "------------------------------------------\n");
-    csPolygon3D* pp = (csPolygon3D*)p->polygons[i];
+    csPolygon3D* pp = p->GetPolygon3D (i);
     dump (pp);
   }
 }

@@ -80,9 +80,9 @@ void csThing::Transform ()
   if (!bbox) CreateBoundingBox ();
   for (i = 0 ; i < num_vertices ; i++)
     wor_verts[i] = obj.This2Other (obj_verts[i]);
-  for (i = 0 ; i < num_polygon ; i++)
+  for (i = 0 ; i < polygons.Length () ; i++)
   {
-    csPolygon3D* p = (csPolygon3D*)polygons[i];
+    csPolygon3D* p = GetPolygon3D (i);
     p->ObjectToWorld (obj);
   }
 }
@@ -111,9 +111,9 @@ void csThing::Transform (csMatrix3& matrix)
 void csThing::CreateLightMaps (iGraphics3D* g3d)
 {
   int i;
-  for (i = 0 ; i < num_polygon ; i++)
+  for (i = 0 ; i < polygons.Length () ; i++)
   {
-    csPolygon3D* p = (csPolygon3D*)polygons[i];
+    csPolygon3D* p = GetPolygon3D (i);
     p->CreateLightMaps (g3d);
   }
 }
@@ -127,9 +127,9 @@ csPolygon3D* csThing::IntersectSphere (csVector3& center, float radius, float* p
   csVector3 hit;
   float A, B, C, D;
 
-  for (i = 0 ; i < num_polygon ; i++)
+  for (i = 0 ; i < polygons.Length () ; i++)
   {
-    p = (csPolygon3D*)polygons[i];
+    p = GetPolygon3D (i);
     pl = p->GetPlane ();
     d = pl->Distance (center);
     if (d < min_d && pl->VisibleFromPoint (center))
@@ -188,10 +188,10 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 
   // Loop over all curves
   csCurve* c;
-  for (i = 0 ; i < num_curves ; i++)
+  for (i = 0 ; i < GetNumCurves () ; i++)
   {
     int j;
-    c = curves[i];
+    c = curves.Get (i);
     csCurveTesselated* tess = c->Tesselate (res);
 
     // First I transform all tesselated vertices from object to
@@ -337,7 +337,7 @@ void csThing::Draw (csRenderView& rview, bool use_z_buf)
   // @@@ Wouldn't it be nice if we checked if all vertices are behind the view plane?
   {
     if (rview.callback) rview.callback (&rview, CALLBACK_THING, (void*)this);
-    Stats::polygons_considered += num_polygon;
+    Stats::polygons_considered += polygons.Length ();
 
     DrawCurves (rview, use_z_buf);
 
@@ -359,7 +359,7 @@ void csThing::Draw (csRenderView& rview, bool use_z_buf)
       }
     }
 
-    DrawPolygonArray (polygons, num_polygon, &rview, use_z_buf);
+    DrawPolygonArray (polygons.GetArray (), polygons.Length (), &rview, use_z_buf);
     if (rview.callback) rview.callback (&rview, CALLBACK_THINGEXIT, (void*)this);
   }
 
@@ -381,12 +381,12 @@ void csThing::DrawFoggy (csRenderView& d)
   {
     csVector2 orig_triangle[3];
     if (!d.callback) d.g3d->OpenFogObject (GetID (), &GetFog ());
-    Stats::polygons_considered += num_polygon;
+    Stats::polygons_considered += polygons.Length ();
 
     d.SetMirrored (!d.IsMirrored ());
-    for (i = 0 ; i < num_polygon ; i++)
+    for (i = 0 ; i < polygons.Length () ; i++)
     {
-      p = (csPolygon3D*)polygons[i];
+      p = GetPolygon3D (i);
       if (p->dont_draw) continue;
       clip = (csPolygon2D*)(render_pool->Alloc ());
       bool front = p->GetPlane ()->VisibleFromPoint (d.GetOrigin ());
@@ -413,9 +413,9 @@ void csThing::DrawFoggy (csRenderView& d)
       render_pool->Free (clip);
     }
     d.SetMirrored (!d.IsMirrored ());
-    for (i = 0 ; i < num_polygon ; i++)
+    for (i = 0 ; i < polygons.Length () ; i++)
     {
-      p = (csPolygon3D*)polygons[i];
+      p = GetPolygon3D (i);
       if (p->dont_draw) continue;
       clip = (csPolygon2D*)(render_pool->Alloc ());
       bool front = p->GetPlane ()->VisibleFromPoint (d.GetOrigin ());
@@ -463,18 +463,17 @@ void csThing::CalculateLighting (csLightView& lview)
   }
   else lview.gouraud_color_reset = false;
 
-  for (i = 0 ; i < num_polygon ; i++)
+  for (i = 0 ; i < polygons.Length () ; i++)
   {
-    p = (csPolygon3D*)polygons[i];
+    p = GetPolygon3D (i);
     p->CamUpdate ();
     p->CalculateLighting (&lview);
   }
 
   // Loop over all curves
-  csCurve* c;
-  for (i = 0 ; i < num_curves ; i++)
+  for (i = 0 ; i < GetNumCurves () ; i++)
   {
-    c = curves[i];
+    csCurve* c = curves.Get (i);
     c->CalculateLighting (lview);
   }
 
@@ -484,19 +483,19 @@ void csThing::CalculateLighting (csLightView& lview)
 void csThing::InitLightMaps (bool do_cache)
 {
   int i;
-  for (i = 0 ; i < num_polygon ; i++)
-    ((csPolygon3D*)polygons[i])->InitLightMaps (this, do_cache, i);
-  for (i = 0 ; i < num_curves ; i++)
-    ((csCurve*)curves[i])->InitLightMaps (this, do_cache, num_polygon+i);
+  for (i = 0 ; i < polygons.Length () ; i++)
+    polygons.Get (i)->InitLightMaps (this, do_cache, i);
+  for (i = 0 ; i < GetNumCurves () ; i++)
+    curves.Get (i)->InitLightMaps (this, do_cache, polygons.Length ()+i);
 }
 
 void csThing::CacheLightMaps ()
 {
   int i;
-  for (i = 0 ; i < num_polygon ; i++)
-    ((csPolygon3D*)polygons[i])->CacheLightMaps (this, i);
-  for (i = 0 ; i < num_curves ; i++)
-    ((csCurve*)curves[i])->CacheLightMaps (this, num_polygon+i);
+  for (i = 0 ; i < polygons.Length () ; i++)
+    polygons.Get (i)->CacheLightMaps (this, i);
+  for (i = 0 ; i < GetNumCurves () ; i++)
+    curves.Get (i)->CacheLightMaps (this, polygons.Length ()+i);
 }
 
 void csThing::Merge (csThing* other)
@@ -506,9 +505,9 @@ void csThing::Merge (csThing* other)
   for (i = 0 ; i < other->GetNumVertices () ; i++)
     merge_vertices[i] = AddVertex (other->Vwor (i));
 
-  for (i = 0 ; i < other->GetNumPolygons () ; i++)
+  for (i = 0 ; i < other->polygons.Length () ; i++)
   {
-    csPolygon3D* p = (csPolygon3D*)(other->GetPolygon (i));
+    csPolygon3D* p = other->GetPolygon3D (i);
     int* idx = p->GetVertices ().GetVertexIndices ();
     for (j = 0 ; j < p->GetVertices ().GetNumVertices () ; j++)
       idx[j] = merge_vertices[idx[j]];

@@ -36,35 +36,6 @@
 scfInterface iSystem;
 
 /**
- * Keyboard driver maintains a structure containing the current state of
- * major control keys (see below). It is NOT (unlike in releases before 008)
- * the responsability of the keyboard driver to maintain this structure,
- * it is maintained by do_keypress and do_keyrelease methods. Instead, it
- * is highly desirable (read: required) for driver to call do_keypress and
- * do_keyrelease with appropiate key codes (see CSKEY_XXX constants below).
- */
-struct csKey
-{
-  bool up;
-  bool down;
-  bool left;
-  bool right;
-  bool pgup;
-  bool pgdn;
-  bool esc;
-  bool alt;
-  bool ctrl;
-  bool shift;
-  bool home;
-  bool end;
-  bool ins;
-  bool del;
-  bool enter;
-  bool tab;
-  bool backspace;
-};
-
-/**
  * This is the lowest-level interface to keyboard.<p>
  * Keyboard driver should generate events and put them into the
  * event queue which is passed to object on Open().

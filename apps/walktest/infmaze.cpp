@@ -170,8 +170,8 @@ void InfiniteMaze::connect_infinite (int x1, int y1, int z1, int x2, int y2, int
   else
     if (x1 < x2) { p1 = "e"; p2 = "w"; }
     else { p1 = "w"; p2 = "e"; }
-  csPolygon3D* po1 = s1->sector->GetPolygon (p1);
-  csPolygon3D* po2 = s2->sector->GetPolygon (p2);
+  csPolygon3D* po1 = s1->sector->GetPolygon3D (p1);
+  csPolygon3D* po2 = s2->sector->GetPolygon3D (p2);
   if (create_portal1) po1->SetCSPortal (s2->sector);
   po2->SetCSPortal (s1->sector);
 }
@@ -190,7 +190,7 @@ void InfiniteMaze::create_loose_portal (int x1, int y1, int z1, int x2, int y2, 
     if (x1 < x2) p1 = "e";
     else p1 = "w";
   InfRoomData* s = (InfRoomData*)(infinite_world->get (x1, y1, z1));
-  csPolygon3D* po = s->sector->GetPolygon (p1);
+  csPolygon3D* po = s->sector->GetPolygon3D (p1);
   CHK (InfPortalCS* prt = new InfPortalCS ());
   po->SetPortal (prt);
   prt->SetSector (NULL);

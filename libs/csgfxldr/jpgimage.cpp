@@ -37,18 +37,18 @@ extern "C"
 
 bool RegisterJPG ()
 {
-  static JPGImageLoader loader;
-  return ImageLoader::Register (&loader);
+  static csJPGImageLoader loader;
+  return csImageLoader::Register (&loader);
 }
 
-AlphaMapFile* JPGImageLoader::LoadAlphaMap(UByte *buf,ULong size)
+AlphaMapFile* csJPGImageLoader::LoadAlphaMap(UByte *buf,ULong size)
 {
   (void) buf;
   (void) size;
   return NULL;
 }
 
-csImageFile* JPGImageLoader::LoadImage (UByte* buf, ULong size)
+csImageFile* csJPGImageLoader::LoadImage (UByte* buf, ULong size)
 {
   CHK (ImageJpgFile* i = new ImageJpgFile(buf, size));
   if (i && (i->get_status() & IFE_BadFormat))

@@ -21,14 +21,14 @@
 
 #include "csgfxldr/csimage.h"
 
-class GIFImageLoader;
+class csGIFImageLoader;
 
 /// An csImageFile subclass for reading GIF files.
 class ImageGifFile : public csImageFile
 {
   ///
   friend class csImageFile;	// For constructor
-  friend class GIFImageLoader;
+  friend class csGIFImageLoader;
 
 private:
   /// Read the GIF file from the buffer.
@@ -45,7 +45,7 @@ public:
 /**
  * The GIF Image Loader.
  */
-class GIFImageLoader : public ImageLoader
+class csGIFImageLoader : public csImageLoader
 {
 protected:
   ///

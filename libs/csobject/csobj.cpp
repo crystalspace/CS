@@ -33,7 +33,9 @@ csObject::csObject() : csBase(), objtree(NULL)
 }
 
 csObject::~csObject() 
-{ if (objtree) CHKB(delete objtree); }
+{
+  CHKB(delete objtree);
+}
 
 csObject::csObject(csObject& csobj) : csBase(), objtree(NULL)
 #ifdef __USE_CS_ID_CODE
@@ -59,8 +61,10 @@ csObjIterator csObject::ObjGet(const csIdType& objtype)
 
 void csObject::ObjAdd(csObject* obj)
 { 
-  if (objtree) objtree->ObjAdd(obj);
-  else CHKB(objtree = new csObjTree(obj)); 
+  if (objtree)
+    objtree->ObjAdd (obj);
+  else
+    CHKB (objtree = new csObjTree (obj));
   if (obj) obj->SetObjectParent(this);
 }
 

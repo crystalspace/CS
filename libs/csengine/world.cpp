@@ -121,10 +121,8 @@ csPolygon3D* csPolyIt::Fetch ()
     return Fetch ();
   }
 
-  csPolygon3D* poly;
-  if (thing) poly = (csPolygon3D*)(thing->GetPolygon (polygon_idx));
-  else poly = (csPolygon3D*)(sector->GetPolygon (polygon_idx));
-  return poly;
+  return thing ?
+    thing->GetPolygon3D (polygon_idx) : sector->GetPolygon3D (polygon_idx);
 }
 
 //---------------------------------------------------------------------------

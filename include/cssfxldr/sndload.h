@@ -28,7 +28,7 @@ class csSoundData;
 struct iSystem;
 
 ///
-class csSoundLoader  
+class csSoundLoader
 {
 public:
   /// Return the name of the wave type supported by this loader.
@@ -49,7 +49,7 @@ public:
   /**
    * Register a loader for a given type of sound files.
    * Adds 'loader' to the list of image formats to be checked during an
-   * ImageLoader::load(...) call.
+   * csSoundLoader::load(...) call.
    */
   static bool Register (csSoundLoader* loader);
 
@@ -65,8 +65,8 @@ protected:
    */
   virtual csSoundData* loadsound(UByte* buf, ULong size) = 0;
 
-private:
-  static csVector *loaderlist;
+  /// Chain sound file loaders in a list
+  csSoundLoader *Next;
 };
 
 #endif // __SOUNDLOADER_H

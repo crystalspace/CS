@@ -21,7 +21,6 @@
 #include <assert.h>
 
 #include "sysdef.h"
-#include "csutil/csvector.h"
 #include "cssfxldr/common/snddata.h"
 #include "cssfxldr/sndload.h"
 #include "isystem.h"
@@ -29,7 +28,7 @@
 // Register all file formats we want
 #define REGISTER_FORMAT(format) \
   extern bool Register##format (); \
-  bool __##format##Support = Register##format ();
+  bool __##format##_supported = Register##format ();
 
 #if defined (DO_AIFF)
   REGISTER_FORMAT (AIFF)
@@ -44,29 +43,23 @@
   REGISTER_FORMAT (IFF)
 #endif
 
-//////////////////////////////////////////////////////////////////////
-// Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-
-csVector *csSoundLoader::loaderlist = NULL;
+static csSoundLoader *loaderlist = NULL;
 
 bool csSoundLoader::Register (csSoundLoader* loader)
 {
-  if (!loaderlist)
-    CHKB (loaderlist = new csVector (8, 8));
-  loaderlist->Push ((csSome)loader);
+  loader->Next = loaderlist;
+  loaderlist = loader;
   return true;
 }
 
 csSoundData* csSoundLoader::load (UByte* buf, ULong size)
 {
-  int i=0;
-  while (i < loaderlist->Length() )
+  csSoundLoader *l = loaderlist;
+  while (l)
   {
-    csSoundLoader* l = (csSoundLoader*) (loaderlist->Get (i));
-    csSoundData* w = l->loadsound (buf,size);
-    if (w) return w;
-    i++; 
+    csSoundData *snd = l->loadsound (buf, size);
+    if (snd) return snd;
+    l = l->Next;
   }
   return NULL;
 }

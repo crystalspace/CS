@@ -38,18 +38,18 @@
 
 bool RegisterTGA ()
 {
-  static TGAImageLoader loader;
-  return ImageLoader::Register (&loader);
+  static csTGAImageLoader loader;
+  return csImageLoader::Register (&loader);
 }
 
-AlphaMapFile* TGAImageLoader::LoadAlphaMap(UByte *buf,ULong size)
+AlphaMapFile* csTGAImageLoader::LoadAlphaMap(UByte *buf,ULong size)
 {
   (void) buf;
   (void) size;
   return NULL;
 }
 
-csImageFile* TGAImageLoader::LoadImage (UByte* buf, ULong size)
+csImageFile* csTGAImageLoader::LoadImage (UByte* buf, ULong size)
 {
   CHK (ImageTgaFile* i = new ImageTgaFile(buf, size));
   if (i && (i->get_status() & IFE_BadFormat))

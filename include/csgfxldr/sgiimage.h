@@ -3,36 +3,43 @@
 
 #include "csgfxldr/csimage.h"
 
-class SGIImageLoader;
+class csSGIImageLoader;
 class ImageSGIFile : public csImageFile
 {
   ///
   friend class csImageFile;	// For constructor
-  friend class SGIImageLoader;
+  friend class csSGIImageLoader;
 
 private:
   // Read the SGI file from the buffer.
   ImageSGIFile (UByte* buf, long size);
-  //Load an RLE encoded 3 bpp picture
+  // Load an RLE encoded 3 bpp picture
   bool loadRGBRLE(UByte *in,RGBPixel *image);
+
 public:
   ///
   virtual ~ImageSGIFile ();
-protected:	//Routines that can be used by AlphaMapSGIFile
-	ULong getLong(UByte *buf);	//Get a long value
-	UShort getShort(UByte *buf);	//Get a short value
-	bool readHeader(UByte *buf,UInt numplanes);	//Read and validate SGI header
-	void loadSGITables(UByte *in,ULong *out,int size);	//Read table with offsets
 
-	//Decode an RLE encoded line
-	UInt decode_rle(UByte *buf,ULong offset,ULong length,UByte *out,UByte *tmp);
+protected:
+  // Routines that can be used by AlphaMapSGIFile
+  // Get a long value
+  ULong getLong(UByte *buf);
+  // Get a short value
+  UShort getShort(UByte *buf);
+  // Read and validate SGI header
+  bool readHeader(UByte *buf,UInt numplanes);
+  // Read table with offsets
+  void loadSGITables(UByte *in,ULong *out,int size);
+
+  // Decode an RLE encoded line
+  UInt decode_rle(UByte *buf,ULong offset,ULong length,UByte *out,UByte *tmp);
 };
 
 /**
  * The SGI Image Loader.
  */
 
-class SGIImageLoader : public ImageLoader
+class csSGIImageLoader : public csImageLoader
 {
 protected:
   ///

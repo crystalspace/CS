@@ -44,11 +44,11 @@ bool littleendian=false;
 
 bool RegisterSGI ()
 {
-  static SGIImageLoader loader;
-  return ImageLoader::Register (&loader);
+  static csSGIImageLoader loader;
+  return csImageLoader::Register (&loader);
 }
 
-csImageFile* SGIImageLoader::LoadImage (UByte* buf, ULong size)
+csImageFile* csSGIImageLoader::LoadImage (UByte* buf, ULong size)
 {
   CHK (ImageSGIFile* i = new ImageSGIFile(buf, size));
   if (i && (i->get_status() & IFE_BadFormat))
@@ -56,7 +56,7 @@ csImageFile* SGIImageLoader::LoadImage (UByte* buf, ULong size)
   return i;    
 }
 
-AlphaMapFile* SGIImageLoader::LoadAlphaMap(UByte* buf,ULong size)
+AlphaMapFile* csSGIImageLoader::LoadAlphaMap(UByte* buf,ULong size)
 {
 	return NULL;
 }

@@ -32,18 +32,18 @@ extern "C" {
 
 bool RegisterPNG ()
 {
-  static PNGImageLoader loader;
-  return ImageLoader::Register (&loader);
+  static csPNGImageLoader loader;
+  return csImageLoader::Register (&loader);
 }
 
-AlphaMapFile* PNGImageLoader::LoadAlphaMap (UByte* buf, ULong size)
+AlphaMapFile* csPNGImageLoader::LoadAlphaMap (UByte* buf, ULong size)
 {
   (void) buf;
   (void) size;
   return NULL;
 }
 
-csImageFile* PNGImageLoader::LoadImage (UByte* buf, ULong size)
+csImageFile* csPNGImageLoader::LoadImage (UByte* buf, ULong size)
 {
   CHK (ImagePngFile* i = new ImagePngFile(buf, size));
   if (i && (i->get_status() & IFE_BadFormat)) 

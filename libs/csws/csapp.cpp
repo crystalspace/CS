@@ -235,7 +235,7 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
     return false;
   }
 
-  image = ImageLoader::load ((UByte *)fbuffer, size);
+  image = csImageLoader::load ((UByte *)fbuffer, size);
   CHK (delete [] fbuffer);
 
   if (image && (image->get_status () & IFE_Corrupt))

@@ -24,7 +24,6 @@
 #include "isystem.h"
 #include "csgfxldr/csimage.h"
 #include "csgfxldr/boxfilt.h"
-#include "csutil/csvector.h"
 #include "csutil/util.h"
 
 void box_filter3 (Filter3x3& f, RGBPixel* bm, int x, int y, int w, int h, int* pr, int* pg, int* pb)
@@ -126,6 +125,7 @@ csImageFile::csImageFile ()
 csImageFile::~csImageFile ()
 {
   CHK (delete [] image);
+  CHKB (delete [] fname);
 }
 
 int csImageFile::GetWidth ()
@@ -345,8 +345,7 @@ csImageFile* csImageFile::blend (Filter3x3* filt1)
 
 void csImageFile::SetName (const char *iName)
 {
-  if (fname)
-    delete [] fname;
+  CHKB (delete [] fname);
   fname = strnew (iName);
 }
 
@@ -360,7 +359,7 @@ const char *csImageFile::GetName ()
 // Register all file formats we want
 #define REGISTER_FORMAT(format) \
   extern bool Register##format (); \
-  bool __##format##Support = Register##format ();
+  bool __##format##_supported = Register##format ();
 
 #if defined (DO_GIF)
   REGISTER_FORMAT (GIF)
@@ -383,40 +382,36 @@ const char *csImageFile::GetName ()
 #if defined (DO_TGA)
   REGISTER_FORMAT (TGA)
 #endif
-// Unfortunately, we can't use static variable here since Register()
-// can happened to be called BEFORE loaderlist is initialized... so we
-// have to track initialization in Register() itself...
-csVector *ImageLoader::loaderlist = NULL;
 
-bool ImageLoader::Register (ImageLoader* loader)
+static csImageLoader *loaderlist = NULL;
+
+bool csImageLoader::Register (csImageLoader* loader)
 {
-  if (!loaderlist)
-    { CHK (loaderlist = new csVector (8, 8)); }
-  loaderlist->Push ((csSome)loader);
+  loader->Next = loaderlist;
+  loaderlist = loader;
   return true;
 }
 
-csImageFile* ImageLoader::load (UByte* buf, ULong size)
+csImageFile* csImageLoader::load (UByte* buf, ULong size)
 {
-  int i=0;
-  while (i < loaderlist->Length() )
+  csImageLoader *l = loaderlist;
+  while (l)
   {
-    ImageLoader* l = (ImageLoader*) (loaderlist->Get (i));
-    csImageFile* img = l->LoadImage (buf,size);
+    csImageFile *img = l->LoadImage (buf, size);
     if (img) return img;
-    i++; 
+    l = l->Next;
   }
   return NULL;
 }
 
-AlphaMapFile* ImageLoader::load_alpha(UByte *buf,ULong size)
+AlphaMapFile* csImageLoader::load_alpha (UByte *buf,ULong size)
 {
-	int i=0;
-	while(i<loaderlist->Length())
-	{
-		ImageLoader* l=(ImageLoader*)(loaderlist->Get(i));
-		AlphaMapFile* alpha=l->LoadAlphaMap(buf,size);
-		if(alpha) return alpha;
-	}
-	return NULL;
+  csImageLoader *l = loaderlist;
+  while (l)
+  {
+    AlphaMapFile *alpha = l->LoadAlphaMap (buf, size);
+    if (alpha) return alpha;
+    l = l->Next;
+  }
+  return NULL;
 }

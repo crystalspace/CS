@@ -21,15 +21,15 @@
 #include "csobject/objtree.h"
 #include "csobject/csobj.h"
 
-csObjTree::csObjTree(csObject* csobj) : 
+csObjTree::csObjTree (csObject* csobj) : 
   subnodes(NULL), subnode_cnt(0), children(NULL), child_cnt(0), nodetype()
 {
   if (csobj)
   {
-    CHK(children = new csObject*[1]);
+    CHK (children = new csObject * [1]);
     nodetype = csobj->GetType();
     child_cnt++;
-    children[0] = csobj;
+    children [0] = csobj;
   }
 }
 
@@ -65,15 +65,15 @@ csObjTree::~csObjTree()
 {
   if (children)
   {
-    for (int i=0;  i<child_cnt;  i++)
-      if (children[i]) CHKB(delete children[i]);
-    CHK(delete[] children);
+    for (int i = 0;  i < child_cnt;  i++)
+      CHKB (delete children [i]);
+    CHK (delete [] children);
   }
   if (subnodes) 
   {
-    for (int i=0;  i<subnode_cnt;  i++)
-      if (subnodes[i]) CHKB(delete subnodes[i]);
-    CHK(delete[] subnodes);
+    for (int i = 0;  i < subnode_cnt; i++)
+      if (subnodes [i]) CHKB (delete subnodes [i]);
+    CHK (delete [] subnodes);
   }
 }
 

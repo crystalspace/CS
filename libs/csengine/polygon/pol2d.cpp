@@ -39,10 +39,8 @@
 
 csPolygon2DFactory* csPolygon2DFactory::SharedFactory()
 {
-  static csPolygon2DFactory* p = 0;
-  if (p == 0)
-    CHKB (p = new csPolygon2DFactory);
-  return p;
+  static csPolygon2DFactory p;
+  return &p;
 }
 
 void csPolygon2D::AddPerspective (float x, float y, float z)

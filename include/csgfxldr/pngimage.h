@@ -21,7 +21,7 @@
 
 #include "csgfxldr/csimage.h"
 
-class PNGImageLoader;
+class csPNGImageLoader;
 
 /**
  * An csImageFile subclass for reading PNG files.<p>
@@ -31,7 +31,7 @@ class ImagePngFile : public csImageFile
 {
   ///
   friend class csImageFile;	// For constructor
-  friend class PNGImageLoader;
+  friend class csPNGImageLoader;
 
 private:
   /// Read the PNG file from the buffer.
@@ -50,7 +50,7 @@ public:
 /**
  * The PNG Image Loader
  */
-class PNGImageLoader : public ImageLoader
+class csPNGImageLoader : public csImageLoader
 {
 protected:
   ///

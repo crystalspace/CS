@@ -20,11 +20,12 @@
 #include "sysdef.h"
 #include "csengine/collider.h"
 #include "csengine/triangle.h"
-
-int CD_num_cols_alloced = 0;
-collision_pair *CD_contact = 0;
+#include "csutil/garray.h"
 
 #define CD_MAX_COLLISION    1000
+
+// This array contains the colliding pairs
+DECLARE_GROWING_ARRAY (static, CD_contact, collision_pair)
 
 static int hits = 0;
 // Array of hits.
@@ -51,12 +52,14 @@ csCollider::csCollider (csPolygonSet *ps)
   _ps = ps;
   _rm = NULL;
 
+  CD_contact.IncRef ();
+
   int i;
   int tri_count = 0;
   // first, count the number of triangles polyset contains
-  for (i = 0; i < _ps->num_polygon ; i++)
+  for (i = 0; i < _ps->GetNumPolygons () ; i++)
   {
-    csPolygon3D *p = (csPolygon3D *)_ps->polygons [i];
+    csPolygon3D *p = _ps->GetPolygon3D (i);
     // Handle solid walls and mirrors.
     if (!p->GetPortal () || p->GetPortal ()->IsSpaceWarped ())
       tri_count += p->GetVertices ().GetNumVertices () - 2;
@@ -68,17 +71,17 @@ csCollider::csCollider (csPolygonSet *ps)
     if (!_rm)
       return;
     
-    for (i = 0; i < _ps->num_polygon ; i++)
+    for (i = 0; i < _ps->GetNumPolygons () ; i++)
     {
-      csPolygon3D *p = (csPolygon3D *)_ps->polygons [i];
+      csPolygon3D *p = _ps->GetPolygon3D (i);
       // Handle solid walls and mirrors.
       if (!p->GetPortal () || p->GetPortal ()->IsSpaceWarped ())
       {
         // Collision detection only works with triangles.
         int *vt = p->GetVertices ().GetVertexIndices ();
         for (int v = 2; v < p->GetVertices ().GetNumVertices (); v++)
-          _rm->AddTriangle (v - 2, _ps->wor_verts [vt [v - 1]],
-            _ps->wor_verts [vt [v]],_ps->wor_verts [vt [0]]);
+          _rm->AddTriangle (v - 2, _ps->Vwor (vt [v - 1]),
+            _ps->Vwor (vt [v]), _ps->Vwor (vt [0]));
       }
     }
     _rm->build_hierarchy ();
@@ -91,6 +94,8 @@ csCollider::csCollider (csSprite3D *sp)
 {
   _type = SPRITE3D;
   _sp = sp;
+
+  CD_contact.IncRef ();
 
   csTriangleMesh *mesh = _sp->tpl->GetBaseMesh ();
 
@@ -127,15 +132,11 @@ csCollider::~csCollider(void)
 {
   if (_rm)
   {
-    // the boxes pointed to should be deleted.
-    CHK (delete [] _rm->b);
-
-    // the triangles pointed to should be deleted.
-    CHK (delete [] _rm->tris);
-
     CHK (delete _rm);
     _rm = NULL;
   }
+
+  CD_contact.DecRef ();
 }
 
 void csCollider::Activate (bool on)
@@ -217,6 +218,11 @@ int csCollider::CollidePair (csCollider *p1, csCollider *p2, csTransform *t1, cs
     return 1;
   }
   return 0;
+}
+
+collision_pair *csCollider::GetCollisions ()
+{
+  return CD_contact.GetArray ();
 }
 
 inline float min3 (float a, float b, float c)
@@ -432,9 +438,8 @@ int coplanar_tri_tri (float N[3],
   return 0;
 }
 
-int tri_contact (
-  const csVector3 &V0, const csVector3 &V1, const csVector3 &V2,
-  const csVector3 &U0, const csVector3 &U1, const csVector3 &U2)
+int tri_contact (const csVector3 &V0, const csVector3 &V1, const csVector3 &V2,
+                 const csVector3 &U0, const csVector3 &U1, const csVector3 &U2)
 {
   float E1 [3], E2 [3];
   float N1 [3], N2 [3], d1, d2;
@@ -536,9 +541,8 @@ int tri_contact (
 // uses no divisions
 // works on coplanar triangles
 
-bool tri_contact (
-  csVector3 P1, csVector3 P2, csVector3 P3,
-  csVector3 Q1, csVector3 Q2, csVector3 Q3)
+bool tri_contact (csVector3 P1, csVector3 P2, csVector3 P3,
+                  csVector3 Q1, csVector3 Q2, csVector3 Q3)
 {
   //
   // One triangle is (p1,p2,p3).  Other is (q1,q2,q3).
@@ -617,26 +621,13 @@ bool tri_contact (
 
 int add_collision (CDTriangle *tr1, CDTriangle *tr2)
 {
-  if (!CD_contact)
+  int limit = CD_contact.GetLimit ();
+  if (csCollider::numHits >= limit)
   {
-    CHK (CD_contact = new collision_pair [10]);
-    if (!CD_contact)
-      return true;
-    CD_num_cols_alloced = 10;
-    csCollider::numHits = 0;
-  }
-
-  if (csCollider::numHits == CD_num_cols_alloced)
-  {
-    CHK (collision_pair *t = new collision_pair [CD_num_cols_alloced * 2]);
-    if (!t)
-      return true;
-    CD_num_cols_alloced *= 2;
-
-    for (int i = 0; i < csCollider::numHits; i++)
-      t [i] = CD_contact [i];
-    CHK (delete [] CD_contact);
-    CD_contact = t;
+//  is this really needed? - A.Z.
+//  if (!limit)
+//    csCollider::numHits = 0;
+    CD_contact.SetLimit (limit + 16);
   }
 
   CD_contact [csCollider::numHits].tr1 = tr1;
@@ -899,9 +890,9 @@ bool BBox::tri_contact (BBox *b1, BBox *b2)
 
   int rc;  // return code
 
-  csVector3 i1 = (( csCollider::mR * b1->trp->p1) + csCollider::mT);
-  csVector3 i2 = (( csCollider::mR * b1->trp->p2) + csCollider::mT);
-  csVector3 i3 = (( csCollider::mR * b1->trp->p3) + csCollider::mT);
+  csVector3 i1 = ((csCollider::mR * b1->trp->p1) + csCollider::mT);
+  csVector3 i2 = ((csCollider::mR * b1->trp->p2) + csCollider::mT);
+  csVector3 i3 = ((csCollider::mR * b1->trp->p3) + csCollider::mT);
 
   csCollider::trianglesTested++;
 

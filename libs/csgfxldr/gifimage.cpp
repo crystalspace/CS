@@ -27,18 +27,18 @@
 
 bool RegisterGIF ()
 {
-  static GIFImageLoader loader;
-  return ImageLoader::Register (&loader);
+  static csGIFImageLoader loader;
+  return csImageLoader::Register (&loader);
 }
 
-AlphaMapFile *GIFImageLoader::LoadAlphaMap(UByte *buf,ULong size)
+AlphaMapFile *csGIFImageLoader::LoadAlphaMap(UByte *buf,ULong size)
 {
   (void) buf;
   (void) size;
   return NULL;
 }
 
-csImageFile* GIFImageLoader::LoadImage (UByte* buf, ULong size)
+csImageFile* csGIFImageLoader::LoadImage (UByte* buf, ULong size)
 {
   CHK (ImageGifFile* i = new ImageGifFile(buf, size));
   if (i && (i->get_status() & IFE_BadFormat))

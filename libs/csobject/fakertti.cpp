@@ -23,7 +23,10 @@
 csIdStr csIdType::default_idstr = NULL;
 
 const csIdType& NULLCLASS::Type()
-{ static csIdType id = csIdType();  return id; }
+{
+  static csIdType id = csIdType();
+  return id;
+}
 
 csIdType csIdFunc::Allocate(csIdStr s, const csIdType& id)
 {
@@ -33,11 +36,13 @@ csIdType csIdFunc::Allocate(csIdStr s, const csIdType& id)
   if (newid.entries)
   {
     newid.length = id.length+1;
-    for (int i=0;  i< newid.length;  i++) newid.entries[i] = id.entries[i];
-    newid.entries[newid.length] = s; 
+    for (int i = 0; i < newid.length; i++)
+      newid.entries [i] = id.entries [i];
+    newid.entries [newid.length] = s; 
     newid.base = &id;
-  }  
-  else newid.entries = &csIdType::default_idstr;
+  }
+  else
+    newid.entries = &csIdType::default_idstr;
   return newid; 
 }
 

@@ -21,7 +21,7 @@
 
 #include "csgfxldr/csimage.h"
 
-class WALImageLoader;
+class csWALImageLoader;
 
 /**
  * An csImageFile subclass for reading WAL files.
@@ -30,7 +30,7 @@ class ImageWALFile : public csImageFile
 {
   ///
   friend class csImageFile;	// For constructor
-  friend class WALImageLoader;
+  friend class csWALImageLoader;
 
 private:
   /// Read the WAL file from the buffer.
@@ -44,7 +44,7 @@ public:
 /**
  * The TGA Image Loader.
  */
-class WALImageLoader : public ImageLoader
+class csWALImageLoader : public csImageLoader
 {
 protected:
   ///
@@ -60,16 +60,4 @@ public:
   { return "WAL (Quake2) image format"; }
 };
 
-/* Header definition. */
-struct WALHeader {
-	unsigned char Name[32];		//Internal Name
-	unsigned int width;		//Width of largest mipmap
-	unsigned int height;		//Height of largest mipmap
-	unsigned int offsets[4];	//Offset to 4 mipmaps in file
-	char nextframe[32];		//Name of next file in animation if any
-	unsigned int flags;		//??
-	unsigned int contents;		//??
-	unsigned int value;		//??
-    }_WALHeader;
 #endif
-

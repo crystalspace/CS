@@ -21,7 +21,7 @@
 
 #include "csgfxldr/csimage.h"
 
-class TGAImageLoader;
+class csTGAImageLoader;
 
 /**
  * An csImageFile subclass for reading TGA files.
@@ -30,7 +30,7 @@ class ImageTgaFile : public csImageFile
 {
   ///
   friend class csImageFile;	// For constructor
-  friend class TGAImageLoader;
+  friend class csTGAImageLoader;
 
 private:
   /// Read the TGA file from the buffer.
@@ -44,7 +44,7 @@ public:
 /**
  * The TGA Image Loader.
  */
-class TGAImageLoader : public ImageLoader
+class csTGAImageLoader : public csImageLoader
 {
 protected:
   ///

@@ -235,7 +235,7 @@ void csLOD::CalculateLOD (csTriangleMesh* mesh, csTriangleVertices* verts,
   // Collapse vertices, one by one until only one remains.
   int num = verts->GetNumVertices ();
   int from, to, col_idx;
-  int* from_vertices, * to_vertices;
+  int *from_vertices, *to_vertices;
   CHK (from_vertices = new int [num]);
   CHK (to_vertices = new int [num]);
   col_idx = 0;
@@ -304,6 +304,9 @@ void csLOD::CalculateLOD (csTriangleMesh* mesh, csTriangleVertices* verts,
     emerge_from[i] = translate[to_vertices[col_idx]];
     col_idx--;
   }
+
+  CHK (delete [] from_vertices);
+  CHK (delete [] to_vertices);
 }
 
 //---------------------------------------------------------------------------

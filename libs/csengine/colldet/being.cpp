@@ -201,7 +201,7 @@ int csBeing::FindSectors ( csVector3 v, csVector3 d, csSector *s, csSector **sa 
   for (i = 0 ; i < s->GetNumPolygons () && c < MAXSECTORSOCCUPIED; i++)
   {
     // Get the polygon of for this sector.
-    csPolygon3D* p = (csPolygon3D*) s->GetPolygon (i);
+    csPolygon3D* p = s->GetPolygon3D (i);
     csPortal* portal = p->GetPortal ();
     // Handle only portals.
     if (portal != NULL)

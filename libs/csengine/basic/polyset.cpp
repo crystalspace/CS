@@ -39,7 +39,6 @@
 #include "igraph3d.h"
 #include "itxtmgr.h"
 
-
 //---------------------------------------------------------------------------
 
 CSOBJTYPE_IMPL(csPolygonSet,csObject);
@@ -55,10 +54,6 @@ csPolygonSet::csPolygonSet () : csObject(), csPolygonParentInt ()
   CONSTRUCT_IBASE (NULL);
 
   max_vertices = num_vertices = 0;
-  max_polygon = num_polygon = 0;
-
-  num_curves = max_curves = 0;
-  curves = NULL;
 
   curves_center.x = curves_center.y = curves_center.z = 0;
   curves_scale=40;  
@@ -69,7 +64,6 @@ csPolygonSet::csPolygonSet () : csObject(), csPolygonParentInt ()
   wor_verts = NULL;
   obj_verts = NULL;
   cam_verts = NULL;
-  polygons = NULL;
   bsp = NULL;
   draw_busy = 0;
   fog.enabled = false;
@@ -84,19 +78,6 @@ csPolygonSet::~csPolygonSet ()
 {
   CHK (delete [] wor_verts);
   CHK (delete [] obj_verts);
-  if (polygons)
-  {
-    for (int i = 0 ; i < num_polygon ; i++)
-      CHKB (delete (csPolygon3D*)polygons [i]);
-    CHK (delete [] polygons);
-  }
-
-  if (curves)
-  {
-    for (int i = 0 ; i < num_curves ; i++)
-      CHKB (delete curves [i]);
-    CHK (delete [] curves);
-  }
   CHK (delete [] curve_vertices);
   CHK (delete [] curve_texels);
   CHK (delete bsp);
@@ -106,9 +87,9 @@ csPolygonSet::~csPolygonSet ()
 void csPolygonSet::Prepare ()
 {
   int i;
-  for (i = 0 ; i < num_polygon ; i++)
+  for (i = 0 ; i < polygons.Length () ; i++)
   {
-    csPolygon3D* p = (csPolygon3D*)polygons[i];
+    csPolygon3D* p = polygons.Get (i);
     p->Finish ();
   }
 }
@@ -282,9 +263,9 @@ void csPolygonSet::CompressVertices ()
   num_vertices = max_vertices = count_unique;
 
   // Now we can remap the vertices in all polygons.
-  for (i = 0 ; i < num_polygon ; i++)
+  for (i = 0 ; i < polygons.Length () ; i++)
   {
-    csPolygon3D* p = (csPolygon3D*)polygons[i];
+    csPolygon3D* p = polygons.Get (i);
     csPolyIndexed& pi = p->GetVertices ();
     int* idx = pi.GetVertexIndices ();
     for (j = 0 ; j < pi.GetNumVertices () ; j++)
@@ -294,16 +275,15 @@ void csPolygonSet::CompressVertices ()
   CHK (delete [] vt);
 }
 
-csPolygon3D* csPolygonSet::GetPolygon (char* name)
+csPolygonInt* csPolygonSet::GetPolygon (int idx)
 {
-  int i;
-  for (i = 0 ; i < num_polygon ; i++)
-  {
-    csPolygon3D* p = (csPolygon3D*)polygons[i];
-    const char* n = p->GetName ();
-    if (n && !strcmp (n, name)) return p;
-  }
-  return NULL;
+  return (csPolygonInt*)GetPolygon3D (idx);
+}
+
+csPolygon3D* csPolygonSet::GetPolygon3D (char* name)
+{
+  int idx = polygons.FindKey (name);
+  return idx >= 0 ? polygons.Get (idx) : NULL;
 }
 
 csPolygon3D* csPolygonSet::NewPolygon (csTextureHandle* texture)
@@ -316,34 +296,14 @@ csPolygon3D* csPolygonSet::NewPolygon (csTextureHandle* texture)
 
 void csPolygonSet::AddPolygon (csPolygonInt* poly)
 {
-  if (!polygons)
-  {
-    max_polygon = 6;
-    CHK (polygons = new csPolygonInt* [max_polygon]);
-  }
-  while (num_polygon >= max_polygon)
-  {
-    max_polygon += 6;
-    CHK (csPolygonInt** new_polygons = new csPolygonInt* [max_polygon]);
-    memcpy (new_polygons, polygons, sizeof (csPolygonInt*)*num_polygon);
-    CHK (delete [] polygons);
-    polygons = new_polygons;
-  }
-
-  polygons[num_polygon++] = poly;
   ((csPolygon3D*)poly)->SetParent (this);
+  polygons.Push (poly);
 }
-
 
 csCurve* csPolygonSet::GetCurve (char* name)
 {
-  int i;
-  for (i = 0 ; i < num_curves ; i++)
-  {
-    csCurve* p = (csCurve*)polygons[i];
-    if (!strcmp (p->GetName (), name)) return p;
-  }
-  return NULL;
+  int idx = curves.FindKey (name);
+  return idx >= 0 ? curves.Get (idx) : NULL;
 }
 
 /*TODO weg?
@@ -360,21 +320,8 @@ csCurve* csPolygonSet::new_bezier (char* name, TextureMM* texture)
 
 void csPolygonSet::AddCurve (csCurve* curve)
 {
-  if (!curves)
-  {
-    max_curves = 6;
-    CHK (curves = new csCurve* [max_curves]);
-  }
-  while (num_curves >= max_curves)
-  {
-    max_curves += 6;
-    CHK (csCurve** new_curves = new csCurve* [max_curves]);
-    memcpy (new_curves, curves, sizeof (csCurve*)*num_curves);
-    CHK (delete [] curves);
-    curves = new_curves;
-  }
-  curves[num_curves++] = curve;
   curve->SetParent (this);
+  curves.Push (curve);
 }
 
 
@@ -407,7 +354,7 @@ void* test_bsp_intersection (csPolygonParentInt*, csPolygonInt** polygon, int nu
 }
 
 csPolygon3D* csPolygonSet::IntersectSegment (const csVector3& start, 
-        const csVector3& end, csVector3& isect, float* pr)
+  const csVector3& end, csVector3& isect, float* pr)
 {
   int i;
   if (bsp)
@@ -421,9 +368,9 @@ csPolygon3D* csPolygonSet::IntersectSegment (const csVector3& start,
     	(void*)&d);
   }
   else
-    for (i = 0 ; i < num_polygon ; i++)
+    for (i = 0 ; i < polygons.Length () ; i++)
     {
-      csPolygon3D* p = (csPolygon3D*)polygons[i];
+      csPolygon3D* p = polygons.Get (i);
       if (p->IntersectSegment (start, end, isect, pr)) return p;
     }
   return NULL;
@@ -646,9 +593,9 @@ csFrustrumList* csPolygonSet::GetShadows (csVector3& origin)
   int i, j;
   csPolygon3D* p;
   bool cw = true; //@@@ Use mirroring parameter here!
-  for (i = 0 ; i < num_polygon ; i++)
+  for (i = 0 ; i < polygons.Length () ; i++)
   {
-    p = (csPolygon3D*)polygons[i];
+    p = polygons.Get (i);
     //if (p->GetPlane ()->VisibleFromPoint (origin) != cw) continue;
     float clas = p->GetPlane ()->GetWorldPlane ().Classify (origin);
     if (ABS (clas) < EPSILON) continue;
@@ -805,7 +752,7 @@ int make_chain (csVector2 *V[], int n, int (*cmp)(const void*, const void*))
   csVector2 *t;
 
   qsort (V, n, sizeof (csVector2*), cmp);
-  for (i=2 ; i<n ; i++) 
+  for (i = 2; i < n; i++) 
   {
     for (j=s ; j>=1 && ccw(V, i, j, j-1) ; j--) ;
     s = j+1;
@@ -840,13 +787,13 @@ void Find2DConvexHull (int nverts, csVector2 *pntptr, int *cNumOutIdxs, int **Ou
   PntPtrs = (csVector2**) &(*OutHullIdxs)[nverts+1];
 
   // alg requires array of ptrs to verts (for qsort) instead of array of verts, so do the conversion
-  for (i=0 ; i<nverts ; i++)
+  for (i=0 ; i < nverts ; i++)
     PntPtrs[i] = &pntptr[i];
 
   *cNumOutIdxs=ch2d (PntPtrs, nverts);
 
   // convert back to array of idxs
-  for (i=0 ; i<*cNumOutIdxs ; i++)
+  for (i = 0; i < *cNumOutIdxs; i++)
     (*OutHullIdxs)[i]= (int) (PntPtrs[i]-&pntptr[0]);
 
   // caller will free returned array
@@ -862,7 +809,7 @@ int find_chull (int nverts, csVector2 *vertices, csVector2 *&chull)
   Find2DConvexHull (nverts, vertices, &num, &order);
 
   CHK(chull = new csVector2[num]);
-  for (int i=0 ; i<num ; i++)
+  for (int i = 0; i < num; i++)
     chull[i]=vertices[order[i]];
 
   free (order);
@@ -883,9 +830,9 @@ csVector2* csPolygonSet::IntersectCameraZPlane (float z,csVector2* /*clipper*/,
     point_list *next;
   } list,*head=&list,*prev;
 
-  for (i=0 ; i<num_polygon ; i++)
+  for (i = 0; i < polygons.Length (); i++)
   {
-    csPolygon3D *p=(csPolygon3D*)polygons[i];
+    csPolygon3D *p = polygons.Get (i);
     int nv = p->GetVertices ().GetNumVertices ();
     int *v_i = p->GetVertices ().GetVertexIndices ();
 
@@ -919,7 +866,7 @@ csVector2* csPolygonSet::IntersectCameraZPlane (float z,csVector2* /*clipper*/,
 
   csVector2 *final_data,*data;
   CHK (data=new csVector2[num_pts]);
-  for (head=&list,i=0 ; i<num_pts ; i++)
+  for (head = &list, i = 0; i < num_pts; i++)
   {
     data[i]=head->data;
 
@@ -934,4 +881,35 @@ csVector2* csPolygonSet::IntersectCameraZPlane (float z,csVector2* /*clipper*/,
   if (num_pts) { CHK (delete data); }
 
   return final_data;
+}
+
+//--------------------------------------------------------- helper classes -----
+
+bool csPolygonSet::csPolygonArray::FreeItem (csSome Item)
+{
+  CHK (delete (csPolygon3D *)(csPolygonInt *)Item);
+  return true;
+}
+
+int csPolygonSet::csPolygonArray::CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
+{
+  const char *name = ((csPolygon3D *)(csPolygonInt *)Item)->GetName ();
+  return name ? strcmp (name, (char *)Key) : -1;
+}
+
+csPolygon3D *csPolygonSet::csPolygonArray::Get (int iNum) const
+{
+  return (csPolygon3D *)(csPolygonInt *)csVector::Get (iNum);
+}
+
+bool csPolygonSet::csCurvesArray::FreeItem (csSome Item)
+{
+  CHK (delete (csCurve *)Item);
+  return true;
+}
+
+int csPolygonSet::csCurvesArray::CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
+{
+  const char *name = ((csCurve *)Item)->GetName ();
+  return name ? strcmp (name, (char *)Key) : -1;
 }

@@ -1335,25 +1335,25 @@ char *csVFS::ReadFile (const char *FileName, size_t &Size)
   char *data = F->GetAllData ();
   if (data)
   {
-    CHK (delete F);
+    F->DecRef ();
     return data;
   }
 
   CHK (data = new char [Size]);
   if (!data)
   {
-    CHK (delete F);
+    F->DecRef ();
     return NULL;
   }
 
   if (F->Read (data, Size) != Size)
   {
     CHK (delete [] data);
-    CHK (delete F);
+    F->DecRef ();
     return NULL;
   }
 
-  CHK (delete F);
+  F->DecRef ();
   return data;
 }
 

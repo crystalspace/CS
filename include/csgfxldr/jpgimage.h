@@ -21,7 +21,7 @@
 
 #include "csgfxldr/csimage.h"
 
-class JPGImageLoader;
+class csJPGImageLoader;
 
 /**
  * An csImageFile subclass for reading JPG files.<p>
@@ -31,7 +31,7 @@ class ImageJpgFile : public csImageFile
 {
   ///
   friend class csImageFile;	// For constructor
-  friend class JPGImageLoader;
+  friend class csJPGImageLoader;
 
 private:
   /// Read the JPG file from the buffer.
@@ -45,7 +45,7 @@ public:
 /**
  * the JPEG Image Loader.
  */
-class JPGImageLoader : public ImageLoader
+class csJPGImageLoader : public csImageLoader
 {
 protected:
   ///

@@ -307,21 +307,7 @@ class csSprite3D : public csObject
   friend class csCollider;
 
 private:
-  /// Static vertex array.
-  static csVector3* tr_verts;
-  /// Static z array.
-  static float* z_verts;
-  /// Static uv array.
-  static csVector2* uv_verts;
-  /// The perspective corrected vertices.
-  static csVector2* persp;
-  /// Array which indicates which vertices are visible and which are not.
-  static bool* visible;
-  /// Array for lighting.
-  static csLight** light_worktable;
-  static int max_light_worktable;
-
-  /// Update the above tables with a new size.
+  /// Set the size of internally used tables
   static void UpdateWorkTables (int max_size);
 
   /// Update defered lighting.

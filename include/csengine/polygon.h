@@ -28,6 +28,7 @@
 #include "csengine/polyset.h"
 #include "csengine/portal.h"
 #include "csengine/cscolor.h"
+#include "ipolygon.h"
 
 class csSector;
 class StatLight;
@@ -489,8 +490,10 @@ public:
    */
   csLightMapped* GetLightMapInfo ()
   {
-    if (txt_info && txt_info->GetTextureType () == POLYTXT_LIGHTMAP) return (csLightMapped*)txt_info;
-    else return NULL;
+    if (txt_info && txt_info->GetTextureType () == POLYTXT_LIGHTMAP)
+      return (csLightMapped*)txt_info;
+    else
+      return NULL;
   }
 
   /**

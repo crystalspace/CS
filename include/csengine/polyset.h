@@ -20,6 +20,7 @@
 #define POLYSET_H
 
 #include "csutil/scf.h"
+#include "csutil/csvector.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h" // texel coords
 #include "csgeom/polyint.h"
@@ -34,15 +35,15 @@ class csWorld;
 class csCamera;
 class csTextureHandle;
 class CLights;
-class csPolygon3D;
 class csPolygon2D;
 class csPolygon2DQueue;
 class csCollider;
 class csBspTree;
 class Dumper;
 class csRenderView;
-class csCurve;
 class csFrustrumList;
+class csPolygon3D;
+class csCurve;
 scfInterface iPolygonSet;
 
 /**
@@ -103,8 +104,6 @@ struct csPolygonSetBBox
 class csPolygonSet : public csObject, public csPolygonParentInt, public iPolygonSet
 {
   friend class Dumper;
-  friend class csCollider;
-  friend class csSector;
 
 protected:
   /**
@@ -125,19 +124,34 @@ protected:
   /// Camera space vertices.
   csTransformedSet cam_verts_set;
 
-  /// Table of ptr to polygons forming the outside of the set
-  csPolygonInt** polygons;
-  /// Number of polygons used.
-  int num_polygon;
-  /// Maximum number of polygons in 'polygon' array.
-  int max_polygon;
+  /// The array of polygons forming the outside of the set
+  class csPolygonArray : public csVector
+  {
+  public:
+    csPolygonArray () : csVector (16, 16) {}
+    virtual ~csPolygonArray ()
+    { DeleteAll (); }
+    virtual bool FreeItem (csSome Item);
+    virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
+    csPolygon3D *Get (int iNum) const;
+    csPolygonInt **GetArray ()
+    { return (csPolygonInt **)root; }
+  } polygons;
 
-  /// Table of ptr to curves forming the outside of the set
-  csCurve** curves;
-  /// Number of curves used.
-  int num_curves;
-  /// Maximum number of curves in 'curves' array.
-  int max_curves;
+  /// The array of curves forming the outside of the set
+  class csCurvesArray : public csVector
+  {
+  public:
+    csCurvesArray () : csVector (16, 16) {}
+    virtual ~csCurvesArray ()
+    { DeleteAll (); }
+    virtual bool FreeItem (csSome Item);
+    virtual int CompareKey (csSome Item, csConstSome Key, int Mode) const;
+    csCurve *Get (int iNum) const
+    { return (csCurve *)csVector::Get (iNum); }
+    csCurve **GetArray ()
+    { return (csCurve **)root; }
+  } curves;
 
   /// csSector where this polyset belongs (pointer to 'this' if it is a sector).
   csSector* sector;
@@ -176,9 +190,7 @@ protected:
   	csPolygon2DQueue* poly_queue);
 
 private:
-  /**
-   * Fog information.
-   */
+  /// Fog information.
   csFog fog;
 
 public:
@@ -206,9 +218,7 @@ public:
   /// scale param (the larger this param it, the more the curves are tesselated).
   float curves_scale;  
 
-  /**
-   * Curve vertices. 
-   */
+  /// Curve vertices. 
   csVector3* curve_vertices;
   /// Texture coords of curve vertices
   csVector2* curve_texels;
@@ -218,9 +228,7 @@ public:
   /// Maximum number of vertices.
   int max_curve_vertices;
 
-  /**
-   * Construct a csPolygonSet.
-   */
+  /// Construct a csPolygonSet.
   csPolygonSet ();
 
   /**
@@ -238,14 +246,10 @@ public:
    */
   virtual void Prepare ();
 
-  /**
-   * Just add a new vertex to the polygonset.
-   */
+  /// Just add a new vertex to the polygonset.
   int AddVertex (const csVector3& v) { return AddVertex (v.x, v.y, v.z); }
 
-  /**
-   * Just add a new vertex to the polygonset.
-   */
+  /// Just add a new vertex to the polygonset.
   int AddVertex (float x, float y, float z);
 
   /**
@@ -280,14 +284,10 @@ public:
    */
   void CompressVertices ();
 
-  /**
-   * Return the world space vector for the vertex.
-   */
+  /// Return the world space vector for the vertex.
   csVector3& Vwor (int idx) { return wor_verts[idx]; }
 
-  /**
-   * Return the object space vector for the vertex.
-   */
+  /// Return the object space vector for the vertex.
   csVector3& Vobj (int idx) { return obj_verts[idx]; }
 
   /**
@@ -297,74 +297,53 @@ public:
    */
   csVector3& Vcam (int idx) { return cam_verts[idx]; }
 
-  /**
-   * Return the number of vertices.
-   */
+  /// Return the number of vertices.
   int GetNumVertices () { return num_vertices; }
 
-  /**
-   * Add a polygon to this polygonset.
-   */
+  /// Add a polygon to this polygonset.
   void AddPolygon (csPolygonInt* spoly);
 
-  /**
-   * Create a new polygon in this polygonset and add it.
-   */
+  /// Create a new polygon in this polygonset and add it.
   csPolygon3D* NewPolygon (csTextureHandle* texture);
 
-  /**
-   * Get the number of polygons in this polygonset.
-   */
-  int GetNumPolygons () { return num_polygon; }
+  /// Get the number of polygons in this polygonset.
+  int GetNumPolygons ()
+  { return polygons.Length (); }
 
-  /**
-   * Get the specified polygon from this set.
-   */
-  csPolygonInt* GetPolygon (int idx) { return polygons[idx]; }
+  /// Get a csPolygonInt with the index.
+  virtual csPolygonInt* GetPolygon (int idx);
 
-  /**
-   * Get the named polygon from this set.
-   */
-  csPolygon3D* GetPolygon (char* name);
+  /// Get the specified polygon from this set.
+  csPolygon3D *GetPolygon3D (int idx)
+  { return polygons.Get (idx); }
 
-  /**
-   * Add a curve to this polygonset.
-   */
+  /// Get the named polygon from this set.
+  csPolygon3D *GetPolygon3D (char* name);
+
+  /// Add a curve to this polygonset.
   void AddCurve (csCurve* curve);
 
-  /**
-   * Get the number of curves in this polygonset.
-   */
-  int GetNumCurves () { return num_curves; }
+  /// Get the number of curves in this polygonset.
+  int GetNumCurves ()
+  { return curves.Length (); }
 
-  /**
-   * Get the specified curve from this set.
-   */
-  csCurve* GetCurve (int idx) { return curves[idx]; }
+  /// Get the specified curve from this set.
+  csCurve* GetCurve (int idx)
+  { return curves.Get (idx); }
 
-  /**
-   * Get the named curve from this set.
-   */
+  /// Get the named curve from this set.
   csCurve* GetCurve (char* name);
 
-  /**
-   * Get the number of curve vertices.
-   */
+  /// Get the number of curve vertices.
   int GetNumCurveVertices () { return num_curve_vertices; }
 
-  /**
-   * Get the specified curve vertex.
-   */
+  /// Get the specified curve vertex.
   csVector3& CurveVertex (int i) { return curve_vertices[i]; }
 
-  /**
-   * Get the specified curve texture coordinate (texel).
-   */
+  /// Get the specified curve texture coordinate (texel).
   csVector2& CurveTexel (int i) { return curve_texels[i]; }
 
-  /**
-   * Add a curve vertex.
-   */
+  /// Add a curve vertex.
   void AddCurveVertex (csVector3& v, csVector2& t);
 
   /**
@@ -374,9 +353,7 @@ public:
    */
   void UseBSP ();
 
-  /**
-   * Return true if there is a BSP tree used in this sector.
-   */
+  /// Return true if there is a BSP tree used in this sector.
   bool IsBSP () { return bsp != NULL; }
 
   /**
@@ -412,9 +389,7 @@ public:
     cam_verts = cam_verts_set.GetVertexArray ()->GetVertices ();
   }
 
-  /**
-   * Make transformation table ready but don't do the transform yet.
-   */
+  /// Make transformation table ready but don't do the transform yet.
   void UpdateTransformation ()
   {
     cam_verts_set.Update ();
@@ -422,32 +397,24 @@ public:
     cam_verts = cam_verts_set.GetVertexArray ()->GetVertices ();
   }
 
-  /**
-   * Make sure the camera vertices are up-to-date to the current camera frame.
-   */
+  /// Make sure the camera vertices are up-to-date to the current camera frame.
   void CamUpdate ()
   {
     cam_verts_set.CheckUpdate ();
     cam_verts = cam_verts_set.GetVertexArray ()->GetVertices ();
   }
 
-  /**
-   * Get the array of camera vertices.
-   */
+  /// Get the array of camera vertices.
   csVector3* GetCameraVertices ()
   {
     CamUpdate ();
     return cam_verts;
   }
 
-  /**
-   * Get the next polygonset in its linked list.
-   */
+  /// Get the next polygonset in its linked list.
   csPolygonSet* GetNext () { return next; }
 
-  /**
-   * Set the next polygonset in its linked list.
-   */
+  /// Set the next polygonset in its linked list.
   void SetNext (csPolygonSet* next) { csPolygonSet::next = next; }
 
   /**
@@ -457,9 +424,7 @@ public:
    */
   void SetSector (csSector* sector) { csPolygonSet::sector = sector; }
 
-  /**
-   * Return the sector that this polygonset belongs to.
-   */
+  /// Return the sector that this polygonset belongs to.
   csSector* GetSector () { return sector; }
 
   /**
@@ -482,9 +447,7 @@ public:
    */
   void CreateBoundingBox ();
 
-  /**
-   * Get the oriented bounding box created by CreateBoundingBox().
-   */
+  /// Get the oriented bounding box created by CreateBoundingBox().
   csPolygonSetBBox* GetBoundingBox () { return bbox; }
 
   /**
@@ -493,14 +456,10 @@ public:
    */
   void GetBoundingBox (csVector3& min_bbox, csVector3& max_bbox);
 
-  /**
-   * Return true if this has fog.
-   */
+  /// Return true if this has fog.
   bool HasFog () { return fog.enabled; }
 
-  /**
-   * Return fog structure.
-   */
+  /// Return fog structure.
   csFog& GetFog () { return fog; }
 
   /**

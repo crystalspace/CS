@@ -225,9 +225,9 @@ csPolygon3D* csSector::HitBeam (csVector3& start, csVector3& end)
 void csSector::CreateLightMaps (iGraphics3D* g3d)
 {
   int i;
-  for (i = 0 ; i < num_polygon ; i++)
+  for (i = 0 ; i < polygons.Length () ; i++)
   {
-    csPolygon3D* p = (csPolygon3D*)polygons[i];
+    csPolygon3D* p = polygons.Get (i);
     p->CreateLightMaps (g3d);
   }
 
@@ -283,9 +283,9 @@ csPolygon3D* csSector::IntersectSphere (csVector3& center, float radius,
   csVector3 hit;
   float A, B, C, D;
 
-  for (i = 0 ; i < num_polygon ; i++)
+  for (i = 0 ; i < polygons.Length () ; i++)
   {
-    p = (csPolygon3D*)polygons[i];
+    p = polygons.Get (i);
     pl = p->GetPlane ();
     d = pl->Distance (center);
     if (d < min_d && pl->VisibleFromPoint (center))
@@ -510,7 +510,7 @@ void csSector::Draw (csRenderView& rview)
 {
   draw_busy++;
   UpdateTransformation (rview);
-  Stats::polygons_considered += num_polygon;
+  Stats::polygons_considered += polygons.Length ();
   int i;
 
   G3D_FOGMETHOD fogmethod = G3DFOGMETHOD_NONE;
@@ -575,7 +575,7 @@ void csSector::Draw (csRenderView& rview)
 	spr_container->World2Camera (rview);
       }
 
-      CHK (poly_queue = new csPolygon2DQueue (GetNumPolygons ()+
+      CHK (poly_queue = new csPolygon2DQueue (polygons.Length ()+
       	static_thing->GetNumPolygons ()));
       static_thing->UpdateTransformation ();
       static_tree->Front2Back (rview.GetOrigin (), &TestQueuePolygons,
@@ -600,10 +600,10 @@ void csSector::Draw (csRenderView& rview)
     }
     else
     {
-      CHK (poly_queue = new csPolygon2DQueue (GetNumPolygons ()));
+      CHK (poly_queue = new csPolygon2DQueue (polygons.Length ()));
     }
     csPolygon2DQueue* queue = poly_queue;
-    TestQueuePolygons (this, polygons, num_polygon, &rview);
+    TestQueuePolygons (this, polygons.GetArray (), polygons.Length (), &rview);
     DrawPolygonsFromQueue (queue, &rview);
     CHK (delete queue);
   }
@@ -611,7 +611,7 @@ void csSector::Draw (csRenderView& rview)
     bsp->Back2Front (rview.GetOrigin (), &DrawPolygons, &rview);
   else
   {
-    DrawPolygons (this, polygons, num_polygon, &rview);
+    DrawPolygons (this, polygons.GetArray (), polygons.Length (), &rview);
     if (static_thing && do_things)
     {
       static_thing->UpdateTransformation (rview);
@@ -1192,7 +1192,8 @@ void csSector::CalculateLighting (csLightView& lview)
     static_thing->UpdateTransformation (center);
     static_tree->Front2Back (center, &CalculateLightingPolygonsFB, (void*)&lview,
       	CullOctreeNodeLighting, (void*)&lview);
-    CalculateLightingPolygonsFB ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&lview);
+    CalculateLightingPolygonsFB ((csPolygonParentInt*)this, polygons.GetArray (),
+      polygons.Length (), (void*)&lview);
     //printf ("Cull: dist=%d quad=%d not=%d\n",
     	//count_cull_dist, count_cull_quad, count_cull_not);
   }
@@ -1202,7 +1203,8 @@ void csSector::CalculateLighting (csLightView& lview)
     if (bsp)
       bsp->Back2Front (center, &CalculateLightingPolygons, (void*)&lview);
     else
-      CalculateLightingPolygons ((csPolygonParentInt*)this, polygons, num_polygon, (void*)&lview);
+      CalculateLightingPolygons ((csPolygonParentInt*)this, polygons.GetArray (),
+        polygons.Length (), (void*)&lview);
   }
 
   // Calculate lighting for all things in the current sector.
@@ -1236,8 +1238,8 @@ void csSector::CalculateLighting (csLightView& lview)
 void csSector::InitLightMaps (bool do_cache)
 {
   int i;
-  for (i = 0 ; i < num_polygon ; i++)
-    ((csPolygon3D*)polygons[i])->InitLightMaps (this, do_cache, i);
+  for (i = 0; i < polygons.Length (); i++)
+    polygons.Get (i)->InitLightMaps (this, do_cache, i);
 
   csThing* sp = first_thing;
   while (sp)
@@ -1250,8 +1252,8 @@ void csSector::InitLightMaps (bool do_cache)
 void csSector::CacheLightMaps ()
 {
   int i;
-  for (i = 0 ; i < num_polygon ; i++)
-    ((csPolygon3D*)polygons[i])->CacheLightMaps (this, i);
+  for (i = 0 ; i < polygons.Length (); i++)
+    polygons.Get (i)->CacheLightMaps (this, i);
 
   csThing* sp = first_thing;
   while (sp)

@@ -33,7 +33,6 @@ struct CDTriangle
   csVector3 p1, p2, p3;
 };
 
-
 //
 class BBox
 {
@@ -45,23 +44,26 @@ public:
   csMatrix3 pR;
   csVector3 pT;
 
-  // dimensions
-  csVector3  d;        // this is "radius", that is, 
-                      // half the measure of a side length
-  BBox *P;  // points to but does not "own".  
+  // this is "radius", that is, half the measure of a side length
+  csVector3 d;
+  // points to but does not "own".  
+  BBox *P;
   BBox *N;
 
   CDTriangle *trp;
 
   BBox () : pT (0, 0, 0), d (0, 0, 0) { }
 
-  int leaf() { return (!P && !N); } 
-  float size() { return d.x; } 
+  int leaf ()
+  { return (!P && !N); } 
+  float size ()
+  { return d.x; } 
 
-  int split_recurse(int *t, int n);
-  int split_recurse(int *t);               // specialized for leaf nodes
-  static bool tri_contact(BBox *b1, BBox *b2); //TODO Should move to BBox.
-
+  bool split_recurse(int *t, int n, BBox *&box_pool, CDTriangle *tris);
+  // specialized for leaf nodes
+  bool split_recurse(int *t, CDTriangle *tris);
+  //
+  static bool tri_contact (BBox *b1, BBox *b2);
 };
 
 class CD_model
@@ -69,7 +71,6 @@ class CD_model
 public:
 
   // these are only for internal use
-
   BBox *b;
   int num_boxes_alloced;
 
@@ -77,16 +78,18 @@ public:
   int num_tris;
   int num_tris_alloced;
   
-  int build_hierarchy();
+  bool build_hierarchy();
 
 public:
 
   /// Create a model object given number of triangles
   CD_model (int n_triangles);
 
+  /// Free the memory allocated for this model
+  ~CD_model ();
+
   /// Add a triangle to the model
-  int AddTriangle (int id, const csVector3 &p1, const csVector3 &p2, const csVector3 &p3);
-  
+  bool AddTriangle (int id, const csVector3 &p1, const csVector3 &p2, const csVector3 &p3);
 };
 
 /****************************************************************************/
@@ -177,11 +180,15 @@ public:
 
   /// Get top level bounding box.
   BBox * GetBbox(void) { return _rm->b; }
+
+  /// Query the array with collisions (and their count)
+  static collision_pair *GetCollisions ();
 };
 
 // Classes to organize triangles in bounding boxes with.
-class Moment {
- public:
+class Moment
+{
+public:
   float A;	// Area of triangle.
   csVector3 m;	// Centriod.
   csMatrix3 s;	// Moment.
@@ -189,7 +196,7 @@ class Moment {
   static Moment *stack;
 
   inline void compute(csVector3 p, csVector3 q, csVector3 r)
-    {
+  {
     csVector3 u, v, w;
 
     // compute the area of the triangle
@@ -236,20 +243,22 @@ class Moment {
   } 
 };
 
-class Accum : public Moment {
- public:
-  inline void clear(void)
-    {
-      A = m.x = m.y = m.z = 0;
-      s.m11 = s.m12 = s.m13 = 0;
-      s.m21 = s.m22 = s.m23 = 0;
-      s.m31 = s.m32 = s.m33 = 0;
-    }
+class Accum : public Moment
+{
+public:
+  inline void clear ()
+  {
+    A = m.x = m.y = m.z = 0;
+    s.m11 = s.m12 = s.m13 = 0;
+    s.m21 = s.m22 = s.m23 = 0;
+    s.m31 = s.m32 = s.m33 = 0;
+  }
   inline void moment( Moment b )
-    { m = m + b.m * b.A; s = s + b.s;  A += b.A; }
-  inline void mean( csVector3 *v ) { *v = m / A; }
+  { m = m + b.m * b.A; s = s + b.s;  A += b.A; }
+  inline void mean( csVector3 *v )
+  { *v = m / A; }
   inline void covariance( csMatrix3 *C )
-    {
+  {
     C->m11 = s.m11 - m.x*m.x/A;
     C->m21 = s.m21 - m.y*m.x/A;
     C->m31 = s.m31 - m.z*m.x/A;
@@ -259,11 +268,12 @@ class Accum : public Moment {
     C->m13 = s.m13 - m.x*m.z/A;
     C->m23 = s.m23 - m.y*m.z/A;
     C->m33 = s.m33 - m.z*m.z/A;
-    }
+  }
   inline void moments(int *t, int n)
   {
-    clear();
-    for(int i=0; i<n; i++) moment(Moment::stack[t[i]]);
+    clear ();
+    for (int i = 0; i < n; i++)
+      moment (Moment::stack [t [i]]);
   }
 };
 

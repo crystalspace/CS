@@ -35,15 +35,28 @@
 #include "csgfxldr/walimage.h"
 #include "walpal.h"
 
+/* Header definition. */
+struct WALHeader
+{
+  unsigned char Name[32];		// Internal Name
+  unsigned int width;			// Width of largest mipmap
+  unsigned int height;			// Height of largest mipmap
+  unsigned int offsets[4];		// Offset to 4 mipmaps in file
+  char nextframe[32];			// Name of next file in animation if any
+  unsigned int flags;			// ??
+  unsigned int contents;		// ??
+  unsigned int value;			// ??
+} _WALHeader;
+
 //---------------------------------------------------------------------------
 
 bool RegisterWAL ()
 {
-  static WALImageLoader loader;
-  return ImageLoader::Register (&loader);
+  static csWALImageLoader loader;
+  return csImageLoader::Register (&loader);
 }
 
-csImageFile* WALImageLoader::LoadImage (UByte* buf, ULong size)
+csImageFile* csWALImageLoader::LoadImage (UByte* buf, ULong size)
 {
   CHK (ImageWALFile* i = new ImageWALFile(buf, size));
   if (i && (i->get_status() & IFE_BadFormat))
@@ -51,7 +64,7 @@ csImageFile* WALImageLoader::LoadImage (UByte* buf, ULong size)
   return i;    
 }
 
-AlphaMapFile *WALImageLoader::LoadAlphaMap(UByte* buf,ULong size)
+AlphaMapFile *csWALImageLoader::LoadAlphaMap(UByte* buf,ULong size)
 {
 	return NULL;
 }

@@ -690,7 +690,7 @@ int FindIntersection(CDTriangle *t1,CDTriangle *t2,csVector3 line[2])
 void WalkTest::CreateColliders (void)
 {
   csPolygon3D *p;
-  CHK (csPolygonSet *pb = new csPolygonSet());
+  CHK (csPolygonSet *pb = new csPolygonSet ());
   pb->SetName ("Player's Body");
 
   pb->AddVertex(-DX_2, OY,    -DZ_2);
@@ -733,9 +733,10 @@ void WalkTest::CreateColliders (void)
   p->AddVertex (0); p->AddVertex (4);
   p->AddVertex (7); p->AddVertex (3);
 
-  CHK (this->body=new csCollider(pb));
+  CHK (body = new csCollider (pb));
+  CHK (delete pb);
 
-  CHK (csPolygonSet *pl = new csPolygonSet());
+  CHK (csPolygonSet *pl = new csPolygonSet ());
 
   pl->AddVertex(-DX_2L, OYL,     -DZ_2L);
   pl->AddVertex(-DX_2L, OYL,     DZ_2L);
@@ -777,18 +778,17 @@ void WalkTest::CreateColliders (void)
   p->AddVertex (0); p->AddVertex (4);
   p->AddVertex (7); p->AddVertex (3);
 
-  CHK (this->legs=new csCollider(pl));
+  CHK (legs = new csCollider(pl));
+  CHK (delete pl);
 
-  if(!this->body||!this->legs)
-    do_cd=false;
+  if (!body || !legs)
+    do_cd = false;
 }
 
 #define MAXSECTORSOCCUPIED  20
 
 // No more than 1000 collisions ;)
-extern collision_pair *CD_contact;
-//collision_pair *our_cd_contact=0;
-collision_pair our_cd_contact[1000];//=0;
+collision_pair our_cd_contact[1000];
 int num_our_cd;
 
 int FindSectors (csVector3 v, csVector3 d, csSector *s, csSector **sa)
@@ -825,6 +825,8 @@ int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt)
   // Check collision with this sector.
   csCollider::numHits = 0;
   csCollider::CollidePair (c, csColliderPointerObject::GetCollider(*sp), cdt);
+  collision_pair *CD_contact = csCollider::GetCollisions ();
+
   hit += csCollider::numHits;
   for (int i=0 ; i<csCollider::numHits ; i++)
     our_cd_contact[num_our_cd++] = CD_contact[i];
@@ -837,10 +839,11 @@ int CollisionDetect (csCollider *c, csSector* sp, csTransform *cdt)
   while (tp)
   {
     // TODO, if and when Things can move, their transform must be passed in.
-    csCollider::numHits=0;
-    csCollider::CollidePair(c,csColliderPointerObject::GetCollider(*tp),cdt);
+    csCollider::numHits = 0;
+    csCollider::CollidePair (c, csColliderPointerObject::GetCollider (*tp), cdt);
     hit += csCollider::numHits;
 
+    CD_contact = csCollider::GetCollisions ();
     for (int i=0 ; i<csCollider::numHits ; i++)
       our_cd_contact[num_our_cd++] = CD_contact[i];
 
@@ -911,9 +914,6 @@ void DoGravity (csVector3& pos, csVector3& vel)
 
     for (int j=0 ; j<hit ; j++)
     {
-      // я -- мудрак!.. я отлаживал сей кусок два дн€. ј надо было только
-      //  использовать не указатели, а значени€. ј впрочем... ¬ам не пон€ть ;) -- D.D.
-
       CDTriangle first = *our_cd_contact[j].tr1;
       CDTriangle second = *our_cd_contact[j].tr2;
 

@@ -29,7 +29,7 @@ int SortedEigen (csMatrix3& M, csMatrix3& evecs);
 
 CD_model::CD_model (int n_triangles)
 {
-  b = 0;
+  b = NULL;
   num_boxes_alloced = 0;
 
   CHK (tris = new CDTriangle [n_triangles]);
@@ -37,7 +37,15 @@ CD_model::CD_model (int n_triangles)
   num_tris_alloced = tris ? n_triangles : 0;
 }
 
-int CD_model::AddTriangle (int id, const csVector3 &p1, const csVector3 &p2,
+CD_model::~CD_model ()
+{
+  // the boxes pointed to should be deleted.
+  CHK (delete [] b);
+  // the triangles pointed to should be deleted.
+  CHK (delete [] tris);
+}
+
+bool CD_model::AddTriangle (int id, const csVector3 &p1, const csVector3 &p2,
   const csVector3 &p3)
 {
   // first make sure that we haven't filled up our allocation.
@@ -56,10 +64,6 @@ int CD_model::AddTriangle (int id, const csVector3 &p1, const csVector3 &p2,
   return true;
 }
 
-static CDTriangle *CD_tri = 0;
-static BBox *CD_boxes = 0;
-static int CD_boxes_inited = 0;
-
 /*
   There are <n> CDTriangle structures in an array starting at <t>.
   
@@ -69,27 +73,26 @@ static int CD_boxes_inited = 0;
 
   <or>, <ax>, and <mp> are model space coordinates.
 */
-int CD_model::build_hierarchy ()
+bool CD_model::build_hierarchy ()
 {
-  // allocate the boxes and set the box list globals
+  // Delete the boxes if they're already allocated
+  CHK (delete [] b);
 
+  // allocate the boxes and set the box list globals
   num_boxes_alloced = num_tris * 2;
-  CHK (b = new BBox[num_boxes_alloced]);
-  if (b == 0) return true;
-  CD_boxes = b;
-  CD_boxes_inited = 1;   // we are in process of initializing b[0].
+  CHK (b = new BBox [num_boxes_alloced]);
+  if (!b) return false;
   
   // Determine initial orientation, mean point, and splitting axis.
-
   int i; 
   Accum _M;
   
   CHK (Moment::stack = new Moment[num_tris]);
 
-  if (Moment::stack == 0)
+  if (!Moment::stack)
   {
-    CHK (delete [] b);
-    return true;
+    CHK (delete [] b); b = NULL;
+    return false;
   }
 
   // first collect all the moments, and obtain the area of the 
@@ -143,39 +146,34 @@ int CD_model::build_hierarchy ()
   CHK (int *t = new int [num_tris]);
   if (t == 0)
   {
-    CHK (delete [] b);
-    CHK (delete [] Moment::stack);
-    return true;
+    CHK (delete [] Moment::stack); Moment::stack = NULL;
+    CHK (delete [] b); b = NULL;
+    CHK (delete [] t);
+    return false;
   }
   for (i = 0; i < num_tris; i++)
     t [i] = i;
 
-  // set the tri pointer
-  CD_tri = tris;
-  
   // do the build
-  int rc = b [0].split_recurse (t, num_tris);
-  if (rc != false)
+  BBox *pool = b + 1;
+  if (!b [0].split_recurse (t, num_tris, pool, tris))
   {
-    CHK (delete [] b);
+    CHK (delete [] b); b = NULL;
     CHK (delete [] t);
-    return true;
+    return false;
   }
   
   // free the moment list
   CHK (delete [] Moment::stack);
-  Moment::stack = 0;
+  Moment::stack = NULL;
 
-  // null the tri pointer
-  CD_tri = 0;
-  
   // free the index list
   CHK (delete [] t);
 
-  return false;
+  return true;
 }
 
-int BBox::split_recurse (int *t, int n)
+bool BBox::split_recurse (int *t, int n, BBox *&box_pool, CDTriangle *tris)
 {
   // The orientation for the parent box is already assigned to this->pR.
   // The axis along which to split will be column 0 of this->pR.
@@ -186,7 +184,7 @@ int BBox::split_recurse (int *t, int n)
   // will be constructed and placed in the parent's CS.
 
   if (n == 1)
-    return split_recurse(t);
+    return split_recurse (t, tris);
   
   // walk along the tris for the box, and do the following:
   //   1. collect the max and min of the vertices along the axes of <or>.
@@ -196,7 +194,6 @@ int BBox::split_recurse (int *t, int n)
   Accum _M1, _M2;
   csMatrix3 C;
 
-  int rc;   // for return code on procedure calls.
   int in;
   CDTriangle *ptr;
   int i;
@@ -210,13 +207,13 @@ int BBox::split_recurse (int *t, int n)
   _M1.clear ();
   _M2.clear ();
 
-  csVector3 c = pR.GetTranspose () * CD_tri[t[0]].p1;
+  csVector3 c = pR.GetTranspose () * tris [t [0]].p1;
   csVector3 minval = c, maxval = c;
 
   for (i=0 ; i<n ; i++)
   {
     in = t[i];
-    ptr = CD_tri + in;
+    ptr = tris + in;
 
     c = pR.GetTranspose () * ptr->p1;
     csMath3::SetMinMax (c, minval, maxval); 
@@ -284,8 +281,8 @@ int BBox::split_recurse (int *t, int n)
   d = (maxval - minval ) * 0.5;
 
   // allocate new boxes
-  P = CD_boxes + CD_boxes_inited++;
-  N = CD_boxes + CD_boxes_inited++;
+  P = box_pool++;
+  N = box_pool++;
 
   // Compute the orientations for the child boxes (eigenvectors of
   // covariance matrix).  Select the direction of maximum spread to be
@@ -304,13 +301,13 @@ int BBox::split_recurse (int *t, int n)
     }
 
     P->pR = tR;
-    if ((rc = P->split_recurse (t, n1)) != false)
-      return rc;
+    if (!P->split_recurse (t, n1, box_pool, tris))
+      return false;
   }
   else
   {
-    if ((rc = P->split_recurse(t)) != false)
-      return rc;
+    if (!P->split_recurse (t, tris))
+      return false;
   }
 
   C = P->pR;
@@ -331,13 +328,13 @@ int BBox::split_recurse (int *t, int n)
     }
       
     N->pR = tR;
-    if ((rc = N->split_recurse(t + n1, n - n1)) != false)
-      return rc;
+    if (!N->split_recurse (t + n1, n - n1, box_pool, tris))
+      return false;
   }
   else
   {
-    if ((rc = N->split_recurse(t+n1)) != false)
-      return rc;
+    if (!N->split_recurse (t + n1, tris))
+      return false;
   }
 
   C = N->pR;
@@ -347,10 +344,10 @@ int BBox::split_recurse (int *t, int n)
 
   N->pT = pR.GetTranspose () * c;
 
-  return false;
+  return true;
 }
 
-int BBox::split_recurse (int *t)
+bool BBox::split_recurse (int *t, CDTriangle *tris)
 {
   // For a single triangle, orientation is easily determined.
   // The major axis is parallel to the longest edge.
@@ -360,7 +357,7 @@ int BBox::split_recurse (int *t)
   // this->pR, this->d, and this->pT are set herein.
 
   P = N = 0;
-  CDTriangle *ptr = CD_tri + t[0];
+  CDTriangle *ptr = tris + t [0];
 
   // Find the major axis: parallel to the longest edge.
   // First compute the squared-lengths of each edge
@@ -445,5 +442,5 @@ int BBox::split_recurse (int *t)
   // Assign the one triangle to this box
   trp = ptr;
 
-  return false;
+  return true;
 }

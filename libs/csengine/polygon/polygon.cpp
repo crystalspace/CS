@@ -291,11 +291,9 @@ csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt (),
 
 csPolygon3D::~csPolygon3D ()
 {
-  if (delete_tex_info)
-    CHKB (delete txt_info);
-  txt_info = NULL;
-  if (plane && delete_plane) CHKB (delete plane);
-  if (portal && delete_portal) CHKB (delete portal);
+  CHKB (delete txt_info); txt_info = NULL;
+  if (delete_plane) CHKB (delete plane);
+  if (delete_portal) CHKB (delete portal);
   while (light_info.lightpatches)
     csWorld::current_world->lightpatch_pool->Free (light_info.lightpatches);
 }
@@ -491,8 +489,6 @@ int csPolygon3D::ClassifyZ (float z)
   if (front == 0) return POL_BACK;
   return POL_SPLIT_NEEDED;
 }
-
-
 
 void csPolygon3D::ComputeNormal ()
 {

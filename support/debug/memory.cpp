@@ -301,9 +301,19 @@ void check_mem ()
   fflush (stdout);
 }
 
-class X { public: ~X () { dump_mem_list (); check_mem (); } } x;
-
 #endif // MEM_CHECK_EXTENSIVE
+
+static class X
+{
+public:
+  ~X ()
+  {
+    dump_mem_list ();
+#ifdef MEM_CHECK_EXTENSIVE
+    check_mem ();
+#endif
+  }
+} x;
 
 void dump_mem_list ()
 {

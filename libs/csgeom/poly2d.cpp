@@ -22,10 +22,8 @@
 
 csPoly2DFactory* csPoly2DFactory::SharedFactory()
 {
-  static csPoly2DFactory* p = 0;
-  if (p == 0)
-    CHK (p = new csPoly2DFactory);
-  return p;
+  static csPoly2DFactory p;
+  return &p;
 }
 
 csPoly2D::csPoly2D (int start_size)

@@ -22,7 +22,7 @@
 
 #include "csgfxldr/csimage.h"
 
-class BMPImageLoader;
+class csBMPImageLoader;
 
 /** An csImageFile subclass for reading BMP files.
  *
@@ -34,7 +34,7 @@ class ImageBMPFile : public csImageFile
 {
   ///
   friend class csImageFile;	// For constructor
-  friend class BMPImageLoader;
+  friend class csBMPImageLoader;
 
 private:
   /// Read the BMP file from the buffer.
@@ -50,7 +50,7 @@ public:
 /**
  * The BMP Image Loader.
  */
-class BMPImageLoader : public ImageLoader
+class csBMPImageLoader : public csImageLoader
 {
 protected:
   ///

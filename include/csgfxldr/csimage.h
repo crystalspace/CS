@@ -166,7 +166,7 @@ class csVector;
 /**
  * Extend this class to support a particular type of image loading.
  */
-class ImageLoader
+class csImageLoader
 {
 protected:
   /**
@@ -179,15 +179,15 @@ protected:
   virtual AlphaMapFile* LoadAlphaMap(UByte* buf,ULong size) =0;
 
   ///
-  virtual ~ImageLoader() {}
+  virtual ~csImageLoader() {}
 
 public:
   /**
    * Register a loader for a given image type.
    * Adds 'loader' to the list of image formats to be checked during an
-   * ImageLoader::load(...) call.
+   * csImageLoader::load(...) call.
    */
-  static bool Register (ImageLoader* loader);
+  static bool Register (csImageLoader* loader);
 
   /// Return the name of the image type supported by this loader.
   virtual const char* GetName() const = 0;
@@ -208,9 +208,9 @@ public:
   * Load an alpha-map from an 8-bit image
   */
   static AlphaMapFile *load_alpha(UByte *buf,ULong size);
-private:
-  // A list of registered loaders
-  static csVector *loaderlist;
+
+  /// A pointer to next image loader (loaders are chained in a list)
+  csImageLoader *Next;
 };
 
 #endif

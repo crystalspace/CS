@@ -1118,7 +1118,7 @@ static bool CommandHandler (char *cmd, char *arg)
   }
   else if (!strcasecmp (cmd, "hi"))
   {
-    csPolygon3D* hi = arg ? Sys->view->GetCamera ()->GetSector ()->GetPolygon (arg) : (csPolygon3D*)NULL;
+    csPolygon3D* hi = arg ? Sys->view->GetCamera ()->GetSector ()->GetPolygon3D (arg) : (csPolygon3D*)NULL;
     if (hi) Sys->Printf (MSG_CONSOLE, "Hilighting polygon: '%s'\n", arg);
     else Sys->Printf (MSG_CONSOLE, "Disabled hilighting.\n");
     Sys->selected_polygon = hi;
@@ -1576,6 +1576,8 @@ WalkTest::~WalkTest ()
   CHK (delete infinite_maze);
   CHK (delete huge_room);
   CHK (delete cslogo);
+  CHK (delete body);
+  CHK (delete legs);
 }
 
 void WalkTest::SetSystemDefaults (csIniFile *Config)

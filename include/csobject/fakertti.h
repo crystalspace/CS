@@ -20,10 +20,14 @@
 #ifndef __FAKERTTI_H_
 #define __FAKERTTI_H_
 
-// Pseudo-RTTI, since AFAIK we still allow gcc 2.7.x which has buggy RTTI
+/**
+ * Pseudo-RTTI, to avoid using "normal" rtti which is a serious size overhead.
+ * We need rtti only for a few objects and a limited set of functions only.
+ * Because of this we provide a fake RTTI system that does everything we need;
+ * it is suggested to compile the engine without RTTI to conserve space.
+ */
 
 typedef const char* csIdStr;
-
 
 /**
  * A class that represents the dynamic type of an object.
@@ -95,47 +99,51 @@ public:
 class csIdFunc
 {
 public:
-/**
- * The following function is used to allocate static csIdType instances.
- * Since it allocates an array that is never freed, it should only be
- * invoked for static variables that exist for the duration of the program.
- */
-static csIdType Allocate(csIdStr s, const csIdType& id);
+  /**
+   * The following function is used to allocate static csIdType instances.
+   * Since it allocates an array that is never freed, it should only be
+   * invoked for static variables that exist for the duration of the program.
+   */
+  static csIdType Allocate(csIdStr s, const csIdType& id);
 
-/**
- * Returns the csIdType common to both entries.
- * This function will return the csIdType representing the highest-derived
- * class which is common to both.
- */
-static csIdType GetCommon(const csIdType& t1, const csIdType& t2);
-
+  /**
+   * Returns the csIdType common to both entries.
+   * This function will return the csIdType representing the highest-derived
+   * class which is common to both.
+   */
+  static csIdType GetCommon(const csIdType& t1, const csIdType& t2);
 };
 
 class NULLCLASS
-{ public:  static const csIdType& Type(); };
+{
+public:
+  static const csIdType& Type();
+};
 
 /**
- * Function declarations for a psuedoRTTI class.
+ * Function declarations for a pseudoRTTI class.
  * Include this define in the definition of every class that uses the 
  * psuedoRTTI system.
  */
-#define CSOBJTYPE \
-  public:                                                          \
-    static csIdStr IdStr();                                        \
-    static const csIdType& Type();                                 \
-    virtual csIdStr GetIdStr() const { return IdStr(); }           \
-    virtual const csIdType& GetType() const { return Type(); } 
+#define CSOBJTYPE							\
+  public:								\
+    static csIdStr IdStr ();						\
+    static const csIdType& Type ();					\
+    virtual csIdStr GetIdStr () const { return IdStr(); }		\
+    virtual const csIdType& GetType () const { return Type(); }
 
 /**
  * The function implementations for a psuedoRTTI class.
  * For every class using the psuedoRTTI system, include this define
  * with the class name and parent class name in the corresponding .cpp file.
  */
-#define CSOBJTYPE_IMPL(thisclass,parentclass) \
-  csIdStr thisclass::IdStr()                                       \
-  { static csIdStr t = #thisclass;  return t; }                    \
-  const csIdType& thisclass::Type()                                \
-  { static csIdType t = csIdFunc::Allocate(IdStr(),                \
-    parentclass::Type());  return t; }
+#define CSOBJTYPE_IMPL(thisclass,parentclass)				\
+  csIdStr thisclass::IdStr ()						\
+  { static csIdStr t = #thisclass; return t; }				\
+  const csIdType& thisclass::Type ()					\
+  {									\
+    static csIdType t = csIdFunc::Allocate (IdStr (), parentclass::Type ());\
+    return t;								\
+  }
 
 #endif

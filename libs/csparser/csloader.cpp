@@ -1740,7 +1740,7 @@ csImageFile* csLoader::load_image (const char* name)
     return NULL;
   }
 
-  ifile = ImageLoader::load ((UByte *)buf, size);
+  ifile = csImageLoader::load ((UByte *)buf, size);
   CHK (delete [] buf);
 
   if (!ifile)
@@ -3266,7 +3266,7 @@ csSector* csLoader::load_room (char* secname, csWorld* w, char* buf,
 
   for (i = 0 ; i < num_portals ; i++)
   {
-    p = sector->GetPolygon (portals[i].poly);
+    p = sector->GetPolygon3D (portals[i].poly);
     if (!p)
     {
       CsPrintf (MSG_FATAL_ERROR, "Error locating polygon '%s' in room '%s'!\n",
@@ -3777,7 +3777,7 @@ bool csLoader::LoadWorld (csWorld* world, LanguageLayer* layer, char* buf)
          (ps==s) ? (ps = s->GetFirstThing ()) : (ps = ps->GetNext ()) )
       for (int i=0;  i < ps->GetNumPolygons ();  i++)
       {
-        csPolygon3D* p = (csPolygon3D*)(ps->GetPolygon (i));
+        csPolygon3D* p = ps->GetPolygon3D (i);
         if (p && p->GetPortal ())
         {
           csPortal* portal = p->GetPortal ();

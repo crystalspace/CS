@@ -197,7 +197,7 @@ csTextureHandle *ivconload_Quake2Textures(csWorld *world,Archive &pakarchive,cha
       // read in the converted skin
       sprintf(buffer,"%s.gif",tempfilename);
       tempfile = fopen(buffer,"rb");
-      ImageFile *newskin = ImageLoader::load(tempfile);
+      ImageFile *newskin = csImageLoader::load(tempfile);
       fclose(tempfile);
       unlink(buffer);
       unlink(tempfilename);
@@ -431,7 +431,7 @@ csTextureHandle * csCrossBuild_Quake2Importer::Import_Quake2Textures(
       size_t imagefilesize;
       char *imagedata = localVFS.ReadFile(skinfilename,imagefilesize);
 
-      csImageFile *newskin = ImageLoader::load((unsigned char *)imagedata,imagefilesize);
+      csImageFile *newskin = csImageLoader::load((unsigned char *)imagedata,imagefilesize);
 
       CHK (delete [] imagedata);
 

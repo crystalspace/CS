@@ -243,7 +243,8 @@ void csStatLight::RegisterPolygon (csPolygon3D* poly)
 
   int i;
   for (i = 0 ; i < num_polygon ; i++)
-    if (polygons[i] == poly) return;
+    if (polygons[i] == poly)
+      return;
   polygons[num_polygon++] = poly;
   if (num_polygon >= MAX_NUM_POLYGON)
   {
