@@ -18,6 +18,7 @@ The history order is reversed so that new features are at the top.
 	  chkheadr.sh and chktools.sh at configuration time.
 	- Eric Sunshine eliminated a number of compilation warnings in the
 	  OpenGL renderer.
+	- Fixed a bug in parsing of attenuation for XML.
 12-Sep-2002
 	- Fixed a crash at exit bug in Blocks.
 	- Fixed stupid bug in star loader that crashed csdemo.
