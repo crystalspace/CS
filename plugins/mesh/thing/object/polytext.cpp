@@ -1408,16 +1408,6 @@ void csShadowBitmap::UpdateLightMap (
 	  }
 	}
 
-	float *weights = new float[vCount];
-	// Get the weights of vertexes
-	for (act = 0; act < vCount ; act++)
-	{
-	  if (distances[act] < 0.001f)
-	    weights[act] = 1.0f;
-	  else
-	    weights[act] = shortestDistance / distances[act];
-	}
-	
 	if (!poly->PointOnPolygon (v))
 	{
 	  normal = nearestNormals[nearestNormal];
@@ -1425,9 +1415,14 @@ void csShadowBitmap::UpdateLightMap (
 	else
 	{
 	  normal.x = normal.y = normal.z = 0.0f;
+	  float weight;
 	  for (act = 0; act < vCount ; act++)
 	  {
-	    normal += weights[act]*nearestNormals[act];
+	    if (distances[act] < 0.001f)
+	      weight = 1.0f;
+	    else
+	      weight = shortestDistance / distances[act];
+	    normal += weight*nearestNormals[act];
 	  }
 	}
 
@@ -1435,7 +1430,6 @@ void csShadowBitmap::UpdateLightMap (
 
 	delete [] nearestNormals;
 	delete [] distances;
-	delete [] weights;
       }
 
       float cosinus = (v - lightpos) * normal;
