@@ -717,9 +717,10 @@ bool csRenderView::ClipBSphere (const csReversibleTransform& o2c,
     {
       CS_ASSERT (GetTopFrustum () != NULL);
       TestSphereFrustum (GetTopFrustum (), tr_center, radius, inside, outside);
-      // It is not possible that the sphere is fully outside the
-      // top-level frustum.
-      CS_ASSERT (!outside);
+      // Because TestSphereFrustum() is not 100% accurate it is possible
+      // that the test here returns 'outside' even though we previously
+      // tested that the sphere was not outside a smaller frustum.
+      if (outside) return false;
       if (!inside) clip_portal = CS_CLIP_TOPLEVEL;
     }
   }
