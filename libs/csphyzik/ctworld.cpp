@@ -42,6 +42,12 @@ ctWorld::ctWorld()
 
 	// default
 	ode_to_math = new OdeRungaKutta4();
+
+  max_state_size = DEFAULT_INIT_MAX_STATE_SIZE;
+  y0 = new real[max_state_size];
+  y1 = new real[max_state_size];
+  y_save = new real[max_state_size];
+  y_save_size = 0;
 }
 
 //!me delete _lists and ode
@@ -49,6 +55,9 @@ ctWorld::~ctWorld()
 {
 	if( ode_to_math ) delete ode_to_math;
 	//!me lists delete here
+  delete [] y0;
+  delete [] y1;
+  delete [] y_save;
 }
 
 void ctWorld::calc_delta_state( real t, const real y[], real dy[] ) 
@@ -80,6 +89,18 @@ ctPhysicalEntity *pe;
 
 }
 
+void ctWorld::resize_state_vector( long new_size )
+{
+  delete [] y0;
+  delete [] y1;
+  delete [] y_save;
+  max_state_size = new_size + STATE_RESIZE_EXTRA;
+  y0 = new real[max_state_size];
+  y1 = new real[max_state_size];
+  y_save = new real[max_state_size];
+}
+
+
 // calculate new positions of world objects after time dt
 errorcode ctWorld::evolve( real t0, real t1 )
 {
@@ -95,11 +116,19 @@ ctPhysicalEntity *pe = body_list.get_first();
 
 	//!me slow.  change to having y0 and y1 as members of world that get resized as needed.
 	gcurrent_world = this;
-	real *y0 = new real[arr_size];
-	real *y1 = new real[arr_size];
+	
+  if( arr_size > max_state_size ){
+    resize_state_vector( arr_size );
+  }
 
 	load_state( y0 );
 	
+  // save this state for posible rewinding
+  for( int i = 0; i < arr_size; i++ ){
+    y_save[i] = y0[i];
+  }
+  y_save_size = arr_size;
+
 	if( ode_to_math ){
 		ode_to_math->calc_step( y0, y1, arr_size, t0, t1, dydt );
 	}else{
@@ -109,13 +138,18 @@ ctPhysicalEntity *pe = body_list.get_first();
 
 	reintegrate_state( y1 );
 
-	//!me auch langsam.  kuch mal uber.
-	delete [] y0;
-	delete [] y1;
 	gcurrent_world = NULL;
 	
 	return WORLD_NOERR;
 
+}
+
+errorcode ctWorld::rewind()
+{
+  //!me do a check here to make sure everything is ok.....
+  //!me danger of rewinding when an object is deleted during evolve....
+  reintegrate_state( y_save );
+  return WORLD_NOERR;
 }
 
 // find and resolve collisions
