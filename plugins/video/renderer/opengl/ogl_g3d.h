@@ -313,10 +313,7 @@ public:
   /// Set optional clipper.
   virtual void SetClipper (csVector2* vertices, int num_vertices);
   /// Draw a triangle mesh.
-  virtual void DrawTriangleMesh (G3DTriangleMesh& mesh)
-  {
-    DefaultDrawTriangleMesh (mesh, this, o2c, clipper, aspect, width2, height2);
-  }
+  virtual void DrawTriangleMesh (G3DTriangleMesh& mesh);
 
   /// Get the iGraphics2D driver.
   virtual iGraphics2D *GetDriver2D ()

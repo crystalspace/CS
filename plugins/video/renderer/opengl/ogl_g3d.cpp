@@ -38,6 +38,8 @@
 #include "icamera.h"
 #include "ilghtmap.h"
 #include "igraph2d.h"
+#include "csutil/garray.h"
+#include "csutil/cscolor.h"
 
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -91,7 +93,7 @@ static const double FOGTABLE_MAXDISTANCE = FOGTABLE_MEDIANDISTANCE * 2.0;
 // fog (distance*density) is mapped to a texture coordinate and then
 // clamped.  This determines the clamp value.  Some OpenGL drivers don't
 // like clamping textures so we must do it ourself
-static const double FOGTABLE_CLAMPVALUE = 0.95;
+static const double FOGTABLE_CLAMPVALUE = 0.85;
 
 /*=========================================================================
  SCF macro section
@@ -639,7 +641,9 @@ void csGraphics3DOpenGL::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     if (poly_alpha > 0)
       glColor4f (flat_r, flat_g, flat_b, 1.0 - (float) poly_alpha / 100.0);
     else
+    {
       glColor4f (flat_r, flat_g, flat_b, 1.0);
+    }
   }
   else
   {
@@ -701,6 +705,7 @@ void csGraphics3DOpenGL::DrawPolygonSingleTexture (G3DPolygonDP & poly)
     tex->GetTextureBox (lightmap_low_u, lightmap_low_v,
 			lightmap_high_u, lightmap_high_v);
 
+    // lightmap fudge factor
     lightmap_low_u -= 0.125;
     lightmap_low_v -= 0.125;
     lightmap_high_u += 0.125;
@@ -1046,6 +1051,297 @@ void csGraphics3DOpenGL::DrawPolygonFX (G3DPolygonDPFX & poly)
       glShadeModel (GL_FLAT);
   }
 }
+
+void csGraphics3DOpenGL::DrawTriangleMesh (G3DTriangleMesh& mesh)
+{
+
+  // yet another work in progress - GJH
+
+  //@@@@@@@ DO INCREF()/DECREF() ON THESE ARRAYS!!!
+  /// Static vertex array.
+  static DECLARE_GROWING_ARRAY (tr_verts, csVector3);
+  /// Static uv array.
+  static DECLARE_GROWING_ARRAY (uv_verts, csVector2);
+  /// The perspective corrected vertices.
+  static DECLARE_GROWING_ARRAY (persp, csVector3);
+  /// Array which indicates which vertices are visible and which are not.
+  static DECLARE_GROWING_ARRAY (visible, bool);
+  /// Array with colors.
+  static DECLARE_GROWING_ARRAY (color_verts, csColor);
+  /// Array with fog values.
+  static DECLARE_GROWING_ARRAY (fog_intensities, float);
+  /// Array with fog colors
+  static DECLARE_GROWING_ARRAY (fog_color_verts, csColor);
+  /// Array with visible triangles
+  static DECLARE_GROWING_ARRAY (visible_indices, int);
+
+  int i;
+
+  // Update work tables.
+  if (mesh.num_vertices > tr_verts.Limit ())
+  {
+    tr_verts.SetLimit (mesh.num_vertices);
+    //z_verts.SetLimit (mesh.num_vertices);
+    uv_verts.SetLimit (mesh.num_vertices);
+    persp.SetLimit (mesh.num_vertices);
+    visible.SetLimit (mesh.num_vertices);
+    color_verts.SetLimit (mesh.num_vertices);
+    fog_intensities.SetLimit (mesh.num_vertices);
+    fog_color_verts.SetLimit (mesh.num_vertices);
+  }
+
+  if (mesh.num_triangles*3 > visible_indices.Limit() )
+  {
+    visible_indices.SetLimit(mesh.num_triangles*3);
+  }
+
+  // Do vertex tweening and/or transformation to camera space
+  // if any of those are needed. When this is done 'verts' will
+  // point to an array of camera vertices.
+  csVector3* f1 = mesh.vertices[0];
+  csVector2* uv1 = mesh.texels[0][0];
+  csColor* col1 = mesh.vertex_colors[0];
+  csVector3* work_verts;
+  csVector2* work_uv_verts;
+  csColor* work_colors;
+
+/*  if (mesh.num_vertices_pool > 1)
+  {
+    // Vertex morphing.
+    float tween_ratio = mesh.morph_factor;
+    float remainder = 1 - tween_ratio;
+    csVector3* f2 = mesh.vertices[1];
+    csVector2* uv2 = mesh.texels[1][0];
+    csColor* col2 = mesh.vertex_colors[1];
+    if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
+      for (i = 0 ; i < mesh.num_vertices ; i++)
+      {
+        tr_verts[i] = o2c * (tween_ratio * f2[i] + remainder * f1[i]);
+	if (mesh.do_morph_texels)
+	  uv_verts[i] = tween_ratio * uv2[i] + remainder * uv1[i];
+	if (mesh.do_morph_colors)
+	{
+	  color_verts[i].red = tween_ratio * col2[i].red + remainder * col1[i].red;
+	  color_verts[i].green = tween_ratio * col2[i].green + remainder * col1[i].green;
+	  color_verts[i].blue = tween_ratio * col2[i].blue + remainder * col1[i].blue;
+	}
+      }
+    else
+      for (i = 0 ; i < mesh.num_vertices ; i++)
+      {
+        tr_verts[i] = tween_ratio * f2[i] + remainder * f1[i];
+	if (mesh.do_morph_texels)
+	  uv_verts[i] = tween_ratio * uv2[i] + remainder * uv1[i];
+	if (mesh.do_morph_colors)
+	{
+	  color_verts[i].red = tween_ratio * col2[i].red + remainder * col1[i].red;
+	  color_verts[i].green = tween_ratio * col2[i].green + remainder * col1[i].green;
+	  color_verts[i].blue = tween_ratio * col2[i].blue + remainder * col1[i].blue;
+	}
+      }
+    work_verts = tr_verts.GetArray ();
+    if (mesh.do_morph_texels)
+      work_uv_verts = uv_verts.GetArray ();
+    else
+      work_uv_verts = uv1;
+    if (mesh.do_morph_colors)
+      work_colors = color_verts.GetArray ();
+    else
+      work_colors = col1;
+  }
+  else*/
+  {
+    if (mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
+    {
+      for (i = 0 ; i < mesh.num_vertices ; i++)
+        tr_verts[i] = o2c * f1[i]; //o2c.GetO2T() *  (f1[i] - o2c.GetO2TTranslation() );
+      work_verts = tr_verts.GetArray ();
+    }
+    else
+      work_verts = f1;
+    work_uv_verts = uv1;
+    work_colors = col1;
+  }
+
+  // set up coordinate transform
+  static GLfloat matrixholder[16];
+
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+  glLoadIdentity();
+
+  glTranslatef(width2,height2,0);
+
+  for (i = 0 ; i < 16 ; i++)
+    matrixholder[i] = 0.0;
+  
+  matrixholder[0] = matrixholder[5] = matrixholder[10] = matrixholder[15] = 1.0;
+  
+  if (0)//(mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE)
+  {
+    matrixholder[3] = matrixholder[7] = matrixholder[11] = 0.0;
+
+/*    csMatrix3 orientation = o2c.GetO2T();
+    csVector3 translation = orientation * o2c.GetO2TTranslation();
+
+    matrixholder[0] = orientation.m11;
+    matrixholder[1] = orientation.m21;
+    matrixholder[2] = orientation.m31;
+
+    matrixholder[4] = orientation.m12;
+    matrixholder[5] = orientation.m22;
+    matrixholder[6] = orientation.m32;
+
+    matrixholder[8] = orientation.m13;
+    matrixholder[9] = orientation.m23;
+    matrixholder[10] = orientation.m33;
+
+    matrixholder[12] = translation.x;
+    matrixholder[13] = translation.y;
+    matrixholder[14] = translation.z;
+
+    matrixholder[11] = 1.0;*/
+
+    matrixholder[11] = 1.0;
+  }
+
+  glMultMatrixf(matrixholder);
+
+  for (i = 0 ; i < mesh.num_vertices ; i++)
+  {
+    if (work_verts[i].z >= SMALL_Z)
+    {
+      persp[i].z = -1. / work_verts[i].z;
+      float iz = -aspect * persp[i].z;
+      persp[i].x = work_verts[i].x* iz;
+      persp[i].y = work_verts[i].y* iz;
+      visible[i] = true;
+    }
+    else
+    {
+      visible[i] = false;
+    }
+  }
+
+  // Clipped polygon (assume it cannot have more than 64 vertices)
+  G3DPolygonDPFX poly;
+  memset (&poly, 0, sizeof(poly));
+
+  // Fill flat color if renderer decide to paint it flat-shaded
+  mesh.txt_handle[0]->GetMeanColor (poly.flat_color_r,
+    poly.flat_color_g, poly.flat_color_b);
+
+  if (mesh.do_fog)
+  {
+    for (i=0; i < mesh.num_vertices; i++)
+    {
+      // specify fog vertex transparency
+      float I = mesh.vertex_fog[i].intensity;
+      if (I > FOGTABLE_MAXDISTANCE * FOGTABLE_CLAMPVALUE)
+      	I = FOGTABLE_CLAMPVALUE;
+      else
+	I = I / FOGTABLE_MAXDISTANCE;
+
+      fog_intensities[i] = I; 
+      fog_color_verts[i].red = mesh.vertex_fog[i].r;
+      fog_color_verts[i].green = mesh.vertex_fog[i].g;
+      fog_color_verts[i].blue = mesh.vertex_fog[i].b;
+    }
+  }
+
+  // build a set of visible triangles for drawing.  We basically go through
+  // the provided triangles and filter out any that have one or more visible vertices
+  int visible_index_count = 0;
+  csTriangle *triangles = mesh.triangles;
+
+  for (i=0; i<mesh.num_triangles; i++)
+  {
+    if ( ( visible [ triangles[i].a ] ) &&
+         ( visible [ triangles[i].b ] ) &&
+         ( visible [ triangles[i].c ] ) )
+    {
+      visible_indices[visible_index_count++] = triangles[i].a;
+      visible_indices[visible_index_count++] = triangles[i].b;
+      visible_indices[visible_index_count++] = triangles[i].c;
+    }
+  }
+
+  float flat_r = 1., flat_g = 1., flat_b = 1.;
+  if (!m_textured)
+  {
+    flat_r = poly.flat_color_r / 255.;
+    flat_g = poly.flat_color_g / 255.;
+    flat_b = poly.flat_color_b / 255.;
+  }
+
+  // Draw all triangles.
+  StartPolygonFX (mesh.txt_handle[0], mesh.fxmode);
+
+  if (m_gouraud)
+  {
+    glEnableClientState(GL_COLOR_ARRAY);
+    glColorPointer(3, GL_FLOAT, 0, & work_colors[0]);
+  }
+  else
+    glColor4f (flat_r, flat_g, flat_b, m_alpha);
+
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+  glVertexPointer(3, GL_FLOAT, 0, & persp[0]);
+  glTexCoordPointer(2, GL_FLOAT, 0, & work_uv_verts[0]);
+  glDrawElements(GL_TRIANGLES, visible_index_count, GL_UNSIGNED_INT, & visible_indices[0]);
+
+  // If there is vertex fog then we apply that last.
+  if (mesh.do_fog)
+  {
+    // let OpenGL save old values for us
+    // -GL_COLOR_BUFFER_BIT saves blend types among other things,
+    // -GL_DEPTH_BUFFER_BIT saves depth test function
+    // -GL_TEXTURE_BIT saves current texture handle
+    glPushAttrib (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_TEXTURE_BIT);
+
+    // we need to texture and blend, with vertex color
+    // interpolation
+    glEnable (GL_TEXTURE_2D);
+    glBindTexture (GL_TEXTURE_2D, m_fogtexturehandle);
+    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glDepthFunc (GL_EQUAL);
+    glShadeModel (GL_SMOOTH);
+
+    glTexCoordPointer(1, GL_FLOAT, 0, & fog_intensities[0]);
+    glColorPointer(3, GL_FLOAT, 0, & fog_color_verts[0]);
+
+    glDrawElements(GL_TRIANGLES, visible_index_count, GL_UNSIGNED_INT, & visible_indices[0]);
+
+
+    // Restore state (blend mode, texture handle, etc.) for next
+    // triangle
+    glPopAttrib ();
+    if (!m_textured)
+      glDisable (GL_TEXTURE_2D);
+    if (!m_gouraud)
+      glShadeModel (GL_FLAT);
+  }
+
+  if (m_gouraud)
+  {
+    glDisableClientState(GL_COLOR_ARRAY);
+  }
+
+  glDisableClientState(GL_VERTEX_ARRAY);
+  glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+  FinishPolygonFX ();
+
+  glMatrixMode(GL_MODELVIEW);
+  glPopMatrix();
+}
+
+
 
 void csGraphics3DOpenGL::OpenFogObject (CS_ID /*id*/, csFog* /*fog*/)
 {
