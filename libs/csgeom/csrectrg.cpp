@@ -194,7 +194,6 @@ csRectRegion::fragmentContainedRect(csRect &r1, csRect &r2)
     // In this case, the rects cancel themselves out.
 
     return;
-
   
   }
 
@@ -229,6 +228,7 @@ void csRectRegion::fragmentRect(
   // inside r1.
   if (!testedEdge)
   {
+    
   }
   
   // If we've gotten here then we should only have to break the rect into 2
@@ -342,12 +342,11 @@ void csRectRegion::Include(csRect &rect)
   } // end for
 }
 
-#if 0
 void 
 csRectRegion::Exclude(csRect &rect)
 {
 
 }
 
-#endif
+
 
