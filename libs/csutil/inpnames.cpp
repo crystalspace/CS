@@ -125,11 +125,16 @@ bool csParseInputDef (const char *name, iEvent* ev, bool use_shift)
   else
   {
     int code = 0;
+    
     for (csKeyCodeDef *c = KeyDefs; c->key; c++)
       if (! strcasecmp (c->key, name)) code = c->code;
-    if (code) *ev = csEvent (0, csevKeyDown, code, 0, mod);
-    else if (strlen (name) != 1) return false;
-    *ev = csEvent (0, csevKeyDown, 0, (int)*name, mod);
+    
+    if	(code)
+    	*ev = csEvent (0, csevKeyDown, code, 0, mod);
+    else if (strlen (name) != 1)
+    	return false;
+    else
+	*ev = csEvent (0, csevKeyDown, 0, (int)*name, mod);
   }
   return true;
 }
