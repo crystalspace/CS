@@ -382,16 +382,53 @@ bool DirectDetection::checkDevices3D ()
   return true;
 }
 
+static BOOL WINAPI OldCallback(GUID FAR *lpGUID, LPSTR pDesc, LPSTR pName,
+                                   LPVOID pContext)
+{
+  return DirectDetectionDDrawEnumCallback (lpGUID, pDesc, pName, pContext,
+    NULL);
+}
+
 /// check 2d devices
 bool DirectDetection::checkDevices2D ()
 {
-  // enumerate DDraw device
-  HRESULT hRes;
-  if (FAILED (hRes = DirectDrawEnumerateEx(
-    DirectDetectionDDrawEnumCallback, this,
-    DDENUM_DETACHEDSECONDARYDEVICES | DDENUM_ATTACHEDSECONDARYDEVICES |
-    DDENUM_NONDISPLAYDEVICES)))
-    SystemFatalError ("Error when enumerating DirectDraw devices.", hRes);
+  HINSTANCE libraryHandle = LoadLibrary("ddraw.dll");
+
+  // If ddraw.dll doesn't exist in the search path,
+  // then DirectX probably isn't installed, so fail.
+  if (!libraryHandle)
+    SystemFatalError ("Error: couldn't load ddraw.dll!", 0);
+
+  // Note that you must know which version of the
+  // function to retrieve (see the following text).
+  LPDIRECTDRAWENUMERATEEXA lpDDEnumEx;
+
+  lpDDEnumEx = (LPDIRECTDRAWENUMERATEEX) GetProcAddress (
+    libraryHandle, "DirectDrawEnumerateExA");
+
+  // If the function is there, call it to enumerate all display
+  // devices attached to the desktop, and any non-display DirectDraw
+  // devices.
+  if (!lpDDEnumEx)
+  {
+    HRESULT hRes;
+    if (FAILED (hRes = DirectDrawEnumerate (OldCallback, this)))
+      SystemFatalError ("Error when enumerating DirectDraw devices.", hRes);
+  } 
+  else
+  {
+    // enumerate DDraw device
+    HRESULT hRes;
+    if (FAILED (hRes = lpDDEnumEx(
+      DirectDetectionDDrawEnumCallback, this,
+      DDENUM_DETACHEDSECONDARYDEVICES | DDENUM_ATTACHEDSECONDARYDEVICES |
+      DDENUM_NONDISPLAYDEVICES)))
+    {
+      SystemFatalError ("Error when enumerating DirectDraw devices.", hRes);
+    }
+  }
+  //Free the library.
+  FreeLibrary (libraryHandle);
   return true;
 }
 
