@@ -8,6 +8,7 @@
 #include "csutil/scfstr.h"
 #include "iaws/awsdefs.h"
 #include "awsgbl.h"
+#include "awsbl.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -169,6 +170,8 @@ bool awsComponent::Setup (iAws *_wmgr, awsComponentNode *settings)
     {
       if (strcmp ("GridBag", ln->GetData ()) == 0)
         layout = new awsGridBagLayout (this);
+      else if (strcmp ("Border", ln->GetData ()) == 0)
+        layout = new awsBorderLayout (this, pm, settings);
     }
   }
 
