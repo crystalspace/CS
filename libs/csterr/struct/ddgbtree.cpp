@@ -696,6 +696,9 @@ void ddgTBinTree::updateSplit(ddgTriIndex tindex, ddgVisState parVis )
 		v = visibilityTriangle(tindex);
 	}
 
+	if (tindex == 1)
+		_vis = v;
+
 	// This will only go as far as the leaves which are currently in the mesh.
 	if (!tcacheId(tindex))
 	{

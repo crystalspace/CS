@@ -76,7 +76,10 @@ class WEXP ddgTBinTree {
 	 * Maximum value of all triangles of this triangle's subtree	(2 bytes)
 	 */
 	short *_rawMaxVal;
-
+	/**
+	 * Visibility state of the top level triangle in this tree.
+	 */
+	ddgVisState _vis;
 
 	/**
 	 * Pointer to neighbouring TBinTrees.
@@ -303,6 +306,8 @@ private:
 	 */
 	ddgTNode *snode(ddgTriIndex tindex);
 public:
+	/// Return toplevel visibility state.
+	ddgVisState vis(void)							{ return _vis; }
 	/// Return the objects visibility state.
 	ddgVisState vis(ddgTriIndex tindex)				{ return gnode(tindex)->vis(); }
 	/// Set the objects visibility state.
