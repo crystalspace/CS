@@ -431,7 +431,7 @@ bool csLoader::TestXml (const char* file, iFile* buf,
   {
     ReportError (
 	    "crystalspace.maploader.parse.xml",
-	    "Document system error for file '%s': %s!", error, file);
+	    "Document system error for file '%s': %s!", file, error);
     doc = 0;
     return false;
   }
@@ -454,7 +454,7 @@ bool csLoader::TestXml (const char* file, iFile* buf,
     {
       ReportError (
 	      "crystalspace.maploader.parse.xml",
-    	      "XML error '%s' for file '%s'!", error, file);
+    	      "XML error '%s' for file '%s'!", file, error);
       doc = 0;
       return false;
     }

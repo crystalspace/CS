@@ -144,6 +144,7 @@ bool csSaver::SaveMaterials(csRef<iDocumentNode>& parent) {
       if(texname && *texname) CreateValueNode(child, "texture", texname);
     }
 
+#ifndef CS_USE_NEW_RENDERER
     int layerCount=mat->GetTextureLayerCount();
     for(int i=0; i<layerCount; i++) {
       csRef<iDocumentNode> layerItem=CreateNode(child, "layer");
@@ -195,6 +196,7 @@ bool csSaver::SaveMaterials(csRef<iDocumentNode>& parent) {
         }
       }
     }
+#endif
   }
   return 1;
 }

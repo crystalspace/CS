@@ -74,8 +74,6 @@ void csGLShaderFVP::SetupState (csRenderMesh *mesh,
 
   if (do_lighting)
   {
-    csShaderVariable* var;
-
     glMatrixMode (GL_MODELVIEW_MATRIX);
     glPushMatrix ();
     glLoadIdentity ();
@@ -292,7 +290,7 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
 
             lights[i].lightnum = child->GetAttributeValueAsInt("num");
 
-            if (str = child->GetAttributeValue("position"))
+            if ((str = child->GetAttributeValue("position")))
               lights[i].positionvar = strings->Request (str);
             else
             {
@@ -301,7 +299,7 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
               lights[i].positionvar = strings->Request (buf);
             }
 
-            if (str = child->GetAttributeValue("diffuse"))
+            if ((str = child->GetAttributeValue("diffuse")))
               lights[i].diffusevar = strings->Request (str);
             else
             {
@@ -310,7 +308,7 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
               lights[i].diffusevar = strings->Request (buf);
             }
 
-            if (str = child->GetAttributeValue("specular"))
+            if ((str = child->GetAttributeValue("specular")))
               lights[i].specularvar = strings->Request (str);
             else
             {
@@ -319,7 +317,7 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
               lights[i].specularvar = strings->Request (buf);
             }
 
-            if (str = child->GetAttributeValue("attenuation"))
+            if ((str = child->GetAttributeValue("attenuation")))
               lights[i].attenuationvar = strings->Request (str);
             else
             {
@@ -333,7 +331,7 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
         case XMLTOKEN_AMBIENT:
           {
             const char* str;
-            if (str = child->GetAttributeValue("color"))
+            if ((str = child->GetAttributeValue("color")))
               ambientvar = strings->Request (str);
             else
               ambientvar = strings->Request ("STANDARD_LIGHT_AMBIENT");
@@ -344,11 +342,11 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
         case XMLTOKEN_ENVIRONMENT:
           {
             const char* str;
-            if (str = child->GetAttributeValue ("type"))
+            if ((str = child->GetAttributeValue ("type")))
             {
               if (!strcasecmp(str, "reflection"))
               {
-                if (str = child->GetAttributeValue ("mapping"))
+                if ((str = child->GetAttributeValue ("mapping")))
                 {
                   if (!strcasecmp(str, "cube") && ext->CS_GL_ARB_texture_cube_map)
                   {
@@ -374,7 +372,7 @@ bool csGLShaderFVP::Prepare(iShaderPass* pass)
 {
   //go through the lights and get direct refs (if we can)
   dynamicVars.Empty ();
-  unsigned int i;
+  int i;
 
   for (i = 0; i < lights.Length (); i++)
   {
@@ -384,25 +382,29 @@ bool csGLShaderFVP::Prepare(iShaderPass* pass)
     if(!ent.positionVarRef)
       ent.positionVarRef = pass->GetVariableRecursive (ent.positionvar);
     if(!ent.positionVarRef)
-      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.positionvar, (int)&ent.positionVarRef));
+      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.positionvar, 
+        (int)&ent.positionVarRef));
 
     ent.diffuseVarRef = svContextHelper.GetVariable (ent.diffusevar);
     if(!ent.diffuseVarRef)
       ent.diffuseVarRef = pass->GetVariableRecursive (ent.diffusevar);
     if(!ent.diffuseVarRef)
-      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.diffusevar, (int)&ent.diffuseVarRef));
+      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.diffusevar, 
+        (int)&ent.diffuseVarRef));
 
     ent.specularVarRef = svContextHelper.GetVariable (ent.specularvar);
     if(!ent.specularVarRef)
       ent.specularVarRef = pass->GetVariableRecursive (ent.specularvar);
     if(!ent.specularVarRef)
-      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.specularvar, (int)&ent.specularVarRef));
+      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.specularvar, 
+        (int)&ent.specularVarRef));
 
     ent.attenuationVarRef = svContextHelper.GetVariable (ent.attenuationvar);
     if(!ent.attenuationVarRef)
       ent.attenuationVarRef = pass->GetVariableRecursive (ent.attenuationvar);
     if(!ent.attenuationVarRef)
-      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.attenuationvar, (int)&ent.attenuationVarRef));
+      ent.dynVars.InsertSorted (csShaderVariableProxy(ent.attenuationvar, 
+        (int)&ent.attenuationVarRef));
   }
 
   return true;

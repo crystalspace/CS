@@ -29,9 +29,11 @@ static int ShaderVariableWrapperCompare (csShaderVariableProxy const &item1,
 }
 
 
-csShaderVariable::csShaderVariable (csStringID name)
-: csRefCount (), Name (name), String(0), TextureHandValue(0), TextureWrapValue(0),
-VectorValue(0) {}
+csShaderVariable::csShaderVariable (csStringID name) : csRefCount (), 
+  String(0), TextureHandValue(0), TextureWrapValue(0), VectorValue(0), 
+  Name (name) 
+{
+}
 
 
 int csShaderVariableList::InsertSorted (csShaderVariableProxy item)

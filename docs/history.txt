@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Oct-2003
+	- res fixed a few warnings occuring with GCC.
+	- res fixed cssaver plugin so it compiles with NR.
+	- res fixed some error messages in csparser where parameters were
+	  mixed up.
 26-Oct-2003
 	- Eric Sunshine updated `simple1' tutorial in the user manual to
 	  reflect recent changes to keyboard-related event handling.

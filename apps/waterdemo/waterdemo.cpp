@@ -628,7 +628,6 @@ bool csWaterDemo::Initialize ()
 
 void csWaterDemo::updateWater (float time)
 {
-  float mytime;
   bool haveRan=false;
   
   if (time>1000) time =0;
@@ -678,10 +677,10 @@ void csWaterDemo::pushDownPoint (float x, float z, float depth)
 {
   int xn, xu, zn, zu;
   float power, dist;
-  xn = floorf(x);
-  xu = ceilf(x);
-  zn = floorf(z);
-  zu = ceilf(z);
+  xn = (int)floorf (x);
+  xu = (int)ceilf (x);
+  zn = (int)floorf (z);
+  zu = (int)ceilf (z);
 
   xn = MAX(xn,0);
   xu = MIN(xu,Height);
