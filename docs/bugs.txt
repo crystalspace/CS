@@ -124,7 +124,7 @@ solved on: May, 20th 1999
 PROBLEM: Transparency won't work with OpenGL. So the Crystal Space logo 
 will show that blue seam, and the window in large.zip will be opaque.
 (thieber@gmx.net)
-SOLUTION:
+SOLUTION: probably solved?
 DIFFICULTY:
 
 PROBLEM: Console doesn't work in OpenGL on Win32, but in game coordinate 
@@ -136,6 +136,6 @@ PROBLEM: The lightmaps in OpenGL on Win32 are still inaccurate at their
 borders. Some will get a little darker on their seams, some look like they 
 overlap. (Take a look at the floor in large.zip. Especially near the 
 doors at start or street.) (thieber@gmx.net)
-SOLUTION:
+SOLUTION: probably solved?
 DIFFICULTY:
 

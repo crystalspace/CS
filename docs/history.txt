@@ -34,6 +34,14 @@ Short-term cleanups that need to be done:
 	  '-bots' commandline option.
 	- Denis added SetMousePosition support to the OpenGL/Win driver
 	  (for 'freelook').
+	- Windows OpenGL 2D driver also has the 2D sprite and text
+	  capabilities now. But this code should be shared! Thomas Hieber
+	  did this.
+	- Gary Haussmann added proper support for partially transparent
+	  textures to the Unix OpenGL 2D driver. He also extended the OpenGL
+	  3D rasterizer to properly support the various transparent polygon
+	  modes that CS has (semi-transparent textures and alpha transparency).
+	- *** Release of 0.13_011 ***
 20-May-99:
 	- Various changes to the Unix OpenGL 2D driver from Gary Haussmann.
 	  2D text should be much better now. He also added support for drawing
