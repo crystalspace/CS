@@ -119,7 +119,8 @@ bool Simple::HandleEvent (iEvent& ev)
   }
   else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q;
+    q.Take (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
   }
@@ -236,8 +237,10 @@ bool Simple::Initialize ()
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
-  csRef<iMeshWrapper> walls (engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingState> walls_state (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
+  csRef<iMeshWrapper> walls;
+  walls.Take (engine->CreateSectorWallsMesh (room, "walls"));
+  csRef<iThingState> walls_state;
+  walls_state.Take (SCF_QUERY_INTERFACE (walls->GetMeshObject (),
   	iThingState));
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
@@ -326,7 +329,8 @@ bool Simple::Initialize ()
   }
 
   // Load a sprite template from disk.
-  csRef<iMeshFactoryWrapper> imeshfact (loader->LoadMeshObjectFactory (
+  csRef<iMeshFactoryWrapper> imeshfact;
+  imeshfact.Take (loader->LoadMeshObjectFactory (
   	"/lib/std/sprite1"));
   if (imeshfact == NULL)
   {
@@ -337,13 +341,15 @@ bool Simple::Initialize ()
   }
 
   // Create the sprite and add it to the engine.
-  csRef<iMeshWrapper> sprite (engine->CreateMeshWrapper (
+  csRef<iMeshWrapper> sprite;
+  sprite.Take (engine->CreateMeshWrapper (
   	imeshfact, "MySprite", room,
 	csVector3 (-3, 5, 3)));
   csMatrix3 m; m.Identity (); m *= 5.;
   sprite->GetMovable ()->SetTransform (m);
   sprite->GetMovable ()->UpdateMove ();
-  csRef<iSprite3DState> spstate (SCF_QUERY_INTERFACE (sprite->GetMeshObject (),
+  csRef<iSprite3DState> spstate;
+  spstate.Take (SCF_QUERY_INTERFACE (sprite->GetMeshObject (),
   	iSprite3DState));
   spstate->SetAction ("default");
 

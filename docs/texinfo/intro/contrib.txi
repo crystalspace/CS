@@ -29,6 +29,11 @@ Andon patched 3ds2lev so it works correctly for
 non-texture mapped @sc{3ds} objects.
 
 @item
+Jochen Moench (@email{jochen.moench@@de.thalesgroup.com})
+
+Jochen added a patch for SetAction() in spr3d plugin.
+
+@item
 Krishnan Shrikumar (@email{krish@@urbyte.com})
 
 Krishnan wrote the sectorexport Blender export script.

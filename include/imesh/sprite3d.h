@@ -323,7 +323,7 @@ struct iSprite3DFactoryState : public iBase
   virtual uint GetMixMode () const = 0;
 };
 
-SCF_VERSION (iSprite3DState, 0, 0, 5);
+SCF_VERSION (iSprite3DState, 0, 0, 6);
 
 /**
  * This interface describes the API for the 3D sprite mesh object.
@@ -361,8 +361,12 @@ struct iSprite3DState : public iBase
   /// Get the number of frames.
   virtual int GetFrameCount () const = 0;
 
-  /// Select an action.
-  virtual bool SetAction (const char * name) = 0;
+  /**
+   * Select an action.
+   * If 'loop'==false the animation will not loop.
+   */
+  virtual bool SetAction (const char * name,
+  	bool loop = true, float speed = 1) = 0;
 
   /// Propogate set action to all children
   virtual bool PropagateAction (const char *name) = 0;

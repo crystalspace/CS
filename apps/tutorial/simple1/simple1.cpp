@@ -118,7 +118,8 @@ bool Simple::HandleEvent (iEvent& ev)
   }
   else if (ev.Type == csevKeyDown && ev.Key.Code == CSKEY_ESC)
   {
-    csRef<iEventQueue> q (CS_QUERY_REGISTRY (object_reg, iEventQueue));
+    csRef<iEventQueue> q;
+    q.Take (CS_QUERY_REGISTRY (object_reg, iEventQueue));
     if (q) q->GetEventOutlet()->Broadcast (cscmdQuit);
     return true;
   }
@@ -235,10 +236,10 @@ bool Simple::Initialize ()
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
 
   room = engine->CreateSector ("room");
-  csRef<iMeshWrapper> walls (
-  	engine->CreateSectorWallsMesh (room, "walls"));
-  csRef<iThingState> walls_state (
-  	SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
+  csRef<iMeshWrapper> walls;
+  walls.Take (engine->CreateSectorWallsMesh (room, "walls"));
+  csRef<iThingState> walls_state;
+  walls_state.Take (SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState));
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);

@@ -919,6 +919,23 @@ private:
 
   uint32 current_features;
 
+
+  /**
+   * Setting to manipulate sprite animation speed
+   * The bigger the value is, the faster the sprite moves.
+   */
+  float speedfactor;
+
+  /**
+   * Setting to indicate if the animation should be played in an endless loop.
+   */
+  bool loopaction;
+
+  /**
+   * Setting to indicate if the animation should be stopped.
+   */
+  bool fullstop;
+
 public:
 
   /**
@@ -1302,8 +1319,11 @@ public:
   /**
    * Select an action.
    */
-  bool SetAction (const char * name)
+  bool SetAction (const char * name, bool loop = true, float speed = 1)
   {
+    speedfactor = speed;
+    loopaction = loop;
+    fullstop = false;
     csSpriteAction2 *act;
     if ((act = factory->FindAction (name)) != NULL)
     {
@@ -1394,7 +1414,7 @@ public:
   }
   virtual void NextFrame (csTicks current_time)
   {
-    OldNextFrame (current_time);
+    OldNextFrame (current_time, !loopaction, !loopaction);
   }
   virtual bool WantToDie () const { return false; }
   virtual void HardTransform (const csReversibleTransform&) { }
@@ -1508,9 +1528,10 @@ public:
     {
       return scfParent->GetFrameCount ();
     }
-    virtual bool SetAction (const char * name)
+    virtual bool SetAction (const char * name, bool loop = true,
+    	float speed = 1)
     {
-      return scfParent->SetAction (name);
+      return scfParent->SetAction (name, loop, speed);
     }
     virtual bool PropagateAction (const char *name)
     {

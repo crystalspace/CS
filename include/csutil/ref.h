@@ -41,11 +41,14 @@ public:
   csRef () : obj (0) {}
 
   /**
-   * Construct a smart pointer from a raw object reference.  Takes ownership of
-   * the referenced object by assuming that its IncRef() method has already
-   * been called, and invokes its DecRef() method upon destruction.
+   * Construct a smart pointer from a raw object reference. Calls IncRef()
+   * on the object.
    */
-  explicit csRef (T* newobj) : obj (newobj) {}
+  explicit csRef (T* newobj) : obj (newobj)
+  {
+    if (obj)
+      obj->IncRef ();
+  }
   
   /**
    * Smart pointer copy constructor.
@@ -79,6 +82,7 @@ public:
       if (obj)
 	obj->IncRef ();
     }
+    return *this;
   }
 
   /**

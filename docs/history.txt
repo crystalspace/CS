@@ -46,6 +46,13 @@ The history order is reversed so that new features are at the top.
 	  methods since they were subsumed by the equivalent functionality of
 	  the assignment operators.  Fixed reference-counting bug in
 	  csRef::Take().
+	- Added patch from Jochen Moench <jochen.moench@de.thalesgroup.com>
+	  to allow SetAction() which will stop the animation after the
+	  action has completed. This also modifies iSprite3DState.
+	  It is now also possible to include a speed factor for animation.
+	- Changed csRef again so that the T* constructor now does IncRef().
+	  This means that 'Take()' is the ONLY safe way to convert an
+	  old style pointer that has already be IncRef()'ed into a csRef.
 30-Jul-2002
 	- Added simple csRefCount class which does reference counting
 	  without the need for iBase.

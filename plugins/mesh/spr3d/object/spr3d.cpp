@@ -894,6 +894,9 @@ csSprite3DMeshObject::csSprite3DMeshObject ()
   shapenr = 0;
   local_lod_level = 1;
   current_features = ALL_LOD_FEATURES;
+  speedfactor = 1;
+  loopaction = true;
+  fullstop = false;
 
   vbuf = NULL;
   vbuf_tween = NULL;
@@ -1574,38 +1577,47 @@ void csSprite3DMeshObject::InitSprite ()
   last_time = csGetTicks ();
 }
 
-bool csSprite3DMeshObject::OldNextFrame (csTicks current_time, bool onestep, bool stoptoend)
+bool csSprite3DMeshObject::OldNextFrame (csTicks current_time,
+	bool onestep, bool stoptoend)
 {
   bool ret = false;
+
+  if (fullstop)
+  {
+    return true;
+  }
 
   // If the sprite has only one frame we disable tweening here.
   if (cur_action->GetFrameCount () <= 1) do_tweening = false;
 
-  if(onestep)
+  if (onestep)
   {
-    if(current_time>last_time+cur_action->GetFrameDelay (cur_frame))
+    if (current_time > last_time+
+    	cur_action->GetFrameDelay (cur_frame)/speedfactor)
     {
       last_time = current_time;
       cur_frame++;
       if (cur_frame >= cur_action->GetFrameCount ())
       {
-        if(stoptoend) cur_frame --;
+        if (stoptoend) cur_frame --;
         else cur_frame = 0;
         ret = true;
+        fullstop = true;
       }
     }
   }
   else
   {
-    while(1)
+    while (1)
     {
-      if(current_time>last_time+cur_action->GetFrameDelay (cur_frame))
+      if (current_time > last_time+
+      	cur_action->GetFrameDelay (cur_frame)/speedfactor)
       {
-        last_time += cur_action->GetFrameDelay (cur_frame);
+        last_time += cur_action->GetFrameDelay (cur_frame)/speedfactor;
         cur_frame++;
         if (cur_frame >= cur_action->GetFrameCount ())
         {
-          if(stoptoend)
+          if (stoptoend)
           {
             cur_frame--;
             ret = true;
@@ -1622,7 +1634,8 @@ bool csSprite3DMeshObject::OldNextFrame (csTicks current_time, bool onestep, boo
   if (do_tweening)
   {
     if (current_time <= last_time) tween_ratio = 0;
-    else tween_ratio = (current_time - last_time) / float (cur_action->GetFrameDelay (cur_frame));
+    else tween_ratio = (current_time - last_time)
+    	/ float (cur_action->GetFrameDelay (cur_frame)/speedfactor);
   }
   else
     tween_ratio = 0;
