@@ -226,6 +226,7 @@ window "Another"
   {
     Frame: (100, 210) - (385, 300)
     Style: lbfsSunken
+    Highlight: "/aws/lbhi.png"
     Columns: 3
     DefaultSortCOl: 0
     Column0Width: 90
