@@ -12,8 +12,12 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+11-Feb-2000
+	- Eric Sunshine eliminated several compilation warnings in csPhyziks.
+	- Eric Sunshine eliminated some unsigned versus signed warnings in
+	  csClear.
 10-Feb-2000
-	- Michael Ewert did some fixes in physiks code.
+	- Michael Ewert did some fixes in csPhyziks code.
 	- Fix to sprite modifications from Seth Galbraith.
 	- Fixed sprites so that they at least load again.
 	  But they are still completely wrong.
