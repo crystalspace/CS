@@ -4415,6 +4415,8 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
         {
           csFrame* fr = stemp->AddFrame ();
           fr->SetName (name);
+          int anm_idx = fr->GetAnmIndex ();
+          int tex_idx = fr->GetTexIndex ();
           int i = 0;
           float x, y, z, u, v;
           while ((cmd = csGetObject (&params, tok_frame, &name, &params2)) > 0)
@@ -4439,8 +4441,8 @@ bool csLoader::LoadSpriteTemplate (csSpriteTemplate* stemp, char* buf)
                     fr->GetName ());
                   fatal_exit (0, false);
                 }
-                stemp->GetVertex (fr, i) = csVector3 (x, y, z);
-                stemp->GetTexel  (fr, i) = csVector2 (u, v);
+                stemp->GetVertex (anm_idx, i) = csVector3 (x, y, z);
+                stemp->GetTexel  (tex_idx, i) = csVector2 (u, v);
                 i++;
                 break;
             }

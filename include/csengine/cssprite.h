@@ -50,9 +50,8 @@ struct iTextureHandle;
 class csFrame : public csBase
 {
 private:
-  csPoly3D* vertices;
-  csPoly2D* texels;
-  csPoly3D* normals;
+  int animation_index;
+  int texturing_index;
   char* name;
 
   /// Bounding box in object space for this frame.
@@ -60,28 +59,16 @@ private:
 
 public:
   ///
-  csFrame ();
+  csFrame (int anm_idx, int tex_idx);
   ///
   virtual ~csFrame ();
 
-  /// should only be used by csSpriteTemplate class
-  csVector3& GetFrameVertex (int i) { return (*vertices)[i]; }
   ///
-  void SetVertices (csPoly3D* v) { vertices = v; }
+  int GetAnmIndex () { return animation_index; }
   ///
-  csPoly3D * GetVertices () { return vertices; }
-
-  /// should only be used by csSpriteTemplate class
-  csVector2& GetFrameTexel (int i) { return (*texels)[i]; }
+  int GetTexIndex () { return texturing_index; }
   ///
-  void SetTexels (csPoly2D * t) { texels = t; }
-  ///
-  csPoly2D * GetTexels () { return texels; }
-
-  /// should only be used by csSpriteTemplate class
-  csVector3& GetFrameNormal (int i) { return (*normals)[i]; }
-  ///
-  void SetNormals (csPoly3D * n) { normals = n;}
+  void SetTexIndex (int tex_idx) { texturing_index = tex_idx; }
 
   ///
   void SetName (char * n);
@@ -93,7 +80,8 @@ public:
    * This has to be called after setting up the frame and before
    * using it.
    */
-  void ComputeBoundingBox (int num_vertices);
+  // void ComputeBoundingBox (int num_vertices);
+  void SetBoundingBox (csBox3& b) { box = b; }
 
   /**
    * Get the bounding box in object space.
@@ -235,20 +223,20 @@ public:
   /// Query the number of texels.
   int GetNumTexels () { return ((csPoly2D*)(texels.Get(0)))->GetNumVertices (); }
   ///
-  csVector2& GetTexel (csFrame* frame, int vertex)
-    { return frame->GetFrameTexel(vertex); }
+  csVector2& GetTexel (int frame, int vertex)
+    { return (*((csPoly2D*)texels.Get(frame)))[vertex]; }
 
   /// Query the number of vertices.
   int GetNumVertices () { return ((csPoly3D*)(vertices.Get(0)))->GetNumVertices (); }
-  /// 
-  csVector3& GetVertex (csFrame* frame, int vertex)
-    { return frame->GetFrameVertex(texel_to_vertex[vertex]); }
+  ///
+  csVector3& GetVertex (int frame, int vertex)
+    { return (*((csPoly3D*)vertices.Get(frame)))[texel_to_vertex[vertex]]; }
 
   /// Query the number of normals.
   int GetNumNormals () { return ((csPoly3D*)(normals.Get(0)))->GetNumVertices (); }
   ///
-  csVector3& GetNormal (csFrame* frame, int vertex)
-    { return frame->GetFrameNormal(texel_to_normal[vertex]); }
+  csVector3& GetNormal (int frame, int vertex)
+    { return (*((csPoly3D*)normals.Get(frame)))[texel_to_normal[vertex]]; }
 
   /**
    * Add a triangle to the normal, texel, and vertex meshes
