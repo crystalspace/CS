@@ -54,12 +54,13 @@
 #include "ivaria/bugplug.h"
 
 #include "plugins/video/canvas/openglcommon/glstates.h"
-
+#include "gl_renderbuffer.h"
 class csGLTextureHandle;
 class csGLTextureManager;
 class csGLPolygonRenderer;
-  
 class csGLExtensionManager;
+class csGLVBOBufferManager;
+class csGLRenderBuffer;
 struct iClipper2D;
 struct iObjectRegistry;
 struct iTextureManager;
@@ -121,6 +122,7 @@ private:
   iObjectRegistry* object_reg;
   csRef<iGraphics2D> G2D;
   csRef<iShaderManager> shadermgr;
+  csRef<csGLVBOBufferManager> vboManager;
 
   csWeakRef<iBugPlug> bugplug;
 
@@ -285,6 +287,20 @@ private:
   void SetupProjection ();
 
   csZBufMode GetZModePass2 (csZBufMode mode);
+
+  csRef<csGLRenderBuffer> spec_renderBuffers[CS_VATTRIB_SPECIFIC_LAST-CS_VATTRIB_SPECIFIC_FIRST+1];
+  void AssignSpecBuffer (uint attr, csGLRenderBuffer* buffer)
+  {
+    if (spec_renderBuffers[attr]) spec_renderBuffers[attr]->RenderRelease ();
+    spec_renderBuffers[attr] = buffer;
+  }
+
+  csRef<csGLRenderBuffer> gen_renderBuffers[CS_VATTRIB_GENERIC_LAST-CS_VATTRIB_GENERIC_FIRST+1];
+  void AssignGenericBuffer (uint attr, csGLRenderBuffer* buffer)
+  {
+    if (gen_renderBuffers[attr]) gen_renderBuffers[attr]->RenderRelease ();
+    gen_renderBuffers[attr] = buffer;
+  }
 
 /*  iRenderBuffer* vertattrib[16]; // @@@ Hardcoded max number of attributes
   bool vertattribenabled[16]; // @@@ Hardcoded max number of attributes

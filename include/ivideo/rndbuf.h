@@ -70,13 +70,13 @@ enum csRenderBufferComponentType
 /**
  * Type of lock
  * CS_BUF_LOCK_NORMAL: Just get a point to the buffer, nothing special
- * CS_BUF_LOCK_RENDER: Special lock only to be used by renderer
+ * CS_BUF_LOCK_READ: Lock used for reading from the buffer
  */
 enum csRenderBufferLockType
 {
   CS_BUF_LOCK_NOLOCK,
-  CS_BUF_LOCK_NORMAL
-  //CS_BUF_LOCK_RENDER
+  CS_BUF_LOCK_NORMAL,
+  CS_BUF_LOCK_READ
 };
 
 SCF_VERSION (iRenderBuffer, 0, 0, 3);

@@ -12,6 +12,12 @@ chronological order.
 	- Eric Sunshined committed an enhancement from C. J. Collier
 	  <cjcollier@colliertech.org> to csutil/t/objreg.t which adds tests for
 	  iObjectRegistry::Get().
+	- Marten rewrote the VBO support. It now uses a fixed cache and only 
+	  a few VBO-allocated buffers togheter with a slot-cache algorithm.
+	  It still needs some work, but it should work for most conditions.
+	  VBO is still disabled by default though, if you want to try it
+	  enable VBO in r3dopengl.cfg.
+	- Marten fixed a typo in xmlshader.
 25-Jan-2005
 	- Jorrit fixed a bug that could come up in case you are relighting
 	  several maps at the same time and a certain polygon was affected

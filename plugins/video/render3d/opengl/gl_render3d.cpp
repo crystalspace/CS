@@ -845,6 +845,7 @@ bool csGLGraphics3D::Open ()
   vbo_thresshold = config->GetInt ("Video.OpenGL.VBOThresshold", 0);
   use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object;
   if (verbose)
+  {
     if (use_hw_render_buffers)
     {
       if (vbo_thresshold == 0)
@@ -859,6 +860,9 @@ bool csGLGraphics3D::Open ()
     {
       Report (CS_REPORTER_SEVERITY_NOTIFY, "VBO is NOT supported.");
     }
+  }
+  if (use_hw_render_buffers) 
+    vboManager.AttachNew (new csGLVBOBufferManager (ext, statecache, object_reg));
 
   stencil_shadow_mask = 127;
   {
@@ -1014,7 +1018,7 @@ bool csGLGraphics3D::Open ()
 
   {
     csRGBpixel* white = new csRGBpixel[1];
-    white->Set (0, 255, 255);
+    white->Set (255, 255, 255);
     img = csPtr<iImage> (new csImageMemory (1, 1, white, true, 
       CS_IMGFMT_TRUECOLOR));
 
@@ -1057,12 +1061,6 @@ void csGLGraphics3D::Close ()
 
 bool csGLGraphics3D::BeginDraw (int drawflags)
 {
-/*  if (lastUsedShaderpass)
-  {
-    lastUsedShaderpass->ResetState ();
-    lastUsedShaderpass->Deactivate ();
-  }
-*/
   SetWriteMask (true, true, true, true);
 
   clipportal_dirty = true;
@@ -1324,6 +1322,14 @@ void csGLGraphics3D::Print (csRect const* area)
   //glFinish ();
   if (bugplug)
     bugplug->ResetCounter ("Triangle Count");
+
+#ifdef CS_DEBUG
+  if (vboManager.IsValid ())
+  {
+    vboManager->ResetFrameStats ();
+  }
+#endif
+
   G2D->Print (area);
 }
 
@@ -1399,7 +1405,9 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
   buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_POSITION]);
   if (buffer) 
   {
-    data = ((csGLRenderBuffer*)buffer)->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+    csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
+    AssignSpecBuffer(CS_VATTRIB_POSITION, glbuffer);
+    data = glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
     if (data != (void*)-1) 
     {
       statecache->SetVertexPointer (buffer->GetComponentCount (),
@@ -1416,7 +1424,9 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
   buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_NORMAL]);
   if (buffer) 
   {
-    data = ((csGLRenderBuffer*)buffer)->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+    csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
+    AssignSpecBuffer(CS_VATTRIB_NORMAL, glbuffer);
+    data = glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
     if (data != (void*)-1) 
     {
       statecache->SetNormalPointer (((csGLRenderBuffer*)buffer)->compGLType, 
@@ -1432,7 +1442,9 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
   buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_COLOR]);
   if (buffer)
   {
-    data = ((csGLRenderBuffer*)buffer)->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+    csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
+    AssignSpecBuffer(CS_VATTRIB_COLOR, glbuffer);
+    data = glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
     if (data != (void*)-1) 
     {
       statecache->SetColorPointer (buffer->GetComponentCount(),
@@ -1446,10 +1458,14 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
     statecache->Disable_GL_COLOR_ARRAY ();
   }
 
+  unsigned int u = -1;
+
   buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_TEXCOORD0]);
   if (buffer)
   {
-    data = ((csGLRenderBuffer*)buffer)->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+    csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
+    AssignSpecBuffer(CS_VATTRIB_TEXCOORD0, glbuffer);
+    data = glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
     if (data != (void*)-1)
     {
       if (ext->CS_GL_ARB_multitexture)
@@ -1479,7 +1495,9 @@ bool csGLGraphics3D::ActivateBuffers (csRenderBufferHolder *holder,
       buffer = holder->GetRenderBuffer (mapping[CS_VATTRIB_TEXCOORD0+i]);
       if (buffer)
       {
-        data = ((csGLRenderBuffer*)buffer)->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
+        csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
+        AssignSpecBuffer(CS_VATTRIB_TEXCOORD0+i, glbuffer);
+        data = glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
         if (data != (void*)-1)
         {
           statecache->SetActiveTU (i);
@@ -1508,8 +1526,12 @@ bool csGLGraphics3D::ActivateBuffers (csVertexAttrib *attribs,
     iRenderBuffer *buffer = buffers[i];
     if (!buffer) continue;
 
-    void* data = ((csGLRenderBuffer*)buffer)->RenderLock (
-      CS_GLBUF_RENDERLOCK_ARRAY);
+    csGLRenderBuffer* glbuffer = (csGLRenderBuffer*)buffer;
+    
+    if (CS_VATTRIB_IS_GENERIC (att)) AssignGenericBuffer(att-CS_VATTRIB_GENERIC_FIRST, glbuffer);
+    else AssignSpecBuffer(att-CS_VATTRIB_SPECIFIC_FIRST, glbuffer);
+
+    void *data = glbuffer->RenderLock (CS_GLBUF_RENDERLOCK_ARRAY);
 
     if (data == (void*)-1) return false;
 
@@ -1518,17 +1540,17 @@ bool csGLGraphics3D::ActivateBuffers (csVertexAttrib *attribs,
     case CS_VATTRIB_POSITION:
       statecache->Enable_GL_VERTEX_ARRAY ();
       statecache->SetVertexPointer (buffer->GetComponentCount (),
-        ((csGLRenderBuffer*)buffer)->compGLType, buffer->GetStride (), data);
+        glbuffer->compGLType, buffer->GetStride (), data);
       break;
     case CS_VATTRIB_NORMAL:
       statecache->Enable_GL_NORMAL_ARRAY ();
-      statecache->SetNormalPointer (((csGLRenderBuffer*)buffer)->compGLType,
+      statecache->SetNormalPointer (glbuffer->compGLType,
         buffer->GetStride (), data);
       break;
     case CS_VATTRIB_COLOR:
       statecache->Enable_GL_COLOR_ARRAY ();
       statecache->SetColorPointer (buffer->GetComponentCount (),
-        ((csGLRenderBuffer*)buffer)->compGLType, buffer->GetStride (), data);
+        glbuffer->compGLType, buffer->GetStride (), data);
       break;
     default:
       if (att >= CS_VATTRIB_TEXCOORD0 && att <= CS_VATTRIB_TEXCOORD7)
@@ -1541,13 +1563,13 @@ bool csGLGraphics3D::ActivateBuffers (csVertexAttrib *attribs,
         } 
         statecache->Enable_GL_TEXTURE_COORD_ARRAY ();
         statecache->SetTexCoordPointer (buffer->GetComponentCount (),
-          ((csGLRenderBuffer*)buffer)->compGLType, buffer->GetStride (), data);
+          glbuffer->compGLType, buffer->GetStride (), data);
       }
       else if (CS_VATTRIB_IS_GENERIC(att) && ext->glEnableVertexAttribArrayARB)
       {
         ext->glEnableVertexAttribArrayARB (att);
         ext->glVertexAttribPointerARB(att, buffer->GetComponentCount (),
-          ((csGLRenderBuffer*)buffer)->compGLType, false, buffer->GetStride (), data);
+          glbuffer->compGLType, false, buffer->GetStride (), data);
       }
       else
       {
@@ -1561,6 +1583,7 @@ bool csGLGraphics3D::ActivateBuffers (csVertexAttrib *attribs,
 
 void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int count)
 {
+  if (vboManager) vboManager->DeactivateVBO ();
   if (!attribs)
   {
     //disable all
@@ -1576,12 +1599,41 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
         statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
       }
     }
+
+    for (unsigned int i = 0; i < CS_VATTRIB_SPECIFIC_LAST-CS_VATTRIB_SPECIFIC_FIRST+1; i++)
+    {
+      csGLRenderBuffer *b = spec_renderBuffers[i];
+      if (b) b->RenderRelease ();
+      spec_renderBuffers[i] = 0;
+    }
+    for (unsigned int i = 0; i < CS_VATTRIB_GENERIC_LAST-CS_VATTRIB_GENERIC_FIRST+1; i++)
+    {
+      csGLRenderBuffer *b = gen_renderBuffers[i];
+      if (b) b->RenderRelease ();
+      gen_renderBuffers[i] = 0;
+    }
   }
   else
   {
     for (unsigned int i = 0; i < count; i++)
     {
       csVertexAttrib att = attribs[i];
+      if (CS_VATTRIB_IS_GENERIC (att))
+      {
+        if (gen_renderBuffers[att]) 
+        {
+          gen_renderBuffers[att]->RenderRelease ();
+          gen_renderBuffers[att] = 0;
+        }
+      }
+      else
+      {
+        if (spec_renderBuffers[att]) 
+        {
+          spec_renderBuffers[att]->RenderRelease ();
+          spec_renderBuffers[att] = 0;
+        }
+      }
       switch (att)
       {
       case CS_VATTRIB_POSITION:
@@ -1746,9 +1798,9 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   
   const size_t indexCompsBytes = indexbuf->compSize;
   CS_ASSERT_MSG("Expecting index buffers to have only 1 component",
-    (indexbuf->compcount == 1));
-  CS_ASSERT((indexCompsBytes * mymesh->indexstart) <= indexbuf->size);
-  CS_ASSERT((indexCompsBytes * mymesh->indexend) <= indexbuf->size);
+    (indexbuf->compCount == 1));
+  CS_ASSERT((indexCompsBytes * mymesh->indexstart) <= indexbuf->bufferSize);
+  CS_ASSERT((indexCompsBytes * mymesh->indexend) <= indexbuf->bufferSize);
 
   GLenum primitivetype = GL_TRIANGLES;
   switch (mymesh->meshtype)
@@ -1876,11 +1928,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
   const uint mixmode = modes.mixmode;
   statecache->SetShadeModel ((mixmode & CS_FX_FLAT) ? GL_FLAT : GL_SMOOTH);
 
-  if (use_hw_render_buffers && vbo_thresshold > 0)
-  {
-    ext->glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-    ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
-  }
+  
   void* bufData = indexbuf->RenderLock (CS_GLBUF_RENDERLOCK_ELEMENTS);
   if (bufData != (void*)-1)
   {
@@ -1928,7 +1976,7 @@ void csGLGraphics3D::DrawMesh (const csCoreRenderMesh* mymesh,
     glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE);
     glDisable (GL_POINT_SPRITE_ARB);
   }
-
+  indexbuf->RenderRelease ();
   SetMirrorMode (false);
 }
 
@@ -2586,6 +2634,7 @@ SCF_IMPLEMENT_IBASE_END
 
 csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
   int iWidth, int iHeight, csGLGraphics3D* iG3D)
+  : R(iR), G(iG), B(iB)
 {
   SCF_CONSTRUCT_IBASE (0);
 
@@ -2614,6 +2663,8 @@ csOpenGLHalo::csOpenGLHalo (float iR, float iG, float iB, unsigned char *iAlpha,
   // Create handle
   glGenTextures (1, &halohandle);
   // Activate handle
+  csGLGraphics3D::statecache->SetActiveTU (0);
+  csGLGraphics3D::statecache->ActivateTU ();
   csGLGraphics3D::statecache->SetTexture (GL_TEXTURE_2D, halohandle);
 
   // Jaddajaddajadda
@@ -2698,6 +2749,7 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
     G3D->statecache->SetActiveTU (0);
   G3D->statecache->ActivateTU ();
 
+  
   //csGLGraphics3D::SetGLZBufferFlags (CS_ZBUF_NONE);
   // @@@ Is this correct to override current_zmode?
   G3D->SetZMode (CS_ZBUF_NONE);
@@ -2716,6 +2768,7 @@ void csOpenGLHalo::Draw (float x, float y, float w, float h, float iIntensity,
   //glTranslatef (0, 0, 0);
 
   G3D->SetMixMode (dstblend);
+
   glColor4f (R, G, B, iIntensity);
 
   glBegin (GL_POLYGON);
@@ -2931,6 +2984,11 @@ bool csGLGraphics3D::DebugCommand (const char* cmdstr)
       ((param != 0) && (*param != 0)) ? param : "/tmp/zbufdump/";
     DumpZBuffer (dir);
 
+    return true;
+  }
+  else if (strcasecmp (cmd, "dump_vbostat") == 0)
+  {
+    if (vboManager) vboManager->DumpStats ();
     return true;
   }
   return false;

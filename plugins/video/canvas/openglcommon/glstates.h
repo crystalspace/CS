@@ -509,6 +509,7 @@ public:
       if (id != currentIndexID)
       {
         extmgr->glBindBufferARB (target, id);
+        currentIndexID = id;
       }
     } 
     else 
@@ -516,6 +517,7 @@ public:
       if (id != currentBufferID)
       {
         extmgr->glBindBufferARB (target, id);
+        currentBufferID = id;
       }
     }
   }
