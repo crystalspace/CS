@@ -20,6 +20,7 @@ A falling blocks game.  (Think 3D Tetris.).
 @cindex Applications, @file{cctest}
 @item cctest
 A test application for the Crystal Clear library and plug-in module.
+@xref{CCtest}.
 
 @cindex @file{cswstest}
 @cindex Applications, @file{cswstest}
@@ -109,7 +110,7 @@ study.  It is also a demo application of the @file{csgame} gaming library.
 @cindex Applications, @file{squawk}
 @item squawk
 A demonstration of a @dfn{sky box} and the use of creative camera and view
-systems.
+systems.  @xref{Squawk}.
 
 @cindex @file{walktest}
 @cindex Applications, @file{walktest}
@@ -118,6 +119,7 @@ The quintessential Crystal Space test program.  @file{walktest} is the test
 harness for most of the features which get added to the engine.  It is not
 necessarily a good programming example, but if you are interested in seeing
 an engine feature in action, this is probably the place to look.
+@xref{Walktest}.
 
 @cindex @file{vsh}
 @cindex Applications, @file{vsh}
