@@ -2299,6 +2299,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   {
     tr_verts.SetLimit (num_vertices);
     uv_verts.SetLimit (num_vertices);
+	uv_mul_verts.SetLimit (num_vertices);
     color_verts.SetLimit (num_vertices);
   }
 
@@ -2557,6 +2558,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   if (multitex || mesh.do_fog)
     SetGLZBufferFlagsPass2 (z_buf_mode, true);
 
+
   //===========
   // Here we perform multi-texturing.
   //===========
@@ -2570,6 +2572,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     }
     if (num_vertices > uv_mul_verts.Limit ())
       uv_mul_verts.SetLimit (num_vertices);
+
     int j;
     for (j = 0 ; j < mat->GetNumTextureLayers () ; j++)
     {
@@ -2590,20 +2593,24 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       int vscale = layer->vscale;
       int ushift = layer->ushift;
       int vshift = layer->vshift;
+
       if (mat->TextureLayerTranslated (j))
       {
         mul_uv = uv_mul_verts.GetArray ();
-	for (i = 0 ; i < num_vertices ; i++)
-	{
-	  mul_uv[i].x = work_uv_verts[i].x * uscale + ushift;
-	  mul_uv[i].y = work_uv_verts[i].y * vscale + vshift;
-	}
+		
+		for (i = 0 ; i < num_vertices ; i++)
+		{
+			mul_uv[i].x = work_uv_verts[i].x * uscale + ushift;
+			mul_uv[i].y = work_uv_verts[i].y * vscale + vshift;
+		}
       }
+
       glVertexPointer (3, GL_FLOAT, 0, & work_verts[0]);
       glTexCoordPointer (2, GL_FLOAT, 0, mul_uv);
       glDrawElements (GL_TRIANGLES, num_triangles*3,
       	GL_UNSIGNED_INT, triangles);
     }
+
  
     // If we have to do gouraud shading we do it here.
     if (do_gouraud)
