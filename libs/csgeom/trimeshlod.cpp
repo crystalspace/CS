@@ -35,7 +35,10 @@ void csTriangleVertexCost::ReplaceVertex (int old, int replace)
   if (DelVertex (old)) AddVertex (replace);
 }
 
-void csTriangleVertexCost::CalculateCost (csTriangleVerticesCost* vertices)
+//=========================================================================
+
+void csTriangleVertexCostEdge::CalculateCost (csTriangleVerticesCost* vertices,
+	void*)
 {
   size_t i;
   to_vertex = -1;
@@ -62,10 +65,12 @@ void csTriangleVertexCost::CalculateCost (csTriangleVerticesCost* vertices)
   cost = min_sq_dist;
 }
 
+//=========================================================================
+
 csTriangleVerticesCost::csTriangleVerticesCost (csTriangleMesh* mesh,
-	csVector3* verts, int num_verts)
+	csVector3* verts, int num_verts, csTriangleVertexCost* cost_vertices)
 {
-  vertices = new csTriangleVertexCost [num_verts];
+  vertices = cost_vertices;
   num_vertices = num_verts;
 
   // Build connectivity information for all vertices in this mesh.
@@ -99,11 +104,11 @@ void csTriangleVerticesCost::UpdateVertices (csVector3* verts)
     vertices[i].pos = verts[i];
 }
 
-int csTriangleVerticesCost::GetMinimalCostVertex ()
+int csTriangleVerticesCost::GetMinimalCostVertex (float& min_cost)
 {
   int i;
   int min_idx = -1;
-  float min_cost = 2.+1000000.;
+  min_cost = 2.+1000000.;
   for (i = 0 ; i < num_vertices ; i++)
     if (!vertices[i].deleted && vertices[i].cost < min_cost)
     {
@@ -113,11 +118,11 @@ int csTriangleVerticesCost::GetMinimalCostVertex ()
   return min_idx;
 }
 
-void csTriangleVerticesCost::CalculateCost ()
+void csTriangleVerticesCost::CalculateCost (void* userdata)
 {
   int i;
   for (i = 0 ; i < num_vertices ; i++)
-    vertices[i].CalculateCost (this);
+    vertices[i].CalculateCost (this, userdata);
 }
 
 void csTriangleVerticesCost::Dump ()
@@ -147,12 +152,13 @@ void csTriangleVerticesCost::Dump ()
 //---------------------------------------------------------------------------
 
 void csTriangleMeshLOD::CalculateLOD (csTriangleMesh* mesh,
-	csTriangleVerticesCost* verts, int* translate, int* emerge_from)
+	csTriangleVerticesCost* verts, int* translate, int* emerge_from,
+	void* userdata)
 {
   size_t i;
   // Calculate the cost for all vertices for the first time.
   // This information will change locally whenever vertices are collapsed.
-  verts->CalculateCost ();
+  verts->CalculateCost (userdata);
 
   // Collapse vertices, one by one until only one remains.
   int num = verts->GetVertexCount ();
@@ -163,7 +169,8 @@ void csTriangleMeshLOD::CalculateLOD (csTriangleMesh* mesh,
   col_idx = 0;
   while (num > 1)
   {
-    from = verts->GetMinimalCostVertex ();
+    float min_cost;
+    from = verts->GetMinimalCostVertex (min_cost);
     from_vertices[col_idx] = from;
     csTriangleVertexCost* vt_from = &verts->GetVertex (from);
 
@@ -207,17 +214,18 @@ void csTriangleMeshLOD::CalculateLOD (csTriangleMesh* mesh,
     num--;
 
     // Recalculate cost for all involved vertices.
-    vt_from->CalculateCost (verts);
-    vt_to->CalculateCost (verts);
+    vt_from->CalculateCost (verts, userdata);
+    vt_to->CalculateCost (verts, userdata);
     for (i = 0 ; i < vt_to->con_vertices.Length () ; i++)
     {
       int id = vt_to->con_vertices[i];
-      verts->GetVertex (id).CalculateCost (verts);
+      verts->GetVertex (id).CalculateCost (verts, userdata);
     }
   }
   // Last index gets the only remaining vertex which should now have
   // minimal cost.
-  from_vertices[col_idx] = verts->GetMinimalCostVertex ();
+  float min_cost;
+  from_vertices[col_idx] = verts->GetMinimalCostVertex (min_cost);
   to_vertices[col_idx] = -1;
 
   // Vertex 0.
@@ -236,6 +244,97 @@ void csTriangleMeshLOD::CalculateLOD (csTriangleMesh* mesh,
 
   delete [] from_vertices;
   delete [] to_vertices;
+}
+
+csTriangle* csTriangleMeshLOD::CalculateLOD (csTriangleMesh* mesh,
+	csTriangleVerticesCost* verts, float max_cost,
+	int& num_triangles, void* userdata)
+{
+  size_t i;
+  // Calculate the cost for all vertices for the first time.
+  // This information will change locally whenever vertices are collapsed.
+  verts->CalculateCost (userdata);
+
+  // Collapse vertices, one by one until only one remains.
+  int num = verts->GetVertexCount ();
+  int from, to, col_idx;
+  int *from_vertices, *to_vertices;
+  from_vertices = new int [num];
+  to_vertices = new int [num];
+  col_idx = 0;
+  while (num > 1)
+  {
+    float min_cost;
+    from = verts->GetMinimalCostVertex (min_cost);
+    if (min_cost >= max_cost) break;
+
+    from_vertices[col_idx] = from;
+    csTriangleVertexCost* vt_from = &verts->GetVertex (from);
+
+    to = verts->GetVertex (from).to_vertex;
+
+    // If to == -1 then it is possible that we have solitary vertices.
+    // In that case it makes no sense to collapse them.
+    if (to == -1)
+    {
+      to_vertices[col_idx] = from;
+      col_idx++;
+      vt_from->deleted = true;
+      num--;
+      continue;
+    }
+
+    to_vertices[col_idx] = to;
+    csTriangleVertexCost* vt_to = &verts->GetVertex (to);
+    col_idx++;
+
+    // Fix connectivity information after moving the 'from' vertex to 'to'.
+    for (i = 0 ; i < vt_from->con_triangles.Length () ; i++)
+    {
+      size_t id = vt_from->con_triangles[i];
+      csTriangle& tr = mesh->GetTriangles ()[id];
+      if (tr.a == from) { tr.a = to; vt_to->AddTriangle (id); }
+      if (tr.b == from) { tr.b = to; vt_to->AddTriangle (id); }
+      if (tr.c == from) { tr.c = to; vt_to->AddTriangle (id); }
+    }
+    for (i = 0 ; i < vt_from->con_vertices.Length () ; i++)
+    {
+      int id = vt_from->con_vertices[i];
+      if (id != to)
+      {
+        verts->GetVertex (id).ReplaceVertex (from, to);
+	vt_to->AddVertex (id);
+      }
+    }
+    vt_to->DelVertex (from);
+    vt_from->deleted = true;
+    num--;
+
+    // Recalculate cost for all involved vertices.
+    vt_from->CalculateCost (verts, userdata);
+    vt_to->CalculateCost (verts, userdata);
+    for (i = 0 ; i < vt_to->con_vertices.Length () ; i++)
+    {
+      int id = vt_to->con_vertices[i];
+      verts->GetVertex (id).CalculateCost (verts, userdata);
+    }
+  }
+
+  // Add all triangles that are not deleted to the result array.
+  csTriangle* triangles = new csTriangle[mesh->GetTriangleCount ()];
+  num_triangles = 0;
+  for (i = 0 ; i < mesh->GetTriangleCount () ; i++)
+  {
+    csTriangle& tr = mesh->GetTriangles ()[i];
+    if (tr.a != tr.b && tr.a != tr.c && tr.b != tr.c)
+    { 
+      triangles[num_triangles++] = tr;
+    }
+  }
+
+  delete [] from_vertices;
+  delete [] to_vertices;
+  return triangles;
 }
 
 //--------------------------------------------------------------------------

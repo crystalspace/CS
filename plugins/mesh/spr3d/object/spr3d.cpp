@@ -414,8 +414,10 @@ void csSprite3DMeshObjectFactory::GenerateLOD ()
     for (i = 0; i < GetVertexCount(); i++)
       v[i] = GetVertex (lod_base_frame, i);
 
+    csTriangleVertexCostEdge* cost_vertices = new csTriangleVertexCostEdge[
+    	GetVertexCount ()];
     csTriangleVerticesCost* verts = new csTriangleVerticesCost (texel_mesh, v,
-  	  GetVertexCount());
+  	  GetVertexCount(), cost_vertices);
     delete [] v;
 
     delete [] emerge_from;
@@ -597,8 +599,10 @@ void csSprite3DMeshObjectFactory::ComputeNormals (csSpriteFrame* frame)
 
   if (!tri_verts)
   {
+    csTriangleVertexCostEdge* cost_vertices = new csTriangleVertexCostEdge[
+    	GetVertexCount ()];
     tri_verts = new csTriangleVerticesCost (texel_mesh, object_verts,
-      GetVertexCount());
+      GetVertexCount(), cost_vertices);
   }
 
   csTriangle * tris = texel_mesh->GetTriangles();
@@ -739,8 +743,10 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
 
   if (!tri_verts)
   {
+    csTriangleVertexCostEdge* cost_vertices = new csTriangleVertexCostEdge[
+    	GetVertexCount ()];
     tri_verts = new csTriangleVerticesCost (texel_mesh, obj_verts,
-    	GetVertexCount());
+    	GetVertexCount(), cost_vertices);
   }
 
   csTriangle * tris = texel_mesh->GetTriangles();
@@ -782,8 +788,10 @@ void csSprite3DMeshObjectFactory::MergeNormals (int base, int frame)
   for (i = 0; i < num_triangles; i++)
     merge_mesh.AddTriangle (merge[tris[i].a], merge[tris[i].b],
     	merge[tris[i].c]);
+  csTriangleVertexCostEdge* cost_vertices = new csTriangleVertexCostEdge[
+    	GetVertexCount ()];
   csTriangleVerticesCost * tv = new csTriangleVerticesCost (&merge_mesh,
-  	obj_verts, GetVertexCount());
+  	obj_verts, GetVertexCount(), cost_vertices);
 
   // calculate vertex normals, by averaging connected triangle normals
   csVector3* fr_normals = GetNormals (frame);

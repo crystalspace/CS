@@ -45,7 +45,7 @@ public:
   ///
   csTriangleVertexCost () : deleted (false) { }
   ///
-  ~csTriangleVertexCost () { }
+  virtual ~csTriangleVertexCost () { }
   ///
   bool DelVertex (int idx);
   ///
@@ -55,7 +55,20 @@ public:
    * Calculate the minimal cost of collapsing this vertex to some other.
    * Also remember which other vertex was selected for collapsing to.
    */
-  void CalculateCost (csTriangleVerticesCost* vertices);
+  virtual void CalculateCost (csTriangleVerticesCost* vertices,
+  	void* userdata) = 0;
+};
+
+/**
+ * This subclass of csTriangleVertexCost uses a very simple
+ * cost metric to calculate the vertex cost. It will basically
+ * just consider the length of the edge.
+ */
+class CS_CSGEOM_EXPORT csTriangleVertexCostEdge : public csTriangleVertexCost
+{
+public:
+  virtual void CalculateCost (csTriangleVerticesCost* vertices,
+  	void* userdata);
 };
 
 /**
@@ -71,9 +84,20 @@ private:
   int num_vertices;
 
 public:
-  /// Build vertex table for a triangle mesh.
+  /**
+   * Build vertex table for a triangle mesh.
+   * \param mesh is the triangle mesh from which to calculate
+   * connectivity information.
+   * \param verts is an array of vertices that will be used to
+   * fill the cost vertex table.
+   * \param num_verts is the size of that table.
+   * \param cost_vertices is a table (with same size as 'verts')
+   * that contains instances of csTriangleVertexCost. This
+   * class will take ownership of this array and delete it with
+   * delete[] later.
+   */
   csTriangleVerticesCost (csTriangleMesh* mesh, csVector3* verts,
-  	int num_verts);
+  	int num_verts, csTriangleVertexCost* cost_vertices);
   ///
   ~csTriangleVerticesCost ();
   /**
@@ -88,10 +112,10 @@ public:
   csTriangleVertexCost& GetVertex (int idx) { return vertices[idx]; }
 
   /// Calculate the cost of all vertices.
-  void CalculateCost ();
+  void CalculateCost (void* userdata);
 
   /// Return the vertex id with minimal cost.
-  int GetMinimalCostVertex ();
+  int GetMinimalCostVertex (float& min_cost);
 
   /// Dump connectivity information@@@ TEMPORARY
   void Dump ();
@@ -114,13 +138,29 @@ public:
    * and with increasing detail, vertices are added in ascending vertex order.
    * 'emerge_from' contains (for a given index in the new order) from
    * which this vertex arises (or seen the other way around: to what this
-   * vertex had collapsed).<p>
-   *
+   * vertex had collapsed).
+   * \param userdata is given to the CalculateCost() function.
+   * <p>
    * Note. The given 'mesh' and 'verts' objects are no longer valid after
    * calling this function. Don't expect any useful information here.
    */
   static void CalculateLOD (csTriangleMesh* mesh, csTriangleVerticesCost* verts,
-  	int* translate, int* emerge_from);
+  	int* translate, int* emerge_from, void* userdata = 0);
+
+  /**
+   * Calculate a simplified set of triangles so that all vertices with
+   * cost lower then the maximum cost are removed. The resulting simplified
+   * triangle mesh is returned (and number of triangles is set to
+   * num_triangles). You must delete[] the returned list of triangles
+   * if you don't want to use it anymore.
+   * \param userdata is given to the CalculateCost() function.
+   * <p>
+   * Note. The given 'mesh' and 'verts' objects are no longer valid after
+   * calling this function. Don't expect any useful information here.
+   */
+  static csTriangle* CalculateLOD (csTriangleMesh* mesh,
+  	csTriangleVerticesCost* verts, float max_cost, int& num_triangles,
+	void* userdata = 0);
 };
 
 

@@ -747,6 +747,38 @@ static void TriangulateHeightMap (const csVector3* normals,
   }
 }
 
+class csTriangleVertexCostHM : public csTriangleVertexCost
+{
+public:
+  virtual void CalculateCost (csTriangleVerticesCost* vertices,
+  	void* userdata)
+  {
+    size_t i;
+    to_vertex = -1;
+    float min_sq_dist = 1000000.;
+    if (deleted)
+    {
+      // If the vertex is deleted we have a very high cost.
+      // The cost is higher than the maximum cost you can get for
+      // a non-deleted vertex. This is to make sure that we get
+      // the last non-deleted vertex at the end of the LOD algorithm.
+      cost = min_sq_dist+1;
+      return;
+    }
+    for (i = 0 ; i < con_vertices.Length () ; i++)
+    {
+      float sq_dist = csSquaredDist::PointPoint (vertices->GetVertex (idx).pos,
+    	  vertices->GetVertex (con_vertices[i]).pos);
+      if (sq_dist < min_sq_dist)
+      {
+        min_sq_dist = sq_dist;
+        to_vertex = con_vertices[i];
+      }
+    }
+    cost = min_sq_dist;
+  }
+};
+
 void csTerrainObject::SetupPolyMeshData ()
 {
   if (polymesh_valid) return;
@@ -782,9 +814,7 @@ printf ("Maximum triangles %d\n", 2 * (res-1) * (res-1)); fflush (stdout);
   polymesh_triangles = new csTriangle [polymesh_tri_count];
   memcpy (polymesh_triangles, tris, sizeof (csTriangle) * polymesh_tri_count);
 printf ("Final triangles %d\n", polymesh_tri_count); fflush (stdout);
-
-  delete[] normals;
-#else
+#elif 1
   polymesh_tri_count = 2 * (res-1) * (res-1);
   polymesh_triangles = new csTriangle [polymesh_tri_count];
 
@@ -799,15 +829,25 @@ printf ("Final triangles %d\n", polymesh_tri_count); fflush (stdout);
       (tri++)->Set (yr + x+1, yr+res + x, yr+res + x+1);
     }
   }
-#endif
-
-#if 0
+#else
   csTriangleMesh mesh;
   mesh.SetTriangles (polymesh_triangles, polymesh_tri_count);
-  csTriangleVerticesCost mesh_verts (&mesh, polymesh_vertices,
-      polymesh_vertex_count);
-  @@@@@@@@@@@@@@
+  csVector3* copy_verts = new csVector3 [res * res];
+  memcpy (copy_verts, polymesh_vertices, sizeof (csVector3)*res*res);
+  csTriangleVertexCostHM* cost_vertices = new csTriangleVertexCostHM[
+  	res * res];
+  csTriangleVerticesCost mesh_verts (&mesh, copy_verts,
+      polymesh_vertex_count, cost_vertices);
+
+  polymesh_tri_count = 0;
+  csTriangle* triangles = csTriangleMeshLOD::CalculateLOD (&mesh,
+  	&mesh_verts, .1, polymesh_tri_count,
+	(void*)normals);
+
+  delete[] copy_verts;
 #endif
+
+  delete[] normals;
   terrasampler->Cleanup ();
 }
 

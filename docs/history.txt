@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Oct-2004
+	- Jorrit generalized the csTriangleMeshLOD class and related
+	  so that you can now generate LOD using different cost
+	  functions.
+	- Jorrit added a new version of csTriangleMeshLOD::CalculateLOD()
+	  which generates a simplified mesh.
 10-Oct-2004
 	- Jorrit committed some unfinished LOD code for bruteblock.
 	  Although it gives good results it also causes irregularities
