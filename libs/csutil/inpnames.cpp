@@ -21,6 +21,7 @@
 #include "cssysdef.h"
 #include "cssys/csuctransform.h"
 #include "iutil/event.h"
+#include "iutil/evdefs.h"
 #include "csutil/csevent.h"
 #include "csutil/event.h"
 #include "csutil/inpnames.h"
@@ -338,8 +339,8 @@ csString csGetKeyDesc (utf32_char code, const csKeyModifiers* modifiers,
   return ret;
 }
 
-bool csParseMouseDef(const char* str, int* x, int* y, 
-    int* button, csKeyModifiers* modifiers)
+bool csParseMoverDef(const char* prefix, int length, const char* str,
+  int* x, int* y, int* button, csKeyModifiers* modifiers)
 {
   if (x) *x = 0;
   if (y) *y = 0;
@@ -347,14 +348,37 @@ bool csParseMouseDef(const char* str, int* x, int* y,
   if (modifiers) memset(modifiers->modifiers, 0, sizeof(modifiers->modifiers));
   csKeyModifiers m;
   const char* name = ParseModifiers (str, m);
-  if (strncasecmp("mouse", name, 5)) return false;
-  name += 5;
+  if (strncasecmp(prefix, name, length)) return false;
+  name += length;
   if (modifiers) *modifiers = m;
   if (!strcasecmp ("x", name)) { if (x) *x = 1; return true; }
   if (!strcasecmp ("y", name)) { if (y) *y = 1; return true; }
   if (!isdigit(name[0] & 0x7f)) return false;
   if (button) *button = atoi(name);
   return true;
+}
+
+bool csParseMouseDef(const char* str, int* x, int* y, 
+    int* button, csKeyModifiers* modifiers)
+{
+  return csParseMoverDef("mouse", 5, str, x, y, button, modifiers);
+}
+
+bool csParseJoystickDef(const char* str, int* x, int* y, 
+    int* button, csKeyModifiers* modifiers)
+{
+  return csParseMoverDef("joystick", 8, str, x, y, button, modifiers);
+}
+
+//@@@TODO: optimize this function
+int csTypeOfInputDef(const char* str)
+{
+  csKeyModifiers m;
+  const char* name = ParseModifiers (str, m);
+  if (csParseJoystickDef (name, 0, 0, 0, 0)) return CSEVTYPE_Joystick;
+  else if (csParseMouseDef (name, 0, 0, 0, 0)) return CSEVTYPE_Mouse;
+  else if (csParseKeyDef (name, 0, 0, 0)) return CSEVTYPE_Keyboard;
+  else return 0;
 }
 
 //---------------------------------------------------------------------------

@@ -80,6 +80,14 @@ public:
 #define CSAXIS_Y -2
 
 /**
+ * Returns the event type described by a free-format string.
+ * \param str Strings are in the form "Ctrl+a", "mouse1", "joystickX" etc.
+ * \return CSEVTYPE_Keyboard, CSEVTYPE_Mouse, CSEVTYPE_Joystick or 0 if
+ *         the string could not be successfully parsed.
+ */
+int csTypeOfInputDef (const char* str);
+
+/**
  * Convert a free-format string into a set of values that can be compared
  * against the data of a keyboard event. 
  * \name str Strings are in the form "Ctrl+a", "alt-shift+enter" etc. 
@@ -120,7 +128,7 @@ csString csGetKeyDesc (utf32_char code,
  * \param y pointer to where the Y value is written;
  *        this will be 1 for mouseY events, 0 otherwise.
  * \param button pointer to where the button number is written to.
- *        for example, the string "mouse1" results in button = 1;
+ *        for example, the string "mouse1" results in *button = 1;
  *        this will be -1 if not a mouse button event.
  * \param modifiers pointer to where the modifiers are written to.
  * \return Whether the string could be successfully parsed.
@@ -130,10 +138,26 @@ csString csGetKeyDesc (utf32_char code,
 bool csParseMouseDef(const char* str, int* x, int* y, 
                             int* button, csKeyModifiers* modifiers);
 
+/**
+ * Convert a free-format string into a set of values that can be compared
+ * against the data of a joystick event.
+ * \param str Strings are in the form "joystickX", "joystick2" etc.
+ * \param x pointer to where the X value is written
+ *        this will be 1 for mouseX events, 0 otherwise
+ * \param y pointer to where the Y value is written
+ *        this will be 1 for mouseY events, 0 otherwise
+ * \param button pointer to where the button number is written to.
+ *        for example, the string "joystick1" results in *button = 1;
+ *        this will be -1 if not a joystick button event.
+ * \return Whether the string could be successfully parsed.
+ * \remark For any piece of information in which you are not interested, pass 0
+ *         for the address.
+ */
+bool csParseJoystickDef(const char* str, int* x, int* y,
+  int* button, csKeyModifiers* modifiers);
+
 /*
   @@@ TODO:
-    csParseJoystickDef
-    csGetKeyDesc
     csGetMouseDesc
     csGetJoystickDesc
  */
