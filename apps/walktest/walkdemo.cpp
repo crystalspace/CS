@@ -1092,6 +1092,7 @@ csThing* CreatePortalThing (const char* name, csSector* room,
   thing->GetMovable ().SetSector (room);
   float dx = 1, dy = 3, dz = .3;
 
+  // bottom
   csPolygon3D* p;
   p = thing->NewPolygon (tm);
   p->flags.Reset (CS_POLY_COLLDET);
@@ -1099,8 +1100,12 @@ csThing* CreatePortalThing (const char* name, csSector* room,
   p->AddVertex (dx, 0, -dz);
   p->AddVertex (dx, 0, dz);
   p->AddVertex (-dx, 0, dz);
-  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+  p->SetTextureSpace (
+      p->Vobj (0), csVector2 (0.25, 0.875),
+      p->Vobj (1), csVector2 (0.75, 0.875),
+      p->Vobj (2), csVector2 (0.75, 0.75));
 
+  // top
   p = thing->NewPolygon (tm);
   p->flags.Reset (CS_POLY_COLLDET);
   p->AddVertex (-dx, dy, dz);
@@ -1108,10 +1113,11 @@ csThing* CreatePortalThing (const char* name, csSector* room,
   p->AddVertex (dx, dy, -dz);
   p->AddVertex (-dx, dy, -dz);
   p->SetTextureSpace (
-      p->Vobj (0), csVector2 (0, 0),
-      p->Vobj (1), csVector2 (1, 0),
-      p->Vobj (2), csVector2 (1, 1));
+      p->Vobj (0), csVector2 (0.25, 0.25),
+      p->Vobj (1), csVector2 (0.75, 0.25),
+      p->Vobj (2), csVector2 (0.75, 0.125));
 
+  // back
   p = thing->NewPolygon (tm);
   p->flags.Reset (CS_POLY_COLLDET);
   p->AddVertex (-dx, 0, dz);
@@ -1119,10 +1125,11 @@ csThing* CreatePortalThing (const char* name, csSector* room,
   p->AddVertex (dx, dy, dz);
   p->AddVertex (-dx, dy, dz);
   p->SetTextureSpace (
-      p->Vobj (0), csVector2 (0, 0),
-      p->Vobj (1), csVector2 (1, 0),
-      p->Vobj (2), csVector2 (1, 1));
+      p->Vobj (0), csVector2 (0.25, 0.75),
+      p->Vobj (1), csVector2 (0.75, 0.75),
+      p->Vobj (2), csVector2 (0.75, 0.25));
 
+  // right
   p = thing->NewPolygon (tm);
   p->flags.Reset (CS_POLY_COLLDET);
   p->AddVertex (dx, 0, dz);
@@ -1130,10 +1137,11 @@ csThing* CreatePortalThing (const char* name, csSector* room,
   p->AddVertex (dx, dy, -dz);
   p->AddVertex (dx, dy, dz);
   p->SetTextureSpace (
-      p->Vobj (0), csVector2 (0, 0),
-      p->Vobj (1), csVector2 (1, 0),
-      p->Vobj (2), csVector2 (1, 1));
+      p->Vobj (0), csVector2 (0.75, 0.75),
+      p->Vobj (1), csVector2 (0.875, 0.75),
+      p->Vobj (2), csVector2 (0.875, 0.25));
 
+  // left
   p = thing->NewPolygon (tm);
   p->flags.Reset (CS_POLY_COLLDET);
   p->AddVertex (-dx, 0, -dz);
@@ -1141,10 +1149,11 @@ csThing* CreatePortalThing (const char* name, csSector* room,
   p->AddVertex (-dx, dy, dz);
   p->AddVertex (-dx, dy, -dz);
   p->SetTextureSpace (
-      p->Vobj (0), csVector2 (0, 0),
-      p->Vobj (1), csVector2 (1, 0),
-      p->Vobj (2), csVector2 (1, 1));
+      p->Vobj (0), csVector2 (0.125, 0.75),
+      p->Vobj (1), csVector2 (0.25, 0.75),
+      p->Vobj (2), csVector2 (0.25, 0.25));
 
+  // front
   p = thing->NewPolygon (tm);
   p->flags.Reset (CS_POLY_COLLDET);
   p->AddVertex (dx, 0, -dz);
