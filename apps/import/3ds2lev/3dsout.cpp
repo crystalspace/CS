@@ -219,24 +219,28 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
     {
       // index to the position on the list using index
       float *xyz = pCurPoint->pos;
-      float u = pCurTexel[0][0];
-      float v = pCurTexel[0][1];
-
       if (flags & FLAG_SPRITE)
       {
-          fprintf (o, "        V(%g,%g,%g:", xyz[0], xyz[1], xyz[2]);
-          if (pCurTexel==NULL)
-              fprintf (o, "0,0)\n");
-          else
-            fprintf (o, "%g,%g)\n",u, (flags & FLAG_SWAP_V ? 1.-v : v));
-      } else {
-          fprintf (o, "        VERTEX (%g,%g,%g)    ; %d\n",
+        float u = 0;
+        float v = 0;
+        if (pCurTexel != NULL)
+        {
+          u = pCurTexel[0][0];
+          v = pCurTexel[0][1];
+	  pCurTexel++;
+        }
+
+        fprintf (o, "        V(%g,%g,%g:", xyz[0], xyz[1], xyz[2]);
+        fprintf (o, "%g,%g)\n",u, (flags & FLAG_SWAP_V ? 1.-v : v));
+      }
+      else
+      {
+        fprintf (o, "        VERTEX (%g,%g,%g)    ; %d\n",
         	  xyz[0], xyz[1], xyz[2], i);
       }
 
       // go to next vertex and texel
       pCurPoint++;
-      pCurTexel++;
     }
 
     // <--output faces-->
