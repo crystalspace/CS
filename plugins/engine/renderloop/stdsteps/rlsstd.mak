@@ -51,7 +51,7 @@ INC.RENDSTEP_STD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RENDSTEP_STD)/*.h \
 SRC.RENDSTEP_STD = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.RENDSTEP_STD)/*.cpp \
   plugins/engine/renderloop/common/*.cpp))
 OBJ.RENDSTEP_STD = $(addprefix $(OUT.RENDSTEP_STD)/,$(notdir $(SRC.RENDSTEP_STD:.cpp=$O)))
-DEP.RENDSTEP_STD = CSSYS CSUTIL CSGEOM
+DEP.RENDSTEP_STD = CSGFX CSSYS CSUTIL CSGEOM
 
 OUTDIRS += $(OUT.RENDSTEP_STD)
 
