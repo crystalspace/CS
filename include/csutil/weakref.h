@@ -41,14 +41,10 @@ class csWeakRef
 private:
   T* obj;
 
-public:
   /**
    * Unlink the object pointed to by this weak reference so that
    * this weak references will not automatically be set to 0 after
-   * the object is destroyed. This is a dangerous function that you
-   * should normally not use. The intended use is for growing
-   * arrays which need to reallocate memory and thus have to cope
-   * with weak reference instances that move in memory.
+   * the object is destroyed.
    */
   void Unlink ()
   {
@@ -56,13 +52,14 @@ public:
   }
 
   /**
-   * Link the object again. Please never call this function!
+   * Link the object again.
    */
   void Link ()
   {
     if (obj) obj->AddRefOwner ((iBase**)&obj);
   }
 
+public:
   /**
    * Construct an empty weak reference.
    */

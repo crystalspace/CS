@@ -29,6 +29,9 @@
 typedef int ArraySortCompareFunction (void const* item1,
 	void const* item2);
 
+/**
+ * The default element handler for csArray.
+ */
 template <class T>
 class csArrayElementHandler
 {
@@ -50,6 +53,9 @@ public:
   }
 };
 
+/**
+ * The default allocator for csArray. Uses malloc/free/realloc.
+ */
 template <class T>
 class csArrayMemoryAllocator
 {
@@ -66,11 +72,56 @@ public:
 
   // The 'relevantcount' parameter should be the number of items
   // in the old array that are initialized.
-  static T* Realloc (T* mem, int /*relevantcount*/, int newcount)
+  static T* Realloc (T* mem, int /*relevantcount*/, int /*oldcount*/, int newcount)
   {
     return (T*)realloc (mem, newcount * sizeof(T));
   }
 };
+
+/**
+ * Special allocator for csArray that makes sure that when
+ * the array is reallocated that the objects are properly constructed
+ * and destructed at their new position. This is needed for objects
+ * that can't be safely moved around in memory (like weak references).
+ * This is of course slower and that's the reason that this is not
+ * done by default.
+ */
+template <class T, class ElementHandler = csArrayElementHandler<T> >
+class csSafeCopyArrayMemoryAllocator
+{
+public:
+  static T* Alloc (int count)
+  {
+    return (T*)malloc (count * sizeof(T));
+  }
+
+  static void Free (T* mem)
+  {
+    free (mem);
+  }
+
+  static T* Realloc (T* mem, int relevantcount, int oldcount, int newcount)
+  {
+    if (newcount <= oldcount)
+    {
+      // Realloc is safe.
+      T* newmem = (T*)realloc (mem, newcount * sizeof (T));
+      CS_ASSERT (newmem == mem);
+      return newmem;
+    }
+
+    T* newmem = Alloc (newcount);
+    int i;
+    for (i = 0 ; i < relevantcount ; i++)
+    {
+      ElementHandler::Construct (newmem + i, mem[i]);
+      ElementHandler::Destroy (mem + i);
+    }
+    Free (mem);
+    return newmem;
+  }
+};
+
 
 /**
  * A templated array class.  The objects in this class are constructed via
@@ -123,7 +174,7 @@ private:
       if (root == 0)
         root = MemoryAllocator::Alloc (n);
       else
-        root = MemoryAllocator::Realloc (root, count, n);
+        root = MemoryAllocator::Realloc (root, count, capacity, n);
       capacity = n;
     }
   }
@@ -539,7 +590,7 @@ public:
     }
     else if (count != capacity)
     {
-      root = MemoryAllocator::Realloc (root, count, count);
+      root = MemoryAllocator::Realloc (root, count, capacity, count);
       capacity = count;
     }
   }
@@ -629,6 +680,29 @@ public:
   /** Returns an Iterator which traverses the Array */
   Iterator GetIterator() const
   { return Iterator(*this); }
+};
+
+/**
+ * Conveniance class to make a version of csArray that does a
+ * safe-copy in case of reallocation of the array. Useful for weak
+ * references.
+ */
+template <class T>
+class csSafeCopyArray
+	: public csArray<T,
+		csArrayElementHandler<T>,
+		csSafeCopyArrayMemoryAllocator<T> >
+{
+public:
+  /**
+   * Initialize object to hold initially 'ilimit' elements, and increase
+   * storage by 'ithreshold' each time the upper bound is exceeded.
+   */
+  csSafeCopyArray (int ilimit = 0, int ithreshold = 0)
+  	: csArray<T, csArrayElementHandler<T>,
+		     csSafeCopyArrayMemoryAllocator<T> > (ilimit, ithreshold)
+  {
+  }
 };
 
 #ifdef CS_EXTENSIVE_MEMDEBUG

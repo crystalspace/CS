@@ -1,5 +1,5 @@
 /*
-  Crystal Space Smart Pointers
+  Crystal Space Weak Reference array
   Copyright (C) 2004 by Jorrit Tyberghein
 
   This library is free software; you can redistribute it and/or
@@ -23,39 +23,11 @@
 #include "csutil/weakref.h"
 #include "csutil/array.h"
 
-template <class T>
-class csWeakRefArrayMemoryAllocator
-{
-public:
-  static csWeakRef<T>* Alloc (int count)
-  {
-    return (csWeakRef<T>*)malloc (count * sizeof(csWeakRef<T>));
-  }
-
-  static void Free (csWeakRef<T>* mem)
-  {
-    free (mem);
-  }
-
-  static csWeakRef<T>* Realloc (csWeakRef<T>* mem, int relevantcount, int newcount)
-  {
-    int i;
-    // First unlink all weak references from their object.
-    for (i = 0 ; i < relevantcount ; i++) mem[i].Unlink ();
-    mem = (csWeakRef<T>*)realloc (mem, newcount * sizeof(csWeakRef<T>));
-    for (i = 0 ; i < relevantcount ; i++) mem[i].Link ();
-    return mem;
-  }
-};
-
 /**
  * An array of weak references.
  */
 template <class T>
-class csWeakRefArray
-	: public csArray<csWeakRef<T>,
-		csArrayElementHandler<csWeakRef<T> >,
-		csWeakRefArrayMemoryAllocator<T> >
+class csWeakRefArray : public csSafeCopyArray<csWeakRef<T> >
 {
 public:
   /**
@@ -63,8 +35,7 @@ public:
    * storage by 'ithreshold' each time the upper bound is exceeded.
    */
   csWeakRefArray (int ilimit = 0, int ithreshold = 0)
-  	: csArray<csWeakRef<T>, csArrayElementHandler<csWeakRef<T> >,
-			csWeakRefArrayMemoryAllocator<T> > (ilimit, ithreshold)
+  	: csSafeCopyArray<csWeakRef<T> > (ilimit, ithreshold)
   {
   }
 

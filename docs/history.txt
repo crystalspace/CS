@@ -10,6 +10,18 @@ chronological order.
 	- Eric Sunshine made some minor updates to cygwin.txi, the most
 	  important of which was to replace "make all" with "make -k all" in
 	  the CS build instructions.
+	- Jorrit did the following array related changes:
+	    - Added csSafeCopyArrayMemoryAllocator which is a memory
+	      allocator that takes care to properly re-construct all
+	      objects upon reallocation of the array. This memory
+	      allocator can be used when you have an array of objects
+	      that cannot be safely moved around in memory otherwise.
+	    - Added csSafeCopyArray conveniance class which is a version
+	      of csArray that uses the csSafeCopyArrayMemoryAllocator.
+	    - Changed csWeakRefArray to inherit from csSafeCopyArray.
+	    - As a consequence of the above changes the dangerous
+	      csWeakRef::Link() and Unlink() functions could be made
+	      private so they cannot be misused.
 20-Jan-2004
 	- Jorrit added a new MemoryAllocator template parameter to csArray.
 	  With this parameter it is possible to use another memory allocator
