@@ -1245,7 +1245,9 @@ void csWorld::RemoveSprite (csSprite* sprite)
   sprite->RemoveFromSectors ();
   int idx = sprites.Find (sprite);
   if (idx == -1) return;
+  sprites[idx] = NULL;
   sprites.Delete (idx);
+  CHK (delete sprite);
 }
 
 struct LightAndDist
