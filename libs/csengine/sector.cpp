@@ -278,11 +278,11 @@ int csRenderMeshList::SortRPCompare (csRMLitem* a, csRMLitem* b, int order)
 
 void csRenderMeshList::CheckVisibility (csRMLitem* item)
 {
-  if (item->visobj->GetVisibilityNumber () != currentVisNr)
+/*  if (item->visobj->GetVisibilityNumber () != currentVisNr)
   {
     item->mwi->potvis = false;
     return;
-  }
+  }*/
   if ((item->mwi->lastFrame != currentFrame) || 
     (item->mwi->lastView != currentView))
   {
@@ -433,7 +433,7 @@ void csRenderMeshList::PrepareFrame (iRenderView* rview)
   for (i = 0 ; i < checkedRPs.Length () ; i++)
     checkedRPs[i] = false;
   RPsorting.SetLength (checkedRPs.Length(), 0);
-  currentVisNr = sector->culler->GetCurrentVisibilityNumber();
+  //currentVisNr = sector->culler->GetCurrentVisibilityNumber();
   // @@@ This won't work as expected when the VC is suspended
   currentFrame = sector->virtual_clock->GetCurrentTicks();
   currentView = rview;
@@ -908,7 +908,7 @@ void csSector::PrepareDraw (iRenderView *rview)
     i--;
   }
 
-  culler->VisTest (rview);
+  //culler->VisTest (rview);
 
   rmeshes.PrepareFrame (rview);
 #else

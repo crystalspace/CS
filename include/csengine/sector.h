@@ -146,7 +146,7 @@ class csRenderMeshList : public iSectorRenderMeshList
   csArray<csRMLitem> rendermeshes;
   csHashMap mwrappers;
   csSector* sector;
-  uint32 currentVisNr;
+  //uint32 currentVisNr;
   csTicks currentFrame;
   csArray<bool> checkedRPs;
   iRenderView* currentView;
