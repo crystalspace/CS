@@ -1533,7 +1533,7 @@ host_os=`echo $ac_cv_host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
 
 
 #------------------------------------------------------------------------------
-# Check for compilers and linker.
+# Check for compilers and linker.f
 #
 # IMPLEMENTATION NOTES
 #
@@ -51467,7 +51467,7 @@ fi
 #------------------------------------------------------------------------------
 # Check if the type wchar_t is available and determine its size.  It might be
 # built-in, or it might come from the wchar.h header file.  Also determine
-# availability of wsclen() and fputws().
+# availability of wcslen(), fputws(), fwide() and wcsrtombs().
 #------------------------------------------------------------------------------
 ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -51884,6 +51884,196 @@ echo "$as_me:$LINENO: result: $ac_cv_func_fputws" >&5
 echo "${ECHO_T}$ac_cv_func_fputws" >&6
 if test $ac_cv_func_fputws = yes; then
   cs_header_text="${cs_header_text}#define CS_HAVE_FPUTWS
+"
+fi
+
+    echo "$as_me:$LINENO: checking for fwide" >&5
+echo $ECHO_N "checking for fwide... $ECHO_C" >&6
+if test "${ac_cv_func_fwide+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+/* Define fwide to an innocuous variant, in case <limits.h> declares fwide.
+   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+#define fwide innocuous_fwide
+
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char fwide (); below.
+    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+    <limits.h> exists even on freestanding compilers.  */
+
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+
+#undef fwide
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char fwide ();
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_fwide) || defined (__stub___fwide)
+choke me
+#else
+char (*f) () = fwide;
+#endif
+#ifdef __cplusplus
+}
+#endif
+
+int
+main ()
+{
+return f != fwide;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_func_fwide=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_func_fwide=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: $ac_cv_func_fwide" >&5
+echo "${ECHO_T}$ac_cv_func_fwide" >&6
+if test $ac_cv_func_fwide = yes; then
+  cs_header_text="${cs_header_text}#define CS_HAVE_FWIDE
+"
+fi
+
+    echo "$as_me:$LINENO: checking for wcsrtombs" >&5
+echo $ECHO_N "checking for wcsrtombs... $ECHO_C" >&6
+if test "${ac_cv_func_wcsrtombs+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+/* Define wcsrtombs to an innocuous variant, in case <limits.h> declares wcsrtombs.
+   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+#define wcsrtombs innocuous_wcsrtombs
+
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char wcsrtombs (); below.
+    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+    <limits.h> exists even on freestanding compilers.  */
+
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+
+#undef wcsrtombs
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char wcsrtombs ();
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_wcsrtombs) || defined (__stub___wcsrtombs)
+choke me
+#else
+char (*f) () = wcsrtombs;
+#endif
+#ifdef __cplusplus
+}
+#endif
+
+int
+main ()
+{
+return f != wcsrtombs;
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_cxx_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_func_wcsrtombs=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_func_wcsrtombs=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+fi
+echo "$as_me:$LINENO: result: $ac_cv_func_wcsrtombs" >&5
+echo "${ECHO_T}$ac_cv_func_wcsrtombs" >&6
+if test $ac_cv_func_wcsrtombs = yes; then
+  cs_header_text="${cs_header_text}#define CS_HAVE_WCSRTOMBS
 "
 fi
 

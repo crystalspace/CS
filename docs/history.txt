@@ -19,6 +19,8 @@ chronological order.
 	- res augmented the generic csPrintf() to parse for ANSI code sequences
 	  to only output formatting sequences to a TTY.
 	- res made csparser and cssynldr use csReport().
+	- res changed the generic csPrintf() to use fputws() only on wide
+	  streams and fputs() otherwise.
 28-Feb-2005
 	- Jorrit changed the generation of the light ID so that it is
 	  compatible again for pseudo dynamic lights. Otherwise too many

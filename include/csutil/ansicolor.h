@@ -44,7 +44,7 @@
 /// Cyan
 #define	CS_ANSI_FC		"\033[36m"
 /// White
-#define	CS_ANSI_FW		"\033[36m"
+#define	CS_ANSI_FW		"\033[37m"
 /** @} */
 
 /// Bold or intense foreground text on
@@ -69,7 +69,7 @@
 /// Cyan
 #define	CS_ANSI_BC		"\033[46m"
 /// White
-#define	CS_ANSI_BW		"\033[46m"
+#define	CS_ANSI_BW		"\033[47m"
 /** @} */
 
 #endif // __CS_CSUTIL_ANSICOLOR_H__

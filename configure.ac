@@ -31,7 +31,7 @@ AC_CANONICAL_HOST
 
 
 #------------------------------------------------------------------------------
-# Check for compilers and linker.
+# Check for compilers and linker.f
 #
 # IMPLEMENTATION NOTES
 #
@@ -1964,7 +1964,7 @@ AC_CHECK_TYPE([intptr_t], [CS_HEADER_PROPERTY([CS_HAS_INTPTR_T])], [],
 #------------------------------------------------------------------------------
 # Check if the type wchar_t is available and determine its size.  It might be
 # built-in, or it might come from the wchar.h header file.  Also determine
-# availability of wsclen() and fputws().
+# availability of wcslen(), fputws(), fwide() and wcsrtombs().
 #------------------------------------------------------------------------------
 AC_LANG_PUSH([C++])
 
@@ -1978,6 +1978,8 @@ AC_CHECK_TYPE([wchar_t], [cs_type_wchar_t=yes], [cs_type_wchar_t=no],
 AS_IF([test $cs_type_wchar_t = yes],
     [AC_CHECK_FUNC([wcslen], [], [CS_HEADER_PROPERTY([CS_USE_FAKE_WCSLEN])])
     AC_CHECK_FUNC([fputws], [CS_HEADER_PROPERTY([CS_HAVE_FPUTWS])], [])
+    AC_CHECK_FUNC([fwide], [CS_HEADER_PROPERTY([CS_HAVE_FWIDE])], [])
+    AC_CHECK_FUNC([wcsrtombs], [CS_HEADER_PROPERTY([CS_HAVE_WCSRTOMBS])], [])
     AC_CHECK_SIZEOF([wchar_t], []
 	[[#if HAVE_WCHAR_H
 	#include <wchar.h>

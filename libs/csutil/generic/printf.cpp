@@ -37,31 +37,57 @@ int csPrintf (char const* str, ...)
 
 static int cs_fputsn (FILE* file, const char* str, size_t len)
 {
-//#ifdef CS_HAVE_FPUTWS
-#if 0
-  // Jorrit: Disabled for now since on some linuxes it appears
-  // that fputws is buggy.
   size_t wstrSize = len + 1;
   CS_ALLOC_STACK_ARRAY(wchar_t, wstr, wstrSize);
-  
+
   csUnicodeTransform::UTF8toWC (wstr, wstrSize, (utf8_char*)str, len);
-    
-  return fputws (wstr, file);
-#else
-  // Use a cheap UTF8-to-ASCII conversion.
-  const utf8_char* ch = (utf8_char*)str;
-  
+
   int n = 0;
+  const wchar_t* wcsPtr = wstr;
+#if defined(CS_HAVE_FPUTWS) && defined(CS_HAVE_FWIDE) \
+  && defined(CS_HAVE_WCSRTOMBS)
+  if (fwide (file, 0) > 0)
+  {
+    return fputws (wstr, file);
+  }
+  else
+  {
+    mbstate_t mbs;
+    memset (&mbs, 0, sizeof (mbs));
+    char mbstr[64];
+    size_t mbslen;
+    while (wcsPtr != 0)
+    {
+      memset (mbstr, 0, sizeof (mbstr));
+      mbslen = wcsrtombs (mbstr, &wcsPtr, sizeof (mbstr) - 1, &mbs);
+      if (mbslen == (size_t)-1)
+      {
+	if (errno == EILSEQ)
+	{
+	  // Catch char that couldn't be encoded, print ? instead
+	  if (fputs (mbstr, file) == EOF) return EOF;
+	  if (fputc ('?', file) == EOF) return EOF;
+	  wcsPtr++;
+	  continue;
+	}
+	break;
+      }
+      if (fputs (mbstr, file) == EOF) return EOF;
+    }
+    if (wcsPtr == 0) return (int)len;
+  }
+#endif
+  // Use a cheap Wide-to-ASCII conversion.
+  const wchar_t* ch = wcsPtr;
+  
   while (len-- > 0)
   {
-    utf8_char type = *ch & 0xc0;
-    
-    if (type <= 0x40)
+    if (*ch < 0x80)
     {
       if (fputc ((char)*ch, file) == EOF) return EOF;
       n++;
     }
-    else if (type == 0xc0)
+    else 
     {
       if (fputc ('?', file) == EOF) return EOF;
       n++;
@@ -71,7 +97,6 @@ static int cs_fputsn (FILE* file, const char* str, size_t len)
   }
   
   return n;
-#endif
 }
 
 static int csFPutStr (FILE* file, const char* str)
