@@ -1,0 +1,15 @@
+crystalspace-data (0.93-1) unstable; urgency=low
+
+  * New demodata.zip file
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Thu, 13 Dec 2001 02:11:42 +0100
+
+crystalspace-data (0.92-1) unstable; urgency=low
+
+  * Data are in a separate package
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Thu, 13 Dec 2001 02:11:42 +0100
+
+Local variables:
+mode: debian-changelog
+End:

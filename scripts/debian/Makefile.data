@@ -1,0 +1,50 @@
+BUILDDIR=$(HOME)/debian/crystal
+DATE=$(shell date '+%Y%m%d')
+VERSION=0.93
+TAG=R0_92_001
+#DATE=20020313
+MINOR=1
+SITE=ftp://sunsite.dk/projects/crystal/cs092/levels
+LEVELS=castle.zip dmburg.zip maze.zip room.zip mazedex.zip newsky.zip sydney.zip demodata.zip 
+
+default: start wget debcopy debbuild
+
+start:
+	@echo "Building Crystalspace-data-$(VERSION)  $(DATE)"
+
+# To get file form ftp site
+wget: $(BUILDDIR)/crystalspace-data-$(VERSION)/data $(BUILDDIR)/wget-stamp
+$(BUILDDIR)/wget-stamp: $(LEVELS)
+	echo "Wgetting files Done"
+	#touch $(BUILDDIR)/wget-stamp
+
+%.zip:
+	@cd $(BUILDDIR)/crystalspace-data-$(VERSION)/data; wget -nc -nd -nH $(SITE)/$@
+	cp ../../../homepage/img/$(shell basename $@ '.zip' ).jpg $(BUILDDIR)/crystalspace-data-$(VERSION)/data
+
+debcopy:
+	cd data ; find . | cpio -pdumvB $(BUILDDIR)/crystalspace-data-$(VERSION)/debian
+
+debclean:
+	cd $(BUILDDIR)/crystalspace-data-$(VERSION); fakeroot debian/rules clean
+	
+debconfigure:
+	cd $(BUILDDIR)/crystalspace-data-$(VERSION); fakeroot debian/rules configure
+
+debbinary:
+	cd $(BUILDDIR)/crystalspace-data-$(VERSION);dch -v $(VERSION)-$(MINOR) Autobuild ; fakeroot debian/rules binary
+
+debbuild:
+	#cd $(BUILDDIR)/crystalspace-data-$(VERSION);dch -v $(VERSION)-$(MINOR) Autobuild ; debuild -us -uc
+	cd $(BUILDDIR)/crystalspace-data-$(VERSION); debuild
+
+$(BUILDDIR):
+	mkdir -p $(BUILDDIR)
+
+$(BUILDDIR)/crystalspace-data-$(VERSION)/data: $(BUILDDIR)/crystalspace-data-$(VERSION)
+	-mkdir $(BUILDDIR)/crystalspace-data-$(VERSION)/data
+
+$(BUILDDIR)/crystalspace-data-$(VERSION): $(BUILDDIR)
+	-mkdir $(BUILDDIR)/crystalspace-data-$(VERSION)
+clean:
+	rm -f $(BUILDDIR)/*-stamp
