@@ -305,7 +305,7 @@ error:    if (Error (LineNo, buff, int (cur - buff)))
             continue;
         }
         strncpy (tmp, cur, i = int (eq - cur));
-        while (i && strchr (INISPACE, tmp[i - 1]))
+        while (i && strchr (CS_INISPACE, tmp[i - 1]))
           i--;
         tmp[i] = 0;
 
