@@ -1979,18 +1979,30 @@ AC_CHECK_TYPE([intmax_t], [CS_HEADER_PROPERTY([CS_HAVE_INTMAX_T])], [],
 
 
 #------------------------------------------------------------------------------
-# Check if the type wchar_t is available and determine its size.  It might be
-# built-in, or it might come from the wchar.h header file.  Also determine
-# availability of wcslen(), fputws(), fwide() and wcsrtombs().
+# Check if the types wchar_t and wint_t are available; also determine the size
+# of wchar_t.  These types might be built-in, or they might come from the
+# wchar.h or wctype.h header files.  Also determine availability of wcslen(),
+# fputws(), fwide() and wcsrtombs().
 #------------------------------------------------------------------------------
+m4_define([cs_wc_include],
+    [[#if HAVE_WCHAR_H
+    #include <wchar.h>
+    #endif
+    #if HAVE_WCTYPE_H
+    #include <wctype.h>
+    #endif
+    ]])
+
 AC_LANG_PUSH([C++])
 
 AC_CHECK_HEADERS([wchar.h], [CS_HEADER_PROPERTY([CS_HAVE_WCHAR_H])])
+AC_CHECK_HEADERS([wctype.h], [CS_HEADER_PROPERTY([CS_HAVE_WCTYPE_H])])
+
+AC_CHECK_TYPE([wint_t], [CS_HEADER_PROPERTY([CS_HAVE_WINT_T])], [],
+    [cs_wc_include])
 
 AC_CHECK_TYPE([wchar_t], [cs_type_wchar_t=yes], [cs_type_wchar_t=no],
-    [[#if HAVE_WCHAR_H
-    #include <wchar.h>
-    #endif]])
+    [cs_wc_include])
 
 AS_IF([test $cs_type_wchar_t = yes],
     [CS_HEADER_PROPERTY([CS_HAVE_WCHAR_T])

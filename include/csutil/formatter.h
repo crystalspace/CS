@@ -24,6 +24,7 @@
  * to scanf() and printf() but more functional.
  */
 
+#include "cssysdef.h"
 #include "csutil/csuctransform.h"
 #include "csutil/dirtyaccessarray.h"
 #include "csutil/util.h"

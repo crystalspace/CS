@@ -151,6 +151,35 @@ typedef uint64 uintmax_t;
 #endif
 
 
+// Provide wchar_t and wint_t. If the configure script determined that these
+// types exist in the standard headers, then just employ those types.  For
+// MSVC, where the configure script is not used, check <stddef.h>, <wchar.h>,
+// and <wctype.h>, which are three of several headers which may provide these
+// types. We can tell if these headers provided the types by checking if
+// _WCHAR_T_DEFINED and _WCTYPE_T_DEFINED have been #defined; newer versions of
+// MSVC will provide them; older ones will not.  If all else fails, then we
+// fake up these types on our own. glibc also #defines _WINT_T when wint_t is
+// available, so we double-check that, as well.
+#include <stddef.h>
+#if defined(CS_HAVE_WCHAR_H)
+#include <wchar.h>
+#endif
+#if defined(CS_HAVE_WCTYPE_H)
+#include <wctype.h>
+#endif
+#if !defined(CS_HAVE_WCHAR_T) && !defined(_WCHAR_T_DEFINED)
+typedef uint16 wchar_t;
+#define _WCHAR_T_DEFINED
+#define CS_WCHAR_T_SIZE 2
+#endif
+#if !defined(CS_HAVE_WINT_T) && !defined(_WCTYPE_T_DEFINED) && \
+    !defined(_WINT_T)
+typedef wchar_t wint_t;
+#define _WCTYPE_T_DEFINED
+#define _WINT_T
+#endif
+
+
 #if defined(CS_COMPILER_GCC)
 #ifndef __STRICT_ANSI__
 /**

@@ -26,18 +26,13 @@
 /**\addtogroup util
  * @{ */
 
-#if defined(CS_HAVE_WCHAR_H)
-#include <wchar.h>
-#endif
-
-#if !defined(CS_HAVE_WCHAR_T)
-typedef uint16 wchar_t;
-#define CS_WCHAR_T_SIZE 2
-#endif
+#include <cssysdef.h>
 
 #if !defined(CS_WCHAR_T_SIZE)
 #  error Unknown wchar_t size.
-#elif (CS_WCHAR_T_SIZE != 1) && (CS_WCHAR_T_SIZE != 2) && (CS_WCHAR_T_SIZE != 4)
+#elif (CS_WCHAR_T_SIZE != 1) && \
+      (CS_WCHAR_T_SIZE != 2) && \
+      (CS_WCHAR_T_SIZE != 4)
 #  error Unsupported wchar_t size.
 #endif
 
@@ -67,8 +62,9 @@ typedef uint32 utf32_char;
 #define CS_UC_IS_LOW_SURROGATE(C)	(((C) & 0xFFFFFC00) == 0x0000D800)
 
 /// Test whether a code point is a Unicode noncharacter
-#define CS_UC_IS_NONCHARACTER(C)	(((C) == CS_UC_INVALID) || ((C) == CS_UC_BOM) \
-					 || (((C) >= 0xFDD0) && ((C) <= 0xFDEF))      \
+#define CS_UC_IS_NONCHARACTER(C)	(((C) == CS_UC_INVALID) || \
+					 ((C) == CS_UC_BOM) || \
+					 (((C) >= 0xFDD0) && ((C) <= 0xFDEF)) \
 					 || ((C) > CS_UC_LAST_CHAR))
 
 /// First char in the "high surrogate" range.

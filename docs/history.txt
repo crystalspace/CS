@@ -15,6 +15,10 @@ chronological order.
 	  how to format floating-point numbers as hexadecimal on MacOS/X.
 	- Eric Sunshine added a -Wno-long-doubles check to configure.ac. This
 	  resolves complaints about csutil/formatter.h on MacOS/X.
+	- Eric Sunshine added <wctype.h> and `wint_t' checks to configure.ac.
+	  <cstypes.h> now fakes up `wchar_t' and `wint_t' if needed.
+	  (csunicode.h no longer fakes up `wchar_t' itself since this is now
+	  handled by <cstypes.h>.)
 19-Mar-2005
 	- Erroroman fixed a bug in genmesh skelanimation exporter
 	- Erroroman added texture "ugly_woman.jpg" to flarge skeleton model.
