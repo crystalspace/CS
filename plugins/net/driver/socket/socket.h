@@ -69,7 +69,7 @@ protected:
   bool BlockingConnection;
 public:
   csSocketListener(iBase* p, csNetworkSocket s, unsigned short port,
-    bool blockingListener, bool blockingConnection);
+    bool reliable, bool blockingListener, bool blockingConnection);
   virtual csPtr<iNetworkConnection> Accept();
   virtual void Terminate() { superclass::Terminate(); }
   virtual csNetworkDriverError GetLastError() const
