@@ -1,6 +1,36 @@
 The history order has been reversed so that new features are at the top.
 
 12-Apr-2000
+	- Andrew Zabolotny implemented a killer enhancement on the
+	  texture cache, courtesy of John Carmack :-) It improves
+	  performance a lot when all the visible textures don't fit at
+	  once into the texture cache (e.g. with complex levels, also
+	  those sudden slowdowns that happens sometimes while
+	  you're walking). Some numbers, just to give you the feeling:
+		Entry data:
+		2.2Mb textures visible at once (e.g. flarge.zip,
+		near the staircase).
+
+		First with texture cache of 10Mb (e.g. far enough for
+		current frame): 11.976048 fps in both cases (old and new).
+
+		Now setting texture cache of 2MB:
+		5.025126 fps without improvement and 11.415525 (!!!!)
+		with improvement.
+ 
+		Now setting texture cache of 1MB:
+		5.025126 fps without improvement (naturally) and
+		6.752194 fps with it
+	  For real-world cases it should give even MORE performance:
+	  generally the more the texture set occupies, the bigger is
+	  improvement. For example, with the default cache size of 5MP
+	  (e.g. 10MB for 16bpp modes), if you ever encountered the
+	  "too much textures in view" problem, you should notice
+	  a huge performance increase.
+12-Apr-2000
+	- Eric Sunshine did the following changes:
+	    csVector::Insert() no longer asks memmove() to move zero bytes.
+	    csVector::Delete() no longer asks memmove() to move zero bytes.
 	- Fixed a second (related) bug in WalkTest CD.
 	- Fundamental API change for sprites. Move() has been replaced with
 	  MovePosition() (relative move). SetMove() has been replaced
