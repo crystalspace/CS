@@ -7,6 +7,14 @@ The history order is reversed so that new features are at the top.
 	  never be used. I leave the code in cvs for now as a reference
 	  for future multi-texture implementations.
 	- Enabled multi-texture again in GeForce specific OpenGL configuration.
+	- Removed the fix in csTextureTrans::compute_texture_space() I added
+	  yesterday. Instead uses __volatile__ keyword with the asm
+	  statements for qsqrt() and qisqrt(). This forces the compiler to
+	  keep the code intact which seems to avoid the bug with
+	  qisqrt() reported yesterday. I also did a small benchmark to see
+	  if adding __volatile__ has a bad effect and I didn't notice an
+	  obvious speed decrease. Thanks to Matt Reda for suggesting
+	  the __volatile__ keyword.
 14-Apr-2002
 	- In one version of csTextureTrans::compute_texture_space()
 	  there were two calls to qisqrt() (equivalent to 1/sqrt()).

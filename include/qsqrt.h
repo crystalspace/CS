@@ -59,7 +59,10 @@ static inline float qsqrt (float x)
 // a *= 1.5 - a * a * h;
 // return a * x;
 
-  __asm__ (
+  // Use __volatile__ so that the compiler will not mess with this
+  // code. Under some versions of gcc in combination with -O2 optimize
+  // mode not using __volatile__ can cause errors.
+  __asm__ __volatile__ (
 		"flds	%1\n"			// x
 		"movl	$0xbe6f0000,%%eax\n"
 		"subl	%1,%%eax\n"
@@ -97,7 +100,10 @@ static inline float qsqrt (float x)
 static inline float qisqrt (float x)
 {
   float ret;
-  __asm__ (
+  // Use __volatile__ so that the compiler will not mess with this
+  // code. Under some versions of gcc in combination with -O2 optimize
+  // mode not using __volatile__ can cause errors.
+  __asm__ __volatile__ (
 		"flds	%1\n"			// x
 		"movl	$0xbe6f0000,%%eax\n"
 		"subl	%1,%%eax\n"
