@@ -603,7 +603,8 @@ csStatLight* csLoader::load_statlight (char* buf)
   float x, y, z, dist = 0, r, g, b;
   int dyn, attenuation = CS_ATTN_LINEAR;
   bool halo = false;
-  float haloIntensity, haloCross;
+  float haloIntensity = 0.0;
+  float haloCross     = 0.0;
 
   if (strchr (buf, ':'))
   {

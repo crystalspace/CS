@@ -299,7 +299,7 @@ csPolygonClipper::csPolygonClipper (csPoly2D *Clipper, bool mirror, bool copy)
 }
 
 csPolygonClipper::csPolygonClipper (csVector2 *Clipper, int Count,
-  bool mirror = false, bool copy = false)
+  bool mirror, bool copy)
 {
   int vert;
 
