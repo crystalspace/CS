@@ -220,6 +220,8 @@ void csRectRegion::fragmentRect(
       // function to handle this business.
 
       fragmentContainedRect(r1, r2);
+
+      return;
     }
       
   }
@@ -229,8 +231,20 @@ void csRectRegion::fragmentRect(
   if (!testedEdge)
   {
 
-    //Fix me:  this code needs to be written!!
+    if (r1.Intersects(r2)) 
+    {
 
+    // Since fragment rect already test for all cases, the ideal method here is to call
+    // fragment rect on the intersection of r1 and r2 with r1 as the fragmentee.  This
+    // creates a properly fragmented system.
+
+     csRect ri(r1);
+     ri.Intersect(r2);
+
+     fragmentContainedRect(r1, ri);
+     
+     return;
+    }
   }
   
   // If we've gotten here then we should only have to break the rect into 2
