@@ -76,8 +76,9 @@ MESHOBJ 'fountain' (
 )
 @end example
 
-This code fragment uses the loader plug-in named
-@samp{crystalspace.mesh.loader.fountain} to load a Mesh Object (type
+This code fragment uses the @samp{crystalspace.mesh.loader.fountain} loader
+plug-in named
+to load a Mesh Object (type
 @samp{iMeshObject}) and register it with the engine (while placing it in the
 current sector).  In this case there are many parameters.  The first parameter
 should always be the name of the factory.  This is true for all Mesh Objects

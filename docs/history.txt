@@ -165,6 +165,7 @@ The history order has been reversed so that new features are at the top.
 	    - Eliminated a compilation warning reported by CodeWarrior in
 	      csEventQueue::Lock().  The compiler did not like the empty
 	      statement following the while() loop.
+	- Eric Sunshine fixed a overfull hbox TeX warning in meshobj/using.txi.
 28-Jan-2001
 	- Eric Sunshine fixed a crasher in PTLab where it was trying to
 	  access a texture (cslogo.gif) which it had never loaded.
