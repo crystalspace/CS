@@ -51,8 +51,6 @@ public:
   awsCheckBox ();
   virtual ~awsCheckBox ();
 
-  /******* Alignment Options ************/
-
   /// Align text to left.
   static const int alignLeft;
 
@@ -61,8 +59,6 @@ public:
 
   /// Align text centered.
   static const int alignCenter;
-
-  /******* Signals **********************/
 
   /// An up and down motion for the button.
   static const int signalClicked;

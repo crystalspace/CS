@@ -33,7 +33,7 @@ protected:
   /// True if this acts as a push-button switch (like tool-bar mode).
   bool is_switch;
 
-  /// True if button was down, and button is in switch mode (toggle=yes).
+  /// True if button was down, and button is in switch mode (toggle = yes).
   bool was_down;
 
   /**
@@ -43,18 +43,16 @@ protected:
    */
   iTextureHandle *tex[3];
 
-  /// Icon position
+  /// Icon position.
   int icon_align;
 
   ///
   bool stretched;
   
-  /// Caption text for this component
+  /// Caption text for this component.
   iString *caption;
 
-protected:
   void ClearGroup ();
-
 public:
   awsCmdButton ();
   virtual ~awsCmdButton ();
@@ -65,12 +63,10 @@ public:
   static const int iconTop;
   static const int iconBottom;
 
-  /******* Signals **********************/
-
   /// An up and down motion for the button.
   static const int signalClicked;
   static const int signalFocused;
-public:
+
   /// Get's the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
@@ -88,7 +84,7 @@ public:
   /// Gets the smallest this button can be.
   csRect getMinimumSize ();
 
-  /// Triggered when the component needs to draw
+  /// Triggered when the component needs to draw.
   virtual void OnDraw (csRect clip);
 
   /// Triggered when the user presses a mouse button down.

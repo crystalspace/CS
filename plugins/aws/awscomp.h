@@ -45,9 +45,9 @@ class awsCanvas;
  *<p>
  *      e.g.
  *<p>
- *        iAwsPrefManager *pm = wmgr->GetPrefMgr();
- *        pm->LookupStringKey("Texture", texturename);
- *        SetTexture(pm->GetPixmapFor(texturename));
+ *        iAwsPrefManager *pm = wmgr->GetPrefMgr ();
+ *        pm->LookupStringKey ("Texture", texturename);
+ *        SetTexture(pm->GetPixmapFor (texturename));
  */
 
 class awsComponent : public iAwsComponent
@@ -286,7 +286,7 @@ public:
   virtual void Lower ();
 
   /** 
-   * Uses the current layout to update the location/size of all children
+   * Uses the current layout to update the location/size of all children.
    */
   virtual void LayoutChildren ();
 
@@ -310,9 +310,10 @@ public:
    */
   virtual void AddChild (iAwsComponent *child);
 
-  /** Removes a child from this component.  Important!! The child will be destroyed automatically if owner
-     *  was true when you called AddChild().
-     */
+  /**
+   * Removes a child from this component. Important!! The child will
+   * be destroyed automatically if owner was true when you called AddChild ().
+   */
   virtual void RemoveChild (iAwsComponent *child);
 
   /// Get's the number of children.
@@ -333,7 +334,7 @@ public:
   /// Sets the sibling below this one.
   virtual void SetComponentBelow (iAwsComponent* below);
 
-	/// Add child to TabOrder.
+  /// Add child to TabOrder.
   virtual bool AddToTabOrder (iAwsComponent *child);
 
   /// Get's next child component in parent TabOrder.
@@ -486,6 +487,7 @@ protected:
 
 class awsComponentFactory : public iAwsComponentFactory
 {
+private:
   iAws *wmgr;
 public:
   SCF_DECLARE_IBASE;

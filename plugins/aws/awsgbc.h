@@ -23,7 +23,7 @@ struct awsGridBagConstraints
 {
   enum
   {
-    GBS_RELATIVE  = -1,
+    GBS_RELATIVE = -1,
 
     /**
      * Specify that this component is the 
@@ -34,33 +34,33 @@ struct awsGridBagConstraints
     /**
      * Do not resize the component. 
      */
-    GBS_NONE      = 0,
+    GBS_NONE = 0,
 
     /**
      * Resize the component both horizontally and vertically. 
      */
-    GBS_BOTH      = 1,
+    GBS_BOTH = 1,
 
     /**
      * Resize the component horizontally but not vertically. 
      */
-    GBS_HORIZONTAL= 2,
+    GBS_HORIZONTAL = 2,
 
     /**
      * Resize the component vertically but not horizontally. 
      */
-    GBS_VERTICAL  = 3,
+    GBS_VERTICAL = 3,
 
     /**
      * Put the component in the center of its display area.
      */
-    GBS_CENTER    = 10,
+    GBS_CENTER = 10,
 
     /**
      * Put the component at the top of its display area,
      * centered horizontally. 
      */
-    GBS_NORTH     = 11,
+    GBS_NORTH = 11,
 
     /**
      * Put the component at the top-right corner of its display area. 
@@ -71,7 +71,7 @@ struct awsGridBagConstraints
      * Put the component on the right side of its display area, 
      * centered vertically.
      */
-    GBS_EAST      = 13,
+    GBS_EAST = 13,
 
     /**
      * Put the component at the bottom-right corner of its display area. 
@@ -82,7 +82,7 @@ struct awsGridBagConstraints
      * Put the component at the bottom of its display area, centered 
      * horizontally. 
      */
-    GBS_SOUTH     = 15,
+    GBS_SOUTH = 15,
 
     /**
      * Put the component at the bottom-left corner of its display area. 
@@ -93,7 +93,7 @@ struct awsGridBagConstraints
      * Put the component on the left side of its display area, 
      * centered vertically.
      */
-    GBS_WEST      = 17,
+    GBS_WEST = 17,
 
     /**
      * Put the component at the top-left corner of its display area. 
@@ -208,13 +208,12 @@ struct awsGridBagConstraints
    * <code>NONE</code>: Do not resize the component. 
    * <li>
    * <code>HORIZONTAL</code>: Make the component wide enough to fill 
-   *         its display area horizontally, but do not change its height. 
+   * its display area horizontally, but do not change its height. 
    * <li>
    * <code>VERTICAL</code>: Make the component tall enough to fill its 
-   *         display area vertically, but do not change its width. 
+   * display area vertically, but do not change its width. 
    * <li>
-   * <code>BOTH</code>: Make the component fill its display area 
-   *         entirely. 
+   * <code>BOTH</code>: Make the component fill its display area entirely. 
    * </ul>
    * <p>
    * The default value is <code>NONE</code>. 
@@ -282,7 +281,7 @@ struct awsGridBagConstraints
    * <code>ipadx</code>, where the default will be 0.
    */
   int minHeight;
-public:
+
   /**
    * Creates a <code>GridBagConstraint</code> object with 
    * all of its fields set to their default value. 

@@ -56,7 +56,7 @@ public:
 
   virtual void Animate (csTicks current_time)
   {
-    (void)current_time; // Do nothing
+    (void)current_time; // Do nothing.
   }
 
   iGraphics2D *G2D () { return rG2D; }
@@ -69,7 +69,7 @@ public:
   {
     (void)area;
     (void)g3d;
-    (void)Alpha;        // Do nothing
+    (void)Alpha;        // Do nothing.
   }
 };
 
