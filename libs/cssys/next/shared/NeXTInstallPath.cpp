@@ -18,40 +18,48 @@
 //
 //=============================================================================
 //-----------------------------------------------------------------------------
-// NeXTInstPath.m
+// NeXTInstallPath.cpp
 //
-//	Cocoa/OpenStep-specific function to determine installation path.
+//	Platform-specific function to determine installation path.
 //
 //-----------------------------------------------------------------------------
-#import <Foundation/Foundation.h>
+#include "cssysdef.h"
+#include "cssys/sysfunc.h"
+#include "NeXTInstallPath.h"
+#include <stdlib.h>
 
-int NeXTGetInstallPath(char* buff, size_t sz, char path_sep)
+//-----------------------------------------------------------------------------
+// csGetInstallPath
+//-----------------------------------------------------------------------------
+bool csGetInstallPath(char* buff, size_t sz)
 {
-  int ok = 0;
-  NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-  NSUserDefaults* defs = [NSUserDefaults standardUserDefaults];
-  NSString* s = [defs stringForKey:@"CrystalSpaceRootIgnore"];
-        
-  buff[0] = '\0';
-  if (s == 0 || [s isEqualToString:@""] ||
-     (![s hasPrefix:@"Y"] && ![s hasPrefix:@"y"] &&	// Yes
-      ![s hasPrefix:@"T"] && ![s hasPrefix:@"t"] &&	// True
-      ![s hasPrefix:@"O"] && ![s hasPrefix:@"o"] &&	// On
-      ![s hasPrefix:@"1"]))				// 1
+  bool ok = false;
+  if (path != 0 && sz > 0)
   {
-    s = [defs stringForKey:@"CrystalSpaceRoot"];
-    if (s != 0 && ![s isEqualToString:@""])
+    ok = true;
+    if (!NeXTGetInstallPath(buff, sz, PATH_SEPARATOR))
     {
-      NSMutableString* path = [s mutableCopy];
-      int const n = [path length];
-      // >=2 to avoid stripping "/" from path if path is root directory.
-      if (n >= 2 && [path characterAtIndex:n - 1] != path_sep)
-        [path appendFormat:@"%c", path_sep];
-      [path getFileSystemRepresentation:buff maxLength:sz];
-      [path release];
-      ok = 1;
+      char const* path = getenv("CRYSTAL");
+      if (path == 0 || *path == '\0')
+      {
+        *buff = '\0';
+      }
+      else
+      {
+        size_t n = strlen(path);
+	CS_ASSERT(n > 0); // Should be caught by above case.
+        // Do we have to add a final path separator to the directory?
+        bool const addsep = (path[n - 1] != PATH_SEPARATOR);
+        if (addsep)
+          n++;
+        if (n >= sz)
+          n = sz - 1;
+        memcpy(buff, path, n);
+        if (addsep)
+          buff[n - 1] = PATH_SEPARATOR;
+        buff[n] = '\0';
+      }
     }
   }
-  [pool release];
   return ok;
 }

@@ -6,6 +6,13 @@ The history order is reversed so that new features are at the top.
 	- Updated faq related to smart pointers and added new entry about
 	  plugin loading.
 	- Eliminated CS/data/tex/arial9.csf since it is considered unnecessary.
+	- Eric Sunshine made the following changes to the Apple/NeXT port:
+	    - Moved libs/cssys/next/openstep/instpath.cpp to
+	      libs/cssys/next/shared/NeXTInstallPath.cpp since it is
+	      sufficiently generic to be shared among the Apple/NeXT platforms.
+	    - Added libs/cssys/next/shared/NeXTInstallPath.h.
+	    - Cleaned up the code comprising the Apple/NeXT csGetInstallPath()
+	      and NeXTInstallPath().
 3-Oct-2002
 	- Finalized the implementation of the indexed operations in the engine
 	  sequence manager.
