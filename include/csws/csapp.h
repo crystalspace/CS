@@ -199,7 +199,7 @@ public:
   iTextureHandle *GetTexture (const char *Name)
   {
     csWSTexture *tex = GetTextures ()->FindTexture (Name);
-    return tex ? tex->GetHandle () : NULL;
+    return tex ? tex->GetHandle () : (iTextureHandle*)NULL;
   }
 
   /// Return application's global mouse object

@@ -82,7 +82,7 @@ char *csComponent::GetSkinName ()
 
 csSkin *csComponent::GetSkin ()
 {
-  return parent ? parent->GetSkin () : NULL;
+  return parent ? parent->GetSkin () : (csSkin*)NULL;
 }
 
 bool csComponent::ApplySkin (csSkin *Skin)
