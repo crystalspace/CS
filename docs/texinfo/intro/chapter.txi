@@ -49,3 +49,4 @@ answer there you can always email the mailing lists. @xref{FAQ}, or
 @imports{intro,authors.txi}
 @imports{intro,contrib.txi}
 @imports{intro,license.txi}
+@imports{intro,nonlgpl.txi}
