@@ -23315,27 +23315,27 @@
 	    <fire delay="100" sequence="fog" />
 	</trigger>
 
-      <trigger name="animlight">
+	<trigger name="animlight">
 	    <sectorvis sector="large" />
 	    <fire sequence="animlight">
 	        <light name="light" light="l1" />
 	    </fire>
-	  </trigger>
+	</trigger>
 
-      <trigger name="anim_sky">
+	<trigger name="anim_sky">
 	    <sectorvis sector="street1" />
 	    <fire sequence="anim_sky" />
-	  </trigger>
+	</trigger>
 	
-	  <trigger name="light_listener_on">
+	<trigger name="light_listener_on">
 	    <lightvalue light="l1" operator="less" red=".1" blue=".1" green=".1" />
 	    <fire sequence="light_listener_on" />
-	  </trigger>
-	  <trigger name="light_listener_off">
+	</trigger>
+	<trigger name="light_listener_off">
 	    <lightvalue light="l1" operator="greater" red=".1" blue=".1" green=".1" />
 	    <fire sequence="light_listener_off" />
 	    <disable />
-	  </trigger>
+	</trigger>
 
 	<trigger name="rot_shapes">
 	    <sectorvis sector="shapes" />

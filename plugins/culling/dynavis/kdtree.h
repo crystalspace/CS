@@ -207,6 +207,11 @@ private:
    */
   void ResetTimestamps ();
 
+  /**
+   * Flatten the children of this node to the given node.
+   */
+  void FlattenTo (csKDTree* node);
+
 public:
   /// Create a new empty KD-tree.
   csKDTree (csKDTree* parent);

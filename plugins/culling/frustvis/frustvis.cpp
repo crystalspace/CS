@@ -141,18 +141,12 @@ SCF_IMPLEMENT_IBASE_END
 
 void csFrustVisObjectWrapper::ObjectModelChanged (iObjectModel* /*model*/)
 {
-  if (updating) return;
-  updating = true;
-  frustvis->UpdateObject (this);
-  updating = false;
+  frustvis->AddObjectToUpdateQueue (this);
 }
 
 void csFrustVisObjectWrapper::MovableChanged (iMovable* /*movable*/)
 {
-  if (updating) return;
-  updating = true;
-  frustvis->UpdateObject (this);
-  updating = false;
+  frustvis->AddObjectToUpdateQueue (this);
 }
 
 //----------------------------------------------------------------------
@@ -165,6 +159,7 @@ csFrustumVis::csFrustumVis (iBase *iParent)
   kdtree = NULL;
   current_visnr = 1;
   vistest_objects_inuse = false;
+  updating = false;
 }
 
 csFrustumVis::~csFrustumVis ()
@@ -288,6 +283,27 @@ void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
   }
 }
 
+void csFrustumVis::AddObjectToUpdateQueue (csFrustVisObjectWrapper* visobj_wrap)
+{
+  if (updating) return;
+  update_queue.Add (visobj_wrap);
+}
+
+void csFrustumVis::UpdateObjects ()
+{
+  updating = true;
+  {
+    csHashIterator it (update_queue.GetHashMap ());
+    while (it.HasNext ())
+    {
+      csFrustVisObjectWrapper* vw = (csFrustVisObjectWrapper*)it.Next ();
+      UpdateObject (vw);
+    }
+  }
+  update_queue.DeleteAll ();
+  updating = false;
+}
+
 void csFrustumVis::UpdateObject (csFrustVisObjectWrapper* visobj_wrap)
 {
   iVisibilityObject* visobj = visobj_wrap->visobj;
@@ -409,6 +425,7 @@ end:
 
 bool csFrustumVis::VisTest (iRenderView* rview)
 {
+  UpdateObjects ();
   current_visnr++;
 
 #if 0
@@ -522,6 +539,7 @@ static bool FrustTestBox_Front2Back (csSimpleKDTree* treenode, void* userdata,
 
 csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csBox3& box)
 {
+  UpdateObjects ();
   current_visnr++;
 
   csVector* v;
@@ -604,6 +622,7 @@ static bool FrustTestSphere_Front2Back (csSimpleKDTree* treenode,
 
 csPtr<iVisibilityObjectIterator> csFrustumVis::VisTest (const csSphere& sphere)
 {
+  UpdateObjects ();
   current_visnr++;
 
   csVector* v;
@@ -754,6 +773,7 @@ bool csFrustumVis::IntersectSegment (const csVector3& start,
     const csVector3& end, csVector3& isect, float* pr,
     iMeshWrapper** p_mesh, iPolygon3D** poly)
 {
+  UpdateObjects ();
   current_visnr++;
   IntersectSegment_Front2BackData data;
   data.seg.Set (start, end);
@@ -867,6 +887,7 @@ static bool CastShadows_Front2Back (csSimpleKDTree* treenode, void* userdata,
 // @@@ USE RADIUS!!!
 void csFrustumVis::CastShadows (iFrustumView* fview)
 {
+  UpdateObjects ();
   current_visnr++;
   CastShadows_Front2BackData data;
   data.current_visnr = current_visnr;

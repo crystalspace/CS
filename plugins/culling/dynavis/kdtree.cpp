@@ -447,24 +447,42 @@ void csKDTree::MoveObject (csKDTreeChild* object, const csBox3& new_bbox)
     }
   }
 
+  object->bbox = new_bbox;
+
   // When updating the bounding box of an object we move the object upwards
   // in the tree until we find a node that completely contains the
   // new bounding box. For small movements this usually means that the
   // object will stay in its current node. Note that the case above already
   // catches that situation but we keep the above case because it is
   // slightly more efficient even.
+
+  // The following counter makes sure we flatten the top-most parent
+  // node every 50 times an object has moved. This ensures the tree
+  // will keep reasonable quality. We don't do this every time because
+  // Flatten() itself has some overhead.
+  static int cnt = 50;
+  cnt--;
+  bool do_flatten = false;
+  if (cnt < 0)
+  {
+    cnt = 50;
+    do_flatten = true;
+  }
+
   csKDTree* node = this;
   if (object->num_leafs > 0)
   {
     node = object->leafs[0];
-    UnlinkObject (object);
-    object->bbox = new_bbox;
+    if (!do_flatten) UnlinkObject (object);
     while (node->parent && !node->GetNodeBBox ().Contains (new_bbox))
     {
       node = node->parent;
     }
+    if (do_flatten)
+      node->Flatten ();
+    else
+      node->AddObject (new_bbox, object);
   }
-  node->AddObject (new_bbox, object);
 }
   
 void csKDTree::Distribute ()
@@ -548,14 +566,14 @@ void csKDTree::FullDistribute ()
   }
 }
 
-void csKDTree::Flatten ()
+void csKDTree::FlattenTo (csKDTree* node)
 {
   if (!child1) return;	// Nothing to do.
 
   // First flatten the children.
   // @@@ Is this the most optimal solution?
-  child1->Flatten ();
-  child2->Flatten ();
+  child1->FlattenTo (node);
+  child2->FlattenTo (node);
 
   csKDTree* c1 = child1; child1 = NULL;
   csKDTree* c2 = child2; child2 = NULL;
@@ -567,17 +585,21 @@ void csKDTree::Flatten ()
     if (obj->num_leafs == 1)
     {
       CS_ASSERT (obj->leafs[0] == c1);
-      obj->leafs[0] = this;
-      AddObject (obj);
-      UpdateBBox (obj->bbox);
+      obj->leafs[0] = node;
+      node->AddObject (obj);
+      node->UpdateBBox (obj->bbox);
     }
     else
     {
-      if (obj->FindLeaf (this) == -1)
+      if (obj->FindLeaf (node) == -1)
       {
-        obj->ReplaceLeaf (c1, this);
-	AddObject (obj);
-        UpdateBBox (obj->bbox);
+        obj->ReplaceLeaf (c1, node);
+	node->AddObject (obj);
+        node->UpdateBBox (obj->bbox);
+      }
+      else
+      {
+        obj->RemoveLeaf (c1);
       }
     }
   }
@@ -587,20 +609,45 @@ void csKDTree::Flatten ()
     if (obj->num_leafs == 1)
     {
       CS_ASSERT (obj->leafs[0] == c2);
-      obj->leafs[0] = this;
-      AddObject (obj);
-      UpdateBBox (obj->bbox);
+      obj->leafs[0] = node;
+      node->AddObject (obj);
+      node->UpdateBBox (obj->bbox);
     }
     else
     {
-      if (obj->FindLeaf (this) == -1)
+      if (obj->FindLeaf (node) == -1)
       {
-        obj->ReplaceLeaf (c2, this);
-	AddObject (obj);
-        UpdateBBox (obj->bbox);
+        obj->ReplaceLeaf (c2, node);
+	node->AddObject (obj);
+        node->UpdateBBox (obj->bbox);
+      }
+      else
+      {
+        obj->RemoveLeaf (c2);
       }
     }
   }
+  delete[] c1->objects;
+  c1->objects = NULL;
+  c1->num_objects = 0;
+  c1->max_objects = 0;
+  delete[] c2->objects;
+  c2->objects = NULL;
+  c2->num_objects = 0;
+  c2->max_objects = 0;
+  delete c1;
+  delete c2;
+}
+
+void csKDTree::Flatten ()
+{
+  if (!child1) return;	// Nothing to do.
+
+  disallow_distribute = false;
+  obj_bbox_valid = false;
+
+  FlattenTo (this);
+  return;
 }
 
 bool csKDTree::Front2Back (const csVector3& pos, csKDTreeVisitFunc* func,

@@ -24,6 +24,7 @@
 #include "iutil/dbghelp.h"
 #include "csutil/csvector.h"
 #include "csutil/scf.h"
+#include "csutil/hashmap.h"
 #include "csgeom/plane3.h"
 #include "iengine/viscull.h"
 
@@ -56,16 +57,10 @@ public:
   csRef<iShadowReceiver> receiver;
   csRef<iThingState> thing_state;
 
-  // The 'updating' flag is true if the object is being updated. This flag
-  // is to prevent us from updating it again (if the callback is fired
-  // again).
-  bool updating;
-
   csFrustVisObjectWrapper (csFrustumVis* frustvis)
   {
     SCF_CONSTRUCT_IBASE (NULL);
     csFrustVisObjectWrapper::frustvis = frustvis;
-    updating = false;
   }
   virtual ~csFrustVisObjectWrapper ()
   {
@@ -98,6 +93,17 @@ private:
   int scr_width, scr_height;	// Screen dimensions.
   uint32 current_visnr;
 
+  // This hash set holds references to csFrustVisObjectWrapper instances
+  // that require updating in the culler.
+  csHashSet update_queue;
+  // The 'updating' flag is true if the objects are being updated. This flag
+  // is to prevent us from updating it again (if the callback is fired
+  // again).
+  bool updating;
+
+  // Update all objects in the update queue.
+  void UpdateObjects ();
+
   // Fill the bounding box with the current object status.
   void CalculateVisObjBBox (iVisibilityObject* visobj, csBox3& bbox);
 
@@ -117,6 +123,10 @@ public:
   // Test visibility for the given object. Returns true if visible.
   bool TestObjectVisibility (csFrustVisObjectWrapper* obj,
   	FrustTest_Front2BackData* data);
+
+  // Add an object to the update queue. That way it will be updated
+  // in the kdtree later when needed.
+  void AddObjectToUpdateQueue (csFrustVisObjectWrapper* visobj_wrap);
 
   // Update one object in FrustVis. This is called whenever the movable
   // or object model changes.

@@ -23,6 +23,7 @@
 #include "iutil/comp.h"
 #include "iutil/dbghelp.h"
 #include "csutil/csvector.h"
+#include "csutil/hashmap.h"
 #include "csutil/scf.h"
 #include "igeom/objmodel.h"
 #include "iengine/movable.h"
@@ -85,17 +86,11 @@ public:
   csRef<iShadowReceiver> receiver;
   csRef<iThingState> thing_state;	// Optional.
 
-  // The 'updating' flag is true if the object is being updated. This flag
-  // is to prevent us from updating it again (if the callback is fired
-  // again).
-  bool updating;
-
   csVisibilityObjectWrapper (csDynaVis* dynavis)
   {
     SCF_CONSTRUCT_IBASE (NULL);
     history = new csVisibilityObjectHistory ();
     csVisibilityObjectWrapper::dynavis = dynavis;
-    updating = false;
   }
   virtual ~csVisibilityObjectWrapper ()
   {
@@ -165,6 +160,17 @@ private:
   bool do_cull_clampoccluder;
   bool do_freeze_vis;
 
+  // This hash set holds references to csVisibilityObjectWrapper instances
+  // that require updating in the culler.
+  csHashSet update_queue;
+  // The 'updating' flag is true if the objects are being updated. This flag
+  // is to prevent us from updating it again (if the callback is fired
+  // again).
+  bool updating;
+
+  // Update all objects in the update queue.
+  void UpdateObjects ();
+
   // For history culling: this is used by the main VisTest() routine
   // to keep track of how many every VisTest() call. We can use that
   // to see if some object was visible previous frame.
@@ -212,6 +218,10 @@ public:
   // Test visibility for the given object. Returns true if visible.
   bool TestObjectVisibility (csVisibilityObjectWrapper* obj,
   	VisTest_Front2BackData* data);
+
+  // Add an object to the update queue. That way it will be updated
+  // in the kdtree later when needed.
+  void AddObjectToUpdateQueue (csVisibilityObjectWrapper* visobj_wrap);
 
   // Update one object in Dynavis. This is called whenever the movable
   // or object model changes.

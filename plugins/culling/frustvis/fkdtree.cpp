@@ -85,7 +85,8 @@ void csSimpleKDTreeChild::RemoveLeaf (csSimpleKDTree* leaf)
   CS_ASSERT (false);
 }
 
-void csSimpleKDTreeChild::ReplaceLeaf (csSimpleKDTree* old_leaf, csSimpleKDTree* new_leaf)
+void csSimpleKDTreeChild::ReplaceLeaf (csSimpleKDTree* old_leaf,
+	csSimpleKDTree* new_leaf)
 {
   int i;
   for (i = 0 ; i < num_leafs ; i++)
@@ -380,7 +381,8 @@ void csSimpleKDTree::AddObject (const csBox3& bbox, csSimpleKDTreeChild* obj)
   UpdateBBox (bbox);
 }
 
-csSimpleKDTreeChild* csSimpleKDTree::AddObject (const csBox3& bbox, void* object)
+csSimpleKDTreeChild* csSimpleKDTree::AddObject (const csBox3& bbox,
+	void* object)
 {
   csSimpleKDTreeChild* obj = new csSimpleKDTreeChild ();
   obj->object = object;
@@ -410,7 +412,8 @@ void csSimpleKDTree::RemoveObject (csSimpleKDTreeChild* object)
   delete object;
 }
 
-void csSimpleKDTree::MoveObject (csSimpleKDTreeChild* object, const csBox3& new_bbox)
+void csSimpleKDTree::MoveObject (csSimpleKDTreeChild* object,
+	const csBox3& new_bbox)
 {
   // If the object is in only one leaf then we test if this object
   // will still be in the bounding box of that leaf after moving it around.
@@ -427,24 +430,42 @@ void csSimpleKDTree::MoveObject (csSimpleKDTreeChild* object, const csBox3& new_
     }
   }
 
+  object->bbox = new_bbox;
+
   // When updating the bounding box of an object we move the object upwards
   // in the tree until we find a node that completely contains the
   // new bounding box. For small movements this usually means that the
   // object will stay in its current node. Note that the case above already
   // catches that situation but we keep the above case because it is
   // slightly more efficient even.
+
+  // The following counter makes sure we flatten the top-most parent
+  // node every 50 times an object has moved. This ensures the tree
+  // will keep reasonable quality. We don't do this every time because
+  // Flatten() itself has some overhead.
+  static int cnt = 50;
+  cnt--;
+  bool do_flatten = false;
+  if (cnt < 0)
+  {
+    cnt = 50;
+    do_flatten = true;
+  }
+
   csSimpleKDTree* node = this;
   if (object->num_leafs > 0)
   {
     node = object->leafs[0];
-    UnlinkObject (object);
-    object->bbox = new_bbox;
+    if (!do_flatten) UnlinkObject (object);
     while (node->parent && !node->GetNodeBBox ().Contains (new_bbox))
     {
       node = node->parent;
     }
+    if (do_flatten)
+      node->Flatten ();
+    else
+      node->AddObject (new_bbox, object);
   }
-  node->AddObject (new_bbox, object);
 }
   
 void csSimpleKDTree::Distribute ()
@@ -528,14 +549,14 @@ void csSimpleKDTree::FullDistribute ()
   }
 }
 
-void csSimpleKDTree::Flatten ()
+void csSimpleKDTree::FlattenTo (csSimpleKDTree* node)
 {
   if (!child1) return;	// Nothing to do.
 
   // First flatten the children.
   // @@@ Is this the most optimal solution?
-  child1->Flatten ();
-  child2->Flatten ();
+  child1->FlattenTo (node);
+  child2->FlattenTo (node);
 
   csSimpleKDTree* c1 = child1; child1 = NULL;
   csSimpleKDTree* c2 = child2; child2 = NULL;
@@ -547,17 +568,21 @@ void csSimpleKDTree::Flatten ()
     if (obj->num_leafs == 1)
     {
       CS_ASSERT (obj->leafs[0] == c1);
-      obj->leafs[0] = this;
-      AddObject (obj);
-      UpdateBBox (obj->bbox);
+      obj->leafs[0] = node;
+      node->AddObject (obj);
+      node->UpdateBBox (obj->bbox);
     }
     else
     {
-      if (obj->FindLeaf (this) == -1)
+      if (obj->FindLeaf (node) == -1)
       {
-        obj->ReplaceLeaf (c1, this);
-	AddObject (obj);
-        UpdateBBox (obj->bbox);
+        obj->ReplaceLeaf (c1, node);
+	node->AddObject (obj);
+        node->UpdateBBox (obj->bbox);
+      }
+      else
+      {
+        obj->RemoveLeaf (c1);
       }
     }
   }
@@ -567,23 +592,49 @@ void csSimpleKDTree::Flatten ()
     if (obj->num_leafs == 1)
     {
       CS_ASSERT (obj->leafs[0] == c2);
-      obj->leafs[0] = this;
-      AddObject (obj);
-      UpdateBBox (obj->bbox);
+      obj->leafs[0] = node;
+      node->AddObject (obj);
+      node->UpdateBBox (obj->bbox);
     }
     else
     {
-      if (obj->FindLeaf (this) == -1)
+      if (obj->FindLeaf (node) == -1)
       {
-        obj->ReplaceLeaf (c2, this);
-	AddObject (obj);
-        UpdateBBox (obj->bbox);
+        obj->ReplaceLeaf (c2, node);
+	node->AddObject (obj);
+        node->UpdateBBox (obj->bbox);
+      }
+      else
+      {
+        obj->RemoveLeaf (c2);
       }
     }
   }
+  delete[] c1->objects;
+  c1->objects = NULL;
+  c1->num_objects = 0;
+  c1->max_objects = 0;
+  delete[] c2->objects;
+  c2->objects = NULL;
+  c2->num_objects = 0;
+  c2->max_objects = 0;
+  delete c1;
+  delete c2;
 }
 
-bool csSimpleKDTree::Front2Back (const csVector3& pos, csSimpleKDTreeVisitFunc* func,
+void csSimpleKDTree::Flatten ()
+{
+  if (!child1) return;	// Nothing to do.
+
+  disallow_distribute = false;
+  obj_bbox_valid = false;
+
+  FlattenTo (this);
+  return;
+}
+
+bool csSimpleKDTree::Front2Back (const csVector3& pos,
+	csSimpleKDTreeVisitFunc* func,
   	void* userdata, uint32 cur_timestamp)
 {
   CS_ASSERT (this != NULL);
@@ -620,7 +671,8 @@ void csSimpleKDTree::ResetTimestamps ()
   }
 }
 
-void csSimpleKDTree::Front2Back (const csVector3& pos, csSimpleKDTreeVisitFunc* func,
+void csSimpleKDTree::Front2Back (const csVector3& pos,
+	csSimpleKDTreeVisitFunc* func,
   	void* userdata)
 {
   if (global_timestamp > 4000000000u)

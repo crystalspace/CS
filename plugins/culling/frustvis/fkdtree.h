@@ -204,6 +204,11 @@ private:
    */
   void ResetTimestamps ();
 
+  /**
+   * Flatten the children of this node to the given node.
+   */
+  void FlattenTo (csSimpleKDTree* node);
+
 public:
   /// Create a new empty KD-tree.
   csSimpleKDTree (csSimpleKDTree* parent);

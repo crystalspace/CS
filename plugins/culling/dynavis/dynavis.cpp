@@ -152,18 +152,12 @@ SCF_IMPLEMENT_IBASE_END
 
 void csVisibilityObjectWrapper::ObjectModelChanged (iObjectModel* /*model*/)
 {
-  if (updating) return;
-  updating = true;
-  dynavis->UpdateObject (this);
-  updating = false;
+  dynavis->AddObjectToUpdateQueue (this);
 }
 
 void csVisibilityObjectWrapper::MovableChanged (iMovable* /*movable*/)
 {
-  if (updating) return;
-  updating = true;
-  dynavis->UpdateObject (this);
-  updating = false;
+  dynavis->AddObjectToUpdateQueue (this);
 }
 
 //----------------------------------------------------------------------
@@ -192,6 +186,8 @@ csDynaVis::csDynaVis (iBase *iParent)
   stats_cnt_vistest = 0;
   stats_total_vistest_time = 0;
   stats_total_notvistest_time = 0;
+
+  updating = false;
 
   do_cull_frustum = true;
   do_cull_coverage = COVERAGE_OUTLINE;
@@ -350,6 +346,27 @@ void csDynaVis::UnregisterVisObject (iVisibilityObject* visobj)
       return;
     }
   }
+}
+
+void csDynaVis::AddObjectToUpdateQueue (csVisibilityObjectWrapper* visobj_wrap)
+{
+  if (updating) return;
+  update_queue.Add (visobj_wrap);
+}
+
+void csDynaVis::UpdateObjects ()
+{
+  updating = true;
+  {
+    csHashIterator it (update_queue.GetHashMap ());
+    while (it.HasNext ())
+    {
+      csVisibilityObjectWrapper* vw = (csVisibilityObjectWrapper*)it.Next ();
+      UpdateObject (vw);
+    }
+  }
+  update_queue.DeleteAll ();
+  updating = false;
 }
 
 void csDynaVis::UpdateObject (csVisibilityObjectWrapper* visobj_wrap)

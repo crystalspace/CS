@@ -1,7 +1,25 @@
 The history order is reversed so that new features are at the top.
 
 11-Dec-2002
-	- Keith Fulton added the <lightcolor> trigger condition tag
+	- Optimization in frustvis where the updates of objects in the
+	  visibility culler are put on a queue and only performed when
+	  actually needed. This means that movable->UpdateMove() no longer
+	  causes a kdtree rebuild every time.
+	- Fixed a rather big bug in the frustvis kdtree->Flatten() function.
+	  It would not properly unlink objects from the parent leafs in all
+	  cases. Also the leafs were not destructed which is a memory
+	  leak.
+	- Optimization in the frustvis kdtree so that MoveObject()
+	  flattens() the affected part of the tree every 50 times it is
+	  called. This greatly increases the quality of the tree while
+	  keeping the overhead of calling Flatten() considerably.
+	- Optimized frustvis->Flatten() by flattening directly to the
+	  top-node instead of doing this in a recursive manner.
+	- The result of all the optimizations in the kdtree means that
+	  walktest flarge will no longer keep slowing down when looking
+	  at the robot.
+	- Added all frustvis/kdtree changes above also to dynavis/kdtree.
+	- Keith Fulton added the <lightvalue> trigger condition tag
 	  to the sequence manager.  The flarge demo now has two
 	  sequences which are listening to the light on the stairs.
 	  One fires when the lights get very dim and the other fires
