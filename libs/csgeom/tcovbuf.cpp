@@ -27,7 +27,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/csrect.h"
 #include "csgeom/transfrm.h"
-#include "tcovbuf.h"
+#include "csgeom/tcovbuf.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"

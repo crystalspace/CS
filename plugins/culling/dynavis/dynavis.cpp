@@ -35,6 +35,7 @@
 #include "csgeom/poly2d.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/kdtree.h"
+#include "csgeom/tcovbuf.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
 #include "igeom/clip2d.h"
@@ -56,7 +57,6 @@
 #include "ivaria/reporter.h"
 #include "ivaria/bugplug.h"
 #include "dynavis.h"
-#include "tcovbuf.h"
 #include "wqueue.h"
 #include "exvis.h"
 

@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+29-Jan-2005
+	- Jorrit moved the tiled coverage buffer from Dynavis to csgeom.
+	  This class is going to be useful for the PVS calculator.
 28-Jan-2005
 	- Andrew Mann fixed bugs in the software sound renderer which prevented
 	  looping from working, and which caused a gap in the looping process.

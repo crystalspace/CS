@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2002 by Jorrit Tyberghein
+    Copyright (C) 2002-2005 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_TCOVBUF_H__
-#define __CS_TCOVBUF_H__
+#ifndef __CS_CSGEOM_TCOVBUF_H__
+#define __CS_CSGEOM_TCOVBUF_H__
 
 #include "csgeom/vector2.h"
 #include "csgeom/math2d.h"
@@ -673,5 +673,5 @@ public:
   } scfiDebugHelper;
 };
 
-#endif // __CS_TCOVBUF_H__
+#endif // __CS_CSGEOM_TCOVBUF_H__
 
