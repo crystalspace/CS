@@ -60,6 +60,32 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine modified cs.txi so that @value{TITLE} now expands to
 	  just "Crystal Space" rather than "Crytal Space" plus the version
 	  number.
+	- Andrew Zabolotny improved, yet again, text drawing speed both with
+	  transparent and filled background from 340.000 & 345.000 characters
+	  per second to respectively ~380.000 and ~520.000 characters per
+	  second (11% and 50% speed increase without and with transparent
+	  background respectively).
+	- Andrew Zabolotny fixed a bug in text clipping introduced by previous
+	  batch of improvements to the canvas plugins that resulted in text
+	  caret moving sometimes twice for one character (this was seen as
+	  misplaced menu text in MazeD for example).
+	- Andrew Zabolotny made the following changes to MazeD:
+	    - Changed the term "modification axis" into more correct
+	      "modification origin" everywhere.
+	    - The "Slide view" mode now allows to position the depth position
+	      of the "camera target" point.  This is done by entering the
+	      "slide view" mode (by clicking the "oblique arrow surrounded by
+	      a square" button on lower toolbar) and by holding down left
+	      mouse button in the target view; then move it with SHIFT key
+	      pressed to change the depth of the point that camera is looking
+	      at.  This does not change the position of the view, but changes
+	      the behaviour when you rotate around it (for example with arrow
+	      keys).  Same applies to "modification origin define" mode (e.g.
+	      SHIFT key allows to modify the depth rather than shifting origin
+	      in the view plane).
+	    - Fixed a bug with cloning an already cloned light (SIGSEGV).
+	    - World save is back.  I have reorganized saving to allow future
+	      extensions for saving to different file formats.
 	- Eric Sunshine reverted the change to dnparse.h which Wyatt Miler
 	  made on 7 July 2000, since it introduced incorrect and buggy
 	  behavior.  Applied a different patch which should be acceptable even
