@@ -79,11 +79,17 @@ public:
   csRef<iShadowReceiver> receiver;
   csRef<iThingState> thing_state;	// Optional.
 
+  // The 'updating' flag is true if the object is being updated. This flag
+  // is to prevent us from updating it again (if the callback is fired
+  // again).
+  bool updating;
+
   csVisibilityObjectWrapper (csDynaVis* dynavis)
   {
     SCF_CONSTRUCT_IBASE (NULL);
     history = new csVisibilityObjectHistory ();
     csVisibilityObjectWrapper::dynavis = dynavis;
+    updating = false;
   }
   virtual ~csVisibilityObjectWrapper ()
   {

@@ -151,12 +151,18 @@ SCF_IMPLEMENT_IBASE_END
 
 void csVisibilityObjectWrapper::ObjectModelChanged (iObjectModel* /*model*/)
 {
+  if (updating) return;
+  updating = true;
   dynavis->UpdateObject (this);
+  updating = false;
 }
 
 void csVisibilityObjectWrapper::MovableChanged (iMovable* /*movable*/)
 {
+  if (updating) return;
+  updating = true;
   dynavis->UpdateObject (this);
+  updating = false;
 }
 
 //----------------------------------------------------------------------

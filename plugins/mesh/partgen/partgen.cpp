@@ -95,6 +95,8 @@ csParticleSystem::~csParticleSystem()
 
 void csParticleSystem::RemoveParticles ()
 {
+  if (particles.Length () <= 0) return;
+
   int i;
   for (i=0 ; i < particles.Length () ; i++)
     if (particles[i])

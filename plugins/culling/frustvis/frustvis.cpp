@@ -141,12 +141,18 @@ SCF_IMPLEMENT_IBASE_END
 
 void csFrustVisObjectWrapper::ObjectModelChanged (iObjectModel* /*model*/)
 {
+  if (updating) return;
+  updating = true;
   frustvis->UpdateObject (this);
+  updating = false;
 }
 
 void csFrustVisObjectWrapper::MovableChanged (iMovable* /*movable*/)
 {
+  if (updating) return;
+  updating = true;
   frustvis->UpdateObject (this);
+  updating = false;
 }
 
 //----------------------------------------------------------------------

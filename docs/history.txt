@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+8-Nov-2002
+	- Dynavis and Frustvis now make sure that their update callbacks
+	  (for when the object or movable changes) are protected against
+	  multiple updates. i.e. when the update is in progress the
+	  callback is disabled until the update is finished again. This
+	  prevents infinite loop when the call to get the object bounding
+	  box from the object resulted in a call to the callback and so on.
 7-Nov-2002
 	- Removed a warning in Dynavis reported by valgrind. Was not
 	  really harmful though.

@@ -55,6 +55,11 @@ public:
   csRef<iShadowReceiver> receiver;
   csRef<iThingState> thing_state;
 
+  // The 'updating' flag is true if the object is being updated. This flag
+  // is to prevent us from updating it again (if the callback is fired
+  // again).
+  bool updating;
+
   csFrustVisObjectWrapper (csFrustumVis* frustvis)
   {
     SCF_CONSTRUCT_IBASE (NULL);

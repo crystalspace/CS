@@ -45,8 +45,8 @@ void csRainMeshObject::SetupObject ()
 {
   if (!initialized)
   {
-    RemoveParticles ();
     initialized = true;
+    RemoveParticles ();
     delete[] part_pos;
     delete[] drop_stop;
 
