@@ -74,7 +74,6 @@ public:
   struct Collection : public iCollection
   {
     SCF_DECLARE_EMBEDDED_IBASE (csCollection);
-    virtual void* GetPrivateObject () { return (void*)scfParent; }
     virtual iObject *QueryObject()
       { return scfParent; }
     virtual iObject* FindObject (char* name) const

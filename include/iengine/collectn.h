@@ -31,9 +31,6 @@ SCF_VERSION (iCollection, 0, 0, 3);
  */
 struct iCollection : public iBase
 {
-  /// @@@ UGLY
-  virtual void* GetPrivateObject () = 0;
-
   /// Query the iObject for this collection
   virtual iObject *QueryObject() = 0;
 
