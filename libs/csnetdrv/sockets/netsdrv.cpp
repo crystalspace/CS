@@ -23,7 +23,9 @@
 #include "isystem.h"
 #include "csutil/util.h"
 
-#if defined(OS_WIN32)
+#if defined(OS_BE)
+#define CS_CLOSESOCKET closesocket
+#elif defined(OS_WIN32)
 #define CS_IOCTLSOCKET ioctlsocket
 #define CS_CLOSESOCKET closesocket
 #define EWOULDBLOCK WSAEWOULDBLOCK
@@ -65,8 +67,7 @@ csNetworkDriverError csSocketEndPoint::GetLastError() const {return LastError;}
 csSocketEndPoint::csSocketEndPoint(csNetworkSocket s, bool blocks) :
   Socket(s), LastError(CS_NET_ERR_NO_ERROR)
 {
-  unsigned long flag = (blocks ? 0 : 1);
-  if (CS_IOCTLSOCKET(Socket, FIONBIO, &flag) == -1)
+  if (!PlatformSetBlocking(blocks))
   {
     LastError = CS_NET_ERR_CANNOT_SET_BLOCKING_MODE;
     CloseSocket();
@@ -92,6 +93,24 @@ bool csSocketEndPoint::ValidateSocket()
   return ok;
 }
 
+#if !defined(OS_BE)
+
+bool csSocketEndPoint::PlatformSetBlocking(bool blocks)
+{
+  unsigned long flag = (blocks ? 0 : 1);
+  return (CS_IOCTLSOCKET(Socket, FIONBIO, &flag) == -1);
+}
+
+#else
+
+bool csSocketEndPoint::PlatformSetBlocking(bool blocks)
+{
+  const unsigned char flag = (blocks ? 0x00 : 0xff);
+  return (setsockopt(Socket, SOL_SOCKET, SO_NONBLOCK, &flag,
+    sizeof(flag)) >= 0);
+}
+
+#endif
 
 // csSocketConnection ---------------------------------------------------------
 
@@ -106,7 +125,7 @@ bool csSocketConnection::Send(const void* data, size_t nbytes)
   bool ok = false;
   if (ValidateSocket())
   {
-    if (send(Socket, (const char*)data, nbytes, 0) != -1)
+    if (send(Socket, (char*)data, nbytes, 0) != -1)
       ok = true;
     else
       LastError = CS_NET_ERR_CANNOT_SEND;
@@ -119,7 +138,7 @@ size_t csSocketConnection::Receive(void* buff, size_t maxbytes)
   size_t received = 0;
   if (ValidateSocket())
   {
-    received = recv(Socket, (char*) buff, maxbytes, 0);
+    received = recv(Socket, (char*)buff, maxbytes, 0);
     if (received == (size_t)-1)
     {
       received = 0;
@@ -269,7 +288,8 @@ iNetworkConnection* csSocketDriver::NewConnection(
 	}
       }
     }
-    delete[] host;
+    if (host != NULL)
+      free(host);
   }
   return connection;
 }

@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_NETWORK_SOCKETS_H__
-#define __CS_NETWORK_SOCKETS_H__
+#ifndef __CS_NETSDRV_H__
+#define __CS_NETSDRV_H__
 
 #include "inetdrv.h"
 #include "drvsdefs.h"
@@ -31,6 +31,7 @@ protected:
   void CloseSocket();
   void ClearError();
   bool ValidateSocket();
+  bool PlatformSetBlocking(bool);
 public:
   csSocketEndPoint(csNetworkSocket s, bool blocks);
   virtual ~csSocketEndPoint();
@@ -103,4 +104,4 @@ public:
   DECLARE_IBASE;
 };
 
-#endif // __CS_NETWORK_SOCKETS_H__
+#endif // __CS_NETSDRV_H__
