@@ -95,6 +95,30 @@ bool csBasicVector::Delete (int n)
     return false;
 }
 
+
+bool csBasicVector::InsertChunk (int n, int size , csSome Item)
+{ // no run-time checks here, just in debug mode
+  CS_ASSERT( n <= count );
+  SetLength (count + size); // Increments 'count' as a side-effect
+  const int nmove = (count - (n + size));
+  CS_ASSERT(nmove > 0);
+  memmove ( &root [ n + size ] , &root [ n ] , nmove * sizeof (csSome) );
+  memcpy  ( &root [ n ] , Item , size * sizeof (csSome) );
+  return true;  
+}
+
+bool csBasicVector::DeleteChunk (int n, int size)
+{ // no run-time checks here, just in debug mode
+  CS_ASSERT( (n >= 0) && (n < count) );
+  CS_ASSERT( (size >= 0) && ( n + size < count ) );
+  const int ncount = count - size;
+  const int nmove  = ncount - n;
+  CS_ASSERT( nmove > 0 );
+  memmove (&root [ n ] , &root [ n + size ] , nmove * sizeof (csSome) );
+  SetLength (ncount);
+  return true;
+}
+
 void csVector::DeleteAll (bool FreeThem)
 {
   if (FreeThem)
