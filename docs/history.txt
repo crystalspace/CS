@@ -42,6 +42,8 @@ The history order is reversed so that new features are at the top.
 	    - Replaced defines for PI, M_PI, and M_PI_2 with static const
 	      floats to increase efficiency. For castle this gives an
 	      improvement of 14 -> 19 FPS which is nothing to sneer at!
+	- Fixed CS a little for compilation on Solaris/X86. Fixes given
+	  to me by Markus Korth <mkorth@military.de>.
 11-Oct-2001
 	- Moved the plugin manager implementation out of the system driver
 	  into csPluginManager (in csutil/plugmgr.h). Modified
