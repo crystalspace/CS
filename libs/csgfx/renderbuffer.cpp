@@ -78,14 +78,17 @@ void csRenderBuffer::Release ()
   isLocked = false;
 }
 
-void csRenderBuffer::CopyInto (const void *data, size_t elementCount)
+void csRenderBuffer::CopyInto (const void *data, size_t elementCount, 
+			       size_t elemOffset)
 {
   if (masterBuffer.IsValid()) return;
+  const size_t elemSize = csRenderBufferComponentSizes[comptype] * compCount;
+  const size_t byteOffs = elemSize * elemOffset;
   version++;
   if (doCopy)
   {
-    memcpy (buffer, data, csMin (bufferSize, 
-      elementCount * csRenderBufferComponentSizes[comptype] * compCount));
+    memcpy (buffer + byteOffs, data, csMin (bufferSize - byteOffs, 
+      elementCount * elemSize));
   }
   else
   {
@@ -200,7 +203,7 @@ csRenderBufferName csRenderBuffer::GetBufferNameFromDescr (const char* name)
     int i = strcmp (strMap[m].descr, name);
     if (i == 0) return strMap[m].name;
     if (i < 0)
-      l = m;
+      l = m + 1;
     else
       r = m;
   }

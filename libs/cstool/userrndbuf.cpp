@@ -57,3 +57,62 @@ bool csUserRenderBufferManager::RemoveRenderBuffer (csStringID name)
   userBuffers.DeleteIndex (bufIndex);
   return true;
 }
+
+class BufferNameIter : public iUserRenderBufferIterator
+{
+  size_t index;
+public:
+  csArray<csStringID> names;
+  csRefArray<iRenderBuffer> buffers;
+
+  SCF_DECLARE_IBASE;
+
+  BufferNameIter() : index(0) {}
+  virtual ~BufferNameIter() {}
+
+  bool HasNext();
+  csStringID Next (csRef<iRenderBuffer>* buf = 0);
+  void Reset();
+};
+
+csRef<iUserRenderBufferIterator> csUserRenderBufferManager::GetBuffers() const
+{
+  csRef<BufferNameIter> newIter;
+  newIter.AttachNew (new BufferNameIter);
+  for (size_t i = 0; i < userBuffers.Length(); i++)
+  {
+    newIter->names.Push (userBuffers[i].name);
+    newIter->buffers.Push (userBuffers[i].buf);
+  }
+  return newIter;
+}
+
+//---------------------------------------------------------------------------
+
+SCF_IMPLEMENT_IBASE(BufferNameIter)
+  SCF_IMPLEMENTS_INTERFACE(iUserRenderBufferIterator)
+SCF_IMPLEMENT_IBASE_END
+
+bool BufferNameIter::HasNext()
+{
+  return index < names.Length();
+}
+
+csStringID BufferNameIter::Next (csRef<iRenderBuffer>* buf)
+{
+  if (index < names.Length())
+  {
+    if (buf != 0) *buf = buffers[index];
+    return names[index++];
+  }
+  else
+  {
+    if (buf != 0) *buf = 0;
+    return csInvalidStringID;
+  }
+}
+
+void BufferNameIter::Reset()
+{
+  index = 0;
+}

@@ -49,9 +49,6 @@ csGLPolygonRenderer::csGLPolygonRenderer (csGLGraphics3D* parent)
   buffer_accessor.AttachNew (new BufferAccessor(this));
   shadermanager = parent->shadermgr;
   bufferHolder.AttachNew (new csRenderBufferHolder);
-  bufferHolder->SetAccessor (buffer_accessor, CS_BUFFER_NORMAL_MASK |
-                                              CS_BUFFER_TANGENT_MASK |
-                                              CS_BUFFER_BINORMAL_MASK);
 }
 
 csGLPolygonRenderer::~csGLPolygonRenderer ()
@@ -102,6 +99,8 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
       CS_BUF_STATIC, CS_BUFCOMP_FLOAT, 2);
     csVector2* lmcoords = (csVector2*)lmcoords_buffer->Lock(CS_BUF_LOCK_NORMAL);
 #endif
+
+    csHash<csRef<iRenderBuffer>, csStringID> extraBufferData;
 
     index_buffer = csRenderBuffer::CreateIndexRenderBuffer (num_indices, 
       CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, 0, num_verts - 1);
@@ -201,6 +200,30 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
         pvIndices[j] = vindex++;
       }
 
+      if (extraBuffers[i] != 0)
+      {
+	// Assemble user buffer data
+	while (extraBuffers[i]->HasNext())
+	{
+	  csRef<iRenderBuffer> srcBuf;
+	  csStringID name = extraBuffers[i]->Next (&srcBuf);
+	  csRef<iRenderBuffer> dstBuf = extraBufferData.Get (name, 0);
+	  if (dstBuf == 0)
+	  {
+	    dstBuf = csRenderBuffer::CreateRenderBuffer (num_verts, CS_BUF_STATIC,
+	      srcBuf->GetComponentType(), srcBuf->GetComponentCount());
+	    void* bufData = dstBuf->Lock (CS_BUF_LOCK_NORMAL);
+	    memset (bufData, 0, dstBuf->GetSize());
+	    extraBufferData.Put (name, dstBuf);
+	    dstBuf->Release();
+	  }
+	  void* srcData = srcBuf->Lock (CS_BUF_LOCK_READ);
+	  dstBuf->CopyInto (srcData, srcBuf->GetElementCount(), pvIndices[0]);
+	  srcBuf->Release();
+	}
+	extraBuffers[i]->Reset();
+      }
+
       // Triangulate poly.
       for (j = 2; j < vc; j++)
       {
@@ -225,6 +248,34 @@ void csGLPolygonRenderer::PrepareBuffers (uint& indexStart, uint& indexEnd)
   #else
     masterBuffer->Release ();
   #endif
+
+    // Finally, add custom buffers to accessor
+    uint accessorMask = 
+      CS_BUFFER_NORMAL_MASK | CS_BUFFER_TANGENT_MASK | CS_BUFFER_BINORMAL_MASK;
+    csHash<csRef<iRenderBuffer>, csStringID>::GlobalIterator userBufIt =
+      extraBufferData.GetIterator();
+
+    while (userBufIt.HasNext())
+    {
+      csStringID name;
+      csRef<iRenderBuffer> buf = userBufIt.Next (name);
+      csRenderBufferName bufName = 
+	csRenderBuffer::GetBufferNameFromDescr (parent->strings->Request (name));
+      if (bufName >= CS_BUFFER_POSITION)
+      {
+	accessorMask &= ~(1 << bufName);
+	bufferHolder->SetRenderBuffer (bufName, buf);
+      }
+      else
+      {
+	if (svcontext == 0) 
+	  svcontext.AttachNew (new csShaderVariableContext());
+	csShaderVariable* sv = svcontext->GetVariableAdd (name);
+	sv->SetValue (buf);
+      }
+    }
+
+    bufferHolder->SetAccessor (buffer_accessor, accessorMask);
   }
   else
   {
@@ -239,6 +290,21 @@ void csGLPolygonRenderer::PrepareRenderMesh (csRenderMesh& mesh)
   PrepareBuffers (mesh.indexstart, mesh.indexend);
   mesh.geometryInstance = this;
   mesh.buffers = bufferHolder;
+  
+  if (svcontext != 0)
+  {
+    if (mesh.variablecontext.IsValid())
+    {
+      const csRefArray<csShaderVariable>& svcVars = 
+	svcontext->GetShaderVariables();
+      for (size_t i = 0; i < svcVars.Length(); i++)
+      {
+	mesh.variablecontext->AddVariable (svcVars[i]);
+      }
+    }
+    else
+      mesh.variablecontext = svcontext;
+  }
 }
 
 void csGLPolygonRenderer::Clear ()
@@ -247,9 +313,11 @@ void csGLPolygonRenderer::Clear ()
   polysNum++;
 }
 
-void csGLPolygonRenderer::AddPolygon (csPolygonRenderData* poly)
+void csGLPolygonRenderer::AddPolygon (csPolygonRenderData* poly,
+				      iUserRenderBufferIterator* extraBuffers)
 {
   polys.Push (poly);
+  this->extraBuffers.Push (extraBuffers);
   polysNum++;
 }
 

@@ -20,8 +20,12 @@
 #ifndef __CS_CANVAS_COMMON_DRAW_COMMON_H__
 #define __CS_CANVAS_COMMON_DRAW_COMMON_H__
 
+/**\file
+ * Common software canvas drawing tools.
+ */
 #include "graph2d.h"
 
+/// Split a g2d color into the color and alpha part.
 template<class Tpixel>
 static void SplitAlpha (const int color, Tpixel& colorPart, uint8& alphaPart)
 {
@@ -29,6 +33,7 @@ static void SplitAlpha (const int color, Tpixel& colorPart, uint8& alphaPart)
   alphaPart = 255 - (color >> 24);
 }
 
+/// PixMixer that ignores alpha.
 template<class Tpixel>
 class csPixMixerCopy
 {
@@ -44,6 +49,7 @@ public:
   }
 };
 
+/// PixMixer that mixes the pixel into the background with alpha
 template<class Tpixel>
 class csPixMixerRGBA
 {
@@ -79,6 +85,7 @@ public:
   }
 };
 
+/// PixMixer that doesn't do anything.
 template<class Tpixel>
 class csPixMixerNoop
 {

@@ -31,6 +31,21 @@
 #include "ivideo/rndbuf.h"
 #include "iutil/strset.h"
 
+SCF_VERSION(iUserRenderBufferIterator, 0, 0, 1);
+
+/**
+ * Interface to iterate over all buffers stored in a csUserRenderBufferManager.
+ */
+struct iUserRenderBufferIterator : public iBase
+{
+  /// Whether a next buffer is available.
+  virtual bool HasNext() = 0;
+  /// Get name of next buffer and optionally the buffer.
+  virtual csStringID Next (csRef<iRenderBuffer>* buf = 0) = 0;
+  /// Rewind to beginning.
+  virtual void Reset() = 0;
+};
+
 /**
  * Helper class to manage multiple render buffers, usually provided by the
  * user.
@@ -70,6 +85,8 @@ public:
    * added.
    */
   bool RemoveRenderBuffer (csStringID name);
+
+  csRef<iUserRenderBufferIterator> GetBuffers() const;
 };
 
 #endif // __CS_CSTOOL_USERRNDBUF_H__

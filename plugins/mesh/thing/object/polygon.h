@@ -26,6 +26,7 @@
 #include "csgeom/transfrm.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/polyidx.h"
+#include "cstool/userrndbuf.h"
 #include "polytext.h"
 #include "iengine/movable.h"
 #include "iengine/sector.h"
@@ -105,6 +106,8 @@ private:
    * the flat color (if no texture) and other parameters.
    */
   csRef<iMaterialWrapper> material;
+
+  csUserRenderBufferManager polyBuffers;
 
   /**
    * Return twice the signed area of the polygon in world space coordinates

@@ -77,7 +77,8 @@ public:
   virtual void Release();
 
   /// Copy data to the render buffer.
-  virtual void CopyInto (const void *data, size_t elementCount);
+  virtual void CopyInto (const void *data, size_t elementCount,
+    size_t elemOffset = 0);
 
   /// Gets the number of components per element
   virtual int GetComponentCount () const

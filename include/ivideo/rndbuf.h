@@ -124,7 +124,8 @@ struct iRenderBuffer : public iBase
    * \remarks Does not work with interleaved buffer, copy to master buffer
    *  instead.
    */
-  virtual void CopyInto (const void *data, size_t elementCount) = 0;
+  virtual void CopyInto (const void *data, size_t elementCount,
+    size_t elemOffset = 0) = 0;
 
   /// Gets the number of components per element
   virtual int GetComponentCount () const = 0;
@@ -141,7 +142,7 @@ struct iRenderBuffer : public iBase
   /// Get the stride of the buffer (in bytes)
   virtual size_t GetStride() const = 0;
 
-  /// Get the distance between two elements (in bytes)
+  /// Get the distance between two elements (in bytes, includes stride)
   virtual size_t GetElementDistance() const = 0;
 
   /// Get the offset of the buffer (in bytes)
@@ -312,6 +313,8 @@ public:
     accessorMask = mask;
     accessor = a;
   }
+  /// Query the accessor mask
+  uint GetAccessorMask() const { return accessorMask; }
 protected:
   uint32 accessorMask;
   csRef<iRenderBufferAccessor> accessor;

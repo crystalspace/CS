@@ -611,7 +611,6 @@ void csGenmeshMeshObject::SetupShaderVariableContext ()
 {
   csShaderVariable* sv;
   
-
   bool ac_verts = false;
   bool ac_texels = false;
   bool ac_normals = false;

@@ -290,6 +290,12 @@ public:
   csPDelArray<csStaticPolyGroup> unlitPolys;
   csArray<StaticSuperLM*> superLMs;
 
+  /** 
+   * Used to verify whether poly-specific renderbuffers have the right
+   * properties.
+   */
+  csUserRenderBufferManager polyBufferTemplates;
+
   /**
    * This field describes how the light hitting polygons of this thing is
    * affected by the angle by which the beam hits the polygon. If this value is
@@ -498,6 +504,9 @@ public:
   virtual csFlags& GetPolygonFlags (int polygon_idx);
   virtual const csPlane3& GetPolygonObjectPlane (int polygon_idx);
   virtual bool IsPolygonTransparent (int polygon_idx);
+
+  virtual bool AddPolygonRenderBuffer (int polygon_idx, const char* name,
+    iRenderBuffer* buffer);
 
   //-------------------- iMeshObjectFactory interface implementation ----------
 
@@ -1141,6 +1150,7 @@ public:
   csWeakRef<iGraphics3D> G3D;
   /// An object pool for lightpatches.
   csLightPatchPool* lightpatch_pool;
+  csRef<iStringSet> stringset;
 
   /**
    * Block allocators for various types of objects in thing.

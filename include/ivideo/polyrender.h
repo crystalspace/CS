@@ -35,6 +35,7 @@
 class csVector3;
 class csMatrix3;
 struct csRenderMesh;
+struct iUserRenderBufferIterator;
 
 /**
  * This structure holds mapping information to map the texture and lightmap on
@@ -240,7 +241,8 @@ struct iPolygonRenderer : public iBase
   virtual void PrepareRenderMesh (csRenderMesh& mesh) = 0;
   
   virtual void Clear () = 0;
-  virtual void AddPolygon (csPolygonRenderData* poly) = 0;
+  virtual void AddPolygon (csPolygonRenderData* poly, 
+    iUserRenderBufferIterator* extraBuffers) = 0;
 };
 
 /** @} */

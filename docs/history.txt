@@ -25,6 +25,8 @@ chronological order.
 	  parser.
 	- Anders Stenberg added functionality to multiple materials
 	  on genmesh instances. 
+	- res added the ability to attach custom data to Thing polygons. Just
+	  add a <renderbuffer> in a <p>.
 25-Feb-2005
 	- Jorrit added a new HOWTO that explains how to compile external
 	  applications for Crystal Space and CEL using Dev-CPP.

@@ -17,16 +17,22 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CANVAS_COMMON_DRAW_LINE_H__
-#define __CS_CANVAS_COMMON_DRAW_LINE_H__
+#ifndef __CS_CSPLUGINCOMMON_CANVAS_DRAW_LINE_H__
+#define __CS_CSPLUGINCOMMON_CANVAS_DRAW_LINE_H__
+
+/**\file
+ * Software canvas line drawing.
+ */
 
 #include "draw_common.h"
 #include "csqint.h"
 
+/// Class to draw a line.
 template<class Tpixel, class Tpixmixer>
 class csG2DDrawLine
 {
 public:
+  /// Draw a line.
   static void DrawLine (csGraphics2D* G2D, float x1, float y1, float x2, float y2,
     Tpixel color, uint8 alpha)
   {
@@ -101,4 +107,4 @@ public:
   }
 };
 
-#endif // __CS_CANVAS_COMMON_DRAW_LINE_H__
+#endif // __CS_CSPLUGINCOMMON_CANVAS_DRAW_LINE_H__

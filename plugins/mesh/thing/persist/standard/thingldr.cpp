@@ -90,7 +90,8 @@ enum
   XMLTOKEN_TEXLEN,
   XMLTOKEN_VISTREE,
   XMLTOKEN_V,
-  XMLTOKEN_SMOOTH
+  XMLTOKEN_SMOOTH,
+  XMLTOKEN_RENDERBUFFER
 };
 
 SCF_IMPLEMENT_IBASE (csThingLoader)
@@ -175,6 +176,7 @@ bool csThingLoader::Initialize (iObjectRegistry* object_reg)
   xmltokens.Register ("matrix", XMLTOKEN_MATRIX);
   xmltokens.Register ("orig", XMLTOKEN_ORIG);
   xmltokens.Register ("origref", XMLTOKEN_ORIGREF);
+  xmltokens.Register ("renderbuffer", XMLTOKEN_RENDERBUFFER);
   return true;
 }
 
@@ -417,6 +419,15 @@ bool csThingLoader::ParsePortal (
   return true;
 }
 
+struct ParsedRB
+{ 
+  csString name;
+  csRef<iRenderBuffer> buf; 
+  csRef<iDocumentNode> node;
+  ParsedRB (const char* name, iRenderBuffer* b, iDocumentNode* n) : 
+    name (name), buf (b), node (n) {}
+};
+
 bool csThingLoader::ParsePoly3d (
         iDocumentNode* node,
 	iLoaderContext* ldr_context,
@@ -462,6 +473,7 @@ bool csThingLoader::ParsePoly3d (
   int set_colldet = 0; // If 1 then set, if -1 then reset, else default.
   int set_viscull = 0; // If 1 then set, if -1 then reset, else default.
   csDirtyAccessArray<int> vertices_to_add;
+  csArray<ParsedRB> renderbuffers;
 
   // For portals.
   csRef<iDocumentNode> portal_node;
@@ -576,6 +588,21 @@ bool csThingLoader::ParsePoly3d (
 	  "crystalspace.thingldr.polygon",
 	  child, "<mixmode> for polygons is no longer supported! Use <mixmode> for the entire mesh instead!");
 	return false;
+      case XMLTOKEN_RENDERBUFFER:
+	{
+	  const char *name = child->GetAttributeValue("name");
+	  if ((name == 0) || (*name == 0))
+	  {
+	    synldr->ReportError ("crystalspace.thingldr.polygon",
+	      child, "<renderbuffer>s must have names");
+	    return false;
+	  }
+
+	  csRef<iRenderBuffer> rb = synldr->ParseRenderBuffer (child);
+	  if (!rb.IsValid()) return false;
+	  renderbuffers.Push (ParsedRB (name, rb, child));
+	}
+	break;
       default:
         synldr->ReportBadToken (child);
         return false;
@@ -838,6 +865,28 @@ bool csThingLoader::ParsePoly3d (
     thing_fact_state->SetPolygonFlags (CS_POLYRANGE_LAST, CS_POLY_COLLDET);
   else if (set_colldet == -1)
     thing_fact_state->ResetPolygonFlags (CS_POLYRANGE_LAST, CS_POLY_COLLDET);
+
+  for (size_t i  = 0; i < renderbuffers.Length(); i++)
+  {
+    const ParsedRB& rb = renderbuffers[i];
+    if (rb.buf->GetElementCount() != vertices_to_add.Length())
+    {
+      synldr->ReportError ("crystalspace.thingldr.polygon", rb.node,
+	"Render buffer element count does not match polygon vertex count: "
+	"%u != %u", (uint)rb.buf->GetElementCount(), 
+	(uint)vertices_to_add.Length());
+      return false;
+    }
+    if (!thing_fact_state->AddPolygonRenderBuffer (CS_POLYINDEX_LAST, 
+      rb.name, rb.buf))
+    {
+      synldr->ReportError ("crystalspace.thingldr.polygon", rb.node,
+	"Either a renderbuffer '%s' was already attached to the polygon "
+	"or the format does not match other buffers of the same name attached "
+	"to other polygons.", rb.name.GetData());
+      return false;
+    }
+  }
 
   return true;
 }

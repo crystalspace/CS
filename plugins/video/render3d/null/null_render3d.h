@@ -49,7 +49,8 @@ public:
 
   virtual void PrepareRenderMesh (csRenderMesh&) { }
   virtual void Clear () { }
-  virtual void AddPolygon (csPolygonRenderData*) { }
+  virtual void AddPolygon (csPolygonRenderData*, 
+    iUserRenderBufferIterator*) { }
 };
 
 class csNullGraphics3D : public iGraphics3D

@@ -36,6 +36,7 @@ struct iMeshObject;
 struct iMeshObjectFactory;
 struct iThingState;
 struct iThingFactoryState;
+struct iRenderBuffer;
 
 /**
  * A range structure for specifing polygon ranges.
@@ -643,6 +644,9 @@ struct iThingFactoryState : public iBase
    * default is used.
    */
   virtual void SetCosinusFactor (float cosfact) = 0;
+
+  virtual bool AddPolygonRenderBuffer (int polygon_idx, const char* name,
+    iRenderBuffer* buffer) = 0;
 };
 
 SCF_VERSION (iThingState, 0, 7, 0);

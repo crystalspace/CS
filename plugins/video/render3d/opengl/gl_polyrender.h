@@ -21,6 +21,7 @@
 #include "csutil/array.h"
 #include "csutil/leakguard.h"
 #include "ivideo/polyrender.h"
+#include "cstool/userrndbuf.h"
 
 class csGLGraphics3D;
 
@@ -32,6 +33,7 @@ private:
   uint polysNum;
 
   csArray<csPolygonRenderData*> polys;
+  csRefArray<iUserRenderBufferIterator> extraBuffers;
   csRef<iShaderManager> shadermanager;
 
   csRef<csRenderBufferHolder> bufferHolder;
@@ -42,6 +44,7 @@ private:
   csRef<iRenderBuffer> lmcoords_buffer;
   uint rbIndexStart, rbIndexEnd;
 
+  csRef<csShaderVariableContext> svcontext;
   
   void PrepareBuffers (uint& indexStart, uint& indexEnd);
 
@@ -92,7 +95,8 @@ public:
   virtual void PrepareRenderMesh (csRenderMesh& mesh);
   
   virtual void Clear ();
-  virtual void AddPolygon (csPolygonRenderData* poly);
+  virtual void AddPolygon (csPolygonRenderData* poly,
+    iUserRenderBufferIterator* extraBuffers);
 
 };
 

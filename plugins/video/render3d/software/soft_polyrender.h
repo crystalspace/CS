@@ -44,12 +44,13 @@ public:
   virtual void PrepareRenderMesh (csRenderMesh& mesh);
 
   virtual void Clear ();
-  virtual void AddPolygon (csPolygonRenderData* poly);
+  virtual void AddPolygon (csPolygonRenderData* poly,
+    iUserRenderBufferIterator* extraBuffers);
 
   virtual void* Lock(csRenderBufferLockType lockType) 
   { return 0; }
   virtual void Release() {}
-  virtual void CopyInto (const void *data, size_t length) {}
+  virtual void CopyInto (const void*, size_t, size_t) {}
   virtual int GetComponentCount () const { return 0; }
   virtual csRenderBufferComponentType GetComponentType () const 
   { return CS_BUFCOMP_FLOAT; }

@@ -21,6 +21,7 @@
 #define __CS_CSPLUGINCOMMON_CANVAS_DRAW_BOX_H__
 
 /**\file
+ * Draw a box to a (software) canvas.
  */
 
 #include "draw_common.h"

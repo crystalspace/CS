@@ -17,13 +17,23 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CANVAS_COMMON_DRAW_TEXT_H__
-#define __CS_CANVAS_COMMON_DRAW_TEXT_H__
+#ifndef __CS_CSPLUGINCOMMON_CANVAS_DRAW_TEXT_H__
+#define __CS_CSPLUGINCOMMON_CANVAS_DRAW_TEXT_H__
+
+/**\file
+ * Software text writing.
+ */
 
 #include "csutil/csuctransform.h"
 #include "draw_common.h"
 #include "csplugincommon/canvas/softfontcache.h"
 
+/**
+ * Class to write some text.
+ * Needs 3 PixMixers: one for to mix with the foreground color, 
+ * one to mix with the background color, one to interpolate between
+ * mixed FG and BG.
+ */
 template<class Tpixel, class Tpixmixer1, class Tpixmixer2, class Tpixmixer3>
 class csG2DDrawText
 {
@@ -369,4 +379,4 @@ public:
   }
 };
 
-#endif // __CS_CANVAS_COMMON_DRAW_TEXT_H___
+#endif // __CS_CSPLUGINCOMMON_CANVAS_DRAW_TEXT_H___

@@ -222,11 +222,7 @@ csThingStatic::csThingStatic (iBase* parent, csThingObjectType* thing_type) :
 
   if ((texLightmapName == csInvalidStringID))
   {
-    csRef<iStringSet> strings = 
-      CS_QUERY_REGISTRY_TAG_INTERFACE (thing_type->object_reg,
-        "crystalspace.shared.stringset", iStringSet);
-
-    texLightmapName = strings->Request ("tex lightmap");
+    texLightmapName = thing_type->stringset->Request ("tex lightmap");
   }
 }
 
@@ -1073,7 +1069,8 @@ void csThingStatic::FillRenderMeshes (
       size_t j;
       for (j = 0; j< pg.polys.Length(); j++)
       {
-	polyRenderer->AddPolygon (&static_polygons[pg.polys[j]]->polygon_data);
+	polyRenderer->AddPolygon (&static_polygons[pg.polys[j]]->polygon_data,
+	  static_polygons[pg.polys[j]]->polyBuffers.GetBuffers());
       }
     }
     else
@@ -1533,6 +1530,23 @@ const csPlane3& csThingStatic::GetPolygonObjectPlane (int polygon_idx)
 bool csThingStatic::IsPolygonTransparent (int polygon_idx)
 {
   return static_polygons[GetRealIndex (polygon_idx)]->IsTransparent ();
+}
+
+bool csThingStatic::AddPolygonRenderBuffer (int polygon_idx, const char* name,
+					    iRenderBuffer* buffer)
+{
+  csStringID nameID = thing_type->stringset->Request (name);
+  iRenderBuffer* Template;
+  if ((Template = polyBufferTemplates.GetRenderBuffer (nameID)) != 0)
+  {
+    if ((Template->GetComponentType() != buffer->GetComponentType())
+      || (Template->GetComponentCount() != buffer->GetComponentCount()))
+      return false;
+  }
+  else
+    polyBufferTemplates.AddRenderBuffer (nameID, buffer);
+  csPolygon3DStatic* sp = static_polygons[GetRealIndex (polygon_idx)];
+  return sp->polyBuffers.AddRenderBuffer (nameID, buffer);
 }
 
 bool csThingStatic::PointOnPolygon (int polygon_idx, const csVector3& v)
@@ -2848,6 +2862,8 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
   G3D = g;
   if (!g) return false;
 
+  stringset = CS_QUERY_REGISTRY (object_reg, iStringSet);
+
   lightpatch_pool = new csLightPatchPool ();
 
   csRef<iVerbosityManager> verbosemgr (
@@ -2881,6 +2897,9 @@ bool csThingObjectType::Initialize (iObjectRegistry *object_reg)
     Notify ("Lightmap quality=%d", csThing::lightmap_quality);
     Notify ("Lightmapping enabled=%d", csThing::lightmap_enabled);
   }
+
+  stringset = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, "crystalspace.shared.stringset", iStringSet);
 
   return true;
 }
