@@ -25,6 +25,7 @@ The history order has been reversed so that new features are at the top.
 	- Added csWorld parameter to csCollection constructor.
 	- Fixed a bug in csWorld::RemoveSky.
 	- Added csWorld::UnlinkCollection and csWorld::RemoveCollection.
+	- Fixed the apps in CS due to the latest changes (forgot to do that).
 	- Eric Sunshine worked around an instruction scheduling optimization
 	  bug in the MacOS/X Server compiler for PowerPC (Macintosh hardware).
 	  This bug was triggered by code in edgeclip.inc and would cause the

@@ -106,7 +106,7 @@ csCollisionPair *CD_contact = NULL;
 
   for( int i = 0; i < continuum_end; i++ ){
 
-    first_sector = space_time_continuum[i]->sprt->GetSector (0);
+    first_sector = space_time_continuum[i]->sprt->GetMovable ().GetSector (0);
     
     // Start collision detection.
     coli = space_time_continuum[i]->col;

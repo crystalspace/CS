@@ -294,7 +294,7 @@ void Phyztest::NextFrame ()
 
  //   CsPrintf (MSG_DEBUG_0, "adding chain\n");
     // use box template
-    csSpriteTemplate* bxtmpl = view->GetWorld ()->GetSpriteTemplate ("box");
+    csSpriteTemplate* bxtmpl = (csSpriteTemplate*)view->GetWorld ()->sprite_templates.FindByName ("box");
     if (!bxtmpl){     
       Printf (MSG_INITIALIZATION, "couldn't load template 'box'\n");
       return;
@@ -342,7 +342,7 @@ void Phyztest::NextFrame ()
   // simple mass on a spring demo
   if( GetKeyState (CSKEY_TAB) && bot == NULL ){
     // add a sprite
-    csSpriteTemplate* tmpl = view->GetWorld ()->GetSpriteTemplate ("box");
+    csSpriteTemplate* tmpl = (csSpriteTemplate*)view->GetWorld ()->sprite_templates.FindByName ("box");
     if (!tmpl){     
       Printf (MSG_INITIALIZATION, "couldn't load template 'bot'\n");
       return;
