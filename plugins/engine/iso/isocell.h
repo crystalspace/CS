@@ -19,6 +19,7 @@
 #ifndef __ISOCELL_H__
 #define __ISOCELL_H__
 
+#include "csutil/scf.h"
 #include "ivaria/iso.h"
 
 /// structure for use in cell tree
@@ -61,7 +62,7 @@ public:
   virtual void AddSprite(iIsoSprite *sprite, const csVector3& pos);
   virtual void RemoveSprite(iIsoSprite *sprite, const csVector3& pos);
   virtual void Draw(iIsoRenderView *rview);
-  virtual void Traverse(void (*func)(iIsoSprite*, void *), void *userdata);
+  virtual void Traverse(iIsoCellTraverseCallback* func);
 
 
 };

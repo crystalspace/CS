@@ -35,6 +35,8 @@ struct iTextureWrapper;
 
 class csProcTexture : public csObject
 {
+  friend struct ProcCallback;
+
 protected:
   // Will be set to true as soon as pt is initialized.
   bool ptReady;

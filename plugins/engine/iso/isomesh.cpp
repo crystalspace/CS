@@ -250,14 +250,14 @@ csIsoMeshSprite::csIsoMeshSprite (iBase *iParent)
   transform.Identity();
   grid = NULL;
   gridcall = NULL;
-  gridcalldata = NULL;
   mesh = NULL;
   zbufmode = CS_ZBUF_USE;
 }
 
 csIsoMeshSprite::~csIsoMeshSprite ()
 {
-  if(mesh) mesh->DecRef();
+  if (mesh) mesh->DecRef();
+  if (gridcall) gridcall->DecRef ();
 }
 
 
@@ -395,7 +395,7 @@ void csIsoMeshSprite::SetGrid(iIsoGrid *grid)
   if(csIsoMeshSprite::grid != grid)
   {
     csIsoMeshSprite::grid = grid;
-    if(gridcall) gridcall(this, gridcalldata);
+    if(gridcall) gridcall->GridChange (this);
   }
 }
 

@@ -53,9 +53,21 @@ csProcTexture::~csProcTexture ()
 {
 }
 
-void csProcTexture::ProcCallback (iTextureWrapper*, void* data)
+struct ProcCallback : public iTextureCallback
 {
-  csProcTexture* pt = (csProcTexture*)data;
+  csProcTexture* pt;
+  SCF_DECLARE_IBASE;
+  ProcCallback () { SCF_CONSTRUCT_IBASE (NULL); }
+  virtual ~ProcCallback () { }
+  virtual void UseTexture (iTextureWrapper*);
+};
+
+SCF_IMPLEMENT_IBASE (ProcCallback)
+  SCF_IMPLEMENTS_INTERFACE (iTextureCallback)
+SCF_IMPLEMENT_IBASE_END
+
+void ProcCallback::UseTexture (iTextureWrapper*)
+{
   pt->PrepareAnim ();
   csTime elapsed_time, current_time;
   pt->sys->GetElapsedTime (elapsed_time, current_time);
@@ -83,7 +95,12 @@ bool csProcTexture::Initialize (iSystem* system)
   tex->SetFlags (tex->GetFlags() | texFlags);
   tex->QueryObject ()->SetName (GetName ());
   if (use_cb)
-    tex->SetUseCallback (ProcCallback, (void*)this);
+  {
+    struct ProcCallback* cb = new struct ProcCallback ();
+    cb->pt = this;
+    tex->SetUseCallback (cb);
+    cb->DecRef ();
+  }
   ptReady = true;
   return true;
 }

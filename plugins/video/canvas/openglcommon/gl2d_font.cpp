@@ -91,7 +91,20 @@ bool GLFontCache::GLGlyphVector::FreeItem (csSome Item)
 
 //-------------------------------------------------------// GLFontCache //----//
 
-static void FontDeleteNotify (iFont *font, void *glyphset)
+struct FontDeleteNotify : public iFontDeleteNotify
+{
+  void* glyphset;
+  SCF_DECLARE_IBASE;
+  FontDeleteNotify () { SCF_CONSTRUCT_IBASE (NULL); }
+  virtual ~FontDeleteNotify () { }
+  virtual void BeforeDelete (iFont* font);
+};
+
+SCF_IMPLEMENT_IBASE (FontDeleteNotify)
+  SCF_IMPLEMENTS_INTERFACE (iFontDeleteNotify)
+SCF_IMPLEMENT_IBASE_END
+
+void FontDeleteNotify::BeforeDelete (iFont *font)
 {
   GLFontCache *This = (GLFontCache *)glyphset;
   This->CacheFree (font);
@@ -100,6 +113,8 @@ static void FontDeleteNotify (iFont *font, void *glyphset)
 GLFontCache::GLFontCache (iFontServer *fs) : FontCache (8, 8)
 {
   int i = 0;
+  delete_callback = new FontDeleteNotify ();
+  ((FontDeleteNotify*)delete_callback)->glyphset = this;
   iFont *font;
   while ((font = fs->GetFont (i++)))
     CacheFont (font);
@@ -110,7 +125,8 @@ GLFontCache::~GLFontCache ()
   // Remove deletion callbacks to avoid being deleted later -
   // when the font cache object will be already deleted
   for (int i = 0; i < FontCache.Length (); i++)
-    FontCache.Get (i)->font->RemoveDeleteCallback (FontDeleteNotify, this);
+    FontCache.Get (i)->font->RemoveDeleteCallback (delete_callback);
+  delete_callback->DecRef ();
 }
 
 GLGlyphSet *GLFontCache::CacheFont (iFont *font)
@@ -122,7 +138,7 @@ GLGlyphSet *GLFontCache::CacheFont (iFont *font)
       break;
   if (i < 0)
     // Tell the font to notify us when it is freed
-    font->AddDeleteCallback (FontDeleteNotify, this);
+    font->AddDeleteCallback (delete_callback);
 
   GLGlyphSet *gs = new GLGlyphSet (font);
   FontCache.Push (gs);
@@ -248,7 +264,7 @@ GLGlyphSet *GLFontCache::CacheFont (iFont *font)
 
 void GLFontCache::CacheFree (iFont *font)
 {
-  font->RemoveDeleteCallback (FontDeleteNotify, this);
+  font->RemoveDeleteCallback (delete_callback);
   for (int i = FontCache.Length () - 1; i >= 0; i--)
   {
     GLGlyphSet *gs = FontCache.Get (i);

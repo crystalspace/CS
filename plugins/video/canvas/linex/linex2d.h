@@ -149,9 +149,9 @@ class csLineX2DFontServer : public iFontServer
     virtual uint8 *GetGlyphBitmap (uint8 c, int &oW, int &oH);
     virtual void GetDimensions (const char *text, int &oW, int &oH);
     virtual int GetLength (const char *text, int maxwidth);
-    virtual void AddDeleteCallback (DeleteNotify, void *)
+    virtual void AddDeleteCallback (iFontDeleteNotify*)
     { }
-    virtual bool RemoveDeleteCallback (DeleteNotify, void *)
+    virtual bool RemoveDeleteCallback (iFontDeleteNotify*)
     { return true; }
     void Load ();
     SCF_DECLARE_IBASE;

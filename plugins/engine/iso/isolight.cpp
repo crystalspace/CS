@@ -198,10 +198,22 @@ float csIsoLight::GetVis(int x, int y) const
   return vismap[ y*visw+x ];
 }
 
-static void lightfunc(iIsoSprite *sprite, void *data)
+struct LightFunc : public iIsoCellTraverseCallback
 {
-  iIsoLight *light = (iIsoLight*)data;
-  light->ShineSprite(sprite);
+  iIsoLight* light;
+  SCF_DECLARE_IBASE;
+  LightFunc () { SCF_CONSTRUCT_IBASE (NULL); }
+  virtual ~LightFunc () { }
+  virtual void Traverse (iIsoSprite* spr);
+};
+
+SCF_IMPLEMENT_IBASE (LightFunc)
+  SCF_IMPLEMENTS_INTERFACE (iIsoCellTraverseCallback)
+SCF_IMPLEMENT_IBASE_END
+
+void LightFunc::Traverse (iIsoSprite* spr)
+{
+  light->ShineSprite(spr);
 }
 
 void csIsoLight::ShineGrid()
@@ -224,14 +236,17 @@ void csIsoLight::ShineGrid()
   if(ymin < 0) ymin = 0;
   if(xmax >= grid->GetWidth()) xmax = grid->GetWidth()-1;
   if(ymax >= grid->GetHeight()) ymax = grid->GetHeight()-1;
+  LightFunc* lf = new LightFunc ();
+  lf->light = this;
   for(int y = ymin; y<=ymax; y++)
   {
     for(int x = xmin; x<=xmax; x++)
     {
       iIsoCell *cell = grid->GetGridCell(x,y);
-      if(cell) cell->Traverse(lightfunc, (iIsoLight*)this);
+      if(cell) cell->Traverse (lf);
     }
   }
+  lf->DecRef ();
 }
 
 void csIsoLight::ShineSprite(iIsoSprite *sprite)

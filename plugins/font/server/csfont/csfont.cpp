@@ -291,8 +291,12 @@ csDefaultFont::csDefaultFont (csDefaultFontServer *parent, const char *name,
 
 csDefaultFont::~csDefaultFont ()
 {
-  for (int i = DeleteCallbacks.Length () - 2; i >= 0; i -= 2)
-    ((DeleteNotify)DeleteCallbacks.Get (i))(this, DeleteCallbacks.Get (i + 1));
+  for (int i = DeleteCallbacks.Length () - 1; i >= 0; i--)
+  {
+    iFontDeleteNotify* delnot = (iFontDeleteNotify*)(DeleteCallbacks.Get (i));
+    delnot->BeforeDelete (this);
+    delnot->DecRef ();
+  }
 
   Parent->NotifyDelete (this);
   if (Name [0] != '*')
@@ -386,21 +390,23 @@ int csDefaultFont::GetLength (const char *text, int maxwidth)
   return n;
 }
 
-void csDefaultFont::AddDeleteCallback (DeleteNotify func, void *databag)
+void csDefaultFont::AddDeleteCallback (iFontDeleteNotify* func)
 {
   DeleteCallbacks.Push ((void *)func);
-  DeleteCallbacks.Push (databag);
+  func->IncRef ();
 }
 
-bool csDefaultFont::RemoveDeleteCallback (DeleteNotify func, void *databag)
+bool csDefaultFont::RemoveDeleteCallback (iFontDeleteNotify* func)
 {
-  for (int i = DeleteCallbacks.Length () - 2; i >= 0; i -= 2)
-    if ((DeleteCallbacks.Get (i) == (void *)func)
-     && (DeleteCallbacks.Get (i + 1) == databag))
+  for (int i = DeleteCallbacks.Length () - 1; i >= 0; i--)
+  {
+    iFontDeleteNotify* delnot = (iFontDeleteNotify*)(DeleteCallbacks.Get (i));
+    if (delnot == func)
     {
       DeleteCallbacks.Delete (i);
-      DeleteCallbacks.Delete (i);
+      func->DecRef ();
       return true;
     }
+  }
   return false;
 }

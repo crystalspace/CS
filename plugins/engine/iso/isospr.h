@@ -45,9 +45,7 @@ private:
   /// drawing prealloc
   G3DPolygonDPFX g3dpolyfx;
   /// the grid change callback
-  void (*gridcall)(iIsoSprite *, void *);
-  /// grid change callback userdata
-  void *gridcalldata;
+  iGridChangeCallback* gridcall;
 
 public:
   SCF_DECLARE_IBASE;
@@ -78,10 +76,14 @@ public:
   }
   virtual void AddToVertexColor(int i, const csColor& color);
   virtual iIsoGrid *GetGrid() const {return grid;}
-  virtual void SetGridChangeCallback(GridChangeCallbackType func, void *data)
-  {gridcall = func; gridcalldata = data;}
-  virtual void GetGridChangeCallback(GridChangeCallbackType &func, void *&data)
-    const {func = gridcall; data = gridcalldata;}
+  virtual void SetGridChangeCallback (iGridChangeCallback* func)
+  {
+    SCF_SET_REF (gridcall, func);
+  }
+  virtual iGridChangeCallback* GetGridChangeCallback () const
+  {
+    return gridcall;
+  }
   virtual void ForcePosition(const csVector3& pos) {position = pos;}
   virtual void ResetAllColors(); 
   virtual void SetAllStaticColors(const csColor& color);

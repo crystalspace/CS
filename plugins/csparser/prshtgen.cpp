@@ -45,27 +45,59 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (VALUE)
 CS_TOKEN_DEF_END
 
-struct HeightMapData
+struct HeightMapData : public iGenerateImageFunction
 {
   iImage* im;
   int iw, ih;	// Image width and height.
   float w, h;	// Image width and height.
   csRGBpixel* p;
   float hscale, hshift;
+  bool slope;
+  SCF_DECLARE_IBASE;
+
+  HeightMapData (bool s) : im (NULL), slope (s)
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+  }
+  virtual ~HeightMapData ()
+  {
+    if (im) im->DecRef ();
+  }
+  float GetHeight (float dx, float dy);
+  float GetSlope (float dx, float dy);
+  virtual float GetValue (float dx, float dy);
 };
 
-static float HeightMapFunc (void* data, float x, float y)
+SCF_IMPLEMENT_IBASE (HeightMapData)
+  SCF_IMPLEMENTS_INTERFACE (iGenerateImageFunction)
+SCF_IMPLEMENT_IBASE_END
+
+float HeightMapData::GetSlope (float x, float y)
 {
-  HeightMapData* hm = (HeightMapData*)data;
-  float dw = fmod (x*(hm->w-1), 1.0f);
-  float dh = fmod (y*(hm->h-1), 1.0f);
-  int ix = int (x*(hm->w-1));
-  int iy = int (y*(hm->h-1));
-  int iw = hm->iw;
-  int ih = hm->ih;
+  float div = 0.02;
+  float mx = x-.01; if (mx < 0) { mx = x; div = .01; }
+  float px = x+.01; if (px > 1) { px = x; div = .01; }
+  float dhdx = GetHeight (px, y) - GetHeight (mx, y);
+  dhdx /= div;
+  div = 0.02;
+  float my = y-.01; if (my < 0) { my = y; div = .01; }
+  float py = y+.01; if (py > 1) { py = y; div = .01; }
+  float dhdy = GetHeight (x, py) - GetHeight (x, my);
+  dhdy /= div;
+  //printf ("x=%g y=%g dhdx=%g dhdy=%g slope=%g , %g\n", x, y, dhdx, dhdy,
+    //fabs((dhdx+dhdy)/2.), fabs(dhdx)/2.+fabs(dhdy)/2.); fflush (stdout);
+  //return fabs ((dhdx+dhdy)/2.);
+  return (fabs(dhdx)+fabs(dhdy))/2.;
+}
+
+float HeightMapData::GetHeight (float x, float y)
+{
+  float dw = fmod (x*(w-1), 1.0f);
+  float dh = fmod (y*(h-1), 1.0f);
+  int ix = int (x*(w-1));
+  int iy = int (y*(h-1));
   int idx = iy * iw + ix;
   float col00, col01, col10, col11;
-  csRGBpixel* p = hm->p;
   col00 = float (p[idx].red + p[idx].green + p[idx].blue)/3.;
   if (ix < iw-1)
     col10 = float (p[idx+1].red + p[idx+1].green + p[idx+1].blue)/3.;
@@ -83,25 +115,13 @@ static float HeightMapFunc (void* data, float x, float y)
   float col0111 = col01 * (1-dw) + col11 * dw;
   float col = col0010 * (1-dh) + col0111 * dh;
   //printf("Heightmap x=%g y=%g height=%g\n", x, y, col * hm->hscale + hm->hshift);
-  return col * hm->hscale + hm->hshift;
+  return col * hscale + hshift;
 }
 
-static float SlopeMapFunc (void* data, float x, float y)
+float HeightMapData::GetValue (float x, float y)
 {
-  float div = 0.02;
-  float mx = x-.01; if (mx < 0) { mx = x; div = .01; }
-  float px = x+.01; if (px > 1) { px = x; div = .01; }
-  float dhdx = HeightMapFunc (data, px, y) - HeightMapFunc (data, mx, y);
-  dhdx /= div;
-  div = 0.02;
-  float my = y-.01; if (my < 0) { my = y; div = .01; }
-  float py = y+.01; if (py > 1) { py = y; div = .01; }
-  float dhdy = HeightMapFunc (data, x, py) - HeightMapFunc (data, x, my);
-  dhdy /= div;
-  //printf ("x=%g y=%g dhdx=%g dhdy=%g slope=%g , %g\n", x, y, dhdx, dhdy,
-    //fabs((dhdx+dhdy)/2.), fabs(dhdx)/2.+fabs(dhdy)/2.); fflush (stdout);
-  //return fabs ((dhdx+dhdy)/2.);
-  return (fabs(dhdx)+fabs(dhdy))/2.;
+  if (slope) return GetSlope (x, y);
+  else return GetHeight (x, y);
 }
 
 csGenerateImageValue* csLoader::ParseHeightgenValue (char* buf)
@@ -138,7 +158,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (char* buf)
           csScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
 	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
 	  if (!img) return NULL;
-	  HeightMapData* data = new HeightMapData ();	// @@@ Memory leak!!!
+	  HeightMapData* data = new HeightMapData (false);
   	  data->im = img;
   	  data->iw = img->GetWidth ();
   	  data->ih = img->GetHeight ();
@@ -147,8 +167,8 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (char* buf)
   	  data->p = (csRGBpixel*)(img->GetImageData ());
   	  data->hscale = hscale;
   	  data->hshift = hshift;
-  	  vf->heightfunc = HeightMapFunc;
-	  vf->userdata = (void*)data;
+	  vf->SetFunction (data);
+	  data->DecRef ();
 	  v = vf;
 	}
 	break;
@@ -160,7 +180,7 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (char* buf)
           csScanStr (params, "%s,%f,%f", &heightmap, &hscale, &hshift);
 	  iImage* img = LoadImage (heightmap, CS_IMGFMT_TRUECOLOR);
 	  if (!img) return NULL;
-	  HeightMapData* data = new HeightMapData ();	// @@@ Memory leak!!!
+	  HeightMapData* data = new HeightMapData (true);
   	  data->im = img;
   	  data->iw = img->GetWidth ();
   	  data->ih = img->GetHeight ();
@@ -169,8 +189,8 @@ csGenerateImageValue* csLoader::ParseHeightgenValue (char* buf)
   	  data->p = (csRGBpixel*)(img->GetImageData ());
   	  data->hscale = hscale;
   	  data->hshift = hshift;
-  	  vf->heightfunc = SlopeMapFunc;
-	  vf->userdata = (void*)data;
+	  vf->SetFunction (data);
+	  data->DecRef ();
 	  v = vf;
 	}
 	break;

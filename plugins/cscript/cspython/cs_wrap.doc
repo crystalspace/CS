@@ -306,10 +306,7 @@ GetGlyphBitmap(c,oW,oH)
 GetDimensions(text,oW,oH)
 
 GetLength(text,maxwidth)
-         typedef void (*DeleteNotify) (iFont *, void *);
-         virtual void AddDeleteCallback (DeleteNotify func, void *databag) = 0;
-         virtual bool RemoveDeleteCallback (DeleteNotify func, void *databag) = 0;
-        
+
 1.14.  class iFontServer
 ------------------------
 

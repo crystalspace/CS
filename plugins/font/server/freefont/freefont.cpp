@@ -149,8 +149,12 @@ csFreeTypeFont::csFreeTypeFont (const char *filename) : DeleteCallbacks (4, 4)
 
 csFreeTypeFont::~csFreeTypeFont ()
 {
-  for (int i = DeleteCallbacks.Length () - 2; i >= 0; i -= 2)
-    ((DeleteNotify)DeleteCallbacks.Get (i))(this, DeleteCallbacks.Get (i + 1));
+  for (int i = DeleteCallbacks.Length () - 1; i >= 0; i--)
+  {
+    iFontDeleteNotify* delnot = (iFontDeleteNotify*)(DeleteCallbacks.Get (i));
+    delnot->BeforeDelete (this);
+    delnot->DecRef ();
+  }
   if (face.z)
     TT_Close_Face (face);
 }
@@ -394,21 +398,23 @@ bool csFreeTypeFont::CreateGlyphBitmaps (int size)
   return true;
 }
 
-void csFreeTypeFont::AddDeleteCallback (DeleteNotify func, void *databag)
+void csFreeTypeFont::AddDeleteCallback (iFontDeleteNotify* func)
 {
   DeleteCallbacks.Push ((void *)func);
-  DeleteCallbacks.Push (databag);
+  func->IncRef ();
 }
 
-bool csFreeTypeFont::RemoveDeleteCallback (DeleteNotify func, void *databag)
+bool csFreeTypeFont::RemoveDeleteCallback (iFontDeleteNotify* func)
 {
-  for (int i = DeleteCallbacks.Length () - 2; i >= 0; i -= 2)
-    if ((DeleteCallbacks.Get (i) == (void *)func)
-     && (DeleteCallbacks.Get (i + 1) == databag))
+  for (int i = DeleteCallbacks.Length () - 1; i >= 0; i--)
+  {
+    iFontDeleteNotify* delnot = (iFontDeleteNotify*)(DeleteCallbacks.Get (i));
+    if (delnot == func)
     {
       DeleteCallbacks.Delete (i);
-      DeleteCallbacks.Delete (i);
+      func->DecRef ();
       return true;
     }
+  }
   return false;
 }

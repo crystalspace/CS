@@ -62,10 +62,8 @@ public:
 class csTerrFuncObject : public iMeshObject
 {
 public:
-  csTerrainHeightFunction* height_func;
-  csTerrainNormalFunction* normal_func;
-  void* height_func_data;
-  void* normal_func_data;
+  iTerrainHeightFunction* height_func;
+  iTerrainNormalFunction* normal_func;
   int blockxy;
   int gridx, gridy;
   csVector3 topleft;
@@ -223,12 +221,15 @@ public:
   /// Get the base color.
   csColor GetColor () const { return base_color; }
   /// Set the function to use for the terrain.
-  void SetHeightFunction (csTerrainHeightFunction* func, void* d);
+  void SetHeightFunction (iTerrainHeightFunction* func)
+  {
+    SCF_SET_REF (height_func, func);
+    initialized = false; 
+  }
   /// Set the normal function to use for the terrain.
-  void SetNormalFunction (csTerrainNormalFunction* func, void* d)
+  void SetNormalFunction (iTerrainNormalFunction* func)
   { 
-    normal_func = func;
-    normal_func_data = d; 
+    SCF_SET_REF (normal_func, func);
     initialized = false; 
   }
   void SetHeightMap (iImage* im, float hscale, float hshift);
@@ -518,13 +519,13 @@ public:
     {
       return scfParent->GetColor ();
     }
-    virtual void SetHeightFunction (csTerrainHeightFunction* func, void* d)
+    virtual void SetHeightFunction (iTerrainHeightFunction* func)
     {
-      scfParent->SetHeightFunction (func, d);
+      scfParent->SetHeightFunction (func);
     }
-    virtual void SetNormalFunction (csTerrainNormalFunction* func, void* d)
+    virtual void SetNormalFunction (iTerrainNormalFunction* func)
     {
-      scfParent->SetNormalFunction (func, d);
+      scfParent->SetNormalFunction (func);
     }
     virtual void SetHeightMap (iImage* im, float hscale, float hshift)
     {

@@ -52,14 +52,29 @@ private:
   int flags;
 
   // The callback which is called just before texture is used.
-  csTextureCallback* use_callback;
-  // User-data for the callback.
-  void* use_data;
+  iTextureCallback* use_callback;
 
   // update our key color with that from the handle
-  inline void UpdateKeyColorFromHandle ();
+  void UpdateKeyColorFromHandle ()
+  {
+    if (handle && handle->GetKeyColor ())
+    {
+      UByte r, g, b;
+      handle->GetKeyColor (r, g, b);
+      SetKeyColor ((int)r, (int)g, (int)b);
+    }
+    else
+      key_col_r = -1;
+  }
+
   // update our key color with that from the image
-  inline void UpdateKeyColorFromImage ();
+  void UpdateKeyColorFromImage ()
+  {
+    if(image->HasKeycolor ())
+      image->GetKeycolor( key_col_r, key_col_g, key_col_b );
+    else
+      key_col_r = -1;
+  }
 
 private:
   /// Release texture handle
@@ -78,7 +93,7 @@ public:
    */
   void SetImageFile (iImage *Image);
   /// Get the iImage.
-  inline iImage* GetImageFile ();
+  iImage* GetImageFile () { return image; }
 
   /**
    * Change the texture handle. The changes will immediatly be visible. This
@@ -87,17 +102,18 @@ public:
    */
   void SetTextureHandle (iTextureHandle *tex);
   /// Get the texture handle.
-  inline iTextureHandle* GetTextureHandle ();
+  iTextureHandle* GetTextureHandle () { return handle; }
 
   /// Set the transparent color.
   void SetKeyColor (int red, int green, int blue);
   /// Query the transparent color.
-  inline void GetKeyColor (int &red, int &green, int &blue);
+  void GetKeyColor (int &red, int &green, int &blue)
+  { red = key_col_r; green = key_col_g; blue = key_col_b; }
 
   /// Set the flags which are used to register the texture
-  inline void SetFlags (int flags);
+  void SetFlags (int flags) { csTextureWrapper::flags = flags; }
   /// Return the flags which are used to register the texture
-  inline int GetFlags ();
+  int GetFlags () { return flags; }
 
   /// Register the texture with the texture manager
   void Register (iTextureManager *txtmng);
@@ -107,25 +123,30 @@ public:
    * This is mainly useful for procedural textures which can then
    * choose to update their image.
    */
-  inline void SetUseCallback (csTextureCallback* callback, void* data);
+  void SetUseCallback (iTextureCallback* callback)
+  {
+    SCF_SET_REF (use_callback, callback);
+  }
 
   /**
    * Get the use callback. If there are multiple use callbacks you can
    * use this function to chain.
    */
-  inline csTextureCallback* GetUseCallback ();
-
-  /**
-   * Get the use data.
-   */
-  inline void* GetUseData ();
+  iTextureCallback* GetUseCallback ()
+  {
+    return use_callback;
+  }
 
   /**
    * Visit this texture. This should be called by the engine right
    * before using the texture. It is responsible for calling the use
    * callback if there is one.
    */
-  inline void Visit ();
+  void Visit ()
+  {
+    if (use_callback)
+      use_callback->UseTexture (&scfiTextureWrapper);
+  }
 
   SCF_DECLARE_IBASE_EXT (csObject);
 
@@ -147,9 +168,8 @@ public:
     virtual void SetFlags (int flags);
     virtual int GetFlags ();
     virtual void Register (iTextureManager *txtmng);
-    virtual void SetUseCallback (csTextureCallback* callback, void* data);
-    virtual csTextureCallback* GetUseCallback ();
-    virtual void* GetUseData ();
+    virtual void SetUseCallback (iTextureCallback* callback);
+    virtual iTextureCallback* GetUseCallback ();
     virtual void Visit ();
   } scfiTextureWrapper;
   friend struct TextureWrapper;
@@ -190,45 +210,5 @@ public:
     virtual iTextureWrapper *FindByName (const char* iName) const;
   } scfiTextureList;
 };
-
-//--- implementation of inline methods ---------------------------------------
-
-inline iImage* csTextureWrapper::GetImageFile ()
-{ return image; }
-inline iTextureHandle* csTextureWrapper::GetTextureHandle ()
-{ return handle; }
-inline void csTextureWrapper::GetKeyColor (int &red, int &green, int &blue)
-{ red = key_col_r; green = key_col_g; blue = key_col_b; }
-inline void csTextureWrapper::SetUseCallback (csTextureCallback* callback, void* data)
-{ use_callback = callback; use_data = data; }
-inline csTextureCallback* csTextureWrapper::GetUseCallback ()
-{ return use_callback; }
-inline void* csTextureWrapper::GetUseData ()
-{ return use_data; }
-inline void csTextureWrapper::Visit ()
-{ if (use_callback) use_callback (&scfiTextureWrapper, use_data); }
-inline void csTextureWrapper::SetFlags (int f)
-{ flags = f; }
-inline int csTextureWrapper::GetFlags ()
-{ return flags; }
-inline void csTextureWrapper::UpdateKeyColorFromHandle ()
-{
-  if (handle && handle->GetKeyColor ())
-  {
-    UByte r, g, b;
-    handle->GetKeyColor (r, g, b);
-    SetKeyColor ((int)r, (int)g, (int)b);
-  }
-  else
-    key_col_r = -1;
-}
-inline void csTextureWrapper::UpdateKeyColorFromImage ()
-{
-  if(image->HasKeycolor ())
-    image->GetKeycolor( key_col_r, key_col_g, key_col_b );
-  else
-    key_col_r = -1;
-}
-
 
 #endif // __CS_TEXTURE_H__

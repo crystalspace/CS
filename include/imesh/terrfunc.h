@@ -28,18 +28,31 @@ class csVector3;
 class csColor;
 class csTransform;
 
-/**
- * Function for the terrain engine. Expects values for dx and dy between
- * 0 and 1 and returns a height.
- */
-typedef float (csTerrainHeightFunction)(void* data, float dx, float dy);
-/**
- * Function for the terrain engine. Expects values for dx and dy between
- * 0 and 1 and returns a normal.
- */
-typedef csVector3 (csTerrainNormalFunction)(void* data, float dx, float dy);
+SCF_VERSION (iTerrainHeightFunction, 0, 0, 1);
 
-SCF_VERSION (iTerrFuncState, 0, 0, 7);
+/**
+ * This class represents a function for the terrain engine. Expects
+ * values for dx and dy between 0 and 1 and returns a height.
+ */
+struct iTerrainHeightFunction : public iBase
+{
+  /// Get height.
+  virtual float GetHeight (float dx, float dy) = 0;
+};
+
+SCF_VERSION (iTerrainNormalFunction, 0, 0, 1);
+
+/**
+ * This class represents a function for the terrain engine. Expects
+ * values for dx and dy between 0 and 1 and returns a normal vector.
+ */
+struct iTerrainNormalFunction : public iBase
+{
+  /// Get normal.
+  virtual csVector3 GetNormal (float dx, float dy) = 0;
+};
+
+SCF_VERSION (iTerrFuncState, 0, 0, 8);
 
 /**
  * This interface describes the API for the terrain object.
@@ -76,11 +89,9 @@ struct iTerrFuncState : public iBase
   /// Get the base color.
   virtual csColor GetColor () const = 0;
   /// Set the function to use for the terrain.
-  virtual void SetHeightFunction (csTerrainHeightFunction* func,
-  	void* data) = 0;
+  virtual void SetHeightFunction (iTerrainHeightFunction* func) = 0;
   /// Set the normal function to use for the terrain.
-  virtual void SetNormalFunction (csTerrainNormalFunction* func,
-  	void* data) = 0;
+  virtual void SetNormalFunction (iTerrainNormalFunction* func) = 0;
   /// Use the given iImage to get a height function from.
   virtual void SetHeightMap (iImage* im, float hscale, float hshift) = 0;
 

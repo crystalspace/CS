@@ -153,12 +153,12 @@ public:
   /**
    * Add a call-on-font-delete callback routine.
    */
-  virtual void AddDeleteCallback (DeleteNotify func, void *databag);
+  virtual void AddDeleteCallback (iFontDeleteNotify* func);
 
   /**
    * Remove a font delete notification callback.
    */
-  virtual bool RemoveDeleteCallback (DeleteNotify func, void *databag);
+  virtual bool RemoveDeleteCallback (iFontDeleteNotify* func);
 };
 
 /**

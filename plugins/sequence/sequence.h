@@ -50,15 +50,15 @@ public:
   //=====
   class StandardOperation : public iSequenceOperation
   {
-  private:
-    int ref_count;
   protected:
     iSequenceManager* seqmgr;
     virtual ~StandardOperation () { }
   public:
-    StandardOperation (iSequenceManager* sm) : ref_count (1), seqmgr (sm) { }
-    virtual void IncRef () { ref_count++; }
-    virtual void DecRef () { if (--ref_count <= 0) delete this; }
+    SCF_DECLARE_IBASE;
+    StandardOperation (iSequenceManager* sm) : seqmgr (sm)
+    {
+      SCF_CONSTRUCT_IBASE (NULL);
+    }
   };
 
   //=====

@@ -20,6 +20,7 @@
 #define DEMOOP_H
 
 #include <stdarg.h>
+#include "csutil/scf.h"
 #include "cssys/sysdriv.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
@@ -39,16 +40,12 @@ struct iMeshWrapper;
  */
 class StandardOp : public iSequenceOperation
 {
-private:
-  int ref_count;
-
 protected:
   virtual ~StandardOp () { }
 
 public:
-  StandardOp () : ref_count (1) { }
-  virtual void IncRef () { ref_count++; }
-  virtual void DecRef () { if (--ref_count <= 0) delete this; }
+  StandardOp () { SCF_CONSTRUCT_IBASE (NULL); }
+  SCF_DECLARE_IBASE;
 };
 
 /**

@@ -36,6 +36,7 @@
 //#define OPENGL_BITMAP_FONT
 
 struct GLGlyphSet;
+struct iFontDeleteNotify;
 
 /**
  * The parent class for csGlyphSet
@@ -109,6 +110,8 @@ protected:
   
   /// the current clipping rect
   int ClipX1, ClipY1, ClipX2, ClipY2;
+  /// Pointer to our callback routine.
+  iFontDeleteNotify* delete_callback;
 
 #ifndef OPENGL_BITMAP_FONT
   // Auxiliary routine for "font-on-a-texture" approach

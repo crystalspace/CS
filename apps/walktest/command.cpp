@@ -51,6 +51,15 @@ iFile* csCommandProcessor::script = NULL;
 // Additional command handler
 csCommandProcessor::CmdHandler csCommandProcessor::ExtraHandler = NULL;
 
+SCF_IMPLEMENT_IBASE (csCommandProcessor::PerformCallback)
+  SCF_IMPLEMENTS_INTERFACE (iConsoleExecCallback)
+SCF_IMPLEMENT_IBASE_END
+
+void csCommandProcessor::PerformCallback::Execute (const char* command)
+{
+  csCommandProcessor::perform_line (command);
+}
+
 void csCommandProcessor::Initialize (iEngine* engine, iCamera* camera,
   iGraphics3D* g3d, iConsoleOutput* console, iSystem* system)
 {
@@ -64,11 +73,6 @@ void csCommandProcessor::Initialize (iEngine* engine, iCamera* camera,
 bool csCommandProcessor::PerformLine (const char* line)
 {
   return perform_line (line);
-}
-
-void csCommandProcessor::perform_callback (void *, const char *command)
-{
-  perform_line (command);
 }
 
 static int value_choice (const char* arg, int old_value, const char* const* choices, int num)

@@ -147,9 +147,6 @@ struct iFont : public iBase
   virtual void *GetGlyphBitmap (unsigned char c, int &oW, int &oH) = 0;
   virtual void GetDimensions (const char *text, int &oW, int &oH) = 0;
   virtual int GetLength (const char *text, int maxwidth) = 0;
-//  typedef void (*DeleteNotify) (iFont *, void *);
-//  virtual void AddDeleteCallback (DeleteNotify func, void *databag) = 0;
-//  virtual bool RemoveDeleteCallback (DeleteNotify func, void *databag) = 0;
 };
 
 

@@ -159,18 +159,14 @@ void csIsoCell::TraverseInOrder(csIsoCellNode *tree,
 }
 
 
-struct calldata { void (*func)(iIsoSprite*, void *); void *userdata; };
 static void callfunc(csIsoCellNode *node, void *data)
 {
-  struct calldata* dat = (struct calldata*)data;
-  dat->func(node->drawpart, dat->userdata);
+  iIsoCellTraverseCallback* func = (iIsoCellTraverseCallback*)data;
+  func->Traverse (node->drawpart);
 }
-void csIsoCell::Traverse(void (*func)(iIsoSprite*, void *), void *userdata)
+void csIsoCell::Traverse(iIsoCellTraverseCallback* func)
 {
-  struct calldata dat;
-  dat.func = func;
-  dat.userdata = userdata;
   if(root)
-    TraverseInOrder(root, callfunc, &dat);
+    TraverseInOrder(root, callfunc, (void*)func);
 }
 

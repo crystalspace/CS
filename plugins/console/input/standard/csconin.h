@@ -37,8 +37,7 @@ class csConsoleInput : iConsoleInput
   // Max lines in history
   int MaxLines;
   // The callback
-  csConsoleExecCallback Callback;
-  void *CallbackData;
+  iConsoleExecCallback* Callback;
   // The console
   iConsoleOutput *Console;
   // The prompt
@@ -73,8 +72,15 @@ public:
   virtual void Bind (iConsoleOutput *iCon);
 
   /// Set the command execution callback
-  virtual void ExecuteCallback (csConsoleExecCallback iCallback,
-    void *iCallbackData) { Callback=iCallback; CallbackData=iCallbackData; }
+  virtual void SetExecuteCallback (iConsoleExecCallback* iCallback)
+  {
+    SCF_SET_REF (Callback, iCallback);
+  }
+  /// Get the command execution callback
+  virtual iConsoleExecCallback* GetExecuteCallback ()
+  {
+    return Callback;
+  }
 
   /// Return a line from the input buffer (-1 = current line)
   virtual const char *GetText (int iLine = -1) const;

@@ -83,32 +83,49 @@ csTerrBlock::~csTerrBlock ()
 
 //------------------------------------------------------------------------
 
-static float TerrFunc (void*, float x, float y)
+struct DefaultFunction : public iTerrainHeightFunction
 {
-  return 8. * (sin (x*40.)+cos (y*40.));
-}
+  SCF_DECLARE_IBASE;
+  DefaultFunction () { SCF_CONSTRUCT_IBASE (NULL); }
+  virtual float GetHeight (float x, float y)
+  {
+    return 8. * (sin (x*40.)+cos (y*40.));
+  }
+};
 
-struct HeightMapData
+SCF_IMPLEMENT_IBASE (DefaultFunction)
+  SCF_IMPLEMENTS_INTERFACE (iTerrainHeightFunction)
+SCF_IMPLEMENT_IBASE_END
+
+struct HeightMapData : public iTerrainHeightFunction
 {
   iImage* im;
   int iw, ih;	// Image width and height.
   float w, h;	// Image width and height.
   csRGBpixel* p;
   float hscale, hshift;
+  SCF_DECLARE_IBASE;
+
+  HeightMapData () : im (NULL) { SCF_CONSTRUCT_IBASE (NULL); }
+  virtual ~HeightMapData ()
+  {
+    if (im) im->DecRef ();
+  }
+  virtual float GetHeight (float dx, float dy);
 };
 
-static float HeightMapFunc (void* data, float x, float y)
+SCF_IMPLEMENT_IBASE (HeightMapData)
+  SCF_IMPLEMENTS_INTERFACE (iTerrainHeightFunction)
+SCF_IMPLEMENT_IBASE_END
+
+float HeightMapData::GetHeight (float x, float y)
 {
-  HeightMapData* hm = (HeightMapData*)data;
-  float dw = fmod (x*(hm->w-1), 1.0f);
-  float dh = fmod (y*(hm->h-1), 1.0f);
-  int ix = int (x*(hm->w-1));
-  int iy = int (y*(hm->h-1));
-  int iw = hm->iw;
-  int ih = hm->ih;
+  float dw = fmod (x*(w-1), 1.0f);
+  float dh = fmod (y*(h-1), 1.0f);
+  int ix = int (x*(w-1));
+  int iy = int (y*(h-1));
   int idx = iy * iw + ix;
   float col00, col01, col10, col11;
-  csRGBpixel* p = hm->p;
   col00 = float (p[idx].red + p[idx].green + p[idx].blue)/3.;
   if (ix < iw-1)
     col10 = float (p[idx+1].red + p[idx+1].green + p[idx+1].blue)/3.;
@@ -125,7 +142,7 @@ static float HeightMapFunc (void* data, float x, float y)
   float col0010 = col00 * (1-dw) + col10 * dw;
   float col0111 = col01 * (1-dw) + col11 * dw;
   float col = col0010 * (1-dh) + col0111 * dh;
-  return col * hm->hscale + hm->hshift;
+  return col * hscale + hshift;
 }
 
 void csTerrFuncObject::SetHeightMap (iImage* im, float hscale, float hshift)
@@ -140,24 +157,9 @@ void csTerrFuncObject::SetHeightMap (iImage* im, float hscale, float hshift)
   data->hscale = hscale;
   data->hshift = hshift;
   data->im->IncRef ();
-  SetHeightFunction (HeightMapFunc, (void*)data);
+  SetHeightFunction (data);
+  data->DecRef ();
 }
-
-void csTerrFuncObject::SetHeightFunction (csTerrainHeightFunction* func, void* d)
-{ 
-  height_func = func; 
-  if (height_func_data) 
-  {
-	HeightMapData *h = (HeightMapData *)height_func_data;
-    h->im->DecRef();
-	delete h->p;
-    delete h;
-	height_func_data = NULL;
-  }
-  height_func_data = d; 
-  initialized = false; 
-}
-
 
 csTerrFuncObject::csTerrFuncObject (iSystem* pSys,
 	iMeshObjectFactory *pFactory)
@@ -184,10 +186,8 @@ csTerrFuncObject::csTerrFuncObject (iSystem* pSys,
   base_color.red = 0;
   base_color.green = 0;
   base_color.blue = 0;
-  height_func = TerrFunc;
+  height_func = new DefaultFunction ();
   normal_func = NULL;
-  height_func_data = NULL;
-  normal_func_data = NULL;
   lod_sqdist[0] = 100*100;
   lod_sqdist[1] = 400*400;
   lod_sqdist[2] = 800*800;
@@ -206,6 +206,8 @@ csTerrFuncObject::~csTerrFuncObject ()
 {
   delete[] blocks;
   if (vis_cb) vis_cb->DecRef ();
+  if (height_func) height_func->DecRef ();
+  if (normal_func) normal_func->DecRef ();
 }
 
 void csTerrFuncObject::CorrectSeams (int tw, int th)
@@ -434,7 +436,7 @@ void csTriangleVertex::CalculateCost (csTriangleVertices* vertices,
   csVector2 this_pos (vv.x, vv.z);
   float this_height = vv.y;
   if (!at_hor_edge && !at_ver_edge)
-    this_height = terrfunc->height_func (terrfunc->height_func_data,
+    this_height = terrfunc->height_func->GetHeight (
       vertices->GetVertex (idx).dx,
       vertices->GetVertex (idx).dy) * terrfunc->scale.y + terrfunc->topleft.y;
   for (i = 0 ; i < num_con_vertices ; i++)
@@ -851,17 +853,17 @@ void csTerrFuncObject::ComputeNormals (const G3DTriangleMesh& mesh,
     float dx = vv.x, dy = vv.z;
     csVector3 n;
     if (normal_func)
-      n = normal_func (normal_func_data, dx, dy);
+      n = normal_func->GetNormal (dx, dy);
     else
     {
-      v[0].Set(-.1, height_func(height_func_data, dx-inv_totx, dy-inv_toty), -.1);
-      v[1].Set(  0, height_func(height_func_data, dx, dy-inv_toty), -.1);
-      v[2].Set( .1, height_func(height_func_data, dx+inv_totx, dy-inv_toty), -.1);
-      v[3].Set( .1, height_func(height_func_data, dx+inv_totx, dy), 0);
-      v[4].Set( .1, height_func(height_func_data, dx+inv_totx, dy+inv_toty),  .1);
-      v[5].Set(  0, height_func(height_func_data, dx, dy+inv_toty),  .1);
-      v[6].Set(-.1, height_func(height_func_data, dx-inv_totx, dy+inv_toty),  .1);
-      v[7].Set(-.1, height_func(height_func_data, dx-inv_totx, dy), 0);
+      v[0].Set(-.1, height_func->GetHeight (dx-inv_totx, dy-inv_toty), -.1);
+      v[1].Set(  0, height_func->GetHeight (dx, dy-inv_toty), -.1);
+      v[2].Set( .1, height_func->GetHeight (dx+inv_totx, dy-inv_toty), -.1);
+      v[3].Set( .1, height_func->GetHeight (dx+inv_totx, dy), 0);
+      v[4].Set( .1, height_func->GetHeight (dx+inv_totx, dy+inv_toty),  .1);
+      v[5].Set(  0, height_func->GetHeight (dx, dy+inv_toty),  .1);
+      v[6].Set(-.1, height_func->GetHeight (dx-inv_totx, dy+inv_toty),  .1);
+      v[7].Set(-.1, height_func->GetHeight (dx-inv_totx, dy), 0);
       n.Set (0, 0, 0);
       int j1, j;
       j1 = 7;
@@ -972,7 +974,7 @@ void csTerrFuncObject::SetupBaseMesh (G3DTriangleMesh& mesh, int bx, int by)
       int vtidx = gy*(gridx+1)+gx;
       csVector3 v = tl;
       v.x += gx*scale.x / float (gridx);
-      v.y += height_func (height_func_data, dx, dy) * scale.y;
+      v.y += height_func->GetHeight (dx, dy) * scale.y;
       v.z += gy*scale.z / float (gridy);
       mesh.vertices[0][vtidx] = v;
       csVector2 uv = tluv;
@@ -1046,7 +1048,7 @@ void csTerrFuncObject::SetupVisibilityTree (csTerrainQuad* quad,
 	if (dx > 1) dx = 1;
 	if (dy < 0) dy = 0;
 	if (dy > 1) dy = 1;
-        float h = height_func (height_func_data, dx, dy) * scale.y + topleft.y;
+        float h = height_func->GetHeight (dx, dy) * scale.y + topleft.y;
 	if (h < min_height) min_height = h;
 	if (h > max_height) max_height = h;
       }
@@ -1131,7 +1133,7 @@ void csTerrFuncObject::SetupObject ()
         float dx = (float (bx)+.5) / float (blockxy);
 	csVector3 tl = topleft;
 	tl.x += (float (bx) + .5)*scale.x;
-	tl.y += height_func (height_func_data, dx, dy)*scale.y;
+	tl.y += height_func->GetHeight (dx, dy)*scale.y;
 	tl.z += (float (by) + .5)*scale.z;
 	blocks[blidx].center = tl;
       }
@@ -1363,7 +1365,7 @@ int csTerrFuncObject::CollisionDetect (csTransform* transform)
   if (p.x < 0 || p.z < 0 || p.x > 1 || p.z > 1) return 0;
 
   // Return height of terrain at this location in Y coord.
-  float h = height_func (height_func_data, p.x, p.z)*scale.y+2;
+  float h = height_func->GetHeight (p.x, p.z)*scale.y+2;
   if (h < p.y) return 0;
   p.y = h;
   // Translate us back.

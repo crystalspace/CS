@@ -1567,7 +1567,10 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     {
       ConsoleInput->Bind (myConsole);
       ConsoleInput->SetPrompt ("cs# ");
-      ConsoleInput->ExecuteCallback (csCommandProcessor::perform_callback, NULL);
+      csCommandProcessor::PerformCallback* cb =
+      	new csCommandProcessor::PerformCallback ();
+      ConsoleInput->SetExecuteCallback (cb);
+      cb->DecRef ();
     }
 
     // Set console to center of screen, if supported

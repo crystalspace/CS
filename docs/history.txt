@@ -1,5 +1,27 @@
 The history order is reversed so that new features are at the top.
 
+18-Jul-2001
+	- Reworked the cstool texture generation tool to also use a
+	  SCF structure for the slope and height function instead of a
+	  regular callback. This also solves a memory leak problem.
+	- Changed csTextureCallback (used by iTextureWrapper) to
+	  the iTextureCallback SCF structure.
+	- Changed DeleteNotify() callback system in iFont to iFontDeleteNotify.
+	- Changed csConsoleExecCallback() callback system to
+	  iConsoleExecCallback. Renamed ExecuteCallback() to
+	  SetExecuteCallback(). Added GetExecuteCallback().
+	- Changed GridChangeCallbackType (in iso engine) to
+	  iGridChangeCallback.
+	- Also made iIsoCellTraverseCallback to be used by
+	  iIsoCell::Traverse().
+	- The sequence manager was already using reference counted callbacks
+	  but I changed it so that they use SCF too.
+	- Note for everyone. When adding a new callback to something please
+	  use the system with SCF interfaces instead of the traditional
+	  callback function with void* userdata. It is very hard to do good
+	  memory management with that type of callback. With SCF callbacks
+	  reference counting is used which is a lot cleaner.
+	- Wouter Wijngaards fixed another bug in iso engine.
 17-Jul-2001
 	- Worked around an internal compiler error (for MingW compiler) in
 	  recent changes to crossbld.cpp by completely rearranging the
@@ -49,12 +71,25 @@ The history order is reversed so that new features are at the top.
 	- Added 'name' parameter to Setup in iVisibilityCuller. This is
 	  used to cache the data better (important for the cached octree,
 	  especially if there are multiple such octrees).
+	- Changed the terrain engine to use an SCF class for getting height
+	  and normal information instead of the traditional callback system.
+	  Basically this means that csTerrainHeightFunction and
+	  csTerrainNormalFunction are now iTerrainHeightFunction and
+	  iTerrainNormalFunction.
 	- Since 5 July texture mapping was broken in the terrain engine.
 	  The block textures were mapped to the wrong blocks giving a
 	  patch-work like result. Fixed now.
 	- Eric Sunshine applied a patch to SCF_DECLARE_FAST_INTERFACE() to
 	  prevent the DJGPP compiler from complaining about semantics of the
 	  static scfInterfaceID variable generating multiple copies.
+	- Philip Wyett changed documentation with the following comment:
+	  Removal of one of my email addresses in preperation of big email
+	  address switch by me in the next two weeks.
+	- Martin Geisse continued work on the model crossbuilder and mdltest:
+	    - Actions are now handled correctly.
+	    - mdltest builds an action into the default model. This is not
+	      visible though because by default a thing is built, but the
+	      action is only visible in sprites.
 16-Jul-2001
 	- Cleaned up new lighting system and CheckFrustum() a little more.
 	- Added iLightingProcessInfo interface. A callback for a null-portal

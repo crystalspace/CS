@@ -21,6 +21,7 @@
 
 #include "ivideo/graph3d.h"
 #include "isys/vfs.h"
+#include "ivaria/conin.h"
 
 struct iEngine;
 struct iCamera;
@@ -57,8 +58,14 @@ public:
   static void Initialize (iEngine* engine, iCamera* camera, iGraphics3D* g3d,
     iConsoleOutput* console, iSystem* system);
 
-  /// This method can be set as a console input callback
-  static void perform_callback (void *, const char *command);
+  /// This struct can be used as a console input callback
+  struct PerformCallback : public iConsoleExecCallback
+  {
+    SCF_DECLARE_IBASE;
+    PerformCallback () { SCF_CONSTRUCT_IBASE (NULL); }
+    virtual ~PerformCallback () { }
+    virtual void Execute (const char* cmd);
+  };
 
   /// Perform the command and return true if it was a valid command.
   static bool perform (const char* cmd, const char* arg = NULL);

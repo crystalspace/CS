@@ -51,7 +51,18 @@ struct iCamera;
 struct iLight;
 struct iMeshObjectFactory;
 
-SCF_VERSION (iIsoEngine, 0, 0, 1);
+SCF_VERSION (iGridChangeCallback, 0, 0, 1);
+
+/**
+ * Called when a grid change happens.
+ */
+struct iGridChangeCallback : public iBase
+{
+  /// Grid change.
+  virtual void GridChange (iIsoSprite* spr) = 0;
+};
+
+SCF_VERSION (iIsoEngine, 0, 0, 2);
 
 /**
  * SCF Interface to the isometric engine.
@@ -242,7 +253,18 @@ struct iIsoGrid : public iBase
   virtual void Draw(iIsoRenderView *rview) = 0;
 };
 
-SCF_VERSION (iIsoCell, 0, 0, 1);
+SCF_VERSION (iIsoCellTraverseCallback, 0, 0, 1);
+
+/**
+ * A callback that is called for cell traversal.
+ */
+struct iIsoCellTraverseCallback : public iBase
+{
+  /// Traverse.
+  virtual void Traverse (iIsoSprite* spr) = 0;
+};
+
+SCF_VERSION (iIsoCell, 0, 0, 2);
 
 /**
  * a grid cell. Size is 1.000 x 1.000 in (x,z) world space.
@@ -255,8 +277,8 @@ struct iIsoCell : public iBase
   virtual void RemoveSprite(iIsoSprite *sprite, const csVector3& pos) = 0;
   /// Draw using given renderview
   virtual void Draw(iIsoRenderView *rview) = 0;
-  /// Traverse in any order, all sprites, calling func(sprite, userdata).
-  virtual void Traverse(void (*func)(iIsoSprite*, void *), void *userdata)=0;
+  /// Traverse in any order, all sprites, calling func->Traverse(sprite).
+  virtual void Traverse(iIsoCellTraverseCallback* func) = 0;
 };
 
 SCF_VERSION (iIsoView, 0, 0, 1);
@@ -387,9 +409,6 @@ SCF_VERSION (iIsoSprite, 0, 0, 1);
 */
 struct iIsoSprite : public iBase
 {
-  /// Type of grid-change callback hook.
-  typedef void (*GridChangeCallbackType)(iIsoSprite *, void *);
-
   /// get the number of vertices
   virtual int GetVertexCount() const = 0;
   /// add a new vertex to the polygon
@@ -437,10 +456,9 @@ struct iIsoSprite : public iBase
   /// get the grid this sprite is part of
   virtual iIsoGrid *GetGrid() const = 0;
   /// set a callback for when the sprite moves to another grid
-  virtual void SetGridChangeCallback(GridChangeCallbackType, void *data) = 0;
+  virtual void SetGridChangeCallback (iGridChangeCallback* cb) = 0;
   /// get the callback for when the sprite moves to another grid
-  virtual void GetGridChangeCallback(GridChangeCallbackType&,
-    void *&data) const = 0;
+  virtual iGridChangeCallback* GetGridChangeCallback () const = 0;
 };
 
 

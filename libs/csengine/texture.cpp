@@ -74,6 +74,8 @@ csTextureWrapper::~csTextureWrapper ()
     handle->DecRef ();
   if (image)
     image->DecRef ();
+  if (use_callback)
+    use_callback->DecRef ();
 }
 
 void csTextureWrapper::SetImageFile (iImage *Image)
@@ -164,12 +166,10 @@ int csTextureWrapper::TextureWrapper::GetFlags ()
   { return scfParent->GetFlags (); }
 void csTextureWrapper::TextureWrapper::Register (iTextureManager *txtmng)
   { scfParent->Register (txtmng); }
-void csTextureWrapper::TextureWrapper::SetUseCallback (csTextureCallback* callback, void* data)
-  { scfParent->SetUseCallback (callback, data); }
-csTextureCallback* csTextureWrapper::TextureWrapper::GetUseCallback ()
+void csTextureWrapper::TextureWrapper::SetUseCallback (iTextureCallback* callback)
+  { scfParent->SetUseCallback (callback); }
+iTextureCallback* csTextureWrapper::TextureWrapper::GetUseCallback ()
   { return scfParent->GetUseCallback (); }
-void* csTextureWrapper::TextureWrapper::GetUseData ()
-  { return scfParent->GetUseData (); }
 void csTextureWrapper::TextureWrapper::Visit ()
   { scfParent->Visit (); }
 

@@ -74,6 +74,7 @@ csConsoleInput::~csConsoleInput ()
     Console->RegisterWatcher (NULL);
     Console->DecRef ();
   }
+  if (Callback) Callback->DecRef ();
 }
 
 bool csConsoleInput::Initialize (iSystem *iSys)
@@ -135,7 +136,7 @@ bool csConsoleInput::HandleEvent (iEvent &Event)
         case CSKEY_ENTER:
 	  Console->PutText(CS_MSG_CONSOLE, "\n");
           if (Callback)
-            Callback (CallbackData, line);
+            Callback->Execute (line);
           if (line [0])
           {
             HistoryPos = History.Push (csStrNew (line)) + 1;

@@ -39,6 +39,12 @@
 
 //-----------------------------------------------------------------------------
 
+SCF_IMPLEMENT_IBASE (StandardOp)
+  SCF_IMPLEMENTS_INTERFACE (iSequenceOperation)
+SCF_IMPLEMENT_IBASE_END
+
+//-----------------------------------------------------------------------------
+
 void FadeOp::Do (csTime dt)
 {
   DemoSequenceManager::demoseq->SetupFade (start_fade,

@@ -275,3 +275,8 @@ void csSequenceManager::RunSequence (csTime time, iSequence* sequence)
     op = op->next;
   }
 }
+
+SCF_IMPLEMENT_IBASE (csSequence::StandardOperation)
+  SCF_IMPLEMENTS_INTERFACE (iSequenceOperation)
+SCF_IMPLEMENT_IBASE_END
+

@@ -39,7 +39,27 @@
 /// Very small font (smallest font that is still readable)
 #define CSFONT_SMALL		"*small"
 
-SCF_VERSION (iFont, 1, 0, 0);
+struct iFont;
+
+SCF_VERSION (iFontDeleteNotify, 0, 0, 1);
+
+/**
+ * Called before a font is deleted.
+ * You can insert any number of callback routines into the font
+ * so that when the font will be destroyed all of them will be
+ * called in turn. This can be used by canvas driver, for example,
+ * if the canvas driver does some kind of caching for fonts,
+ * e.g. OpenGL driver pre-caches the font on a texture, it needs
+ * some mechanism to be notified when the font is destroyed to free
+ * the cache texture associated with the font.
+ */
+struct iFontDeleteNotify : public iBase
+{
+  /// Before delete.
+  virtual void BeforeDelete (iFont* font) = 0;
+};
+
+SCF_VERSION (iFont, 1, 0, 1);
 
 /**
  * A font object.
@@ -92,28 +112,17 @@ struct iFont : public iBase
   virtual int GetLength (const char *text, int maxwidth) = 0;
 
   /**
-   * You can insert any number of callback routines into the font
-   * so that when the font will be destroyed all of them will be
-   * called in turn. This can be used by canvas driver, for example,
-   * if the canvas driver does some kind of caching for fonts,
-   * e.g. OpenGL driver pre-caches the font on a texture, it needs
-   * some mechanism to be notified when the font is destroyed to free
-   * the cache texture associated with the font.
-   */
-  typedef void (*DeleteNotify) (iFont *, void *);
-
-  /**
    * Add a font delete notification callback routine.
    * This routine will be called from font destructor,
    * with the font instance being passed as argument.
    * Another parameter is provided to supply additional data.
    */
-  virtual void AddDeleteCallback (DeleteNotify func, void *databag) = 0;
+  virtual void AddDeleteCallback (iFontDeleteNotify* func) = 0;
 
   /**
    * Remove a font delete notification callback.
    */
-  virtual bool RemoveDeleteCallback (DeleteNotify func, void *databag) = 0;
+  virtual bool RemoveDeleteCallback (iFontDeleteNotify* func) = 0;
 };
 
 SCF_VERSION (iFontServer, 2, 0, 0);

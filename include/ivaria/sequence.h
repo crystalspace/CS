@@ -23,15 +23,14 @@
 
 struct iSequenceManager;
 
+SCF_VERSION (iSequenceOperation, 0, 0, 1);
+
 /**
  * A sequence operation. This is effectively a callback
- * to the application. DecRef() and IncRef() have to perform reference
- * counting. If the reference is zero the operation must be deleted.
+ * to the application.
  */
-struct iSequenceOperation
+struct iSequenceOperation : public iBase
 {
-  virtual void DecRef () = 0;
-  virtual void IncRef () = 0;
   /**
    * Do the operation. The dt parameter is the difference between
    * the time the sequence manager is at now and the time this operation
@@ -43,16 +42,14 @@ struct iSequenceOperation
   virtual void Do (csTime dt) = 0;
 };
 
+SCF_VERSION (iSequenceCondition, 0, 0, 1);
+
 /**
  * A sequence condition. This is also a callback to the application.
- * This condition returns true on success. DecRef() and IncRef() have to
- * perform reference counting. If the reference is zero the condition
- * must be deleted.
+ * This condition returns true on success.
  */
-struct iSequenceCondition
+struct iSequenceCondition : public iBase
 {
-  virtual void DecRef () = 0;
-  virtual void IncRef () = 0;
   /**
    * Do the condition. The dt parameter is the difference between
    * the time the sequence manager is at now and the time this condition

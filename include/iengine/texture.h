@@ -28,10 +28,18 @@ struct iTextureManager;
 struct iTextureWrapper;
 struct iObject;
 
-/// A callback function for when a csTextureWrapper is used.
-typedef void (csTextureCallback) (iTextureWrapper* wrap, void* data);
+SCF_VERSION (iTextureCallback, 0, 0, 1);
 
-SCF_VERSION (iTextureWrapper, 0, 0, 3);
+/**
+ * A callback for when a iTextureWrapper is used.
+ */
+struct iTextureCallback : public iBase
+{
+  /// Get height.
+  virtual void UseTexture (iTextureWrapper* wrap) = 0;
+};
+
+SCF_VERSION (iTextureWrapper, 0, 0, 4);
 
 /**
  * This class represents a texture wrapper which holds
@@ -78,18 +86,13 @@ struct iTextureWrapper : public iBase
    * This is mainly useful for procedural textures which can then
    * choose to update their image.
    */
-  virtual void SetUseCallback (csTextureCallback* callback, void* data) = 0;
+  virtual void SetUseCallback (iTextureCallback* callback) = 0;
 
   /**
    * Get the use callback. If there are multiple use callbacks you can
    * use this function to chain.
    */
-  virtual csTextureCallback* GetUseCallback () = 0;
-
-  /**
-   * Get the use data.
-   */
-  virtual void* GetUseData () = 0;
+  virtual iTextureCallback* GetUseCallback () = 0;
 
   /**
    * Visit this texture. This should be called by the engine right

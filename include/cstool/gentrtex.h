@@ -19,26 +19,32 @@
 #ifndef __CSGENTERTEX_H__
 #define __CSGENTERTEX_H__
 
+#include "csutil/scf.h"
 #include "csutil/cscolor.h"
 #include "csgeom/vector2.h"
 #include "csgfx/rgbpixel.h"
+
 struct iImage;
 class csGenerateImageValue;
 class csGenerateImageTexture;
 
-/** a base class which represents a value that can be computed
-  for blending purposes for each pixel. */
+/**
+ * A base class which represents a value that can be computed
+ * for blending purposes for each pixel.
+ */
 class csGenerateImageValue
 {
 public:
   /// delete it
   virtual ~csGenerateImageValue() {}
   /// get the value for location
-  virtual float GetValue(float x, float y) = 0;
+  virtual float GetValue (float x, float y) = 0;
 };
 
-/** a base class which represents a texture that can be displayed
-  on the terrain. It has a colour for each pixel */
+/**
+ * A base class which represents a texture that can be displayed
+ * on the terrain. It has a colour for each pixel
+ */
 class csGenerateImageTexture
 {
 public:
@@ -49,7 +55,8 @@ public:
 };
 
 
-/** This class will compute a texture for a terrain.
+/**
+ * This class will compute a texture for a terrain.
  * The texture is based on the heightmap for the terrain.
  * It is like the povray MaterialMap, but then indexed with
  * the height of the terrain.
@@ -60,8 +67,10 @@ public:
 */
 class csGenerateImage 
 {
+private:
   /// the texture to show
   csGenerateImageTexture *tex;
+
 public:
   /// create empty
   csGenerateImage();
@@ -89,7 +98,8 @@ public:
  * This class is used to store the layers of textures per value. Used in the
  * Blend class.
  */
-class csGenerateImageLayer {
+class csGenerateImageLayer
+{
 public:
   /// the value where this texture should show
   float value;
@@ -100,9 +110,9 @@ public:
 };
 
 /**
- * a class for a solid coloured texture
-*/
-class csGenerateImageTextureSolid:public csGenerateImageTexture
+ * A class for a solid coloured texture.
+ */
+class csGenerateImageTextureSolid : public csGenerateImageTexture
 {
 public:
   /// the colour, range 0-1
@@ -114,9 +124,9 @@ public:
 };
 
 /**
- * A class for a single texture
-*/
-class csGenerateImageTextureSingle:public csGenerateImageTexture
+ * A class for a single texture.
+ */
+class csGenerateImageTextureSingle : public csGenerateImageTexture
 {
 public:
   /// the image - the texture image
@@ -142,7 +152,7 @@ public:
  * a class for a texture that is made by blending together other textures
  * based on a value. It has a set of layers to blend between.
  */
-class csGenerateImageTextureBlend:public csGenerateImageTexture
+class csGenerateImageTextureBlend : public csGenerateImageTexture
 {
 public:
   /// the list - sorted by value - of layers
@@ -159,25 +169,51 @@ public:
   void AddLayer(float value, csGenerateImageTexture *tex);
 };
 
+SCF_VERSION (iGenerateImageFunction, 0, 0, 1);
+
+/**
+ * This class represents a function for csGenerateImageValueFunc. Expects
+ * values for dx and dy between 0 and 1 and returns a height or slope.
+ */
+struct iGenerateImageFunction : public iBase
+{
+  /// Get height or slope.
+  virtual float GetValue (float dx, float dy) = 0;
+};
+
 
 /**
  * This class will generate a value using a given function. For heights
  * or slopes.
-*/
+ */
 class csGenerateImageValueFunc : public csGenerateImageValue
 {
+private:
+  /// Height or slope function.
+  iGenerateImageFunction* heightfunc;
+
 public:
-  /// height or slope func
-  float (*heightfunc)(void *, float, float);
-  /// userdata for the heightfunc
-  void *userdata;
-  /// get the value for location
-  virtual float GetValue(float x, float y){return heightfunc(userdata, x, y);}
+  csGenerateImageValueFunc () : heightfunc (NULL) { }
+  virtual ~csGenerateImageValueFunc ()
+  {
+    if (heightfunc) heightfunc->DecRef ();
+  }
+
+  /// Get the value for location.
+  virtual float GetValue(float x, float y)
+  {
+    return heightfunc->GetValue (x, y);
+  }
+  /// Set the function.
+  void SetFunction (iGenerateImageFunction* func)
+  {
+    SCF_SET_REF (heightfunc, func);
+  }
 };
 
 /**
- * This class will generate a constant value
-*/
+ * This class will generate a constant value.
+ */
 class csGenerateImageValueFuncConst : public csGenerateImageValue
 {
 public:
@@ -190,7 +226,7 @@ public:
 /**
  * This class will generate a value using a texture. The average of the
  * rgb values will be returned.
-*/
+ */
 class csGenerateImageValueFuncTex : public csGenerateImageValue
 {
 public:

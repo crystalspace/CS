@@ -71,11 +71,22 @@ void Cleanup ()
   delete System;
 }
 
+struct PlayerGridChange : public iGridChangeCallback
+{
+  IsoTest* app;
+  SCF_DECLARE_IBASE;
+  PlayerGridChange () { SCF_CONSTRUCT_IBASE (NULL); }
+  virtual ~PlayerGridChange() { }
+  virtual void GridChange (iIsoSprite* spr);
+};
+
+SCF_IMPLEMENT_IBASE (PlayerGridChange)
+  SCF_IMPLEMENTS_INTERFACE (iGridChangeCallback)
+SCF_IMPLEMENT_IBASE_END
 
 /// helper grid change callback for the player sprite - to move the light
-static void PlayerGridChange(iIsoSprite *sprite, void *mydata)
+void PlayerGridChange::GridChange (iIsoSprite *sprite)
 {
-  IsoTest* app = (IsoTest*)mydata;
   if(app->GetLight())
     app->GetLight()->SetGrid(sprite->GetGrid());
 }
@@ -188,7 +199,10 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   player->SetMaterialWrapper(snow);
   player->SetMixMode(CS_FX_ADD);
   world->AddSprite(player);
-  player->SetGridChangeCallback(PlayerGridChange, (void*)this);
+  PlayerGridChange* cb = new PlayerGridChange ();
+  cb->app = this;
+  player->SetGridChangeCallback(cb);
+  cb->DecRef ();
 
   // add a light to the scene.
   iIsoLight *scenelight = engine->CreateLight();

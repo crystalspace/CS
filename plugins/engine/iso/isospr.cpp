@@ -46,11 +46,11 @@ csIsoSprite::csIsoSprite (iBase *iParent)
   g3dpolyfx.flat_color_b = 1;
   grid = NULL;
   gridcall = NULL;
-  gridcalldata = NULL;
 }
 
 csIsoSprite::~csIsoSprite ()
 {
+  if (gridcall) gridcall->DecRef ();
 }
 
 int csIsoSprite::GetVertexCount() const
@@ -285,7 +285,7 @@ void csIsoSprite::SetGrid(iIsoGrid *grid)
   if(csIsoSprite::grid != grid)
   {
     csIsoSprite::grid = grid;
-    if(gridcall) gridcall(this, gridcalldata);
+    if(gridcall) gridcall->GridChange (this);
   }
 }
 

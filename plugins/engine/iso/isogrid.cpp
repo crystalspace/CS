@@ -306,21 +306,47 @@ int csIsoGrid::GetGroundMultY() const
   return groundmap->GetMultY();
 }
 
-static void resetspritelight(iIsoSprite* spr, void * /*dat*/)
+struct ResetSpriteLight : public iIsoCellTraverseCallback
+{
+  SCF_DECLARE_IBASE;
+  ResetSpriteLight () { SCF_CONSTRUCT_IBASE (NULL); }
+  virtual ~ResetSpriteLight () { }
+  virtual void Traverse (iIsoSprite* spr);
+};
+
+SCF_IMPLEMENT_IBASE (ResetSpriteLight)
+  SCF_IMPLEMENTS_INTERFACE (iIsoCellTraverseCallback)
+SCF_IMPLEMENT_IBASE_END
+
+void ResetSpriteLight::Traverse (iIsoSprite* spr)
 {
   spr->ResetAllColors();
 }
 
 void csIsoGrid::ResetAllLight()
 {
+  ResetSpriteLight* rs = new ResetSpriteLight ();
   for(int i=0; i<width*height; i++) 
     if(grid[i]) 
-      grid[i]->Traverse(resetspritelight, NULL);
+      grid[i]->Traverse (rs);
+  rs->DecRef ();
 }
 
-static void setspritecolor(iIsoSprite* spr, void *dat)
+struct SetSpriteColor : public iIsoCellTraverseCallback
 {
-  const csColor *col = (const csColor*)dat;
+  const csColor* col;
+  SCF_DECLARE_IBASE;
+  SetSpriteColor () { SCF_CONSTRUCT_IBASE (NULL); }
+  virtual ~SetSpriteColor () { }
+  virtual void Traverse (iIsoSprite* spr);
+};
+
+SCF_IMPLEMENT_IBASE (SetSpriteColor)
+  SCF_IMPLEMENTS_INTERFACE (iIsoCellTraverseCallback)
+SCF_IMPLEMENT_IBASE_END
+
+void SetSpriteColor::Traverse (iIsoSprite* spr)
+{
   spr->SetAllColors(*col);
 }
 
@@ -328,28 +354,47 @@ void csIsoGrid::SetAllLight(const csColor& color)
 {
   // make copy of color, since (weird usermade) iIsoSprites could violate 
   // the const that is promised in my heading.
+  SetSpriteColor* sp = new SetSpriteColor ();
   csColor col = color;
+  sp->col = &col;
   for(int i=0; i<width*height; i++) 
     if(grid[i]) 
     {
-      grid[i]->Traverse(setspritecolor, &col);
+      grid[i]->Traverse (sp);
     }
+  sp->DecRef ();
 }
 
-static void setspritestaticcolor(iIsoSprite* spr, void *dat)
+struct SetSpriteStaticColor : public iIsoCellTraverseCallback
 {
-  const csColor *col = (const csColor*)dat;
+  const csColor* col;
+  SCF_DECLARE_IBASE;
+  SetSpriteStaticColor () { SCF_CONSTRUCT_IBASE (NULL); }
+  virtual ~SetSpriteStaticColor () { }
+  virtual void Traverse (iIsoSprite* spr);
+};
+
+SCF_IMPLEMENT_IBASE (SetSpriteStaticColor)
+  SCF_IMPLEMENTS_INTERFACE (iIsoCellTraverseCallback)
+SCF_IMPLEMENT_IBASE_END
+
+void SetSpriteStaticColor::Traverse (iIsoSprite* spr)
+{
+  spr->SetAllColors(*col);
   spr->SetAllStaticColors(*col);
 }
 
 void csIsoGrid::SetAllStaticLight(const csColor& color)
 {
   csColor col = color;
+  SetSpriteStaticColor* sp = new SetSpriteStaticColor ();
+  sp->col = &col;
   for(int i=0; i<width*height; i++) 
     if(grid[i]) 
     {
-      grid[i]->Traverse(setspritestaticcolor, &col);
+      grid[i]->Traverse (sp);
     }
+  sp->DecRef ();
 }
 
 

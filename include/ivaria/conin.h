@@ -24,9 +24,20 @@
 
 struct iEvent;
 struct iConsoleOutput;
-typedef void (*csConsoleExecCallback) (void *, const char *);
 
-SCF_VERSION (iConsoleInput, 1, 0, 0);
+
+SCF_VERSION (iConsoleExecCallback, 0, 0, 1);
+
+/**
+ * Command execution callback.
+ */
+struct iConsoleExecCallback : public iBase
+{
+  /// Execute.
+  virtual void Execute (const char* cmd) = 0;
+};
+
+SCF_VERSION (iConsoleInput, 1, 0, 1);
 
 /**
  * This is a plugin that can handle keyboard input and display
@@ -40,8 +51,9 @@ struct iConsoleInput : public iBase
   virtual void Bind (iConsoleOutput*) = 0;
 
   /// Set the command execution callback
-  virtual void ExecuteCallback (csConsoleExecCallback iCallback,
-    void *iCallbackData) = 0;
+  virtual void SetExecuteCallback (iConsoleExecCallback* iCallback) = 0;
+  /// Get the command execution callback.
+  virtual iConsoleExecCallback* GetExecuteCallback () = 0;
 
   /// Return a line from the input buffer (-1 = current line)
   virtual const char *GetText (int iLine = -1) const = 0;
