@@ -1,3 +1,10 @@
+The AsciiArt library is availble here:
+
+http://aa-project.sourceforge.net/
+
+*** These notes are quite old; so they may not accurately reflect present-day
+    AsciiArt.
+
 You have to make a small change to aalib.h (sorry, not my fault) before
 the driver will properly compile with any decent C++ compiler:
 
