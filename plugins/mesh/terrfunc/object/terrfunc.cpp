@@ -530,62 +530,6 @@ void csTerrFuncObject::LoadMaterialGroup (iLoaderContext* ldr_context,
 class csTriangleVertices;
 
 /*
- * The representation of a vertex in a triangle mesh.
- * This is basicly used as a temporary structure to be able to
- * calculate the cost of collapsing this vertex more quickly.
- */
-class csTriangleVertex
-{
-public:
-  // Position of this vertex in 3D space.
-  csVector3 pos;
-  // Terrain function coordinates for this vertex.
-  float dx, dy;
-  // True if a corner point.
-  bool at_corner;
-  // True if a horizontal edge point.
-  bool at_hor_edge;
-  // True if a vertical edge point.
-  bool at_ver_edge;
-  // Index of this vertex.
-  int idx;
-  // True if already deleted.
-  bool deleted;
-
-  // Triangles that this vertex is connected to.
-  int* con_triangles;
-  // Number of triangles.
-  int num_con_triangles;
-  int max_con_triangles;
-
-  // Other vertices that this vertex is connected to.
-  int* con_vertices;
-  // Number of vertices.
-  int num_con_vertices;
-  int max_con_vertices;
-
-  // Precalculated minimal cost of collapsing this vertex to some other.
-  float cost;
-  // Vertex to collapse to with minimal cost.
-  int to_vertex;
-
-  csTriangleVertex () : deleted (false), con_triangles (NULL),
-  	num_con_triangles (0), max_con_triangles (0),
-  	con_vertices (NULL), num_con_vertices (0), max_con_vertices (0) { }
-  ~csTriangleVertex () { delete [] con_triangles; delete [] con_vertices; }
-  void AddTriangle (int idx);
-  void AddVertex (int idx);
-  bool DelVertex (int idx);
-  void ReplaceVertex (int old, int replace);
-
-  /*
-   * Calculate the minimal cost of collapsing this vertex to some other.
-   * Also remember which other vertex was selected for collapsing to.
-   */
-  void CalculateCost(csTriangleVertices* vertices, csTerrFuncObject* terrfunc);
-};
-
-/*
  * A class which holds vertices and connectivity information for a triangle
  * mesh. This is a general vertices structure but it is mostly useful
  * for LOD generation since every vertex contains information which
@@ -593,9 +537,67 @@ public:
  */
 class csTriangleVertices
 {
+public:
+  /*
+   * The representation of a vertex in a triangle mesh.
+   * This is basicly used as a temporary structure to be able to
+   * calculate the cost of collapsing this vertex more quickly.
+   */
+  class csTriangleVertex
+  {
+  public:
+    // Position of this vertex in 3D space.
+    csVector3 pos;
+    // Terrain function coordinates for this vertex.
+    float dx, dy;
+    // True if a corner point.
+    bool at_corner;
+    // True if a horizontal edge point.
+    bool at_hor_edge;
+    // True if a vertical edge point.
+    bool at_ver_edge;
+    // Index of this vertex.
+    int idx;
+    // True if already deleted.
+    bool deleted;
+
+    // Triangles that this vertex is connected to.
+    int* con_triangles;
+    // Number of triangles.
+    int num_con_triangles;
+    int max_con_triangles;
+
+    // Other vertices that this vertex is connected to.
+    int* con_vertices;
+    // Number of vertices.
+    int num_con_vertices;
+    int max_con_vertices;
+
+    // Precalculated minimal cost of collapsing this vertex to some other.
+    float cost;
+    // Vertex to collapse to with minimal cost.
+    int to_vertex;
+
+    csTriangleVertex () : deleted (false), con_triangles (NULL),
+                          num_con_triangles (0), max_con_triangles (0),
+                          con_vertices (NULL), num_con_vertices (0), max_con_vertices (0) { }
+    ~csTriangleVertex () { delete [] con_triangles; delete [] con_vertices; }
+    void AddTriangle (int idx);
+    void AddVertex (int idx);
+    bool DelVertex (int idx);
+    void ReplaceVertex (int old, int replace);
+
+    /*
+     * Calculate the minimal cost of collapsing this vertex to some other.
+     * Also remember which other vertex was selected for collapsing to.
+     */
+    void CalculateCost(csTriangleVertices* vertices, csTerrFuncObject* terrfunc);
+  };
+
 private:
   csTriangleVertex* vertices;
   int num_vertices;
+
 
 public:
   // Build vertex table for a triangle mesh.
@@ -615,7 +617,7 @@ public:
   int GetMinimalCostVertex ();
 };
 
-void csTriangleVertex::AddTriangle (int idx)
+void csTriangleVertices::csTriangleVertex::AddTriangle (int idx)
 {
   int i;
   for (i = 0 ; i < num_con_triangles ; i++)
@@ -636,7 +638,7 @@ void csTriangleVertex::AddTriangle (int idx)
   num_con_triangles++;
 }
 
-void csTriangleVertex::AddVertex (int idx)
+void csTriangleVertices::csTriangleVertex::AddVertex (int idx)
 {
   int i;
   for (i = 0 ; i < num_con_vertices ; i++)
@@ -657,7 +659,7 @@ void csTriangleVertex::AddVertex (int idx)
   num_con_vertices++;
 }
 
-bool csTriangleVertex::DelVertex (int idx)
+bool csTriangleVertices::csTriangleVertex::DelVertex (int idx)
 {
   int i;
   for (i = 0 ; i < num_con_vertices ; i++)
@@ -672,12 +674,12 @@ bool csTriangleVertex::DelVertex (int idx)
   return false;
 }
 
-void csTriangleVertex::ReplaceVertex (int old, int replace)
+void csTriangleVertices::csTriangleVertex::ReplaceVertex (int old, int replace)
 {
   if (DelVertex (old)) AddVertex (replace);
 }
 
-void csTriangleVertex::CalculateCost (csTriangleVertices* vertices,
+void csTriangleVertices::csTriangleVertex::CalculateCost (csTriangleVertices* vertices,
 	csTerrFuncObject* terrfunc)
 {
   int i;
@@ -1009,11 +1011,11 @@ void csTerrFuncObject::ComputeLODLevel (
   while (true)
   {
     int from = verts->GetMinimalCostVertex ();
-    csTriangleVertex& vt_from = verts->GetVertex (from);
+    csTriangleVertices::csTriangleVertex& vt_from = verts->GetVertex (from);
     float cost = vt_from.cost;
     if (cost > maxcost) break;
     int to = vt_from.to_vertex;
-    csTriangleVertex& vt_to = verts->GetVertex (to);
+    csTriangleVertices::csTriangleVertex& vt_to = verts->GetVertex (to);
 
     // First update all triangles to replace the 'from' vertex with the
     // 'to' vertex. This can basically collapse triangles to a flat triangle.
