@@ -8,6 +8,8 @@ The history order is reversed so that new features are at the top.
 	- Matze Braun added mk/autoconf dir for autoconf macros and added a
 	  script to regenerate configure (bin/autogen.sh).
 	- Matze Braun added a check for the libxml2 plugin.
+	- Matze Braun fixed a typo in csdemo makefile which caused csdemo not
+	  getting installed by "make install"
 21-Feb-2003
   	- Andrew Craig changed iEngine->GetNearbyObjects() to take a bool
           parameter crossPortals. If you want to limit the search to the
