@@ -171,6 +171,12 @@ struct iShaderPass : iBase
 
   /// Check if valid
   virtual bool IsValid() = 0;
+
+  /// Activate the whole pass
+  virtual void Activate() = 0;
+
+  /// Deactivate the whole pass
+  virtual void Deactivate() = 0;
 };
 
 SCF_VERSION (iShaderProgram, 0,0,1);
