@@ -1699,7 +1699,7 @@ bool csTerrFuncObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 	  SetupVertexBuffer (block.vbuf[0], block.vbuf[0]);
 	  block.Draw(rview, clip_portal, clip_plane, clip_z_plane,
 	    correct_du, correct_su, correct_dv, correct_sv, this);
-	  break; //// only one block
+	  //break; //// only one block
 	  continue;
 	}
         csVector3& bc = block.center;

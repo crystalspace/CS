@@ -262,8 +262,8 @@ void csTerrainQuadDiv::ComputeLOD(int framenum, const csVector3& campos,
     if(campos.x > maxx) distx = campos.x-maxx;
     if(campos.z < miny) disty = miny-campos.z;
     if(campos.z > maxy) disty = campos.z-maxy;
-    distx*=01.;
-    disty*=01.;
+    distx*=0.1;
+    disty*=0.1;
     dist = 1. / qsqrt(1.0 + distx*distx + disty*disty);
   }
   e *= dist;
