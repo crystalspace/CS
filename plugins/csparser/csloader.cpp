@@ -154,7 +154,7 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* name)
       	->NewMaterial (material);
     if (region) region->QueryObject ()->ObjAdd (mat->QueryObject ());
     // First we have to extract the optional region name from the name:
-    char char* n = strchr (name, '/');
+    char const* n = strchr (name, '/');
     if (!n) n = name;
     else n++;
     mat->QueryObject()->SetName (n);
