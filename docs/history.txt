@@ -18,6 +18,8 @@ chronological order.
 	- Eric Sunshine added some content to the front page of the API
 	  reference manual since people seem to be regularly been confused by
 	  its emptiness and easily miss the links at the very top of the page.
+	- Eric Sunshine fixed bugs in odivx.mak and odivx4.mak where $ prefix
+	  was missing in a variable expansion.
 23-Feb-2004
 	- Jorrit moved the Engine.Lighthing.LightmapQuality config option
 	  from engine.cfg to thing.cfg (and renamed it
