@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2003 by Rene Jager (renej@frog.nl, renej.frog@yucom.be)
+    Copyright (C) 2003 Rene Jager <renej_frog@users.sourceforge.net>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -23,7 +23,7 @@
 	Search for 'pythpre' (pre-include phase) and 'pythpost' (post-include
 	phase) for places where to include files for new scripting languages.
 
-	Python:
+	Python (renej_frog@users.sourceforge.net):
 		Used for the new "cspython" plugin based on python 2.2 including
 		almost complete access to CS.
 
@@ -33,7 +33,7 @@
 		to set the CRYSTAL environment variable.
 		See $CRYSTAL/scripts/python/pysimpcd.py for an example of usage.
 
-	Perl:
+	Perl (oktal@gmx.co.uk):
 		Used for the "csperl5" plugin based on perl 5.8 including
 		access to most parts of CS
 		(although some ealier versions are probably supported).
@@ -42,8 +42,12 @@
 		Make sure the directory containing cspace.pm and cspace.so,
 		$CRYSTAL/scripts/perl5, is in perl's @INC array.
 
+    Java (renej_frog@users.sourceforge.net):
+        A wrapper for using CS from Java is provided: crystalspace.jar
+        and libcsjava.so.
+
 	Note:
-		Tested with swig 1.3.17, swig 1.1 won't work!
+		Tested with swig 1.3.17 and up, swig 1.1 won't work!
 
 	Thanks to:
 		Norman Kramer <norman@users.sourceforge.net> who made me think
@@ -372,6 +376,8 @@
 	%include "ivaria/rubypre.i"
 #elif defined(SWIGTCL8)
 	%include "ivaria/tclpre.i"
+#elif defined(SWIGJAVA)
+	%include "ivaria/javapre.i"
 #endif
 
 // Handle arrays as input arguments.
@@ -1134,6 +1140,8 @@ uint _CS_FX_SETALPHA_INT (uint);
 	%include "ivaria/rubypost.i"
 #elif defined(SWIGTCL8)
 	%include "ivaria/tclpost.i"
+#elif defined(SWIGJAVA)
+	%include "ivaria/javapost.i"
 #endif
 
 

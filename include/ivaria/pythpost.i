@@ -1,19 +1,19 @@
 /*
-    Copyright (C) 2003 by Rene Jager (renej@frog.nl, renej.frog@yucom.be)
+    Copyright (C) 2003 Rene Jager <renej_frog@users.sourceforge.net>
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Library General Public
-    License as published by the Free Software Foundation; either
-    version 2 of the License, or (at your option) any later version.
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Library General Public
+	License as published by the Free Software Foundation; either
+	version 2 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Library General Public License for more details.
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Library General Public License for more details.
 
-    You should have received a copy of the GNU Library General Public
-    License along with this library; if not, write to the Free
-    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+	You should have received a copy of the GNU Library General Public
+	License along with this library; if not, write to the Free
+	Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 /*
@@ -119,7 +119,7 @@ struct _csPyEventHandler : public iEventHandler
 		def HandleEvent (self, event):
 			return self._func(event)
 
-	def csInitializer_SetupEventHandler (reg, obj,
+	def _csInitializer_SetupEventHandler (reg, obj,
 			mask=(CSMASK_FrameProcess|CSMASK_Input|CSMASK_Broadcast)):
 		"""Replacement of C++ versions."""
 		if callable(obj):
@@ -131,7 +131,7 @@ struct _csPyEventHandler : public iEventHandler
 			hdlr = obj
 		return csInitializer._SetupEventHandler(reg, hdlr, mask)
 
-	def csInitializer_RequestPlugins (reg, plugins):
+	def _csInitializer_RequestPlugins (reg, plugins):
 		"""Replacement of C++ version with variable argument list."""
 		def _get_tuple (x):
 			if callable(x):
@@ -148,9 +148,9 @@ struct _csPyEventHandler : public iEventHandler
 				ok = 0
 		return ok
 
-	csInitializer.RequestPlugins = staticmethod(csInitializer_RequestPlugins)
+	csInitializer.RequestPlugins = staticmethod(_csInitializer_RequestPlugins)
 
-	csInitializer.SetupEventHandler = staticmethod(csInitializer_SetupEventHandler)
+	csInitializer.SetupEventHandler = staticmethod(_csInitializer_SetupEventHandler)
 
 %}
 
@@ -160,27 +160,27 @@ csWrapPtr _CS_QUERY_REGISTRY (iObjectRegistry *reg, const char *iface,
 	int iface_ver)
 {
   return csWrapPtr (iface, reg->Get
-    (iface, iSCF::SCF->GetInterfaceID (iface), iface_ver));
+	(iface, iSCF::SCF->GetInterfaceID (iface), iface_ver));
 }
 
 csWrapPtr _CS_QUERY_REGISTRY_TAG_INTERFACE (iObjectRegistry *reg,
 	const char *tag, const char *iface, int iface_ver)
 {
   return csWrapPtr (iface, reg->Get
-    (tag, iSCF::SCF->GetInterfaceID (iface), iface_ver));
+	(tag, iSCF::SCF->GetInterfaceID (iface), iface_ver));
 }
 
 csWrapPtr _SCF_QUERY_INTERFACE (iBase *obj, const char *iface, int iface_ver)
 {
   return csWrapPtr (iface, obj->QueryInterface
-    (iSCF::SCF->GetInterfaceID (iface), iface_ver));
+	(iSCF::SCF->GetInterfaceID (iface), iface_ver));
 }
 
 csWrapPtr _SCF_QUERY_INTERFACE_SAFE (iBase *obj, const char *iface,
 	int iface_ver)
 {
   return csWrapPtr (iface, iBase::QueryInterfaceSafe
-    (obj, iSCF::SCF->GetInterfaceID (iface), iface_ver));
+	(obj, iSCF::SCF->GetInterfaceID (iface), iface_ver));
 }
 
 csWrapPtr _CS_QUERY_PLUGIN_CLASS (iPluginManager *obj, const char *id,
@@ -198,21 +198,21 @@ csWrapPtr _CS_LOAD_PLUGIN (iPluginManager *obj, const char *id,
 csWrapPtr _CS_GET_CHILD_OBJECT (iObject *obj, const char *iface, int iface_ver)
 {
   return csWrapPtr (iface, obj->GetChild
-    (iSCF::SCF->GetInterfaceID (iface), iface_ver));
+	(iSCF::SCF->GetInterfaceID (iface), iface_ver));
 }
 
 csWrapPtr _CS_GET_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 	int iface_ver, const char *name)
 {
   return csWrapPtr (iface, obj->GetChild
-    (iSCF::SCF->GetInterfaceID (iface), iface_ver, name));
+	(iSCF::SCF->GetInterfaceID (iface), iface_ver, name));
 }
 
 csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 	int iface_ver, const char *name)
 {
   return csWrapPtr (iface, obj->GetChild
-    (iSCF::SCF->GetInterfaceID (iface), iface_ver, name, true));
+	(iSCF::SCF->GetInterfaceID (iface), iface_ver, name, true));
 }
 
 %}
@@ -414,6 +414,26 @@ csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 		{ return f * *self; }
 }
 
+// iutil/string.h
+%extend iString
+{
+	char __getitem__ (size_t i) const
+		{ return self->GetAt(i); }
+	void __setitem__ (size_t i, char c)
+		{ self->SetAt(i, c); }
+}
+
+// csutil/csstring.h
+%extend csString
+{
+	char __getitem__ (size_t i) const
+		{ return self->operator[](i); }
+	void __setitem__ (size_t i, char c)
+		{ self->operator[](i) = c; }
+	void __delitem__ (size_t i)
+		{ self->DeleteAt(i); }
+}
+
 %pythoncode %{
 
 	CS_VEC_FORWARD = csVector3(0,0,1)
@@ -430,6 +450,8 @@ csWrapPtr _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject *obj, const char *iface,
 	CS_VEC_TILT_DOWN = -csVector3(-1,0,0)
 
 %}
+
+%include "ivaria/pythvarg.i"
 
 #endif // SWIGPYTHON
 
