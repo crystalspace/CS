@@ -27,7 +27,6 @@
 #include <glide.h>
 
 #include "sysdef.h"
-#include "cs3d/software/scan.h"
 #include "StdAssrt.h"
 #include "ilghtmap.h"
 #include "isystem.h"

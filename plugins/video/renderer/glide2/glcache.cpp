@@ -22,7 +22,6 @@
 
 #include "sysdef.h"
 #include "cssys/common/system.h"
-#include "cs3d/software/scan.h"   //@@@WHY?
 #include "cs3d/glide2/g3dglide.h"
 #include "cs3d/glide2/glcache.h"
 #include "cs3d/glide2/glidelib.h"

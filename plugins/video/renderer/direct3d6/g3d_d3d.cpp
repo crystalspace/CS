@@ -33,7 +33,6 @@
 #include "d3dcaps.h"
 
 #include "sysdef.h"
-#include "cs3d/software/scan.h"	//@@@Why is this needed???
 #include "StdAssrt.h"
 #include "cs2d/ddraw6/IG2D.h"
 #include "cssys/win32/iDDetect.h"

@@ -27,7 +27,6 @@
 //#include "engine/camera.h"
 //#include "engine/light/dynlight.h"
 //#include "engine/light/lghtmap.h"
-#include "cs3d/software/scan.h"
 #include "cs3d/software/graph3d.h"
 #include "cs3d/glide3/g3dglide.h"
 #include "cs3d/glide3/glcache.h"
