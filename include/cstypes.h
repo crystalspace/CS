@@ -73,9 +73,9 @@ typedef unsigned long long uint64;
 /// signed 64 bit integer
 typedef long long int64;
 /// specify 64 bit integer constant
-#define CONST_I64(x) x##LL
+#define CONST_INT64(x) x ## LL
 /// specify 64 bit unsigned integer constant
-#define CONST_UI64(x) x##ULL
+#define CONST_UINT64(x) x ## ULL
 #else
 # ifdef COMP_VC
 /// unsigned 64 bit integer
@@ -83,9 +83,9 @@ typedef unsigned __int64 uint64;
 /// signed 64 bit integer
 typedef __int64 int64;
 /// specify 64 bit integer constant
-#define CONST_I64(x) x##i64
+#define CONST_INT64(x) x##i64
 /// specify 64 bit unsigned integer constant
-#define CONST_UI64(x) x##ui64
+#define CONST_UINT64(x) x##ui64
 # else
 #  warning NO definition for 64 bit integers defined for your compiler
 # endif
@@ -93,6 +93,7 @@ typedef __int64 int64;
 
 #else
 // we're happy and can simply use stdint.h
+#define __STDC_CONSTANT_MACROS
 #include <stdint.h>
 typedef uint8_t uint8;
 typedef int8_t int8;
@@ -102,8 +103,8 @@ typedef uint32_t uint32;
 typedef int32_t int32;
 typedef uint64_t uint64;
 typedef int64_t int64;
-#define CONST_I64(x) INT64_C(x)
-#define CONST_UI64(x) UINT64_C(x)
+#define CONST_INT64(x) INT64_C (x)
+#define CONST_UINT64(x) UINT64_C (x)
 #endif
 
 #endif // end of #if !defined(CS_BUILTIN_SIZED_TYPES)

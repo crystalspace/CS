@@ -27,6 +27,8 @@ The history order is reversed so that new features are at the top.
 	- Changed the readxml parser so that it no longer does any string
 	  manipulation. Instead it gets the string data directly from the
 	  XML data it is reading.
+	- Matze removed some unused/rarely used function from util.h
+	- Matze added some namespaces in util.h for testing
 	- res made the following changes to the newly arrived movie recorder:
 	    - use of CS types (uint8 etc.) instead of custom typedefs 
 	    - use of 64bit portability macros and some other fixes to make it
@@ -34,6 +36,11 @@ The history order is reversed so that new features are at the top.
 	    - added mmx.h from original NuppelVideo sources.
 	- Clarified csObjectPool class by making it templated and simplified
 	  the code a lot.
+	- Matze fixed renamed the CONST_I64 macro to CONST_INT64 to be
+	  consistent with our datatypes. Also we need to define
+	  __STDC_CONSTANT_MACROS if we want to use the macros from stdint.h
+	- Matze fixed the movierecorder plugin. Seems the mmx stuff only works
+	  on gcc 3.x
 1-Apr-2003
 	- Reverted dllwrap change to win32gcc.mak from 4 days ago since
 	  it prevents debug symbols from being present in plugins.
