@@ -9,6 +9,8 @@ chronological order.
 25-Feb-2005
 	- Jorrit added a new howto that explains how to compile external
 	  applications for Crystal Space and CEL using Dev-CPP.
+	- Jorrit fixed compilation for a few mesh plugins when leak
+	  guards are enabled.
 24-Feb-2005
 	- Jorrit fixed edge drawing by the OpenGL renderer by using
 	  glPolygonMode(GL_BACK,GL_LINE) instead of the way it was currently
