@@ -657,7 +657,7 @@ int Win32Assistant::GetCmdShow () const
 
 //----------------------------------------// Windows input translator //------//
 
-#define MAX_SCANCODE 0x3c
+#define MAX_SCANCODE 0x5a
 
 /*
     This table does not contain special key codes, since those are
@@ -763,16 +763,9 @@ LRESULT CALLBACK Win32Assistant::WindowProc (HWND hWnd, UINT message,
         int key = (scancode < MAX_SCANCODE) ? ScanCodeToChar [scancode] : 0;
         if (key || (wParam >= ' '))
         {
-	  iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
+          iEventOutlet* outlet = GLOBAL_ASSISTANT->GetEventOutlet();
           outlet->Key (key, wParam, true);
-	  if (scancode < MAX_SCANCODE)
-	  {
-	    // @@@@@@@ TEMPORARY bugfix. Maybe the LastCharCode
-	    // table is too small? In anycase this fix is needed.
-	    // Otherwise, pressing numpad numbers crashes CS.
-	    // But maybe this is not the right fix?
-            LastCharCode [scancode] = (unsigned char) wParam;
-	  }
+          LastCharCode [scancode] = (unsigned char) wParam;
         }
       }
       break;
