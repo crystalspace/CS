@@ -9,6 +9,12 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in the new software OpenGL clipper (in csFrustum/
 	  ClipToPlane). It now seems to work perfectly in all cases as far
 	  as I can see.
+	- Added code to save the result of auto-detection (OpenGL renderer).
+	  The result of this test is saved in user.cfg. I had hoped to save
+	  it with 'Global' put in front so that the test results would work
+	  for all apps but at this moment they are saved with the app prefix.
+	  This means that as long as you use the same app it will reuse the
+	  saved config.
 9-May-2001
 	- Martin Geisse added a version of typed vectors that don't delete
 	  their elements.

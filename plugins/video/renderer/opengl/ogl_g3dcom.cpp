@@ -593,6 +593,20 @@ void csGraphics3DOGLCommon::PerfTest ()
   	clip_required[0], clip_required[1], clip_required[2]);
   SysPrintf (MSG_INITIALIZATION, "    Video.OpenGL.ClipOptional = %c%c%c\n",
   	clip_optional[0], clip_optional[1], clip_optional[2]);
+  char buf[4]; buf[3] = 0;
+  buf[0] = clip_required[0];
+  buf[1] = clip_required[1];
+  buf[2] = clip_required[2];
+  config->SetStr ("Video.OpenGL.ClipRequired", buf);
+  buf[0] = clip_outer[0];
+  buf[1] = clip_outer[1];
+  buf[2] = clip_outer[2];
+  config->SetStr ("Video.OpenGL.ClipOuter", buf);
+  buf[0] = clip_optional[0];
+  buf[1] = clip_optional[1];
+  buf[2] = clip_optional[2];
+  config->SetStr ("Video.OpenGL.ClipOptional", buf);
+  config->Save ();
 
   SetClipper (NULL, CS_CLIPPER_NONE);
 
