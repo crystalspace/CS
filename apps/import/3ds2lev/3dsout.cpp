@@ -423,10 +423,23 @@ pointfound:
   if (!found)
     return false;
 
+#if 1
+  double dist = plane->Distance (vectors[nonshared]);
+printf ("\npl:%g,%g,%g,%g\n", plane->norm.x, plane->norm.y, plane->norm.z,
+	plane->DD);
+printf ("ve:%g,%g,%g\n", vectors[nonshared].x, vectors[nonshared].y,
+	vectors[nonshared].z);
+printf ("dist:%g\n", dist);
+  if (dist > 0.01)
+  {
+    return false;
+  }
+#else
   if (!RelaxedPlanesEqual (*plane, planes[trinum]) )
   {
     return false;
   }
+#endif
 
   // check if the poly shares 3 vertices
   int p;
