@@ -26,6 +26,8 @@
 #include "cssys/next/NeXTSystemDriver.h"
 #include "iutil/event.h"
 #include "isys/system.h"
+struct iObjectRegistry;
+struct iVirtualClock;
 typedef void* NeXTDelegateHandle;
 
 class NeXTAssistant : public iNeXTAssistant
@@ -33,8 +35,13 @@ class NeXTAssistant : public iNeXTAssistant
 private:
   NeXTSystemDriver* system;
   NeXTDelegateHandle controller;	// Application & window delegate.
+  iEventQueue* event_queue;		// Global event queue.
   iEventOutlet* event_outlet;		// Shared event outlet.
+  iVirtualClock* virtual_clock;		// Global virtual clock.
   bool should_shutdown;			// cscmdQuit was received.
+  iObjectRegistry* get_registry();
+  iEventQueue* get_event_queue();
+  iVirtualClock* get_virtual_clock();
   void init_menu(iConfigFile*);
 
 public:

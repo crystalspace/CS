@@ -34,10 +34,10 @@ SCF_VERSION (iNeXTAssistant, 0, 0, 1);
 /**
  * This is an interface for an object which provides assistance to
  * NeXT-specific canvases and Objective-C bridging code for application
- * run-loop support.  An instance of this object will be registered to the
+ * run-loop support.  An instance of this object will be registered with the
  * object registry with tag 'NeXTAssistant', however it is generally
  * recommended that you query the object registry for this object by simply
- * asking for the object implementing NeXTAssistant.
+ * asking for the object implementing iNeXTAssistant.
  */
 struct iNeXTAssistant : public iBase
 {
@@ -54,8 +54,8 @@ struct iNeXTAssistant : public iBase
 
   /**
    * Query whether or not the application's event loop should continue running.
-   * This will return `false' until some Crystal Space entity requests a
-   * shutdown, in which case the caller of this method will proceed to
+   * This will return `true' until some Crystal Space entity requests a
+   * shutdown, in which case the caller of this method should proceed to
    * terminate the AppKit's run-loop.
    */
   virtual bool continue_running() = 0;
@@ -99,12 +99,12 @@ struct iNeXTAssistant : public iBase
    * interpretation of events and instead use one of the methods below for
    * directly placing a csEvent in the queue, but it is much more convenient to
    * allow this method to do so.  The first argument is a pointer to an NSEvent
-   * (Cocoa and OpenStep) or an NXEvent (NextStep), but cast as an opaque
+   * (Cocoa and OpenStep) or an NXEvent (NextStep), but is cast as an opaque
    * NeXTEvent handle for representation in the C++ world.  The second argument
    * is a pointer to the view with which the event is associated, or NULL if
    * not associated with any view.  The view argument refers to an NSView
-   * (Cocoa and OpenStep) or a View (NextStep), but cast as an opaque NeXTView
-   * handle for representation in the C++ world.
+   * (Cocoa and OpenStep) or a View (NextStep), but is cast as an opaque
+   * NeXTView handle for representation in the C++ world.
    */
   virtual void dispatch_event(NeXTEvent, NeXTView) = 0;
 
@@ -122,7 +122,7 @@ struct iNeXTAssistant : public iBase
 
   /**
    * Post a mouse-down event to the Crystal Space event queue.  The
-   * mouse-button number 1-based.  The coordinates are specified in terms of
+   * mouse-button number is 1-based.  The coordinates are specified in terms of
    * the Crystal Space coordinate system where `x' increases from left to
    * right, and `y' increases from top to bottom.
    */
@@ -130,7 +130,7 @@ struct iNeXTAssistant : public iBase
 
   /**
    * Post a mouse-up event to the Crystal Space event queue.  The mouse-button
-   * number 1-based.  The coordinates are specified in terms of the Crystal
+   * number is 1-based.  The coordinates are specified in terms of the Crystal
    * Space coordinate system where `x' increases from left to right, and `y'
    * increases from top to bottom.
    */

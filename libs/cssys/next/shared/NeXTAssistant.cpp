@@ -24,6 +24,7 @@
 #include "csutil/cfgacc.h"
 #include "iutil/eventq.h"
 #include "iutil/objreg.h"
+#include "iutil/virtclk.h"
 
 typedef void* NeXTAssistantHandle;
 #define NSD_PROTO(RET,FUNC) extern "C" RET NeXTAssistant_##FUNC
@@ -46,23 +47,20 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-NeXTAssistant::NeXTAssistant(NeXTSystemDriver* p) :
-  system(p), event_outlet(0), should_shutdown(false)
+NeXTAssistant::NeXTAssistant(NeXTSystemDriver* p) : system(p),
+  event_queue(0), event_outlet(0), virtual_clock(0), should_shutdown(false)
 {
   SCF_CONSTRUCT_IBASE(0);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventPlug);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEventHandler);
+
   controller = NeXTDelegate_startup(this);
 
-  iObjectRegistry* r = system->GetObjectRegistry();
-  if (r != 0)
+  iEventQueue* q = get_event_queue();
+  if (q != 0)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY(r, iEventQueue);
-    if (q != 0)
-    {
-      event_outlet = q->CreateEventOutlet(&scfiEventPlug);
-      q->RegisterListener(&scfiEventHandler, CSMASK_Broadcast);
-    }
+    event_outlet = q->CreateEventOutlet(&scfiEventPlug);
+    q->RegisterListener(&scfiEventHandler, CSMASK_Broadcast);
   }
 }
 
@@ -73,9 +71,55 @@ NeXTAssistant::NeXTAssistant(NeXTSystemDriver* p) :
 NeXTAssistant::~NeXTAssistant()
 {
   NeXTDelegate_shutdown(controller);
+  orphan();
+  if (virtual_clock != 0)
+    virtual_clock->DecRef();
   if (event_outlet != 0)
     event_outlet->DecRef();
-  orphan();
+  if (event_queue != 0)
+    event_queue->DecRef();
+}
+
+
+//-----------------------------------------------------------------------------
+// get_registry
+//-----------------------------------------------------------------------------
+iObjectRegistry* NeXTAssistant::get_registry()
+{
+  iObjectRegistry* r = 0;
+  if (system != 0)
+    r = system->GetObjectRegistry();
+  return r;
+}
+
+
+//-----------------------------------------------------------------------------
+// get_event_queue
+//-----------------------------------------------------------------------------
+iEventQueue* NeXTAssistant::get_event_queue()
+{
+  if (event_queue == 0)
+  {
+    iObjectRegistry* r = get_registry();
+    if (r != 0)
+      event_queue = CS_QUERY_REGISTRY(r, iEventQueue);
+  }
+  return event_queue;
+}
+
+
+//-----------------------------------------------------------------------------
+// get_virtual_clock
+//-----------------------------------------------------------------------------
+iVirtualClock* NeXTAssistant::get_virtual_clock()
+{
+  if (virtual_clock == 0)
+  {
+    iObjectRegistry* r = get_registry();
+    if (r != 0)
+      virtual_clock = CS_QUERY_REGISTRY(r, iVirtualClock);
+  }
+  return virtual_clock;
 }
 
 
@@ -87,13 +131,9 @@ void NeXTAssistant::orphan()
 {
   if (system != 0)
   {
-    iObjectRegistry* r = system->GetObjectRegistry();
-    if (r != 0)
-    {
-      iEventQueue* q = CS_QUERY_REGISTRY(r, iEventQueue);
-      if (q != 0)
-        q->RemoveListener(&scfiEventHandler);
-    }
+    iEventQueue* q = get_event_queue();
+    if (q != 0)
+      q->RemoveListener(&scfiEventHandler);
     system = 0;
   }
 }
@@ -138,32 +178,32 @@ void NeXTAssistant::request_shutdown()
 
 void NeXTAssistant::advance_state()
 {
-  if (system != 0)
-  {
-    system->NextFrame();
-    if (!continue_running())
-      NeXTDelegate_stop_event_loop(controller);
-  }
+  iVirtualClock* c = get_virtual_clock();
+  if (c != 0)
+    c->Advance();
+  iEventQueue* q = get_event_queue();
+  if (q != 0)
+    q->Process();
+  if (!continue_running())
+    NeXTDelegate_stop_event_loop(controller);
 }
 
 bool NeXTAssistant::continue_running() { return !should_shutdown; }
 
 void NeXTAssistant::application_activated()
 {
-  if (system != 0)
-  {
-    system->ResumeVirtualTimeClock();
-    event_outlet->ImmediateBroadcast(cscmdFocusChanged,(void*)true);
-  }
+  iVirtualClock* c = get_virtual_clock();
+  if (c != 0)
+    c->Resume();
+  event_outlet->ImmediateBroadcast(cscmdFocusChanged,(void*)true);
 }
 
 void NeXTAssistant::application_deactivated()
 {
-  if (system != 0)
-  {
-    system->SuspendVirtualTimeClock();
-    event_outlet->ImmediateBroadcast(cscmdFocusChanged, (void*)false);
-  }
+  iVirtualClock* c = get_virtual_clock();
+  if (c != 0)
+    c->Suspend();
+  event_outlet->ImmediateBroadcast(cscmdFocusChanged, (void*)false);
 }
 
 void NeXTAssistant::flush_graphics_context()

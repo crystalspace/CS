@@ -83,6 +83,19 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine removed dead code from system.cpp which resulted after
 	  Jorrit's recent changes.
 	- Eric Sunshine fixed a number of documentation errors in virtclk.h.
+	- Eric Sunshine fixed the Apple/NeXT ports so that they once again
+	  compile following Jorrit's recent changes to the system driver and
+	  related facilities.  In particular, these changes were made to
+	  NeXTAssistant:
+	    - Now suspends and resumes the virtual time clock using the new
+	      iVirtualClock object which is available via the object registry,
+	      rather than invoking csSystem's newly protected
+	      SuspendVirtualTimeClock() and ResumeVirtualTimeClock() methods.
+	    - Since csSystem::NextFrame() is now private,
+	      NeXTAssistant::advance_state() now advances the state of the
+	      engine manually by invoking iVirtualClock::Advance() and
+	      iEventQueue::Process(), thus duplicating the two bits of
+	      remaining functionality in csSystem::NextFrame().
 4-Oct-2001
 	- Removed support for old and obsolete 'debug_level' in system
 	  driver.
