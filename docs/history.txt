@@ -9,6 +9,7 @@ chronological order.
 26-Oct-2003
 	- Eric Sunshine updated `simple1' tutorial in the user manual to
 	  reflect recent changes to keyboard-related event handling.
+	- res changed the VFS cache to read files not null terminated.
 25-Oct-2003
 	- Rhad moved emitter list initialization into the
 	  RecreateParticleSystem() member function of partedit.  This fixes the

@@ -129,7 +129,7 @@ csPtr<iDataBuffer> csVfsCacheManager::ReadCache (
   GetVFS ()->ChDir (vfsdir);
   CacheName (buf, type ? type : current_type,
   	scope ? scope : current_scope, id);
-  csRef<iDataBuffer> data (GetVFS ()->ReadFile (buf));
+  csRef<iDataBuffer> data (GetVFS ()->ReadFile (buf, false));
   GetVFS ()->PopDir ();
 
   if (!data)
