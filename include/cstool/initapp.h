@@ -27,8 +27,8 @@
  * \addtogroup appframe
  * @{ */
 
+#include <stdarg.h>
 #include "csextern.h"
-
 #include "cstypes.h"
 #include "csutil/array.h"
 #include "csutil/csstring.h"
@@ -295,6 +295,13 @@ public:
    * with CS_REQUEST_END!
    */
   static bool RequestPlugins (iObjectRegistry*, ...);
+
+  /**
+   * This is just like RequestPlugins(...), which accepts a variable list of
+   * arguments at compile-time, except that arguments are passed as a
+   * `va_list'.
+   */
+  static bool RequestPluginsV (iObjectRegistry*, va_list);
 
   /**
    * Request a few widely used standard plugins and also read the standard

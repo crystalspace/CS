@@ -810,6 +810,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "csutil/sysfunc.h"
 
 %ignore csInitializer::RequestPlugins(iObjectRegistry*, ...);
+%ignore csInitializer::RequestPluginsV;
 %rename (_RequestPlugins) csInitializer::RequestPlugins(iObjectRegistry*, csArray<csPluginRequest> const&);
 %ignore csInitializer::SetupEventHandler(iObjectRegistry*, csEventHandlerFunc, unsigned int);
 %rename(_SetupEventHandler) csInitializer::SetupEventHandler(iObjectRegistry*, iEventHandler *, unsigned int);

@@ -290,20 +290,26 @@ bool csInitializer::SetupConfigManager (
 
 bool csInitializer::RequestPlugins (iObjectRegistry* r, ...)
 {
-  va_list arg;
-  va_start (arg, r);
+  va_list args;
+  va_start(args, r);
+  bool const ok = RequestPlugins(r, args);
+  va_end(args);
+  return ok;
+}
+
+bool csInitializer::RequestPluginsV (iObjectRegistry* r, va_list args)
+{
   csArray<csPluginRequest> reqs;
-  char const* plugName = va_arg (arg, char*);
+  char const* plugName = va_arg (args, char*);
   while (plugName != 0)
   {
-    char* intName = va_arg (arg, char*);
-    scfInterfaceID scfId = va_arg (arg, scfInterfaceID);
-    int version = va_arg (arg, int);
+    char* intName = va_arg (args, char*);
+    scfInterfaceID scfId = va_arg (args, scfInterfaceID);
+    int version = va_arg (args, int);
     csPluginRequest req(plugName, intName, scfId, version);
     reqs.Push(req);
-    plugName = va_arg (arg, char*);
+    plugName = va_arg (args, char*);
   }
-  va_end (arg);
   return RequestPlugins(r, reqs);
 }
 

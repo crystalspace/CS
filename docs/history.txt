@@ -35,6 +35,9 @@ chronological order.
 	  function fragment program. This should not be needed, and 
 	  furthermore, happens after GL context destruction (and causes crashes
 	  on platforms sensitive to that).
+	- Eric Sunshine added csInitializer::RequestPluginsV(). This is just
+	  like the variable-argument RequestPlugins(...), except that the
+	  arguments are specified as a `va_list'.
 5-Dec-2004
 	- res made the following changes:
 	    - Fixed the Win32 shared library linking.
