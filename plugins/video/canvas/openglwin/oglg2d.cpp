@@ -271,9 +271,6 @@ bool csGraphics2DOpenGL::Initialize (iObjectRegistry *object_reg)
     pfmt.PixelBytes = 1;
   }
 
-  Report (CS_REPORTER_SEVERITY_NOTIFY,
-  	"Using %d bits per pixel (%d color mode).", Depth, 1 << Depth);
-
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
 						   iCommandLineParser);
   m_bHardwareCursor = config->GetBool ("Video.SystemMouseCursor", true);
@@ -335,7 +332,7 @@ bool csGraphics2DOpenGL::Open()
 
     EnumDisplaySettings(NULL, 0, &dmode);
 
-	dmode.dmBitsPerPel = Depth;
+    dmode.dmBitsPerPel = Depth;
     dmode.dmPelsWidth = Width;
     dmode.dmPelsHeight = Height;
     dmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
@@ -374,6 +371,10 @@ bool csGraphics2DOpenGL::Open()
     }
   }
 
+  EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &dmode);
+  Depth = dmode.dmBitsPerPel;
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+    "Using %d bits per pixel (%d color mode).", Depth, 1 << (Depth==32?24:Depth) );
 
   if (FullScreen)
   {
