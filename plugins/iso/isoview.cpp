@@ -257,7 +257,7 @@ void csIsoFakeCamera::IsoReady(const csVector3& position,
   shiftx = scroll.x + minz * trans.GetO2T().m13;
   shifty = scroll.y + minz * trans.GetO2T().m23;
 
-  rview->GetG3D()->SetPerspectiveCenter(shiftx, shifty);
+  rview->GetG3D()->SetPerspectiveCenter((int)shiftx, (int)shifty);
   rview->GetG3D()->SetClipper( rview->GetClipper(), CS_CLIPPER_TOPLEVEL);
 
   //csMatrix3 bb = trans.GetO2T();
