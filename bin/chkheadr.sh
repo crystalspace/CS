@@ -14,5 +14,5 @@ EOF
 ${CXX} -c comptest.cpp 2>/dev/null || echo "CS_USE_FAKE_SOCKLEN_TYPE = yes"
 
 # clean up
-rm -f comptest.cpp comtest.o
+rm -f comptest.cpp comptest.o
 
