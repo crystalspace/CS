@@ -54,6 +54,9 @@ The history order is reversed so that new features are at the top.
 	  RedHat version 7 to build the project without undue effort, since the
 	  compiler which shipped with RedHat 7 is quite buggy and is known to
 	  fail disastrously with an `internal compiler error' on qsqrt.h.
+	- Eric Sunshine worked around a silly texi2html bug where it complained
+	  about a @node and @subsubheading both named "Lighting" (even though
+	  the @subsubheading wasn't even related to the @node).
 29-May-2001
 	- Michael Voasse added accessor functions to iCameraPosition for
 	  sector, position upward vector and forward vector.

@@ -9,7 +9,7 @@
 This section describes how to do animation for meshes and how they can
 get lit by surrounding lights.
 
-@subsubheading Animation
+@subsubheading Animating Meshes
 
 Not all meshes support animation. All particle systems and 3D sprites
 have animation.
@@ -34,7 +34,7 @@ It will only tell the engine that every mesh will have to update it's
 animation to the given time as soon as that mesh is visible.
 So it is very efficient to call this function.
 
-@subsubheading Lighting
+@subsubheading Lighting Meshes
 
 Almost all meshes support lighting. Mesh things are treated
 specially as they have support for lightmaps and dynamic lighting using
@@ -58,7 +58,7 @@ be visible. Here is an example:
 This example considers both dynamic and static lights and will take the
 10 lights that are closest to the mesh.
 
-@subsubheading Include Files
+@subsubheading Mesh Include Files
 
 The include files useful for this section are:
 
@@ -66,4 +66,3 @@ The include files useful for this section are:
   #include "iengine/mesh.h"
   #include "iengine/engine.h"
 @end example
-
