@@ -147,7 +147,7 @@
 		// Cast operators
 
 		//! Cast a HPoint to a Point. w is discarded.
-		inline_				operator	Point()					const		{ return Point(x, y, z);									}
+		//inline_				operator	Point()					const		{ return Point(x, y, z);									}
 
 		public:
 				float		w;
