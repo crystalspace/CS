@@ -28,7 +28,11 @@
 #include "cssys/unix/iunix.h"
 #endif
 #include "csutil/inifile.h"
-#include "cs3d/glide2/glidelib.h"
+#ifdef GLIDE3
+#include "cs3d/glide3/gllib3.h"
+#else
+#include "cs3d/glide2/gllib2.h"
+#endif
 #include "csutil/csrect.h"
 #include "isystem.h"
 #include "itexture.h"
@@ -107,7 +111,7 @@ void csGraphics2DGlideCommon::SetTMUPalette(int tmu)
     p.data[i]=0xFF<<24 | pal.red<<16 | pal.green<<8 | pal.blue;
   }
   
-  GlideLib_grTexDownloadTable(tmu, GR_TEXTABLE_PALETTE, &p);		
+  GlideLib_grTexDownloadTable( GR_TEXTABLE_PALETTE, &p);		
 }
 
 void csGraphics2DGlideCommon::DrawLine (float x1, float y1, float x2, float y2, int color)
@@ -120,9 +124,9 @@ void csGraphics2DGlideCommon::DrawLine (float x1, float y1, float x2, float y2, 
     y1 = Height - y1;
     y2 = Height - y2;
     if ( !ClipLine( x1, y1, x2, y2, ClipX1, ClipY1, ClipX2, ClipY2 ) ){
-      GrVertex a,b;
-      a.x=x1; a.y=y1;a.z=GR_WDEPTHVALUE_NEAREST;a.oow=GR_WDEPTHVALUE_FARTHEST;
-      b.x=x2; b.y=y2;b.z=GR_WDEPTHVALUE_NEAREST;b.oow=GR_WDEPTHVALUE_FARTHEST;
+      MyGrVertex a,b;
+      a.x=x1; a.y=y1;a.oow=1;
+      b.x=x2; b.y=y2;b.oow=1;
 
       GlideLib_grColorCombine ( GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE,
                                 GR_COMBINE_LOCAL_CONSTANT, GR_COMBINE_OTHER_NONE, FXFALSE );
@@ -202,7 +206,7 @@ void csGraphics2DGlideCommon::DrawPixel (int x, int y, int color)
     *((UShort*)GetPixelAt( x, y )) = color;
   else
   {
-    GrVertex p;
+    MyGrVertex p;
     p.x=x; p.y=y;
     
     GlideLib_grColorCombine ( GR_COMBINE_FUNCTION_LOCAL, GR_COMBINE_FACTOR_NONE,
@@ -281,7 +285,9 @@ void csGraphics2DGlideCommon::RestoreArea (csImageArea *Area, bool Free)
   if (Area)
   {
     if ( !locked ){
-      GlideLib_grLfbWriteRegion( GR_BUFFER_BACKBUFFER, Area->x, Area->y, GR_LFB_SRC_FMT_565, Area->w, Area->h, Area->w*pfmt.PixelBytes, Area->data );
+      GlideLib_grLfbWriteRegion( GR_BUFFER_BACKBUFFER, Area->x, Area->y, 
+                                 GR_LFB_SRC_FMT_565, Area->w, Area->h, 
+				 FXFALSE, Area->w*pfmt.PixelBytes, Area->data );
     }else{
       int x, y, n;
       unsigned char *data = (unsigned char*)Area->data;

@@ -21,6 +21,22 @@
 
 #include "csutil/scf.h"
 
+#ifdef GLIDE3
+typedef struct {
+  float sow;
+  float tow;
+  float oow;
+} MyGrTmuVertex;
+
+typedef struct {
+  float x,y;
+  float ooz;
+  float oow;
+  float r,g,b;
+  MyGrTmuVertex tmuvtx[3];
+} MyGrVertex;
+#endif
+
 #if defined (OS_LINUX)
 #include <X11/Xlib.h>
 #endif

@@ -46,7 +46,6 @@ protected:
   int glDrawMode;
   bool GraphicsReady;
   GrLfbInfo_t lfbInfo;
-  GrState fxstate;
       
   /// flag to prevent 2D drawing
   static bool locked;	
