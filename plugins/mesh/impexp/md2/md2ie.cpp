@@ -25,6 +25,7 @@
 #include "csutil/datastrm.h"
 #include "csutil/csstring.h"
 #include "csutil/nobjvec.h"
+#include "csutil/util.h"
 
 // all int's in an MD2 file are little endian
 #include "cssys/csendian.h"
@@ -39,6 +40,8 @@ static int const SIZEOF_MD2FLOAT = 4;
 static int const SIZEOF_MD2SKINNAME = 64;
 static int const SIZEOF_MD2FRAMENAME = 16;
 static int const SIZEOF_MD2HEADER = 15*SIZEOF_MD2LONG;
+
+static const float SCALE_FACTOR = 0.025;
 
 CS_DECLARE_TYPED_VECTOR (csStringVector, csString);
 CS_DECLARE_OBJECT_VECTOR (csVertexFrameVector, iModelDataVertices);
@@ -211,11 +214,19 @@ static void ReadMD2Header (csMD2Header *hdr, csDataStream *in)
 
 #undef CS_MD2_READ
 
+static void extractActionName (const char * str, char * act)
+{
+  unsigned i = 0;
+  while (str[i] > '9')
+    act[i++] = str[i];
+  act[i] = 0;
+}
+
 iModelData *csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
 {
   // prepare input buffer
   csDataStream in (Buffer, Size, false);
-  unsigned char readbuffer[MAX_DATAELEMENT_SIZE];
+  uint8 readbuffer[MAX_DATAELEMENT_SIZE];
   int i,j;
 
   // check for the correct version
@@ -232,6 +243,7 @@ iModelData *csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
   ReadMD2Header (&Header, &in);
 
   // read in texmap (skin) names - skin names are 64 bytes long
+  // Unused
   csStringVector SkinNames;
   in.SetPosition (Header.SkinOffset);
   for (i = 0; i < Header.SkinCount; i++)
@@ -268,10 +280,10 @@ iModelData *csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
     Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());
 
     in.Read (readbuffer, SIZEOF_MD2SHORT*6);
-    for (j = 2; j>=0; j--)
+    for (j = 0; j < 3; j++)
     {
-      short xyzindex = get_le_short(readbuffer + j * SIZEOF_MD2SHORT);
-      short texindex = get_le_short(readbuffer + (j+3) * SIZEOF_MD2SHORT);
+      short xyzindex = get_le_short (readbuffer + j * SIZEOF_MD2SHORT);
+      short texindex = get_le_short (readbuffer + (j+3) * SIZEOF_MD2SHORT);
       Polygon->AddVertex (xyzindex, 0, 0, texindex);
     }
 
@@ -279,30 +291,48 @@ iModelData *csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
   }
 
   // now we read in the frames.  The number of frames is stored in 'num_object'
-  float scale[3],translate[3];
-  csVertexFrameVector Frames;
+
   iModelDataVertices *DefaultFrame = NULL;
+
+  char currAction [256];
+  memset (currAction, 0, 256);
+  iModelDataAction * action = 0;
 
   for (i = 0; i < Header.FrameCount; i++)
   {
+    csVector3 scale, translate;
     // read in scale and translate info
-    in.Read (scale, SIZEOF_MD2FLOAT*3);
-    in.Read (translate, SIZEOF_MD2FLOAT*3);
-    for (j = 0; j<3; j++)
+    in.Read (&scale, SIZEOF_MD2FLOAT*3);
+    in.Read (&translate, SIZEOF_MD2FLOAT*3);
+    for (j = 0; j < 3; j++)
     {
-      scale[j] = convert_endian(scale[j]);
-      translate[j] = convert_endian(translate[j]);
+      scale[j] = convert_endian (scale[j]);
+      translate[j] = convert_endian (translate[j]);
     }
+    scale *= SCALE_FACTOR;
+    translate *= SCALE_FACTOR;
 
     // name of this frame
-    char FrameName [SIZEOF_MD2FRAMENAME];
+    char FrameName [SIZEOF_MD2FRAMENAME+1];
+    char ActionName [SIZEOF_MD2FRAMENAME+1];
     in.Read (FrameName, SIZEOF_MD2FRAMENAME);
+    FrameName [SIZEOF_MD2FRAMENAME] = 0;
+    extractActionName (FrameName, ActionName);
+    if (strcmp (ActionName, currAction))
+    {
+      SCF_DEC_REF (action);
+      memcpy (currAction, ActionName, strlen (ActionName)+1);
+      action = new csModelDataAction ();
+      action->QueryObject ()->SetName (currAction);
+      Object->QueryObject ()->ObjAdd (action->QueryObject ());
+    }
 
     // read in vertex coordinate data for the frame
     in.Read (readbuffer, 4*Header.VertexCount);
 
     iModelDataVertices *VertexFrame = new csModelDataVertices ();
-    Frames.Push (VertexFrame);
+    action->AddFrame (i / 10., VertexFrame->QueryObject ());
+    VertexFrame->QueryObject ()->SetName (FrameName);
     if (!DefaultFrame)
        DefaultFrame = VertexFrame;
 
@@ -313,19 +343,21 @@ iModelData *csModelConverterMD2::Load (uint8 *Buffer, uint32 Size)
 
     for (j = 0; j < Header.VertexCount; j++)
     {
-      csVector3 Vertex (readbuffer[j*4] * scale[0] + translate[0],
-                        readbuffer[j*4+1] * scale[1] + translate[1],
-			readbuffer[j*4+2] * scale[2] + translate[2]);
-      VertexFrame->AddVertex (Vertex);
-    }
-
+      const uint8 * buf = readbuffer + j*4;
+      csVector3 v (buf [0], buf [1], buf [2]);
+      for (int k = 0; k < 3; k++)
+        v[k] = v[k] * scale[k] + translate[k];
+      csSwapFloat (v.y, v.z);
+      VertexFrame->AddVertex (v);
+    }	
     VertexFrame->AddColor (csColor (1, 1, 1));
     VertexFrame->AddNormal (csVector3 (1, 0, 0));
     VertexFrame->DecRef ();
   }
-
+  SCF_DEC_REF (action);
   Object->SetDefaultVertices (DefaultFrame);
   Object->DecRef ();
+  delete Texels;
   return Scene;
 }
 
