@@ -338,5 +338,5 @@ void csSoundDriverOSS::SysPrintf(int mode, char* szMsg, ...)
   vsprintf (buf, szMsg, arg);
   va_end (arg);
   
-  m_piSystem->Print(mode, buf);
+  m_piSystem->Printf(mode, buf);
 }
