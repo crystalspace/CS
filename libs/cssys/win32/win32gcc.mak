@@ -68,6 +68,9 @@ LIBS.SOUND.SYSTEM=$(LFLAGS.l)dsound $(LFLAGS.l)winmm
 # Python library
 LIBS.CSPYTHON.SYSTEM=$(LFLAGS.l)python15
 
+# Freetype library
+LIBS.FREETYPE.SYSTEM=$(LFLAGS.l)ttf
+
 # Where can the Zlib library be found on this system?
 Z_LIBS=$(LFLAGS.l)z
 
