@@ -149,6 +149,9 @@ public:
   //   or object model changes.
   void UpdateObject (csPVSVisObjectWrapper* visobj_wrap);
 
+  // Clear all objects.
+  void ClearObjects ();
+
   virtual void Setup (const char* name);
   virtual void RegisterVisObject (iVisibilityObject* visobj);
   virtual void UnregisterVisObject (iVisibilityObject* visobj);

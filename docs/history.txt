@@ -24,6 +24,15 @@ chronological order.
 	- Jorrit reverted the above change and instead changed the addon/loader
 	  so that it uses CS_QUERY_REGISTRY_TAG.
 	- Jorrit extended pvscalc so that it now calculates the kdtree.
+	- Jorrit fixed a bug in pvsvis. It wouldn't store the boxes of the
+	  objects which means visculling and other PVS operations failed.
+	  With this bug fixed, pvsvis will roughly work as frustvis in case
+	  the PVS information is missing.
+	- Jorrit changed pvsvis so that by default it will make minsize
+	  one fifth instead of 1/20 of total box.
+	- Jorrit fixed pvscalc so that the kdtree calculation now actually
+	  works. The kdtree is also stored in the cache and pvsvis is able
+	  to read and use it. No visibility information yet.
 30-Jan-2005
 	- res fixed a leak in spr2d.
 	- res fixed a leak in the VBO buffer manager.

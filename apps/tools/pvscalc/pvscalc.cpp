@@ -33,10 +33,12 @@ PVSCalcSector::PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs)
 void PVSCalcSector::CountDistribution (
 	const csArray<csBox3>& boxlist,
 	float wherex, float wherey, float wherez,
-	int& distx, int& disty, int& distz)
+	int& distx, int& disty, int& distz,
+	bool& badx, bool &bady, bool& badz)
 {
   size_t i;
   distx = disty = distz = 0;
+  size_t middlex = 0, middley = 0, middlez = 0;
   for (i = 0 ; i < boxlist.Length () ; i++)
   {
     int splitx = boxlist[i].TestSplit (0, wherex);
@@ -44,11 +46,20 @@ void PVSCalcSector::CountDistribution (
     int splitz = boxlist[i].TestSplit (2, wherez);
     if (splitx < 0) distx--;
     else if (splitx > 0) distx++;
+    else middlex++;
     if (splity < 0) disty--;
     else if (splity > 0) disty++;
+    else middley++;
     if (splitz < 0) distz--;
     else if (splitz > 0) distz++;
+    else middlez++;
   }
+  distx = ABS (distx);
+  disty = ABS (disty);
+  distz = ABS (distz);
+  badx = (middlex == boxlist.Length ());
+  bady = (middley == boxlist.Length ());
+  badz = (middlez == boxlist.Length ());
 }
 
 void PVSCalcSector::DistributeBoxes (int axis, float where,
@@ -68,26 +79,29 @@ void PVSCalcSector::DistributeBoxes (int axis, float where,
 }
 
 void PVSCalcSector::BuildKDTree (void* node, const csArray<csBox3>& boxlist,
-	const csBox3& bbox, const csVector3& minsize)
+	const csBox3& bbox, const csVector3& minsize,
+	bool minsize_only, int depth)
 {
+  if (depth > maxdepth) maxdepth = depth;
+
   int axis;
   float where;
   csVector3 bbox_size = bbox.Max () - bbox.Min ();
-  if (boxlist.Length () <= 1)
+  if (minsize_only || boxlist.Length () <= 1)
   {
     // If we have 1 or less objects left then we continue splitting the
     // node so that leafs are smaller then 'minsize'.
-    if (bbox_size.x < minsize.x)
+    if (bbox_size.x > minsize.x)
     {
       axis = 0;
       where = bbox.MinX () + bbox_size.x / 2;
     }
-    else if (bbox_size.y < minsize.y)
+    else if (bbox_size.y > minsize.y)
     {
       axis = 1;
       where = bbox.MinY () + bbox_size.y / 2;
     }
-    else if (bbox_size.z < minsize.z)
+    else if (bbox_size.z > minsize.z)
     {
       axis = 2;
       where = bbox.MinZ () + bbox_size.z / 2;
@@ -100,25 +114,34 @@ void PVSCalcSector::BuildKDTree (void* node, const csArray<csBox3>& boxlist,
   else
   {
     int distx, disty, distz;
+    bool badx, bady, badz;
     CountDistribution (boxlist,
     	bbox.MinX () + bbox_size.x / 2,
     	bbox.MinY () + bbox_size.y / 2,
     	bbox.MinZ () + bbox_size.z / 2,
-	distx, disty, distz);
-    if (distx < disty && distx < distz)
+	distx, disty, distz,
+	badx, bady, badz);
+    if (!badx && distx < disty && distx < distz)
     {
       axis = 0;
       where = bbox.MinX () + bbox_size.x / 2;
     }
-    else if (disty < distx && disty < distz)
+    else if (!bady && disty < distx && disty < distz)
     {
       axis = 1;
       where = bbox.MinY () + bbox_size.y / 2;
     }
-    else
+    else if (!badz)
     {
       axis = 2;
       where = bbox.MinZ () + bbox_size.z / 2;
+    }
+    else
+    {
+      // All options are bad. Here we mark the traversal so that
+      // we only continue to split for minsize.
+      BuildKDTree (node, boxlist, bbox, minsize, true, depth);
+      return;
     }
   }
 
@@ -130,8 +153,9 @@ void PVSCalcSector::BuildKDTree (void* node, const csArray<csBox3>& boxlist,
   csArray<csBox3> boxlist_right;
   DistributeBoxes (axis, where, boxlist, boxlist_left, boxlist_right);
   pvstree->SplitNode (node, axis, where, child1, child2);
-  BuildKDTree (child1, boxlist_left, box1, minsize);
-  BuildKDTree (child2, boxlist_right, box2, minsize);
+  countnodes += 2;
+  BuildKDTree (child1, boxlist_left, box1, minsize, minsize_only, depth+1);
+  BuildKDTree (child2, boxlist_right, box2, minsize, minsize_only, depth+1);
 }
 
 void PVSCalcSector::BuildKDTree ()
@@ -141,7 +165,9 @@ void PVSCalcSector::BuildKDTree ()
   void* root = pvstree->CreateRootNode ();
   const csBox3& bbox = pvstree->GetBoundingBox ();
   const csVector3& minsize = pvstree->GetMinimalNodeBox ();
-  BuildKDTree (root, boxes, bbox, minsize);
+  countnodes = 1;
+  maxdepth = 0;
+  BuildKDTree (root, boxes, bbox, minsize, false, 0);
 }
 
 void PVSCalcSector::CollectGeometry (iMeshWrapper* mesh,
@@ -243,6 +269,14 @@ void PVSCalcSector::Calculate ()
   	staticcount, allcount);
   parent->ReportInfo( "%d static and %d total polygons",
   	staticpcount, allpcount);
+
+  BuildKDTree ();
+  parent->ReportInfo( "KDTree: max depth=%d, number of nodes=%d",
+  	maxdepth, countnodes);
+  if (!pvstree->WriteOut ())
+  {
+    parent->ReportError ("Error writing out PVS cache!");
+  }
 }
 
 //-----------------------------------------------------------------------------

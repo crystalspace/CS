@@ -67,6 +67,7 @@
 	<min x="-16" y="-1" z="-4" />
 	<max x="16" y="10" z="16" />
       </box>
+      <minnode x="8" y="6" z="8" />
     </cullerp>
     <meshobj name="floor">
       <plugin>genmesh</plugin>

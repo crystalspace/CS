@@ -33,6 +33,8 @@ private:
   iSector* sector;
   iPVSCuller* pvs;
   iStaticPVSTree* pvstree;
+  int maxdepth;
+  int countnodes;
 
   // All static polygons. Will be sorted on size.
   csArray<csPoly3D> polygons;
@@ -47,7 +49,8 @@ private:
   void CountDistribution (
 	const csArray<csBox3>& boxlist,
 	float wherex, float wherey, float wherez,
-	int& distx, int& disty, int& distz);
+	int& distx, int& disty, int& distz,
+	bool& badx, bool &bady, bool& badz);
   /// Distribute a set of boxes to left/right.
   void DistributeBoxes (int axis, float where,
 	const csArray<csBox3>& boxlist,
@@ -56,7 +59,8 @@ private:
   /// Build the kdtree.
   void BuildKDTree ();
   void BuildKDTree (void* node, const csArray<csBox3>& boxlist,
-	const csBox3& bbox, const csVector3& minsize);
+	const csBox3& bbox, const csVector3& minsize,
+	bool minsize_only, int depth);
 
 public:
   PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs);

@@ -161,6 +161,7 @@ csStaticPVSTree::~csStaticPVSTree ()
 
 void csStaticPVSTree::Clear ()
 {
+  pvsvis->ClearObjects ();
   delete root;
   root = 0;
   nodes_by_id.DeleteAll ();
@@ -266,7 +267,7 @@ bool csStaticPVSTree::WriteOut ()
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   iCacheManager* cache_mgr = engine->GetCacheManager ();
   return cache_mgr->CacheData ((void*)buf->GetData (), buf->GetSize (),
-  	"PVS", pvscache, 0);
+  	"pvs", pvscache, 0);
 }
 
 const char* csStaticPVSTree::ReadPVS (char*& data, csStaticPVSNode*& node)
@@ -306,7 +307,7 @@ const char* csStaticPVSTree::ReadPVS ()
   csRef<iEngine> engine = CS_QUERY_REGISTRY (object_reg, iEngine);
   iCacheManager* cache_mgr = engine->GetCacheManager ();
   csRef<iDataBuffer> buf = cache_mgr->ReadCache (
-  	"PVS", pvscache, 0);
+  	"pvs", pvscache, 0);
   if (!buf)
   {
     CreateRootNode ();
@@ -431,7 +432,7 @@ void csStaticPVSTree::SetBoundingBox (const csBox3& bbox)
   // the root box.
   if (!node_minbox_set)
   {
-    node_minbox = (root_box.Max () - root_box.Min ()) / 20.0;
+    node_minbox = (root_box.Max () - root_box.Min ()) / 5.0;
   }
 
   if (root)

@@ -158,6 +158,13 @@ csPVSVis::csPVSVis (iBase *iParent)
 
 csPVSVis::~csPVSVis ()
 {
+  ClearObjects ();
+  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
+  SCF_DESTRUCT_IBASE ();
+}
+
+void csPVSVis::ClearObjects ()
+{
   while (visobj_vector.Length () > 0)
   {
     csPVSVisObjectWrapper* visobj_wrap = visobj_vector.Pop ();
@@ -169,8 +176,6 @@ csPVSVis::~csPVSVis ()
     pvstree.RemoveObject (visobj_wrap);
     visobj->DecRef ();
   }
-  SCF_DESTRUCT_EMBEDDED_IBASE (scfiComponent);
-  SCF_DESTRUCT_IBASE ();
 }
 
 bool csPVSVis::Initialize (iObjectRegistry *object_reg)
@@ -191,6 +196,7 @@ bool csPVSVis::Initialize (iObjectRegistry *object_reg)
   }
 
   pvstree.SetObjectRegistry (object_reg);
+  pvstree.SetPVSVis (this);
   pvstree.SetBoundingBox (csBox3 (-100, -100, -100, 100, 100, 100));
   return true;
 }
@@ -299,6 +305,7 @@ void csPVSVis::RegisterVisObject (iVisibilityObject* visobj)
   csBox3 bbox;
   CalculateVisObjBBox (visobj, bbox);
   pvstree.AddObject (bbox, visobj_wrap);
+  visobj_wrap->obj_bbox = bbox;
 
   iMeshWrapper* mesh = visobj->GetMeshWrapper ();
   visobj_wrap->mesh = mesh;
@@ -372,6 +379,7 @@ void csPVSVis::UpdateObject (csPVSVisObjectWrapper* visobj_wrap)
   csBox3 bbox;
   CalculateVisObjBBox (visobj, bbox);
   pvstree.MoveObject (visobj_wrap, bbox);
+  visobj_wrap->obj_bbox = bbox;
   visobj_wrap->shape_number = visobj->GetObjectModel ()->GetShapeNumber ();
   visobj_wrap->update_number = movable->GetUpdateNumber ();
 }
@@ -389,7 +397,6 @@ int csPVSVis::TestNodeVisibility (csStaticPVSNode* treenode,
 	PVSTest_Front2BackData* data, uint32& frustum_mask)
 {
   csBox3 node_bbox = treenode->GetNodeBBox ();
-
   if (node_bbox.Contains (data->pos))
   {
     return NODE_INSIDE;
@@ -500,8 +507,6 @@ void csPVSVis::PVSTest_Traverse (csStaticPVSNode* treenode,
   if (child1) PVSTest_Traverse (child1, data, cur_timestamp, frustum_mask);
   csStaticPVSNode* child2 = treenode->child2;
   if (child2) PVSTest_Traverse (child2, data, cur_timestamp, frustum_mask);
-
-  return;
 }
 
 bool csPVSVis::VisTest (iRenderView* rview, 

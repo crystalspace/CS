@@ -24,6 +24,7 @@
 #include "csgeom/box.h"
 #include "ivaria/pvstree.h"
 
+class csPVSVis;
 class csPVSVisObjectWrapper;
 
 class csStaticPVSNode;
@@ -108,6 +109,8 @@ public:
 class csStaticPVSTree : public iStaticPVSTree
 {
 private:
+  csPVSVis* pvsvis;
+
   csStaticPVSNode* root;	// @@@ TODO: allocator for tree!
   // 'id' is the index, the pointer to the node is the contents.
   csArray<csStaticPVSNode*> nodes_by_id;
@@ -144,6 +147,11 @@ private:
 public:
   csStaticPVSTree ();
   virtual ~csStaticPVSTree ();
+
+  void SetPVSVis (csPVSVis* pvsvis)
+  {
+    csStaticPVSTree::pvsvis = pvsvis;
+  }
 
   void SetObjectRegistry (iObjectRegistry* o)
   {
