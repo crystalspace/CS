@@ -86,28 +86,20 @@
 }
 
 // csgeom/transfrm.h
-%ignore operator* (const csVector3&, const csTransform&);
-%ignore operator* (const csTransform&, const csVector3&);
-%ignore operator*=(csVector3&, const csTransform&);
-%ignore operator* (const csPlane3&, const csTransform&);
-%ignore operator* (const csTransform&, const csPlane3&);
-%ignore operator*=(csPlane3&, const csTransform&);
-%ignore operator* (const csSphere&, const csTransform&);
-%ignore operator* (const csTransform&, const csSphere&);
-%ignore operator*=(csSphere&, const csTransform&);
-%ignore operator* (const csMatrix3&, const csTransform&);
-%ignore operator* (const csTransform&, const csMatrix3&);
-%ignore operator*= (csMatrix3&, const csTransform&);
-%ignore operator* (const csTransform&, const csReversibleTransform&);
+%ignore csTransform::operator*;
 
 #ifndef CS_MINI_SWIG
+%extend csTransform
+{
+  static csMatrix3 mulmat1 (const csMatrix3& m, const csTransform& t)
+  { return m * t; }
+  static csMatrix3 mulmat2 (const csTransform& t, const csMatrix3& m)
+  { return t * m; }
+}
 %extend csReversibleTransform
 {
-  csMatrix3 mulmat1 (const csMatrix3& m, const csTransform& t)
-  { return m * t; }
-  csMatrix3 mulmat2 (const csTransform& t, const csMatrix3& m)
-  { return t * m; }
-  csTransform mulrev (const csTransform& t1, const csReversibleTransform& t2)
+  static csTransform mulrev (const csTransform& t1,
+	                     const csReversibleTransform& t2)
   { return t1 * t2; } 
 }
 #endif // CS_MINI_SWIG
