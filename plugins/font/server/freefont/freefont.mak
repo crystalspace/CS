@@ -22,7 +22,6 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 LIB.EXTERNAL.FREEFONT = -lttf
-CFLAGS.FREEFONT = -I/usr/local/include/freetype
 
 ifeq ($(USE_PLUGINS),yes)
   FREEFONT = $(OUTDLL)freefont$(DLL)
@@ -56,7 +55,7 @@ ifeq ($(MAKESECTION),targets)
 freefont: $(OUTDIRS) $(FREEFONT)
 
 $(OUT)%$O: plugins/font/server/freefont/%.cpp
-	$(DO.COMPILE.CPP) $(CFLAGS.FREEFONT) 
+	$(DO.COMPILE.CPP)
 
 $(FREEFONT): $(OBJ.FREEFONT) $(LIB.FREEFONT)
 	$(DO.PLUGIN) $(LIB.EXTERNAL.FREEFONT)
@@ -68,7 +67,7 @@ freefontclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)freefont.dep
 $(OUTOS)freefont.dep: $(SRC.FREEFONT)
-	$(DO.DEP1) $(CFLAGS.FREEFONT) $(DO.DEP2)
+	$(DO.DEP)
 else
 -include $(OUTOS)freefont.dep
 endif

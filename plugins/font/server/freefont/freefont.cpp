@@ -16,7 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <freetype.h>
+#include <freetype/freetype.h>
 
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
