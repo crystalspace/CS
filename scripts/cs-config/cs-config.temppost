@@ -12,6 +12,7 @@ depends()
 	-lcsphyzik) DEPS="-lcsgeom -lcsutil -lcssys";;
 	*)
 	    CEXFILE=`echo "$1.cex" | sed -e "s/\-l//"`
+	    findcexfile "$CEXFILE"
 	    if test -r "$CEXFILE"; then
 		DEPS=`/bin/sh $CEXFILE --deps`
 	    else
@@ -134,12 +135,30 @@ addlib()
     done
 }
 
+findcexfile()
+{
+#   file in search path?
+    for p in $CSCONFPATH; do
+	if test -f "$p/$1.cex"; then
+	    CEXFILE="$p/$1.cex"
+	    return
+	fi
+    done
+
+    if test -f "$CRYSTAL/$1.cex"; then
+	CEXFILE="$CRYSTAL/$1.cex"
+	return
+    fi
+
+    CEXFILE=""
+}      
+
 addexlib()
 {
-    EXDEP=`/bin/sh $1.cex --deps`
-    EXLIB=`/bin/sh $1.cex --libs`
-    EXCXXFLAGS=`/bin/sh $1.cex --cxxflags`
-    EXCFLAGS=`/bin/sh $1.cex --cflags`
+    EXDEP=`/bin/sh $1 --deps`
+    EXLIB=`/bin/sh $1 --libs`
+    EXCXXFLAGS=`/bin/sh $1 --cxxflags`
+    EXCFLAGS=`/bin/sh $1 --cflags`
     add_cxxflags="$add_cxxflags $EXCXXFLAGS"
     add_cflags="$add_cflags $EXCFLAGS"
 
@@ -209,13 +228,14 @@ while test $# -gt 0; do
 	addlib "-lcsphyzik"
 	;;
     *)
-	if test -r "$1.cex"; then
-	    addexlib "$1"            
-	else
+	findcexfile "$1"
+	if test -z "$CEXFILE"; then
 	    echo "Unknown lib: $1"
             usage 1 1>&2
 	    exit 1
-	fi                           
+	fi
+	
+	addexlib "$CEXFILE"
         ;;
   esac
   shift
