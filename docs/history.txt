@@ -6,6 +6,9 @@ The history order is reversed so that new features are at the top.
 	    - Removed a redundant @noindent.
 	    - Re-wrote the new Troubleshooting section in order to eliminate
 	      sentence fragments and other incomprehensible wordage.
+	- Eric Sunshine fixed a problem in iCamera::GetSector() where the
+	  compiler didn't like casting (void*) to (iSector*).  This occurs on
+	  some platforms where NULL is defined as ((void*)0).
 19-Jun-2001
 	- Removed verbose output of lightmap calculation if recalculation
 	  of lighting is not enabled. Now the progress bars are only

@@ -375,7 +375,8 @@ public:
     { scfParent->MoveUnrestricted (v); }
 
     virtual iSector* GetSector () const
-    { return scfParent->GetSector () ? &scfParent->GetSector()->scfiSector : NULL; }
+    { return scfParent->GetSector() ?
+      &scfParent->GetSector()->scfiSector : 0; }
     virtual void SetSector (iSector *s)
     { scfParent->SetSector (s->GetPrivateObject ()); }
 
@@ -393,8 +394,13 @@ public:
     }
     virtual bool GetFarPlane (csPlane3& pl) const
     {
-      if (scfParent->fp) { pl = *scfParent->fp; return scfParent->use_farplane; }
-      else return false;
+      if (scfParent->fp)
+      {
+        pl = *scfParent->fp;
+	return scfParent->use_farplane;
+      }
+      else
+        return false;
     }
     virtual long GetCameraNumber () const
     {
