@@ -53,6 +53,88 @@ The history order is reversed so that new features are at the top.
 	- csMeshFactoryWrapper instances are now also added to the current
 	  region. iCurveTemplate and iPolyTxtPlane instances are now correctly
 	  deleted from regions. Thanks to Thiago Ramon for mentioning this.
+	- Eric Sunshine made the following changes to the project:
+	    - Added the new function csDefaultRunLoop().  This function
+	      replaces csInitializer::MainLoop(), which was non-portable.  This
+	      function should be called by applications which do not otherwise
+	      implement their own run-loop.  The run-loop implemented by this
+	      function is guaranteed to be portable across all application
+	      (since each platform is given the opportunity to provide an
+	      appropriate platform-specific implementation).  Each time through
+	      the run-loop, it advances the virtual clock and processes the
+	      Crystal Space event queue.  csDefaultRunLoop() only returns when
+	      a csevBroadcast event is posted to the Crystal Space event queue
+	      with command code cscmdQuit.  Note, that if your application
+	      already implements its own run-loop, then you should _not_ call
+	      this function, since it would more-or-less permanently interrupt
+	      your own run-loop and prevent it from doing its work.  For
+	      instance, if you are adding Crystal Space to an existing
+	      Microsoft Windows application, which already has its own run-loop
+	      to process the Windows event queue, then do _not_ call this
+	      function.
+	    - csDefaultRunLoop() is intended to be implemented by each platform
+	      in a fashion which is appropriate for implementing run-loops on
+	      the given platform.  For instance, with Apple's Cocoa frameworks,
+	      csDefaultRunLoop() should arrange to have the NSApplication class
+	      implement the run-loop; with BeOS's Application Kit,
+	      csDefaultRunLoop() should arrange to have the BApplication class
+	      implement the run-loop; etc.
+	    - A default implementation of csDefaultRunLoop() is provided in
+	      CS/libs/cssys/general/runloop.cpp for platforms which do not
+	      otherwise have any special run-loop needs.  The default
+	      implementation, however, is very simple-minded in that it merely
+	      advances the virtual clock and processes the event queue until
+	      cscmdQuit is received.  It is not particularly platform-friendly
+	      since it makes no attempt to yield the CPU, nor does it make any
+	      attempt to interact nicely with a platform's native GUI.
+	    - Implemented a platform-specific csDefaultRunLoop() for the
+	      Apple/NeXT ports.  This function is essentially a one-liner which
+	      merely asks the NeXTAssistant (from the object registry) to
+	      invoke the platform-specific run-loop, which is implemented by
+	      Cocoa's NSApplication class.
+	    - All other platforms currently employ the default implementation
+	      of csDefaultRunLoop() from runloop.cpp.  In the future, however,
+	      some platforms, such as BeOS, will implement their own versions
+	      of csDefaultRunLoop().
+	    - Added new functions csPlatformStartup() and csPlatformShutdown().
+	      These functions are called by csInitializer::Initialize() and
+	      csInitializer::DestroyApplication(), respectively, though they
+	      can also be called manually in cases where csInitializer is not
+	      utilized.  These functions provide hooks for platform-specific
+	      initialization and shutdown.  csPlatformStartup() and
+	      csPlatformShutdown() are intended to be implemented by each
+	      platform in some appropriate fashion.  One common use for these
+	      functions is to publish platform-specific "helper" objects via
+	      the shared-object registry (iObjectRegistry).
+	    - Created default implementations of csPlatformStartup() and
+	      csPlatformShutdown() in CS/libs/cssys/general/sysinit.cpp.  The
+	      default implementations of these functions do nothing.
+	    - Implemented platform-specific csPlatformStartup() and
+	      csPlatformShutdown() for the Apple/NeXT ports.  These functions
+	      publish an iNeXTAssistant with the shared-object registry.
+	    - All other platforms currently employ the default implementations
+	      of csPlatformStartup() and csPlatformShutdown() from sysinit.cpp.
+	      In the future, however, some platforms, such as BeOS, Windows,
+	      etc., will implement their own versions of these functions in
+	      order to publish their platform-specific "helper" objects.
+	    - The functional version of csInitializer::SetupEventHandler() now
+	      accepts an event mask, just like the object-oriented version.  It
+	      also provides a default event mask, which includes all event
+	      types in which the typical application is interested.
+	    - With the introduction of csDefaultRunLoop(), csPlatformStartup(),
+	      and csPlatformShutdown(), it become possible to remove _all_ code
+	      from the Apple/NeXT csSystemDriver subclass, thus the system
+	      driver for the Apple/NeXT ports is now _completely_ empty and can
+	      be removed (though this will not happen until all remaining code
+	      is removed from the csSystemDriver subclasses of the other ports,
+	      as well).
+	    - Adjusted the Apple/NeXT ports to take into account all of the
+	      recent changes to application initialization and run-loop
+	      mechanics.  These ports once again compile cleanly, and the
+	      programs run.  (The only exception is that programs which utilize
+	      the 3D renderer crash with a BUS error on address 0x0 when the 3D
+	      renderer tries to load the 2D canvas.  I will look into this
+	      problem shortly.)
 11-Oct-2001
 	- Moved the plugin manager implementation out of the system driver
 	  into csPluginManager (in csutil/plugmgr.h). Modified
