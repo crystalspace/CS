@@ -20,6 +20,8 @@ The history order is reversed so that new features are at the top.
 	      may need to return in order to fix.
 	  Detecting the difference between cmd.exe and some fancy shell is a
 	  matter of fine detail.
+	- Started working on visibility algorithm in terrain engine. Does
+	  not work yet.
 28-May-2001
 	- Fixed all the plugins makefiles so that they now have an additional
 	  CSUTIL in their link line. This satisfies one-pass linkers after

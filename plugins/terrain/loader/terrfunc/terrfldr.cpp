@@ -45,6 +45,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (DIRLIGHT)
   CS_TOKEN_DEF (LODDIST)
   CS_TOKEN_DEF (LODCOST)
+  CS_TOKEN_DEF (QUADDEPTH)
 CS_TOKEN_DEF_END
 
 IMPLEMENT_IBASE (csTerrFuncFactoryLoader)
@@ -133,6 +134,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
     CS_TOKEN_TABLE (LODDIST)
     CS_TOKEN_TABLE (LODCOST)
     CS_TOKEN_TABLE (CORRECTSEAMS)
+    CS_TOKEN_TABLE (QUADDEPTH)
   CS_TOKEN_TABLE_END
 
   char *pName;
@@ -254,6 +256,13 @@ iBase* csTerrFuncLoader::Parse (const char* pString, iEngine *iEngine,
 	  iTerrainState->SetMaximumLODCost (lod, cost);
 	}
 	break;
+      case CS_TOKEN_QUADDEPTH:
+        {
+	  int qd;
+	  ScanStr (pParams, "%d", &qd);
+	  iTerrainState->SetQuadDepth (qd);
+	}
+        break;
       case CS_TOKEN_HEIGHTMAP:
         {
 	  float hscale, hshift;

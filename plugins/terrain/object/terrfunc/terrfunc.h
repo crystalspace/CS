@@ -29,6 +29,7 @@
 struct iEngine;
 struct iMaterialWrapper;
 struct iSystem;
+class csTerrainQuad;
 
 #define LOD_LEVELS 4
 
@@ -59,7 +60,7 @@ public:
   csTerrainNormalFunction* normal_func;
   void* height_func_data;
   void* normal_func_data;
-  int blockx, blocky;
+  int blockxy;
   int gridx, gridy;
   csVector3 topleft;
   csVector3 scale;
@@ -93,6 +94,24 @@ private:
   float correct_du, correct_su;
   float correct_dv, correct_sv;
 
+  // For visibility.
+  int quad_depth;
+  int block_depth;	// Depth of the quadtree in one block.
+  csTerrainQuad* quadtree;
+
+  /**
+   * Take a part of a mesh and calculate the minimum/maximum height.
+   * The part is specified with the coordinates cx, cy given a certain
+   * dimension. i.e. if w is 2 this means the mesh is divided into 2*2
+   * sub-meshes and coordinate 0,1 (for example) means that we take
+   * the sub-mesh at coordinate 0,1.
+   * This function assumes the bbox in csTerrBlock is ok.
+   */
+  static void GetMinMaxMesh (const G3DTriangleMesh& mesh,
+  	const csBox3& bbox,
+  	int cx, int cy, int w,
+	float& min_height, float& max_height);
+
   /**
    * Clear a mesh and initialize it for new usage (call before
    * SetupBaseMesh() or ComputeLODLevel() (as dest)).
@@ -105,6 +124,17 @@ private:
    * intervals (gridx/gridy resolution).
    */
   void SetupBaseMesh (G3DTriangleMesh& mesh, int bx, int by);
+
+  /**
+   * Setup the visibility tree.
+   */
+  void SetupVisibilityTree (csTerrainQuad* quad,
+    int x1, int y1, int x2, int y2);
+
+  /**
+   * Setup the visibility tree.
+   */
+  void SetupVisibilityTree ();
 
   /**
    * Compute a destination mesh from a given source mesh
@@ -180,16 +210,17 @@ public:
   /// Setup the number of blocks in the terrain.
   void SetResolution (int x, int y)
   {
-    block_dim_invalid = blockx != x || blocky != y;
-    blockx = x;
-    blocky = y;
+    // @@@: x and y should be equal!!!
+    CS_ASSERT (x == y);
+    block_dim_invalid = blockxy != x;
+    blockxy = x;
     initialized = false;
   }
 
   /// Get the x resolution.
-  int GetXResolution () { return blockx; }
+  int GetXResolution () { return blockxy; }
   /// Get the y resolution.
-  int GetYResolution () { return blocky; }
+  int GetYResolution () { return blockxy; }
   /**
    * Setup the number of grid points in every block for the base mesh.
    */
@@ -234,24 +265,18 @@ public:
   {
     lod_sqdist[lod-1] = dist*dist;
   }
-  /**
-   * Get the distance at which lod will switch to that level.
-   */
+  /// Get the distance at which lod will switch to that level.
   float GetLODDistance (int lod)
   {
     return sqrt (lod_sqdist[lod-1]);
   }
-  /**
-   * Set the maximum cost for LOD level (1..3).
-   */
+  /// Set the maximum cost for LOD level (1..3).
   void SetMaximumLODCost (int lod, float maxcost)
   {
     max_cost[lod-1] = maxcost;
     initialized = false;
   }
-  /**
-   * Get the maximum cost for LOD level (1..3).
-   */
+  /// Get the maximum cost for LOD level (1..3).
   float GetMaximumLODCost (int lod)
   {
     return max_cost[lod-1];
@@ -263,14 +288,29 @@ public:
    */
   void CorrectSeams (int tw, int th);
 
-  /**
-   * Get texture size for which seams will be corrected.
-   */
+  /// Get texture size for which seams will be corrected.
   void GetCorrectSeams (int& tw, int& th) const
   {
     tw = correct_tw;
     th = correct_th;
   }
+
+  void SetQuadDepth (int qd)
+  {
+    quad_depth = qd;
+    initialized = false;
+  }
+
+  int GetQuadDepth () const
+  {
+    return quad_depth;
+  }
+
+  /**
+   * Test visibility from a given position.
+   * This will call MarkVisible() for all quad nodes that are visible.
+   */
+  void TestVisibility (iRenderView* rview);
 
   ///--------------------- iTerrainObject implementation ---------------------
   DECLARE_IBASE;
@@ -301,12 +341,12 @@ public:
   {
     if (!blocks || block_dim_invalid)
     {
-      blocks = new csTerrBlock [blockx*blocky];
+      blocks = new csTerrBlock [blockxy*blockxy];
       block_dim_invalid = false;
     }
     blocks[i].material = mat;
   }
-  virtual int GetNumMaterials () { return blockx*blocky; }
+  virtual int GetNumMaterials () { return blockxy*blockxy; }
   virtual void SetLOD (unsigned int) { }
 
   virtual int CollisionDetect (csTransform *p);
@@ -403,6 +443,14 @@ public:
     virtual void GetCorrectSeams (int& tw, int& th) const
     {
       scfParent->GetCorrectSeams (tw, th);
+    }
+    virtual void SetQuadDepth (int qd)
+    {
+      scfParent->SetQuadDepth (qd);
+    }
+    virtual int GetQuadDepth () const
+    {
+      return scfParent->GetQuadDepth ();
     }
   } scfiTerrFuncState;
   friend class TerrFuncState;

@@ -37,7 +37,7 @@ typedef float (csTerrainHeightFunction)(void* data, float dx, float dy);
  */
 typedef csVector3 (csTerrainNormalFunction)(void* data, float dx, float dy);
 
-SCF_VERSION (iTerrFuncState, 0, 0, 5);
+SCF_VERSION (iTerrFuncState, 0, 0, 6);
 
 /**
  * This interface describes the API for the terrain object.
@@ -109,6 +109,14 @@ struct iTerrFuncState : public iBase
    * Get texture size for which seams will be corrected.
    */
   virtual void GetCorrectSeams (int& tw, int& th) const = 0;
+  /**
+   * Set the depth of the quad-tree used for visibility testing.
+   */
+  virtual void SetQuadDepth (int qd) = 0;
+  /**
+   * Get the depth of the quad-tree used for visibility testing.
+   */
+  virtual int GetQuadDepth () const = 0;
 };
 
 #endif // __ITERRAIN_TERRFUNC_H_

@@ -35,6 +35,7 @@
 #include "csgfx/rgbpixel.h"
 #include "isys/vfs.h"
 #include "terrfunc.h"
+#include "terrvis.h"
 #include "qint.h"
 
 IMPLEMENT_IBASE (csTerrFuncObject)
@@ -144,8 +145,7 @@ csTerrFuncObject::csTerrFuncObject (iSystem* pSys,
   pSystem = pSys;
   csTerrFuncObject::pFactory = pFactory;
   initialized = false;
-  blockx = 4;
-  blocky = 4;
+  blockxy = 4;
   gridx = 8; gridy = 8;
   topleft.Set (0, 0, 0);
   scale.Set (1, 1, 1);
@@ -164,6 +164,8 @@ csTerrFuncObject::csTerrFuncObject (iSystem* pSys,
   max_cost[1] = .08;
   max_cost[2] = .2;
   CorrectSeams (0, 0);
+  quad_depth = 4;
+  quadtree = NULL;
 }
 
 csTerrFuncObject::~csTerrFuncObject ()
@@ -202,7 +204,7 @@ void csTerrFuncObject::LoadMaterialGroup (iEngine* engine, const char *pName,
 {
   if (!blocks || block_dim_invalid)
   {
-    blocks = new csTerrBlock [blockx*blocky];
+    blocks = new csTerrBlock [blockxy*blockxy];
     block_dim_invalid = false;
   }
   int i;
@@ -212,9 +214,9 @@ void csTerrFuncObject::LoadMaterialGroup (iEngine* engine, const char *pName,
   {
     sprintf (pMatName, pName, i);
     iMaterialWrapper* mat = engine->FindMaterial (pMatName);
-    int bx = i % blockx;
-    int by = i / blockx;
-    int newi = bx*blockx + by;
+    int bx = i % blockxy;
+    int by = i / blockxy;
+    int newi = bx*blockxy + by;
     blocks[newi].material = mat;
   }
 }
@@ -585,8 +587,8 @@ csTriangleVertices::csTriangleVertices (const G3DTriangleMesh& mesh,
       		       ABS (v.z-box.MaxY ()) < .001;
     bool at_ver_edge = ABS (v.x-box.MinX ()) < .001 ||
       		       ABS (v.x-box.MaxX ()) < .001;
-    v.x /= terrfunc->scale.x * float (terrfunc->blockx);
-    v.z /= terrfunc->scale.z * float (terrfunc->blocky);
+    v.x /= terrfunc->scale.x * float (terrfunc->blockxy);
+    v.z /= terrfunc->scale.z * float (terrfunc->blockxy);
     vertices[i].dx = v.x;
     vertices[i].dy = v.z;
     vertices[i].at_hor_edge = at_hor_edge;
@@ -801,15 +803,15 @@ void csTerrFuncObject::ComputeNormals (const G3DTriangleMesh& mesh,
 {
   csVector3* normals = new csVector3 [mesh.num_vertices];
   *pNormals = normals;
-  float inv_totx = .5 / float (1+blockx*gridx);
-  float inv_toty = .5 / float (1+blocky*gridy);
+  float inv_totx = .5 / float (1+blockxy*gridx);
+  float inv_toty = .5 / float (1+blockxy*gridy);
   csVector3 v[8];
   int i;
   for (i = 0 ; i < mesh.num_vertices ; i++)
   {
     csVector3 vv = mesh.vertices[0][i] - topleft;
-    vv.x /= scale.x * float (blockx);
-    vv.z /= scale.z * float (blocky);
+    vv.x /= scale.x * float (blockxy);
+    vv.z /= scale.z * float (blockxy);
     float dx = vv.x, dy = vv.z;
     csVector3 n;
     if (normal_func)
@@ -843,10 +845,10 @@ void csTerrFuncObject::ComputeNormals ()
   int lod;
   int bx, by;
   for (lod = 0 ; lod < LOD_LEVELS ; lod++)
-    for (by = 0 ; by < blocky ; by++)
-      for (bx = 0 ; bx < blockx ; bx++)
+    for (by = 0 ; by < blockxy ; by++)
+      for (bx = 0 ; bx < blockxy ; bx++)
       {
-	int blidx = by*blockx + bx;
+	int blidx = by*blockxy + bx;
 	ComputeNormals (blocks[blidx].mesh[lod], &blocks[blidx].normals[lod]);
       }
 }
@@ -863,10 +865,10 @@ void csTerrFuncObject::ComputeBBoxes ()
 {
   int lod;
   int bx, by;
-  for (by = 0 ; by < blocky ; by++)
-    for (bx = 0 ; bx < blockx ; bx++)
+  for (by = 0 ; by < blockxy ; by++)
+    for (bx = 0 ; bx < blockxy ; bx++)
     {
-      int blidx = by*blockx + bx;
+      int blidx = by*blockxy + bx;
       blocks[blidx].bbox.StartBoundingBox ();
       for (lod = 0 ; lod < LOD_LEVELS ; lod++)
       {
@@ -910,17 +912,17 @@ void csTerrFuncObject::SetupBaseMesh (G3DTriangleMesh& mesh, int bx, int by)
   tl.z += by*scale.z;
   csVector2 tluv (0, 0);
 #if 0
-  tluv.x += float (bx) / float (blockx);
-  tluv.y += float (by) / float (blocky);
+  tluv.x += float (bx) / float (blockxy);
+  tluv.y += float (by) / float (blockxy);
 #endif
   int gx, gy;
   float dx, dy;
   for (gy = 0 ; gy <= gridy ; gy++)
   {
-    dy = float (by*gridy+gy) / float (blocky * gridy);
+    dy = float (by*gridy+gy) / float (blockxy * gridy);
     for (gx = 0 ; gx <= gridx ; gx++)
     {
-      dx = float (bx*gridx+gx) / float (blockx * gridx);
+      dx = float (bx*gridx+gx) / float (blockxy * gridx);
       int vtidx = gy*(gridx+1)+gx;
       csVector3 v = tl;
       v.x += gx*scale.x / float (gridx);
@@ -929,8 +931,8 @@ void csTerrFuncObject::SetupBaseMesh (G3DTriangleMesh& mesh, int bx, int by)
       mesh.vertices[0][vtidx] = v;
       csVector2 uv = tluv;
 #if 0
-      uv.x += float (gx) / float (blockx*gridx);
-      uv.y += float (gy) / float (blocky*gridy);
+      uv.x += float (gx) / float (blockxy*gridx);
+      uv.y += float (gy) / float (blockxy*gridy);
 #else
       uv.x += float (gx) / float (gridx);
       uv.y += float (gy) / float (gridy);
@@ -957,6 +959,114 @@ void csTerrFuncObject::SetupBaseMesh (G3DTriangleMesh& mesh, int bx, int by)
     }
 }
 
+void csTerrFuncObject::GetMinMaxMesh (const G3DTriangleMesh& mesh,
+	const csBox3& bbox,
+  	int cx, int cy, int w,
+	float& min_height, float& max_height)
+{
+  float boxw = bbox.MaxX () - bbox.MinX ();
+  float boxh = bbox.MaxY () - bbox.MinY ();
+  float minx = bbox.MinX () + float (cx) * boxw / float (w);
+  float miny = bbox.MinY () + float (cy) * boxh / float (w);
+  float maxx = bbox.MinX () + float (cx+1) * boxw / float (w);
+  float maxy = bbox.MinY () + float (cy+1) * boxh / float (w);
+  // Add a small border to min/max so that points at the
+  // border are also counted.
+  minx -= boxw / 1000.;
+  miny -= boxh / 1000.;
+  maxx += boxw / 1000.;
+  maxy += boxh / 1000.;
+  min_height = bbox.MaxY ();
+  max_height = bbox.MinY ();
+  int i;
+  for (i = 0 ; i < mesh.num_vertices ; i++)
+  {
+    float x = mesh.vertices[0][i].x;
+    float z = mesh.vertices[0][i].z;
+    if (x >= minx && x <= maxx && z >= miny && z <= maxy)
+    {
+      float y = mesh.vertices[0][i].y;
+      if (y < min_height) min_height = y;
+      if (y > max_height) max_height = y;
+    }
+  }
+}
+
+void csTerrFuncObject::SetupVisibilityTree (csTerrainQuad* quad,
+	int x1, int y1, int x2, int y2)
+{
+  float min_height, max_height;
+
+  if (quad->IsLeaf ())
+  {
+    // bx and by are coordinates of block.
+    int bx = x1 >> block_depth;
+    int by = y1 >> block_depth;
+    // w is total width/height inside block.
+    int w = 1 << block_depth;
+    // cx and cy are coordinates inside block.
+    int cx = x1 & (w-1);
+    int cy = y1 & (w-1);
+
+    int blidx = by*blockxy + bx;
+    csTerrBlock& block = blocks[blidx];
+    G3DTriangleMesh& mesh = block.mesh[0];
+    GetMinMaxMesh (mesh, block.bbox, cx, cy, w, min_height, max_height);
+
+    quad->SetMinimumHeight (min_height);
+    quad->SetMaximumHeight (max_height);
+    return;
+  }
+
+  min_height = 1000000000.;
+  max_height = -1000000000.;
+  int i;
+  for (i = 0 ; i < 4 ; i++)
+  {
+    int xx1, yy1, xx2, yy2;
+    switch (i)
+    {
+      case CS_QUAD_TOPLEFT:
+        xx1 = x1; yy1 = y1; xx2 = x1 + (x2-x1)/2; yy2 = y1 + (y2-y1)/2;
+	break;
+      case CS_QUAD_TOPRIGHT:
+        xx1 = x1 + (x2-x1)/2; yy1 = y1; xx2 = x2; yy2 = y1 + (y2-y1)/2;
+	break;
+      case CS_QUAD_BOTLEFT:
+        xx1 = x1; yy1 = y1 + (y2-y1)/2; xx2 = x1 + (x2-x1)/2; yy2 = y2;
+	break;
+      case CS_QUAD_BOTRIGHT:
+        xx1 = x1 + (x2-x1)/2; yy1 = y1 + (y2-y1)/2; xx2 = x2; yy2 = y2;
+	break;
+    }
+    csTerrainQuad* c = quad->GetChild (i);
+    SetupVisibilityTree (c, xx1, yy1, xx2, yy2);
+    if (c->GetMinimumHeight () < min_height)
+      min_height = c->GetMinimumHeight ();
+    if (c->GetMaximumHeight () > max_height)
+      max_height = c->GetMaximumHeight ();
+  }
+  quad->SetMinimumHeight (min_height);
+  quad->SetMaximumHeight (max_height);
+}
+
+void csTerrFuncObject::SetupVisibilityTree ()
+{
+  delete quadtree;
+  quadtree = new csTerrainQuad ();
+  quadtree->Build (quad_depth);
+  int res = 1 << quad_depth;
+  block_depth = 0;
+  int b = blockxy;
+  while (b > 1)
+  {
+    block_depth++;
+    b >>= 1;
+  }
+  block_depth = quad_depth-block_depth;
+  SetupVisibilityTree (quadtree, 0, 0, res, res);
+}
+
 void csTerrFuncObject::SetupObject ()
 {
   if (!initialized)
@@ -965,17 +1075,17 @@ void csTerrFuncObject::SetupObject ()
     if (!blocks || block_dim_invalid)
     {
       delete[] blocks;
-      blocks = new csTerrBlock [blockx*blocky];
+      blocks = new csTerrBlock [blockxy*blockxy];
     }
 
     int bx, by;
     int blidx = 0;
-    for (by = 0 ; by < blocky ; by++)
+    for (by = 0 ; by < blockxy ; by++)
     {
-      float dy = (float (by)+.5) / float (blocky);
-      for (bx = 0 ; bx < blockx ; bx++, blidx++)
+      float dy = (float (by)+.5) / float (blockxy);
+      for (bx = 0 ; bx < blockxy ; bx++, blidx++)
       {
-        float dx = (float (bx)+.5) / float (blockx);
+        float dx = (float (bx)+.5) / float (blockxy);
 	csVector3 tl = topleft;
 	tl.x += (float (bx) + .5)*scale.x;
 	tl.y += height_func (height_func_data, dx, dy)*scale.y;
@@ -990,10 +1100,10 @@ void csTerrFuncObject::SetupObject ()
       printf ("Setting up LOD level %d\n", lod);
       int del_tri = 0;
       int tot_tri = 0;
-      for (by = 0 ; by < blocky ; by++)
-        for (bx = 0 ; bx < blockx ; bx++)
+      for (by = 0 ; by < blockxy ; by++)
+        for (bx = 0 ; bx < blockxy ; bx++)
 	{
-	  int blidx = by*blockx+bx;
+	  int blidx = by*blockxy+bx;
 	  csTerrBlock& block = blocks[blidx];
 	  block.dirlight_numbers[lod] = -1;
 	  InitMesh (block.mesh[lod]);
@@ -1013,6 +1123,7 @@ void csTerrFuncObject::SetupObject ()
     }
     ComputeNormals ();
     ComputeBBoxes ();
+    SetupVisibilityTree ();
   }
 }
 
@@ -1024,7 +1135,7 @@ void csTerrFuncObject::RecomputeShadowMap ()
 void csTerrFuncObject::RecomputeLighting (int lod, int bx, int by)
 {
   if (!do_dirlight) return;
-  int blidx = by*blockx + bx;
+  int blidx = by*blockxy + bx;
   csTerrBlock& block = blocks[blidx];
   if (dirlight_number != block.dirlight_numbers[lod])
   {
@@ -1103,6 +1214,49 @@ bool csTerrFuncObject::BBoxVisible (const csBox3& bbox,
   return rview->ClipBBox (sbox, cbox, clip_portal, clip_plane);
 }
 
+void csTerrFuncObject::TestVisibility (iRenderView* rview)
+{
+  SetupObject ();
+
+  csTerrainQuad::MarkAllInvisible ();
+
+  iCamera* camera = rview->GetCamera ();
+  iClipper2D* clipper = rview->GetClipper ();
+
+  const csReversibleTransform& camtrans = camera->GetTransform ();
+  const csVector3& origin = camtrans.GetOrigin ();
+  float inv_fov = camera->GetInvFOV ();
+  float sx = camera->GetShiftX ();
+  float sy = camera->GetShiftY ();
+
+  // First take the current clipper and calculate the left-most
+  // and right-most viewing vectors (and then angles) as seen in object
+  // space for the terrain.
+  int nv = clipper->GetNumVertices ();
+  csVector2* v = clipper->GetClipPoly ();
+  csVector3 v3;
+  v3.z = 1;
+  int i, i1;
+  i1 = nv-1;
+  for (i = 0 ; i < nv ; i++)
+  {
+    v3.x = (v[i].x - sx) * inv_fov;
+    v3.y = (v[i].y - sy) * inv_fov;
+    csVector3 vo3 = camtrans.This2Other (v3);
+    // origin->vo3 is now a vector in object space. We now calculate
+    // the angle projected on the xz plane.
+    vo3 -= origin;
+    vo3.Normalize ();
+    float cos_angle = vo3 * csVector3 (1, 0, 0);
+    // @@@ BAD USE LOOKUP TABLE!!!
+    if (cos_angle < -1) cos_angle = -1;
+    else if (cos_angle > 1) cos_angle = 1;
+    float angle = acos (cos_angle);
+    if (vo3.z < 0) angle = M_PI*2 - angle;
+    i1 = i;
+  }
+}
+
 void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
 {
   SetupObject ();
@@ -1117,9 +1271,9 @@ void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
 
   int bx, by;
   int blidx = 0;
-  for (by = 0 ; by < blocky ; by++)
+  for (by = 0 ; by < blockxy ; by++)
   {
-    for (bx = 0 ; bx < blockx ; bx++, blidx++)
+    for (bx = 0 ; bx < blockxy ; bx++, blidx++)
     {
       csTerrBlock& block = blocks[blidx];
       int clip_portal, clip_plane;
@@ -1150,8 +1304,8 @@ int csTerrFuncObject::CollisionDetect (csTransform* transform)
 {
   // Translate us into terrain coordinate space.
   csVector3 p = transform->GetOrigin () - topleft;
-  p.x /= scale.x * float (blockx);
-  p.z /= scale.z * float (blocky);
+  p.x /= scale.x * float (blockxy);
+  p.z /= scale.z * float (blockxy);
   // If our location is outside the terrain then we cannot hit it.
   if (p.x < 0 || p.z < 0 || p.x > 1 || p.z > 1) return 0;
 
@@ -1160,8 +1314,8 @@ int csTerrFuncObject::CollisionDetect (csTransform* transform)
   if (h < p.y) return 0;
   p.y = h;
   // Translate us back.
-  p.x *= scale.x * float (blockx);
-  p.z *= scale.z * float (blocky);
+  p.x *= scale.x * float (blockxy);
+  p.z *= scale.z * float (blockxy);
   p = p + topleft;
   transform->SetOrigin (p);
   return 1;

@@ -865,14 +865,12 @@ void csGraphics3DOGLCommon::CalculateFrustum ()
     csVector3 v3;
     v3.z = 1;
     csVector2* v = clipper->GetClipPoly ();
-    int i, i1;
-    i1 = nv-1;
+    int i;
     for (i = 0 ; i < nv ; i++)
     {
       v3.x = (v[i].x - width2) * inv_aspect;
       v3.y = (v[i].y - height2) * inv_aspect;
       frustum.AddVertex (v3);
-      i1 = i;
     }
   }
 }
@@ -2619,6 +2617,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 // @@@ Experimental define to see if using a TEXTURE matrix
 // instead of scaling manually is more efficient. Have to try
 // this out on various cards to see the effect.
+// Conclusion: it seems to be slower for some reason (but not much).
 #define EXP_SCALE_MATRIX 0
 #if EXP_SCALE_MATRIX
 	glMatrixMode (GL_TEXTURE);
@@ -2686,9 +2685,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     glShadeModel (GL_SMOOTH);
     SetClientStates (CS_CLIENTSTATE_ALL);
     glVertexPointer (3, GL_FLOAT, 0, & work_verts[0]);
-    glTexCoordPointer (2, GL_FLOAT, sizeof (G3DFogInfo), & work_fog[0].intensity);
-    glColorPointer (3, GL_FLOAT, sizeof (G3DFogInfo), & work_fog[0].r);
-
+    glTexCoordPointer (2, GL_FLOAT, sizeof(G3DFogInfo), &work_fog[0].intensity);
+    glColorPointer (3, GL_FLOAT, sizeof (G3DFogInfo), &work_fog[0].r);
     glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
 
     if (!m_textured)
@@ -2714,17 +2712,17 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
 
 
-void csGraphics3DOGLCommon::OpenFogObject (CS_ID /*id*/, csFog* /*fog*/)
+void csGraphics3DOGLCommon::OpenFogObject (CS_ID, csFog*)
 {
   // OpenGL driver implements vertex-based fog ...
 }
 
-void csGraphics3DOGLCommon::DrawFogPolygon (CS_ID /*id*/, G3DPolygonDFP &/*poly*/, int /*fogtype*/)
+void csGraphics3DOGLCommon::DrawFogPolygon (CS_ID, G3DPolygonDFP&, int)
 {
   // OpenGL driver implements vertex-based fog ...
 }
 
-void csGraphics3DOGLCommon::CloseFogObject (CS_ID /*id*/)
+void csGraphics3DOGLCommon::CloseFogObject (CS_ID)
 {
   // OpenGL driver implements vertex-based fog ...
 }
@@ -2747,7 +2745,8 @@ void csGraphics3DOGLCommon::CacheTexture (iPolygonTexture *texture)
     lightmap_cache->Cache (texture);
 }
 
-bool csGraphics3DOGLCommon::SetRenderState (G3D_RENDERSTATEOPTION op, long value)
+bool csGraphics3DOGLCommon::SetRenderState (G3D_RENDERSTATEOPTION op,
+	long value)
 {
   switch (op)
   {
@@ -2839,8 +2838,8 @@ void csGraphics3DOGLCommon::DumpCache ()
 {
 }
 
-void csGraphics3DOGLCommon::DrawLine (const csVector3 & v1, const csVector3 & v2,
-	float fov, int color)
+void csGraphics3DOGLCommon::DrawLine (const csVector3 & v1,
+	const csVector3 & v2, float fov, int color)
 {
   FlushDrawPolygon ();
   lightmap_cache->Flush ();
