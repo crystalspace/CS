@@ -123,6 +123,10 @@ static inline char* strdup( char const* s )
 //-----------------------------------------------------------------------------
 // NeXT does not supply getcwd() so fake one up using getwd().
 //-----------------------------------------------------------------------------
+#if defined(OS_NEXT_NEXTSTEP) || \
+    defined(OS_NEXT_OPENSTEP) || \
+    defined(OS_NEXT_MACOSXS)
+
 #if defined(SYSDEF_GETCWD)
 #undef SYSDEF_GETCWD
 
@@ -142,6 +146,7 @@ static inline char* getcwd( char* p, size_t size )
     }
 
 #endif // SYSDEF_GETCWD
+#endif // OS_NEXT_NEXTSTEP || OS_NEXT_OPENSTEP
 
 
 //-----------------------------------------------------------------------------
