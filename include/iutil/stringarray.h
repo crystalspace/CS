@@ -27,7 +27,7 @@
  */
 /**\addtogroup util
  * @{ */
-SCF_VERSION (iStringArray, 0, 0, 1);
+SCF_VERSION (iStringArray, 0, 0, 2);
 
 /// This is an SCF-compatible interface for csStringArray.
 struct iStringArray : public iBase
@@ -44,8 +44,14 @@ struct iStringArray : public iBase
   /// Get Nth string in vector.
   virtual char const *Get (int n) const = 0;
 
-  /// Find index of given string.
+  /// Find index of given string pointer.
   virtual int Find (const char *value) const = 0;
+
+  /// Find index of given string contents.
+  virtual int FindContent (const char *value) const = 0;
+
+  /// Case insensitive version of FindContent.
+  virtual int FindCaseContent (const char *value) const = 0;
 
   /// Find index of a string in a pre-sorted string array.
   virtual int FindSortedKey (const char *value) const = 0;

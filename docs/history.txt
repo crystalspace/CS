@@ -33,6 +33,13 @@ chronological order.
 	  executables and plugins would have an undesirable dependency upon
 	  XFree86, if XFree86 happened to be installed on the computer.  (The
 	  --with-x flag can be used to override this behavior.)
+	- Oktal added a FindContent method to csStringArray and iStringArray
+	  that compares the contents of the strings instead of the char
+	  pointers themselves, and FindCaseContent a case insensitive version.
+	- Oktal fixed bfdplugins.cpp so it supports BFD data in .so files and
+	  .csplugin files at the same time (but not for the same plugin).
+	- Oktal fixed an off-by-one bug in csHash::Iterator.
+	- Oktal changed csHash::DeleteAll() from void to bool.
 30-Aug-2003
 	- Old_Belge added the morph target support to sprcal3d.
 	- Eric Sunshine augmented configure.ac so that it emits the appropriate
@@ -210,8 +217,6 @@ chronological order.
 	- Eric Sunshine fixed a lot of makefiles throughout the project which
 	  were incorrectly using DO.PLUGIN rather than	DO.PLUGIN.PREAMBLE,
 	  CORE, POSTAMBLE.
-	- Oktal changed a doxygen comment in csHashMapReversible to reflect the
-	  dodgy way it works.
 28-Aug-2003
 	- Jorrit fixed the x2d plugin so it actually reports an error if the
 	  'xwin' plugin cannot be found.

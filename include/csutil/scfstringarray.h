@@ -63,10 +63,22 @@ public:
     return v.Get (n);
   }
 
-  /// Find index of given string.
+  /// Find index of given string pointer.
   virtual int Find (const char *value) const
   {
     return v.Find ((char*)value);
+  }
+
+  /// Find index of given string contents.
+  virtual int FindContent (const char *value) const
+  {
+    return v.FindContent ((char*)value);
+  }
+
+  /// Case insensitive version of FindContent().
+  virtual int FindCaseContent (const char *value) const
+  {
+    return v.FindCaseContent ((char*)value);
   }
 
   /// Find index of a string in a pre-sorted string array.

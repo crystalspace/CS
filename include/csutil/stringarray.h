@@ -131,6 +131,35 @@ public:
     SetLength (l);
     return ret;
   }
+
+  /**
+   * Call csArray::Find(what).
+   */
+  int Find (const char *what) const
+  {
+    return superclass::Find (what);
+  }
+
+  /**
+   * This version of Find compares the contents of the string instead of just
+   * the char pointers.
+   */
+  int FindContent (const char *what) const
+  {
+    for (int i = 0; i < Length (); i++)
+      if (strcmp (Get (i), what)) return i;
+    return -1;
+  }
+
+  /**
+   * Case insensitive version of FindContent().
+   */
+  int FindCaseContent (const char *what) const
+  {
+    for (int i = 0; i < Length (); i++)
+      if (strcasecmp (Get (i), what)) return i;
+    return -1;
+  }
 };
 
 #endif // __CS_STRINGARRAY_H__
