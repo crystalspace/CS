@@ -30,6 +30,9 @@ The history order is reversed so that new features are at the top.
 	- Both RAPID and OPCODE now call Cleanup() on the polygon mesh to
 	  release unneeded memory. I thought this was done a long time
 	  ago but apparently not.
+	- libs/cssys/win32/win32.cpp was including graph2d.h and
+	  graph3d.h. That is not needed. Only natwin.h and cursor.h
+	  from include/ivideo are required.
 16-Apr-2003
 	- Rhad altered the rapid triangle collision test to ignore
 	  degenerate triangles.

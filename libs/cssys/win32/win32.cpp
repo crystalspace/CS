@@ -24,9 +24,8 @@
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 #include "iutil/cmdline.h"
-#include "ivideo/graph2d.h"
-#include "ivideo/graph3d.h"
 #include "ivideo/natwin.h"
+#include "ivideo/cursor.h"
 #include <stdarg.h>
 #include <windows.h>
 
