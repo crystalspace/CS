@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004 by Jorrit Tyberghein
+    Copyright (C) 2004-2005 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -23,6 +23,9 @@
 
 class PVSCalc;
 
+/// Dimension of the coverage buffer.
+#define DIM_COVBUFFER 512
+
 /**
  * All information related to the projection plane where all area
  * shadows are projected on.
@@ -39,6 +42,8 @@ struct PVSCalcProjectionPlane
   // After projection of a shadow on the plane it will be a 2D polygon.
   // This 2D polygon needs to be scaled on the coverage buffer using
   // the following scale and offset.
+  // From projected 2D point (p) to coverage buffer (c):
+  //     c = (p-offset) * scale;
   csVector2 scale, offset;
 };
 
@@ -102,6 +107,12 @@ private:
    * is surely visible from the source box.
    */
   bool SetupProjectionPlane (const csBox3& source, const csBox3& dest);
+
+  /**
+   * Calculate the area shadow on the shadow plane for a given polygon.
+   * Also update this on the coverage buffer.
+   */
+  void CastAreaShadow (const csPoly3D& polygon);
 
 public:
   PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs);

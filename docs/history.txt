@@ -14,6 +14,7 @@ chronological order.
 	  project a box outline to an axis aligned plane.
 	- Jorrit added a version of csBox3::ProjectOutline() that accepts
 	  a csArray<csVector2> instead of csPoly2D.
+	- Jorrit did some additional work on pvscalc.
 9-Feb-2005
 	- Jorrit implemented sorting in csChainHull2D::SortXY.
 	- Jorrit worked a bit further on pvscalc.

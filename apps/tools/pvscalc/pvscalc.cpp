@@ -30,7 +30,7 @@ PVSCalcSector::PVSCalcSector (PVSCalc* parent, iSector* sector, iPVSCuller* pvs)
   pvstree = pvs->GetPVSTree ();
 
   // @@@ Make dimension configurable?
-  plane.covbuf = new csTiledCoverageBuffer (512, 512);
+  plane.covbuf = new csTiledCoverageBuffer (DIM_COVBUFFER, DIM_COVBUFFER);
 }
 
 PVSCalcSector::~PVSCalcSector ()
@@ -352,13 +352,68 @@ bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
 {
   if (!FindShadowPlane (source, dest, plane.axis, plane.where))
     return false;
-  
-  // First calculate all projections ... @@@
-  // Calculate bounding hull ... @@@
-  // @@@
+
+  // We project the destination box on the given shadow plane as seen
+  // from every corner of the source box. ProjectOutline() will add the
+  // projected vertices to 'poly' so in the end we will have a collection
+  // of points on the shadow plane. These points form the boundaries
+  // where all the projected shadows will be relevant for visibility.
+  csDirtyAccessArray<csVector2> poly;
+  dest.ProjectOutline (source.GetCorner (CS_BOX_CORNER_xyz),
+  	plane.axis, plane.where, poly);
+  dest.ProjectOutline (source.GetCorner (CS_BOX_CORNER_Xyz),
+  	plane.axis, plane.where, poly);
+  dest.ProjectOutline (source.GetCorner (CS_BOX_CORNER_xYz),
+  	plane.axis, plane.where, poly);
+  dest.ProjectOutline (source.GetCorner (CS_BOX_CORNER_XYz),
+  	plane.axis, plane.where, poly);
+  dest.ProjectOutline (source.GetCorner (CS_BOX_CORNER_xyZ),
+  	plane.axis, plane.where, poly);
+  dest.ProjectOutline (source.GetCorner (CS_BOX_CORNER_XyZ),
+  	plane.axis, plane.where, poly);
+  dest.ProjectOutline (source.GetCorner (CS_BOX_CORNER_xYZ),
+  	plane.axis, plane.where, poly);
+  dest.ProjectOutline (source.GetCorner (CS_BOX_CORNER_XYZ),
+  	plane.axis, plane.where, poly);
+
+  // Now we calculate the convex hull of the projection points. This
+  // convex hull will refine the boundary which is calculated above as
+  // only projections that intersect with this hull are relevant for
+  // visibility. This convex hull can later be inserted in the coverage
+  // buffer.
+  csChainHull2D::SortXY (poly.GetArray (), poly.Length ());
+  csVector2* hull = new csVector2[poly.Length ()];
+  int hull_points = csChainHull2D::CalculatePresorted (poly.GetArray (),
+  	poly.Length (), hull);
+
+  // Now we calculate the bounding 2D box of those points. That will
+  // be used to calculate how we will transform projected 2D coordinates
+  // to coordinates on the coverage buffer.
+  csBox2 bbox (hull[0]);
+  size_t i;
+  for (i = 1 ; i < (size_t)hull_points ; i++)
+    bbox.AddBoundingVertexSmart (hull[i]);
+  plane.offset = bbox.Min ();
+  plane.scale.x = float (DIM_COVBUFFER) / (bbox.MaxX ()-bbox.MinX ());
+  plane.scale.y = float (DIM_COVBUFFER) / (bbox.MaxY ()-bbox.MinY ());
+
+  // Clear the coverage buffer.
+  plane.covbuf->Initialize ();
+
+  // Now insert our hull outline inverted in the coverage buffer. That
+  // will basically mask out all vertices outside the relevant area.
+  plane.covbuf->InsertPolygonInverted (hull, hull_points, 1.0f);
+
+  // We no longer need the hull points here.
+  delete[] hull;
+
   return true;
 }
 
+void PVSCalcSector::CastAreaShadow (const csPoly3D& polygon)
+{
+  // @@@ TODO
+}
 
 void PVSCalcSector::Calculate ()
 {
