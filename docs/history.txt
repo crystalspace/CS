@@ -1,7 +1,13 @@
 The history order has been reversed so that new features are at the top.
 
+25-Jan-2001
+	- Wouter Wijngaards fixed mazed compilation, by adding csutil
+	  library after the cssys for linking.
+	- Norman Kramer is still working hard on the new video codec plugins.
 24-Jan-2001
 	- Small update to Python scripting system.
+	- Norman Kramer added dummy audio stream and did some further work
+	  on AVI support.
 	- Eric Sunshine made the following changes to csConfigFile and
 	  iConfigFileNew:
 	    - Added SubsectionExists(), which is similar to KeyExists() except
