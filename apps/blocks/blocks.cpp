@@ -1133,7 +1133,7 @@ void Blocks::HandleGameKey (int key, bool shift, bool alt, bool ctrl)
     cam_move_src = view->GetCamera ()->GetW2CTranslation ();
     cur_hor_dest = (cur_hor_dest-1+4)%4;
     cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
-    cam_move_up = csVector3 (0, -1, 0);
+    cam_move_up = csVector3 (0, 1, 0);
     move_right_dx = dest_move_right_dx[cur_hor_dest];
     move_right_dy = dest_move_right_dy[cur_hor_dest];
     move_down_dx = dest_move_down_dx[cur_hor_dest];
@@ -1146,7 +1146,7 @@ void Blocks::HandleGameKey (int key, bool shift, bool alt, bool ctrl)
     cam_move_src = view->GetCamera ()->GetW2CTranslation ();
     cur_hor_dest = (cur_hor_dest+1)%4;
     cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
-    cam_move_up = csVector3 (0, -1, 0);
+    cam_move_up = csVector3 (0, 1, 0);
     move_right_dx = dest_move_right_dx[cur_hor_dest];
     move_right_dy = dest_move_right_dy[cur_hor_dest];
     move_down_dx = dest_move_down_dx[cur_hor_dest];
@@ -1159,7 +1159,7 @@ void Blocks::HandleGameKey (int key, bool shift, bool alt, bool ctrl)
     cam_move_src = view->GetCamera ()->GetW2CTranslation ();
     if (cur_ver_dest > 0) cur_ver_dest--;
     cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
-    cam_move_up = csVector3 (0, -1, 0);
+    cam_move_up = csVector3 (0, 1, 0);
   }
   else if (key_viewup.Match (key, shift, alt, ctrl))
   {
@@ -1168,7 +1168,7 @@ void Blocks::HandleGameKey (int key, bool shift, bool alt, bool ctrl)
     cam_move_src = view->GetCamera ()->GetW2CTranslation ();
     if (cur_ver_dest < 2) cur_ver_dest++;
     cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
-    cam_move_up = csVector3 (0, -1, 0);
+    cam_move_up = csVector3 (0, 1, 0);
   }
   else if (key_zoomin.Match (key, shift, alt, ctrl))
   {
@@ -1176,7 +1176,7 @@ void Blocks::HandleGameKey (int key, bool shift, bool alt, bool ctrl)
     cam_move_dist = 1;
     cam_move_src = view->GetCamera ()->GetW2CTranslation ();
     cam_move_dest = cam_move_src + .3 * (view_origin - cam_move_src);
-    cam_move_up = csVector3 (0, -1, 0);
+    cam_move_up = csVector3 (0, 1, 0);
   }
   else if (key_zoomout.Match (key, shift, alt, ctrl))
   {
@@ -1184,7 +1184,7 @@ void Blocks::HandleGameKey (int key, bool shift, bool alt, bool ctrl)
     cam_move_dist = 1;
     cam_move_src = view->GetCamera ()->GetW2CTranslation ();
     cam_move_dest = cam_move_src - .3 * (view_origin - cam_move_src);
-    cam_move_up = csVector3 (0, -1, 0);
+    cam_move_up = csVector3 (0, 1, 0);
   }
   else if (key_rotpx.Match (key, shift, alt, ctrl))
   {
@@ -2218,7 +2218,7 @@ void Blocks::StartDemo ()
   view->SetSector (demo_room);
   csVector3 pos (0, 3, -5);
   view->GetCamera ()->SetPosition (pos);
-  cam_move_up = csVector3 (0, -1, 0);
+  cam_move_up = csVector3 (0, 1, 0);
   view->GetCamera ()->LookAt (view_origin-pos, cam_move_up);
   view->SetRectangle (0, 0, Sys->FrameWidth, Sys->FrameHeight);
 
@@ -2267,7 +2267,7 @@ void Blocks::StartNewGame ()
   Sys->InitGame ();
   Sys->StartNewShape ();
 
-  cam_move_up = csVector3 (0, -1, 0);
+  cam_move_up = csVector3 (0, 1, 0);
   view->SetSector (room);
   Sys->HandleCameraMovement ();
   view->SetRectangle (0, 0, Sys->FrameWidth, Sys->FrameHeight);

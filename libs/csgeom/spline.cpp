@@ -82,8 +82,10 @@ void csCubicSpline::Calculate (float time)
 
 float csCubicSpline::GetInterpolatedDimension (int dim)
 {
-  return A*points[idx] + B*points[idx+1] +
-  	 C*derivative_points[idx] + D*derivative_points[idx+1];
+  float* p = &points[dim*num_points];
+  float* dp = &derivative_points[dim*num_points];
+  return A*p[idx] + B*p[idx+1] +
+  	 C*dp[idx] + D*dp[idx+1];
 }
 
 //---------------------------------------------------------------------------

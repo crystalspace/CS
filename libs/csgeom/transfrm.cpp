@@ -227,10 +227,11 @@ void csReversibleTransform::RotateThis (const csVector3& v, float angle)
       );
 }
 
-void csReversibleTransform::LookAt (const csVector3& v, const csVector3& up)
+void csReversibleTransform::LookAt (const csVector3& v, const csVector3& upNeg)
 {
   csMatrix3 m; /* initialized to be the identity matrix */
   csVector3 w1, w2, w3 = v;
+  csVector3 up = -upNeg;
 
   float sqr;
   sqr = v*v;

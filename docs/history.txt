@@ -22,6 +22,10 @@ The history order has been reversed so that new features are at the top.
 	  The OpenStep compiler is buggy and requires that an inline function
 	  calling a second inline functions only do so after the second inline
 	  function has already been seen by the compiler.
+	- Fixed a bug in csCubicSpline. It was ignoring the dimension in
+	  GetInterpolatedDimension().
+	- Fixed csReversibleTransform::LookAt(). The was interpreting the
+	  up vector in a negative way. I fixed Blocks too.
 17-Apr-2001
 	- Martin Geisse eliminated some warnings in the function terrain
 	  loader.
