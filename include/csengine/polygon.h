@@ -798,6 +798,14 @@ public:
    * 'v2' and 'len2' for the v-axis.
    */
   void SetTextureSpace (
+    const csVector3& v_orig,
+    const csVector3& v1, float len1,
+    const csVector3& v2, float len2);
+
+  /**
+   * The same but all in floats.
+   */
+  void SetTextureSpace (
     float xo, float yo, float zo,
     float x1, float y1, float z1, float len1,
     float x2, float y2, float z2, float len2);
