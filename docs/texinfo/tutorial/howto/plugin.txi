@@ -322,7 +322,7 @@ This should conclude the implementation of the plugin.
 plugin modules implement which @sc{scf} classes by consulting meta-information
 associated with each plugin.  The meta-information file for your plugin must
 have the same basename as your built plugin module, but with extension
-@file{.csplugin}.  For example, if the example plugin is built with the name
+@file{.csplugin}.  For instance, if the example plugin is built with the name
 @file{myplugin.dll} (Windows) or @file{myplugin.so} (Unix), then the associated
 meta-information file should be named @file{myplugin.csplugin}.  The
 meta-information file is a structured @sc{xml}-format document, and can contain
@@ -355,7 +355,7 @@ might look like this:
 @noindent
 Each @sc{scf} class exported by the plugin should be presented in a
 @code{<class>} node within the @code{<classes>} group.  Each class has a
-@code{<name>}, which is the @sc{scf>} name of the class; an
+@code{<name>}, which is the @sc{scf} name of the class; an
 @code{<implementation>}, which is the name of the C++ class implementing the
 @sc{scf>} class; a @code{<description>}; and optionally a @code{<requires>}
 node, which lists the other @sc{scf>} classes upon which this class depends.
