@@ -119,11 +119,15 @@ public:
 
   virtual void Close ();
 
+  virtual void SetClipRect (int xmin, int ymin, int xmax, int ymax);
+
   /**
    * This routine should be called before any draw operations.
    * It should return true if graphics context is ready.
    */
   virtual bool BeginDraw ();
+  /// This routine should be called when you finished drawing
+  virtual void FinishDraw ();
 
   /// Resize the canvas
   virtual bool Resize (int width, int height);
@@ -139,6 +143,13 @@ public:
 
   /// Set a palette entry
   virtual void SetRGB (int i, int r, int g, int b);
+  virtual int FindRGB (int r, int g, int b)
+  {
+    if (r < 0) r = 0; else if (r > 255) r = 255;
+    if (g < 0) g = 0; else if (g > 255) g = 255;
+    if (b < 0) b = 0; else if (b > 255) b = 255;
+    return (r << 16) | (g << 8) | b;
+  }
 
   /// Draw a line
   virtual void DrawLine (float x1, float y1, float x2, float y2, int color);

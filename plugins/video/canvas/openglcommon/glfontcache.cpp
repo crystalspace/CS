@@ -243,42 +243,6 @@ void csGLFontCache::CopyGlyphData (iFont* font, utf32_char glyph, int tex,
   }
 }
 
-void csGLFontCache::SetClipRect (int x1, int y1, int x2, int y2)
-{ 
-  ClipX1 = x1; 
-  ClipY1 = G2D->Height - y2; 
-  ClipX2 = x2; 
-  ClipY2 = G2D->Height - y1; 
-}
-
-bool csGLFontCache::ClipRect (float x, float y,
-  float &x1, float &y1, float &x2, float &y2,
-  float &tx1, float &ty1, float &tx2, float &ty2)
-{
-  float nx1 = x1 + x, ny1 = y1 + y, nx2 = x2 + x, ny2 = y2 + y;
-  float ntx1 = tx1, nty1 = ty1, ntx2 = tx2, nty2 = ty2;
-
-  if ((nx1 > float (ClipX2)) || (nx2 < float (ClipX1))
-   || (ny1 > float (ClipY2)) || (ny2 < float (ClipY1)))
-      return false;
-
-  if (nx1 < ClipX1)
-    tx1 += (ntx2 - ntx1) * (ClipX1 - nx1) / (nx2 - nx1), x1 = ClipX1 - x;
-  if (nx2 > ClipX2)
-    tx2 -= (ntx2 - ntx1) * (nx2 - ClipX2) / (nx2 - nx1), x2 = ClipX2 - x;
-  if (tx2 <= tx1)
-    return false;
-
-  if (ny1 < ClipY1)
-    ty2 -= (nty2 - nty1) * (ClipY1 - ny1) / (ny2 - ny1), y1 = ClipY1 - y;
-  if (ny2 > ClipY2)
-    ty1 += (nty2 - nty1) * (ny2 - ClipY2) / (ny2 - ny1), y2 = ClipY2 - y;
-  if (ty2 <= ty1)
-    return false;
-
-  return true;
-}
-
 void csGLFontCache::FlushArrays (GLuint texture, int& numverts, 
 				 int bgVertOffset, int& numBgVerts, 
 				 const int fg, const int bg)
@@ -309,8 +273,7 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
 
   if (!(flags & CS_WRITE_BASELINE)) pen_y += font->GetAscent ();
 
-  bool gl_texture2d = G2D->statecache->IsEnabled_GL_TEXTURE_2D ();
-  if (!gl_texture2d) G2D->statecache->Enable_GL_TEXTURE_2D ();
+  G2D->statecache->Enable_GL_TEXTURE_2D ();
   if (bg < 0) G2D->setGLColorfromint (fg);
 
   int maxwidth, maxheight;
@@ -319,8 +282,8 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
   KnownFont* knownFont = GetCachedFont (font);
   if (knownFont == 0) knownFont = CacheFont (font);
 
+  if (pen_y <= ClipY1) return;
   pen_y = G2D->Height - pen_y/* - maxheight*/;
-  if (pen_y >= ClipY2) return;
 
   glPushMatrix ();
   glTranslatef (pen_x, pen_y, 0);
@@ -414,32 +377,29 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
     y2 = cacheData->bmetrics.top;
     y1 = y2 - cacheData->bmetrics.height;
 
-    if (ClipRect (pen_x, pen_y, x1, y1, x2, y2, tx1, ty1, tx2, ty2))
-    {
-      wtTexcoords[numverts].x = tx1;
-      wtTexcoords[numverts].y = ty1;
-      wtVerts2d[numverts].x = x1;
-      wtVerts2d[numverts].y = y2;
-      numverts++;
+    wtTexcoords[numverts].x = tx1;
+    wtTexcoords[numverts].y = ty1;
+    wtVerts2d[numverts].x = x1;
+    wtVerts2d[numverts].y = y2;
+    numverts++;
 
-      wtTexcoords[numverts].x = tx2;
-      wtTexcoords[numverts].y = ty1;
-      wtVerts2d[numverts].x = x2;
-      wtVerts2d[numverts].y = y2;
-      numverts++;
+    wtTexcoords[numverts].x = tx2;
+    wtTexcoords[numverts].y = ty1;
+    wtVerts2d[numverts].x = x2;
+    wtVerts2d[numverts].y = y2;
+    numverts++;
 
-      wtTexcoords[numverts].x = tx2;
-      wtTexcoords[numverts].y = ty2;
-      wtVerts2d[numverts].x = x2;
-      wtVerts2d[numverts].y = y1;
-      numverts++;
-      
-      wtTexcoords[numverts].x = tx1;
-      wtTexcoords[numverts].y = ty2;
-      wtVerts2d[numverts].x = x1;
-      wtVerts2d[numverts].y = y1;
-      numverts++;
-    }
+    wtTexcoords[numverts].x = tx2;
+    wtTexcoords[numverts].y = ty2;
+    wtVerts2d[numverts].x = x2;
+    wtVerts2d[numverts].y = y1;
+    numverts++;
+    
+    wtTexcoords[numverts].x = tx1;
+    wtTexcoords[numverts].y = ty2;
+    wtVerts2d[numverts].x = x1;
+    wtVerts2d[numverts].y = y1;
+    numverts++;
 
     if (bg >= 0)
     {
@@ -460,21 +420,18 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
 	// null-width or height glyphs. But we still want a BG for them.
 	tx1 = ty1 = 0.0f;
 	tx2 = ty2 = 1.0f;
-	if (ClipRect (pen_x, pen_y, bx1, by1, bx2, by2, tx1, ty1, tx2, ty2))
-	{
-	  wtVerts2d[bgVertOffset + numBgVerts].x = bx1;
-	  wtVerts2d[bgVertOffset + numBgVerts].y = by2;
-	  numBgVerts++;
-	  wtVerts2d[bgVertOffset + numBgVerts].x = bx2;
-	  wtVerts2d[bgVertOffset + numBgVerts].y = by2;
-	  numBgVerts++;
-	  wtVerts2d[bgVertOffset + numBgVerts].x = bx2;
-	  wtVerts2d[bgVertOffset + numBgVerts].y = by1;
-	  numBgVerts++;
-	  wtVerts2d[bgVertOffset + numBgVerts].x = bx1;
-	  wtVerts2d[bgVertOffset + numBgVerts].y = by1;
-	  numBgVerts++;
-	}
+	wtVerts2d[bgVertOffset + numBgVerts].x = bx1;
+	wtVerts2d[bgVertOffset + numBgVerts].y = by2;
+	numBgVerts++;
+	wtVerts2d[bgVertOffset + numBgVerts].x = bx2;
+	wtVerts2d[bgVertOffset + numBgVerts].y = by2;
+	numBgVerts++;
+	wtVerts2d[bgVertOffset + numBgVerts].x = bx2;
+	wtVerts2d[bgVertOffset + numBgVerts].y = by1;
+	numBgVerts++;
+	wtVerts2d[bgVertOffset + numBgVerts].x = bx1;
+	wtVerts2d[bgVertOffset + numBgVerts].y = by1;
+	numBgVerts++;
 
 	if (oldH < (y2 - y1))
 	{
@@ -487,21 +444,18 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
 
       tx1 = ty1 = 0.0f;
       tx2 = ty2 = 1.0f;
-      if (ClipRect (pen_x, pen_y, bx1, by1, bx2, by2, tx1, ty1, tx2, ty2))
-      {
-	wtVerts2d[bgVertOffset + numBgVerts].x = bx1;
-	wtVerts2d[bgVertOffset + numBgVerts].y = by2;
-	numBgVerts++;
-	wtVerts2d[bgVertOffset + numBgVerts].x = bx2;
-	wtVerts2d[bgVertOffset + numBgVerts].y = by2;
-	numBgVerts++;
-	wtVerts2d[bgVertOffset + numBgVerts].x = bx2;
-	wtVerts2d[bgVertOffset + numBgVerts].y = by1;
-	numBgVerts++;
-	wtVerts2d[bgVertOffset + numBgVerts].x = bx1;
-	wtVerts2d[bgVertOffset + numBgVerts].y = by1;
-	numBgVerts++;
-      }
+      wtVerts2d[bgVertOffset + numBgVerts].x = bx1;
+      wtVerts2d[bgVertOffset + numBgVerts].y = by2;
+      numBgVerts++;
+      wtVerts2d[bgVertOffset + numBgVerts].x = bx2;
+      wtVerts2d[bgVertOffset + numBgVerts].y = by2;
+      numBgVerts++;
+      wtVerts2d[bgVertOffset + numBgVerts].x = bx2;
+      wtVerts2d[bgVertOffset + numBgVerts].y = by1;
+      numBgVerts++;
+      wtVerts2d[bgVertOffset + numBgVerts].x = bx1;
+      wtVerts2d[bgVertOffset + numBgVerts].y = by1;
+      numBgVerts++;
     }
 
     x1 = x_left + cacheData->glyphMetrics.advance;
@@ -521,21 +475,18 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
     float tx1, ty1, tx2, ty2;
     tx1 = ty1 = 0.0f;
     tx2 = ty2 = 1.0f;
-    if (ClipRect (pen_x, pen_y, bx1, by1, bx2, by2, tx1, ty1, tx2, ty2))
-    {
-      wtVerts2d[bgVertOffset + numBgVerts].x = bx1;
-      wtVerts2d[bgVertOffset + numBgVerts].y = by2;
-      numBgVerts++;
-      wtVerts2d[bgVertOffset + numBgVerts].x = bx2;
-      wtVerts2d[bgVertOffset + numBgVerts].y = by2;
-      numBgVerts++;
-      wtVerts2d[bgVertOffset + numBgVerts].x = bx2;
-      wtVerts2d[bgVertOffset + numBgVerts].y = by1;
-      numBgVerts++;
-      wtVerts2d[bgVertOffset + numBgVerts].x = bx1;
-      wtVerts2d[bgVertOffset + numBgVerts].y = by1;
-      numBgVerts++;
-    }
+    wtVerts2d[bgVertOffset + numBgVerts].x = bx1;
+    wtVerts2d[bgVertOffset + numBgVerts].y = by2;
+    numBgVerts++;
+    wtVerts2d[bgVertOffset + numBgVerts].x = bx2;
+    wtVerts2d[bgVertOffset + numBgVerts].y = by2;
+    numBgVerts++;
+    wtVerts2d[bgVertOffset + numBgVerts].x = bx2;
+    wtVerts2d[bgVertOffset + numBgVerts].y = by1;
+    numBgVerts++;
+    wtVerts2d[bgVertOffset + numBgVerts].x = bx1;
+    wtVerts2d[bgVertOffset + numBgVerts].y = by1;
+    numBgVerts++;
   }
 
   FlushArrays (lastTexture, numverts, bgVertOffset, numBgVerts, fg, bg);
@@ -550,7 +501,5 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
   G2D->statecache->Disable_GL_BLEND ();
   glPopMatrix ();
 
-  if (!gl_texture2d) G2D->statecache->Disable_GL_TEXTURE_2D ();
-  
   PurgeEmptyPlanes (knownFont);
 }

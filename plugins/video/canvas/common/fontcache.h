@@ -223,7 +223,7 @@ public:
   GlyphCacheData* GetLeastUsed ();
 
 
-  virtual void SetClipRect (int x1, int y1, int x2, int y2)
+  void SetClipRect (int x1, int y1, int x2, int y2)
   { 
     ClipX1 = x1; ClipY1 = y1; ClipX2 = x2; ClipY2 = y2; 
   }

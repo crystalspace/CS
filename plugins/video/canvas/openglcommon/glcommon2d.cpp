@@ -33,7 +33,7 @@
 SCF_IMPLEMENT_IBASE_EXT (csGraphics2DGLCommon)
   SCF_IMPLEMENTS_INTERFACE (iEventPlug)
 SCF_IMPLEMENT_IBASE_EXT_END
-
+  
 csGraphics2DGLCommon::csGraphics2DGLCommon (iBase *iParent) :
   csGraphics2D (iParent), statecache (0)
 {
@@ -213,6 +213,12 @@ void csGraphics2DGLCommon::Close ()
   csGraphics2D::Close ();
 }
 
+void csGraphics2DGLCommon::SetClipRect (int xmin, int ymin, int xmax, int ymax)
+{
+  csGraphics2D::SetClipRect (xmin, ymin, xmax, ymax);
+  glScissor (ClipX1, Height - ClipY2, ClipX2 - ClipX1, ClipY2 - ClipY1);
+}
+
 bool csGraphics2DGLCommon::BeginDraw ()
 {
   if (!csGraphics2D::BeginDraw ())
@@ -224,6 +230,9 @@ bool csGraphics2DGLCommon::BeginDraw ()
   glLoadIdentity ();
   glOrtho (0, Width, 0, Height, -1.0, 10.0);
   glViewport (0, 0, Width, Height);
+
+  statecache->Enable_GL_SCISSOR_TEST ();
+  glScissor (ClipX1, Height - ClipY2, ClipX2 - ClipX1, ClipY2 - ClipY1);
 
   glMatrixMode (GL_MODELVIEW);
   glLoadIdentity ();
@@ -239,26 +248,20 @@ bool csGraphics2DGLCommon::BeginDraw ()
   return true;
 }
 
+void csGraphics2DGLCommon::FinishDraw ()
+{
+  csGraphics2D::FinishDraw();
+  if (FrameBufferLocked != 0) return;
+  statecache->Disable_GL_SCISSOR_TEST ();
+  statecache->Enable_GL_TEXTURE_2D ();
+}
+
 void csGraphics2DGLCommon::DecomposeColor (int iColor,
   GLubyte &oR, GLubyte &oG, GLubyte &oB)
 {
-  switch (pfmt.PixelBytes)
-  {
-    case 1: // paletted colors
-      oR = Palette [iColor].red;
-      oG = Palette [iColor].green;
-      oB = Palette [iColor].blue;
-      break;
-    case 2: // 16bit color
-    case 4: // truecolor
-      oR = ((iColor & pfmt.RedMask  ) >> pfmt.RedShift  );
-      oG = ((iColor & pfmt.GreenMask) >> pfmt.GreenShift);
-      oB = ((iColor & pfmt.BlueMask ) >> pfmt.BlueShift );
-      oR = oR << (8-pfmt.RedBits);
-      oG = oG << (8-pfmt.GreenBits);
-      oB = oB << (8-pfmt.BlueBits);
-      break;
-  }
+  oR = (iColor >> 16) & 0xff;
+  oG = (iColor >> 8) & 0xff;
+  oB = iColor & 0xff;
 }
 
 void csGraphics2DGLCommon::DecomposeColor (int iColor,
@@ -273,9 +276,8 @@ void csGraphics2DGLCommon::DecomposeColor (int iColor,
 
 void csGraphics2DGLCommon::setGLColorfromint (int color)
 {
-  GLubyte r, g, b;
-  DecomposeColor (color, r, g, b);
-  glColor3ub (r, g, b);
+  glColor3ub ((color >> 16) & 0xff, (color >> 8) & 0xff,
+    color & 0xff);
 }
 
 csGLScreenShot* csGraphics2DGLCommon::GetScreenShot ()
@@ -354,86 +356,67 @@ void csGraphics2DGLCommon::SetRGB (int i, int r, int g, int b)
 void csGraphics2DGLCommon::DrawLine (
   float x1, float y1, float x2, float y2, int color)
 {
-  if (!ClipLine (x1, y1, x2, y2, ClipX1, ClipY1, ClipX2, ClipY2))
-  {
-    // prepare for 2D drawing--so we need no fancy GL effects!
-    bool gl_texture2d = statecache->IsEnabled_GL_TEXTURE_2D ();
-    bool gl_alphaTest = glIsEnabled(GL_ALPHA_TEST);
-    if (gl_texture2d) statecache->Disable_GL_TEXTURE_2D ();
-    if (gl_alphaTest) statecache->Disable_GL_ALPHA_TEST ();
-    setGLColorfromint (color);
+  // prepare for 2D drawing--so we need no fancy GL effects!
+  statecache->Disable_GL_TEXTURE_2D ();
+  bool gl_alphaTest = glIsEnabled(GL_ALPHA_TEST);
+  if (gl_alphaTest) statecache->Disable_GL_ALPHA_TEST ();
+  setGLColorfromint (color);
 
-    // opengl doesn't draw the last pixel of a line, but we
-    // want that pixel anyway, add the pixel.
-    /*if(y1==y2){ // horizontal lines
-      if(x2>x1) x2++;
-      else if(x1>x2) x1++;
-    }
-    if(x1==x2) { // vertical lines
-      if(y2>y1) y2++;
-      else if(y1>y2) y1++;
-    }
-    if(x1!=x2 && y1!=y2) // diagonal lines
-    {
-      if(x2>x1) x2++;
-      else if(x1>x2) x1++;
-    }*/
-
-    // This extends the line enough to get the last pixel of the line on GL
-    // Note! If this doesn't work in OR, just revert to old way for OR and
-    // not for NR. It's tested (at least a bit :) and seems to work in NR.
-    csVector2 delta (x2-x1, y2-y1);
-    if (delta.SquaredNorm ()>EPSILON*EPSILON)
-    {
-      delta *= 1.4142135623731/delta.Norm ();
-      x2 += delta.x;
-      y2 += delta.y;
-    }
-
-    // This is a workaround for a hard-to-really fix problem with OpenGL:
-    // whole Y coordinates are "rounded" up, this leads to one-pixel-shift
-    // compared to software line drawing. This is not exactly a bug (because
-    // this is an on-the-edge case) but it's different, thus we'll slightly
-    // shift whole coordinates down.
-    // but QInt(y1) == y1 is too coarse a test.
-    if (fabs(float(int(y1))-y1) < 0.1f) { y1 += 0.05f; }
-    if (fabs(float(int(y2))-y2) < 0.1f) { y2 += 0.05f; }
-
-    // Notice: using height-y has range 1..height, but this is OK.
-    //    This is because on opengl y=0.0 is off screen, as is y=height.
-    //    using height-sy gives output on screen which is identical to
-    //    using the software canvas.
-    //    the same goes for all the other DrawX functions.
-    
-    glBegin (GL_LINES);
-    glVertex2f (x1, Height - y1);
-    glVertex2f (x2, Height - y2);
-    glEnd ();
-
-    if (gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
-    if (gl_alphaTest) statecache->Enable_GL_ALPHA_TEST ();
+  // opengl doesn't draw the last pixel of a line, but we
+  // want that pixel anyway, add the pixel.
+  /*if(y1==y2){ // horizontal lines
+    if(x2>x1) x2++;
+    else if(x1>x2) x1++;
   }
+  if(x1==x2) { // vertical lines
+    if(y2>y1) y2++;
+    else if(y1>y2) y1++;
+  }
+  if(x1!=x2 && y1!=y2) // diagonal lines
+  {
+    if(x2>x1) x2++;
+    else if(x1>x2) x1++;
+  }*/
+
+  // This extends the line enough to get the last pixel of the line on GL
+  // Note! If this doesn't work in OR, just revert to old way for OR and
+  // not for NR. It's tested (at least a bit :) and seems to work in NR.
+  csVector2 delta (x2-x1, y2-y1);
+  if (delta.SquaredNorm ()>EPSILON*EPSILON)
+  {
+    delta *= 1.4142135623731/delta.Norm ();
+    x2 += delta.x;
+    y2 += delta.y;
+  }
+
+  // This is a workaround for a hard-to-really fix problem with OpenGL:
+  // whole Y coordinates are "rounded" up, this leads to one-pixel-shift
+  // compared to software line drawing. This is not exactly a bug (because
+  // this is an on-the-edge case) but it's different, thus we'll slightly
+  // shift whole coordinates down.
+  // but QInt(y1) == y1 is too coarse a test.
+  if (fabs(float(int(y1))-y1) < 0.1f) { y1 += 0.05f; }
+  if (fabs(float(int(y2))-y2) < 0.1f) { y2 += 0.05f; }
+
+  // Notice: using height-y has range 1..height, but this is OK.
+  //    This is because on opengl y=0.0 is off screen, as is y=height.
+  //    using height-sy gives output on screen which is identical to
+  //    using the software canvas.
+  //    the same goes for all the other DrawX functions.
+  
+  glBegin (GL_LINES);
+  glVertex2f (x1, Height - y1);
+  glVertex2f (x2, Height - y2);
+  glEnd ();
+
+  if (gl_alphaTest) statecache->Enable_GL_ALPHA_TEST ();
 }
 
 void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
 {
-  if ((x > ClipX2) || (y > ClipY2))
-    return;
-  if (x < ClipX1)
-    w -= (ClipX1 - x), x = ClipX1;
-  if (y < ClipY1)
-    h -= (ClipY1 - y), y = ClipY1;
-  if (x + w > ClipX2)
-    w = ClipX2 - x;
-  if (y + h > ClipY2)
-    h = ClipY2 - y;
-  if ((w <= 0) || (h <= 0))
-    return;
-
+  statecache->Disable_GL_TEXTURE_2D ();
   y = Height - y;
   // prepare for 2D drawing--so we need no fancy GL effects!
-  bool gl_texture2d = statecache->IsEnabled_GL_TEXTURE_2D ();
-  if (gl_texture2d) statecache->Disable_GL_TEXTURE_2D ();
   setGLColorfromint (color);
 
   glBegin (GL_QUADS);
@@ -442,38 +425,30 @@ void csGraphics2DGLCommon::DrawBox (int x, int y, int w, int h, int color)
   glVertex2i (x + w, y - h);
   glVertex2i (x, y - h);
   glEnd ();
-
-  if (gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
 }
 
 void csGraphics2DGLCommon::DrawPixel (int x, int y, int color)
 {
-  if ((x >= ClipX1) && (x < ClipX2) && (y >= ClipY1) && (y < ClipY2))
-  {
-    // prepare for 2D drawing--so we need no fancy GL effects!
-    bool gl_texture2d = statecache->IsEnabled_GL_TEXTURE_2D ();
-    if (gl_texture2d) statecache->Disable_GL_TEXTURE_2D ();
+  // prepare for 2D drawing--so we need no fancy GL effects!
+  statecache->Disable_GL_TEXTURE_2D ();
 
-    // using floating point pixel addresses to fix an on-the-edge case.
-    // offsetting the y by a little just like for DrawLine.
-    // The whole pixels get rounded up, shifting the drawpixel.
-    float y1 = y;
-    if (fabs(float(int(y1))-y1) < 0.1f) { y1 += 0.05f; }
-    setGLColorfromint (color);
-    glBegin (GL_POINTS);
-    glVertex2f (x, Height - y1);
-    glEnd ();
-
-    if (gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
-  }
+  // using floating point pixel addresses to fix an on-the-edge case.
+  // offsetting the y by a little just like for DrawLine.
+  // The whole pixels get rounded up, shifting the drawpixel.
+  float y1 = y;
+  if (fabs(float(int(y1))-y1) < 0.1f) { y1 += 0.05f; }
+  setGLColorfromint (color);
+  glBegin (GL_POINTS);
+  glVertex2f (x, Height - y1);
+  glEnd ();
 }
 
 void csGraphics2DGLCommon::DrawPixels (
   csPixelCoord const* pixels, int num_pixels, int color)
 {
   // prepare for 2D drawing--so we need no fancy GL effects!
-  bool gl_texture2d = statecache->IsEnabled_GL_TEXTURE_2D ();
-  if (gl_texture2d) statecache->Disable_GL_TEXTURE_2D ();
+  statecache->Disable_GL_TEXTURE_2D ();
+
   setGLColorfromint (color);
 
   int i;
@@ -483,13 +458,9 @@ void csGraphics2DGLCommon::DrawPixels (
     int x = pixels->x;
     int y = pixels->y;
     pixels++;
-    if ((x >= ClipX1) && (x < ClipX2) && (y >= ClipY1) && (y < ClipY2))
-    {
-      glVertex2i (x, Height - y);
-    }
+    glVertex2i (x, Height - y);
   }
   glEnd ();
-  if (gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
 }
 
 void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
@@ -497,27 +468,14 @@ void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
 {
   int orig_x = x;
   int orig_y = y;
-  if ((x > ClipX2) || (y > ClipY2))
-    return;
-  if (x < ClipX1)
-    w -= (ClipX1 - x), x = ClipX1;
-  if (y < ClipY1)
-    h -= (ClipY1 - y), y = ClipY1;
-  if (x + w > ClipX2)
-    w = ClipX2 - x;
-  if (y + h > ClipY2)
-    h = ClipY2 - y;
-  if ((w <= 0) || (h <= 0))
-    return;
 
   // If vertical clipping is needed we skip the initial part.
   data += 4*w*(y-orig_y);
   // Same for horizontal clipping.
   data += 4*(x-orig_x);
 
-  bool gl_texture2d = statecache->IsEnabled_GL_TEXTURE_2D ();
+  statecache->Disable_GL_TEXTURE_2D ();
   bool gl_alphaTest = glIsEnabled(GL_ALPHA_TEST);
-  if (gl_texture2d) statecache->Disable_GL_TEXTURE_2D ();
   if (gl_alphaTest) statecache->Disable_GL_ALPHA_TEST ();
 
   glColor3f (0., 0., 0.);
@@ -538,7 +496,6 @@ void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
 #endif // CS_USE_NEW_RENDERER
   glDrawPixels (w, h, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
-  if (gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
   if (gl_alphaTest) statecache->Enable_GL_ALPHA_TEST ();
 }
 
@@ -582,9 +539,8 @@ csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
     delete Area;
     return 0;
   }
-  bool gl_texture2d = statecache->IsEnabled_GL_TEXTURE_2D ();
+  statecache->Disable_GL_TEXTURE_2D ();
   bool gl_alphaTest = glIsEnabled(GL_ALPHA_TEST);
-  if (gl_texture2d) statecache->Disable_GL_TEXTURE_2D ();
   if (gl_alphaTest) statecache->Disable_GL_ALPHA_TEST ();
   //csGLStates::Disable_GL_DITHER ();
   GLenum format, type;
@@ -610,16 +566,14 @@ csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
   }
   glReadPixels (x, y, w, h, format, type, dest);
 
-  if (gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
   if (gl_alphaTest) statecache->Enable_GL_ALPHA_TEST ();
   return Area;
 }
 
 void csGraphics2DGLCommon::RestoreArea (csImageArea *Area, bool Free)
 {
-  bool gl_texture2d = statecache->IsEnabled_GL_TEXTURE_2D ();
+  statecache->Disable_GL_TEXTURE_2D ();
   bool gl_alphaTest = glIsEnabled(GL_ALPHA_TEST);
-  if (gl_texture2d) statecache->Disable_GL_TEXTURE_2D ();
   if (gl_alphaTest) statecache->Disable_GL_ALPHA_TEST ();
   //csGLStates::Disable_GL_DITHER ();
   if (Area)
@@ -651,7 +605,6 @@ void csGraphics2DGLCommon::RestoreArea (csImageArea *Area, bool Free)
       FreeArea (Area);
   } /* endif */
 
-  if (gl_texture2d) statecache->Enable_GL_TEXTURE_2D ();
   if (gl_alphaTest) statecache->Enable_GL_ALPHA_TEST ();
 }
 

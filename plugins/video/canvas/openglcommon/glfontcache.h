@@ -98,15 +98,9 @@ protected:
 
   void CopyGlyphData (iFont* font, utf32_char glyph, int tex,
     const csRect& rect, iDataBuffer* bitmapDataBuf, iDataBuffer* alphaDataBuf);
-
-  bool ClipRect (float x, float y,
-    float &x1, float &y1, float &x2, float &y2,
-    float &tx1, float &ty1, float &tx2, float &ty2);
 public:
   csGLFontCache (csGraphics2DGLCommon* G2D);
   virtual ~csGLFontCache ();
-
-  virtual void SetClipRect (int x1, int y1, int x2, int y2);
 
   /**
    * Draw a string using OpenGL, where the baseline starts at x,y. 

@@ -11,6 +11,10 @@ chronological order.
 	  CS spec file.
 	- Vincent Knecht augmented CS spec file to compute flarge and partsys
 	  lightmaps.
+	- res simplified the GL color (de)composition in the canvases. No need
+	  to juggle with pixel formats here.
+	- res changed the GL canvases to use scissor instead of manual 
+	  clipping.
 27-Feb-2004
 	- Jorrit enabled the Dynavis write queue again since it appears to
 	  be giving better fps in most cases. Perhaps we need to come up with
