@@ -8,6 +8,26 @@ The history order has been reversed so that new features are at the top.
 	      on some platforms (rather than performing malloc as documented).
 	    - Now checks for null pointer before calling free().
 	    - Now enforces valid values for 'ilimit' and 'ithreshold'.
+	- Eric Sunshine made the following changes to the csFont plugin:
+	    - Fixed bug: Was leaking a VFS reference.
+	    - Fixed bug: The destructor was leaking every csFontDef record
+	      added by LoadFont().  The contents of the records were being
+	      freed, but the records themselves were not.
+	    - Fixed a really significant number of memory leaks in
+	      ReadFntFile() which would occur on error conditions.  It's
+	      currently using a 'goto' (yuck!) to handle such conditions.  In
+	      the future, this code should be reorganized to avoid having to
+	      use 'goto' at all.
+	    - ReadFntFile() now ensures that the font metrics are valid
+	      before trying to read the font file contents.  In particular,
+	      it asserts that the width, height, and bytes-per-char have
+	      valid values.
+	    - Performed a number of very obvious optimizations.
+	    - Simplified and cleaned up a lot of the code; but ReadFntFile()
+	      still needs a reorganization (as noted earlier with regard to
+	      'goto').
+	    - Downgraded severity level of diagnostic messages from FATAL to
+	      WARNING.
 5-Oct-2000
 	- Samuel Humphreys fixed particle systems in STATBSP worlds. Their
 	  bsp bounding boxes would otherwise remain uninitialized and so

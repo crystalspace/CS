@@ -41,25 +41,16 @@ struct csFontDef
  */
 class csDefaultFontServer : public iFontServer
 {
-  // the system
+private:
   iSystem *System;
 
-  // The list of pre-registered fonts
-  static csFontDef FontList[];
-
-  // number of preregistered fonts
-  int FontPreCount;
-
-  // vector of all FontDefs
+  // A list of csFontDef pointers.
   csBasicVector fonts;
 
-  // Number of fonts
-  int FontCount;
+  // Read a .fnt file from VFS.  Return a csFontDef if ok, or NULL on error.
+  csFontDef* ReadFntFile(const char *file);
 
-  /// Read a .fnt file to a new csFontDef given vfs path, false on error.
-  bool ReadFntFile(const char *file, csFontDef *&fontdef);
-
-  /// get the fontDef for a certain font ID
+  // Get the fontDef for a certain font ID
   csFontDef *GetFontDef(int id) {return (csFontDef*)fonts[id];}
 
 public:
@@ -100,9 +91,13 @@ public:
    * Return a pointer to a bitmap containing a rendered character (by current
    * font).  NULL if error occured.
    */
-  virtual unsigned char* GetGlyphBitmap (int fontId, unsigned char c, int &oW, int &oH);
+  virtual unsigned char* GetGlyphBitmap (int fontId, unsigned char c,
+    int &oW, int &oH);
 
-  /// Return character size in pixels. Returns false if values could not be determined.
+  /**
+   * Return character size in pixels.  Returns false if values could not be
+   * determined.
+   */
   virtual bool GetGlyphSize (int fontId, unsigned char c, int &oW, int &oH);
 
   /// Get maximal font height
@@ -114,7 +109,7 @@ public:
 
   /// Return font count.
   virtual int GetFontCount ()
-  { return FontCount; }
+  { return fonts.Length(); }
 };
 
 #endif // __CS_CSFONT_H__
