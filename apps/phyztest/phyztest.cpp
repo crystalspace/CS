@@ -26,6 +26,8 @@
 #include "csengine/camera.h"
 #include "csengine/light.h"
 #include "csengine/polygon.h"
+#include "csengine/cdobj.h"
+#include "csengine/collider.h"
 #include "csparser/csloader.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
@@ -33,7 +35,7 @@
 #include "csphyzik/phyziks.h"
 #include "csgeom/math3d.h"
 #include "csengine/cssprite.h"
-
+#include "cstso.h"
 
 // PHYZTEST DEMO
 // hit del key to create a swinging chain
@@ -90,7 +92,7 @@ ctRigidBody *arb;
 	arb = ctRigidBody::new_ctRigidBody();
 	arb->set_m( 2.0 );
 	arb->set_pos( ppos[0],ppos[1],ppos[2] );
-	arb->calc_simple_I_tensor( .1,.2,.1 );
+	arb->calc_simple_I_tensor( .1,0.2,.1 );
 	return arb;
 }
 
@@ -115,7 +117,7 @@ csSprite3D *tsprt;
 
 Phyztest::Phyztest ()
 {
-  debug_level = 0;
+  debug_level = 1;
   view = NULL;
   world = NULL;
   dynlight = NULL;
@@ -179,64 +181,67 @@ bool Phyztest::Initialize (int argc, char *argv[], const char *iConfigName)
   room->SetName ("room"); 
   csPolygon3D* p;
   p = room->NewPolygon (tm);
-  p->AddVertex (-5, 0, 5);
-  p->AddVertex (5, 0, 5);
-  p->AddVertex (5, 0, -5);
-  p->AddVertex (-5, 0, -5);
+  p->AddVertex (-5, 5, 5);
+  p->AddVertex (5, 5, 5);
+  p->AddVertex (5, 5, -5);
+  p->AddVertex (-5, 5, -5);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
   p = room->NewPolygon (tm);
-  p->AddVertex (-5, 20, -5);
-  p->AddVertex (5, 20, -5);
-  p->AddVertex (5, 20, 5);
-  p->AddVertex (-5, 20, 5);
+  p->AddVertex (-5, 17, -5);
+  p->AddVertex (5, 17, -5);
+  p->AddVertex (5, 17, 5);
+  p->AddVertex (-5, 17, 5);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
   p = room->NewPolygon (tm);
-  p->AddVertex (-5, 20, 5);
-  p->AddVertex (5, 20, 5);
-  p->AddVertex (5, 0, 5);
-  p->AddVertex (-5, 0, 5);
+  p->AddVertex (-5, 17, 5);
+  p->AddVertex (5, 17, 5);
+  p->AddVertex (5, 5, 5);
+  p->AddVertex (-5, 5, 5);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
   p = room->NewPolygon (tm);
-  p->AddVertex (5, 20, 5);
-  p->AddVertex (5, 20, -5);
-  p->AddVertex (5, 0, -5);
-  p->AddVertex (5, 0, 5);
+  p->AddVertex (5, 17, 5);
+  p->AddVertex (5, 17, -5);
+  p->AddVertex (5, 5, -5);
+  p->AddVertex (5, 5, 5);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
   p = room->NewPolygon (tm);
-  p->AddVertex (-5, 20, -5);
-  p->AddVertex (-5, 20, 5);
-  p->AddVertex (-5, 0, 5);
-  p->AddVertex (-5, 0, -5);
+  p->AddVertex (-5, 17, -5);
+  p->AddVertex (-5, 17, 5);
+  p->AddVertex (-5, 5, 5);
+  p->AddVertex (-5, 5, -5);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
   p = room->NewPolygon (tm);
-  p->AddVertex (5, 20, -5);
-  p->AddVertex (-5, 20, -5);
-  p->AddVertex (-5, 0, -5);
-  p->AddVertex (5, 0, -5);
+  p->AddVertex (5, 17, -5);
+  p->AddVertex (-5, 17, -5);
+  p->AddVertex (-5, 5, -5);
+  p->AddVertex (5, 5, -5);
   p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
 
   csStatLight* light;
-  light = new csStatLight (-3, 5, 0, 10, 1, 0, 0, false);
+  light = new csStatLight (-3, 7, 0, 10, 1, 0, 0, false);
   room->AddLight (light);
-  light = new csStatLight (3, 5, 0, 10, 0, 0, 1, false);
+  light = new csStatLight (3, 7, 0, 10, 0, 0, 1, false);
   room->AddLight (light);
-  light = new csStatLight (0, 5, -3, 10, 0, 1, 0, false);
+  light = new csStatLight (0, 7, -3, 10, 0, 1, 0, false);
   room->AddLight (light);
+
+  CHK(csCollider* pCollider = new csCollider(room));
+  csColliderPointerObject::SetCollider(*room, pCollider, true);
 
   world->Prepare ();
 
   // Create a dynamic light.
-  angle = 0;
+ /* angle = 0;
   dynlight = new csDynLight (cos (angle)*3, 17, sin (angle)*3, 7, 1, 0, 0);
   world->AddDynLight (dynlight);
   dynlight->SetSector (room);
   dynlight->Setup ();
-
+*/
   Printf (MSG_INITIALIZATION, "--------------------------------------\n");
 
   // csView is a view encapsulating both a camera and a clipper.
@@ -245,7 +250,7 @@ bool Phyztest::Initialize (int argc, char *argv[], const char *iConfigName)
   // easier.
   view = new csView (world, G3D);
   view->SetSector (room);
-  view->GetCamera ()->SetPosition (csVector3 (0, 10, -4));
+  view->GetCamera ()->SetPosition (csVector3 (0, 8, -4));
   view->SetRectangle (2, 2, FrameWidth - 4, FrameHeight - 4);
 
   txtmgr->AllocPalette ();
@@ -293,7 +298,7 @@ ctVector3 px;
   	ctArticulatedBody *ab_parent;
   	ctArticulatedBody *ab_child;
   	// each link of chain has a rigid body 
-  	ctRigidBody *rb = add_test_body( ctVector3( 0.0,10.0,0.0 ) );
+  	ctRigidBody *rb = add_test_body( ctVector3( 0.0,8.0,0.0 ));
   	// which is used in the creation of an articulated body ( linked to others via a joint )
   	ab_parent = new ctArticulatedBody( rb );
   	// the world only needs to have a pointer to the root of the articulated body tree.
@@ -338,7 +343,7 @@ ctVector3 px;
     bot->SetTemplate( tmpl );
     view->GetWorld ()->sprites.Push (bot);
     bot->MoveToSector (room);
-    m.Identity (); m = m * 2.0;
+    m.Identity (); //m = m * 2.0;
     bot->SetTransform (m);
     bot->SetMove (csVector3( 0, 10, 0 ));
     bot->SetAction ("default");
@@ -346,33 +351,43 @@ ctVector3 px;
 
     // add the rigidbody physics object
     rb_bot = ctRigidBody::new_ctRigidBody();
-    rb_bot->set_m( 20.0 );
+    rb_bot->set_m( 15.0 );
     rb_bot->set_pos( 0,10,0);
-    rb_bot->calc_simple_I_tensor( 0.5,0.5, 0.5 );
+    rb_bot->set_v( ctVector3( 1.0,0, 0));
+    rb_bot->calc_simple_I_tensor( 0.2,0.4, 0.2 );
     phyz_world.add_rigidbody( rb_bot );
 
     // create a spring force object and add it to our test body
-    ctSpringF *sf = new ctSpringF( rb_bot, ctVector3( 0, 0.5, 0 ) , &phyz_world, ctVector3( 0,12, 0 ) );
+    ctSpringF *sf = new ctSpringF( rb_bot, ctVector3( 0, 0.2, 0 ) , &phyz_world, ctVector3( 0,12, 0 ) );
     sf->set_rest_length( 0 );
     sf->set_magnitude( 300.0 );
-    rb_bot->add_force( sf );
+  //  rb_bot->add_force( sf );
+    ctVector3 rotaxisz( 0,0,1 );
+    ctVector3 rotaxisy( 0,1,0 );
+ 
+    rb_bot->rotate_around_line( rotaxisy, degree_to_rad(45) );  
+    rb_bot->rotate_around_line( rotaxisz, degree_to_rad(60) );
+    rb_bot->set_angular_v( ctVector3( 0,0,0) );
+    new csRigidSpaceTimeObj( bot, rb_bot );
   }
   
   // Move the dynamic light around.
-  angle += elapsed_time * 0.4 / 1000.;
+/*  angle += elapsed_time * 0.4 / 1000.;
   while (angle >= 2.*3.1415926) angle -= 2.*3.1415926;
   dynlight->Move (room, cos (angle)*3, 17, sin (angle)*3);
   dynlight->Setup ();
-
+*/
   // evolve the physics world by time step.  Slowed down by 4x due to speed of demo objects
-  phyz_world.evolve( 0, 0.25*elapsed_time / 1000.0 );  //!me .25 needed to balance test samples..
+  //!me phyz_world.evolve( 0, 0.25*elapsed_time / 1000.0 );  //!me .25 needed to balance test samples..
+  csRigidSpaceTimeObj::evolve_system( 0, 0.25*elapsed_time / 1000.0, &phyz_world, world );
 
   // if we have a spring and mass demo started
   if( bot ){
   	// note: ctVector3 and csVector3 are not directly compatable yet
     px = rb_bot->get_pos();
+
     csVector3 new_p( px[0], px[1], px[2] );   
-    bot->SetMove ( new_p );
+//    bot->SetMove ( new_p );
     csLight* lights[2];
     int num_lights = world->GetNearbyLights (room, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
     bot->UpdateLighting (lights, num_lights);  
@@ -398,6 +413,10 @@ ctVector3 px;
         m.Set( M[0][0], M[0][1], M[0][2],
                M[1][0], M[1][1], M[1][2],
                M[2][0], M[2][1], M[2][2]);    // set orientation of sprite
+        csMatrix3 M_scale;   // chain is half size of box
+        M_scale.Identity();
+        M_scale *= 0.5;
+        m *= M_scale;
   			chain[i]->sprt->SetTransform(m);
   			num_lights = world->GetNearbyLights (room, new_p, CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, lights, 2);
               chain[i]->sprt->UpdateLighting (lights, num_lights);  		
@@ -447,7 +466,8 @@ int main (int argc, char* argv[])
   srand (time (NULL));
 
   // add gravity to the world.  enviro forces affect all bodies in the world
-  ctGravityF *gf = new ctGravityF( 9.81 / M_PER_WORLDUNIT );
+  //ctGravityF *gf = new ctGravityF( 9.81 / M_PER_WORLDUNIT );
+  ctGravityF *gf = new ctGravityF( 1.0 / M_PER_WORLDUNIT );
   phyz_world.add_enviro_force( gf );
   // add air resistance
   ctAirResistanceF *af = new ctAirResistanceF();
