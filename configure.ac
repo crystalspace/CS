@@ -1,4 +1,4 @@
-d#                                               -*- Autoconf -*-
+#                                               -*- Autoconf -*-
 #==============================================================================
 # Copyright (C)2003,2004 by Eric Sunshine <sunshine@sunshineco.com>
 #
