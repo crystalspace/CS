@@ -56,6 +56,11 @@ ceImageView::ceImageView (csComponent *iParent, iGraphics3D *G3D)
   image = NULL;
 
   SetState (CSS_SELECTABLE, true);
+  // set background color to use and make palette
+  int palsize = 1;
+  int *palette = new int[palsize];
+  SetPalette(palette, palsize);
+  SetColor(0, cs_Color_Gray_L);
   if (parent)
     parent->SendCommand (cscmdWindowSetClient, (void *)this);
 }
@@ -63,19 +68,6 @@ ceImageView::ceImageView (csComponent *iParent, iGraphics3D *G3D)
 ceImageView::~ceImageView ()
 {
   if (image) delete image;
-}
-
-bool ceImageView::SetRect (int xmin, int ymin, int xmax, int ymax)
-{
-  bool rc = csComponent::SetRect (xmin, ymin, xmax, ymax);
-
-  parent->LocalToGlobal (xmin, ymin);
-  parent->LocalToGlobal (xmax, ymax);
-  // Engine uses the upside down coordinate system
-  ymin = app->bound.Height () - ymin;
-  ymax = app->bound.Height () - ymax;
-
-  return rc;
 }
 
 bool ceImageView::HandleEvent (iEvent &Event)
@@ -93,6 +85,7 @@ bool ceImageView::HandleEvent (iEvent &Event)
 
 void ceImageView::Draw ()
 {
+  Box (0, 0, bound.Width(), bound.Height(), 0);
   if (image) Pixmap (image, 0, 0, bound.Width (), bound.Height ());
 }
 
@@ -178,11 +171,16 @@ bool PicViewApp::Initialize ()
   //------------------------------- ok, now initialize the CSWS application ---
 
   // Initialize the image window ...
-  csWindow *w = new csWindow (this, "3D View",
-    CSWS_DEFAULTVALUE & ~(CSWS_BUTCLOSE | CSWS_MENUBAR));
+  csWindow *w = new csWindow (this, "Image View", CSWS_TITLEBAR, cswfsThin );
   image_view = new ceImageView (w, pG3D);
   image_window = w;
   w->SetRect (140, 0, bound.Width (), bound.Height ());
+  w->SetDragStyle(0);
+  w->SetResizeMode(CS_LOCK_ALL);
+  int bw = 0, bh = 0;
+  w->GetBorderSize(bw, bh);
+  image_view->SetRect(bw, bh + w->GetTitlebarHeight(), bw + 5, 
+    bh+w->GetTitlebarHeight() + 5);
 
   w = new ceControlWindow (this, "", CSWS_DEFAULTVALUE & ~CSWS_MENUBAR);
   w->SetRect (1, 50, 1+140, 50+320);
@@ -283,7 +281,7 @@ void PicViewApp::LoadNextImage (int idx, int step)
     txtmgr->UnregisterTexture (image_view->image->GetTextureHandle ());
     delete image_view->image;
     image_view->image = NULL;
-    image_view->SetRect (0, 0, 5, 5);
+    image_view->SetSize(5, 5);
   }
   if (ifile)
   {
@@ -306,8 +304,8 @@ void PicViewApp::LoadNextImage (int idx, int step)
       w = w*90/100;
       h = h*90/100;
     }
-  printf ("size is %d %d\n", w, h);
-    image_view->SetRect (0, 0, w, h);
+    printf ("size is %d %d\n", w, h);
+    image_view->SetSize(w,h);
   }
   image_view->Invalidate ();
 }

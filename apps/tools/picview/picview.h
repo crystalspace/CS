@@ -85,8 +85,6 @@ public:
   ceImageView (csComponent *iParent, iGraphics3D *G3D);
   virtual ~ceImageView ();
 
-  // Track movement of the window.
-  virtual bool SetRect (int xmin, int ymin, int xmax, int ymax);
   // Redraw the view.
   virtual void Draw ();
   // Do motion etc.
