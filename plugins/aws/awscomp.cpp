@@ -309,6 +309,12 @@ awsComponent::getMinimumSize()
   return csRect(0,0,30,15);
 }
 
+csRect 
+awsComponent::getInsets()
+{
+  return csRect(0,0,0,0);
+}
+
 void
 awsComponent::AddChild(iAwsComponent *child, bool has_layout)
 {

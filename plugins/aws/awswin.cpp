@@ -50,6 +50,8 @@ minp(50,5, 50+13, 5+11), maxp(34,5, 34+13, 5+11), closep(18,5, 18+13,5+11),
 min_down(false), max_down(false), close_down(false),
 is_zoomed(false), is_minimized(false), todraw_dirty(true), view(NULL)
 {
+  SCF_CONSTRUCT_IBASE(NULL);
+
   // Window start off hidden.
   SetFlag(AWSF_CMP_HIDDEN);
 }
@@ -75,6 +77,9 @@ bool
 awsWindow::Setup(iAws *_wmgr, awsComponentNode *settings)
 {
   if (!comp.Setup(_wmgr, settings)) return false;
+
+  if (Layout())
+    Layout()->SetOwner(this);
 
   iAwsPrefManager *pm = WindowManager()->GetPrefMgr();
 
@@ -540,8 +545,9 @@ awsWindow::OnMouseMove(int button, int x, int y)
 
     if (Layout())
     {
+      csRect r(this->getInsets());
       RecursiveLayoutChildren(this);
-      MoveChildren(Frame().xmin, Frame().ymin);
+      MoveChildren(Frame().xmin+r.xmin, Frame().ymin+r.ymin);
     }
     
     // Fix internal redraw zone
@@ -1199,13 +1205,32 @@ awsWindow::GetEngineView()
 csRect 
 awsWindow::getPreferredSize()
 {
-  return csRect(0,0,comp.Frame().Width(), comp.Frame().Height());
+  //csRect r = this->getInsets();
+  //return csRect(0,0,comp.Frame().Width() - 50/*(r.xmin+r.xmax)*/, comp.Frame().Height()-(r.ymin+r.ymax));
+
+  return getMinimumSize();
 }
  
 csRect 
 awsWindow::getMinimumSize()
 {
+  csRect r = this->getInsets();
   return  csRect(0,0,comp.Frame().Width(), comp.Frame().Height());
+}
+
+csRect
+awsWindow::getInsets()
+{
+  switch(frame_style)
+  {
+  case fsBitmap:
+    return csRect(0,0,0,0);
+  default:
+    if (frame_options & foBeveledBorder)
+      return csRect(2,2,2,2);
+    else
+      return csRect(9,20,9,9);
+  }
 }
 
 awsLayoutManager *
@@ -1233,3 +1258,5 @@ awsWindow::RecursiveLayoutChildren(iAwsComponent *cmp)
     RecursiveLayoutChildren(child);
   }
 }
+
+

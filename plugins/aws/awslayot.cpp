@@ -414,9 +414,9 @@ awsGridBagLayout::GetLayoutInfo(iAwsComponent *parent, int sizeflag)
 
       /* Cache the current slave's size. */
       if (sizeflag == PREFERREDSIZE)
-		d = cmp->getPreferredSize();
+	d = cmp->getPreferredSize();
       else
-		d = cmp->getMinimumSize();
+	d = cmp->getMinimumSize();
 
       constraints->minWidth = d.Width();
       constraints->minHeight = d.Height();
@@ -424,11 +424,11 @@ awsGridBagLayout::GetLayoutInfo(iAwsComponent *parent, int sizeflag)
       /* Zero width and height must mean that this is the last item (or
        * else something is wrong). */
       if (constraints->gridheight == 0 && constraints->gridwidth == 0)
-		curRow = curCol = -1;
+	curRow = curCol = -1;
 
       /* Zero width starts a new row */
       if (constraints->gridheight == 0 && curRow < 0)
-		curCol = curX + curWidth;
+	curCol = curX + curWidth;
 
       /* Zero height starts a new column */
       else if (constraints->gridwidth == 0 && curCol < 0)
@@ -776,19 +776,21 @@ awsGridBagLayout::GetMinSize(iAwsComponent *parent, GridBagLayoutInfo *info)
 {
     csRect d;
     int i, t;
-    //csRect insets = parent.getInsets();
-
+    csRect insets;
+    
+    insets=parent->getInsets();
+        
     t = 0;
     for(i = 0; i < info->width; i++)
       t += info->minWidth[i];
 
-    d.xmax = t; // + insets.left + insets.right;
+    d.xmax = t + insets.xmin + insets.xmax;
 
     t = 0;
     for(i = 0; i < info->height; i++)
       t += info->minHeight[i];
 
-    d.ymax = t; //+ insets.top + insets.bottom;
+    d.ymax = t + insets.ymin + insets.ymax;
 
     return d;
 }
@@ -949,7 +951,7 @@ awsGridBagLayout::ArrangeGrid(iAwsComponent *parent)
 	    cmp->Frame().Height() != r.Height()) 
 	{
 	    cmp->Frame().Set(r);
-	    printf("gridbaglayout: %d,%d - %d, %d\n", r.xmin, r.ymin, r.xmax,r.ymax);
+	    
 	}
       }
     }

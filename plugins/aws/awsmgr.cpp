@@ -626,8 +626,11 @@ awsManager::CreateWindowFrom(char *defname)
   // If window has layout, then layout children.
   if (win->Layout())
   {
+    csRect r=win->getInsets();
+    r.xmin+=win->Frame().xmin;
+    r.ymin+=win->Frame().ymin;
     RecursiveLayoutChildren(win);
-    win->MoveChildren(win->Frame().xmin, win->Frame().ymin);
+    win->MoveChildren(r.xmin, r.ymin);
   }
 
   

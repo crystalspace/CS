@@ -188,13 +188,7 @@ private:
 
     /// Event dispatcher, demultiplexes events and sends them off to the proper event handler
     virtual bool HandleEvent(iEvent& Event);
-
-    /// Gets the preferred size of the component
-    virtual csRect getPreferredSize();
-
-    /// Gets the minimum size that the component can be
-    virtual csRect getMinimumSize();
-
+    
     /// Gets the layout manager for this window.
     awsLayoutManager * Layout();
 
@@ -318,6 +312,15 @@ public:
 
     /// Gets the engine view for this window
     virtual iView *GetEngineView();
+
+    /// Gets the preferred size of the component
+    virtual csRect getPreferredSize();
+
+    /// Gets the minimum size that the component can be
+    virtual csRect getMinimumSize();
+
+    /// Gets the inset amounts that are need to fit components properly.
+    virtual csRect getInsets();
 
 public:
     /// Event triggered when a window is about to be raised

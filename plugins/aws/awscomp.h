@@ -215,6 +215,9 @@ public:
     /// Gets the minimum size that the component can be
     virtual csRect getMinimumSize();
 
+    /// Gets the inset amounts that are need to fit components properly.
+    virtual csRect getInsets();
+
 public:
     /// Triggered when the component needs to draw
     virtual void OnDraw(csRect clip);
