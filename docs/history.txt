@@ -50,6 +50,9 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine eliminated a compilation complaint about Get() being
 	  re-declared as virtual in csTokenVector (though it was not virtual
 	  in the parent class).
+	- csMeshFactoryWrapper instances are now also added to the current
+	  region. iCurveTemplate and iPolyTxtPlane instances are now correctly
+	  deleted from regions. Thanks to Thiago Ramon for mentioning this.
 11-Oct-2001
 	- Moved the plugin manager implementation out of the system driver
 	  into csPluginManager (in csutil/plugmgr.h). Modified

@@ -175,6 +175,28 @@ void csRegion::Region::DeleteAll ()
       o->DecRef ();
     }
 
+  for (i = 0 ; i < copy.Length () ; i++)
+    if (copy[i])
+    {
+      iObject* obj = copy[i];
+      iCurveTemplate* o = SCF_QUERY_INTERFACE_FAST (obj, iCurveTemplate);
+      if (!o) continue;
+      scfParent->ObjRemove (obj);
+      copy[i] = NULL;
+      o->DecRef ();
+    }
+
+  for (i = 0 ; i < copy.Length () ; i++)
+    if (copy[i])
+    {
+      iObject* obj = copy[i];
+      iPolyTxtPlane* o = SCF_QUERY_INTERFACE_FAST (obj, iPolyTxtPlane);
+      if (!o) continue;
+      scfParent->ObjRemove (obj);
+      copy[i] = NULL;
+      o->DecRef ();
+    }
+
 #ifdef CS_DEBUG
   // Sanity check (only in debug mode). There should be no more
   // non-NULL references in the copy array now.

@@ -561,6 +561,7 @@ csMeshFactoryWrapper::csMeshFactoryWrapper (iMeshObjectFactory* meshFact)
   meshFact->IncRef ();
   parent = NULL;
   children.SetMeshFactory (this);
+  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csMeshFactoryWrapper::csMeshFactoryWrapper ()
@@ -569,6 +570,7 @@ csMeshFactoryWrapper::csMeshFactoryWrapper ()
   csMeshFactoryWrapper::meshFact = NULL;
   parent = NULL;
   children.SetMeshFactory (this);
+  csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csMeshFactoryWrapper::~csMeshFactoryWrapper ()
