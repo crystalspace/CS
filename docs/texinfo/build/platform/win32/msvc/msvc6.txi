@@ -1,0 +1,469 @@
+@c -*-texinfo-*-
+@node MSVC6, Mingw, Unix, Platform Instructions
+@subsection Microsoft Visual C++ 6
+@cindex Windows, Building
+
+@menu
+* MSVC6 Intro:: Introduction
+* MSVC6 Required:: Required/Optional External Libraries and Software
+* MSVC6 Compile:: Compiling Crystal Space
+* MSVC6 Rundemo:: Running the Demonstration Applications
+* MSVC6 Workspace:: Structure of the Workspace
+* MSVC6 User App:: Compiling Your Own Program Using Crystal Space
+* MSVC6 FAQ:: Frequently Asked Questions (@sc{faq})
+@end menu
+
+@node MSVC6 Intro, MSVC6 Required, Windows, MSVC6
+@subsubsection Introduction
+
+In order to successfully compile the Crystal Space 3D Software Development
+Kit (@sc{sdk}), you will need a copy of @emph{Microsoft Developer Studio 6}
+or the stand alone version of @emph{Microsoft Visual C++ 6}, with additionally
+Service Pack (@sc{sp}) 5 installed.
+
+@subsubheading Getting Extra Help
+
+If you need help with Crystal Space and Visual C++ or just Crystal Space in
+general.  You can subscribe and then post a message to the Crystal Space
+mailing list.  To subscribe see the following site and fill in the form:
+
+@uref{http://lists.sourceforge.net/lists/listinfo/crystal-main}
+
+Alternatively you can email the Win32 port maintainer directly at the following:
+
+@email{philipwyett@@dsl.pipex.com}.
+
+@node MSVC6 Required, Windows MSVC5, MSVC6 Intro, MSVC6
+@subsubsection Required/Optional External Libraries and Software
+
+All the following libraries and Software Development Kits (@sc{sdk}) unless
+stated are not required.  However, if you choose not to install them, at
+compile time you must follow the documented instructions of how to unload these
+projects from the Crystal Space build process.
+
+@subsubheading Winlibs - Required
+
+Before you attempt to compile Crystal Space, you must download
+and install @emph{winlibs}.  Winlibs is a package containing all
+third party header, pre-built library and dll files used by Crystal
+Space, i.e. @samp{zlib.dll}, @samp{libjpeg.dll}, @samp{png.dll} and
+@samp{xmlparse.dll}.  The latest version of the winlibs package
+@samp{winlibs0.19c.zip} can be downloaded from:
+
+@noindent
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/winlibs0.19c.zip}
+
+Once you have downloaded the winlbs package, extract it too your @samp{CS\}
+root directory.
+
+@subsubheading OpenGL
+
+The required headers and library files for compiling the Crystal Space OpenGL
+related plugins, are included within the Visual C++ 6 distribution.
+However, optionally you can also install and use Silicon Graphics own OpenGL
+Software Development Kit (@sc{sdk}) for Windows.  If you wish to do this, it
+can be obtained from:
+
+@uref{http://www.meer.net/~gold/OpenGL/sgi-opengl.html}
+
+@subsubheading DirectX - Required
+
+In order to compile Crystal Space at its minimum i.e. the software render,
+requires you must have at least some form of the DirectX Software Development
+Kit (@sc{sdk}) on your system.
+
+@itemize @bullet
+@item
+DirectX 5.0 or higher is required.  With this, you get sound output and
+non-accelerated graphics.
+package.
+
+@item
+DirectX 6.1 or higher (including DirectX 8a) allows hardware-accelerated 3D
+graphics.
+@end itemize
+
+Visual C++ 6 comes with the minimum DirectX @sc{sdk} 5 files in-order to build
+Crystal Space.
+
+To enable you to build Crystal Space to it optimum @sc{d3d} support, you must
+download the latest DirectX Software Development Kit (@sc{sdk}), which can be
+obtained from:
+
+@uref{http://www.msdn.microsoft.com/directx}
+
+If you are unable to accomplish the 100+Mb (For the full @sc{sdk}) or 43Mb (For
+the Visual-C only parts of the @sc{sdk}) download of the DirectX 8a @sc{sdk}
+from the link above.  You can obtain cut down older versions (6 & 7 with no
+documents or example code) of the DirectX @sc{sdk}'s from the following
+website:
+
+@uref{http://www.multimania.com/noote/CrystalSpace}
+
+Thanks, to the miracle which is Microsoft.  If you download and install the
+latest DirectX 8a Software Development Kit (@sc{sdk}) and already have Visual
+C++ installed, it will ask you if you wish to add the paths to the @sc{sdk} to
+Visual C++ so it can use it.  We recommend you accept when offered this option.
+If it is not the latest @sc{sdk} you install you will have to manually point
+Visual C++ to where you installed the @sc{sdk} in-order for it to be used.
+This can be done from the Visual C++ file menu and selecting
+@emph{Tools->Options->Directories}.  You must add the paths for both the
+include files and libraries and being that we wish Visual C++ to see and use
+this new @sc{sdk} before all possible others on your system, you must click on
+and drag both paths you have entered to the top of the list.
+
+@subsubheading Simple Direct Media Layer
+
+Crystal Space contains support for a Simple Direct Media Layer 2D canvas which
+can be used as an alternative to the default Direct Draw canvas for use with
+the Crystal Space software 3D renderer.  To compile the SDL2D canvas you must
+have the supported 1.2.1 development runtime for your version of @sc{msvc} be
+it 5 or 6.  Please remeber to add the @emph{indlude} and @emph{lib} directories
+to the global MSVC options, so @sc{msvc} can see them.
+
+@uref{http://www.libsdl.org}
+
+Also remember to copy the @emph{SDL.dll} into the @emph{CS\} root directory
+or at it to your systems path before using the SDL2D canvas.
+
+For instructon on using a specific canvas including
+the @emph{sdl2d} canvas @ref{Common Command Line Options}
+
+@subsubheading Python
+
+Crystal Space contains support for Python scripting and thus has projects
+within it requires that Python be installed on your system.  If you wish to
+compile with Python support you must install Python 1.5.2, which can be
+obtained from:
+
+Note: Crystal Space currently only supports Python 1.5.2 and not a more recent
+version i.e. 2.0.
+
+@uref{http://www.python.org}
+
+@subsubheading BisonFlex
+
+*** TODO ***
+
+You need not compile all parts of Crystal Space.  For example, if you don't
+want to use DirectX (DDRAW/D3D) for graphics or have Python scripting support,
+then you don't have to compile it.  See the compilation instructions on how to
+remove the projects.
+
+@node MSVC6 Compile, MSVC6 Rundemo, Windows MSVC5, MSVC6
+@subsubsection Compiling Crystal Space
+
+To compile Crystal Space, you'll have to perform the following steps.  If
+anything doesn't work, see the Win32 @sc{faq}, @ref{MSVC6 FAQ}.
+
+@enumerate
+@item
+Load @file{CS\mk\visualc\csall.dsw}.
+
+@item
+Remove all projects you don't want to compile.  To do this, right-click on the
+project in the list and select @emph{Unload Project}.  Examples of projects
+which you don't want to compile might include @samp{plgopengl} if you do not
+have the OpenGL @sc{sdk} insatalled, or @samp{plgcspython} if you do not have
+the Python @sc{sdk} installed.
+
+@item
+Make @samp{grpall} your active project.  This is done by right clicking on it
+and then clicking on @samp{Set as Active Project}.
+
+@item
+From the file menu selct @emph{Build->Rebuild All} or alernatively hit your
+@kbd{@key{F7}} key.
+
+@item
+After a while the compilation should finish without error.  The signal for a
+successful build will be come in the form of the something similar to the
+following:
+
+@example
+------------ Configuration: grpall - Win32 Debug ------------
+
+grpall.lib - 0 error(s), 0 warning(s)
+@end example
+@end enumerate
+
+@node MSVC6 Rundemo, MSVC6 Workspace, MSVC6 Compile, MSVC6
+@subsubsection Running the Demonstration Applications
+
+The first app you should try is Walktest.  This program shows many of the
+features of the 3D engine.  You can run it by starting it from the windows
+explorer.  It should be at @file{.../cs/walktest.exe}.  Don't start it from
+other locations or from within Visual Studio.  It won't find the required files
+if you do.
+
+If you want to run a debug session, you first have to set the working
+directory.  Open @emph{Project/Settings}, select the appWalktest project,
+switch to the @emph{Debug} tab and enter the base @file{CS} directory as the
+working directory for debug sessions (for example, @file{C:\CS\}).  Be sure to
+to this for @emph{Debug} and @emph{Release} builds.
+
+You can now continue with the next platform-independent step.  The remaining
+Windows-specific sections are only important when you want to compile your own
+application using Crystal Space.
+
+@node MSVC6 Workspace, Win32 User App, Win32 Rundemo, Win32
+@subsubsection Structure of the Workspace
+
+@emph{Note}: If you find bugs in the @sc{msvc} project or workspace files
+coming with Crystal Space, don't send fixes for these files to the developers.
+These files are generated automatically, so your fixes would be useless.
+Better, send a description of the bug to the mailing list.
+
+The Crystal Space workspace is divided into several projects.  They all exist
+as separate project files (@file{*.dsp}).  All of them are being bound together
+by a workspace @file{csall.dsw}.  This workspace will also ensure correct
+linking between the various projects.
+
+The workspace uses a prefix system for naming the projects and grouping them.
+There are currently four prefixes in use.  The prefix @file{grp} is used to
+group the projects into the three main categories: @emph{libraries},
+@emph{plug-ins}, and @emph{applications}.  There is also a special group
+@samp{grpall} that contains the three major groups @samp{grplibs},
+@samp{grpapps}, and @samp{grpplugins}.
+
+The @emph{Libraries} are C++ libraries that you can link into your own
+programs.  Some of these libraries are part of the core of Crystal Space.  You
+can find more information about this in @ref{Libraries}.  Their output are
+@file{.lib} files.
+
+The @emph{Plugins} are also programming libraries, but they use a special
+mechanism called @sc{scf} as their interface to your program.  This separates
+their interface from the internals of the library and thus allows dynamic
+linking.  In fact, some of the @emph{Libraries} also use @sc{scf}.  The rule
+for the @sc{msvc} workspace is simple: The @emph{Plugins} are projects that
+build a dynamic library (@file{.dll}).  You can find more information in the
+section of this manual dealing with plug-in modules.  @xref{Plug-In Drivers}.
+
+The @emph{Applications} are programs using some of these libraries, so they
+produce @file{.exe} files.
+
+@node MSVC6 User App, MSVC6 FAQ, MSVC6 Workspace, MSVC6
+@subsubsection Compiling Your Own Program Using Crystal Space
+
+It is assumed that you have set up @sc{msvc} projects before.  If you want to
+create a project using Crystal Space, you have two possibilities how to do
+this: You can either create the project inside the Crystal Space workspace, or
+you can create a new workspace.  Either way, you have to do the usual setup,
+like adding the source files.  In addition to this, you must perform the
+following steps.
+
+@itemize @bullet
+@item
+Set the output path to the @file{CS} root directory.  Any Crystal Space
+application must be executed in this directory.  If you want to run it in
+another directory, you must copy the files @file{scf.cfg} and @file{vfs.cfg},
+the data directory and all plugins (@file{.dll}) into this new directory, or
+set the CRYSTAL environment variable to your Crystal Space directory.
+
+@item
+Set the include paths.  Simply open one of the application projects coming with
+Crystal Space, for example @samp{Walktest}, select
+@emph{Project Settings/C/C++} and copy all command line options that look like
+this: @samp{/I "../../anything"}.
+
+@item
+Add the Crystal Space libraries.  If you are using the Crystal Space workspace,
+simply add dependencies to the Crystal Space projects.  Otherwise you have to
+link to the @file{.lib} files.  To do this, either add these files to the
+project like source files or add them as command line options in @emph{Project
+Settings/C/C++}.  Note that if you add them like source files, you may wish
+to add the release libraries to a @emph{Release} folder and the debug libs to
+a @emph{Debug} folder, and disable each of these
+(@emph{Project Settings/General}) for the opposite type of build.
+
+@item
+Add external libraries (@file{zlib}, @file{libjpeg}, @file{DirectX}, ...).
+They can be added just like the Crystal Space libraries, except that you can
+not use project dependencies.
+@end itemize
+
+@node MSVC6 FAQ, , MSVC6 User App, MSVC6
+@subsubsection Frequently Asked Questions (@sc{faq})
+
+This is the list of frequently asked questions for the Win32 port of Crsytal
+Space.  Please consult this list if you are having difficulty building or using
+the project.
+
+@subsubheading Compilation
+
+@itemize @bullet
+@item
+Q. @emph{I get errors like the following:}
+
+@example
+plugins\video\canvas\ddraw8\i_g2d.h(14) : error C2061:
+  syntax error : identifier 'LPDIRECTDRAW7'
+plugins\video\canvas\ddraw8\i_g2d.h(16) : error C2061:
+  syntax error : identifier 'LPDIRECTDRAWSURFACE7'
+@end example
+
+A. You are not using the DirectX @sc{sdk} 8 or higher. Either you have not
+installed the correct DirectX @sc{sdk}, or you haven't told @sc{msvc} to use
+it instead of the older @sc{sdk} included with @sc{msvc}. Either install the
+@sc{sdk} correctly or unload the DirectX 8 related projects.
+
+@item
+Q. @emph{Where are the @file{zlib.h}, @file{png.h} and @file{jpeglib.h} files?}
+
+A. Those files are not part of the Crystal Space project, but they are
+required to build it.  You must get a version of the following packages, most
+of which can be easily found on the Internet.  You can download precompiled
+versions of these libraries or grab the source code and compile it yourself if
+you prefer.  @xref{External Libraries}.
+
+The resources from these packages should be placed in the following locations.
+
+@example
+CS\libjpeg.dll
+CS\png.dll
+CS\zlib.dll
+CS\include\cssys\win32\jconfig.h
+CS\include\cssys\win32\jerror.h
+CS\include\cssys\win32\jinclude.h
+CS\include\cssys\win32\jmorecfg.h
+CS\include\cssys\win32\jpeglib.h
+CS\include\cssys\win32\png.h
+CS\include\cssys\win32\pngconf.h
+CS\include\cssys\win32\zconf.h
+CS\include\cssys\win32\zlib.h
+CS\libs\cssys\win32\lib\zlib.lib
+CS\libs\cssys\win32\lib\png.lib
+CS\libs\cssys\win32\lib\libjpeg.lib
+@end example
+
+Note that the source code package generally already contains the files from the
+@file{include} and @file{libs} directories, so you may not have to bother with
+them.  The @sc{cvs} repository contains these files as well.
+@end itemize
+
+@subsubheading Linking
+
+@itemize @bullet
+@item
+Q. @emph{Where are the files @file{png.lib} and @file{zlib.lib}?}
+
+A. Just look above at the question about @file{zlib.h} and @file{png.h}.
+It's the same problem, and if you have already done what is explained there,
+I can't do much for you!
+
+@item
+Q. @emph{I've got unresolved symbols.}
+
+A. What kind of symbols?
+
+@itemize @minus
+@item
+@samp{_png_@dots{}}: That means that you don't link the project with
+@file{png.lib}.  Just take a look below where it is explained how to do so.
+
+@item
+@samp{_inflate@dots{}} and @samp{_deflate@dots{}}: Well, it seems to your
+project lacks @file{zlib.lib}.  The trick is explained just below, so hang on.
+
+@item
+@samp{_DirectDraw@dots{}}: Same as above, but for @file{ddraw.lib} (DirectX
+component), look below.
+
+@item
+Any others: Well, I always have a solution, but this one is more difficult.  It
+seems that there is a missing source file in your project.  But the question
+is, which source file?  If it isn't obvious by the name of the functions, just
+to the following: In the menu @emph{Edit}, select the option @emph{Find in
+Files@dots{}}.  Put the name of the function in the field ``Find What'', check
+that the ``In Folder'' field content is the Crystal Space source directory and
+press @emph{Find}.  You should get a bunch of files, many of them just making a
+call to the function.  But there is surely one which contains the definition of
+the function.  Look at the position of the file where it is defined, and add it
+to the project (menu @emph{Project/Add To Project/Files}).
+
+In order to add (or remove) a library for the link process, invoke the
+@emph{Project/Settings/Link} menu item, then select the ``General'' category
+tab..  There is a field called ``Object/Library Modules'' that lists all the
+libraries added to the project at link time.
+@end itemize
+@end itemize
+
+OK, now it should link.  So you should have an executable file called
+@file{walktest.exe} in your src directory.  Let's run it!
+
+@subsubheading Executing
+
+@itemize @bullet
+@item
+Q. @emph{I just get a black screen.}
+
+A. When I start @file{walktest} I just get a black screen, maybe with some
+text output, but after a few seconds it drops back to the normal windows
+screen without an error.
+
+This shouldn't happen any more, because in most cases now, @file{walktest} will
+display proper error messages.  Anyway, you should make sure you have set an
+appropriate directory set (see above).  Make sure you have specified the map
+file in @file{walktest.cfg} as @samp{Walktest.Settings.WorldFile=} (also keep
+in mind, that your current directory is, where the executable sits.)
+
+@item
+Q. @emph{I get the following (or similar) errors:}
+
+@example
+WARNING: could not load plugin
+  `crystalspace.graphics3d.software'
+WARNING: failed to initialize plugin
+  `crystalspace.engine.3d'
+FATAL: No iGraphics3D plug-in loaded!
+FATAL: No iGraphics2D plug-in loaded!
+Error initializing system!
+@end example
+
+A. You probably did not compile everything. Compiling only the @file{.exe}
+file is not sufficient!  You must also compile all plug-ins you want to use.
+In the above example the software renderer is missing.
+
+If you are certain that everything is compiled, make sure your working
+directory is set to @file{CS\}.  To do this go to the @emph{Project} menu.
+Select @emph{Settings} and go to the @emph{Debug} tab.  Change the debug
+executate to @file{X:\CS\appname} where @file{X:} is the drive letter where the
+Crystal Space project is installed.  Next set the working directory to
+@file{X:\CS}.  Click @sc{ok} and you should be all set.
+
+If after doing this, you are still getting the same error, make sure that you 
+have the @file{zlib.dll} installed, the @sc{vfs} plugin is dependent upon it.
+@end itemize
+
+@subsubheading Miscellaneous
+
+@itemize @bullet
+@item
+Q. @emph{I don't care about Direct3D support.}
+
+A. Right click on the Direct3DRender project, and click @emph{Unload
+Project}.  It won't be compiled any longer after that.  To reload it, right
+click on it and click @emph{Load Project}.
+
+@item
+Q. @emph{My last update did compile, but now I got a new version from the
+@sc{cvs} repository and everthing seems to be broken.}
+
+A. When working with Crystal Space, always keep in mind, that this is a
+multiplatform project.  So sometimes not all features will work correct on all
+platforms.  Sometimes a specific port may even be broken due to changes in
+other ports.  Since the introduction of @sc{cvs} (@pxref{CVS}) this is usually
+only for a short time, so if you got your version out of @sc{cvs}, it usually
+pays off, to post a message describing the problems to the Crystal Space
+Mailing List describing you problem and include the exact error messages.  If
+you wait a while, this will probably be fixed, or at least be worked around.
+@xref{Mailing Lists}.
+
+@item
+Q. @emph{I have a problem that you haven't solved here!}
+
+A. Try sending a note to the Crystal Space mailing list and asking your
+question there.  @xref{Mailing Lists}.  Be sure to include any pertinent
+information, such as the operating system you are using, the compiler, which
+version of Crystal Space, and any special configuration information.
+@end itemize
