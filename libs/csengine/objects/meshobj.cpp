@@ -761,13 +761,16 @@ bool csMeshMeshList::PrepareItem (csSome item)
   iMeshWrapper *oldParent = child->GetParentContainer ();
   if (oldParent)
     oldParent->GetChildren ()->Remove (child);
-  else {
-      csEngine::current_engine->GetMeshes ()->Remove (child);
-      /* csSector->PrepareMesh tells the culler about the mesh
-         (since removing the mesh above also removes it from the culler...) */
-      for(int i = 0; i < mesh->GetMovable().GetSectors()->GetCount(); i++) {
-          mesh->GetMovable().GetSectors()->Get(i)->GetPrivateObject()->PrepareMesh(child);
-      }
+  else
+    csEngine::current_engine->GetMeshes ()->Remove (child);
+
+  /* csSector->PrepareMesh tells the culler about the mesh
+     (since removing the mesh above also removes it from the culler...) */
+  for (int i = 0 ; i < mesh->GetMovable().GetSectors()->GetCount() ; i++)
+  {
+    csSector* sector = mesh->GetMovable ().GetSectors ()->Get (i);
+    sector->UnprepareMesh (child);
+    sector->PrepareMesh (child);
   }
 
   child->SetParentContainer (&mesh->scfiMeshWrapper);

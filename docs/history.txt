@@ -1,5 +1,7 @@
 The history order is reversed so that new features are at the top.
 
+17-Dec-2002
+	- Fixed the fix on reparenting of a mesh object for the culler.
 16-Dec-2002
 	- Completely removed the old octree culler. This has a great impact
 	  on the internal engine structure. It greatly simplifies both
