@@ -30,7 +30,7 @@ class csProcPlasma : public csProcTexture
 {
 private:
   /// palette
-  int *palette;
+  unsigned char *palette;
   /// number of colours in palette
   int palsize;
 

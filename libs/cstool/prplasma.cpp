@@ -101,11 +101,8 @@ void csProcPlasma::MakePalette (int max)
   int i;
   if (palette) delete[] palette;
   palsize = max;
-  palette = new int[palsize];
-  iTextureManager* ptTxtMgr = g3d->GetTextureManager ();
-  palette[0] = ptTxtMgr->FindRGB (0,0,0);
-  for (i = 0; i < palsize; i++)
-    palette[i] = palette[0];
+  palette = new unsigned char[palsize*4];
+  memset (palette, 0, 4*palsize);
   /// fill the palette
   int maxcolours = palsize;
   csColor col;
@@ -121,7 +118,10 @@ void csProcPlasma::MakePalette (int max)
     r = (int) col.red;
     g = (int) col.green;
     b = (int) col.blue;
-    palette[i] = ptTxtMgr->FindRGB(r, g, b);
+    palette[i*4+0] = r;
+    palette[i*4+1] = g;
+    palette[i*4+2] = b;
+    palette[i*4+3] = 255;
   }
 }
 
@@ -139,6 +139,7 @@ void csProcPlasma::Animate (csTicks current_time)
   g3d->SetRenderTarget (tex->GetTextureHandle ());
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
 
+  unsigned char* data = new unsigned char[4*mat_w*mat_h];
   uint8 curanim0, curanim1, curanim2, curanim3;
   /// draw texture
   curanim2 = anims2;
@@ -157,7 +158,9 @@ void csProcPlasma::Animate (csTicks current_time)
       thex %= mat_w;
       they %= mat_h;
 
-      g2d->DrawPixel (thex, they, palette[col*palsize/256] );
+      unsigned int* d = (unsigned int*)(data+4*(thex+they*mat_w));
+      unsigned int* p = (unsigned int*)(&palette[4*col*palsize/256]);
+      *d = *p;
 
       curanim0 += lineincr0;
       curanim1 += lineincr1;
@@ -165,6 +168,8 @@ void csProcPlasma::Animate (csTicks current_time)
     curanim2 += lineincr2;
     curanim3 += lineincr3;
   }
+  g2d->Blit (0, 0, mat_w, mat_h, data);
+  delete[] data;
 
   g3d->FinishDraw ();
 

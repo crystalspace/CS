@@ -304,46 +304,43 @@ void csGraphics2DGLCommon::DrawPixels (csPixelCoord* pixels,
 void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
 	unsigned char* data)
 {
-  bool hor_clip_needed = false;
-  bool ver_clip_needed = false;
   int orig_x = x;
   int orig_y = y;
   int orig_w = w;
   if ((x > ClipX2) || (y > ClipY2))
     return;
   if (x < ClipX1)
-    { w -= (ClipX1 - x), x = ClipX1; hor_clip_needed = true; }
+    w -= (ClipX1 - x), x = ClipX1;
   if (y < ClipY1)
-    { h -= (ClipY1 - y), y = ClipY1; ver_clip_needed = true; }
+    h -= (ClipY1 - y), y = ClipY1;
   if (x + w > ClipX2)
-    { w = ClipX2 - x; hor_clip_needed = true; }
+    w = ClipX2 - x;
   if (y + h > ClipY2)
-    { h = ClipY2 - y; }
+    h = ClipY2 - y;
   if ((w <= 0) || (h <= 0))
     return;
 
   // If vertical clipping is needed we skip the initial part.
-  if (ver_clip_needed)
-    data += 4*w*(y-orig_y);
+  data += 4*w*(y-orig_y);
+  // Same for horizontal clipping.
+  data += 4*(x-orig_x);
 
-  if (!hor_clip_needed)
-  {
-    glRasterPos2i (x, y);
-    glDrawPixels (w, h, GL_RGBA, GL_UNSIGNED_BYTE, data);
-  }
-  else
-  {
-    data += 4*(x-orig_x);
+  bool gl_texture2d = glIsEnabled(GL_TEXTURE_2D);
+  bool gl_alphaTest = glIsEnabled(GL_ALPHA_TEST);
+  if (gl_texture2d) statecache->DisableState (GL_TEXTURE_2D);
+  if (gl_alphaTest) statecache->DisableState (GL_ALPHA_TEST);
 
-    // More complicated. We need to do scanline by scanline.
-    int j;
-    for (j = y ; j < y+h ; j++)
-    {
-      glRasterPos2i (x, j);
-      glDrawPixels (w, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
-      data += 4*orig_w;
-    }
+  glColor3f (0., 0., 0.);
+  int j;
+  for (j = y ; j < y+h ; j++)
+  {
+    glRasterPos2i (x, Height-j);
+    glDrawPixels (w, 1, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    data += 4*orig_w;
   }
+
+  if (gl_texture2d) statecache->EnableState (GL_TEXTURE_2D);
+  if (gl_alphaTest) statecache->EnableState (GL_ALPHA_TEST);
 }
 
 void csGraphics2DGLCommon::Write (iFont *font, int x, int y, int fg, int bg,

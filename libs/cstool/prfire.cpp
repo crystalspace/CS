@@ -32,7 +32,6 @@ csProcFire::csProcFire () : csProcTexture()
 {
   palsize = 0;
   palette = NULL;
-  new_palette = NULL;
   image = 0;
   mat_w = 128;
   mat_h = 128;
@@ -53,7 +52,6 @@ csProcFire::csProcFire () : csProcTexture()
 csProcFire::~csProcFire ()
 {
   delete[] palette;
-  delete[] new_palette;
   delete[] fireline;
   delete[] image;
 }
@@ -100,15 +98,9 @@ void csProcFire::MakePalette (int max)
 {
   int i;
   delete[] palette;
-  delete[] new_palette;
   palsize = max;
-  palette = new int [palsize];
-  new_palette = new unsigned char [palsize*4];
-  iTextureManager* ptTxtMgr = g3d->GetTextureManager ();
-  palette[0] = ptTxtMgr->FindRGB (0,0,0);
-  for (i = 0; i < palsize; i++)
-    palette[i] = palette[0];
-  memset (new_palette, 0, 4*palsize);
+  palette = new unsigned char [palsize*4];
+  memset (palette, 0, 4*palsize);
   /// fill the palette
   int maxcolours = palsize/2;
   csColor col;
@@ -125,10 +117,9 @@ void csProcFire::MakePalette (int max)
     r = (int) col.red;
     g = (int) col.green;
     b = (int) col.blue;
-    palette[i] = ptTxtMgr->FindRGB (r,g,b);
-    new_palette[i*4+0] = r;
-    new_palette[i*4+1] = g;
-    new_palette[i*4+2] = b;
+    palette[i*4+0] = r;
+    palette[i*4+1] = g;
+    palette[i*4+2] = b;
   }
   //// guess rest of colours
   float inc = 512.0f / float (palsize - maxcolours);
@@ -141,10 +132,9 @@ void csProcFire::MakePalette (int max)
     r = (int) col.red;
     g = (int) col.green;
     b = (int) col.blue;
-    palette[i] = ptTxtMgr->FindRGB(r,g,b);
-    new_palette[i*4+0] = r;
-    new_palette[i*4+1] = g;
-    new_palette[i*4+2] = b;
+    palette[i*4+0] = r;
+    palette[i*4+1] = g;
+    palette[i*4+2] = b;
   }
 }
 
@@ -225,7 +215,6 @@ void csProcFire::Animate (csTicks /*current_time*/)
   if (!g3d->BeginDraw (CSDRAW_2DGRAPHICS)) return;
   /// draw firetexture
   im = image;
-#if 0
   unsigned char* data = new unsigned char [mat_w*mat_h*4];
   unsigned char* d = data;
   for (y = 0 ; y < mat_h ; y++)
@@ -234,20 +223,13 @@ void csProcFire::Animate (csTicks /*current_time*/)
       int col = *im++;
       col = col * palsize / 256;
       col *= 4;
-      *d++ = new_palette[col+0];
-      *d++ = new_palette[col+1];
-      *d++ = new_palette[col+2];
-      d++;
+      *d++ = palette[col+0];
+      *d++ = palette[col+1];
+      *d++ = palette[col+2];
+      *d++ = 0;
     }
   g2d->Blit (0, 0, mat_w, mat_h, data);
-#else
-  for (y = 0 ; y < mat_h ; y++)
-    for (x = 0 ; x < mat_w ; x++)
-    {
-      int col = *im++;
-      g2d->DrawPixel (x, y, palette[col*palsize/256]);
-    }
-#endif
+  delete[] data;
   g3d->FinishDraw ();
 }
 

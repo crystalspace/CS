@@ -43,6 +43,9 @@ The history order is reversed so that new features are at the top.
 	- Added iGraphics2D->DrawPixels() and Blit() which offer faster
 	  ways to render pixels on a canvas. Especially for OpenGL.
 	  Still not working properly though.
+	- OpenGL version of Blit now works and is a LOT faster than
+	  individual pixel drawing. Fixed fire and plasma procedural textures
+	  to use the new Blit() routine.
 15-Oct-2002
 	- Started work on the OpenGL implementation of SetRenderTarget().
 	  Added code in BeginDraw() to copy the texture to the display.
