@@ -1999,7 +1999,7 @@ bool csSpriteCal3DMeshObject::SetAnimAction(int idx, float delayIn,
     return false;
 
   calModel.getMixer()->executeAction(idx,delayIn,delayOut,
-  	1 /* ,factory->anims[idx]->lock */ );
+    1  ,factory->anims[idx]->lock  );
 
   return true;
 }
@@ -2012,7 +2012,7 @@ bool csSpriteCal3DMeshObject::SetAnimAction(const char *name, float delayIn,
     return false;
 
   calModel.getMixer()->executeAction(idx,delayIn,delayOut,
-  	1 /* ,factory->anims[idx]->lock */ );
+    1  ,factory->anims[idx]->lock  );
 
   return true;
 }
