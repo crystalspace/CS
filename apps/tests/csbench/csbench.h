@@ -58,7 +58,7 @@ private:
   csRef<iDocumentSystem> docsys;
   csRef<iCommandLineParser> cmdline;
   csRef<iView> view;
-  csRef<iGeneralMeshState> genmesh;
+  csRef<iGeneralMeshState> gmSingle;
   csRef<iStringSet> strings;
   iSector* room_single;
   iSector* room_multi;
@@ -68,7 +68,7 @@ private:
   	const char* name);
 
   bool SetupMaterials ();
-  iSector* CreateRoom (const char* name,
+  iSector* CreateRoom (const char* name, const char* meshname,
   	const csVector3& p1, const csVector3& p2);
   bool CreateTestCaseSingleBigObject ();
   bool CreateTestCaseMultipleObjects ();
@@ -78,7 +78,8 @@ private:
   iDocumentSystem* GetDocumentSystem ();
   iShaderManager* GetShaderManager ();
   void PerformShaderTest (const char* shaderPath, const char* shtype, 
-    const char* shaderPath2, const char* shtype2);
+    const char* shaderPath2, const char* shtype2, 
+    iGeneralMeshState* genmesh);
 
 public:
   CsBench ();

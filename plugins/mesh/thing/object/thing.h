@@ -677,7 +677,7 @@ private:
   struct csPolyGroup
   {
     iMaterialWrapper* material;
-    csArray<csPolygon3D*> polys;
+    csArray<size_t> polys;
   };
 
   /// Polys with the same material and the same SLM

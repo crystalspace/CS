@@ -173,15 +173,18 @@ bool CsBench::SetupMaterials ()
   material = engine->GetMaterialList ()->FindByName ("stone");
   csShaderVariable* normalSV = 
     material->GetMaterial()->GetVariableAdd (strings->Request ("tex normal"));
-  normalSV->SetValue (engine->GetTextureList()->FindByName ("stone_normal"));
+  iTextureWrapper* stoneDot3 = 
+    engine->GetTextureList()->FindByName ("stone_normal");
+  stoneDot3->SetTextureClass ("normalmap");
+  normalSV->SetValue (stoneDot3);
   return true;
 }
 
-iSector* CsBench::CreateRoom (const char* name,
+iSector* CsBench::CreateRoom (const char* name, const char* meshname,
 	const csVector3& p1, const csVector3& p2)
 {
   iSector* room2 = engine->CreateSector (name);
-  csRef<iMeshWrapper> walls = engine->CreateSectorWallsMesh (room2, "walls");
+  csRef<iMeshWrapper> walls = engine->CreateSectorWallsMesh (room2, meshname);
   csRef<iThingState> ws =
     SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
   csRef<iThingFactoryState> walls_state = ws->GetFactory ();
@@ -193,7 +196,7 @@ iSector* CsBench::CreateRoom (const char* name,
 
 bool CsBench::CreateTestCaseSingleBigObject ()
 {
-  iSector* room2 = CreateRoom ("room2_single",
+  iSector* room2 = CreateRoom ("room2_single", "room_single",
   	csVector3 (-5, -5, 5), csVector3 (5, 5, 15));
   // Create our factory.
   iMeshFactoryWrapper* fact = CreateGenmeshLattice (BIGOBJECT_DIM,
@@ -203,8 +206,11 @@ bool CsBench::CreateTestCaseSingleBigObject ()
   // Now create an instance:
   csRef<iMeshWrapper> mesh =
     engine->CreateMeshWrapper (fact, "complex", room2, csVector3 (0, 0, 10.0));
-  genmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iGeneralMeshState);
+  csRef<iGeneralMeshState> genmesh = 
+    SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iGeneralMeshState);
   genmesh->SetMaterialWrapper (material);
+  
+  gmSingle = genmesh;
 
   csRef<iLight> l;
   iLightList* ll = room2->GetLights ();
@@ -230,7 +236,7 @@ bool CsBench::CreateTestCaseSingleBigObject ()
 
 bool CsBench::CreateTestCaseMultipleObjects ()
 {
-  iSector* room2 = CreateRoom ("room2_multi",
+  iSector* room2 = CreateRoom ("room2_multi", "room_multi",
   	csVector3 (-5, -5, 5), csVector3 (5, 5, 15));
   // Create our factory.
   iMeshFactoryWrapper* fact = CreateGenmeshLattice (SMALLOBJECT_DIM,
@@ -246,7 +252,8 @@ bool CsBench::CreateTestCaseMultipleObjects ()
   {
     csRef<iMeshWrapper> mesh =
       engine->CreateMeshWrapper (fact, "small", room2, p);
-    genmesh = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iGeneralMeshState);
+    csRef<iGeneralMeshState> genmesh = 
+      SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iGeneralMeshState);
     genmesh->SetMaterialWrapper (material);
     p.x += step;
     p.y += step;
@@ -284,7 +291,8 @@ bool CsBench::Initialize (int argc, const char* const argv[],
   // Make sure the commandline has -verbose and -console for consistent
   // results.
   cmdline = CS_QUERY_REGISTRY (object_reg, iCommandLineParser);
-  cmdline->AddOption ("verbose", "true");
+  cmdline->AddOption ("verbose", "-scf");
+  cmdline->AddOption ("console", 0);
 
   if (!csInitializer::SetupConfigManager (object_reg, iConfigName))
     return ReportError ("Couldn't initialize app!");
@@ -385,7 +393,8 @@ float CsBench::BenchMark (const char* name, const char* description,
   csRef<iImage> shot = csPtr<iImage> (g2d->ScreenShot ());
   if (shot)
   {
-    csRef<iDataBuffer> shotbuf = imageio->Save (shot, "image/jpg", "");
+    csRef<iDataBuffer> shotbuf = imageio->Save (shot, "image/jpg", 
+      "compress=10");
     if (shotbuf)
     {
       csString filename;
@@ -436,7 +445,8 @@ iDocumentSystem* CsBench::GetDocumentSystem ()
 }
 
 void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype, 
-				 const char* shaderPath2, const char* shtype2)
+				 const char* shaderPath2, const char* shtype2,
+				 iGeneralMeshState* genmesh)
 {
   csRef<iShaderCompiler> shcom = GetShaderManager ()->GetCompiler ("XMLShader");
   csRef<iDocument> shaderDoc = GetDocumentSystem ()->CreateDocument ();
@@ -461,7 +471,11 @@ void CsBench::PerformShaderTest (const char* shaderPath, const char* shtype,
   csRef<iShaderPriorityList> prilist = shcom->GetPriorities (shadernode);
   size_t i;
   iMaterialWrapper* oldmat = material;
-  csRef<iMeshWrapper> walls (engine->FindMeshObject ("walls"));
+  //csRef<iMeshWrapper> walls (engine->FindMeshObject ("walls"));
+  //csRef<iMeshWrapper> walls (
+    //view->GetCamera()->GetSector()->GetMeshes()->FindByName ("walls"));
+  csRef<iMeshWrapper> walls (engine->FindMeshObject (
+    view->GetCamera()->GetSector()->QueryObject()->GetName()));
   csRef<iThingState> ws =
     SCF_QUERY_INTERFACE (walls->GetMeshObject (), iThingState);
   for (i = 0 ; i < prilist->GetCount () ; i++)
@@ -519,8 +533,8 @@ void CsBench::PerformTests ()
 
   g3d->SetOption ("StencilThreshold", "0");
   view->GetCamera ()->SetSector (room_single);
-  float stencil0 = BenchMark ("stencilclip_single",
-  	"Stencil clipping, single object");
+  float stencil0 = BenchMark ("stencilclip_single", 
+    "Stencil clipping, single object");
   view->GetCamera ()->SetSector (room_multi);
   BenchMark ("stencilclip_multi", "Stencil clipping, multiple objects");
 
@@ -537,14 +551,14 @@ void CsBench::PerformTests ()
   }
 
   view->GetCamera ()->SetSector (room_single);
-  PerformShaderTest ("/shader/std_lighting.xml", "standard", 0, 0);
+  PerformShaderTest ("/shader/std_lighting.xml", "standard", 0, 0, gmSingle);
 
   iRenderLoopManager* rlmgr = engine->GetRenderLoopManager ();
   csRef<iRenderLoop> loop = rlmgr->Load ("/shader/std_rloop_diffuse.xml");
   engine->SetCurrentDefaultRenderloop (loop);
 
   PerformShaderTest ("/shader/light_bumpmap.xml", "diffuse", 
-    "/shader/ambient.xml", "ambient");
+    "/shader/ambient.xml", "ambient", gmSingle);
 }
 
 /*---------------------------------------------------------------------*

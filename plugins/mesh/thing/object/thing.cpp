@@ -2660,7 +2660,8 @@ void csThing::PrepareLMs ()
       pg->polys.SetLength (slpg.polys.Length ());
       for (j = 0; j < slpg.polys.Length(); j++)
       {
-	pg->polys.Put (j, &polygons[slpg.polys[j]]);
+	//pg->polys.Put (j, &polygons[slpg.polys[j]]);
+	pg->polys.Put (j, slpg.polys[j]);
       }
       //pg->polys.ShrinkBestFit();
 
@@ -2680,7 +2681,7 @@ void csThing::PrepareLMs ()
       {
 	csPolygon3D* poly = &polygons[slpg.polys[j]];
 
-	lpg->polys.Put (j, poly);
+	lpg->polys.Put (j, slpg.polys[j]);
 	const csRect& r = slpg.lmRects[j];
 	csRef<iRendererLightmap> rlm = 
 	  SLM->RegisterLightmap (r.xmin, r.ymin, r.Width (), r.Height ());
@@ -2708,7 +2709,7 @@ void csThing::PrepareLMs ()
     pg->polys.SetLength (spg.polys.Length ());
     for (j = 0; j < spg.polys.Length(); j++)
     {
-      pg->polys.Put (j, &polygons[spg.polys[j]]);
+      pg->polys.Put (j, spg.polys[j]);
     }
     //pg->polys.ShrinkBestFit();
 
@@ -2759,29 +2760,29 @@ void csThing::UpdateDirtyLMs ()
     size_t j;
     for (j = 0; j < litPolys[i]->polys.Length (); j++)
     {
-      csPolygon3D *poly = litPolys[i]->polys[j];
-      csPolyTexture* lmi = poly->GetPolyTexture ();
+      csPolygon3D& poly = polygons[litPolys[i]->polys[j]];
+      csPolyTexture* lmi = poly.GetPolyTexture ();
       if (ident)
       {
-        poly->GetStaticPoly ()->MappingGetTextureSpace (m_world2tex,
+        poly.GetStaticPoly ()->MappingGetTextureSpace (m_world2tex,
 		v_world2tex);
       }
       else
       {
 	csMatrix3 m_obj2tex;
 	csVector3 v_obj2tex;
-        poly->GetStaticPoly ()->MappingGetTextureSpace (m_obj2tex,
+        poly.GetStaticPoly ()->MappingGetTextureSpace (m_obj2tex,
 		v_obj2tex);
-        csPolyTexture* lmi = poly->GetPolyTexture ();
+        csPolyTexture* lmi = poly.GetPolyTexture ();
         lmi->ObjectToWorld (m_obj2tex, v_obj2tex,
 		o2c, m_world2tex, v_world2tex);
       }
       if (lmi->GetLightVersion () != GetLightVersion ())
       {
         const csPlane3& world_plane = GetPolygonWorldPlaneNoCheck (
-		poly->GetPolyIdx ());
+		poly.GetPolyIdx ());
 	csLightingScratchBuffer& scratch = static_data->thing_type->lightingScratch;
-        if (lmi->RecalculateDynamicLights (m_world2tex, v_world2tex, poly,
+        if (lmi->RecalculateDynamicLights (m_world2tex, v_world2tex, &poly,
 		world_plane, scratch))
         {
 	  litPolys[i]->lightmaps[j]->SetData (

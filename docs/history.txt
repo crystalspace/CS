@@ -9,6 +9,12 @@ chronological order.
 11-Mar-2005
 	- Jorrit fixed the simple2 tutorial in the documentation so that it
 	  explicitly states that you shouldn't use the scale.
+	- res made a tweak to csuctransform.h to allow compilation for 
+	  external projects.
+	- res fixed a problem where elements of csPolyGroup::polys would point
+	  to freed memory. Fixed by using an index into an array instead.
+	- res made csbench work again. Issues were above Thing problem but also
+	  that wrong mesh objects were used for the light_bumpmap shader test.
 10-Mar-2005
 	- Fixed flarge so that the name of the 'fire' texture plugin
 	  no longer conflicts with the name of the 'fire' mesh loader plugin
