@@ -995,7 +995,7 @@ drawline:
 }
 
 // Define the skin for windowing system
-SKIN_DECLARE_DEFAULT (DefaultSkin);
+CSWS_SKIN_DECLARE_DEFAULT (DefaultSkin);
 
 /*
  * Main function

@@ -68,6 +68,12 @@ The history order is reversed so that new features are at the top.
 		--> CS_GET_FIRST_NAMED_CHILD_OBJECT()
 	    GET_FIRST_NAMED_CHILD_OBJECT_FAST()
 		--> CS_GET_FIRST_NAMED_CHILD_OBJECT_FAST()
+	- Eric Sunshine added a "CSWS_" prefix to the following skin-related
+	  macros from CSWS:
+	    SKIN_DECLARE()              --> CSWS_SKIN_DECLARE()
+	    SKIN_SLICE()                --> CSWS_SKIN_SLICE()
+	    SKIN_DECLARE_END            --> CSWS_SKIN_DECLARE_END
+	    CSWS_SKIN_DECLARE_DEFAULT() --> CSWS_CSWS_SKIN_DECLARE_DEFAULT()
 3-Jul-2001
 	- Fixed the Python plugin after Martin's changes.
 	- Added iEngine::GetCameraPosition() which takes a name as a parameter

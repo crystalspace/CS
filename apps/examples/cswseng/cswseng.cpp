@@ -527,7 +527,7 @@ void ceCswsEngineApp::LoadNewMap (const char* filename)
 /*---------------------------------------------------------------------*
  * Main function
  *---------------------------------------------------------------------*/
-SKIN_DECLARE_DEFAULT (DefaultSkin);
+CSWS_SKIN_DECLARE_DEFAULT (DefaultSkin);
 
 int main (int argc, char* argv[])
 {

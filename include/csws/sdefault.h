@@ -23,16 +23,16 @@
 #include "csskin.h"
 #include "csbackgr.h"
 
-#define SKIN_DECLARE_DEFAULT(var)	\
-  SKIN_DECLARE (my##var##Type, csSkin);	\
-    SKIN_SLICE (DefaultScrollBar);		\
-    SKIN_SLICE (DefaultButton);		\
-    SKIN_SLICE (DefaultWindow);		\
-    SKIN_SLICE (DefaultDialog);		\
-    SKIN_SLICE (DefaultTitlebar);		\
-    SKIN_SLICE (DefaultListBox);		\
-    SKIN_SLICE (DefaultListBoxItem);		\
-  SKIN_DECLARE_END var
+#define CSWS_SKIN_DECLARE_DEFAULT(var)	\
+  CSWS_SKIN_DECLARE (my##var##Type, csSkin);	\
+    CSWS_SKIN_SLICE (DefaultScrollBar);		\
+    CSWS_SKIN_SLICE (DefaultButton);		\
+    CSWS_SKIN_SLICE (DefaultWindow);		\
+    CSWS_SKIN_SLICE (DefaultDialog);		\
+    CSWS_SKIN_SLICE (DefaultTitlebar);		\
+    CSWS_SKIN_SLICE (DefaultListBox);		\
+    CSWS_SKIN_SLICE (DefaultListBoxItem);		\
+  CSWS_SKIN_DECLARE_END var
 
 class csButton;
 class csListBox;

@@ -307,7 +307,7 @@ public:
  * into your program (e.g. if you don't use the tree view, you don't need
  * the tree view skin either - and a single skin slice can be as big as
  * 30K of code or even more!). For simple programs you can use the simple
- * SKIN_DECLARE_XXX macros (defined inside the respective skin header file)
+ * CSWS_SKIN_DECLARE_XXX macros (defined inside the respective skin header file)
  * which includes ALL the components of the skin; but if you want a finer
  * grade of control you should use the macros below.
  */
@@ -318,7 +318,7 @@ public:
  * <p>`base' is the base class of the skin (e.g. "csSkin")
  * <p>`prefix' is the prefix for section names in CSWS' configuration file
  */
-#define SKIN_DECLARE(name,base)	\
+#define CSWS_SKIN_DECLARE(name,base)	\
   class name : public base	\
   {				\
   public:			\
@@ -329,19 +329,19 @@ public:
  * that is in process of definition. "comp" is the component
  * name, e.g. "Button", "Window" and so on.
  */
-#define SKIN_SLICE(comp)	\
+#define CSWS_SKIN_SLICE(comp)	\
       InsertSorted (new cs##comp##Skin);
 
 /**
  * Finish the definition of a skin.
- * After SKIN_DECLARE_END you should put either a variable name
- * (e.g. "SKIN_DECLARE_END myskin;") or simply a ';' - in the later
+ * After CSWS_SKIN_DECLARE_END you should put either a variable name
+ * (e.g. "CSWS_SKIN_DECLARE_END myskin;") or simply a ';' - in the later
  * case you will define just a <b>type</b> called [name], where
- * `name' is the first parameter passed to SKIN_DECLARE(), and you will 
+ * `name' is the first parameter passed to CSWS_SKIN_DECLARE(), and you will 
  * have to declare somewhere a variable of this type in order to use
  * the skin.
  */
-#define SKIN_DECLARE_END	\
+#define CSWS_SKIN_DECLARE_END	\
     }				\
   }
 
