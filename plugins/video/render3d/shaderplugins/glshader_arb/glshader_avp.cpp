@@ -131,10 +131,19 @@ bool csShaderGLAVP::LoadProgramStringToGL(const char* programstring)
   glGetIntegerv(GL_PROGRAM_ERROR_POSITION_ARB, &errorpos);
   if(errorpos != -1)
   {
+    char* end = strchr (programstring+errorpos, '\n');
+    if (end)
+      *(end-1) = 0;
+    const char* start = strrchr (programstring, '\n');
+    if (!start)
+      start = programstring+errorpos;
+    else
+      start++;
+
     csReport ( object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glarb",
       "Couldn't load vertexprogram", NULL);
     csReport ( object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glarb",
-      "Programerror at %d", errorpos);
+      "Programerror at: \"%s\"", start);
     csReport ( object_reg, CS_REPORTER_SEVERITY_WARNING,"crystalspace.render3d.shader.glarb",
       "Errorstring %s", programErrorString);
     return false;
