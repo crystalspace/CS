@@ -300,8 +300,11 @@ again:
 	      modified = true;
 	      // If child is now completely full/inside then we can set
 	      // the state of this bit to full as well.
-	      new_msk_in |= 1 << (CS_CM_MASKBITS-bits);
-	      new_msk_out &= ~(1 << (CS_CM_MASKBITS-bits));
+	      if (children[idx].IsFull ())
+	      {
+	        new_msk_in |= 1 << (CS_CM_MASKBITS-bits);
+	        new_msk_out &= ~(1 << (CS_CM_MASKBITS-bits));
+	      }
 	    }
 	  }
 	}
@@ -371,9 +374,9 @@ again:
     {
       for (c = 0 ; c < Child::GetHorizontalSize () ; c++)
         for (r = 0 ; r < Child::GetVerticalSize () ; r++)
-      	  ig2d->DrawPixel (new_hor_offs+c, new_ver_offs+r, ~0);
+      	  ig2d->DrawPixel (new_hor_offs+c, ig2d->GetHeight () - (new_ver_offs+r), ~0);
     }
-    else if (OUTSIDE (msk_in))
+    else if (OUTSIDE (msk_out))
     {
       // Nothing to dump here.
     }
@@ -394,17 +397,17 @@ again:
       {
         for (c = 0 ; c < Child::GetHorizontalSize () ; c++)
           for (r = 0 ; r < Child::GetVerticalSize () ; r++)
-      	    ig2d->DrawPixel (new_hor_offs+c, new_ver_offs+r, 0x5555);
+      	    ig2d->DrawPixel (new_hor_offs+c, ig2d->GetHeight () - (new_ver_offs+r), 0x5555);
       }
     }
     if (level <= 1)
     {
       for (c = 0 ; c < Child::GetHorizontalSize () ; c++)
       	ig2d->DrawPixel (new_hor_offs+c,
-		new_ver_offs+Child::GetVerticalSize ()-1, 0xaaaa);
+		ig2d->GetHeight () - (new_ver_offs+Child::GetVerticalSize ()-1), 0xaaaa);
       for (r = 0 ; r < Child::GetVerticalSize () ; r++)
         ig2d->DrawPixel (new_hor_offs+Child::GetHorizontalSize ()-1,
-		new_ver_offs+r, 0xaaaa);
+		ig2d->GetHeight () - (new_ver_offs+r), 0xaaaa);
     }
 
     // Go to next bit.
@@ -477,7 +480,7 @@ again:
   {
     // If bit in polygon mask is zero (i.e. outside polygon)
     // then nothing happens.
-    if (INSIDE (pol_in) && OUTSIDE (msk_in)) return true;
+    if (INSIDE (pol_in) && NOT_INSIDE (msk_in)) return true;
 
     // Go to next bit.
     pol_in >>= 1;
@@ -552,7 +555,7 @@ again:
     if (INSIDE (pol_in))
     {
       // Otherwise we test this mask. If outside then we have a hit.
-      if (OUTSIDE (msk_in))
+      if (NOT_INSIDE (msk_in))
       {
       	modified = true;
 	new_msk_in |= 1 << (CS_CM_MASKBITS-bits);
@@ -605,7 +608,7 @@ again:
     {
       col = idx & CS_CM_HORMASK;
       row = idx >> CS_CM_HORSHIFT;
-      ig2d->DrawPixel (hor_offs+col, ver_offs+row, ~0);
+      ig2d->DrawPixel (hor_offs+col, ig2d->GetHeight () - (ver_offs+row), ~0);
     }
 
     // Go to next bit.
