@@ -17,7 +17,9 @@ rule Nasm
 {
   Depends $(<) : $(>) ;
   NASM.FLAGS on $(<) += $(NASM.FLAGS) ;
-  local includeflags = [ FIncludes $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ] ;
+  # NASM doesn't scan for headers in current dir of the files, so add the dir of
+  # the file to the -I flags
+  local includeflags = [ FIncludes $(SEARCH_SOURCE)/$(<:D) $(SUBDIRHDRS) $(HDRS) ] ;
   # NASM requires that -I paths have a trailing slash.
   INCLUDEFLAGS on $(<) = $(includeflags)$(SLASH) ;
 }
