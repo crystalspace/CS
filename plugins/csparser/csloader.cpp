@@ -27,6 +27,7 @@
 #include "cstool/crossb.h"
 #include "cstool/sndwrap.h"
 #include "cstool/mapnode.h"
+#include "cstool/mdltool.h"
 #include "csgfx/csimage.h"
 #include "csloader.h"
 
@@ -59,6 +60,9 @@
 #include "imesh/thing/polygon.h"
 #include "imesh/thing/portal.h"
 #include "imesh/thing/thing.h"
+#include "imesh/mdlconv.h"
+#include "imesh/mdldata.h"
+#include "imesh/crossbld.h"
 #include "ivaria/reporter.h"
 
 //---------------------------------------------------------------------------
@@ -733,6 +737,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
   char str[255];
   iLoaderPlugin* plug = NULL;
   str[0] = 0;
+  iMaterialWrapper *mat = NULL;
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
@@ -778,7 +783,7 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
       case CS_TOKEN_MATERIAL:
         {
           csScanStr (params, "%s", str);
-          iMaterialWrapper *mat = FindMaterial (str);
+          mat = FindMaterial (str);
           if (mat)
 	  {
 	    iSprite3DFactoryState* state = SCF_QUERY_INTERFACE (
@@ -803,27 +808,52 @@ bool csLoader::LoadMeshObjectFactory (iMeshFactoryWrapper* stemp, char* buf,
 	  converter* filedata = new converter;
 	  if (filedata->ivcon (str, true, false, NULL, VFS) == ERROR)
 	  {
-            ReportError (
-	      "crystalspace.maploader.parse.loadingmodel",
-	      "Error loading file model '%s'!", str);
-	    delete filedata;
-	    return false;
-	  }
-  	  iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
+	    iDataBuffer *buf = VFS->ReadFile (str);
+	    if (!buf)
+	    {
+              ReportError (
+	        "crystalspace.maploader.parse.loadingmodel",
+	        "Error opening file model '%s'!", str);
+  	      delete filedata;
+	      return false;
+	    }
+
+	    iModelData *Model = ModelConverter->Load (buf->GetUint8 (), buf->GetSize ());
+	    buf->DecRef ();
+            if (!Model) {
+              ReportError (
+ 	        "crystalspace.maploader.parse.loadingmodel",
+	        "Error loading file model '%s'!", str);
+	      delete filedata;
+	      return false;
+	    }
+
+	    csModelDataTools::SplitObjectsByMaterial (Model);
+	    csModelDataTools::MergeObjects (Model, false);
+	    iMeshFactoryWrapper *stemp2 =
+	      CrossBuilder->BuildSpriteFactoryHierarchy (Model, Engine, mat);
+	    Model->DecRef ();
+
+	    stemp->SetMeshObjectFactory (stemp2->GetMeshObjectFactory ());
+	    for (int i=0; i<stemp2->GetChildCount (); i++)
+	      stemp->AddChild (stemp2->GetChild (i), csReversibleTransform ());
+	  } else {
+  	    iMeshObjectType* type = CS_QUERY_PLUGIN_CLASS (plugin_mgr,
 	  	"crystalspace.mesh.object.sprite.3d", "MeshObj",
 		iMeshObjectType);
-  	  if (!type)
-  	  {
-    	    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.sprite.3d",
-	    	"MeshObj", iMeshObjectType);
-    	    printf ("Load TYPE plugin crystalspace.mesh.object.sprite.3d\n");
-  	  }
-	  iMeshObjectFactory* fact = type->NewFactory ();
-	  stemp->SetMeshObjectFactory (fact);
-	  fact->DecRef ();
-	  csCrossBuild_SpriteTemplateFactory builder (object_reg);
-	  builder.CrossBuild (fact, *filedata);
-	  delete filedata;
+  	    if (!type)
+  	    {
+      	      type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.sprite.3d",
+	    	  "MeshObj", iMeshObjectType);
+    	      printf ("Load TYPE plugin crystalspace.mesh.object.sprite.3d\n");
+  	    }
+	    iMeshObjectFactory* fact = type->NewFactory ();
+	    stemp->SetMeshObjectFactory (fact);
+	    fact->DecRef ();
+	    csCrossBuild_SpriteTemplateFactory builder (object_reg);
+	    builder.CrossBuild (fact, *filedata);
+	  }
+          delete filedata;
         }
         break;
 
@@ -1667,7 +1697,8 @@ SCF_EXPORT_CLASS_TABLE (csparser)
     "crystalspace.sound.loader., crystalspace.image.loader, "
     "crystalspace.mesh.loader., "
     "crystalspace.engine.3d, crystalspace.graphics3d., "
-    "crystalspace.sound.render., crystalspace.motion.manager.")
+    "crystalspace.sound.render., crystalspace.motion.manager., "
+    "crystalspace.mesh.crossbuilder, crystalspace.modelconverter.")
 SCF_EXPORT_CLASS_TABLE_END
 
 CS_IMPLEMENT_PLUGIN
@@ -1685,6 +1716,8 @@ csLoader::csLoader(iBase *p)
   G3D = NULL;
   SoundRender = NULL;
   MotionManager = NULL;
+  ModelConverter = NULL;
+  CrossBuilder = NULL;
 
   flags = 0;
   ResolveOnlyRegion = false;
@@ -1701,6 +1734,8 @@ csLoader::~csLoader()
   SCF_DEC_REF(G3D);
   SCF_DEC_REF(SoundRender);
   SCF_DEC_REF(MotionManager);
+  SCF_DEC_REF(ModelConverter);
+  SCF_DEC_REF(CrossBuilder);
   delete Stats;
 }
 
@@ -1733,6 +1768,9 @@ bool csLoader::Initialize(iObjectRegistry *object_Reg)
   GET_PLUGIN (G3D, CS_FUNCID_VIDEO, iGraphics3D, "video-driver");
   GET_PLUGIN (SoundRender, CS_FUNCID_SOUND, iSoundRender, "sound-driver");
   GET_PLUGIN (MotionManager, CS_FUNCID_MOTION, iMotionManager, "motion-manager");
+  GET_PLUGIN (ModelConverter, CS_FUNCID_CONVERTER, iModelConverter, "model-converter");
+  GET_PLUGIN (CrossBuilder, CS_FUNCID_CROSSBUILDER, iCrossBuilder, "model-crossbuilder");
+
   return true;
 }
 

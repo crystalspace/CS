@@ -104,6 +104,10 @@ struct iPlugin : public iBase
 #define CS_FUNCID_MOTION	"MotionManager"
 /// Reporting
 #define CS_FUNCID_REPORTER	"Reporter"
+/// Model Importer
+#define CS_FUNCID_CONVERTER	"Converter"
+/// Model Crossbuilder
+#define CS_FUNCID_CROSSBUILDER	"CrossBuilder"
 
 /**
  * Query a pointer to some plugin through the Plugin Manager interface.

@@ -363,7 +363,6 @@ iMeshFactoryWrapper *csCrossBuilder::BuildSpriteFactoryHierarchy (
       "crystalspace.mesh.object.sprite.3d", NULL);
     if (!SubWrapper) {
       // seems like building 3d sprites is impossible
-      Engine->GetMeshFactories ()->RemoveMeshFactory (MainWrapper);
       return NULL;
     }
 
@@ -372,7 +371,7 @@ iMeshFactoryWrapper *csCrossBuilder::BuildSpriteFactoryHierarchy (
     if (!sfState) {
       // impossible to query the correct interface, maybe because
       // of a version conflict
-      Engine->GetMeshFactories ()->RemoveMeshFactory (MainWrapper);
+      Engine->GetMeshFactories ()->RemoveMeshFactory (SubWrapper);
       return NULL;
     }
     

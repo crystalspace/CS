@@ -1,0 +1,66 @@
+WORLD (
+  TEXTURES (
+    TEXTURE 'oldmetal.gif' (FILE (/lib/stdtex/oldmetal.jpg))
+    TEXTURE 'parket.gif' (FILE (/lib/stdtex/parket.jpg))
+    TEXTURE 'asphalt.gif' (FILE (/lib/stdtex/asphalt.jpg))
+    TEXTURE 'mosaic.gif' (FILE (/lib/stdtex/mosaic.jpg))
+  )
+  MATERIALS (
+    MATERIAL 'mosaic' (TEXTURE ('mosaic.gif'))
+    MATERIAL 'oldmetal' (TEXTURE ('oldmetal.gif'))
+    MATERIAL 'parket' (TEXTURE ('parket.gif'))
+    MATERIAL 'asphalt' (TEXTURE ('asphalt.gif'))
+  )
+  RENDERPRIORITIES (
+    PRIORITY 'sky' (1,NONE)
+    PRIORITY 'wall' (2,NONE)
+    PRIORITY 'object' (3,NONE)
+    PRIORITY 'alpha' (4,BACK2FRONT)
+  )
+  PLUGINS (
+    PLUGIN 'thing' ('crystalspace.mesh.loader.thing')
+    PLUGIN 'thingFact' ('crystalspace.mesh.loader.factory.thing')
+    PLUGIN 'plane' ('crystalspace.mesh.loader.thing.plane')
+    PLUGIN 'spr3dFact' ('crystalspace.mesh.loader.factory.sprite.3d')
+    PLUGIN 'spr3d' ('crystalspace.mesh.loader.sprite.3d')
+  )
+
+  MESHFACT 'test' (
+    PLUGIN ('spr3d')
+    FILE (/lev/mdltest/model)
+    MATERIAL ('mosaic')
+  )
+
+  SECTOR 'room' (
+    MESHOBJ 'walls' (
+      PLUGIN ('thing')
+      PARAMS (
+        MATERIAL ('oldmetal')
+        VERTEX (-5,-5,-5)
+        VERTEX (-5,-5,+5)
+        VERTEX (+5,-5,+5)
+        VERTEX (+5,-5,-5)
+        VERTEX (-5,+5,-5)
+        VERTEX (-5,+5,+5)
+        VERTEX (+5,+5,+5)
+        VERTEX (+5,+5,-5)
+
+        POLYGON (VERTICES (0,1,2,3))
+        POLYGON (VERTICES (1,0,4,5))
+        POLYGON (VERTICES (2,1,5,6))
+        POLYGON (VERTICES (3,2,6,7))
+        POLYGON (VERTICES (0,3,7,4))
+        POLYGON (VERTICES (7,6,5,4))
+      )
+      ZFILL ()
+    )
+    LIGHT (0,0,0:3,1,1,1,0)
+
+    MESHOBJ (
+      PLUGIN ('spr3d')
+      PARAMS (FACTORY (test))
+    )
+    ZUSE ()
+  )
+)
+

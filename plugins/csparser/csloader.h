@@ -41,6 +41,8 @@ struct iMotionManager;
 struct iLoaderPlugin;
 struct iObjectRegistry;
 struct iPluginManager;
+struct iModelConverter;
+struct iCrossBuilder;
 
 struct iObject;
 struct iThingState;
@@ -253,6 +255,10 @@ public:
   iSoundRender *SoundRender;
   // motion manager
   iMotionManager *MotionManager;
+  // model converter
+  iModelConverter *ModelConverter;
+  // crossbuilder
+  iCrossBuilder *CrossBuilder;
 
   // constructor
   csLoader(iBase *p);
