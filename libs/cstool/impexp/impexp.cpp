@@ -805,11 +805,6 @@ int converter::data_read ( void ) {
   else if ( leqi ( filein_type, "VLA" ) == TRUE ) {
     ierror = vla_read ( filein );
   }
-  else if ( leqi ( filein_type, "MD2" ) == TRUE) {
-    // make sure libs/csutil/md2/md2.cpp is linked in or this
-    // will give the linker problems!
-    ierror = md2_read ( filein );
-  }
   else if ( leqi ( filein_type, "MDL" ) == TRUE) {
     ierror = mdl_read ( filein );
   }
