@@ -451,7 +451,11 @@ struct iMeshList : public iBase
   /// Find a mesh and return its index
   virtual int Find (iMeshWrapper *obj) const = 0;
 
-  /// Find a mesh by name
+  /**
+   * Find a mesh by name. If there is a colon in the name
+   * then this function is able to search for children too.
+   * i.e. like mesh:childmesh:childmesh.
+   */
   virtual iMeshWrapper *FindByName (const char *Name) const = 0;
 };
 

@@ -345,11 +345,19 @@ iSector *csRegion::Region::FindSector (const char *iName)
   return sector;	// DecRef is ok here.
 }
 
-iMeshWrapper *csRegion::Region::FindMeshObject (const char *iName)
+iMeshWrapper *csRegion::Region::FindMeshObject (const char *Name)
 {
-  csRef<iMeshWrapper> m (CS_GET_NAMED_CHILD_OBJECT (
-      scfParent, iMeshWrapper, iName));
-  return m;	// DecRef is ok here.
+  if (strchr (Name, ':'))
+  {
+    //@@@@@@@@@@@@@@@@@ TODO!!!
+    return NULL;
+  }
+  else
+  {
+    csRef<iMeshWrapper> m (CS_GET_NAMED_CHILD_OBJECT (
+        scfParent, iMeshWrapper, Name));
+    return m;	// DecRef is ok here.
+  }
 }
 
 iMeshFactoryWrapper *csRegion::Region::FindMeshFactory (const char *iName)

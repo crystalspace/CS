@@ -31,6 +31,11 @@ The history order is reversed so that new features are at the top.
 	  that the end result of a timed operation is well defined.
 	- Added rotation command to the engine sequence manager and modified
 	  flarge to use it.
+	- Added the ability for iMeshList->FindByName() to look for children
+	  in mesh objects too. Use the : notation for this like:
+	  	name1:name2:name3:...
+	  Doesn't work for region/name1:name2... yet.
+	- Some new sequence stuff in flarge. Unfinished.
 22-Sep-2002
 	- Modified iMeshWrapper->SetDrawCallback() so that multiple
 	  callbacks are now supported. Added RemoveDrawCallback() and

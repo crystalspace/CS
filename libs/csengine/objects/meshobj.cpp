@@ -612,6 +612,23 @@ csMeshList::csMeshList ()
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiMeshList);
 }
 
+iMeshWrapper* csMeshList::FindByNameWithChild (const char *Name) const
+{
+  char* p = strchr (Name, ':');
+  if (!p) return FindByName (Name);
+
+  int i;
+  for (i = 0 ; i < Length () ; i++)
+  {
+    iMeshWrapper* m = Get (i);
+    if (!strncmp (m->QueryObject ()->GetName (), Name, p-Name))
+    {
+      return m->GetChildren ()->FindByName (p+1);
+    }
+  }
+  return NULL;
+}
+
 int csMeshList::MeshList::GetCount () const
 {
   return scfParent->Length ();
@@ -652,7 +669,10 @@ int csMeshList::MeshList::Find (iMeshWrapper *obj) const
 
 iMeshWrapper *csMeshList::MeshList::FindByName (const char *Name) const
 {
-  return scfParent->FindByName (Name);
+  if (strchr (Name, ':'))
+    return scfParent->FindByNameWithChild (Name);
+  else
+    return scfParent->FindByName (Name);
 }
 
 //--------------------------------------------------------------------------

@@ -300,6 +300,86 @@
             <secondlen>5</secondlen>
         </params>
     </addon>
+    <meshfact name="square">
+        <plugin>meshFact</plugin>
+        <params>
+            <numvt>4</numvt>
+            <numtri>4</numtri>
+            <v x="-2" y="0" z="-2" u="0" v="0" />
+            <v x="2" y="0" z="-2" u="1" v="0" />
+            <v x="2" y="0" z="2" u="1" v="1" />
+            <v x="-2" y="0" z="2" u="0" v="1" />
+            <t v1="3" v2="0" v3="1" />
+            <t v1="1" v2="2" v3="3" />
+            <t v1="1" v2="0" v3="3" />
+            <t v1="3" v2="2" v3="1" />
+            <autonormals />
+        </params>
+    </meshfact>
+    <meshfact name="squareL">
+        <plugin>meshFact</plugin>
+        <params>
+            <numvt>4</numvt>
+            <numtri>4</numtri>
+            <v x="-2" y="0" z="-2" u="0" v="0" />
+            <v x="-2" y="4" z="-2" u="1" v="0" />
+            <v x="-2" y="4" z="2" u="1" v="1" />
+            <v x="-2" y="0" z="2" u="0" v="1" />
+            <t v1="3" v2="0" v3="1" />
+            <t v1="1" v2="2" v3="3" />
+            <t v1="1" v2="0" v3="3" />
+            <t v1="3" v2="2" v3="1" />
+            <autonormals />
+        </params>
+    </meshfact>
+    <meshfact name="squareR">
+        <plugin>meshFact</plugin>
+        <params>
+            <numvt>4</numvt>
+            <numtri>4</numtri>
+            <v x="2" y="0" z="-2" u="0" v="0" />
+            <v x="2" y="4" z="-2" u="1" v="0" />
+            <v x="2" y="4" z="2" u="1" v="1" />
+            <v x="2" y="0" z="2" u="0" v="1" />
+            <t v1="3" v2="0" v3="1" />
+            <t v1="1" v2="2" v3="3" />
+            <t v1="1" v2="0" v3="3" />
+            <t v1="3" v2="2" v3="1" />
+            <autonormals />
+        </params>
+    </meshfact>
+    <meshfact name="squareU">
+        <plugin>meshFact</plugin>
+        <params>
+            <numvt>4</numvt>
+            <numtri>4</numtri>
+            <v x="-2" y="0" z="2" u="0" v="0" />
+            <v x="2" y="0" z="2" u="1" v="0" />
+            <v x="2" y="4" z="2" u="1" v="1" />
+            <v x="-2" y="4" z="2" u="0" v="1" />
+            <t v1="3" v2="0" v3="1" />
+            <t v1="1" v2="2" v3="3" />
+            <t v1="1" v2="0" v3="3" />
+            <t v1="3" v2="2" v3="1" />
+            <autonormals />
+        </params>
+    </meshfact>
+    <meshfact name="squareD">
+        <plugin>meshFact</plugin>
+        <params>
+            <numvt>4</numvt>
+            <numtri>4</numtri>
+            <v x="-2" y="0" z="-2" u="0" v="0" />
+            <v x="2" y="0" z="-2" u="1" v="0" />
+            <v x="2" y="4" z="-2" u="1" v="1" />
+            <v x="-2" y="4" z="-2" u="0" v="1" />
+            <t v1="3" v2="0" v3="1" />
+            <t v1="1" v2="2" v3="3" />
+            <t v1="1" v2="0" v3="3" />
+            <t v1="3" v2="2" v3="1" />
+            <autonormals />
+        </params>
+    </meshfact>
     <meshfact name="genMeshFact">
         <plugin>meshFact</plugin>
         <params>
@@ -19027,6 +19107,9 @@
                     <v>3</v>
                     <v>1</v>
                     <v>0</v>
+                    <portal>
+                        <sector>kamer2l1</sector>
+                    </portal>
                     <texmap>
                         <matrix>
                             <m11>0</m11>
@@ -19084,6 +19167,165 @@
                 </p>
             </params>
         </meshobj>
+    </sector>
+    <sector name="kamer2l1">
+        <meshobj name="walls">
+            <plugin>thing</plugin>
+            <zfill />
+            <params>
+                <v x="-38" y="-19" z="11" />
+                <v x="-38" y="-19" z="16" />
+                <v x="-38" y="-14" z="11" />
+                <v x="-38" y="-14" z="16" />
+                <v x="-19" y="-19" z="11" />
+                <v x="-19" y="-19" z="16" />
+                <v x="-19" y="-14" z="11" />
+                <v x="-19" y="-14" z="16" />
+                <material>asphalt</material>
+		<texlen>2</texlen>
+                <p name="north">
+                    <v>3</v> <v>7</v> <v>5</v> <v>1</v>
+                </p>
+                <p name="east">
+                    <v>7</v> <v>6</v> <v>4</v> <v>5</v>
+                    <portal>
+                        <sector>kamer2l</sector>
+                    </portal>
+                </p>
+                <p name="south">
+                    <v>6</v> <v>2</v> <v>0</v> <v>4</v>
+                </p>
+                <p name="west">
+                    <v>2</v> <v>3</v> <v>1</v> <v>0</v>
+                    <portal>
+                        <sector>kamer2l2</sector>
+                    </portal>
+                </p>
+                <p name="up">
+                    <v>2</v> <v>6</v> <v>7</v> <v>3</v>
+                </p>
+                <p name="down">
+                    <v>1</v> <v>5</v> <v>4</v> <v>0</v>
+                </p>
+            </params>
+        </meshobj>
+    </sector>
+    <sector name="kamer2l2">
+        <meshobj name="walls">
+            <plugin>thing</plugin>
+            <zfill />
+            <params>
+                <v x="-57" y="-19" z="11" />
+                <v x="-57" y="-19" z="16" />
+                <v x="-57" y="-14" z="11" />
+                <v x="-57" y="-14" z="16" />
+                <v x="-38" y="-19" z="11" />
+                <v x="-38" y="-19" z="16" />
+                <v x="-38" y="-14" z="11" />
+                <v x="-38" y="-14" z="16" />
+                <material>asphalt</material>
+		<texlen>2</texlen>
+                <p name="north">
+                    <v>3</v> <v>7</v> <v>5</v> <v>1</v>
+                </p>
+                <p name="east">
+                    <v>7</v> <v>6</v> <v>4</v> <v>5</v>
+                    <portal>
+                        <sector>kamer2l1</sector>
+                    </portal>
+                </p>
+                <p name="south">
+                    <v>6</v> <v>2</v> <v>0</v> <v>4</v>
+                </p>
+                <p name="west">
+                    <v>2</v> <v>3</v> <v>1</v> <v>0</v>
+                    <portal>
+                        <sector>kamer2lhuge</sector>
+			<clip />
+                    </portal>
+                </p>
+                <p name="up">
+                    <v>2</v> <v>6</v> <v>7</v> <v>3</v>
+                </p>
+                <p name="down">
+                    <v>1</v> <v>5</v> <v>4</v> <v>0</v>
+                </p>
+            </params>
+        </meshobj>
+    </sector>
+    <sector name="kamer2lhuge">
+        <meshobj name="exterior">
+            <plugin>crystalspace.mesh.loader.ball</plugin>
+            <zfill />
+            <priority>wall</priority>
+            <params>
+                <factory>ballFact</factory>
+                <material>asphalt</material>
+                <numrim>12</numrim>
+                <radius x="100" y="100" z="100" />
+                <shift x="0" y="0" z="0" />
+		<reversed />
+            </params>
+            <move>
+                <v x="-80" y="-16" z="13" />
+            </move>
+        </meshobj>
+        <meshobj name="floorplate">
+            <plugin>mesh</plugin>
+            <params>
+                <factory>square</factory>
+                <material>mosaic</material>
+            </params>
+            <move>
+                <v x="-80" y="-16" z="13" />
+            </move>
+            <meshobj name="plateL">
+                <plugin>mesh</plugin>
+                <params>
+                    <factory>squareL</factory>
+                    <material>mosaic</material>
+                </params>
+                <move>
+                    <v x="0" y="0" z="0" />
+                </move>
+            </meshobj>
+            <meshobj name="plateR">
+                <plugin>mesh</plugin>
+                <params>
+                    <factory>squareR</factory>
+                    <material>mosaic</material>
+                </params>
+                <move>
+                    <v x="0" y="0" z="0" />
+                </move>
+            </meshobj>
+            <meshobj name="plateU">
+                <plugin>mesh</plugin>
+                <params>
+                    <factory>squareU</factory>
+                    <material>mosaic</material>
+                </params>
+                <move>
+                    <v x="0" y="0" z="0" />
+                </move>
+            </meshobj>
+            <meshobj name="plateD">
+                <plugin>mesh</plugin>
+                <params>
+                    <factory>squareD</factory>
+                    <material>mosaic</material>
+                </params>
+                <move>
+                    <v x="0" y="0" z="0" />
+                </move>
+            </meshobj>
+        </meshobj>
+        <light name="hugeroom_light">
+            <center x="-80" y="-16" z="13" />
+            <radius>200</radius>
+            <color red="0" green="0.2" blue="0.7" />
+            <dynamic />
+        </light>
     </sector>
     <sector name="gang">
         <meshobj name="walls">
@@ -22618,16 +22860,16 @@
 
     <sequences>
         <sequence name="fogloop">
-	    <fadefog sector="kamer2l" red="1" green="1" blue="1" density="0.1"
+	    <fadefog sector="kamer2l" red="1" green="1" blue="1" density="0.05"
 	    	duration="1000" />
 	    <delay>1000</delay>
-	    <fadefog sector="kamer2l" red="1" green="0" blue="0" density="0.2"
+	    <fadefog sector="kamer2l" red="1" green="0" blue="0" density="0.02"
 	    	duration="1000" />
 	    <delay>1000</delay>
-	    <fadefog sector="kamer2l" red="0" green="1" blue="0" density="0.1"
+	    <fadefog sector="kamer2l" red="0" green="1" blue="0" density="0.01"
 		duration="1000" />
 	    <delay>1000</delay>
-	    <fadefog sector="kamer2l" red="0" green="0" blue="1" density="0.2"
+	    <fadefog sector="kamer2l" red="0" green="0" blue="1" density="0.02"
 	    	duration="1000" />
 	    <delay>1000</delay>
 	    <runsequence>fogloop</runsequence>
@@ -22653,12 +22895,41 @@
 	    <runsequence>animlight</runsequence>
 	</sequence>
 
+	<sequence name="animhugelight">
+	    <fadelight light="hugeroom_light" red="0" green="0" blue=".2" duration="3000" />
+	    <delay>3000</delay>
+	    <fadelight light="hugeroom_light" red="0" green=".3" blue=".8" duration="3000" />
+	    <delay>3000</delay>
+	    <fadelight light="hugeroom_light" red="0" green=".2" blue=".3" duration="3000" />
+	    <delay>3000</delay>
+	    <fadelight light="hugeroom_light" red="0" green=".4" blue=".7" duration="3000" />
+	    <delay>3000</delay>
+	    <fadelight light="hugeroom_light" red="0" green=".1" blue=".5" duration="3000" />
+	    <delay>3000</delay>
+	    <runsequence>animhugelight</runsequence>
+	</sequence>
+
 	<sequence name="rotball">
 	    <rotate mesh="transpBall" axis="1" angle="3" duration="1000" />
 	    <delay>1000</delay>
 	    <runsequence>rotball</runsequence>
 	</sequence>
+
+	<sequence name="openbox">
+	    <rotate mesh="floorplate:plateL" axis="2" angle="-1.5707963" duration="6000" />
+	    <rotate mesh="floorplate:plateR" axis="2" angle="1.5707963" duration="6000" />
+	    <rotate mesh="floorplate:plateU" axis="0" angle="-1.5707963" duration="6000" />
+	    <rotate mesh="floorplate:plateD" axis="0" angle="1.5707963" duration="6000" />
+	    <delay>6000</delay>
+	    <rotate mesh="floorplate:plateL" axis="2" angle="1.5707963" duration="6000" />
+	    <rotate mesh="floorplate:plateR" axis="2" angle="-1.5707963" duration="6000" />
+	    <rotate mesh="floorplate:plateU" axis="0" angle="1.5707963" duration="6000" />
+	    <rotate mesh="floorplate:plateD" axis="0" angle="-1.5707963" duration="6000" />
+	    <delay>6000</delay>
+	    <runsequence>openbox</runsequence>
+	</sequence>
     </sequences>
+
     <triggers>
         <trigger name="setfog">
 	    <sectorvis>kamer2l</sectorvis>
@@ -22672,6 +22943,16 @@
 	
 	<trigger name="rotball">
 	    <fire delay=0>rotball</fire>
+	</trigger>
+
+	<trigger name="animhugelight">
+	    <sectorvis>kamer2lhuge</sectorvis>
+	    <fire delay=0>animhugelight</fire>
+	</trigger>
+
+	<trigger name="openbox">
+	    <sectorvis>kamer2l2</sectorvis>
+	    <fire delay=2000>openbox</fire>
 	</trigger>
     </triggers>
 

@@ -53,6 +53,9 @@ public:
   /// constructor
   csMeshList ();
 
+  /// Find a mesh in <name>:<childname>:<childname> notation.
+  iMeshWrapper *FindByNameWithChild (const char *Name) const;
+
   class MeshList : public iMeshList
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMeshList);
