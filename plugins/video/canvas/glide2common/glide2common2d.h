@@ -44,7 +44,7 @@ protected:
   /// current and last last mouse position
   int mx, my;
   int mxold, myold;
-  
+
   /// do we render into backbuffer ?
   FxI32 m_drawbuffer;
     

@@ -54,6 +54,7 @@ csGraphics2DGlideCommon::csGraphics2DGlideCommon (iBase *iParent) :
   mx=my=mxold=myold=-1;
   writtenArea.MakeEmpty();
   mouseRect.MakeEmpty();
+  m_drawbuffer = GR_BUFFER_BACKBUFFER;
   PrepareCursors (mouseshapes);
 }
 
@@ -80,7 +81,6 @@ csGraphics2DGlideCommon::~csGraphics2DGlideCommon ()
   Close ();
   if (cursorBmp) delete cursorBmp;
   if (mcBack) delete mcBack;
-  delete [] Memory;
 }
 
 bool csGraphics2DGlideCommon::Open(const char *Title)
@@ -190,6 +190,7 @@ bool csGraphics2DGlideCommon::BeginDraw(/*int Flag*/)
       locked=true;
     }else
   {
+  printf("could not lock mem\n");
   }
   return bret;
 
@@ -202,7 +203,6 @@ void csGraphics2DGlideCommon::FinishDraw ()
   csGraphics2D::FinishDraw ();
   if (FrameBufferLocked)
     return;
-
   Memory=NULL;
   for (int i = 0; i < Height; i++) LineAddress [i] = 0;
   if (locked) 
@@ -232,19 +232,19 @@ void csGraphics2DGlideCommon::DrawPixel (int x, int y, int color)
   }
 }
 
-void csGraphics2DGlideCommon::WriteCharGlide ( csGraphics2D *This, int x, int y, int fg, int bg, char c)
+void csGraphics2DGlideCommon::WriteCharGlide (csGraphics2D *This, int x, int y, int fg, int bg, char c)
 {
-  This->WriteChar16( This, x,y,fg,bg,c);
+  This->WriteChar16 (This, x,y,fg,bg,c);
 }
 
-unsigned char* csGraphics2DGlideCommon::GetPixelAt ( int x, int y)
+unsigned char* csGraphics2DGlideCommon::GetPixelAt (int x, int y)
 {
   if (!locked) BeginDraw();
   return (Memory + (x + x + LineAddress[ y ]));
 }
 
-void csGraphics2DGlideCommon::Print( csRect* area ){
-
+void csGraphics2DGlideCommon::Print (csRect* area)
+{
   if (!GetDoubleBufferState())
     if ( area != NULL ) 
       writtenArea.Set( *area );
@@ -377,9 +377,19 @@ float csGraphics2DGlideCommon::GetZBuffValue (int x, int y)
 
 bool csGraphics2DGlideCommon::DoubleBuffer (bool Enable)
 {
-    m_drawbuffer = (Enable ? GR_BUFFER_BACKBUFFER : GR_BUFFER_FRONTBUFFER);
-    GlideLib_grRenderBuffer ( m_drawbuffer );
-    return true;
+  while (locked) FinishDraw ();
+  m_drawbuffer = (Enable ? GR_BUFFER_BACKBUFFER : GR_BUFFER_FRONTBUFFER);
+  GlideLib_grRenderBuffer (m_drawbuffer);
+/*
+  if (!bSwitchDoubleBuffer && (Enable != (m_drawbuffer == GR_BUFFER_BACKBUFFER)))
+  {
+    bSwitchDoubleBuffer = true;
+  }
+  else // this is called again before the buffering switched
+  if (bSwitchDoubleBuffer && (Enable == (m_drawbuffer == GR_BUFFER_BACKBUFFER)))
+    bSwitchDoubleBuffer = false;
+    */
+  return true;
 }
 
 int csGraphics2DGlideCommon::PrepareCursors (char **shapes)
@@ -494,7 +504,8 @@ void csGraphics2DGlideCommon::DrawCursor ()
   // remember what we are overdrawing
   mouseRect.Set( MAX(0,mx-hx), MAX(0,my-hy), MIN(Width-1,mx-hx+mcCols), MIN(Height-1,my-hy+mcRows) );
 
-  for (row=mouseRect.ymin; row<mouseRect.ymax; row++){
+  for (row=mouseRect.ymin; row<mouseRect.ymax; row++)
+  {
     UShort *p = (UShort*)GetPixelAt( mouseRect.xmin, row );
     memcpy( mcBack + (row-mouseRect.ymin)*mcCols, p, sizeof(UShort)*(mouseRect.Width()) );
   }
@@ -520,7 +531,8 @@ void csGraphics2DGlideCommon::DrawCursor ()
     for (col=0; col<mcCols && sx<Width; col++, sx++)
     {
       color = cursorBmp [ nCursor*3 + nCurCursor*mcRows*mcCols + row*mcCols + col ];
-      if ( sx >= 0 && sy >= 0 && color != keycolor ){
+      if ( sx >= 0 && sy >= 0 && color != keycolor )
+      {
         DrawPixel( sx, sy, color );
       }
     }
