@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+17-Nov-2002
+	- Fixed a huge memory leak in the XML loader. The main document
+	  node was never cleaned up which resulted in the entire node
+	  tree to remain in memory. For big levels this could result in
+	  70-120 Megabyte leaks.
 15-Nov-2002
 	- Eric Sunshine made the following changes:
 	    - Augmented the project configuration phase so that it determines

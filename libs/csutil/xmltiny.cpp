@@ -487,10 +487,14 @@ csTinyXmlDocument::csTinyXmlDocument (csTinyDocumentSystem* sys)
 
 csTinyXmlDocument::~csTinyXmlDocument ()
 {
+  Clear ();
 }
 
 void csTinyXmlDocument::Clear ()
 {
+  if (!root) return;
+  TiDocument* doc = (TiDocument*)(((csTinyXmlNode*)(iDocumentNode*)root)->GetTiNode ());
+  delete doc;
   root = 0;
 }
 
