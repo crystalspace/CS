@@ -89,6 +89,9 @@ The history order has been reversed so that new features are at the top.
 	  support. Also support for skinned listbox headers.
 	- Christopher also did some further updates to cslistbox to make
 	  it work better as a skinned control.
+	- Christopher also implemented alpha with listbox.
+	- Christopher squashed some bugs with display mess-ups using
+	  bitmap frames and buttons in CSWS.
 	- Implemented LookAt(), RotateOther(), and RotateThis() in
 	  csReversibleTransform. These functions used to be in csCamera
 	  but now csCamera simply inherits them.
@@ -104,6 +107,12 @@ The history order has been reversed so that new features are at the top.
 	  totally untested at this moment.
 	- Fixed the python plugin and pysimp applications so that they
 	  work again.
+	- Philip Wyett fixed Blocks on Windows 2000 again after Eric
+	  reverted his previous (bad) fix.
+	- Norman Kramer added a new export script for Blender 2.12 (scripts/
+	  blender/csexp212.py). This script can export all meshes in a scene
+	  to mesh factories. All the factories are placed in a LIBRARY called
+	  scene.lib.
 16-Apr-2001
 	- Added iEngine::CreateSectorWallsMesh().
 	- Fixed simplep (plugin version of simple) so that it works again.
