@@ -1090,7 +1090,6 @@ void csGraphics3DOGLCommon::Print (csRect * area)
     times[cur] = elapsed_time;
     totaltime += times[cur];
     cur = (cur+1)%num;
-    iSystem* sys = CS_GET_SYSTEM (object_reg);	//@@@
     if (totaltime/10 < fps_limit) csSleep (fps_limit - totaltime/10);
   }
   G2D->Print (area);
