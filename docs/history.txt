@@ -9,6 +9,13 @@ The history order is reversed so that new features are at the top.
 	  variable to the empty string for all platforms except OS/2, thus
 	  resulting in the "make: -c: Command not found" error message
 	  experienced by non-OS/2 ports.
+	- Eric Sunshine fixed the next2d canvas so that it once again builds
+	  successfully.  It broke on 2001/12/27.
+	- Eric Sunshined changed the next2d canvas so that it no longer bothers
+	  to register the iEventHandler implementor with the event queue in
+	  NeXTDriver2D::Initialize(), since its superclass'
+	  csGrahpics2D::Initialize() already does so.  (No need to register the
+	  same event handler twice.)
 7-Jan-2002
 	- Corrected the includes in the collision detection howto.
 	- Extended iLoader::LoadTexture() with a 'register' parameter which
