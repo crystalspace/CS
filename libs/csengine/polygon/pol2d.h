@@ -25,6 +25,7 @@
 
 class csPolygon3D;
 class csPolyPlane;
+class csClipper;
 interface IGraphics2D;
 interface IGraphics3D;
 
@@ -187,5 +188,13 @@ public:
    */
   void AddFogPolygon (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* plane, bool mirror, CS_ID id, int fog_type);
 };
+
+struct G3DPolygon;
+
+/**
+ * Prepare a filled in G3DPolygon structure for drawing via
+ * g3d->DrawPolygonQuick.
+ */
+extern void PreparePolygonQuick (G3DPolygon* g3dpoly, bool gouraud);
 
 #endif /*POL2D_H*/

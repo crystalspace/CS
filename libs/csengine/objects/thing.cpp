@@ -299,22 +299,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 	csVector2 *cpoly = rview.view->Clip (persp, 3, rescount);
 	if (!cpoly) continue;
 
-	// Compute U & V in vertices of the polygon
-	// Find first the topmost triangle vertex
-	int top;
-	if (persp [0].y < persp [1].y)
-	  if (persp [0].y < persp [2].y)
-	    top = 0;
-	  else
-	    top = 2;
-	else
-	  if (persp [1].y < persp [2].y)
-	    top = 1;
-	  else
-	    top = 2;
-
 	poly.num = rescount;
-
 	poly.pi_triangle = (csVector2 *)persp;
 	int j;
 	for (j = 0; j < 3; j++)
@@ -331,82 +316,17 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 	    poly.pi_tritexcoords[j].g = ((float)mapG[lm_idx])/256.;
 	    poly.pi_tritexcoords[j].b = ((float)mapB[lm_idx])/256.;
 	  }
-	} // endfor
+	}
 
 	for (j = 0; j < rescount; j++)
 	{
-	  float x = poly.vertices [j].sx = cpoly [j].x;
-	  float y = poly.vertices [j].sy = cpoly [j].y;
-
-	  // Find the triangle left/right edges between which
-	  // is located given x,y point
-	  int vtl, vtr, vbl, vbr;
-	  vtl = vtr = top;
-	  vbl = (vtl + 1) % 3;
-	  vbr = (vtl + 3 - 1) % 3;
-	  if (y > persp [vbl].y)
-	  {
-	    vtl = vbl;
-	    vbl = (vbl + 1) % 3;
-	  }
-	  else if (y > persp [vbr].y)
-	  {
-	    vtr = vbr;
-	    vbr = (vbr + 3 - 1) % 3;
-	  }
-          else
-          {
-            // The last two vertices of the triangle have the same height.
-	    // @@@ I think we should interpolate by 'x' here but this fix at
-	    // least eliminates most errors.
-            vtl = vbl;
-            vbl = (vbl + 1) % 3;
-          }
-
-	  // Now interpolate Z,U,V by Y
-	  float tL = persp [vbl].y - persp [vtl].y;
-	  if (tL< -0.001 || tL>0.001)
-	    tL = (y - persp [vtl].y) / tL;
-	  float tR = persp [vbr].y - persp [vtr].y;
-	  if (tR< -0.001 || tR>0.001)
-	    tR = (y - persp [vtr].y) / tR;
-	  float xL = persp [vtl].x + tL * (persp [vbl].x - persp [vtl].x);
-	  float xR = persp [vtr].x + tR * (persp [vbr].x - persp [vtr].x);
-	  float tX = xR - xL;
-	  if (tX< -0.001 || tX>0.001)
-	    tX = (x - xL) / tX;
-
-	  // Calculate Z
-	  INTERPOLATE (poly.pi_texcoords [j].z,
-		       poly.pi_tritexcoords [vtl].z, poly.pi_tritexcoords [vbl].z,
-		       poly.pi_tritexcoords [vtr].z, poly.pi_tritexcoords [vbr].z);
-	  // Calculate U
-	  INTERPOLATE (poly.pi_texcoords [j].u,
-		       poly.pi_tritexcoords [vtl].u, poly.pi_tritexcoords [vbl].u,
-		       poly.pi_tritexcoords [vtr].u, poly.pi_tritexcoords [vbr].u);
-	  // Calculate V
-	  INTERPOLATE (poly.pi_texcoords [j].v,
-		       poly.pi_tritexcoords [vtl].v, poly.pi_tritexcoords [vbl].v,
-		       poly.pi_tritexcoords [vtr].v, poly.pi_tritexcoords [vbr].v);
-	  if (gouraud)
-          {
-            // Calculate R
-            INTERPOLATE (poly.pi_texcoords [j].r,
-			 poly.pi_tritexcoords [vtl].r, poly.pi_tritexcoords [vbl].r,
-			 poly.pi_tritexcoords [vtr].r, poly.pi_tritexcoords [vbr].r);
-            // Calculate G
-            INTERPOLATE (poly.pi_texcoords [j].g,
-			 poly.pi_tritexcoords [vtl].g, poly.pi_tritexcoords [vbl].g,
-			 poly.pi_tritexcoords [vtr].g, poly.pi_tritexcoords [vbr].g);
-            // Calculate B
-            INTERPOLATE (poly.pi_texcoords [j].b,
-			 poly.pi_tritexcoords [vtl].b, poly.pi_tritexcoords [vbl].b,
-			 poly.pi_tritexcoords [vtr].b, poly.pi_tritexcoords [vbr].b);
-          }
+	  poly.vertices [j].sx = cpoly [j].x;
+	  poly.vertices [j].sy = cpoly [j].y;
 	}
 	CHK (delete[] cpoly);
-	// Draw resulting polygon
 
+        PreparePolygonQuick (&poly, gouraud);
+	// Draw resulting polygon
 	rview.g3d->DrawPolygonQuick (poly, gouraud);
       }
     }

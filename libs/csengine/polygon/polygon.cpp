@@ -1364,6 +1364,114 @@ void csPolygon2D::Draw (IGraphics2D* g2d, int col)
   }
 }
 
+//---------------------------------------------------------------------------
+
+void PreparePolygonQuick (G3DPolygon* g3dpoly, bool gouraud)
+{
+  csVector2* orig_triangle = g3dpoly->pi_triangle;
+
+  // First we have to find the u,v coordinates for every
+  // point in the clipped polygon. We know we started
+  // from orig_triangle and that texture mapping is not perspective correct.
+
+  // Compute U & V in vertices of the polygon
+  // First find the topmost triangle vertex
+  int top;
+  if (orig_triangle [0].y < orig_triangle [1].y)
+    if (orig_triangle [0].y < orig_triangle [2].y) top = 0;
+    else top = 2;
+  else
+    if (orig_triangle [1].y < orig_triangle [2].y) top = 1;
+    else top = 2;
+
+  int j;
+  CHK (g3dpoly->pi_texcoords = new G3DPolygon::poly_texture_def [64]);
+  for (j = 0 ; j < g3dpoly->num ; j++)
+  {
+    float x = g3dpoly->vertices[j].sx;
+    float y = g3dpoly->vertices[j].sy;
+
+    // Find the triangle left/right edges between which
+    // the given x,y point is located.
+    int vtl, vtr, vbl, vbr;
+    vtl = vtr = top;
+    vbl = (vtl + 1) % 3;
+    vbr = (vtl + 3 - 1) % 3;
+    if (y > orig_triangle [vbl].y)
+    {
+      vtl = vbl;
+      vbl = (vbl + 1) % 3;
+    }
+    else if (y > orig_triangle [vbr].y)
+    {
+      vtr = vbr;
+      vbr = (vbr + 3 - 1) % 3;
+    }
+    else
+    {
+      // The last two vertices of the triangle have the same height.
+      // @@@ I think we should interpolate by 'x' here but this fix at
+      // least eliminates most errors.
+      vtl = vbl;
+      vbl = (vbl + 1) % 3;
+    }
+
+    // Now interpolate Z,U,V by Y
+    float tL = orig_triangle [vbl].y - orig_triangle [vtl].y;
+    if (tL) tL = (y - orig_triangle [vtl].y) / tL;
+    float tR = orig_triangle [vbr].y - orig_triangle [vtr].y;
+    if (tR) tR = (y - orig_triangle [vtr].y) / tR;
+    float xL = orig_triangle [vtl].x + tL * (orig_triangle [vbl].x - orig_triangle [vtl].x);
+    float xR = orig_triangle [vtr].x + tR * (orig_triangle [vbr].x - orig_triangle [vtr].x);
+    float tX = xR - xL;
+    if (tX) tX = (x - xL) / tX;
+
+#   define INTERPOLATE(val,tl,bl,tr,br)	\
+        {					\
+          float vl,vr;				\
+          if (tl != bl)				\
+            vl = tl + (bl - tl) * tL;		\
+          else					\
+            vl = tl;				\
+          if (tr != br)				\
+            vr = tr + (br - tr) * tR;		\
+          else					\
+            vr = tr;				\
+          val = vl + (vr - vl) * tX;		\
+        }
+
+    // Calculate Z
+    INTERPOLATE (g3dpoly->pi_texcoords [j].z,
+          g3dpoly->pi_tritexcoords [vtl].z, g3dpoly->pi_tritexcoords [vbl].z,
+          g3dpoly->pi_tritexcoords [vtr].z, g3dpoly->pi_tritexcoords [vbr].z);
+    // Calculate U
+    INTERPOLATE (g3dpoly->pi_texcoords [j].u,
+          g3dpoly->pi_tritexcoords [vtl].u, g3dpoly->pi_tritexcoords [vbl].u,
+          g3dpoly->pi_tritexcoords [vtr].u, g3dpoly->pi_tritexcoords [vbr].u);
+    // Calculate V
+    INTERPOLATE (g3dpoly->pi_texcoords [j].v,
+          g3dpoly->pi_tritexcoords [vtl].v, g3dpoly->pi_tritexcoords [vbl].v,
+          g3dpoly->pi_tritexcoords [vtr].v, g3dpoly->pi_tritexcoords [vbr].v);
+    if (gouraud)
+    {
+      // Calculate R
+      INTERPOLATE (g3dpoly->pi_texcoords [j].r,
+            g3dpoly->pi_tritexcoords [vtl].r, g3dpoly->pi_tritexcoords [vbl].r,
+            g3dpoly->pi_tritexcoords [vtr].r, g3dpoly->pi_tritexcoords [vbr].r);
+      // Calculate G
+      INTERPOLATE (g3dpoly->pi_texcoords [j].g,
+            g3dpoly->pi_tritexcoords [vtl].g, g3dpoly->pi_tritexcoords [vbl].g,
+            g3dpoly->pi_tritexcoords [vtr].g, g3dpoly->pi_tritexcoords [vbr].g);
+      // Calculate B
+      INTERPOLATE (g3dpoly->pi_texcoords [j].b,
+            g3dpoly->pi_tritexcoords [vtl].b, g3dpoly->pi_tritexcoords [vbl].b,
+            g3dpoly->pi_tritexcoords [vtr].b, g3dpoly->pi_tritexcoords [vbr].b);
+    }
+  }
+}
+
+//---------------------------------------------------------------------------
+
 G3DPolygon g3dpoly;
 
 // For debugging
@@ -1418,7 +1526,7 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
     g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERFILLENABLE, true);
   }
 
-  memset(&g3dpoly, 0, sizeof(G3DPolygon));
+  memset (&g3dpoly, 0, sizeof (G3DPolygon));
   g3dpoly.num = num_vertices;
   g3dpoly.txt_handle = poly->GetTextureHandle ();
   g3dpoly.inv_aspect = csCamera::inv_aspect;
@@ -1426,21 +1534,6 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
   if (poly->GetUVCoords ())
   {
     // We are going to use DrawPolygonQuick.
-
-    // First we have to find the u,v coordinates for every
-    // point in the clipped polygon. We know we started
-    // from orig_triangle and that texture mapping is not perspective correct.
-
-    // Compute U & V in vertices of the polygon
-    // First find the topmost triangle vertex
-    int top;
-    if (orig_triangle [0].y < orig_triangle [1].y)
-      if (orig_triangle [0].y < orig_triangle [2].y) top = 0;
-      else top = 2;
-    else
-      if (orig_triangle [1].y < orig_triangle [2].y) top = 1;
-      else top = 2;
-
     g3dpoly.pi_triangle = orig_triangle;
     g3dpoly.pi_tritexcoords[0].z = 1. / poly->Vcam (0).z;
     g3dpoly.pi_tritexcoords[0].u = poly->GetUVCoords ()[0].x;
@@ -1464,90 +1557,12 @@ void csPolygon2D::DrawFilled (IGraphics3D* g3d, csPolygon3D* poly, csPolyPlane* 
       g3dpoly.pi_tritexcoords[2].g = po_colors[2].green;
       g3dpoly.pi_tritexcoords[2].b = po_colors[2].blue;
     }
-    int j;
-    CHK (g3dpoly.pi_texcoords = new G3DPolygon::poly_texture_def [64]);
-    for (j = 0 ; j < num_vertices ; j++)
+    for (i = 0 ; i < num_vertices ; i++)
     {
-      float x = g3dpoly.vertices[j].sx = vertices[j].x;
-      float y = g3dpoly.vertices[j].sy = vertices[j].y;
-
-      // Find the triangle left/right edges between which
-      // the given x,y point is located.
-      int vtl, vtr, vbl, vbr;
-      vtl = vtr = top;
-      vbl = (vtl + 1) % 3;
-      vbr = (vtl + 3 - 1) % 3;
-      if (y > orig_triangle [vbl].y)
-      {
-        vtl = vbl;
-        vbl = (vbl + 1) % 3;
-      }
-      else if (y > orig_triangle [vbr].y)
-      {
-        vtr = vbr;
-        vbr = (vbr + 3 - 1) % 3;
-      }
-      else
-      {
-        // The last two vertices of the triangle have the same height.
-	// @@@ I think we should interpolate by 'x' here but this fix at
-	// least eliminates most errors.
-        vtl = vbl;
-        vbl = (vbl + 1) % 3;
-      }
-
-      // Now interpolate Z,U,V by Y
-      float tL = orig_triangle [vbl].y - orig_triangle [vtl].y;
-      if (tL) tL = (y - orig_triangle [vtl].y) / tL;
-      float tR = orig_triangle [vbr].y - orig_triangle [vtr].y;
-      if (tR) tR = (y - orig_triangle [vtr].y) / tR;
-      float xL = orig_triangle [vtl].x + tL * (orig_triangle [vbl].x - orig_triangle [vtl].x);
-      float xR = orig_triangle [vtr].x + tR * (orig_triangle [vbr].x - orig_triangle [vtr].x);
-      float tX = xR - xL;
-      if (tX) tX = (x - xL) / tX;
-
-#     define INTERPOLATE(val,tl,bl,tr,br)	\
-        {					\
-          float vl,vr;				\
-          if (tl != bl)				\
-            vl = tl + (bl - tl) * tL;		\
-          else					\
-            vl = tl;				\
-          if (tr != br)				\
-            vr = tr + (br - tr) * tR;		\
-          else					\
-            vr = tr;				\
-          val = vl + (vr - vl) * tX;		\
-        }
-
-      // Calculate Z
-      INTERPOLATE (g3dpoly.pi_texcoords [j].z,
-          g3dpoly.pi_tritexcoords [vtl].z, g3dpoly.pi_tritexcoords [vbl].z,
-          g3dpoly.pi_tritexcoords [vtr].z, g3dpoly.pi_tritexcoords [vbr].z);
-      // Calculate U
-      INTERPOLATE (g3dpoly.pi_texcoords [j].u,
-          g3dpoly.pi_tritexcoords [vtl].u, g3dpoly.pi_tritexcoords [vbl].u,
-          g3dpoly.pi_tritexcoords [vtr].u, g3dpoly.pi_tritexcoords [vbr].u);
-      // Calculate V
-      INTERPOLATE (g3dpoly.pi_texcoords [j].v,
-          g3dpoly.pi_tritexcoords [vtl].v, g3dpoly.pi_tritexcoords [vbl].v,
-          g3dpoly.pi_tritexcoords [vtr].v, g3dpoly.pi_tritexcoords [vbr].v);
-      if (po_colors)
-      {
-        // Calculate R
-        INTERPOLATE (g3dpoly.pi_texcoords [j].r,
-            g3dpoly.pi_tritexcoords [vtl].r, g3dpoly.pi_tritexcoords [vbl].r,
-            g3dpoly.pi_tritexcoords [vtr].r, g3dpoly.pi_tritexcoords [vbr].r);
-        // Calculate G
-        INTERPOLATE (g3dpoly.pi_texcoords [j].g,
-            g3dpoly.pi_tritexcoords [vtl].g, g3dpoly.pi_tritexcoords [vbl].g,
-            g3dpoly.pi_tritexcoords [vtr].g, g3dpoly.pi_tritexcoords [vbr].g);
-        // Calculate B
-        INTERPOLATE (g3dpoly.pi_texcoords [j].b,
-            g3dpoly.pi_tritexcoords [vtl].b, g3dpoly.pi_tritexcoords [vbl].b,
-            g3dpoly.pi_tritexcoords [vtr].b, g3dpoly.pi_tritexcoords [vbr].b);
-      }
+      g3dpoly.vertices[i].sx = vertices[i].x;
+      g3dpoly.vertices[i].sy = vertices[i].y;
     }
+    PreparePolygonQuick (&g3dpoly, po_colors != NULL);
     g3d->StartPolygonQuick (g3dpoly.txt_handle, po_colors != NULL);
     g3d->DrawPolygonQuick (g3dpoly, po_colors != NULL);
     g3d->FinishPolygonQuick ();
