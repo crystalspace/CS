@@ -36,7 +36,7 @@
 /// XLIB version.
 class csGraphics2DLineXLib : public csGraphics2D, public iEventPlug
 {
-  iXWindow  *xwin;
+  csRef<iXWindow> xwin;
   /// The event outlet
   iEventOutlet *EventOutlet;
   int screen_num;
