@@ -1,5 +1,10 @@
 The history order is reversed so that new features are at the top.
 
+15-Feb-2002
+	- Reverted 'res' change to win32gcc.mak since it breaks compile of
+	  ddraw plugin. The problem is that the -lddraw library link command
+	  is added after the command so it is added after the 'rm'. This is
+	  obviously wrong.
 14-Feb-2002
 	- Fixed new gridbag constraints in AWS so that it is an enum
 	  (static const int is not legal in C++) and also renamed
