@@ -7,6 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 14-Mar-2004
+	- Jorrit added back the Get() to csHash that res removed a while ago.
+	  Having that Get() there does NOT restrict the csHash to be used
+	  on objects that have a default constructor. It only adds that
+	  restriction if that Get() is actually used.
 	- Keith Fulton committed Performance enhancements to sprcal3d
 	  giving about 3x FPS in debug mode in viewmesh for a cal3d model.
 	  Most of the enhancements are to minimize calls to 

@@ -246,6 +246,25 @@ public:
     return fallback;
   }
 
+  /**
+   * Get the first element matching the given key or a
+   * simple constructed object if none.
+   */
+  const T& Get (const K& key) const
+  {
+    const csArray<Element> &values = 
+      Elements[KeyHandler::ComputeHash (key) % Modulo];
+    const int len = values.Length ();
+    for (int i = 0; i < len; ++i)
+    {
+      const Element& v = values[i];
+      if (KeyHandler::CompareKeys (v.key, key))
+	return v.value;
+    }
+   static const T zero (0);
+   return zero;
+  }
+
   /// Delete all the elements.
   void DeleteAll ()
   {
