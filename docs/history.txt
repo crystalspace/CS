@@ -3,6 +3,12 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+22-Apr-2003
+	- Eric Sunshine added links for the new CrystalDoc translation project
+	  to the Crystal Space web site.  Also cleaned up the web site's main
+	  menu a bit.  Re-ordered the entries so that the most interesting and
+	  useful are near the top.  Renamed some entries to make them less
+	  confusing.
 21-Apr-2003
 	- Rhad modified csPosixCondition::Wait() to not pass through
 	  CS_SHOW_ERROR when a timeout is specified and expires. The
