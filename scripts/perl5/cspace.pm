@@ -9552,6 +9552,7 @@ package cspace::iGraphics3D;
 *HasNearPlane = *cspacec::iGraphics3D_HasNearPlane;
 *SetRenderState = *cspacec::iGraphics3D_SetRenderState;
 *GetRenderState = *cspacec::iGraphics3D_GetRenderState;
+*SetOption = *cspacec::iGraphics3D_SetOption;
 *CreateRenderBuffer = *cspacec::iGraphics3D_CreateRenderBuffer;
 *CreateInterleavedRenderBuffers = *cspacec::iGraphics3D_CreateInterleavedRenderBuffers;
 *SetBufferState = *cspacec::iGraphics3D_SetBufferState;
