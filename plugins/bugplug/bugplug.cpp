@@ -975,6 +975,35 @@ bool csBugPlug::HandleEndFrame (iEvent& /*event*/)
     debug_sector_view->Draw ();
   }
 
+  if (process_next_key || process_next_mouse)
+  {
+    G3D->BeginDraw (CSDRAW_2DGRAPHICS);
+    iFontServer* fntsvr = G2D->GetFontServer ();
+    CS_ASSERT (fntsvr != NULL);
+    iFont* fnt = fntsvr->GetFont (0);
+    if (fnt == NULL)
+    {
+      fnt = fntsvr->LoadFont (CSFONT_COURIER);
+    }
+    CS_ASSERT (fnt != NULL);
+    int fw, fh;
+    fnt->GetMaxSize (fw, fh);
+    int sw = G2D->GetWidth ();
+    int sh = G2D->GetHeight ();
+    int x = 150;
+    int y = sh/2 - (fh+5*2)/2;
+    int w = 200;
+    int h = fh+5*2;
+    int bgcolor = G3D->GetTextureManager ()->FindRGB (255, 255, 0);
+    G2D->DrawBox (x, y, w, h, bgcolor);
+    int fgcolor = G3D->GetTextureManager ()->FindRGB (0, 0, 0);
+    char* msg;
+    if (process_next_key) msg = "Press a BugPlug key...";
+    else msg = "Click on screen...";
+    int maxlen = fnt->GetLength (msg, w-10);
+    G2D->Write (fnt, x+5, y+5, fgcolor, bgcolor, msg);
+  }
+
   if (edit_mode)
   {
     G3D->BeginDraw (CSDRAW_2DGRAPHICS);

@@ -6,6 +6,8 @@ The history order is reversed so that new features are at the top.
 	  were cleared at the wrong time.
 	- While still not completely correct, tiled coverage buffer
 	  is starting to work a bit now.
+	- Made BugPlug a little bit more friendly by showing a message
+	  when it is waiting for a key.
 14-Jun-2002
 	- Upto now BugPlug has always been a plugin with no own interface.
 	  So there was no way to talk with BugPlug. This has now changed.
