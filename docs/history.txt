@@ -1,8 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
 18-May-2000
-	- Frank O'Connor added __CRYSTAL_SPACE__ define to VC project
-	  file.
+	- Frank O'Connor added __CRYSTAL_SPACE__ define to VC project file.
 	- Another small terrain update from Alex Pfaffe.
 	- Started work on multiple passes in PVS.
 	- Small optimization on PVS building speed.
@@ -12,6 +11,8 @@ The history order has been reversed so that new features are at the top.
 	  enough right now.
 	- Eric Sunshine fixed many additional compilation warnings in the
 	  terrain library; mostly reported by MSVC.
+	- Eric Sunshine fixed many warnings throughout the project which were
+	  reported by MSVC.
 17-May-2000
 	- Thomas Riemer added scaffolding functions to allow loading world
 	  into NetSpace world.
