@@ -77,6 +77,9 @@ private:
   csRefArray<iRenderStep> steps;
   csRef<iEngine> engine;
   csString target;
+  bool doCreate;
+  int newW, newH;
+  bool persistent;
 public:
   SCF_DECLARE_IBASE;
 
@@ -91,6 +94,10 @@ public:
 
   void SetTarget (const char* t)
   { target = t; }
+  void SetCreate (int w, int h)
+  { doCreate = true; newW = w; newH = h; }
+  void SetPersistent (bool p)
+  { persistent = p; }
 };
 
 

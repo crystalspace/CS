@@ -29,6 +29,7 @@
 #include "iengine/sector.h"
 #include "iengine/mesh.h"
 #include "iengine/material.h"
+#include "ivaria/reporter.h"
 #include "ivideo/material.h"
 #include "csgeom/transfrm.h"
 #include "csgfx/shadervar.h"
@@ -36,98 +37,7 @@
 
 #include "fullquad.h"
 
-class csFullscreenQuad
-{
-private:
-  csRef<iGraphics3D> g3d;
-  csRef<iRenderBuffer> vertices;
-  csRef<iRenderBuffer> indices;
-  csRef<iRenderBuffer> texcoords;
-
-  csShaderVariableContext* varcontext;
-
-  csStringID vertices_name, indices_name, texcoords_name;
-
-public:
-
-  //SCF_DECLARE_IBASE;
-
-  csFullscreenQuad (iGraphics3D* g3d, iStringSet* strings)
-  {
-    //SCF_CONSTRUCT_IBASE (0)
-
-    csFullscreenQuad::g3d = g3d;
-
-    vertices = g3d->CreateRenderBuffer (
-      sizeof (csVector3)*4, CS_BUF_STATIC,
-      CS_BUFCOMP_FLOAT, 3, false);
-    texcoords = g3d->CreateRenderBuffer (
-      sizeof (csVector2)*4, CS_BUF_STATIC,
-      CS_BUFCOMP_FLOAT, 2, false);
-    indices = g3d->CreateRenderBuffer (
-      sizeof (unsigned int)*4, CS_BUF_STATIC,
-      CS_BUFCOMP_UNSIGNED_INT, 1, true);
-
-    csVector3* vbuf = (csVector3*)vertices->Lock(CS_BUF_LOCK_NORMAL);
-    vbuf[0] = csVector3 ( -1,  1, 0);
-    vbuf[1] = csVector3 (  1,  1, 0);
-    vbuf[2] = csVector3 (  1, -1, 0);
-    vbuf[3] = csVector3 ( -1, -1, 0);
-    vertices->Release();
-
-    unsigned int* ibuf = (unsigned int*)indices->Lock(CS_BUF_LOCK_NORMAL);
-    ibuf[0] = 0;  ibuf[1] = 1;  ibuf[2] = 2;    ibuf[3] = 3;
-    indices->Release();
-
-    csVector2* tcbuf = (csVector2*)texcoords->Lock(CS_BUF_LOCK_NORMAL);
-    tcbuf[0] = csVector2 (0, 1);
-    tcbuf[1] = csVector2 (1, 1);
-    tcbuf[2] = csVector2 (1, 0);
-    tcbuf[3] = csVector2 (0, 0);
-    texcoords->Release();
-
-    vertices_name = strings->Request ("vertices");
-    indices_name = strings->Request ("indices");
-    texcoords_name = strings->Request ("texture coordinates");
-
-    varcontext = new csShaderVariableContext ();
-    csShaderVariable* sv;
-    sv = varcontext->GetVariableAdd (vertices_name);
-    sv->SetValue(vertices);
-    sv = varcontext->GetVariableAdd (indices_name);
-    sv->SetValue(indices);
-    sv = varcontext->GetVariableAdd (texcoords_name);
-    sv->SetValue(texcoords);
-  }
-
-  virtual ~csFullscreenQuad ()
-  {
-    //SCF_DESTRUCT_IBASE();
-  }
-
-  csShaderVariableContext* GetContext ()
-  {
-    return varcontext;
-  }
-
-  /*iRenderBuffer* GetRenderBuffer(csStringID name)
-  {
-    if (name == vertices_name)
-      return vertices;
-    if (name == indices_name)
-      return indices;
-    if (name == texcoords_name)
-      return texcoords;
-    return 0;
-  }*/
-};
-
-/*SCF_IMPLEMENT_IBASE (csFullscreenQuad)
-  SCF_IMPLEMENTS_INTERFACE (iRenderBufferSource)
-SCF_IMPLEMENT_IBASE_END*/
-
 //---------------------------------------------------------------------------
-
 
 SCF_IMPLEMENT_FACTORY(csFullScreenQuadRSType);
 SCF_IMPLEMENT_FACTORY(csFullScreenQuadRSLoader);
@@ -157,8 +67,43 @@ csPtr<iBase> csFullScreenQuadRSLoader::Parse (iDocumentNode* node,
 				       iLoaderContext* ldr_context,      
 				       iBase* context)
 {
-  csRef<iRenderStep> step = 
+  csFullScreenQuadRenderStep* newstep = 
     new csFullScreenQuadRenderStep (object_reg);
+  csRef<iRenderStep> step;
+  step.AttachNew (newstep);    
+
+  if (!ParseStep (node, newstep, newstep->GetOtherSettings(),
+    false))
+    return 0;
+
+  if (newstep->GetDistinguishFirstPass () &&
+    newstep->GetFirstSettings().shader.IsEmpty() &&
+    (newstep->GetFirstSettings().material.IsEmpty() ||
+    (newstep->GetFirstSettings().shadertype == csInvalidStringID)))
+  {
+    synldr->Report ("crystalspace.renderloop.step.fullscreenquad",
+      CS_REPORTER_SEVERITY_WARNING, node,
+      "Neither a shader nor a material & shadertype was set for first pass");
+  }
+
+  if (newstep->GetOtherSettings().shader.IsEmpty() &&
+    (newstep->GetOtherSettings().material.IsEmpty() ||
+    (newstep->GetOtherSettings().shadertype == csInvalidStringID)))
+  {
+    synldr->Report ("crystalspace.renderloop.step.fullscreenquad",
+      CS_REPORTER_SEVERITY_WARNING, node,
+      "Neither a shader nor a material & shadertype was set for other passes");
+  }
+
+  return csPtr<iBase> (step);
+}
+
+bool csFullScreenQuadRSLoader::ParseStep (iDocumentNode* node,
+  csFullScreenQuadRenderStep* step, 
+  csFullScreenQuadRenderStep::DrawSettings& settings, bool firstPass)
+{
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, "crystalspace.shared.stringset", iStringSet);
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -170,26 +115,86 @@ csPtr<iBase> csFullScreenQuadRSLoader::Parse (iDocumentNode* node,
     {
       case XMLTOKEN_MATERIAL:
 	{
-	  ((csFullScreenQuadRenderStep*)(void*)step)->
-            SetMaterial (child->GetContentsValue ());
+	  settings.material = child->GetContentsValue ();
 	}
 	break;
       case XMLTOKEN_SHADERTYPE:
         {
-          csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-            object_reg, "crystalspace.shared.stringset", iStringSet);
-          ((csFullScreenQuadRenderStep*)(void*)step)->
-            SetShaderType (strings->Request (child->GetContentsValue ()));
+	  settings.shadertype = 
+	    strings->Request (child->GetContentsValue ());
+          //((csFullScreenQuadRenderStep*)(void*)step)->
+          //  SetShaderType (strings->Request (child->GetContentsValue ()));
         }
         break;
+      case XMLTOKEN_SHADER:
+	{
+	  settings.shader = child->GetContentsValue ();
+	}
+	break;
+      case XMLTOKEN_MIXMODE:
+	if (!synldr->ParseMixmode (child, settings.mixmode))
+	{
+	  return false;
+	}
+	break;
+      case XMLTOKEN_ALPHAMODE:
+	if (!synldr->ParseAlphaMode (child, strings, settings.alphaMode))
+	{
+	  return false;
+	}
+	break;
+      case XMLTOKEN_FIRSTPASS:
+	{
+	  if (firstPass)
+	  {
+	    synldr->Report ("crystalspace.renderloop.step.fullscreenquad",
+	      CS_REPORTER_SEVERITY_WARNING, child, 
+	      "Can't nest <firstpass> tokens");
+	    return false;
+	  }
+	  csFullScreenQuadRenderStep::DrawSettings& firstSettings =
+	    step->GetFirstSettings();
+	  firstSettings = settings;
+	  if (!ParseStep (child, step, firstSettings, true))
+	    return false;
+	}
+	break;
+      case XMLTOKEN_SHADERVAR:
+	{
+	  const char* varname = child->GetAttributeValue ("name");
+	  if (!varname)
+	  {
+	    synldr->Report ("crystalspace.renderloop.step.fullscreenquad",
+	      CS_REPORTER_SEVERITY_WARNING, child,
+	      "<shadervar> without name");
+	    return false;
+	  }
+	  if (!settings.svContext.IsValid())
+	    settings.svContext.AttachNew (new csShaderVariableContext ());
+
+	  csRef<csShaderVariable> var;
+	  var.AttachNew (new csShaderVariable (strings->Request (varname)));
+
+	  if (!synldr->ParseShaderVar (child, *var))
+	  {
+	    return false;
+	  }
+	  settings.svContext->AddVariable (var);
+	}
+	break;
+      case XMLTOKEN_TEXTURE:
+	{
+	  settings.texture = child->GetContentsValue ();
+	}
+	break;
       default:
 	if (synldr) synldr->ReportBadToken (child);
 	return 0;
     }
   }
-
-  return csPtr<iBase> (step);
+  return true;
 }
+
 
 //---------------------------------------------------------------------------
 
@@ -226,105 +231,104 @@ csFullScreenQuadRenderStep::csFullScreenQuadRenderStep (
 {
   SCF_CONSTRUCT_IBASE(0);
 
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
-    "crystalspace.shared.stringset", iStringSet);
-
   csRef<iGraphics3D> g3d = 
     CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-
-  fullquad = new csFullscreenQuad (g3d, strings);
+  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (object_reg, 
+    "crystalspace.shared.stringset", iStringSet);
+  csFullScreenQuadRenderStep::object_reg = object_reg;
 
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
 
-  material = "";
+  firstPass.material = "";
+  firstPass.shader = "";
+  firstPass.texture = "";
+  firstPass.shadertype = csInvalidStringID;
+  firstPass.mixmode = CS_FX_COPY;
+  firstPass.alphaMode.autoAlphaMode = true;
+  firstPass.alphaMode.autoModeTexture = strings->Request (
+    CS_MATERIAL_TEXTURE_DIFFUSE);
+
+  otherPasses = firstPass;
+  distinguishFirstPass = false;
+  isFirstPass = true;
 }
 
 csFullScreenQuadRenderStep::~csFullScreenQuadRenderStep ()
 {
-  delete fullquad;
   SCF_DESTRUCT_IBASE();
 }
 
 void csFullScreenQuadRenderStep::Perform (iRenderView* rview, iSector* sector,
   csShaderVarStack &stacks)
 {
-  /*
-    @@@ FIXME: Render buffers -> SV
-   */
   csRef<iGraphics3D> g3d = rview->GetGraphics3D();
+  if (!shaderMgr.IsValid())
+    shaderMgr = CS_QUERY_REGISTRY (object_reg, iShaderManager);
 
-  //g3d->BeginDraw (CSDRAW_3DGRAPHICS);
-  iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (material);
-  if (mat != 0)
+  const DrawSettings& settings = 
+    (distinguishFirstPass && isFirstPass) ? firstPass : otherPasses;
+  isFirstPass = false;
+
+  iShader* shader = 0;
+
+  if (!settings.shader.IsEmpty())
   {
-    mat->Visit(); // @@@ here?
-    iShader* shader = 
-      mat->GetMaterialHandle()->GetShader(shadertype);
-    
-    //iShaderTechnique *tech = shader->GetBestTechnique ();
+    shader = shaderMgr->GetShader (settings.shader);
+  }
 
-    if (shader != 0)
+  if ((shader == 0) && (!settings.material.IsEmpty() &&
+    (settings.shadertype != csInvalidStringID)))
+  {
+    iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName (
+      settings.material);
+    if (mat != 0)
     {
-      int numPasses = shader->GetNumberOfPasses ();
-      for (int p=0; p < numPasses; p++)
-      {
-        csRenderMesh mesh;
-        mesh.clip_plane = CS_CLIP_NOT;
-        mesh.clip_portal = CS_CLIP_NOT;
-        mesh.clip_z_plane = CS_CLIP_NOT;
-        mesh.do_mirror = false;
-        mesh.indexstart = 0;
-        mesh.indexend = 4;
-        csReversibleTransform trans = csReversibleTransform (
-		csMatrix3(), csVector3 (0, 0, -2.0f));
-        mesh.object2camera = trans;
-        mesh.meshtype = CS_MESHTYPE_QUADS;
-        mesh.z_buf_mode = CS_ZBUF_NONE;
-        mesh.material = mat;
-        //mesh.variablecontext = fullquad->GetContext ();
-
-        /*uint mixmode = pass->GetMixmodeOverride ();
-        if (mixmode != 0)
-          mesh.mixmode = mixmode;
-        else
-          mesh.mixmode = CS_FX_COPY;
-
-        pass->Activate (0);
-        pass->SetupState (&mesh, dynDomain);*/
-	shader->ActivatePass (p);
-	shader->SetupPass (&mesh, stacks);
-        g3d->DrawMesh (&mesh, stacks);
-	shader->TeardownPass ();
-	shader->DeactivatePass ();
-      }
+      mat->Visit(); // @@@ here?
+      shader = mat->GetMaterialHandle()->GetShader (settings.shadertype);
     }
   }
-#if 0
-  csRenderMesh mesh;
-  mesh.clip_plane = CS_CLIP_NOT;
-  mesh.clip_portal = CS_CLIP_NOT;
-  mesh.clip_z_plane = CS_CLIP_NOT;
-  mesh.do_mirror = false;
-  mesh.indexstart = 0;
-  mesh.indexend = 4;
-  mesh.mixmode = CS_FX_COPY;
-  mesh.streamsource = csFullscreenQuad::instance;
-  csReversibleTransform trans (csMatrix3(), csVector3 ());
-  mesh.transform = &trans;
-  mesh.meshtype = CS_MESHTYPE_QUADS;
-  mesh.z_buf_mode = CS_ZBUF_NONE;
-  csRef<iShaderManager> shadman = CS_QUERY_REGISTRY (object_reg, iShaderManager);
 
-  //g3d->SetRenderTarget (engine->FindTexture ("TARGET2")->GetTextureHandle ());  
-  mesh.mathandle = engine->GetMaterialList ()->FindByName ("post a")->GetMaterialHandle ();
-  csRef<iShader> shader = shadman->GetShader ("posteffect a");
-  g3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARSCREEN );
-  shader->GetBestTechnique ()->GetPass (0)->Activate (&mesh);
-  shader->GetBestTechnique ()->GetPass (0)->SetupState (&mesh);
-  g3d->DrawMesh (&mesh, stacks);
-  shader->GetBestTechnique ()->GetPass (0)->ResetState ();
-  shader->GetBestTechnique ()->GetPass (0)->Deactivate ();
-  g3d->FinishDraw ();
-#endif
+  if (shader != 0)
+  {
+    static uint indices[4] = {0, 1, 2, 3};
+    csVector3 verts[4];
+    csVector2 texels[4];
+
+    csSimpleRenderMesh mesh;
+    mesh.meshtype = CS_MESHTYPE_QUADS;
+    mesh.indexCount = 4;
+    mesh.indices = indices;
+    mesh.vertexCount = 4;
+
+    float hw = float (g3d->GetWidth () / 2);
+    float hh = float (g3d->GetHeight () / 2);
+    float asp = hw / hh;
+
+    verts[0].Set (-asp, -1.0f, 2.0f);
+    texels[0].Set (0.0f, 1.0f);
+    verts[1].Set (-asp,  1.0f, 2.0f);
+    texels[1].Set (0.0f, 0.0f);
+    verts[2].Set ( asp,  1.0f, 2.0f);
+    texels[2].Set (1.0f, 0.0f);
+    verts[3].Set ( asp, -1.0f, 2.0f);
+    texels[3].Set (1.0f, 1.0f);
+
+    mesh.vertices = verts;
+    mesh.texcoords = texels;
+    mesh.shader = shader;
+    mesh.dynDomain = settings.svContext;
+    mesh.alphaType = settings.alphaMode;
+    mesh.mixmode = settings.mixmode;
+
+    if (!settings.texture.IsEmpty())
+    {
+      iTextureWrapper* tex = engine->GetTextureList()->FindByName (
+	settings.texture);
+      if (tex != 0)
+	mesh.texture = tex->GetTextureHandle();
+    }
+
+    g3d->DrawSimpleMesh (mesh);
+  }
 }
 

@@ -567,6 +567,7 @@ bool csTextSyntaxService::ParseShaderVar (iDocumentNode* node,
       {
 	csRef<iTextureWrapper> tex;
         // @@@ This should be done in a better way...
+	//  @@@ E.g. lazy retrieval of the texture with an accessor?
         csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
         if (eng)
         {

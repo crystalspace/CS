@@ -29,7 +29,9 @@
 #include "iengine/texture.h"
 #include "iengine/mesh.h"
 #include "iengine/material.h"
+#include "ivaria/reporter.h"
 #include "ivideo/texture.h"
+#include "ivideo/txtmgr.h"
 
 #include "target.h"
 
@@ -71,8 +73,10 @@ csPtr<iBase> csTargetRSLoader::Parse (iDocumentNode* node,
 				       iLoaderContext* ldr_context,      
 				       iBase* context)
 {
-  csRef<iRenderStep> step = 
-    new csTargetRenderStep (object_reg);
+  csRef<iRenderStep> newstep;
+  csTargetRenderStep* step = new csTargetRenderStep (object_reg);
+  newstep.AttachNew (step);
+
   csRef<iRenderStepContainer> steps =
     SCF_QUERY_INTERFACE (step, iRenderStepContainer);
 
@@ -85,13 +89,45 @@ csPtr<iBase> csTargetRSLoader::Parse (iDocumentNode* node,
     switch (id)
     {
       case XMLTOKEN_TARGET:
-        ((csTargetRenderStep*)(void*)step)->SetTarget (
-		child->GetContentsValue ());
+        step->SetTarget (child->GetContentsValue ());
         break;
       case XMLTOKEN_STEPS:
 	{
 	  if (!rsp.ParseRenderSteps (steps, child))
 	    return 0;
+	}
+	break;
+      case XMLTOKEN_CREATETEXTURE:
+	{
+	  int width = child->GetAttributeValueAsInt ("width");
+	  if (width <= 0)
+	  {
+	    synldr->Report (
+	      "crystalspace.renderloop.step.rendertarget",
+	      CS_REPORTER_SEVERITY_WARNING, child,
+	      "Bogus width %d", width);
+	    return false;
+	  }
+	  int height = child->GetAttributeValueAsInt ("height");
+	  if (height <= 0)
+	  {
+	    synldr->Report (
+	      "crystalspace.renderloop.step.rendertarget",
+	      CS_REPORTER_SEVERITY_WARNING, child,
+	      "Bogus height %d", height);
+	    return false;
+	  }
+	  step->SetCreate (width, height);
+	}
+	break;
+      case XMLTOKEN_PERSISTENT:
+	{
+	  bool p;
+	  if (!synldr->ParseBool (child, p, false))
+	  {
+	    return false;
+	  }
+	  step->SetPersistent (p);
 	}
 	break;
       default:
@@ -100,7 +136,7 @@ csPtr<iBase> csTargetRSLoader::Parse (iDocumentNode* node,
     }
   }
 
-  return csPtr<iBase> (step);
+  return csPtr<iBase> (newstep);
 }
 
 //---------------------------------------------------------------------------
@@ -139,7 +175,8 @@ csTargetRenderStep::csTargetRenderStep (
 {
   SCF_CONSTRUCT_IBASE(0);
   engine = CS_QUERY_REGISTRY (object_reg, iEngine);
-  target = "";
+  doCreate = false;
+  persistent = false;
 }
 
 csTargetRenderStep::~csTargetRenderStep ()
@@ -155,13 +192,20 @@ void csTargetRenderStep::Perform (iRenderView* rview, iSector* sector,
   csRef<iTextureWrapper> tex = 
     engine->GetTextureList ()->FindByName (target);
   csRef<iTextureHandle> oldcontext;
+  if (!tex.IsValid() && doCreate && !target.IsEmpty())
+  {
+    tex = engine->CreateBlackTexture (target, newW, newH, 0, 
+      CS_TEXTURE_3D);
+    tex->Register (g3d->GetTextureManager ());
+    tex->GetTextureHandle()->Prepare();
+  }
   if (tex != 0)
   {
-    g3d->SetRenderTarget (tex->GetTextureHandle (), false);
+    g3d->SetRenderTarget (tex->GetTextureHandle (), persistent);
     oldcontext = engine->GetContext ();
     engine->SetContext (tex->GetTextureHandle ());
   }
-  g3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER);
+  //g3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER);
   for (int i = 0; i < steps.Length(); i++)
   {
     steps[i]->Perform (rview, sector, stacks);
@@ -169,7 +213,7 @@ void csTargetRenderStep::Perform (iRenderView* rview, iSector* sector,
   
   if (tex != 0)
   {
-    g3d->FinishDraw ();
+    //g3d->FinishDraw ();
     engine->SetContext (oldcontext);
   }
 }

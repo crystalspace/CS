@@ -227,8 +227,9 @@ csPtr<iRenderLoop> csRenderLoopManager::Load (const char* fileName)
     return 0;
   }
 
-  csRef<iDocumentSystem> xml (CS_QUERY_REGISTRY (engine->object_reg, 
-    iDocumentSystem));
+  csRef<iDocumentSystem> xml/* (CS_QUERY_REGISTRY (engine->object_reg, 
+    iDocumentSystem))*/;  
+      /* @@@ Eeek. The iDocumentSystem may not be initialized. */
   if (!xml) xml.AttachNew (new csTinyDocumentSystem ());
   csRef<iDocument> doc = xml->CreateDocument ();
 

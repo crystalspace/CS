@@ -693,7 +693,7 @@ struct csSimpleRenderMesh
   /// (Optional) Mix mode. Defaults to CS_FX_COPY.
   uint mixmode;
 
-  csSimpleRenderMesh () : texture (0), shader (0), dynDomain (0), 
+  csSimpleRenderMesh () : colors(0), texture (0), shader (0), dynDomain (0), 
     z_buf_mode (CS_ZBUF_NONE), mixmode (CS_FX_COPY)
   {  
     alphaType.autoAlphaMode = true;
