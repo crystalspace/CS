@@ -32,9 +32,11 @@ csView::csView (csWorld *iWorld, iGraphics3D* ig3d)
   world = iWorld;
   (G3D = ig3d)->IncRef ();
 
-  view = new csPolygon2D ();
+  pview = new csPolygon2D ();
   camera = new csCamera ();
   clipper = NULL;
+
+  orig_width = orig_height = 0;
 }
 
 csView::~csView ()
@@ -42,81 +44,125 @@ csView::~csView ()
   G3D->DecRef ();
   delete bview;
   delete camera;
-  delete view;
+  delete pview;
   delete clipper;
 }
 
 void csView::ClearView ()
 {
-  if (view) view->MakeEmpty ();
+  if (pview) pview->MakeEmpty ();
 }
 
 void csView::SetRectangle (int x, int y, int w, int h)
-{
+{  
   orig_width = G3D->GetWidth ();
-  orig_height = G3D->GetHeight();
-
+  orig_height = G3D->GetHeight ();
   // Do not allow the rectangle to go out of the screen
   if (x < 0) { w += x; x = 0; }
   if (y < 0) { h += y; y = 0; }
   if (x + w > orig_width) { w = orig_width - x; }
   if (y + h > orig_height) { h = orig_height - y; }
 
-  delete view;  view = NULL;
+  delete pview;  pview = NULL;
   delete bview;
   bview = new csBox2 (x, y, x + w, y + h);
   delete clipper; clipper = NULL;
 }
 
+void csView::SetContext (iGraphics3D *ig3d)
+{
+  orig_width = G3D->GetWidth ();
+  orig_height = G3D->GetHeight();
+  G3D->DecRef ();
+  (G3D = ig3d)->IncRef ();
+
+  UpdateView ();
+}
+
+void csView::UpdateView ()
+{
+  if (!orig_width || !orig_height)
+  {
+    orig_width = G3D->GetWidth ();
+    orig_height = G3D->GetHeight ();
+    return;
+  }
+
+  float scale_x = ((float)G3D->GetWidth ())  / ((float)orig_width);
+  float scale_y = ((float)G3D->GetHeight ()) / ((float)orig_height);
+
+  orig_width = G3D->GetWidth ();
+  orig_height = G3D->GetHeight ();
+
+  if (pview)
+  {
+    int i;
+    csVector2 *pverts = pview->GetVertices ();
+    int InCount = pview->GetNumVertices ();
+    // scale poly
+    for (i = 0; i < InCount; i++)
+    {
+      (*(pverts + i)).x *= scale_x;
+      (*(pverts + i)).y *= scale_y;
+    }
+
+    // clip to make sure we are not exceeding screen bounds
+    int OutCount;
+    csBoxClipper bc (0., 0., 
+		     (float)G3D->GetWidth (), (float)G3D->GetHeight());
+    csVector2 TempPoly [InCount + 5];
+    UByte rc = bc.Clip (pview->GetVertices (), InCount , TempPoly, OutCount);
+    if (rc != CS_CLIP_OUTSIDE)
+    {
+      pview->MakeRoom (OutCount);
+      pview->SetVertices (&(TempPoly[0]), OutCount);
+      pview->UpdateBoundingBox ();
+    } 
+  } 
+  else if (bview)
+  {
+    csBox2 *new_bview = new csBox2 ( QRound (scale_x * bview->MinX()),
+				     QRound (scale_y * bview->MinY()),
+				     QRound (scale_x * (bview->MaxX())),
+				     QRound (scale_y * (bview->MaxY())) );
+    delete bview;
+    bview = new_bview;
+  }
+  else
+    bview = new csBox2 (0, 0, orig_width - 1, orig_height - 1);
+
+  delete clipper;
+  clipper = NULL;
+}
+
 void csView::AddViewVertex (int x, int y)
 {
-  if (!view)
-    view = new csPolygon2D ();
-  view->AddVertex (x, y);
+  if (!pview)
+    pview = new csPolygon2D ();
+
+  pview->AddVertex (x, y);
   delete clipper; clipper = NULL;
 }
 
 void csView::Draw ()
 {
   UpdateClipper();
-  G3D->SetPerspectiveCenter ((int)camera->GetShiftX (), (int)camera->GetShiftY ());
+  G3D->SetPerspectiveCenter ( (int)camera->GetShiftX (), 
+			      (int)camera->GetShiftY () );
+
+  world->SetContext (G3D);
   world->Draw (camera, clipper);
 }
 
 void csView::UpdateClipper ()
 {
   if ((orig_width != G3D->GetWidth ()) || (orig_height != G3D->GetHeight()))
-  {
-    float xscale = ((float)G3D->GetWidth ())  / ((float)orig_width);
-    float yscale = ((float)G3D->GetHeight ()) / ((float)orig_height);
-    orig_width = G3D->GetWidth ();
-    orig_height = G3D->GetHeight ();
-
-    int xmin, ymin, xmax, ymax;
-    if (!bview)
-    {
-      xmin = 0;
-      ymin = 0;
-      xmax = orig_width - 1;
-      ymax = orig_height - 1;
-    }
-    else
-    {
-      xmin = QRound (xscale * bview->MinX());
-      xmax = QRound (xscale * (bview->MaxX() + 1));
-      ymin = QRound (yscale * bview->MinY());
-      ymax = QRound (yscale * (bview->MaxY() + 1));
-      delete bview;
-    }
-    bview = new csBox2 (xmin, ymin, xmax - 1, ymax - 1);
-    delete clipper;
-    clipper = NULL;
-  }
+    UpdateView ();
 
   if (!clipper)
   {
-    if (view)
-      clipper = new csPolygonClipper (view);
+    if (pview)
+      clipper = new csPolygonClipper (pview);
     else
       clipper = new csBoxClipper (*bview);
   }

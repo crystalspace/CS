@@ -48,12 +48,15 @@ private:
   // Clipping rectangle.
   csBox2 *bview;
   // Clipping region.
-  csPolygon2D *view;
+  csPolygon2D *pview;
 
   // csCamera.
   csCamera *camera;
   // World.
   csWorld *world;
+
+  /// Update view on context rescale or change (automatic)
+  void UpdateView ();
 
 public:
   /// Constructor.
@@ -74,6 +77,8 @@ public:
   void ClearView ();
   /// Set clipping rectangle.
   void SetRectangle (int x, int y, int w, int h);
+  /// Set Context
+  void SetContext (iGraphics3D *ig3d);
   /// Add a vertex to clipping polygon (non-rectangular clipping).
   void AddViewVertex (int x, int y);
   /// Update the Clipper. This is usually called from Draw.
