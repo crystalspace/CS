@@ -24,6 +24,7 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed csGetPluginPaths() for Unix so that it respects
 	  csGetAppDir() and csGetResourceDir() when composing the list of
 	  directories to scan for plugin modules.
+	- Matze added a workaround for bison 1.875 to aws
 22-Jun-2003
 	- Luca did the following:
 	  - Fixed a bug in the label component of AWS: in fact the method

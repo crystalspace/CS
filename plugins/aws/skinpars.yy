@@ -19,6 +19,10 @@
 #include "awsparser.h"
 #include <stdio.h>
 
+// bison 1.875 outputs wrong code (an attribute after a label is not allowed in
+// g++
+#define __attribute__(x)
+
 %}
 
 
