@@ -4705,7 +4705,7 @@ bool csLoader::ParseSharedVariable (iLoaderContext* ldr_context,
   }
   else
   {
-    SyntaxService->ReportError ("csLoader::ParseSharedVariable",
+    SyntaxService->ReportError ("crystalspace.maploader",
     	node, "Variable tag does not have 'name' attribute.");
     return false;
   }
@@ -4765,7 +4765,7 @@ bool csLoader::ParseShaderList (iDocumentNode* node)
 
 	  if(!shaderFile)
 	  {
-	    ReportWarning ("csLoader::ParseShaderList", 
+	    ReportWarning ("crystalspace.maploader",
 	      "Unable to open shader file '%s'!",
 	      fileChild->GetContentsValue ());
 	    break;
@@ -4779,7 +4779,7 @@ bool csLoader::ParseShaderList (iDocumentNode* node)
 	  const char* err = shaderDoc->Parse (shaderFile);
 	  if (err != 0)
 	  {
-	    ReportWarning ("csLoader::ParseShaderList", 
+	    ReportWarning ("crystalspace.maploader",
 	      "Could not parse shader file '%s': %s",
 	      fileChild->GetContentsValue (), err);
 	    break;
@@ -4793,8 +4793,14 @@ bool csLoader::ParseShaderList (iDocumentNode* node)
 
 	csRef<iShaderManager> shmgr (CS_QUERY_REGISTRY(object_reg, 
 	  iShaderManager));
-	csRef<iShaderCompiler> shcom (shmgr->GetCompiler (
-          shaderNode->GetAttributeValue ("type")));
+        const char* type = shaderNode->GetAttributeValue ("type");
+	if (type == 0)
+	{
+	  SyntaxService->ReportError ("crystalspace.maploader", shaderNode,
+	    "'type' attribute is missing!");
+	  return false;
+	}
+	csRef<iShaderCompiler> shcom (shmgr->GetCompiler (type));
 	csRef<iShader> shader = 
 	  shcom->CompileShader (shaderNode);
 

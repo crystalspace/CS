@@ -37,6 +37,7 @@ chronological order.
 	  ambient color (STANDARD_LIGHT_AMBIENT). So you can use this to
 	  set another ambient value on a material. This is useful to make
 	  fullbright materials for example.
+	- Jorrit improved error reporting for shader loading a bit.
 1-Apr-2004
 	- Eric Sunshine fixed include/Jamfile so that it installs Swig (*.i)
 	  files.  These are needed by CEL, for instance.
