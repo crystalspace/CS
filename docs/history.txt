@@ -1,5 +1,19 @@
 The history order has been reversed so that new features are at the top.
 
+23-Dec-2000
+	- Norman Kramer fixed a bug in the bmp loader.
+	- Moved snow, rain, spiral, fountain, fire, and explosion particle
+	  systems from csengine to csfx library. Only the basic particle
+	  and newtonian particle systems remain in csengine.
+	- Found out that materials and textures were not correctly searched
+	  in the current region. Fixed csloader for this.
+	- Fixed a potential bug with polygons that had no texture. The
+	  new Visit() would crash on them. It seems however that there is
+	  still a bug somewhere. The portal command is very unreliable now.
+	  To be investigated.
+	- Extended csLoader::FindMaterial() with a regionOnly parameter.
+	- Added csEngine::FindCsTexture() and FindCsMaterial() which return
+	  a csTextureHandle and csMaterialHandle respectively.
 22-Dec-2000
 	- Eliminated a bug in the procedural texture manager for the software
 	  renderer.  The problem was that only the first 8-bit proc texture was
