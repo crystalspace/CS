@@ -126,8 +126,8 @@ struct SymCallbackInfo
 
 csStringSet cswinCallStack::strings;
 
-BOOL cswinCallStack::EnumSymCallback (SYMBOL_INFO* pSymInfo, ULONG SymbolSize, 
-				      PVOID UserContext)
+BOOL CALLBACK cswinCallStack::EnumSymCallback (SYMBOL_INFO* pSymInfo,
+  ULONG SymbolSize, PVOID UserContext)
 {
   if ((pSymInfo->Flags & SYMFLAG_PARAMETER) != 0)
   {
