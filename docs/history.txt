@@ -14,6 +14,13 @@ The history order is reversed so that new features are at the top.
 	- Added iSector->SetSectorCallback() and other appropriate functions.
 	  This callback will be called whenever the sector is traversed
 	  for lighting or renering.
+	- Added a new null mesh. This mesh does not draw or do anything at
+	  all. It represents a sphere of a certain radius which is handled
+	  by the engine and visibility culler in all normal aspects but
+	  otherwise has no influence on screen. This object is useful in
+	  combination with the callbacks mentioned above. You can then
+	  define triggers that activate when a certain area of space
+	  becomes visible or is entered. More on triggers in later commits...
 21-Sep-2002
 	- Keith Fulton added optimization to dynamic lightmap recalculation
 	  to use tighter loops when overflow protection is not necessary.  These
