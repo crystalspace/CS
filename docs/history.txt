@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+6-Mar-2004
+	- Anders Stenberg finally found and fixed a clipper problem in NR, 
+	  which actually turned out to be more than a clipper problem.
 5-Mar-2004
 	- Jorrit changed 'userobject' in csKDTree to a csRef<iBase>.
 	- Eric Sunshine increased robustness of CS_STATIC_VARIABLE_CLEANUP by

@@ -1694,6 +1694,8 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh,
     glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE);
     glDisable(GL_POINT_SPRITE_ARB);
   }
+
+  SetMirrorMode (false);
 }
 
 void csGLGraphics3D::DrawPixmap (iTextureHandle *hTex,
