@@ -36,14 +36,14 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: walk walktestclean
+.PHONY: walk walkclean
 
 all: $(WALKTEST.EXE)
 walk: $(OUTDIRS) $(WALKTEST.EXE)
 clean: walkclean
 
 $(WALKTEST.EXE): $(DEP.EXE) $(OBJ.WALKTEST) \
-  $(CSPARSER.LIB) $(CSENGINE.LIB) $(CSSCRIPT.LIB) \
+  $(CSAPPUTIL.LIB) $(CSPARSER.LIB) $(CSENGINE.LIB) $(CSSCRIPT.LIB) \
   $(CSGEOM.LIB) $(CSSNDLDR.LIB) $(CSGFXLDR.LIB) \
   $(CSUTIL.LIB) $(CSCOM.LIB) $(CSSYS.LIB) $(CSINPUT.LIB) $(CSOBJECT.LIB)
 	$(DO.LINK.EXE)
