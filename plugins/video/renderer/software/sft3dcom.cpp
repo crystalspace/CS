@@ -2872,7 +2872,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
   struct
   {
     // Start and final vertex number
-    char sv, fv;
+    uint8 sv, fv;
     // The X coordinates and its per-scanline delta; also the final Y coordinate
     int x, dxdy, fy;
     // The `U/V/Z' texture coordinates and their per-scanline delta
@@ -2984,7 +2984,9 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
         if (L.fv == bot)
           return;
         L.sv = L.fv;
-	if (--L.fv < 0)
+	if (L.fv)
+	  L.fv--;
+	else
 	  L.fv = poly.num - 1;
 
         leave = false;
