@@ -51,12 +51,15 @@ float csImposterMesh::CalcIncidenceAngleDist(iRenderView *rview)
   return csSquaredDist::PointPoint (straight, pt);
 }
 
-bool csImposterMesh::CheckIncidenceAngle(iRenderView *rview,float tolerance)
+bool csImposterMesh::CheckIncidenceAngle(iRenderView *rview, float tolerance)
 {
-  float dist2 = CalcIncidenceAngleDist(rview);
+  float const dist2 = CalcIncidenceAngleDist(rview);
+  float diff = dist2 - incidence_dist;
+  if (diff < 0)
+      diff = -diff;
 
   // If not ok, mark for redraw of imposter
-  if (abs (dist2 - incidence_dist) > tolerance )
+  if (diff > tolerance)
   {
     SetImposterReady (false);
     return false;
