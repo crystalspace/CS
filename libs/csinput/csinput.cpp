@@ -93,11 +93,14 @@ void csKeyboardDriver::do_keypress (time_t evtime, int key)
 
 void csKeyboardDriver::do_keyrelease (time_t evtime, int key)
 {
+  int smask = (GetKeyState (CSKEY_SHIFT) ? CSMASK_SHIFT : 0)
+            | (GetKeyState (CSKEY_CTRL) ? CSMASK_CTRL : 0)
+            | (GetKeyState (CSKEY_ALT) ? CSMASK_ALT : 0);
   if ((key >= 32) && (key < 128))
     if (GetKeyState (CSKEY_SHIFT))
       key = ShiftedKey [key - 32];
   if (EventQueue)
-    CHKB (EventQueue->Put (new csEvent (evtime, csevKeyUp, key, 0)));
+    CHKB (EventQueue->Put (new csEvent (evtime, csevKeyUp, key, smask)));
   SetKeyState (key, false);
 }
 
