@@ -80,6 +80,13 @@ public:
 
   /// Occurs whenever the component loses keyboard focus.
   static const int signalLostFocus;
+
+  /// Occurs when the "enter" key is pressed.
+  static const int signalEnterPressed;
+
+  /// Occures when the "tab" key is pressed.
+  static const int signalTabPressed;
+
 public:
   /// Get's the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, awsComponentNode *settings);
