@@ -387,7 +387,9 @@ SysSystemDriver::SysSystemDriver () : csSystemDriver ()
   wc.cbClsExtra     = 0;
   wc.cbWndExtra     = 0;
 
-  ASSERT(RegisterClass (&wc));
+  bool bResult;
+  bResult = RegisterClass (&wc)
+  ASSERT(bResult);
 }
 
 bool SysSystemDriver::Open (const char *Title)
