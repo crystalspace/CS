@@ -6,20 +6,21 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
-26-Nov-2003
-	- res re-added VC7 project files.
 25-Nov-2003
 	- Marten Svanfeldt branched CS with the new branch NEW_SHADERSYS.
 	  The purpose of this branch is to develop the new shadersystem 
 	  without disturbing all other development. Goal is to merge it back
 	  within three weeks. Initial changes to this branch is:
 	    - Move shadermgr into plugins\video\render3d\shader\shadermgr
-	    - Moved the shaderplugins to plugins\video\render3d\shader\shaderplugins
+	    - Moved the shaderplugins to
+	      plugins\video\render3d\shader\shaderplugins
 	    - Added an initial implementation of csXMLShader and 
-	      csXMLShaderCompiler in plugin\video\render3d\shader\shadercompiler\
+	      csXMLShaderCompiler in
+	      plugin\video\render3d\shader\shadercompiler\
 	      xmlshader. It have all methods but lacks testing.
 	    - Rewrote ivideo/shader/shader.h We should move this file to
 	      ivideo.
+	- res re-added VC7 project files.
 24-Nov-2003
 	- Eric Sunshine performed minor clean up of the new cslibs test in
 	  configure.ac.  Now wraps cslibs-config invocations in AC_RUN_LOG().
