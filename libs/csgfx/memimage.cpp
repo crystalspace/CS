@@ -56,7 +56,7 @@ void csImageMemory::ConstructWHF (int width, int height, int format)
 void csImageMemory::ConstructSource (iImage* source)
 {
   ConstructWHF (source->GetWidth(), source->GetHeight(), source->GetFormat());
- 
+
   AllocImage();
   memcpy (Image, source->GetImageData(), csImageTools::ComputeDataSize (this));
   if (Alpha)
@@ -65,7 +65,7 @@ void csImageMemory::ConstructSource (iImage* source)
     memcpy (Palette, source->GetPalette(), sizeof (csRGBpixel) * 256);
 }
 
-void csImageMemory::ConstructBuffers (int width, int height, void* buffer, 
+void csImageMemory::ConstructBuffers (int width, int height, void* buffer,
     bool destroy, int format, csRGBpixel *palette)
 {
   ConstructCommon();
@@ -82,15 +82,15 @@ csImageMemory::csImageMemory (int width, int height, int format) : csImageBase()
   ConstructWHF (width, height, format);
 }
 
-csImageMemory::csImageMemory (int width, int height, void* buffer, 
-			      bool destroy, int format, csRGBpixel *palette) 
+csImageMemory::csImageMemory (int width, int height, void* buffer,
+                              bool destroy, int format, csRGBpixel *palette)
   : csImageBase()
 {
   ConstructBuffers (width, height, buffer, destroy, format, palette);
 }
 
-csImageMemory::csImageMemory (int width, int height, const void* buffer, 
-			      int format, const csRGBpixel *palette)
+csImageMemory::csImageMemory (int width, int height, const void* buffer,
+                              int format, const csRGBpixel *palette)
  : csImageBase()
 {
   ConstructWHF (width, height, format);
@@ -176,7 +176,7 @@ csImageMemory::~csImageMemory ()
   if (!destroy_image)
   {
     // Before calling FreeImage() we first
-    // clear the 'Image' and 'Palette' pointers so that 
+    // clear the 'Image' and 'Palette' pointers so that
     // it will not try to deallocate.
     Image = 0;
     Palette = 0;
@@ -186,25 +186,28 @@ csImageMemory::~csImageMemory ()
   SCF_DESTRUCT_IBASE ();
 }
 
-void* csImageMemory::GetImagePtr () 
-{ 
+void* csImageMemory::GetImagePtr ()
+{
   EnsureImage();
-  return Image; 
+  return Image;
 }
-csRGBpixel* csImageMemory::GetPalettePtr () 
-{ 
+csRGBpixel* csImageMemory::GetPalettePtr ()
+{
   EnsureImage();
-  return Palette; 
+  return Palette;
 }
-uint8* csImageMemory::GetAlphaPtr () 
-{ 
+uint8* csImageMemory::GetAlphaPtr ()
+{
   EnsureImage();
-  return Alpha; 
+  return Alpha;
 }
 
 void csImageMemory::Clear (const csRGBpixel &colour)
 {
   if ((Format & CS_IMGFMT_MASK) != CS_IMGFMT_TRUECOLOR) return;
+
+  EnsureImage ();
+
   uint32 *src = (uint32*) &colour;
   uint32 *dst = (uint32*)Image;
 
@@ -244,8 +247,8 @@ void csImageMemory::CheckAlpha ()
   if (noalpha)
   {
     if (Alpha)
-    { 
-      delete [] Alpha; Alpha = 0; 
+    {
+      delete [] Alpha; Alpha = 0;
     }
     Format &= ~CS_IMGFMT_ALPHA;
   }
@@ -266,7 +269,7 @@ void csImageMemory::ConvertFromRGBA (csRGBpixel *iImage)
       {
         if (!Alpha)
           Alpha = new uint8 [pixels];
-	int i;
+        int i;
         for (i = 0; i < pixels; i++)
           Alpha [i] = iImage [i].alpha;
       }
@@ -274,15 +277,15 @@ void csImageMemory::ConvertFromRGBA (csRGBpixel *iImage)
       {
         // The most complex case: reduce an RGB image to a paletted image.
         int maxcolors = 256;
-	csColorQuantizer quant;
-	quant.Begin ();
+        csColorQuantizer quant;
+        quant.Begin ();
 
-	quant.Count (iImage, pixels);
-	quant.Palette (Palette, maxcolors);
-	quant.RemapDither (iImage, pixels, Width, Palette, maxcolors, 
-	  (uint8 *&)Image, has_keycolour ? &keycolour : 0);
+        quant.Count (iImage, pixels);
+        quant.Palette (Palette, maxcolors);
+        quant.RemapDither (iImage, pixels, Width, Palette, maxcolors,
+          (uint8 *&)Image, has_keycolour ? &keycolour : 0);
 
-	quant.End ();
+        quant.End ();
       }
       delete [] iImage;
       break;
@@ -295,7 +298,7 @@ void csImageMemory::ConvertFromRGBA (csRGBpixel *iImage)
 }
 
 void csImageMemory::ConvertFromPal8 (uint8 *iImage, csRGBpixel *iPalette,
-				     int nPalColors)
+                                     int nPalColors)
 {
   int pixels = Width * Height;
 
@@ -303,7 +306,7 @@ void csImageMemory::ConvertFromPal8 (uint8 *iImage, csRGBpixel *iPalette,
   if (nPalColors < 256)
   {
     csRGBpixel *newPal = new csRGBpixel [256];
-    memcpy ((void*)newPal, (const void*)iPalette, 
+    memcpy ((void*)newPal, (const void*)iPalette,
       nPalColors * sizeof(csRGBpixel));
     delete[] iPalette;
     iPalette = newPal;
@@ -346,8 +349,8 @@ void csImageMemory::ConvertFromPal8 (uint8 *iImage, csRGBpixel *iPalette,
         while (pixels--)
           *out++ = iPalette [*in++];
       delete [] Alpha; Alpha = 0;
-      delete [] iImage; 
-      delete [] iPalette; 
+      delete [] iImage;
+      delete [] iPalette;
       break;
     }
   }
@@ -357,9 +360,9 @@ void csImageMemory::ConvertFromPal8 (uint8 *iImage, csRGBpixel *iPalette,
     Format &= ~CS_IMGFMT_ALPHA;
 }
 
-void csImageMemory::ConvertFromPal8 (uint8 *iImage, 
-				     const csRGBcolor *iPalette, 
-				     int nPalColors)
+void csImageMemory::ConvertFromPal8 (uint8 *iImage,
+                                     const csRGBcolor *iPalette,
+                                     int nPalColors)
 {
   csRGBpixel *newpal = new csRGBpixel [256];
   int i;
@@ -429,7 +432,7 @@ void csImageMemory::ClearKeyColor ()
 
 void csImageMemory::ApplyKeyColor ()
 {
-  if (has_keycolour 
+  if (has_keycolour
     && ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8))
   {
     if (Image == 0) return;
@@ -448,8 +451,8 @@ void csImageMemory::ApplyKeyColor ()
     {
       if (!usedEntries[*imagePtr])
       {
-	usedEntries[*imagePtr] = true;
-	remainingEntries--;
+        usedEntries[*imagePtr] = true;
+        remainingEntries--;
       }
       imagePtr++;
     }
@@ -460,8 +463,8 @@ void csImageMemory::ApplyKeyColor ()
     {
       if (Palette[i].eq (keycolour))
       {
-	keyIndex = i;
-	break;
+        keyIndex = i;
+        break;
       }
     }
     if (keyIndex <= 0)
@@ -473,8 +476,8 @@ void csImageMemory::ApplyKeyColor ()
     {
       if (!usedEntries[i])
       {
-	newIndex = i;
-	break;
+        newIndex = i;
+        break;
       }
     }
     if (newIndex == -1)
@@ -491,16 +494,16 @@ void csImageMemory::ApplyKeyColor ()
     for (i = 0; i < pixcount; i++)
     {
       if (*imagePtr == 0)
-	*imagePtr = newIndex;
+        *imagePtr = newIndex;
       else if (*imagePtr == keyIndex)
-	*imagePtr = 0;
+        *imagePtr = 0;
       imagePtr++;
     }
   }
 }
 
 bool csImageMemory::Copy (iImage* simage, int x, int y,
-			  int width, int height )
+                          int width, int height )
 {
   if (width<0) return false;
   if (height<0) return false;
@@ -525,14 +528,14 @@ bool csImageMemory::Copy (iImage* simage, int x, int y,
         break;
       case CS_IMGFMT_PALETTED8:
         for ( i=0; i<height; i++ )
-	  memcpy ((uint8*)Image + (i+y)*Width + x,
-	  	(uint8*)simage->GetImageData() + i*width,  width);
+          memcpy ((uint8*)Image + (i+y)*Width + x,
+                (uint8*)simage->GetImageData() + i*width,  width);
         break;
       case CS_IMGFMT_TRUECOLOR:
         for ( i=0; i<height; i++ )
           memcpy ((csRGBpixel*)Image + (i+y)*Width + x,
-	  	(csRGBpixel*)simage->GetImageData() + i*width,
-		width * sizeof (csRGBpixel));
+                (csRGBpixel*)simage->GetImageData() + i*width,
+                width * sizeof (csRGBpixel));
         break;
     }
   }
@@ -541,7 +544,7 @@ bool csImageMemory::Copy (iImage* simage, int x, int y,
 }
 
 bool csImageMemory::CopyScale (iImage* simage, int x, int y,
-			       int width, int height )
+                               int width, int height )
 {
   if (width<0) return false;
   if (height<0) return false;
@@ -554,7 +557,7 @@ bool csImageMemory::CopyScale (iImage* simage, int x, int y,
 }
 
 bool csImageMemory::CopyTile (iImage* simage, int x, int y,
-			      int width, int height )
+                              int width, int height )
 {
   if (width<0) return false;
   if (height<0) return false;
@@ -576,7 +579,7 @@ bool csImageMemory::CopyTile (iImage* simage, int x, int y,
     for(int j=0;j<hfactor;j++)
       psimage->Copy (simage, i*sWidth, j*sHeight, sWidth, sHeight);
 
-  Copy (csImageManipulate::Rescale (psimage, width, height), x, y, 
+  Copy (csImageManipulate::Rescale (psimage, width, height), x, y,
     width, height);
 
   return true;
