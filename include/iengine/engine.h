@@ -493,7 +493,7 @@ struct iEngine : public iBase
    * that Draw would do except for one important thing: it will
    * not draw anything. Instead it will call a callback function for
    * every entity that it was planning to draw. This allows you to show
-   * or draw debugging information (2D egdes for example).
+   * or draw debugging information (2D edges for example).
    */
   virtual void DrawFunc (iCamera* c, iClipper2D* clipper,
     iDrawFuncCallback* callback) = 0;
