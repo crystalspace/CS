@@ -117,14 +117,6 @@ void csBspTree::Build (csPolygonInt** polygons, int num)
   delete [] new_polygons;
 }
 
-#define BSPDB 0
-
-#if BSPDB
-#  define DB(msg) CsPrintf##msg;
-#else
-#  define DB(msg)
-#endif
-
 int csBspTree::SelectSplitter (csPolygonInt** polygons, int num)
 {
   int i, j, poly_idx;
@@ -235,18 +227,15 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, int num)
       }
     }
   }
-DB((MSG_DEBUG_0, "BEST=%d\n", poly_idx));
   return poly_idx;
 }
 
 void csBspTree::Build (csBspNode* node, csPolygonInt** polygons,
 	int num)
 {
-DB((MSG_DEBUG_0, "num=%d\n", num))
   int i;
   if (!Covers (polygons, num))
   {
-DB((MSG_DEBUG_0, "  !Covers\n"))
     // We have a convex set.
     node->polygons_on_splitter = false;
     for (i = 0 ; i < num ; i++)
@@ -255,7 +244,6 @@ DB((MSG_DEBUG_0, "  !Covers\n"))
   }
 
   int poly_idx = SelectSplitter (polygons, num);
-DB((MSG_DEBUG_0, "  poly_idx=%d\n", poly_idx))
   csPolygonInt* split_poly = polygons[poly_idx];
   node->splitter = *(split_poly->GetPolyPlane ());
 
@@ -267,7 +255,6 @@ DB((MSG_DEBUG_0, "  poly_idx=%d\n", poly_idx))
   for (i = 0 ; i < num ; i++)
   {
     int c = polygons[i]->Classify (node->splitter);
-DB((MSG_DEBUG_0, "  pol%d->%d\n", i, c))
     switch (c)
     {
       case POL_SAME_PLANE:

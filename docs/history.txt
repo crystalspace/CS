@@ -2,6 +2,10 @@ The history order has been reversed so that new features are at the top.
 
 24-May-2000
 	- Some changes to terrain engine from Alex Pfaffe.
+	- Fixed another problem in octree building which could cause
+	  differences in the octree on various problems. This is not really
+	  a bug but I like to have the generated octree the same on all
+	  platforms to easy debugging and make bugs more reproducable.
 23-May-2000
 	- Fixed a small potential problem with the polygon Covers function.
 	  It compared a float to 0 which seems to be a little system
