@@ -390,7 +390,7 @@ void csGraphics3DOGLCommon::InitGLExtensions ()
 	csString cfgkey;
 	cfgkey << EXT_CONFIG_KEY << "." << ext;
 
-	#define USE_OGL_EXT(extname)		  \
+#       define USE_OGL_EXT(extname)		  \
 	if (!strcmp (ext, "GL_" #extname))	  \
 	{					  \
 	  if (!config->GetBool(EXT_CONFIG_KEY	  \
@@ -407,8 +407,8 @@ void csGraphics3DOGLCommon::InitGLExtensions ()
 	  }					  \
 	} else
 
-	#include "ogl_suppext.h"
-	#undef USE_OGL_EXT
+#       include "ogl_suppext.h"
+#       undef USE_OGL_EXT
 	{ /* the last 'else' */ }
 
 	ext = next;
@@ -421,17 +421,17 @@ void csGraphics3DOGLCommon::InitGLExtensions ()
     iConfigIterator *it = config->Enumerate (EXT_CONFIG_KEY);
     while (it->Next())
     {
-	#define USE_OGL_EXT(extname)				    \
+#     define USE_OGL_EXT(extname)				    \
 	if (!strcmp (it->GetKey(), EXT_CONFIG_KEY ".GL_" #extname)) \
 	{ continue; } else
 
-	#include "ogl_suppext.h"
-	#undef USE_OGL_EXT
-	{
-	  Report (CS_REPORTER_SEVERITY_NOTIFY,
+#     include "ogl_suppext.h"
+#     undef USE_OGL_EXT
+      {
+	Report (CS_REPORTER_SEVERITY_NOTIFY,
 	    "Extension %s was used in config but is "
 	    "actually not supported", it->GetKey());
-	}
+      }
     }
     it->DecRef();
   }
@@ -821,12 +821,12 @@ bool csGraphics3DOGLCommon::NewOpen ()
       if (s##str) \
       { \
         csString s_##str; \
-  s_##str << OGLCONFIGS_PREFIX << oglconfig << '.' << #str; \
-  if (config->KeyExists(s_##str.GetData())) \
-  { \
-    count++; \
-    apply &= csGlobMatches(s##str, config->GetStr(s_##str.GetData())); \
-  } \
+	s_##str << OGLCONFIGS_PREFIX << oglconfig << '.' << #str; \
+	if (config->KeyExists(s_##str.GetData())) \
+	{ \
+	  count++; \
+	  apply &= csGlobMatches(s##str, config->GetStr(s_##str.GetData())); \
+	} \
       }
 
       CHECK_STRING (GL_VENDOR);
@@ -837,14 +837,14 @@ bool csGraphics3DOGLCommon::NewOpen ()
 
       if (apply && count != 0)
       {
-  csString cfgfkey;
-  cfgfkey << OGLCONFIGS_PREFIX << oglconfig << OGLCONFIGS_SUFFIX;
-  csString cfgfile("/config/");
-  cfgfile << config->GetStr(cfgfkey.GetData());
-  config.AddConfig(object_reg, cfgfile.GetData(),
-    iConfigManager::ConfigPriorityPlugin + 1);
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "read config for '%s' from %s",
-    oglconfig.GetData(), cfgfile.GetData());
+	csString cfgfkey;
+	cfgfkey << OGLCONFIGS_PREFIX << oglconfig << OGLCONFIGS_SUFFIX;
+	csString cfgfile("/config/");
+	cfgfile << config->GetStr(cfgfkey.GetData());
+	config.AddConfig(object_reg, cfgfile.GetData(),
+	  iConfigManager::ConfigPriorityPlugin + 1);
+	Report (CS_REPORTER_SEVERITY_NOTIFY, "read config for '%s' from %s",
+	  oglconfig.GetData(), cfgfile.GetData());
       }
       oglconfigs.Push(csStrNew (oglconfig.GetData()));
     }
@@ -1693,7 +1693,7 @@ void csGraphics3DOGLCommon::SetupStencil ()
     statecache->DisableState (GL_TEXTURE_2D);
     SetupBlend (CS_FX_TRANSPARENT, 0, false);
     glBegin (GL_TRIANGLE_FAN);
-  int i;
+    int i;
     for (i = 0 ; i < nv ; i++)
       glVertex2f (v[i].x, v[i].y);
     glEnd ();
@@ -1869,8 +1869,8 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
         float vshift = layer->vshift;
         for (i = 0 ; i < queue.num_vertices ; i++)
         {
-    *dst++ = (*src++) * uscale + ushift;
-    *dst++ = (*src++) * vscale + vshift;
+	  *dst++ = (*src++) * uscale + ushift;
+	  *dst++ = (*src++) * vscale + vshift;
         }
 
         p_gltxt = queue.layer_gltxt;
@@ -2315,8 +2315,8 @@ void csGraphics3DOGLCommon::DrawPolygonZFill (G3DPolygonDP & poly)
   for (i = 1; i < poly.num; i++)
   {
     if ((ABS (poly.vertices[i].x - poly.vertices[i - 1].x)
-   + ABS (poly.vertices[i].y - poly.vertices[i - 1].y))
-    > VERTEX_NEAR_THRESHOLD)
+	+ ABS (poly.vertices[i].y - poly.vertices[i - 1].y))
+	> VERTEX_NEAR_THRESHOLD)
       num_vertices++;
   }
   // if this is a 'degenerate' polygon, skip it
@@ -2541,17 +2541,17 @@ static void ResolveVertex (
       texel = otexels[i1] * (1-r) + otexels[i2] * r;
       if (ocolors)
       {
-  color.red = ocolors[i1].red * (1-r) + ocolors[i2].red * r;
-  color.green = ocolors[i1].green * (1-r) + ocolors[i2].green * r;
-  color.blue = ocolors[i1].blue * (1-r) + ocolors[i2].blue * r;
+	color.red = ocolors[i1].red * (1-r) + ocolors[i2].red * r;
+	color.green = ocolors[i1].green * (1-r) + ocolors[i2].green * r;
+	color.blue = ocolors[i1].blue * (1-r) + ocolors[i2].blue * r;
       }
       if (ofog)
       {
-  fog.intensity = ofog[i1].intensity*(1-r)+ofog[i2].intensity*r;
-  fog.intensity2 = 0;
-  fog.r = ofog[i1].r * (1-r) + ofog[i2].r * r;
-  fog.g = ofog[i1].g * (1-r) + ofog[i2].g * r;
-  fog.b = ofog[i1].b * (1-r) + ofog[i2].b * r;
+	fog.intensity = ofog[i1].intensity*(1-r)+ofog[i2].intensity*r;
+	fog.intensity2 = 0;
+	fog.r = ofog[i1].r * (1-r) + ofog[i2].r * r;
+	fog.g = ofog[i1].g * (1-r) + ofog[i2].g * r;
+	fog.b = ofog[i1].b * (1-r) + ofog[i2].b * r;
       }
       break;
     }
@@ -2561,9 +2561,9 @@ static void ResolveVertex (
       csColor color1, color2;
       G3DFogInfo fog1, fog2;
       ResolveVertex (ci->inside.ci1, clipped_translate, overts, otexels,
-    ocolors, ofog, texel1, color1, fog1);
+	ocolors, ofog, texel1, color1, fog1);
       ResolveVertex (ci->inside.ci2, clipped_translate, overts, otexels,
-    ocolors, ofog, texel2, color2, fog2);
+	ocolors, ofog, texel2, color2, fog2);
       delete ci->inside.ci1;
       delete ci->inside.ci2;
       ci->type = CS_CLIPINFO_ORIGINAL;
@@ -2571,17 +2571,17 @@ static void ResolveVertex (
       texel = texel1 * (1-r) + texel2 * r;
       if (ocolors)
       {
-  color.red = color1.red * (1-r) + color2.red * r;
-  color.green = color1.green * (1-r) + color2.green * r;
-  color.blue = color1.blue * (1-r) + color2.blue * r;
+	color.red = color1.red * (1-r) + color2.red * r;
+	color.green = color1.green * (1-r) + color2.green * r;
+	color.blue = color1.blue * (1-r) + color2.blue * r;
       }
       if (ofog)
       {
-  fog.intensity =  fog1.intensity*(1-r)+fog2.intensity*r;
-  fog.intensity2 = 0;
-  fog.r = fog1.r * (1-r) + fog2.r * r;
-  fog.g = fog1.g * (1-r) + fog2.g * r;
-  fog.b = fog1.b * (1-r) + fog2.b * r;
+	fog.intensity =  fog1.intensity*(1-r)+fog2.intensity*r;
+	fog.intensity2 = 0;
+	fog.r = fog1.r * (1-r) + fog2.r * r;
+	fog.g = fog1.g * (1-r) + fog2.g * r;
+	fog.b = fog1.b * (1-r) + fog2.b * r;
       }
       break;
     }
@@ -2744,8 +2744,8 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     {
       if (planes[j].Classify (v-frust_origin) >= 0)
       {
-  inside = false;
-  break;  // Not inside.
+	inside = false;
+	break;  // Not inside.
       }
     }
     if (inside)
@@ -2778,7 +2778,7 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     csTriangle& tri = triangles[i];
     int cnt = int ((*clipped_translate)[tri.a] != -1)
         + int ((*clipped_translate)[tri.b] != -1)
-  + int ((*clipped_translate)[tri.c] != -1);
+	+ int ((*clipped_translate)[tri.c] != -1);
     if (cnt == 0)
     {
       //=====
@@ -2796,13 +2796,13 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
         csVector3 v0 = vertices[tri.a] - frust_origin;
         csVector3 v1 = vertices[tri.b] - frust_origin;
         csVector3 v2 = vertices[tri.c] - frust_origin;
-  float c0 = pl.Classify (v0);
-  float c1 = pl.Classify (v1);
-  // Set cnt to 1 so that we will clip in the next part.
-  if ((c0 < 0 && c1 > 0) || (c0 > 0 && c1 < 0)) { cnt = 1; break; }
-  float c2 = pl.Classify (v2);
-  if ((c0 < 0 && c2 > 0) || (c0 > 0 && c2 < 0)) { cnt = 1; break; }
-  if ((c1 < 0 && c2 > 0) || (c1 > 0 && c2 < 0)) { cnt = 1; break; }
+	float c0 = pl.Classify (v0);
+	float c1 = pl.Classify (v1);
+	// Set cnt to 1 so that we will clip in the next part.
+	if ((c0 < 0 && c1 > 0) || (c0 > 0 && c1 < 0)) { cnt = 1; break; }
+	float c2 = pl.Classify (v2);
+	if ((c0 < 0 && c2 > 0) || (c0 > 0 && c2 < 0)) { cnt = 1; break; }
+	if ((c1 < 0 && c2 > 0) || (c1 > 0 && c2 < 0)) { cnt = 1; break; }
       }
     }
 
@@ -2834,7 +2834,7 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
         (*clipped_triangles)[num_clipped_triangles].b = tri.b;
         (*clipped_triangles)[num_clipped_triangles].c = tri.c;
         num_clipped_triangles++;
-  continue;
+	continue;
       }
 
       csVector3 poly[100];  // @@@ Arbitrary limit
@@ -2857,8 +2857,8 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       //-----
       for (j = 0 ; j < num_planes ; j++)
       {
-  csFrustum::ClipToPlane (poly, num_poly, clipinfo, planes[j]);
-  if (num_poly <= 0) break;
+	csFrustum::ClipToPlane (poly, num_poly, clipinfo, planes[j]);
+	if (num_poly <= 0) break;
       }
 
       //-----
@@ -2867,22 +2867,22 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       //-----
       for (j = 0 ; j < num_poly ; j++)
       {
-  if (clipinfo[j].type == CS_CLIPINFO_ORIGINAL)
-  {
-    clipinfo[j].original.idx =
-      (*clipped_translate)[clipinfo[j].original.idx];
-  }
+	if (clipinfo[j].type == CS_CLIPINFO_ORIGINAL)
+	{
+	  clipinfo[j].original.idx =
+	    (*clipped_translate)[clipinfo[j].original.idx];
+	}
         else
-  {
-    ResolveVertex (&clipinfo[j], clipped_translate->GetArray (),
-      vertices, texels, vertex_colors, vertex_fog,
-    clipped_texels->GetArray ()[num_clipped_vertices],
-    clipped_colors->GetArray ()[num_clipped_vertices],
-    clipped_fog->GetArray ()[num_clipped_vertices]);
-    (*clipped_vertices)[num_clipped_vertices] = poly[j]+frust_origin;
-    clipinfo[j].original.idx = num_clipped_vertices;
-    num_clipped_vertices++;
-  }
+	{
+	  ResolveVertex (&clipinfo[j], clipped_translate->GetArray (),
+	    vertices, texels, vertex_colors, vertex_fog,
+	    clipped_texels->GetArray ()[num_clipped_vertices],
+	    clipped_colors->GetArray ()[num_clipped_vertices],
+	    clipped_fog->GetArray ()[num_clipped_vertices]);
+	  (*clipped_vertices)[num_clipped_vertices] = poly[j]+frust_origin;
+	  clipinfo[j].original.idx = num_clipped_vertices;
+	  num_clipped_vertices++;
+	}
       }
 
       //-----
@@ -3064,8 +3064,8 @@ void csGraphics3DOGLCommon::ClipTrianglePolygonMesh (
     {
       if (planes[j].Classify (v-frust_origin) >= 0)
       {
-  inside = false;
-  break;  // Not inside.
+	inside = false;
+	break;  // Not inside.
       }
     }
     if (inside)
@@ -3098,7 +3098,7 @@ void csGraphics3DOGLCommon::ClipTrianglePolygonMesh (
     csTriangle& tri = triangles[i];
     int cnt = int ((*clipped_translate)[tri.a] != -1)
         + int ((*clipped_translate)[tri.b] != -1)
-  + int ((*clipped_translate)[tri.c] != -1);
+	+ int ((*clipped_translate)[tri.c] != -1);
     if (cnt == 0)
     {
       //=====
@@ -3116,13 +3116,13 @@ void csGraphics3DOGLCommon::ClipTrianglePolygonMesh (
         csVector3 v0 = vertices[tri.a] - frust_origin;
         csVector3 v1 = vertices[tri.b] - frust_origin;
         csVector3 v2 = vertices[tri.c] - frust_origin;
-  float c0 = pl.Classify (v0);
-  float c1 = pl.Classify (v1);
-  // Set cnt to 1 so that we will clip in the next part.
-  if ((c0 < 0 && c1 > 0) || (c0 > 0 && c1 < 0)) { cnt = 1; break; }
-  float c2 = pl.Classify (v2);
-  if ((c0 < 0 && c2 > 0) || (c0 > 0 && c2 < 0)) { cnt = 1; break; }
-  if ((c1 < 0 && c2 > 0) || (c1 > 0 && c2 < 0)) { cnt = 1; break; }
+	float c0 = pl.Classify (v0);
+	float c1 = pl.Classify (v1);
+	// Set cnt to 1 so that we will clip in the next part.
+	if ((c0 < 0 && c1 > 0) || (c0 > 0 && c1 < 0)) { cnt = 1; break; }
+	float c2 = pl.Classify (v2);
+	if ((c0 < 0 && c2 > 0) || (c0 > 0 && c2 < 0)) { cnt = 1; break; }
+	if ((c1 < 0 && c2 > 0) || (c1 > 0 && c2 < 0)) { cnt = 1; break; }
       }
     }
 
@@ -3159,7 +3159,7 @@ void csGraphics3DOGLCommon::ClipTrianglePolygonMesh (
         (*clipped_lightmaps)[num_clipped_triangles] = lightmaps[i];
         lightmaps[i]->IncRef();
         num_clipped_triangles++;
-  continue;
+	continue;
       }
 
       csVector3 poly[100];  // @@@ Arbitrary limit
@@ -3182,8 +3182,8 @@ void csGraphics3DOGLCommon::ClipTrianglePolygonMesh (
       //-----
       for (j = 0 ; j < num_planes ; j++)
       {
-  csFrustum::ClipToPlane (poly, num_poly, clipinfo, planes[j]);
-  if (num_poly <= 0) break;
+	csFrustum::ClipToPlane (poly, num_poly, clipinfo, planes[j]);
+	if (num_poly <= 0) break;
       }
 
       //-----
@@ -3192,22 +3192,22 @@ void csGraphics3DOGLCommon::ClipTrianglePolygonMesh (
       //-----
       for (j = 0 ; j < num_poly ; j++)
       {
-  if (clipinfo[j].type == CS_CLIPINFO_ORIGINAL)
-  {
-    clipinfo[j].original.idx =
-      (*clipped_translate)[clipinfo[j].original.idx];
-  }
+	if (clipinfo[j].type == CS_CLIPINFO_ORIGINAL)
+	{
+	  clipinfo[j].original.idx =
+	    (*clipped_translate)[clipinfo[j].original.idx];
+	}
         else
-  {
-    ResolveVertex (&clipinfo[j], clipped_translate->GetArray (),
-      vertices, texels, vertex_colors, vertex_fog,
-    clipped_texels->GetArray ()[num_clipped_vertices],
-    clipped_colors->GetArray ()[num_clipped_vertices],
-    clipped_fog->GetArray ()[num_clipped_vertices]);
-    (*clipped_vertices)[num_clipped_vertices] = poly[j]+frust_origin;
-    clipinfo[j].original.idx = num_clipped_vertices;
-    num_clipped_vertices++;
-  }
+	{
+	  ResolveVertex (&clipinfo[j], clipped_translate->GetArray (),
+	    vertices, texels, vertex_colors, vertex_fog,
+	    clipped_texels->GetArray ()[num_clipped_vertices],
+	    clipped_colors->GetArray ()[num_clipped_vertices],
+	    clipped_fog->GetArray ()[num_clipped_vertices]);
+	  (*clipped_vertices)[num_clipped_vertices] = poly[j]+frust_origin;
+	  clipinfo[j].original.idx = num_clipped_vertices;
+	  num_clipped_vertices++;
+	}
       }
 
       //-----
@@ -3257,12 +3257,12 @@ static void ResolveVertexLightmap (
       texel = otexels[i1] * (1-r) + otexels[i2] * r;
       if (ofog)
       {
-  fog_texel.x = ofog[fog_indices[i1]].intensity*(1-r)+ofog[fog_indices[i1]].intensity*r;
-  fog_texel.y= 0;
+	fog_texel.x = ofog[fog_indices[i1]].intensity*(1-r)+ofog[fog_indices[i1]].intensity*r;
+	fog_texel.y= 0;
 
-  fog.red = ofog[fog_indices[i1]].r * (1-r) + ofog[fog_indices[i2]].r * r;
-  fog.green = ofog[fog_indices[i1]].g * (1-r) + ofog[fog_indices[i2]].g * r;
-  fog.blue = ofog[fog_indices[i1]].b * (1-r) + ofog[fog_indices[i2]].b * r;
+	fog.red = ofog[fog_indices[i1]].r * (1-r) + ofog[fog_indices[i2]].r * r;
+	fog.green = ofog[fog_indices[i1]].g * (1-r) + ofog[fog_indices[i2]].g * r;
+	fog.blue = ofog[fog_indices[i1]].b * (1-r) + ofog[fog_indices[i2]].b * r;
 
       }
       break;
@@ -3284,11 +3284,11 @@ static void ResolveVertexLightmap (
       texel = texel1 * (1-r) + texel2 * r;
       if (ofog)
       {
-  fog_texel.x =  fog_texel1.x*(1-r)+fog_texel2.x*r;
-  fog_texel.y = 0;
-  fog.red = fog1.red * (1-r) + fog2.red * r;
-  fog.green = fog1.green * (1-r) + fog2.green * r;
-  fog.blue = fog1.blue * (1-r) + fog2.blue * r;
+	fog_texel.x =  fog_texel1.x*(1-r)+fog_texel2.x*r;
+	fog_texel.y = 0;
+	fog.red = fog1.red * (1-r) + fog2.red * r;
+	fog.green = fog1.green * (1-r) + fog2.green * r;
+	fog.blue = fog1.blue * (1-r) + fog2.blue * r;
       }
       break;
     }
@@ -3460,9 +3460,8 @@ void csGraphics3DOGLCommon::ClipTriangleLightmapMesh (
     {
       if (planes[j].Classify (v-frust_origin) >= 0)
       {
-
-  inside = false;
-  break;  // Not inside.
+	inside = false;
+	break;  // Not inside.
       }
     }
     if (inside)
@@ -3509,7 +3508,7 @@ void csGraphics3DOGLCommon::ClipTriangleLightmapMesh (
     csTriangle& tri = triangles[i];
     int cnt = int ((*clipped_lightmap_translate)[tri.a] != -1)
         + int ((*clipped_lightmap_translate)[tri.b] != -1)
-  + int ((*clipped_lightmap_translate)[tri.c] != -1);
+	+ int ((*clipped_lightmap_translate)[tri.c] != -1);
     if (cnt == 0)
     {
       //=====
@@ -3524,8 +3523,6 @@ void csGraphics3DOGLCommon::ClipTriangleLightmapMesh (
       for (j = 0 ; j < num_diag_planes ; j++)
       {
         csPlane3& pl = diag_planes[j];
-
-
 
         csVector3 v0;
         v0.x = vertices[tri.a].x - frust_origin.x;
@@ -3543,13 +3540,13 @@ void csGraphics3DOGLCommon::ClipTriangleLightmapMesh (
         v2.y = vertices[tri.c].y - frust_origin.y;
         v2.z = vertices[tri.c].z - frust_origin.z;
 
-  float c0 = pl.Classify (v0);
-  float c1 = pl.Classify (v1);
-  // Set cnt to 1 so that we will clip in the next part.
-  if ((c0 < 0 && c1 > 0) || (c0 > 0 && c1 < 0)) { cnt = 1; break; }
-  float c2 = pl.Classify (v2);
-  if ((c0 < 0 && c2 > 0) || (c0 > 0 && c2 < 0)) { cnt = 1; break; }
-  if ((c1 < 0 && c2 > 0) || (c1 > 0 && c2 < 0)) { cnt = 1; break; }
+	float c0 = pl.Classify (v0);
+	float c1 = pl.Classify (v1);
+	// Set cnt to 1 so that we will clip in the next part.
+	if ((c0 < 0 && c1 > 0) || (c0 > 0 && c1 < 0)) { cnt = 1; break; }
+	float c2 = pl.Classify (v2);
+	if ((c0 < 0 && c2 > 0) || (c0 > 0 && c2 < 0)) { cnt = 1; break; }
+	if ((c1 < 0 && c2 > 0) || (c1 > 0 && c2 < 0)) { cnt = 1; break; }
       }
     }
 
@@ -3581,7 +3578,7 @@ void csGraphics3DOGLCommon::ClipTriangleLightmapMesh (
         (*clipped_lightmap_triangles)[num_clipped_triangles].b = tri.b;
         (*clipped_lightmap_triangles)[num_clipped_triangles].c = tri.c;
         num_clipped_triangles++;
-  continue;
+	continue;
       }
 
       csVector3 poly[100];  // @@@ Arbitrary limit
@@ -3623,8 +3620,8 @@ void csGraphics3DOGLCommon::ClipTriangleLightmapMesh (
       //-----
       for (j = 0 ; j < num_planes ; j++)
       {
-  csFrustum::ClipToPlane (poly, num_poly, clipinfo, planes[j]);
-  if (num_poly <= 0) break;
+	csFrustum::ClipToPlane (poly, num_poly, clipinfo, planes[j]);
+	if (num_poly <= 0) break;
       }
 
       //-----
@@ -3633,30 +3630,31 @@ void csGraphics3DOGLCommon::ClipTriangleLightmapMesh (
       //-----
       for (j = 0 ; j < num_poly ; j++)
       {
-  if (clipinfo[j].type == CS_CLIPINFO_ORIGINAL)
-  {
-    clipinfo[j].original.idx =
-      (*clipped_lightmap_translate)[clipinfo[j].original.idx];
-  }
+	if (clipinfo[j].type == CS_CLIPINFO_ORIGINAL)
+	{
+	  clipinfo[j].original.idx =
+	    (*clipped_lightmap_translate)[clipinfo[j].original.idx];
+	}
         else
-  {
-    ResolveVertexLightmap (&clipinfo[j], clipped_lightmap_translate->GetArray (),
-                                 texels, vertex_fog,
-                                 clipped_lightmap_texels->GetArray ()[num_clipped_vertices],
-                                 clipped_lightmap_fog->GetArray ()[num_clipped_vertices],
-                                 clipped_lightmap_fog_texels->GetArray ()[num_clipped_vertices],
-                                 fog_indices);
+	{
+	  ResolveVertexLightmap (
+	  	&clipinfo[j], clipped_lightmap_translate->GetArray (),
+		texels, vertex_fog,
+		clipped_lightmap_texels->GetArray ()[num_clipped_vertices],
+		clipped_lightmap_fog->GetArray ()[num_clipped_vertices],
+		clipped_lightmap_fog_texels->GetArray ()[num_clipped_vertices],
+		fog_indices);
 
-    (*clipped_lightmap_vertices)[num_clipped_vertices].x =
+	  (*clipped_lightmap_vertices)[num_clipped_vertices].x =
             poly[j].x+frust_origin.x;
           (*clipped_lightmap_vertices)[num_clipped_vertices].y =
             poly[j].y+frust_origin.y;
           (*clipped_lightmap_vertices)[num_clipped_vertices].z =
             poly[j].z+frust_origin.z;
           (*clipped_lightmap_vertices)[num_clipped_vertices].w = 1.0;
-    clipinfo[j].original.idx = num_clipped_vertices;
-    num_clipped_vertices++;
-  }
+	  clipinfo[j].original.idx = num_clipped_vertices;
+	  num_clipped_vertices++;
+	}
       }
 
       //-----
@@ -3706,13 +3704,12 @@ static void ResolveVertexUnlitPolys (
       float r = ci->onedge.r;
       if (ofog)
       {
-  fog_texel.x = ofog[fog_indices[i1]].intensity*(1-r)+ofog[fog_indices[i1]].intensity*r;
-  fog_texel.y= 0;
+	fog_texel.x = ofog[fog_indices[i1]].intensity*(1-r)+ofog[fog_indices[i1]].intensity*r;
+	fog_texel.y= 0;
 
-  fog.red = ofog[fog_indices[i1]].r * (1-r) + ofog[fog_indices[i2]].r * r;
-  fog.green = ofog[fog_indices[i1]].g * (1-r) + ofog[fog_indices[i2]].g * r;
-  fog.blue = ofog[fog_indices[i1]].b * (1-r) + ofog[fog_indices[i2]].b * r;
-
+	fog.red = ofog[fog_indices[i1]].r * (1-r) + ofog[fog_indices[i2]].r * r;
+	fog.green = ofog[fog_indices[i1]].g * (1-r) + ofog[fog_indices[i2]].g * r;
+	fog.blue = ofog[fog_indices[i1]].b * (1-r) + ofog[fog_indices[i2]].b * r;
       }
       break;
     }
@@ -3732,11 +3729,11 @@ static void ResolveVertexUnlitPolys (
       float r = ci->inside.r;
       if (ofog)
       {
-  fog_texel.x =  fog_texel1.x*(1-r)+fog_texel2.x*r;
-  fog_texel.y = 0;
-  fog.red = fog1.red * (1-r) + fog2.red * r;
-  fog.green = fog1.green * (1-r) + fog2.green * r;
-  fog.blue = fog1.blue * (1-r) + fog2.blue * r;
+	fog_texel.x =  fog_texel1.x*(1-r)+fog_texel2.x*r;
+	fog_texel.y = 0;
+	fog.red = fog1.red * (1-r) + fog2.red * r;
+	fog.green = fog1.green * (1-r) + fog2.green * r;
+	fog.blue = fog1.blue * (1-r) + fog2.blue * r;
       }
       break;
     }
@@ -3908,9 +3905,8 @@ void csGraphics3DOGLCommon::ClipUnlitPolys (
     {
       if (planes[j].Classify (v-frust_origin) >= 0)
       {
-
-  inside = false;
-  break;  // Not inside.
+	inside = false;
+	break;  // Not inside.
       }
     }
     if (inside)
@@ -3956,7 +3952,7 @@ void csGraphics3DOGLCommon::ClipUnlitPolys (
     csTriangle& tri = triangles[i];
     int cnt = int ((*clipped_lightmap_translate)[tri.a] != -1)
         + int ((*clipped_lightmap_translate)[tri.b] != -1)
-  + int ((*clipped_lightmap_translate)[tri.c] != -1);
+	+ int ((*clipped_lightmap_translate)[tri.c] != -1);
     if (cnt == 0)
     {
       //=====
@@ -4028,7 +4024,7 @@ void csGraphics3DOGLCommon::ClipUnlitPolys (
         (*clipped_lightmap_triangles)[num_clipped_triangles].b = tri.b;
         (*clipped_lightmap_triangles)[num_clipped_triangles].c = tri.c;
         num_clipped_triangles++;
-  continue;
+	continue;
       }
 
       csVector3 poly[100];  // @@@ Arbitrary limit
@@ -4070,8 +4066,8 @@ void csGraphics3DOGLCommon::ClipUnlitPolys (
       //-----
       for (j = 0 ; j < num_planes ; j++)
       {
-  csFrustum::ClipToPlane (poly, num_poly, clipinfo, planes[j]);
-  if (num_poly <= 0) break;
+	csFrustum::ClipToPlane (poly, num_poly, clipinfo, planes[j]);
+	if (num_poly <= 0) break;
       }
 
       //-----
@@ -4080,19 +4076,19 @@ void csGraphics3DOGLCommon::ClipUnlitPolys (
       //-----
       for (j = 0 ; j < num_poly ; j++)
       {
-  if (clipinfo[j].type == CS_CLIPINFO_ORIGINAL)
-  {
-    clipinfo[j].original.idx =
-      (*clipped_lightmap_translate)[clipinfo[j].original.idx];
-  }
-  else
-  {
-    ResolveVertexUnlitPolys (&clipinfo[j], clipped_lightmap_translate->GetArray (),
-    vertex_fog, clipped_lightmap_fog->GetArray ()[num_clipped_vertices],
-    (*clipped_lightmap_fog_texels)[num_clipped_vertices],
-    fog_indices);
+	if (clipinfo[j].type == CS_CLIPINFO_ORIGINAL)
+	{
+	  clipinfo[j].original.idx =
+	    (*clipped_lightmap_translate)[clipinfo[j].original.idx];
+	}
+	else
+	{
+	  ResolveVertexUnlitPolys (&clipinfo[j], clipped_lightmap_translate->GetArray (),
+	    vertex_fog, clipped_lightmap_fog->GetArray ()[num_clipped_vertices],
+	    (*clipped_lightmap_fog_texels)[num_clipped_vertices],
+	    fog_indices);
 
-    (*clipped_lightmap_vertices)[num_clipped_vertices].x =
+	  (*clipped_lightmap_vertices)[num_clipped_vertices].x =
             poly[j].x+frust_origin.x;
           (*clipped_lightmap_vertices)[num_clipped_vertices].y =
             poly[j].y+frust_origin.y;
@@ -4101,7 +4097,7 @@ void csGraphics3DOGLCommon::ClipUnlitPolys (
           (*clipped_lightmap_vertices)[num_clipped_vertices].w = 1.0;
           clipinfo[j].original.idx = num_clipped_vertices;
           num_clipped_vertices++;
-  }
+	}
       }
 
       //-----
