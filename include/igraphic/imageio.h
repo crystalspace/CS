@@ -40,21 +40,24 @@ SCF_VERSION (iImageIO, 1, 0, 0);
 /// \internal format can be written
 #define CS_IMAGEIO_SAVE 2
 
+/// Description for a file format supported by an image loader.
+struct csImageIOFileFormatDescription
+{
+  /// mime type of image, e.g. "image/png"
+  const char *mime;
+  /// descriptive format specifier, e.g. "8 bit palettized"
+  const char *subtype;
+  /// a combination of CS_IMAGEIO_* flags
+  int cap;
+};
+
 /**
  * The iImageIO interface is used to save and load graphic files.
  */
 struct iImageIO : public iBase
 {
   /// Description for a file format supported by an image loader.
-  struct FileFormatDescription
-  {
-    /// mime type of image, e.g. "image/png"
-    const char *mime;
-    /// descriptive format specifier, e.g. "8 bit palettized"
-    const char *subtype;
-    /// a combination of CS_IMAGEIO_* flags
-    int cap;
-  };
+  typedef csImageIOFileFormatDescription FileFormatDescription;
 
   /**
    * Propagate the image fileformats handled by this plugin.
@@ -96,7 +99,7 @@ struct iImageIO : public iBase
    * <code>compress=50</code><br>
    * <code>progressive,compress=30</code>
    */
-  virtual csPtr<iDataBuffer> Save (iImage *image, iImageIO::FileFormatDescription *format,
+  virtual csPtr<iDataBuffer> Save (iImage *image, FileFormatDescription *format,
     const char* extraoptions = NULL) = 0;
 
   /**

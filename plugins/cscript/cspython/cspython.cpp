@@ -60,18 +60,12 @@ csPython::~csPython()
   object_reg=NULL;
 }
 
-#ifdef USE_NEW_CSPYTHON_PLUGIN
 extern "C" {
   struct swig_type_info;
   extern PyObject * SWIG_NewPointerObj(void *, swig_type_info *, int own);
   extern swig_type_info * SWIG_TypeQuery(const char *);
   extern void init_cspace();
 }
-#else
-extern "C" {
-  extern void SWIG_MakePtr(char *_c, const void *_ptr, char *type);
-}
-#endif
 
 bool csPython::Initialize(iObjectRegistry* object_reg)
 {
@@ -95,20 +89,12 @@ bool csPython::Initialize(iObjectRegistry* object_reg)
   if (!LoadModule ("cshelper")) return false;
 #endif
   if (!LoadModule ("pdb")) return false;
-#ifndef USE_NEW_CSPYTHON_PLUGIN
-  if (!LoadModule ("cspacec")) return false;
-#endif
   if (!LoadModule ("cspace")) return false;
 
   Mode = CS_REPORTER_SEVERITY_NOTIFY;
 
   // Store the object registry pointer in 'cspace.object_reg'.
-#ifdef USE_NEW_CSPYTHON_PLUGIN
   Store("cspace.object_reg", object_reg, (void *) "iObjectRegistry *");
-#else
-  Store("cspace.object_reg_ptr", object_reg, (void*)"_iObjectRegistry_p");
-  RunText("cspace.object_reg=cspace.iObjectRegistryPtr(cspace.object_reg_ptr)");
-#endif
 
   return true;
 }
@@ -134,7 +120,6 @@ bool csPython::RunText(const char* Text)
 
 bool csPython::Store(const char* name, void* data, void* tag)
 {
-#if USE_NEW_CSPYTHON_PLUGIN
   swig_type_info * ti = SWIG_TypeQuery((char*)tag);
   PyObject * obj = SWIG_NewPointerObj(data, ti, 0);
   char *mod_name = csStrNew(name);
@@ -147,13 +132,6 @@ bool csPython::Store(const char* name, void* data, void* tag)
   PyModule_AddObject(module, (char*)var_name, obj);
 
   delete[] mod_name;
-#else
-  char command[256];
-  char sysPtr[100];
-  SWIG_MakePtr (sysPtr, data, (char*)tag);
-  sprintf (command, "%s=\"%s\"", name, sysPtr);
-  RunText (command);
-#endif
 
   return true;
 }

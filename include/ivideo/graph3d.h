@@ -389,14 +389,17 @@ struct G3DTriangleMesh
   /// If morphing is applied then morph vertex colors too if true.
   bool do_morph_colors;
 
-  /// Type of vertices supplied.
-  enum
+  /// Types of vertices supplied.
+  enum VertexMode
   {
     /// Must apply transformation and perspective.
     VM_WORLDSPACE,
     /// Must apply perspective.
     VM_VIEWSPACE
-  } vertex_mode;
+  };
+  
+  /// Type of vertices supplied.
+  VertexMode vertex_mode;
 
   /// DrawPolygonFX flag.
   uint mixmode;
@@ -444,14 +447,17 @@ struct G3DPolygonMesh
   /// Consider polygon vertices in anti-clockwise order if true.
   bool do_mirror;
 
-  /// Type of vertices supplied.
-  enum
+  /// Types of vertices supplied.
+  enum VertexMode
   {
     /// Must apply transformation and perspective.
     VM_WORLDSPACE,
     /// Must apply perspective.
     VM_VIEWSPACE
-  } vertex_mode;
+  };
+  
+  /// Type of vertices supplied.
+  VertexMode vertex_mode;
 
   /// Information for fogging the vertices.
   G3DFogInfo* vertex_fog;

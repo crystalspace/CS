@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2002-2003 by Rene Jager (renej.frog@yucom.be)
+    Copyright (C) 2003 by Rene Jager (renej@frog.nl, renej.frog@yucom.be)
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,24 +19,52 @@
 /*
 	SWIG interface for Crystal Space
 
-	Used for the new "cspython" plugin based on python 2.2 including
-	almost complete access to CS.
+	This file includes scripting language specific SWIG files.
+	Search for 'pythpre' (pre-include phase) and 'pythpost' (post-include
+	phase) for places where to include files for new scripting languages.
 
-	Additionally, provides CS as a python 2.2 module name "cspace".
-	To use this, make sure cspace.py and _cspace.so in directory
-	$CRYSTAL/scripts/python can be found by python; and don't forget
-	to set the CRYSTAL environment variable.
-	See $CRYSTAL/scripts/python/pysimpcd.py for an example of usage.
+	Python:
+		Used for the new "cspython" plugin based on python 2.2 including
+		almost complete access to CS.
 
-	This file includes scripting language specific SWIG files (see bottom).
+		Additionally, provides CS as a python 2.2 module name "cspace".
+		To use this, make sure cspace.py and _cspace.so in directory
+		$CRYSTAL/scripts/python can be found by python; and don't forget
+		to set the CRYSTAL environment variable.
+		See $CRYSTAL/scripts/python/pysimpcd.py for an example of usage.
 
-	Note: tested with swig 1.3.17, swig 1.1 won't work!
+	Note:
+		Tested with swig 1.3.17, swig 1.1 won't work!
 
 	Thanks to:
-		Norman Kramer who made me think about sequence of declarations in
-			SWIG file.
-		Mark Gossage who made me think about preventing handling of smart
-			pointers by SWIG to reduce size of generated code.
+		Norman Kramer <norman@users.sourceforge.net> who made me think
+			about sequence of declarations in SWIG file.
+		Mark Gossage <mark@gossage.cjb.net> who made me think about
+			preventing handling of smart pointers by SWIG to reduce
+			size of generated code.
+		Mat Sutcliffe <oktal@gmx.co.uk> for input, Perl includes,
+			and wrapping SCF and other macros.
+*/
+
+/*
+	SWIG's preprocessor can be used to "replace" a macro by a function
+	in the target scripting language using the following:
+
+	In C header file:
+
+		#define X(arg) ...
+
+	which as a function would have the prototype:
+
+		int X (int i);
+
+	Now in the SWIG *.i file do:
+
+		#define _X(a) X(a)
+		#undef X
+		int _X (int i);
+
+	and there will be a "X" function in the scripting language available.
 */
 
 %module cspace
@@ -49,119 +77,276 @@
 #include "ivaria/dynamics.h"
 #include "ivaria/engseq.h"
 #include "iutil/cache.h"
-#include "iutil/document.h"
 #include "csutil/xmltiny.h"
+#include "igeom/objmodel.h"
+#include "inetwork/sockerr.h"
+#include "inetwork/netman.h"
+#include "inetwork/socket2.h"
+
+// Mark Gossage: somewhere in winuser.h there are a couple of #defines to
+// rename RegisterClass and UnregisterClass (which are windoze fns).
+// They also accidentally rename the iSCF fns too.
+#ifdef RegisterClass
+#	undef RegisterClass
+#endif
+#ifdef UnregisterClass
+#	undef UnregisterClass
+#endif
 
 %}
 
+// The following list holds all the interfaces that are handled correctly.
+// If you have problems, first check if the interface in question is in
+// this list. Please keep the list sorted alphabetically.
+%define APPLY_FOR_EACH_INTERFACE
+	INTERFACE_APPLY(iAudioStream)
+	INTERFACE_APPLY(iBase)
+	INTERFACE_APPLY(iBinaryLoaderPlugin)
+	INTERFACE_APPLY(iBodyGroup)
+	INTERFACE_APPLY(iCamera)
+	INTERFACE_APPLY(iCameraPosition)
+	INTERFACE_APPLY(iCacheManager)
+	INTERFACE_APPLY(iCollider)
+	INTERFACE_APPLY(iCollideSystem)
+	INTERFACE_APPLY(iComponent)
+	INTERFACE_APPLY(iConfigFile)
+	INTERFACE_APPLY(iConfigIterator)
+	INTERFACE_APPLY(iConfigManager)
+	INTERFACE_APPLY(iDataBuffer)
+	INTERFACE_APPLY(iDebugHelper)
+	INTERFACE_APPLY(iDocument)
+	INTERFACE_APPLY(iDocumentSystem)
+	INTERFACE_APPLY(iDynamics)
+	INTERFACE_APPLY(iDynamicSystem)
+	INTERFACE_APPLY(iEngine)
+	INTERFACE_APPLY(iEvent)
+	INTERFACE_APPLY(iEventHandler)
+	INTERFACE_APPLY(iEventQueue)
+	INTERFACE_APPLY(iFactory)
+	INTERFACE_APPLY(iFile)
+	INTERFACE_APPLY(iFont)
+	INTERFACE_APPLY(iFontServer)
+	INTERFACE_APPLY(iFrustumView)
+	INTERFACE_APPLY(iFrustumViewUserdata)
+	INTERFACE_APPLY(iGraphics3D)
+	INTERFACE_APPLY(iGraphics2D)
+	INTERFACE_APPLY(iHalo)
+	INTERFACE_APPLY(iImage)
+	INTERFACE_APPLY(iImageIO)
+	INTERFACE_APPLY(iJoint)
+	INTERFACE_APPLY(iKeyboardDriver)
+	INTERFACE_APPLY(iLightList)
+	INTERFACE_APPLY(iLoader)
+	INTERFACE_APPLY(iLoaderPlugin)
+	INTERFACE_APPLY(iMaterial)
+	INTERFACE_APPLY(iMaterialWrapper)
+	INTERFACE_APPLY(iMeshFactoryWrapper)
+	INTERFACE_APPLY(iMeshObject)
+	INTERFACE_APPLY(iMeshObjectFactory)
+	INTERFACE_APPLY(iMeshObjectType)
+	INTERFACE_APPLY(iMeshWrapper)
+	INTERFACE_APPLY(iModelConverter)
+	INTERFACE_APPLY(iMovable)
+	INTERFACE_APPLY(iMovableListener)
+	INTERFACE_APPLY(iNetworkConnection)
+	INTERFACE_APPLY(iNetworkDriver)
+	INTERFACE_APPLY(iNetworkEndPoint)
+	INTERFACE_APPLY(iNetworkListener)
+	INTERFACE_APPLY(iNetworkManager)
+	INTERFACE_APPLY(iNetworkPacket)
+	INTERFACE_APPLY(iNetworkSocket2)
+	INTERFACE_APPLY(iObject)
+	INTERFACE_APPLY(iObjectModel)
+	INTERFACE_APPLY(iObjectModelListener)
+	INTERFACE_APPLY(iObjectRegistry)
+	INTERFACE_APPLY(iPluginManager)
+	INTERFACE_APPLY(iPolygon3D)
+	INTERFACE_APPLY(iPolygonMesh)
+	INTERFACE_APPLY(iPolygonTexture)
+	INTERFACE_APPLY(iSCF)
+	INTERFACE_APPLY(iScript)
+	INTERFACE_APPLY(iSector)
+	INTERFACE_APPLY(iSectorList)
+	INTERFACE_APPLY(iSoundHandle)
+	INTERFACE_APPLY(iSoundLoader)
+	INTERFACE_APPLY(iSoundRender)
+	INTERFACE_APPLY(iSoundWrapper)
+	INTERFACE_APPLY(iSoundDriver)
+	INTERFACE_APPLY(iSoundSource)
+	INTERFACE_APPLY(iSprite3DState)
+	INTERFACE_APPLY(iStatLight)
+	INTERFACE_APPLY(iStream)
+	INTERFACE_APPLY(iStreamIterator)
+	INTERFACE_APPLY(iStreamFormat)
+	INTERFACE_APPLY(iStrVector)
+	INTERFACE_APPLY(iTextureHandle)
+	INTERFACE_APPLY(iTextureList)
+	INTERFACE_APPLY(iTextureManager)
+	INTERFACE_APPLY(iTextureWrapper)
+	INTERFACE_APPLY(iThingState)
+	INTERFACE_APPLY(iVFS)
+	INTERFACE_APPLY(iVideoStream)
+	INTERFACE_APPLY(iView)
+	INTERFACE_APPLY(iVirtualClock)
+	INTERFACE_APPLY(iVisibilityCuller)
+%enddef
+
+%include "typemaps.i"
+
+// The following list all kown arguments that are actually (also) outputs.
+// It is possible that some of the output arguments should be INOUT instead
+// of OUTPUT.
+
+// output arguments
+%apply unsigned char * OUTPUT { uint8 & red };
+%apply unsigned char * OUTPUT { uint8 & green };
+%apply unsigned char * OUTPUT { uint8 & blue };
+%apply unsigned char * OUTPUT { uint8 & oR };
+%apply unsigned char * OUTPUT { uint8 & oG };
+%apply unsigned char * OUTPUT { uint8 & oB };
+%apply int * OUTPUT { int & red };
+%apply int * OUTPUT { int & green };
+%apply int * OUTPUT { int & blue };
+%apply int * OUTPUT { int & r };
+%apply int * OUTPUT { int & g };
+%apply int * OUTPUT { int & b };
+%apply int * OUTPUT { int & mw };
+%apply int * OUTPUT { int & mh };
+%apply int * OUTPUT { int & oW };
+%apply int * OUTPUT { int & oH };
+%apply int * OUTPUT { int & oR };
+%apply int * OUTPUT { int & oG };
+%apply int * OUTPUT { int & oB };
+%apply int * OUTPUT { int & w };
+%apply int * OUTPUT { int & h };
+%apply int * OUTPUT { int & bw };
+%apply int * OUTPUT { int & bh };
+%apply int * OUTPUT { int & ClientW };
+%apply int * OUTPUT { int & ClientH };
+%apply int * OUTPUT { int & totw };
+%apply int * OUTPUT { int & toth };
+%apply int * OUTPUT { int & sugw };
+%apply int * OUTPUT { int & sugh };
+%apply int * OUTPUT { int & adv };
+%apply int * OUTPUT { int & left };
+%apply int * OUTPUT { int & top };
+%apply int * OUTPUT { int & desc };
+%apply int * OUTPUT { int & nr };
+%apply int * OUTPUT { int & key };
+%apply int * OUTPUT { int & shift };
+%apply int * OUTPUT { int & button };
+%apply int * OUTPUT { int & ver };
+%apply int * OUTPUT { int & scfInterfaceID };
+%apply int * OUTPUT { int & a };
+%apply int * OUTPUT { int & x };
+%apply int * OUTPUT { int & y };
+%apply int * OUTPUT { int & oFontSize };
+%apply int * OUTPUT { int & oUnderlinePos };
+%apply int * OUTPUT { int & newX };
+%apply int * OUTPUT { int & newY };
+%apply int * OUTPUT { int & newH };
+%apply int * OUTPUT { int & newW };
+%apply int * OUTPUT { int & xmin };
+%apply int * OUTPUT { int & ymin };
+%apply int * OUTPUT { int & xmax };
+%apply int * OUTPUT { int & ymax };
+%apply int * OUTPUT { int & theRow };
+%apply int * OUTPUT { int & theCol };
+%apply int * OUTPUT { int & row };
+%apply int * OUTPUT { int & col };
+%apply int * OUTPUT { int & newHeight };
+%apply int * OUTPUT { int & newWidth };
+%apply int * OUTPUT { int & oColor };
+%apply int * OUTPUT { int & val };
+%apply float * OUTPUT { float & oDiffuse };
+%apply float * OUTPUT { float & oAmbient };
+%apply float * OUTPUT { float & oReflection };
+%apply float * OUTPUT { float & red };
+%apply float * OUTPUT { float & green };
+%apply float * OUTPUT { float & blue };
+%apply float * OUTPUT { float & a };
+%apply float * OUTPUT { float & b };
+%apply float * OUTPUT { float & x1 };
+%apply float * OUTPUT { float & y1 };
+%apply float * OUTPUT { float & x2 };
+%apply float * OUTPUT { float & y2 };
+%apply float * OUTPUT { float & oH };
+%apply float * OUTPUT { float & oS };
+%apply float * OUTPUT { float & oR };
+%apply float * OUTPUT { float & oG };
+%apply float * OUTPUT { float & oB };
+%apply float * OUTPUT { float & r };
+%apply float * OUTPUT { float & g };
+%apply float * OUTPUT { float & b };
+%apply float * OUTPUT { float & l };
+%apply float * OUTPUT { float & h };
+%apply float * OUTPUT { float & s };
+%apply float * OUTPUT { float & start };
+%apply float * OUTPUT { float & dist };
+%apply float * OUTPUT { float & w };
+%apply float * OUTPUT { float & ra };
+%apply float * OUTPUT { float & rb };
+
+// input/output arguments
+%apply int * INOUT { int & maxcolors };
+%apply float * INOUT { float & iR };
+%apply float * INOUT { float & iG };
+%apply float * INOUT { float & iB };
+
 %include "cstypes.h"
 
-%rename(assign) operator=;
+%inline %{
 
-typedef unsigned scfInterfaceID;
+	// This pointer wrapper can be used to prevent code-bloat by macro's acting
+	// as template functions.
+	// Examples are SCF_QUERY_INTERFACE and CS_QUERY_REGISTRY.
+	// Thanks to Mat Sutcliffe <oktal@gmx.co.uk>.
+	// Note that his works _only_ if you're _not_ using virtual inheritance!
+
+	struct csWrapPtr
+	{
+	  csRef<iBase> Ref;
+	  const char *Type;
+	  csWrapPtr (const char *t, iBase *r) : Ref (r), Type (t) {}
+	  csWrapPtr (const char *t, csPtr<iBase> r) : Ref (r), Type (t) {}
+	  csWrapPtr (const csWrapPtr &p) : Ref (p.Ref), Type (p.Type) {}
+	};
+
+%}
+
+// Macro's expected in rest of this file: ignored by default.
+// When overriding in language-specific files, first #undef and then
+// re-%define them.
+#define TYPEMAP_OUT_csRef(T)
+#define TYPEMAP_OUT_csPtr(T)
+#define TYPEMAP_OUT_csWrapPtr
+#define TYPEMAP_IN_ARRAY_CNT_PTR(a,b)
+#define TYPEMAP_IN_ARRAY_PTR_CNT(a,b) 
+#define TYPEMAP_OUTARG_ARRAY_PTR_CNT(a,b,c)
 
 #if defined(SWIGPYTHON)
-
-	%define TYPEMAP_OUT_csRef(T)
-		%typemap(out) csRef<T>
-		{
-			csRef<T> ref($1);
-			if (ref.IsValid()) {
-				ref->IncRef();
-				$result = SWIG_NewPointerObj(
-					(void *) (T *) ref, $descriptor(T *), 1
-				);
-			} else {
-				Py_INCREF(Py_None);
-				$result = Py_None;
-			}
-		}
-	%enddef
-
-	%define TYPEMAP_OUT_csPtr(T)
-		%typemap(out) csPtr<T>
-		{
-			csRef<T> ref($1);
-			if (ref.IsValid()) {
-				ref->IncRef();
-				$result = SWIG_NewPointerObj(
-					(void *) (T *) ref, $descriptor(T *), 1
-				);
-			} else {
-				Py_INCREF(Py_None);
-				$result = Py_None;
-			}
-		}
-	%enddef
-
-	%typemap(in) (int argc, char const* const argv[])
-	{
-		if (PyList_Check($input)) {
-			int i;
-			$1 = PyList_Size($input);
-			$2 = (char **) malloc(($1+1)*sizeof(char *));
-			for (i = 0; i < $1; i++) {
-				PyObject *o = PyList_GetItem($input,i);
-				if (PyString_Check(o))
-					$2[i] = PyString_AsString(PyList_GetItem($input,i));
-				else {
-					PyErr_SetString(
-						PyExc_TypeError, "list must contain strings"
-					);
-					free($2);
-					return NULL;
-				}
-			}
-			$2[i] = 0;
-		} else {
-			PyErr_SetString(PyExc_TypeError, "not a list");
-			return NULL;
-		}
-	}
-
-	%typemap(freearg) (int argc, char const* const argv[])
-	{
-		free((char *) $2);
-	}
-
-	%typemap(in) (const char* description, ...)
-	{
-		$1 = "%s";
-		$2 = (void *) PyString_AsString($input);
-	}
-
+	%include "ivaria/pythpre.i"
 #elif defined(SWIGPERL5)
-
-	// TODO help needed...
-
-	%define TYPEMAP_OUT_csRef(T)
-		// ignore
-	%enddef
-
-	%define TYPEMAP_OUT_csPtr(T)
-		// ignore
-	%enddef
-
-#else
-
-	%define TYPEMAP_OUT_csRef(T)
-		// ignore
-	%enddef
-
-	%define TYPEMAP_OUT_csPtr(T)
-		// ignore
-	%enddef
-
+	%include "ivaria/perlpre.i"
+#elif defined(SWIGRUBY)
+	%include "ivaria/rubypre.i"
+#elif defined(SWIGTCL8)
+	%include "ivaria/tclpre.i"
 #endif
 
-%define INTERFACE_PRE(T)
+// Handle arrays as input arguments.
+TYPEMAP_IN_ARRAY_CNT_PTR(
+	(int num_layers, iTextureWrapper ** wrappers), /**/
+)
+TYPEMAP_IN_ARRAY_PTR_CNT(
+	(csVector2 * InPolygon, int InCount), *
+)
 
-	%nodefault T;
-
-	TYPEMAP_OUT_csRef(T)
-	TYPEMAP_OUT_csPtr(T)
-
-%enddef
+// Handle arrays as output arguments.
+TYPEMAP_OUTARG_ARRAY_PTR_CNT(
+	(csVector2 * OutPolygon, int & OutCount),
+	new csVector2[MAX_OUTPUT_VERTICES], *
+)
 
 %ignore csPtr::csPtr;
 %ignore csRef::csRef;
@@ -171,113 +356,93 @@ typedef unsigned scfInterfaceID;
 
 %include "csutil/ref.h"
 
-INTERFACE_PRE(iBase)
-INTERFACE_PRE(iBinaryLoaderPlugin)
-INTERFACE_PRE(iCamera)
-INTERFACE_PRE(iCameraPosition)
-INTERFACE_PRE(iCacheManager)
-INTERFACE_PRE(iCollider)
-INTERFACE_PRE(iCollideSystem)
-INTERFACE_PRE(iComponent)
-INTERFACE_PRE(iConfigFile)
-INTERFACE_PRE(iConfigIterator)
-INTERFACE_PRE(iConfigManager)
-INTERFACE_PRE(iDataBuffer)
-INTERFACE_PRE(iDebugHelper)
-INTERFACE_PRE(iDocumentAttributeIterator)
-INTERFACE_PRE(iDocumentAttribute)
-INTERFACE_PRE(iDocumentNodeIterator)
-INTERFACE_PRE(iDocumentNode)
-INTERFACE_PRE(iDocument)
-INTERFACE_PRE(iDocumentSystem)
-INTERFACE_PRE(iDynamics)
-INTERFACE_PRE(iDynamicSystem)
-INTERFACE_PRE(iEngine)
-INTERFACE_PRE(iEvent)
-INTERFACE_PRE(iEventHandler)
-INTERFACE_PRE(iEventQueue)
-INTERFACE_PRE(iFile)
-INTERFACE_PRE(iFont)
-INTERFACE_PRE(iFontServer)
-INTERFACE_PRE(iGraphics3D)
-INTERFACE_PRE(iGraphics2D)
-INTERFACE_PRE(iImage)
-INTERFACE_PRE(iImageIO)
-INTERFACE_PRE(iKeyboardDriver)
-INTERFACE_PRE(iLightList)
-INTERFACE_PRE(iLoader)
-INTERFACE_PRE(iLoaderPlugin)
-INTERFACE_PRE(iMaterial)
-INTERFACE_PRE(iMeshFactoryWrapper)
-INTERFACE_PRE(iMeshObject)
-INTERFACE_PRE(iMeshObjectFactory)
-INTERFACE_PRE(iMeshObjectType)
-INTERFACE_PRE(iMeshWrapper)
-INTERFACE_PRE(iModelConverter)
-INTERFACE_PRE(iMovable)
-INTERFACE_PRE(iMovableListener)
-INTERFACE_PRE(iObject)
-INTERFACE_PRE(iObjectRegistry)
-INTERFACE_PRE(iPluginManager)
-INTERFACE_PRE(iPolygon3D)
-INTERFACE_PRE(iPolygonMesh)
-INTERFACE_PRE(iPolygonTexture)
-INTERFACE_PRE(iSCF)
-INTERFACE_PRE(iScript)
-INTERFACE_PRE(iSector)
-INTERFACE_PRE(iSectorList)
-INTERFACE_PRE(iSoundHandle)
-INTERFACE_PRE(iSoundLoader)
-INTERFACE_PRE(iSoundRender)
-INTERFACE_PRE(iSoundWrapper)
-INTERFACE_PRE(iSoundDriver)
-INTERFACE_PRE(iSoundSource)
-INTERFACE_PRE(iSprite3DState)
-INTERFACE_PRE(iStatLight)
-INTERFACE_PRE(iStrVector)
-INTERFACE_PRE(iTextureHandle)
-INTERFACE_PRE(iTextureManager)
-INTERFACE_PRE(iTextureWrapper)
-INTERFACE_PRE(iThingState)
-INTERFACE_PRE(iVFS)
-INTERFACE_PRE(iView)
-INTERFACE_PRE(iVirtualClock)
-INTERFACE_PRE(iVisibilityCuller)
+%define INTERFACE_PRE(T)
 
+	%nodefault T;
+	%ignore T##_scfGetID ();
+
+	TYPEMAP_OUT_csRef(T)
+	TYPEMAP_OUT_csPtr(T)
+
+%enddef
+
+#undef INTERFACE_APPLY
+#define INTERFACE_APPLY(x) INTERFACE_PRE(x)
+APPLY_FOR_EACH_INTERFACE
+
+TYPEMAP_OUT_csWrapPtr
+
+// Ignored macro's.
 #define CS_STRUCT_ALIGN_4BYTE_BEGIN
 #define CS_STRUCT_ALIGN_4BYTE_END
-
 #define CS_GNUC_PRINTF(format_idx, arg_idx)
 #define CS_GNUC_SCANF(format_idx, arg_idx)
+#define CS_DECLARE_STATIC_CLASSVAR(a, b, c)
 
-#ifdef SWIGPYTHON
-
-#endif // SWIGPYTHON
+// Inclusion of CS headers.
+// The sequence of %include-ing the CS headers can be crucial!
+// The scheme is as follows: %ignore'd functions and types are placed
+// before actual inclusion, as are "local" %typemap's (like default).
+// After %include-ing the header resets can be done; for example
+// resetting the %typemap(default). The %extend-ing and extra code takes
+// place after all %include's are done, mentioning the header(s) it is
+// related to.
 
 %include "csutil/scf.h"
+
+%include "iutil/dbghelp.h"
+
+%ignore operator* (const csColor &, float);
+%ignore operator* (float , const csColor &);
+%ignore operator+ (const csColor &, const csColor &);
+%ignore operator- (const csColor &, const csColor &);
 %include "csutil/cscolor.h"
+
 %include "csutil/cmdhelp.h"
+%include "csutil/strset.h"
+
+%ignore csVector2::operator[];
+%ignore csVector2::Norm (const csVector2 &);
 %include "csgeom/vector2.h"
 
 %ignore csVector3::operator[];
+%ignore csVector3::Norm (const csVector3 &);
+%ignore csVector3::Unit (const csVector3 &);
 %include "csgeom/vector3.h"
 
 %include "csgeom/matrix2.h"
 %include "csgeom/matrix3.h"
 %include "csgeom/transfrm.h"
-%include "csgeom/plane2.h"
-%include "csgeom/plane3.h"
 %include "csgeom/sphere.h"
-//NOTYET %include "csgeom/poly2d.h"
-//NOTYET %include "csgeom/poly3d.h"
-//NOTYET %include "csgeom/csrect.h"
-//NOTYET %include "csgeom/csrectrg.h"
-//NOTYET %include "csgeom/quaterni.h"
-//NOTYET %include "csgeom/spline.h"
-//NOTYET %include "csgeom/cspoint.h"
-//NOTYET %include "csgeom/math3d.h"
 
-%rename(asRGBpixel) csRGBpixel::operator csRGBpixel;
+%ignore csPlane2::A ();
+%ignore csPlane2::B ();
+%ignore csPlane2::C ();
+%include "csgeom/plane2.h"
+
+%ignore csPlane3::A ();
+%ignore csPlane3::B ();
+%ignore csPlane3::C ();
+%ignore csPlane3::D ();
+%include "csgeom/plane3.h"
+
+%include "csgeom/math2d.h"
+
+%ignore csPoly2D::operator[];
+%include "csgeom/poly2d.h"
+
+%include "csgeom/math3d.h"
+
+%ignore csPoly3D::operator[];
+%include "csgeom/poly3d.h"
+
+%include "csgeom/csrect.h"
+%include "csgeom/csrectrg.h"
+%include "csgeom/quaterni.h"
+%include "csgeom/spline.h"
+%include "csgeom/cspoint.h"
+
+%rename(asRGBcolor) csRGBpixel::operator csRGBcolor;
 %include "csgfx/rgbpixel.h"
 
 %include "cssys/sysfunc.h"
@@ -289,6 +454,10 @@ INTERFACE_PRE(iVisibilityCuller)
 %typemap(default) const char * configName;
 
 %include "igeom/polymesh.h"
+%include "igeom/clip2d.h"
+%include "igeom/objmodel.h"
+
+%include "iengine/fview.h"
 %include "iengine/light.h"
 %include "iengine/statlght.h"
 %include "iengine/sector.h"
@@ -300,31 +469,58 @@ INTERFACE_PRE(iVisibilityCuller)
 %include "iengine/mesh.h"
 %include "iengine/movable.h"
 %include "iengine/viscull.h"
+
 %include "imesh/mdlconv.h"
 %include "imesh/object.h"
 %include "imesh/sprite3d.h"
 %include "imesh/thing/thing.h"
 %include "imesh/thing/lightmap.h"
 %include "imesh/thing/polygon.h"
+
 %include "imap/parser.h"
 %include "imap/loader.h"
 %include "imap/reader.h"
 %include "imap/saver.h"
+
 %include "isound/handle.h"
 %include "isound/loader.h"
 %include "isound/renderer.h"
 %include "isound/wrapper.h"
 %include "isound/driver.h"
 %include "isound/source.h"
+
 %include "iutil/comp.h"
 %include "iutil/cache.h"
-%include "iutil/document.h"
 %include "iutil/vfs.h"
 %include "iutil/object.h"
 %include "iutil/dbghelp.h"
 %include "iutil/objreg.h"
 %include "iutil/virtclk.h"
+
+%rename(AddInt8) iEvent::Add(const char *, int8);
+%rename(AddInt16) iEvent::Add(const char *, int16);
+%rename(AddInt32) iEvent::Add(const char *, int32, bool);
+%rename(AddUInt8) iEvent::Add(const char *, uint8);
+%rename(AddUInt16) iEvent::Add(const char *, uint16);
+%rename(AddUInt32) iEvent::Add(const char *, uint32);
+%rename(AddFloat) iEvent::Add(const char *, float);
+%rename(AddDouble) iEvent::Add(const char *, double);
+%rename(AddString) iEvent::Add(const char *, char *);
+%rename(AddBool) iEvent::Add(const char *, bool, bool);
+%rename(AddVoidPtr) iEvent::Add(const char *, void *, uint32);
+%rename(FindInt8) iEvent::Find(const char *, int8 &, int);
+%rename(FindInt16) iEvent::Find(const char *, int16 &, int);
+%rename(FindInt32) iEvent::Find(const char *, int32 &, bool, int);
+%rename(FindUInt8) iEvent::Find(const char *, uint8 &, int);
+%rename(FindUInt16) iEvent::Find(const char *, uint16 &, int);
+%rename(FindUInt32) iEvent::Find(const char *, uint32 &, int);
+%rename(FindFloat) iEvent::Find(const char *, float &, int);
+%rename(FindDouble) iEvent::Find(const char *, double &, int);
+%rename(FindString) iEvent::Find(const char *, char **, int);
+%rename(FindBool) iEvent::Find(const char *, bool &, int);
+%rename(FindVoidPtr) iEvent::Find(const char *, void **, uint32 &, int);
 %include "iutil/event.h"
+
 %include "iutil/evdefs.h"
 %include "iutil/eventq.h"
 %include "iutil/eventh.h"
@@ -333,26 +529,34 @@ INTERFACE_PRE(iVisibilityCuller)
 %include "iutil/cfgfile.h"
 %include "iutil/cfgmgr.h"
 %include "iutil/strvec.h"
+%include "iutil/document.h"
+
+%include "csutil/xmltiny.h"
 
 %rename(asString) iDataBuffer::operator * () const;
+%ignore iDataBuffer::GetInt8;
 %include "iutil/databuff.h"
 
-%ignore G3DTriangleMesh::vertex_mode;
-%ignore G3DTriangleMesh::VM_WORLDSPACE;
-%ignore G3DTriangleMesh::VM_VIEWSPACE;
-%ignore G3DPolygonMesh::vertex_mode;
-%ignore G3DPolygonMesh::VM_WORLDSPACE;
-%ignore G3DPolygonMesh::VM_VIEWSPACE;
 %include "ivideo/graph3d.h"
-
 %include "ivideo/graph2d.h"
+
+%ignore GetGlyphSize(uint8, int &, int &);
+%ignore GetGlyphBitmap(uint8, int &, int &);
+%ignore GetGlyphAlphaBitmap(uint8, int &, int &);
+%ignore GetDimensions(char const *, int &, int &);
 %include "ivideo/fontserv.h"
+
 %include "ivideo/halo.h"
+
+%rename(GetKeyColorStatus) iTextureHandle::GetKeyColor();
 %include "ivideo/texture.h"
+
 %include "ivideo/txtmgr.h"
 %include "ivideo/vbufmgr.h"
 %include "ivideo/material.h"
 %include "ivideo/natwin.h"
+%include "ivideo/codec.h"
+
 %include "igraphic/image.h"
 %include "igraphic/imageio.h"
 
@@ -368,220 +572,81 @@ INTERFACE_PRE(iVisibilityCuller)
 %include "ivaria/script.h"
 %include "ivaria/engseq.h"
 
+%include "inetwork/netman.h"
+%include "inetwork/sockerr.h"
+%include "inetwork/driver.h"
+%include "inetwork/socket2.h"
+
+%include "csutil/csobject.h"
+
 %include "cstool/csview.h"
 %include "cstool/collider.h"
-//NOTYET %include "csutil/csinput.h"
 
 %define INTERFACE_POST(T)
 
 	%extend T
 	{
-		~ T ()
-			{ SCF_DEC_REF(self); }
-
-		static csPtr<T> _CS_QUERY_REGISTRY (iObjectRegistry * reg)
-			{ return CS_QUERY_REGISTRY(reg, T); }
-
-		static csPtr<T> _CS_QUERY_REGISTRY_TAG_INTERFACE (
-			iObjectRegistry * reg, const char * tag)
-			{ return CS_QUERY_REGISTRY_TAG_INTERFACE(reg, tag, T); }
-
-		static csPtr<T> _SCF_QUERY_INTERFACE (iBase * obj)
-			{ return SCF_QUERY_INTERFACE(obj, T); }
-
-		static csPtr<T> _SCF_QUERY_INTERFACE_SAFE (iBase * obj)
-			{ return SCF_QUERY_INTERFACE_SAFE(obj, T); }
-
-		static csPtr<T> _CS_QUERY_PLUGIN_CLASS (iPluginManager * obj,
-			const char * class_id)
-			{ return CS_QUERY_PLUGIN_CLASS(obj, class_id, T); }
-
-		static csPtr<T> _CS_LOAD_PLUGIN (iPluginManager * obj,
-			const char * class_id)
-			{ return CS_LOAD_PLUGIN(obj, class_id, T); }
-
-		static csPtr<T> _CS_GET_CHILD_OBJECT (iObject * object)
-			{ return CS_GET_CHILD_OBJECT(object, T); }
-
-		static csPtr<T> _CS_GET_NAMED_CHILD_OBJECT (iObject * object,
-			const char *name)
-			{ return CS_GET_NAMED_CHILD_OBJECT(object, T, name); }
-
-		static csPtr<T> _CS_GET_FIRST_NAMED_CHILD_OBJECT (iObject * object,
-			const char * name)
-			{ return CS_GET_FIRST_NAMED_CHILD_OBJECT(object, T, name); }
-
+		~ T () { SCF_DEC_REF(self); }
 	}
 
 %enddef
 
-INTERFACE_POST(iBase)
-INTERFACE_POST(iBinaryLoaderPlugin)
-INTERFACE_POST(iCamera)
-INTERFACE_POST(iCameraPosition)
-INTERFACE_POST(iCacheManager)
-INTERFACE_POST(iCollider)
-INTERFACE_POST(iCollideSystem)
-INTERFACE_POST(iComponent)
-INTERFACE_POST(iConfigFile)
-INTERFACE_POST(iConfigIterator)
-INTERFACE_POST(iConfigManager)
-INTERFACE_POST(iDataBuffer)
-INTERFACE_POST(iDebugHelper)
-INTERFACE_POST(iDocumentAttributeIterator)
-INTERFACE_POST(iDocumentAttribute)
-INTERFACE_POST(iDocumentNodeIterator)
-INTERFACE_POST(iDocumentNode)
-INTERFACE_POST(iDocument)
-INTERFACE_POST(iDocumentSystem)
-INTERFACE_POST(iDynamics)
-INTERFACE_POST(iDynamicSystem)
-INTERFACE_POST(iEngine)
-INTERFACE_POST(iEvent)
-INTERFACE_POST(iEventHandler)
-INTERFACE_POST(iEventQueue)
-INTERFACE_POST(iFile)
-INTERFACE_POST(iFont)
-INTERFACE_POST(iFontServer)
-INTERFACE_POST(iGraphics3D)
-INTERFACE_POST(iGraphics2D)
-INTERFACE_POST(iImage)
-INTERFACE_POST(iImageIO)
-INTERFACE_POST(iKeyboardDriver)
-INTERFACE_POST(iLightList)
-INTERFACE_POST(iLoader)
-INTERFACE_POST(iLoaderPlugin)
-INTERFACE_POST(iMaterial)
-INTERFACE_POST(iMeshFactoryWrapper)
-INTERFACE_POST(iMeshObject)
-INTERFACE_POST(iMeshObjectFactory)
-INTERFACE_POST(iMeshObjectType)
-INTERFACE_POST(iMeshWrapper)
-INTERFACE_POST(iModelConverter)
-INTERFACE_POST(iMovable)
-INTERFACE_POST(iMovableListener)
-INTERFACE_POST(iObject)
-INTERFACE_POST(iObjectRegistry)
-INTERFACE_POST(iPluginManager)
-INTERFACE_POST(iPolygon3D)
-INTERFACE_POST(iPolygonMesh)
-INTERFACE_POST(iPolygonTexture)
-INTERFACE_POST(iSCF)
-INTERFACE_POST(iScript)
-INTERFACE_POST(iSector)
-INTERFACE_POST(iSectorList)
-INTERFACE_POST(iSoundHandle)
-INTERFACE_POST(iSoundLoader)
-INTERFACE_POST(iSoundRender)
-INTERFACE_POST(iSoundWrapper)
-INTERFACE_POST(iSoundDriver)
-INTERFACE_POST(iSoundSource)
-INTERFACE_POST(iSprite3DState)
-INTERFACE_POST(iStatLight)
-INTERFACE_POST(iStrVector)
-INTERFACE_POST(iTextureHandle)
-INTERFACE_POST(iTextureManager)
-INTERFACE_POST(iTextureWrapper)
-INTERFACE_POST(iThingState)
-INTERFACE_POST(iVFS)
-INTERFACE_POST(iView)
-INTERFACE_POST(iVirtualClock)
-INTERFACE_POST(iVisibilityCuller)
+#undef INTERFACE_APPLY
+#define INTERFACE_APPLY(x) INTERFACE_POST(x)
+APPLY_FOR_EACH_INTERFACE
 
-// The following isn't necessary if include/iutil/event.h would have
-// named struct instead of anonymous ones...
-%inline %{
-
-	struct _Struct_iEvent_Key
-	{
-		int Code;
-		int Char;
-		int Modifiers;
-	};
-
-	struct _Struct_iEvent_Mouse
-	{
-		int x,y;
-		int Button;
-		int Modifiers;
-	};
-
-	struct _Struct_iEvent_Joystick
-	{
-		int number;
-		int x, y;
-		int Button;
-		int Modifiers;
-	};
-
-	struct _Struct_iEvent_Command
-	{
-		uint Code;
-		void *Info;
-	};
-
-	struct _Struct_iEvent_Network
-	{
-		iNetworkSocket2 *From;
-		iNetworkPacket *Data;
-	};
-
-%}
-
-%{
-
-	_Struct_iEvent_Key * iEvent_Key_get (iEvent * event)
-	{
-		return (_Struct_iEvent_Key *) (void *) &event->Key;
-	}
-
-	_Struct_iEvent_Mouse * iEvent_Mouse_get (iEvent * event)
-	{
-		return (_Struct_iEvent_Mouse *) (void *) &event->Mouse;
-	}
-
-	_Struct_iEvent_Joystick * iEvent_Joystick_get (iEvent * event)
-	{
-		return (_Struct_iEvent_Joystick *) (void *) &event->Joystick;
-	}
-
-	_Struct_iEvent_Command * iEvent_Command_get (iEvent * event)
-	{
-		return (_Struct_iEvent_Command *) (void *) &event->Command;
-	}
-
-	_Struct_iEvent_Network * iEvent_Network_get (iEvent * event)
-	{
-		return (_Struct_iEvent_Network *) (void *) &event->Network;
-	}
-
-%}
-
+// iutil/event.h
 %extend iEvent
 {
-	const _Struct_iEvent_Key Key;
-	const _Struct_iEvent_Mouse Mouse;
-	const _Struct_iEvent_Joystick Joystick;
-	const _Struct_iEvent_Command Command;
-	const _Struct_iEvent_Network Network;
+	const csEventKeyData Key;
+	const csEventMouseData Mouse;
+	const csEventJoystickData Joystick;
+	const csEventCommandData Command;
+	const csEventNetworkData Network;
 }
 
-%inline %{
-
-	csPtr<iBase> _CS_QUERY_REGISTRY_TAG (iObjectRegistry * reg,
-		const char * tag)
-	{
-		return CS_QUERY_REGISTRY_TAG(reg, tag);
-	}
-
-	csPtr<iBase> _CS_LOAD_PLUGIN_ALWAYS (iPluginManager * plugin_mgr,
-		const char * class_id)
-	{
-		return CS_LOAD_PLUGIN_ALWAYS(plugin_mgr, class_id);
-	}
-
+// iutil/event.h
+%{
+	csEventKeyData * iEvent_Key_get (iEvent * event)
+		{ return &event->Key; }
+	csEventMouseData * iEvent_Mouse_get (iEvent * event)
+		{ return &event->Mouse; }
+	csEventJoystickData * iEvent_Joystick_get (iEvent * event)
+		{ return &event->Joystick; }
+	csEventCommandData * iEvent_Command_get (iEvent * event)
+		{ return &event->Command; }
+	csEventNetworkData * iEvent_Network_get (iEvent * event)
+		{ return &event->Network; }
 %}
 
+// iutil/evdefs.h
+#define _CS_IS_KEYBOARD_EVENT(e) CS_IS_KEYBOARD_EVENT(e)
+#undef CS_IS_KEYBOARD_EVENT
+bool _CS_IS_KEYBOARD_EVENT (const iEvent &);
+#define _CS_IS_MOUSE_EVENT(e) CS_IS_MOUSE_EVENT(e)
+#undef CS_IS_MOUSE_EVENT
+bool _CS_IS_MOUSE_EVENT (const iEvent &);
+#define _CS_IS_JOYSTICK_EVENT(e) CS_IS_JOYSTICK_EVENT(e)
+#undef CS_IS_JOYSTICK_EVENT
+bool _CS_IS_JOYSTICK_EVENT (const iEvent &);
+#define _CS_IS_INPUT_EVENT(e) CS_IS_INPUT_EVENT(e)
+#undef CS_IS_INPUT_EVENT
+bool _CS_IS_INPUT_EVENT (const iEvent &);
+#define _CS_IS_NETWORK_EVENT(e) CS_IS_NETWORK_EVENT(e)
+#undef CS_IS_NETWORK_EVENT
+bool _CS_IS_NETWORK_EVENT (const iEvent &);
+
+// iutil/objreg.h
+#define _CS_QUERY_REGISTRY_TAG(a, b) CS_QUERY_REGISTRY_TAG(a, b)
+#undef CS_QUERY_REGISTRY_TAG
+csPtr<iBase> _CS_QUERY_REGISTRY_TAG (iObjectRegistry *, const char *);
+
+// iutil/plugin.h
+#define _CS_LOAD_PLUGIN_ALWAYS(a, b) CS_LOAD_PLUGIN_ALWAYS(a, b)
+#undef CS_LOAD_PLUGIN_ALWAYS
+csPtr<iBase> _CS_LOAD_PLUGIN_ALWAYS (iPluginManager *, const char *);
+
+// ivaria/collider.h
 %extend iCollideSystem
 {
 	csCollisionPair * GetCollisionPairByIndex (int index)
@@ -590,6 +655,7 @@ INTERFACE_POST(iVisibilityCuller)
 	}
 }
 
+// cstool/initapp.h
 %extend csInitializer
 {
 	static bool _RequestPlugin (iObjectRegistry * object_reg,
@@ -599,40 +665,17 @@ INTERFACE_POST(iVisibilityCuller)
 			object_reg, plugName, intName, scfId, version, CS_REQUEST_END
 		);
 	}
-
-	static bool _RegisterDocumentSystem (iObjectRegistry * object_reg)
-	{
-	  iDocumentSystem *ds = new csTinyDocumentSystem;
-	  bool res = object_reg->Register (ds, "iDocumentSystem");
-	  ds->DecRef ();
-	  return res;
-	}
 }
 
-%extend csVector3
-{
-	csVector3 project (const csVector3 & what) const
-		{ return what << *self; }
-}
+// ivideo/graph3d.h
+#define _CS_FX_SETALPHA(a) CS_FX_SETALPHA(a)
+#undef CS_FX_SETALPHA
+uint _CS_FX_SETALPHA (uint);
+#define _CS_FX_SETALPHA_INT(a) CS_FX_SETALPHA_INT(a)
+#undef CS_FX_SETALPHA_INT
+uint _CS_FX_SETALPHA_INT (uint);
 
-%extend csRGBpixel
-{
-	csRGBcolor Color () const
-		{ return *self; }
-}
-
-%extend G3DTriangleMesh
-{
-	enum { VM_WORLDSPACE, VM_VIEWSPACE };
-	int vertex_mode;
-}
-
-%extend G3DPolygonMesh
-{
-	enum { VM_WORLDSPACE, VM_VIEWSPACE };
-	int vertex_mode;
-}
-
+// csgeom/vector2.h csgeom/vector3.h
 %define VECTOR_OBJECT_FUNCTIONS(V)
 	V operator + (const V & v) const
 		{ return *self + v; }
@@ -654,11 +697,13 @@ INTERFACE_POST(iVisibilityCuller)
 		{ return f > *self; }
 %enddef
 
+// csgeom/vector2.h
 %extend csVector2
 {
 	VECTOR_OBJECT_FUNCTIONS(csVector2)
 }
 
+// csgeom/vector3.h
 %extend csVector3
 {
 	VECTOR_OBJECT_FUNCTIONS(csVector3)
@@ -669,8 +714,11 @@ INTERFACE_POST(iVisibilityCuller)
 		{ return *self /= t; }
 	csVector3 operator / (const csReversibleTransform & t)
 		{ return *self / t; }
+	csVector3 project (const csVector3 & what) const
+		{ return what << *self; }
 }
 
+// csgeom/plane3.h
 %extend csPlane3
 {
 	csPlane3 & operator *= (const csTransform & t)
@@ -681,6 +729,7 @@ INTERFACE_POST(iVisibilityCuller)
 		{ return *self / t; }
 }
 
+// csgeom/sphere.h
 %extend csSphere
 {
 	csSphere & operator *= (const csTransform & t)
@@ -689,6 +738,7 @@ INTERFACE_POST(iVisibilityCuller)
 		{ return *self / t; }
 }
 
+// csgeom/matrix3.h
 %extend csMatrix3
 {
 	csMatrix3 operator + (const csMatrix3 & m)
@@ -715,6 +765,7 @@ INTERFACE_POST(iVisibilityCuller)
 		{ return *self *= t; }
 }
 
+// csgeom/transfrm.h
 %extend csTransform
 {
 	csVector3 operator * (const csVector3 & v) const
@@ -729,6 +780,7 @@ INTERFACE_POST(iVisibilityCuller)
 		{ return *self * t; } 
 }
 
+// csgeom/transfrm.h
 %extend csReversibleTransform
 {
 	csReversibleTransform & operator *= (const csReversibleTransform & t)
@@ -741,6 +793,7 @@ INTERFACE_POST(iVisibilityCuller)
 		{ return *self / t; }
 }
 
+// csutil/cscolor.h
 %extend csColor
 {
 	csColor operator + (const csColor & c) const
@@ -751,13 +804,25 @@ INTERFACE_POST(iVisibilityCuller)
 		{ return *self * f; }
 }
 
-#ifdef SWIGPYTHON
-	%include "ivaria/pythoncs.i"
-#endif
+// csgeom/quaterni.h
+%extend csQuaternion
+{
+	csQuaternion operator + (const csQuaternion& q)
+		{ return *self + q; }
+	csQuaternion operator - (const csQuaternion& q)
+		{ return *self - q; }
+	csQuaternion operator * (const csQuaternion& q)
+		{ return *self * q; }
+}
 
-#ifdef SWIGPERL5
-// TODO help needed...
-//	%include "ivaria/perl5cs.i"
+#if defined(SWIGPYTHON)
+	%include "ivaria/pythpost.i"
+#elif defined(SWIGPERL5)
+	%include "ivaria/perlpost.i"
+#elif defined(SWIGRUBY)
+	%include "ivaria/rubypost.i"
+#elif defined(SWIGTCL8)
+	%include "ivaria/tclpost.i"
 #endif
 
 
