@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Mipmapping
+@node Mipmapping, Lighting, Texture Cache, Concepts
 @section Mipmapping
 @cindex Mipmapping
 

@@ -1,5 +1,5 @@
 @c -*-texinfo-*
-@node Portal Engine
+@node Portal Engine, Space Warping, Cameras and Matrices, Concepts
 @section The Portal Engine
 @cindex Portal Engine
 
@@ -108,7 +108,7 @@ you want (note that all polygons of a Sector can be Portals, even the floor
 and ceiling polygons. In fact there is no special attribute for a floor or
 ceiling polygon. All polygons are equivalent).
 
-@node Sectors
+@node Sectors, Things, Portal Engine, Portal Engine
 @subsection Sectors
 @cindex Sectors
 
@@ -128,7 +128,7 @@ Sector. This is useful if you want to define non-convex Sectors. The BSP is
 local to the Sector (another Sector can use another BSP if it wishes). The
 Sector still uses Portals to go to another Sector.
 
-@node Things
+@node Things, Polygons, Sectors, Portal Engine
 @subsection Things
 @cindex Things
 
@@ -149,7 +149,7 @@ Currently polygons in Things cannot be Portals. In future I plan to fix this.
 With this feature you could have very interesting effects (like a television
 Thing with the screen a Portal to some Sector).
 
-@node Polygons
+@node Polygons, Portals, Things, Portal Engine
 @subsection Polygons
 @cindex Polygons
 
@@ -174,7 +174,7 @@ the polygon surface.
 A polygon can also be a Portal (see below). Normally a Portal polygon is not
 texture mapped unless the texture is semi-transparent.
 
-@node Portals
+@node Portals, Rendering The World, Polygons, Portal Engine
 @subsection Portals
 @cindex Portals
 
@@ -243,7 +243,7 @@ sure that all Sectors are convex. A BSP tree approach would solve this
 automatically.
 @end itemize
 
-@node Rendering The World
+@node Rendering The World, , Portals, Portal Engine
 @subsection Rendering The World
 @cindex Rendering The World
 

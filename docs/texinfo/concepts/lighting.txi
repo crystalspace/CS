@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Lighting
+@node Lighting, Visibility Culling, Mipmapping, Concepts
 @section Lighting
 @cindex Lighting
 
@@ -34,7 +34,7 @@ zero.
 * Shadow Calculation::
 @end menu
 
-@node Static Lights
+@node Static Lights, Pseudo-Dynamic Lights, Lighting, Lighting
 @subsection Static Lights
 @cindex Static Lights
 
@@ -118,7 +118,7 @@ lightmap of the following size:
 
 Note that also the texture in the texture cache will have that size.
 
-@node Pseudo-Dynamic Lights
+@node Pseudo-Dynamic Lights, Dynamic Lights, Static Lights, Lighting
 @subsection Pseudo-Dynamic Lights
 @cindex Pseudo-Dynamic Lights
 
@@ -165,7 +165,7 @@ in some room.
 If the intensity of a pseudo-dynamic light does not change there is no
 performance hit at all.
 
-@node Dynamic Lights
+@node Dynamic Lights, Shadow Calculation, Pseudo-Dynamic Lights, Lighting
 @subsection Dynamic Lights
 @cindex Dynamic Lights
 
@@ -173,7 +173,7 @@ The latest Crystal Space versions also support true dynamic lights. These are
 rendered atop of the normal lightmaps as explained above and support colors
 and limited shadows.
 
-@node Shadow Calculation
+@node Shadow Calculation, , Dynamic Lights, Lighting
 @subsection Shadow Calculation
 @cindex Shadow Calculation
 

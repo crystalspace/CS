@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node Texture Cache
+@node Texture Cache, Mipmapping, Texture Mapping, Concepts
 @section Texture Cache
 @cindex Texture Cache
 
