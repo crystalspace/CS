@@ -22,3 +22,11 @@
 @ifnotinfo
 @picturesss{tutorial,howto,msvc7proj,snap3}
 @end ifnotinfo
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap4}
+@end ifnotinfo
+
+@ifnotinfo
+@picturesss{tutorial,howto,msvc7proj,snap5}
+@end ifnotinfo
