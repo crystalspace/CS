@@ -31,6 +31,13 @@ The history order is reversed so that new features are at the top.
 	- Did a quick hack in the terrain engine so that it will correctly
 	  align for textures of size 64! Need to make it more general so
 	  that it works for all texture sizes though.
+	- Robert Bate updated the Mac port again:
+	    - Codewarrior is very picky with the floating point constants
+	      passed to templated routines. Making sure they all are floats.
+	    - Updating the JPEG, PNG anf ZLIB libaries to the latest and
+	      greatest.
+	    - New project files for CW Pro 6. These projects are Carbonized
+	      (Run on both 9 and X).
 3-May-2001
 	- Wouter Wijngaards did the following:
 	  added a class that can generate iImages for terrain textures on
