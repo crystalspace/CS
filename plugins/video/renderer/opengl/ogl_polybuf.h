@@ -366,8 +366,8 @@ public:
   /// Gets the original vertices count
   virtual int GetVertexCount() const {return verticesCount;}
 
-  /// Given a polygon triangularizes it and adds it to the polygon buffer
-  void AddTriangles(csTrianglesPerMaterial* pol,
+  /// Given a polygon triangulize it and adds it to the polygon buffer
+  void AddTriangles (csTrianglesPerMaterial* pol,
     csTrianglesPerSuperLightmap* triSuperLM,
     int* verts, int num_vertices, const csMatrix3& m_obj2tex,
     const csVector3& v_obj2tex,iPolygonTexture* poly_texture, int mat_index,

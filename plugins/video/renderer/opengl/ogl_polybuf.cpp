@@ -296,17 +296,17 @@ void TrianglesSuperLightmapList::Add(TrianglesSuperLightmapNode* t)
  * the triangles and vertices that will be used in fog
  */
 csTrianglesPerSuperLightmap* csTriangleArrayPolygonBuffer::
-    SearchFittingSuperLightmap(iPolygonTexture* poly_texture,
-                               csRect& rect,int /*num_vertices*/)
+    SearchFittingSuperLightmap (iPolygonTexture* poly_texture,
+                                csRect& rect,int /*num_vertices*/)
 {
   int i;
   if (poly_texture == NULL || poly_texture->GetLightMap () == NULL)
   {
-    //OK This polygon has no lightmap.
-    //Let's check if we have to create a unlitPolygonsSL or is already
-    //created
+    // OK This polygon has no lightmap.
+    // Let's check if we have to create a unlitPolygonsSL or is already
+    // created
     if (unlitPolysSL) return unlitPolysSL;
-    unlitPolysSL = new csTrianglesPerSuperLightmap(verticesCount);
+    unlitPolysSL = new csTrianglesPerSuperLightmap (verticesCount);
     unlitPolysSL->isUnlit = true;
     return unlitPolysSL;
   }
@@ -315,9 +315,9 @@ csTrianglesPerSuperLightmap* csTriangleArrayPolygonBuffer::
   int lm_height = piLM->GetHeight();
 
   TrianglesSuperLightmapNode* curr = superLM.last;
-  for(i = 0; i < superLM.numElems; i++)
+  for (i = 0; i < superLM.numElems; i++)
   {
-    if(curr->info->region->Alloc(lm_width,lm_height,rect))
+    if (curr->info->region->Alloc (lm_width, lm_height, rect))
       return curr->info;
     curr = curr->prev;
   }
@@ -325,14 +325,14 @@ csTrianglesPerSuperLightmap* csTriangleArrayPolygonBuffer::
   //We haven't found any, let's create a new one
 
   curr = new TrianglesSuperLightmapNode();
-  curr->info = new csTrianglesPerSuperLightmap(verticesCount);
+  curr->info = new csTrianglesPerSuperLightmap (verticesCount);
 
-  if(!curr->info->region->Alloc(lm_width,lm_height,rect))
+  if (!curr->info->region->Alloc (lm_width, lm_height, rect))
   {
     return NULL;
   }
 
-  superLM.Add(curr);
+  superLM.Add (curr);
   return curr->info;
 }
 
