@@ -22,12 +22,14 @@
 #include "csutil/scf.h"
 #include "csutil/garray.h"
 #include "csutil/cscolor.h"
+#include "igraph3d.h"
 
 struct iMaterialWrapper;
 struct iSkeleton;
 struct iSkeletonState;
 struct iMeshObject;
 struct iMeshObjectFactory;
+struct iRenderView;
 struct iRenderView;
 
 /**

@@ -7,6 +7,22 @@ The history order has been reversed so that new features are at the top.
 	- Created the spr3d plugin (untested). The old csSprite3D is still
 	  there and will remain there until everything is ported to the
 	  new plugin. I also still have to implement spr3dldr (the loader).
+	- Added spr3d, spr3dldr, explo, and exploldr targets to 'walkall'
+	  because these are really required by WalkTest.
+	- Started work on spr3dldr (the Sprite3D loader plugin). The
+	  plugin currently works but only supports a tiny subset of what
+	  needs to be supported (i.e. not enough to be useful).
+	- Wouter Wijngaards changed csPixmap to allow subclassing. Made
+	  a subclass of csPixmap, that is csAnim2D - an animated pixmap.
+	  Each time you draw the correct frame of the animation is
+	  substituted, and drawn. Use like a csPixmap, and redraw each frame
+	  (if not already a 2d overdraw).
+	- Norman Kramer did the following:
+	    - Fixed bug in the c yuv2rgba routine: u,v values were taken
+	      for 4 sequential pixel, instead the were meant for a 2x2
+	      pixelblock.
+	    - Started NASM mmx routine for yuv2rgba: doesnt work yet and
+	      is not scheduled either.
 4-Feb-2001
 	- Wouter Wijngaards changed includes, so that make depend works
 	  nicer for csfedit.
