@@ -307,7 +307,7 @@ const char* csLightMap::ReadFromCache (
     if (file->Read ((char*)lm_ptr, 3) != 3)
       return "File too short while reading static lightmap data!";
     lm_ptr += 3;
-    *(lm_ptr++) = -127;
+    *(lm_ptr++) = (char)-127;
   }
 
   //-------------------------------
