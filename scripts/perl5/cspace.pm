@@ -56,6 +56,7 @@ package cspace;
 *csGetTicks = *cspacec::csGetTicks;
 *csSleep = *cspacec::csSleep;
 *csGetUsername = *cspacec::csGetUsername;
+*csGetPlatformConfigPath = *cspacec::csGetPlatformConfigPath;
 *csfxInterference = *cspacec::csfxInterference;
 *csfxFadeOut = *cspacec::csfxFadeOut;
 *csfxFadeTo = *cspacec::csfxFadeTo;
