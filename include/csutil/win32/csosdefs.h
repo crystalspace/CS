@@ -480,14 +480,20 @@ static inline void* fast_mem_copy (void *dest, const void *src, int count)
 // just to avoid windows.h inclusion
 #define csSW_SHOWNORMAL 1
 
-#ifdef __STRICT_ANSI__
+#if defined(CS_COMPILER_GCC) && defined(__STRICT_ANSI__)
 // Need those...
-extern int	_argc;
-extern char**	_argv;
+  extern int		_argc;
+  extern char**	_argv;
+  #define CS_WIN32_ARGC _argc
+  #define CS_WIN32_ARGV _argv
+#elif defined(CS_COMPILER_BCC) 
+  #define CS_WIN32_ARGC _argc
+  #define CS_WIN32_ARGV _argv
+#else
+  #define CS_WIN32_ARGC __argc
+  #define CS_WIN32_ARGV __argv
 #endif
 
-#define CS_WIN32_ARGC _argc
-#define CS_WIN32_ARGV _argv
 
 #ifdef __CYGWIN32__
 #if !defined(CS_IMPLEMENT_PLATFORM_APPLICATION)

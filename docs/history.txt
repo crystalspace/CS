@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Mar-2005
+	- res added some terrain-related interfaces to cspace.i.
+	- res made more -ansi -pedantic compile fixes on Win32. 
 4-Mar-2005
 	- Eric Sunshine applied patch from <obi666@users.sourceforge.net>
 	  (patch #1155282), which adds iAnimTimeUpdateHandler for
