@@ -70,6 +70,8 @@ chronological order.
 	    CS/plugins/stdrep
 	  The only remaining directories which need to be converted are
 	  CS/plugins/mesh and CS/plugins/video.
+	- Eric Sunshine eliminated numerous ambiguous operator overload errors
+	  from partedit.
 6-Nov-2003
 	- res bumped the version of the iGraphics2D interface and updated some
 	  Doxygen comments in include/graph2d.h (basically, the differences

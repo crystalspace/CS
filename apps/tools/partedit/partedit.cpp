@@ -407,25 +407,25 @@ bool PartEdit::UpdateGen3D(EmitterList *elist,Emitter3DState *emitter_state)
     switch (use_emitter)
     {
     case EMITTER_LINE:
-      elist->current=elist->line;
+      elist->current=(iEmitGen3D*)elist->line;
      break;
     case EMITTER_BOX:
-      elist->current=elist->box;
+      elist->current=(iEmitGen3D*)elist->box;
      break;
     case EMITTER_CYLINDER:
-      elist->current=elist->cylinder;
+      elist->current=(iEmitGen3D*)elist->cylinder;
      break;
     case EMITTER_CONE:
-      elist->current=elist->cone;
+      elist->current=(iEmitGen3D*)elist->cone;
      break;
     case EMITTER_SPHERE:
-      elist->current=elist->sphere;
+      elist->current=(iEmitGen3D*)elist->sphere;
      break;
     case EMITTER_SPHERETANGENT:
-      elist->current=elist->spheretangent;
+      elist->current=(iEmitGen3D*)elist->spheretangent;
      break;
     case EMITTER_CYLINDERTANGENT:
-      elist->current=elist->cylindertangent;
+      elist->current=(iEmitGen3D*)elist->cylindertangent;
      break;
     case EMITTER_MIX:
       {
@@ -433,12 +433,12 @@ bool PartEdit::UpdateGen3D(EmitterList *elist,Emitter3DState *emitter_state)
         // clearing saves us from having to check if any existing mix members were removed
         elist->mix=csPtr<iEmitMix> (EmitFactoryState->CreateMix());
 
-        elist->current=elist->mix;
+        elist->current=(iEmitGen3D*)elist->mix;
       }
      break;
     case EMITTER_POINT:
     default:
-      elist->current=elist->point;
+      elist->current=(iEmitGen3D*)elist->point;
      break;
     }
   }
