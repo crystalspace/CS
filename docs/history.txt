@@ -54,6 +54,8 @@ The history order is reversed so that new features are at the top.
 	      full path
 	    - Added #include "cssys/syspath.h" so vfs could find 
 	      csGetConfigPath
+	- Oktal fixed a preprocessor directive in csprocessorcap.h,
+	  it's "#elif" not "#else if".
 16-Jun-2003
 	- Oktal separated a multiple-argument %ignore directive into several
 	  single-argument ones, in perlpre.i, in order to support older

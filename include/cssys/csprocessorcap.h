@@ -159,7 +159,7 @@ end_detect:
         pop ebx
         pop eax
     }
-    #else if COMP_GCC 
+    #elif COMP_GCC 
     __asm__(
     //detect 386/486
     "  pushfl                           \n"
