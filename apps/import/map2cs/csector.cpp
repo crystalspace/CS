@@ -289,8 +289,11 @@ bool CCSSector::WriteLights(csRef<iDocumentNode> node, CIWorld* pWorld)
           //I will prefer the "_light" format provided by Half-Life, because
           //this will allow colored light. If there is no "_light" statement,
           //we will look for a "light" key, which will only contain the radius.
+	  //Also added in: "_color" from Quake3 for more support with visuals
+	  //in GtkRadiant.
 
           bool   LightOk         = false;
+	  bool	 ColorOk		 = false;
           double r               = 255;
           double g               = 255;
           double b               = 255;
@@ -305,18 +308,40 @@ bool CCSSector::WriteLights(csRef<iDocumentNode> node, CIWorld* pWorld)
           if (lightvalue)
           {
             char dummy;
-            if (sscanf(lightvalue, "%lf %lf %lf %lf%c", &r, &g, &b, &radius, &dummy)==4)
+            if (sscanf(lightvalue, "%lf %lf %lf %lf%c",
+	    	&r, &g, &b, &radius, &dummy)==4)
             {
               LightOk = true;
+	      ColorOk = true;
             }
           }
+
+	  const char* colorvalue = pEntity->GetValueOfKey("_color");
+	  if (colorvalue)
+	  {
+	    char dummy;
+	    double r2            = 1.0;
+	    double g2            = 1.0;
+	    double b2            = 1.0;
+
+	    if (sscanf(colorvalue, "%lf %lf %lf%c", &r2, &g2, &b2, &dummy)==3)
+	    {
+	      r = r2 * 255;
+	      g = g2 * 255;
+	      b = b2 * 255;
+	      ColorOk = true;
+	    }
+	  }
 
           if (!LightOk)
           {
             radius = pEntity->GetNumValueOfKey("light", 100);
-            r      = 255;
-            g      = 255;
-            b      = 255;
+	    if (!ColorOk) 
+	    {
+              r      = 255;
+              g      = 255;
+              b      = 255;
+	    }
           }
 
           //dynamic light key
@@ -332,8 +357,10 @@ bool CCSSector::WriteLights(csRef<iDocumentNode> node, CIWorld* pWorld)
             char dummy;
             if (sscanf(attenuationlightvalue, "%s%c",attenuation, &dummy) == 1)
             {
-              if (!(strcmp(attenuation,"none")    || strcmp(attenuation,"linear") ||
-                    strcmp(attenuation,"inverse") || strcmp(attenuation,"realistic")))
+              if (!(strcmp(attenuation,"none") ||
+	            strcmp(attenuation,"linear") ||
+                    strcmp(attenuation,"inverse") ||
+		    strcmp(attenuation,"realistic")))
               {
                 strcpy( attenuation , "realistic" );
               }

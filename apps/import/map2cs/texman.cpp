@@ -26,6 +26,7 @@
 #include "texfile.h"
 #include "wad3file.h"
 #include "pk3file.h"
+#include "entity.h"
 
 #include "iutil/vfs.h"
 
@@ -96,6 +97,30 @@ void CTextureManager::LoadTextureArchives(CMapFile* pMap)
     }
     while (nr>0);
   }
+
+}
+
+void CTextureManager::LoadArchive(char* filename)
+{
+
+  /******************************
+  Implemented to allow for a key
+  in the worldspawn entity to set
+  the texture package (currently
+  only supports one package)
+  ******************************/
+
+  CTextureArchive* pArchive = new CPk3File;
+  
+  if (pArchive->Open(filename)) 
+  {
+    m_TextureArchives.Push(pArchive);
+  }
+  else 
+  {
+    delete pArchive;
+  }
+
 }
 
 CTextureFile* CTextureManager::GetTexture(const char* TextureName)

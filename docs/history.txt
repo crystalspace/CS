@@ -6,6 +6,25 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+8-Apr-2004
+	- Jorrit committed a patch to map2cs from Aren Blondahl:
+	    - Added Support for "_color" tag in light entities for support
+	      with proper q3 .map format and GtkRadiant compatibility.
+	    - Added Support for keys on the "worldspawn" entity to be added
+	      in as a <key /> tag. This will allow developers to add keys to
+	      their "worldspawn" and access them in their code through
+	      Engine->QueryObject()->GetChild("name here"); Returning a
+	      iKeyValuePair*
+	    - Added Support for info passed in the config file to be
+	      specified in the .map, I had some people I knew annoyed about
+	      creating a .cfg each time they made a new map, now the scaling
+	      factor can be set in the "worldspawn" entity under the key
+	      "world_scale". And also by adding in a key "archive" to the
+	      world spawn (or perhaps any entity at this time **will clean
+	      that up in the future**) the value of the key is loaded as a
+	      pk3 file (will add support for other archive types later).
+	      This will essentially exclude the need for the .cfg (for now
+	      at least) I will be adding more options in the future.
 7-Apr-2004
 	- res added a small helper class to create minidumps on Win32.
 	- res augmented the Win32 assistant to allow user-defined exception

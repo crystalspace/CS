@@ -55,6 +55,63 @@ bool CMapFile::Read(const char* filename, const char* configfile)
 
   m_NumBrushes  = 0;
 
+  /***********************
+  Kind of sloppy, ill find
+  a nicer way to do it in 
+  the future!
+  ***********************/
+
+  CMapParser preParser;
+  if (!preParser.Open(filename)) return false;
+
+  bool inBrush = false;
+
+  char Buff[1000], Key[1000], Value[1000];
+  while (preParser.GetNextToken(Buff))
+  {
+    if (strcmp(Buff, "{")==0) 
+	{
+	  //new entity//
+	  while (preParser.GetNextToken(Buff)) 
+	  {	
+	    if (strcmp(Buff, "}")==0) 
+		{
+		  //end of entity or brush//
+		  if (inBrush)
+			  inBrush = false;
+		  else
+              break;
+		} 
+		else if (strcmp(Buff, "{")==0) 
+		{
+          //Beginning of brush//
+		  inBrush = true;
+		}
+		else if (strcmp(Buff, "{")==0)
+		{
+		  //Info in a brush//
+		}
+		else
+		{
+		  //Key Pair//
+		  strcpy(Key, Buff);
+		  if (strcmp(Key, "archive")==0) 
+		  {
+            if (!preParser.GetNextToken(Buff))
+            {
+              preParser.ReportError("Format error. Keys and values for entities must"
+                             "always come in pairs. Found no match for key \"%s\"",
+                             Key);
+              return false;
+            }
+			strcpy(Value, Buff);
+			m_TextureManager.LoadArchive(Value);
+		  }
+		}
+	  }
+	}
+  }
+
   CMapParser parser;
   if (!parser.Open(filename)) return false;
 

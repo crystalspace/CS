@@ -166,6 +166,19 @@ bool CCSWorld::Write(csRef<iDocumentNode> root, CMapFile* pMap, const char * /*s
   CMapEntity* pEntity = GetWorldspawn();
   
   {
+    int keyNum = pEntity->GetNumberOfKeyValuePairs();
+    for (int i = 0; i < keyNum; i++) {
+      CMapKeyValuePair*	newPair = pEntity->GetKeyValuePair(i);
+	  if (strcmp(newPair->GetKey(), "world_scale")==0 || strcmp(newPair->GetKey(), "archive")==0)
+		  continue;
+
+      DocNode newKey = CreateNode (world, "key");
+	  newKey->SetAttribute("name", newPair->GetKey());
+	  newKey->SetAttribute("value", newPair->GetValue());
+    }
+  }
+
+  {
     DocNode scaling = CreateNode (world, "key");
     scaling->SetAttribute ("name", "map2cs_scaling");
     scaling->SetAttributeAsFloat ("value", m_ScaleFactor);

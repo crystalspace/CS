@@ -284,6 +284,27 @@ bool CIWorld::PrepareData(const char* filename, CMapFile* pMap)
   m_pMap = pMap;
   m_ScaleFactor = pMap->GetConfigFloat("Map2CS.General.Scaling", 1.0/40.0);
 
+  /**************************
+  Added in to let scaleing be
+  specified in the worldspawn
+  **************************/
+
+  int maxEnt = pMap->GetNumEntities();
+
+  for (int i = 0; i < maxEnt; i++) 
+  {
+    CMapEntity*	curEnt = pMap->GetEntity(i);
+	double curScale;
+
+	if (strcmp(curEnt->GetValueOfKey("classname"), "worldspawn")==0) {
+	  curScale = curEnt->GetNumValueOfKey("world_scale");
+
+	  if (curScale != 0.0)
+	    m_ScaleFactor = curScale;
+
+	}
+  }
+
   BuildTexturelist();
   FindSectors();
   FindPortals();
