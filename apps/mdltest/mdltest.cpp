@@ -21,6 +21,7 @@
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
 #include "cstool/mdldata.h"
+#include "cstool/mdltool.h"
 #include "cstool/initapp.h"
 #include "mdltest.h"
 #include "iengine/sector.h"
@@ -344,7 +345,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
 
   const char *Filename = cmdline->GetName (0);
   iModelData *Model = Filename ? ImportModel (Filename) : CreateDefaultModel (tm2);
-  Model->MergeObjects (true);
+  csModelDataTools::MergeObjects (Model, true);
 
 //  Model->LoadImages (vfs, imageio, g3d->GetTextureManager ()->GetTextureFormat ());
   imageio->DecRef ();

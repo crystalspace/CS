@@ -284,8 +284,6 @@ struct iModelDataObject : public iBase
   virtual iModelDataVertices* GetDefaultVertices () const = 0;
   /// Set the default vertex set
   virtual void SetDefaultVertices (iModelDataVertices*) = 0;
-  /// Copy the contents of another object into this one
-  virtual void MergeCopyObject (iModelDataObject *obj) = 0;
 };
 
 
@@ -373,11 +371,6 @@ struct iModelData : public iBase
   virtual void RegisterTextures (iTextureList *tl) = 0;
   /// Register all materials using the given material list
   virtual void RegisterMaterials (iMaterialList *ml) = 0;
-  /**
-   * Merge all contained mesh objects into a single one. If 'MultiTexture'
-   * is true then objects with different textures may be merged.
-   */
-  virtual void MergeObjects (bool MultiTexture) = 0;
 };
 
 #endif // __IMESH_MDLDATA_H__
