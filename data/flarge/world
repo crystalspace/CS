@@ -9512,9 +9512,10 @@ WORLD (
         V (6,4,-6)
         V (6,4,6)
         MATERIAL ('plasma')
-	TEXLEN (4)
+	TEXLEN (5.5)
         POLYGON 'east' (
           VERTICES (7,6,4,5)
+	  LIGHTING (no)
 	  PORTAL ('wavySector')
 	  WARP (
 	    W (11,0,0)
@@ -9523,6 +9524,7 @@ WORLD (
         )
         POLYGON 'south' (
           VERTICES (6,2,0,4)
+	  LIGHTING (no)
 	  PORTAL ('wavySector')
 	  WARP (
 	    W (0,0,-11)
@@ -9531,6 +9533,7 @@ WORLD (
         )
         POLYGON 'west' (
           VERTICES (2,3,1,0)
+	  LIGHTING (no)
 	  PORTAL ('wavySector')
 	  WARP (
 	    W (-11,0,0)
@@ -9539,12 +9542,15 @@ WORLD (
         )
         POLYGON 'up' (
           VERTICES (2,6,7,3)
+	  LIGHTING (no)
         )
         POLYGON 'down' (
           VERTICES (1,5,4,0)
+	  LIGHTING (no)
         )
         POLYGON 'north' (
           VERTICES (3,7,5,1)
+	  LIGHTING (no)
 	  PORTAL ('wavySector')
 	  WARP (
 	    W (0,0,11)
@@ -9559,6 +9565,7 @@ WORLD (
       KEY ("entity_WavePortal","south,3,.01,24000")
       KEY ("entity_WavePortal","east,1,.01,29000")
     )
+    FOG (.2,.3,.5,0.08)
   )
 )
 
