@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/loader/thing
+vpath %.cpp plugins/mesh/thing/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
   THINGLDR = $(OUTDLL)thingldr$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(THINGLDR)
 endif
 
-INC.THINGLDR = $(wildcard plugins/mesh/loader/thing/*.h)
-SRC.THINGLDR = $(wildcard plugins/mesh/loader/thing/*.cpp)
+INC.THINGLDR = $(wildcard plugins/mesh/thing/persist/classic/*.h)
+SRC.THINGLDR = $(wildcard plugins/mesh/thing/persist/classic/*.cpp)
 OBJ.THINGLDR = $(addprefix $(OUT),$(notdir $(SRC.THINGLDR:.cpp=$O)))
 DEP.THINGLDR = CSGEOM CSUTIL CSSYS CSUTIL
 

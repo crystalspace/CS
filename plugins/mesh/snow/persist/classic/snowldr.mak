@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/loader/snow
+vpath %.cpp plugins/mesh/snow/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
   SNOWLDR = $(OUTDLL)snowldr$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNOWLDR)
 endif
 
-INC.SNOWLDR = $(wildcard plugins/mesh/loader/snow/*.h)
-SRC.SNOWLDR = $(wildcard plugins/mesh/loader/snow/*.cpp)
+INC.SNOWLDR = $(wildcard plugins/mesh/snow/persist/classic/*.h)
+SRC.SNOWLDR = $(wildcard plugins/mesh/snow/persist/classic/*.cpp)
 OBJ.SNOWLDR = $(addprefix $(OUT),$(notdir $(SRC.SNOWLDR:.cpp=$O)))
 DEP.SNOWLDR = CSGEOM CSUTIL CSSYS CSUTIL
 

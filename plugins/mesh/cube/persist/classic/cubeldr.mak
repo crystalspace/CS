@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/loader/cube
+vpath %.cpp plugins/mesh/cube/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
   CUBELDR = $(OUTDLL)cubeldr$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(CUBELDR)
 endif
 
-INC.CUBELDR = $(wildcard plugins/mesh/loader/cube/*.h)
-SRC.CUBELDR = $(wildcard plugins/mesh/loader/cube/*.cpp)
+INC.CUBELDR = $(wildcard plugins/mesh/cube/persist/classic/*.h)
+SRC.CUBELDR = $(wildcard plugins/mesh/cube/persist/classic/*.cpp)
 OBJ.CUBELDR = $(addprefix $(OUT),$(notdir $(SRC.CUBELDR:.cpp=$O)))
 DEP.CUBELDR = CSGEOM CSUTIL CSSYS CSUTIL
 

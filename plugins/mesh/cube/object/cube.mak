@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/object/cube
+vpath %.cpp plugins/mesh/cube/object
 
 ifeq ($(USE_PLUGINS),yes)
   CUBE = $(OUTDLL)cube$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(CUBE)
 endif
 
-INC.CUBE = $(wildcard plugins/mesh/object/cube/*.h)
-SRC.CUBE = $(wildcard plugins/mesh/object/cube/*.cpp)
+INC.CUBE = $(wildcard plugins/mesh/cube/object/*.h)
+SRC.CUBE = $(wildcard plugins/mesh/cube/object/*.cpp)
 OBJ.CUBE = $(addprefix $(OUT),$(notdir $(SRC.CUBE:.cpp=$O)))
 DEP.CUBE = CSGEOM CSUTIL CSSYS CSUTIL
 

@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/loader/rain
+vpath %.cpp plugins/mesh/rain/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
   RAINLDR = $(OUTDLL)rainldr$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(RAINLDR)
 endif
 
-INC.RAINLDR = $(wildcard plugins/mesh/loader/rain/*.h)
-SRC.RAINLDR = $(wildcard plugins/mesh/loader/rain/*.cpp)
+INC.RAINLDR = $(wildcard plugins/mesh/rain/persist/classic/*.h)
+SRC.RAINLDR = $(wildcard plugins/mesh/rain/persist/classic/*.cpp)
 OBJ.RAINLDR = $(addprefix $(OUT),$(notdir $(SRC.RAINLDR:.cpp=$O)))
 DEP.RAINLDR = CSGEOM CSUTIL CSSYS CSUTIL
 

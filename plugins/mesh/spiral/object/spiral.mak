@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/object/spiral plugins/mesh/object/partgen
+vpath %.cpp plugins/mesh/spiral/object plugins/mesh/partgen
 
 ifeq ($(USE_PLUGINS),yes)
   SPIRAL = $(OUTDLL)spiral$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(SPIRAL)
 endif
 
-INC.SPIRAL = $(wildcard plugins/mesh/object/spiral/*.h plugins/mesh/object/partgen/*.h)
-SRC.SPIRAL = $(wildcard plugins/mesh/object/spiral/*.cpp plugins/mesh/object/partgen/*.cpp)
+INC.SPIRAL = $(wildcard plugins/mesh/spiral/object/*.h plugins/mesh/partgen/*.h)
+SRC.SPIRAL = $(wildcard plugins/mesh/spiral/object/*.cpp plugins/mesh/partgen/*.cpp)
 OBJ.SPIRAL = $(addprefix $(OUT),$(notdir $(SRC.SPIRAL:.cpp=$O)))
 DEP.SPIRAL = CSGEOM CSUTIL CSSYS CSUTIL
 

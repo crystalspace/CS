@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/object/snow plugins/mesh/object/partgen
+vpath %.cpp plugins/mesh/snow/object plugins/mesh/partgen
 
 ifeq ($(USE_PLUGINS),yes)
   SNOW = $(OUTDLL)snow$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(SNOW)
 endif
 
-INC.SNOW = $(wildcard plugins/mesh/object/snow/*.h plugins/mesh/object/partgen/*.h)
-SRC.SNOW = $(wildcard plugins/mesh/object/snow/*.cpp plugins/mesh/object/partgen/*.cpp)
+INC.SNOW = $(wildcard plugins/mesh/snow/object/*.h plugins/mesh/partgen/*.h)
+SRC.SNOW = $(wildcard plugins/mesh/snow/object/*.cpp plugins/mesh/partgen/*.cpp)
 OBJ.SNOW = $(addprefix $(OUT),$(notdir $(SRC.SNOW:.cpp=$O)))
 DEP.SNOW = CSGEOM CSUTIL CSSYS CSUTIL
 

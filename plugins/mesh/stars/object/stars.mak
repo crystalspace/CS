@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/object/stars
+vpath %.cpp plugins/mesh/stars/object
 
 ifeq ($(USE_PLUGINS),yes)
   STARS = $(OUTDLL)stars$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(STARS)
 endif
 
-INC.STARS = $(wildcard plugins/mesh/object/stars/*.h)
-SRC.STARS = $(wildcard plugins/mesh/object/stars/*.cpp)
+INC.STARS = $(wildcard plugins/mesh/stars/object/*.h)
+SRC.STARS = $(wildcard plugins/mesh/stars/object/*.cpp)
 OBJ.STARS = $(addprefix $(OUT),$(notdir $(SRC.STARS:.cpp=$O)))
 DEP.STARS = CSGEOM CSUTIL CSSYS CSUTIL
 

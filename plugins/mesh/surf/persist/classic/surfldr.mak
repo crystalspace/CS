@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/loader/surf
+vpath %.cpp plugins/mesh/surf/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
   SURFLDR = $(OUTDLL)surfldr$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(SURFLDR)
 endif
 
-INC.SURFLDR = $(wildcard plugins/mesh/loader/surf/*.h)
-SRC.SURFLDR = $(wildcard plugins/mesh/loader/surf/*.cpp)
+INC.SURFLDR = $(wildcard plugins/mesh/surf/persist/classic/*.h)
+SRC.SURFLDR = $(wildcard plugins/mesh/surf/persist/classic/*.cpp)
 OBJ.SURFLDR = $(addprefix $(OUT),$(notdir $(SRC.SURFLDR:.cpp=$O)))
 DEP.SURFLDR = CSGEOM CSUTIL CSSYS CSUTIL
 

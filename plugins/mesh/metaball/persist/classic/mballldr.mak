@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/loader/metaball
+vpath %.cpp plugins/mesh/metaball/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
   MBALLLDR = $(OUTDLL)mballldr$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(MBALLLDR)
 endif
 
-INC.MBALLLDR = $(wildcard plugins/mesh/loader/metaball/*.h)
-SRC.MBALLLDR = $(wildcard plugins/mesh/loader/metaball/*.cpp)
+INC.MBALLLDR = $(wildcard plugins/mesh/metaball/persist/classic/*.h)
+SRC.MBALLLDR = $(wildcard plugins/mesh/metaball/persist/classic/*.cpp)
 OBJ.MBALLLDR = $(addprefix $(OUT),$(notdir $(SRC.MBALLLDR:.cpp=$O)))
 DEP.MBALLLDR = CSGEOM CSUTIL CSSYS CSUTIL
 

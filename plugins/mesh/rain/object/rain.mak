@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/object/rain plugins/mesh/object/partgen
+vpath %.cpp plugins/mesh/rain/object plugins/mesh/partgen
 
 ifeq ($(USE_PLUGINS),yes)
   RAIN = $(OUTDLL)rain$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(RAIN)
 endif
 
-INC.RAIN = $(wildcard plugins/mesh/object/rain/*.h plugins/mesh/object/partgen/*.h)
-SRC.RAIN = $(wildcard plugins/mesh/object/rain/*.cpp plugins/mesh/object/partgen/*.cpp)
+INC.RAIN = $(wildcard plugins/mesh/rain/object/*.h plugins/mesh/partgen/*.h)
+SRC.RAIN = $(wildcard plugins/mesh/rain/object/*.cpp plugins/mesh/partgen/*.cpp)
 OBJ.RAIN = $(addprefix $(OUT),$(notdir $(SRC.RAIN:.cpp=$O)))
 DEP.RAIN = CSGEOM CSUTIL CSSYS CSUTIL
 

@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/loader/fountain
+vpath %.cpp plugins/mesh/fountain/persist/classic
 
 ifeq ($(USE_PLUGINS),yes)
   FOUNTLDR = $(OUTDLL)fountldr$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(FOUNTLDR)
 endif
 
-INC.FOUNTLDR = $(wildcard plugins/mesh/loader/fountain/*.h)
-SRC.FOUNTLDR = $(wildcard plugins/mesh/loader/fountain/*.cpp)
+INC.FOUNTLDR = $(wildcard plugins/mesh/fountain/persist/classic/*.h)
+SRC.FOUNTLDR = $(wildcard plugins/mesh/fountain/persist/classic/*.cpp)
 OBJ.FOUNTLDR = $(addprefix $(OUT),$(notdir $(SRC.FOUNTLDR:.cpp=$O)))
 DEP.FOUNTLDR = CSGEOM CSUTIL CSSYS CSUTIL
 

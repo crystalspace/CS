@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/object/emit plugins/mesh/object/partgen
+vpath %.cpp plugins/mesh/emit/object plugins/mesh/partgen
 
 ifeq ($(USE_PLUGINS),yes)
   EMIT = $(OUTDLL)emit$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(EMIT)
 endif
 
-INC.EMIT = $(wildcard plugins/mesh/object/emit/*.h plugins/mesh/object/partgen/*.h)
-SRC.EMIT = $(wildcard plugins/mesh/object/emit/*.cpp plugins/mesh/object/partgen/*.cpp)
+INC.EMIT = $(wildcard plugins/mesh/emit/object/*.h plugins/mesh/partgen/*.h)
+SRC.EMIT = $(wildcard plugins/mesh/emit/object/*.cpp plugins/mesh/partgen/*.cpp)
 OBJ.EMIT = $(addprefix $(OUT),$(notdir $(SRC.EMIT:.cpp=$O)))
 DEP.EMIT = CSGEOM CSUTIL CSSYS CSUTIL
 

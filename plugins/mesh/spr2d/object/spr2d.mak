@@ -22,7 +22,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/mesh/object/spr2d
+vpath %.cpp plugins/mesh/spr2d/object
 
 ifeq ($(USE_PLUGINS),yes)
   SPR2D = $(OUTDLL)spr2d$(DLL)
@@ -35,8 +35,8 @@ else
   TO_INSTALL.STATIC_LIBS += $(SPR2D)
 endif
 
-INC.SPR2D = $(wildcard plugins/mesh/object/spr2d/*.h)
-SRC.SPR2D = $(wildcard plugins/mesh/object/spr2d/*.cpp)
+INC.SPR2D = $(wildcard plugins/mesh/spr2d/object/*.h)
+SRC.SPR2D = $(wildcard plugins/mesh/spr2d/object/*.cpp)
 OBJ.SPR2D = $(addprefix $(OUT),$(notdir $(SRC.SPR2D:.cpp=$O)))
 DEP.SPR2D = CSGEOM CSUTIL CSSYS CSUTIL
 

@@ -23,7 +23,7 @@
 #include "csgeom/math2d.h"
 #include "csgeom/box.h"
 #include "csgeom/transfrm.h"
-#include "plugins/mesh/object/spr3d/spr3d.h"
+#include "plugins/mesh/spr3d/object/spr3d.h"
 #include "imesh/skeleton.h"
 #include "iengine/skelbone.h"
 
