@@ -1,5 +1,5 @@
 # Application description
-DESCRIPTION.simplevp = Exampleapplication using Vertex-Programs
+DESCRIPTION.simplevp = Example application using Vertex-Programs
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/tutorial/simplevp
+vpath %.cpp apps/examples/simplevp
 
 simplevp.EXE = simplevp$(EXE)
 INC.simplevp = $(wildcard apps/examples/simplevp/*.h)
