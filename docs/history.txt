@@ -44,6 +44,8 @@ The history order is reversed so that new features are at the top.
 	- res removed all member access control directives from the classes
 	  generated when using cstool/tokenlist.h since this seems to cause
 	  problems on some platforms.
+	- Jorrit removed the infinite and line 3D renderers. They were pretty
+	  obsolete. Also removed the associated linex canvas.
 	- Eric Sunshine applied a patch from Mike Vannorsdel which implements
 	  iGraphics2D::SetMousePosition() for the MacOS/X OpenGL canvas.  Also
 	  publishes an OSXDelegate2D_setLevel() function to set the "window

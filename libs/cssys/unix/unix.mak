@@ -9,7 +9,6 @@ endif
 
 ifeq ($(X11.AVAILABLE),yes)
   PLUGINS += video/canvas/softx
-  PLUGINS += video/canvas/linex
   # The X-Window plugin
   PLUGINS += video/canvas/xwindow
   # Shared Memory Plugin
