@@ -20,6 +20,7 @@
 #define __CS_ODEPARTICLES_H__
 
 #include "csgeom/vector3.h"
+#include "csutil/randomgen.h"
 #include "iutil/comp.h"
 #include "ivaria/dynamics.h"
 #include "ivaria/ode.h"
@@ -38,15 +39,35 @@ class csODEParticlePhysics : public iParticlesPhysics
   csRef<iVirtualClock> clock;
   csRef<iODEDynamicState> odestate;
 
+  struct SortableBody {
+    float sort;
+    csRef<iRigidBody> body;
+  };
   struct ParticleObjects {
     iParticlesObjectState *particles;
-    csArray<csParticlesData> *data;
+    csArray<csParticlesData> data;
+    float total_elapsed_time;
+    float new_particles;
     csRef<iDynamicSystem> dynsys;
-    csArray< csRef<iRigidBody> > bodies;
-    int active_count;
+    csArray<SortableBody> bodies;
+    int dead_particles;
   };
   csArray<ParticleObjects> partobjects;
+  csRandomGen rng;
 
+  ParticleObjects *Find (iParticlesObjectState *p)
+  {
+    for (int i = 0; i < partobjects.Length(); i ++)
+    {
+      if (p == partobjects[i].particles)
+        return &partobjects[i];
+    }
+    return 0;
+  }
+  static int DataSort(void const *item1, void const *item2)
+  { return (int)ceil(((csParticlesData*)item2)->sort - ((csParticlesData*)item1)->sort); }
+  static int BodySort(void const *item1, void const *item2)
+  { return (int)ceil(((SortableBody*)item2)->sort - ((SortableBody*)item1)->sort); }
 public:
   SCF_DECLARE_IBASE;
 
@@ -82,11 +103,13 @@ public:
     { return scfParent->HandleEvent (event); }
   } scfiEventHandler;
 
-  void RegisterParticles (iParticlesObjectState *particles,
-    csArray<csParticlesData> *data);
+  const csArray<csParticlesData> *RegisterParticles (iParticlesObjectState *particles);
 
   void RemoveParticles (iParticlesObjectState *particles);
 
+  void Start (iParticlesObjectState *particles);
+
+  void Stop (iParticlesObjectState *particles);
 };
 
 #endif // __CS_ODEPARTICLES_H__

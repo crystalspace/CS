@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/cscolor.h"
 #include "iutil/objreg.h"
 #include "iutil/plugin.h"
 #include "iutil/virtclk.h"
@@ -135,7 +136,7 @@ bool csODEParticlePhysics::Initialize (iObjectRegistry* reg)
 	"No event queue available");
       return false;
   }
-  eq->RegisterListener (&scfiEventHandler, CSMASK_Broadcast);
+  eq->RegisterListener (&scfiEventHandler, CSMASK_Nothing);
 
   clock = CS_QUERY_REGISTRY (objreg, iVirtualClock);
   if (clock == 0) 
@@ -154,33 +155,112 @@ void csODEParticlePhysics::Execute (float stepsize)
   for (int i = 0; i < partobjects.Length(); i ++)
   {
     ParticleObjects &po = partobjects[i];
-    if (po.data->Length () < po.active_count) 
-    {
-      int removes = po.active_count - po.data->Length();
-      for (int j = po.active_count - removes; j < po.active_count; j ++) 
-      {
-        po.dynsys->RemoveBody (po.bodies[j]);
-      }
-    } 
-    po.bodies.SetLength (po.data->Length());
 
-    int new_active_count = 0;
-    for (int j = 0; j < po.data->Length (); j ++)
+    if (po.total_elapsed_time < po.particles->GetEmitTime ())
     {
-      csParticlesData &part = po.data->Get (j);
-      if (part.time_to_live < 0) { break; }
-      new_active_count ++;
-      if (new_active_count > po.active_count) {
-        po.bodies[j] = po.dynsys->CreateBody ();
-	po.bodies[j]->AttachColliderSphere (po.particles->GetParticleRadius(), 
-	  csVector3 (0,0,0), po.particles->GetDampener(),
-	  po.particles->GetMass (), po.particles->GetDiffusion ());
+      po.new_particles += stepsize * (float)po.particles->GetParticlesPerSecond();
+      po.total_elapsed_time += stepsize;
+    }
+    float newdead = po.dead_particles - po.new_particles;
+    if (newdead < po.data.Length() * 0.3)
+    {
+      int oldlen = po.data.Length ();
+      int newlen = (oldlen > (int)po.new_particles) ?
+        oldlen : (int)po.new_particles;
+      newlen <<= 1;
+      po.data.SetLength (newlen);
+      po.bodies.SetLength (newlen);
+      po.dead_particles += newlen - oldlen;
+      for (int i = oldlen; i < newlen; i ++)
+      {
+        po.data[i].sort = -FLT_MAX;
+	po.data[i].color.w = 0.0f;
+	po.data[i].time_to_live = 0.0;
+	po.bodies[i].sort = -FLT_MAX;
+	po.bodies[i].body = 0;
       }
-      po.bodies[j]->SetPosition(part.position);
+    }
+    else if (newdead > po.data.Length () * 0.7 && po.data.Length() > 1)
+    {
+      int oldlen = po.data.Length ();
+      int newlen = oldlen >> 1;
+      po.data.Truncate (newlen);
+      po.bodies.Truncate (newlen);
+      po.dead_particles -= oldlen - newlen;
+    }
+
+    int dead_offset = po.data.Length () - po.dead_particles;
+    
+    csVector3 emitter;
+    po.particles->GetEmitPosition (emitter);
+    for (int j = 0; j < (int)po.new_particles; j ++)
+    {
+      csParticlesData &point = po.data.Get(j+dead_offset);
+      csVector3 start;
+      switch (po.particles->GetEmitType())
+      {
+      case CS_PART_EMIT_SPHERE:
+      {
+        start = csVector3((rng.Get() - 0.5) * 2,
+                          (rng.Get() - 0.5) * 2,
+			  (rng.Get() - 0.5) * 2);
+        start.Normalize ();
+        float inner_radius = po.particles->GetSphereEmitInnerRadius ();
+        float outer_radius = po.particles->GetSphereEmitOuterRadius ();
+        start = emitter +
+          (start * ((rng.Get() * (outer_radius - inner_radius ))
+          + inner_radius ));
+        break;
+      }
+      case CS_PART_EMIT_PLANE:
+        break;
+      case CS_PART_EMIT_BOX:
+        break;
+      }
+      point.position = start;
+      point.velocity = csVector3 ();
+      point.mass = po.particles->GetMass () +
+        (rng.Get() * po.particles->GetMassVariation ());
+      point.time_to_live = po.particles->GetTimeToLive () +
+        (rng.Get() * po.particles->GetTimeVariation ());
+      point.color = csVector4 ();
+
+      csRef<iRigidBody> b = po.dynsys->CreateBody ();
+      b->SetPosition(point.position);
+      b->AttachColliderSphere (po.particles->GetParticleRadius(), 
+        csVector3 (0,0,0), po.particles->GetDampener(),
+        point.mass, po.particles->GetDiffusion ());
+      po.bodies[j+dead_offset].body = b;
+    }
+
+    dead_offset += (int)po.new_particles;
+    po.dead_particles -= (int)po.new_particles;
+    po.new_particles -= (int)po.new_particles;
+
+    for (int j = 0; j < dead_offset; j ++)
+    {
+      CS_ASSERT (po.data[j].time_to_live > 0);
+      po.data[j].time_to_live -= stepsize;
+      if (po.data[j].time_to_live <= 0.0)
+      {
+        po.data[j].color.w = 0.0;
+        po.data[j].sort = -FLT_MAX;
+        po.dynsys->RemoveBody (po.bodies[j].body);
+	po.bodies[j].sort = -FLT_MAX;
+	po.bodies[j].body = 0;
+	continue;
+      }
+      csRef<iRigidBody> b = po.bodies[j].body;
+
+      csVector3 diff (rng.Get() * 2.0 - 1,
+        rng.Get() * 2.0 - 1,
+        rng.Get() * 2.0 - 1);
+      diff *= po.particles->GetDiffusion () * stepsize;
+      // b->SetPosition(b->GetPosition() + diff);
 
       csVector3 emitter;
       po.particles->GetEmitPosition (emitter);
-      csVector3 dir = part.position - emitter;
+      csVector3 dir = b->GetPosition() - emitter;
       float sq_dist = dir.SquaredNorm ();
       float sq_range = po.particles->GetForceRange ();
       sq_range *= sq_range;
@@ -215,9 +295,8 @@ void csODEParticlePhysics::Execute (float stepsize)
 	break;
       }
 
-      po.bodies[j]->AddForce (dir * (po.particles->GetForce() * falloff));
+      // po.bodies[j].body->AddForce (dir * (po.particles->GetForce() * falloff));
     }
-    po.active_count = new_active_count;
   }
 }
 
@@ -232,47 +311,73 @@ bool csODEParticlePhysics::HandleEvent (iEvent &event)
   for (int i = 0; i < partobjects.Length(); i ++)
   { 
     ParticleObjects &po = partobjects[i];
-    for (int j = 0; j < po.data->Length (); j ++)
+    for (int j = 0; j < (po.data.Length() - po.dead_particles); j ++)
     {
-      csParticlesData &part = po.data->Get (j);
-      CS_ASSERT (part.time_to_live >= 0);
+      csParticlesData &part = po.data.Get (j);
+      CS_ASSERT (part.time_to_live > 0);
 
-      part.velocity = po.bodies[i]->GetLinearVelocity ();
-      part.position = po.bodies[i]->GetPosition ();
+      part.velocity = po.bodies[j].body->GetLinearVelocity ();
+      part.position = po.bodies[j].body->GetPosition ();
+
+      switch (po.particles->GetParticleColorMethod ())
+      {
+      case CS_PART_COLOR_CONSTANT:
+      {
+	csColor constant = po.particles->GetConstantColor ();
+	part.color.x = constant.red;
+	part.color.y = constant.blue;
+	part.color.z = constant.green;
+	part.color.w = 1.0;
+        break;
+      }
+      case CS_PART_COLOR_LINEAR:
+      {
+        float normaltime = part.time_to_live / 
+	  (po.particles->GetTimeToLive() + po.particles->GetTimeVariation());
+	const csArray<csColor> &grad = po.particles->GetGradient();
+        if (grad.Length())
+	{
+	  float cref = (1.0 - normaltime) * (float)grad.Length();
+	  int index = (int)floor (cref);
+	  csColor c1 = grad[index];
+	  csColor c2 = grad[(index == grad.Length()-1)?index:index+1];
+	  float interp = cref - floor(cref);
+	  part.color.x = ((1.0 - interp) * c1.red) + (interp * c2.red);
+	  part.color.y = ((1.0 - interp) * c1.green) + (interp * c2.green);
+	  part.color.z = ((1.0 - interp) * c1.blue) + (interp * c2.blue);
+	}
+	part.color.w = normaltime;
+        break;
+      }
+      case CS_PART_COLOR_HEAT:
+        break;
+      case CS_PART_COLOR_CALLBACK:
+        break;
+      case CS_PART_COLOR_LOOPING:
+        break;
+      }
+      part.sort = po.particles->GetObjectToCamera ().Other2This (part.position).z;
+      po.bodies[j].sort = part.sort;
     }
-    po.particles->Update ((float)clock->GetElapsedTicks () / 1000.0);
+    po.data.Sort(DataSort);
+    po.bodies.Sort(BodySort);
   }
   return true;
 }
 
-void csODEParticlePhysics::RegisterParticles (iParticlesObjectState *particles,
-	csArray<csParticlesData> *data)
+const csArray<csParticlesData> *csODEParticlePhysics::RegisterParticles (iParticlesObjectState *particles)
 {
   if (!dyn) 
   {
       csReport (objreg, CS_REPORTER_SEVERITY_ERROR,
         "crystalspace.particles.physics.ode",
 	"Cannot register particles objects until initialize is called");
-      return;
+      return 0;
   }
   ParticleObjects &po = partobjects.GetExtend (partobjects.Length());
   po.particles = particles;
-  po.data = data;
   po.dynsys = dyn->CreateSystem ();
-  po.bodies.SetLength (data->Length ());
-  po.active_count = 0;
-
-  for (int i = 0; i < data->Length(); i ++) 
-  {
-    csParticlesData &part = data->Get (i);
-    if (part.time_to_live < 0) { break; }
-    po.bodies[i] = po.dynsys->CreateBody ();
-    po.bodies[i]->AttachColliderSphere (po.particles->GetParticleRadius(), 
-	csVector3 (0,0,0), po.particles->GetDampener(),
-	po.particles->GetMass (), po.particles->GetDiffusion ());
-    po.bodies[i]->SetPosition (part.position);
-    po.active_count ++;
-  }
+  return &po.data;
 }
 
 void csODEParticlePhysics::RemoveParticles (iParticlesObjectState *particles)
@@ -285,5 +390,41 @@ void csODEParticlePhysics::RemoveParticles (iParticlesObjectState *particles)
       break;
     }
   }
+}
+
+void csODEParticlePhysics::Start (iParticlesObjectState *particles)
+{
+  ParticleObjects* po = Find (particles);
+  CS_ASSERT (po);
+
+  if (po->data.Length () == 0) 
+  {
+    int start_size = particles->GetInitialParticleCount() * 2;
+printf ("Initial size = %d\n", start_size);
+    po->data.SetLength (start_size);
+    po->bodies.SetLength (start_size);
+    for (int i = 0; i < start_size; i ++)
+    {
+      po->data[i].sort = -FLT_MAX;
+      po->data[i].color.w = 0.0;
+      po->data[i].time_to_live = 0.0;
+      po->bodies[i].sort = -FLT_MAX;
+      po->bodies[i].body = 0;
+    }
+printf ("Setting dead parts to %d\n", start_size);
+    po->dead_particles = start_size;
+  }
+
+  po->new_particles = (float)po->particles->GetInitialParticleCount();
+  po->total_elapsed_time = 0.0;
+}
+
+void csODEParticlePhysics::Stop (iParticlesObjectState *particles)
+{
+  ParticleObjects* po = Find (particles);
+  CS_ASSERT (po);
+    
+  po->new_particles = 0.0;
+  po->total_elapsed_time = particles->GetEmitTime ();
 }
 
