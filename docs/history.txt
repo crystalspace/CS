@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+01-Mar-2004
+	- res augmented the Win32 canvas to allow retrieval/setting of the
+	  window rectangle (via PerformExtension()).
 29-Feb-2004
 	- Eric Sunshine augmented the configure.ac Python check so that it can
 	  detect a working Python installation on MacOS/X despite the fact that

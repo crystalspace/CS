@@ -740,6 +740,22 @@ bool csGraphics2DOpenGL::PerformExtensionV (char const* command, va_list args)
     csGraphics2DGLCommon::PerformExtensionV (command, args);
     return true;
   }
+  if (!strcasecmp (command, "getcoords"))
+  {
+    csRect* r = (csRect*)va_arg (args, csRect*);
+    RECT wr;
+    GetWindowRect (m_hWnd, &wr);
+    r->Set (wr.left, wr.top, wr.right, wr.bottom);
+    return true;
+  }
+  if (!strcasecmp (command, "setcoords"))
+  {
+    if (!AllowResizing) return false;
+    csRect* r = (csRect*)va_arg (args, csRect*);
+    SetWindowPos (m_hWnd, 0, r->xmin, r->ymin, r->Width(), r->Height(),
+      SWP_NOZORDER | SWP_NOACTIVATE);
+    return true;
+  }
   return csGraphics2DGLCommon::PerformExtensionV (command, args);
 }
 
