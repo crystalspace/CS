@@ -75,20 +75,12 @@ private:
   void InitializePolygonBuffer (const csBox2Int& bbox);
 
   /**
-   * Draw a left-side line on the coverage buffer.
+   * Draw a line on the coverage buffer.
    * Normally a line is rendered upto but NOT including x2,y2 (i.e. the
    * scanline at y2 is ignored). With yfurther==1 you can go to y2. This
    * is useful for the lowest lines.
    */
-  void DrawLeftLine (int x1, int y1, int x2, int y2, int yfurther = 0);
-
-  /**
-   * Draw a right-side line on the coverage buffer.
-   * Normally a line is rendered upto but NOT including x2,y2 (i.e. the
-   * scanline at y2 is ignored). With yfurther==1 you can go to y2. This
-   * is useful for the lowest lines.
-   */
-  void DrawRightLine (int x1, int y1, int x2, int y2, int yfurther = 0);
+  void DrawLine (int x1, int y1, int x2, int y2, int yfurther = 0);
 
   /**
    * Draw a polygon on the coverage buffer.
@@ -98,8 +90,7 @@ private:
    * polygon will be extended horizontally.
    * Returns false if polygon is outside screen.
    */
-  bool DrawPolygon (csVector2* verts, int num_verts, csBox2Int& bbox,
-  	int shift = 0);
+  bool DrawPolygon (csVector2* verts, int num_verts, csBox2Int& bbox);
 
   /**
    * Draw an outline on the coverage buffer.

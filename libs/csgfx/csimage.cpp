@@ -362,7 +362,7 @@ iImage *csImageFile::Sharpen (csRGBpixel *transp, int strength)
   csRGBpixel *src_o = (csRGBpixel*)original->GetImageData ();
   csRGBpixel *src_b = (csRGBpixel*)blurry->GetImageData ();
   csRGBpixel *dest = result;
-  
+ 
   for (int n = Width * Height; n > 0; n--)
   {
     int v;

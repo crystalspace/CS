@@ -149,7 +149,7 @@ bool csCoverageBuffer::IsFull ()
   return true;
 }
 
-void csCoverageBuffer::DrawLeftLine (int x1, int y1, int x2, int y2,
+void csCoverageBuffer::DrawLine (int x1, int y1, int x2, int y2,
 	int yfurther)
 {
   y2 += yfurther;
@@ -261,146 +261,6 @@ void csCoverageBuffer::DrawLeftLine (int x1, int y1, int x2, int y2,
     int x = x1<<16;
     int y = y1;
     int dx = ((x2-x1)<<16) / (dy-yfurther);
-    dy--;
-    while (dy > 0)
-    {
-      uint32* buf = &buffer[(y>>5) << w_shift];
-      if (x < 0)
-      {
-        buf[0] ^= 1 << (y & 0x1f);
-      }
-      else
-      {
-        int xn = x>>16;
-	if (xn < width)
-          buf[xn] ^= 1 << (y & 0x1f);
-        else
-	{
-	  if (dx > 0) break;	// We can stop here.
-	}
-      }
-      x += dx;
-      y++;
-      dy--;
-    }
-  }
-}
-
-void csCoverageBuffer::DrawRightLine (int x1, int y1, int x2, int y2,
-	int yfurther)
-{
-  y2 += yfurther;
-  if (y2 < 0 || y1 >= height)
-  {
-    //------
-    // Totally outside screen vertically.
-    //------
-    return;
-  }
-
-  if (x1 < 0 && x2 < 0)
-  {
-    //------
-    // Totally on the left side. Just clamp.
-    //------
-
-    // First we need to clip vertically. This is easy to do
-    // in this particular case since x=0 all the time.
-    if (y1 < 0) y1 = 0;
-    if (y2 >= height) y2 = height-1;
-
-    int dy = y2-y1;
-    int y = y1;
-    while (dy > 0)
-    {
-      // @@@ Optimize!
-      uint32* buf = &buffer[(y>>5) << w_shift];
-      buf[0] ^= 1 << (y & 0x1f);
-      y++;
-      dy--;
-    }
-    return;
-  }
-  else if (x1 >= width && x2 >= width)
-  {
-    //------
-    // Lines on the far right can just be dropped since they
-    // will have no effect on the coverage buffer.
-    //------
-    return;
-  }
-  else if (x1 == x2)
-  {
-    //------
-    // If line is fully vertical we also have a special case that
-    // is easier to resolve.
-    //------
-    // First we need to clip vertically. This is easy to do
-    // in this particular case since x=0 all the time.
-    if (y1 < 0) y1 = 0;
-    if (y2 >= height) y2 = height-1;
-
-    int dy = y2-y1;
-    int y = y1;
-    while (dy > 0)
-    {
-      // @@@ Optimize!
-      uint32* buf = &buffer[(y>>5) << w_shift];
-      buf[x1] ^= 1 << (y & 0x1f);
-      y++;
-      dy--;
-    }
-    return;
-  }
-
-  //------
-  // We don't have any of the trivial horizontal cases.
-  // So we must clip vertically first.
-  //------
-  if (y1 < 0)
-  {
-    x1 = x1 + ( (0-y1) * (x2-x1) ) / (y2-yfurther-y1);
-    y1 = 0;
-  }
-  if (y2 >= height)
-  {
-    x2 = x1 + ( (height-1-y1) * (x2-x1) ) / (y2-yfurther-y1);
-    y2 = height-1;
-    yfurther = 0;
-  }
-
-  if (x1 >= 0 && x2 >= 0 && x1 < width && x2 < width)
-  {
-    //------
-    // The normal case, no clipping needed at all.
-    //------
-    int dy = (y2-y1)+1;
-    int x = x1<<16;
-    int y = y1;
-    int dx = ((x2-x1)<<16) / (dy-yfurther);
-    int dx2 = dx>>1;
-    x += dx2;
-    dy--;
-    while (dy > 0)
-    {
-      uint32* buf = &buffer[(y>>5) << w_shift];
-      buf[x>>16] ^= 1 << (y & 0x1f);
-      x += dx;
-      y++;
-      dy--;
-    }
-  }
-  else
-  {
-    //------
-    // In this case we need to clip horizontally.
-    //------
-    int dy = (y2-y1)+1;
-    int x = x1<<16;
-    int y = y1;
-    int dx = ((x2-x1)<<16) / (dy-yfurther);
-    int dx2 = dx>>1;
-    x += dx2;
     dy--;
     while (dy > 0)
     {
@@ -427,7 +287,7 @@ void csCoverageBuffer::DrawRightLine (int x1, int y1, int x2, int y2,
 }
 
 bool csCoverageBuffer::DrawPolygon (csVector2* verts, int num_verts,
-	csBox2Int& bbox, int shift)
+	csBox2Int& bbox)
 {
   int i, j;
 
@@ -472,52 +332,33 @@ bool csCoverageBuffer::DrawPolygon (csVector2* verts, int num_verts,
   InitializePolygonBuffer (bbox);
 
   //---------
-  // First find out in which direction the 'right' lines go.
+  // Draw all lines.
   //---------
-  //@@@@ THIS IS NOT VERY OPTIMAL!
-  int top_vt_right = (top_vt+1)%num_verts;
-  int top_vt_left = (top_vt-1+num_verts)%num_verts;
-  int dxdyR = ((xa[top_vt_right]-xa[top_vt])<<16)
-  	/ (ya[top_vt_right]-ya[top_vt]+1);
-  int dxdyL = ((xa[top_vt_left]-xa[top_vt])<<16)
-  	/ (ya[top_vt_left]-ya[top_vt]+1);
-  int dir_right = (dxdyR > dxdyL) ? 1 : -1;
-
-  //---------
-  // Draw all right lines.
-  //---------
-  int dir = dir_right;
-  i = top_vt;
-  j = (i+num_verts+dir)%num_verts;
-
-  while (i != bot_vt)
+  j = num_verts-1;
+  for (i = 0 ; i < num_verts ; i++)
   {
     if (ya[i] != ya[j])
     {
-      DrawRightLine (xa[i]+shift, ya[i], xa[j]+shift, ya[j],
-      	ya[j] == bbox.maxy ? 1 : 0);
+      int xa1, xa2, ya1, ya2;
+      if (ya[i] < ya[j])
+      {
+	xa1 = xa[i];
+        xa2 = xa[j];
+	ya1 = ya[i];
+	ya2 = ya[j];
+      }
+      else
+      {
+	xa1 = xa[j];
+        xa2 = xa[i];
+	ya1 = ya[j];
+	ya2 = ya[i];
+      }
+      DrawLine (xa1, ya1, xa2, ya2, ya2 == bbox.maxy ? 1 : 0);
     }
-    i = j;
-    j = (j+num_verts+dir)%num_verts;
+    j = i;
   }
 
-  //---------
-  // Draw all left lines.
-  //---------
-  dir = -dir_right;
-  i = top_vt;
-  j = (i+num_verts+dir)%num_verts;
-
-  while (i != bot_vt)
-  {
-    if (ya[i] != ya[j])
-    {
-      DrawLeftLine (xa[i]-shift, ya[i], xa[j]-shift, ya[j],
-      	ya[j] == bbox.maxy ? 1 : 0);
-    }
-    i = j;
-    j = (j+num_verts+dir)%num_verts;
-  }
   return true;
 }
 
@@ -533,7 +374,17 @@ bool csCoverageBuffer::DrawOutline (csVector2* verts, int num_verts,
   // y coordinate) and bottom vertex.
   //@@@ TODO: pre-shift x with 16
   //---------
-  int xa[128], ya[128];
+  static int* xa = NULL, * ya = NULL;
+  static int num_xa = 0;
+  if (num_verts > num_xa)
+  {
+    delete[] xa;
+    delete[] ya;
+    num_xa = num_verts;
+    // @@@ MEMORY LEAK!!!
+    xa = new int[num_xa];
+    ya = new int[num_xa];
+  }
   int top_vt = 0;
   int bot_vt = 0;
   xa[0] = QRound (verts[0].x);
@@ -592,7 +443,7 @@ bool csCoverageBuffer::DrawOutline (csVector2* verts, int num_verts,
 	xa1 = xa[vt2];
         xa2 = xa[vt1];
       }
-      DrawLeftLine (xa1, ya1, xa2, ya2, 0);	// @@@ last parm 1 on last row?
+      DrawLine (xa1, ya1, xa2, ya2, 0);	// @@@ last parm 1 on last row?
     }
   }
 
@@ -619,7 +470,7 @@ bool csCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
 	float max_depth, bool negative)
 {
   csBox2Int bbox;
-  if (!DrawPolygon (verts, num_verts, bbox, 0/*1*/)) //@@@ Shift?
+  if (!DrawPolygon (verts, num_verts, bbox))
     return false;
 
   // In this routine we render the polygon to the polygon buffer
@@ -796,7 +647,7 @@ bool csCoverageBuffer::TestPolygon (csVector2* verts, int num_verts,
 	float min_depth)
 {
   csBox2Int bbox;
-  if (!DrawPolygon (verts, num_verts, bbox, 0))
+  if (!DrawPolygon (verts, num_verts, bbox))
     return false;
 
   int i, x;

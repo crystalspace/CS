@@ -3,6 +3,13 @@ The history order is reversed so that new features are at the top.
 27-May-2002
 	- Fixed IsZero() from Toni by using a 'float' precision instead
 	  of 'double'.
+	- Fixed a bug in the coverage buffer of Dynavis in case the outline
+	  has a lot of vertices. Now it automatically adapts the array
+	  of vertices.
+	- Simplified the coverage buffer a bit by removing support for
+	  left/right lines.
+	- Polygon insertion into coverage buffer is now also more robust
+	  and faster because it doesn't care about left/right lines anymore.
 26-May-2002
 	- Fixed a bug in the KD-tree of Dynavis. It was possible for
 	  a split axis to be outside the node bounding box.

@@ -20,3 +20,5 @@
 - VPT (Visible Point Tracking) and keeping an object visible for a
   random number of frames.
 
+- Automatic rebalancing of KD-tree.
+
