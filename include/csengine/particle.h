@@ -58,6 +58,11 @@ protected:
   bool change_alpha; float alphapersecond; float alpha_now;
   /// Rotate particles, angle in radians.
   bool change_rotation; float anglepersecond;
+  /** bounding box in 3d of all particles in this system.
+   * the particle system subclass has to give this a reasonable value.
+   * no particle may exceed the bbox. 
+   */
+  csBox3 bbox;
 
 protected:
   /// Update this sprite in the polygon trees.
@@ -146,6 +151,9 @@ public:
   /// Stop change of rotation
   inline void UnsetChangeRotation() {change_rotation=false;}
 
+  /// Get the bounding box for this particle system.
+  inline const csBox3& GetBoundingBox() const {return bbox;}
+
   /**
    *  Get an iParticle for this particle system, thus you can add
    *  the particle system as particle to another particle system,
@@ -170,6 +178,7 @@ public:
   virtual void SetMixmode (UInt mode);
   /// Rotate all particles
   virtual void Rotate(float angle);
+
 
   /**
    * Update the state of the particles as time has passed.
@@ -284,6 +293,9 @@ protected:
   /// scaling of particles.
   bool scale_particles;
   time_t fade_particles;
+  /// starting bbox.
+  bbox startbox;
+  float radiusnow;
 
 public:
   /**
