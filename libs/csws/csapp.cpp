@@ -112,7 +112,7 @@ void csApp::printf (int mode, char* str, ...)
   va_start (arg, str);
   vsprintf (buf, str, arg);
   va_end (arg);
-  System->Printf (mode, buf);
+  System->Printf (mode, "%s", buf);
 }
 
 void csApp::ShutDown ()

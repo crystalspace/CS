@@ -318,6 +318,18 @@ public:
   void pplInvalidate (csRect &rect)
   { GfxPpl->Invalidate (rect); }
 
+  /**
+   * Tell the graphics pipeline that you are going to update
+   * the entire screen during NEXT frame. This will force graphics
+   * pipeline to NOT cache the image of the current frame so that it
+   * can be propagated to next frame (if during next frame you are
+   * going to repaint just a part of screen, propagating image
+   * changes through multiple video pages is a MUST, otherwise
+   * you will get flickering images).
+   */
+  void pplDontCacheFrame ()
+  { GfxPpl->DontCacheFrame = true; }
+
 protected:
   /// Initialize configuration data: load csws.cfg
   virtual void LoadConfig ();

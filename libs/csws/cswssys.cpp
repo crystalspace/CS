@@ -88,6 +88,12 @@ bool cswsSystemDriver::Initialize (int argc, const char* const argv[],
  */
 void cswsSystemDriver::DemoWrite (const char* buf)
 {
+  if (Console)
+  {
+    csSystemDriver::DemoWrite (buf);
+    return;
+  }
+
   const char *crpos;
   while ((crpos = strchr (buf, '\n')))
   {
@@ -114,7 +120,7 @@ void cswsSystemDriver::DemoWrite (const char* buf)
     } /* endif */
     strcpy (textline [curline], "");
   } /* endwhile */
-  strcpy (textline [curline], buf);
+  strcat (textline [curline], buf);
   linecolor [curline] = textcolor;
   RefreshConsole ();
 }

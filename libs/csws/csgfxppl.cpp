@@ -256,6 +256,7 @@ void csGraphicsPipeline::Invalidate (csRect &rect)
 
 void csGraphicsPipeline::StartFrame (int iCurPage)
 {
+  DontCacheFrame = false;
   CurPage = iCurPage;
   if (CurPage > MaxPage)
     MaxPage = CurPage;
@@ -284,7 +285,7 @@ void csGraphicsPipeline::FinishFrame ()
     if (RefreshRect.xmax > FrameWidth) RefreshRect.xmax = FrameWidth;
     if (RefreshRect.ymax > FrameHeight) RefreshRect.ymax = FrameHeight;
 
-    if (G2D->GetDoubleBufferState ())
+    if (G2D->GetDoubleBufferState () && !DontCacheFrame)
       SyncArea [CurPage] = G2D->SaveArea (RefreshRect.xmin, RefreshRect.ymin,
         RefreshRect.Width (), RefreshRect.Height ());
   }
@@ -305,6 +306,9 @@ void csGraphicsPipeline::Sync (int CurPage, int &xmin, int &ymin,
     if (xmax < x) xmax = x;						\
     if (ymax < y) ymax = y;						\
   }
+
+  if (!BeginDraw (CSDRAW_2DGRAPHICS))
+    return;
 
   int Page = CurPage + 1;
   while (1)
