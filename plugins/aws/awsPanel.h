@@ -26,7 +26,7 @@
 /**
  * This class serves as a generic component which supports many of the basic
  * graphic options that components use such as background drawing and frame
- * styles. It also clips to children so that drawing is optimized
+ * styles. It also clips to children so that drawing is optimized.
  */
 
 class awsPanel : public awsComponent  
@@ -72,8 +72,7 @@ public:
   virtual void OnChildShow ();
   virtual void OnChildHide ();
 
-  // Frame styles
-
+  /// Frame styles.
   static const int fsBump;
   static const int fsSimple;
   static const int fsRaised;

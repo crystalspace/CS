@@ -60,7 +60,7 @@ private:
   bool mouse_over;
   void* user_param;
 
-  /// An image which will displayed to the left of the caption
+  /// An image which will displayed to the left of the caption.
   iTextureHandle* image;
 
   /**
@@ -144,29 +144,29 @@ public:
 class awsMenu : public awsControlBar  
 {
 protected:
-  /// The currently selected component
+  /// The currently selected component.
   iAwsComponent* select;
 
-  /// The component currently showing it's child 
+  /// The component currently showing it's child.
   iAwsComponent* popup_showing;
 
-  /// The 'child' menu
+  /// The 'child' menu.
   awsMenu* child_menu;
 
-  /// The 'parent' menu
+  /// The 'parent' menu.
   awsMenu* parent_menu;
 
-  /// The current position of the mouse
+  /// The current position of the mouse.
   csPoint mouse_pos;
 
-  /// A slots and sink for receiving events
+  /// A slots and sink for receiving events.
   awsSlot slot_select, slot_close;
   awsSink sink;
 
-  /// True if we currently have captured the mouse
+  /// True if we currently have captured the mouse.
   bool mouse_captured;
 
-  /// True if we should not capture the mouse the next time it exits
+  /// True if we should not capture the mouse the next time it exits.
   bool let_mouse_exit;
 
   virtual void SetMenuParent (awsMenu* parent_menu);
@@ -186,10 +186,10 @@ public:
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
   virtual bool GetProperty (const char* name, void** parm);
 
-  /// These can be used to add/remove any type of menu entry to the menu
+  /// These can be used to add/remove any type of menu entry to the menu.
   virtual void AddChild (iAwsComponent* comp);
 
-  /// Adds a menu entry of the default type to the menu
+  /// Adds a menu entry of the default type to the menu.
   virtual iAwsSource* AddChild (
     const char* caption,
     iTextureHandle* image,
@@ -222,13 +222,13 @@ public:
    */
   virtual void Select (iAwsComponent* child);
 
-  /// A callback
+  /// A callback.
   //static void OnTimer(void* param, iAwsSource* src);
 
-  /// Hides the component
+  /// Hides the component.
   virtual void Hide ();
 
-  /// Keeps track of the mouse position
+  /// Keeps track of the mouse position.
   virtual bool HandleEvent (iEvent &Event);
 
   virtual bool OnMouseExit ();

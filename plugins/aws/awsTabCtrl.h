@@ -42,10 +42,10 @@ protected:
   /// Does this bottom reside on the top of the notebook or below.
   bool is_top;
 
-  /// Caption
+  /// Caption.
   iString *caption;
 
-  /// Is the mouse currently held doen 
+  /// Is the mouse currently held doen .
   bool captured;
 
   /// If theres an icon, how is it align.
@@ -80,8 +80,8 @@ public:
   virtual const char *Type () { return "Tab Button"; }
 
   void SetActive (bool what);
-  void SetFirst (bool what) { is_first=what; }
-  void SetTop (bool what) { is_top=what; }
+  void SetFirst (bool what) { is_first = what; }
+  void SetTop (bool what) { is_top = what; }
 
   static const int signalActivateTab;
   static const int signalDeactivateTab;
@@ -122,37 +122,37 @@ protected:
 
   TabVector vTabs;
 
-  /// First visible button
+  /// First visible button.
   int first;
   
-  /// The active tab
+  /// The active tab.
   int active;
   
-  /// Button bar on top of notebook or below ?
+  /// Button bar on top of notebook or below?
   bool is_top;
 
   /// True if the client area should be shrunk because of the scroll buttons.
   bool clip_to_scroll;
 
-  /// Our kitchen sink
+  /// Our kitchen sink.
   awsSink *sink;
 
-  /// Max height of buttons in bar
+  /// Max height of buttons in bar.
   int maxheight;
 
-  /// The two "next/prev" buttons
+  /// The two "next/prev" buttons.
   awsSliderButton next, prev;
 
-  /// Slots for the next/prev buttons
+  /// Slots for the next/prev buttons.
   awsSlot slot_activate, slot_next, slot_prev;
 
-  /// Images for next/prev buttons
+  /// Images for next/prev buttons.
   iTextureHandle *nextimg, *previmg;
 
-  /// Layout the buttons, hide or show them, align the next/prev handles
+  /// Layout the buttons, hide or show them, align the next/prev handles.
   void DoLayout ();
 
-  /// Finds the index of the first tab which uses this param
+  /// Finds the index of the first tab which uses this param.
   int FindTab (void* user_param);
 public:
   awsTabCtrl ();
@@ -191,14 +191,14 @@ public:
    */
   void RemoveTab (void* user_param);
 
-  /// Activate the <idx>-th tab
+  /// Activate the <idx>-th tab.
   void ActivateTab (int idx);
-  /// Activate the tab that uses this src
+  /// Activate the tab that uses this src.
   void ActivateTab (iAwsSource* src);
-  /// Activate the tab that uses this user_param
+  /// Activate the tab that uses this user_param.
   void ActivateTab (void* param);
 
-  /// Returns the source for the currently active tab
+  /// Returns the source for the currently active tab.
   iAwsSource* GetActiveTab ();
   /// Returns the index of the currently active tab. 
   int GetActiveTabIndex ();
