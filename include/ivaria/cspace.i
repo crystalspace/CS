@@ -355,6 +355,7 @@
 // re-%define them.
 #define TYPEMAP_OUT_csRef(T)
 #define TYPEMAP_OUT_csPtr(T)
+#define TYPEMAP_OUT_csRefArray(T)
 #define TYPEMAP_OUT_csWrapPtr
 #define TYPEMAP_IN_ARRAY_CNT_PTR(a,b)
 #define TYPEMAP_IN_ARRAY_PTR_CNT(a,b) 
@@ -399,6 +400,7 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT(
 
 	TYPEMAP_OUT_csRef(T)
 	TYPEMAP_OUT_csPtr(T)
+	TYPEMAP_OUT_csRefArray(T)
 
 %enddef
 

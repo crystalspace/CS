@@ -167,18 +167,18 @@
 /****************************************************************************
  * Define typemaps to get the pointers out of csRef, csPtr and csWrapPtr.
  ****************************************************************************/
-%define TYPEMAP_OUT_csRef_BODY(pT, cT)
+%define TYPEMAP_OUT_csRef_BODY(result, pT, cT)
   if (rf.IsValid ())
   {
     rf->IncRef ();
     SV *rv = newSVsv (& PL_sv_undef);
     sv_setref_iv (rv, pT, (int) (cT *) rf);
-    $result = rv;
+    result = rv;
   }
   else
   {
     SvREFCNT_inc (& PL_sv_undef);
-    $result = & PL_sv_undef;
+    result = & PL_sv_undef;
   }
 %enddef
 
@@ -187,7 +187,7 @@
   %typemap(out) csRef<T>
   {
     csRef<T> rf ($1);
-    TYPEMAP_OUT_csRef_BODY(#T, T)
+    TYPEMAP_OUT_csRef_BODY ($result, "cspace::" #T, T)
   }
 %enddef
 
@@ -196,7 +196,7 @@
   %typemap(out) csPtr<T>
   {
     csRef<T> rf ($1);
-    TYPEMAP_OUT_csRef_BODY(#T, T)
+    TYPEMAP_OUT_csRef_BODY ($result, "cspace::" #T, T)
   }
 %enddef
 
@@ -205,30 +205,124 @@
   %typemap(out) csWrapPtr
   {
     csRef<iBase> rf ($1.Ref);
-    TYPEMAP_OUT_csRef_BODY($1.Type, iBase)
+    TYPEMAP_OUT_csRef_BODY ($result, $1.Type, iBase)
   }
 %enddef
 
 /****************************************************************************
+ * Typemap to get the pointers out of csRefArray and convert to a Perl array.
+ ****************************************************************************/
+#undef TYPEMAP_OUT_csRefArray
+%define TYPEMAP_OUT_csRefArray(T)
+  %typemap(out) csRefArray<T>
+  {
+    AV *av = newAV ();
+    for (int i = 0; i < $1.Length (); i++)
+    {
+      SV *ae;
+      TYPEMAP_OUT_csRef_BODY (ae, "cspace::" #T, T)
+      av_push (av, ae);
+      SvREFCNT_dec (ae);
+    }
+    $result = newRV_noinc ((SV *) av);
+  }
+%enddef
+
+/****************************************************************************
+ * Typemaps to convert csArray to a Perl array and vice versa.
+ ****************************************************************************/
+%define _TYPEMAP_csArray(T, toSV, fromSV)
+  %typemap(out) csArray<T>
+  {
+    AV *av = newAV ();
+    for (int i = 0; i < $1.Length (); i++)
+    {
+      SV *ae = toSV ($1.Get (i));
+      av_push (av, ae);
+      SvREFCNT_dec (ae);
+    }
+    $result = newRV_noinc ((SV *) av);
+  }
+  %typemap(in) csArray<T>
+  {
+    if (SvTYPE ($input) != SVt_PVAV)
+      croak ("%s", "Argument must be an array reference");
+    AV *av = (AV *) SvRV ($input);
+    if (av_len (av) >= 0)
+    {
+      for (int i = 0; i <= av_len (av); i++)
+      {
+        SV *sv = av_fetch (av, i, 0);
+        $1.Push (fromSV (sv));
+      }
+    }
+  }
+%enddef
+
+_TYPEMAP_csArray(int,			newSViv,	SvIV)
+_TYPEMAP_csArray(short,			newSViv,	SvIV)
+_TYPEMAP_csArray(long,			newSViv,	SvIV)
+_TYPEMAP_csArray(unsigned int,		newSVuv,	SvUV)
+_TYPEMAP_csArray(unsigned long,		newSVuv,	SvUV)
+_TYPEMAP_csArray(unsigned short,	newSVuv,	SvUV)
+_TYPEMAP_csArray(float,			newSVnv,	SvNV)
+_TYPEMAP_csArray(double,		newSVnv,	SvNV)
+
+#undef TYPEMAP_csArray
+%define TYPEMAP_csArray(T)
+  %typemap(out) csArray<T>
+  {
+    AV *av = newAV ();
+    for (int i = 0; i < $1.Length (); i++)
+    {
+      SV *rv = newSViv (0);
+      sv_setref_iv (rv, "cspace::" #T, (int) (void *) & $1.Get (i));
+      av_push (av, rv);
+      SvREFCNT_dec (ae);
+    }
+    $result = newRV_noinc ((SV *) av);
+  }
+  %typemap(in) csArray<T>
+  {
+    if (SvTYPE ($input) != SVt_PVAV)
+      croak ("%s", "Argument must be an array reference");
+    AV *av = (AV *) SvRV ($input);
+    if (av_len (av) >= 0)
+      for (int i = 0; i <= av_len (av); i++)
+      {
+        SV *sv = av_fetch (av, i, 0);
+        if (! sv_isa (sv, "cspace::" #T))
+          croak ("All elements of array must be cspace::%s", #T);
+        T *v = (T *) SvIV (SvRV (sv));
+        $1.Push (* v);
+      }
+  }
+%enddef
+
+/****************************************************************************
+ * It seems there's a bug in Swig with this function.
+ ****************************************************************************/
+%ignore scfInitialize(int argc, const char * const argv[]);
+
+/****************************************************************************
  * Typemaps to convert an argc/argv pair to a Perl array.
  ****************************************************************************/
-%typemap(in) (int argc, char const * const argv[])
+%typemap(in) (int argc, const char * argv[])
 {
   if (SvTYPE ($input) != SVt_PVAV)
     croak ("%s", "Argument must be an array reference");
   AV *av = (AV *) SvRV ($input);
   $1 = av_len (av) + 1;
-  $2 = new (char *)[$1 + 2];
+  $2 = new (char *)[$1];
   for (int i = 0; i < $1; i++)
   {
     SV *sv = av_shift (av);
     $2[i] = SvPV_nolen (sv);
     SvREFCNT_dec (sv);
   }
-  $2[$1] = 0;
 }
 
-%typemap(freearg) (int argc, char const * const argv[])
+%typemap(freearg) (int argc, const char * argv[])
 {
   delete [] $2;
 }

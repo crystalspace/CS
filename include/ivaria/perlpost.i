@@ -714,44 +714,6 @@ TYPEMAP_OUTARG_ARRAY_PTR_CNT((char * & __chars__, int & __len__), 0, *)
   }
 }
 
-/****************************************************************************
- * An extra operator overload for csHashMapReversible.
- * This one converts it to a native Perl hash.
- ****************************************************************************/
-%native(csHashMapReversible___hv__) ___hv__;
-%{
-  void ___hv__ (pTHXo_ CV *thisfunc)
-  {
-    dXSARGS;
-    dTARG;
-    SV *hm_ref = ST (0);
-    if (! hm_ref)
-      croak("Malformed \%{} request of csHashMapReversible");
-
-    SV *hm_obj = SvRV (hm_ref);
-    if (! sv_isa (hm_obj, "cspace::csHashMapReversible"))
-      croak("Erroneous \%{} request of non-csHashMapReversible");
-
-    csHashMapReversible *hm = (csHashMapReversible *) SvIV (hm_obj);
-  
-    csGlobalHashIteratorReversible iter (hm);
-    HV *hv = newHV ();
-    void *value;
-    while ((value = iter.Next ()))
-    {
-      const char *key = iter.GetKey ();
- 
-      SV *sv = newSViv ((int) value);
-      hv_store (hv, key, strlen (key), sv, 0);
-      SvREFCNT_dec (sv);
-    }
-    SV *rv = newRV ((SV *) hv);
-    SvREFCNT_dec ((SV *) hv);
-    ST (0) = rv;
-    XSRETURN (1);
-  }
-%}
-
 /*****************************************************************************
  * Define macros to create classes that are inheritable by script classes,
  * to allow scripts to write their own implementations of interfaces.

@@ -9,6 +9,11 @@ The history order is reversed so that new features are at the top.
 	  The patch adds multicast support.
 	  I also added warnings that are triggered when deprecated functions
 	  are called.
+	- Oktal fixed the argv error in the Perl module by just having Swig
+	  ignore the function that was causing trouble. This looks like some
+	  sort of bug in Swig.
+	  Also added csArray and csRefArray support, and removed the
+	  typemap to convert csHashMapReversible to a native Perl hash type.
 24-Jun-2003
 	- Oktal added an iGraphicsMemory interface with which to access
 	  the csGraphicsMemory plugin.

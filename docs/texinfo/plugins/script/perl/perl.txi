@@ -65,6 +65,11 @@ Calling methods works as you might expect:
 $vect->Norm();
 @end example
 
+@subheading Arrays
+
+Wherever an array is expected, or wherever an array is returned, in or from
+a CS C++ call, a Perl array reference is used.
+
 @subheading Operator Overloading
 
 Operator overloading is not yet supported. All the code required to support it
