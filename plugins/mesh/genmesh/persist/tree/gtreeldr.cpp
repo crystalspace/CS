@@ -614,7 +614,7 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
 #if 0
   co_tree = new csConstructionObject (cg_debug4);
   co_tree->AddRule (new csDepthRule (co_tree, NULL, 3));
-#elif 0
+#elif 1
   co_tree = new csConstructionObject (cg_straighttrunk);
   co_branch1 = new csConstructionObject (cg_branch);
   co_sidebranch = new csConstructionObject (cg_straighttrunk);
@@ -623,7 +623,7 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   co_branch1->AddRule (new csStraightRule (co_sidebranch));
   co_branch1->AddRule (new csStraightRule (co_sidebranch));
   co_sidebranch->AddRule (new csDepthRule (co_sidebranch, NULL, 4));
-#else 1
+#else
   co_tree = new csConstructionObject (cg_straighttrunk);
   co_branch1 = new csConstructionObject (cg_branch);
   co_branch2 = new csConstructionObject (cg_branch);
