@@ -496,7 +496,7 @@ bool csShaderGLCGVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
 
 	      while (lineData != 0)
 	      {
-		char* param = strstr (lineData, "c[");
+		const char* param = strstr (lineData, "c[");
 		if (param != 0)
 		{
 		  param += 2;

@@ -20,6 +20,9 @@ chronological order.
 	- Jorrit added the ability to set bounding box for mesh objects
 	  in a world file. Uses the SetObjectBoundingBox() added yesterday.
 	  Uses <box min=... max=... /> syntax in <meshobj>.
+	- res silenced some more VC2005 compiler warnings and fixed some 
+	  compile errors due missing external dependencies.
+	- res enabled "Whole program optimization" for VC7 release builds.
 21-Jan-2005
 	- Jorrit continued work on the PVS. The PVS kdtree should now be
 	  working (not tested).

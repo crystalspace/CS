@@ -43,8 +43,13 @@
 			ConfigurationType="1"
 			CharacterSet="2"
 [% END %]
+[% MACRO global_app_release BLOCK -%]
+			WholeProgramOptimization="TRUE"
+[% END %]
 [% MACRO global_appcon GET global_app %]
+[% MACRO global_appcon_release GET global_app_release %]
 [% MACRO global_appgui GET global_app %]
+[% MACRO global_appgui_release GET global_app_release %]
 
 [% MACRO global_group BLOCK -%]
 			ConfigurationType="4"
@@ -56,6 +61,9 @@
 
 [% MACRO global_plugin BLOCK -%]
 			ConfigurationType="2"
+[% END %]
+[% MACRO global_plugin_release BLOCK -%]
+			WholeProgramOptimization="TRUE"
 [% END %]
 
 [% MACRO compiler_release BLOCK -%]

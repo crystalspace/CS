@@ -146,10 +146,12 @@ projtypes = {
   appcon =>
   {
     defines = ['_CONSOLE']
+    libs = ['advapi32.lib', 'user32.lib', 'gdi32.lib', 'shell32.lib']
   },
   appgui =>
   {
     defines = ['_WINDOWS']
+    libs = ['advapi32.lib', 'user32.lib', 'gdi32.lib', 'shell32.lib']
   },
   group =>
   {
@@ -161,7 +163,8 @@ projtypes = {
   plugin =>
   {
     defines = ['_WINDOWS'],
-    libs = ['delayimp.lib']
+    libs = ['delayimp.lib', 'advapi32.lib', 'user32.lib', 'gdi32.lib', 
+      'shell32.lib']
   }
 };
 

@@ -57,7 +57,7 @@ END -%]
 				PreprocessorDefinitions="
 [%- composedefs(['WIN32','CS_WIN32_CSCONFIG','__CRYSTAL_SPACE__']) %]"
 				OptimizeForProcessor="1"
-				AdditionalOptions="[% flags(compose('cflags', [], ' ')) | html %]"
+				AdditionalOptions="[% flags(compose('cflags', [], ' ')) | html %] [% flags(compose('cflags7', [], ' ')) | html %]"
 				AdditionalIncludeDirectories="[% composedirs('incdirs', ['.']) %]"
 				PrecompiledHeaderFile="[% workbuild([my.doc.project.0,'.pch']) %]"
 				AssemblerListingLocation="[% workbuild([]) %]"
@@ -72,7 +72,7 @@ END -%]
 			<Tool
 				Name="VCLinkerTool"
 [% interpolate('linker') -%]
-				AdditionalOptions="[% flags(compose('lflags', [], ' ')) | html %]"
+				AdditionalOptions="[% flags(compose('lflags', [], ' ')) | html %] [% flags(compose('lflags7', [], ' ')) | html %]"
 				AdditionalDependencies="[% compose('libs', [], ' ') %]"
 				IgnoreImportLibrary="TRUE"
 				SuppressStartupBanner="TRUE"

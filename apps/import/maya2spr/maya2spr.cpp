@@ -19,12 +19,11 @@
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <math.h>
+#include "cssysdef.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "cssysdef.h"
 #include "maya_mdl.h"
 #include "igraphic/imageio.h"
 
