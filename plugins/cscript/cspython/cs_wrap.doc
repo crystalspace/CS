@@ -601,25 +601,17 @@ GetTextureFormat()
 
 GetMaterialHandle()
         TextureHandle *GetTextureHandle ();
+        loat GetFDU ();
+        loat GetFDV ();
+        nt GetWidth ();
+        nt GetHeight ();
+        nt GetShiftU ();
+        nt GetIMinU ();
+        nt GetIMinV ();
+        oid GetTextureBox (float& fMinU, float& fMinV,
+         float& fMaxU, float& fMaxV);
+        nt GetOriginalWidth ();
         
-GetFDU()
-
-GetFDV()
-
-GetWidth()
-
-GetHeight()
-
-GetShiftU()
-
-GetIMinU()
-
-GetIMinV()
-
-GetTextureBox(fMinU,fMinV,fMaxU,fMaxV)
-
-GetOriginalWidth()
-
 DynamicLightsDirty()
 
 RecalculateDynamicLights()

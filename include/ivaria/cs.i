@@ -370,16 +370,16 @@ struct iPolygonTexture : public iBase
 {
   iMaterialHandle *GetMaterialHandle ();
 //iTextureHandle *GetTextureHandle ();
-  float GetFDU ();
-  float GetFDV ();
-  int GetWidth ();
-  int GetHeight ();
-  int GetShiftU ();
-  int GetIMinU ();
-  int GetIMinV ();
-  void GetTextureBox (float& fMinU, float& fMinV,
-    float& fMaxU, float& fMaxV);
-  int GetOriginalWidth ();
+//float GetFDU ();
+//float GetFDV ();
+//int GetWidth ();
+//int GetHeight ();
+//int GetShiftU ();
+//int GetIMinU ();
+//int GetIMinV ();
+//void GetTextureBox (float& fMinU, float& fMinV,
+//  float& fMaxU, float& fMaxV);
+//int GetOriginalWidth ();
   bool DynamicLightsDirty ();
   bool RecalculateDynamicLights ();
   iLightMap *GetLightMap ();
