@@ -29,12 +29,11 @@
 #include "csutil/vfs.h"
 #include "iworld.h"
 
-/** Provided for app developer to insert new functions and variables into Walktest
- *  To use, remove the "walktest/" from the two myapp include lines, copy myapp1.h, 
- *  myapp2.h, and myapp.cpp to the app directory, and modify as needed.  
- */
-#include <walktest/myapp1.h>
-//#include <myapp1.h>
+// Provided for app developer to insert new functions and variables into
+// Walktest To use, remove the "walktest/" from the two myapp include lines,
+// copy myapp1.h, myapp2.h, and myapp.cpp to the app directory, and modify as
+// needed.
+#include "myapp1.h"
 
 class Polygon3D;
 class WalkTest;
@@ -293,11 +292,12 @@ public:
   ///
   void eatkeypress (int status, int key, bool shift, bool alt, bool ctrl);
 
-  /** The following "MyApp" functions give the application designer hooks
-   *  into WalkTest so that new functionality may be added without modifing
-   *  WalkTest itself.
+  /**
+   * The following "MyApp" functions give the application designer hooks
+   * into WalkTest so that new functionality may be added without modifing
+   * WalkTest itself.
    */
-  
+
   /// Load any standard libraries here.
   void MyAppInitialize1(void);
   /// Load any standard textures here.
@@ -326,9 +326,9 @@ public:
   bool MyAppMouseClick2Handler(csEvent &Event);
   bool MyAppMouseClick3Handler(csEvent &Event);
 
-// Provided for app developer to insert new functions and variables into Walktest
-#include <walktest/myapp2.h>
-//#include <myapp2.h>
+// Provided for app developer to insert new functions and variables into
+// Walktest
+#include "myapp2.h"
 };
 
 extern csVector2 coord_check_vector;

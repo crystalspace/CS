@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 2000 by David Durant
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,15 +16,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef MYAPP2_H
-#define MYAPP2_H
+#ifndef __CS_MYAPP2_H__
+#define __CS_MYAPP2_H__
 
-/** This file is #included in walktest.h within 
- *  the definition of the class WalkTest.
- *
- *  The app developer may add members to WalkTest here.
- */
+// This file is #included in walktest.h within the definition of the class
+//  WalkTest.
 
+// The app developer may add members to WalkTest here.
 
-
-#endif   // #ifndef MYAPP2_H
+#endif // __CS_MYAPP2_H__

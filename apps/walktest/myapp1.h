@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 2000 by David Durant
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,10 +16,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef MYAPP1_H
-#define MYAPP1_H
+#ifndef __CS_MYAPP1_H__
+#define __CS_MYAPP1_H__
 
-/// This file is #included in walktest.h as the last included file.
+// This file is #included in walktest.h as the last included file.
 
-
-#endif   // #ifndef MYAPP1_H
+#endif // __CS_MYAPP1_H__
