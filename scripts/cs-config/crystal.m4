@@ -6,18 +6,14 @@
 # that if it tries to find Crystal Space and then it just looks in 
 # /usr/local/crystal. Causes an error if it cant find it or you fed it a bad
 # (optional) path. Remember to do CFLAGS="$CFLAGS $CRYSTAL_CFLAGS" and so
-# forth for CRYSTAL_LIBS, CRYSTAL_CXXFLAGS, and CRYSTAL_LIBS so you can use
+# forth for CRYSTAL_LIBS, CRYSTAL_CFLAGS, and CRYSTAL_LIBS so you can use
 # the information provided by this script!
 
 # Matze Braun <MatzeBraun@gmx.de>
 # Patrick McFarland (Diablo-D3) <unknown@panax.com>
 
-dnl AC_PATH_CRYSTAL([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND [, LIBS]]]])
-dnl Test for CS, and define CRYSTAL_VERSION, CRYSRAL_LONGVERSION, 
-dnl CRYSTAL_CFLAGS, CRYSTAL_CXXFLAGS, and CRYSTAL_LIBS
-dnl
-
-AC_DEFUN(AC_PATH_CRYSTAL,
+dnl helper function
+AC_DEFUN(CS_PATH_CRYSTAL_HELPER,
 [dnl 
 dnl Get the cflags and libraries from the cs-config script
 dnl
@@ -43,16 +39,13 @@ if test "x$CRYSTAL" != x ; then
 fi
 
 if test "x$CRYSTAL" = x ; then
-   AC_PATH_PROG(CSCONF, cs-config)
+   AC_CHECK_PROGS([CSCONF], [cs-config])
    if test "x$CSCONF" = x ; then 
       CRYSTAL=/usr/local/crystal
       if test -f $CRYSTAL/bin/cs-config ; then
          CSCONF="$CRYSTAL/bin/cs-config"
       else
-         echo "*** The cs-config script installed by Crystal Space could not be found"
-         echo "*** If Crystal Space was installed in PREFIX, make sure PREFIX/bin is in"
-         echo "*** your path, or set the CRYSTAL environment variable to the full path"
-         echo "*** to cs-config."
+	 no_result=yes
 	 no_cs=yes
       fi
    fi
@@ -64,11 +57,9 @@ fi
 if test "x$no_cs" = "x" ; then
 	min_cs_version=ifelse([$1], ,0.94,$1)
 	AC_MSG_CHECKING(for Crystal Space - version >= $min_cs_version)
-	CRYSTAL_CFLAGS=`$CSCONF $csconf_args --cflags $4`
-	CRYSTAL_CXXFLAGS=`$CSCONF $csconf_args --cxxflags $4`
+	CRYSTAL_CFLAGS=`$CSCONF $csconf_args --cxxflags $4`
 	CRYSTAL_LIBS=`$CSCONF $csconf_args --libs $4`
 	CRYSTAL_VERSION=`$CSCONF --version $4`
-	CRYSTAL_LONGVERSION=`$CSCONF --longversion $4`
 
 	cs_major_version=`$CSCONF $cs_args --version | \
 	   sed 's/\([[0-9]]*\).\([[0-9]]*\).\([[0-9]]*\)?/\1/'`
@@ -85,11 +76,9 @@ if test "x$no_cs" != "x" ; then
 fi
 
 if test x$enable_cstest = xyes ; then
-   ac_save_CFLAGS="$CFLAGS"
    ac_save_CXXFLAGS="$CXXFLAGS"
    ac_save_LIBS="$LIBS"
-   CFLAGS="$CFLAGS $CRYSTAL_CFLAGS"
-   CXXFLAGS="$CXXFLAGS $CRYSTAL_CXXFLAGS"
+   CXXFLAGS="$CXXFLAGS $CRYSTAL_CFLAGS"
    LIBS="$LIBS $CRYSTAL_LIBS"
 
    AC_LANG_SAVE()
@@ -135,30 +124,52 @@ int main (int argc, char *argv[])
 }
 
 ],, no_cs=yes,[echo $ac_n "cross compiling; assumed OK... $ac_c"])
-  CFLAGS="$ac_save_CFLAGS"
   CXXFLAGS="$ac_save_CXXFLAGS"
   LIBS="$ac_save_LIBS"
   AC_LANG_RESTORE()
 fi
 
 if test "x$no_cs" = "x" ; then
-   AC_MSG_RESULT($CRYSTAL_LONGVERSION)
+   AC_MSG_RESULT($CRYSTAL_VERSION)
    ifelse([$2], , :, [$2])     
 else
-   AC_MSG_RESULT(no)
-   echo "*** Could not run Crystal Space test program, checking why..."
+   if test x$no_result = x ; then
+     AC_MSG_RESULT(no)
+   fi
    CRYSTAL_CFLAGS=""
-   CRYSTAL_CXXFLAGS=""
    CRYSTAL_VERSION=""
-   CRYSTAL_LONGVERSION=""
    CRYSTAL_LIBS=""
    ifelse([$3], , :, [$3])
 fi
 
-AC_SUBST(CRYSTAL_CFLAGS)
-AC_SUBST(CRYSTAL_CXXFLAGS)
-AC_SUBST(CRYSTAL_LIBS)
-AC_SUBST(CRYSTAL_VERSION)
-AC_SUBST(CRYSTAL_LONGVERSION)
+])
+
+dnl CS_PATH_CRYSTAL([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND [, LIBS]]]])
+dnl Test for CS, and define CRYSTAL_VERSION, 
+dnl CRYSTAL_CFLAGS, and CRYSTAL_LIBS
+dnl
+AC_DEFUN([CS_PATH_CRYSTAL],[
+
+CS_PATH_CRYSTAL_HELPER($1,$2,$3,$4)
+
+AC_SUBST([CRYSTAL_CFLAGS])
+AC_SUBST([CRYSTAL_LIBS])
+AC_SUBST([CRYSTAL_VERSION])
+
+])
+
+dnl CS_PATH_CRYSTAL([MINIMUM-VERSION, [ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND [, LIBS]]]])
+dnl Test for CS, and define CRYSTAL_VERSION, 
+dnl CRYSTAL_CFLAGS, and CRYSTAL_LIBS (just sets JAMCONFIG properties instead of
+dnl Makefile substs.
+dnl
+AC_DEFUN([CS_PATH_CRYSTAL_JAM],[
+
+CS_PATH_CRYSTAL_HELPER($1,$2,$3,$4)
+
+CS_JAMCONFIG_PROPERTY([CRYSTAL.CFLAGS], [$CRYSTAL_CFLAGS])
+CS_JAMCONFIG_PROPERTY([CRYSTAL.LFLAGS], [$CRYSTAL_LIBS])
+CS_JAMCONFIG_PROPERTY([CRYSTAL.VERSION], [$CRYSTAL_VERSION])
+
 ])
 
