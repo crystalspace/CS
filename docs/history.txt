@@ -14,6 +14,8 @@ The history order is reversed so that new features are at the top.
 	- Jorrit renamed csObjectModel in Dynavis to csDynavisObjectModel to
 	  avoid a conflict with csObjectModel in csgeom (prevented static
 	  linking).
+	- res updated the GL ext manager generator script to contain Jorrits
+	  latest csGLExtensionManager fix.
 22-May-2003
 	- res made the following changes:
 	    - when using the new renderer, the sector now stores the 
@@ -33,7 +35,7 @@ The history order is reversed so that new features are at the top.
 	- res added resizing to the glwin32 canvas, fixed a typo and some 
 	  possible NULL pointer accesses in glcommon.
 	- Matze added possibility to specify msvc version for the msvcgen.sh
-	  script shich is used to regenerate msvc-projectfiles on jam.
+	  script which is used to regenerate msvc-projectfiles on jam.
 	- Matze reworked static linking with jam. This stuff is not tied into
 	  the Application and plugin rules anymore. Now jam constructs an
 	  extra library target for each plugin and has some helper rules so

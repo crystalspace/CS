@@ -172,20 +172,22 @@ def writeFunctionInit (func):
                   ") gl->GetProcAddress (\"" + \
                   name + "\")) != NULL);\n")
     output.write ("      if (!funcTest && config->GetBool \
-(\"Video.OpenGL.ReportMissingEntries\", defaultReportMissingEntries))\n");                
+(\"Video.OpenGL.ReportMissingEntries\", REPORT_MISSING_ENTRIES))\n");                
     output.write ("        Report (\"Failed to retrieve %s\", \"" + name + "\");\n");
     output.write ("      allclear &= funcTest;\n");
 
 output.write (header.read ())
 writeDefinitions (xmldoc.getElementsByTagName ("EXTENSION"))
-output.write ("struct csGLExtensionManager\n\
+output.write ("\
+#ifdef CS_DEBUG\n\
+#  define REPORT_MISSING_ENTRIES true\n\
+#else\n\
+#  define REPORT_MISSING_ENTRIES false\n\
+#endif\n\
+\n\
+struct csGLExtensionManager\n\
 {\n\
 private:\n\
-#ifdef CS_DEBUG\n\
-  static const bool defaultReportMissingEntries = true;\n\
-#else\n\
-  static const bool defaultReportMissingEntries = false;\n\
-#endif\n\
   iObjectRegistry* object_reg;\n\
   csConfigAccess config;\n\
   iOpenGLInterface* gl;\n\
@@ -229,6 +231,7 @@ public:\n\
 writeExtensions (xmldoc.getElementsByTagName ("EXTENSION"))
 writeFunctions (xmldoc.getElementsByTagName ("EXTENSION"))
 writeInitExtensions (xmldoc.getElementsByTagName ("EXTENSION"))
-output.write ("};\n\n");
+output.write ("};\n\
+#undef REPORT_MISSING_ENTRIES\n\n");
 output.write (footer.read ())
 output.close ()
