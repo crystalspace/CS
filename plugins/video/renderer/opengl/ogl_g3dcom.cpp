@@ -1455,7 +1455,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   // Draw all triangles.
   StartPolygonFX (mesh.txt_handle[0], mesh.fxmode);
 
-  if (m_gouraud)
+  if (m_gouraud && work_colors)
   {
     glEnableClientState(GL_COLOR_ARRAY);
     
