@@ -45,6 +45,9 @@ protected:
 
   /// Caption text for this component
   iString *caption;
+
+  ///
+  bool stretched; 
 protected:
   void ClearGroup ();
 public:

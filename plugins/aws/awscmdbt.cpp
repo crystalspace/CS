@@ -22,6 +22,7 @@ awsCmdButton::awsCmdButton () :
   is_switch(false),
   was_down(false),
   icon_align(0),
+  stretched(false),
   caption(NULL)
 {
   tex[0] = tex[1] = tex[2] = NULL;
@@ -75,9 +76,13 @@ bool awsCmdButton::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   {
 	  iString *tn1 = NULL, *tn2 = NULL, *tn3 = NULL;
 	  
+	  int stretch;
+
 	  pm->GetString (settings, "BitmapNormal", tn1);
 	  pm->GetString (settings, "BitmapFocused", tn2);
 	  pm->GetString (settings, "BitmapClicked", tn3);
+	  if(pm->GetInt (settings, "Stretched", stretch))
+		stretched = stretch;
 	  
 	  if (tn1) tex[0] = pm->GetTexture (tn1->GetData (), tn1->GetData ());
 	  if (tn2) tex[1] = pm->GetTexture (tn2->GetData (), tn2->GetData ());
@@ -374,8 +379,8 @@ void awsCmdButton::OnDraw (csRect /*clip*/)
 		  tex[texindex],
 		  Frame ().xmin+is_down,
 		  Frame ().ymin+is_down,
-		  w,
-		  h,
+		  stretched ? Frame ().Width() : w,
+		  stretched ? Frame ().Height() : h,
 		  0,
 		  0,
 		  w,
