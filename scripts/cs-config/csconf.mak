@@ -5,7 +5,7 @@ DESCRIPTION.csconfig = cs-config build options script
 ifeq ($(MAKESECTION),rootdefines)
 
 PSEUDOHELP += \
-  $(NEWLINE)echo $"  make csconfig     Build the $(DESCRIPTION.csconfig)$"
+  $(NEWLINE)echo $"  make cs-config     Build the $(DESCRIPTION.csconfig)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
@@ -15,9 +15,9 @@ ifeq ($(MAKESECTION),roottargets)
 .PHONY: csconfig csconfigclean
 
 all: csconfig
-csconfig:
+cs-config:
 	$(MAKE_TARGET) DO_CREATE_CSCONFIG=yes
-csconfigclean:
+cs-configclean:
 	$(MAKE_CLEAN)
 
 endif
@@ -52,14 +52,14 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: csconfig csconfigclean
+.PHONY: build.cs-config cs-configclean
 
 all: $(CSCONFIG.EXE)
-clean: csconfigclean
+clean: cs-configclean
 
 ifeq ($(DO_CREATE_CSCONFIG),yes)
 
-csconfig: $(OUTDIRS) $(CSCONFIG.EXE)
+build.cs-config: $(OUTDIRS) $(CSCONFIG.EXE)
 
 # Create csconfig.tmp for the make variables that need to be transferred.
 $(CSCONFIG.EXE): $(CSCONFIG.DEP)
@@ -106,7 +106,7 @@ $(CSCONFIG.EXE): $(CSCONFIG.DEP)
 	
 endif # ifeq ($(DO_CREATE_CSCONFIG),yes)
 
-csconfigclean:
+cs-configclean:
 	-$(RM) $(CSCONFIG.EXE) 
 
 endif
