@@ -32,8 +32,9 @@ struct iSector;
 struct iThing;
 struct iSprite;
 struct iMaterialWrapper;
+struct iRegion;
 
-SCF_VERSION (iWorld, 0, 1, 1);
+SCF_VERSION (iWorld, 0, 1, 2);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -46,6 +47,17 @@ struct iWorld : public iPlugIn
   virtual csWorld *GetCsWorld () = 0;
   /// Query the format to load textures (usually this depends on texture manager)
   virtual int GetTextureFormat () = 0;
+
+  /**
+   * Create or select a new region (name can be NULL for the default main
+   * region). All new objects will be marked as belonging to this region.
+   */
+  virtual void SelectRegion (const char* iName) = 0;
+  /**
+   * Get a reference to the current region (or NULL if the default main
+   * region is selected).
+   */
+  virtual iRegion* GetCurrentRegion () = 0;
 
   /**
    * Create or select a new object library (name can be NULL for world).

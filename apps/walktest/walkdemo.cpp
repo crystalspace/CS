@@ -40,6 +40,7 @@
 #include "csengine/cspixmap.h"
 #include "csengine/collider.h"
 #include "csengine/particle.h"
+#include "csengine/region.h"
 #include "csutil/scanstr.h"
 #include "csparser/impexp.h"
 #include "csobject/dataobj.h"
@@ -1067,5 +1068,79 @@ void light_statics ()
     }
     sp->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
   }
+}
+
+//===========================================================================
+
+void OpenPortal (csView* view, char* lev)
+{
+  csSector* room = view->GetCamera ()->GetSector ();
+  csVector3 pos = view->GetCamera ()->Camera2World (csVector3 (0, 0, 1));
+  csMaterialWrapper* tm = Sys->world->GetMaterials ()->FindByName ("spark");
+  csThing* thing = new csThing (Sys->world);
+  Sys->world->things.Push (thing);
+  thing->SetName ("portal");
+  thing->GetMovable ().SetSector (room);
+  float dx = 1, dy = 3, dz = .3;
+
+  csPolygon3D* p;
+  p = thing->NewPolygon (tm);
+  p->AddVertex (-dx, -1, dz);
+  p->AddVertex (dx, -1, dz);
+  p->AddVertex (dx, -1, -dz);
+  p->AddVertex (-dx, -1, -dz);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+
+  p = thing->NewPolygon (tm);
+  p->AddVertex (-dx, dy-1, -dz);
+  p->AddVertex (dx, dy-1, -dz);
+  p->AddVertex (dx, dy-1, dz);
+  p->AddVertex (-dx, dy-1, dz);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+
+  p = thing->NewPolygon (tm);
+  p->AddVertex (-dx, dy-1, dz);
+  p->AddVertex (dx, dy-1, dz);
+  p->AddVertex (dx, -1, dz);
+  p->AddVertex (-dx, -1, dz);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+
+  p = thing->NewPolygon (tm);
+  p->AddVertex (dx, dy-1, dz);
+  p->AddVertex (dx, dy-1, -dz);
+  p->AddVertex (dx, -1, -dz);
+  p->AddVertex (dx, -1, dz);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+
+  p = thing->NewPolygon (tm);
+  p->AddVertex (-dx, dy-1, -dz);
+  p->AddVertex (-dx, dy-1, dz);
+  p->AddVertex (-dx, -1, dz);
+  p->AddVertex (-dx, -1, -dz);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+
+  p = thing->NewPolygon (tm);
+  p->AddVertex (dx, dy-1, -dz);
+  p->AddVertex (-dx, dy-1, -dz);
+  p->AddVertex (-dx, -1, -dz);
+  p->AddVertex (dx, -1, -dz);
+  p->SetTextureSpace (p->Vobj (0), p->Vobj (1), 3);
+
+  thing->Prepare (room);
+  thing->InitLightMaps (false);
+  room->ShineLights (thing);
+  thing->CreateLightMaps (Sys->G3D);
+
+  thing->GetMovable ().SetPosition (pos);
+  thing->GetMovable ().UpdateMove ();
+
+  Sys->world->SelectRegion (lev);
+  // @@@ No error checking!
+  char buf[255];
+  sprintf (buf, "/lev/%s", lev);
+  Sys->VFS->ChDir (buf);
+  csLoader::AppendWorldFile (Sys->world, "world");
+  Sys->world->GetCsCurrentRegion ()->Prepare ();
+  Sys->world->SelectRegion (NULL);
 }
 

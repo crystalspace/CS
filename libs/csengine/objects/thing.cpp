@@ -59,6 +59,7 @@ csThing::csThing (csWorld* world, bool is_sky) :
   tree_bbox.SetOwner (this);
   csThing::is_sky = is_sky;
   movable.SetObject (this);
+  world->AddToCurrentRegion (this);
 }
 
 csThing::~csThing ()

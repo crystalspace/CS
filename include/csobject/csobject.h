@@ -78,8 +78,12 @@ public:
   virtual csObject* GetObjectParent () const
   { return NULL; }
 
-  /// Return the first subobject instance of the given type
-  csObject *GetChild (const csIdType& iType) const;
+  /**
+   * Return the first subobject instance of the given type.
+   * If 'derived' is true then this function will return the
+   * first object which has the given type or a subclass of that type.
+   */
+  csObject *GetChild (const csIdType& iType, bool derived = false) const;
 
   /**
    * Return an iterator referencing all objects of the given type.

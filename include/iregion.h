@@ -1,4 +1,5 @@
 /*
+    Crystal Space 3D engine
     Copyright (C) 2000 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
@@ -16,68 +17,35 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_REGION_H__
-#define __CS_REGION_H__
+#ifndef __IREGION_H__
+#define __IREGION_H__
 
-#include "csobject/csobject.h"
-#include "iregion.h"
+#include "csutil/scf.h"
 
-class csWorld;
+SCF_VERSION (iRegion, 0, 1, 0);
 
 /**
  * A region. A region is basically a collection of objects in the
  * 3D engine that can be treated as a unit.
  */
-class csRegion : public csObjectNoDel, public iRegion
+struct iRegion : public iBase
 {
-  friend class Dumper;
-
-private:
-  csWorld* world;
-
-public:
-  /**
-   * Initialize an empty region.
-   */
-  csRegion (csWorld* world);
-
-  /**
-   * Delete the region without deleting the entities in it. The entities
-   * in this region will simply get unconnected.
-   */
-  virtual ~csRegion ();
-
-  /**
-   * Add an object to this region.
-   */
-  void AddToRegion (csObject* obj);
-
-  /**
-   * Release an object from this region.
-   */
-  void ReleaseFromRegion (csObject* obj);
-
-  CSOBJTYPE;
-
-  //--------------------- iRegion implementation ---------------------
-  DECLARE_IBASE;
-
   /**
    * Clear this region without removing the entities in it. The entities
    * will simply get unconnected from this region.
    */
-  virtual void Clear ();
+  virtual void Clear () = 0;
 
   /**
    * Delete all entities in this region.
    */
-  virtual void DeleteAll ();
+  virtual void DeleteAll () = 0;
 
   /**
    * Prepare all objects in this region. This has to be called
    * directly after loading new objects.
    */
-  virtual bool Prepare ();
+  virtual bool Prepare () = 0;
 };
 
-#endif // __CS_REGION_H__
+#endif // __IREGION_H__

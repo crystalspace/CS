@@ -2074,7 +2074,7 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
 
   // if the texture has transparent bits, we have to tweak the
   // OpenGL blend mode so that it handles the transparent pixels correctly
-  if (hTex->GetKeyColor ())
+  if (hTex->GetKeyColor () || hTex->GetAlphaMap ())
   {
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

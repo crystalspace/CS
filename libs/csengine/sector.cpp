@@ -77,6 +77,7 @@ csSector::csSector (csWorld* world) : csPolygonSet (world)
   level_r = level_g = level_b = 0;
   static_tree = NULL;
   static_thing = NULL;
+  world->AddToCurrentRegion (this);
 }
 
 csSector::~csSector ()

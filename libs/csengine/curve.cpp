@@ -814,6 +814,13 @@ void csBezierCurve::Normal (csVector3& vec, double u, double v)
 
 //------------------------------------------------------------------
 
+csCurveTemplate::csCurveTemplate () : csObject ()
+{
+  csWorld::current_world->AddToCurrentRegion (this);
+}
+
+//------------------------------------------------------------------
+
 csBezierTemplate::csBezierTemplate ()
   : csCurveTemplate () 
 {

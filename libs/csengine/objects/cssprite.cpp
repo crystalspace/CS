@@ -506,6 +506,7 @@ csSprite::csSprite (csObject* theParent) : csObject ()
     csSprite* sparent = (csSprite*)parent;
     movable.SetParent (&sparent->GetMovable ());
   }
+  csWorld::current_world->AddToCurrentRegion (this);
 }
 
 csSprite::~csSprite ()

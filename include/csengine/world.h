@@ -31,6 +31,7 @@
 #include "iworld.h"
 #include "iconfig.h"
 
+class csRegion;
 class csRadiosity;
 class csSector;
 class csSprite;
@@ -60,6 +61,7 @@ class csLightHalo;
 struct iSystem;
 struct iVFS;
 struct iMaterialWrapper;
+struct iRegion;
 
 
 /**
@@ -460,9 +462,16 @@ public:
   /// Maximum texture aspect ratio
   int MaxAspectRatio;
   /// A pointer to current object library
-  csObject *Library;
-  /// The list of all object libraries currently loaded
-  csNamedObjVector Libraries;
+  csObject* library;
+  /**
+   * The list of all object libraries currently loaded.
+   * @@@ When regions are complete support for libraries will be removed.
+   */
+  csNamedObjVector libraries;
+  /// A pointer to the current region.
+  csRegion* region;
+  /// The list of all regions currently loaded.
+  csNamedObjVector regions;
 
   /// Option variable: inhibit lightmap recalculation?
   static bool do_not_force_relight;
@@ -1017,6 +1026,20 @@ public:
     return it;
   }
 
+  /**
+   * Get a reference to the current region (or NULL if the default main
+   * region is selected).
+   */
+  csRegion* GetCsCurrentRegion ()
+  {
+    return region;
+  }
+
+  /**
+   * Add an object to the current region.
+   */
+  void AddToCurrentRegion (csObject* obj);
+
   CSOBJTYPE;
   DECLARE_IBASE;
 
@@ -1040,9 +1063,23 @@ public:
   virtual int GetTextureFormat ();
 
   /**
+   * Create or select a new region (name can be NULL for the default main
+   * region). All new objects will be marked as belonging to this region.
+   */
+  virtual void SelectRegion (const char* iName);
+
+  /**
+   * Get a reference to the current region (or NULL if the default main
+   * region is selected).
+   */
+  virtual iRegion* GetCurrentRegion ();
+
+  /**
    * Create or select a new object library (name can be NULL for world).
    * All new objects will be marked as belonging to this library.
    * You can then delete a whole library at once, for example.
+   * @@@ Libraries are obsolete!!! When regions are finished use them
+   * instead.
    */
   virtual void SelectLibrary (const char *iName);
   /// Delete a whole library (all objects that are part of library)

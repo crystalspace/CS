@@ -195,7 +195,7 @@ struct iGraphics2D : public iPlugIn
 
  /**
   * This routine should be called before any draw operations.
-  * It should return S_OK if graphics context is ready.
+  * It should return true if graphics context is ready.
   */
   virtual bool BeginDraw () = 0;
 

@@ -49,6 +49,7 @@
 #include "csengine/covtree.h"
 #include "csengine/particle.h"
 #include "csengine/radiosty.h"
+#include "csengine/region.h"
 #include "csgeom/fastsqrt.h"
 #include "csgeom/polypool.h"
 #include "csgfxldr/csimage.h"
@@ -576,7 +577,7 @@ csWorld::csWorld (iBase *iParent) : csObject (), camera_positions (16, 16)
   use_pvs = false;
   use_pvs_only = false;
   freeze_pvs = false;
-  Library = NULL;
+  library = NULL;
   world_states = NULL;
   rad_debug = NULL;
 
@@ -769,8 +770,13 @@ void csWorld::Clear ()
   use_pvs = false;
 
   // Clear all object libraries
-  Library = NULL;
-  Libraries.DeleteAll ();
+  library = NULL;
+  libraries.DeleteAll ();
+
+  // Clear all regions.
+  region = NULL;
+  regions.DeleteAll ();
+
   tr_manager.Initialize ();
 }
 
@@ -1727,20 +1733,50 @@ int csWorld::GetTextureFormat ()
   return txtmgr->GetTextureFormat ();
 }
 
+void csWorld::SelectRegion (const char *iName)
+{
+  if (iName == NULL)
+  {
+    region = NULL; // Default world region.
+    return;
+  }
+
+  region = (csRegion*)regions.FindByName (iName);
+  if (!region)
+  {
+    region = new csRegion (this);
+    region->SetName (iName);
+    regions.Push (region);
+  }
+}
+
+iRegion* csWorld::GetCurrentRegion ()
+{
+  return (iRegion*)region;
+}
+
+void csWorld::AddToCurrentRegion (csObject* obj)
+{
+  if (region)
+  {
+    region->AddToRegion (obj);
+  }
+}
+
 void csWorld::SelectLibrary (const char *iName)
 {
-  Library = Libraries.FindByName (iName);
-  if (!Library)
+  library = libraries.FindByName (iName);
+  if (!library)
   {
-    Library = new csObjectNoDel ();
-    Library->SetName (iName);
-    Libraries.Push (Library);
+    library = new csObjectNoDel ();
+    library->SetName (iName);
+    libraries.Push (library);
   }
 }
 
 bool csWorld::DeleteLibrary (const char *iName)
 {
-  csObject *lib = Libraries.FindByName (iName);
+  csObject *lib = libraries.FindByName (iName);
   if (!lib) return false;
 
 #define DELETE_ALL_OBJECTS(vector,type)				\
@@ -1890,7 +1926,7 @@ iThing *csWorld::CreateThing (const char *iName, iSector *iParent)
   thing->SetName (iName);
   csSector *sector = iParent->GetPrivateObject ();
   thing->GetMovable ().SetSector (sector);
-  sector->things.Push (thing);
+  things.Push (thing);
   iThing *p = QUERY_INTERFACE (thing, iThing);
   thing->DecRef ();
   return p;

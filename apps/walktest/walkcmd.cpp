@@ -551,7 +551,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("  stats fps perftest coordshow\n");
     CONPRI("Special effects:\n");
     CONPRI("  addbot delbot addskel addghost fire explosion spiral rain\n");
-    CONPRI("  snow fountain flame\n");
+    CONPRI("  snow fountain flame portal\n");
     CONPRI("Debugging:\n");
     CONPRI("  fclear hi frustum zbuf debug0 debug1 debug2 edges palette\n");
     CONPRI("  db_boxshow db_boxcam1 db_boxcam2 db_boxsize1 db_boxsize2\n");
@@ -1005,6 +1005,18 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "capture"))
     CaptureScreen ();
+  else if (!strcasecmp (cmd, "portal"))
+  {
+    if (arg)
+    {
+      char level[100];
+      ScanStr (arg, "%s", level);
+      void OpenPortal (csView* view, char* lev);
+      OpenPortal (Sys->view, level);
+    }
+    else
+      Sys->Printf (MSG_CONSOLE, "Expected parameter 'level'!\n");
+  }
   else if (!strcasecmp (cmd, "perftest"))
   {
     int num = 100;

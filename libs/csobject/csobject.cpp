@@ -106,13 +106,23 @@ csObjectNoDel::~csObjectNoDel ()
   }
 }
 
-csObject *csObject::GetChild (const csIdType& iType) const
+csObject *csObject::GetChild (const csIdType& iType, bool derived) const
 {
   if (!children)
     return NULL;
-  for (int i = 0; i < children->count; i++)
-    if (&children->obj [i]->GetType () == &iType)
-      return children->obj [i];
+  int i;
+  if (derived)
+  {
+    for (i = 0; i < children->count; i++)
+      if (children->obj [i]->GetType () >= iType)
+        return children->obj [i];
+  }
+  else
+  {
+    for (i = 0; i < children->count; i++)
+      if (&children->obj [i]->GetType () == &iType)
+        return children->obj [i];
+  }
   return NULL;
 }
 

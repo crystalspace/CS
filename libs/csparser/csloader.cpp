@@ -43,6 +43,7 @@
 #include "csengine/dumper.h"
 #include "csengine/keyval.h"
 #include "csengine/particle.h"
+#include "csengine/region.h"
 #include "csengine/halo.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
@@ -206,6 +207,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (RADIUS)
   CS_TOKEN_DEF (RAIN)
   CS_TOKEN_DEF (REFLECTION)
+  CS_TOKEN_DEF (REGION)
   CS_TOKEN_DEF (ROOM)
   CS_TOKEN_DEF (ROT)
   CS_TOKEN_DEF (ROT_X)
@@ -3987,8 +3989,10 @@ csSoundDataObject *csLoader::LoadSoundObject (csWorld* world,
 
 //---------------------------------------------------------------------------
 
-bool csLoader::LoadWorld (char* buf)
+bool csLoader::LoadWorld (char* buf, bool onlyRegion)
 {
+  (void)onlyRegion;
+
   CS_TOKEN_TABLE_START (tokens)
     CS_TOKEN_TABLE (WORLD)
   CS_TOKEN_TABLE_END
@@ -4012,6 +4016,7 @@ bool csLoader::LoadWorld (char* buf)
     CS_TOKEN_TABLE (KEY)
     CS_TOKEN_TABLE (MOTION)
     CS_TOKEN_TABLE (INCLUDESPRITE)
+    CS_TOKEN_TABLE (REGION)
   CS_TOKEN_TABLE_END
 
   csResetParserLine();
@@ -4027,7 +4032,7 @@ bool csLoader::LoadWorld (char* buf)
     long cmd;
     char* params;
 
-    World->SelectLibrary (name);
+    World->SelectLibrary (name); //@@@? Don't do this for regions!
 
     while ((cmd = csGetObject (&data, commands, &name, &params)) > 0)
     {
@@ -4040,17 +4045,31 @@ bool csLoader::LoadWorld (char* buf)
       {
         case CS_TOKEN_MOTION:
 	  {
-	    iMotionManager* motionmanager=System->MotionMan;
-	    if (!motionmanager) {
-	      CsPrintf(MSG_FATAL_ERROR, "No motion manager loaded!\n");
-	      fatal_exit(0, false);
-	    } else {
-	      iMotion* m=motionmanager->FindByName(name);
-	      if(!m) {
-		m=motionmanager->AddMotion(name);
-		LoadMotion(m, params);
+	    iMotionManager* motionmanager = System->MotionMan;
+	    if (!motionmanager)
+	    {
+	      CsPrintf (MSG_FATAL_ERROR, "No motion manager loaded!\n");
+	      fatal_exit (0, false);
+	    }
+	    else
+	    {
+	      iMotion* m = motionmanager->FindByName (name);
+	      if (!m)
+	      {
+		m = motionmanager->AddMotion (name);
+		LoadMotion (m, params);
 	      }
 	    }
+	  }
+	  break;
+        case CS_TOKEN_REGION:
+	  {
+	    char str[255];
+	    ScanStr (params, "%s", str);
+	    if (*str)
+	      World->SelectRegion (str);
+	    else
+	      World->SelectRegion (NULL);
 	  }
 	  break;
         case CS_TOKEN_INCLUDESPRITE:
@@ -4191,9 +4210,15 @@ bool csLoader::LoadWorld (char* buf)
 
 bool csLoader::LoadWorldFile (csWorld* world, const char* file)
 {
+  world->StartWorld ();
+  return AppendWorldFile (world, file);
+}
+
+bool csLoader::AppendWorldFile (csWorld* world, const char* file,
+	bool onlyRegion)
+{
   World = world;
 
-  world->StartWorld ();
   csLoaderStat::Init ();
 
   iDataBuffer *buf = System->VFS->ReadFile (file);
@@ -4215,7 +4240,7 @@ bool csLoader::LoadWorldFile (csWorld* world, const char* file)
   CsPrintf (MSG_INITIALIZATION, "Lightmap grid size = %dx%d.\n",
       csLightMap::lightcell_size, csLightMap::lightcell_size);
 
-  if (!LoadWorld (**buf))
+  if (!LoadWorld (**buf, onlyRegion))
     return false;
 
   if (csLoaderStat::polygons_loaded)

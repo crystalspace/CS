@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csengine/polytmap.h"
 #include "csengine/textrans.h"
+#include "csengine/world.h"
 #include "csgeom/transfrm.h"
 
 //---------------------------------------------------------------------------
@@ -28,6 +29,7 @@ IMPLEMENT_CSOBJTYPE (csPolyTxtPlane,csObject);
 csPolyTxtPlane::csPolyTxtPlane () : csObject ()
 {
   ref_count = 1;
+  csWorld::current_world->AddToCurrentRegion (this);
 }
 
 csPolyTxtPlane::~csPolyTxtPlane ()

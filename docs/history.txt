@@ -1,6 +1,56 @@
 The history order has been reversed so that new features are at the top.
 
+6-Dec-2000
+	- Fixed a comment in iGraphics2D.
+	- Extend csObject::GetChild() with a new 'derived' parameter similar
+	  to how GetIterator() works. With 'derived' set to true GetChild()
+	  will return the first child that matches the type or is a type
+	  derived from the given type. To get the first child you can now
+	  use GetChild (csObject::Type, true);
+	- Added iRegion SCF interface which csRegion extends.
+	- Extended iWorld and csWorld with SelectRegion and GetCurrentRegion.
+	- More work on csRegion class. DeleteAll(), Clear(), and Prepare()
+	  should all work now. But untested at the moment.
+	- All objects that should belong to a region will now add themselves
+	  to the current region automatically.
+	- Added new 'REGION' keyworld to WORLD in loader. This keyworld
+	  will create/select a new region and all subsequent sectors,
+	  collections, sprite templates or thing templates, will be added
+	  to that region. If the name of the region is empty then the default
+	  NULL region will be used. Note that it is possible to interleave
+	  region selection. For example, you can first create a few sectors
+	  in region 'east', followed by a few sectors in region 'west',
+	  followed again by a few sectors in region 'east'.
+	- Fixed a bug in csWorld::CreateThing(). This function accidently
+	  added the thing twice to the list of things for every sector (once
+	  by doing SetSector on the movable and once explicit). In addition
+	  this routine forgot to add the thing to the list of things in the
+	  world.
+	- Added 'portal' console command to WalkTest. This will create a new
+	  region with the given name and load the same named level into
+	  that region. Then it will create a portal on the spot you are
+	  standing to the start position of the new level. For example,
+	  you can do 'portal maze' to load maze.zip into the 'maze' region.
+	  Then you can enter 'maze.zip' through the new portal :-)
+	  WARNING! This command does not work at the moment and the only
+	  effect is crashing WalkTest! Work in Progress!
+	- Added csLoader::AppendWorldFile() which will load a world
+	  file without first clearing the original world.
+	- Added a parameter 'onlyRegion' to AppendWorldFile(). If true then
+	  then portals will only connect to the sectors in the current
+	  region, things will only use thing templates defined in the
+	  current region and sprites will only use sprite templates
+	  defined in the current region.
+	- Small fix in OpenGL which SHOULD support alpha for DrawPixmap
+	  but for some reason doesn't.
 5-Dec-2000
+	- Wouter Wijngaards created csBox3::SquaredOriginDist which returns
+	  a float with the squared distance of the box to (0,0,0). It
+	  is extremely fast (algo taken from sector.cpp).
+	- Norman Kramer did the following changes:
+	    - Catched a div by zero in LOD calc for sprites.
+     	    - Sprites are now clipped if shortest distance is greater than
+	      D() value of the farplane (squared version).
 	- Started work on csRegion class. Not functional at the moment.
 	- Eric Sunshine made the following changes:
 	    - Removed all platform-specific specializations from of csdef.h.
@@ -87,6 +137,9 @@ The history order has been reversed so that new features are at the top.
 	    - Added general/findlib.cpp to SRC.SYS_CSSYS in next.mak.
 4-Dec-2000
 	- Norman Kramer implemented farplane culling for sprites.
+	- Added 'sndload' to the 'walkall' target because without the
+	  sound loader WalkTest will not run.
+	- Fixed a number of compile errors that trigger with VC5.
 3-Dec-2000
 	- Norman Kramer did some work on CrystalBall (his polygon culler).
 	- Norman also did the following with relation to the c-buffer

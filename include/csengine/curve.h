@@ -280,7 +280,7 @@ protected:
 
 public:
   ///
-  csCurveTemplate() : csObject() {}
+  csCurveTemplate();
 
   ///
   virtual csCurve* MakeCurve () = 0;

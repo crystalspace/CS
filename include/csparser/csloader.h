@@ -71,8 +71,8 @@ class csLoader
   static bool load_matrix (char* buf, csMatrix3 &m);
   /// Parse a vector definition
   static bool load_vector (char* buf, csVector3 &v);
-	/// Parse a quaternion definition
-	static bool load_quaternion (char* buf, csQuaternion &q);
+  /// Parse a quaternion definition
+  static bool load_quaternion (char* buf, csQuaternion &q);
   /// Parse a color definition
   static bool load_color (char *buf, csRGBcolor &c);
   /// Parse a polygon plane definition and return a new object
@@ -169,15 +169,15 @@ class csLoader
    */
   static bool LoadMaterials (char* buf, const char* prefix = NULL);
 
-	/**
-	 * Loads a skeletal motion from a file
-	 */
-	static iMotion* LoadMotion (csWorld* world, const char* fname);
+  /**
+   * Loads a skeletal motion from a file
+   */
+  static iMotion* LoadMotion (csWorld* world, const char* fname);
 
-	/**
-	 * Loads a skeletal motion from an existing stream
-	 */
-	static bool LoadMotion (iMotion* mot, char* buf);
+  /**
+   * Loads a skeletal motion from an existing stream
+   */
+  static bool LoadMotion (iMotion* mot, char* buf);
 
   /**
    * Load a library into given world.<p>
@@ -186,8 +186,8 @@ class csLoader
    */
   static bool LoadLibrary (char* buf);
 
-  /// World from a memory buffer
-  static bool LoadWorld (char* buf);
+  /// Load world from a memory buffer
+  static bool LoadWorld (char* buf, bool onlyRegion);
 
   /**
    * Get a sprite template frame from a frame number
@@ -210,6 +210,16 @@ class csLoader
 public:
   /// Load file into a world.
   static bool LoadWorldFile (csWorld* world, const char* filename);
+
+  /**
+   * Append file into a world (i.e. don't clear the current world
+   * contents first). If 'onlyRegion' is true then portals will only
+   * connect to the sectors in the current region, things will only use
+   * thing templates defined in the current region and sprites will
+   * only use sprite templates defined in the current region.
+   */
+  static bool AppendWorldFile (csWorld* world, const char* filename,
+  	bool onlyRegion = true);
 
   /// Load library from a VFS file
   static bool LoadLibraryFile (csWorld* world, const char* filename);

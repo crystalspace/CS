@@ -294,6 +294,11 @@ is the texture to use for the particles.
 Add a particle system simulating an spiral.  The parameter for this command is
 the texture to use for the particles.  Experimental!
 
+@item portal @var{level}
+Create a new region with the given name and load the same named level
+into that region. Then create a portal on the spot you are standing to
+the start position of the new level and back.
+
 @item dumpvis
 This command takes the current view and dumps information for the rendering
 process.  You will see what sectors and polygons are rendered and how they are

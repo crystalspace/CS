@@ -28,6 +28,7 @@ csCollection::csCollection (csWorld* world) : csObject(), objects (8,8), movable
 {
   movable.SetObject (this);
   csCollection::world = world;
+  world->AddToCurrentRegion (this);
 }
 
 csCollection::~csCollection ()
