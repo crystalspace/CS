@@ -95,6 +95,7 @@ public:
     { scfParent->m_piSystem = p; return true; }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugIn;
+  friend struct eiPlugIn;
 
 private:
   // used to setup timer when background=true (not currently used)
