@@ -116,6 +116,7 @@ protected:
   /// Compute the mean color for the just-created texture
   virtual void ComputeMeanColor ();
 
+  /// the texture manager
   csTextureManagerSoftware *texman;
 
 public:
@@ -146,11 +147,14 @@ public:
   /// Apply gamma correction to private palette
   void ApplyGamma (UByte *GammaTable);
 
+  /// Creates the DynamicTexture object with interfaces
   void CreateDynamicTexture (iGraphics3D *parentG3D, csPixelFormat *pfmt,
                              RGBPixel *pal_8bit, bool share_hint);
 
+  /// Return the interfaces to the dynamic texture buffer
   virtual iGraphics3D *GetDynamicTextureInterface ();
 
+  /// Called to update pal2glob with palette information created elsewhere
   virtual void DynamicTextureSyncPalette ();
 
   /// Called when dynamic texture shares texture manager with parent context

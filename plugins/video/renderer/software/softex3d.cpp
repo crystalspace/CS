@@ -25,8 +25,23 @@
 #include "soft_txt.h"
 
 DECLARE_FACTORY (csDynamicTextureSoft3D)
-
-IMPLEMENT_IBASE (csDynamicTextureSoft3D)
+void csDynamicTextureSoft3D::IncRef ()					       	
+{									
+  if (scfParent)							
+    scfParent->IncRef ();						
+  scfRefCount++;							
+}									
+void csDynamicTextureSoft3D::DecRef ()	
+{									
+  scfRefCount--;							
+  if (scfParent)							
+    scfParent->DecRef ();						
+  if (scfRefCount <= 0)							
+    delete this;							
+}									
+void *csDynamicTextureSoft3D::QueryInterface (const char *iInterfaceID, int iVersion)	
+{
+//IMPLEMENT_IBASE (csDynamicTextureSoft3D)
   IMPLEMENTS_INTERFACE (iPlugIn)
   IMPLEMENTS_INTERFACE (iGraphics3D)
 IMPLEMENT_IBASE_END
@@ -36,6 +51,7 @@ csDynamicTextureSoft3D::csDynamicTextureSoft3D (iBase *iParent)
 {
   CONSTRUCT_IBASE (iParent);
   tex_mm = NULL;
+  System = NULL;
 }
 
 bool csDynamicTextureSoft3D::Initialize (iSystem *iSys)
@@ -44,6 +60,15 @@ bool csDynamicTextureSoft3D::Initialize (iSystem *iSys)
   // gets called below, after the G2D driver is created
   (System = iSys)->IncRef();
   return true;
+}
+
+void csDynamicTextureSoft3D::Close ()
+{
+  if (tex_mm)
+  {
+    tcache = NULL;
+    texman = NULL;
+  }
 }
 
 void csDynamicTextureSoft3D::SetTarget (csTextureMMSoftware *tex_mm)
@@ -74,22 +99,6 @@ iGraphics3D *csDynamicTextureSoft3D::CreateOffScreenRenderer
     if (!Open (NULL))
       return NULL;
     SharedOpen ((csGraphics3DSoftwareCommon*)parent_g3d);
-//      if (pfmt.PixelBytes == 4)
-//        pixel_shift = 2;
-//      else if (pfmt.PixelBytes == 2)
-//        pixel_shift = 1;
-//      else
-//        pixel_shift = 0;
-
-//  #ifdef TOP8BITS_R8G8B8_USED
-//      if (pfmt.PixelBytes == 4)
-//        pixel_adjust = (pfmt.RedShift && pfmt.GreenShift && pfmt.BlueShift) ? 8 : 0;
-//  #endif
-//      alpha_mask = 0;
-//      alpha_mask |= 1 << (pfmt.RedShift);
-//      alpha_mask |= 1 << (pfmt.GreenShift);
-//      alpha_mask |= 1 << (pfmt.BlueShift);
-//      alpha_mask = ~alpha_mask;
     G2D->Open (NULL);
   }
   else

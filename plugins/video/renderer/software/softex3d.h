@@ -32,7 +32,7 @@ public:
   csTextureMMSoftware *tex_mm;
 
   csDynamicTextureSoft3D (iBase *iParent);
-  virtual ~csDynamicTextureSoft3D () {};
+  virtual ~csDynamicTextureSoft3D () { Close (); };
 
   virtual bool Initialize (iSystem *iSys);
   virtual iGraphics3D *CreateOffScreenRenderer (iGraphics3D *parent_g3d, 
@@ -40,6 +40,7 @@ public:
      RGBPixel *palette, int pal_size);
 
   virtual void Print (csRect *area);
+  virtual void Close ();
 
   void SetTarget (csTextureMMSoftware *tex_mm);
 };

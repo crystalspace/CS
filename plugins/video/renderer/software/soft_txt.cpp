@@ -289,7 +289,7 @@ void csTextureMMSoftware::DynamicTextureSyncPalette ()
   if (((flags & CS_TEXTURE_DYNAMIC) != CS_TEXTURE_DYNAMIC) ||
      ((flags & CS_TEXTURE_DYNAMIC_SHARE_HINT) == CS_TEXTURE_DYNAMIC_SHARE_HINT))
     return;
-
+  // This texture has its own texture manager.
   // Calculate pal2glob from palette created by the dynamic textures'
   // texture manager which this texture shares.
   remap_texture ();

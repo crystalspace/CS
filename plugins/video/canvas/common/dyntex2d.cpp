@@ -40,7 +40,7 @@ csDynamicTextureSoft2D::csDynamicTextureSoft2D (iSystem *isys) :
 
 csDynamicTextureSoft2D::~csDynamicTextureSoft2D ()
 {
-
+  //  Close ();
 }
 
 iGraphics2D *csDynamicTextureSoft2D::CreateOffScreenCanvas 
@@ -117,9 +117,7 @@ iGraphics2D *csDynamicTextureSoft2D::CreateOffScreenCanvas
 
   pfmt.complete ();
 
-
-
-  // Get the font server
+  // Get the font server, as we've bypassed csGraphics2D::Initialize
   const char *p = System->ConfigGetStr ("FontServer", CS_FUNCID_FONT, 
 					"crystalspace.font.server.csfont");
   FontServer = LOAD_PLUGIN (System, p, CS_FUNCID_FONT, iFontServer);
@@ -145,6 +143,7 @@ void csDynamicTextureSoft2D::Close ()
   // These arrays are shared with the texture, the texture will destroy them.
   Palette = NULL;
   Memory = NULL;
+  // the font server is DecRefed in csGraphics2D
   csGraphics2D::Close ();
 }
 
