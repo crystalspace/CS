@@ -704,11 +704,6 @@ rule Win32Resource
 
 #----------------------------------------------------------------------------
 
-# Implementation note: The --strip-root directives are order-sensitive when the
-# build directory is the same as the source directory, in which case TOP is "."
-# and MSVCGEN_BUILD_ROOT is "./out".  If TOP incorrectly appeared first, then
-# it would invalidate the following --strip-root option since TOP is a prefix
-# of MSVCGEN_BUILD_ROOT.
 actions MsvcProjectGen
 {
   $(RUN_MSVCGEN) \
