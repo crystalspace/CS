@@ -201,7 +201,7 @@ inline void set_le_short (void *buff, short s)
 inline void set_le_long (void *buff, long l)
 {
 #ifdef PROC_NEEDS_STRICT_ALIGNMENT
-  long l = little_endian_long (l);
+  l = little_endian_long (l);
   memcpy (buff, &l, sizeof (l));
 #else
   *((long *)buff) = little_endian_long (l);
