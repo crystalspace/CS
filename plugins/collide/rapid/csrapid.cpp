@@ -137,6 +137,8 @@ struct TriPolygonMesh : public iPolygonMesh
   virtual int GetPolygonCount () { return 1; }
   virtual csMeshedPolygon* GetPolygons () { return poly; }
   virtual void Cleanup () { }
+  virtual bool IsDeformable () const { return false; }
+  virtual uint32 GetChangeNumber () const { return 0; }
 };
 
 SCF_IMPLEMENT_IBASE (TriPolygonMesh)

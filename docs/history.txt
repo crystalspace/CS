@@ -7,6 +7,7 @@ The history order is reversed so that new features are at the top.
 	- Also fixed Doxygen comments in iPolygonMesh for the two new
 	  methods (deformation).
 	- Fixed the unit tester in csgeom for the new methods.
+	- Fixed the rapid plugin for the new methods.
 10-Jan-2002
 	- Made the calling of the movable callbacks safe so that they now
 	  can delete themselves from the movable. This basically amounts
