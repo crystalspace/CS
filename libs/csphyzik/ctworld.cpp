@@ -28,21 +28,21 @@ static ctWorld *gcurrent_world = NULL;
 
 void dydt(real t, const real y[], real dy[] )
 {
-//	assert_goto( gcurrent_world != NULL, "current world NULL in dydt\n", ASSERTFAIL );
-	
-	gcurrent_world->calc_delta_state( t, y, dy ); 
-	
+//  assert_goto( gcurrent_world != NULL, "current world NULL in dydt\n", ASSERTFAIL );
+  
+  gcurrent_world->calc_delta_state( t, y, dy ); 
+  
 //ASSERTFAIL:
-	
+  
 }
 
 ctWorld::ctWorld()
 {
-	ctArticulatedBody::set_joint_friction( DEFAULT_JOINT_FRICTION );
+  ctArticulatedBody::set_joint_friction( DEFAULT_JOINT_FRICTION );
 
   fsm_state = CTWS_NORMAL;
-	// default
-	ode_to_math = new OdeRungaKutta4();
+  // default
+  ode_to_math = new OdeRungaKutta4();
 
   max_state_size = DEFAULT_INIT_MAX_STATE_SIZE;
   y0 = new real[max_state_size];
@@ -54,8 +54,8 @@ ctWorld::ctWorld()
 //!me delete _lists and ode
 ctWorld::~ctWorld()
 {
-	if( ode_to_math ) delete ode_to_math;
-	//!me lists delete here
+  if( ode_to_math ) delete ode_to_math;
+  //!me lists delete here
   delete [] y0;
   delete [] y1;
   delete [] y_save;
@@ -63,17 +63,17 @@ ctWorld::~ctWorld()
 
 void ctWorld::calc_delta_state( real t, const real y[], real dy[] ) 
 {
-	// move data from y array into all entities in this world
-	reintegrate_state( y );
+  // move data from y array into all entities in this world
+  reintegrate_state( y );
 
-	// zero out force accumulator and what-not
-	init_state();
+  // zero out force accumulator and what-not
+  init_state();
 
-	// solve forces and torques of bodies in this world
-	solve( t );
+  // solve forces and torques of bodies in this world
+  solve( t );
 
-	// load all delta step data from bodies into ydot
-	load_delta_state( dy );
+  // load all delta step data from bodies into ydot
+  load_delta_state( dy );
 
 }
 
@@ -82,11 +82,11 @@ void ctWorld::init_state()
 {
 ctPhysicalEntity *pe;
 
-	pe = body_list.get_first();
-	while( pe ){
-		pe->init_state();
-		pe = body_list.get_next();
-	}
+  pe = body_list.get_first();
+  while( pe ){
+    pe->init_state();
+    pe = body_list.get_next();
+  }
 
 }
 
@@ -108,48 +108,48 @@ errorcode ctWorld::evolve( real t0, real t1 )
 long arr_size = 0;
 ctPhysicalEntity *pe = body_list.get_first();
 
-	while( pe ){
-//		if( pe->uses_ODE() ){
-			arr_size +=	pe->get_state_size();
-//		}
-		pe = body_list.get_next();
-	}
+  while( pe ){
+//    if( pe->uses_ODE() ){
+      arr_size += pe->get_state_size();
+//    }
+    pe = body_list.get_next();
+  }
 
-	gcurrent_world = this;
-	
+  gcurrent_world = this;
+  
   if( arr_size > max_state_size ){
     resize_state_vector( arr_size );
   }
 
-	load_state( y0 );
-	
+  load_state( y0 );
+  
   // save this state for posible rewinding
   for( int i = 0; i < arr_size; i++ ){
     y_save[i] = y0[i];
   }
   y_save_size = arr_size;
 
-	if( ode_to_math ){
-		ode_to_math->calc_step( y0, y1, arr_size, t0, t1, dydt );
-	}else{
+  if( ode_to_math ){
+    ode_to_math->calc_step( y0, y1, arr_size, t0, t1, dydt );
+  }else{
     if( fsm_state == CTWS_REWOUND && t1 >= rewound_from ){
       fsm_state = CTWS_NORMAL;
       rewound_from = 0;
     }
-		//!me boom!  no ode, so get out.
-		return WORLD_ERR_NOODE;
-	}
+    //!me boom!  no ode, so get out.
+    return WORLD_ERR_NOODE;
+  }
 
-	reintegrate_state( y1 );
+  reintegrate_state( y1 );
 
-	gcurrent_world = NULL;
-	
+  gcurrent_world = NULL;
+  
   if( fsm_state == CTWS_REWOUND && t1 >= rewound_from ){
     fsm_state = CTWS_NORMAL;
     rewound_from = 0;
   }
 
-	return WORLD_NOERR;
+  return WORLD_NOERR;
 
 }
 
@@ -174,27 +174,27 @@ void ctWorld::solve( real t )
 ctPhysicalEntity *pe;
 ctForce *frc;
 
-	// solve for forces affecting contents of world.  the order matters
+  // solve for forces affecting contents of world.  the order matters
 
-	// first apply all environmental forces of this world to bodies
-	frc = enviro_force_list.get_first();
-	while( frc ){
-		pe = body_list.get_first();
-		while( pe ){
+  // first apply all environmental forces of this world to bodies
+  frc = enviro_force_list.get_first();
+  while( frc ){
+    pe = body_list.get_first();
+    while( pe ){
       if( !(fsm_state == CTWS_REWOUND && (pe->flags & CTF_NOREWIND)) )
-			  pe->apply_given_F( *frc );
-			pe = body_list.get_next();
-		}
+        pe->apply_given_F( *frc );
+      pe = body_list.get_next();
+    }
 
-		frc = enviro_force_list.get_next();
-	}
+    frc = enviro_force_list.get_next();
+  }
 
-	pe = body_list.get_first();
-	while( pe ){
+  pe = body_list.get_first();
+  while( pe ){
     if( !(fsm_state == CTWS_REWOUND && (pe->flags & CTF_NOREWIND)) )
-		  pe->solve(t);
-		pe = body_list.get_next();
-	}
+      pe->solve(t);
+    pe = body_list.get_next();
+  }
 
 }
 
@@ -204,16 +204,16 @@ void ctWorld::load_state( real *state_array )
 {
 ctPhysicalEntity *pe;
 long state_size;
-	pe = body_list.get_first();
-	while( pe ){
+  pe = body_list.get_first();
+  while( pe ){
     if( fsm_state == CTWS_REWOUND && (pe->flags & CTF_NOREWIND) ){
       state_size = pe->get_state_size();
     }else{
-			state_size = pe->set_state( state_array );
+      state_size = pe->set_state( state_array );
     }
-	  state_array += state_size;
-		pe = body_list.get_next();
-	}
+    state_array += state_size;
+    pe = body_list.get_next();
+  }
 
 }
 
@@ -222,16 +222,16 @@ void ctWorld::reintegrate_state( const real *state_array )
 {
 ctPhysicalEntity *pe;
 long state_size;
-	pe = body_list.get_first();
-	while( pe ){
+  pe = body_list.get_first();
+  while( pe ){
     if( fsm_state == CTWS_REWOUND && (pe->flags & CTF_NOREWIND) ){
       state_size = pe->get_state_size();
     }else{
-			state_size = pe->get_state( state_array );
-			state_array += state_size;
-		}
-		pe = body_list.get_next();
-	}
+      state_size = pe->get_state( state_array );
+      state_array += state_size;
+    }
+    pe = body_list.get_next();
+  }
 
 }
 
@@ -240,16 +240,16 @@ void ctWorld::load_delta_state( real *state_array )
 {
 ctPhysicalEntity *pe;
 long state_size;
-	pe = body_list.get_first();
-	while( pe ){
-		if( fsm_state == CTWS_REWOUND && (pe->flags & CTF_NOREWIND) ){
+  pe = body_list.get_first();
+  while( pe ){
+    if( fsm_state == CTWS_REWOUND && (pe->flags & CTF_NOREWIND) ){
       state_size = pe->get_state_size();
     }else{
-			state_size = pe->set_delta_state( state_array );
-			state_array += state_size;
-		}
-		pe = body_list.get_next();
-	}
+      state_size = pe->set_delta_state( state_array );
+      state_array += state_size;
+    }
+    pe = body_list.get_next();
+  }
 
 }
 
@@ -258,12 +258,12 @@ long state_size;
 //!me should consolodate these three methods, they do the same thing.
 errorcode ctWorld::add_physicalentity( ctPhysicalEntity *pe )
 {
-	if( pe ){
-		body_list.add_link( pe );
-		return WORLD_NOERR;
-	}else{
-		return WORLD_ERR_NULLPARAMETER;
-	}
+  if( pe ){
+    body_list.add_link( pe );
+    return WORLD_NOERR;
+  }else{
+    return WORLD_ERR_NULLPARAMETER;
+  }
 }
 
 
@@ -271,44 +271,44 @@ errorcode ctWorld::add_physicalentity( ctPhysicalEntity *pe )
 // add a rigidbody to this world
 errorcode ctWorld::add_rigidbody( ctRigidBody *rb )
 {
-	if( rb ){
-		body_list.add_link( rb );
-		return WORLD_NOERR;
-	}else{
-		return WORLD_ERR_NULLPARAMETER;
-	}
+  if( rb ){
+    body_list.add_link( rb );
+    return WORLD_NOERR;
+  }else{
+    return WORLD_ERR_NULLPARAMETER;
+  }
 }
 
 // add an articulated body to this world. 
 errorcode ctWorld::add_articulatedbodybase( ctArticulatedBody *ab )
 {
-	if( ab ){
-		body_list.add_link( ab );
-		return WORLD_NOERR;
-	}else{
-		return WORLD_ERR_NULLPARAMETER;
-	}
+  if( ab ){
+    body_list.add_link( ab );
+    return WORLD_NOERR;
+  }else{
+    return WORLD_ERR_NULLPARAMETER;
+  }
 }
 
 
 errorcode ctWorld::add_enviro_force( ctForce *f )
 {
-	if( f ){
-		enviro_force_list.add_link( f );
-		return WORLD_NOERR;
-	}else{
-		return WORLD_ERR_NULLPARAMETER;
-	}
+  if( f ){
+    enviro_force_list.add_link( f );
+    return WORLD_NOERR;
+  }else{
+    return WORLD_ERR_NULLPARAMETER;
+  }
 }
 
 errorcode ctWorld::delete_articulatedbody( ctArticulatedBody *pbase )
 {
-	if( pbase ){
-		body_list.delete_link( pbase );
-		return WORLD_NOERR;
-	}else{
-		return WORLD_ERR_NULLPARAMETER;
-	}
+  if( pbase ){
+    body_list.delete_link( pbase );
+    return WORLD_NOERR;
+  }else{
+    return WORLD_ERR_NULLPARAMETER;
+  }
 }
 
 
@@ -317,10 +317,10 @@ void ctWorld::apply_fuction_to_body_list( void(*fcn)( ctPhysicalEntity *ppe ) )
 {
 ctPhysicalEntity *pe;
 
-	pe = body_list.get_first();
-	while( pe ){
-		fcn( pe );
-		pe = body_list.get_next();
-	} 
+  pe = body_list.get_first();
+  while( pe ){
+    fcn( pe );
+    pe = body_list.get_next();
+  } 
 
 }
