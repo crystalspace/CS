@@ -6,6 +6,20 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+18-Feb-2005
+	- Jorrit worked further on PVSCalc:
+	    - Some small fixes on kdtree building.
+	    - If the two children are invisible then the node itself
+	      is automatically marked invisible too.
+	    - Added a test so that solid splits (a split where an
+	      axis aligned polygon completely covers the node cut) get
+	      a higher quality.
+	- Jorrit added support for %b (box) and %v (vector3) to csPrintf.
+	  So now you can print out a vector and a 3D box like this:
+	    csPrintf ("box %b, vector %v\n", &box, &vector);
+	  For printing out a 2D vector or a 2D box you can use %2b and
+	  %2v. Unfortunatelly using %b and %v cause compiler warnings.
+	  Don't know how to avoid that yet.
 17-Feb-2005
 	- Jorrit added csPoly3D::ClassifyAxis().
 	- Jorrit added constants CS_AXIS_X, CS_AXIS_Y, and CS_AXIS_Z, to

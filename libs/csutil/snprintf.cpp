@@ -90,6 +90,10 @@
 #include <float.h>
 #endif
 
+#include "csgeom/vector2.h"
+#include "csgeom/vector3.h"
+#include "csgeom/box.h"
+
 typedef enum {
     NO = 0, YES = 1
 } boolean_e;
@@ -891,7 +895,6 @@ int ap_vformatter(int (*flush_func)(ap_vformatter_buff *),
 		    prefix_char = ' ';
 		break;
 
-
 	    case 'o':
 		if (var_type == IS_QUAD) {
 		    ui_quad = va_arg(ap, u_widest_int);
@@ -941,6 +944,82 @@ int ap_vformatter(int (*flush_func)(ap_vformatter_buff *),
 		}
 		break;
 
+
+	    case 'v':
+	        {
+		    static char buf[200];
+		    if (min_width == 2)
+		    {
+		        csVector2* v = va_arg(ap, csVector2*);
+		        if (v)
+		        {
+		            sprintf (buf, "%g,%g", v->x, v->y);
+			    s = buf;
+			    s_len = strlen (buf);
+		        }
+		        else
+		        {
+		            s = S_NULL;
+		            s_len = S_NULL_LEN;
+		        }
+		    }
+		    else
+		    {
+		        csVector3* v = va_arg(ap, csVector3*);
+		        if (v)
+		        {
+		            sprintf (buf, "%g,%g,%g", v->x, v->y, v->z);
+			    s = buf;
+			    s_len = strlen (buf);
+		        }
+		        else
+		        {
+		            s = S_NULL;
+		            s_len = S_NULL_LEN;
+		        }
+		    }
+		}
+		pad_char = ' ';
+	    	break;
+
+	    case 'b':
+	        {
+		    static char buf[200];
+		    if (min_width == 2)
+		    {
+		        csBox2* v = va_arg(ap, csBox2*);
+		        if (v)
+		        {
+		            sprintf (buf, "(%g,%g)-(%g,%g)", v->MinX (), v->MinY (),
+				    v->MaxX (), v->MaxY ());
+			    s = buf;
+			    s_len = strlen (buf);
+		        }
+		        else
+		        {
+		            s = S_NULL;
+		            s_len = S_NULL_LEN;
+		        }
+		    }
+		    else
+		    {
+		        csBox3* v = va_arg(ap, csBox3*);
+		        if (v)
+		        {
+		            sprintf (buf, "(%g,%g,%g)-(%g,%g,%g)", v->MinX (), v->MinY (), v->MinZ (),
+				    v->MaxX (), v->MaxY (), v->MaxZ ());
+			    s = buf;
+			    s_len = strlen (buf);
+		        }
+		        else
+		        {
+		            s = S_NULL;
+		            s_len = S_NULL_LEN;
+		        }
+		    }
+		}
+		pad_char = ' ';
+	    	break;
 
 	    case 's':
 		s = va_arg(ap, char *);

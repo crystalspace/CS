@@ -21,11 +21,11 @@
 CS_IMPLEMENT_APPLICATION
 
 #undef DB
-//#define DB(x) printf x
+//#define DB(x) csPrintf x
 #define DB(x)
 
 #undef DBA
-#define DBA(x) printf x
+#define DBA(x) csPrintf x
 
 //-----------------------------------------------------------------------------
 
@@ -202,7 +202,6 @@ float PVSCalcSector::FindBestSplitLocation (float from, float to, float& where,
 {
   // Calculate center
   where = from + (to-from) * 0.5;
-#if 0
   float best_dist = 1000000.0;
   float best_where = where;
   size_t i;
@@ -210,7 +209,6 @@ float PVSCalcSector::FindBestSplitLocation (float from, float to, float& where,
   for (i = 0 ; i < axis_polylist.Length () ; i++)
   {
     float awhere = axis_polylist[i].GetWhere ();
-    printf ("i=%d awhere=%g\n", i, awhere); fflush (stdout);
     if (awhere > from+EPSILON && awhere < to-EPSILON
     	&& fabs (awhere-where) < best_dist)
     {
@@ -219,7 +217,6 @@ float PVSCalcSector::FindBestSplitLocation (float from, float to, float& where,
     }
   }
   where = best_where;
-#endif
   return to-from;
 }
 
@@ -240,6 +237,25 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
     return FindBestSplitLocation (max2, min1, where, axis_polylist);
   }
   return -1.0;
+}
+
+/*
+ * Make a 2D slice out of a 3D polygon.
+ */
+static void SlicePolygon (const csPoly3D& poly, csPoly2D& slice, int axis)
+{
+  size_t j;
+  slice.SetVertexCount (poly.GetVertexCount ());
+  for (j = 0 ; j < poly.GetVertexCount () ; j++)
+  {
+    const csVector3& v = poly[j];
+    switch (axis)
+    {
+      case CS_AXIS_X: slice[j].x = v.y; slice[j].y = v.z; break;
+      case CS_AXIS_Y: slice[j].x = v.x; slice[j].y = v.z; break;
+      case CS_AXIS_Z: slice[j].x = v.x; slice[j].y = v.y; break;
+    }
+  }
 }
 
 float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
@@ -272,6 +288,11 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
 
   // @@@ Is the routine below very efficient?
 # define FBSL_ATTEMPTS 50
+
+  //------------------
+  // In the first pass we try a number of fixed planes and calculate
+  // quality for those.
+  //------------------
   float a;
   float best_qual = -2.0;
   float inv_num_objects = 1.0 / float (boxlist.Length ());
@@ -316,7 +337,18 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
     }
   }
 
-  // Also try to calculate quality for all axis aligned planes.
+  //------------------
+  // In the second pass we calculate quality for all axis aligned
+  // planes.
+  //------------------
+
+  // We get a 2D slide from the node box here. We do axis * 2
+  // because GetSide() expects a side and not an axix.
+  csBox2 box_slice = node_bbox.GetSide (axis * 2);
+  csPoly2D slice;
+
+  mina = node_bbox.Min (axis);
+  maxa = node_bbox.Max (axis);
   for (i = 0 ; i < axis_polylist.Length () ; i++)
   {
     // Calculate a possible split location.
@@ -350,9 +382,25 @@ float PVSCalcSector::FindBestSplitLocation (int axis, float& where,
     }
     else
     {
+      // Now we check if this axis aligned polygon happens to cover
+      // the entire split. In that case it is a very good splitter to
+      // use and we increase the quality a lot.
+      csPoly3DBox* poly = axis_polylist[i].GetPoly ();
+      SlicePolygon (*poly, slice, axis);
+      bool solid =
+      	slice.In (box_slice.GetCorner (CS_BOX_CORNER_xy)) &&
+      	slice.In (box_slice.GetCorner (CS_BOX_CORNER_Xy)) &&
+      	slice.In (box_slice.GetCorner (CS_BOX_CORNER_xY)) &&
+      	slice.In (box_slice.GetCorner (CS_BOX_CORNER_XY));
+
       float qual_cut = 1.0 - (float (cut) * inv_num_objects);
       float qual_balance = 1.0 - (float (ABS (left-right)) * inv_num_objects);
       qual = .6 + (6.0 * qual_cut + qual_balance);	// Bonus for using axis plane.
+      if (solid)
+      {
+        qual += 5.0f;	// Very high bonus!
+	DBA(("SOLID\n"));
+      }
     }
     if (qual > best_qual)
     {
@@ -931,9 +979,8 @@ bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
   plane.offset = bbox.Min ();
   plane.scale.x = float (DIM_COVBUFFER) / (bbox.MaxX ()-bbox.MinX ());
   plane.scale.y = float (DIM_COVBUFFER) / (bbox.MaxY ()-bbox.MinY ());
-  DB(("  Hull box: (%g,%g)-(%g,%g) scale=%g,%g offset=%g,%g\n",
-  	bbox.MinX (), bbox.MinY (), bbox.MaxX (), bbox.MaxY (),
-	plane.scale.x, plane.scale.y, plane.offset.x, plane.offset.y));
+  DB(("  Hull box: %2b scale=%2v offset=%2v\n", &bbox,
+	&plane.scale, &plane.offset));
 
   // Clear the coverage buffer.
   plane.covbuf->Initialize ();
@@ -945,10 +992,10 @@ bool PVSCalcSector::SetupProjectionPlane (const csBox3& source,
   DB(("  Hull:\n"));
   for (i = 0 ; i < (size_t)hull_points ; i++)
   {
-    DB(("    N:%d (%g,%g)\n", i, hull[i].x, hull[i].y));
+    DB(("    N:%d (%2v)\n", i, &hull[i]));
     hull[i].x = (hull[i].x-plane.offset.x) * plane.scale.x;
     hull[i].y = (hull[i].y-plane.offset.y) * plane.scale.y;
-    DB(("    C:%d (%g,%g)\n", i, hull[i].x, hull[i].y));
+    DB(("    C:%d (%2v)\n", i, &hull[i]));
   }
   plane.covbuf->InsertPolygonInvertedNoDepth (hull, hull_points);
 
@@ -972,7 +1019,7 @@ bool PVSCalcSector::CastAreaShadow (const csBox3& source,
   size_t j;
   for (j = 0 ; j < polygon.GetVertexCount () ; j++)
   {
-    DB((" (%g,%g,%g)", polygon[j].x, polygon[j].y, polygon[j].z));
+    DB((" (%v)", &polygon[j]));
   }
   DB(("\n"));
 
@@ -1020,7 +1067,7 @@ bool PVSCalcSector::CastAreaShadow (const csBox3& source,
   {
     pi_verts[i].x = (pi_verts[i].x-plane.offset.x) * plane.scale.x;
     pi_verts[i].y = (pi_verts[i].y-plane.offset.y) * plane.scale.y;
-    DB((" (%g,%g)", pi_verts[i].x, pi_verts[i].y));
+    DB((" (%2v)", &pi_verts[i]));
   }
   DB(("\n"));
   int nummod = plane.covbuf->InsertPolygonNoDepth (
@@ -1104,19 +1151,19 @@ bool PVSCalcSector::NodesSurelyVisible (const csBox3& source,
   return false;
 }
 
-void PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
+bool PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
 	PVSCalcNode* destnode,
 	csSet<PVSCalcNode*>& invisible_nodes)
 {
   // If sourcenode is equal to node then visibility is obvious. In that
   // case we don't proceed since all children of node will also be visible
   // (since they are contained in sourcenode then).
-  if (sourcenode == destnode) return;
+  if (sourcenode == destnode) return false;
 
   // If the destination node is already in the set of invisible nodes
   // then we don't have to proceed either. That means that the destination
   // node is invisible for one of the parents of the sourcenode.
-  if (invisible_nodes.In (destnode)) return;
+  if (invisible_nodes.In (destnode)) return true;
 
   // If the PVS of the destination node is already calculated and this node
   // was invisible for the destination node then we can use symmetry. i.e.
@@ -1143,7 +1190,7 @@ void PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
 
       // If the destination node is invisible that automatically implies
       // that the children are invisible too. No need to recurse further.
-      return;
+      return true;
     }
   }
 
@@ -1157,17 +1204,8 @@ void PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
   // traversing to the children so we only skip the testing part.
   if (!dest.Overlap (source))
   {
-    DB(("\nTEST (%g,%g,%g)-(%g,%g,%g) -> (%g,%g,%g)-(%g,%g,%g)\n",
-	source.MinX (), source.MinY (), source.MinZ (),
-	source.MaxX (), source.MaxY (), source.MaxZ (),
-	dest.MinX (), dest.MinY (), dest.MinZ (),
-	dest.MaxX (), dest.MaxY (), dest.MaxZ ()));
+    DB(("\nTEST %b -> %b\n", &source, &dest));
 
-    //float pz = 5;
-    //if ((source.MaxZ()<pz && dest.MinZ()>pz) || (source.MinZ()>pz && dest.MaxZ()<pz))
-      //printf ("####################################################\n");
-    //else
-      //printf ("----------------------------------------------------\n");
     // First we do a trivial test to see if the nodes can surely see each
     // other.
     if (!NodesSurelyVisible (source, dest))
@@ -1177,6 +1215,12 @@ void PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
       // children.
       if (SetupProjectionPlane (source, dest))
       {
+      	// Before filling coverage buffer with relevant polygons
+	// we first try to fill it with the relevant axis aligned polygons
+	// that are on the destination node.
+	// @@@ TODO
+
+	// Try to fill coverage buffer with all relevant polygons.
         int level = CastShadowsUntilFull (source);
         if (level == 1)
         {
@@ -1188,11 +1232,7 @@ void PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
 	  int destrep = destnode->represented_nodes;
           total_invisnodes += destrep;
 	  DBA(("%d ", destrep));
-          DB(("Marked invisible (%g,%g,%g)-(%g,%g,%g) to (%g,%g,%g)-(%g,%g,%g)\n",
-    	    source.MinX (), source.MinY (), source.MinZ (),
-    	    source.MaxX (), source.MaxY (), source.MaxZ (),
-    	    dest.MinX (), dest.MinY (), dest.MinZ (),
-    	    dest.MaxX (), dest.MaxY (), dest.MaxZ ()));
+          DB(("Marked invisible %b to %b\n", &source, &dest));
 
 	  // If visibility for the destination node was already calculated
 	  // and we are here then that means that this node was considered visible
@@ -1214,7 +1254,7 @@ void PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
 
           // If the destination node is invisible that automatically implies
           // that the children are invisible too. No need to recurse further.
-          return;
+          return true;
         }
       }
     }
@@ -1226,9 +1266,22 @@ void PVSCalcSector::RecurseDestNodes (PVSCalcNode* sourcenode,
   // full. This means that we have to proceed to test visibility for the
   // children of the destination node.
   if (destnode->child1)
-    RecurseDestNodes (sourcenode, destnode->child1, invisible_nodes);
-  if (destnode->child2)
-    RecurseDestNodes (sourcenode, destnode->child2, invisible_nodes);
+  {
+    bool vis1 = RecurseDestNodes (sourcenode, destnode->child1, invisible_nodes);
+    bool vis2 = RecurseDestNodes (sourcenode, destnode->child2, invisible_nodes);
+    if (vis1 && vis2)
+    {
+      // Both children are invisible. Then we mark this node invisible too.
+      pvstree->MarkInvisible (sourcenode->node, destnode->node);
+      sourcenode->invisible_nodes.Add (destnode);
+      total_invisnodes++;
+      DBA(("P%d ", 1));
+      DB(("Marked invisible children\n"));
+      return true;
+    }
+  }
+
+  return false;
 }
 
 void PVSCalcSector::RecurseSourceNodes (PVSCalcNode* sourcenode,

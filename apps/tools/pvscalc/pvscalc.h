@@ -387,9 +387,10 @@ private:
   /**
    * Find all invisible nodes for the given source node by recursively
    * traversing the destination node. This will update the set of
-   * invisible nodes.
+   * invisible nodes. This function returns true if the dest node was
+   * found invisible. Otherwise false.
    */
-  void RecurseDestNodes (PVSCalcNode* sourcenode, PVSCalcNode* destnode,
+  bool RecurseDestNodes (PVSCalcNode* sourcenode, PVSCalcNode* destnode,
 	csSet<PVSCalcNode*>& invisible_nodes);
 
 
