@@ -24,125 +24,189 @@
 #include "iutil/comp.h"
 #include "csutil/typedvec.h"
 #include "csgeom/quaterni.h"
-#include "csgeom/matrix3.h"
 
 struct csMotionFrame
 {
-  int keyframe;
-
-  int *qlinks;
-  int numqlinks;
-  unsigned int *qaffector;
-
-  int *mlinks;
-  int nummlinks;
-  unsigned int *maffector;
-
-  int *vlinks;
-  int numvlinks;
-  unsigned int *vaffector;
+  float frametime;
+  csVector3 pos;
+  csQuaternion rot;
 };
 
-struct csAppliedFrame
+class csMotionBone
 {
-  csTicks keyframe;
+public:
+  char *name;
+  unsigned int hash;
 
-  csQuaternion **qlinks;
-  int numqlinks;
-  iSkeletonBone **qaffector;
-
-  csMatrix3 **mlinks;
-  int nummlinks;
-  iSkeletonBone **maffector;
-
-  csVector3 **vlinks;
-  int numvlinks;
-  iSkeletonBone **vaffector;
-};
-
-struct csFrameSet
-{
-  unsigned int name;
-  int numframes;
   csMotionFrame *frames;
+  int framecount;
+
+  csMotionBone():name(NULL), hash(0), frames(NULL), framecount(0) {}
+
+  unsigned int GetHash() { return hash; }
+  char* GetName() { return name; }
+
+  void SelectFrameForTime(float time, float *weight, int *curframe, int *nextframe);
+  void Animate(float time, csVector3 &v, csQuaternion &q, bool interpolate);
 };
 
-CS_DECLARE_TYPED_VECTOR( csAppliedFrameVector, csAppliedFrame );
+CS_DECLARE_TYPED_VECTOR( csMotionBoneVectorBase, csMotionBone );
+class csMotionBoneVector : public csMotionBoneVectorBase
+{
+public:
+  csMotionBoneVector (int ilimit = 0, int ithreshold = 0) 
+    : csMotionBoneVectorBase(ilimit, ithreshold) {}
+  virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
+    { unsigned int id1 = ((csMotionBone*)Item1)->GetHash(), id2 = ((csMotionBone*)Item2)->GetHash();
+      return id1 - id2; }
 
-class csMotion : public iMotion
+  virtual int CompareKey (csSome Item1, csConstSome Key, int /*Mode*/) const
+    { unsigned int id1 = ((csMotionBone*)Item1)->GetHash(), id2 = (unsigned int)Key; return id1 - id2; }
+
+  virtual bool FreeItem (csSome Item) {
+    delete (csMotionBone*)Item; return true;
+  }
+};
+
+class csMotionTemplate : public iMotionTemplate
 {
 public:
   char* name;
   unsigned int hash;
 
-  csQuaternion* transquat;
-  int numtransquat;
-  
-  csMatrix3* transmat;
-  int numtransmat;
-  
-  csVector3* translate;
-  int numtranslate;
+  float duration;
+  int loopcount;
+  bool loopflip;
 
-  CS_DECLARE_TYPED_VECTOR( csFrameSetVector, csFrameSet ) framesets;
+  csMotionBoneVector bones;
 
   SCF_DECLARE_IBASE;
 
-  csMotion();
-  virtual ~csMotion();
-  virtual const char* GetName ();
-  virtual void SetName (const char* name); 
-  virtual bool AddAnim (const csQuaternion &quat);
-  virtual bool AddAnim (const csMatrix3 &mat);
-  virtual bool AddAnim (const csVector3 &vec);
-  virtual void AddFrameSet( const char *name );
-  virtual int AddFrame (int frametime);
-  virtual void AddFrameQLink (int frameindex, const char* affector, int link);
-  virtual void AddFrameMLink (int frameindex, const char* affector, int link);
-  virtual void AddFrameVLink (int frameindex, const char* affector, int link);
+  csMotionTemplate();
+  virtual ~csMotionTemplate();
+
+  void SetName (const char* name); 
   unsigned int GetHash() { return hash; }
+
+  virtual const char* GetName ();
+  virtual void SetDuration (float duration);
+  virtual void SetLoopCount (int loopcount);
+  virtual void SetLoopFlip (bool enable);
+
+  virtual int AddBone (const char* name);
+  virtual int FindBoneByName (const char* name);
+
+  virtual void AddFrameBone (int boneid, float frametime, const csVector3 &v, const csQuaternion &q);
 };
 
-CS_DECLARE_TYPED_VECTOR(csMotionVectorBase, csMotion);
-
-class csMotionVector : public csMotionVectorBase
+CS_DECLARE_TYPED_VECTOR( csMotionTemplateVectorBase, csMotionTemplate );
+class csMotionTemplateVector : public csMotionTemplateVectorBase
 {
 public:
-  csMotionVector (int ilimit = 8, int ithreshold = 16) 
-    : csMotionVectorBase(ilimit, ithreshold) {}
+  csMotionTemplateVector (int ilimit = 8, int ithreshold = 16) 
+    : csMotionTemplateVectorBase(ilimit, ithreshold) {}
   virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
-    { int id1 = ((csMotion*)Item1)->GetHash(), id2 = ((csMotion*)Item2)->GetHash();
+    { unsigned int id1 = ((csMotionTemplate*)Item1)->GetHash(), id2 = ((csMotionTemplate*)Item2)->GetHash();
       return id1 - id2; }
 
   virtual int CompareKey (csSome Item1, csConstSome Key, int /*Mode*/) const
-    { int id1 = ((csMotion*)Item1)->GetHash(), id2 = (unsigned int)Key; return id1 - id2; }
+    { unsigned int id1 = ((csMotionTemplate*)Item1)->GetHash(), id2 = (unsigned int)Key; return id1 - id2; }
+
+  virtual bool FreeItem (csSome Item) {
+    ((csMotionTemplate*)Item)->DecRef(); return true;
+  }
 };
 
-struct csAppliedMotion
+class csMotionStackItem {
+public:
+  csMotionTemplate *motion;
+
+  float frametime;
+  float rate;
+
+  int loopcount;
+  bool loopflip;
+
+  csMotionStackItem(csMotionTemplate *Tmotion);
+  ~csMotionStackItem();
+
+  void DoLoop();
+  bool Update(float timedelta);
+};
+
+CS_DECLARE_TYPED_VECTOR( csMotionStackVectorBase, csMotionStackItem );
+class csMotionStackVector : public csMotionStackVectorBase
 {
-  iSkeletonBone *skel;
-  csMotion* curmotion;
-  int curframeset;
-  int curtime;
-  int totaltime;  // Total time for complete cycle
-  int numframes;
-  int curframe;
-  int nextframe;
-  bool Loop;
-  bool Sweep;
-  float Rate;
-  csAppliedFrameVector frames;
+public:
+  csMotionStackVector (int ilimit = 0, int ithreshold = 0) 
+    : csMotionStackVectorBase(ilimit, ithreshold) {}
+  virtual bool FreeItem (csSome Item) {
+    delete (csMotionStackItem*)Item; return true;
+  }
 };
 
-CS_DECLARE_TYPED_VECTOR_NODELETE(csAppliedMotionVector,csAppliedMotion); 
+#define MAX_MOTION_PER_BONE 12
+struct csMotionBoneCacheItem {
+  unsigned int hash;
+  iSkeletonBone *bone;
+  int nummotions;
+  unsigned short stacks[MAX_MOTION_PER_BONE];
+  unsigned short boneids[MAX_MOTION_PER_BONE];
+};
+
+class csMotionController : public iMotionController {
+  iSkeletonBone* skel;
+
+  bool paused;
+
+  csMotionStackVector stack;
+  bool stackchanged;
+
+  csMotionBoneCacheItem* bonecache;
+  int bonecachesize;
+  int bonecachelimit;
+public:
+  SCF_DECLARE_IBASE;
+
+  csMotionController(iSkeletonBone* Tskel);
+  virtual ~csMotionController();
+
+  iSkeletonBone* GetSkeleton() { return skel; }
+  void Update(float timedelta);
+  void RecalculateBoneCache();
+  bool AddToBoneCache(unsigned int hash, int stack, int bone);
+  void Animate();
+
+  virtual void SetMotion(iMotionTemplate *motion);
+  virtual void BlendMotion(iMotionTemplate *motion);
+  virtual void Pause(bool enable);
+};
+
+CS_DECLARE_TYPED_VECTOR( csMotionControllerVectorBase, csMotionController );
+class csMotionControllerVector : public csMotionControllerVectorBase
+{
+public:
+  csMotionControllerVector (int ilimit = 8, int ithreshold = 16) 
+    : csMotionControllerVectorBase(ilimit, ithreshold) {}
+  virtual int Compare (csSome Item1, csSome Item2, int /*Mode*/) const
+    { unsigned int id1 = (int)((csMotionController*)Item1)->GetSkeleton(), id2 = (unsigned int)((csMotionController*)Item2)->GetSkeleton();
+      return id1 - id2; }
+
+  virtual int CompareKey (csSome Item1, csConstSome Key, int /*Mode*/) const
+    { unsigned int id1 = (int)((csMotionController*)Item1)->GetSkeleton(), id2 = (unsigned int)Key; return id1 - id2; }
+
+  virtual bool FreeItem (csSome Item) {
+    ((csMotionController*)Item)->DecRef(); return true;
+  }
+};
 
 class csMotionManager : public iMotionManager
 {
-  csMotionVector motions;
-  csAppliedMotionVector skels;
-  csAppliedMotionVector cache;
   csTicks oldtime;
-  bool slerp;
+  
+  csMotionTemplateVector motions;
+  csMotionControllerVector controllers;
+
   iObjectRegistry* object_reg;
   
 public:
@@ -152,81 +216,34 @@ public:
   virtual ~csMotionManager();
 
   virtual bool Initialize (iObjectRegistry *object_reg);
-  virtual iMotion* FindByName (const char* name)
-  {
-    return FindClassByName(name);  
-  }
-  virtual iMotion* AddMotion (const char* name);
-  virtual void DeleteMotion (const char* name );
-  
-  /**
-   * Apply motion returns an index to the new motion for use with the motion
-   * control API If the cache flag is set then the compiled motion is cached
-   * rather than being active.
-   */
-  virtual int ApplyMotion(iSkeletonBone *skel, const char* motion, 
-	const char *frameset, bool loop, bool sweep, float rate, 
-	int start_time, bool cache);
-	
-  /**
-   * If the skeletal structure for a sprite is modified, then the compiled will
-   * become invalid.  Recompile motion 'purifies' the motion so that it can be
-   * used with the sprite again.  This applies to active sprites as well.  This
-   * assumes the sprite in question still exists.
-   */
-  virtual void RecompileMotion( int idx, bool cached );
 
-  /// Reserve motion takes an active motion and places it on the cached list.
-  virtual int ReserveMotion( int idx );
-  /// Restore motion takes a cached motion and places it on the active list.
-  virtual int RestoreMotion( int idx );
-  /**
-   * Delete motion.  If cache is true then the motion is delete from the cached
-   * list otherwise it is deleted from the active motions list.
-   */
-  virtual void DeleteAppliedMotion( int motion_index, bool cache);
-  
-  virtual void SetActiveMotion( int idx, bool loop, bool sweep, float rate ) 
-  { 
-	skels[idx]->Loop = loop;
-	skels[idx]->Sweep = sweep;
-	skels[idx]->Rate = rate;
+  csMotionTemplate* FindMotionTemplateByName (const char* name);
+  csMotionTemplate* AddMotionTemplate (const char* name);
+
+  csMotionController* FindMotionControllerBySkeleton (iSkeletonBone *skel);
+  csMotionController* AddMotionController (iSkeletonBone *skel);
+
+  void UpdateController(csMotionController *controller, float timedelta);
+
+  virtual iMotionTemplate* AddMotion (const char* name) {
+    return AddMotionTemplate(name);
   }
-  virtual void SetCachedMotion( int idx, bool loop, bool sweep, float rate, int time )
-  {
-	cache[idx]->Loop = loop;
-	cache[idx]->Sweep = sweep;
-	cache[idx]->Rate = rate;
-	cache[idx]->curtime = time;
+  virtual void DeleteMotion (iMotionTemplate* motiontemp);
+  virtual iMotionTemplate* FindMotionByName (const char* name) {
+    return FindMotionTemplateByName(name);
   }
-  
-  virtual void SetReverse( int idx ) { skels[idx]->Rate = -skels[idx]->Rate; }
-  virtual void SetLoop( int idx, bool loop ) { skels[idx]->Loop = loop; }
-  virtual void SetSweep( int idx, bool sweep ) { skels[idx]->Sweep = sweep; }
-  virtual void SetRate( int idx, float rate) { skels[idx]->Rate = rate; }
-  virtual void SetTime( int idx, int time) { skels[idx]->curtime = time; }
-  virtual bool GetLoop( int idx ) { return skels[idx]->Loop; }
-  virtual bool GetSweep( int idx ) { return skels[idx]->Sweep; }
-  virtual float GetRate( int idx ) { return skels[idx]->Rate; }
-  virtual int GetTime( int idx ) { return skels[idx]->curtime; }
-  virtual bool IsFirst( int idx ) { return !(skels[idx]->curframe); }
-  virtual bool IsLast( int idx ) 
-  { return !(skels[idx]->numframes - skels[idx]->curframe - 1); }
-  virtual void UpdateAll();
-  virtual void UpdateAll(int time);
-  virtual void SetSlerp( bool setting ) { slerp = setting; }
-  csMotion* FindClassByName (const char* name);
-  void UpdateTransform(iSkeletonBone *bone, csQuaternion *quat);
-  void UpdateTransform(iSkeletonBone *bone, csQuaternion *quat1, 
-		csQuaternion *quat2, float ratio );
-  void UpdateTransform(iSkeletonBone *bone, csMatrix3 *mat);
-  void UpdateTransform(iSkeletonBone *bone, csVector3 *vec);
-  void UpdateTransform(iSkeletonBone *bone, csVector3 vec, 
-		csVector3 vec2, float ratio );
-  void UpdateAppliedFrame(csAppliedFrame *fr);
-  void UpdateAppliedFrame(csAppliedFrame *fr, csAppliedFrame *next, float ratio);
-  bool UpdateAppliedMotion(csAppliedMotion *am, csTicks elapsedtime);
-  void CompileMotion( csAppliedMotion *motion );
+
+  virtual iMotionController* AddController (iSkeletonBone *skel) {
+    return AddMotionController(skel);
+  }
+  virtual void DeleteController (iMotionController *inst);
+  virtual iMotionController* FindControllerBySkeleton (iSkeletonBone *skel) {
+    return FindMotionControllerBySkeleton(skel);
+  }
+
+  virtual void UpdateAll ( float timedelta );
+  virtual void UpdateAll ( unsigned int curtime );
+  virtual void UpdateAll ();
 
   struct eiComponent : public iComponent
   {
@@ -237,6 +254,6 @@ public:
 };
 
 iSkeletonBone *csFindBone( iSkeletonBone *bone, unsigned int hash );
-int csFindFrameSet( csMotion *mot, unsigned int hash );
 
 #endif
+

@@ -21,6 +21,7 @@
 #include "cssys/sysfunc.h"
 #include "csgeom/math3d.h"
 #include "csgeom/matrix3.h"
+#include "csgeom/quaterni.h"
 #include "csgeom/transfrm.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
@@ -67,6 +68,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MATERIAL)
   CS_TOKEN_DEF (MATRIX)
   CS_TOKEN_DEF (MIXMODE)
+  CS_TOKEN_DEF (Q)
   CS_TOKEN_DEF (ROT)
   CS_TOKEN_DEF (ROT_X)
   CS_TOKEN_DEF (ROT_Y)
@@ -180,6 +182,12 @@ bool csSprite3DFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
+static bool load_quaternion (char* buf, csQuaternion &q)
+{
+  csScanStr (buf, "%f,%f,%f,%f", &q.x, &q.y, &q.z, &q.r);
+  return true;
+}
+
 static bool load_matrix (iReporter* reporter, char* buf, csMatrix3 &m)
 {
   CS_TOKEN_TABLE_START(commands)
@@ -192,6 +200,7 @@ static bool load_matrix (iReporter* reporter, char* buf, csMatrix3 &m)
     CS_TOKEN_TABLE (SCALE_Y)
     CS_TOKEN_TABLE (SCALE_Z)
     CS_TOKEN_TABLE (SCALE)
+    CS_TOKEN_TABLE (Q)
   CS_TOKEN_TABLE_END
 
   char* params;
@@ -261,6 +270,12 @@ static bool load_matrix (iReporter* reporter, char* buf, csMatrix3 &m)
 		"Badly formed scale '%s'!", params);
 	  return false;
 	}
+        break;
+      case CS_TOKEN_Q:
+        csQuaternion quat;
+        load_quaternion(params, quat);
+        csMatrix3 quatmat(quat);
+        m*=quatmat;
         break;
     }
   }
@@ -1043,7 +1058,16 @@ iBase* csSprite3DLoader::Parse (const char* string, iMaterialList* matlist,
 		"The skeleton has no bones!");
 	    return NULL; 
 	  }
-	  motman->ApplyMotion( bone, name, str, true, false, 1.0, 0, false);
+          iMotionTemplate* motion=motman->FindMotionByName(str);
+	  if (!motion)
+	  {
+      	    ReportError (reporter,
+		"crystalspace.sprite3dloader.parse.motion.nomotion",
+		"The motion '%s' does not exist!", str);
+	    return NULL; 
+	  }
+          iMotionController* mc=motman->AddController(bone);
+          mc->SetMotion(motion);
 	}
 	break;
       case CS_TOKEN_TWEEN:

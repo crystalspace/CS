@@ -2263,8 +2263,14 @@ bool CommandHandler (const char *cmd, const char *arg)
 	  {
 	    if (Sys->myMotionMan)
 	    {
-	      if (!Sys->myMotionMan->ApplyMotion(sb, motion, motion, true,
-	      	false, 1.0, 0, false))
+              iMotionController* mc=Sys->myMotionMan->FindControllerBySkeleton(sb);
+              if(!mc) {
+                mc=Sys->myMotionMan->AddController(sb);
+              }
+              iMotionTemplate* mt=Sys->myMotionMan->FindMotionByName(motion);
+	      if (mt) {
+                mc->SetMotion(mt);
+              } else
 	        Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "That motion does not exist!");
 	    }
 	    else

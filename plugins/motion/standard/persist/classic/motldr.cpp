@@ -38,17 +38,18 @@
 CS_IMPLEMENT_PLUGIN
 
 CS_TOKEN_DEF_START
-  CS_TOKEN_DEF(ANIM)
+  CS_TOKEN_DEF(BONE)
   CS_TOKEN_DEF(EULER)
   CS_TOKEN_DEF(FILE)
   CS_TOKEN_DEF(FRAME)
-  CS_TOKEN_DEF(ACTIONSET)
-  CS_TOKEN_DEF(QLINK)
-  CS_TOKEN_DEF(MLINK)
-  CS_TOKEN_DEF(VLINK)
+  CS_TOKEN_DEF(DURATION)
   CS_TOKEN_DEF(IDENTITY)
+  CS_TOKEN_DEF(LOOP)
+  CS_TOKEN_DEF(LOOPCOUNT)
+  CS_TOKEN_DEF(LOOPFLIP)
   CS_TOKEN_DEF(MATRIX)
   CS_TOKEN_DEF(MOTION)
+  CS_TOKEN_DEF(POS)
   CS_TOKEN_DEF(Q)
   CS_TOKEN_DEF(ROT_X)
   CS_TOKEN_DEF(ROT_Y)
@@ -58,7 +59,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF(SCALE_Y)
   CS_TOKEN_DEF(SCALE_Z)
   CS_TOKEN_DEF(SCALE)
-  CS_TOKEN_DEF(V)
 CS_TOKEN_DEF_END
 
 SCF_IMPLEMENT_IBASE (csMotionLoader)
@@ -125,15 +125,15 @@ bool csMotionLoader::Initialize (iObjectRegistry* object_reg)
 static bool load_matrix (char* buf, csMatrix3 &m)
 {
   CS_TOKEN_TABLE_START(commands)
-	CS_TOKEN_TABLE(IDENTITY)
-	CS_TOKEN_TABLE(ROT_X)
-	CS_TOKEN_TABLE(ROT_Y)
-	CS_TOKEN_TABLE(ROT_Z)
-	CS_TOKEN_TABLE(ROT)
-	CS_TOKEN_TABLE(SCALE_X)
-	CS_TOKEN_TABLE(SCALE_Y)
-	CS_TOKEN_TABLE(SCALE_Z)
-	CS_TOKEN_TABLE(SCALE)
+    CS_TOKEN_TABLE(IDENTITY)
+    CS_TOKEN_TABLE(ROT_X)
+    CS_TOKEN_TABLE(ROT_Y)
+    CS_TOKEN_TABLE(ROT_Z)
+    CS_TOKEN_TABLE(ROT)
+    CS_TOKEN_TABLE(SCALE_X)
+    CS_TOKEN_TABLE(SCALE_Y)
+    CS_TOKEN_TABLE(SCALE_Z)
+    CS_TOKEN_TABLE(SCALE)
   CS_TOKEN_TABLE_END
 
   char* params;
@@ -247,7 +247,7 @@ void csMotionLoader::Report (int severity, const char* msg, ...)
   va_end (arg);
 }
 
-iMotion* csMotionLoader::LoadMotion (const char* fname )
+iMotionTemplate* csMotionLoader::LoadMotion (const char* fname )
 {
   iDataBuffer *databuff = vfs->ReadFile (fname);
 
@@ -260,7 +260,7 @@ iMotion* csMotionLoader::LoadMotion (const char* fname )
   }
 
   CS_TOKEN_TABLE_START (tokens)
-  	CS_TOKEN_TABLE (MOTION)
+    CS_TOKEN_TABLE (MOTION)
   CS_TOKEN_TABLE_END
 
   char *name, *data;
@@ -280,7 +280,7 @@ iMotion* csMotionLoader::LoadMotion (const char* fname )
       Report (CS_REPORTER_SEVERITY_ERROR, "No motion manager loaded!");
     else
     {
-      iMotion* m = motman->FindByName (name);
+      iMotionTemplate* m = motman->FindMotionByName (name);
       if (!m)
       {
 	m = motman->AddMotion (name);
@@ -302,34 +302,118 @@ iMotion* csMotionLoader::LoadMotion (const char* fname )
   return NULL;
 }
 
-bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
-{
-  CS_TOKEN_TABLE_START (commands)
-    CS_TOKEN_TABLE (ANIM)
-    CS_TOKEN_TABLE (FRAME)
-	CS_TOKEN_TABLE (ACTIONSET)
-  CS_TOKEN_TABLE_END
-
+bool load_transform (char* buf, csVector3 &v, csQuaternion &q) {
   CS_TOKEN_TABLE_START (tok_anim)
-    CS_TOKEN_TABLE (EULER)
-    CS_TOKEN_TABLE (Q)
-    CS_TOKEN_TABLE (MATRIX)
-	CS_TOKEN_TABLE (V)
+    CS_TOKEN_TABLE (POS)
+    CS_TOKEN_TABLE (ROT)
   CS_TOKEN_TABLE_END
 
-  CS_TOKEN_TABLE_START (tok_frame)
-    CS_TOKEN_TABLE (QLINK)
-    CS_TOKEN_TABLE (MLINK)
-    CS_TOKEN_TABLE (VLINK)
+  CS_TOKEN_TABLE_START (tok_rot)
+    CS_TOKEN_TABLE (EULER)
+    CS_TOKEN_TABLE (MATRIX)
+    CS_TOKEN_TABLE (Q)
   CS_TOKEN_TABLE_END
 
   char* name;
   long cmd;
   char* params;
   char* params2;
-  char buffer[255];
 
-  while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
+  while ( (cmd = csGetObject (&buf, tok_anim, &name, &params))>0 ) {
+    switch ( cmd ) {
+      case CS_TOKEN_POS: {
+        load_vector(params, v);
+        break;
+      }
+      case CS_TOKEN_ROT:
+        while ( (cmd = csGetObject (&params, tok_rot, &name, &params2))>0 ) {
+          switch ( cmd ) {
+            case CS_TOKEN_Q: {
+                load_quaternion(params2, q);
+                break;
+              }
+//TODO Implement me
+            case CS_TOKEN_MATRIX: {
+		csMatrix3 m;
+                load_matrix(params2, m);
+//		q.Set(m);
+                break;
+              }
+            case CS_TOKEN_EULER: {
+                csVector3 euler;
+                load_vector(params2, euler);
+                q.SetWithEuler(euler);
+                break;
+              }
+          }
+        }
+        break;
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    return false;
+  }
+  return true;
+}
+
+
+bool csMotionLoader::LoadBone (iMotionTemplate* mot, int bone, char* buf)
+{
+  CS_TOKEN_TABLE_START (tok_bone)
+    CS_TOKEN_TABLE (FRAME)
+  CS_TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+
+  while((cmd = csGetObject (&buf, tok_bone, &name, &params))>0) {
+    if (!params) 
+    {
+      Report (CS_REPORTER_SEVERITY_ERROR, "Expected parameters instead of '%s'!", buf);
+      exit (1);
+    }
+    switch ( cmd ) {
+      case CS_TOKEN_FRAME: {
+        float frametime;
+        csScanStr(name, "%f", &frametime);
+        csVector3 v(0,0,0);
+        csQuaternion q(1,0,0,0);
+        load_transform(params, v, q);
+        mot->AddFrameBone(bone, frametime, v, q);
+        break;
+      }
+    }
+  }
+  if (cmd == CS_PARSERR_TOKENNOTFOUND)
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR, "Token '%s' not found while parsing the a sprite template!",
+        csGetLastOffender ());
+    exit (1);
+  }
+  return true;
+}
+
+bool csMotionLoader::LoadMotion (iMotionTemplate* mot, char* buf)
+{
+  CS_TOKEN_TABLE_START (tok_commands)
+    CS_TOKEN_TABLE (DURATION)
+    CS_TOKEN_TABLE (BONE)
+  CS_TOKEN_TABLE_END
+
+  CS_TOKEN_TABLE_START (tok_duration)
+    CS_TOKEN_TABLE (LOOP)
+    CS_TOKEN_TABLE (LOOPCOUNT)
+    CS_TOKEN_TABLE (LOOPFLIP)
+  CS_TOKEN_TABLE_END
+
+  char* name;
+  long cmd;
+  char* params;
+  char* params2;
+
+  while ((cmd = csGetObject (&buf, tok_commands, &name, &params)) > 0)
   {
     if (!params)
     {
@@ -338,87 +422,33 @@ bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
     }
     switch (cmd)
     {
-      case CS_TOKEN_ANIM:
-        {
-	  cmd = csGetObject (&params, tok_anim, &name, &params2);
-	  switch (cmd) 
-	  {
-	    case CS_TOKEN_EULER:
-	      {
-	        csVector3 e;
-	        csQuaternion quat;
-	        load_vector(params2, e);
-	        quat.SetWithEuler(e);
-	        mot->AddAnim(quat);
-	      }
-	      break;
-	    case CS_TOKEN_Q:
-	      {
-	        csQuaternion quat;
-	        load_quaternion(params2, quat);
-	        mot->AddAnim(quat);
-	      }
-	      break;
-	    case CS_TOKEN_MATRIX:
-	      {
-	        csMatrix3 mat;
-	        load_matrix(params2, mat);
-	        mot->AddAnim(mat);
-	      }
-	      break;
-		case CS_TOKEN_V:
-		  {
-			csVector3 vec;
-			load_vector(params2, vec);
-			mot->AddAnim(vec);
-		  }
-		  break;
-	    default:
-	      Report (CS_REPORTER_SEVERITY_ERROR, "Expected MATRIX, Q, or V instead of '%s'!", buf);
-	      exit (1);
-	  }     
+      case CS_TOKEN_DURATION: {
+        float duration=0.0f;
+        csScanStr(name, "%f", &duration);
+        mot->SetDuration(duration);
+        while ( (cmd = csGetObject (&params, tok_duration, &name, &params2))>0 ) {
+          switch ( cmd ) {
+            case CS_TOKEN_LOOP:
+              mot->SetLoopCount(-1);
+              break;
+            case CS_TOKEN_LOOPFLIP:
+              mot->SetLoopFlip(1);
+              break;
+            case CS_TOKEN_LOOPCOUNT: {
+              int loopcount=0;
+              csScanStr(name, "%d", &loopcount);
+              mot->SetLoopCount(loopcount);
+              break;
+            }
+          }
         }
         break;
-	  case CS_TOKEN_ACTIONSET:
-	{
-	  csScanStr( params, "%s", &buffer );
-	  mot->AddFrameSet(buffer);	   
-	}
-	break;
-      case CS_TOKEN_FRAME:
-	{
-	  int frametime,link;
-	  csScanStr(name, "%d", &frametime);
-	  int index=mot->AddFrame(frametime);
-	  while((cmd = csGetObject (&params, tok_frame, &name, &params2))>0)
-	  {
-		switch (cmd)
-		{
-		  case CS_TOKEN_QLINK:
-			{
-	  		  csScanStr(params2, "%d", &link);
-	  		  mot->AddFrameQLink(index, name, link);
-			}
-			break;
-		  case CS_TOKEN_MLINK:
-			{
-			  csScanStr( params2, "%d", &link);
-			  mot->AddFrameMLink(index, name, link);
-			}
-			break;
-		  case CS_TOKEN_VLINK:
-			{
-			  csScanStr( params2, "%d", &link);
-			  mot->AddFrameVLink(index, name, link);
-			}
-			break;
-		  default:
-	    	Report (CS_REPORTER_SEVERITY_ERROR, "Expected LINK instead of '%s'!", buf);
-	    	exit (1);
-		}
-	  }
-    } // case CS_TOKEN_FRAME
-	
+      }
+      case CS_TOKEN_BONE: {
+        int bone=mot->AddBone(name);
+        LoadBone(mot, bone, params);
+        break;
+      }
     }
   }
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
@@ -434,10 +464,10 @@ bool csMotionLoader::LoadMotion (iMotion* mot, char* buf)
 iBase* csMotionLoader::Parse ( const char *string, iMaterialList*,
 	iMeshFactoryList*, iBase* /* context */ )
 {
-CS_TOKEN_TABLE_START(commands)
-  CS_TOKEN_TABLE(FILE)
-  CS_TOKEN_TABLE(MOTION)
-CS_TOKEN_TABLE_END
+  CS_TOKEN_TABLE_START(commands)
+    CS_TOKEN_TABLE(FILE)
+    CS_TOKEN_TABLE(MOTION)
+  CS_TOKEN_TABLE_END
 
   char *name;
   long cmd;
@@ -445,7 +475,7 @@ CS_TOKEN_TABLE_END
   char str[255];
   char *buf = (char *) string;
   str[0] = '\0';
-  iMotion *m;
+  iMotionTemplate *m;
 
   while (( cmd = csGetObject ( &buf, commands, &name, &params )) > 0)
   {
@@ -456,9 +486,9 @@ CS_TOKEN_TABLE_END
 	}
 	switch (cmd)
 	{
-      case CS_TOKEN_MOTION:
-	  {
-	    m = motman->FindByName (name);
+          case CS_TOKEN_MOTION:
+          {
+	    m = motman->FindMotionByName (name);
 	    if (!m)
 	    {
 		  m = motman->AddMotion (name);
@@ -512,3 +542,4 @@ void csMotionSaver::WriteDown ( iBase* /* obj */, iStrVector* /* string */)
   printf("Motion Saver: Motion manager not loaded... aborting\n");
   plugin_mgr->DecRef ();
 }
+

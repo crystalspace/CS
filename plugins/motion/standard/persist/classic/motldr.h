@@ -28,7 +28,7 @@ struct iEngine;
 struct iObjectRegistry;
 struct iVFS;
 struct iMotionManager;
-struct iMotion;
+struct iMotionTemplate;
 
 /*
  *
@@ -46,8 +46,10 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  iMotion* LoadMotion ( const char *fname );
-  bool LoadMotion ( iMotion *mot, char *buf );
+  bool LoadBone (iMotionTemplate* mot, int bone, char* buf);
+
+  iMotionTemplate* LoadMotion ( const char *fname );
+  bool LoadMotion ( iMotionTemplate *mot, char *buf );
 
   /// Constructor
   csMotionLoader (iBase *);
