@@ -595,10 +595,11 @@ public:
   /**
    * Delete an object from the set. This function
    * does nothing if the object is not in the set.
+   * Return true if the object was present.
    */
-  void Delete (const T& object)
+  bool Delete (const T& object)
   {
-    map.Delete (object, object);
+    return map.Delete (object, object);
   }
 
   /// Get the number of elements in the set.

@@ -130,6 +130,8 @@ chronological order.
 	- Remi Bonnet added a scriptable action in aws for the notebook
 	  component. This allow a program using Crystal Space to change the
 	  active tab dynamically.
+	- Remi Bonnet made csSet::Delete returns whether an object was deleted
+	  or not.
 14-Apr-2004
 	- Eric Sunshine fixed bugs in csString where GetData() and the (char
 	  const*) operator would incorrectly return a null pointer at times.
