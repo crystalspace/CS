@@ -332,7 +332,7 @@ void csStuffObject::GetObjectBoundingBox (csBox3& bbox, int /*type*/)
 }
 
 
- csPtr<iMeshObjectFactory> csStuffObject::GetFactory () const
+ iMeshObjectFactory* csStuffObject::GetFactory () const
  { return factory; };
  void csStuffObject::UpdateLighting (iLight **,int, iMovable *) {
   SetupMesh();
