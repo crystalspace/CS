@@ -1585,22 +1585,23 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
     statecache->Disable_GL_NORMAL_ARRAY ();
     statecache->Disable_GL_COLOR_ARRAY ();
     statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
+    unsigned int i;
     if (ext->CS_GL_ARB_multitexture)
     {
-      for (unsigned int i = 0; i < CS_GL_MAX_LAYER; i++)
+      for (i = 0; i < CS_GL_MAX_LAYER; i++)
       {
         statecache->SetActiveTU (i);
         statecache->Disable_GL_TEXTURE_COORD_ARRAY ();
       }
     }
 
-    for (unsigned int i = 0; i < CS_VATTRIB_SPECIFIC_LAST-CS_VATTRIB_SPECIFIC_FIRST+1; i++)
+    for (i = 0; i < CS_VATTRIB_SPECIFIC_LAST-CS_VATTRIB_SPECIFIC_FIRST+1; i++)
     {
       csGLRenderBuffer *b = spec_renderBuffers[i];
       if (b) b->RenderRelease ();
       spec_renderBuffers[i] = 0;
     }
-    for (unsigned int i = 0; i < CS_VATTRIB_GENERIC_LAST-CS_VATTRIB_GENERIC_FIRST+1; i++)
+    for (i = 0; i < CS_VATTRIB_GENERIC_LAST-CS_VATTRIB_GENERIC_FIRST+1; i++)
     {
       csGLRenderBuffer *b = gen_renderBuffers[i];
       if (b) b->RenderRelease ();
@@ -1609,7 +1610,7 @@ void csGLGraphics3D::DeactivateBuffers (csVertexAttrib *attribs, unsigned int co
   }
   else
   {
-    for (unsigned int i = 0; i < count; i++)
+    for (i = 0; i < count; i++)
     {
       csVertexAttrib att = attribs[i];
       if (CS_VATTRIB_IS_GENERIC (att))
