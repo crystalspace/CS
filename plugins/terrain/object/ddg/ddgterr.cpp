@@ -415,8 +415,6 @@ void csDDGTerrainObject::Draw (iRenderView* rview, bool use_z_buf)
   iClipper2D* pClipper = rview->GetClipper ();
   // RDS NOTE: check in cube, it's done a little different
   pG3D->SetObjectToCamera( &RevTrans );
-  // @@@ This should only be done when aspect changes...
-  pG3D->SetPerspectiveAspect( pCamera->GetFOV() );
   pG3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
       use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
 

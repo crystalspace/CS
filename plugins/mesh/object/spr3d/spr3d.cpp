@@ -906,8 +906,6 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   //   C = Mwc * (Mow * O - Vow - Vwc)
   //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
   g3d->SetObjectToCamera (&tr_o2c);
-  // @@@ This should only be done when aspect changes...
-  g3d->SetPerspectiveAspect (fov);
 
   bool do_tween = false;
   if (!skeleton_state && tween_ratio) do_tween = true;

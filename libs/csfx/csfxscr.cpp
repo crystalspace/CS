@@ -141,7 +141,6 @@ void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
   dpfx.vertices[3].r = bottomcolor.red;
   dpfx.vertices[3].g = bottomcolor.green;
   dpfx.vertices[3].b = bottomcolor.blue;
-  dpfx.inv_aspect = 0;
   dpfx.mat_handle = NULL;
   dpfx.flat_color_r = 255;
   dpfx.flat_color_g = 255;
@@ -193,7 +192,6 @@ void csfxScreenDPFX(iGraphics3D *g3d, iMaterialHandle *mat, UInt mixmode,
   dpfx.vertices[3].r = 1.;
   dpfx.vertices[3].g = 1.;
   dpfx.vertices[3].b = 1.;
-  dpfx.inv_aspect = 0;
   dpfx.mat_handle = mat;
   dpfx.flat_color_r = r;
   dpfx.flat_color_g = g;

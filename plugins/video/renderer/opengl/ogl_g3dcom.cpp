@@ -184,6 +184,7 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
   clipper = NULL;
   cliptype = CS_CLIPPER_NONE;
   toplevel_init = false;
+  frustum_valid = false;
 
   // see note above
   tr_verts.IncRef ();
@@ -503,6 +504,30 @@ void csGraphics3DOGLCommon::SetDimensions (int width, int height)
   csGraphics3DOGLCommon::height = height;
   csGraphics3DOGLCommon::width2 = width / 2;
   csGraphics3DOGLCommon::height2 = height / 2;
+  frustum_valid = false;
+}
+
+void csGraphics3DOGLCommon::CalculateFrustum ()
+{
+  if (frustum_valid) return;
+  frustum_valid = true;
+  if (clipper)
+  {
+    frustum.MakeEmpty ();
+    int nv = clipper->GetNumVertices ();
+    csVector3 v3;
+    v3.z = 1;
+    csVector2* v = clipper->GetClipPoly ();
+    int i, i1;
+    i1 = nv-1;
+    for (i = 0 ; i < nv ; i++)
+    {
+      v3.x = (v[i].x - width2) * inv_aspect;
+      v3.y = (v[i].y - height2) * inv_aspect;
+      frustum.AddVertex (v3);
+      i1 = i;
+    }
+  }
 }
 
 void csGraphics3DOGLCommon::SetClipper (iClipper2D* clip, int cliptype)
@@ -512,6 +537,7 @@ void csGraphics3DOGLCommon::SetClipper (iClipper2D* clip, int cliptype)
   clipper = clip;
   if (!clipper) cliptype = CS_CLIPPER_NONE;
   csGraphics3DOGLCommon::cliptype = cliptype;
+  frustum_valid = false;
 
 #if 0
 // @@@ TODO: init z-buffer
@@ -723,7 +749,6 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP & poly)
   Dc = poly.normal.D ();
 
   float M, N, O;
-  float inv_aspect = poly.inv_aspect;
   if (ABS (Dc) < SMALL_D)
   {
     // The Dc component of the plane normal is too small. This means
@@ -1080,7 +1105,6 @@ void csGraphics3DOGLCommon::DrawPolygonZFill (G3DPolygonDP & poly)
   Dc = poly.normal.D ();
 
   float M, N, O;
-  float inv_aspect = poly.inv_aspect;
   if (ABS (Dc) < SMALL_D)
   {
     // The Dc component of the plane normal is too small. This means
@@ -1607,7 +1631,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 
   matrixholder[0] = matrixholder[5] = 1.0;
 
-  matrixholder[11] = +1.0/aspect;
+  matrixholder[11] = inv_aspect;
   matrixholder[14] = -matrixholder[11];
 
   glMultMatrixf(matrixholder);
@@ -2098,7 +2122,6 @@ bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
   Cc = poly.normal.C ();
   Dc = poly.normal.D ();
 
-  float inv_aspect = poly.inv_aspect;
   float M, N, O;
   if (ABS (Dc) < SMALL_D)
   {

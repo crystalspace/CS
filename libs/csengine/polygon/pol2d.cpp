@@ -446,7 +446,6 @@ void csPolygon2D::DrawFilled (iRenderView* rview, csPolygon3D* poly,
     if (poly->GetMaterialWrapper ())
       poly->GetMaterialWrapper ()->Visit ();
     g3dpolyfx.mat_handle = poly->GetMaterialHandle ();
-    g3dpolyfx.inv_aspect = icam->GetInvFOV ();
 
     csColor *po_colors = do_light && gs ? gs->GetColors () : NULL;
 
@@ -513,7 +512,6 @@ void csPolygon2D::DrawFilled (iRenderView* rview, csPolygon3D* poly,
     if (poly->GetMaterialWrapper ())
       poly->GetMaterialWrapper ()->Visit ();
     g3dpoly.mat_handle = poly->GetMaterialHandle ();
-    g3dpoly.inv_aspect = icam->GetInvFOV ();
     g3dpoly.mixmode = poly->GetTextureTypeInfo ()->GetMixMode ();
 
     // We are going to use DrawPolygon.
@@ -590,7 +588,6 @@ void csPolygon2D::FillZBuf (iRenderView* rview, csPolygon3D* poly,
   CS_LOCAL_STATIC(G3DPolygonDP,g3dpoly);
   g3dpoly.mixmode = CS_FX_COPY;
   g3dpoly.num = num_vertices;
-  g3dpoly.inv_aspect = icam->GetInvFOV ();
 
   // We are going to use DrawPolygon.
   int i;
@@ -627,7 +624,6 @@ void csPolygon2D::AddFogPolygon (iGraphics3D* g3d, csPolygon3D* /*poly*/,
   CS_LOCAL_STATIC(G3DPolygonDFP,g3dpoly);
   memset(&g3dpoly, 0, sizeof(g3dpoly));
   g3dpoly.num = num_vertices;
-  g3dpoly.inv_aspect = csEngine::current_engine->current_camera->GetInvFOV ();
 #if 0
   memcpy (g3dpoly.vertices, vertices, num_vertices * sizeof (csVector2));
 #else

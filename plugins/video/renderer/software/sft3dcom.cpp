@@ -1402,7 +1402,6 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
   float max_y, min_y;
   unsigned char *d;
   uint32 *z_buf;
-  float inv_aspect = poly.inv_aspect;
 
   if (poly.num < 3) return;
 
@@ -1678,7 +1677,6 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
   float min_z;
   unsigned char *d;
   uint32 *z_buf;
-  float inv_aspect = poly.inv_aspect;
 
   if (poly.num < 3)
     return;
@@ -2344,7 +2342,6 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id,
   float max_y, min_y;
   unsigned char *d;
   uint32 *z_buf;
-  float inv_aspect = poly.inv_aspect;
 
   if (poly.num < 3)
     return;

@@ -465,8 +465,6 @@ bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 
   iClipper2D* clipper; clipper = rview->GetClipper ();
   g3d->SetObjectToCamera (&tr_o2c);
-  // @@@ This should only be done when aspect changes...
-  g3d->SetPerspectiveAspect (fov);
   top_mesh.clip_portal = clip_portal;
   top_mesh.clip_plane = clip_plane;
   top_mesh.do_mirror = camera->IsMirrored ();

@@ -589,7 +589,6 @@ void DrawDebugBoxSide (csCamera* cam, bool do3d,
   csVector2 persp;
   poly.num = 4;
   poly.use_fog = false;
-  poly.inv_aspect = cam->GetInvFOV ();
   poly.mat_handle = NULL;
   poly.flat_color_r = 255;
   poly.flat_color_g = 255;

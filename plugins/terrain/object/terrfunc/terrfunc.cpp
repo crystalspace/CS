@@ -988,6 +988,11 @@ void csTerrFuncObject::SetupObject ()
   }
 }
 
+void csTerrFuncObject::RecomputeShadowMap ()
+{
+  
+}
+
 void csTerrFuncObject::RecomputeLighting (int lod, int bx, int by)
 {
   if (!do_dirlight) return;
@@ -1079,7 +1084,6 @@ void csTerrFuncObject::Draw (iRenderView* rview, bool use_z_buf)
   csReversibleTransform& camtrans = pCamera->GetTransform ();
   const csVector3& origin = camtrans.GetOrigin ();
   pG3D->SetObjectToCamera (&camtrans);
-  pG3D->SetPerspectiveAspect (pCamera->GetFOV ());
   pG3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
       use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
 

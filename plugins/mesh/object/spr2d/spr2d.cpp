@@ -281,7 +281,6 @@ bool csSprite2DMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 
   g3dpolyfx.num = vertices.Length ();
   g3dpolyfx.mat_handle = mat;
-  g3dpolyfx.inv_aspect = camera->GetInvFOV ();
   g3dpolyfx.mat_handle->GetTexture ()->GetMeanColor (g3dpolyfx.flat_color_r,
     g3dpolyfx.flat_color_g, g3dpolyfx.flat_color_b);
 

@@ -141,7 +141,6 @@ struct iGraphics3D:public iPlugIn
   void SetPerspectiveCenter (int x, int y);
   void SetPerspectiveAspect (float aspect);
   void SetObjectToCamera (csReversibleTransform* o2c);
-  void SetClipper (csVector2* vertices, int num_vertices);
   iGraphics2D *GetDriver2D ();
   iTextureManager *GetTextureManager ();
   iHalo *CreateHalo (float iR, float iG, float iB,

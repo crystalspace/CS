@@ -65,7 +65,6 @@ void SetupPolygonDPFX (iGraphics3D* /*g3d*/, G3DPolygonDPFX& poly,
   poly.vertices[3].g = 1;
   poly.vertices[3].b = 0;
   poly.use_fog = false;
-  poly.inv_aspect = 1./400.;
   poly.mat_handle = NULL;
   poly.flat_color_r = 255;
   poly.flat_color_g = 255;
@@ -84,6 +83,7 @@ void SinglePolygonTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
 void SinglePolygonTester::Draw (iGraphics3D* g3d)
 {
   draw++;
+  g3d->SetPerspectiveAspect (400);
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILL);
   g3d->StartPolygonFX (poly.mat_handle, CS_FX_COPY|CS_FX_GOURAUD);
   g3d->DrawPolygonFX (poly);

@@ -289,8 +289,6 @@ SetPerspectiveAspect(aspect)
 
 SetObjectToCamera(o2c)
 
-SetClipper(vertices,num_vertices)
-
 GetDriver2D()
 
 GetTextureManager()

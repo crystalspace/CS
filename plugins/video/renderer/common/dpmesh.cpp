@@ -53,7 +53,7 @@ static DECLARE_GROWING_ARRAY (visible, bool);
  */
 void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
 	csReversibleTransform &o2c,
-	iClipper2D * /*clipper*/, float aspect, float inv_aspect,
+	iClipper2D * /*clipper*/, float aspect, float /*inv_aspect*/,
 	int width2, int height2)
 {
   // Update work arrays
@@ -96,7 +96,6 @@ void DefaultDrawPolygonMesh (G3DPolygonMesh& mesh, iGraphics3D *piG3D,
   csVector3 v_cam2tex;
 
   G3DPolygonDP poly;
-  poly.inv_aspect = inv_aspect;
   poly.use_fog = mesh.do_fog;
   poly.alpha = 0;
   poly.plane.m_cam2tex = &m_cam2tex;

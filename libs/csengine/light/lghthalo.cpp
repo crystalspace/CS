@@ -480,7 +480,6 @@ void csLightFlareHalo::ProcessFlareComponent(csEngine const& engine,
   // prepare for drawing
   dpfx.num = num_clipped_verts;
   dpfx.use_fog = false;
-  dpfx.inv_aspect = engine.current_camera->GetInvFOV();
   if(!comp->image) 
   {
     printf("INTERNAL ERROR: flare used without material.\n");

@@ -33,6 +33,7 @@
 #include "video/renderer/common/dtmesh.h"
 #include "video/renderer/common/dpmesh.h"
 #include "csgeom/transfrm.h"
+#include "csgeom/poly3d.h"
 #include "ogl_txtmgr.h"
 #include "ivideo/graph3d.h"
 #include "isys/plugin.h"
@@ -118,7 +119,10 @@ private:
   // Some common shortcut functions that may or may not apply, depending
   // on the underlying hardware
   // guess the proper blend mode to use
-  void Guess_BlendMode(GLenum *src, GLenum *dst);
+  void Guess_BlendMode (GLenum *src, GLenum *dst);
+
+  /// Make sure the frustum is correct.
+  void CalculateFrustum ();
 
 protected:
   friend class csOpenGLHalo;
@@ -155,6 +159,13 @@ protected:
   iClipper2D* clipper;
   /// Clipper type.
   bool cliptype;
+  /// 3D Frustum calculated from clipper.
+  csPoly3D frustum;
+  /**
+   * If true the frustum below is valid. If false
+   * we need to calculate it from the clipper and aspect.
+   */
+  bool frustum_valid;
   /**
    * If true then we already have initialized our toplevel portal.
    * This flag is set to false after BeginDraw() and will be set to true
@@ -359,6 +370,7 @@ public:
   {
     width2 = x;
     height2 = y;
+    frustum_valid = false;
   }
   /// Get center of projection.
   virtual void GetPerspectiveCenter (int& x, int& y)
@@ -371,6 +383,7 @@ public:
   {
     this->aspect = aspect;
     inv_aspect = 1./aspect;
+    frustum_valid = false;
   }
   /// Get perspective aspect.
   virtual float GetPerspectiveAspect ()

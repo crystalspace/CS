@@ -126,7 +126,7 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDP& poly)
 
   // Get the plane normal of the polygon. Using this we can calculate
   // '1/z' at every screen space point.
-  float inv_aspect = poly.inv_aspect;
+  float inv_aspect = ctxt->icamera->GetInvFOV ();
   float Ac, Bc, Cc, Dc, inv_Dc;
   Ac = poly.normal.A ();
   Bc = poly.normal.B ();
@@ -248,7 +248,7 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDPFX& poly)
 
   float shift_x = ctxt->icamera->GetShiftX ();
   float shift_y = ctxt->icamera->GetShiftY ();
-  float inv_aspect = poly.inv_aspect;
+  float inv_aspect = ctxt->icamera->GetInvFOV ();
 
   int i;
   for (i = 0 ; i < poly.num ; i++)

@@ -1197,6 +1197,7 @@ void csEngine::Draw (csCamera* c, csClipper* view)
   // First initialize G3D with the right clipper.
   G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);	// We are at top-level.
   G3D->ResetNearPlane ();
+  G3D->SetPerspectiveAspect (c->GetFOV ());
   
   csSector* s = c->GetSector ();
   s->Draw (&rview);
@@ -1222,6 +1223,7 @@ void csEngine::DrawFunc (csCamera* c, csClipper* view,
   // First initialize G3D with the right clipper.
   G3D->SetClipper (view, true);	// We are at top-level.
   G3D->ResetNearPlane ();
+  G3D->SetPerspectiveAspect (c->GetFOV ());
 
   csSector* s = c->GetSector ();
   s->Draw (&rview);

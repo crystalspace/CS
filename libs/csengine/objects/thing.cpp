@@ -715,8 +715,6 @@ void csThing::DrawPolygonArrayDPM (csPolygonInt** /*polygon*/, int /*num*/,
 
   csReversibleTransform tr_o2c = icam->GetTransform ();
   d->GetGraphics3D ()->SetObjectToCamera (&tr_o2c);
-  // @@@ This should only be done when aspect changes...
-  d->GetGraphics3D ()->SetPerspectiveAspect (icam->GetFOV ());
   d->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zMode);
 
   G3DPolygonMesh mesh;
@@ -1325,7 +1323,6 @@ bool csThing::DrawCurves (iRenderView* rview, iMovable* movable,
   csReversibleTransform obj_cam = camtrans;
   if (can_move) obj_cam /= movtrans;
   rview->GetGraphics3D ()->SetObjectToCamera (&obj_cam);
-  rview->GetGraphics3D ()->SetPerspectiveAspect (icam->GetFOV ());
   rview->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, zMode);
 
   // Base of the mesh.

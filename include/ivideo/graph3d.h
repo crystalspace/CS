@@ -121,12 +121,6 @@ struct G3DPolygonDPFX
   /// Use fog info?
   bool use_fog;
 
-  /**
-   * Invert aspect ratio that was used to perspective project the
-   * vertices (1/fov)
-   */
-  float inv_aspect;
-
   /// The material handle as returned by iTextureManager.
   iMaterialHandle *mat_handle;
 
@@ -143,9 +137,6 @@ struct G3DPolygonDFP
   int num;
   /// Vertices that form the polygon.
   G3DVertex vertices[100];
-
-  /// Invert aspect ratio that was used to perspective project the vertices (1/fov)
-  float inv_aspect;
 
   /// The plane equation in camera space of this polygon.
   csPlane3 normal;

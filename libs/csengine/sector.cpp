@@ -925,7 +925,6 @@ void csSector::Draw (iRenderView* rview)
         // We must add a FRONT fog polygon for the clipper to this sector.
         rview->GetClipPlane (g3dpoly.normal);
 	g3dpoly.normal.Invert ();
-        g3dpoly.inv_aspect = icam->GetInvFOV ();
         rview->GetGraphics3D ()->DrawFogPolygon (GetID (), g3dpoly, CS_FOG_FRONT);
       }
     }

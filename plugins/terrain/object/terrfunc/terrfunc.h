@@ -83,6 +83,10 @@ private:
   // This number is increased whenever there is a lighting change
   long dirlight_number;
 
+  // For shadows. This grid is like a z-buffer indicating the closeness
+  // of that part of the landscape to the light.
+  float* shadow_map;
+
   bool initialized;
 
   /**
@@ -132,6 +136,11 @@ private:
    * mesh, the LOD meshes, normals, ...
    */
   void SetupObject ();
+
+  /**
+   * Recompute the shadow map if the light changes.
+   */
+  void RecomputeShadowMap ();
 
   /**
    * Recompute lighting for one block.

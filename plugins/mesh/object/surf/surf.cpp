@@ -288,8 +288,6 @@ bool csSurfMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 
   iClipper2D* clipper; clipper = rview->GetClipper ();
   g3d->SetObjectToCamera (&tr_o2c);
-  // @@@ This should only be done when aspect changes...
-  g3d->SetPerspectiveAspect (fov);
   mesh.clip_portal = clip_portal;
   mesh.clip_plane = clip_plane;
   mesh.do_mirror = camera->IsMirrored ();

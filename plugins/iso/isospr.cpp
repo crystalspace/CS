@@ -205,7 +205,7 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
   g3dpolyfx.num = poly.GetNumVertices ();
   g3dpolyfx.mat_handle = material->GetMaterialHandle();
   /// guesstimate of fov (angle) of view. 1/fov.
-  g3dpolyfx.inv_aspect = 1./180.;
+  g3d->SetPerspectiveAspect (180.);
   g3dpolyfx.mat_handle->GetTexture ()->GetMeanColor (g3dpolyfx.flat_color_r,
     g3dpolyfx.flat_color_g, g3dpolyfx.flat_color_b);
 
