@@ -163,6 +163,12 @@ public:
 
   /**
    * Load a library and add it to the world.
+   * the library is automatically added to the world, if loading was successful.
+   *
+   * Parameters:
+   * name:   a symbolic name for that library. usefull for later references
+   * fname:  name of the file that contains the library (for instance "standard.zip")
+   * return: a pointer to the loaded library, or NULL, if loading was not possible.
    */
   static csLibrary* LoadLibrary (csWorld* world, char* name, char* fname);
 

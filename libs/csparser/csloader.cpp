@@ -3588,8 +3588,8 @@ file describing how the world looks.\n", file);
     buf = wf->read ("world");
     if (!buf)
     {
-      CsPrintf (MSG_FATAL_ERROR, "Could not find 'world' file inside ZIP archive '%s'!\n\
-Are you sure '%s' is a valid Crystal Space level archive?\n", file, file);
+      CsPrintf (MSG_FATAL_ERROR, "Could not find 'world' file inside ZIP archive '%s'!\n"
+                "Are you sure '%s' is a valid Crystal Space level archive?\n", file, file);
       world->CloseWorldFile ();
       return false;
     }
@@ -3661,6 +3661,57 @@ bool CSLoader::LoadTextures (csTextureList* textures, char* buf, csWorld* world,
       case kTokenTexsTex:
         {
           ImageFile *image = CSLoader::load_image (name, world, ar);
+
+          //Now we check the size of the loaded image. Having an image, that
+          //is not a power of two will result in strange errors while 
+          //rendering it is by far better to check the format of all textures
+          //already while loading them.
+          int Width  = image->get_width();
+          int Height = image->get_height();
+          bool TextureSizeIsIllegal = false;
+
+          int AllowedWidth = 1;
+          while (Width!=AllowedWidth)
+          {
+            AllowedWidth <<= 1;
+            if (AllowedWidth>0x10000000)
+            {
+              TextureSizeIsIllegal = true;
+              break;
+            }
+          }
+              
+          int AllowedHeight = 1;
+          while (Height!=AllowedHeight)
+          {
+            AllowedHeight <<= 1;
+            if (AllowedHeight>0x10000000)
+            {
+              TextureSizeIsIllegal = true;
+              break;
+            }
+          }
+
+          if (TextureSizeIsIllegal)
+          {
+            CsPrintf (MSG_FATAL_ERROR, 
+                      "Texture '%s' has illegal format!\n" 
+                      "The Width and Height must be a power of two.\n"
+                      "actual size is w:%d h:%d\n",
+                      name, Width, Height);
+            fatal_exit (0, false);
+          }
+
+          if (Height>256 || Width>256)
+          {
+            CsPrintf (MSG_WARNING, 
+                      "Texture '%s' may not be usable on 3DFX based cards.\n" 
+                      "The Width and Height for these cards may not be larger than 256\n"
+                      "actual size is w:%d h:%d\n",
+                      name, Width, Height);
+          }
+
+          
           tex = textures->NewTexture (image);
           csNameObject::AddName(*tex,name);
           //if (!tex->loaded_correctly ())
@@ -3685,9 +3736,20 @@ csLibrary* CSLoader::LoadLibrary (csWorld* world, char* name, char* fname)
 {
   CHK (csLibrary* lib = new csLibrary ());
   csNameObject::AddName(*lib,name);
-  world->libraries.Push (lib);
-  CSLoader::load_library_def (lib, world, fname, world->GetTextures ());
-  return lib;
+
+  //try to load the given library
+  if (CSLoader::load_library_def (lib, world, fname, world->GetTextures ()))
+  {
+    //Loading was ok. Now we add the library to the world.
+    world->libraries.Push (lib);
+    return lib;
+  }
+  else
+  {
+    //Something went wrong loading the lib. So we do some cleanup now
+    delete lib;
+    return NULL;
+  }
 }
 
 csTextureHandle* CSLoader::LoadTexture (csWorld* world, char* name, char* fname, Archive* ar)
