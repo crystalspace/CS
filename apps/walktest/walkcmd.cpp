@@ -591,16 +591,21 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     char txtname[100];
     int cnt = 0;
-    if (arg) cnt = ScanStr (arg, "%s", txtname);
-    extern void add_particles_rain (csSector* sector, const csVector3& center,
-    	char* txtname);
-    if (cnt != 1)
+    int num, speed;
+    if (arg) cnt = ScanStr (arg, "%s,%d,%f", txtname, &num, &speed);
+    extern void add_particles_rain (csSector* sector, char* txtname,
+    	int num, float speed);
+    if (cnt < 1)
     {
-      Sys->Printf (MSG_CONSOLE, "Expected parameter 'texture'!\n");
+      Sys->Printf (MSG_CONSOLE, "Expected parameter 'texture[,num[,speed]]'!\n");
     }
     else
+    {
+      if (cnt <= 2) speed = 2;
+      if (cnt <= 1) num = 100;
       add_particles_rain (Sys->view->GetCamera ()->GetSector (),
-    	Sys->view->GetCamera ()->GetOrigin (), txtname);
+    	txtname, num, speed);
+    }
   }
   else if (!strcasecmp (cmd, "explosion"))
   {

@@ -80,7 +80,7 @@ extern void move_sprite (csSprite3D* sprite, csSector* where,
 //===========================================================================
 // Demo particle system (rain).
 //===========================================================================
-void add_particles_rain (csSector* sector, const csVector3& center, char* txtname)
+void add_particles_rain (csSector* sector, char* txtname, int num, float speed)
 {
   // First check if the texture exists.
   csTextureHandle* txt = Sys->view->GetWorld ()->GetTextures ()->
@@ -91,19 +91,28 @@ void add_particles_rain (csSector* sector, const csVector3& center, char* txtnam
     return;
   }
 
-  csRainParticleSystem* exp = new csRainParticleSystem (40,
+  csPolygonSetBBox* pset_bbox = sector->GetBoundingBox ();
+  if (!pset_bbox)
+  {
+    sector->CreateBoundingBox ();
+    pset_bbox = sector->GetBoundingBox ();
+  }
+  csBox3 bbox;
+  bbox.StartBoundingBox (sector->Vwor (pset_bbox->i1));
+  bbox.AddBoundingVertexSmart (sector->Vwor (pset_bbox->i2));
+  bbox.AddBoundingVertexSmart (sector->Vwor (pset_bbox->i3));
+  bbox.AddBoundingVertexSmart (sector->Vwor (pset_bbox->i4));
+  bbox.AddBoundingVertexSmart (sector->Vwor (pset_bbox->i5));
+  bbox.AddBoundingVertexSmart (sector->Vwor (pset_bbox->i6));
+  bbox.AddBoundingVertexSmart (sector->Vwor (pset_bbox->i7));
+  bbox.AddBoundingVertexSmart (sector->Vwor (pset_bbox->i8));
+
+  csRainParticleSystem* exp = new csRainParticleSystem (num,
   	txt, CS_FX_MULTIPLY2, false, .3/50., .3,
-	csVector3 (-3, -3, -3), csVector3 (3, 3, 3),
-	csVector3 (0, -1, 0));
+	bbox.Min (), bbox.Max (),
+	csVector3 (0, -speed, 0));
   exp->MoveToSector (sector);
-  //exp->SetSelfDestruct (3000);
-  //exp->SetMixmode (CS_FX_SETALPHA (0.50));
-  //exp->SetChangeRotation(5.0);
-  //exp->SetChangeSize (1.25);
-  //exp->SetFadeSprites (500);
-  //exp->SetColor( csColor(1,1,0) );
-  //exp->SetChangeColor( csColor(0,-1.0/3.2,0) );
-  //exp->AddLight (Sys->world, sector, 1000);
+  exp->SetColor (csColor (1,1,1));
 }
 
 //===========================================================================

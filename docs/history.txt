@@ -1,5 +1,11 @@
 The history order has been reversed so that new features are at the top.
 
+16-Jun-2000
+	- Improved the 'rain' console command in WalkTest so that it
+	  adds rain to the entire current sector. There are now three
+	  parameters: 'rain raindrop.png,100,2'. 100 is the number of
+	  particles. Use more particles for bigger sectors. 2 is the
+	  speed in meters per second.
 15-Jun-2000
 	- Cleaned up some debugging stuff for c-buffer from WalkTest.
 	- Moved csOjbectStuffFactory::Initialize to csObjectStub.
@@ -21,6 +27,7 @@ The history order has been reversed so that new features are at the top.
 	  rain.
 	- Added 'rain' console command to create a new rain particle
 	  system. Experimental right now. Doesn't work perfectly yet.
+	- Martin Geisse added new features to dungeon plugin.
 14-Jun-2000
 	- Added new command 'db_frustum' to debug the CheckFrustum routine.
 	  This function expects an integer parameter and will draw an outline
