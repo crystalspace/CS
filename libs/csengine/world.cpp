@@ -38,6 +38,7 @@
 #include "csengine/config.h"
 #include "csgeom/fastsqrt.h"
 #include "csobject/nameobj.h"
+#include "cssys/common/cspmeter.h"
 #include "csutil/archive.h"
 #include "csutil/inifile.h"
 #include "csgfxldr/csimage.h"
@@ -360,63 +361,36 @@ AMBIENT_BLUE=%d\nREFLECT=%d\nRADIOSITY=%d\nACCURATE_THINGS=%d\nCOSINUS_FACTOR=%f
     csSector::cfg_reflections = 1;
   }
 
-  int sn, total, last_printed=0, complete;
-  total = sn = sectors.Length ();
+  int sn = 0;
+  int total = sectors.Length ();
+  csProgressMeter meter (total);
   CsPrintf (MSG_INITIALIZATION, "Initializing lightmaps (%d sectors total):\n  ",total);
-  CsPrintf (MSG_TICKER, "begin");
 
-  for(last_printed=0;sn-->0;)
+  for (sn = 0; sn < total; sn++)
   {
     csSector* s = (csSector*)sectors[sn];
     s->InitLightmaps ();
-    complete=100-100*sn/total;
-    for(;last_printed<complete;last_printed+=2)
-    {
-      if(last_printed%10)
-        CsPrintf(MSG_INITIALIZATION, ".");
-      else
-        CsPrintf(MSG_INITIALIZATION, "%d%%",last_printed);
-    }
+    meter.Step();
   }
 
-  total = sn = sectors.Length ();
-
-  CsPrintf(MSG_INITIALIZATION, "100%%\n");
-  CsPrintf(MSG_INITIALIZATION, "Shining lights (%d sectors total):\n  ",total);
-  for(last_printed=0;sn-->0;)
+  meter.Reset();
+  CsPrintf(MSG_INITIALIZATION, "\nShining lights (%d sectors total):\n  ",total);
+  for (sn = 0; sn < total; sn++)
   {
     csSector* s = (csSector*)sectors[sn];
     s->ShineLights ();
-
-    complete=100-100*sn/total;
-    for(;last_printed<complete;last_printed+=2)
-    {
-      if(last_printed%10)
-        CsPrintf(MSG_INITIALIZATION, ".");
-      else
-        CsPrintf(MSG_INITIALIZATION, "%d%%",last_printed);
-    }
+    meter.Step();
   }
 
-  total = sn = sectors.Length ();
-
-  CsPrintf(MSG_INITIALIZATION, "100%%\n");
-  CsPrintf(MSG_INITIALIZATION, "Caching lightmaps (%d sectors total):\n  ",total);
-  for(last_printed=0;sn-->0;)
+  meter.Reset();
+  CsPrintf(MSG_INITIALIZATION, "\nCaching lightmaps (%d sectors total):\n  ",total);
+  for (sn = 0; sn < total; sn++)
   {
     csSector* s = (csSector*)sectors[sn];
     s->CacheLightmaps ();
-    complete=100-100*sn/total;
-    for(;last_printed<complete;last_printed+=2)
-    {
-      if(last_printed%10)
-        CsPrintf(MSG_INITIALIZATION, ".");
-      else
-        CsPrintf(MSG_INITIALIZATION, "%d%%",last_printed);
-    }
+    meter.Step();
   }
-  CsPrintf (MSG_INITIALIZATION,"100%%\n");
-  CsPrintf (MSG_TICKER, "end");
+  CsPrintf (MSG_INITIALIZATION,"\n");
 
   csPolygonSet::current_light_frame_number++;
 
