@@ -913,11 +913,11 @@ void csGenmeshMeshObjectFactory::SetupVertexBuffer ()
 
 void csGenmeshMeshObjectFactory::SetupFactory ()
 {
-#ifndef CS_USE_NEW_RENDERER
   if (!initialized)
   {
     initialized = true;
     object_bbox_valid = false;
+#ifndef CS_USE_NEW_RENDERER
     SetupVertexBuffer ();
 
     top_mesh.morph_factor = 0;
@@ -925,8 +925,8 @@ void csGenmeshMeshObjectFactory::SetupFactory ()
     top_mesh.do_morph_texels = false;
     top_mesh.do_morph_colors = false;
     top_mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
-  }
 #endif
+  }
 }
 
 #ifdef CS_USE_NEW_RENDERER

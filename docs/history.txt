@@ -33,6 +33,8 @@ The history order is reversed so that new features are at the top.
 	- Fixed glrender3d and shadermgr so they compile on gcc.
 	- Fixed r3dtest so it compiles with old renderer too. Easier
 	  to compare performance that way.
+	- Fixed an initialization bug with bounding box creation in genmesh
+	  for new renderer.
 16-Jan-2003
 	- 'reverse_action' in 3D sprites was not initialized to false.
 	- Fixed odedynam plugin so it compiles again.
