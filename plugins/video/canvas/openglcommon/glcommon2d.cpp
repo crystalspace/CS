@@ -200,14 +200,18 @@ void csGraphics2DGLCommon::WriteCharGL (int x, int y, int fg, int /*bg*/, char c
   
   setGLColorfromint(fg);
 
-  // FIXME: without the 0.5 shift rounding errors in the
-  // openGL renderer can misalign text!
-  // maybe we should modify the glOrtho() in glrender to avoid
-  // having to do this fractional shift?
-  //glRasterPos2i (x, Height-y-1-FontList[Font].Height);
-  glRasterPos2f (x+0.5, Height-y-0.5-FontList[Font].Height);
+  // in fact the WriteCharacter() method properly shifts over
+  // the current modelview transform on each call, so that characters
+  // are drawn left-to-write.  But we bypass that because we know the
+  // exact x,y location of each letter.  We manipulate the transform
+  // directly, so any shift in WriteCharacter() is effectively ignored
+  // due to the Push/PopMatrix calls
+
+  glPushMatrix();
+  glTranslatef (x, Height-y-FontList[Font].Height,0.0);
 
   LocalFontServer->WriteCharacter(c,Font);
+  glPopMatrix();
 }
 
 void csGraphics2DGLCommon::DrawSpriteGL (ITextureHandle *hTex, int sx, int sy,

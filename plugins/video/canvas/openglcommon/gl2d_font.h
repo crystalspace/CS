@@ -41,13 +41,13 @@
 class csGraphics2DOpenGLFontServer
 {
     /// number of fonts currently stored here
-    int Font_Count;
+    int mFont_Count;
 
-    /** each font is stored as a set of opengl display lists, one
-     * per character.  Each display list, or character, has a number; the 
-     * number of the first character for each font is stored here
-     */
-    GLuint *Font_Offsets;
+    /** each font needs some extra information connected to how it is stored
+     *  internally */
+    class GLFontInfo;
+
+    GLFontInfo **mFont_Information_Array;
 
     /// Build a font from font data
     void BuildFont(FontDef &newfont);
@@ -66,17 +66,20 @@ class csGraphics2DOpenGLFontServer
     void AddFont(FontDef &addme);
 
     /// Check how many fonts are stored in here
-    int CountFonts() const { return Font_Count; }
+    int CountFonts() const { return mFont_Count; }
 
     /** Draw a string using OpenGL.  It is assumed you have
-     * set up the render state using glColor and glRasterPos.
-     * to use a non-default font, pass in a second argument with
+     * set up the render state using glColor and a modelview transform.
+     * To use a non-default font, pass in a second argument with
      * the number of the font to use */
     void WriteCharacters(char *writeme, int fontnumber = 0);
 
     /** Draw a single character using OpenGL.  It is assumed you have
-     * set up the render state using glColor and glRasterPos.
-     * to use a non-default font, pass in a second argument with
+     * set up the render state using glColor and set the modelview
+     * transform so that the character can be drawn at (0,0).  The
+     * transform will be updated so that the next character will
+     * be drawn shifted over, in the correct position.
+     * To use a non-default font, pass in a second argument with
      * the number of the font to use */
     void WriteCharacter(char writeme, int fontnumber = 0);
 
