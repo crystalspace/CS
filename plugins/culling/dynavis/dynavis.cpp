@@ -186,7 +186,7 @@ bool csDynaVis::do_cull_writequeue = true;
 bool csDynaVis::do_cull_ignoresmall = false;
 bool csDynaVis::do_cull_clampoccluder = false;
 bool csDynaVis::do_cull_vpt = true;
-bool csDynaVis::do_cull_outline_splatting = true;
+bool csDynaVis::do_cull_outline_splatting = false;	// Fix bug with outlines behind view plane first!!!
 bool csDynaVis::do_insert_inverted_clipper = true;
 
 csDynaVis::csDynaVis (iBase *iParent) : visobj_wrappers (1000)

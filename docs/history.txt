@@ -27,6 +27,8 @@ chronological order.
 	  changes.
 	- res further worked on the PS1.x -> 1.4 converter. Can handle veeery
 	  simple programs now.
+	- Jorrit disabled outline splatting in the Dynavis plugin. This can
+	  be enabled again as soon as it works properly.
 25-Mar-2004
 	- res ported code to properly handle keycolored procedural textures
 	  over from the OR.
