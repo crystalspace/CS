@@ -1034,6 +1034,36 @@ bool csChunkLodTerrainObject::SetMaterialMap (iImage* map)
   return SetMaterialMap (image_data, map->GetWidth(), map->GetHeight());
 }
 
+bool csChunkLodTerrainObject::SetLODValue (const char* parameter, float value)
+{
+  if (strcmp (parameter, "lod distance") == 0)
+  {
+    lod_distance = value;
+    return true;
+  }
+  else if (strcmp (parameter, "error tolerance") == 0)
+  {
+    error_tolerance = value;
+    return true;
+  }
+  else
+    return false;
+}
+
+float csChunkLodTerrainObject::GetLODValue (const char* parameter) const
+{
+  if (strcmp (parameter, "lod distance") == 0)
+  {
+    return lod_distance;
+  }
+  else if (strcmp (parameter, "error tolerance") == 0)
+  {
+    return error_tolerance;
+  }
+  else
+    return 0.0f;
+}
+
 bool csChunkLodTerrainObject::SaveState (const char *filename)
 {
   return false;

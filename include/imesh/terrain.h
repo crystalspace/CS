@@ -31,7 +31,7 @@ struct iImage;
 struct iMovable;
 class csTransform;
 
-SCF_VERSION (iTerrainObjectState, 0, 0, 3);
+SCF_VERSION (iTerrainObjectState, 0, 1, 0);
 
 /**
  * This will override the settings for material in the parent
@@ -58,19 +58,23 @@ struct iTerrainObjectState : public iBase
   virtual bool SetMaterialMap (iImage* map) = 0;
 
   /**
-   * The distance at which splatting is no longer in effect and the
-   * base texture is the only layer.
+   * Set a LOD parameter.
+   * 
+   * The following parameters can be used:
+   * <ul>
+   * <li><i>"lod distance"</i> - The distance at which splatting is no longer 
+   *  in effect and the base texture is the only layer.</li>
+   * <li><i>"error tolerance"</i>  - The screenspace error tolerance in 
+   *  numbers of pixels. Error will be less than the given tolerance so 
+   *  setting the tolerance to values less than 1 is worthless.</li>
+   * </ul>
+   * \return Whether the value was accepted by the terrain object.
    */
-  virtual void SetLODDistance (float distance) = 0;
-  virtual float GetLODDistance () const = 0;
-
+  virtual bool SetLODValue (const char* parameter, float value) = 0;
   /**
-   * Sets the screenspace error tolerance in numbers of pixels. 
-   * Error will be less than the given tolerance so setting the tolerance
-   * to values less than 1 is worthless.
+   * Get a LOD parameter.
    */
-  virtual void SetErrorTolerance (float error) = 0;
-  virtual float GetErrorTolerance () const = 0;
+  virtual float GetLODValue (const char* parameter) const = 0;
 
   /**
    * Save/Restore preprocessing information, the algorithm will 

@@ -49,8 +49,7 @@ enum
   XMLTOKEN_FACTORY,
   XMLTOKEN_MATERIALPALETTE,
   XMLTOKEN_MATERIALMAP,
-  XMLTOKEN_LODDISTANCE,
-  XMLTOKEN_ERRORTOLERANCE,
+  XMLTOKEN_LODVALUE,
   XMLTOKEN_STATICLIGHTING,
   XMLTOKEN_CASTSHADOWS
 };
@@ -271,8 +270,7 @@ bool csTerrainObjectLoader::Initialize (iObjectRegistry* objreg)
   xmltokens.Register ("material", XMLTOKEN_MATERIAL);
   xmltokens.Register ("materialpalette", XMLTOKEN_MATERIALPALETTE);
   xmltokens.Register ("materialmap", XMLTOKEN_MATERIALMAP);
-  xmltokens.Register ("loddistance", XMLTOKEN_LODDISTANCE);
-  xmltokens.Register ("errortolerance", XMLTOKEN_ERRORTOLERANCE);
+  xmltokens.Register ("lodvalue", XMLTOKEN_LODVALUE);
   xmltokens.Register ("staticlighting", XMLTOKEN_STATICLIGHTING);
   xmltokens.Register ("castshadows", XMLTOKEN_CASTSHADOWS);
   return true;
@@ -407,22 +405,23 @@ csPtr<iBase> csTerrainObjectLoader::Parse (iDocumentNode* node,
         }
         break;
       }
-      case XMLTOKEN_LODDISTANCE:
+      case XMLTOKEN_LODVALUE:
       {
         if (material_map_set)
 	{
           synldr->ReportError ("crystalspace.terrain.factory.loader",
-              child, "<loddistance> must be set before <materialmap>!");
+              child, "<lodvalue> must be set before <materialmap>!");
           return 0;
 	}
-        float dist = child->GetContentsValueAsFloat ();
-	state->SetLODDistance (dist);
-	break;
-      }
-      case XMLTOKEN_ERRORTOLERANCE:
-      {
-        float error = child->GetContentsValueAsFloat ();
-	state->SetErrorTolerance (error);
+	const char* name = child->GetAttributeValue ("name");
+	if (name == 0)
+	{
+          synldr->ReportError ("crystalspace.terrain.factory.loader",
+              child, "<lodvalue> has no 'name' attribute");
+          return 0;
+	}
+        float val = child->GetContentsValueAsFloat ();
+	state->SetLODValue (name, val);
 	break;
       }
       case XMLTOKEN_STATICLIGHTING:

@@ -429,10 +429,8 @@ public:
   }
   bool SetMaterialMap (const csArray<char>& data, int x, int y);
   bool SetMaterialMap (iImage* map);
-  void SetLODDistance (float distance) { lod_distance = distance; }
-  float GetLODDistance () const { return lod_distance; }
-  void SetErrorTolerance (float error) { error_tolerance = error; }
-  float GetErrorTolerance () const { return error_tolerance; }
+  bool SetLODValue (const char* parameter, float value);
+  float GetLODValue (const char* parameter) const;
   /// Saves the texture quad-tree into the file specified
   bool SaveState (const char *filename);
   bool RestoreState (const char *filename);
@@ -472,14 +470,10 @@ public:
     { return scfParent->SetMaterialMap (data, x, y); }
     virtual bool SetMaterialMap (iImage* map)
     { return scfParent->SetMaterialMap (map); }
-    virtual void SetLODDistance (float distance)
-    { scfParent->SetLODDistance (distance); }
-    virtual float GetLODDistance () const
-    { return scfParent->GetLODDistance (); }
-    virtual void SetErrorTolerance (float error)
-    { scfParent->SetErrorTolerance (error); }
-    virtual float GetErrorTolerance () const
-    { return scfParent->GetErrorTolerance (); }
+    virtual bool SetLODValue (const char* parameter, float value)
+    { return scfParent->SetLODValue (parameter, value); }
+    virtual float GetLODValue (const char* parameter) const
+    { return scfParent->GetLODValue (parameter); }
     virtual bool SaveState (const char *filename)
     { return scfParent->SaveState (filename); }
     virtual bool RestoreState (const char *filename) 

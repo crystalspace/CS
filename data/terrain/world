@@ -187,8 +187,8 @@
 	  <material>Marble</material>
 	  <material>Stone</material>
 	</materialpalette>
-	<loddistance>200</loddistance>
-	<errortolerance>1</errortolerance>
+	<lodvalue name="lod distance">200</lodvalue>
+	<lodvalue name="error tolerance">1</lodvalue>
 	<materialmap image="/lev/terrain/materialmap.png" />
       </params>
       <move> 
