@@ -1005,8 +1005,6 @@ bool csOctree::BoxCanSeeOccludee (const csBox3& box, const csBox3& occludee)
   // all those polygons. The resulting intersection is then added to the
   // c-buffer.
 
-  int i;
-
   // First find a suitable plane between box and occludee. We take a plane
   // as close to box as possible (i.e. it will be a plane containing one
   // of the sides of 'box').
@@ -1047,7 +1045,7 @@ printf ("plane_nr=%d plane_pos=%f\n", plane_nr, plane_pos);
   int num_planes;
   num_planes = csMath3::OuterPlanes (occludee, box, planes);
   csPlane2 planes2d[8]; // The lines making up the 2D outline.
-  for (i = 0 ; i < num_planes ; i++)
+  for (int i = 0 ; i < num_planes ; i++)
     csIntersect3::PlaneAxisPlane (planes[i], plane_nr, plane_pos, planes2d[i]);
   // @@@ This routine is not ideal. We would like to be able to have
   // a convex 2D polygon for the projection of the outer planes on the
