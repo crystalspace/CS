@@ -31,6 +31,11 @@ chronological order.
 	  be enabled again as soon as it works properly.
 	- Luca reflected the change to the signature of the method
 	  iMeshObject::GetRenderMeshes to the csMeshObject class.
+	- Eric Sunshine worked around an MSVC6 compiler bug where it was unable
+	  to determine the type of template argument K in
+	  csStringArray::FindSortedKey().  Hopefully, we will be able to find a
+	  more suitable solution in the near future so that the ugly hack
+	  presently in use can be eliminated.
 25-Mar-2004
 	- res ported code to properly handle keycolored procedural textures
 	  over from the OR.

@@ -112,7 +112,31 @@ public:
     int (*comparekey)(char const* const& s, char const* const& k) =
     CaseSensitiveCompareKey, int* candidate = 0) const
   {
+#if !defined(COMP_VC)
     return superclass::FindSortedKey(key, comparekey, candidate);
+#else
+    // @@@ Ugly MSVC6 work-around; duplicate superclass' implementation.  When
+    // calling superclass::FindSortedKey(), MSVC6 claims that template argument
+    // K is ambiguous: (char const*) or (char const* const&).
+    int m = 0, l = 0, r = Length () - 1;
+    while (l <= r)
+    {
+      m = (l + r) / 2;
+      int cmp = comparekey (Get(m), key);
+
+      if (cmp == 0)
+      {
+        if (candidate) *candidate = -1;
+        return m;
+      }
+      else if (cmp < 0)
+        l = m + 1;
+      else
+        r = m - 1;
+    }
+    if (candidate) *candidate = m;
+    return -1;
+#endif
   }
 
   /**
