@@ -4,18 +4,28 @@
 
 if $(CMD.SWIG)
 {
-  # The sed commands/script with which the generated Swig file will be
-  # post-processed.  We filter out CVS `Header' keywords in order to prevent
-  # CVS from thinking that the file has changed simply because the Header
-  # information is different.  This is especially important when the
-  # Swig-generated files are created/updated by an automated script.  Further,
-  # we define the sed script here rather than inline in the Swig action in
-  # order to prevent accidental expansion of the `Header' keyword in this
-  # script (swig.jam) itself, since it is likely that the command in the Swig
-  # action will have additonal dollar signs following the sed commands; and CVS
-  # will replace everything between the two dollar signs with the `Header'
-  # information.
-  SWIG.SED_SCRIPT = "'/\$Header:/d'" ;
+  # Post-processing of the Swig-generated C++ file.  We need to ensure that
+  # <stdint.h> defines INT64_C() and cousins, which means that the
+  # __STDC_CONSTANT_MACROS and __STDC_LIMIT_MACROS macros must be defined
+  # before <stdint.h> is included.  In some Python installations, Python.h
+  # includes <stdint.h>, and Swig-generated output includes Python.h before we
+  # ever have a chance to define the __STDC_* macros.  There is no
+  # Swig-supported mechanism allowing us to insert these #defines before
+  # Python.h is included, so we post-process the output file.  Also, we delete
+  # any lines containing the CVS `Header' keyword to ensure that CVS does not
+  # consider the file changed simply because `Header' expansion differs.
+  # (Despite the fact that this customization seems project-specific, it should
+  # be safe for all projects.)
+  SWIG.SED_SCRIPT =
+    "'s/\\([ 	]*#[ 	]*include[ 	][ 	]*[<\"]Python.h[>\"]\\)/\\
+    #ifndef __STDC_CONSTANT_MACROS\\
+    #define __STDC_CONSTANT_MACROS\\
+    #endif\\
+    #ifndef __STDC_LIMIT_MACROS\\
+    #define __STDC_LIMIT_MACROS\\
+    #endif\\
+    \\1/
+    /\$Header:/d'" ;
 
   ## Swig cppfile : swigfile
   rule Swig

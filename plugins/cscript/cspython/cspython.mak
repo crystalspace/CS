@@ -96,6 +96,7 @@ endif
 TO_INSTALL.EXE += python.cex
 
 SWIG.CSPYTHON.OUTDIR = $(OUTDERIVED)/python
+SWIG.CSPYTHON.SED = $(SWIG.CSPYTHON.OUTDIR)/cspython.sed
 SWIG.CSPYTHON.INTERFACE = $(SRCDIR)/include/ivaria/cspace.i
 SWIG.CSPYTHON = $(SWIG.CSPYTHON.OUTDIR)/cs_pyth.cpp
 SWIG.CSPYTHON.CVS = $(SRCDIR)/plugins/cscript/cspython/cs_pyth.cpp
@@ -173,11 +174,32 @@ $(SWIG.CSPYTHON.PY): $(SWIG.CSPYTHON.PY.CVS)
 	-$(RM) $(SWIG.CSPYTHON.PY)
 	$(CP) $(SWIG.CSPYTHON.PY.CVS) $(SWIG.CSPYTHON.PY)
 else
+# Post-processing of the Swig-generated C++ file.  We need to ensure that
+# <stdint.h> defines INT64_C() and cousins, which means that the
+# __STDC_CONSTANT_MACROS and __STDC_LIMIT_MACROS macros must be defined before
+# <stdint.h> is included.  In some Python installations, Python.h includes
+# <stdint.h>, and Swig-generated output includes Python.h before we ever have a
+# chance to define the __STDC_* macros.  There is no Swig-supported mechanism
+# allowing us to insert these #defines before Python.h is included, so we
+# post-process the output file.  Also, we delete any lines containing the CVS
+# `Header' keyword to ensure that CVS does not consider the file changed simply
+# because `Header' expansion differs.
+$(SWIG.CSPYTHON.SED):
+	echo $"s/\([ 	]*#[ 	]*include[ 	][ 	]*[<"]Python.h[>"]\)/\$">$@
+	echo $"#ifndef __STDC_CONSTANT_MACROS\$">>$@
+	echo $"#define __STDC_CONSTANT_MACROS\$">>$@
+	echo $"#endif\$">>$@
+	echo $"#ifndef __STDC_LIMIT_MACROS\$">>$@
+	echo $"#define __STDC_LIMIT_MACROS\$">>$@
+	echo $"#endif\$">>$@
+	echo $"\1/$">>$@
+	echo $"/$(BUCK)Header:/d$">>$@
+
 $(SWIG.CSPYTHON) $(SWIG.CSPYTHON.PY): \
-  $(SWIG.CSPYTHON.INTERFACE) $(SWIG.CSPYTHON.DEPS)
+  $(SWIG.CSPYTHON.INTERFACE) $(SWIG.CSPYTHON.DEPS) $(SWIG.CSPYTHON.SED)
 	$(CMD.SWIG) $(SWIG.FLAGS) $(SWIG.FLAGS.CSPYTHON) -o $(SWIG.CSPYTHON) \
 	$(SWIG.CSPYTHON.INTERFACE)
-	$(SED) '/$(BUCK)Header:/d' < $(SWIG.CSPYTHON) > $(SWIG.CSPYTHON).sed
+	$(SED) -f $(SWIG.CSPYTHON.SED) < $(SWIG.CSPYTHON) > $(SWIG.CSPYTHON).sed
 	$(RM) $(SWIG.CSPYTHON)
 	$(MV) $(SWIG.CSPYTHON).sed $(SWIG.CSPYTHON)
 

@@ -43,6 +43,15 @@ chronological order.
 	- Eric Sunshine fixed bugs in configure.ac where it was composing
 	  search paths using a literal ":" delimiter rather than
 	  $PATH_SEPARATOR.
+	- Eric Sunshine worked around a problem where INT64_C() and similar
+	  macros from <stdint.h> were not getting defined when building
+	  cs_pyth.cpp.  This happened because the Swig-generated cs_pyth.cpp
+	  includes <Python.h> very early, which includes <stdint.h> (on some
+	  platforms) before we have a chance to define __STDC_LIMIT_MACROS.
+	  __STDC_LIMIT_MACROS must be defined before <stdint.h> is included in
+	  order for <stdint.h> to define INT64_C() and cousins.  To solve,
+	  cs_pyth.cpp is now post-processed to ensure that __STDC_LIMIT_MACROS
+	  is defined before <Python.h> is included.
 22-Mar-2004
 	- Anders Stenberg fixed several places where mesh objects would
 	  return "false" from GetRenderMeshes (which is supposed to return
