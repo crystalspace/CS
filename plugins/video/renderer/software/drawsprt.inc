@@ -148,7 +148,7 @@ static void DP_NAME (iGraphics2D *G2D, iTextureHandle *hTex,
 	    {
 	      register uint8
 #ifdef DP_PIXFORM_R8G8B8
-	      dstf = ((31-alpha[(_tx & bwm)>>16])<<3), srcf = dstf ^ 0xff;
+	      dstf = (255-alpha[(_tx & bwm)>>16]), srcf = dstf ^ 0xff;
 #else
 	      dstf = (31-alpha[(_tx & bwm)>>16]), srcf = dstf ^ 0x1f;
 #endif
@@ -162,7 +162,7 @@ static void DP_NAME (iGraphics2D *G2D, iTextureHandle *hTex,
           {
 	    register uint8
 #ifdef DP_PIXFORM_R8G8B8
-	    dstf = ((31-alpha[(_tx & bwm)>>16])<<3), srcf = dstf ^ 0xff;
+	    dstf = (255-alpha[(_tx & bwm)>>16]), srcf = dstf ^ 0xff;
 #else
 	    dstf = (31-alpha[(_tx & bwm)>>16]), srcf = dstf ^ 0x1f;
 #endif
@@ -188,7 +188,7 @@ static void DP_NAME (iGraphics2D *G2D, iTextureHandle *hTex,
 	    {
 	      register uint8
 #ifdef DP_PIXFORM_R8G8B8
-	      dstf = ((31-alpha[tx>>16])<<3), srcf = dstf ^ 0xff;
+	      dstf = (255-alpha[tx>>16]), srcf = dstf ^ 0xff;
 #else
 	      dstf = (31-alpha[tx>>16]), srcf = dstf ^ 0x1f;
 #endif
@@ -202,7 +202,7 @@ static void DP_NAME (iGraphics2D *G2D, iTextureHandle *hTex,
           {
 	    register uint8
 #ifdef DP_PIXFORM_R8G8B8
-	    dstf = ((31-alpha[tx>>16])<<3), srcf = dstf ^ 0xff;
+	    dstf = (255-alpha[tx>>16]), srcf = dstf ^ 0xff;
 #else
 	    dstf = (31-alpha[tx>>16]), srcf = dstf ^ 0x1f;
 #endif

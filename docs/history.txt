@@ -1,5 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
+24-Nov-2000
+	- Fixed a bug in alpha map support for DrawPixmap and software
+	  renderer when used on a 32-bit display. It was actually completely
+	  wrong.
 23-Nov-2000
 	- Martin Geisse did some clean-up work for dnapp.
 	- Martin also fixed a bug in csIniFile which crashed when the
