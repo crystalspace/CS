@@ -16,6 +16,10 @@ chronological order.
 	- Jorrit did a small optimization to csNewParticleSystem. If lighting
 	  is not enabled it will not call GetRelevantLights() from the
 	  light manager.
+	- Jorrit restored bugplug screenshot to put screenshot back to /this
+	  instead of /tmp. Having them in /tmp is very confusing as this
+	  will mix screenshots of different apps with no way to distinguish
+	  them.
 10-Feb-2004
 	- Eric Sunshine fixed CS/data/Jamfile so that it no longer tries to
 	  install the non-existent unifont.csf file.  (Bug reported by Frank
