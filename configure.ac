@@ -580,7 +580,8 @@ CS_MAKEFILE_PROPERTY([CXX], [$CXX -c])
 CS_MAKEFILE_PROPERTY([LINK], [$CXX])
 AS_IF([test $ac_compiler_gnu = yes],
     [cs_compiler_name=GCC CS_HEADER_PROPERTY([COMP_GCC])],
-    [cs_compiler_name=$CXX])
+    [cs_compiler_name="AS_TR_CPP([$CXX])"])
+CS_MAKEFILE_PROPERTY([COMP], [$cs_compiler_name])
 CS_HEADER_PROPERTY([CS_COMPILER_NAME],
     [CS_ESCAPE(["])$cs_compiler_name[]CS_ESCAPE(["])])
 
@@ -659,12 +660,13 @@ AS_IF([test -n "$MAKEDEP"],
     [AC_CACHE_CHECK([for makedep extensions], [cs_cv_prog_makedep_ok],
 	[cs_makedep_ver=`makedep -V | sed -e "s/.*Version *//" 2>/dev/null`
 	AS_IF([test `expr "${cs_makedep_ver}" ">" 0.0.0` = "1"],
-	    [cs_cv_prog_makedep_ok=yes], [cs_cv_prog_makedep_ok=no])])
-    AS_IF([test $cs_cv_prog_makedep_ok = yes],
-	[CS_MAKEFILE_PROPERTY([MAKEDEP.AVAILABLE], [$cs_cv_prog_makedep_ok])
-	CS_MAKEFILE_PROPERTY([CMD.MAKEDEP], [$MAKEDEP])
-	CS_MAKEFILE_PROPERTY([DEPEND_TOOL], [mkdep])])],
+	    [cs_cv_prog_makedep_ok=yes], [cs_cv_prog_makedep_ok=no])])],
     [cs_cv_prog_makedep_ok=no])
+AS_IF([test $cs_cv_prog_makedep_ok = yes],
+    [CS_MAKEFILE_PROPERTY([MAKEDEP.AVAILABLE], [$cs_cv_prog_makedep_ok])
+    CS_MAKEFILE_PROPERTY([CMD.MAKEDEP], [$MAKEDEP])
+    CS_MAKEFILE_PROPERTY([DEPEND_TOOL], [mkdep])],
+    [CS_MAKEFILE_PROPERTY([DEPEND_TOOL], [cc])])
 
 
 
@@ -1434,8 +1436,10 @@ case $cs_host_family in
 	;;
 esac
 
+cs_host_os_normalized_uc="AS_TR_CPP([$cs_host_os_normalized])"
 CS_MAKEFILE_PROPERTY([TARGET], [$cs_host_target])
 CS_MAKEFILE_PROPERTY([TARGET_MAKEFILE], [$cs_host_makefile])
+CS_MAKEFILE_PROPERTY([OS], [$cs_host_os_normalized_uc])
 CS_HEADER_PROPERTY([CS_PLATFORM_NAME],
     [CS_ESCAPE(["])$cs_host_os_normalized[]CS_ESCAPE(["])])
 

@@ -2635,9 +2635,11 @@ if test $ac_compiler_gnu = yes; then
   cs_compiler_name=GCC cs_header_text="${cs_header_text}#define COMP_GCC
 "
 else
-  cs_compiler_name=$CXX
+  cs_compiler_name="`echo "$CXX" | $as_tr_cpp`"
 fi
 
+cs_makefile_text="${cs_makefile_text}COMP = $cs_compiler_name
+"
 cs_header_text="${cs_header_text}#define CS_COMPILER_NAME \\\"$cs_compiler_name\\\"
 "
 
@@ -3169,17 +3171,20 @@ fi
 fi
 echo "$as_me:$LINENO: result: $cs_cv_prog_makedep_ok" >&5
 echo "${ECHO_T}$cs_cv_prog_makedep_ok" >&6
-    if test $cs_cv_prog_makedep_ok = yes; then
-  cs_makefile_text="${cs_makefile_text}MAKEDEP.AVAILABLE = $cs_cv_prog_makedep_ok
-"
-	cs_makefile_text="${cs_makefile_text}CMD.MAKEDEP = $MAKEDEP
-"
-	cs_makefile_text="${cs_makefile_text}DEPEND_TOOL = mkdep
-"
-fi
-
 else
   cs_cv_prog_makedep_ok=no
+fi
+
+if test $cs_cv_prog_makedep_ok = yes; then
+  cs_makefile_text="${cs_makefile_text}MAKEDEP.AVAILABLE = $cs_cv_prog_makedep_ok
+"
+    cs_makefile_text="${cs_makefile_text}CMD.MAKEDEP = $MAKEDEP
+"
+    cs_makefile_text="${cs_makefile_text}DEPEND_TOOL = mkdep
+"
+else
+  cs_makefile_text="${cs_makefile_text}DEPEND_TOOL = cc
+"
 fi
 
 
@@ -14168,9 +14173,12 @@ fi
 	;;
 esac
 
+cs_host_os_normalized_uc="`echo "$cs_host_os_normalized" | $as_tr_cpp`"
 cs_makefile_text="${cs_makefile_text}TARGET = $cs_host_target
 "
 cs_makefile_text="${cs_makefile_text}TARGET_MAKEFILE = $cs_host_makefile
+"
+cs_makefile_text="${cs_makefile_text}OS = $cs_host_os_normalized_uc
 "
 cs_header_text="${cs_header_text}#define CS_PLATFORM_NAME \\\"$cs_host_os_normalized\\\"
 "

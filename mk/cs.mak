@@ -1,22 +1,18 @@
-###############################################
-# These are the dependencies for Crystal Space.
-# This is an include file for the makefiles.
-# Don't use this directly as a makefile.
-###############################################
+#==============================================================================
+# These are the dependencies for Crystal Space.  This is an include file for
+# the makefiles.  Don't use this directly as a makefile.
+#==============================================================================
 
 # The following two symbols are intended to be used in "echo" commands.
 # config.mak can override them depending on configured platform's requirements.
 "='
 |=|
 
-# The following include file should define all variables
-# needed for this makefile to work. Please do not change
-# the include order unless you know what you are doing!
-MAKESECTION=earlyinit
--include config.mak
-ifneq ($(TARGET_MAKEFILE),)
-  include $(TARGET_MAKEFILE)
-endif
+# The following include file should define all variables needed for this
+# makefile to work.  Please do not change the include order unless you know
+# what you are doing!
+include config.mak
+include $(TARGET_MAKEFILE)
 include mk/user.mak
 include mk/common.mak
 
@@ -87,7 +83,7 @@ ifneq (.,$(OUTDLL))
 OUTDIRS += $(OUTDLL)
 endif
 
-############################################
+#==============================================================================
 
 CFLAGS.INCLUDE+=$(CFLAGS.I). $(CFLAGS.I)./include $(CFLAGS.I)./libs \
   $(CFLAGS.I)./plugins $(CFLAGS.I)./apps
@@ -119,25 +115,30 @@ DO.COMPILE.C = $(CC) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 # How to compile a .cpp source
 DO.COMPILE.CPP = $(CXX) $(CFLAGS.@) $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 # How to compile a GAS source
-DO.COMPILE.S = $(CC) $(CFLAGS.@) -x assembler-with-cpp $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
+DO.COMPILE.S = \
+  $(CC) $(CFLAGS.@) -x assembler-with-cpp $(<<) $(CFLAGS) $(CFLAGS.INCLUDE)
 # How to compile a NASM source
 DO.COMPILE.ASM = $(NASM.BIN) $(NASM.@) $(NASMFLAGS) $(<<)
 # How to make a static library
 DO.STATIC.LIBRARY = $(AR) $(ARFLAGS) $(ARFLAGS.@) $(^^)
 # How to make a shared/dynamic library
-DO.SHARED.LIBRARY = $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS)
+DO.SHARED.LIBRARY = \
+  $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS)
 # How to make a static plugin
 DO.STATIC.PLUGIN.PREAMBLE =
 DO.STATIC.PLUGIN.CORE = $(AR) $(ARFLAGS) $(ARFLAGS.@) $(^^)
 DO.STATIC.PLUGIN.POSTAMBLE =
 # How to make a shared plugin
 DO.SHARED.PLUGIN.PREAMBLE =
-DO.SHARED.PLUGIN.CORE = $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS)
+DO.SHARED.PLUGIN.CORE = \
+  $(LINK) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS)
 DO.SHARED.PLUGIN.POSTAMBLE =
 # How to link a console executable
-DO.LINK.CONSOLE.EXE = $(LINK) $(LFLAGS) $(LFLAGS.CONSOLE.EXE) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
+DO.LINK.CONSOLE.EXE = $(LINK) $(LFLAGS) $(LFLAGS.CONSOLE.EXE) $(LFLAGS.@) \
+  $(^^) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
 # How to link a graphical executable
-DO.LINK.EXE = $(LINK) $(LFLAGS) $(LFLAGS.EXE) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
+DO.LINK.EXE = $(LINK) $(LFLAGS) $(LFLAGS.EXE) $(LFLAGS.@) \
+  $(^^) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
 
 # How to do either a dynamic or static library (depending on MAKE_DLL)
 ifeq ($(MAKE_DLL),yes)
@@ -173,7 +174,8 @@ dep: build.makedep
         endif
       endif
       DO.DEP1 = $(MAKEDEP) $(subst $(CFLAGS.I),-I,$(CFLAGS.INCLUDE) )
-      DO.DEP2 = $(filter-out %.asm,$^) -o $(BUCK)O -p $(BUCK)\(OUT\)/ -r -c -f $@
+      DO.DEP2 = \
+        $(filter-out %.asm,$^) -o $(BUCK)O -p $(BUCK)\(OUT\)/ -r -c -f $@
       DO.DEP = $(DO.DEP1) $(DO.DEP2)
     else
       DO.DEP = echo Building dependencies is not supported on this platform
@@ -195,7 +197,8 @@ LIBS.EXE := $(sort $(LIBS.EXE))
 # made the last ones (in the exact sequence) but only if they are already
 # present in LIBS.EXE
 ifdef LIBS.SORT
-  LIBS.EXE := $(filter-out $(LIBS.SORT),$(LIBS.EXE)) $(foreach LIB,$(LIBS.SORT),$(filter $(LIB),$(LIBS.EXE)))
+  LIBS.EXE := $(filter-out $(LIBS.SORT),$(LIBS.EXE)) \
+    $(foreach LIB,$(LIBS.SORT),$(filter $(LIB),$(LIBS.EXE)))
 endif
 
 all: $(OUTDIRS)
@@ -206,10 +209,8 @@ maintainerclean: distclean
 	-$(RMDIR) configure autom4te.cache
 
 distclean: clean
-	-$(RM) config.mak config.cache config.status include/volatile.h
-# Enable this after old configuration facility is removed, and `configure'
-# creates Makefile.
-#	-$(RM) Makefile
+	-$(RM) Makefile config.mak config.cache config.status \
+	include/volatile.h
 
 clean:
 	-$(RM) config.log

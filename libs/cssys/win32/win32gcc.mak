@@ -1,8 +1,7 @@
-# This is the makefile for Mingw and Cygwin (gcc for Win32)
-# With Mingw, optionally works with the MSYS environment.
+# This is the makefile for Mingw+MSYS and Cygwin (gcc for Win32)
 
 # Friendly names for building environment
-DESCRIPTION.win32gcc = Windows with Mingw or Cygwin
+DESCRIPTION.win32gcc = Windows with Mingw+MSYS or Cygwin
 DESCRIPTION.OS.win32gcc = Win32
 
 # Choose which drivers you want to build/use
@@ -12,34 +11,11 @@ PLUGINS += video/canvas/ddraw8
 #PLUGINS.DYNAMIC +=video/format/avi
 #PLUGINS.DYNAMIC +=video/format/codecs/opendivx
 
-# Make sure that GL.LFLAGS and optionally GL.CFLAGS are set correctly below.
-GL.AVAILABLE = yes
 ifeq ($(GL.AVAILABLE),yes)
 PLUGINS += video/canvas/openglwin
 endif
 
 PLUGINS += sound/driver/waveoutsd
-
-#--------------------------------------------------- rootdefines & defines ---#
-ifneq (,$(findstring defines,$(MAKESECTION)))
-
-.SUFFIXES: .exe .dll
-
-# Processor type.
-PROC=X86
-
-# Operating system
-OS=WIN32
-
-# Compiler
-COMP=GCC
-
-# Command to update a target
-ifeq (,$(MSYSTEM))
-UPD=libs/cssys/win32/winupd.bat $@ DEST
-endif
-
-endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
 #----------------------------------------------------------------- defines ---#
 ifeq ($(MAKESECTION),defines)
@@ -53,78 +29,61 @@ O=.o
 LIB_PREFIX=lib
 
 # Extra libraries needed on this system (beside drivers)
-# LIBS.SYSTEM comes from the local config.mak and is set up by win32conf.sh.
-LIBS.EXE= $(LFLAGS.L)/usr/lib/w32api $(LFLAGS.l)gdi32 $(LIBS.SYSTEM) \
+# LIBS.SYSTEM comes from the local config.mak and is set up by the Autoconf
+# configure script.
+LIBS.EXE = \
+  $(LFLAGS.L)/usr/lib/w32api \
+  $(LFLAGS.l)gdi32 \
+  $(LIBS.SYSTEM) \
   $(LFLAGS.l)shell32 
 
-# OpenGL settings for use with OpenGL Drivers...untested
-# SGI OPENGL SDK v1.1.1 for Win32
-#GL.LFLAGS = $(LFLAGS.l)opengl
-
-# MS OpenGL
-GL.LFLAGS = $(LFLAGS.l)opengl32
-
 # Sound library
-LIBS.SOUND.SYSTEM=$(LFLAGS.l)dsound $(LFLAGS.l)winmm
+LIBS.SOUND.SYSTEM = $(LFLAGS.l)dsound $(LFLAGS.l)winmm
 
 # Lua library
-LIBS.CSLUA.SYSTEM=$(LFLAGS.l)lua $(LFLAGS.l)lualib
+LIBS.CSLUA.SYSTEM = $(LFLAGS.l)lua $(LFLAGS.l)lualib
 
 # Freetype library
-LIBS.FREETYPE.SYSTEM=$(LFLAGS.l)ttf
+LIBS.FREETYPE.SYSTEM = $(LFLAGS.l)ttf
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=$(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS) -pipe
-
-# Flags for the compiler which are used when optimizing.
-CFLAGS.optimize=-s -O3 -ffast-math
-ifneq ($(shell gcc --version),2.95.2)
-# WARNING: mingw32 2.95.2 has a bug that causes incorrect code
-# to be generated if you use -fomit-frame-pointer
-CFLAGS.optimize += -fomit-frame-pointer
-endif
-
-# Flags for the compiler which are used when debugging.
-CFLAGS.debug=-g3
+CFLAGS.GENERAL = $(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS) -pipe
 
 # Flags for the compiler which are used when profiling.
-CFLAGS.profile=-pg -O -g
+CFLAGS.profile = -pg -O -g
 
 # Flags for the compiler which are used when building a shared library.
-CFLAGS.DLL=
+CFLAGS.DLL =
 
 # General flags for the linker which are used in any case.
 LFLAGS.GENERAL = $(CSTHREAD.LFLAGS)
 
 # Flags for the linker which are used when optimizing.
-LFLAGS.optimize=-s
-
-# Flags for the linker which are used when debugging.
-LFLAGS.debug=-g3
+LFLAGS.optimize += -s
 
 # Flags for the linker which are used when profiling.
-LFLAGS.profile=-pg
+LFLAGS.profile = -pg
 
 # Flags for linking DLLs in optimize mode
-DFLAGS.optimize = -s
+DFLAGS.optimize += -s
 
 # Flags for linking DLLs in debug mode
 DFLAGS.debug = 
 #DFLAGS.debug = -Xlinker --export-all-symbols
 
 # Flags for the linker which are used when building a shared library.
-LFLAGS.DLL=$(DFLAGS.$(MODE)) -shared
+LFLAGS.DLL = $(DFLAGS.$(MODE)) -shared
 
 # Typical extension for objects and static libraries
-LIB=.a
+LIB = .a
 define AR
   rm -f $@
   ar
 endef
-ARFLAGS=cr
+ARFLAGS = cr
 
 # System-dependent flags to pass to NASM
-NASMFLAGS.SYSTEM=-f win32 $(CFLAGS.D)EXTERNC_UNDERSCORE
+NASMFLAGS.SYSTEM = -f win32 $(CFLAGS.D)EXTERNC_UNDERSCORE
 
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = $(wildcard libs/cssys/win32/*.cpp) \
@@ -136,59 +95,40 @@ SRC.SYS_CSSYS = $(wildcard libs/cssys/win32/*.cpp) \
   $(CSTHREAD.SRC)
 INC.SYS_CSSYS = $(wildcard libs/cssys/win32/*.h) $(CSTHREAD.INC)
 
-# Command sequence for creating a directory, and command for creating a
-# directory as well as any missing parents.
-# Note that directories will have forward slashes. Please
-# make sure that this command accepts that (or use 'subst' first).
-# If we are using a Unix-like shell, then use Unix-like paths, otherwise
-# simply inherit these settings from CS/mk/dos.mak.
-ifeq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL))$(findstring cmd,$(SHELL))$(findstring CMD,$(SHELL)))
-  MKDIR=$(CMD.MKDIR) $(patsubst %/,%,$@)
-  MKDIRS=$(CMD.MKDIRS) $(patsubst %/,%,$@)
-endif
-
 # Extra parameters for 'sed' which are used for doing 'make depend'.
-SYS_SED_DEPEND=-e "s/\.ob*j*\:/\$$O:/g"
+SYS_SED_DEPEND = -e "s/\.ob*j*\:/\$$O:/g"
 
 # Flags for linking a GUI and a console executable
 ifeq ($(MODE),debug)
-  LFLAGS.EXE=-mconsole
+  LFLAGS.EXE = -mconsole
 else
-  LFLAGS.EXE=-mwindows
+  LFLAGS.EXE = -mwindows
 endif
-# commenting out the following line will make the -noconsole option work
+# Commenting out the following line will make the -noconsole option work
 # but the only way to redirect output will be WITH -noconsole (wacky :-)
 # and the console will not start minimized if a shortcut says it should
-#LFLAGS.EXE+=-mconsole
-LFLAGS.CONSOLE.EXE=-mconsole
+#LFLAGS.EXE += -mconsole
+LFLAGS.CONSOLE.EXE = -mconsole
 
 # Use makedep to build dependencies
-DEPEND_TOOL=mkdep
+DEPEND_TOOL = mkdep
 
 endif # ifeq ($(MAKESECTION),defines)
 
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-# If SHELL is the Windows COMMAND or CMD, then we need "bash" for scripts.
-# Also, multiple commands are separated with "&" vs ";" w/ bash.
-ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL))$(findstring cmd,$(SHELL))$(findstring CMD,$(SHELL)))
-  RUN_SCRIPT = bash
-  COMMAND_DELIM = &
-else
-  COMMAND_DELIM = ;
-endif
+COMMAND_DELIM = ;
 
 # How to make shared libs for cs-config
-LINK.PLUGIN=$(LINK)
-PLUGIN.POSTFLAGS=-mwindows -mconsole
+LINK.PLUGIN = $(LINK)
+PLUGIN.POSTFLAGS = -mwindows -mconsole
 
-# How to make a shared AKA dynamic library
-
+# How to make a shared (a.k.a. dynamic) library.
 ifeq ($(MODE),debug)
-  RCFLAGS=-DCS_DEBUG
+  RCFLAGS = -DCS_DEBUG
 else
-  RCFLAGS=
+  RCFLAGS =
 endif
 
 COMPILE_RES = windres --include-dir include $(RCFLAGS) 
@@ -232,29 +172,3 @@ DO.LINK.CONSOLE.EXE = \
     $(OUT)/$(@:$(EXE)=-rsrc.o) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
 
 endif # ifeq ($(MAKESECTION),postdefines)
-
-#-------------------------------------------------------------- confighelp ---#
-ifeq ($(MAKESECTION),confighelp)
-
-ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL)))
-"=
-|=³
-endif
-
-SYSHELP += \
-  $(NEWLINE)echo $"  make win32gcc     Prepare for building on $(DESCRIPTION.win32gcc)$"
-
-endif # ifeq ($(MAKESECTION),confighelp)
-
-#--------------------------------------------------------------- configure ---#
-ifeq ($(MAKESECTION),rootdefines) # Makefile includes us twice with valid
-ifeq ($(ROOTCONFIG),config)	  # ROOTCONFIG, but we only need to run once.
-
-ifneq (,$(MSYSTEM))
-SYSCONFIG += $(NEWLINE)sh libs/cssys/win32/win32conf.sh $(INSTALL_DIR)>>config.tmp
-else
-SYSCONFIG=libs/cssys/win32/winconf.bat mingw32
-endif
-
-endif # ifeq ($(ROOTCONFIG),config)
-endif # ifeq ($(MAKESECTION),rootdefines)

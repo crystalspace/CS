@@ -4,34 +4,28 @@
 #
 ################################################################################
 
-.PHONY: help banner showplatforms showconfig platforms all depend configure \
-  configbanner clean cleanlib cleandep distclean maintainerclean libs plugins \
-  drivers drivers2d drivers3d snddrivers netdrivers meshes softcanvas show
+.PHONY: all help openbanner showconfig depend clean cleanlib cleandep \
+  distclean maintainerclean libs plugins drivers drivers2d drivers3d \
+  snddrivers netdrivers meshes softcanvas show
 
 # The following two symbols are intended to be used in "echo" commands.
 # config.mak can override them depending on configured platform's requirements.
 "='
 |=|
--include config.mak
+
+include config.mak
+include $(TARGET_MAKEFILE)
+include mk/user.mak
+include mk/common.mak
 
 # parameters for recursive make calls
 RECMAKEFLAGS=--no-print-directory --no-builtin-rules
 MAKEFLAGS+=r
-
-MAKESECTION=earlyinit
-ifneq ($(TARGET_MAKEFILE),)
-  include $(TARGET_MAKEFILE)
-endif
-include mk/user.mak
-include mk/common.mak
-
-# Find all available platform targets
-SYSMAKEFILES=$(wildcard libs/cssys/*/*.mak)
-SYSTARGETS=$(basename $(notdir $(SYSMAKEFILES)))
+@SET_MAKE@
 
 # The initial driver and application targets help text
-SYSHELP = \
-  echo $"The makefile system can be configured for the following platforms:$"
+CONFIGHELP = \
+  echo $"Configured for $(DESCRIPTION.$(TARGET)) with the following options:$"
 DRIVERHELP = \
   echo $"The following Crystal Space drivers can be built:$"
 PLUGINHELP = \
@@ -51,7 +45,7 @@ define PSEUDOHELP
   echo $"  make meshes       Make all mesh plugins$"
   echo $"  make drivers      Make all drivers$"
   echo $"  make drivers2d    Make all supported 2D graphics drivers$"
-  echo $"  make drivers3d    Make all supported 3D graphics drivers (renderers)$"
+  echo $"  make drivers3d    Make all supported 3D graphics renderers$"
   echo $"  make snddrivers   Make all supported sound drivers$"
   echo $"  make netdrivers   Make all supported network drivers$"
   echo $"  make check        Make and run tests (before commiting)$"
@@ -62,36 +56,12 @@ define PSEUDOHELP
   echo $"  make distclean    Clean everything$"
   echo $"  make platforms    List the available target platforms$"
 endef
-define SYSMODIFIERSHELP
-  echo $(SEPARATOR)
-  echo $"The following optional configuration modifiers may be specified:$"
-  echo $"$"
-  echo $"  USE_PLUGINS=yes$|no (default: yes)$"
-  echo $"      Build drivers/plugins as dynamic/static modules.$"
-  echo $"  MODE=optimize$|debug$|profile (default: optimize)$"
-  echo $"      Select one of three available compilation modes.$"
-  echo $"  EXTENSIVE_MEMDEBUG=yes$|no (default:no)$"
-  echo $"      In debug mode, enable extensive heap validation.$"
-endef
-
-# If there is no target defined (makefile system was not configured),
-# find the available targets and present the list to the user.
-ifeq ($(TARGET),)
-
-MAKESECTION=confighelp
-include mk/cache.mak
-include mk/install.mak
--include $(SYSMAKEFILES)
-
-help: banner showplatforms
-
-else
 
 MAKESECTION=rootdefines
 include mk/subs.mak
 
-help: banner showconfig driverhelp pluginhelp libhelp apphelp dochelp \
-  pseudohelp
+help: openbanner showconfig driverhelp pluginhelp libhelp apphelp dochelp \
+  pseudohelp 
 
 dep:
 	@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@ DO_DEPEND=yes
@@ -104,12 +74,8 @@ clean cleanlib cleandep distclean maintainerclean show:
 unknown:
 	$(RM) config.mak include/volatile.h
 
-platforms:
-	@echo $(SEPARATOR)
-	@$(MAKE) $(RECMAKEFLAGS) showplatforms TARGET="" TARGET_MAKEFILE=""
-
 showconfig:
-	@echo $"Configured for $(DESCRIPTION.$(TARGET)) with the following modifiers:$"
+	@$(CONFIGHELP)
 	@echo $"  USE_PLUGINS=$(USE_PLUGINS)$"
 	@echo $"  MODE=$(MODE)$"
 	@echo $"  EXTENSIVE_MEMDEBUG=$(EXTENSIVE_MEMDEBUG)$"
@@ -140,64 +106,8 @@ pseudohelp:
 	@$(PSEUDOHELP)
 	@echo $(SEPARATOR)
 
-endif
-
-banner:
+openbanner:
 	@echo $(SEPARATOR)
-	@echo $"  Before compiling Crystal Space examine mk/user.mak and see if settings$"
-	@echo $"  are suited to your system.$"
-	@echo $(SEPARATOR)
-
-showplatforms:
-	@$(SYSHELP)
-	@$(SYSMODIFIERSHELP)
-	@echo $"$"
-	@echo $"Example: make linux USE_PLUGINS=yes MODE=debug$"
-	@echo $(SEPARATOR)
-
-# Prepare for specific platform.
-# WARNING: Try to avoid quotes in most important "echo" statements
-# since several platforms (OS/2, DOS and WIN32) have a "echo" that does
-# literal output, i.e. they do not strip quotes from string.
-$(SYSTARGETS):
-	@echo TARGET = $@>config.tmp
-	@echo TARGET_MAKEFILE = $(filter %$@.mak,$(SYSMAKEFILES))>>config.tmp
-	@$(MAKE) $(RECMAKEFLAGS) ROOTCONFIG=config configure \
-		TARGET=$@ TARGET_MAKEFILE=$(filter %$@.mak,$(SYSMAKEFILES))
-
-ifeq ($(ROOTCONFIG),config)
-
-# Force config.tmp to be always rebuilt
-.PHONY: config.tmp
-
-configure: configbanner config.tmp
-	@$(MAKE) $(RECMAKEFLAGS) ROOTCONFIG=volatile configure
-
-configbanner:
-	@echo $(SEPARATOR)
-	@echo $"  Configuring makefiles for $(DESCRIPTION.$(TARGET)) [$(MODE)]$"
-	@echo $(SEPARATOR)
-
-config.tmp:
-	@echo USE_PLUGINS = $(USE_PLUGINS)>>config.tmp
-	@echo MODE = $(MODE)>>config.tmp
-	@echo EXTENSIVE_MEMDEBUG = $(EXTENSIVE_MEMDEBUG)>>config.tmp
-	@echo FORCEBUCK = $(FORCEBUCK)>>config.tmp
-	@$(SYSCONFIG)
-	@$(subst DEST,config.mak,$(UPD))
-
-endif
-ifeq ($(ROOTCONFIG),volatile)
-
-include mk/volatile.mak
-
-configure: volatile.tmp
-
-volatile.tmp: config.mak
-	@$(DO.MAKE.VOLATILE)
-	@$(subst DEST,include/volatile.h,$(UPD))
-
-endif
 
 MAKESECTION=roottargets
 include mk/subs.mak

@@ -1,6 +1,6 @@
 The history order is reversed so that new features are at the top.
 
-15-Jan-2002
+15-Jan-2003
 	- Started removing a few csVector usages and replacing them
 	  with typed versions. In particular changed:
 	    - csCrysBall
@@ -11,7 +11,13 @@ The history order is reversed so that new features are at the top.
 	- Removed csObjVector (replaced with csRefArray in most places).
 	- Fixed terrfunc so that it correctly calculates the bounding box.
 	  This fixes an assert in dynavis/frustvis.
-14-Jan-2002
+	- Eric Sunshine removed the old ad-hoc "make platform" configuration
+	  mechanism.  The new Autoconf configure script is now the only way to
+	  configure the project.
+	- Eric Sunshine updated the configure script so that it emits the
+	  makefile variables COMP and OS to config.mak, and also now emits
+	  DEPEND_TOOL=cc if makedep is missing or has the incorrect version.
+14-Jan-2003
 	- Keith Fulton fixed a bug in csPArray and csRefArray where DeleteAll()
 	  would not set the limit to 0.
 	- Keith also fixed FindByName() and GetIndexByName() in
@@ -46,7 +52,7 @@ The history order is reversed so that new features are at the top.
 	  from old syntax to XML.
 	- Added InsertSorted() and FindSortedKey() to csPArray and
 	  csPDelArray. Fixed motion plugin with that.
-13-Jan-2002
+13-Jan-2003
 	- Further work on XML doc.
 	- Added support for <key> in mesh factories and collections.
 	- Enhanced the new XML document a lot. Also some other smaller
@@ -89,7 +95,7 @@ The history order is reversed so that new features are at the top.
 	  check.
 	- Eric Sunshine repaired overfull hbox warnings reported by TeX in
 	  xmlfmt.txi.
-12-Jan-2002
+12-Jan-2003
 	- Started work on new map format document.
 	- Eric Sunshine silenced some warning messages from ActiveState Perl
 	  during configuration process.
@@ -98,7 +104,7 @@ The history order is reversed so that new features are at the top.
 	  from old syntax to XML.
 	- Eric Sunshine fixed some Texinfo mark-up errors and eliminated a
 	  number of overfull and underfull hbox warnings reported by TeX.
-11-Jan-2002
+11-Jan-2003
 	- Fixed a problem in genmesh where
 	  iObjectModel->GetPolygonMeshColldet() was not returning the
 	  polygon mesh implementation of the object.
@@ -107,13 +113,12 @@ The history order is reversed so that new features are at the top.
 	- Fixed the unit tester in csgeom for the new methods.
 	- Fixed the rapid plugin for the new methods.
 	- Fixed various outdated information throughout the documentation.
-	  Still a lot of work to do however. Some of the modifications
-	  I did:
+	  Still a lot of work to do however. Some of the modifications I did:
 	    - Removed all mention of 8-bit display support since CS
 	      no longer supports that.
 	    - Modified all map file examples from old syntax to XML.
 	    - Used csRef where appropriate.
-10-Jan-2002
+10-Jan-2003
 	- Made the calling of the movable callbacks safe so that they now
 	  can delete themselves from the movable. This basically amounts
 	  to walking the callback list in reverse order.
@@ -130,7 +135,7 @@ The history order is reversed so that new features are at the top.
 	- Added csPtrArray. This is a templated array similar to csRefArray.
 	  The main difference is that no reference counting is used.
 	  The difference with csVector is that csPtrArray is type-safe.
-9-Jan-2002
+9-Jan-2003
 	- Fixed a bug in the iLight version of IsDynamic(). This caused
 	  pseudo-dynamic lights to be broken since the recent move of thing
 	  outside the engine since that forced the system to use iLight
@@ -143,7 +148,7 @@ The history order is reversed so that new features are at the top.
 	  plays the named animation one time, while saving the prior
 	  animation.  When the override animation is completed, the prior
 	  animation is restore to operation.
-8-Jan-2002
+8-Jan-2003
 	- Committed a 'backwards compatibility' set from Rene Jager for the
 	  Python plugin and SWIG 1.1. The new cspython plugin is built when
 	  USE_NEW_CSPYTHON_PLUGIN=yes during make. It is now put in
@@ -172,7 +177,7 @@ The history order is reversed so that new features are at the top.
 	  remove the callback from inside the callback itself. But this
 	  was actually not true. Changed the loops in light code to make
 	  it really safe.
-7-Jan-2002
+7-Jan-2003
 	- Keith Fulton added SetReverseAction to the Sprite3d so that
 	  they can walk backwards without defining a new action.  Call this
 	  just after setting the action.  Also he made it reset to forward
@@ -197,10 +202,10 @@ The history order is reversed so that new features are at the top.
 	  joystick.cfg.
 	- Eric Sunshine updated vfs.cfg and joystick.cfg to agree with the new
 	  normalized CS_PLATFORM_NAME.
-	- Eric Sunshine udpated NASM URL in user manual.
+	- Eric Sunshine updated NASM URL in user manual.
 	- Eric Sunshine updated aged entries in Contributors section of user
 	  manual.
-6-Jan-2002
+6-Jan-2003
 	- Fixed a stupid bug in Dynavis. Dynavis wasn't correctly updating
 	  the kdtree when objects moved. The reason was that UpdateObjects()
 	  wasn't called when needed. Frustvis didn't suffer from this
@@ -238,7 +243,7 @@ The history order is reversed so that new features are at the top.
 	      was present.
 	    - The -I/usr/local/include viability test is now performed only if
 	      /usr/local/include is present on the build host.
-5-Jan-2002
+5-Jan-2003
 	- Applied a patch from Rene Jager (renej.frog@yucom.be) which does
 	  the following:
 	    - Added include/ivaria/cspace.i which is a SWIG 1.3 version of
@@ -246,11 +251,11 @@ The history order is reversed so that new features are at the top.
 	    - Made the Python plugin SWIG 1.3 compatible.
 	    - A few fixes on the OPCODE plugin so that it works a lot better
 	      now (almost as good as the RAPID plugin).
-4-Jan-2002
+4-Jan-2003
 	- Andreas Busch removed duplicate #include lines from various
 	  source files and correcty named the multiple-include-protection
 	  define in shadervar.h.
-3-Jan-2002
+3-Jan-2003
 	- Eric Sunshine made the following changes:
 	    - Configuration phase now detects libmng automatically.  Added
 	      bin/chkmng.sh.

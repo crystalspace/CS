@@ -24,7 +24,7 @@
 ifneq ($(findstring defines,$(MAKESECTION)),)
 
 ifeq (,$(strip $(INSTALL_DIR)))
-INSTALL_DIR = /usr/local/crystal
+  INSTALL_DIR = /usr/local/crystal
 endif
 
 endif # ifneq ($(findstring defines,$(MAKESECTION)),)
@@ -282,21 +282,3 @@ install_all: \
 endif # ifeq ($(DO_INSTALL),yes)
 
 endif # ifeq ($(MAKESECTION),targets)
-
-#-------------------------------------------------------------- confighelp ---#
-ifeq ($(MAKESECTION),confighelp)
-
-SYSMODIFIERSHELP += \
-  $(NEWLINE)echo $"  INSTALL_DIR=path (default: /usr/local/crystal)$" \
-  $(NEWLINE)echo $"      Overrides the default installation destination.$" \
-  $(NEWLINE)echo $"      Specify an absolute path (excluding the trailing /).$"
-
-endif # ifeq ($(MAKESECTION),confighelp)
-
-#--------------------------------------------------------------- configure ---#
-
-ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/config)
-
-SYSCONFIG += $(NEWLINE)echo INSTALL_DIR = $(INSTALL_DIR)>>config.tmp
-
-endif # ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/config)

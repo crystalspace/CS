@@ -1,9 +1,7 @@
 # This submakefile dynamically computes the name for all plugin, library, and
 # application submakefiles and includes them.
 
-ifneq ($(TARGET_MAKEFILE),)
-  include $(TARGET_MAKEFILE)
-endif
+include $(TARGET_MAKEFILE)
 
 PLUGINS += video/renderer video/canvas # Special defines.
 ifeq ($(USE_PLUGINS),yes)

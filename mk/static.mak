@@ -26,11 +26,14 @@
 #	application.
 #
 #	When Crystal Space applications are configured to dynamically load
-#	plug-in modules at run-time (that is, USE_PLUGINS=yes), the code for
-#	plug-in modules is packaged into a dynamic-link library.  On the other
-#	hand, when applications are configured to link statically (that is,
-#	USE_PLUGINS=no), plug-in modules must be linked directly into the
-#	application (since they can not be loaded at run-time).
+#	plug-in modules at run-time (that is, the makefile variable USE_PLUGINS
+#	is "yes" or the configure script was invoked with --enable-plugins,
+#	which is the default), the code for plug-in modules is packaged into a
+#	dynamic-link library.  On the other hand, when applications are
+#	configured to link statically (that is, USE_PLUGINS=no or
+#	--disable-plugins was specified), plug-in modules must be linked
+#	directly into the application (since they can not be loaded at
+#	run-time).
 #
 #	In this case, the code for plug-in modules is packaged into a static
 #	library.  In order to ensure that the linker actually incorporates
@@ -69,9 +72,9 @@
 #
 # EXPORTS
 #	If the project is configured to link plug-in modules into applications
-#	statically (that is, if USE_PLUGINS=no), then the makefile variable
-#	DEP.EXE is augmented with the name of the object file corresponding to
-#	the synthesized C++ file.
+#	statically (that is, if USE_PLUGINS=no or --disable-plugins was
+#	specified), then the makefile variable DEP.EXE is augmented with the
+#	name of the object file corresponding to the synthesized C++ file.
 #
 #	The name of the synthesized C++ file is contained in the makefile
 #	variable SRC.LIBREF.  The location of the file is mentioned in

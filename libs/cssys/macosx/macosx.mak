@@ -21,33 +21,14 @@ export MACOSX_DEPLOYMENT_TARGET = 10.2
 #--------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
-PROC = POWERPC
-
-# Operating system.
-OS = MACOSX
-
-# Operating system family: UNIX (for Unix or Unix-like platforms), WIN32, etc.
-OS_FAMILY = UNIX
-
-# Compiler. Can be one of: GCC, MPWERKS, VC (Visual C++), UNKNOWN
-COMP = GCC
-
 # Application wrapper support.
 MACOSX.APP_EXE  = $@/Contents/MacOS/$(notdir $(basename $@))
 MACOSX.APP_ICON = libs/cssys/macosx/appicon.icns
 MACOSX.APP_DIR  = .
 MACOSX.APP_EXT  = .app
 
-# Plug-in component support.
-MACOSX.PLUGIN_DIR = components
-MACOSX.PLUGIN_EXT = .csplugin
-
 # Apple can not use the x86 assembly in CS.
 override DO_ASM = no
-
-# The extensive memory debugger facility in cssysdef.h is incompatible with
-# the Apple compiler.
-override EXTENSIVE_MEMDEBUG = no
 
 endif # ifneq (,$(findstring defines,$(MAKESECTION)))
 
@@ -102,12 +83,6 @@ CFLAGS.PIXEL_LAYOUT = -DCS_24BIT_PIXEL_LAYOUT=CS_24BIT_PIXEL_ARGB
 GL.CFLAGS = -DCS_OPENGL_PATH=OpenGL
 GL.LFLAGS = -framework OpenGL
 
-# Flags for the compiler which are used when optimizing.
-CFLAGS.optimize = -O3
-
-# Flags for the compiler which are used when debugging.
-CFLAGS.debug = -g
-
 # Flags for the compiler which are used when profiling.
 CFLAGS.profile = -pg -O -g
 
@@ -117,9 +92,6 @@ CFLAGS.DLL =
 # General flags for the linker which are used in any case.  The "config" flags
 # are determined at configuration time and come from CS/config.mak.
 LFLAGS.GENERAL = $(MACOSX.LFLAGS.CONFIG) $(CSTHREAD.LFLAGS)
-
-# Flags for the linker which are used when debugging.
-LFLAGS.debug = -g
 
 # Flags for the linker which are used when profiling.
 LFLAGS.profile = -pg
@@ -147,7 +119,8 @@ SRC.SYS_CSSYS = $(wildcard \
   libs/cssys/general/printf.cpp \
   libs/cssys/general/sysroot.cpp \
   $(CSTHREAD.SRC)
-INC.SYS_CSSYS = $(wildcard $(addsuffix /*.h,$(MACOSX.SOURCE_PATHS))) $(CSTHREAD.INC)
+INC.SYS_CSSYS = $(wildcard $(addsuffix /*.h,$(MACOSX.SOURCE_PATHS))) \
+  $(CSTHREAD.INC)
 
 # Where to put dynamic libraries on this system?
 OUTDLL = $(MACOSX.PLUGIN_DIR)
@@ -190,30 +163,3 @@ define DO.LINK.EXE
 endef
 
 endif # ifeq ($(MAKESECTION),postdefines)
-
-#-------------------------------------------------------------- confighelp ---#
-ifeq ($(MAKESECTION),confighelp)
-
-SYSHELP += $(NEWLINE)echo $"  make macosx       Prepare for building on $(DESCRIPTION.macosx)$"
-
-endif # ifeq ($(MAKESECTION),confighelp)
-
-#--------------------------------------------------------------- configure ---#
-ifeq ($(MAKESECTION),rootdefines) # Makefile includes us twice with valid
-ifeq ($(ROOTCONFIG),config)	  # ROOTCONFIG, but we only need to run once.
-
-SYSCONFIG += \
-  $(NEWLINE)sh libs/cssys/macosx/osxconf.sh>>config.tmp
-  $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
-
-endif # ifeq ($(ROOTCONFIG),config)
-
-ifeq ($(ROOTCONFIG),volatile)
-
-MAKE_VOLATILE_H += \
-  $(NEWLINE)echo $"\#define OS_MACOSX_DESCRIPTION "MacOS/X"$">>volatile.tmp \
-  $(NEWLINE)echo $"\#define OS_MACOSX_PLUGIN_DIR "$(MACOSX.PLUGIN_DIR)/"$">>volatile.tmp \
-  $(NEWLINE)echo $"\#define OS_MACOSX_PLUGIN_EXT "$(MACOSX.PLUGIN_EXT)"$">>volatile.tmp
-
-endif # ifeq ($(ROOTCONFIG),volatile)
-endif # ifeq ($(MAKESECTION),rootdefines)

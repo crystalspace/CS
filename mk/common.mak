@@ -12,7 +12,8 @@ endef
 COMMA=,
 EMPTY=
 SPACE=$(EMPTY) $(EMPTY)
-SEPARATOR=$"*-------------------------------------------------------------------------*$"
+SEPARATOR=\
+$"*-------------------------------------------------------------------------*$"
 
 # If no-one's supplied a value for $(FORCEBUCK), turn that feature off
 ifeq ($(strip $(FORCEBUCK)),)
@@ -44,12 +45,6 @@ endif
 OUTSUFX. =
 OUTSUFX.no =
 OUTSUFX.yes = .pic
-
-# This macro should update target only if it has changed
-define UPD
-  cmp -s $@ DEST || (rm -f DEST && cp $@ DEST)
-  rm -f $@
-endef
 
 # Macro used to build a subtarget
 define MAKE_TARGET
@@ -84,4 +79,3 @@ define MAKE_CHECK
   @echo $(SEPARATOR)
   +@$(MAKE) $(RECMAKEFLAGS) -f mk/cs.mak $@
 endef
-

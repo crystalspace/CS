@@ -1,29 +1,36 @@
 #=============================================================================
-# This is an configuration file which describes user options global to all
-# Crystal Space programs and libraries.  Edit it to suit your taste.  Also
-# have a look at the platform-dependent makefile for system settings.
-#
-# Documentation copyright (C)1999-2001 by Eric Sunshine.
+# This is an configuration file which describes options global to all Crystal
+# Space programs and libraries.  You may edit it to suit your taste.  Also have
+# a look at the platform-dependent makefile for system settings.
 #=============================================================================
 
-# Include a local makefile where you can add additional targets or whatever.
-# This comes in handy, if you don't want to alter the original CS makefiles.
+#-----------------------------------------------------------------------------
+# If you prefer not to edit factory-supplied makefiles, such as this one, then
+# you can instead create and edit the file CS/mk/local.mak.  In this file, you
+# can augment the PLUGINS and PLUGINS.DYNAMIC lists and override any options
+# discovered automatically at project configuration time by the "configure"
+# script.  Overrideable options can be found by looking in the generated
+# CS/config.mak file after configuring the project.
+#-----------------------------------------------------------------------------
 -include mk/local.mak
 
-#-----------------------------------------------------------------------------
-# Dynamic Settings
-# Changes to these settings will be reflected in the makefile system
-# immediately.
-#-----------------------------------------------------------------------------
 
-# Default list of plugins to build.  Note that you'll link all plugins into
-# executable in the case of static build.  If you want additional plugins to
-# be built either define the environment variable PLUGINS or put a line similar
-# to those below into config.mak. The plugins listed in PLUGINS variable
-# are always built; PLUGINS.DYNAMIC are built only if plugins are compiled
-# as shared libraries. Please think twice before adding anything to PLUGINS;
-# in most cases you will want to add to PLUGINS.DYNAMIC.
-
+#-----------------------------------------------------------------------------
+# Default list of plugins to build.  The plugins listed by the PLUGINS variable
+# are always built.  Plugins listed by PLUGINS.DYNAMIC are built only if the
+# project is configured with --enable-plugins (which is the default).  Please
+# think twice before adding anything to PLUGINS; in most cases you will want to
+# add optional plugins to PLUGINS.DYNAMIC.  Be aware that the platform-specific
+# makefile (CS/libs/cssys/*.mak) may augment the plugin list with plugins
+# specific to the platform.
+#
+# If you want additional plugins to be built, you can augment the PLUGINS or
+# PLUGINS.DYNAMIC variables in your CS/mk/local.mak file as noted above.
+#
+# Note that if the project was configured with --disable-plugins, then all
+# modules which would otherwise have been independent plugins will get linked
+# into each executable.
+#-----------------------------------------------------------------------------
 ifeq ($(ZLIB.AVAILABLE),yes)
 PLUGINS += filesys/vfs
 endif
@@ -140,109 +147,4 @@ endif
 # most platforms.
 ifeq ($(PERL.AVAILABLE),yes)
 #PLUGINS.DYNAMIC += cscript/csperl5
-endif
-
-
-#-----------------------------------------------------------------------------
-# Static Settings            *** TAKE NOTE ***
-# After changing the settings in this section, you must re-run the makefile
-# configuration step (for example, "make unknown" followed by "make linux")
-# in order for your changes to become effective.
-#-----------------------------------------------------------------------------
-
-# Should we build drivers/plugins as loadable modules?
-ifndef USE_PLUGINS
-  USE_PLUGINS=yes
-endif
-
-# Should we build libraries as shared/dynamic libraries?
-# Currently only supported on Unix
-# NOTE! Be careful enabling this option. It hasn't been tested well
-# and it will not work in some situations (like with 'make install').
-ifndef USE_SHARED_LIBS
-  USE_SHARED_LIBS=no
-endif
-
-# Default build mode (either "optimize", "debug", or "profile").
-ifndef MODE
-  MODE=optimize
-endif
-
-# If MODE is "debug", should we use the extensive heap validating machinery?
-# Do not enable this if you platform or your own code uses an overloaded `new'
-# operator.
-ifndef EXTENSIVE_MEMDEBUG
-  EXTENSIVE_MEMDEBUG=no
-endif
-
-# Enable strict smart pointers. If this is set to yes then csPtr return
-# values can ONLY be assigned to csRef's. So casting of csPtr to normal pointers
-# does not work. This is a good way to ensure that your code is fully
-# clean with regards to smart pointer usage. Note that this flag does NOT
-# affect the ability to cast csRef's to normal pointers. Only for csPtr.
-# In addition to the removal of the cast operator, setting this flag in
-# combination with debug mode also causes some tests to be added for good
-# usage of csPtr (i.e. calling a function that returns csPtr and not using
-# the result will be detected at runtime).
-ifndef STRICT_SMART_POINTERS
-  STRICT_SMART_POINTERS=yes
-endif
-
-# Should we cache makefile information?  Caching information speeds up the
-# build process by avoiding the time-consuming scanning which locates and then
-# reads makefiles throughout the project.  Usually caching is desirable.
-ifndef USE_MAKEFILE_CACHE
-  USE_MAKEFILE_CACHE=yes
-endif
-
-# Should we monitor and automatically refresh an outdated makefile cache?
-# The makefile cache is created when the makefile system is first configured,
-# and then automatically refreshed when the chosen platform-specific makefile
-# changes, user.mak changes, or one of the source makefiles for the cache
-# changes.  Unfortunately, monitoring the source makefiles for changes adds
-# some overhead and slows down the build process slightly.  If you have a slow
-# disk subsystem, then you may want to disable the cache monitoring facility
-# since even this small amount of extra overhead may become annoying.  In most
-# cases, it is safe to disable this facility since makefiles rarely change,
-# thus it is unlikely that the cache will become outdated.  Even if it does
-# become outdated, you can still rebuild it manually by invoking the `recache'
-# makefile target (i.e. "make recache").  Beware, however, that if you update
-# the project frequently from the CVS repository, it is probably safest to
-# leave the cache monitor enabled, just in case other developers modify
-# makefiles in the repository.
-ifndef MONITOR_MAKEFILE_CACHE
-  MONITOR_MAKEFILE_CACHE=yes
-endif
-
-# Should we use NASM for assembly?  For most environments, this setting is
-# automatically enabled if nasm is available.
-ifndef NASM.AVAILABLE
-  NASM.AVAILABLE=no
-endif
-
-# If 'yes' include assembly optimizations in Crystal Space.  On systems that
-# don't support this, setting this option to 'yes' does nothing.
-ifndef DO_ASM
-  DO_ASM=yes
-endif
-
-# If "yes" include MMX support in software renderer
-ifndef DO_MMX
-  DO_MMX=yes
-endif
-
-# Set to 1 to use Mesa instead of "real" OpenGL.  You can define MESA_PATH
-# variable in environment to point to MesaGL base path. If Mesa is not
-# used then you can use OPENGL_PATH to point to the base of the OpenGL
-# libraries and includes.
-ifndef USE_MESA
-  USE_MESA=0
-endif
-
-# The tool used to build dependencies. The possible values are:
-# none  - Cannot build dependencies on this platform
-# cc    - Use the C compiler (gcc -MM) for this
-# mkdep - Use the makedep tool provided in the apps/makedep directory
-ifndef DEPEND_TOOL
-  DEPEND_TOOL=cc
 endif

@@ -4,6 +4,8 @@
 # are specific to a given platform, if necessary.
 #------------------------------------------------------------------------------
 
+.SUFFIXES: .exe .dll
+
 # The command for running shell scripts (usually the same as SHELL)
 
 RUN_SCRIPT=$(SHELL)
@@ -35,10 +37,10 @@ OUTSUFX.yes=
 # Command for creating a directory.
 # Note that directories will have forward slashes. Please
 # make sure that this command accepts that (or use 'subst' first).
-MKDIR=mkdir $(subst /,\,$(patsubst %/,%,$@))
+MKDIR=$(CMD.MKDIR) $(subst /,\,$(patsubst %/,%,$@))
 
 # Command for creating a directory including missing parents.
-MKDIRS=libs/cssys/win32/mkdirs.bat $(strip $(subst /, ,$@))
+MKDIRS=$(CMD.MKDIRS) $(subst /,\,$(patsubst %/,%,$@))
 
 # The command to remove all specified files.
 RM=rm -f
@@ -58,9 +60,6 @@ CD=cd
 # The command to print out the current working directory.  The output from
 # this command should be suitable for input back into the $(CD) command.
 PWD=pwd
-
-# The command to invoke a Perl interpreter.
-PERL=perl
 
 # Extra parameters for 'sed' which are used for doing 'make depend'.
 SYS_SED_DEPEND=-e "s/\.o/$$O/g"

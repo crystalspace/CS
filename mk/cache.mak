@@ -34,20 +34,18 @@
 #
 # IMPORTS
 #	Makefile caching is controlled by the USE_MAKEFILE_CACHE variable.  The
-#	default value of this variable is set to `yes' in user.mak.  This
-#	variable can also be set from the command line at makefile
-#	configuration time and becomes a persistent setting in config.mak.
-#	Example: make linux USE_MAKEFILE_CACHE=yes
+#	default value of this variable is set to `yes' by the configure script.
+#	The value can be overridden at configuration time with the
+#	--disable-makefile-cache option.
 #
 #	In order to prevent the makefile cache from becoming outdated, it can
 #	be refreshed automatically anytime any of its source makefiles is
 #	changed.  However, monitoring the source makefiles for changes slows
 #	down the build process slightly, so this option can be disabled, if
 #	desired, by setting the MONITOR_MAKEFILE_CACHE variable to `no'.  By
-#	default, for safety and accuracy, this variable is set to `yes' in
-#	user.mak.  It can also be set from the command line at makefile
-#	configuration time and becomes a persistent setting in config.mak.
-#	Example: make linux MONITOR_MAKEFILE_CACHE=yes
+#	default, for safety and accuracy, this variable is set to `yes' by the
+#	configure script.  It can be disabled with the
+#	--disable-makefile-cache-monitor option.
 #
 #	Note that the makefile cache is also refreshed any time user.mak or the
 #	configured platform-specific makefile is changed.  These two files are
@@ -61,8 +59,7 @@
 #	MONITOR_MAKEFILE_CACHE to `no'.
 #
 #	USE_MAKEFILE_CACHE and MONITOR_MAKEFILE_CACHE are written to config.mak
-#	at makefile configuration time in order to make the settings
-#	persistent.
+#	at project configuration time in order to make the settings persistent.
 #
 #	The actual cache is stored in the file cache.mak in the root directory
 #	of the project.  It is removed when the makefile targets `distclean'
@@ -175,25 +172,3 @@ cleancache:
 	$(RM) $(MAKEFILE_CACHE)
 
 endif # ifneq (,$(findstring targets,$(MAKESECTION)))
-
-#-------------------------------------------------------------- confighelp ---#
-ifeq ($(MAKESECTION),confighelp)
-
-SYSMODIFIERSHELP += \
-  $(NEWLINE)echo $"  USE_MAKEFILE_CACHE=yes$|no (default: yes)$" \
-  $(NEWLINE)echo $"      Cache makefile information for speedier builds.$" \
-  $(NEWLINE)echo $"  MONITOR_MAKEFILE_CACHE=yes$|no (default: yes)$" \
-  $(NEWLINE)echo $"      Automatically refresh makefile cache when outdated.$" \
-  $(NEWLINE)echo $"      Caution: Monitoring cache slows build process slightly.$"
-
-endif # ifeq ($(MAKESECTION),confighelp)
-
-#--------------------------------------------------------------- configure ---#
-
-ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/config)
-
-SYSCONFIG += \
-  $(NEWLINE)@echo USE_MAKEFILE_CACHE = $(USE_MAKEFILE_CACHE)>>config.tmp \
-  $(NEWLINE)@echo MONITOR_MAKEFILE_CACHE = $(MONITOR_MAKEFILE_CACHE)>>config.tmp
-
-endif # ifeq ($(MAKESECTION)/$(ROOTCONFIG),rootdefines/config)
