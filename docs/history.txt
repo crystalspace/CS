@@ -36,6 +36,8 @@ The history order has been reversed so that new features are at the top.
 	    - Added special note about having to run applications from the
 	      command line rather than by double-clicking on them from the
 	      file viewer.
+	- Eric Sunshine overhauled README.htm.  Added a large number of
+	  missing links.  Made aesthetic improvements.
 7-Sep-2000
 	- Continued work on saver in levtool.  The saved world file works very
 	  well already.  But a few important things are still missing (like
