@@ -3629,6 +3629,7 @@ class iLight(iBase):
     def CreateCrossHalo(*args): return _cspace.iLight_CreateCrossHalo(*args)
     def CreateNovaHalo(*args): return _cspace.iLight_CreateNovaHalo(*args)
     def CreateFlareHalo(*args): return _cspace.iLight_CreateFlareHalo(*args)
+    def GetHalo(*args): return _cspace.iLight_GetHalo(*args)
     def GetBrightnessAtDistance(*args): return _cspace.iLight_GetBrightnessAtDistance(*args)
     def GetFlags(*args): return _cspace.iLight_GetFlags(*args)
     def SetLightCallback(*args): return _cspace.iLight_SetLightCallback(*args)
