@@ -13,26 +13,27 @@
 # Default list of plugins to build.  Note that you'll link all plugins into
 # executable in the case of static build.  If you want additional plugins to
 # be built either define the environment variable PLUGINS or put a line similar
-# to those below into config.mak.
+# to those below into config.mak. The plugins listed in PLUGINS variable
+# are always built; PLUGINS.DYNAMIC are built only if plugins are compiled
+# as shared libraries. Please think twice before adding anything to PLUGINS;
+# in most cases you will want to add to PLUGINS.DYNAMIC.
 PLUGINS += video/renderer video/canvas
 PLUGINS += simpcon
 PLUGINS += font/server/csfont 
 PLUGINS += colldet/rapid
 PLUGINS += perfstat
-#ifeq ($(USE_SHARED_PLUGINS),yes)
-PLUGINS += video/renderer/line video/renderer/null video/renderer/inf
-PLUGINS += sound/loader sound/driver/nulldrv
-PLUGINS += cscon
-PLUGINS += csclear
-PLUGINS += dungeon
-PLUGINS += engine
-PLUGINS += net/driver/socket net/netman
-#PLUGINS += font/server/freefont
-PLUGINS += csstdldr
-PLUGINS += netspace/nstp netspace/nsmgr
-PLUGINS += csauth/simple
-PLUGINS += metaball
-#endif
+PLUGINS.DYNAMIC += video/renderer/line video/renderer/null video/renderer/inf
+PLUGINS.DYNAMIC += sound/loader sound/driver/nulldrv
+PLUGINS.DYNAMIC += cscon
+PLUGINS.DYNAMIC += csclear
+PLUGINS.DYNAMIC += dungeon
+PLUGINS.DYNAMIC += engine
+PLUGINS.DYNAMIC += net/driver/socket net/netman
+#PLUGINS.DYNAMIC += font/server/freefont
+PLUGINS.DYNAMIC += csstdldr
+PLUGINS.DYNAMIC += netspace/nstp netspace/nsmgr
+PLUGINS.DYNAMIC += csauth/simple
+PLUGINS.DYNAMIC += metaball
 
 #-----------------------------------------------------------------------------
 # Static Settings            *** TAKE NOTE ***
