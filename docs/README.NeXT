@@ -3,7 +3,7 @@
 
     This document was written by Eric Sunshine <sunshine@sunshineco.com>
     Copyright (C)1999 by Eric Sunshine
-    1999/11/22
+    1999/12/23
 
     Also see INSTALL.NeXT for installation details.
 ===============================================================================
@@ -465,6 +465,8 @@ This is a list of items which are planned for future releases of this project.
 -------
 This is a list of known problems with the current release of this project.
 
+    o Alt-c in WalkTest does not work.  I thought that the Window Server might
+      be eating it but disabling dead-key processing did not solve the problem.
     o Using the -nolight option causes WalkTest to crash very early in
       csScan_CalcBlendTables().  This seems to be an issue with other ports
       as well, though.  It may not be NeXT-specific.
@@ -484,6 +486,19 @@ This is a list of known problems with the current release of this project.
 
 9. History
 ----------
+1999/12/23 (15r001+CVS)
+    Disabled dead-key processing (DPSSetDeadKeysEnabled).  I was hoping that
+        this would fix the problem of alt-c not working in WalkTest, but it did
+        not.
+    Worked around NextStep compiler bug where it was not emitting
+        implementations for methods which were not actually defined within the
+        class declaration.  Work around was to define all methods within
+        declaration (even really lengthy ones).
+    Worked around NextStep compiler code-generation bug where it was corrupting
+        computation of coverage mask in CS/libs/csengine/covtree.cpp.  Had to
+        disable strength-reduction optimization in order to work around
+        problem.
+
 1999/11/22 (15r000+CVS)
     Removed much obfuscation which was forced upon the port by use of COM
         within Crystal Space.  SCF, the replacement, does not have the
