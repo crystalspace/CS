@@ -93,7 +93,7 @@ CFLAGS.INCLUDE= $(CFLAGS.I)/usr/include/directx
 #$(CFLAGS.I)/dx7asdk/dxf/include
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) -pipe
+CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS) -pipe
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize=-s -O3 -ffast-math
@@ -113,7 +113,7 @@ CFLAGS.profile=-pg -O -g
 CFLAGS.DLL=
 
 # General flags for the linker which are used in any case.
-LFLAGS.GENERAL=
+LFLAGS.GENERAL=$(CSTHREAD.LFLAGS)
 
 # Flags for the linker which are used when optimizing.
 LFLAGS.optimize=-s
@@ -150,7 +150,8 @@ SRC.SYS_CSSYS = $(wildcard libs/cssys/win32/*.cpp) \
   libs/cssys/general/getopt.cpp \
   libs/cssys/general/printf.cpp \
   libs/cssys/general/runloop.cpp \
-  libs/cssys/general/sysinit.cpp
+  libs/cssys/general/sysinit.cpp \
+  $(CSTHREAD.SRC)
 
 # The C compiler
 CC=gcc -c

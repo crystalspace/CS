@@ -123,7 +123,7 @@ PNG_LIBS = $(LFLAGS.l)png
 JPG_LIBS = $(LFLAGS.l)jpeg
 
 # The name of the JNG/MNG library.
-MNG_LIBS = $(LFLAGS.L)libs/libmng $(LFLAGS.l)mng
+MNG_LIBS = $(LFLAGS.l)mng
 
 # Additional audio libraries.
 SOUND_LIBS =
@@ -137,7 +137,9 @@ CFLAGS.GENERAL = \
   $(NEXT.CFLAGS.GENERAL) \
   $(NEXT.CFLAGS.CONFIG) \
   $(NEXT.ARCH_FLAGS) \
-  -Wno-precomp -fno-common -pipe
+  -Wno-precomp -fno-common -pipe \
+  $(CFLAGS.SYSTEM) \
+  $(CSTHREAD.CFLAGS)
 
 # Special option for the software 3D renderer to force it to ARGB mode
 CFLAGS.PIXEL_LAYOUT = -DCS_24BIT_PIXEL_LAYOUT=CS_24BIT_PIXEL_ARGB
@@ -161,7 +163,8 @@ CFLAGS.DLL = $(NEXT.CFLAGS.DLL)
 LFLAGS.GENERAL = \
   $(NEXT.ARCH_FLAGS) \
   $(NEXT.LFLAGS.GENERAL) \
-  $(NEXT.LFLAGS.CONFIG)
+  $(NEXT.LFLAGS.CONFIG) \
+  $(CSTHREAD.LFLAGS)
 
 # Flags for the linker which are used when debugging.
 LFLAGS.debug = -g
@@ -190,7 +193,8 @@ SRC.SYS_CSSYS = $(wildcard \
   libs/cssys/general/findlib.cpp \
   libs/cssys/general/getopt.cpp \
   libs/cssys/general/printf.cpp \
-  libs/cssys/general/sysroot.cpp
+  libs/cssys/general/sysroot.cpp \
+  $(CSTHREAD.SRC)
 
 # Where to put dynamic libraries on this system?
 OUTDLL = $(NEXT.PLUGIN_DIR)

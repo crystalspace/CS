@@ -75,7 +75,7 @@ SOUND_LIBS=
 CFLAGS.INCLUDE=$(CFLAGS.I)/usr/pkg/include $(CFLAGS.I)/usr/include
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-Wall
+CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS)
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize=-O6 -fomit-frame-pointer -malign-loops=2 -malign-jumps=2 \
@@ -91,7 +91,7 @@ CFLAGS.profile=-pg -O -g
 CFLAGS.DLL=
 
 # General flags for the linker which are used in any case.
-LFLAGS.GENERAL=-Wl,-E
+LFLAGS.GENERAL=-Wl,-E $(CSTHREAD.LFLAGS)
 
 # Flags for the linker which are used when debugging.
 LFLAGS.debug=-g3
@@ -112,16 +112,8 @@ SRC.SYS_CSSYS= $(wildcard libs/cssys/unix/*.cpp) \
   libs/cssys/general/getopt.cpp \
   libs/cssys/general/printf.cpp \
   libs/cssys/general/runloop.cpp \
-  libs/cssys/general/sysinit.cpp
-
-# The C compiler.
-#CC=gcc -c
-
-# The C++ compiler.
-#CXX=g++ -c
-
-# The linker.
-#LINK=gcc
+  libs/cssys/general/sysinit.cpp \
+  $(CSTHREAD.SRC)
 
 # Use makedep to build dependencies
 DEPEND_TOOL=mkdep

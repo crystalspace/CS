@@ -67,3 +67,9 @@ SYS_SED_DEPEND=-e "s/\.o/$$O/g"
 
 # Use makedep to build dependencies
 DEPEND_TOOL=mkdep
+
+# The files implementing threading and the related compiler and linker flags.
+CSTHREAD.SRC = libs/cssys/win32/winthread.cpp
+CSTHREAD.INC = libs/cssys/win32/winthread.h
+CSTHREAD.CFLAGS =
+CSTHREAD.LFLAGS =

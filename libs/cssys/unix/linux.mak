@@ -87,7 +87,7 @@ SOUND_LIBS=
 CFLAGS.INCLUDE=
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-Wall -Wunused -W $(CFLAGS.SYSTEM)
+CFLAGS.GENERAL=-Wall -Wunused -W $(CFLAGS.SYSTEM) $(CFLAGS.CSTHREAD)
 
 # Flags for the compiler which are used when optimizing.
 ifeq ($(PROC),X86)
@@ -106,7 +106,7 @@ CFLAGS.profile=-pg -O -g
 CFLAGS.DLL=
 
 # General flags for the linker which are used in any case.
-LFLAGS.GENERAL=
+LFLAGS.GENERAL=$(CSTHREAD.LFLAGS)
 
 # Flags for the linker which are used when debugging.
 LFLAGS.debug=-g3
@@ -130,21 +130,8 @@ SRC.SYS_CSSYS= $(wildcard libs/cssys/unix/*.cpp) \
   libs/cssys/general/getopt.cpp \
   libs/cssys/general/printf.cpp \
   libs/cssys/general/runloop.cpp \
-  libs/cssys/general/sysinit.cpp
-
-ifeq ($(PTHREAD.AVAILABLE),yes)
-SRC.SYS_CSSYS += libs/cssys/general/cspthrd.cpp
-LIBS.EXE+=$(PTHREAD.LFLAGS)
-endif
-
-# The C compiler.
-#CC=gcc -c
-
-# The C++ compiler.
-#CXX=g++ -c
-
-# The linker.
-#LINK=gcc
+  libs/cssys/general/sysinit.cpp \
+  $(CSTHREAD.SRC)
 
 # Use makedep to build dependencies
 DEPEND_TOOL=mkdep

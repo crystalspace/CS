@@ -1,23 +1,23 @@
 /*
     Copyright (C) 2002 by Norman Krämer
-  
+
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
     version 2 of the License, or (at your option) any later version.
-  
+
     This library is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     Library General Public License for more details.
-  
+
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "cssysdef.h"
-#include "cssys/thread.h"
+#include "cspthrd.h"
 #include <sys/time.h>
 
 #ifdef CS_DEBUG
@@ -26,7 +26,7 @@
 #define CS_SHOW_ERROR
 #endif
 
-csPtr<csMutex> csMutex::Create ()
+csRef<csMutex> csMutex::Create ()
 {
   return csPtr<csMutex>(new csPosixMutex);
 }
@@ -34,22 +34,14 @@ csPtr<csMutex> csMutex::Create ()
 csPosixMutex::csPosixMutex ()
 {
   lasterr = NULL;
-
-  /*
-    Create an 'fast' mutex, that is a deadlock occurs if a thread 
-    tries to LockWait a mutex it already owns.
-  */
+  // Create an 'fast' mutex, that is a deadlock occurs if a thread 
+  // tries to LockWait a mutex it already owns.
   pthread_mutex_init (&mutex, NULL);
 }
 
 csPosixMutex::~csPosixMutex ()
 {
-#ifdef CS_DEBUG
-  //  CS_ASSERT (Destroy ());
   Destroy ();
-#else
-  Destroy ();
-#endif
 }
 
 bool csPosixMutex::Destroy ()
@@ -138,17 +130,18 @@ bool csPosixMutex::Release ()
   return rc == 0;
 }
 
-void csPosixMutex::Cleanup (void *arg)
+void csPosixMutex::Cleanup (void* arg)
 {
   ((csPosixMutex*)arg)->Release ();
 }
 
-const char* csPosixMutex::GetLastError ()
+char const* csPosixMutex::GetLastError ()
 {
   return lasterr;
 }
 
-csPtr<csSemaphore> csSemaphore::Create (uint32 value)
+
+csRef<csSemaphore> csSemaphore::Create (uint32 value)
 {
   return csPtr<csSemaphore>(new csPosixSemaphore (value));
 }
@@ -214,12 +207,13 @@ bool csPosixSemaphore::Destroy ()
   return rc == 0;
 }
 
-const char* csPosixSemaphore::GetLastError ()
+char const* csPosixSemaphore::GetLastError ()
 {
   return lasterr;
 }
 
-csPtr<csCondition> csCondition::Create (uint32 conditionAttributes)
+
+csRef<csCondition> csCondition::Create (uint32 conditionAttributes)
 {
   return csPtr<csCondition>(new csPosixCondition (conditionAttributes));
 }
@@ -235,15 +229,15 @@ csPosixCondition::~csPosixCondition ()
   Destroy ();
 }
 
-void csPosixCondition::Signal (bool bAll)
+void csPosixCondition::Signal (bool WakeAll)
 {
-  if (bAll)
+  if (WakeAll)
     pthread_cond_broadcast (&cond);
   else
     pthread_cond_signal (&cond);
 }
 
-bool csPosixCondition::Wait (csMutex *mutex, csTicks timeout)
+bool csPosixCondition::Wait (csMutex* mutex, csTicks timeout)
 {
   int rc = 0;
   if (timeout > 0)
@@ -253,7 +247,7 @@ bool csPosixCondition::Wait (csMutex *mutex, csTicks timeout)
     struct timespec to;
     gettimeofday (&now, &tz);
     to.tv_sec = now.tv_sec + (timeout / 1000);
-    to.tv_nsec = (now.tv_usec + (timeout % 1000)*1000)*1000;
+    to.tv_nsec = (now.tv_usec + (timeout % 1000) * 1000) * 1000;
     rc = pthread_cond_timedwait (&cond, &((csPosixMutex*)mutex)->mutex, &to);
     switch (rc)
     {
@@ -296,20 +290,20 @@ bool csPosixCondition::Destroy ()
   return rc == 0;
 }
 
-const char* csPosixCondition::GetLastError ()
+char const* csPosixCondition::GetLastError ()
 {
   return lasterr;
 }
 
 
-csPtr<csThread> csThread::Create (iRunnable *runnable, uint32 options)
+csRef<csThread> csThread::Create (csRunnable* r, uint32 options)
 {
-  return csPtr<csThread>(new csPosixThread (runnable, options));
+  return csPtr<csThread>(new csPosixThread (r, options));
 }
 
-csPosixThread::csPosixThread (iRunnable *runnable, uint32 /*options*/)
+csPosixThread::csPosixThread (csRunnable* r, uint32 /*options*/)
 {
-  csPosixThread::runnable = runnable;
+  runnable = r;
   running = false;
   created = false;
   lasterr = NULL;
@@ -319,8 +313,8 @@ csPosixThread::~csPosixThread ()
 {
   if (running)
     Kill ();
-  //  if (created)
-    //    pthread_join (thread, NULL); // clean up resources
+//if (created)
+//  pthread_join (thread, NULL); // clean up resources
 }
 
 bool csPosixThread::Start ()
@@ -335,10 +329,10 @@ bool csPosixThread::Start ()
     pthread_attr_t attr;
     int rc;
 
-    /* 
-       Force thread to be joinable, in later pthread implementations this is default already
-       Thread cancellation state is _assumed_ to be PTHREAD_CANCEL_ENABLE and cancellation type is PTHREAD_CANCEL_DEFERRED
-    */
+    // Force thread to be joinable, in later pthread implementations this
+    // is default already Thread cancellation state is _assumed_ to be
+    // PTHREAD_CANCEL_ENABLE and cancellation type is
+    // PTHREAD_CANCEL_DEFERRED
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
     rc = pthread_create(&thread, &attr, ThreadRun, (void*)this); 
@@ -445,18 +439,17 @@ bool csPosixThread::Kill ()
   return !running;
 }
 
-const char *csPosixThread::GetLastError ()
+char const* csPosixThread::GetLastError ()
 {
   return lasterr;
 }
 
-void* csPosixThread::ThreadRun (void *param)
+void* csPosixThread::ThreadRun (void* param)
 {
-  csPosixThread *thread = (csPosixThread *)param;
+  csPosixThread* thread = (csPosixThread*)param;
   thread->runnable->Run ();
   thread->running = false;
   pthread_exit (NULL);
 }
 
 #undef CS_SHOW_ERROR
-

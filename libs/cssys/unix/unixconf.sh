@@ -37,11 +37,6 @@ UNIX_DIR=libs/cssys/unix
 # Check for Pthread
 . ${BIN_DIR}/chkpthrd.sh
 
-if [ -n "${PTHREAD_OK}" -a ${PTHREAD_OK} -eq 1 ]; then
-  echo "CS_THREAD  = yes"
-  echo "CS_THREAD.INC = cspthrd.h"
-fi
-
 # Check for Readline (required by some Python installations).
 . ${BIN_DIR}/chkrdlin.sh
 

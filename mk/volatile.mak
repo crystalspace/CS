@@ -110,10 +110,6 @@ endif
 ifdef CS_BIG_ENDIAN
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_BIG_ENDIAN$">>volatile.tmp
 endif
-ifeq ($(CS_THREAD),yes)
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_THREAD$">>volatile.tmp
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_THREAD_INC "$(CS_THREAD.INC)"$">>volatile.tmp
-endif
 ifneq ($(OS_FAMILY),)
   MAKE_VOLATILE_H+=$(VOLATILE_H.OS_FAMILY)
 endif

@@ -4,6 +4,46 @@ The history order is reversed so that new features are at the top.
 	- For some reason include/cssys/win32/csosdefs.h was full of
 	  ^M (carriage return) characters. This failed the compilation.
 	- Fixed other ^M chars in other thread related files.
+	- Eric Sunshine made the following changes related to the CS threading
+	  API, implementation, and configuration:
+	    - Additional cleanup of the API.  Also added and updated comments.
+	    - Eliminated the csRefCounted class from cssys/thread.h.  Instead,
+	      now uses the existing csRefCount class from csutil/refcount.h.
+	    - Renamed iRunnable to csRunnable and derived it from csRefCount
+	      rather than iBase.  The rationale for this change is that
+	      threading can be considered lower-level than SCF, therefore it
+	      should not rely upon SCF.  It is conceivable, for example, that
+	      SCF itself could benefit from the threading-related API in order
+	      to become thread-aware, thus we do not want a circular
+	      dependency.
+	    - Updated the API to return csRef's rather than csPtr's since csPtr
+	      is a dangerous backward-compatibility hack.  In particular, csPtr
+	      will leak the resource if the caller of a function returning the
+	      csPtr ignores the returned value.  As a general rule, use csRef
+	      for all new API.
+	    - Eliminated the CS_SAFE_LOCKWAIT() and CS_SAFE_RELEASE() macros
+	      since it proved difficult to support this functionality in an
+	      abstract and portable way without resorting to extreme ugliness.
+	      In particular, on many platforms, the pthread implementation of
+	      these "functions" is performed with macros which must be used in
+	      pairs within the same scope, thus it was not possible to
+	      encapsulate them in abstract methods.
+	    - Moved cspthrd.h from include/cssys to libs/cssys/general, and
+	      winthread.h from include/cssys/win32 to libs/cssys/win32 since
+	      these files are no longer included by the public
+	      include/cssys/thread.h on account of removal of
+	      CS_SAFE_LOCKWAIT() and CS_SAFE_RELEASE().
+	    - Added new generic makefile variables CSTHREAD.SRC, CSTHREAD.INC,
+	      CSTHREAD.CFLAGS, and CSTHREAD.LFLAGS.
+	    - Augmented mk/unix.mak and mk/dos.mak to choose the proper
+	      threading implementation based upon the platform's configuration.
+	    - Upgraded all of the platform-specific makefiles to use the
+	      threading facilities if available.
+	    - Eliminated the now unused CS_THREAD and CS_THREAD.INC makefile
+	      variables.  Eliminated the now unused CS_THREAD and CS_THREAD_INC
+	      volatile.h defines.
+	    - Fixed line-termination problem in cspthrd.cpp where it contained
+	      an extra carriage return on each line.
 8-Oct-2002
 	- Eric Sunshine made the following changes:
 	    - Added the new makefile variable MKDIRS which, given a path

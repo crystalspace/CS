@@ -52,6 +52,12 @@ ARFLAGS=cr
 # Typical prefix for library filenames
 LIB_PREFIX=lib
 
+# The files implementing threading and the related compiler and linker flags.
+CSTHREAD.SRC =
+CSTHREAD.INC =
+CSTHREAD.CFLAGS =
+CSTHREAD.LFLAGS =
+
 # Extra libraries needed on this system.
 LIBS.EXE = -lm
 LIBS.SORT = -lm
@@ -76,7 +82,7 @@ SOUND_LIBS=
 CFLAGS.INCLUDE=-Ilibs/cssys/djgpp/libs/libpng -Ilibs/cssys/djgpp/libs/libjpeg -Ilibs/cssys/djgpp/libs/zlib
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM)
+CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS)
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize=-s -O6 -fomit-frame-pointer -ffast-math
@@ -91,7 +97,11 @@ CFLAGS.profile=-pg -O -g
 CFLAGS.DLL=
 
 # General flags for the linker which are used in any case.
-LFLAGS.GENERAL=-Llibs/cssys/djgpp/libs/libpng -Llibs/cssys/djgpp/libs/libjpeg -Llibs/cssys/djgpp/libs/zlib
+LFLAGS.GENERAL= \
+  -Llibs/cssys/djgpp/libs/libpng \
+  -Llibs/cssys/djgpp/libs/libjpeg \
+  -Llibs/cssys/djgpp/libs/zlib \
+  $(CSTHREAD.LFLAGS)
 
 # Flags for the linker which are used when optimizing.
 LFLAGS.optimize=-s
@@ -103,7 +113,10 @@ LFLAGS.debug=-g
 LFLAGS.profile=-pg
 
 # Flags for the linker which are used when building a shared library.
-LFLAGS.DLL=-Llibs/cssys/djgpp/libs/libpng -Llibs/cssys/djgpp/libs/libjpeg -Llibs/cssys/djgpp/libs/zlib
+LFLAGS.DLL= \
+  -Llibs/cssys/djgpp/libs/libpng \
+  -Llibs/cssys/djgpp/libs/libjpeg \
+  -Llibs/cssys/djgpp/libs/zlib
 
 # System-dependent flags to pass to NASM
 NASMFLAGS.SYSTEM=-f coff -DEXTERNC_UNDERSCORE
@@ -120,7 +133,9 @@ SRC.SYS_CSSYS = \
   libs/cssys/general/instpath.cpp \
   libs/cssys/general/runloop.cpp \
   libs/cssys/general/sysinit.cpp \
-  libs/cssys/general/username.cpp
+  libs/cssys/general/username.cpp \
+  $(CSTHREAD.SRC)
+
 ifeq ($(USE_PLUGINS),yes)
 SRC.SYS_CSSYS += libs/cssys/djgpp/loadlib.cpp libs/cssys/general/findlib.cpp
 endif

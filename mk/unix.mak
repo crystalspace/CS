@@ -79,3 +79,11 @@ DO_SHM=yes
 
 # Put this in front of the application name to run the test
 RUN_TEST=./
+
+# The files implementing threading and the related compiler and linker flags.
+ifeq ($(PTHREAD.AVIALABLE),yes)
+CSTHREAD.SRC = libs/cssys/general/cspthrd.cpp
+CSTHREAD.INC = libs/cssys/general/cspthrd.h
+CSTHREAD.CFLAGS = $(PTHREAD.CFLAGS)
+CSTHREAD.LFLAGS = $(PTHREAD.LFLAGS)
+endif

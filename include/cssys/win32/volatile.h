@@ -47,6 +47,5 @@
 #else
 #	undef DO_DINPUT_KEYBOARD
 #endif
-#define CS_THREAD
-#define CS_THREAD_INC "winthread.h"
+
 #endif // __CS_VOLATILE_H__

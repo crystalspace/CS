@@ -100,7 +100,7 @@ CFLAGS.INCLUDE=$(CFLAGS.I)/usr/include/directx \
 # $(CFLAGS.I)/dx7asdk/dxf/include
 
 # General flags for the compiler which are used in any case.
-CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) -pipe
+CFLAGS.GENERAL=-Wall $(CFLAGS.SYSTEM) $(CSTHREAD.CFLAGS) -pipe
 
 # Flags for the compiler which are used when optimizing.
 CFLAGS.optimize=-s -O3 -ffast-math
@@ -120,11 +120,11 @@ CFLAGS.profile=-pg -O -g
 CFLAGS.DLL=
 
 # General flags for the linker which are used in any case.
-LFLAGS.GENERAL=
+LFLAGS.GENERAL = $(CSTHREAD.LFLAGS)
 
 # Extra linker flags used by MSYS
 ifneq (,$(MSYSTEM))
-LFLAGS.GENERAL=$(LFLAGS.L)/usr/lib/w32api
+LFLAGS.GENERAL += $(LFLAGS.L)/usr/lib/w32api
 endif
 
 # Flags for the linker which are used when optimizing.
@@ -162,16 +162,8 @@ SRC.SYS_CSSYS = $(wildcard libs/cssys/win32/*.cpp) \
   libs/cssys/general/getopt.cpp \
   libs/cssys/general/printf.cpp \
   libs/cssys/general/runloop.cpp \
-  libs/cssys/general/sysinit.cpp 
-
-# The C compiler
-CC=gcc -c
-
-# The C++ compiler
-CXX=g++ -c
-
-# The linker.
-LINK=g++
+  libs/cssys/general/sysinit.cpp \
+  $(CSTHREAD.SRC)
 
 # Command sequence for creating a directory, and command for creating a
 # directory as well as any missing parents.

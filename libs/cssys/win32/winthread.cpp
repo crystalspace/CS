@@ -17,7 +17,7 @@
 */
 
 #include "cssysdef.h"
-#include "cssys/thread.h"
+#include "winthread.h"
 #include <process.h>
 
 #ifdef CS_DEBUG
@@ -29,13 +29,13 @@
 #define CS_GET_SYSERROR() \
 if (lasterr){LocalFree (lasterr); lasterr = NULL;}\
 FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | \
-			   FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, \
-			   NULL, (DWORD)GetLastError (), \
-			   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lasterr, 0, NULL)
+    FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, \
+    NULL, (DWORD)GetLastError (), \
+    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lasterr, 0, NULL)
 
 #define CS_TEST(x) if(!(x)) {CS_GET_SYSERROR(); CS_SHOW_ERROR;}
 
-csPtr<csMutex> csMutex::Create ()
+csRef<csMutex> csMutex::Create ()
 {
   return csPtr<csMutex>(new csWinMutex ());
 }
@@ -60,7 +60,7 @@ csWinMutex::~csWinMutex ()
 
 bool csWinMutex::Destroy ()
 {
-  bool rc=CloseHandle (mutex);
+  bool rc = CloseHandle (mutex);
   CS_TEST (rc);
   return rc;
 }
@@ -86,23 +86,24 @@ bool csWinMutex::Release ()
   return rc;
 }
 
-const char* csWinMutex::GetLastError ()
+char const* csWinMutex::GetLastError ()
 {
-  return (const char*)lasterr;
+  return (char const*)lasterr;
 }
 
 
-csPtr<csSemaphore> csSemaphore::Create (uint32 value)
+csRef<csSemaphore> csSemaphore::Create (uint32 value)
 {
   return csPtr<csSemaphore>(new csWinSemaphore (value));
 }
 
-csWinSemaphore::csWinSemaphore (uint32 value)
+csWinSemaphore::csWinSemaphore (uint32 v)
 {
   lasterr = NULL;
-  value=0;
+  value = v;
   sem = CreateSemaphore (NULL, (LONG)value, (LONG)value, NULL);
-  if (sem != NULL) this->value=value;
+  if (sem == NULL)
+    value = 0;
   CS_TEST (sem != NULL);
 }
 
@@ -114,7 +115,8 @@ csWinSemaphore::~csWinSemaphore ()
 bool csWinSemaphore::LockWait ()
 {
   bool rc = (WaitForSingleObject (sem, INFINITE) != WAIT_FAILED);
-  if (rc) value--;
+  if (rc)
+    value--;
   CS_TEST (rc);
   return rc;
 }
@@ -122,16 +124,17 @@ bool csWinSemaphore::LockWait ()
 bool csWinSemaphore::LockTry ()
 {
   bool rc = (WaitForSingleObject (sem, 1) != WAIT_FAILED);
-  if (rc) value--;
+  if (rc)
+    value--;
   CS_TEST (rc);
   return rc;
 }
 
-
 bool csWinSemaphore::Release ()
 {
-  bool rc=ReleaseSemaphore (sem, 1, &value);
-  if (rc) value++;
+  bool rc = ReleaseSemaphore (sem, 1, &value);
+  if (rc)
+    value++;
   CS_TEST (rc);
   return rc;
 }
@@ -143,17 +146,18 @@ uint32 csWinSemaphore::Value ()
 
 bool csWinSemaphore::Destroy ()
 {
-  bool rc=CloseHandle (sem);
+  bool rc = CloseHandle (sem);
   CS_TEST (rc);
   return rc;
 }
 
-const char* csWinSemaphore::GetLastError ()
+char const* csWinSemaphore::GetLastError ()
 {
-  return (const char*)lasterr;
+  return (char const*)lasterr;
 }
 
-csPtr<csCondition> csCondition::Create (uint32 conditionAttributes)
+
+csRef<csCondition> csCondition::Create (uint32 conditionAttributes)
 {
   return csPtr<csCondition>(new csWinCondition (conditionAttributes));
 }
@@ -170,16 +174,16 @@ csWinCondition::~csWinCondition ()
   Destroy ();
 }
 
-void csWinCondition::Signal (bool bAll)
+void csWinCondition::Signal (bool /*WakeAll*/)
 {
-  bool rc = PulseEvent (cond); // only releases one waiting thread, coz its auto-reset
+  // only releases one waiting thread, coz its auto-reset
+  bool rc = PulseEvent (cond);
   CS_TEST (rc);
 }
 
-bool csWinCondition::Wait (csMutex *mutex, csTicks timeout)
+bool csWinCondition::Wait (csMutex* mutex, csTicks timeout)
 {
-  DWORD rc;
-  // SignalObjectAndWait is only available in WinNT 4.0 and above
+  // SignalObjectAndWait() is only available in WinNT 4.0 and above
   // so we use the potentially dangerous version below
   if (mutex->Release () && LockWait ((DWORD)timeout))
     return mutex->LockWait ();
@@ -200,19 +204,20 @@ bool csWinCondition::Destroy ()
   return rc;
 }
 
-const char* csWinCondition::GetLastError ()
+char const* csWinCondition::GetLastError ()
 {
-  return (const char*)lasterr;
+  return (char const*)lasterr;
 }
 
-csPtr<csThread> csThread::Create (iRunnable *runnable, uint32 options)
+
+csRef<csThread> csThread::Create (csRunnable* r, uint32 options)
 {
-  return csPtr<csThread>(new csWinThread (runnable, options));
+  return csPtr<csThread>(new csWinThread (r, options));
 }
 
-csWinThread::csWinThread (iRunnable *runnable, uint32 /*options*/)
+csWinThread::csWinThread (csRunnable* r, uint32 /*options*/)
 {
-  csWinThread::runnable = runnable;
+  runnable = r;
   running = false;
   lasterr = NULL;
 }
@@ -226,7 +231,7 @@ csWinThread::~csWinThread ()
 bool csWinThread::Start ()
 {
   thread = (HANDLE)_beginthread (ThreadRun, 0, (void*)this);
-  running = ((unsigned long)thread != -1);
+  running = ((unsigned long)thread != (unsigned long)~0);
   CS_TEST (running);
   return running;
 }
@@ -241,8 +246,8 @@ bool csWinThread::Wait ()
   if (running)
   {
     bool rc = (WaitForSingleObject (thread, INFINITE) != WAIT_FAILED);
-	CS_TEST (rc);
-	return rc;
+    CS_TEST (rc);
+    return rc;
   }
   return true;
 }
@@ -251,20 +256,20 @@ bool csWinThread::Kill ()
 {
   if (running)
   {
-    running = !TerminateThread (thread, -1);
-	CS_TEST (!running);
+    running = !TerminateThread (thread, ~0);
+    CS_TEST (!running);
   }
   return !running;
 }
 
-const char *csWinThread::GetLastError ()
+char const* csWinThread::GetLastError ()
 {
-  return (const char*)lasterr;
+  return (char const*)lasterr;
 }
 
-void csWinThread::ThreadRun (void *param)
+void csWinThread::ThreadRun (void* param)
 {
-  csWinThread *thread = (csWinThread *)param;
+  csWinThread *thread = (csWinThread*)param;
   thread->runnable->Run ();
   thread->running = false;
   _endthread();
