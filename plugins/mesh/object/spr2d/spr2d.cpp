@@ -328,6 +328,11 @@ void csSprite2DMeshObject::GetObjectBoundingBox (csBox3& /*bbox*/, bool /*accura
   //bbox = object_bbox;
 }
 
+void csSprite2DMeshObject::HardTransform (const csReversibleTransform& t)
+{
+  (void)t;
+}
+
 void csSprite2DMeshObject::CreateRegularVertices (int n, bool setuv)
 {
   double angle_inc = 2.0 * PI / n;

@@ -134,6 +134,17 @@ public:
   /// Get the children of this mesh object.
   csNamedObjVector& GetChildren () { return children; }
 
+  /**
+   * Do a hard transform of this object.
+   * This transformation and the original coordinates are not
+   * remembered but the object space coordinates are directly
+   * computed (world space coordinates are set to the object space
+   * coordinates by this routine). Note that some implementations
+   * of mesh objects will not change the orientation of the object but
+   * only the position.
+   */
+  void HardTransform (const csReversibleTransform& t);
+
   CSOBJTYPE;
 };
 

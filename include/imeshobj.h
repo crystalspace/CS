@@ -27,12 +27,13 @@ struct iMeshObject;
 struct iRenderView;
 struct iMovable;
 struct iLight;
+class csReversibleTransform;
 
 /// A callback function for MeshObj::Draw().
 typedef void (csMeshCallback) (iMeshObject* spr, iRenderView* rview,
 	void* callbackData);
 
-SCF_VERSION (iMeshObject, 0, 0, 6);
+SCF_VERSION (iMeshObject, 0, 0, 7);
 
 /**
  * This is a general mesh object that the engine can interact with.
@@ -97,9 +98,25 @@ struct iMeshObject : public iBase
    * particle systems that only have a limited time to live.
    */
   virtual bool WantToDie () = 0;
+
+  /**
+   * Do a hard transform of this object.
+   * This transformation and the original coordinates are not
+   * remembered but the object space coordinates are directly
+   * computed (world space coordinates are set to the object space
+   * coordinates by this routine). Note that some implementations
+   * of mesh objects will not change the orientation of the object but
+   * only the position.
+   */
+  virtual void HardTransform (const csReversibleTransform& t) = 0;
+
+  /**
+   * Return true if HardTransform is supported for this mesh object type.
+   */
+  virtual bool SupportsHardTransform () = 0;
 };
 
-SCF_VERSION (iMeshObjectFactory, 0, 0, 3);
+SCF_VERSION (iMeshObjectFactory, 0, 0, 4);
 
 /**
  * This object is a factory which can generate
@@ -112,6 +129,22 @@ struct iMeshObjectFactory : public iBase
 {
   /// Create an instance of iMeshObject.
   virtual iMeshObject* NewInstance () = 0;
+
+  /**
+   * Do a hard transform of this factory.
+   * This transformation and the original coordinates are not
+   * remembered but the object space coordinates are directly
+   * computed (world space coordinates are set to the object space
+   * coordinates by this routine). Note that some implementations
+   * of mesh objects will not change the orientation of the object but
+   * only the position.
+   */
+  virtual void HardTransform (const csReversibleTransform& t) = 0;
+
+  /**
+   * Return true if HardTransform is supported for this factory.
+   */
+  virtual bool SupportsHardTransform () = 0;
 };
 
 SCF_VERSION (iMeshObjectType, 0, 0, 1);

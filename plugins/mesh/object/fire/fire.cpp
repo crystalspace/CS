@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "csgeom/matrix3.h"
+#include "csgeom/transfrm.h"
 #include "fire.h"
 #include "imater.h"
 #include "ilight.h"
@@ -207,6 +208,12 @@ void csFireMeshObject::AddLight (iEngine *engine, iSector *sec)
   dynlight->Setup ();
   delete_light = true;
   light_engine = engine;
+}
+
+void csFireMeshObject::HardTransform (const csReversibleTransform& t)
+{
+  origin = t.This2Other (origin);
+  initialized = false;
 }
 
 //----------------------------------------------------------------------

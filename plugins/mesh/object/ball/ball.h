@@ -37,7 +37,7 @@ class csBallMeshObject : public iMeshObject
 {
 private:
   float radiusx, radiusy, radiusz;
-  float shiftx, shifty, shiftz;
+  csVector3 shift;
   iMaterialWrapper* material;
   UInt MixMode;
   csMeshCallback* vis_cb;
@@ -103,9 +103,7 @@ public:
   void SetShift (float shiftx, float shifty, float shiftz)
   {
     initialized = false;
-    csBallMeshObject::shiftx = shiftx;
-    csBallMeshObject::shifty = shifty;
-    csBallMeshObject::shiftz = shiftz;
+    shift.Set (shiftx, shifty, shiftz);
   }
   void SetRimVertices (int num)
   {
@@ -134,6 +132,8 @@ public:
   virtual void GetObjectBoundingBox (csBox3& bbox, bool accurate = false);
   virtual void NextFrame (cs_time /*current_time*/) { }
   virtual bool WantToDie () { return false; }
+  virtual void HardTransform (const csReversibleTransform& t);
+  virtual bool SupportsHardTransform () { return true; }
 
   //------------------------- iBallState implementation ----------------
   class BallState : public iBallState
@@ -177,8 +177,9 @@ public:
   //------------------------ iMeshObjectFactory implementation --------------
   DECLARE_IBASE;
 
-  /// Draw.
   virtual iMeshObject* NewInstance ();
+  virtual void HardTransform (const csReversibleTransform&) { }
+  virtual bool SupportsHardTransform () { return false; }
 };
 
 /**

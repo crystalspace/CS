@@ -49,6 +49,8 @@ private:
   csBox3 object_bbox;
   csMeshCallback* vis_cb;
   void* vis_cbData;
+  float sizex, sizey, sizez;
+  csVector3 shift;
 
   /**
    * Camera space bounding box is cached here.
@@ -105,6 +107,8 @@ public:
   virtual void GetObjectBoundingBox (csBox3& bbox, bool accurate = false);
   virtual void NextFrame (cs_time /*current_time*/) { }
   virtual bool WantToDie () { return false; }
+  virtual void HardTransform (const csReversibleTransform& t);
+  virtual bool SupportsHardTransform () { return true; }
 };
 
 /**
@@ -116,7 +120,7 @@ class csCubeMeshObjectFactory : public iMeshObjectFactory
 {
 private:
   float sizex, sizey, sizez;
-  float shiftx, shifty, shiftz;
+  csVector3 shift;
   iMaterialWrapper* material;
   UInt MixMode;
 
@@ -133,12 +137,14 @@ public:
   float GetSizeY () { return sizey; }
   /// Get the z size of this cube.
   float GetSizeZ () { return sizez; }
+  /// Get the shift.
+  const csVector3& GetShift () { return shift; }
   /// Get the x shift of this cube.
-  float GetShiftX () { return shiftx; }
+  float GetShiftX () { return shift.x; }
   /// Get the y shift of this cube.
-  float GetShiftY () { return shifty; }
+  float GetShiftY () { return shift.y; }
   /// Get the z shift of this cube.
-  float GetShiftZ () { return shiftz; }
+  float GetShiftZ () { return shift.z; }
   /// Get the material for this cube.
   iMaterialWrapper* GetMaterialWrapper () { return material; }
   /// Get mixmode.
@@ -147,8 +153,9 @@ public:
   //------------------------ iMeshObjectFactory implementation --------------
   DECLARE_IBASE;
 
-  /// Draw.
   virtual iMeshObject* NewInstance ();
+  virtual void HardTransform (const csReversibleTransform&) { }
+  virtual bool SupportsHardTransform () { return false; }
 
   //------------------------- iCubeFactoryState implementation ----------------
   class CubeFactoryState : public iCubeFactoryState
@@ -165,13 +172,11 @@ public:
     virtual float GetSizeZ () { return scfParent->sizez; }
     virtual void SetShift (float shiftx, float shifty, float shiftz)
     {
-      scfParent->shiftx = shiftx;
-      scfParent->shifty = shifty;
-      scfParent->shiftz = shiftz;
+      scfParent->shift.Set (shiftx, shifty, shiftz);
     }
-    virtual float GetShiftX () { return scfParent->shiftx; }
-    virtual float GetShiftY () { return scfParent->shifty; }
-    virtual float GetShiftZ () { return scfParent->shiftz; }
+    virtual float GetShiftX () { return scfParent->shift.x; }
+    virtual float GetShiftY () { return scfParent->shift.y; }
+    virtual float GetShiftZ () { return scfParent->shift.z; }
     virtual void SetMaterialWrapper (iMaterialWrapper* material)
     {
       scfParent->material = material;
@@ -191,7 +196,7 @@ class csCubeMeshObjectType : public iMeshObjectType
 {
 private:
   float default_sizex, default_sizey, default_sizez;
-  float default_shiftx, default_shifty, default_shiftz;
+  csVector3 default_shift;
   UInt default_MixMode;
 
 public:

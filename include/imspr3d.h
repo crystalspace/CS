@@ -183,9 +183,6 @@ struct iSprite3DFactoryState : public iBase
   /// Get action number No
   virtual iSpriteAction* GetAction (int No) = 0;
 
-  // @@@ TODO: what about HardTransform()? Needs to be extension
-  //  	       to csMeshWrapper.
-
   /// Enable skeletal animation for this factory.
   virtual void EnableSkeletalAnimation () = 0;
   /**

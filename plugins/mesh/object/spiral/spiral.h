@@ -60,6 +60,10 @@ public:
   /// Update the particle system.
   virtual void Update (cs_time elapsed_time);
 
+  /// For iMeshObject.
+  virtual void HardTransform (const csReversibleTransform& t);
+  virtual bool SupportsHardTransform () { return true; }
+
   DECLARE_IBASE_EXT (csParticleSystem);
 
   //------------------------- iSpiralState implementation ----------------
@@ -96,8 +100,9 @@ public:
   //------------------------ iMeshObjectFactory implementation --------------
   DECLARE_IBASE;
 
-  /// Draw.
   virtual iMeshObject* NewInstance ();
+  virtual void HardTransform (const csReversibleTransform&) { }
+  virtual bool SupportsHardTransform () { return false; }
 };
  
 /**
@@ -122,7 +127,6 @@ public:
   //------------------------ iMeshObjectType implementation --------------
   DECLARE_IBASE;
 
-  /// Draw.
   virtual iMeshObjectFactory* NewFactory ();
 };
 

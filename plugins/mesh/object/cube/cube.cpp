@@ -43,6 +43,10 @@ csCubeMeshObject::csCubeMeshObject (csCubeMeshObjectFactory* factory)
   initialized = false;
   camera_cookie = 0;
   vis_cb = NULL;
+  sizex = factory->GetSizeX ();
+  sizey = factory->GetSizeY ();
+  sizez = factory->GetSizeZ ();
+  shift = factory->GetShift ();
 }
 
 csCubeMeshObject::~csCubeMeshObject ()
@@ -123,12 +127,6 @@ void csCubeMeshObject::SetupObject ()
   if (!initialized)
   {
     initialized = true;
-    float sizex = factory->GetSizeX ();
-    float sizey = factory->GetSizeY ();
-    float sizez = factory->GetSizeZ ();
-    float shiftx = factory->GetShiftX ();
-    float shifty = factory->GetShiftY ();
-    float shiftz = factory->GetShiftZ ();
     float sx = sizex/2;
     float sy = sizey/2;
     float sz = sizez/2;
@@ -145,7 +143,7 @@ void csCubeMeshObject::SetupObject ()
     for (i = 0 ; i < 8 ; i++)
     {
       normals[i] = vertices[i]; normals[i].Normalize ();
-      vertices[i] += csVector3 (shiftx, shifty, shiftz);
+      vertices[i] += shift;
       object_bbox.AddBoundingVertex (vertices[i]);
     }
     uv[0].Set (0, 0);
@@ -331,6 +329,12 @@ void csCubeMeshObject::GetObjectBoundingBox (csBox3& bbox, bool /*accurate*/)
   bbox = object_bbox;
 }
 
+void csCubeMeshObject::HardTransform (const csReversibleTransform& t)
+{
+  shift = t.This2Other (shift);
+  initialized = false;
+}
+
 //----------------------------------------------------------------------
 
 IMPLEMENT_IBASE (csCubeMeshObjectFactory)
@@ -349,9 +353,7 @@ csCubeMeshObjectFactory::csCubeMeshObjectFactory ()
   sizex = 1;
   sizey = 1;
   sizez = 1;
-  shiftx = 0;
-  shifty = 0;
-  shiftz = 0;
+  shift.Set (0, 0, 0);
   material = NULL;
   MixMode = 0;
 }
@@ -392,9 +394,7 @@ csCubeMeshObjectType::csCubeMeshObjectType (iBase* pParent)
   default_sizex = 1;
   default_sizey = 1;
   default_sizez = 1;
-  default_shiftx = 0;
-  default_shifty = 0;
-  default_shiftz = 0;
+  default_shift.Set (0, 0, 0);
   default_MixMode = 0;
 }
 
@@ -412,7 +412,7 @@ iMeshObjectFactory* csCubeMeshObjectType::NewFactory ()
   csCubeMeshObjectFactory* cm = new csCubeMeshObjectFactory ();
   iCubeFactoryState* cubeLook = QUERY_INTERFACE (cm, iCubeFactoryState);
   cubeLook->SetSize (default_sizex, default_sizey, default_sizez);
-  cubeLook->SetShift (default_shiftx, default_shifty, default_shiftz);
+  cubeLook->SetShift (default_shift.x, default_shift.y, default_shift.z);
   return QUERY_INTERFACE (cm, iMeshObjectFactory);
 }
 
@@ -437,9 +437,9 @@ bool csCubeMeshObjectType::csCubeConfig::SetOption (int id, csVariant* value)
     case 0: scfParent->default_sizex = value->v.f; break;
     case 1: scfParent->default_sizey = value->v.f; break;
     case 2: scfParent->default_sizez = value->v.f; break;
-    case 3: scfParent->default_shiftx = value->v.f; break;
-    case 4: scfParent->default_shifty = value->v.f; break;
-    case 5: scfParent->default_shiftz = value->v.f; break;
+    case 3: scfParent->default_shift.x = value->v.f; break;
+    case 4: scfParent->default_shift.y = value->v.f; break;
+    case 5: scfParent->default_shift.z = value->v.f; break;
     default: return false;
   }
   return true;
@@ -453,9 +453,9 @@ bool csCubeMeshObjectType::csCubeConfig::GetOption (int id, csVariant* value)
     case 0: value->v.f = scfParent->default_sizex; break;
     case 1: value->v.f = scfParent->default_sizey; break;
     case 2: value->v.f = scfParent->default_sizez; break;
-    case 3: value->v.f = scfParent->default_shiftx; break;
-    case 4: value->v.f = scfParent->default_shifty; break;
-    case 5: value->v.f = scfParent->default_shiftz; break;
+    case 3: value->v.f = scfParent->default_shift.x; break;
+    case 4: value->v.f = scfParent->default_shift.y; break;
+    case 5: value->v.f = scfParent->default_shift.z; break;
     default: return false;
   }
   return true;

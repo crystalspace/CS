@@ -119,6 +119,11 @@ void csRainMeshObject::Update (cs_time elapsed_time)
   }
 }
 
+void csRainMeshObject::HardTransform (const csReversibleTransform& t)
+{
+  (void)t;
+}
+
 //----------------------------------------------------------------------
 
 IMPLEMENT_IBASE (csRainMeshObjectFactory)

@@ -167,6 +167,20 @@ bool csMeshWrapper::HitBeamObject (const csVector3& /*start*/,
   return false;
 }
 
+void csMeshWrapper::HardTransform (const csReversibleTransform& t)
+{
+  mesh->HardTransform (t);
+  int i;
+  for (i = 0 ; i < children.Length () ; i++)
+  {
+    csSprite* spr = (csSprite*)children[i];
+    // @@@ Change as soon as csMeshWrapper becomes csSprite.
+    if (spr->GetType () >= csMeshWrapper::Type)
+      ((csMeshWrapper*)spr)->HardTransform (t);
+  }
+}
+
+
 //--------------------------------------------------------------------------
 
 IMPLEMENT_IBASE (csMeshFactoryWrapper)

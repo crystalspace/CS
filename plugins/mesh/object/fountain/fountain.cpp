@@ -18,6 +18,7 @@
 */
 
 #include "cssysdef.h"
+#include "csgeom/transfrm.h"
 #include "csgeom/matrix3.h"
 #include "fountain.h"
 #include "imater.h"
@@ -158,6 +159,12 @@ void csFountainMeshObject::Update (cs_time elapsed_time)
     todo_time -= intersperse;
   }
   time_left = todo_time;
+}
+
+void csFountainMeshObject::HardTransform (const csReversibleTransform& t)
+{
+  origin = t.This2Other (origin);
+  initialized = false;
 }
 
 //----------------------------------------------------------------------

@@ -105,6 +105,8 @@ public:
   virtual void GetObjectBoundingBox (csBox3& bbox, bool accurate = false);
   virtual void NextFrame (cs_time /*current_time*/) { }
   virtual bool WantToDie () { return false; }
+  virtual void HardTransform (const csReversibleTransform& t);
+  virtual bool SupportsHardTransform () { return false; }
 
   //------------------------- iSprite2DState implementation ----------------
   class Sprite2DState : public iSprite2DState
@@ -186,8 +188,9 @@ public:
   //------------------------ iMeshObjectFactory implementation --------------
   DECLARE_IBASE;
 
-  /// Draw.
   virtual iMeshObject* NewInstance ();
+  virtual void HardTransform (const csReversibleTransform&) { }
+  virtual bool SupportsHardTransform () { return false; }
 
   //------------------------- iSprite2DFactoryState implementation ----------------
   class Sprite2DFactoryState : public iSprite2DFactoryState

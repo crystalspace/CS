@@ -48,7 +48,7 @@ csBallMeshObject::csBallMeshObject ()
   initialized = false;
   camera_cookie = 0;
   radiusx = radiusy = radiusz = 1;
-  shiftx = shifty = shiftz = 0;
+  shift.Set (0, 0, 0);
   verts_circle = 6;
   material = NULL;
   MixMode = 0;
@@ -94,7 +94,7 @@ void csBallMeshObject::GetTransformedBoundingBox (iTransformationManager* tranma
   cbox = camera_bbox;
 }
 
-void Perspective (const csVector3& v, csVector2& p, float fov,
+static void Perspective (const csVector3& v, csVector2& p, float fov,
     	float sx, float sy)
 {
   float iz = fov / v.z;
@@ -291,7 +291,7 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
     vertices[i].y *= radiusy/2;
     vertices[i].z *= radiusz/2;
     normals[i] = vertices[i].Unit ();
-    vertices[i] += csVector3 (shiftx, shifty, shiftz);
+    vertices[i] += shift;
   }
 
   // Setup the mesh and normal array.
@@ -319,6 +319,19 @@ void csBallMeshObject::SetupObject ()
   if (!initialized)
   {
     initialized = true;
+    delete[] top_normals;
+    delete[] top_mesh.vertices[0];
+    delete[] top_mesh.vertex_colors[0];
+    delete[] top_mesh.texels[0][0];
+    delete[] top_mesh.triangles;
+    delete[] top_mesh.vertex_fog;
+    top_normals = NULL;
+    top_mesh.vertices[0] = NULL;
+    top_mesh.vertex_colors[0] = NULL;
+    top_mesh.texels[0][0] = NULL;
+    top_mesh.triangles = NULL;
+    top_mesh.vertex_fog = NULL;
+
     GenerateSphere (verts_circle, top_mesh, top_normals);
     object_bbox.StartBoundingBox (csVector3 (-radiusx/2, -radiusy/2, -radiusz/2));
     object_bbox.AddBoundingVertexSmart (csVector3 ( radiusx/2, -radiusy/2, -radiusz/2));
@@ -474,6 +487,12 @@ void csBallMeshObject::GetObjectBoundingBox (csBox3& bbox, bool /*accurate*/)
 {
   SetupObject ();
   bbox = object_bbox;
+}
+
+void csBallMeshObject::HardTransform (const csReversibleTransform& t)
+{
+  shift = t.This2Other (shift);
+  initialized = false;
 }
 
 //----------------------------------------------------------------------

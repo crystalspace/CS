@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "csgeom/matrix3.h"
+#include "csgeom/transfrm.h"
 #include "explo.h"
 #include "imater.h"
 #include "iengine.h"
@@ -147,7 +148,11 @@ void csExploMeshObject::RemoveLight ()
   light_engine = NULL;
 }
 
-
+void csExploMeshObject::HardTransform (const csReversibleTransform& t)
+{
+  center = t.This2Other (center);
+  initialized = false;
+}
 
 //----------------------------------------------------------------------
 

@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "csgeom/matrix3.h"
+#include "csgeom/transfrm.h"
 #include "spiral.h"
 #include "imater.h"
 #include <math.h>
@@ -112,6 +113,12 @@ void csSpiralMeshObject::Update (cs_time elapsed_time)
     part->MovePosition( -(float)time_before_new_particle / 1000.0 * dir);
   }
   csNewtonianParticleSystem::Update (elapsed_time);
+}
+
+void csSpiralMeshObject::HardTransform (const csReversibleTransform& t)
+{
+  source = t.This2Other (source);
+  initialized = false;
 }
 
 //----------------------------------------------------------------------

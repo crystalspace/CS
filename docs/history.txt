@@ -6,6 +6,20 @@ The history order has been reversed so that new features are at the top.
 	  which is not right because they are not csObject's.
 	- Added a 'virtual' to the destructor of the new ini file stuff
 	  because otherwise gcc gave warnings.
+	- Extended iMeshObject with HardTransform() to do a hard
+	  transform on the object. Also added this to csMeshWrapper.
+	  Also added SupportsHardTransform() so that an application
+	  can test if HardTransform() is supported.
+	- Extended iMeshObjectFactory with the same two functions. Sometimes
+	  HardTransform() only makes sense on the factory.
+	- Implemented HardTransform() in all mesh object plugins. Note
+	  that this transformation doesn't affect the orientation of
+	  the mesh object. Only the location is changed. Even for particle
+	  systems and cube although it could be useful there.
+	  Note that for spr2d, snow, and rain HardTransform() don't do
+	  anything.
+	- Fixed a bug in ball plugin if some setting was changed after
+	  already being initialized.
 18-Jan-2001
 	- Wouter Wijngaards fixed Martin's stricmp() in cfgfile.cpp.
 	  stricmp is not portable, please use strcasecmp.
