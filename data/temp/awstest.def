@@ -35,13 +35,28 @@ window "Splash"
 
   component "TestLabel" is "Label"
   {
-    Frame: (20, 30) - (200, 45)
-    Caption: "This is a test label. (Centered)"
+    Frame: (20, 5) - (250, 20)
+    Align: lblAlignCenter
+    Caption: "Login to AWSTEST"
+  }
+
+  component "User" is "Label"
+  {
+    Frame: (10, 50) - (75, 70)
+    Align: lblAlignRight
+    Caption: "Username:"
+  }
+
+  component "Pass" is "Label"
+  {
+    Frame: (10, 75) - (75, 95)
+    Align: lblAlignRight
+    Caption: "Password:"
   }
 
   component "UserName" is "Text Box"
   {
-    Frame: (20, 50) - (250, 70)
+    Frame: (80, 50) - (250, 70)
     Style: tbfsNormal
     Text: "Newuser"
     Disallow: "0123456789 "
@@ -54,7 +69,7 @@ window "Splash"
 
   component "Password" is "Text Box"
   {
-    Frame: (20, 75) - (250, 95)
+    Frame: (80, 75) - (250, 95)
     Style: tbfsNormal
     Masked: Yes
     MaskChar: "*"
@@ -81,7 +96,7 @@ window "Splash"
 
 window "Another"
 {
-  Frame: (200,300)-(500,440)
+  Frame: (100,100)-(500,440)
   Style: wfsNormal
 
   component "HideWindow" is "Command Button"
