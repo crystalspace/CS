@@ -45,8 +45,11 @@ public:
    * will be destroyed when the interfaces are.
    */ 
   csImageMemory (int width, int height, RGBPixel *buffer, bool destroy);
+
   virtual ~csImageMemory ();
 
+  /// Clears image to colour
+  void Clear (const RGBPixel &colour);
 
   /// Rescale the image to the given size
   virtual void Rescale (int NewWidth, int NewHeight);

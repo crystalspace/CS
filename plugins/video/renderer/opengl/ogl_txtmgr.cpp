@@ -86,6 +86,7 @@ void csTextureMMOpenGL::InitTexture (csTextureManagerOpenGL *texman,
   orig_width = image->GetWidth ();
   orig_height = image->GetHeight ();
 
+  // If necessary rescale if bigger than maximum texture size
   if ((orig_width > texman->max_tex_size) ||
       (orig_height > texman->max_tex_size))
   {
@@ -111,8 +112,10 @@ void csTextureMMOpenGL::InitTexture (csTextureManagerOpenGL *texman,
       case BACK_BUFFER_TEXTURE:
       {
 	csOpenGLProcBackBuffer *bbtexG3D = new csOpenGLProcBackBuffer(NULL);
-	// already shares the texture cache
-	bbtexG3D->Prepare (texman->G3D, this, pfmt);
+	bool persistent = (flags & CS_TEXTURE_PROC_PERSISTENT) == 
+	                   CS_TEXTURE_PROC_PERSISTENT;
+	// already shares the texture cache/manager
+	bbtexG3D->Prepare (texman->G3D, this, pfmt, persistent);
 	((csTextureProcOpenGL*)tex[0])->texG3D = (iGraphics3D*) bbtexG3D;
 	break;
       }
@@ -131,8 +134,11 @@ void csTextureMMOpenGL::InitTexture (csTextureManagerOpenGL *texman,
       }
       case SOFTWARE_TEXTURE_32BIT:
       {
+	// This path forces the software procedural textures to be in 32bit
+	// no matter what the pfmt.
 	csOpenGLProcSoftware *stexG3D = new csOpenGLProcSoftware (NULL);
 	csPixelFormat pfmt2;
+	// @@ BAD need to work out endianness issues etc.
 	pfmt2.PixelBytes = 4;
 	pfmt2.RedMask = 16711680;
 	pfmt2.GreenMask = 65280;

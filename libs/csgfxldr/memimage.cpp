@@ -48,6 +48,13 @@ csImageMemory::~csImageMemory ()
     Image = NULL;
 }
 
+void csImageMemory::Clear (const RGBPixel &colour)
+{
+  ULong *src = (ULong*) &colour;
+  ULong *dst = (ULong*)Image;
+  for (int i = 0; i < Width*Height; i++, dst++)
+    *dst = *src;
+}
 
 // short cut
 void csImageMemory::Rescale (int NewWidth, int NewHeight)

@@ -361,8 +361,10 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
-  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, 
+		   rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
+  glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, 
+		   rstate_bilinearmap ? GL_LINEAR : GL_NEAREST);
 
   RGBPixel *src;
   iImage *img = NULL;
@@ -499,7 +501,7 @@ void OpenGLTextureCache::Load (csGLCacheData *d)
 	}
       }
       glTexImage2D (GL_TEXTURE_2D, 0, 4, tw, th,
-		    0, GL_RGB, GL_UNSIGNED_BYTE, src);
+		    0, GL_RGBA, GL_UNSIGNED_BYTE, src);
     }
   }
   d->Handle = texturehandle;

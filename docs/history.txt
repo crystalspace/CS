@@ -1,8 +1,25 @@
 The history order has been reversed so that new features are at the top.
+10-Jul-2000
+	- Samuel did the following changes:
+            - Added new Clear (RGBPixel &colour) function to csImageMemory. This 
+              clears the image to the specified colour.
+	    - Implemented new procedural texture flag: CS_TEXTURE_PROC_PERSISTENT
+              This has been implemented for opengl backbuffer & software versions
+	      aswell as the pure software drivers...see documentation for further
+              details. Only mip-mapping to deal with now.
+            - Fixed the software 32bit RGB transpositions problem, I think :)
+              32bit software procedural clours should now be correct. Please 
+              people on big endian machines check this!!
+            - Optimised the GL back buffer implementation so it now clears Zbuffer
+              and/or screen with QUADS rather than the whole screen ;).
+            - Fixed the garbling which occured on the first frame in opengl.
+            - Various changes to dtsimple. Currently the meta balls texture is 
+              set to be persistent over the top of the squawk background, so the 
+              metaballs smear over the texture rather than being cleared each frame
 8-Jul-2000
         - Samuel did the following changes:
             - Fixed the opengl back buffer procedural texture so it now displays
-              curves and sprites non-inverted. The back buffer uses a non-inverted
+              curves and sprites non-inverted. The back buffer uses an inverted
               orthographic projection matrix, which was being overwritten by the
               DrawTriangleMesh routine.
             - Added emacs friendly comments that these .inc files are really C++

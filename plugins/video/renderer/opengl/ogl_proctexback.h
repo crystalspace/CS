@@ -46,16 +46,22 @@ class csClipper;
 class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
 {
  protected:
-  csTextureMMOpenGL *tex;
+  csTextureMMOpenGL *tex_mm;
   csTextureProcOpenGL *tex_0;
 
   int frame_width, frame_height, pixel_bytes;
   csPixelFormat pfmt;
   bool rstate_bilinearmap;
 
-  // The pair of intefaces to the frame buffer
+  /// The pair of intefaces to the frame buffer
   csGraphics3DOGLCommon *g3d;
   iGraphics2D *g2d;
+
+  /// Does the user expect the buffer to seem to remain intact between frames?
+  bool persistent;
+
+  /// Temporarty buffer to convert glReadPixels to RGBPixel
+  char *buffer;
 
  public:
   DECLARE_IBASE;
@@ -65,7 +71,7 @@ class csOpenGLProcBackBuffer : public csGraphics3DOGLCommon
   virtual ~csOpenGLProcBackBuffer ();
 
   void Prepare (csGraphics3DOGLCommon *g3d, csTextureMMOpenGL *tex, 
-		csPixelFormat *ipfmt);
+		csPixelFormat *ipfmt, bool bpersistent);
 
   virtual bool Initialize (iSystem* /*System*/)
   { return false; }
@@ -94,12 +100,14 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
 {
   iGraphics2D *g2d;
   int frame_height, width, height;
+  csPixelFormat *pfmt;
   int font;
 
  public:
   DECLARE_IBASE;
 
-  csOpenGLProcBackBuffer2D (iGraphics2D *ig2d, int iwidth, int iheight);  
+  csOpenGLProcBackBuffer2D (iGraphics2D *ig2d, int iwidth, int iheight, 
+			    csPixelFormat *ipfmt);  
 
   virtual ~csOpenGLProcBackBuffer2D ();
 
@@ -136,8 +144,7 @@ class csOpenGLProcBackBuffer2D : public iGraphics2D
   { return false; }
 
   // Use DrawBox?
-  virtual void Clear (int color)
-  { g2d->Clear (color); }
+  virtual void Clear (int color);
 
   // UseDrawBox?
   virtual void ClearAll (int color)

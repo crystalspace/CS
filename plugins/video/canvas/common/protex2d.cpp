@@ -119,8 +119,18 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
 	// texture
 	destroy_memory = true;
 	Memory = new unsigned char[width*height*2];
+
 	image_buffer = (RGBPixel*) buffer;
-	memset (image_buffer, 0, sizeof(RGBPixel)*width*height);
+
+	UShort *dst = (UShort*)Memory;
+	UShort bb = 8 - pfmt.BlueBits;
+	UShort gb = 8 - pfmt.GreenBits;
+	UShort rb = 8 - pfmt.RedBits;
+	for (int i = 0; i < width*height; i++, dst++)
+	  *dst = ((((UShort)image_buffer[i].blue >> bb) << pfmt.BlueShift) +
+		  (((UShort)image_buffer[i].green >> gb) << pfmt.GreenShift) +
+		  (((UShort)image_buffer[i].red >> rb) << pfmt.RedShift));
+      
       }
       else if ((hint == csosbHardware) || (hint == csosbHardwareAlone))
       {
@@ -132,7 +142,7 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
     else
     {
       // 32bit shared software or hardware
-      Depth = 16;
+      Depth = 32;
       _DrawPixel = DrawPixel32;
       _WriteChar = WriteChar32;
       _GetPixelAt = GetPixelAt32;
@@ -140,8 +150,18 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
       destroy_memory = true;
       Memory = new unsigned char[width*height*4];
       image_buffer = (RGBPixel*) buffer;
-      memset (image_buffer, 0, sizeof(RGBPixel)*width*height);
-      memset (Memory, 0, sizeof(RGBPixel)*width*height);
+      ULong red, green, blue, total;
+      ULong *dst = (ULong*) Memory;
+      for (int i = 0; i < width*height; i++, dst++)
+      {
+	red = image_buffer[i].red << pfmt.RedShift;
+	green = image_buffer[i].green << pfmt.GreenShift;
+	blue = image_buffer[i].blue << pfmt.BlueShift;
+	total = red + green + blue;
+	*dst = (image_buffer[i].red << pfmt.RedShift) +
+	  (image_buffer[i].green << pfmt.GreenShift) +
+	  (image_buffer[i].blue << pfmt.BlueShift);
+      }
     }
   }
 
@@ -154,14 +174,11 @@ iGraphics2D *csProcTextureSoft2D::CreateOffScreenCanvas
 
 bool csProcTextureSoft2D::Open(const char *Title)
 {
+#ifdef CS_DEBUG
   CsPrintf (MSG_INITIALIZATION, "Crystal Space procedural texture buffer\n");
-
+#endif
   // Open your graphic interface
-  if (!csGraphics2D::Open (Title))
-    return false;
-
-  Clear (0);
-  return true;
+  return csGraphics2D::Open (Title);
 }
 
 void csProcTextureSoft2D::Close ()
@@ -177,45 +194,35 @@ void csProcTextureSoft2D::Print (csRect*)
 {
   if (image_buffer)
   {
-    RGBPixel *im = image_buffer;
+    RGBPixel *dst = image_buffer;
     if (pfmt.PixelBytes == 2)
     {
       // As we are in 16bit mode we unpack the 16 bit frame buffer into 
       // the 32 bit image_buffer as this is the format required by the 
       // quantization routines in the texture manager.
-      UShort *mem = (UShort*) Memory;
-
-      for (int i = 0; i < Width*Height; i++, im++, mem++)
+      UShort *src = (UShort*) Memory;
+      UShort bb = 8 - pfmt.BlueBits;
+      UShort gb = 8 - pfmt.GreenBits;
+      UShort rb = 8 - pfmt.RedBits;
+      for (int i = 0; i < Width*Height; i++, src++, dst++)
       {
-	im->red = ((*mem & pfmt.RedMask) >> pfmt.RedShift) << (8 - pfmt.RedBits);
-	im->green = ((*mem & pfmt.GreenMask) >> pfmt.GreenShift) 
-					     << (8 - pfmt.GreenBits);
-	im->blue = ((*mem & pfmt.BlueMask) >> pfmt.BlueShift) 
-					   << (8 - pfmt.BlueBits); 
+	dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift) << rb;
+	dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift) << gb;
+	dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift) << bb; 
       }
     }
-    // 32bit byte shuffle hmmm...ERIC !!
-    else if (pfmt.RedMask > pfmt.BlueMask)
-    {
-      RGBPixel *mem = (RGBPixel *)Memory;
-      for (int i = 0; i < Width*Height; i++, im++, mem++)
-      {
-	im->alpha = 255;
-	im->red = mem->blue;
-	im->green = mem->green;
-	im->blue = mem->red;
-      }
-    }
+    // 32bit byte shuffle hmmm...if only RGBPixel ordered its red,green,blue,alpha
+    // members differently....
     else
     {
-      RGBPixel *mem = (RGBPixel *)Memory;
-      for (int i = 0; i < Width*Height; i++, im++, mem++)
+      ULong *src = (ULong *)Memory;
+      for (int i = 0; i < Width*Height; i++, src++, dst++)
       {
-	im->alpha = 255;
-	im->red = mem->alpha;
-	im->green = mem->red;
-	im->blue = mem->green;
+	dst->red = ((*src & pfmt.RedMask) >> pfmt.RedShift);
+	dst->green = ((*src & pfmt.GreenMask) >> pfmt.GreenShift);
+	dst->blue = ((*src & pfmt.BlueMask) >> pfmt.BlueShift);
       }
     }
   }
 }
+
