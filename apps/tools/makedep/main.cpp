@@ -184,16 +184,16 @@ static void add_include (const char *inc, char **incp)
   if (!inc) return;
 
 #if defined (__EMX__) || defined (__DJGPP__) || defined (WIN32)
-#  define PATH_SEPARATOR	';'
+#  define PATH_SEP	';'
 #else
-#  define PATH_SEPARATOR	':'
+#  define PATH_SEP	':'
 #endif
 
   /* can have more than one component */
   beg = (char *) strdup (inc);
   for (;;)
   {
-    end = (char *) strchr (beg, PATH_SEPARATOR);
+    end = (char *) strchr (beg, PATH_SEP);
     if (end)
       *end = 0;
     if (incp >= includedirs + MAXDIRS)
