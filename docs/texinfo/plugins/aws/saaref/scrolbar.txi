@@ -76,7 +76,7 @@ Scrollbars publish the following properties.
 The current value of the scrollbar. This property is read-only.
 
 @item Change
-The amount the scrollbars value is decremented/incremented. The default is 1.
+The amount the scrollbars value is decremented/incremented. The default is 0.1.
 
 @item Max
 The maximum value the scrollbars value can take.

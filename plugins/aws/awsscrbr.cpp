@@ -106,6 +106,10 @@ bool awsScrollBar::Setup (iAws *_wmgr, iAwsComponentNode *settings)
   h = (int)amntvis;
   pm->GetInt (settings, "PageSize", h);
   amntvis = (float)h;
+  pm->GetInt (settings, "Change", h);
+  value_delta = (float)h;
+  pm->GetInt (settings, "BigChange", h);
+  value_page_delta = (float)h;
 
   // Setup embedded buttons
   incVal = new awsSliderButton;
