@@ -35,7 +35,7 @@
 #	configured makefile environment.
 #
 #	Because MSVC.PLUGINS.REQUIRED supplements PLUGINS, the Visual-C++
-#	project file generation mechanism is able to generate DSP files for
+#	project file generation mechanism is able to generate project files for
 #	Windows-specific plug-in modules even when the makefiles are
 #	configured for a different platform, such as Unix, which would not
 #	normally process Windows-specific modules.
@@ -43,8 +43,7 @@
 #------------------------------------------------------------------------------
 MSVC.MAKE.FLAGS = \
   3DS.AVAILABLE=yes \
-  ODE.AVAILABLE=yes \
-  CSPYTHON_MSVC_EXCLUDE=yes
+  ODE.AVAILABLE=yes
 
 MSVC.PLUGINS.REQUIRED =         \
   cscript/cspython              \

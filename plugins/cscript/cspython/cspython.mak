@@ -97,9 +97,7 @@ TO_INSTALL.EXE += python.cex
 
 SWIG.CSPYTHON.OUTDIR = $(OUTDERIVED)/python
 SWIG.CSPYTHON.INTERFACE = $(SRCDIR)/include/ivaria/cspace.i
-ifneq ($(CSPYTHON_MSVC_EXCLUDE),yes)
 SWIG.CSPYTHON = $(SWIG.CSPYTHON.OUTDIR)/cs_pyth.cpp
-endif
 SWIG.CSPYTHON.CVS = $(SRCDIR)/plugins/cscript/cspython/cs_pyth.cpp
 SWIG.CSPYTHON.OBJ = $(addprefix $(OUT)/,$(notdir $(SWIG.CSPYTHON:.cpp=$O)))
 SWIG.CSPYTHON.PY = $(SWIG.CSPYTHON.OUTDIR)/cspace.py
@@ -109,8 +107,14 @@ TRASH.CSPYTHON = $(wildcard $(addprefix $(SRCDIR)/scripts/python/,*.pyc *.pyo))
 
 INF.CSPYTHON = $(SRCDIR)/plugins/cscript/cspython/cspython.csplugin
 INC.CSPYTHON = $(wildcard $(addprefix $(SRCDIR)/,plugins/cscript/cspython/*.h))
+ifeq ($(DO_MSVCGEN),yes)
 SRC.CSPYTHON = $(filter-out $(SRCDIR)/plugins/cscript/cspython/pythmod.cpp, \
-  $(sort $(wildcard $(SRCDIR)/plugins/cscript/cspython/*.cpp) $(SWIG.CSPYTHON)))
+  $(wildcard $(SRCDIR)/plugins/cscript/cspython/*.cpp))
+else
+SRC.CSPYTHON = $(SWIG.CSPYTHON) $(filter-out \
+  $(SWIG.CSPYTHON.CVS) $(SRCDIR)/plugins/cscript/cspython/pythmod.cpp, \
+  $(wildcard $(SRCDIR)/plugins/cscript/cspython/*.cpp))
+endif
 OBJ.CSPYTHON = $(addprefix $(OUT)/, $(notdir $(SRC.CSPYTHON:.cpp=$O)))
 DEP.CSPYTHON = CSTOOL CSGFX CSGEOM CSUTIL CSUTIL
 
