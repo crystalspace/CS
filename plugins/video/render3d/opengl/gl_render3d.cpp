@@ -35,8 +35,8 @@
 #include "ivideo/rndbuf.h"
 #include "ivideo/render3d.h"
 
-
 #include "gl_render3d.h"
+#include "glextmanager.h"
 
 #include "ivideo/effects/efserver.h"
 #include "ivideo/effects/efdef.h"
@@ -78,6 +78,8 @@ csGLRender3D::csGLRender3D (iBase *parent)
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiEffectClient);
+
+  scfiEventHandler = NULL;
 }
 
 csGLRender3D::~csGLRender3D()
@@ -124,6 +126,10 @@ bool csGLRender3D::Open ()
       "crystalspace.video.effects.stdserver", iEffectServer);
     object_reg->Register (effectserver, "iEffectServer");
   }
+
+  csRef<iOpenGLInterface> gl = SCF_QUERY_INTERFACE (G2D, iOpenGLInterface);
+  ext.InitExtensions (gl);
+
   return true;
 }
 
@@ -167,6 +173,8 @@ void csGLRender3D::SetFOV(float fov)
 void csGLRender3D::DrawMesh(csRenderMesh* mymesh)
 {
 }
+
+
 
 ////////////////////////////////////////////////////////////////////
 //                         iEffectClient

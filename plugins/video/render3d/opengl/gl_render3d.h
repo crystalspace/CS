@@ -35,6 +35,9 @@
 #include "ivideo/render3d.h"
 #include "ivideo/effects/efclient.h"
 
+#include "glextmanager.h"
+
+
 struct iObjectRegistry;
 struct iTextureManager;
 struct iRenderBufferManager;
@@ -44,7 +47,6 @@ struct iEffectServer;
 struct iEffectDefinition;
 struct iEffectTechnique;
 struct iEvent;
-
 
 SCF_VERSION (csGLRender3D, 0, 0, 1);
 
@@ -57,6 +59,8 @@ private:
   csRef<iRenderBufferManager> buffermgr;
   csRef<iLightingManager> lightmgr;
   csRef<iEffectServer> effectserver;
+
+  csGLExtensionManager ext;
   
 
   float fov;
