@@ -18,11 +18,11 @@
 	Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "sysdef.h"
 #include <stdio.h>
 #include <windows.h>
 #include <mmsystem.h>
 
-#include "sysdef.h"
 #include "csutil/scf.h"
 #include "cssnddrv/waveoutsd/wodrv.h"
 #include "isystem.h"

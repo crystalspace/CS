@@ -16,15 +16,14 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "sysdef.h"
 #include <windows.h>
 #include <stdlib.h>
 #include "ddraw.h"
 #include "d3d.h"
 #include "d3dcaps.h"
 
-#include "sysdef.h"
 #include "d3d_txtcache.h"
-
 #include "d3d_g3d.h"
 #include "itexture.h"
 #include "ilghtmap.h"

@@ -25,13 +25,13 @@
 // modified by Tristan McLure  09/08/1999
 #define INITGUID
 
+#include "sysdef.h"
 #include <windows.h>
 #include <stdlib.h>
 #include "ddraw.h"
 #include "d3d.h"
 #include "d3dcaps.h"
 
-#include "sysdef.h"
 #include "csutil/scf.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"

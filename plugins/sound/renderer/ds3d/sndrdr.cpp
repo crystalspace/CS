@@ -17,13 +17,12 @@
   License along with this library; if not, write to the Free
   Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+#include "sysdef.h"
 #include <stdio.h>
 #include <windows.h>
-
 #include <initguid.h>
 #include "dsound.h"
 
-#include "sysdef.h"
 #include "csutil/scf.h"
 #include "cssndrdr/ds3d/sndrdr.h"
 #include "cssndrdr/ds3d/sndbuf.h"
