@@ -23,70 +23,53 @@
 #include "itxtmgr.h"
 #include "csgfxldr/rgbpixel.h"
 
-IMPLEMENT_IBASE (csAVIPlayer)
-  IMPLEMENTS_INTERFACE (iVideoPlayer)
+IMPLEMENT_IBASE (csAVIFormat)
+  IMPLEMENTS_INTERFACE (iStreamFormat)
   IMPLEMENTS_INTERFACE (iPlugIn)
 IMPLEMENT_IBASE_END
 
-IMPLEMENT_FACTORY (csAVIPlayer)
-EXPORT_CLASS_TABLE (aviplay)
-  EXPORT_CLASS (csOpenDivX, "crystalspace.video.aviplayer", 
-		"CrystalSpace AVI player interface")
+IMPLEMENT_FACTORY (csAVIFormat)
+EXPORT_CLASS_TABLE (avifmt)
+  EXPORT_CLASS (csOpenDivX, "crystalspace.video.format.avi", 
+		"CrystalSpace AVI format interface")
 EXPORT_CLASS_TABLE_END
 
-csAVIPlayer::csAVIPlayer (iBase *pParent): memimage(1,1)
+csAVIFormat::csAVIFormat (iBase *pParent)
 {
   CONSTRUCT_IBASE (pParent);
 }
 
-csAVIPlayer::~csAVIPlayer ()
+csAVIFormat::~csAVIFormat ()
 {
   if (bOK && pFile)
   {
-    if (pCodec) pCodec->DecRef ();
+    ReleaseStreams ();
     pFile->DecRef ();
     delete [] pData;
   }
 
-  if (pMaterial) pMaterial->DecRef ();
-  if (pG3D) pG3D->DecRef ();
   if (pSystem) pSystem->DecRef ();
 }
 
-bool csAVIPlayer::Initialize (iSystem *iSys)
+bool csAVIFormat::Initialize (iSystem *iSys)
 {
-  rc.Set (0, 0, 0, 0);
-  fxmode = CS_FX_COPY;
-  bTimeSynced = false;
   bOK = false;
   datalen = 0;
 
-  pG3D = QUERY_PLUGIN (iSys, iGraphics3D);
   pSystem = iSys;
   pSystem->IncRef ();
-  pMaterial = NULL;
   pFile = NULL;
   pData = NULL;
 
-  polyfx.num = 4;
-  polyfx.use_fog = false;
-  for (int i=0; i<4; i++) 
-  {
-    polyfx.vertices[i].r=1;
-    polyfx.vertices[i].g=1;
-    polyfx.vertices[i].b=1;
-    polyfx.vertices[i].z=1;
-  }
-
-  return pG3D != NULL;
+  return true;
 }
 
-void csAVIPlayer::GetDecoderCaps (csVideoDecoderCap &caps)
+void csAVIFormat::GetDecoderCaps (csVideoDecoderCap &caps)
 {
-  caps = (csVideoDecoderCap)0; // currently we can only play one after another, no positioning or whatsoever
+  caps = CS_POS_BY_FRAME; // @@@TODO: BY_TIME should be relatively easy to implement
 }
 
-bool csAVIPlayer::Load (iFile *pVideoData)
+bool csAVIFormat::Load (iFile *pVideoData)
 {
   bOK = false;
   if (pFile)
@@ -112,7 +95,7 @@ bool csAVIPlayer::Load (iFile *pVideoData)
   return false;
 }
 
-bool csAVIPlayer::InitVideoData ()
+bool csAVIFormat::InitVideoData ()
 {
   bool bSucc;
 
@@ -196,22 +179,49 @@ bool csAVIPlayer::InitVideoData ()
   return vVideoStream.Length () > 0;
 }
 
-bool csAVIPlayer::GotoFrame (ULong frameindex)
+iStreamIterator* csAVIFormat::GetStreamIterator ()
 {
-  (void)frameindex;
-  return false;
+	return new streamiterator (this);
 }
 
-bool csAVIPlayer::GotoTime (ULong timeindex)
+void csAVIFormat::Select (iAudioStream *pAudio, iVideoStream *pVideo)
 {
-  (void)timeindex;
-  return false;
+	this->pAudio = pAudio;
+	this->pVideo = pVideo;
 }
 
-bool csAVIPlayer::SetPlayMethod (bool bTimeSynced)
+void csAVIFormat::NextFrame ()
 {
-  (void)bTimeSynced;
-  return bTimeSynced == true;
+	pAudio->NextFrame ();
+	pVideo->NextFrame ();
 }
 
+IMPLEMENT_IBASE (csAVIFormat::streamiterator)
+  IMPLEMENTS_INTERFACE (iStreamIterator)
+  IMPLEMENTS_INTERFACE (iBase)
+IMPLEMENT_IBASE_END
+
+csAVIFormat::streamiterator::streamiterator (iBase *pBase)
+{
+	CONSTRUCT_IBASE (pBase);
+   pAVI = (csAVIFormat*)pBase;
+   pos = 0;
+}
+
+csAVIFormat::streamiterator::~streamiterator ()
+{
+	
+}
+
+bool csAVIFormat::streamiterator::HasNext ()
+{
+	return pos < pAVI->vStream.Length ();
+}
+
+iStream* csAVIFormat::streamiterator::GetNext ()
+{
+	if (HasNext ())
+	  return (iStream*)pAVI->vStream.Get (++pos);
+   return NULL;
+}
 

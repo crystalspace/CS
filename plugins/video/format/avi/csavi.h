@@ -38,6 +38,8 @@ class csAVIFormat : public iStreamFormat
     iStream *GetNext ();
   };
 
+  friend class streamiterator;
+
   struct RIFFheader
   {
     char id[4];
@@ -117,15 +119,28 @@ class csAVIFormat : public iStreamFormat
 
   char *pData;
 
+  RIFFheader fileheader;
+  RIFFlist hdrl, strl;
+  RIFFchunk avih, strh;
+
+  AVIHeader aviheader;
+  StreamHeader streamheader;
+
+  csVector vStream;
+  iAudioStream *pAudio;
+  iVideoStream *pVideo;
+
+  bool InitVideoData ();
+
  public:
   DECLARE_IBASE;
-  csAVIPlayer (iBase *pParent);
-  virtual ~csAVIPlayer ();
+  csAVIFormat (iBase *pParent);
+  virtual ~csAVIFormat ();
 
   virtual bool Initialize (iSystem *iSys);
 
   virtual void GetCaps (csStreamFormatCap &caps);
-  virtual iStreamIterator& GetStreamIterator ();
+  virtual iStreamIterator* GetStreamIterator ();
   virtual void Select (iAudioStream *pAudio, iVideoStream *pVideo);
   virtual void NextFrame ();
   virtual bool Load (iFile *pVideoData);

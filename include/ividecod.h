@@ -116,7 +116,7 @@ struct iStreamFormat : public iPlugIn
   /**
    * Get an iterator to enumerate the streams.
    */
-  virtual iStreamIterator& GetStreamIterator () = 0;
+  virtual iStreamIterator* GetStreamIterator () = 0;
   /**
    * Choose a video and audio stream to be played when calling NextFrame.
    */
