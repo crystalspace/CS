@@ -47,7 +47,9 @@ typedef unsigned char UByte;	// Unsigned 8 bit value
 typedef signed char SByte;	// Signed 8 bit value
 typedef unsigned short UShort;	// Unsigned 16 bit value
 typedef signed short SShort;	// Signed 16 bit value
+#ifndef OS_PS2
 typedef unsigned long ULong;	// Unsigned 32 bit value
+#endif
 typedef signed long SLong;	// Signed 32 bit value
 typedef unsigned int UInt;	// Unsigned int value (16..32 bit)
 typedef signed int SInt; 	// Signed int value (16..32 bit)
