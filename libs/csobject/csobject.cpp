@@ -60,7 +60,7 @@ public:
     Object->IncRef ();
     Reset ();
   }
-  ~csObjectIterator ()
+  virtual ~csObjectIterator ()
   {
     Object->DecRef ();
   }
@@ -166,13 +166,14 @@ csObject::csObject () : csBase (), iObject (), children (NULL), Name (NULL)
   csid = id++;
 }
 
-csObject::csObject (csObject& iObj) : csBase (), iObject (iObj), csid (iObj.csid),
-  children (NULL), Name (NULL)
+csObject::csObject (csObject& iObj) :
+  csBase (), iObject (iObj), csid (iObj.csid), children (NULL), Name (NULL)
 {
   CONSTRUCT_IBASE (NULL);
   if (iObj.children)
   {
-    int size = sizeof (csObjContainer) + sizeof (csObject *) * (iObj.children->limit - 1);
+    int size =
+      sizeof(csObjContainer) + sizeof(csObject*) * (iObj.children->limit - 1);
     if (size > 0)
     {
       children = (csObjContainer *)malloc (size);
@@ -253,7 +254,7 @@ void csObject::ObjAdd (csObject *obj)
   if (!children)
     csObjContainer::SetLimit (children, CONTAINER_LIMIT_DELTA);
   else if (children->count >= children->limit)
-    csObjContainer::SetLimit (children, children->limit + CONTAINER_LIMIT_DELTA);
+    csObjContainer::SetLimit(children, children->limit + CONTAINER_LIMIT_DELTA);
 
   children->obj [children->count++] = obj;
   obj->SetObjectParent (this);
@@ -277,7 +278,8 @@ void csObject::ObjRelease (csObject *obj)
       memmove (&children->obj [i], &children->obj [i + 1],
         (children->limit - (i + 1)) * sizeof (csObject *));
       if (--children->count <= children->limit - CONTAINER_LIMIT_DELTA)
-        csObjContainer::SetLimit (children, children->limit - CONTAINER_LIMIT_DELTA);
+        csObjContainer::SetLimit (children,
+	  children->limit - CONTAINER_LIMIT_DELTA);
       break;
     }
 }
@@ -357,7 +359,7 @@ iObjectIterator *csObject::GetIterator (int TypeID)
   return new csObjectIterator (this, TypeID);
 }
 
-//------------------------------------------------------ Object iterator -----//
+//----------------------------------------------------- Object iterator -----//
 
 csObjIterator::csObjIterator (const csIdType &iType, const csObject &iObj,
 	bool derived)
@@ -393,11 +395,13 @@ void csObjIterator::Next ()
       }
       if (derived)
       {
-        if (Container->obj [Index]->GetType () >= *Type) break;
+        if (Container->obj [Index]->GetType () >= *Type)
+	  break;
       }
       else
       {
-        if (&Container->obj [Index]->GetType () == Type) break;
+        if (&Container->obj [Index]->GetType () == Type)
+	  break;
       }
     }
   }
@@ -414,7 +418,7 @@ bool csObjIterator::FindName(const char* name)
   return false;
 }
 
-//-------------------- miscelaneous simple classes derived from csObject -----//
+//------------------- miscelaneous simple classes derived from csObject -----//
 
 IMPLEMENT_CSOBJTYPE (csDataObject, csObject);
 IMPLEMENT_CSOBJTYPE (csPObject, csObject);
@@ -426,4 +430,3 @@ csPObject::~csPObject ()
     parent->ObjRelease (this);
   }
 }
-
