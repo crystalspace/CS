@@ -100,7 +100,7 @@ LFLAGS.profile=-pg
 LFLAGS.DLL=-Wl,-shared
 
 # System-dependent flags to pass to NASM
-NASMFLAGS.SYSTEM=-f elf $(CFLAGS.D)EXTERNC_UNDERSCORE
+NASMFLAGS.SYSTEM=-f elf 
 
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = \
