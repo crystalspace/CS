@@ -1241,6 +1241,14 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonFX(G3DPolygonDPFX& poly, bool g
 
   VERIFY_SUCCESS( m_lpd3dDevice->Begin(D3DPT_TRIANGLEFAN, D3DVT_TLVERTEX, D3DDP_DONOTUPDATEEXTENTS) == DD_OK );
   
+  float alpha = poly.alpha;
+  if (alpha == 0.0f)
+  {
+    //workaround for a bug in alpha transparency. It looks like on some cards you may not select
+    //alpha == 0, (opaque) because that will make the result invisible. :-(
+    alpha = 0.01f; 
+  }
+
   for(i=0; i<poly.num; i++)
   {
     vx.sx = poly.vertices[i].sx;
@@ -1248,9 +1256,9 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygonFX(G3DPolygonDPFX& poly, bool g
     vx.sz = SCALE_FACTOR / poly.vertices[i].z;
     vx.rhw = poly.vertices[i].z;
     if (m_gouroud)
-      vx.color = D3DRGBA(poly.vertices[i].r, poly.vertices[i].g, poly.vertices[i].b, poly.alpha);
+      vx.color = D3DRGBA(poly.vertices[i].r, poly.vertices[i].g, poly.vertices[i].b, alpha);
     else
-      vx.color = D3DRGBA(1.0f, 1.0f, 1.0f, poly.alpha);
+      vx.color = D3DRGBA(1.0f, 1.0f, 1.0f, alpha);
     vx.specular = D3DRGB(0.0, 0.0, 0.0);
     vx.tu = poly.vertices[i].u;
     vx.tv = poly.vertices[i].v;
