@@ -18,6 +18,7 @@ chronological order.
 	- Eric Sunshine performed a bit more re-writing of the "HOWTO Create a
 	  Plugin" section of the manual in order to bring a few portions
 	  up-to-date and to clarify some of the discussion.
+	- Jorrit added a new stat_dyn_reflect.xml shader.
 20-Dec-2004
 	- Jorrit added csFastRandFloat() which is a fast random number
 	  generator routine that returns a number between 0 and 1.
