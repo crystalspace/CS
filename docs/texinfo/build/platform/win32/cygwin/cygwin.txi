@@ -41,13 +41,44 @@ distrubtions files in the same location.
 Click/Double Click on @emph{setup.exe} icon as shown in the screenshot above to begin
 the the installation process.
 
+You will be first be propmted with a Cygwin welcome dialog, which can be seen in the
+screenshot below. It tells you basic information e.g. what it is and what version of
+@emph{setup.exe} it is.
+
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot2}
 @end ifnotinfo
 
+Click on the @emph{Next} button to continue.
+
+The next dialog you will see is the @emph{Choose a Download Source} dialog - See screenshot
+below. Here you need to choose if you wish to download and install direct from the internet
+or download to your system so you can can install it later. Cygwin like Linux can uninstall
+and update using this program. So really the decision is do you want to download and keep
+it to avoid a large download at a later date or if you have broadband say, download and
+install and not worry about keeping the package files. This is a matter of personal preference
+which we leave to you.
+
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot3}
 @end ifnotinfo
+
+After deciding click on the @emph{Next} button to continue.
+
+Note: For the purposes of this tutorial, we will be assuming you are installing directly
+from the internet.
+
+The next dialog you will see is the @emph{Select Root Install Directory} dialog - See
+screenshot below. The first thing to choose is the location of where you wish Cygwin to
+be installed on your system. We would suggest creating a directory called @emph{cygwin}
+at the location of your choice and pointing the installer to that directory.
+
+The next thing to decide if you are a system administrator, is do you want any others with
+system access to have acces to Cygwin. Also you are asked if you wish to use normal DOS text
+file formatting or Unix. The difference is the CR/LF (Carriage Return/Line Feed) used in text
+files. This is all a matter of preference for the user. If you are a pure Windows users I
+would use the @emph{DOS} option. However, if you maybe moving the files you use to a Linux
+machine for instance it can be favourable to use the @emph{Unix} option. We leave it you.
 
 @ifnotinfo
 @picturessss{build,platform,win32,cygwin,cygshot4}
