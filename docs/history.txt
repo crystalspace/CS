@@ -12,6 +12,32 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+13-Feb-2000
+	- Eric Sunshine performed a fairly extensive overhaul of csIniFile.
+	  Except for the lowest level I/O functionality, most methods have
+	  undergone radical simplification.  Details are as follows:
+	    - Enumeration methods now return convenient iteration objects
+	      instead of working through inconvenient call-back functions.
+	    - Reimplemented most functionality of csIniFile, itself, in terms
+	      of iterators, thus significantly simplifying the implementation
+	      by eliminating a tremendous amount of nearly identical
+	      copy/paste code.
+	    - Modified clients of csIniFile to work through the new iterator
+	      objects.
+	    - Added missing 'const' qualifiers to several methods.
+	- Eric Sunshine re-engineered the way the Apple/NeXT ports generation
+	  the application's main menu.  Details are as follows:
+	    - Moved the main menu configuration information for all Apple/NeXT
+	      platforms to the new configuration file "next.cfg" which is
+	      loaded at run-time.  Removed the NeXTMenu.cfg files which
+	      hard-coded menu configuration into the application at compile
+	      time.
+	    - Rewrote NeXTMenu.cpp to load menu configuration from the new
+	      configuration file.  Menu related keywords in configuration are
+	      now lower-case rather than upper-case as they were in
+	      NeXTMenu.cfg.
+	- Eric Sunshine added several hundred (or more) missing 'const'
+	  qualifiers throughout the project.
 11-Feb-2000
 	- Eric Sunshine eliminated several compilation warnings in csPhyziks.
 	- Eric Sunshine eliminated some unsigned versus signed warnings in
