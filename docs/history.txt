@@ -6,6 +6,9 @@ The history order has been reversed so that new features are at the top.
 	  parameters: 'rain raindrop.png,100,2'. 100 is the number of
 	  particles. Use more particles for bigger sectors. 2 is the
 	  speed in meters per second.
+	- Fixed a pretty severe memory leak in the c-buffer. This leak
+	  could trigger in any use of the c-buffer but it was most
+	  obvious when doing lighting or radiosity.
 15-Jun-2000
 	- Cleaned up some debugging stuff for c-buffer from WalkTest.
 	- Moved csOjbectStuffFactory::Initialize to csObjectStub.

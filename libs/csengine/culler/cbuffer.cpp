@@ -105,7 +105,7 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
   csCBufferSpan* ps = NULL;	// 'ps' holds the previous span.
   while (s)
   {
-    // If the start of the empty span is after then end of the full span
+    // If the start of the empty span is after the end of the full span
     // then we can stop scanning.
     if (s->startx > endx) break;
 
@@ -124,6 +124,7 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
 	csCBufferSpan* sn = s->next;
         if (ps) ps->next = sn;
 	else first_span = sn;
+	if (!sn) last_span = ps;
 	parent->FreeSpan (s);
 	s = sn;
 	continue;
