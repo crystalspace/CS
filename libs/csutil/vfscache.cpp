@@ -142,6 +142,9 @@ bool csVfsCacheManager::ClearCache (const char* type, const char* scope,
   	const uint32* id)
 {
   // @@@ Not implemented yet.
+  (void)type;
+  (void)scope;
+  (void)id;
   return false;
 }
 

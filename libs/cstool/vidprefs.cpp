@@ -323,7 +323,7 @@ bool csVideoPreferences::HandleEvent (iEvent& ev)
   return false;
 }
 
-void csVideoPreferences::SetSoftwareL (iAwsSource *source)
+void csVideoPreferences::SetSoftwareL (iAwsSource *)
 {
   printf ("Software mode!\n"); fflush (stdout);
 
@@ -332,7 +332,7 @@ void csVideoPreferences::SetSoftwareL (iAwsSource *source)
   exit_loop = true;
 }
 
-void csVideoPreferences::SetOpenGLL (iAwsSource *source)
+void csVideoPreferences::SetOpenGLL (iAwsSource *)
 {
   printf ("OpenGL mode!\n"); fflush (stdout);
 

@@ -131,7 +131,7 @@ void Cleanup ()
 }
 
 iMeshWrapper* Demo::LoadObject (const char* objname, const char* filename,
-	const char* classId, const char* loaderClassId,
+                                const char* /*classId*/, const char* loaderClassId,
 	iSector* sector, const csVector3& pos)
 {
   iDataBuffer* databuf = myVFS->ReadFile (filename);

@@ -73,10 +73,10 @@ csSingleIndexVertexSet::~csSingleIndexVertexSet ()
 
 int csSingleIndexVertexSet::Add (int Vertex, int Normal, int Color, int Texel)
 {
-  int i;
 
 /* @@@: Removed the code below because it is extremely expensive
    and it is seldom needed. Maybe this should be optional?
+  int i;
   for (i=0; i<Count; i++)
   {
     if (((!Vertices) || (Vertex == Vertices->Get (i))) &&

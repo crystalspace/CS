@@ -312,7 +312,6 @@ void DemoSequenceManager::ControlPaths (iCamera* camera, csTicks elapsed_time)
 
     // See if we have to go to another sector when going through a
     // portal.
-    csVector3 remember_pos = pos;
     csReversibleTransform trans;
     trans.SetOrigin (oldpos);
     bool mirror = false;
