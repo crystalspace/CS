@@ -6,6 +6,8 @@ The history order is reversed so that new features are at the top.
 5-Jul-2003
 	- Marten added so that NR use gl*Pointer when there are no 
 	  glAttributePointer extension available.
+	- res added a home-grown GetLongPathName () surrogate for older 
+	  Windowses, where it's unsupported. This was pointed out by Paul G.
 4-Jul-2003
 	- res committed fixes from Oktal for some circular #include 
 	  dependencies in the new renderer.

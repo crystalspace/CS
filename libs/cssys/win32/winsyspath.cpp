@@ -23,11 +23,105 @@
 
 #include <windows.h>
 
+typedef DWORD (STDAPICALLTYPE* PFNGETLONGPATHNAMEA) (LPCSTR lpszShortPath, 
+						     LPSTR lpszLongPath,
+						     DWORD cchBuffer);
+
+static DWORD STDAPICALLTYPE MyGetLPN (LPCSTR lpszShortPath, LPSTR lpszLongPath, 
+				      DWORD cchBuffer)
+{
+  // @@@ Deal with UNC paths?
+
+  // Because the we know the parameters with which this function will be 
+  // called, some safety checks can be omitted.
+  if (lpszShortPath == lpszLongPath)
+  {
+    CS_ALLOC_STACK_ARRAY (char, nshort, strlen (lpszShortPath) + 1);
+    strcpy (nshort, lpszShortPath);
+    lpszShortPath = nshort;
+  }
+  const char* nextpos = lpszShortPath;
+  DWORD bufRemain = cchBuffer;
+  *lpszLongPath = 0;
+
+#define BUFCAT(s)				  \
+  {						  \
+    int len = strlen (s);			  \
+    if (bufRemain > 0)				  \
+    {						  \
+      strncat (lpszLongPath, s, bufRemain);	  \
+      bufRemain -= len;				  \
+    }						  \
+  }
+
+
+  while (nextpos != 0)
+  {
+    char buf[MAX_PATH];
+    const char* pos = nextpos;
+    char* bs = strchr (pos, '\\');
+    if (bs)
+    {
+      strncpy (buf, pos, (bs - pos));
+      buf[bs - pos] = 0;
+    }
+    else
+    {
+      strcpy (buf, pos);
+    }
+    if (buf[1] == ':')
+    {
+      BUFCAT (buf);
+    }
+    else
+    {
+      BUFCAT ("\\");
+      char* bufEnd = strchr (lpszLongPath, 0);
+      strncpy (bufEnd, buf, bufRemain - 1);
+      bufEnd[bufRemain - 1] = 0;
+
+      WIN32_FIND_DATA fd;
+      HANDLE hFind = FindFirstFile (lpszLongPath, &fd);
+      if (hFind != INVALID_HANDLE_VALUE)
+      {
+	*bufEnd = 0;
+	BUFCAT (fd.cFileName);
+	FindClose (hFind);
+      }
+      else
+      {
+	return 0;
+      }
+    }
+    nextpos = bs ? bs + 1 : 0;
+  }
+  return (cchBuffer - bufRemain);
+#undef BUFCAT
+}
+
 char* csExpandPath (const char* path)
 {
+  if ((path == 0) || (*path == 0)) return 0;
+
   char fullName[MAX_PATH];
   GetFullPathName (path, sizeof(fullName), fullName, 0);
-  if (GetLongPathName (fullName, fullName, sizeof (fullName)) == 0) 
+
+  DWORD result;
+  PFNGETLONGPATHNAMEA GetLongPathName = 0;
+  // unfortunately, GetLongPathName() is only supported on Win98+/W2k+
+  HMODULE hKernel32 = LoadLibrary ("kernel32.dll");
+  if (hKernel32 != 0)
+  {
+    GetLongPathName = 
+      (PFNGETLONGPATHNAMEA)GetProcAddress (hKernel32, "GetLongPathNameA");
+    if (GetLongPathName == 0)
+    {
+      GetLongPathName = MyGetLPN;
+    }
+    result = GetLongPathName (fullName, fullName, sizeof (fullName));
+    FreeLibrary (hKernel32);
+  }
+  if (result == 0) 
   {
     return 0;
   }
