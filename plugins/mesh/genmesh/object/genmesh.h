@@ -106,6 +106,9 @@ private:
   // has changed and we need to recalculate.
   bool lighting_dirty;
 
+  // choose whether to draw shadow caps or not
+  bool shadow_caps;
+
   bool initialized;
   long shapenr;
   csRefArray<iObjectModelListener> listeners;
@@ -206,13 +209,19 @@ public:
     return (iMeshObjectFactory*)factory;
   }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
+#ifdef CS_USE_NEW_RENDERER
+  virtual void EnableShadowCaps ()
+  { shadow_caps = true; }
+  virtual void DisableShadowCaps ()
+  { shadow_caps = false; }
+#endif
   virtual void UpdateLighting (iLight** lights, int num_lights,
       	iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
 #ifdef CS_USE_NEW_RENDERER
   virtual bool DrawZ (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
   virtual bool DrawShadow (iRenderView* rview, iMovable* movable, csZBufMode zbufMode, iLight *light);
-  virtual bool DrawLight (iRenderView* rview, iMovable* movable, csZBufMode zbufMode);
+  virtual bool DrawLight (iRenderView* rview, iMovable* movable, csZBufMode zbufMode, iLight *light);
 #endif // CS_USE_NEW_RENDERER
   virtual void SetVisibleCallback (iMeshObjectDrawCallback* cb)
   {

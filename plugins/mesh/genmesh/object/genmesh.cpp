@@ -126,6 +126,7 @@ csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
   do_shadows = true;
   do_shadow_rec = false;
   lighting_dirty = true;
+  shadow_caps = false;
 
   dynamic_ambient.Set (0,0,0);
   ambient_version = 0;
@@ -815,6 +816,10 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
   mater->Visit ();
   if(!factory->GetEdgeMidpoint()) return false; //bad hack.. EdgeMidpoint might not be initialized on first rendering
 
+  r3d->SetObjectToCamera (&rview->GetCamera ()->GetTransform ());
+  //set the light-parameters
+  r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION, light->GetCenter ());
+
   // Prepare for rendering.
   mesh.z_buf_mode = CS_ZBUF_TEST;
   mesh.mixmode = CS_FX_COPY;
@@ -829,16 +834,10 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
   unsigned int *buf = (unsigned int *)shadow_index_buffer->Lock(iRenderBuffer::CS_BUF_LOCK_NORMAL);
   csVector3 lightpos = light->GetCenter() * movable->GetFullTransform();
   int i;
-  int index_range = 0, edge_start = factory->GetTriangleCount()*3;
+  int edge_start = factory->GetTriangleCount()*3;
+  int index_range = edge_start;
 
-  /*
-  for (i = 0; i < factory->GetTriangleCount(); i ++)
-  {
-    buf[index_range ++] = ibuf[i*3 + 0];
-    buf[index_range ++] = ibuf[i*3 + 1];
-    buf[index_range ++] = ibuf[i*3 + 2];
-  }
-  */
+  memcpy (buf, ibuf, edge_start*sizeof(int));
   
   for (i = 0; i < edge_start; i += 2)
   {
@@ -856,19 +855,29 @@ bool csGenmeshMeshObject::DrawShadow (iRenderView* rview, iMovable* movable,
   }
 
   shadow_index_buffer->Release ();
-  mesh.SetIndexRange (0, index_range);
+
+  if (shadow_caps) 
+    mesh.SetIndexRange (0, index_range);
+  else 
+    mesh.SetIndexRange (edge_start, index_range);
 
   r3d->SetObjectToCamera (&tr_o2c);
-  r3d->SetShadowState (CS_SHADOW_VOLUME_PASS1);
+  if (shadow_caps)
+    r3d->SetShadowState (CS_SHADOW_VOLUME_FAIL1);
+  else 
+    r3d->SetShadowState (CS_SHADOW_VOLUME_PASS1);
   r3d->DrawMesh (&mesh);
-  r3d->SetShadowState (CS_SHADOW_VOLUME_PASS2);
+  if (shadow_caps)
+    r3d->SetShadowState (CS_SHADOW_VOLUME_FAIL2);
+  else 
+    r3d->SetShadowState (CS_SHADOW_VOLUME_PASS2);
   r3d->DrawMesh (&mesh);
 
   return true;
 }
 
 bool csGenmeshMeshObject::DrawLight (iRenderView* rview, iMovable* /*movable*/,
-	csZBufMode mode)
+	csZBufMode mode, iLight *light)
 {
   iMaterialWrapper* mater = material;
   if (!mater) mater = factory->GetMaterialWrapper ();
@@ -888,6 +897,29 @@ bool csGenmeshMeshObject::DrawLight (iRenderView* rview, iMovable* /*movable*/,
 
   mater->Visit ();
 
+  csColor color = light->GetColor ();
+  float diffuse, specular, ambient;
+  csRGBpixel matcolor;
+
+  mater->GetMaterial()->GetReflection (diffuse,ambient, specular);
+  mater->GetMaterial()->GetFlatColor(matcolor, false);
+  color.red *= (matcolor.red/255);
+  color.green *= (matcolor.green/255);
+  color.blue *= (matcolor.blue/255);
+
+  r3d->SetObjectToCamera (&rview->GetCamera ()->GetTransform ());
+  //set the light-parameters
+  r3d->SetLightParameter (0, CS_LIGHTPARAM_POSITION,
+  	light->GetCenter ());
+  //set this to be lightcolor * diffuse material
+  r3d->SetLightParameter (0, CS_LIGHTPARAM_DIFFUSE,
+  	csVector3 (color.red, color.green, color.blue)*diffuse);
+  r3d->SetLightParameter (0, CS_LIGHTPARAM_SPECULAR,
+    csVector3 (color.red, color.green, color.blue)*specular);
+
+  r3d->SetLightParameter (0, CS_LIGHTPARAM_ATTENUATION,
+  	light->GetAttenuationVector() );
+      
   // Prepare for rendering.
   mesh.z_buf_mode = CS_ZBUF_TEST;
   mesh.mixmode = CS_FX_ADD;
