@@ -4,6 +4,10 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 16-Apr-2003
+	- Rhad altered the rapid triangle collision test to ignore
+	  degenerate triangles.
+	    - Added a couple tests for degenerate tris that should 
+	      be very fast. A degenerate tri in a test never collides.
 	- Bart Boatwright added csApplicationFramework class.
 	- Rhad fixed csList so that it functions to at least a greater
 	  extent than it originally did.
