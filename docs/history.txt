@@ -4,6 +4,13 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 23-Jun-2003
+        - Boyan did the following in AWS:
+          - Added iAwsComponent->GetFirstFocusableChild
+          - Added awsWindow->SetFocusedChild and awsWindow->GetFocusedChild
+          - awsWindow now holds last focused child on Hide() If window
+            shows again WindowManager knows witch child need to be focused. If
+            there is no info about last focused child window calls 
+            GetFirstFocusableChild and focus it.
 	- Jorrit fixed formatting with the csQuaternion class.
 22-Jun-2003
 	- Luca did the following:
