@@ -3,11 +3,11 @@ Section: games
 Priority: optional
 Maintainer: Christian Bayle <bayle@debian.org>
 Build-Depends-Indep: debhelper (>> 3.0.0),imagemagick
-Standards-Version: 3.5.8
+Standards-Version: 3.6.1.0
 
 Package: crystalspace-data
 Architecture: all
-Depends: crystalspace, crystalspace-demos
+Depends: crystalspace
 Description: Multiplatform 3D Game SDK datas and menus for Demos
  Crystal Space is an free 3D game toolkit. It can be used for a variety
  of 3D visualization tasks. Many people will probably be interested in using
