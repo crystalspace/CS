@@ -25,6 +25,17 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine fixed a number of csClear and csPython makefiles so
 	  that the targets are only listed if the respective plugins are
 	  enabled via the makefile PLUGINS variable.
+	- Eric Sunshine removed much of the obfuscation forced upon the NeXT
+	  ports by Crystal Space's (now obsolete) COM system.  Thus the port
+	  was significanly simplified in some areas and clarity was increased
+	  overall.
+	- Eric Sunshine reworked NeXTSystemDriver to implement the
+	  iNeXTSystemDriver interface via embedding rather than inheritance
+	  in order to work around a NextStep compiler bug which resulted in
+	  a crash either at compile time or run time depending upon
+	  circumstances.  The actual problem is that the compiler does not
+	  deal gracefully with multiple inheritance when a common base class
+	  is involved.
 21-Nov-1999
 	- Michael Dale Long added some changes to CrystalClear:
 	    - Fixed rotation skew in cctest.
