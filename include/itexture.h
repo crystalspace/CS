@@ -31,6 +31,9 @@ struct iGraphics3D;
  */
 struct iTextureHandle : public iBase
 {
+  /// Retrieve the flags set for this texture
+  virtual int GetFlags () = 0;
+
   /// Enable key color
   virtual void SetKeyColor (bool Enable) = 0;
 
