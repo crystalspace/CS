@@ -32,6 +32,10 @@ const int alignLeft=0;
 const int alignCenter=1;
 const int alignRight=2;
 
+const int hsTreeBox=0;
+const int hsState=1;
+const int hsRow=2;
+
 //////////////////////////////////////////////////////////////////////////
 // awsListRow implementation 
 //
@@ -197,6 +201,7 @@ awsListBox::Execute(char *action, iAwsParmList &parmlist)
     memset(row->cols, 0, sizeof(awsListItem) * ncolumns);
     
     parmlist.GetInt("parent", (int *)&(row->parent));
+    parmlist.GetBool("selectable", &(row->selectable));
 
     /* Fill in the columns by looking for several parameters:
      *   textX, imageX, txtalignX, imgalignX, statefulX, stateX, groupstateX, 
@@ -220,10 +225,7 @@ awsListBox::Execute(char *action, iAwsParmList &parmlist)
 
       cs_snprintf(buf, 50, "groupstate%d", i);
       parmlist.GetBool(buf, &(row->cols[i].group_state));
-
-      cs_snprintf(buf, 50, "selectable%d", i);
-      parmlist.GetBool(buf, &(row->cols[i].selectable));
-
+      
       cs_snprintf(buf, 50, "aligntxt%d", i);
       parmlist.GetInt(buf, &(row->cols[i].txt_align));
 
@@ -262,6 +264,73 @@ awsListBox::ClearGroup()
    if (cmp && cmp!=this)
      cmp->HandleEvent(Event);
  }
+}
+
+bool
+awsListBox::RecursiveClearPeers(awsListItem *itm, awsListRow *row)
+{
+  int i;
+  for(i=0; i<ncolumns; ++i)
+  {
+    // If this is it, then clear it's friends
+    if(&(row->cols[i]) == itm)
+    {
+      if (row->parent)
+      {
+        int j;
+        for(j=0; j<row->parent->children->Length(); ++j)
+        {
+          awsListRow *crow = (awsListRow *)row->parent->children->Get(j);
+          crow->cols[i].state = false;
+        }
+      }
+
+      return true;
+    }
+    else if (row->children)
+    {
+      // Otherwise, recusively descend the tree.
+      int j;
+
+      // Search through list for this guy, and clear his peers
+      for(j=0; j<row->children->Length(); ++j)
+      {
+        awsListRow *crow = (awsListRow *)row->children->Get(j);
+        if (RecursiveClearPeers(itm, crow))
+          return true;
+      } // end for j (number of rows)
+    }
+  }
+  
+  return false;
+}
+
+void 
+awsListBox::ClearPeers(awsListItem *itm)
+{  
+  int j;
+
+  // Search through list for this guy, and clear his peers
+  for(j=0; j<rows.Length(); ++j)
+  {
+     awsListRow *row = (awsListRow *)rows[j];
+     if (RecursiveClearPeers(itm, row))
+       return;
+
+  } // end for j (number of rows)
+}
+
+void 
+awsListBox::ClearHotspots()
+{
+  int i;
+  for(i=0; i<hotspots.Length(); ++i)
+  {
+    awsListHotspot *hs = (awsListHotspot *)hotspots[i];
+    delete hs;
+  }
+
+  hotspots.SetLength(0);
 }
 
 bool 
@@ -303,8 +372,9 @@ awsListBox::OnDraw(csRect clip)
 
   int i,j;
   int border=3;
+
+  ClearHotspots();
     
-  
   switch(frame_style)
   {
   case fsBump:
@@ -487,20 +557,42 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, in
   {
     // When it's a child AND has children...
     tree_expanded->GetOriginalDimensions(tbw, tbh);
-    g3d->DrawPixmap(tree_expanded, x+2+(tbw*(depth+1)), y, tbw, tbh, 0,0, tbw, tbh);
+    g3d->DrawPixmap((row->expanded ? tree_expanded : tree_collapsed),
+                    x+2+(tbw*(depth+1)), y, 
+                    tbw, tbh, 0,0, tbw, tbh);
+
     g3d->DrawPixmap(tree_hline, x+2+(tbw*depth), y, tbw, tbh, 0,0, tbw, tbh);
 
     if (last_child)
       g3d->DrawPixmap(tree_vline, x+2+(tbw*depth), y, tbw, ith>>1, 0,0, tbw, tbh);    
     else
       g3d->DrawPixmap(tree_vline, x+2+(tbw*depth), y, tbw, ith+2, 0,0, tbw, tbh);    
+
+    // Create hot spot for expand/collapse
+    awsListHotspot *hs = new awsListHotspot;
+
+    hs->obj = row;
+    hs->type = hsTreeBox;
+    hs->r.Set(x+2+(tbw*(depth+1)), y, x+2+(tbw*(depth+1))+tbw, y+tbh);
+
+    hotspots.Push(hs);
     
   }
   else if (row->children)
   {
     // Draw tree box if needed
     tree_expanded->GetOriginalDimensions(tbw, tbh);
-    g3d->DrawPixmap(tree_expanded, x+2, y, tbw, tbh, 0,0, tbw, tbh);
+    g3d->DrawPixmap((row->expanded ? tree_expanded : tree_collapsed), 
+                    x+2, y, tbw, tbh, 0,0, tbw, tbh);
+
+    // Create hot spot for expand/collapse
+    awsListHotspot *hs = new awsListHotspot;
+
+    hs->obj = row;
+    hs->type = hsTreeBox;
+    hs->r.Set(x+2, y, x+2+tbw, y+tbh);
+
+    hotspots.Push(hs);
   }
   else if (depth)
   {
@@ -675,7 +767,7 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, in
     y+=ith+2;
 
     // Draw children
-    if (row->children)
+    if (row->children && row->expanded)
     {
       for(i=0; i<row->children->Length(); ++i)
       {
@@ -706,6 +798,7 @@ awsListBox::OnMouseDown(int button, int x, int y)
 bool 
 awsListBox::OnMouseUp(int button, int x, int y)
 {
+  /*
   if (!is_switch)
   {
     if (is_down)
@@ -722,8 +815,32 @@ awsListBox::OnMouseUp(int button, int x, int y)
 
     Broadcast(signalSelected);
   }
+  */
+  
+  int i;
+  for(i=0; i<hotspots.Length(); ++i)
+  {
+    awsListHotspot *hs = (awsListHotspot *)hotspots[i];
+    if (hs->r.Contains(x, y))
+    {
+      printf("listbox: matched hotspot\n");
+      switch(hs->type)
+      {
+      case hsTreeBox:
+        {
+          awsListRow *row =(awsListRow *)hs->obj;
+          if (row->expanded) row->expanded=false;
+          else row->expanded=true;
 
-  Invalidate();
+          Invalidate();
+          return true;
+        }
+        break;
+
+      } // end switch type
+    } // end if contains
+  } // end for
+  
   return true;
 }
     

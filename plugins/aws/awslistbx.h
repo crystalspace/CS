@@ -37,12 +37,6 @@ struct awsListItem
 
   /// Whether this is a group state item or not (like radio-buttons vs. checkboxes)
   bool group_state;
-
-  /// If this is selectable
-  bool selectable;
-
-  /// If this is expanded (tree control)
-  bool expanded;
   
   /// Alignment of text (left or right) and stateful box (if one)
   int txt_align;
@@ -69,6 +63,12 @@ struct awsListRow
   /// Pointer to columns of items in this row
   awsListItem *cols;
 
+  /// If this is selectable
+  bool selectable;
+
+  /// If this is expanded (tree control)
+  bool expanded;
+
   /// Gets the minimum height of the row, does NOT recurse for children.
   int GetHeight(iAwsPrefManager *pm, int colcount);
 };
@@ -92,6 +92,18 @@ struct awsListColumn
   int width;
 };
 
+/// Manages clickable parts of the listbox
+struct awsListHotspot
+{
+  /// The region that contains the hotspot
+  csRect r;
+
+  /// The owner of the hotspot (either an item or row)
+  void  *obj;
+
+  /// The type of hotspot (tree box, stateful item, etc.)
+  int type;
+};
 
 
 /// The actual listbox control that puts all this stuff together.
@@ -165,8 +177,14 @@ class awsListBox : public awsComponent
    /// Row container (grows and shrinks as items are manipulated)
    awsListRowVector rows;
 
+   /// Container of hotspots
+   csBasicVector hotspots;
+
 protected:
    void ClearGroup();
+   bool RecursiveClearPeers(awsListItem *itm, awsListRow *row);
+   void ClearPeers(awsListItem *itm);
+   void ClearHotspots();
    bool DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, int depth, bool last_child);
    
 public:
