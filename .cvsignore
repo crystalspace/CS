@@ -1,5 +1,4 @@
 .cvsignore
-*.cfg
 *.dll
 *.exe
 *.zip
