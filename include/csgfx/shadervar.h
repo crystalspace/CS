@@ -44,7 +44,7 @@ SCF_VERSION (iShaderVariableAccessor, 0, 0, 1);
 * This is used when we know the object providing the value of a single
 * variable, but the exact value cannot be predetermined.
 */
-struct iShaderVariableAccessor
+struct iShaderVariableAccessor : public iBase
 {
   /// Called before the value of the attached SV is returned
   virtual void PreGetValue (csShaderVariable *variable) = 0;
@@ -80,7 +80,7 @@ private:
   csRef<iRenderBuffer> RenderBuffer;
   csVector4 VectorValue;
 
-  iShaderVariableAccessor* accessor;
+  csRef<iShaderVariableAccessor> accessor;
 
 public:
   csStringID Name;

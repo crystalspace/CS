@@ -22,18 +22,25 @@
 #include "cssys/sysfunc.h"
 #include "csutil/cscolor.h"
 #include "csutil/parray.h"
+#include "csutil/garray.h"
 #include "csutil/randomgen.h"
 #include "csutil/refarr.h"
+#include "csutil/hash.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
 #include "csgeom/poly2d.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/box.h"
 #include "csgeom/objmodel.h"
+#include "csgfx/shadervarcontext.h"
 #include "imesh/spritecal3d.h"
 #include "imesh/object.h"
+#include "imesh/lighting.h"
+#include "iengine/dynlight.h"
 #include "iengine/material.h"
+#include "iengine/light.h"
 #include "iengine/lod.h"
+#include "iengine/statlght.h"
 #include "iutil/config.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -163,9 +170,12 @@ public:
    * used for the isometric engine).
    */
   iEngine* engine;
+  
+  static csStringID vertex_name, texel_name, normal_name, color_name, 
+    index_name;
 
   /// Create the sprite template.
-  csSpriteCal3DMeshObjectFactory (iBase *pParent);
+  csSpriteCal3DMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
   /// Destroy the template.
   virtual ~csSpriteCal3DMeshObjectFactory ();
 
@@ -458,6 +468,7 @@ public:
 class csSpriteCal3DMeshObject : public iMeshObject
 {
 private:
+  csRef<iObjectRegistry> object_reg;
   iMeshObjectDrawCallback* vis_cb;
   uint32 current_features;  // LOD Control thing
   iBase* logparent;
@@ -479,20 +490,75 @@ private:
 //  csArray<G3DTriangleMesh>  mesh;
 //  csArray<bool>             initialized;
 //  csArray<csColor*>         mesh_colors;
-  bool arrays_initialized;
-  csArray<int>		     attached_ids;
   csArray<G3DTriangleMesh>  *meshes;
-  csArray<bool>             *is_initialized;
-  csArray<csColor*>         *meshes_colors;
-  csBox3 object_bbox;
+#else
+  class BaseAccessor : public iShaderVariableAccessor
+  {
+  protected:
+    csSpriteCal3DMeshObject* meshobj;
+    int mesh, submesh;
 
+    csRef<iRenderBuffer> vertex_buffer;
+    int vertex_size;
+    csRef<iRenderBuffer> texel_buffer;
+    int texel_size;
+    csRef<iRenderBuffer> normal_buffer;
+    int normal_size;
+    csRef<iRenderBuffer> color_buffer;
+    int color_size;
+    csRef<iRenderBuffer> index_buffer;
+    int index_size;
+  public:
+    SCF_DECLARE_IBASE;
+
+    BaseAccessor (csSpriteCal3DMeshObject* meshobj, int mesh, 
+      int submesh)
+    {
+      SCF_CONSTRUCT_IBASE (0);
+      BaseAccessor::meshobj = meshobj;
+      BaseAccessor::mesh = mesh;
+      BaseAccessor::submesh = submesh;
+    }
+    virtual ~BaseAccessor() 
+    {
+      SCF_DESTRUCT_IBASE ();
+    }
+    virtual void PreGetValue (csShaderVariable *variable);
+  };
+
+  bool rmeshesSetup;
+  bool meshChanged;
+  csRef<iStringSet> strings;
+  csDirtyAccessArray<csRenderMesh*> allRenderMeshes;
+  csArray<csArray<csRenderMesh> > renderMeshes;
+  csRef<iGraphics3D> G3D;
+  iMovable* currentMovable;
 #endif
+  bool arrays_initialized;
+  csBox3 object_bbox;
+  csArray<csColor*>         *meshes_colors;
+  csArray<int>		     attached_ids;
+  csArray<bool>             *is_initialized;
+  csSet<iLight*> affecting_lights;
+  bool lighting_dirty;
+  csColor dynamic_ambient;
 
   void SetupObject ();
   void SetupObjectSubmesh(int index);
-  void SetupVertexBuffer (int mesh,int submesh,int num_vertices,int num_triangles,csTriangle *triangles);
-  bool DrawSubmesh (iGraphics3D* g3d,iRenderView* rview,CalRenderer *pCalRenderer,int mesh,int submesh,iMaterialWrapper *material);
-  void UpdateLightingSubmesh (iLight** lights, int num_lights,iMovable* movable,CalRenderer *pCalRenderer,int mesh, int submesh);
+#ifndef CS_USE_NEW_RENDERER
+  void SetupVertexBuffer (int mesh, int submesh, int num_vertices,
+    int num_triangles, csTriangle *triangles);
+  bool DrawSubmesh (iGraphics3D* g3d, iRenderView* rview, 
+    CalRenderer *pCalRenderer, int mesh, int submesh, 
+    iMaterialWrapper *material);
+#else
+  void SetupRenderMeshes ();
+#endif
+  void InitSubmeshLighting (int mesh, int submesh, CalRenderer *pCalRenderer,
+    iMovable* movable);
+  void UpdateLightingSubmesh (iLight* lights, iMovable* movable, 
+    CalRenderer *pCalRenderer, int mesh, int submesh);
+  void UpdateLighting (iMovable* movable, CalRenderer *pCalRenderer);
 
 public:
   SCF_DECLARE_IBASE;
@@ -501,7 +567,8 @@ public:
   csSpriteCal3DMeshObjectFactory* factory;
 
   /// Constructor.
-  csSpriteCal3DMeshObject (iBase *pParent, CalCoreModel& calCoreModel);
+  csSpriteCal3DMeshObject (iBase *pParent, iObjectRegistry* object_reg,
+    CalCoreModel& calCoreModel);
   /// Destructor.
   virtual ~csSpriteCal3DMeshObject ();
 
@@ -511,6 +578,56 @@ public:
   /// Get the factory.
   csSpriteCal3DMeshObjectFactory* GetFactory3D () const { return factory; }
 
+  // ------------------------------- Lighting --------------------------------
+  void DynamicLightChanged (iDynLight* dynlight);
+  void DynamicLightDisconnect (iDynLight* dynlight);
+  void StaticLightChanged (iStatLight* statlight);
+  void StaticLightDisconnect (iStatLight* statlight);
+
+  //------------------------- iLightingInfo interface -------------------------
+  struct LightingInfo : public iLightingInfo
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csSpriteCal3DMeshObject);
+    virtual void InitializeDefault (bool clear)
+    {
+    }
+    virtual bool ReadFromCache (iCacheManager* cache_mgr)
+    {
+      return true;
+    }
+    virtual bool WriteToCache (iCacheManager* cache_mgr)
+    {
+      return true;
+    }
+    virtual void PrepareLighting ()
+    {
+    }
+    virtual void SetDynamicAmbientLight (const csColor& color)
+    {
+      scfParent->dynamic_ambient = color;
+    }
+    virtual const csColor& GetDynamicAmbientLight ()
+    {
+      return scfParent->dynamic_ambient;;
+    }
+    virtual void DynamicLightChanged (iDynLight* dynlight)
+    {
+      scfParent->DynamicLightChanged (dynlight);
+    }
+    virtual void DynamicLightDisconnect (iDynLight* dynlight)
+    {
+      scfParent->DynamicLightDisconnect (dynlight);
+    }
+    virtual void StaticLightChanged (iStatLight* statlight)
+    {
+      scfParent->StaticLightChanged (statlight);
+    }
+    virtual void StaticLightDisconnect (iStatLight* statlight)
+    {
+      scfParent->StaticLightDisconnect (statlight);
+    }
+  } scfiLightingInfo;
+  friend struct LightingInfo;
 
   ///------------------------ iMeshObject implementation ----------------------
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
@@ -551,7 +668,7 @@ public:
     return ifact;	// DecRef is ok here.
   }
   virtual bool DrawTest (iRenderView* rview, iMovable* movable);
-  virtual csRenderMesh **GetRenderMeshes (int &n) { n = 0; return 0; }
+  virtual csRenderMesh **GetRenderMeshes (int &n);
   virtual void UpdateLighting (iLight** lights, int num_lights,
       iMovable* movable);
   virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
@@ -820,6 +937,7 @@ public:
   } scfiLODControl;
   friend struct LODControl;
 
+#ifndef CS_USE_NEW_RENDERER
   /// interface to receive state of vertexbuffermanager
   struct eiVertexBufferManagerClient : public iVertexBufferManagerClient
   {
@@ -827,6 +945,7 @@ public:
     virtual void ManagerClosing ();
   }scfiVertexBufferManagerClient;
   friend struct eiVertexBufferManagerClient;
+#endif
 
   void GetObjectBoundingBox (csBox3& bbox, int type, csVector3 *verts,int vertCount);
   void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);

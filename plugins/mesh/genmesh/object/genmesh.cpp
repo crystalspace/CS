@@ -106,6 +106,10 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObject::LightingInfo)
   SCF_IMPLEMENTS_INTERFACE (iLightingInfo)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
+#ifdef CS_USE_NEW_RENDERER
+SCF_IMPLEMENT_IBASE (csGenmeshMeshObject::ShaderVariableAccessor)
+SCF_IMPLEMENT_IBASE_END
+#endif
 
 csGenmeshMeshObject::csGenmeshMeshObject (csGenmeshMeshObjectFactory* factory)
 #ifdef CS_USE_NEW_RENDERER 
@@ -1206,6 +1210,11 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csGenmeshMeshObjectFactory::
 	eiVertexBufferManagerClient)
   SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
+#endif
+
+#ifdef CS_USE_NEW_RENDERER
+SCF_IMPLEMENT_IBASE (csGenmeshMeshObjectFactory::ShaderVariableAccessor)
+SCF_IMPLEMENT_IBASE_END
 #endif
 
 csStringID csGenmeshMeshObjectFactory::vertex_name = csInvalidStringID;

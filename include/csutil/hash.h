@@ -419,7 +419,7 @@ public:
     }
 
     /// Move the iterator back to the first element.
-    void Reset () { Zero (); Init (); }
+    void Reset () { Zero (); Init (); FindItem (); }
   };
   friend class GlobalIterator;
 

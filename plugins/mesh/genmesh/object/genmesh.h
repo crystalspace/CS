@@ -413,9 +413,17 @@ public:
   class ShaderVariableAccessor : public iShaderVariableAccessor
   {
   public:
+    SCF_DECLARE_IBASE;
+
     csGenmeshMeshObject* parent;
     ShaderVariableAccessor (csGenmeshMeshObject* p) : parent(p)
-    {}
+    {
+      SCF_CONSTRUCT_IBASE (0);
+    }
+    virtual ~ShaderVariableAccessor ()
+    {
+      SCF_DESTRUCT_IBASE ();
+    }
 
     virtual void PreGetValue (csShaderVariable* variable)
     {
@@ -745,9 +753,17 @@ public:
   class ShaderVariableAccessor : public iShaderVariableAccessor
   {
   public:
+    SCF_DECLARE_IBASE;
+
     csGenmeshMeshObjectFactory* parent;
     ShaderVariableAccessor (csGenmeshMeshObjectFactory* p) : parent(p)
-    {}
+    {
+      SCF_CONSTRUCT_IBASE (0);
+    }
+    virtual ~ShaderVariableAccessor ()
+    {
+      SCF_DESTRUCT_IBASE ();
+    }
 
     virtual void PreGetValue (csShaderVariable* variable)
     {

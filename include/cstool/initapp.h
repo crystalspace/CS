@@ -231,7 +231,7 @@ public:
    * The set can be requested with:
    * \code
    * csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-       object_reg, "crystalspace.shared.stringset", iStringSet);
+   *   object_reg, "crystalspace.shared.stringset", iStringSet);
    * \endcode
    */
   static bool CreateStringSet (iObjectRegistry*);
