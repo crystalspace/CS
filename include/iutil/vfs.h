@@ -26,10 +26,9 @@
 /**\addtogroup vfs
  * @{ */
 #include "csutil/scf.h"
+#include "csutil/ref.h"
 #include "iutil/databuff.h"
-
-// forward declarations
-struct iStrVector;
+#include "iutil/strvec.h"
 
 /**
  * File time structure - used to query and set
@@ -127,7 +126,7 @@ struct iFile : public iBase
 };
 
 
-SCF_VERSION (iVFS, 0, 0, 5);
+SCF_VERSION (iVFS, 0, 0, 6);
 
 /**
  * The Virtual Filesystem Class is intended to be the only way for Crystal
@@ -180,7 +179,7 @@ struct iVFS : public iBase
    * Find all files in a virtual directory and return an array with their
    * names.
    */
-  virtual iStrVector *FindFiles (const char *Path) const = 0;
+  virtual csRef<iStrVector> FindFiles (const char *Path) const = 0;
   /**
    * Replacement for standard fopen().
    * Mode: combination of VFS_FILE_XXX.
@@ -208,8 +207,11 @@ struct iVFS : public iBase
   virtual bool Mount (const char *VirtualPath, const char *RealPath) = 0;
   /// Unmount an VFS path; if RealPath is NULL, entire VirtualPath is unmounted
   virtual bool Unmount (const char *VirtualPath, const char *RealPath) = 0;
-  /// Mount the root directory or directories beneath the specified virtual path
-  virtual iStrVector *MountRoot (const char *VirtualPath) = 0;
+  /**
+   * Mount the root directory or directories beneath the given virtual path.
+   * Returns a list of absolute virtual pathnames mounted by this operation.
+   */
+  virtual csRef<iStrVector> MountRoot (const char *VirtualPath) = 0;
 
   /// Save current configuration back into configuration file
   virtual bool SaveMounts (const char *FileName) = 0;

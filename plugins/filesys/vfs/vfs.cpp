@@ -17,6 +17,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <ctype.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -1385,119 +1386,110 @@ bool csVFS::Exists (const char *Path) const
   return exists;
 }
 
-iStrVector *csVFS::MountRoot (const char *Path)
+csRef<iStrVector> csVFS::MountRoot (const char *Path)
 {
-  if (!Path)
-    return NULL;
+  scfStrVector* outv = new scfStrVector;
 
-  scfStrVector * root_list = new scfStrVector(16, 16);
-
-  char * buffer = csFindSystemRoots();
-
-  char *p = buffer;
-  while (*p != '\0')
+  if (Path != 0)
   {
-    char * vfs_dir = new char[strlen(p) + strlen(Path) + 2];
-    char * real_dir = new char[strlen(p) + 2];
-
-    strcpy(vfs_dir, Path);
-    strcat(vfs_dir, "/");
-    strcat(vfs_dir, p);
-	vfs_dir[strlen(vfs_dir)-1] = '\0';
-
-    strncpy(real_dir, p, strlen(p)-1);
-	real_dir[strlen(p)-1] = '\0';
-    strcat(real_dir,"$/");
-
-    root_list->Push(vfs_dir);
-    Mount(vfs_dir, real_dir);
-
-    while (*p != '\0')
-      p++;
-    p++;
-
-	delete [] vfs_dir;
-	delete [] real_dir;
-  }
-
-  delete [] buffer;
-
-  return root_list;
-}
-
-iStrVector *csVFS::FindFiles (const char *Path) const
-{
-  if (!Path)
-    return NULL;
-
-  VfsNode *node;				// the node we are searching
-  char suffix [VFS_MAX_PATH_LEN + 1];		// the suffix relative to node
-  char mask [VFS_MAX_PATH_LEN + 1];		// the filename mask
-  char XPath [VFS_MAX_PATH_LEN + 1];		// the expanded path
-  scfStrVector *fl = new scfStrVector (16, 16);// the output list
-
-  PreparePath (Path, false, node, suffix, sizeof (suffix));
-
-  // Now separate the mask from directory suffix
-  int dirlen = strlen (suffix);
-  while (dirlen && suffix [dirlen - 1] != VFS_PATH_SEPARATOR)
-    dirlen--;
-  strcpy (mask, suffix + dirlen);
-  suffix [dirlen] = 0;
-  if (!mask [0])
-    strcpy (mask, "*");
-
-  if (node)
-  {
-    strcpy (XPath, node->VPath);
-    strcat (XPath, suffix);
-  }
-  else
-  {
-    char *s = _ExpandPath (Path, true);
-    strcpy (XPath, s);
-    delete [] s;
-  }
-
-  // first add all nodes that are located one level deeper
-  // these are "directories" and will have a slash appended
-  size_t sl = strlen (XPath);
-  int i;
-  for (i = 0; i < NodeList.Length (); i++)
-  {
-    VfsNode *node = (VfsNode *)NodeList [i];
-    if ((memcmp (node->VPath, XPath, sl) == 0)
-     && (node->VPath [sl]))
+    csRef<iStrVector> roots = csFindSystemRoots();
+    for (int i = 0, n = roots->Length(); i < n; i++)
     {
-      const char *pp = node->VPath + sl;
-      while (*pp && *pp == VFS_PATH_SEPARATOR)
-	pp++;
-      while (*pp && *pp != VFS_PATH_SEPARATOR)
-        pp++;
-      while (*pp && *pp == VFS_PATH_SEPARATOR)
-        pp++;
-      char *news = new char [pp - node->VPath + 1];
-      memcpy (news, node->VPath, pp - node->VPath);
-      news [pp - node->VPath] = 0;
-      if (fl->Find (news) == -1)
-        fl->Push (news);
-      else
-        delete [] news;
+      char const* t = roots->Get(i);
+      csString s(t);
+
+      csString vfs_dir;
+      vfs_dir << Path << '/';
+      for (int j = 0, k = s.Length(); j < k; j++)
+      {
+        char const c = s[j];
+        if (c == '_' || c == '-' || isalnum(c))
+	  vfs_dir << (char)tolower(c);
+      }
+
+      csString real_dir;
+      real_dir << s << "$/";
+
+      outv->Push(csStrNew(vfs_dir));
+      Mount(vfs_dir, real_dir);
     }
   }
 
-  // Now find all files in given directory node
-  if (node)
-    node->FindFiles (suffix, mask, fl);
+  csRef<iStrVector> v(outv);
+  outv->DecRef();
+  return v;
+}
 
-  if (fl->Length () == 0)
+csRef<iStrVector> csVFS::FindFiles (const char *Path) const
+{
+  scfStrVector *fl = new scfStrVector;		// the output list
+
+  if (Path != 0)
   {
-    delete fl;
-    fl = NULL;
+    VfsNode *node;				// the node we are searching
+    char suffix [VFS_MAX_PATH_LEN + 1];		// the suffix relative to node
+    char mask [VFS_MAX_PATH_LEN + 1];		// the filename mask
+    char XPath [VFS_MAX_PATH_LEN + 1];		// the expanded path
+
+    PreparePath (Path, false, node, suffix, sizeof (suffix));
+
+    // Now separate the mask from directory suffix
+    int dirlen = strlen (suffix);
+    while (dirlen && suffix [dirlen - 1] != VFS_PATH_SEPARATOR)
+      dirlen--;
+    strcpy (mask, suffix + dirlen);
+    suffix [dirlen] = 0;
+    if (!mask [0])
+      strcpy (mask, "*");
+
+    if (node)
+    {
+      strcpy (XPath, node->VPath);
+      strcat (XPath, suffix);
+    }
+    else
+    {
+      char *s = _ExpandPath (Path, true);
+      strcpy (XPath, s);
+      delete [] s;
+    }
+
+    // first add all nodes that are located one level deeper
+    // these are "directories" and will have a slash appended
+    size_t sl = strlen (XPath);
+    int i;
+    for (i = 0; i < NodeList.Length (); i++)
+    {
+      VfsNode *node = (VfsNode *)NodeList [i];
+      if ((memcmp (node->VPath, XPath, sl) == 0) && (node->VPath [sl]))
+      {
+        const char *pp = node->VPath + sl;
+        while (*pp && *pp == VFS_PATH_SEPARATOR)
+	  pp++;
+        while (*pp && *pp != VFS_PATH_SEPARATOR)
+          pp++;
+        while (*pp && *pp == VFS_PATH_SEPARATOR)
+          pp++;
+        char *news = new char [pp - node->VPath + 1];
+        memcpy (news, node->VPath, pp - node->VPath);
+        news [pp - node->VPath] = 0;
+        if (fl->Find (news) == -1)
+          fl->Push (news);
+        else
+          delete [] news;
+      }
+    }
+
+    // Now find all files in given directory node
+    if (node)
+      node->FindFiles (suffix, mask, fl);
+
+    ArchiveCache->CheckUp ();
   }
 
-  ArchiveCache->CheckUp ();
-  return fl;
+  csRef<iStrVector> v(fl);
+  fl->DecRef();
+  return v;
 }
 
 iFile *csVFS::Open (const char *FileName, int Mode)

@@ -19,6 +19,7 @@
 
 #include "cssysdef.h"
 #include "csutil/util.h"
+#include "csutil/ref.h"
 #include "cstool/initapp.h"
 #include "iutil/vfs.h"
 #include "iutil/cfgmgr.h"
@@ -262,8 +263,8 @@ static void cmd_ls (char *args)
   else
     dir = VFS->GetCwd ();
 
-  iStrVector *fl = VFS->FindFiles (dir);
-  if (fl)
+  csRef<iStrVector> fl = VFS->FindFiles (dir);
+  if (fl->Length() > 0)
   {
     bool nl = false;
 	int i;
@@ -298,7 +299,6 @@ static void cmd_ls (char *args)
         }
       }
     }
-    fl->DecRef ();
     if (nl)
       printf ("\n");
   }
@@ -318,7 +318,7 @@ static void cmd_cp (char *args)
   if (!get2args ("cp", args, src, dst))
     return;
 
-  iStrVector *fl = VFS->FindFiles (src);
+  csRef<iStrVector> fl = VFS->FindFiles (src);
   int i;
   for (i = 0; i < fl->Length (); i++)
   {
@@ -347,7 +347,6 @@ static void cmd_cp (char *args)
       if (!data)
       {
         fprintf (stderr, "cp: cannot read file \"%s\"\n", src);
-        fl->DecRef ();
         return;
       }
 
@@ -368,7 +367,6 @@ static void cmd_cp (char *args)
       if (!sF)
       {
         dF->DecRef ();
-        fl->DecRef ();
         fprintf (stderr, "cp: cannot open source file \"%s\"\n", src);
         return;
       }
@@ -386,7 +384,6 @@ static void cmd_cp (char *args)
       dF->DecRef ();
     }
   }
-  fl->DecRef ();
 }
 
 static void cmd_rm (char *args)

@@ -158,7 +158,7 @@ public:
   virtual bool Exists (const char *Path) const;
 
   /// Find all files in a virtual directory and return an array of their names
-  virtual iStrVector *FindFiles (const char *Path) const;
+  virtual csRef<iStrVector> FindFiles (const char *Path) const;
   /// Replacement for standard fopen()
   virtual iFile *Open (const char *FileName, int Mode);
   /**
@@ -184,7 +184,7 @@ public:
   virtual bool Unmount (const char *VirtualPath, const char *RealPath);
   
   /// Mount the root directory or directories 
-  virtual iStrVector *MountRoot (const char *VirtualPath);
+  virtual csRef<iStrVector> MountRoot (const char *VirtualPath);
 
   /// Save current configuration back into configuration file
   virtual bool SaveMounts (const char *FileName);

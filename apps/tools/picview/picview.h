@@ -22,6 +22,7 @@
 #include <stdarg.h>
 #include "csws/csws.h"
 #include "csutil/csvector.h"
+#include "csutil/ref.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "ivideo/graph3d.h"
@@ -57,7 +58,7 @@ public:
   iImageIO* image_loader;
   ceImageView* image_view;
   csWindow* image_window;
-  iStrVector* files;
+  csRef<iStrVector> files;
   int cur_idx;
   csButton* label1;
   csButton* label2;

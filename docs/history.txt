@@ -3,6 +3,21 @@ The history order is reversed so that new features are at the top.
 28-Aug-2002
 	- Added iPolygonMesh implementation for genmesh so it now works
 	  with collision detection.
+	- Eric Sunshine made the following changes:
+	    - Changed csFindSystemRoots() so that it returns csRef<iStrVector>
+	      instead of a string buffer (which the caller had to free) filled
+	      with null terminated strings plus a final null terminator.  The
+	      old return value was far too low-level.  Rewrote all
+	      csFindSystemRoots() implementations.
+	    - iVFS::MountRoot() now returns csRef<iStrVector> rather than
+	      iStrVector*.  For consistency, iVFS::FindFiles() also now returns
+	      csRef<iStrVector> rather than iStrVector*.
+	    - Fixed double-delete problem affecting all strings placed in the
+	      iStrVector returned by iVFS::MountRoot().
+	    - Changed the behavior of iVFS::MountRoot() so that it now
+	      normalizes mounted "roots" rather than mounting them in native
+	      form.  For example, in vsh on Windows, we now have /native/c/,
+	      /native/d/, etc. rather than /native/C:/, /native/D:/, etc.
 27-Aug-2002
 	- Eric Sunshine simplified the task of extracting version numbers and
 	  release date from csver.h by external tools.  Also simplified the

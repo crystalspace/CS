@@ -21,6 +21,8 @@
 
 #include <stdarg.h>
 #include <stdio.h>
+#include "csutil/ref.h"
+#include "iutil/strvec.h"
 struct iObjectRegistry;
 
 /**
@@ -93,16 +95,10 @@ extern bool csGetInstallPath (char *oInstallPath, size_t iBufferSize);
 extern void csSleep (int /*SleepTime*/);
 
 /**
- * This function will return the list of "top-level" directories.  For
- * instance in Unix it simply returns '/' but for Windows it may return
- * a list of all the drive letters.  This lets an application auto-mount
- * the complete file system into the VFS using MountRoot()
- * <p>
- * The value returned is a single buffer containing
- * '\0' delimited names of the root directories.  The
- * caller is expected to use "delete []" to free the memory.
- * The list is terminated with an extra '\0'.
+ * Get the list of root directories.<p>
+ * For instance in Unix it simply returns '/' but for Windows it may return a
+ * list of available drive letters.
  */
-extern char * csFindSystemRoots();
+extern csRef<iStrVector> csFindSystemRoots();
 
 #endif // __CS_SYSFUNC_H__

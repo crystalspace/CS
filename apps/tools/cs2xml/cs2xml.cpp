@@ -1823,18 +1823,15 @@ void Cs2Xml::ConvertDir (const char* vfspath, bool backup)
 {
   vfs->PushDir ();
   vfs->ChDir (vfspath);
-  csRef<iStrVector> files;
-  files.Take (vfs->FindFiles ("."));
+  csRef<iStrVector> files(vfs->FindFiles ("."));
   int i;
   for (i = 0 ; i < files->Length () ; i++)
   {
     char* str = files->Get (i);
 
     // Test if it is a dir (@@@ rather ugly test! Needs support in VFS).
-    csRef<iStrVector> recfiles;
-    recfiles.Take (vfs->FindFiles (str));
-    if (recfiles && recfiles->Length () > 0 &&
-    	strcmp (recfiles->Get (0), str) != 0)
+    csRef<iStrVector> recfiles(vfs->FindFiles (str));
+    if (recfiles->Length () > 0 && strcmp (recfiles->Get (0), str) != 0)
     {
       ConvertDir (str, backup);
     }

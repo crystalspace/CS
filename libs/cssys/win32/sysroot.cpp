@@ -1,6 +1,7 @@
 /*
     Find System Roots
     Copyright (C) 2002 by Mark Carnes
+    Copyright (C) 2002 by Eric Sunshine
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,17 +20,27 @@
 
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
+#include "csutil/scfstrv.h"
+#include "csutil/util.h"
 
-char * csFindSystemRoots ()
+csRef<iStrVector> csFindSystemRoots()
 {
-  char * buffer = new char[200];
-  int len = GetLogicalDriveStrings(199,buffer);
-  if (len > 199)
+  int const lim = 199;
+  char* buffer = new char[lim + 1];
+  int len = GetLogicalDriveStrings(lim, buffer);
+  if (len > lim)
   {
     delete [] buffer;
-    buffer = new char[len+1];
+    buffer = new char[len + 1];
     len = GetLogicalDriveStrings(len, buffer);
   }
 
-  return buffer;
+  scfStrVector* p = new scfStrVector;
+  for (char const* s = buffer; *s != '\0'; s += strlen(s) + 1)
+    p->Push(csStrNew(s));
+  csRef<iStrVector> v(p);
+  p->DecRef();
+
+  delete[] buffer;
+  return v;
 }
