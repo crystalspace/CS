@@ -215,6 +215,8 @@ public:
   static const unsigned long sWindowHidden;
   static const unsigned long sWindowShown;
   static const unsigned long sWindowClosed;
+  static const unsigned long sWindowZoomed;
+  static const unsigned long sWindowMinimized;
 
   /******* Frame Styles **********************/
 
@@ -281,6 +283,9 @@ public:
 
   /// Get's component
   iAwsComponent *GetComponent ();
+
+  /// register signals and constants
+  static bool Register (iAws *mgr);
 public:
   /// Raises a window to the top.
   virtual void Raise ();

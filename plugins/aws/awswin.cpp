@@ -24,6 +24,8 @@ const unsigned long awsWindow::sWindowLowered = 0x2;
 const unsigned long awsWindow::sWindowShown = 0x3;
 const unsigned long awsWindow::sWindowHidden = 0x4;
 const unsigned long awsWindow::sWindowClosed = 0x5;
+const unsigned long awsWindow::sWindowZoomed = 0x6;
+const unsigned long awsWindow::sWindowMinimized = 0x7;
 
 const int awsWindow:: fsNormal = 0x0;
 const int awsWindow:: fsToolbar = 0x1;
@@ -478,7 +480,18 @@ bool awsWindow::OnMouseUp (int button, int x, int y)
 
     Invalidate ();
     WindowManager ()->InvalidateUpdateStore ();
+    Broadcast (sWindowZoomed);
     return true;
+  }
+
+  if (close_down && (frame_options & foClose) && closep.Contains (x, y))
+  {
+    Broadcast (sWindowClosed);
+  }
+
+  if (min_down && (frame_options & foMin) && minp.Contains (x, y))
+  {
+    Broadcast (sWindowMinimized);
   }
 
   if (min_down || max_down || close_down)
@@ -1542,4 +1555,21 @@ void awsWindow::RecursiveLayoutChildren (iAwsComponent *cmp, bool /*move_kids*/)
 
     RecursiveLayoutChildren (child, cmp->Layout()==0);
   }
+}
+
+bool awsWindow::Register (iAws *mgr)
+{
+  if (mgr)
+  {
+    iAwsPrefManager *pm = mgr->GetPrefMgr ();
+    pm->RegisterConstant ("signalWindowRaised", awsWindow::sWindowRaised);
+    pm->RegisterConstant ("signalWindowLowered", awsWindow::sWindowLowered);
+    pm->RegisterConstant ("signalWindowShown", awsWindow::sWindowShown);
+    pm->RegisterConstant ("signalWindowHidden", awsWindow::sWindowHidden);
+    pm->RegisterConstant ("signalWindowClosed", awsWindow::sWindowClosed);
+    pm->RegisterConstant ("signalWindowZoomed", awsWindow::sWindowZoomed);
+    pm->RegisterConstant ("signalWindowMinimized", awsWindow::sWindowMinimized);
+    return true;
+  }
+  return false;
 }

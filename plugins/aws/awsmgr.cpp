@@ -41,6 +41,7 @@
 #include "awslayot.h"
 
 #include "awsntbk.h"
+#include "awswin.h"
 
 #include <stdio.h>
 
@@ -1177,6 +1178,9 @@ void awsManager::RegisterCommonComponents ()
   (void)new awsNotebookFactory (this);
   (void)new awsNotebookPageFactory (this);
   (void)new awsNotebookButtonFactory (this);
+
+  // window constants
+  (void)awsWindow::Register (this);
 
   // Standard sink
   GetSinkMgr ()->RegisterSink ("awsStandardSink", new awsStandardSink (this));
