@@ -47,56 +47,46 @@ WORLD (
   )
 
   MESHFACT 'fountainFact' (
-    CLASS ('crystalspace.mesh.object.fountain')
     PLUGIN ('crystalspace.mesh.loader.factory.fountain')
     PARAMS ()
   )
   MESHFACT 'snowFact' (
-    CLASS ('crystalspace.mesh.object.snow')
     PLUGIN ('crystalspace.mesh.loader.factory.snow')
     PARAMS ()
   )
   MESHFACT 'fireFact' (
-    CLASS ('crystalspace.mesh.object.fire')
     PLUGIN ('fireFact')
     PARAMS ()
   )
   MESHFACT 'rainFact' (
-    CLASS ('crystalspace.mesh.object.rain')
     PLUGIN ('rainFact')
     PARAMS ()
   )
   MESHFACT 'spiralFact' (
-    CLASS ('crystalspace.mesh.object.spiral')
     PLUGIN ('spiralFact')
     PARAMS ()
   )
   MESHFACT 'hazeFact' (
-    CLASS ('crystalspace.mesh.object.haze')
     PLUGIN ('hazeFact')
     PARAMS ()
   )
 
   MESHFACT 'emitFact' (
-    CLASS ('crystalspace.mesh.object.emit')
     PLUGIN ('emitFact')
     PARAMS ()
   )
 
   MESHFACT 'explosionFact' (
-    CLASS ('crystalspace.mesh.object.explosion')
     PLUGIN ('crystalspace.mesh.loader.factory.explosion')
     PARAMS ()
   )
 
   MESHFACT 'ballFact' (
-    CLASS ('crystalspace.mesh.object.ball')
     PLUGIN ('crystalspace.mesh.loader.factory.ball')
     PARAMS ()
   )
 
   MESHFACT 'genMeshFact' (
-    CLASS ('crystalspace.mesh.object.genmesh')
     PLUGIN ('meshFact')
     PARAMS (
       ; 8 vertices and 12 triangles.
