@@ -1592,13 +1592,11 @@ void csLightingPolyTexQueue::UpdateMaps (csLight* light,
 	const csVector3& lightpos, const csColor& lightcolor)
 {
   int i;
-printf ("UpdateMaps\n"); fflush (stdout);
   for (i = 0 ; i < polytxts.Length () ; i++)
   {
     csPolyTexture* pt = (csPolyTexture*)polytxts[i];
     pt->UpdateFromShadowBitmap (light, lightpos, lightcolor);
   }
-printf ("UpdateMaps END\n"); fflush (stdout);
   polytxts.DeleteAll ();
 }
 

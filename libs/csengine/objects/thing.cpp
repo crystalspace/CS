@@ -2264,8 +2264,8 @@ static void* CheckFrustumPolygonsFB (csThing* thing,
 // be part of the class.
 // @@@ This function needs to use the PVS. However, this function itself
 // is used for the PVS so we need to take care!
-static bool CullOctreeNodeLighting (csPolygonTree* tree, csPolygonTreeNode* node,
-  const csVector3& /*pos*/, void* data)
+static bool CullOctreeNodeLighting (csPolygonTree* tree,
+	csPolygonTreeNode* node, const csVector3& /*pos*/, void* data)
 {
   if (!node) return false;
   if (node->Type () != NODE_OCTREE) return true;
