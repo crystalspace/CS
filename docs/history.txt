@@ -23,6 +23,11 @@ The history order is reversed so that new features are at the top.
 	  were unknown.
 	- Eric Sunshine fixed several problems where Brandon Ehle committed
 	  changes to dead files in CVS's Attic.
+	- Eric Sunshine removed a PS2 specialization which Brandon Ehle added
+	  to CS/include/cssys/unix/csosdefs.h.  Why Brandon placed this
+	  specialization in the Unix configuration file rather than the PS2
+	  configuration file (which is the obviously correct place) is a
+	  mystery.
 24-May-2001
 	- Eric Sunshine fixed several problems in lexan.mak.
 	- Eric Sunshine eliminated compilation warning from csobject.cpp about

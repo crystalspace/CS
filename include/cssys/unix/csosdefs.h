@@ -29,9 +29,6 @@
      if (getenv ("GGI_DISPLAY"))
        return "crystalspace.graphics2d.ggi";
      else
-#  if defined(OS_PS2)
-       return "crystalspace.graphics2d.ps2d";
-#  endif
 #  if defined (OS_LINUX)
      if (getenv ("DISPLAY"))
 #  endif

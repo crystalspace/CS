@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
-    Written by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,13 +21,9 @@
 
 #include <math.h>
 
-#ifdef SYSDEF_SOFTWARE2D
-#  define SOFTWARE_2D_DRIVER get_software_2d_driver ()
-   static inline char* get_software_2d_driver ()
-   {
-       return "crystalspace.graphics2d.ps2d";
-   }
-#endif
+// The 2D graphics driver used by the software renderer
+#define SOFTWARE_2D_DRIVER_PS2 "crystalspace.graphics2d.ps2d"
+#define SOFTWARE_2D_DRIVER SOFTWARE_2D_DRIVER_PS2
 
 // The 2D graphics driver used by OpenGL renderer
 #define OPENGL_2D_DRIVER "crystalspace.graphics2d.ps2d"
@@ -49,14 +44,11 @@
 extern "C" unsigned long inet_addr(const char*);
 #endif
 
-//BEhle include stdio now, so it won't screw up stuff later
+// Include stdio now, so it won't screw up stuff later
 #include <stdio.h>
 #include <sys/types.h>
 
-//External library
-//#include "peed.h"
-
-//BEhle Kill all of the possible defines
+// Kill all of the possible defines
 #undef fopen
 #define fopen ps2fopen
 #undef fclose
@@ -101,7 +93,7 @@ extern "C" unsigned long inet_addr(const char*);
 #undef stderr
 #define stderr ps2stderr
 
-//BEhle Then defines the functions
+// Then defines the functions
 extern "C" {
 typedef int FILE;
 FILE *fopen(const char * filename, const char * mode);

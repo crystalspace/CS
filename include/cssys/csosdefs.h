@@ -26,6 +26,8 @@
 #  include "cssys/next/csosdefs.h"
 #elif defined(OS_BE)		/* Must appear before OS_UNIX */
 #  include "cssys/be/csosdefs.h"
+#elif defined(OS_PS2)		/* Must appear before OS_UNIX */
+#  include "cssys/ps2/csosdefs.h"
 #elif defined(OS_UNIX)
 #  include "cssys/unix/csosdefs.h"
 #elif defined(OS_WIN32)
@@ -36,8 +38,6 @@
 #  include "cssys/os2/csosdefs.h"
 #elif defined(OS_DOS) && defined(COMP_GCC)
 #  include "cssys/djgpp/csosdefs.h"
-#elif defined(OS_PS2)
-#  include "cssys/ps2/csosdefs.h"
 # else
 #  error Unable to locate platform-specific "csosdefs.h" file.
 #endif
