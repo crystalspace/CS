@@ -62,6 +62,7 @@ chronological order.
 	      related callbacks all now expect intptr_t.
 	    - Fixed a number of additional potential 64-bit problems reported
 	      by the compiler throughout the project.
+	- Jorrit fixed pvscalc so that the minnode size is no longer ignored.
 21-Mar-2005
 	- Eric Sunshine re-wrote crystal.m4 essentially from scratch since it
 	  was fragile, obfuscated, and unnecessarily complex.

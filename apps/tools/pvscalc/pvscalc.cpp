@@ -577,7 +577,7 @@ void PVSCalcSector::BuildKDTree (void* node, const csArray<csBox3>& boxlist,
   int axis;
   float where;
   csVector3 bbox_size = bbox.Max () - bbox.Min ();
-  if (minsize_only)
+  if (minsize_only || boxlist.Length () <= 10)
   {
     float where0, where1, where2;
     float q0 = bbox_size.x > minsize.x
@@ -613,10 +613,10 @@ void PVSCalcSector::BuildKDTree (void* node, const csArray<csBox3>& boxlist,
       return;
     }
   }
-  else if (boxlist.Length () <= 10)
-  {
-    return;
-  }
+  //else if (boxlist.Length () <= 10)
+  //{
+    //return;
+  //}
   else
   {
     float where0, where1, where2;
