@@ -7,8 +7,8 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 23-Oct-2004
-	- res fixed the GL iGraphics3D::DrawPixmap() disabling blendin, which
-	  subsequently messed up text writing.
+	- res fixed the GL iGraphics3D::DrawPixmap() disabling blending, which
+	  messed up subsequent text writing.
 22-Oct-2004
 	- Eric Sunshine fixed a bug in the replacement MakeLocate rule in
 	  subdir.jam where it failed to set the LOCATE variable for the target
