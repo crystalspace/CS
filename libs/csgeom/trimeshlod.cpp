@@ -214,7 +214,7 @@ void csTriangleVerticesSorted::ChangeCostVertex (int vtidx)
     csList<int>::Iterator it_cur = it;
 
     it.Prev ();
-    while (it.HasPrevious () && cost < verts[it.FetchPrev ()].cost)
+    while (it.HasPrevious () && cost < verts[it.FetchPrevious ()].cost)
     {
       it.Previous ();
     }
