@@ -90,6 +90,39 @@ The history order is reversed so that new features are at the top.
 	    - Index buffer now uses UNSIGNED_INT instead of INT. The latter
 	      one doesn't seem to be liked by ATI's Cat3.4.
 	- res added a Jamfile for the stencil shadow renderstep.
+	- Eric Sunshine made the following changes:
+	    - Renamed csGetAppPath() to csGetAppDir() to better reflect its
+	      function.
+	    - Added a new csGetAppPath() which returns the actual absolute path
+	      to the executable (as opposed to csGetAppDir() which returns the
+	      directory containing the executable).
+	    - Added csGetResourceDir() as complement of csGetAppDir().  On many
+	      platforms, the resource path is the same as the application path,
+	      but this might not be true for all platforms.  For instance, on
+	      MacOS/X, csGetAppDir() needs to return the directory in which the
+	      .app wrapper is contained, however csGetResourceDir() needs to
+	      return the Resources directory inside the wrapper.
+	    - Added platform-specific csGetAppDir() and csGetResourceDir() for
+	      MacOS/X.
+	    - Updated the generic csGetPluginPaths() so that it includes the
+	      result of csGetResourceDir() in the plugin path list.
+	    - The above changes should allow the MacOS/X port to once again
+	      locate its plugin modules.
+	    - Fixed bug: In the case of a bare program name as argv[0] (as
+	      opposed to an absolute or relative path), the default
+	      csGetAppDir() in cssys/general simply returned the first
+	      component of PATH which actually existed, rather than returning
+	      the component of PATH which contained the application.
+	    - Fixed bug: The default csGetAppDir() in cssys/general was always
+	      using ';' as the path delimiter, even though that only works for
+	      Windows.  Now uses ':' for Unix and Unix-like platforms.
+	    - Fixed bug: The default csGetPluginPaths() in cssys/general was
+	      attempting to prevent pushing "/" onto the plugin path list
+	      (because "/" has ambiguous meaning under Windows), but was
+	      instead actually preventing addition of any absolute path to the
+	      list (that is, any path beginning with "/").
+	    - Renamed iCommandLineParser::GetAppPath() to GetAppDir() to better
+	      reflect its function.
 19-Jun-2003
 	- Oktal made the following changes to the Perl plugin and module:
 	    - Got rid of all the warnings in the Perl plugin and module,

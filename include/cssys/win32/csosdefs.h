@@ -274,6 +274,7 @@ struct mmioInfo
 #  define CS_MAXPATHLEN 260 /* not 256 */
 #endif
 #define PATH_SEPARATOR '\\'
+#define PATH_DELIMITER ';'
 
 #if defined (__CYGWIN32__) && defined(CS_SYSDEF_PROVIDE_MKDIR)
 #    define MKDIR(path) mkdir(path, 0755)

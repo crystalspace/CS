@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2003 by Jorrit Tyberghein
-	      (C) 2003 by Frank Richter
+    Copyright (C) 2003 by Greg Block
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,12 +21,8 @@
 
 #include "iutil/cfgfile.h"
 #include "csutil/scf.h"
-#include "csutil/strhash.h"
-#include "csutil/parray.h"
 
 #import <Foundation/Foundation.h>
-
-
 
 class csDefaultsIterator;
 
@@ -115,4 +110,3 @@ public:
   virtual const char *GetComment () const;
 };
 #endif
-

@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2003 by Jorrit Tyberghein
-	      (C) 2003 by Frank Richter
+    Copyright (C) 2003 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,45 +19,21 @@
 #include "cssysdef.h"
 #include "cssys/sysfunc.h"
 #include "cssys/syspath.h"
-
-#include <windows.h>
-
-char* csExpandPath (const char* path)
-{
-  char fullName[MAX_PATH];
-  GetFullPathName (path, sizeof(fullName), fullName, 0);
-  if (GetLongPathName (fullName, fullName, sizeof (fullName)) == 0) 
-  {
-    return 0;
-  }
-
-  return (csStrNew (fullName));
-}
-
-bool csPathsIdentical (const char* path1, const char* path2)
-{
-  return (strcasecmp (path1, path2) == 0);
-}
-
-char* csGetAppPath (const char*)
-{
-  char appPath[MAX_PATH];
-  GetModuleFileName (0, appPath, sizeof (appPath) - 1);
-  return (csStrNew (appPath));
-}
+#include "csutil/cstring.h"
+#include "csutil/util.h"
+#include <string.h>
 
 char* csGetAppDir (const char* argv0)
 {
+  char* appdir = 0;
   char* apppath = csGetAppPath(argv0);
-  char* slash = strrchr (apppath, PATH_SEPARATOR);
-  if (slash)
-    *slash = 0;
-  char* appdir = csStrNew(apppath);
-  delete[] apppath;
+  if (apppath != 0)
+  {
+    char* slash = strrchr (apppath, PATH_SEPARATOR);
+    if (slash != 0)
+      *slash = '\0';
+    appdir = csStrNew (apppath);
+    delete[] apppath;
+  }
   return appdir;
-}
-
-char* csGetResourcePath (const char* argv0)
-{
-  return csGetAppDir(argv0);
 }

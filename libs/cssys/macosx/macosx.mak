@@ -121,14 +121,15 @@ SRC.SYS_CSSYS = $(wildcard $(addprefix $(SRCDIR)/, \
   $(addsuffix /*.c,$(MACOSX.SOURCE_PATHS)) \
   $(addsuffix /*.m,$(MACOSX.SOURCE_PATHS)) \
   $(addsuffix /*.mm,$(MACOSX.SOURCE_PATHS)))) \
+  $(SRCDIR)/libs/cssys/general/apppath.cpp \
+  $(SRCDIR)/libs/cssys/general/csprocessorcap.cpp \
   $(SRCDIR)/libs/cssys/general/findlib.cpp \
   $(SRCDIR)/libs/cssys/general/getopt.cpp \
-  $(SRCDIR)/libs/cssys/general/printf.cpp \
-  $(SRCDIR)/libs/cssys/general/sysroot.cpp \
-  $(SRCDIR)/libs/cssys/general/scanplugins.cpp \
-  $(SRCDIR)/libs/cssys/general/csprocessorcap.cpp \
+  $(SRCDIR)/libs/cssys/general/pathutil.cpp \
   $(SRCDIR)/libs/cssys/general/pluginpaths.cpp \
-  $(SRCDIR)/libs/cssys/general/syspath.cpp \
+  $(SRCDIR)/libs/cssys/general/printf.cpp \
+  $(SRCDIR)/libs/cssys/general/scanplugins.cpp \
+  $(SRCDIR)/libs/cssys/general/sysroot.cpp \
   $(CSTHREAD.SRC)
 INC.SYS_CSSYS = \
   $(wildcard $(addprefix $(SRCDIR)/,$(addsuffix /*.h,$(MACOSX.SOURCE_PATHS))))\

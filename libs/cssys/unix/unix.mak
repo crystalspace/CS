@@ -89,16 +89,19 @@ NASMFLAGS.SYSTEM = -f elf
 
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS= $(wildcard $(SRCDIR)/libs/cssys/unix/*.cpp) \
-  $(SRCDIR)/libs/cssys/general/sysroot.cpp \
+  $(SRCDIR)/libs/cssys/general/appdir.cpp \
+  $(SRCDIR)/libs/cssys/general/apppath.cpp \
+  $(SRCDIR)/libs/cssys/general/csprocessorcap.cpp \
   $(SRCDIR)/libs/cssys/general/findlib.cpp \
   $(SRCDIR)/libs/cssys/general/getopt.cpp \
-  $(SRCDIR)/libs/cssys/general/printf.cpp \
-  $(SRCDIR)/libs/cssys/general/runloop.cpp \
-  $(SRCDIR)/libs/cssys/general/sysinit.cpp \
+  $(SRCDIR)/libs/cssys/general/pathutil.cpp \
   $(SRCDIR)/libs/cssys/general/platformconfig.cpp \
+  $(SRCDIR)/libs/cssys/general/printf.cpp \
+  $(SRCDIR)/libs/cssys/general/resdir.cpp \
+  $(SRCDIR)/libs/cssys/general/runloop.cpp \
   $(SRCDIR)/libs/cssys/general/scanplugins.cpp \
-  $(SRCDIR)/libs/cssys/general/csprocessorcap.cpp \
-  $(SRCDIR)/libs/cssys/general/syspath.cpp \
+  $(SRCDIR)/libs/cssys/general/sysinit.cpp \
+  $(SRCDIR)/libs/cssys/general/sysroot.cpp \
   $(CSTHREAD.SRC)
 INC.SYS_CSSYS = $(wildcard $(SRCDIR)/libs/cssys/unix/*.h) $(CSTHREAD.INC)
 

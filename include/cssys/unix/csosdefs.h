@@ -26,6 +26,7 @@
 // filesystem settings
 #define CS_MAXPATHLEN	256
 #define PATH_SEPARATOR  '/'
+#define PATH_DELIMITER	':'
 
 #ifdef CS_SYSDEF_PROVIDE_SOFTWARE2D
 #  define CS_SOFTWARE_2D_DRIVER get_software_2d_driver ()

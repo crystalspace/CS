@@ -62,22 +62,57 @@ csPluginPaths* csGetPluginPaths (const char* argv0);
 
 /**
  * Expand a native path relative to the current directory.
+ * \remark The specified path must refer to a directory, rather than a file.
  * \remark Caller is responsible to free the returend string with delete[] 
  *   after using it.
  */
 char* csExpandPath (const char* path);
 
 /**
- * Return the path the application was started from.
- * \remark May return 0.
- * \remark Caller is responsible to free the returend string with delete[] 
+ * Return the absolute path of the executable.
+ * \remark May return 0 if some problem prevents determination of the
+ *   application's path.
+ * \remark Caller is responsible for freeing the returend string with delete[] 
  *   after using it.
  * \remark This function is primarily intended for very low-level use before 
- *   or during the initialization of CS' core components. Past this pointe,
- *   applications and plugins should rather use 
- *   iCommandLineParser::GetAppPath().
+ *   or during the initialization of CS core components.
+ * \param argv0 The first element of the argv[] array passed to main().  On
+ *   many platforms, this is the only way to determine the actual location of
+ *   the executable.
  */
 char* csGetAppPath (const char* argv0);
+
+/**
+ * Return the directory in which the application resides.
+ * \remark May return 0 if some problem prevents determination of the
+ *   application's directory.
+ * \remark Caller is responsible for freeing the returend string with delete[] 
+ *   after using it.
+ * \remark This function is primarily intended for very low-level use before 
+ *   or during the initialization of CS core components. Past this point,
+ *   applications and plugins should rather use 
+ *   iCommandLineParser::GetAppPath().
+ * \param argv0 The first element of the argv[] array passed to main().  On
+ *   many platforms, this is the only way to determine the actual location of
+ *   the executable.
+ */
+char* csGetAppDir (const char* argv0);
+
+/**
+ * Return the directory in which the application's resources reside.  On
+ * many platforms, resources (such as plugin modules) reside in the same
+ * directory as the application itself.  This default implementation
+ * returns the same value as csGetAppPath(), however platforms may want to
+ * override the default implementation if this behavior is unsuitable.
+ * \remark May return 0 if some problem prevents determination of the
+ *   resource path.
+ * \remark Caller is responsible for freeing the returend string with delete[] 
+ *   after using it.
+ * \param argv0 The first element of the argv[] array passed to main().  On
+ *   many platforms, this is the only way to determine the actual location of
+ *   the resources.
+ */
+char* csGetResourceDir (const char* argv0);
 
 /**
  * Check whether two native paths actually point to the same location.

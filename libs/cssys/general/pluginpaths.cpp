@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2003 by Jorrit Tyberghein
-	      (C) 2003 by Frank Richter
+    Copyright (C) 2003 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -26,17 +25,15 @@ csPluginPaths* csGetPluginPaths (const char* argv0)
 {
   csPluginPaths* paths = new csPluginPaths;
 
-  char* appPath = csGetAppPath (argv0);
+  char* appPath = csGetAppDir (argv0);
+  char* resPath = csGetResourceDir (argv0);
   char* configPath = csGetConfigPath ();
   
-  /*
-     Don't add "/".
-     @@@ Won't work on Win32.
-   */
-  if (appPath && *appPath && (*appPath != PATH_SEPARATOR))
-  {
+  // Don't add "/" since it won't work on Windows.
+  if (resPath && *resPath && (resPath[1] != 0 || *resPath != PATH_SEPARATOR))
+    paths->AddOnce (resPath, true, "app");
+  if (appPath && *appPath && (appPath[1] != 0 || *appPath != PATH_SEPARATOR))
     paths->AddOnce (appPath, true, "app");
-  }
 
   if (configPath)
   {
@@ -49,12 +46,11 @@ csPluginPaths* csGetPluginPaths (const char* argv0)
     paths->AddOnce (tmp, true, "crystal");
 
     paths->AddOnce (configPath, false, "crystal");
-    
-    delete[] configPath;
   }
-
+    
+  delete[] configPath;
   delete[] appPath;
+  delete[] resPath;
 
   return paths;
 }
-

@@ -1,6 +1,5 @@
 /*
-    Copyright (C) 2003 by Jorrit Tyberghein
-	      (C) 2003 by Frank Richter
+    Copyright (C) 2003 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -54,67 +53,7 @@ char* csExpandPath (const char* path)
   return (csStrNew (normalized_path));
 }
 
-char* csGetAppPath (const char* argv0)
-{
-  if (!argv0 || (*argv0 == 0)) return 0;
-
-  char* app = csStrNew (argv0);
-  char* fullPath = 0;
-
-  if (*app == PATH_SEPARATOR)
-  {
-    char* slash = strrchr (app, PATH_SEPARATOR);
-    if (slash) *slash = 0;
-
-    // Absolute path. 
-    fullPath = csStrNew (app);
-  } 
-  else if (strchr (app, PATH_SEPARATOR) != 0)
-  {
-    char* slash = strrchr (app, PATH_SEPARATOR);
-    if (slash) *slash = 0;
-
-    // Relative path.
-    fullPath = csExpandPath (app);
-  }
-  else 
-  {
-    // A bare name. Search PATH.
-    char* envPATH = csStrNew (getenv ("PATH"));
-
-    char* currentPart;
-    char* nextPart = envPATH;
-
-    do
-    {
-      currentPart = nextPart;
-      nextPart = strchr (currentPart, ';');
-      if (nextPart)
-      {
-	*nextPart++ = 0;
-      }
-
-      fullPath = csExpandPath (currentPart);
-      if (access (fullPath, F_OK))
-      {
-	delete[] fullPath; fullPath = 0;
-      }
-    }
-    while ((nextPart != 0) && (fullPath == 0));
-
-    char* slash = strrchr (fullPath, PATH_SEPARATOR);
-    if (slash) *slash = 0;
-
-    delete[] envPATH;
-  }
-
-  delete[] app;
-
-  return fullPath;
-}
-
 bool csPathsIdentical (const char* path1, const char* path2)
 {
   return (strcmp (path1, path2) == 0);
 }
-

@@ -13,8 +13,8 @@ case MACOS_X :
   SearchSubdir general ;
   SYSFILES = [ Wildcard macosx : *.cpp *.m *.mm *.h ] 
 		findlib.cpp getopt.cpp printf.cpp sysroot.cpp cspthrd.cpp 
-		cspthrd.h scanplugins.cpp csprocessorcap.cpp syspath.cpp 
-		pluginpaths.cpp ;
+		cspthrd.h scanplugins.cpp csprocessorcap.cpp pathutil.cpp 
+		apppath.cpp pluginpaths.cpp ;
   InstallConfig macosx.cfg ;
 case * :		# posix/unix/linux mode
   SearchSubdir unix ;
@@ -22,16 +22,17 @@ case * :		# posix/unix/linux mode
   SYSFILES = [ Wildcard unix : *.cpp *.h ]
 		sysroot.cpp findlib.cpp getopt.cpp printf.cpp runloop.cpp 
 		sysinit.cpp cspthrd.cpp cspthrd.h platformconfig.cpp 
-		scanplugins.cpp csprocessorcap.cpp syspath.cpp 
-		pluginpaths.cpp ;
+		scanplugins.cpp csprocessorcap.cpp pathutil.cpp apppath.cpp
+		appdir.cpp resdir.cpp pluginpaths.cpp ;
 }
 
 Library cssys :
 	[ Wildcard *.cpp *.h ]
 	$(SYSFILES)
 ;
-CFlags cssys : -DCS_CONFIGDIR='\"$(INSTALLDIR.CONFIG)\"' -DCS_PLUGINDIR='\"$(INSTALLDIR.PLUGIN)\"' ;
+CFlags cssys :
+  -DCS_CONFIGDIR='\"$(INSTALLDIR.CONFIG)\"' 
+  -DCS_PLUGINDIR='\"$(INSTALLDIR.PLUGIN)\"' ;
 
 LibDepends cssys : csutil ;
 Help cssys : "Crystal Space system library" ;
-

@@ -68,9 +68,9 @@ struct iCommandLineParser : public iBase
     bool defaultValue = false) = 0;
     
   /**
-   * Returns the path of the application binary.
+   * Returns the directory of the application binary.
    */
-  virtual const char* GetAppPath () = 0;
+  virtual const char* GetAppDir () = 0;
 };
 
 /** @} */

@@ -33,11 +33,12 @@
 
 
 //-----------------------------------------------------------------------------
-// Provide CS_MAXPATHLEN and PATH_SEPARATOR with proper values.
+// Provide CS_MAXPATHLEN, PATH_SEPARATOR, PATH_DELIMITER with proper values.
 //-----------------------------------------------------------------------------
 #include <sys/param.h>
 #define CS_MAXPATHLEN MAXPATHLEN
 #define PATH_SEPARATOR '/'
+#define PATH_DELIMITER ':'
 
 
 //-----------------------------------------------------------------------------
