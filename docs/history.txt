@@ -27,6 +27,8 @@ The history order has been reversed so that new features are at the top.
 	- Changed calloc/free in polytext.h (csCoverageMatrix) to
 	  new[]/delete[] in order to help debugging it (memory debugger
 	  only works on C++ memory allocators).
+	- Added 'pvs' command to toggle pvs usage (note that PVS is still
+	  not working properly).
 10-May-2000
 	- Michael Dale Long did a major update for CrystalClear.  A lot of
 	  work has been done on iActor.  The main thing was adding multiple

@@ -137,6 +137,11 @@ freelook is disabled.
 @item gouraud
 Toggle support for gouraud shading. By default this is on.
 
+@item pvs
+Toggle pvs visibility culling on/off. Use this in combination with the
+c-buffer (see cbuffer command) to enable the PVS. In the current release
+of CS this feature is still experimental.
+
 @item cbuffer
 Toggle c-buffer rendering on/off. In some levels (especially levels with
 many non-moving things) enabling the c-buffer for the engine can improve

@@ -211,7 +211,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     Sys->Printf (MSG_CONSOLE, " picklight, droplight, colldet, stats, hi, frustum\n");
     Sys->Printf (MSG_CONSOLE, " fps, perftest, capture, coordshow, zbuf, freelook\n");
     Sys->Printf (MSG_CONSOLE, " map, fire, debug0, debug1, debug2, edges, p_alpha, s_fog\n");
-    Sys->Printf (MSG_CONSOLE, " snd_play, snd_volume, do_gravity, cbuffer, covtree, solidbsp\n");
+    Sys->Printf (MSG_CONSOLE, " snd_play, snd_volume, do_gravity, cbuffer, covtree, solidbsp, pvs\n");
     Sys->Printf (MSG_CONSOLE, " addbot, delbot, loadsprite, addsprite, delsprite, addskel, addghost\n");
     Sys->Printf (MSG_CONSOLE, " step_forward, step_backward, strafe_left, strafe_right\n");
     Sys->Printf (MSG_CONSOLE, " look_up, look_down, rotate_left, rotate_right, jump, move3d\n");
@@ -266,6 +266,15 @@ bool CommandHandler (const char *cmd, const char *arg)
     Command::change_boolean (arg, &Sys->do_show_palette, "palette");
   else if (!strcasecmp (cmd, "move3d"))
     Command::change_boolean (arg, &Sys->move_3d, "move3d");
+  else if (!strcasecmp (cmd, "pvs"))
+  {
+    bool en = Sys->world->IsPVS ();
+    Command::change_boolean (arg, &en, "pvs");
+    if (en) 
+      Sys->world->EnablePVS ();
+    else
+      Sys->world->DisablePVS ();
+  }
   else if (!strcasecmp (cmd, "cbuffer"))
   {
     bool en = Sys->world->GetCBuffer () != NULL;
@@ -380,22 +389,12 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "debug2"))
   {
-#   if 1
-    if (Sys->world->IsPVS ())
-    {
-      Sys->world->DisablePVS ();
-      Sys->Printf (MSG_CONSOLE, "Disabled PVS.\n");
-    }
-    else
-    {
-      Sys->world->EnablePVS ();
-      Sys->Printf (MSG_CONSOLE, "Enabled PVS.\n");
-    }
-#   else
+#   if 0
     extern bool do_covtree_dump;
     do_covtree_dump = !do_covtree_dump;
+#   else
+    Sys->Printf (MSG_CONSOLE, "No debug2 implementation in this version.\n");
 #   endif
-    //Sys->Printf (MSG_CONSOLE, "No debug2 implementation in this version.\n");
   }
   else if (!strcasecmp (cmd, "strafe_left"))
   {
