@@ -130,6 +130,16 @@ public:
 
   /// Prepare the texture for usage
   virtual void Prepare ();
+
+  virtual bool GetMipMapDimensions (int mipmap, int &mw, int &mh, int &md)
+  { return false; }
+  
+  virtual void GetOriginalDimensions (int& mw, int& mh, int &md)
+  { mw=0; mh=0; md=0; }
+
+  virtual void SetTextureTarget (int target)
+  { }
+
 };
 
 /**
@@ -178,6 +188,12 @@ public:
   virtual void GetLightmapRendererCoords (int slmWidth, int slmHeight,
     int lm_x1, int lm_y1, int lm_x2, int lm_y2,
     float& lm_u1, float& lm_v1, float &lm_u2, float& lm_v2);
+
+#ifdef CS_USE_NEW_RENDERER
+  virtual csPtr<iTextureHandle> RegisterTexture (iImageVector *image, int flags, int target)
+  { return csPtr<iTextureHandle>(0);  }
+#endif
+
 };
 
 #endif // __CS_NULL_TXT_H__

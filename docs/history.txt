@@ -9,6 +9,10 @@ chronological order.
 7-Feb-2004
         - Philip Wyett fixed make build of gl3d plugin after recent
           effects changes.
+	- Keith Fulton fixed bounding box calculation on setup of a sprcal3d model,
+	  which was causing SECONDS of lag the first time any sprcal3d was created
+	  and made visible.  Now it happens more or less instantly.
+	- Keith also fixed compiler errors in Null Renderer for NR settings.
 6-Feb-2004
 	- Jorrit clarified the comment for iEngine->CreateBaseMaterial().
 	- Jorrit corrected the howto on creating a thing. It was still
