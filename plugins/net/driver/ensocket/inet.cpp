@@ -1,12 +1,29 @@
-/*****************************************************************************
+/*
+    Copyright (C) 2000 by Jorrit Tyberghein
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+/***********************************************************************
   
   This code is provided as-is by Erik Namtvedt.
   Help with the SCF interface was provided by Norman Kraemer.
   Help with Win32 projects was provided by Philip Wyett.
   Help with CS in general was provided by Jorrit Tyberghein.
 
-*****************************************************************************/
-
+***********************************************************************/
 
 #define CS_SYSDEF_PROVIDE_SOCKETS
 #include "cssysdef.h"
@@ -44,34 +61,25 @@ csNetworkDriver2::csNetworkDriver2 (iBase *parent)
   if (WSAStartup(MAKEWORD(1,0),&Data) != 0) 
     last_error = CS_NET_DRIVER_NOERROR;
 #endif
-
 }
-
 
 csNetworkDriver2::~csNetworkDriver2() 
 {
-
   last_error = CS_NET_DRIVER_NOERROR;
 
 #ifdef OS_WIN32
   if (WSACleanup() != 0)
     last_error = CS_NET_DRIVER_CANNOT_STOP;
 #endif
-
 }
-
 
 int csNetworkDriver2::LastError()
 {
-
   return last_error;
-
 }
-
 
 iNetworkSocket2 *csNetworkDriver2::CreateSocket (int socket_type) 
 {
-
   int proto_type = -1;
 
   last_error = CS_NET_DRIVER_UNSUPPORTED_SOCKET_TYPE;
@@ -99,7 +107,6 @@ SCF_IMPLEMENT_IBASE (csNetworkSocket2)
   SCF_IMPLEMENTS_INTERFACE (iNetworkSocket2)
 SCF_IMPLEMENT_IBASE_END
 
-
 csNetworkSocket2::csNetworkSocket2 (iBase *parent, int socket_type) 
 {
   SCF_CONSTRUCT_IBASE (parent);
@@ -113,7 +120,7 @@ csNetworkSocket2::csNetworkSocket2 (iBase *parent, int socket_type)
     socketfd = socket(AF_INET,SOCK_DGRAM,IPPROTO_UDP);
     if (socketfd != socket_error) 
     {
-	proto_type = SOCK_DGRAM;
+      proto_type = SOCK_DGRAM;
     }
     else
     {
@@ -144,7 +151,6 @@ csNetworkSocket2::csNetworkSocket2 (iBase *parent, int socket_type)
 
   if (proto_type == -1)
     last_error = CS_NET_SOCKET_UNSUPPORTED_SOCKET_TYPE; 
-
 }
 
 csNetworkSocket2::~csNetworkSocket2 ()
@@ -152,7 +158,6 @@ csNetworkSocket2::~csNetworkSocket2 ()
   if (read_buffer) free(read_buffer);
   
   last_error = CS_NET_SOCKET_NOERROR;
-
 }
 
 int csNetworkSocket2::LastError ()
@@ -162,13 +167,11 @@ int csNetworkSocket2::LastError ()
 
 int csNetworkSocket2::LastOSError ()
 {
-
 #ifdef OS_WIN32
 	return GetLastError();
 #else
 	return errno;
 #endif
-
 }
 
 int csNetworkSocket2::Close() 
@@ -178,19 +181,14 @@ int csNetworkSocket2::Close()
   closesocket(socketfd);
 
   return CS_NET_SOCKET_NOERROR;
-
 }
-
 
 int csNetworkSocket2::Disconnect() 
 {
-
   Close();
 
   return CS_NET_SOCKET_NOERROR;
-
 }
-	
 
 int csNetworkSocket2::SetSocketBlock (bool block) 
 {
@@ -199,7 +197,6 @@ int csNetworkSocket2::SetSocketBlock (bool block)
     const char flag = (block ? 0x00 : 0xff);
     unsigned long arg = (block ? 0 : 1);
 
-    
     if (block) 
     {
       arg = 0;
@@ -219,7 +216,6 @@ int csNetworkSocket2::SetSocketBlock (bool block)
       return CS_NET_SOCKET_NOERROR;
     else
       return CS_NET_SOCKET_CANNOT_SETBLOCK;
-
 #else
 //    IOCTL(socketfd,O_NONBLOCK,&arg);
     IOCTL(socketfd, FIONBIO, &arg);
@@ -228,7 +224,6 @@ int csNetworkSocket2::SetSocketBlock (bool block)
       return CS_NET_SOCKET_NOERROR;
     else
       return CS_NET_SOCKET_CANNOT_SETBLOCK;
-
 #endif
   }
   else
@@ -237,7 +232,6 @@ int csNetworkSocket2::SetSocketBlock (bool block)
   }
 
   return CS_NET_SOCKET_NOERROR;
-
 }
 
 int csNetworkSocket2::SetSocketReuse (bool reuse) 
@@ -249,7 +243,6 @@ int csNetworkSocket2::SetSocketReuse (bool reuse)
       return CS_NET_SOCKET_NOERROR;
     else
       return CS_NET_SOCKET_CANNOT_SETREUSE;
-
   } 
   else 
   {
@@ -259,7 +252,6 @@ int csNetworkSocket2::SetSocketReuse (bool reuse)
 
 int csNetworkSocket2::WaitForConnection (int source, int port, int que) 
 {
-
   local_addr.sin_family = AF_INET;
   local_addr.sin_port = htons(port);
   local_addr.sin_addr.s_addr = source;
@@ -282,7 +274,6 @@ int csNetworkSocket2::WaitForConnection (int source, int port, int que)
   return CS_NET_SOCKET_NOERROR;
 }
 
-
 int csNetworkSocket2::set (SOCKET socket_fd, bool bConnected, struct sockaddr_in saddr)
 {
   socketfd = socket_fd;
@@ -296,10 +287,8 @@ int csNetworkSocket2::set (SOCKET socket_fd, bool bConnected, struct sockaddr_in
   return CS_NET_SOCKET_NOERROR;
 }
 
-
 int csNetworkSocket2::SELECT (int fds, fd_set *readfds, fd_set *writefds, fd_set *expectfds) 
 {
-  
   struct timeval to;
   to.tv_sec = 0;
   to.tv_usec = 0;
@@ -317,10 +306,8 @@ int csNetworkSocket2::SELECT (int fds, fd_set *readfds, fd_set *writefds, fd_set
   return result;
 }
 
-
 char *csNetworkSocket2::RemoteName() 
 {
-
   last_error = CS_NET_SOCKET_NOERROR;
 
   return inet_ntoa(local_addr.sin_addr);
@@ -328,7 +315,6 @@ char *csNetworkSocket2::RemoteName()
 
 int csNetworkSocket2::IOCTL (SOCKET socketfd, long cmd, u_long *argp)
 {
-
  int result; 
 
  last_error = CS_NET_SOCKET_NOERROR;
@@ -345,14 +331,11 @@ int csNetworkSocket2::IOCTL (SOCKET socketfd, long cmd, u_long *argp)
  }
 
  return result;
-
 }
 
 iNetworkSocket2* csNetworkSocket2::Accept() 
 {
-
   last_error = CS_NET_SOCKET_NOERROR;
-
 
   if (proto_type == SOCK_DGRAM) 
     return 0;
@@ -364,7 +347,7 @@ iNetworkSocket2* csNetworkSocket2::Accept()
     FD_SET(fd_list[0],&fd_mask);
     if (SELECT(FD_SETSIZE,&fd_mask,0,0) != 1)
     {
-	return 0; 
+      return 0; 
     }
   }
 
@@ -382,9 +365,7 @@ iNetworkSocket2* csNetworkSocket2::Accept()
   tmpSocket->socketfd = socket_fd;
   tmpSocket->connected = true;
   memcpy(&tmpSocket->local_addr,&remote_addr,sizeof(struct sockaddr_in));
-  /*
-  printf("connection from %s\n",inet_ntoa(remote_addr.sin_addr));
-  */
+  // printf("connection from %s\n",inet_ntoa(remote_addr.sin_addr));
 
   if (!blocking) 
   {
@@ -408,23 +389,19 @@ int csNetworkSocket2::Recv (char *buff, size_t size)
     {
       if (!blocking) 
       {
-
-        
         FD_ZERO(&fd_mask);
         fd_list[0] = socketfd;
         FD_SET(fd_list[0],&fd_mask);
         if (SELECT(FD_SETSIZE,&fd_mask,0,0) != 1)
         { 
           last_error = CS_NET_SOCKET_NODATA;
-	  return -1;
+          return -1;
         }
 
         if (FD_ISSET(socketfd,&fd_mask)) 
         {
           result = recv(socketfd,buff,1,0);
-          /*
-          if (result > 0) printf("%c",buff[0]);
-          */
+          //if (result > 0) printf("%c",buff[0]);
 
           if (result == 0)
           {
@@ -435,11 +412,9 @@ int csNetworkSocket2::Recv (char *buff, size_t size)
         }
 
         return result;      
-
       } 
       else 
       {
-
         result = recv(socketfd,buff,size,0);
       
         if (result != 1)
@@ -474,13 +449,11 @@ int csNetworkSocket2::Recv (char *buff, size_t size)
         result = recvfrom(socketfd,buff,size,0,(struct sockaddr *)&local_addr,&addr_len);
         if (result == socket_error)
           last_error = CS_NET_SOCKET_NOTCONNECTED;
-
       }
       buff[result] = 0;
     }
     
     return result;
-    
   }
 
   return 0;
@@ -498,7 +471,6 @@ int csNetworkSocket2::ReadLine (char *buff, size_t size )
     return 0;
   }
 
-
   if ((connected) || (proto_type == SOCK_DGRAM)) 
   {
     if (!blocking)
@@ -506,9 +478,7 @@ int csNetworkSocket2::ReadLine (char *buff, size_t size )
       if (buffer_size == -1)
       {
          buffer_size = size;
-
          read_buffer = (char *)realloc(read_buffer,size * sizeof(char));
-         
          memset(read_buffer,0,size);
       }
 
@@ -566,7 +536,6 @@ int csNetworkSocket2::ReadLine (char *buff, size_t size )
     		
         return 0;
       }
-
     }
     else
     {
@@ -592,7 +561,6 @@ int csNetworkSocket2::ReadLine (char *buff, size_t size )
       }
     }
     strcat(read_buffer,"\0");
-
   }
   else
   {
@@ -633,7 +601,6 @@ int csNetworkSocket2::Send (char *buff, size_t size)
     {
       result = send(socketfd,buff,size,0);
     }
-    
   }
 
   if (result == socket_error) 
@@ -645,7 +612,6 @@ int csNetworkSocket2::Send (char *buff, size_t size)
 
 int csNetworkSocket2::Connect (char *host, int port)
 {
-
   last_error = CS_NET_SOCKET_NOERROR;
 
   host_ent = gethostbyname(host);
@@ -682,7 +648,6 @@ bool csNetworkSocket2::IsConnected()
 
   return connected;
 }
-
 
 SCF_IMPLEMENT_FACTORY (csNetworkDriver2)
 
