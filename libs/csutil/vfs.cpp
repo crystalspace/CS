@@ -65,7 +65,7 @@ public:
   // write a block of data
   virtual size_t Write (const char *Data, size_t DataSize);
   // check for EOF
-  virtual bool EOF ();
+  virtual bool AtEOF ();
   /// Query current file pointer
   virtual size_t GetPos ();
   /// Clear file error after queriyng status
@@ -103,7 +103,7 @@ public:
   // write a block of data
   virtual size_t Write (const char *Data, size_t DataSize);
   // check for EOF
-  virtual bool EOF ();
+  virtual bool AtEOF ();
   /// Query current file pointer
   virtual size_t GetPos ();
 
@@ -224,7 +224,7 @@ public:
   // Get value of a variable
   static const char *GetValue (const csIniFile *Config, char *VarName);
   // Find all files in a subpath
-  void FindFiles (char *Suffix, csStrVector *FileList);
+  void FindFiles (char *Suffix, char *Mask, csStrVector *FileList);
   // Find a file and return the appropiate csFile object
   csFile *Open (int Mode, char *Suffix);
   // Delete a file
@@ -455,7 +455,7 @@ size_t DiskFile::Write (const char *Data, size_t DataSize)
   return rc;
 }
 
-bool DiskFile::EOF ()
+bool DiskFile::AtEOF ()
 {
   return feof (file);
 }
@@ -537,7 +537,7 @@ size_t ArchiveFile::Write (const char *Data, size_t DataSize)
   return DataSize;
 }
 
-bool ArchiveFile::EOF ()
+bool ArchiveFile::AtEOF ()
 {
   if (data)
     return fpos + 1 >= Size;
@@ -699,7 +699,7 @@ const char *VfsNode::GetValue (const csIniFile *Config, char *VarName)
   return "";
 }
 
-void VfsNode::FindFiles (char *Suffix, csStrVector *FileList)
+void VfsNode::FindFiles (char *Suffix, char *Mask, csStrVector *FileList)
 {
   // Look through all RPathV's for file or directory
   for (int i = 0; i < RPathV.Length (); i++)
@@ -731,6 +731,9 @@ void VfsNode::FindFiles (char *Suffix, csStrVector *FileList)
          || (strcmp (de->d_name, "..") == 0))
           continue;
 
+        if (!fnamematches (de->d_name, Mask))
+          continue;
+
         bool append_slash = isdir (tpath, de);
         char *vpath = new char [strlen (VPath) + strlen (Suffix) +
 	  strlen (de->d_name) + (append_slash ? 2 : 1)];
@@ -743,6 +746,7 @@ void VfsNode::FindFiles (char *Suffix, csStrVector *FileList)
 	  vpath [sl++] = VFS_PATH_SEPARATOR;
 	  vpath [sl] = 0;
 	}
+
 	FileList->Push (vpath);
       } /* endwhile */
       closedir (dh);
@@ -773,7 +777,8 @@ void VfsNode::FindFiles (char *Suffix, csStrVector *FileList)
       {
         char *fname = a->GetFileName (iterator);
 	size_t fnl = strlen (fname);
-	if ((fnl >= sl) && (memcmp (fname, Suffix, sl) == 0))
+	if ((fnl >= sl) && (memcmp (fname, Suffix, sl) == 0)
+         && fnamematches (fname, Mask))
 	{
           size_t cur = sl;
 	  while (cur < fnl)
@@ -1147,12 +1152,28 @@ csStrVector *csVFS::FindFiles (const char *Path) const
   if (!Path)
     return NULL;
 
-  VfsNode *node;
-  char suffix [VFS_MAX_PATH_LEN + 1];
-  char *XPath = ExpandPath (Path, true);
-  csStrVector *fl = new csStrVector (16, 16);
+  VfsNode *node;				// the node we are searching
+  char suffix [VFS_MAX_PATH_LEN + 1];		// the suffix relative to node
+  char mask [VFS_MAX_PATH_LEN + 1];		// the filename mask
+  char XPath [VFS_MAX_PATH_LEN + 1];		// the expanded path
+  csStrVector *fl = new csStrVector (16, 16);	// the output list
 
-  PreparePath (XPath, true, node, suffix, sizeof (suffix));
+  PreparePath (Path, false, node, suffix, sizeof (suffix));
+
+  // Now separate the mask from directory suffix
+  int dirlen = strlen (suffix);
+  while (dirlen && suffix [dirlen - 1] != '/')
+    dirlen--;
+  strcpy (mask, suffix + dirlen);
+  suffix [dirlen] = 0;
+  if (!mask [0])
+    strcpy (mask, "*");
+
+  if (node)
+    strcpy (XPath, node->VPath);
+  else
+    XPath [0] = 0;
+  strcat (XPath, suffix);
 
   // first add all nodes that are located one level deeper
   // these are "directories" and will have a slash appended
@@ -1180,11 +1201,9 @@ csStrVector *csVFS::FindFiles (const char *Path) const
     }
   }
 
-  delete [] XPath;
-
   // Now find all files in given directory node
   if (node)
-    node->FindFiles (suffix, fl);
+    node->FindFiles (suffix, mask, fl);
 
   if (fl->Length () == 0)
   {

@@ -217,6 +217,36 @@ void splitpath (char *iPathName, char *iPath, size_t iPathSize, char *iName,
   else
     memcpy (iName, &iPathName [sl], maxl - sl + 1);
 }
+
+bool fnamematches (const char *fName, const char *fMask)
+{
+  while (*fName || *fMask)
+  {
+    if (*fMask == '*')
+    {
+      while (*fMask == '*')
+        fMask++;
+      if (!*fMask)
+        return true;		// mask = "something*"
+      while (*fName && *fName != *fMask)
+        fName++;
+      if (!*fName)
+        return false;		// "*C" - fName does not contain C
+    }
+    else
+    {
+      if ((*fMask != '?')
+       && (*fName != *fMask))
+        return false;
+      if (*fMask)
+        fMask++;
+      if (*fName)
+        fName++;
+    }
+  }
+  return (!*fName) && (!*fMask);
+}
+
 /*------------------------------------------------------------------------------
   Byte swap 32 bit data buffer
 ------------------------------------------------------------------------------*/
@@ -243,7 +273,6 @@ void ByteSwap16bitBuffer( register unsigned short* place, register unsigned long
   }
 }
 
-
 // finds the smallest number that is a power of two and is larger or equal to n
 int FindNearestPowerOf2 (int n)
 {
@@ -253,7 +282,6 @@ int FindNearestPowerOf2 (int n)
 
   return w;
 }
-
 
 // returns true if n is a power of two
 bool IsPowerOf2 (int n)

@@ -46,6 +46,15 @@ extern char *expandname (char *iName);
  */
 extern void splitpath (char *iPathName, char *iPath, size_t iPathSize,
   char *iName, size_t iNameSize);
+/**
+ * This is a really simple function that does very nice
+ * "filename against filemask" comparisons. It understands
+ * even such things like "*a*.txt" or "*a?b*" or even "*"
+ * (wish I DOS could do it ...). No "[]" wildcards though :-)
+ * <p>
+ * NOTE: If you want case-insensitive comparison, upcase strings first.
+ */
+extern bool fnamematches (const char *fName, const char *fMask);
 
 /// Swap two integer variables
 inline void iSwap (int &a, int &b)

@@ -24,11 +24,6 @@
 #include "def.h"
 #include "csvector.h"
 
-// Remove the standard definition of EOF since our method is called so
-#ifdef EOF
-#  undef EOF
-#endif
-
 // Composite path divider
 #define VFS_PATH_DIVIDER        ','
 // The "virtual" path separator
@@ -209,7 +204,7 @@ public:
   /// Replacement for standard fwrite()
   virtual size_t Write (const char *Data, size_t DataSize) = 0;
   /// Replacement for standard feof()
-  virtual bool EOF () = 0;
+  virtual bool AtEOF () = 0;
   /// Query current file pointer
   virtual size_t GetPos () = 0;
 
