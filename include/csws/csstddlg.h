@@ -73,7 +73,7 @@
 #define CSMBS_CENTER		0x20000000
 
 /// Display a message box and return ID of pressed button (0 for Esc)
-extern int csMessageBox (csComponent *iParent, char *iTitle, char *iMessage,
+extern int csMessageBox (csComponent *iParent, const char *iTitle, const char *iMessage,
   int iFlags = CSMBS_INFO | CSMBS_OK, ...);
 
 /// File name entry field in file dialogs
@@ -86,8 +86,8 @@ extern int csMessageBox (csComponent *iParent, char *iTitle, char *iMessage,
 #define CSWID_FILELIST		0xC50C
 
 /// Create and return a new file open dialog
-extern csWindow *csFileDialog (csComponent *iParent, char *iTitle,
-  char *iFileName = "./", char *iOpenButtonText = "~Load");
+extern csWindow *csFileDialog (csComponent *iParent, const char *iTitle,
+  const char *iFileName = "./", const char *iOpenButtonText = "~Load");
 /// Query full name, filename and pathname from a file dialog
 extern void csQueryFileDialog (csWindow *iFileDialog, char *iFileName,
   size_t iFileNameSize);
@@ -108,9 +108,9 @@ extern void csQueryFileDialog (csWindow *iFileDialog, char *iFileName,
 #define CSWID_COLORRGB		0xC513
 
 /// Create and return a new color choose dialog
-extern csWindow *csColorDialog (csComponent *iParent, char *iTitle, int iColor = 0);
+extern csWindow *csColorDialog (csComponent *iParent, const char *iTitle, int iColor = 0);
 /// Same but accepts R/G/B separately
-csWindow *csColorDialog (csComponent *iParent, char *iTitle,
+csWindow *csColorDialog (csComponent *iParent, const char *iTitle,
   float iR, float iG, float iB);
 /// Query color dialog contents as a single color value
 extern void csQueryColorDialog (csWindow *iColorDialog, int &oColor);

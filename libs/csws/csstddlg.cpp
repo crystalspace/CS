@@ -40,7 +40,7 @@
 
 //--//--//--//--//--//--//--//--//--//--//--//--//--//--//- Message boxes --//--
 
-int csMessageBox (csComponent *iParent, char *iTitle, char *iMessage, int iFlags, ...)
+int csMessageBox (csComponent *iParent, const char *iTitle, const char *iMessage, int iFlags, ...)
 {
   #define DIST_BITMAPX		8
   #define DIST_BITMAPY		8
@@ -118,8 +118,7 @@ int csMessageBox (csComponent *iParent, char *iTitle, char *iMessage, int iFlags
   // Create static objects for all text lines
   csStatic *L [100];
   int L_count = 0, L_maxw = 0;
-  char *MsgStart = iMessage;
-  MsgStart = iMessage;
+  const char *MsgStart = iMessage;
   for (;;)
   {
     if ((*iMessage == '\n') || (*iMessage == 0))
@@ -493,8 +492,8 @@ void cspFileDialog::Reread ()
     activate->SendCommand (cscmdListBoxItemSet, (void *)true);
 }
 
-csWindow *csFileDialog (csComponent *iParent, char *iTitle, char *iFileName,
-  char *iOpenButtonText)
+csWindow *csFileDialog (csComponent *iParent, const char *iTitle, const char *iFileName,
+  const char *iOpenButtonText)
 {
   csWindow *w = new csWindow (iParent, iTitle,
     CSWS_BUTSYSMENU | CSWS_BUTCLOSE | CSWS_TITLEBAR);
@@ -768,14 +767,14 @@ bool cspColorDialog::HandleEvent (iEvent &Event)
 // color dialog width (without frames)
 #define CD_WIDTH	(5 + (10 + 128 + CSSB_DEFAULTSIZE * 2 + 30) + 5)
 
-csWindow *csColorDialog (csComponent *iParent, char *iTitle, int iColor)
+csWindow *csColorDialog (csComponent *iParent, const char *iTitle, int iColor)
 {
   float r,g,b;
   csGetRGB (iColor, iParent->app, r, g, b);
   return csColorDialog (iParent, iTitle, r, g, b);
 }
 
-csWindow *csColorDialog (csComponent *iParent, char *iTitle,
+csWindow *csColorDialog (csComponent *iParent, const char *iTitle,
   float iR, float iG, float iB)
 {
   csWindow *w = new csWindow (iParent, iTitle,

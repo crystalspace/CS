@@ -30,7 +30,7 @@ class csTitleBar : public csComponent
 {
 public:
   /// Create title bar object
-  csTitleBar (csComponent *iParent, char *iTitle);
+  csTitleBar (csComponent *iParent, const char *iTitle);
 
   /// Handle input events
   virtual bool HandleEvent (iEvent &Event);

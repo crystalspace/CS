@@ -127,7 +127,7 @@ protected:
 
 public:
   /// Create a window object
-  csWindow (csComponent *iParent, char *iTitle, int iWindowStyle = CSWS_DEFAULTVALUE,
+  csWindow (csComponent *iParent, const char *iTitle, int iWindowStyle = CSWS_DEFAULTVALUE,
     csWindowFrameStyle iFrameStyle = cswfs3D);
 
   /// Rescale titlebar, menu etc before passing to original SetRect

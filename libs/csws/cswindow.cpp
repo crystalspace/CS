@@ -62,7 +62,7 @@ void csSysMenu::Hide ()
   SysButton->Invalidate ();
 }
 
-csWindow::csWindow (csComponent *iParent, char *iTitle, int iWindowStyle,
+csWindow::csWindow (csComponent *iParent, const char *iTitle, int iWindowStyle,
   csWindowFrameStyle iFrameStyle) : csComponent (iParent)
 {
   state |= CSS_SELECTABLE | CSS_TOPSELECT;

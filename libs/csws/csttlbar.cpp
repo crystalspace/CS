@@ -23,7 +23,7 @@
 #include "csws/csttlbar.h"
 #include "ievent.h"
 
-csTitleBar::csTitleBar (csComponent *iParent, char *iText)
+csTitleBar::csTitleBar (csComponent *iParent, const char *iText)
   : csComponent (iParent)
 {
   text = new char [strlen (iText) + 1];
