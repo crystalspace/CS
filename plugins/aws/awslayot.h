@@ -21,7 +21,7 @@ public:
     * code and must be fixed by the embedder.  This should ALWAYS be used by widgets
     * which embed the component and use delegate wrappers (i.e. awsecomponent)
     */
-  virtual SetOwner(iAwsComponent *_owner)
+  virtual void SetOwner(iAwsComponent *_owner)
   { owner = _owner; }
 
   /** Adds a component to the layout, returning it's actual rect.  This function needs

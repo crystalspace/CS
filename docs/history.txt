@@ -5,6 +5,8 @@ The history order is reversed so that new features are at the top.
 	  ddraw plugin. The problem is that the -lddraw library link command
 	  is added after the command so it is added after the 'rm'. This is
 	  obviously wrong.
+	- Fixed a compile error in aws. You cannot say 'virtual Func ()'.
+	  You have to specify a return type or 'void'.
 14-Feb-2002
 	- Fixed new gridbag constraints in AWS so that it is an enum
 	  (static const int is not legal in C++) and also renamed
