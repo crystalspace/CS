@@ -69,6 +69,8 @@ chronological order.
 	  being hardcoded to always use CS_JAMCONFIG_PROPERTY() (though they
 	  still default to CS_JAMCONFIG_PROPERTY() if an emitter is not
 	  specified).
+	- res augmented msvcgen with the ability to specify debug versions of
+	  the cflags/lflags/libraries.
 11-May-2004
 	- Eric Sunshine made some clarifications and corrections to the
 	  'simple' tutorial, AWS "getting started", and iGraphics3D Doxygen

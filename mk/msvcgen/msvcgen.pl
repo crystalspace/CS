@@ -59,12 +59,15 @@ $main::opt_g = '';	# Alias for 'target'.
 $main::opt_meta_file = '';
 $main::opt_M = '';	# Alias for 'meta-file'.
 @main::opt_library = ();
+@main::opt_debuglibrary = ();
 @main::opt_L = ();	# Alias for 'library'.
 @main::opt_delaylib = ();
 @main::opt_Y = ();	# Alias for 'delaylib'.
 @main::opt_lflags = ();
+@main::opt_debuglflags = ();
 @main::opt_l = ();	# Alias for 'lflags'.
 @main::opt_cflags = ();
+@main::opt_debugcflags = ();
 $main::opt_output = '';
 $main::opt_fragment = undef;
 @main::opt_depend = ();
@@ -107,12 +110,15 @@ my @script_options = (
     'meta-file=s',
     'M=s',		# Alias for 'meta-file'.
     'library=s@',
+    'debuglibrary=s@',
     'L=s@',		# Alias for 'library'.
     'delaylib=s@',
     'Y=s@',		# Alias for 'delaylib'.
     'lflags=s@',
+    'debuglflags=s@',
     'l=s@',		# Alias for 'lflags'.
     'cflags=s@',
+    'debugcflags=s@',
     'output=s',
     'fragment:s',
     'depend=s@',
@@ -408,16 +414,20 @@ sub interpolate_project {
     	interpolate('%name%', $main::opt_name, \$delaylibs);
     	interpolate('%delaylib%', $delaylib, \$delaylibs);
     }
-    interpolate('%name%',      xmlprotect($main::opt_name),         \$result);
-    interpolate('%project%',   xmlprotect($main::opt_project_name), \$result);
-    interpolate('%makefile%',  xmlprotect($main::makefile),         \$result);
-    interpolate('%target%',    xmlprotect($main::opt_target),       \$result);
-    interpolate('%metafile%',  xmlprotect($main::opt_meta_file),    \$result);
-    interpolate('%libs%',      xmlprotect(\@main::opt_library),     \$result);
-    interpolate('%delaylibs%', xmlprotect($delaylibs), 	            \$result);
-    interpolate('%lflags%',    xmlprotect(\@main::opt_lflags),      \$result);
-    interpolate('%cflags%',    xmlprotect(\@main::opt_cflags),      \$result);
-    interpolate('%groups%',    interpolate_project_groups(),        \$result);
+    interpolate('%name%',      	 xmlprotect($main::opt_name),         \$result);
+    interpolate('%upcasename%',	 xmlprotect(uc($main::opt_name)),     \$result);
+    interpolate('%project%',   	 xmlprotect($main::opt_project_name), \$result);
+    interpolate('%makefile%',    xmlprotect($main::makefile),         \$result);
+    interpolate('%target%',      xmlprotect($main::opt_target),       \$result);
+    interpolate('%metafile%',    xmlprotect($main::opt_meta_file),    \$result);
+    interpolate('%libs%',      	 xmlprotect(\@main::opt_library),     \$result);
+    interpolate('%debuglibs%', 	 xmlprotect(\@main::opt_debuglibrary),\$result);
+    interpolate('%delaylibs%', 	 xmlprotect($delaylibs), 	      \$result);
+    interpolate('%lflags%', 	 xmlprotect(\@main::opt_lflags),      \$result);
+    interpolate('%debuglflags%', xmlprotect(\@main::opt_debuglflags), \$result);
+    interpolate('%cflags%', 	 xmlprotect(\@main::opt_cflags),      \$result);
+    interpolate('%debugcflags%', xmlprotect(\@main::opt_debugcflags), \$result);
+    interpolate('%groups%',      interpolate_project_groups(),        \$result);
     return $result;
 }
 
@@ -611,10 +621,16 @@ sub validate_workspace_options {
 	if $main::opt_meta_file;
     usage_error("The --library option can be used only with --project.")
 	if @main::opt_library;
+    usage_error("The --debuglibrary option can be used only with --project.")
+	if @main::opt_debuglibrary;
     usage_error("The --lflags option can be used only with --project.")
 	if @main::opt_lflags;
+    usage_error("The --debuglflags option can be used only with --project.")
+	if @main::opt_debuglflags;
     usage_error("The --cflags option can be used only with --project.")
 	if @main::opt_cflags;
+    usage_error("The --debugcflags option can be used only with --project.")
+	if @main::opt_debugcflags;
     usage_error("The --fragment option can be used only with --project.")
 	if defined($main::opt_fragment);
     usage_error("The --depend option can be used only with --project.")
@@ -891,13 +907,14 @@ directory named via --template-dir.  The template files appgui.tpl, appcon.tpl,
 plugin.tpl, library.tpl, and group.tpl correspond to the project types
 available via the --template option.  Template files may contain the variables
 \%name\%, \%project\%, \%target\%, \%metafile\%, \%makefile\%, \%groups\%,
-\%libs\%, %delaylibs%, \%lflags\%, and \%cflags\%.  The variables \%name\%,
-\%project\%, \%target\%, \%metafile\%, \%libs\%, \%cflags\%, and \%lflags\% are
-replaced with values specified via the --name, --project-name, --target,
---meta-file, --library, --cflags, and --lflags options, respectively.  The
-\%name\% variable can be used in any template file.  The replacement value for
-\%makefile\% is the same as the name of the generated project file except that
-.mak is substituted for the suffix.
+\%libs\%, \%debuglibs\%, %delaylibs%, \%lflags\%, \%debuglflags\%, \%cflags\%
+and \%debugcflags\%.  The variables \%name\%, \%project\%, \%target\%, \%libs\%, 
+\%debuglibs\%, \%cflags\%, \%debugcflags\%, \%lflags\% and \%debuglflags\% are 
+replaced with values specified via the --name, --project-name, --target, 
+--library, --debuglibrary, --cflags, --debugcflags, --lflags, and --debuglflags 
+options, respectively.  The \%name\% variable can be used in any template file.  
+The replacement value for \%makefile\% is the same as the name of the generated 
+project file except that .mak is substituted for the suffix.
 
 The template prjgroup.tpi is used multiple times to build a value for the
 \%groups\% variable mentioned above.  This template is used to create the file
@@ -1093,6 +1110,13 @@ Project Options:
                  --depend option in that it refers to libraries which exist
                  outside of the project graph, whereas --depend always refers
                  to projects which are members of the project graph.
+    --debuglibrary=<name>
+                 Specifies the name of an extra Windows library with which the
+                 project should be linked in addition to those which are
+                 already mentioned in the template file.  The named library
+                 will become part of the replacement value for the 
+		 \%debuglibs\% variable in the template files. This can be used 
+		 if another set of libraries is to be used for debug purposes. 
     -Y <name>
     --delaylib=<name>
                  Specifies the name of a DLL which should be delay-loaded.  In
@@ -1112,6 +1136,12 @@ Project Options:
                  --lflags option may be specified any number of times, in which
                  case the effects are cumulative, or not at all if no extra
                  linker options are required.
+    --debuglflags=<flags>
+                 Specifies extra linker options which should be used in
+                 addition to those already mentioned in the template file.
+                 This is the replacement value for the \%debuglflags\% variable 
+		 in the project template files.  This can be used if another 
+		 set of flags is to be used for debug purposes.
     -c <flags>
     --cflags=<flags>
                  Specifies extra compiler options which should be used in
@@ -1122,6 +1152,12 @@ Project Options:
                  cumulative, or not at all if no extra compiler options are
                  required.  As an example, a pre-processor macro named
                  __FOOBAR__ can be defined with: --cflags='/D "__FOOBAR__"'
+    --cflags=<flags>
+                 Specifies extra compiler options which should be used in
+                 addition to those already mentioned in the template file.
+                 This is the replacement value for the \%debugcflags\% 
+		 variable in the project template files.  This can be used 
+		 if another set of flags is to be used for debug purposes.
     -f
     -f <path>
     --fragment

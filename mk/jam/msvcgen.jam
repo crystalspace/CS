@@ -701,14 +701,53 @@ rule MsvcLFlags
   if $(>) { LFLAGS on $($(<)_TARGET) += $(>) ; }
 }
 
+rule MsvcExternalDebugLibrary
+{
+  if $(>) { DEBUGLIBRARIES on $($(<)_TARGET) += $(>) ; }
+}
+
+rule MsvcDebugCFlags
+{
+  if $(>) { DEBUGCFLAGS on $($(<)_TARGET) += $(>) ; }
+}
+
+rule MsvcDebugLFlags
+{
+  if $(>) { DEBUGLFLAGS on $($(<)_TARGET) += $(>) ; }
+}
+
 rule ExternalLibs
 {
   local i ;
   for i in $(>)
   {
     MsvcCFlags $(<) : $($(i).CFLAGS) ;
+    if $($(i).CFLAGS.DEBUG)
+    {
+      MsvcDebugCFlags $(<) : $($(i).CFLAGS.DEBUG) ;
+    }
+    else
+    {
+      MsvcDebugCFlags $(<) : $($(i).CFLAGS) ;
+    }
     MsvcLFlags $(<) : $($(i).LFLAGS) ;
+    if $($(i).LFLAGS.DEBUG)
+    {
+      MsvcDebugLFlags $(<) : $($(i).LFLAGS.DEBUG) ;
+    }
+    else
+    {
+      MsvcDebugLFlags $(<) : $($(i).LFLAGS) ;
+    }
     MsvcExternalLibrary $(<) : $($(i).LIBS) ;
+    if $($(i).LIBS.DEBUG)
+    {
+      MsvcExternalDebugLibrary $(<) : $($(i).LIBS.DEBUG) ;
+    }
+    else
+    {
+      MsvcExternalDebugLibrary $(<) : $($(i).LIBS) ;
+    }
     
     if $($(<)_TYPE) = library
     {
@@ -750,6 +789,9 @@ actions MsvcProjectGen
   --library=$(LIBRARIES) \
   --lflags='$(LFLAGS)' \
   --cflags='$(CFLAGS)' \
+  --debuglibrary=$(DEBUGLIBRARIES) \
+  --debuglflags='$(DEBUGLFLAGS)' \
+  --debugcflags='$(DEBUGCFLAGS)' \
   --strip-root='$(MSVCGEN_STRIP_ROOT)' \
   --accept='$(ACCEPTS)' \
   --reject='$(REJECTS)' \
