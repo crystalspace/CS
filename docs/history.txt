@@ -27,6 +27,8 @@ chronological order.
 	  for all textures.
 	- Jorrit simplified the code of the NR OpenGL texture cache a bit now
 	  that it is no longer a cache.
+	- Jorrit implemented the 'no copy' mode for software vertex buffers.
+	  Genmesh now uses that mode.
 29-Sep-2004
 	- Rhad changed csMutexes in the windows software driver to
 	  critical sections.  Per MMsystem documentation, critical sections

@@ -1304,7 +1304,7 @@ void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
       if (!vertex_buffer)
         vertex_buffer = g3d->CreateRenderBuffer (
             sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
-            CS_BUFCOMP_FLOAT, 3);
+            CS_BUFCOMP_FLOAT, 3, false);
       const csVector3* mesh_vertices = AnimControlGetVertices ();
       if (!mesh_vertices) mesh_vertices = factory->GetVertices ();
       vertex_buffer->CopyToBuffer (
@@ -1317,7 +1317,7 @@ void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
       if (!texel_buffer)
         texel_buffer = g3d->CreateRenderBuffer (
             sizeof (csVector2)*num_mesh_vertices, CS_BUF_STATIC,
-            CS_BUFCOMP_FLOAT, 2);
+            CS_BUFCOMP_FLOAT, 2, false);
       const csVector2* mesh_texels = AnimControlGetTexels ();
       if (!mesh_texels) mesh_texels = factory->GetTexels ();
       texel_buffer->CopyToBuffer (
@@ -1330,7 +1330,7 @@ void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
       if (!normal_buffer)
         normal_buffer = g3d->CreateRenderBuffer (
             sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
-            CS_BUFCOMP_FLOAT, 3);
+            CS_BUFCOMP_FLOAT, 3, false);
       const csVector3* mesh_normals = AnimControlGetNormals ();
       if (!mesh_normals) mesh_normals = factory->GetNormals ();
       normal_buffer->CopyToBuffer (
@@ -1363,7 +1363,7 @@ void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
           color_buffer = g3d->CreateRenderBuffer (
               sizeof (csColor) * num_lit_mesh_colors, 
 	      do_lighting ? CS_BUF_DYNAMIC : CS_BUF_STATIC,
-              CS_BUFCOMP_FLOAT, 3);
+              CS_BUFCOMP_FLOAT, 3, false);
         }
         mesh_colors_dirty_flag = false;
         const csColor* mesh_colors = 0;
@@ -1385,7 +1385,7 @@ void csGenmeshMeshObject::PreGetShaderVariableValue (csShaderVariable* var)
           //  the existing buffer.
           color_buffer = g3d->CreateRenderBuffer (
               sizeof (csColor) * factory->GetVertexCount(), CS_BUF_STATIC,
-              CS_BUFCOMP_FLOAT, 3);
+              CS_BUFCOMP_FLOAT, 3, false);
         }
         mesh_colors_dirty_flag = false;
         const csColor* mesh_colors = 0;
@@ -1794,7 +1794,7 @@ void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (
       if (!vertex_buffer)
         vertex_buffer = g3d->CreateRenderBuffer (
           sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 3);
+          CS_BUFCOMP_FLOAT, 3, false);
       mesh_vertices_dirty_flag = false;
       vertex_buffer->CopyToBuffer (
         mesh_vertices, sizeof(csVector3)*num_mesh_vertices);
@@ -1809,7 +1809,7 @@ void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (
       if (!texel_buffer)
         texel_buffer = g3d->CreateRenderBuffer (
           sizeof (csVector2)*num_mesh_vertices, CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 2);
+          CS_BUFCOMP_FLOAT, 2, false);
       mesh_texels_dirty_flag = false;
       texel_buffer->CopyToBuffer (
         mesh_texels, sizeof (csVector2)*num_mesh_vertices);
@@ -1824,7 +1824,7 @@ void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (
       if (!normal_buffer)
         normal_buffer = g3d->CreateRenderBuffer (
           sizeof (csVector3)*num_mesh_vertices, CS_BUF_STATIC,
-          CS_BUFCOMP_FLOAT, 3);
+          CS_BUFCOMP_FLOAT, 3, false);
       mesh_normals_dirty_flag = false;
       normal_buffer->CopyToBuffer (
         mesh_normals, sizeof (csVector3)*num_mesh_vertices);

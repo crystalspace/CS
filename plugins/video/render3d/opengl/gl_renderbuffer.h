@@ -102,6 +102,7 @@ class csSysRenderBuffer : public csGLRenderBuffer
 private:
   void *buffer;
   bool locked;
+  bool iscopy;
 public:
   csSysRenderBuffer (void *buffer, size_t size, csRenderBufferType type,
     csRenderBufferComponentType comptype, int compcount) :
@@ -109,6 +110,16 @@ public:
   {
     csSysRenderBuffer::buffer = buffer;
     locked = false;
+    // We have a buffer from another source. Don't delete that.
+    if (buffer)
+    {
+      iscopy = true;
+    }
+    else
+    {
+      iscopy = false;
+      nodelete = true;
+    }
   }
 
   virtual ~csSysRenderBuffer ()
@@ -132,7 +143,10 @@ public:
 
   virtual void CopyToBuffer(const void *data, size_t length)
   {
-    memcpy(buffer, data, length);
+    if (iscopy)
+      memcpy (buffer, data, length);
+    else
+      buffer = (void*)data;
   }
 
   virtual void* RenderLock (csGLRenderBufferLockType type);

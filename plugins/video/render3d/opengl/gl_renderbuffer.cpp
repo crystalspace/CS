@@ -108,8 +108,10 @@ csPtr<iRenderBuffer> csGLGraphics3D::CreateRenderBuffer (size_t size,
   }
   else
   {
+    char* buf = 0;
+    if (copy) buf = new char[size];
     csSysRenderBuffer *buffer = new csSysRenderBuffer (
-      new char[size], size, type, componentType, componentCount);
+      buf, size, type, componentType, componentCount);
     return csPtr<iRenderBuffer> (buffer);
   }
   return csPtr<iRenderBuffer> (0);
