@@ -1,5 +1,9 @@
 The history order has been reversed so that new features are at the top.
 
+3-Oct-2000
+	- Eric Sunshine replaced out-of-date crystalspace.console.stdout
+	  references in several programs (nstp, perfest, ttffnt) with new
+	  crystalspace.console.output.standard.
 2-Oct-2000
 	- Andrew Zabolotny did the following changes to CS:
 	    - Overhauled the csIniFile class. There is now a new
