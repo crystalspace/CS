@@ -18,6 +18,8 @@ chronological order.
 	  was initialized with 256,256,256. However csRGBpixel can only hold
 	  unsigned char and 256 wraps to 0 then. This could cause performance
 	  degradation.
+	- Anders added a color buffer to bruteblock, currently just initialized 
+	  with (0.5, 0.5, 0.5) to avoid overbright terrain.
 26-May-2004
 	- Keith fixed bug in HitBeam code which assumed that all meshes for
 	  a sprcal3d were attached to the model instance.  This is not required.
