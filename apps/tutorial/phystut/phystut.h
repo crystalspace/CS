@@ -34,7 +34,6 @@ struct iSector;
 struct iView;
 struct iDynamics;
 struct iDynamicSystem;
-struct iDynamicsMoveCallback;
 struct iRigidBody;
 struct iJoint;
 struct iMeshFactoryWrapper;
@@ -53,7 +52,6 @@ private:
 
 	iDynamics* dyn;
   iDynamicSystem* dynSys;
-  iDynamicsMoveCallback* moveCallback;
   iMeshFactoryWrapper* boxFact;
   iMeshFactoryWrapper* ballFact;
 

@@ -82,7 +82,8 @@ struct iDynamicSystem : public iBase
   /// Remove a joint from the simulation
   virtual void RemoveJoint (iJoint* joint) = 0;
 
-  virtual iDynamicsMoveCallback* CreateDefaultMoveCallback () = 0;
+  /// Get the default move callback.
+  virtual iDynamicsMoveCallback* GetDefaultMoveCallback () = 0;
 };
 
 SCF_VERSION (iDynamicsMoveCallback, 0, 0, 1);
@@ -208,7 +209,10 @@ struct iRigidBody : public iBase
   /// Attach a bone to this body
   virtual void AttachBone (iSkeletonBone* bone) = 0;
 
-  /// Set a callback to be executed when this body moves
+  /**
+   * Set a callback to be executed when this body moves.
+   * If NULL, no callback is executed.
+   */
   virtual void SetMoveCallback (iDynamicsMoveCallback* cb) = 0;
 
   /// Update transforms for mesh and/or bone

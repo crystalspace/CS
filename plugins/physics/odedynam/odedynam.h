@@ -134,6 +134,7 @@ private:
   dSpaceID spaceID;
 
   iCollideSystem* collidesys;
+  iDynamicsMoveCallback* move_cb;
 
   csObjVector bodies;
   csObjVector joints;
@@ -159,7 +160,7 @@ public:
   iJoint* CreateJoint ();
   void RemoveJoint (iJoint* joint);
 
-  iDynamicsMoveCallback* CreateDefaultMoveCallback ();
+  iDynamicsMoveCallback* GetDefaultMoveCallback () { return move_cb; }
 };
 
 /**

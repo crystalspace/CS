@@ -233,7 +233,8 @@ csODEDynamicSystem::csODEDynamicSystem ()
 
   worldID = dWorldCreate ();
   spaceID = dHashSpaceCreate ();
-  dWorldSetCFM (worldID,1e-5); 
+  dWorldSetCFM (worldID,1e-5);
+  move_cb = (iDynamicsMoveCallback*)new csODEDefaultMoveCallback ();
 }
 
 csODEDynamicSystem::~csODEDynamicSystem ()
@@ -241,12 +242,14 @@ csODEDynamicSystem::~csODEDynamicSystem ()
   SCF_DEC_REF (collidesys);
   dSpaceDestroy (spaceID);
   dWorldDestroy (worldID);
+  if (move_cb) move_cb->DecRef ();
 }
 
 iRigidBody* csODEDynamicSystem::CreateBody ()
 {
   csODERigidBody* body = new csODERigidBody (this);
   bodies.Push (body);
+  body->SetMoveCallback(move_cb);
   return (iRigidBody*)body;
 }
 
@@ -277,11 +280,6 @@ const csVector3 csODEDynamicSystem::GetGravity () const
   dVector3 grav;
   dWorldGetGravity (worldID, grav);
   return csVector3 (grav[0], grav[1], grav[2]);
-}
-
-iDynamicsMoveCallback* csODEDynamicSystem::CreateDefaultMoveCallback ()
-{
-  return (iDynamicsMoveCallback*)new csODEDefaultMoveCallback ();
 }
 
 void csODEDynamicSystem::Step (float stepsize)
