@@ -148,6 +148,15 @@
 	</OpenGL>
       </Video>
     </config>
+    <config name="enableIntensityBlendText">
+      <Video>
+	<OpenGL>
+	  <FontCache>
+	    <UseIntensityBlend>yes</UseIntensityBlend>
+	  </FontCache>
+	</OpenGL>
+      </Video>
+    </config>
     <config name="nolinearfog">
       <Video>
 	<ShaderManager>
@@ -273,6 +282,7 @@
       </conditions>
       <applicable>
 	<usecfg>nolinearfog</usecfg>
+	<usecfg>enableintensityblend</usecfg>
       </applicable>
     </rule>
     <!--

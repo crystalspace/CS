@@ -16,6 +16,9 @@ chronological order.
 		- less then distance 20: skip 4 frames
 		- less then distance 50: skip 20 frames
 		- more then 50: skip 1000 frames
+	- res tweaked the GL text drawing settings; the somewhat problematic
+	  method to use the GL_BLEND method together with a GL_INTENSITY
+	  texture is now disabled by default.
 27-Dec-2004
 	- Eric Sunshine applied a fix to csXWindow::HandleEvent(), loosely
 	  based upon a patch submitted by Seth Yastrov <syastrov@gmail.com>,
