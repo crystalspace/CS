@@ -344,9 +344,17 @@ int VideoSystem::Open ()
     AppertureSize = 0x10000;
     int xmode = VideoMode & 0xfff;
     ScreenSize = XModeTable [xmode].Width * XModeTable [xmode].Height * 1;
-    PageSize = 0x8000;
+    if (ScreenSize / 4 <= 0x8000)
+    {
+      PageSize = 0x8000;
+      VideoPages = 2;
+    }
+    else
+    {
+      PageSize = 0xffff;
+      VideoPages = 1;
+    }
     BytesPerScanLine = XModeTable [xmode].Width / 4;
-    VideoPages = 2;
     SetXmode (xmode);
   }
   else
