@@ -2,11 +2,14 @@
 #define __IVARIA_AWS_H__
 
 #include "csutil/scf.h"
+#include "cssys/system.h"
 #include "csgeom/csrect.h"
 #include "iutil/string.h"
 
 struct iAws;
 struct iAwsPrefs;
+class  awsWindow;
+class  awsComponentNode;
             
 
 SCF_VERSION (iAws, 0, 0, 1);
@@ -19,6 +22,12 @@ public:
 
   /// Set the preference manager used by the window system
   virtual void       SetPrefMgr(iAwsPrefs *pmgr)=0;
+
+  /// Get the top window
+  virtual awsWindow *GetTopWindow()=0;
+
+  /// Set the top window
+  virtual void       SetTopWindow(awsWindow *win)=0;
 };
 
 
@@ -53,6 +62,16 @@ public:
 
   /// Lookup the value of a rect key by id (from the skin def)
   virtual bool LookupRectKey(unsigned long id, csRect &rect)=0; 
+
+  /// Get the an integer from a given component node
+  virtual bool GetInt(awsComponentNode *node, char *name, int &val)=0;
+
+  /// Get the a rect from a given component node
+  virtual bool GetRect(awsComponentNode *node, char *name, csRect &rect)=0;
+
+  /// Get the value of an integer from a given component node
+  virtual bool GetString(awsComponentNode *node, char *name, iString *&val)=0;
+
 };
 
 #endif // __IVARIA_AWS_H__
