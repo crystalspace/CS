@@ -2251,6 +2251,11 @@ The history order is reversed so that new features are at the top.
 	  scripts.  Typically, its value is the same as SHELL, but some
 	  platforms may need to change it.  For example, on Windows, if SHELL
 	  is COMMAND.COM or CMD.EXE, then RUN_SCRIPT may be set to "bash".
+	- Philip Wyett updated MSVC_libs to naming of other msvc_libs.
+	  This version also features latest Freetype 2.1.2.
+	- Ryan Surkamp extended bcterr with some functions for level editors.
+	  Changed system lod usage. Fixed materials->IncRef() and DecRef().
+	  Added support to change control points at runtime.
 23-Jul-2002
 	- Both walktest and cslight now support the 'cache:' keyword
 	  on the commandline. If this keyword is given then the lightmap
@@ -2263,10 +2268,39 @@ The history order is reversed so that new features are at the top.
 	- The engine will now store 'precalc_info' in the cache manager
 	  instead of VFS (as it should have done a long time ago).
 	  It is also now called 'lm_precalc_info'.
+	- Matthias Braun fixed a warning in aws and disabled RectRegionDebug
+	  class because it only gives unresolved symbols on linux.
+	- Noah Falk removed background drawing from the bitmap style in AWS.
+	- Ryan Surkamp added CorrectSeams support and control point
+	  manipulation (to bcterr). Untested until he creates a sample level.
 22-Jul-2002
 	- Also extended cslight tool with the ability to load multiple
 	  maps and thus calculate lighting for all maps together. Note that
 	  lightmaps will go to the cache of the last specified level for now.
+	- David M. Asbell updated 3D sprites so they look in the direction
+	  of the normal associated with the triangle specified in the sprite
+	  socket that it is attached to. Also removed some test code and
+	  extra csMatrix3 that was not needed.
+	- Daniel Duhprey fixed ogl_g3dext.cpp to point to right .h.
+	- 'res' did the following:
+	    - When doing CS_EXTENSIVE_MEMDEBUG w/ MSVC the crt's
+	      built-in memory debugging support for filename/line is used.
+	    - CS_EXTENSIVE_MEMDEBUG defined for MSVC 7 debug builds by
+	      default.
+	    - Fixed a very stupid typo that disbaled the whole MSVC debug
+	      stuff (duh!)
+	    - Fix so that memdebug.cpp w/ CS_EXTENSIVE_MEMDEBUG actually
+	      compiles.
+	    - When using MSVC w/ ext. memdebug malloc() will record
+	      filename/line as well.
+	    - Changed header inclusion in gl-ext so it compiles with MSVC.
+	    - MSVC debug: calloc records filename/line now as well.
+	    - Fixed a few line endings in caltocs.
+	- Ryan Surkamp added a feature to groupmaterial (bcterr).
+	- Ryan finally fixed material coordinate bug on edges in bcterr.
+	- Ryan also fixed the cpu limiter and edited HeightTestExt.
+	- Philip Wyett fixed the gl-ext makefile so it no longer wildcards
+	  for .hpp files.
 21-Jul-2002
 	- Renamed new ogl_g3dext.hpp to ogl_g3dext.h.
 	- Added a new feature to walktest. You can now say:
@@ -2283,6 +2317,46 @@ The history order is reversed so that new features are at the top.
 	    walktest flarge room
 	  it will not be able to load lights from flarge cache but only the
 	  lights from room. I will try to find a solution for this later.
+	- Thomas H. Hendrick <thomash@users.sourceforge.net> started work
+	  on the new OpenGL_ext renderer.
+	- Philip Wyett fixed the clean target of the new OpenGL_ext
+	  renderer.
+	- Noah Falk changed all the awsKey and KeyContainer classes over
+	  to use an iXXX equivalent for the public API. This should fix the
+	  build problems with awsecomp.h on external apps. Also I fixed
+	  awstest to properly set up the engine view component. Finally I
+	  added the csRectRegionDebug class and used it to fully debug
+	  csRectRegion which had bugs in both Include() and Exclude(). As
+	  best I can tell it is now bug-free.
+	- Ryan Surkamp added iTerrFunc, and iPolygonMesh (to bcterr). Will be
+	  creating a sample level, cleanup code, and get shared lod working
+	  correctly again(design change). Still need to create a way to
+	  determin max_LOD and use max_LOD. Still not lit. Edited draw
+	  function, will be rewriting it soon. Will also be adding visibility
+	  culling into the quadtree?
+	- 'res' fixed DLLWRAPWRAP under cmd.
+20-Jul-2002
+	- 'res' added workarounds for crash & weird artifacts with
+	  freefont 2.1.2 (maybe someone with a little more knowledge 
+	  about freetype than I have should find out the real cause).
+	- Philip Wyett encapsulated the recently added crtdbg.h (msvc only
+	  header) so it is only read into MSVC compiles (for freefnt2).
+	- Philip did a minor fix to make line to invoke FreeType 2 font
+	  server correct (data/config/walktest.cfg).
+	- Philip updated links to msvc_libs (updated for FreeType 2.1.2).
+	- Ryan Surkamp fixed texture coordinates to work with height
+	  generated textures. The seems are still bugged but that isn't
+	  my plugins fault (bcterr).
+	- Ryan also added high level interface for bcterr. Will also be adding
+	  iTerrFunc soon to work with Walktest.
+	- Ryan added material group support to bcterr and also a feww more
+	  collision interfaces.
+	- 'res removed the include of crtdbg.h completely (leftover from some
+	  debugging I did).
+	- Philip Wyett re-ordered close of GLX 2d canvas. This fixes a bug when
+	  quitting walktest from fullscreen. This involved the NVidia driver
+	  freaking out re-probing and returning you back to the Linux login
+	  screen.
 19-Jul-2002
 	- Got a new tutorial from Hariharan Bhasker. This tutorial
 	  shows how to use the csPath class in csgeom to smoothly move
@@ -2300,6 +2374,19 @@ The history order is reversed so that new features are at the top.
 	  can be found in plugins/mesh/bcterr.
 	- Fixed a new memory leak in iPluginManager::LoadPlugin() when
 	  it would load the same plugin a second time.
+	- Philip Wyett fixed include in milk2spr after filename change.
+	  Additionally fixed some other compile errors there.
+	- Philip also updated .cvsignore to add mng headers from latest
+	  msvc_libs.
+	- Philip fixed a type and addes tests of new gcvs beta for -m bug
+	  fix (documentation).
+	- 'res' added .cvsignore for vc7 project files.
+	- 'res' fixed an error in the caltocs documentation found by
+	  Scott DC <beuja@iinet.net.au>.
+	- Ryan Surkamp added collision detection using quadtrees to
+	  the bcterr landscape engine (currently unsupported by all apps).
+	- Ryan also added HeightTest() function to bcterr interface.
+	- Philip Wyett removed entry for 'ggi' canvas from linux.mak.
 18-Jul-2002
 	- Steven Geens fixed a bad bug in the RAPID collision detection
 	  plugin. It now seems to work properly in all cases regardless
@@ -2309,6 +2396,11 @@ The history order is reversed so that new features are at the top.
 	- Added iTerrFuncState::GetHeightFunction() and GetNormalFunction()
 	  so that you can retrieve the functions used by the landscape
 	  engine.
+	- Philip Wyett added jng plugin to MSVC port.
+	- 'res' activated dllwrapwrap (to work around that dllwrap bug
+	  that symbols in libs aren't exported properly). tested it
+	  on win2k with both cmd and bash as shell, works for me.
+	- Daniel Duhprey added new group handling to ODE dynamics.
 17-Jul-2002
 	- Added unittest for RAPID plugin. Extended unittest app so that it
 	  calls this unittest. This test now fails but I don't know why.
@@ -2333,6 +2425,13 @@ The history order is reversed so that new features are at the top.
 	  is actually able to convert skeletal information! It has not been
 	  tested a lot though. Thanks to Steven Geens <old_belge@hotmail.com>
 	  for making this.
+	- Norman Kramer renamed msModel.h to msmodel.h (milk2spr).
+	- Daniel Duhprey fixed ODE dynamics plugin to optimize statics
+	  so they don't collide (no reason to check it since they will
+	  not respond to collision anyway).
+16-Jul-2002
+	- Brandon Ehle fixed caltocs so it only writes texture coordinates
+	  if they are available.
 15-Jul-2002
 	- Fixed a compiler error in spr3d by rearranging the code a little
 	  bit.
@@ -2351,13 +2450,68 @@ The history order is reversed so that new features are at the top.
 	  I reverted back to version 1.81.
 	- Reverted my own reversion of graph2d.cpp. Don't know why it didn't
 	  work at first.
+	- Philip Wyett fixed a compile error under Linux (SDL).
+	- Philip Wyett messed a bit with the star plugin.
+	- Daniel Duhprey fixed ODE dynamics plugin to use the grouping
+	  advantage of ODE for speedups.
+14-Jul-2002
+	- David M. Asbell <dasbell@users.sourceforge.net> added support
+	  for SpriteSockets, a mechanism for attaching sprites to specific
+	  places on other sprites. Also added support for reading and writing
+	  sprite sockets in ASCII loader.
+	- Daniel Duhprey added a fix to the line collision from John
+	  Jarger (ODE dynamics plugin).
+	- Matt Reda fixed OpenGL clipping in DrawPixel (for general OpenGL
+	  canvas code).
+	- Matt also fixed an instance where the clip rect was still being
+	  set to (0,0,Width,Height) instead of (0,0,Width-1,Height-1) in
+	  common/graph2d.cpp.
+	- Peter Amstutz fixed a bug in instantiating a second copy of a textbox
+	  in AWS.
+	- Noah Falk made fixes to aws embedded components. They should now
+	  be usable again. Also added a sample embedded component to awstest
+	  to make future testing easier and as a very simple instructive sample.
+	- Matt Reda reverted his earlier changes to the clipping rect, but also
+	  fixed the calls in csGraphics2D::Resize().
+	- Matt fixed two clipping calls in OpenGL's Resize() function.
+13-Jul-2002
+	- 'res' fixed broken loading of some images in png loader.
+	- 'res' also fixed a bug when stripping alpha from paletted images.
 12-Jul-2002
 	- csPluginManager::LoadPlugin() is now a bit smarter. If a plugin
 	  is already on the plugin list it will not add it anymore. So you
 	  can now safely do CS_LOAD_PLUGIN multiple times to create multiple
 	  instances of the same plugin.
+	- 'res' fixed PNG image loader to have better handling of tRNS.
+	- Matthias Braun changed Execute prototype in AWS and temporarily
+	  added GetThisNode() to iAwsKeyFactory because it is needed for
+	  creating external components.
+11-Jul-2002
+	- Mathew Sutcliffe caused csTime to become useful outside of CSWS
+	  by overloading the constructor to allow its parent to be
+	  an iEventHandler or an iEventQueue.
+	- Daniel Duhprey fixed ODE dynamics plugin to have more robust
+	  handling for sharp corners.
+	- Noah Falk changed the common canvas clipping code and added some
+	  tests to g2dtest. Also made small bug fixes to AWS including
+	  frame property, embedded components, some graphical changes
+	  for fsBitmap, and making labels not pressable.
 10-Jul-2002
 	- Further work on levtool.
+	- Peter Amstutz added support for converting quaternions to matrices.
+	  Fixed bug in matrix to quaternion code, and added methods to convert
+	  to/from axis-angle representation from quaternions.
+	- Peter also fixed bugs in Normalize(), added Invert() and prototypes
+	  for converting to a matrix, and to/from axis-angle representation
+	  (quaternions).
+	- 'res' did the following:
+	    - Added requirement for missing JPEG libs to jngio.mak.
+	    - Some fixes to makefiles (jng).
+	    - Turned off CMS use in jng.
+	    - Vertex normals are now calculated from the 3ds smoothing
+	      information. (however this information is not honored. vertex
+	      normals are unnecessarily recalculated at a later point.
+	      Need to investigate a bit more).
 9-Jul-2002
 	- DynaVis now correctly does frustum culling in mirrored sectors.
 	  Apparently the fix that I did yesterday for FrustVis has the
@@ -2411,10 +2565,28 @@ The history order is reversed so that new features are at the top.
 	  that case. Seems that DynaVis still has some problems though.
 	- Removed csSector::GetVisibleObjects() since that is no longer
 	  needed (there is always a culler to do this work now).
+	- Brandon Ehle did the following in caltocs:
+	    - Fixed a bug regarding windows and mac text .cfg files.
+	    - Fixed a bug with GCC that does not include stdc++ by default.
+	- Chrisopher Nelson did the following:
+	    - Committed fix for an error that was found by Craig Ching.
+	    - Committed the changes posted by Andrew Craig. Also fixed
+	      my previous fix from Craig Ching.
+	    - Added a comment which notes the possible problem noted by
+	      Craig Ching and Peter Amstutz.
+	- 'res' did the following:
+	    - Jng plugin can now save as well.
+	    - Gfxtest crashed when image saver plugin returned NULL.
+	    - Gfxtest: output filename when saving is now optional.
+	    - csMemFile::GetAllData() created a databuffer with the buffer just
+	      freed.
+	    - Small change in one of the png plugin comments.
 7-Jul-2002
 	- csSector::GetVisibleObjects() now uses the efficient
 	  csIntersect3::BoxFrustum() routine. This also fixes a bug
 	  because the old code was actually not always correct.
+	- 'res' added image loader for JNG format (JPEG with alpha channel).
+	  This uses libmng.
 6-Jul-2002
 	- Removed -fno-rtti from comptest.sh. So this option will no
 	  longer be used from the moment you do 'make linux' again.
@@ -2436,6 +2608,15 @@ The history order is reversed so that new features are at the top.
 	  designed with Dynavis in mind so it will export seperate objects
 	  in 3dsMax as seperate objects in CS. Thanks to Luca Pancallo for
 	  creating this very useful script!
+	- Daniel Duhprey fixed some problems with the mesh colliders in the
+	  ODE dynamics plugin.
+	- 'res' did the following:
+	    - Fixed a crash in CSWS when it was attempting to display
+	      empty directories.
+	    - When parsing fails (in csParser::GetObject()) *name and
+	      *data become NULL (was assumed in some places).
+	    - Name and data can be NULL in ase this information is not
+	      wanted.
 3-Jul-2002
 	- Added non-functional iEngine->GetVisibleObjects(). The purpose
 	  of this routine will be to return all potentially visible objects
@@ -2451,12 +2632,16 @@ The history order is reversed so that new features are at the top.
 	  documentation for the loader plugins. This means that everything
 	  that is INSIDE a PARAMS block is not documented by this documentation.
 	- Matze did some aws cleanups:
-		-reindented some stuff
-		-rewrote some parts of the parser
-		-changed some char* into const char*
-		-changed lots of stuff that used iString* before, but since
-			everyone was using iString* without care (LEAKS!)
-			I changed most of this stuff to const char*
+		- Reindented some stuff
+		- Rewrote some parts of the parser
+		- Changed some char* into const char*
+		- Changed lots of stuff that used iString* before, but since
+		  everyone was using iString* without care (LEAKS!)
+		  I changed most of this stuff to const char*
+		- Fixed a bug in connection parsing.
+	- Daniel Duhprey added a collision callback mechanism to the
+	  ODE dynamics plugin.
+	- 'res' fixed two parameters of awsParser. They had the same name.
 2-Jul-2002
 	- Removed an obsolete feature to show the c-buffer in walktest.
 	- Removed db_cbuffer console command in walktest.
@@ -2473,6 +2658,13 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in iDynLight->GetNext(). It would actually try to
 	  get the iDynLight from a NULL csDynLight pointer.
 	- Removed isoldr.h from the plugins dir.
+	- Toni reports:
+	    Little optimization for DPM.
+	    With previous implementation all the lightmap in a FASTMESH
+	    superlightmap were recalculated (because a dynamic light could
+	    affect the mesh). Now the mesh polybuffer is marked as lightmaps
+	    dirty and only when the mesh has dirty lightmaps recalculates the
+	    superlightmap.
 1-Jul-2002
 	- Extended both iShadowCaster and iShadowReceiver with iMovable
 	  parameter.
@@ -2498,6 +2690,8 @@ The history order is reversed so that new features are at the top.
 	  CS_QUERY_REGISTRY and CS_QUERY_REGISTRY_TAG will also benefit
 	  from this optimization.
 	- Updated apimod96.txi for this change.
+	- Mathew Sutcliffe added info on how to implement sliding along
+	  walls to the collision detection howto.
 30-Jun-2002
 	- Thing mesh objects now implement iShadowCaster.
 	  csSector::CheckFrustum() will now use that instead of directly
@@ -2505,10 +2699,43 @@ The history order is reversed so that new features are at the top.
 	- Further work on using iShadowCaster instead of iThingState.
 	  Also fixed a bug with checking of the flags for enabling
 	  and disabling shadows.
+	- Philip Wyett did the following:
+	    - Added user.cfg to distclean.
+	    - Added a line which will expand MSVC post build macros in
+	      apps and plugins and copy them to
+	      'CS\mk\visualc\post_build_debug.txt'. Could people who are
+	      having failures in the post build step copy to 'CS\' root
+	      directory please do a debug build and then send me the file
+	      'post_build_debug.txt' attached to an email to
+	      philipwyett@dsl.pipex.com.
+	- Removed user.cfg from distclean again.
+	- Norman Kramer reports:
+	    Ok, I feel better now 6 hours after the 0:2 defeat to Brazil.
+	    Although the german team delivered their best performance Brazil
+	    proved how important are the genial soloist. Congrats.
+	    Oh btw, I fixed a circular ref counting problem with uv
+	    animations.
+	- Norman also fixed another missing DecRef() in the loader if the
+	  crossbuilder is used and also fixed incref/decref of the window-
+	  manager inside the embedded component factory.
 29-Jun-2002
 	- Removed the dependency on iSector from iShadowBlock and
 	  iShadowBlockList. This means that it is now easier to use
 	  iShadowBlock outside the engine (i.e. from within Dynavis soon).
+28-Jun-2002
+	- 'res' made some Doxygen grouping changes and also some changes
+	  to the MSVC7 project file generation.
+	- 'res' did some changes to compile CS with gcc 3.1:
+	    - Replaced alloca()'s with ALLOC_STACK_ARRAY.
+	    - Added a typecast in win32 loadlib.cpp.
+	- Christopher Nelson did the following:
+	    - Button was not hiding properly.
+	    - Frame styles were not registered.
+	    - Fixed def file to have more pleasing results.
+	    - Added a new type "Opaque" to the flexible parameter list.
+	- Daniel Duhprey fixed a couple joint issues (looks at rotConstraint
+	  for hinges now). Implemented MeshBox and MeshSphere collisions
+	  (odedynamics plugin).
 27-Jun-2002
 	- Eric Sunshine fixed a significant number of problems in the Texinfo
 	  source files.  Also eliminated all TeX overfull and underfull 'hbox'
@@ -6221,7 +6448,7 @@ updated3-Jun-2002
 	- Eric Sunshined changed the next2d canvas so that it no longer bothers
 	  to register the iEventHandler implementor with the event queue in
 	  NeXTDriver2D::Initialize(), since its superclass'
-	  csGrahpics2D::Initialize() already does so.  (No need to register the
+	  csGraphics2D::Initialize() already does so.  (No need to register the
 	  same event handler twice.)
 	- Eric Sunshine eliminated several compilation warnings from AWS.
 	- 'res' did a fix to the png image loader.

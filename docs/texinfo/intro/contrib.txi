@@ -58,6 +58,12 @@ steps to porting Crystal Space to @sc{dos}.  Parts of his code are still
 present in the current version.
 
 @item
+David M. Asbell (@email{dasbell@@users.sourceforge.net})
+
+David added support for SpriteSockets, a mechanism for attaching sprites
+to specific places on other sprites.
+
+@item
 David N. Arnold (@email{derek_arnold@@fuse.net})
 
 David enhanced the @sc{dos} port made by Murat.  He added C++ classes and
@@ -359,6 +365,11 @@ Visual C++ for Windows 95 and also contributed a few small patches to the
 Windows 95 version.  He also contributed up-to-date project files for Visual
 C++.  He also ported Crystal Space to the Glide @sc{api} (together with
 Nathaniel)!
+
+@item
+Thomas H. Hendrick (@email{thomas@@users.sourceforge.net})
+
+Thomas started work on the new OpenGL_ext renderer.
 
 @item
 Thomas Ogbuji, Chimezie (@email{thomasog@@uiuc.edu})
