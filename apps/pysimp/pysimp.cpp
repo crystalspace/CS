@@ -64,25 +64,11 @@ PySimple *System;
 
 PySimple::PySimple ()
 {
-  view = NULL;
-  engine = NULL;
   motion_flags = 0;
-  LevelLoader = NULL;
-  myG3D = NULL;
-  kbd = NULL;
-  vc = NULL;
 }
 
 PySimple::~PySimple ()
 {
-  SCF_DEC_REF (vc);
-  SCF_DEC_REF (myG3D);
-  if (view)
-    delete view;
-  if (LevelLoader)
-    LevelLoader->DecRef();
-  if (kbd)
-    kbd->DecRef();
 }
 
 void PySimple::Report (int severity, const char* msg, ...)
@@ -299,7 +285,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  view = new csView (engine, myG3D);
+  view = csPtr<iView> (new csView (engine, myG3D));
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 2, 0));
   iGraphics2D* g2d = myG3D->GetDriver2D ();

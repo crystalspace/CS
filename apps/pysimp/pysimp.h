@@ -23,7 +23,7 @@
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 
-class csView;
+struct iView;
 struct iSector;
 struct iEngine;
 struct iLoader;
@@ -36,13 +36,13 @@ struct iEvent;
 class PySimple
 {
 public:
-  csView* view;
-  iEngine* engine;
+  csRef<iView> view;
+  csRef<iEngine> engine;
   int motion_flags;
-  iLoader* LevelLoader;
-  iGraphics3D* myG3D;
-  iKeyboardDriver* kbd;
-  iVirtualClock* vc;
+  csRef<iLoader> LevelLoader;
+  csRef<iGraphics3D> myG3D;
+  csRef<iKeyboardDriver> kbd;
+  csRef<iVirtualClock> vc;
   iObjectRegistry* object_reg;
 
 public:

@@ -159,7 +159,7 @@ struct iFont : public iBase
 
 struct iFontServer : public iBase
 {
-  virtual iFont *LoadFont (const char *filename) = 0;
+  virtual csPtr<iFont> LoadFont (const char *filename) = 0;
   virtual int GetFontCount () = 0;
   virtual iFont *GetFont (int iIndex) = 0;
 };
@@ -278,7 +278,7 @@ struct iMeshObject : public iBase
 {
   %addmethods
   {
-    iThingState* Query_iThingState()
+    csPtr<iThingState> Query_iThingState()
     {
       return SCF_QUERY_INTERFACE(self, iThingState);
     }
@@ -344,7 +344,7 @@ struct iImage : public iBase
 
 struct iTextureManager : public iBase
 {
-  iTextureHandle *RegisterTexture (iImage *image, int flags);
+  csPtr<iTextureHandle> RegisterTexture (iImage *image, int flags);
   void PrepareTextures ();
   void FreeImages ();
   void ResetPalette ();
@@ -409,7 +409,7 @@ struct iEngine : public iBase
   virtual iTextureWrapper* CreateTexture (const char *iName,
   	const char *iFileName, csColor *iTransp, int iFlags) = 0;
   virtual iSector *CreateSector (const char *iName) = 0;
-  virtual iMeshWrapper* CreateSectorWallsMesh (iSector* sector,
+  virtual csPtr<iMeshWrapper> CreateSectorWallsMesh (iSector* sector,
       const char* name) = 0;
   virtual iSectorList *GetSectors () = 0;
   virtual iMaterialList *GetMaterialList () = 0;
@@ -424,15 +424,13 @@ public:
   {
     iEngine* Query_iEngine()
     {
-      iEngine* en = CS_QUERY_REGISTRY (self, iEngine);
-      en->DecRef ();
-      return en;
+      csRef<iEngine> en (CS_QUERY_REGISTRY (self, iEngine));
+      return en;	// DecRef is ok here.
     }
     iGraphics3D* Query_iGraphics3D()
     {
-      iGraphics3D* g3d = CS_QUERY_REGISTRY (self, iGraphics3D);
-      g3d->DecRef ();
-      return g3d;
+      csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (self, iGraphics3D));
+      return g3d;	// DecRef is ok here.
     }
     void Print(int mode, const char* format) {
       printf (format);
