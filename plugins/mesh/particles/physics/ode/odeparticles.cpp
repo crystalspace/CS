@@ -327,30 +327,31 @@ bool csODEParticlePhysics::HandleEvent (iEvent &event)
       {
       case CS_PART_COLOR_CONSTANT:
       {
-	csColor constant = po.particles->GetConstantColor ();
+	csColor4 constant;
+	po.particles->GetConstantColor (constant);
 	part.color.x = constant.red;
 	part.color.y = constant.green;
 	part.color.z = constant.blue;
-	part.color.w = 1.0;
+	part.color.w = 1.0f;
         break;
       }
       case CS_PART_COLOR_LINEAR:
       {
         float normaltime = part.time_to_live / 
 	  (po.particles->GetTimeToLive() + po.particles->GetTimeVariation());
-	const csArray<csColor> &grad = po.particles->GetGradient();
+	const csArray<csColor4> &grad = po.particles->GetGradient();
         if (grad.Length())
 	{
 	  float cref = (1.0 - normaltime) * (float)grad.Length();
 	  size_t index = (size_t)floor (cref);
-	  csColor c1 = grad[index];
-	  csColor c2 = grad[(index == grad.Length()-1)?index:index+1];
+	  const csColor4& c1 = grad[index];
+	  const csColor4& c2 = grad[(index == grad.Length()-1)?index:index+1];
 	  float interp = cref - floor(cref);
 	  part.color.x = ((1.0 - interp) * c1.red) + (interp * c2.red);
 	  part.color.y = ((1.0 - interp) * c1.green) + (interp * c2.green);
 	  part.color.z = ((1.0 - interp) * c1.blue) + (interp * c2.blue);
+	  part.color.w = ((1.0 - interp) * c1.alpha) + (interp * c2.alpha);
 	}
-	part.color.w = normaltime;
         break;
       }
       case CS_PART_COLOR_HEAT:

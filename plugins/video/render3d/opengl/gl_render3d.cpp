@@ -312,6 +312,10 @@ void csGLGraphics3D::SetMixMode (uint mode)
       // Color = DEST + SrcAlpha * SRC
       statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE);
       break;
+    case CS_FX_PREMULTALPHA:
+      // Color = (1-SrcAlpha) * DEST + SRC
+      statecache->SetBlendFunc (GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+      break;
     case CS_FX_ALPHA:
       // Color = Alpha * SRC + (1-Alpha) * DEST
       statecache->SetBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -836,7 +840,10 @@ bool csGLGraphics3D::Open ()
       // getting the maximum texture size simply doesn't work. In that
       // case we will issue a warning about this and assume 256x256.
       mts = 256;
-      Report (CS_REPORTER_SEVERITY_WARNING, "Detecting maximum texture size fails! 256x256 is assumed.\nEdit Video.OpenGL.Caps.MaxTextureSize if you want to change.");
+      Report (CS_REPORTER_SEVERITY_WARNING, 
+	"Detecting maximum texture size fails! 256x256 is assumed.\n"
+	"Edit Video.OpenGL.Caps.MaxTextureSize if you want to specify a "
+	"value.");
     }
   }
   if (verbose)

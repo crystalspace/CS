@@ -501,7 +501,7 @@ bool csParticlesFactoryLoader::ParseColorConstant (iDocumentNode *node,
     {
       case XMLTOKEN_COLOR:
       {
-        csColor color;
+        csColor4 color;
         synldr->ParseColor (child, color);
         state->SetConstantColorMethod (color);
         method_set = true;
@@ -641,7 +641,7 @@ bool csParticlesFactoryLoader::ParseGradient (iDocumentNode *node,
     {
       case XMLTOKEN_COLOR:
       {
-        csColor color;
+        csColor4 color;
         synldr->ParseColor (child, color);
         state->AddColor (color);
         break;
@@ -1095,7 +1095,7 @@ bool csParticlesObjectLoader::ParseColorConstant (iDocumentNode *node,
     {
       case XMLTOKEN_COLOR:
       {
-        csColor color;
+        csColor4 color;
         synldr->ParseColor (child, color);
         state->SetConstantColorMethod (color);
         method_set = true;
@@ -1235,7 +1235,7 @@ bool csParticlesObjectLoader::ParseGradient (iDocumentNode *node,
     {
       case XMLTOKEN_COLOR:
       {
-        csColor color;
+        csColor4 color;
         synldr->ParseColor (child, color);
         state->AddColor (color);
         break;

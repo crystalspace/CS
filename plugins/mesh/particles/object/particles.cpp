@@ -131,7 +131,7 @@ csParticlesFactory::csParticlesFactory (csParticlesType* p,
   physics_plugin = "crystalspace.particles.physics.simple";
 
   color_method = CS_PART_COLOR_CONSTANT;
-  constant_color = csColor(1,1,1);
+  constant_color = csColor4 (1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 csParticlesFactory::~csParticlesFactory ()

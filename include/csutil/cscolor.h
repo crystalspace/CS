@@ -35,7 +35,6 @@ public:
   float green;
   /// Blue (0..1)
   float blue;
-
 public:
   /// Initialize a color object (contents undefined)
   csColor () { }
@@ -80,6 +79,22 @@ public:
   /// Subtract given R,G,B components from color.
   void Subtract (float r, float g, float b)
   { red -= r; green -= g; blue -= b; }
+};
+
+/**
+ * A class used to represent a color in RGBA space.
+ */
+class csColor4 : public csColor
+{
+public:
+  /// Alpha value
+  float alpha;
+
+  /// Initialize a color object (contents undefined)
+  csColor4 () { }
+  /// Initialize a color object with given R,G,B,A components
+  csColor4 (float r, float g, float b, float a = 1.0f) : csColor (r, g, b)
+  { alpha = a; }
 };
 
 /// Multiply a color by a scalar value.

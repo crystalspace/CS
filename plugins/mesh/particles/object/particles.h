@@ -118,11 +118,11 @@ private:
 
   csString physics_plugin;
 
-  csArray<csColor> gradient_colors;
+  csArray<csColor4> gradient_colors;
 
   float loop_time;
   float base_heat;
-  csColor constant_color;
+  csColor4 constant_color;
   csParticleColorMethod color_method;
   csRef<iParticlesColorCallback> color_callback;
   csFlags flags;
@@ -217,13 +217,13 @@ public:
   void SetTimeVariation (float variation)
   { time_variation = variation; }
 
-  void AddColor (csColor color)
+  void AddColor (csColor4 color)
   {
     gradient_colors.Push(color);
   }
   void ClearColors ()
   { gradient_colors.DeleteAll (); }
-  void SetConstantColorMethod (csColor color)
+  void SetConstantColorMethod (csColor4 color)
   {
     color_method = CS_PART_COLOR_CONSTANT;
     constant_color = color;
@@ -294,13 +294,13 @@ public:
   { return particle_radius; }
   csParticleColorMethod GetParticleColorMethod ()
   { return color_method; }
-  csColor GetConstantColor ()
-  { return constant_color; }
+  void GetConstantColor (csColor4& color)
+  { color = constant_color; }
   float GetColorLoopTime ()
   { return loop_time; }
   float GetBaseHeat ()
   { return base_heat; }
-  const csArray<csColor> &GetGradient ()
+  const csArray<csColor4> &GetGradient ()
   { return gradient_colors; }
   void SetDampener (float damp)
   { dampener = damp; }
@@ -364,11 +364,11 @@ public:
     { scfParent->SetTimeToLive (time); }
     virtual void SetTimeVariation (float variation)
     { scfParent->SetTimeVariation (variation); }
-    virtual void AddColor (csColor color)
+    virtual void AddColor (csColor4 color)
     { scfParent->AddColor (color); }
     virtual void ClearColors ()
     { scfParent->ClearColors (); }
-    virtual void SetConstantColorMethod (csColor color)
+    virtual void SetConstantColorMethod (csColor4 color)
     { scfParent->SetConstantColorMethod (color); }
     virtual void SetLinearColorMethod ()
     { scfParent->SetLinearColorMethod (); }
@@ -384,11 +384,11 @@ public:
     { scfParent->SetParticleRadius (radius); }
     virtual csParticleColorMethod GetParticleColorMethod ()
     { return scfParent->GetParticleColorMethod (); }
-    virtual csColor GetConstantColor ()
-    { return scfParent->GetConstantColor (); }
+    virtual void GetConstantColor (csColor4& color )
+    { scfParent->GetConstantColor (color); }
     virtual float GetColorLoopTime ()
     { return scfParent->GetColorLoopTime (); }
-    virtual const csArray<csColor> &GetGradient ()
+    virtual const csArray<csColor4> &GetGradient ()
     { return scfParent->GetGradient (); }
     virtual float GetBaseHeat ()
     { return scfParent->GetBaseHeat (); }
@@ -528,10 +528,10 @@ private:
   float particle_radius;
   bool radius_changed;
 
-  csArray<csColor> gradient_colors;
+  csArray<csColor4> gradient_colors;
   float loop_time;
   float base_heat;
-  csColor constant_color;
+  csColor4 constant_color;
   csParticleColorMethod color_method;
   csRef<iParticlesColorCallback> color_callback;
 
@@ -706,7 +706,7 @@ public:
   { time_to_live = time; }
   void SetTimeVariation (float variation)
   { time_variation = variation; }
-  void AddColor (csColor color)
+  void AddColor (csColor4 color)
   {
     gradient_colors.Push(color);
   }
@@ -714,7 +714,7 @@ public:
   {
     gradient_colors.DeleteAll ();
   }
-  void SetConstantColorMethod (csColor color)
+  void SetConstantColorMethod (csColor4 color)
   {
     color_method = CS_PART_COLOR_CONSTANT;
     constant_color = color;
@@ -800,13 +800,13 @@ public:
   { return particle_mass; }
   csParticleColorMethod GetParticleColorMethod ()
   { return color_method; }
-  csColor GetConstantColor ()
-  { return constant_color; }
+  void GetConstantColor (csColor4& color)
+  { color = constant_color; }
   float GetColorLoopTime ()
   { return loop_time; }
   float GetBaseHeat ()
   { return base_heat; }
-  const csArray<csColor> &GetGradient ()
+  const csArray<csColor4> &GetGradient ()
   { return gradient_colors; }
   void SetTransformMode (bool transform)
   { transform_mode = transform; }
@@ -863,11 +863,11 @@ public:
     { scfParent->SetTimeToLive (time); }
     virtual void SetTimeVariation (float variation)
     { scfParent->SetTimeVariation (variation); }
-    virtual void AddColor (csColor color)
+    virtual void AddColor (csColor4 color)
     { scfParent->AddColor (color); }
     virtual void ClearColors ()
     { scfParent->ClearColors (); }
-    virtual void SetConstantColorMethod (csColor color)
+    virtual void SetConstantColorMethod (csColor4 color)
     { scfParent->SetConstantColorMethod (color); }
     virtual void SetLinearColorMethod ()
     { scfParent->SetLinearColorMethod (); }
@@ -881,11 +881,11 @@ public:
     { return scfParent->GetColorCallback (); }
     virtual csParticleColorMethod GetParticleColorMethod ()
     { return scfParent->GetParticleColorMethod (); }
-    virtual csColor GetConstantColor ()
-    { return scfParent->GetConstantColor (); }
+    virtual void GetConstantColor (csColor4& color)
+    { scfParent->GetConstantColor (color); }
     virtual float GetColorLoopTime ()
     { return scfParent->GetColorLoopTime (); }
-    virtual const csArray<csColor> &GetGradient ()
+    virtual const csArray<csColor4> &GetGradient ()
     { return scfParent->GetGradient (); }
     virtual float GetBaseHeat ()
     { return scfParent->GetBaseHeat (); }

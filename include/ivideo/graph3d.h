@@ -268,6 +268,8 @@ enum G3D_FOGMETHOD
 #define CS_FX_DESTALPHAADD 0x60000000 
 /// =(srcalpha)*SRC + DST
 #define CS_FX_SRCALPHAADD  0x70000000
+/// =SRC + DST*(1-srcalpha)
+#define CS_FX_PREMULTALPHA 0x80000000
 /**
   * Use the mix mode of the mesh zmode.
   * (NOTE: NOT VALID AS MESH ZMODE - only for shader pass mixmodes)

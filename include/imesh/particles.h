@@ -103,7 +103,7 @@ struct iParticlesColorCallback : public iBase
   virtual csColor GetColor (float time) = 0;
 };
 
-SCF_VERSION (iParticlesStateBase, 1, 0, 0);
+SCF_VERSION (iParticlesStateBase, 1, 1, 0);
 
 /**
  * Particles shared state interface
@@ -220,7 +220,7 @@ struct iParticlesStateBase : public iBase
   virtual float GetTimeVariation () = 0;
 
   /// Set the color method to a constant color
-  virtual void SetConstantColorMethod (csColor color) = 0;
+  virtual void SetConstantColorMethod (csColor4 color) = 0;
 
   /**
    * Set the color method to linear color (based on time to live 
@@ -248,7 +248,7 @@ struct iParticlesStateBase : public iBase
   virtual iParticlesColorCallback* GetColorCallback () = 0;
 
   /// Add a color to the gradient
-  virtual void AddColor (csColor color) = 0;
+  virtual void AddColor (csColor4 color) = 0;
 
   /// Clear the color gradient
   virtual void ClearColors () = 0;
@@ -257,10 +257,10 @@ struct iParticlesStateBase : public iBase
   virtual csParticleColorMethod GetParticleColorMethod () = 0;
 
   /// Get the constant color (for constant color method)
-  virtual csColor GetConstantColor () = 0;
+  virtual void GetConstantColor (csColor4& color) = 0;
 
   /// Get the color gradient
-  virtual const csArray<csColor> &GetGradient () = 0;
+  virtual const csArray<csColor4> &GetGradient () = 0;
 
   /// Get the loop time (for looping color method)
   virtual float GetColorLoopTime () = 0;

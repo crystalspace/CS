@@ -214,6 +214,19 @@ bool csTextSyntaxService::ParseColor (iDocumentNode* node, csColor &c)
   return true;
 }
 
+bool csTextSyntaxService::ParseColor (iDocumentNode* node, csColor4 &c)
+{				      
+  c.red = node->GetAttributeValueAsFloat ("red");
+  c.green = node->GetAttributeValueAsFloat ("green");
+  c.blue = node->GetAttributeValueAsFloat ("blue");
+  csRef<iDocumentAttribute> attr = node->GetAttribute ("alpha");
+  if (attr.IsValid())
+    c.alpha = attr->GetValueAsFloat ();
+  else
+    c.alpha = 1.0f;
+  return true;
+}
+
 bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode,
 					bool allowFxMesh)
 {
@@ -254,6 +267,8 @@ bool csTextSyntaxService::ParseMixmode (iDocumentNode* node, uint &mixmode,
 	MIXMODE_EXCLUSIVE mixmode |= CS_FX_DESTALPHAADD; break;
       case XMLTOKEN_SRCALPHAADD:
 	MIXMODE_EXCLUSIVE mixmode |= CS_FX_SRCALPHAADD; break;
+      case XMLTOKEN_PREMULTALPHA:
+	MIXMODE_EXCLUSIVE mixmode |= CS_FX_PREMULTALPHA; break;
       case XMLTOKEN_ALPHA:
         MIXMODE_EXCLUSIVE {
 	  mixmode &= ~CS_FX_MASK_ALPHA;

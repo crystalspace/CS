@@ -344,11 +344,12 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
     {
     case CS_PART_COLOR_CONSTANT:
     {
-      csColor constant_color = part->particles->GetConstantColor ();
+      csColor4 constant_color;
+      part->particles->GetConstantColor (constant_color);
       point.color.x = constant_color.red;
       point.color.y = constant_color.green;
       point.color.z = constant_color.blue;
-      point.color.w = 1.0f;
+      point.color.w = constant_color.alpha;//1.0f;
       break;
     }
     case CS_PART_COLOR_LINEAR:
@@ -356,7 +357,7 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
       float colortime = point.time_to_live
         / (part->particles->GetTimeToLive ()
         + part->particles->GetTimeVariation ());
-      const csArray<csColor> &gradient_colors =
+      const csArray<csColor4> &gradient_colors =
         part->particles->GetGradient ();
       int color_len=gradient_colors.Length();
       if (color_len)
@@ -364,8 +365,8 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
         // With a gradient
         float cref = (1.0f - colortime) * (float)(color_len-1);
         int index = (int)floor(cref);
-        csColor color1 = gradient_colors.Get(index);
-        csColor color2 = color1;
+        csColor4 color1 = gradient_colors.Get(index);
+        csColor4 color2 = color1;
         if (index != color_len - 1)
         {
           color2 = gradient_colors.Get(index + 1);
@@ -376,6 +377,7 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
         point.color.x = ((1.0f - pos) * color1.red) + (pos * color2.red);
         point.color.y = ((1.0f - pos) * color1.green) + (pos * color2.green);
         point.color.z = ((1.0f - pos) * color1.blue) + (pos * color2.blue);
+        point.color.w = ((1.0f - pos) * color1.alpha) + (pos * color2.alpha);
       }
       else
       {
@@ -384,8 +386,9 @@ void csParticlesPhysicsSimple::StepPhysics (float true_elapsed_time,
         point.color.x = 1.0f * colortime;
         point.color.y = 0.0f * colortime;
         point.color.z = 1.0f * colortime;
+	point.color.w = 1.0f;
       }
-      point.color.w = colortime;
+      //point.color.w = colortime;
       break;
     }
     case CS_PART_COLOR_HEAT:

@@ -6,6 +6,16 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+16-Jul-2004
+	- res added csColor4, a descendant of csColor, with an alpha component
+	  added.
+	- res added a new mixmode, CS_FX_PREMULTALPHA.
+	- res augmented the 'particles' particle system & physics to support 
+	  alpha in particle color gradients.
+	- res changed the 'particles' level to vary alpha in the fire system.
+	  Together with the PREMULTALPHA mixmode, the bottom part is blended
+	  additive, while the upper part is alpha-blended (thus, the fire 
+	  looks more "firey" while the smoke stays opaque).
 15-Jul-2004
 	- Eric Sunshine fixed shell quoting problems from 10-Jul-2004 change to
 	  GenerateWin32ManifestRc rule in win32.jam which caused 'sed'

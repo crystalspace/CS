@@ -12,7 +12,7 @@
 		<file>/lib/stdtex/oldbrick.jpg</file>
     </texture>
 	<texture name="dot">
-		<file>dot.tga</file>
+		<file>dot.png</file>
 	</texture>
   </textures>
 
@@ -38,7 +38,6 @@
     <priority name="sky">
       <level>1</level>
       <sort>NONE</sort>
-      <camera />
     </priority>
     <priority name="mirror">
       <level>2</level>
@@ -247,15 +246,15 @@
 		  <timevariation>0.5</timevariation>
 		  <colormethod type="linear">
 		    <gradient>
-			  <color red="1.00" green="0.35" blue="0.00"/>
-   			  <color red="1.00" green="0.32" blue="0.00"/>
-			  <color red="1.00" green="0.22" blue="0.00"/>
-			  <color red="0.80" green="0.12" blue="0.00"/>
-			  <color red="0.60" green="0.00" blue="0.00"/>
-			  <color red="0.40" green="0.00" blue="0.00"/>
-			  <color red="0.20" green="0.00" blue="0.00"/>
-			  <color red="0.00" green="0.00" blue="0.00"/>
-			  <color red="0.00" green="0.00" blue="0.00"/>
+			  <color red="1.00" green="0.35" blue="0.00" alpha="0" />
+   			  <color red="1.00" green="0.32" blue="0.00" alpha=".1" />
+			  <color red="1.00" green="0.22" blue="0.00" alpha=".3" />
+			  <color red="0.80" green="0.12" blue="0.00" alpha=".8" />
+			  <color red="0.60" green="0.00" blue="0.00" alpha=".9" />
+			  <color red="0.40" green="0.00" blue="0.00" alpha=".97" />
+			  <color red="0.20" green="0.00" blue="0.00" alpha="1" />
+			  <color red="0.00" green="0.00" blue="0.00" alpha="1" />
+			  <color red="0.00" green="0.00" blue="0.00" alpha="1" />
 		    </gradient>
 		</colormethod>
 	  </params>

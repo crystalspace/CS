@@ -67,6 +67,7 @@ public:
   virtual bool ParseVector (iDocumentNode* node, csVector3 &v);
   virtual bool ParseBox (iDocumentNode* node, csBox3 &v);
   virtual bool ParseColor (iDocumentNode* node, csColor &c);
+  virtual bool ParseColor (iDocumentNode* node, csColor4 &c);
   virtual bool ParseMixmode (iDocumentNode* node, uint &mixmode,
     bool allowFxMesh = false);
   virtual bool HandlePortalParameter (

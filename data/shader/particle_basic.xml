@@ -2,7 +2,7 @@
 <shader type="xmlshader" name="particle_basic">
 	<technique priority="50">
 		<pass>
-		  <mixmode><alpha/></mixmode>
+		  <mixmode><!--alpha/--><premultalpha /></mixmode>
 			<buffer name="vertices" destination="position" />
 			<buffer name="colors" destination="primary color" />
 			<buffer name="texture coordinates" destination="texture coordinate" />
