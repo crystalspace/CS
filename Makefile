@@ -94,6 +94,10 @@ clean cleanlib cleandep distclean:
 	@$(MAKE) --no-print-directory -f mk/cs.mak $@
 
 install:
+ifndef INSTALL_DIR
+	@echo please specify the INSTALL_DIR.
+	exit 1
+endif
 	@echo $(SEPARATOR)
 	@echo "  Installing to "$(INSTALL_DIR)
 	@echo $(SEPARATOR)
