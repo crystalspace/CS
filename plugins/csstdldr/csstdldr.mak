@@ -15,7 +15,8 @@ ifeq ($(MAKESECTION),roottargets)
 
 .PHONY: stdldr stdldrclean
 
-all plugins: stdldr
+#@@@ dont enable till stdldr will be ready
+#all plugins: stdldr
 
 stdldr:
 	$(MAKE_TARGET) MAKE_DLL=yes
@@ -34,12 +35,12 @@ ifeq ($(USE_SHARED_PLUGINS),yes)
 # STDLDR = $(OUTDLL)stdldr$(DLL)
   STDLDR = testldr$(EXE)
   DEP.STDLDR = $(CSUTIL.LIB) $(CSGEOM.LIB)
-  TO_INSTALL.DYNAMIC_LIBS += $(STDLDR)
+# TO_INSTALL.DYNAMIC_LIBS += $(STDLDR)
 else
   STDLDR = $(OUT)$(LIB_PREFIX)stdld$(LIB)
   DEP.EXE += $(STDLDR)
   CFLAGS.STATIC_SCF += $(CFLAGS.D)SCL_STDLDR
-  TO_INSTALL.STATIC_LIBS += $(STDLDR)
+# TO_INSTALL.STATIC_LIBS += $(STDLDR)
 endif
 DESCRIPTION.$(STDLDR) = $(DESCRIPTION.stdldr)
 SRC.STDLDR = plugins/csstdldr/stdparse.cpp plugins/csstdldr/stdldr.cpp \

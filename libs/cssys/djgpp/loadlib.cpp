@@ -146,11 +146,14 @@ static void *_dlerrh (const char *symbol)
   return NULL;
 }
 
-static __attribute__((constructor)) void _dlinit ()
+static struct __dlinit
 {
-  dlregsym (syms);
-  dlsetres (_dlerrh);
-}
+  __dlinit ()
+  {
+    dlregsym (syms);
+    dlsetres (_dlerrh);
+  }
+} __dummy_dlinit;
 
 csLibraryHandle csFindLoadLibrary (const char *iName)
 {
@@ -159,7 +162,7 @@ csLibraryHandle csFindLoadLibrary (const char *iName)
 
 csLibraryHandle csLoadLibrary (const char* iName)
 {
-  return dlopen (module = name, 0);
+  return dlopen (module = iName, 0);
 }
 
 void *csGetLibrarySymbol (csLibraryHandle Handle, const char *iName)

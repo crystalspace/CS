@@ -134,7 +134,7 @@ outb %al, $0x61
 handler_chain:	popw	%ds
 		popl	%edx
 		popl	%eax
-		ljmp	%cs:(old_vector)
+		ljmp	*%cs:(old_vector)
 
 __locked_code_end:
 

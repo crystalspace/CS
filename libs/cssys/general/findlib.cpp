@@ -64,9 +64,7 @@ csLibraryHandle csFindLoadLibrary (const char *iPrefix, const char *iName,
         break;
     }
   }
-  char buf[500];
-  sprintf(buf, "DLERROR: Could not find (%s)%s(%s).\n", 
-    iPrefix, iName, iSuffix );
-  csSystemDriver::console_out(buf);
+  printf ("DYNAMIC LINKING ERROR: Could not find (%s)%s(%s).\n",
+    iPrefix, iName, iSuffix);
   return (csLibraryHandle)0;
 }

@@ -85,13 +85,13 @@
 :nomakedep
 
   echo ### Checking whenever you have libdl installed (dynamic module loader) ...
-  set SHPLUGINS=no
+  set SH=no
   dxe2gen --help >conftest.o
   if not exist conftest.o goto nodxe2gen
 
   del conftest.o >nul
   echo $$$ O.K., setting USE_SHARED_PLUGINS to "yes"
-  set SHPLUGINS=yes
+  set SH=yes
 
     echo ### Checking if you have dynamic version of Zlib ...
     gcc conftest.cpp -o conftest.exe -lz_i
@@ -124,15 +124,21 @@
   :nojpeg_i
 
 :nodxe2gen
-  echo USE_SHARED_PLUGINS = %SHPLUGINS%>>config.tmp
+  echo USE_SHARED_PLUGINS = %SH%>>config.tmp
   del conftest.* >nul
 
   rem Under windoze we do a 2-sec pause, otherwise it will tell us
   rem that "config.mak" has timestamp "in the future". Ha-ha.
 
-  if /%WINDIR%/ == // goto nowindoze
-  sleep 2
+  rem Another reason to launch "sleep" is to clear "exit code"
+  rem of the batch file. The ugly DOS uses the exit code of last program
+  rem run from a batch file as the exit code of the batchfile itself,
+  rem thus "exit 0" you see at the end is purely for ahestetical reasons.
 
-:nowindoze
+  set SH=0
+  if /%WINDIR%/ == // set SH=2
+  sleep %SH%
+
+  echo All done
 
   exit 0
