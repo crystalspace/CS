@@ -2146,7 +2146,7 @@ bool csSpriteCal3DMeshObject::AttachCoreMesh(const char *meshname)
     return false;
 
   return AttachCoreMesh(factory->submeshes[idx]->index,
-  	(int)factory->submeshes[idx]->default_material);
+  	(int)(iMaterialWrapper*)factory->submeshes[idx]->default_material);
 }
 
 bool csSpriteCal3DMeshObject::AttachCoreMesh(int mesh_id,int iMatWrapID)
