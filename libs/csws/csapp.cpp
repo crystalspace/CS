@@ -136,12 +136,12 @@ bool csApp::InitialSetup (int argc, const char* const argv[],
   // Change to the directory on VFS where we keep our data
   System->VFS->ChDir (iDataDir);
 
-  int Width = System->G2D->GetWidth ();
-  int Height = System->G2D->GetHeight ();
-  bound.Set (0, 0, Width, Height);
+  ScreenWidth = System->G2D->GetWidth ();
+  ScreenHeight = System->G2D->GetHeight ();
+  bound.Set (0, 0, ScreenWidth, ScreenHeight);
   dirty.Set (bound);
-  WindowListWidth = Width / 3;
-  WindowListHeight = Width / 6;
+  WindowListWidth = ScreenWidth / 3;
+  WindowListHeight = ScreenWidth / 6;
 
   // Tell printf() console is ready
   System->ConsoleReady = true;
@@ -570,7 +570,7 @@ void csApp::Draw ()
     case csabsNothing:
       break;
     case csabsSolid:
-      Box (0, 0, bound.Width (), bound.Height (), CSPAL_APP_WORKSPACE);
+      Clear (CSPAL_APP_WORKSPACE);
       break;
   } /* endswitch */
   csComponent::Draw ();

@@ -101,7 +101,7 @@ void csStatic::Draw ()
         break;
       }
     case csscsRectangle:
-      Box (0, 0, bound.Width (), bound.Height (), CSPAL_STATIC_BACKGROUND);
+      Clear (CSPAL_STATIC_BACKGROUND);
       break;
     case csscsText:
       break;

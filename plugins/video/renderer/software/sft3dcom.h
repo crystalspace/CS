@@ -61,7 +61,7 @@ protected:
   csGraphics3DSoftwareCommon *partner;
 
   /// ID/window name of this context
-  const char* Title;
+  const char *title;
 
   /// Z buffer for software renderer only. Hardware rendering uses own Z buffer.
   unsigned long* z_buffer;

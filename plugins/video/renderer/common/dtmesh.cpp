@@ -34,37 +34,48 @@
 //------------------------------------------------------------------------
 
 #define INTERPOLATE1(component) \
-  g3dpoly->vertices[i].##component## = tritexcoords[vt].##component## + t*(tritexcoords[vt2].##component##-tritexcoords[vt].##component##);
+  g3dpoly->vertices [i].##component## = tritexcoords [vt].##component## + \
+    t * (tritexcoords [vt2].##component## - tritexcoords [vt].##component##);
 
 #define INTERPOLATE1_FOG(component) \
-  g3dpoly->fog_info[i].##component## = trifoginfo[vt].##component## + t*(trifoginfo[vt2].##component##-trifoginfo[vt].##component##);
+  g3dpoly->fog_info [i].##component## = trifoginfo [vt].##component## + \
+    t * (trifoginfo [vt2].##component## - trifoginfo [vt].##component##);
 
 #define INTERPOLATE(component) \
 { \
-  float v1 = tritexcoords[edge1[0]].##component## + t1 * (tritexcoords[edge1[1]].##component## - tritexcoords[edge1[0]].##component##); \
-  float v2 = tritexcoords[edge2[0]].##component## + t2 * (tritexcoords[edge2[1]].##component## - tritexcoords[edge2[0]].##component##); \
-  g3dpoly->vertices[i].##component## = v1 + t * (v2 - v1); \
+  float v1 = tritexcoords [edge1 [0]].##component## + \
+    t1 * (tritexcoords [edge1 [1]].##component## - \
+          tritexcoords [edge1 [0]].##component##); \
+  float v2 = tritexcoords [edge2 [0]].##component## + \
+    t2 * (tritexcoords [edge2 [1]].##component## - \
+          tritexcoords [edge2 [0]].##component##); \
+  g3dpoly->vertices [i].##component## = v1 + t * (v2 - v1); \
 }
 #define INTERPOLATE_FOG(component) \
 { \
-  float v1 = trifoginfo[edge1[0]].##component## + t1 * (trifoginfo[edge1[1]].##component## - trifoginfo[edge1[0]].##component##); \
-  float v2 = trifoginfo[edge2[0]].##component## + t2 * (trifoginfo[edge2[1]].##component## - trifoginfo[edge2[0]].##component##); \
-  g3dpoly->fog_info[i].##component## = v1 + t * (v2 - v1); \
+  float v1 = trifoginfo [edge1 [0]].##component## + \
+    t1 * (trifoginfo [edge1 [1]].##component## - \
+          trifoginfo [edge1 [0]].##component##); \
+  float v2 = trifoginfo [edge2 [0]].##component## + \
+    t2 * (trifoginfo [edge2 [1]].##component## - \
+          trifoginfo [edge2 [0]].##component##); \
+  g3dpoly->fog_info [i].##component## = v1 + t * (v2 - v1); \
 }
 
-static void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
-	int num_vertices, csVertexStatus* clipped_vtstats,
-	csVector2* orig_triangle, bool use_fog, bool gouraud)
+static void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly,
+  csVector2* clipped_verts, int num_vertices,
+  csVertexStatus* clipped_vtstats, csVector2* orig_triangle,
+  bool use_fog, bool gouraud)
 {
   // first we copy the first three texture coordinates to a local buffer
   // to avoid that they are overwritten when interpolating.
-  G3DTexturedVertex tritexcoords[3];
-  G3DFogInfo trifoginfo[3];
-	int i;
+  G3DTexturedVertex tritexcoords [3];
+  G3DFogInfo trifoginfo [3];
+  int i;
   for (i = 0; i < 3; i++)
   {
-    tritexcoords[i] = g3dpoly->vertices[i];
-    trifoginfo[i] = g3dpoly->fog_info[i];
+    tritexcoords [i] = g3dpoly->vertices [i];
+    trifoginfo [i] = g3dpoly->fog_info [i];
   }
 
   int vt, vt2;
@@ -90,7 +101,7 @@ static void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_ver
 	break;
       case CS_VERTEX_ONEDGE:
         vt = clipped_vtstats[i].Vertex;
-	vt2 = (vt+1)%3;
+	vt2 = vt + 1; if (vt2 >= 3) vt2 = 0;
 	t = clipped_vtstats[i].Pos;
 	INTERPOLATE1 (z);
 	INTERPOLATE1 (u);
@@ -110,16 +121,16 @@ static void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_ver
 	}
 	break;
       case CS_VERTEX_INSIDE:
-        float x = clipped_verts[i].x;
-        float y = clipped_verts[i].y;
-        int edge1[2], edge2[2];
-        if ((y >= orig_triangle[0].y && y <= orig_triangle[1].y) ||
-	    (y <= orig_triangle[0].y && y >= orig_triangle[1].y))
+        float x = clipped_verts [i].x;
+        float y = clipped_verts [i].y;
+        int edge1 [2], edge2 [2];
+        if ((y >= orig_triangle [0].y && y <= orig_triangle [1].y) ||
+	    (y <= orig_triangle [0].y && y >= orig_triangle [1].y))
 	{
 	  edge1[0] = 0;
 	  edge1[1] = 1;
-          if ((y >= orig_triangle[1].y && y <= orig_triangle[2].y) ||
-	      (y <= orig_triangle[1].y && y >= orig_triangle[2].y))
+          if ((y >= orig_triangle [1].y && y <= orig_triangle [2].y) ||
+	      (y <= orig_triangle [1].y && y >= orig_triangle [2].y))
 	  {
 	    edge2[0] = 1;
 	    edge2[1] = 2;
@@ -137,30 +148,30 @@ static void G3DPreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_ver
 	  edge2[0] = 0;
 	  edge2[1] = 2;
 	}
-	csVector2& A = orig_triangle[edge1[0]];
-	csVector2& B = orig_triangle[edge1[1]];
-	csVector2& C = orig_triangle[edge2[0]];
-	csVector2& D = orig_triangle[edge2[1]];
+	csVector2& A = orig_triangle [edge1 [0]];
+	csVector2& B = orig_triangle [edge1 [1]];
+	csVector2& C = orig_triangle [edge2 [0]];
+	csVector2& D = orig_triangle [edge2 [1]];
 	float t1 = (y - A.y) / (B.y - A.y);
 	float t2 = (y - C.y) / (D.y - C.y);
 	float x1 = A.x + t1 * (B.x - A.x);
 	float x2 = C.x + t2 * (D.x - C.x);
 	t = (x - x1) / (x2 - x1);
-	INTERPOLATE(z);
-	INTERPOLATE(u);
-	INTERPOLATE(v);
+	INTERPOLATE (z);
+	INTERPOLATE (u);
+	INTERPOLATE (v);
 	if (gouraud)
 	{
-	  INTERPOLATE(r);
-	  INTERPOLATE(g);
-	  INTERPOLATE(b);
+	  INTERPOLATE (r);
+	  INTERPOLATE (g);
+	  INTERPOLATE (b);
 	}
 	if (use_fog)
 	{
-	  INTERPOLATE_FOG(r);
-	  INTERPOLATE_FOG(g);
-	  INTERPOLATE_FOG(b);
-	  INTERPOLATE_FOG(intensity);
+	  INTERPOLATE_FOG (r);
+	  INTERPOLATE_FOG (g);
+	  INTERPOLATE_FOG (b);
+	  INTERPOLATE_FOG (intensity);
 	}
 	break;
     }
@@ -390,5 +401,3 @@ void DefaultDrawTriangleMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
 
   g3d->FinishPolygonFX ();
 }
-
-//------------------------------------------------------------------------

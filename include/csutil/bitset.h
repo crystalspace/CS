@@ -29,21 +29,21 @@
 
 // Processor-dependent macros
 #if defined (PROC_INTEL) && defined (COMP_GCC) && !defined(OS_NEXT)
-#  define IMPLEMENT_BIT_SET \
-   asm ("bts %1,%0" : : "o" (*bits), "r" (index));
-#  define IMPLEMENT_BIT_RESET \
-   asm ("btr %1,%0" : : "o" (*bits), "r" (index));
-#  define IMPLEMENT_BIT_GET \
-   bool result; \
-   asm ("bt %2,%1\nsetc %%al" : "=a" (result) : "o" (*bits), "r" (index)); \
-   return result;
+#  define BIT_SET(bits,index) \
+   asm ("bts %1,%0" : : "o" (*bits), "r" (index))
+#  define BIT_RESET(bits,index) \
+   asm ("btr %1,%0" : : "o" (*bits), "r" (index))
+#  define BIT_GET(bits,index) \
+   ({ bool result; \
+      asm ("bt %2,%1\nsetc %%al" : "=a" (result) : "o" (*bits), "r" (index)); \
+      result; })
 #else
-#  define IMPLEMENT_BIT_SET \
-   bits [index / BITS_PER_BYTE] |= (1 << (index % BITS_PER_BYTE));
-#  define IMPLEMENT_BIT_RESET \
-   bits [index / BITS_PER_BYTE] &= ~(1 << (index % BITS_PER_BYTE));
-#  define IMPLEMENT_BIT_GET \
-   return !!(bits [index / BITS_PER_BYTE] & (1 << (index % BITS_PER_BYTE)));
+#  define BIT_SET(bits,index) \
+   bits [index / BITS_PER_BYTE] |= (1 << (index % BITS_PER_BYTE))
+#  define BIT_RESET(bits,index) \
+   bits [index / BITS_PER_BYTE] &= ~(1 << (index % BITS_PER_BYTE))
+#  define BIT_GET(bits,index) \
+   !!(bits [index / BITS_PER_BYTE] & (1 << (index % BITS_PER_BYTE)))
 #endif
 
 /**
@@ -60,6 +60,11 @@ class csBitSet
   unsigned byte_count;
   unsigned char *bits;
 public:
+  /// Create an empty bit set
+  csBitSet () : bit_count (0), byte_count (0), bits (NULL)
+  {
+  }
+
   /// Create bit set of given size
   csBitSet (unsigned iBitCount) : bit_count (iBitCount)
   {
@@ -101,7 +106,7 @@ public:
 
   /// Set a bit in the array
   inline void Set (unsigned index)
-  { IMPLEMENT_BIT_SET }
+  { BIT_SET (bits, index); }
 
   /// Set a number of bits in the array, starting with given index
   inline void Set (unsigned index, unsigned count)
@@ -124,7 +129,7 @@ public:
 
   /// Reset a bit in the array
   inline void Reset (unsigned index)
-  { IMPLEMENT_BIT_RESET }
+  { BIT_RESET (bits, index); }
 
   /// Set a number of bits in the array, starting with given index
   inline void Reset (unsigned index, unsigned count)
@@ -146,7 +151,7 @@ public:
 
   /// Get the value of a bit in the array
   inline bool Get (unsigned index) const
-  { IMPLEMENT_BIT_GET }
+  { return BIT_GET (bits, index); }
 
   /// Same but in a more nice form
   inline bool operator [] (unsigned index) const

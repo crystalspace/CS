@@ -128,7 +128,7 @@ struct csVertexStatus;
 extern void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_poly,
   int num_vertices, csVector2 *orig_triangle, bool gouraud);
 extern void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly, csVector2* clipped_poly,
-  int num_vertices, csVertexStatus* clipped_vtstats, csVector2 *orig_poly,
+  int num_vertices, csVertexStatus* clipped_vtstats,
   int orig_num_vertices, bool gouraud);
 
 /*

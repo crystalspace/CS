@@ -24,7 +24,6 @@
 #include "csgeom/plane3.h"
 #include "iplugin.h"
 
-
 class csMatrix3;
 class csVector3;
 class csVector2;
@@ -77,13 +76,13 @@ public:
 class G3DTexturedVertex : public G3DVertex
 {
 public:
-  /// z value
+  /// inverse z value (1/real_z)
   float z;
   
-  //Texture coordinates
+  // Texture coordinates
   float u, v; 
 
-  //Lighting info (Used only with Gouroud shading (between 0 and 1))
+  // Lighting info (Used only with Gouraud shading (between 0 and 1))
   float r, g, b;
 };
 

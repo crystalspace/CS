@@ -16,6 +16,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#define SYSDEF_ALLOCA
 #include "cssysdef.h"
 #include "qint.h"
 #include "csengine/polygon.h"
@@ -119,53 +120,53 @@ void csPolygon2D::Draw (iGraphics2D* g2d, int col)
 //---------------------------------------------------------------------------
 
 #define INTERPOLATE1(component) \
-  g3dpoly->vertices[i].##component## = tritexcoords[vt].##component## + t*(tritexcoords[vt2].##component##-tritexcoords[vt].##component##);
+  g3dpoly->vertices [i].##component## = inpoly [vt].##component## + \
+    t * (inpoly [vt2].##component## - inpoly [vt].##component##);
 
 #define INTERPOLATE(component) \
 { \
-  float v1 = tritexcoords[edge_from[0]].##component## + \
-    t1 * (tritexcoords[edge_to[0]].##component## - tritexcoords[edge_from[0]].##component##); \
-  float v2 = tritexcoords[edge_from[1]].##component## + \
-    t2 * (tritexcoords[edge_to[1]].##component## - tritexcoords[edge_from[1]].##component##); \
-  g3dpoly->vertices[i].##component## = v1 + t * (v2 - v1); \
+  float v1 = inpoly [edge_from [0]].##component## + \
+    t1 * (inpoly [edge_to [0]].##component## - inpoly [edge_from [0]].##component##); \
+  float v2 = inpoly [edge_from [1]].##component## + \
+    t2 * (inpoly [edge_to [1]].##component## - inpoly [edge_from [1]].##component##); \
+  g3dpoly->vertices [i].##component## = v1 + t * (v2 - v1); \
 }
 
 void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
-	csVector2* clipped_verts,
-	int num_vertices, csVertexStatus* clipped_vtstats,
-	csVector2* orig_poly, int orig_num_vertices, bool gouraud)
+  csVector2* clipped_verts, int num_vertices, csVertexStatus* clipped_vtstats,
+  int orig_num_vertices, bool gouraud)
 {
   // first we copy the first texture coordinates to a local buffer
   // to avoid that they are overwritten when interpolating.
-  G3DTexturedVertex tritexcoords[50];	//@@@
+  ALLOC_STACK_ARRAY (inpoly, G3DTexturedVertex, orig_num_vertices);
   int i;
   for (i = 0; i < orig_num_vertices; i++)
-    tritexcoords[i] = g3dpoly->vertices[i];
+    inpoly[i] = g3dpoly->vertices[i];
 
   int vt, vt2;
   float t;
-  for (i = 0 ; i < num_vertices ; i++)
+  for (i = 0; i < num_vertices; i++)
   {
-    g3dpoly->vertices[i].sx = clipped_verts[i].x;
-    g3dpoly->vertices[i].sy = clipped_verts[i].y;
+    g3dpoly->vertices [i].sx = clipped_verts [i].x;
+    g3dpoly->vertices [i].sy = clipped_verts [i].y;
     switch (clipped_vtstats[i].Type)
     {
       case CS_VERTEX_ORIGINAL:
         vt = clipped_vtstats[i].Vertex;
-        g3dpoly->vertices[i].z = tritexcoords[vt].z;
-        g3dpoly->vertices[i].u = tritexcoords[vt].u;
-        g3dpoly->vertices[i].v = tritexcoords[vt].v;
+        g3dpoly->vertices [i].z = inpoly [vt].z;
+        g3dpoly->vertices [i].u = inpoly [vt].u;
+        g3dpoly->vertices [i].v = inpoly [vt].v;
 	if (gouraud)
 	{
-          g3dpoly->vertices[i].r = tritexcoords[vt].r;
-          g3dpoly->vertices[i].g = tritexcoords[vt].g;
-          g3dpoly->vertices[i].b = tritexcoords[vt].b;
+          g3dpoly->vertices [i].r = inpoly [vt].r;
+          g3dpoly->vertices [i].g = inpoly [vt].g;
+          g3dpoly->vertices [i].b = inpoly [vt].b;
 	}
 	break;
       case CS_VERTEX_ONEDGE:
         vt = clipped_vtstats[i].Vertex;
-	vt2 = (vt+1)%orig_num_vertices;
-	t = clipped_vtstats[i].Pos;
+	vt2 = vt + 1; if (vt2 >= orig_num_vertices) vt2 = 0;
+	t = clipped_vtstats [i].Pos;
 	INTERPOLATE1 (z);
 	INTERPOLATE1 (u);
 	INTERPOLATE1 (v);
@@ -177,19 +178,19 @@ void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
 	}
 	break;
       case CS_VERTEX_INSIDE:
-        float x = clipped_verts[i].x;
-        float y = clipped_verts[i].y;
-        int edge_from[2], edge_to[2];
+        float x = clipped_verts [i].x;
+        float y = clipped_verts [i].y;
+        int edge_from [2], edge_to [2];
 	int edge = 0;
 	int j, j1;
-	j1 = orig_num_vertices-1;
-	for (j = 0 ; j < orig_num_vertices ; j++)
+	j1 = orig_num_vertices - 1;
+	for (j = 0; j < orig_num_vertices; j++)
 	{
-          if ((y >= orig_poly[j].y && y <= orig_poly[j1].y) ||
-	      (y <= orig_poly[j].y && y >= orig_poly[j1].y))
+          if ((y >= inpoly [j].sy && y <= inpoly [j1].sy) ||
+	      (y <= inpoly [j].sy && y >= inpoly [j1].sy))
 	  {
-	    edge_from[edge] = j;
-	    edge_to[edge] = j1;
+	    edge_from [edge] = j;
+	    edge_to [edge] = j1;
 	    edge++;
 	    if (edge >= 2) break;
 	  }
@@ -198,26 +199,26 @@ void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
 	if (edge == 1)
 	{
 	  // Safety if we only found one edge.
-	  edge_from[1] = edge_from[0];
-	  edge_to[1] = edge_to[0];
+	  edge_from [1] = edge_from [0];
+	  edge_to [1] = edge_to [0];
 	}
-	csVector2& A = orig_poly[edge_from[0]];
-	csVector2& B = orig_poly[edge_to[0]];
-	csVector2& C = orig_poly[edge_from[1]];
-	csVector2& D = orig_poly[edge_to[1]];
-	float t1 = (y - A.y) / (B.y - A.y);
-	float t2 = (y - C.y) / (D.y - C.y);
-	float x1 = A.x + t1 * (B.x - A.x);
-	float x2 = C.x + t2 * (D.x - C.x);
+	G3DTexturedVertex& A = inpoly [edge_from [0]];
+	G3DTexturedVertex& B = inpoly [edge_to [0]];
+	G3DTexturedVertex& C = inpoly [edge_from [1]];
+	G3DTexturedVertex& D = inpoly [edge_to [1]];
+	float t1 = (y - A.sy) / (B.sy - A.sy);
+	float t2 = (y - C.sy) / (D.sy - C.sy);
+	float x1 = A.sx + t1 * (B.sx - A.sx);
+	float x2 = C.sx + t2 * (D.sx - C.sx);
 	t = (x - x1) / (x2 - x1);
-	INTERPOLATE(z);
-	INTERPOLATE(u);
-	INTERPOLATE(v);
+	INTERPOLATE (z);
+	INTERPOLATE (u);
+	INTERPOLATE (v);
 	if (gouraud)
 	{
-	  INTERPOLATE(r);
-	  INTERPOLATE(g);
-	  INTERPOLATE(b);
+	  INTERPOLATE (r);
+	  INTERPOLATE (g);
+	  INTERPOLATE (b);
 	}
 	break;
     }
@@ -226,8 +227,6 @@ void PreparePolygonFX2 (G3DPolygonDPFX* g3dpoly,
 
 #undef INTERPOLATE
 #undef INTERPOLATE1
-#undef INTERPOLATE_FOG
-#undef INTERPOLATE1_FOG
 
 void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
 	int num_vertices, csVector2* orig_triangle, bool gouraud)
@@ -251,9 +250,9 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
 
   // first we copy the first three texture coordinates to a local buffer
   // to avoid that they are overwritten when interpolating.
-  G3DTexturedVertex tritexcoords[3];
+  G3DTexturedVertex inpoly[3];
   for (int i = 0; i < 3; i++)
-    tritexcoords [i] = g3dpoly->vertices [i];
+    inpoly [i] = g3dpoly->vertices [i];
 
   // Now we have to find the u,v coordinates for every
   // point in the clipped polygon. We know we started
@@ -303,7 +302,7 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
     //  |\       |\      start/final values and deltas ONCE (not more)
     //  | \      | \     per triangle.On the left pictures this happens
     //  |*X\     |  \    at the point B. This means we should "emulate"
-    //  |   *B   |   *B  this switch bytaking different start/final values
+    //  |   *B   |   *B  this switch by taking different start/final values
     //  |  /     |*X/    for interpolation if examined point X is below
     //  | /      | /     the point B.
     //  |/       |/
@@ -353,33 +352,33 @@ void PreparePolygonFX (G3DPolygonDPFX* g3dpoly, csVector2* clipped_verts,
 
     // Calculate Z
     INTERPOLATE(g3dpoly->vertices [j].z,
-                tritexcoords [vtl].z, tritexcoords [vbl].z,
-                tritexcoords [vtr].z, tritexcoords [vbr].z);
+                inpoly [vtl].z, inpoly [vbl].z,
+                inpoly [vtr].z, inpoly [vbr].z);
     if (g3dpoly->txt_handle)
     {
       // Calculate U
       INTERPOLATE(g3dpoly->vertices [j].u,
-                  tritexcoords [vtl].u, tritexcoords [vbl].u,
-                  tritexcoords [vtr].u, tritexcoords [vbr].u);
+                  inpoly [vtl].u, inpoly [vbl].u,
+                  inpoly [vtr].u, inpoly [vbr].u);
       // Calculate V
       INTERPOLATE(g3dpoly->vertices [j].v,
-                  tritexcoords [vtl].v, tritexcoords [vbl].v,
-                  tritexcoords [vtr].v, tritexcoords [vbr].v);
+                  inpoly [vtl].v, inpoly [vbl].v,
+                  inpoly [vtr].v, inpoly [vbr].v);
     }
     if (gouraud)
     {
       // Calculate R
       INTERPOLATE(g3dpoly->vertices [j].r,
-                  tritexcoords [vtl].r, tritexcoords [vbl].r,
-                  tritexcoords [vtr].r, tritexcoords [vbr].r);
+                  inpoly [vtl].r, inpoly [vbl].r,
+                  inpoly [vtr].r, inpoly [vbr].r);
       // Calculate G
       INTERPOLATE (g3dpoly->vertices [j].g,
-                  tritexcoords [vtl].g, tritexcoords [vbl].g,
-                  tritexcoords [vtr].g, tritexcoords [vbr].g);
+                  inpoly [vtl].g, inpoly [vbl].g,
+                  inpoly [vtr].g, inpoly [vbr].g);
       // Calculate B
       INTERPOLATE (g3dpoly->vertices [j].b,
-                  tritexcoords [vtl].b, tritexcoords [vbl].b,
-                  tritexcoords [vtr].b, tritexcoords [vbr].b);
+                  inpoly [vtl].b, inpoly [vbl].b,
+                  inpoly [vtr].b, inpoly [vbr].b);
     }
     else
     {

@@ -280,9 +280,9 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 	else
           if (area >= SMALL_EPSILON) continue;
 
-        triangle[mirror ? 2 : 0] = persp[ct.i1];
-        triangle[1] = persp[ct.i2];
-        triangle[mirror ? 0 : 2] = persp[ct.i3];
+        triangle [mirror ? 2 : 0] = persp [ct.i1];
+        triangle [1] = persp [ct.i2];
+        triangle [mirror ? 0 : 2] = persp [ct.i3];
 
   	// Clip triangle
   	int rescount;
@@ -312,9 +312,11 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
         else { idx = 0; dir = 1; }
   	for (j = 0; j < 3; j++)
   	{
-      	  poly.vertices [idx].z = 1 / z_array[trivert [j]];
-    	  poly.vertices [idx].u = texes[j]->x;
-    	  poly.vertices [idx].v = texes[j]->y;
+          poly.vertices [idx].sx = triangle [idx].x;
+          poly.vertices [idx].sy = triangle [idx].y;
+      	  poly.vertices [idx].z = 1 / z_array [trivert [j]];
+    	  poly.vertices [idx].u = texes [j]->x;
+    	  poly.vertices [idx].v = texes [j]->y;
     	  if (gouraud)
     	  {
       	    int lm_idx = control_y[j]*(lm_width+2) + control_x[j];
@@ -327,17 +329,8 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
 
         //PreparePolygonFX (&poly, clipped_triangle, rescount, (csVector2 *)triangle, gouraud);
 	if (clip_result != CS_CLIP_INSIDE)
-          PreparePolygonFX2 (&poly, clipped_triangle, rescount, clipped_vtstats,
-		  (csVector2 *)triangle, 3, gouraud);
-	else
-	{
-          poly.vertices [0].sx = triangle [0].x;
-          poly.vertices [0].sy = triangle [0].y;
-          poly.vertices [1].sx = triangle [1].x;
-          poly.vertices [1].sy = triangle [1].y;
-          poly.vertices [2].sx = triangle [2].x;
-          poly.vertices [2].sy = triangle [2].y;
-	}
+          PreparePolygonFX2 (&poly, clipped_triangle, rescount,
+            clipped_vtstats, 3, gouraud);
 
   	// Draw resulting polygon
 	if (!rview.callback)

@@ -174,7 +174,7 @@ void csListBoxItem::Draw ()
   bool enabled = !parent->GetState (CSS_DISABLED);
   bool selected = enabled && GetState (CSS_LISTBOXITEM_SELECTED);
   if (selected)
-    Box (0, 0, bound.Width (), bound.Height (), CSPAL_LISTBOXITEM_SELECTION);
+    Clear (CSPAL_LISTBOXITEM_SELECTION);
   if (GetState (CSS_FOCUSED) && enabled)
   {
     int w,h;

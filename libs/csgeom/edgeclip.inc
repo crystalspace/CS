@@ -10,7 +10,7 @@
   // First ("previous") point x/y
   float px = InP [0].x, py = InP [0].y;
   // The "inside/outside polygon" flag for previous vertex
-  bool prevVertexInside = BOXCLIP_INSIDE (px, py);
+  bool prevVertexInside = CLIP_INSIDE (px, py);
 
   // Empty output polygon
   OutV = 0;
@@ -22,16 +22,9 @@
     bool LastVertex = (vert == InV);
     // Second ("current") point x/y
     float cx, cy;
-    if (LastVertex)
-    {
-      cx = InP [0].x;
-      cy = InP [0].y;
-    }
-    else
-    {
-      cx = InP [vert].x;
-      cy = InP [vert].y;
-    } /* endif */
+    realvert = LastVertex ? 0 : vert;
+    cx = InP [realvert].x;
+    cy = InP [realvert].y;
 
     // If starting vertex is visible, put it into output array
     if (prevVertexInside)
@@ -52,7 +45,7 @@
     } /* endif */
 
     // The "inside/outside polygon" flag for current vertex
-    bool curVertexInside = BOXCLIP_INSIDE (cx, cy);
+    bool curVertexInside = CLIP_INSIDE (cx, cy);
 
     // If vertices are on different sides of edge,
     // look where we're intersecting
@@ -65,7 +58,7 @@
       double t;
       float tx, ty;
 
-      BOXCLIP_INTERSECT
+      CLIP_INTERSECT
 
       if ((!OutV
         || fabs (tx - OutP [OutV - 1].x) > EPSILON
@@ -77,12 +70,52 @@
         OutP [OutV].x = tx;
         OutP [OutV].y = ty;
 #ifdef OUTPUT_VERTEX_STATUS
+        //
+        // Four cases are possible here:
+        //
+        // (*) prev vertex: CS_VERTEX_ORIGINAL
+        //     curr vertex: CS_VERTEX_ORIGINAL
+        //       -> status_v = prev_vertex.index
+        //       -> status_t = t
+        //
+        // (*) prev vertex: CS_VERTEX_ORIGINAL
+        //     curr vertex: CS_VERTEX_ONEDGE
+        //       -> status_v = prev_vertex.index
+        //       -> status_t = t * curr_vertex.status_t
+        //
+        // (*) prev vertex: CS_VERTEX_ONEDGE
+        //     curr vertex: CS_VERTEX_ORIGINAL
+        //       -> status_v = prev_vertex.status_v
+        //       -> status_t = prev_vertex.status_t + t * (1 - prev_vertex.status_t)
+        //
+        // (*) prev vertex: CS_VERTEX_ONEDGE
+        //     curr vertex: CS_VERTEX_ONEDGE
+        //       -> status_type = CS_VERTEX_INSIDE
+        //
         if (InS [vert - 1].Type == CS_VERTEX_ORIGINAL)
-        {
-          OutS [OutV].Type = CS_VERTEX_ONEDGE;
-          OutS [OutV].Pos = t;
-          OutS [OutV].Vertex = InS [vert - 1].Vertex;
-        }
+          if (InS [realvert].Type == CS_VERTEX_ORIGINAL)
+          {
+            OutS [OutV].Type = CS_VERTEX_ONEDGE;
+            OutS [OutV].Vertex = InS [vert - 1].Vertex;
+            OutS [OutV].Pos = t;
+          }
+          else
+          {
+            // Current vertex is on edge, it cannot be CS_VERTEX_INSIDE
+            // because it is connected with at least one CS_VERTEX_ORIGINAL
+            OutS [OutV].Type = CS_VERTEX_ONEDGE;
+            OutS [OutV].Vertex = InS [vert - 1].Vertex;
+            OutS [OutV].Pos = t * InS [realvert].Pos;
+          }
+        else if (InS [vert - 1].Type == CS_VERTEX_ONEDGE)
+          if (InS [realvert].Type == CS_VERTEX_ORIGINAL)
+          {
+            OutS [OutV].Type = CS_VERTEX_ONEDGE;
+            OutS [OutV].Vertex = InS [vert - 1].Vertex;
+            OutS [OutV].Pos = InS [vert - 1].Pos + t * (1 - InS [vert - 1].Pos);
+          }
+          else
+            OutS [OutV].Type = CS_VERTEX_INSIDE;
         else
           OutS [OutV].Type = CS_VERTEX_INSIDE;
 #endif
@@ -142,5 +175,5 @@
 #endif
 }
 
-#undef BOXCLIP_INSIDE
-#undef BOXCLIP_INTERSECT
+#undef CLIP_INSIDE
+#undef CLIP_INTERSECT

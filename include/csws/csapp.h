@@ -93,6 +93,8 @@ public:
   bool RedrawFlag;
   /// This is set to TRUE each time top-level window list changes
   bool WindowListChanged;
+  /// Screen width and height (application can be actually smaller)
+  int ScreenWidth, ScreenHeight;
 
   /// Titlebar buttons definitions
   csStrVector *titlebardefs;
@@ -270,10 +272,6 @@ public:
   void pplRestoreClipRect ()
   { GfxPpl->RestoreClipRect (); }
 
-  /// Draw a 3D polygon
-  void pplPolygon3D (G3DPolygonDPFX &poly, UInt mode)
-  { GfxPpl->Polygon3D (poly, mode); }
-
   /// Return the width of given text using currently selected font
   int TextWidth (const char *text, int Font, int FontSize)
   { return GfxPpl->TextWidth (text, Font, FontSize); }
@@ -293,6 +291,24 @@ public:
   /// Get R,G,B at given screen location
   void GetPixel (int x, int y, UByte &oR, UByte &oG, UByte &oB)
   { GfxPpl->GetPixel (x, y, oR, oG, oB); }
+
+  //--- 3D drawing ---//
+
+  /// Draw a 3D polygon
+  void pplPolygon3D (G3DPolygonDPFX &poly, UInt mode)
+  { GfxPpl->Polygon3D (poly, mode); }
+
+  /// Clear the Z-buffer in the given area
+  void pplClearZbuffer (int x1, int y1, int x2, int y2)
+  { GfxPpl->ClearZbuffer (x1, y1, x2, y2); }
+
+  /// Clear the entire Z-buffer (takes effect before next 3D draw operation)
+  void pplClearZbuffer ()
+  { GfxPpl->ClearZbuffer (); }
+
+  /// Set the respective Z-buffer mode (one of CS_ZBUF_XXX constants)
+  void SetZbufferMode (unsigned mode)
+  { GfxPpl->SetZbufferMode (mode); }
 
 protected:
   /// Initialize configuration data: load csws.cfg

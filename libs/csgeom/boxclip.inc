@@ -32,8 +32,8 @@
   csVector2 *OutP = (ClipCount & 1) ? OutPolygon : TempPoly;
   // Number of output vertices
   int OutV = -1;
-  // Current input vertex
-  int vert;
+  // Current input vertex, vertex % num_vertices
+  int vert, realvert;
   // Flag: was input polygon clipped?
   bool Clipped = false;
 
@@ -55,9 +55,9 @@
   // Do we need to clip against left x line?
   if (ClipEdges & 1)
 #endif
-#define BOXCLIP_INSIDE(x,y)			\
+#define CLIP_INSIDE(x,y)			\
   (x >= region.MinX ())
-#define BOXCLIP_INTERSECT			\
+#define CLIP_INTERSECT				\
   /* t = (region.X - px) / (cx - px) */		\
   t = (region.MinX () - px) / (cx - px);	\
   tx = region.MinX ();				\
@@ -73,9 +73,9 @@
   // Do we need to clip against right x line?
   if (ClipEdges & 2)
 #endif
-#define BOXCLIP_INSIDE(x,y)			\
+#define CLIP_INSIDE(x,y)			\
   (x <= region.MaxX ())
-#define BOXCLIP_INTERSECT			\
+#define CLIP_INTERSECT				\
   /* t = (region.X - px) / (cx - px) */		\
   t = (region.MaxX () - px) / (cx - px);	\
   tx = region.MaxX ();				\
@@ -91,9 +91,9 @@
   // Do we need to clip against bottom y line?
   if (ClipEdges & 4)
 #endif
-#define BOXCLIP_INSIDE(x,y)			\
+#define CLIP_INSIDE(x,y)			\
   (y >= region.MinY ())
-#define BOXCLIP_INTERSECT			\
+#define CLIP_INTERSECT				\
   /* t = (region.Y - py) / (cy - py) */		\
   t = (region.MinY () - py) / (cy - py);	\
   ty = region.MinY ();				\
@@ -109,9 +109,9 @@
   // Do we need to clip against top y line?
   if (ClipEdges & 8)
 #endif
-#define BOXCLIP_INSIDE(x,y)			\
+#define CLIP_INSIDE(x,y)			\
   (y <= region.MaxY ())
-#define BOXCLIP_INTERSECT			\
+#define CLIP_INTERSECT				\
   /* t = (region.Y - py) / (cy - py) */		\
   t = (region.MaxY () - py) / (cy - py);	\
   ty = region.MaxY ();				\

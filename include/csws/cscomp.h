@@ -639,6 +639,17 @@ public:
   void ObliqueRect3D (int xmin, int ymin, int xmax, int ymax, int cornersize,
     int darkindx, int lightindx);
 
+  /// Clear the entire component with given color
+  void Clear (int colindx)
+  { Box (0, 0, bound.Width (), bound.Height (), colindx); }
+
+  /// Clear the Z-buffer in the given rectangle
+  void ClearZbuffer (int x1, int y1, int x2, int y2);
+
+  /// Clear the Z-buffer in the area covered by this component
+  void ClearZbuffer ()
+  { ClearZbuffer (0, 0, bound.Width (), bound.Height ()); }
+
   /// Draw a 3D polygon
   void Polygon3D (G3DPolygonDPFX &poly, UInt mode);
 

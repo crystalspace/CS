@@ -194,6 +194,20 @@ void csGraphicsPipeline::RestoreClipRect ()
   ClipRect = OrigClip;
 }
 
+int csGraphicsPipeline::TextWidth (const char *text, int Font, int FontSize)
+{
+  G2D->SetFontID (Font);
+  G2D->SetFontSize (FontSize);
+  return text ? G2D->GetTextWidth (Font, text) : 0;
+}
+
+int csGraphicsPipeline::TextHeight (int Font, int FontSize)
+{
+  G2D->SetFontID (Font);
+  G2D->SetFontSize (FontSize);
+  return G2D->GetTextHeight (Font);
+}
+
 void csGraphicsPipeline::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
 {
   if (!BeginDraw (CSDRAW_3DGRAPHICS))
@@ -207,18 +221,29 @@ void csGraphicsPipeline::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
   G3D->FinishPolygonFX ();
 }
 
-int csGraphicsPipeline::TextWidth (const char *text, int Font, int FontSize)
+void csGraphicsPipeline::ClearZbuffer (int x1, int y1, int x2, int y2)
 {
-  G2D->SetFontID (Font);
-  G2D->SetFontSize (FontSize);
-  return text ? G2D->GetTextWidth (Font, text) : 0;
-}
+  if (!BeginDraw (CSDRAW_3DGRAPHICS))
+    return;
 
-int csGraphicsPipeline::TextHeight (int Font, int FontSize)
-{
-  G2D->SetFontID (Font);
-  G2D->SetFontSize (FontSize);
-  return G2D->GetTextHeight (Font);
+  SetZbufferMode (CS_ZBUF_FILLONLY);
+
+  G3DPolygonDP poly;
+  memset (&poly, 0, sizeof (poly));
+  poly.num = 4;
+  y1 = FrameHeight - y1;
+  y2 = FrameHeight - y2;
+  poly.vertices [0].sx = x1;
+  poly.vertices [0].sy = y1;
+  poly.vertices [1].sx = x1;
+  poly.vertices [1].sy = y2;
+  poly.vertices [2].sx = x2;
+  poly.vertices [2].sy = y2;
+  poly.vertices [3].sx = x2;
+  poly.vertices [3].sy = y1;
+  // Set plane normal to be perpendicular to OZ and very far away
+  poly.normal.Set (0, 0, -1, 1e50);
+  G3D->DrawPolygon (poly);
 }
 
 void csGraphicsPipeline::StartFrame (int iCurPage)
@@ -306,46 +331,9 @@ void csGraphicsPipeline::Desync ()
     } /* endif */
 }
 
-bool csGraphicsPipeline::BeginDrawImp (int iMode)
-{
-  if (DrawMode != 0)
-  {
-    // Restore clip rectangle, font id and font size
-    G2D->SetClipRect (OrigClip.xmin, OrigClip.ymin, OrigClip.xmax, OrigClip.ymax);
-    G2D->SetFontID (OrigFont);
-    G2D->SetFontSize (OrigFontSize);
-    G3D->FinishDraw ();
-  }
-  if (G3D->BeginDraw (DrawMode = iMode))
-  {
-    G2D->GetClipRect (OrigClip.xmin, OrigClip.ymin, OrigClip.xmax, OrigClip.ymax);
-    ClipRect = OrigClip;
-    OrigFont = G2D->GetFontID ();
-    OrigFontSize = G2D->GetFontSize ();
-    return true;
-  }
-  DrawMode = 0;
-  return false;
-}
-
 void csGraphicsPipeline::FinishDraw ()
 {
-  // Restore clip rectangle, font id and font size
-  G2D->SetClipRect (OrigClip.xmin, OrigClip.ymin, OrigClip.xmax, OrigClip.ymax);
-  G2D->SetFontID (OrigFont);
-  G2D->SetFontSize (OrigFontSize);
-
-#if 0 // debug
-if (!RefreshRect.IsEmpty ())
-{
-G2D->DrawLine (RefreshRect.xmin, RefreshRect.ymin, RefreshRect.xmax-1, RefreshRect.ymin, -1);
-G2D->DrawLine (RefreshRect.xmin, RefreshRect.ymax-1, RefreshRect.xmax-1, RefreshRect.ymax-1, -1);
-G2D->DrawLine (RefreshRect.xmin, RefreshRect.ymin, RefreshRect.xmin, RefreshRect.ymax-1, -1);
-G2D->DrawLine (RefreshRect.xmax-1, RefreshRect.ymin, RefreshRect.xmax-1, RefreshRect.ymax-1, -1);
-}
-#endif
-
-  G3D->FinishDraw ();
+  FinishDrawImp ();
 
   if (!RefreshRect.IsEmpty ())
     G3D->Print (&RefreshRect);
@@ -353,4 +341,34 @@ G2D->DrawLine (RefreshRect.xmax-1, RefreshRect.ymin, RefreshRect.xmax-1, Refresh
 
   // Clear refresh rectangle now
   RefreshRect.Set (INT_MAX, INT_MAX, INT_MIN, INT_MIN);
+}
+
+bool csGraphicsPipeline::BeginDrawImp (int iMode)
+{
+  int clearz = (DrawMode & CSDRAW_CLEARZBUFFER);
+
+  if (DrawMode != 0)
+    FinishDrawImp ();
+
+  if (G3D->BeginDraw ((DrawMode = iMode) | clearz))
+  {
+    G2D->GetClipRect (OrigClip.xmin, OrigClip.ymin, OrigClip.xmax, OrigClip.ymax);
+    ClipRect = OrigClip;
+    OrigFont = G2D->GetFontID ();
+    OrigFontSize = G2D->GetFontSize ();
+    return true;
+  }
+
+  // Failed to start drawing
+  DrawMode = 0;
+  return false;
+}
+
+void csGraphicsPipeline::FinishDrawImp ()
+{
+  // Restore clip rectangle, font id and font size
+  G2D->SetClipRect (OrigClip.xmin, OrigClip.ymin, OrigClip.xmax, OrigClip.ymax);
+  G2D->SetFontID (OrigFont);
+  G2D->SetFontSize (OrigFontSize);
+  G3D->FinishDraw ();
 }

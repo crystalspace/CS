@@ -149,7 +149,7 @@ csGraphics3DSoftwareCommon::csGraphics3DSoftwareCommon () :
   Caps.MaxAspectRatio = 32768;
   width = height = -1;
   partner = NULL;
-  Title = NULL;
+  title = NULL;
 }
 
 csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
@@ -196,7 +196,7 @@ void csGraphics3DSoftwareCommon::SharedInitialize(csGraphics3DSoftwareCommon *p)
 #endif
 }
 
-bool csGraphics3DSoftwareCommon::Open (const char* title)
+bool csGraphics3DSoftwareCommon::Open (const char* Title)
 {
   if (!G2D->Open (Title))
   {
@@ -235,7 +235,7 @@ bool csGraphics3DSoftwareCommon::Open (const char* title)
     pixel_adjust = (pfmt.RedShift && pfmt.GreenShift && pfmt.BlueShift) ? 8 : 0;
 #endif
 
-  Title = title;
+  title = Title;
   DrawMode = 0;
   SetDimensions (G2D->GetWidth (), G2D->GetHeight ());
   z_buf_mode = CS_ZBUF_NONE;
@@ -1060,7 +1060,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
     else
       fin_y = fyR;
 
-    screenY = height - 1 - sy;
+    screenY = height - sy;
 
     while (sy > fin_y)
     {
@@ -1096,14 +1096,15 @@ void csGraphics3DSoftwareCommon::DrawPolygonFlat (G3DPolygonDPF& poly)
 
 void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
 {
+  if (z_buf_mode == CS_ZBUF_FILLONLY)
+  {
+    DrawFogPolygon (0, poly, CS_FOG_BACK);
+    return;
+  }
+
   if (!do_textured)
   {
     DrawPolygonFlat (poly);
-    return;
-  }
-  else if (z_buf_mode == CS_ZBUF_FILLONLY)
-  {
-    DrawFogPolygon (0, poly, CS_FOG_BACK);
     return;
   }
 
@@ -1621,7 +1622,7 @@ texr_done:
     else
       fin_y = fyR;
 
-    screenY = height - 1 - sy;
+    screenY = height - sy;
 
     while (sy > fin_y)
     {
@@ -1748,10 +1749,10 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, 
     }
     else
     {
-      inv_Dc = 1/Dc;
-      M = -Ac*inv_Dc*inv_aspect;
-      N = -Bc*inv_Dc*inv_aspect;
-      O = -Cc*inv_Dc;
+      inv_Dc = 1 / Dc;
+      M = -Ac * inv_Dc * inv_aspect;
+      N = -Bc * inv_Dc * inv_aspect;
+      O = -Cc * inv_Dc;
     }
   }
 
@@ -1836,9 +1837,9 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, 
   // Select the right scanline drawing function.
   csDrawScanline* dscan = NULL;
   int scan_index =
-  	fog_type == CS_FOG_FRONT ?  SCANPROC_FOG :
-	fog_type == CS_FOG_BACK ?  SCANPROC_ZFIL :
-	fog_type == CS_FOG_VIEW ?  SCANPROC_FOG_VIEW :
+  	fog_type == CS_FOG_FRONT ? SCANPROC_FOG :
+	fog_type == CS_FOG_BACK ? SCANPROC_ZFIL :
+	fog_type == CS_FOG_VIEW ? SCANPROC_FOG_VIEW :
 	-1;
 
   if ((scan_index < 0) || !(dscan = ScanProc [scan_index]))
@@ -1936,7 +1937,7 @@ void csGraphics3DSoftwareCommon::DrawFogPolygon (CS_ID id, G3DPolygonDFP& poly, 
     else
       fin_y = fyR;
 
-    screenY = height - 1 - sy;
+    screenY = height - sy;
 
     while (sy > fin_y)
     {
@@ -2344,7 +2345,7 @@ void csGraphics3DSoftwareCommon::DrawPolygonFX (G3DPolygonDPFX& poly)
     else
       fin_y = fyR;
 
-    int screenY = height - 1 - sy;
+    int screenY = height - sy;
     while (sy > fin_y)
     {
       if ((sy & 1) != do_interlaced)
@@ -2646,10 +2647,10 @@ void csGraphics3DSoftwareCommon::DrawLine (const csVector3& v1, const csVector3&
 
   float iz1 = fov/z1;
   int px1 = QInt (x1 * iz1 + (width/2));
-  int py1 = height - 1 - QInt (y1 * iz1 + (height/2));
+  int py1 = height - QInt (y1 * iz1 + (height/2));
   float iz2 = fov/z2;
   int px2 = QInt (x2 * iz2 + (width/2));
-  int py2 = height - 1 - QInt (y2 * iz2 + (height/2));
+  int py2 = height - QInt (y2 * iz2 + (height/2));
 
   G2D->DrawLine (px1, py1, px2, py2, color);
 }
@@ -2660,10 +2661,3 @@ float csGraphics3DSoftwareCommon::GetZBuffValue (int x, int y)
   if (!zbf) return 0;
   return 16777216.0 / float (zbf);
 }
-
-
-
-
-
-
-

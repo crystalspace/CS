@@ -637,7 +637,7 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
   // Now allocate the space for the projected lighted polygon
   int nvlf = lview.light_frustum->GetNumVertices ();
   csVector3 *lf3d = lview.light_frustum->GetVertices ();
-  csVector2 *lf2d = (csVector2 *)alloca (nvlf * sizeof (csVector2));
+  ALLOC_STACK_ARRAY (lf2d, csVector2, nvlf);
   // Project the light polygon from world space to responsability grid space
   float inv_lightcell_size = 1.0 / lightcell_size;
   int i, j;
@@ -670,7 +670,7 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
     csf = lview.shadows.GetFirst ();
   }
 
-  csPolygonClipper **sfc = (csPolygonClipper **)alloca (nsf * sizeof (csPolygonClipper *));
+  ALLOC_STACK_ARRAY (sfc, csPolygonClipper *, nsf);
   for (i = 0; i < nsf; i++, csf = (dli ? dli->GetShadow (i) : csf->next))
   {
     if (!dli)
@@ -725,6 +725,9 @@ void csPolyTexture::GetCoverageMatrix (csFrustumView& lview, csCoverageMatrix &c
     // Now subtract the shadow from the coverage matrix
     csAntialiasedPolyFill (s2d, nv, &cm, __sub_PutPixel, __sub_DrawBox);
 
+//@@@@@@@
+//todo: implement accurate lighting (computing overlapping portions of
+//shadow polygons and add/subtract them accordingly).
 #if 1
     sfc [i] = NULL;
 #else

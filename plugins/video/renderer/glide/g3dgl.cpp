@@ -199,24 +199,18 @@ csGraphics3DGlide::~csGraphics3DGlide()
 {
   GlideLib_grGlideShutdown();
 
-  if ( state ) 
-    delete [] state;
-  if ( fogtable ) 
-    delete [] fogtable;
-  if (clipper)
-    delete clipper;
-  if (m_verts)
-    delete [] m_verts;
+  delete [] state;
+  delete [] fogtable;
+  delete clipper;
+  delete [] m_verts;
   if (m_pTextureCache)
     m_pTextureCache->DecRef ();
   if (m_pLightmapCache)
     m_pLightmapCache->DecRef ();
   if (m_pAlphamapCache)
     m_pAlphamapCache->DecRef ();
-  if (config)
-    delete config;
-  if (txtmgr)
-    delete txtmgr;
+  delete config;
+  delete txtmgr;
   if (m_pCamera)
     m_pCamera->DecRef ();
   if (m_piGlide2D)

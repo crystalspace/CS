@@ -333,8 +333,7 @@ void csMenuItem::Draw ()
   } /* endif */
 
   // Draw the background
-  Box (0, 0, bound.Width (), bound.Height (), selected ?
-    CSPAL_MENUITEM_SELECTION : CSPAL_MENUITEM_BACKGROUND);
+  Clear (selected ? CSPAL_MENUITEM_SELECTION : CSPAL_MENUITEM_BACKGROUND);
   // Draw the item text
   if (text)
   {

@@ -75,7 +75,6 @@ csGraphics3DOpenGL::csGraphics3DOpenGL (iBase *iParent) :
 
 csGraphics3DOpenGL::~csGraphics3DOpenGL ()
 {
-
 }
 
 bool csGraphics3DOpenGL::Initialize (iSystem * iSys)
@@ -85,7 +84,6 @@ bool csGraphics3DOpenGL::Initialize (iSystem * iSys)
 
 bool csGraphics3DOpenGL::Open (const char *Title)
 {
-
   return NewOpen (Title);
 }
 

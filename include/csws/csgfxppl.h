@@ -156,6 +156,17 @@ private:
   /// Return the height of selected font and size
   int TextHeight (int Font, int FontSize);
 
+  /// Clear Z-buffer (takes effect before next 3D draw operation)
+  void ClearZbuffer ()
+  { DrawMode |= CSDRAW_CLEARZBUFFER; }
+
+  /// Clear the Z-buffer in the given area
+  void ClearZbuffer (int x1, int y1, int x2, int y2);
+
+  /// Set the respective Z-buffer mode (one of CS_ZBUF_XXX constants)
+  void SetZbufferMode (unsigned mode)
+  { G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode); }
+
   /// Called at the start of every frame
   void StartFrame (int iCurPage);
 
@@ -166,11 +177,14 @@ private:
   bool BeginDraw (int iMode)
   { return (iMode != DrawMode) ? BeginDrawImp (iMode) : true; }
 
+  /// Finish painting
+  void FinishDraw ();
+
   /// Do the actual work for BeginDraw ()
   bool BeginDrawImp (int iMode);
 
-  /// Finish painting
-  void FinishDraw ();
+  /// Do the actual work for FinishDraw ()
+  void FinishDrawImp ();
 };
 
 #endif // __CSGFXPPL_H__

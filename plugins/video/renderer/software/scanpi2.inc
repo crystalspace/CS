@@ -8,7 +8,7 @@
   while (_dest < _destend)
   {
 #ifdef PI_ZUSE
-    if (z >= *zbuff)
+    if (z > *zbuff)
 #endif
     {
 #ifndef PI_FLAT

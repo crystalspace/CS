@@ -332,7 +332,7 @@ void csNotebook::Draw ()
     lasttab = pages.Length () - 1;
 
   // Draw the background
-  Box (0, 0, bound.Width (), bound.Height (), CSPAL_NOTEBOOK_BACKGROUND);
+  Clear (CSPAL_NOTEBOOK_BACKGROUND);
 
   // Display a thin 3D frame if required
   if (style & CSNBS_PAGEFRAME)

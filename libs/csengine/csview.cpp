@@ -64,7 +64,7 @@ void csView::SetRectangle (int x, int y, int w, int h)
 
   delete view;  view = NULL;
   delete bview;
-  bview = new csBox2 (x, y, x + w - 1, y + h - 1);
+  bview = new csBox2 (x, y, x + w, y + h);
   delete clipper; clipper = NULL;
 }
 

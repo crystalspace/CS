@@ -104,7 +104,7 @@ void csButton::Draw ()
   {
     case csbfsNone:
       if (!GetState (CSS_TRANSPARENT))
-        Box (0, 0, bound.Width (), bound.Height (), CSPAL_BUTTON_BACKGROUND);
+        Clear (CSPAL_BUTTON_BACKGROUND);
       areaw = bound.Width (); areah = bound.Height ();
       break;
     case csbfsOblique:
@@ -165,7 +165,7 @@ void csButton::Draw ()
       else
       {
         areaw = bound.Width (); areah = bound.Height ();
-        Box (0, 0, bound.Width (), bound.Height (), CSPAL_BUTTON_BACKGROUND);
+        Clear (CSPAL_BUTTON_BACKGROUND);
       } /* endif */
       break;
     default:

@@ -60,7 +60,7 @@
       Include definitions required for access()
 
     #define SYSDEF_ALLOCA
-      Include definition for alloca()
+      Include definition for alloca() and ALLOC_STACK_ARRAY()
 
     #define SYSDEF_GETOPT
       For getopt() and GNU getopt_long()
@@ -274,11 +274,8 @@
 #endif
 
 #ifdef SYSDEF_ALLOCA
-// Enable memory allocation
-#  if (defined(COMP_GCC) && defined(OS_WIN32))
-#	include <malloc.h>
-#  else
-#  if defined(COMP_WCC) || defined (COMP_VC) || defined(COMP_BC)
+// Prototypes for dynamic stack memory allocation
+#  if defined(COMP_WCC) || defined (COMP_VC) || defined(COMP_BC) || (defined(COMP_GCC) && defined(OS_WIN32))
 #    include <malloc.h>
 #  elif defined(COMP_GCC) && defined(OS_DOS)
 #    include <stdlib.h>
@@ -287,7 +284,14 @@
 #  else
 #    include <alloca.h>
 #  endif
-# endif
+#  if defined (COMP_GCC)
+    // In GCC we are able to declare stack vars of dynamic size directly
+#    define ALLOC_STACK_ARRAY(var,type,size) \
+       type var [size]
+#  else
+#    define ALLOC_STACK_ARRAY(var,type,size) \
+       type *var = (type *)alloca (size * sizeof (type))
+#  endif
 #endif
 
 #ifdef SYSDEF_ACCESS

@@ -22,8 +22,8 @@
   csVector2 *OutP = (ClipPolyVertices & 1) ? OutPolygon : TempPoly;
   // Number of output vertices
   int OutV = 0;
-  // Current clipper edge & input vertex
-  int edge, vert;
+  // Current clipper edge & input vertex & vertex % num_vertices
+  int edge, vert, realvert;
   // Flag: was input polygon clipped?
   bool Clipped = false;
 
@@ -44,10 +44,10 @@
   }
 #endif
 
-#define BOXCLIP_INSIDE(xx,yy)				\
+#define CLIP_INSIDE(xx,yy)				\
   (xx - ClipPoly [edge].x) * ClipData [edge].y -	\
   (yy - ClipPoly [edge].y) * ClipData [edge].x >= 0;
-#define BOXCLIP_INTERSECT				\
+#define CLIP_INTERSECT					\
   /* Check if and where edges intersects */		\
   /* t = - (n * (a - c)) / (n * (b - a)) */		\
   double denom = ((cx - px) * ClipData [edge].y -	\

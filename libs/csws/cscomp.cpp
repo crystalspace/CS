@@ -1039,7 +1039,8 @@ void csComponent::Clip (csObjVector &rect, csComponent *last)
             nb->Invalidate (inv, true);
           } /* endfor */
           state = oldstate;
-        } else if ((nb->GetState (CSS_VISIBLE)) && (nb->clipparent == this))
+        }
+        else if ((nb->GetState (CSS_VISIBLE)) && (nb->clipparent == this))
           for (i = rect.Length () - 1; i >= 0; i--)
           {
             csRect *cur = (csRect *)rect[i];
@@ -1313,39 +1314,6 @@ void csComponent::ObliqueRect3D (int xmin, int ymin, int xmax, int ymax,
   Line (xmin, ymax - 1, xmin, ymin + cornersize, lightindx);
   Line (xmin, ymin + cornersize - 1, xmin + cornersize - 1, ymin, lightindx);
   Line (xmin + cornersize, ymin, xmax - 1, ymin, lightindx);
-}
-
-void csComponent::Polygon3D (G3DPolygonDPFX &poly, UInt /*mode*/)
-{
- /* Do clipping as follows: create a minimal rectangle which fits the polygon,
-  * clip the rectangle against children & parents, then clip the poly against
-  * all resulting rectangles.
-  */
-  csObjVector rect (8, 4);
-  int i, x = QInt (poly.vertices[0].sx), y = QInt (poly.vertices[0].sy);
-  csRect *lb = new csRect (x, y, x, y);
-  for (i = 1; i < poly.num; i++)
-    lb->Extend (QInt (poly.vertices[i].sx), QInt (poly.vertices[i].sy));
-
-  lb->xmax++;
-  lb->ymax++;
-  lb->Intersect (dirty);
-  if (!clip.IsEmpty ())
-    lb->Intersect (clip);
-  rect.Push (lb);
-  Clip (rect, this);
-
-  for (i = rect.Length () - 1; i >= 0; i--)
-  {
-    csRect *cur = (csRect *)rect[i];
-// not implemented yet - todo clipping
-/*
-    app->pplPolygon3D (poly, mode);
-    if (!app->ClipLine (xx1, yy1, xx2, yy2,
-        cur->xmin, cur->ymin, cur->xmax, cur->ymax))
-      app->pplLine (xx1, yy1, xx2, yy2, color);
-*/
-  }
 }
 
 void csComponent::SetState (int mask, bool enable)
