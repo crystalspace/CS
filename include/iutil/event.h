@@ -93,7 +93,7 @@ SCF_VERSION (iEvent, 0, 1, 1);
  * </table>
  * <p>
  * A way to retrieve an keyboard event's data without requiring a plethora
- * of iEvent->Find() invokations provides the csKeyEventHelper class.
+ * of iEvent->Find() invocations provides the csKeyEventHelper class.
  * <p>
  * Also see iKeyComposer for informations about composing accented etc.
  * characters from dead and normal keys.

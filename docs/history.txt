@@ -31,7 +31,7 @@ chronological order.
 	  provided by Write(), so it has been marked as deprecated.
 	- res added SCF_DESTRUCT macros to the common and glwin32 canvas code.
 	- res updated a comment in ogl_txtmgr.cpp.
-	- res added a SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS invokation missing
+	- res added a SCF_IMPLEMENT_IBASE_REMOVE_REF_OWNERS invocation missing
 	  for csTinyXmlNode.
 	- Eric Sunshine fixed bugs: swigpythinst and swigperl5inst makefile
 	  targets failed to ensure that the appropriate `out' directories
@@ -41,6 +41,9 @@ chronological order.
 	  changed, causing compilation to fail.
 	- Eric Sunshine augmented jobber.pl to now automatically update
 	  out-dated Swig-generated Python and Perl5 files.
+	- Eric Sunshine performed project-wide spelling corrections:
+	    invokate   --> invocate
+	    invokation --> invocation
 4-Nov-2003
 	- Jorrit fixed a bug in Dynavis history culling. In some cases objects
 	  could remain visible for longer then expected because the history
@@ -5141,7 +5144,7 @@ chronological order.
 	- Jorrit got a fix from Arthur K. (nemerle@lsk.pl) for two memory
 	  leaks in AWS.
 	- res changed the way how SCF plugin scanning works:
-	    - Moved scanning invokation to scfInitialize().
+	    - Moved scanning invocation to scfInitialize().
 	    - A platform-dependent function, csScanPluginsDir(), returns
 	      plugin filenames and metadata.
 	    - Such a function is provided for Win32. For unix and MacOS/X,
@@ -5291,7 +5294,7 @@ chronological order.
 	  memory leak due to the non-destruction of the awsTutorial class
 	  instance.
 	- res fixed win32gcc.mak where the resourcer merger and compiler
-	  invokation didn't respect $(SRCDIR) causing "file not found"
+	  invocation didn't respect $(SRCDIR) causing "file not found"
 	  errors.
 	- res added a script to package XML metadata into a Windows resource
 	  script.
@@ -5364,7 +5367,7 @@ chronological order.
 	  introduced with Eric's large SCF changes on June 5, 2003.
 	- Jorrit renamed strarr.h to stringarray.h.
 	- res made the following changes:
-	    - Moved CS_INITIALIZE_PLATFORM_APPLICATION invokation to
+	    - Moved CS_INITIALIZE_PLATFORM_APPLICATION invocation to
 	      csInitializer::CreateEnvironment() and also augmented the
 	      doxygen documentation, as suggested by ES.
 	    - Added iWin32Assistant::GetApplicationWindow().
