@@ -137,8 +137,8 @@ int NeXTDriver2D::get_desired_depth() const
 	depth = atoi(s);
     else
 	{
-	csConfigAccess Config(iSys, "/config/video.cfg");
-	depth = Config->GetInt( "Video.SimulateDepth", 0 );
+	csConfigAccess cfg( System, "/config/video.cfg" );
+	depth = cfg->GetInt( "Video.SimulateDepth", 0 );
 	}
     if (depth != 0 && depth != 15 && depth != 16 && depth != 32)
 	{
