@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+23-Oct-2001
+	- M Voase did the following
+	  - Improved lighting on water procedural texture in flarge.
 22-Oct-2001
 	- Fixed a bug in the 'addghost' console command. It would fail
 	  if you used it more than once.
