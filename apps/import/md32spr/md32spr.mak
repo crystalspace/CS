@@ -28,7 +28,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 vpath %.cpp apps/import/md32spr
 
-MD32SPR.EXE = md32spr$(EXE)
+MD32SPR.EXE = md32spr$(EXE.CONSOLE)
 INC.MD32SPR = $(wildcard apps/import/md32spr/*.h)
 SRC.MD32SPR = $(wildcard apps/import/md32spr/*.cpp)
 OBJ.MD32SPR = $(addprefix $(OUT)/,$(notdir $(SRC.MD32SPR:.cpp=$O)))
@@ -57,7 +57,7 @@ $(MD32SPR.EXE): $(OBJ.MD32SPR) $(LIB.MD32SPR)
 	$(DO.LINK.CONSOLE.EXE) $(ZLIB.LFLAGS)
 
 md32sprclean:
-	-$(RM) $(MD32SPR.EXE) $(OBJ.MD32SPR)
+	-$(RMDIR) $(MD32SPR.EXE) $(OBJ.MD32SPR)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/md32spr.dep

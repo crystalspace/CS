@@ -17,6 +17,8 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine updated the configure script so that it emits the
 	  makefile variables COMP and OS to config.mak, and also now emits
 	  DEPEND_TOOL=cc if makedep is missing or has the incorrect version.
+	- Eric Sunshine eliminated compilation warnigns from the cloth plugin.
+	- Eric Sunshine fixed bugs in md32spr.mak.
 14-Jan-2003
 	- Keith Fulton fixed a bug in csPArray and csRefArray where DeleteAll()
 	  would not set the limit to 0.
