@@ -4,6 +4,8 @@ he history order is reversed so that new features are at the top.
 	- Matze added an autoconf macro for CS to scripts/cs-config, no
 	  documentation on usage yet, but I think it should be clear how to use
 	  it if you know autoconf.
+	- Matze fixed a strange compiler warning in csobject.cpp (I had to add a iObject() to
+	  the initializer list in the copy constructor, anyone knows why this is needed?)
 9-Jan-2002
 	- Eric Sunshine applied a much saner patch to the makefiles to combat
 	  the breakage caused by AndyZ's makefile change.  Reverted a patch

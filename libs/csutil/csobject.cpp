@@ -117,7 +117,7 @@ csObject::csObject (iBase* pParent) : Children (NULL), Name (NULL)
   InitializeObject ();
 }
 
-csObject::csObject (csObject &o) : Children (NULL), Name (NULL)
+csObject::csObject (csObject &o) : iObject(), Children (NULL), Name (NULL)
 {
   SCF_CONSTRUCT_IBASE (NULL);
   InitializeObject ();
