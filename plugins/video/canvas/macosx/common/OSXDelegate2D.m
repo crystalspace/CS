@@ -89,17 +89,19 @@
 // In fullscreen mode, opens a zero-sized window to get events
 - (BOOL) openWindow:(char *) winTitle width:(int) w height:(int) h depth:(int) d fullscreen:(BOOL) fs onDisplay:(CGDirectDisplayID) display onScreen:(int) screen;
 {
+    NSScreen *scr = [[NSScreen screens] objectAtIndex:screen];
     NSRect rect = NSZeroRect;
 
     if (window != nil)
         return YES;
 
-    // Position window in upper left in fullscreen mode, because although CG will switch resolutions,
-    // NSScreen does not reflect this change, and I don't think whatever mechanism NSWindow uses to position
-    // itself reflects this change either, because putting the rect at 0,0 puts it off the bottom of the screen
+    // Position window in upper left in fullscreen mode, because although CG will 
+    // switch resolutions, NSScreen does not reflect this change, and I don't think
+    // whatever mechanism NSWindow uses to position itself reflects this change either, 
+    // because putting the rect at 0,0 puts it off the bottom of the screen
     // Center rect in Windowed mode (using CG to get correct screen dimensions)
     if (fs == YES)
-        rect = NSMakeRect(0, [[NSScreen mainScreen] frame].size.height - h, w - 1, h - 1);
+        rect = NSMakeRect(0, [scr frame].size.height - h, w - 1, h - 1);
     else
     {
         int dispWidth = CGDisplayPixelsWide(display);
@@ -110,8 +112,7 @@
     // Create window with correct style
     style = [self getWindowStyleForMode:fs];
     window = [[OSXWindow alloc] initWithContentRect:rect styleMask:style
-                backing:NSBackingStoreBuffered defer:NO 
-                screen:[[NSScreen screens] objectAtIndex:screen]];
+                backing:NSBackingStoreBuffered defer:NO screen:scr];
 
     if (window == nil)
         return NO;

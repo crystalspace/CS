@@ -10,7 +10,11 @@
 
 
 // Initialized on first use, destroyed at program termination
-static CGColorSpaceRef colorSpace = NULL;
+static CGColorSpaceRef colorSpace = NULL;        
+    
+
+
+////////// OSXDelegate (CGBlit) category
 
 
 @interface OSXDelegate2D (CGBlit)
@@ -37,22 +41,39 @@ static CGColorSpaceRef colorSpace = NULL;
 
     if ([contentView lockFocusIfCanDraw] == YES)
     {
-        size_t bytesPerPixel = depth / 8;
-        size_t bitsPerComponent = (depth == 32) ? 8 : 5;
-        size_t bytesPerRow = bytesPerPixel * width;
-        size_t bufferSize = height * bytesPerRow;
-        CGDataProviderRef prov = CGDataProviderCreateWithData(NULL, buffer, bufferSize, NULL);
-        CGImageRef image = CGImageCreate(width, height, bitsPerComponent, depth, bytesPerRow, colorSpace,
-                                        kCGImageAlphaNoneSkipFirst, prov, NULL, NO, kCGRenderingIntentDefault);
+        // We only need new versions of these when the backing buffer changes
+        // Using static variables will be a problem if the user creates more than
+        // one canvas at a time
+        static CGDataProviderRef prov = NULL;
+        static CGImageRef image = NULL;
+        static CGRect rect;
 
-        CGContextDrawImage([[NSGraphicsContext currentContext] graphicsPort],
-                                CGRectMake(0, 0, width, height), image);
+        if ((prov == NULL) || 
+            (width != rect.size.width) || (height != rect.size.height))
+        {
+            size_t bytesPerPixel = depth / 8;
+            size_t bitsPerComponent = (depth == 32) ? 8 : 5;
+            size_t bytesPerRow = bytesPerPixel * width;
+            size_t bufferSize = height * bytesPerRow;
+
+            if (prov != NULL)
+            {
+                CGDataProviderRelease(prov);
+                CGImageRelease(image);            
+            }
+
+            prov = CGDataProviderCreateWithData(NULL, buffer, bufferSize, NULL);
+            image = CGImageCreate(width, height, bitsPerComponent, depth, 
+                                bytesPerRow, colorSpace, kCGImageAlphaNoneSkipFirst, 
+                                prov, NULL, NO, kCGRenderingIntentDefault);
+            rect = CGRectMake(0, 0, width, height);
+        };
+        
+        CGContextDrawImage([[NSGraphicsContext currentContext] graphicsPort], 
+                            rect, image);
 
         [window flushWindow];
         [contentView unlockFocus];
-
-        CGDataProviderRelease(prov);
-        CGImageRelease(image);
 
         return YES;
     };

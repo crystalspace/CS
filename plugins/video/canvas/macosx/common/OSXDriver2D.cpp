@@ -7,7 +7,6 @@
 //
 
 
-// Must be first include
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "iutil/cmdline.h"
