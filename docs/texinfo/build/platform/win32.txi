@@ -62,10 +62,10 @@ locations:
 This site should contain everything you need in the @samp{Sources} section: @*
 @uref{http://www.multimania.com/noote/CrystalSpace}
 
-@item OpenGL runtime libraries
+@item SGI OpenGL for Windows Software Development Kit (@sc{sdk})
 @uref{http://www.meer.net/~gold/OpenGL/sgi-opengl.html}
 
-@item OpenGL @sc{sdk}
+@item Microsoft OpenGL @sc{sdk}
 The Microsoft OpenGL @sc{sdk} ships with the platform @sc{sdk}. In Microsoft's
 own words:
 @quotation
