@@ -24,7 +24,6 @@
 class csLightPatchPool;
 class csPolygon3D;
 struct iLight;
-struct iShadowBlock;
 
 /**
  * A light patch. This is a 3D polygon which fits on a world level 3D
@@ -54,9 +53,6 @@ private:
 
   /// Light that this light patch originates from.
   iLight* light;
-
-  /// List of shadow frustums.
-  csRef<iShadowBlock> shadows;
 
   /// frustum of where the visible light hits (for use with curves)
   csRef<csFrustum> light_frustum;
@@ -93,11 +89,6 @@ public:
    * Get the light that this light patch belongs too.
    */
   iLight* GetLight () { return light; }
-
-  /// Set the shadow block.
-  void SetShadowBlock (iShadowBlock* bl);
-  /// Get a reference to the shadow list.
-  iShadowBlock* GetShadowBlock () { return shadows; }
 
   /// Get the number of vertices in this light patch.
   int GetVertexCount () { return num_vertices; }

@@ -503,9 +503,29 @@ void csLight::CalculateLighting ()
 
   ctxt->SetNewLightFrustum (new csFrustum (center));
   ctxt->GetLightFrustum ()->MakeInfinite ();
-  sector->CheckFrustum ((iFrustumView *) &lview);
 
-  lpi->FinalizeLighting ();
+  if (dynamic_type == CS_LIGHT_DYNAMICTYPE_DYNAMIC)
+  {
+    csRef<iMeshWrapperIterator> it = csEngine::current_engine
+    	->GetNearbyMeshes (sector, center, GetInfluenceRadius ());
+    while (it->HasNext ())
+    {
+      iMeshWrapper* m = it->Next ();
+      iShadowReceiver* receiver = m->GetShadowReceiver ();
+      if (receiver)
+      {
+        receiver->CastShadows (m->GetMovable (), &lview);
+        csMeshWrapper* cmw = ((csMeshWrapper::MeshWrapper*)m)
+		->GetCsMeshWrapper ();
+        cmw->InvalidateRelevantLights ();
+      }
+    }
+  }
+  else
+  {
+    sector->CheckFrustum ((iFrustumView *) &lview);
+    lpi->FinalizeLighting ();
+  }
 }
 
 void csLight::CalculateLighting (iMeshWrapper *th)

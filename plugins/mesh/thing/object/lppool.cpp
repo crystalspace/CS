@@ -41,7 +41,6 @@ csLightPatch::~csLightPatch ()
 void csLightPatch::RemovePatch ()
 {
   if (polygon) polygon->UnlinkLightpatch (this);
-  shadows->DeleteShadows ();
   light_frustum = 0;
 }
 
@@ -55,10 +54,5 @@ void csLightPatch::Initialize (int n)
   }
 
   num_vertices = n;
-}
-
-void csLightPatch::SetShadowBlock (iShadowBlock* bl)
-{
-  shadows = bl;
 }
 

@@ -1198,38 +1198,6 @@ bool csPolygon3D::WriteToCache (iFile* file, csPolygon3DStatic* spoly)
   return true;
 }
 
-void csPolygon3D::FillLightMapDynamic (iFrustumView* lview)
-{
-  csFrustumContext *ctxt = lview->GetFrustumContext ();
-
-  // We are working for a dynamic light. In this case we create
-  // a light patch for this polygon.
-  // @@@ Lots of pointers to get the lightpatch pool!!!
-  csLightPatch *lp = thing->GetStaticData ()->thing_type->
-    lightpatch_pool->Alloc ();
-  csRef<iShadowBlock> sb = lview->CreateShadowBlock ();
-  lp->SetShadowBlock (sb);
-  AddLightpatch (lp);
-
-  iFrustumViewUserdata* fvud = lview->GetUserdata ();
-  iLightingProcessInfo* lpi = (iLightingProcessInfo*)fvud;
-  iLight* l = lpi->GetLight ();
-  lp->SetLight (l);
-
-  csFrustum *light_frustum = ctxt->GetLightFrustum ();
-  lp->Initialize (light_frustum->GetVertexCount ());
-
-  // Copy shadow frustums.
-  lp->GetShadowBlock ()->AddRelevantShadows (ctxt->GetShadows ());
-
-  int i, mi;
-  for (i = 0; i < lp->GetVertexCount (); i++)
-  {
-    mi = ctxt->IsMirrored () ? lp->GetVertexCount () - i - 1 : i;
-    lp->GetVertex (i) = light_frustum->GetVertex (mi);
-  }
-}
-
 bool csPolygon3D::MarkRelevantShadowFrustums (
   iFrustumView* lview,
   csPlane3 &plane,
@@ -1394,8 +1362,6 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
   csVector3 *poly;
   int num_vertices;
 
-  bool fill_lightmap = true;
-
   num_vertices = spoly->polygon_data.num_vertices;
   if ((size_t)num_vertices > VectorArray->Length ())
     VectorArray->SetLength (num_vertices);
@@ -1432,39 +1398,38 @@ void csPolygon3D::CalculateLightingDynamic (iFrustumView *lview,
       poly_plane,
       dist_to_plane * dist_to_plane);
 
-  if (min_sqdist >= lview->GetSquaredRadius ())
+  if (min_sqdist >= lview->GetSquaredRadius ()) return;
+
+  // Update the lightmap.
+  FillLightMapDynamic (lview, new_light_frustum);
+}
+
+void csPolygon3D::FillLightMapDynamic (iFrustumView* lview,
+	csFrustum* light_frustum)
+{
+  csFrustumContext *ctxt = lview->GetFrustumContext ();
+
+  // We are working for a dynamic light. In this case we create
+  // a light patch for this polygon.
+  // @@@ Lots of pointers to get the lightpatch pool!!!
+  csLightPatch *lp = thing->GetStaticData ()->thing_type->
+    lightpatch_pool->Alloc ();
+  AddLightpatch (lp);
+
+  iFrustumViewUserdata* fvud = lview->GetUserdata ();
+  iLightingProcessInfo* lpi = (iLightingProcessInfo*)fvud;
+  iLight* l = lpi->GetLight ();
+  lp->SetLight (l);
+
+  //csFrustum *light_frustum = ctxt->GetLightFrustum ();
+  lp->Initialize (light_frustum->GetVertexCount ());
+
+  int i, mi;
+  for (i = 0; i < lp->GetVertexCount (); i++)
   {
-    return ;
+    mi = ctxt->IsMirrored () ? lp->GetVertexCount () - i - 1 : i;
+    lp->GetVertex (i) = light_frustum->GetVertex (mi);
   }
-
-  csFrustumContext *old_ctxt = lview->GetFrustumContext ();
-  lview->CreateFrustumContext ();
-
-  csFrustumContext *new_ctxt = lview->GetFrustumContext ();
-
-  // @@@ CHECK IF SetLightFrustum doesn't cause memory leaks!!!
-  new_ctxt->SetLightFrustum (new_light_frustum);
-
-  // Mark all shadow frustums in 'new_lview' which are relevant. i.e.
-  // which are inside the light frustum and are not obscured (shadowed)
-  // by other shadow frustums.
-  // We also give the polygon plane to MarkRelevantShadowFrustums so that
-  // all shadow frustums which start at the same plane are discarded as
-  // well.
-  // FillLightMap() will use this information and
-
-  csPlane3 inv_world_plane = world_plane;
-  // First translate plane to center of frustum.
-  inv_world_plane.DD += inv_world_plane.norm * lview->GetFrustumContext ()
-    ->GetLightFrustum ()->GetOrigin ();
-  inv_world_plane.Invert ();
-  if (!MarkRelevantShadowFrustums (lview, inv_world_plane, spoly)) goto stop;
-
-  // Update the lightmap given light and shadow frustums in new_lview.
-  if (fill_lightmap) FillLightMapDynamic (lview);
-
-stop:
-  lview->RestoreFrustumContext (old_ctxt);
 }
 
 void csPolygon3D::CalculateLightingStatic (iFrustumView *lview,

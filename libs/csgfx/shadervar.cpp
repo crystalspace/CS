@@ -20,7 +20,7 @@
 #include "cssysdef.h"
 #include "csgfx/shadervar.h"
 
-CS_LEAKGUARD_IMPLEMENT (csShaderVariable)
+//CS_LEAKGUARD_IMPLEMENT (csShaderVariable)
 
 csShaderVariable::csShaderVariable (csStringID name) :
   csRefCount (), TextureHandValue (0), TextureWrapValue (0), VectorValue (0),

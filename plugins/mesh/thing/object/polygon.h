@@ -642,7 +642,7 @@ public:
    * The "frustum" parameter defines the original light frustum (not the
    * one bounded by this polygon as given by "lview").
    */
-  void FillLightMapDynamic (iFrustumView* lview);
+  void FillLightMapDynamic (iFrustumView* lview, csFrustum* frustum);
 
   /**
    * Check all shadow frustums and mark all relevant ones. A shadow

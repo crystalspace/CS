@@ -461,18 +461,14 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
   csPolygon3D* polygon,
   const csPlane3& polygon_world_plane)
 {
-  csPolyTextureMapping* tmapping = polygon->GetStaticPoly ()->GetTextureMapping ();
+  csPolyTextureMapping* tmapping = polygon->GetStaticPoly ()
+  	->GetTextureMapping ();
   int lw = 1 +
     ((tmapping->GetLitOriginalWidth () + csLightMap::lightcell_size - 1) >>
       csLightMap::lightcell_shift);
   int lh = 1 +
     ((tmapping->GetLitHeight () + csLightMap::lightcell_size - 1) >>
       csLightMap::lightcell_shift);
-
-  int u, uv;
-
-  int l1, l2 = 0, l3 = 0;
-  float d;
 
   int ww, hh;
   iMaterialHandle* mat_handle = polygon->GetStaticPoly()->GetMaterialHandle();
@@ -490,7 +486,6 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
 
   csVector3 v1, v2;
 
-  int ru, rv;
   float invww, invhh;
   invww = 1.0f / (float)ww;
   invhh = 1.0f / (float)hh;
@@ -512,13 +507,14 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
   else
     lightpos = light->GetCenter ();
 
+  float infradius_sq = light->GetInfluenceRadiusSq ();
+
   // Calculate the uv's for all points of the frustum (the
   // frustum is actually a clipped version of the polygon).
-  csVector2 *f_uv = 0;
+  csVector2 f_uv[100];
   if (lp->GetVertices ())
   {
     int mi;
-    f_uv = new csVector2[lp->GetVertexCount ()];
     for (i = 0; i < lp->GetVertexCount (); i++)
     {
       //if (lview.IsMirrored ()) mi = lview.num_frustum-i-1;
@@ -534,6 +530,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
       if (f_uv[i].y > maxy) maxy = f_uv[MaxIndex = i].y;
     }
   }
+  else return;
 
   csColor color = light->GetColor () * CS_NORMAL_LIGHT_LEVEL;
 
@@ -565,7 +562,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp,
       {
         // Check first if polygon has been finished
 a:
-        if (scanR2 == MinIndex) goto finish;
+        if (scanR2 == MinIndex) return;
         scanR1 = scanR2;
         scanR2 = (scanR2 + 1) % lp->GetVertexCount ();
 
@@ -575,7 +572,7 @@ a:
           goto a;
         }
 
-        /*      if (scanR2 == MinIndex) goto finish;
+        /*      if (scanR2 == MinIndex) return;
         scanR1 = scanR2;
         scanR2 = (scanR2 + 1) % lp->num_vertices;
 */
@@ -598,7 +595,7 @@ a:
       if (sy <= fyL)
       {
 b:
-        if (scanL2 == MinIndex) goto finish;
+        if (scanL2 == MinIndex) return;
         scanL1 = scanL2;
         scanL2 = (scanL2 - 1 + lp->GetVertexCount ()) % lp->GetVertexCount ();
 
@@ -641,7 +638,7 @@ b:
       // @@@ The check below should not be needed but it is.
       if (sy < 0)
       {
-        goto finish;
+        return;
       }
 
       // Compute the rounded screen coordinates of horizontal strip
@@ -661,104 +658,366 @@ b:
       if (xR < 0) xR = 0;
       if (xL > lw) xL = lw;
 
-      for (u = xR; u < xL; u++)
-      {
-        uv = sy * new_lw + u;
+      v1.x = float ((xR << csLightMap::lightcell_shift)
+      	+ tmapping->GetIMinU ()) * invww;
+      v1.y = float ((sy << csLightMap::lightcell_shift)
+      	+ tmapping->GetIMinV ()) * invhh;
+      v1.z = 0;
+      float dv1x = float (csLightMap::lightcell_size) * invww;
 
-        ru = u << csLightMap::lightcell_shift;
-        rv = sy << csLightMap::lightcell_shift;
+      int uv = sy * new_lw + xR;
+      csRGBpixel* map_uv = map + uv;
 
-        v1.x = (float)(ru + tmapping->GetIMinU ()) * invww;
-        v1.y = (float)(rv + tmapping->GetIMinV ()) * invhh;
-        v1.z = 0;
-        v2 = vv + m_t2w * v1;
+      // We have to calculate v2 = vv + m_t2w * v1 every time in the
+      // loop below. However, v1.z is 0 and v1.y never changes so we
+      // can optimize this a little bit.
+      v2.x = vv.x + m_t2w.m11 * v1.x + m_t2w.m12 * v1.y;
+      v2.y = vv.y + m_t2w.m21 * v1.x + m_t2w.m22 * v1.y;
+      v2.z = vv.z + m_t2w.m31 * v1.x + m_t2w.m32 * v1.y;
+      float dv2x_x = m_t2w.m11 * dv1x;
+      float dv2x_y = m_t2w.m21 * dv1x;
+      float dv2x_z = m_t2w.m31 * dv1x;
 
-        // Check if the point on the polygon is shadowed. To do this
-        // we traverse all shadow frustums and see if it is contained in
-  // any of them.
-        iShadowIterator *shadow_it = lp->GetShadowBlock ()
-    		->GetShadowIterator ();
-        bool shadow = false;
-        while (shadow_it->HasNext ())
-        {
-          csFrustum *shadow_frust = shadow_it->Next ();
-          if (
-            shadow_it->IsRelevant () &&
-            ((csPolygon3D *) (shadow_it->GetUserData ())) != polygon)
-            if (shadow_frust->Contains (v2 - shadow_frust->GetOrigin ()))
-            {
-              shadow = true;
-              break;
-            }
-        }
+      // We work relative to lightpos.
+      v2 -= lightpos;
 
-        shadow_it->DecRef ();
+      int du = xL - xR;
+      if (cosfact > 0.0001)
+        ShineDynLightMapHorizCosfact (du, map_uv, v2,
+	  dv2x_x, dv2x_y, dv2x_z,
+	  light, color, infradius_sq, cosfact,
+	  polygon_world_plane);
+      else
+        ShineDynLightMapHoriz (du, map_uv, v2,
+	  dv2x_x, dv2x_y, dv2x_z,
+	  light, color, infradius_sq,
+	  polygon_world_plane);
 
-        if (!shadow)
-        {
-          d = csSquaredDist::PointPoint (lightpos, v2);
-
-          if (d >= light->GetInfluenceRadiusSq ()) continue;
-          d = csQsqrt (d);
-
-          float cosinus = (v2 - lightpos) * polygon_world_plane.Normal ();
-          cosinus /= d;
-          cosinus += cosfact;
-          if (cosinus < 0)
-            cosinus = 0;
-          else if (cosinus > 1)
-            cosinus = 1;
-
-          float brightness = cosinus * light->GetBrightnessAtDistance (d);
-
-          if (color.red > 0)
-          {
-            l1 = csQround (color.red * brightness);
-            if (l1)
-            {
-              CS_ASSERT (uv >= 0 && uv < lm_size);
-              l1 += map[uv].red;
-              if (l1 > 255) l1 = 255;
-              map[uv].red = l1;
-            }
-          }
-
-          if (color.green > 0)
-          {
-            l2 = csQround (color.green * brightness);
-            if (l2)
-            {
-              CS_ASSERT (uv >= 0 && uv < lm_size);
-              l2 += map[uv].green;
-              if (l2 > 255) l2 = 255;
-              map[uv].green = l2;
-            }
-          }
-
-          if (color.blue > 0)
-          {
-            l3 = csQround (color.blue * brightness);
-            if (l3)
-            {
-              CS_ASSERT (uv >= 0 && uv < lm_size);
-              l3 += map[uv].blue;
-              if (l3 > 255) l3 = 255;
-              map[uv].blue = l3;
-            }
-          }
-        }
-      }
-
-      if (!sy) goto finish;
+      if (!sy) return;
       sxL += dxL;
       sxR += dxR;
       sy--;
     }
   }
-
-finish:
-  delete[] f_uv;
 }
+
+#undef UPDATE_MAP
+#define UPDATE_MAP(cname) \
+      if (color.cname > 0) \
+      { \
+        float fl = color.cname * brightness; \
+        if (fl > 0.5) \
+        { \
+          int l = csQint (fl) + map_uv->cname; \
+          if (l > 255) l = 255; \
+          map_uv->cname = l; \
+        } \
+      }
+
+void csPolyTexture::ShineDynLightMapHorizCosfact (
+	int du, csRGBpixel* map_uv,
+	csVector3& v2,
+	float dv2x_x, float dv2x_y, float dv2x_z,
+	iLight* light, const csColor& color, float infradius_sq,
+	float cosfact,
+	const csPlane3& polygon_world_plane)
+{
+  float inv_dist;
+
+  // We select a different loop based on attenuation type for most
+  // effiency. This makes a huge difference.
+  switch (light->GetAttenuation ())
+  {
+    case CS_ATTN_INVERSE:
+      while (du > 0)
+      {
+        du--;
+        // Calculate squared distance between lightpos and transformed point.
+        float d = v2.x * v2.x + v2.y * v2.y + v2.z * v2.z;
+        if (d < infradius_sq)
+        {
+          float inv_d = csQisqrt (d);
+
+          // Remember that v2 is point on lightmap in 3D minutes lightpos.
+          float cosinus = v2 * polygon_world_plane.Normal ();
+          cosinus *= inv_d;
+          cosinus += cosfact;
+          if (cosinus < 0.02) continue;
+          else if (cosinus > 1) cosinus = 1;
+
+          float brightness = cosinus * inv_d;
+          if (brightness < 0.005) continue;
+	  UPDATE_MAP (red);
+	  UPDATE_MAP (green);
+	  UPDATE_MAP (blue);
+        }
+        v2.x += dv2x_x;
+        v2.y += dv2x_y;
+        v2.z += dv2x_z;
+        map_uv++;
+      }
+      break;
+    case CS_ATTN_REALISTIC:
+      while (du > 0)
+      {
+        du--;
+        // Calculate squared distance between lightpos and transformed point.
+        float sqd = v2.x * v2.x + v2.y * v2.y + v2.z * v2.z;
+        if (sqd < infradius_sq)
+        {
+          float inv_d = csQisqrt (sqd);
+
+          // Remember that v2 is point on lightmap in 3D minutes lightpos.
+          float cosinus = v2 * polygon_world_plane.Normal ();
+          cosinus *= inv_d;
+          cosinus += cosfact;
+          if (cosinus < 0.02) continue;
+          else if (cosinus > 1) cosinus = 1;
+
+          float brightness = cosinus / sqd;
+          if (brightness < 0.005) continue;
+	  UPDATE_MAP (red);
+	  UPDATE_MAP (green);
+	  UPDATE_MAP (blue);
+        }
+        v2.x += dv2x_x;
+        v2.y += dv2x_y;
+        v2.z += dv2x_z;
+        map_uv++;
+      }
+      break;
+    case CS_ATTN_NONE:
+      while (du > 0)
+      {
+        du--;
+        // Calculate squared distance between lightpos and transformed point.
+        float d = v2.x * v2.x + v2.y * v2.y + v2.z * v2.z;
+        if (d < infradius_sq)
+        {
+          float inv_d = csQisqrt (d);
+
+          // Remember that v2 is point on lightmap in 3D minutes lightpos.
+          float cosinus = v2 * polygon_world_plane.Normal ();
+          cosinus *= inv_d;
+          cosinus += cosfact;
+	  float brightness;
+          if (cosinus < 0.001) continue;
+          else if (cosinus > 1) brightness = 1;
+	  else brightness = cosinus;
+
+	  UPDATE_MAP (red);
+	  UPDATE_MAP (green);
+	  UPDATE_MAP (blue);
+        }
+        v2.x += dv2x_x;
+        v2.y += dv2x_y;
+        v2.z += dv2x_z;
+        map_uv++;
+      }
+      break;
+    case CS_ATTN_LINEAR:
+      inv_dist = 1.0 / light->GetInfluenceRadius ();
+      while (du > 0)
+      {
+        du--;
+        // Calculate squared distance between lightpos and transformed point.
+        float d = v2.x * v2.x + v2.y * v2.y + v2.z * v2.z;
+        if (d < infradius_sq)
+        {
+          d = csQsqrt (d);
+
+          // Remember that v2 is point on lightmap in 3D minutes lightpos.
+          float cosinus = v2 * polygon_world_plane.Normal ();
+          cosinus /= d;
+          cosinus += cosfact;
+	  float brightness;
+          if (cosinus < 0.02) continue;
+          else if (cosinus > 1) brightness = 1.0 - d * inv_dist;
+	  else brightness = cosinus - cosinus * d * inv_dist;
+
+          if (brightness < 0.005) continue;
+	  UPDATE_MAP (red);
+	  UPDATE_MAP (green);
+	  UPDATE_MAP (blue);
+        }
+        v2.x += dv2x_x;
+        v2.y += dv2x_y;
+        v2.z += dv2x_z;
+        map_uv++;
+      }
+      break;
+    default:
+      // Most general loop.
+      while (du > 0)
+      {
+        du--;
+        // Calculate squared distance between lightpos and transformed point.
+        float d = v2.x * v2.x + v2.y * v2.y + v2.z * v2.z;
+        if (d < infradius_sq)
+        {
+          d = csQsqrt (d);
+
+          // Remember that v2 is point on lightmap in 3D minutes lightpos.
+          float cosinus = v2 * polygon_world_plane.Normal ();
+          cosinus /= d;
+          cosinus += cosfact;
+          if (cosinus < 0.02) continue;
+          else if (cosinus > 1) cosinus = 1;
+
+          float brightness = cosinus * light->GetBrightnessAtDistance (d);
+          if (brightness < 0.005) continue;
+	  UPDATE_MAP (red);
+	  UPDATE_MAP (green);
+	  UPDATE_MAP (blue);
+        }
+        v2.x += dv2x_x;
+        v2.y += dv2x_y;
+        v2.z += dv2x_z;
+        map_uv++;
+      }
+      break;
+  }
+}
+
+void csPolyTexture::ShineDynLightMapHoriz (
+	int du, csRGBpixel* map_uv,
+	csVector3& v2,
+	float dv2x_x, float dv2x_y, float dv2x_z,
+	iLight* light, const csColor& color, float infradius_sq,
+	const csPlane3& polygon_world_plane)
+{
+  float inv_dist;
+
+  // We select a different loop based on attenuation type for most
+  // effiency. This makes a huge difference.
+  switch (light->GetAttenuation ())
+  {
+    case CS_ATTN_INVERSE:
+      while (du > 0)
+      {
+        du--;
+        // Calculate squared distance between lightpos and transformed point.
+        float d = v2.x * v2.x + v2.y * v2.y + v2.z * v2.z;
+        if (d < infradius_sq)
+        {
+          // Remember that v2 is point on lightmap in 3D minutes lightpos.
+          float brightness = v2 * polygon_world_plane.Normal ();
+          brightness /= d;
+          if (brightness < 0.005) continue;
+	  UPDATE_MAP (red);
+	  UPDATE_MAP (green);
+	  UPDATE_MAP (blue);
+        }
+        v2.x += dv2x_x;
+        v2.y += dv2x_y;
+        v2.z += dv2x_z;
+        map_uv++;
+      }
+      break;
+    case CS_ATTN_REALISTIC:
+      while (du > 0)
+      {
+        du--;
+        // Calculate squared distance between lightpos and transformed point.
+        float sqd = v2.x * v2.x + v2.y * v2.y + v2.z * v2.z;
+        if (sqd < infradius_sq)
+        {
+          float d = csQsqrt (sqd);
+
+          // Remember that v2 is point on lightmap in 3D minutes lightpos.
+          float cosinus = v2 * polygon_world_plane.Normal ();
+          float brightness = cosinus / (d * sqd);
+          if (brightness < 0.005) continue;
+	  UPDATE_MAP (red);
+	  UPDATE_MAP (green);
+	  UPDATE_MAP (blue);
+        }
+        v2.x += dv2x_x;
+        v2.y += dv2x_y;
+        v2.z += dv2x_z;
+        map_uv++;
+      }
+      break;
+    case CS_ATTN_NONE:
+      while (du > 0)
+      {
+        du--;
+        // Calculate squared distance between lightpos and transformed point.
+        float d = v2.x * v2.x + v2.y * v2.y + v2.z * v2.z;
+        if (d < infradius_sq)
+        {
+          float inv_d = csQisqrt (d);
+
+          // Remember that v2 is point on lightmap in 3D minutes lightpos.
+          float brightness = v2 * polygon_world_plane.Normal ();
+          brightness *= inv_d;
+          if (brightness < 0.005) continue;
+
+	  UPDATE_MAP (red);
+	  UPDATE_MAP (green);
+	  UPDATE_MAP (blue);
+        }
+        v2.x += dv2x_x;
+        v2.y += dv2x_y;
+        v2.z += dv2x_z;
+        map_uv++;
+      }
+      break;
+    case CS_ATTN_LINEAR:
+      inv_dist = 1.0 / light->GetInfluenceRadius ();
+      while (du > 0)
+      {
+        du--;
+        // Calculate squared distance between lightpos and transformed point.
+        float d = v2.x * v2.x + v2.y * v2.y + v2.z * v2.z;
+        if (d < infradius_sq)
+        {
+          float inv_d = csQisqrt (d);
+
+          // Remember that v2 is point on lightmap in 3D minutes lightpos.
+          float cosinus = v2 * polygon_world_plane.Normal ();
+	  float brightness = cosinus * (inv_d - inv_dist);
+
+          if (brightness < 0.005) continue;
+	  UPDATE_MAP (red);
+	  UPDATE_MAP (green);
+	  UPDATE_MAP (blue);
+        }
+        v2.x += dv2x_x;
+        v2.y += dv2x_y;
+        v2.z += dv2x_z;
+        map_uv++;
+      }
+      break;
+    default:
+      // Most general loop.
+      while (du > 0)
+      {
+        du--;
+        // Calculate squared distance between lightpos and transformed point.
+        float d = v2.x * v2.x + v2.y * v2.y + v2.z * v2.z;
+        if (d < infradius_sq)
+        {
+          d = csQsqrt (d);
+
+          // Remember that v2 is point on lightmap in 3D minutes lightpos.
+          float cosinus = v2 * polygon_world_plane.Normal ();
+          cosinus /= d;
+          float brightness = cosinus * light->GetBrightnessAtDistance (d);
+          if (brightness < 0.005) continue;
+	  UPDATE_MAP (red);
+	  UPDATE_MAP (green);
+	  UPDATE_MAP (blue);
+        }
+        v2.x += dv2x_x;
+        v2.y += dv2x_y;
+        v2.z += dv2x_z;
+        map_uv++;
+      }
+      break;
+  }
+}
+#undef UPDATE_MAP
 
 void csPolyTexture::UpdateFromShadowBitmap (
   iLight *light,

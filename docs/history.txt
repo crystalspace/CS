@@ -6,6 +6,15 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+31-Aug-2004
+	- Jorrit did a huge optimization and cleanup on dynamic lights (old
+	  style dynamic lights which do NOT use stencil hardware). Pressing
+	  'L' in walktest (which adds a huge dynamic light at the current
+	  spot) improved from 22 seconds to something slightly bigger then
+	  0 seconds (for a big level). To do this I had to remove support
+	  for shadows. I don't think shadows for dynamic lights are that
+	  important. They will still correctly shadow if they shine through
+	  a portal (i.e. the portal boundary).
 30-Aug-2004
 	- Jorrit fixed iCameraPosition->Load() so that it will first
 	  attempt to find a sector in the current region and if that

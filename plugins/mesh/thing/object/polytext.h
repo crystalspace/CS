@@ -324,6 +324,21 @@ public:
 	const csVector3& v_world2tex,
 	csPolygon3D* polygon,
 	const csPlane3& polygon_world_plane);
+  // Assuming cosfact == 0 this will do one scanline of a lightmap.
+  void ShineDynLightMapHoriz (
+	int du, csRGBpixel* map_uv,
+	csVector3& v2,
+	float dv2x_x, float dv2x_y, float dv2x_z,
+	iLight* light, const csColor& color, float infradius_sq,
+	const csPlane3& polygon_world_plane);
+  // Same but using cosfact now.
+  void ShineDynLightMapHorizCosfact (
+	int du, csRGBpixel* map_uv,
+	csVector3& v2,
+	float dv2x_x, float dv2x_y, float dv2x_z,
+	iLight* light, const csColor& color, float infradius_sq,
+	float cosfact,
+	const csPlane3& polygon_world_plane);
 
   /**
    * Transform this plane from object space to world space using
