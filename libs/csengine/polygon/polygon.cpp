@@ -2156,6 +2156,7 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
   csFrustumContext *ctxt = lview.GetFrustumContext ();
   iShadowIterator *shadow_it = ctxt->GetShadows ()->GetShadowIterator ();
   csFrustum *lf = ctxt->GetLightFrustum ();
+  const csVector3 &center = ctxt->GetLightFrustum ()->GetOrigin ();
 
   // Precalculate the normals for csFrustum::BatchClassify.
   csVector3 *lf_verts = lf->GetVertices ();
@@ -2180,15 +2181,12 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
     else
     {
       csPolygon3D *sfp = (csPolygon3D *) (shadow_it->GetUserData ());
-      switch
-      (
-        csFrustum::BatchClassify (
+      switch (csFrustum::BatchClassify (
             lf_verts,
             lf_normals,
             lf->GetVertexCount (),
             sf->GetVertices (),
-            sf->GetVertexCount ())
-      )
+            sf->GetVertexCount ()))
       {
         case CS_FRUST_PARTIAL:
         case CS_FRUST_INSIDE:
@@ -2241,6 +2239,21 @@ bool csPolygon3D::MarkRelevantShadowFrustums (
           shadow_it->MarkRelevant (false);
           break;
         case CS_FRUST_COVERED:
+	  {
+	    // To see if we really have a 'covered' case we first
+	    // test if the covering polygon isn't behind the first
+	    // polygon. To do that we take a ray from the center of
+	    // the light to the plane of the other polygon and see
+	    // if it intersects.
+	    csVector3 isect;
+	    float dist;
+	    if (!csIntersect3::Plane (center, Vwor (0), *(sfp->GetPolyPlane ()),
+	    	isect, dist))
+	    {
+              shadow_it->MarkRelevant (false);
+	      break;
+	    }
+	  }
           shadow_it->DecRef ();
           return false;
       }
@@ -2256,7 +2269,8 @@ bool csPolygon3D::MarkRelevantShadowFrustums (csFrustumView &lview)
   csPlane3 poly_plane = *GetPolyPlane ();
 
   // First translate plane to center of frustum.
-  poly_plane.DD += poly_plane.norm * lview.GetFrustumContext ()->GetLightFrustum ()->GetOrigin ();
+  poly_plane.DD += poly_plane.norm * lview.GetFrustumContext ()
+  	->GetLightFrustum ()->GetOrigin ();
   poly_plane.Invert ();
   return MarkRelevantShadowFrustums (lview, poly_plane);
 }

@@ -5,6 +5,9 @@ The history order is reversed so that new features are at the top.
 	  (when writing text) without a corresponding glBegin().
 	  Thanks to Mihai Ganea <miaig2@myrealbox.com> for spotting and
 	  fixing this bug.
+	- Fixed a bug in dynamic lighting where it would cause bad shadows
+	  if some object enclosed another. Added an additional test to see
+	  if a polygon is really covering another to avoid this.
 9-Oct-2002
 	- For some reason include/cssys/win32/csosdefs.h was full of
 	  ^M (carriage return) characters. This failed the compilation.
