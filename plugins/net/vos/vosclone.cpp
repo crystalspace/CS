@@ -46,9 +46,9 @@ public:
   virtual void doTask();
 };
 
-ConstructCloneTask::ConstructCloneTask(iObjectRegistry *objreg, 
-		  vRef<csMetaObject3D> obj, csMetaClone *c, std::string n,
-		  iSector *s)
+ConstructCloneTask::ConstructCloneTask(iObjectRegistry *objreg,
+      vRef<csMetaObject3D> obj, csMetaClone *c, std::string n,
+      iSector *s)
   : object_reg(objreg), templ(obj), clone(c, true), name(n), sector(s)
 {
 }
@@ -78,7 +78,7 @@ csMetaClone::csMetaClone(VobjectBase* superobject)
 }
 
 MetaObject* csMetaClone::new_csMetaClone(VobjectBase* superobject,
-	const std::string& type)
+  const std::string& type)
 {
   return new csMetaClone(superobject);
 }
@@ -98,11 +98,11 @@ void csMetaClone::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   {
     LOG("csMetaClone", 2, "object is already set up");
   }
-  else obj->Setup(vosa3dl, sect); 
-  
-  LOG("csMetaClone", 2, "setting up cone");
+  else obj->Setup(vosa3dl, sect);
+
+  LOG("csMetaClone", 2, "setting up clone");
   vosa3dl->mainThreadTasks.push(new ConstructCloneTask(
-                              vosa3dl->GetObjectRegistry(), obj, this, 
+                              vosa3dl->GetObjectRegistry(), obj, this,
                               getURLstr(), sect->GetSector()));
 
   LOG("csMetaClone", 2, "calling csMetaObject3D::setup");

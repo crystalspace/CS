@@ -103,15 +103,15 @@ void ConstructPolygonMeshTask::doTask()
       if(polys[i].size() < 3) flat = true;
       for(size_t n = 0; n < polys[i].size(); n++)
       {
-        thingfac->AddPolygonVertex(CS_POLYRANGE_SINGLE(polymap[i]),polys[i][n]);
+        thingfac->AddPolygonVertex(CS_POLYRANGE_SINGLE(polymap[i]), polys[i][n]);
 
         // Does this code reject (say) a quad with one colinear vertex?
         // Is this desireable?
         if(n > 2)
         {
-          float a = csMath3::Area3(thingfac->GetPolygonVertex(polymap[i],n-2),
-                                   thingfac->GetPolygonVertex(polymap[i],n-1),
-                                   thingfac->GetPolygonVertex(polymap[i],n));
+          float a = csMath3::Area3(thingfac->GetPolygonVertex(polymap[i], n-2),
+                                   thingfac->GetPolygonVertex(polymap[i], n-1),
+                                   thingfac->GetPolygonVertex(polymap[i], n));
           if(ABS(a) < EPSILON) flat = true;
         }
       }
@@ -122,6 +122,13 @@ void ConstructPolygonMeshTask::doTask()
         polymap[i] = -1;
         LOG("ConstructPolygonMeshTask", 2, "Discarded polygon "
                      << i << " with three colinear or coincident vertices");
+      }
+      else
+      {
+        thingfac->SetPolygonTextureMapping(CS_POLYRANGE_SINGLE(polymap[i]),
+                                           thingfac->GetPolygonVertex(polymap[i], 0),
+                                           thingfac->GetPolygonVertex(polymap[i], 1),
+                                           1);
       }
     }
 
@@ -209,94 +216,99 @@ void ConstructPolygonMeshTask::doTask()
              }
           */
 
+        if(i >= texsp.size()) {
+          thingfac->SetPolygonMaterial(p, csMetaMaterial::GetCheckerboard());
+          continue;
+        }
+
         switch(texsp[i].type)
         {
-          case A3DL::PolygonMesh::NoTexture:
-            break;
-          case A3DL::PolygonMesh::UVcoord:
+        case A3DL::PolygonMesh::NoTexture:
+          break;
+        case A3DL::PolygonMesh::UVcoord:
+        {
+          csVector2 uv1(texsp[i].Rep.UVcoord.u1, texsp[i].Rep.UVcoord.v1);
+          csVector2 uv2(texsp[i].Rep.UVcoord.u2, texsp[i].Rep.UVcoord.v2);
+          csVector2 uv3(texsp[i].Rep.UVcoord.u3, texsp[i].Rep.UVcoord.v3);
+
+          csMatrix2 m ( uv2.x - uv1.x,
+                        uv3.x - uv1.x,
+                        uv2.y - uv1.y,
+                        uv3.y - uv1.y);
+          float det = m.Determinant ();
+
+          if (ABS (det) < 0.0001f)
           {
-              csVector2 uv1(texsp[i].Rep.UVcoord.u1, texsp[i].Rep.UVcoord.v1);
-              csVector2 uv2(texsp[i].Rep.UVcoord.u2, texsp[i].Rep.UVcoord.v2);
-              csVector2 uv3(texsp[i].Rep.UVcoord.u3, texsp[i].Rep.UVcoord.v3);
+            // Set the u-v axis to the two sides which join at the
+            // greatest angle (another idea: set it to the greatest side
+            // and a purpendicular?)
 
-              csMatrix2 m ( uv2.x - uv1.x,
-                            uv3.x - uv1.x,
-                            uv2.y - uv1.y,
-                            uv3.y - uv1.y);
-              float det = m.Determinant ();
+            csVector3 vt1 = thingfac->GetVertex(texsp[i].Rep.UVcoord.vert1);
+            csVector3 vt2 = thingfac->GetVertex(texsp[i].Rep.UVcoord.vert2);
+            csVector3 vt3 = thingfac->GetVertex(texsp[i].Rep.UVcoord.vert3);
 
-              if (ABS (det) < 0.0001f)
-              {
-                // Set the u-v axis to the two sides which join at the
-                // greatest angle (another idea: set it to the greatest side
-                // and a purpendicular?)
+            float norm12 = (vt1 - vt2).Norm();
+            float norm23 = (vt2 - vt3).Norm();
+            float norm13 = (vt3 - vt1).Norm();
 
-                csVector3 vt1 = thingfac->GetVertex(texsp[i].Rep.UVcoord.vert1);
-                csVector3 vt2 = thingfac->GetVertex(texsp[i].Rep.UVcoord.vert2);
-                csVector3 vt3 = thingfac->GetVertex(texsp[i].Rep.UVcoord.vert3);
+            if(norm12 > norm23 && norm12 > norm13)
+              thingfac->SetPolygonTextureMapping(p, vt1, vt2, 1);
+            else if(norm23 > norm13)
+              thingfac->SetPolygonTextureMapping(p, vt2, vt3, 1);
+            else
+              thingfac->SetPolygonTextureMapping(p, vt1, vt3, 1);
+          }
+          else
+          {
+            thingfac->SetPolygonTextureMapping(
+              p, thingfac->GetVertex(texsp[i].Rep.UVcoord.vert1), uv1,
+              thingfac->GetVertex(texsp[i].Rep.UVcoord.vert2), uv2,
+              thingfac->GetVertex(texsp[i].Rep.UVcoord.vert3), uv3);
+          }
+        }
+        break;
+        case A3DL::PolygonMesh::PolygonPlane:
+        {
+          csVector3 org(texsp[i].Rep.PolygonPlane.xorg,
+                        texsp[i].Rep.PolygonPlane.yorg,
+                        texsp[i].Rep.PolygonPlane.zorg);
+          csVector3 vec(texsp[i].Rep.PolygonPlane.x,
+                        texsp[i].Rep.PolygonPlane.y,
+                        texsp[i].Rep.PolygonPlane.z);
+          thingfac->SetPolygonTextureMapping(p, org, vec,
+                                             texsp[i].Rep.PolygonPlane.len);
+        }
+        break;
+        case A3DL::PolygonMesh::ArbitraryPlane:
+        {
+          csVector3 org(texsp[i].Rep.ArbitraryPlane.xorg,
+                        texsp[i].Rep.ArbitraryPlane.yorg,
+                        texsp[i].Rep.ArbitraryPlane.zorg);
+          csVector3 vec1(texsp[i].Rep.ArbitraryPlane.x1,
+                         texsp[i].Rep.ArbitraryPlane.y1,
+                         texsp[i].Rep.ArbitraryPlane.z1);
+          csVector3 vec2(texsp[i].Rep.ArbitraryPlane.x2,
+                         texsp[i].Rep.ArbitraryPlane.y2,
+                         texsp[i].Rep.ArbitraryPlane.z2);
+          thingfac->SetPolygonTextureMapping(
+            p, org, vec1, texsp[i].Rep.ArbitraryPlane.len1,
+            vec2, texsp[i].Rep.ArbitraryPlane.len2);
+        }
+        break;
+        case A3DL::PolygonMesh::TexMatrix:
+        {
+          csMatrix3 mx(texsp[i].Rep.Matrix.m11, texsp[i].Rep.Matrix.m12,
+                       texsp[i].Rep.Matrix.m13, texsp[i].Rep.Matrix.m21,
+                       texsp[i].Rep.Matrix.m22, texsp[i].Rep.Matrix.m23,
+                       texsp[i].Rep.Matrix.m31, texsp[i].Rep.Matrix.m32,
+                       texsp[i].Rep.Matrix.m33);
 
-                float norm12 = (vt1 - vt2).Norm();
-                float norm23 = (vt2 - vt3).Norm();
-                float norm13 = (vt3 - vt1).Norm();
+          csVector3 vec(texsp[i].Rep.Matrix.x, texsp[i].Rep.Matrix.y,
+                        texsp[i].Rep.Matrix.z);
 
-                if(norm12 > norm23 && norm12 > norm13)
-                  thingfac->SetPolygonTextureMapping(p, vt1, vt2, 1);
-                else if(norm23 > norm13)
-                  thingfac->SetPolygonTextureMapping(p, vt2, vt3, 1);
-                else
-                  thingfac->SetPolygonTextureMapping(p, vt1, vt3, 1);
-              }
-              else
-              {
-                thingfac->SetPolygonTextureMapping(
-                     p, thingfac->GetVertex(texsp[i].Rep.UVcoord.vert1), uv1,
-                        thingfac->GetVertex(texsp[i].Rep.UVcoord.vert2), uv2,
-                        thingfac->GetVertex(texsp[i].Rep.UVcoord.vert3), uv3);
-              }
-            }
-            break;
-          case A3DL::PolygonMesh::PolygonPlane:
-            {
-              csVector3 org(texsp[i].Rep.PolygonPlane.xorg,
-                            texsp[i].Rep.PolygonPlane.yorg,
-                            texsp[i].Rep.PolygonPlane.zorg);
-              csVector3 vec(texsp[i].Rep.PolygonPlane.x,
-                            texsp[i].Rep.PolygonPlane.y,
-                            texsp[i].Rep.PolygonPlane.z);
-              thingfac->SetPolygonTextureMapping(p, org, vec, 
-					                             texsp[i].Rep.PolygonPlane.len);
-            }
-            break;
-          case A3DL::PolygonMesh::ArbitraryPlane:
-            {
-              csVector3 org(texsp[i].Rep.ArbitraryPlane.xorg,
-                            texsp[i].Rep.ArbitraryPlane.yorg,
-                            texsp[i].Rep.ArbitraryPlane.zorg);
-              csVector3 vec1(texsp[i].Rep.ArbitraryPlane.x1,
-                             texsp[i].Rep.ArbitraryPlane.y1,
-                             texsp[i].Rep.ArbitraryPlane.z1);
-              csVector3 vec2(texsp[i].Rep.ArbitraryPlane.x2,
-                             texsp[i].Rep.ArbitraryPlane.y2,
-                             texsp[i].Rep.ArbitraryPlane.z2);
-              thingfac->SetPolygonTextureMapping(
-                             p, org, vec1, texsp[i].Rep.ArbitraryPlane.len1,
-                                     vec2, texsp[i].Rep.ArbitraryPlane.len2);
-            }
-            break;
-          case A3DL::PolygonMesh::TexMatrix:
-            {
-              csMatrix3 mx(texsp[i].Rep.Matrix.m11, texsp[i].Rep.Matrix.m12,
-                           texsp[i].Rep.Matrix.m13, texsp[i].Rep.Matrix.m21,
-                           texsp[i].Rep.Matrix.m22, texsp[i].Rep.Matrix.m23,
-                           texsp[i].Rep.Matrix.m31, texsp[i].Rep.Matrix.m32,
-                           texsp[i].Rep.Matrix.m33);
-
-              csVector3 vec(texsp[i].Rep.Matrix.x, texsp[i].Rep.Matrix.y,
-                            texsp[i].Rep.Matrix.z);
-
-              thingfac->SetPolygonTextureMapping(p, mx, vec);
-            }
-            break;
+          thingfac->SetPolygonTextureMapping(p, mx, vec);
+        }
+        break;
         }
 #if 0
         if(texsp[i].isPortal)
@@ -335,8 +347,10 @@ void ConstructPolygonMeshTask::doTask()
             else
               thingfac->SetPolygonMaterial(p,csMetaMaterial::GetCheckerboard());
           }
-    else
-      thingfac->SetPolygonMaterial(p, csMetaMaterial::GetCheckerboard());
+          else
+          {
+            thingfac->SetPolygonMaterial(p, csMetaMaterial::GetCheckerboard());
+          }
       }
     }
 
@@ -372,7 +386,7 @@ void ConstructPolygonMeshTask::doTask()
 
     //if(portals.size()) meshwrapper->SetRenderPriority(
     //  engine->GetRenderPriority("portal"));
-    
+
     // Set up dynamics for mesh
     LOG("ConstructPolygonMeshTask", 3, "setting up dynamics");
     if (dynsys)
@@ -388,8 +402,8 @@ void ConstructPolygonMeshTask::doTask()
       csOrthoTransform t (tm, tv);
       collider->AttachColliderMesh (meshwrapper, t, 0, 1, 0);
       //if (isRemote()) collider->MakeStatic();
-		
-	  polygonmesh->GetCSinterface()->SetCollider (collider);
+
+    polygonmesh->GetCSinterface()->SetCollider (collider);
     }
 
     LOG("ConstructPolygonMeshTask", 3, "done with " << name);
