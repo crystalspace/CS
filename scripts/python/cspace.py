@@ -8949,6 +8949,9 @@ class iShaderVariableContextPtr(iShaderVariableContext):
         _swig_setattr(self, iShaderVariableContext,self.__class__,iShaderVariableContext)
 _cspace.iShaderVariableContext_swigregister(iShaderVariableContextPtr)
 
+TagNeutral = _cspace.TagNeutral
+TagForbidden = _cspace.TagForbidden
+TagRequired = _cspace.TagRequired
 class iShaderManager(iShaderVariableContext):
     __swig_setmethods__ = {}
     for _s in [iShaderVariableContext]: __swig_setmethods__.update(_s.__swig_setmethods__)
@@ -8965,6 +8968,9 @@ class iShaderManager(iShaderVariableContext):
     def RegisterCompiler(*args): return _cspace.iShaderManager_RegisterCompiler(*args)
     def GetCompiler(*args): return _cspace.iShaderManager_GetCompiler(*args)
     def GetShaderVariableStack(*args): return _cspace.iShaderManager_GetShaderVariableStack(*args)
+    def SetTagOptions(*args): return _cspace.iShaderManager_SetTagOptions(*args)
+    def GetTagOptions(*args): return _cspace.iShaderManager_GetTagOptions(*args)
+    def GetTags(*args): return _cspace.iShaderManager_GetTags(*args)
     def __del__(self, destroy=_cspace.delete_iShaderManager):
         try:
             if self.thisown: destroy(self)
