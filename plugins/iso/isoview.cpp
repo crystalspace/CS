@@ -92,12 +92,16 @@ void csIsoView::Draw()
   csBoxClipper* clipper = new csBoxClipper(rect.xmin, rect.ymin, 
     rect.xmax, rect.ymax);
   rview->SetClipper(clipper);
+  if(rview->GetNumBuckets() < engine->GetNumMaterials())
+    rview->CreateBuckets(engine->GetNumMaterials());
   PreCalc();
   
   for(int pass = CSISO_RENDERPASS_PRE; pass <= CSISO_RENDERPASS_POST; pass++)
   {
     rview->SetRenderPass(pass);
     world->Draw(rview);
+    if(pass == CSISO_RENDERPASS_MAIN)
+      rview->DrawBuckets();
   }
   delete clipper;
 }

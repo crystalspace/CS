@@ -78,10 +78,15 @@ void csIsoMaterial::GetReflection (float &oDiffuse, float &oAmbient,
 
 IMPLEMENT_IBASE_EXT (csIsoMaterialWrapper)
   IMPLEMENTS_EMBEDDED_INTERFACE (iMaterialWrapper)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iIsoMaterialWrapperIndex)
 IMPLEMENT_IBASE_EXT_END
 
 IMPLEMENT_EMBEDDED_IBASE (csIsoMaterialWrapper::MaterialWrapper)
   IMPLEMENTS_INTERFACE (iMaterialWrapper)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csIsoMaterialWrapper::IsoMaterialWrapperIndex)
+  IMPLEMENTS_INTERFACE (iIsoMaterialWrapperIndex)
 IMPLEMENT_EMBEDDED_IBASE_END
 
 IMPLEMENT_CSOBJTYPE (csIsoMaterialWrapper, csPObject);
@@ -90,8 +95,10 @@ csIsoMaterialWrapper::csIsoMaterialWrapper (iMaterial* material) :
   csPObject (), handle (NULL)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
+  CONSTRUCT_EMBEDDED_IBASE (scfiIsoMaterialWrapperIndex);
   csIsoMaterialWrapper::material = material;
   material->IncRef ();
+  index = 0;
   //csEngine::current_engine->AddToCurrentRegion (this);
 }
 
@@ -99,9 +106,11 @@ csIsoMaterialWrapper::csIsoMaterialWrapper (csIsoMaterialWrapper &th) :
   csPObject (), handle (NULL)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
+  CONSTRUCT_EMBEDDED_IBASE (scfiIsoMaterialWrapperIndex);
   (material = th.material)->IncRef ();
   handle = th.GetMaterialHandle ();
   SetName (th.GetName ());
+  index = th.index;
   //csEngine::current_engine->AddToCurrentRegion (this);
 }
 
@@ -109,8 +118,10 @@ csIsoMaterialWrapper::csIsoMaterialWrapper (iMaterialHandle *ith) :
   csPObject (), material (NULL)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiMaterialWrapper);
+  CONSTRUCT_EMBEDDED_IBASE (scfiIsoMaterialWrapperIndex);
   ith->IncRef ();
   handle = ith;
+  index = 0;
   //csEngine::current_engine->AddToCurrentRegion (this);
 }
 
@@ -157,6 +168,7 @@ csIsoMaterialList::csIsoMaterialList () : csNamedObjVector (16, 16)
 {
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiMaterialList);
+  lastindex = 0;
 }
 
 csIsoMaterialList::~csIsoMaterialList ()
@@ -164,16 +176,52 @@ csIsoMaterialList::~csIsoMaterialList ()
   DeleteAll ();
 }
 
+int csIsoMaterialList::GetNewIndex()
+{
+  int i = lastindex;
+  while(i < Length())
+  {
+    if(Get(i)==NULL)
+    {
+      lastindex = i+1;
+      return i;
+    }
+    i++;
+  }
+  /// no indices free
+  Push(NULL);
+  lastindex = Length();
+  return lastindex-1;
+}
+
+void csIsoMaterialList::RemoveIndex(int i)
+{
+  if(i>=Length()) return;
+  if(i==Length()-1)
+  {
+    (void)Pop(); // pop last element from the list
+    lastindex = Length();
+    return;
+  }
+  /// remove from middle of list
+  (*this)[i] = NULL;
+  if(i<lastindex) lastindex = i;
+}
+
 csIsoMaterialWrapper* csIsoMaterialList::NewMaterial (iMaterial* material)
 {
   csIsoMaterialWrapper *tm = new csIsoMaterialWrapper (material);
-  Push (tm);
+  int i = GetNewIndex();
+  (*this)[i] = tm;
+  tm->SetIndex(i);
   return tm;
 }
 
 csIsoMaterialWrapper* csIsoMaterialList::NewMaterial (iMaterialHandle *ith)
 {
   csIsoMaterialWrapper *tm = new csIsoMaterialWrapper (ith);
-  Push (tm);
+  int i = GetNewIndex();
+  (*this)[i] = tm;
+  tm->SetIndex(i);
   return tm;
 }

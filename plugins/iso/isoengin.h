@@ -20,6 +20,7 @@
 #define __ISOENGIN_H__
 
 #include "ivaria/iso.h"
+#include "isomater.h"
 
 /**
  *
@@ -34,6 +35,8 @@ private:
   iGraphics3D* g3d;
   /// texturemanager
   iTextureManager* txtmgr;
+  /// the material list
+  csIsoMaterialList materials;
 
   /// current world
   iIsoWorld *world;
@@ -72,7 +75,17 @@ public:
     float h);
   virtual iIsoSprite* CreateXWallSprite(const csVector3& pos, float w,
     float h);
-
+  virtual iMaterialWrapper *CreateMaterialWrapper(iMaterial *material,
+    const char *name);
+  virtual iMaterialWrapper *CreateMaterialWrapper(iMaterialHandle *handle,
+    const char *name);
+  virtual iMaterialWrapper *CreateMaterialWrapper(const char *vfsfilename,
+    const char *materialname);
+  virtual iMaterialWrapper *FindMaterial(const char *name);
+  virtual iMaterialWrapper *FindMaterial(int index);
+  virtual void RemoveMaterial(const char *name);
+  virtual void RemoveMaterial(int index);
+  virtual int GetNumMaterials() const ;
 
 };
 

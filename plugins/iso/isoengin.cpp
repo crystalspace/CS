@@ -26,9 +26,14 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "isys/evdefs.h"
+#include "isys/event.h"
 #include "isys/system.h"
+#include "isys/vfs.h"
 #include "iutil/cfgmgr.h"
 #include "csutil/util.h"
+#include "iobject/object.h"
+#include "igraphic/loader.h"
+
 
 IMPLEMENT_IBASE (csIsoEngine)
   IMPLEMENTS_INTERFACE (iIsoEngine)
@@ -56,6 +61,8 @@ csIsoEngine::csIsoEngine (iBase *iParent)
 
 csIsoEngine::~csIsoEngine ()
 {
+  for(int i=0; i<materials.Length(); i++)
+    RemoveMaterial(i);
   if(g3d) g3d->DecRef();
   if(system) system->DecRef();
 }
@@ -63,15 +70,61 @@ csIsoEngine::~csIsoEngine ()
 bool csIsoEngine::Initialize (iSystem* p)
 {
   (system = p)->IncRef();
-  g3d = QUERY_PLUGIN_ID (system, CS_FUNCID_VIDEO, iGraphics3D);
-  if (!g3d) return false;
-  g2d = g3d->GetDriver2D ();
-  txtmgr = g3d->GetTextureManager();
+  // Tell system driver that we want to handle broadcast events
+  if (!system->CallOnEvents (this, CSMASK_Broadcast))
+    return false;
   return true;
 }
 
-bool csIsoEngine::HandleEvent (iEvent& /*e*/)
+bool csIsoEngine::HandleEvent (iEvent& Event)
 {
+  // Handle some system-driver broadcasts
+  if (Event.Type == csevBroadcast)
+    switch (Event.Command.Code)
+    {
+      case cscmdSystemOpen:
+      {
+        // system is open we can get ptrs now
+        g3d = QUERY_PLUGIN_ID (system, CS_FUNCID_VIDEO, iGraphics3D);
+        if (!g3d)
+        {
+          system->Printf(MSG_INTERNAL_ERROR, "IsoEngine: could not get G3D.\n");
+          return false;
+        }
+        g2d = g3d->GetDriver2D ();
+        if (!g2d) 
+        {
+          system->Printf(MSG_INTERNAL_ERROR, "IsoEngine: could not get G2D.\n");
+          return false;
+        }
+        txtmgr = g3d->GetTextureManager();
+        if (!txtmgr) 
+        {
+          system->Printf(MSG_INTERNAL_ERROR, 
+            "IsoEngine: could not get TextureManager.\n");
+          return false;
+        }
+        return true;
+      }
+      case cscmdSystemClose:
+      {
+        // We must free all material and texture handles since after
+        // G3D->Close() they all become invalid, no matter whenever
+        // we did or didn't an IncRef on them.
+	for(int i=0; i<materials.Length(); i++)
+	  RemoveMaterial(i);
+        return true;
+      }
+      case cscmdContextResize:
+      {
+        return false;
+      }
+      case cscmdContextClose:
+      {
+        return false;
+      }
+    } /* endswitch */
+
   return false;
 }
 
@@ -147,4 +200,120 @@ iIsoSprite* csIsoEngine::CreateXWallSprite(const csVector3& pos, float w,
 iIsoLight* csIsoEngine::CreateLight()
 {
   return new csIsoLight(this);
+}
+
+iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(iMaterial *material,
+      const char *name)
+{
+  iMaterialWrapper* wrap = QUERY_INTERFACE(materials.NewMaterial(material),
+    iMaterialWrapper);
+  iObject *object = QUERY_INTERFACE(wrap, iObject);
+  object->SetName(name);
+  object->DecRef();
+  return wrap;
+}
+
+iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(iMaterialHandle *handle,
+	    const char *name)
+{
+  iMaterialWrapper* wrap = QUERY_INTERFACE(materials.NewMaterial(handle),
+    iMaterialWrapper);
+  iObject *object = QUERY_INTERFACE(wrap, iObject);
+  object->SetName(name);
+  object->DecRef();
+  //printf("name %s = %d \n", name, materials.FindByName(name)->GetIndex());
+  return wrap;
+}
+
+iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
+	          const char *materialname)
+{
+  iImageLoader *imgloader = QUERY_PLUGIN(system, iImageLoader);
+  if(imgloader==NULL)
+  {
+    system->Printf(MSG_INTERNAL_ERROR, "Could not get image loader plugin.\n");
+    system->Printf(MSG_INTERNAL_ERROR, "Failed to load file %s.\n", 
+      vfsfilename);
+    return NULL;
+  }
+  iVFS *VFS = QUERY_PLUGIN(system, iVFS);
+  if(VFS==NULL)
+  {
+    system->Printf(MSG_INTERNAL_ERROR, "Could not get VFS plugin.\n");
+    system->Printf(MSG_INTERNAL_ERROR, "Failed to load file %s.\n", 
+      vfsfilename);
+    return NULL;
+  }
+
+  iDataBuffer *buf = VFS->ReadFile (vfsfilename);
+  if(!buf) 
+  {
+    system->Printf(MSG_INTERNAL_ERROR, "Could not read vfs file %s\n", 
+      vfsfilename);
+    return NULL;
+  }
+  iImage *image = imgloader->Load(buf->GetUint8 (), buf->GetSize (),
+    txtmgr->GetTextureFormat ());
+  if(!image) 
+  {
+    system->Printf(MSG_INTERNAL_ERROR, 
+      "The imageloader could not load image %s\n", vfsfilename);
+    return NULL;
+  }
+  iTextureHandle *handle = txtmgr->RegisterTexture(image, CS_TEXTURE_2D |
+    CS_TEXTURE_3D);
+  if(!handle) 
+  {
+    system->Printf(MSG_INTERNAL_ERROR, 
+      "Texturemanager could not register texture %s\n", vfsfilename);
+    return NULL;
+  }
+  csIsoMaterial *material = new csIsoMaterial(handle);
+  iMaterialHandle *math = txtmgr->RegisterMaterial(material);
+  if(!math) 
+  {
+    system->Printf(MSG_INTERNAL_ERROR, 
+      "Texturemanager could not register material %s\n", materialname);
+    return NULL;
+  }
+
+  buf->DecRef();
+  imgloader->DecRef();
+  return CreateMaterialWrapper(math, materialname);
+}
+
+iMaterialWrapper *csIsoEngine::FindMaterial(const char *name)
+{
+  return QUERY_INTERFACE(materials.FindByName(name), iMaterialWrapper);
+}
+
+iMaterialWrapper *csIsoEngine::FindMaterial(int index)
+{
+  return QUERY_INTERFACE(materials.Get(index), iMaterialWrapper);
+}
+
+void csIsoEngine::RemoveMaterial(const char *name)
+{
+  csIsoMaterialWrapper *wrap = materials.FindByName(name);
+  if(!wrap) return;
+  int i;
+  for(i=0; i< materials.Length(); i++)
+  {
+    if(materials.Get(i) == wrap) break;
+  }
+  materials.RemoveIndex(i);
+  delete wrap;
+}
+
+void csIsoEngine::RemoveMaterial(int index)
+{
+  csIsoMaterialWrapper *wrap = materials.Get(index);
+  if(!wrap) return;
+  materials.RemoveIndex(index);
+  delete wrap;
+}
+
+int csIsoEngine::GetNumMaterials() const
+{
+  return materials.Length();
 }

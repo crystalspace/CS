@@ -24,7 +24,7 @@
 #include "csgeom/poly2d.h"
 #include "csgeom/poly3d.h"
 
-struct iMaterialHandle;
+struct iMaterialWrapper;
 
 class csIsoSprite : public iIsoSprite {
 private:
@@ -33,7 +33,7 @@ private:
   /// world space position
   csVector3 position;
   /// material to draw
-  iMaterialHandle *material;
+  iMaterialWrapper *material;
   /// mixmode to use
   UInt mixmode;
   /// the 3d polygon in objectspace for the sprite
@@ -65,9 +65,9 @@ public:
   virtual const csVector3& GetPosition() const {return position;}
   virtual void SetPosition(const csVector3& pos);
   virtual void MovePosition(const csVector3& delta);
-  virtual void SetMaterialHandle(iMaterialHandle *material)
+  virtual void SetMaterialWrapper(iMaterialWrapper *material)
   {csIsoSprite::material = material;}
-  virtual iMaterialHandle* GetMaterialHandle() const {return material;}
+  virtual iMaterialWrapper* GetMaterialWrapper() const {return material;}
   virtual void SetMixmode(UInt mode) {mixmode = mode;}
   virtual UInt GetMixmode() const {return mixmode;}
   virtual void Draw(iIsoRenderView *rview);

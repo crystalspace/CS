@@ -21,6 +21,8 @@
 
 #include "ivaria/iso.h"
 
+class csIsoRenderBucket;
+
 /**
  *  isometric rendering view, used during rendering
 */
@@ -40,6 +42,12 @@ private:
   iClipper2D *clipper;
   /// lower bound on screen z
   float minz;
+  /// buckets to fill with rendering info
+  csIsoRenderBucket **buckets;
+  /// maxbuckets;
+  int maxbuckets;
+  /// a list of prealloced buckets
+  csIsoRenderBucket *prebuck;
 
 public:
   DECLARE_IBASE;
@@ -60,6 +68,12 @@ public:
   /// set precalc grid values
   void SetPrecalcGrid(int sx, int sy, int sw, int sh, float cpy)
   { startx = sx; starty = sy; scanw = sw; scanh = sh; celpery = cpy; }
+  /// get num buckets
+  int GetNumBuckets() const {return maxbuckets;}
+  /// create new buckets for later drawing
+  void CreateBuckets(int num);
+  /// draw all the buckets
+  void DrawBuckets();
 
   //-------- iIsoRenderView -----------------------------------
   virtual iIsoView* GetView() const {return view;}
@@ -71,6 +85,21 @@ public:
   { sx = startx; sy = starty; sw = scanw; sh = scanh; cpy = celpery; } 
   virtual float GetMinZ() const {return minz;}
   virtual void SetMinZ(float val) {minz = val;}
+  virtual void AddPolyFX(int materialindex, G3DPolygonDPFX *g3dpolyfx, 
+    UInt mixmode);
+};
+
+/** keeps render info
+*/
+class csIsoRenderBucket
+{
+public:
+  /// ptr to alloced g3dpolyfx to draw
+  G3DPolygonDPFX *g3dpolyfx;
+  /// mixmode
+  UInt mixmode;
+  /// next to draw;
+  csIsoRenderBucket *next;
 };
 
 #endif

@@ -18,6 +18,7 @@
 
 #include "cssysdef.h"
 #include "isorview.h"
+#include "ivideo/graph3d.h"
 
 IMPLEMENT_IBASE (csIsoRenderView)
   IMPLEMENTS_INTERFACE (iIsoRenderView)
@@ -30,9 +31,73 @@ csIsoRenderView::csIsoRenderView (iBase *iParent)
   g3d = NULL;
   renderpass = 0;
   clipper = NULL;
+  buckets = NULL;
+  maxbuckets = 0;
+  prebuck = 0;
 }
 
 csIsoRenderView::~csIsoRenderView ()
 {
+  delete[] buckets;
 }
 
+void csIsoRenderView::CreateBuckets(int num)
+{
+  delete[] buckets;
+  maxbuckets = num;
+  buckets = new csIsoRenderBucket* [num];
+  memset(buckets, 0, sizeof(csIsoRenderBucket*)*num);
+}
+
+void csIsoRenderView::DrawBuckets()
+{
+  csIsoRenderBucket *p, *np;
+  for(int i=0; i<maxbuckets; i++)
+  {
+    p = buckets[i];
+    if(!p) continue;
+    //int num = 0;
+    g3d->StartPolygonFX (p->g3dpolyfx->mat_handle, p->mixmode);
+    while(p)
+    {
+      g3d->DrawPolygonFX (*p->g3dpolyfx);
+      /// move to prealloc list
+      np = p->next;
+      p->next = prebuck;
+      prebuck = p;
+      p = np;
+      //num++;
+    }
+    g3d->FinishPolygonFX ();
+    //printf("Drawn index %d for %d times\n", i, num);
+    buckets[i] = NULL;
+  }
+}
+
+void csIsoRenderView::AddPolyFX(int materialindex, G3DPolygonDPFX *g3dpolyfx,  
+  UInt mixmode) 
+{ 
+  if(materialindex>=maxbuckets) 
+  {
+    g3d->StartPolygonFX (g3dpolyfx->mat_handle, mixmode);
+    g3d->DrawPolygonFX (*g3dpolyfx);
+    g3d->FinishPolygonFX ();
+    return;
+  }
+  csIsoRenderBucket *bucket = 0;
+  if(prebuck)
+  {
+    // use preallocated buckets
+    bucket = prebuck;
+    prebuck = bucket->next;
+  }
+  else
+  {
+    /// link in to draw reversed later
+    bucket = new csIsoRenderBucket;
+  }
+  bucket->g3dpolyfx = g3dpolyfx;
+  bucket->mixmode = mixmode;
+  bucket->next = buckets[materialindex];
+  buckets[materialindex] = bucket;
+}

@@ -32,7 +32,9 @@ struct iEvent;
 struct iGraphics2D;
 struct iGraphics3D;
 struct iTextureManager;
+struct iMaterial;
 struct iMaterialHandle;
+struct iMaterialWrapper;
 struct iClipper2D;
 struct iIsoWorld;
 struct iIsoView;
@@ -41,6 +43,7 @@ struct iIsoSprite;
 struct iIsoGrid;
 struct iIsoCell;
 struct iIsoLight;
+struct G3DPolygonDPFX;
 
 SCF_VERSION (iIsoEngine, 0, 0, 1);
 
@@ -81,6 +84,33 @@ struct iIsoEngine : public iPlugIn
   /// (convenience) create new wall along x sprite (along y in grids).
   virtual iIsoSprite* CreateXWallSprite(const csVector3& pos, float w, 
     float h) = 0;
+
+  /// Create a new materialwrapper for the iso engine from material
+  virtual iMaterialWrapper *CreateMaterialWrapper(iMaterial *material,
+    const char *name) = 0;
+  /** 
+   * Create a new materialwrapper for the iso engine from 
+   * pre-prepared iMaterialHandle given. It is Increfed.
+   */
+  virtual iMaterialWrapper *CreateMaterialWrapper(iMaterialHandle *handle,
+    const char *name) = 0;
+  /** 
+   * Create a new materialwrapper for the iso engine from 
+   * the given file (on the VFS), resulting in a material with that texture.
+   */
+  virtual iMaterialWrapper *CreateMaterialWrapper(const char *vfsfilename,
+    const char *materialname) = 0;
+  /// Find a material by name
+  virtual iMaterialWrapper *FindMaterial(const char *name) = 0;
+  /// Find a material by index
+  virtual iMaterialWrapper *FindMaterial(int index) = 0;
+  /// delete a material by name
+  virtual void RemoveMaterial(const char *name) = 0;
+  /// delete a material by index
+  virtual void RemoveMaterial(int index) = 0;
+  /// get the possible number of materials (indices 0..n-1), some are NULL.
+  virtual int GetNumMaterials() const = 0;
+
 };
 
 SCF_VERSION (iIsoWorld, 0, 0, 1);
@@ -314,6 +344,9 @@ struct iIsoRenderView : public iBase
   virtual float GetMinZ() const = 0;
   /// set the minimum z value.
   virtual void SetMinZ(float val) = 0;
+  /// add a component to draw between MAIN and FG passes, give materialindex.
+  virtual void AddPolyFX(int materialindex, G3DPolygonDPFX *g3dpolyfx, 
+    UInt mixmode) = 0;
 };
 
 SCF_VERSION (iIsoSprite, 0, 0, 1);
@@ -356,10 +389,10 @@ struct iIsoSprite : public iBase
    */
   virtual void ForcePosition(const csVector3& pos) = 0;
 
-  /// Set the materialhandle to use
-  virtual void SetMaterialHandle(iMaterialHandle *material) = 0;
-  /// Get the materialhandle
-  virtual iMaterialHandle* GetMaterialHandle() const = 0;
+  /// Set the materialwrapper to use
+  virtual void SetMaterialWrapper(iMaterialWrapper *material) = 0;
+  /// Get the materialwrapper
+  virtual iMaterialWrapper* GetMaterialWrapper() const = 0;
   /// Set the mixmode
   virtual void SetMixmode(UInt mode) = 0;
   /// Get the mixmode
@@ -436,4 +469,18 @@ struct iIsoLight : public iBase
   virtual void ShineSprite(iIsoSprite *sprite) = 0;
 };
 
+SCF_VERSION (iIsoMaterialWrapperIndex, 0, 0, 1);
+
+/**
+ * the materialwrappers, iMaterialWrappers made by the isoengine,
+ * also implement this interface, giving an index in the materials list.
+ * It is used inside the engine
+*/
+struct iIsoMaterialWrapperIndex: public iBase
+{
+  /// Get the index
+  virtual int GetIndex() const = 0;
+  /// Set the index -- use with caution!
+  virtual void SetIndex(int i) = 0;
+};
 #endif

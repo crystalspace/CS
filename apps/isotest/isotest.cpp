@@ -25,7 +25,6 @@
 #include "ivideo/txtmgr.h"
 #include "ivideo/fontserv.h"
 #include "ivaria/iso.h"
-#include "isomater.h"
 #include "imap/parser.h"
 #include "igraphic/loader.h"
 #include "csgeom/box.h"
@@ -55,28 +54,6 @@ void cleanup ()
 {
   System->console_out ("Cleaning up...\n");
   delete System;
-}
-
-
-/// helper texture loader
-static iMaterialHandle* LoadTexture(iSystem *sys, iTextureManager *txtmgr, 
-  iVFS *VFS, char *name)
-{
-  iImageLoader *imgloader = QUERY_PLUGIN(sys, iImageLoader);
-  iDataBuffer *buf = VFS->ReadFile (name);
-  if(!buf) printf("Could not read file %s\n", name);
-  iImage *image = imgloader->Load(buf->GetUint8 (), buf->GetSize (),
-    txtmgr->GetTextureFormat ());
-  if(!image) printf("Could not load image %s\n", name);
-  iTextureHandle *handle = txtmgr->RegisterTexture(image, CS_TEXTURE_2D |
-    CS_TEXTURE_3D);
-  if(!handle) printf("Could not register texture %s\n", name);
-  csIsoMaterial *material = new csIsoMaterial(handle);
-  iMaterialHandle *math = txtmgr->RegisterMaterial(material);
-
-  buf->DecRef();
-  imgloader->DecRef();
-  return math;
 }
 
 
@@ -144,14 +121,14 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   world = engine->CreateWorld();
   view = engine->CreateView(world);
 
-  iMaterialHandle *math1 = LoadTexture(this, txtmgr, VFS, 
-    "/lib/std/stone4.gif");
-  iMaterialHandle *math2 = LoadTexture(this, txtmgr, VFS, 
-    "/lib/std/mystone2.gif");
-  iMaterialHandle *snow = LoadTexture(this, txtmgr, VFS, 
-    "/lib/std/snow.jpg");
-  iMaterialHandle *halo = LoadTexture(this, txtmgr, VFS, 
-    "/lib/stdtex/flare_purp.jpg");
+  iMaterialWrapper *math1 = engine->CreateMaterialWrapper(
+    "/lib/std/stone4.gif", "floor1");
+  iMaterialWrapper *math2 = engine->CreateMaterialWrapper(
+    "/lib/std/mystone2.gif", "floor2");
+  iMaterialWrapper *snow = engine->CreateMaterialWrapper(
+    "/lib/std/snow.jpg", "player");
+  iMaterialWrapper *halo = engine->CreateMaterialWrapper(
+    "/lib/stdtex/flare_purp.jpg", "halo");
 
   // create a rectangular grid in the world
   // the grid is 10 units wide (from 0..10 in the +z direction)
@@ -168,8 +145,8 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
       // put tiles on the floor
       sprite = engine->CreateFloorSprite(csVector3(y,0,x), 1.0, 1.0);
       if((x+y)&1)
-        sprite->SetMaterialHandle(math1);
-      else sprite->SetMaterialHandle(math2);
+        sprite->SetMaterialWrapper(math1);
+      else sprite->SetMaterialWrapper(math2);
       world->AddSprite(sprite);
       for(my=0; my<multy; my++)
         for(mx=0; mx<multx; mx++)
@@ -179,7 +156,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   // add the player sprite to the world
   csVector3 startpos(10,0,5);
   player = engine->CreateFrontSprite(startpos, 1.3, 2.7);
-  player->SetMaterialHandle(snow);
+  player->SetMaterialWrapper(snow);
   player->SetMixmode(CS_FX_ADD);
   world->AddSprite(player);
   player->SetGridChangeCallback(PlayerGridChange, (void*)this);
@@ -195,7 +172,7 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
   // add a glowing halo to the light
   sprite = engine->CreateFrontSprite(scenelight->GetPosition() -
     csVector3(0,1.0,0), 2.0, 2.0);
-  sprite->SetMaterialHandle(halo);
+  sprite->SetMaterialWrapper(halo);
   sprite->SetMixmode(CS_FX_ADD);
   world->AddSprite(sprite);
 
@@ -212,47 +189,47 @@ bool IsoTest::Initialize (int argc, const char* const argv[],
     for(mx=0; mx<multx; mx++)
       grid->SetGroundValue(5, 15, mx, my, 4.0);
   sprite = engine->CreateFloorSprite(csVector3(15,4,5), 1.0, 1.0);
-  sprite->SetMaterialHandle(math1);
+  sprite->SetMaterialWrapper(math1);
   world->AddSprite(sprite);
   for(my=0; my<4; my++)
   {
     sprite = engine->CreateXWallSprite(csVector3(15,my,5), 1.0, 1.0);
-    sprite->SetMaterialHandle(math1);
+    sprite->SetMaterialWrapper(math1);
     world->AddSprite(sprite);
     sprite = engine->CreateZWallSprite(csVector3(16,my,5), 1.0, 1.0);
-    sprite->SetMaterialHandle(math1);
+    sprite->SetMaterialWrapper(math1);
     world->AddSprite(sprite);
   }
 
   for(mx=0; mx<8; mx++)
   {
     sprite = engine->CreateFloorSprite(csVector3(5,4,2+mx), 1.0, 1.0);
-    sprite->SetMaterialHandle(math1);
+    sprite->SetMaterialWrapper(math1);
     world->AddSprite(sprite);
   }
   for(my=0; my<4; my++)
   {
     sprite = engine->CreateXWallSprite(csVector3(5,my,2), 1.0, 1.0);
-    sprite->SetMaterialHandle(math1);
+    sprite->SetMaterialWrapper(math1);
     world->AddSprite(sprite);
     sprite = engine->CreateXWallSprite(csVector3(5,my,7), 1.0, 1.0);
-    sprite->SetMaterialHandle(math2);
+    sprite->SetMaterialWrapper(math2);
     world->AddSprite(sprite);
     for(mx=0; mx<3; mx++)
     {
       sprite = engine->CreateZWallSprite(csVector3(6,my,2+mx), 1.0, 1.0);
-      sprite->SetMaterialHandle(math1);
+      sprite->SetMaterialWrapper(math1);
       world->AddSprite(sprite);
       sprite = engine->CreateZWallSprite(csVector3(6,my,7+mx), 1.0, 1.0);
-      sprite->SetMaterialHandle(math1);
+      sprite->SetMaterialWrapper(math1);
       world->AddSprite(sprite);
     }
   }
   sprite = engine->CreateZWallSprite(csVector3(6,3,5), 1.0, 1.0);
-  sprite->SetMaterialHandle(math1);
+  sprite->SetMaterialWrapper(math1);
   world->AddSprite(sprite);
   sprite = engine->CreateZWallSprite(csVector3(6,3,6), 1.0, 1.0);
-  sprite->SetMaterialHandle(math1);
+  sprite->SetMaterialWrapper(math1);
   world->AddSprite(sprite);
   for(x=0; x<3; x++)
     for(my=0; my<multy; my++)

@@ -25,6 +25,7 @@
 #include "ivideo/material.h"
 #include "ivideo/texture.h"
 #include "ivideo/txtmgr.h"
+#include "iengine/material.h"
 
 IMPLEMENT_IBASE (csIsoSprite)
   IMPLEMENTS_INTERFACE (iIsoSprite)
@@ -202,7 +203,7 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
   //material->Visit ();
 
   g3dpolyfx.num = poly.GetNumVertices ();
-  g3dpolyfx.mat_handle = material;
+  g3dpolyfx.mat_handle = material->GetMaterialHandle();
   /// guesstimate of fov (angle) of view. 1/fov.
   g3dpolyfx.inv_aspect = 1./180.;
   g3dpolyfx.mat_handle->GetTexture ()->GetMeanColor (g3dpolyfx.flat_color_r,
@@ -249,6 +250,17 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
     PreparePolygonFX2 (&g3dpolyfx, clipped_poly2d, num_clipped_verts,
         clipped_vtstats, poly.GetNumVertices(), true);
 
+  iIsoMaterialWrapperIndex *wrapindex = QUERY_INTERFACE(
+    material, iIsoMaterialWrapperIndex);
+  if((rview->GetRenderPass()==CSISO_RENDERPASS_MAIN) && wrapindex)
+  {
+    /// delay drawing, put into buckets
+    //printf("Drawing index %d \n", wrapindex->GetIndex());
+    rview->AddPolyFX(wrapindex->GetIndex(), &g3dpolyfx, mixmode|CS_FX_GOURAUD);
+    wrapindex->DecRef();
+    return;
+  }
+  // for non-iso-engine created materials, we have to draw them now.
   //rview->CalculateFogPolygon (g3dpolyfx);
   g3d->StartPolygonFX (g3dpolyfx.mat_handle, mixmode | CS_FX_GOURAUD);
   g3d->DrawPolygonFX (g3dpolyfx);

@@ -26,6 +26,7 @@
 #include "csobject/nobjvec.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
+#include "ivaria/iso.h"
 
 class csTextureWrapper;
 struct iTextureManager;
@@ -112,6 +113,8 @@ private:
   iMaterial* material;
   /// The handle as returned by iTextureManager.
   iMaterialHandle* handle;
+  /// the material number (index in the materiallist)
+  int index;
 
 public:
   /// Construct a material handle given a material.
@@ -132,7 +135,7 @@ public:
   /// Get the material handle.
   iMaterialHandle* GetMaterialHandle () { return handle; }
 
-  /// Change the base material
+  /// Change the base material - you must also change the index.
   void SetMaterial (iMaterial* material);
   /// Get the material.
   iMaterial* GetMaterial () { return material; }
@@ -146,6 +149,11 @@ public:
    * that are used.
    */
   void Visit ();
+
+  /// Get the material index
+  int GetIndex() const {return index;}
+  /// Set the material index
+  void SetIndex(int i) {index = i;}
 
   CSOBJTYPE;
   DECLARE_IBASE_EXT (csPObject);
@@ -173,6 +181,14 @@ public:
       return scfParent->GetMaterial ();
     }
   } scfiMaterialWrapper;
+
+  //------------------- iIsoMaterialWrapperIndex implementation ------------
+  struct IsoMaterialWrapperIndex : public iIsoMaterialWrapperIndex
+  {
+    DECLARE_EMBEDDED_IBASE (csIsoMaterialWrapper);
+    virtual int GetIndex() const {return scfParent->GetIndex();}
+    virtual void SetIndex(int i) {scfParent->SetIndex(i);}
+  } scfiIsoMaterialWrapperIndex;
 };
 
 /**
@@ -180,6 +196,10 @@ public:
  */
 class csIsoMaterialList : public csNamedObjVector
 {
+  /// the last possibly free index
+  int lastindex;
+  /// get an unused index (NULL), expands the array if necessary
+  int GetNewIndex();
 public:
   /// Initialize the array
   csIsoMaterialList ();
@@ -202,6 +222,9 @@ public:
   /// Find a material by name
   csIsoMaterialWrapper *FindByName (const char* iName)
   { return (csIsoMaterialWrapper *)csNamedObjVector::FindByName (iName); }
+
+  /// remove 'index' from the list. Does not decref/delete.
+  void RemoveIndex(int i);
 
   DECLARE_IBASE;
 
