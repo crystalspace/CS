@@ -85,16 +85,24 @@ rule Library
   # Generate install rules
   if ! [ IsElem noinstall : $(3) ]
   {
-    Depends install_lib : [ DoInstall $(target) : $(libdir) ] ;
+    if "$(RANLIB)"
+    {
+      Depends install_lib : [ DoInstall $(target) : $(libdir) : : Ranlib ] ;
+    }
+    else
+    {
+      Depends install_lib : [ DoInstall $(target) : $(libdir)  ] ;
+    }
   }
 
-  if $(CRELIB) { CreLib $(target) : $(objects[1]) ; }
+  if $(CRELIB)
+  {
+    CreLib $(target) : $(objects[1]) ;
+  }
 
   Archive $(target) : $(objects) ;
   Clean $(<)clean : $(target) ;
   Depends clean : $(<)clean ;
-
-  if $(RANLIB) { Ranlib $(target) ; }
 
   # If we can't scan the library, we have to leave the .o's around.
   if ! ( $(NOARSCAN) || $(NOARUPDATE) )

@@ -63,7 +63,7 @@ rule InstallDoc
 }
 
 ##  InstallMan files
-##    DoInstall man files
+##    Installs Unix manual files
 rule InstallMan
 {
     local dir i ;
@@ -88,10 +88,20 @@ rule InstallMan
     }
 }
 
-##  DoInstall sourcename : directories [ : installapp ]
-##    Creates a new installtarget for the given sources.  The target(s) are
-##    returned as function result.  (Note: We can't name this rule Install,
-##    because Jambase already defines an action for DoInstall :-/)
+##  DoInstall sourcenames : directories [ : installapp : [ postinstallrules ]]
+##    Creates a new install target for the given sources named by
+##    `sourcenames'.  `directories' is a list of directory components
+##    indicating the installation directory for `sourcename'.  `installapp' is
+##    the actual program to run to install the sources.  If not specified, then
+##    $(INSTALL_DATA) is used.  If the optional `postinstallrules' is provided,
+##    it is a list of Jam rules to invoke on the installed target after it is
+##    installed.  Each rule is invoked with the installed target as the first
+##    argument, and the source target as the second.  This rule returns the
+##    names of the installed targets, so it is convenient to use the results as
+##    the input for another rule.  For example:
+##        Depends install : [ DoInstall $(docfiles) : $(installdocdir) ] ;
+##    (Implementation Note: We can't name this rule Install, because Jambase
+##    already defines an action for DoInstall :-/)
 rule DoInstall
 {
     local targets target i dir gdir ;
@@ -115,6 +125,15 @@ rule DoInstall
 	{
             INSTALL_APP on $(target) = $(INSTALL_DATA) ;
         }
+
+	if "$(4)"
+	{
+	    local postrule ;
+	    for postrule in $(4)
+	    {
+		$(postrule) $(target) : $(i) ;
+	    }
+	}
     }
 
     Always $(targets) ;

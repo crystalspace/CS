@@ -37,6 +37,9 @@ chronological order.
 	- Eric Sunshine updated outdated information in the KDevelop HOWTO and
 	  fixed some incorrect examples.  Also updated the snap5 screenshot so
 	  that it no longer mentions the obsolete cssys library.
+	- Eric Sunshine augmented the Jam DoInstall rule so that it accepts an
+	  optional list of post-install rules to invoke upon the installed
+	  target.
 	- Eric Sunshine fixed Jam build system bug where it failed to run
 	  `ranlib' on the installed libraries.  (Instead, it incorrectly
 	  invoked ranlib just after building the libraries, which is completely
