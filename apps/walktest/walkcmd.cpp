@@ -225,7 +225,8 @@ bool CommandHandler (const char *cmd, const char *arg)
     CONPRI("Statistics:\n");
     CONPRI("  stats fps perftest coordshow\n");
     CONPRI("Special effects:\n");
-    CONPRI("  addbot delbot addskel addghost fire explosion spiral rain snow\n");
+    CONPRI("  addbot delbot addskel addghost fire explosion spiral rain\n");
+    CONPRI("  snow fountain\n");
     CONPRI("Debugging:\n");
     CONPRI("  fclear hi frustum zbuf debug0 debug1 debug2 edges palette\n");
     CONPRI("Various:\n");
@@ -620,6 +621,20 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (cnt <= 0) strcpy (txtname, "snow.jpg");
     add_particles_snow (Sys->view->GetCamera ()->GetSector (),
     	txtname, num, speed);
+  }
+  else if (!strcasecmp (cmd, "fountain"))
+  {
+    char txtname[100];
+    int cnt = 0;
+    int num = 0;
+    if (arg) cnt = ScanStr (arg, "%s,%d", txtname, &num);
+    extern void add_particles_fountain (csSector* sector, char* txtname,
+    	int num, const csVector3& origin);
+    if (cnt <= 1) num = 50;
+    if (cnt <= 0) strcpy (txtname, "green.gif");
+    add_particles_fountain (Sys->view->GetCamera ()->GetSector (),
+    	txtname, num, Sys->view->GetCamera ()->GetOrigin ()-
+	csVector3 (0, Sys->cfg_body_height, 0));
   }
   else if (!strcasecmp (cmd, "explosion"))
   {

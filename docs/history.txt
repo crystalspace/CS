@@ -3,6 +3,10 @@ The history order has been reversed so that new features are at the top.
 20-Jun-2000
 	- Wouter Wijngaards added a fountain particle system. Under
 	  construction still...
+	- Added 'fountain' console command to create a fountain.
+	  The first argument is the texture (default is 'green.gif' until
+	  we find a better splash texture). The second argument is
+	  the number of particles (default is 50).
 	- Enabled extensions in OpenGL renderer.
 	- Disabled the experimental optimization in DrawPolygon for OpenGL.
 	  It had a bad effect on performance.

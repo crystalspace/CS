@@ -197,6 +197,31 @@ void add_particles_snow (csSector* sector, char* txtname, int num, float speed)
 }
 
 //===========================================================================
+// Demo particle system (fountain).
+//===========================================================================
+void add_particles_fountain (csSector* sector, char* txtname, int num,
+	const csVector3& origin)
+{
+  // First check if the texture exists.
+  csTextureHandle* txt = Sys->view->GetWorld ()->GetTextures ()->
+  	FindByName (txtname);
+  if (!txt)
+  {
+    Sys->Printf (MSG_CONSOLE, "Can't find texture '%s' in memory!\n", txtname);
+    return;
+  }
+
+  csFountainParticleSystem* exp = new csFountainParticleSystem(
+      Sys->view->GetWorld (), num, txt,
+      CS_FX_ADD, false, 0.1, 0.1,
+      origin, csVector3(0, -1.0, 0), 5.0,
+      3.0, 0.2,
+      0.0, 3.1415926/2.);
+  exp->MoveToSector (sector);
+  exp->SetColor (csColor (.25,.25,.25));
+}
+
+//===========================================================================
 // Demo particle system (explosion).
 //===========================================================================
 void add_particles_explosion (csSector* sector, const csVector3& center, char* txtname)
