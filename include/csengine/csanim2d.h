@@ -39,33 +39,32 @@ private:
   unsigned long FrameTime;
 
   /// add a frame.
-  inline void AddFrame(csPixmap *s) {Frames.Push(s);}
+  void AddFrame(csPixmap *s) {Frames.Push(s);}
 
 public:
   /// build a new animation
-  inline csAnimation2D() {FrameTime=100;}
+  csAnimation2D() {FrameTime=100;}
   /// destructor
   ~csAnimation2D();
 
   /// add a frame
-  void AddFrame(iTextureHandle *Tex)
-        {AddFrame(new csPixmap(Tex));}
+  void AddFrame(iTextureHandle *Tex) {AddFrame(new csPixmap(Tex));}
   /// add a frame
   void AddFrame(iTextureHandle *Tex, int x, int y, int w, int h)
         {AddFrame(new csPixmap(Tex, x, y, w, h));}
   /// get a frame by time
   csPixmap *GetFrameByTime(unsigned long Time);
   /// get a frame by number
-  inline csPixmap *GetFrame(int n) {return (csPixmap*)(Frames.Get(n));}
+  csPixmap *GetFrame(int n) {return (csPixmap*)(Frames.Get(n));}
   /// get number of frames
-  inline int NumFrames() {return Frames.Length();}
+  int NumFrames() {return Frames.Length();}
 
   /// get time per frame
-  inline unsigned long GetFrameTime() {return FrameTime;}
+  unsigned long GetFrameTime() {return FrameTime;}
   /// set time per frame
-  inline void SetFrameTime(unsigned long t) {FrameTime=t;}
+  void SetFrameTime(unsigned long t) {FrameTime=t;}
   /// get total time
-  inline unsigned long GetTotalTime() {return FrameTime*NumFrames();}
+  unsigned long GetTotalTime() {return FrameTime*NumFrames();}
 
   /// draw the sprite
   void Draw(iGraphics3D*, int x, int y, unsigned long time);
