@@ -33,27 +33,29 @@ vpath %.cpp $(SRCDIR)/plugins/sound/driver/waveoutsd
 
 # The WaveOut sound driver
 ifeq ($(USE_PLUGINS),yes)
-  WOS = $(OUTDLL)/sndwaveout$(DLL)
-  LIB.WOS = $(foreach d,$(DEP.WOS),$($d.LIB))
-  LDFLAGS.WOS = $(LIBS.SOUND.SYSTEM)
-  TO_INSTALL.DYNAMIC_LIBS += $(WOS)
+  SNDWAVEOUT = $(OUTDLL)/sndwaveout$(DLL)
+  LIB.SNDWAVEOUT = $(foreach d,$(DEP.SNDWAVEOUT),$($d.LIB))
+  LDFLAGS.SNDWAVEOUT = $(LIBS.SOUND.SYSTEM)
+  TO_INSTALL.DYNAMIC_LIBS += $(SNDWAVEOUT)
 else
-  WOS = $(OUT)/$(LIB_PREFIX)sndwaveout$(LIB)
-  DEP.EXE += $(WOS)
+  SNDWAVEOUT = $(OUT)/$(LIB_PREFIX)sndwaveout$(LIB)
+  DEP.EXE += $(SNDWAVEOUT)
   LIBS.EXE += $(LIBS.SOUND.SYSTEM)
   SCF.STATIC += sndwaveout
-  TO_INSTALL.STATIC_LIBS += $(WOS)
+  TO_INSTALL.STATIC_LIBS += $(SNDWAVEOUT)
 endif
 
-INC.WOS = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/waveoutsd/*.h))
-SRC.WOS = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/waveoutsd/*.cpp))
-OBJ.WOS = $(addprefix $(OUT)/,$(notdir $(SRC.WOS:.cpp=$O)))
-DEP.WOS = CSUTIL CSSYS CSUTIL
+INC.SNDWAVEOUT = \
+  $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/waveoutsd/*.h))
+SRC.SNDWAVEOUT = \
+  $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/waveoutsd/*.cpp))
+OBJ.SNDWAVEOUT = $(addprefix $(OUT)/,$(notdir $(SRC.SNDWAVEOUT:.cpp=$O)))
+DEP.SNDWAVEOUT = CSUTIL CSSYS CSUTIL
 
-MSVC.DSP += WOS
-DSP.WOS.NAME = sndwaveout
-DSP.WOS.TYPE = plugin
-DSP.WOS.LIBS = winmm
+MSVC.DSP += SNDWAVEOUT
+DSP.SNDWAVEOUT.NAME = sndwaveout
+DSP.SNDWAVEOUT.TYPE = plugin
+DSP.SNDWAVEOUT.LIBS = winmm
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -62,21 +64,21 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: sndwaveout sndwaveoutclean
 
-sndwaveout: $(OUTDIRS) $(WOS)
+sndwaveout: $(OUTDIRS) $(SNDWAVEOUT)
 
-$(WOS): $(OBJ.WOS) $(LIB.WOS)
-	$(DO.PLUGIN) $(LDFLAGS.WOS)
+$(SNDWAVEOUT): $(OBJ.SNDWAVEOUT) $(LIB.SNDWAVEOUT)
+	$(DO.PLUGIN) $(LDFLAGS.SNDWAVEOUT)
 
 clean: sndwaveoutclean
 sndwaveoutclean:
-	$(RM) $(WOS) $(OBJ.WOS)
+	$(RM) $(SNDWAVEOUT) $(OBJ.SNDWAVEOUT)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)/wos.dep
-$(OUTOS)/wos.dep: $(SRC.WOS)
+dep: $(OUTOS)/sndwaveout.dep
+$(OUTOS)/sndwaveout.dep: $(SRC.SNDWAVEOUT)
 	$(DO.DEP)
 else
--include $(OUTOS)/wos.dep
+-include $(OUTOS)/sndwaveout.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

@@ -25,49 +25,49 @@ ifeq ($(MAKESECTION),postdefines)
 vpath %.cpp $(SRCDIR)/plugins/video/format/codecs/rle
 
 ifeq ($(USE_PLUGINS),yes)
-  RLE = $(OUTDLL)/rlecodec$(DLL)
-  LIB.RLE = $(foreach d,$(DEP.RLE),$($d.LIB))
-  TO_INSTALL.DYNAMIC_LIBS += $(RLE)
+  RLECODEC = $(OUTDLL)/rlecodec$(DLL)
+  LIB.RLECODEC = $(foreach d,$(DEP.RLECODEC),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(RLECODEC)
 else
-  RLE = $(OUT)/$(LIB_PREFIX)rlecodec$(LIB)
-  DEP.EXE += $(RLE)
+  RLECODEC = $(OUT)/$(LIB_PREFIX)rlecodec$(LIB)
+  DEP.EXE += $(RLECODEC)
   SCF.STATIC += rlecodec
-  TO_INSTALL.STATIC_LIBS += $(RLE)
+  TO_INSTALL.STATIC_LIBS += $(RLECODEC)
 endif
 
-INC.RLE = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/codecs/rle/*.h))
-SRC.RLE = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/codecs/rle/*.cpp))
-OBJ.RLE = $(addprefix $(OUT)/,$(notdir $(SRC.RLE:.cpp=$O)))
-DEP.RLE = CSUTIL CSSYS
-CFG.RLE =
+INC.RLECODEC = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/codecs/rle/*.h))
+SRC.RLECODEC = $(wildcard $(addprefix $(SRCDIR)/,plugins/video/format/codecs/rle/*.cpp))
+OBJ.RLECODEC = $(addprefix $(OUT)/,$(notdir $(SRC.RLECODEC:.cpp=$O)))
+DEP.RLECODEC = CSUTIL CSSYS
+CFG.RLECODEC =
 
-TO_INSTALL.CONFIG += $(CFG.RLE)
+TO_INSTALL.CONFIG += $(CFG.RLECODEC)
 TO_INSTALL.DATA +=
 
-MSVC.DSP += RLE
-DSP.RLE.NAME = rlecodec
-DSP.RLE.TYPE = plugin
+MSVC.DSP += RLECODEC
+DSP.RLECODEC.NAME = rlecodec
+DSP.RLECODEC.TYPE = plugin
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 .PHONY: rlecodec rlecodecclean
-rlecodec: $(OUTDIRS) $(RLE)
+rlecodec: $(OUTDIRS) $(RLECODEC)
 
-$(RLE): $(OBJ.RLE) $(LIB.RLE)
-	$(DO.PLUGIN) $(LIB.EXTERNAL.RLE)
+$(RLECODEC): $(OBJ.RLECODEC) $(LIB.RLECODEC)
+	$(DO.PLUGIN) $(LIB.EXTERNAL.RLECODEC)
 
 clean: rlecodecclean
 rlecodecclean:
-	-$(RM) $(RLE) $(OBJ.RLE)
+	-$(RM) $(RLECODEC) $(OBJ.RLECODEC)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)/rle.dep
-$(OUTOS)/rle.dep: $(SRC.RLE)
+dep: $(OUTOS)/rlecodec.dep
+$(OUTOS)/rlecodec.dep: $(SRC.RLECODEC)
 	$(DO.DEP)
 else
--include $(OUTOS)/rle.dep
+-include $(OUTOS)/rlecodec.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)

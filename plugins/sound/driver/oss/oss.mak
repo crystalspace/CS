@@ -33,19 +33,19 @@ vpath %.cpp $(SRCDIR)/plugins/sound/driver/oss
 
 # The OSS sound driver
 ifeq ($(USE_PLUGINS),yes)
-  SNDOSS = $(OUTDLL)/ossdrv$(DLL)
-  LIB.SNDOSS = $(foreach d,$(DEP.SNDOSS),$($d.LIB))
-  TO_INSTALL.DYNAMIC_LIBS += $(SNDOSS)
+  OSSDRV = $(OUTDLL)/ossdrv$(DLL)
+  LIB.OSSDRV = $(foreach d,$(DEP.OSSDRV),$($d.LIB))
+  TO_INSTALL.DYNAMIC_LIBS += $(OSSDRV)
 else
-  SNDOSS = $(OUT)/$(LIB_PREFIX)ossdrv.a
-  DEP.EXE += $(SNDOSS)
+  OSSDRV = $(OUT)/$(LIB_PREFIX)ossdrv.a
+  DEP.EXE += $(OSSDRV)
   SCF.STATIC += ossdrv
-  TO_INSTALL.STATIC_LIBS += $(SNDOSS)
+  TO_INSTALL.STATIC_LIBS += $(OSSDRV)
 endif
 
-SRC.SNDOSS = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/oss/*.cpp))
-OBJ.SNDOSS = $(addprefix $(OUT)/,$(notdir $(SRC.SNDOSS:.cpp=$O)))
-DEP.SNDOSS = CSUTIL CSSYS CSUTIL
+SRC.OSSDRV = $(wildcard $(addprefix $(SRCDIR)/,plugins/sound/driver/oss/*.cpp))
+OBJ.OSSDRV = $(addprefix $(OUT)/,$(notdir $(SRC.OSSDRV:.cpp=$O)))
+DEP.OSSDRV = CSUTIL CSSYS CSUTIL
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
@@ -54,18 +54,18 @@ ifeq ($(MAKESECTION),targets)
 
 .PHONY: ossdrv ossdrvclean
 
-ossdrv: $(OUTDIRS) $(SNDOSS)
+ossdrv: $(OUTDIRS) $(OSSDRV)
 
-$(SNDOSS): $(OBJ.SNDOSS) $(LIB.SNDOSS)
+$(OSSDRV): $(OBJ.OSSDRV) $(LIB.OSSDRV)
 	$(DO.PLUGIN)
 
 clean: ossdrvclean
 ossdrvclean:
-	$(RM) $(SNDOSS) $(OBJ.SNDOSS)
+	$(RM) $(OSSDRV) $(OBJ.OSSDRV)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/oss.dep
-$(OUTOS)/oss.dep: $(SRC.SNDOSS)
+$(OUTOS)/oss.dep: $(SRC.OSSDRV)
 	$(DO.DEP)
 else
 -include $(OUTOS)/oss.dep
