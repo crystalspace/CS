@@ -59,7 +59,8 @@
   #define SIGN(x) ((x) < 0 ? -1 : ((x) > 0 ? 1 : 0))
 #endif
 
-// PI
+// PI - These changes add more flexiblity and offer improvements
+// on both low and high end systems in varying performance instances
 #ifndef PI
   static const float PI = 4.0f * (float) atan (1.0f);
 #endif
