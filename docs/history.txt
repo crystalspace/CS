@@ -4,23 +4,31 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 30-May-2003
-	- Philip Wyett added the CS copyright notice and moved the
-	  includes to the correct place in 'iddetect.h'.
+	- Philip Wyett added the CS copyright notice and moved the includes to
+	  the correct place in 'iddetect.h'.
 	- res changed the Win32 port to eliminate the global ApplicationShow
 	  and ModuleHandle variables. Those are now members of the
 	  Win32Assistant and the values are retrieved at it's construction.
 	- Matze fixed a crasher in the maploader.
-	- duhprey did the following to odedynam:
-	  - Added linear and angular global dampening hack
-	  - Added interface for anonymous colliders in system, these have body 0 in
-	    ode terms which makes then immune to gravity and collision response
-	  - Modified joint interface to survive being attached to only one body, the
-	    other is attached to body 0 and static on the other end.
+	- Duhprey made the following changes to odedynam:
+	  - Added linear and angular global dampening hack.
+	  - Added interface for anonymous colliders in system, these have body
+	    0 in ode terms which makes then immune to gravity and collision
+	    response.
+	  - Modified joint interface to survive being attached to only one
+	    body, the other is attached to body 0 and static on the other end.
 	  - Allowed an arbitrary execute callback for use when a mesh or a bone
-		is not attached to a body, but there is a callback handler.
-    - duhprey also did the following to physldr:
-	  - Fixed a few bugs in the parsing
-	  - Added parse commands for the new features in odedynam
+	    is not attached to a body, but there is a callback handler.
+	- Duhprey made the following changes to physldr:
+	  - Fixed a few bugs in the parsing.
+	  - Added parse commands for the new features in odedynam.
+	- Eric Sunshine made the following changes to the Jam build:
+	    - Removed some leftover junk from LinkStaticPlugins in static.jam.
+	    - Added a hack to Jamrules to allow STATIC.PLUGINLIST work on all
+	      supported platforms, rather than only Linux.  (This is a hack
+	      because STATIC.PLUGINLIST itself is an ugly hack.)
+	    - Fixed problem in macosx/cocoa/Jamfile which prevented cocoa2d
+	      driver from ever being considered a build target by Jam.
 29-May-2003
 	- Oktal removed the clean target from from swig.jam as it was deleting
 	  the Swig-generated Python and Perl source files.
