@@ -742,7 +742,8 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
   // Compute the light coverage for every cell of the lightmap
   GetCoverageMatrix (lview, lc);
 
-  unsigned char *map;
+  unsigned char *ShadowMap;
+  csRGBpixel *LightMap;
   csShadowMap *smap = NULL;
 
   int ww, hh;
@@ -767,11 +768,11 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
     }
     else
       first_time = false;
-    map = smap->map;
+    ShadowMap = smap->map;
   }
   else
   {
-    map = lm->GetStaticMap ().GetMap ();
+    LightMap = lm->GetStaticMap ().GetMap ();
   }
 
   // From: T = Mwt * (W - Vwt)
@@ -795,8 +796,7 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
   for (int i = 0; i < lmh; i++)
   {
     int uv = i * lm->GetWidth ();
-    int lmuv = uv << 2;
-    for (int j = 0; j < lmw; j++, uv++, lmuv += 4)
+    for (int j = 0; j < lmw; j++, uv++)
     {
       float lightness = lc.coverage [covaddr++];
       if (lightness < EPSILON)
@@ -828,17 +828,17 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
 
       if (dyn)
       {
-        l = map [uv] + QRound (NORMAL_LIGHT_LEVEL * lightness * brightness);
-        map [uv] = l < 255 ? l : 255;
+        l = ShadowMap [uv] + QRound (NORMAL_LIGHT_LEVEL * lightness * brightness);
+        ShadowMap [uv] = l < 255 ? l : 255;
       }
       else
       {
-        l = map [lmuv] + QRound (light_r * lightness * brightness);
-        map [lmuv] = l < 255 ? l : 255;
-        l = map [lmuv+1] + QRound (light_g * lightness * brightness);
-        map [lmuv+1] = l < 255 ? l : 255;
-        l = map [lmuv+2] + QRound (light_b * lightness * brightness);
-        map [lmuv+2] = l < 255 ? l : 255;
+        l = LightMap [uv].red + QRound (light_r * lightness * brightness);
+        LightMap [uv].red = l < 255 ? l : 255;
+        l = LightMap [uv].green + QRound (light_g * lightness * brightness);
+        LightMap [uv].green = l < 255 ? l : 255;
+        l = LightMap [uv].blue + QRound (light_b * lightness * brightness);
+        LightMap [uv].blue = l < 255 ? l : 255;
       } /* endif */
     } /* endfor */
   } /* endfor */
@@ -876,9 +876,9 @@ void csPolyTexture::ShineDynLightMap (csLightPatch* lp)
   invww = 1. / (float)ww;
   invhh = 1. / (float)hh;
 
-  csRGBLightMap& remap = lm->GetRealMap ();
+  csRGBMap& remap = lm->GetRealMap ();
   csDynLight* light = (csDynLight*)(lp->GetLight ());
-  unsigned char* map = remap.GetMap ();
+  csRGBpixel* map = remap.GetMap ();
 
   int i;
   float miny = 1000000, maxy = -1000000;
@@ -1060,16 +1060,15 @@ b:      if (scanL2 == MinIndex) goto finish;
 
 	  float brightness = cosinus * light->GetBrightnessAtDistance (d);
 
-	  int lmuv = uv << 2;
 	  if (color.red > 0)
 	  {
 	    l1 = QRound (color.red * brightness);
 	    if (l1)
 	    {
-	      CS_ASSERT (uv >= 0 && uv < remap.GetMaxSize ());
-	      l1 += map[lmuv];
+	      CS_ASSERT (uv >= 0 && uv < remap.GetSize ());
+	      l1 += map[uv].red;
 	      if (l1 > 255) l1 = 255;
-	      map[lmuv] = l1;
+	      map[uv].red = l1;
 	    }
 	  }
 	  if (color.green > 0)
@@ -1077,10 +1076,10 @@ b:      if (scanL2 == MinIndex) goto finish;
 	    l2 = QRound (color.green * brightness);
 	    if (l2)
 	    {
-	      CS_ASSERT (uv >= 0 && uv < remap.GetMaxSize ());
-	      l2 += map[lmuv+1];
+	      CS_ASSERT (uv >= 0 && uv < remap.GetSize ());
+	      l2 += map[uv].green;
 	      if (l2 > 255) l2 = 255;
-	      map[lmuv+1] = l2;
+	      map[uv].green = l2;
 	    }
 	  }
 	  if (color.blue > 0)
@@ -1088,10 +1087,10 @@ b:      if (scanL2 == MinIndex) goto finish;
 	    l3 = QRound (color.blue * brightness);
 	    if (l3)
 	    {
-	      CS_ASSERT (uv >= 0 && uv < remap.GetMaxSize ());
-	      l3 += map[lmuv+2];
+	      CS_ASSERT (uv >= 0 && uv < remap.GetSize ());
+	      l3 += map[uv].blue;
 	      if (l3 > 255) l3 = 255;
-	      map[lmuv+2] = l3;
+	      map[uv].blue = l3;
 	    }
 	  }
         }

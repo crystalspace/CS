@@ -31,7 +31,7 @@
 class csEngine;
 class csPolygon3D;
 class csLightMap;
-class csRGBLightMap;
+class csRGBMap;
 class csProgressPulse;
 class csShadowFrustum;
 struct iProgressMeter;
@@ -41,7 +41,7 @@ float FastPow2(float x, const int y);
 
 /**
  * A small class encapsulating an RGB lightmap.
- * The float version of csRGBlightmap
+ * The float version of csRGBMap
  * Helps radiosity.
  */
 class csRGBFloatLightMap
@@ -97,35 +97,33 @@ public:
   }
 
   /// copy from bytemap
-  void Copy (csRGBLightMap& other, int size)
+  void Copy (csRGBMap& other, int size)
   {
     Clear ();
     if (other.GetMap()) { 
       Alloc (size); 
-      UByte* m = other.GetMap ();
+      csRGBpixel* m = other.GetMap ();
       for(int i=0; i<size; i++)
       {
-	int lmi = i << 2;
-        GetRed()[i] = m[lmi];
-        GetGreen()[i] = m[lmi+1];
-        GetBlue()[i] = m[lmi+2];
+        GetRed()[i] = m[i].red;
+        GetGreen()[i] = m[i].green;
+        GetBlue()[i] = m[i].blue;
       }
     }
   }
 
   /// copy to bytemap
-  void CopyTo (csRGBLightMap& other, int size)
+  void CopyTo (csRGBMap& other, int size)
   {
     other.Clear ();
     if (GetMap()) { 
       other.Alloc (size); 
-      UByte* m = other.GetMap ();
+      csRGBpixel* m = other.GetMap ();
       for(int i=0; i<size; i++)
       {
-	int lmi = i << 2;
-        m[lmi] = (unsigned char)GetRed()[i];
-        m[lmi+1] = (unsigned char)GetGreen()[i];
-        m[lmi+2] = (unsigned char)GetBlue()[i];
+        m[i].red = (unsigned char)GetRed()[i];
+        m[i].green = (unsigned char)GetGreen()[i];
+        m[i].blue = (unsigned char)GetBlue()[i];
       }
     }
   }
@@ -148,7 +146,7 @@ protected:
   int width, height, size;
   
   /// ptr to static lightmap of polygon
-  csRGBLightMap *lightmap;
+  csRGBMap *lightmap;
  
   /// the change to this lightmap, unshot light.
   csRGBFloatLightMap *deltamap;
@@ -158,7 +156,7 @@ protected:
    * lightmap that we store in order to restore the static lightmap
    * values later.
    */
-  csRGBLightMap* copy_lightmap;
+  csRGBMap* copy_lightmap;
  
   /// the area of one lumel of the polygon
   float one_lumel_area;
@@ -221,7 +219,7 @@ public:
   
   /// Get avg texture colour for a patch.
   void GetTextureColour(int suv, int w, int h, csColor &avg,
-    csRGBLightMap *texturemap);
+    csRGBMap *texturemap);
   
   /// Cap every delta in patch to value.
   void CapDelta(int suv, int w, int h, float max);
@@ -311,7 +309,7 @@ public:
    *  Compute the texture map at the size of the lumel map.
    *  Gets the texture, and scales down. You must delete the map.
    */
-  csRGBLightMap *ComputeTextureLumelSized();
+  csRGBMap *ComputeTextureLumelSized();
 
   /// Get a RadElement when you have a csPolygon3D or a csCurve
   static csRadElement* GetRadElement(csPolygon3D &object);
@@ -585,7 +583,7 @@ private:
   int src_x, src_y;
   /// texture map of source polygon - reasonably quick to compute, saves
   /// a lot of space.
-  csRGBLightMap *texturemap;
+  csRGBMap *texturemap;
   /// the shadows lying on the dest polygon, 1=full visible, 0=all shadow
   csCoverageMatrix *shadow_matrix;
   /// color from passing portals between source and dest polygon.

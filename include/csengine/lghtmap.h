@@ -21,6 +21,7 @@
 
 #include "csutil/scf.h"
 #include "csgfx/rgbpixel.h"
+#include "csgfx/rgbmap.h"
 #include "imesh/thing/lightmap.h"
 
 class csPolyTexture;
@@ -67,55 +68,6 @@ private:
 };
 
 /**
- * A small class encapsulating an RGB lightmap.
- */
-class csRGBLightMap
-{
-private:
-  int max_sizeRGB;	// Max size for every map.
-  unsigned char* map;
-
-public:
-  ///
-  void Clear ()
-  {
-    delete [] map; map = NULL;
-    max_sizeRGB = 0;
-  }
-
-  ///
-  csRGBLightMap () : max_sizeRGB (0), map (NULL) { }
-  ///
-  ~csRGBLightMap () { Clear (); }
-
-  ///
-  int GetMaxSize () { return max_sizeRGB; }
-  ///
-  void SetMaxSize (int s) { max_sizeRGB = s; }
-
-  /// Get data.
-  unsigned char* GetMap () { return map; }
-
-  /// Set color maps.
-  void SetMap (unsigned char* m) { map = m; }
-
-  ///
-  void Alloc (int size)
-  {
-    max_sizeRGB = size;
-    delete [] map;
-    map = new unsigned char [size*4];
-  }
-
-  ///
-  void Copy (csRGBLightMap& other, int size)
-  {
-    Clear ();
-    if (other.map) { Alloc (size); memcpy (map, other.map, size*4); }
-  }
-};
-
-/**
  * The static and all dynamic lightmaps for one polygon.
  */
 class csLightMap : public iLightMap
@@ -128,7 +80,7 @@ private:
    * A color lightmap containing all static lighting information
    * for the static lights (no pseudo-dynamic lights are here).
    */
-  csRGBLightMap static_lm;
+  csRGBMap static_lm;
 
   /**
    * The final lightmap that is going to be used for rendering.
@@ -136,7 +88,7 @@ private:
    * contain extra lighting information obtained from all the
    * pseudo-dynamic shadowmaps and also the true dynamic lights.
    */
-  csRGBLightMap real_lm;
+  csRGBMap real_lm;
 
   /** 
    * A flag indicating whether the lightmaps needs recalculating
@@ -219,9 +171,9 @@ public:
   bool UpdateRealLightMap ();
   
   ///
-  csRGBLightMap& GetStaticMap () { return static_lm; }
+  csRGBMap& GetStaticMap () { return static_lm; }
   ///
-  csRGBLightMap& GetRealMap () { return real_lm; }
+  csRGBMap& GetRealMap () { return real_lm; }
 
   /**
    * Allocate the lightmap. 'w' and 'h' are the size of the
@@ -239,7 +191,7 @@ public:
   csShadowMap* NewShadowMap (csLight* light, int w, int h);
 
   /**
-   * Allocate the static RGBLightMap.
+   * Allocate the static csRGBMap.
    */
   void AllocStaticLM (int w, int h);
 
@@ -293,7 +245,7 @@ public:
   //------------------------ iLightMap implementation ------------------------
   SCF_DECLARE_IBASE;
   ///
-  virtual unsigned char *GetMapData ();
+  virtual csRGBpixel *GetMapData ();
   ///
   virtual int GetWidth ()
   { return lwidth; }

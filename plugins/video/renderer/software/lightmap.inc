@@ -82,7 +82,7 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
 
   iLightMap *lm = pt->GetLightMap ();
   int lm_w = lm->GetWidth ();
-  UByte *lm_data = lm->GetMapData ();
+  csRGBpixel *lm_data = lm->GetMapData ();
   int lm_size = lm->GetSize ();
 
   void *dst = ct->get_bitmap ();
@@ -140,23 +140,21 @@ void LM_NAME (iPolygonTexture *pt, SoftwareCachedTexture *ct,
   // this problem there is now a test to see if we stay within bounds.
   int src_end = lm_size - lm_w - 1;
 
-  int lmlm_w = lm_w << 2;
   for (int lv = min_lv; lv < max_lv; lv++)
   {
     for (int lu = min_lu; lu < max_lu; lu++)
     {
       if (src >= src_end) return;
-      int lmsrc = src << 2;
-#define GET(map, col)				\
-      UByte col##00, col##10, col##01, col##11;	\
-      col##00 = map [lmsrc];			\
-      col##10 = map [lmsrc + 4];		\
-      col##01 = map [lmsrc + lmlm_w];		\
-      col##11 = map [lmsrc + lmlm_w + 4];
+#define GET(map, col, col_long)                 \
+      UByte col##00, col##10, col##01, col##11; \
+      col##00 = map [src].col_long;             \
+      col##10 = map [src + 1].col_long;         \
+      col##01 = map [src + lm_w].col_long;      \
+      col##11 = map [src + lm_w + 1].col_long;
 
-      GET (lm_data, r);
-      GET ((lm_data+1), g);
-      GET ((lm_data+2), b);
+      GET (lm_data, r, red);
+      GET (lm_data, g, green);
+      GET (lm_data, b, blue);
 #undef GET
 
       // this is somewhat tricky but in practice it works well

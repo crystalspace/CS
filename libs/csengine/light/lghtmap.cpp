@@ -150,25 +150,20 @@ void csLightMap::Alloc (int w, int h, int r, int g, int b)
   static_lm.Alloc (lm_size);
   real_lm.Alloc (lm_size);
 
-  UByte* map = static_lm.GetMap ();
-  ULong v;
-  *(0+(UByte*)&v) = r;
-  *(1+(UByte*)&v) = g;
-  *(2+(UByte*)&v) = b;
-  *(3+(UByte*)&v) = 128;
-  ULong* m = (ULong*)map;
-  ULong* m_end = m+lm_size;
-  while (m < m_end)
-  {
-    *m++ = v;
-  }
+  csRGBpixel* map = static_lm.GetMap ();
+  csRGBpixel def (r, g, b);
+  // don't know why, but the previous implementation did this:
+  def.alpha = 128;
+
+  for (int i=0; i<lm_size; i++)
+    map[i] = def;
 }
 
 void csLightMap::CopyLightMap (csLightMap* source)
 {
   lm_size = source->lm_size;
-  static_lm.Copy (source->static_lm, lm_size);
-  real_lm.Copy (source->real_lm, lm_size);
+  static_lm.Copy (&source->static_lm);
+  real_lm.Copy (&source->real_lm);
   lwidth = source->lwidth;
   lheight = source->lheight;
   rwidth = source->rwidth;
@@ -443,7 +438,7 @@ bool csLightMap::UpdateRealLightMap ()
   // Then add all pseudo-dynamic lights.
   //---
   csLight* light;
-  unsigned char* map;
+  csRGBpixel* map;
   float red, green, blue;
   unsigned char* p, * last_p;
   int l, s;
@@ -466,12 +461,14 @@ bool csLightMap::UpdateRealLightMap ()
       do
       {
         s = *p++;
-        l = *map + QRound (red * s);
-        *map++ = l < 255 ? l : 255;
-        l = *map + QRound (green * s);
-        *map++ = l < 255 ? l : 255;
-        l = *map + QRound (blue * s);
-        *map++ = l < 255 ? l : 255;
+	
+        l = map->red + QRound (red * s);
+        map->red = l < 255 ? l : 255;
+        l = map->green + QRound (green * s);
+        map->green = l < 255 ? l : 255;
+        l = map->blue + QRound (blue * s);
+        map->blue = l < 255 ? l : 255;
+
 	map++;
       }
       while (p < last_p);
@@ -491,13 +488,12 @@ void csLightMap::ConvertToMixingMode ()
   mer = 0;
   meg = 0;
   meb = 0;
-  unsigned char* map;
-  map = static_lm.GetMap ();
+  csRGBpixel *map = static_lm.GetMap ();
   for (i = 0 ; i < lm_size ; i++)
   {
-    mer += *map++;
-    meg += *map++;
-    meb += *map++;
+    mer += map->red;
+    meg += map->green;
+    meb += map->blue;
     map++;
   }
   mean_color.red   = mer/lm_size;
@@ -506,8 +502,8 @@ void csLightMap::ConvertToMixingMode ()
 }
 
 // Only works for expanding a map.
-static void ResizeMap2 (unsigned char* old_map, int oldw, int oldh,
-		 unsigned char* new_map, int neww, int /*newh*/)
+static void ResizeMap2 (csRGBpixel* old_map, int oldw, int oldh,
+		 csRGBpixel* new_map, int neww, int /*newh*/)
 {
   int row;
   for (row = 0 ; row < oldh ; row++)
@@ -538,11 +534,9 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
     return;	// Already ok, nothing to do.
 
   // Move the old data to o_stat and o_real.
-  csRGBLightMap o_stat, o_real;
-  o_stat.SetMap (static_lm.GetMap ()); static_lm.SetMap (NULL);
-  o_stat.SetMaxSize (static_lm.GetMaxSize ());
-  o_real.SetMap (real_lm.GetMap ()); real_lm.SetMap (NULL);
-  o_real.SetMaxSize (real_lm.GetMaxSize ());
+  csRGBMap o_stat, o_real;
+  o_stat.TakeOver (&static_lm);
+  o_real.TakeOver (&real_lm);
 
   lm_size = lwidth * lheight;
  
@@ -565,7 +559,7 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
   }
 }
 
-unsigned char *csLightMap::GetMapData ()
+csRGBpixel *csLightMap::GetMapData ()
 {
   return GetRealMap ().GetMap ();
 }

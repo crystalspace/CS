@@ -637,7 +637,7 @@ void OpenGLLightmapCache::Load (csLMCacheData *d)
   iLightMap* lightmap_info = d->Source;
   int lmwidth = lightmap_info->GetWidth ();
   int lmheight = lightmap_info->GetHeight ();
-  unsigned char* lm_data = lightmap_info->GetMapData ();
+  csRGBpixel* lm_data = lightmap_info->GetMapData ();
 
   glBindTexture (GL_TEXTURE_2D, d->Handle);
   csRect& r = d->super_lm_rect;

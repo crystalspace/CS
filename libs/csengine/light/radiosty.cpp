@@ -104,20 +104,19 @@ bool csRadElement::DeltaIsZero(int suv, int w, int h)
 }
 
 void csRadElement::GetTextureColour(int suv, int w, int h, csColor &avg, 
-                                    csRGBLightMap *texturemap)
+                                    csRGBMap *texturemap)
 {
   /// Note that the texturemap must be width * height in size
   avg.red = 0.0f;
   avg.green = 0.0f;
   avg.blue = 0.0f;
-  UByte* m = texturemap->GetMap ();
+  csRGBpixel* m = texturemap->GetMap ();
   for(int y=0; y<h; y++, suv += width - w)
     for(int x=0; x<w; x++, suv ++)
     {
-      int lmsuv = suv << 2;
-      avg.red += m[lmsuv];
-      avg.green += m[lmsuv+1];
-      avg.blue += m[lmsuv+2];
+      avg.red += m[suv].red;
+      avg.green += m[suv].green;
+      avg.blue += m[suv].blue;
     }
   avg *= 1.0f / float( w*h );
 }
@@ -168,25 +167,24 @@ void csRadElement::CopyAndClearDelta()
 {
   int res;
   int uv;
-  UByte* lm = lightmap->GetMap ();
+  csRGBpixel* lm = lightmap->GetMap ();
   float* dm = deltamap->GetMap ();
   for(uv=0; uv<size; uv++)
   {
-    int lmuv = uv << 2;
     // Red
-    res = lm[lmuv] + QRound(dm[uv]);
+    res = lm[uv].red + QRound(dm[uv]);
     if (res > 255) res = 255; else if (res < 0) res = 0;
-    lm[lmuv] = res;
+    lm[uv].red = res;
     dm[uv] = 0.0;
     // Green
-    res = lm[lmuv+1] + QRound(dm[uv+size]);
+    res = lm[uv].green + QRound(dm[uv+size]);
     if (res > 255) res = 255; else if (res < 0) res = 0;
-    lm[lmuv+1] = res;
+    lm[uv].green = res;
     dm[uv+size] = 0.0;
     // Blue
-    res = lm[lmuv+2] + QRound(dm[uv+size+size]);
+    res = lm[uv].blue + QRound(dm[uv+size+size]);
     if (res > 255) res = 255; else if (res < 0) res = 0;
-    lm[lmuv+2] = res;
+    lm[uv].blue = res;
     dm[uv+size+size] = 0.0;
   }
 
@@ -225,10 +223,10 @@ void csRadElement::ApplyAmbient(int red, int green, int blue)
   }
 }
 
-csRGBLightMap * csRadElement::ComputeTextureLumelSized()
+csRGBMap * csRadElement::ComputeTextureLumelSized()
 {
   int uv;
-  csRGBLightMap *map = new csRGBLightMap();
+  csRGBMap *map = new csRGBMap();
   map->Alloc(size);
   // fill map with flat color
   int flatr = QRound(GetFlatColor().red * 255.0);
@@ -238,13 +236,12 @@ csRGBLightMap * csRadElement::ComputeTextureLumelSized()
   int flatb = QRound(GetFlatColor().blue * 255.0);
   if(flatb > 255) flatb = 255; else if (flatb < 0) flatb = 0;
 
-  UByte* m = map->GetMap ();
+  csRGBpixel* m = map->GetMap ();
   for(uv=0; uv<size; uv++)
   {
-    int lmuv = uv << 2;
-    m[lmuv] = flatr;
-    m[lmuv+1] = flatr;
-    m[lmuv+2] = flatr;
+    m[uv].red = flatr;
+    m[uv].green = flatr;
+    m[uv].blue = flatr;
   }
 
   // get texture of element
@@ -299,10 +296,9 @@ csRGBLightMap * csRadElement::ComputeTextureLumelSized()
 	  sumb += rgb[txt_idx].blue;
 	}
        // store averages
-       int lmlumel_uv = lumel_uv << 2;
-       m[lmlumel_uv] = sumr >> texelsperlumel_shift;
-       m[lmlumel_uv+1] = sumr >> texelsperlumel_shift;
-       m[lmlumel_uv+2] = sumr >> texelsperlumel_shift;
+       m[lumel_uv].red = sumr >> texelsperlumel_shift;
+       m[lumel_uv].green = sumr >> texelsperlumel_shift;
+       m[lumel_uv].blue = sumr >> texelsperlumel_shift;
     }
 
   /*
@@ -361,17 +357,17 @@ void csRadElement::ShowDeltaMap ()
 {
   if (copy_lightmap) return;
 
-  copy_lightmap = new csRGBLightMap ();
-  copy_lightmap->Copy (*lightmap, lightmap->GetMaxSize ());
+  copy_lightmap = new csRGBMap ();
+  copy_lightmap->Copy (lightmap);
 
-  deltamap->CopyTo (*lightmap, lightmap->GetMaxSize ());
+  deltamap->CopyTo (*lightmap, lightmap->GetSize ());
 }
 
 void csRadElement::RestoreStaticMap ()
 {
   if (!copy_lightmap) return;
 
-  lightmap->Copy (*copy_lightmap, copy_lightmap->GetMaxSize ());
+  lightmap->Copy (copy_lightmap);
 
   delete copy_lightmap;
   copy_lightmap = NULL;

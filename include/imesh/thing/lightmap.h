@@ -20,6 +20,8 @@
 #define __IENGINE_LIGHTMAP_H__
 
 #include "csutil/scf.h"
+struct csRGBpixel;
+
 
 SCF_VERSION (iLightMap, 0, 0, 2);
 
@@ -31,8 +33,8 @@ SCF_VERSION (iLightMap, 0, 0, 2);
  */
 struct iLightMap : public iBase
 {
-  /// Get light map data (format rgb0rgb0rgb0...).
-  virtual unsigned char *GetMapData () = 0;
+  /// Get light map data
+  virtual csRGBpixel *GetMapData () = 0;
   /// Get lightmap width (could be adjusted to power of two)
   virtual int GetWidth () = 0;
   /// Get lightmap height (could be adjusted to power of two)
