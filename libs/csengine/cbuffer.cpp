@@ -37,6 +37,7 @@ void csCBufferLine::Initialize (int startx, int endx)
     // Append the current unused list to the last span
     // and set the new unused list to the first span.
     // This moves all used spans to the unused list.
+
     last_span->next = parent->first_unused;
     parent->first_unused = first_span;
   }
@@ -68,6 +69,7 @@ void csCBufferLine::MakeFull ()
     parent->FreeSpan (first_span);
     first_span = n;
   }
+  last_span=NULL;
 }
 
 bool csCBufferLine::TestSpan (int startx, int endx)
@@ -107,10 +109,6 @@ bool csCBufferLine::InsertSpan (int startx, int endx)
     if (s->endx >= startx)
     {
       // We have found a span which ends after the start of the full span.
-
-      // If the start of the empty span is after the end of the full span
-      // then we can stop.
-      if (s->startx > endx) return vis;
 
       // We know this empty span is going to modified somehow.
       // So the full span is visible.
