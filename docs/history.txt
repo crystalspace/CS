@@ -12,6 +12,10 @@ The history order is reversed so that new features are at the top.
 	  wrong for these shutdown functions to make the assertion that certain
 	  components must be present.  This issue was reported by Troy Chard
 	  <troy.chard@shaw.ca>.
+	- Eric Sunshine fixed a compilation error in m2s_mdl.cpp introduced
+	  when some of the RegisterClass() overloads were removed from iSCF
+	  during Eric's Phase Three removal of monolithic scf.cfg.  (Bug
+	  #749883)
 6-June-2003
 	- res did further fixes related to the new shader var stuff.
 	  r3dtest now seems to run fine (for me, at least.)

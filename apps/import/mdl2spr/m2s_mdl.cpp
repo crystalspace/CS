@@ -339,7 +339,6 @@ bool Mdl::WriteSPR(const char* spritename, float scaleMdl, int delayMdl,
   {
     if (mdl2spr_imageio == 0)
     {
-      iSCF::SCF->RegisterClass("crystalspace.graphic.image.io.png","cspngimg");
       mdl2spr_imageio =
         SCF_CREATE_INSTANCE ("crystalspace.graphic.image.io.png", iImageIO);
     }
