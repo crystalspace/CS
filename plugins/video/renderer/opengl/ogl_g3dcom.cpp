@@ -30,6 +30,7 @@
 #include "csgeom/plane3.h"
 #include "ogl_g3dcom.h"
 #include "ogl_txtcache.h"
+#include "ogl_txtmgr.h"
 #include "csutil/inifile.h"
 #include "isystem.h"
 #include "igraph3d.h"
