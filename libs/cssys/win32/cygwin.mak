@@ -10,6 +10,7 @@ DESCRIPTION.OS.cygwin = Win32
 PLUGINS+= sound/renderer/software
 PLUGINS+= video/canvas/ddraw
 #PLUGINS+= video/canvas/ddraw8
+#PLUGINS+=physics/odedynam
 
 # udp/tcp network plugin
 PLUGINS+=net/driver/ensocket
