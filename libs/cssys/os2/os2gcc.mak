@@ -160,7 +160,7 @@ endif
 LIBS.SOCKET.SYSTEM=$(LFLAGS.l)socket
 
 # Override linker with os2link.exe
-LINK=@$(OS2LINK) --linker=$(LD) --description="$(DESCRIPTION.$@)" \
+LINK=$(OS2LINK) --linker=$(LD) --description="$(DESCRIPTION.$@)" \
   --verbose --console --out=$(OUT)
 LFLAGS.CONSOLE.EXE=
 
@@ -172,6 +172,9 @@ SYS_SED_DEPEND=-e "s/\.ob*j*\:/\$$O:/g"
 
 # Use makedep to build dependencies
 DEPEND_TOOL=mkdep
+
+# XFree86/2 places shm extension in a separate library
+LIB.XEXTSHM.SYSTEM = -lshm
 
 endif # ifeq ($(MAKESECTION),defines)
 

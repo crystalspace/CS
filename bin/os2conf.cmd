@@ -224,7 +224,7 @@
   if (X11ROOT \= "") then
   do
     say 'X11_PATH = 'X11ROOT'/XFree86';
-    say 'PLUGINS += video/canvas/softx';
+    say 'PLUGINS += video/canvas/softx video/canvas/xwindow video/canvas/xextshm video/canvas/xextf86vm';
     say 'USE_XFREE86VM = yes';
     say 'X11_EXTRA_LIBS = -lshm';
     call saycon ANSI.LCYAN||"      found"

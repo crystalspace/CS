@@ -660,7 +660,7 @@ void csGraphics2DOS2DIVE::KeyboardHandlerStub (void *Self, unsigned char ScanCod
   if (KeyCode == CSKEY_ENTER) CharCode = CSKEY_ENTER;
 
   // WM_CHAR does not support Ctrl+# ...
-  if (KeyboardDriver->GetKeyState (CSKEY_CTRL) && !CharCode
+  if (This->KeyboardDriver->GetKeyState (CSKEY_CTRL) && !CharCode
    && (KeyCode > 96) && (KeyCode < 127))
     CharCode = KeyCode - 96;
 

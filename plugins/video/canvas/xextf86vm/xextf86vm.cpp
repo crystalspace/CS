@@ -30,7 +30,7 @@ CS_IMPLEMENT_PLUGIN
 
 SCF_IMPLEMENT_FACTORY (csXExtF86VM)
 
-SCF_EXPORT_CLASS_TABLE (xextf86vm)
+SCF_EXPORT_CLASS_TABLE (xext86vm)
   SCF_EXPORT_CLASS (csXExtF86VM, "crystalspace.window.x.extf86vm",
     "X-Window Shared Memory Extension plugin for Crystal Space")
 SCF_EXPORT_CLASS_TABLE_END
