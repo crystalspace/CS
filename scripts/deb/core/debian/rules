@@ -71,11 +71,11 @@ endif
 	# Install as much as possible
 #	perl -pi -e "s/#TO_INSTALL/TO_INSTALL/" $(CURDIR)/CS/cache.mak
 	# Activating scripts
-#	chmod +x $(CURDIR)/debian/createmenus
+	chmod +x $(CURDIR)/debian/createmenus
 #	chmod +x $(CURDIR)/debian/addmissing
 	chmod +x $(CURDIR)/debian/automan
 	# Creating menus
-#	$(CURDIR)/debian/createmenus $(CURDIR)
+	$(CURDIR)/debian/createmenus $(CURDIR)
 	# Some path adjustment
 #	perl -pi -e "s:/usr/local/crystal:/usr/lib/crystalspace:" $(CURDIR)/CS/libs/csutil/generic/instpath.cpp
 #	perl -pi -e "s:/usr/local/crystal:/usr/lib/crystalspace:" $(CURDIR)/CS/libs/csutil/unix/instpath.cpp
