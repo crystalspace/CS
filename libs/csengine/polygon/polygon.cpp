@@ -2331,12 +2331,10 @@ void csPolygon3D::CalculateLightingDynamic (csFrustumView *lview)
   if (!csMath3::Visible (center, plane->GetWorldPlane ())) return ;
 
   // Compute the distance from the center of the light
-
   // to the plane of the polygon.
   float dist_to_plane = GetPolyPlane ()->Distance (center);
 
   // If distance is too small or greater than the radius of the light
-
   // then we have a trivial case (no hit).
   if (dist_to_plane < SMALL_EPSILON || dist_to_plane >= lview->GetRadius ())
     return ;
@@ -2367,17 +2365,11 @@ void csPolygon3D::CalculateLightingDynamic (csFrustumView *lview)
   if (!new_light_frustum) return ;
 
   // There is an intersection of the current light frustum with the polygon.
-
   // This means that the polygon is hit by the light.
-
   // The light is close enough to the plane of the polygon. Now we calculate
-
   // an accurate minimum squared distance from the light to the polygon. Note
-
   // that we use the new_frustum which is relative to the center of the
-
   // light.
-
   // So this algorithm works with the light position at (0,0,0).
   csPlane3 poly_plane = csPoly3D::ComputePlane (poly, num_vertices);
 
@@ -2404,19 +2396,12 @@ void csPolygon3D::CalculateLightingDynamic (csFrustumView *lview)
   new_ctxt->SetLightFrustum (new_light_frustum);
 
   // Mark all shadow frustums in 'new_lview' which are relevant. i.e.
-
   // which are inside the light frustum and are not obscured (shadowed)
-
   // by other shadow frustums.
-
   // We also give the polygon plane to MarkRelevantShadowFrustums so that
-
   // all shadow frustums which start at the same plane are discarded as
-
   // well.
-
   // FillLightMap() will use this information and
-
   // csPortal::CalculateLighting() will also use it!!
   po = GetPortal ();
   if (!MarkRelevantShadowFrustums (*lview)) goto stop;
@@ -2440,49 +2425,32 @@ void csPolygon3D::CalculateLightingStatic (csFrustumView *lview, bool vis)
   const csVector3 &center = light_frustum->GetOrigin ();
 
   // If plane is not visible then return (backface culling).
-  if (!csMath3::Visible (center, plane->GetWorldPlane ())) return ;
+  if (!csMath3::Visible (center, plane->GetWorldPlane ())) return;
 
   // Compute the distance from the center of the light
-
   // to the plane of the polygon.
   float dist_to_plane = GetPolyPlane ()->Distance (center);
 
   // If distance is too small or greater than the radius of the light
-
   // then we have a trivial case (no hit).
   if (dist_to_plane < SMALL_EPSILON || dist_to_plane >= lview->GetRadius ())
     return ;
 
   // In the following algorithm we ignore the light frustum and only
-
   // apply shadows on the lightmap.
-
   // @@@ TODO: Optimization. Use the light frustum to test if the
-
   // polygon falls inside the light frustum (to avoid unneeded work).
-
   // Beware of mirroring here.
-
   // @@@ TODO: Optimization. Calculate minimum squared distance between
-
   // the light center and the polygon to see if we should bother lighting
-
   // at all.
-
   // @@@ TODO: Optimization. Mark all shadow frustums which are relevant. i.e.
-
   // which are inside the light frustum and are not obscured (shadowed)
-
   // by other shadow frustums. Maybe only do this for portals.
-
   // We should also give the polygon plane to MarkRelevantShadowFrustums so
-
   // that all shadow frustums which start at the same plane are discarded as
-
   // well.
-
   // @@@ TODO: Optimization. Precalculated edge-table to detect polygons
-
   // that are adjacent.
   csPolyTexLightMap *lmi = GetLightMapInfo ();
   bool calc_lmap;
@@ -2498,12 +2466,12 @@ void csPolygon3D::CalculateLightingStatic (csFrustumView *lview, bool vis)
   }
 
   // Update the lightmap given light and shadow frustums in lview.
-  if (calc_lmap) FillLightMapStatic (lview, vis);
+  if (calc_lmap)
+    FillLightMapStatic (lview, vis);
 
   csPortal *po = GetPortal ();
 
   // @@@@@@@@ We temporarily don't do lighting through space-warping portals.
-
   // Needs to be fixed soon!!!
   if (po && !po->flags.Check (CS_PORTAL_WARP))
   {
@@ -2566,3 +2534,4 @@ void csPolygon3D::FillLightMapStatic (csFrustumView *lview, bool vis)
     lmi->tex->FillLightMap (lview, vis, this);
   }
 }
+

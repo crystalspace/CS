@@ -1,5 +1,15 @@
 The history order is reversed so that new features are at the top.
 
+12-Mar-2002
+	- Made the lightmap cache for pseudo-dynamic lightmaps (shadow
+	  maps) a bit more robust. Previously changing pseudo-dynamic
+	  lights could cause the map to become unloadable because
+	  old cached dynamic lightmap files made things crash.
+	- Cleaned up pol2d.cpp source code which seems to have been
+	  badly formatted by the C++ 'beautifier' :-)
+	- Fixed a bad bug in pseudo-dynamic lights. Due to a wrong test
+	  in the lighting code polygons that were fully lit by a
+	  pseudo-dynamic light would not get lit at all.
 11-Mar-2002
 	- Fixed a bug in csScanStr when presented with an empty string
 	  as input. This prevented the proper scanning of the format

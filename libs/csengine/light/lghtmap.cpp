@@ -342,14 +342,25 @@ bool csLightMap::ReadFromCache (
 
   data = cache_mgr->ReadCache (type, NULL, uid);
   if (!data) return true;   // No dynamic data. @@@ Recalc dynamic data?
+  int size = data->GetSize ();
   d = **data;
   memcpy (lh.header, d, 4);
-  d += 4;
+  d += 4; size -= 4;
   memcpy (&lh.dyn_cnt, d, 4);
-  d += 4;
+  d += 4; size -= 4;
   lh.dyn_cnt = convert_endian (lh.dyn_cnt);
 
-  for (i = 0; i < lh.dyn_cnt; i++)
+  // Calculate the expected size and see if it matches with the
+  // size we still have in our data buffer. If it doesn't match
+  // we don't load anything.
+  int expected_size = lh.dyn_cnt * (sizeof (ls.light_id) + lm_size);
+  if (expected_size != size)
+  {
+    data->DecRef ();
+    return true;
+  }
+
+  for (i = 0 ; i < lh.dyn_cnt ; i++)
   {
     memcpy (&ls.light_id, d, sizeof (ls.light_id));
     d += sizeof (ls.light_id);
@@ -359,7 +370,6 @@ bool csLightMap::ReadFromCache (
     if (il)
     {
       light = il->GetPrivateObject ();
-
       csShadowMap *smap = NewShadowMap (light, w, h);
       memcpy (smap->GetArray (), d, lm_size);
     }
@@ -446,7 +456,7 @@ void csLightMap::Cache (
   memcpy (lm_ptr, static_lm.GetArray (), lm_size * 4);
   while (--n >= 0) 
   {
-    cf->Write(lm_ptr, 3);
+    cf->Write (lm_ptr, 3);
     lm_ptr += 4;
   }
   delete[] lm_rgba;

@@ -396,6 +396,7 @@ void csStatLight::SetColor (const csColor &col)
 }
 
 //---------------------------------------------------------------------------
+
 csLightPatch::csLightPatch ()
 {
   next_poly = prev_poly = NULL;

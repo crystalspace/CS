@@ -284,26 +284,18 @@ void csPolyTexture::FillLightMap (
   if (!vis && (subpoly == polygon))
   {
     // If the subpoly is equal to the polygon and it is completely
-
     // shadowed due to external causes (i.e. c-buffer) then we just
-
     // fill it as entirely shadowed.
     shadow_bitmap->RenderTotal (1);
   }
   else
   {
     // We will now start rendering an optional light frustum and several
-
     // shadow frustums on our shadow bitmap. But first we will create a
-
     // clipping polygon on our polygon which is guaranteed to be larger
-
     // than the lightmap.
-
     // @@@ Actually we only want to project the light and shadow frustums
-
     // on the polygon plane but I'm not sure yet how to do that efficiently.
-
     // poly will be the polygon to which we clip all frustums.
     csVector3 poly[4];
     csPolygon3D *base_poly = polygon->GetBasePolygon ();
@@ -325,73 +317,39 @@ void csPolyTexture::FillLightMap (
     poly[3] = m_t2w * v + v_t2w - lightpos;
 
     // To transform a frustum coordinate to lightmap space we use
-
     // the following equation:
-
     //    F: frustum space vertex from polygon
-
     //    P: light position
-
     //    Mw2t: world -> texture transformation matrix
-
     //    Vw2t: world -> texture transformation vector
-
     //    T: texture coordinate (only first two coordinates are used)
-
     //    L: lightmap coordinate
-
     //
-
     //    T = Mw2t * (F + P - Vw2t)
-
     //    L.x = (T.x * ww - Imin_u) * inv_lightcell_size
-
     //    L.y = (T.y * hh - Imin_v) * inv_lightcell_size
-
     // This can be optimized to:
-
     //    T = Mw2t * F + Mw2t * (P - Vw2t)
-
     //    L.x = (T.x * ww * inv_lightcell_size) - (Imin_u * inv_lightcell_size)
-
     //    L.y = (T.y * hh * inv_lightcell_size) - (Imin_v * inv_lightcell_size)
-
     // Let's say that:
-
     //    wl = ww * inv_lightcell_size
-
     //    hl = hh * inv_lightcell_size
-
     //    ul = - Imin_u * inv_lightcell_size
-
     //    vl = - Imin_v * inv_lightcell_size
-
     // Then we can say:
-
     //    L.x = (T.x * wl) + ul
-
     //    L.y = (T.y * hl) + vl
-
     // We can also say:
-
     //    TL = Mw2t * (P - Vw2t)
-
     // So that:
-
     //    T = Mw2t * F + TL
-
     //    T.x = Mw2t.m11 * F.x + Mw2t.m12 * F.y + Mw2t.m13 * F.z + TL.x
-
     //    T.y = Mw2t.m21 * F.x + Mw2t.m22 * F.y + Mw2t.m23 * F.z + TL.y
-
     // Let's call m<x><y> = Mw2t.m<x><y> for easy of use:
-
     //    T.x = m11 * F.x + m12 * F.y + m13 * F.z + TL.x
-
     //    T.y = m21 * F.x + m22 * F.y + m23 * F.z + TL.y
-
     //    L.x = m11*wl * F.x + m12*wl * F.y + m13*wl * F.z + TL.x*wl + ul
-
     //    L.y = m11*hl * F.x + m12*hl * F.y + m13*hl * F.z + TL.y*hl + vl
     csMatrix3 &Mw2t = txt_pl->m_world2tex;
     csVector3 &Vw2t = txt_pl->v_world2tex;
@@ -434,36 +392,25 @@ void csPolyTexture::FillLightMap (
       csFrustum *shadow_frust = shadow_it->Next ();
 
       //@@@ QUESTION!
-
       //Why do we have to copy the polygon data to the shadow frustum?
-
       //We have a pointer to the polygon in the shadow frustum. That should
-
       //be enough. On the other hand, we have to be careful with space
-
       //warping portals. In that case the list of shadow frustums is
-
       //currently transformed and we cannot do that to the original polygon.
-
       // @@@ Optimization: Check for shadow_it->IsRelevant() here.
       csPolygon3D *shad_poly = (csPolygon3D *) (shadow_it->GetUserData ());
       if (shad_poly->GetBasePolygon () == base_poly) continue;
 
       // Check if planes of two polygons are equal
-
       // (@@@ should be precalculated).
       csPlane3 base_pl = *(base_poly->GetPolyPlane ());
       csPlane3 shad_pl = *(shad_poly->GetPolyPlane ());
       if (csMath3::PlanesClose (base_pl, shad_pl)) continue;
 
       // @@@ TODO: Optimize. Custom version of Intersect that is more
-
       // optimal (doesn't require to copy 'poly') and detects cases
-
       // that should not shadow.
-
       // @@@ TODO: Actually we don't want to intersect really. We
-
       // only want to project the shadow frustum on the polygon plane!!!
       csFrustum *new_shadow = shadow_frust->Intersect (poly, num_vertices);
       if (new_shadow)
@@ -525,11 +472,8 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp)
   if (cosfact == -1) cosfact = cfg_cosinus_factor;
 
   // From: T = Mwt * (W - Vwt)
-
   // ===>
-
   // Mtw * T = W - Vwt
-
   // Mtw * T + Vwt = W
   csMatrix3 m_t2w = txt_pl->m_world2tex.GetInverse ();
   csVector3 vv = txt_pl->v_world2tex;
@@ -557,7 +501,6 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp)
     lightpos = light->GetCenter ();
 
   // Calculate the uv's for all points of the frustum (the
-
   // frustum is actually a clipped version of the polygon).
   csVector2 *f_uv = NULL;
   if (lp->GetVertices ())
@@ -567,12 +510,10 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp)
     for (i = 0; i < lp->GetVertexCount (); i++)
     {
       //if (lview.IsMirrored ()) mi = lview.num_frustum-i-1;
-
       //else mi = i;
       mi = i;
 
       // T = Mwt * (W - Vwt)
-
       //v1 = pl->m_world2tex * (lp->vertices[mi] + lp->center - pl->v_world2tex);
       v1 = txt_pl->m_world2tex * (lp->GetVertex (mi) + lightpos - txt_pl->v_world2tex);
       f_uv[i].x = (v1.x * ww - Imin_u) * inv_lightcell_size;
@@ -601,9 +542,7 @@ void csPolyTexture::ShineDynLightMap (csLightPatch *lp)
   for (;;)
   {
     //-----
-
     // We have reached the next segment. Recalculate the slopes.
-
     //-----
     bool leave;
     do
@@ -721,8 +660,8 @@ b:
         v2 = vv + m_t2w * v1;
 
         // Check if the point on the polygon is shadowed. To do this
-
-        // we traverse all shadow frustums and see if it is contained in any of them.
+        // we traverse all shadow frustums and see if it is contained in
+	// any of them.
         iShadowIterator *shadow_it = lp->GetShadowBlock ().GetShadowIterator ();
         bool shadow = false;
         while (shadow_it->HasNext ())
@@ -827,11 +766,8 @@ void csPolyTexture::UpdateFromShadowBitmap (
   bool dyn = slight->IsDynamic ();
 
   // From: T = Mwt * (W - Vwt)
-
   // ===>
-
   // Mtw * T = W - Vwt
-
   // Mtw * T + Vwt = W
   csPolyTxtPlane *txt_pl = polygon->GetLightMapInfo ()->GetTxtPlane ();
   csMatrix3 m_t2w = txt_pl->m_world2tex.GetInverse ();
@@ -1288,21 +1224,13 @@ void csShadowBitmap::UpdateLightMap (
     for (j = 0; j < lm_w; j++, uv++)
     {
       //@@@
-
       //if (i == j) lightmap[uv].red = 255;
-
       //if (i == lm_w-1-j) lightmap[uv].blue = 255;
-
       //@@@
-
       // our v vector calculation is equivalent to
-
       // int ru = j << lightcell_shift;
-
       // int rv = i << lightcell_shift;
-
       // csVector3 v (float (ru + shf_u) * mul_u, float (rv + shf_v) * mul_v, 0);
-
       // v = v_t2w + m_t2w * v;
       v += v_ru;
 
@@ -1359,7 +1287,7 @@ void csShadowBitmap::UpdateShadowMap (
   const csVector3 &poly_normal,
   float cosfact)
 {
-  if (IsFullyShadowed () || IsFullyLit ()) return ;
+  if (IsFullyShadowed () || IsFullyUnlit ()) return ;
 
   bool ful_lit = IsFullyLit ();
   int i, j;

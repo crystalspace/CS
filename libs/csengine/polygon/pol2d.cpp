@@ -36,9 +36,7 @@
 #include "ivideo/txtmgr.h"
 
 // An ugly hack to avoid "local relocation entries in non-writable section"
-
 // linkage error on OpenStep/HPPA/Sparc when csEngine library is linked into
-
 // a plug-in.  @@@FIXME: Work around this in a cleaner way in the future.
 #if !defined(OS_NEXT) || (!defined(PROC_SPARC) && !defined(PROC_HPPA))
 # define CS_LOCAL_STATIC(X, Y) static X Y
@@ -48,49 +46,63 @@
   if (Y##__ == 0) Y##__ = new X; \
   X &Y = *Y##__
 #endif
+
 csPolygon2DFactory * csPolygon2DFactory::SharedFactory()
-{ CS_LOCAL_STATIC
-    (csPolygon2DFactory, p); return &p; }void csPolygon2D::AddPerspective
-    (const csVector3 &v)
-{ if (num_vertices >= max_vertices) MakeRoom
-      (
-        max_vertices +
-        5
-      ); csEngine::current_engine->current_camera->Perspective
-          (v, vertices[num_vertices]); bbox.AddBoundingVertex
-        (vertices[num_vertices]); num_vertices++; }void csPolygon2D::AddPerspectiveUnit
-        (const csVector3 &v)
-{ if (num_vertices >= max_vertices) MakeRoom
-        (max_vertices + 5); float iz = 1.0f /
-    v.z; vertices[num_vertices].x = v.x *
-    iz; vertices[num_vertices].y = v.y *
-    iz; bbox.AddBoundingVertex
-    (vertices[num_vertices]);
-    num_vertices++; }void csPolygon2D::
-    AddPerspectiveAspect (const csVector3 &v, float ratio, float shift)
-{ if (num_vertices >= max_vertices) MakeRoom
-        (max_vertices + 5); float iz = ratio /
-    v.z; vertices[num_vertices].x = v.x *
-    iz +
-    shift; vertices[num_vertices].y = v.y *
-    iz +
-    shift; bbox.AddBoundingVertex
-    (vertices[num_vertices]); num_vertices++; }void csPolygon2D::Draw
-    (iGraphics2D * g2d, int col)
-{ int i; int x1, y1, x2, y2; if (!num_vertices) return ; x1 = QRound
-    (vertices[num_vertices - 1].x); y1 = QRound
-      (vertices[num_vertices - 1].y); for (
-                                        i = 0;
-                                        i < num_vertices;
-                                        i++){ x2 = QRound(vertices[i].x); y2 = QRound
-          (vertices[i].y); g2d->DrawLine
-            (
-              x1, csEngine::frame_height -
-              1 -
-              y1, x2, csEngine::frame_height -
-              1 -
-              y2, col
-            ); x1 = x2; y1 = y2; } }
+{
+  CS_LOCAL_STATIC (csPolygon2DFactory, p);
+  return &p;
+}
+
+void csPolygon2D::AddPerspective (const csVector3 &v)
+{
+  if (num_vertices >= max_vertices) MakeRoom (max_vertices + 5);
+  csEngine::current_engine->current_camera->Perspective (v,
+  	vertices[num_vertices]);
+  bbox.AddBoundingVertex (vertices[num_vertices]);
+  num_vertices++;
+}
+
+void csPolygon2D::AddPerspectiveUnit (const csVector3 &v)
+{
+  if (num_vertices >= max_vertices)
+    MakeRoom (max_vertices + 5);
+  float iz = 1.0f / v.z;
+  vertices[num_vertices].x = v.x * iz;
+  vertices[num_vertices].y = v.y * iz;
+  bbox.AddBoundingVertex (vertices[num_vertices]);
+  num_vertices++;
+}
+
+void csPolygon2D::AddPerspectiveAspect (const csVector3 &v, float ratio,
+  float shift)
+{
+  if (num_vertices >= max_vertices)
+    MakeRoom (max_vertices + 5);
+  float iz = ratio / v.z;
+  vertices[num_vertices].x = v.x * iz + shift;
+  vertices[num_vertices].y = v.y * iz + shift;
+  bbox.AddBoundingVertex (vertices[num_vertices]);
+  num_vertices++;
+}
+
+void csPolygon2D::Draw (iGraphics2D * g2d, int col)
+{
+  int i;
+  int x1, y1, x2, y2;
+  
+  if (!num_vertices) return;
+  x1 = QRound (vertices[num_vertices - 1].x);
+  y1 = QRound (vertices[num_vertices - 1].y);
+  for (i = 0; i < num_vertices ; i++)
+  {
+    x2 = QRound(vertices[i].x);
+    y2 = QRound (vertices[i].y);
+    g2d->DrawLine (x1, csEngine::frame_height - 1 - y1, x2,
+    	csEngine::frame_height - 1 - y2, col);
+    x1 = x2;
+    y1 = y2;
+  }
+}
 
 //---------------------------------------------------------------------------
 #define INTERPOLATE1(component) \
@@ -116,7 +128,6 @@ void PreparePolygonFX2 (
   bool gouraud)
 {
   // first we copy the first texture coordinates to a local buffer
-
   // to avoid that they are overwritten when interpolating.
   ALLOC_STACK_ARRAY (inpoly, G3DTexturedVertex, orig_num_vertices);
 
@@ -213,6 +224,7 @@ void PreparePolygonFX2 (
 
 #undef INTERPOLATE
 #undef INTERPOLATE1
+
 void PreparePolygonFX (
   G3DPolygonDPFX *g3dpoly,
   csVector2 *clipped_verts,
@@ -221,11 +233,8 @@ void PreparePolygonFX (
   bool gouraud)
 {
   // Note: Assumes clockwise vertices, otherwise wouldn't be visible :).
-
   // 'was_clipped' will be true if the triangle was clipped.
-
   // This is the case if rescount != 3 (because we then don't have
-
   // a triangle) or else if any of the clipped vertices is different.
   bool was_clipped = (num_vertices != 3);
   int j;
@@ -241,20 +250,15 @@ void PreparePolygonFX (
   if (!was_clipped) return ;
 
   // first we copy the first three texture coordinates to a local buffer
-
   // to avoid that they are overwritten when interpolating.
   G3DTexturedVertex inpoly[3];
   int i;
   for (i = 0; i < 3; i++) inpoly[i] = g3dpoly->vertices[i];
 
   // Now we have to find the u,v coordinates for every
-
   // point in the clipped polygon. We know we started
-
   // from orig_triangle and that texture mapping is not perspective correct.
-
   // Compute U & V in vertices of the polygon
-
   // First find the topmost triangle vertex
   int top;
   if (orig_triangle[0].y < orig_triangle[1].y)
@@ -278,19 +282,12 @@ void PreparePolygonFX (
     _vbr = top + 1;
 
   // Rare special case is when triangle edge on, vertices satisfy
-
   //  *--------->x     a == b && (a.y < c.y) && (a.x > c.x)
-
   //  |  *a,b          and is clipped at c, where orig_triangle[0]
-
   //  | /              can be either a, b or c. In other words when
-
   //  |/               the single vertex is not 'top' and clipped.
-
   // /|*c
-
   //  |                The '-= EPSILON' for both left and right
-
   //  y     fig. 2     is fairly arbitrary, this probably needs to be refined.
   if (orig_triangle[top] == orig_triangle[_vbl])
     orig_triangle[_vbl].x -= EPSILON;
@@ -303,27 +300,16 @@ void PreparePolygonFX (
     float y = g3dpoly->vertices[j].y;
 
     // Find the original triangle top/left/bottom/right vertices
-
     // between which the currently examined point is located.
-
     // There are two possible major cases:
-
     // A*       A*       When DrawPolygonFX works, it will switch
-
     //  |\       |\      start/final values and deltas ONCE (not more)
-
     //  | \      | \     per triangle.On the left pictures this happens
-
     //  |*X\     |  \    at the point B. This means we should "emulate"
-
     //  |   *B   |   *B  this switch by taking different start/final values
-
     //  |  /     |*X/    for interpolation if examined point X is below
-
     //  | /      | /     the point B.
-
     //  |/       |/
-
     // C*       C*  Fig.1 :-)
     int vtl = top, vtr = top, vbl = _vbl, vbr = _vbr;
     int ry = QRound (y);
@@ -462,7 +448,6 @@ void csPolygon2D::DrawFilled (
         if (lp)
         {
           // If there is at least one light patch we do the lighting reset
-
           // in the first call to UpdateVertexLighting().
           bool reset = true;
           while (lp)
@@ -481,9 +466,7 @@ void csPolygon2D::DrawFilled (
         else
         {
           // There are no more lightpatches. In this case we need to restore
-
           // lighting to the static lighting. This can be done by calling
-
           // UpdateVertexLighting() with no light and reset set to true.
           unsplit->UpdateVertexLighting (NULL, csColor (0, 0, 0), true, true);
         }
@@ -509,7 +492,6 @@ void csPolygon2D::DrawFilled (
     float shift_y = icam->GetShiftY ();
 
     // Here we have to do a little messy thing because PreparePolygonFX()
-
     // still requires the original triangle that was valid before clipping.
     csVector2 orig_triangle[3];
     float iz = 1.0f / unsplit->Vcam (0).z;
