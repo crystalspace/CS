@@ -156,7 +156,7 @@ ctFeatherstoneAlgorithm *out_link_solver;
 	// -applied because this is actualy force and torque needed to 
 	// keep link from NOT accelerating.
 	Za.set_a( pe_g->get_T()*(-1.0)*pe_g->get_F());
-	Za.set_b( pe_g->w % (pe_g->get_I() * pe_g->w) - (pe_g->get_T()*pe_g->get_torque()) );  
+	Za.set_b( pe_g->get_angular_v() % (pe_g->get_I() * pe_g->get_angular_v()) - (pe_g->get_T()*pe_g->get_torque()) );  
 //!me need to put in proper frame right? Za.set_b( pe_g->w % (pe_g->get_I() * pe_g->w) - pe_g->get_torque() );  
 
 	jnt = ab.inboard_joint;
@@ -175,7 +175,7 @@ ctFeatherstoneAlgorithm *out_link_solver;
 		}
 
 		if( pe_f ){
-			jnt->calc_coriolus( ab.r_fg, ab.R_fg*pe_f->w, c );
+			jnt->calc_coriolus( ab.r_fg, ab.R_fg*pe_f->get_angular_v(), c );
 		}else{
 			ctSpatialVector ct( 0.0,0.0,0.0,0.0,0.0,0.0 );
 			c = ct;
