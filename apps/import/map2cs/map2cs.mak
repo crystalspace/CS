@@ -26,12 +26,13 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp apps/import/map2cs
 
 MAP2CS.EXE = map2cs$(EXE.CONSOLE)
-INC.MAP2CS = $(wildcard apps/import/map2cs/*.h)
-SRC.MAP2CS = $(wildcard apps/import/map2cs/*.cpp)
-OBJ.MAP2CS = $(addprefix $(OUT)/,$(notdir $(SRC.MAP2CS:.cpp=$O)))
+DIR.MAP2CS = apps/import/map2cs
+OUT.MAP2CS = $(OUT)/$(DIR.MAP2CS)
+INC.MAP2CS = $(wildcard $(DIR.MAP2CS)/*.h )
+SRC.MAP2CS = $(wildcard $(DIR.MAP2CS)/*.cpp )
+OBJ.MAP2CS = $(addprefix $(OUT.MAP2CS)/,$(notdir $(SRC.MAP2CS:.cpp=$O)))
 DEP.MAP2CS = CSTOOL CSGFX CSUTIL CSSYS CSUTIL CSGEOM
 LIB.MAP2CS = $(foreach d,$(DEP.MAP2CS),$($d.LIB))
 CFG.MAP2CS = data/config/map2cs.cfg
@@ -49,24 +50,34 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: build.map2cs map2csclean
+.PHONY: build.map2cs map2csclean map2cscleandep
 
 all: $(MAP2CS.EXE)
-build.map2cs: $(OUTDIRS) $(MAP2CS.EXE)
+build.map2cs: $(OUT.MAP2CS) $(MAP2CS.EXE)
 clean: map2csclean
+
+$(OUT.MAP2CS)/%$O: $(DIR.MAP2CS)/%.cpp
+	$(DO.COMPILE.CPP)
 
 $(MAP2CS.EXE): $(OBJ.MAP2CS) $(LIB.MAP2CS)
 	$(DO.LINK.CONSOLE.EXE) $(ZLIB.LFLAGS)
 
+$(OUT.MAP2CS):
+	$(MKDIRS)
+
 map2csclean:
 	-$(RMDIR) $(MAP2CS.EXE) $(OBJ.MAP2CS)
 
+cleandep: map2cscleandep
+map2cscleandep:
+	-$(RM) $(OUT.MAP2CS)/map2cs.dep
+
 ifdef DO_DEPEND
-dep: $(OUTOS)/map2cs.dep
-$(OUTOS)/map2cs.dep: $(SRC.MAP2CS)
-	$(DO.DEP1) $(ZLIB.CFLAGS) $(DO.DEP2)
+dep: $(OUT.MAP2CS) $(OUT.MAP2CS)/map2cs.dep
+$(OUT.MAP2CS)/map2cs.dep: $(SRC.MAP2CS)
+	$(DO.DEPEND)
 else
--include $(OUTOS)/map2cs.dep
+-include $(OUT.MAP2CS)/map2cs.dep
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
