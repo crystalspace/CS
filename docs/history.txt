@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+19-Mar-2004
+	- Keith Fulton fixed very obvious bug in RecalcBoundingBox where
+	  old bbox was not cleared out before new points were added.
+	- Added a skeleton update as soon as an anim cycle is added, which
+	  makes the bbox update.  This enables accurate colliders to be created.
 18-Mar-2004
 	- Anders Stenberg changed the terraformer interface a bit (made Sample
 	  functions return pointers to data instead of filling out supplied

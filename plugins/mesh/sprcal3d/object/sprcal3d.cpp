@@ -766,6 +766,7 @@ void csSpriteCal3DMeshObject::SetFactory (csSpriteCal3DMeshObjectFactory* tmpl)
   }
   //  calModel.setMaterialSet(0);
   calModel.update(0);
+  last_update_time = csGetTicks();
 
   RecalcBoundingBox(object_bbox);
 
@@ -829,20 +830,21 @@ void csSpriteCal3DMeshObject::GetRadius (csVector3& rad, csVector3& cent)
 
 void csSpriteCal3DMeshObject::RecalcBoundingBox (csBox3& bbox)
 {
-//  bbox.Set(-1,0,-1,1,2,1);
-
-  if (bboxVersion == meshVersion) return;
+  if (bboxVersion == meshVersion)
+    return;
 
   CalBoundingBox &calBoundingBox  = calModel.getBoundingBox(CAL3D_EXACT_BOXES);
   CalVector p[8];
   calBoundingBox.computePoints(p);
 
+  bbox.StartBoundingBox();
   for (int i=0; i<8; i++)
   {
     bbox.AddBoundingVertexSmart(p[i].x,p[i].y,p[i].z);
   }
 
   bboxVersion = meshVersion;
+//  printf("Bbox Width:%1.2f Height:%1.2f Depth:%1.2f\n",bbox.Max().x - bbox.Min().x,bbox.Max().y - bbox.Min().y,bbox.Max().z - bbox.Min().z);
 }
 
 
@@ -1619,8 +1621,11 @@ bool csSpriteCal3DMeshObject::Advance (csTicks current_time)
 {
   // update anim frames, etc. here
   float delta = ((float)current_time - last_update_time)/1000.0F;
+  if (!current_time)
+    delta = 0;
   calModel.update(delta);
-  last_update_time = current_time;
+  if (current_time)
+    last_update_time = current_time;
 
   if (is_idling) // check for override and play if time
   {
@@ -1712,6 +1717,8 @@ bool csSpriteCal3DMeshObject::AddAnimCycle(const char *name, float weight,
     return false;
 
   AddAnimCycle(idx,weight,delay);
+
+  Advance(0);
   return true;
 }
 
