@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- nullgraphics3d.csplugin -->
+<!-- null3d.csplugin -->
 <plugin>
   <scf>
     <classes>

@@ -252,9 +252,7 @@ void csNewParticleSystem::SetupObject ()
 }
 
 void csNewParticleSystem::SetupParticles (
-  const csReversibleTransform& trans,
-  csVector3* vertices,
-  csBox3& bbox)	// @@@ For CS_USE_OLD_RENDERER
+  const csReversibleTransform& trans, csVector3* vertices)
 {
   int i;
 
@@ -369,8 +367,7 @@ csRenderMesh **csNewParticleSystem::GetRenderMeshes (int &num,
   if (!movable->IsFullTransformIdentity ())
     trans /= movable->GetFullTransform ();
   
-  csBox3 box;
-  SetupParticles (trans, vertices, box);
+  SetupParticles (trans, vertices);
 
   if (Lighting && light_mgr)
   {

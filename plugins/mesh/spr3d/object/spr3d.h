@@ -1413,10 +1413,8 @@ public:
   void SetBaseColor (const csColor& col)
   {
     base_color.Set (col);
-#ifndef CS_USE_OLD_RENDERER
     if (MixMode & CS_FX_ALPHA)
       base_color.alpha = 1.0 - float (MixMode & CS_FX_MASK_ALPHA) / 255.0;
-#endif
     ResetVertexColors ();
   }
 

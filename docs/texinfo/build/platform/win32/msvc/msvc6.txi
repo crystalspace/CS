@@ -82,15 +82,6 @@ must install Python 2.2 or later, which can be obtained from:
 
 @uref{http://www.python.org}
 
-@subsubheading Selecting the Renderer Architecture
-
-At this moment we have two completely different renderer architectures in
-Crystal Space. The old renderer and the new renderer. The new renderer is
-nearly feature complete and is now the default.  If it doesn't work right for
-you then you should send us a report and go back to old renderer.  To use the
-old renderer you should open the @file{wksoldrenderer.dsw} instead of
-@file{wkstypical.dsw} (see below).
-
 @subsubheading Compiling Crystal Space
 
 To compile Crystal Space, you'll have to perform the following steps.  If
@@ -98,10 +89,7 @@ anything doesn't work, see the Win32 @sc{faq}, @ref{MSVC6 FAQ}.
 
 @enumerate
 @item
-Load @file{CS\mk\msvc\wkstypical.dsw}.  (On the other hand, if you want to
-try out the old renderer, open the workspace
-@file{wksoldrenderer.dsw} in the same directory, and select either the
-Release_OR or Debug_OR build mode.)
+Load @file{CS\mk\msvc\wkstypical.dsw}.
 
 @item
 Remove all projects you don't want to compile.  To do this, right-click on the
@@ -115,12 +103,10 @@ on it and then clicking on @emph{Set as Active Project}.
 
 @item
 From the file menu select @emph{Build->Rebuild All} or alternatively hit your
-@kbd{@key{F7}} key.  @strong{Note} that you must build the project using the
-@emph{Release} or @emph{Debug} build modes if you are using
-@file{wkstypical.dsw}. Do @strong{not} use the special-purpose
-@emph{Release_OR}, @emph{Debug_OR}, or @emph{ExtensiveMemDebug} build modes. On
-the other hand, if you are using @file{wksoldrenderer.dsw}, then you
-@strong{must} use @emph{Release_OR} or @emph{Debug_OR}.
+@kbd{@key{F7}} key.  @emph{Note}: If you want to build a debuggable version of
+Crystal Space, you should select the @emph{Debug} build mode; otherwise select
+the @emph{Release} build mode.  Do not use the special-purpose
+@emph{ExtensiveMemDebug} build mode.
 
 @item
 After a while the compilation should finish without error.  The signal for a
@@ -174,13 +160,6 @@ Crystal Space.
 @c @item
 @c @file{wksall.dsw} --- Builds all modules, even the experimental ones.
 @c 
-@item
-@file{wksoldrenderer.dsw} --- Same as @file{wkstypical.dsw}, but builds the old
-renderer, rather than the old one.  Use this workspace if the new renderer
-fails to work for you (though submit a bug report explaining what went
-wrong). When using this workspace, you also need to select either the
-@emph{Release_OR} or @emph{Debug_OR} build mode, rather than the @emph{Release}
-or @emph{Debug} build mode.
 @end itemize
 
 The workspace uses a prefix system for naming contained projects:

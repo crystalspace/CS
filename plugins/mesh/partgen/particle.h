@@ -152,10 +152,7 @@ protected:
   /**
    * Setup particles in the given tables right before they are drawn.
    */
-  void SetupParticles (
-    const csReversibleTransform& trans,
-    csVector3* vertices,
-    csBox3& box);	// @@@ For CS_USE_OLD_RENDERER
+  void SetupParticles (const csReversibleTransform&, csVector3* vertices);
 
 public:
   /// constructor

@@ -58,12 +58,8 @@ NSOpenGLContext *context;
     NSOpenGLPixelFormatAttribute attribs[] = {
         NSOpenGLPFAWindow, NSOpenGLPFADoubleBuffer, NSOpenGLPFAAccelerated,
         NSOpenGLPFAColorSize, depth, NSOpenGLPFADepthSize, 32,
-#ifdef CS_USE_OLD_RENDERER
-        NSOpenGLPFAStencilSize, 1,
-#else
         NSOpenGLPFAStencilSize, 8,
         NSOpenGLPFAAlphaSize, 8,
-#endif
         NSOpenGLPFAScreenMask, CGDisplayIDToOpenGLDisplayMask(display), nil
     };
 

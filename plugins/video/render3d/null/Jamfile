@@ -1,10 +1,10 @@
 SubDir TOP plugins video render3d null ;
 
-Description nullrender3d : "Render3D null driver" ;
+Description null3d : "3D null (do-nothing) renderer" ;
+Plugin null3d : [ Wildcard *.cpp *.h ] ;
+LinkWith null3d : render3dcommon cstool csgfx csgeom csutil ;
+CompileGroups null3d : renderers renderall ;
 
-Plugin nullrender3d
-	: [ Wildcard *.cpp *.h ]
-;
-LinkWith nullrender3d : render3dcommon cstool csgfx csgeom csutil ;
-
-CompileGroups nullrender3d : renderers ;
+# Historic alias.
+NotFile nullrender3d ;
+Depends nullrender3d null3d ;

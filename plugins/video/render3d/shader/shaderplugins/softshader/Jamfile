@@ -3,4 +3,4 @@ SubDir TOP plugins video render3d shader shaderplugins softshader ;
 Description softshader : "Render3d Shaderplugin for software renderer" ;
 Plugin softshader : [ Wildcard *.cpp *.h ] ;
 LinkWith softshader : csgeom csgfx csutil ;
-CompileGroups softshader : renderers ;
+CompileGroups softshader : renderers renderall ;

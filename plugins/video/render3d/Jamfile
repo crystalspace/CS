@@ -1,12 +1,9 @@
 SubDir TOP plugins video render3d ;
 
-if ! [ Property build : oldrenderer ] || [ Property build : projgen ]
-{
-  # Jam rules are order-sensitive; Library targets must appear before Plugin.
-  SubInclude TOP plugins video render3d common ;
+# Jam rules are order-sensitive; Library targets must appear before Plugin.
+SubInclude TOP plugins video render3d common ;
 
-  SubInclude TOP plugins video render3d opengl ;
-  SubInclude TOP plugins video render3d software ;
-  SubInclude TOP plugins video render3d shader ;
-  SubInclude TOP plugins video render3d null ;
-}
+SubInclude TOP plugins video render3d opengl ;
+SubInclude TOP plugins video render3d software ;
+SubInclude TOP plugins video render3d shader ;
+SubInclude TOP plugins video render3d null ;

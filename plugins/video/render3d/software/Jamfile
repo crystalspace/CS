@@ -1,16 +1,21 @@
 SubDir TOP plugins video render3d software ;
 
-Description softrender3d : "Render3D software 3D renderer" ;
+Description soft3d : "3D software renderer" ;
 
-if $(CMD.NASM) && $(TARGET.PROCESSOR) = "X86" && $(TARGET.PROCESSORSIZE) = "32" && ! [ Property build : projgen ]
+if $(CMD.NASM) && $(TARGET.PROCESSOR) = "X86" &&
+   $(TARGET.PROCESSORSIZE) = "32" && ! [ Property build : projgen ]
 {
-  SOFTRENDER3D_ASMFILES = [ Wildcard i386 : *.asm *.cpp *.h ] ;
+  SOFT3D_ASMFILES = [ Wildcard i386 : *.asm *.cpp *.h ] ;
 }
 else
 {
-  SOFTRENDER3D_ASMFILES = ;
+  SOFT3D_ASMFILES = ;
 }
 
-Plugin softrender3d : [ Wildcard *.cpp *.h ] $(SOFTRENDER3D_ASMFILES) ;
-LinkWith softrender3d : render3dcommon csgeom csgfx csutil ;
-CompileGroups softrender3d : renderers ;
+Plugin soft3d : [ Wildcard *.cpp *.h ] $(SOFT3D_ASMFILES) ;
+LinkWith soft3d : render3dcommon csgeom csgfx csutil ;
+CompileGroups soft3d : renderers ;
+
+# Historic alias.
+NotFile softrender3d ;
+Depends softrender3d soft3d ;

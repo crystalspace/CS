@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- glgraphics3d.csplugin -->
+<!-- gl3d.csplugin -->
 <plugin>
   <scf>
     <classes>

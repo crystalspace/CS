@@ -1,8 +1,5 @@
 SubDir TOP apps waterdemo ;
 
-if ! [ Property build : oldrenderer ] || [ Property build : projgen ]
-{
 Description waterdemo : "water surface shader demonstration" ;
 Application waterdemo : [ Wildcard *.cpp *.h ] : noinstall ;
 LinkWith waterdemo : csgeom csgfx cstool csutil ;
-}

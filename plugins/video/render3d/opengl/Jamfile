@@ -2,9 +2,13 @@ SubDir TOP plugins video render3d opengl ;
 
 if $(GL.AVAILABLE) = "yes"
 {
-Description glrender3d : "Render3d OpenGL driver" ;
-Plugin glrender3d : [ Wildcard *.cpp *.h ] ;
-LinkWith glrender3d : render3dcommon csgeom csgfx csutil cstool ;
-ExternalLibs glrender3d : GL ;
-CompileGroups glrender3d : renderers nrall ;
+Description gl3d : "3D OpenGL renderer" ;
+Plugin gl3d : [ Wildcard *.cpp *.h ] ;
+LinkWith gl3d : render3dcommon csgeom csgfx csutil cstool ;
+ExternalLibs gl3d : GL ;
+CompileGroups gl3d : renderers renderall ;
+
+# Historic alias.
+NotFile glrender3d ;
+Depends glrender3d gl3d ;
 }
