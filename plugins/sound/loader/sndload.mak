@@ -90,3 +90,21 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
+
+#------------------------------------------------------------------- config ---#
+ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)
+
+ifeq ($(DO_AIFF),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_AIFF$">>volatile.tmp
+endif
+ifeq ($(DO_IFF),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_IFF$">>volatile.tmp
+endif
+ifeq ($(DO_WAV),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_WAV$">>volatile.tmp
+endif
+ifeq ($(DO_AU),yes)
+  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_AU$">>volatile.tmp
+endif
+
+endif # ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)
