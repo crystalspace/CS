@@ -220,19 +220,6 @@ public:
   /// Calls Trim() and collapses internal whitespace to a single space.
   csString &Collapse();
 
-  /**
-   * Format like sprintf. Very fast.
-   * Warning! No bounds checking or resizing is performed!
-   */
-  csString &Format (const char *format, ...)
-  {
-    va_list args;
-    va_start (args, format);
-    vsprintf (Data, format, args);
-    va_end (args);
-    return *this;
-  }
-
   /// Assign a string to another
   csString &operator = (const csString &iStr)
   { return Replace (iStr); }
