@@ -23,7 +23,7 @@
 
 #include "cssysdef.h"
 #include "isystem.h"
-#include "icfgfile.h"
+#include "icfgnew.h"
 #include "isnddrv.h"
 #include "isnddata.h"
 
@@ -61,7 +61,7 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
   System = iSys;
 
   // read the config file
-  Config = System->CreateConfig ("/config/sound.cfg");
+  Config = System->CreateConfigNew ("/config/sound.cfg");
 
   // load the sound driver plug-in
 #ifdef SOUND_DRIVER
@@ -92,11 +92,11 @@ bool csSoundRenderSoftware::Open()
   System->Printf (MSG_INITIALIZATION, "Software Sound Renderer selected\n");
 
   SoundDriver->Open(this,
-    Config->GetInt("Sound.Software", "Frequency", 22050),
-    Config->GetYesNo("Sound.Software", "16Bits", true),
-    Config->GetYesNo("Sound.Software", "Stereo", true));
+    Config->GetInt("Sound.Software.Frequency", 22050),
+    Config->GetBool("Sound.Software.16Bits", true),
+    Config->GetBool("Sound.Software.Stereo", true));
 
-  Volume = Config->GetFloat("Sound", "Volume", 1.0);
+  Volume = Config->GetFloat("Sound.Volume", 1.0);
   if (Volume>1) Volume = 1;
   if (Volume<0) Volume = 0;
 

@@ -30,6 +30,7 @@
 #include "isndrdr.h"
 
 struct iSoundDriver;
+struct iConfigFileNew;
 class csSoundListenerSoftware;
 class csSoundSourceSoftware;
 
@@ -72,7 +73,7 @@ public:
 	
 private:
   // the config file
-  iConfigFile *Config;
+  iConfigFileNew *Config;
 
   // all active sound sources
   csVector Sources;

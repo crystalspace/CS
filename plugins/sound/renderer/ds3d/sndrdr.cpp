@@ -25,7 +25,7 @@
 
 #include "csutil/scf.h"
 #include "isystem.h"
-#include "icfgfile.h"
+#include "icfgnew.h"
 
 #include "sndrdr.h"
 #include "sndlstn.h"
@@ -57,7 +57,7 @@ bool csSoundRenderDS3D::Initialize(iSystem *iSys) {
   LoadFormat.Bits = -1;
   LoadFormat.Freq = -1;
   LoadFormat.Channels = -1;
-  Config = iSys->CreateConfig("/config/sound.cfg");
+  Config = iSys->CreateConfigNew("/config/sound.cfg");
   return true;
 }
 
@@ -95,7 +95,7 @@ bool csSoundRenderDS3D::Open()
     if (!Listener->Initialize(this)) return false;
   }
 
-  float vol = Config->GetFloat("Sound","Volume",-1);
+  float vol = Config->GetFloat("Sound.Volume",-1);
   if (vol>=0) SetVolume(vol);
   System->Printf (MSG_INITIALIZATION, "  Volume: %g\n", GetVolume());
   

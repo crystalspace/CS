@@ -30,7 +30,7 @@
 
 class csSoundListenerDS3D;
 class csSoundSourceDS3D;
-struct iConfigFile;
+struct iConfigFileNew;
 
 class csSoundRenderDS3D : public iSoundRender
 {
@@ -68,7 +68,7 @@ public:
   csSoundListenerDS3D *Listener;
   csSoundFormat LoadFormat;
   csVector ActiveSources;
-  iConfigFile *Config;
+  iConfigFileNew *Config;
 };
 
 #endif	//__SOUND_RENDER_DS3D_H__

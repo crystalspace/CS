@@ -28,6 +28,8 @@
 #include "isnddrv.h"
 #include "isystem.h"
 
+struct iConfigFileNew;
+
 class csSoundDriverWaveOut : public iSoundDriver
 {
 public:
@@ -56,7 +58,7 @@ protected:
   iSystem *System;
 
   // config file
-  iConfigFile *Config;
+  iConfigFileNew *Config;
 
   // sound renderer
   iSoundRender *SoundRender;

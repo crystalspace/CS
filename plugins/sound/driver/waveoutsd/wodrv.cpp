@@ -25,7 +25,7 @@
 #include "csutil/scf.h"
 #include "isystem.h"
 #include "isndrdr.h"
-#include "icfgfile.h"
+#include "icfgnew.h"
 #include "wodrv.h"
 
 IMPLEMENT_FACTORY (csSoundDriverWaveOut)
@@ -49,7 +49,7 @@ csSoundDriverWaveOut::csSoundDriverWaveOut(iBase *piBase)
   MemorySize = 0;
   Memory = NULL;
   WaveOut = NULL;
-  Config = 0;
+  Config = NULL;
 }
 
 csSoundDriverWaveOut::~csSoundDriverWaveOut()
@@ -60,7 +60,7 @@ csSoundDriverWaveOut::~csSoundDriverWaveOut()
 bool csSoundDriverWaveOut::Initialize (iSystem *iSys)
 {
   System = iSys;
-  Config = System->CreateConfig ("/config/sound.cfg");
+  Config = System->CreateConfigNew ("/config/sound.cfg");
   return true;
 }
 
@@ -91,7 +91,7 @@ bool csSoundDriverWaveOut::Open(iSoundRender *render, int frequency, bool bit16,
   Format.cbSize = 0;
 
   // read settings from the config file
-  unsigned int RefreshRate=Config->GetInt("Sound.WaveOut", "Refresh", 5);
+  unsigned int RefreshRate=Config->GetInt("Sound.WaveOut.Refresh", 5);
   System->Printf (MSG_INITIALIZATION, "  updating %d times per second\n",
     RefreshRate);
 
