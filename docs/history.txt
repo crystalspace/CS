@@ -1,5 +1,22 @@
 The history order has been reversed so that new features are at the top.
 
+17-Apr-2001
+	- Martin Geisse eliminated some warnings in the function terrain
+	  loader.
+	- Philip Wyett eliminated three uninitialized variable warnings to
+	  ch under VC6 (avi plugin).
+	- Implemented TEST and NONE z-buffer modes for all perspective correct
+	  texture mapping routines in the software renderer. Also implemented
+	  TEST z-buffer mode routines for all perspetive incorrect texture
+	  mapping routines. This completes support for all Z-buf modes
+	  in the software renderer.
+	- Fixed a bug in the OpenGL renderer with regards to clearing of
+	  the Z-buffer. When the last operation in the previous frame disables
+	  the Z-buffer writing (glDepthMask()) then the clear of the
+	  Z-buffer will not happen. This is because glClear() actually listens
+	  to the buffer write masks and doesn't update the buffer when the
+	  mask is disabled. This affected iso mostly as CS normally doesn't
+	  require a clear of the Z-buffer.
 16-Apr-2001
 	- Added iEngine::CreateSectorWallsMesh().
 	- Fixed simplep (plugin version of simple) so that it works
@@ -23,6 +40,8 @@ The history order has been reversed so that new features are at the top.
 	- Wouter also changed the demo particle systems in walktest to
 	  use ZBUF_TEST mode. This makes them look a lot better. For
 	  the 'flame' commans (a fire particle system), this helps a lot.
+	- Martin Geisse extended the iEngine interface and added iTextureList.
+	- Martin also added lots of methods to iTextureWrapper.
 15-Apr-2001
 	- Martin Geisse removed csstdldr, the test application for it,
 	  the iLoader interface and renamed iLoaderNew to iLoader.

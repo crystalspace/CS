@@ -512,6 +512,7 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
 
   if (DrawFlags & CSDRAW_CLEARZBUFFER)
   {
+    glDepthMask (GL_TRUE);
     if (DrawFlags & CSDRAW_CLEARSCREEN)
       glClear (GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     else
