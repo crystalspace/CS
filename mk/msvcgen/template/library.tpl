@@ -32,13 +32,13 @@ RSC=rc.exe
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
-# PROP BASE Output_Dir "Release"
-# PROP BASE Intermediate_Dir "Release"
+# PROP BASE Output_Dir "csrelease"
+# PROP BASE Intermediate_Dir "csrelease"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 0
-# PROP Output_Dir "Release\%project%"
-# PROP Intermediate_Dir "Release\%project%"
+# PROP Output_Dir "csrelease\bin\libs"
+# PROP Intermediate_Dir "csrelease\temp\%project%"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W4 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_LIB" /YX /FD /c
 # ADD CPP /nologo /MT /W4 /GX /O2 /I "..\.." /I "..\..\include\cssys\win32" /I "..\..\include" /I "..\..\libs" /I "..\..\support" /I "..\..\apps" /I "..\..\plugins" /D "NDEBUG" /D "_LIB" /D "WIN32" /D "_WINDOWS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /YX /FD %cflags% /c
@@ -59,13 +59,13 @@ PostBuild_Cmds=echo File is a lib, Copy skipped.
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "Debug"
-# PROP BASE Intermediate_Dir "Debug"
+# PROP BASE Output_Dir "csdebug"
+# PROP BASE Intermediate_Dir "csdebug"
 # PROP BASE Target_Dir ""
 # PROP Use_MFC 0
 # PROP Use_Debug_Libraries 1
-# PROP Output_Dir "Debug\%project%"
-# PROP Intermediate_Dir "Debug\%project%"
+# PROP Output_Dir "csdebug\bin\libs"
+# PROP Intermediate_Dir "csdebug\temp\%project%"
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W4 /Gm /GX /Zi /Od /D "WIN32" /D "_DEBUG" /D "_LIB" /YX /FD /c
 # ADD CPP /nologo /MTd /W4 /Gm /GX /Zi /Od /I "..\.." /I "..\..\include\cssys\win32" /I "..\..\include" /I "..\..\libs" /I "..\..\support" /I "..\..\apps" /I "..\..\plugins" /D "_DEBUG" /D "_LIB" /D "WIN32" /D "_WINDOWS" /D "WIN32_VOLATILE" /D "__CRYSTAL_SPACE__" /YX /FD %cflags% /c
