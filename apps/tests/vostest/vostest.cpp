@@ -296,7 +296,7 @@ bool Vostest::Initialize ()
 #endif
 
     csRef<iVosApi> vosapi = SCF_QUERY_INTERFACE(vosa3dl, iVosApi);
-    VOS::vRef<VOS::Vobject> vobject = vosapi->GetVobject();
+    VUtil::vRef<VOS::Vobject> vobject = vosapi->GetVobject();
 
     csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,
         "crystalspace.application.vostest",
