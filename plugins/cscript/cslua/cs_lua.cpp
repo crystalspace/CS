@@ -3080,7 +3080,7 @@ wrap_iGraphics2D_Open(lua_State *L)
 	}
 }
 	lua_settop(L, 0);
-    _result = (bool )iGraphics2D_Open(_arg0,_arg1);
+    _result = (bool )iGraphics2D_Open(_arg0);
 {
 	lua_pushnumber(L, (double)_result);
 }
@@ -4761,7 +4761,7 @@ wrap_iGraphics3D_Open(lua_State *L)
 	}
 }
 	lua_settop(L, 0);
-    _result = (bool )iGraphics3D_Open(_arg0,_arg1);
+    _result = (bool )iGraphics3D_Open(_arg0);
 {
 	lua_pushnumber(L, (double)_result);
 }
