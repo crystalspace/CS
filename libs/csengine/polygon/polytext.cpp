@@ -1036,15 +1036,43 @@ void csShadowBitmap::UpdateLightMap (csRGBpixel* lightmap,
   float light_b = lightcolor.blue * NORMAL_LIGHT_LEVEL;
   bool ful_lit = IsFullyLit ();
   int i, j;
+  int base_uv = 0;
+  float rv_step = (1 << lightcell_shift) * mul_v;
+  float ru_step = (1 << lightcell_shift) * mul_u;
+  float rv = shf_v * mul_v;
+  float ru_base = shf_u * mul_u - ru_step;
+
+  csVector3 v_ru (m_t2w.m11, m_t2w.m21, m_t2w.m31);
+  csVector3 v_rv (m_t2w.m12, m_t2w.m22, m_t2w.m32);
+  csVector3 v, v_base;
+
+  v_base = v_t2w + rv*v_rv + ru_base*v_ru;
+  v_rv *= rv_step;
+  v_ru *= ru_step;
+
   for (i = 0 ; i < lm_h ; i++)
   {
-    int uv = i * lm_w;
+    int uv = base_uv;
+    base_uv += lm_w;
+
+    v = v_base;
+    v_base += v_rv;
+
     for (j = 0 ; j < lm_w ; j++, uv++)
     {
 //@@@
 //if (i == j) lightmap[uv].red = 255;
 //if (i == lm_w-1-j) lightmap[uv].blue = 255;
 //@@@
+
+      // our v vector calculation is equivalent to
+      // int ru = j << lightcell_shift;
+      // int rv = i << lightcell_shift;
+      // csVector3 v (float (ru + shf_u) * mul_u, float (rv + shf_v) * mul_v, 0);
+      // v = v_t2w + m_t2w * v;
+
+      v += v_ru;
+
       float lightness;
       if (ful_lit)
         lightness = 1;
@@ -1057,10 +1085,6 @@ void csShadowBitmap::UpdateLightMap (csRGBpixel* lightmap,
 
       // @@@ Optimization: It should be possible to combine these
       // calculations into a more efficient formula.
-      int ru = j << lightcell_shift;
-      int rv = i << lightcell_shift;
-      csVector3 v (float (ru + shf_u) * mul_u, float (rv + shf_v) * mul_v, 0);
-      v = v_t2w + m_t2w * v;
 
       float d = csSquaredDist::PointPoint (lightpos, v);
       if (d >= light->GetSquaredRadius ()) continue;
@@ -1071,19 +1095,20 @@ void csShadowBitmap::UpdateLightMap (csRGBpixel* lightmap,
       cosinus /= d;
       cosinus += cosfact;
       if (cosinus < 0)
-        cosinus = 0;
+        continue;
       else if (cosinus > 1)
         cosinus = 1;
 
-      float brightness = cosinus * light->GetBrightnessAtDistance (d);
+      float scale = cosinus * light->GetBrightnessAtDistance (d) * lightness;
 
       int l;
-      l = lightmap[uv].red + QRound (light_r * lightness * brightness);
-      lightmap[uv].red = l < 255 ? l : 255;
-      l = lightmap[uv].green + QRound (light_g * lightness * brightness);
-      lightmap[uv].green = l < 255 ? l : 255;
-      l = lightmap[uv].blue + QRound (light_b * lightness * brightness);
-      lightmap[uv].blue = l < 255 ? l : 255;
+      csRGBpixel &lumel = lightmap[uv];
+      l = lumel.red + QRound (light_r * scale);
+      lumel.red = l < 255 ? l : 255;
+      l = lumel.green + QRound (light_g * scale);
+      lumel.green = l < 255 ? l : 255;
+      l = lumel.blue + QRound (light_b * scale);
+      lumel.blue = l < 255 ? l : 255;
     }
   }
 }
@@ -1100,11 +1125,31 @@ void csShadowBitmap::UpdateShadowMap (unsigned char* shadowmap,
   if (IsFullyShadowed () || IsFullyLit ()) return;
   bool ful_lit = IsFullyLit ();
   int i, j;
+  int base_uv = 0;
+  float rv_step = (1 << lightcell_shift) * mul_v;
+  float ru_step = (1 << lightcell_shift) * mul_u;
+  float rv = shf_v * mul_v;
+  float ru_base = shf_u * mul_u - ru_step;
+
+  csVector3 v_ru (m_t2w.m11, m_t2w.m21, m_t2w.m31);
+  csVector3 v_rv (m_t2w.m12, m_t2w.m22, m_t2w.m32);
+  csVector3 v, v_base;
+
+  v_base = v_t2w + rv*v_rv + ru_base*v_ru;
+  v_rv *= rv_step;
+  v_ru *= ru_step;
+
   for (i = 0 ; i < lm_h ; i++)
   {
-    int uv = i * lm_w;
+    int uv = base_uv;
+    base_uv += lm_w;
+
+    v = v_base;
+    v_base += v_rv;
     for (j = 0 ; j < lm_w ; j++, uv++)
     {
+      v += v_ru;
+
       float lightness;
       if (ful_lit)
         lightness = 1;
@@ -1115,13 +1160,6 @@ void csShadowBitmap::UpdateShadowMap (unsigned char* shadowmap,
           continue;
       }
 
-      // @@@ Optimization: It should be possible to combine these
-      // calculations into a more efficient formula.
-      int ru = j << lightcell_shift;
-      int rv = i << lightcell_shift;
-      csVector3 v (float (ru + shf_u) * mul_u, float (rv + shf_v) * mul_v, 0);
-      v = v_t2w + m_t2w * v;
-
       float d = csSquaredDist::PointPoint (lightpos, v);
       if (d >= light->GetSquaredRadius ()) continue;
 
@@ -1131,7 +1169,7 @@ void csShadowBitmap::UpdateShadowMap (unsigned char* shadowmap,
       cosinus /= d;
       cosinus += cosfact;
       if (cosinus < 0)
-        cosinus = 0;
+        continue;
       else if (cosinus > 1)
         cosinus = 1;
 
