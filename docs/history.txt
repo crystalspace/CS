@@ -12,6 +12,16 @@ chronological order.
 	  differences between his local copy he forgot to commit and 
 	  Eric Sunshine's recent update to this file to fix compilation.)
 	- res made the csShadowIterator destructor virtual.
+	- Eric Sunshine added an ugly hack to jobber.pl to work around
+	  SourceForge CVS server brokenness.  Specifically, the SourceForge CVS
+	  server is so mis-configured that it drops the connection any time the
+	  (admittedly) large Swig-generated CS/scripts/perl5/cswigpl5.inc is
+	  committed to the repository even though this script is running on a
+	  local SourceForge machine.  To work around the problem, we enable
+	  compression in order send less information to the CVS server, under
+	  the assumption that the huge file size is what is triggering the
+	  server to drop the connection.  Enabling compression seems to
+	  side-step the problem.
 5-Nov-2003
 	- Jorrit optimized the kdtree a bit so that it now does 20 attempts
 	  instead of 10 to find the best split location. Also the cost is

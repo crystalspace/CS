@@ -87,7 +87,7 @@ use strict;
 $Getopt::Long::ignorecase = 0;
 
 my $PROG_NAME = 'jobber.pl';
-my $PROG_VERSION = '23';
+my $PROG_VERSION = '24';
 my $AUTHOR_NAME = 'Eric Sunshine';
 my $AUTHOR_EMAIL = 'sunshine@sunshineco.com';
 my $COPYRIGHT = "Copyright (C) 2000-2003 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
@@ -102,6 +102,9 @@ my $COPYRIGHT = "Copyright (C) 2000-2003 by $AUTHOR_NAME <$AUTHOR_EMAIL>";
 #        repository in order to perform the conversion process.  This list
 #        should include the documentation directories as well as those
 #        containing tools and supporting files used in the conversion process.
+#    CVSFLAGS - Additional flags to pass to each of the `cvs' command
+#        invocations.  An obvious example would be to set this variable to
+#        "-z9" to enable compression.
 #    BROWSEABLE_DIR - Directory into which generated documentation should be
 #        copied for online browsing.
 #    PACKAGE_DIR - Directory into which archives of generated documentation
@@ -188,6 +191,16 @@ $ENV{'PATH'} =
 
 # The Visual-C++ DSW and DSP generation process is a bit too noisy.
 $ENV{'MSVC_QUIET'} = 'yes';
+
+# This is just plain ugly.  The SourceForge CVS server is so mis-configured
+# that it drops the connection any time the (admittedly) large Swig-generated
+# CS/scripts/perl5/cswigpl5.inc is committed to the repository even though
+# this script is running on a local SourceForge machine.  To work around the
+# problem, we enable compression in order send less information to the CVS
+# server, under the assumption that the huge file size is what is triggering
+# the server to drop the connection.  Enabling compression seems to side-step
+# the problem.
+my $CVSFLAGS = '-z6';
 
 my $PROJECT_ROOT = 'CS';
 my $CVSUSER = 'sunshine';
@@ -478,7 +491,7 @@ sub cvs_remove {
     return unless @{$files};
     my $paths = prepare_pathnames(@{$files});
     print "Invoking CVS remove: ${\scalar(@{$files})} paths\n";
-    run_command("cvs -Q remove $paths") unless $TESTING;
+    run_command("cvs -Q $CVSFLAGS remove $paths") unless $TESTING;
 }
 
 #------------------------------------------------------------------------------
@@ -511,7 +524,7 @@ sub cvs_add {
     $flags = '' unless defined($flags);
     print "Invoking CVS add: ${\scalar(@{$files})} paths" .
 	($flags ? " [$flags]" : '') . "\n";
-    run_command("cvs -Q add $flags $paths") unless $TESTING;
+    run_command("cvs -Q $CVSFLAGS add $flags $paths") unless $TESTING;
 }
 
 #------------------------------------------------------------------------------
@@ -555,7 +568,7 @@ sub cvs_examine {
 #------------------------------------------------------------------------------
 sub cvs_checkout {
     print "CVSROOT: $CVSROOT\nExtracting: $CVS_SOURCES\n";
-    run_command("cvs -Q -d $CVSROOT checkout -P $CVS_SOURCES");
+    run_command("cvs -Q $CVSFLAGS -d $CVSROOT checkout -P $CVS_SOURCES");
 }
 
 #------------------------------------------------------------------------------
@@ -568,8 +581,8 @@ sub cvs_update {
     foreach my $target (@TARGETS) {
 	$dirs .= " @{$target->{'olddirs'}}" if exists $target->{'olddirs'};
     }
-    print "$line\n$message\n", run_command("cvs -q update $dirs"), "$line\n"
-	if $dirs;
+    print "$line\n$message\n", run_command("cvs -q $CVSFLAGS update $dirs"),
+        "$line\n" if $dirs;
 }
 
 #------------------------------------------------------------------------------
@@ -578,7 +591,8 @@ sub cvs_update {
 #------------------------------------------------------------------------------
 sub cvs_commit_dirs {
     my ($dirs, $message) = @_;
-    run_command("cvs -Q commit -m \"$message\" @{$dirs}") unless $TESTING;
+    run_command("cvs -Q $CVSFLAGS commit -m \"$message\" @{$dirs}")
+	unless $TESTING;
 }
 
 #------------------------------------------------------------------------------
