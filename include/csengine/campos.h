@@ -69,6 +69,9 @@ public:
   struct CameraPosition : public iCameraPosition
   {
     DECLARE_EMBEDDED_IBASE(csCameraPosition);
+
+    virtual iObject *QueryObject() {return scfParent;}
+
   } scfiCameraPosition;
 };
 

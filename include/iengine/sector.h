@@ -28,6 +28,7 @@ struct iTerrainWrapper;
 struct iThing;
 struct iStatLight;
 struct iVisibilityCuller;
+struct iObject;
 
 SCF_VERSION (iSector, 0, 1, 9);
 
@@ -43,6 +44,8 @@ struct iSector : public iBase
 {
   /// Used by the engine to retrieve internal sector object (ugly)
   virtual csSector *GetPrivateObject () = 0;
+  /// Get the iObject for this sector.
+  virtual iObject *QueryObject() = 0;
 
   /// Get the ID of this sector.
   virtual CS_ID GetID () = 0;

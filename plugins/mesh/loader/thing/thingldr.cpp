@@ -1241,7 +1241,7 @@ iBase* csPlaneLoader::Parse (const char* string, iEngine* engine,
     {
       case CS_TOKEN_NAME:
         ScanStr (params, "%s", name);
-	ppl->SetName (name);
+	ppl->QueryObject()->SetName (name);
         break;
       case CS_TOKEN_ORIG:
         tx1_given = true;

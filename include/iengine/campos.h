@@ -21,6 +21,8 @@
 
 #include "csutil/scf.h"
 
+struct iObject;
+
 SCF_VERSION (iCameraPosition, 0, 0, 1);
 
 /**
@@ -28,6 +30,8 @@ SCF_VERSION (iCameraPosition, 0, 0, 1);
  */
 struct iCameraPosition : public iBase
 {
+  /// Get the iObject for this camera position.
+  virtual iObject *QueryObject() = 0;
 };
 
 #endif

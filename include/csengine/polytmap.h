@@ -135,13 +135,14 @@ public:
   struct PolyTxtPlane : public iPolyTxtPlane
   {
     DECLARE_EMBEDDED_IBASE (csPolyTxtPlane);
+
+    virtual iObject *QueryObject()
+    {
+      return scfParent;
+    }
     virtual csPolyTxtPlane* GetPrivateObject ()
     {
       return (csPolyTxtPlane*)scfParent;
-    }
-    virtual void SetName (const char* name)
-    {
-      scfParent->SetName (name);
     }
     virtual void SetTextureSpace (const csVector3& v_orig,
 			const csVector3& v1, float len1,

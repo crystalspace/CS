@@ -24,6 +24,7 @@
 class csMatrix3;
 class csVector3;
 class csPolyTxtPlane;
+struct iObject;
 
 SCF_VERSION (iPolyTxtPlane, 0, 0, 1);
 
@@ -36,8 +37,8 @@ struct iPolyTxtPlane : public iBase
 {
   /// @@@ Ugly
   virtual csPolyTxtPlane* GetPrivateObject () = 0;
-  /// Set the name of this plane.
-  virtual void SetName (const char* name) = 0;
+  /// Get the iObject for this texture plane.
+  virtual iObject *QueryObject() = 0;
   /// Set texture space mapping.
   virtual void SetTextureSpace (const csVector3& v_orig,
 			const csVector3& v1, float len1,

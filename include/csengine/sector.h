@@ -511,6 +511,8 @@ public:
 
     virtual csSector *GetPrivateObject ()
     { return (csSector*)scfParent; }
+    virtual iObject *QueryObject()
+    { return scfParent; }
     virtual iVisibilityCuller* GetVisibilityCuller ()
     {
       return scfParent->GetVisibilityCuller ();
