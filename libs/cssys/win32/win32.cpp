@@ -481,6 +481,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
   need_console = true;
 #endif
 
+#if 0
   // required as the CommandLineParser isn't set up yet:
   int i;
   for (i = 1; i < CS_WIN32_ARGC; i++)
@@ -493,6 +494,7 @@ Win32Assistant::Win32Assistant (iObjectRegistry* r) :
       if (!strcmp(opt, "noconsole")) need_console = false;
     }
   }
+#endif
 
   if (need_console)
   {

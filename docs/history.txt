@@ -5,6 +5,10 @@ The history order is reversed so that new features are at the top.
 	  character constant for cursor assignment, rather than using an 8-bit
 	  character, since not all compilers are capable of correctly dealing
 	  with 8-bit charactes.
+	- Reverted the code from 'res' to read the commandline in windows
+	  port. This is not the right way to do this. The best way is to
+	  do this through the commandline parser. If needed this will have
+	  to be delayed until the commandline parser IS ready.
 6-Nov-2001
 	- Eric Sunshine fixed the derivation of Win32Assistant.  It was
 	  incorrectly inheriting iEventPlug and iEventHandler privately, rather
