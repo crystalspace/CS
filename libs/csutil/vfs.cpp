@@ -1,6 +1,6 @@
 /*
     Crystal Space Virtual File System class
-    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999,2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -54,7 +54,7 @@ class DiskFile : public csFile
   // The file
   FILE *file;
   // constructor
-    DiskFile(int Mode, VfsNode * ParentNode, int RIndex, const char * NameSuffix);
+  DiskFile(int Mode, VfsNode* ParentNode, int RIndex, const char* NameSuffix);
   // set Error according to errno
   void CheckError ();
 
@@ -95,8 +95,8 @@ class ArchiveFile : public csFile
   // current data pointer
   size_t fpos;
   // constructor
-  ArchiveFile (int Mode, VfsNode *ParentNode, int RIndex, const char *NameSuffix,
-    VfsArchive *ParentArchive);
+  ArchiveFile (int Mode, VfsNode *ParentNode, int RIndex,
+    const char *NameSuffix, VfsArchive *ParentArchive);
 
 public:
   DECLARE_IBASE;
@@ -145,7 +145,8 @@ public:
   }
   bool CheckUp ()
   {
-    return (RefCount == 0) && (System->GetTime () - LastUseTime > VFS_KEEP_UNUSED_ARCHIVE_TIME);
+    return (RefCount == 0) &&
+      (System->GetTime () - LastUseTime > VFS_KEEP_UNUSED_ARCHIVE_TIME);
   }
   VfsArchive (const char *filename, iSystem *iSys) : csArchive (filename)
   {
@@ -255,9 +256,10 @@ private:
 // The global archive cache
 static VfsArchiveCache *ArchiveCache;
 
-// --------------------------------------------------------------- csFile --- //
+// -------------------------------------------------------------- csFile --- //
 
-csFile::csFile (int Mode, VfsNode *ParentNode, int RIndex, const char *NameSuffix)
+csFile::csFile (int Mode, VfsNode *ParentNode, int RIndex,
+  const char *NameSuffix)
 {
   (void)Mode;
   Node = ParentNode;
@@ -290,7 +292,7 @@ char *csFile::GetAllData ()
   return NULL;
 }
 
-// ----------------------------------------------------------- DiskFile --- //
+// ------------------------------------------------------------ DiskFile --- //
 
 IMPLEMENT_IBASE (DiskFile)
   IMPLEMENTS_INTERFACE (iFile)
@@ -325,7 +327,7 @@ DiskFile::DiskFile (int Mode, VfsNode *ParentNode, int RIndex,
 #ifdef VFS_DEBUG
     printf ("VFS: Trying to open disk file \"%s\"\n", fName);
 #endif
-    file = fopen (fName, (Mode & VFS_FILE_MODE) == VFS_FILE_WRITE ? "wb" : "rb");
+    file = fopen (fName, (Mode & VFS_FILE_MODE) == VFS_FILE_WRITE ? "wb":"rb");
     if (file || (t != 1))
       break;
     char *lastps = strrchr (ns, VFS_PATH_SEPARATOR);
@@ -471,7 +473,8 @@ void DiskFile::CheckError ()
 #ifdef EACCES
    case EACCES:
 #endif
-#if defined( ETXTBSY ) || defined( EROFS ) || defined( EPERM ) || defined( EACCES )
+#if defined( ETXTBSY ) || defined( EROFS ) || defined( EPERM ) || \
+    defined( EACCES )
       Error = VFS_STATUS_ACCESSDENIED;
       break;
 #endif
@@ -512,15 +515,15 @@ size_t DiskFile::GetPos ()
   return ftell (file);
 }
 
-// ---------------------------------------------------------- ArchiveFile --- //
+// --------------------------------------------------------- ArchiveFile --- //
 
 IMPLEMENT_IBASE (ArchiveFile)
   IMPLEMENTS_INTERFACE (iFile)
 IMPLEMENT_IBASE_END
 
 ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, int RIndex,
-  const char *NameSuffix, VfsArchive *ParentArchive) : csFile (Mode, ParentNode,
-  RIndex, NameSuffix)
+  const char *NameSuffix, VfsArchive *ParentArchive) :
+  csFile (Mode, ParentNode, RIndex, NameSuffix)
 {
   CONSTRUCT_IBASE (NULL);
   Archive = ParentArchive;
@@ -534,7 +537,8 @@ ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, int RIndex,
   ArchiveCache->CheckUp ();
 
 #ifdef VFS_DEBUG
-  printf ("VFS: Trying to open file \"%s\" from archive \"%s\"\n", NameSuffix, Archive->GetName ());
+  printf ("VFS: Trying to open file \"%s\" from archive \"%s\"\n",
+    NameSuffix, Archive->GetName ());
 #endif
 
   if ((Mode & VFS_FILE_MODE) == VFS_FILE_READ)
@@ -547,7 +551,7 @@ ArchiveFile::ArchiveFile (int Mode, VfsNode *ParentNode, int RIndex,
   }
   else if ((Mode & VFS_FILE_MODE) == VFS_FILE_WRITE)
   {
-    if ((fh = Archive->NewFile (NameSuffix, 0, !(Mode & VFS_FILE_UNCOMPRESSED))))
+    if ((fh=Archive->NewFile(NameSuffix, 0, !(Mode & VFS_FILE_UNCOMPRESSED))))
     {
       Error = VFS_STATUS_OK;
       Archive->Writing++;
@@ -608,7 +612,7 @@ char *ArchiveFile::GetAllData ()
   return ret;
 }
 
-// -------------------------------------------------------------- VfsNode --- //
+// ------------------------------------------------------------- VfsNode --- //
 
 VfsNode::VfsNode (char *iPath, const char *iConfigKey, iSystem *iSys)
 {
@@ -723,7 +727,7 @@ bool VfsNode::RemoveRPath (const char *RealPath)
 const char *VfsNode::GetValue (const csIniFile *Config, const char *VarName)
 {
   // Look in environment first
-  char *value = getenv (VarName);
+  const char *value = getenv (VarName);
   if (value)
     return value;
 
@@ -733,7 +737,7 @@ const char *VfsNode::GetValue (const csIniFile *Config, const char *VarName)
     return value;
 
   // Now look in "VFS.Alias" section for alias section name
-  char *alias = Config->GetStr ("VFS.Alias", OS_VERSION, NULL);
+  const char *alias = Config->GetStr ("VFS.Alias", OS_VERSION, NULL);
   // If there is one, look into that section too
   if (alias)
     value = Config->GetStr (alias, VarName, NULL);
@@ -752,7 +756,8 @@ const char *VfsNode::GetValue (const csIniFile *Config, const char *VarName)
   return "";
 }
 
-void VfsNode::FindFiles (const char *Suffix, const char *Mask, iStrVector *FileList)
+void VfsNode::FindFiles (const char *Suffix, const char *Mask,
+  iStrVector *FileList)
 {
   // Look through all RPathV's for file or directory
   for (int i = 0; i < RPathV.Length (); i++)
@@ -896,7 +901,7 @@ iFile *VfsNode::Open (int Mode, const char *FileName)
         CHK (ArchiveCache->Push (new VfsArchive (rpath, System)));
       }
 
-      CHK (f = new ArchiveFile (Mode, this, i, FileName, ArchiveCache->Get (idx)));
+      f = new ArchiveFile (Mode, this, i, FileName, ArchiveCache->Get (idx));
       if (f->GetStatus () == VFS_STATUS_OK)
         break;
       else
@@ -909,7 +914,8 @@ iFile *VfsNode::Open (int Mode, const char *FileName)
   return f;
 }
 
-bool VfsNode::FindFile (const char *Suffix, char *RealPath, csArchive *&Archive) const
+bool VfsNode::FindFile (const char *Suffix, char *RealPath,
+  csArchive *&Archive) const
 {
   // Look through all RPathV's for file or directory
   for (int i = 0; i < RPathV.Length (); i++)
@@ -1014,13 +1020,13 @@ bool VfsNode::SetFileTime (const char *Suffix, tm &ztime)
   }
   else
   {
-    // not supported for now since there's no portable way of doing that - A.Z.
+    // Not supported for now since there's no portable way of doing that - A.Z.
     return false;
   }
   return true;
 }
 
-// ------------------------------------------------------------ VfsVector --- //
+// ----------------------------------------------------------- VfsVector --- //
 
 csVFS::VfsVector::VfsVector () : csVector (16, 16)
 {
@@ -1049,7 +1055,7 @@ int csVFS::VfsVector::CompareKey (csSome Item, csConstSome Key, int Mode) const
   return strcmp (((VfsNode *)Item)->VPath, (char *)Key);
 }
 
-// ---------------------------------------------------------------- csVFS --- //
+// --------------------------------------------------------------- csVFS --- //
 
 IMPLEMENT_IBASE (csVFS)
   IMPLEMENTS_INTERFACE (iVFS)
@@ -1088,21 +1094,17 @@ bool csVFS::Initialize (iSystem *iSys)
   if (!System->RegisterDriver ("iVFS", this))
     return false;
 
-  CHK (csIniFile *vfsconfig = new csIniFile (System->ConfigGetStr ("VFS.Options",
-    "Config", "vfs.cfg")));
+  csIniFile *vfsconfig =
+    new csIniFile (System->ConfigGetStr ("VFS.Options", "Config", "vfs.cfg"));
   return ReadConfig (vfsconfig);
-}
-
-bool csVFS::EnumConfig (csSome Parm, char *Name, size_t DataSize, csSome Data)
-{
-  (void) DataSize;
-  ((csVFS *)Parm)->AddLink (Name, (char *)Data);
-  return false;
 }
 
 bool csVFS::ReadConfig (csIniFile *Config)
 {
-  (config = Config)->EnumData ("VFS", EnumConfig, this);
+  config = Config;
+  csIniFile::DataIterator iterator (config->EnumData ("VFS"));
+  while (iterator.NextItem())
+    AddLink (iterator.GetName(), (const char*)iterator.GetData());
   NodeList.QuickSort (0);
   return true;
 }

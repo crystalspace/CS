@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1999 by Andrew Zabolotny
+    Copyright (C) 1999,2000 by Andrew Zabolotny
     Crystal Space Shared Class Facility (SCF)
 
     This library is free software; you can redistribute it and/or
@@ -104,7 +104,8 @@ scfSharedLibrary::scfSharedLibrary (const char *iLibraryName)
   strcpy (name, iLibraryName);
   strcat (name, "_GetClassTable");
 
-  scfGetClassInfo func = (scfGetClassInfo)csGetLibrarySymbol (LibraryHandle, name);
+  scfGetClassInfo func =
+    (scfGetClassInfo)csGetLibrarySymbol (LibraryHandle, name);
   if (func)
     ClassTable = func ();
 }
@@ -177,10 +178,11 @@ public:
   virtual int CompareKey (csSome Item, csConstSome Key, int) const
   { return strcmp (((scfFactory *)Item)->ClassID, (char *)Key); }
   virtual int Compare (csSome Item1, csSome Item2, int) const
-  { return strcmp (((scfFactory *)Item1)->ClassID, ((scfFactory *)Item2)->ClassID); }
+  { return strcmp (((scfFactory *)Item1)->ClassID,
+                   ((scfFactory *)Item2)->ClassID); }
 };
 
-//------------------------------------------ Class factory implementation ----//
+//----------------------------------------- Class factory implementation ----//
 
 scfFactory::scfFactory (const char *iClassID, const char *iLibraryName,
   const char *iDepend)
@@ -218,7 +220,7 @@ scfFactory::~scfFactory ()
 #ifdef CS_DEBUG
   // Warn user about unreleased instances of this class
   if (scfRefCount)
-    fprintf (stderr, "SCF WARNING: %d unreleased instances of class %s left!\n",
+    fprintf (stderr, "SCF WARNING: %d unreleased instances of class %s!\n",
       scfRefCount, ClassID);
 #endif
 
@@ -260,7 +262,8 @@ void scfFactory::DecRef ()
 #ifdef CS_DEBUG
   if (!scfRefCount)
   {
-    fprintf (stderr, "SCF WARNING: Extra calls to scfFactory::DecRef () for class %s\n", ClassID);
+    fprintf (stderr, "SCF WARNING: Extra calls to scfFactory::DecRef () for "
+      "class %s\n", ClassID);
     return;
   }
 #endif
@@ -314,26 +317,12 @@ const char *scfFactory::QueryDependencies ()
   return Dependencies;
 }
 
-//-------------------------------------------------- Client SCF functions ----//
+//------------------------------------------------- Client SCF functions ----//
 
 // This is the registry for all class factories
 static scfClassRegistry *ClassRegistry;
 // If this bool is true, we should sort the registery
 static bool SortClassRegistry = false;
-
-#ifndef CS_STATIC_LINKED
-// This is the iterator used to enumerate configuration file entries
-static bool ConfigIterator (csSome, char *Name, size_t, csSome Data)
-{
-  char *text = (char *)Data;
-  char *copy = (char *)alloca (strlen (text) + 1);
-  strcpy (copy, text);
-  char *depend = strchr (copy, ':');
-  if (depend) *depend++ = 0;
-  scfRegisterClass (Name, copy, depend);
-  return false;
-}
-#endif
 
 void scfInitialize (csIniFile *iConfig)
 {
@@ -343,7 +332,18 @@ void scfInitialize (csIniFile *iConfig)
   if (!LibraryRegistry)
     CHKB (LibraryRegistry = new scfLibraryVector());
   if (iConfig)
-    iConfig->EnumData ("SCF.Registry", ConfigIterator, NULL);
+  {
+    csIniFile::DataIterator iterator (iConfig->EnumData ("SCF.Registry"));
+    while (iterator.NextItem())
+    {
+      const char* data = (char*)iterator.GetData();
+      char* val = (char*)alloca (strlen (data) + 1);
+      strcpy (val, data);
+      char* depend = strchr (val, ':');
+      if (depend) *depend++ = 0;
+      scfRegisterClass (iterator.GetName(), val, depend);
+    }
+  }
 #else
   (void)iConfig;
 #endif
@@ -408,7 +408,7 @@ bool scfRegisterClass (const char *iClassID, const char *iLibraryName,
   if (ClassRegistry->FindKey (iClassID) >= 0)
     return false;
   // Create a factory and add it to class registry
-  CHK (ClassRegistry->Push (new scfFactory (iClassID, iLibraryName, Dependencies)));
+  ClassRegistry->Push (new scfFactory (iClassID, iLibraryName, Dependencies));
   SortClassRegistry = true;
   return true;
 #else
@@ -507,10 +507,3 @@ IMPLEMENT_IBASE(csSCF)
   IMPLEMENTS_INTERFACE(iBase)
   IMPLEMENTS_INTERFACE(iSCF)
 IMPLEMENT_IBASE_END
-/*
-IMPLEMENT_FACTORY(csSCF)
-
-EXPORT_CLASS_TABLE(scf)
-  EXPORT_CLASS(csSCF, "crystalspace.engine.scf", "Crystal Space SCF")
-EXPORT_CLASS_TABLE_END
-*/

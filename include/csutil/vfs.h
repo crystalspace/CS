@@ -1,6 +1,6 @@
 /*
     Crystal Space Virtual File System class
-    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999,2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __VFS_H__
-#define __VFS_H__
+#ifndef __CS_VFS_H__
+#define __CS_VFS_H__
 
 #include "def.h"
 #include "csstrvec.h"
@@ -28,7 +28,7 @@
 class VfsNode;
 class csIniFile;
 
-/// A replacement for FILE type in the virtual file space
+/// A replacement for standard-C FILE type in the virtual file space
 class csFile : public iFile
 {
 protected:
@@ -152,7 +152,7 @@ public:
   /// Check whenever a file exists
   virtual bool Exists (const char *Path) const;
 
-  /// Find all files in a virtual directory and return an array with their names
+  /// Find all files in a virtual directory and return an array of their names
   virtual iStrVector *FindFiles (const char *Path) const;
   /// Replacement for standard fopen()
   virtual iFile *Open (const char *FileName, int Mode);
@@ -194,13 +194,12 @@ private:
   /// Add a virtual link: real path can contain $(...) macros
   virtual bool AddLink (const char *VirtualPath, const char *RealPath);
 
-  // Callback function used to read ini file
-  static bool EnumConfig (csSome Parm, char *Name, size_t DataSize, csSome Data);
   // Find the VFS node corresponding to given virtual path
-  VfsNode *GetNode (const char *Path, char *NodePrefix, size_t NodePrefixSize) const;
+  VfsNode *GetNode (const char *Path, char *NodePrefix,
+    size_t NodePrefixSize) const;
   // Common routine for many functions
   bool PreparePath (const char *Path, bool IsDir, VfsNode *&Node,
     char *Suffix, size_t SuffixSize) const;
 };
 
-#endif // __VFS_H__
+#endif // __CS_VFS_H__
