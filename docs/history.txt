@@ -19,6 +19,8 @@ chronological order.
 	- Rhad added some mutex protection around the software renderer calls
 	  to start the software driver to avoid potential race conditions 
 	  with the mixing function.
+	- Jorrit fixed callstack.cpp so that it compiles on Mingw. Please
+	  don't use single quotes in #error unless you also close the quote.
 28-Sep-2004
 	- Rhad mutexed some portions of the software renderer to reduce
 	  thread contention issues.  This is not a complete fix but should
