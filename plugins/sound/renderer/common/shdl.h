@@ -19,7 +19,7 @@
 #ifndef __SHDL_H__
 #define __SHDL_H__
 
-#include "isound\handle.h"
+#include "isound/handle.h"
 struct iSoundData;
 
 class csSoundHandle : public iSoundHandle
