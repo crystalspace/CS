@@ -354,7 +354,7 @@ inline char* __VfsCheckVar(const char* VarName)
 #  include <io.h>
 #endif
 
-#ifdef COMP_BC
+#if defined (COMP_BC) || defined (__CYGWIN32__)
 #  define GETPID() getpid()
 #else
 #  define GETPID() _getpid()
