@@ -235,6 +235,7 @@ you can try writing your first program.
 @menu
 * TutIntro Basic Concepts:: Basic Crystal Space Concepts
 * TutIntro Minimum Requirements:: Minimum Application Requirements
+* TutIntro Compilation:: Compiling the Application
 @end menu
 
 @node TutIntro Basic Concepts, TutIntro Minimum Requirements, Tutorial Introduction, Tutorial Introduction
@@ -388,7 +389,7 @@ get the application running. In the tutorial below we will use several of the
 functions from @code{csInitializer}. This class contains only static member
 functions.
 
-@node TutIntro Minimum Requirements, , TutIntro Basic Concepts, Tutorial Compilation
+@node TutIntro Minimum Requirements, TutIntro Compilation, TutIntro Basic Concepts, Tutorial Introduction
 @subsection Minimum Application Requirements
 @cindex Tutorial Minimum Application Requirements
 @cindex Minimum Application Requirements, Tutorial
