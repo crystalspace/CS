@@ -45,6 +45,8 @@ chronological order.
 	  neglected to link the plugin against txtmgr.o (from renderer/common)
 	  despite the fact that AWS's csTextureHandleNull is derived from
 	  csTextureHandle in txtmgr.o.
+	- Jorrit added a note to levbuilding.txi talking about how thing
+	  polygons should be quads for most optimal results.
 12-Feb-2004
 	- Jorrit did several documentation enhancements:
 	    - Added a link to the new level building section in the
