@@ -40,7 +40,7 @@ awsKey::awsKey(iString *n)
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-awsPrefManager::awsPrefManager(iBase *iParent):n_win_defs(0), n_skin_defs(0), def_skin(NULL), awstxtmgr(NULL), fontsvr(NULL), default_font(NULL)
+awsPrefManager::awsPrefManager(iBase *iParent):n_win_defs(0), n_skin_defs(0), def_skin(NULL), awstxtmgr(NULL), fontsvr(NULL), default_font(NULL), wmgr(NULL)
 {
   SCF_CONSTRUCT_IBASE (iParent);
 }
@@ -233,7 +233,7 @@ awsPrefManager::Load(const char *def_file)
   unsigned int ncw = n_win_defs,
                ncs = n_skin_defs;
 
-  if(awsparse(this))
+  if(awsparse(wmgr))
       printf("\tsyntax error in definition file, load failed.\n");
   else
   {

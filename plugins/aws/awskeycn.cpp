@@ -1,9 +1,11 @@
 #include "cssysdef.h"
 #include "iutil/string.h"
+#include "csutil/scfstr.h"
 #include "csgeom/csrect.h"
 #include "csutil/csdllist.h"
 #include "ivaria/aws.h"
 #include "awsprefs.h"
+
 
 extern unsigned long aws_adler32(unsigned long adler,  const unsigned char *buf,  unsigned int len);
 
@@ -62,3 +64,15 @@ awsKeyContainer::Consume(awsKeyContainer *c)
      //Do NOT delete awsKeyContainer!  This is NOT a memory leak!  The caller is
      //  responsible for cleaning up the container!
   }
+
+
+
+// Connection node ///////////////////////////////////////////////////////////////////////////////
+awsConnectionNode::awsConnectionNode():awsKey(new scfString("Connect"))
+{}
+
+awsConnectionNode::~awsConnectionNode()
+{};
+
+
+

@@ -28,6 +28,16 @@ awsSinkManager::awsSinkManager(iBase *p)
  
 awsSinkManager::~awsSinkManager()
 {
+  int i;
+  
+  for(i=0; i<sinks.Length(); ++i)
+  {
+    SinkMap *sm = (SinkMap *)sinks[i];
+
+    sm->sink->DecRef();
+    delete sm;
+  }
+  
   return;
 }
     
@@ -40,12 +50,23 @@ awsSinkManager::Initialize(iObjectRegistry *sys)
 void 
 awsSinkManager::RegisterSink(char *name, iAwsSink *sink)
 {
-
+  sink->IncRef();
+  sinks.Push(new SinkMap(NameToId(name), sink));
 }
 
 iAwsSink* 
-awsSinkManager::FindSink(char *name)
+awsSinkManager::FindSink(char *_name)
 {
+  int i;
+  unsigned long name = NameToId(_name);
+
+  for(i=0; i<sinks.Length(); ++i)
+  {
+    SinkMap *sm = (SinkMap *)sinks[i];
+
+    if (sm->name == name)
+      return sm->sink;    
+  }
   return NULL;
 }
 
@@ -117,6 +138,7 @@ awsSource::RegisterSlot(iAwsSlot *slot, unsigned long signal)
   ssm->slot = slot;
   ssm->signal = signal;
 
+  slot->IncRef();
   slots.Push(ssm);
     
   return true;
@@ -136,6 +158,7 @@ awsSource::UnregisterSlot(iAwsSlot *slot, unsigned long signal)
 
        if (ssm->signal == signal && ssm->slot == slot)
        {
+          slot->DecRef();
           slots.Delete(i);
           delete ssm;
 
@@ -170,12 +193,17 @@ awsSource::Broadcast(unsigned long signal)
 
 awsSlot::awsSlot():sink(NULL) {}
 
-awsSlot::~awsSlot() {}
+awsSlot::~awsSlot() 
+{
+  if (sink)
+    sink->DecRef();
+}
 
 void 
 awsSlot::Initialize(iAwsSink *_sink)
 {
  sink = _sink;
+ sink->IncRef();
 }
 
 void 

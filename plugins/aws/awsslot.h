@@ -33,6 +33,15 @@
 
 class awsSinkManager : public iAwsSinkManager
 {
+  struct SinkMap
+  {
+    unsigned long name;
+    iAwsSink     *sink;
+
+    SinkMap(unsigned long n, iAwsSink *s):name(n), sink(s) {};
+  };
+
+  csBasicVector sinks;
 
 public:
   SCF_DECLARE_IBASE;

@@ -49,6 +49,9 @@ const unsigned char KEY_SKIN = 4;
 const unsigned char KEY_COMPONENT = 5;
 const unsigned char KEY_RGB  = 6;
 const unsigned char KEY_POINT= 7;
+const unsigned char KEY_CONNECTION = 8;
+const unsigned char KEY_CONNECTIONMAP = 9;
+
 
 /// Abstract key interface
 class awsKey
@@ -176,6 +179,37 @@ public:
   csPoint Value() { return val; }
 };
 
+class awsConnectionKey : public awsKey
+{
+  /// The sink that we want
+  iAwsSink *sink;
+  /// The trigger that we want
+  unsigned long trigger;
+  /// The signal that we want
+  unsigned long signal;
+  
+public:
+  /// Constructs an integer key with the given name
+  awsConnectionKey(iString *name, iAwsSink *s, unsigned long t, unsigned long sig):
+      awsKey(name), sink(s), trigger(t), signal(sig) {};
+
+  /// Destructor does nothing
+  virtual ~awsConnectionKey() {};
+
+  /// So that we know this is a rect key 
+  virtual unsigned char Type() 
+  { return KEY_CONNECTION; }
+
+  /// Gets the sink for this key
+  iAwsSink *Sink() { return sink; }
+  
+  /// Gets the trigger for this key
+  unsigned long Trigger() { return trigger; }
+
+  /// Gets the signal for this key
+  unsigned long Signal()  { return signal;  }
+};
+
 
 //////////////////////////////////  Containers ////////////////////////////////////////////////////////////////////////
 
@@ -257,15 +291,30 @@ public:
   { return (awsKey *)Children()[i];  }
 };
 
+class awsConnectionNode : public awsKey, awsKeyContainer
+{
+  
+public:  
+  awsConnectionNode();
+  virtual ~awsConnectionNode();
+    
+  /// So that we know this is a component node
+  virtual unsigned char Type() 
+  { return KEY_CONNECTIONMAP; }
+      
+  /// Exposes length of child list for iteration
+  int GetLength()
+  { return Children().Length(); }
+  
+  /// Exposes [] for index access
+  awsKey *GetItemAt(int i)
+  { return (awsKey *)Children()[i];  }
+};
+
+
+
 //////////////////////////////////  Preference Manager ////////////////////////////////////////////////////////////////
 
-/*const unsigned int COLOR_HIGHLIGHT  = 0;
-const unsigned int COLOR_SHADOW     = 1;
-const unsigned int COLOR_FILL 	    = 2;
-const unsigned int COLOR_DARKFILL   = 3;
-const unsigned int COLOR_TEXTFORE   = 4;
-const unsigned int COLOR_TEXTBACK   = 5;
-const unsigned int COLOR_TEXTDISABLED = 6;*/
 
 enum AWS_COLORS { AC_HIGHLIGHT, AC_HIGHLIGHT2, AC_SHADOW, AC_SHADOW2, AC_FILL, AC_DARKFILL, 
 		  AC_TEXTFORE, AC_TEXTBACK, AC_TEXTDISABLED, 
@@ -301,6 +350,9 @@ class awsPrefManager : public iAwsPrefManager
 
   /// default font
   iFont *default_font;
+
+  /// window manager
+  iAws  *wmgr;
 
   /// constant value heap
   csBasicVector constants;

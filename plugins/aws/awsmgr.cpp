@@ -40,6 +40,7 @@ awsManager::awsManager(iBase *p):prefmgr(NULL), sinkmgr(NULL),
 awsManager::~awsManager()
 {
   SCF_DEC_REF (prefmgr);
+  SCF_DEC_REF (sinkmgr);
 
   void *p = component_factories.GetFirstItem();
   while ((p=component_factories.GetCurrentItem ()))
