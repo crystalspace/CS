@@ -74,7 +74,7 @@ csjngimgclean:
 ifdef DO_DEPEND
 dep: $(OUTOS)/jngimg.dep
 $(OUTOS)/jngimg.dep: $(SRC.CSJNGIMG)
-	$(DO.DEP1) $(MNG.CFLAGS) $(JPEG.CFLAGS) $(ZLIB.CFLAGS) $(DO.DEP2)
+	$(DO.DEP1) $(MNG.CFLAGS) $(DO.DEP2)
 else
 -include $(OUTOS)/jngimg.dep
 endif
