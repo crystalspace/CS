@@ -241,6 +241,14 @@ void csSurfMeshObject::SetupObject ()
   if (!initialized)
   {
     initialized = true;
+    if (!vbuf)
+    {
+      iObjectRegistry* object_reg = ((csSurfMeshObjectFactory*)factory)
+      	->object_reg;
+      iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+      // @@@ priority should be a parameter
+      vbuf = g3d->GetVertexBufferManager ()->CreateBuffer (0);
+    }
     delete[] surf_vertices;
     delete[] surf_colors;
     delete[] surf_texels;
@@ -260,15 +268,8 @@ void csSurfMeshObject::SetupObject ()
     mesh.do_morph_texels = false;
     mesh.do_morph_colors = false;
     mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
+    mesh.buffers[0] = vbuf;
 
-    if (!vbuf)
-    {
-      iObjectRegistry* object_reg = ((csSurfMeshObjectFactory*)factory)
-      	->object_reg;
-      iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-      // @@@ priority should be a parameter
-      g3d->GetVertexBufferManager ()->CreateBuffer (0);
-    }
   }
 }
 
@@ -381,13 +382,13 @@ bool csSurfMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 //     - Z fill vs Z use
   if (!material)
   {
-    printf ("INTERNAL ERROR: ball used without material!\n");
+    printf ("INTERNAL ERROR: surface used without material!\n");
     return false;
   }
   iMaterialHandle* mat = material->GetMaterialHandle ();
   if (!mat)
   {
-    printf ("INTERNAL ERROR: ball used without valid material handle!\n");
+    printf ("INTERNAL ERROR: surface used without valid material handle!\n");
     return false;
   }
 
