@@ -630,7 +630,7 @@ void csTextureManagerSoftware::PrepareTextures ()
       if ((txt->GetFlags() & CS_TEXTURE_DYNAMIC_SHARE_HINT) == 
 						CS_TEXTURE_DYNAMIC_SHARE_HINT)
 	((csTextureMMSoftware*)txt)->CreateDynamicTexture (G3D, &pfmt,
-	       (pfmt.PixelBytes == 1) ? &cmap.palette[0] : NULL, true);
+	       (pfmt.PixelBytes == 1) ? &cmap.palette[0] : 0, true);
       else					  
 	((csTextureMMSoftware*)txt)->CreateDynamicTexture(G3D,&pfmt,NULL,false);
     }
@@ -658,7 +658,7 @@ void csTextureManagerSoftware::PrepareTexture (iTextureHandle *handle)
     if ((txt->GetFlags() & CS_TEXTURE_DYNAMIC_SHARE_HINT) == 
 	                                          CS_TEXTURE_DYNAMIC_SHARE_HINT)
       ((csTextureMMSoftware*)txt)->CreateDynamicTexture (G3D, &pfmt,
-	       (pfmt.PixelBytes == 1) ? &cmap.palette[0] : NULL, true);
+	       (pfmt.PixelBytes == 1) ? &cmap.palette[0] : 0, true);
     else					  
       ((csTextureMMSoftware*)txt)->CreateDynamicTexture(G3D, &pfmt, NULL,false);
   }
