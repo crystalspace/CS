@@ -88,7 +88,12 @@ csBspTree::csBspTree (csPolygonParentInt* pset, csPolygonInt** polygons, int num
 {
   csBspTree::pset = pset;
   CHK (root = new csBspNode);
-  Build (root, polygons, num, mode);
+
+  CHK (csPolygonInt** new_polygons = new csPolygonInt* [num]);
+  int i;
+  for (i = 0 ; i < num ; i++) new_polygons[i] = polygons[i];
+  Build (root, new_polygons, num, mode);
+  CHK (delete [] new_polygons);
 }
 
 csBspTree::~csBspTree ()
@@ -98,7 +103,13 @@ csBspTree::~csBspTree ()
 
 void csBspTree::AddDynamicPolygons (csPolygonInt** polygons, int num, int mode)
 {
-  BuildDynamic (root, polygons, num, mode);
+  // @@@ We should only do this copy if there is a split in the first level.
+  // Now it is just overhead.
+  CHK (csPolygonInt** new_polygons = new csPolygonInt* [num]);
+  int i;
+  for (i = 0 ; i < num ; i++) new_polygons[i] = polygons[i];
+  BuildDynamic (root, new_polygons, num, mode);
+  CHK (delete [] new_polygons);
 }
 
 void csBspTree::RemoveDynamicPolygons ()
@@ -123,19 +134,51 @@ int csBspTree::SelectSplitter (csPolygonInt** polygons, int num, int mode)
   {
     poly_idx = 0;
   }
-  else if (mode == BSP_MINIMIZE_SPLITS)
+  else if (mode == BSP_MINIMIZE_SPLITS || mode == BSP_ALMOST_MINIMIZE_SPLITS)
   {
     // Choose the polygon which generates the least number of splits.
     int min_splits = 32767;
-    for (i = 0 ; i < num ; i++)
+    int n = num;
+    if (mode == BSP_ALMOST_MINIMIZE_SPLITS && n > 20) n = 20;
+    for (i = 0 ; i < n ; i++)
     {
       int cnt = 0;
-      for (j = 0 ; j < num ; j++)
+      for (j = 0 ; j < n ; j++)
         if (polygons[j]->Classify (polygons[i]) == POL_SPLIT_NEEDED) cnt++;
       if (cnt < min_splits) { min_splits = cnt; poly_idx = i; }
     }
   }
-  else
+  else if (mode == BSP_BALANCED || mode == BSP_ALMOST_BALANCED)
+  {
+    // Choose the polygon which generates a balanced tree.
+    int min_front_back_diff = 32767;
+    int min_splits = 32767;
+    int n = num;
+    if (mode == BSP_ALMOST_BALANCED && n > 20) n = 20;
+    for (i = 0 ; i < n ; i++)
+    {
+      int front = 0, back = 0;
+      int splits = 0;
+      for (j = 0 ; j < n ; j++)
+      {
+        int c = polygons[j]->Classify (polygons [i]);
+	if (c == POL_FRONT) front++;
+	else if (c == POL_BACK) back++;
+	else if (c == POL_SPLIT_NEEDED) splits++;
+      }
+      if (ABS (front-back) < min_front_back_diff)
+      {
+        min_splits = 32767;
+        min_front_back_diff = ABS (front-back);
+	poly_idx = i;
+      }
+      else if (ABS (front-back) == min_front_back_diff)
+      {
+        if (splits < min_splits) { min_splits = splits; poly_idx = i; }
+      }
+    }
+  }
+  else if (mode == BSP_MOST_ON_SPLITTER)
   {
     // First choose a polygon which shares its plane with the highest
     // number of other polygons.

@@ -30,6 +30,9 @@ class Dumper;
 #define BSP_MINIMIZE_SPLITS 1		// Minimize the number of polygon splits
 #define BSP_MOST_ON_SPLITTER 2		// Splitter with most coplanar polygons
 #define BSP_RANDOM 3			// Choose a random splitter
+#define BSP_ALMOST_MINIMIZE_SPLITS 4	// Select a number of polygons and choose minimal split
+#define BSP_BALANCED 5			// Try to create a balanced tree
+#define BSP_ALMOST_BALANCED 6		// Try to create an approximation of a balanced tree
 
 /**
  * A BSP node.
