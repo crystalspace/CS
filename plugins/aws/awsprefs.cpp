@@ -616,3 +616,9 @@ iAwsKeyFactory *awsPrefManager::CreateKeyFactory ()
 {
   return new awsKeyFactory ();
 }
+
+iAwsConnectionNodeFactory *awsPrefManager::CreateConnectionNodeFactory ()
+{
+  return new awsConnectionNodeFactory ();
+}
+

@@ -140,7 +140,50 @@ void awsKeyFactory::AddConnectionKey (
   }
 }
 
+void awsKeyFactory::AddConnectionNode (iAwsConnectionNodeFactory *node)
+{
+  if(base && node && node->GetThisNode())
+  {
+    base->Add ((awsKey*)node->GetThisNode());
+    ((awsConnectionNodeFactory *)node)->base_in_use = true;
+  }
+}
+
 iAwsComponentNode *awsKeyFactory::GetThisNode ()
+{
+  return base;
+}
+
+awsConnectionNodeFactory::awsConnectionNodeFactory ()
+{
+  base=0;
+  base_in_use=false;
+}
+
+awsConnectionNodeFactory::~awsConnectionNodeFactory ()
+{
+  // THIS LEAKS!! Key containers do not yet clean up after themselves!
+  if (base && !base_in_use) delete base;
+}
+
+void awsConnectionNodeFactory::Initialize()
+{
+  base=new awsConnectionNode();
+}
+
+void awsConnectionNodeFactory::AddConnectionKey (
+  const char* name,
+  iAwsSink *s,
+  unsigned long t,
+  unsigned long sig)
+{
+  if (base)
+  {
+    base->Add ((awsKey*)(new awsConnectionKey (name, s, t, sig)));
+  }
+}
+
+awsConnectionNode *awsConnectionNodeFactory::GetThisNode ()
 {
   return base;
 }

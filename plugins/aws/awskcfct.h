@@ -60,6 +60,9 @@ public:
   /// Add a point key
   virtual void AddPointKey (const char* name, csPoint v);
 
+  /// Add a connection node
+  virtual void AddConnectionNode (iAwsConnectionNodeFactory *node);
+
   /// Add a connection key
   virtual void AddConnectionKey (
                 const char* name,
@@ -70,5 +73,36 @@ public:
   /// Get the base node
   iAwsComponentNode *GetThisNode ();
 };
+
+class awsConnectionNodeFactory : public iAwsConnectionNodeFactory
+{
+  /** Connection container. All connection keys get added to this, then
+   *  it is added to a component to be useful.
+   */
+  awsConnectionNode *base;
+
+  /// This is true if we canNOT delete the base when we go.
+  bool base_in_use;
+public:
+  SCF_DECLARE_IBASE;
+
+  awsConnectionNodeFactory ();
+  virtual ~awsConnectionNodeFactory ();
+
+  /// Initializes the factory
+  virtual void Initialize ();
+
+  /// Add a connection key
+  virtual void AddConnectionKey (
+                const char* name,
+                iAwsSink *s,
+                unsigned long t,
+                unsigned long sig);
+
+  /// Get the base node
+  awsConnectionNode *GetThisNode ();
+
+  friend awsKeyFactory;
+ };
 
 #endif

@@ -738,6 +738,9 @@ public:
 
   /** Creates a new key factory */
   virtual iAwsKeyFactory *CreateKeyFactory ();
+
+  /** Creates a new connection node factory */
+  virtual iAwsConnectionNodeFactory *CreateConnectionNodeFactory ();
 };
 
 #endif
