@@ -373,14 +373,14 @@ MSVC.CAR = $(patsubst %/,%,$(dir $*))
 # Macro which returns second element of $* when $* is "element1/element2".
 MSVC.CDR = $(notdir $*)
 
-# Macro which returns "project-workspace" if $* is "workspace/project",
+# Macro which returns "project_workspace" if $* is "workspace/project",
 # otherwise returns "project" if $* is "project".
 MSVC.FORMAT = $(MSVC.FORMAT.PRE)$(MSVC.FORMAT.MID)$(MSVC.FORMAT.POST)
 MSVC.FORMAT.PRE  = $(DSP.$(MSVC.CDR).NAME)
 MSVC.FORMAT.MID  = $(MSVC.FORMAT.$(words $(subst /, ,$*)))
 MSVC.FORMAT.POST = $(MSVC.WORKSPACE.$(MSVC.CAR).NAME)
 MSVC.FORMAT.1 =
-MSVC.FORMAT.2 = -
+MSVC.FORMAT.2 = _
 
 # Macro to compose workspace name. (ex: "TYPICAL" becomes "wkstypical.sln")
 # If $* contains a slash, then only the text before the slash is used.
