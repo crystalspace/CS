@@ -23,6 +23,7 @@
 #include "csgeom/vector3.h"
 #include "csutil/cscolor.h"
 #include "csengine/polygon.h"
+#include "csengine/polytext.h"
 #include "csengine/lghtmap.h"
 
 class csWorld;
@@ -130,6 +131,8 @@ private:
   float one_lumel_area;
   /// values for loop detection, last shooting priority and repeats
   float last_shoot_priority; int num_repeats;
+  /// the cookie to determine if polygon has already received light
+  int iter_cookie;
 
 public:
   csRadPoly(csPolygon3D *original);
@@ -173,6 +176,10 @@ public:
   inline int GetNumRepeats() { return num_repeats; }
   /// Increment the number of repeats of shooting at same priority by one.
   inline void IncNumRepeats() {num_repeats++;}
+  /// Get the iteration cookie
+  inline int GetIterCookie() {return iter_cookie;}
+  /// Set the iteration cookie
+  inline void SetIterCookie(int val) { iter_cookie = val; }
 
   /// Get world coordinates for a lumel -- slow method
   void GetLumelWorldCoords(csVector3& res, int x, int y);
@@ -183,6 +190,7 @@ public:
   { res = lumel_origin + x* lumel_x_axis + y * lumel_y_axis; }
   /// get area of one lumel in world space
   inline float GetOneLumelArea() const { return one_lumel_area; }
+
   /** 
    * computes new priority value, summing the light unshot.
    * Note: Do no touch the variable total_unshot_light without 
@@ -374,7 +382,7 @@ private:
   /// a lot of space.
   csRGBLightMap *texturemap;
   /// the shadows lying on the dest polygon, 1=full visible, 0=all shadow
-  float *shadow_map;
+  csPolyTexture::csCoverageMatrix *shadow_matrix;
   /// color of source lumel for multiplying delta's with.
   csColor src_lumel_color;
   /// color from passing portals between source and dest polygon.
@@ -418,8 +426,6 @@ public:
   void RemoveAmbient();
   /// check if dest poly is visible to source poly
   bool VisiblePoly(csRadPoly *src, csRadPoly *dest);
-  /// map a frustum using given drawfunc.
-  void MapFrustum(csFrustum *shad, void (*drawfunc)(int, int, float, void*));
 
 };
 
