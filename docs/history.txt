@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+24-Aug-2001
+	- Fixed metaballs plugin so that it really works again now.
+	  This caused walktest+flarge to crash.
 23-Aug-2001
 	- Fog should now work for the metaballs plugin.
 	- Started work on vertex buffer support in the 3D renderers. There is

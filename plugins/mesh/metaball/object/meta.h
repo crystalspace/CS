@@ -84,7 +84,7 @@ public:
 
   csMetaBall (iMeshObjectFactory *fact);
   virtual ~csMetaBall ();
-  virtual bool Initialize ();
+  virtual bool Initialize (iObjectRegistry* object_reg);
 
   virtual void SetMaterial (iMaterialWrapper *tex)
   { th = tex; }
@@ -209,7 +209,9 @@ public:
 class csMetaBallFactory : public iMeshObjectFactory
 {
 public:
-  csMetaBallFactory( iBase *parent );
+  iObjectRegistry* object_reg;
+
+  csMetaBallFactory( iBase *parent, iObjectRegistry* object_reg);
   virtual ~csMetaBallFactory();
   SCF_DECLARE_IBASE;
   virtual iMeshObject* NewInstance();
@@ -226,6 +228,8 @@ public:
 class csMetaBallType : public iMeshObjectType
 {
 public:
+  iObjectRegistry* object_reg;
+
   SCF_DECLARE_IBASE;
 
   csMetaBallType ( iBase * );
@@ -235,11 +239,19 @@ public:
   {
     return ALL_FEATURES;
   }
+  bool Initialize (iObjectRegistry* object_reg)
+  {
+    csMetaBallType::object_reg = object_reg;
+    return true;
+  }
 
   struct eiPlugin : public iPlugin
   {
     SCF_DECLARE_EMBEDDED_IBASE(csMetaBallType);
-    virtual bool Initialize (iObjectRegistry*) { return true; }
+    virtual bool Initialize (iObjectRegistry* object_reg)
+    {
+      return scfParent->Initialize (object_reg);
+    }
     virtual bool HandleEvent (iEvent&) { return false; }
   } scfiPlugin;
 };

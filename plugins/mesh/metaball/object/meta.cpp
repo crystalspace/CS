@@ -119,10 +119,11 @@ void csMetaBall::InitTables(void)
   }
 }
 
-bool csMetaBall::Initialize ()
+bool csMetaBall::Initialize (iObjectRegistry* object_reg)
 {
   if (!initialize)
   {
+    csMetaBall::object_reg = object_reg;
     initialize = true;
     meta_balls = new MetaBall[num_meta_balls];
     memset(&mesh,0,sizeof(G3DTriangleMesh));
@@ -516,17 +517,20 @@ SCF_IMPLEMENT_IBASE(csMetaBallFactory)
   SCF_IMPLEMENTS_INTERFACE(iMeshObjectFactory)
 SCF_IMPLEMENT_IBASE_END
 
-csMetaBallFactory::csMetaBallFactory( iBase *par )
+csMetaBallFactory::csMetaBallFactory( iBase *par, iObjectRegistry* object_reg )
 {
   SCF_CONSTRUCT_IBASE(par);
+  csMetaBallFactory::object_reg = object_reg;
 }
+
 csMetaBallFactory::~csMetaBallFactory()
 {
 }
+
 iMeshObject* csMetaBallFactory::NewInstance()
 {
   csMetaBall* cm = new csMetaBall((iMeshObjectFactory *) this);
-  cm->Initialize();
+  cm->Initialize(object_reg);
   iMeshObject* im = SCF_QUERY_INTERFACE( cm, iMeshObject );
   im->DecRef();
   return im;
@@ -560,7 +564,7 @@ csMetaBallType::~csMetaBallType()
 
 iMeshObjectFactory* csMetaBallType::NewFactory()
 {
-  csMetaBallFactory* cm = new csMetaBallFactory(this);
+  csMetaBallFactory* cm = new csMetaBallFactory(this, object_reg);
   iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE(cm, iMeshObjectFactory);
   ifact->DecRef();
   return ifact;
