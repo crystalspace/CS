@@ -17,7 +17,7 @@ RegisterFileType OCc : .m ;
 
 actions OCc
 {
-  $(OBJC) -c -o $(<) $(OBJCFLAGS) $(CCDEFS) $(CCHDRS) $(>)
+  $(CMD.OBJC) -c -o $(<) $(OBJCFLAGS) $(CCDEFS) $(CCHDRS) $(>)
 }
 }
 
@@ -35,6 +35,6 @@ RegisterFileType OC++ : .mm ;
 
 actions OC++
 {
-  $(OBJCXX) -c -o $(<) $(OBJC++FLAGS) $(CCDEFS) $(CCHDRS) $(>)
+  $(CMD.OC++) -c -o $(<) $(OBJC++FLAGS) $(CCDEFS) $(CCHDRS) $(>)
 }
 }
