@@ -136,7 +136,7 @@
 struct iPlugIn;
 struct iVFS;
 
-SCF_VERSION (iSystem, 1, 0, 0);
+SCF_VERSION (iSystem, 2, 0, 0);
 
 /**
  * This interface serves as a way for plug-ins to query Crystal Space about
@@ -172,8 +172,6 @@ struct iSystem : public iBase
   virtual void StartShutdown () = 0;
   /// Check if system is shutting down
   virtual bool GetShutdown () = 0;
-  /// Get a VFS implementation if available
-  virtual iVFS* GetVFS () const = 0;
   /// Get a integer configuration value
   virtual int ConfigGetInt (const char *Section, const char *Key, int Default = 0) = 0;
   /// Get a string configuration value
@@ -220,6 +218,10 @@ struct iSystem : public iBase
   virtual void AddOptionCL (const char *iName, const char *iValue) = 0;
   /// Add a command-line name to the command-line names array
   virtual void AddNameCL (const char *iName) = 0;
+  /// Replace the Nth command-line option with a new value
+  virtual bool ReplaceOptionCL (const char *iName, const char *iValue, int iIndex = 0) = 0;
+  /// Replace the Nth command-line name with a new value
+  virtual bool ReplaceNameCL (const char *iValue, int iIndex = 0) = 0;
   /// A shortcut for requesting to load a plugin (before Initialize())
   inline void RequestPlugin (const char *iPluginName)
   { AddOptionCL ("plugin", iPluginName); }

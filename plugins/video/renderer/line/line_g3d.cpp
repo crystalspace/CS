@@ -95,13 +95,16 @@ bool csGraphics3DLine::Initialize (iSystem *iSys)
 {
   System = iSys;
 
-  iVFS* v = System->GetVFS();
+  iVFS* v = QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
   config = new csIniFile (v, "/config/line3d.cfg");
   v->DecRef(); v = NULL;
 
   width = height = -1;
 
-  const char *driver = config->GetStr ("Hardware", "Driver2D", LINE_SOFTWARE_2D_DRIVER);
+  const char *driver = iSys->GetOptionCL ("canvas");
+  if (!driver)
+    driver = config->GetStr ("Hardware", "Canvas", LINE_SOFTWARE_2D_DRIVER);
+
   G2D = LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
   if (!G2D)
     return false;

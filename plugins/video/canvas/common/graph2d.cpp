@@ -76,7 +76,8 @@ bool csGraphics2D::Initialize (iSystem* pSystem)
 
 csGraphics2D::~csGraphics2D ()
 {
-  if (FontServer) FontServer->DecRef ();
+  if (FontServer)
+    FontServer->DecRef ();
   Close ();
   if (Palette)
     delete [] Palette;

@@ -32,7 +32,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 # Local CFLAGS and libraries
-#LIBS._OGLGLIDE+=-L$(X11_PATH)/lib -lXext -lX11
+#LIBS._OGLGLIDE+=-L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
 
 CFLAGS.OGLGLIDE+=-I/usr/include/glide -I/usr/local/glide/include
 LIBS._OGLGLIDE+=-lglide2x

@@ -18,10 +18,10 @@
 
 #include "cssysdef.h"
 #include "video/canvas/openglx/glx2d.h"
+#include "video/canvas/common/x11comm.h"
 #include "csutil/scf.h"
 #include "cssys/csevent.h"
 #include "cssys/csinput.h"
-#include "cssys/unix/iunix.h"
 #include "csutil/csrect.h"
 #include "csutil/inifile.h"
 #include "isystem.h"
@@ -48,15 +48,7 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
   if (!csGraphics2DGLCommon::Initialize (pSystem))
     return false;
 
-  UnixSystem = QUERY_INTERFACE (System, iUnixSystemDriver);
-  if (!UnixSystem)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not support "
-                               "the IUnixSystemDriver interface\n");
-    return false;
-  }
-
-  iVFS* v = pSystem->GetVFS();
+  iVFS* v = QUERY_PLUGIN_ID (pSystem, CS_FUNCID_VFS, iVFS);
   csIniFile *config = new csIniFile(v,  "/config/opengl.cfg" );
   v->DecRef(); 
   v = NULL;
@@ -89,7 +81,7 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
   // Query system settings
   int sim_depth;
   bool do_shm;
-  UnixSystem->GetExtSettings (sim_depth, do_shm, do_hwmouse);
+  GetX11Settings (System, sim_depth, do_shm, do_hwmouse);
 
   dpy = XOpenDisplay (NULL);
   if (!dpy)
@@ -136,8 +128,6 @@ csGraphics2DGLX::~csGraphics2DGLX ()
   // Destroy your graphic interface
   XFree ((void*)active_GLVisual);
   Close ();
-  if (UnixSystem)
-    UnixSystem->DecRef ();
   if (dispdriver)
     dispdriver->DecRef();
  

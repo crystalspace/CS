@@ -49,7 +49,7 @@ bool csFreeTypeServer::Initialize (iSystem *pSystem)
   if (!succ)
     pSystem->Printf (MSG_FATAL_ERROR, "Could not create a TrueType engine instance !\n");
   else{
-    iVFS *v= pSystem->GetVFS ();
+    iVFS *v= QUERY_PLUGIN_ID (pSystem, CS_FUNCID_VFS, iVFS);
     csIniFile *ftini = new csIniFile ( v, "config/freetype.cfg");
     defaultSize = ftini->GetInt ("Default", "size", 10);
     platformID = ftini->GetInt ("Default", "platformid", 3);

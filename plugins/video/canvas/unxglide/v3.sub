@@ -46,7 +46,8 @@ else
 endif
 DESCRIPTION.$(GLIDX2D3) = $(DESCRIPTION.glidx2d3)
 SRC.GLIDX2D3 = plugins/video/canvas/unxglide/glidex2d.cpp \
-  plugins/video/canvas/glide2common/glide2common2d.cpp $(SRC.COMMON.DRV2D)
+  plugins/video/canvas/glide2common/glide2common2d.cpp \
+  plugins/video/canvas/common/x11comm.cpp $(SRC.COMMON.DRV2D)
 OBJ.GLIDX2D3 = $(OUT)glidx2d3$O $(OUT)glide3common2d$O \
   $(addprefix $(OUT), $(notdir $(SRC.COMMON.DRV2D:.cpp=$O)))
 

@@ -83,7 +83,7 @@ bool csSoundRenderSoftware::Initialize (iSystem *iSys)
 
 	m_piSystem = iSys;
 
-	iVFS* v = m_piSystem->GetVFS();
+	iVFS* v = QUERY_PLUGIN_ID (m_piSystem, CS_FUNCID_VFS, iVFS);
 	configsndsoft = new csIniFile (v, "/config/sndsoft.cfg");
 	v->DecRef(); v = NULL;
 	

@@ -20,7 +20,6 @@
 
 #include "cssysdef.h"
 #include "video/canvas/svgalib/svga.h"
-#include "cssys/unix/iunix.h"
 #include "csutil/csrect.h"
 #include "cssys/csinput.h"
 #include "isystem.h"
@@ -67,14 +66,6 @@ bool csGraphics2DSVGALib::Initialize (iSystem *pSystem)
 {
   if (!csGraphics2D::Initialize (pSystem))
     return false;
-
-  UnixSystem = QUERY_INTERFACE (System, iUnixSystemDriver);
-  if (!UnixSystem)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not support "
-                               "the IUnixSystemDriver interface\n");
-    return false;
-  }
 
   Font = 0;
   Memory = NULL;
@@ -148,8 +139,6 @@ csGraphics2DSVGALib::~csGraphics2DSVGALib(void)
 {
   // Destroy your graphic interface
   Close();
-  if (UnixSystem)
-    UnixSystem->DecRef ();
 }
 
 bool csGraphics2DSVGALib::Open(const char *Title)

@@ -32,7 +32,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 # Local CFLAGS and libraries
-#LIBS._OGLEMPTY+=-L$(X11_PATH)/lib -lXext -lX11
+#LIBS._OGLEMPTY+=-L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
 
 # The driver
 ifeq ($(USE_SHARED_PLUGINS),yes)

@@ -83,6 +83,10 @@ Compiled zip, jpeg and png libraries@*
 @sc{nasm} (Netwide Assembler) for @sc{dos}@*
 @uref{ftp://ftp.linuxgames.com/crystal/nasm/nasm-0.98e-bin-dos.zip}
 
+@noindent
+@sc{libdxe} (Dynamic Library Loader) for @sc{DJGPP}@*
+@uref{ftp://ftp.linuxgames.com:/crystal/support/dxe2_010.zip}
+
 @subsubheading Installation
 
 Follow these installation instructions:

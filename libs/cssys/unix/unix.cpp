@@ -30,37 +30,8 @@
 
 //------------------------------------------------------ The System driver ---//
 
-IMPLEMENT_IBASE_EXT (SysSystemDriver)
-  IMPLEMENTS_INTERFACE (iUnixSystemDriver)
-IMPLEMENT_IBASE_EXT_END
-
 SysSystemDriver::SysSystemDriver () : csSystemDriver ()
 {
-}
-
-void SysSystemDriver::SetSystemDefaults (csIniFile *config)
-{
-  csSystemDriver::SetSystemDefaults (config);
-  SimDepth = Config->GetInt ("VideoDriver", "SIMULATE_DEPTH", 0);
-  UseSHM = Config->GetYesNo ("VideoDriver", "XSHM", true);
-  HardwareCursor = Config->GetYesNo ("VideoDriver", "SystemMouseCursor", true);
-
-  const char *val;
-  if ((val = GetOptionCL ("shm")))
-    UseSHM = true;
-
-  if ((val = GetOptionCL ("noshm")))
-    UseSHM = false;
-
-  if ((val = GetOptionCL ("sdepth")))
-  {
-    SimDepth = atol (val);
-    if (SimDepth != 8 && SimDepth != 15 && SimDepth != 16 && SimDepth != 32)
-    {
-      Printf (MSG_FATAL_ERROR, "Crystal Space can't run in this simulated depth! (use 8, 15, 16, or 32)!\n");
-      exit (0);
-    }
-  }
 }
 
 void SysSystemDriver::Help ()
@@ -85,14 +56,4 @@ void SysSystemDriver::Loop(void)
 void SysSystemDriver::Sleep (int SleepTime)
 {
   usleep (SleepTime * 1000);
-}
-
-//------------------------------------------------------ XUnixSystemDriver ---//
-
-void SysSystemDriver::GetExtSettings (int &oSimDepth,
-  bool &oUseSHM, bool &oHardwareCursor)
-{
-  oSimDepth = SimDepth;
-  oUseSHM = UseSHM;
-  oHardwareCursor = HardwareCursor;
 }

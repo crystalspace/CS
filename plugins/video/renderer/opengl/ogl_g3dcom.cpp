@@ -212,11 +212,15 @@ bool csGraphics3DOGLCommon::NewInitialize (iSystem * iSys)
 {
   (System = iSys)->IncRef ();
 
-  iVFS* v = System->GetVFS();
+  iVFS* v = QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
   config = new csIniFile (v, "/config/opengl.cfg");
   v->DecRef(); v = NULL;
 
-  G2D = LOAD_PLUGIN (System, OPENGL_2D_DRIVER, NULL, iGraphics2D);
+  const char *driver = iSys->GetOptionCL ("canvas");
+  if (!driver)
+    driver = config->GetStr ("Display", "Canvas", OPENGL_2D_DRIVER);
+
+  G2D = LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
   if (!G2D)
     return 0;
 

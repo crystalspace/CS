@@ -1,4 +1,5 @@
 /*
+    Common routines for X-Windows drivers
     Copyright (C) 1998 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
@@ -16,17 +17,20 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IUNIX_H__
-#define __IUNIX_H__
+#ifndef __X11COMM_H__
+#define __X11COMM_H__
 
-#include "csutil/scf.h"
+#include "isystem.h"
 
-SCF_VERSION (iUnixSystemDriver, 0, 0, 1);
+/**
+ * Query user preferences through iSystem interface:
+ * (o) oHardwareCursor will be set if user desires hardware (system)
+ *     mouse cursor (vs software - drawn by CS engine)
+ * (o) oUseSHM will be set if user wants to use X11 shared memory
+ *     extension (it is not always available).
+ * (o) oSimDepth is the screen depth to simulate.
+ */
+extern void GetX11Settings (iSystem *iSys, int &oSimDepth, bool &oUseSHM,
+  bool &oHardwareCursor);
 
-struct iUnixSystemDriver : public iBase
-{
-  /// Get user settings
-  virtual void GetExtSettings (int &oSimDepth, bool &oUseSHM, bool &oHardwareCursor) = 0;
-};
-
-#endif // __IUNIX_H__
+#endif // __X11COMM_H__

@@ -22,10 +22,10 @@
 #include "csutil/scf.h"
 #include "cssys/csevent.h"
 #include "cssys/csinput.h"
-#include "cssys/unix/iunix.h"
 #include "csutil/inifile.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
+#include "video/canvas/common/x11comm.h"
 #include "video/renderer/glide/gllib.h"
 
 #ifdef GLIDE3
@@ -63,16 +63,6 @@ bool csGraphics2DGlideX::Initialize (iSystem *pSystem)
   if (!csGraphics2DGlideCommon::Initialize (pSystem))
     return false;
 
-  UnixSystem = QUERY_INTERFACE (System, iUnixSystemDriver);
-  if (!UnixSystem)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not support "
-                               "the iUnixSystemDriver interface\n");
-    return false;
-  }
-
-  Screen* screen_ptr;
-
   // if we are going to do glide in an Xwindow, 
   // we need to set some environment vars first...
   if (m_DoGlideInWindow)
@@ -86,12 +76,11 @@ bool csGraphics2DGlideX::Initialize (iSystem *pSystem)
   // Query system settings
   int sim_depth;
   bool do_shm;
-  UnixSystem->GetExtSettings (sim_depth, do_shm, do_hwmouse);
+  GetX11Settings (sim_depth, do_shm, do_hwmouse);
 
   dpy = XOpenDisplay (NULL);
 
   screen_num = DefaultScreen (dpy);
-  screen_ptr = DefaultScreenOfDisplay (dpy);
   display_width = DisplayWidth (dpy, screen_num);
   display_height = DisplayHeight (dpy, screen_num);
 
@@ -139,8 +128,6 @@ csGraphics2DGlideX::~csGraphics2DGlideX ()
   // Destroy your graphic interface
   GraphicsReady=0;
   Close ();
-  if (UnixSystem)
-    UnixSystem->DecRef ();
 }
 
 bool csGraphics2DGlideX::Open(const char *Title)

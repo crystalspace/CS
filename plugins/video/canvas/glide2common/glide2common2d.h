@@ -23,8 +23,6 @@
 #include "video/canvas/common/graph2d.h"
 #if defined(OS_BE)	// dh: is this OS-dependence necessary? 
 #include "cssys/be/beitf.h"
-#else
-#include "cssys/unix/iunix.h"
 #endif
 #include "csutil/inifile.h"
 #include "csutil/csrect.h"

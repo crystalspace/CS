@@ -21,7 +21,6 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "cssys/unix/iunix.h"
 
 #define XK_MISCELLANY 1
 #include <X11/Xlib.h>
@@ -32,9 +31,11 @@
 
 
 #ifdef DO_SHM
+extern "C" {
 #  include <X11/extensions/XShm.h>
 #  include <sys/ipc.h>
 #  include <sys/shm.h>
+}
 #endif /* DO_SHM */
 
 #ifdef XFREE86VM
@@ -90,9 +91,6 @@ class csGraphics2DXLib : public csGraphics2D
   unsigned char* sim_lt8;	// 8-bit lookup table (with 16-bit index) for simulated depth
   UShort* sim_lt16;		// 16-bit lookup table (with 8-bit index) for simulated depth
   
-  /// Pointer to DOS-specific interface
-  iUnixSystemDriver* UnixSystem;
-
   bool currently_full_screen;
 
 #ifdef XFREE86VM

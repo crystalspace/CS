@@ -100,9 +100,6 @@ endif
 # Flags for linker when building a GUI executable
 LFLAGS.EXE+=-Zstack 512
 
-# Flags for linker when building a GUI executable
-LFLAGS.EXE+=-Zstack 512
-
 # Flags for the linker which are used when building a shared library.
 LFLAGS.DLL=-Zdll
 

@@ -26,15 +26,12 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "cssys/unix/iunix.h"
 
 /// SVGALIB version.
 class csGraphics2DSVGALib : public csGraphics2D
 {
   /// Physical graphics context
   GraphicsContext physicalscreen;
-  /// Pointer to DOS-specific interface
-  iUnixSystemDriver* UnixSystem;
 
   /// Keep track of pressed keys
   bool keydown [128];

@@ -365,7 +365,7 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
   // configuration file for other plugins may (and almost always do) reside on
   // a VFS volume.
   Config = new csIniFile;
-  VFS = (iVFS*)LoadPlugIn("crystalspace.kernel.vfs", CS_FUNCID_VFS, "iVFS", 0);
+  VFS = LOAD_PLUGIN (this, "crystalspace.kernel.vfs", CS_FUNCID_VFS, iVFS);
 
   // Initialize configuration file
   if (iConfigName)
@@ -406,6 +406,15 @@ bool csSystemDriver::Initialize (int argc, const char* const argv[], const char 
     Printf (MSG_INITIALIZATION, "Using alternative 3D driver: %s\n", temp);
     PluginList.Push (new csPluginLoadRec (CS_FUNCID_VIDEO, temp));
     g3d_override = true;
+  }
+  if ((val = GetOptionCL ("canvas")))
+  {
+    char temp [100];
+    if (!strchr (val, '.'))
+    {
+      sprintf (temp, "crystalspace.graphics2d.%s", val);
+      ReplaceOptionCL ("canvas", temp);
+    }
   }
 
   // Eat all --plugin switches specified on the command line
@@ -527,7 +536,7 @@ void csSystemDriver::Close ()
   if (CmdManager)
     CmdManager->Close ();
   if (Auth)
-      Auth->Close();
+    Auth->Close();
   if (G3D)
     G3D->Close ();
 }
@@ -571,7 +580,7 @@ void csSystemDriver::NextFrame (time_t /*elapsed_time*/, time_t /*current_time*/
   if (Sound)
     Sound->Update ();
   if (NetMan)
-	NetMan->Update();
+    NetMan->Update();
 }
 
 bool csSystemDriver::ProcessEvents ()
@@ -607,14 +616,21 @@ void csSystemDriver::CollectOptions (int argc, const char* const argv[])
 {
   for (int i = 1; i < argc; i++)
   {
-    const char *opt = argv [i];
+    char *opt = (char *)argv [i];
     if (*opt == '-')
     {
       while (*opt == '-') opt++;
-      char* wopt = strnew (opt);
-      char *arg = strchr (wopt, '=');
-      if (arg) *arg++ = 0; else arg = wopt + strlen (wopt);
-      CommandLine.Push (new csCommandLineOption (wopt, arg));
+      char *arg = strchr (opt, '=');
+      if (arg)
+      {
+        char *newopt = new char [arg - opt + 1];
+        memcpy (newopt, opt, arg - opt);
+        (opt = newopt) [arg - opt] = 0;
+        arg = strnew (arg + 1);
+      }
+      else
+        opt = strnew (opt);
+      CommandLine.Push (new csCommandLineOption (opt, arg));
     }
     else
       CommandLineNames.Push (strnew (opt));
@@ -693,7 +709,8 @@ void csSystemDriver::Help ()
   Printf (MSG_STDOUT, "  -help              this help\n");
   Printf (MSG_STDOUT, "  -mode=<w>x<y>      set resolution (default=%dx%d)\n", FrameWidth, FrameHeight);
   Printf (MSG_STDOUT, "  -depth=<d>         set depth (default=%d bpp)\n", Depth);
-  Printf (MSG_STDOUT, "  -video=<s>         the 3D driver (opengl, glide, software, ...)\n");
+  Printf (MSG_STDOUT, "  -video=<s>         the 3D rendering driver (opengl, glide, software, ...)\n");
+  Printf (MSG_STDOUT, "  -canvas=<s>        the 2D canvas driver (asciiart, x2d, ...)\n");
   Printf (MSG_STDOUT, "  -plugin=<s>        load the plugin after all others\n");
 }
 
@@ -915,7 +932,7 @@ iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iFuncID,
     Printf (MSG_WARNING, "WARNING: could not load plugin `%s'\n", iClassID);
   else
   {
-    PlugIns.Push (new csPlugIn (p, iClassID, iFuncID));
+    int index = PlugIns.Push (new csPlugIn (p, iClassID, iFuncID));
     if (p->Initialize (this))
     {
       iBase *ret;
@@ -930,7 +947,7 @@ iBase *csSystemDriver::LoadPlugIn (const char *iClassID, const char *iFuncID,
       }
     }
     Printf (MSG_WARNING, "WARNING: failed to initialize plugin `%s'\n", iClassID);
-    PlugIns.Delete (PlugIns.Length () - 1);
+    PlugIns.Delete (index);
   }
   return NULL;
 }
@@ -1007,12 +1024,6 @@ void csSystemDriver::StartShutdown ()
 bool csSystemDriver::GetShutdown ()
 {
   return Shutdown;
-}
-
-iVFS* csSystemDriver::GetVFS () const
-{
-  VFS->IncRef();
-  return VFS;
 }
 
 int csSystemDriver::ConfigGetInt (const char *Section, const char *Key, int Default)
@@ -1135,7 +1146,7 @@ void csSystemDriver::GetMousePosition (int &x, int &y)
   y = Mouse.GetLastY ();
 }
 
-const char *csSystemDriver::GetOptionCL (const char *iName, int iIndex)
+csSystemDriver::csCommandLineOption *csSystemDriver::FindOptionCL (const char *iName, int iIndex)
 {
   int idx = CommandLine.FindKey (iName);
   if (idx >= 0)
@@ -1148,9 +1159,39 @@ const char *csSystemDriver::GetOptionCL (const char *iName, int iIndex)
       if (CommandLine.CompareKey (CommandLine.Get (idx), iName, 0) == 0)
         iIndex--;
     }
-    return ((csCommandLineOption *)CommandLine.Get (idx))->Value;
+    return (csCommandLineOption *)CommandLine.Get (idx);
   }
   return NULL;
+}
+
+bool csSystemDriver::ReplaceOptionCL (const char *iName, const char *iValue, int iIndex)
+{
+  csCommandLineOption *clo = FindOptionCL (iName, iIndex);
+  if (clo)
+  {
+    delete [] clo->Value;
+    clo->Value = strnew (iValue);
+    return true;
+  }
+  else
+    return false;
+}
+
+bool csSystemDriver::ReplaceNameCL (const char *iValue, int iIndex)
+{
+  if ((iIndex >= 0) && (iIndex < CommandLineNames.Length ()))
+  {
+    CommandLineNames.Replace (iIndex, strnew (iValue));
+    return true;
+  }
+  else
+    return false;
+}
+
+const char *csSystemDriver::GetOptionCL (const char *iName, int iIndex)
+{
+  csCommandLineOption *clo = FindOptionCL (iName, iIndex);
+  return clo ? clo->Value : NULL;
 }
 
 const char *csSystemDriver::GetNameCL (int iIndex)

@@ -130,12 +130,12 @@ class csSystemDriver : public iSystem
     char *Name;
     /// Option value
     char *Value;
-    /// Name and Value should be in same array (optimization)
+    /// Name and Value should be already allocated
     csCommandLineOption (char *iName, char *iValue)
     { Name = iName; Value = iValue; }
-    /// Destructor: assume that "delete [] Name" will remove also Value
+    /// Destructor
     ~csCommandLineOption ()
-    { delete [] Name; }
+    { delete [] Name; delete [] Value; }
   };
 
   class csCommandLineOptions : public csVector
@@ -147,6 +147,9 @@ class csSystemDriver : public iSystem
     virtual int CompareKey (csSome Item, csConstSome Key, int /*Mode*/) const
     { return strcmp (((csCommandLineOption *)Item)->Name, (const char*)Key); }
   };
+
+  // Find Nth command-line option and return a pointer to the object (or NULL)
+  csCommandLineOption *FindOptionCL (const char *iName, int iIndex);
 
 public:
   /// -------------------------- plug-ins --------------------------
@@ -365,8 +368,6 @@ public:
   virtual void StartShutdown ();
   /// check if system is shutting down
   virtual bool GetShutdown ();
-  /// Get a VFS implementation if available
-  virtual iVFS* GetVFS () const;
   /// Get a integer configuration value
   virtual int ConfigGetInt (const char *Section, const char *Key, int Default = 0);
   /// Get a string configuration value
@@ -414,6 +415,10 @@ public:
   virtual void AddOptionCL (const char *iName, const char *iValue);
   /// Add a command-line name to the command-line names array
   virtual void AddNameCL (const char *iName);
+  /// Replace the Nth command-line option with a new value
+  virtual bool ReplaceOptionCL (const char *iName, const char *iValue, int iIndex = 0);
+  /// Replace the Nth command-line name with a new value
+  virtual bool ReplaceNameCL (const char *iValue, int iIndex = 0);
   /// Called before forced suspend / after resuming suspend
   virtual void SuspendResume (bool iSuspend);
   /// Toggle console text output (for consoles that share text/graphics mode)

@@ -318,7 +318,7 @@ bool csGraphics3DDirect3DDx6::Initialize (iSystem *iSys)
 
   m_piSystem->Printf (MSG_INITIALIZATION, "\nDirect3DRender DX6.1 selected\n");
 
-  iVFS* v = m_piSystem->GetVFS();
+  iVFS* v = QUERY_PLUGIN_ID (m_piSystem, CS_FUNCID_VFS, iVFS);
   config = new csIniFile(v, "/config/direct3ddx6.cfg");
   v->DecRef(); v = NULL;
 

@@ -11,25 +11,23 @@
 #-----------------------------------------------------------------------------
 
 # Default list of plugins to build.  Note that you'll link all plugins into
-# executable in the case of static build
-ifndef PLUGINS
-  PLUGINS  = video/renderer video/canvas
-  PLUGINS += video/renderer/line video/renderer/null video/renderer/inf
-  PLUGINS += cscon
-  PLUGINS += csclear
-  PLUGINS += dungeon
-  PLUGINS += engine
-  PLUGINS += net/driver/socket net/netman
-  PLUGINS += font/server/csfont
-# PLUGINS += font/server/freefont
-# PLUGINS += csstdldr
-  PLUGINS += netspace/nstp netspace/nsmgr
-  PLUGINS += csauth/simple
-  PLUGINS += colldet/rapid
-  PLUGINS += metaball
-  PLUGINS += $(DETECTED_PLUGINS)
-endif
-
+# executable in the case of static build.  If you want additional plugins to
+# be built either define the environment variable PLUGINS or put a line similar
+# to those below into config.mak.
+PLUGINS += video/renderer video/canvas
+PLUGINS += video/renderer/line video/renderer/null video/renderer/inf
+PLUGINS += cscon 
+PLUGINS += csclear 
+PLUGINS += dungeon 
+PLUGINS += engine
+PLUGINS += net/driver/socket net/netman 
+PLUGINS += font/server/csfont 
+#PLUGINS += font/server/freefont
+#PLUGINS += csstdldr
+PLUGINS += netspace/nstp netspace/nsmgr 
+PLUGINS += csauth/simple 
+PLUGINS += colldet/rapid
+PLUGINS += metaball
 
 #-----------------------------------------------------------------------------
 # Static Settings            *** TAKE NOTE ***

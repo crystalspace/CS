@@ -64,7 +64,7 @@ bool csGraphics2DAA::Initialize (iSystem *pSystem)
   if (!csGraphics2D::Initialize (pSystem))
     return false;
 
-  iVFS* v = pSystem->GetVFS();
+  iVFS* v = QUERY_PLUGIN_ID (pSystem, CS_FUNCID_VFS, iVFS);
   config = new csIniFile (v, "/config/asciiart.cfg");
   v->DecRef(); v = NULL;
 

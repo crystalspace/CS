@@ -23,7 +23,6 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-//#include "cssys/unix/iunix.h"
 #include <allegro.h>
 
 /// DOS Allegro 2D graphics driver
@@ -31,8 +30,6 @@ class csGraphics2DAlleg : public csGraphics2D
 {
   /// Palette has been changed?
   bool PaletteChanged;
-  /// Pointer to Unix-specific interface
-  //iUnixSystemDriver* UnixSystem;
   int keydown [128];
   int x_mouse;
   int y_mouse; /* Previously recorded mouse position */

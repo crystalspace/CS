@@ -99,7 +99,7 @@ bool csGraphics3DInfinite::Initialize (iSystem *iSys)
 {
   System = iSys;
 
-  iVFS* v = System->GetVFS();
+  iVFS* v = QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
   config = new csIniFile (v, "/config/inf3d.cfg");
   v->DecRef(); v = NULL;
 

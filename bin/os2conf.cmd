@@ -200,13 +200,28 @@
   call saycon ANSI.LGREEN"Checking whenever OpenGL toolkit is installed ..."
   if (SysSearchPath("LIBRARY_PATH", "opengl.lib") \= "") then
   do
-    say 'PLUGINS += plugins/canvas/openglos2 plugins/renderer/opengl';
+    say 'PLUGINS += video/canvas/openglos2 video/renderer/opengl';
     call saycon ANSI.LCYAN||"      found"
   end
   else
     call problem "low",
       "OpenGL library has not been found along your LIBRARY_PATH. You"NL,
       " won't be able to build OpenGL renderer and OpenGL 2D drivers for OS/2";
+
+  call saycon ANSI.LGREEN"Checking if XFree86/2 is installed ..."
+  X11ROOT = value('X11ROOT',,'os2environment');
+  if (X11ROOT \= "") then
+  do
+    say 'X11_PATH = 'X11ROOT'/XFree86';
+    say 'PLUGINS += video/canvas/softx';
+    say 'USE_XFREE86VM = yes';
+    say 'X11_EXTRA_LIBS = -lshm';
+    call saycon ANSI.LCYAN||"      found"
+  end
+  else
+    call problem "low",
+      "XFree86 for OS/2 has not been found. You won't be able to"NL,
+      " compile and use the X11 video canvas driver";
 
   /* Restore console color to gray */
   call outcon ANSI.LGRAY;

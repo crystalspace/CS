@@ -186,7 +186,7 @@ csGraphics3DSoftwareCommon::~csGraphics3DSoftwareCommon ()
 
 void csGraphics3DSoftwareCommon::NewInitialize ()
 {
-  iVFS* v = System->GetVFS();
+  iVFS* v = QUERY_PLUGIN_ID (System, CS_FUNCID_VFS, iVFS);
   config = new csIniFile (v, "/config/soft3d.cfg");
   v->DecRef(); v = NULL;
 

@@ -32,7 +32,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 # We need also the X libs
 CFLAGS.LINEX2D+=-I$(X11_PATH)/include
-LIBS.LINEX2D+=-L$(X11_PATH)/lib -lXext -lX11
+LIBS.LINEX2D+=-L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
 
 ifeq ($(USE_XFREE86VM),yes)
   CFLAGS.LINEX2D+=-DXFREE86VM
@@ -85,17 +85,3 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
-
-#------------------------------------------------------------------ config ---#
-ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)
-
-# Default value for DO_SHM
-ifndef DO_SHM
-  DO_SHM = yes
-endif
-
-ifeq ($(DO_SHM)$(findstring DO_SHM,$(MAKE_VOLATILE_H)),yes)
-  MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define DO_SHM$">>volatile.tmp
-endif
-
-endif # ifeq ($(ROOTCONFIG)/$(MAKESECTION),volatile/rootdefines)

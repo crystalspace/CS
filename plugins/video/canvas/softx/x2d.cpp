@@ -19,17 +19,16 @@
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "csutil/scf.h"
-#include "csutil/csstring.h"
-#include "cssys/unix/iunix.h"
 #include "cssys/csevent.h"
-#include "video/canvas/softx/x2d.h"
+#include "video/canvas/common/x11comm.h"
 #include "csutil/csrect.h"
 #include "isystem.h"
+#include "x2d.h"
 
 IMPLEMENT_FACTORY (csGraphics2DXLib)
 
 EXPORT_CLASS_TABLE (x2d)
-  EXPORT_CLASS (csGraphics2DXLib, "crystalspace.graphics2d.xlib",
+  EXPORT_CLASS (csGraphics2DXLib, "crystalspace.graphics2d.x2d",
     "X-Windows 2D graphics driver for Crystal Space")
 EXPORT_CLASS_TABLE_END
 
@@ -38,28 +37,21 @@ IMPLEMENT_IBASE (csGraphics2DXLib)
   IMPLEMENTS_INTERFACE (iGraphics2D)
 IMPLEMENT_IBASE_END
 
-// csGraphics2DXLib functions
 csGraphics2DXLib::csGraphics2DXLib (iBase *iParent) :
-  csGraphics2D (), xim (NULL), cmap (0),
+  csGraphics2D (), dpy (NULL), xim (NULL), cmap (0),
   sim_lt8 (NULL), sim_lt16 (NULL)
 {
   CONSTRUCT_IBASE (iParent);
+
+  EmptyMouseCursor = 0;
+  memset (&MouseCursor, 0, sizeof (MouseCursor));
+  leader_window = window = 0;
 }
 
 bool csGraphics2DXLib::Initialize (iSystem *pSystem)
 {
   if (!csGraphics2D::Initialize (pSystem))
     return false;
-
-  UnixSystem = QUERY_INTERFACE (System, iUnixSystemDriver);
-  if (!UnixSystem)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not support "
-                               "the iUnixSystemDriver interface\n");
-    return false;
-  }
-
-  Screen* screen_ptr;
 
   // Open display
   dpy = XOpenDisplay (NULL);
@@ -71,23 +63,21 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
   }
 
   // Query system settings
-  UnixSystem->GetExtSettings (sim_depth, do_shm, do_hwmouse);
+  GetX11Settings (System, sim_depth, do_shm, do_hwmouse);
 
   screen_num = DefaultScreen (dpy);
   root_window = RootWindow (dpy, screen_num);
-  screen_ptr = DefaultScreenOfDisplay (dpy);
   display_width = DisplayWidth (dpy, screen_num);
   display_height = DisplayHeight (dpy, screen_num);
 
   // First make a window which is never mapped (trick from gtk to get the main
   // window to behave under certain window managers, themes and circumstances)
-  leader_window = XCreateSimpleWindow(dpy, root_window,
-					  10, 10, 10, 10, 0, 0 , 0);
+  leader_window = XCreateSimpleWindow(dpy, root_window, 10, 10, 10, 10, 0, 0 , 0);
   XClassHint *class_hint = XAllocClassHint();
   class_hint->res_name = "Xsoft Crystal Space";
   class_hint->res_class = "Crystal Space";
   XmbSetWMProperties (dpy, leader_window,
-                      NULL, NULL, NULL, 0, 
+                      NULL, NULL, NULL, 0,
                       NULL, NULL, class_hint);
 
   XFree (class_hint);
@@ -147,30 +137,30 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
     {
       case 8:
         pfmt.RedMask = pfmt.GreenMask = pfmt.BlueMask = 0;
-	pfmt.PalEntries = 256;
-	pfmt.PixelBytes = 1;
-	break;
+      	pfmt.PalEntries = 256;
+      	pfmt.PixelBytes = 1;
+      	break;
       case 15:
       	pfmt.RedMask   = 0x1f << 10;
       	pfmt.GreenMask = 0x1f << 5;
       	pfmt.BlueMask  = 0x1f;
-	pfmt.PalEntries = 0;
-	pfmt.PixelBytes = 2;
-	break;
+      	pfmt.PalEntries = 0;
+      	pfmt.PixelBytes = 2;
+      	break;
       case 16:
       	pfmt.RedMask   = 0x1f << 11;
       	pfmt.GreenMask = 0x3f << 5;
       	pfmt.BlueMask  = 0x1f;
-	pfmt.PalEntries = 0;
-	pfmt.PixelBytes = 2;
-	break;
+      	pfmt.PalEntries = 0;
+      	pfmt.PixelBytes = 2;
+      	break;
       case 32:
       	pfmt.RedMask = 0xff << 16;
-	pfmt.GreenMask = 0xff << 8;
-	pfmt.BlueMask = 0xff;
-	pfmt.PalEntries = 0;
-	pfmt.PixelBytes = 4;
-	break;
+      	pfmt.GreenMask = 0xff << 8;
+      	pfmt.BlueMask = 0xff;
+      	pfmt.PalEntries = 0;
+      	pfmt.PixelBytes = 4;
+      	break;
     }
     pfmt.complete ();
   }
@@ -264,8 +254,6 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
 csGraphics2DXLib::~csGraphics2DXLib(void)
 {
   Close();
-  if (UnixSystem)
-    UnixSystem->DecRef ();
   delete [] sim_lt8;
   delete [] sim_lt16;
 }
@@ -300,16 +288,19 @@ bool csGraphics2DXLib::Open(const char *Title)
 #endif
 
   WMwindow = XCreateWindow (dpy, root_window, 64, 16, Width,Height, 4,
-    vinfo.depth, InputOutput, visual,
-    CWBorderPixel | (cmap ? CWColormap : 0), &swa);
+    vinfo.depth, InputOutput, visual, CWBorderPixel | (cmap ? CWColormap : 0), &swa);
 
   XSelectInput (dpy, WMwindow, FocusChangeMask | KeyPressMask |
     KeyReleaseMask | StructureNotifyMask);
 
+  // Intern WM_DELETE_WINDOW and set window manager protocol
+  // (Needed to catch user using window manager "delete window" button)
+  wm_delete_window = XInternAtom (dpy, "WM_DELETE_WINDOW", False);
+  XSetWMProtocols (dpy, WMwindow, &wm_delete_window, 1);
+
   window = XCreateWindow (dpy, WMwindow, 0, 0,
-			  Width, Height, 0, vinfo.depth, InputOutput, visual,
-			  CWBackPixel | CWBorderPixel | CWBitGravity | 
-			  (cmap ? CWColormap : 0), &swa);
+    Width, Height, 0, vinfo.depth, InputOutput, visual,
+    CWBackPixel | CWBorderPixel | CWBitGravity | (cmap ? CWColormap : 0), &swa);
 
   XStoreName (dpy, WMwindow, Title);
 
@@ -320,36 +311,35 @@ bool csGraphics2DXLib::Open(const char *Title)
   XSetGraphicsExposures (dpy, gc, False);
 
   XSelectInput (dpy, window, ExposureMask | KeyPressMask | KeyReleaseMask |
-    FocusChangeMask | PointerMotionMask | ButtonPressMask | 
+    FocusChangeMask | PointerMotionMask | ButtonPressMask |
     ButtonReleaseMask | StructureNotifyMask);
 
   if (cmap)
     XSetWindowColormap (dpy, window, cmap);
 
-  // Intern WM_DELETE_WINDOW and set window manager protocol
-  // (Needed to catch user using window manager "delete window" button)
-  wm_delete_window = XInternAtom (dpy, "WM_DELETE_WINDOW", False);
-  XSetWMProtocols (dpy, window, &wm_delete_window, 1);
-
   // Now communicate fully to the window manager our wishes using the non-mapped
   // leader_window to form a window_group
   XSizeHints normal_hints;
-  normal_hints.flags = PSize | PResizeInc;
+  normal_hints.flags = PMinSize | PMaxSize | PSize | PResizeInc;
   normal_hints.width = Width;
   normal_hints.height = Height;
   normal_hints.width_inc = 1;
   normal_hints.height_inc = 1;
-  XSetWMNormalHints (dpy, window, &normal_hints);
+  normal_hints.min_width = 320;
+  normal_hints.min_height = 200;
+  normal_hints.max_width = display_width;
+  normal_hints.max_height = display_height;
+  XSetWMNormalHints (dpy, WMwindow, &normal_hints);
 
   XWMHints wm_hints;
   wm_hints.flags = InputHint | StateHint | WindowGroupHint;
   wm_hints.input = True;
   wm_hints.window_group = leader_window;
   wm_hints.initial_state = NormalState;
-  XSetWMHints (dpy, window, &wm_hints);
+  XSetWMHints (dpy, WMwindow, &wm_hints);
 
   Atom wm_client_leader = XInternAtom (dpy, "WM_CLIENT_LEADER", False);
-  XChangeProperty (dpy, window, wm_client_leader, XA_WINDOW, 32, 
+  XChangeProperty (dpy, window, wm_client_leader, XA_WINDOW, 32,
 		   PropModeReplace, (const unsigned char*)&leader_window, 1);
   XmbSetWMProperties (dpy, window, Title, Title,
                       NULL, 0, NULL, NULL, NULL);
@@ -364,14 +354,14 @@ bool csGraphics2DXLib::Open(const char *Title)
   EmptyMouseCursor = XCreatePixmapCursor (dpy, EmptyPixmap, EmptyPixmap,
     &Black, &Black, 0, 0);
   MouseCursor [csmcArrow] = XCreateFontCursor (dpy, XC_left_ptr);
-//MouseCursor [csmcLens] = XCreateFontCursor (dpy, 
+//MouseCursor [csmcLens] = XCreateFontCursor (dpy,
   MouseCursor [csmcCross] = XCreateFontCursor (dpy, 33/*XC_crosshair*/);
   MouseCursor [csmcPen] = XCreateFontCursor (dpy, XC_hand2/*XC_pencil*/);
   MouseCursor [csmcMove] = XCreateFontCursor (dpy, XC_fleur);
   /// Diagonal (\) resizing cursor
-//MouseCursor [csmcSizeNWSE] = XCreateFontCursor (dpy, 
+//MouseCursor [csmcSizeNWSE] = XCreateFontCursor (dpy,
   /// Diagonal (/) resizing cursor
-//MouseCursor [csmcSizeNESW] = XCreateFontCursor (dpy, 
+//MouseCursor [csmcSizeNESW] = XCreateFontCursor (dpy,
   /// Vertical sizing cursor
   MouseCursor [csmcSizeNS] = XCreateFontCursor (dpy, XC_sb_v_double_arrow);
   /// Horizontal sizing cursor
@@ -436,7 +426,7 @@ bool csGraphics2DXLib::AllocateMemory ()
     }
     if (do_shm)
     {
-      xim = XShmCreateImage(dpy, DefaultVisual(dpy,sc), disp_depth, 
+      xim = XShmCreateImage(dpy, DefaultVisual(dpy,sc), disp_depth,
 			    ZPixmap, 0, &shmi, Width, Height);
       if (!xim)
       {
@@ -834,33 +824,27 @@ void csGraphics2DXLib::recompute_grey_palette ()
 
 bool csGraphics2DXLib::PerformExtension (const char* args)
 {
-  csString ext(args);
-
-  if (ext.CompareNoCase ("sim_pal"))
+  if (!strcasecmp (args, "sim_pal"))
   {
     recompute_simulated_palette ();
     return true;
   }
-  else if (ext.CompareNoCase ("sim_grey"))
+  else if (!strcasecmp (args, "sim_grey"))
   {
     recompute_grey_palette ();
     return true;
   }
-  else if (ext.CompareNoCase ("sim_332"))
+  else if (!strcasecmp (args, "sim_332"))
   {
     restore_332_palette ();
     return true;
   }
-  else if (ext.CompareNoCase ("fullscreen"))
+  else if (!strcasecmp (args, "fullscreen"))
   {
     if (currently_full_screen)
-    {
       LeaveFullScreen ();
-    }
     else
-    {
       EnterFullScreen ();
-    }
   }
 
   return false;
@@ -868,6 +852,13 @@ bool csGraphics2DXLib::PerformExtension (const char* args)
 
 void csGraphics2DXLib::Print (csRect *area)
 {
+  // If we won't tell X-Windows to flush, the applications starts to response
+  // slowly in some circumstances (on some machines, OSes, configurations etc)
+  // Since we flush at START of this routine, we're actually flushing PREVIOUS
+  // frame, thus after doing XPutImage the server gets a chance (during
+  // computation of next frame) to flush the image without our "help".
+  XFlush (dpy); XSync (dpy, false);
+
   if (sim_depth)
   {
     if (sim_depth == 16 && real_pfmt.PixelBytes == 4)
@@ -1039,10 +1030,6 @@ void csGraphics2DXLib::Print (csRect *area)
     else
       XPutImage (dpy, window, gc, xim, 0, 0, 0, 0, Width, Height);
   }
-#if 0 // @@@ Temporarily disabled
-  if (!LoopStarted)
-    XFlush (dpy);
-#endif
 }
 
 void csGraphics2DXLib::SetRGB(int i, int r, int g, int b)
@@ -1247,17 +1234,17 @@ bool csGraphics2DXLib::HandleEvent (csEvent &/*Event*/)
 	if (!resize)
         {
 	  csRect rect (event.xexpose.x, event.xexpose.y,
-		       event.xexpose.x + event.xexpose.width, 
+		       event.xexpose.x + event.xexpose.width,
 		       event.xexpose.y + event.xexpose.height);
 	  Print (&rect);
 	}
-	break; 
+	break;
       default:
         break;
     }
 
   if (resize)
-  { 
+  {
     if (!ReallocateMemory ())
     {
       CsPrintf (MSG_FATAL_ERROR, "Unable to allocate memory on resize!\n");
@@ -1288,17 +1275,17 @@ bool csGraphics2DXLib::ReallocateMemory ()
     return false;
   }
 
-  // Warning: reallocating memory from  csGraphics2D...need to promote 
+  // Warning: reallocating memory from  csGraphics2D...need to promote
   // this eventually
   delete [] LineAddress;
   LineAddress = new int [Height];
   if (LineAddress == NULL) return false;
- 
+
   // Initialize scanline address array
   int i,addr,bpl = Width * pfmt.PixelBytes;
   for (i = 0, addr = 0; i < Height; i++, addr += bpl)
     LineAddress[i] = addr;
- 
+
   SetClipRect (0, 0, Width, Height);
   XSync (dpy, False);
   return true;
@@ -1308,7 +1295,7 @@ bool csGraphics2DXLib::ReallocateMemory ()
 Bool GetModeInfo(Display *dpy, int scr, XF86VidModeModeInfo *info)
 {
   XF86VidModeModeLine *l;
-    
+
   l = (XF86VidModeModeLine*) ((char*) info + sizeof(info->dotclock));
 
   return XF86VidModeGetModeLine (dpy, scr, (int *) &info->dotclock, l);
@@ -1445,8 +1432,11 @@ void csGraphics2DXLib::EnterFullScreen()
 #endif // XFREE86VM
 }
 
-void csGraphics2DXLib::LeaveFullScreen()
+void csGraphics2DXLib::LeaveFullScreen ()
 {
+  if (!dpy)
+    return;
+
 #ifdef XFREE86VM
   XF86VidModeModeInfo mode;
   int pointerX;

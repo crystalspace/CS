@@ -21,7 +21,6 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "cssys/unix/iunix.h"
 #include "video/canvas/glide2common/iglide2d.h"
 #include "video/canvas/glide2common/glide2common2d.h"
 
@@ -72,9 +71,6 @@ private:
   Cursor EmptyMouseCursor;
   /// A empty pixmap
   Pixmap EmptyPixmap;
-
-  /// Pointer to Unix-specific interface
-  iUnixSystemDriver* UnixSystem;
 
 public:
 //  DECLARE_IBASE;

@@ -34,7 +34,7 @@ ifeq ($(MAKESECTION),postdefines)
 LIBS.ASCIIART+=$(LFLAGS.l)aa
 # On Unix we need additional libraries
 ifdef X11_PATH
-  LIBS.ASCIIART+=-lgpm -lslang -L$(X11_PATH)/lib -lXext -lX11
+  LIBS.ASCIIART+=-lgpm -lslang -L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
 endif
 
 # The 2D Ascii Art driver

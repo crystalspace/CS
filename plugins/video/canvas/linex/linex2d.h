@@ -21,7 +21,6 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "cssys/unix/iunix.h"
 
 #define XK_MISCELLANY 1
 #include <X11/Xlib.h>
@@ -29,12 +28,6 @@
 #include <X11/keysymdef.h>
 #include <X11/cursorfont.h>
 #include <X11/Xatom.h>
-
-#ifdef DO_SHM
-#  include <X11/extensions/XShm.h>
-#  include <sys/ipc.h>
-#  include <sys/shm.h>
-#endif /* DO_SHM */
 
 #ifdef XFREE86VM
 #  include <X11/extensions/xf86vmode.h>
@@ -76,9 +69,6 @@ class csGraphics2DLineXLib : public csGraphics2D
   Cursor EmptyMouseCursor;
   /// A empty pixmap
   Pixmap EmptyPixmap;
-
-  /// Pointer to DOS-specific interface
-  iUnixSystemDriver* UnixSystem;
 
   bool currently_full_screen;
 

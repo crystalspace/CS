@@ -21,7 +21,6 @@
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "csalleg.h"
-//#include "cssys/unix/iunix.h"
 #include "cssys/csinput.h"
 #include "csutil/csrect.h"
 #include "csutil/csstring.h"
@@ -67,24 +66,12 @@ csGraphics2DAlleg::csGraphics2DAlleg (iBase *iParent) :
 csGraphics2DAlleg::~csGraphics2DAlleg ()
 {
   Close ();
-//  if (UnixSystem)
-//    UnixSystem->DecRef ();
 }
 
 bool csGraphics2DAlleg::Initialize (iSystem *pSystem)
 {
   if (!csGraphics2D::Initialize (pSystem))
     return false;
-
-#if 0
-  UnixSystem = QUERY_INTERFACE (System, iUnixSystemDriver);
-  if (!UnixSystem)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "The system driver does not support "
-                             "the IUnixSystemDriver interface\n");
-    return false;
-  }
-#endif
 
   switch (Depth)
   {

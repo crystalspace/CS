@@ -32,7 +32,7 @@ ifeq ($(MAKESECTION),postdefines)
 
 # We need also the X libs
 CFLAGS.X2D+=-I$(X11_PATH)/include
-LIBS.X2D+=-L$(X11_PATH)/lib -lXext -lX11
+LIBS.X2D+=-L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
  
 ifeq ($(USE_XFREE86VM),yes)
   CFLAGS.X2D+=-DXFREE86VM
@@ -51,7 +51,8 @@ else
   CFLAGS.STATIC_SCF+=$(CFLAGS.D)SCL_X2D
 endif
 DESCRIPTION.$(XLIB2D) = $(DESCRIPTION.x2d)
-SRC.XLIB2D = $(wildcard plugins/video/canvas/softx/*.cpp $(SRC.COMMON.DRV2D))
+SRC.XLIB2D = $(wildcard plugins/video/canvas/softx/*.cpp \
+  plugins/video/canvas/common/x11comm.cpp $(SRC.COMMON.DRV2D))
 OBJ.XLIB2D = $(addprefix $(OUT),$(notdir $(SRC.XLIB2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)

@@ -37,7 +37,7 @@ enum
   csevJoystickDown,		// A joystick button has been pressed
   csevJoystickUp,		// A joystick button has been released
   csevCommand,			// Somebody(-thing) sent a command
-  csevBroadcast,			// Somebody(-thing) sent a broadcast command
+  csevBroadcast,		// Somebody(-thing) sent a broadcast command
   csevNetwork			// Something has arrived on network.
 };
 

@@ -31,7 +31,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 # Local CFLAGS and libraries
-LIBS._GLX2D+=-L$(X11_PATH)/lib -lXext -lX11
+LIBS._GLX2D+=-L$(X11_PATH)/lib -lXext -lX11 $(X11_EXTRA_LIBS)
 
 ifeq ($(USE_MESA),1)
   ifdef MESA_PATH
@@ -67,6 +67,7 @@ else
 endif
 DESCRIPTION.$(GLX2D) = $(DESCRIPTION.glx2d)
 SRC.GLX2D = $(wildcard plugins/video/canvas/openglx/*.cpp \
+  plugins/video/canvas/common/x11comm.cpp \
   $(SRC.COMMON.DRV2D.OPENGL) $(SRC.COMMON.DRV2D))
 OBJ.GLX2D = $(addprefix $(OUT),$(notdir $(SRC.GLX2D:.cpp=$O)))
 

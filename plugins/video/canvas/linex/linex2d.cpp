@@ -20,7 +20,6 @@
 #include "cssysdef.h"
 #include "csutil/scf.h"
 #include "csutil/csstring.h"
-#include "cssys/unix/iunix.h"
 #include "cssys/csevent.h"
 #include "video/canvas/linex/linex2d.h"
 #include "csutil/csrect.h"
@@ -29,7 +28,7 @@
 IMPLEMENT_FACTORY (csGraphics2DLineXLib)
 
 EXPORT_CLASS_TABLE (linex2d)
-  EXPORT_CLASS (csGraphics2DLineXLib, "crystalspace.graphics2d.linexlib",
+  EXPORT_CLASS (csGraphics2DLineXLib, "crystalspace.graphics2d.linex2d",
     "X-Windows 2D graphics driver (line3d) for Crystal Space")
 EXPORT_CLASS_TABLE_END
 
@@ -38,29 +37,20 @@ IMPLEMENT_IBASE (csGraphics2DLineXLib)
   IMPLEMENTS_INTERFACE (iGraphics2D)
 IMPLEMENT_IBASE_END
 
-// csGraphics2DLineXLib functions
 csGraphics2DLineXLib::csGraphics2DLineXLib (iBase *iParent) :
-  csGraphics2D (), cmap (0)
+  csGraphics2D (), dpy (NULL), cmap (0)
 {
   CONSTRUCT_IBASE (iParent);
-  window = 0;
-  back = 0;
+
+  EmptyMouseCursor = 0;
+  memset (&MouseCursor, 0, sizeof (MouseCursor));
+  leader_window = window = 0;
 }
 
 bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
 {
   if (!csGraphics2D::Initialize (pSystem))
     return false;
-
-  UnixSystem = QUERY_INTERFACE (System, iUnixSystemDriver);
-  if (!UnixSystem)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "FATAL: The system driver does not support "
-                               "the iUnixSystemDriver interface\n");
-    return false;
-  }
-
-  Screen* screen_ptr;
 
   // Open display
   dpy = XOpenDisplay (NULL);
@@ -71,25 +61,22 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
     exit (-1);
   }
 
-  // Query system settings
-  int sim_depth;
-  bool do_shm;
-  UnixSystem->GetExtSettings (sim_depth, do_shm, do_hwmouse);
+  do_hwmouse = System->ConfigGetYesNo ("VideoDriver", "SystemMouseCursor", true);
 
   screen_num = DefaultScreen (dpy);
   root_window = RootWindow (dpy, screen_num);
-  screen_ptr = DefaultScreenOfDisplay (dpy);
   display_width = DisplayWidth (dpy, screen_num);
   display_height = DisplayHeight (dpy, screen_num);
 
-  leader_window = XCreateSimpleWindow(dpy, root_window,
-					  10, 10, 10, 10, 0, 0 , 0);
+  leader_window = XCreateSimpleWindow (dpy, root_window, 10, 10, 10, 10, 0, 0 , 0);
   XClassHint *class_hint = XAllocClassHint();
   class_hint->res_name = "XLine Crystal Space";
   class_hint->res_class = "Crystal Space";
   XmbSetWMProperties (dpy, leader_window,
                       NULL, NULL, NULL, 0, 
                       NULL, NULL, class_hint);
+
+  XFree (class_hint);
 
   // Determine visual information.
   // Try in order:
@@ -167,8 +154,6 @@ bool csGraphics2DLineXLib::Initialize (iSystem *pSystem)
 csGraphics2DLineXLib::~csGraphics2DLineXLib(void)
 {
   Close();
-  if (UnixSystem)
-    UnixSystem->DecRef ();
 }
 
 bool csGraphics2DLineXLib::Open(const char *Title)
@@ -196,15 +181,18 @@ bool csGraphics2DLineXLib::Open(const char *Title)
     CWOverrideRedirect | CWBorderPixel | (cmap ? CWColormap : 0), &swa);
 #endif
 
-  WMwindow = XCreateWindow (dpy, root_window,
-    64, 16, Width,Height, 4,
-    vinfo.depth, InputOutput, visual,
-    CWBorderPixel | (cmap ? CWColormap : 0), &swa);
-
+  WMwindow = XCreateWindow (dpy, root_window, 64, 16, Width, Height, 4,
+    vinfo.depth, InputOutput, visual, CWBorderPixel | (cmap ? CWColormap : 0), &swa);
+  
   XSelectInput (dpy, WMwindow, FocusChangeMask | KeyPressMask |
-  	KeyReleaseMask | StructureNotifyMask);
+    KeyReleaseMask | StructureNotifyMask);
 
-  window = XCreateWindow (dpy, WMwindow, 64, 16,
+  // Intern WM_DELETE_WINDOW and set window manager protocol
+  // (Needed to catch user using window manager "delete window" button)
+  wm_delete_window = XInternAtom (dpy, "WM_DELETE_WINDOW", False);
+  XSetWMProtocols (dpy, WMwindow, &wm_delete_window, 1);
+
+  window = XCreateWindow (dpy, WMwindow, 0, 0,
     Width, Height, 0, vinfo.depth, InputOutput, visual,
     CWBackPixel | CWBorderPixel | CWBitGravity | (cmap ? CWColormap : 0), &swa);
 
@@ -216,35 +204,33 @@ bool csGraphics2DLineXLib::Open(const char *Title)
   XSetLineAttributes (dpy, gc, 0, LineSolid, CapButt, JoinMiter);
   XSetGraphicsExposures (dpy, gc, False);
 
-  XSetWindowAttributes attr;
-  attr.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask |
-    FocusChangeMask | PointerMotionMask | ButtonPressMask | 
-    ButtonReleaseMask | StructureNotifyMask;
-
-  XChangeWindowAttributes (dpy, window, CWEventMask, &attr);
+  XSelectInput (dpy, window, ExposureMask | KeyPressMask | KeyReleaseMask |
+    FocusChangeMask | PointerMotionMask | ButtonPressMask |
+    ButtonReleaseMask | StructureNotifyMask);
 
   if (cmap)
     XSetWindowColormap (dpy, window, cmap);
 
-  // Intern WM_DELETE_WINDOW and set window manager protocol
-  // (Needed to catch user using window manager "delete window" button)
-  wm_delete_window = XInternAtom (dpy, "WM_DELETE_WINDOW", False);
-  XSetWMProtocols (dpy, window, &wm_delete_window, 1);
-
+  // Now communicate fully to the window manager our wishes using the non-mapped
+  // leader_window to form a window_group
   XSizeHints normal_hints;
-  normal_hints.flags = PSize | PResizeInc;
+  normal_hints.flags = PMinSize | PMaxSize | PSize | PResizeInc;
   normal_hints.width = Width;
   normal_hints.height = Height;
   normal_hints.width_inc = 1;
   normal_hints.height_inc = 1;
-  XSetWMNormalHints (dpy, window, &normal_hints);
+  normal_hints.min_width = 320;
+  normal_hints.min_height = 200;
+  normal_hints.max_width = display_width;
+  normal_hints.max_height = display_height;
+  XSetWMNormalHints (dpy, WMwindow, &normal_hints);
 
   XWMHints wm_hints;
   wm_hints.flags = InputHint | StateHint | WindowGroupHint;
   wm_hints.input = True;
   wm_hints.window_group = leader_window;
   wm_hints.initial_state = NormalState;
-  XSetWMHints (dpy, window, &wm_hints);
+  XSetWMHints (dpy, WMwindow, &wm_hints);
 
   Atom wm_client_leader = XInternAtom (dpy, "WM_CLIENT_LEADER", False);
   XChangeProperty (dpy, window, wm_client_leader, XA_WINDOW, 32, 
@@ -253,7 +239,7 @@ bool csGraphics2DLineXLib::Open(const char *Title)
                       NULL, 0, NULL, NULL, NULL);
 
   XMapWindow (dpy, window);
-  XMapRaised (dpy, window);
+  XMapRaised (dpy, WMwindow);
 
   // Create mouse cursors
   XColor Black;
@@ -444,7 +430,9 @@ bool csGraphics2DLineXLib::PerformExtension (const char* args)
 
 void csGraphics2DLineXLib::Print (csRect* /*area*/)
 {
-  usleep (5000);
+  XFlush (dpy); XSync (dpy, false);
+
+//usleep (5000);
   if (nr_segments)
   {
     XSetForeground (dpy, gc_back, seg_color);
@@ -453,7 +441,6 @@ void csGraphics2DLineXLib::Print (csRect* /*area*/)
   }
 
   XCopyArea (dpy, back, window, gc, 0, 0, Width, Height, 0, 0);
-  XSync (dpy, false);
 }
 
 void csGraphics2DLineXLib::DrawLine (float x1, float y1, float x2, float y2, int color)

@@ -21,7 +21,6 @@
 
 #include "csutil/scf.h"
 #include "video/canvas/common/graph2d.h"
-#include "cssys/unix/iunix.h"
 
 #include <ggi/ggi.h>
 

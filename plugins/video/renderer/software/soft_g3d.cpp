@@ -64,8 +64,9 @@ bool csGraphics3DSoftware::Initialize (iSystem *iSys)
 
   NewInitialize ();
 
-  const char *driver = config->GetStr ("Hardware", "Driver2D", 
-				       SOFTWARE_2D_DRIVER);
+  const char *driver = iSys->GetOptionCL ("canvas");
+  if (!driver)
+    driver = config->GetStr ("Hardware", "Canvas", SOFTWARE_2D_DRIVER);
 
   G2D = LOAD_PLUGIN (System, driver, NULL, iGraphics2D);
 

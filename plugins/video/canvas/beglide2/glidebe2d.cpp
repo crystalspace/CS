@@ -168,18 +168,18 @@ bool csGraphics2DBeGlide::HandleEvent (csEvent &/*Event*/)
     {
       case ButtonPress:
         state = ((XButtonEvent*)&event)->state;
-        UnixSystem->MouseEvent (button_mapping[event.xbutton.button],
+        System->MouseEvent (button_mapping[event.xbutton.button],
           true, event.xbutton.x, event.xbutton.y,
           (state & ShiftMask ? CSMASK_SHIFT : 0) |
 	  (state & Mod1Mask ? CSMASK_ALT : 0) |
 	  (state & ControlMask ? CSMASK_CTRL : 0));
           break;
       case ButtonRelease:
-        UnixSystem->MouseEvent (button_mapping [event.xbutton.button],
+        System->MouseEvent (button_mapping [event.xbutton.button],
           false, event.xbutton.x, event.xbutton.y, 0);
         break;
       case MotionNotify:
-        UnixSystem->MouseEvent (0, false, event.xbutton.x, event.xbutton.y, 0);
+        System->MouseEvent (0, false, event.xbutton.x, event.xbutton.y, 0);
         break;
       case KeyPress:
       case KeyRelease:
@@ -224,11 +224,11 @@ bool csGraphics2DBeGlide::HandleEvent (csEvent &/*Event*/)
           case XK_F12:        key = CSKEY_F12; break;
           default:            break;
         }
-	UnixSystem->KeyboardEvent (key, down);
+	System->KeyboardEvent (key, down);
         break;
       case FocusIn:
       case FocusOut:
-        UnixSystem->FocusEvent (event.type == FocusIn);
+        System->FocusEvent (event.type == FocusIn);
         break;
       case Expose:
       {

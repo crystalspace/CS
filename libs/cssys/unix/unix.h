@@ -22,27 +22,15 @@
 #include "csutil/scf.h"
 #include "cssys/csinput.h"
 #include "cssys/system.h"
-#include "iunix.h"
 #include "igraph2d.h"
 
 /// Unix version.
-class SysSystemDriver : public csSystemDriver, public iUnixSystemDriver
+class SysSystemDriver : public csSystemDriver
 {
-  /// Use system cursor if true; otherwise use builtin CSWS software cursors
-  bool HardwareCursor;
-  /// Use shared-memory extension? (ONLY FOR X2D DRIVER)
-  bool UseSHM;
-  /// Simulated depth (ONLY FOR X2D DRIVER)
-  int SimDepth;
-
 public:
   // Constructor
   SysSystemDriver ();
 
-  DECLARE_IBASE_EXT (csSystemDriver);
-
-  /// Check for system-specific INI entries
-  virtual void SetSystemDefaults (csIniFile *config);
   // Main event loop
   virtual void Loop ();
   // Display system-specific help
@@ -52,11 +40,6 @@ public:
 
   /// Toggle console text output (for consoles that share text/graphics mode)
   virtual void EnablePrintf (bool /*iEnable*/) { }
-
-  /// Implementation of iUnixSystemDriver
-
-  /// Get user settings
-  virtual void GetExtSettings (int &oSimDepth, bool &oUseSHM, bool &oHardwareCursor);
 };
 
 #endif // __UNIX_H__
