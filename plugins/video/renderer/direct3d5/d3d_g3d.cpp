@@ -209,8 +209,11 @@ csGraphics3DDirect3DDx5::~csGraphics3DDirect3DDx5 ()
     delete config;
   if (m_piG2D)
     m_piG2D->DecRef ();
-  if (m_piSystem)
-    m_piSystem->DecRef ();
+  
+  //Will cause a protection fault, because this is called from the 
+  //systems destructor.
+  //if (m_piSystem)
+  //  m_piSystem->DecRef ();
 }
 
 bool csGraphics3DDirect3DDx5::Initialize (iSystem *iSys)

@@ -241,14 +241,17 @@ void csTextureManagerDirect3D::remap_textures ()
 
   // Remap all textures according to the new colormap.
   for (i = 0 ; i < textures.Length () ; i++)
-    ((csTextureMMDirect3D*)textures[i])->remap_texture (this);
+  {
+    csTextureMMDirect3D* pTexture = (csTextureMMDirect3D*)textures[i];
+    pTexture->remap_texture (this);
+  }
 
-  black_color = 0;
-  white_color = encode_rgb (255, 255, 255);
-  red_color = encode_rgb (255, 0, 0);
-  blue_color = encode_rgb (0, 0, 255);
+  black_color  = 0;
+  white_color  = encode_rgb (255, 255, 255);
+  red_color    = encode_rgb (255, 0,   0);
+  blue_color   = encode_rgb (0,   0,   255);
   yellow_color = encode_rgb (255, 255, 0);
-  green_color = encode_rgb (0, 255, 0);
+  green_color  = encode_rgb (0,   255, 0);
 }
 
 int csTextureManagerDirect3D::find_rgb_map (int r, int g, int b, int map_type, int l)
