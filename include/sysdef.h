@@ -293,6 +293,9 @@
 #  endif
 #  include <sys/types.h>
 #  include <sys/socket.h>
+#  if defined (OS_UNIX)
+#    include <sys/filio.h>
+#  endif
 #  include <netinet/in.h>
 #  include <netdb.h>
 #endif
