@@ -69,7 +69,7 @@ void csPGFontEngine::DrawChar (font_descriptor *f, stdbitmap *b,
   str[0] = ch;
   str[1] = '\0';
 
-  GETBMP(b)->G2D ()->Write (GETFONT(f), pos->x, pos->y, color, -1, str);
+  //GETBMP(b)->G2D ()->Write (GETFONT(f), pos->x, pos->y, color, -1, str);
 }
 
 void csPGFontEngine::MeasureChar (font_descriptor *f, pgpair *pos,
@@ -87,7 +87,7 @@ void csPGFontEngine::DrawString (font_descriptor *f, stdbitmap *b,
   pgpair *pos, uint32 color, const pgstring *str,
   pgquad *clip, int16 lgop, int16 angle)
 {
-  GETBMP(b)->G2D ()->Write (GETFONT(f), pos->x, pos->y, color, -1, GETSTR(str));
+  //GETBMP(b)->G2D ()->Write (GETFONT(f), pos->x, pos->y, color, -1, GETSTR(str));
 }
 
 void csPGFontEngine::MeasureString (font_descriptor *f, const pgstring *str,

@@ -69,8 +69,8 @@ inline bool csPicoGUIServer::Initialize (iObjectRegistry *objreg)
   csRef<iEventQueue> evq = CS_QUERY_REGISTRY (objreg, iEventQueue);
   if (! evq) return false;
 
-  csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (objreg, iGraphics2D);
-  if (! g2d) return false;
+  csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (objreg, iGraphics3D);
+  if (! g3d) return false;
 
   csRef<iFontServer> fsv = CS_QUERY_REGISTRY (objreg, iFontServer);
   if (! fsv) return false;
@@ -78,7 +78,7 @@ inline bool csPicoGUIServer::Initialize (iObjectRegistry *objreg)
   csRef<iImageIO> img = CS_QUERY_REGISTRY (objreg, iImageIO);
   if (! img) return false;
 
-  if (! csPGVideoDriver::Construct (g2d, img)) return false;
+  if (! csPGVideoDriver::Construct (g3d, img)) return false;
 
   if (! csPGFontEngine::Construct (fsv)) return false;
 

@@ -35,11 +35,11 @@ struct iImageIO;
 class csPGVideoDriver
 {
  private:
-  static csRef<iGraphics2D> Gfx2D;
+  static csRef<iGraphics3D> Gfx3D;
   static csRef<iImageIO> ImageIO;
 
  protected:
-  static bool Construct (iGraphics2D *, iImageIO *);
+  static bool Construct (iGraphics3D *, iImageIO *);
   friend class csPicoGUIServer;
 
  public:
@@ -56,8 +56,8 @@ class csPGVideoDriver
   static void CoordLogicalize (int *x, int *y);
   static void Update (hwrbitmap, int16 x, int16 y, int16 w, int16 h);
   static int IsRootless () { return 0; }
-  static hwrcolor ColorPG2CS (hwrcolor);
-  static hwrcolor ColorCS2PG (hwrcolor);
+  static hwrcolor ColorPG2CS (pgcolor);
+  static pgcolor ColorCS2PG (hwrcolor);
   static void Pixel (hwrbitmap, int16 x, int16 y, hwrcolor color, int16);
   static hwrcolor GetPixel (hwrbitmap, int16 x, int16 y);
   static void Slab (hwrbitmap, int16 x, int16 y, int16 w,
@@ -72,13 +72,14 @@ class csPGVideoDriver
     stdbitmap *pic, int16 px, int16 py, int16);
   static g_error Load (hwrbitmap*, const uint8 *data, __u32 len);
   static g_error New (hwrbitmap*, int16 w, int16 h, uint16 bpp);
-  static void Free (hwrbitmap hb) { delete GETBMP (hb); }
+  static void Free (hwrbitmap hb);
   static g_error GetSize (hwrbitmap, int16 *w, int16 *h);
   static g_error GetGropRender (hwrbitmap, groprender **);
   static g_error GetShareMem (hwrbitmap, __u32 uid, pgshmbitmap *info);
   static void SpriteShow (sprite *);
   static void SpriteHide (sprite *);
   static void SpriteRedraw (sprite *);
+  static void SpriteProtect (pgquad *, sprite *);
   static void CharBlit (hwrbitmap, uint8 *data,
     int16 x, int16 y, int16 w, int16 h, int16 lines, int16 angle,
     hwrcolor color, pgquad *clip, int16, int pitch);

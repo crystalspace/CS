@@ -23,6 +23,11 @@
 #include "iutil/eventh.h"
 #include "iutil/eventq.h"
 
+/// @@@ Solve this better. "timeval" and "fd_set" is what we're after.
+#ifdef WIN32
+#include "winsock.h"
+#endif
+
 struct inlib;
 struct cursor;
 class csPicoGUIServer;

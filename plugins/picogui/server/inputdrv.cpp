@@ -21,11 +21,6 @@
 #include "iutil/event.h"
 #include "iutil/evdefs.h"
 
-/// @@@ Solve this better. "timeval" is what we're after.
-#ifdef WIN32
-#include "winsock.h"
-#endif
-
 extern "C"
 {
   #include <picogui/types.h>
