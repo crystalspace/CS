@@ -45,7 +45,7 @@ private:
 #endif
   /// Byte number in output pixel format of red, green and blue
   int RedByte, GreenByte, BlueByte;
-  /// The amount to shift output pixel to the right (used in RGBA big-endian mode)
+  /// The amount to shift output pixel to the left (used in RGBA big-endian mode)
   int PostShift;
 
 protected:
