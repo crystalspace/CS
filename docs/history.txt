@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+31-Oct-2004
+	- Eric Sunshine renamed the following `null' SCF classes in order to
+	  make them consistent with the names of all other `null' plugins:
+	      crystalspace.mesh.object.nullmesh -->
+	          crystalspace.mesh.object.null
+	      crystalspace.graphics2d.null2d --> crystalspace.graphics2d.null
 30-Oct-2004
 	- res improved the Win32 custom cursor cleanup a bit.
 	- res fixed a crash in the software sound renderer source, where a 

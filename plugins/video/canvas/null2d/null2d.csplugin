@@ -4,7 +4,7 @@
   <scf>
     <classes>
       <class>
-        <name>crystalspace.graphics2d.null2d</name>
+        <name>crystalspace.graphics2d.null</name>
         <implementation>csGraphics2DNull</implementation>
         <description>Null 2D graphics driver for Crystal Space</description>
         <requires>

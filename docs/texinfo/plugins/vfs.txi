@@ -178,7 +178,7 @@ here. This example is only intended to understand the concept:
 ;;; $@@ -- installation directory of Crystal Space
 ;;; $* -- application resource directory
 ;;; $^ -- directory in which application resides
-;;; The expansions of $@, $*, and $^ always have a trailing
+;;; The expansions of $@@, $*, and $^ always have a trailing
 ;;; path delimiter.
 ;
 ; The following variables should be defined either in

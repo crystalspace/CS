@@ -270,10 +270,10 @@ csPtr<iBase> csNullFactoryLoader::Parse (iDocumentNode* node,
   csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (object_reg,
   	iPluginManager));
   csRef<iMeshObjectType> type (CS_QUERY_PLUGIN_CLASS (plugin_mgr,
-  	"crystalspace.mesh.object.nullmesh", iMeshObjectType));
+  	"crystalspace.mesh.object.null", iMeshObjectType));
   if (!type)
   {
-    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.nullmesh",
+    type = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.mesh.object.null",
     	iMeshObjectType);
   }
   if (!type)

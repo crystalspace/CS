@@ -2067,11 +2067,11 @@ bool csLoader::LoadMeshObjectFactory (iLoaderContext* ldr_context,
 	  csRef<iPluginManager> plugin_mgr =
 	  	CS_QUERY_REGISTRY (object_reg, iPluginManager);
 	  csRef<iMeshObjectType> type = CS_QUERY_PLUGIN_CLASS (
-		plugin_mgr, "crystalspace.mesh.object.nullmesh",
+		plugin_mgr, "crystalspace.mesh.object.null",
 		iMeshObjectType);
 	  if (!type)
 	    type = CS_LOAD_PLUGIN (plugin_mgr,
-	    	"crystalspace.mesh.object.nullmesh", iMeshObjectType);
+	    	"crystalspace.mesh.object.null", iMeshObjectType);
 	  if (!type)
 	  {
             SyntaxService->ReportError (
@@ -3193,11 +3193,11 @@ bool csLoader::LoadMeshObject (iLoaderContext* ldr_context,
 	  csRef<iPluginManager> plugin_mgr =
 	  	CS_QUERY_REGISTRY (object_reg, iPluginManager);
 	  csRef<iMeshObjectType> type = CS_QUERY_PLUGIN_CLASS (
-		plugin_mgr, "crystalspace.mesh.object.nullmesh",
+		plugin_mgr, "crystalspace.mesh.object.null",
 		iMeshObjectType);
 	  if (!type)
 	    type = CS_LOAD_PLUGIN (plugin_mgr,
-	    	"crystalspace.mesh.object.nullmesh", iMeshObjectType);
+	    	"crystalspace.mesh.object.null", iMeshObjectType);
 	  if (!type)
 	  {
             SyntaxService->ReportError (
@@ -4794,7 +4794,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	    goto error;
 	  }
 	  csRef<iMeshWrapper> mesh = Engine->CreateMeshWrapper (
-	  	"crystalspace.mesh.object.nullmesh", meshname);
+	  	"crystalspace.mesh.object.null", meshname);
           if (!LoadPolyMeshInSector (ldr_context, mesh, child))
 	  {
 	    // Error is already reported.

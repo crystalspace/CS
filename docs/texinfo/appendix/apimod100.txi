@@ -593,3 +593,17 @@ for more information regarding this issue.
 @noindent
 @uref{http://www.w3.org/TR/REC-xml/#sec-white-space}@*
 @uref{http://www.xml.com/axml/notes/AllWSAlways.html}
+
+@subheading @sc{scf} Class Name Normalization
+
+The following @sc{scf} class names have been normalized in order to be
+consistent with the names of all other available ``null'' plugins:
+
+@itemize @bullet
+@item
+@code{crystalspace.mesh.object.nullmesh} @result{}
+@code{crystalspace.mesh.object.null}
+@item
+@code{crystalspace.graphics2d.null2d} @result{}
+@code{crystalspace.graphics2d.null}
+@end itemize

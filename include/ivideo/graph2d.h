@@ -164,7 +164,7 @@ SCF_VERSION (iGraphics2D, 2, 6, 0);
  *   <li>DirectDraw canvas plugin (crystalspace.graphics2d.directdraw)
  *   <li>X11 canvas plugin (crystalspace.graphics2d.x2d)
  *   <li>Memory canvas plugin (crystalspace.graphics2d.memory)
- *   <li>Null 2D canvas plugin (crystalspace.graphics2d.null2d)
+ *   <li>Null 2D canvas plugin (crystalspace.graphics2d.null)
  *   <li>Some others.
  *   <li>Note that it is the 3D renderer that will automatically create
  *       the right instance of the canvas that it requires.

@@ -135,7 +135,7 @@ bool csNullGraphics3D::Initialize (iObjectRegistry* objreg)
 
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
   if (!G2D)
-    G2D = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.graphics2d.null2d", iGraphics2D);
+    G2D = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.graphics2d.null", iGraphics2D);
   if (!G2D)
     return false;
 

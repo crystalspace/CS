@@ -150,7 +150,7 @@ section:
 
 @example
   csRef<iMeshWrapper> loddy_mesh = Engine->CreateMeshWrapper (
-	"crystalspace.mesh.object.nullmesh", "loddy");
+	"crystalspace.mesh.object.null", "loddy");
   csRef<iNullMeshState> nullmesh = SCF_QUERY_INTERFACE (
     	loddy_mesh->GetMeshObject (), iNullMeshState);
   nullmesh->SetBoundingBox (csBox3 (

@@ -4,7 +4,7 @@
   <scf>
     <classes>
       <class>
-        <name>crystalspace.mesh.object.nullmesh</name>
+        <name>crystalspace.mesh.object.null</name>
         <implementation>csNullmeshMeshObjectType</implementation>
         <description>Crystal Space Null Mesh Type</description>
       </class>
