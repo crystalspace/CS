@@ -122,8 +122,9 @@ DFLAGS.optimize = -s
 DFLAGS.debug = -g3
 
 # Flags for the linker which are used when building a shared library.
-LFLAGS.DLL=$(DFLAGS.$(MODE)) -q --no-export-all-symbols --dllname $*
 
+LFLAGS.DLL=$(DFLAGS.$(MODE)) -shared
+    
 # Typical extension for objects and static libraries
 LIB=.a
 define AR
@@ -151,7 +152,7 @@ SRC.SYS_CSSYS = $(wildcard libs/cssys/win32/*.cpp) \
 #CXX=g++ -c
 
 # The linker.
-#LINK=gcc
+LINK=gcc
 
 # Command sequence for creating a directory.
 # Note that directories will have forward slashes. Please
@@ -181,12 +182,12 @@ endif # ifeq ($(MAKESECTION),defines)
 ifeq ($(MAKESECTION),postdefines)
 
 # How to make shared libs for cs-config
-LINK.PLUGIN=dllwrap
+LINK.PLUGIN=$(LINK)
 PLUGIN.POSTFLAGS=-mwindows -mconsole
 
 # How to make a shared AKA dynamic library
 DO.SHARED.PLUGIN.CORE = \
-  dllwrap $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows
+  $(LINK.PLUGIN) $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows
 
 # Commenting out the following line will make the -noconsole option work
 # but the only way to redirect output will be WITH -noconsole (wacky :-)
