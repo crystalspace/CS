@@ -23,6 +23,8 @@
 #include "ogl_proctexback.h"
 #include "ogl_g3dcom.h"
 #include "csgeom/polyclip.h"
+#include "ievent.h"
+#include "cssys/csevent.h"
 
 IMPLEMENT_IBASE (csOpenGLProcBackBuffer)
   IMPLEMENTS_INTERFACE (iGraphics3D)
@@ -51,7 +53,7 @@ csOpenGLProcBackBuffer::~csOpenGLProcBackBuffer ()
   lightmap_cache = NULL;
   m_fogtexturehandle = 0;
   delete [] buffer;
-  System->QueueContextCloseEvent ((void*)G2D);
+  System->GetSystemEventOutlet ()->Broadcast (cscmdContextClose, (void*)G2D);
 }
 
 void csOpenGLProcBackBuffer::Close ()

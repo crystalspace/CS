@@ -317,5 +317,7 @@ class csOpenGLProcSoftware2D : public iGraphics2D
    int /*pal_size = 0*/)
   { return NULL; }
 
+  virtual bool PerformExtension (const char * /*iCommand*/, ...)
+  { return false; }
 };
 #endif // _OGL_PROCEXSOFT_H_

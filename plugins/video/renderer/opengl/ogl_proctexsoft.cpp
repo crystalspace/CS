@@ -27,6 +27,8 @@
 #include "isprotex.h"
 #include "itxtmgr.h"
 #include "ipolygon.h"
+#include "ievent.h"
+#include "cssys/csevent.h"
 
 IMPLEMENT_IBASE (csOpenGLProcSoftware)
   IMPLEMENTS_INTERFACE (iGraphics3D)
@@ -177,7 +179,7 @@ csOpenGLProcSoftware::~csOpenGLProcSoftware ()
       last = last->next_soft_tex;
     last->next_soft_tex = next_soft_tex;
   }
-  system->QueueContextCloseEvent ((void*)dummy_g2d);
+  system->GetSystemEventOutlet ()->Broadcast (cscmdContextClose, (void*)dummy_g2d);
   dummy_g2d->DecRef ();
 }
 
