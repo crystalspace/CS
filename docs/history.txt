@@ -126,8 +126,8 @@ chronological order.
 	  iKeyValuePair.
 	- Squee filled in various Write*() methods on the syntax service. Also
 	  fixed some bugs in cssaver, though there's plenty more to be done.
-	- Squee added 'saveworld' command to the walktest console to easily test
-	  cssaver plugin.
+	- Squee added 'saveworld' command to the walktest console to easily
+	  test cssaver plugin.
 1-Dec-2004
 	- res added a patch from Brendan Costa adding support for underline
 	  position, underline thickness and line height to iFont.
