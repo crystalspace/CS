@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+30-May-2003
+	- Philip Wyett added the CS copyright notice and moved the
+	  includes to the correct place in 'iddetect.h'.
 29-May-2003
 	- Oktal removed the clean target from from swig.jam as it was deleting
 	  the Swig-generated Python and Perl source files.
