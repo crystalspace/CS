@@ -233,7 +233,6 @@ bool csGraphics2DGLX::Open(const char *Title)
       GLX_RED_SIZE, 4,
       GLX_BLUE_SIZE, 4,
       GLX_GREEN_SIZE, 4,
-      GLX_AUX_BUFFERS, 1,
       None
     };
 
@@ -250,7 +249,6 @@ bool csGraphics2DGLX::Open(const char *Title)
       GLX_RED_SIZE, 4,
       GLX_BLUE_SIZE, 4,
       GLX_GREEN_SIZE, 4,
-      GLX_AUX_BUFFERS, 1,
       None
     };
 
@@ -325,13 +323,6 @@ bool csGraphics2DGLX::Open(const char *Title)
 	      "Alpha: bits %d\n", alpha_bits);
   } 
  
-  int aux_buffers;
-  glXGetConfig(dpy, active_GLVisual, GLX_AUX_BUFFERS, &aux_buffers);
-
-  CsPrintf (MSG_INITIALIZATION, 
-	    "Auxiliary buffers %d,  depth %dbit\n\n",
-	    aux_buffers, aux_buffers ? frame_buffer_depth : 0);
-
   // Create window
   XSetWindowAttributes winattr;
   winattr.border_pixel = 0;

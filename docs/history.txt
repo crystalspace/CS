@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+6-Jun-2000
+	- Fixed OpenGL GLX driver (2D driver for OpenGL/X Windows).
+	  It was trying to find a visual with AUX buffers.
 5-Jun-2000
 	- Added a few const methods to csPoly2D as well.
 	- Added a speed improvement to PVS. Before considering an
@@ -11,6 +14,9 @@ The history order has been reversed so that new features are at the top.
 	  it against the c-buffer on the plane to see if that part of
 	  the c-buffer still contains unshadowed parts. If not then it
 	  makes no sense to consider this occluder either.
+	- Robert Bate updated the Mac project files and changed
+	  max_texture_size from int to GLint so things will compile with
+	  CW.
 4-Jun-2000
 	- Fixed serious bug with csPoly2D::Intersect() and csPoly2D::
 	  ClipPlane() that could cause clipping errors in some cases.
