@@ -45,6 +45,16 @@ The history order is reversed so that new features are at the top.
 	  this mesh for visibility occlusion you can use the <viscull />
 	  keyword instead (or both). Check out data/flarge/world for an
 	  example.
+	- Additionally implemented <mesh> inside <polymesh>.
+	    <polymesh>
+                <mesh>
+		    <v x="-1" y="-1" z="-1" />
+		    <v x="1" y="-1" z="-1" />
+		    <v x="0" y="4" z="-1" />
+		    <t v1="0" v2="1" v3="2" />
+                </mesh>
+	        <colldet />
+	    </polymesh>
 14-Apr-2003
 	- Philip Wyett removed makedep entry under apps/tools for Jam. This
 	  is no longer needed after recent changes.

@@ -774,6 +774,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("sound", XMLTOKEN_SOUND);
   xmltokens.Register ("sounds", XMLTOKEN_SOUNDS);
   xmltokens.Register ("start", XMLTOKEN_START);
+  xmltokens.Register ("t", XMLTOKEN_T);
   xmltokens.Register ("texture", XMLTOKEN_TEXTURE);
   xmltokens.Register ("textures", XMLTOKEN_TEXTURES);
   xmltokens.Register ("transparent", XMLTOKEN_TRANSPARENT);
@@ -1262,8 +1263,58 @@ bool csLoader::LoadLodControl (iLODControl* lodctrl, iDocumentNode* node)
   return true;
 }
 
+//--------------------------------------------------------------------
+
+// Private class implementing iPolygonMesh for a general mesh.
+class PolygonMeshMesh : public iPolygonMesh
+{
+private:
+  csVector3* vertices;
+  csMeshedPolygon* polygons;
+  int* vertex_indices;
+  int num_verts;
+  int num_tris;
+
+public:
+  PolygonMeshMesh (int num_verts, int num_tris)
+  {
+    SCF_CONSTRUCT_IBASE (NULL);
+    PolygonMeshMesh::num_verts = num_verts;
+    PolygonMeshMesh::num_tris = num_tris;
+    vertices = new csVector3[num_verts];
+    polygons = new csMeshedPolygon[num_tris];
+    vertex_indices = new int[num_tris*3];
+
+    int i;
+    for (i = 0 ; i < num_tris ; i++)
+    {
+      polygons[i].num_vertices = 3;
+      polygons[i].vertices = &vertex_indices[i*3];
+    }
+  }
+  virtual ~PolygonMeshMesh ()
+  {
+    delete[] vertices;
+    delete[] polygons;
+    delete[] vertex_indices;
+  }
+
+  SCF_DECLARE_IBASE;
+
+  virtual int GetVertexCount () { return num_verts; }
+  virtual csVector3* GetVertices () { return vertices; }
+  virtual int GetPolygonCount () { return num_tris; }
+  virtual csMeshedPolygon* GetPolygons () { return polygons; }
+  virtual void Cleanup () { }
+  virtual bool IsDeformable () const { return false; }
+  virtual uint32 GetChangeNumber () const { return 0; }
+};
+
+SCF_IMPLEMENT_IBASE (PolygonMeshMesh)
+  SCF_IMPLEMENTS_INTERFACE (iPolygonMesh)
+SCF_IMPLEMENT_IBASE_END
+
 // Private class implementing iPolygonMesh for one cube.
-// This will be used for gravity collider.
 class PolygonMeshCube : public iPolygonMesh
 {
 private:
@@ -1355,10 +1406,62 @@ bool csLoader::ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel)
 	}
         break;
       case XMLTOKEN_MESH:
-	SyntaxService->ReportError (
-	  "crystalspace.maploader.parse.polymesh",
-	  child, "<mesh> not yet implemented!");
-	return false;
+	{
+	  int num_vt = 0;
+	  int num_tri = 0;
+	  csRef<iDocumentNodeIterator> child_it = child->GetNodes ();
+	  while (child_it->HasNext ())
+	  {
+	    csRef<iDocumentNode> child_child = child_it->Next ();
+	    if (child_child->GetType () != CS_NODE_ELEMENT) continue;
+	    const char* child_value = child_child->GetValue ();
+	    csStringID child_id = xmltokens.Request (child_value);
+	    switch (child_id)
+	    {
+	      case XMLTOKEN_V: num_vt++; break;
+	      case XMLTOKEN_T: num_tri++; break;
+	      default:
+		SyntaxService->ReportBadToken (child_child);
+		return false;
+	    }
+	  }
+
+	  polymesh = csPtr<iPolygonMesh> (
+	  	new PolygonMeshMesh (num_vt, num_tri));
+	  csVector3* vt = polymesh->GetVertices ();
+	  csMeshedPolygon* po = polymesh->GetPolygons ();
+	  num_vt = 0;
+	  num_tri = 0;
+
+	  child_it = child->GetNodes ();
+	  while (child_it->HasNext ())
+	  {
+	    csRef<iDocumentNode> child_child = child_it->Next ();
+	    if (child_child->GetType () != CS_NODE_ELEMENT) continue;
+	    const char* child_value = child_child->GetValue ();
+	    csStringID child_id = xmltokens.Request (child_value);
+	    switch (child_id)
+	    {
+	      case XMLTOKEN_V:
+	        if (!SyntaxService->ParseVector (child_child, vt[num_vt]))
+		  return false;
+		num_vt++;
+		break;
+	      case XMLTOKEN_T:
+		po[num_tri].vertices[0] = child_child->GetAttributeValueAsInt (
+			"v1");
+		po[num_tri].vertices[1] = child_child->GetAttributeValueAsInt (
+			"v2");
+		po[num_tri].vertices[2] = child_child->GetAttributeValueAsInt (
+			"v3");
+	        num_tri++;
+		break;
+	      default:
+		SyntaxService->ReportBadToken (child_child);
+		return false;
+	    }
+	  }
+	}
         break;
       case XMLTOKEN_COLLDET:
         colldet = true;
