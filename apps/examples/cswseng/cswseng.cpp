@@ -79,7 +79,7 @@ ceEngineView::ceEngineView (csComponent *iParent, iEngine *Engine,
 
 ceEngineView::~ceEngineView ()
 {
-  delete view;
+  if (view) view->DecRef ();
   ceCswsEngineApp* lapp = (ceCswsEngineApp*)app;
   lapp->engine_views.Delete (lapp->engine_views.Find (this));
 }
@@ -277,7 +277,7 @@ void ceCswsEngineApp::SetupDefaultWorld ()
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
   if (!tm)
   {
-    LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif");
+    LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif")->DecRef ();
     tm = engine->GetMaterialList ()->FindByName ("stone");
   }
 
@@ -422,7 +422,7 @@ bool ceCswsEngineApp::Initialize ()
   csWindow *w = new csWindow (this, "3D View",
     CSWS_DEFAULTVALUE & ~(CSWS_BUTCLOSE | CSWS_MENUBAR));
   engine_views.Push (new ceEngineView (w, engine, start_sector,
-  	csVector3 (0, 5, 0), pG3D));
+				       csVector3 (0, 5, 0), pG3D));
   w->SetRect (bound.Width () / 2, 0, bound.Width (), bound.Height () / 2);
 
   w = new ceControlWindow (this, "", CSWS_DEFAULTVALUE & ~CSWS_MENUBAR);
@@ -551,9 +551,9 @@ CSWS_SKIN_DECLARE_DEFAULT (DefaultSkin);
 
 int main (int argc, char* argv[])
 {
-  SysSystemDriver Sys;
+  SysSystemDriver *Sys = new SysSystemDriver;
+  System = Sys;
   srand (time (NULL));
-  System = &Sys;
 
   iObjectRegistry* object_reg = System->GetObjectRegistry ();
   iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
@@ -566,14 +566,16 @@ int main (int argc, char* argv[])
   System->RequestPlugin ("crystalspace.engine.3d:Engine");
   System->RequestPlugin ("crystalspace.level.loader:LevelLoader");
 
-  if (!Sys.Initialize (argc, argv, NULL))
+  if (!System->Initialize (argc, argv, NULL))
   {
     printf ("System not initialized !\n");
+    delete System;
     return -1;
   }    
   if (!csInitializeApplication (object_reg))
   {
     printf ("couldn't init app! (plugins missing?)\n");
+    delete System;
     return -1;
   }
 
@@ -581,21 +583,26 @@ int main (int argc, char* argv[])
   iNativeWindow* nw = g3d->GetDriver2D ()->GetNativeWindow ();
   if (nw) nw->SetTitle ("Crystal Space Example: CSWS And Engine");
 
-  if (!Sys.Open ())
+  if (!System->Open ())
   {
     printf ("Could not open system !\n");
+    delete System;
     return -1;
   }
   // Create our main class.
-  ceCswsEngineApp theApp (object_reg, DefaultSkin);
+  
+  ceCswsEngineApp *theApp = new ceCswsEngineApp (object_reg, DefaultSkin);
 
   // Initialize the main system. This will load all needed plug-ins
   // (3D, 2D, network, sound, ...) and initialize them.
-  if (theApp.Initialize ())
-    Sys.Loop ();
+  if (theApp->Initialize ())
+    System->Loop ();
   else
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
     	"crystalspace.application.cswseng", "Error initializing system!");
 
+  delete theApp;
+  
+  delete System;
   return 0;
 }
