@@ -149,7 +149,7 @@ static int s_KeyTable[257]=
 
 DWORD WINAPI s_threadroutine (LPVOID param)
 {
-  iSystem *System = (iSystem *)param;
+  SysSystemDriver *System = (SysSystemDriver *)param;
   HRESULT hr;
   DWORD dwWait = INFINITE;
   char *buffer;
@@ -192,7 +192,7 @@ DWORD WINAPI s_threadroutine (LPVOID param)
     MessageBox (NULL, "CreateEvent() Failed!", NULL, MB_OK|MB_ICONERROR);
     ExitProcess (1);
   }
-  if (!DuplicateHandle (GetCurrentProcess(), kbd->m_hEvent, GetCurrentProcess (),
+  if (!DuplicateHandle (GetCurrentProcess(), System->m_hEvent, GetCurrentProcess (),
         &hEvent [1], 0, FALSE, DUPLICATE_SAME_ACCESS))
   {
     MessageBox (NULL, "DuplicateEvent() Failed!", NULL, MB_OK|MB_ICONERROR);
@@ -404,7 +404,6 @@ bool SysSystemDriver::Open (const char *Title)
   if (!csSystemDriver::Open (Title))
     return false;
 
-  csKeyboardDriver::Open (EvQueue);
 #ifdef DO_DINPUT_KEYBOARD
   DWORD dwThreadId;
   m_hEvent = CreateEvent (NULL, FALSE, FALSE, NULL);
