@@ -69,7 +69,6 @@
 #  endif
 #endif
 
-
 //---------------------------------------------------------------
 // Test if the makefile correctly defines all the operating
 // system (one of the OS_ flags), the compiler (one of the
@@ -108,33 +107,35 @@
 #include <assert.h>
 
 #ifndef TRUE
-#define TRUE 1
+#  define TRUE 1
 #endif
 
 #ifndef FALSE
-#define FALSE 0
+#  define FALSE 0
 #endif
 
 #ifndef MIN
-#define MIN(a,b) ((a)<(b)?(a):(b))
+#  define MIN(a,b) ((a)<(b)?(a):(b))
 #endif
 
 #ifndef MAX
-#define MAX(a,b) ((a)>(b)?(a):(b))
+#  define MAX(a,b) ((a)>(b)?(a):(b))
 #endif
 
 #ifndef ABS
-#define ABS(x) ((x)<0?-(x):(x))
+#  define ABS(x) ((x)<0?-(x):(x))
 #endif
 
 #if !defined(SIGN) && !defined(OS_AMIGAOS)
-#define SIGN(x) ((x) < 0 ? -1 : ((x) > 0 ? 1 : 0))
+#  define SIGN(x) ((x) < 0 ? -1 : ((x) > 0 ? 1 : 0))
 #endif
 
 #undef EPSILON
 #define EPSILON 0.001				/* Small value */
 #undef SMALL_EPSILON
 #define SMALL_EPSILON 0.000001			/* Very small value */
+#undef SMALL_EPSILON_D
+#define SMALL_EPSILON_D 0.000000000001		/* Very, very small value */
 
 #ifndef PI
 #  define PI		3.14159265358979323	/* You know this number, don't you? */
@@ -146,33 +147,23 @@
 #  define M_PI_2	1.57079632679489661923	/* PI/2 */
 #endif
 
-#if defined(COMP_WCC)
-#define strcasecmp stricmp
-#define strncasecmp strnicmp
-#endif
-
-#if defined(COMP_VC)
-#define strcasecmp _stricmp
-#define strncasecmp _strnicmp
-#endif
-
 // NextStep 3.3 compiler frequently crashes when initializing static const
 // tables of unknown size.  Ex: static const Foo[] = { ... };  Work around
 // the problem by removing 'const'.
 #if defined(OS_NEXT)
-#define CS_STATIC_TABLE static
+#  define CS_STATIC_TABLE static
 #else
-#define CS_STATIC_TABLE static const
+#  define CS_STATIC_TABLE static const
 #endif
 
 #if defined(OS_NEXT)
-#define CS_USE_OLD_CASTS
+#  define CS_USE_OLD_CASTS
 #endif
 
 #if defined(CS_USE_OLD_CASTS)
-#define CS_CAST(C,T) (T)
+#  define CS_CAST(C,T) (T)
 #else
-#define CS_CAST(C,T) C<T>
+#  define CS_CAST(C,T) C<T>
 #endif
 
 #define STATIC_CAST(T)      CS_CAST(static_cast,T)
@@ -180,7 +171,7 @@
 #define REINTERPRET_CAST(T) CS_CAST(reinterpret_cast,T)
 #define CONST_CAST(T)       CS_CAST(const_cast,T)
 
-//#define SMALL_Z .1
+// The smallest Z at which 3D clipping occurs
 #define SMALL_Z .01
 
 // This macro causes a crash. Can be useful for debugging.
