@@ -20,6 +20,8 @@ chronological order.
 	    - Specified datadir, libdir and sysconfig switches of configure.
 	    - Specified CS_CONFIGDIR in cslight commands.
 	    - Re-enabled levels relighting when building NR.
+	- res fixed csLightIterRenderStep::GetAttenuationTexture() to only
+	  allocate the amount of memory actually required.
 3-Jul-2004
 	- Remi Bonnet fixed a few signed/unsigned comparisons warnings and a
 	  bug in aws where unsigned can't be used.

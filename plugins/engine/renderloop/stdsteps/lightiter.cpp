@@ -307,7 +307,7 @@ csPtr<iTextureHandle> csLightIterRenderStep::GetAttenuationTexture (
   #define CS_HALF_ATTTABLE_SIZE	  ((float)CS_ATTTABLE_SIZE/2.0f)
 
     csRGBpixel *attenuationdata = 
-      new csRGBpixel[CS_ATTTABLE_SIZE * CS_ATTTABLE_SIZE * 4];
+      new csRGBpixel[CS_ATTTABLE_SIZE * CS_ATTTABLE_SIZE];
     csRGBpixel* data = attenuationdata;
     for (int y=0; y < CS_ATTTABLE_SIZE; y++)
     {
