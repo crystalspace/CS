@@ -15,7 +15,7 @@ if $(CMD.TEXI2DVI)
   Help dvidocs : "user manual in dvi format" ;
 }
 
-if $(CMD.DVIPS)
+if $(CMD.TEXI2DVI) && $(CMD.DVIPS)
 {
   Texi2PS psdocs : cs-unix.txi : ps ;
   Help psdocs : "user manual in ps format" ;
@@ -28,7 +28,7 @@ if $(CMD.MAKEINFO)
   Help infodocs : "user manual in info format" ;
 }
   
-if $(CMD.DVIPDF)
+if $(CMD.TEXI2DVI) && $(CMD.DVIPDF)
 {
   Texi2PDF pdfdocs : cs-unix.txi : pdf ;
   Help pdfdocs : "user manual in pdf format" ;
