@@ -1117,6 +1117,11 @@ public:
   /// Get a camera position by its name.
   virtual iCameraPosition* GetCameraPosition (const char* name) const;
 
+  /// Set the amount of ambient light
+  virtual void SetAmbientLight (const csColor &c);
+  /// Return the amount of ambient light
+  virtual void GetAmbientLight (csColor &c) const;
+
   //--------------------- iConfig interface implementation --------------------
 
   csEngineConfig scfiConfig;

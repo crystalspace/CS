@@ -2385,4 +2385,18 @@ iCameraPosition* csEngine::GetCameraPosition (const char* name) const
   	->scfiCameraPosition;
 }
 
+void csEngine::SetAmbientLight (const csColor &c)
+{
+  csLight::ambient_red = c.red * 255.0;
+  csLight::ambient_green = c.green * 255.0;
+  csLight::ambient_blue = c.blue * 255.0;
+}
+
+void csEngine::GetAmbientLight (csColor &c) const
+{
+  c.red = csLight::ambient_red / 255.0;
+  c.green = csLight::ambient_green / 255.0;
+  c.blue = csLight::ambient_blue / 255.0;
+}
+
 //-------------------End-Multi-Context-Support--------------------------------

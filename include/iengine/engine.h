@@ -515,6 +515,14 @@ struct iEngine : public iBase
 
   /// Set the drawing context
   virtual void SetContext (iGraphics3D*) = 0;
+
+  /**
+   * Set the amount of ambient light. This has no effect until you
+   * recalculate the lightmaps.
+   */
+  virtual void SetAmbientLight (const csColor &) = 0;
+  /// Return the amount of ambient light
+  virtual void GetAmbientLight (csColor &) const = 0;
 };
 
 #endif // __IENGINE_ENGINE_H__
