@@ -35,6 +35,11 @@ The history order is reversed so that new features are at the top.
 	  plugin-paths function in the MacOS/X port:
 	    - Fixed bug: csGetPluginsPath() was leaking char[1024] buffer.
 	    - Cleaned up implementation files.
+	- Eric Sunshine changed the socket support check in the configure
+	  script so that it no longer includes both <winsock.h> and
+	  <sys/socket.h> at the same time even if both are present.  This works
+	  around a problem with Cygwin where including both files causes the
+	  test to fail because the headers are incompatible with one another.
 25-Feb-2003
 	- Marten Svanfeldt made these changes:
 	    - Fixed a bug in the light/shadow culling.

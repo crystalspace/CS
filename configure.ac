@@ -1724,7 +1724,10 @@ AS_IF([test $cs_cv_header_soundcard_h = yes],
 
 #------------------------------------------------------------------------------
 # Check for BSD-style socket support.  Also test for presence of type
-# socklen_t.
+# socklen_t.  Note that we must not include both <winsock.h> and <sys/socket.h>
+# at the same time on Cygwin even though they both exist since the inclusion of
+# both files generates a lot of errors.  Therefore, if <winsock.h> is present,
+# we include only it, otherwise we include <sys/socket.h>.
 #------------------------------------------------------------------------------
 m4_define([cs_socket_flags],
     [CS_CREATE_TUPLE() \
@@ -1747,9 +1750,6 @@ CS_CHECK_BUILD([for socket support], [cs_cv_sys_socket],
 	[#if HAVE_SYS_TYPES_H
 	#include <sys/types.h>
 	#endif
-	#if HAVE_SYS_SOCKET_H
-	#include <sys/socket.h>
-	#endif
 	#if HAVE_NETINET_IN_H
 	#include <netinet/in.h>
 	#endif
@@ -1758,6 +1758,8 @@ CS_CHECK_BUILD([for socket support], [cs_cv_sys_socket],
 	#endif
 	#if HAVE_WINSOCK_H
 	#include <winsock.h>
+	#elif HAVE_SYS_SOCKET_H
+	#include <sys/socket.h>
 	@%:@endif],
 	[struct in_addr a; inet_ntoa(a); socket(0,0,0);])],
 	[cs_socket_flags], [],
