@@ -277,7 +277,7 @@ void ceCswsEngineApp::SetupDefaultWorld ()
   iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
   if (!tm)
   {
-    LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif")->DecRef ();
+    LevelLoader->LoadTexture ("stone", "/lib/std/stone4.gif"); //->DecRef ();
     tm = engine->GetMaterialList ()->FindByName ("stone");
   }
 
