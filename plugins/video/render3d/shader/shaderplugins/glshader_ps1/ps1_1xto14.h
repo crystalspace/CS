@@ -31,12 +31,14 @@ protected:
   csString lastError;
   csArray<uint> neededRegs;
 
-  int tempRegisterMap[2];
+  int tempRegisterMap[2][2];
+  int tempRegisterExpire[2][2];
 
   const char* SetLastError (const char* fmt, ...);
   void ResetState();
 
-  const char* GetTempReg (int oldReg, int instrIndex, int& newReg);
+  const char* GetTempReg (int oldReg, int instrIndex, uint usedBits,
+    int& newReg);
   const char* GetTexTempReg (int oldReg, int instrIndex, int& newReg);
 
   const char* AddInstruction (const csPSProgramInstruction &instr,

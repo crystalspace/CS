@@ -22,8 +22,35 @@
 #include "ps1_1xto14.h"
 #include "ps1_instr.h"
 
-#define TEXREG_BIT(regnum)	    (1 << regnum)
-#define TEMPREG_BIT(regnum)	    (1 << (16 + regnum))
+#define BIT_RGB			    0x1
+#define BIT_ALPHA		    0x2
+#define BIT_RGBA		    0x3
+
+#define TEXREG_BIT(regnum, bits)    ((bits) << ((regnum) * 2))
+#define TEMPREG_BIT(regnum, bits)   ((bits) << (16 + (regnum) * 2))
+
+inline int destModBits (uint destMod)
+{
+  uint result = 0;
+  if ((destMod & (CS_PS_WMASK_RED | CS_PS_WMASK_GREEN | CS_PS_WMASK_BLUE)) ||
+    (destMod == CS_PS_WMASK_NONE)) result |= BIT_RGB;
+  if ((destMod & CS_PS_WMASK_ALPHA) ||
+    (destMod == CS_PS_WMASK_NONE)) result |= BIT_ALPHA;
+  return result;
+}
+
+inline int srcModBits (uint srcMod)
+{
+  uint result = 0;
+  const uint repMaskRGB = CS_PS_RMOD_REP_RED | CS_PS_RMOD_REP_GREEN | 
+    CS_PS_RMOD_REP_BLUE;
+  const uint repMask = repMaskRGB | CS_PS_RMOD_REP_ALPHA;
+  if ((srcMod & (repMaskRGB | CS_PS_RMOD_XYZ)) || ((srcMod & repMask) == 0))
+    result |= BIT_RGB;
+  if ((srcMod & (CS_PS_RMOD_REP_ALPHA | CS_PS_RMOD_XYW)) || ((srcMod & repMask) == 0))
+    result |= BIT_ALPHA;
+  return result;
+}
 
 const char* csPS1xTo14Converter::SetLastError (const char* fmt, ...)
 {
@@ -41,31 +68,76 @@ void csPS1xTo14Converter::ResetState()
 
   int i;
   for (i = 0; i < 2; i++)
-    tempRegisterMap[i] = -1;
+  {
+    tempRegisterMap[i][0] = -1;
+    tempRegisterMap[i][1] = -1;
+    tempRegisterExpire[i][0] = 0;
+    tempRegisterExpire[i][1] = 0;
+  }
   neededRegs.Empty();
 }
 
 const char* csPS1xTo14Converter::GetTempReg (int oldReg, int instrIndex, 
-					     int& newReg)
+					     uint usedBits, int& newReg)
 {
   newReg = -1;
+
+  switch (usedBits)
+  {
+    case BIT_RGB:
+      if ((tempRegisterMap[oldReg][0] != -1) && 
+	(instrIndex < tempRegisterExpire[oldReg][0]))
+      {
+	newReg = tempRegisterMap[oldReg][0];
+	return 0;
+      }
+      break;
+    case BIT_ALPHA:
+      if ((tempRegisterMap[oldReg][1] != -1) && 
+	(instrIndex < tempRegisterExpire[oldReg][1]))
+      {
+	newReg = tempRegisterMap[oldReg][1];
+	return 0;
+      }
+      break;
+    case BIT_RGBA:
+      if ((tempRegisterMap[oldReg][0] != -1) && 
+	(tempRegisterMap[oldReg][1] != -1) && 
+	(instrIndex < tempRegisterExpire[oldReg][0]) &&
+	(instrIndex < tempRegisterExpire[oldReg][1]))
+      {
+	newReg = tempRegisterMap[oldReg][0];
+	return 0;
+      }
+      break;
+  }
 
   // Determine timespan the original temp reg was used.
   int firstNeeded = instrIndex + 1, lastNeeded = firstNeeded;
   while ((lastNeeded < neededRegs.Length()) && 
-    (neededRegs[lastNeeded] & TEMPREG_BIT(oldReg)))
+    (neededRegs[lastNeeded] & TEMPREG_BIT(oldReg, BIT_RGBA)))
     lastNeeded++;
 
-  int r;
-  for (r = 0; r < 4; r++)
+  int checkOrder[4];
+  checkOrder[0] = oldReg;
+  int o, r = 1;
+  for (o = 0; o < 4; o++)
   {
+    if (o != oldReg)
+      checkOrder[r++] = o;
+  }
+
+  for (o = 0; o < 4; o++)
+  {
+    r = checkOrder[o];
+
     // Test if the temp reg is free for the time we need it
     // (r0-r3 double as texture registers)
     bool isFree = true;
     
     for (int i = firstNeeded; i < lastNeeded; i++)
     {
-      if (neededRegs[i] & TEXREG_BIT(r))
+      if (neededRegs[i] & TEXREG_BIT(r, BIT_RGBA))
       {
 	isFree = false;
 	break;
@@ -81,19 +153,32 @@ const char* csPS1xTo14Converter::GetTempReg (int oldReg, int instrIndex,
 
   if (newReg == -1)
   {
+    bool realTempUsed[2] = {false, false};
+    for (r = 0; r < 1; r++)
+    {
+      if (tempRegisterMap[r][0] != -1)
+	realTempUsed[tempRegisterMap[r][0] - 4] = true;
+      if (tempRegisterMap[r][1] != -1)
+	realTempUsed[tempRegisterMap[r][1] - 4] = true;
+    }
     for (r = 0; r < 1; r++)
     {
       bool isFree = true;
-      
-      for (int i = firstNeeded; i < lastNeeded; i++)
-      {
-	if (neededRegs[i] & TEMPREG_BIT(i))
-	{
-	  isFree = false;
-	  break;
-	}
-      }
 
+      //if (tempMapBack[r] != -1)
+      if (realTempUsed[r])
+      {
+	uint bits = TEMPREG_BIT(/*tempRegisterMap[*/r/*]*/, BIT_RGBA);
+	for (int i = firstNeeded; i < lastNeeded; i++)
+	{
+	  if (neededRegs[i] & bits)
+	  {
+	    isFree = false;
+	    break;
+	  }
+	}
+
+      }
       if (isFree) 
       {
 	newReg = r + 4;
@@ -106,9 +191,11 @@ const char* csPS1xTo14Converter::GetTempReg (int oldReg, int instrIndex,
     return SetLastError ("(%d): Could not find register to alias r%d",
       instrIndex, oldReg);
 
-  tempRegisterMap[oldReg] = newReg;
+  if (usedBits & BIT_RGB) tempRegisterMap[oldReg][0] = newReg;
+  if (usedBits & BIT_ALPHA) tempRegisterMap[oldReg][1] = newReg;
+  if (usedBits & BIT_RGB) tempRegisterExpire[oldReg][0] = lastNeeded;
+  if (usedBits & BIT_ALPHA) tempRegisterExpire[oldReg][1] = lastNeeded;
 
-  //newReg = oldReg;
   return 0;
 }
 
@@ -139,8 +226,8 @@ const char* csPS1xTo14Converter::AddInstruction (
     case CS_PS_INS_DP4:
     case CS_PS_INS_LRP:
     case CS_PS_INS_MAD:
-    case CS_PS_INS_MOV:
     case CS_PS_INS_MUL:
+    case CS_PS_INS_MOV:
     case CS_PS_INS_NOP:
     case CS_PS_INS_SUB:
       // Arithmetic instructions 
@@ -177,23 +264,55 @@ const char* csPS1xTo14Converter::AddArithmetic (
     } 
     else if (newInstr.src_reg[i] == CS_PS_REG_TEMP)
     {
-      if (tempRegisterMap[newInstr.src_reg_num[i]] == -1)
+      if ((tempRegisterMap[newInstr.src_reg_num[i]][0] == -1) ||
+	(tempRegisterMap[newInstr.src_reg_num[i]][1] == -1))
 	return SetLastError ("%s(%d): Temp register %d hasn't been "
 	  "assigned yet", GetInstructionName (instr.instruction), 
 	  instrIndex, newInstr.src_reg_num[i]);
 
-      newInstr.src_reg_num[i] = tempRegisterMap[newInstr.src_reg_num[i]];
+      uint srcBits = srcModBits (newInstr.src_reg_mods[i]);
+      if (srcBits == BIT_RGBA)
+      {
+	srcBits = destModBits (newInstr.dest_reg_mods);
+      }
+      switch (srcBits)
+      {
+	case BIT_RGB:
+	  newInstr.src_reg_num[i] = 
+	    tempRegisterMap[newInstr.src_reg_num[i]][0];
+	  break;
+	case BIT_ALPHA:
+	  newInstr.src_reg_num[i] = 
+	    tempRegisterMap[newInstr.src_reg_num[i]][1];
+	  break;
+	case BIT_RGBA:
+	  CS_ASSERT(tempRegisterMap[newInstr.src_reg_num[i]][0] ==
+	    tempRegisterMap[newInstr.src_reg_num[i]][1]);
+	  newInstr.src_reg_num[i] = 
+	    tempRegisterMap[newInstr.src_reg_num[i]][0];
+	  break;
+      }
     }
   }
   
   if (newInstr.dest_reg == CS_PS_REG_TEMP)
   {
-    if ((err = GetTempReg (newInstr.dest_reg_num, instrIndex, 
+    uint destBits = destModBits (newInstr.dest_reg_mods);
+    if ((err = GetTempReg (newInstr.dest_reg_num, instrIndex, destBits,
       newInstr.dest_reg_num)) != 0)
     {
       return err;
     }
   }
+
+  // Check for no-ops
+  if ((newInstr.instruction == CS_PS_INS_MOV) && 
+    (newInstr.dest_reg == newInstr.src_reg[0]) &&
+    (newInstr.dest_reg_num == newInstr.src_reg_num[0]) &&
+    (newInstr.dest_reg_mods == CS_PS_WMASK_NONE) && 
+    (newInstr.src_reg_mods[0] == CS_PS_RMOD_NONE) &&
+    (newInstr.inst_mods == 0))
+    return 0;
 
   newInstructions.Push (newInstr);
 
@@ -228,9 +347,20 @@ const char* csPS1xTo14Converter::AddTEX (const csPSProgramInstruction &instr,
 const char* csPS1xTo14Converter::CollectUsage (
   const csArray<csPSProgramInstruction>*& instrs)
 {
+  /*
+    Collect what registers are 'used' at every line in the PS.
+    A register is 'used' if it was written to and later read from.
+   */
+
   int i;
   uint currentBits = 0;
-  int lastTempUse[6] = {-1, -1, -1, -1, -1, -1};
+  int lastTempUse[2] = {-1, -1};
+  int lastTexUse[4] = {-1, -1, -1, -1};
+
+  /* 
+    @@@ DP3 and DP4 are executed in both the RGB and A pipe... 
+    that prolly needs to be reflected somehow.
+   */
 
   for (i = 0; i < instrs->Length(); i++)
   {
@@ -241,18 +371,16 @@ const char* csPS1xTo14Converter::CollectUsage (
     uint nextBits = currentBits;
     if (instr.dest_reg == CS_PS_REG_TEMP)
     {
-      currentBits &= ~TEMPREG_BIT (dr);
-      nextBits |= TEMPREG_BIT (dr);
-
-      for (j = i - 1; j > lastTempUse[dr]; j--)
-      {
-	neededRegs[j] &= ~TEMPREG_BIT (dr);
-      }
+      uint bit = TEMPREG_BIT (dr, destModBits (instr.dest_reg_mods));
+      currentBits &= ~bit;
+      nextBits |= bit;
     }
     else if (instr.dest_reg == CS_PS_REG_TEX)
     {
-      currentBits &= ~TEXREG_BIT (instr.dest_reg_num);
-      nextBits |= TEXREG_BIT (instr.dest_reg_num);
+      uint bit = TEXREG_BIT (instr.dest_reg_num, 
+	destModBits (instr.dest_reg_mods));
+      currentBits &= ~bit;
+      nextBits |= bit;
     }
 
     for (j = 0; j < 3; j++)
@@ -260,17 +388,49 @@ const char* csPS1xTo14Converter::CollectUsage (
       const int sr = instr.src_reg_num[j];
       if (instr.src_reg[j] == CS_PS_REG_TEMP)
       {
-	currentBits |= TEMPREG_BIT (sr);
+	currentBits |= TEMPREG_BIT (sr, srcModBits (instr.src_reg_mods[j]));
 	lastTempUse[sr] = i;
       }
       else if (instr.src_reg[j] == CS_PS_REG_TEX)
       {
-	currentBits |= TEXREG_BIT (sr);
+	currentBits |= TEXREG_BIT (sr, srcModBits (instr.src_reg_mods[j]));
+	lastTexUse[sr] = i;
+      }
+      else if (instr.src_reg[j] == CS_PS_REG_NONE)
+	break;
+    }
+
+    if (instr.dest_reg == CS_PS_REG_TEMP)
+    {
+      const uint mask = ~TEMPREG_BIT (dr, srcModBits (instr.dest_reg_mods));
+      // Register is free up to the last instr it was read.
+      for (j = i - 1; j > lastTempUse[dr]; j--)
+      {
+	neededRegs[j] &= mask;
       }
     }
 
     neededRegs.Push (currentBits);
     currentBits = nextBits;
+  }
+
+  // Clear out those that have been written to, but are not read from.
+  int reg;
+  for (reg = 1; reg < 2; reg++)
+  {
+    const uint mask = ~TEMPREG_BIT (reg, BIT_RGBA);
+    for (int j = instrs->Length() - 1; j > lastTempUse[reg]; j--)
+    {
+      neededRegs[j] &= mask;
+    }
+  }
+  for (reg = 0; reg < 4; reg++)
+  {
+    const uint mask = ~TEXREG_BIT (reg, BIT_RGBA);
+    for (int j = instrs->Length() - 1; j > lastTexUse[reg]; j--)
+    {
+      neededRegs[j] &= mask;
+    }
   }
 
   return 0;
@@ -291,7 +451,19 @@ const char* csPS1xTo14Converter::GetNewInstructions (
       return err;
   }
 
-  if (tempRegisterMap[0] != 0)
+  if ((tempRegisterMap[0][0] == -1) ||
+    (tempRegisterMap[0][1] == -1))
+  {
+    char writeLack[5] = "";
+    if (tempRegisterMap[0][0] == -1) strcat (writeLack, "rgb");
+    if (tempRegisterMap[0][1] == -1) strcat (writeLack, "a");
+    return SetLastError ("r0.%s isn't written to!", writeLack);
+  }
+
+  int moveBits = 0;
+  if (tempRegisterMap[0][0] != 0) moveBits |= BIT_RGB;
+  if (tempRegisterMap[0][1] != 0) moveBits |= BIT_ALPHA;
+  if (moveBits != 0)
   {
     csPSProgramInstruction newInstr;
 
@@ -299,7 +471,22 @@ const char* csPS1xTo14Converter::GetNewInstructions (
     newInstr.dest_reg = CS_PS_REG_TEMP;
     newInstr.dest_reg_num = 0;
     newInstr.src_reg[0] = CS_PS_REG_TEMP;
-    newInstr.src_reg_num[0] = tempRegisterMap[0];
+
+    switch (moveBits)
+    {
+      case BIT_RGB:
+	newInstr.src_reg_num[0] = tempRegisterMap[0][0];
+	newInstr.dest_reg_mods = CS_PS_WMASK_RED | CS_PS_WMASK_GREEN |
+	  CS_PS_WMASK_BLUE;
+	break;
+      case BIT_ALPHA:
+	newInstr.src_reg_num[0] = tempRegisterMap[0][1];
+	newInstr.dest_reg_mods = CS_PS_WMASK_ALPHA;
+	break;
+      case BIT_RGBA:
+	newInstr.src_reg_num[0] = tempRegisterMap[0][0];
+	break;
+    }
 
     newInstructions.Push (newInstr);
   }

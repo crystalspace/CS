@@ -205,7 +205,7 @@ bool csPixelShaderParser::GetInstruction (const char *str,
     inst_id = instrStrings.Request (istr);
     if (inst_id != csInvalidStringID)
     {
-      inst.instruction = inst_id;
+      inst.instruction = (csPixelShaderInstruction)inst_id;
       return true;
     }
   }
@@ -264,7 +264,7 @@ bool csPixelShaderParser::GetInstruction (const char *str,
     return false;
   }
   
-  inst.instruction = inst_id;
+  inst.instruction = (csPixelShaderInstruction)inst_id;
 
   // Find the instruction modifier(s)
 
@@ -464,3 +464,86 @@ bool csPixelShaderParser::ParseProgram (const char *program)
 
   return true;
 }
+
+#ifdef CS_DEBUG
+
+static char GetRegType (csPSRegisterType type)
+{
+  switch (type)
+  {
+    case CS_PS_REG_TEX:		return 't'; break;
+    case CS_PS_REG_CONSTANT:	return 'c'; break;
+    case CS_PS_REG_TEMP:	return 'r'; break;
+    case CS_PS_REG_COLOR:	return 'v'; break;
+    default:			return '?'; break;
+  }
+}
+
+static void GetSrcRegname (csPSRegisterType type, int num, uint mods, 
+			   csString& str)
+{
+  if (mods & CS_PS_RMOD_NEGATE) str << '-';
+  if (mods & CS_PS_RMOD_INVERT) str << "1-";
+
+  str << GetRegType (type);
+  str << num;
+
+  const uint baseMods = (CS_PS_RMOD_BIAS | CS_PS_RMOD_SCALE);
+  if (mods & baseMods) str << '_';
+  if (mods & CS_PS_RMOD_BIAS) str << 'b';
+  if (mods & CS_PS_RMOD_SCALE) str << "x2";
+
+  if (mods & CS_PS_RMOD_DZ) str << "_dz";
+  if (mods & CS_PS_RMOD_DW) str << "_dw";
+
+  const uint repMask = (CS_PS_RMOD_REP_RED | CS_PS_RMOD_REP_GREEN | 
+    CS_PS_RMOD_REP_BLUE | CS_PS_RMOD_REP_ALPHA);
+  if (mods & repMask) str << '.';
+  if (mods & CS_PS_RMOD_REP_RED) str << 'r';
+  if (mods & CS_PS_RMOD_REP_GREEN) str << 'g';
+  if (mods & CS_PS_RMOD_REP_BLUE) str << 'b';
+  if (mods & CS_PS_RMOD_REP_ALPHA) str << 'a';
+
+  if (mods & CS_PS_RMOD_XYZ) str << ".xyz";
+  if (mods & CS_PS_RMOD_XYW) str << ".xyw";
+}
+
+void csPixelShaderParser::WriteProgram (const csArray<csPSProgramInstruction>& instrs, 
+					csString& str)
+{
+  for(int i = 0; i < instrs.Length (); i++)
+  {
+    const csPSProgramInstruction& instr = instrs.Get (i);
+
+    str << instrStrings.Request (instr.instruction);
+    if (instr.inst_mods & CS_PS_IMOD_X2) str << "_x2";
+    if (instr.inst_mods & CS_PS_IMOD_X4) str << "_x4";
+    if (instr.inst_mods & CS_PS_IMOD_X8) str << "_x8";
+    if (instr.inst_mods & CS_PS_IMOD_D2) str << "_d2";
+    if (instr.inst_mods & CS_PS_IMOD_D4) str << "_d4";
+    if (instr.inst_mods & CS_PS_IMOD_D8) str << "_d8";
+    if (instr.inst_mods & CS_PS_IMOD_SAT) str << "_sat";
+
+    str << ' ';
+    str << GetRegType (instr.dest_reg);
+    str << instr.dest_reg_num;
+
+    if (instr.dest_reg_mods != 0) str << '.';
+    if (instr.dest_reg_mods & CS_PS_WMASK_RED) str << 'r';
+    if (instr.dest_reg_mods & CS_PS_WMASK_GREEN) str << 'g';
+    if (instr.dest_reg_mods & CS_PS_WMASK_BLUE) str << 'b';
+    if (instr.dest_reg_mods & CS_PS_WMASK_ALPHA) str << 'a';
+
+    for (int j = 0; j < 3; j++)
+    {
+      if (instr.src_reg[j] == CS_PS_REG_NONE) break;
+      str << ", ";
+      
+      GetSrcRegname (instr.src_reg[j], instr.src_reg_num[j], 
+	instr.src_reg_mods[j], str);
+    }
+
+    str << '\n';
+  }
+}
+#endif

@@ -893,68 +893,69 @@ bool csGLGraphics3D::Open ()
   fogvar->SetValue (fogtex);
   shadermgr->AddVariable(fogvar);
 
-  #define CS_NORMTABLE_SIZE 128
+  const int normalizeCubeSize = config->GetInt (
+    "Video.OpenGL.NormalizeCubeSize", 256);
 
   imgvec = csPtr<iImageVector> (new csImageVector ());
 
   // Positive X
   unsigned char *normdata = 
-    new unsigned char[CS_NORMTABLE_SIZE*CS_NORMTABLE_SIZE*4];
-  FillNormalizationMapSide (normdata, CS_NORMTABLE_SIZE,  0,  0,  1,
+    new unsigned char[normalizeCubeSize*normalizeCubeSize*4];
+  FillNormalizationMapSide (normdata, normalizeCubeSize,  0,  0,  1,
                                                           0, -1,  0,
                                                          -1,  0,  0);
   img = csPtr<iImage> (new csImageMemory (
-    CS_NORMTABLE_SIZE, CS_NORMTABLE_SIZE, normdata, true,
+    normalizeCubeSize, normalizeCubeSize, normdata, true,
     CS_IMGFMT_TRUECOLOR));
   imgvec->AddImage (img);
 
   // Negative X
-  normdata = new unsigned char[CS_NORMTABLE_SIZE*CS_NORMTABLE_SIZE*4];
-  FillNormalizationMapSide (normdata, CS_NORMTABLE_SIZE,  0,  0, -1,
+  normdata = new unsigned char[normalizeCubeSize*normalizeCubeSize*4];
+  FillNormalizationMapSide (normdata, normalizeCubeSize,  0,  0, -1,
                                                           0, -1,  0,
                                                           1,  0,  0);
   img = csPtr<iImage> (new csImageMemory (
-    CS_NORMTABLE_SIZE, CS_NORMTABLE_SIZE, normdata, true, 
+    normalizeCubeSize, normalizeCubeSize, normdata, true, 
     CS_IMGFMT_TRUECOLOR));
   imgvec->AddImage (img);
 
   // Positive Y
-  normdata = new unsigned char[CS_NORMTABLE_SIZE*CS_NORMTABLE_SIZE*4];
-  FillNormalizationMapSide (normdata, CS_NORMTABLE_SIZE,  1,  0,  0,
+  normdata = new unsigned char[normalizeCubeSize*normalizeCubeSize*4];
+  FillNormalizationMapSide (normdata, normalizeCubeSize,  1,  0,  0,
                                                           0,  0,  1,
                                                           0,  1,  0);
   img = csPtr<iImage> (new csImageMemory (
-    CS_NORMTABLE_SIZE, CS_NORMTABLE_SIZE, normdata, true, 
+    normalizeCubeSize, normalizeCubeSize, normdata, true, 
     CS_IMGFMT_TRUECOLOR));
   imgvec->AddImage (img);
 
   // Negative Y
-  normdata = new unsigned char[CS_NORMTABLE_SIZE*CS_NORMTABLE_SIZE*4];
-  FillNormalizationMapSide (normdata, CS_NORMTABLE_SIZE,  1,  0,  0,
+  normdata = new unsigned char[normalizeCubeSize*normalizeCubeSize*4];
+  FillNormalizationMapSide (normdata, normalizeCubeSize,  1,  0,  0,
                                                           0,  0, -1,
                                                           0, -1,  0);
   img = csPtr<iImage> (new csImageMemory (
-    CS_NORMTABLE_SIZE, CS_NORMTABLE_SIZE, normdata, true, 
+    normalizeCubeSize, normalizeCubeSize, normdata, true, 
     CS_IMGFMT_TRUECOLOR));
   imgvec->AddImage (img);
 
   // Positive Z
-  normdata = new unsigned char[CS_NORMTABLE_SIZE*CS_NORMTABLE_SIZE*4];
-  FillNormalizationMapSide (normdata, CS_NORMTABLE_SIZE,  1,  0,  0,
+  normdata = new unsigned char[normalizeCubeSize*normalizeCubeSize*4];
+  FillNormalizationMapSide (normdata, normalizeCubeSize,  1,  0,  0,
                                                           0, -1,  0,
                                                           0,  0,  1);
   img = csPtr<iImage> (new csImageMemory (
-    CS_NORMTABLE_SIZE, CS_NORMTABLE_SIZE, normdata, true, 
+    normalizeCubeSize, normalizeCubeSize, normdata, true, 
     CS_IMGFMT_TRUECOLOR));
   imgvec->AddImage (img);
 
   // Negative Z
-  normdata = new unsigned char[CS_NORMTABLE_SIZE*CS_NORMTABLE_SIZE*4];
-  FillNormalizationMapSide (normdata, CS_NORMTABLE_SIZE, -1,  0,  0,
+  normdata = new unsigned char[normalizeCubeSize*normalizeCubeSize*4];
+  FillNormalizationMapSide (normdata, normalizeCubeSize, -1,  0,  0,
                                                           0, -1,  0,
                                                           0,  0, -1);
   img = csPtr<iImage> (new csImageMemory (
-    CS_NORMTABLE_SIZE, CS_NORMTABLE_SIZE, normdata, true, 
+    normalizeCubeSize, normalizeCubeSize, normdata, true, 
     CS_IMGFMT_TRUECOLOR));
   imgvec->AddImage (img);
 

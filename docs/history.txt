@@ -14,6 +14,10 @@ chronological order.
 	- Jorrit fixed another bug in the NR null3d renderer. It was using
 	  csRef and DecRef() at the same time.
 	- Jorrit added 'chunklod' to the list of static plugins for Jam.
+	- res worked further on the PS1.x->1.4 converter. Improved register
+	  aliasing.
+	- res made the NR normalizer cubemap size changeable via a config 
+	  setting. Also increased the default size to 256.
 28-Mar-2004
 	- Eric Sunshine moved csutil's copy of TinyXML into a private namespace
 	  to avoid clashes with other external libraries which also embed

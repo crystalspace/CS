@@ -239,6 +239,11 @@ bool csShaderGLPS1_ATI::GetATIShaderCommand
   return true;
 }
 
+
+#ifdef CS_DEBUG
+//#define DUMP_CONVERTER_OUTPUT
+#endif
+
 bool csShaderGLPS1_ATI::LoadProgramStringToGL (const char* programstring)
 {
   if(!programstring)
@@ -247,11 +252,6 @@ bool csShaderGLPS1_ATI::LoadProgramStringToGL (const char* programstring)
   csPixelShaderParser parser (shaderPlug->object_reg);
 
   if(!parser.ParseProgram (programstring)) return false;
-
-  /*if(parser.GetVersion () != CS_PS_1_4)
-  {
-    return false;
-  }*/
 
   const csArray<csPSConstant> &constants = parser.GetConstants ();
 
@@ -293,6 +293,12 @@ bool csShaderGLPS1_ATI::LoadProgramStringToGL (const char* programstring)
 	err);
       return false;
     }
+#ifdef DUMP_CONVERTER_OUTPUT
+    csString prog;
+    parser.WriteProgram (*instrs, prog);
+
+    csPrintf (prog);
+#endif
   }
 
   csGLExtensionManager *ext = shaderPlug->ext;

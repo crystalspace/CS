@@ -29,7 +29,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 struct csPSProgramInstruction
 {
-  int instruction;
+  csPixelShaderInstruction instruction;
   unsigned short inst_mods;
   csPSRegisterType dest_reg;
   int dest_reg_num;
@@ -86,6 +86,11 @@ public:
   { return program_instructions; }
   const csArray<csPSConstant> &GetConstants ()
   { return program_constants; }
+
+#ifdef CS_DEBUG
+  void WriteProgram (const csArray<csPSProgramInstruction>& instr, 
+    csString& str);
+#endif
 
   csPixelShaderVersion GetVersion () const { return version; };
 };
