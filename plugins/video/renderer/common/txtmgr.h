@@ -145,6 +145,14 @@ public:
   { return NULL; }
 
   virtual void ProcTextureSync () {};
+
+  /**
+   * Query if the texture has an alpha channel.<p>
+   * This depends both on whenever the original image had an alpha channel
+   * and of the fact whenever the renderer supports alpha maps at all.
+   */
+  virtual bool GetAlphaMap ()
+  { return false; }
 };
 
 /**
