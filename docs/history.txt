@@ -118,6 +118,8 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine promoted the Copy rule implementation from docs.jam to
 	  helper.jam since Copy is sufficiently generic, and is now used by
 	  other Jamfiles (such as plugin.jam).
+	- Eric Sunshine upgraded the Jam Copy rule to utilize $(CP) rather than
+	  the literal `cp'.
 25-May-2003
 	- Jorrit optimized ball->HitBeamObject() considerably by moving an
 	  expensive operation out the inner loop. Same optimization for
