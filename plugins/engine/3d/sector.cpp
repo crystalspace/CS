@@ -623,6 +623,9 @@ void csSector::PrepareDraw (iRenderView *rview)
   draw_busy++;
 #endif
 
+  if (csEngine::current_engine->bugplug)
+    csEngine::current_engine->bugplug->AddCounter ("Sector Count", 1);
+
   // Make sure the visibility culler is loaded.
   GetVisibilityCuller ();
   csRenderView* csrview = (csRenderView*)rview;

@@ -845,6 +845,14 @@ bool csEngine::Initialize (iObjectRegistry *object_reg)
   {
     do_verbose = cmdline->GetOption ("verbose") != 0;
   }
+  if (do_verbose)
+  {
+    bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
+  }
+  else
+  {
+    bugplug = 0;
+  }
 
   VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   if (!VFS) return false;
@@ -1745,6 +1753,9 @@ void csEngine::StartDraw (iCamera *c, iClipper2D *view, csRenderView &rview)
 
 void csEngine::Draw (iCamera *c, iClipper2D *view)
 {
+  if (bugplug)
+    bugplug->ResetCounter ("Sector Count");
+
   current_framenumber++;
   ControlMeshes ();
   csRenderView rview (c, view, G3D, G2D);

@@ -51,6 +51,7 @@
 #include "iutil/virtclk.h"
 #include "ivaria/engseq.h"
 #include "ivaria/reporter.h"
+#include "ivaria/bugplug.h"
 #include "ivideo/graph2d.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/shader/shader.h"
@@ -233,6 +234,9 @@ public:
    * '\' as path separator, Mac uses ':' and Unix uses '/').
    */
   csRef<iVFS> VFS;
+
+  /// For debugging purposes.
+  csRef<iBugPlug> bugplug;
 
   /**
    * Pointer to the engine sequence manager.
