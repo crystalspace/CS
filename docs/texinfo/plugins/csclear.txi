@@ -1,7 +1,7 @@
 @c -*-texinfo-*-
 @node CrystalClear, csPython, PlugIns, PlugIns
 @subsection CrystalClear
-@cindex CrystalClear
+@cindex CrystalClear Plug-In
 @cindex Plug-In, CrystalClear
 
 This section covers the Crystal Space Common Layered Entertainment Animation

@@ -1,0 +1,686 @@
+@node World File Format
+@section Format of the World File
+@cindex World File Format
+
+The first section of this document is a syntax description of the
+Crystal Space world file format. The second section gives a few hints
+about what everything means.
+
+@node WorldFmt Syntax
+@subsection Syntax
+
+@itemize @bullet
+@item
+Basic syntax elements:
+
+@table @code
+@item <from..to>
+A numeric range. For example, @code{<0..1>} is a number between 0 and 1.
+
+@item <number>
+A general number.
+
+@item <pos-number>
+A general positive number.
+
+@item <name>
+A name identifier.
+
+@item <integer>
+A general integer.
+
+@item <pos-integer>
+A positive integer (> 0).
+
+@item <string>
+A string delimited by double quotes. Special characters are escaped by
+backslash.
+@end table
+
+@item
+List of numbers:
+@example
+<number-list> ::= <number> [ ',' <number> ]
+@end example
+
+@item
+Boolean values:
+@example
+<yes> ::= 'yes' | 'true' | 'on' | '1'
+<no> ::= 'no' | 'false' | 'off' | '0'
+<yes-no> ::= <yes> | <no>
+@end example
+
+@item
+Color description:
+@example
+<red> ::= <0..1>
+<green> ::= <0..1>
+<blue> ::= <0..1>
+<color> ::= <red> ',' <green> ',' <blue>
+@end example
+
+@item
+Fog description:
+@example
+<density> ::= <number>
+<fog-desc> ::= 'FOG' '(' <color> ',' <density> ')'
+@end example
+
+@item
+Vectors and coordinates. Note that the z-axis points forward, the y-axis
+points upwards and the x-axis points to the right.
+@example
+<x> ::= <number>
+<y> ::= <number>
+<z> ::= <number>
+<u> ::= <number>
+<v> ::= <number>
+<vector-2d> ::= <x> ',' <z>
+<vector-3d> ::= <x> ',' <y> ',' <z>
+<vertex-idx> ::= <integer>
+<coordinate> ::= <vector-3d>
+<coordinate-2d> ::= <vector-2d>
+<texture-coordinate> ::= <u> ',' <v>
+@end example
+
+@item
+Various names of objects (name can be empty):
+@example
+<sector-name> ::= <name>
+<light-name> ::= <name>
+<thing-name> ::= <name>
+<thingtpl-name> ::= <name>
+<plane-name> ::= <name>
+<col-name> ::= <name>
+<script-name> ::= <name>
+<texture-name> ::= <name>
+<polygon-name> ::= <name>
+<sprite-name> ::= <name>
+<spritetpl-name> ::= <name>
+<library-name> ::= <name>
+<file-name> ::= <name>
+@end example
+
+@item
+Various attributes and numbers:
+@example
+<max-textures-nr> ::= <pos-integer>
+<radius> ::= <pos-number>
+<texture-length> ::= <pos-number>
+<height-nr> ::= <number>
+<alpha-nr> ::= '0' | '25' | '50' | '75'
+<fog-nr> ::= '0' | '1'
+<angle> ::= <number>
+<light-index> ::= '0' | <pos-integer>
+<vertex-index> ::= '0' | <pos-integer>
+<keyname> ::= <string>
+<keyvalue> ::= <string>
+@end example
+
+@item
+Various basic objects:
+@example
+<vertex> ::= 'VERTEX' '(' <coordinate> ')'
+
+<texture> ::= 'TEXTURE' '(' <texture-name> ')'
+<ceil-texture> ::= 'CEIL_TEXTURE' '(' <texture-name> ')'
+<floor-texture> ::= 'FLOOR_TEXTURE' '(' <texture-name> ')'
+<texnr> ::= 'TEXNR' '(' <texture-name> ')'
+
+<texlen> ::= 'LEN' '(' <texture-length> ')'
+<texture-scale> ::= 'TEXTURE_SCALE' '(' <texture-length> ')'
+
+<bsp> ::= 'BSP' '(' ')'
+<statbsp> ::= 'STATBSP' '(' ')'
+
+<plane> ::= 'PLANE' '(' <plane-name> ')'
+
+<key> :: 'KEY' '(' <keyname> ',' <keyvalue> ')'
+
+<tex-lighting> ::= 'TEXTURE_LIGHTING' '(' <yes-no> ')'
+<lighting> ::= 'LIGHTING' '(' <yes-no> ')'
+
+<dim> ::= 'DIM' '(' <x> ',' <y> ',' <z> ')'
+<height> ::= 'HEIGHT' '(' <height-nr> ')'
+<floor-height> ::= 'FLOOR_HEIGHT' '(' <height-nr> ')'
+
+<alpha> ::= 'ALPHA' '(' <alpha-nr> ')'
+<fog> ::= 'FOG' '(' <fog-nr> ')'
+
+<vector> ::= 'V' '(' <vector-3d> ')'
+
+<matrix-scaler> ::= <number>
+<matrix-x-scaler> ::= <matrix-scaler>
+<matrix-y-scaler> ::= <matrix-scaler>
+<matrix-z-scaler> ::= <matrix-scaler>
+<stated-matrix-x-scaler> ::= 'SCALE_X' '(' <matrix-x-scaler> ')'
+<stated-matrix-y-scaler> ::= 'SCALE_Y' '(' <matrix-y-scaler> ')'
+<stated-matrix-z-scaler> ::= 'SCALE_Z' '(' <matrix-z-scaler> ')'
+<complex-matrix-scaler> ::= <stated-matrix-x-scaler> | 
+  <stated-matrix-y-scaler> | <stated-matrix-z-scaler>
+<full-matrix-scaler> ::= <matrix-x-scaler> ',' <matrix-y-scaler> ','
+  <matrix-z-scaler>
+<uniform-matrix-scaler> ::= <matrix-scaler>
+<simple-matrix-scaler> ::= 'SCALE' '(' <uniform-matrix-scaler> |
+  <full-matrix-scaler> ')'
+<compound-matrix-scaler> ::= <simple-matrix-scaler> | <complex-matrix-scaler>
+<rotation-x-angle> ::= <angle>
+<rotation-y-angle> ::= <angle>
+<rotation-z-angle> ::= <angle>
+<rotation-x-matrix> ::= 'ROT_X' '(' <rotation-x-angle> ')'
+<rotation-y-matrix> ::= 'ROT_Y' '(' <rotation-y-angle> ')'
+<rotation-z-matrix> ::= 'ROT_Z' '(' <rotation-z-angle> ')'
+<complex-rotation-matrix> ::= <rotation-x-matrix> | 
+  <rotation-y-matrix> | <rotation-z-matrix>
+<simple-rotation-matrix> ::= 'ROT' '(' <rotation-x-angle> ','
+  <rotation-y-angle> ',' <rotation-z-angle> ')'
+<rotation-matrix> ::= <simple-rotation-matrix> | <complex-rotation-matrix>
+<complex-matrix> ::= <rotation-matrix> | <compound-matrix-scaler>
+<simple-scaled-matrix> ::= <uniform-matrix-scaler>
+<normal-matrix> ::= <vector-3d> ',' <vector-3d> ',' <vector-3d>
+<identity-matrix> ::= 'IDENTITY'
+<matrix> ::= 'MATRIX '(' <identity-matrix> | <normal-matrix> | 
+  <simple-scaled-matrix> | <complex-matrix>... ')'
+@end example
+
+@item
+Various components:
+@example
+<plane-orig> ::= 'ORIG' '(' <vector-3d> | <vertex-idx> ')'
+<plane-first> ::= 'FIRST' '(' <vector-3d> | <vertex-idx> ')'
+<plane-second> ::= 'SECOND' '(' <vector-3d> | <vertex-idx> ')'
+<plane-first-len> ::= 'FIRST_LEN' '(' <texture-length> ')'
+<plane-second-len> ::= 'SECOND_LEN' '(' <texture-length> ')'
+<plane-uvec> ::= 'UVEC' '(' <vector-3d> ')'
+<plane-vvec> ::= 'VVEC' '(' <vector-3d> ')'
+<uv-shift> ::= 'UV_SHIFT' '(' <texture-coordinate> ')'
+<polytext-comp> ::= <plane-orig> | <plane-first-len> | 
+  <plane-first> | <plane-second-len> |
+  <plane-second> | <matrix> | <vector> | <texlen> | <plane> | 
+  <plane-uvec> | <plane-vvec> | <uv-shift>
+<polygon-texture> ::= 'TEXTURE' '(' [ <polytext-comp> ] ')'
+
+<beziertext-comp> ::= <plane-orig> | <plane-first-len> | 
+  <plane-first> | <plane-second-len> |
+  <plane-second> | <matrix> | <vector> | <texlen> | <uv-shift> |
+  <plane-uvec> | <plane-vvec>
+<bezier-texture> ::= 'TEXTURE' '(' [ <beziertext-comp> ] ')'
+
+<portal> ::= 'PORTAL' '(' <sector-name> ')'
+
+<after-vector> ::= 'W' '(' <vector-3d> ')'
+<warp-mirror> ::= 'MIRROR' '(' ')'
+<warp-static> ::= 'STATIC' '(' ')'
+<portal-clip> ::= 'CLIP' '(' ')'
+<portal-zfill> ::= 'ZFILL' '(' ')'
+<warp-comp> ::= <matrix> | <vector> | <after-vector> | 
+  <warp-mirror> | <warp-static> | <portal-clip> | <portal-zfill>
+<warp> ::= 'WARP' '(' [ <warp-comp> ] ')'
+
+<move-comp> ::= <matrix> | <vector>
+<move2> ::= 'MOVE' '(' [ <move-comp> ] ')'
+<move> ::= 'MOVE' '(' <matrix> <vector> ')'
+
+<floor> ::= 'FLOOR' '(' '(' <coordinate> ')' '(' <coodinate> ')'
+  '(' <coordinate> ')' '(' <coordinate> ')' ')'
+<ceiling> ::= 'CEILING' '(' '(' <coordinate> ')'
+  '(' <coodinate> ')' '(' <coordinate> ')' '(' <coordinate> ')' ')'
+<floor-ceil> ::= 'FLOOR_CEILING' '(' '(' <coordinate-2d> ')' '(' 
+  <coodinate-2d> ')' '(' <coordinate-2d> ')' '(' <coordinate-2d> ')' ')'
+@end example
+
+@item
+A circle of vertices: This command is just a short-cut for specifying some
+circular vertices. Internally it is exactly the same as saying
+@samp{VERTEX (...) VERTEX (...) ...}.
+@example
+<radiusx> ::= <number>
+<radiusy> ::= <number>
+<radiusz> ::= <number>
+<num-verts> ::= <integer>
+<circle> ::= 'CIRCLE' '(' <coordinate> ':' <radiusx> ',' <radiusy>
+  ',' <radiusz> ',' <num-verts> ')'
+@end example
+
+@item
+A skydome (half-sphere): A skydome is a large short-cut for creating a
+complex half-sphere with gouraud shaded triangles. Note that you need to
+generate the first circle of vertices using the @code{CIRCLE} macro.
+@example
+<skydome-radius> ::= 'RADIUS' '(' <radius> ')'
+<skydome-vertices> ::= 'VERTICES' '(' <vertex-index> [ ',' 
+  <vertex-index> ] ')'
+<skydome-comp> ::= <skydome-radius> | <skydome-vertices> | <lighting>
+<skydome> ::= 'SKYDOME' '(' [ <skydome-comp> ] ')'
+@end example
+
+@item
+A light:
+@example
+<dynamic-flag> ::= '0' | '1'
+
+<light-oldsyntax> ::= <coordinate> ':' <radius> ',' <color> ',' 
+  <dynamic-flag>
+
+<light-center> ::= 'CENTER' '(' <coordinate> ')'
+<light-radius> ::= 'RADIUS' '(' <radius> ')'
+<light-color> ::= 'COLOR' '(' <color> ')'
+<light-dynamic> ::= 'DYNAMIC' '(' ')'
+<light-halo> ::= 'HALO' '(' ')'
+<light-comp> ::= <light-center> | <light-radius> | <light-dynamic> |
+  <light-color> | <light-halo>
+<light-newsyntax> ::= [ <light-comp> ]
+
+<light> ::= 'LIGHT' <light-name> '(' <light-oldsyntax> | <light-newsyntax> ')'
+@end example
+
+@item
+A bezier curve:
+@example
+<bezier-comp> ::= <texnr> | <bezier-texture> | <vertices>
+<bezier> ::= 'BEZIER' '(' [ <bezier-comp> ] ')'
+@end example
+
+@item
+A polygon: The list of vertices is a list of vertex indices. These indices
+are relative to the list of vertices of the parent object (a sector, thing or
+thing template). The first vertex in the parent object has index 0. The
+vertices of a polygon must be defined in clock-wise ordering as seen from a
+position from where you want the polygon to be visible.
+@example
+<vertices> ::= 'VERTICES' '(' <vertex-index> [ ',' <vertex-index> ] ')'
+
+<uva-scale> ::= <number>
+<uva-offset> ::= <number>
+<uva-spec> ::= <angle> ',' <uva-scale> ',' <uva-offset>
+<uva> ::= 'UVA' '(' <uva-spec> [ ',' <uva-spec> ] ')'
+<uv> ::= 'UV' '(' <texture-coordinate> [ ',' <texture-coordinate> ] ')'
+
+<colors> ::= 'COLORS' '(' <color> [ ',' <color> ] ')'
+<gouraud> ::= 'GOURAUD' '(' ')'
+<flatcol> ::= 'FLATCOL' '(' <color> ')'
+  
+<cosfact> ::= 'COSFACT' '(' <number> ')'
+
+<polygon-comp> ::= <texnr> | <lighting> | <portal> | <warp> |
+  <polygon-texture> | <vertices> | <alpha> |
+  <fog> | <uv> | <uva> | <colors> | <cosfact> | <gouraud> |
+  <flatcol> | <mixmode>
+<polygon> ::= 'POLYGON' <polygon-name> '(' [ <polygon-comp> ] ')'
+@end example
+
+@item
+Polygon templates:
+@example
+<polygon-tpl-comp> ::= <texnr> | <lighting> | <polygon-texture> | <vertices> |
+  <gouraud> | <flatcol>
+<polygon-template> ::= 'POLYGON' <polygon-name> '(' [ <polygon-tpl-comp> ] ')'
+@end example
+
+@item
+A collection object:
+@example
+<col-thing> ::= 'THING' '(' <thing-name> ')'
+<col-collection> ::= 'COLLECTION' '(' <col-name> ')'
+<col-light> ::= 'LIGHT' '(' <sector-name> ',' <light-index> ')'
+<col-sector> ::= 'SECTOR' '(' <sector-name> ')'
+
+<collection-comp> ::= <col-thing> | <col-collection> | <col-light> |
+  <col-sector>
+<collection> ::= 'COLLECTION' <col-name> '(' [ <collection-comp> ] ')'
+@end example
+
+@item
+A texture description:
+@example
+<transparent> ::= 'TRANSPARENT' '(' <color> ')'
+<procedural> ::= 'PROCEDURAL' '(' ')'
+<persistent> ::= 'PERSISTENT' '(' ')'
+<filter> ::= 'FILTER' '(' ... ')'
+<mipmap> ::= 'MIPMAP' '(' <yes-no> ')'
+<dither> ::= 'DITHER' '(' <yes-no> ')'
+<texture-file> ::= 'FILE' '(' <file-name> ')'
+
+<texture-desc-comp> ::= <transparent> | <filter> | <mipmap> | <dither> |
+  <file> | <procedural> | <persistent>
+<texture-desc> ::= 'TEXTURE' <texture-name> '(' [ <texture-desc-comp> ] ')'
+@end example
+
+@item
+Things and objects:
+@example
+<moveable> ::= 'MOVEABLE' '(' ')'
+<detail> ::= 'DETAIL' '(' ')'
+<convex> ::= 'CONVEX' '(' ')'
+<template> ::= 'TEMPLATE' '(' <thingtpl-name> ')'
+<tex-select> ::= 'TEX_SET_SELECT' '(' <tex-set-name> ')'
+<thing-camera> ::= 'CAMERA' '(' ')'
+  
+<thing-comp> ::= <vertex> | <polygon> | <texnr> | <texlen> | 
+  <key> | <bsp> | <move2> |
+  <template> | <fog-desc> | <moveable> | <detail> | <convex> | <circle> |
+  <bezier> | <tex-select> | <thing-camera>
+<thing> ::= 'THING' <thing-name> '(' [ <thing-comp> ] ')'
+<sky> ::= 'SKY' <thing-name> '(' [ <thing-comp> ] ')'
+
+<sixface-comp> ::= <move2> | <texture-scale> | <texture> | 
+  <ceil-texture> | <dim> | <height> | <floor-height> | <floor-ceil> | 
+  <floor-texture> | <floor> | <ceiling> |
+  <moveable> | <detail> | <fog-desc> | <convex>
+<sixface> ::= 'SIXFACE' <thing-name> '(' [ <sixface-comp> ] ')'
+@end example
+
+@item
+Thing and object templates:
+@example
+<curve-center> ::= 'CURVECENTER' '(' <coordinate> ')'
+<curve-scale> ::= 'CURVESCALE' '(' <number> ')'
+<curve-control> ::= 'CURVECONTROL' '(' <coordinate> ':' 
+  <texture-coordinate> ')'
+<template-file> ::= 'FILE' '(' <file-name> ')'
+<thing-tpl-comp> ::= <vertex> | <polygon-template> | <texnr> | 
+  <texlen> | <move> | <fog-desc> | <circle> | <bezier> |
+  <curve-center> | <curve-scale> | <curve-control> | <template-file>
+<thing-template> ::= 'THING' <thingtpl-name> '(' [ <thing-tpl-comp> ] ')'
+
+<sixface-tpl-comp> ::= <move> | <texture-scale> | <texture> |
+  <ceil-texture> | <dim> | <height> | <floor-height> | 
+  <floor-ceil> | <floor-texture> | <floor> | <ceiling> | <fog-desc>
+<sixface-template> ::= 'SIXFACE' <thingtpl-name> '(' [ <sixface-tpl-comp> ] ')'
+@end example
+
+@item
+Sprites: If @code{ACTION} is specified, then frame-number is the frame number
+in that action. If not then frame-number is the frame-number out of the whole
+set of frames for that sprite template.
+
+The specified frame is used as a @samp{base} for determining which vertices
+and normals should be merged --- the changes actually affect all frames of
+the sprite template.
+@example
+<u> ::= <number>
+<v> ::= <number>
+<x> ::= <number>
+<y> ::= <number>
+<z> ::= <number>
+<v1> ::= <pos-number>
+<v2> ::= <pos-number>
+<v3> ::= <pos-number>
+<frame-vector> :: 'V' '(' <x> ',' <y> ',' <z> ':' <u> ',' <v> ')'
+<frame-name> :: <name>
+<sprite-frame> ::= 'FRAME' <frame-name> '(' [ <frame-vector> ] ')'
+<action-name> :: <name>
+<action-delay> :: <pos-number>
+<action-frame> :: 'F' '(' <frame-name> ',' <action-delay> ')'
+<sprite-action> :: = 'ACTION' <action-name> '(' [ <action-frame> ] ')' 
+<sprite-triangle> ::= 'TRIANGLE' '(' <v1> ',' <v2> ',' <v3> ')'
+<sprite-skeleton> ::= ... @@@@@@ (to be further defined here)
+<sprite-tween> ::= 'TWEEN' '(' <yes-no> ')'
+
+<sprite-tpl-comp> ::= <texnr> | <sprite-frame> | <sprite-action> | 
+  <sprite-triangle> | <template-file> | <sprite-skeleton> | <sprite-tween>
+<sprite-template> ::= 'SPRITE' <spritetpl-name> '(' [ <sprite-tpl-comp> ... ] ')'
+
+<mixmode1> ::= 'COPY ()' | 'MULTIPLY ()' | 'MULTIPLY2 ()' | 'ADD ()' |
+  'ALPHA' '(' <number> ')' | 'TRANSPARENT ()' | 'KEYCOLOR ()'
+<mixmode> ::= 'MIXMODE' '(' <mixmode1> [ ',' <mixmode1> ] ')'
+
+<sp-template> ::= 'TEMPLATE' '(' <spritetpl-name> ',' <action-name> ')'
+<sprite-comp> ::= <move2> | <sp-template> | <texnr> | <mixmode> | <sprite-tween>
+<sprite> ::= 'SPRITE' <sprite-name> '(' [ <sprite-comp> ] ')'
+
+<move2d> ::= 'MOVE' '(' <vector-3d> ')'
+<spr2d-vertices> ::= 'VERTICES' '(' <vector-2d> [ ',' <vector-2d> ] 
+<sprite2d-comp> ::= <move2d> | <texnr> | <spr2d-vertices> | <uv> |
+  <mixmode> | <colors> | <lighting>
+<sprite2d> ::= 'SPRITE2D' <sprite-name> '(' [ <sprite2d-comp> ] ')'
+@end example
+
+@item
+Nodes
+@example
+<position>  ::= 'POSITION' '(' <coordinate> ')' 
+<node-comp> ::= <position> | <key>
+<node> ::= 'NODE' '(' [<node-comp>] ')'
+@end example
+
+@item
+Particle Systems:
+@example
+<partsys-color> ::= 'COLOR' '(' <color> ')'
+<partsys-number> ::= 'NUMBER' '(' <number> ')'
+<partsys-dropsize> ::= 'DROPSIZE' '(' <float> ',' <float> ')'
+<partsys-box> ::= 'BOX' '(' <vector-3d> ',' <vector-3d> ')'
+
+<fountain-origin> ::= 'ORIGIN' '(' <vector-3d> ')'
+<fountain-accel> ::= 'ACCEL' '(' <vector-3d> ')'
+<fountain-speed> ::= 'SPEED' '(' <number> ')'
+<fountain-falltime> ::= 'FALLTIME' '(' <number> ')'
+<fountain-opening> ::= 'OPENING' '(' <number> ')'
+<fountain-azimuth> ::= 'AZIMUTH' '(' <number> ')'
+<fountain-elevation> ::= 'ELEVATION' '(' <number> ')'
+<fountain-comp> ::= <texture> | <mixmode> | <lighting> |
+  <partsys-dropsize> | <partsys-color> | <partsys-number> |
+  <fountain-origin> | <fountain-accel> | <fountain-speed> |
+  <fountain-falltime> | <fountain-opening> | <fountain-azimuth> |
+  <fountain-elevation>
+<fountain> ::= 'FOUNTAIN' <name> '(' <fountain-comp> ')'
+
+<fire-origin> ::= 'ORIGIN' '(' <vector-3d> ')'
+<fire-speed> ::= 'SPEED' '(' <vector-3d> ')'
+<fire-swirl> ::= 'SWIRL' '(' <number> ')'
+<fire-totaltime> ::= 'TOTALTIME' '(' <number> ')'
+<fire-colorscale> ::= 'COLORSCALE' '(' <number> ')'
+<fire-comp> ::= <texture> | <mixmode> | <lighting> |
+  <partsys-dropsize> | <partsys-number> |
+  <fire-origin> | <fire-speed> | <fire-swirl> |
+  <fire-totaltime> | <fire-colorscale>
+<fire> ::= 'FIRE' <name> '(' <fire-comp> ')'
+
+<snow-swirl> ::= 'SWIRL' '(' <number> ')'
+<snow-speed> ::= 'SPEED' '(' <vector-3d> ')'
+<snow-comp> ::= <texture> | <mixmode> | <lighting> |
+  <partsys-dropsize> | <partsys-color> | <partsys-number> |
+  <partsys-box> | <snow-speed> | <snow-swirl>
+<snow> ::= 'SNOW' <name> '(' <snow-comp> ')'
+
+<rain-speed> ::= 'SPEED' '(' <vector-3d> ')'
+<rain-comp> ::= <texture> | <mixmode> | <lighting> |
+  <partsys-dropsize> | <partsys-color> | <partsys-number> |
+  <partsys-box> | <rain-speed>
+<rain> ::= 'RAIN' <name> '(' <rain-comp> ')'
+
+<partsys> ::= <fountain> | <snow> | <rain> | <fire>
+@end example
+
+@item
+Sectors and rooms:
+@example
+<tex-comp> ::= <texture> | <plane> | <texlen>
+<tex> ::= 'TEX' '(' [ <tex-comp> ] ')'
+
+<portal-poly> ::= 'POLYGON' '(' <polygon-name> ')'
+<portal-sector> ::= 'SECTOR' '(' <sector-name> ')'
+<room-portal-comp> ::= <portal-poly> | <portal-sector> | <alpha> | 
+  <warp>
+<room-portal> ::= 'PORTAL' '(' [ <room-portal-comp> ) ')'
+
+<split-direction> ::= 'VER' | 'HOR'
+<split-list> ::= <number-list>
+<split> ::= 'SPLIT' '(' <polygon-name> ',' <split-direction> '(' 
+  <split-list> ')' ')'
+
+<sector-comp> ::= <vertex> | <polygon> | <texnr> | <texlen> | 
+  <bsp> | <statbsp> | <thing> |
+  <sixface> | <light> | <sprite> | <fog-desc> | <circle> | <skydome> |
+  <key> | <node> | <partsys> | <sky>
+<sector> ::= 'SECTOR' <sector-name> '(' [ <sector-comp> ] ')'
+
+<room-comp> ::= <tex-lighting> | <texture-scale> | <texture> |
+  <tex> | <ceil-texture> | <floor-texture> | <light> |
+  <dim> | <height> | <floor-height> | <floor-ceil> | <floor> | 
+  <ceiling> | <sixface> | <thing> | <room-portal> | <split> |
+  <partsys> | <sky> |
+  <bsp> | <statbsp> | <move> | <sprite> | <fog-desc>
+<room> ::= 'ROOM' <sector-name> '(' [ <room-comp> ] ')'
+@end example
+
+@item
+Descriptions for all textures:
+@example
+<max-textures> ::= 'MAX_TEXTURES' '(' <max-textures-nr> ')'
+<textures-comp> ::= <max-textures> | <texture-desc>
+<textures> ::= 'TEXTURES' '(' [ <textures-comp> ] ')'
+@end example
+
+@item
+Grouping textures: Sometimes you want things of the same type but with
+different textures on it. Here comes the grouping of textures in handy.
+
+The final name of a texture in a @code{TEX_SET} will be
+@samp{<tex-set-name>_<texture-name>}. The textures will be merged into the
+global texturelist. You should define a @code{TEX_SET} after @code{TEXTURES}
+since the later command deletes the internal list first :) For usage of
+@code{TEX_SET} see the @code{THING} description.
+@example
+<tex-set-name> ::= name
+<texture-set> ::= 'TEX_SET' <tex-set-name> '(' [ <texture-desc> ] ')'
+@end example
+  
+@item
+Plane description:
+@example
+<plane-desc-comp> ::= <plane-orig> | <plane-first-len> | 
+  <plane-first> | <plane-second-len> |
+  <plane-second> | <matrix> | <vector> |
+  <plane-uvec> | <plane-vvec>
+<plane-desc> ::= 'PLANE' <plane-name> '(' [ <plane-desc-comp> ] ')'
+@end example
+
+@item
+Library description:
+@example
+<library> ::= 'LIBRARY' <library-name> '(' <file-name> ')'
+@end example
+
+@item
+Start description:
+@example
+<start> ::= 'START' '(' <sector-name> ',' <coordinate> ')'
+@end example
+
+@item
+The World:
+@example
+<world-comp> ::= <textures> | <library> | <sector> | <room> | 
+  <thing-template> | <sixface-template> | <sprite-template> |
+  <plane-desc> | <collection> | <start> | <key>
+<world> ::= 'WORLD' '(' [ <world-comp> ] ')'
+@end example
+
+@item
+Description of a Library file (@file{library}):
+@example
+<library-comp> ::= <textures> | <thing-template> | <sprite-template>
+<library> ::= 'LIBRARY' '(' [ <library-comp> ] ')'
+@end itemize
+
+@node WorldFmt Hints
+@subsection Hints
+
+A little explanation about @code{LEN} and @code{TEXLEN}. With those you can
+specify the size of the texture on the polygon. For example, let's say that
+you have a rectangular polygon which is 4 units wide and 6 units high. A
+texture with @code{LEN} set to 2 will be tiled 2 times horizontally and 3
+times vertically. If this texture is 128x128 (for example) then the final
+texture on the polygon will be 256x384.
+
+Using a @code{TEXTURE} statement inside a @code{POLYGON} or with a
+@code{PLANE} statement you can get even more control on how the texture
+should be scaled accross the polygon. I will explain it with an example. Say
+that you have a polygon like this:
+@example
+VERTEX (0,2,3) VERTEX (2,2,3) VERTEX (2,0,3) VERTEX (0,0,3)
+POLYGON 'xxx' (VERTICES (0,1,2,3))
+@end example
+
+Let's say that you want to align the texture so that it's origin is at
+(2,2,3). You can do this as follows:
+@example
+POLYGON 'xxx' (VERTICES (0,1,2,3) TEXTURE (ORIG (2,2,3) FIRST (0,2,3)
+  SECOND (2,0,3) FIRST_LEN (1) SECOND_LEN (1)))
+@end example
+
+With @code{ORIG}, @code{FIRST}, and @code{SECOND} you specify how the u/v
+coordinate system is located. The origin of u/v is at @code{ORIG}, the u-axis
+is at @code{FIRST-ORIG}, and the v-axis is at @code{SECOND-ORIG}.
+@code{FIRST_LEN} and @code{SECOND_LEN} are simlar to @code{LEN} and
+@code{TEXLEN} except that you can control the u and v scaling seperately
+here. Note that @code{ORIG}, @code{FIRST}, and @code{SECOND} need not
+coincide with vertices of the polygon. They should just be on the same plane
+as the polygon. That way you can also create slanted textures.
+
+@code{TEXLEN} in a @code{THING} or @code{SECTOR} is the default @code{LEN}
+for all polygons following the @code{TEXLEN} declaration. @code{TEXNR} in a
+@code{THING} or @code{SECTOR} is the default @code{TEXNR} for all following
+polygons.
+
+@code{PLANE}s are good and recommended. A @code{PLANE} is just a way to give
+a name to a texture orientation. All polygons sharing the same @code{PLANE}
+will have textures that fit perfectly at the borders. CS will also be able to
+do some optimizations on polygons that share the same plane (like backface
+culling a whole set of polygons in one go). Note that even if a @code{PLANE}
+is only used by one polygon it does not hurt. If you did not specify the
+@code{PLANE}, Crystal Space would have created one anyway.
+
+Currently Crystal Space assumes that there is a sector called @samp{room}. It
+will use that as a starting place. It will also always start at location
+(0,0,0).
+
+Note that @code{SECTOR}s must be convex (unless you add a @code{BSP} tree).
+@code{THING}s need not be convex.
+
+Vertices in a @code{THING} are specified in local object space. You can
+translate this object space to world space with the @code{MOVE} statement.
+
+When a @code{THING} or @code{SPRITE} is defined in the @code{WORLD} statement
+and not in a @code{SECTOR} or @code{ROOM} then you define a template. This
+template can then be used inside a @code{SECTOR} or @code{ROOM} by giving
+another @code{THING} or @code{SPRITE} statement and using the @code{TEMPLATE}
+statement there. It is also possible to define the @code{THING} or
+@code{SPRITE} inside the @code{SECTOR} or @code{ROOM} but using templates is
+preferable.
+
+With @code{WARP} you give a matrix which will mirror space. For example, when
+you want to make a mirroring floor the warping matrix should invert Y and
+leave the others intact. So the @code{WARP} matrix is:
+@example
+/ 1  0 0 \
+| 0 -1 0 |
+\ 0  0 1 /
+@end example
+
+The vector should be a vector on the plane of the mirror. It is used to
+determine where exactly mirroring should start. If the floor is at height
+-1 (for example) so @code{<0,-1,0>} is a good spot.
+
+Note that @code{PORTAL}s are one-direction only. If you need a @code{PORTAL}
+that works in two directions (so that you can go back) then you'll also have
+to specify a @code{PORTAL} in the other sector pointing back.
+
+Note that even though a @code{PORTAL} does not require a texture (unless it
+has alpha transparency) you still need to specify one. The current CS code
+assumes that every polygon has a texture.
+
+The @code{ROOM} and @code{SIXFACE} interface is good for human editors but it
+is not suited for computer generated output. Ignore @code{ROOM} and
+@code{SIXFACE} if you want to write an editor or convertor and concentrate on
+@code{SECTOR} and @code{THING} instead.
+
+@code{MATRIX (.5)} is a shorthand for:
+@example
+/ .5 0 0 \
+| 0 .5 0 |
+\ 0 0 .5 /
+@end example

@@ -13,15 +13,17 @@ Space.
 
 @menu
 * CrystalClear::
+* Dungeon::
 * csPython::
 @end menu
 
 @imports{plugins,csclear.txi}
+@imports{plugins,dungeon.txi}
 
 @node csPython, , CrystalClear, PlugIns
 @subsection csPython
-@cindex csPython
-@cindex Python
+@cindex csPython Plug-In
+@cindex Python Plug-In
 @cindex Scripting, Python
 
 The plug-in module brings Python scripting support to Crystal Space.  It is
