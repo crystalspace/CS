@@ -47,6 +47,8 @@ The history order is reversed so that new features are at the top.
 	  if the installed lib3ds is sufficiently recent.  This approach will
 	  provide better feedback and debugging information for a user than the
 	  old approach where the checks were combined.
+	- Eric Sunshine applied a patch to ogl_g3dcom.cpp from Daniel Schubert
+	  <daschubert@web.de> which resolves several int versus GLenum issues.
 6-Feb-2003
 	- Removed Video.OpenGL.Caps.MaxTexWidth, MaxTexHeight, MinTexWidth,
 	  and MinTexHeight options in opengl.cfg. Instead there is now the
