@@ -368,9 +368,10 @@ void MergeAction (iModelDataAction *Out, iModelDataAction *In1,
   }
 }
 
+typedef CS_DECLARE_OBJECT_VECTOR (csActionVector, iModelDataAction);
+
 void csModelDataObject::MergeCopyObject (iModelDataObject *obj)
 {
-  CS_DECLARE_OBJECT_VECTOR (csActionVector, iModelDataAction);
 
   // store vertex, normal, texel and color offset
   int VertexOffset = DefaultVertices ? DefaultVertices->GetVertexCount () : 0;

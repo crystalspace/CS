@@ -368,8 +368,10 @@ csSystemDriver::~csSystemDriver ()
   // Deregister all known drivers and plugins
   if (VFS) VFS->DecRef ();
 
-  // Free all plugins
-  Plugins.DeleteAll ();
+  // Free all plugins.
+  for (int i = 0; i < Plugins.Length(); i++)
+      UnloadPlugin((iPlugin *)Plugins.Get(i));
+     
   // Free the system event outlet
   EventOutlets.DeleteAll ();
 
@@ -946,6 +948,7 @@ bool csSystemDriver::UnloadPlugin (iPlugin *iObject)
 
 #undef CHECK
 
+  scfiObjectRegistry.Unregister((iBase *)iObject, NULL);
   return Plugins.Delete (idx);
 }
 

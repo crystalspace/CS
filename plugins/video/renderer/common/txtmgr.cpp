@@ -213,7 +213,7 @@ csMaterialHandle::~csMaterialHandle ()
 {
   FreeMaterial ();
   texman->UnregisterMaterial (this);
-  texman->DecRef ();
+  texman->DecRef ();  //@@@ TODO: Make txtmgr destructor delete its associated materials. MHV
 }
 
 void csMaterialHandle::FreeMaterial ()
