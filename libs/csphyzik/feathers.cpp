@@ -240,7 +240,8 @@ ctArticulatedBody *ab_f;
 ctFeatherstoneAlgorithm *out_link_solver;
 ctFeatherstoneAlgorithm *svr_f;
 //ctMatrix3 Mwork;
-ctVector3 vwork;
+/* initialize vwork to something to avoid compiler warning */
+ctVector3 vwork(0);
 ctSpatialVector svwork;
 //ctSpatialMatrix sMwork;
 //ctSpatialVector ZaIac;
@@ -367,7 +368,8 @@ void ctFeatherstoneAlgorithm::test_impulse_response()
     if( inboard_link != NULL ){
       in_feather = (ctFeatherstoneAlgorithm *)inboard_link->solver;
 	    ctSpatialMatrix fXg;
-      ctVector3 vwork;
+      /* initialize vwork to something to avoid compiler warning */
+      ctVector3 vwork(0);
       s = ab.inboard_joint->get_spatial_joint_axis();
       // fXg.form_spatial_transformation( ab.T_fg.get_transpose(), ab.T_fg.get_transpose()*ab.r_fg * -1 );
       ab.T_fg.put_transpose( Mwork );
@@ -439,8 +441,9 @@ void ctFeatherstoneAlgorithm::propagate_impulse()
     inboard_link = ab.inboard_joint->inboard;
     if( inboard_link != NULL ){
       in_feather = (ctFeatherstoneAlgorithm *)inboard_link->solver;
-	  ctSpatialMatrix fXg;
-      ctVector3 vwork;
+          ctSpatialMatrix fXg;
+      /* initialize vwork to something to avoid compiler warning */
+      ctVector3 vwork(0);
       ctSpatialVector s = ab.inboard_joint->get_spatial_joint_axis();
       // fXg.form_spatial_transformation( ab.T_fg.get_transpose(), ab.T_fg.get_transpose()*ab.r_fg * -1 );
       ab.T_fg.put_transpose( Mwork );
