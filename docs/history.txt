@@ -56,6 +56,9 @@ chronological order.
 	  - Shader passes can now override the zmode of the renderer.
 	  - Updated the OR lighting shader to utilize zmesh2 in the 2-pass
 	    technique.
+	- John Harger fixed the quads mode in the particles plugin. The test
+	  level should work now too. (And has a nice fire effect, courtesy of
+	  Daniel Duhprey)
 10-Jan-2004
 	- res added a facility to draw meshes with less render buffer juggling
 	  etc. required from the client.

@@ -188,38 +188,6 @@
     <plugin>crystalspace.mesh.loader.factory.ball</plugin>
 	<params />
   </meshfact>
-	<meshfact name="explosionFACT">
-	  <plugin>crystalspace.mesh.loader.factory.particles</plugin>
-	    <params>
-			<emitter type="sphere">
-				<time>300</time>
-				<innerradius>0.01</innerradius>
-				<outerradius>0.04</outerradius>
-		  </emitter>
-		  <force type="radial">
-			<amount>0.001</amount>
-			<range>0.5</range>
-			<falloff>linear</falloff>
-			<dampener>0.1</dampener>
-		  </force>
-		  <mass>1.0</mass>
-		  <maxparticles>1000</maxparticles>
-		  <pps>1000</pps>
-		  <initial>0</initial>
-		  <diffusion>0.1</diffusion>
-		  <radius>0.1</radius>
-		  <ttl>0.75</ttl>
-		  <timevariation>0.1</timevariation>
-		  <heatfunction>time_linear</heatfunction>
-		  <gradient>
-			<color red="1" green="1" blue="0"/>
-			<color red="1" green="0.5" blue="0"/>
-			<color red="1" green="0" blue="0"/>
-			<color red="0.5" green="0.5" blue="0.5"/>
-			<color red="0.7" green="0.7" blue="0.7"/>
-		  </gradient>
-	  </params>
-	</meshfact>
 	<meshfact name="fountainFACT">
 	  <plugin>crystalspace.mesh.loader.factory.particles</plugin>
 	    <params>
@@ -230,16 +198,15 @@
 		  </emitter>
 		  <force type="linear">
 			<direction x="0.5" y="1" z="0"/>
-			<amount>0.015</amount>
+			<amount>10</amount>
 			<range>3.0</range>
 			<falloff>linear</falloff>
-			<dampener>0.1</dampener>
 		  </force>
+		  <dampener>0.1</dampener>
 		  <mass>5</mass>
-		  <maxparticles>5000</maxparticles>
-		  <pps>100</pps>
+		  <pps>50</pps>
 		  <initial>0</initial>
-		  <gravity x="0" y="-0.001" z="0"/>
+		  <gravity x="0" y="-1" z="0"/>
 		  <diffusion>0.1</diffusion>
 		  <radius>0.1</radius>
 		  <ttl>5</ttl>
@@ -249,6 +216,43 @@
 			<color red="0" green="0" blue="1"/>
 			<color red="0" green="0.5" blue="1"/>
 			<color red="1" green="1" blue="1"/>
+		  </gradient>
+	  </params>
+	</meshfact>
+	<meshfact name="fireFACT">
+	  <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+	    <params>
+		  <emitter type="sphere">
+				<time>300</time>
+				<innerradius>0.1</innerradius>
+				<outerradius>0.3</outerradius>
+		  </emitter>
+		  <force type="linear">
+			<direction x="0" y="1" z="0"/>
+			<amount>20</amount>
+			<range>1.0</range>
+			<falloff>linear</falloff>
+		  </force>
+		  <dampener>3.0</dampener>
+		  <mass>1</mass>
+		  <pps>300</pps>
+		  <initial>0</initial>
+		  <gravity x="0" y="-1.0" z="0"/>
+		  <diffusion>1.0</diffusion>
+		  <radius>0.3</radius>
+		  <ttl>1</ttl>
+		  <timevariation>0.5</timevariation>
+		  <heatfunction>time_linear</heatfunction>
+		  <gradient>
+			<color red="1.00" green="0.35" blue="0.00"/>
+			<color red="1.00" green="0.32" blue="0.00"/>
+			<color red="1.00" green="0.22" blue="0.00"/>
+			<color red="0.80" green="0.12" blue="0.00"/>
+			<color red="0.60" green="0.00" blue="0.00"/>
+			<color red="0.40" green="0.00" blue="0.00"/>
+			<color red="0.20" green="0.00" blue="0.00"/>
+			<color red="0.00" green="0.00" blue="0.00"/>
+			<color red="0.00" green="0.00" blue="0.00"/>
 		  </gradient>
 	  </params>
 	</meshfact>
@@ -310,27 +314,27 @@
       </params>
       <priority>wall</priority>
     </meshobj>
-	<meshobj name="explosion">
-		<plugin>crystalspace.mesh.loader.particles</plugin>
-		<params>
-			<factory>explosionFACT</factory>
-			<material>particle</material>
-		</params>
-		<move>
-			<v x="0" y="2" z="5"/>
-		</move>
-	</meshobj>
 	<meshobj name="fountain">
+	  <plugin>crystalspace.mesh.loader.particles</plugin>
+	  <params>
+		<factory>fountainFACT</factory>
+		<material>particle</material>
+	  </params>
+	  <move>
+		<v x="-2.5" y="1" z="5"/>
+	  </move>
+	</meshobj>
+	<meshobj name="fire">
 		<plugin>crystalspace.mesh.loader.particles</plugin>
 		<params>
-			<factory>fountainFACT</factory>
+			<factory>fireFACT</factory>
 			<material>particle</material>
 		</params>
 		<move>
-			<v x="-2.5" y="1" z="5"/>
+			<v x="0" y="1" z="5"/>
 		</move>
 	  </meshobj>
-
   </sector>
 
 </world>
+

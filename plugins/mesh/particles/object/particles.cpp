@@ -314,9 +314,6 @@ bool csParticlesObject::DrawTest (iRenderView* rview, iMovable* movable)
     }
   }
 
-  /*if (!movable->IsFullTransformIdentity ())
-    tr_o2c /= movable->GetFullTransform ();*/
-
   int clip_portal, clip_plane, clip_z_plane;
   csSphere s(emitter, radius);
   if (!rview->ClipBSphere (tr_o2c, s, clip_portal, clip_plane, clip_z_plane))
@@ -425,7 +422,7 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
       }
       unsigned int *indices = new unsigned int[buffer_length * 6];
       int j;
-      for (i = 0, j = 0; i < bufsize-1; i += 4, j += 6)
+      for (i = 0, j = 0; i < bufsize-4; i += 4, j += 6)
       {
         // First triangle
         indices[j] = i;
@@ -448,11 +445,11 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
   }
   if (name == vertex_name)
   {
-    void *data;
+    i_vertex *data;
     int size;
     if (point_sprites)
     {
-      data = point_data.GetArray ();
+      data = (i_vertex*)point_data.GetArray ();
       size = point_data.Length () * (sizeof(csParticlesData));
     }
     else
@@ -463,18 +460,19 @@ iRenderBuffer *csParticlesObject::GetRenderBuffer (csStringID name)
       for (i = 0, j = 0; i < len - 1; i++, j += 4)
       {
         csParticlesData &point = point_data[i];
-        i_vertex &vertex = vertex_data[j];
+        i_vertex vertex;
         vertex.position = point.position + corners[0];
         vertex.color = point.color;
-        vertex = vertex_data[j + 1];
+        vertex_data.Put (j, vertex);
         vertex.position = point.position + corners[1];
         vertex.color = point.color;
-        vertex = vertex_data[j + 2];
+        vertex_data.Put (j+1, vertex);
         vertex.position = point.position + corners[2];
         vertex.color = point.color;
-        vertex = vertex_data[j + 3];
+        vertex_data.Put (j+2, vertex);
         vertex.position = point.position + corners[3];
         vertex.color = point.color;
+        vertex_data.Put (j+3, vertex);
       }
 
       data = vertex_data.GetArray ();
