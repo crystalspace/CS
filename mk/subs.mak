@@ -19,7 +19,7 @@ include mk/cache.mak
 
 ifeq ($(strip $(SUBMAKEFILES)),)
   SUBMAKEFILES = $(sort \
-    docs/docs.mak mk/install.mak mk/msvcgen/msvcgen.mak \
+    docs/docs.mak mk/install.mak mk/msvcgen/msvcgen.mak mk/static.mak \
     $(wildcard $(addsuffix /*.mak,$(addprefix plugins/,$(sort $(PLUGINS)))) \
     apps/*/*.mak \
     apps/tests/*/*.mak \

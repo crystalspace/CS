@@ -137,6 +137,12 @@ The history order is reversed so that new features are at the top.
 	      problem shortly.)
 	- Eric Sunshine eliminated a couple "unused variable" warnings from
 	  perftest.cpp.
+	- Eric Sunshine fixed a bad bug in mk/subs.mak where it neglected to
+	  include mk/static.mak.  Without static.mak, applications built with
+	  USE_PLUGINS=no would fail miserably at run-time since none of the
+	  modules (such as VFS, soft3d, etc.) would get linked into the
+	  application.  Technically speaking, without static.mak, the derived
+	  cslibref.cpp file was never generated.
 11-Oct-2001
 	- Moved the plugin manager implementation out of the system driver
 	  into csPluginManager (in csutil/plugmgr.h). Modified
