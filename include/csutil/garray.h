@@ -101,6 +101,10 @@
  * <li>void SetLength (int) - set the amount of elements that are actually used
  * <li>int Length () - query the amount of elements that are actually used
  * <li>operator [] (int) - return a reference to Nth element of the array
+ * <li><i>type*</i> GetArray() - query a pointer to the first item
+ * <i>Note:</i> if you want to pass a reference to the array as a whole,
+ * better use <i>myArray</i>->GetArray() than &<i>myArray</i>[0], the latter
+ * one is a possible source of hard-to-find bugs.
  * </ul>
  * Usage examples:
  * <pre>
