@@ -705,7 +705,9 @@ void csLightMap::ConvertFor3dDriver (bool requirePO2, int maxAspect)
   // Move the old data to o_stat and o_real.
   csRGBLightMap o_stat, o_real;
   o_stat.SetMap (static_lm.GetMap ()); static_lm.SetMap (NULL);
+  o_stat.SetMaxSize (static_lm.GetMaxSize ());
   o_real.SetMap (real_lm.GetMap ()); real_lm.SetMap (NULL);
+  o_real.SetMaxSize (real_lm.GetMaxSize ());
 
   lm_size = lwidth*lheight;
  

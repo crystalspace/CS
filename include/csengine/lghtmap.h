@@ -90,6 +90,8 @@ public:
 
   ///
   int GetMaxSize () { return max_sizeRGB; }
+  ///
+  void SetMaxSize (int s) { max_sizeRGB = s; }
 
   /// Get data.
   unsigned char* GetMap () { return map; }
