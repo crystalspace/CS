@@ -52,10 +52,10 @@ public:
   /// Destructor
   ~csRectRegion();
 
-  /// Add a rect to this region; may cause unions, but will not adjance(?).
+  /// Add a rect to this region; may cause unions, but will not adjance (see csRect).
   void Include(csRect &rect);
   /// Exclude a rect from this region; may cause splitting.
-  //  void Exclude(csRect &rect);
+  void Exclude(csRect &rect);
 };
 
 #endif //__CS_CSRECTREGION_H__
