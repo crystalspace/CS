@@ -1,4 +1,3 @@
-
 /*
  *  CS Object output
  *  Author: Luca Pancallo 2000.09.28
@@ -8,6 +7,7 @@
 #include "3ds2lev.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 #include <ctype.h>
 
 // includes for lib3ds
@@ -23,20 +23,103 @@
 
 extern int flags;
 
+//---------------------------------------------------------------------------
+Writer::Writer (const char* fname)
+    : indentlevel(0)
+{
+    file = fopen(fname, "w");
+    indented = false;
+}
+
+Writer::Writer(FILE* f)
+    : indented(false), indentlevel(0), file(f)
+{
+}
+
+Writer::~Writer()
+{
+    fclose(file);
+}
+
+void Writer::Indent(int sp)
+{
+    indentlevel+=sp;
+}
+
+void Writer::UnIndent(int sp)
+{
+    if (indentlevel-sp<0)
+	indentlevel=0;
+    else
+	indentlevel-=sp;
+}
+
+void Writer::WriteL(const char* line, ...)
+{
+    va_list args;
+    va_start(args, line);
+
+    WriteV(line,args);    
+    
+    fputc('\n', file);
+    indented = false;
+
+    va_end(args);
+}
+
+void Writer::WriteV(const char* line, va_list args)
+{
+    if (!indented)
+    {
+	for (int i=0;i<indentlevel;i++)
+	    fputc(' ', file);
+	indented = true;
+    }
+
+    vfprintf(file, line, args);
+}
+
+void Writer::Write(const char* line, ...)
+{
+    va_list args;
+    va_start(args, line);
+
+    WriteV(line, args);
+
+    va_end(args);
+}
+
+//---------------------------------------------------------------------------
+
+CSWriter::CSWriter(const char* filename, Lib3dsFile* data3d)
+    : Writer (filename), p3dsFile(data3d)
+{
+}
+
+CSWriter::CSWriter(FILE* f, Lib3dsFile* data3d)
+    : Writer(f), p3dsFile(data3d)
+{
+}
+
+CSWriter::~CSWriter()
+{
+}
+
 /**
  * Outputs the header with TEXTURES, MATERIALS, PLUGINS.
  */
-void OutpHeadCS (FILE *o, Lib3dsFile *p3dsFile)
+void CSWriter::OutpHeaderCS()
 {
   if (flags & FLAG_SPRITE)
   {
-    fprintf (o, "MESHFACT 'sprite' (\n");
-    fprintf (o, "  PLUGIN ('crystalspace.mesh.loader.factory.sprite.3d')\n");
-    fprintf (o, "  PARAMS (\n");
+    WriteL ("MESHFACT 'sprite' (");
+    Indent();
+    WriteL ("PLUGIN ('crystalspace.mesh.loader.factory.sprite.3d')");
+    WriteL ("PARAMS (");
+    Indent();
   }
   else
   {
-
     // extracts all unique textures
     char *textures[10000];
     int numTextures = 0;
@@ -66,44 +149,52 @@ void OutpHeadCS (FILE *o, Lib3dsFile *p3dsFile)
       p3dsMesh = p3dsMesh->next;
     }
 
-    fprintf (o, "WORLD (\n");
+    WriteL ("WORLD (");
+    Indent();
 
-    fprintf (o, "  TEXTURES (\n");
-
+    WriteL ("TEXTURES (");
+    Indent();
     // set the current mesh to the first in the file
     for (j=0; j<numTextures; j++)
-        fprintf (o, "    TEXTURE '%s' (FILE (%s)) \n",textures[j], textures[j]);
+        WriteL ("TEXTURE '%s' (FILE (%s)) ",textures[j], textures[j]);
+    
+    UnIndent();
+    WriteL (")"); 
+    WriteL("");
 
-    fprintf (o, "  )\n\n");
-
-    fprintf (o, "  MATERIALS (\n");
+    WriteL ("MATERIALS (");
+    Indent();
 
     for (j=0; j<numTextures; j++)
-        fprintf (o, "    MATERIAL '%s' (TEXTURE ('%s')) \n",textures[j], textures[j]);
-
-    fprintf (o, "  )\n\n");
-
-    fprintf (o, "  PLUGINS (\n");
-    fprintf (o, "    PLUGIN 'thing' ('crystalspace.mesh.loader.thing')\n");
-    fprintf (o, "    )\n");
-    fprintf (o, "  SECTOR 'room' (\n");
+        WriteL ("MATERIAL '%s' (TEXTURE ('%s'))",textures[j], textures[j]);
+    
+    UnIndent();
+    WriteL (")");
+    WriteL ("");
+    
+    WriteL ("PLUGINS (");
+    Indent();
+    WriteL ("PLUGIN 'thing' ('crystalspace.mesh.loader.thing')");
+    UnIndent();
+    WriteL (")");
+    WriteL(""); 
+    WriteL ("SECTOR 'room' (");
+    Indent();
   }
 }
-
 
 /**
  * Outputs all the objects present in the 3ds file.
  * Based on the object name we create MESHOBJ or PART.
  *
  */
-void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
+void CSWriter::OutpObjectsCS (bool lighting)
 {
-
   Lib3dsMesh *p3dsMesh = p3dsFile->meshes;
 
   if (flags & FLAG_SPRITE)
   {
-    fprintf (o, "  ; '%s'\n", p3dsMesh->name);
+    WriteL ("; Spritename: '%s'", p3dsMesh->name);
   }
   else
   {
@@ -175,20 +266,24 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
         {
             if (!staticObj)
             {
-                fprintf (o, "    MESHOBJ 'static' (\n");
-                fprintf (o, "      PLUGIN ('thing')\n");
-                fprintf (o, "      ZFILL ()\n");
-                fprintf (o, "      PRIORITY('wall')\n");
-                fprintf (o, "      PARAMS (\n");
-                fprintf (o, "      VISTREE()\n");
-                fprintf (o, "; Object Name : %s ", p3dsMesh->name);
-                fprintf (o, " Faces: %6d faces \n", (int)p3dsMesh->faces);
-                fprintf (o, "      PART '%s' (\n", p3dsMesh->name);
+                WriteL ("MESHOBJ 'static' (");
+		Indent();
+		WriteL ("PLUGIN ('thing')");
+                WriteL ("ZFILL()");
+	        WriteL ("PRIORITY('wall')");
+		WriteL ("PARAMS(");
+		Indent();
+		WriteL ("VISTREE()");
+		Write ("; Object Name: '%s'" , p3dsMesh->name);
+                WriteL (" Faces: %6d faces ", (int)p3dsMesh->faces);
+                Write ("PART '%s' (", p3dsMesh->name);
+		Indent();
                 staticObj = true;
             }
             else
             {
-                fprintf (o, "      PART '%s' (\n", p3dsMesh->name);
+                WriteL ("PART '%s' (", p3dsMesh->name);
+		Indent();
             }
             part = true;
         }
@@ -198,31 +293,30 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
             // close previous PART and MESHOBJ if present
             if (part)
             {
-                fprintf (o, "      )\n\n");
-                fprintf (o, "    )\n\n");
-                part = false;
+                WriteL (")"); WriteL (""); // end PART
+		UnIndent();
+                WriteL (")"); WriteL (""); // end MESHOBJ
+		UnIndent();               		
             }
-            fprintf (o, "; Object Name : %s ", p3dsMesh->name);
-            fprintf (o, " Faces: %6d faces \n", (int)p3dsMesh->faces);
+            Write ("; Object Name : %s ", p3dsMesh->name);
+            WriteL (" Faces: %6d faces ", (int)p3dsMesh->faces);
 
-            fprintf (o, "    MESHOBJ '%s' (\n", p3dsMesh->name);
-            fprintf (o, "      PLUGIN ('thing')\n");
-            fprintf (o, "      ZUSE ()\n");
+            WriteL ("MESHOBJ '%s' (", p3dsMesh->name);
+	    Indent();
+	    WriteL ("PLUGIN ('thing')");
+	    WriteL ("ZUSE ()");
             // handles transparent objects
             if (strstr(p3dsMesh->name, "_t_"))
-            {
-                fprintf (o, "      PRIORITY('alpha')\n");
-            }
+                WriteL ("PRIORITY('alpha')");
             else
-            {
-                fprintf (o, "      PRIORITY('object')\n");
-            }
-            fprintf (o, "      PARAMS (\n");
+                WriteL ("PRIORITY('object')");
+            WriteL ("PARAMS (");
+	    Indent();
 
             meshobj = true;
         }
     }
-    fprintf (o, "        MATERIAL ('%s')\n", p3dsMesh->faceL->material);
+    WriteL ("MATERIAL ('%s')", p3dsMesh->faceL->material);
 
     // <--output vertexes-->
 
@@ -249,13 +343,12 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
           pCurTexel++;
         }
 
-        fprintf (o, "        V(%g,%g,%g:", xyz[0], xyz[1], xyz[2]);
-        fprintf (o, "%g,%g)\n",u, (flags & FLAG_SWAP_V ? 1.-v : v));
+        Write ("V(%g,%g,%g:", xyz[0], xyz[1], xyz[2]);
+        WriteL ("%g,%g)",u, (flags & FLAG_SWAP_V ? 1.-v : v));
       }
       else
       {
-        fprintf (o, "        VERTEX (%g,%g,%g)    ; %d\n",
-        	  xyz[0], xyz[1], xyz[2], i);
+        WriteL ("VERTEX (%g,%g,%g)    ; %d", xyz[0], xyz[1], xyz[2], i);
       }
 
       // go to next vertex and texel
@@ -274,7 +367,7 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
     {
       if (flags & FLAG_SPRITE)
       {
-        fprintf (o, "        TRIANGLE (%d,%d,%d)\n",
+        WriteL ("TRIANGLE (%d,%d,%d)",
 		pCurFace->points[0], pCurFace->points[1], pCurFace->points[2]);
       }
       else
@@ -283,10 +376,11 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
         if (p3dsFile->lights)
             lighting = true;
 
-        fprintf (o, "        POLYGON 'x%d_%d'  (VERTICES (%d,%d,%d)%s\n",
+        WriteL ("POLYGON 'x%d_%d'  (VERTICES (%d,%d,%d)%s",
 	             numMesh, i, pCurFace->points[0],
 		     pCurFace->points[1], pCurFace->points[2],
 	             lighting ? "" : " LIGHTING (no)");
+	Indent();
         if (pTexelList)
         {
           Lib3dsTexel *mapV0 = (Lib3dsTexel*)pTexelList[pCurFace->points[0]];
@@ -298,13 +392,14 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
           Lib3dsTexel *mapV2 = (Lib3dsTexel*)pTexelList[pCurFace->points[2]];
           float u2 = mapV2[0][0];
           float v2 = mapV2[0][1];
-          fprintf (o, "          TEXTURE (UV (0,%g,%g,1,%g,%g,2,%g,%g))\n",
+          WriteL ("TEXTURE (UV (0,%g,%g,1,%g,%g,2,%g,%g))",
                  u0, (flags & FLAG_SWAP_V ? 1.-v0 : v0),
                  u1, (flags & FLAG_SWAP_V ? 1.-v1 : v1),
                  u2, (flags & FLAG_SWAP_V ? 1.-v2 : v2));
         }
 
-        fprintf (o, "        )\n"); // close polygon
+        WriteL (")"); // close polygon
+	UnIndent();
       }
 
       // go to next face
@@ -312,43 +407,40 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
     }
 
     if (meshobj) {
-        // close PARAMS tag
-        fprintf (o, "      )\n\n");
-        // close MESHOBJ tag
-        fprintf (o, "    )\n\n");
-
+	WriteL(")"); WriteL(""); // close PARAMS tag
+	UnIndent();
+	WriteL(")"); WriteL(""); // close MESHOBJ
+	UnIndent();             	
         meshobj = false;
-
     } else {
-        // close PART
-        fprintf (o, "      )\n\n");
+	WriteL (")"); WriteL("");
+	UnIndent();
     }
 
     // increment mesh count
     numMesh++;
     p3dsMesh = p3dsMesh->next;
-
   } // ~end while (p3dsMesh)
 
   // if working on static object closes MESHOBJECT
   if (part)
   {
-     // close PARAMS tag
-     fprintf (o, "      )\n\n");
-
-     // close MESHOBJ tag
-     fprintf (o, "    )\n\n");
+     WriteL("("); WriteL(""); // close PARAMS
+     UnIndent();
+     WriteL("("); WriteL(""); // close MESHOBJ
+     UnIndent();                                  
      part = false;
   }
 
   if (flags & FLAG_SPRITE)
   {
-    fprintf (o, "ACTION 'default' (F (f1,1000))\n");
-    fprintf (o, "  )\n");
+    WriteL ("ACTION 'default' (F (f1,1000))");
+    WriteL (")");
+    UnIndent();
   }
   else
   {
-    fprintf (o, "    CULLER ('static')\n");
+    WriteL ("CULLER ('static')");
 
     Lib3dsLight *pCurLight = p3dsFile->lights;
     // output lights
@@ -359,19 +451,22 @@ void OutpObjectsCS (FILE * o, Lib3dsFile *p3dsFile, bool lighting)
         fprintf (stderr, "Spotlight are not supported. Light '%s' will not be imported in CS\n", pCurLight->name);
       // convert omni-lights
       } else {
-        fprintf (o, "    LIGHT (\n");
-        fprintf (o, "      CENTER (%g,%g,%g) \n",pCurLight->position[0], pCurLight->position[1], pCurLight->position[2]);
-        fprintf (o, "      RADIUS (%g) \n",pCurLight->outer_range);
-        fprintf (o, "      COLOR (%g,%g,%g)\n",pCurLight->color[0], pCurLight->color[1], pCurLight->color[2]);
-        fprintf (o, "    )\n");
+        WriteL ("LIGHT (");
+	Indent();
+        WriteL ("CENTER (%g,%g,%g)",pCurLight->position[0], pCurLight->position[1], pCurLight->position[2]);
+        WriteL ("RADIUS (%g)",pCurLight->outer_range);
+        WriteL ("COLOR (%g,%g,%g)",pCurLight->color[0], pCurLight->color[1], pCurLight->color[2]);
+        WriteL (")");
+	UnIndent();
       }
 
       pCurLight = pCurLight->next;
     }
 
-    fprintf (o, "  )\n");
-    fprintf (o, ")\n");
+    WriteL (")");
+    UnIndent();
+    WriteL (")");
+    UnIndent();
   }
-
 }
 

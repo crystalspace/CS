@@ -26,9 +26,7 @@ typedef float           float32;
 
 class cs3ds2LevConverter
 {
-
 public:
-
   /// constructor
   cs3ds2LevConverter();
 

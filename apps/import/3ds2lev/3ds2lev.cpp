@@ -2,14 +2,12 @@
  *  Object converter/optimizer
  *  Author: Luca Pancallo
  */
-
 #include "cssysdef.h"
 #include <stdlib.h>
 #include <ctype.h>
 #include <math.h>
 #include "3dsout.h"
 #include "3ds2lev.h"
-
 
 #include "csutil/datastrm.h"
 
@@ -682,12 +680,14 @@ int main (int argc, char * argv[])
     }
   }
 
+  CSWriter writer(outf, p3dsFile);
+
   // Output data in CS format
   if (!(flags & FLAG_LIST))
   {
     fprintf (stderr, "Writing output in CS format...");
-    OutpHeadCS (outf, p3dsFile);
-    OutpObjectsCS (outf, p3dsFile, flags & FLAG_LIGHTING);
+    writer.OutpHeaderCS ();
+    writer.OutpObjectsCS (flags & FLAG_LIGHTING);
 
     fprintf (stderr, "done! \n");
   }
