@@ -19,7 +19,7 @@
 #include "sysdef.h"
 #include "csgeom/math3d.h"
 #include "csengine/collider.h"
-#include "csengine/colldet/rapid.h"
+#include "csengine/rapid.h"
 
 /**
  * Located in eigen.cpp, this function returns the eigenvectors of M,

@@ -5,7 +5,7 @@
 // just wanted to see some stuff bouncing around for now. 
 #include "csphyzik/ctcat.h"
 #include "csengine/collider.h"
-#include "csengine/colldet/rapid.h"
+#include "csengine/rapid.h"
 
 class csWorld;
 class csSprite3D;

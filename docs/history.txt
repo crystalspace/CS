@@ -12,6 +12,10 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+9-Mar-2000
+	- Norman Kramer fixed bug in SetRenderState (glide) and added
+	  CS_FX_KEYCOLOR mixmode in Glide.
+	- Moved include/csengine/colldet/rapid.h to include/csengine.
 8-Mar-2000
 	- Decreased glOrtho setting in OpenGL renderer from 150 to 10 to
 	  make Z buffering precision better. This breaks the terrain engine
@@ -20,6 +24,11 @@ Short-term cleanups that need to be done:
 	  in the world list at deletion. So it is now safe to do
 	  'delete spr'.
 	- Martin Geisse provided another update to the Texinfo documents.
+	- Daniel Fannar Gudbjartsson started cleaning up collision
+	  detection.
+	- Thomas Hieber fixed the changes from Daniel so that it compiles
+	  again on VC.
+	- Thomas also updated the VC project files.
 7-Mar-2000
 	- Added LIGHTING(yes/no) option to skydomes to be able to disable
 	  lighting for the generated triangles.

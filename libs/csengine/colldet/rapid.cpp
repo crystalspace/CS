@@ -70,7 +70,7 @@
 #include "csengine/world.h"
 #include "csengine/camera.h"
 #include "csengine/sector.h"
-#include "csengine/colldet/rapid.h"
+#include "csengine/rapid.h"
 #include "csengine/triangle.h"
 #include "csutil/garray.h"
 

@@ -50,6 +50,7 @@
 #include "csengine/cspixmap.h"
 #include "csengine/terrain.h"
 #include "csengine/cssprite.h"
+#include "csengine/rapid.h"
 #include "csparser/impexp.h"
 #include "csutil/inifile.h"
 #include "csutil/csrect.h"
@@ -61,7 +62,6 @@
 #include "itxtmgr.h"
 #include "isndrdr.h"
 #include "iimage.h"
-#include "csengine/colldet/rapid.h"
 
 #if defined(OS_DOS) || defined(OS_WIN32) || defined (OS_OS2)
 #  include <io.h>

@@ -53,7 +53,7 @@
 #include "isndbuf.h"
 #include "isndrdr.h"
 #include "igraph3d.h"
-#include "csengine/colldet/rapid.h"
+#include "csengine/rapid.h"
 
 csKeyMap* mapping = NULL;
 
