@@ -76,7 +76,7 @@ DDSURFACEDESC2 csGraphics3DDirect3DDx6::m_ddsdHaloSurfDesc = { 0 };
 
 IMPLEMENT_FACTORY (csGraphics3DDirect3DDx6)
 
-EXPORT_CLASS_TABLE (dx613d)
+EXPORT_CLASS_TABLE (d3ddx61)
   EXPORT_CLASS (csGraphics3DDirect3DDx6, "crystalspace.graphics3d.direct3d.dx61",
     "Direct3D DX6.1 3D graphics driver for Crystal Space")
 EXPORT_CLASS_TABLE_END
@@ -231,8 +231,8 @@ csGraphics3DDirect3DDx6::~csGraphics3DDirect3DDx6()
     delete config;
   if (m_piG2D)
     m_piG2D->DecRef ();
-  if (m_piSystem)
-    m_piSystem->DecRef ();
+  //if (m_piSystem)
+  //  m_piSystem->DecRef ();
 }
 
 bool csGraphics3DDirect3DDx6::Initialize (iSystem *iSys)
