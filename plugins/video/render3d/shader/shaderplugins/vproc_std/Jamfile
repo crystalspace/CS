@@ -2,5 +2,5 @@ SubDir TOP plugins video render3d shader shaderplugins vproc_std ;
 
 Description vproc_std : "Standard vertex preprocessor" ;
 Plugin vproc_std : [ Wildcard *.cpp *.h ] ;
-LinkWith vproc_std : csplugincommon csgeom csgfx csutil ;
+LinkWith vproc_std : crystalspace ;
 CompileGroups vproc_std : shaders renderers renderall ;
