@@ -33,7 +33,7 @@ public:
 
   /// Create a iStrVector from scratch
   scfStrVector (int iLimit = 16, int iDelta = 16)
-  { v = new csStrVector (iLimit, iDelta); }
+  { CONSTRUCT_IBASE (NULL); v = new csStrVector (iLimit, iDelta); }
 
   /// Create a iStrVector from given csStrVector (takes ownership)
   scfStrVector (csStrVector*);
