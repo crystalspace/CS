@@ -17,6 +17,8 @@ ifeq ($(MAKESECTION),roottargets)
 all apps: walk
 walk:
 	$(MAKE_TARGET)
+walkclean:
+	$(MAKE_CLEAN)
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
@@ -49,7 +51,7 @@ $(WALKTEST.EXE): $(DEP.EXE) $(OBJ.WALKTEST) \
 	$(DO.LINK.EXE)
 
 walkclean:
-	-$(RM) $(WALKTEST.EXE)
+	-$(RM) $(WALKTEST.EXE) $(OBJ.WALKTEST)
 
 ifdef DO_DEPEND
 depend: $(OUTOS)walktest.dep
