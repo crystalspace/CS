@@ -1,5 +1,5 @@
 SubDir TOP src ;
 
+Description #PROJECTNAME# : "#LONGNAME#" ;
 Application #PROJECTNAME# : [ Wildcard *.cpp *.h ] ;
 ExternalLibs #PROJECTNAME# : CRYSTAL ;
-Help #PROJECTNAME# : "#LONGNAME#" ;
