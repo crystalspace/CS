@@ -299,8 +299,8 @@ csJoystickDriver::csJoystickDriver (iObjectRegistry* r) :
   Listener = &scfiEventHandler;
   StartListening();
   memset (&Button, 0, sizeof (Button));
-  memset (&LastX, sizeof (LastX), 0);
-  memset (&LastY, sizeof (LastY), 0);
+  memset (&LastX, 0, sizeof (LastX));
+  memset (&LastY, 0, sizeof (LastY));
 }
 
 csJoystickDriver::~csJoystickDriver ()
