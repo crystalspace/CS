@@ -18,6 +18,7 @@
 
 #include "sysdef.h"
 #include "csgeom/frustrum.h"
+#include "csgeom/transfrm.h"
 
 void csFrustrum::Clear ()
 {
@@ -25,6 +26,7 @@ void csFrustrum::Clear ()
   num_vertices = max_vertices = 0;
   CHK (delete backplane); backplane = NULL;
   wide = false;
+  mirrored = false;
 }
 
 csFrustrum::csFrustrum (csVector3& o, csVector3* verts, int num_verts, csPlane* backp)
@@ -33,6 +35,7 @@ csFrustrum::csFrustrum (csVector3& o, csVector3* verts, int num_verts, csPlane* 
   num_vertices = num_verts;
   max_vertices = num_verts;
   wide = false;
+  mirrored = false;
   if (verts)
   {
     CHK (vertices = new csVector3 [max_vertices]);
@@ -53,6 +56,7 @@ csFrustrum::csFrustrum (const csFrustrum &copy)
   num_vertices = copy.num_vertices;
   max_vertices = copy.max_vertices;
   wide = copy.wide;
+  mirrored = copy.mirrored;
   if (copy.vertices)
   {
     CHK (vertices = new csVector3 [max_vertices]);
@@ -109,7 +113,16 @@ void csFrustrum::MakeEmpty ()
   wide = false;
 }
 
-void csFrustrum::ClipToPlane (csPlane* plane)
+void csFrustrum::Transform (csTransform* trans)
+{
+  int i;
+  origin = trans->Other2This (origin);
+  for (i = 0 ; i < num_vertices ; i++)
+    vertices[i] = trans->Other2ThisRelative (vertices[i]);
+  if (backplane) (*backplane) *= (*trans);
+}
+
+void csFrustrum::ClipPolyToPlane (csPlane* plane)
 {
   // First classify all vertices of the current polygon with regards to this
   // frustrum.
@@ -189,14 +202,12 @@ void csFrustrum::ClipToPlane (csVector3& v1, csVector3& v2)
   csVector3 Plane_Normal;
   int i;
 
-bool mirror = false;	// @@@ Change later!
-
   // Make sure that we have space in the array for at least three extra
   // vertices.
   if (num_vertices >= max_vertices-3) ExtendVertexArray (3);
 
   // Do the check only once at the beginning instead of twice during the routine.
-  if (mirror)
+  if (mirrored)
     Plane_Normal = v2%v1;
   else
     Plane_Normal = v1%v2;
@@ -259,6 +270,8 @@ bool mirror = false;	// @@@ Change later!
 
 csFrustrum* csFrustrum::Intersect (const csFrustrum& other)
 {
+  if (other.IsEmpty ()) return NULL;
+  if (other.IsInfinite ()) { CHK (csFrustrum* f = new csFrustrum (*this)); return f; }
   return Intersect (other.vertices, other.num_vertices);
 }
 
@@ -271,11 +284,11 @@ csFrustrum* csFrustrum::Intersect (csVector3* poly, int num)
     // frustrum with the other is equal to the other.
     CHK (new_frustrum = new csFrustrum (origin, poly, num));
   }
-  else if (!poly)
+  else if (IsEmpty ())
   {
-    // Other frustrum is infinite. In this case the intersection
-    // is equal to this frustrum.
-    CHK (new_frustrum = new csFrustrum (*this));
+    // If this frustrum is empty then the intersection will be empty
+    // as well.
+    return NULL;
   }
   else
   {
@@ -287,8 +300,8 @@ csFrustrum* csFrustrum::Intersect (csVector3* poly, int num)
     i1 = num_vertices-1;
     for (i = 0 ; i < num_vertices ; i++)
     {
-      new_frustrum->ClipToPlane (vertices[i], vertices[i1]);
-      if (new_frustrum->GetNumVertices () == 0)
+      new_frustrum->ClipToPlane (vertices[i1], vertices[i]);
+      if (new_frustrum->IsEmpty ())
       {
         // Intersection has become empty. Return NULL.
 	CHK (delete new_frustrum);
@@ -301,8 +314,8 @@ csFrustrum* csFrustrum::Intersect (csVector3* poly, int num)
     // in the new frustrum to that.
     if (backplane)
     {
-      new_frustrum->ClipToPlane (backplane);
-      if (new_frustrum->GetNumVertices () == 0)
+      new_frustrum->ClipPolyToPlane (backplane);
+      if (new_frustrum->IsEmpty ())
       {
         // Intersection has become empty. Return NULL.
 	CHK (delete new_frustrum);
