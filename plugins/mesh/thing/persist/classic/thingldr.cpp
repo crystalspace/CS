@@ -499,9 +499,9 @@ static iPolygon3D* load_poly3d (iEngine* engine, char* polyname, char* buf,
   csVector3 tx_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
   float tx1_len = default_texlen, tx2_len = default_texlen;
   float tx_len = default_texlen;
-  char xplane_name[100];
-  char yplane_name[100];
-  char zplane_name[100];
+  char xplane_name[100]; xplane_name[0] = 0;
+  char yplane_name[100]; yplane_name[0] = 0;
+  char zplane_name[100]; zplane_name[0] = 0;
 
   csMatrix3 tx_matrix;
   csVector3 tx_vector (0, 0, 0);
