@@ -23,6 +23,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/transfrm.h"
 #include "csgeom/vector3.h"
 #include "cstool/rendermeshholder.h"
+#include "csutil/leakguard.h"
 #include "csutil/bitarray.h"
 #include "csutil/cscolor.h"
 #include "csutil/refarr.h"
@@ -52,6 +53,8 @@ class csSegment3;
 class csTerrBlock : public csRefCount
 {
 public:
+  CS_LEAKGUARD_DECLARE (csTerrBlock);
+
   csRef<iRenderBuffer> mesh_vertices;
   csVector3 *vertex_data;
   csRef<iRenderBuffer> mesh_morphvertices;
@@ -218,7 +221,6 @@ public:
 class csTerrainObject : public iMeshObject
 {
 private:
-
   friend class csTerrBlock;
 
   csBox2 region;
@@ -295,6 +297,8 @@ private:
   void SetupObject ();
 
 public:
+  CS_LEAKGUARD_DECLARE (csTerrainObject);
+
   /// Constructor.
   csTerrainObject (iObjectRegistry* object_reg, iMeshObjectFactory* factory);
   virtual ~csTerrainObject ();
@@ -554,6 +558,8 @@ private:
   csFlags flags;
 
 public:
+  CS_LEAKGUARD_DECLARE (csTerrainFactory);
+
   csRef<iTerraFormer> terraformer;
 
   csBox2 samplerRegion;

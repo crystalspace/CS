@@ -9,6 +9,9 @@ chronological order.
 24-Aug-2004
 	- Jorrit fixed a bug in Dynavis where it would try to use the
 	  hint_goodoccluder flag before setting the value of that.
+	- Jorrit fixed a crash bug in walktest/flarge when you tried to jump
+	  on the car.
+	- Jorrit added some leak guards.
 23-Aug-2004
 	- Jorrit added lots more leak guards.
 	- Jorrit fixed a leak in xmlshader where a failing technique was
