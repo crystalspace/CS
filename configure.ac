@@ -2,8 +2,8 @@
 #==============================================================================
 # Copyright (C)2003 by Eric Sunshine <sunshine@sunshineco.com>
 #
-# Autoconf input script for Crystal Space.  Process this file with Autoconf
-# to produce a configure script.
+# Autoconf input script for Crystal Space.  Process this file with
+# CS/bin/autogen.sh to produce a configure script.
 #==============================================================================
 AC_PREREQ([2.56])
 
@@ -38,7 +38,7 @@ m4_define([cs_install_dir_default], [/usr/local/crystal])
 # Present Cases:
 #	/usr/local -- Not all compilers search here by default, so we specify
 #		it manually.
-#	/sw -- Fink, the MacOS/X manager of Unix packages installs here by
+#	/sw -- Fink, the MacOS/X manager of Unix packages, installs here by
 #		default.
 #------------------------------------------------------------------------------
 m4_define([cs_lib_paths_default],
@@ -47,222 +47,14 @@ m4_define([cs_lib_paths_default],
 
 
 #------------------------------------------------------------------------------
-# Replacement for AS_MKDIR_P() from m4sugar/m4sh.m4 which fixes two problems
-# which are present at least as recently as Autoconf 2.57.  This bug, along
-# with a patch, was submitted to the Autoconf GNATS database by Eric Sunshine
-# as #227.
-#
-# 1) Removes bogus "-p" directory which the stock AS_MKDIR_P() leaves laying
-#    around in the working directory if the mkdir command does not recognize
-#    the -p option.
-# 2) Takes advantage of the older "mkdirs" program if it exists and if "mkdir
-#    -p" does not work.
-#------------------------------------------------------------------------------
-m4_defun([_AS_MKDIR_P_PREPARE],
-[if mkdir -p . 2>/dev/null; then
-  as_mkdir_p='mkdir -p'
-elif mkdirs . 2>/dev/null; then
-  as_mkdir_p='mkdirs'
-else
-  as_mkdir_p=''
-fi
-test -r ./-p && rm -rf ./-p
-])# _AS_MKDIR_P_PREPARE
-
-m4_define([AS_MKDIR_P],
-[AS_REQUIRE([_$0_PREPARE])dnl
-{ if test -n "$as_mkdir_p"; then
-    $as_mkdir_p $1
-  else
-    as_dir=$1
-    as_dirs=
-    while test ! -d "$as_dir"; do
-      as_dirs="$as_dir $as_dirs"
-      as_dir=`AS_DIRNAME("$as_dir")`
-    done
-    test ! -n "$as_dirs" || mkdir $as_dirs
-  fi || AS_ERROR([cannot create directory $1]); }
-])# AS_MKDIR_P
-
-
-
-#------------------------------------------------------------------------------
-# CS_TRIM(STRING)
-#	Strip leading and trailing spaces from STRING and collapse internal
-#	runs of multiple spaces to a single space.
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_TRIM], [`echo x$1 | sed 's/^x//;s/   */ /g;s/^ //;s/ $//'`])
-
-
-
-#------------------------------------------------------------------------------
-# Text cache facility.  These macros provide a way to incrementally store
-# arbitrary text in a shell variable, and to write the saved text to a file.
-#
-# CS_TEXT_CACHE_APPEND(VARIABLE, TEXT)
-#	Append text to the contents of the named shell variable.  If the text
-#	contains references to shell variables (such as $foo), then those
-#	references will be expanded.  If expansion is not desired, then protect
-#	the text with AS_ESCAPE().
-#
-# CS_TEXT_CACHE_PREPEND(VARIABLE, TEXT)
-#	Prepend text to the contents of the named shell variable.  If the text
-#	contains references to shell variables (such as $foo), then those
-#	references will be expanded.  If expansion is not desired, then protect
-#	the text with AS_ESCAPE().
-#
-# CS_TEXT_CACHE_OUTPUT(VARIABLE, FILENAME, [FILTER])
-#	Instruct config.status to write the contents of the named shell
-#	variable to the given filename.  If the file resides in a directory,
-#	the directory will be created, if necessary.  If the output file
-#	already exists, and if the cached text is identical to the contents of
-#	the existing file, then the existing file is left alone, thus its time
-#	stamp remains unmolested.  This heuristic may help to minimize rebuilds
-#	when the file is listed as a dependency in a makefile.  If FILTER is
-#	supplied, it should be a shell command which accepts text (the content
-#	of VARIABLE) on its standard input and emits a filtered or transformed
-#	version of that text to its standard output.  The filtered text will
-#	instead be written to FILENAME.  Be aware that the text sent through
-#	the filter is exactly the text stored in the cache variable, and that
-#	this text might not end with a line terminator, thus the filter command
-#	should be capable of editing non-terminated text, if you expect such
-#	text to exist in the cache variable.  This issue might affect some
-#	older versions of sed, for instance, which would discard the last line
-#	of text if the line terminator was missing.  NOTE: There is a bug in
-#	Autoconf, at least as recently as 2.57, which forces us to invoke
-#	AS_MKDIR_P in the third argument to AC_CONFIG_COMMANDS (the
-#	`init-cmds') rather than the second (the `cmds') This is undesirable
-#	because it means that the directory will be created anytime
-#	config.status is invoked (even for a simple --help), rather than being
-#	created only when requested to output the text cache.  This bug was
-#	submitted to the Autoconf GNATS database by Eric Sunshine as #228.
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_TEXT_CACHE_APPEND], [$1="${$1}$2"])
-AC_DEFUN([CS_TEXT_CACHE_PREPEND], [$1="$2${$1}"])
-AC_DEFUN([CS_TEXT_CACHE_OUTPUT],
-    [AC_CONFIG_COMMANDS([$2],
-	[echo $ECHO_N "$$1$ECHO_C"m4_ifval([$3],[|$3]) > $tmp/tcache
-	    if diff $2 $tmp/tcache >/dev/null 2>&1; then
-		AC_MSG_NOTICE([$2 is unchanged])
-	    else
-		rm -f $2
-		mv $tmp/tcache $2
-	    fi],
-	[$1='$$1' cs_dir=`AS_DIRNAME([$2])`
-	    AS_MKDIR_P([AS_ESCAPE([$cs_dir])])])])
-
-
-
-#------------------------------------------------------------------------------
-# Text cache facility for C-style #define properties.  The cache is stored in
-# the shell variable cs_header_text.
-#
-# CS_HEADER_APPEND(TEXT)
-#	Append text to the C header text cache.  This is a cover for
-#	CS_TEXT_CACHE_APPEND().
-#
-# CS_HEADER_PREPEND(TEXT)
-#	Prepend text to the C header text cache.  This is a cover for
-#	CS_TEXT_CACHE_PREPEND().
-#
-# CS_HEADER_PROPERTY(KEY, [VALUE])
-#	Append a line of the form "#define KEY VALUE" to the C header text
-#	cache.  If the VALUE argument is omitted, then the appended line has
-#	the simplified form "#define KEY".
-#
-# CS_HEADER_OUTPUT(FILENAME)
-#	Instruct config.status to write the C header text cache to the given
-#	filename.  This is a cover for CS_TEXT_CACHE_OUTPUT().
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_HEADER_APPEND], [CS_TEXT_CACHE_APPEND([cs_header_text], [$1])])
-AC_DEFUN([CS_HEADER_PREPEND], [CS_TEXT_CACHE_PREPEND([cs_header_text], [$1])])
-AC_DEFUN([CS_HEADER_PROPERTY],
-[CS_HEADER_APPEND([@%:@define $1[]m4_ifval([$2], [ $2], [])
-])])
-AC_DEFUN([CS_HEADER_OUTPUT], [CS_TEXT_CACHE_OUTPUT([cs_header_text], [$1])])
-
-
-
-#------------------------------------------------------------------------------
-# Text cache facility for makefile-style properties.  The cache is stored in
-# the shell variable cs_makefile_text.
-#
-# CS_MAKEFILE_APPEND(TEXT)
-#	Append text to the makefile text cache.  This is a cover for
-#	CS_TEXT_CACHE_APPEND().
-#
-# CS_MAKEFILE_PREPEND(TEXT)
-#	Prepend text to the makefile text cache.  This is a cover for
-#	CS_TEXT_CACHE_PREPEND().
-#
-# CS_MAKEFILE_PROPERTY(KEY, VALUE, [APPEND])
-#	Append a line of the form "KEY = VALUE" to the makefile text cache.  If
-#	the APPEND argument is not the empty string, then VALUE is appended to
-#	the existing value of KEY using the form "KEY += VALUE".  Note that if
-#	VALUE references other makefile variables, for example $(OBJS), then be
-#	sure to protect the value with AS_ESCAPE().  For example:
-#	CS_MAKEFILE_PROPERTY([ALLOBJS], [AS_ESCAPE([$(OBJS) $(LIBOBJS)])])
-#
-# CS_MAKEFILE_OUTPUT(FILENAME)
-#	Instruct config.status to write the makefile text cache to the given
-#	filename.  This is a cover for CS_TEXT_CACHE_OUTPUT().
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_MAKEFILE_APPEND],
-    [CS_TEXT_CACHE_APPEND([cs_makefile_text], [$1])])
-AC_DEFUN([CS_MAKEFILE_PREPEND],
-    [CS_TEXT_CACHE_PREPEND([cs_makefile_text], [$1])])
-AC_DEFUN([CS_MAKEFILE_PROPERTY],
-    [CS_MAKEFILE_APPEND([$1 m4_ifval([$3], [+=], [=]) $2
-])])
-AC_DEFUN([CS_MAKEFILE_OUTPUT],[CS_TEXT_CACHE_OUTPUT([cs_makefile_text], [$1])])
-
-
-
-#------------------------------------------------------------------------------
-# Text cache facility for Jam-style properties.  The cache is stored in
-# the shell variable cs_jamfile_text.
-#
-# CS_JAMCONFIG_APPEND(TEXT)
-#	Append text to the Jam text cache.  This is a cover for
-#	CS_TEXT_CACHE_APPEND().
-#
-# CS_JAMCONFIG_PREPEND(TEXT)
-#	Prepend text to the Jam text cache.  This is a cover for
-#	CS_TEXT_CACHE_PREPEND().
-#
-# CS_JAMCONFIG_PROPERTY(KEY, VALUE, [APPEND])
-#	Append a line of the form "KEY = VALUE" to the Jam text cache.  If the
-#	APPEND argument is not the empty string, then VALUE is appended to the
-#	existing value of KEY using the form "KEY += VALUE".  Note that if
-#	VALUE references other Jam variables, for example $(OBJS), then be sure
-#	to protect the value with AS_ESCAPE().  For example:
-#	CS_JAMCONFIG_PROPERTY([ALLOBJS], [AS_ESCAPE([$(OBJS) $(LIBOBJS)])])
-#
-# CS_JAMCONFIG_OUTPUT(FILENAME)
-#	Instruct config.status to write the Jam text cache to the given
-#	filename.  This is a cover for CS_TEXT_CACHE_OUTPUT().
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_JAMCONFIG_APPEND],
-    [CS_TEXT_CACHE_APPEND([cs_jamconfig_text], [$1])])
-AC_DEFUN([CS_JAMCONFIG_PREPEND],
-    [CS_TEXT_CACHE_PREPEND([cs_jamconfig_text], [$1])])
-AC_DEFUN([CS_JAMCONFIG_PROPERTY],
-    [CS_JAMCONFIG_APPEND([$1 m4_ifval([$3], [+=], [?=]) \"$2\" ;
-])])
-AC_DEFUN([CS_JAMCONFIG_OUTPUT],
-     [CS_TEXT_CACHE_OUTPUT([cs_jamconfig_text], [$1],
-	 [sed 's/\${\([[a-zA-Z_]]\+\)}/$(\1)/g;s/\\/\\\\/g'])])
-
-
-
-#------------------------------------------------------------------------------
 # CS_BUILD_PROPERTY(KEY, VALUE, [APPEND])
 #	A utility function which invokes both CS_MAKEFILE_PROPERTY() and
 #	CS_JAMCONFIG_PROPERTY(), thereby emitting a build property suitable for
 #	each build system (GNU make & Jam).  Some variable names differ between
-#	the makefile and the Jam build systems, thus it is necessary to perform
-#	some translation on KEY from the makefile variable name to the Jam
-#	variable name.  If you have a situation in which a build variable is
+#	the makefile and the Jam build systems, thus this implementation
+#	performs translation on KEY from the makefile variable name to the Jam
+#	variable name automatically.  However, VALUE not translated
+#	automatically, so if you have a situation in which a build variable is
 #	mentioned in VALUE, then you should instead invoke
 #	CS_MAKEFILE_PROPERTY() and CS_JAMCONFIG_PROPERTY() manually with the
 #	appropriate values.
@@ -277,9 +69,9 @@ AC_DEFUN([CS_BUILD_PROPERTY],
 # _CS_TRANSLATE_MAKE_TO_JAM([TEXT])
 #	Helper function for CS_BUILD_PROPERTY() which translates makefile-style
 #	names to Jam style names.  This is necessary since the makefile and Jam
-#	build systems use different names in some cases.  It is more convenient
-#	to perform the name translation here in one place, than manually in
-#	each place a build property is emitted.
+#	build systems use different variable names in some cases.  It is more
+#	convenient to perform the name translation here in one place, than
+#	manually in each place a build property is emitted.
 #------------------------------------------------------------------------------
 AC_DEFUN([_CS_TRANSLATE_MAKE_TO_JAM],
     [m4_case([$1],
@@ -299,300 +91,6 @@ AC_DEFUN([_CS_TRANSLATE_MAKE_TO_JAM],
 	[USE_XFREE86VM], [XFREE86VM.AVAILABLE],
 	[PROC], [TARGET.PROCESSOR],
 	[$1])])
-
-
-
-#------------------------------------------------------------------------------
-# CS_SPLIT(LINE, [OUTPUT-VARIABLES], [DELIMITER], [FILLER])
-#	Split LINE into individual tokens.  Tokens are delimited by DELIMITER,
-#	which is the space character if omitted.  OUTPUT-VARIABLES is a
-#	comma-delimited list of shell variables which should receive the
-#	extracted tokens.  If there are too few tokens to fill the output
-#	variables, then the excess variables will be assigned the empty string.
-#	If there are too few output variables, then the excess tokens will be
-#	ignored.  If OUTPUT-VARIABLES is omitted, then the split tokens will be
-#	assigned to the shell meta-variables $1, $2, $3, etc.  When
-#	OUTPUT-VARIABLES is omitted, FILLER is assigned to meta-variables in
-#	cases where DELIMITER delimits a zero-length token.  FILLER defaults
-#	to "filler".  For example, if DELIMITER is "+" and OUTPUT-VARIABLES is
-#	omitted, given the line "one++three", $1 will be "one", $2 will be
-#	"filler", and $3 will be "three".
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_SPLIT],
-    [m4_define([cs_split_filler], m4_default([$4],[filler]))
-    set cs_split_filler `echo "$1" | awk 'BEGIN { FS="m4_default([$3],[ ])" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "cs_split_filler"; else print $i } }'`
-    shift
-    m4_map([_CS_SPLIT], [$2])])
-
-AC_DEFUN([_CS_SPLIT],
-    [AS_IF([test $[@%:@] -eq 0], [$1=''],
-	[AS_IF([test "$[1]" = cs_split_filler], [$1=''], [$1=$[1]])
-	shift])])
-
-
-
-#------------------------------------------------------------------------------
-# CS_SPLIT_TUPLE(TUPLE, OUTPUT-VARIABLES)
-#	Split a build-tuple into its component parts.  A build tuple is
-#	constructed by CS_CREATE_TUPLE() and is comprised of compiler flags,
-#	linker flags, and library references.  OUTPUT-VARIABLES is a
-#	comma-delimited list of shell variables which should receive the
-#	extracted compiler flags, linker flags, and library references,
-#	respectively.
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_SPLIT_TUPLE],
-    [CS_SPLIT([$1], [cs_dummy,$2], [@])
-    m4_map([_CS_SPLIT_TUPLE], [$2])])
-
-AC_DEFUN([_CS_SPLIT_TUPLE],
-    [$1=`echo $$1 | sed 'y%@%:@% %'`
-    ])
-
-
-
-#------------------------------------------------------------------------------
-# CS_CREATE_TUPLE([CFLAGS], [LFLAGS], [LIBS])
-#	Construct a build-tuple which is comprised of compiler flags, linker
-#	flags, and library references.  Build tuples are encoded so as to
-#	preserve whitespace in each component.  This makes it possible for
-#	macros (such as CS_BUILD_IFELSE) which employ build tuples to accept
-#	whitespace-delimited lists of tuples, and for shell "for" statements to
-#	iterate over tuple lists without compromising whitespace embedded
-#	within individual flags or library references.
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_CREATE_TUPLE], [`echo @$1@$2@$3 | sed 'y% %@%:@%'`])
-
-
-
-#------------------------------------------------------------------------------
-# CS_LANG_CFLAGS
-#	Return the literal string CFLAGS if the current language is C.  Return
-#	the literal string CXXFLAGS if the current language is C++.  Generic
-#	compiler test macros which need to modify or save the compiler flags
-#	can invoke this macro to get the name of the compiler flags environment
-#	variable (either CFLAGS or CXXFLAGS) depending upon the current
-#	language.  For example:
-#		CS_LANG_CFLAGS="$CS_LANG_CFLAGS -Wall"
-#	With C, this expands to:
-#		CFLAGS="$CFLAGS -Wall"
-#	With C++, it expands to:
-#		CXXFLAGS="$CXXFLAGS -Wall"
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_LANG_CFLAGS], [AC_LANG_CASE([C], [CFLAGS], [C++], [CXXFLAGS])])
-
-
-
-#------------------------------------------------------------------------------
-# CS_BUILD_IFELSE([PROGRAM], [FLAGS], [LANGUAGE], [ACTION-IF-BUILT],
-#                 [ACTION-IF-NOT-BUILT], [OTHER-CFLAGS], [OTHER-LFLAGS],
-#                 [OTHER-LIBS])
-#	Try building a program using the supplied compiler flags, linker flags,
-#	and library references.  PROGRAM is typically a program composed via
-#	AC_LANG_PROGRAM().  PROGRAM may be omitted if you are interested only
-#	in learning if the compiler or linker respects certain flags.  LANGUAGE
-#	is typically either C or C++ and specifies which compiler to use for
-#	the test.  If LANGUAGE is omitted, C is used.  FLAGS is a whitespace
-#	delimited list of build tuples.  Tuples are created with
-#	CS_CREATE_TUPLE() and are composed of up to three elements each.  The
-#	first element represents compiler flags, the second linker flags, and
-#	the third libraries used when linking the program.  Each tuple from
-#	FLAGS is attempted in order.  If you want a build attempted with no
-#	special flags prior to builds with specialized flags, create an empty
-#	tuple with CS_CREATE_TUPLE() at the start of the FLAGS list.  If the
-#	build is successful, then the shell variables cs_build_ok is set to
-#	"yes", cs_build_cflags, cs_build_lflags, and cs_build_libs are set to
-#	the tuple elements which resulted in the successful build, and
-#	action-if-built is invoked.  Upon successful build, no further tuples
-#	are consulted.  If no tuple results in a successful build, then
-#	cs_build_ok is set to "no" and action-if-not-built is invoked.
-#	OTHER-CFLAGS, OTHER-LFLAGS, and OTHER-LIBS specify additional compiler
-#	flags, linker flags, and libraries which should be used with each tuple
-#	build attempt.  Upon successful build, these additional flags are
-#	reflected in the variables cs_build_cflags, cs_build_lflags, and
-#	cs_build_libs.
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_BUILD_IFELSE],
-    [AC_LANG_PUSH(m4_default([$3],[C]))
-    cs_cflags_save="$CS_LANG_CFLAGS"
-    cs_lflags_save="$LDFLAGS"
-    cs_libs_save="$LIBS"
-    cs_build_ok=no
-
-    for cs_build_item in m4_default([$2],[CS_CREATE_TUPLE()])
-    do
-	CS_SPLIT_TUPLE(
-	    [$cs_build_item],[cs_cflags_test,cs_lflags_test,cs_libs_test])
-	CS_LANG_CFLAGS="$cs_cflags_test $6 $cs_cflags_save"
-	LDFLAGS="$cs_lflags_test $7 $cs_lflags_save"
-	LIBS="$cs_libs_test $8 $cs_libs_save"
-	AC_LINK_IFELSE(m4_default([$1], [AC_LANG_PROGRAM([],[])]),
-	    [cs_build_ok=yes
-	    break])
-    done
-
-    CS_LANG_CFLAGS=$cs_cflags_save
-    LDFLAGS=$cs_lflags_save
-    LIBS=$cs_libs_save
-    AC_LANG_POP(m4_default([$3],[C]))
-
-    AS_IF([test $cs_build_ok = yes],
-	[cs_build_cflags=CS_TRIM([$cs_cflags_test $6])
-	cs_build_lflags=CS_TRIM([$cs_lflags_test $7])
-	cs_build_libs=CS_TRIM([$cs_libs_test $8])
-	m4_default([$4],[:])],
-	[m4_default([$5],[:])])])
-
-
-
-#------------------------------------------------------------------------------
-# CS_CHECK_BUILD(MESSAGE, CACHE-VAR, [PROGRAM], [FLAGS], [LANGUAGE],
-#                [ACTION-IF-BUILT], [ACTION-IF-NOT-BUILT], [IGNORE-CACHE],
-#                [OTHER-CFLAGS], [OTHER-LFLAGS], [OTHER-LIBS])
-#	Like CS_BUILD_IFELSE() but also prints "checking" and result messages,
-#	and optionally respects the cache.  Sets CACHE-VAR to "yes" upon
-#	success, else "no" upon failure.  Additionally, sets CACHE-VAR_cflags,
-#	CACHE-VAR_lflags, and CACHE-VAR_libs to the values which resulted in a
-#	successful build.  If IGNORE-CACHE is "yes", then the cache variables
-#	are ignored upon entry to this macro, however they are still set to
-#	appropriate values upon exit.
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_CHECK_BUILD],
-    [AS_IF([test "$8" != yes],
-	[AC_CACHE_CHECK([$1], [$2],
-	    [CS_BUILD_IFELSE([$3], [$4], [$5],
-		[$2=yes
-		$2_cflags=$cs_build_cflags
-		$2_lflags=$cs_build_lflags
-		$2_libs=$cs_build_libs],
-		[$2=no], [$9], [$10], [$11])])],
-	[AC_MSG_CHECKING([$1])
-	    CS_BUILD_IFELSE([$3], [$4], [$5],
-		[$2=yes
-		$2_cflags=$cs_build_cflags
-		$2_lflags=$cs_build_lflags
-		$2_libs=$cs_build_libs],
-		[$2=no], [$9], [$10], [$11])
-	    AC_MSG_RESULT([$$2])])
-    AS_IF([test $$2 = yes], [m4_default([$6],[:])],
-	[$2_cflags=''
-	$2_lflags=''
-	$2_libs=''
-	m4_default([$7],[:])])])
-
-
-
-#------------------------------------------------------------------------------
-# CS_CHECK_LIB_WITH(LIBRARY, PROGRAM, [SEARCH-LIST], [LANGUAGE],
-#                   [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND], [OTHER-CFLAGS],
-#                   [OTHER-LFLAGS], [OTHER-LIBS])
-#	Similar to AC_CHECK_LIB(), but allows caller to to provide list of
-#	directories in which to search for LIBRARY, and allows user to override
-#	library location via --with-libLIBRARY=dir.  LIBRARY is the name of the
-#	library which is to be located (for example, "readline" for
-#	libreadline.a).  PROGRAM, which is typically composed with
-#	AC_LANG_PROGRAM(), is a program which refernces at least one function
-#	or symbol in LIBRARY.  SEARCH-LIST is a whitespace-delimited list of
-#	paths in which to search for the library and its header files, in
-#	addition to those searched by the compiler and linker by default, and
-#	those referenced by the cs_lib_paths_default macro.  Each list item can
-#	specify an include|library directory tuple (for example,
-#	"/usr/include|/usr/lib"), or a single directory (for example, "/usr").
-#	If the second form is used, then the directory itself is searched
-#	first.  If the library resources are not found, then "include" and
-#	"lib" subdirectories of the directory are searched.  Thus, specifying
-#	"/proj" is shorthand for "/proj|/proj /proj/include|/proj/lib".  Items
-#	in the search list can include wildcards.  SEARCH-LIST can be overriden
-#	by the user with the --with-libLIBRARY=dir option, in which case only
-#	"dir" and "dir/include|dir/lib" are searched.  If SEARCH-LIST is
-#	omitted and the user did not override the search list via
-#	--with-libLIBRARY=dir, then only the directories normally searched by
-#	the compiler and the directories mentioned via cs_lib_paths_default are
-#	searched.  LANGUAGE is typically either C or C++ and specifies which
-#	compiler to use for the test.  If LANGUAGE is omitted, C is used.
-#	OTHER-CFLAGS, OTHER-LFLAGS, and OTHER-LIBS can specify additional
-#	compiler flags, linker flags, and libraries needed to successfully link
-#	with LIBRARY.  If the library is found and can be successfully linked
-#	into a program, then the shell cache variable cs_cv_libLIBRARY is set
-#	to "yes"; cs_cv_libLIBRARY_cflags, cs_cv_libLIBRARY_lflags, and
-#	cs_cv_libLIBRARY_libs are set, respectively, to the compiler flags
-#	(including OTHER-CFLAGS), linker flags (including OTHER-LFLAGS), and
-#	library references (including OTHER-LIBS) which resulted in a
-#	successful build; and ACTION-IF-FOUND is invoked.  If the library was
-#	not found or was unlinkable, or if the user disabled the library with
-#	--without-libLIBRARY, then cs_cv_libLIBRARY is set to "no" and
-#	ACTION-IF-NOT-FOUND is invoked.
-#------------------------------------------------------------------------------
-AC_DEFUN([CS_CHECK_LIB_WITH],
-    [AC_ARG_WITH([lib$1], [AC_HELP_STRING([--with-lib$1=dir],
-	[specify location of lib$1 if not detected automatically; searches dir,
-	dir/include, and dir/lib])])
-
-    AS_IF([test -z "$with_lib$1"], [with_lib$1=yes])
-    AS_IF([test "$with_lib$1" != no],
-	[# If --with-lib value is same as cached value, then assume other
-	 # cached values are also valid; otherwise, ignore all cached values.
-	AS_IF([test "$with_lib$1" != "$cs_cv_with_lib$1"],
-	    [cs_ignore_cache=yes], [cs_ignore_cache=no])
-
-	AS_IF([test $with_lib$1 != yes],
-	    [cs_check_lib_paths=$with_lib$1],
-	    [cs_check_lib_paths="| cs_lib_paths_default $3"])
-
-	_CS_CHECK_LIB_CREATE_FLAGS(
-	    [cs_check_lib_flags], [$1], [$cs_check_lib_paths])
-
-	CS_CHECK_BUILD([for lib$1], [cs_cv_lib$1], [$2], [$cs_check_lib_flags],
-	    [$4], [], [], [$cs_ignore_cache], [$7], [$8], [$9])],
-	[cs_cv_lib$1=no])
-    cs_cv_with_lib$1="$with_lib$1"
-
-    AS_IF([test "$cs_cv_lib$1" = yes],
-	[m4_default([$5],[:])], [m4_default([$6],[:])])])
-
-
-
-#------------------------------------------------------------------------------
-# _CS_CHECK_LIB_CREATE_FLAGS(VARIABLE, LIBRARY, PATHS)
-#	Helper macro for CS_CHECK_LIB_WITH().  Constructs a list of build
-#	tuples suitable for CS_CHECK_BUILD() and assigns the tuple list to the
-#	shell variable VARIABLE.  LIBRARY and PATHS have the same meanings as
-#	the like-named arguments of CS_CHECK_LIB_WITH().
-#------------------------------------------------------------------------------
-AC_DEFUN([_CS_CHECK_LIB_CREATE_FLAGS],
-    [$1=''
-    for cs_lib_item in $3
-    do
-	case $cs_lib_item in
-	    *\|*) CS_SPLIT(
-		    [$cs_lib_item], [cs_check_incdir,cs_check_libdir], [|])
-		_CS_CHECK_LIB_CREATE_FLAG([$1],
-		    [$cs_check_incdir], [$cs_check_libdir], [$2])
-		;;
-	    *)  _CS_CHECK_LIB_CREATE_FLAG(
-		    [$1], [$cs_lib_item], [$cs_lib_item], [$2])
-		_CS_CHECK_LIB_CREATE_FLAG([$1],
-		    [$cs_lib_item/include], [$cs_lib_item/lib], [$2])
-		;;
-	esac
-    done])
-
-
-
-#------------------------------------------------------------------------------
-# _CS_CHECK_LIB_CREATE_FLAG(VARIABLE, HEADER-DIR, LIBRARY-DIR, LIBRARY)
-#	Helper macro for _CS_CHECK_LIB_CREATE_FLAGS().  Constructs a single
-#	build tuple suitable for CS_CHECK_BUILD() and appends the tuple to the
-#	shell variable VARIABLE.  LIBRARY has the same meanings as the
-#	like-named arguments of CS_CHECK_LIB_WITH().
-#------------------------------------------------------------------------------
-AC_DEFUN([_CS_CHECK_LIB_CREATE_FLAG],
-   [AS_IF([test -n "$2"], [cs_check_lib_cflag="-I$2"], [cs_check_lib_cflag=''])
-    AS_IF([test -n "$3"], [cs_check_lib_lflag="-L$3"], [cs_check_lib_lflag=''])
-    AS_IF([test -n "$4"], [cs_check_lib_libs="-l$4" ], [cs_check_lib_libs='' ])
-    $1="$$1 CS_CREATE_TUPLE(
-	[$cs_check_lib_cflag], [$cs_check_lib_lflag], [$cs_check_lib_libs])"])
 
 
 
@@ -629,10 +127,10 @@ AC_DEFUN([CS_EMIT_BUILD_RESULT],
 #	whitespace-delimited list of build tuples created with
 #	CS_CREATE_TUPLE().  Each tuple from FLAGS is attempted in order until
 #	one is found which is recognized by the compiler.  After that, no
-#	further other flags are checked.  LANGUAGE is typically either C or C++
-#	and specifies which compiler to use for the test.  If LANGUAGE is
-#	omitted, C is used.  MAKEFILE-VARIABLE is the name of the makefile
-#	variable to insert into the makefile text cache if a usable flag is
+#	further flags are checked.  LANGUAGE is typically either C or C++ and
+#	specifies which compiler to use for the test.  If LANGUAGE is omitted,
+#	C is used.  MAKEFILE-VARIABLE is the name of the makefile variable to
+#	insert into the makefile and Jam text caches if a usable flag is
 #	encountered.  CACHE-VALUE is the value to assign to the makefile
 #	variable.  If omitted, it defaults to $cs_build_cflags.  If you are
 #	checking linker flags, rather than compiler flags, then you should
@@ -690,7 +188,7 @@ CS_HEADER_PROPERTY([CS_COMPILER_NAME],
 AC_CHECK_PROGS([FLEXBIN], [flex])
 AS_IF([test -n "$FLEXBIN"], [CS_BUILD_PROPERTY([FLEXBIN], [$FLEXBIN])])
 
-# bison check disabled for now until we have a test for bison >= 1.35
+# Bison check disabled temporarily until we have a test for bison >= 1.35.
 #AC_CHECK_PROGS([BISONBIN], [bison])
 #AS_IF([test -n "$BISONBIN"], [CS_BUILD_PROPERTY([BISONBIN], [$BISONBIN])])
 
@@ -726,8 +224,8 @@ AC_PROG_MAKE_SET
 # Determine how to make a directory tree.  We need to know the exact commands,
 # so that we can emit them to the makefile, thus the AS_MKDIR_P function is not
 # what we want to use here.  First try "mkdir -p", then try the older "mkdirs".
-# If the mkdir command failed to recognize -p, then it might have created a
-# directory named "-p", so clean up that bogus directory.
+# Finally, if the mkdir command failed to recognize -p, then it might have
+# created a directory named "-p", so clean up that bogus directory.
 #------------------------------------------------------------------------------
 AC_CACHE_CHECK([how to create a directory], [cs_cv_shell_mkdir],
     [cs_cv_shell_mkdir='mkdir'])
@@ -1179,7 +677,7 @@ AS_IF([test -d /usr/local/include],
 
 
 #------------------------------------------------------------------------------
-# Check for typical required libraries.
+# Check for typical required libraries (libm, libdl, libnsl).
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_COMMON_LIBS],
     [AC_LANG_PUSH([C])
@@ -1510,9 +1008,9 @@ CS_CHECK_LIB_WITH([mikmod],
 
 
 #------------------------------------------------------------------------------
-# Check for libogg/libvorbis/libvorbisfile.
-# In addition to the standard installed locations, we
-# also search CS/libs/libogg*.CS/libs/libvorbis.* CS/libs/libvorbisfile*
+# Check for libogg/libvorbis/libvorbisfile.  In addition to the standard
+# installed locations, we also search CS/libs/libogg*, CS/libs/libvorbis.*,
+# CS/libs/libvorbisfile*.
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([ogg],
     [AC_LANG_PROGRAM(
@@ -1547,8 +1045,8 @@ AS_IF([test "$cs_cv_libvorbis" = yes],
 
 
 #------------------------------------------------------------------------------
-# Check for lib3ds.  In addition to the standard installed locations, we
-# also search CS/libs/lib3ds*.
+# Check for lib3ds.  In addition to the standard installed locations, we also
+# search CS/libs/lib3ds*.
 #------------------------------------------------------------------------------
 AC_DEFUN([CS_CHECK_LIB3DS_PREPARE],
     [AC_REQUIRE([CS_CHECK_COMMON_LIBS])])
@@ -1624,6 +1122,8 @@ AC_CHECK_FT2([2.0],
     [CS_BUILD_PROPERTY([FT2.AVAILABLE], [yes])
     CS_BUILD_PROPERTY([FT2.LFLAGS], [$FT2_LIBS])
     CS_BUILD_PROPERTY([FT2.CFLAGS], [$FT2_CFLAGS])])
+
+
 
 #------------------------------------------------------------------------------
 # For Mingw, test if we need to link explicitly with libmingwex.a.  Older
@@ -1842,13 +1342,13 @@ AC_LANG_POP([C++])
 
 
 #------------------------------------------------------------------------------
-# Check if stdint.h is available.
+# Check if stdint.h is available and if the INT64_C() macro is available.
 #------------------------------------------------------------------------------
 AC_CHECK_HEADER([stdint.h],
     [cs_cv_header_stdint_h=yes], [cs_cv_header_stdint_h=no])
 
 AS_IF([test $cs_cv_header_stdint_h = yes],
-    [CS_CHECK_BUILD([whether INT64_C works], [cs_cv_c_int64],
+    [CS_CHECK_BUILD([if INT64_C is available], [cs_cv_c_int64],
         [AC_LANG_PROGRAM(
             [#define __STDC_CONSTANT_MACROS
             #define __STDC_LIMIT_MACROS
@@ -2153,14 +1653,17 @@ AS_IF([test $enable_extensive_memory_debugger = yes],
 
 
 #------------------------------------------------------------------------------
-# Determine installation directory.
+# Determine installation directory for GNU make build system.
 #------------------------------------------------------------------------------
-### GNU makefile build system.
 AS_IF([test $prefix = NONE],
     [cs_install_dir=cs_install_dir_default], [cs_install_dir=$prefix])
 CS_MAKEFILE_PROPERTY([INSTALL_DIR], [$cs_install_dir])
 
-### Jam build system.
+
+
+#------------------------------------------------------------------------------
+# Determine installation directories for Jam build system.
+#------------------------------------------------------------------------------
 # Handle the case when no prefix is given. And the special case when a path
 # contains more than 2 slashes, these paths seem to be correct but jam fails
 # on them.

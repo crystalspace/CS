@@ -68,6 +68,11 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine folded out some redundancy from configure.ac introduced
 	  recently into the X-Windows check.  Also performed very minor cleanup
 	  of new DirectDraw check.
+	- Eric Sunshine extracted all of the useful, general-purpose utility
+	  macros from CS/configure.ac, and placed them into individual,
+	  re-usable utility m4 files in CS/mk/autoconf.  The new files are:
+	  checkbuild.m4, checklib.m4, headercache.m4, jamcache.m4,
+	  makecache.m4, mkdir.m4, split.m4, textcache.m4, and trim.m4.
 14-Apr-2003
 	- Philip Wyett removed makedep entry under apps/tools for Jam.  This is
 	  no longer needed after recent changes.

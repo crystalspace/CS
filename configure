@@ -2728,7 +2728,7 @@ if test -n "$FLEXBIN"; then
 fi
 
 
-# bison check disabled for now until we have a test for bison >= 1.35
+# Bison check disabled temporarily until we have a test for bison >= 1.35.
 #AC_CHECK_PROGS([BISONBIN], [bison])
 #AS_IF([test -n "$BISONBIN"], [CS_BUILD_PROPERTY([BISONBIN], [$BISONBIN])])
 
@@ -3224,8 +3224,8 @@ fi
 # Determine how to make a directory tree.  We need to know the exact commands,
 # so that we can emit them to the makefile, thus the AS_MKDIR_P function is not
 # what we want to use here.  First try "mkdir -p", then try the older "mkdirs".
-# If the mkdir command failed to recognize -p, then it might have created a
-# directory named "-p", so clean up that bogus directory.
+# Finally, if the mkdir command failed to recognize -p, then it might have
+# created a directory named "-p", so clean up that bogus directory.
 #------------------------------------------------------------------------------
 echo "$as_me:$LINENO: checking how to create a directory" >&5
 echo $ECHO_N "checking how to create a directory... $ECHO_C" >&6
@@ -7027,7 +7027,7 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Check for typical required libraries.
+# Check for typical required libraries (libm, libdl, libnsl).
 #------------------------------------------------------------------------------
 
 
@@ -14255,9 +14255,9 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Check for libogg/libvorbis/libvorbisfile.
-# In addition to the standard installed locations, we
-# also search CS/libs/libogg*.CS/libs/libvorbis.* CS/libs/libvorbisfile*
+# Check for libogg/libvorbis/libvorbisfile.  In addition to the standard
+# installed locations, we also search CS/libs/libogg*, CS/libs/libvorbis.*,
+# CS/libs/libvorbisfile*.
 #------------------------------------------------------------------------------
 
 # Check whether --with-libogg or --without-libogg was given.
@@ -15598,8 +15598,8 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Check for lib3ds.  In addition to the standard installed locations, we
-# also search CS/libs/lib3ds*.
+# Check for lib3ds.  In addition to the standard installed locations, we also
+# search CS/libs/lib3ds*.
 #------------------------------------------------------------------------------
 
 
@@ -17653,6 +17653,8 @@ fi
 
 
 
+
+
 #------------------------------------------------------------------------------
 # For Mingw, test if we need to link explicitly with libmingwex.a.  Older
 # versions of Mingw did not have this library, whereas newer interim versions
@@ -19204,7 +19206,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 #------------------------------------------------------------------------------
-# Check if stdint.h is available.
+# Check if stdint.h is available and if the INT64_C() macro is available.
 #------------------------------------------------------------------------------
 if test "${ac_cv_header_stdint_h+set}" = set; then
   echo "$as_me:$LINENO: checking for stdint.h" >&5
@@ -19345,8 +19347,8 @@ fi
 
 if test $cs_cv_header_stdint_h = yes; then
   if test "" != yes; then
-  echo "$as_me:$LINENO: checking whether INT64_C works" >&5
-echo $ECHO_N "checking whether INT64_C works... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking if INT64_C is available" >&5
+echo $ECHO_N "checking if INT64_C is available... $ECHO_C" >&6
 if test "${cs_cv_c_int64+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -19486,8 +19488,8 @@ fi
 echo "$as_me:$LINENO: result: $cs_cv_c_int64" >&5
 echo "${ECHO_T}$cs_cv_c_int64" >&6
 else
-  echo "$as_me:$LINENO: checking whether INT64_C works" >&5
-echo $ECHO_N "checking whether INT64_C works... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking if INT64_C is available" >&5
+echo $ECHO_N "checking if INT64_C is available... $ECHO_C" >&6
 	    ac_ext=cc
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -21550,9 +21552,8 @@ fi
 
 
 #------------------------------------------------------------------------------
-# Determine installation directory.
+# Determine installation directory for GNU make build system.
 #------------------------------------------------------------------------------
-### GNU makefile build system.
 if test $prefix = NONE; then
   cs_install_dir=/usr/local/crystal
 else
@@ -21562,7 +21563,11 @@ fi
 cs_makefile_text="${cs_makefile_text}INSTALL_DIR = $cs_install_dir
 "
 
-### Jam build system.
+
+
+#------------------------------------------------------------------------------
+# Determine installation directories for Jam build system.
+#------------------------------------------------------------------------------
 # Handle the case when no prefix is given. And the special case when a path
 # contains more than 2 slashes, these paths seem to be correct but jam fails
 # on them.
