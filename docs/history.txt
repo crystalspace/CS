@@ -27,6 +27,10 @@ chronological order.
 	  practice, this caused all invocations of SetValue(), other than the
 	  first, to appear to be ignored; and csKeyValuePair::GetValue() only
 	  ever returned the value set by the first invocation of SetValue().
+	- Eric Sunshine updated the "simple" example code in sprcal3d.txi so
+	  that it agrees with the new simple1 tutorial which is now based upon
+	  csApplicationFramework. Also updated out-of-date material in
+	  sprcal3d.txi and corrected a number of errors.
 19-Nov-2004
 	- PK fixed the mesh attaching to sockets in viewmesh by adding
 	  sprite->GetMovable()->UpdateMove() to ViewMesh::AttachMeshToSocket.

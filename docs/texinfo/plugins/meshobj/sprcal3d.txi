@@ -194,7 +194,7 @@ We now show you how to edit the @file{simple1} tutorial
 (@pxref{Tutorial Simple}) in order to load the Cal3d model.
 
 Add the following to @file{simple1.cpp}
-at the end of @code{Simple::Initialize()}:
+just after the call to @code{CreateRoom()} in @code{Simple::Application()}:
 
 @example
 csRef<iVFS> VFS(CS_QUERY_REGISTRY(object_reg, iVFS));
@@ -218,8 +218,8 @@ You should be looking right at the model.
 @subsubheading Controling the Model
 
 We can now display the model but we cannot set animations, etc.
-To resolve this, perform the following.
-After the code previously inserted into  @file{simple1.cpp}, add this code:
+To resolve this, insert the following code into @file{simple1.cpp} immediately
+after the code which you inserted to display the model:
 
 @example
 // Make it do something.
@@ -228,19 +228,13 @@ csRef<iSpriteCal3DFactoryState> factstate(
   iSpriteCal3DFactoryState));
 csRef<iSpriteCal3DState> cal3dstate(SCF_QUERY_INTERFACE(
   sprite->GetMeshObject(), iSpriteCal3DState));
-cal3dstate->SetAnimCycle("strut", 1.0f);
-@end example
-
-Don't forget to add this to the list of included header files:
-
-@example
-#include "imesh/spritecal3d.h"
+cal3dstate->SetAnimCycle("walk", 1.0f);
 @end example
 
 Now, build @file{simple1} and run it from the @file{CS} directory.
-You should now see the @file{cally} model ``strutting''.
+You should now see the @file{cally} model ``walking''.
 
-Note: See @file{CS/include/imesh/sprcal3d.h} for more information about the
+Note: See @file{CS/include/imesh/spritecal3d.h} for more information about the
 @sc{scf} interfaces @samp{iSpriteCal3DState} and
 @samp{iSpriteCal3DFactoryState}. Alternately, consult the Crystal Space
 @sc{api} documentation.
@@ -278,8 +272,9 @@ example program.
 You can use morph animations programmatically as follows.
 
 @noindent
-In this example, @samp{cal3dfactorystate} is the Cal3D factory state object.
-Using the state object, find the @samp{morphanimationid} with the given name.
+In this example, @samp{cal3dfactorystate} is the Cal3D factory state object of
+type @samp{iSpriteCal3DFactoryState}.  Using the state object, find the
+@samp{morphanimationid} with the given name.
 
 @example
 int morphanimationid =
@@ -287,8 +282,9 @@ int morphanimationid =
 @end example
 
 @noindent
-In this example, cal3dstate is the Cal3D state object.  We instruct it to fully
-blend (1.0f) the morph animation, over a period of (10.0f) ten seconds.
+In this example, @samp{cal3dstate} is the Cal3D state object of type
+@samp{iSpriteCal3DState}.  We instruct it to fully blend (1.0f) the morph
+animation, over a period of (10.0f) ten seconds.
 
 @example
 cal3dstate->BlendMorphTarget(morphanimationid, 1.0f, 10.0f);
@@ -320,8 +316,8 @@ program.
 You can use sockets in code as follows.
 
 @noindent
-In this example, @samp{cal3dstate} is the Cal3D state object.  Here we find a
-socket with a given name.
+In this example, @samp{cal3dstate} is the Cal3D state object of type
+@samp{iSpriteCal3DState}. Here we find a socket with a given name.
 
 @example
 iSpriteCal3DSocket* socket = cal3dstate->FindSocket(name);
