@@ -33,6 +33,11 @@ The history order is reversed so that new features are at the top.
 	  drawer.
 	- Converted tinyxml string class (TiXmlString) to use malloc/realloc.
 	  This should speed up things a tiny bit.
+	- Fixed a bug in all the particle systems. They were not correctly
+	  updating their change number when the shape of the particle system
+	  changed. This *can* potentially lead to culling errors.
+	- In addition to the bug above the particle systems were also not
+	  calling FireListeners() to notify cullers about possible changes.
 12-Feb-2003
 	- Performed several optimizations on the tinyxml parser. Hopefully
 	  it is now a little faster.

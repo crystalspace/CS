@@ -87,8 +87,10 @@ public:
   void SetParticleCount (int num)
   {
     initialized = false;
+    shapenr++;
     number = num;
     SetCount (number);
+    FireListeners ();
   }
   /// Get the number of particles
   int GetParticleCount () const {return number;}
@@ -96,7 +98,9 @@ public:
   void SetCenter (const csVector3& center)
   {
     initialized = false;
+    shapenr++;
     csExploMeshObject::center = center;
+    FireListeners ();
   }
   /// Get the explosion center
   const csVector3 &GetCenter () const {return center;}
@@ -104,7 +108,9 @@ public:
   void SetPush (const csVector3& push)
   {
     initialized = false;
+    shapenr++;
     csExploMeshObject::push = push;
+    FireListeners ();
   }
   /// Get the push vector.
   const csVector3& GetPush () const {return push;}
@@ -112,7 +118,9 @@ public:
   void SetNrSides (int nr_sides)
   {
     initialized = false;
+    shapenr++;
     csExploMeshObject::nr_sides = nr_sides;
+    FireListeners ();
   }
   /// Get the number of sides.
   int GetNrSides () const {return nr_sides;}
@@ -120,7 +128,9 @@ public:
   void SetPartRadius (float part_radius)
   {
     initialized = false;
+    shapenr++;
     csExploMeshObject::part_radius = part_radius;
+    FireListeners ();
   }
   /// Get the radius of all particles.
   float GetPartRadius () const {return part_radius;}
@@ -136,7 +146,9 @@ public:
   void SetSpreadPos (float spread_pos)
   {
     initialized = false;
+    shapenr++;
     csExploMeshObject::spread_pos = spread_pos;
+    FireListeners ();
   }
   /// Get the spread position.
   float GetSpreadPos () const {return spread_pos;}
@@ -144,7 +156,9 @@ public:
   void SetSpreadSpeed (float spread_speed)
   {
     initialized = false;
+    shapenr++;
     csExploMeshObject::spread_speed = spread_speed;
+    FireListeners ();
   }
   /// Get the spread speed.
   float GetSpreadSpeed () const {return spread_speed;}
@@ -152,7 +166,9 @@ public:
   void SetSpreadAcceleration (float spread_accel)
   {
     initialized = false;
+    shapenr++;
     csExploMeshObject::spread_accel = spread_accel;
+    FireListeners ();
   }
   /// Get the spread acceleration.
   float GetSpreadAcceleration () const {return spread_accel;}
