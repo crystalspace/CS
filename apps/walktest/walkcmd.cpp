@@ -652,13 +652,13 @@ bool CommandHandler (const char *cmd, const char *arg)
   }
   else if (!strcasecmp (cmd, "coordsave"))
   {
-    Sys->Printf (MSG_CONSOLE, "SAVE COORDS\n");
-    SaveCamera (Sys->VFS, "/lib/std/coord");
+    Sys->Printf (MSG_CONSOLE, "Saved camera location in /temp/walktest.cam\n");
+    SaveCamera (Sys->VFS, "/temp/walktest.cam");
   }
   else if (!strcasecmp (cmd, "coordload"))
   {
-    Sys->Printf (MSG_CONSOLE, "LOAD COORDS\n");
-    LoadCamera (Sys->VFS, "/lib/std/coord");
+    Sys->Printf (MSG_CONSOLE, "Loaded camera location from /temp/walktest.cam\n");
+    LoadCamera (Sys->VFS, "/temp/walktest.cam");
   }
   else if (!strcasecmp (cmd, "plugins"))
   {

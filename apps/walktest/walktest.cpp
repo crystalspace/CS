@@ -992,8 +992,8 @@ void CaptureScreen ()
 void debug_dump ()
 {
   if (Sys->VFS)
-    SaveCamera (Sys->VFS, "/this/coord.bug");
-  Sys->Printf (MSG_DEBUG_0, "Camera saved in coord.bug\n");
+    SaveCamera (Sys->VFS, "/temp/walktest.bug");
+  Sys->Printf (MSG_DEBUG_0, "Camera saved in /temp/walktest.bug\n");
   Dumper::dump (Sys->view->GetCamera ());
   Sys->Printf (MSG_DEBUG_0, "Camera dumped in debug.txt\n");
   Dumper::dump (Sys->engine);
