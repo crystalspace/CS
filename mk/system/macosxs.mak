@@ -25,6 +25,15 @@
 #	Consequently, NEXT.CFLAGS.DEBUG includes the -finline-functions
 #	directive.
 #
+# *NOTE*
+#	The $(subst) calls in DO.MAKE.VOLATILE work around a bug in GNU make
+#	on MacOS/X Server.  Specifically, make corrupts MAKE_VOLATILE_H (and
+#	probably other variables) by truncating values which are appended to
+#	it with +=.  In this case we see instances of volatile.t and
+#	volatile.tm, which is clearly incorrect.  To work around the problem,
+#	we manually translate .t and .tm back into .tmp.  Do not replace the
+#	$(subst) calls with $(patsubst) since patsubst is incapable of
+#	transforming the sort of strings which MAKE_VOLATILE_H contains.
 #-------------------------------------------------------------------------------
 
 NEXT.TARGET=macosxs
@@ -42,3 +51,8 @@ NEXT.LFLAGS.GENERAL=-framework AppKit -framework Foundation
 NEXT.FRIEND=yes
 include mk/system/next.mak
 NEXT.FRIEND=no
+
+override DO.MAKE.VOLATILE=\
+  $(subst volatile.t,volatile.tmp,\
+  $(subst volatile.tm,volatile.t,\
+  $(subst volatile.tmp,volatile.t,$(MAKE_VOLATILE_H))))

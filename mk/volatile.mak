@@ -1,5 +1,7 @@
 # This is an submakefile which defines basical rules for building volatile.h
 
+DO.MAKE.VOLATILE=$(MAKE_VOLATILE_H)
+
 ifeq ($(USE_DLL),no)
   MAKE_VOLATILE_H+=$(NEWLINE)echo $"\#define CS_STATIC_LINKED$">>volatile.tmp
 endif
