@@ -2,55 +2,55 @@ The history order is reversed so that new features are at the top.
 
 6-Aug-2001
         - Michael Voase added the following,
-Feature update:
-- CS/include/csutil/typedvec.h: Added CS_DECLARE_TYPED_VECTOR_DECREF
-  convenience macro.
-  
-Texture manager cleanup: common
-- CS/include/ivideo/texture.h: Added UnregisterTexture() and
-  UnregisterMaterial() to the scf interface.
-  
-- CS/libs/csengine/texture.cpp: Texture wrapper now keeps a
-  reference to the texture handle when registered with a texture
-  wrapper.
-  
-- CS/libs/objects/meshobj.cpp: FreeItem(): Added NULL assignment
-  to object being free'd to prevent dangling pointers.
+          Feature update:
+          - CS/include/csutil/typedvec.h: Added CS_DECLARE_TYPED_VECTOR_DECREF
+            convenience macro.
 
-- CS/libs/objects/thing.cpp: Added portal polygon delete routine
-  to thing destructor, in preparation for an audit.
+          Texture manager cleanup: common
+          - CS/include/ivideo/texture.h: Added UnregisterTexture() and
+            UnregisterMaterial() to the scf interface.
+
+          - CS/libs/csengine/texture.cpp: Texture wrapper now keeps a
+            reference to the texture handle when registered with a texture
+            wrapper.
+  
+          - CS/libs/objects/meshobj.cpp: FreeItem(): Added NULL assignment
+            to object being free'd to prevent dangling pointers.
+
+          - CS/libs/objects/thing.cpp: Added portal polygon delete routine
+            to thing destructor, in preparation for an audit.
  
-- CS/libs/csws/cswstex.cpp: Changed how csws textures are treated.
-  The csws textures now use the freshly added UnregisterTexture()
-  scf interface to unregister textures. Note: Texture Manager now
-  destructs correctly in csfedit and a couple of other csws apps
-  (finally ;).
+          - CS/libs/csws/cswstex.cpp: Changed how csws textures are treated.
+            The csws textures now use the freshly added UnregisterTexture()
+            scf interface to unregister textures. Note: Texture Manager now
+            destructs correctly in csfedit and a couple of other csws apps
+            (finally ;).
   
-- Texure Manager Common: 
-  - Changed csMatVector and csTexVector to use 
-    CS_DECLARE_TYPED_VECTOR_DECREF.
+          - Texure Manager Common: 
+            - Changed csMatVector and csTexVector to use 
+              CS_DECLARE_TYPED_VECTOR_DECREF.
   
-  - Added UnregisterTexture() and UnregisterMaterial() to
-    iTextureManager interface. You should now be able to
-    Register/Unregister textures and materials with impunity.
+            - Added UnregisterTexture() and UnregisterMaterial() to
+              iTextureManager interface. You should now be able to
+              Register/Unregister textures and materials with impunity.
     
-- Texture Manager All drivers:
-  - Changed procedural texture Prepare() methods to adhere to the
-    scf contract. This includes the opengl software
-    procedural textures, which seemed to have a blatant habit of
-    deleteing every texture handle it touched.... Ouch. The
-    health of the software proctex manager is not good.
-    Although the current round of bugfixes allows it
-    exit cleanly, a corrupted texture cache does not. If
-    one temporarily disables the 'delete tcache' line in 
-    sft3dcom.cpp, Clear(), the engine does exit cleanly. I have
-    not traced this back as yet as the texture cache is another
-    animal altogether.
+          - Texture Manager All drivers:
+            - Changed procedural texture Prepare() methods to adhere to the
+              scf contract. This includes the opengl software
+              procedural textures, which seemed to have a blatant habit of
+              deleteing every texture handle it touched.... Ouch. The
+              health of the software proctex manager is not good.
+              Although the current round of bugfixes allows it
+              exit cleanly, a corrupted texture cache does not. If
+              one temporarily disables the 'delete tcache' line in 
+              sft3dcom.cpp, Clear(), the engine does exit cleanly. I have
+              not traced this back as yet as the texture cache is another
+              animal altogether.
 
-  - Modified Unregister[Material|Texture] to check for a
-    zero reference count on incoming handles. This breaks
-    an endless loop issue between csMat/TexVector,
-    the destructor and unregister (it is a circular reference).
+            - Modified Unregister[Material|Texture] to check for a
+              zero reference count on incoming handles. This breaks
+              an endless loop issue between csMat/TexVector,
+              the destructor and unregister (it is a circular reference).
 	
 
 5-Aug-2001
