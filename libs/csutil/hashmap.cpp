@@ -164,6 +164,23 @@ csHashObject csHashMap::Get (csHashKey key) const
   return NULL;
 }
 
+void csHashMap::Delete (csHashKey key, csHashObject object)
+{
+  uint32 idx = key % NumBuckets;
+  if (!Buckets[idx]) return;
+  csHashBucket* bucket = Buckets[idx];
+  uint32 i;
+  for (i = bucket->Length () ; i-- > 0 ; )
+  {
+    csHashElement* element = bucket->Get(i);
+    if (element->key == key && element->object == object)
+    {
+      bucket->Delete (i);
+      break;
+    }
+  }
+}
+
 void csHashMap::DeleteAll (csHashKey key)
 {
   uint32 idx = key % NumBuckets;
@@ -224,6 +241,9 @@ void csHashSet::DeleteAll ()
   map.DeleteAll ();
 }
 
-void csHashSet::Delete (csHashObject)
+void csHashSet::Delete (csHashObject object)
 {
+  csHashKey key = (csHashKey)object;
+  map.Delete (key, object);
 }
+

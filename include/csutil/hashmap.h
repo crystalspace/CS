@@ -162,6 +162,14 @@ public:
   csHashObject Get (csHashKey key) const;
 
   /**
+   * Delete the given key/object from the map.
+   * This function will only delete the object once. If multiple
+   * 'Put''s are done with the same object then this function will
+   * only delete one of them.
+   */
+  void Delete (csHashKey key, csHashObject object);
+
+  /**
    * Delete all objects from this map with a given key.
    */
   void DeleteAll (csHashKey key);
@@ -216,7 +224,6 @@ public:
   /**
    * Delete an object from the set. This function
    * does nothing if the object is not in the set.
-   * @@@ Not implemented yet!
    */
   void Delete (csHashObject object);
 

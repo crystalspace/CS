@@ -9,6 +9,12 @@ The history order is reversed so that new features are at the top.
 	- Keith Fulton modified flarge/world to demonstrate use
 	  of this feature to simulate torch flicker in the long
 	  hallway before the fog.
+	- Added csHashMap::Delete() to delete individual objects from
+	  a hashmap.
+	- Implemented csHashSet::Delete().
+	- Fixed a bug in frustvis and dynavis where it would crash
+	  if an object that just moved was also deleted immediatelly
+	  (i.e. this crash occured when firing missiles in walktest).
 11-Dec-2002
 	- Optimization in frustvis where the updates of objects in the
 	  visibility culler are put on a queue and only performed when

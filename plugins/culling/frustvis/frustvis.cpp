@@ -270,6 +270,7 @@ void csFrustumVis::UnregisterVisObject (iVisibilityObject* visobj)
       visobj_vector[i];
     if (visobj_wrap->visobj == visobj)
     {
+      update_queue.Delete (visobj_wrap);
       visobj->GetMovable ()->RemoveListener (
 		  (iMovableListener*)visobj_wrap);
       visobj->GetObjectModel ()->RemoveListener (

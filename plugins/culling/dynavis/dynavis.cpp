@@ -334,6 +334,7 @@ void csDynaVis::UnregisterVisObject (iVisibilityObject* visobj)
       visobj_vector[i];
     if (visobj_wrap->visobj == visobj)
     {
+      update_queue.Delete (visobj_wrap);
       visobj_wrap->model->GetModel ()->RemoveListener (
 		      (iObjectModelListener*)visobj_wrap);
       iMovable* movable = visobj->GetMovable ();
