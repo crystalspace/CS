@@ -1,5 +1,12 @@
 The history order is reversed so that new features are at the top.
 
+29-Jun-2001
+	- Got an Insure log from Philip Wyett. Using this I fixed a number
+	  of small problems and one rather bad problem. The bad problem
+	  that is fixed is:
+	      - Terrain visibility had a memory overwrite bug with the
+	        horizontal index lookup table.
+	- Added 'csparser' to 'make walkall' target.
 28-Jun-2001
 	- Fixed error handling in spr2dldr (for mixmode) a little.
 	- Added error reporting to ballldr (using reporter plugin).
@@ -42,6 +49,40 @@ The history order is reversed so that new features are at the top.
 	    - Did a little cleanup in mdldata.h.
 	    - Added 'position' member to csModelDataLight.
 	    - Added 'GetRefCount' Implementation to all model data components.
+	    - Removed two unneeded include lines from win32.h.
+	- Martin Geisse moved the csparser library to a plugin.
+	- Martin Geisse updated documentation to reflect the csparser changes.
+	- Martin changed the crossbuilder class to take an (iSystem*) as a
+	  parameter in the constructor instead of using the global system
+	  variable.
+	- Martin moved the converter, crossbuilder and sound wrapper classes
+	  from csparser to cstool.
+	- Philip Wyett created the makefiles for the new csparser plugin and
+	  did various other makefile/dsp changes related to this.
+	- Philip moved "DirectDetection" out of the Win32 portion of the
+	  system library and created a "directxcommon" repository from
+	  where the files can be picked up in plugins for which they are
+	  needed. This pre-empts the known removal of CSSYS and fixes an
+	  anomoly where this code was being compiled twice.
+	  Once into CSSYS and then in DirectX related plugins.
+	  Tested with MingW and VC and is fine. :-)
+	  May need cleaning up, Work in progress...
+	- Philip added ddraw and zlib to plugin.tpl, appgui.tpl, and appcon.tpl
+	  as compiling with VC and the Insure++ runtime debugger throws out
+	  link errors. :-(
+	- Philip added CSGFX to demo.mak and csgamtst.mak to make compatible
+	  for building with MSVC and Parasoft Insure++ runtime debugger.
+	- Philip fixed some bad returns from void functions in terrain
+	  plugin.
+	- Michael Voasse did the following:
+	    - First installment in the HitBeamObject() updates. First victim
+	      is ball. *WARNING* I have reset the size of the ball back to its
+	      correct value. What was being declared as a RADIUS, was in fact,
+	      the diameter. Ball now works, but there are some problems with
+	      hard transforms, and they are all twice the size they used to be.
+	    - I have also added a few small bugfixs to csloader incorrectly
+	      returning a false, instead of a NULL. Probably overlooked
+	      earlier...
 27-Jun-2001
 	- Renamed csFilenameMatches() to csGlobMatches() because it is
 	  useful for more than just filenames (in csutil).

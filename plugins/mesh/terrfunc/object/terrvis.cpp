@@ -100,8 +100,8 @@ static void BuildHorIndexTable (int horsize)
   // Important: the values at -128 and 128 are boundary
   // values to prevent overflow. They are set to the same
   // values as -127 and 127.
-  horidx_table[-128] = horidx_table[-127];
-  horidx_table[128] = horidx_table[127];
+  horidx_table[-128+128] = horidx_table[-127+128];
+  horidx_table[128+128] = horidx_table[127+128];
 }
 
 int csTerrainQuad::GetHorIndex(const csVector3& campos, float x, float z, 

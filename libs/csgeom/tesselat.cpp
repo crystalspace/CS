@@ -380,9 +380,9 @@ int csTesselator::Tesselate(const GridCell &grid, csVector3* vrt)
 
   for(i=0;triTable[cubeindex][i]!=-1;)
   {
-    vrt[i]=vertlist[triTable[cubeindex][i++]];
-    vrt[i]=vertlist[triTable[cubeindex][i++]];
-    vrt[i]=vertlist[triTable[cubeindex][i++]];
+    vrt[i]=vertlist[triTable[cubeindex][i]]; i++;
+    vrt[i]=vertlist[triTable[cubeindex][i]]; i++;
+    vrt[i]=vertlist[triTable[cubeindex][i]]; i++;
   }
   return i;
 }
