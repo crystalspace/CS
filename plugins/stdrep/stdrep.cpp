@@ -233,13 +233,20 @@ bool csReporterListener::HandleEvent (iEvent& event)
       if (l > 0)
       {
 	int i;
-        csRef<iGraphics2D> g2d = CS_QUERY_REGISTRY (object_reg, iGraphics2D);
+#ifdef CS_USE_NEW_RENDERER
+        csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iRender3D);
+#else
+        csRef<iGraphics3D> g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+#endif // CS_USE_NEW_RENDERER
+
+        csRef<iGraphics2D> g2d = g3d->GetDriver2D ();
         iFontServer* fntsvr = g2d->GetFontServer ();
         if (fntsvr)
         {
           csRef<iFont> fnt (fntsvr->GetFont (0));
 	  if (fnt)
 	  {
+            g3d->BeginDraw (CSDRAW_2DGRAPHICS);
 	    int sw = g2d->GetWidth ();
 	    int sh = g2d->GetHeight ();
 	    int fw, fh;
