@@ -44,15 +44,15 @@ private:
       csSymbolTable *Owner;
       csRef<csShaderVariable> Val;
 
-      inline Symbol (csShaderVariable *value, csSymbolTable *owner);
-      inline Symbol (const Symbol &other);
+      Symbol (csShaderVariable *value, csSymbolTable *owner);
+      Symbol (const Symbol &other);
     };
     csArray<Symbol> Vals;
     csStringID Name;
 
-    inline Stack (csStringID id);
-    inline Stack (csStringID id, const csArray<Symbol> &vals);
-    inline Stack (csStringID id, csShaderVariable *value, csSymbolTable *owner);
+    Stack (csStringID id);
+    Stack (csStringID id, const csArray<Symbol> &vals);
+    Stack (csStringID id, csShaderVariable *value, csSymbolTable *owner);
   };
 
 protected:
