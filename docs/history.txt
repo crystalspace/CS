@@ -20,6 +20,9 @@ The history order is reversed so that new features are at the top.
 	  USE_PLUGINS=no is specified.
 	- Eric Sunshine fixed vsh.mak and vfstest.mak so that these programs
 	  can link when USE_PLUGINS=no.
+	- Eric Sunshine fixed the makefiles so that g2dtest, perftest, and
+	  csdemo can link successfully when USE_PLUGINS=no.  These programs
+	  required the CSGFX library.
 1-Jun-2001
 	- Michael Voasse fixed a couple of additional bugs in motion
 	  manager. Changed csAppliedFrameVector from TYPED_VECTOR to

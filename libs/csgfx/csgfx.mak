@@ -38,6 +38,12 @@ SRC.CSGFX = libs/csgfx/csimage.cpp \
 CSGFX.LIB = $(OUT)$(LIB_PREFIX)csgfx$(LIB_SUFFIX)
 OBJ.CSGFX = $(addprefix $(OUT),$(notdir $(SRC.CSGFX:.cpp=$O)))
 
+ifneq ($(USE_PLUGINS),yes)
+  # When not using plugins, applications usually require this library since
+  # it is needed by several plugin modules which are linked into the app.
+  DEP.EXE += $(CSGFX.LIB)
+endif
+
 TO_INSTALL.STATIC_LIBS += $(CSGFX.LIB)
 
 MSVC.DSP += CSGFX
