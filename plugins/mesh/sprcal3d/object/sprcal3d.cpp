@@ -1092,7 +1092,7 @@ void csSpriteCal3DMeshObject::SetupObject()
 #ifdef CS_USE_NEW_RENDERER
     renderMeshes.SetLength (meshCount);
 #endif
-
+    
     for (int index=0; index<meshCount; index++)
     {
       SetupObjectSubmesh (index);
@@ -1104,6 +1104,7 @@ void csSpriteCal3DMeshObject::SetupObject()
     if (!mesh)
       continue;
     int submeshes = mesh->getSubmeshCount();
+
     for (int j=0; j<submeshes; j++)
     {
       if (!is_initialized[index][j])
@@ -1117,7 +1118,9 @@ void csSpriteCal3DMeshObject::SetupObject()
 	meshes[index][j].vertex_fog = 0;
 #endif
 
-	factory->GetObjectBoundingBox(object_bbox);  // initialize object_bbox here
+    RecalcBoundingBox(object_bbox);
+
+//	factory->GetObjectBoundingBox(object_bbox);  // initialize object_bbox here
 
 #ifndef CS_USE_NEW_RENDERER
 	meshes[index][j].morph_factor = 0.0f;
