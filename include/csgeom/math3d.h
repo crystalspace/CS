@@ -87,7 +87,7 @@ public:
 
   /// Divide a vector by a scalar.
   inline friend csVector3 operator/ (const csVector3& v, float f)
-  { f = 1.0/f; return csVector3(v.x*f, v.y*f, v.z*f); }
+  { f = 1.0f/f; return csVector3(v.x*f, v.y*f, v.z*f); }
 
   /// Check if two vectors are equal.
   inline friend bool operator== (const csVector3& v1, const csVector3& v2)
