@@ -25,33 +25,42 @@
 DirectDetection DDetection;
 DirectDetectionDevice * DirectDevice;
 
-void sys_fatalerror (char *str, HRESULT hRes = S_OK)
+void sys_fatalerror(char *str, HRESULT hRes = S_OK)
 {
-  LPVOID lpMsgBuf;
-  char* szMsg = NULL;
-  char szStdMessage[] = "Last Error: ";
-
-  if (FAILED (hRes)
-   && FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-      NULL, hRes, MAKELANGID (LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL))
-  {
-    szMsg = new char [strlen ((const char*)lpMsgBuf) + strlen (str) +
-      strlen (szStdMessage) + 1];
-    strcpy (szMsg, str);
-    strcat (szMsg, szStdMessage);
-    strcat (szMsg, (const char*)lpMsgBuf);
+	LPVOID lpMsgBuf;
+	char* szMsg;
+	char szStdMessage[] = "Last Error: ";
+	if (FAILED(hRes))
+	{
+		DWORD dwResult;
+		dwResult = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL,
+								 hRes,  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
+							     (LPTSTR) &lpMsgBuf, 0, NULL );
+	
+		if (dwResult != 0)
+		{
+			szMsg = new char[strlen((const char*)lpMsgBuf) + strlen(str) + strlen(szStdMessage) + 1];
+			strcpy( szMsg, str );
+			strcat( szMsg, szStdMessage );
+			strcat( szMsg, (const char*)lpMsgBuf );
 			
-    LocalFree (lpMsgBuf);
-  }
+			LocalFree( lpMsgBuf );
+			
+			MessageBox (NULL, szMsg, "Fatal Error in DirectDraw2D.dll", MB_OK|MB_TOPMOST);
+			delete szMsg;
 
-  MessageBox (NULL, szMsg ? szMsg : str, "DirectDraw2D.dll: fatal error",
-    MB_OK | MB_TOPMOST);
-  if (szMsg)
-    delete szMsg;
-  exit (1);
+			exit(1);
+		}
+	}
+
+	MessageBox(NULL, str, "Fatal Error in DirectDraw2D.dll", MB_OK|MB_TOPMOST);
+	
+	exit(1);
 }
 
-//---------------------------------------------// The 2D Graphics Driver //---//
+/////The 2D Graphics Driver//////////////
+
+#define NAME  "Crystal"
 
 BEGIN_INTERFACE_TABLE(csGraphics2DDDraw3)
     IMPLEMENTS_COMPOSITE_INTERFACE_EX( IGraphics2D, XGraphics2D )
@@ -61,21 +70,21 @@ END_INTERFACE_TABLE()
 
 IMPLEMENT_UNKNOWN_NODELETE(csGraphics2DDDraw3)
 
-// Windowed-mode palette stuff
-struct
-{
+///// Windowed-mode palette stuff //////
+
+struct {
   WORD Version;
   WORD NumberOfEntries;
   PALETTEENTRY aEntries[256];
 } SysPalette = 
 {
   0x300,
-  256
+    256
 };
 
-HPALETTE hWndPalette = NULL;
+HPALETTE hWndPalette=NULL;
 
-void ClearSystemPalette ()
+void ClearSystemPalette()
 {
   struct 
   {
@@ -85,7 +94,7 @@ void ClearSystemPalette ()
   } Palette =
   {
     0x300,
-    256
+      256
   };
   
   HPALETTE BlackPal, OldPal;
@@ -95,29 +104,29 @@ void ClearSystemPalette ()
   
   for(c=0; c<256; c++)
   {
-    Palette.aEntries [c].peRed = 0;
-    Palette.aEntries [c].peGreen = 0;
-    Palette.aEntries [c].peBlue = 0;
-    Palette.aEntries [c].peFlags = PC_NOCOLLAPSE;
+    Palette.aEntries[c].peRed = 0;
+    Palette.aEntries[c].peGreen = 0;
+    Palette.aEntries[c].peBlue = 0;
+    Palette.aEntries[c].peFlags = PC_NOCOLLAPSE;
   }
   
-  hdc = GetDC (NULL);
+  hdc = GetDC(NULL);
   
-  BlackPal = CreatePalette ((LOGPALETTE *)&Palette);
+  BlackPal = CreatePalette((LOGPALETTE *)&Palette);
   
-  OldPal = SelectPalette (hdc,BlackPal,FALSE);
-  RealizePalette (hdc);
-  SelectPalette (hdc, OldPal, FALSE);
-  DeleteObject (BlackPal);
+  OldPal = SelectPalette(hdc,BlackPal,FALSE);
+  RealizePalette(hdc);
+  SelectPalette(hdc, OldPal, FALSE);
+  DeleteObject(BlackPal);
   
-  ReleaseDC (NULL, hdc);
+  ReleaseDC(NULL, hdc);
 }
 
-void CreateIdentityPalette (RGBpaletteEntry *p)
+
+void CreateIdentityPalette(RGBpaletteEntry *p)
 {
   int i;
-  struct
-  {
+  struct {
     WORD Version;
     WORD nEntries;
     PALETTEENTRY aEntries[256];
@@ -127,45 +136,59 @@ void CreateIdentityPalette (RGBpaletteEntry *p)
       256
   };
   
-  if (hWndPalette)
+  if(hWndPalette)
     DeleteObject(hWndPalette);
   
   Palette.aEntries[0].peFlags = 0;
   Palette.aEntries[0].peFlags = 0;
   
-  for (i = 1; i < 255; i++)
+  for(i=1; i<255; i++)
   {
-    Palette.aEntries [i].peRed = p [i].red;
-    Palette.aEntries [i].peGreen = p [i].green;
-    Palette.aEntries [i].peBlue = p [i].blue;
-    Palette.aEntries [i].peFlags = PC_RESERVED;
+    Palette.aEntries[i].peRed = p[i].red;
+    Palette.aEntries[i].peGreen = p[i].green;
+    Palette.aEntries[i].peBlue = p[i].blue;
+    Palette.aEntries[i].peFlags = PC_RESERVED;
   }
   
-  hWndPalette = CreatePalette ((LOGPALETTE *)&Palette);
+  hWndPalette = CreatePalette((LOGPALETTE *)&Palette);
   
-  if (!hWndPalette) 
-    sys_fatalerror ("Error creating identity palette.");
+  if(!hWndPalette) 
+    sys_fatalerror("Error creating identity palette.");
 }
 
+extern DirectDetection DDetection;
+extern DirectDetectionDevice * DirectDevice;
+
 csGraphics2DDDraw3::csGraphics2DDDraw3(ISystem* piSystem, bool bUses3D) : 
-  csGraphics2D (piSystem), m_hWnd (NULL), m_bDisableDoubleBuffer (false),
-  m_bPaletteChanged (false), m_bPalettized (false), m_lpDD (NULL),
-  m_lpddClipper (NULL), m_lpddPal (NULL), m_lpddsBack (NULL),
-  m_lpddsPrimary (NULL), m_nActivePage (0), m_nGraphicsReady (true),
-  m_bLocked (false), m_piWin32System (NULL), m_bUses3D (bUses3D),
-  m_bHardwareCursor (true)
+                   csGraphics2D (piSystem),
+                   m_hWnd(NULL),
+                   m_bDisableDoubleBuffer(false),
+                   m_bPaletteChanged(false),
+                   m_bPalettized(false),
+                   m_lpDD(NULL),
+                   m_lpddClipper(NULL),
+                   m_lpddPal(NULL),
+                   m_lpddsBack(NULL),
+                   m_lpddsPrimary(NULL),
+                   m_nActivePage(0),
+                   m_nGraphicsReady(true),
+                   m_bLocked(false),
+                   m_piWin32System(NULL),
+                   m_bUses3D(bUses3D)
 {
-  HRESULT rc = piSystem->QueryInterface (IID_IWin32SystemDriver,
-    (void**)&m_piWin32System);
-  if (FAILED (rc))
-    sys_fatalerror("csGraphics2DDDraw3::Open(QI) -- ISystem passed does not support IWin32SystemDriver.", rc);
+  HRESULT ddrval;
+
+  // QI for IWin32SystemDriver //
+  ddrval = piSystem->QueryInterface(IID_IWin32SystemDriver, (void**)&m_piWin32System);
+  if (FAILED(ddrval))
+  	  sys_fatalerror("csGraphics2DDDraw3::Open(QI) -- ISystem passed does not support IWin32SystemDriver.", ddrval);
 }
 
 csGraphics2DDDraw3::~csGraphics2DDDraw3(void)
 {
-  FINAL_RELEASE (m_piWin32System);
-  Close ();
-  m_nGraphicsReady = 0;
+  FINAL_RELEASE(m_piWin32System);
+  Close();
+  m_nGraphicsReady=0;
 }
 
 void csGraphics2DDDraw3::Initialize ()
@@ -174,17 +197,16 @@ void csGraphics2DDDraw3::Initialize ()
   HRESULT ddrval;
   DDPIXELFORMAT ddpf;
 
-  csGraphics2D::Initialize ();
+  csGraphics2D::Initialize();
 
-  // Get the creation parameters
-  m_piWin32System->GetInstance (&m_hInstance);
-  m_piWin32System->GetCmdShow (&m_nCmdShow);
-  m_piWin32System->GetHardwareCursor (&m_bHardwareCursor);
+  // Get the creation parameters //
+  m_piWin32System->GetInstance(&m_hInstance);
+  m_piWin32System->GetCmdShow(&m_nCmdShow);
 
-  system->GetDepthSetting (Depth);
-  system->GetHeightSetting (Height);
-  system->GetWidthSetting (Width);
-  system->GetFullScreenSetting (FullScreen);
+  system->GetDepthSetting(Depth);
+  system->GetHeightSetting(Height);
+  system->GetWidthSetting(Width);
+  system->GetFullScreenSetting(FullScreen);
   
   // Create the DirectDraw device //
   LPGUID pGuid = NULL;
@@ -196,11 +218,11 @@ void csGraphics2DDDraw3::Initialize ()
   else
   {
       DDetection.checkDevices3D();
-      DirectDevice = DDetection.findBestDevice3D (FullScreen);
+      DirectDevice = DDetection.findBestDevice3D(FullScreen);
   }
   
   if (DirectDevice == NULL)
-    sys_fatalerror("Cannot find a suitable video device");
+    sys_fatalerror("csGraphics2DDDraw3::Open(DirectDevice) -- Error creating DirectDevice.");
   
   if (!DirectDevice->IsPrimary2D)
     pGuid = &DirectDevice->Guid2D;
@@ -218,7 +240,7 @@ void csGraphics2DDDraw3::Initialize ()
 
   int RedMask, GreenMask, BlueMask;
 
-  if (!FullScreen)
+  if(!FullScreen)
   {
     // Set cooperative level
     ddrval = m_lpDD->SetCooperativeLevel (NULL, DDSCL_NORMAL);
@@ -233,14 +255,14 @@ void csGraphics2DDDraw3::Initialize ()
     
     ddrval = m_lpDD->CreateSurface (&ddsd, &m_lpddsPrimary, NULL);
     if (ddrval != DD_OK)
-      sys_fatalerror ("Cannot create primary surface for DirectDraw", ddrval);
+      sys_fatalerror("Cannot create primary surface for DirectDraw", ddrval);
     
     // get the pixel format
-    memset (&ddpf, 0, sizeof(ddpf));
-    ddpf.dwSize = sizeof (ddpf);
-    ddrval = m_lpddsPrimary->GetPixelFormat (&ddpf);
+    memset(&ddpf, 0, sizeof(ddpf));
+    ddpf.dwSize = sizeof(ddpf);
+    ddrval = m_lpddsPrimary->GetPixelFormat(&ddpf);
     if (ddrval != DD_OK)
-      sys_fatalerror ("Cannot get pixel format descriptor.", ddrval);
+      sys_fatalerror("Cannot get pixel format descriptor.", ddrval);
     
     RedMask = ddpf.dwRBitMask;
     GreenMask = ddpf.dwGBitMask;
@@ -248,25 +270,23 @@ void csGraphics2DDDraw3::Initialize ()
 
     // automatically determine bit-depth for windowed mode //
     if(ddpf.dwFlags & DDPF_PALETTEINDEXED8)
-      Depth = 8;
+      Depth=8;
     else if(ddpf.dwRGBBitCount == 16)
-      Depth = 16;
+      Depth=16;
     else if(ddpf.dwRGBBitCount == 32)
-      Depth = 32;
+      Depth=32;
     else
     {
-      sys_fatalerror ("To run in windowed mode desktop should be in either\n"
-                      "8-bit, 16-bit or 32-bit mode, or use full screen mode.", ddrval);
-      m_lpddsPrimary->Release ();
-      m_lpddsPrimary = NULL;
-      exit (1);
+      sys_fatalerror("Crystal Space requires desktop to be in either 8-bit, 16-bit or 32-bit mode, or to use full screen mode.", ddrval);
+      m_lpddsPrimary->Release(); m_lpddsPrimary = NULL;
+      exit(1);
     }
     // release the temporary surface
-    m_lpddsPrimary->Release (); m_lpddsPrimary = NULL;
+    m_lpddsPrimary->Release(); m_lpddsPrimary = NULL;
   }
   else
   {
-    if (Depth == 16)
+    if(Depth == 16)
     {
       RedMask   = 0x1f << 11;
       GreenMask = 0x3f << 5;
@@ -280,7 +300,9 @@ void csGraphics2DDDraw3::Initialize ()
     }
   }
   
+  
   // set xx bpp mode up //
+  
   if (Depth==16)
   {
     DrawPixel = DrawPixel16;   WriteChar = WriteChar16;
@@ -310,6 +332,8 @@ void csGraphics2DDDraw3::Initialize ()
     
     complete_pixel_format();
   }
+
+  // message("Using %d bits per pixel (%d color mode).\n", m_nDepth, 1 << m_nDepth);
 }
 
 bool csGraphics2DDDraw3::Open(char *Title)
@@ -325,21 +349,20 @@ bool csGraphics2DDDraw3::Open(char *Title)
   DWORD exStyle = 0;
   DWORD style = WS_POPUP;
   if (!FullScreen)
-    style |= WS_CAPTION;
+	  style |= WS_CAPTION;
   
-  int wwidth, wheight;
-  wwidth = Width + 2 * GetSystemMetrics (SM_CXSIZEFRAME);
-  wheight = Height + 2 * GetSystemMetrics (SM_CYSIZEFRAME) +
-    GetSystemMetrics (SM_CYCAPTION);
+  int wwidth,wheight;
+  wwidth=Width+2*GetSystemMetrics(SM_CXSIZEFRAME);
+  wheight=Height+2*GetSystemMetrics(SM_CYSIZEFRAME)+GetSystemMetrics(SM_CYCAPTION);
   
-  m_hWnd = CreateWindowEx (exStyle, WINDOWCLASSNAME, Title, style,
-    (GetSystemMetrics (SM_CXSCREEN) - wwidth) / 2,
-    (GetSystemMetrics (SM_CYSCREEN) - wheight) / 2,
-    wwidth, wheight, NULL, NULL, m_hInstance, NULL);
-  if (!m_hWnd)
-    sys_fatalerror ("Cannot create CrystalSpace window", GetLastError());
-
-  ShowWindow (m_hWnd, m_nCmdShow);
+  m_hWnd = CreateWindowEx(exStyle, NAME, Title, style,
+	                      (GetSystemMetrics(SM_CXSCREEN)-wwidth)/2,
+                          (GetSystemMetrics(SM_CYSCREEN)-wheight)/2,
+                          wwidth, wheight, NULL, NULL, m_hInstance, NULL );
+  if( !m_hWnd )
+    sys_fatalerror("Cannot create CrystalSpace window", GetLastError());
+  
+  ShowWindow( m_hWnd, m_nCmdShow );
   UpdateWindow( m_hWnd );
   SetFocus( m_hWnd );
   
@@ -500,7 +523,7 @@ bool csGraphics2DDDraw3::DoubleBuffer ()
 
 void csGraphics2DDDraw3::Print (csRect *area)
 {
-  RECT r= {0,0,Width,Height};
+  RECT r={0,0,Width,Height};
   POINT	pt;
   HRESULT ddrval;
   
@@ -558,15 +581,15 @@ void csGraphics2DDDraw3::Print (csRect *area)
   }
 }
 
-HRESULT csGraphics2DDDraw3::RestoreAll ()
+HRESULT csGraphics2DDDraw3::RestoreAll()
 {
   HRESULT ddrval;
   
-  ddrval = m_lpddsPrimary->Restore ();
+  ddrval = m_lpddsPrimary->Restore();
   return ddrval;
 }
 
-unsigned char *csGraphics2DDDraw3::LockBackBuf ()
+unsigned char *csGraphics2DDDraw3::LockBackBuf()
 {
   DDSURFACEDESC ddsd;
   HRESULT ret=DDERR_WASSTILLDRAWING;
@@ -586,21 +609,19 @@ unsigned char *csGraphics2DDDraw3::LockBackBuf ()
 
   m_bLocked = true;
 
-  return ret == DD_OK ? (unsigned char *)ddsd.lpSurface : NULL;
+  return ret==DD_OK ? (unsigned char *)ddsd.lpSurface : NULL;
 }
 
 void csGraphics2DDDraw3::FinishDraw ()
 {
-  m_lpddsBack->Unlock (NULL);
+  m_lpddsBack->Unlock(NULL);
   m_bLocked = false;
   Memory = NULL;
-  if (m_nActivePage == 0)
-    m_nActivePage = 1;
-  else 
-    m_nActivePage = 0;
+  if (m_nActivePage == 0) m_nActivePage = 1;
+  else m_nActivePage = 0;
 }
 
-HRESULT csGraphics2DDDraw3::SetColorPalette ()
+HRESULT csGraphics2DDDraw3::SetColorPalette()
 {
   HRESULT ret;
   
@@ -613,28 +634,26 @@ HRESULT csGraphics2DDDraw3::SetColorPalette ()
       m_lpddPal->Release ();
       m_lpddPal = NULL;
     }
-
-    ret = m_lpDD->CreatePalette (DDPCAPS_8BIT, (PALETTEENTRY *)Palette,
-      &m_lpddPal, NULL);
-    if (ret == DD_OK)
-      m_lpddsPrimary->SetPalette (m_lpddPal);
-
-    if (!FullScreen)
+    
+    ret=m_lpDD->CreatePalette(DDPCAPS_8BIT, (PALETTEENTRY *)Palette, &m_lpddPal, NULL);
+    if(ret==DD_OK) m_lpddsPrimary->SetPalette(m_lpddPal);
+    
+    if(!FullScreen)
     {
       HPALETTE oldPal;
       HDC dc = GetDC(NULL);
-
-      SetSystemPaletteUse (dc, SYSPAL_NOSTATIC);
-      PostMessage (HWND_BROADCAST, WM_SYSCOLORCHANGE, 0, 0);
-
-      CreateIdentityPalette (Palette);
-      ClearSystemPalette ();
-
-      oldPal = SelectPalette (dc, hWndPalette, FALSE);
-
-      RealizePalette (dc);
-      SelectPalette (dc, oldPal, FALSE);
-      ReleaseDC (NULL, dc);
+      
+      SetSystemPaletteUse(dc, SYSPAL_NOSTATIC);
+      PostMessage(HWND_BROADCAST, WM_SYSCOLORCHANGE, 0, 0);
+      
+      CreateIdentityPalette(Palette);
+      ClearSystemPalette();
+      
+      oldPal = SelectPalette(dc, hWndPalette, FALSE);
+      
+      RealizePalette(dc);
+      SelectPalette(dc, oldPal, FALSE);
+      ReleaseDC(NULL, dc);
     }
 
     return ret;
@@ -643,15 +662,14 @@ HRESULT csGraphics2DDDraw3::SetColorPalette ()
   return DD_OK;
 }
 
-bool csGraphics2DDDraw3::BeginDraw ()
+bool csGraphics2DDDraw3::BeginDraw()
 {
-  if (m_bDisableDoubleBuffer)
-    Print (NULL);
-  Memory = LockBackBuf ();
+  if (m_bDisableDoubleBuffer) Print (NULL);
+  Memory = LockBackBuf();
   return (Memory != NULL);
 }
 
-void csGraphics2DDDraw3::SetRGB (int i, int r, int g, int b)
+void csGraphics2DDDraw3::SetRGB(int i, int r, int g, int b)
 {
   csGraphics2D::SetRGB (i, r, g, b);
   m_bPaletteChanged = true;
@@ -661,55 +679,36 @@ bool csGraphics2DDDraw3::SetMouseCursor (int iShape, ITextureHandle *hBitmap)
 {
   (void)hBitmap;
 
-  if (!m_bHardwareCursor)
-  {
-    m_piWin32System->SetMouseCursor (NULL);
-    return false;
-  } /* endif */
+  return false; //the code below needs more work on the general Win32 files, 
+                //but just returning false will give us a working MazeD for now
 
-  switch (iShape)
+/*
+  switch(iShape)
   {
-    case csmcNone:
-      m_piWin32System->SetMouseCursor (NULL);
-      break;
-    case csmcArrow:
-      m_piWin32System->SetMouseCursor (IDC_ARROW);
-      break;
-    case csmcMove:
-      m_piWin32System->SetMouseCursor (IDC_SIZEALL);
-      break;
-    case csmcSizeNWSE:
-      m_piWin32System->SetMouseCursor (IDC_SIZENWSE);
-      break;
-    case csmcSizeNESW:
-      m_piWin32System->SetMouseCursor (IDC_SIZENESW);
-      break;
-    case csmcSizeNS:
-      m_piWin32System->SetMouseCursor (IDC_SIZENS);
-      break;
-    case csmcSizeEW:
-      m_piWin32System->SetMouseCursor (IDC_SIZEWE);
-      break;
-    case csmcStop:
-      m_piWin32System->SetMouseCursor (IDC_NO);
-      break;
-    case csmcWait:
-      m_piWin32System->SetMouseCursor (IDC_WAIT);
-      break;
-    default:
-      m_piWin32System->SetMouseCursor (NULL);
-      return false;
+    case csmcNone: SetCursor(NULL); break;
+    case csmcArrow: SetCursor(LoadCursor (NULL, IDC_ARROW)); break;
+    case csmcMove: SetCursor(LoadCursor (NULL, IDC_SIZEALL)); break;
+    case csmcSizeNWSE: SetCursor(LoadCursor (NULL, IDC_SIZENWSE)); break;
+    case csmcSizeNESW: SetCursor(LoadCursor (NULL, IDC_SIZENESW)); break;
+    case csmcSizeNS: SetCursor(LoadCursor (NULL, IDC_SIZENS)); break;
+    case csmcSizeEW: SetCursor(LoadCursor (NULL, IDC_SIZEWE)); break;
+    case csmcStop: SetCursor(LoadCursor (NULL, IDC_NO)); break;
+    case csmcWait: SetCursor(LoadCursor (NULL, IDC_WAIT)); break;
+    default: return false;
   }
-  return true;
+  return true;*/
 }
 
 bool csGraphics2DDDraw3::SetMousePosition (int x, int y)
 {
-  POINT p = { x, y };
+  POINT p;
+  
+  p.x = x;
+  p.y = y;
 
-  ClientToScreen (m_hWnd, &p);
+  ClientToScreen(m_hWnd, &p);
 
-  ::SetCursorPos (p.x, p.y);
+  ::SetCursorPos(p.x, p.y);
 
   return true;
 }
