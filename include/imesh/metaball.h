@@ -18,32 +18,27 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __IVARIA_METABALL_H__
-#define __IVARIA_METABALL_H__
+#ifndef __IMESH_METABALL_H__
+#define __IMESH_METABALL_H__
 
 #include "csutil/scf.h"
-#include "isys/plugin.h"
 
-struct iGraphics3D;
-struct iMaterialHandle;
+struct iMaterialWrapper;
 
 struct MetaParameters
 {
   float iso_level;
   float charge;
-  float d_alpha;
+  float rate;
 };
 
 enum EnvMappingModes    {TRUE_ENV_MAP,FAKE_ENV_MAP};
 
-SCF_VERSION (iMetaBalls, 0, 0, 1);
+SCF_VERSION (iMetaBallState, 0, 0, 1);
 
 ///
-struct iMetaBalls : public iPlugIn
+struct iMetaBallState : public iBase
 {
-  /// 
-  virtual bool Initialize (iSystem *sys) = 0;
-
   /// Get number of balls currently being animated
   virtual int GetNumberMetaBalls () = 0;
 
@@ -65,17 +60,22 @@ struct iMetaBalls : public iPlugIn
   /// Get modifiable parameters
   virtual MetaParameters *GetParameters () = 0;
 
-  /// Set where the metaballs are to be rendered
-  virtual void SetContext (iGraphics3D *g3d) = 0;
-
   /// Set material to be environmentally mapped
-  virtual void SetMaterial (iMaterialHandle *mat) = 0;
-
-  /// Do it
-  virtual bool Draw () = 0;
+  virtual void SetMaterial (iMaterialWrapper *mat) = 0;
 
   /// For statistics only
   virtual int ReportNumberTriangles () = 0;
+
+  /// Regular lighting and mixmode settings  
+  virtual UInt GetMixMode () = 0;
+  
+  virtual void SetMixMode ( UInt mode ) = 0;
+  
+  virtual bool IsLighting () = 0;
+  
+  virtual void SetLighting ( bool set ) = 0;
+  
+  virtual iMaterialWrapper* GetMaterial () = 0;
 };
 
-#endif //  __IVARIA_METABALL_H__
+#endif //  __IMESH_METABALL_H__
