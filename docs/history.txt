@@ -10,6 +10,11 @@ chronological order.
 	- Rhad fixed a long standing bug in the Ogg loader.
 	  - Per specs, SEEK_END must seek 1 byte past the end of data
 	    buffer, not to the last byte.
+	- Jorrit fixed a bug with hierarchical objects (and static lod
+	  too) that are created using meshref. The children would not get
+	  added to the engine with the result that cached lighting wouldn't
+	  be saved/loaded. For this purpose I added
+	  iEngine->AddMeshAndChildren().
 4-Oct-2004
 	- res fixed xmlshader to correctly deal with shader conditionals 
 	  in text.

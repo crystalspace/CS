@@ -1007,6 +1007,8 @@ public:
   	iSector* sourceSector, const csVector3& pos, iSector* destSector,
 	csVector3* vertices, int num_vertices, iPortal*& portal);
 
+  virtual void AddMeshAndChildren (iMeshWrapper* mesh);
+
   void SetTopLevelClipper (csRenderView* rv)
   {
     top_clipper = rv;

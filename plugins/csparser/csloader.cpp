@@ -1492,7 +1492,7 @@ bool csLoader::LoadLibrary (iLoaderContext* ldr_context, iDocumentNode* node)
 	      return false;
 	    }
 	    mesh->QueryObject ()->SetName (child->GetAttributeValue ("name"));
-	    Engine->GetMeshes ()->Add (mesh);
+	    Engine->AddMeshAndChildren (mesh);
 	    //mesh->DecRef ();
           }
           break;
@@ -4778,7 +4778,7 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	  mesh->QueryObject ()->SetName (meshname);
           mesh->GetMovable ()->SetSector (sector);
 	  mesh->GetMovable ()->UpdateMove ();
-	  Engine->GetMeshes ()->Add (mesh);
+	  Engine->AddMeshAndChildren (mesh);
 	  mesh->DecRef ();
         }
         break;

@@ -1414,6 +1414,15 @@ iCacheManager* csEngine::GetCacheManager ()
   return cache_mgr;
 }
 
+void csEngine::AddMeshAndChildren (iMeshWrapper* mesh)
+{
+  meshes.Add (mesh);
+  iMeshList* ml = mesh->GetChildren ();
+  int i;
+  for (i = 0 ; i < ml->GetCount () ; i++)
+    AddMeshAndChildren (ml->Get (i));
+}
+
 void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
 {
   // If we have to read from the cache then we check if the 'precalc_info'
