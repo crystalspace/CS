@@ -4,12 +4,36 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine fixed vfs.cfg so that it works with MacOS/X Server
 	  again following Andrew's change to the meaning of CS_PLATFORM_NAME.
 	- Eric Sunshine added several missing /lev/* entries to vfs.cfg.
+	- Norman Kramer removed empty and svga displaydrivers for MESA.
+	- Norman also did some small modifications to the OpenGL X2D canvas
+	  in general:
+	    - Explicit set of dispdriver to NULL.
+	    - Slightly changed error message when not being able to load
+	      from opengl.cfg.
+	- Norman did the following changes to the OpenGL renderer:
+	    - Enabled the perspective patch in DrawPolygonFX (although its
+	      a slowdown i'd rather trade that for a correctly mapped
+	      texture).
+	    - Perspective patch expected 1/z instead of z as the 3rd
+	      coo-value. Since this seemed not consistent with software
+	      renderer i changed it to expect a plain z-value.
+13-Jan-2001
+	- Wyatt Miler did some minor Mac project file adjustment and updated
+	  for the new mesh object plugins.
 12-Jan-2001
 	- Eric Sunshine fixed several bugs in soundraw.cpp where it was
 	  applying `delete[]' to a void*.
 	- Eric Sunshine fixed the makefiles for vsh and vfstest so that they
 	  link with the VFS plugin when built `statically'.  These broke for
 	  static builds when VFS was moved into its own plug-in module.
+	- Wouter Wijngaards added a method to csmeshwrapper to get a
+	  pointer to the mesh back again.
+	- Wouter also updated win32/directdetection.h to make it
+	  backwards compatible to dx3 define. It should compile fine now
+	  for dx8. (Also it still compiles fine with older dx versions).
+	- Wouter made similar changes in the make install target as the
+	  changes in docs from htm to html. The make install target
+	  should work once more.
 11-Jan-2001
 	- Wyatt Miler updated the Macintosh project files.
 	- Eric Sunshine made the following changes to the project:
