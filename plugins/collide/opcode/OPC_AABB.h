@@ -373,9 +373,9 @@
 		inline_			bool		GomezIntersect(const AABB& a)
 						{
 							Point	T = mCenter - a.mCenter;	// Vector from A to B
-							return	((fabsf(T.x) <= (a.mExtents.x + mExtents.x))
-									&& (fabsf(T.y) <= (a.mExtents.y + mExtents.y))
-									&& (fabsf(T.z) <= (a.mExtents.z + mExtents.z)));
+							return	((fabs(T.x) <= (a.mExtents.x + mExtents.x))
+									&& (fabs(T.y) <= (a.mExtents.y + mExtents.y))
+									&& (fabs(T.z) <= (a.mExtents.z + mExtents.z)));
 						}
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

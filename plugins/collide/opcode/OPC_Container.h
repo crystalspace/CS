@@ -170,7 +170,7 @@
 		inline_	void			SetGrowthFactor(float growth)			{ mGrowthFactor = growth;	}	//!< Sets the growth factor
 
 		//! Access as an array
-		inline_	udword&			operator[](udword i)			const	{ ASSERT(i>=0 && i<mCurNbEntries); return mEntries[i];	}
+		inline_	udword&			operator[](udword i)			const	{ ASSERT(i<mCurNbEntries); return mEntries[i];	}
 
 		// Stats
 				udword			GetUsedRam()					const;

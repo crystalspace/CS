@@ -38,7 +38,7 @@
 				Plane&	Set(const Point& p0, const Point& p1, const Point& p2);
 
 		inline_	float	Distance(const Point& p)			const						{ return (p | n) + d;								}
-		inline_	bool	Belongs(const Point& p)				const						{ return fabsf(Distance(p)) < PLANE_EPSILON;		}
+		inline_	bool	Belongs(const Point& p)				const						{ return fabs(Distance(p)) < PLANE_EPSILON;		}
 
 		inline_	void	Normalize()
 		{

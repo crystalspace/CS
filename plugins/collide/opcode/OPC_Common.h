@@ -24,7 +24,7 @@
 #ifdef OPC_CPU_COMPARE
 	#define GREATER(x, y)	AIR(x) > IR(y)
 #else
-	#define GREATER(x, y)	fabsf(x) > (y)
+	#define GREATER(x, y)	fabs(x) > (y)
 #endif
 
 	struct VertexPointers

@@ -106,7 +106,7 @@ Matrix4x4& Matrix4x4::Invert()
 	float Det = Determinant();
 	Matrix4x4 Temp;
 
-	if(fabsf(Det) < MATRIX4X4_EPSILON)
+	if(fabs(Det) < MATRIX4X4_EPSILON)
 		return	*this;		// The matrix is not invertible! Singular case!
 
 	float IDet = 1.0f / Det;
@@ -152,8 +152,8 @@ Matrix4x4& Matrix4x4::Shadow(const Point& light, const Point& p0, const Point& p
 	float D		= -(p0|n);
 	Plane PlaneEquation;
 	float Coeff;
-	if(fabsf(D)<0.0001f)	Coeff = -1.0f;
-	else					Coeff = -1.0f / fabsf(D);
+	if(fabs(D)<0.0001f)	Coeff = -1.0f;
+	else					Coeff = -1.0f / fabs(D);
 	PlaneEquation.n.x = n.x * Coeff;
 	PlaneEquation.n.y = n.y * Coeff;
 	PlaneEquation.n.z = n.z * Coeff;
@@ -346,7 +346,7 @@ void	Matrix::LUDecomposition( sdword* indx, float* d )
 	{
 		big = 0.0f;
 		for (j=0; j<4; j++)
-			if ((tmp = (float) fabsf( (*this)(i, j) )) > big)
+			if ((tmp = (float) fabs( (*this)(i, j) )) > big)
 				big = tmp;
 		/*
 		if (big == 0.0f) {
@@ -372,7 +372,7 @@ void	Matrix::LUDecomposition( sdword* indx, float* d )
 			for (k=0; k<j; k++)
 				sum -= (*this)(i, k) * (*this)(k, j);
 			(*this)(i, j) = sum;
-			if ((dum = vv[i] * (float) fabsf(sum)) >= big)
+			if ((dum = vv[i] * (float) fabs(sum)) >= big)
 			{
 				big = dum;
 				imax = i;
@@ -476,7 +476,7 @@ Matrix::operator	PRS() const
 			Row = *GetRow( dwRow );
 			Scale[dwRow] = ScaleFactor = Row.Magnitude();
 
-			if ( fabsf(ScaleFactor) > mEpsilon )
+			if ( fabs(ScaleFactor) > mEpsilon )
 				NormalizedRow = Row / ScaleFactor;
 			else
 			{

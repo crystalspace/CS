@@ -15,7 +15,7 @@ BOOL SphereCollider::SphereTriOverlap(const Point& vert0, const Point& vert1, co
 	float fB0	= kDiff | TriEdge0;
 	float fB1	= kDiff | TriEdge1;
 	float fC	= kDiff.SquareMagnitude();
-	float fDet	= fabsf(fA00*fA11 - fA01*fA01);
+	float fDet	= fabs(fA00*fA11 - fA01*fA01);
 	float u		= fA01*fB1-fA11*fB0;
 	float v		= fA01*fB0-fA00*fB1;
 	float SqrDist;
@@ -163,5 +163,5 @@ BOOL SphereCollider::SphereTriOverlap(const Point& vert0, const Point& vert1, co
 		}
 	}
 
-	return fabsf(SqrDist) < mRadius2;
+	return fabs(SqrDist) < mRadius2;
 }

@@ -159,7 +159,7 @@
 		// Ray in local space
 							Point			mOrigin;			//!< Ray origin
 							Point			mDir;				//!< Ray direction (normalized)
-							Point			mFDir;				//!< fabsf(mDir)
+							Point			mFDir;				//!< fabs(mDir)
 							Point			mData, mData2;
 		// Stabbed faces
 							CollisionFace	mStabbedFace;		//!< Current stabbed face
