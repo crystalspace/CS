@@ -86,6 +86,9 @@ install: build
 	mv $(addprefix $(CURDIR)/debian/tmp/usr/lib/crystalspace/bin/,\
 		 $(DEVBIN))\
 		$(CURDIR)/debian/tmp/usr/bin
+	# renaming picview because of name conflict with picview package
+	mv $(CURDIR)/debian/tmp/usr/bin/picview \
+		$(CURDIR)/debian/tmp/usr/bin/cspicview
 	# From Loic Dachary (fix for cs-config)
 	perl -pi -e 's:^prefix=.*:prefix=/usr:' $(CURDIR)/debian/tmp/usr/bin/cs-config
 	perl -pi -e 's:^includedir=.*:includedir=/usr/include/crystalspace:' $(CURDIR)/debian/tmp/usr/bin/cs-config
