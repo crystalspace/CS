@@ -1,6 +1,3 @@
-#ifndef __CS_AWS_NOTEBOOK_H__
-#define __CS_AWS_NOTEBOOK_H__
-
 /*
     Copyright (C) 2002 by Norman Kraemer
   
@@ -19,6 +16,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef __CS_AWS_NTBK_H__
+#define __CS_AWS_NTBK_H__
+
 #include "awscomp.h"
 #include "awsPanel.h"
 #include "awscmdbt.h"
@@ -29,40 +29,37 @@ class awsSliderButton;
 
 class awsNotebookButton : public awsComponent
 {
- protected:
-
-  // texture background, overlay and icon
+protected:
+  /// Texture background, overlay and icon.
   iTextureHandle *tex[3];
 
-  // does this button depict the active tab ?
+  /// Does this button depict the active tab?
   bool is_active;
 
-  // is this the first button that is drawn ? important for color selection
+  /// Is this the first button that is drawn ? important for color selection.
   bool is_first;
 
-  // does this bottom reside on the top of the notebook or below
+  /// Does this bottom reside on the top of the notebook or below.
   bool is_top;
 
-  // caption
+  /// Caption
   iString *caption;
 
-  // is the mouse currently held doen ?
+  /// Is the mouse currently held doen?
   bool captured;
 
-  // if theres an icon, how is it align
+  /// If theres an icon, how is it align.
   int icon_align;
 
-  // alpha level for overlay texture if any
+  /// Alpha level for overlay texture if any.
   int alpha_level;
 
-  // trigger event if needed
+  /// Trigger event if needed.
   bool HandleClick (int x, int y);
 
-  // determines the usable rect to expose itself
+  /// Determines the usable rect to expose itself.
   void GetClientRect (csRect &pf);
-
- public:
-
+public:
   awsNotebookButton ();
   virtual ~awsNotebookButton ();
 
@@ -77,12 +74,11 @@ class awsNotebookButton : public awsComponent
   bool OnMouseDoubleClick (int, int x, int y);
   virtual csRect getMinimumSize ();
 
-  virtual const char *Type ()
-  {return "Notebook Button";}
+  virtual const char *Type () { return "Notebook Button"; }
 
-  void SetActive (bool what){is_active=what;}
-  void SetFirst (bool what){is_first=what;}
-  void SetTop (bool what){is_top=what;}
+  void SetActive (bool what) { is_active=what; }
+  void SetFirst (bool what) { is_first=what; }
+  void SetTop (bool what) { is_top=what; }
 
   static const int signalActivateTab;
   static const int iconLeft;
@@ -91,31 +87,33 @@ class awsNotebookButton : public awsComponent
   static const int iconBottom;
 };
 
-class awsNotebookButtonFactory :
-  public awsComponentFactory
+class awsNotebookButtonFactory : public awsComponentFactory
 {
 public:
-  /// Calls register to register the component that it builds with the window manager
+  /**
+   * Calls register to register the component that it builds with the
+   * window manager.
+   */
   awsNotebookButtonFactory (iAws *wmgr);
 
   /// Returns a newly created component of the type this factory handles.
   virtual iAwsComponent *Create ();
 };
 
-
 SCF_VERSION (iAwsClientRect, 0, 0, 1);
+
 struct iAwsClientRect : public iBase
 {
   /**
-   * Return a sub rectangle of the components client rectangle where children can be drawn.
+   * Return a sub rectangle of the components client rectangle where
+   * children can be drawn.
    */
   virtual csRect GetClientRect () = 0;
 }; 
 
 class awsNotebookButtonBar : public awsComponent
 {
- protected:
-
+protected:
   struct tabEntry
   {
     awsNotebookButton *button;
@@ -140,6 +138,7 @@ class awsNotebookButtonBar : public awsComponent
       sink->IncRef ();
       return csPDelArray<tabEntry>::Push (te);
     }
+
     void FreeAll ()
     {
       int i;
@@ -147,26 +146,31 @@ class awsNotebookButtonBar : public awsComponent
         FreeItem (Get (i));
       DeleteAll ();
     }
+
     void FreeItem (tabEntry* te)
     {
-      te->slot->Disconnect (te->button, awsCmdButton::signalClicked, 
-                           te->sink, te->sink->GetTriggerID ("ActivateTab"));
+      te->slot->Disconnect (te->button, awsCmdButton::signalClicked,
+        te->sink, te->sink->GetTriggerID ("ActivateTab"));
       if (te->slot) te->slot->DecRef ();
       if (te->sink) te->sink->DecRef ();
     }
+
     static int CompareComp (tabEntry* const& te1, tabEntry* const& te2)
     {
       return (te1->comp < te2->comp ? -1 : te1->comp > te2->comp ? 1 : 0);
     }
+
     static int CompareButton (tabEntry* const& te1, tabEntry* const& te2)
     {
       return (te1->button < te2->button ? -1 : te1->button>te2->button ? 1 : 0);
     }
+
     static int CompareKeyComp (tabEntry* const& te1, void* Key)
     {
       iAwsComponent *comp = (iAwsComponent *)Key;
       return (te1->comp < comp ? -1 : te1->comp > comp ? 1 : 0);
     }
+
     static int CompareKeyButton (tabEntry* const& te1, void* Key)
     {
       awsNotebookButton *button = (awsNotebookButton *)Key;
@@ -176,63 +180,68 @@ class awsNotebookButtonBar : public awsComponent
 
   TabVector vTabs;
 
-  // the two "next/prev" buttons
+  /// The two "next/prev" buttons.
   awsSliderButton *next, *prev;
 
-  // the slots for next/prev
+  /// The slots for next/prev.
   awsSlot *next_slot, *prev_slot;
 
-  // images for next/prev buttons
+  /// Images for next/prev buttons.
   iTextureHandle *nextimg, *previmg;
 
-  // first visible button
+  /// First visible button.
   int first;
-  // the active tab
+  
+  /// The active tab.
   int active;
-  // button bar on top of notebook or below ?
+  
+  /// Button bar on top of notebook or below?
   bool is_top;
 
-  // our kitchen sink
+  /// Our kitchen sink.
   awsSink *sink;
 
-  // max height of buttons in bar
+  /// Max height of buttons in bar.
   int maxheight;
 
-  // Scroll list of button left
+  /// Scroll list of button left.
   void ScrollLeft ();
 
-  // Scroll list of button right
+  /// Scroll list of button right.
   void ScrollRight ();
 
-  // scroll buttons until the <idx>-th becomes visible
+  /// Scroll buttons until the <idx>-th becomes visible.
   void MakeVisible (int idx);
 
-  // return the rectangle where buttons can be drawn in
+  /// Return the rectangle where buttons can be drawn in.
   csRect GetClientRect ();
-
- public:
-
+public:
   SCF_DECLARE_IBASE_EXT (awsComponent);
 
   awsNotebookButtonBar ();
   virtual ~awsNotebookButtonBar ();
 
-  /// Triggered when the component needs to draw
+  /// Triggered when the component needs to draw.
   virtual void OnDraw (csRect clip);
 
   virtual bool Setup (iAws *_wmgr, iAwsComponentNode *settings);
-  virtual const char *Type (){return "Notebook ButtonBar";}
+  virtual const char *Type () { return "Notebook ButtonBar"; }
 
-  // This will create a button based on the Caption property of the component.
-  // the Icon and IconAlign properties are also taken into account.
-  // If this component is the first that has been added it becomes the active one.
+  /**
+   * This will create a button based on the Caption property of the component.
+   * The Icon and IconAlign properties are also taken into account. If this
+   * component is the first that has been added it becomes the active one.
+   */
   bool Add (iAwsComponent *comp);
 
-  // This will remove the button associated with this component.
-  // The next tab will become active (or the prev if no next exist) if this was the active one.
+  /**
+   * This will remove the button associated with this component.
+   * The next tab will become active (or the prev if no next exist) if
+   * this was the active one.
+   */
   bool Remove (iAwsComponent *comp);
 
-  // Activate the <idx>-th tab
+  /// Activate the <idx>-th tab.
   void Activate (int idx);
 
   static void ActivateTab (void *sk, iAwsSource *source);
@@ -241,10 +250,10 @@ class awsNotebookButtonBar : public awsComponent
 
   static const int HandleSize;
 
-  // layout the buttons, hide or show them, align the next/prev handles
+  /// Layout the buttons, hide or show them, align the next/prev handles.
   void DoLayout ();
 
-  // show buttonbar at top or bottom
+  /// Show buttonbar at top or bottom.
   void SetTopBottom (bool to_top);
 
   struct eiAwsClientRect : public iAwsClientRect
@@ -255,88 +264,78 @@ class awsNotebookButtonBar : public awsComponent
   friend struct eiAwsClientRect;
 };
 
-class awsNotebookPage :
-  public awsComponent
+class awsNotebookPage : public awsComponent
 {
- protected:
-  /// Holds the texture handle for the background
+protected:
+  /// Holds the texture handle for the background.
   iTextureHandle *tex;
 
-  // caption we show in the tab button
+  /// Caption we show in the tab button
   iString *caption;
   iString *icon;
   int iconalign;
-
 public:
   awsNotebookPage ();
   virtual ~awsNotebookPage ();
 
-public:
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
-  /// Gets properties
+  /// Gets properties.
   bool GetProperty (const char *name, void **parm);
 
-  /// Sets properties
+  /// Sets properties.
   bool SetProperty (const char *name, void *parm);
 
   /// Returns the named TYPE of the component, like "Notebook Page", etc.
   virtual const char *Type ();
-
 };
 
-class awsNotebookPageFactory :
-  public awsComponentFactory
+class awsNotebookPageFactory : public awsComponentFactory
 {
 public:
-
-  /// Calls register to register the component that it builds with the window manager
+  /**
+   * Calls register to register the component that it builds with
+   * the window manager.
+   */
   awsNotebookPageFactory (iAws *wmgr);
 
   /// Returns a newly created component of the type this factory handles.
   virtual iAwsComponent *Create ();
 };
 
-class awsNotebook :
-  public awsPanel
+class awsNotebook : public awsPanel
 {
- protected:
-
- protected:
-  
-  // button bar location
+protected:
+  /// Button bar location.
   int bb_location;
 
-  // button bar style
+  /// Button bar style.
   int bb_style;
 
-  // maximum height of a tab
+  /// Maximum height of a tab.
   int maxheight;
 
-  // our sink
+  /// Our kitchen sink.
   awsSink sink;
 
-  // our slot
+  /// Our slot.
   awsSlot slot;
 
-  // our tab control
+  /// Our tab control.
   awsTabCtrl tab_ctrl;
-
 public:
   awsNotebook ();
   virtual ~awsNotebook ();
 
-public:
+  /// Button bar location.
+  static const int nbTop;    // Buttons are above page.
+  static const int nbBottom; // Buttons are below page.
 
-  /************** button bar location ***********/
-  static const int nbTop;    // buttons are above page
-  static const int nbBottom; // buttons are below page
+  /// Button bar style.
+  static const int nbBreak; // Button are broken onto next line to be visible.
+  static const int nbSlide; // Add slider to make outside buttons visible.
 
-  /************** button bar style ***********/
-  static const int nbBreak; // button are broken onto next line to be visible
-  static const int nbSlide; // a slider is added to make outside buttons visible
-
-  /************** frame styles ***********/
+  /// Frame styles
   static const int fsBump;
   static const int fsSimple;
   static const int fsRaised;
@@ -346,17 +345,16 @@ public:
 
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
-  /// Gets properties
+  /// Gets properties.
   bool GetProperty (const char *name, void **parm);
 
-  /// Sets properties
+  /// Sets properties.
   bool SetProperty (const char *name, void *parm);
 
   /// Returns the named TYPE of the component, like "Notebook Page", etc.
   virtual const char *Type ();
-public:
 
-  /// Triggered when the component needs to draw
+  /// Triggered when the component needs to draw.
   virtual void OnDraw (csRect clip);
 
   virtual void AddChild (iAwsComponent *child);
@@ -366,15 +364,17 @@ public:
 
 };
 
-class awsNotebookFactory :
-  public awsComponentFactory
+class awsNotebookFactory : public awsComponentFactory
 {
 public:
-  /// Calls register to register the component that it builds with the window manager
+  /**
+   * Calls register to register the component that it builds with
+   * the window manager.
+   */
   awsNotebookFactory (iAws *wmgr);
 
   /// Returns a newly created component of the type this factory handles.
   virtual iAwsComponent *Create ();
 };
 
-#endif // __CS_AWS_NOTEBOOK_H__
+#endif // __CS_AWS_NTBK_H__
