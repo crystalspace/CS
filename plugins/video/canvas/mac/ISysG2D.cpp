@@ -25,7 +25,7 @@
 
 IMPLEMENT_COMPOSITE_UNKNOWN(csGraphics2DMac, XMacGraphicsInfo)
 
-STDMETHODIMP IXMacGraphicsInfo::Open(const char* szTitle)
+STDMETHODIMP IXMacGraphicsInfo::Open(char* szTitle)
 {
     METHOD_PROLOGUE( csGraphics2DMac, XMacGraphicsInfo);
     
