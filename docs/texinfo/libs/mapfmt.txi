@@ -221,6 +221,7 @@ points forward.
 @production{v, @nonterm{number}}@*
 @production{vector-2d, @nonterm{x} @COMMA{} @nonterm{z}}@*
 @production{vector-3d, @nonterm{x} @COMMA{} @nonterm{y} @COMMA{} @nonterm{z}}@*
+@production{vector-4d, @nonterm{x} @COMMA{} @nonterm{y} @COMMA{} @nonterm{z} @COMMA{} @nonterm{r} }@*
 @production{vertex-idx, @nonterm{integer}}@*
 @production{coordinate, @nonterm{vector-3d}}@*
 @production{coordinate-2d, @nonterm{vector-2d}}@*
@@ -282,7 +283,8 @@ points forward.
 
 @subsubheading Vertex and Vector
 @production{vertex, @token{VERTEX} @LP{} @nonterm{coordinate} @RP{}}@*
-@production{vector, @token{V} @LP{} @nonterm{vector-3d} @RP{}}
+@production{vector, @token{V} @LP{} @nonterm{vector-3d} @RP{}}@*
+@production{quaternion, @token{Q} @LP{} @nonterm{vector-4d} @RP{}}
 
 @subsubheading Matrices, Vectors, Scalers, and Angles
 @production{matrix-scaler, @nonterm{number}}@*
@@ -772,6 +774,15 @@ from where you want the polygon to be visible.
 @production{sprite2d, @token{SPRITE2D} @nonterm{sprite-name}
     @LP{} [ @nonterm{sprite2d-comp} @dots{} ] @RP{}}
 
+@subsubheading Sprite Files
+@noindent
+Sometimes you will want to share a sprite among many worlds.  To accomplish
+this, create a seperate file for your sprite that contains the @samp{SPRITE}
+definition and use the @samp{INCLUDESPRITE} macro to load it in.
+
+@production{sprite-file,
+    @token{INCLUDESPRITE} @LP{} @nonterm{file-name} @RP{}}
+
 @subsubheading Nodes
 @production{position, @token{POSITION} @LP{} @nonterm{coordinate} @RP{}}@*
 @production{node-comp, @nonterm{position} | @nonterm{key}}@*
@@ -953,15 +964,36 @@ internal list first.  For usage of @samp{MAT_SET} see the description of
 @production{start, @token{START}
     @LP{} @nonterm{sector-name} @COMMA{} @nonterm{coordinate} @RP{}}
 
+@subsubheading Skeletal Animation
+@production{euler, @token{EULER} @LP{} @nonterm{vector-3d} @RP{}}
+
+@production{anim-comp, @nonterm{euler}}@*
+    @prodnext{@nonterm{quaternion}}@*
+    @prodnext{@nonterm{matrix}}@*
+@production{motion-anim,
+    @token{ANIM} @LP{} [ @nonterm{anim-comp} @dots{} ] @RP{}}
+
+@production{anim-index, @nonterm{pos-integer}}@*
+@production{link, @token{LINK} @nonterm{bone-name} @LP{} @nonterm{anim-index} @RP{}}@*
+@production{motion-frame,
+    @token{FRAME} @nonterm{motion-time} @LP{} [ @nonterm{link} @dots{} ] @RP{}}
+
+@production{motion-comp, @nonterm{motion-anim}}@*
+    @prodnext{@nonterm{motion-frame}}@*
+@production{animation, @token{MOTION} @nonterm{motion-name}
+    @LP{} [ @nonterm{motion-comp} @dots{} ] @RP{}}
+
 @subsubheading World
 @production{world-comp, @nonterm{textures}}@*
     @prodnext{@nonterm{materials}}@*
     @prodnext{@nonterm{library}}@*
+    @prodnext{@nonterm{animation}}@*
     @prodnext{@nonterm{sector}}@*
     @prodnext{@nonterm{room}}@*
     @prodnext{@nonterm{thing-template}}@*
     @prodnext{@nonterm{sixface-template}}@*
     @prodnext{@nonterm{sprite-template}}@*
+    @prodnext{@nonterm{sprite-file}}@*
     @prodnext{@nonterm{plane-desc}}@*
     @prodnext{@nonterm{collection}}@*
     @prodnext{@nonterm{start}}@*
