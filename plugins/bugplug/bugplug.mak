@@ -34,7 +34,7 @@ ifeq ($(USE_PLUGINS),yes)
   LIB.BUGPLUG = $(foreach d,$(DEP.BUGPLUG),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(BUGPLUG)
 else
-  BUGPLUG = $(OUT.BUGPLUG)/$(LIB_PREFIX)bugplug$(LIB)
+  BUGPLUG = $(OUT)/$(LIB_PREFIX)bugplug$(LIB)
   DEP.EXE += $(BUGPLUG)
   SCF.STATIC += bugplug
   TO_INSTALL.STATIC_LIBS += $(BUGPLUG)
@@ -63,7 +63,7 @@ ifeq ($(MAKESECTION),targets)
 
 bugplug: $(OUTDLL) $(OUT.BUGPLUG) $(BUGPLUG)
 
-$(OUT.BUGPLUG)/%$O: $(DIR.BUGPLUG)/%.cpp
+$(OUT.BUGPLUG)/%$O: $(DIR.BUGPLUG)/%.cpp $(OUT.BUGPLUG)
 	$(DO.COMPILE.CPP)
 
 $(BUGPLUG): $(OBJ.BUGPLUG) $(LIB.BUGPLUG)

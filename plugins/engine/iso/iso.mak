@@ -29,7 +29,7 @@ ifeq ($(USE_PLUGINS),yes)
   LIB.ISO = $(foreach d,$(DEP.ISO),$($d.LIB))
   TO_INSTALL.DYNAMIC_LIBS += $(ISO)
 else
-  ISO = $(OUT.ISO)/$(LIB_PREFIX)iso$(LIB)
+  ISO = $(OUT)/$(LIB_PREFIX)iso$(LIB)
   DEP.EXE += $(ISO)
   SCF.STATIC += iso
   TO_INSTALL.STATIC_LIBS += $(ISO)
@@ -54,7 +54,7 @@ ifeq ($(MAKESECTION),targets)
 
 iso: $(OUTDLL) $(OUT.ISO) $(ISO)
 
-$(OUT.ISO)/%$O: $(DIR.ISO)/%.cpp
+$(OUT.ISO)/%$O: $(DIR.ISO)/%.cpp $(OUT.ISO)
 	$(DO.COMPILE.CPP)
 
 $(ISO): $(OBJ.ISO) $(LIB.ISO)

@@ -1,10 +1,21 @@
 The history order is reversed so that new features are at the top.
 
 10-Mar-2003
-	- Added a few timing printfs in region code to debug long load
-	  times.
-	- A few optimizations in the spr2d plugin to make particle systems
-	  use a bit less memory.
+	- Added a few timing printfs in region code to debug long load times.
+	- A few optimizations in the spr2d plugin to make particle systems use
+	  a bit less memory.
+	- Eric Sunshine fixed a couple problems with iso.mak and bugplug.mak in
+	  "static" and "profile" modes:
+	    - The personalized "out" directory for each these modules was not
+	      getting created if the module was being built indirectly as a
+	      dependency of some other modules (as opposed to getting built by
+	      direct invocation via "make iso" or "make bugplug" which worked
+	      correctly).
+	    - The static link library generated in place of the plugin module
+	      was being emitted in the personalized "out" directory rather than
+	      the global "out" directory, but there was no -L directive telling
+	      the linker to look for the library in the personalized directory,
+	      thus linking failed.
 9-Mar-2003
 	- Marten Svanfeldt made the following changes:
 	    - Moved setting of lightposition from meshplugin into engine
