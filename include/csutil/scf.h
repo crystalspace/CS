@@ -103,8 +103,12 @@ struct iBase
 #ifdef CS_REF_TRACKER
  #include <typeinfo>
  #define CS_TYPENAME(x)		    typeid(x).name()
- /// @@@ HACK: Force an AddAlias() call for every contained interface
- #define SCF_INIT_TRACKER_ALIASES    QueryInterface ((scfInterfaceID)-1, -1);
+ /* @@@ HACK: Force an AddAlias() call for every contained interface
+  * However, when iSCF::SCF == 0, don't call QI to prevent interface ID 
+  * resolution (which will fail).
+  */
+ #define SCF_INIT_TRACKER_ALIASES    \
+  if (iSCF::SCF != 0) QueryInterface ((scfInterfaceID)-1, -1);
 #else
  #define CS_TYPENAME(x)		    0
  #define SCF_INIT_TRACKER_ALIASES

@@ -63,8 +63,7 @@ public:
   bool Initialize (iObjectRegistry* object_reg);
 
   virtual bool ParseBool (iDocumentNode* node, bool& result, bool def_result);
-  virtual bool WriteBool (iDocumentNode* node, const char* name, bool value,
-                          bool default_value);
+  virtual bool WriteBool (iDocumentNode* node, const char* name, bool value);
   virtual bool ParseMatrix (iDocumentNode* node, csMatrix3 &m);
   virtual bool WriteMatrix (iDocumentNode* node, csMatrix3* m);
   virtual bool ParseVector (iDocumentNode* node, csVector3 &v);

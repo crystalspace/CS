@@ -112,22 +112,25 @@ bool csTextSyntaxService::ParseBool (iDocumentNode* node, bool& result,
 }
 
 bool csTextSyntaxService::WriteBool (iDocumentNode* node, const char* name,
-                                     bool value, bool default_value)
+                                     bool value)
 {
-  if (value != default_value)
+  if (value)
   {
-    if (value)
-    {
-      node->CreateNodeBefore(CS_NODE_ELEMENT, 0)->SetValue(name);
-    }
-    else
-    {
-      csRef<iDocumentNode> valueNode = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
-      valueNode->SetValue(name);
-      valueNode->CreateNodeBefore(CS_NODE_TEXT, 0)->SetValue("no");
-    }
+    csRef<iDocumentNode> valueNode = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    if (!valueNode.IsValid()) return false;
+    valueNode->SetValue(name);
+    return true;
   }
-  return true;
+  else
+  {
+    csRef<iDocumentNode> valueNode = node->CreateNodeBefore(CS_NODE_ELEMENT, 0);
+    if (!valueNode.IsValid()) return false;
+    valueNode->SetValue(name);
+    valueNode = valueNode->CreateNodeBefore(CS_NODE_TEXT, 0);
+    if (!valueNode.IsValid()) return false;
+    valueNode->SetValue("no");
+    return false;
+  }
 }
 
 bool csTextSyntaxService::ParseMatrix (iDocumentNode* node, csMatrix3 &m)

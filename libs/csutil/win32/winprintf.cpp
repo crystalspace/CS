@@ -28,24 +28,17 @@
 static int _cs_fputs (const char* string, FILE* stream)
 {
   int rc;
-  if ((stream == stdout) || (stream == stderr))
+  UINT cp;
+  if (_isatty (_fileno (stream)) && ((cp = GetConsoleOutputCP ()) != CP_UTF8))
   {
-    UINT cp;
-    if ((cp = GetConsoleOutputCP ()) != CP_UTF8)
-    {
-      // The UTF-8 text has to be converted to the output codepage.
-    
-      rc = fputs (cswinCtoA (string, cp), stream);
-    }
-    else
-    {
-      // Not much to do - the text can be dumped to the console,
-      // Windows will care about proper output.
-      rc = fputs (string, stream);
-    }
+    /* We're writing to a console, the UTF-8 text has to be converted to the 
+     * output codepage. */
+    rc = fputs (cswinCtoA (string, cp), stream);
   }
   else
   {
+    /* Not much to do - the text can be dumped to the stream,
+     * Windows will care about proper output. */
     rc = fputs (string, stream);
   }
   return rc;
@@ -83,13 +76,16 @@ int csPrintf (char const* str, ...)
   va_start(args, str);
   int const rc = _cs_vfprintf (stdout, str, args);
   va_end(args);
+  fflush (stdout);
   return rc;
 }
 
 // Replacement for vprintf()
 int csPrintfV(char const* str, va_list args)
 {
-  return _cs_vfprintf (stdout, str, args);
+  int ret = _cs_vfprintf (stdout, str, args);
+  fflush (stdout);
+  return ret;
 }
 
 int csFPutErr (const char* str)

@@ -61,7 +61,7 @@
 #include "ivaria/keyval.h"
 #include "igeom/objmodel.h"
 
-#define ONE_OVER_256 (1.0/255.0)
+#define ONE_OVER_255 (1.0/255.0)
 
 CS_IMPLEMENT_PLUGIN
 
@@ -193,13 +193,13 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
       }
       if (r != r2 || g != g2 || b != b2)
       {
-        csColor col (r * ONE_OVER_256, g * ONE_OVER_256, b * ONE_OVER_256);
+        csColor col (r * ONE_OVER_255, g * ONE_OVER_255, b * ONE_OVER_255);
         synldr->WriteColor (CreateNode (child, "transparent"), &col);
       }
     }
   
     synldr->WriteBool (child, "for2d", texWrap->GetFlags () & CS_TEXTURE_2D, false);
-    // No for3d as that's default
+    synldr->WriteBool (child, "for3d", texWrap->GetFlags () & CS_TEXTURE_3D, true);
     synldr->WriteBool (child, "mipmap", !(texWrap->GetFlags () & CS_TEXTURE_NOMIPMAPS), true);
     synldr->WriteBool (child, "dither", texWrap->GetFlags () & CS_TEXTURE_DITHER, false);
     synldr->WriteBool (child, "clamp", texWrap->GetFlags () & CS_TEXTURE_CLAMP, false);
@@ -249,7 +249,35 @@ bool csSaver::SaveTextures(iDocumentNode *parent)
     }
     else if (texTarget == iTextureHandle::CS_TEX_IMG_3D)
     {
-      /* ... */
+      csString imgName (filename);
+
+      if (imgName.FindFirst (':') == (size_t)-1)
+      {
+	CreateValueNode(child, "file", filename);
+      }
+      else
+      {
+	csRef<iDocumentNode> params = 
+	  child->CreateNodeBefore (CS_NODE_ELEMENT, 0);
+	params->SetValue ("params");
+	if (!imgName.IsEmpty())
+	{
+	  size_t pos = 0;
+
+	  while (pos < imgName.Length())
+	  {
+	    size_t colon = imgName.FindFirst (':', pos);
+	    size_t subStrLen;
+	    if (colon == 0)
+	      subStrLen = imgName.Length() - pos;
+	    else
+	      subStrLen = colon - pos;
+	    if (subStrLen > 0)
+	      CreateValueNode (params, "layer", imgName.Slice (pos, subStrLen));
+	    pos = colon + 1;
+	  }
+	}
+      }
     }
     else
     {
@@ -329,8 +357,8 @@ bool csSaver::SaveMaterials(iDocumentNode *parent)
     matWrap->GetMaterial()->GetFlatColor(color, 0);
     if (color.red != 255 || color.green != 255 || color.blue != 255)
     {
-      csColor col (color.red * ONE_OVER_256, color.green * ONE_OVER_256,
-	      color.blue * ONE_OVER_256);
+      csColor col (color.red * ONE_OVER_255, color.green * ONE_OVER_255,
+	      color.blue * ONE_OVER_255);
       synldr->WriteColor (CreateNode (child, "color"), &col);     
     }
 

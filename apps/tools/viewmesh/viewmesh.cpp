@@ -39,14 +39,14 @@ struct vmAnimCallback : public CalAnimationCallback
 {
   vmAnimCallback() {}
 
-  virtual void AnimationUpdate(float anim_time,CalModel *model)
+  virtual void AnimationUpdate (float anim_time, CalModel*, void*)
   {
-    printf("Anim Update at time %.2f.\n",anim_time);
+    csPrintf ("Anim Update at time %.2f.\n",anim_time);
   }
 
-  virtual void AnimationComplete(CalModel *model)
+  virtual void AnimationComplete (CalModel*, void*)
   {
-    printf("Anim Completed!\n");
+    csPrintf ("Anim Completed!\n");
   }
 };
 #endif

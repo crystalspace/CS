@@ -85,8 +85,21 @@ struct iSyntaxService : public iBase
   /**
    * Write a node representing the value of the boolean.
    */
-  virtual bool WriteBool (iDocumentNode* node, const char* name,
-                          bool value, bool default_value) = 0;
+  virtual bool WriteBool (iDocumentNode* node, const char* name, 
+    bool value) = 0;
+  
+  /**
+   * Write a node representing the value of the boolean, if it differs from
+   * a provided default value.
+   */
+  bool WriteBool (iDocumentNode* node, const char* name, bool value, 
+    bool default_value) 
+  { 
+    if (value != default_value) 
+      return WriteBool (node, name, value); 
+    else
+      return true;
+  }
   
   /**
    * Parse a matrix description. Returns true if successful.
