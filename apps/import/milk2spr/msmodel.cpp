@@ -912,9 +912,14 @@ bool MsModel::WriteSPR(const char* spritename)
           v->SetAttributeAsFloat("z",currentFrame->vertex->position.z);
           v->SetAttributeAsFloat("u",currentFrame->vertex->u);
           v->SetAttributeAsFloat("v",currentFrame->vertex->v);
-          v->SetAttributeAsFloat("nx",currentFrame->vertex->normal.x);
-          v->SetAttributeAsFloat("ny",currentFrame->vertex->normal.y);
-          v->SetAttributeAsFloat("nz",currentFrame->vertex->normal.z);
+          if(!(currentFrame->vertex->normal.x == 0 &&
+               currentFrame->vertex->normal.y == 0 &&
+               currentFrame->vertex->normal.z == 0))
+          {
+            v->SetAttributeAsFloat("nx",currentFrame->vertex->normal.x);
+            v->SetAttributeAsFloat("ny",currentFrame->vertex->normal.y);
+            v->SetAttributeAsFloat("nz",currentFrame->vertex->normal.z);
+          }
           //fprintf(f, "      V (%f,%f,%f:%f,%f)\n", currentFrame->vertex->position.x, 
           //                                         currentFrame->vertex->position.y, 
           //                                         currentFrame->vertex->position.z, 
