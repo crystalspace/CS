@@ -267,10 +267,10 @@ void OpenGLCache::Clear ()
   while (head)
     Unload (head);
 
-  CS_ASSERT (!head)
-  CS_ASSERT (!tail)
-  CS_ASSERT (!total_size)
-  CS_ASSERT (!num)
+  CS_ASSERT (!head);
+  CS_ASSERT (!tail);
+  CS_ASSERT (!total_size);
+  CS_ASSERT (!num);
 }
 
 //----------------------------------------------------------------------------//
