@@ -72,6 +72,16 @@ csMatrix2 &csMatrix2::operator*= (float s)
   return *this;
 }
 
+csMatrix2 &csMatrix2::operator/= (float s)
+{
+  s=1.0f/s;
+  m11 *= s;
+  m12 *= s;
+  m21 *= s;
+  m22 *= s;
+  return *this;
+}
+
 void csMatrix2::Identity ()
 {
   m11 = m22 = 1;

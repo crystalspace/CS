@@ -10,6 +10,9 @@ The history order is reversed so that new features are at the top.
 	  display is used.  Presently, only the DirectDraw canvases respect the
 	  display number.  This patch is based upon code sent by Groton
 	  <groton@gmx.net>.
+	- Eric Sunshine applied patch from Mark <mark@gossage.cjb.net> for
+	  csMatrix2 and csMatrix3 which supplies missing implementations of
+	  operator/=(float).
 23-Dec-2002
 	- Andreas Busch cleaned up multiple-include-protection in header files
 	  and renamed some defines to be more CS coding-style compliant.  All

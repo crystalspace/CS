@@ -91,6 +91,21 @@ csMatrix3 &csMatrix3::operator*= (float s)
   return *this;
 }
 
+csMatrix3 &csMatrix3::operator/= (float s)
+{
+  s=1.0f/s;
+  m11 *= s;
+  m12 *= s;
+  m13 *= s;
+  m21 *= s;
+  m22 *= s;
+  m23 *= s;
+  m31 *= s;
+  m32 *= s;
+  m33 *= s;
+  return *this;
+}
+
 void csMatrix3::Identity ()
 {
   m11 = m22 = m33 = 1.0;
