@@ -1022,7 +1022,8 @@ STDMETHODIMP csGraphics3DDirect3DDx5::DrawPolygon (G3DPolygonDP& poly)
     }
     else
     {
-      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_SRCALPHA);
+      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_SRCALPHA);     
+      m_lpd3dDevice->SetRenderState(D3DRENDERSTATE_SRCBLEND,  D3DBLEND_DESTCOLOR);
     }
 
     //Attention: Now we need to be in a D3DRENDERSTATE_ZFUNC that allows the same z-value to be
