@@ -20,6 +20,17 @@
 #ifndef __CS_GARRAY_H__
 #define __CS_GARRAY_H__
 
+/**
+ * Default growstep for growing arrays.
+ */
+#define CS_GARRAY_GROWSTEP 16
+
+/**
+ * If SetLength() is called and the new length is CS_GARRAY_SHRINKLIMIT
+ * smaller than the limit then the new array will be shrinked.
+ */
+#define CS_GARRAY_SHRINKLIMIT 1000
+
 // Common macro for declarations below
 #define CS_TYPEDEF_GROWING_ARRAY_EXT(Name, Type, ExtraConstructor, Extra) \
   class Name								\
@@ -31,10 +42,10 @@
   public:								\
     int Limit () const							\
     { return limit; }							\
-    void SetLimit (int iLimit)						\
+    void SetLimit (int inlimit)						\
     {									\
-      if (limit == iLimit) return;					\
-      if ((limit = iLimit)!=0)						\
+      if (limit == inlimit) return;					\
+      if ((limit = inlimit)!=0)						\
         root = (ga_type *)realloc (root, limit * sizeof (ga_type));	\
       else								\
       { if (root) { free (root); root = NULL; } }			\
@@ -45,11 +56,12 @@
     { SetLimit (0); }							\
     int Length () const							\
     { return length; }							\
-    void SetLength (int iLength, int iGrowStep = 8)			\
+    void SetLength (int inlength, int growstep = CS_GARRAY_GROWSTEP)	\
     {									\
-      length = iLength;							\
-      int newlimit = ((length + (iGrowStep - 1)) / iGrowStep) * iGrowStep;\
-      if (newlimit != limit) SetLimit (newlimit);			\
+      length = inlength;						\
+      int newlimit = ((length + (growstep - 1)) / growstep) * growstep;	\
+      if (newlimit > limit || newlimit < limit-CS_GARRAY_SHRINKLIMIT)   \
+        SetLimit (newlimit);						\
     }									\
     ga_type &operator [] (int n)					\
     { CS_ASSERT (n >= 0 && n < limit); return root [n]; }		\
@@ -63,16 +75,16 @@
       SetLength (length-1); }						\
     ga_type *GetArray ()						\
     { return root; }							\
-    int Push (const ga_type &val, int iGrowStep = 8)			\
+    int Push (const ga_type &val, int growstep = CS_GARRAY_GROWSTEP)	\
     {									\
-      SetLength (length + 1, iGrowStep);				\
+      SetLength (length + 1, growstep);					\
       memcpy (root + length - 1, &val, sizeof (ga_type));		\
       return length-1;							\
     }									\
-    void Insert (int pos, const ga_type &val, int iGrowStep = 8)	\
+    void Insert (int pos, const ga_type &val, int growstep=CS_GARRAY_GROWSTEP)\
     {									\
       CS_ASSERT (pos>=0 && pos<=length);				\
-      SetLength (length + 1, iGrowStep);				\
+      SetLength (length + 1, growstep);					\
       memmove (root+pos+1, root+pos, sizeof(ga_type) * (length-pos-1)); \
       memcpy (root + pos, &val, sizeof (ga_type));			\
     }									\

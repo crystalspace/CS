@@ -1,8 +1,37 @@
 The history order is reversed so that new features are at the top.
 
+8-Mar-2002
+	- Peter Amstutz <tetron@student.umass.edu> gave a patch which
+	  does the following:
+	    - garray.h will not shrink the allocated size when SetLength() is
+	      called (SetLimit() can still shrink the array). He did not change
+	      the allocation policy (it still allocates +8 elements at a time).
+	    - In mdltest.ccp/csSingleIndexVertexSet::Add() he commented out
+	      the n-factorial linear search which he believes is supposed to
+	      optimize vertices, but in practice does nothing (except suck
+	      up a LOT of runtime).
+	    - In sprbuild.cpp/csSpriteBuilder::Build() he added code to count
+	      the number of vertices in the imported model and preallocate
+	      the required memory in the vertex arrays.
+	    - In sprtri.cpp/csTriangleMesh2::AddTriangle() he changed the
+	      resize policy from allocating +8 elements at a time to doubling
+	      the array size.
+	- Jorrit additionally modified the following on this patch:
+	    - garray.h will still shrink the allocated size when
+	      SetLength() is called which will result in a limit that
+	      is 1000 (CS_GARRAY_SHRINKLIMIT) units smaller than the old
+	      limit. This means that arrays will still shrink by calling
+	      SetLength() if the new length is sufficiently smaller than
+	      the old one.
+	    - The default grow limit is now set to 16 (CS_GARRAY_GROWSTEP)
+	      instead of 8.
+	    - Instead of doubling the number of triangles in the spr3d
+	      plugin the triangles are doubled with a maximum of 1000
+	      triangles at a time. This ensures that not too much memory
+	      is wasted.
 7-Mar-2002
 	- Matt Reda fixed an endian-related bug in the OpenGL screenshot
-	  code
+	  code.
 	- Fixed another occurance of an initializer in a cpp file.
 	  This is not legal.
 	- The cache manager is no longer registered with the object

@@ -75,6 +75,8 @@ int csSingleIndexVertexSet::Add (int Vertex, int Normal, int Color, int Texel)
 {
   int i;
 
+/* @@@: Removed the code below because it is extremely expensive
+   and it is seldom needed. Maybe this should be optional?
   for (i=0; i<Count; i++)
   {
     if (((!Vertices) || (Vertex == Vertices->Get (i))) &&
@@ -83,6 +85,8 @@ int csSingleIndexVertexSet::Add (int Vertex, int Normal, int Color, int Texel)
         ((!Texels) || (Texel == Texels->Get (i))))
       return i;
   }
+*/
+
   if (Vertices) Vertices->Push (Vertex);
   if (Normals) Normals->Push (Normal);
   if (Colors) Colors->Push (Color);

@@ -87,6 +87,26 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
   csIntArray SpriteNormals;
   csIntArray SpriteTexels;
 
+  int vertices=0;
+  // count polygons 
+  it1 = Object->QueryObject ()->GetIterator ();
+  while (!it1->IsFinished ())
+  {
+    iModelDataPolygon *poly =
+      SCF_QUERY_INTERFACE_FAST (it1->GetObject (), iModelDataPolygon);
+    if (poly)
+    {
+      vertices += poly->GetVertexCount ();
+    }
+    it1->Next ();
+  }
+  it1->DecRef ();
+
+  // reserve memory
+  SpriteVertices.SetLimit (vertices+1);
+  SpriteNormals.SetLimit (vertices+1);
+  SpriteTexels.SetLimit (vertices+1);
+
   // copy polygon data (split polygons into triangles)
   it1 = Object->QueryObject ()->GetIterator ();
   while (!it1->IsFinished ())

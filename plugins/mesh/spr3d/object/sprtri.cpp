@@ -68,14 +68,15 @@ void csTriangleMesh2::AddTriangle (int a, int b, int c)
 {
   if (num_triangles >= max_triangles)
   {
-    csTriangle* new_triangles = new csTriangle [max_triangles+8];
+    int new_max = MIN (max_triangles+1000, max_triangles*2+2);
+    csTriangle* new_triangles = new csTriangle [new_max];
     if (triangles)
     {
       memcpy (new_triangles, triangles, sizeof (csTriangle)*max_triangles);
       delete [] triangles;
     }
     triangles = new_triangles;
-    max_triangles += 8;
+    max_triangles = new_max;
   }
   triangles[num_triangles].a = a;
   triangles[num_triangles].b = b;
