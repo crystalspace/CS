@@ -1519,6 +1519,9 @@ bool csBugPlug::EatKey (iEvent& event)
       case DEBUGCMD_PROFDUMP:
         CS_PROFDUMP(object_reg);
         break;
+      case DEBUGCMD_PROFRESET:
+        CS_PROFRESET(object_reg);
+        break;
       case DEBUGCMD_SHADOWDEBUG:
 	// swap the default shadow volume material shader to/from a version
 	// better visualizing the volume.
@@ -2128,6 +2131,7 @@ int csBugPlug::GetCommandCode (const char* cmdstr, char* args)
   if (!strcmp (cmd, "mesh_zplus"))	return DEBUGCMD_MESH_ZPLUS;
   if (!strcmp (cmd, "listplugins"))	return DEBUGCMD_LISTPLUGINS;
   if (!strcmp (cmd, "profdump"))	return DEBUGCMD_PROFDUMP;
+  if (!strcmp (cmd, "profreset"))	return DEBUGCMD_PROFRESET;
 
   return DEBUGCMD_UNKNOWN;
 }

@@ -12,6 +12,9 @@ chronological order.
 	- Jorrit added new 'profdump' command to buplug (assigned to 'p' key
 	  by default, fps command has been remapped to ctrl-alt-p). This
 	  will simply call CS_PROFDUMP.
+	- Jorrit extended the profiler so that the token is also remembered
+	  now. Additionally added a way to clear the profile data. Added
+	  a 'profclear' command to bugplug (assigned to 'ctrl-shift-p').
 1-Feb-2005
 	- Jorrit reverted a bug fix in engine->GetNearbyObjects() and
 	  GetNearbyMeshes() that was done on 15-Jan. The problem is that this

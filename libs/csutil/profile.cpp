@@ -44,10 +44,12 @@ csProfiler::~csProfiler ()
   SCF_DESTRUCT_IBASE ();
 }
 
-void csProfiler::RegisterProfilePoint (const char* file, int line,
+void csProfiler::RegisterProfilePoint (const char* token,
+	const char* file, int line,
   	uint32* ptr_count, uint32* ptr_time)
 {
   csProfileInfo info;
+  info.token = token;
   info.file = file;
   info.line = line;
   info.ptr_count = ptr_count;
@@ -63,12 +65,24 @@ void csProfiler::Dump ()
   {
     const csProfileInfo& pi = profile_info[i];
     if (*pi.ptr_count > 0)
-      printf ("%d %d %g %s %d\n", *pi.ptr_count, *pi.ptr_time,
+      printf ("%d %d %g %s/%s %d\n", *pi.ptr_count, *pi.ptr_time,
     	float (*pi.ptr_time) / float (*pi.ptr_count),
-    	pi.file, pi.line);
+    	pi.token, pi.file, pi.line);
   }
   fflush (stdout);
 }
+
+void csProfiler::Reset ()
+{
+  size_t i;
+  for (i = 0 ; i < profile_info.Length () ; i++)
+  {
+    const csProfileInfo& pi = profile_info[i];
+    *pi.ptr_count = 0;
+    *pi.ptr_time = 0;
+  }
+}
+
 
 #endif
 

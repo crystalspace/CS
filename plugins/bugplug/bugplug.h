@@ -148,6 +148,7 @@ class csShadow;
 #define DEBUGCMD_SAVEMAP	1064	// SaveMap
 #define DEBUGCMD_LISTPLUGINS	1065	// List all loaded plugins
 #define DEBUGCMD_PROFDUMP	1066	// Dump profile info (CS_PROFSTART).
+#define DEBUGCMD_PROFRESET	1067	// Reset profile info (CS_PROFRESET).
 
 // For showing of polygon meshes.
 #define BUGPLUG_POLYMESH_NO	0

@@ -31,13 +31,16 @@ SCF_VERSION (iProfiler, 0, 0, 1);
 
 struct iProfiler : public iBase
 {
-  virtual void RegisterProfilePoint (const char* file, int line,
+  virtual void RegisterProfilePoint (const char* token,
+  	const char* file, int line,
   	uint32* ptr_count, uint32* ptr_time) = 0;
   virtual void Dump () = 0;
+  virtual void Reset () = 0;
 };
 
 struct csProfileInfo
 {
+  const char* token;
   const char* file;
   int line;
   uint32* ptr_count;
@@ -54,9 +57,11 @@ public:
   virtual ~csProfiler ();
 
   SCF_DECLARE_IBASE;
-  virtual void RegisterProfilePoint (const char* file, int line,
+  virtual void RegisterProfilePoint (const char* token,
+  	const char* file, int line,
   	uint32* ptr_count, uint32* ptr_time);
   virtual void Dump ();
+  virtual void Reset ();
 };
 
 #if 1
@@ -70,6 +75,12 @@ gettimeofday(&tv, 0);\
 v = tv.tv_sec + tv.tv_usec*1000000;\
 }
 #endif
+
+#define CS_PROFRESET(obj_reg) \
+{ \
+csRef<iProfiler> profiler = CS_QUERY_REGISTRY (obj_reg, iProfiler); \
+if (profiler) profiler->Reset (); \
+}
 
 #define CS_PROFDUMP(obj_reg) \
 { \
@@ -104,6 +115,7 @@ tok##__prof__cnt++
 
 #else
 
+#define CS_PROFRESET(obj_reg)
 #define CS_PROFDUMP(obj_reg)
 #define CS_PROFSTART(tok,obj_reg)
 #define CS_PROFSTOP(tok)
