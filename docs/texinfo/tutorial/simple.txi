@@ -282,7 +282,7 @@ In the source file @file{simple.cpp} we place the following:
 #include "csutil/cscolor.h"
 #include "cstool/csview.h"
 #include "cstool/initapp.h"
-#include "simple1.h"
+#include "simple.h"
 #include "iutil/eventq.h"
 #include "iutil/event.h"
 #include "iutil/objreg.h"
