@@ -19,8 +19,6 @@
 /*
   TODO:
     Make nice startup screen with moving blocks as demo.
-    Detect end of game when blocks are too high.
-    Better rotation of blocks.
     Better textures.
     Make keys configurable.
     Add highscore list.
@@ -76,25 +74,29 @@ Blocks::Blocks ()
   full_rotate_x_reverse = create_rotate_x (-M_PI/2);
   full_rotate_y_reverse = create_rotate_y (-M_PI/2);
   full_rotate_z_reverse = create_rotate_z (-M_PI/2);
-  
+
   pause = false;
 
-  destinations[0][0] = csVector3 (0, 3, -5);
-  destinations[1][0] = csVector3 (5, 3, 0);
-  destinations[2][0] = csVector3 (0, 3, 5);
-  destinations[3][0] = csVector3 (-5, 3, 0);
-  destinations[0][1] = csVector3 (0, 6, -5);
-  destinations[1][1] = csVector3 (5, 6, 0);
-  destinations[2][1] = csVector3 (0, 6, 5);
-  destinations[3][1] = csVector3 (-5, 6, 0);
-  destinations[0][2] = csVector3 (0, 8, -5);
-  destinations[1][2] = csVector3 (5, 8, 0);
-  destinations[2][2] = csVector3 (0, 8, 5);
-  destinations[3][2] = csVector3 (-5, 8, 0);
-  destinations[0][3] = csVector3 (0, 10, -2);
-  destinations[1][3] = csVector3 (2, 10, 0);
-  destinations[2][3] = csVector3 (0, 10, 2);
-  destinations[3][3] = csVector3 (-2, 10, 0);
+  destinations[0][0] = csVector3 (0, 3, -7);
+  destinations[1][0] = csVector3 (7, 3, 0);
+  destinations[2][0] = csVector3 (0, 3, 7);
+  destinations[3][0] = csVector3 (-7, 3, 0);
+  destinations[0][1] = csVector3 (0, 5, -6);
+  destinations[1][1] = csVector3 (6, 5, 0);
+  destinations[2][1] = csVector3 (0, 5, 6);
+  destinations[3][1] = csVector3 (-6, 5, 0);
+  destinations[0][2] = csVector3 (0, 7, -5);
+  destinations[1][2] = csVector3 (5, 7, 0);
+  destinations[2][2] = csVector3 (0, 7, 5);
+  destinations[3][2] = csVector3 (-5, 7, 0);
+  destinations[0][3] = csVector3 (0, 7.5, -2);
+  destinations[1][3] = csVector3 (2, 7.5, 0);
+  destinations[2][3] = csVector3 (0, 7.5, 2);
+  destinations[3][3] = csVector3 (-2, 7.5, 0);
+  destinations[0][4] = csVector3 (0, 8, -.4);
+  destinations[1][4] = csVector3 (.4, 8, 0);
+  destinations[2][4] = csVector3 (0, 8, .4);
+  destinations[3][4] = csVector3 (-.4, 8, 0);
   dest_move_right_dx[0] = 1; dest_move_right_dy[0] = 0;
   dest_move_right_dx[1] = 0; dest_move_right_dy[1] = 1;
   dest_move_right_dx[2] = -1; dest_move_right_dy[2] = 0;
@@ -153,7 +155,10 @@ void Blocks::init_game ()
   move_down_dy = dest_move_down_dy[cur_hor_dest];
   cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
 
+  force_next_shape = SHAPE_RANDOM;
+
   pause = false;
+  gameover = false;
 }
 
 void reset_vertex_colors (csThing* th)
@@ -441,6 +446,7 @@ void set_uv (csPolygon3D* p, float u1, float v1, float u2, float v2,
   gs->SetUV (2, u3, v3);
 }
 
+// dx,dy,dz are logical coordinates (Z vertical).
 csThing* Blocks::create_cube_thing (float dx, float dy, float dz)
 {
   csThing* cube;
@@ -448,7 +454,10 @@ csThing* Blocks::create_cube_thing (float dx, float dy, float dz)
   cube->SetName ("cubexxx");
   cube->SetSector (room);
   cube->SetFlags (CS_ENTITY_MOVEABLE, CS_ENTITY_MOVEABLE);
-  csVector3 shift (dx*CUBE_DIM, dz*CUBE_DIM, dy*CUBE_DIM);
+  csVector3 shift (
+  	(dx-shift_rotate.x)*CUBE_DIM,
+  	(dz-shift_rotate.z)*CUBE_DIM,
+	(dy-shift_rotate.y)*CUBE_DIM);
   cube->MergeTemplate (cube_tmpl, cube_txt, 1, NULL, &shift, NULL);
 
   csPolygon3D* p;
@@ -468,12 +477,13 @@ csThing* Blocks::create_cube_thing (float dx, float dy, float dz)
   return cube;
 }
 
+// dx,dy,dz and x,y,z are logical coordinates (Z vertical).
 void Blocks::add_cube (float dx, float dy, float dz, float x, float y, float z)
 {
   csThing* cube = add_cube_thing (room, dx, dy, dz,
-  	(x-ZONE_DIM/2)*CUBE_DIM,
-	z*CUBE_DIM+CUBE_DIM/2,
-  	(y-ZONE_DIM/2)*CUBE_DIM);
+  	(x-ZONE_DIM/2+shift_rotate.x)*CUBE_DIM,
+	(z+shift_rotate.z)*CUBE_DIM+CUBE_DIM/2,
+  	(y-ZONE_DIM/2+shift_rotate.y)*CUBE_DIM);
   cube_info[num_cubes].thing = cube;
   cube_info[num_cubes].dx = dx;
   cube_info[num_cubes].dy = dy;
@@ -481,6 +491,8 @@ void Blocks::add_cube (float dx, float dy, float dz, float x, float y, float z)
   num_cubes++;
 }
 
+// dx,dy,dz are logical coordinates (Z vertical).
+// x,y,z are physical coordinates (Y vertical).
 csThing* Blocks::add_cube_thing (csSector* sect, float dx, float dy, float dz,
 	float x, float y, float z)
 {
@@ -497,7 +509,13 @@ csThing* Blocks::add_cube_thing (csSector* sect, float dx, float dy, float dz,
 
 void Blocks::start_shape (BlShapeType type, int x, int y, int z)
 {
+  if (force_next_shape != SHAPE_RANDOM)
+  {
+    type = force_next_shape;
+    force_next_shape = SHAPE_RANDOM;
+  }
   num_cubes = 0;
+  shift_rotate.Set (0, 0, 0);
   switch (type)
   {
     case SHAPE_R1:
@@ -519,6 +537,7 @@ void Blocks::start_shape (BlShapeType type, int x, int y, int z)
       add_cube (2, 0, 0, x, y, z);
       break;
     case SHAPE_L1:
+      shift_rotate.Set (-.5, 0, .5);
       add_cube (-1, 0, 1, x, y, z);
       add_cube (-1, 0, 0, x, y, z);
       add_cube (0, 0, 0, x, y, z);
@@ -549,6 +568,7 @@ void Blocks::start_shape (BlShapeType type, int x, int y, int z)
       add_cube (1, 1, 0, x, y, z);
       break;
     case SHAPE_CUBE:
+      shift_rotate.Set (.5, .5, .5);
       add_cube (0, 0, 0, x, y, z);
       add_cube (1, 0, 0, x, y, z);
       add_cube (0, 1, 0, x, y, z);
@@ -587,6 +607,7 @@ void Blocks::start_shape (BlShapeType type, int x, int y, int z)
       add_cube (0, 1, 0, x, y, z);
       break;
     case SHAPE_FLATX:
+      shift_rotate.Set (.5, .5, .5);
       add_cube (0, 0, 0, x, y, z);
       add_cube (1, 0, 0, x, y, z);
       add_cube (0, 1, 0, x, y, z);
@@ -594,6 +615,7 @@ void Blocks::start_shape (BlShapeType type, int x, int y, int z)
       add_cube (0, 0, 1, x, y, z);
       break;
     case SHAPE_FLATXX:
+      shift_rotate.Set (.5, .5, .5);
       add_cube (0, 0, 0, x, y, z);
       add_cube (1, 0, 0, x, y, z);
       add_cube (0, 1, 0, x, y, z);
@@ -620,6 +642,7 @@ void Blocks::start_shape (BlShapeType type, int x, int y, int z)
 
 void Blocks::start_demo_shape (BlShapeType type, float x, float y, float z)
 {
+  shift_rotate.Set (0, 0, 0);
   switch (type)
   {
     case SHAPE_DEMO_B:
@@ -700,11 +723,11 @@ void Blocks::start_rotation (BlRotType type)
   switch (type)
   {
     case ROT_PX:
-      if (!check_new_shape_rotation (full_rotate_x)) return;
+      if (!check_new_shape_rotation (full_rotate_x_reverse)) return;
       rot_px_todo = M_PI/2;
       break;
     case ROT_MX:
-      if (!check_new_shape_rotation (full_rotate_x_reverse)) return;
+      if (!check_new_shape_rotation (full_rotate_x)) return;
       rot_mx_todo = M_PI/2;
       break;
     case ROT_PY:
@@ -750,6 +773,11 @@ void Blocks::eatkeypress (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
   {
     switch (key)
     {
+      case '0':
+        difficulty = NUM_BORING_SHAPE;
+	startup_screen = false;
+	newgame = true;
+	break;
       case '1':
         difficulty = NUM_EASY_SHAPE;
 	startup_screen = false;
@@ -772,6 +800,13 @@ void Blocks::eatkeypress (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
 
   switch (key)
   {
+    case '1': force_next_shape = SHAPE_R2; break;
+    case '2': force_next_shape = SHAPE_R3; break;
+    case '3': force_next_shape = SHAPE_R4; break;
+    case '4': force_next_shape = SHAPE_L1; break;
+    case '5': force_next_shape = SHAPE_L2; break;
+    case '6': force_next_shape = SHAPE_FLAT; break;
+    case '7': force_next_shape = SHAPE_CUBE; break;
     case 'u':
       if (cam_move_dist) break;
       cam_move_dist = 1;
@@ -808,7 +843,7 @@ void Blocks::eatkeypress (int key, bool /*shift*/, bool /*alt*/, bool /*ctrl*/)
       if (cam_move_dist) break;
       cam_move_dist = 1;
       cam_move_src = view->GetCamera ()->GetW2CTranslation ();
-      if (cur_ver_dest < 3) cur_ver_dest++;
+      if (cur_ver_dest < 4) cur_ver_dest++;
       cam_move_dest = destinations[cur_hor_dest][cur_ver_dest];
       cam_move_up = csVector3 (0, -1, 0);
       break;
@@ -854,21 +889,37 @@ void Blocks::rotate_shape_internal (const csMatrix3& rot)
 {
   int i;
 
+  csVector3 new_shift_rot;
+  new_shift_rot = rot * shift_rotate;
+  if (new_shift_rot.x < -.25) new_shift_rot.x = .5;
+  else if (new_shift_rot.x > .25) new_shift_rot.x = .5;
+  else new_shift_rot.x = 0;
+  if (new_shift_rot.y < -.25) new_shift_rot.y = .5;
+  else if (new_shift_rot.y > .25) new_shift_rot.y = .5;
+  else new_shift_rot.y = 0;
+  if (new_shift_rot.z < -.25) new_shift_rot.z = .5;
+  else if (new_shift_rot.z > .25) new_shift_rot.z = .5;
+  else new_shift_rot.z = 0;
+
   for (i = 0 ; i < num_cubes ; i++)
   {
     csVector3 v;
-    v.x = cube_info[i].dx*10.;
-    v.y = cube_info[i].dy*10.;
-    v.z = cube_info[i].dz*10.;
+    v.x = cube_info[i].dx;
+    v.y = cube_info[i].dy;
+    v.z = cube_info[i].dz;
+    v = (v - shift_rotate) * 10.;
     v = rot * v;
+    v = v + (new_shift_rot*10.);
 
-    if (v.x < 0) cube_info[i].dx = (float)((int)(v.x-.5)/10.);
-    else cube_info[i].dx = (float)((int)(v.x+.5)/10.);
-    if (v.y < 0) cube_info[i].dy = (float)((int)(v.y-.5)/10.);
-    else cube_info[i].dy = (float)((int)(v.y+.5)/10.);
-    if (v.z < 0) cube_info[i].dz = (float)((int)(v.z-.5)/10.);
-    else cube_info[i].dz = (float)((int)(v.z+.5)/10.);
+    if (v.x < 0) cube_info[i].dx = (float)((int)(v.x-5)/10);
+    else cube_info[i].dx = (float)((int)(v.x+5)/10);
+    if (v.y < 0) cube_info[i].dy = (float)((int)(v.y-5)/10);
+    else cube_info[i].dy = (float)((int)(v.y+5)/10);
+    if (v.z < 0) cube_info[i].dz = (float)((int)(v.z-5)/10);
+    else cube_info[i].dz = (float)((int)(v.z+5)/10);
   }
+
+  shift_rotate = new_shift_rot;
 }
 
 void Blocks::freeze_shape ()
@@ -887,6 +938,7 @@ void Blocks::freeze_shape ()
     // Before we let go of the shape (lose the pointer to it) we set it's
     // name according to it's position.
     cube_info[i].thing->SetName (cubename); 
+    if (z >= GAMEOVER_HEIGHT) gameover = true;
   }
 }
 
@@ -924,19 +976,38 @@ bool Blocks::check_new_shape_rotation (const csMatrix3& rot)
   int i;
   int x, y, z;
   int dx, dy, dz;
+  csVector3 new_shift_rot;
+  new_shift_rot = rot * shift_rotate;
+  if (new_shift_rot.x < -.25) new_shift_rot.x = .5;
+  else if (new_shift_rot.x > .25) new_shift_rot.x = .5;
+  else new_shift_rot.x = 0;
+  if (new_shift_rot.y < -.25) new_shift_rot.y = .5;
+  else if (new_shift_rot.y > .25) new_shift_rot.y = .5;
+  else new_shift_rot.y = 0;
+  if (new_shift_rot.z < -.25) new_shift_rot.z = .5;
+  else if (new_shift_rot.z > .25) new_shift_rot.z = .5;
+  else new_shift_rot.z = 0;
+
+  new_shift_rot *= 10.;
+
   for (i = 0 ; i < num_cubes ; i++)
   {
     csVector3 v;
-    v.x = (float)cube_info[i].dx;
-    v.y = (float)cube_info[i].dy;
-    v.z = (float)cube_info[i].dz;
-    v = rot * v;
-    if (v.x < 0) dx = (int)(v.x-.5);
-    else dx = (int)(v.x+.5);
-    if (v.y < 0) dy = (int)(v.y-.5);
-    else dy = (int)(v.y+.5);
-    if (v.z < 0) dz = (int)(v.z-.5);
-    else dz = (int)(v.z+.5);
+
+    v.x = cube_info[i].dx;
+    v.y = cube_info[i].dy;
+    v.z = cube_info[i].dz;
+    v = (v - shift_rotate) * 10.;
+
+    v = rot * v + new_shift_rot;
+
+    if (v.x < 0) dx = ((int)(v.x-5)/10);
+    else dx = ((int)(v.x+5)/10);
+    if (v.y < 0) dy = ((int)(v.y-5)/10);
+    else dy = ((int)(v.y+5)/10);
+    if (v.z < 0) dz = ((int)(v.z-5)/10);
+    else dz = ((int)(v.z+5)/10);
+
     x = cube_x + dx;
     y = cube_y + dy;
     z = cube_z + dz;
@@ -968,7 +1039,7 @@ void Blocks::move_cubes (time_t elapsed_time)
   float elapsed_rot = 3 * elapsed * (M_PI/2);
   float elapsed_fall = elapsed*speed;
   float elapsed_move = elapsed*1.6;
-  float elapsed_cam_move = elapsed*1.6;
+  float elapsed_cam_move = elapsed*2;
 
   if (fog_density)
   {
@@ -1007,6 +1078,7 @@ void Blocks::move_cubes (time_t elapsed_time)
   }
 
   if (pause) return;
+  if (gameover) return;
 
   if (!move_down_todo)
   {
@@ -1096,7 +1168,8 @@ void Blocks::move_cubes (time_t elapsed_time)
   for (i = 0 ; i < num_cubes ; i++)
   {
     csThing* t = cube_info[i].thing;
-    if (do_rot) t->Transform (rot);
+    if (do_rot)
+      t->Transform (rot);
     t->Move (dx, -elapsed_fall, dy);
     t->Transform ();
     reset_vertex_colors (t);
@@ -1334,6 +1407,7 @@ void Blocks::removePlane (int z)
 
 void Blocks::handleTransition (time_t elapsed_time)
 {
+  if (gameover) return;
   int i;
   transition = false;
 
@@ -1446,6 +1520,7 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
     if (!Gfx3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
     view->Draw ();
     if (!Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+    Gfx2D->Write (100,  80, white, black, "0: boring");
     Gfx2D->Write (100, 100, white, black, "1: novice");
     Gfx2D->Write (100, 120, white, black, "2: normal");
     Gfx2D->Write (100, 140, white, black, "3: expert");
@@ -1460,7 +1535,7 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
   if (!transition) move_cubes (elapsed_time);
   // This is where the transition is handled.
   else handleTransition (elapsed_time);
-  
+
   // Tell Gfx3D we're going to display 3D things
   if (!Gfx3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
   view->Draw ();
@@ -1470,6 +1545,12 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
   char scorebuf[50];
   sprintf (scorebuf, "%d", score);
   Gfx2D->Write (10, Sys->FrameHeight-20, white, black, scorebuf);
+
+  // Game over!
+  if (gameover)
+  {
+    Gfx2D->Write (10, Sys->FrameHeight/2, white, black, "GAME OVER!");
+  }
 
   // Drawing code ends here
   Gfx3D->FinishDraw ();

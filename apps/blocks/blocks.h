@@ -43,7 +43,8 @@ enum BlRotType
 
 enum BlShapeType
 {
-  SHAPE_R1 = 0,
+  SHAPE_RANDOM = -1,
+  SHAPE_R1,
   SHAPE_R2,
   SHAPE_R3,
   SHAPE_R4,
@@ -67,6 +68,7 @@ enum BlShapeType
   SHAPE_DEMO_S
 };
 
+#define NUM_BORING_SHAPE (SHAPE_R4+1)
 #define NUM_EASY_SHAPE (SHAPE_T1+1)
 #define NUM_MEDIUM_SHAPE (SHAPE_U+1)
 #define NUM_HARD_SHAPE (SHAPE_FLATXX+1)
@@ -77,6 +79,9 @@ enum BlShapeType
 // By zone we mean the space where the shapes move/fall.
 #define ZONE_DIM 6
 #define ZONE_HEIGHT 15
+
+// When blocks freeze at this height the game is over.
+#define GAMEOVER_HEIGHT ZONE_HEIGHT-3
 
 // This is a kind of padding around the world(zone).
 #define ZONE_SAFETY 2
@@ -118,21 +123,32 @@ private:
 
   csVector3 view_origin;
 
-  /**
+  // Shift value for rotating a shape.
+  // Normally shapes are rotated around (0,0,0).
+  // With this vector you can shift this half a block
+  // to make sure that rotation always happens around
+  // the visual center of the shape and not the logical
+  // center.
+  csVector3 shift_rotate;
+
+  // For debugging: force the next shape.
+  BlShapeType force_next_shape;
+
+  /*
    * How much distance does the camera still need to move (with
    * 1 being the full distance to move)?
    */
   float cam_move_dist;
   csVector3 cam_move_src, cam_move_dest;
   csVector3 cam_move_up;
-  csVector3 destinations[4][4];
+  csVector3 destinations[4][5];	// [horizontal][vertical]
   int dest_move_right_dx[4];
   int dest_move_right_dy[4];
   int dest_move_down_dx[4];
   int dest_move_down_dy[4];
   int cur_hor_dest, cur_ver_dest;
 
-  /**
+  /*
    * How much rotation around the specified axis do we still
    * need to do for the current cube?
    */
@@ -143,13 +159,13 @@ private:
   float rot_my_todo;
   float rot_mz_todo;
 
-  /**
+  /*
    * How much do we have to move down before we reach another
    * cube-level?
    */
   float move_down_todo;
 
-  /**
+  /*
    * How much distance do we have to move horizontally and in
    * what direction?
    */
@@ -157,7 +173,7 @@ private:
   int move_hor_dx;
   int move_hor_dy;
   
-  /**
+  /*
    * The following four flags indicate how the movement keys work.
    * This is to make sure that pressing the right arrow key will always
    * move the block to the right for example.
@@ -186,6 +202,9 @@ private:
   // When true clear world and start a new game. Usually false,
   // 'cause we are playing.
   bool newgame;
+
+  // If true we have Game Over.
+  bool gameover;
 
   // When true we are in startup screen mode.
   bool startup_screen;

@@ -12,8 +12,25 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+8-Feb-2000
+	- Seth Galbraith contributed big changes to sprite format.
+	- Norman Kramer added screenshot support to Glide rasterizer.
+	- Michael Dale Long added all the HTML files generated from the
+	  LaTeX documentation.
+	- Added 'boring' level to Blocks to test out some things.
+	- Implemented proper rotation of the blocks. Most of the shapes
+	  now rotate around their center.
+	- Added top-view to blocks.
+	- Added 'Game Over' test to Blocks. So now the game actually
+	  ends if you get too high (and you don't need Crack to get high
+	  with Blocks :-).
 7-Feb-2000
 	- Michael Ewert modified phyztest to use new ctVector3 modifications.
+	- Fixed bug with Blocks. The rotation check for 'x' was wrong.
+	- Michael Dale Long fixed the EntityManager interface to use
+	  ULongVector instead of csIntVector for lists of Entity classes,
+	  since they are declared ULong.
+	- Robert Bate updated the Macintosh project files.
 6-Feb-2000
 	- Michael Dale Long stomped some minor bugs in csConsole. Added
 	  support for left/right arrow key movements.
