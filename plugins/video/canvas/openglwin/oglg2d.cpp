@@ -312,6 +312,7 @@ bool csGraphics2DOpenGL::Open()
 
     EnumDisplaySettings(NULL, 0, &dmode);
 
+	dmode.dmBitsPerPel = Depth;
     dmode.dmPelsWidth = Width;
     dmode.dmPelsHeight = Height;
     dmode.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
