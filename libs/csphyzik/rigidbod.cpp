@@ -42,14 +42,14 @@ ctRigidBody::~ctRigidBody()
 ctRigidBody *ctRigidBody::new_ctRigidBody()
 {
 ctReferenceFrame *rf = new ctReferenceFrame();
-	return new ctRigidBody( *rf );
+  return new ctRigidBody( *rf );
 
 }
 ctRigidBody *ctRigidBody::new_ctRigidBody( coord x, coord y, coord z )
 {
 ctReferenceFrame *rf = new ctReferenceFrame();
 //!me set coords
-	return new ctRigidBody( *rf );
+  return new ctRigidBody( *rf );
 
 }
 
@@ -58,12 +58,12 @@ ctReferenceFrame *rf = new ctReferenceFrame();
 // so need to calc L to set w
 void ctRigidBody::set_angular_v( const ctVector3 &pw )
 {
-	ctMatrix3 I_inv_world = get_I_inv_world();
+  ctMatrix3 I_inv_world = get_I_inv_world();
 
-	// angular speed = 
-	// inverse of inertia tensor in world coords * angular momentum
-	w = pw;
-	L = I_inv_world.get_transpose() * w;
+  // angular speed = 
+  // inverse of inertia tensor in world coords * angular momentum
+  w = pw;
+  L = I_inv_world.get_transpose() * w;
 }
 
 // v is a secondary value that is calculated from momentum
@@ -77,18 +77,18 @@ int ctRigidBody::set_state( real *state_array )
 {
 int len;
 
-	len = ctPhysicalEntity::set_state( state_array );	
-	state_array += len;
-	
-	*state_array++ = P[0];
-	*state_array++ = P[1];
-	*state_array++ = P[2];
+  len = ctPhysicalEntity::set_state( state_array ); 
+  state_array += len;
+  
+  *state_array++ = P[0];
+  *state_array++ = P[1];
+  *state_array++ = P[2];
 
-	*state_array++ = L[0];
-	*state_array++ = L[1];
-	*state_array++ = L[2];
+  *state_array++ = L[0];
+  *state_array++ = L[1];
+  *state_array++ = L[2];
 
-	return ctRigidBody::get_state_size(); 
+  return ctRigidBody::get_state_size(); 
 }
 
 
@@ -96,85 +96,85 @@ int ctRigidBody::set_delta_state( real *state_array )
 {
 int len;
 
-	len = ctPhysicalEntity::set_delta_state( state_array );	
-	state_array += len;
-	
-	// dP/dt = F     derivitive of momentum with time = applied force
-	*state_array++ = F[0];   
-	*state_array++ = F[1];
-	*state_array++ = F[2];
+  len = ctPhysicalEntity::set_delta_state( state_array ); 
+  state_array += len;
+  
+  // dP/dt = F     derivitive of momentum with time = applied force
+  *state_array++ = F[0];   
+  *state_array++ = F[1];
+  *state_array++ = F[2];
 
-	// dL/dt = T     derivitive of angular momentum with time = applied torque
-	*state_array++ = T[0];
-	*state_array++ = T[1];
-	*state_array++ = T[2];
+  // dL/dt = T     derivitive of angular momentum with time = applied torque
+  *state_array++ = T[0];
+  *state_array++ = T[1];
+  *state_array++ = T[2];
 
-	return ctRigidBody::get_state_size(); 
+  return ctRigidBody::get_state_size(); 
 
 }
 
 int ctRigidBody::get_state( const real *state_array )
 {
 int len;
-	len = ctPhysicalEntity::get_state( state_array );
-	state_array += len;
+  len = ctPhysicalEntity::get_state( state_array );
+  state_array += len;
 
-	// momentum
-	P[0] = *state_array++;
-	P[1] = *state_array++;
-	P[2] = *state_array++;
+  // momentum
+  P[0] = *state_array++;
+  P[1] = *state_array++;
+  P[2] = *state_array++;
 
-	// angular momentum
-	L[0] = *state_array++;
-	L[1] = *state_array++;
-	L[2] = *state_array++;
+  // angular momentum
+  L[0] = *state_array++;
+  L[1] = *state_array++;
+  L[2] = *state_array++;
 
-	// calc velocity from eqn:  p = mv    momentum = mass * velocity
-	if( m >= MIN_REAL ){
-		v = P/m;
-	}
+  // calc velocity from eqn:  p = mv    momentum = mass * velocity
+  if( m >= MIN_REAL ){
+    v = P/m;
+  }
 
-	// calculate inverse of inertia tensor in world coords 
-	// this result is used to calculate angular speed w
-	ctMatrix3 I_inv_world = get_I_inv_world();
+  // calculate inverse of inertia tensor in world coords 
+  // this result is used to calculate angular speed w
+  ctMatrix3 I_inv_world = get_I_inv_world();
 
-	// angular speed = 
-	// inverse of inertia tensor in world coords * angular momentum
-	w = I_inv_world * L;
+  // angular speed = 
+  // inverse of inertia tensor in world coords * angular momentum
+  w = I_inv_world * L;
 
-	return ctRigidBody::get_state_size(); 
+  return ctRigidBody::get_state_size(); 
 }
 
 // calc I for a block of given dimensions
 void ctRigidBody::calc_simple_I_tensor( real x, real y, real z )
 {
 real k;
-	
-	if( m > MIN_REAL ){
-		k = m/12.0;
-	}else{
-		k = MIN_REAL;
-	}
-	for( int i = 0; i < 3; i++ )
-		for( int j = 0; j < 3; j++ )
-			I[i][j] = 0.0;
+  
+  if( m > MIN_REAL ){
+    k = m/12.0;
+  }else{
+    k = MIN_REAL;
+  }
+  for( int i = 0; i < 3; i++ )
+    for( int j = 0; j < 3; j++ )
+      I[i][j] = 0.0;
 
-	I[0][0] = (y*y + z*z)*k;
-	I[1][1] = (x*x + z*z)*k;
-	I[2][2] = (x*x + y*y)*k;
-	
-	I_inv[0][0] = ( y > MIN_REAL || z > MIN_REAL ) ? 1.0/I[0][0] : MAX_REAL;
-	I_inv[1][1] = ( x > MIN_REAL || z > MIN_REAL ) ? 1.0/I[1][1] : MAX_REAL;
-	I_inv[2][2] = ( x > MIN_REAL || y > MIN_REAL ) ? 1.0/I[2][2] : MAX_REAL;
+  I[0][0] = (y*y + z*z)*k;
+  I[1][1] = (x*x + z*z)*k;
+  I[2][2] = (x*x + y*y)*k;
+  
+  I_inv[0][0] = ( y > MIN_REAL || z > MIN_REAL ) ? 1.0/I[0][0] : MAX_REAL;
+  I_inv[1][1] = ( x > MIN_REAL || z > MIN_REAL ) ? 1.0/I[1][1] : MAX_REAL;
+  I_inv[2][2] = ( x > MIN_REAL || y > MIN_REAL ) ? 1.0/I[2][2] : MAX_REAL;
 }
 
 void ctRigidBody::set_m( real pm )
 {
-	if( pm > MIN_REAL ){
-		I *= ( pm/m );
-		I_inv *= ( m/pm );
-		m = pm;
-	}
+  if( pm > MIN_REAL ){
+    I *= ( pm/m );
+    I_inv *= ( m/pm );
+    m = pm;
+  }
 }
 
 
@@ -278,7 +278,7 @@ real mass = get_impulse_m();
 
   L += jx % jv;
 
-	ctMatrix3 I_inv_world = get_I_inv_world();
+  ctMatrix3 I_inv_world = get_I_inv_world();
   w = I_inv_world * L;
 
 }
