@@ -20,6 +20,7 @@
 #include "csengine/campos.h"
 #include "csengine/engine.h"
 #include "csgeom/matrix3.h"
+#include "csgeom/plane3.h"
 #include "csutil/util.h"
 
 SCF_IMPLEMENT_IBASE_EXT (csCameraPosition)
@@ -30,71 +31,91 @@ SCF_IMPLEMENT_EMBEDDED_IBASE (csCameraPosition::CameraPosition)
   SCF_IMPLEMENTS_INTERFACE (iCameraPosition)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
-csCameraPosition::csCameraPosition (const char *iName, const char *iSector,
-  const csVector3 &iPosition, const csVector3 &iForward,
-  const csVector3 &iUpward)
+csCameraPosition::csCameraPosition (const char *name, const char *sector,
+  const csVector3 &position, const csVector3 &forward,
+  const csVector3 &upward)
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCameraPosition);
-  SetName (iName);
-  Sector = csStrNew (iSector);
-  Position = iPosition;
-  Forward = iForward;
-  Upward = iUpward;
+  SetName (name);
+  csCameraPosition::sector = csStrNew (sector);
+  csCameraPosition::position = position;
+  csCameraPosition::forward = forward;
+  csCameraPosition::upward = upward;
+  far_plane = NULL;
+
   csEngine::current_engine->AddToCurrentRegion (this);
 }
 
 csCameraPosition::~csCameraPosition ()
 {
-  delete [] Sector;
+  delete [] sector;
+  delete [] far_plane;
 }
 
-void csCameraPosition::Set (const char *iSector, const csVector3 &iPosition,
-  const csVector3 &iForward, const csVector3 &iUpward)
+void csCameraPosition::Set (const char *sector, const csVector3 &position,
+  const csVector3 &forward, const csVector3 &upward)
 {
-  delete [] Sector;
-  Sector = csStrNew (iSector);
-  Position = iPosition;
-  Forward = iForward;
-  Upward = iUpward;
+  delete [] csCameraPosition::sector;
+  csCameraPosition::sector = csStrNew (sector);
+  csCameraPosition::position = position;
+  csCameraPosition::forward = forward;
+  csCameraPosition::upward = upward;
 }
 
-bool csCameraPosition::Load (iCamera* oCamera, iEngine *e)
+bool csCameraPosition::Load (iCamera* camera, iEngine *e)
 {
-  iSector *room = e->GetSectors ()->FindByName (Sector);
+  iSector* room = e->GetSectors ()->FindByName (sector);
   if (!room) return false;
-  oCamera->SetSector (room);
-  oCamera->GetTransform ().SetOrigin (Position);
-  csVector3 Right = Upward % Forward;
-  oCamera->GetTransform ().SetT2O (
-    csMatrix3 (Right.x, Upward.x, Forward.x,
-               Right.y, Upward.y, Forward.y,
-               Right.z, Upward.z, Forward.z));
+  camera->SetSector (room);
+  camera->GetTransform ().SetOrigin (position);
+  csVector3 right = upward % forward;
+  camera->GetTransform ().SetT2O (
+    csMatrix3 (right.x, upward.x, forward.x,
+               right.y, upward.y, forward.y,
+               right.z, upward.z, forward.z));
+  camera->SetFarPlane (far_plane);
+
   return true;
+}
+
+void csCameraPosition::SetFarPlane (csPlane3* fp)
+{
+  ClearFarPlane ();
+  if (fp)
+    far_plane = new csPlane3 (*fp);
+}
+
+void csCameraPosition::ClearFarPlane ()
+{
+  delete far_plane; far_plane = NULL;
 }
 
 
 iObject *csCameraPosition::CameraPosition::QueryObject()
   { return scfParent; }
 iCameraPosition *csCameraPosition::CameraPosition::Clone () const
-  { return &(new csCameraPosition (*scfParent))->scfiCameraPosition; }
+{
+  return &((new csCameraPosition (*scfParent))->scfiCameraPosition);
+}
 const char *csCameraPosition::CameraPosition::GetSector()
-  { return scfParent->Sector; }
+  { return scfParent->sector; }
 void csCameraPosition::CameraPosition::SetSector(const char *Name)
-  { scfParent->Sector = csStrNew (Name); }
+  { scfParent->sector = csStrNew (Name); }
 const csVector3 &csCameraPosition::CameraPosition::GetPosition()
-  { return scfParent->Position; }
+  { return scfParent->position; }
 void csCameraPosition::CameraPosition::SetPosition (const csVector3 &v)
-  { scfParent->Position = v; }
+  { scfParent->position = v; }
 const csVector3 &csCameraPosition::CameraPosition::GetUpwardVector()
-  { return scfParent->Upward; }
+  { return scfParent->upward; }
 void csCameraPosition::CameraPosition::SetUpwardVector (const csVector3 &v)
-  { scfParent->Upward = v; }
+  { scfParent->upward = v; }
 const csVector3 &csCameraPosition::CameraPosition::GetForwardVector()
-  { return scfParent->Forward; }
+  { return scfParent->forward; }
 void csCameraPosition::CameraPosition::SetForwardVector (const csVector3 &v)
-  { scfParent->Forward = v; }
-void csCameraPosition::CameraPosition::Set (const char *sector, const csVector3 &pos,
-      const csVector3 &forward, const csVector3 &upward)
+  { scfParent->forward = v; }
+void csCameraPosition::CameraPosition::Set (const char *sector,
+	const csVector3 &pos, const csVector3 &forward, const csVector3 &upward)
   { scfParent->Set (sector, pos, forward, upward); }
 bool csCameraPosition::CameraPosition::Load (iCamera *c, iEngine *e)
   { return scfParent->Load (c, e); }
+

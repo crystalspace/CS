@@ -1046,26 +1046,6 @@ void WalkTest::PrepareFrame (csTicks elapsed_time, csTicks current_time)
       angle += angle_velocity;
     }
   }
-
-#if 0
-  if (do_cd && csBeing::init)
-  {
-    // TODO ALEX: In future this should depend on whether the whole world
-    // or 'active' sectors need to be set up as monsters hunt for player
-    // outside of current sector, but this will do for now.
-
-    // Test camera collision.
-    // Load camera location into player.
-    csBeing::player->sector = view->GetCamera ()->GetSector ();
-    csBeing::player->transform = view->GetCamera ();
-    collcount = csBeing::player->CollisionDetect ();
-    // Load player transformation back into camera.
-    view->GetCamera ()->SetW2C (csBeing::player->transform->GetO2T ());
-    view->GetCamera ()->SetPosition (csBeing::player->transform->GetO2TTranslation ());
-    view->GetCamera ()->SetSector (csBeing::player->sector);
-
-  }
-#endif
 }
 
 void perf_test (int num)
@@ -1216,12 +1196,6 @@ void WalkTest::InitCollDet (iEngine* engine, iRegion* region)
 	mesh->DecRef ();
       }
     }
-
-    // Create a player object that follows the camera around.
-    //  player = csBeing::PlayerSpawn("Player");
-
-    //  init = true;
-    //  Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "DONE");
   }
 }
 

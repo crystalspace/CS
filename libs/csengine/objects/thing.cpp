@@ -107,7 +107,7 @@ csThing::csThing (iBase* parent) : csObject (parent),
   logparent = NULL;
 
   curves_center.x = curves_center.y = curves_center.z = 0;
-  curves_scale = 40;  
+  curves_scale = 40;
   curve_vertices = NULL;
   curve_texels = NULL;
   num_curve_vertices = max_curve_vertices = 0;
@@ -140,7 +140,7 @@ csThing::csThing (iBase* parent) : csObject (parent),
   current_lod = 1;
   current_features = 0;
   thing_edges_valid = false;
-  
+
   curves_transf_ok = false;
 
   polybuf = NULL;
@@ -755,7 +755,7 @@ int csThing::FindPolygonIndex (iPolygon3D* polygon) const
   csPolygon3D* p = polygon->GetPrivateObject ();
   return polygons.Find (p);
 }
-  
+
 csPolygon3D* csThing::NewPolygon (csMaterialWrapper* material)
 {
   csPolygon3D* p = new csPolygon3D (material);
@@ -1039,7 +1039,7 @@ static void* IntersectSegmentTestPol (csThing* thing,
   return NULL;
 }
 
-csPolygon3D* csThing::IntersectSegmentFull (const csVector3& start, 
+csPolygon3D* csThing::IntersectSegmentFull (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr, csMeshWrapper** p_mesh)
 {
   if (static_tree)
@@ -1088,7 +1088,7 @@ csPolygon3D* csThing::IntersectSegmentFull (const csVector3& start,
   }
 }
 
-csPolygon3D* csThing::IntersectSegment (const csVector3& start, 
+csPolygon3D* csThing::IntersectSegment (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr, bool only_portals)
 {
   if (only_portals)
@@ -1113,7 +1113,7 @@ csPolygon3D* csThing::IntersectSegment (const csVector3& start,
     if (pr) *pr = best_r;
     return best_p;
   }
-  
+
   if (static_tree)
   {
     // Version with culler.
@@ -1230,7 +1230,7 @@ void csThing::DrawPolygonArray (csPolygonInt** polygon, int num,
   csPolygon2D* clip;
   iCamera* icam = d->GetCamera ();
   const csReversibleTransform& camtrans = icam->GetTransform ();
-  
+
   // Setup clip and far plane.
   csPlane3 clip_plane, *pclip_plane;
   bool do_clip_plane = d->GetClipPlane (clip_plane);
@@ -1247,7 +1247,11 @@ void csThing::DrawPolygonArray (csPolygonInt** polygon, int num,
     if (p->ClipToPlane (pclip_plane,
 	 	camtrans.GetOrigin (), verts, num_verts)) //@@@Pool for verts?
     {
-      if (!plclip || plclip->ClipPolygon (verts, num_verts))
+      // The far plane is defined negative. So if the polygon is entirely
+      // in front of the far plane it is not visible. Otherwise we will render
+      // it.
+      if (!plclip ||
+      	csPoly3D::Classify (*plclip, verts, num_verts) != POL_FRONT)
       {
         clip = (csPolygon2D*)(render_pool->Alloc ());
 	if (p->DoPerspective (camtrans, verts, num_verts, clip, NULL,
@@ -1538,10 +1542,14 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	  	verts, num_verts))
 	{
       	  csPlane3* plclip = icam->GetFarPlane ();
-	  if (!plclip || plclip->ClipPolygon (verts, num_verts))   
+          // The far plane is defined negative. So if the polygon is entirely
+          // in front of the far plane it is not visible. Otherwise we will
+	  // render it.
+          if (!plclip ||
+      	    csPoly3D::Classify (*plclip, verts, num_verts) != POL_FRONT)
 	  {
             if (bsppol->DoPerspective (camtrans, verts,
-	       		num_verts, clip, icam->IsMirrored ()) 
+	       		num_verts, clip, icam->IsMirrored ())
 	          && clip->ClipAgainst (d->GetClipper ()) )
             {
 	      if (c_buffer->TestPolygon (clip->GetVertices (),
@@ -1549,7 +1557,7 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
 	        mark_vis = true;
             }
 	  }
-	}    
+	}
 	if (mark_vis)
           obj->visobj->MarkVisible ();
         if (clip) render_pool->Free (clip);
@@ -1589,7 +1597,8 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         clip = (csPolygon2D*)(render_pool->Alloc ());
         if (
          p->ClipToPlane (pclip_plane, camtrans.GetOrigin (), verts, num_verts)
-	 && (!plclip || plclip->ClipPolygon (verts, num_verts))		    
+         && (!plclip ||
+      	    csPoly3D::Classify (*plclip, verts, num_verts) != POL_FRONT)
          && p->DoPerspective (camtrans, verts, num_verts, clip, NULL,
                               icam->IsMirrored ())
          && clip->ClipAgainst (d->GetClipper ()))
@@ -1616,7 +1625,8 @@ void* csThing::TestQueuePolygonArray (csPolygonInt** polygon, int num,
         clip = (csPolygon2D*)(render_pool->Alloc ());
         if (!(
            p->ClipToPlane (pclip_plane, camtrans.GetOrigin (), verts, num_verts)
-           && (!plclip || plclip->ClipPolygon (verts, num_verts))
+           && (!plclip ||
+      	      csPoly3D::Classify (*plclip, verts, num_verts) != POL_FRONT)
            && p->DoPerspective (camtrans, verts, num_verts, clip, NULL,
                                 icam->IsMirrored ())
            && clip->ClipAgainst (d->GetClipper ())))
@@ -2248,8 +2258,9 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
 
   if (num_array)
   {
-    int nVert = MIN (6, num_array); // if we use a farplane we could have up to 7 corners, 
-                                    // but the 7th we'll need not here
+    // If we use a farplane we could have up to 7 corners,
+    // but the 7th we'll need not here.
+    int nVert = MIN (6, num_array);
 
     csVector3 cam[7];
     // If all vertices are behind z plane then the node is
@@ -2277,17 +2288,17 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
       count_cull_node_notvis_behind++;
       return false;
     }
-    
+
     if (far_plane)
     {
       if (num_array == 7) // we havent transformed the 7th yet
-       cam[6] = camtrans.Other2This (array[6]);
+        cam[6] = camtrans.Other2This (array[6]);
       for (i = 0 ; i < num_array ; i++)
-        if (far_plane->Classify (cam[i]) > SMALL_EPSILON) 
+        if (far_plane->Classify (cam[i]) > SMALL_EPSILON)
 	  break;
       if (i == num_array) return false;
     }
-    
+
     persp.MakeEmpty ();
     if (num_z_0 == 0)
     {
@@ -2475,7 +2486,7 @@ bool csThing::Draw (iRenderView* rview, iMovable* movable, csZBufMode zMode)
       // Here we render using the Z-buffer.
       //-----
       csOctree* otree = (csOctree*)static_tree;
-      csPolygonIntArray& unsplit = otree->GetRoot ()->GetUnsplitPolygons (); 
+      csPolygonIntArray& unsplit = otree->GetRoot ()->GetUnsplitPolygons ();
       DrawPolygonArray (unsplit.GetPolygons (), unsplit.GetPolygonCount (),
     	  rview, CS_ZBUF_USE);
     }
@@ -3270,7 +3281,7 @@ void csThing::AddPortalPolygon (csPolygon3D* poly)
   int idx = portal_polygons.Find (poly);
   //@@@???CS_ASSERT (idx == -1);
   if (idx != -1) return;
- 
+
   CS_ASSERT (poly->GetPortal () != NULL);
   CS_ASSERT (poly->GetParent () == this);
   portal_polygons.Push (poly);
@@ -3343,7 +3354,7 @@ iMeshObjectFactory* csThing::MeshObject::GetFactory () const
 
 //---------------------------------------------------------------------------
 
-iPolygon3D* csThing::VisCull::IntersectSegment (const csVector3& start, 
+iPolygon3D* csThing::VisCull::IntersectSegment (const csVector3& start,
   const csVector3& end, csVector3& isect, float* pr, iMeshWrapper** p_mesh)
 {
   csMeshWrapper* m;

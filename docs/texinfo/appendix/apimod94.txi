@@ -41,3 +41,19 @@ The following defines have changed:
 @code{VEC_TILT_DOWN} @result{} @code{CS_VEC_TILT_DOWN}
 @end itemize
 
+@subheading Various Changes
+@cindex @code{csPlane3::ClipPolygon()}
+
+@code{csPlane3::ClipPolygon()} will now by default consider the
+polygon to be visible on the negative side of the plane
+(@code{csPlane3::Classify()}) as opposed to the positive side like
+it used to be. It now has a third parameter @samp{reversed} which
+you can set to @code{true} so that it behaves again as before.
+
+@subheading Engine Changes
+@cindex far planes
+
+Far plane handling in the engine has changed. Polygons are no longer
+clipped exactly to the far plane but instead the polygons are rejected
+which are fully behind the far plane.
+

@@ -102,6 +102,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (DETAIL)
   CS_TOKEN_DEF (DYNAMIC)
   CS_TOKEN_DEF (FACTORY)
+  CS_TOKEN_DEF (FARPLANE)
   CS_TOKEN_DEF (FILE)
   CS_TOKEN_DEF (FOG)
   CS_TOKEN_DEF (FORWARD)
@@ -2225,6 +2226,7 @@ bool csLoader::ParseStart (char* buf, iCameraPosition* campos)
     CS_TOKEN_TABLE (POSITION)
     CS_TOKEN_TABLE (UP)
     CS_TOKEN_TABLE (FORWARD)
+    CS_TOKEN_TABLE (FARPLANE)
   CS_TOKEN_TABLE_END
 
   long cmd;
@@ -2254,6 +2256,13 @@ bool csLoader::ParseStart (char* buf, iCameraPosition* campos)
         case CS_TOKEN_FORWARD:
 	  csScanStr (params, "%f,%f,%f", &forward.x, &forward.y, &forward.z);
 	  break;
+        case CS_TOKEN_FARPLANE:
+        {
+	  csPlane3 p;
+          csScanStr (params, "%f,%f,%f,%f", &p.A (), &p.B (), &p.C (), &p.D ());
+	  campos->SetFarPlane (&p);
+	  break;
+        }
       }
     }
     if (cmd == CS_PARSERR_TOKENNOTFOUND)

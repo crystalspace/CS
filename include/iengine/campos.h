@@ -26,7 +26,7 @@ struct iObject;
 struct iEngine;
 struct iCamera;
 
-SCF_VERSION (iCameraPosition, 0, 0, 3);
+SCF_VERSION (iCameraPosition, 0, 1, 0);
 
 /**
  * A camera position. This object can be used to initialize a camera object to
@@ -38,6 +38,7 @@ SCF_VERSION (iCameraPosition, 0, 0, 3);
  * <li> Upward and forward vectors: These vectors define the orientation of the
  *      camera. More exactly, they are used to compute the transformation of
  *      the camera.
+ * <li> A far plane used to clip geometry which is too far away.
  * </ul>
  */
 struct iCameraPosition : public iBase
@@ -46,27 +47,27 @@ struct iCameraPosition : public iBase
   virtual iObject *QueryObject() = 0;
 
   /// Create a clone this camera position.
-  virtual iCameraPosition *Clone () const = 0;
+  virtual iCameraPosition* Clone () const = 0;
   
   /// Return the home sector.
-  virtual const char *GetSector() = 0;
+  virtual const char *GetSector () = 0;
   /// Set the home sector.
-  virtual void SetSector(const char *Name) = 0;
+  virtual void SetSector (const char *Name) = 0;
   
   /// Return the position.
-  virtual const csVector3 &GetPosition() = 0;
+  virtual const csVector3 &GetPosition () = 0;
   /// Set the position.
-  virtual void SetPosition(const csVector3 &p) = 0;
+  virtual void SetPosition (const csVector3 &p) = 0;
   
   /// Return the 'up' vector.
-  virtual const csVector3 &GetUpwardVector() = 0;
+  virtual const csVector3 &GetUpwardVector () = 0;
   /// Set the 'up' vector.
-  virtual void SetUpwardVector(const csVector3 &v) = 0;
+  virtual void SetUpwardVector (const csVector3 &v) = 0;
   
   /// Return the 'front' vector.
-  virtual const csVector3 &GetForwardVector() = 0;
+  virtual const csVector3 &GetForwardVector () = 0;
   /// Set the 'front' vector.
-  virtual void SetForwardVector(const csVector3 &v) = 0;
+  virtual void SetForwardVector (const csVector3 &v) = 0;
 
   /// Set all attributes of the camera position.
   virtual void Set (const char *sector, const csVector3 &pos,
@@ -74,6 +75,27 @@ struct iCameraPosition : public iBase
 
   /// Load the camera position into a camera object.
   virtual bool Load (iCamera*, iEngine*) = 0;
+
+  /**
+   * Set the 3D far plane used to clip all geometry.
+   * If the pointer is NULL then far plane clipping will be disabled.
+   * Otherwise it will be enabled and the plane will be copied (so you
+   * can free or reuse the pointer you give here). Note that the far-plane
+   * will cull away geometry which is on the negative side of the plane
+   * (with csPlane3::Classify() function).
+   */
+  virtual void SetFarPlane (csPlane3* pl) = 0;
+
+  /**
+   * Clear the far plane so no clipping will occur. This is equivalent
+   * to SetFarPlane(NULL).
+   */
+  virtual void ClearFarPlane () = 0;
+
+  /**
+   * Get the current far plane (or NULL if none is defined).
+   */
+  virtual csPlane3* GetFarPlane () const = 0;
 };
 
 

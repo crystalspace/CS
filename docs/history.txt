@@ -4,6 +4,26 @@ he history order is reversed so that new features are at the top.
 	- Greatly enhanced and clarified the comments for the
 	  csTransform, csReversibleTransform, and csOrthoTransform classes
 	  in the reference manual.
+	- Enhanced the reference manual documentation for csPlane3.
+	- Changed the default behaviour of csPlane3::ClipPolygon(). It will
+	  now by default clip the polygon on the negative side of the plane
+	  (as opposed to positive before). You can still get the old behaviour
+	  back by using reversed=true as the third parameter.
+	- Added a static version of csPoly3D::Classify().
+	- Changed the far-plane handling code to use Classify() instead
+	  of ClipPolygon(). This means that polygons will no longer be
+	  clipped to the far plane (which is inefficient anyway) but only
+	  rejected/accepted. If a polygon is fully behind the far plane
+	  it will be rejected.
+	- Added SetFarPlane(), ClearFarPlane() and GetFarPlane() to
+	  iCameraPosition. With this you can set the far plane for cameras
+	  initialized from the camera position.
+	- Added FARPLANE(a,b,c,d) keyword while parsing START() block in map
+	  files. With this keyword you can now set the far plane in a
+	  map file.
+	- Removed the old csBeing references in walktest.
+	- Reformatted crysbal.cpp a bit.
+	- Updated apimod94.txi.
 17-Jan-2002
 	- Jorge Acereda made the following changes:
 	    - Added a comment to iGraphics2D::Write() to document the

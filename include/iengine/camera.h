@@ -187,7 +187,9 @@ struct iCamera : public iBase
    * Set the 3D far plane used to clip all geometry.
    * If the pointer is NULL then far plane clipping will be disabled.
    * Otherwise it will be enabled and the plane will be copied (so you
-   * can free or reuse the pointer you give here).
+   * can free or reuse the pointer you give here). Note that the far-plane
+   * will cull away geometry which is on the negative side of the plane
+   * (with csPlane3::Classify() function).
    */
   virtual void SetFarPlane (csPlane3* fp) = 0;
 

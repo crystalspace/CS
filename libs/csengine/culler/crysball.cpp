@@ -20,8 +20,8 @@
 #include "csengine/crysball.h"
 #include "csgeom/frustum.h"
 
-int csCrystalBall::csTriNode::Add (const csCrystalBallVec *normal, int tri1, int tri2, 
-				 int tri3, csVector *vP, csVector *vTP)
+int csCrystalBall::csTriNode::Add (const csCrystalBallVec *normal,
+	int tri1, int tri2, int tri3, csVector *vP, csVector *vTP)
 {
   int nPos = 0;
   if (IsLeaf ())
@@ -46,8 +46,9 @@ int csCrystalBall::csTriNode::Add (const csCrystalBallVec *normal, int tri1, int
       else
       {
 	// split
-	// as the splitpoint we just take the middle of old-new (this will ensure, that
-	// the old and new point are separated in distinct triangles)
+	// as the splitpoint we just take the middle of old-new (this will
+	// ensure, that the old and new point are separated in distinct
+	// triangles)
 	csVector3 *mc = new csVector3 (*n + (*normal - *n)/2.0f);
 	mc->Normalize (); // now the point lies on the unit sphere
 	divider = vTP->Push ((void*)mc);
@@ -56,7 +57,8 @@ int csCrystalBall::csTriNode::Add (const csCrystalBallVec *normal, int tri1, int
 
 	// now decide which triangle the old and the new point(s) will go into
 	if ((bOld=(Classify (*n, tri1, tri2, divider, vTP) == INSIDE)))
-	  AddChild (new csTriNode (this, from, len)); // contains the original points
+	  // contains the original points
+	  AddChild (new csTriNode (this, from, len));
 	else
 	if ((bNew=(Classify (*normal, tri1, tri2, divider, vTP) == INSIDE)))
 	{
@@ -68,24 +70,30 @@ int csCrystalBall::csTriNode::Add (const csCrystalBallVec *normal, int tri1, int
 	  AddChild (new csTriNode (this, from+len+1, 0)); // remains empty
 
 	if (!bOld && (bOld=(Classify (*n, tri2, tri3, divider, vTP) == INSIDE)))
-	  AddChild (new csTriNode (this, from, len)); // contains the original points
+	  // contains the original points
+	  AddChild (new csTriNode (this, from, len));
 	else
-	if (!bNew && (bNew=(Classify (*normal, tri2, tri3, divider, vTP) == INSIDE)))
+	if (!bNew && (bNew=(Classify (*normal, tri2, tri3, divider, vTP)
+		== INSIDE)))
 	{
 	  csTriNode *tnode = new csTriNode (this, from+len, 0);
-	  AddChild (new csTriNode (this, from+len, 1)); // contains the new point
+	  // contains the new point
+	  AddChild (new csTriNode (this, from+len, 1));
 	  nPos = tnode->Add (normal, tri2, tri3, divider, vP, vTP);
 	}
 	else
 	  AddChild (new csTriNode (this, from+len+1, 0)); // remains empty
 
 	if (!bOld && (bOld=(Classify (*n, tri3, tri1, divider, vTP) == INSIDE)))
-	  AddChild (new csTriNode (this, from, len)); // contains the original points
+	  // contains the original points
+	  AddChild (new csTriNode (this, from, len));
 	else
-	if (!bNew && (bNew=(Classify (*normal, tri3, tri1, divider, vTP) == INSIDE)))
+	if (!bNew && (bNew=(Classify (*normal, tri3, tri1, divider, vTP)
+		== INSIDE)))
 	{
 	  csTriNode *tnode = new csTriNode (this, from+len, 0);
-	  AddChild (new csTriNode (this, from+len, 1)); // contains the new point
+	  // contains the new point
+	  AddChild (new csTriNode (this, from+len, 1));
 	  nPos = tnode->Add (normal, tri3, tri1, divider, vP, vTP);
 	}
 	else
@@ -98,12 +106,15 @@ int csCrystalBall::csTriNode::Add (const csCrystalBallVec *normal, int tri1, int
   {
     // ok, this is not a leaf, lets check which subtriangle we have to dive into
     if (Classify (*normal, tri1, tri2, divider, vTP) == INSIDE)
-      nPos = ((csTriNode*)children.Get (0))->Add (normal, tri1, tri2, divider, vP, vTP);
+      nPos = ((csTriNode*)children.Get (0))->
+      	Add (normal, tri1, tri2, divider, vP, vTP);
     else
     if (Classify (*normal, tri2, tri3, divider, vTP) == INSIDE)
-      nPos = ((csTriNode*)children.Get (1))->Add (normal, tri2, tri3, divider, vP, vTP);
+      nPos = ((csTriNode*)children.Get (1))->
+      	Add (normal, tri2, tri3, divider, vP, vTP);
     else
-      nPos = ((csTriNode*)children.Get (2))->Add (normal, tri3, tri1, divider, vP, vTP);
+      nPos = ((csTriNode*)children.Get (2))->
+      	Add (normal, tri3, tri1, divider, vP, vTP);
   }
   return nPos;
 }
@@ -137,16 +148,20 @@ int csCrystalBall::csTriNode::Classify (const csVector3 &n, int i1, int i2,
   frust.AddVertex (*(csVector3*)vTP->Get (i2));
   frust.AddVertex (*(csVector3*)vTP->Get (i3));
   
-  return (frust.Contains (n) ? csCrystalBall::csTriNode::INSIDE : csCrystalBall::csTriNode::OUTSIDE);
+  return (frust.Contains (n)
+  	? csCrystalBall::csTriNode::INSIDE
+	: csCrystalBall::csTriNode::OUTSIDE);
 }
 
-void csCrystalBall::csTriNode::Transform (const csMatrix3 &m, csVector &indexVector, 
-					int useSign, long cookie,
-					const csVector *vP, const csVector *vTP, 
-					const csVector3 &v1, const csVector3 &v2, 
-					const csVector3 &v3)
+void csCrystalBall::csTriNode::Transform (
+	const csMatrix3 &m, csVector &indexVector, 
+	int useSign, long cookie,
+	const csVector *vP, const csVector *vTP, 
+	const csVector3 &v1, const csVector3 &v2, 
+	const csVector3 &v3)
 {
-  // if the node has no children, we can decide based on the normal assigned to this triangle
+  // If the node has no children, we can decide based on the normal
+  // assigned to this triangle.
   if (IsLeaf ())
   {
     if (len>0)
@@ -160,7 +175,8 @@ void csCrystalBall::csTriNode::Transform (const csMatrix3 &m, csVector &indexVec
 	int to = from+len;
 	int i;
 	for (i=from; i < to; i++)
-	  indexVector.Push ((csSome)((csCrystalBallVec*)vP->Get (i))->GetIndex ());
+	  indexVector.Push ((csSome)((csCrystalBallVec*)vP->Get (i))->
+	  	GetIndex ());
       }
     }
   }
@@ -182,7 +198,8 @@ void csCrystalBall::csTriNode::Transform (const csMatrix3 &m, csVector &indexVec
 	int to = tri->from+tri->len;
 	int j;
 	for (j=tri->from; j < to; j++)
-	  indexVector.Push ((csSome)((csCrystalBallVec*)vP->Get (j))->GetIndex ());
+	  indexVector.Push ((csSome)((csCrystalBallVec*)vP->Get (j))->
+	  	GetIndex ());
       }
       else
       if (match == 1)
@@ -216,8 +233,9 @@ bool csCrystalBall::csTriNode::SignMatches (const csVector3 *tn, int useSign)
   return match;
 }
 
-int csCrystalBall::csTriNode::SignMatches (const csVector3 *n1, const csVector3 *n2, 
-					 const csVector3 *td, int useSign)
+int csCrystalBall::csTriNode::SignMatches (
+	const csVector3 *n1, const csVector3 *n2, 
+	const csVector3 *td, int useSign)
 {
   int match;
   if (useSign < 0)
@@ -283,22 +301,14 @@ void csCrystalBall::InsertPolygon (iPolygonMesh *polyset, int idx)
 
   switch (i)
   {
-  case 0:
-    i1=3; i2=1; i2=2; break;
-  case 1:
-    i1=0; i2=1; i2=2; break;
-  case 2:
-    i1=3; i2=1; i2=5; break;
-  case 3:
-    i1=0; i2=1; i2=5; break;
-  case 4:
-    i1=3; i2=4; i2=2; break;
-  case 5:
-    i1=0; i2=4; i2=2; break;
-  case 6:
-    i1=3; i2=4; i2=5; break;
-  case 7:
-    i1=0; i2=4; i2=5; break;
+    case 0: i1=3; i2=1; i2=2; break;
+    case 1: i1=0; i2=1; i2=2; break;
+    case 2: i1=3; i2=1; i2=5; break;
+    case 3: i1=0; i2=1; i2=5; break;
+    case 4: i1=3; i2=4; i2=2; break;
+    case 5: i1=0; i2=4; i2=2; break;
+    case 6: i1=3; i2=4; i2=5; break;
+    case 7: i1=0; i2=4; i2=5; break;
   }
 
   int nPos = tri[i].Add (n, i1, i2, i3, &vPoints, &vTrianglePoints);
@@ -332,20 +342,20 @@ void csCrystalBall::Transform (const csTransform &o2c, csVector &indexVector,
   csVector3 ne2 = -1 * e2;
   csVector3 ne3 = -1 * e3;
 
-  tri[0].Transform (m, indexVector, useSign, cookie, &vPoints, &vTrianglePoints, 
-		     ne1,  e2,  e3);
-  tri[1].Transform (m, indexVector, useSign, cookie, &vPoints, &vTrianglePoints, 
-		     e1,  e2,  e3);
-  tri[2].Transform (m, indexVector, useSign, cookie, &vPoints, &vTrianglePoints, 
-		     ne1,  e2, ne3);
-  tri[3].Transform (m, indexVector, useSign, cookie, &vPoints, &vTrianglePoints, 
-		     e1,  e2, ne3);
-  tri[4].Transform (m, indexVector, useSign, cookie, &vPoints, &vTrianglePoints, 
-		     ne1, ne2,  e3);
-  tri[5].Transform (m, indexVector, useSign, cookie, &vPoints, &vTrianglePoints, 
-		     e1, ne2,  e3);
-  tri[6].Transform (m, indexVector, useSign, cookie, &vPoints, &vTrianglePoints, 
-		     ne1, ne2, ne3);
-  tri[7].Transform (m, indexVector, useSign, cookie, &vPoints, &vTrianglePoints, 
-		     e1, ne2, ne3);
+  tri[0].Transform (m, indexVector, useSign, cookie, &vPoints,
+  	&vTrianglePoints, ne1,  e2,  e3);
+  tri[1].Transform (m, indexVector, useSign, cookie, &vPoints,
+  	&vTrianglePoints, e1,  e2,  e3);
+  tri[2].Transform (m, indexVector, useSign, cookie, &vPoints,
+  	&vTrianglePoints, ne1,  e2, ne3);
+  tri[3].Transform (m, indexVector, useSign, cookie, &vPoints,
+  	&vTrianglePoints, e1,  e2, ne3);
+  tri[4].Transform (m, indexVector, useSign, cookie, &vPoints,
+  	&vTrianglePoints, ne1, ne2,  e3);
+  tri[5].Transform (m, indexVector, useSign, cookie, &vPoints,
+  	&vTrianglePoints, e1, ne2,  e3);
+  tri[6].Transform (m, indexVector, useSign, cookie, &vPoints,
+  	&vTrianglePoints, ne1, ne2, ne3);
+  tri[7].Transform (m, indexVector, useSign, cookie, &vPoints,
+  	&vTrianglePoints, e1, ne2, ne3);
 }

@@ -152,8 +152,8 @@ bool csPoly3D::ProjectZPlane (const csVector3& point, float plane_z,
   return true;
 }
 
-
-int csPoly3D::Classify (const csPlane3& pl) const
+int csPoly3D::Classify (const csPlane3& pl, csVector3* vertices,
+	int num_vertices)
 {
   int i;
   int front = 0, back = 0;

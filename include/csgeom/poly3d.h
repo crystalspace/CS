@@ -195,13 +195,26 @@ public:
   }
 
   /**
-   * Classify this polygon with regards to a plane (in world space).
-   * If this poly is on same plane it returns POL_SAME_PLANE.  If this poly is
-   * completely in front of the given plane it returnes POL_FRONT.  If this
+   * Static function to classify a polygon with regards to a plane.
+   * If this poly is on same plane it returns POL_SAME_PLANE.
+   * If this poly is completely in front of the given plane it returnes
+   * POL_FRONT. If this poly is completely back of the given plane it
+   * returnes POL_BACK. Otherwise it returns POL_SPLIT_NEEDED.
+   */
+  static int Classify (const csPlane3& pl,
+  	csVector3* vertices, int num_vertices);
+
+  /**
+   * Classify this polygon with regards to a plane.
+   * If this poly is on same plane it returns POL_SAME_PLANE. If this poly is
+   * completely in front of the given plane it returnes POL_FRONT. If this
    * poly is completely back of the given plane it returnes POL_BACK.
    * Otherwise it returns POL_SPLIT_NEEDED.
    */
-  int Classify (const csPlane3& pl) const;
+  int Classify (const csPlane3& pl) const
+  {
+    return Classify (pl, vertices, num_vertices);
+  }
 
   /// Same as Classify() but for X plane only.
   int ClassifyX (float x) const;

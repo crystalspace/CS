@@ -27,17 +27,11 @@
 
 struct iEngine;
 struct iCamera;
+class csPlane3;
 
 /**
  * A camera position. This object can be used to initialize a camera object to
- * a certain state. It has the following properties: <ul>
- * <li> Home sector name: This name is used to find the home sector of the
- *      camera in the engine when the camera position is applied.
- * <li> Position: Position of the camera
- * <li> Upward and forward vectors: These vectors define the orientation of the
- *      camera. More exactly, they are used to compute the transformation of
- *      the camera.
- * </ul>
+ * a certain state.
  */
 class csCameraPosition : public csObject
 {
@@ -45,27 +39,37 @@ private:
   /// Destroy this object and free all associated memory
   virtual ~csCameraPosition ();
 
-public:
+private:
   /// The sector this camera points to
-  char *Sector;
+  char* sector;
   /// The camera position
-  csVector3 Position;
+  csVector3 position;
   /// Camera orientation: forward vector
-  csVector3 Forward;
+  csVector3 forward;
   /// Camera orientation: upward vector
-  csVector3 Upward;
+  csVector3 upward;
+  /**
+   * Far plane. Negative side of this plane (as seen with Classify() function)
+   * is invisible (which is different from how planes in CS usually
+   * act). If this is NULL there is no far plane.
+   */
+  csPlane3* far_plane;
 
+public:
   /// Initialize the camera position object
-  csCameraPosition (const char *iName, const char *iSector,
-    const csVector3 &iPosition,
-    const csVector3 &iForward, const csVector3 &iUpward);
+  csCameraPosition (const char *name, const char *sector,
+    const csVector3 &position,
+    const csVector3 &forward, const csVector3 &upward);
 
   /// Change camera position object
-  void Set (const char *iSector, const csVector3 &iPosition,
-    const csVector3 &iForward, const csVector3 &iUpward);
+  void Set (const char *sector, const csVector3 &position,
+    const csVector3 &forward, const csVector3 &upward);
 
   /// Load the camera position into a camera object
   bool Load (iCamera*, iEngine*);
+
+  void SetFarPlane (csPlane3* pl);
+  void ClearFarPlane ();
 
   SCF_DECLARE_IBASE_EXT (csObject);
 
@@ -87,6 +91,18 @@ public:
     virtual void Set (const char *sector, const csVector3 &pos,
       const csVector3 &forward, const csVector3 &upward);
     virtual bool Load (iCamera *c, iEngine *e);
+    virtual void SetFarPlane (csPlane3* pl)
+    {
+      scfParent->SetFarPlane (pl);
+    }
+    virtual void ClearFarPlane ()
+    {
+      scfParent->ClearFarPlane ();
+    }
+    virtual csPlane3* GetFarPlane () const
+    {
+      return scfParent->far_plane;
+    }
   } scfiCameraPosition;
   friend struct CameraPosition;
 };

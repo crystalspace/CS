@@ -91,6 +91,11 @@ WORLD (
     PLUGIN 'emit' ('crystalspace.mesh.loader.emit')
   )
 
+  START (
+    SECTOR ('room')
+    POSITION (0, 0, 0)
+  )
+
   ADDON (
     PLUGIN ('plane')
     PARAMS (

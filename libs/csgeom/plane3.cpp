@@ -42,11 +42,13 @@ static CS_DECLARE_GROWING_ARRAY (verts, csVector3);
 static CS_DECLARE_GROWING_ARRAY (vis, bool);
 static void CPInit (int len) { verts.SetLimit (len); vis.SetLimit (len); }
 
-bool csPlane3::ClipPolygon (csVector3*& pverts, int& num_verts)
+bool csPlane3::ClipPolygon (csVector3*& pverts, int& num_verts, bool reversed)
 {
   int i,i1, num_vertices = num_verts, cnt_vis = 0;
   bool zs, z1s;
   float r;
+
+  if (!reversed) Invert ();
 
   if (num_verts > verts.Limit())
     CPInit (num_verts);
@@ -59,12 +61,16 @@ bool csPlane3::ClipPolygon (csVector3*& pverts, int& num_verts)
   }
 
   if (cnt_vis == 0)
+  {
+    if (!reversed) Invert ();
     return false; // Polygon is not visible.
+  }
 
   // If all vertices are visible then everything is ok.
   if (cnt_vis == num_vertices)
   {
     num_verts = num_vertices;
+    if (!reversed) Invert ();
     return true;
   }
 
@@ -96,6 +102,7 @@ bool csPlane3::ClipPolygon (csVector3*& pverts, int& num_verts)
     i1 = i;
   }
   pverts = verts.GetArray();
+  if (!reversed) Invert ();
   return true;
 }
 
