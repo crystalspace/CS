@@ -21,7 +21,6 @@
 #include "csengine/arrays.h"
 #include "csengine/curve.h"
 #include "csengine/polygon.h"
-#include "csengine/thingtpl.h"
 
 //-------------------------------------------------------- csCurvesArray -----//
 

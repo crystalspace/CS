@@ -27,7 +27,6 @@
 #include "csengine/triangle.h"
 #include "csengine/sector.h"
 #include "csengine/thing.h"
-#include "csengine/thingtpl.h"
 #include "csengine/cssprite.h"
 #include "csengine/csspr2d.h"
 #include "csengine/skeleton.h"
