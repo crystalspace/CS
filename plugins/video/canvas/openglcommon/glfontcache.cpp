@@ -313,8 +313,8 @@ void csGLFontCache::WriteString (iFont *font, int pen_x, int pen_y,
   glTexCoordPointer(2, GL_FLOAT, sizeof (csVector2), wtTexcoords.GetArray ());
   glVertexPointer(2, GL_FLOAT, sizeof (csVector2), wtVerts2d.GetArray ());
 
-  float x1 = 0.0;
-  float x2, y1, y2;
+  float x1 = 0;
+  float x2 = 0, y1 = 0, y2 = 0;
   int advance = 0;
   bool firstchar = true;
   float oldH = 0.0f;

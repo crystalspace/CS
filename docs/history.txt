@@ -31,6 +31,8 @@ chronological order.
 	  whatever the newest supported profile is. (Useful for forcing
 	  arbvp1 vertex programs so you can use the "glstate") Newest profile
 	  is still the default behavior.
+	- Eric Sunshine eliminated a few compilation warnings about potentially
+	  uninitialize variables in glfontcache.cpp
 1-Mar-2004
 	- res augmented the Win32 canvas to allow retrieval/setting of the
 	  window rectangle (via PerformExtension()).
