@@ -43,7 +43,7 @@
 #include "iengine/lightmgr.h"
 #include "ivideo/rndbuf.h"
 #include "ivideo/rendermesh.h"
-#include "cstool/anonrndbuf.h"
+#include "cstool/userrndbuf.h"
 #include "cstool/rendermeshholder.h"
 #include "csgfx/shadervar.h"
 #include "csgfx/shadervarcontext.h"
@@ -229,6 +229,9 @@ public:
   // mesh itself will do it.
   void SetupShaderVariableContext ();
 
+  bool AddRenderBuffer (const char *name, iRenderBuffer* buffer);
+  bool RemoveRenderBuffer (const char *name);
+
   //----------------------- Shadow and lighting system ----------------------
   char* GenerateCacheName ();
   void InitializeDefault (bool clear);
@@ -413,6 +416,10 @@ public:
     {
       return scfParent->GetAnimationControl ();
     }
+    virtual bool AddRenderBuffer (const char *name, iRenderBuffer* buffer)
+    { return scfParent->AddRenderBuffer (name, buffer); }
+    virtual bool RemoveRenderBuffer (const char *name)
+    { return scfParent->RemoveRenderBuffer (name); }
   } scfiGeneralMeshState;
   friend class GeneralMeshState;
 
@@ -507,8 +514,8 @@ private:
   csRef<iRenderBuffer> binormal_buffer;
   csRef<iRenderBuffer> tangent_buffer;
   
-  csAnonRenderBufferManager anon_buffers;
-  csArray<csStringID> anon_buffer_names;
+  csUserRenderBufferManager userBuffers;
+  csArray<csStringID> user_buffer_names;
 
   uint default_mixmode;
   bool default_lighting;
@@ -618,19 +625,17 @@ public:
   bool IsBack2Front () const { return back2front; }
   void BuildBack2FrontTree ();
 
-  bool AddRenderBuffer (const char *name,
-  	csRenderBufferComponentType component_type, int component_size);
-  bool SetRenderBufferComponent (const char *name, int index,
-  	int component, float value);
-  bool SetRenderBufferComponent (const char *name, int index,
-  	int component, int value);
-  bool SetRenderBuffer (const char *name, float *value);
-  bool SetRenderBuffer (const char *name, int *value);
+  bool AddRenderBuffer (const char *name, iRenderBuffer* buffer);
+  bool RemoveRenderBuffer (const char *name);
   /**
    * Get the string ID's for the anonymous buffers
    */
-  const csArray<csStringID> &GetAnonymousNames ()
-  { return anon_buffer_names; }
+  const csArray<csStringID>& GetUserBufferNames ()
+  { return user_buffer_names; }
+  const csUserRenderBufferManager& GetUserBuffers()
+  { return userBuffers; }
+  iStringSet* GetStrings()
+  { return strings; }
 
   const csBox3& GetObjectBoundingBox ();
   void SetObjectBoundingBox (const csBox3& bbox);
@@ -841,29 +846,10 @@ public:
     {
       return scfParent->GetAnimationControlFactory ();
     }
-    virtual bool AddRenderBuffer (const char *name, 
-      csRenderBufferComponentType component_type, int component_size)
-    {
-      return scfParent->AddRenderBuffer (name, component_type, component_size);
-    }
-    virtual bool SetRenderBufferComponent (const char *name, int index,
-      int comp, float value)
-    {
-      return scfParent->SetRenderBufferComponent (name, index, comp, value);
-    }
-    virtual bool SetRenderBufferComponent (const char *name, int index,
-      int comp, int value)
-    {
-      return scfParent->SetRenderBufferComponent (name, index, comp, value);
-    }
-    virtual bool SetRenderBuffer (const char *name, float *value) 
-    {
-      return scfParent->SetRenderBuffer (name, value);
-    }
-    virtual bool SetRenderBuffer (const char *name, int *value) 
-    {
-      return scfParent->SetRenderBuffer (name, value);
-    }
+    virtual bool AddRenderBuffer (const char *name, iRenderBuffer* buffer)
+    { return scfParent->AddRenderBuffer (name, buffer); }
+    virtual bool RemoveRenderBuffer (const char *name)
+    { return scfParent->RemoveRenderBuffer (name); }
   } scfiGeneralFactoryState;
   friend class GeneralFactoryState;
 

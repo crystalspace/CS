@@ -17,15 +17,24 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __CS_CANVAS_COMMON_DRAW_BOX_H__
-#define __CS_CANVAS_COMMON_DRAW_BOX_H__
+#ifndef __CS_CSPLUGINCOMMON_CANVAS_DRAW_BOX_H__
+#define __CS_CSPLUGINCOMMON_CANVAS_DRAW_BOX_H__
+
+/**\file
+ */
 
 #include "draw_common.h"
 
+/**
+ * Draw a box to a (software) canvas.
+ * \c Tpixel defines the type of a pixel (e.g. uint32...),
+ * \c Tpixmixer a matching mixer class.
+ */
 template<class Tpixel, class Tpixmixer>
 class csG2DDrawBox
 {
 public:
+  /// Draw a box.
   static void DrawBox (csGraphics2D* G2D, int x, int y, int w, int h,
     Tpixel color, uint8 alpha)
   {
@@ -40,4 +49,4 @@ public:
   }
 };
 
-#endif // __CS_CANVAS_COMMON_DRAW_BOX_H__
+#endif // __CS_CSPLUGINCOMMON_CANVAS_DRAW_BOX_H__

@@ -575,7 +575,6 @@ void csGenmeshMeshObject::SetupShaderVariableContext ()
 {
   csShaderVariable* sv;
   
-  bufferHolder->SetAccessor (scfiRenderBufferAccessor, CS_BUFFER_ALL_MASK);
 
   bool ac_verts = false;
   bool ac_texels = false;
@@ -587,11 +586,27 @@ void csGenmeshMeshObject::SetupShaderVariableContext ()
     ac_normals = anim_ctrl->AnimatesNormals ();
   }
 
-  for (size_t i=0;i<factory->GetAnonymousNames().Length();i++)
+  uint bufferMask = CS_BUFFER_ALL_MASK;
+
+  for (size_t i=0;i<factory->GetUserBufferNames().Length();i++)
   {
-    sv = svcontext->GetVariableAdd (factory->GetAnonymousNames().Get(i));
-    sv->SetAccessor (factory->scfiShaderVariableAccessor);
+    const csStringID userBuf = factory->GetUserBufferNames().Get(i);
+    const char* bufName = factory->GetStrings()->Request (userBuf);
+    csRenderBufferName userName = 
+      csRenderBuffer::GetBufferNameFromDescr  (bufName);
+    if (userName >= CS_BUFFER_POSITION)
+    {
+      bufferHolder->SetRenderBuffer (userName, 
+	factory->GetUserBuffers().GetRenderBuffer (userBuf));
+      bufferMask &= ~(1 << userName);
+    }
+    else
+    {
+      sv = svcontext->GetVariableAdd (userBuf);
+      sv->SetAccessor (factory->scfiShaderVariableAccessor);
+    }
   }
+  bufferHolder->SetAccessor (scfiRenderBufferAccessor, bufferMask);
 }
   
 void csGenmeshMeshObject::SetupObject ()
@@ -1273,6 +1288,28 @@ void csGenmeshMeshObject::PreGetBuffer (csRenderBufferHolder* holder, csRenderBu
   factory->PreGetBuffer (holder, buffer);
 }
 
+bool csGenmeshMeshObject::AddRenderBuffer (const char *name,
+					   iRenderBuffer* buffer)
+{
+  /*csStringID bufID = strings->Request (name);
+  if (userBuffers.AddRenderBuffer (bufID, buffer))
+  {
+    user_buffer_names.Push (bufID);
+    return true;
+  }*/
+  return false;
+}
+
+bool csGenmeshMeshObject::RemoveRenderBuffer (const char *name)
+{
+  /*csStringID bufID = strings->Request (name);
+  if (userBuffers.RemoveRenderBuffer (bufID))
+  {
+    user_buffer_names.DeleteFast (bufID);
+    return true;
+  }*/
+  return false;
+}
 
 //----------------------------------------------------------------------
 
@@ -1315,7 +1352,6 @@ SCF_IMPLEMENT_IBASE_END
 
 csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iMeshObjectType *pParent,
       iObjectRegistry* object_reg)
-     : anon_buffers(object_reg)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiGeneralFactoryState);
@@ -1485,15 +1521,15 @@ void csGenmeshMeshObjectFactory::SetupFactory ()
 void csGenmeshMeshObjectFactory::PreGetShaderVariableValue (
   csShaderVariable* var)
 {
-  iRenderBuffer *a = anon_buffers.GetRenderBuffer (var->GetName());
-  if (a!=0)
+  iRenderBuffer *a = userBuffers.GetRenderBuffer (var->GetName());
+  if (a != 0)
   {
-    var->SetValue(a);
-    return;
+    var->SetValue (a);
   }
 }
 
-void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder, csRenderBufferName buffer)
+void csGenmeshMeshObjectFactory::PreGetBuffer (csRenderBufferHolder* holder, 
+					       csRenderBufferName buffer)
 {
   if (!holder) return;
   if (buffer == CS_BUFFER_POSITION)
@@ -2004,34 +2040,26 @@ void csGenmeshMeshObjectFactory::GenerateBox (const csBox3& box)
 }
 
 bool csGenmeshMeshObjectFactory::AddRenderBuffer (const char *name,
-  csRenderBufferComponentType component_type, int component_size)
+						  iRenderBuffer* buffer)
 {
-  anon_buffer_names.Push (strings->Request(name));
-  return anon_buffers.AddRenderBuffer (name, component_type,
-    component_size, num_mesh_vertices);
+  csStringID bufID = strings->Request (name);
+  if (userBuffers.AddRenderBuffer (bufID, buffer))
+  {
+    user_buffer_names.Push (bufID);
+    return true;
+  }
+  return false;
 }
 
-bool csGenmeshMeshObjectFactory::SetRenderBufferComponent (const char *name,
-    int index, int component, float value)
+bool csGenmeshMeshObjectFactory::RemoveRenderBuffer (const char *name)
 {
-  return anon_buffers.SetRenderBufferComponent(name, index, component, value);
-}
-
-bool csGenmeshMeshObjectFactory::SetRenderBufferComponent (const char *name,
-    int index, int component, int value)
-{
-  return anon_buffers.SetRenderBufferComponent(name, index, component, value);
-}
-
-bool csGenmeshMeshObjectFactory::SetRenderBuffer (const char *name,
-    float *value)
-{
-  return anon_buffers.SetRenderBuffer (name, value, num_mesh_vertices);
-}
-
-bool csGenmeshMeshObjectFactory::SetRenderBuffer (const char *name, int *value)
-{
-  return anon_buffers.SetRenderBuffer(name, value, num_mesh_vertices);
+  csStringID bufID = strings->Request (name);
+  if (userBuffers.RemoveRenderBuffer (bufID))
+  {
+    user_buffer_names.DeleteFast (bufID);
+    return true;
+  }
+  return false;
 }
 
 void csGenmeshMeshObjectFactory::Invalidate ()

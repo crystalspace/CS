@@ -31,6 +31,7 @@ struct iPluginManager;
 struct iObjectRegistry;
 struct iSyntaxService;
 struct iGeneralFactoryState;
+struct iGeneralMeshState;
 
 /**
  * General Mesh factory loader.
@@ -128,6 +129,8 @@ public:
   /// Parse a given node and return a new object for it.
   virtual csPtr<iBase> Parse (iDocumentNode* node,
     iLoaderContext* ldr_context, iBase* context);
+  bool ParseRenderBuffer(iDocumentNode *node, iGeneralMeshState* state, 
+    iGeneralFactoryState* factstate);
 
   struct eiComponent : public iComponent
   {

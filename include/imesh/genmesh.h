@@ -85,9 +85,18 @@ struct iGeneralMeshCommonState : public iBase
   virtual void SetShadowReceiving (bool m) = 0;
   /// Is shadow receiving enabled?
   virtual bool IsShadowReceiving () const = 0;
+
+  /**
+   * Adds an independently named render buffer.
+   */
+  virtual bool AddRenderBuffer (const char *name, iRenderBuffer* buffer) = 0;
+  /**
+   * Removes an independently named render buffer.
+   */
+  virtual bool RemoveRenderBuffer (const char *name) = 0;
 };
 
-SCF_VERSION (iGeneralMeshState, 0, 0, 3);
+SCF_VERSION (iGeneralMeshState, 0, 1, 0);
 
 /**
  * This interface describes the API for the general mesh object.
@@ -120,7 +129,7 @@ struct iGeneralMeshState : public iGeneralMeshCommonState
   virtual iGenMeshAnimationControl* GetAnimationControl () const = 0;
 };
 
-SCF_VERSION (iGeneralFactoryState, 0, 2, 0);
+SCF_VERSION (iGeneralFactoryState, 0, 3, 0);
 
 /**
  * This interface describes the API for the general mesh factory.
@@ -241,29 +250,6 @@ struct iGeneralFactoryState : public iGeneralMeshCommonState
    */
   virtual iGenMeshAnimationControlFactory* GetAnimationControlFactory ()
   	const = 0;
-
-  /**
-   * @@@ NR @@@
-   * Adds an independantly named stream, sets to VertexCount
-   */
-  virtual bool AddRenderBuffer (const char *name, 
-    csRenderBufferComponentType component_type, int component_size) = 0;
-
-  /**
-   * @@@ NR @@@
-   * Adds a component to stream with name
-   */
-  virtual bool SetRenderBufferComponent (const char *name, int index,
-  	int component, float value) = 0; 
-  virtual bool SetRenderBufferComponent (const char *name, int index,
-  	int component, int value) = 0; 
-
-  /**
-   * @@@ NR @@@
-   * Sets the stream based on the input array
-   */
-  virtual bool SetRenderBuffer (const char *name, float *value) = 0;
-  virtual bool SetRenderBuffer (const char *name, int *value) = 0;
 };
 
 SCF_VERSION (iGenMeshAnimationControl, 0, 0, 1);

@@ -19,6 +19,7 @@
 #include <stdarg.h>
 #include "cssysdef.h"
 #include "syntxldr.h"
+#include "csutil/dirtyaccessarray.h"
 #include "csutil/ref.h"
 #include "csutil/cscolor.h"
 #include "csutil/scanstr.h"
@@ -1124,9 +1125,190 @@ bool csTextSyntaxService::WriteKey (iDocumentNode *node, iKeyValuePair *keyvalue
   return true;
 }
 
+CS_IMPLEMENT_STATIC_VAR (GetBufferParseError, csString, ());
+
+struct vgInt
+{
+  template <class T>
+  static void Get (T& v, iDocumentNode* node, const char* attr)
+  { v = node->GetAttributeValueAsInt (attr); }
+};
+
+struct vgFloat
+{
+  template <class T>
+  static void Get (T& v, iDocumentNode* node, const char* attr)
+  { v = node->GetAttributeValueAsFloat (attr); }
+};
+
+template <class ValGetter>
+struct BufferParser
+{
+  template <class T>
+  static const char* Parse (iDocumentNode* node,int compNum,
+    csDirtyAccessArray<T>& buf)
+  {
+    char compAttrName[24];
+
+    csRef<iDocumentNodeIterator> it = node->GetNodes();
+    while (it->HasNext())
+    {
+      csRef<iDocumentNode> child = it->Next();
+      if (child->GetType() != CS_NODE_ELEMENT) continue;
+      if ((strcmp (child->GetValue(), "element") != 0)
+	&& (strcmp (child->GetValue(), "e") != 0)
+	&& (strcmp (child->GetValue(), "dongledome") != 0))
+      {
+	GetBufferParseError()->Format ("unexpected node '%s'", 
+	  child->GetValue());
+	return GetBufferParseError()->GetData();
+      }
+      for (int c = 0; c < compNum; c++)
+      {
+	sprintf (compAttrName, "c%d", c);
+	T v;
+	ValGetter::Get (v, child, compAttrName);
+	buf.Push (v);
+      }
+    }
+    return 0;
+  }
+};
+
 csRef<iRenderBuffer> csTextSyntaxService::ParseRenderBuffer (iDocumentNode* node)
 {
-  return 0;
+  static const char* msgid = "crystalspace.syntax.renderbuffer";
+
+  const char* componentType = node->GetAttributeValue ("type");
+  if (componentType == 0)
+  {
+    ReportError (msgid, node, "no 'type' attribute");
+    return 0;
+  }
+  int componentNum = node->GetAttributeValueAsInt ("components");
+  if (componentNum <= 0)
+  {
+    ReportError (msgid, node, "bogus 'components' attribute: %d", componentNum);
+    return 0;
+  }
+
+  const char* err;
+  csRef<iRenderBuffer> buffer;
+  if ((strcmp (componentType, "int") == 0) 
+    || (strcmp (componentType, "i") == 0))
+  {
+    csDirtyAccessArray<int> buf;
+    err = BufferParser<vgInt>::Parse (node, componentNum, buf);
+    if (err == 0)
+    {
+      size_t bufElems = buf.Length() / componentNum;
+      buffer = csRenderBuffer::CreateRenderBuffer (bufElems,
+	CS_BUF_STATIC, CS_BUFCOMP_INT, (uint)componentNum);
+      buffer->CopyInto (buf.GetArray(), bufElems);
+    }
+  }
+  else if ((strcmp (componentType, "uint") == 0) 
+    || (strcmp (componentType, "ui") == 0))
+  {
+    csDirtyAccessArray<uint> buf;
+    err = BufferParser<vgInt>::Parse (node, componentNum, buf);
+    if (err == 0)
+    {
+      size_t bufElems = buf.Length() / componentNum;
+      buffer = csRenderBuffer::CreateRenderBuffer (bufElems,
+	CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_INT, (uint)componentNum);
+      buffer->CopyInto (buf.GetArray(), bufElems);
+    }
+  }
+  else if ((strcmp (componentType, "byte") == 0) 
+    || (strcmp (componentType, "b") == 0))
+  {
+    csDirtyAccessArray<int8> buf;
+    err = BufferParser<vgInt>::Parse (node, componentNum, buf);
+    if (err == 0)
+    {
+      size_t bufElems = buf.Length() / componentNum;
+      buffer = csRenderBuffer::CreateRenderBuffer (bufElems,
+	CS_BUF_STATIC, CS_BUFCOMP_BYTE, (uint)componentNum);
+      buffer->CopyInto (buf.GetArray(), bufElems);
+    }
+  }
+  else if ((strcmp (componentType, "ubyte") == 0) 
+    || (strcmp (componentType, "ub") == 0))
+  {
+    csDirtyAccessArray<uint8> buf;
+    err = BufferParser<vgInt>::Parse (node, componentNum, buf);
+    if (err == 0)
+    {
+      size_t bufElems = buf.Length() / componentNum;
+      buffer = csRenderBuffer::CreateRenderBuffer (bufElems,
+	CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_BYTE, (uint)componentNum);
+      buffer->CopyInto (buf.GetArray(), bufElems);
+    }
+  }
+  else if ((strcmp (componentType, "short") == 0) 
+    || (strcmp (componentType, "s") == 0))
+  {
+    csDirtyAccessArray<int16> buf;
+    err = BufferParser<vgInt>::Parse (node, componentNum, buf);
+    if (err == 0)
+    {
+      size_t bufElems = buf.Length() / componentNum;
+      buffer = csRenderBuffer::CreateRenderBuffer (bufElems,
+	CS_BUF_STATIC, CS_BUFCOMP_SHORT, (uint)componentNum);
+      buffer->CopyInto (buf.GetArray(), bufElems);
+    }
+  }
+  else if ((strcmp (componentType, "ushort") == 0) 
+    || (strcmp (componentType, "us") == 0))
+  {
+    csDirtyAccessArray<uint16> buf;
+    err = BufferParser<vgInt>::Parse (node, componentNum, buf);
+    if (err == 0)
+    {
+      size_t bufElems = buf.Length() / componentNum;
+      buffer = csRenderBuffer::CreateRenderBuffer (bufElems,
+	CS_BUF_STATIC, CS_BUFCOMP_UNSIGNED_SHORT, (uint)componentNum);
+      buffer->CopyInto (buf.GetArray(), bufElems);
+    }
+  }
+  else if ((strcmp (componentType, "float") == 0) 
+    || (strcmp (componentType, "f") == 0))
+  {
+    csDirtyAccessArray<float> buf;
+    err = BufferParser<vgFloat>::Parse (node, componentNum, buf);
+    if (err == 0)
+    {
+      size_t bufElems = buf.Length() / componentNum;
+      buffer = csRenderBuffer::CreateRenderBuffer (bufElems,
+	CS_BUF_STATIC, CS_BUFCOMP_FLOAT, (uint)componentNum);
+      buffer->CopyInto (buf.GetArray(), bufElems);
+    }
+  }
+  else if ((strcmp (componentType, "double") == 0) 
+    || (strcmp (componentType, "d") == 0))
+  {
+    csDirtyAccessArray<double> buf;
+    err = BufferParser<vgFloat>::Parse (node, componentNum, buf);
+    if (err == 0)
+    {
+      size_t bufElems = buf.Length() / componentNum;
+      buffer = csRenderBuffer::CreateRenderBuffer (bufElems,
+	CS_BUF_STATIC, CS_BUFCOMP_DOUBLE, (uint)componentNum);
+      buffer->CopyInto (buf.GetArray(), bufElems);
+    }
+  }
+  else
+  {
+    ReportError (msgid, node, "unknown value for 'type': %s", componentType);
+    return 0;
+  }
+  if (err != 0)
+  {
+    ReportError (msgid, node, "%s", err);
+    return 0;
+  }
+  return buffer;
 }
 
 void csTextSyntaxService::ReportError (const char* msgid,

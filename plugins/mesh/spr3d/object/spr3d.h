@@ -47,7 +47,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/rendermesh.h"
 #include "ivideo/rndbuf.h"
-#include "cstool/anonrndbuf.h"
+#include "cstool/userrndbuf.h"
 #include "cstool/rendermeshholder.h"
 #include "ivideo/material.h"
 #include "csqint.h"
@@ -382,8 +382,6 @@ public:
 
   csWeakRef<iGraphics3D> g3d;
   csRef<iLightManager> light_mgr;
-
-  csAnonRenderBufferManager *anon_buffers;
 
   /**
    * Reference to the engine (optional because sprites can also be

@@ -29,6 +29,7 @@
 #include "csutil/scfstr.h"
 #include "csutil/scfstrset.h"
 #include "csutil/xmltiny.h"
+#include "csgfx/renderbuffer.h"
 
 #include "xmlshader.h"
 
@@ -318,69 +319,12 @@ bool csXMLShaderTech::LoadPass (iDocumentNode *node, shaderPass *pass)
           return false;
         }
 
-        if (strcasecmp (source, "position") == 0)
+	sourceName = csRenderBuffer::GetBufferNameFromDescr (source);
+	if (sourceName < CS_BUFFER_POSITION)
         {
-          sourceName = CS_BUFFER_POSITION;
-        }
-        else if (strcasecmp (source, "normal") == 0)
-        {
-          sourceName = CS_BUFFER_NORMAL;
-        }
-        else if (strcasecmp (source, "color") == 0)
-        {
-          sourceName = CS_BUFFER_COLOR;
-        }
-        else if (strcasecmp (source, "primary color") == 0)
-        {
-          sourceName = CS_BUFFER_COLOR;
-        }
-        else if (strcasecmp (source, "lit color") == 0)
-        {
-          sourceName = CS_BUFFER_COLOR_LIGHTING;
-        }
-        else if (strcasecmp (source, "texture coordinate 0") == 0)
-        {
-          sourceName = CS_BUFFER_TEXCOORD0;
-        }
-        else if (strcasecmp (source, "texture coordinate 1") == 0)
-        {
-          sourceName = CS_BUFFER_TEXCOORD1;
-        }
-        else if (strcasecmp (source, "texture coordinate 2") == 0)
-        {
-          sourceName = CS_BUFFER_TEXCOORD2;
-        }
-        else if (strcasecmp (source, "texture coordinate 3") == 0)
-        {
-          sourceName = CS_BUFFER_TEXCOORD3;
-        }
-        else if (strcasecmp (source, "texture coordinate lightmap") == 0)
-        {
-          sourceName = CS_BUFFER_TEXCOORD_LIGHTMAP;
-        }
-        else if (strcasecmp (source, "generic 0") == 0)
-        {
-          sourceName = CS_BUFFER_GENERIC0;
-        }
-        else if (strcasecmp (source, "generic 1") == 0)
-        {
-          sourceName = CS_BUFFER_GENERIC1;
-        }
-        else if (strcasecmp (source, "generic 2") == 0)
-        {
-          sourceName = CS_BUFFER_GENERIC2;
-        }
-        else if (strcasecmp (source, "generic 3") == 0)
-        {
-          sourceName = CS_BUFFER_GENERIC3;
-        }
-        else if (strcasecmp (source, "binormal") == 0)
-        {
-          sourceName = CS_BUFFER_BINORMAL;
-        }
-        else if (strcasecmp (source, "tangent") == 0)
-        {
-          sourceName = CS_BUFFER_TANGENT;
+          SetFailReason ("invalid buffermapping, '%s' not %s here.",
+	    (sourceName == CS_BUFFER_NONE) ? "recognized" : "allowed");
+          return false;
         }
         
         pass->defaultMappings[attrib] = sourceName;

@@ -262,7 +262,6 @@ csSprite3DMeshObjectFactory::~csSprite3DMeshObjectFactory ()
   delete tri_verts;
   delete[] cachename;
   ClearLODListeners ();
-  delete anon_buffers;
 
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiSprite3DFactoryState);
   SCF_DESTRUCT_EMBEDDED_IBASE (scfiLODControl);
@@ -2536,7 +2535,6 @@ csPtr<iMeshObjectFactory> csSprite3DMeshObjectType::NewFactory ()
   cm->engine = engine;
 
   cm->g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
-  cm->anon_buffers = new csAnonRenderBufferManager (object_reg);
 
   cm->light_mgr = CS_QUERY_REGISTRY (object_reg, iLightManager);
   csRef<iMeshObjectFactory> ifact (

@@ -269,6 +269,11 @@ struct iSyntaxService : public iBase
    * Returns true if successful.
    */
   virtual bool WriteKey (iDocumentNode* node, iKeyValuePair* keyvalue) = 0;
+
+  /**
+   * Parse a user render buffer.
+   */
+  virtual csRef<iRenderBuffer> ParseRenderBuffer (iDocumentNode* node) = 0;
 };
 
 /** @} */

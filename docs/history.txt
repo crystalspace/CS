@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+26-Feb-2005
+	- res renamed "anonymous render buffers" to user render buffers,
+	  simplified csUserRenderBufferManager, added a render buffer parser
+	  to the syntax services, and fixed GM factories to support user render
+	  buffers.
+	- res made a small improvement to the csplugincommon/canvas docs.
 25-Feb-2005
 	- Jorrit added a new HOWTO that explains how to compile external
 	  applications for Crystal Space and CEL using Dev-CPP.

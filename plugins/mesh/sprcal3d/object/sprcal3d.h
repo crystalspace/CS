@@ -26,7 +26,6 @@
 #include "csgeom/poly2d.h"
 #include "csgeom/poly3d.h"
 #include "csqint.h"
-#include "cstool/anonrndbuf.h"
 #include "cstool/rendermeshholder.h"
 #include "csutil/cscolor.h"
 #include "csutil/dirtyaccessarray.h"

@@ -18,7 +18,7 @@
 */
 
 #include "cssysdef.h"
-#include "cstool/anonrndbuf.h"
+#include "cstool/userrndbuf.h"
 #include "cstool/basetexfact.h"
 #include "cstool/collider.h"
 #include "cstool/csanim2d.h"

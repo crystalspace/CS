@@ -202,6 +202,17 @@ public:
     csRenderBufferType type, uint count, 
     const csInterleavedSubBufferOptions* elements, 
     csRef<iRenderBuffer>* buffers);
+
+  /**
+   * Utility to retrieve the "friendly" string name of a buffer description,
+   * e.g. "position" for CS_BUFFER_POSITION.
+   */
+  static const char* GetDescrFromBufferName (csRenderBufferName bufferName);
+  /**
+   * Retrieve the buffer name for a "friendly" buffer description.
+   * Can be used to parse e.g. shader files.
+   */
+  static csRenderBufferName GetBufferNameFromDescr (const char* name);
 protected:
   /// hint about main usage
   csRenderBufferType bufferType; 

@@ -24,13 +24,13 @@
  * Render buffer interface
  */
  
-/**
- * \addtogroup gfx3d
- * @{ */
-
 #include "csutil/scf.h"
 #include "csutil/strset.h"
 #include "csutil/refcount.h"
+
+/**
+ * \addtogroup gfx3d
+ * @{ */
 
 class csVector3;
 class csVector2;
@@ -71,14 +71,14 @@ enum csRenderBufferComponentType
 };
 
 /**
- * Type of lock
- * CS_BUF_LOCK_NORMAL: Just get a point to the buffer, nothing special
- * CS_BUF_LOCK_READ: Lock used for reading from the buffer
+ * Type of lock of a render buffer.
  */
 enum csRenderBufferLockType
 {
   CS_BUF_LOCK_NOLOCK,
+  /// Lock used for reading only from the buffer
   CS_BUF_LOCK_READ,
+  /// Just get a point to the buffer, nothing special
   CS_BUF_LOCK_NORMAL
 };
 
@@ -172,6 +172,9 @@ struct iRenderBuffer : public iBase
 /**
  * Defines the names of the renderbuffers as provided by the
  * meshes.
+ * \remark These constants are used to generate a mask (see
+ *  csRenderBufferNameMask), hence their number should be kept
+ *  below 32.
  */
 enum csRenderBufferName
 {
@@ -208,7 +211,11 @@ enum csRenderBufferName
   CS_BUFFER_TANGENT,
   /// Binormals
   CS_BUFFER_BINORMAL,
-  /// special
+
+  /**
+   * Not really a renderbuffer. Use to determine the number of available
+   * default buffer names.
+   */
   CS_BUFFER_COUNT
 };
 
@@ -298,14 +305,13 @@ public:
   }
 
   /**
-   * Set accessor
+   * Set accessor.
    */
   void SetAccessor (iRenderBufferAccessor* a, uint32 mask)
   {
     accessorMask = mask;
     accessor = a;
   }
-
 protected:
   uint32 accessorMask;
   csRef<iRenderBufferAccessor> accessor;

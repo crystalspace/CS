@@ -150,3 +150,59 @@ csRef<iRenderBuffer> csRenderBuffer::CreateInterleavedRenderBuffers (size_t elem
   }
   return master;
 }
+
+const char* csRenderBuffer::GetDescrFromBufferName (csRenderBufferName bufferName)
+{
+  static const char* bufferDescr[CS_BUFFER_COUNT] = {
+    "index", "position", "normal", "primary color", "lit color", 
+    "texture coordinate 0", "texture coordinate 1", 
+    "texture coordinate 2", "texture coordinate 3", 
+    "texture coordinate lightmap", "generic 0", "generic 1", "generic 2",
+    "generic 3", "tangent", "binormal"
+  };
+
+  if ((bufferName >= 0) && (bufferName < CS_BUFFER_COUNT))
+    return bufferDescr[bufferName];
+  return 0;
+}
+
+csRenderBufferName csRenderBuffer::GetBufferNameFromDescr (const char* name)
+{
+  struct StrToName
+  {
+    const char* descr;
+    csRenderBufferName name;
+  };
+  static const StrToName strMap[] = {
+    {"binormal",		    CS_BUFFER_BINORMAL},
+    {"color",			    CS_BUFFER_COLOR},
+    {"generic 0",		    CS_BUFFER_GENERIC0},
+    {"generic 1",		    CS_BUFFER_GENERIC1},
+    {"generic 2",		    CS_BUFFER_GENERIC2},
+    {"generic 3",		    CS_BUFFER_GENERIC3},
+    {"index",			    CS_BUFFER_INDEX},
+    {"lit color",		    CS_BUFFER_COLOR_LIGHTING},
+    {"normal",			    CS_BUFFER_NORMAL},
+    {"position",		    CS_BUFFER_POSITION},
+    {"primary color",		    CS_BUFFER_COLOR},
+    {"tangent",			    CS_BUFFER_TANGENT},
+    {"texture coordinate 0",	    CS_BUFFER_TEXCOORD0},
+    {"texture coordinate 1",	    CS_BUFFER_TEXCOORD1},
+    {"texture coordinate 2",	    CS_BUFFER_TEXCOORD2},
+    {"texture coordinate 3",	    CS_BUFFER_TEXCOORD3},
+    {"texture coordinate lightmap", CS_BUFFER_TEXCOORD_LIGHTMAP}
+  };
+
+  size_t l = 0, r = sizeof (strMap) / sizeof (StrToName);
+  while (l < r)
+  {
+    size_t m = (l+r) / 2;
+    int i = strcmp (strMap[m].descr, name);
+    if (i == 0) return strMap[m].name;
+    if (i < 0)
+      l = m;
+    else
+      r = m;
+  }
+  return CS_BUFFER_NONE;
+}

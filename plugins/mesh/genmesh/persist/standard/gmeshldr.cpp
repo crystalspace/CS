@@ -151,145 +151,38 @@ bool csGeneralFactoryLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
-
 bool csGeneralFactoryLoader::ParseRenderBuffer(iDocumentNode *node,
 	iGeneralFactoryState* state)
 {
   if(!node) return false;
   if(!state) return false;
 
-  csRef<iDocumentNode> child;
-  csRef<iDocumentNodeIterator> children = node->GetNodes();
-
-  if(!children.IsValid()) return false; // empty renderbuffer..
-  
-  const char *comptype = node->GetAttributeValue("type");
   const char *name = node->GetAttributeValue("name");
-  int compcount = node->GetAttributeValueAsInt("compcount");
-  int length = state->GetVertexCount();
-  
-  if(strcmp(comptype, "float") == 0)
+  if ((name == 0) || (*name == 0))
   {
-    float *floatarray = new float[length * compcount];
-    int vertexindex = 0;
-    while(children->HasNext())
-    {
-      child = children->Next();
-      if (child->GetType () != CS_NODE_ELEMENT) continue;
-      
-      if(strcmp("va", child->GetValue ()) == 0)
-      {
-        for(int i = 0; i < compcount; i++)
-        {
-          char attribname[12];
-          attribname[0] = 'f';
-          attribname[1] = '\0';
-          sprintf (&attribname[1], "%d", i);
-
-          floatarray[vertexindex * compcount + i] = child
-	  	->GetAttributeValueAsFloat(attribname);
-        }
-        vertexindex++;
-      }
-    };
-
-    state->AddRenderBuffer(name, CS_BUFCOMP_FLOAT, compcount);
-    state->SetRenderBuffer(name, floatarray);
-    delete[] floatarray;
-  }
-  if(strcmp(comptype, "int") == 0)
-  {
-    int *intarray = new int[length * compcount];
-    int vertexindex = 0;
-    while(children->HasNext())
-    {
-      child = children->Next();
-      if (child->GetType () != CS_NODE_ELEMENT) continue;
-      
-      if(strcmp("va", child->GetValue()) == 0)
-      {
-        for(int i = 0; i < compcount; i++)
-        {
-          char attribname[12];
-          attribname[0] = 'i';
-          attribname[1] = '\0';
-          sprintf(&attribname[1], "%d", i);
-
-          intarray[vertexindex * compcount + i] = child
-	  	->GetAttributeValueAsInt(attribname);
-        }
-        vertexindex++;
-      }
-    };
-
-    state->AddRenderBuffer(name, CS_BUFCOMP_INT, compcount);
-    state->SetRenderBuffer(name, intarray);
-    delete[] intarray;
-  }
-  else if(strcmp(comptype, "short") == 0)
-  {
-    compcount += (compcount % 2);
-    short *shortarray = new short[length * compcount];
-    int vertexindex = 0;
-    while(children->HasNext())
-    {
-      child = children->Next();
-      if (child->GetType () != CS_NODE_ELEMENT) continue;
-      
-      if(strcmp("va", child->GetValue()) == 0)
-      {
-        for(int i = 0; i < compcount; i++)
-        {
-          char attribname[12];
-          attribname[0] = 's';
-          attribname[1] = '\0';
-          sprintf (&attribname[1], "%d", i);
-
-          shortarray[vertexindex * compcount + i] = child
-	  	->GetAttributeValueAsInt(attribname);
-        }
-        vertexindex++;
-      }
-    };
-
-    state->AddRenderBuffer(name, CS_BUFCOMP_SHORT, compcount);
-    state->SetRenderBuffer(name, (int*)shortarray);
-    delete[] shortarray;
-  }
-  else if(strcmp(comptype, "byte") == 0)
-  {
-    compcount += (compcount % 4);
-    unsigned char *bytearray = new unsigned char[length * compcount];
-    int vertexindex = 0;
-    while(children->HasNext())
-    {
-      child = children->Next();
-      if (child->GetType () != CS_NODE_ELEMENT) continue;
-      
-      if(strcmp("va", child->GetValue()) == 0)
-      {
-        for(int i = 0; i < compcount; i++)
-        {
-          char attribname[12];
-          attribname[0] = 'b';
-          attribname[1] = '\0';
-          sprintf (&attribname[1], "%d", i);
-
-          bytearray[vertexindex * compcount + i] = child
-	  	->GetAttributeValueAsInt(attribname);
-        }
-        vertexindex++;
-      }
-    };
-
-    state->AddRenderBuffer(name, CS_BUFCOMP_BYTE, compcount);
-    state->SetRenderBuffer(name, (int*)bytearray);
-  
-    delete[] bytearray;
-  }
-  else
+    synldr->ReportError ("crystalspace.genmeshfactoryloader.parse",
+      node, "<renderbuffer>s must have names");
     return false;
-  
+  }
+  csRef<iRenderBuffer> buf = synldr->ParseRenderBuffer (node);
+  if (!buf.IsValid()) return false;
+
+  size_t rbElem = buf->GetElementCount();
+  if (state->GetVertexCount() != rbElem)
+  {
+    synldr->ReportError ("crystalspace.genmeshfactoryloader.parse",
+      node, "Render buffer vertex count(%u) different from "
+      "factory vertex count (%d)", (uint)rbElem, state->GetVertexCount());
+    return false;
+  }
+
+  if (!state->AddRenderBuffer (name, buf))
+  {
+    synldr->ReportError ("crystalspace.genmeshfactoryloader.parse",
+      node, "A <renderbuffer> of name '%s' was already provided",
+      name);
+    return false;
+  }
   return true;
 }
 
@@ -771,11 +664,47 @@ bool csGeneralMeshLoader::Initialize (iObjectRegistry* object_reg)
   return true;
 }
 
+bool csGeneralMeshLoader::ParseRenderBuffer(iDocumentNode *node,
+	iGeneralMeshState* state, iGeneralFactoryState* factstate)
+{
+  if(!node) return false;
+  if(!state) return false;
+
+  const char *name = node->GetAttributeValue("name");
+  if ((name == 0) || (*name == 0))
+  {
+    synldr->ReportError ("crystalspace.genmeshloader.parse",
+      node, "<renderbuffer>s must have names");
+    return false;
+  }
+  csRef<iRenderBuffer> buf = synldr->ParseRenderBuffer (node);
+  if (!buf.IsValid()) return false;
+
+  size_t rbElem = buf->GetElementCount();
+  if (factstate->GetVertexCount() != rbElem)
+  {
+    synldr->ReportError ("crystalspace.genmeshloader.parse",
+      node, "Render buffer vertex count(%u) different from "
+      "factory vertex count (%d)", (uint)rbElem, factstate->GetVertexCount());
+    return false;
+  }
+
+  if (!state->AddRenderBuffer (name, buf))
+  {
+    synldr->ReportError ("crystalspace.genmeshloader.parse",
+      node, "A <renderbuffer> of name '%s' was already provided",
+      name);
+    return false;
+  }
+  return true;
+}
+
 csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 	iLoaderContext* ldr_context, iBase*)
 {
   csRef<iMeshObject> mesh;
   csRef<iGeneralMeshState> meshstate;
+  csRef<iGeneralFactoryState> factstate;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -831,6 +760,16 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
 		child, "Couldn't find factory '%s'!", factname);
 	    return 0;
 	  }
+	  factstate = SCF_QUERY_INTERFACE (fact->GetMeshObjectFactory(), 
+	    iGeneralFactoryState);
+	  if (!factstate)
+	  {
+      	    synldr->ReportError (
+		"crystalspace.genmeshloader.parse.badfactory",
+		child, "Factory '%s' doesn't appear to be a genmesh factory!",
+		factname);
+	    return 0;
+	  }
 	  mesh = fact->GetMeshObjectFactory ()->NewInstance ();
 	  CS_ASSERT (mesh != 0);
           meshstate = SCF_QUERY_INTERFACE (mesh, iGeneralMeshState);
@@ -866,6 +805,9 @@ csPtr<iBase> csGeneralMeshLoader::Parse (iDocumentNode* node,
           meshstate->SetMixMode (mm);
 	}
 	break;
+      case XMLTOKEN_RENDERBUFFER:
+        ParseRenderBuffer (child, meshstate, factstate);
+        break;
       default:
         synldr->ReportBadToken (child);
 	return 0;
