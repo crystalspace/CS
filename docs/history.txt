@@ -6,6 +6,8 @@ The history order has been reversed so that new features are at the top.
 	  interface to allow correct usage of it and leaving Martins
 	  intention of being able to create apps without 'cssys'
 	  intact.
+	- Reverted part of the patch from Philip because otherwise OpenGL
+	  would not open a window when running apps (if using MingW).
 12-Mar-2001
 	- Robert Bate updated the Mac project files and added project files
 	  for terrain plugin.
