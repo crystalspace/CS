@@ -22,6 +22,15 @@ chronological order.
 	  undisirable that it warranted removal).
 	- Eric Sunshine removed obsolete #include "iengine/statlght.h" from
 	  simple.txi tutorial.
+	- Eric Sushine augmented the csRef<> copy-constructor and assignment
+	  operator so that they allow assignment from compatible csRef<> types,
+	  rather than requiring assignment from the exact same type of csRef<>.
+	  This means that the following type-compatible assignments will now
+	  work as expected:
+	    struct iFoo : public iBase {...};
+	    csRef<iFoo> f = ...;
+	    csRef<iBase> b(f);
+	    b = f;
 13-Mar-2004
 	- John Harger fixed the nVidia part of the PS1 plugin so that it will
 	  use the correct texture target on a 'tex' instruction.

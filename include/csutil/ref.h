@@ -154,7 +154,8 @@ public:
   /**
    * Smart pointer copy constructor.
    */
-  csRef (csRef const& other) : obj (other.obj)
+  template <class T2>
+  csRef (csRef<T2> const& other) : obj (other.obj)
   {
     CSREF_TRACK_INCREF (obj, this);
   }
@@ -253,9 +254,11 @@ public:
   /**
    * Assign another object to this smart pointer.
    */
-  csRef& operator = (csRef const& other)
+  template <class T2>
+  csRef& operator = (csRef<T2> const& other)
   {
-    this->operator=(other.obj);
+    T* p = other.obj; // No cast; allow compiler to check type compatibility.
+    this->operator=(p);
     return *this;
   }
 
