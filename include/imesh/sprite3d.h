@@ -372,6 +372,9 @@ struct iSprite3DState : public iBase
   virtual bool SetAction (const char * name,
   	bool loop = true, float speed = 1) = 0;
 
+  /// Set whether action should run in reverse or not.
+  virtual void SetReverseAction(bool reverse) = 0;
+
   /// Propogate set action to all children
   virtual bool PropagateAction (const char *name) = 0;
 
