@@ -64,6 +64,9 @@ typedef void (csLightingFunc) (csFrustumView* lview, int type, void* entity);
 class csRenderView : public csCamera
 {
 private:
+  // WARNING! When adding fields to this class don't forget to update
+  // the copy constructor!
+
   /// Engine handle.
   csEngine* engine;
   iEngine* iengine;

@@ -30,6 +30,16 @@ The history order has been reversed so that new features are at the top.
 	  of csCamera.
 	- Note that these changes break CAMERA things and reflecting
 	  portals. Not sure why yet.
+	- Reflecting portals work again. The bug was very nasty. You
+	  have to be very careful when defining copy constructors (or
+	  forgetting to define them) for classes implementing SCF interfaces.
+	  If you are not careful scfParent is simply copied and you get
+	  bad and unexpected results of scfParent still pointing to the
+	  original class. Even worse is when you have classes that inherit
+	  from classes that implement SCF interfaces. This was the case
+	  with csRenderView. As an unexpected bonus this fix also fixes
+	  the problem that sprites and particle systems were not visible
+	  in mirrors.
 	- Eric Sunshine resolved a circular reference problem between the
 	  system driver and the VFS plugin.  The actual problem was that the
 	  VFS plugin was utilizing the new configuration manager module even

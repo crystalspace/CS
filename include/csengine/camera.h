@@ -68,8 +68,10 @@ private:
 public:
   ///
   csCamera ();
-  /// copy constructor
+  /// Copy constructor.
   csCamera (csCamera* c);
+  /// Copy constructor.
+  csCamera (const csCamera& c);
   ///
   virtual ~csCamera ();
 

@@ -52,19 +52,18 @@ csCamera::csCamera () : csOrthoTransform()
   fp = NULL;
 }
 
-csCamera::csCamera (csCamera* c) : csOrthoTransform (*c)
+csCamera::csCamera (csCamera* c) : csOrthoTransform ()
 {
+  *this = *c;
   CONSTRUCT_IBASE (NULL);
   CONSTRUCT_EMBEDDED_IBASE (scfiCamera);
-  mirror = c->mirror;
-  sector = c->sector;
-  aspect = c->aspect;
-  fov_angle = c->fov_angle;
-  inv_aspect = c->inv_aspect;
-  shift_x = c->shift_x;
-  shift_y = c->shift_y;
-  use_farplane = c->UseFarPlane();
-  fp = c->GetFarPlane();
+}
+
+csCamera::csCamera (const csCamera& c) : csOrthoTransform ()
+{
+  *this = c;
+  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiCamera);
 }
 
 csCamera::~csCamera ()

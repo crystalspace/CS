@@ -114,10 +114,35 @@ csRenderView::csRenderView (const csCamera& c, csClipper* v, iGraphics3D* ig3d,
   SetView (v);
 }
 
-csRenderView::csRenderView (const csRenderView& c)
+csRenderView::csRenderView (const csRenderView& c) : csCamera (c)
 {
-  *this = c;
   CONSTRUCT_EMBEDDED_IBASE (scfiRenderView);
+
+  // Copy all the fields. We can't use the assignment
+  // here since that would copy the camera object again which would invalidate
+  // all SCF stuff (scfParent).
+  // @@@ BETTER WAY FOR ALL THIS? REMOVE UNNEEDED FIELDS FROM RVIEW.
+  engine = c.engine;
+  iengine = c.iengine;
+  view = c.view;
+  iview = c.iview;
+  g3d = c.g3d;
+  g2d = c.g2d;
+  leftx = c.leftx;
+  rightx = c.rightx;
+  topy = c.topy;
+  boty = c.boty;
+  portal_polygon = c.portal_polygon;
+  previous_sector = c.previous_sector;
+  this_sector = c.this_sector;
+  clip_plane = c.clip_plane;
+  do_clip_plane = c.do_clip_plane;
+  do_clip_frustum = c.do_clip_frustum;
+  callback = c.callback;
+  callback_data = c.callback_data;
+  fog_info = c.fog_info;
+  added_fog_info = c.added_fog_info;
+
   icamera = QUERY_INTERFACE (this, iCamera);
   if (iview) iview->IncRef ();
   if (iengine) iengine->IncRef ();
