@@ -12,6 +12,8 @@ chronological order.
 	  Costa.
 	- Eric Sunshine fixed const vs. non-const mixup in xmlshader which
 	  resulted in compiler failure in MSVC6. Reported by Brendon Costa.
+	- Eric Sunshine fixed phystut MSVC project file so that it defines
+	  CS_HAS_ODE.
 16-Sep-2004
 	- Jorrit fixed several cases in the loader where it would crash
 	  in case checkDupes was true and the object that it was loading
