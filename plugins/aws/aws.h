@@ -118,6 +118,33 @@ class awsManager :
   /// Contains the list of factory to ID mappings.
   csDLinkList component_factories;
 
+  /**
+   * Defines a transition
+   */
+  struct awsWindowTransition
+  {
+    /// The rect we start with
+    csRect start;
+
+    /// The rect we end with
+    csRect end;
+
+    /// Where we are
+    float morph;
+
+    /// The size of steps to take
+    float morph_step;
+
+    /// The window we're dealing with
+    iAwsWindow *win;
+
+    /// The type of transition
+    unsigned transition_type;
+  };
+
+  /// Contains the list of windows in transition
+  csBasicVector transitions;
+
   /// Mode flags for the engine
   unsigned int flags;
 public:
@@ -154,6 +181,9 @@ public:
   /// Returns true if part of this window is inside the dirty zones
   virtual bool WindowIsDirty (iAwsWindow *win);
 
+  /// Returns true if window is in transition
+  virtual bool WindowIsInTransition(iAwsWindow *win, bool perform_transition=false);
+ 
   /// Causes the current view of the window system to be drawn to the given graphics device.
   virtual void Print (iGraphics3D *g3d, uint8 Alpha = 0);
 
@@ -211,6 +241,10 @@ protected:
 
   /// Registers all the "known" components.
   void RegisterCommonComponents ();
+
+  /// Performs transitioning on a window.
+  void PerformTransition(awsWindowTransition *t);
+
 public:
   /// Instantiates a window based on a window definition.
   virtual iAwsWindow *CreateWindowFrom (char *defname);
@@ -220,6 +254,13 @@ public:
 
   /// Creates a new parameter list
   virtual iAwsParmList *CreateParmList ();
+
+  /// Creates and enables a transition for a window
+  virtual void CreateTransition(iAwsWindow *win, unsigned transition_type, float step_size=0.1);
+
+  /// Creates and enables a transition for a window
+  virtual void CreateTransitionEx(iAwsWindow *win, unsigned transition_type, float step_size, csRect &user);
+
 public:
   /// Set the contexts however you want
   virtual void SetCanvas (iAwsCanvas *newCanvas);

@@ -171,6 +171,9 @@ private:
   /// Set's the unique id of this component. Note: only to be used by window manager.
   virtual void SetID (unsigned long _id);
 
+  /// Moves the window and all associated items (including children)
+  virtual void Move(int delta_x, int delta_y);
+
   /// Recursively moves children (and all nested children) by relative amount given.
   virtual void MoveChildren (int delta_x, int delta_y);
 

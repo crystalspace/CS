@@ -1336,6 +1336,37 @@ unsigned int awsWindow::Flags ()
   return comp.Flags ();
 }
 
+void awsWindow::Move(int delta_x, int delta_y)
+{
+   csRect dirty1 (Frame ());
+
+   dirty1.Outset (2);
+
+  /*if (delta_x + Frame ().xmin < 0)
+     delta_x = -Frame ().xmin;
+  else if (delta_x + Frame ().xmax > WindowManager ()->G2D ()->GetWidth ())
+     delta_x = WindowManager ()->G2D ()->GetWidth () - Frame ().xmax;
+
+  if (delta_y + Frame ().ymin < 0)
+    delta_y = -Frame ().ymin;
+  else if (delta_y + Frame ().ymax > WindowManager ()->G2D ()->GetHeight ())
+    delta_y = WindowManager ()->G2D ()->GetHeight () - Frame ().ymax;*/
+
+  Frame().Move(delta_x, delta_y);
+  comp.MoveChildren(delta_x, delta_y);
+  minp.Move (delta_x, delta_y);
+  maxp.Move (delta_x, delta_y);
+  closep.Move (delta_x, delta_y);
+
+  if (WindowManager ()->GetFlags () & AWSF_AlwaysEraseWindows)
+      WindowManager ()->Erase (dirty1);
+
+    // Mark changed pos
+    WindowManager ()->Mark (Frame ());
+    WindowManager ()->InvalidateUpdateStore ();
+    todraw_dirty = true;
+}
+
 void awsWindow::MoveChildren (int delta_x, int delta_y)
 {
   comp.MoveChildren (delta_x, delta_y);

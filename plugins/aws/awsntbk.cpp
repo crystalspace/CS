@@ -825,7 +825,7 @@ void awsNotebookButtonBar::DoLayout ()
 
   r = Frame ();
 
-  for (int i=MAX(first,0); i < vTabs.Length (); i++)
+  for (i=MAX(first,0); i < vTabs.Length (); i++)
   {
     awsNotebookButton *btn = vTabs.Get (i)->button;
     csRect &br =  btn->Frame ();

@@ -309,6 +309,155 @@ iAwsCanvas *awsManager::CreateCustomCanvas (
   return canvas;
 }
 
+void awsManager::CreateTransition(iAwsWindow *win, unsigned transition_type, float step_size)
+{
+  if (win==NULL) return;
+
+  awsWindowTransition *t = new awsWindowTransition;
+  int w = G2D()->GetWidth();
+  int h = G2D()->GetHeight();
+  
+  t->morph=0.0;
+  t->morph_step=step_size;
+  t->transition_type=transition_type;
+  t->win=win;
+  
+  switch(transition_type)
+  {
+  case AWS_TRANSITION_SLIDE_IN_LEFT:
+    t->end=win->Frame();
+    t->start=csRect(w+1, t->end.ymin, w+1+t->end.Width(), t->end.ymax);
+    break;
+    
+  case AWS_TRANSITION_SLIDE_IN_RIGHT:
+    t->end=win->Frame();
+    t->start=csRect(0-t->end.Width()-1, t->end.ymin, -1, t->end.ymax);
+    break;
+
+  case AWS_TRANSITION_SLIDE_IN_UP:
+    t->end=win->Frame();
+    t->start=csRect(t->end.xmin, h+1, t->end.xmax, h+1+t->end.Height());
+    break;
+
+  case AWS_TRANSITION_SLIDE_IN_DOWN:
+    t->end=win->Frame();
+    t->start=csRect(t->end.xmin, 0-t->end.Height()-1, t->end.xmax, -1);
+    break;
+
+  case AWS_TRANSITION_SLIDE_OUT_LEFT:
+    t->start=win->Frame();
+    t->end=csRect(w+1, t->start.ymin, w+1+t->start.Width(), t->start.ymax);
+    break;
+    
+  case AWS_TRANSITION_SLIDE_OUT_RIGHT:
+    t->start=win->Frame();
+    t->end=csRect(0-t->start.Width()-1, t->start.ymin, -1, t->start.ymax);
+    break;
+
+  case AWS_TRANSITION_SLIDE_OUT_UP:
+    t->start=win->Frame();
+    t->end=csRect(t->start.xmin, h+1, t->start.xmax, h+1+t->start.Height());
+    break;
+
+  case AWS_TRANSITION_SLIDE_OUT_DOWN:
+    t->start=win->Frame();
+    t->end=csRect(t->start.xmin, 0-t->start.Height()-1, t->start.xmax, -1);
+    break;
+
+  default:
+    delete t;
+    return;
+    break;
+  }
+
+  transitions.Push(t);
+  
+}
+
+void awsManager::CreateTransitionEx(iAwsWindow *win, unsigned transition_type, float step_size, csRect &user)
+{
+  if (win==NULL) return;
+
+  awsWindowTransition *t = new awsWindowTransition;
+  int w = G2D()->GetWidth();
+  int h = G2D()->GetHeight();
+  
+  t->morph=0.0;
+  t->morph_step=step_size;
+  t->transition_type=transition_type;
+  t->win=win;
+  
+  switch(transition_type)
+  {
+  case AWS_TRANSITION_SLIDE_IN_LEFT:
+  case AWS_TRANSITION_SLIDE_IN_RIGHT:
+  case AWS_TRANSITION_SLIDE_IN_UP:
+  case AWS_TRANSITION_SLIDE_IN_DOWN:
+    t->end=win->Frame();
+    t->start=user;
+    break;
+
+  case AWS_TRANSITION_SLIDE_OUT_LEFT:    
+  case AWS_TRANSITION_SLIDE_OUT_RIGHT:  
+  case AWS_TRANSITION_SLIDE_OUT_DOWN:
+    t->start=win->Frame();
+    t->end=user;
+    break;
+
+  default:
+    delete t;
+    return;
+    break;
+  }
+
+  transitions.Push(t);
+  
+}
+
+void 
+awsManager::PerformTransition(awsWindowTransition *t)
+{
+  float dx, dy;
+  csRect interp(t->start);
+
+  if (t->morph==0.0)
+  {
+    t->win->Move(t->start.xmin - t->win->Frame().xmin,
+	         t->start.ymin - t->win->Frame().ymin);
+    
+  }
+
+  dx=t->end.xmin - t->start.xmin;
+  dy=t->end.ymin - t->start.ymin;
+
+  dx*=t->morph;
+  dy*=t->morph;
+
+  interp.Move((int)dx, (int)dy);
+  t->win->Move(interp.xmin - t->win->Frame().xmin,
+	       interp.ymin - t->win->Frame().ymin);
+
+  t->win->Invalidate();
+
+  if (t->morph==1.0)
+  {
+    transitions.Delete(t);
+    delete t;
+    return;
+  }
+  else
+  {
+
+    t->morph+=t->morph_step;
+    if (t->morph>1.0)
+      t->morph=1.0;
+  }
+
+  
+  
+}
+
+
 void awsManager::Mark (csRect &rect)
 {
   dirty.Include (rect);
@@ -340,6 +489,24 @@ bool awsManager::WindowIsDirty (iAwsWindow *win)
 
   for (i = 0; i < dirty.Count (); ++i)
     if (win->Overlaps (dirty.RectAt (i))) return true;
+
+  return false;
+}
+
+bool awsManager::WindowIsInTransition(iAwsWindow *win, bool perform_transition)
+{
+  int i;
+
+  for(i = 0; i < transitions.Length(); ++i)
+  {
+    awsWindowTransition *t = (awsWindowTransition *)transitions[i];
+
+    if (t->win==win)
+    {
+      if (perform_transition) PerformTransition(t);
+      return true;
+    }
+  }
 
   return false;
 }
@@ -445,7 +612,11 @@ void awsManager::Redraw ()
   }
 
   // check to see if there is anything to redraw.
-  if (dirty.Count () == 0 && !(flags & AWSF_AlwaysRedrawWindows))
+  if (transitions.Length()==0   
+      && dirty.Count () == 0 
+      && !(flags & AWSF_AlwaysRedrawWindows)
+     )
+
     return ;
   else
   {
@@ -461,7 +632,10 @@ void awsManager::Redraw ()
   {
     if (
       (!curwin->isHidden ()) &&
-      (WindowIsDirty (curwin) || (flags & AWSF_AlwaysRedrawWindows)))
+      (   WindowIsInTransition(curwin, true) /* MUST COME BEFORE OTHERS! */
+       || WindowIsDirty (curwin) 
+       || (flags & AWSF_AlwaysRedrawWindows) 
+      ))
     {
       curwin->SetRedrawTag (redraw_tag);
       if (flags & AWSF_AlwaysRedrawWindows) Mark (curwin->Frame ());
