@@ -200,7 +200,7 @@ public:
     DeleteAll ();
   }
 
-  /// Query vector length.
+  /// return the number of elements in the Array
   int Length () const
   {
     return count;
@@ -375,6 +375,33 @@ public:
     else
       return false;
   }
+
+  /** Iterator for the Array object */
+  class Iterator
+  {
+  public:
+    /** Returns true if the next Next() call will return an element */
+    bool HasNext()
+    { return currentelem < array.Length(); }
+
+    /** Returns the next element in the array. */
+    const T& Next()
+    { return array.Get(currentelem++); }
+
+  protected:
+    Iterator(const csArray<T>& newarray)
+	: currentelem(0), array(newarray)
+    { }
+    friend class csArray<T>;
+    
+  private:
+    int currentelem;
+    const csArray<T>& array;
+  };
+
+  /** Returns an Iterator which traverses the Array */
+  Iterator GetIterator() const
+  { return Iterator(*this); }
 };
 
 #ifdef CS_EXTENSIVE_MEMDEBUG

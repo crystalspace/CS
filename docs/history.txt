@@ -44,6 +44,7 @@ The history order is reversed so that new features are at the top.
 	      <setvar var="v" x="1" y="2" z="1"/> set vector 1,2,1 to 'v'.
 	      <setvar var="v" red="0" green="0" blue="1"/> set 'v' to blue.
 	    - These changes are totally untested!
+	- Matze added an Iterator to csArray.
 23-Jun-2003
         - Boyan did the following in AWS:
           - Added iAwsComponent->GetFirstFocusableChild
