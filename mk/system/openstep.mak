@@ -28,6 +28,7 @@
 #-------------------------------------------------------------------------------
 
 NEXT.TARGET=openstep
+NEXT.TARGET.DESCRIPTION=$(NEXT.TARGET)
 NEXT.FLAVOR=OPENSTEP
 NEXT.DESCRIPTION=OpenStep
 NEXT.ARCHS=i386 m68k sparc

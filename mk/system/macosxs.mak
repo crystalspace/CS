@@ -27,7 +27,8 @@
 #
 #-------------------------------------------------------------------------------
 
-NEXT.TARGET=macosxs$(SPACE)
+NEXT.TARGET=macosxs
+NEXT.TARGET.DESCRIPTION=$(NEXT.TARGET)$(SPACE)
 NEXT.FLAVOR=MACOSXS
 NEXT.DESCRIPTION=MacOS/X Server
 NEXT.ARCHS=i386 ppc
