@@ -4,6 +4,7 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 4-Apr-2003
+	- Boyan added lightning loader plugin.
 	- Fixed bug in the calculation of GetRadius() of genmesh and
 	  spr3d. This bug could cause culling errors in some rare cases.
 	- By pure luck I discovered that both frustvis and dynavis were
