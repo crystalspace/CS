@@ -45,7 +45,7 @@ for each given day, however, are in normal (ascending) chronological order.
 	  partedit/Jamfile from apps/tools/Jamfile.
 	- res added the forgotten partedit/Jamfile and re-added it to
 	  apps/tools/Jamfile.
-	- Eric Sunshine removed all remaining remnants of the old monolithic
+	- Eric Sunshine removed all remnants of the old monolithic
 	  system-driver (csSystemDriver, SysSystemDriver, etc.).  This finally
 	  completes the task which began about two years ago.
 	- Eric Sunshine eliminated compilation warning in OSXMenu.m which arose
