@@ -147,6 +147,7 @@ class csShadow;
 #define DEBUGCMD_MESH_ZPLUS	1063	// Move mesh
 #define DEBUGCMD_SAVEMAP	1064	// SaveMap
 #define DEBUGCMD_LISTPLUGINS	1065	// List all loaded plugins
+#define DEBUGCMD_PROFDUMP	1066	// Dump profile info (CS_PROFSTART).
 
 // For showing of polygon meshes.
 #define BUGPLUG_POLYMESH_NO	0

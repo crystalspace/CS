@@ -71,11 +71,6 @@ v = tv.tv_sec + tv.tv_usec*1000000;\
 }
 #endif
 
-#define CS_PROFSETUP(obj_reg) \
-csProfiler* cs__prof__prof = new csProfiler (); \
-obj_reg->Register (cs__prof__prof, "iProfiler"); \
-cs__prof__prof->DecRef ();
-
 #define CS_PROFDUMP(obj_reg) \
 { \
 csRef<iProfiler> profiler = CS_QUERY_REGISTRY (obj_reg, iProfiler); \
@@ -90,6 +85,11 @@ if (!tok##__prof__init) \
 { \
   tok##__prof__init = true; \
   csRef<iProfiler> profiler = CS_QUERY_REGISTRY (obj_reg, iProfiler); \
+  if (!profiler) \
+  { \
+    profiler.AttachNew (new csProfiler ()); \
+    obj_reg->Register (cs__prof__prof, "iProfiler"); \
+  } \
   if (profiler) \
     profiler->RegisterProfilePoint (__FILE__, __LINE__, &tok##__prof__cnt, &tok##__prof__time); \
 } \
@@ -104,7 +104,6 @@ tok##__prof__cnt++
 
 #else
 
-#define CS_PROFSETUP(obj_reg)
 #define CS_PROFDUMP(obj_reg)
 #define CS_PROFSTART(tok,obj_reg)
 #define CS_PROFSTOP(tok)

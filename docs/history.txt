@@ -6,6 +6,12 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+2-Feb-2005
+	- Jorrit removed CS_PROFSETUP. Setup is now automatic the first time
+	  you use CS_PROFSTART.
+	- Jorrit added new 'profdump' command to buplug (assigned to 'p' key
+	  by default, fps command has been remapped to ctrl-alt-p). This
+	  will simply call CS_PROFDUMP.
 1-Feb-2005
 	- Jorrit reverted a bug fix in engine->GetNearbyObjects() and
 	  GetNearbyMeshes() that was done on 15-Jan. The problem is that this
