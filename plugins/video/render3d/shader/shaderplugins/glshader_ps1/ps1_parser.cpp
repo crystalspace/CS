@@ -511,6 +511,7 @@ static void GetSrcRegname (csPSRegisterType type, int num, uint mods,
   if (mods & CS_PS_RMOD_XYZ) str << ".xyz";
   if (mods & CS_PS_RMOD_XYW) str << ".xyw";
 }
+#endif
 
 void csPixelShaderParser::GetInstructionString (
   const csPSProgramInstruction& instr, csString& str)
@@ -525,6 +526,7 @@ void csPixelShaderParser::GetInstructionString (
   if (instr.inst_mods & CS_PS_IMOD_SAT) str << "_sat";
 }
 
+#ifdef CS_DEBUG
 void csPixelShaderParser::WriteProgram (
 	const csArray<csPSProgramInstruction>& instrs, 
 	csString& str)

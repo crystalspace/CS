@@ -47,6 +47,8 @@ chronological order.
 	    - --with newrenderer
 	    - --with perl
 	  Relighting levels is disabled for now when building NR.
+	- res fixed csPixelShaderParser::GetInstructionString() appearing
+	  in a "#ifdef CS_DEBUG" in the glshader_ps1 plugin.
 28-Jun-2004
 	- Eric Sunshine fixed csApplicationFramework destructor so that it does
 	  not bomb out if csApplicationFramework::Main() was not called.
