@@ -30,6 +30,10 @@
  * care if someone is listening or not.                                                                                            *
  */
 
+/**
+ * This class implements the sink managaer, which controls all other
+ * registered sinks.
+ */
 class awsSinkManager : public iAwsSinkManager
 {
 private:
