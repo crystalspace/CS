@@ -1551,7 +1551,7 @@ void csBugPlug::DebugCmd (const char* cmd)
 	bool res = dbghelp->DebugCommand (params);
 	Report (CS_REPORTER_SEVERITY_NOTIFY,
 	  "Debug command execution %s.",
-	  res ? "succesful" : "failed");
+	  res ? "successful" : "failed");
       }
     }
   }
