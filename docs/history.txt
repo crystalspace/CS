@@ -17,6 +17,10 @@ The history order has been reversed so that new features are at the top.
 	  to the buffer write masks and doesn't update the buffer when the
 	  mask is disabled. This affected iso mostly as CS normally doesn't
 	  require a clear of the Z-buffer.
+	- Wouter Wijngaards did the following update:
+	  The isometric sprites now use zbuffer TEST mode when the sprite is
+	  transparent. This removes some glitches in drawing overlapping
+	  transparent sprites.
 16-Apr-2001
 	- Added iEngine::CreateSectorWallsMesh().
 	- Fixed simplep (plugin version of simple) so that it works
