@@ -35,6 +35,9 @@ chronological order.
 	  such as walktest_static, thus resulting in link failure.
 	- Eric Sunshine fixed conflict between typedef of GLhandleARB in
 	  canvas/openglcommon/glextmanager.h and /usr/include/GL/glext.h.
+	- Jorrit did a small optimization to Dynavis by keeping the
+	  camera transform local. Avoids a few virtual calls and also avoids
+	  having to pass the camera along as a parameter.
 28-Jun-2004
 	- Eric Sunshine fixed csApplicationFramework destructor so that it does
 	  not bomb out if csApplicationFramework::Main() was not called.

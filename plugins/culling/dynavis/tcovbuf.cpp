@@ -2103,7 +2103,7 @@ void csTiledCoverageBuffer::InsertPolygonInverted (csVector2* verts,
 }
 
 bool csTiledCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
-	float max_depth/*, int& cnt_notculled_objects*/)
+	float max_depth)
 {
   csBox2Int bbox;
   if (!DrawPolygon (verts, num_verts, bbox))
@@ -2117,7 +2117,6 @@ bool csTiledCoverageBuffer::InsertPolygon (csVector2* verts, int num_verts,
   if (endrow >= num_tile_rows) endrow = num_tile_rows-1;
 
   bool modified = false;
-  //cnt_notculled_objects = 0;
   for (ty = startrow ; ty <= endrow ; ty++)
   {
     csTileCol fvalue = TILECOL_EMPTY;

@@ -174,6 +174,7 @@ private:
   int scr_width, scr_height;	// Screen dimensions.
   int reduce_buf;
   float fov, sx, sy;
+  csReversibleTransform cam_trans;	// Cache of the camera transform.
 
   uint32 current_vistest_nr;
 
@@ -232,14 +233,13 @@ private:
   	bool full_transform_identity);
 
   // Given an occluder, update it in the coverage buffer.
-  void UpdateCoverageBuffer (iCamera* camera, csVisibilityObjectWrapper* obj);
+  void UpdateCoverageBuffer (csVisibilityObjectWrapper* obj);
 
   // Given an occluder, update it in the coverage buffer. Using the outline.
-  void UpdateCoverageBufferOutline (iCamera* camera,
-  	csVisibilityObjectWrapper* obj);
+  void UpdateCoverageBufferOutline (csVisibilityObjectWrapper* obj);
 
   // Append an occluder to the write queue.
-  void AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
+  void AppendWriteQueue (iVisibilityObject* visobj,
   	csDynavisObjectModel* model, csVisibilityObjectWrapper* obj,
 	const csBox2& sbox, float min_depth, float maximum);
 
@@ -265,7 +265,7 @@ public:
   // Test visibility for the given single-polygon object.
   // Returns true if visible.
   void TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
-  	VisTest_Front2BackData* data, iCamera* camera, bool& vis,
+  	VisTest_Front2BackData* data, bool& vis,
 	csBox2& sbox, float& min_depth, float& max_depth,
 	uint32 frustum_mask);
   // Test visibility for the given object. Returns true if visible.

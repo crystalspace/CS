@@ -612,18 +612,16 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
   {
     // @@@ Do write queue here too? First tests indicate that this is not
     // a good idea.
-    iCamera* camera = data->rview->GetCamera ();
-    const csReversibleTransform& camtrans = camera->GetTransform ();
     float max_depth;
 #define DO_OUTLINE_TEST 0
 #define DO_WRITEQUEUE_TEST 0
 #if DO_OUTLINE_TEST
     static csPoly2D outline;
     outline.MakeEmpty ();
-    if (node_bbox.ProjectBoxAndOutline (camtrans, fov, sx, sy, sbox,
+    if (node_bbox.ProjectBoxAndOutline (cam_trans, fov, sx, sy, sbox,
     	outline, min_depth, max_depth))
 #else
-    if (node_bbox.ProjectBox (camtrans, fov, sx, sy, sbox,
+    if (node_bbox.ProjectBox (cam_trans, fov, sx, sy, sbox,
     	min_depth, max_depth))
 #endif
     {
@@ -669,7 +667,7 @@ bool csDynaVis::TestNodeVisibility (csKDTree* treenode,
 	    do
 	    {
 	      // Yes! We found such an object. Insert it now.
-	      UpdateCoverageBuffer (camera, qobj);
+	      UpdateCoverageBuffer (qobj);
 	      // Now try again.
               rc = tcovbuf->TestRectangle (testrect_data, min_depth);
               if (!rc)
@@ -754,12 +752,11 @@ CS_IMPLEMENT_STATIC_VAR (GetTrVerts, dynavis_tr_verts, ())
 typedef csDirtyAccessArray<csVector3> dynavis_tr_cam;
 CS_IMPLEMENT_STATIC_VAR (GetTrCam, dynavis_tr_cam, ())
 
-void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
-	csVisibilityObjectWrapper* obj)
+void csDynaVis::UpdateCoverageBuffer (csVisibilityObjectWrapper* obj)
 {
   if (do_cull_coverage != COVERAGE_POLYGON && obj->use_outline_filler)
   {
-    UpdateCoverageBufferOutline (camera, obj);
+    UpdateCoverageBufferOutline (obj);
     return;
   }
   iVisibilityObject* visobj = obj->visobj;
@@ -772,7 +769,7 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
   int vertex_count = polymesh->GetVertexCount ();
   int poly_count = polymesh->GetPolygonCount ();
 
-  csReversibleTransform trans = camera->GetTransform ();
+  csReversibleTransform trans = cam_trans;
   // Camera position in object space.
   csVector3 campos_object;
   if (obj->full_transform_identity)
@@ -926,8 +923,7 @@ void csDynaVis::UpdateCoverageBuffer (iCamera* camera,
 # endif
 }
 
-void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
-	csVisibilityObjectWrapper* obj)
+void csDynaVis::UpdateCoverageBufferOutline (csVisibilityObjectWrapper* obj)
 {
   iVisibilityObject* visobj = obj->visobj;
   csDynavisObjectModel* model = obj->model;
@@ -937,7 +933,7 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
   csVector3* verts = polymesh->GetVertices ();
   int vertex_count = polymesh->GetVertexCount ();
 
-  csReversibleTransform trans = camera->GetTransform ();
+  csReversibleTransform trans = cam_trans;
   // Camera position in object space.
   csVector3 campos_object;
   if (obj->full_transform_identity)
@@ -1005,7 +1001,7 @@ void csDynaVis::UpdateCoverageBufferOutline (iCamera* camera,
 # endif
 }
 
-void csDynaVis::AppendWriteQueue (iCamera* camera, iVisibilityObject* visobj,
+void csDynaVis::AppendWriteQueue (iVisibilityObject* visobj,
   	csDynavisObjectModel* /*model*/, csVisibilityObjectWrapper* obj,
 	const csBox2& sbox, float min_depth, float max_depth)
 {
@@ -1082,7 +1078,7 @@ bool csDynaVis::TestWriteQueueRelevance (float min_depth,
 }
 
 void csDynaVis::TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
-  	VisTest_Front2BackData* data, iCamera* camera, bool& vis,
+  	VisTest_Front2BackData* data, bool& vis,
 	csBox2& sbox, float& min_depth, float& max_depth,
 	uint32 frustum_mask)
 {
@@ -1090,7 +1086,7 @@ void csDynaVis::TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
   iVisibilityObject* visobj = obj->visobj;
 
   iMovable* movable = visobj->GetMovable ();
-  csReversibleTransform trans = camera->GetTransform ();
+  csReversibleTransform trans = cam_trans;
   if (!obj->full_transform_identity)
   {
     csReversibleTransform movtrans = movable->GetFullTransform ();
@@ -1212,7 +1208,7 @@ void csDynaVis::TestSinglePolygonVisibility (csVisibilityObjectWrapper* obj,
 	    do
 	    {
 	      // Yes! We found such an object. Insert it now.
-	      UpdateCoverageBuffer (data->rview->GetCamera (), qobj);
+	      UpdateCoverageBuffer (qobj);
 	      // Now try again.
               rc = tcovbuf->TestRectangle (testrect_data, min_depth);
               if (!rc)
@@ -1277,8 +1273,6 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   if (obj->mesh && obj->mesh->GetFlags ().Check (CS_ENTITY_INVISIBLEMESH))
     return false;
 
-  iCamera* camera = data->rview->GetCamera ();
-  const csReversibleTransform& camtrans = camera->GetTransform ();
   iMovable* movable = obj->visobj->GetMovable ();
   csOBBFrozen frozen_obb;
 
@@ -1320,7 +1314,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   // more efficiently.
   if (obj->model->IsSinglePolygon ())
   {
-    TestSinglePolygonVisibility (obj, data, camera, vis,
+    TestSinglePolygonVisibility (obj, data, vis,
     	sbox, min_depth, max_depth, new_mask2);
     goto end;
   }
@@ -1329,7 +1323,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   sbox_rc = true;
   if (obj->model->HasOBB ())
   {
-    csReversibleTransform trans = camtrans;
+    csReversibleTransform trans = cam_trans;
     if (!obj->full_transform_identity)
     {
       csReversibleTransform movtrans = movable->GetFullTransform ();
@@ -1342,7 +1336,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
   else
   {
     // No OBB, so use AABB instead.
-    sbox_rc = obj_bbox.ProjectBox (camtrans, fov, sx, sy, sbox,
+    sbox_rc = obj_bbox.ProjectBox (cam_trans, fov, sx, sy, sbox,
 		min_depth, max_depth);
   }
   if (!sbox_rc || sbox.MaxX () <= 0 || sbox.MaxY () <= 0 ||
@@ -1364,7 +1358,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 
     if (do_cull_vpt && hist->has_vpt_point)
     {
-      csVector3 cam_center = camtrans * hist->vpt_point;
+      csVector3 cam_center = cam_trans * hist->vpt_point;
       if (cam_center.z >= .1)
       {
 	csVector2 sbox_center;
@@ -1434,7 +1428,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
 	    do
 	    {
 	      // Yes! We found such an object. Insert it now.
-	      UpdateCoverageBuffer (data->rview->GetCamera (), qobj);
+	      UpdateCoverageBuffer (qobj);
 	      // Now try again.
               rc = tcovbuf->TestRectangle (testrect_data, min_depth);
               if (!rc)
@@ -1495,7 +1489,7 @@ bool csDynaVis::TestObjectVisibility (csVisibilityObjectWrapper* obj,
       {
 	for (i = 0 ; i < 9 ; i++)	// Also include CS_BOX_CENTER3
 	{
-	  csVector3 v = camtrans * obj_bbox.GetCorner (i);
+	  csVector3 v = cam_trans * obj_bbox.GetCorner (i);
 	  if (v.z >= .1)
 	  {
 	    csVector2 p;
@@ -1531,14 +1525,14 @@ end:
       {
         // We are using the write queue so we insert the object there
         // for later culling.
-        AppendWriteQueue (data->rview->GetCamera (), obj->visobj, obj->model,
+        AppendWriteQueue (obj->visobj, obj->model,
       	  obj, sbox, min_depth, max_depth);
       }
       else
       {
         // Let it update the coverage buffer if we
         // are using cull_coverage.
-        UpdateCoverageBuffer (data->rview->GetCamera (), obj);
+        UpdateCoverageBuffer (obj);
       }
     }
   }
@@ -1629,9 +1623,9 @@ bool csDynaVis::VisTest (iRenderView* rview,
   debug_ty = ty;
   debug_by = by;
 
-  fov = float (debug_camera->GetFOV ());
-  sx = debug_camera->GetShiftX ();
-  sy = debug_camera->GetShiftY ();
+  fov = float (rview->GetCamera ()->GetFOV ());
+  sx = rview->GetCamera ()->GetShiftX ();
+  sy = rview->GetCamera ()->GetShiftY ();
   int rb = reduce_buf;
   while (rb)
   {
@@ -1640,6 +1634,7 @@ bool csDynaVis::VisTest (iRenderView* rview,
     sy /= 2.0f;
     rb >>= 1;
   }
+  cam_trans = rview->GetCamera ()->GetTransform ();
 
   // Just keep vis information from last frame.
   if (do_freeze_vis)
@@ -1712,7 +1707,7 @@ bool csDynaVis::VisTest (iRenderView* rview,
   // The big routine: traverse from front to back and mark all objects
   // visible that are visible. In the mean time also update the coverage
   // buffer for further culling.
-  data.pos = rview->GetCamera ()->GetTransform ().GetOrigin ();
+  data.pos = cam_trans.GetOrigin ();
   data.rview = rview;
   data.dynavis = this;
   data.viscallback = viscallback;
