@@ -593,6 +593,7 @@ void csPolygon2D::DrawFilled (
 # endif
 #endif
     g3dpoly.poly_texture = poly->GetLightMapInfo ()->GetPolyTex ();
+    g3dpoly.do_fullbright = poly->flags.Check (CS_POLY_LM_REFUSED);
 
     csPolyTxtPlane *txt_plane = poly->GetLightMapInfo ()->GetTxtPlane ();
     csMatrix3 m_cam2tex;

@@ -2216,7 +2216,7 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
 
   iPolygonTexture *tex = poly.poly_texture;
   iLightMap* lm = tex->GetLightMap ();
-  if (m_renderstate.lighting && lm)
+  if (!poly.do_fullbright && m_renderstate.lighting && lm)
   {
     lightmap_cache->Cache (tex);
     csLMCacheData* clm = (csLMCacheData *)lm->GetCacheData ();

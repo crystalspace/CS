@@ -188,6 +188,9 @@ struct G3DPolygonDP : public G3DPolygonDFP
 
   /// Handle to lighted textures (texture + lightmap)
   iPolygonTexture* poly_texture;
+  
+  /// Draw fullbright?
+  bool do_fullbright;
 
   /// Mixmode to use. If CS_FX_COPY then no mixmode is used.
   uint mixmode;

@@ -896,12 +896,9 @@ void csPolygon3D::Finish ()
 
     if (!csEngine::current_engine->G3D->IsLightmapOK (lmi->GetPolyTex()))
     {
-      lmi->tex->SetLightMap (NULL);
       csEngine::current_engine->Report ("Renderer can't handle lightmap "
 	"for polygon '%s'", GetName());
-      uint mixmode = scfiPolygon3D.GetPolyTexType ()->GetMixMode ();
-      SetTextureType (POLYTXT_NONE);
-      scfiPolygon3D.GetPolyTexType ()->SetMixMode (mixmode);
+      flags.Set (CS_POLY_LM_REFUSED, CS_POLY_LM_REFUSED);
     }
 
     lm->DecRef ();

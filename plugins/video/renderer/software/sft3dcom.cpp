@@ -2066,7 +2066,7 @@ void csGraphics3DSoftwareCommon::DrawPolygon (G3DPolygonDP& poly)
   csTextureSoftware *txt_unl = (csTextureSoftware *)tex_mm->get_texture (mipmap);
 
   // Check if polygon has a lightmap (i.e. if it is lighted)
-  bool has_lightmap = tex->GetLightMap () && do_lighting;
+  bool has_lightmap = tex->GetLightMap () && do_lighting && !poly.do_fullbright;
   if (has_lightmap)
   {
     // If there is a lightmap we check if the size of the lighted

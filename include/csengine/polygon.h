@@ -431,6 +431,13 @@ public:
 #define CS_POLY_SPLIT		0x20000000
 
 /**
+ * This flag is set if the renderer can't handle the lightmap.
+ * Lighting is still calculated, but the lightmap isn't passed to the
+ * renderer.
+ */
+#define CS_POLY_LM_REFUSED	0x10000000
+
+/**
  * This is our main 3D polygon class. Polygons are used to construct the
  * outer hull of sectors and the faces of 3D things.
  * Polygons can be transformed in 3D (usually they are transformed so
