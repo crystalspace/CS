@@ -31,8 +31,8 @@ struct iGraphics2D;
 struct iGraphics3D;
 struct iCamera;
 struct iSector;
+struct iPolygon3D;
 struct csFog;
-class csRenderView;
 
 /**
  * Information for vertex based fog. There is an instance of this
@@ -68,7 +68,69 @@ public:
   csFog* fog;
 };
 
-SCF_VERSION (iRenderView, 0, 0, 7);
+/**
+ * This structure keeps track of the current render context.
+ * It is used by iRenderView. When recursing through a portal
+ * a new render context will be created and set in place of the
+ * old one.
+ */
+class csRenderContext
+{
+public:
+  /// The current camera.
+  iCamera* icamera;
+  /// The 2D polygon describing how everything drawn inside should be clipped.
+  iClipper2D* iview;
+
+  /// The portal polygon (or NULL if the first sector).
+  iPolygon3D* portal_polygon;
+  /// The previous sector (or NULL if the first sector).
+  iSector* previous_sector;
+  /// This sector.
+  iSector* this_sector;
+
+  /**
+   * This variable holds the plane of the portal through which the camera
+   * is looking.
+   */
+  csPlane3 clip_plane;
+
+  /**
+   * If true then we clip all objects to 'clip_plane'. In principle
+   * one should always clip to 'clip_plane'. However, in many cases
+   * this is not required because portals mostly arrive in at the
+   * boundaries of a sector so there can actually be no objects
+   * after the portal plane. But it is possible that portals arive
+   * somewhere in the middle of a sector (for example with BSP sectors
+   * or with Things containing portals). In that case this variable
+   * will be set to true and clipping to 'clip_plane' is required.
+   */
+  bool do_clip_plane;
+
+  /**
+   * If true then we have to clip all objects to the portal frustum
+   * (either in 2D or 3D). Normally this is not needed but some portals
+   * require this. If do_clip_plane is true then the value of this
+   * field is also implied to be true. The top-level portal should
+   * set do_clip_frustum to true in order for all geometry to be
+   * correctly clipped to screen boundaries.
+   */
+  bool do_clip_frustum;
+
+  /**
+   * Every fogged sector we encountered results in an extra structure in the
+   * following list. This is only used if we are doing vertex based fog.
+   */
+  csFogInfo* fog_info;
+
+  /**
+   * If the following variable is true then a fog_info was added in this
+   * recursion level.
+   */
+  bool added_fog_info;
+};
+
+SCF_VERSION (iRenderView, 0, 1, 0);
 
 /**
  * This interface represents all information needed to render
@@ -76,12 +138,48 @@ SCF_VERSION (iRenderView, 0, 0, 7);
  */
 struct iRenderView : public iBase
 {
-  /// Get the private csRenderView (UGLY).
-  virtual csRenderView* GetPrivateObject () = 0;
+  /// Get the current render context.
+  virtual csRenderContext* GetRenderContext () = 0;
+  /**
+   * Create a new render context. This is typically used
+   * when going through a portal. Note that you should remember
+   * the old render context if you want to restore it later.
+   * The render context will get all the values from the current context
+   * (with SCF references properly incremented).
+   */
+  virtual void CreateRenderContext () = 0;
+  /**
+   * Restore a render context. Use this to restore a previously overwritten
+   * render context. This function will take care of properly cleaning
+   * up the current render context.
+   */
+  virtual void RestoreRenderContext (csRenderContext* original) = 0;
+  /**
+   * Create a new camera in the current render context. This function
+   * will create a new camera based on the current one. The new camera
+   * reference is returned.
+   */
+  virtual iCamera* CreateNewCamera () = 0;
+
   /// Get the engine.
   virtual iEngine* GetEngine () = 0;
+  /// Get the 2D graphics subsystem.
+  virtual iGraphics2D* GetGraphics2D () = 0;
+  /// Get the 3D graphics subsystem.
+  virtual iGraphics3D* GetGraphics3D () = 0;
+  /// Set the view frustum at z=1.
+  virtual void SetFrustum (float lx, float rx, float ty, float by) = 0;
+  /// Get the frustum.
+  virtual void GetFrustum (float& lx, float& rx, float& ty, float& by) = 0;
+
+  //-----------------------------------------------------------------
+  // The following functions operate on the current render context.
+  //-----------------------------------------------------------------
+
   /// Get the 2D clipper for this view.
   virtual iClipper2D* GetClipper () = 0;
+  /// Set the 2D clipper for this view.
+  virtual void SetClipper (iClipper2D* clip) = 0;
   /**
    * If true then we have to clip all objects to the portal frustum
    * (returned with GetClipper()). Normally this is not needed but
@@ -89,12 +187,6 @@ struct iRenderView : public iBase
    * value of this function is also implied to be true.
    */
   virtual bool IsClipperRequired () = 0;
-  /// Get the 2D graphics subsystem.
-  virtual iGraphics2D* GetGraphics2D () = 0;
-  /// Get the 3D graphics subsystem.
-  virtual iGraphics3D* GetGraphics3D () = 0;
-  /// Get the view frustum defined at z=1.
-  virtual void GetViewFrustum (float& leftx, float& rightx, float& topy, float& boty) = 0;
   /**
    * Get the 3D clip plane that should be used to clip all geometry.
    * If this function returns false then this plane is invalid and should
@@ -102,6 +194,17 @@ struct iRenderView : public iBase
    * drawing.
    */
   virtual bool GetClipPlane (csPlane3& pl) = 0;
+  /// Get the clip plane.
+  virtual csPlane3& GetClipPlane () = 0;
+  /**
+   * Set the 3D clip plane that should be used to clip all geometry.
+   */
+  virtual void SetClipPlane (const csPlane3& pl) = 0;
+  /// Enable the use of a clip plane.
+  virtual void UseClipPlane (bool u) = 0;
+  /// Enable the use of a clip frustum.
+  virtual void UseClipFrustum (bool u) = 0;
+
   /**
    * Every fogged sector we encountered results in an extra structure in the
    * following list. This is only used if we are doing vertex based fog.
@@ -109,9 +212,17 @@ struct iRenderView : public iBase
    */
   virtual csFogInfo* GetFirstFogInfo () = 0;
   /**
+   * Set the first fog info.
+   */
+  virtual void SetFirstFogInfo (csFogInfo* fi) = 0;
+  /**
    * Return true if fog info has been added.
    */
   virtual bool AddedFogInfo () = 0;
+  /**
+   * Reset fog info.
+   */
+  virtual void ResetFogInfo () = 0;
   /**
    * Get the current camera.
    */
@@ -146,13 +257,29 @@ struct iRenderView : public iBase
   virtual iSector* GetThisSector () = 0;
 
   /**
+   * Set the current sector.
+   */
+  virtual void SetThisSector (iSector* s) = 0;
+
+  /**
    * Get previous sector.
    */
   virtual iSector* GetPreviousSector () = 0;
-  /// Set the view frustum at z=1.
-  virtual void SetFrustum (float lx, float rx, float ty, float by) = 0;
-  /// Get the frustum.
-  virtual void GetFrustum (float& lx, float& rx, float& ty, float& by) = 0;
+
+  /**
+   * Set the previous sector.
+   */
+  virtual void SetPreviousSector (iSector* s) = 0;
+
+  /**
+   * Get the portal polygon.
+   */
+  virtual iPolygon3D* GetPortalPolygon () = 0;
+
+  /**
+   * Set the portal polygon.
+   */
+  virtual void SetPortalPolygon (iPolygon3D* poly) = 0;
 };
 
 #endif

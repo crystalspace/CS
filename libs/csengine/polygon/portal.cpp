@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -162,26 +162,31 @@ bool csPortal::Draw (csPolygon2D* new_clipper, csPolygon3D* portal_polygon,
 
   csPolygonClipper new_view (new_clipper, icam->IsMirrored (), true);
 
-  //@@@ THIS SHOULD HAPPEN DIFFERENTLY.
-  csRenderView new_rview = *(rview->GetPrivateObject ());
-  new_rview.SetView (&new_view);
-  new_rview.ResetFogInfo ();
-  new_rview.SetPortalPolygon (portal_polygon);
-  new_rview.SetPreviousSector (rview->GetPrivateObject ()->GetThisSector ());
-  new_rview.SetClipPlane (portal_polygon->GetPlane ()->GetCameraPlane());
-  new_rview.GetClipPlane ().Invert ();
-  if (flags.Check (CS_PORTAL_CLIPDEST)) new_rview.UseClipPlane (true);
+  csRenderContext* old_ctxt = rview->GetRenderContext ();
+  rview->CreateRenderContext ();
+  rview->SetClipper (&new_view);
+  rview->ResetFogInfo ();
+  rview->SetPortalPolygon (&portal_polygon->scfiPolygon3D);
+  rview->SetPreviousSector (rview->GetThisSector ());
+  rview->SetClipPlane (portal_polygon->GetPlane ()->GetCameraPlane());
+  rview->GetClipPlane ().Invert ();
+  if (flags.Check (CS_PORTAL_CLIPDEST)) rview->UseClipPlane (true);
 
   csTranCookie old_cookie = 0;
   if (flags.Check (CS_PORTAL_WARP))
   {
-    bool mirror = new_rview.IsMirrored ();
-    WarpSpace (new_rview, mirror);
-    new_rview.SetMirrored (mirror);
-    old_cookie = csEngine::current_engine->tr_manager.NewCameraFrame ();
-  }
+    iCamera* inewcam = rview->CreateNewCamera ();
 
-  sector->Draw (new_rview);
+    bool mirror = inewcam->IsMirrored ();
+    WarpSpace (inewcam->GetTransform (), mirror);
+    inewcam->SetMirrored (mirror);
+
+    old_cookie = csEngine::current_engine->tr_manager.NewCameraFrame ();
+    sector->Draw (rview);
+  }
+  else
+    sector->Draw (rview);
+  rview->RestoreRenderContext (old_ctxt);
 
   if (flags.Check (CS_PORTAL_WARP))
     csEngine::current_engine->tr_manager.RestoreCameraFrame (old_cookie);

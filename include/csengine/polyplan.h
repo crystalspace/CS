@@ -122,6 +122,11 @@ public:
   csPlane3& GetObjectPlane () { return plane_obj; }
 
   /**
+   * Get the object version of the plane.
+   */
+  const csPlane3& GetObjectPlane () const { return plane_obj; }
+
+  /**
    * Get the world version of the plane.
    */
   csPlane3& GetWorldPlane () { return plane_wor; }
@@ -135,6 +140,11 @@ public:
    * Get the camera version of the plane.
    */
   csPlane3& GetCameraPlane () { return plane_cam; }
+
+  /**
+   * Get the camera version of the plane.
+   */
+  const csPlane3& GetCameraPlane () const { return plane_cam; }
 
   /**
    * Get the normal in object space.

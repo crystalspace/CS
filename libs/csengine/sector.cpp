@@ -50,6 +50,7 @@
 #include "ivfs.h"
 #include "istlight.h"
 #include "iviscull.h"
+#include "irview.h"
 
 // Option variable: render portals?
 bool csSector::do_portals = true;
@@ -695,39 +696,40 @@ int compare_z_thing (const void* p1, const void* p2)
 // that passes through the portal. Note that 3D sprites don't
 // currently support 3D geometry clipping yet.
 
-void csSector::Draw (csRenderView& rview)
+void csSector::Draw (iRenderView* rview)
 {
   draw_busy++;
   int i;
-  rview.SetThisSector (this);
+  iCamera* icam = rview->GetCamera ();
+  rview->SetThisSector (&scfiSector);
 
   G3D_FOGMETHOD fogmethod = G3DFOGMETHOD_NONE;
 
-  if (rview.GetCallback ())
+  //@@@@@ EDGESif (rview.GetCallback ())
+  //{
+    //rview.CallCallback (CALLBACK_SECTOR, (void*)this);
+  //}
+  /*else*/ if (HasFog ())
   {
-    rview.CallCallback (CALLBACK_SECTOR, (void*)this);
-  }
-  else if (HasFog ())
-  {
-    if ((fogmethod = rview.GetEngine ()->fogmethod) == G3DFOGMETHOD_VERTEX)
+    if ((fogmethod = csEngine::current_engine->fogmethod) == G3DFOGMETHOD_VERTEX)
     {
       csFogInfo* fog_info = new csFogInfo ();
-      fog_info->next = rview.GetFogInfo ();
-      if (rview.GetPortalPolygon ())
+      fog_info->next = rview->GetFirstFogInfo ();
+      iPolygon3D* ipoly3d = rview->GetPortalPolygon ();
+      if (ipoly3d)
       {
-        fog_info->incoming_plane = rview.GetPortalPolygon ()->GetPlane ()->
-		GetCameraPlane ();
+        fog_info->incoming_plane = ipoly3d->GetCameraPlane ();
         fog_info->incoming_plane.Invert ();
 	fog_info->has_incoming_plane = true;
       }
       else fog_info->has_incoming_plane = false;
       fog_info->fog = &GetFog ();
       fog_info->has_outgoing_plane = true;
-      rview.SetFogInfo (fog_info);
+      rview->SetFirstFogInfo (fog_info);
     }
     else if (fogmethod != G3DFOGMETHOD_NONE)
     {
-      rview.GetG3D ()->OpenFogObject (GetID (), &GetFog ());
+      rview->GetGraphics3D ()->OpenFogObject (GetID (), &GetFog ());
     }
   }
 
@@ -735,7 +737,7 @@ void csSector::Draw (csRenderView& rview)
   for (i = 0 ; i < skies.Length () ; i++)
   {
     csThing* th = (csThing*)skies[i];
-    th->Draw (&rview.scfiRenderView);
+    th->Draw (rview);
   }
 
   // In some cases this queue will be filled with all visible
@@ -751,7 +753,7 @@ void csSector::Draw (csRenderView& rview)
   // If we have a visibility culler in this sector we use it here.
   if (culler)
   {
-    if (culler->VisTest (&rview.scfiRenderView))
+    if (culler->VisTest (rview))
     {
       // The visibility culler worked and marked all registered
       // visible things as visible.
@@ -794,7 +796,7 @@ void csSector::Draw (csRenderView& rview)
 
   // If we have a static thing we draw it here.
   if (static_thing)
-    static_thing->Draw (&rview.scfiRenderView);
+    static_thing->Draw (rview);
 
   if (do_things)
   {
@@ -835,7 +837,7 @@ void csSector::Draw (csRenderView& rview)
       csThing* th = thing_queue[i];
       if (th != static_thing)
         if (th->GetFog ().enabled) sort_list[sort_idx++] = th;
-        else th->Draw (&rview.scfiRenderView);
+        else th->Draw (rview);
     }
 
     if (sort_idx)
@@ -847,8 +849,8 @@ void csSector::Draw (csRenderView& rview)
       for (i = 0 ; i < sort_idx ; i++)
       {
         csThing* th = sort_list[i];
-        if (th->GetFog ().enabled) th->DrawFoggy (&rview.scfiRenderView);
-        else th->Draw (&rview.scfiRenderView);
+        if (th->GetFog ().enabled) th->DrawFoggy (rview);
+        else th->Draw (rview);
       }
     }
 
@@ -866,14 +868,14 @@ void csSector::Draw (csRenderView& rview)
     // In those cases we draw the mesh anyway. @@@ Note that we should
     // draw it clipped (in 3D) to the portal polygon. This is currently not
     // done.
-    csSector* previous_sector = rview.GetPreviousSector ();
+    iSector* previous_sector = rview->GetPreviousSector ();
 
     int spr_num;
     if (mesh_queue) spr_num = num_mesh_queue;
     else spr_num = meshes.Length ();
 
-    if (rview.AddedFogInfo ())
-      rview.GetFogInfo ()->has_outgoing_plane = false;
+    if (rview->AddedFogInfo ())
+      rview->GetFirstFogInfo ()->has_outgoing_plane = false;
 
     for (i = 0 ; i < spr_num ; i++)
     {
@@ -881,7 +883,8 @@ void csSector::Draw (csRenderView& rview)
       if (mesh_queue) sp = mesh_queue[i];
       else sp = (csMeshWrapper*)meshes[i];
 
-      if (!previous_sector || sp->GetMovable ().GetSectors ().Find (previous_sector) == -1)
+      if (!previous_sector ||
+      		sp->GetMovable ().GetSectors ().Find (previous_sector->GetPrivateObject ()) == -1)
       {
         // Mesh is not in the previous sector or there is no previous sector.
         sp->Draw (rview);
@@ -890,8 +893,8 @@ void csSector::Draw (csRenderView& rview)
       {
         if (
 	  previous_sector->HasFog () ||
-	  rview.GetPortalPolygon ()->IsTransparent () ||
-	  rview.GetPortalPolygon ()->GetPortal ()->flags.Check (CS_PORTAL_WARP))
+	  rview->GetPortalPolygon ()->IsTransparent () ||
+	  rview->GetPortalPolygon ()->GetPortal ()->GetFlags ().Check (CS_PORTAL_WARP))
 	{
 	  // @@@ Here we should draw clipped to the portal.
           sp->Draw (rview);
@@ -912,10 +915,10 @@ void csSector::Draw (csRenderView& rview)
   }
 
   // queue all halos in this sector to be drawn.
-  if (!rview.GetCallback ())
+  //@@@@ EDGES if (!rview.GetCallback ())
     for (i = lights.Length () - 1; i >= 0; i--)
       // Tell the engine to try to add this light into the halo queue
-      rview.GetEngine ()->AddHalo ((csLight *)lights.Get (i));
+      csEngine::current_engine->AddHalo ((csLight *)lights.Get (i));
 
   // Handle the fog, if any
   if (fogmethod != G3DFOGMETHOD_NONE)
@@ -923,33 +926,33 @@ void csSector::Draw (csRenderView& rview)
     G3DPolygonDFP g3dpoly;
     if (fogmethod == G3DFOGMETHOD_ZBUFFER)
     {
-      g3dpoly.num = rview.GetView ()->GetNumVertices ();
-      csVector2 *clipview = rview.GetView ()->GetClipPoly ();
+      g3dpoly.num = rview->GetClipper ()->GetNumVertices ();
+      csVector2 *clipview = rview->GetClipper ()->GetClipPoly ();
       memcpy (g3dpoly.vertices, clipview, g3dpoly.num * sizeof (csVector2));
-      if (rview.GetSector () == this && draw_busy == 0)
+      if (icam->GetSector () == &scfiSector && draw_busy == 0)
       {
         // Since there is fog in the current camera sector we simulate
         // this by adding the view plane polygon.
-        rview.GetG3D ()->DrawFogPolygon (GetID (), g3dpoly, CS_FOG_VIEW);
+        rview->GetGraphics3D ()->DrawFogPolygon (GetID (), g3dpoly, CS_FOG_VIEW);
       }
       else
       {
         // We must add a FRONT fog polygon for the clipper to this sector.
-        g3dpoly.normal = rview.GetClipPlane ();
+        rview->GetClipPlane (g3dpoly.normal);
 	g3dpoly.normal.Invert ();
-        g3dpoly.inv_aspect = rview.GetInvFOV ();
-        rview.GetG3D ()->DrawFogPolygon (GetID (), g3dpoly, CS_FOG_FRONT);
+        g3dpoly.inv_aspect = icam->GetInvFOV ();
+        rview->GetGraphics3D ()->DrawFogPolygon (GetID (), g3dpoly, CS_FOG_FRONT);
       }
     }
-    else if (fogmethod == G3DFOGMETHOD_VERTEX && rview.AddedFogInfo ())
+    else if (fogmethod == G3DFOGMETHOD_VERTEX && rview->AddedFogInfo ())
     {
-      csFogInfo *fog_info = rview.GetFogInfo ();
-      rview.SetFogInfo (rview.GetFogInfo ()->next);
+      csFogInfo *fog_info = rview->GetFirstFogInfo ();
+      rview->SetFirstFogInfo (rview->GetFirstFogInfo ()->next);
       delete fog_info;
     }
   }
 
-  if (rview.GetCallback ()) rview.CallCallback (CALLBACK_SECTOREXIT, (void*)this);
+  //@@@@@ EDGES if (rview.GetCallback ()) rview.CallCallback (CALLBACK_SECTOREXIT, (void*)this);
 
   draw_busy--;
 }

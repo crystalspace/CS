@@ -186,8 +186,10 @@ bool csDDGTerrain::drawTriangle (ddgTBinTree *bt, ddgVBIndex tvc, ddgVArray *vbu
 static DECLARE_GROWING_ARRAY (fog_verts, G3DFogInfo);
 static DECLARE_GROWING_ARRAY (color_verts, csColor);
 
-void csDDGTerrain::Draw (csRenderView& rview, bool use_z_buf)
+void csDDGTerrain::Draw (iRenderView* rview, bool use_z_buf)
 {
+  iCamera* icam = rview->GetCamera ();
+  const csReversibleTransform& camtrans = icam->GetTransform ();
   bool modified = true;
 
   unsigned int i = 0, s = 0, d = 0, n = 0, nd = 0;
@@ -202,22 +204,22 @@ void csDDGTerrain::Draw (csRenderView& rview, bool use_z_buf)
   // matrix.
 
   // Position of camera.
-  const csVector3& translation = rview.GetO2TTranslation ();
+  const csVector3& translation = camtrans.GetO2TTranslation ();
   ddgVector3 p (translation.x, translation.y, translation.z);
 
   // Compute the camera's foward facing vector in world space.
   const csVector3 cforward (0,0,-1);
-  const csVector3 wforward = rview.This2OtherRelative (cforward);
+  const csVector3 wforward = camtrans.This2OtherRelative (cforward);
   ddgVector3 f (wforward.x,wforward.y,wforward.z);
   f.normalize ();
   // Compute the camera's up facing vector in world space.
   const csVector3 cup (0,1,0);
-  const csVector3 wup = rview.This2OtherRelative (cup);
+  const csVector3 wup = camtrans.This2OtherRelative (cup);
   ddgVector3 u (wup.x,wup.y,wup.z);
   u.normalize ();
   // Compute the camera's right facing vector in world space.
   const csVector3 cright (-1,0,0);
-  const csVector3 wright = rview.This2OtherRelative (cright);
+  const csVector3 wright = camtrans.This2OtherRelative (cright);
   ddgVector3 r (wright.x,wright.y,wright.z);
   r.normalize ();
  
@@ -229,8 +231,9 @@ void csDDGTerrain::Draw (csRenderView& rview, bool use_z_buf)
   context->right (&r);
 
   // Get the FOV in angles.
-  context->fov (rview.GetFOVAngle ());
-  context->aspect (float (rview.GetG3D ()->GetWidth ()) / (float)rview.GetG3D ()->GetHeight ());
+  context->fov (icam->GetFOVAngle ());
+  context->aspect (float (rview->GetGraphics3D ()->GetWidth ())
+  	/ (float)rview->GetGraphics3D ()->GetHeight ());
 
   // Construct some clipping planes.
   context->extractPlanes (context->frustrum ());
@@ -299,11 +302,13 @@ void csDDGTerrain::Draw (csRenderView& rview, bool use_z_buf)
 
   } // end modified.
 
-  rview.GetG3D ()->SetObjectToCamera (&rview);
-  rview.GetG3D ()->SetClipper (rview.GetView ()->GetClipPoly (), rview.GetView ()->GetNumVertices ());
+  csReversibleTransform trans = camtrans;
+  rview->GetGraphics3D ()->SetObjectToCamera (&trans);
+  rview->GetGraphics3D ()->SetClipper (rview->GetClipper ()->GetClipPoly (),
+  	rview->GetClipper ()->GetNumVertices ());
   // @@@ This should only be done when aspect changes...
-  rview.GetG3D ()->SetPerspectiveAspect (rview.GetFOV ());
-  rview.GetG3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
+  rview->GetGraphics3D ()->SetPerspectiveAspect (icam->GetFOV ());
+  rview->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
       use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
 
   // Setup the structure for DrawTriangleMesh.
@@ -316,7 +321,7 @@ void csDDGTerrain::Draw (csRenderView& rview, bool use_z_buf)
     g3dmesh.num_vertices_pool = 1;
     g3dmesh.num_materials = 1;
     g3dmesh.use_vertex_color = false;
-    g3dmesh.do_mirror = rview.IsMirrored ();
+    g3dmesh.do_mirror = icam->IsMirrored ();
     g3dmesh.do_morph_texels = false;
     g3dmesh.do_morph_colors = false;
     g3dmesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
@@ -373,12 +378,12 @@ void csDDGTerrain::Draw (csRenderView& rview, bool use_z_buf)
         fog_verts.SetLimit (nd);
       g3dmesh.vertex_fog = fog_verts.GetArray ();
 
-      rview.CalculateFogMesh (rview, g3dmesh);
+      rview->CalculateFogMesh (icam->GetTransform (), g3dmesh);
 
-      if (rview.GetCallback ())
-        rview.CallCallback (CALLBACK_MESH, (void*)&g3dmesh);
-      else
-        rview.GetG3D ()->DrawTriangleMesh (g3dmesh);
+      //@@@@ EDGES if (rview.GetCallback ())
+        //rview.CallCallback (CALLBACK_MESH, (void*)&g3dmesh);
+      //else
+        rview->GetGraphics3D ()->DrawTriangleMesh (g3dmesh);
       // Increment the starting offset by the number of triangles that
       // were in this block.
       s += d;

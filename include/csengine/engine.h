@@ -22,9 +22,9 @@
 #include "csutil/scf.h"
 #include "csgeom/math3d.h"
 #include "csobject/nobjvec.h"
-#include "csengine/rview.h"
 #include "csengine/tranman.h"
 #include "csengine/arrays.h"
+#include "csengine/rview.h"
 #include "csobject/csobject.h"
 #include "igraph3d.h"
 #include "isystem.h"
@@ -48,7 +48,6 @@ class csDynLight;
 class csClipper;
 class csCovcube;
 class csCBufferCube;
-class csRenderView;
 class csEngine;
 class Dumper;
 class csLight;
@@ -59,6 +58,7 @@ class csCovMaskLUT;
 class csPoly2DPool;
 class csLightPatchPool;
 class csLightHalo;
+class csRenderView;
 struct iSystem;
 struct iVFS;
 struct iMaterialWrapper;
@@ -1214,6 +1214,8 @@ public:
   /// Create mesh object.
   virtual iMeshWrapper* CreateMeshObject (iMeshFactoryWrapper* factory,
   	const char* name, iSector* sector, const csVector3& pos);
+
+  virtual iClipper2D* GetTopLevelClipper ();
 
   //--------------------- iConfig interface implementation --------------------
 

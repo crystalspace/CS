@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,6 +20,7 @@
 #define __IPORTAL_H__
 
 #include "csutil/scf.h"
+#include "csutil/flags.h"
 
 /**
  * If this flag is set then this portal will clip all geometry in
@@ -66,7 +67,7 @@ class csVector3;
 struct iSector;
 struct iPolygon3D;
 
-SCF_VERSION (iPortal, 0, 0, 1);
+SCF_VERSION (iPortal, 0, 0, 2);
 
 /**
  * This is the interface to the Portal objects. Polygons that are
@@ -78,7 +79,7 @@ SCF_VERSION (iPortal, 0, 0, 1);
 struct iPortal : public iBase
 {
   /// Set portal flags (see CS_PORTAL_XXX values above)
-  virtual void SetFlags (int iMask, int iValue) = 0;
+  virtual csFlags& GetFlags () = 0;
 
   /// Get the sector that the portal points to
   virtual iSector *GetPortal () = 0;

@@ -1321,11 +1321,31 @@ public:
       scfParent->SetCSPortal (iTarget->GetPrivateObject ());
       return scfParent->GetPortal ();
     }
+    virtual iPortal* GetPortal ()
+    {
+      return scfParent->GetPortal ();
+    }
 
     ///
     virtual void SetTextureSpace (csVector3& v_orig, csVector3& v1, float len1)
     {
       scfParent->SetTextureSpace (v_orig, v1, len1);
+    }
+    virtual const csPlane3& GetWorldPlane ()
+    {
+      return scfParent->plane->GetWorldPlane ();
+    }
+    virtual const csPlane3& GetObjectPlane ()
+    {
+      return scfParent->plane->GetObjectPlane ();
+    }
+    virtual const csPlane3& GetCameraPlane ()
+    {
+      return scfParent->plane->GetCameraPlane ();
+    }
+    virtual bool IsTransparent ()
+    {
+      return scfParent->IsTransparent ();
     }
   } scfiPolygon3D;
   friend struct eiPolygon3D;

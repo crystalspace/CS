@@ -42,8 +42,9 @@ struct iRegion;
 struct iView;
 struct iGraphics3D;
 struct iTransformationManager;
+struct iClipper2D;
 
-SCF_VERSION (iEngine, 0, 1, 13);
+SCF_VERSION (iEngine, 0, 1, 14);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -227,6 +228,11 @@ struct iEngine : public iPlugIn
    * possible that this mode will still be CS_ENGINE_AUTODETECT.
    */
   virtual int GetEngineMode () = 0;
+
+  /**
+   * Get the top-level clipper.
+   */
+  virtual iClipper2D* GetTopLevelClipper () = 0;
 
   /// Get the transformation manager.
   virtual iTransformationManager* GetTransformationManager () = 0;

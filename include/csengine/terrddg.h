@@ -93,7 +93,7 @@ public:
   /**
    * Draw this terrain given a view and transformation.
    */
-  virtual void Draw (csRenderView& rview, bool use_z_buf = true);
+  virtual void Draw (iRenderView* rview, bool use_z_buf = true);
 
   /// Set a material for this surface.
   virtual void SetMaterial (int i, csMaterialWrapper *material)

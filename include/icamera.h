@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -37,8 +37,9 @@
 #define VEC_TILT_DOWN  (-csVector3(-1,0,0))
 
 class csCamera;
+struct iSector;
 
-SCF_VERSION (iCamera, 0, 0, 6);
+SCF_VERSION (iCamera, 0, 0, 7);
 
 /// Camera class.
 struct iCamera : public iBase
@@ -152,6 +153,11 @@ struct iCamera : public iBase
    * drawing.
    */
   virtual bool GetFarPlane (csPlane3& pl) = 0;
+
+  /**
+   * Get the current sector.
+   */
+  virtual iSector* GetSector () = 0;
 };
 
 #endif

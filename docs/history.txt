@@ -1,6 +1,29 @@
 The history order has been reversed so that new features are at the top.
 
+22-Feb-2001
+	- Philip Wyett removed: 'System.Win32.DebugConsole = yes/no'
+	  from system.cfg and re-coded 'SetSystemDefaults' so if you do a
+	  debug build you get the debug console windows and if you do a
+	  release build you do not. This is prep work for a Win32 fix to
+	  come and new DX8 drivers.
+	- Added iPolygon3D::GetWorldPlane(), GetObjectPlane(),
+	  GetCameraPlane(), GetPortal(), and IsTransparent().
+	- Added const versions of csPolyPlane::GetCameraPlane() and
+	  GetObjectPlane().
+	- Replaced iPortal::SetFlags() with GetFlags() :-)
+	- Added iCamera::GetSector().
+	- Replaced all csXxx fiels in csRenderView with iXxx fields (if
+	  applicable).
+	- Added iEngine::GetTopLevelClipper().
+	- csRenderView no longer inherits from csCamera. I added
+	  csRenderContext which contains all the fields that can change
+	  from one recursion level to another. So the iRenderView
+	  interface has changed a lot (check it out).
+	- Fixed CS_ENTITY_CAMERA flag for things. It is even slightly more
+	  efficient than it was before.
 21-Feb-2001
+	- Wouter Wijngaards made animation of procedural sky work. The
+	  clouds move and change when you animate the sky.
 	- Added iMeshObject::GetShapeNumber(). Using this number one can
 	  check if the object has changed shape enough so that the maximum
 	  bounding box is no longer valid. All mesh object plugins implement

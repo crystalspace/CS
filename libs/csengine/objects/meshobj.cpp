@@ -23,6 +23,7 @@
 #include "csengine/engine.h"
 #include "csengine/thing.h"
 #include "igraph3d.h"
+#include "irview.h"
 
 IMPLEMENT_CSOBJTYPE (csMeshWrapper, csPObject)
 
@@ -209,15 +210,14 @@ void csMeshWrapper::DeferUpdateLighting (int flags, int num_lights)
   defered_lighting_flags = flags;
 }
 
-void csMeshWrapper::Draw (csRenderView& rview)
+void csMeshWrapper::Draw (iRenderView* rview)
 {
   iMeshWrapper* meshwrap = &scfiMeshWrapper;
-  iRenderView* irv = QUERY_INTERFACE (&rview, iRenderView);
-  if (draw_cb) draw_cb (meshwrap, irv, draw_cbData);
-  if (mesh->DrawTest (irv, &movable.scfiMovable))
+  if (draw_cb) draw_cb (meshwrap, rview, draw_cbData);
+  if (mesh->DrawTest (rview, &movable.scfiMovable))
   {
     UpdateDeferedLighting (movable.GetFullPosition ());
-    mesh->Draw (irv, &movable.scfiMovable);
+    mesh->Draw (rview, &movable.scfiMovable);
   }
   int i;
   for (i = 0 ; i < children.Length () ; i++)
@@ -225,7 +225,6 @@ void csMeshWrapper::Draw (csRenderView& rview)
     csMeshWrapper* spr = (csMeshWrapper*)children[i];
     spr->Draw (rview);
   }
-  irv->DecRef ();
 }
 
 void csMeshWrapper::NextFrame (cs_time current_time)

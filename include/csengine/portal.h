@@ -194,8 +194,7 @@ public:
   DECLARE_IBASE;
 
   /// Set portal flags (see CS_PORTAL_XXX values)
-  virtual void SetFlags (int iMask, int iValue)
-  { flags.Set (iMask, iValue); }
+  virtual csFlags& GetFlags () { return flags; }
 
   /// Get the sector that the portal points to
   virtual iSector *GetPortal ();

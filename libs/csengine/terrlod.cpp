@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1999,2000 by Jorrit Tyberghein
+    Copyright (C) 1999-2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -29,6 +29,7 @@
 #include "qsqrt.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
+#include "irview.h"
 
 IMPLEMENT_CSOBJTYPE (csLODTerrain, csTerrain);
 
@@ -454,17 +455,20 @@ bool csLODTerrain::Initialize (const void *vheightMapFile, unsigned long /*size*
     return true;
 }
 
-void csLODTerrain::Draw (csRenderView& rview, bool use_z_buf)
+void csLODTerrain::Draw (iRenderView* rview, bool use_z_buf)
 {
 
+    iCamera* icam = rview->GetCamera ();
 // HELP again ....
-    rview.GetG3D ()->SetObjectToCamera (&rview);
-    rview.GetG3D ()->SetClipper (rview.GetView ()->GetClipPoly (), rview.GetView ()->GetNumVertices ());
-    rview.GetG3D ()->SetPerspectiveAspect (rview.GetFOV ());
-    rview.GetG3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
+    csReversibleTransform camtrans = icam->GetTransform ();
+    rview->GetGraphics3D ()->SetObjectToCamera (&camtrans);
+    rview->GetGraphics3D ()->SetClipper (rview->GetClipper ()->GetClipPoly (),
+    	rview->GetClipper ()->GetNumVertices ());
+    rview->GetGraphics3D ()->SetPerspectiveAspect (icam->GetFOV ());
+    rview->GetGraphics3D ()->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE,
 			       use_z_buf ? CS_ZBUF_USE : CS_ZBUF_FILL);
 
-    position = rview.GetOrigin();
+    position = icam->GetTransform ().GetOrigin();
 
     resetQuadTree();
 
@@ -502,10 +506,10 @@ void csLODTerrain::Draw (csRenderView& rview, bool use_z_buf)
     material->Visit ();
     g3dmesh->mat_handle[0] = material->GetMaterialHandle();
 
-    if (rview.GetCallback ())
-        rview.CallCallback (CALLBACK_MESH, (void*)g3dmesh);
-    else
-	rview.GetG3D ()->DrawTriangleMesh (*g3dmesh);
+    //@@@@ EDGES if (rview.GetCallback ())
+        //rview.CallCallback (CALLBACK_MESH, (void*)g3dmesh);
+    //else
+	rview->GetGraphics3D ()->DrawTriangleMesh (*g3dmesh);
 
 }
 

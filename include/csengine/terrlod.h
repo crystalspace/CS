@@ -21,12 +21,12 @@
 
 #include "csgeom/transfrm.h"
 #include "csobject/csobject.h"
-#include "csengine/rview.h"
 #include "csengine/terrain.h"
 #include "igraph3d.h"
 #include "csutil/cscolor.h"
 
 class csMaterialWrapper;
+struct iRenderView;
 
 /**
  * This object encapsulates a terrain surface so that it
@@ -94,7 +94,7 @@ public:
   /// Loads and initializes the heightmap
   virtual bool Initialize (const void *heightMapFile, unsigned long size);
   /// main draw function
-  virtual void Draw (csRenderView& rview, bool use_z_buf);
+  virtual void Draw (iRenderView* rview, bool use_z_buf);
   /// puts us on top of terrain (should be changed)
   virtual int CollisionDetect (csTransform *p);
   

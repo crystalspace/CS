@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998,2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -375,6 +375,7 @@ public:
       if (scfParent->fp) { pl = *scfParent->fp; return true; }
       else return false;
     }
+    virtual iSector* GetSector ();
   } scfiCamera;
   friend struct Camera;
 

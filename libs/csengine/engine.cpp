@@ -1325,12 +1325,12 @@ void csEngine::StartDraw (csCamera* c, csClipper* view, csRenderView& rview)
 
 void csEngine::Draw (csCamera* c, csClipper* view)
 {
-  csRenderView rview (*c, view, G3D, G2D);
+  csRenderView rview (&c->scfiCamera, view, G3D, G2D);
   StartDraw (c, view, rview);
   rview.SetCallback (NULL, NULL);
 
   csSector* s = c->GetSector ();
-  s->Draw (rview);
+  s->Draw (&rview);
 
   // draw all halos on the screen
   cs_time Elapsed, Current;
@@ -1343,13 +1343,13 @@ void csEngine::Draw (csCamera* c, csClipper* view)
 void csEngine::DrawFunc (csCamera* c, csClipper* view,
   csDrawFunc* callback, void* callback_data)
 {
-  csRenderView rview (*c, view, G3D, G2D);
+  csRenderView rview (&c->scfiCamera, view, G3D, G2D);
   StartDraw (c, view, rview);
 
   rview.SetCallback (callback, callback_data);
 
   csSector* s = c->GetSector ();
-  s->Draw (rview);
+  s->Draw (&rview);
 }
 
 void csEngine::AddHalo (csLight* Light)
@@ -2321,6 +2321,11 @@ void csEngine::SetContext (iGraphics3D* g3d)
     }
     G3D->IncRef ();
   }
+}
+
+iClipper2D* csEngine::GetTopLevelClipper ()
+{
+  return (iClipper2D*)top_clipper;
 }
 
 //-------------------End-Multi-Context-Support--------------------------------

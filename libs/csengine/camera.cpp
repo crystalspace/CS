@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998, 2000 by Jorrit Tyberghein
+    Copyright (C) 1998-2001 by Jorrit Tyberghein
     Camera code written by Ivan Avramovic <ivan@avramovic.com>
   
     This library is free software; you can redistribute it and/or
@@ -235,3 +235,9 @@ void csCamera::ComputeDefaultAngle (int width)
   float inv_disp_radius = qisqrt (rview_fov*rview_fov + disp_width*disp_width);
   default_fov_angle = 2. * acos (disp_width * inv_disp_radius) * (360./(2.*M_PI));
 }
+
+iSector* csCamera::Camera::GetSector ()
+{
+  return &scfParent->GetSector ()->scfiSector;
+}
+

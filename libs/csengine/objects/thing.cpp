@@ -41,6 +41,7 @@
 #include "itxtmgr.h"
 #include "itexture.h"
 #include "ivfs.h"
+#include "irview.h"
 #include "qint.h"
 
 long csThing::current_light_frame_number = 0;
@@ -1534,13 +1535,15 @@ void csThing::DrawCurves (iRenderView* rview)
 void csThing::Draw (iRenderView* rview)
 {
   if (flags.Check (CS_ENTITY_INVISIBLE)) return;
-  //@@@@@@@@@@@@@@@@@@@@@@@@@@ HOW TO FIX THIS!!!! @@@@@@@@@@@@@@@@@@@@@@@ if (flags.Check (CS_ENTITY_CAMERA))
-  //{
-    //csRenderView rview_new = rview;
-    //rview_new.SetO2TTranslation (csVector3 (0));
-    //DrawInt (rview_new);
-  //}
-  /*else*/ DrawInt (rview);
+  if (flags.Check (CS_ENTITY_CAMERA))
+  {
+    csOrthoTransform& trans = rview->GetCamera ()->GetTransform ();
+    csVector3 old = trans.GetO2TTranslation ();
+    trans.SetO2TTranslation (csVector3 (0));
+    DrawInt (rview);
+    trans.SetO2TTranslation (old);
+  }
+  else DrawInt (rview);
 }
 
 static int count_cull_node_notvis_behind;

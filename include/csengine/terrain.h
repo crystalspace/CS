@@ -20,12 +20,12 @@
 #define __CS_TERRAIN_H__
 
 #include "csgeom/transfrm.h"
-#include "csengine/rview.h"
 #include "csobject/csobject.h"
 #include "csutil/cscolor.h"
 
 class csMaterialWrapper;
 class csVector3;
+struct iRenderView;
 
 /**
  * This object encapsulates a terrain surface so that it
@@ -54,7 +54,7 @@ public:
   /**
    * Draw this terrain given a view and transformation.
    */
-  virtual void Draw (csRenderView& rview, bool use_z_buf = true) = 0;
+  virtual void Draw (iRenderView* rview, bool use_z_buf = true) = 0;
 
   /// Set a material for this surface.
   virtual void SetMaterial (int i, csMaterialWrapper *material) = 0;

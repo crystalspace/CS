@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2000 by Andrew Zabolotny
+    Copyright (C) 2000-2001 by Andrew Zabolotny
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "csengine/rview.h"
 #include "csengine/engine.h"
+#include "csengine/polygon.h"
 #include "csengine/sector.h"
 #include "csgeom/polyclip.h"
 #include "igraph3d.h"
@@ -69,114 +70,69 @@ bool csFrustumView::DeregisterCleanup (csFrustrumViewCleanup *action)
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_IBASE_EXT (csRenderView)
-  IMPLEMENTS_EMBEDDED_INTERFACE (iRenderView)
-IMPLEMENT_IBASE_EXT_END
-
-IMPLEMENT_EMBEDDED_IBASE (csRenderView::RenderView)
+IMPLEMENT_IBASE (csRenderView)
   IMPLEMENTS_INTERFACE (iRenderView)
-IMPLEMENT_EMBEDDED_IBASE_END
+IMPLEMENT_IBASE_END
 
 csRenderView::csRenderView () :
-    csCamera (), engine (NULL), iengine (NULL), view (NULL), iview (NULL),
-    g3d (NULL), g2d (NULL),
-    portal_polygon (NULL), previous_sector (NULL), this_sector (NULL),
-    do_clip_plane (false), do_clip_frustum (false),
-    callback (NULL), callback_data (NULL), fog_info (NULL),
-    added_fog_info (false)
+    ctxt (NULL), iengine (NULL), g3d (NULL), g2d (NULL),
+    callback (NULL), callback_data (NULL)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiRenderView);
-  icamera = QUERY_INTERFACE (this, iCamera);
+  CONSTRUCT_IBASE (NULL);
+  ctxt = new csRenderContext ();
+  memset (ctxt, 0, sizeof (csRenderContext));
 }
 
-csRenderView::csRenderView (const csCamera& c) :
-    csCamera (c), engine (NULL), iengine (NULL), view (NULL), iview (NULL),
-    g3d (NULL), g2d (NULL),
-    portal_polygon (NULL), previous_sector (NULL), this_sector (NULL),
-    do_clip_plane (false), do_clip_frustum (false),
-    callback (NULL), callback_data (NULL), fog_info (NULL),
-    added_fog_info (false)
+csRenderView::csRenderView (iCamera* c) :
+    ctxt (NULL), iengine (NULL), g3d (NULL), g2d (NULL),
+    callback (NULL), callback_data (NULL)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiRenderView);
-  icamera = QUERY_INTERFACE (this, iCamera);
+  CONSTRUCT_IBASE (NULL);
+  ctxt = new csRenderContext ();
+  memset (ctxt, 0, sizeof (csRenderContext));
+  c->IncRef ();
+  ctxt->icamera = c;
 }
 
-csRenderView::csRenderView (const csCamera& c, csClipper* v, iGraphics3D* ig3d,
-    iGraphics2D* ig2d) :
-    csCamera (c), engine (NULL), iengine (NULL), iview (NULL), g3d (ig3d), g2d (ig2d),
-    portal_polygon (NULL), previous_sector (NULL), this_sector (NULL),
-    do_clip_plane (false), do_clip_frustum (false),
-    callback (NULL), callback_data (NULL), fog_info (NULL),
-    added_fog_info (false)
+csRenderView::csRenderView (iCamera* c, csClipper* v, iGraphics3D* ig3d,
+    	iGraphics2D* ig2d) :
+    ctxt (NULL), iengine (NULL), g3d (ig3d), g2d (ig2d),
+    callback (NULL), callback_data (NULL)
 {
-  CONSTRUCT_EMBEDDED_IBASE (scfiRenderView);
-  icamera = QUERY_INTERFACE (this, iCamera);
-  SetView (v);
-}
-
-csRenderView::csRenderView (const csRenderView& c) : csCamera (c)
-{
-  CONSTRUCT_EMBEDDED_IBASE (scfiRenderView);
-
-  // Copy all the fields. We can't use the assignment
-  // here since that would copy the camera object again which would invalidate
-  // all SCF stuff (scfParent).
-  // @@@ BETTER WAY FOR ALL THIS? REMOVE UNNEEDED FIELDS FROM RVIEW.
-  engine = c.engine;
-  iengine = c.iengine;
-  view = c.view;
-  iview = c.iview;
-  g3d = c.g3d;
-  g2d = c.g2d;
-  leftx = c.leftx;
-  rightx = c.rightx;
-  topy = c.topy;
-  boty = c.boty;
-  portal_polygon = c.portal_polygon;
-  previous_sector = c.previous_sector;
-  this_sector = c.this_sector;
-  clip_plane = c.clip_plane;
-  do_clip_plane = c.do_clip_plane;
-  do_clip_frustum = c.do_clip_frustum;
-  callback = c.callback;
-  callback_data = c.callback_data;
-  fog_info = c.fog_info;
-  added_fog_info = c.added_fog_info;
-
-  icamera = QUERY_INTERFACE (this, iCamera);
-  if (iview) iview->IncRef ();
-  if (iengine) iengine->IncRef ();
+  CONSTRUCT_IBASE (NULL);
+  ctxt = new csRenderContext ();
+  memset (ctxt, 0, sizeof (csRenderContext));
+  c->IncRef ();
+  ctxt->icamera = c;
+  ctxt->iview = QUERY_INTERFACE (v, iClipper2D);
 }
 
 csRenderView::~csRenderView ()
 {
+  if (ctxt && ctxt->icamera) ctxt->icamera->DecRef ();
   if (iengine) iengine->DecRef ();
+  delete ctxt;
 }
 
-void csRenderView::SetView (csClipper* view)
+void csRenderView::SetCamera (iCamera* icam)
 {
-  iClipper2D* ic = QUERY_INTERFACE (view, iClipper2D);
-  if (iview) iview->DecRef ();
-  iview = ic;
-  csRenderView::view = view;
+  icam->IncRef ();
+  if (ctxt->icamera) ctxt->icamera->DecRef ();
+  ctxt->icamera = icam;
 }
 
-void csRenderView::SetEngine (csEngine* engine)
+void csRenderView::SetClipper (iClipper2D* view)
 {
-  iEngine* ien = QUERY_INTERFACE (engine, iEngine);
+  view->IncRef ();
+  if (ctxt->iview) ctxt->iview->DecRef ();
+  ctxt->iview = view;
+}
+
+void csRenderView::SetEngine (iEngine* engine)
+{
+  engine->IncRef ();
   if (iengine) iengine->DecRef ();
-  iengine = ien;
-  csRenderView::engine = engine;
-}
-
-void csRenderView::SetThisSector (csSector* sect)
-{
-  this_sector = sect;
-}
-
-void csRenderView::SetPreviousSector (csSector* sect)
-{
-  previous_sector = sect;
+  iengine = engine;
 }
 
 // Remove this for old fog
@@ -199,7 +155,7 @@ static void InitializeFogTable ()
 #define SMALL_D 0.01
 void csRenderView::CalculateFogPolygon (G3DPolygonDP& poly)
 {
-  if (!fog_info || poly.num < 3) { poly.use_fog = false; return; }
+  if (!ctxt->fog_info || poly.num < 3) { poly.use_fog = false; return; }
   poly.use_fog = true;
 
 #ifdef USE_EXP_FOG
@@ -238,14 +194,16 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDP& poly)
     O = -Cc*inv_Dc;
   }
 
+  float shift_x = ctxt->icamera->GetShiftX ();
+  float shift_y = ctxt->icamera->GetShiftY ();
   int i;
   for (i = 0 ; i < poly.num ; i++)
   {
     // Calculate the original 3D coordinate again (camera space).
     csVector3 v;
-    v.z = 1. / (M * (poly.vertices[i].sx - GetShiftX ()) + N * (poly.vertices[i].sy - GetShiftY ()) + O);
-    v.x = (poly.vertices[i].sx - GetShiftX ()) * v.z * inv_aspect;
-    v.y = (poly.vertices[i].sy - GetShiftY ()) * v.z * inv_aspect;
+    v.z = 1. / (M * (poly.vertices[i].sx - shift_x) + N * (poly.vertices[i].sy - shift_y) + O);
+    v.x = (poly.vertices[i].sx - shift_x) * v.z * inv_aspect;
+    v.y = (poly.vertices[i].sy - shift_y) * v.z * inv_aspect;
 
     // Initialize fog vertex.
     poly.fog_info[i].r = 0;
@@ -255,7 +213,7 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDP& poly)
 
     // Consider a ray between (0,0,0) and v and calculate the thickness of every
     // fogged sector in between.
-    csFogInfo* fi = fog_info;
+    csFogInfo* fi = ctxt->fog_info;
     while (fi)
     {
       float dist1, dist2;
@@ -319,7 +277,7 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDP& poly)
 // which are almost exactly the same.
 void csRenderView::CalculateFogPolygon (G3DPolygonDPFX& poly)
 {
-  if (!fog_info || poly.num < 3) { poly.use_fog = false; return; }
+  if (!ctxt->fog_info || poly.num < 3) { poly.use_fog = false; return; }
   poly.use_fog = true;
 
 #ifdef USE_EXP_FOG
@@ -327,6 +285,8 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDPFX& poly)
     InitializeFogTable ();
 #endif
 
+  float shift_x = ctxt->icamera->GetShiftX ();
+  float shift_y = ctxt->icamera->GetShiftY ();
   float inv_aspect = poly.inv_aspect;
 
   int i;
@@ -335,8 +295,8 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDPFX& poly)
     // Calculate the original 3D coordinate again (camera space).
     csVector3 v;
     v.z = 1. / poly.vertices[i].z;
-    v.x = (poly.vertices[i].sx - GetShiftX ()) * v.z * inv_aspect;
-    v.y = (poly.vertices[i].sy - GetShiftY ()) * v.z * inv_aspect;
+    v.x = (poly.vertices[i].sx - shift_x) * v.z * inv_aspect;
+    v.y = (poly.vertices[i].sy - shift_y) * v.z * inv_aspect;
 
     // Initialize fog vertex.
     poly.fog_info[i].r = 0;
@@ -346,7 +306,7 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDPFX& poly)
 
     // Consider a ray between (0,0,0) and v and calculate the thickness of every
     // fogged sector in between.
-    csFogInfo* fi = fog_info;
+    csFogInfo* fi = ctxt->fog_info;
     while (fi)
     {
       float dist1, dist2;
@@ -360,7 +320,7 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDPFX& poly)
       else
         dist1 = 0;
       //@@@ assume all FX polygons have no outgoing plane
-      if (!added_fog_info)
+      if (!ctxt->added_fog_info)
       {
         const csPlane3& pl = fi->outgoing_plane;
         float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
@@ -414,7 +374,7 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDPFX& poly)
 
 void csRenderView::CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh& mesh)
 {
-  if (!fog_info) { mesh.do_fog = false; return; }
+  if (!ctxt->fog_info) { mesh.do_fog = false; return; }
   mesh.do_fog = true;
 
 #ifdef USE_EXP_FOG
@@ -448,7 +408,7 @@ void csRenderView::CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh&
 
     // Consider a ray between (0,0,0) and v and calculate the thickness of every
     // fogged sector in between.
-    csFogInfo* finfo = fog_info;
+    csFogInfo* finfo = ctxt->fog_info;
     while (finfo)
     {
       float dist1, dist2;
@@ -462,7 +422,7 @@ void csRenderView::CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh&
       else
         dist1 = 0;
       //@@@ assume all FX polygons have no outgoing plane
-      if (!added_fog_info)
+      if (!ctxt->added_fog_info)
       {
         const csPlane3& pl = finfo->outgoing_plane;
         float denom = pl.norm.x*v.x + pl.norm.y*v.y + pl.norm.z*v.z;
@@ -518,21 +478,22 @@ bool csRenderView::ClipBBox (const csBox2& sbox, const csBox3& cbox,
     bool& do_clip)
 {
   // Test against far plane if needed.
-  if (UseFarPlane ())
+  csPlane3 far_plane;
+  if (ctxt->icamera->GetFarPlane (far_plane))
   {
     // Ok, so this is not really a far plane clipping - we just dont draw this
     // object if no point of the camera_bounding box is closer than the D
     // part of the farplane.
-    if (cbox.SquaredOriginDist () > GetFarPlane ()->D ()*GetFarPlane ()->D ())
+    if (cbox.SquaredOriginDist () > far_plane.D ()*far_plane.D ())
        return false;	
   }
   
   // Test if we need and should clip to the current portal.
   int box_class;
-  box_class = view->ClassifyBox (sbox);
+  box_class = ctxt->iview->ClassifyBox (sbox);
   if (box_class == -1) return false; // Not visible.
   do_clip = false;
-  if (do_clip_plane || do_clip_frustum)
+  if (ctxt->do_clip_plane || ctxt->do_clip_frustum)
   {
     if (box_class == 0) do_clip = true;
   }
@@ -546,20 +507,42 @@ bool csRenderView::ClipBBox (const csBox2& sbox, const csBox3& cbox,
   // why not do it to the smallest possible clip area.
   if (!do_clip)
   {
-    box_class = engine->top_clipper->ClassifyBox (sbox);
+    box_class = iengine->GetTopLevelClipper ()->ClassifyBox (sbox);
     if (box_class == 0) do_clip = true;
   }
 
   return true;
 }
 
-iSector* csRenderView::RenderView::GetThisSector ()
+void csRenderView::CreateRenderContext ()
 {
-  return &scfParent->GetThisSector ()->scfiSector;
+  csRenderContext* old_ctxt = ctxt;
+  // @@@ Use a pool for render contexts?
+  // A pool would work very well here since the number of render contexts
+  // is limited by recursion depth.
+  ctxt = new csRenderContext ();
+  *ctxt = *old_ctxt;
+  if (ctxt->icamera) ctxt->icamera->IncRef ();
+  if (ctxt->iview) ctxt->iview->IncRef ();
 }
 
-iSector* csRenderView::RenderView::GetPreviousSector ()
+void csRenderView::RestoreRenderContext (csRenderContext* original)
 {
-  return &scfParent->GetPreviousSector ()->scfiSector;
+  csRenderContext* old_ctxt = ctxt;
+  ctxt = original;
+
+  if (old_ctxt->icamera) old_ctxt->icamera->IncRef ();
+  if (old_ctxt->iview) old_ctxt->iview->IncRef ();
+  delete old_ctxt;
 }
+
+iCamera* csRenderView::CreateNewCamera ()
+{
+  // A pool for cameras?
+  csCamera* newcam = new csCamera (ctxt->icamera->GetPrivateObject ());
+  ctxt->icamera->DecRef ();
+  ctxt->icamera = &newcam->scfiCamera;
+  return ctxt->icamera;
+}
+
 

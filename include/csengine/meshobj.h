@@ -31,7 +31,6 @@ struct iRenderView;
 struct iMovable;
 class Dumper;
 class csMeshWrapper;
-class csRenderView;
 class csCamera;
 class csMeshFactoryWrapper;
 class csPolyTreeObject;
@@ -204,7 +203,7 @@ public:
    * If needed the skeleton state will first be updated.
    * Optionally update lighting if needed (DeferUpdateLighting()).
    */
-  void Draw (csRenderView& rview);
+  void Draw (iRenderView* rview);
 
   /// Go the next animation frame.
   void NextFrame (cs_time current_time);

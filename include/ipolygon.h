@@ -20,6 +20,7 @@
 #define __IPOLYGON_H__
 
 #include "csutil/scf.h"
+#include "csgeom/plane3.h"
 
 struct iMaterialHandle;
 struct iMaterialWrapper;
@@ -41,7 +42,7 @@ class csColor;
  */
 #define CS_POLY_LIGHTING	0x00000001
 
-SCF_VERSION (iPolygon3D, 0, 1, 5);
+SCF_VERSION (iPolygon3D, 0, 1, 6);
 
 /**
  * This is the interface to 3D polygons.
@@ -110,9 +111,25 @@ struct iPolygon3D : public iBase
 
   /// Create a portal object pointing to given sector
   virtual iPortal *CreatePortal (iSector *iTarget) = 0;
+  /**
+   * Return the pointer to the portal if there is one.
+   */
+  virtual iPortal* GetPortal () = 0;
 
   /// Set texture space mapping (if using lightmapping) for this polygon.
   virtual void SetTextureSpace (csVector3& v_orig, csVector3& v1, float len1) = 0;
+
+  /// Get world space plane.
+  virtual const csPlane3& GetWorldPlane () = 0;
+  /// Get object space plane.
+  virtual const csPlane3& GetObjectPlane () = 0;
+  /// Get camera space plane.
+  virtual const csPlane3& GetCameraPlane () = 0;
+
+  /**
+   * Return true if this polygon or the texture it uses is transparent.
+   */
+  virtual bool IsTransparent () = 0;
 };
 
 SCF_VERSION (iPolygonTexture, 1, 0, 0);

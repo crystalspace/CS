@@ -21,11 +21,11 @@
 
 #include "csobject/pobject.h"
 #include "csobject/nobjvec.h"
-#include "csengine/rview.h"
 #include "csengine/bsp.h"
 #include "csgeom/math3d.h"
 #include "csutil/cscolor.h"
 #include "isector.h"
+#include "igraph3d.h"
 
 class csThing;
 class csEngine;
@@ -36,12 +36,14 @@ class csCollection;
 class csCamera;
 class csTerrain;
 class csDynLight;
-class Dumper;
 class csPolygon2DQueue;
 class csProgressPulse;
+class csFrustumView;
+class Dumper;
 struct iGraphics3D;
 struct iStatLight;
 struct iVisibilityCuller;
+struct iRenderView;
 
 /**
  * A sector is a container for objects. It is one of
@@ -441,7 +443,7 @@ public:
   /**
    * Draw the sector in the given view and with the given transformation.
    */
-  void Draw (csRenderView& rview);
+  void Draw (iRenderView* rview);
 
   //----------------------------------------------------------------------
   // Utility Functions

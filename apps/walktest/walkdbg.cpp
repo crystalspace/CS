@@ -134,6 +134,8 @@ csVector2 coord_check_vector;
 
 void select_object (csRenderView* rview, int type, void* entity)
 {
+#if 0
+//@@@@@@@@@@@@@
   if (type == CALLBACK_POLYGON2D)
   {
     int i;
@@ -188,6 +190,7 @@ void select_object (csRenderView* rview, int type, void* entity)
       }
     }
   }
+#endif
 }
 
 
@@ -366,6 +369,8 @@ static void WalkDbgDrawMesh (G3DTriangleMesh& mesh, iGraphics3D* g3d,
 // selected light and/or polygon.
 void draw_edges (csRenderView* rview, int type, void* entity)
 {
+#if 0
+//@@@@@@@@@@@@
   iTextureManager* txtmgr = Gfx3D->GetTextureManager ();
   int selcol;
   int white = txtmgr->FindRGB (255, 255, 255);
@@ -388,7 +393,7 @@ void draw_edges (csRenderView* rview, int type, void* entity)
   {
     csPolygon2D* polygon = (csPolygon2D*)entity;
     if (!hilighted_only || Sys->selected_polygon == last_poly)
-      polygon->Draw (rview->GetG2D (), selcol);
+      polygon->Draw (rview->GetGraphics2D (), selcol);
   }
   else if (type == CALLBACK_POLYGONQ)
   {
@@ -399,7 +404,7 @@ void draw_edges (csRenderView* rview, int type, void* entity)
       int i;
       for (i = 0 ; i < dpfx->num ; i++)
       {
-        rview->GetG2D ()->DrawLine (dpfx->vertices[i].sx,
+        rview->GetGraphics2D ()->DrawLine (dpfx->vertices[i].sx,
 	  csEngine::frame_height - 1 - dpfx->vertices[i].sy,
       	  dpfx->vertices[i1].sx,
 	  csEngine::frame_height - 1 - dpfx->vertices[i1].sy, blue);
@@ -412,7 +417,7 @@ void draw_edges (csRenderView* rview, int type, void* entity)
     if (!hilighted_only)
     {
       G3DTriangleMesh* mesh = (G3DTriangleMesh*)entity;
-      WalkDbgDrawMesh (*mesh, rview->GetG3D (), rview->GetG2D ());
+      WalkDbgDrawMesh (*mesh, rview->GetG3D (), rview->GetGraphics2D ());
     }
   }
   else if (type == CALLBACK_SECTOR)
@@ -434,14 +439,15 @@ void draw_edges (csRenderView* rview, int type, void* entity)
           px = QInt (v.x * iz + rview->GetShiftX ());
           py = csEngine::frame_height - 1 - QInt (v.y * iz + rview->GetShiftY ());
           r = QInt (.3 * iz);
-          rview->GetG2D ()->DrawLine (px-r, py-r, px+r, py+r, selcol);
-          rview->GetG2D ()->DrawLine (px+r, py-r, px-r, py+r, selcol);
-          rview->GetG2D ()->DrawLine (px, py-2, px, py+2, red);
-          rview->GetG2D ()->DrawLine (px+2, py, px-2, py, red);
+          rview->GetGraphics2D ()->DrawLine (px-r, py-r, px+r, py+r, selcol);
+          rview->GetGraphics2D ()->DrawLine (px+r, py-r, px-r, py+r, selcol);
+          rview->GetGraphics2D ()->DrawLine (px, py-2, px, py+2, red);
+          rview->GetGraphics2D ()->DrawLine (px+2, py, px-2, py, red);
         }
       }
     }
   }
+#endif
 }
 
 // Callback for DrawFunc() to show a 3D map of everything that is visible.
@@ -951,7 +957,7 @@ void draw_frust_edges (csRenderView* rview, int type, void* entity)
     csPolygon2D* polygon = (csPolygon2D*)entity;
     int idx = dbf.queue.Find (last_poly);
     if (idx != -1)
-      polygon->Draw (rview->GetG2D (), col);
+      polygon->Draw (rview->GetGraphics2D (), col);
   }
 }
 
