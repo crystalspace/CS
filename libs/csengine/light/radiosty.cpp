@@ -461,6 +461,7 @@ void csRadPoly::Setup()
   CalcLumel2World(lumel_y_axis, 0, 1);
   one_lumel_area = ABS( csMath3::Area3(lumel_origin, lumel_x_axis, 
     lumel_y_axis) );
+  printf("The one lumel area is %g in size\n", one_lumel_area);
   lumel_x_axis -= lumel_origin;
   lumel_y_axis -= lumel_origin;
 }
@@ -1469,6 +1470,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
 #if 1
   //if(totalfactor > 10.0f)
   //if(totalfactor > 0.001f)
+  if(rand()%255==0)
     CsPrintf(MSG_STDOUT, "totalfactor %g = "
   	"cosshoot %g * cosdest %g * area %g * vis %g / sqdis %g.  "
 	"srclumelcolor (%g, %g, %g), deltacolor (%g, %g, %g)\n", 
