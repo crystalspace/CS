@@ -29,6 +29,9 @@ The history order has been reversed so that new features are at the top.
 	  plug-in which was reported by BeOS compiler.
 	- Eric Sunshine eliminated a couple compilation warnings in the
 	  OpenGL renderer.
+	- Eric Sunshine fixed a typographical error in cssysdef.h
+	  (OS_BEOS --> OS_BE) to allow the networking code to compile on
+	  BeOS.
 21-Jun-2000
 	- Norman Kramer added new SetViewArea for gridviews to retsrict the
 	  area they can show.

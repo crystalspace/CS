@@ -325,7 +325,7 @@
 #  if defined (OS_UNIX)
 #    define BSD_COMP 1
 #    include <sys/ioctl.h>
-#    if !defined (OS_SOLARIS) && !defined (OS_BEOS)
+#    if !defined (OS_SOLARIS) && !defined (OS_BE)
 #      include <arpa/inet.h>
 #      include <sys/time.h>
 #    endif
