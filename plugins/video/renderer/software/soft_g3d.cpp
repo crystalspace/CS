@@ -1889,7 +1889,7 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
   gouraud = pqinfo.do_gouraud;
 
   float flat_r, flat_g, flat_b;
-  if (poly.txt_handle) { flat_r = flat_g = flat_b = 0; }
+  if (poly.txt_handle) { flat_r = flat_g = flat_b = 1; }
   else { flat_r = poly.flat_color_r; flat_g = poly.flat_color_g; flat_b = poly.flat_color_b; }
 
   //-----
@@ -1907,19 +1907,19 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
     uu[i] = pqinfo.tw * poly.pi_texcoords [i].u;
     vv[i] = pqinfo.th * poly.pi_texcoords [i].v;
     iz[i] = poly.pi_texcoords [i].z;
-    rr[i] = pqinfo.redFact*(flat_r+poly.pi_texcoords[i].r);
-    gg[i] = pqinfo.greenFact*(flat_g+poly.pi_texcoords[i].g);
-    bb[i] = pqinfo.blueFact*(flat_b+poly.pi_texcoords[i].b);
+    rr[i] = pqinfo.redFact*(flat_r*poly.pi_texcoords[i].r);
+    gg[i] = pqinfo.greenFact*(flat_g*poly.pi_texcoords[i].g);
+    bb[i] = pqinfo.blueFact*(flat_b*poly.pi_texcoords[i].b);
     if (poly.vertices [i].sy > top_y)
     {
       top_y = poly.vertices [i].sy;
       top = i;
-    } /* endif */
+    }
     if (poly.vertices [i].sy < bot_y)
     {
       bot_y = poly.vertices [i].sy;
       bot = i;
-    } /* endif */
+    }
   }
 
   //-----
@@ -1957,19 +1957,19 @@ STDMETHODIMP csGraphics3DSoftware::DrawPolygonQuick (G3DPolygon& poly, bool gour
   long dr = 0, dg = 0, db = 0;
   if (gouraud)
   {
-    float rr0 = pqinfo.redFact*(flat_r+poly.pi_tritexcoords [0].r);
-    float rr1 = pqinfo.redFact*(flat_r+poly.pi_tritexcoords [1].r);
-    float rr2 = pqinfo.redFact*(flat_r+poly.pi_tritexcoords [2].r);
+    float rr0 = pqinfo.redFact*(flat_r*poly.pi_tritexcoords [0].r);
+    float rr1 = pqinfo.redFact*(flat_r*poly.pi_tritexcoords [1].r);
+    float rr2 = pqinfo.redFact*(flat_r*poly.pi_tritexcoords [2].r);
     dr = QInt16 (((rr0 - rr2) * (poly.pi_triangle [1].y - poly.pi_triangle [2].y)
                 - (rr1 - rr2) * (poly.pi_triangle [0].y - poly.pi_triangle [2].y)) * inv_dd);
-    float gg0 = pqinfo.greenFact*(flat_g+poly.pi_tritexcoords [0].g);
-    float gg1 = pqinfo.greenFact*(flat_g+poly.pi_tritexcoords [1].g);
-    float gg2 = pqinfo.greenFact*(flat_g+poly.pi_tritexcoords [2].g);
+    float gg0 = pqinfo.greenFact*(flat_g*poly.pi_tritexcoords [0].g);
+    float gg1 = pqinfo.greenFact*(flat_g*poly.pi_tritexcoords [1].g);
+    float gg2 = pqinfo.greenFact*(flat_g*poly.pi_tritexcoords [2].g);
     dg = QInt16 (((gg0 - gg2) * (poly.pi_triangle [1].y - poly.pi_triangle [2].y)
                 - (gg1 - gg2) * (poly.pi_triangle [0].y - poly.pi_triangle [2].y)) * inv_dd);
-    float bb0 = pqinfo.blueFact*(flat_b+poly.pi_tritexcoords [0].b);
-    float bb1 = pqinfo.blueFact*(flat_b+poly.pi_tritexcoords [1].b);
-    float bb2 = pqinfo.blueFact*(flat_b+poly.pi_tritexcoords [2].b);
+    float bb0 = pqinfo.blueFact*(flat_b*poly.pi_tritexcoords [0].b);
+    float bb1 = pqinfo.blueFact*(flat_b*poly.pi_tritexcoords [1].b);
+    float bb2 = pqinfo.blueFact*(flat_b*poly.pi_tritexcoords [2].b);
     db = QInt16 (((bb0 - bb2) * (poly.pi_triangle [1].y - poly.pi_triangle [2].y)
                 - (bb1 - bb2) * (poly.pi_triangle [0].y - poly.pi_triangle [2].y)) * inv_dd);
   }
