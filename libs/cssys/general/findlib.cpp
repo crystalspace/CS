@@ -130,7 +130,7 @@ csLibraryHandle csFindLoadLibrary (const char *iPrefix, const char *iName,
     else
     {
       callbackPrint printer;
-      fprintf (stderr, "DLERROR: %s, file not found, tried:\n", iName);
+      fprintf (stderr, "WARNING: %s, file not found, tried:\n", iName);
       csFindLoadLibraryHelper (iPrefix, iName, iSuffix, printer);
     }
   }
