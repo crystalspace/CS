@@ -66,6 +66,7 @@ awsManager::awsManager (iBase *p) :
   keyb_focus(NULL),
   mouse_focus(NULL),
   focused(NULL),
+  modal_dialog(NULL),
   mouse_captured(false),
   ptG2D(NULL),
   ptG3D(NULL),
@@ -950,8 +951,59 @@ void awsManager::ReleaseMouse ()
   mouse_focus = NULL;
 }
 
-bool awsManager::HandleEvent (iEvent &Event)
+void awsManager::SetModal (iAwsComponent *comp)
 {
+
+#ifdef DEBUG_MANAGER
+  printf("aws-debug: Modal Set: %p\n", comp);
+#endif
+
+
+  // return out if the new modal window is null or there is already a modal_dialog
+  if (comp == NULL || modal_dialog)
+	return;
+
+
+  modal_dialog = comp;
+}
+
+
+
+void awsManager::UnSetModal()
+{
+
+#ifdef DEBUG_MANAGER
+  printf("aws-debug: Modal Unset: %p\n", modal_dialog);
+#endif
+
+  modal_dialog = NULL;
+}
+
+
+bool awsManager::HandleEvent (iEvent &Event)
+{  
+   //  If there is a modal_dialog check to see if we are
+   //  it's or a child of it.  If not return out.
+  if (modal_dialog)
+  {
+    iAwsComponent *comp = ComponentAt(Event.Mouse.x, Event.Mouse.y);
+
+    while (comp)
+    {
+
+      if (comp == modal_dialog)
+        break;
+
+      comp = comp->Parent();
+
+    }
+
+    if (comp == NULL)
+      return true;
+
+  }
+
+
   // Find out what kind of event it is
   switch (Event.Type)
   {

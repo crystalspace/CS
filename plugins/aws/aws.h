@@ -92,6 +92,9 @@ private:
   /// The focused component, NULL otherwise.
   iAwsComponent *focused;
 
+  /// The current modal dialog, NULL if otherwise.
+  iAwsComponent *modal_dialog;
+
   /// True if mouse events are locked into the top window
   bool mouse_captured;
 
@@ -232,6 +235,13 @@ public:
 
   /// Release the mouse events to go where they normally would.
   virtual void ReleaseMouse ();
+
+  /// Set this component to be a modal dialog.
+  virtual void SetModal(iAwsComponent *comp);
+
+  /// Set no active modal dialogs.
+  virtual void UnSetModal();
+
 
 protected:
 
