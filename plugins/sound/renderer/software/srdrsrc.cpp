@@ -348,6 +348,11 @@ void csSoundSourceSoftware::AddToBufferStatic(void *mem, long size)
 
       if (Num == 0)
       {
+	if (!(PlayMethod & SOUND_LOOP))
+	{
+	  Active = false;
+	  break;
+	}
 	if (wait == 0)
 	{
 	  Restart();
