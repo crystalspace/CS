@@ -425,12 +425,12 @@ bool csAVIFormat::HasChunk (ULong id, ULong frameindex)
     else
     {
       char *pp = maxframepos;
-      hcl ch;
+      hcl* ch = new hcl;
       while (pp < moviendpos && maxframe <= frameindex)
       {
 	memcpy (&ch, pp, len_hcl);
-	ch.Endian ();
-	pp += AVI_EVEN(ch.size) + len_hcl;
+	ch->Endian ();
+	pp += AVI_EVEN(ch->size) + len_hcl;
 	maxframepos = pp;
 	maxframe++;
       }
@@ -439,7 +439,7 @@ bool csAVIFormat::HasChunk (ULong id, ULong frameindex)
       {
 	if (pp>moviendpos)
 	{
-	  maxframepos -= (AVI_EVEN(ch.size) + len_hcl);
+	  maxframepos -= (AVI_EVEN(ch->size) + len_hcl);
 	  maxframe--;
 	}
       }
@@ -474,33 +474,33 @@ bool csAVIFormat::GetChunk (ULong frameindex, AVIDataChunk *pChunk)
     
       if (!no_recl)
       {
-	hcl ch;
+	hcl* ch = new hcl;
 	while (startfrom <= frameindex)
 	{
 	  memcpy (&ch, pp, len_hcl);
-	  ch.Endian ();
-	  pp += AVI_EVEN(ch.size) + len_hcl;
+	  ch->Endian ();
+	  pp += AVI_EVEN(ch->size) + len_hcl;
 	  startfrom++;
 	}
-	pChunk->currentframepos = pp - (AVI_EVEN(ch.size) + len_hcl);
+	pChunk->currentframepos = pp - (AVI_EVEN(ch->size) + len_hcl);
 	pChunk->currentframe = frameindex;
-	pp = pp - AVI_EVEN(ch.size) + len_id;
-	maxsize = AVI_EVEN(ch.size);
+	pp = pp - AVI_EVEN(ch->size) + len_id;
+	maxsize = AVI_EVEN(ch->size);
       }
       else 
       { // no_recl == true
-	hcl ch;
+	hcl* ch = new hcl;
 	while (startfrom <= frameindex)
 	{
 	  memcpy (&ch, pp, len_hcl);
-	  ch.Endian ();
-	  pp += AVI_EVEN(ch.size) + len_hcl;
+	  ch->Endian ();
+	  pp += AVI_EVEN(ch->size) + len_hcl;
 	  startfrom++;
 	}
-	pp -= (AVI_EVEN(ch.size) + len_hcl);
+	pp -= (AVI_EVEN(ch->size) + len_hcl);
 	pChunk->currentframepos = pp;
 	pChunk->currentframe = frameindex;
-	maxsize = AVI_EVEN(ch.size) + len_hcl;
+	maxsize = AVI_EVEN(ch->size) + len_hcl;
       }
     }
 
