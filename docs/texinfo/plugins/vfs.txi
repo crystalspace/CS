@@ -158,7 +158,7 @@ here. This example is only intended to understand the concept:
 ;
 ; $. - The current directory.
 ; $@@ - The directory into which CS has been installed. This is
-;      detected by SysSystemDriver::GetInstallPath().
+;      detected by iSystem::GetInstallPath().
 ; $/ - The native path separator character; this value is
 ;      supplied by the VFS manager, so you do not need to define
 ;      it here; you can do so, however, if you really want to.
