@@ -23,6 +23,9 @@
 #include "emit.h"
 #include "ivideo/material.h"
 #include "iengine/material.h"
+#include "iengine/rview.h"
+#include "iengine/camera.h"
+#include "iengine/movable.h"
 #include "qsqrt.h"
 #include "qint.h"
 #include "csgeom/math3d.h"
@@ -547,6 +550,56 @@ void csEmitMeshObject::SetupObject ()
     SetupColor ();
     SetupMixMode ();
   }
+}
+
+
+/// particle backtofront sorting
+struct comppart { csVector3 pos; iParticle *part;};
+static int compareparticle(const void* p1, const void* p2)
+{
+  struct comppart *cp1 = (struct comppart*)p1;
+  struct comppart *cp2 = (struct comppart*)p2;
+  /// pos.z is smaller when close to camera.
+  /// bigger z's should be drawn first.
+  /// thus the bigger z should be considered first.
+  /// so if cp1.z > cp2.z --- return -1 (draw p1 before p2)
+  /// if cp1.z == cp2.z --- return 0 (same)
+  /// if cp1.z < cp2.z --- return +1 (draw p1 after p2)
+  /// this is the sign of cp2.z - cp1.z
+  float val = cp2->pos.z - cp1->pos.z;
+  if(val<0) return -1;
+  if(val>0) return +1;
+  return 0;
+}
+
+bool csEmitMeshObject::Draw (iRenderView* rview, iMovable* movable,
+        csZBufMode mode)
+{
+  // detect if back to front is needed.
+  if(MixMode & CS_FX_ADD)
+    return csParticleSystem::Draw(rview, movable, mode);
+
+  // draw back to front
+  if (vis_cb) if (!vis_cb->BeforeDrawing (this, rview)) return false;
+  csReversibleTransform trans = movable->GetFullTransform ();
+
+  // sort
+  int i;
+  csReversibleTransform tr_o2c = rview->GetCamera()->GetTransform()
+    * trans.GetInverse(); // object to camera space
+  struct comppart *order = new struct comppart [number];
+  for (i = 0 ; i < number ; i++)
+  {
+    order[i].pos = tr_o2c * part_pos[i];
+    order[i].part = GetParticle(i);
+  }
+  qsort(order, number, sizeof( struct comppart ), compareparticle);
+  
+  for (i = 0 ; i < number ; i++)
+    order[i].part->Draw (rview, trans, mode);
+
+  delete[] order;
+  return true;
 }
 
 csEmitMeshObject::csEmitMeshObject (iSystem* system,

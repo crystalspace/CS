@@ -316,6 +316,8 @@ public:
   /// For iMeshObject.
   virtual void HardTransform (const csReversibleTransform& t);
   virtual bool SupportsHardTransform () const { return false; }
+  /// draw back to front if needed
+  virtual bool Draw (iRenderView* rview, iMovable* movable, csZBufMode mode);
 
   SCF_DECLARE_IBASE_EXT (csParticleSystem);
 
