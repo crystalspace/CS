@@ -8,6 +8,9 @@ chronological order.
 
 19-Apr-2004
 	- Eric Sunshine added LGPL license notice to the .m4 and .jam files.
+	- Jorrit fixed a bug in iEngine->CreatePortalContainer(). If there
+	  is a portal render priority then the created mesh will automatically
+	  get that render priority.
 18-Apr-2004
 	- Eric Sunshine fixed CS/bin/autogen.sh so that it returns the exit
 	  status of 'autoconf' as its own exit status. This allows invokers of

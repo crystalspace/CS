@@ -3187,6 +3187,8 @@ csPtr<iMeshWrapper> csEngine::CreatePortalContainer (const char* name,
   	name, sector, pos);
   csMeshWrapper* cmesh = ((csMeshWrapper::MeshWrapper*)(iMeshWrapper*)mesh)
   	->GetCsMeshWrapper ();
+  if (GetPortalRenderPriority () != 0)
+    cmesh->SetRenderPriority (GetPortalRenderPriority ());
   pc->SetMeshWrapper (cmesh);
   pc->DecRef ();
   return csPtr<iMeshWrapper> (mesh);
