@@ -23,7 +23,6 @@
 #include "csextern.h"
 
 #include "ivideo/shader/shader.h"
-#include "ivideo/shader/shader.h"
 #include "shadervar.h"
 
 /**\file
