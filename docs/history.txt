@@ -9,6 +9,8 @@ chronological order.
 6-Aug-2003
 	- Jorrit fixed a compile error in freefnt2 font server related to the
 	  csRefArray->csArray change.
+	- Eric Sunshine patched mk/install.mak to ensure that the `uninst'
+	  object file directory exists at "make install" time.
 5-Aug-2003
 	- Jorrit fixed metaball.mak. Was missing a CSUTIL dependency after
 	  CSSYS.

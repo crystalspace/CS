@@ -291,6 +291,7 @@ install_scripts: $(INSTALL_DIR)/scripts $(INSTALL_SCRIPTS.DIR) \
 # trying to use a blanket approach of globally enabling MAKE_DLL during the
 # installation process will not succeed.
 install_all: \
+  $(OUTDIRS) \
   $(TO_INSTALL.ROOT) \
   $(TO_INSTALL.CONFIG) \
   $(TO_INSTALL.DATA) \
