@@ -29,6 +29,19 @@ SCF_VERSION (iLightingInfo, 0, 3, 0);
  * This interface is implemented by mesh objects that have some kind
  * of lighting system. It has features to initialize lighting, to read
  * it from a cache, ...
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Several mesh objects implement this.
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>SCF_QUERY_INTERFACE() on iMeshObject.
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>The 3D engine plugin (crystalspace.engine.3d).
+ *   </ul>
  */
 struct iLightingInfo : public iBase
 {

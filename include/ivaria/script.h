@@ -28,7 +28,7 @@ SCF_VERSION (iScriptObject, 0, 0, 1);
 /**
  * This provides the interface to an object in an object-oriented scripting
  * language.
- *
+ * <p>
  * Several functions here take a variable-length argument list with a
  * printf-style format string supporting all the argument types supported by
  * printf, except width and precision specifiers, as they have no meaning here.

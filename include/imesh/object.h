@@ -84,6 +84,20 @@ SCF_VERSION (iMeshObject, 0, 3, 0);
  * or similar information. For this reason, a mesh object can only be used
  * in the engine if a hook object is created for it in the engine that does
  * the required management. The hook object is called mesh wrapper.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>All mesh objects implement this.
+ *   <li>iMeshObjectFactory::NewInstance()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iMeshWrapper::GetMeshObject()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>The 3D engine plugin (crystalspace.engine.3d).
+ *   </ul>
  */
 struct iMeshObject : public iBase
 {
@@ -256,10 +270,25 @@ SCF_VERSION (iMeshObjectFactory, 0, 0, 6);
  * mesh objects of a certain type. For example, if you want to have
  * multiple sets of sprites from the same sprite template then
  * you should have an instance of iMeshObjectFactory for evey sprite
- * template and an instance of iMeshObject for every sprite. <p>
- *
+ * template and an instance of iMeshObject for every sprite.
+ * <p>
  * To use a mesh factory in the engine, you have to create a mesh factory
  * wrapper for it.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>All mesh objects implement this.
+ *   <li>iMeshObjectType::NewFactory()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iMeshFactoryWrapper::GetMeshObjectFactory()
+ *   <li>iMeshObject::GetFactory()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>The 3D engine plugin (crystalspace.engine.3d).
+ *   </ul>
  */
 struct iMeshObjectFactory : public iBase
 {
@@ -326,6 +355,20 @@ SCF_VERSION (iMeshObjectType, 0, 0, 2);
  * This plugin describes a specific type of mesh objects. Through
  * this plugin the user can create instances of mesh object factories
  * which can then be used to create instances of mesh objects.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>All mesh object plugins implement this interface.
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_PLUGIN_CLASS()
+ *   <li>CS_LOAD_PLUGIN()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>The 3D engine plugin (crystalspace.engine.3d).
+ *   </ul>
  */
 struct iMeshObjectType : public iBase
 {

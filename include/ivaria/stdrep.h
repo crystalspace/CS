@@ -29,6 +29,15 @@ SCF_VERSION (iStandardReporterListener, 0, 0, 3);
 
 /**
  * Interface to control the settings of the reporter listener plugin.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Standard Reporter Listener plugin (crystalspace.utilities.stdrep)
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   </ul>
  */
 struct iStandardReporterListener : public iBase
 {

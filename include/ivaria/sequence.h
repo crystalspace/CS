@@ -28,6 +28,15 @@ SCF_VERSION (iSequenceOperation, 0, 2, 0);
 /**
  * A sequence operation. This is effectively a callback
  * to the application.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Application using the sequence manager.
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iSequence
+ *   </ul>
  */
 struct iSequenceOperation : public iBase
 {
@@ -54,6 +63,15 @@ SCF_VERSION (iSequenceCondition, 0, 1, 0);
 /**
  * A sequence condition. This is also a callback to the application.
  * This condition returns true on success.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Application using the sequence manager.
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iSequence
+ *   </ul>
  */
 struct iSequenceCondition : public iBase
 {
@@ -87,6 +105,15 @@ SCF_VERSION (iSequence, 0, 0, 2);
  * All operations added to this sequence will be executed relative to the
  * time the sequence itself is executed. The execute order of operations
  * added at the same relative time is undefined.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iSequenceManager::NewSequence()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iSequenceManager
+ *   </ul>
  */
 struct iSequence : public iBase
 {
@@ -143,6 +170,19 @@ SCF_VERSION (iSequenceManager, 0, 1, 0);
  * The sequence manager. The sequence manager is a plugin that will perform
  * sequences of operations depending on elapsed time. It is mostly useful
  * for demo's or intros of games.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Sequence Manager plugin (crystalspace.utilities.sequence)
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEngineSequenceManager
+ *   </ul>
  */
 struct iSequenceManager : public iBase
 {

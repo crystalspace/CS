@@ -135,6 +135,17 @@ SCF_VERSION (iPolygonHandle, 0, 0, 1);
  * iThingState->CreatePolygonHandle(). Note that this handle will make
  * sure that the returned pointers are cleared if the thing or thing
  * factory happens to be removed.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iThingState::CreatePolygonHandle()
+ *   <li>iThingFactoryState::CreatePolygonHandle()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iThingState
+ *   <li>iThingFactoryState
+ *   </ul>
  */
 struct iPolygonHandle : public iBase
 {
@@ -174,6 +185,21 @@ SCF_VERSION (iThingFactoryState, 0, 2, 0);
 /**
  * This is the state interface to access the internals of a thing
  * mesh factory.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Thing mesh object plugin (crystalspace.mesh.object.thing)
+ *   <li>iMeshObjectType::NewFactory()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>SCF_QUERY_INTERFACE() on iMeshFactoryWrapper::GetMeshObjectFactory()
+ *   <li>iThingState::GetFactory()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Thing Factory Loader plugin (crystalspace.mesh.loader.factory.thing)
+ *   </ul>
  */
 struct iThingFactoryState : public iBase
 {
@@ -585,6 +611,20 @@ SCF_VERSION (iThingState, 0, 7, 0);
 /**
  * This is the state interface to access the internals of a thing
  * mesh object.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Thing mesh object plugin (crystalspace.mesh.object.thing)
+ *   <li>iMeshObjectFactory::NewInstance()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>SCF_QUERY_INTERFACE() on iMeshWrapper::GetMeshObject()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Thing Loader plugin (crystalspace.mesh.loader.thing)
+ *   </ul>
  */
 struct iThingState : public iBase
 {
@@ -694,6 +734,15 @@ SCF_VERSION (iThingEnvironment, 0, 3, 0);
 /**
  * This interface is implemented by the iObjectType for things.
  * Using this interface you can access some global information for things.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Thing mesh plugin.
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>SCF_QUERY_INTERFACE on thing mesh plugin (iMeshObjectType).
+ *   </ul>
  */
 struct iThingEnvironment : public iBase
 {

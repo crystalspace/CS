@@ -40,6 +40,20 @@ SCF_VERSION (iBCTerrState, 0, 0, 3);
 
 /**
  * This interface describes the API for the Bezier Curve terrain object.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>BCTerr mesh object plugin (crystalspace.mesh.object.bcterr)
+ *   <li>iMeshObjectFactory::NewInstance()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>SCF_QUERY_INTERFACE() on iMeshWrapper::GetMeshObject()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>BCTerr Loader plugin (crystalspace.mesh.loader.bcterr)
+ *   </ul>
  */
 struct iBCTerrState : public iBase
 {
@@ -97,6 +111,20 @@ SCF_VERSION (iBCTerrFactoryState, 0, 0, 3);
 
 /**
  * This interface describes the API for the Bezier Curve terrain Factory object.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>BCTerr mesh object plugin (crystalspace.mesh.object.bcterr)
+ *   <li>iMeshObjectType::NewFactory()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>SCF_QUERY_INTERFACE() on iMeshFactoryWrapper::GetMeshObjectFactory()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>BCTerr Factory Loader plugin (crystalspace.mesh.loader.factory.bcterr)
+ *   </ul>
  */
 struct iBCTerrFactoryState : public iBase
 {

@@ -33,6 +33,21 @@ SCF_VERSION (iBallState, 0, 0, 4);
  * Using this you can set up the ball to whatever (ball) shape you
  * want it to have and the appearance. The ball plugin implements
  * this interface in addition to iMeshObject.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Ball mesh object plugin (crystalspace.mesh.object.ball)
+ *   <li>iMeshObjectFactory::NewInstance()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>SCF_QUERY_INTERFACE() on iMeshWrapper::GetMeshObject()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Ball Loader plugin (crystalspace.mesh.loader.ball)
+ *   <li>Ball Loader plugin (crystalspace.mesh.loader.factory.ball)
+ *   </ul>
  */
 struct iBallState : public iBase
 {

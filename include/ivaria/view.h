@@ -32,6 +32,19 @@ struct iClipper2D;
 /**
  * The iView class encapsulates the top-level Crystal Space
  * renderer interface. It is basically a camera and a clipper.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Applications using csView.
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>Application stores it.
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Application uses it.
+ *   </ul>
  */
 struct iView : public iBase
 {

@@ -38,6 +38,11 @@ SCF_VERSION (iEmitCylinderTangent, 0, 0, 1);
 /**
  * This interface is for objects that can generate 3d vectors, which
  * are used for emitting.
+ * <p>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEmitState
+ *   </ul>
  */
 struct iEmitGen3D : public iBase
 {
@@ -45,14 +50,36 @@ struct iEmitGen3D : public iBase
   virtual void GetValue(csVector3& value, csVector3 &given) = 0;
 };
 
-/// fixed value emitter - returns a particular point value.
+/**
+ * Fixed value emitter - returns a particular point value.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iEmitFactoryState::CreateFixed()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEmitState
+ *   </ul>
+ */
 struct iEmitFixed : public iEmitGen3D
 {
   /// set the fixed value
   virtual void SetValue(const csVector3& value) = 0;
 };
 
-/// sphere value emitter - returns points in a sphere.
+/**
+ * Sphere value emitter - returns points in a sphere.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iEmitFactoryState::CreateSphere()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEmitState
+ *   </ul>
+ */
 struct iEmitSphere : public iEmitGen3D
 {
   /// set content, center and min, max radius
@@ -61,7 +88,18 @@ struct iEmitSphere : public iEmitGen3D
   virtual void GetContent(csVector3& center, float& min, float& max) = 0;
 };
 
-/// box value emitter - returns points in an (axis aligned) box.
+/**
+ * Box value emitter - returns points in an (axis aligned) box.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iEmitFactoryState::CreateBox()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEmitState
+ *   </ul>
+ */
 struct iEmitBox : public iEmitGen3D
 {
   /// set content, min and max vector values
@@ -70,7 +108,18 @@ struct iEmitBox : public iEmitGen3D
   virtual void GetContent(csVector3& min, csVector3& max) = 0;
 };
 
-/// cone value emitter - returns points in a cone.
+/**
+ * Cone value emitter - returns points in a cone.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iEmitFactoryState::CreateCone()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEmitState
+ *   </ul>
+ */
 struct iEmitCone : public iEmitGen3D
 {
   /**
@@ -84,7 +133,18 @@ struct iEmitCone : public iEmitGen3D
     float& azimuth, float& aperture, float& min, float& max) = 0;
 };
 
-/// mix value emitter - returns a weighted random mix of other emitters.
+/**
+ * Mix value emitter - returns a weighted random mix of other emitters.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iEmitFactoryState::CreateMix()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEmitState
+ *   </ul>
+ */
 struct iEmitMix : public iEmitGen3D
 {
   /// add a weighted emitter to the mix
@@ -105,7 +165,18 @@ struct iEmitMix : public iEmitGen3D
   virtual void GetContent(int num, float& weight, iEmitGen3D*& emit) = 0;
 };
 
-/// line value emitter - returns values on the line between start and end.
+/**
+ * Line value emitter - returns values on the line between start and end.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iEmitFactoryState::CreateLine()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEmitState
+ *   </ul>
+ */
 struct iEmitLine : public iEmitGen3D
 {
   /// set content, start and end vector values
@@ -114,7 +185,18 @@ struct iEmitLine : public iEmitGen3D
   virtual void GetContent(csVector3& start, csVector3& end) = 0;
 };
 
-/// cylinder value emitter - returns values in a cylinder.
+/**
+ * Cylinder value emitter - returns values in a cylinder.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iEmitFactoryState::CreateCylinder()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEmitState
+ *   </ul>
+ */
 struct iEmitCylinder : public iEmitGen3D
 {
   /// set content, start and end position of cylinder, min/max distance
@@ -126,8 +208,17 @@ struct iEmitCylinder : public iEmitGen3D
 };
 
 /**
- * sphere tangential value emitter - gives direction tangential to sphere
+ * Sphere tangential value emitter - gives direction tangential to sphere
  * Uses the given point, gives a tangential direction for that.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iEmitFactoryState::CreateSphereTangent()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEmitState
+ *   </ul>
  */
 struct iEmitSphereTangent : public iEmitGen3D
 {
@@ -138,8 +229,17 @@ struct iEmitSphereTangent : public iEmitGen3D
 };
 
 /**
- * cylinder tangential value emitter - gives direction tangential to cylinder
+ * Cylinder tangential value emitter - gives direction tangential to cylinder
  * Uses the given point, gives a tangential direction for that
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iEmitFactoryState::CreateCylinderTangent()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEmitState
+ *   </ul>
  */
 struct iEmitCylinderTangent : public iEmitGen3D
 {
@@ -155,6 +255,20 @@ SCF_VERSION (iEmitFactoryState, 0, 0, 1);
 
 /**
  * This interface describes the API for the emitter mesh factory object.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Emit mesh object plugin (crystalspace.mesh.object.emit)
+ *   <li>iMeshObjectType::NewFactory()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>SCF_QUERY_INTERFACE() on iMeshFactoryWrapper::GetMeshObjectFactory()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Emit Factory Loader plugin (crystalspace.mesh.loader.factory.emit)
+ *   </ul>
  */
 struct iEmitFactoryState : public iBase
 {
@@ -183,6 +297,20 @@ SCF_VERSION (iEmitState, 0, 0, 1);
 
 /**
  * This interface describes the API for the emitter mesh object.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Emit mesh object plugin (crystalspace.mesh.object.emit)
+ *   <li>iMeshObjectFactory::NewInstance()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>SCF_QUERY_INTERFACE() on iMeshWrapper::GetMeshObject()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Emit Loader plugin (crystalspace.mesh.loader.emit)
+ *   </ul>
  */
 struct iEmitState : public iBase
 {

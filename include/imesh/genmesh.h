@@ -34,6 +34,20 @@ SCF_VERSION (iGeneralMeshState, 0, 0, 3);
 
 /**
  * This interface describes the API for the general mesh object.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Genmesh mesh object plugin (crystalspace.mesh.object.genmesh)
+ *   <li>iMeshObjectFactory::NewInstance()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>SCF_QUERY_INTERFACE() on iMeshWrapper::GetMeshObject()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Genmesh Loader plugin (crystalspace.mesh.loader.genmesh)
+ *   </ul>
  */
 struct iGeneralMeshState : public iBase
 {
@@ -94,6 +108,20 @@ SCF_VERSION (iGeneralFactoryState, 0, 1, 0);
  * exception to this rule. Setting that on the factory will have an
  * effect immediatelly on all mesh objects created from that factory
  * except for those mesh objects that have their own material set.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Genmesh mesh object plugin (crystalspace.mesh.object.genmesh)
+ *   <li>iMeshObjectType::NewFactory()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>SCF_QUERY_INTERFACE() on iMeshFactoryWrapper::GetMeshObjectFactory()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Genmesh Factory Loader plugin (crystalspace.mesh.loader.factory.genmesh)
+ *   </ul>
  */
 struct iGeneralFactoryState : public iGeneralMeshState
 {

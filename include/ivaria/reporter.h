@@ -73,6 +73,16 @@ SCF_VERSION (iReporterListener, 0, 0, 1);
 /**
  * Implement this interface if you're interested in hearing about
  * new messages on the reporter.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Application.
+ *   <li>Standard reporter listener plugin (crystalspace.utilities.stdrep)
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iReporter
+ *   </ul>
  */
 struct iReporterListener : public iBase
 {
@@ -89,6 +99,11 @@ SCF_VERSION (iReporterIterator, 0, 0, 1);
 
 /**
  * An iterator to iterate over all messages in the reporter.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iReporter::GetMessageIterator()
+ *   </ul>
  */
 struct iReporterIterator : public iBase
 {
@@ -126,6 +141,20 @@ SCF_VERSION (iReporter, 0, 1, 0);
  * standard reporter listener (iStandardReporterListener) is such
  * a plugin. It will print out the messages that arrive
  * on the reporter.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Reporter plugin (crystalspace.utilities.reporter)
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Entire CS and application.
+ *   <li>csReporterHelper
+ *   </ul>
  */
 struct iReporter : public iBase
 {
