@@ -1531,13 +1531,11 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights)
     csVector3 obj_light_pos = movable.GetTransform ().Other2This (wor_light_pos);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_center);
 
-	float in_obj_dist = 0.0f;
+    float in_obj_dist = 0.0f;
 
-	// FIX: Check for divide by zero
-	if(obj_sq_dist > 0.0)
-	{
-		in_obj_dist = qisqrt (obj_sq_dist);
-	}
+    // FIX: Check for divide by zero
+    if (obj_sq_dist > SMALL_EPSILON)
+      in_obj_dist = qisqrt (obj_sq_dist);
 
     csVector3 obj_light_dir = (obj_light_pos - obj_center);
 

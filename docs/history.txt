@@ -1,5 +1,8 @@
 The history order has been reversed so that new features are at the top.
 
+30-Jan-2001
+	- Fixed the fix from Philip Wyett to make it slightly more
+	  robust.
 29-Jan-2001
 	- Philip Wyett added a divide by zero check in csSprite3D.
 	  This fixes ptlab on Windows.
