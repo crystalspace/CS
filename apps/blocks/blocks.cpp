@@ -81,6 +81,14 @@ static long LastConnectTime = 0;
 // End networking stuff.
 //-----------------------------------------------------------------------------
 
+#define  QUERY_PLUG_ID(myPlug, funcid, iFace, errMsg) \
+  myPlug = QUERY_PLUGIN_ID (Sys, funcid, iFace); \
+  if (!myPlug) \
+  { \
+    Sys->Printf (MSG_FATAL_ERROR, errMsg); \
+    return -1; \
+  }
+
 #define  QUERY_PLUG(myPlug, iFace, errMsg) \
   myPlug = QUERY_PLUGIN (Sys, iFace); \
   if (!myPlug) \
@@ -89,8 +97,8 @@ static long LastConnectTime = 0;
     return -1; \
   }
 
-#define  QUERY_PLUG_NM(myPlug, iFace, errMsg) \
-  myPlug = QUERY_PLUGIN (Sys, iFace); \
+#define  QUERY_PLUG_NM(myPlug, funcid, iFace, errMsg) \
+  myPlug = QUERY_PLUGIN_ID (Sys, funcid, iFace); \
   if (!myPlug) \
   { \
     Sys->Printf (MSG_INITIALIZATION, errMsg); \
@@ -3055,14 +3063,14 @@ int main (int argc, char* argv[])
   }
 
   // Find the pointer to engine plugin
-  QUERY_PLUG (Sys->engine, iEngine, "No iEngine plugin!\n");
+  QUERY_PLUG_ID (Sys->engine, CS_FUNCID_ENGINE, iEngine, "No iEngine plugin!\n");
 
   Sys->thing_type = Sys->engine->GetThingType ();
 
-  QUERY_PLUG (Sys->myG3D, iGraphics3D, "No iGraphics3D plugin!\n");
+  QUERY_PLUG_ID (Sys->myG3D, CS_FUNCID_VIDEO, iGraphics3D, "No iGraphics3D plugin!\n");
   QUERY_PLUG (Sys->myG2D, iGraphics2D, "No iGraphics2D plugin!\n");
-  QUERY_PLUG (Sys->myVFS, iVFS, "No iVFS plugin!\n");
-  QUERY_PLUG_NM (Sys->myNetDrv, iNetworkDriver, "No iNetworkDriver plugin!\n");
+  QUERY_PLUG_ID (Sys->myVFS, CS_FUNCID_VFS, iVFS, "No iVFS plugin!\n");
+  QUERY_PLUG_NM (Sys->myNetDrv, CS_FUNCID_NETDRV, iNetworkDriver, "No iNetworkDriver plugin!\n");
 
   // Get a font handle
   Sys->font = Gfx2D->GetFontServer ()->LoadFont (CSFONT_LARGE);
