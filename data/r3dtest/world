@@ -33,7 +33,7 @@
     <settings>
         <clearzbuf>yes</clearzbuf>
         <lightmapcellsize>16</lightmapcellsize>
-	<renderloop>myLoop</renderloop>
+        <renderloop>myLoop</renderloop>
     </settings>
     <key name="map2cs_scaling" value="0.025" />
     <start>
@@ -848,15 +848,13 @@
         </meshobj>
         <light>
             <center x="-4.2" y="-11" z="-1.4" />
-            <radius>150</radius>
+            <radius>5</radius>
             <color red="1.5625" green="1.5625" blue="0.784314" />
-            <attenuation>none</attenuation>
         </light>
         <light>
             <center x="1.8" y="-12" z="-8.2" />
-            <radius>150</radius>
+            <radius>5</radius>
             <color red="1.5625" green="0.784314" blue="0.392157" />
-            <attenuation>none</attenuation>
         </light>
         <meshobj name="e6">
             <plugin>thing</plugin>

@@ -777,7 +777,6 @@ bool csGLGraphics3D::Open ()
 
   csRef<csShaderVariable> fogvar = shadermgr->CreateVariable(
     strings->Request ("standardtex fog"));
-  fogvar->SetType (csShaderVariable::TEXTURE);
   fogvar->SetValue (fogtex);
   shadermgr->AddVariable(fogvar);
 
@@ -854,6 +853,40 @@ bool csGLGraphics3D::Open ()
     strings->Request ("standardtex normalization map"));
   normvar->SetValue (normtex);
   shadermgr->AddVariable(normvar);
+
+
+  #define CS_ATTTABLE_SIZE 128
+
+  unsigned char *attenuationdata = 
+    new unsigned char[CS_ATTTABLE_SIZE * CS_ATTTABLE_SIZE * 4];
+  unsigned char* data = attenuationdata;
+  for (int y=0; y<CS_ATTTABLE_SIZE; y++)
+  {
+    for (int x=0; x<CS_ATTTABLE_SIZE; x++)
+    {
+      float yv = 3.0*(y-CS_ATTTABLE_SIZE/2+0.5)/(float)(CS_ATTTABLE_SIZE/2);
+      float xv = 3.0*(x-CS_ATTTABLE_SIZE/2+0.5)/(float)(CS_ATTTABLE_SIZE/2);
+      float i = exp(-0.7*(xv*xv+yv*yv));
+      *data++ = i>1?255:i*255;
+      *data++ = i>1?255:i*255;
+      *data++ = i>1?255:i*255;
+      *data++ = i>1?255:i*255;
+    }
+  }
+
+  img  = csPtr<iImage> (new csImageMemory (
+    CS_ATTTABLE_SIZE, CS_ATTTABLE_SIZE, attenuationdata, true, 
+    CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA));
+  imgvec = csPtr<iImageVector> (new csImageVector ());
+  imgvec->AddImage (img);
+  csRef<iTextureHandle> atttex = txtmgr->RegisterTexture (
+    imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
+    iTextureHandle::CS_TEX_IMG_2D);
+
+  csRef<csShaderVariable> attvar = shadermgr->CreateVariable(
+    strings->Request ("standardtex attenuation"));
+  attvar->SetValue (atttex);
+  shadermgr->AddVariable(attvar);
 
   return true;
 }

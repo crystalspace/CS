@@ -27,6 +27,7 @@ chronological order.
 	      for both old and new renderer. We're not there yet though...
         - acraig fixed a problem in sprcal3d where it was using the old
           renderer iLight::GetSquaredRadius() function that no longer exists.
+	- Anders Stenberg added attenuation shader for PPL
 6-Sep-2003
 	- Jorrit fixed a compile bug in perfstat.
 	- Anders Stenberg did the following changes to the new renderer:

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<fixedfp>
+	<layer>
+		<colorsource num="0" source="texture" modifier="color"/>
+		<coloroperation operation="replace"/>
+	</layer>
+	<layer>
+		<colorsource num="0" source="texture" modifier="color"/>
+		<colorsource num="1" source="previous layer" modifier="color"/>
+		<coloroperation operation="modulate" scale="2"/>
+	</layer>
+</fixedfp>

@@ -1,7 +1,16 @@
 <shader name="light">
 	<technique priority="200">
 		<pass>
-		  <mixmode><add/></mixmode>
+			<writemask r="false" g="false" b="false" a="true"/>
+		  <mixmode><copy/></mixmode>
+  		<streammapping stream="vertices" destination="attribute 0" />
+			<vp type="gl_arb_vp" file="/shader/flat_ppl_attenuation.avp"/>
+      <texturemapping unit="0" name="standardtex attenuation" />
+      <texturemapping unit="1" name="standardtex attenuation" />
+			<fp type="gl_fixed_fp" file="/shader/tex_modulate.ffp"/>
+		</pass>
+		<pass>
+		  <mixmode><destalphaadd/></mixmode>
   		<streammapping stream="vertices" destination="attribute 0" />
       <streammapping stream="colors" destination="attribute 1" />
       <streammapping stream="normals" destination="attribute 2" />
