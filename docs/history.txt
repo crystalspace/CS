@@ -26,6 +26,12 @@ The history order is reversed so that new features are at the top.
 	  though (and this leak is OpenGL specific).
 	- Fixed a potential problem in the OpenGL proc textures implementation
 	  (a missing init to NULL if setup of texture failed).
+	- Restructured the map loading tutorial a little so that it now
+	  has a LoadMap() function. Also updated the tutorial documentation.
+	- Temporarily added a handler for the 'l' key in the map loading
+	  tutorial (code only) to reload the current level. This is for
+	  debugging memory leaks in the engine. Also enabled the debugging
+	  graph.
 22-Nov-2001
 	- Further work on documentation. Created a 'Documentation Guide'
 	  section which guides the CS game writer through some of the more

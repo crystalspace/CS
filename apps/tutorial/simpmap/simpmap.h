@@ -47,6 +47,7 @@ private:
   bool HandleEvent (iEvent& ev);
   void SetupFrame ();
   void FinishFrame ();
+  bool LoadMap ();
 
 public:
   Simple ();

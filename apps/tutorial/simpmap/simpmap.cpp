@@ -52,6 +52,7 @@
 #include "ivaria/reporter.h"
 #include "ivaria/stdrep.h"
 #include "csutil/cmdhelp.h"
+#include "csutil/debug.h"
 
 CS_IMPLEMENT_APPLICATION
 
@@ -139,6 +140,14 @@ bool Simple::HandleEvent (iEvent& ev)
     }
     return true;
   }
+  else if (ev.Type == csevKeyDown && ev.Key.Code == 'l')
+  {
+    csDebuggingGraph::Dump (NULL);
+    engine->DeleteAll ();
+    csDebuggingGraph::Dump (NULL);
+    LoadMap ();
+    return true;
+  }
 
   return false;
 }
@@ -148,10 +157,58 @@ bool Simple::SimpleEventHandler (iEvent& ev)
   return simple->HandleEvent (ev);
 }
 
+bool Simple::LoadMap ()
+{
+  // Set VFS current directory to the level we want to load.
+  iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
+  VFS->ChDir ("/lev/partsys");
+  VFS->DecRef ();
+  // Load the level file which is called 'world'.
+  if (!loader->LoadMapFile ("world"))
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simpmap",
+    	"Couldn't load level!");
+    return false;
+  }
+  engine->Prepare ();
+
+  // Find the starting position in this level.
+  csVector3 pos (0, 0, 0);
+  if (engine->GetCameraPositions ()->GetCount () > 0)
+  {
+    // There is a valid starting position defined in the level file.
+    iCameraPosition* campos = engine->GetCameraPositions ()->Get (0);
+    room = engine->GetSectors ()->FindByName (campos->GetSector ());
+    pos = campos->GetPosition ();
+  }
+  else
+  {
+    // We didn't find a valid starting position. So we default
+    // to going to room called 'room' at position (0,0,0).
+    room = engine->GetSectors ()->FindByName ("room");
+  }
+  if (!room)
+  {
+    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
+    	"crystalspace.application.simple1",
+      	"Can't find a valid starting position!");
+    return false;
+  }
+
+  view->GetCamera ()->SetSector (room);
+  view->GetCamera ()->GetTransform ().SetOrigin (pos);
+
+  iTextureManager* txtmgr = g3d->GetTextureManager ();
+  txtmgr->SetPalette ();
+  return true;
+}
+
 bool Simple::Initialize (int argc, const char* const argv[])
 {
   object_reg = csInitializer::CreateEnvironment (argc, argv);
   if (!object_reg) return false;
+  csDebuggingGraph::SetupGraph (object_reg);
 
   if (!csInitializer::RequestPlugins (object_reg,
   	CS_REQUEST_VFS,
@@ -241,51 +298,11 @@ bool Simple::Initialize (int argc, const char* const argv[])
     return false;
   }
 
-  // Set VFS current directory to the level we want to load.
-  iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
-  VFS->ChDir ("/lev/flarge");
-  VFS->DecRef ();
-  // Load the level file which is called 'world'.
-  if (!loader->LoadMapFile ("world"))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simpmap",
-    	"Couldn't load level!");
-    return false;
-  }
-  engine->Prepare ();
-
-  // Find the starting position in this level.
-  csVector3 pos (0, 0, 0);
-  if (engine->GetCameraPositions ()->GetCount () > 0)
-  {
-    // There is a valid starting position defined in the level file.
-    iCameraPosition* campos = engine->GetCameraPositions ()->Get (0);
-    room = engine->GetSectors ()->FindByName (campos->GetSector ());
-    pos = campos->GetPosition ();
-  }
-  else
-  {
-    // We didn't find a valid starting position. So we default
-    // to going to room called 'room' at position (0,0,0).
-    room = engine->GetSectors ()->FindByName ("room");
-  }
-  if (!room)
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-    	"crystalspace.application.simple1",
-      	"Can't find a valid starting position!");
-    return false;
-  }
-
   view = new csView (engine, g3d);
-  view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (pos);
   iGraphics2D* g2d = g3d->GetDriver2D ();
   view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
-  iTextureManager* txtmgr = g3d->GetTextureManager ();
-  txtmgr->SetPalette ();
+  if (!LoadMap ()) return false;
   return true;
 }
 

@@ -18,7 +18,8 @@ in the code.
 @subsection Minimal Base Code
 
 To start with we first take the code of tutorial one
-and remove the code that creates geometry. This results in the following
+and remove the code that creates geometry. In addition we add
+a new @code{LoadMap()} function. This results in the following
 for @file{simple.h}:
 
 @example
@@ -53,6 +54,7 @@ private:
   bool HandleEvent (iEvent& ev);
   void SetupFrame ();
   void FinishFrame ();
+  bool LoadMap ();
 
 public:
   Simple ();
@@ -347,14 +349,12 @@ Here we add the code to load a map. In this example we will load the
 
 In the second tutorial we already mentioned @sc{vfs} (@pxref{VFS}). This
 is important in this case too since we are going to load the map from
-the virtual filesystem. To do this we first add the following code
-right before the creation of the view:
+the virtual filesystem. To do this we first add the new @code{LoadMap()}
+routine right before the @code{Initialize()} function:
 
 @example
-bool Simple::Initialize (int argc, const char* const argv[])
+bool Simple::LoadMap ()
 @{
-  @dots{}
-
   // Set VFS current directory to the level we want to load.
   iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);
   VFS->ChDir ("/lev/flarge");
@@ -369,8 +369,10 @@ bool Simple::Initialize (int argc, const char* const argv[])
   @}
   engine->Prepare ();
 
-  @dots{}
-@end example
+  iTextureManager* txtmgr = g3d->GetTextureManager ();
+  txtmgr->SetPalette ();
+  return true;
+@}
 
 This code will first use @code{iVFS::ChDir()} to set the current
 directory in the virtual file system to @file{/lev/flarge}. In the
@@ -389,6 +391,26 @@ If this is succesful then you must call @code{iEngine::Prepare()} to
 make sure that all lightmaps are correctly loaded from the cache
 and other necessary setup work is done (i.e. textures are registered
 and so on).
+
+We additionally change the last part of @code{Initialize()} to
+this:
+
+@example
+bool Simple::Initialize (int argc, const char* const argv[])
+@{
+  @dots{}
+
+  view = new csView (engine, g3d);
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+
+  if (!LoadMap ()) return false;
+  return true;
+@}
+@end example
+
+So first we create our view but doesn't yet set the current sector.
+@code{LoadMap()} will do that based on the loaded level.
 
 @node Simple Locating the Camera, , Simple Loading The Map, Tutorial Simple Map
 @subsection Locating the Camera
@@ -413,7 +435,7 @@ First add the following to the include section:
 #include "iengine/campos.h"
 @end example
 
-Then add the following somewhere before the creation of the view:
+Then add the following after @code{engine->Prepare()} in @code{LoadMap()}:
 
 @example
   // Find the starting position in this level.
@@ -438,6 +460,13 @@ Then add the following somewhere before the creation of the view:
       	"Can't find a valid starting position!");
     return false;
   @}
+  view->GetCamera ()->SetSector (room);
+  view->GetCamera ()->GetTransform ().SetOrigin (pos);
+
+  iTextureManager* txtmgr = g3d->GetTextureManager ();
+  txtmgr->SetPalette ();
+  return true;
+@}
 @end example
 
 First we see how many camera positions there were defined in the
@@ -446,13 +475,6 @@ then the map didn't define a starting position. In that case we will
 assume there is a sector called 'room' and we will start the camera
 at (0,0,0) in that sector. But otherwise we will use the first
 starting position defined in the map.
-
-Then you also have to modify the call to @code{SetOrigin()} so that
-it reads:
-
-@example
-  view->GetCamera ()->GetTransform ().SetOrigin (pos);
-@end example
 
 This is all. After adding this code this application will now load
 the 'flarge' map and display it so you can run around in this level.
