@@ -30,7 +30,7 @@ LIBHELP = \
 SYSHELP = \
   echo $"The makefile system can be configured for the following platforms:$"
 define SYSMODIFIERSHELP
-  echo $"  -*- Modifiers -*-$"
+  echo $"+++ Modifiers +++$"
   echo $"  USE_DLL=yes$|no$"
   echo $"      Build drivers/plugins as dynamic/static modules$"
   echo $"  MODE=optimize$|debug$|profile$"
