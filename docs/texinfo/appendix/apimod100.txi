@@ -26,8 +26,8 @@ track of the index of the current item of an array iteration.  Fixing forward
 iteration over a @code{csArray<>} to instead use @samp{size_t} is simple:
 
 @example
-csArray<@dots{}> someArray;
-for (int i = 0, n = someArray.Length(); i < n; i++)
+csArray<@dots{}> a;
+for (int i = 0, n = a.Length(); i < n; i++)
 @{
   @dots{}
 @}
@@ -38,7 +38,7 @@ Is changed to:
 
 @example
 @dots{}
-for (size_t i = 0, n = someArray.Length(); i < n; i++)
+for (size_t i = 0, n = a.Length(); i < n; i++)
 @dots{}
 @end example
 
@@ -47,8 +47,8 @@ Backward iteration is a bit more problematic. As mentioned before,
 problem in constructs like:
 
 @example
-csArray<@dots{}> someArray;
-for (int i = someArray.Length() - 1; i >= 0; i--)
+csArray<@dots{}> a;
+for (int i = a.Length() - 1; i >= 0; i--)
 @{
   @dots{}
 @}
@@ -61,7 +61,7 @@ of the loop is executed correctly. However, decrementing @samp{i} will
 is unsigned. Instead, decreasing will make @samp{i} wrap around from 0 to
 something like 0xffffffff (on 32-bit machines). Clearly, this is greater
 than 0, effectively causing an infinite loop. The same thing also happens when
-@samp{someArray} has no items (i.e. @samp{someArray.Length() == 0}). Here the
+@samp{a} has no items (i.e. @samp{a.Length() == 0}). Here the
 -1 in the initialization of @samp{i} causes wrap-around.
 
 Possible solutions include:
@@ -75,16 +75,16 @@ Use an @code{int}-typed counter variable and cast the array length to
 Re-write the loop to deal properly with the unsigned nature of @samp{size_t}:
 
 @example
-csArray<@dots{}> someArray;
-for (size_t i = someArray.Length(); i-- > 0;)
+csArray<@dots{}> a;
+for (size_t i = a.Length(); i-- > 0;)
 @{
   @dots{}
 @}
 @end example
 
 This code does the same as the @samp{int} version above, iterating from 
-@samp{someArray.Length() - 1} to 0, inclusively. It also correctly works
-in the case @samp{someArray.Length() == 0}. The ``trick'' is to place the 
+@samp{a.Length() - 1} to 0, inclusively. It also correctly works
+in the case @samp{a.Length() == 0}. The ``trick'' is to place the 
 modification of @samp{i} as a post-decrement in the loop condition. This 
 way, as soon as @samp{i} becomes 0, the loop is terminated. The 
 post-decrement ensures that @samp{i} has the expected value in the loop body.
@@ -107,8 +107,8 @@ actually a valid index by testing with @samp{>= 0} no longer works since
 equality against @samp{csArrayItemNotFound}:
 
 @example
-csArray<@dots{}> someArray;
-int index = someArray.Find (@dots{});
+csArray<@dots{}> a;
+int index = a.Find (@dots{});
 if (i >= 0)
 @{
   /* Item found */
@@ -124,8 +124,8 @@ else
 Has to be replaced with:
 
 @example
-csArray<@dots{}> someArray;
-size_t index = someArray.Find (@dots{});
+csArray<@dots{}> a;
+size_t index = a.Find (@dots{});
 if (i != csArrayItemNotFound)
 @{
   /* Item found */

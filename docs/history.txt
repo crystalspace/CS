@@ -11,6 +11,8 @@ chronological order.
 	  Eric Sunshine in apimod98.txi.
 	- Jorrit fixed a size_t related mismatch in csEvent and iEvent which
 	  caused compile errors on MacOS/X.
+	- Eric Sunshine eliminated underfull 'hbox' warnings from TeX in
+	  apimod100.txi.
 11-Jul-2004
 	- res made the following changes:
 	    - Removed the fake bool stuff. Compilers that are able to deal with
