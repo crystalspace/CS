@@ -99,12 +99,6 @@ struct iRenderBuffer : public iBase
   /// Gets the component type
   virtual csRenderBufferComponentType GetComponentType () const = 0;
 
-  /// Returns wheter the buffer is discarded or not
-  virtual bool IsDiscarded() const = 0;
-
-  /// Set if buffer can be discarded or not
-  virtual void CanDiscard(bool value) = 0;
-
   /// Get type of buffer (where it's located)
   virtual csRenderBufferType GetBufferType() const = 0;
 

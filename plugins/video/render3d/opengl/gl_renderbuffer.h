@@ -35,7 +35,6 @@ private:
   csRenderBufferType type;
   csRenderBufferComponentType comptype;
   bool locked;
-  bool discarded;
 public:
   SCF_DECLARE_IBASE;
 
@@ -50,7 +49,6 @@ public:
     csSysRenderBuffer::comptype = comptype;
     csSysRenderBuffer::compcount = compcount;
     locked = false;
-    discarded = true;
   }
 
   virtual ~csSysRenderBuffer ()
@@ -70,11 +68,7 @@ public:
   }
 
   /// Releases the buffer. After this all writing to the buffer is illegal
-  virtual void Release() { locked = false; discarded = false; }
-
-  virtual bool IsDiscarded() const { return discarded; }
-
-  virtual void CanDiscard(bool value) {}
+  virtual void Release() { locked = false; }
 
   /// Get type of buffer (where it's located)
   virtual csRenderBufferType GetBufferType() const { return type; }
@@ -104,7 +98,6 @@ private:
   csRenderBufferType type;
   csRenderBufferComponentType comptype;
   bool locked;
-  bool discarded;
   csRenderBufferLockType lastLock;
   csGLExtensionManager *ext;
 public:
@@ -120,7 +113,6 @@ public:
     csVBORenderBuffer::compcount = compcount;
     csVBORenderBuffer::ext = ext;
     locked = false;
-    discarded = true;
     ext->glGenBuffersARB (1, &bufferId);
     ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, bufferId);
     ext->glBufferDataARB (GL_ARRAY_BUFFER_ARB, size, 0, 
@@ -163,15 +155,10 @@ public:
     {
       ext->glBindBufferARB (GL_ARRAY_BUFFER_ARB, bufferId);
       ext->glUnmapBufferARB (GL_ARRAY_BUFFER_ARB);
-      discarded = false;
     }
     locked = false;
     lastLock = CS_BUF_LOCK_NOLOCK;
   }
-
-  virtual bool IsDiscarded() const { return discarded; }
-
-  virtual void CanDiscard(bool value) {}
 
   /// Get type of buffer (where it's located)
   virtual csRenderBufferType GetBufferType() const { return type; }

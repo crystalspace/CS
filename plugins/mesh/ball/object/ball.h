@@ -32,6 +32,12 @@
 #include "ivideo/vbufmgr.h"
 #include "igeom/polymesh.h"
 
+#ifdef CS_USE_NEW_RENDERER
+#include "ivideo/render3d.h"
+#include "ivideo/rndbuf.h"
+#include "ivideo/rendermesh.h"
+#endif
+
 struct iMaterialWrapper;
 struct iObjectRegistry;
 struct iEngine;
@@ -62,19 +68,43 @@ private:
   uint32 current_features;
 
   int verts_circle;
-  csRef<iVertexBuffer> vbuf;
-  iVertexBufferManager* vbufmgr;
 
-  G3DTriangleMesh top_mesh;
   csVector3* ball_vertices;
   csVector2* ball_texels;
   csColor* ball_colors;
   int num_ball_vertices;
-
   csVector3* top_normals;
   bool initialized;
   csBox3 object_bbox;
 
+#ifdef CS_USE_NEW_RENDERER
+  unsigned int* ball_indices;
+  int ball_triangles;
+  csRenderMesh mesh;
+  csRenderMesh* meshPtr;
+
+  csReversibleTransform tr_o2c;
+  csRef<iRenderBuffer> vertex_buffer;
+  csRef<iRenderBuffer> texel_buffer;
+  csRef<iRenderBuffer> normal_buffer;
+  csRef<iRenderBuffer> color_buffer;
+  csRef<iRenderBuffer> index_buffer;
+
+  csRef<iRender3D> r3d;
+  
+  bool ball_vertices_dirty_flag;
+  bool ball_texels_dirty_flag;
+  bool ball_normals_dirty_flag;
+  bool ball_colors_dirty_flag;
+  bool ball_triangle_dirty_flag;
+
+  csStringID vertex_name, texel_name, normal_name, color_name, index_name;
+
+#else
+  csRef<iVertexBuffer> vbuf;
+  iVertexBufferManager* vbufmgr;
+  G3DTriangleMesh top_mesh;
+#endif
   /**
    * Camera space bounding box is cached here.
    * GetCameraBoundingBox() will check the current camera number from the
@@ -95,9 +125,13 @@ private:
    */
   void SetupObject ();
 
+#ifdef CS_USE_NEW_RENDERER
+  /// Generate a mesh with a sphere.
+  void GenerateSphere (int num_circle);
+#else
   /// Generate a mesh with a sphere.
   void GenerateSphere (int num_circle, G3DTriangleMesh& mesh,
-      	csVector3*& normals);
+    csVector3*& normals);
 
   /// retrieve a vertexbuffer from the manager if not done already
   void SetupVertexBuffer ();
@@ -109,7 +143,7 @@ private:
     virtual void ManagerClosing ();
   }scfiVertexBufferManagerClient;
   friend struct eiVertexBufferManagerClient;
-
+#endif
 public:
   /// Constructor.
   csBallMeshObject (iMeshObjectFactory* factory);
@@ -210,8 +244,25 @@ public:
 
   int GetVertexCount () { SetupObject(); return num_ball_vertices; }
   csVector3* GetVertices () { SetupObject (); return ball_vertices; }
+#ifndef CS_USE_NEW_RENDERER
   int GetTriangleCount () { SetupObject(); return top_mesh.num_triangles; }
   csTriangle* GetTriangles () { SetupObject (); return top_mesh.triangles; }
+#else
+  int GetTriangleCount () { SetupObject(); return ball_triangles; }
+  csTriangle* GetTriangles () { SetupObject (); return (csTriangle*)ball_indices; }
+
+  virtual csRenderMesh **GetRenderMeshes (int &num);
+
+  iRenderBuffer *GetRenderBuffer (csStringID name);
+  //------------------------- iRenderBufferSource implementation ----------------
+  class BufferSource : public iRenderBufferSource 
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csBallMeshObject);
+    iRenderBuffer *GetRenderBuffer (csStringID name)
+    { return scfParent->GetRenderBuffer (name); }
+  } scfiRenderBufferSource;
+  friend class BufferSource;
+#endif
 
   //----------------------- iMeshObject implementation ------------------------
   SCF_DECLARE_IBASE;

@@ -32,7 +32,9 @@
 #include "iengine/engine.h"
 #include "iengine/light.h"
 #include "iutil/objreg.h"
+
 #include "qsqrt.h"
+#include "iutil/strset.h"
 
 //#define BALL_DEBUG
 
@@ -42,7 +44,11 @@ SCF_IMPLEMENT_IBASE (csBallMeshObject)
   SCF_IMPLEMENTS_INTERFACE (iMeshObject)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iObjectModel)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iBallState)
+#ifdef CS_USE_NEW_RENDERER
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iRenderBufferSource)
+#else
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iVertexBufferManagerClient)
+#endif
   {
     static scfInterfaceID iPolygonMesh_scfID = (scfInterfaceID)-1;		
     if (iPolygonMesh_scfID == (scfInterfaceID)-1)				
@@ -61,16 +67,22 @@ SCF_IMPLEMENT_IBASE (csBallMeshObject)
   }
 SCF_IMPLEMENT_IBASE_END
 
+#ifdef CS_USE_NEW_RENDERER
+SCF_IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::BufferSource)
+  SCF_IMPLEMENTS_INTERFACE (iRenderBufferSource) 
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+#else
+SCF_IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::eiVertexBufferManagerClient)
+  SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+#endif
+
 SCF_IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::BallState)
   SCF_IMPLEMENTS_INTERFACE (iBallState)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::ObjectModel)
   SCF_IMPLEMENTS_INTERFACE (iObjectModel)
-SCF_IMPLEMENT_EMBEDDED_IBASE_END
-
-SCF_IMPLEMENT_EMBEDDED_IBASE (csBallMeshObject::eiVertexBufferManagerClient)
-  SCF_IMPLEMENTS_INTERFACE (iVertexBufferManagerClient)
 SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_IBASE(csBallMeshObject::PolyMesh)
@@ -82,7 +94,11 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   SCF_CONSTRUCT_IBASE (0);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObjectModel);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiBallState);
+#ifdef CS_USE_NEW_RENDERER
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRenderBufferSource);
+#else
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
+#endif
   csBallMeshObject::factory = factory;
 
   scfiPolygonMesh.SetBall (this);
@@ -106,8 +122,13 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   ball_vertices = 0;
   ball_colors = 0;
   ball_texels = 0;
+#ifdef CS_USE_NEW_RENDERER
+  ball_indices = 0;
+#else
   top_mesh.triangles = 0;
   top_mesh.vertex_fog = 0;
+  vbufmgr = 0;
+#endif
   reversed = false;
   toponly = false;
   cyl_mapping = false;
@@ -117,21 +138,43 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   color.blue = 0.0f;
   current_lod = 1.0f;
   current_features = 0;
-  vbufmgr = 0;
   polygons = 0;
+  
+#ifdef CS_USE_NEW_RENDERER
+  r3d = CS_QUERY_REGISTRY (((csBallMeshObjectFactory*)factory)->object_reg, iRender3D);
+  csRef<iStringSet> strings = 
+    CS_QUERY_REGISTRY_TAG_INTERFACE (((csBallMeshObjectFactory*)factory)->object_reg, 
+    "crystalspace.renderer.stringset", iStringSet);
+
+  vertex_name = strings->Request ("vertices");
+  texel_name = strings->Request ("texture coordinates");
+  normal_name = strings->Request ("normals");
+  color_name = strings->Request ("colors");
+  index_name = strings->Request ("indices");
+
+  ball_vertices_dirty_flag = false;
+  ball_texels_dirty_flag = false;
+  ball_normals_dirty_flag = false;
+  ball_colors_dirty_flag = false;
+  ball_triangle_dirty_flag = false;
+#endif
 }
 
 csBallMeshObject::~csBallMeshObject ()
 {
   if (vis_cb) vis_cb->DecRef ();
-  if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
   delete[] top_normals;
   delete[] ball_vertices;
   delete[] ball_colors;
   delete[] ball_texels;
+  delete[] polygons;
+#ifdef CS_USE_NEW_RENDERER
+  delete[] ball_indices;
+#else
   delete[] top_mesh.triangles;
   delete[] top_mesh.vertex_fog;
-  delete[] polygons;
+  if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
+#endif
 }
 
 void csBallMeshObject::GetTransformedBoundingBox (long cameranr,
@@ -221,8 +264,12 @@ float csBallMeshObject::GetScreenBoundingBox (long cameranr,
   return cbox.MaxZ ();
 }
 
+#ifdef CS_USE_NEW_RENDERER
+void csBallMeshObject::GenerateSphere (int num)
+#else
 void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
-    csVector3*& normals)
+                     csVector3*& normals)
+#endif
 {
   int num_vertices = 0;
   int num_triangles = 0;
@@ -410,13 +457,21 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
     }
 
   // Scale and shift all the vertices.
+#ifdef CS_USE_NEW_RENDERER
+  top_normals = new csVector3[num_vertices];
+#else
   normals = new csVector3[num_vertices];
+#endif
   for (i = 0 ; i < num_vertices ; i++)
   {
     vertices[i].x *= radiusx;
     vertices[i].y *= radiusy;
     vertices[i].z *= radiusz;
+#ifdef CS_USE_NEW_RENDERER
+    top_normals[i] = vertices[i].Unit ();
+#else
     normals[i] = vertices[i].Unit ();
+#endif
     vertices[i] += shift;
   }
 
@@ -440,62 +495,217 @@ void csBallMeshObject::GenerateSphere (int num, G3DTriangleMesh& mesh,
   ball_colors = new csColor[num_vertices];
   for (i = 0 ; i < num_vertices ; i++)
     ball_colors[i].Set (1.0f, 1.0f, 1.0f);
+
+#ifdef CS_USE_NEW_RENDERER
+  ball_triangles = num_triangles;
+  ball_indices = new unsigned int[num_triangles*3];
+  memcpy (ball_indices, triangles, sizeof(csTriangle)*num_triangles);
+
+  ball_vertices_dirty_flag = true;
+  ball_texels_dirty_flag = true;
+  ball_normals_dirty_flag = true;
+  ball_colors_dirty_flag = true;
+  ball_triangle_dirty_flag = true;
+#else
   mesh.vertex_fog = new G3DFogInfo[num_vertices];
   mesh.num_triangles = num_triangles;
   mesh.triangles = new csTriangle[num_triangles];
   memcpy (mesh.triangles, triangles, sizeof(csTriangle)*num_triangles);
+#endif
 
   delete[] vertices;
   delete[] uvverts;
   delete[] triangles;
 }
 
+
 void csBallMeshObject::SetupObject ()
 {
   if (!initialized)
   {
     initialized = true;
+
+#ifdef CS_USE_NEW_RENDERER
+    delete[] ball_indices;
+    ball_indices = 0;
+#else
     SetupVertexBuffer ();
+    delete[] top_mesh.triangles;
+    delete[] top_mesh.vertex_fog;
+    top_mesh.triangles = 0;
+    top_mesh.vertex_fog = 0;
+#endif
+   
     delete[] top_normals;
     delete[] ball_vertices;
     delete[] ball_colors;
     delete[] ball_texels;
-    delete[] top_mesh.triangles;
-    delete[] top_mesh.vertex_fog;
+    
     top_normals = 0;
     ball_vertices = 0;
     ball_colors = 0;
     ball_texels = 0;
-    top_mesh.triangles = 0;
-    top_mesh.vertex_fog = 0;
 
+#ifdef CS_USE_NEW_RENDERER
+    GenerateSphere (verts_circle);
+#else
     GenerateSphere (verts_circle, top_mesh, top_normals);
+#endif
     object_bbox.StartBoundingBox (
       csVector3 (-radiusx, -radiusy, -radiusz) + shift);
     object_bbox.AddBoundingVertexSmart (
       csVector3 ( radiusx,  radiusy,  radiusz) + shift);
-    top_mesh.morph_factor = 0.0f;
-    top_mesh.num_vertices_pool = 1;
-    top_mesh.do_morph_texels = false;
-    top_mesh.do_morph_colors = false;
-    top_mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
   }
 }
 
+#ifdef CS_USE_NEW_RENDERER
+iRenderBuffer* csBallMeshObject::GetRenderBuffer (csStringID name)
+{
+  if (name == vertex_name)
+  {
+    if (ball_vertices_dirty_flag)
+    {
+      vertex_buffer = r3d->CreateRenderBuffer (
+        sizeof (csVector3)*num_ball_vertices, CS_BUF_STATIC, 
+        CS_BUFCOMP_FLOAT, 3);
+      ball_vertices_dirty_flag = false;
+      csVector3* vbuf = (csVector3*)vertex_buffer->Lock(CS_BUF_LOCK_NORMAL);
+      memcpy (vbuf, ball_vertices, sizeof(csVector3)*num_ball_vertices);
+      vertex_buffer->Release ();
+    }
+    if (vertex_buffer)
+    {
+      return vertex_buffer;
+    }
+    return 0;
+  }
+  if (name == texel_name)
+  {
+    if (ball_texels_dirty_flag)
+    {
+      texel_buffer = r3d->CreateRenderBuffer (
+        sizeof (csVector2)*num_ball_vertices, CS_BUF_STATIC, 
+        CS_BUFCOMP_FLOAT, 2);
+      ball_texels_dirty_flag = false;
+      csVector2* tbuf = (csVector2*)texel_buffer->Lock (CS_BUF_LOCK_NORMAL);
+      memcpy (tbuf, ball_texels, sizeof (csVector2) * num_ball_vertices);
+      texel_buffer->Release ();
+    }
+    if (texel_buffer)
+    {
+      return texel_buffer;
+    }
+    return 0;
+  }
+  if (name == normal_name)
+  {
+    if (ball_normals_dirty_flag )
+    {
+      normal_buffer = r3d->CreateRenderBuffer (
+        sizeof (csVector3)*num_ball_vertices, CS_BUF_STATIC,
+        CS_BUFCOMP_FLOAT, 3);
+      ball_normals_dirty_flag = false;
+      csVector3 *nbuf = (csVector3*)normal_buffer->Lock(CS_BUF_LOCK_NORMAL);
+      memcpy (nbuf, top_normals, sizeof (csVector3)*num_ball_vertices);
+      normal_buffer->Release();
+    }
+    if(normal_buffer)
+    {
+      return normal_buffer;
+    }
+    return 0;
+  }
+  if (name == color_name)
+  {
+    if (ball_colors_dirty_flag)
+    {
+      color_buffer = r3d->CreateRenderBuffer (
+        sizeof (csColor)*num_ball_vertices, CS_BUF_STATIC,
+        CS_BUFCOMP_FLOAT, 3);
+      ball_colors_dirty_flag = false;
+      csColor *cbuf = (csColor*)color_buffer->Lock(CS_BUF_LOCK_NORMAL);
+      memcpy (cbuf, ball_colors, sizeof (csColor) * num_ball_vertices);
+      color_buffer->Release();
+    }
+    if (color_buffer)
+    {
+      return color_buffer;
+    }
+    return 0;
+  }
+  if (name == index_name)
+  {
+    if (ball_triangle_dirty_flag)
+    {
+      index_buffer = r3d->CreateRenderBuffer (
+        sizeof (unsigned int)*ball_triangles*3, CS_BUF_INDEX,
+        CS_BUFCOMP_UNSIGNED_INT, 1);
+      ball_triangle_dirty_flag = false;
+      unsigned int *ibuf = (unsigned int *)index_buffer->Lock(
+        CS_BUF_LOCK_NORMAL);
+      int i;
+      memcpy (ibuf, ball_indices, sizeof (unsigned int) * ball_triangles *3);
+      index_buffer->Release ();
+    }
+    if (index_buffer)
+    {
+      return index_buffer;
+    }
+    return 0;
+  }
+  return 0;
+}
+
+csRenderMesh **csBallMeshObject::GetRenderMeshes (int &num)
+{
+  iMaterialWrapper* mater = material;
+
+  if (!mater)
+  {
+    printf ("INTERNAL ERROR: mesh used without material!\n");
+    return false;
+  }
+
+  // iRender3D* r3d = rview->GetGraphics3D ();
+
+  mater->Visit ();
+  mesh.transform = &tr_o2c;
+
+  // Prepare for rendering.
+  mesh.z_buf_mode = CS_ZBUF_TEST;// mode;
+  mesh.mixmode = CS_FX_COPY; // MixMode;
+
+  mesh.indexstart = 0;
+  mesh.indexend = ball_triangles * 3;
+  //mesh.mathandle = mater->GetMaterialHandle();
+  mesh.material = mater;
+  csRef<iRenderBufferSource> source = SCF_QUERY_INTERFACE (this, iRenderBufferSource);
+  mesh.buffersource = source;
+  mesh.meshtype = CS_MESHTYPE_TRIANGLES;
+  meshPtr = &mesh;
+  num = 1;
+  return &meshPtr;
+}
+#endif
+
+#ifndef CS_USE_NEW_RENDERER
+
 void csBallMeshObject::SetupVertexBuffer ()
 {
- if (!vbuf)
- {
-   iObjectRegistry* object_reg = ((csBallMeshObjectFactory*)factory)
-     ->object_reg;
-   csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
-   // @@@ priority should be a parameter.
-   vbufmgr = g3d->GetVertexBufferManager ();
-   vbuf = vbufmgr->CreateBuffer (0);
-   vbufmgr->AddClient (&scfiVertexBufferManagerClient);
-   top_mesh.buffers[0] = vbuf;
- }
+  if (!vbuf)
+  {
+    iObjectRegistry* object_reg = ((csBallMeshObjectFactory*)factory)
+      ->object_reg;
+    csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
+    // @@@ priority should be a parameter.
+    vbufmgr = g3d->GetVertexBufferManager ();
+    vbuf = vbufmgr->CreateBuffer (0);
+    vbufmgr->AddClient (&scfiVertexBufferManagerClient);
+    top_mesh.buffers[0] = vbuf;
+  }
 }
+
+#endif
 
 bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 {
@@ -509,11 +719,13 @@ bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   // ->
   //   C = Mwc * (Mow * O - Vow - Vwc)
   //   C = Mwc * Mow * O - Mwc * (Vow + Vwc)
-  csReversibleTransform tr_o2c = camera->GetTransform ();
+#ifndef CS_USE_NEW_RENDERER
+  csReversibleTransform tr_o2c;
+#endif
+  tr_o2c = camera->GetTransform ();
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
 
-#if 1
   csVector3 radius;
   csSphere sphere;
   scfiObjectModel.GetRadius (radius, sphere.GetCenter ());
@@ -525,34 +737,21 @@ bool csBallMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   if (rview->ClipBSphere (tr_o2c, sphere, clip_portal, clip_plane,
   	clip_z_plane) == false)
     return false;
+
+#ifdef CS_USE_NEW_RENDERER
+  mesh.transform = &tr_o2c;
+  mesh.clip_portal = clip_portal;
+  mesh.clip_plane = clip_plane;
+  mesh.clip_z_plane = clip_z_plane;
+  mesh.do_mirror = camera->IsMirrored ();  
 #else
-  float fov = camera->GetFOV ();
-  float shiftx = camera->GetShiftX ();
-  float shifty = camera->GetShiftY ();
-
-  // Test visibility of entire ball by clipping bounding box against clipper.
-  // There are three possibilities:
-  //	1. box is not visible -> ball is not visible.
-  //	2. box is entirely visible -> ball is visible and need not be clipped.
-  //	3. box is partially visible -> ball is visible and needs to be clipped
-  //	   if rview has do_clip_plane set to true.
-  csBox2 sbox;
-  csBox3 cbox;
-  if (GetScreenBoundingBox (camera->GetCameraNumber (),
-  	movable->GetUpdateNumber (), fov, shiftx, shifty,
-  	tr_o2c, sbox, cbox) < 0)
-    return false;
-  int clip_portal, clip_plane, clip_z_plane;
-  if (rview->ClipBBox (sbox, cbox, clip_portal, clip_plane,
-  	clip_z_plane) == false)
-    return false;
-#endif
-
   g3d->SetObjectToCamera (&tr_o2c);
   top_mesh.clip_portal = clip_portal;
   top_mesh.clip_plane = clip_plane;
   top_mesh.clip_z_plane = clip_z_plane;
   top_mesh.do_mirror = camera->IsMirrored ();
+#endif
+
   return true;
 }
 
@@ -596,8 +795,11 @@ void csBallMeshObject::UpdateLighting (iLight** lights, int num_lights,
     csVector3 wor_light_pos = li->GetCenter ();
     csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, 0);
+#ifdef CS_USE_NEW_RENDERER
+    if (obj_sq_dist >= li->GetInfluenceRadiusSq ()) continue;
+#else
     if (obj_sq_dist >= li->GetSquaredRadius ()) continue;
-
+#endif
     float in_obj_dist = (obj_sq_dist >= SMALL_EPSILON)?qisqrt (obj_sq_dist):1.0f;
 
     csColor light_color = li->GetColor () * (256.0f / CS_NORMAL_LIGHT_LEVEL)
@@ -646,6 +848,7 @@ bool csBallMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
 
   iGraphics3D* g3d = rview->GetGraphics3D ();
 
+#ifndef CS_USE_NEW_RENDERER
   // Prepare for rendering.
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, mode);
 
@@ -656,11 +859,12 @@ bool csBallMeshObject::Draw (iRenderView* rview, iMovable* /*movable*/,
   top_mesh.mixmode = MixMode | CS_FX_GOURAUD;
   CS_ASSERT (!vbuf->IsLocked ());
   vbufmgr->LockBuffer (vbuf,
-  	ball_vertices, ball_texels, ball_colors, num_ball_vertices,
-	0, object_bbox);
+    ball_vertices, ball_texels, ball_colors, num_ball_vertices,
+    0, object_bbox);
   rview->CalculateFogMesh (g3d->GetObjectToCamera (), top_mesh);
   g3d->DrawTriangleMesh (top_mesh);
   vbufmgr->UnlockBuffer (vbuf);
+#endif
 
   return true;
 }
@@ -686,8 +890,14 @@ bool csBallMeshObject::HitBeamOutline (const csVector3& start,
   // will be a bit faster than its more accurate cousin (below).
 
   csSegment3 seg (start, end);
-  int i, max = top_mesh.num_triangles;
+  int i, max;
+#ifdef CS_USE_NEW_RENDERER
+  csTriangle *tr = (csTriangle*)ball_indices;
+  max = ball_triangles;
+#else
   csTriangle *tr = top_mesh.triangles;
+  max = top_mesh.num_triangles;
+#endif
   csVector3 *vrt = ball_vertices;
   for (i = 0 ; i < max ; i++)
   {
@@ -712,13 +922,19 @@ bool csBallMeshObject::HitBeamObject(const csVector3& start,
   // Usegae is optional.
 
   csSegment3 seg (start, end);
-  int i, max = top_mesh.num_triangles;
+  int i, max;
   float tot_dist = csSquaredDist::PointPoint (start, end);
   float dist, temp;
   float itot_dist = 1.0f / tot_dist;
   dist = temp = tot_dist;
   csVector3 *vrt = ball_vertices, tmp;
+#ifdef CS_USE_NEW_RENDERER
+  csTriangle *tr = (csTriangle*)ball_indices;
+  max = ball_triangles;
+#else
   csTriangle *tr = top_mesh.triangles;
+  max = top_mesh.num_triangles;
+#endif
   for (i = 0; i < max; i++)
   {
     if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
@@ -738,6 +954,7 @@ bool csBallMeshObject::HitBeamObject(const csVector3& start,
   return true;
 }
 
+#ifndef CS_USE_NEW_RENDERER
 void csBallMeshObject::eiVertexBufferManagerClient::ManagerClosing ()
 {
   if (scfParent->vbuf)
@@ -746,6 +963,7 @@ void csBallMeshObject::eiVertexBufferManagerClient::ManagerClosing ()
     scfParent->vbufmgr = 0;
   }
 }
+#endif
 
 
 /// interpolate a gradient
@@ -974,10 +1192,17 @@ csMeshedPolygon* csBallMeshObject::GetPolygons ()
 {
   if (!polygons)
   {
-    csTriangle* triangles = top_mesh.triangles;
-    polygons = new csMeshedPolygon [top_mesh.num_triangles];
+#ifdef CS_USE_NEW_RENDERER
+    csTriangle* triangles = (csTriangle*)ball_indices;
+    polygons = new csMeshedPolygon [ball_triangles];
     int i;
+    for (i = 0 ; i < ball_triangles ; i++)
+#else
+    csTriangle* triangles = top_mesh.triangles;
+    polygons = new csMeshedPolygon [top_mesh.num_triangles];int i;
     for (i = 0 ; i < top_mesh.num_triangles ; i++)
+#endif
+    
     {
       polygons[i].num_vertices = 3;
       polygons[i].vertices = &triangles[i].a;

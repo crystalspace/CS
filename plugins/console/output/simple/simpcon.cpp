@@ -105,7 +105,11 @@ bool csSimpleConsole::Initialize (iObjectRegistry *object_reg)
 {
   csSimpleConsole::object_reg = object_reg;
 
+#ifdef CS_USE_NEW_RENDERER
+  G3D = CS_QUERY_REGISTRY (object_reg, iRender3D);
+#else
   G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+#endif
   if (!G3D) return false;
   G2D = G3D->GetDriver2D ();
 
