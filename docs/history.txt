@@ -57,8 +57,6 @@ chronological order.
 	      FindNextPrime())
 	    - csEvent constructs it's 'attributes' hash map a smaller size.
 	      This should reduce it's memory requirements a bit.
-	    - Made the copy constructors for csHash<>::Iterator and 
-	      GlobalIterator public.
 	- res forgot to update makedep after removing the stdio aliases from 
 	  the Win32 port.
 	- res made csHash<> a friend class of csHash<>:: Iterator and
