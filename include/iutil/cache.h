@@ -102,6 +102,12 @@ struct iCacheManager : public iBase
    */
   virtual bool ClearCache (const char* type = 0, const char* scope = 0,
   	const uint32* id = 0) = 0;
+
+  /**
+   * Ensure that the cached data is written on whatever medium is
+   * behind the cache.
+   */
+  virtual void Flush () = 0;
 };
 
 #endif // __CS_IUTIL_CACHE_H__

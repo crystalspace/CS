@@ -488,6 +488,7 @@ bool csLoader::ParseHeightgen (iLoaderContext* ldr_context, iDocumentNode* node)
 	        ReportError ("crystalspace.maploader.parse.heightgen",
 	          "Cache Failed: cannot save data in cache.");
               }
+	      cache->Flush ();
             }
           }
 

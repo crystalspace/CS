@@ -71,6 +71,10 @@ public:
    */
   virtual bool ClearCache (const char* type = 0, const char* scope = 0,
   	const uint32* id = 0);
+  /**
+   * Does nothing. 
+   */
+  virtual void Flush () { }
 };
 
 #endif // __CS_UTIL_NULCACHE_H__

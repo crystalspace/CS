@@ -88,6 +88,11 @@ public:
    */
   virtual bool ClearCache (const char* type = 0, const char* scope = 0,
   	const uint32* id = 0);
+
+  /**
+   * Flush VFS.
+   */
+  virtual void Flush ();
 };
 
 #endif // __CS_UTIL_VFSCACHE_H__

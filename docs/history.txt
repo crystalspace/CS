@@ -28,6 +28,14 @@ chronological order.
 	  etc.) and tries linking with librt.so, which is where the semaphore
 	  functions reside on Solaris. These functions are needed by
 	  CS/libs/csutil/generic/cspthrd.cpp.
+	- Jorrit removed the call to VFS->Sync() in the VFS cache manager.
+	  This caused huge overhead when caching lightmaps because for
+	  every lightmap file the entire zip would be written.
+	- Jorrit added iCacheManager->Flush(). This is a generic way to flush
+	  the cache manager data. That way users of the cache don't have to
+	  do vfs->Sync() anymore since vfs->Sync() may not be appropriate
+	  for the specific cache implementation. Instead they will call
+	  iCacheManager->Flush() now.
 25-Oct-2004
 	- Jorrit disabled VBO by default now. It gives too many problems
 	  (both on ATI and nVidia). Having this option on by default can

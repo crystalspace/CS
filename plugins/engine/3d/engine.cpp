@@ -1367,11 +1367,7 @@ void csEngine::ForceRelight (iLight* light, iRegion* region)
     }
   }
 
-  if (!VFS->Sync())
-  {
-    Warn ("Error updating lighttable cache!");
-    Warn ("Perhaps disk full or no write permission?");
-  }
+  cm->Flush ();
 }
 
 void csEngine::RemoveLight (iLight* light)
@@ -1726,13 +1722,7 @@ void csEngine::ShineLights (iRegion *region, iProgressMeter *meter)
 
   if (do_relight && (lightcache_mode & CS_ENGINE_CACHE_WRITE))
   {
-    Report ("Updating VFS....");
-    if (!VFS->Sync())
-    {
-      Warn ("Error updating lighttable cache!");
-      Warn ("Perhaps disk full or no write permission?");
-    }
-    Report ("DONE!");
+    cm->Flush ();
   }
 }
 

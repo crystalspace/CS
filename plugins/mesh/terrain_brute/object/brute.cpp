@@ -924,6 +924,7 @@ void csTerrainObject::WriteCDLODToCache ()
   cache_mgr->CacheData ((void*)(m.GetData ()), m.GetSize (),
   	  "bruteblock_lod", cachename, 0);
   delete[] cachename;
+  cache_mgr->Flush ();
 }
 
 void csTerrainObject::SetupPolyMeshData ()

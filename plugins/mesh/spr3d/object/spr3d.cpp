@@ -478,6 +478,7 @@ void csSprite3DMeshObjectFactory::GenerateLOD ()
 
     cache_mgr->CacheData ((void*)(m.GetData ()), m.GetSize (),
   	  buf, GetCacheName (), 0);
+    cache_mgr->Flush ();
   }
 
   delete [] translate;

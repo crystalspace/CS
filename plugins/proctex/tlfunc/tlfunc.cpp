@@ -271,8 +271,11 @@ csPtr<iBase> csFuncTexLoader::Parse (iDocumentNode* node,
     if (!data.IsValid())
       data = imageio->Save (Image, "image/tga");
     if (data.IsValid())
+    {
       cache->CacheData (data->GetData(), data->GetSize(),
 	cache_type, cache_scope, ~0);
+      cache->Flush ();
+    }
   }
 
   csRef<iGraphics3D> G3D = CS_QUERY_REGISTRY (object_reg, iGraphics3D);

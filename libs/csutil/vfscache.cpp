@@ -118,8 +118,6 @@ bool csVfsCacheManager::CacheData (void* data, size_t size,
 	"Could not write file '%s' in VFS dir '%s'\n", buf, vfsdir);
     return false;
   }
-  cf = 0;	// Not sure why this is needed? Seems to crash otherwise @@@
-  GetVFS ()->Sync ();
 
   return true;
 }
@@ -153,5 +151,10 @@ bool csVfsCacheManager::ClearCache (const char* type, const char* scope,
   (void)scope;
   (void)id;
   return false;
+}
+
+void csVfsCacheManager::Flush ()
+{
+  GetVFS ()->Sync ();
 }
 
