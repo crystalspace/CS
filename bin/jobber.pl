@@ -305,7 +305,7 @@ my $CAPTURED_OUTPUT = '';
 my $CONFIGURE = 
     "csver=`./configure --version | awk '/crystal/ { print \$3 }'`\n" .
     "csverlist=`echo \$csver | tr '.' ' '`\n" .
-    "copy=`sed '/\\[[Cc]opyright/!d;s/[^[]*\\[\\([^]]*\\)\\].*/\\1/'" .
+    "cscopy=`sed '/\\[[Cc]opyright/!d;s/[^[]*\\[\\([^]]*\\)\\].*/\\1/'" .
     "  < configure.ac`\n" .
     "cat << EOF > Jamconfig\n" .
     "CMD.C++ ?= \"g++\" ;\n" .
@@ -324,7 +324,7 @@ my $CONFIGURE =
     "JAMCONFIG_READ ?= \"yes\" ;\n" .
     "MODE ?= \"optimize\" ;\n" .
     "MSVCGEN_SILENT ?= \"yes\" ;\n" .
-    "PACKAGE_COPYRIGHT ?= \"\$copy\" ;\n" .
+    "PACKAGE_COPYRIGHT ?= \"\$cscopy\" ;\n" .
     "PACKAGE_HOMEPAGE ?= \"http://crystal.sourceforge.net/\" ;\n" .
     "PACKAGE_LONGNAME ?= \"Crystal Space\" ;\n" .
     "PACKAGE_NAME ?= \"crystal\" ;\n" .
