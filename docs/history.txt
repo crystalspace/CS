@@ -1,6 +1,18 @@
 The history order has been reversed so that new features are at the top.
 
+13-Mar-2001
+	- Philip Wyett fixed VC6 compile error in 'plgengine', created
+	  by move of 'int ApplicationShow;'. Modification was made to SCF
+	  interface to allow correct usage of it and leaving Martins
+	  intention of being able to create apps without 'cssys'
+	  intact.
 12-Mar-2001
+	- Robert Bate updated the Mac project files and added project files
+	  for terrain plugin.
+	- Martin Geisse did a small update to the windows docs.
+	- Martin also fixed a bug in the system driver.
+	- Martin moved the 'ApplicationShow' variable from cssys to
+	  cswin32exe, so you can create applications that don't use cssys.
 	- Added a new constructor csFrustum with which you can create
 	  a frustum that already has place for the right number of vertices
 	  but the vertices are not initialized yet.
