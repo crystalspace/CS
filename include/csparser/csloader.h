@@ -179,6 +179,10 @@ public:
    */
   static csTextureHandle* LoadTexture (csWorld* world, const char* name,
     const char* fname);
+
+  /// Load a image and return an iImage object
+  static iImage* LoadImage (const char* name)
+  { return load_image (name); }
 };
 
 #endif

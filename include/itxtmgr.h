@@ -47,6 +47,15 @@ struct iTextureHandle;
  * Then texture manager recompute that texture from the image buffer.
  */
 #define CS_TEXTURE_DYNAMIC	0x00000004
+/**
+ * The number of mipmaps computed for this texture
+ * 0     .. default number ( implementation dependend )
+ * n > 0 .. not more than n
+ */
+#define CS_TEXTURE_MMLEVEL_MASK	0x000000F0
+
+#define CS_SET_TEXTURE_MMLEVEL(level) ((UInt)level<<4)
+#define CS_GET_TEXTURE_MMLEVEL(flag) ((flag&CS_TEXTURE_MMLEVEL_MASK)>>4)
 
 SCF_VERSION (iTextureManager, 1, 0, 0);
 
