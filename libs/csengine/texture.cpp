@@ -117,6 +117,10 @@ void csTextureWrapper::Register (iTextureManager *txtmgr)
   // smgh 22/07/00
   //if (handle) handle->DecRef ();
 
+  // don't register the texture twice. Also stop if we have no image
+  if (handle || !image)
+    return;
+
   // Now we check the size of the loaded image. Having an image, that
   // is not a power of two will result in strange errors while
   // rendering. It is by far better to check the format of all textures

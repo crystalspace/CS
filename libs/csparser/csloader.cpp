@@ -1457,7 +1457,7 @@ struct csLoaderPluginRec
     delete [] ShortName; 
     delete [] ClassID; 
     if (Plugin) {
-      System->UnloadPlugIn(Plugin);
+      if (System) System->UnloadPlugIn(Plugin);
       Plugin->DecRef ();
     }
   }                                                                                  
