@@ -63,8 +63,11 @@ The history order is reversed so that new features are at the top.
 	  new wfoDontCaptureMouseMove option, correcting some problems
 	  with the previous patch and transparent windows with
 	  mouse-capturing children.
-        - DeSigna performed some more minor updates to the
-	  CS manual's introductory chapter. 
+        - DeSigna performed some more minor updates to the CS manual's
+	  introductory chapter.
+	- Eric Sunshine repaired a number of Texinfo problems introduced over
+	  the last few weeks which caused documentation conversion to fail with
+	  makeinfo and TeX.
 12-Jun-2003
 	- Jorrit clarified a comment with csColliderWrapper telling people that
 	  you must DecRef() the new collider wrapper after creating it.

@@ -12,9 +12,9 @@ that you have a better idea of what is explained where.
 One of the most useful sections for creating your own project is of
 course the tutorial section (@pxref{Tutorials}). Here you will find six
 tutorials which can help you to write your own Crystal Space game along
-with the very important introductory tutorial (@pxref{Tutorial 
-Introduction}). You should certainly read this if you want to have a
-good idea on some of the basic concepts of Crystal Space.
+with the very important introductory tutorial
+(@pxref{Tutorial Introduction}). You should certainly read this if you want to
+have a good idea on some of the basic concepts of Crystal Space.
 
 Additionally, the tutorial section contains the @sc{howto} section
 (@pxref{HOWTO}).  The @sc{howto}s are small documents explaining how to

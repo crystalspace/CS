@@ -57,7 +57,7 @@ with what can be seen in the screenshot below.
 @end ifnotinfo
 
 As discussed above, Crystal Space applications are primarily console based
-(though @sc{GUI} are allowed) inorder to give us acces to the verbose
+(though @sc{gui} are allowed) inorder to give us acces to the verbose
 diagnostic text via @emph{-console}.  Under @emph{Application type:}, select
 @emph{Console application}.  We are starting from a blank canvas. So, in the
 @emph{Additional options:} section, check the box @emph{Empty project}.  Once

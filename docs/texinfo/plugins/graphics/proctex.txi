@@ -17,8 +17,8 @@ can be updated with this technique. i.e. you don't need to mark a texture
 as being procedural.
 
 @subsubheading Updating a Texture Image
-@cindex code{SetRenderTarget()}
-@cindex code{Blit()}
+@cindex @code{SetRenderTarget()}
+@cindex @code{Blit()}
 
 The following code demonstrates how you can update a texture image:
 
@@ -52,7 +52,7 @@ again. Note that setting @samp{persistant} to true is slower if you intend
 to update the entire texture area anyway.
 
 @subsubheading Using csProcTexture
-@cindex code{csProcTexture}
+@cindex @code{csProcTexture}
 
 In the @samp{cstool} library there is a conveniance class you can use
 to make updating of procedural textures easier. This class is called
@@ -63,8 +63,8 @@ to make updating of procedural textures easier. This class is called
 class MyProcTexture : public csProcTexture
 @{
 public:
-  MyProcTexture () { }
-  virtual ~MyProcTexture () { }
+  MyProcTexture () @{ @}
+  virtual ~MyProcTexture () @{ @}
   virtual bool PrepareAnim ();
   virtual void Animate (csTicks current_time);
 @};
