@@ -119,6 +119,6 @@ csPtr<iString> csSoftShader_FP::GetProgramID()
 {
   csMD5::Digest d = csMD5::Encode("blah");
   scfString* str = new scfString();
-  str->Append((const char*)d.data[0], 16);
+  str->Append((char const*)&d.data, sizeof(d.data));
   return csPtr<iString>(str);
 }

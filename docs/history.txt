@@ -19,10 +19,13 @@ chronological order.
 	  is detected.
 	- Eric Sunshine added a check to configure.ac to see if the compiler
 	  recognizes the -pipe option.
-	- Eric Sunshine fixed several bugs in the glshader_cg plugin where
-	  the various ProgramID() methods were casting the first character of
+	- Eric Sunshine fixed several bugs in various shader plugins where
+	  their ProgramID() methods were casting the first character of
 	  a string to a pointer, rather than taking the address of the string
-	  as intended.  Also eliminated several compilation warnings.
+	  as intended.  Also eliminated several compilation warnings in
+	  glrender_cg plugin.
+	- Eric Sunshine eliminated use of magic constants in favor of sizeof()
+	  in numerous locations throughout the project.
 13-Sep-2003
 	- Philipp Aumayr removed changed a delete data; to delete[] data; in
 	  plugins/video/openglcommon/glfontcache.h. mentioned by unaek in 

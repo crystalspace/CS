@@ -134,8 +134,8 @@ const char* csLight::GenerateUniqueID ()
   csMD5::Digest digest = csMD5::Encode (mf.GetData (), mf.GetSize ());
 
   delete[] light_id;
-  light_id = new char[16];
-  memcpy (light_id, digest.data, 16);
+  light_id = new char[sizeof(digest.data)];
+  memcpy (light_id, digest.data, sizeof(digest.data));
   return light_id;
 }
 
