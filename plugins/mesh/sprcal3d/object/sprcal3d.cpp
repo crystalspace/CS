@@ -1997,12 +1997,8 @@ int csSpriteCal3DMeshObject::FindAnim(const char *name)
 void csSpriteCal3DMeshObject::ClearAllAnims()
 {
   while (active_anims.Length())
-  {
-    csCal3DAnimation *pop = active_anims.Pop();
-    ClearAnimCycle(pop->index,0);
-    // do not delete pop because ptr is shared with factory
-    active_weights.Pop();
-  }
+    ClearAnimCyclePos(active_anims.Length() - 1, 0);
+
   if (last_locked_anim != -1)
   {
      calModel.getMixer()->removeAction(last_locked_anim);
@@ -2039,25 +2035,48 @@ bool csSpriteCal3DMeshObject::AddAnimCycle(int idx, float weight, float delay)
 {
   calModel.getMixer()->blendCycle(idx,weight,delay);
 
-  active_anims.Push(factory->anims[idx]);
-  active_weights.Push(weight);
+  ActiveAnim const a = { factory->anims[idx], weight };
+  active_anims.Push(a);
   return true;
+}
+
+int csSpriteCal3DMeshObject::FindAnimCyclePos(int idx) const
+{
+  for (size_t i = active_anims.Length(); i-- > 0; )
+    if (idx == active_anims[i].anim->index)
+      return (int)i;
+  return -1;
+}
+
+int csSpriteCal3DMeshObject::FindAnimCycleNamePos(char const* name) const
+{
+  for (size_t i = active_anims.Length(); i-- > 0; )
+    if (name == active_anims[i].anim->name)
+      return (int)i;
+  return -1;
+}
+
+void csSpriteCal3DMeshObject::ClearAnimCyclePos(int pos, float delay)
+{
+  calModel.getMixer()->clearCycle(active_anims[pos].anim->index,delay);
+  // We do not 'delete' active_anims[pos].anim because it is owned by factory.
+  active_anims.DeleteIndex(pos);
 }
 
 void csSpriteCal3DMeshObject::ClearAnimCycle(int idx, float delay)
 {
-  calModel.getMixer()->clearCycle(idx,delay);
+  int const pos = FindAnimCyclePos(idx);
+  if (pos != -1)
+    ClearAnimCyclePos(pos,delay);
 }
 
 bool csSpriteCal3DMeshObject::ClearAnimCycle(const char *name, float delay)
 {
-  int idx = FindAnim(name);
-  if (idx == -1)
-    return false;
-
-  ClearAnimCycle(idx,delay);
-
-  return true;
+  int const pos = FindAnimCycleNamePos(name);
+  bool const ok = (pos != -1);
+  if (ok)
+    ClearAnimCycle(pos,delay);
+  return ok;
 }
 
 int csSpriteCal3DMeshObject::GetActiveAnimCount()
@@ -2068,15 +2087,16 @@ int csSpriteCal3DMeshObject::GetActiveAnimCount()
 int csSpriteCal3DMeshObject::GetActiveAnims(char *buffer,int max_length)
 {
   int count=0;
-  size_t i;
+  size_t i, n;
 
-  for (i=0; i<active_anims.Length() && count<max_length-1; i++)
+  for (i=0, n=active_anims.Length(); i<n && count<max_length-1; i++)
   {
-    buffer[count++] = active_anims[i]->index;
+    ActiveAnim const& a = active_anims[i];
+    buffer[count++] = a.anim->index;
     // will not work for % weights, but only for weights >= 1.
-    buffer[count++] = (char)active_weights[i];
+    buffer[count++] = (char)a.weight;
   }
-  return i==active_anims.Length();  // true if successful
+  return i == n;  // true if successful
 }
 
 void csSpriteCal3DMeshObject::SetActiveAnims(const char *buffer,int anim_count)

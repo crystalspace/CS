@@ -542,14 +542,19 @@ public:
 class csSpriteCal3DMeshObject : public iMeshObject
 {
 private:
+  struct ActiveAnim
+  {
+    csCal3DAnimation* anim;
+    float weight;
+  };
+
   iObjectRegistry* object_reg;
   iMeshObjectDrawCallback* vis_cb;
   uint32 current_features;  // LOD Control thing
   iBase* logparent;
   CalModel calModel;
   float last_update_time;
-  csArray<csCal3DAnimation*> active_anims;
-  csArray<float>             active_weights;
+  csArray<ActiveAnim> active_anims;
   bool is_idling;
   int  default_idle_anim,last_locked_anim;
   float idle_override_interval;
@@ -637,6 +642,10 @@ private:
   void SetupObjectSubmesh(int index);
   void SetIdleOverrides(csRandomGen *rng,int which);
   void RecalcBoundingBox(csBox3& bbox);
+
+  int FindAnimCyclePos(int idx) const;
+  int FindAnimCycleNamePos(char const*) const;
+  void ClearAnimCyclePos(int pos, float delay);
 
 #ifndef CS_USE_NEW_RENDERER
   void SetupVertexBuffer (int mesh, int submesh, int num_vertices,

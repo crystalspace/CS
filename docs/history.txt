@@ -15,6 +15,14 @@ chronological order.
 	- Eric Sunshine fixed 20-Oct-2004 bug in Swig rule (swig.jam) which
 	  caused Swig to be invoked with an empty "-outdir" option if caller of
 	  Swig rule had not provided an `outdir'.
+	- Eric Sunshine (blindly) fixed a bug in csSpriteCal3DMeshObject where
+	  it completely mismanaged its active_anims[] and active_weights[]
+	  members. AddAnimCycle() would append animation cycle information to
+	  these arrays, but ClearAnimCycle() never reversed the operation. The
+	  result was that the client's, Cal3D's, and csSpriteCal3DMeshObject's
+	  notion of which animation cycles were active were out-of-sync. (The
+	  only time animation cycles were ever removed from these arrays was
+	  when ClearAllAnims() was invoked.)
 27-Oct-2004
 	- Eric Sunshine added two mechanisms to msvcgen allowing clients to
 	  have control over the generated project name:
