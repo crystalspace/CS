@@ -25,6 +25,8 @@ chronological order.
 	  fixed some typographical, grammatical, and Texinfo mark-up problems;
 	  as well as TeX `hbox' warnings.
 	- res updated cslight and g2dtest for his recent font changes.
+	- res added an example of setting the font size in the old vs new way
+	  to the resp. API mod paragraph.
 9-Mar-2004
 	- Wouter clarified a comment on iLightingInfo::InitializeDefault().
 	- Reed added "relight" command to Walktest.

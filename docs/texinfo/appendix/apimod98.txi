@@ -1393,3 +1393,16 @@ calls returned the same instance of a font, and thus subsequent calls
 of @code{SetSize} affected a font globally (e.g. all Arial fonts would
 have the same size.) The new behaviour is to only return an existing
 instance of a font when both the font name and font size match.
+
+Code like:
+@example
+csRef<iFont> font = fontserver->LoadFont ("myfont.ttf");
+font->SetSize (23);
+g2d->Write (font, /* ... */);
+@end example
+
+Should be changed to:
+@example
+csRef<iFont> font = fontserver->LoadFont ("myfont.ttf", 23);
+g2d->Write (font, /* ... */);
+@end example
