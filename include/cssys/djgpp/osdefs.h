@@ -33,4 +33,8 @@
 #  define __NEED_GENERIC_ISDIR
 #endif
 
+#if defined (SYSDEF_GETCWD)
+#  include <dos.h>
+#endif
+
 #endif // __OSDEFS_H__
