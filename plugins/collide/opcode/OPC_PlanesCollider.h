@@ -17,30 +17,29 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include Guard
-#ifndef __CS_OPC_PLANESCOLLIDER_H__
-#define __CS_OPC_PLANESCOLLIDER_H__
+#ifndef __OPC_PLANESCOLLIDER_H__
+#define __OPC_PLANESCOLLIDER_H__
 
-	struct //OPCODE_API
-       	PlanesCache : VolumeCache {
+	struct OPCODE_API PlanesCache : VolumeCache
+	{
 					PlanesCache()
 					{
 					}
 	};
 
-	class //OPCODE_API
-       	PlanesCollider : public VolumeCollider 	{
+	class OPCODE_API PlanesCollider : public VolumeCollider
+	{
 		public:
 		// Constructor / Destructor
 											PlanesCollider();
 		virtual								~PlanesCollider();
-		// Generic collision query
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/**
 		 *	Generic collision query for generic OPCODE models. After the call, access the results:
 		 *	- with GetContactStatus()
-		 *	- with GetNbTouchedFaces()
-		 *	- with GetTouchedFaces()
+		 *	- with GetNbTouchedPrimitives()
+		 *	- with GetTouchedPrimitives()
 		 *
 		 *	\param		cache			[in/out] a planes cache
 		 *	\param		planes			[in] list of planes in world space
@@ -51,36 +50,30 @@
 		 *	\warning	SCALE NOT SUPPORTED. The matrices must contain rotation & translation parts only.
 		 */
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-							bool			Collide(PlanesCache& cache, const Plane* planes, udword nb_planes, OPCODE_Model* model, const Matrix4x4* worldm=null);
-
-		// Collision queries
-							bool			Collide(PlanesCache& cache, const Plane* planes, udword nb_planes, const AABBCollisionTree* tree,		const Matrix4x4* worldm=null);
-							bool			Collide(PlanesCache& cache, const Plane* planes, udword nb_planes, const AABBNoLeafTree* tree,			const Matrix4x4* worldm=null);
-							bool			Collide(PlanesCache& cache, const Plane* planes, udword nb_planes, const AABBQuantizedTree* tree,		const Matrix4x4* worldm=null);
-							bool			Collide(PlanesCache& cache, const Plane* planes, udword nb_planes, const AABBQuantizedNoLeafTree* tree,	const Matrix4x4* worldm=null);
+							bool			Collide(PlanesCache& cache, const Plane* planes, udword nb_planes, const Model& model, const Matrix4x4* worldm=null);
 
 		// Mutant box-with-planes collision queries
-		inline_				bool			Collide(PlanesCache& cache, const OBB& box, OPCODE_Model* model, const Matrix4x4* worldb=null, const Matrix4x4* worldm=null)
-							{
-								Plane PL[6];
+		inline_				bool			Collide(PlanesCache& cache, const OBB& box, const Model& model, const Matrix4x4* worldb=null, const Matrix4x4* worldm=null)
+											{
+												Plane PL[6];
 
-								if(worldb)
-								{
-									// Create a new OBB in world space
-									OBB WorldBox;
-									box.Rotate(*worldb, WorldBox);
-									// Compute planes from the sides of the box
-									WorldBox.ComputePlanes(PL);
-								}
-								else
-								{
-									// Compute planes from the sides of the box
-									box.ComputePlanes(PL);
-								}
+												if(worldb)
+												{
+													// Create a new OBB in world space
+													OBB WorldBox;
+													box.Rotate(*worldb, WorldBox);
+													// Compute planes from the sides of the box
+													WorldBox.ComputePlanes(PL);
+												}
+												else
+												{
+													// Compute planes from the sides of the box
+													box.ComputePlanes(PL);
+												}
 
-								// Collide with box planes
-								return Collide(cache, PL, 6, model, worldm);
-							}
+												// Collide with box planes
+												return Collide(cache, PL, 6, model, worldm);
+											}
 		// Settings
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,10 +91,14 @@
 		// Leaf description
 							VertexPointers	mVP;
 		// Internal methods
-							void			_Collide(const AABBCollisionNode* node, udword clipmask);
-							void			_Collide(const AABBNoLeafNode* node, udword clipmask);
-							void			_Collide(const AABBQuantizedNode* node, udword clipmask);
-							void			_Collide(const AABBQuantizedNoLeafNode* node, udword clipmask);
+							void			_Collide(const AABBCollisionNode* node, udword clip_mask);
+							void			_Collide(const AABBNoLeafNode* node, udword clip_mask);
+							void			_Collide(const AABBQuantizedNode* node, udword clip_mask);
+							void			_Collide(const AABBQuantizedNoLeafNode* node, udword clip_mask);
+							void			_CollideNoPrimitiveTest(const AABBCollisionNode* node, udword clip_mask);
+							void			_CollideNoPrimitiveTest(const AABBNoLeafNode* node, udword clip_mask);
+							void			_CollideNoPrimitiveTest(const AABBQuantizedNode* node, udword clip_mask);
+							void			_CollideNoPrimitiveTest(const AABBQuantizedNoLeafNode* node, udword clip_mask);
 			// Overlap tests
 		inline_				BOOL			PlanesAABBOverlap(const Point& center, const Point& extents, udword& out_clip_mask, udword in_clip_mask);
 		inline_				BOOL			PlanesTriOverlap(udword in_clip_mask);
@@ -109,4 +106,16 @@
 							BOOL			InitQuery(PlanesCache& cache, const Plane* planes, udword nb_planes, const Matrix4x4* worldm=null);
 	};
 
-#endif // __CS_OPC_PLANESCOLLIDER_H__
+	class OPCODE_API HybridPlanesCollider : public PlanesCollider
+	{
+		public:
+		// Constructor / Destructor
+											HybridPlanesCollider();
+		virtual								~HybridPlanesCollider();
+
+							bool			Collide(PlanesCache& cache, const Plane* planes, udword nb_planes, const HybridModel& model, const Matrix4x4* worldm=null);
+		protected:
+							Container		mTouchedBoxes;
+	};
+
+#endif // __OPC_PLANESCOLLIDER_H__

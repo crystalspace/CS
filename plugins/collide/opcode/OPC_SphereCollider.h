@@ -17,14 +17,13 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include Guard
-#ifndef __CS_OPC_SPHERECOLLIDER_H__
-#define __CS_OPC_SPHERECOLLIDER_H__
+#ifndef __OPC_SPHERECOLLIDER_H__
+#define __OPC_SPHERECOLLIDER_H__
 
-	struct // OPCODE_API
-       	SphereCache : VolumeCache {
-					SphereCache() : Center(0.0f,0.0f,0.0f), FatRadius2(0.0f), FatCoeff(1.1f)
-					{
-					}
+	struct OPCODE_API SphereCache : VolumeCache
+	{
+					SphereCache() : Center(0.0f,0.0f,0.0f), FatRadius2(0.0f), FatCoeff(1.1f)	{}
+					~SphereCache()																{}
 
 		// Cached faces signature
 		Point		Center;		//!< Sphere used when performing the query resulting in cached faces
@@ -33,19 +32,19 @@
 		float		FatCoeff;	//!< mRadius2 multiplier used to create a fat sphere
 	};
 
-	class //OPCODE_API
-       	SphereCollider : public VolumeCollider 	{
+	class OPCODE_API SphereCollider : public VolumeCollider
+	{
 		public:
 		// Constructor / Destructor
 											SphereCollider();
 		virtual								~SphereCollider();
-		// Generic collision query
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/**
 		 *	Generic collision query for generic OPCODE models. After the call, access the results:
 		 *	- with GetContactStatus()
-		 *	- in the user-provided destination array
+		 *	- with GetNbTouchedPrimitives()
+		 *	- with GetTouchedPrimitives()
 		 *
 		 *	\param		cache			[in/out] a sphere cache
 		 *	\param		sphere			[in] collision sphere in local space
@@ -56,24 +55,10 @@
 		 *	\warning	SCALE NOT SUPPORTED. The matrices must contain rotation & translation parts only.
 		 */
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-							bool			Collide(SphereCache& cache, const Sphere& sphere, OPCODE_Model* model, const Matrix4x4* worlds=null, const Matrix4x4* worldm=null);
+							bool			Collide(SphereCache& cache, const Sphere& sphere, const Model& model, const Matrix4x4* worlds=null, const Matrix4x4* worldm=null);
 
-		// Collision queries
-							bool			Collide(SphereCache& cache, const Sphere& sphere, const AABBCollisionTree* tree,		const Matrix4x4* worlds=null, const Matrix4x4* worldm=null);
-							bool			Collide(SphereCache& cache, const Sphere& sphere, const AABBNoLeafTree* tree,			const Matrix4x4* worlds=null, const Matrix4x4* worldm=null);
-							bool			Collide(SphereCache& cache, const Sphere& sphere, const AABBQuantizedTree* tree,		const Matrix4x4* worlds=null, const Matrix4x4* worldm=null);
-							bool			Collide(SphereCache& cache, const Sphere& sphere, const AABBQuantizedNoLeafTree* tree,	const Matrix4x4* worlds=null, const Matrix4x4* worldm=null);
+		// 
 							bool			Collide(SphereCache& cache, const Sphere& sphere, const AABBTree* tree);
-		// Settings
-
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		/**
-		 *	Validates current settings. You should call this method after all the settings and callbacks have been defined for a collider.
-		 *	\return		null if everything is ok, else a string describing the problem
-		 */
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		override(Collider)	const char*		ValidateSettings();
-
 		protected:
 		// Sphere in model space
 							Point			mCenter;			//!< Sphere center
@@ -84,6 +69,10 @@
 							void			_Collide(const AABBQuantizedNode* node);
 							void			_Collide(const AABBQuantizedNoLeafNode* node);
 							void			_Collide(const AABBTreeNode* node);
+							void			_CollideNoPrimitiveTest(const AABBCollisionNode* node);
+							void			_CollideNoPrimitiveTest(const AABBNoLeafNode* node);
+							void			_CollideNoPrimitiveTest(const AABBQuantizedNode* node);
+							void			_CollideNoPrimitiveTest(const AABBQuantizedNoLeafNode* node);
 			// Overlap tests
 		inline_				BOOL			SphereContainsBox(const Point& bc, const Point& be);
 		inline_				BOOL			SphereAABBOverlap(const Point& center, const Point& extents);
@@ -92,4 +81,16 @@
 							BOOL			InitQuery(SphereCache& cache, const Sphere& sphere, const Matrix4x4* worlds=null, const Matrix4x4* worldm=null);
 	};
 
-#endif // __CS_OPC_SPHERECOLLIDER_H__
+	class OPCODE_API HybridSphereCollider : public SphereCollider
+	{
+		public:
+		// Constructor / Destructor
+											HybridSphereCollider();
+		virtual								~HybridSphereCollider();
+
+							bool			Collide(SphereCache& cache, const Sphere& sphere, const HybridModel& model, const Matrix4x4* worlds=null, const Matrix4x4* worldm=null);
+		protected:
+							Container		mTouchedBoxes;
+	};
+
+#endif // __OPC_SPHERECOLLIDER_H__

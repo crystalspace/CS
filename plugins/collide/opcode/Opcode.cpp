@@ -35,16 +35,31 @@
 // Precompiled Header
 #include "Stdafx.h"
 
+bool Opcode::InitOpcode()
+{
+	Log("// Initializing OPCODE\n\n");
+//	LogAPIInfo();
+	return true;
+}
+
+void ReleasePruningSorters();
+bool Opcode::CloseOpcode()
+{
+	Log("// Closing OPCODE\n\n");
+
+	ReleasePruningSorters();
+
+	return true;
+}
+
 #ifdef ICE_MAIN
 
-void ModuleAttach(udword hmod)
+void ModuleAttach(HINSTANCE hinstance)
 {
-	Log("// Opening OPCODE\n\n");
 }
 
 void ModuleDetach()
 {
-	Log("// Closing OPCODE\n\n");
 }
 
 #endif

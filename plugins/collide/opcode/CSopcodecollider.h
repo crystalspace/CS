@@ -51,14 +51,18 @@ class csOPCODECollider : public iCollider
 {
 /// The internal model object.
 public:
-  Opcode::OPCODE_Model* m_pCollisionModel;
+  Opcode::Model* m_pCollisionModel;
   IceMaths::Matrix4x4 transform;
   unsigned int* indexholder;
   Point *vertholder;
 
+  Opcode::MeshInterface opcMeshInt;
+
 private:
   void GeometryInitialize (iPolygonMesh *mesh);
 
+  static void MeshCallback (udword triangle_index, 
+    Opcode::VertexPointers& triangle, void* user_data);
 public:
   /**
    * Global variables

@@ -21,7 +21,7 @@
  *
  *	\class		VolumeCollider
  *	\author		Pierre Terdiman
- *	\version	1.2
+ *	\version	1.3
  *	\date		June, 2, 2001
 */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -39,13 +39,6 @@ using namespace Opcode;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 VolumeCollider::VolumeCollider() :
 	mTouchedPrimitives	(null),
-#ifdef OPC_USE_CALLBACKS
-	mUserData			(0),
-	mObjCallback		(null),
-#else
-	mFaces				(null),
-	mVerts				(null),
-#endif
 	mNbVolumeBVTests	(0),
 	mNbVolumePrimTests	(0)
 {
@@ -69,26 +62,21 @@ VolumeCollider::~VolumeCollider()
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const char* VolumeCollider::ValidateSettings()
 {
-#ifdef OPC_USE_CALLBACKS
-	if(!mObjCallback)		return "Object callback must be defined! Call: SetCallback().";
-#else
-	if(!mFaces || !mVerts)	return "Object pointers must be defined! Call: SetPointers().";
-#endif
 	return null;
 }
 
-// Pretty dumb way to dump - to do better
+// Pretty dumb way to dump - to do better - one day...
 
-#define IMPLEMENT_NOLEAFDUMP(type)											\
-void VolumeCollider::_Dump(const type* node)								\
-{																			\
-	if(node->HasLeaf())		mTouchedPrimitives->Add(node->GetPrimitive());	\
-	else					_Dump(node->GetPos());							\
-																			\
-	if(ContactFound()) return;												\
-																			\
-	if(node->HasLeaf2())	mTouchedPrimitives->Add(node->GetPrimitive2());	\
-	else					_Dump(node->GetNeg());							\
+#define IMPLEMENT_NOLEAFDUMP(type)												\
+void VolumeCollider::_Dump(const type* node)									\
+{																				\
+	if(node->HasPosLeaf())	mTouchedPrimitives->Add(node->GetPosPrimitive());	\
+	else					_Dump(node->GetPos());								\
+																				\
+	if(ContactFound()) return;													\
+																				\
+	if(node->HasNegLeaf())	mTouchedPrimitives->Add(node->GetNegPrimitive());	\
+	else					_Dump(node->GetNeg());								\
 }
 
 #define IMPLEMENT_LEAFDUMP(type)						\

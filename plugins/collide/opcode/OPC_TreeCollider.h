@@ -17,11 +17,57 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include Guard
-#ifndef __CS_OPC_TREECOLLIDER_H__
-#define __CS_OPC_TREECOLLIDER_H__
+#ifndef __OPC_TREECOLLIDER_H__
+#define __OPC_TREECOLLIDER_H__
 
-	class //OPCODE_API
-       	AABBTreeCollider : public Collider {
+	//! This structure holds cached information used by the algorithm.
+	//! Two model pointers and two colliding primitives are cached. Model pointers are assigned
+	//! to their respective meshes, and the pair of colliding primitives is used for temporal
+	//! coherence. That is, in case temporal coherence is enabled, those two primitives are
+	//! tested for overlap before everything else. If they still collide, we're done before
+	//! even entering the recursive collision code.
+	struct OPCODE_API BVTCache : Pair
+	{
+		//! Constructor
+		inline_				BVTCache()
+							{
+								ResetCache();
+								ResetCountDown();
+							}
+
+					void	ResetCache()
+							{
+								Model0			= null;
+								Model1			= null;
+								id0				= 0;
+								id1				= 1;
+#ifdef __MESHMERIZER_H__		// Collision hulls only supported within ICE !
+								HullTest		= true;
+								SepVector.pid	= 0;
+								SepVector.qid	= 0;
+								SepVector.SV	= Point(1.0f, 0.0f, 0.0f);
+#endif // __MESHMERIZER_H__
+							}
+
+		inline_		void	ResetCountDown()
+							{
+#ifdef __MESHMERIZER_H__		// Collision hulls only supported within ICE !
+								CountDown		= 50;
+#endif // __MESHMERIZER_H__
+							}
+
+		const Model*		Model0;	//!< Model for first object
+		const Model*		Model1;	//!< Model for second object
+
+#ifdef __MESHMERIZER_H__	// Collision hulls only supported within ICE !
+		SVCache				SepVector;
+		udword				CountDown;
+		bool				HullTest;
+#endif // __MESHMERIZER_H__
+	};
+
+	class OPCODE_API AABBTreeCollider : public Collider
+	{
 		public:
 		// Constructor / Destructor
 											AABBTreeCollider();
@@ -123,47 +169,6 @@
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		inline_				const Pair*		GetPairs()						const	{ return (const Pair*)mPairs.GetEntries();		}
 
-#ifdef OPC_USE_CALLBACKS
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		/**
-		 *	Callback control: a method to setup callback 0. Must provide triangle-vertices for a given triangle index.
-		 *	\param		callback	[in] user-defined callback
-		 *	\param		data		[in] user-defined data
-		 *	\see		SetCallback1(OPC_CALLBACK callback, udword data)
-		 */
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		inline_				void			SetCallback0(OPC_CALLBACK callback, udword data)	{ mObjCallback0	= callback;	mUserData0	= data;		}
-
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		/**
-		 *	Callback control: a method to setup callback 1. Must provide triangle-vertices for a given triangle index.
-		 *	\param		callback	[in] user-defined callback
-		 *	\param		data		[in] user-defined data
-		 *	\see		SetCallback0(OPC_CALLBACK callback, udword data)
-		 */
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		inline_				void			SetCallback1(OPC_CALLBACK callback, udword data)	{ mObjCallback1	= callback;	mUserData1	= data;		}
-#else
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		/**
-		 *	Pointers control: a method to setup object0 pointers. Must provide access to faces and vertices for a given object.
-		 *	\param		faces	[in] pointer to faces
-		 *	\param		verts	[in] pointer to vertices
-		 *	\see		SetPointers1(const Triangle* faces, const Point* verts)
-		 */
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		inline_				void			SetPointers0(const IndexedTriangle* faces, const Point* verts)	{ mFaces0 = faces;	mVerts0 = verts;	}
-
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		/**
-		 *	Pointers control: a method to setup object1 pointers. Must provide access to faces and vertices for a given object.
-		 *	\param		faces	[in] pointer to faces
-		 *	\param		verts	[in] pointer to vertices
-		 *	\see		SetPointers0(const Triangle* faces, const Point* verts)
-		 */
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		inline_				void			SetPointers1(const IndexedTriangle* faces, const Point* verts)	{ mFaces1 = faces;	mVerts1 = verts;	}
-#endif
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/**
 		 *	Validates current settings. You should call this method after all the settings and callbacks have been defined for a collider.
@@ -175,19 +180,9 @@
 		protected:
 		// Colliding pairs
 							Container		mPairs;				//!< Pairs of colliding primitives
-#ifdef OPC_USE_CALLBACKS
-		// User callback
-							udword			mUserData0;			//!< User-defined data sent to callbacks
-							udword			mUserData1;			//!< User-defined data sent to callbacks
-							OPC_CALLBACK	mObjCallback0;		//!< Callback for object 0
-							OPC_CALLBACK	mObjCallback1;		//!< Callback for object 1
-#else
-		// User pointers
-					const IndexedTriangle*	mFaces0;			//!< User-defined faces
-					const IndexedTriangle*	mFaces1;			//!< User-defined faces
-							const Point*	mVerts0;			//!< User-defined vertices
-							const Point*	mVerts1;			//!< User-defined vertices
-#endif
+		// User mesh interfaces
+					const	MeshInterface*	mIMesh0;			//!< User-defined mesh interface for object0
+					const	MeshInterface*	mIMesh1;			//!< User-defined mesh interface for object1
 		// Stats
 							udword			mNbBVBVTests;		//!< Number of BV-BV tests
 							udword			mNbPrimPrimTests;	//!< Number of Primitive-Primitive tests
@@ -234,7 +229,16 @@
 			// Init methods
 							void			InitQuery(const Matrix4x4* world0=null, const Matrix4x4* world1=null);
 							bool			CheckTemporalCoherence(Pair* cache);
+
+		inline_				BOOL			Setup(const MeshInterface* mi0, const MeshInterface* mi1)
+											{
+												mIMesh0	= mi0;
+												mIMesh1	= mi1;
+
+												if(!mIMesh0 || !mIMesh1)	return FALSE;
+
+												return TRUE;
+											}
 	};
 
-#endif // __CS_OPC_TREECOLLIDER_H__
-
+#endif // __OPC_TREECOLLIDER_H__

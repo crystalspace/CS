@@ -25,16 +25,17 @@
  *
  *	Usage:
  *
- *	1) Build an OPCODE_Model using a creation structure:
+ *	1) Create a static mesh interface using callbacks or pointers. (see OPC_MeshInterface.cpp).
+ *	Keep it around in your app, since a pointer to this interface is saved internally and
+ *	used until you release the collision structures.
+ *
+ *	2) Build a Model using a creation structure:
  *
  *	\code
- *		OPCODE_Model Sample;
+ *		Model Sample;
  *
  *		OPCODECREATE OPCC;
- *		OPCC.NbTris			= ...;
- *		OPCC.NbVerts		= ...;
- *		OPCC.Tris			= ...;
- *		OPCC.Verts			= ...;
+ *		OPCC.IMesh			= ...;
  *		OPCC.Rules			= ...;
  *		OPCC.NoLeaf			= ...;
  *		OPCC.Quantized		= ...;
@@ -42,7 +43,7 @@
  *		bool Status = Sample.Build(OPCC);
  *	\endcode
  *
- *	2) Create a tree collider and setup it:
+ *	3) Create a tree collider and set it up:
  *
  *	\code
  *		AABBTreeCollider TC;
@@ -50,44 +51,6 @@
  *		TC.SetFullBoxBoxTest(...);
  *		TC.SetFullPrimBoxTest(...);
  *		TC.SetTemporalCoherence(...);
- *	\endcode
- *
- *	3) Setup object callbacks. Geometry & topology are NOT stored in the collision system,
- *	in order to save some ram. So, when the system needs them to perform accurate intersection
- *	tests, you're requested to provide the triangle-vertices corresponding to a given face index.
- *
- *	Ex:
- *
- *	\code
- *		static void ColCallback(udword triangleindex, VertexPointers& triangle, udword user_data)
- *		{
- *			// Get back Mesh0 or Mesh1 (you also can use 2 different callbacks)
- *			Mesh* MyMesh = (Mesh*)user_data;
- *			// Get correct triangle in the app-controlled database
- *			const Triangle* Tri = MyMesh->GetTriangle(triangleindex);
- *			// Setup pointers to vertices for the collision system
- *			triangle.Vertex[0] = MyMesh->GetVertex(Tri->mVRef[0]);
- *			triangle.Vertex[1] = MyMesh->GetVertex(Tri->mVRef[1]);
- *			triangle.Vertex[2] = MyMesh->GetVertex(Tri->mVRef[2]);
- *		}
- *
- *		// Setup callbacks
- *		TC.SetCallback0(ColCallback, udword(Mesh0));
- *		TC.SetCallback1(ColCallback, udword(Mesh1));
- *	\endcode
- *
- *	Of course, you should make this callback as fast as possible. And you're also not supposed
- *	to modify the geometry *after* the collision trees have been built. The alternative was to
- *	store the geometry & topology in the collision system as well (as in RAPID) but we have found
- *	this approach to waste a lot of ram in many cases.
- *
- *	Since version 1.2 you can also use plain pointers. It's a tiny bit faster, but not as safe.
- *
- *	Ex:
- *
- *	\code
- *		TC.SetPointers0(Mesh0->GetFaces(), Mesh0->GetVerts());
- *		TC.SetPointers1(Mesh1->GetFaces(), Mesh1->GetVerts());
  *	\endcode
  *
  *	4) Perform a collision query
@@ -118,9 +81,9 @@
  *		TC.GetNbBVPrimTests()	= number of Triangle-BV overlap tests performed during last query
  *	\endcode
  *
- *	\class		OPCODE_Model
+ *	\class		Model
  *	\author		Pierre Terdiman
- *	\version	1.2
+ *	\version	1.3
  *	\date		March, 20, 2001
 */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -131,27 +94,12 @@
 
 using namespace Opcode;
 
-OPCODECREATE::OPCODECREATE()
-{
-	NbTris			= 0;
-	NbVerts			= 0;
-	Tris			= null;
-	Verts			= null;
-	Rules			= SPLIT_COMPLETE | SPLIT_LARGESTAXIS;
-	NoLeaf			= true;
-	Quantized		= true;
-#ifdef __MESHMERIZER_H__
-	CollisionHull	= false;
-#endif // __MESHMERIZER_H__
-	KeepOriginal	= false;
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  *	Constructor.
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-OPCODE_Model::OPCODE_Model() : mSource(null), mTree(null), mNoLeaf(false), mQuantized(false)
+Model::Model()
 {
 #ifdef __MESHMERIZER_H__	// Collision hulls only supported within ICE !
 	mHull	= null;
@@ -163,10 +111,19 @@ OPCODE_Model::OPCODE_Model() : mSource(null), mTree(null), mNoLeaf(false), mQuan
  *	Destructor.
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-OPCODE_Model::~OPCODE_Model()
+Model::~Model()
 {
-	DELETESINGLE(mSource);
-	DELETESINGLE(mTree);
+	Release();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *	Releases the model.
+ */
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void Model::Release()
+{
+	ReleaseBase();
 #ifdef __MESHMERIZER_H__	// Collision hulls only supported within ICE !
 	DELETESINGLE(mHull);
 #endif // __MESHMERIZER_H__
@@ -179,30 +136,33 @@ OPCODE_Model::~OPCODE_Model()
  *	\return		true if success
  */
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-bool OPCODE_Model::Build(const OPCODECREATE& create)
+bool Model::Build(const OPCODECREATE& create)
 {
 	// 1) Checkings
-	if (!create.NbTris || !create.Tris || !create.Verts)	return false;
+	if(!create.mIMesh || !create.mIMesh->IsValid())	return false;
 
-	// In this lib, we only support complete trees
-	if (!(create.Rules & SPLIT_COMPLETE)) {
-		return false;
-		//SetIceError("OPCODE WARNING: supports complete trees only! Use SPLIT_COMPLETE.\n");
-		 };
+	// For this model, we only support complete trees
+	if(create.mSettings.mLimit!=1)	return SetIceError ("OPCODE WARNING: supports complete trees only! Use mLimit = 1.", null);
 
-	// Check topology. If the model contains degenerate faces, collision report can be wrong in some cases.
-	// e.g. it happens with the standard MAX teapot. So clean your meshes first... If you don't have a mesh cleaner
-	// you can try this: www.codercorner.com/Consolidation.zip
-	const IndexedTriangle* Tris = (const IndexedTriangle*)create.Tris;
-	udword NbDegenerate = 0;
-	udword i;
-	for(i=0;i<create.NbTris;i++)
+	// Look for degenerate faces.
+	udword NbDegenerate = create.mIMesh->CheckTopology();
+	if(NbDegenerate)	Log ("OPCODE WARNING: found %d degenerate faces in model! Collision might report wrong results!", NbDegenerate);
+	// We continue nonetheless.... 
+
+	Release();	// Make sure previous tree has been discarded [Opcode 1.3, thanks Adam]
+
+	// 1-1) Setup mesh interface automatically [Opcode 1.3]
+	SetMeshInterface(create.mIMesh);
+
+	// Special case for 1-triangle meshes [Opcode 1.3]
+	udword NbTris = create.mIMesh->GetNbTriangles();
+	if(NbTris==1)
 	{
-		if(Tris[i].IsDegenerate())	NbDegenerate++;
+		// We don't need to actually create a tree here, since we'll only have a single triangle to deal with anyway.
+		// It's a waste to use a "model" for this but at least it will work.
+		mModelCode |= OPC_SINGLE_NODE;
+		return true;
 	}
-	if(NbDegenerate)
-	  Log("OPCODE WARNING: found %d degenerate faces in model! Collision might report wrong results!\n", NbDegenerate);
-	// We continue nonetheless....
 
 	// 2) Build a generic AABB Tree.
 	mSource = new AABBTree;
@@ -210,52 +170,53 @@ bool OPCODE_Model::Build(const OPCODECREATE& create)
 
 	// 2-1) Setup a builder. Our primitives here are triangles from input mesh,
 	// so we use an AABBTreeOfTrianglesBuilder.....
-	AABBTreeOfTrianglesBuilder TB;
-	TB.mTriList			= Tris;
-	TB.mVerts			= create.Verts;
-	TB.mRules			= create.Rules;
-	TB.mNbPrimitives	= create.NbTris;
-	if(!mSource->Build(&TB))	return false;
+	{
+		AABBTreeOfTrianglesBuilder TB;
+		TB.mIMesh			= create.mIMesh;
+		TB.mSettings		= create.mSettings;
+		TB.mNbPrimitives	= NbTris;
+		if(!mSource->Build(&TB))	return false;
+	}
 
 	// 3) Create an optimized tree according to user-settings
-	// 3-1) Create the correct class
-	mNoLeaf		= create.NoLeaf;
-	mQuantized	= create.Quantized;
-
-	if(mNoLeaf)
-	{
-		if(mQuantized)	mTree = new AABBQuantizedNoLeafTree;
-		else			mTree = new AABBNoLeafTree;
-	}
-	else
-	{
-		if(mQuantized)	mTree = new AABBQuantizedTree;
-		else			mTree = new AABBCollisionTree;
-	}
-	CHECKALLOC(mTree);
+	if(!CreateTree(create.mNoLeaf, create.mQuantized))	return false;
 
 	// 3-2) Create optimized tree
 	if(!mTree->Build(mSource))	return false;
 
 	// 3-3) Delete generic tree if needed
-	if(!create.KeepOriginal)	DELETESINGLE(mSource);
+	if(!create.mKeepOriginal)	DELETESINGLE(mSource);
 
 #ifdef __MESHMERIZER_H__
 	// 4) Convex hull
-	if(create.CollisionHull)
+	if(create.mCollisionHull)
 	{
 		// Create hull
 		mHull = new CollisionHull;
 		CHECKALLOC(mHull);
 
 		CONVEXHULLCREATE CHC;
-		CHC.NbVerts			= create.NbVerts;
-		CHC.Vertices		= create.Verts;
+		// ### doesn't work with strides
+		CHC.NbVerts			= create.mIMesh->GetNbVertices();
+		CHC.Vertices		= create.mIMesh->GetVerts();
 		CHC.UnifyNormals	= true;
 		CHC.ReduceVertices	= true;
 		CHC.WordFaces		= false;
 		mHull->Compute(CHC);
 	}
 #endif // __MESHMERIZER_H__
+
 	return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+ *	Gets the number of bytes used by the tree.
+ *	\return		amount of bytes used
+ */
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+udword Model::GetUsedBytes() const
+{
+	if(!mTree)	return 0;
+	return mTree->GetUsedBytes();
 }

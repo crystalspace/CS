@@ -50,6 +50,10 @@ public:
 	csReversibleTransform T1;
 	csOPCODECollider* col2;
 	csReversibleTransform T2;
+
+  //Opcode::MeshInterface mesh0;
+  //Opcode::MeshInterface mesh1;
+
   csCollisionPair *pairs;
   int N_pairs;
   iObjectRegistry *object_reg;

@@ -17,30 +17,37 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include Guard
-#ifndef __CS_OPC_OBBCOLLIDER_H__
-#define __CS_OPC_OBBCOLLIDER_H__
+#ifndef __OPC_OBBCOLLIDER_H__
+#define __OPC_OBBCOLLIDER_H__
 
-	struct // OPCODE_API
-       	OBBCache : VolumeCache 	{
-					OBBCache()
+	struct OPCODE_API OBBCache : VolumeCache
+	{
+					OBBCache() : FatCoeff(1.1f)
 					{
+						FatBox.mCenter.Zero();
+						FatBox.mExtents.Zero();
+						FatBox.mRot.Identity();
 					}
+
+		// Cached faces signature
+		OBB				FatBox;		//!< Box used when performing the query resulting in cached faces
+		// User settings
+		float			FatCoeff;	//!< extents multiplier used to create a fat box
 	};
 
-	class //OPCODE_API
-       	OBBCollider : public VolumeCollider {
+	class OPCODE_API OBBCollider : public VolumeCollider
+	{
 		public:
 		// Constructor / Destructor
 											OBBCollider();
 		virtual								~OBBCollider();
-		// Generic collision query
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/**
 		 *	Generic collision query for generic OPCODE models. After the call, access the results:
 		 *	- with GetContactStatus()
-		 *	- with GetNbTouchedFaces()
-		 *	- with GetTouchedFaces()
+		 *	- with GetNbTouchedPrimitives()
+		 *	- with GetTouchedPrimitives()
 		 *
 		 *	\param		cache			[in/out] a box cache
 		 *	\param		box				[in] collision OBB in local space
@@ -51,13 +58,8 @@
 		 *	\warning	SCALE NOT SUPPORTED. The matrices must contain rotation & translation parts only.
 		 */
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-							bool			Collide(OBBCache& cache, const OBB& box, OPCODE_Model* model, const Matrix4x4* worldb=null, const Matrix4x4* worldm=null);
+							bool			Collide(OBBCache& cache, const OBB& box, const Model& model, const Matrix4x4* worldb=null, const Matrix4x4* worldm=null);
 
-		// Collision queries
-							bool			Collide(OBBCache& cache, const OBB& box, const AABBCollisionTree* tree,			const Matrix4x4* worldb=null, const Matrix4x4* worldm=null);
-							bool			Collide(OBBCache& cache, const OBB& box, const AABBNoLeafTree* tree,			const Matrix4x4* worldb=null, const Matrix4x4* worldm=null);
-							bool			Collide(OBBCache& cache, const OBB& box, const AABBQuantizedTree* tree,			const Matrix4x4* worldb=null, const Matrix4x4* worldm=null);
-							bool			Collide(OBBCache& cache, const OBB& box, const AABBQuantizedNoLeafTree* tree,	const Matrix4x4* worldb=null, const Matrix4x4* worldm=null);
 		// Settings
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -113,6 +115,10 @@
 							void			_Collide(const AABBNoLeafNode* node);
 							void			_Collide(const AABBQuantizedNode* node);
 							void			_Collide(const AABBQuantizedNoLeafNode* node);
+							void			_CollideNoPrimitiveTest(const AABBCollisionNode* node);
+							void			_CollideNoPrimitiveTest(const AABBNoLeafNode* node);
+							void			_CollideNoPrimitiveTest(const AABBQuantizedNode* node);
+							void			_CollideNoPrimitiveTest(const AABBQuantizedNoLeafNode* node);
 			// Overlap tests
 		inline_				BOOL			OBBContainsBox(const Point& bc, const Point& be);
 		inline_				BOOL			BoxBoxOverlap(const Point& extents, const Point& center);
@@ -121,4 +127,16 @@
 							BOOL			InitQuery(OBBCache& cache, const OBB& box, const Matrix4x4* worldb=null, const Matrix4x4* worldm=null);
 	};
 
-#endif // __CS_OPC_OBBCOLLIDER_H__
+	class OPCODE_API HybridOBBCollider : public OBBCollider
+	{
+		public:
+		// Constructor / Destructor
+											HybridOBBCollider();
+		virtual								~HybridOBBCollider();
+
+							bool			Collide(OBBCache& cache, const OBB& box, const HybridModel& model, const Matrix4x4* worldb=null, const Matrix4x4* worldm=null);
+		protected:
+							Container		mTouchedBoxes;
+	};
+
+#endif // __OPC_OBBCOLLIDER_H__

@@ -37,6 +37,8 @@
 #include "igeom/polymesh.h"
 #include "ivaria/collider.h"
 
+#include "OPC_TreeBuilders.h"
+
 using namespace Opcode;
 
 //#define CD_MAX_COLLISION    1000
@@ -70,6 +72,9 @@ csOPCODECollider::csOPCODECollider (iPolygonMesh* mesh)
   transform.m[1][3] = 0;
   transform.m[2][3] = 0;
   transform.m[3][3] = 1;  
+
+  opcMeshInt.SetCallback (&MeshCallback, this);
+
   GeometryInitialize (mesh);
 }
 
@@ -97,7 +102,7 @@ void csOPCODECollider::GeometryInitialize (iPolygonMesh* mesh)
 
   if (tri_count>1)
   {
-    m_pCollisionModel = new OPCODE_Model;
+    m_pCollisionModel = new Opcode::Model;
     if (!m_pCollisionModel)
       return;
 
@@ -127,15 +132,24 @@ void csOPCODECollider::GeometryInitialize (iPolygonMesh* mesh)
       index += 3 * (p.num_vertices - 2);
     }
    
+    opcMeshInt.SetNbTriangles (tri_count);
+    opcMeshInt.SetNbVertices (vertcount);
+
     // Mesh data
-    OPCC.NbTris = tri_count;
-    OPCC.NbVerts = vertcount;
-    OPCC.Tris = indexholder;
-    OPCC.Verts = vertholder;
-    OPCC.Rules = SPLIT_COMPLETE | SPLIT_SPLATTERPOINTS | SPLIT_GEOMCENTER;
-    OPCC.NoLeaf = true;
-    OPCC.Quantized = true;
+    OPCC.mIMesh = &opcMeshInt;
+    //OPCC.NbTris = tri_count;
+    //OPCC.NbVerts = vertcount;
+    //OPCC.Tris = indexholder;
+    //OPCC.Verts = vertholder;
+    //OPCC.Rules = SPLIT_COMPLETE | SPLIT_SPLATTERPOINTS | SPLIT_GEOMCENTER;
+    OPCC.mSettings.mRules = SPLIT_SPLATTER_POINTS | SPLIT_GEOM_CENTER;
+    OPCC.mNoLeaf = true;
+    OPCC.mQuantized = true;
+    OPCC.mKeepOriginal = false;
+    OPCC.mCanRemap = false;
   }
+  else
+    return;
 
   bool status = m_pCollisionModel->Build (OPCC);  // this should create the OPCODE model
   if (!status) { return; };
@@ -152,4 +166,18 @@ csOPCODECollider::~csOPCODECollider ()
   delete[] indexholder;
   delete[] vertholder;
   SCF_DESTRUCT_IBASE ();
+}
+
+void csOPCODECollider::MeshCallback (udword triangle_index, 
+				     VertexPointers& triangle, 
+				     void* user_data)
+{
+  csOPCODECollider* collider = (csOPCODECollider*)user_data;
+
+  udword *tri_array = collider->indexholder;
+  Point *vertholder = collider->vertholder;
+  int index = 3 * triangle_index;
+  triangle.Vertex[0] = &vertholder [tri_array[index]] ;
+  triangle.Vertex[1] = &vertholder [tri_array[index + 1]];
+  triangle.Vertex[2] = &vertholder [tri_array[index + 2]];
 }

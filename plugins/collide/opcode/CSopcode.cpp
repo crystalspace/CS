@@ -33,6 +33,7 @@
 #include "csgeom/transfrm.h"
 #include "csutil/scfstr.h"
 #include "iutil/string.h"
+#include "ivaria/reporter.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -49,17 +50,27 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 SCF_IMPLEMENT_FACTORY (csOPCODECollideSystem)
 
-
 using namespace Opcode;
 
-static void _opcodeCallback (udword triangleIndex, VertexPointers& triangle, udword userdata)
+void Opcode_Log (const char* msg, ...)
 {
-  udword *tri_array = ((csOPCODECollider *) userdata)->indexholder;
-  Point *vertholder = ((csOPCODECollider *) userdata)->vertholder;
-  int index = 3 * triangleIndex;
-  triangle.Vertex[0] = &vertholder [tri_array[index]] ;
-  triangle.Vertex[1] = &vertholder [tri_array[index + 1]];
-  triangle.Vertex[2] = &vertholder [tri_array[index + 2]];
+  va_list args;
+  va_start (args, msg);
+  csReportV (0, CS_REPORTER_SEVERITY_NOTIFY, // @@@ use a real object_reg
+    "crystalspace.collisiondetection.opcode", msg, args);
+  va_end (args);
+}
+
+bool Opcode_Err (const char* msg, ...)
+{
+  va_list args;
+  va_start (args, msg);
+  // Although it's called "..._Err", Opcode also reports less-than-fatal 
+  // messages thorugh it
+  csReportV (0, CS_REPORTER_SEVERITY_WARNING, // @@@ use a real object_reg
+    "crystalspace.collisiondetection.opcode", msg, args);
+  va_end (args);
+  return false;
 }
 
 csOPCODECollideSystem::csOPCODECollideSystem (iBase *pParent)
@@ -105,8 +116,8 @@ bool csOPCODECollideSystem::Collide (
   col1 = (csOPCODECollider*) collider1;
   col2 = (csOPCODECollider*) collider2;
  
-  TreeCollider.SetCallback0 (_opcodeCallback , udword(col1));
-  TreeCollider.SetCallback1 (_opcodeCallback , udword(col2));
+  //TreeCollider.SetCallback0 (_opcodeCallback , udword(col1));
+  //TreeCollider.SetCallback1 (_opcodeCallback , udword(col2));
 
   ColCache.Model0 = col1->m_pCollisionModel;
   ColCache.Model1 = col2->m_pCollisionModel;

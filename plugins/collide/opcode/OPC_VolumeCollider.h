@@ -17,20 +17,20 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include Guard
-#ifndef __CS_OPC_VOLUMECOLLIDER_H__
-#define __CS_OPC_VOLUMECOLLIDER_H__
+#ifndef __OPC_VOLUMECOLLIDER_H__
+#define __OPC_VOLUMECOLLIDER_H__
 
-	struct //OPCODE_API
-       	VolumeCache {
-					VolumeCache()
-					{
-					}
+	struct OPCODE_API VolumeCache
+	{
+							VolumeCache() : Model(null)		{}
+							~VolumeCache()					{}
 
-		Container	TouchedPrimitives;	//!< Indices of touched primitives
+		Container			TouchedPrimitives;	//!< Indices of touched primitives
+		const BaseModel*	Model;				//!< Owner
 	};
 
-	class //OPCODE_API
-       	VolumeCollider : public Collider {
+	class OPCODE_API VolumeCollider : public Collider
+	{
 		public:
 		// Constructor / Destructor
 											VolumeCollider();
@@ -43,7 +43,7 @@
 		 *	Gets the number of touched primitives after a collision query.
 		 *	\see		GetContactStatus()
 		 *	\see		GetTouchedPrimitives()
-		 *	\return		the number of touched faces
+		 *	\return		the number of touched primitives
 		 */
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		inline_				udword			GetNbTouchedPrimitives()	const	{ return mTouchedPrimitives ? mTouchedPrimitives->GetNbEntries() : 0;	}
@@ -56,7 +56,7 @@
 		 *	\return		the list of touched primitives (primitive indices)
 		 */
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		inline_				udword*			GetTouchedPrimitives()		const	{ return mTouchedPrimitives ? mTouchedPrimitives->GetEntries() : null;	}
+		inline_		const	udword*			GetTouchedPrimitives()		const	{ return mTouchedPrimitives ? mTouchedPrimitives->GetEntries() : null;	}
 
 		// Stats
 
@@ -80,25 +80,6 @@
 
 		// Settings
 
-#ifdef OPC_USE_CALLBACKS
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		/**
-		 *	Callback control: a method to setup object callback. Must provide triangle-vertices for a given triangle index.
-		 *	\param		callback	[in] user-defined callback
-		 *	\param		user_data	[in] user-defined data
-		 */
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		inline_				void			SetCallback(OPC_CALLBACK callback, udword user_data)	{ mObjCallback = callback;	mUserData = user_data;	}
-#else
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		/**
-		 *	Pointers control: a method to setup object pointers. Must provide access to faces and vertices for a given object.
-		 *	\param		faces	[in] pointer to faces
-		 *	\param		verts	[in] pointer to vertices
-		 */
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		inline_				void			SetPointers(const IndexedTriangle* faces, const Point* verts)	{ mFaces = faces;	mVerts = verts;			}
-#endif
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/**
 		 *	Validates current settings. You should call this method after all the settings / callbacks have been defined for a collider.
@@ -110,15 +91,7 @@
 		protected:
 		// Touched primitives
 							Container*		mTouchedPrimitives;	//!< List of touched primitives
-#ifdef OPC_USE_CALLBACKS
-		// User callback
-							udword			mUserData;			//!< User-defined data sent to callback
-							OPC_CALLBACK	mObjCallback;		//!< Object callback
-#else
-		// User pointers
-					const IndexedTriangle*	mFaces;				//!< User-defined faces
-							const Point*	mVerts;				//!< User-defined vertices
-#endif
+
 		// Dequantization coeffs
 							Point			mCenterCoeff;
 							Point			mExtentsCoeff;
@@ -137,13 +110,29 @@
 		 */
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		override(Collider) inline_	void	InitQuery()
-							{
-								// Reset stats & contact status
-								mNbVolumeBVTests	= 0;
-								mNbVolumePrimTests	= 0;
-								Collider::InitQuery();
-							}
+											{
+												// Reset stats & contact status
+												mNbVolumeBVTests	= 0;
+												mNbVolumePrimTests	= 0;
+												Collider::InitQuery();
+											}
+
+		inline_				BOOL			IsCacheValid(VolumeCache& cache)
+											{
+												// We're going to do a volume-vs-model query.
+												if(cache.Model!=mCurrentModel)
+												{
+													// Cached list was for another model so we can't keep it
+													// Keep track of new owner and reset cache
+													cache.Model = mCurrentModel;
+													return FALSE;
+												}
+												else
+												{
+													// Same models, no problem
+													return TRUE;
+												}
+											}
 	};
 
-#endif // __CS_OPC_VOLUMECOLLIDER_H__
-
+#endif // __OPC_VOLUMECOLLIDER_H__

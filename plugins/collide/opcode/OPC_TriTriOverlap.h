@@ -78,9 +78,9 @@ BOOL CoplanarTriTri(const Point& n, const Point& v0, const Point& v1, const Poin
 	short i0,i1;
 	/* first project onto an axis-aligned plane, that maximizes the area */
 	/* of the triangles, compute indices: i0,i1. */
-	A[0] = (float)fabs(n[0]);
-	A[1] = (float)fabs(n[1]);
-	A[2] = (float)fabs(n[2]);
+	A[0] = fabsf(n[0]);
+	A[1] = fabsf(n[1]);
+	A[2] = fabsf(n[2]);
 	if(A[0]>A[1])
 	{
 		if(A[0]>A[2])
@@ -195,9 +195,9 @@ inline_ BOOL AABBTreeCollider::TriTriOverlap(const Point& V0, const Point& V1, c
 
 	// Coplanarity robustness check
 #ifdef OPC_TRITRI_EPSILON_TEST
-	if(fabs(du0)<LOCAL_EPSILON) du0 = 0.0f;
-	if(fabs(du1)<LOCAL_EPSILON) du1 = 0.0f;
-	if(fabs(du2)<LOCAL_EPSILON) du2 = 0.0f;
+	if(fabsf(du0)<LOCAL_EPSILON) du0 = 0.0f;
+	if(fabsf(du1)<LOCAL_EPSILON) du1 = 0.0f;
+	if(fabsf(du2)<LOCAL_EPSILON) du2 = 0.0f;
 #endif
 	const float du0du1 = du0 * du1;
 	const float du0du2 = du0 * du2;
@@ -218,9 +218,9 @@ inline_ BOOL AABBTreeCollider::TriTriOverlap(const Point& V0, const Point& V1, c
 	float dv2 = (N2|V2) + d2;
 
 #ifdef OPC_TRITRI_EPSILON_TEST
-	if(fabs(dv0)<LOCAL_EPSILON) dv0 = 0.0f;
-	if(fabs(dv1)<LOCAL_EPSILON) dv1 = 0.0f;
-	if(fabs(dv2)<LOCAL_EPSILON) dv2 = 0.0f;
+	if(fabsf(dv0)<LOCAL_EPSILON) dv0 = 0.0f;
+	if(fabsf(dv1)<LOCAL_EPSILON) dv1 = 0.0f;
+	if(fabsf(dv2)<LOCAL_EPSILON) dv2 = 0.0f;
 #endif
 
 	const float dv0dv1 = dv0 * dv1;
@@ -233,10 +233,10 @@ inline_ BOOL AABBTreeCollider::TriTriOverlap(const Point& V0, const Point& V1, c
 	const Point D = N1^N2;
 
 	// Compute and index to the largest component of D
-	float max=(float)fabs(D[0]);
+	float max=fabsf(D[0]);
 	short index=0;
-	float bb=(float)fabs(D[1]);
-	float cc=(float)fabs(D[2]);
+	float bb=fabsf(D[1]);
+	float cc=fabsf(D[2]);
 	if(bb>max) max=bb,index=1;
 	if(cc>max) max=cc,index=2;
 

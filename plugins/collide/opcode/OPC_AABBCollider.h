@@ -17,11 +17,11 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include Guard
-#ifndef __CS_OPC_AABBCOLLIDER_H__
-#define __CS_OPC_AABBCOLLIDER_H__
+#ifndef __OPC_AABBCOLLIDER_H__
+#define __OPC_AABBCOLLIDER_H__
 
-	struct // OPCODE_API
-       	AABBCache : VolumeCache {
+	struct OPCODE_API AABBCache : VolumeCache
+	{
 						AABBCache() : FatCoeff(1.1f)
 						{
 							FatBox.mCenter.Zero();
@@ -34,20 +34,19 @@
 		float			FatCoeff;	//!< mRadius2 multiplier used to create a fat sphere
 	};
 
-	class //OPCODE_API
-       	AABBCollider : public VolumeCollider	{
+	class OPCODE_API AABBCollider : public VolumeCollider
+	{
 		public:
 		// Constructor / Destructor
 											AABBCollider();
 		virtual								~AABBCollider();
-		// Generic collision query
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/**
 		 *	Generic collision query for generic OPCODE models. After the call, access the results:
 		 *	- with GetContactStatus()
-		 *	- with GetNbTouchedFaces()
-		 *	- with GetTouchedFaces()
+		 *	- with GetNbTouchedPrimitives()
+		 *	- with GetTouchedPrimitives()
 		 *
 		 *	\param		cache			[in/out] a box cache
 		 *	\param		box				[in] collision AABB in world space
@@ -56,24 +55,9 @@
 		 *	\warning	SCALE NOT SUPPORTED. The matrices must contain rotation & translation parts only.
 		 */
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-							bool			Collide(AABBCache& cache, const CollisionAABB& box, OPCODE_Model* model);
-
-		// Collision queries
-							bool			Collide(AABBCache& cache, const CollisionAABB& box, const AABBCollisionTree* tree);
-							bool			Collide(AABBCache& cache, const CollisionAABB& box, const AABBNoLeafTree* tree);
-							bool			Collide(AABBCache& cache, const CollisionAABB& box, const AABBQuantizedTree* tree);
-							bool			Collide(AABBCache& cache, const CollisionAABB& box, const AABBQuantizedNoLeafTree* tree);
+							bool			Collide(AABBCache& cache, const CollisionAABB& box, const Model& model);
+		//
 							bool			Collide(AABBCache& cache, const CollisionAABB& box, const AABBTree* tree);
-		// Settings
-
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		/**
-		 *	Validates current settings. You should call this method after all the settings and callbacks have been defined for a collider.
-		 *	\return		null if everything is ok, else a string describing the problem
-		 */
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		override(Collider)	const char*		ValidateSettings();
-
 		protected:
 							CollisionAABB	mBox;			//!< Query box in (center, extents) form
 							Point			mMin;			//!< Query box min point
@@ -86,6 +70,10 @@
 							void			_Collide(const AABBQuantizedNode* node);
 							void			_Collide(const AABBQuantizedNoLeafNode* node);
 							void			_Collide(const AABBTreeNode* node);
+							void			_CollideNoPrimitiveTest(const AABBCollisionNode* node);
+							void			_CollideNoPrimitiveTest(const AABBNoLeafNode* node);
+							void			_CollideNoPrimitiveTest(const AABBQuantizedNode* node);
+							void			_CollideNoPrimitiveTest(const AABBQuantizedNoLeafNode* node);
 			// Overlap tests
 		inline_				BOOL			AABBContainsBox(const Point& bc, const Point& be);
 		inline_				BOOL			AABBAABBOverlap(const Point& b, const Point& Pb);
@@ -94,4 +82,16 @@
 							BOOL			InitQuery(AABBCache& cache, const CollisionAABB& box);
 	};
 
-#endif // __CS_OPC_AABBCOLLIDER_H__
+	class OPCODE_API HybridAABBCollider : public AABBCollider
+	{
+		public:
+		// Constructor / Destructor
+											HybridAABBCollider();
+		virtual								~HybridAABBCollider();
+
+							bool			Collide(AABBCache& cache, const CollisionAABB& box, const HybridModel& model);
+		protected:
+							Container		mTouchedBoxes;
+	};
+
+#endif // __OPC_AABBCOLLIDER_H__

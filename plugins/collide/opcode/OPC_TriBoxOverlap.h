@@ -79,25 +79,25 @@ inline_ BOOL planeBoxOverlap(const Point& normal, const float d, const Point& ma
 	float rad;										\
 	float min, max;									\
 													\
-	const float fey0 = (float)fabs(e0.y);					\
-	const float fez0 = (float)fabs(e0.z);					\
+	const float fey0 = fabsf(e0.y);					\
+	const float fez0 = fabsf(e0.z);					\
 	AXISTEST_X01(e0.z, e0.y, fez0, fey0);			\
-	const float fex0 = (float)fabs(e0.x);					\
+	const float fex0 = fabsf(e0.x);					\
 	AXISTEST_Y02(e0.z, e0.x, fez0, fex0);			\
 	AXISTEST_Z12(e0.y, e0.x, fey0, fex0);			\
 													\
-	const float fey1 = (float)fabs(e1.y);					\
-	const float fez1 = (float)fabs(e1.z);					\
+	const float fey1 = fabsf(e1.y);					\
+	const float fez1 = fabsf(e1.z);					\
 	AXISTEST_X01(e1.z, e1.y, fez1, fey1);			\
-	const float fex1 = (float)fabs(e1.x);					\
+	const float fex1 = fabsf(e1.x);					\
 	AXISTEST_Y02(e1.z, e1.x, fez1, fex1);			\
 	AXISTEST_Z0(e1.y, e1.x, fey1, fex1);			\
 													\
 	const Point e2 = mLeafVerts[0] - mLeafVerts[2];	\
-	const float fey2 = (float)fabs(e2.y);					\
-	const float fez2 = (float)fabs(e2.z);					\
+	const float fey2 = fabsf(e2.y);					\
+	const float fez2 = fabsf(e2.z);					\
 	AXISTEST_X2(e2.z, e2.y, fez2, fey2);			\
-	const float fex2 = (float)fabs(e2.x);					\
+	const float fex2 = fabsf(e2.x);					\
 	AXISTEST_Y1(e2.z, e2.x, fez2, fex2);			\
 	AXISTEST_Z12(e2.y, e2.x, fey2, fex2);
 

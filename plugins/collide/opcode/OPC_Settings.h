@@ -17,14 +17,16 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Include Guard
-#ifndef __CS_OPC_SETTINGS_H__
-#define __CS_OPC_SETTINGS_H__
+#ifndef __OPC_SETTINGS_H__
+#define __OPC_SETTINGS_H__
 
 	//! Use CPU comparisons (comment that line to use standard FPU compares)
+#if defined(PROC_X86)
 	#define OPC_CPU_COMPARE
+#endif
 
 	//! Use FCOMI / FCMOV on Pentium-Pro based processors (comment that line to use plain C++)
-	#define OPC_USE_FCOMI
+//	#define OPC_USE_FCOMI
 
 	//! Use epsilon value in tri-tri overlap test
 	#define OPC_TRITRI_EPSILON_TEST
@@ -32,9 +34,18 @@
 	//! Use tree-coherence or not [not implemented yet]
 //	#define OPC_USE_TREE_COHERENCE
 
-	//! Use callbacks or direct pointers
+	//! Use callbacks or direct pointers. Using callbacks might be a bit slower (but probably not much)
 	#define OPC_USE_CALLBACKS
 
-       	// NB: no compilation flag to enable/disable stats since they're actually needed in the box/box overlap test
+	//! Support triangle and vertex strides or not. Using strides might be a bit slower (but probably not much)
+//	#define OPC_USE_STRIDE
 
-#endif // __CS_OPC_SETTINGS_H__
+	//! Discard negative pointer in vanilla trees
+	#define OPC_NO_NEG_VANILLA_TREE
+
+	//! Use a callback in the ray collider
+	#define OPC_RAYHIT_CALLBACK
+
+	// NB: no compilation flag to enable/disable stats since they're actually needed in the box/box overlap test
+
+#endif //__OPC_SETTINGS_H__
