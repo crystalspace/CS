@@ -455,7 +455,6 @@ Flock::Flock(iEngine *engine, int num, iMaterialWrapper *mat, iSector *sector)
 
     iSprite2DState *sprstate = SCF_QUERY_INTERFACE(spr[i]->GetMeshObject(), 
       iSprite2DState);
-	sprstate->IncRef ();
     sprstate->GetVertices().SetLimit(4);
     sprstate->GetVertices().SetLength(4);
     sprstate->GetVertices()[0].color_init.Set(1.0,1.0,1.0);
