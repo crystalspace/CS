@@ -68,6 +68,16 @@ const csVector3* csPortal::GetVertices () const
   return parent->GetVertices ()->GetArray ();
 }
 
+const csVector3* csPortal::GetWorldVertices (iMovable* movable)
+{
+  if (movable)
+  {
+    const csReversibleTransform& movtrans = movable->GetFullTransform ();
+    parent->ObjectToWorld (movable, movtrans);
+  }
+  return parent->GetWorldVertices ()->GetArray ();
+}
+
 int* csPortal::GetVertexIndices () const
 {
   return (int*)vertex_indices.GetArray ();

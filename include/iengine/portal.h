@@ -159,6 +159,17 @@ struct iPortal : public iBase
   virtual const csVector3* GetVertices () const = 0;
 
   /**
+   * Get an array of world space vertices. Use this in combination
+   * with GetVertexIndices() to find out where the portal is.
+   * Note! This function assumes the mesh containing this portal
+   * has previously been transformed to world space!
+   * The optional movable parameter can be used to recalculate the world
+   * plane if that is needed. If the movable parameter is not given then
+   * the last calculated world plane is used.
+   */
+  virtual const csVector3* GetWorldVertices (iMovable* movable = 0) = 0;
+
+  /**
    * Get an array of vertex indices (indices in the array returned
    * by GetVertices()).
    */

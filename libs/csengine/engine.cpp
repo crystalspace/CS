@@ -2474,8 +2474,9 @@ void csEngine::GetNearbyObjectList (iSector* sector,
         for (j = 0 ; j < pc ; j++)
         {
           iPortal* portal = portals->GetPortal (j);
+	  const csVector3* world_vertices = portal->GetWorldVertices (
+	  	imw->GetMovable ());
           const csPlane3& wor_plane = portal->GetWorldPlane ();
-	  const csVector3* world_vertices = portal->GetVertices (); // @@@ NEED WORLD!
           // Can we see the portal?
           if (wor_plane.Classify (pos) < -0.001)
           {
@@ -2577,13 +2578,14 @@ void csEngine::GetNearbyMeshList (iSector* sector,
         for (j = 0 ; j < pc ; j++)
         {
           iPortal* portal = portals->GetPortal (j);
+	  const csVector3* world_vertices = portal->GetWorldVertices (
+	  	imw->GetMovable ());
           const csPlane3& wor_plane = portal->GetWorldPlane ();
-	  const csVector3* world_vertices = portal->GetVertices (); // @@@ NEED WORLD!
           // Can we see the portal?
           if (wor_plane.Classify (pos) < -0.001)
           {
             csVector3 poly[100];	//@@@ HARDCODE
-          int k;
+            int k;
 	    int* idx = portal->GetVertexIndices ();
             for (k = 0 ; k < portal->GetVertexIndicesCount () ; k++)
             {

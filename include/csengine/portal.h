@@ -145,6 +145,7 @@ public:
   virtual csFlags& GetFlags () { return flags; }
 
   virtual const csVector3* GetVertices () const;
+  virtual const csVector3* GetWorldVertices (iMovable* movable = 0);
   virtual int* GetVertexIndices () const;
   virtual int GetVertexIndicesCount () const;
 
