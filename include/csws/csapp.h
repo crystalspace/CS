@@ -73,7 +73,7 @@ protected:
 
   /// Set up initial application layout (read configs, create windows, menus etc)
   virtual bool InitialSetup (int argc, char *argv[],
-    const char *ConfigName, const char *VfsConfigName);
+    const char *ConfigName, const char *VfsConfigName, const char* dataDir);
 
 public:
   /// Application's adaptive palette
