@@ -75,11 +75,15 @@ csLibraryHandle csFindLoadLibrary(char const* name)
   if (!initialized)
   {
     initialized = true;
-    char path[ CS_MAXPATHLEN ];
-    csGetInstallPath(path, sizeof(path));
-    strcat(path, OS_MACOSX_PLUGIN_DIR);
+#if 0 // the same is done in csInitializer::InitalizeSCF 
+    char temp [CS_MAXPATHLEN];
+    char *path = csGetConfigPath ();
+    strcpy (temp, path);
+    delete[] path;
+    strcat(temp, OS_MACOSX_PLUGIN_DIR);
     csAddLibraryPath(OS_MACOSX_PLUGIN_DIR);
-    csAddLibraryPath(path);
+    csAddLibraryPath(temp);
+#endif
   }
   return csFindLoadLibrary(0, name, OS_MACOSX_PLUGIN_EXT);
 }

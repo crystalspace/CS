@@ -97,52 +97,48 @@ iObjectRegistry* csInitializer::CreateEnvironment (
   return reg;
 }
 
-bool csInitializer::InitializeSCF ()
+// Scan a directory for .scf files
+static void ScanScfDir (const char* dir)
 {
   // Initialize Shared Class Facility|
-  char scfconfigpath [CS_MAXPATHLEN + 1];
-  char scffilepath [CS_MAXPATHLEN + 1];
   struct dirent* de;
   DIR* dh;
-
-#ifndef CS_STATIC_LINKED
-  // Add both installpath and installpath/lib dirs to search for plugins
-  csGetInstallPath (scfconfigpath, sizeof (scfconfigpath));
-  csAddLibraryPath (scfconfigpath);
-  strcat (scfconfigpath, "lib");
-  int scfconfiglen = strlen(scfconfigpath);
-  scfconfigpath[scfconfiglen] = PATH_SEPARATOR;
-  scfconfigpath[scfconfiglen+1] = 0;
-  csAddLibraryPath (scfconfigpath);
-#endif
-
-  // Find scf.cfg and initialize SCF
-  csGetInstallPath (scfconfigpath, sizeof (scfconfigpath));
-  strcpy(scffilepath, scfconfigpath);
-  strcat (scffilepath, "scf.cfg");
-  csConfigFile scfconfig (scffilepath);
-  scfInitialize (&scfconfig);
-
-  dh = opendir(scfconfigpath[0] == '\0' ? "." : scfconfigpath);
+  csConfigFile scfconfig;
+  
+  dh = opendir(dir);
   if (dh != 0)
   {
     while ((de = readdir(dh)) != 0)
     {
-      if (!(isdir(scfconfigpath, de)))
+      if (!(isdir(dir, de)))
       {
         int const n = strlen(de->d_name);
         if (n >= 4 && strcasecmp(de->d_name + n - 4, ".scf") == 0)
         {
-	  strcpy(scffilepath, scfconfigpath);
-	  strcat(scffilepath, de->d_name);
+	  csString scffilepath = dir;
+	  scffilepath += PATH_SEPARATOR;
+	  scffilepath += de->d_name;
 	  scfconfig.Clear();
 	  scfconfig.Load(scffilepath);
-	  csRef<iConfigIterator> it (scfconfig.Enumerate());
-	  while (it->Next())
+	  int scfver = scfconfig.GetInt(".scfVersion", 0);
+	  switch (scfver)
 	  {
-	    char const* key = it->GetKey();
-	    if (*key == '.')
-	     scfconfig.DeleteKey(key);
+	    case 1:
+	      {
+	        csRef<iConfigIterator> it (scfconfig.Enumerate());
+	        while (it->Next())
+	        {
+		  char const* key = it->GetKey();
+		  if (*key == '.')
+		    scfconfig.DeleteKey(key);
+	        }
+	        scfInitialize (&scfconfig);
+	      }
+	      break;
+	    default:
+	      printf ("Didn't recognize SCF version in '%s'\n", 
+					(const char*) scffilepath);
+	      /* unrecognized version */;
 	  }
 	  scfInitialize (&scfconfig);
 	}
@@ -150,6 +146,35 @@ bool csInitializer::InitializeSCF ()
     }
     closedir(dh);
   }
+}
+
+bool csInitializer::InitializeSCF ()
+{
+  // Find scf.cfg and initialize SCF
+  char* configpath = csGetConfigPath ();
+  csString scfconfpath = configpath;
+  scfconfpath += PATH_SEPARATOR;
+  scfconfpath += "scf.cfg";
+  delete[] configpath;
+    
+  csConfigFile scfconfig (scfconfpath);
+  scfInitialize (&scfconfig);
+
+#ifndef CS_STATIC_LINKED
+  // Search plugins in pluginpaths
+  char** pluginpaths = csGetPluginPaths ();
+  for (int i=0; pluginpaths[i]!=0; i++)
+  {
+    csString temp = pluginpaths[i];
+    temp += PATH_SEPARATOR;
+    csAddLibraryPath(temp);
+    ScanScfDir (pluginpaths[i]);
+    
+    delete[] pluginpaths[i];
+  }
+  delete[] pluginpaths;
+#endif
+
   return true;
 }
 
@@ -261,7 +286,10 @@ bool csInitializer::SetupConfigManager (
     csRef<iPluginManager> plugin_mgr (CS_QUERY_REGISTRY (r, iPluginManager));
     VFS = CS_LOAD_PLUGIN (plugin_mgr, "crystalspace.kernel.vfs", iVFS);
     if (!VFS)
+    {
+      fprintf (stderr, "Couldn't load vfs plugin!\n");
       return false;
+    }
     r->Register (VFS, "iVFS");
   }
 

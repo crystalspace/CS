@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "csutil/util.h"
+
 static inline bool
 GetRegistryInstallPath (const HKEY parentKey, char *oInstallPath, size_t iBufferSize)
 {
@@ -65,7 +67,7 @@ GetRegistryInstallPath (const HKEY parentKey, char *oInstallPath, size_t iBuffer
   return false;
 }
 
-bool csGetInstallPath (char *oInstallPath, size_t iBufferSize)
+char* csGetConfigPath ()
 {
   // override the default to get install path from
   // 1. CRYSTAL environment variable
@@ -75,113 +77,99 @@ bool csGetInstallPath (char *oInstallPath, size_t iBufferSize)
   // 5. A "Crystal" subfolder under the "Program Files" dir.
   // 6. hard-wired default path
 
-  //@@@ this function is called several times; maybe cache the found dir
-
   // try env variable first
   // we check this before we check registry, so that one app can putenv() to
   // use a special private build of CrystalSpace, while other apps fall back on
   // the shared systemwide registry strategy; this is the best approach unless
   // someone implements a SetInstallPath() to override it before Open() is
   // called.
-  if (1)
-  {
-    char *path = getenv ("CRYSTAL");
-    if (path && *path)
-    {
-      strncpy(oInstallPath, path, iBufferSize);
-      goto got_value;
-    }
-  }
+  char *path = getenv ("CRYSTAL");
+  if (path && *path)
+    return csStrNew (path);
 
   // try the registry
-  if (1)
-  {
-    if (GetRegistryInstallPath (HKEY_CURRENT_USER, oInstallPath, iBufferSize))
-      goto got_value;
-    if (GetRegistryInstallPath (HKEY_LOCAL_MACHINE, oInstallPath, iBufferSize))
-      goto got_value;
-  }
+  path = new char[1024];
+  if (GetRegistryInstallPath (HKEY_CURRENT_USER, path, 1024))
+    return path;
+  if (GetRegistryInstallPath (HKEY_LOCAL_MACHINE, path, 1024))
+    return path;
 
   // perhaps current drive/dir?
-  if (1)
+  FILE *test = fopen("scf.cfg", "r");
+  if(test != NULL)
   {
-    FILE *test = fopen("scf.cfg", "r");
-    if(test != NULL)
-    {
-      // usr current dir
-      fclose(test);
-      strncpy(oInstallPath, "", iBufferSize);
-      goto got_value;
-    }
+    // use current dir
+    fclose(test);
+    strcpy(path, ".");
+    return path;
   }
 
   // directory where app is?
-  if (1)
+  char apppath[MAX_PATH + 1];
+  GetModuleFileName (0, apppath, sizeof(apppath)-1);
+  char* slash = strrchr (apppath, '\\');
+  if (slash) *(slash+1) = 0;
+
+  char testfn[MAX_PATH];
+  strcpy(testfn, apppath);
+  strcat(testfn, "scf.cfg");
+
+  test = fopen(testfn, "r");
+  if(test != NULL)
   {
-    char apppath[MAX_PATH + 1];
-    GetModuleFileName (0, apppath, sizeof(apppath)-1);
-    char* slash = strrchr (apppath, '\\');
-    if (slash) *(slash+1) = 0;
-
-    char testfn[MAX_PATH];
-    strcpy(testfn, apppath);
-    strcat(testfn, "scf.cfg");
-
-    FILE *test = fopen(testfn, "r");
-    if(test != NULL)
-    {
-      // use current dir
-      fclose(test);
-      strncpy(oInstallPath, apppath, iBufferSize);
-      goto got_value;
-    }
+    // use current dir
+    fclose(test);
+    strncpy (path, apppath, 1024);
+    return path;
   }
 
   // retrieve the path of the Program Files folder and append 
   // a "\Crystal\".
-  if (1)
+  if (MinShellDllVersion(5, 0))
   {
-    if (MinShellDllVersion(5, 0))
-    {
-      LPMALLOC MAlloc;
-      LPITEMIDLIST pidl;
-      char path[MAX_PATH];
+    LPMALLOC MAlloc;
+    LPITEMIDLIST pidl;
+    char programpath[MAX_PATH];
 
-      path[0] = 0;
-      if (SUCCEEDED(SHGetMalloc (&MAlloc)))
+    programpath[0] = 0;
+    if (SUCCEEDED(SHGetMalloc (&MAlloc)))
+    {
+      if (SUCCEEDED(SHGetSpecialFolderLocation (0, CSIDL_PROGRAM_FILES, &pidl)))
       {
-        if (SUCCEEDED(SHGetSpecialFolderLocation (0, CSIDL_PROGRAM_FILES, &pidl)))
+	if (SUCCEEDED(SHGetPathFromIDList (pidl, programpath)))
 	{
-          if (SUCCEEDED(SHGetPathFromIDList (pidl, path)))
-	  {
-	    strncpy (oInstallPath, path, MIN(sizeof(path), iBufferSize));
-	    strcat (oInstallPath, "\\Crystal\\");
-	  }
-	  MAlloc->Free (pidl);
+	  strncpy (path, programpath, MIN(sizeof(programpath), 1024-30));
+	  strcat (path, "\\Crystal\\");
 	}
-	MAlloc->Release ();
+	MAlloc->Free (pidl);
       }
-      if (path[0]) 
-	goto got_value;
+      MAlloc->Release ();
     }
+    if (programpath[0]) 
+      return path;
   }
 
   // nothing helps, use default
   // which is "C:\Program Files\Crystal\"
-  strncpy(oInstallPath, "C:\\Program Files\\Crystal\\", iBufferSize);
+  strncpy(path, "C:\\Program Files\\Crystal\\", 1024);
 
-got_value:
-  // got the value in oInstallPath, check for ending '/' or '\'.
-  int len = strlen(oInstallPath);
-  if(len == 0) return false;
-  if( oInstallPath[len-1] == '/' || oInstallPath[len-1] == '\\' )
-    return true;
-  if(len+1 >= (int)iBufferSize)
-  {
-    strncpy(oInstallPath, "", iBufferSize); //make empty if possible
-    return false;
-  }
-  oInstallPath[len] = '\\';
-  oInstallPath[len+1] = 0;
-  return true;
+  return path;
 }
+
+char** csGetPluginPaths ()
+{
+  char** paths = new char* [4];
+
+  char* configpath = csGetConfigPath ();
+  char* temp = new char[MAX_PATH];
+  strncpy (temp, configpath, MAX_PATH);
+  strcat (temp, "\\lib");
+    
+  paths[0] = temp;
+  paths[1] = configpath;
+  paths[2] = ".";
+  paths[3] = 0;
+
+  return paths;
+}
+

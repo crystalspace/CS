@@ -1207,9 +1207,17 @@ bool csVFS::Initialize (iObjectRegistry *object_reg)
 {
   csVFS::object_reg = object_reg;
   char vfsconfigpath [CS_MAXPATHLEN + 1];
-  csGetInstallPath (vfsconfigpath, sizeof (vfsconfigpath));
+
+  char* confpath = csGetConfigPath ();
+  strcpy (vfsconfigpath, confpath);
+  size_t len = strlen(vfsconfigpath);
+  vfsconfigpath[len]=PATH_SEPARATOR;
+  vfsconfigpath[len+1]=0;
+  delete[] confpath;
+
   basedir = csStrNew (vfsconfigpath);
   strcat (vfsconfigpath, "vfs.cfg");
+  printf ("Config: %s\n", vfsconfigpath);
   config.Load (vfsconfigpath);
   return ReadConfig ();
 }

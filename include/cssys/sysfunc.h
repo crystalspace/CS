@@ -84,8 +84,14 @@ csTicks csGetTicks ();
  * It has a limited use because mostly everything should be done
  * through VFS which is installation directory - independent; but
  * some initialization tasks still need this.
+ * You're responsible to delete[] the string after using it.
  */
-bool csGetInstallPath (char *oInstallPath, size_t iBufferSize);
+char* csGetConfigPath ();
+
+/** Get a list of directories where plugins are installed
+ * You're responsible to free the array with delete[] after using it.
+ */
+char** csGetPluginPaths ();
 
 /**
  * This function will freeze your application for given number of 1/1000

@@ -28,38 +28,39 @@
 #include "OSXInstallPath.h"
 #include <stdlib.h>
 
+#include "csutil/util.h"
+
 //-----------------------------------------------------------------------------
 // csGetInstallPath
 //-----------------------------------------------------------------------------
-bool csGetInstallPath(char* buff, size_t sz)
+char* csGetConfigPath ()
 {
-  bool ok = false;
-  if (buff != 0 && sz > 0)
+  char* buff = new char[1024];
+    
+  if (OSXGetInstallPath(buff, 1024, PATH_SEPARATOR))
   {
-    ok = true;
-    if (!OSXGetInstallPath(buff, sz, PATH_SEPARATOR))
-    {
-      char const* path = getenv("CRYSTAL");
-      if (path == 0 || *path == '\0')
-      {
-        *buff = '\0';
-      }
-      else
-      {
-        size_t n = strlen(path);
-	CS_ASSERT(n > 0); // Should be caught by above case.
-        // Do we have to add a final path separator to the directory?
-        bool const addsep = (path[n - 1] != PATH_SEPARATOR);
-        if (addsep)
-          n++;
-        if (n >= sz)
-          n = sz - 1;
-        memcpy(buff, path, n);
-        if (addsep)
-          buff[n - 1] = PATH_SEPARATOR;
-        buff[n] = '\0';
-      }
-    }
+    return buff;
   }
-  return ok;
+  
+  char const* path = getenv("CRYSTAL");
+  if (!path || *path == 0)
+  {
+    strncpy (buff, ".", 1024);
+    return buff;
+  }
+  
+  strncpy (buff, path, 1024);  
+  return buff;
 }
+
+char** csGetPluginPaths ()
+{
+  char** paths = new char* [4];
+
+  paths[0] = csGetConfigPath ();
+  paths[1] = csStrNew (OS_MACOSX_PLUGIN_DIR);
+  paths[2] = csStrNew (".");
+  paths[3] = 0;
+
+  return paths; 
+}    

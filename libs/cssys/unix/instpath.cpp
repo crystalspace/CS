@@ -21,51 +21,97 @@
 #include <unistd.h>
 
 #include "cssysdef.h"
+
+#include "csutil/util.h"
+
 #include "cssys/sysfunc.h"
 
-bool csGetInstallPath (char *oInstallPath, size_t iBufferSize)
+// these defines should be set by the configure script
+
+#ifndef CS_CONFIGDIR
+#define CS_CONFIGDIR "/usr/local/crystal"
+#endif
+#ifndef CS_PLUGINDIR
+#define CS_PLUGINDIR "/usr/local/crystal/lib"
+#endif
+
+char* csGetConfigPath ()
 {
-  const char *path = getenv ("CRYSTAL");
-  if (!path)
+  const char* crystal = getenv ("CRYSTAL");
+  char* path;
+
+  if (!crystal)
   {
     // no setting, use the default.
     // is the current dir a possible install? try opening scf.cfg,
-    if (!access ("scf.cfg", F_OK))
+    if (!access ("scf.cfg", F_OK))                                    
     {
-      strncpy (oInstallPath, "", iBufferSize);
-      return true;
+      printf ("ConfigPath: .\n");
+      return csStrNew (".");
     }
-    // default install place
-    if (!access ("/usr/local/crystal/scf.cfg", F_OK))
-    {
-      strncpy (oInstallPath, "/usr/local/crystal/", iBufferSize);
-      return true;
-    }
+
+    // XXX: This shouldn't be here and can be removed as soon as the new
+    // system works...
+#if 1
     // debian install place
     if (!access ("/usr/lib/crystalspace/scf.cfg", F_OK))
     {
-      strncpy (oInstallPath, "/usr/lib/crystalspace/", iBufferSize);
-      return true;
+      return csStrNew ("/usr/lib/crystalspace/");
     }
-    /// no install location can be found
-    fprintf(stderr,
-      "Warning: Crystal Space installation directory not detected.\n");
-    strncpy (oInstallPath, "/usr/local/crystal/", iBufferSize);
-    return true;
+#endif
+
+    // default install place
+    return csStrNew(CS_CONFIGDIR);
   }
 
-  // Well, we won't check for brain-damaged cases here such as iBufferSize < 3
-  // since we presume user has even a little brains...
+  // check for $CRYSTAL/etc
+  path = new char[320];
+  strncpy (path, crystal, 300);
+  strcat (path, "/etc/scf.cfg");
+  if (!access (path, F_OK))
+  {
+    strncpy (path, crystal, 300);
+    strcat (path, "/etc");
+    printf ("ConfigPath: %s\n", path);
+    return path;
+  }
+  
+  // check for $CRYSTAL
+  strncpy (path, crystal, 300);
+  strcat (path, "/scf.cfg");
+  if (!access (path, F_OK))
+  {
+    strncpy (path, crystal, 320);
+    printf ("ConfigPath: %s\n", path);
+    return path;
+  }
+    
+  fprintf (stderr, 
+      "Couldn't find scf.cfg in '%s' (defined by CRYSTAL var).\n", crystal);
 
-  strncpy (oInstallPath, path, iBufferSize);
-  // check for ending '/'
-  size_t len = strlen (oInstallPath);
-  // empty stands for current directory
-  if (!len)
-    oInstallPath [len++] = '.';
-  if (oInstallPath [len - 1] != '/')
-    oInstallPath [len++] = '/';
-  oInstallPath [len] = 0;
-  return true;
+  delete[] path;
+  return NULL;
+}
+
+char** csGetPluginPaths ()
+{
+  const char* crystal = getenv ("CRYSTAL");
+
+  if (!crystal)
+  {
+    char** paths = new char* [3];
+    paths[0] = csStrNew(CS_PLUGINDIR);
+    paths[1] = csStrNew(".");
+    paths[2] = 0;
+  
+    return paths;
+  }
+
+  char** paths = new char* [3];
+  paths[0] = csStrNew(crystal);
+  paths[1] = csStrNew(".");
+  paths[2] = 0;
+  
+  return paths;
 }
 
