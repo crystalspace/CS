@@ -20,6 +20,8 @@
 #ifndef __CS_PROCTEX_H__
 #define __CS_PROCTEX_H__
 
+#include "csextern.h"
+
 #include <stdarg.h>
 #include "csutil/csobject.h"
 #include "itexture/iproctex.h"
@@ -43,7 +45,7 @@ class ProcEventHandler;
  * Generic superclass for procedural textures. This class
  * takes care of scheduling when a procedural texture needs updating.
  */
-class csProcTexture : public csObject
+class CS_CSTOOL_EXPORT csProcTexture : public csObject
 {
   friend struct csProcTexCallback;
   friend class ProcEventHandler;

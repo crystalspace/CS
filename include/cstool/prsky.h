@@ -19,6 +19,8 @@
 #ifndef __CS_PROCSKYTEX_H__
 #define __CS_PROCSKYTEX_H__
 
+#include "csextern.h"
+
 #include "csgeom/math3d.h"
 #include "csgfx/rgbpixel.h"
 #include "csutil/cscolor.h"
@@ -29,7 +31,7 @@ class csProcSky;
 /**
  * A polygon of a sky.
  */
-class csProcSkyTexture : public csProcTexture
+class CS_CSTOOL_EXPORT csProcSkyTexture : public csProcTexture
 {
   /// the sky this is a part of
   csProcSky *sky;
@@ -95,7 +97,7 @@ public:
  * a sky, this represents a whole sphere of sky - so multiple polygons
  * can be rendered to.
  */
-class csProcSky
+class CS_CSTOOL_EXPORT csProcSky
 {
   /// the proc sky textures of this sky
   csProcSkyTexture *firstsky;

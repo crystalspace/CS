@@ -20,6 +20,8 @@
 #ifndef __CS_CSVIEW_H__
 #define __CS_CSVIEW_H__
 
+#include "csextern.h"
+
 #include "ivaria/view.h"
 
 class csPoly2D;
@@ -29,7 +31,7 @@ class csBox2;
  * The csView class encapsulates the top-level Crystal Space
  * renderer interface. It is basically a camera and a clipper.
  */
-class csView : public iView
+class CS_CSTOOL_EXPORT csView : public iView
 {
 private:
   /// the engine

@@ -20,13 +20,15 @@
 #ifndef __CS_PROCWATERTEX_H__
 #define __CS_PROCWATERTEX_H__
 
+#include "csextern.h"
+
 #include "csutil/cscolor.h"
 #include "cstool/proctex.h"
 
 /**
  * Water.
  */
-class csProcWater : public csProcTexture
+class CS_CSTOOL_EXPORT csProcWater : public csProcTexture
 {
 private:
   /// palette

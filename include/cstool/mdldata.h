@@ -19,6 +19,8 @@
 #ifndef __CS_MDLDATA_H__
 #define __CS_MDLDATA_H__
 
+#include "csextern.h"
+
 #include "imesh/mdldata.h"
 #include "csutil/garray.h"
 #include "csutil/csobject.h"
@@ -73,7 +75,7 @@ class csIntArray;
 //----------------------------------------------------------------------------
 
 /// Document me!@@@
-class csModelDataTexture : public iModelDataTexture
+class CS_CSTOOL_EXPORT csModelDataTexture : public iModelDataTexture
 {
 private:
   char *FileName;
@@ -111,7 +113,7 @@ public:
 };
 
 /// Document me!@@@
-class csModelDataMaterial : public iModelDataMaterial
+class CS_CSTOOL_EXPORT csModelDataMaterial : public iModelDataMaterial
 {
 private:
   csRef<iMaterial> BaseMaterial;
@@ -136,7 +138,7 @@ public:
 };
 
 /// Document me!@@@
-class csModelDataVertices : public iModelDataVertices
+class CS_CSTOOL_EXPORT csModelDataVertices : public iModelDataVertices
 {
 private:
   csDirtyAccessArray<csVector3> Vertices;
@@ -172,7 +174,7 @@ public:
 };
 
 /// Document me!@@@
-class csModelDataAction : public iModelDataAction
+class CS_CSTOOL_EXPORT csModelDataAction : public iModelDataAction
 {
 private:
   csDirtyAccessArray<float> Times;
@@ -206,7 +208,7 @@ public:
 };
 
 /// Document me!@@@
-class csModelDataPolygon : public iModelDataPolygon
+class CS_CSTOOL_EXPORT csModelDataPolygon : public iModelDataPolygon
 {
 private:
   csDirtyAccessArray<int> Vertices;
@@ -241,7 +243,7 @@ public:
 };
 
 /// Document me!@@@
-class csModelDataObject : public iModelDataObject
+class CS_CSTOOL_EXPORT csModelDataObject : public iModelDataObject
 {
 private:
   csRef<iModelDataVertices> DefaultVertices;
@@ -259,7 +261,7 @@ public:
 };
 
 /// Document me!@@@
-class csModelDataCamera : public iModelDataCamera
+class CS_CSTOOL_EXPORT csModelDataCamera : public iModelDataCamera
 {
 private:
   csVector3 Position, UpVector, FrontVector, RightVector;
@@ -294,7 +296,7 @@ public:
 };
 
 /// Document me!@@@
-class csModelDataLight : public iModelDataLight
+class CS_CSTOOL_EXPORT csModelDataLight : public iModelDataLight
 {
 private:
   float Radius;
@@ -316,7 +318,7 @@ public:
   iModelDataLight *Clone () const;
 };
 
-class csModelData : public iModelData
+class CS_CSTOOL_EXPORT csModelData : public iModelData
 {
 public:
   SCF_DECLARE_IBASE;

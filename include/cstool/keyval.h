@@ -19,6 +19,8 @@
 #ifndef __CS_KEYVAL_H__
 #define __CS_KEYVAL_H__
 
+#include "csextern.h"
+
 #include "csgeom/vector3.h"
 #include "csutil/csobject.h"
 #include "ivaria/keyval.h"
@@ -31,7 +33,7 @@
  * One way to attach key value pairs to CS objects is to add the following
  * xml to your object: <key name="somename" value="somevalue" />
  */
-class csKeyValuePair : public csObject
+class CS_CSTOOL_EXPORT csKeyValuePair : public csObject
 {
 public:
   /// The constructor. Requires both key and value. Data is being copied!

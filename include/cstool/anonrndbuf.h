@@ -19,6 +19,8 @@
 #ifndef __CS_ANONRNDBUF_H__
 #define __CS_ANONRNDBUF_H__
 
+#include "csextern.h"
+
 #include "csutil/ref.h"
 #include "csutil/garray.h"
 #include "csutil/refarr.h"
@@ -27,7 +29,7 @@
 #include "iutil/strset.h"
 
 /// Document me! @@@
-class csAnonRenderBufferManager
+class CS_CSTOOL_EXPORT csAnonRenderBufferManager
 {
   class anonbuffer
   {

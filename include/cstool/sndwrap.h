@@ -21,11 +21,13 @@
 #ifndef __CS_SNDWRAP_H__
 #define __CS_SNDWRAP_H__
 
+#include "csextern.h"
+
 #include "csutil/csobject.h"
 #include "isound/wrapper.h"
 
 /// Document me and possible move me to some sound manager! @@@
-class csSoundWrapper : public csObject
+class CS_CSTOOL_EXPORT csSoundWrapper : public csObject
 {
 protected:
   ///

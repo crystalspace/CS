@@ -20,6 +20,8 @@
 #ifndef __CS_CSPIXMAP_H__
 #define __CS_CSPIXMAP_H__
 
+#include "csextern.h"
+
 #include "csutil/ref.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/texture.h"
@@ -39,7 +41,7 @@
  * Note that this class is only used as the interface to several
  * implementations of pixmaps, for example csSimplePixmap.
  */
-class csPixmap
+class CS_CSTOOL_EXPORT csPixmap
 {
 public:
   /// Destructor
@@ -84,7 +86,7 @@ public:
 };
 
 /// This is the simple implementation of csPixmap that uses a single texture
-class csSimplePixmap : public csPixmap
+class CS_CSTOOL_EXPORT csSimplePixmap : public csPixmap
 {
 protected:
   csRef<iTextureHandle> hTex;

@@ -20,6 +20,8 @@
 #ifndef __CS_CSANIM2D_H__
 #define __CS_CSANIM2D_H__
 
+#include "csextern.h"
+
 #include "csutil/array.h"
 #include "csutil/parray.h"
 #include "cstool/cspixmap.h"
@@ -29,7 +31,7 @@ class csPixmap;
 class csAnimatedPixmap;
 
 /// A 2d animation template. This class is used to create animated pixmaps.
-class csAnimationTemplate
+class CS_CSTOOL_EXPORT csAnimationTemplate
 {
 private:
   /// sprite frames
@@ -75,7 +77,7 @@ public:
 
 
 /// A pixmap with a 2d animation.
-class csAnimatedPixmap : public csPixmap
+class CS_CSTOOL_EXPORT csAnimatedPixmap : public csPixmap
 {
 public:
   /// Create an animated pixmap.

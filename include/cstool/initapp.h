@@ -27,6 +27,8 @@
  * \addtogroup appframe
  * @{ */
 
+#include "csextern.h"
+
 #include "cstypes.h"
 #include "csutil/array.h"
 #include "csutil/csstring.h"
@@ -106,7 +108,7 @@ typedef bool (*csEventHandlerFunc) (iEvent&);
  * csPluginRequest r2(CS_REQUEST_PLUGIN("myproj.foobar",iFoobar));
  * \endcode
  */
-class csPluginRequest
+class CS_CSTOOL_EXPORT csPluginRequest
 {
 private:
   csString class_name;
@@ -133,7 +135,7 @@ public:
  * setup an application. It is possible to do all the setup on your own
  * but using the functions below will help considerably.
  */
-class csInitializer
+class CS_CSTOOL_EXPORT csInitializer
 {
 public:
   /**

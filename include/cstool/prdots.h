@@ -19,13 +19,15 @@
 #ifndef __CS_PROCDOTSTEX_H__
 #define __CS_PROCDOTSTEX_H__
 
+#include "csextern.h"
+
 #include "csutil/cscolor.h"
 #include "cstool/proctex.h"
 
 /**
  * Random dots (demonstration procedural texture).
  */
-class csProcDots : public csProcTexture
+class CS_CSTOOL_EXPORT csProcDots : public csProcTexture
 {
 private:
   /// palette

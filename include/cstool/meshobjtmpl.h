@@ -19,6 +19,8 @@
 #ifndef __CS_MESHOBJTMPL_H__
 #define __CS_MESHOBJTMPL_H__
 
+#include "csextern.h"
+
 #include "csutil/refarr.h"
 #include "iengine/material.h"
 #include "iengine/engine.h"
@@ -57,7 +59,7 @@
  * <li> Default implementation of most methods
  * </ul>
  */
-class csMeshObject : public iMeshObject
+class CS_CSTOOL_EXPORT csMeshObject : public iMeshObject
 {
 protected:
   /// the drawing callback
@@ -232,7 +234,7 @@ public:
   virtual void GetRadius (csVector3& radius, csVector3& center);
 
   // implementation of iObjectModel
-  struct eiObjectModel : public csObjectModel
+  struct CS_CSTOOL_EXPORT eiObjectModel : public csObjectModel
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMeshObject);
     virtual void GetObjectBoundingBox (csBox3& bbox, int type)
@@ -251,7 +253,7 @@ public:
  * This is the abstract implementation of iMeshObjectFactory. Like
  * csMeshObject, it stores a pointer to the "logical parent".
  */
-class csMeshFactory : public iMeshObjectFactory
+class CS_CSTOOL_EXPORT csMeshFactory : public iMeshObjectFactory
 {
 protected:
   /// Logical parent (usually the wrapper object from the engine)
@@ -323,7 +325,7 @@ public:
 /**
  * This is the abstract implementation of iMeshObjectType.
  */
-class csMeshType : public iMeshObjectType
+class CS_CSTOOL_EXPORT csMeshType : public iMeshObjectType
 {
 protected:
   /// pointer to the engine if available (@@@ temporary)
@@ -355,7 +357,7 @@ public:
   /**
    * iComponent implementation.
    */
-  struct eiComponent : public iComponent
+  struct CS_CSTOOL_EXPORT eiComponent : public iComponent
   {
     SCF_DECLARE_EMBEDDED_IBASE (csMeshType);
     virtual bool Initialize (iObjectRegistry* p)

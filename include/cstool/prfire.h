@@ -20,6 +20,8 @@
 #ifndef __CS_PROCFIRETEX_H__
 #define __CS_PROCFIRETEX_H__
 
+#include "csextern.h"
+
 #include "csutil/cscolor.h"
 #include "csutil/randomgen.h"
 #include "cstool/proctex.h"
@@ -31,7 +33,7 @@ struct csRGBcolor;
 /**
  * Fire.
  */
-class csProcFire : public csProcTexture, public iFireTexture
+class CS_CSTOOL_EXPORT csProcFire : public csProcTexture, public iFireTexture
 {
 private:
   /// Palette.

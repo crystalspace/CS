@@ -19,6 +19,8 @@
 #ifndef __CS_RENDERMESHLIST_H__
 #define __CS_RENDERMESHLIST_H__
 
+#include "csextern.h"
+
 #include "csutil/array.h"
 #include "csutil/parray.h"
 #include "csutil/ref.h"
@@ -32,7 +34,7 @@ struct csRenderMesh;
  * This class is used when we need to store, sort and then render a list of
  * rendermeshes.
  */
-class csRenderMeshList
+class CS_CSTOOL_EXPORT csRenderMeshList
 {
 public:
   /**

@@ -19,6 +19,8 @@
 #ifndef __CS_GENTERTEX_H__
 #define __CS_GENTERTEX_H__
 
+#include "csextern.h"
+
 #include "csutil/scf.h"
 #include "csutil/cscolor.h"
 #include "csgeom/vector2.h"
@@ -32,7 +34,7 @@ class csGenerateImageTexture;
  * A base class which represents a value that can be computed
  * for blending purposes for each pixel.
  */
-class csGenerateImageValue
+class CS_CSTOOL_EXPORT csGenerateImageValue
 {
 public:
   /// delete it
@@ -45,7 +47,7 @@ public:
  * A base class which represents a texture that can be displayed
  * on the terrain. It has a colour for each pixel
  */
-class csGenerateImageTexture
+class CS_CSTOOL_EXPORT csGenerateImageTexture
 {
 public:
   /// delete it
@@ -65,7 +67,7 @@ public:
  * pixel the base textures are blended together, based on the
  * height.
 */
-class csGenerateImage
+class CS_CSTOOL_EXPORT csGenerateImage
 {
 private:
   /// the texture to show
@@ -98,7 +100,7 @@ public:
  * This class is used to store the layers of textures per value. Used in the
  * Blend class.
  */
-class csGenerateImageLayer
+class CS_CSTOOL_EXPORT csGenerateImageLayer
 {
 public:
   /// the value where this texture should show
@@ -112,7 +114,8 @@ public:
 /**
  * A class for a solid coloured texture.
  */
-class csGenerateImageTextureSolid : public csGenerateImageTexture
+class CS_CSTOOL_EXPORT csGenerateImageTextureSolid : 
+  public csGenerateImageTexture
 {
 public:
   /// the colour, range 0-1
@@ -126,7 +129,8 @@ public:
 /**
  * A class for a single texture.
  */
-class csGenerateImageTextureSingle : public csGenerateImageTexture
+class CS_CSTOOL_EXPORT csGenerateImageTextureSingle : 
+  public csGenerateImageTexture
 {
 public:
   /// the image - the texture image
@@ -152,7 +156,8 @@ public:
  * a class for a texture that is made by blending together other textures
  * based on a value. It has a set of layers to blend between.
  */
-class csGenerateImageTextureBlend : public csGenerateImageTexture
+class CS_CSTOOL_EXPORT csGenerateImageTextureBlend : 
+  public csGenerateImageTexture
 {
 public:
   /// the list - sorted by value - of layers
@@ -186,7 +191,7 @@ struct iGenerateImageFunction : public iBase
  * This class will generate a value using a given function. For heights
  * or slopes.
  */
-class csGenerateImageValueFunc : public csGenerateImageValue
+class CS_CSTOOL_EXPORT csGenerateImageValueFunc : public csGenerateImageValue
 {
 private:
   /// Height or slope function.
@@ -213,7 +218,8 @@ public:
 /**
  * This class will generate a constant value.
  */
-class csGenerateImageValueFuncConst : public csGenerateImageValue
+class CS_CSTOOL_EXPORT csGenerateImageValueFuncConst : 
+  public csGenerateImageValue
 {
 public:
   /// the value to return
@@ -226,7 +232,8 @@ public:
  * This class will generate a value using a texture. The average of the
  * rgb values will be returned.
  */
-class csGenerateImageValueFuncTex : public csGenerateImageValue
+class CS_CSTOOL_EXPORT csGenerateImageValueFuncTex : 
+  public csGenerateImageValue
 {
 public:
   /// the texture to use

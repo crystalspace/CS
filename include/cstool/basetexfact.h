@@ -24,6 +24,8 @@
  * Texture factory base.
  */
 
+#include "csextern.h"
+
 #include "csutil/scf.h"
 #include "iutil/objreg.h"
 #include "itexture/itexfact.h"
@@ -33,7 +35,7 @@
  * \remark Descendants must at least implement Generate(). Adding more 
  * parameters should be done via additional interfaces.
  */
-class csBaseTextureFactory : public iTextureFactory
+class CS_CSTOOL_EXPORT csBaseTextureFactory : public iTextureFactory
 {
 protected:
   /// object registry

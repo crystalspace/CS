@@ -19,6 +19,8 @@
 #ifndef __CS_SPRBUILD_H__
 #define __CS_SPRBUILD_H__
 
+#include "csextern.h"
+
 #include "csutil/csstring.h"
 
 class csVector3;
@@ -35,7 +37,7 @@ struct iDataBuffer;
  * and creates a 3d sprite from it. However, this class does not contain
  * the part that actually creates the sprite. This is done in subclasses.
  */
-class csSpriteBuilder
+class CS_CSTOOL_EXPORT csSpriteBuilder
 {
 public:
   virtual ~csSpriteBuilder () { }
@@ -74,7 +76,7 @@ public:
 };
 
 /// This sprite builder writes the data to a buffer
-class csSpriteBuilderFile : private csSpriteBuilder
+class CS_CSTOOL_EXPORT csSpriteBuilderFile : private csSpriteBuilder
 {
 private:
   csString Out;
@@ -98,7 +100,7 @@ public:
 };
 
 /// This sprite builder takes a sprite factory and adds the input information
-class csSpriteBuilderMesh : private csSpriteBuilder
+class CS_CSTOOL_EXPORT csSpriteBuilderMesh : private csSpriteBuilder
 {
 private:
   iSprite3DFactoryState *Out;

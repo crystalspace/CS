@@ -20,6 +20,8 @@
 #ifndef __CS_MAPNODE_H__
 #define __CS_MAPNODE_H__
 
+#include "csextern.h"
+
 #include "csgeom/vector3.h"
 #include "csutil/csobject.h"
 #include "ivaria/mapnode.h"
@@ -28,7 +30,7 @@
  * A node. This is an iObject that is bound to a position and a sector in
  * the world.
  */
-class csMapNode : public csObject
+class CS_CSTOOL_EXPORT csMapNode : public csObject
 {
 public:
   /// The constructor. Requires the Nodes name!
@@ -76,7 +78,7 @@ private:
 /**
  * A node iterator.
  */
-class csNodeIterator
+class CS_CSTOOL_EXPORT csNodeIterator
 {
 public:
   /**

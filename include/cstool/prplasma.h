@@ -20,13 +20,15 @@
 #ifndef __CS_PROCPLASMATEX_H__
 #define __CS_PROCPLASMATEX_H__
 
+#include "csextern.h"
+
 #include "csutil/cscolor.h"
 #include "cstool/proctex.h"
 
 /**
  * Plasma.
  */
-class csProcPlasma : public csProcTexture
+class CS_CSTOOL_EXPORT csProcPlasma : public csProcTexture
 {
 private:
   /// palette

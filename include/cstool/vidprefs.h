@@ -19,6 +19,8 @@
 #ifndef __CS_VIDPREFS_H__
 #define __CS_VIDPREFS_H__
 
+#include "csextern.h"
+
 #include "cstypes.h"
 #include "csutil/ref.h"
 
@@ -43,7 +45,7 @@ struct iImageIO;
  * already initialized. This will make all registered textures
  * and materials invalid.
  */
-class csVideoPreferences
+class CS_CSTOOL_EXPORT csVideoPreferences
 {
 private:
   iObjectRegistry* object_reg;
