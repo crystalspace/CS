@@ -26,6 +26,8 @@ chronological order.
 	  hard-coded into <cssysdef.h>.
 	- Eric Sunshine fixed <csutil/formatter.h> so that it builds cleanly
 	  with older versions of gcc, such as 2.95.x.
+	- Eric Sunshine fixed some build errors which manifested with older
+	  versions of gcc, such as 2.95.x.
 19-Mar-2005
 	- Erroroman fixed a bug in genmesh skelanimation exporter
 	- Erroroman added texture "ugly_woman.jpg" to flarge skeleton model.

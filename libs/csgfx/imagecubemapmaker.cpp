@@ -147,8 +147,10 @@ const char* csImageCubeMapMaker::GetRawFormat() const
 
 csRef<iDataBuffer> csImageCubeMapMaker::GetRawData() const
 {
-  return cubeImages[0].IsValid() ? 
-    cubeImages[0]->GetRawData() : 0;
+  csRef<iDataBuffer> d;
+  if (cubeImages[0].IsValid())
+    d = cubeImages[0]->GetRawData();
+  return d;
 }
 
 csRef<iImage> csImageCubeMapMaker::GetSubImage (uint num)
