@@ -4640,7 +4640,7 @@
         </meshobj>
         <meshobj name="rot_door1">
             <plugin>thing</plugin>
-	    <zfill />
+	    <zuse />
             <params>
                 <v x="-2.5" y="0" z="-0.1" />
                 <v x="-2.5" y="0" z="0.1" />
