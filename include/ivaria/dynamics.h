@@ -112,18 +112,26 @@ struct iDynamicSystem : public iBase
   /// Get the default move callback.
   virtual iDynamicsMoveCallback* GetDefaultMoveCallback () = 0;
 
-  /// The following colliders exist relative only to the space and are static
+  /// Attaches a static collider mesh to world
   virtual bool AttachColliderMesh (iMeshWrapper* mesh,
   	const csOrthoTransform& trans, float friction,
 	float elasticity, float softness = 0.316f) = 0;
+
+  /// Attaches a static collider cylinder to world
   virtual bool AttachColliderCylinder (float length, float radius,
   	const csOrthoTransform& trans, float friction,
 	float elasticity, float softness = 0.316f) = 0;
+
+  /// Attaches a static collider box to world
   virtual bool AttachColliderBox (const csVector3 &size,
   	const csOrthoTransform& trans, float friction,
 	float elasticity, float softness = 0.316f) = 0;
+
+  /// Attaches a static collider sphere to world
   virtual bool AttachColliderSphere (float radius, const csVector3 &offset,
   	float friction, float elasticity, float softness = 0.316f) = 0;
+
+  /// Attaches a static collider plane to world
   virtual bool AttachColliderPlane (const csPlane3 &plane, float friction,
 	float elasticity, float softness = 0.316f) = 0;
 };

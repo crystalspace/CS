@@ -19,6 +19,8 @@ chronological order.
 	- Troy in odedynam: Fixed longstanding memory leak with float arrays.
 	  Altered iDynamicSystem::CreateBody to prevent extra references from 
 	  being created (thanks to Eric Sunshine on this one).
+	- Troy in ivaria/dynamics.h added comments to iDynamicSystem 
+	  'AttachCollider' methods so they appear in API docs.
 19-Aug-2003
 	- Jorrit fixed a bug in the new optimization in odedynamics where
 	  the transform of the object was ignored.
