@@ -8,12 +8,14 @@ if $(PTHREAD.AVAILABLE) = "yes"
   CFLAGS += $(PTHREAD.CFLAGS) ;
 }
 
-# jam2.4 has wrong rules for handling archives. This should work better
-if $(JAMVERSION) = 2.4
+# Seems jams header scanning fails on macosx. This is atleast true for jam 2.4,
+# let's hope that this will work better with jam 2.5.
+CMD.AR = "ar ru" ;
+NOARUPDATE = true ;
+NOARSCAN = true ;
+action Archive
 {
-  AR = "ar ru" ;
-  NOARUPDATE = ;  
-  NOARSCAN = ;
+  $(CMD.AR) $(<) $(>)
 }
 
 APPLICATION.LFLAGS += -framework AppKit -framework Foundation ;
