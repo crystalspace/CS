@@ -348,9 +348,9 @@ public:
     int tx, int ty, int tw, int th);
 
   /// Create an off screen canvas
-  virtual iGraphics3D *CreateOffScreenRenderer (iGraphics2D */*parent_g2d*/,
-    int /*width*/, int /*height*/, csPixelFormat */*pfmt*/, void */*buffer*/, 
-    RGBPixel */*palette*/, int /*pal_size*/)
+  virtual iGraphics3D *CreateOffScreenRenderer (iGraphics2D* /*parent_g2d*/,
+    int /*width*/, int /*height*/, csPixelFormat* /*pfmt*/, void* /*buffer*/, 
+    RGBPixel* /*palette*/, int /*pal_size*/)
   { return NULL; }
 
 private:
