@@ -61,7 +61,7 @@ bool csBinaryDocAttributeIterator::HasNext ()
 
 csRef<iDocumentAttribute> csBinaryDocAttributeIterator::Next ()
 {
-  return csRef<iDocumentAttribute> ((*node->attributes)[pos++]);
+  return (iDocumentAttribute*) (*node->attributes)[pos++];
 }
 
 // =================================================
@@ -384,7 +384,7 @@ bool csBinaryDocNodeIterator::HasNext ()
 
 csRef<iDocumentNode> csBinaryDocNodeIterator::Next ()
 {
-  csRef<iDocumentNode> retNode ((*node->children)[pos++]);
+  csRef<iDocumentNode> retNode = (iDocumentNode*) ((*node->children)[pos++]);
   FastForward();
   return retNode;
 }
@@ -736,7 +736,7 @@ csRef<iDocumentNode> csBinaryDocNode::GetNode (const char* value)
   for (i = 0; i < children->Length(); i++)
   {
     if (strcmp ((*children)[i]->GetValue(), value) == 0)
-      return csRef<iDocumentNode> ((*children)[i]);
+      return (iDocumentNode*) ((*children)[i]);
   }
   return NULL;
 }
@@ -787,7 +787,7 @@ csRef<iDocumentNode> csBinaryDocNode::CreateNodeBefore (csDocumentNodeType type,
   if (newPos < 0) newPos = children->Length();
   children->Insert (newPos, newNode);
 
-  return (csRef<iDocumentNode> (newNode));
+  return (iDocumentNode*) newNode;
 }
 
 const char* csBinaryDocNode::GetContentsValue ()
@@ -850,7 +850,7 @@ csRef<iDocumentAttribute> csBinaryDocNode::GetAttribute (const char* name)
   int attrIndex = IndexOfAttr (name);
   if (attrIndex >= 0)
   {
-    return csRef<iDocumentAttribute> ((*attributes)[attrIndex]);
+    return (iDocumentAttribute*) ((*attributes)[attrIndex]);
   }
   return NULL;
 }
@@ -1014,7 +1014,7 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
     nodesFile->Write ((char*)&attrCount, sizeof(uint32));
     nodesFile->Write ((char*)attrStarts, sizeof(uint32) * attrCount);
 
-    int i;
+    unsigned int i;
     for (i = 0; i < attrCount; i++)
     {
       attrStarts[i] = nodesFile->GetPos () - nodeStart;
@@ -1035,7 +1035,7 @@ void csBinaryDocNode::Store (csMemFile* nodesFile)
     nodesFile->Write ((char*)&childCount, sizeof(uint32));
     nodesFile->Write ((char*)childStarts, sizeof(uint32) * childCount);
 
-    int i;
+    unsigned int i;
     for (i = 0; i < childCount; i++)
     {
       childStarts[i] = nodesFile->GetPos () - nodeStart;
@@ -1306,7 +1306,7 @@ const char* csBinaryDocument::Parse (iString* str)
     (new csDataBuffer(str->Length()));
   memcpy (newBuffer->GetData(), str->GetData(),
     str->Length());
-  data = newBuffer;
+  data = (iDataBuffer*) newBuffer;
   return Parse (newBuffer);
 }
 
@@ -1315,7 +1315,7 @@ const char* csBinaryDocument::Parse (const char* buf)
   csRef<csDataBuffer> newBuffer = csPtr<csDataBuffer> 
     (new csDataBuffer(strlen (buf)));
   memcpy (newBuffer->GetData(), buf, strlen (buf));
-  data = newBuffer;
+  data = (iDataBuffer*) newBuffer;
   return Parse (newBuffer);
 }
 

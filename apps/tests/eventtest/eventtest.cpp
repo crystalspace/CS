@@ -46,7 +46,7 @@ bool run_pool_tests(iObjectRegistry* object_reg)
   }
   csEventQueue *eq = STATIC_CAST(csEventQueue *, (iEventQueue *)q);
 
-  fprintf (stdout, "Event Pool count: %ld\n", eq->CountPool());
+  fprintf (stdout, "Event Pool count: %d\n", eq->CountPool());
   fprintf (stdout, "Allocating 10 events...  ");
   begin = csGetTicks();
   int i;
@@ -57,7 +57,7 @@ bool run_pool_tests(iObjectRegistry* object_reg)
   end = csGetTicks();
   fprintf (stdout, "%d ms\n\n", end - begin);
 
-  fprintf (stdout, "Event Pool count: %ld\n", eq->CountPool());
+  fprintf (stdout, "Event Pool count: %d\n", eq->CountPool());
   fprintf (stdout, "Allocating 100 events...  ");
   begin = csGetTicks();
   for (i = 0; i < 100; i++)
@@ -67,7 +67,7 @@ bool run_pool_tests(iObjectRegistry* object_reg)
   end = csGetTicks();
   fprintf (stdout, "%d ms\n\n", end - begin);
 
-  fprintf (stdout, "Event Pool count: %ld\n", eq->CountPool());
+  fprintf (stdout, "Event Pool count: %d\n", eq->CountPool());
   fprintf (stdout, "Allocating 1000 events...  ");
   begin = csGetTicks();
   for (i = 0; i < 1000; i += 10)
@@ -86,7 +86,7 @@ bool run_pool_tests(iObjectRegistry* object_reg)
   end = csGetTicks();
   fprintf (stdout, "%d ms\n\n", end - begin);
 
-  fprintf (stdout, "Event Pool count: %ld\n", eq->CountPool());
+  fprintf (stdout, "Event Pool count: %d\n", eq->CountPool());
   fprintf (stdout, "Allocating 10000 events...  ");
   begin = csGetTicks();
   // On my machine, this unrolled loop is 10x faster then doing one at a time
@@ -164,10 +164,10 @@ bool run_event_tests(iObjectRegistry* object_reg)
   fprintf (stdout, "  value: %d\n", my_uint16);
   int32 my_int32 = 0;
   fprintf (stdout, "Searching for my_int32...%s", e->Find("my_int32", my_int32) ? "Success!\n" : "Failure!\n");
-  fprintf (stdout, "  value: %ld\n", my_int32);
+  fprintf (stdout, "  value: %d\n", my_int32);
   uint32 my_uint32 = 0;
   fprintf (stdout, "Searching for my_uint32...%s", e->Find("my_uint32", my_uint32) ? "Success!\n" : "Failure!\n");
-  fprintf (stdout, "  value: %ld\n", my_uint32);
+  fprintf (stdout, "  value: %u\n", my_uint32);
   float my_float= 0;
   fprintf (stdout, "Searching for my_float...%s", e->Find("my_float", my_float) ? "Success!\n" : "Failure!\n");
   fprintf (stdout, "  value: %f\n", my_float);

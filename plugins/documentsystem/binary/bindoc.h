@@ -222,7 +222,7 @@ public:
   csBinaryDocAttribute (csBinaryDocument* document,
     csBinaryDocNode* node,
     bdNodeAttribute* data);
-  ~csBinaryDocAttribute ();
+  virtual ~csBinaryDocAttribute ();
 
   virtual const char* GetName ();
   virtual const char* GetValue ();
