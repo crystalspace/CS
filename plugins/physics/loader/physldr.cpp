@@ -246,7 +246,6 @@ bool csPhysicsLoader::ParseBody (iDocumentNode* node, iRigidBody* body)
         body->MakeStatic ();
         break;
       case XMLTOKEN_MESH:
-        body->MakeDynamic ();
         if (child->GetContentsValue ()) {
           iMeshWrapper *m = engine->FindMeshObject (child->GetContentsValue ());
           if (m) {
