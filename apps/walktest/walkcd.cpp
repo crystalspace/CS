@@ -226,6 +226,8 @@ int CollisionDetect (csColliderWrapper *c, iSector* sp,
   int i, j;
 
   // Check collision with this sector.
+  csCollisionPair* CD_contact;
+#if 0
   Sys->collide_system->ResetCollisionPairs ();
   if (c->Collide (sp->QueryObject (), cdt)) hit++;
   csCollisionPair* CD_contact = Sys->collide_system->GetCollisionPairs ();
@@ -235,6 +237,7 @@ int CollisionDetect (csColliderWrapper *c, iSector* sp,
 
   if (Sys->collide_system->GetOneHitOnly () && hit)
     return 1;
+#endif
 
   // Check collision with the meshes in this sector.
   iMeshList* ml = sp->GetMeshes ();
@@ -312,8 +315,11 @@ void DoGravity (csVector3& pos, csVector3& vel)
     for ( ; num_sectors-- ; )
       hits += CollisionDetect (Sys->body, n[num_sectors], &test);
 
-//printf ("body: hits=%d num_our_cd=%d\n", hits, num_our_cd);
-    for (j=0 ; j<num_our_cd ; j++)
+#if 0
+    if (num_our_cd > 0)
+	printf ("body: hits=%d num_our_cd=%d\n", hits, num_our_cd);
+#endif
+    for (j=0 ; j<num_our_cd; j++)
     {
       csCollisionPair& cd = our_cd_contact[j];
       csVector3 n = ((cd.c2-cd.b2)%(cd.b2-cd.a2)).Unit();
@@ -324,6 +330,21 @@ void DoGravity (csVector3& pos, csVector3& vel)
 
     // We now know our (possible) velocity. Let's try to move up or down, if possible
     new_pos = pos+vel;
+    
+    // Try again, and don't move if we're still in a wall
+    int num_sectors = FindSectors (new_pos, 4.0f*Sys->body_radius,
+	    Sys->view->GetCamera()->GetSector(), n);
+    Sys->collide_system->SetOneHitOnly (false);
+    Sys->collide_system->ResetCollisionPairs ();
+    test = csOrthoTransform (csMatrix3(), new_pos);
+    int hit = 0;
+    for (; num_sectors--;)
+      if (CollisionDetect (Sys->body, n[num_sectors], &test) > 0)
+      {
+	new_pos-=vel;
+	break;
+      }
+    
     test = csOrthoTransform (csMatrix3(), new_pos);
 
     num_sectors = FindSectors (new_pos, 4.0f*Sys->legs_radius,
@@ -332,7 +353,6 @@ void DoGravity (csVector3& pos, csVector3& vel)
     num_our_cd = 0;
     Sys->collide_system->SetOneHitOnly (false);
     Sys->collide_system->ResetCollisionPairs ();
-    int hit = 0;
 
     for ( ; num_sectors-- ; )
       hit += CollisionDetect (Sys->legs, n[num_sectors], &test);
