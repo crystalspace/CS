@@ -253,8 +253,8 @@ csPolygon3D::csPolygon3D (csTextureHandle* texture) : csObject (),
 #endif
 }
 
-csPolygon3D::csPolygon3D (csPolygon3D& poly) : csObject (), csPolygonInt (),
-  vertices (4)
+csPolygon3D::csPolygon3D (csPolygon3D& poly) : iBase(), csObject (),
+  csPolygonInt (), vertices (4)
 {
   const char* tname = poly.GetName ();
   if (tname) SetName (tname);
