@@ -39,16 +39,17 @@
 #
 #------------------------------------------------------------------------------
 
-MSVC.PLUGINS.REQUIRED =     \
-  cscript/cspython          \
-  csgame/gamecore           \
-  font/server/freefont      \
-  sound/driver/waveoutsd    \
-  sound/renderer/ds3d       \
-  sound/renderer/software   \
-  video/canvas/ddraw        \
-  video/canvas/ddraw61      \
-  video/canvas/openglwin    \
-  video/format/avi          \
-  video/renderer/direct3d61 \
+MSVC.PLUGINS.REQUIRED =        \
+  cscript/cspython             \
+  csgame/gamecore              \
+  font/server/freefont         \
+  sound/driver/waveoutsd       \
+  sound/renderer/ds3d          \
+  sound/renderer/software      \
+  video/canvas/ddraw           \
+  video/canvas/ddraw61         \
+  video/canvas/openglwin       \
+  video/format/avi             \
+  video/format/codecs/opendivx \
+  video/renderer/direct3d61    \
   video/renderer/opengl
