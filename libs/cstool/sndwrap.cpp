@@ -18,7 +18,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <string.h>
 #include "cssysdef.h"
 #include "isound/handle.h"
 #include "cstool/sndwrap.h"

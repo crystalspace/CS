@@ -1529,16 +1529,17 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // real window for example).
   int w3d = Gfx3D->GetWidth ();
   int h3d = Gfx3D->GetHeight ();
+  // clear all backbuffers to black
+  // and Zbuffer, mainly to make better zbufdumps
+  Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS | CSDRAW_CLEARZBUFFER);
+  myG2D->ClearAll (myG2D->FindRGB(0,0,0));
+  Gfx3D->FinishDraw ();
 #ifdef CS_DEBUG
   view->SetRectangle (2, 2, w3d - 4, h3d - 4);
   myG2D->SetClipRect (2, 2, w3d - 2, h3d - 2);
 #else
   view->SetRectangle (0, 0, w3d, h3d);
 #endif
-  // clear all backbuffers to black
-  myG2D->BeginDraw ();
-  myG2D->ClearAll (myG2D->FindRGB(0,0,0));
-  myG2D->FinishDraw ();
 
 #if 0
 {

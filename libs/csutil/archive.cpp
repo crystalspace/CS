@@ -16,11 +16,11 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+#include "cssysdef.h"
 #include <string.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "cssysdef.h"
 #include "csutil/csendian.h"
 #include "csutil/archive.h"
 #include "csutil/csstring.h"

@@ -19,13 +19,12 @@
    write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
+// added for Crystal Space to avoid a lot of compiler warnings
+#include "cssysdef.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
-
-// added for Crystal Space to avoid a lot of compiler warnings
-#include "cssysdef.h"
 
 #if defined (WIN32) && !defined (__CYGWIN32__)
 /* It's not Unix, really.  See?  Capital letters.  */

@@ -17,7 +17,6 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <stdio.h>
 #include "cssysdef.h"
 #include "csutil/sparse3d.h"
 

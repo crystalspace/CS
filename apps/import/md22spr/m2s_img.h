@@ -20,10 +20,10 @@
 #ifndef __M2S_IMG_H__
 #define __M2S_IMG_H__
 
-#include "igraphic/image.h"
+#include "csgfx/imagebase.h"
 #include "csgfx/rgbpixel.h"
 
-class SkinImage : public iImage
+class SkinImage : public csImageBase
 {
 protected:
   void* Image;
@@ -36,20 +36,8 @@ public:
   virtual const void *GetImageData ();
   virtual int GetWidth () const;
   virtual int GetHeight () const;
-  virtual void SetName (const char*);
-  virtual const char *GetName () const;
   virtual int GetFormat () const;
   virtual const csRGBpixel *GetPalette ();
-  virtual const uint8 *GetAlpha ();
-  virtual bool HasKeyColor () const { return false; }
-  virtual bool HasKeycolor () const
-  { return HasKeyColor(); }
-  virtual void GetKeyColor (int &r, int &g, int &b) const { }
-  virtual void GetKeycolor (int &r, int &g, int &b) const
-  { GetKeyColor (r, g, b); }
-  virtual uint HasMipmaps() const { return 0; }
-  virtual csRef<iImage> GetMipmap (uint num)
-  { return (num == 0) ? this : 0; }
 };
 
 #endif // __M2S_IMG_H__

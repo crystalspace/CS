@@ -16,9 +16,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "cssysdef.h"
 #include <stdio.h>
 #include <string.h>
-#include "cssysdef.h"
 #include "csutil/cmdhelp.h"
 #include "csutil/csevent.h"
 #include "csutil/snprintf.h"

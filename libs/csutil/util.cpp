@@ -15,12 +15,12 @@
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
+
+#include "cssysdef.h"
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-
-#include "cssysdef.h"
 #include "csutil/csunicode.h"
 #include "csutil/csuctransform.h"
 #include "csutil/util.h"

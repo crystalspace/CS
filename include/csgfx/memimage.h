@@ -22,14 +22,14 @@
 
 #include "csextern.h"
 #include "csutil/leakguard.h"
-#include "csgfx/imagetools.h"
-#include "csgfx/rgbpixel.h"
-#include "igraphic/image.h"
+#include "imagetools.h"
+#include "rgbpixel.h"
+#include "imagebase.h"
 
 /**
  * Memory image.
  */
-class CS_CSGFX_EXPORT csImageMemory : public iImage
+class CS_CSGFX_EXPORT csImageMemory : public csImageBase
 {
 private:
   /// Common code shared by constructors.
@@ -154,26 +154,15 @@ public:
   virtual int GetWidth () const { return Width; }
   virtual int GetHeight () const { return Height; }
 
-  virtual void SetName (const char *iName);
-  virtual const char *GetName () const { return fName; }
-
   virtual int GetFormat () const { return Format; }
   virtual const csRGBpixel* GetPalette () { return GetPalettePtr(); }
   virtual const uint8* GetAlpha () { return GetAlphaPtr(); }
 
   virtual bool HasKeyColor () const { return has_keycolour; }
-  virtual bool HasKeycolor () const
-  { return HasKeyColor(); }
 
   virtual void GetKeyColor (int &r, int &g, int &b) const
   { r = keycolour.red; g = keycolour.green; b = keycolour.blue; }
-  virtual void GetKeycolor (int &r, int &g, int &b) const
-  { GetKeyColor (r, g, b); }
 
-  virtual uint HasMipmaps () const { return 0; }
-  virtual csRef<iImage> GetMipmap (uint num)
-  { return (num == 0) ? this : 0; }
-  
   /// Clears image to colour. Only works for truecolor images.
   void Clear (const csRGBpixel &colour);
 

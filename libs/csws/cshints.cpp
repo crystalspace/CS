@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <stdlib.h>
 #include "cssysdef.h"
+#include <stdlib.h>
 #include "csws/cshints.h"
 #include "csws/csapp.h"
 #include "csws/cswspal.h"

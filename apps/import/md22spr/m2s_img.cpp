@@ -27,11 +27,8 @@ SCF_IMPLEMENT_IBASE_END
 const void *SkinImage::GetImageData () { return Image; }
 int SkinImage::GetWidth () const { return Width; }
 int SkinImage::GetHeight () const { return Height; }
-void SkinImage::SetName (const char*) {}
-const char *SkinImage::GetName () const { return 0; }
 int SkinImage::GetFormat () const { return CS_IMGFMT_PALETTED8; }
 const csRGBpixel *SkinImage::GetPalette () { return Palette; }
-const uint8 *SkinImage::GetAlpha () { return 0; }
 
 SkinImage::SkinImage(void* Data, const void* Pal, int w, int h) :
   Image(Data), Width(w), Height(h), Size(w * h)

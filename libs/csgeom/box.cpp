@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <math.h>
 #include "cssysdef.h"
+#include <math.h>
 #include "csgeom/box.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/poly2d.h"

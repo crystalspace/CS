@@ -28,280 +28,294 @@
 
 #include "plugins/video/canvas/openglcommon/glextmanager.h"
 
-#define IMPLEMENT_CACHED_BOOL(name) \
-  bool enabled_##name; \
-  void Enable_##name () \
-  { \
-    if (!enabled_##name) \
-    { \
-      enabled_##name = true;  \
-      glEnable (name); \
-    } \
-  } \
-  void Disable_##name () \
-  { \
-    if (enabled_##name) { \
-      enabled_##name = false;  \
-      glDisable (name); \
-    } \
-  } \
-  bool IsEnabled_##name () const \
-  { \
-    return enabled_##name; \
+// Set to 'true' to force state changing commands. For debugging.
+#define FORCE_STATE_CHANGE			  false/*true*/
+
+#define IMPLEMENT_CACHED_BOOL(name)					     \
+  bool enabled_##name;							     \
+  void Enable_##name ()							     \
+  {									     \
+    if (!enabled_##name || FORCE_STATE_CHANGE)				     \
+    {									     \
+      enabled_##name = true;						     \
+      glEnable (name);							     \
+    }									     \
+  }									     \
+  void Disable_##name ()						     \
+  {									     \
+    if (enabled_##name || FORCE_STATE_CHANGE) {				     \
+      enabled_##name = false;						     \
+      glDisable (name);							     \
+    }									     \
+  }									     \
+  bool IsEnabled_##name () const					     \
+  {									     \
+    return enabled_##name;						     \
   }
 
 #define CS_GL_MAX_LAYER 16
 
 
-#define IMPLEMENT_CACHED_BOOL_CURRENTLAYER(name) \
-  bool enabled_##name[CS_GL_MAX_LAYER]; \
-  void Enable_##name () \
-  { \
-    if (!enabled_##name[currentUnit]) \
-    { \
-      ActivateTU (); \
-      enabled_##name[currentUnit] = true;  \
-      glEnable (name); \
-    } \
-  } \
-  void Disable_##name () \
-  { \
-    if (enabled_##name[currentUnit]) \
-    { \
-      ActivateTU (); \
-      enabled_##name[currentUnit] = false;  \
-      glDisable (name); \
-    } \
-  } \
-  bool IsEnabled_##name () const \
-  { \
-    return enabled_##name[currentUnit]; \
+#define IMPLEMENT_CACHED_BOOL_CURRENTLAYER(name)			     \
+  bool enabled_##name[CS_GL_MAX_LAYER]; 				     \
+  void Enable_##name () 						     \
+  { 									     \
+    if (!enabled_##name[currentUnit] || FORCE_STATE_CHANGE)		     \
+    { 									     \
+      ActivateTU (); 							     \
+      enabled_##name[currentUnit] = true;  				     \
+      glEnable (name); 							     \
+    } 									     \
+  } 									     \
+  void Disable_##name () 						     \
+  { 									     \
+    if (enabled_##name[currentUnit] || FORCE_STATE_CHANGE)		     \
+    { 									     \
+      ActivateTU (); 							     \
+      enabled_##name[currentUnit] = false;  				     \
+      glDisable (name); 						     \
+    } 									     \
+  } 									     \
+  bool IsEnabled_##name () const 					     \
+  { 									     \
+    return enabled_##name[currentUnit]; 				     \
   }
 
-#define IMPLEMENT_CACHED_PARAMETER_1(func, name, type1, param1) \
-  type1 parameter_##param1; \
-  void Set##name (type1 param1, bool forced = false) \
-  { \
-    if (forced || (param1 != parameter_##param1)) \
-    { \
-      parameter_##param1 = param1;  \
-      func (param1); \
-    } \
-  } \
-  void Get##name (type1 & param1) const\
-  { \
-    param1 = parameter_##param1;  \
+#define IMPLEMENT_CACHED_PARAMETER_1(func, name, type1, param1) 	     \
+  type1 parameter_##param1; 						     \
+  void Set##name (type1 param1, bool forced = false)			     \
+  { 									     \
+    if (forced || (param1 != parameter_##param1)			     \
+      || FORCE_STATE_CHANGE) 						     \
+    { 									     \
+      parameter_##param1 = param1;  					     \
+      func (param1); 							     \
+    } 									     \
+  } 									     \
+  void Get##name (type1 & param1) const					     \
+  { 									     \
+    param1 = parameter_##param1;  					     \
   }
 
 #define IMPLEMENT_CACHED_PARAMETER_2(func, name, type1, param1, type2, param2) \
-  type1 parameter_##param1; \
-  type2 parameter_##param2; \
-  void Set##name (type1 param1, type2 param2, bool forced = false) \
-  { \
-    if (forced || (param1 != parameter_##param1) || (param2 != parameter_##param2)) \
-    { \
-      parameter_##param1 = param1;  \
-      parameter_##param2 = param2;  \
-      func (param1, param2); \
-    } \
-  } \
-  void Get##name (type1 & param1, type2 & param2) const\
-  { \
-    param1 = parameter_##param1;  \
-    param2 = parameter_##param2;  \
+  type1 parameter_##param1; 						     \
+  type2 parameter_##param2; 						     \
+  void Set##name (type1 param1, type2 param2, bool forced = false)	     \
+  { 									     \
+    if (forced || (param1 != parameter_##param1)			     \
+      || (param2 != parameter_##param2)					     \
+      || FORCE_STATE_CHANGE)						     \
+    { 									     \
+      parameter_##param1 = param1;  					     \
+      parameter_##param2 = param2;  					     \
+      func (param1, param2);   						     \
+    }   			  					     \
+  }   			  						     \
+  void Get##name (type1 & param1, type2 & param2) const			     \
+  {   			  			  			     \
+    param1 = parameter_##param1;  					     \
+    param2 = parameter_##param2;  					     \
   }
 
 #define IMPLEMENT_CACHED_PARAMETER_3(func, name, type1, param1, type2, param2, type3, param3) \
-  type1 parameter_##param1; \
-  type2 parameter_##param2; \
-  type3 parameter_##param3; \
+  type1 parameter_##param1; 						     \
+  type2 parameter_##param2; 						     \
+  type3 parameter_##param3; 						     \
   void Set##name (type1 param1, type2 param2, type3 param3, bool forced = false) \
-  { \
-    if (forced || (param1 != parameter_##param1) || (param2 != parameter_##param2) || (param3 != parameter_##param3)) \
-    { \
-      parameter_##param1 = param1;  \
-      parameter_##param2 = param2;  \
-      parameter_##param3 = param3;  \
-      func (param1, param2, param3); \
-    } \
-  } \
-  void Get##name (type1 &param1, type2 & param2, type3 & param3) const\
-  { \
-    param1 = parameter_##param1;  \
-    param2 = parameter_##param2;  \
-    param3 = parameter_##param3;  \
+  { 									     \
+    if (forced || (param1 != parameter_##param1)			     \
+      || (param2 != parameter_##param2)					     \
+      || (param3 != parameter_##param3)					     \
+      || FORCE_STATE_CHANGE)						     \
+    { 									     \
+      parameter_##param1 = param1;  					     \
+      parameter_##param2 = param2;  					     \
+      parameter_##param3 = param3;  					     \
+      func (param1, param2, param3); 					     \
+    } 									     \
+  } 									     \
+  void Get##name (type1 &param1, type2 & param2, type3 & param3) const	     \
+  { 									     \
+    param1 = parameter_##param1;  					     \
+    param2 = parameter_##param2;  					     \
+    param3 = parameter_##param3;  					     \
   }
 
-#define IMPLEMENT_CACHED_PARAMETER_4(func, name, type1, param1, \
-    type2, param2, type3, param3, type4, param4) \
-  type1 parameter_##param1; \
-  type2 parameter_##param2; \
-  type3 parameter_##param3; \
-  type4 parameter_##param4; \
-  void Set##name (type1 param1, type2 param2, type3 param3, type4 param4, \
-    bool forced = false) \
-  { \
-    if (forced || (param1 != parameter_##param1) || \
-      (param2 != parameter_##param2) || \
-      (param3 != parameter_##param3) || \
-      (param4 != parameter_##param4)) \
-    { \
-      parameter_##param1 = param1;  \
-      parameter_##param2 = param2;  \
-      parameter_##param3 = param3;  \
-      parameter_##param4 = param4;  \
-      func (param1, param2, param3, param4); \
-    } \
-  } \
+#define IMPLEMENT_CACHED_PARAMETER_4(func, name, type1, param1, 	     \
+    type2, param2, type3, param3, type4, param4) 			     \
+  type1 parameter_##param1; 						     \
+  type2 parameter_##param2; 						     \
+  type3 parameter_##param3; 						     \
+  type4 parameter_##param4; 						     \
+  void Set##name (type1 param1, type2 param2, type3 param3, type4 param4,    \
+    bool forced = false) 						     \
+  { 									     \
+    if (forced || (param1 != parameter_##param1) || 			     \
+      (param2 != parameter_##param2) || 				     \
+      (param3 != parameter_##param3) || 				     \
+      (param4 != parameter_##param4)					     \
+      || FORCE_STATE_CHANGE) 						     \
+    { 									     \
+      parameter_##param1 = param1;  					     \
+      parameter_##param2 = param2;  					     \
+      parameter_##param3 = param3;  					     \
+      parameter_##param4 = param4;  					     \
+      func (param1, param2, param3, param4); 				     \
+    } 									     \
+  } 									     \
   void Get##name (type1 &param1, type2 & param2, type3 & param3, type4& param4) const\
-  { \
-    param1 = parameter_##param1;  \
-    param2 = parameter_##param2;  \
-    param3 = parameter_##param3;  \
-    param4 = parameter_##param4;  \
+  { 									     \
+    param1 = parameter_##param1;  					     \
+    param2 = parameter_##param2; 					     \
+    param3 = parameter_##param3;  					     \
+    param4 = parameter_##param4;  					     \
   }
 
-#define IMPLEMENT_CACHED_CLIENT_STATE(name)	      \
-  bool enabled_##name; \
-  void Enable_##name () \
-  { \
-    if (!enabled_##name) \
-    { \
-      enabled_##name = true;  \
-      glEnableClientState (name); \
-    } \
-  } \
-  void Disable_##name () \
-  { \
-    if (enabled_##name) { \
-      enabled_##name = false;  \
-      glDisableClientState (name); \
-    } \
-  } \
-  bool IsEnabled_##name () const \
-  { \
-    return enabled_##name; \
-  }
-
-
-#define IMPLEMENT_CACHED_CLIENT_STATE_LAYER(name)	      \
-  bool enabled_##name[CS_GL_MAX_LAYER]; \
-  void Enable_##name () \
-  { \
-    if (!enabled_##name[currentUnit]) \
-    { \
-      ActivateTU (); \
-      enabled_##name[currentUnit] = true;  \
-      glEnableClientState (name); \
-    } \
-  } \
-  void Disable_##name () \
-  { \
-    if (enabled_##name[currentUnit]) { \
-      ActivateTU (); \
-      enabled_##name[currentUnit] = false;  \
-      glDisableClientState (name); \
-    } \
-  } \
-  bool IsEnabled_##name () const \
-  { \
-    return enabled_##name[currentUnit]; \
-  }
-
-#define IMPLEMENT_CACHED_PARAMETER_1_LAYER(func, name, type1, param1) \
-  type1 parameter_##param1[CS_GL_MAX_LAYER]; \
-  void Set##name (type1 param1, bool forced = false) \
-  { \
-    if (forced || (param1 != parameter_##param1[currentUnit])) \
-    { \
-      ActivateTU (); \
-      parameter_##param1[currentUnit] = param1;  \
-      func (param1); \
-    } \
-  } \
-  void Get##name (type1 &param1) const\
-  { \
-    param1 = parameter_##param1[currentUnit];  \
+#define IMPLEMENT_CACHED_CLIENT_STATE(name)				     \
+  bool enabled_##name;							     \
+  void Enable_##name () 						     \
+  { 									     \
+    if (!enabled_##name || FORCE_STATE_CHANGE)				     \
+    { 									     \
+      enabled_##name = true;  						     \
+      glEnableClientState (name); 					     \
+    } 									     \
+  } 									     \
+  void Disable_##name () 						     \
+  { 									     \
+    if (enabled_##name || FORCE_STATE_CHANGE) {				     \
+      enabled_##name = false;  						     \
+      glDisableClientState (name); 					     \
+    } 									     \
+  } 									     \
+  bool IsEnabled_##name () const 					     \
+  { 									     \
+    return enabled_##name; 						     \
   }
 
 
-#define IMPLEMENT_CACHED_PARAMETER_2_LAYER(func, name, type1, param1, \
-  type2, param2) \
-  type1 parameter_##param1[CS_GL_MAX_LAYER]; \
-  type2 parameter_##param2[CS_GL_MAX_LAYER]; \
-  void Set##name (type1 param1, type2 param2, bool forced = false) \
-  { \
-    if (forced || (param1 != parameter_##param1[currentUnit]) || \
-                  (param2 != parameter_##param2[currentUnit])) \
-    { \
-      ActivateTU (); \
-      parameter_##param1[currentUnit] = param1;  \
-      parameter_##param2[currentUnit] = param2;  \
-      func (param1, param2); \
-    } \
-  } \
-  void Get##name (type1 &param1, type2 & param2) const\
-  { \
-    param1 = parameter_##param1[currentUnit];  \
-    param2 = parameter_##param2[currentUnit];  \
+#define IMPLEMENT_CACHED_CLIENT_STATE_LAYER(name)	      		     \
+  bool enabled_##name[CS_GL_MAX_LAYER]; 		     		     \
+  void Enable_##name () 		     		     		     \
+  { 		     		     		     		     	     \
+    if (!enabled_##name[currentUnit] || FORCE_STATE_CHANGE)	     	     \
+    { 		     		     		     		     	     \
+      ActivateTU (); 		     		     		     	     \
+      enabled_##name[currentUnit] = true;  		     		     \
+      glEnableClientState (name); 		     		     	     \
+    }									     \
+  }								  	     \
+  void Disable_##name ()					    	     \
+  {									     \
+    if (enabled_##name[currentUnit] || FORCE_STATE_CHANGE) {   	     	     \
+      ActivateTU (); 	     	     	     	     	     		     \
+      enabled_##name[currentUnit] = false;				     \
+      glDisableClientState (name);					     \
+    }									     \
+  }									     \
+  bool IsEnabled_##name () const					     \
+  {									     \
+    return enabled_##name[currentUnit];					     \
+  }
+
+#define IMPLEMENT_CACHED_PARAMETER_1_LAYER(func, name, type1, param1)	     \
+  type1 parameter_##param1[CS_GL_MAX_LAYER];				     \
+  void Set##name (type1 param1, bool forced = false)			     \
+  {									     \
+    if (forced || (param1 != parameter_##param1[currentUnit])		     \
+       || FORCE_STATE_CHANGE)						     \
+    {									     \
+      ActivateTU ();							     \
+      parameter_##param1[currentUnit] = param1;				     \
+      func (param1);							     \
+    }									     \
+  }									     \
+  void Get##name (type1 &param1) const					     \
+  {									     \
+    param1 = parameter_##param1[currentUnit];				     \
   }
 
 
-#define IMPLEMENT_CACHED_PARAMETER_3_LAYER(func, name, type1, param1, \
-  type2, param2, type3, param3) \
-  type1 parameter_##param1[CS_GL_MAX_LAYER]; \
-  type2 parameter_##param2[CS_GL_MAX_LAYER]; \
-  type3 parameter_##param3[CS_GL_MAX_LAYER]; \
-  void Set##name (type1 param1, type2 param2, type3 param3,\
-    bool forced = false) \
-  { \
-    if (forced || (param1 != parameter_##param1[currentUnit]) || \
-                  (param2 != parameter_##param2[currentUnit]) || \
-                  (param3 != parameter_##param3[currentUnit])) \
-    { \
-      ActivateTU (); \
-      parameter_##param1[currentUnit] = param1;  \
-      parameter_##param2[currentUnit] = param2;  \
-      parameter_##param3[currentUnit] = param3;  \
-      func (param1, param2, param3); \
-    } \
-  } \
-  void Get##name (type1 &param1, type2 & param2, type3 & param3) const\
-  { \
-    param1 = parameter_##param1[currentUnit];  \
-    param2 = parameter_##param2[currentUnit];  \
-    param3 = parameter_##param3[currentUnit];  \
+#define IMPLEMENT_CACHED_PARAMETER_2_LAYER(func, name, type1, param1,	     \
+  type2, param2)							     \
+  type1 parameter_##param1[CS_GL_MAX_LAYER];				     \
+  type2 parameter_##param2[CS_GL_MAX_LAYER];				     \
+  void Set##name (type1 param1, type2 param2, bool forced = false)	     \
+  {									     \
+    if (forced || (param1 != parameter_##param1[currentUnit]) ||	     \
+                  (param2 != parameter_##param2[currentUnit])		     \
+       || FORCE_STATE_CHANGE)						     \
+    {									     \
+      ActivateTU ();							     \
+      parameter_##param1[currentUnit] = param1;				     \
+      parameter_##param2[currentUnit] = param2;				     \
+      func (param1, param2);						     \
+    }									     \
+  }									     \
+  void Get##name (type1 &param1, type2 & param2) const			     \
+  {									     \
+    param1 = parameter_##param1[currentUnit];				     \
+    param2 = parameter_##param2[currentUnit];				     \
   }
 
 
-#define IMPLEMENT_CACHED_PARAMETER_4_LAYER(func, name, type1, param1, \
-    type2, param2, type3, param3, type4, param4) \
-  type1 parameter_##param1[CS_GL_MAX_LAYER]; \
-  type2 parameter_##param2[CS_GL_MAX_LAYER]; \
-  type3 parameter_##param3[CS_GL_MAX_LAYER]; \
-  type4 parameter_##param4[CS_GL_MAX_LAYER]; \
-  void Set##name (type1 param1, type2 param2, type3 param3, type4 param4, \
-    bool forced = false) \
-  { \
-    if (forced || (param1 != parameter_##param1[currentUnit]) || \
-                  (param2 != parameter_##param2[currentUnit]) || \
-                  (param3 != parameter_##param3[currentUnit]) || \
-                  (param4 != parameter_##param4[currentUnit])) \
-    { \
-      ActivateTU (); \
-      parameter_##param1[currentUnit] = param1;  \
-      parameter_##param2[currentUnit] = param2;  \
-      parameter_##param3[currentUnit] = param3;  \
-      parameter_##param4[currentUnit] = param4;  \
-      func (param1, param2, param3, param4); \
-    } \
-  } \
+#define IMPLEMENT_CACHED_PARAMETER_3_LAYER(func, name, type1, param1,	     \
+  type2, param2, type3, param3)						     \
+  type1 parameter_##param1[CS_GL_MAX_LAYER];				     \
+  type2 parameter_##param2[CS_GL_MAX_LAYER];				     \
+  type3 parameter_##param3[CS_GL_MAX_LAYER];				     \
+  void Set##name (type1 param1, type2 param2, type3 param3,		     \
+    bool forced = false)						     \
+  {									     \
+    if (forced || (param1 != parameter_##param1[currentUnit]) ||	     \
+                  (param2 != parameter_##param2[currentUnit]) ||	     \
+                  (param3 != parameter_##param3[currentUnit]		     \
+       || FORCE_STATE_CHANGE))						     \
+    {									     \
+      ActivateTU ();							     \
+      parameter_##param1[currentUnit] = param1;				     \
+      parameter_##param2[currentUnit] = param2;				     \
+      parameter_##param3[currentUnit] = param3;				     \
+      func (param1, param2, param3);					     \
+    }									     \
+  }									     \
+  void Get##name (type1 &param1, type2 & param2, type3 & param3) const	     \
+  {									     \
+    param1 = parameter_##param1[currentUnit];				     \
+    param2 = parameter_##param2[currentUnit];				     \
+    param3 = parameter_##param3[currentUnit];				     \
+  }
+
+
+#define IMPLEMENT_CACHED_PARAMETER_4_LAYER(func, name, type1, param1,	     \
+    type2, param2, type3, param3, type4, param4)			     \
+  type1 parameter_##param1[CS_GL_MAX_LAYER];				     \
+  type2 parameter_##param2[CS_GL_MAX_LAYER];				     \
+  type3 parameter_##param3[CS_GL_MAX_LAYER];				     \
+  type4 parameter_##param4[CS_GL_MAX_LAYER];				     \
+  void Set##name (type1 param1, type2 param2, type3 param3, type4 param4,    \
+    bool forced = false)						     \
+  {									     \
+    if (forced || (param1 != parameter_##param1[currentUnit]) ||	     \
+                  (param2 != parameter_##param2[currentUnit]) ||	     \
+                  (param3 != parameter_##param3[currentUnit]) ||	     \
+                  (param4 != parameter_##param4[currentUnit])		     \
+       || FORCE_STATE_CHANGE)						     \
+    {									     \
+      ActivateTU ();							     \
+      parameter_##param1[currentUnit] = param1;				     \
+      parameter_##param2[currentUnit] = param2;				     \
+      parameter_##param3[currentUnit] = param3;				     \
+      parameter_##param4[currentUnit] = param4;				     \
+      func (param1, param2, param3, param4);				     \
+    }									     \
+  }									     \
   void Get##name (type1 &param1, type2 & param2, type3 & param3, type4& param4) const\
-  { \
-    param1 = parameter_##param1[currentUnit];  \
-    param2 = parameter_##param2[currentUnit];  \
-    param3 = parameter_##param3[currentUnit];  \
-    param4 = parameter_##param4[currentUnit];  \
+  {									     \
+    param1 = parameter_##param1[currentUnit];				     \
+    param2 = parameter_##param2[currentUnit];				     \
+    param3 = parameter_##param3[currentUnit];				     \
+    param4 = parameter_##param4[currentUnit];				     \
   }
 
 
@@ -524,5 +538,7 @@ public:
 #undef IMPLEMENT_CACHED_PARAMETER_1
 #undef IMPLEMENT_CACHED_PARAMETER_2
 #undef IMPLEMENT_CACHED_PARAMETER_3
+
+#undef FORCE_STATE_CHANGE
 
 #endif // __CS_GLSTATES_H__

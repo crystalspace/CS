@@ -17,11 +17,12 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-extern "C" {
+#include "cssysdef.h"
+extern "C" 
+{
 #include <ctype.h>
 #include <stdarg.h>
 }
-#include "cssysdef.h"
 #include "csutil/csstring.h"
 #include "csutil/snprintf.h"
 

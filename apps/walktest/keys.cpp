@@ -697,6 +697,12 @@ bool WalkTest::WalkHandleEvent (iEvent &Event)
       #endif
 	break;
       }
+      else if (Event.Command.Code == cscmdContextResize)
+      {
+	Sys->FrameWidth = Sys->myG2D->GetWidth();
+	Sys->FrameHeight = Sys->myG2D->GetHeight();
+	break;
+      }
       break;
     }
     case csevKeyboard:

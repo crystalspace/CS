@@ -17,8 +17,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <limits.h>
 #include "cssysdef.h"
+#include <limits.h>
 #include "csqint.h"
 #include "csws/csgfxppl.h"
 #include "csws/csmouse.h"

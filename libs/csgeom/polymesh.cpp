@@ -16,8 +16,8 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include <math.h>
 #include "cssysdef.h"
+#include <math.h>
 #include "csgeom/polymesh.h"
 #include "csgeom/pmtools.h"
 

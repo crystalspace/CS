@@ -37,7 +37,6 @@ void csImageMemory::ConstructCommon()
   DG_ADDI (this, 0);
   DG_TYPE (this, "csImageMemory");
 
-  fName = 0;
   Image = 0;
   Palette = 0;
   Alpha = 0;
@@ -78,19 +77,21 @@ void csImageMemory::ConstructBuffers (int width, int height, void* buffer,
   destroy_image = destroy;
 }
 
-csImageMemory::csImageMemory (int width, int height, int format)
+csImageMemory::csImageMemory (int width, int height, int format) : csImageBase()
 {
   ConstructWHF (width, height, format);
 }
 
 csImageMemory::csImageMemory (int width, int height, void* buffer, 
-			      bool destroy, int format, csRGBpixel *palette)
+			      bool destroy, int format, csRGBpixel *palette) 
+  : csImageBase()
 {
   ConstructBuffers (width, height, buffer, destroy, format, palette);
 }
 
 csImageMemory::csImageMemory (int width, int height, const void* buffer, 
 			      int format, const csRGBpixel *palette)
+ : csImageBase()
 {
   ConstructWHF (width, height, format);
   AllocImage();
@@ -99,18 +100,18 @@ csImageMemory::csImageMemory (int width, int height, const void* buffer,
     memcpy (Palette, palette, sizeof (csRGBpixel) * 256);
 }
 
-csImageMemory::csImageMemory (iImage* source)
+csImageMemory::csImageMemory (iImage* source) : csImageBase()
 {
   ConstructSource (source);
 }
 
-csImageMemory::csImageMemory (iImage* source, int newFormat)
+csImageMemory::csImageMemory (iImage* source, int newFormat) : csImageBase()
 {
   ConstructSource (source);
   SetFormat (newFormat);
 }
 
-csImageMemory::csImageMemory (int iFormat)
+csImageMemory::csImageMemory (int iFormat) : csImageBase()
 {
   ConstructWHF (0, 0, iFormat);
 }
@@ -181,7 +182,6 @@ csImageMemory::~csImageMemory ()
     Palette = 0;
   }
   FreeImage();
-  delete [] fName;
   DG_REM (this);
   SCF_DESTRUCT_IBASE ();
 }
@@ -200,12 +200,6 @@ uint8* csImageMemory::GetAlphaPtr ()
 { 
   EnsureImage();
   return Alpha; 
-}
-
-void csImageMemory::SetName (const char *iName)
-{
-  delete[] fName;
-  fName = csStrNew (iName);
 }
 
 void csImageMemory::Clear (const csRGBpixel &colour)

@@ -385,16 +385,16 @@ void Name (void (*p)())                                                \
 #define CS_IMPLEMENT_STATIC_VAR_EXT(getterFunc,Type,initParam,kill_how) \
 extern "C" {                                                            \
 static Type* getterFunc ();                                             \
-static void getterFunc ## _kill ();                                     \
-static void getterFunc ## _kill_array ();                               \
-void getterFunc ## _kill ()                                             \
+static void getterFunc ## _kill ();					\
+static void getterFunc ## _kill_array ();				\
+void getterFunc ## _kill ()                                      	\
 {                                                                       \
-  (void)getterFunc ## _kill_array;                                      \
+  (void)(&getterFunc ## _kill_array);					\
   delete getterFunc ();                                                 \
 }                                                                       \
-void getterFunc ## _kill_array ()                                       \
+void getterFunc ## _kill_array ()                                	\
 {                                                                       \
-  (void)getterFunc ## _kill;                                            \
+  (void)(&getterFunc ## _kill);						\
   delete [] getterFunc ();                                              \
 }                                                                       \
 Type* getterFunc ()                                                     \
@@ -451,30 +451,30 @@ static Type &getterFunc ();
  */
 #ifndef CS_IMPLEMENT_STATIC_CLASSVAR_EXT
 #define CS_IMPLEMENT_STATIC_CLASSVAR_EXT(Class,var,getterFunc,Type,initParam,\
-  kill_how)                                                    \
-Type *Class::var = 0;                                          \
-extern "C" {                                                   \
-static void Class ## _ ## getterFunc ## _kill ();              \
-static void Class ## _ ## getterFunc ## _kill_array ();        \
-void Class ## _ ## getterFunc ## _kill ()                      \
-{                                                              \
-  (void) Class ## _ ## getterFunc ## _kill_array;              \
-  delete Class::getterFunc ();                                 \
-}                                                              \
-void Class ## _ ## getterFunc ## _kill_array ()                \
-{                                                              \
-  (void) Class ## _ ## getterFunc ## _kill;                    \
-  delete [] Class::getterFunc ();                              \
-}                                                              \
-}                                                              \
-Type* Class::getterFunc ()                                     \
-{                                                              \
-  if (!var)                                                    \
-  {                                                            \
-    var = new Type initParam;                                  \
-    csStaticVarCleanup (Class ## _ ## getterFunc ## kill_how); \
-  }                                                            \
-  return var;                                                  \
+  kill_how)                                                    	\
+Type *Class::var = 0;                                          	\
+extern "C" {                                                   	\
+static void Class ## _ ## getterFunc ## _kill ();              	\
+static void Class ## _ ## getterFunc ## _kill_array ();        	\
+void Class ## _ ## getterFunc ## _kill ()               	\
+{                                                              	\
+  delete Class::getterFunc ();                                 	\
+  (void)(&Class ## _ ## getterFunc ## _kill_array);		\
+}                                                              	\
+void Class ## _ ## getterFunc ## _kill_array ()         	\
+{                                                              	\
+  delete [] Class::getterFunc ();                              	\
+  (void)(&Class ## _ ## getterFunc ## _kill);			\
+}                                                              	\
+}                                                              	\
+Type* Class::getterFunc ()                                     	\
+{                                                              	\
+  if (!var)                                                    	\
+  {                                                            	\
+    var = new Type initParam;                                  	\
+    csStaticVarCleanup (Class ## _ ## getterFunc ## kill_how); 	\
+  }                                                            	\
+  return var;                                                  	\
 }
 #endif
 
