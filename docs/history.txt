@@ -50,6 +50,16 @@ The history order is reversed so that new features are at the top.
 	  initialized. (Finally, you don't need to search for your 1 pixel
 	  model anymore.)
 	- Eric Sunshine eliminated compilation warnings in AWS.
+	- Eric Sunshine made the following changes the configuration scripts:
+	    - Eliminated corrupt, unportable, and unnecessary `sed' expressions
+	      from packageinfo.m4 which broke the configure script.
+	    - Renamed CS_PACKAGEINFO_SETJAMCONFIG macro to CS_EMIT_PACKAGEINFO
+	      in packageinfo.m4.  This macro now takes an argument which
+	      specifies the target to which the extended information should be
+	      emitted (for example, to the Jam or make configuration caches).
+	    - configure.ac now takes advantage of the new CS_EMIT_PACKAGEINFO
+	      functionality to emit extended package information to both
+	      config.mak and Jamconfig, rather than only to Jamconfig.
 24-May-2003
 	- Jorrit fixed a bug in GetObjectBoundingBox() of 2D sprites. This
 	  could cause culling errors of those sprites.

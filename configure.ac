@@ -155,8 +155,9 @@ AC_DEFUN([CS_EMIT_BUILD_FLAGS],
 # INITIALIZATION
 #===============================================================================
 AC_INIT([crystal], [cs_version_number], [crystal-main@lists.sourceforge.net])
-CS_PACKAGEINFO([Crystal Space], [(c)1998-2003 Jorrit Tyberghein and others.],
-		[http://crystal.sourceforge.net])
+CS_PACKAGEINFO([Crystal Space],
+    [Copyright (C)1998-2003 Jorrit Tyberghein and others],
+    [http://crystal.sourceforge.net/])
 AC_CONFIG_SRCDIR([libs/cssys/cssys.mak])
 AC_CONFIG_AUX_DIR([mk/autoconf])
 AC_PREFIX_DEFAULT([cs_install_dir_default])
@@ -1748,6 +1749,7 @@ CS_HEADER_APPEND(
 #------------------------------------------------------------------------------
 # Boilerplate: config.mak
 #------------------------------------------------------------------------------
+CS_EMIT_PACKAGEINFO([make])
 CS_MAKEFILE_PROPERTY([SRCDIR], [$srcdir])
 
 # Hack: The makefile system presently assumes that CFLAGS.SYSTEM should be
@@ -1760,9 +1762,8 @@ CS_MAKEFILE_PROPERTY([CFLAGS.SYSTEM], [AS_ESCAPE([$(CXXFLAGS.SYSTEM)])], [+])
 #------------------------------------------------------------------------------
 # Boilerplate: Jamconfig
 #------------------------------------------------------------------------------
-CS_PACKAGEINFO_SETJAMCONFIG
+CS_EMIT_PACKAGEINFO([jam])
 CS_JAMCONFIG_PROPERTY([JAMCONFIG_READ], [yes])
-CS_JAMCONFIG_PROPERTY([CONFIGURE_INVOCATION], [$0 $ac_configure_args])
 
 
 

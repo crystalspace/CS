@@ -74,7 +74,7 @@ CS_JAMCONFIG_PROPERTY([MODE], [$cs_build_mode])
 # Output Installpaths/package info
 #-----------------------------------------------------------------------------
 CS_OUTPUT_INSTALLDIRS
-CS_PACKAGEINFO_SETJAMCONFIG
+CS_EMIT_PACKAGEINFO([jam])
                                                                                 
 #----------------------------------------------------------------------------
 # Output generated files.  Also create a Jamfile when compiling outside
