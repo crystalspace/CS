@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+27-Sep-2003
+	- Eric Sunshine made minor clarifications to the "SCF Changes" section
+	  of the "Release Notes 0.96 to 0.98" appendix in the user manual.
 26-Sep-2003
 	- Jorrit fixed the static lod documentation which forgot to mention
 	  that you had to add the children to the parent too.

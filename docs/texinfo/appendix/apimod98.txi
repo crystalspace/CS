@@ -674,26 +674,26 @@ environment variable, or the @samp{CrystalSpaceRoot} default setting on MacOS/X
 @end itemize
 
 If you would like @sc{scf} to scan additional directories, you can invoke
-either of these two functions:
+either of these two functions (multiple times, if necessary):
 
 @itemize @bullet
 @item
-@code{scfInitialize (csPluginPaths const*)}
+@code{scfInitialize(csPluginPaths const*)}
 @item
 @code{iSCF::ScanPluginsPath(char const*, bool, char const*)}
 @end itemize
 
-Finally, if need to manually register a single plugin module with @sc{scf} for
-which you know the native pathname (not a @sc{vfs} pathname), you can invoke
-@code{iSCF::RegisterPlugin()}.
+Finally, if you need to manually register a single plugin module with @sc{scf}
+for which you know the native pathname (not a @sc{vfs} pathname), you can
+invoke @code{iSCF::RegisterPlugin()}.
 
-For those relatively rare cases when a named @sc{scf} class is built directly
-into an application, rather than being implemented via a plugin, the class must
-be registered with @sc{scf} manually since @sc{scf} will not otherwise be able
-to discover the class automatically as it does with plugin modules.  Manual
-registration is accomplished with the @code{SCF_REGISTER_STATIC_CLASS()} macro.
-This macro existed previously, but accepted a different set of arguments.  The
-new arguments are:
+For those relatively rare cases when a @emph{named} @sc{scf} class is built
+directly into an application, rather than being implemented via a plugin, the
+class must be registered with @sc{scf} manually since @sc{scf} will not
+otherwise be able to discover it automatically as is the case with named
+classes exported from plugin modules.  Manual registration is accomplished with
+the @code{SCF_REGISTER_STATIC_CLASS()} macro.  This macro existed previously,
+but accepted a different set of arguments.  The new arguments are:
 
 @example
 SCF_REGISTER_STATIC_CLASS(
@@ -715,7 +715,7 @@ SCF_REGISTER_STATIC_CLASS(
   "myproj.myplugin.bar1,myproj.myplugin.bar2")
 @end example
 
-If you used to @code{SCF_REGISTER_STATIC_LIBRARY()} or
+If you used to use @code{SCF_REGISTER_STATIC_LIBRARY()} or
 @code{SCF_REGISTER_STATIC_CLASS_DEP()} for this same purpose, you must now
 instead use @code{SCF_REGISTER_STATIC_CLASS()}.  (A macro named
 @code{SCF_REGISTER_STATIC_LIBRARY()} still exists, but it has a completely
@@ -733,15 +733,14 @@ plugin module (@file{.so} or @file{.dll}) in a text file with the same name as
 the plugin module, except with extension @file{.csplugin}.  The
 meta-information embedding option is enabled, by default.
 
-The platform-specific plugin loaders are capable of reading plugin
-meta-information when it is embedded and when it exists in a stand-alone
-@file{.csplugin} resource.  Even when configured for embedding, the plugin
-loaders will still be able to recognize and utilize external @file{.csplugin}
-resource.  This means that Crystal Space-based projects with unsophisticated
-build systems, which are incapable of embedding meta-information into the
-plugin module, can still create usable plugins by simply placing a copy of the
-@file{.csplugin} file alongside the plugin executable (@file{.so} or
-@file{.dll}).
+The platform-specific plugin loaders are capable of reading embedded plugin
+meta-information, as well as meta-information in stand-alone @file{.csplugin}
+files.  Even when configured for embedding, the plugin loaders will still be
+able to recognize and utilize external @file{.csplugin} resources.  This means
+that Crystal Space-based projects with unsophisticated build systems, which are
+incapable of embedding meta-information into the plugin module, can still
+create usable plugins by simply placing a copy of the @file{.csplugin} file
+alongside the plugin executable (@file{.so} or @file{.dll}).
 
 External projects which are based upon Crystal Space's Jam build system
 (@file{CS/mk/jam}) inherit, for free, the capability of embedding
@@ -763,7 +762,7 @@ required at the time of writing:
 @item Windows
 @code{EMBED_META = yes}
 
-@item MacOS/X
+@item MacOS/X (not yet supported)
 @code{EMBED_META = yes}
 @end table
 
