@@ -26,6 +26,9 @@ chronological order.
 	  The routine forgot to set the 'isect' return value AND in
 	  addition to that it even used that value. Hitting cal3d
 	  sprites with HitBeam() should now work.
+	- Anders Stenberg added scissor clipping to NR. This means a GL
+	  scissor clipping box is applied to the bounding box of the clipper, 
+	  which in practice means some fillrate is saved.
 26-Mar-2004
 	- Marten added csMatrix as a type a csShaderVariable can store.
 	- Marten made the shadermanager responsible for handling the shader-

@@ -1935,12 +1935,28 @@ void csGLGraphics3D::SetClipper (iClipper2D* clipper, int cliptype)
   csGLGraphics3D::cliptype = cliptype;
   stencil_initialized = false;
   frustum_valid = false;
-  for (int i = 0; i<6; i++)
+  int i;
+  for (i = 0; i<6; i++)
     glDisable ((GLenum)(GL_CLIP_PLANE0+i));
   DisableStencilClipping ();
   cache_clip_portal = -1;
   cache_clip_plane = -1;
   cache_clip_z_plane = -1;
+  if (cliptype != CS_CLIPPER_NONE)
+  {
+    csVector2 *clippoly = clipper->GetClipPoly ();
+    csBox2 scissorbox;
+    scissorbox.AddBoundingVertex (clippoly[0]);
+    for (i=1; i<clipper->GetVertexCount (); i++)
+      scissorbox.AddBoundingVertexSmart (clippoly[i]);
+
+    glScissor (scissorbox.MinX (), scissorbox.MinY (), 
+      scissorbox.MaxX ()-scissorbox.MinX (),
+      scissorbox.MaxY ()-scissorbox.MinY ());
+    glEnable (GL_SCISSOR_TEST);
+  } else {
+    glDisable (GL_SCISSOR_TEST);
+  }
 }
 
 // @@@ doesn't serve any purpose for now, but might in the future.
