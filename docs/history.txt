@@ -13,6 +13,9 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 3-Feb-2000
+	- Seth Galbraith changed sprites so that
+	  csSpriteTemplate::MergeTexels is now called when loading
+	  sprite templates.
 	- Eric Sunshine temporarily removed Seth Galbraith's new call to
 	  csSpriteTemplate::MergeTexels() from csLoader since MergeTexels() is
 	  buggy and results in deferred memory corruption at termination time.
