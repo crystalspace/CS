@@ -926,7 +926,10 @@ csGenmeshMeshObjectFactory::csGenmeshMeshObjectFactory (iBase *pParent,
   csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
   engine = eng;	// We don't want a circular reference!
 
+  //@@@ Crashes istest and isomap - NEW RENDERER ???
+#ifdef CS_USE_NEW_RENDERER
   shadowmat = engine->FindMaterial ("shadow extruder");
+#endif
 }
 
 csGenmeshMeshObjectFactory::~csGenmeshMeshObjectFactory ()

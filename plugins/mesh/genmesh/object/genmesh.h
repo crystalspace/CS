@@ -473,7 +473,11 @@ public:
   iBase* logparent;
 
   iEngine* engine;
+
+  //@@@ Crashes istest and isomap - NEW RENDERER ???
+#ifdef CS_USE_NEW_RENDERER
   csRef<iMaterialWrapper> shadowmat;
+#endif
 
   /// Constructor.
   csGenmeshMeshObjectFactory (iBase *pParent, iObjectRegistry* object_reg);
