@@ -52,7 +52,6 @@ csCamera::csCamera () : csOrthoTransform()
   fp = NULL;
   cameranr = cur_cameranr++;
   only_portals = true;
-  unmirrored_camera_pos.Set (0, 0, 0);
 }
 
 csCamera::csCamera (csCamera* c) : csOrthoTransform ()

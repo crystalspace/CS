@@ -1461,6 +1461,7 @@ void csEngine::StartDraw (iCamera* c, iClipper2D* view, csRenderView& rview)
 
   current_camera = c;
   rview.SetEngine (this);
+  rview.SetOriginalCamera (c);
 
   // This flag is set in HandleEvent on a cscmdContextResize event
   if (resize)
@@ -1496,7 +1497,6 @@ void csEngine::StartDraw (iCamera* c, iClipper2D* view, csRenderView& rview)
 
 void csEngine::Draw (iCamera* c, iClipper2D* view)
 {
-//printf ("=====================\n");
   ControlMeshes ();
 
   csRenderView rview (c, view, G3D, G2D);

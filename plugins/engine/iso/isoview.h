@@ -152,19 +152,6 @@ public:
   virtual csPlane3* GetFarPlane() const {return NULL;}
   virtual long GetCameraNumber() const {return camnum;}
   virtual iPolygon3D *GetHit (csVector3 &) {return NULL;}
-  // Added to allow compilation but not implemented
-  virtual void SetUnmirroredCameraPos (const csVector3& ump) 
-    { CS_ASSERT(false && "UNIMPLEMENTED"); }
-  virtual const csVector3& GetUnmirroredCameraPos () const
-    { 
-      CS_ASSERT(false && "UNIMPLEMENTED"); 
-      static const csVector3 v(0,0,0);
-      return v;
-    }
-  
-
-
-
 
   /// but in isometric space :-)
   virtual void Perspective (const csVector3& v, csVector2& p) const

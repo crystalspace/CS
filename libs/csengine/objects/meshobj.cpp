@@ -193,25 +193,49 @@ void csMeshWrapper::Draw (iRenderView* rview)
   {
     // To render an entity that is centered around the camera
     // we take the regular camera transform and replace the shift
-    // vector with 0. Except if the camera is mirrored in which case
-    // we do something special (see below).
+    // vector with 0. Except if we are space-warping in which case
+    // the 0 vector will be translated according to the warp.
 
-    csOrthoTransform& trans = rview->GetCamera ()->GetTransform ();
+    iCamera* cam = rview->GetCamera ();
+    iCamera* orig_cam = rview->GetOriginalCamera ();
+    csOrthoTransform& trans = cam->GetTransform ();
+    // Remember old position.
     csVector3 old = trans.GetO2TTranslation ();
 
-    //if (rview->GetCamera ()->IsMirrored ())
-    //{
-      // The camera is mirrored. In this case we don't set the translation
-      // of the transform to 0,0,0 but instead to the mirror position of
-      // 0,0,0.
-      const csVector3& ump = rview->GetCamera ()->GetUnmirroredCameraPos ();
-      trans.SetO2TTranslation (ump);
-    //}
-    //else
-    //{
-      //// Normal un-mirrored case.
-      //trans.SetO2TTranslation (csVector3 (0));
-    //}
+
+    // Optimization. If the original camera is equal to the current
+    // camera we know we are not doing space-warping and in that case
+    // we can skip all the code below.
+    if (cam != orig_cam)
+    {
+      csOrthoTransform& orig_trans = orig_cam->GetTransform ();
+
+      // First we use the current camera transformation to transform the origin
+      // of the camera (0) in camera space to world space. i.e. we get the
+      // position of the camera in world space. It is important to realize
+      // that we are possibly using a modified transform here. If we are in
+      // a recursion level (through portals) with portals that warped space,
+      // then the world space coordinate will be 'corrected' to reflect
+      // that warping.
+      csVector3 v = trans.Other2This (csVector3 (0));
+
+      // Now we take the transformation from the original camera (before
+      // space warping) and we transform the result of the previous transform
+      // back. The final result of this is that 'v' will now be the location
+      // that the original world space coordinate 0,0,0 would warp to provided
+      // we go through all the portals that resulted in this recursion level.
+      // If there were no space warping portals then 'v' will simply be
+      // transformed back to 0,0,0.
+      v = orig_trans.This2Other (v);
+
+      // We use this offset 'v' instead of the original translation.
+      trans.SetO2TTranslation (-v);
+    }
+    else
+    {
+      // Here we are sure there is no space warping.
+      trans.SetO2TTranslation (csVector3 (0));
+    }
 
     DrawInt (rview);
     trans.SetO2TTranslation (old);

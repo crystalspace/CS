@@ -124,7 +124,8 @@ SCF_IMPLEMENT_IBASE_END
 
 
 /// fake 3d render view ...
-class csIsoFakeRenderView : public iRenderView {
+class csIsoFakeRenderView : public iRenderView
+{
   iCamera *fakecam;
   iIsoRenderView *isorview;
   /**
@@ -335,6 +336,7 @@ public:
   {
     callback->DrawFunc (this, type, data);
   }
+  virtual iCamera* GetOriginalCamera () const { return NULL; }
 };
 
 SCF_IMPLEMENT_IBASE (csIsoFakeRenderView)

@@ -1,5 +1,14 @@
 he history order is reversed so that new features are at the top.
 
+17-Jan-2002
+	- Removed the iCamera::SetUnmirroredCameraPos() function again
+	  (and fixed iso engine for this). This turned out not to be the good
+	  way to solve the bug of mirroring CS_ENTITY_CAMERA objects.
+	- Added iRenderView::GetOriginalCamera(). This will return the original
+	  camera before any space warping transformation occured.
+	- Using the above new function it is now possible to correctly
+	  render mesh objects with the CS_ENTITY_CAMERA flag set even through
+	  space warping portals.
 16-Jan-2002
 	- Matt Reda fixed a memory leak in csIsoEngine::CreateMeshFactory()
 	- Fixed a bug in iRenderView::ClipBSphere() in combination

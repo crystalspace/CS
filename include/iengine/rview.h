@@ -178,7 +178,7 @@ public:
   int draw_rec_level;
 };
 
-SCF_VERSION (iRenderView, 0, 2, 2);
+SCF_VERSION (iRenderView, 0, 3, 0);
 
 /**
  * This interface represents all information needed to render
@@ -389,6 +389,12 @@ struct iRenderView : public iBase
    * Call callback.
    */
   virtual void CallCallback (int type, void* data) = 0;
+
+  /**
+   * Get the original camera for this render view. This is
+   * the camera before any space warping portals.
+   */
+  virtual iCamera* GetOriginalCamera () const = 0;
 };
 
 #endif

@@ -73,6 +73,10 @@ private:
   iGraphics3D* g3d;
   /// The 2D graphics subsystem used for drawing.
   iGraphics2D* g2d;
+  /**
+   * A copy to the original base camera before space warping.
+   */
+  iCamera* original_camera;
 
   /// The view frustum as defined at z=1.
   float leftx, rightx, topy, boty;
@@ -118,6 +122,10 @@ public:
   void SetEngine (iEngine* engine);
   /// Set the camera.
   void SetCamera (iCamera* camera);
+  /// Set the original camera.
+  void SetOriginalCamera (iCamera* camera);
+  /// Get the original camera.
+  virtual iCamera* GetOriginalCamera () const { return original_camera; }
 
   ///
   virtual void SetCallback (iDrawFuncCallback* cb)
