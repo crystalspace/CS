@@ -181,11 +181,6 @@ class csLoader
 	 */
 	static bool LoadMotion (iMotion* mot, char* buf);
 
-	/**
-	 * Loads an animation chunk (rotation data) from a motion section
-	 */
-	static bool LoadAnim (iMotionAnim* mot, char* buf);
-
   /**
    * Load a library into given world.<p>
    * A library is just a world file that contains just sprite templates,
