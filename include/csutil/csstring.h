@@ -114,14 +114,14 @@ public:
 
   /// Get a pointer to the null-terminated character array.
   char const* GetData () const
-  { return Data; }
+  { return Data != 0 ? Data : ""; }
 
   /**
    * Get a pointer to the null-terminated character array.  Warning: this is a
    * non-const pointer, so use this function with care!
    */
   char* GetData ()
-  { return Data; }
+  { return Data != 0 ? Data : ""; }
 
   /// Query string length.  Length does not include null terminator.
   size_t Length () const
@@ -560,7 +560,7 @@ const csString& operator = (TYPE s) { return Replace (s); }
 
   /// Return a pointer to the null-terminated character string.
   operator const char* () const
-  { return Data; }
+  { return Data != 0 ? Data : ""; }
 
   /// Check if two strings are equal.
   bool operator == (const csString& iStr) const

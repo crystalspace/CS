@@ -31,10 +31,14 @@ chronological order.
 	  and Frustvis by replacing csHashSet with csSet<T>.
 	- res augmented the GL fixed shader program plugin to allow 
 	  manipulation of the texture matrix.
+	- Eric Sunshine fixed bugs in csString where GetData() and the (char
+	  const*) operator would incorrectly return a null pointer at times.
+	  (These methods should always return a zero-length C-string when the
+	  csString is empty; they should never return null.)
 12-Apr-2004
 	- Luca added some code to csloader.cpp/*.h to recursively handle the
 	  flags in meshes' children if needed.
-	- res ported OpenPortal() to NR. Still has issues, tho.
+	- res ported OpenPortal() to NR. Still has issues, though.
 	- res updated todo_newrenderer.txt.
 	- res ported the halo stuff to NR. Work somewhat (except flares), but
 	  could be better.
@@ -68,10 +72,10 @@ chronological order.
 	  roughly parallels the Application rule, except that it builds a shell
 	  script, rather than an application.  The ShellScript rules takes care
 	  of all the typical housekeeping, such as setting up the installation
-	  target and ensuring that the script is executable once created.  The
-	  actual content of the generated shell script is provided by a
-	  client-supplied "content creation" rule.  The cs-config script is now
-	  created via this new mechanism.
+	  and clean targets, and ensuring that the script is executable once
+	  created.  The actual content of the generated shell script is
+	  provided by a client-supplied "content creation" rule.  The cs-config
+	  script is now created via this new mechanism.
 	- Jorrit did more API documentation enhancements
 	  (iEngineSequenceManager) and also added a few constants
 	  instead of 0, 1, and 2 for AddConditionLightChange().
