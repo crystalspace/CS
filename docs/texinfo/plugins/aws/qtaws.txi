@@ -1,0 +1,49 @@
+@c -*-texinfo-*-
+@node AWS QT Designer and AWS, , AWS Architecture, AWS
+@subsection Using QT Designer To Create @sc{aws} Definition Files
+
+On many platforms Trolltechs Designer is available, a tool that lets you create graphical user interfaces like
+Dialogs, Forms etc. It saves the interface description in an easy to read format (XML -  even though i was not 
+able to locate a formal document type description (DTD) for it, it's format is pretty obvious).
+
+You should be aware that not all features the Designer is capable of can be translated into @sc{aws} simply because
+they are not available in @sc{aws}. The same is true for features available in @sc{aws} but not in Designer.
+
+@subsubheading What you need
+
+Since Designer saves its interface description in XML writing an extensible stylesheet to transform it into @sc{aws} format
+was an obvious choice. So you will need a XSLT stylesheet processor. You can either choose a commercial product or
+the excellent Xalan which is part of the Apache project. You can get it for free here:
+@uref{http://xml.apache.org}
+For development i used the Xalan Java 2 version at: @uref{http://xml.apache.org/xalan-j/index.html}
+
+@subsubheading How to use it
+
+Design your dialog or widget in Designer and save it somewhere.
+To process the stylesheet with the java version of Xalan you call:
+@example
+java org.apache.xalan.xslt.Process -IN path/to/the/saved/designer/file.ui -XSL path/to/CS/scripts/aws/qt2aws.xsl
+@end example
+
+Append the output to a file containing skin definitions.
+
+@subsubheading What controls are converted ?
+
+@multitable @columnfractions 0.4 0.2 0.4
+@item @strong{QT Class} @tab @tab @strong{AWS Class}
+@item QPushButton @tab ==> @tab Command Button
+@item QRadioButton @tab ==> @tab Radio Button
+@item QSlider @tab ==> @tab Scroll Bar
+@item QButtonGroup @tab ==> @tab Group Frame
+@item QGroupBox @tab ==> @tab Group Frame
+@item QFrame @tab ==> @tab Group Frame
+@item QCheckBox @tab ==> @tab Check Box
+@item QLineEdit @tab ==> @tab Text Box
+@item QLabel @tab ==> @tab Label
+@item QLabel with Pixmap @tab ==> @tab Image View
+@item QListBox @tab ==> @tab List Box
+@item QListView @tab ==> @tab List Box
+@item QDialog @tab ==> @tab Window
+@item QWidget @tab ==> @tab Window
+@end multitable
+

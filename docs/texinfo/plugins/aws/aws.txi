@@ -25,6 +25,7 @@ easily @dfn{skinned} by non-programmers.
 * AWS Trigger Reference:: @sc{aws} Standard Sink Trigger Reference
 * AWS Signals and Actions Reference:: @sc{aws} Standard Component Signal and Action Reference
 * AWS Architecture:: In-Depth Explanation of @sc{aws} Architecture
+* AWS QT Designer and AWS:: Using QT Designer To Create @sc{aws} Definition Files
 @end menu
 
 @importss{plugins,aws,quick.txi}
@@ -33,3 +34,4 @@ easily @dfn{skinned} by non-programmers.
 @importss{plugins,aws,trigref.txi}
 @importsss{plugins,aws,saaref,saaref.txi}
 @importss{plugins,aws,indepth.txi}
+@importss{plugins,aws,qtaws.txi}

@@ -1,5 +1,5 @@
 @c -*-texinfo-*-
-@node AWS Architecture, , AWS Signals and Actions Reference, AWS
+@node AWS Architecture, AWS QT Designer and AWS, AWS Signals and Actions Reference, AWS
 @subsection In-Depth Explanation of @sc{aws} Architecture
 
 This section contains some information about the internal nature and
