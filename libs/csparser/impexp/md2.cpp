@@ -78,7 +78,7 @@ csConverter_MD2FrameManipulator::~csConverter_MD2FrameManipulator()
       if (m_frame_array[frameindex].vertexcoords)
         delete [] m_frame_array[frameindex].vertexcoords;
     }
-    delete m_frame_array;
+    delete[] m_frame_array;
   }
 }
 
