@@ -15,6 +15,7 @@ The history order has been reversed so that new features are at the top.
 	  cstreend.h where unlinkable code is generated when an inline method
 	  calls a second inline before the compiler has seen a declaration of
 	  the second method.
+  	- Norman Kramer fixed glide renderer after Jorrit broke it yesterday.
 25-Jun-2000
 	- New tree control in CSWS from Norman Kramer.
 	- Did an experiment for speeding up OpenGL by putting the setup
