@@ -1,7 +1,8 @@
 /*
     Dynamics/Kinematics modeling and simulation library.
     Copyright (C) 1999 by Michael Alexander Ewert
-
+                  2001 Anders Stenberg
+		  
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
     License as published by the Free Software Foundation; either
@@ -101,6 +102,42 @@ public:
   /// Set Rest Length of spring
   void set_rest_length( real len )
   { rest_length = len; }
+
+  virtual ctVector3 apply_F ( ctDynamicEntity &pe );
+
+  //!me expand to include 3+ bodies on one spring
+  virtual void add_body ( ctPhysicalEntity *bod )
+  { if ( body_vector.get_size () < 2 ) body_vector.add_link( bod ); }
+};
+
+
+class ctCappedSpringF : public ctNBodyForce
+{
+protected:
+  ctLinkList<ctVector3> attachment_point_vector;
+  real cap_min, cap_max;
+	
+public:
+  /// body b2 can be NULL to indicate it is attached to the immovable world
+  ctCappedSpringF ( ctPhysicalEntity *b1, ctVector3 p1, 
+	      ctPhysicalEntity *b2, ctVector3 p2 )
+  {
+    body_vector.add_link( b1 );
+    attachment_point_vector.add_link( new ctVector3(p1) );
+    body_vector.add_link( b2 );
+    attachment_point_vector.add_link( new ctVector3(p2) );
+    cap_min = cap_max = 1;
+  }
+	
+  ~ctCappedSpringF ()
+  { 
+    attachment_point_vector.delete_link ( attachment_point_vector.get_first() );
+    attachment_point_vector.delete_link ( attachment_point_vector.get_first() );
+  }
+
+  /// Set Rest Length of spring
+  void set_cap_lengths( real min, real max )
+  { cap_min = min; cap_max = max; }
 
   virtual ctVector3 apply_F ( ctDynamicEntity &pe );
 
