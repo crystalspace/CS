@@ -20,8 +20,8 @@ chronological order.
 	  the bcsgeom library (whatever that is :-).
 	- Jorrit fixed the NR glrender3d target. You can't declare variables
 	  without a type like this:
-		static const textureMinFilters[3] = {GL_NEAREST_MIPMAP_NEAREST, 
-		GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR};
+	    static const textureMinFilters[3] = {GL_NEAREST_MIPMAP_NEAREST, 
+	    GL_NEAREST_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_LINEAR};
 	- Jorrit fixed a harmless initialization error in Frustvis and
 	  Dynavis.
 	- Jorrit fixed a bug with NR and handling of visibility culling and
@@ -40,6 +40,9 @@ chronological order.
 	  with that.
 	- Jorrit removed the obsolete render context data system from
 	  iRenderView. Nothing was using it.
+	- Eric Sunshine fixed bug in scripts/cs-config/Makefile.template where
+	  it incorrectly defined DO.EXEC rather than DO.EXE, thus causing the
+	  build to fail.
 21-Mar-2004
 	- Luca Cappa committed the res fix to the problem regarding the lack
 	  of the regex.c file in the CSUtil library. The problem was 
@@ -85,7 +88,7 @@ chronological order.
 	- res moved the NV/ATI fragment shader setup to the ps1 plugin.
 	- res updated sprcal3d after Marten's recent changes.
 	- res tried some more to get NR softrender3d to work. Not there yet, 
-	  tho.
+	  though.
 20-Mar-2004
 	- Anders Stenberg fixed procedural textures in NR. Visit for
 	  textures wasn't called, and is now called on access in the shader
