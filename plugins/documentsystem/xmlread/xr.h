@@ -437,6 +437,11 @@ public:
   {
     value = _value;
   }
+  const char* GetContentsValue ()
+  {
+    if (contentsvalue) contentsvalue[contentsvalue_len] = 0;
+    return contentsvalue;
+  }
 
 protected:
   /*  [internal use]
@@ -454,6 +459,11 @@ protected:
 private:
   TrDocumentAttributeSet attributeSet;
   const char* value;
+
+  // If not null then this represents the first TEXT node. This
+  // is an optimization.
+  char* contentsvalue;
+  int contentsvalue_len;
 };
 
 

@@ -1410,6 +1410,7 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     int i;
     csMapToLoad* map = first_map;
     Engine->DeleteAll ();
+    csTicks start_time = csGetTicks ();
     for (i = 0 ; i < num_maps ; i++, map = map->next_map)
     {
       if (map == cache_map)
@@ -1485,6 +1486,10 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
       }
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Preparing finished...");
     }
+
+    csTicks stop_time = csGetTicks ();
+    printf ("Total level load time: %g seconds\n",
+    	float (stop_time-start_time) / 1000.0); fflush (stdout);
 
     Create2DSprites ();
 

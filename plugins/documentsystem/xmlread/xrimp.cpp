@@ -76,10 +76,11 @@ csXmlReadNode* csXmlReadDocumentSystem::Alloc ()
   }
 }
 
-csXmlReadNode* csXmlReadDocumentSystem::Alloc (TrDocumentNode* node)
+csXmlReadNode* csXmlReadDocumentSystem::Alloc (TrDocumentNode* node,
+	bool use_contents_value)
 {
   csXmlReadNode* n = Alloc ();
-  n->SetTiNode (node);
+  n->SetTiNode (node, use_contents_value);
   return n;
 }
 
@@ -147,25 +148,42 @@ csXmlReadNodeIterator::csXmlReadNodeIterator (
   csXmlReadNodeIterator::sys = sys;
   csXmlReadNodeIterator::parent = parent;
   csXmlReadNodeIterator::value = value ? csStrNew (value) : NULL;
+  use_contents_value = false;
   if (!parent)
     current = NULL;
   else if (value)
     current = parent->FirstChild (value);
   else
-    current = parent->FirstChild ();
+  {
+    if (parent->ToElement () && parent->ToElement ()->GetContentsValue ())
+    {
+      use_contents_value = true;
+      current = parent;
+    }
+    else
+    {
+      current = parent->FirstChild ();
+    }
+  }
 }
 
 bool csXmlReadNodeIterator::HasNext ()
 {
-  return current != NULL;
+  return use_contents_value || current != NULL;
 }
 
 csRef<iDocumentNode> csXmlReadNodeIterator::Next ()
 {
   csRef<iDocumentNode> node;
-  if (current != NULL)
+  if (use_contents_value)
   {
-    node = csPtr<iDocumentNode> (sys->Alloc (current));
+    node = csPtr<iDocumentNode> (sys->Alloc (current, true));
+    use_contents_value = false;
+    current = parent->FirstChild ();
+  }
+  else if (current != NULL)
+  {
+    node = csPtr<iDocumentNode> (sys->Alloc (current, false));
     if (value)
       current = current->NextSibling (value);
     else
@@ -212,13 +230,24 @@ csXmlReadNode::~csXmlReadNode ()
 csRef<iDocumentNode> csXmlReadNode::GetParent ()
 {
   csRef<iDocumentNode> child;
-  if (!node->Parent ()) return child;
-  child = csPtr<iDocumentNode> (sys->Alloc (node->Parent ()));
-  return child;
+  if (use_contents_value)
+  {
+    // If we use contents value then the parent is actually this object.
+    IncRef ();
+    return csPtr<iDocumentNode> (this);
+  }
+  else
+  {
+    if (!node->Parent ()) return child;
+    child = csPtr<iDocumentNode> (sys->Alloc (node->Parent (), false));
+    return child;
+  }
 }
 
 csDocumentNodeType csXmlReadNode::GetType ()
 {
+  if (use_contents_value) return CS_NODE_TEXT;
+
   switch (node->Type ())
   {
     case TrDocumentNode::DOCUMENT: return CS_NODE_DOCUMENT;
@@ -235,19 +264,27 @@ csDocumentNodeType csXmlReadNode::GetType ()
 bool csXmlReadNode::Equals (iDocumentNode* other)
 {
   csXmlReadNode* other_node = (csXmlReadNode*)other;
-  return GetTiNode () == other_node->GetTiNode ();
+  return GetTiNode () == other_node->GetTiNode ()
+  	&& use_contents_value == other_node->use_contents_value;
 }
 
 const char* csXmlReadNode::GetValue ()
 {
-  return node->Value ();
+  if (use_contents_value)
+  {
+    return node->ToElement ()->GetContentsValue ();
+  }
+  else
+  {
+    return node->Value ();
+  }
 }
 
 csRef<iDocumentNodeIterator> csXmlReadNode::GetNodes ()
 {
   csRef<iDocumentNodeIterator> it;
   it = csPtr<iDocumentNodeIterator> (new csXmlReadNodeIterator (
-  	sys, node_children, NULL));
+  	sys, use_contents_value ? NULL : node_children, NULL));
   return it;
 }
 
@@ -255,23 +292,29 @@ csRef<iDocumentNodeIterator> csXmlReadNode::GetNodes (const char* value)
 {
   csRef<iDocumentNodeIterator> it;
   it = csPtr<iDocumentNodeIterator> (new csXmlReadNodeIterator (
-  	sys, node_children, value));
+  	sys, use_contents_value ? NULL : node_children, value));
   return it;
 }
 
 csRef<iDocumentNode> csXmlReadNode::GetNode (const char* value)
 {
-  if (!node_children) return NULL;
+  if (!node_children || use_contents_value) return NULL;
   csRef<iDocumentNode> child;
   TrDocumentNode* c = node_children->FirstChild (value);
   if (!c) return child;
-  child = csPtr<iDocumentNode> (sys->Alloc (c));
+  child = csPtr<iDocumentNode> (sys->Alloc (c, false));
   return child;
 }
 
 const char* csXmlReadNode::GetContentsValue ()
 {
-  if (!node_children) return NULL;
+  if (!node_children || use_contents_value) return NULL;
+  TrXmlElement* el = node->ToElement ();
+  if (el && el->GetContentsValue ())
+  {
+    return el->GetContentsValue ();
+  }
+
   TrDocumentNode* child = node_children->FirstChild ();
   while (child)
   {
@@ -305,6 +348,7 @@ float csXmlReadNode::GetContentsValueAsFloat ()
 
 csRef<iDocumentAttributeIterator> csXmlReadNode::GetAttributes ()
 {
+  if (use_contents_value) return NULL;
   csRef<iDocumentAttributeIterator> it;
   it = csPtr<iDocumentAttributeIterator> (
   	new csXmlReadAttributeIterator (node));
@@ -313,6 +357,7 @@ csRef<iDocumentAttributeIterator> csXmlReadNode::GetAttributes ()
 
 TrDocumentAttribute* csXmlReadNode::GetAttributeInternal (const char* name)
 {
+  if (use_contents_value) return NULL;
   int count = node->ToElement ()->GetAttributeCount ();
   int i;
   for (i = 0 ; i < count ; i++)
@@ -327,6 +372,7 @@ TrDocumentAttribute* csXmlReadNode::GetAttributeInternal (const char* name)
 
 csRef<iDocumentAttribute> csXmlReadNode::GetAttribute (const char* name)
 {
+  if (use_contents_value) return NULL;
   csRef<iDocumentAttribute> attr;
   TrDocumentAttribute* a = GetAttributeInternal (name);
   if (a)
@@ -338,6 +384,7 @@ csRef<iDocumentAttribute> csXmlReadNode::GetAttribute (const char* name)
 
 const char* csXmlReadNode::GetAttributeValue (const char* name)
 {
+  if (use_contents_value) return NULL;
   TrXmlElement* el = node->ToElement ();
   if (el) return el->Attribute (name);
   else return NULL;
@@ -388,7 +435,7 @@ csRef<iDocumentNode> csXmlReadDocument::CreateRoot (char* buf)
 {
   Clear ();
   TrDocument* doc = new TrDocument (buf);
-  root = csPtr<iDocumentNode> (sys->Alloc (doc));
+  root = csPtr<iDocumentNode> (sys->Alloc (doc, false));
   return root;
 }
 
@@ -396,7 +443,7 @@ csRef<iDocumentNode> csXmlReadDocument::CreateRoot ()
 {
   Clear ();
   TrDocument* doc = new TrDocument ();
-  root = csPtr<iDocumentNode> (sys->Alloc (doc));
+  root = csPtr<iDocumentNode> (sys->Alloc (doc, false));
   return root;
 }
 

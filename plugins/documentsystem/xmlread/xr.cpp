@@ -214,6 +214,7 @@ TrXmlElement::TrXmlElement ()
 {
   value = NULL;
   type = ELEMENT;
+  contentsvalue = NULL;
 }
 
 TrXmlElement::~TrXmlElement()
@@ -262,8 +263,8 @@ TrDocumentAttribute& TrXmlElement::GetAttributeRegistered (
 }
 
 TrDocument::TrDocument(char* buf) :
-  blk_element (1000),
-  blk_text (1000)
+  blk_element (5000),
+  blk_text (100)
 {
   error = false;
   //  ignoreWhiteSpace = true;

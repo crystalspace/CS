@@ -389,6 +389,7 @@ char* TrXmlElement::ReadValue( TrDocument* document, char* p )
 {
   // Read in text and elements in any order.
   p = SkipWhiteSpace( p );
+  bool first_text = false;
   TrDocumentNode* lastChild = NULL;
   while ( p && *p )
   {
@@ -399,18 +400,31 @@ char* TrXmlElement::ReadValue( TrDocument* document, char* p )
       char* ps = SkipWhiteSpace (p);
       if (*ps != '<')
       {
-        // Take what we have, make a text element.
-        TrXmlText* textNode = document->blk_text.Alloc ();
-        if ( !textNode )
-        {
-          document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
-          return 0;
+        // If we are parsing the first child we use an optimization
+	// to store the text in this node instead of a child.
+	if (lastChild == NULL && !first_text)
+	{
+	  first_text = true;
+	  const char* end = "<";
+	  p = ps;
+	  p = ReadText( p, contentsvalue, contentsvalue_len, true, end);
+	  if ( p ) p--;
+	}
+	else
+	{
+          // Take what we have, make a text element.
+          TrXmlText* textNode = document->blk_text.Alloc ();
+          if ( !textNode )
+          {
+            document->SetError( TIXML_ERROR_OUT_OF_MEMORY );
+            return 0;
+          }
+
+	  p = ps;
+          p = textNode->Parse( document, p );
+
+          lastChild = LinkEndChild( lastChild, textNode );
         }
-
-	p = ps;
-        p = textNode->Parse( document, p );
-
-        lastChild = LinkEndChild( lastChild, textNode );
       }
     } 
     else if ( StringEqual(p, "<![CDATA[") )

@@ -106,6 +106,7 @@ struct csXmlReadNodeIterator : public iDocumentNodeIterator
 private:
   csXmlReadDocumentSystem* sys;
   TrDocumentNode* current;
+  bool use_contents_value;
   TrDocumentNodeChildren* parent;
   char* value;
 
@@ -128,6 +129,7 @@ struct csXmlReadNode : public iDocumentNode
 private:
   friend class csXmlReadDocumentSystem;
   TrDocumentNode* node;
+  bool use_contents_value;	// Optimization: use GetContentsValue().
   TrDocumentNodeChildren* node_children;
   // We keep a reference to 'sys' to avoid it being cleaned up too early.
   // We need 'sys' for the pool.
@@ -142,9 +144,10 @@ public:
   virtual ~csXmlReadNode ();
 
   TrDocumentNode* GetTiNode () { return node; }
-  void SetTiNode (TrDocumentNode* node)
+  void SetTiNode (TrDocumentNode* node, bool use_contents_value)
   {
     csXmlReadNode::node = node;
+    csXmlReadNode::use_contents_value = use_contents_value;
     node_children = node->ToDocumentNodeChildren ();
   }
 
