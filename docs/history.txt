@@ -19,7 +19,7 @@ chronological order.
 	  path after pushing the current working directory.
 	- Eric Sunshine fixed engine.mak so that it also installs
 	  data/shader/or_lighting.xml, since this is required by the engine
-	  when configured for the old renderer.  Also upgraded
+	  when configured for the new renderer.  Also upgraded
 	  csEngine::HandleEvent() so that it deals more gracefully with
 	  failure to load or_lighting.xml (rather than crashing outright).
 27-Mar-2004
