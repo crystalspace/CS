@@ -336,7 +336,7 @@ iKeyboardDriver* csJoystickDriver::GetKeyboardDriver()
 void csJoystickDriver::DoButton (int number, int button, bool down,
   int x, int y)
 {
-  if (number <= 0 && number > CS_MAX_JOYSTICK_COUNT)
+  if (number <= 0 || number > CS_MAX_JOYSTICK_COUNT)
     return;
 
   if (x != LastX [number - 1] || y != LastY [number - 1])

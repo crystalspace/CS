@@ -1,5 +1,8 @@
 The history order is reversed so that new features are at the top.
 
+1-Jan-2001
+	- Fixed bug [497461] from sf.net. This bug prevented joystick
+	  button handling to work properly. Reported by J.F. Miller.
 31-Dec-2001
 	- Got a patch from Tobias Brueckner <tobias.brueckner@gmx.net> which
 	  does the following:
