@@ -40,6 +40,7 @@ ctWorld::ctWorld()
 {
 	ctArticulatedBody::set_joint_friction( DEFAULT_JOINT_FRICTION );
 
+  fsm_state = CTWS_NORMAL;
 	// default
 	ode_to_math = new OdeRungaKutta4();
 
@@ -114,7 +115,6 @@ ctPhysicalEntity *pe = body_list.get_first();
 		pe = body_list.get_next();
 	}
 
-	//!me slow.  change to having y0 and y1 as members of world that get resized as needed.
 	gcurrent_world = this;
 	
   if( arr_size > max_state_size ){
@@ -132,6 +132,10 @@ ctPhysicalEntity *pe = body_list.get_first();
 	if( ode_to_math ){
 		ode_to_math->calc_step( y0, y1, arr_size, t0, t1, dydt );
 	}else{
+    if( fsm_state == CTWS_REWOUND && t1 >= rewound_from ){
+      fsm_state = CTWS_NORMAL;
+      rewound_from = 0;
+    }
 		//!me boom!  no ode, so get out.
 		return WORLD_ERR_NOODE;
 	}
@@ -140,14 +144,19 @@ ctPhysicalEntity *pe = body_list.get_first();
 
 	gcurrent_world = NULL;
 	
+  if( fsm_state == CTWS_REWOUND && t1 >= rewound_from ){
+    fsm_state = CTWS_NORMAL;
+    rewound_from = 0;
+  }
+
 	return WORLD_NOERR;
 
 }
 
-errorcode ctWorld::rewind()
+errorcode ctWorld::rewind( real t1, real t2 )
 {
-  //!me do a check here to make sure everything is ok.....
-  //!me danger of rewinding when an object is deleted during evolve....
+  fsm_state = CTWS_REWOUND;
+  rewound_from = t2;
   reintegrate_state( y_save );
   return WORLD_NOERR;
 }
@@ -172,7 +181,8 @@ ctForce *frc;
 	while( frc ){
 		pe = body_list.get_first();
 		while( pe ){
-			pe->apply_given_F( *frc );
+      if( !(fsm_state == CTWS_REWOUND && (pe->flags & CTF_NOREWIND)) )
+			  pe->apply_given_F( *frc );
 			pe = body_list.get_next();
 		}
 
@@ -181,7 +191,8 @@ ctForce *frc;
 
 	pe = body_list.get_first();
 	while( pe ){
-		pe->solve(t);
+    if( !(fsm_state == CTWS_REWOUND && (pe->flags & CTF_NOREWIND)) )
+		  pe->solve(t);
 		pe = body_list.get_next();
 	}
 
@@ -195,10 +206,12 @@ ctPhysicalEntity *pe;
 long state_size;
 	pe = body_list.get_first();
 	while( pe ){
-		//if( pe->uses_ODE() ){
+    if( fsm_state == CTWS_REWOUND && (pe->flags & CTF_NOREWIND) ){
+      state_size = pe->get_state_size();
+    }else{
 			state_size = pe->set_state( state_array );
-			state_array += state_size;
-		//}
+    }
+	  state_array += state_size;
 		pe = body_list.get_next();
 	}
 
@@ -211,10 +224,12 @@ ctPhysicalEntity *pe;
 long state_size;
 	pe = body_list.get_first();
 	while( pe ){
-		//if( pe->uses_ODE() ){
+    if( fsm_state == CTWS_REWOUND && (pe->flags & CTF_NOREWIND) ){
+      state_size = pe->get_state_size();
+    }else{
 			state_size = pe->get_state( state_array );
 			state_array += state_size;
-		//}
+		}
 		pe = body_list.get_next();
 	}
 
@@ -227,14 +242,31 @@ ctPhysicalEntity *pe;
 long state_size;
 	pe = body_list.get_first();
 	while( pe ){
-		//if( pe->uses_ODE() ){
+		if( fsm_state == CTWS_REWOUND && (pe->flags & CTF_NOREWIND) ){
+      state_size = pe->get_state_size();
+    }else{
 			state_size = pe->set_delta_state( state_array );
 			state_array += state_size;
-		//}
+		}
 		pe = body_list.get_next();
 	}
 
 }
+
+
+// add a physical entity to this world
+//!me should consolodate these three methods, they do the same thing.
+errorcode ctWorld::add_physicalentity( ctPhysicalEntity *pe )
+{
+	if( pe ){
+		body_list.add_link( pe );
+		return WORLD_NOERR;
+	}else{
+		return WORLD_ERR_NULLPARAMETER;
+	}
+}
+
+
 
 // add a rigidbody to this world
 errorcode ctWorld::add_rigidbody( ctRigidBody *rb )
@@ -277,4 +309,18 @@ errorcode ctWorld::delete_articulatedbody( ctArticulatedBody *pbase )
 	}else{
 		return WORLD_ERR_NULLPARAMETER;
 	}
+}
+
+
+// apply the given function to all physical entities in the system.
+void ctWorld::apply_fuction_to_body_list( void(*fcn)( ctPhysicalEntity *ppe ) )
+{
+ctPhysicalEntity *pe;
+
+	pe = body_list.get_first();
+	while( pe ){
+		fcn( pe );
+		pe = body_list.get_next();
+	} 
+
 }
