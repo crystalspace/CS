@@ -392,7 +392,7 @@ static BOOL WINAPI OldCallback(GUID FAR *lpGUID, LPSTR pDesc, LPSTR pName,
 /// check 2d devices
 bool DirectDetection::checkDevices2D ()
 {
-  HINSTANCE libraryHandle = LoadLibrary("ddraw.dll");
+  HINSTANCE libraryHandle = LoadLibrary ("ddraw.dll");
 
   // If ddraw.dll doesn't exist in the search path,
   // then DirectX probably isn't installed, so fail.
@@ -403,7 +403,7 @@ bool DirectDetection::checkDevices2D ()
   // function to retrieve (see the following text).
   LPDIRECTDRAWENUMERATEEXA lpDDEnumEx;
 
-  lpDDEnumEx = (LPDIRECTDRAWENUMERATEEX) GetProcAddress (
+  lpDDEnumEx = (LPDIRECTDRAWENUMERATEEXA) GetProcAddress (
     libraryHandle, "DirectDrawEnumerateExA");
 
   // If the function is there, call it to enumerate all display
@@ -419,7 +419,7 @@ bool DirectDetection::checkDevices2D ()
   {
     // enumerate DDraw device
     HRESULT hRes;
-    if (FAILED (hRes = lpDDEnumEx(
+    if (FAILED (hRes = lpDDEnumEx (
       DirectDetectionDDrawEnumCallback, this,
       DDENUM_DETACHEDSECONDARYDEVICES | DDENUM_ATTACHEDSECONDARYDEVICES |
       DDENUM_NONDISPLAYDEVICES)))
