@@ -54,8 +54,8 @@ csThingTemplate::~csThingTemplate ()
       CHKB (delete polygon [i]);
     CHK (delete [] polygon);
   }
-  CHK (delete curve_vertices);
-  CHK (delete curve_texels);
+  CHK (delete [] curve_vertices);
+  CHK (delete [] curve_texels);
 }
 
 void csThingTemplate::AddVertex (float x, float y, float z)
