@@ -72,7 +72,6 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
   // Query system settings
   UnixSystem->GetExtSettings (sim_depth, do_shm, do_hwmouse);
 
-
   screen_num = DefaultScreen (dpy);
   root_window = RootWindow (dpy, screen_num);
   screen_ptr = DefaultScreenOfDisplay (dpy);
@@ -90,7 +89,8 @@ bool csGraphics2DXLib::Initialize (iSystem *pSystem)
                       NULL, NULL, NULL, 0, 
                       NULL, NULL, class_hint);
 
-//    XFree (class_hint);
+  XFree (class_hint);
+
   // Determine visual information.
   // Try in order:
   //   screen depth
@@ -285,7 +285,7 @@ bool csGraphics2DXLib::Open(const char *Title)
   swa.border_pixel = 0;
   swa.colormap = cmap;
   swa.bit_gravity = CenterGravity;
-  window = XCreateWindow (dpy, DefaultRootWindow(dpy), 64, 16,
+  window = XCreateWindow (dpy, root_window, 64, 16,
 			  Width, Height, 4, vinfo.depth, InputOutput, visual,
 			  CWBackPixel | CWBorderPixel | CWBitGravity | 
 			  (cmap ? CWColormap : 0), &swa);
@@ -490,7 +490,11 @@ void csGraphics2DXLib::Close ()
     delete [] Memory;
     Memory = NULL;
   }
-
+  if (leader_window)
+  {
+    XDestroyWindow (dpy, leader_window);
+    leader_window = 0;
+  }
   csGraphics2D::Close ();
 }
 

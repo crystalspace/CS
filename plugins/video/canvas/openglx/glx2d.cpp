@@ -59,7 +59,8 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
 
   iVFS* v = pSystem->GetVFS();
   csIniFile *config = new csIniFile(v,  "/config/opengl.cfg" );
-  v->DecRef(); v = NULL;
+  v->DecRef(); 
+  v = NULL;
   
   dispdriver = NULL;
   const char *strDriver;
@@ -99,9 +100,26 @@ bool csGraphics2DGLX::Initialize (iSystem *pSystem)
   }
 
   screen_num = DefaultScreen (dpy);
+  root_window = RootWindow (dpy, screen_num);
   screen_ptr = DefaultScreenOfDisplay (dpy);
   display_width = DisplayWidth (dpy, screen_num);
   display_height = DisplayHeight (dpy, screen_num);
+
+  // First make a window which is never mapped (trick from gtk to get the main
+  // window to behave under certain window managers, themes and circumstances)
+  leader_window = XCreateSimpleWindow(dpy, root_window,
+					  10, 10, 10, 10, 0, 0 , 0);
+  XClassHint *class_hint = XAllocClassHint();
+  class_hint->res_name = "glX Crystal Space";
+  class_hint->res_class = "Crystal Space";
+  XmbSetWMProperties (dpy, leader_window,
+                      NULL, NULL, NULL, 0, 
+                      NULL, NULL, class_hint);
+
+  // Currently freeing the class hint (as you should) causes the driver to 
+  // crash on exit. Doing the same thing without glX doesnt cause a problem.
+//    XFree (class_hint);
+
 
   // The texture manager only needs to know this:
   pfmt.PalEntries = 0;
@@ -227,20 +245,45 @@ bool csGraphics2DGLX::Open(const char *Title)
   XSetWindowAttributes winattr;
   winattr.border_pixel = 0;
   winattr.colormap = cmap;
-  winattr.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask |
-    FocusChangeMask | PointerMotionMask | ButtonPressMask | ButtonReleaseMask;
-  window = XCreateWindow(dpy,RootWindow(dpy,active_GLVisual->screen), 0, 0,
-    Width,Height, 0 /*border width */,
-    active_GLVisual->depth, InputOutput, active_GLVisual->visual,
-    CWBorderPixel | CWColormap | CWEventMask, &winattr);
+  winattr.bit_gravity = CenterGravity;
+  winattr.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask | 
+    CWBitGravity | FocusChangeMask | PointerMotionMask | ButtonPressMask | 
+    ButtonReleaseMask;
 
-  XMapWindow (dpy, window);
+  window = XCreateWindow(dpy, root_window, 0, 0, Width,Height, 0 /*border*/,
+    active_GLVisual->depth, InputOutput, active_GLVisual->visual,
+    CWBorderPixel | CWColormap | CWEventMask | CWBitGravity, &winattr);
+
   XStoreName (dpy, window, Title);
 
   // Intern WM_DELETE_WINDOW and set window manager protocol
   // (Needed to catch user using window manager "delete window" button)
   wm_delete_window = XInternAtom (dpy, "WM_DELETE_WINDOW", False);
   XSetWMProtocols (dpy, window, &wm_delete_window, 1);
+
+  // Now communicate fully to the window manager our wishes using the non-mapped
+  // leader_window to form a window_group
+  XSizeHints normal_hints;
+  normal_hints.flags = PSize;
+  normal_hints.width = Width;
+  normal_hints.height = Height;
+  XSetWMNormalHints (dpy, window, &normal_hints);
+
+  XWMHints wm_hints;
+  wm_hints.flags = InputHint | StateHint | WindowGroupHint;
+  wm_hints.input = True;
+  wm_hints.window_group = leader_window;
+  wm_hints.initial_state = NormalState;
+  XSetWMHints (dpy, window, &wm_hints);
+
+  Atom wm_client_leader = XInternAtom (dpy, "WM_CLIENT_LEADER", False);
+  XChangeProperty (dpy, window, wm_client_leader, XA_WINDOW, 32, 
+		   PropModeReplace, (const unsigned char*)&leader_window, 1);
+  XmbSetWMProperties (dpy, window, Title, Title,
+                      NULL, 0, NULL, NULL, NULL);
+
+  XRaiseWindow (dpy, window);
+  XMapWindow (dpy, window);
 
   // Create mouse cursors
   XColor Black;
@@ -328,6 +371,11 @@ void csGraphics2DGLX::Close(void)
     glXDestroyContext(dpy,active_GLContext);
     active_GLContext = NULL;
   }
+  if (leader_window)
+  {
+    XDestroyWindow (dpy, leader_window);
+    leader_window = 0;
+  }
 }
 
 
@@ -389,6 +437,7 @@ bool csGraphics2DGLX::HandleEvent (csEvent &/*Event*/)
       case ClientMessage:
 	if (static_cast<Atom>(event.xclient.data.l[0]) == wm_delete_window)
 	{
+	  System->QueueContextCloseEvent ((void*)this);
 	  System->StartShutdown();
 	}
 	break;

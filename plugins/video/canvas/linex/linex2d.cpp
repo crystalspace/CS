@@ -333,7 +333,11 @@ void csGraphics2DLineXLib::Close ()
     delete [] Memory;
     Memory = NULL;
   }
-
+  if (leader_window)
+  {
+    XDestroyWindow (dpy, leader_window);
+    leader_window = 0;
+  }
   csGraphics2D::Close ();
 }
 

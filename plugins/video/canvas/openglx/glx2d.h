@@ -32,6 +32,7 @@
 #include <X11/Xutil.h>
 #include <X11/keysymdef.h>
 #include <X11/cursorfont.h>
+#include <X11/Xatom.h>
 
 /// XLIB version.
 class csGraphics2DGLX : public csGraphics2DGLCommon
@@ -41,6 +42,8 @@ class csGraphics2DGLX : public csGraphics2DGLCommon
   int screen_num;
   int display_width, display_height;
   Window window;
+  Window leader_window;
+  Window root_window;
   GC gc;
   XVisualInfo *active_GLVisual;
   GLXContext active_GLContext;
