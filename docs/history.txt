@@ -11,6 +11,7 @@ chronological order.
 	  it couldn't be removed again.
 	- Jorrit added more leak guards.
 	- Jorrit added a missing SCF_IMPLEMENTS_INTERFACE(iImageVector).
+	- Erotoman fixed bug in lightning mesh
 21-Aug-2004
 	- Jorrit added more leakguards to CS.
         - Philip Wyett fixed attempts to load
