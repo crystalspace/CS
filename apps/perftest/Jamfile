@@ -1,9 +1,0 @@
-SubDir TOP apps perftest ;
-
-Description perftest : "graphics performance tester" ;
-
-Application perftest
-	: [ Wildcard *.cpp *.h ]
-;
-LinkWith perftest : csgeom csgfx cstool csutil ;
-

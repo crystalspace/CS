@@ -17,6 +17,7 @@ chronological order.
 	      "standard"
         - Philip Wyett fixed a compile error with software renderer.
 	- Philip Wyett removed 'vbufmgr.h' refererence from cspace.i.
+	- Marten removed some files which didn't go away last commit.
 12-Dec-2004
 	- Eric Sunshine worked around problem in csjava caused by new operator
 	  overrides in csColor and csColor4. Although modern C++ can deal with

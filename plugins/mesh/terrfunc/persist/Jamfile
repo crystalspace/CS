@@ -1,3 +1,0 @@
-SubDir TOP plugins mesh terrfunc persist ;
-
-SubInclude TOP plugins mesh terrfunc persist standard ;
