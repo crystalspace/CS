@@ -175,7 +175,6 @@ AC_DEFUN([CS_CHECK_BUILD],
 AC_DEFUN([CS_CHECK_BUILD_FLAGS],
     [AC_CACHE_CHECK([$1], [$2],
 	[CS_BUILD_IFELSE([], [$3], [$4],
-	    [$2=CS_TRIM([$cs_build_cflags $cs_build_lflags $cs_build_libs])
-		m4_default([$5],[:])],
-	    [$2=no
-		m4_default([$6],[:])])])])
+	    [$2=CS_TRIM([$cs_build_cflags $cs_build_lflags $cs_build_libs])],
+	    [$2=no])])
+    AS_IF([test $$2 != no], m4_default([$5],[:]), m4_default([$6],[:]))])
