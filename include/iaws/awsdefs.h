@@ -19,6 +19,7 @@
 *****************************************************************************/
 
 
+const unsigned int AWSF_CMP_DEAF        = 32; // set if  component should not receive events
 const unsigned int AWSF_CMP_INVISIBLE   = 16; // set by window manager when a component gets too small during resize
 const unsigned int AWSF_CMP_HIDDEN      = 8;  // set if component is hidden
 const unsigned int AWSF_CMP_TRANSPARENT = 2;  // set if component is transparent

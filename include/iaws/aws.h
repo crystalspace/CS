@@ -443,6 +443,12 @@ struct iAwsComponent : public iAwsSource
   /// Shows a component
   virtual void Show()=0;
 
+  /// Returns the state of the DEAF flag
+  virtual bool isDeaf()=0;
+
+  /// set deaf/not deaf
+  virtual void SetDeaf (bool bDeaf)=0;
+
   /// Get's the unique id of this component.
   virtual unsigned long GetID()=0;
 
