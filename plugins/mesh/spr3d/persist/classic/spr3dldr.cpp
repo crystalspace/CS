@@ -363,7 +363,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iDocumentNode* node,
         {
           iSkeletonConnection* newcon = limb->CreateConnection ();
 	  iSkeletonLimb* newlimb = SCF_QUERY_INTERFACE (newcon, iSkeletonLimb);
-	  const char* limbname = child->GetContentsValue ();
+	  const char* limbname = child->GetAttributeValue ("name");
 	  if (limbname) newlimb->SetName (limbname);
 	  if (!LoadSkeleton (child, reporter, newlimb))
 	    return false;

@@ -11,6 +11,9 @@ The history order is reversed so that new features are at the top.
 	- Attempted to optimized tinyxml parser by caching nodes.
 	  For some reason this doesn't work so I commit the code
 	  disabled so that I can debug this later.
+	- Fixed a bug in XML version of spr3dldr. It would not correctly
+	  load the names of the limbs. This prevent the motion manager
+	  from working.
 3-Sep-2002
 	- Converted several functions in iEngine to return a csPtr instead
 	  of a normal pointer. This means that you can now safely assign
