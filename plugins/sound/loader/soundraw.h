@@ -45,8 +45,6 @@ private:
   long NumSamples;
   // format of this sound
   csSoundFormat Format;
-
-  long pos;
 };
 
 #endif

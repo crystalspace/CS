@@ -29,8 +29,6 @@ csSoundDataRaw::csSoundDataRaw(iBase *iParent, void *d, long n,
   Data = d;
   NumSamples = n;
   Format = f;
-
-  pos = 0;
 }
 
 csSoundDataRaw::~csSoundDataRaw() {

@@ -209,54 +209,6 @@ bool csSoundSourceDS3D::IsPlaying() {
   return (r & DSBSTATUS_PLAYING);
 }
 
-/*
-void csSoundSourceDS3D::Update() {
-  // check if new data must be read from the stream
-  // @@@ this is not in a working state!
-  if (!Static) {
-    DWORD PlayPos, WritePos;
-    Buffer2D->GetCurrentPosition(&PlayPos, &WritePos);
-
-    // get number of bytes to write
-    unsigned long WriteBytes = BufferBytes + WritePos - PlayPos;
-    if (WriteBytes >= BufferBytes) WriteBytes -= BufferBytes;
-
-    // get number of samples to transfer
-    long NumSamples = WriteBytes / SampleBytes;
-
-    // read data from the sound stream; NumSamples may change
-    void *d = SoundStream->Read(NumSamples);
-
-    // calculate number of bytes to transfer and bytes to clear
-    unsigned long TransferBytes = NumSamples * SampleBytes;
-    unsigned long ClearBytes = WriteBytes - TransferBytes;
-
-    // get rid of inaccuracies (if we are mistaken and these are no
-    // inaccuracies, i.e. sound has really finished, destruction of
-    // this sound source will simply be delayed 1 round).
-    if (ClearBytes<=4) ClearBytes = 0;
-
-    // write everything
-    Write(d, TransferBytes);
-
-    // discard the stream buffer
-    SoundStream->DiscardBuffer(d);
-
-    // check if stream is finished (i.e. we had to clear bytes)
-    if (ClearBytes) {
-      if (Looped) {
-        SoundStream->Restart();
-        Update();
-      } else {
-        WriteMute(ClearBytes);
-        StopNextUpdate = true;
-      }
-    }
-
-    WriteStream(NumSamples);
-  }
-}*/
-
 void csSoundSourceDS3D::Write(void *Data, unsigned long NumBytes) {
   void *Pointer1 = NULL, *Pointer2 = NULL;
   DWORD Length1, Length2;
