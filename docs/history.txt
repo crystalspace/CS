@@ -32,7 +32,7 @@ The history order has been reversed so that new features are at the top.
 	      CSWS,--outstanding issue with paletted mode...i.e. the glx
 	      drivers will not work in paletted mode, but it wouldn't have
 	      done before my modifications anyway....a todo!
-	    -  Small modification to csws so it requests a single buffer
+	    - Small modification to csws so it requests a single buffer
 	      before opening the graphics drivers.
 	    - Change of signature to iGraphics3D->CreateOffScreenRenderer,
 	      have attempted to update all drivers, but I may of
