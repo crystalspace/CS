@@ -1,9 +1,14 @@
 The history order is reversed so that new features are at the top.
 
 25-Fev-2003
-	-Matze Braun added a .dds image file loader (only loading so far)
-	 and extended iImage with a HasMipmaps functions which indicates if
-	 the image contains precalculated mipmaps.
+	- Mårten Svanfeldt made these changes:
+	    - Fixed a bug in the light/shadow culling.
+	    - Added a flag to make objects not cast hardarebased shadows.
+	    - Added a (temporary) fix to avoid the mip-mapping errors in
+	      new renderer.
+	- Matze Braun added a .dds image file loader (only loading so far)
+	  and extended iImage with a HasMipmaps functions which indicates if
+	  the image contains precalculated mipmaps.
 	- res added csImageFile::HasMipmaps() which Matze seems to have 
 	  forgotten. 
 	- res fixed a division by zero in the DDS loader.
