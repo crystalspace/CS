@@ -9,6 +9,9 @@ The history order has been reversed so that new features are at the top.
 	- Fixed an additional bug in simple which would cause another
 	  crash at exit.
 	- Small update to python plugin.
+	- Fixed a bug in WalkTest. If you pressed the mouse button WalkTest
+	  would just continue going forward even after releasing it again.
+	  Bug fixed by Navdeep S. Tinna.
 18-Feb-2001
 	- Eric Sunshine eliminated a compilation warning in levtool.cpp on
 	  BeOS.

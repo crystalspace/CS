@@ -728,7 +728,10 @@ bool WalkTest::HandleEvent (iEvent &Event)
       break;
     case csevMouseUp:
       if (Event.Mouse.Button == 1)
+      {
         move_forward = false;
+	step (0, 0);
+      }
       break;
   }
 
