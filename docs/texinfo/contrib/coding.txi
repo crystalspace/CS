@@ -25,7 +25,7 @@ void foo()
   @{
     int b = bar();
     if (a < b)
-      printf("Hello\n");
+      printf ("Hello\n");
   @}
 @}
 @end example
@@ -35,11 +35,16 @@ spaces, for example @samp{for_(} rather than @samp{for(_}, where @samp{_}
 represents whitespace in this context.  Also add sufficient whitespace between
 tokens.
 
+In cases you are unsure what specific coding style to employ, just follow the
+style in the code you're editing or your personal preference. Always try to 
+keep it both readable and consistent. 
+
 @item
 @emph{Class and Method Naming}
 
 Classes should be named in this fashion: @code{csThisIsAClass}. The name
-starts with lower-case @samp{cs} and has every word capitalized.
+starts with lower-case @samp{cs} and has every word capitalized (also known
+as "CamelCase").
 
 Methods and functions should be named in this fashion: @code{ThisIsAMethod()}.
 Each word in the name is capitalized.
@@ -112,12 +117,9 @@ controls should take this form:
 @item
 @emph{Include @file{cssysdef.h}}
 
-Always include @file{cssysdef.h} in each source file as the very first file
-included.  If you need to use special facilities provided by @file{cssysdef.h}
-then be sure to @code{#define} the appropriate macro before including
-@file{cssysdef.h}.
-
-@emph{Never} include @file{cssysdef.h} in header files.
+Always include @file{cssysdef.h} in each source or header file as the very 
+first file included.  The latter is recommended, as it makes headers more
+self-contained.
 
 @item
 @emph{Module and Library Dependencies}
@@ -125,7 +127,7 @@ then be sure to @code{#define} the appropriate macro before including
 Do not introduce unnecessary dependencies between libraries and modules.
 Absolutely avoid introducing circular dependencies.
 
-For instance, code in the @code{csGeom} library should never refer to code
-from the @code{csEngine} library.  The other way around is okay, however,
-since @code{csEngine} is at a higher level within the dependency hierarchy.
+For instance, code in the @code{csutil} library should never refer to code
+from the @code{cstool} library.  The other way around is okay, however,
+since @code{cstool} is at a higher level within the dependency hierarchy.
 @end enumerate
