@@ -152,7 +152,7 @@ SRC.SYS_CSSYS = \
 CC=gcc -c
 
 # The C++ compiler
-CXX=gcc -c
+CXX=g++ -c
 
 # The linker.
 LINK=gcc
