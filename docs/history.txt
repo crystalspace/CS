@@ -12,10 +12,17 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+12-Jan-2000
+	- Added double linked list code from David Durant to csutil.
 11-Jan-2000
 	- Changes from David Durant to implement a new callback for sprites
 	  which is called when the sprite is REALLY drawn. He also added
 	  an actor pointer (csObject) to csSprite3D.
+	- Andrew Zabolotny added -f option to awk debug script so that it
+	  can be invoked manually.
+	- Some corrections to INSTALL.Win for SCF.
+	- Norman Kramer fixed rle8 encoding and added little/big endian
+	  support in bmp loader class.
 10-Jan-2000
 	- Andrew Zabolotny has CVS write access again! :-)
 	- He also fixed the change that Jorrit made with regards
