@@ -45,7 +45,7 @@
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-converter::converter() : frame_builder(NULL), revnorm(FALSE)
+converter::converter() : revnorm(FALSE), frame_builder(NULL)
 {
 }
 
