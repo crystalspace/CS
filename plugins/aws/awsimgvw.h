@@ -1,7 +1,4 @@
-#ifndef __CS_AWS_IMAGE_VIEW_H__
-#define __CS_AWS_IMAGE_VIEW_H__
-
-/**************************************************************************
+/*
     Copyright (C) 2000-2001 by Christopher Nelson
 
     This library is free software; you can redistribute it and/or
@@ -17,41 +14,45 @@
     You should have received a copy of the GNU Library General Public
     License along with this library; if not, write to the Free
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-*****************************************************************************/
-# include "awscomp.h"
+*/
+
+#ifndef __CS_AWS_IMGVW_H__
+#define __CS_AWS_IMGVW_H__
+
+#include "awscomp.h"
 
 class awsImageView : public awsComponent
 {
-  /// True when button is down, false if up
+private:
+  /// True when button is down, false if up.
   bool is_down;
 
-  /// True if the component has the mouse over it
+  /// True if the component has the mouse over it.
   bool mouse_is_over;
 
-  /// True if button was down, and button is in switch mode (toggle=yes)
+  /// True if button was down, and button is in switch mode (toggle = yes).
   bool was_down;
 
-  /// Holds the texture handle for the image we are viewing
-  iTextureHandle *img1; // via Image
-  iTextureHandle *img2; // via Texture
+  /// Holds the texture handle for the image we are viewing.
+  iTextureHandle *img1; // Via Image
+  iTextureHandle *img2; // Via Texture
 
-  /// true if we should draw a solid color instead
+  /// True if we should draw a solid color instead.
   bool draw_color;
 
-  /// the color to draw if draw_color is true
+  /// The color to draw if draw_color is true.
   int color;
 
   /// Flags for frame style.
   int frame_style;
 
-  /// Alpha level for this component
+  /// Alpha level for this component.
   int alpha_level;
-protected:
 public:
   awsImageView ();
   virtual ~awsImageView ();
 
-  /******** Frame styles ***********/
+  /// Frame styles
   static const int fsBump;
   static const int fsSimple;
   static const int fsRaised;
@@ -63,8 +64,6 @@ public:
   static const int fsFixed;
   static const int frameMask;
   static const int imageMask;
-
-  /******* Signals **********************/
 
   /// An up and down motion for the button
   static const int signalClicked;
@@ -81,10 +80,10 @@ public:
   /// Get's the texture handle and the title, plus style if there is one.
   virtual bool Setup (iAws *wmgr, iAwsComponentNode *settings);
 
-  /// Gets properties
+  /// Gets properties.
   bool GetProperty (const char *name, void **parm);
 
-  /// Sets properties
+  /// Sets properties.
   bool SetProperty (const char *name, void *parm);
 
   void SetColor(int color);
@@ -93,33 +92,33 @@ public:
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual const char *Type ();
-public:
 
-  /// Triggered when the component needs to draw
+  /// Triggered when the component needs to draw.
   virtual void OnDraw (csRect clip);
 
-  /// Triggered when the user presses a mouse button down
+  /// Triggered when the user presses a mouse button down.
   virtual bool OnMouseDown (int button, int x, int y);
 
-  /// Triggered when the user unpresses a mouse button
+  /// Triggered when the user unpresses a mouse button.
   virtual bool OnMouseUp (int button, int x, int y);
 
-  /// Triggered when the user moves the mouse
+  /// Triggered when the user moves the mouse.
   virtual bool OnMouseMove (int button, int x, int y);
 
-  /// Triggered when this component loses mouse focus
+  /// Triggered when this component loses mouse focus.
   virtual bool OnMouseExit ();
 
-  /// Triggered when this component gains mouse focus
+  /// Triggered when this component gains mouse focus.
   virtual bool OnMouseEnter ();
 };
 
-class awsImageViewFactory :
-  public awsComponentFactory
+class awsImageViewFactory : public awsComponentFactory
 {
 public:
-
-  /// Calls register to register the component that it builds with the window manager
+  /**
+   * Calls register to register the component that it builds with the
+   * window manager.
+   */
   awsImageViewFactory (iAws *wmgr);
 
   /// Does nothing
@@ -128,4 +127,5 @@ public:
   /// Returns a newly created component of the type this factory handles.
   virtual iAwsComponent *Create ();
 };
-#endif // __CS_AWS_IMAGE_VIEW_H__
+
+#endif // __CS_AWS_IMGVW_H__
