@@ -34,8 +34,8 @@ ifeq ($(COMP),GCC)
 # Mingw/Cygwin both use libddraw.a (static lib) as the
 # place to get MS DirectDraw references from
   LIBS.DDRAW+=$(LFLAGS.l)ddraw$
-  LIBS.DINPUT+=$(LFLAGS.l)dinput$
 else
+#COMP_VC & COMP_BC
   LIBS.DDRAW+=$(LFLAGS.l)ddraw$(LIB)
 endif
 
@@ -48,7 +48,7 @@ else
   DDRAW=$(OUT)$(LIB_PREFIX)csddraw$(LIB)
   DEP.EXE+=$(DDRAW)
   ifeq ($(COMP),GCC)
-    LIBS.EXE+=$(LIBS.DDRAW) $(LIBS.DINPUT)
+    LIBS.EXE+=$(LIBS.DDRAW)
   else
     LIBS.EXE+=$(LIBS.DDRAW)
   endif
@@ -58,6 +58,7 @@ endif
 DESCRIPTION.$(DDRAW)=$(DESCRIPTION.ddraw)
 
 SRC.DDRAW = $(wildcard plugins/video/canvas/ddraw/*.cpp $(SRC.COMMON.DRV2D)) \
+	$(wildcard plugins/video/canvas/common/*.cpp) \
 	libs/cssys/win32/directdetection.cpp
 OBJ.DDRAW = $(addprefix $(OUT),$(notdir $(SRC.DDRAW:.cpp=$O)))
 
@@ -66,7 +67,7 @@ endif # ifeq ($(MAKESECTION),postdefines)
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-vpath %.cpp plugins/video/canvas/ddraw
+vpath %.cpp plugins/video/canvas/ddraw plugins/video/canvas/common
 
 .PHONY: ddraw ddrawclean
 
