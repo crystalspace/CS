@@ -132,8 +132,6 @@ public:
 	float distancesq( ddgVector3 *p);
 	/// Return the true distance of the box's centre point to the eye.
 	float distance( ddgVector3 *p) { return sqrtf(distancesq(p)); }
-	/// Test for intersection of line with bbox.
-	bool intersect( ddgVector3 *p1, ddgVector3 *p2);
 	/// Test for intersection of another bbox.
 	bool intersect( ddgBBox *b );
     /** 
