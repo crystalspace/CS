@@ -62,7 +62,7 @@ csLibraryHandle csLoadLibrary (const char* iName)
     char *str = new char[strlen(buf) + strlen(iName) + 50];
     sprintf (str, "LoadLibrary('%s') error %d: %s",
 	iName, (int)errorCode, buf);
-    ErrorMessages.Push (csStrNew (str));
+    ErrorMessages.Push (str);
     LocalFree (buf);
     return NULL;
   }
@@ -74,10 +74,9 @@ csLibraryHandle csLoadLibrary (const char* iName)
   {
     const char *noPluginCompiler =
       "%s: DLL doesn't export \"plugin_compiler\".\n";
-    CS_ALLOC_STACK_ARRAY (char, msg, 
-      strlen(noPluginCompiler) + strlen(iName));
+    char *msg = new char[strlen(noPluginCompiler) + strlen(iName)];
     sprintf (msg, noPluginCompiler, iName);
-    ErrorMessages.Push (csStrNew (msg));
+    ErrorMessages.Push (msg);
     FreeLibrary ((HMODULE)handle);
     return NULL;
   }
@@ -86,10 +85,10 @@ csLibraryHandle csLoadLibrary (const char* iName)
   {
     const char *compilerMismatch =
       "%s: plugin compiler mismatches app compiler: %s != " CS_COMPILER_NAME "\n";
-    CS_ALLOC_STACK_ARRAY (char, msg, 
-      strlen(compilerMismatch) + strlen(iName) + strlen(plugin_compiler));
+    char *msg = new char[strlen(compilerMismatch) + strlen(iName) + 
+      strlen(plugin_compiler)];
     sprintf (msg, compilerMismatch, iName, plugin_compiler);
-    ErrorMessages.Push (csStrNew (msg));
+    ErrorMessages.Push (msg);
     FreeLibrary ((HMODULE)handle);
     return NULL;
   }
