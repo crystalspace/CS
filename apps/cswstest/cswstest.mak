@@ -27,7 +27,7 @@ vpath %.cpp apps/cswstest apps/support
 
 CSWSTEST.EXE=cswstest$(EXE)
 SRC.CSWSTEST = $(wildcard apps/cswstest/*.cpp) \
-  apps/support/static.cpp apps/support/cspace.cpp apps/support/command.cpp
+  apps/support/static.cpp apps/support/cspace.cpp
 OBJ.CSWSTEST = $(addprefix $(OUT),$(notdir $(SRC.CSWSTEST:.cpp=$O)))
 DESCRIPTION.$(CSWSTEST.EXE) = $(DESCRIPTION.wstest)
 
