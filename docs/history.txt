@@ -1,6 +1,27 @@
 The history order has been reversed so that new features are at the top.
 
+26-Jul-2000
+	- Started completing support for the rapid collision detection
+	  plugin and also completing support for the interfaces needed
+	  to do good collision detection. As soon as this is finished
+	  the old colldet dir in csengine will be removed.
+	- csPolygonSet and csSprite3D also implement (through embedding)
+	  iPolygonMesh now so that they can be used with the CD system.
 25-Jul-2000
+	- Thomas Hieber did a small maintainance release to Map2CS
+	  (labeled 0.82):
+	    - Unique names for entities, if no explicit name has been given.
+	    - Manual sectors will now use the name of the entity instead of
+	      "s" plus a number.
+	    - If the entity has not been assigned a name, it will be called
+	      "e" plus a number.
+	    - Skybox now uses the new keyword "SKY". The result is
+	      already  better than the previous version, which used things,
+	      but sky is still being moved  (which shouldn't happen
+	      any more). The problem probably is,  that skyboxes from
+	      map2cs are usually being looked at through a portal, and
+	      maybe that code in the engine is still broken.
+	    - Cleaned up and reformatted some odd code I came across.
 	- Norman Kramer did another fix to csFrustum::Classify().
 	- Engine plugin is now working!
 	- Extended iWorld with a few functions from csWorld.

@@ -34,6 +34,7 @@
 #include "csengine/triangle.h"
 #include "igraph3d.h"
 #include "iparticl.h"
+#include "ipolmesh.h"
 
 class Dumper;
 class csTextureList;
@@ -892,6 +893,47 @@ public:
   csVector3* GetObjectVerts (csFrame* fr);
 
   CSOBJTYPE;
+
+  //-------------------- iPolygonMesh interface implementation ------------------
+  struct PolyMesh : public iPolygonMesh
+  {
+    DECLARE_EMBEDDED_IBASE (csSprite3D);
+
+    /// Get the number of vertices for this mesh.
+    virtual int GetNumVertices ()
+    {
+      csSpriteTemplate* tmpl = scfParent->GetTemplate ();
+      return tmpl->GetNumVertices ();
+    }
+    /// Get the pointer to the array of vertices.
+    virtual csVector3* GetVertices ()
+    {
+      csSpriteTemplate* tmpl = scfParent->GetTemplate ();
+      return tmpl->GetVertices (0);
+    }
+    /// Get the number of polygons for this mesh.
+    virtual int GetNumPolygons ()
+    {
+      csSpriteTemplate* tmpl = scfParent->GetTemplate ();
+      return tmpl->GetNumTriangles ();
+    }
+    /// Get the pointer to the array of polygons.
+    virtual csMeshedPolygon* GetPolygons ();
+
+    PolyMesh ()
+    {
+      polygons = NULL;
+    }
+
+    virtual ~PolyMesh ()
+    {
+      delete polygons;
+    }
+
+    csMeshedPolygon* polygons;
+  } scfiPolygonMesh;
+  friend struct PolyMesh;
+
 };
 
 #endif /*CSSPRITE_H*/

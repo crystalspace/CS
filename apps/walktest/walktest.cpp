@@ -1114,7 +1114,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
   view = new csView (world, Gfx3D);
 
   // Get the collide system plugin.
-  const char* p = Config->GetStr ("WalkTest", "COLLDET_PLUGIN" "");
+  const char* p = Config->GetStr ("WalkTest", "COLLDET_PLUGIN",
+  	"crystalspace.colldet.rapid");
   collide_system = LOAD_PLUGIN (Sys, p, "CollDet", iCollideSystem);
   if (!collide_system)
   {

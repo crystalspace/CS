@@ -207,13 +207,6 @@ public:
 // models are not being scaled up or down, but have their native
 // dimensions.
 
-// this is for the client
-struct collision_pair
-{
-  csCdTriangle *tr1;
-  csCdTriangle *tr2;
-};
-
 // Classes to organize triangles in bounding boxes with.
 class Moment
 {

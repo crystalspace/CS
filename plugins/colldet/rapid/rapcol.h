@@ -28,7 +28,7 @@ class csTransform;
 class csCdModel;
 class csCdBBox;
 struct csCdTriangle;
-struct collision_pair;
+struct csCollisionPair;
 struct iPolygonMesh;
 
 /// Low level collision detection using the RAPID algorithm.
@@ -39,13 +39,6 @@ class csRAPIDCollider
   /// The internal collision object.
   csCdModel* m_pCollisionModel;
 
-  /**
-   * Find the first collision that involved this object, and return who
-   * it was.  This call does not alter queue state.  Return 0 if no
-   * collision involving this object occurred.
-   * Optionally return the triangles involved in the collision.
-   */
-  csRAPIDCollider* FindCollision (csCdTriangle **tr1 = 0, csCdTriangle **tr2 = 0);
   /// Get top level bounding box.
   const csCdBBox* GetBbox () const;
 
@@ -104,7 +97,7 @@ public:
                         csTransform *pOtherTransform = NULL);
 
   /// Query the array with collisions (and their count).
-  static collision_pair *GetCollisions ();
+  static csCollisionPair *GetCollisions ();
 
   static void CollideReset ();
   static void SetFirstHit (bool fh) {firstHit = fh;}

@@ -67,8 +67,9 @@ bool csPluginCollider::Collide (csCollider &otherCollider,
   if (!m_CollisionDetectionActive || 
       !pCollider2->m_CollisionDetectionActive) return 0;
 
+  int num_hits;
   return collide_system->Collide (collider, pTransform1,
-  	pCollider2->collider, pTransform2);
+  	pCollider2->collider, pTransform2, num_hits) != NULL;
 }
 
 csPluginCollider *csPluginCollider::GetPluginCollider (csObject &object) 

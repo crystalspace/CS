@@ -30,6 +30,7 @@
 #include "csutil/cscolor.h"
 #include "igraph3d.h"
 #include "ipolyset.h"
+#include "ipolmesh.h"
 
 class csPolygonInt;
 class csSector;
@@ -44,6 +45,7 @@ class Dumper;
 class csRenderView;
 class csFrustumList;
 class csCurve;
+class iPolygonMesh;
 
 /**
  * This structure keeps the indices of the vertices which
@@ -537,6 +539,43 @@ public:
     virtual bool CreateKey (const char *iName, const char *iValue);
   } scfiPolygonSet;
   friend struct PolySet;
+
+  //-------------------- iPolygonMesh interface implementation ------------------
+  struct PolyMesh : public iPolygonMesh
+  {
+    DECLARE_EMBEDDED_IBASE (csPolygonSet);
+
+    /// Get the number of vertices for this mesh.
+    virtual int GetNumVertices ()
+    {
+      return scfParent->GetNumVertices ();
+    }
+    /// Get the pointer to the array of vertices.
+    virtual csVector3* GetVertices ()
+    {
+      return scfParent->wor_verts;
+    }
+    /// Get the number of polygons for this mesh.
+    virtual int GetNumPolygons ()
+    {
+      return scfParent->GetNumPolygons ();
+    }
+    /// Get the pointer to the array of polygons.
+    virtual csMeshedPolygon* GetPolygons ();
+
+    PolyMesh ()
+    {
+      polygons = NULL;
+    }
+
+    virtual ~PolyMesh ()
+    {
+      delete polygons;
+    }
+
+    csMeshedPolygon* polygons;
+  } scfiPolygonMesh;
+  friend struct PolyMesh;
 };
 
 #endif // __CS_POLYSET_H__

@@ -21,12 +21,22 @@
 #define __ICOLLIDE_H__
 
 #include "csutil/scf.h"
+#include "csgeom/vector3.h"
 #include "iplugin.h"
 
 struct iPolygonMesh;
 class csTransform;
 
 SCF_VERSION (iCollider, 0, 1, 0);
+
+/**
+ * A structure used to return collision pairs.
+ */
+struct csCollisionPair
+{
+  csVector3 a1, b1, c1;	// First triangle
+  csVector3 a2, b2, c2;	// Second triangle
+};
 
 /**
  * A collider.
@@ -53,10 +63,30 @@ struct iCollideSystem : public iPlugIn
   /**
    * Test collision between two colliders.
    * This is only supported for iCollider objects created by
-   * this plugin.
+   * this plugin. Returns null if no collision or else a
+   * pointer to an array of csCollisionPair's. In the latter
+   * case 'num_pairs' will be set to the number of pairs in that
+   * array. Note that this array will only be valid upto the next
+   * time that Collide is called.
    */
-  virtual bool Collide (iCollider* collider1, csTransform* trans1,
-  	iCollider* collider2, csTransform* trans2) = 0;
+  virtual csCollisionPair* Collide (iCollider* collider1, csTransform* trans1,
+  	iCollider* collider2, csTransform* trans2,
+	int& num_pairs) = 0;
+
+  /**
+   * Indicate if we are interested only in the first hit that is found.
+   * This is only valid for CD algorithms that actually allow the
+   * detection of multiple CD hit points.
+   */
+  virtual void SetOneHitOnly (bool o) = 0;
+
+  /**
+   * Return true if this CD system will only return the first hit
+   * that is found. For CD systems that support multiple hits this
+   * will return the value set by the SetOneHitOnly() function.
+   * For CD systems that support one hit only this will always return true.
+   */
+  virtual bool GetOneHitOnly () = 0;
 };
 
 #endif // __ICOLLIDE_H__

@@ -20,8 +20,7 @@
 #define _RAPID_H_
 
 #include "icollide.h"
-
-class csRAPIDCollider;
+#include "rapcol.h"
 
 /**
  * RAPID version of collider.
@@ -74,8 +73,25 @@ public:
    * This is only supported for iCollider objects created by
    * this plugin.
    */
-  virtual bool Collide (iCollider* collider1, csTransform* trans1,
-  	iCollider* collider2, csTransform* trans2);
+  virtual csCollisionPair* Collide (iCollider* collider1, csTransform* trans1,
+  	iCollider* collider2, csTransform* trans2, int& num_pairs);
+
+  /**
+   * Indicate if we are interested only in the first hit that is found.
+   */
+  virtual void SetOneHitOnly (bool o)
+  {
+    csRAPIDCollider::SetFirstHit (o);
+  }
+
+  /**
+   * Return true if this CD system will only return the first hit
+   * that is found.
+   */
+  virtual bool GetOneHitOnly ()
+  {
+    return csRAPIDCollider::GetFirstHit ();
+  }
 };
 
 #endif // _RAPID_H_

@@ -49,10 +49,15 @@ IMPLEMENT_CSOBJTYPE (csPolygonSet,csObject);
 IMPLEMENT_IBASE (csPolygonSet)
   IMPLEMENTS_INTERFACE (iBase)
   IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonSet)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
 IMPLEMENT_IBASE_END
 
 IMPLEMENT_EMBEDDED_IBASE(csPolygonSet::PolySet)
   IMPLEMENTS_INTERFACE(iPolygonSet)
+IMPLEMENT_EMBEDDED_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE(csPolygonSet::PolyMesh)
+  IMPLEMENTS_INTERFACE(iPolygonMesh)
 IMPLEMENT_EMBEDDED_IBASE_END
 
 long csPolygonSet::current_light_frame_number = 0;
@@ -1109,3 +1114,25 @@ bool csPolygonSet::PolySet::CreateKey (const char *iName, const char *iValue)
   scfParent->ObjAdd (new csKeyValuePair (iName, iValue));
   return true;
 }
+
+//---------------------------------------------------------------------------------------------------------
+
+csMeshedPolygon* csPolygonSet::PolyMesh::GetPolygons ()
+{
+  if (!polygons)
+  {
+    polygons = new csMeshedPolygon [scfParent->GetNumPolygons ()];
+    const csPolygonArray& pol = scfParent->polygons;
+    int i;
+    for (i = 0 ; i < scfParent->GetNumPolygons () ; i++)
+    {
+      csPolygon3D* p = pol.Get (i);
+      polygons[i].num_vertices = p->GetNumVertices ();
+      polygons[i].vertices = p->GetVertexIndices ();
+    }
+  }
+  return polygons;
+}
+
+//---------------------------------------------------------------------------------------------------------
+

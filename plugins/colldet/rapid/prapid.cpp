@@ -67,11 +67,12 @@
 #include "plugins/colldet/rapid/rapcol.h"
 #include "plugins/colldet/rapid/prapid.h"
 #include "ipolmesh.h"
+#include "icollide.h"
 
 #define CD_MAX_COLLISION    1000
 
 // This array contains the colliding pairs
-static DECLARE_GROWING_ARRAY (CD_contact, collision_pair);
+static DECLARE_GROWING_ARRAY (CD_contact, csCollisionPair);
 
 static int hits = 0;
 // Array of hits.
@@ -222,7 +223,7 @@ bool csRAPIDCollider::Collide (csRAPIDCollider &otherCollider,
   return 0;
 }
 
-collision_pair *csRAPIDCollider::GetCollisions ()
+csCollisionPair *csRAPIDCollider::GetCollisions ()
 {
   return CD_contact.GetArray ();
 }
@@ -629,8 +630,12 @@ int add_collision (csCdTriangle *tr1, csCdTriangle *tr2)
     CD_contact.SetLimit (limit + 16);
   }
 
-  CD_contact [csRAPIDCollider::numHits].tr1 = tr1;
-  CD_contact [csRAPIDCollider::numHits].tr2 = tr2;
+  CD_contact [csRAPIDCollider::numHits].a1 = tr1->p1;
+  CD_contact [csRAPIDCollider::numHits].b1 = tr1->p2;
+  CD_contact [csRAPIDCollider::numHits].c1 = tr1->p3;
+  CD_contact [csRAPIDCollider::numHits].a2 = tr2->p1;
+  CD_contact [csRAPIDCollider::numHits].b2 = tr2->p2;
+  CD_contact [csRAPIDCollider::numHits].c2 = tr2->p3;
   csRAPIDCollider::numHits++;
 
   return false;
@@ -854,31 +859,6 @@ int csRAPIDCollider::Report (csRAPIDCollider **id1, csRAPIDCollider **id2)
   *id2 = hitv [currHit] [1];
   currHit++;
   return 1;
-}
-
-csRAPIDCollider* csRAPIDCollider::FindCollision (csCdTriangle **tr1, csCdTriangle **tr2)
-{
-  int i = 0;
-  while (i < hits)
-    if (hitv [i][0] == this)
-    {
-      if (tr1)
-        *tr1 = CD_contact [i].tr2;
-      if (tr2)
-        *tr2 = CD_contact [i].tr1;
-      return hitv [i][1];
-    }
-    else if (hitv [i][1] == this)
-    {
-      if (tr1)
-        *tr1 = CD_contact[i].tr1;
-      if (tr2)
-        *tr2 = CD_contact[i].tr2;
-      return hitv[i][0];
-    }
-    else
-      i++;
-  return 0;
 }
 
 bool csCdBBox::TrianglesHaveContact(csCdBBox *pBox1, csCdBBox *pBox2)

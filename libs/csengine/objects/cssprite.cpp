@@ -504,6 +504,14 @@ void csSprite::Particle::DeferUpdateLighting(int flags, int num_lights)
 
 IMPLEMENT_CSOBJTYPE (csSprite3D, csSprite)
 
+//IMPLEMENT_IBASE (csSprite3D)
+  //IMPLEMENTS_EMBEDDED_INTERFACE (iPolygonMesh)
+//IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE(csSprite3D::PolyMesh)
+  IMPLEMENTS_INTERFACE(iPolygonMesh)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 /// Static vertex array.
 static DECLARE_GROWING_ARRAY (tr_verts, csVector3);
 /// Static uv array.
@@ -1337,4 +1345,25 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights, csVector3* 
   // Clamp all vertice colors to 2.0
   FixVertexColors ();
 }
+
+//--------------------------------------------------------------------------
+
+csMeshedPolygon* csSprite3D::PolyMesh::GetPolygons ()
+{
+  if (!polygons)
+  {
+    csSpriteTemplate* tmpl = scfParent->GetTemplate ();
+    csTriangle* triangles = tmpl->GetTriangles ();
+    polygons = new csMeshedPolygon [GetNumPolygons ()];
+    int i;
+    for (i = 0 ; i < GetNumPolygons () ; i++)
+    {
+      polygons[i].num_vertices = 3;
+      polygons[i].vertices = &triangles[i].a;
+    }
+  }
+  return polygons;
+}
+
+//--------------------------------------------------------------------------
 
