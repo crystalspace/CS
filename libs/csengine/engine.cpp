@@ -446,7 +446,7 @@ csEngine::csEngine (iBase *iParent) : sectors (true), camera_positions (16, 16)
   cbufcube = NULL;
   current_camera = NULL;
   current_engine = this;
-  current_iengine = SCF_QUERY_INTERFACE (this, iEngine);
+  current_iengine = SCF_QUERY_INTERFACE_FAST (this, iEngine);
   current_iengine->DecRef ();
   use_pvs = false;
   use_pvs_only = false;
@@ -1004,7 +1004,7 @@ void csEngine::ShineLights (iRegion* iregion, iProgressMeter* meter)
     csMeshWrapper* s = (csMeshWrapper*)meshes[sn];
     if (!region || region->IsInRegion (s))
     {
-      iLightingInfo* linfo = SCF_QUERY_INTERFACE (s->GetMeshObject (),
+      iLightingInfo* linfo = SCF_QUERY_INTERFACE_FAST (s->GetMeshObject (),
       	iLightingInfo);
       if (linfo)
       {
@@ -1076,7 +1076,7 @@ void csEngine::ShineLights (iRegion* iregion, iProgressMeter* meter)
     csMeshWrapper* s = (csMeshWrapper*)meshes[sn];
     if (!region || region->IsInRegion (s))
     {
-      iLightingInfo* linfo = SCF_QUERY_INTERFACE (s->GetMeshObject (),
+      iLightingInfo* linfo = SCF_QUERY_INTERFACE_FAST (s->GetMeshObject (),
       	iLightingInfo);
       if (linfo)
       {
@@ -1517,7 +1517,7 @@ int csEngine::GetNearbyLights (csSector* sector, const csVector3& pos, ULong fla
         sqdist = csSquaredDist::PointPoint (pos, dl->GetCenter ());
         if (sqdist < dl->GetSquaredRadius ())
 	{
-	  iLight* il = SCF_QUERY_INTERFACE (dl, iLight);
+	  iLight* il = SCF_QUERY_INTERFACE_FAST (dl, iLight);
 	  light_array->AddLight (il, sqdist);
 	  il->DecRef ();
 	}
@@ -1535,7 +1535,7 @@ int csEngine::GetNearbyLights (csSector* sector, const csVector3& pos, ULong fla
       sqdist = csSquaredDist::PointPoint (pos, sl->GetCenter ());
       if (sqdist < sl->GetSquaredRadius ())
       {
-	iLight* il = SCF_QUERY_INTERFACE (sl, iLight);
+	iLight* il = SCF_QUERY_INTERFACE_FAST (sl, iLight);
         light_array->AddLight (il, sqdist);
 	il->DecRef ();
       }
@@ -1711,7 +1711,7 @@ iMeshWrapper* csEngine::CreateSectorWallsMesh (csSector* sector,
 {
   iMeshObjectType* thing_type = GetThingType ();
   iMeshObjectFactory* thing_fact = thing_type->NewFactory ();
-  iMeshObject* thing_obj = SCF_QUERY_INTERFACE (thing_fact, iMeshObject);
+  iMeshObject* thing_obj = SCF_QUERY_INTERFACE_FAST (thing_fact, iMeshObject);
   thing_fact->DecRef ();
 
   csMeshWrapper* thing_wrap = new csMeshWrapper (&scfiObject, thing_obj);
@@ -1725,7 +1725,7 @@ iMeshWrapper* csEngine::CreateSectorWallsMesh (csSector* sector,
   thing_wrap->SetZBufMode (CS_ZBUF_FILL);
   thing_wrap->SetRenderPriority (GetWallRenderPriority ());
 
-  iMeshWrapper* mesh_wrap = SCF_QUERY_INTERFACE (thing_wrap, iMeshWrapper);
+  iMeshWrapper* mesh_wrap = SCF_QUERY_INTERFACE_FAST (thing_wrap, iMeshWrapper);
   mesh_wrap->DecRef ();
   return mesh_wrap;
 }
@@ -1799,7 +1799,7 @@ iMeshWrapper *csEngine::FindMeshObject (const char *iName, bool regionOnly)
   else
     mesh = (csMeshWrapper*)meshes.FindByName (iName);
   if (!mesh) return NULL;
-  iMeshWrapper* imesh = SCF_QUERY_INTERFACE (mesh, iMeshWrapper);
+  iMeshWrapper* imesh = SCF_QUERY_INTERFACE_FAST (mesh, iMeshWrapper);
   imesh->DecRef ();
   return imesh;
 }
@@ -1821,7 +1821,7 @@ iMaterial* csEngine::CreateBaseMaterial (iTextureWrapper* txt)
 {
   csMaterial* mat = new csMaterial ();
   if (txt) mat->SetTextureWrapper (txt);
-  iMaterial* imat = SCF_QUERY_INTERFACE (mat, iMaterial);
+  iMaterial* imat = SCF_QUERY_INTERFACE_FAST (mat, iMaterial);
   imat->DecRef ();
   return imat;
 }
@@ -1837,7 +1837,7 @@ iMaterial* csEngine::CreateBaseMaterial (iTextureWrapper* txt,
     mat->AddTextureLayer (wrappers[i], layers[i].mode,
     	layers[i].uscale, layers[i].vscale, layers[i].ushift, layers[i].vshift);
   }
-  iMaterial* imat = SCF_QUERY_INTERFACE (mat, iMaterial);
+  iMaterial* imat = SCF_QUERY_INTERFACE_FAST (mat, iMaterial);
   imat->DecRef ();
   return imat;
 }
@@ -1930,7 +1930,7 @@ iStatLight* csEngine::CreateLight (const char* name,
   csStatLight* light = new csStatLight (pos.x, pos.y, pos.z, radius,
   	color.red, color.green, color.blue, pseudoDyn);
   if (name) light->SetName (name);
-  iStatLight* il = SCF_QUERY_INTERFACE (light, iStatLight);
+  iStatLight* il = SCF_QUERY_INTERFACE_FAST (light, iStatLight);
   il->DecRef ();
   return il;
 }
@@ -1941,7 +1941,7 @@ iDynLight* csEngine::CreateDynLight (const csVector3& pos, float radius,
   csDynLight* light = new csDynLight (pos.x, pos.y, pos.z, radius,
   	color.red, color.green, color.blue);
   AddDynLight (light);
-  iDynLight* il = SCF_QUERY_INTERFACE (light, iDynLight);
+  iDynLight* il = SCF_QUERY_INTERFACE_FAST (light, iDynLight);
   il->DecRef ();
   return il;
 }
@@ -2074,7 +2074,7 @@ iMeshWrapper* csEngine::LoadMeshObject (
     meshwrap->GetMovable ().SetPosition (pos);
     meshwrap->GetMovable ().UpdateMove ();
   }
-  iMeshWrapper* imw = SCF_QUERY_INTERFACE (meshwrap, iMeshWrapper);
+  iMeshWrapper* imw = SCF_QUERY_INTERFACE_FAST (meshwrap, iMeshWrapper);
   imw->DecRef ();
 
   char* buf = **input;
@@ -2166,7 +2166,7 @@ iCurveTemplate* csEngine::CreateBezierTemplate (const char* name)
   csBezierTemplate* ptemplate = new csBezierTemplate ();
   if (name) ptemplate->SetName (name);
   curve_templates.Push (ptemplate);
-  iCurveTemplate* itmpl = SCF_QUERY_INTERFACE (ptemplate, iCurveTemplate);
+  iCurveTemplate* itmpl = SCF_QUERY_INTERFACE_FAST (ptemplate, iCurveTemplate);
   itmpl->DecRef ();
   return itmpl;
 }
@@ -2180,7 +2180,7 @@ iCurveTemplate* csEngine::FindCurveTemplate (const char *iName,
   else
     pl = (csCurveTemplate*)curve_templates.FindByName (iName);
   if (!pl) return NULL;
-  iCurveTemplate* itmpl = SCF_QUERY_INTERFACE (pl, iCurveTemplate);
+  iCurveTemplate* itmpl = SCF_QUERY_INTERFACE_FAST (pl, iCurveTemplate);
   itmpl->DecRef ();
   return itmpl;
 }

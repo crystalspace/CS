@@ -583,7 +583,7 @@ iPolyTexType* csPolygon3D::eiPolygon3D::GetPolyTexType ()
 
 iThingState* csPolygon3D::eiPolygon3D::GetParent ()
 {
-  iThingState* it = SCF_QUERY_INTERFACE (scfParent->GetParent (), iThingState);
+  iThingState* it = SCF_QUERY_INTERFACE_FAST (scfParent->GetParent (), iThingState);
   it->DecRef ();
   return it;
 }
@@ -1723,7 +1723,7 @@ void csPolygon3D::FillLightMap (csFrustumView& lview)
       // We are working for a vertex lighted polygon.
       csColor& col = linfo.GetColor ();
       csLight* l = (csLight*)lview.GetUserData ();
-      iLight* il = SCF_QUERY_INTERFACE (l, iLight);
+      iLight* il = SCF_QUERY_INTERFACE_FAST (l, iLight);
       UpdateVertexLighting (il, col, false, ctxt->IsFirstTime ());
       il->DecRef ();
       return;

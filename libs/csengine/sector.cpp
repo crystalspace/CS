@@ -143,7 +143,7 @@ void csSector::AddMesh (csMeshWrapper* mesh)
 
   if (culler)
   {
-    iVisibilityObject* vo = SCF_QUERY_INTERFACE (mesh, iVisibilityObject);
+    iVisibilityObject* vo = SCF_QUERY_INTERFACE_FAST (mesh, iVisibilityObject);
     vo->DecRef ();
     culler->RegisterVisObject (vo);
   }
@@ -172,7 +172,7 @@ void csSector::UnlinkMesh (csMeshWrapper* mesh)
     meshes.Delete (idx);
     if (culler)
     {
-      iVisibilityObject* vo = SCF_QUERY_INTERFACE (mesh, iVisibilityObject);
+      iVisibilityObject* vo = SCF_QUERY_INTERFACE_FAST (mesh, iVisibilityObject);
       vo->DecRef ();
       culler->UnregisterVisObject (vo);
     }
@@ -274,7 +274,7 @@ void csSector::UseCuller (const char* meshname)
   if (culler_mesh) return;
   culler_mesh = GetMesh (meshname);
   if (!culler_mesh) return;
-  culler = SCF_QUERY_INTERFACE (culler_mesh->GetMeshObject (), iVisibilityCuller);
+  culler = SCF_QUERY_INTERFACE_FAST (culler_mesh->GetMeshObject (), iVisibilityCuller);
   if (!culler) return;
   culler->Setup ();
 
@@ -286,7 +286,7 @@ void csSector::UseCuller (const char* meshname)
     csMeshWrapper* th = (csMeshWrapper*)meshes[i];
     th->GetMovable ().UpdateMove ();
 
-    iVisibilityObject* vo = SCF_QUERY_INTERFACE (th, iVisibilityObject);
+    iVisibilityObject* vo = SCF_QUERY_INTERFACE_FAST (th, iVisibilityObject);
     vo->DecRef ();
     culler->RegisterVisObject (vo);
   }
@@ -425,7 +425,7 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
     if (mesh != culler_mesh)
     {
       // @@@ UGLY!!!
-      iThingState* ith = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iThingState);
+      iThingState* ith = SCF_QUERY_INTERFACE_FAST (mesh->GetMeshObject (), iThingState);
       if (ith)
       {
         csThing* sp = (csThing*)(ith->GetPrivateObject ());
@@ -465,7 +465,7 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
     // culler_mesh has option CS_THING_MOVE_NEVER so
     // object space == world space.
     // @@@ UGLY!!! We need another abstraction for this.
-    iThingState* ith = SCF_QUERY_INTERFACE (
+    iThingState* ith = SCF_QUERY_INTERFACE_FAST (
     	culler_mesh->GetMeshObject (), iThingState);
     csThing* sp = (csThing*)(ith->GetPrivateObject ());
     ith->DecRef ();
@@ -1016,7 +1016,7 @@ void csSector::RealCheckFrustum (iFrustumView* lview)
 	csMeshWrapper* mesh = (csMeshWrapper*)o;
 	// @@@ should not be known in engine.
 	// @@@ UGLY
-	iThingState* ithing = SCF_QUERY_INTERFACE (
+	iThingState* ithing = SCF_QUERY_INTERFACE_FAST (
 		mesh->GetMeshObject (), iThingState);
 	if (ithing)
 	{
@@ -1039,7 +1039,7 @@ void csSector::RealCheckFrustum (iFrustumView* lview)
       csMeshWrapper* mesh = (csMeshWrapper*)o;
       // @@@ should not be known in engine.
       // @@@ UGLY
-      iThingState* ithing = SCF_QUERY_INTERFACE (
+      iThingState* ithing = SCF_QUERY_INTERFACE_FAST (
       	mesh->GetMeshObject (), iThingState);
       if (ithing)
       {

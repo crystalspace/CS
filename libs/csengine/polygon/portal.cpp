@@ -65,7 +65,7 @@ csPortal::~csPortal ()
 iReferencedObject* csPortal::GetReferencedObject () const
 {
   if (!sector) return NULL;
-  iReferencedObject* refobj = SCF_QUERY_INTERFACE (sector, iReferencedObject);
+  iReferencedObject* refobj = SCF_QUERY_INTERFACE_FAST (sector, iReferencedObject);
   refobj->DecRef ();
   return refobj;
 }
@@ -78,7 +78,7 @@ void csPortal::SetReferencedObject (iReferencedObject* b)
   }
   else
   {
-    iSector* s = SCF_QUERY_INTERFACE (b, iSector);
+    iSector* s = SCF_QUERY_INTERFACE_FAST (b, iSector);
     CS_ASSERT (s != NULL);
     SetSector (s);
     s->DecRef ();
@@ -97,7 +97,7 @@ void csPortal::SetSector (iSector* s)
     if (sector)
     {
       // First unlink from the previous sector.
-      iReferencedObject* refobj = SCF_QUERY_INTERFACE (sector, iReferencedObject);
+      iReferencedObject* refobj = SCF_QUERY_INTERFACE_FAST (sector, iReferencedObject);
       CS_ASSERT (refobj != NULL);
       refobj->RemoveReference (&scfiPortal);
       refobj->DecRef ();
@@ -106,7 +106,7 @@ void csPortal::SetSector (iSector* s)
     if (sector)
     {
       // Link to the new sector.
-      iReferencedObject* refobj = SCF_QUERY_INTERFACE (sector, iReferencedObject);
+      iReferencedObject* refobj = SCF_QUERY_INTERFACE_FAST (sector, iReferencedObject);
       CS_ASSERT (refobj != NULL);
       refobj->AddReference (&scfiPortal);
       refobj->DecRef ();

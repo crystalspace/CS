@@ -1779,7 +1779,7 @@ void csThing::RegisterVisObject (iVisibilityObject* visobj)
 {
   csVisObjInfo* vinf = new csVisObjInfo ();
   vinf->visobj = visobj;
-  iShadowCaster* shadcast = SCF_QUERY_INTERFACE (visobj, iShadowCaster);
+  iShadowCaster* shadcast = SCF_QUERY_INTERFACE_FAST (visobj, iShadowCaster);
   if (shadcast) shadcast->DecRef ();
   vinf->shadcast = shadcast;
   vinf->bbox = new csPolyTreeBBox ();
@@ -2002,7 +2002,7 @@ static void* CheckFrustumPolygonsFB (csThing* thing,
       // A BSP polygon. Used for testing visibility of things.
       csBspPolygon* bsppol = (csBspPolygon*)polygon[i];
       csVisObjInfo* obj = bsppol->GetOriginator ();
-      iThingState* ith = SCF_QUERY_INTERFACE (obj->visobj, iThingState);
+      iThingState* ith = SCF_QUERY_INTERFACE_FAST (obj->visobj, iThingState);
       if (ith)
       {
         ith->DecRef ();
@@ -2181,7 +2181,7 @@ void csThing::CastShadows (iFrustumView* fview)
     csMeshWrapper* mesh = (csMeshWrapper*)o;
     // @@@ should not be known in engine.
     // @@@ UGLY
-    iThingState* ithing = SCF_QUERY_INTERFACE (mesh->GetMeshObject (), iThingState);
+    iThingState* ithing = SCF_QUERY_INTERFACE_FAST (mesh->GetMeshObject (), iThingState);
     if (ithing)
     {
       csThing* sp = (csThing*)(ithing->GetPrivateObject ());
@@ -2331,7 +2331,7 @@ void csThing::MergeTemplate (iThingState* tpl,
   curves_center = tpl->GetCurvesCenter ();
   curves_scale = tpl->GetCurvesScale ();
   //@@@ TEMPORARY
-  iThingState* ith = SCF_QUERY_INTERFACE (tpl, iThingState);
+  iThingState* ith = SCF_QUERY_INTERFACE_FAST (tpl, iThingState);
   ParentTemplate = (csThing*)(ith->GetPrivateObject ());
   ith->DecRef ();
 
@@ -2426,7 +2426,7 @@ iPolygon3D *csThing::ThingState::CreatePolygon (const char *iName)
   csPolygon3D *p = new csPolygon3D ((csMaterialWrapper *)NULL);
   if (iName) p->SetName (iName);
   scfParent->AddPolygon (p);
-  iPolygon3D *ip = SCF_QUERY_INTERFACE (p, iPolygon3D);
+  iPolygon3D *ip = SCF_QUERY_INTERFACE_FAST (p, iPolygon3D);
   p->DecRef ();
   return ip;
 }
@@ -2486,7 +2486,7 @@ bool csThingObjectType::Initialize (iSystem* pSystem)
 iMeshObjectFactory* csThingObjectType::NewFactory ()
 {
   csThing* cm = new csThing (this);
-  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
+  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE_FAST (cm, iMeshObjectFactory);
   ifact->DecRef ();
   return ifact;
 }

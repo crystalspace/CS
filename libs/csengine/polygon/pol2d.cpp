@@ -416,7 +416,7 @@ void csPolygon2D::DrawFilled (iRenderView* rview, csPolygon3D* poly,
           bool reset = true;
           while (lp)
           {
-	    iLight* il = SCF_QUERY_INTERFACE (lp->GetLight (), iLight);
+	    iLight* il = SCF_QUERY_INTERFACE_FAST (lp->GetLight (), iLight);
             unsplit->UpdateVertexLighting (il,
 	    	lp->GetLight ()->GetColor (), true, reset);
 	    il->DecRef ();

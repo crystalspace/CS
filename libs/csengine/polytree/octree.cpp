@@ -776,7 +776,7 @@ void csOctree::Cache (csOctreeNode* node, iFile* cf)
 void csOctree::Cache (iVFS* vfs, const char* name)
 {
   csMemFile m;
-  iFile* mf = SCF_QUERY_INTERFACE((&m), iFile);
+  iFile* mf = SCF_QUERY_INTERFACE_FAST ((&m), iFile);
   WriteString (mf, "OCTR", 4);
   WriteLong (mf, 100002); // Version number.
   WriteBox3 (mf, bbox);
