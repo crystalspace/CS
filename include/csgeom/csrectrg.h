@@ -40,7 +40,7 @@ protected:
   int region_count;
   int region_max;
 
-  void pushRect(csRect const&);
+  void pushRect(csRect const &);
   void deleteRect(int);
   bool chopEdgeIntersection(csRect&, csRect&);
   void fragmentRect(csRect&, csRect&, bool testedContains, bool testedEdge);
@@ -56,6 +56,11 @@ public:
   void Include(csRect &rect);
   /// Exclude a rect from this region; may cause splitting.
   void Exclude(csRect &rect);
+
+  /// Returns the number of rectangles in this region
+  int Count() { return region_count; }
+  /// Returns the rect at a specific index
+  csRect& RectAt(int i) {  return region[i]; }
 };
 
 #endif //__CS_CSRECTREGION_H__
