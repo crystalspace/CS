@@ -336,11 +336,11 @@ MSVC.VERSIONDESC = \
   $(DESCRIPTION.$(DSP.$*.NAME))
 
 # Command to generate the project.rc file.
-MSVC.MAKEVERRC.COMMAND = \
-  $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh '$(MSVC.VERSIONRC.TEMP)' '$(MSVC.VERSIONDESC)'
-MSVC.MERGERC.COMMAND = \
-  $(RUN_SCRIPT) libs/cssys/win32/mergeres.sh '$(MSVC.VERSIONRC.OUT)' '$(MSVC.CVS.DIR)/' \
-  '$(MSVC.VERSIONRC.TEMP)' '$($($*.EXE).WINRSRC)'
+MSVC.MAKEVERRC.COMMAND = $(RUN_SCRIPT) libs/cssys/win32/mkverres.sh \
+  '$(MSVC.VERSIONRC.TEMP)' '$(MSVC.VERSIONDESC)'
+MSVC.MERGERC.COMMAND = $(RUN_SCRIPT) libs/cssys/win32/mergeres.sh \
+  '$(MSVC.VERSIONRC.OUT)' '$(MSVC.CVS.DIR)/' '$(MSVC.VERSIONRC.TEMP)' \
+  '$($($*.EXE).WINRSRC)'
 
 # Command to generate the project.rc file for a given project.
 MSVC.MAKEVERRC = $(MSVC.MAKEVERRC.$(DSP.$*.TYPE))
