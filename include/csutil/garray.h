@@ -106,7 +106,7 @@ bool InsertChunk (int n, int size , Type* Item)                                 
   CS_ASSERT( n <= count );                                                       \
   CS_ASSERT( size>0 );                                                           \
   SetLength ( length + size); /* Increments 'count' as a side-effect */          \
-  const int nmove = (length - (n + size));                                       \ 
+  const int nmove = (length - (n + size));                                       \
   if (nmove > 0)                                                                 \
     memmove ( &root [ n + size ] , &root [ n ] , nmove * sizeof (Type) );        \
                                                                                  \
