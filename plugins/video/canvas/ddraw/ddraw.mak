@@ -55,6 +55,7 @@ DEP.DDRAW = CSUTIL CSSYS CSUTIL
 MSVC.DSP += DDRAW
 DSP.DDRAW.NAME = csddraw
 DSP.DDRAW.TYPE = plugin
+DSP.DDRAW.LIBS = ddraw
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
