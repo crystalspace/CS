@@ -326,9 +326,9 @@ void csAVIStreamVideo::yuv_channel_2_rgba_interleave (char *data[3])
 	uvidx = sc  >>1;
       }
       y=1.164f*(((float)(unsigned char)ydata[idx]) - 16.f);
-      pixel[tidx].blue = FIX_RANGE(y + uf1);
+      pixel[tidx].red = FIX_RANGE(y + uf1);
       pixel[tidx].green= FIX_RANGE(y - uf2 - vf1);
-      pixel[tidx].red  = FIX_RANGE(y + vf2);
+      pixel[tidx].blue  = FIX_RANGE(y + vf2);
 
       while (xtic < sw)
       {
