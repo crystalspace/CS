@@ -176,7 +176,7 @@ void csTerrain::Draw (csRenderView& rview, bool use_z_buf)
 			p = bt->tri(tvp)->pos();
             if (p->v[2] < d)
                 d = p->v[2];
-            mesh->qz()->ddgSplayTree::insert (bt->index(),tvc,d);
+            mesh->qz()->ddgSplayTree::insert (bt->index(),tvc,(unsigned int)d);
 			mesh->qsi ()->next ();
 		}
 		qri = mesh->qzi();
