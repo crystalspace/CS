@@ -1246,21 +1246,30 @@ CS_CHECK_LIB_WITH([vga],
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([cal3d],
     [AC_LANG_PROGRAM([#include <cal3d/cal3d.h>],
-	[CalModel m; m.create(0); m.destroy();])],
-    [], [C++],
-    [CS_EMIT_BUILD_RESULT([cs_cv_libcal3d], [CAL3D])
-	CS_MAKEFILE_PROPERTY([HAS_CAL3D], [yes])])
+	[CalModel m; m.create(0); m.destroy();])], [], [C++])
+
+AS_IF([test $cs_cv_libcal3d = yes],
+    [CS_CHECK_BUILD([if cal3d is sufficiently recent], [cs_cv_cal3d_recent],
+	[AC_LANG_PROGRAM(
+	    [#include <cal3d/cal3d.h>
+	    @%:@include <string>],
+	    [std::string s(""); CalCoreModel m; m.addAnimHelper(s,0);])],
+	[], [C++],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libcal3d], [CAL3D])
+	    CS_MAKEFILE_PROPERTY([HAS_CAL3D], [yes])])])
 
     
+
 #------------------------------------------------------------------------------
 # Check for SDL
+# @@@ FIXME We should probably use sdl-config.
 #------------------------------------------------------------------------------
-# XXX: We should use sdl-config...
 CS_CHECK_LIB_WITH([SDL],
-    [AC_LANG_PROGRAM([#include <SDL/SDL.h>],
-	[SDL_Init(0);])], [], [C++],
-	[CS_EMIT_BUILD_RESULT([cs_cv_libSDL], [SDL])
-	    CS_MAKEFILE_PROPERTY([HAS_SDL], [yes])])
+    [AC_LANG_PROGRAM([#include <SDL/SDL.h>], [SDL_Init(0);])],
+    [], [C++],
+    [CS_EMIT_BUILD_RESULT([cs_cv_libSDL], [SDL])
+	CS_MAKEFILE_PROPERTY([HAS_SDL], [yes])])
+
 
 
 #------------------------------------------------------------------------------
@@ -1284,12 +1293,16 @@ CS_CHECK_BUILD([for Linux joystick API], [cs_cv_sys_linux_joystick],
     [], [],
     [CS_BUILD_PROPERTY([LINUXJOYSTICK.AVAILABLE], [yes])])
 
+
+
 #------------------------------------------------------------------------------
 # Check if libbfd is present (part of GNU binutils).
 #------------------------------------------------------------------------------
 CS_CHECK_LIB_WITH([bfd],
     [AC_LANG_PROGRAM([#include <bfd.h>], [bfd_init();])], [], [],
     [CS_EMIT_BUILD_RESULT([cs_cv_libbfd], [LIBBFD])], [], [], [], [-liberty])
+
+
 
 #------------------------------------------------------------------------------
 # Check if objcopy is present (part of GNU binutils).
@@ -1298,6 +1311,8 @@ AC_CHECK_PROGS([OBJCOPY], [objcopy])
 AS_IF([test -n "$OBJCOPY"],
     [CS_BUILD_PROPERTY([OBJCOPY.AVAILABLE], [yes])
     CS_BUILD_PROPERTY([CMD.OBJCOPY], [$OBJCOPY])])
+
+
 
 #------------------------------------------------------------------------------
 # Determine if plugin modules must implement main().  This is needed on some
