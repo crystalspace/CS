@@ -58,7 +58,8 @@ $(3DS2LEV.EXE): $(OBJ.3DS2LEV) $(LIB.3DS2LEV)
 	-$(RM) $(3DS2LEV.EXE) $(OBJ.3DS2LEV)
 
 ifdef DO_DEPEND
-dep: $(OUTOS)3ds2lev.dep
+3ds2levdep: $(OUTOS)3ds2lev.dep
+#dep: $(OUTOS)3ds2lev.dep
 $(OUTOS)3ds2lev.dep: $(SRC.3DS2LEV)
 	$(DO.DEP)
 else
