@@ -199,7 +199,7 @@ inline int csBasicVector::PushSmart (csSome what)
 
 inline csSome csBasicVector::Pop ()
 {
-  if (!root)
+  if (!root || count<=0)
     return NULL;
 
   csSome ret = root [count - 1];
