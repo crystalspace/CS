@@ -165,27 +165,41 @@ inline void csVector::QuickSort (int Mode)
  *   Declares a new vector type NAME as a subclass of BASE.  Elements of
  *   this vector are pointer to TYPE.
  */
-#define DECLARE_TYPED_VECTOR_WITH_BASE(NAME,TYPE,BASE) \
-class NAME : protected BASE \
-{ \
-public: \
-  NAME(int ilimit = 8, int ithreshold = 16) : BASE(ilimit, ithreshold) {} \
-  inline TYPE*& operator [] (int n) {return (TYPE*&)BASE::operator[](n);} \
-  inline TYPE*& Get (int n) const   {return (TYPE*&)BASE::Get(n);} \
-  inline TYPE*& operator [] (int n) const { return Get(n); } \
-  void SetLength (int n) {BASE::SetLength(n);} \
-  inline int Length () const {return BASE::Length();} \
-  int Find (TYPE* which) const {return BASE::Find(which);} \
-  int FindKey (const TYPE* value) const {return BASE::FindKey(value);} \
-  inline void Push (TYPE* what) {BASE::Push(what);} \
-  inline TYPE* Pop () {return (TYPE*)BASE::Pop();} \
-  bool Delete (int n) {return BASE::Delete(n);} \
-  void DeleteAll () {BASE::DeleteAll();} \
-  bool Insert (int n, TYPE* Item) {return BASE::Insert(n, Item);} \
-  virtual bool FreeItem (TYPE* Item) {return BASE::FreeItem(Item);} \
+#define DECLARE_TYPED_VECTOR_WITH_BASE(NAME,TYPE,BASE)		\
+class NAME : protected BASE					\
+{								\
+public:								\
+  NAME (int ilimit = 8, int ithreshold = 16) :			\
+    BASE (ilimit, ithreshold) {}				\
+  inline TYPE*& operator [] (int n)				\
+  { return (TYPE*&)BASE::operator [] (n); }			\
+  inline TYPE*& Get (int n) const				\
+  { return (TYPE*&)BASE::Get (n); }				\
+  inline TYPE*& operator [] (int n) const			\
+  { return Get (n); }						\
+  void SetLength (int n)					\
+  { BASE::SetLength (n); }					\
+  inline int Length () const					\
+  { return BASE::Length (); }					\
+  int Find (TYPE* which) const					\
+  { return BASE::Find (which); }				\
+  int FindKey (const TYPE* value) const				\
+  { return BASE::FindKey (value); }				\
+  inline void Push (TYPE* what)					\
+  { BASE::Push (what); }					\
+  inline TYPE* Pop ()						\
+  { return (TYPE*)BASE::Pop (); }				\
+  bool Delete (int n)						\
+  { return BASE::Delete (n); }					\
+  void DeleteAll ()						\
+  { BASE::DeleteAll (); }					\
+  bool Insert (int n, TYPE* Item)				\
+  { return BASE::Insert (n, Item); }				\
+  virtual bool FreeItem (TYPE* Item)				\
+  { return BASE::FreeItem (Item); }				\
 };
 
-#define DECLARE_TYPED_VECTOR(NAME,TYPE) \
-  DECLARE_TYPED_VECTOR_WITH_BASE(NAME,TYPE,csVector)
+#define DECLARE_TYPED_VECTOR(NAME,TYPE)				\
+  DECLARE_TYPED_VECTOR_WITH_BASE (NAME,TYPE,csVector)
 
 #endif // __CSVECTOR_H__
