@@ -25,6 +25,7 @@
 #include "csutil/win32/callstack.h"
 #include "csutil/win32/wintools.h"
 
+#include <windows.h>
 #include <tlhelp32.h>
 
 static void PrintError (const char* format, ...)
@@ -103,6 +104,7 @@ static void RescanModules ()
   bool res = Module32First (hSnap, &me);
   while (res)
   {
+    SetLastError (ERROR_SUCCESS);
     if (DbgHelp::SymLoadModule64 (symInit.GetSymProcessHandle (), 0, me.szExePath,
       /*me.szExePath*/0, (LONG_PTR)me.modBaseAddr, 0) == 0)
     {
@@ -163,6 +165,7 @@ void cswinCallStack::AddFrame (const STACKFRAME64& frame)
   stackFrame.Virtual = frame.Virtual;
 
   entry.hasParams = false;
+  SetLastError (ERROR_SUCCESS);
   bool result = DbgHelp::SymSetContext (symInit.GetSymProcessHandle (), 
     &stackFrame, 0);
   if (!result)
@@ -170,6 +173,7 @@ void cswinCallStack::AddFrame (const STACKFRAME64& frame)
     // Bit hackish: if SymSetContext() failed, scan the loaded DLLs
     // and try to load their debug info.
     RescanModules ();
+    SetLastError (ERROR_SUCCESS);
     result = DbgHelp::SymSetContext (symInit.GetSymProcessHandle (), 
       &stackFrame, 0);
   }
@@ -281,6 +285,7 @@ bool cswinCallStack::GetParameters (size_t num, csString& str)
 
 class CurrentThreadContextHelper
 {
+public:
   HANDLE mutex;
 
   struct ContextThreadParams
@@ -296,7 +301,6 @@ class CurrentThreadContextHelper
   HANDLE evFinishedWork;
 
   static DWORD WINAPI ContextThread (LPVOID lpParameter);
-public:
   CurrentThreadContextHelper ();
   ~CurrentThreadContextHelper ();
 
@@ -325,6 +329,20 @@ CurrentThreadContextHelper::~CurrentThreadContextHelper ()
     CloseHandle (evFinishedWork);
 }
 
+/*
+  When this #define is enabled, the current thread context will not have the
+  instruction pointer somewhere in the kernel. It seems that with WinXP SP2
+  the shipped dbghelp.dll can't grok the kernel stack, so we work around this
+  by avoiding the kernel stack :P However, the approach uses some dubious
+  home-grown thread synchronization, so a safe version is supplied (and 
+  activate by not #defining AVOID_CONTEXT_IN_KERNEL).
+ */
+#define AVOID_CONTEXT_IN_KERNEL
+
+#ifdef AVOID_CONTEXT_IN_KERNEL
+int contextGettingState;
+#endif
+
 DWORD CurrentThreadContextHelper::ContextThread (LPVOID lpParameter)
 {
   ContextThreadParams& params = *((ContextThreadParams*)lpParameter);
@@ -332,92 +350,117 @@ DWORD CurrentThreadContextHelper::ContextThread (LPVOID lpParameter)
   while (true)
   {
     WaitForSingleObject (params.evStartWork, INFINITE);
-
     if (params.context == 0)
       return 0;
 
+#ifdef AVOID_CONTEXT_IN_KERNEL
+    do
+    {
+      Sleep (0);
+    }
+    while (contextGettingState < 1);
+#endif
     SuspendThread (params.CallingThread);
     GetThreadContext (params.CallingThread, params.context);
+#ifdef AVOID_CONTEXT_IN_KERNEL
+    contextGettingState = 2;
+#endif
     ResumeThread (params.CallingThread);
 
     SetEvent (params.evFinishedWork);
   }
 }
 
-bool CurrentThreadContextHelper::GetCurrentThreadContext (CONTEXT* context)
-{
-  WaitForSingleObject (mutex, INFINITE);
-
-  /* GetThreadContext() doesn't work reliably for the current thread, so do it
-   * from another thread while the real current one is suspended. */
-  if (hThread == 0)
-  {
-    evStartWork = CreateEvent (0, false, false, 0);
-    if (evStartWork == 0)
-    {
-      ReleaseMutex (mutex);
-      return false;
-    }
-    evFinishedWork = CreateEvent (0, false, false, 0);
-    if (evFinishedWork == 0)
-    {
-      ReleaseMutex (mutex);
-      return false;
-    }
-
-    params.evStartWork = evStartWork;
-    params.evFinishedWork = evFinishedWork;
-
-    DWORD ThreadID;
-    hThread = CreateThread (0, 0, ContextThread, &params, 
-      0, &ThreadID);
-    if (hThread == 0)
-    {
-      ReleaseMutex (mutex);
-      return false;
-    }
-  }
-
-  HANDLE ThisThread;
-  if (!DuplicateHandle (GetCurrentProcess (), 
-    GetCurrentThread (), GetCurrentProcess (), &ThisThread,
-    0, false, DUPLICATE_SAME_ACCESS))
-  {
-    ReleaseMutex (mutex);
-    return false;
-  }
-
-  params.CallingThread = ThisThread;
-  params.context = context;
-
-  if (!SetEvent (evStartWork))
-  {
-    ReleaseMutex (mutex);
-    return false;
-  }
-  WaitForSingleObject (evFinishedWork, INFINITE);
-
-  CloseHandle (ThisThread);
-
-  ReleaseMutex (mutex);
-  return true;
-}
-
 static CurrentThreadContextHelper contextHelper;
 
 csCallStack* csCallStackHelper::CreateCallStack (int skip)
 {
+  const int currentContextSkip = 
+#ifdef AVOID_CONTEXT_IN_KERNEL
+    1;	// Skip CreateCallStack()
+#else
+    2;	// Skip one more to also hide SuspendThread()
+#endif
   HANDLE hProc = symInit.GetSymProcessHandle ();
   HANDLE hThread = GetCurrentThread ();
 
   CONTEXT context;
   memset (&context, 0, sizeof (context));
   context.ContextFlags = CONTEXT_FULL;
-  if (!contextHelper.GetCurrentThreadContext (&context))
-    return 0;
+
+  // This 'snippet' gets the context for the current thread
+  {
+    WaitForSingleObject (contextHelper.mutex, INFINITE);
+
+    /* GetThreadContext() doesn't work reliably for the current thread, so do it
+     * from another thread while the real current one is suspended. */
+    if (contextHelper.hThread == 0)
+    {
+      contextHelper.evStartWork = CreateEvent (0, false, false, 0);
+      if (contextHelper.evStartWork == 0)
+      {
+	ReleaseMutex (contextHelper.mutex);
+	return 0;
+      }
+      contextHelper.evFinishedWork = CreateEvent (0, false, false, 0);
+      if (contextHelper.evFinishedWork == 0)
+      {
+	ReleaseMutex (contextHelper.mutex);
+	return 0;
+      }
+
+      contextHelper.params.evStartWork = contextHelper.evStartWork;
+      contextHelper.params.evFinishedWork = contextHelper.evFinishedWork;
+
+      DWORD ThreadID;
+      contextHelper.hThread = CreateThread (0, 0, contextHelper.ContextThread, 
+	&contextHelper.params, 0, &ThreadID);
+      if (contextHelper.hThread == 0)
+      {
+	ReleaseMutex (contextHelper.mutex);
+	return 0;
+      }
+    }
+
+    HANDLE ThisThread;
+    if (!DuplicateHandle (GetCurrentProcess (), 
+      GetCurrentThread (), GetCurrentProcess (), &ThisThread,
+      0, false, DUPLICATE_SAME_ACCESS))
+    {
+      ReleaseMutex (contextHelper.mutex);
+      return 0;
+    }
+
+    contextHelper.params.CallingThread = ThisThread;
+    contextHelper.params.context = &context;
+
+  #ifdef AVOID_CONTEXT_IN_KERNEL
+    contextGettingState = 0;
+  #endif
+    if (!SetEvent (contextHelper.evStartWork))
+    {
+      ReleaseMutex (contextHelper.mutex);
+      return 0;
+    }
+
+    contextGettingState = 1;
+
+  #ifdef AVOID_CONTEXT_IN_KERNEL
+    do
+    {
+    }
+    while (contextGettingState < 2);
+  #else
+    WaitForSingleObject (contextHelper.evFinishedWork, INFINITE);
+  #endif
+
+    CloseHandle (ThisThread);
+
+    ReleaseMutex (contextHelper.mutex);
+  }
 
   return cswinCallStackHelper::CreateCallStack (hProc, hThread, context, 
-    skip + 1); // Always skip one more to hide GetCurrentThreadContext()
+    skip + currentContextSkip); 
 }
 
 csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc, 
@@ -449,8 +492,7 @@ csCallStack* cswinCallStackHelper::CreateCallStack (HANDLE hProc,
     DbgHelp::SymGetModuleBase64, 0))
   {
     count++;
-    // Always skip the first entry (this func)
-    if (count > (skip + 1)) stack->AddFrame (frame);
+    if (count > skip) stack->AddFrame (frame);
   }
 
   return stack;

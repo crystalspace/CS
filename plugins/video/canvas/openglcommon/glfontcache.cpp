@@ -233,64 +233,67 @@ void csGLFontCache::CopyGlyphData (iFont* font, utf32_char glyph, size_t tex,
 				   const csRect& texRect, iDataBuffer* bitmapDataBuf, 
 				   iDataBuffer* alphaDataBuf)
 {
-  statecache->SetTexture (GL_TEXTURE_2D, textures[tex].handle);
-
-  glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
-
-  csRGBpixel* rgbaData = new csRGBpixel[texRect.Width () * texRect.Height ()];
-
-  const int padX = texRect.Width() - bmetrics.width;
-  if (alphaDataBuf)
+  if ((texRect.Width () > 0) && (texRect.Height () > 0))
   {
-    uint8* alphaData = alphaDataBuf->GetUint8 ();
-    csRGBpixel* dest = rgbaData;
-    uint8* src = alphaData;
-    int x, y;
-    for (y = 0; y < bmetrics.height; y++)
-    {
-      for (x = 0; x < bmetrics.width; x++)
-      {
-	const uint8 val = *src++;
-	(dest++)->Set (255 - val, 255 - val, 255 - val, val);
-      }
-      dest += padX;
-    }
-  }
-  else
-  {
-    if (bitmapDataBuf)
-    {
-      uint8* bitData = bitmapDataBuf->GetUint8 ();
+    statecache->SetTexture (GL_TEXTURE_2D, textures[tex].handle);
 
+    glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
+
+    csRGBpixel* rgbaData = new csRGBpixel[texRect.Width () * texRect.Height ()];
+
+    const int padX = texRect.Width() - bmetrics.width;
+    if (alphaDataBuf)
+    {
+      uint8* alphaData = alphaDataBuf->GetUint8 ();
       csRGBpixel* dest = rgbaData;
-      uint8* src = bitData;
-      uint8 byte = *src++;
+      uint8* src = alphaData;
       int x, y;
       for (y = 0; y < bmetrics.height; y++)
       {
 	for (x = 0; x < bmetrics.width; x++)
 	{
-	  const uint8 val = (byte & 0x80) ? 0xff : 0;
+	  const uint8 val = *src++;
 	  (dest++)->Set (255 - val, 255 - val, 255 - val, val);
-	  if ((x & 7) == 7)
-	  {
-	    byte = *src++;
-	  }
-	  else
-	  {
-	    byte <<= 1;
-	  }
 	}
-	if ((bmetrics.width & 7) != 0) byte = *src++;
 	dest += padX;
       }
     }
-  }
+    else
+    {
+      if (bitmapDataBuf)
+      {
+	uint8* bitData = bitmapDataBuf->GetUint8 ();
 
-  glTexSubImage2D (GL_TEXTURE_2D, 0, texRect.xmin, texRect.ymin, 
-    texRect.Width (), texRect.Height (), 
-    GL_RGBA, GL_UNSIGNED_BYTE, rgbaData);
-  delete[] rgbaData;
+	csRGBpixel* dest = rgbaData;
+	uint8* src = bitData;
+	uint8 byte = *src++;
+	int x, y;
+	for (y = 0; y < bmetrics.height; y++)
+	{
+	  for (x = 0; x < bmetrics.width; x++)
+	  {
+	    const uint8 val = (byte & 0x80) ? 0xff : 0;
+	    (dest++)->Set (255 - val, 255 - val, 255 - val, val);
+	    if ((x & 7) == 7)
+	    {
+	      byte = *src++;
+	    }
+	    else
+	    {
+	      byte <<= 1;
+	    }
+	  }
+	  if ((bmetrics.width & 7) != 0) byte = *src++;
+	  dest += padX;
+	}
+      }
+    }
+
+    glTexSubImage2D (GL_TEXTURE_2D, 0, texRect.xmin, texRect.ymin, 
+      texRect.Width (), texRect.Height (), 
+      GL_RGBA, GL_UNSIGNED_BYTE, rgbaData);
+    delete[] rgbaData;
+  }
 }
 
 void csGLFontCache::FlushArrays ()

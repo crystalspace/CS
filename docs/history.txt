@@ -26,6 +26,9 @@ chronological order.
 	- res added some error reporting to the Win32 callstack code and other 
 	  various improvements.
 	- res fixed leaks in chunklod.
+	- res changed the Win32 call stack generator to not start with the 
+	  stack in the kernel. This also seems to fix call stack generation
+	  on WinXP SP2.
 27-Sep-2004
 	- dfryer changed "unsigned int" to size_t in
 	  csXMLShaderTech::ActivatePass().  Prototype used size_t; size_t is
