@@ -12,6 +12,12 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+24-Jun-99:
+	- Renamed MarkVisibleThing() to GetVisibleThings().
+	- The optimization with lighting and bounding boxes is active now.
+	- The bounding box creation also works for curves now.
+23-Jun-99:
+	- Fixed another serious bug with lighting.
 22-Jun-99:
 	- Thomas Hieber cleaned up the software renderer some more.
 	  He unified most routines for scanline drawing.
