@@ -170,7 +170,7 @@ DO.LINK.EXE = \
     "$(DESCRIPTION.$(TARGET.RAW))" "$(SRCDIR)/include/csver.h" $(COMMAND_DELIM) \
   $(MERGERES) $(OUT)/$(@:$(EXE)=-rsrc.rc) $(SRCDIR) $(SRCDIR) \
     $(OUT)/$(@:$(EXE)=-version.rc) $($@.WINRSRC) $(COMMAND_DELIM) \
-  $(COMPILE_RES) -i $(OUT)/$(@:$(EXE)=-rsrc.rc) \
+  $(COMPILE_RES) -i $(OUT)/$(@:$(EXE)=-rsrc.rc) --include-dir="$(SRCDIR)/include" \
     -o $(OUT)/$(@:$(EXE)=-rsrc.o) $(COMMAND_DELIM) \
   $(LINK) $(LFLAGS) $(LFLAGS.EXE) $(LFLAGS.@) $(^^) \
     $(OUT)/$(@:$(EXE)=-rsrc.o) $(L^) $(LIBS) $(LIBS.EXE.PLATFORM)
