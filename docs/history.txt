@@ -1,5 +1,13 @@
 The history order is reversed so that new features are at the top.
 
+26-Nov-2001
+	- Added documentation for terrain engine.
+	- Extended documentation on the format of the plugin loaders
+	  by also adding the format of every keyword.
+	- Fixed EMITSPHERE and EMITCONE keywords in emit loader. The csScanStr
+	  used there had the wrong number of parameters.
+	- Increased the number of hardcoded vertices in a limb (skeletal
+	  animation) from 1000 to 20000. Still hardcoded though.
 24-Nov-2001
 	- Added more debug graph commands for iImage. Also added links to
 	  iImage and the texture manager for the 3D renderers. This reveals

@@ -92,38 +92,38 @@ transformations in the skeleton connectors are identity transformations).
 @subsubheading Factory Loader
 
 @table @code
-@item MATERIAL
+@item MATERIAL(materialName)
 Material to use for the sprite.
-@item FRAME
+@item FRAME(V(x,y,z:u,v) @dots{})
 Define one frame.  A frame is a list of vertices which are specified using the
 @samp{V} keyword.  Every vertex has a 3D position in object space and (u,v)
 coordinates in the given texture (from 0 to 1).  Note that every frame needs to
 have the same number of vertices.
-@item ACTION
+@item ACTION(F(@dots{}) @dots{})
 Define one action.  An action is a list of frames.  Every frame is annotated
 with the @samp{F} keyword which contains the name of the frame to use and a
 delay.
-@item SKELETON
+@item SKELETON(@dots{})
 Define a skeleton. See below for keywords in skeleton.
-@item TRIANGLE
+@item TRIANGLE(i1,i2,i3)
 Define one triangle.  The three parameters are the indices for the three
 triangle vertices.
-@item SMOOTH
+@item SMOOTH(base,frame)
 Defines how to apply normal smoothing on the sprite.
-@item TWEEN
+@item TWEEN(boolean)
 Set to true if you want to enable frame tweening.  Default is false.
 @end table
 
 A skeleton is a hierarchial structure which is defined as follows:
 
 @table @code
-@item LIMB
+@item LIMB(@dots{})
 A limb defines a connection to a child limb.  This is where the hierarchy kicks
 in.  Inside @samp{LIMB} you use the same keywords as on this level.
-@item VERTICES
+@item VERTICES(v1,@dots{})
 This is a list of vertex indices from the main frame.  This limb will control
 the given vertices.
-@item TRANSFORM
+@item TRANSFORM(@dots{})
 Specify the default transformation to use for this limb with relation to its
 parent (cannot be used on the top level).
 @end table
@@ -153,20 +153,20 @@ defined in @file{CS/include/imesh/sprite3d.h}:
 @subsubheading Object Loader
 
 @table @code
-@item FACTORY
+@item FACTORY(factoryName)
 Name of the factory to use for creation of this instance.
-@item MIXMODE
+@item MIXMODE(mode)
 Blending mode, one of @samp{ADD}, @samp{ALPHA}, @samp{COPY}, @samp{KEYCOLOR},
 @samp{MULTIPLY2}, @samp{MULTIPLY}, or @samp{TRANSPARENT}.
-@item MATERIAL
+@item MATERIAL(materialName)
 Material to use for the sprite.
-@item TWEEN
+@item TWEEN(boolean)
 Set to true if you want to enable frame tweening.  Default is false.
-@item LIGHTING
+@item LIGHTING(boolean)
 Set to true if you want to enable lighting.  Default is true.
-@item BASECOLOR
+@item BASECOLOR(r,g,b)
 Base color that will be added to all vertex colors. Default 0,0,0.
-@item ACTION
+@item ACTION(actionName)
 The default action to use for this sprite instance.
 @end table
 

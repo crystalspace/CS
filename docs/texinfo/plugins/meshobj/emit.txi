@@ -173,47 +173,48 @@ Also see the general documentation for particle systems for other recognized
 keywords.  @xref{MeshObject PartSys}.
 
 @table @code
-@item RECTPARTICLES
+@item RECTPARTICLES(width,height)
 Set the width and height of the particles rectangular shape.
-@item REGULARPARTICLES
+@item REGULARPARTICLES(numSides,radius)
 Set the number of sides and a radius of the regular shaped particles.
-@item TOTALTIME
+@item TOTALTIME(totalTime)
 Set the maximum age in milliseconds.
-@item LIGHTING
+@item LIGHTING(boolean)
 Disable or enable lighting for the particles
-@item NUMBER
+@item NUMBER(numberParticles)
 Set the number of particles
-@item STARTPOS
+@item STARTPOS(@dots{})
 Give an @sc{emit} object for starting position.
-@item STARTSPEED
+@item STARTSPEED(@dots{})
 Give the starting speed @sc{emit}.
-@item STARTACCEL
+@item STARTACCEL(@dots{})
 Give the starting acceleration @sc{emit}.
-@item ATTRACTORFORCE
+@item ATTRACTORFORCE(force)
 Give the attractor force value.
-@item ATTRACTOR
+@item ATTRACTOR(@dots{})
 Give the @sc{emit} that makes attracting points (per particle).
-@item AGING
+@item AGING(time,r,g,b,alpha,swirl,rotspeed,scale)
 Give a age time, colour red, colour green, colour blue, alpha, swirl, 
 rotationspeed and scale. 
-@item EMITFIXED
+@item EMITFIXED(x,y,z)
 Fixed (x, y, z) emitter.
-@item EMITBOX
+@item EMITBOX(minx,miny,minz,maxx,maxy,maxz)
 Box emitter, min x,y,z, max x,y,z.
-@item EMITSPHERE
+@item EMITSPHERE(x,y,z,min,max)
 Sphere emitter, origin x,y,z, min, max.
-@item EMITCONE
+@item EMITCONE(x,y,z,elevation,azimuth,aperture,minradius,maxradius)
 Cone emitter, start x,y,z, elevation, azimuth, aperture, min,max radius.
-@item EMITMIX
+@item EMITMIX(@dots{})
 Use several @samp{EMITMIX} keywords in a row to create a mix with several
 @sc{emit}s.  Inside each @samp{EMITMIX}, @code{WEIGHT(value)} can be used to
 set the weight.
-@item EMITLINE
+@item EMITLINE(x1,y1,z1,x2,y2,z2)
 Line emitter, start, end point.
-@item EMITCYLINDER
+@item EMITCYLINDER(x1,y1,z1,x2,y2,z2,mindist,maxdist)
 Cylinder emitter, start, end point, min, max distance.
-@item EMITCYLINDERTANGENT
+@item EMITCYLINDERTANGENT(x1,y1,z1,x2,y2,z2,minspeed,maxspeed)
 CylinderTangent emitter. Give start, end point, min, max speed.
-@item EMITSPHERETANGENT
+@item EMITSPHERETANGENT(x,y,z,minspeed,maxspeed)
 SphereTangent emitter. Give origin, min, max speed.
 @end table
+

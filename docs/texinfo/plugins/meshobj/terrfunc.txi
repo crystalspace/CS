@@ -11,7 +11,202 @@
 @emph{Written by Jorrit Tyberghein,
 (@email{jorrit.tyberghein@@uz.kuleuven.ac.be}).}
 
-@strong{DOCUMENTATION NOT UP-TO-DATE}
+This mesh object represents a landscape engine. It features four static
+@sc{lod} levels and dynamic lighting for one directional light. In future
+it will also have support for dynamic shadows but this is still a todo
+at this moment.
 
-This mesh object represents a landscape engine.
+The basic principle behind the terrain engine is that the entire terrain
+is divided in a number of blocks. Usually this is equal to 8x8 blocks
+for the terrain but this is something that you can control. The division
+into blocks is important for three reasons. The first reason is that @sc{lod}
+selection happens on a block level. i.e. every block is shown at one level
+of @sc{lod} independent from the other blocks. The second reason is that
+visibility culling for terrain engine also works on block granularity (also
+the visibility algo itself goes deeper for doing the actual tests). The
+last reason for the blocks is that every block can have a seperate texture.
+This is important because some hardware has texture limitations and you
+often want to overlay a very big texture on a landscape. Since very block
+has its own texture you can do this easily.
+
+The terrain engine is based on a height function (as opposed to a heightmap
+alone). Support for heightmaps is provided too by converting a heightmap
+to a height function. But in general you can feed the terrain engine with
+any function @code{height=heightfunc(x,y)}. You can also optionally give
+a normal function. If not given the landscape engine will calculate normals
+from the height function automatically.
+
+Every block is further divided into a grid. For example, with a grid
+of 16x16 every block will have 16x16 quads or 16x16x2 triangles at the
+highest detail level. The combination of blocks and grids control how
+many triangles the entire terrain will have.
+
+The terrain engine supports four levels of @sc{lod} which it will use
+independently for every block. Level 0 is highest detail. You can control
+the distance at which every @sc{lod} level kicks in and you can also
+control the quality of every level.
+
+The terrain engine supports a visibility algorithm based on a quad-tree.
+The visibility algorithm will cull away geometry on a blocks level (i.e.
+either an entire block is visible or not). But internally it will use
+a quad-tree which can (and should) go deeper than the blocks resolution
+to make sure that the visibility testing is fine enough.
+
+Every block has its own texture. You can use a big texture and split it
+into individual parts. One part for every block. Crystal Space also has
+a texture generation utility which is able to create realistic terrain
+textures given several base textures and a heightmap.
+
+The terrain engine also supports one colored directional light without
+shadows. In the future we will have support for dynamic shadows.
+
+@subsubheading Basic Structure
+
+The following @sc{scf} class names are used (for @code{CS_LOAD_PLUGIN()}):
+
+@itemize @bullet
+@item
+Type plugin: @samp{crystalspace.mesh.object.terrfunc}
+@item
+Loader plugin: @samp{crystalspace.mesh.loader.terrfunc}
+@item
+Factory loader plugin: @samp{crystalspace.mesh.loader.factory.terrfunc}
+@end itemize
+
+Objects in this plugin implement the following @sc{scf} interfaces (get
+with @code{SCF_QUERY_INTERFACE()}):
+
+@itemize @bullet
+@item
+@emph{MeshObject}
+@itemize @bullet
+@item
+Implements @samp{iMeshObject}
+@item
+Implements @samp{iTerrFuncState}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectFactory}
+@end itemize
+@item
+@emph{MeshObjectFactory}
+@itemize @bullet
+@item
+Implements @samp{iMeshObjectType}
+@end itemize
+@end itemize
+
+@subsubheading Factory State Interface
+
+This plugin has no factory state interface.
+
+@subsubheading Factory Loader
+
+The fire mesh factory loader has no parameters.
+
+@subsubheading Object State Interface
+
+@samp{iTerrFuncState} is the @sc{scf} interface that you can
+use to set/get settings for a landscape object. The definition of this
+interface can be found in @file{CS/include/imesh/terrfunc.h} and that's also
+the include file you need to include in your applications to use this plugin.
+Using this interface you can access the terrain parameters.
+
+@subsubheading Object Loader
+
+The terrain loader recognizes the following keywords:
+
+@table @code
+@item FACTORY(factoryName)
+Name of the factory to use for creation of this instance.
+@item MATERIAL(number,materialName)
+The material to use for the given block of the terrain. The
+block number is 0 to the total number of blocks (see the
+@samp{BLOCKS} command).
+@item ALLMATERIAL(materialName)
+The material to use for all blocks of the terrain.
+@item GROUPMATERIAL(materialNameFormat,start,end)
+@samp{materialNameFormat} is a @code{printf} style string
+containing a @code{%d} to indicate the number used for the material
+name. @samp{start} and @samp{end} indicate the range of materials
+to set (block numbers).
+@item CORRECTSEAMS(textureWidth,textureHeight)
+When the given materials are split from a big texture you can use
+@samp{CORRECTSEAMS} to make sure the textures line up correctly at
+the borders of blocks. Here is an example. Given a terrain of 8x8
+blocks (64 total) and given a texture size of 128x128 for every block
+you would have to generate a total big texture with horizontal and
+vertical dimensions equal to @code{(partsize-2)*8+2}. In this case (with
+partsize equal to 128) this would mean a total texture of 1010x1010 where
+every block gets a 128x128 texture where the borders are shared with the
+adjacent block (hence the 126x126 that is really allocated for one block).
+If you follow these guidelines you can then use @code{CORRECTSEAMS(128,128)}
+and you will have perfectly aligned textures for all 8x8 blocks.
+@item BLOCKS(xblocks,yblocks)
+The number of blocks in horizontal and vertical direction. Blocks are
+important for visibility culling and @sc{lod} selection because these happen
+on a block level. So you should use enough blocks to make sure that
+everything works smoothly. 8x8 is probably a good bet in most cases.
+4x4 is a default though.
+Warning! Due to a current limitation in the terrain
+engine the number of horizontal blocks must be equal to the number of
+vertical blocks.
+@item GRID(xgrid,ygrid)
+With @samp{GRID} you control the highest detail resolution of every
+block. For example @code{GRID(16,16)} means that every block will use
+16x16 quads (or 16x16x2 triangles) at highest detail. The default value
+for @samp{GRID} is 8x8.
+@item TOPLEFT(x,y,z)
+The top-left coordinate of the terrain. By default this is (0,0,0).
+For @samp{x} and @samp{z} the terrain will be generated from 0 to
+@samp{xblocks-1} and @samp{yblocks-1} respectively. Use @samp{SCALE}
+to scale this first and then use @samp{TOPLEFT} to relocate.
+The @samp{y} value in @samp{TOPLEFT} will be added to the height
+function (after scaling).
+@item SCALE(x,y,z)
+Scale the entire terrain. @samp{x} and @samp{z} will scale the
+default 0 to @samp{xblocks-1} and @samp{yblocks-1}. The @samp{y}
+scale will be used to multiply with the value from the height function.
+@item COLOR(r,g,b)
+This is the base color which will be added to all triangle of the
+terrain. Consider this a kind of ambient lighting. Default is black.
+Full bright would be @code{1,1,1}.
+@item DIRLIGHT(x,y,z:r,g,b)
+Set a directional light. @code{x,y,z} is a normal vector for the light.
+@code{r,g,b} is the color of the light.
+@item LODDIST(lodlevel,distance)
+Set the distance at which we switch to the given @sc{lod} level. @sc{lod}
+level 0 (highest detail) is always used for very close viewpoints but you
+can control distance for levels 1, 2, and 3. Default values are 100,
+400, and 800 for the three levels. Note that @sc{lod} happens on a
+block basis so for every block the distance here will be used to see
+what @sc{lod} level to select.
+@item LODCOST(lodlevel,maxcost)
+Set the cost factor to use for going from the previous @sc{lod} level
+to the new one. High values for @samp{maxcost} mean that more triangles
+will be removed (i.e. better @sc{lod} but worse quality). The default
+values are @code{0.03}, @code{0.08}, and @code{0.2}. So @samp{LODDIST}
+controls at which distance a new @sc{lod} level is selected while
+@samp{LODCOST} controls the quality of every @sc{lod} level. The base
+quality (i.e. highest quality) of every block is controlled with the
+@samp{GRID} command.
+@item QUADDEPTH(quaddepth)
+Control the depth of the quad-tree which is used for visibility culling.
+This depth is measured from the entire terrain. Usually you make sure
+that the depth is high enough so that individual blocks are at least
+sub-divided about three extra times. i.e. given a terrain with 8x8 blocks
+you would probably want to use a depth of six (which is default). Higher
+quadtree depth's will increase the cost of visibility culling but also
+increase the accuracy. So a higher depth will be more important for a
+slow renderer (software renderer for example).
+@item VISTEST(enabled)
+Enable or disable visibility culling. Default is on.
+@item HEIGHTMAP(heightmapFile,scale,shift)
+Use the given image file as a heightmap for the landscape. Values from
+this heightmap will go between 0 and 256. You can alter the range by
+playing with @samp{scale} (default 1) and @samp{shift} (default 0).
+@end table
 

@@ -31,13 +31,13 @@ the loader for the object. In addition it will add particle system specific
 keywords which are explained in the respective sections.
 
 @table @code
-@item FACTORY
+@item FACTORY(factoryName)
 Name of the factory to use for creation of this instance.
-@item MIXMODE
+@item MIXMODE(mode)
 Blending mode, one of @samp{ADD}, @samp{ALPHA}, @samp{COPY}, @samp{KEYCOLOR},
 @samp{MULTIPLY2}, @samp{MULTIPLY}, or @samp{TRANSPARENT}.
-@item MATERIAL
+@item MATERIAL(materialName)
 Material to use for the particle system.
-@item COLOR
+@item COLOR(r,g,b)
 Color to use for all particles.
 @end table

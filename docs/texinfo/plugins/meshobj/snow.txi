@@ -82,16 +82,16 @@ Also see the general documentation for particle systems for other recognized
 keywords.  @xref{MeshObject PartSys}.
 
 @table @code
-@item DROPSIZE
+@item DROPSIZE(width,height)
 Size of the droplets for the snow (width and height).
-@item BOX
+@item BOX(minx,miny,minz,maxx,maxy,maxz)
 Box that will contain the snow particles.  Give two 3D coordinates here.
-@item FALLSPEED
+@item FALLSPEED(x,y,z)
 Speed of the snow.
-@item SWIRL
+@item SWIRL(swirlValue)
 Swirl.
-@item LIGHTING
+@item LIGHTING(boolean)
 Disable or enable lighting for the snow particles.
-@item NUMBER
+@item NUMBER(nrParticles)
 Number of particles to use.
 @end table

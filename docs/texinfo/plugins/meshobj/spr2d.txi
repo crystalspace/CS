@@ -71,18 +71,18 @@ can access the material, blending mode (mixmode), and lighting settings.
 @subsubheading Factory Loader
 
 @table @code
-@item LIGHTING
+@item LIGHTING(boolean)
 Enable/disable lighting.
-@item MATERIAL
+@item MATERIAL(materialName)
 Material to use for the polygon.
-@item MIXMODE
+@item MIXMODE(mode)
 Blending mode; one of @samp{ADD}, @samp{ALPHA}, @samp{COPY}, @samp{KEYCOLOR},
 @samp{MULTIPLY2}, @samp{MULTIPLY}, or @samp{TRANSPARENT}.
-@item UVANIMATION
+@item UVANIMATION(FRAME (@dots{}) @dots{})
 Define an uv animation, that is a sequence of frames which textures are all in
 one big texture.  Thus the animation is achieved by altering the (u,v)
 coordinates of the polygon defined by this sprite.
-@item FRAME
+@item FRAME(ms,vertices @dots{})
 Defines a single frame within an uv animation by specifying its duration in
 milliseconds and the u,v coordinates to use.
 @itemize

@@ -349,7 +349,7 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
 	break;
       case CS_TOKEN_EMITSPHERE:
         {
-          csScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, &p, &q);
+          csScanStr (params, "%f,%f,%f,%f,%f", &a.x, &a.y, &a.z, &p, &q);
 	  iEmitSphere *esphere = fstate->CreateSphere();
 	  esphere->SetContent(a, p, q);
 	  result = esphere;
@@ -357,7 +357,7 @@ static iEmitGen3D* ParseEmit (char* buf, iEmitFactoryState *fstate,
 	break;
       case CS_TOKEN_EMITCONE:
         {
-          csScanStr (params, "%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z,
+          csScanStr (params, "%f,%f,%f,%f,%f,%f,%f,%f", &a.x, &a.y, &a.z,
 	    &p, &q, &r, &s, &t);
 	  iEmitCone *econe = fstate->CreateCone();
 	  econe->SetContent(a, p, q, r, s, t);

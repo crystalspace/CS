@@ -83,8 +83,8 @@ Also see the general documentation for particle systems for other recognized
 keywords.  @xref{MeshObject PartSys}.
 
 @table @code
-@item SOURCE
+@item SOURCE(x,y,z)
 Source of the spiral (3D coordinate).
-@item NUMBER
+@item NUMBER(nrParticles)
 Number of particles to use.
 @end table

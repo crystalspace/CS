@@ -73,31 +73,31 @@ and radius.
 @subsubheading Object Loader
 
 @table @code
-@item FACTORY
+@item FACTORY(factoryName)
 Name of the factory to use for creation of this instance.
-@item MIXMODE
+@item MIXMODE(mode)
 Blending mode, one of @samp{ADD}, @samp{ALPHA}, @samp{COPY}, @samp{KEYCOLOR},
 @samp{MULTIPLY2}, @samp{MULTIPLY}, or @samp{TRANSPARENT}.
-@item MATERIAL
+@item MATERIAL(materialName)
 Material to use for the ball.
-@item NUMRIM
+@item NUMRIM(number)
 Number of vertices on the rim of the ball (i.e. the number of vertices along
 the equator).  A good default is 6.
-@item RADIUS
+@item RADIUS(x,y,z)
 Three parameters for x, y, and z radius.
-@item SHIFT
+@item SHIFT(x,y,z)
 Three parameters for x, y, and z shift.
-@item REVERSED
+@item REVERSED(boolean)
 Reverse the order of the triangles so that the ball is visible from the
 inside instead of the outside.
-@item TOPONLY
+@item TOPONLY(boolean)
 Only generate the top triangles instead of two halves.
-@item CYLINDRICAL
+@item CYLINDRICAL(boolean)
 Use cylindrical texture mapping instead of only a circle from the
 texture (default off).
-@item LIGHTING
+@item LIGHTING(boolean)
 Enable/disable lighting. Default on.
-@item COLOR
+@item COLOR(r,g,b)
 Set the base color to use for the ball. This color will be added to the
 color calculated by lighting (if lighting is enabled).
 @end table

@@ -67,14 +67,14 @@ and various settings related to the shape of the cube.
 @subsubheading Factory Loader
 
 @table @code
-@item MATERIAL
+@item MATERIAL(materialName)
 Material to use for the polygon.
-@item MIXMODE
+@item MIXMODE(mode)
 Blending mode, one of @samp{ADD}, @samp{ALPHA}, @samp{COPY}, @samp{KEYCOLOR},
 @samp{MULTIPLY2}, @samp{MULTIPLY}, or @samp{TRANSPARENT}.
-@item SIZE
+@item SIZE(x,y,z)
 Size of the cube in x, y, and z direction.
-@item SHIFT
+@item SHIFT(x,y,z)
 Shift of the cube in x, y, z direction.
 @end table
 
@@ -85,7 +85,7 @@ This plugin has no object state interface.
 @subsubheading Object Loader
 
 @table @code
-@item FACTORY
+@item FACTORY(factoryName)
 Name of the factory to use for creation of this instance.
 @end table
 
