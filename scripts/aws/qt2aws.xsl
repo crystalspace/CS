@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
-    Copyright (C) 2002 by Norman Krämer
+    Copyright (C) 2002 by Norman Kraemer
   
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
