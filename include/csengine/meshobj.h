@@ -551,18 +551,6 @@ public:
     {
       return scfParent->WantToDie ();
     }
-    virtual void MarkVisible ()
-    {
-      scfParent->MarkVisible ();
-    }
-    virtual void MarkInvisible ()
-    {
-      scfParent->MarkInvisible ();
-    }
-    virtual bool IsVisible () const
-    {
-      return scfParent->IsVisible ();
-    }
   } scfiMeshWrapper;
   friend struct MeshWrapper;
 

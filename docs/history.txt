@@ -6,6 +6,11 @@ The history order is reversed so that new features are at the top.
 	- Fixed another memory leak (in csparser) with images. Now there
 	  only seems to be a remaining leak with procedural textures and
 	  OpenGL.
+	- Removed MarkVisible(), IsVisible() and MarkInvisible() from
+	  iMeshWrapper. These are private functions and not to be used
+	  from user code.
+	- Removed RelinkMesh() from iSector. This is a private function
+	  and not to be used from user code.
 28-Nov-2001
 	- Made the test on bad UV coordinates for a polygon a little
 	  bit more strict so that it rejects more polygons. There were

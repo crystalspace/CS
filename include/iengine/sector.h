@@ -71,12 +71,6 @@ struct iSector : public iBase
   /// Get the list of static and pseudo-dynamic lights in this sector.
   virtual iLightList* GetLights () = 0;
 
-  /**
-   * Relink a mesh in the sector. This function is called automatically by a
-   * mesh wrapper when the render priority has been changed. internal use only.
-   */
-  virtual void RelinkMesh (iMeshWrapper*) = 0;
-
   /// Calculate lighting for all objects in this sector
   virtual void ShineLights () = 0;
   /// Version of ShineLights() which only affects one mesh object.

@@ -658,7 +658,7 @@ void csSector::Draw (iRenderView* rview)
       for (j = 0 ; j < v->Length () ; j++)
       {
         iMeshWrapper* sp = v->Get (j);
-        if (!UseCuller || sp->IsVisible ())
+        if (!UseCuller || sp->GetPrivateObject ()->IsVisible ())
 	{
           if (!PreviousSector || sp->GetMovable ()->GetSectors ()->
     	      Find (PreviousSector) == -1)

@@ -113,7 +113,7 @@ struct iMeshDrawCallback : public iBase
 };
 
 
-SCF_VERSION (iMeshWrapper, 0, 1, 17);
+SCF_VERSION (iMeshWrapper, 0, 1, 18);
 
 /**
  * A mesh wrapper is an engine-level object that wraps around an actual
@@ -330,13 +330,6 @@ struct iMeshWrapper : public iBase
    * Returns true if the object wants to die.
    */
   virtual bool WantToDie () = 0;
-
-  /// Mark this object as visible
-  virtual void MarkVisible () = 0;
-  /// Mark this object as invisible.
-  virtual void MarkInvisible () = 0;
-  /// Return if this object is marked as visible or invisible.
-  virtual bool IsVisible () const = 0;
 };
 
 SCF_VERSION (iMeshFactoryWrapper, 0, 1, 6);

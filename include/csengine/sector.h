@@ -433,8 +433,6 @@ public:
       { return scfParent->GetMeshes (); }
     virtual iLightList* GetLights ()
       { return scfParent->GetLights (); }
-    virtual void RelinkMesh (iMeshWrapper* m)
-      { scfParent->RelinkMesh (m); }
     virtual void ShineLights ()
       { scfParent->ShineLights (); }
     virtual void ShineLights (iMeshWrapper* mesh)

@@ -156,7 +156,7 @@ void csMeshWrapper::SetRenderPriority (long rp)
   for (i = 0 ; i < sectors->GetCount () ; i++)
   {
     iSector* ss = sectors->Get (i);
-    if (ss) ss->RelinkMesh (&scfiMeshWrapper);
+    if (ss) ss->GetPrivateObject ()->RelinkMesh (&scfiMeshWrapper);
   }
 }
 
