@@ -85,6 +85,10 @@ groups = [
 #    cflagsskey
 #        Name of key in `my.doc' hash specifying array of additional compiler
 #        flags for this build mode for the specific project being generated.
+#    incdirskey
+#        Name of the key in `my.doc' hash specifying array of additional header
+#        search directories for this build mode for the specific project being
+#        generated.
 #    lflags
 #        Array of additional linker flags for this build mode.
 #    lflagskey
@@ -97,6 +101,10 @@ groups = [
 #        Name of key in `my.doc' hash specifying array of additional library
 #        dependencies for this build mode for the specific project being
 #        generated.
+#    libdirskey
+#        Name of the key in `my.doc' hash specifying array of additional
+#        library search directories for this build mode for the specific
+#        project being generated.
 #------------------------------------------------------------------------------
 builds = [
   {
@@ -105,8 +113,10 @@ builds = [
     defines => ['NDEBUG'],
     defineskey => 'define',
     cflagskey => 'cflags',
+    incdirskey => 'include',
     lflagskey => 'lflags',
     libskey => 'library',
+    libdirskey => 'libdir',
     priority => 100
   },
   {
@@ -115,8 +125,10 @@ builds = [
     defines => ['_DEBUG','CS_DEBUG'],
     defineskey => 'definedebug',
     cflagskey => 'cflagsdebug',
+    incdirskey => 'includedebug',
     lflagskey => 'lflagsdebug',
     libskey => 'librarydebug',
+    libdirskey => 'libdirdebug',
     priority => 200
   }
 ];

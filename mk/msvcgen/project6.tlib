@@ -23,9 +23,9 @@
   PROCESS projectx6.tlib;
 
   MACRO composedefs(defs) GET compose('defines', defs, ' ', '/D "', '"');
-  MACRO composedirs(key, seed, directive) BLOCK;
+  MACRO composedirs(tag, seed, directive) BLOCK;
     prefix = directive _ '"';
-    GET composepaths(key, seed, ' ', prefix, '"');
+    GET composepaths(${"build.${tag}key"}, seed, ' ', prefix, '"');
   END;
 
   my = {};
@@ -83,11 +83,11 @@ RSC=rc.exe
 [% interpolate('ignoreexportlib') -%]
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /vmb /vms /W3 /Gm /G5 /D "WIN32" /FD /c
-# ADD CPP /nologo /vmb /vms /W3 /Gm /GX /G5 /FD /c [% interpolate('addcpp', ' ') %] /D "_MT" /D "_MBCS" [% composedefs(['WIN32','CS_WIN32_CSCONFIG','__CRYSTAL_SPACE__']) %] [% flags(compose('cflags', [], ' ')) %] [% composedirs('include', ['.'], '/I ') %]
+# ADD CPP /nologo /vmb /vms /W3 /Gm /GX /G5 /FD /c [% interpolate('addcpp', ' ') %] /D "_MT" /D "_MBCS" [% composedefs(['WIN32','CS_WIN32_CSCONFIG','__CRYSTAL_SPACE__']) %] [% flags(compose('cflags', [], ' ')) %] [% composedirs('incdirs', ['.'], '/I ') %]
 # ADD BASE MTL /nologo /mktyplib203 /o "NUL" /win32
 # ADD MTL /nologo /mktyplib203 /o "NUL" /win32 [% composedefs([]) %]
 # ADD BASE RSC /l 0x409
-# ADD RSC /l 0x409 /fo".\[% workbuild([my.doc.project.0,'.res']) %]" [% composedefs(['CS_WIN32_CSCONFIG', '__CRYSTAL_SPACE__']) %] [% composedirs('include', ['.'], '/i ') %]
+# ADD RSC /l 0x409 /fo".\[% workbuild([my.doc.project.0,'.res']) %]" [% composedefs(['CS_WIN32_CSCONFIG', '__CRYSTAL_SPACE__']) %] [% composedirs('incdirs', ['.'], '/i ') %]
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -96,7 +96,7 @@ LIB32=link.exe -lib
 # ADD LIB32 /nologo [% interpolate('addlib32') %]
 LINK32=link.exe
 # ADD BASE LINK32 user32.lib gdi32.lib advapi32.lib /nologo /machine:I386
-# ADD LINK32 shell32.lib user32.lib gdi32.lib advapi32.lib [% compose('libs', [], ' ') %] [% interpolate('delaylibs', ' ') %] /nologo /version:4.0 /machine:I386 [% interpolate('linkeropts', ' ') %] [% interpolate('addlink32') %] [% composedirs('libdir', [], '/libpath:') %] [% flags(compose('lflags', [], ' ')) %]
+# ADD LINK32 shell32.lib user32.lib gdi32.lib advapi32.lib [% compose('libs', [], ' ') %] [% interpolate('delaylibs', ' ') %] /nologo /version:4.0 /machine:I386 [% interpolate('linkeropts', ' ') %] [% interpolate('addlink32') %] [% composedirs('libdirs', [], '/libpath:') %] [% flags(compose('lflags', [], ' ')) %]
 # Begin Special Build Tool
 SOURCE="$(InputPath)"
 [% interpolate('postbuild') -%]

@@ -23,7 +23,7 @@
   PROCESS projectx7.tlib;
 
   MACRO composedefs(defs) GET compose('defines', defs, ';');
-  MACRO composedirs(key, seed) GET composepaths(key, seed, ';');
+  MACRO composedirs(tag, seed) GET composepaths(${"build.${tag}key"},seed,';');
 
   my = {};
   load(respfile, 'doc');
@@ -58,7 +58,7 @@ END -%]
 [%- composedefs(['WIN32','CS_WIN32_CSCONFIG','__CRYSTAL_SPACE__']) %]"
 				OptimizeForProcessor="1"
 				AdditionalOptions="[% flags(compose('cflags', [], ' ')) | html %]"
-				AdditionalIncludeDirectories="[% composedirs('include', ['.']) %]"
+				AdditionalIncludeDirectories="[% composedirs('incdirs', ['.']) %]"
 				PrecompiledHeaderFile="[% workbuild([my.doc.project.0,'.pch']) %]"
 				AssemblerListingLocation="[% workbuild([]) %]"
 				ObjectFile="[% workbuild([]) %]"
@@ -76,7 +76,7 @@ END -%]
 				AdditionalDependencies="[% compose('libs', [], ' ') %]"
 				IgnoreImportLibrary="TRUE"
 				SuppressStartupBanner="TRUE"
-				AdditionalLibraryDirectories="[% composedirs('libdir', []) %]"
+				AdditionalLibraryDirectories="[% composedirs('libdirs', []) %]"
 				IgnoreDefaultLibraryNames="LIBC,LIBCD,LIBCMT,LIBCMTD"
 				ProgramDatabaseFile="[% workbuild([my.doc.project.0,'.pdb']) %]"
 				TargetMachine="1"/>
@@ -102,7 +102,7 @@ END -%]
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="[% composedefs([]) %]"
-				AdditionalIncludeDirectories="[% composedirs('include', ['.']) %]"
+				AdditionalIncludeDirectories="[% composedirs('incdirs', ['.']) %]"
 				Culture="1033"/>
 			<Tool
 				Name="VCWebServiceProxyGeneratorTool"/>

@@ -30,8 +30,10 @@ builds = builds.merge([
     defines => ['NDEBUG','CS_USE_OLD_RENDERER'],
     defineskey => 'define',
     cflagskey => 'cflags',
+    incdirskey => 'include',
     lflagskey => 'lflags',
     libskey => 'library',
+    libdirskey => 'libdir',
     priority => 300
   },
   {
@@ -40,8 +42,10 @@ builds = builds.merge([
     defines => ['_DEBUG','CS_DEBUG','CS_USE_OLD_RENDERER'],
     defineskey => 'definedebug',
     cflagskey => 'cflagsdebug',
+    incdirskey => 'includedebug',
     lflagskey => 'lflagsdebug',
     libskey => 'librarydebug',
+    libdirskey => 'libdirdebug',
     priority => 400
   },
   {
@@ -50,8 +54,10 @@ builds = builds.merge([
     defines => ['_DEBUG','CS_DEBUG','CS_EXTENSIVE_MEMDEBUG'],
     defineskey => 'definedebug',
     cflagskey => 'cflagsdebug',
+    incdirskey => 'includedebug',
     lflagskey => 'lflagsdebug',
     libskey => 'librarydebug',
+    libdirskey => 'libdirdebug',
     priority => 500
   },
   {
@@ -61,8 +67,10 @@ builds = builds.merge([
 		'CS_EXTENSIVE_MEMDEBUG'],
     defineskey => 'definedebug',
     cflagskey => 'cflagsdebug',
+    incdirskey => 'includedebug',
     lflagskey => 'lflagsdebug',
     libskey => 'librarydebug',
+    libdirskey => 'libdirdebug',
     priority => 600
   }]);
 

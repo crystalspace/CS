@@ -36,6 +36,11 @@ chronological order.
 	  sprcal3d.
 	- Eric Sunshine fixed `viewmesh' so that it builds cleanly even when
 	  cal3d is not available.
+	- Eric Sunshine upgraded the msvcgen templates so that they distinguish
+	  between "release" and "debug" header and library search paths. This
+	  change allows projects to take full advantage of the the
+	  EXTLIB.INCDIRS, EXTLIB.INCDIRS.DEBUG, EXTLIB.LIBDIRS,
+	  EXTLIB.LIBDIRS.DEBUG functionality which was added on 29-Nov-2004.
 9-Dec-2004
 	- Keith Fulton added support for new animation callback system in
 	  cal3d.  See viewmesh.cpp for very simple example of how to use this.

@@ -744,11 +744,11 @@ rule MsvcProject
     Always $(resource) ;
   }
   
+  local inckeys = "include" includedebug ;
+  local incdirs = $(MSVC.INCDIRS_LITERAL) $(MSVC.INCDIRS_LITERAL.$(rawname)) ;
+  ResponseFile $(respfile) : "$(inckeys)|$(incdirs)" : notfile : $(respdir) ;
+
   local incdir ;
-  for incdir in $(MSVC.INCDIRS_LITERAL) $(MSVC.INCDIRS_LITERAL.$(rawname))
-  {
-    ResponseFile $(respfile) : "include|$(incdir)" : notfile : $(respdir) ;
-  }
   for incdir in $(MSVC.INCDIRS) $(MSVC.INCDIRS.$(rawname))
   {
     if $(incdir) = "."
@@ -759,7 +759,7 @@ rule MsvcProject
     {
       incdir = [ ConcatDirs $(relpath) $(incdir) ] ;
     }
-    ResponseFile $(respfile) : "include|$(incdir)" : notfile : $(respdir) ;
+    ResponseFile $(respfile) : "$(inckeys)|$(incdir)" : notfile : $(respdir) ;
   }
 
   if ! [ Property msvcgen : templatedir ]
@@ -923,16 +923,8 @@ rule _MsvcRespEmit
   CheckOptions ignoremode : $(options) : $(target) ;
   if ! [ IsElem ignoremode ] { modes = [ MsvcClassifyMode $(mode) ] ; }
 
-  local item ;
-  for item in $(items)
-  {
-    local m ;
-    for m in $(modes)
-    {
-      ResponseFile $($(target)_PRJ_RESPFILE) : "$(tag)$(m)|$(item)" :
-	notfile : $($(target)_PRJ_RESPDIR) ;
-    }
-  }
+  ResponseFile $($(target)_PRJ_RESPFILE) : "$(tag)$(modes)|$(items)" :
+    notfile : $($(target)_PRJ_RESPDIR) ;
 }
 
 # MsvcExternalLibrary target [ : libs [ : mode ]]
@@ -992,7 +984,7 @@ rule MsvcLFlags1
 #   an external library.
 rule _MsvcIncDirs
 {
-  _MsvcRespEmit $(1) : $(2) : include : : ignoremode ;
+  _MsvcRespEmit $(1) : $(2) : include : $(3) ;
 }
 
 # _MsvcLibDirs target : libdirs [ : mode ]
@@ -1000,7 +992,7 @@ rule _MsvcIncDirs
 #   an external library.
 rule _MsvcLibDirs
 {
-  _MsvcRespEmit $(1) : $(2) : libdir : : ignoremode ;
+  _MsvcRespEmit $(1) : $(2) : libdir : $(3) ;
 }
 
 # _ExternalLibsHelperMsvc target : libtag : subrule : attribute
