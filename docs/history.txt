@@ -24,8 +24,10 @@ chronological order.
 	- Eric Sunshine fixed bug in data/Jamfile were it was installing some
 	  maps directly into ${sharedir}/crystal and others into
 	  ${sharedir}/crystal/maps.
-	- Eric Sunshine added scripts/python/Jamfile so that Python example
-	  scripts and very important cspace.py get installed.
+	- Eric Sunshine added scripts/python/Jamfile to ensure that the Python
+	  example scripts and very important cspace.py get installed.
+	- Eric Sunshine added scripts/perl5/Jamfile to ensure that cspace.pm
+	  gets installed.
 4-Feb-2004
 	- Jorrit started the removal of the old effect system (used in OR).
 	  This is unused and doesn't work properly as well.  Removed support

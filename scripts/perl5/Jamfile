@@ -1,0 +1,3 @@
+SubDir TOP scripts perl5 ;
+
+InstallData [ Wildcard *.pm ] : perl5 ;
