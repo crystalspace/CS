@@ -907,7 +907,7 @@ bool csGraphics2DDDraw3::CreateIdentityPalette (csRGBpixel *p)
 LRESULT CALLBACK csGraphics2DDDraw3::WindowProc (HWND hWnd, UINT message,
   WPARAM wParam, LPARAM lParam)
 {
-  csGraphics2DDDraw3 *This = (csGraphics2DDDraw3 *)GetWindowLongPtr (hWnd, GWL_USERDATA);
+  csGraphics2DDDraw3 *This = (csGraphics2DDDraw3 *)GetWindowLongPtrA (hWnd, GWL_USERDATA);
   switch (message)
   {
     case WM_PAINT:

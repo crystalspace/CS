@@ -813,7 +813,7 @@ void csGraphics2DOpenGL::AllowResize (bool iAllow)
 LRESULT CALLBACK csGraphics2DOpenGL::WindowProc (HWND hWnd, UINT message,
   WPARAM wParam, LPARAM lParam)
 {
-  csGraphics2DOpenGL *This = (csGraphics2DOpenGL *)GetWindowLongPtr (hWnd, GWL_USERDATA);
+  csGraphics2DOpenGL *This = (csGraphics2DOpenGL *)GetWindowLongPtrA (hWnd, GWL_USERDATA);
   switch (message)
   {
     case WM_ACTIVATE:
