@@ -26,6 +26,24 @@ The history order is reversed so that new features are at the top.
 	- The material manager in the 3D renderers is now capable of
 	  holding four texture layers too. They are still not used
 	  however.
+	- Fixed a small bug in the OpenGL renderer with regards to
+	  transparency that I introduced yesterday.
+	- FINALLY fixed the very bad bug which completely locked up
+	  my machine when a sprite was visible in fog using OpenGL
+	  on an NVidia GeForce. It appears that the NVidia doesn't like
+	  the use of glTexCoordPointer with 1 as the first parameter
+	  (i.e. only one texture component). So fog and DrawTriangleMesh
+	  finally works right with OpenGL!
+	- Also fixed fog for DrawPolygonFX itself. DPFX was using perspective
+	  correct texture mapping but fog was not doing that.
+	- Added support for multi-texturing in OpenGL renderer for DrawPolygon,
+	  DrawPolygonFX, and DrawTriangleMesh. data/flarge shows two
+	  examples (one on the initial room and one on the sprites in the
+	  large hall). Software renderer currently ignores the extra
+	  textures. There is still a bug in the DrawTriangleMesh version
+	  though. The color of gouraud shading seems to shift.
+	- Martin Geisse fixed a lot of cases where the system driver was
+	  IncRef'ed and DecRef'ed, which should not happen
 30-Apr-2001
 	- Philip Wyett fixed csVector3 up (); so that you/camera
 	  is the right way up in ptlab. :-)

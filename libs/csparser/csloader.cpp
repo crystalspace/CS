@@ -850,8 +850,8 @@ void csLoader::mat_process (char *name, char* buf, const char *prefix)
 	  int layer_ushift = 0, layer_vshift = 0;
 	  UInt layer_mode = CS_FX_ADD;
 	  char* params2;
-	  while ((cmd = csGetObject (&params, layerCommands,
-		&name, &params2)) > 0)
+	  while ((cmd = csGetCommand (&params, layerCommands,
+		&params2)) > 0)
 	  {
 	    switch (cmd)
 	    {

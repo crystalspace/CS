@@ -225,6 +225,11 @@ protected:
   int num_texture_layers;
   /// Texture layers.
   csTextureLayer texture_layers[4];
+  /**
+   * Flags that indicate if the texture layer needs translating
+   * relative to the base texture.
+   */
+  bool texture_layer_translate[4];
   /// The flat color of the material
   csRGBpixel flat_color;
   /// Material reflection parameters
@@ -244,6 +249,14 @@ public:
 
   /// Release the original material (iMaterial).
   void FreeMaterial ();
+
+  /// Get the number of texture layers.
+  int GetNumTextureLayers () { return num_texture_layers; }
+  /// Get a texture layer.
+  csTextureLayer* GetTextureLayer (int idx) { return &texture_layers[idx]; }
+  /// Returns true if texture layer needs translation.
+  bool TextureLayerTranslated (int idx)
+  { return texture_layer_translate[idx]; }
 
   ///---------------------- iMaterialHandle implementation ----------------------
   DECLARE_IBASE;

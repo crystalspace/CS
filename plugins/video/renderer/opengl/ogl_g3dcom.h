@@ -47,14 +47,33 @@ class csGraphics3DOGLCommon : public iGraphics3D
 {
 private:
   /**
-   * set proper GL flags based on ZBufMode.  This is usually
+   * Set proper GL flags based on ZBufMode.  This is usually
    * utilized just before a polygon is drawn; it is not
    * done when the Z-buffer mode is set in SetRenderState because
    * other routines may modify the GL flags between a call
    * to SetRenderState and the call to the polygon
    * drawing routine
    */
-  void SetGLZBufferFlags();
+  void SetGLZBufferFlags ();
+
+  /**
+   * Set proper GL flags based on ZBufMode.
+   * This version is used to set the zbuffer flags for the second
+   * pass of polygon drawing. The following second pass zbuf flags
+   * are used depending on first pass flags:
+   * <ul>
+   * <li>ZNONE -> ZNONE
+   * <li>ZFILL -> ZNONE or ZEQUAL
+   * <li>ZTEST -> ZTEST
+   * <li>ZUSE  -> ZEQUAL
+   * </ul>
+   * The result for ZFILL depends on the multiPol flag. If
+   * multiPol == true this means that multiple polygons will
+   * be rendered in the second pass (i.e. in a five polygon model
+   * we will first render five polygon for first pass, then five for
+   * second pass). In that case we need ZEQUAL mode.
+   */
+  void SetGLZBufferFlagsPass2 (bool multiPol);
 
   /**
    * Pointer to a member function that tries to draw the polygon in a quick
@@ -162,6 +181,11 @@ protected:
   float m_alpha;
   /// Should DrawPolygonFX use texture?
   bool  m_textured;
+  /**
+   * Pointer to material handle for DrawPolygonFX.
+   * This is NULL normally but not NULL if multi-texture is used.
+   */
+  csMaterialHandle* m_multimat;
 
   // load-time configuration options
   struct
@@ -276,6 +300,9 @@ public:
 
   /// Draw a polygon with special effects.
   virtual void DrawPolygonFX (G3DPolygonDPFX& poly);
+
+  /// Give a material to csGraphics3DOGLCommon to cache it.
+  void CacheTexture (iMaterialHandle *mat_handle);
 
   /// Give a texture to csGraphics3DOGLCommon to cache it.
   void CacheTexture (iPolygonTexture *texture);
