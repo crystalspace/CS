@@ -92,8 +92,11 @@ public:
 
   virtual void SetDirLight (const csVector3& pos, const csColor& col)
   {
-    if (do_dirlight /*@@@ && ((dirlight - pos) < .00001)*/ && ABS (col.red-dirlight_color.red) < .0001 && ABS (col.green-dirlight_color.green) < .0001 && ABS (col.blue-dirlight_color.blue) < .0001)
-      return;	// Nothing changed.
+    if (do_dirlight && ((dirlight - pos) < .00001))
+      if (ABS (col.red-dirlight_color.red) < .0001 &&
+          ABS (col.green-dirlight_color.green) < .0001 &&
+	  ABS (col.blue-dirlight_color.blue) < .0001)
+        return;	// Nothing changed.
     do_dirlight = true;
     dirlight = pos;
     dirlight.Normalize ();
