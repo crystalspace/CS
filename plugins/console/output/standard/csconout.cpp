@@ -120,7 +120,7 @@ bool csConsoleOutput::Initialize (iObjectRegistry *object_reg)
     csRef<iReporter> r = CS_QUERY_REGISTRY (object_reg, iReporter);
     if (r)
 	r->Report(CS_REPORTER_SEVERITY_WARNING,
-	    crystalspace.console.output.standard,
+	    "crystalspace.console.output.standard",
 	    "csConsoleOutput: Unable to locate iFontServer");
     else
 	csPrintf("Warning ID: crystalspace.console.output.standard\n"
