@@ -26,6 +26,9 @@ chronological order.
 	  consolidation of libraries into crystalspace.lib so that `jam check'
 	  actually runs tests from the various t/ subdirectories of CS/libs
 	  once again.
+	- Eric Sunshine enhanced the UnitTest rule in unittest.jam so that it
+	  can accept a list of test directories as its second argument, rather
+	  than only a single directory.
 	- Eric Sunshine disabled automatic UnitTest rule invocation for
 	  Application (application.jam) and Plugin (plugin.jam) targets for now
 	  since unit-testing for these types of targets needs to be thought-out
