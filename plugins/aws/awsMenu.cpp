@@ -778,7 +778,7 @@ awsMenuBar::awsMenuBar()
 
 awsMenuBar::~awsMenuBar()
 {
-  awsMenu::~awsMenu();
+  this->awsMenu::~awsMenu();
 }
 
 bool awsMenuBar::Setup(iAws *wmgr, awsComponentNode *settings)
@@ -888,7 +888,7 @@ timer(NULL)
 
 awsPopupMenu::~awsPopupMenu()
 {
-  awsMenu::~awsMenu();
+  this->awsMenu::~awsMenu();
 
   if(timer) delete timer;
 }

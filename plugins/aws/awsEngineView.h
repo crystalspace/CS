@@ -5,7 +5,7 @@
 #if !defined(AFX_AWSENGINEVIEW_H__6451E6E6_A559_4018_B48F_EBF7ECD35B84__INCLUDED_)
 #define AFX_AWSENGINEVIEW_H__6451E6E6_A559_4018_B48F_EBF7ECD35B84__INCLUDED_
 
-#include "..\..\PLUGINS\AWS\awscomp.h"
+#include "awscomp.h"
 
 struct iView;
 

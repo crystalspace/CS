@@ -232,15 +232,12 @@ iAwsComponent *awsManager::CreateEmbeddableComponentFrom(char *name)
 
 	iAwsComponentFactory *factory = FindComponentFactory(name);
 
-
-
     // If we have a factory for this component, then create it and set it up.
-
-    if (factory)
-
+    if (factory) 
+	{
+		factory->DecRef();
 		return factory->Create ();
-
-
+	}
 
 	return NULL;
 
