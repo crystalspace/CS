@@ -1073,7 +1073,7 @@ bool csTreeCtrl::AddChild (csComponent *item1, csComponent *item2)
 	node1->AddChild (node2);
       }
     }else{
-      new TreeCtrlNode (item2, node1, false);
+      (void)new TreeCtrlNode (item2, node1, false);
     }
     succ = true;
   }
