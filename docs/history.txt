@@ -4,6 +4,11 @@ http://crystal.sourceforge.net/
 The history order is reversed so that new features are at the top.
 
 6-Apr-2003
+        - Rhad fixed a bug in the software sound renderer that caused
+          streaming audio to be advanced twice per "cycle" instead of
+          once if StartStream() was called on the handle (as it should
+          have been, but probably wasn't).  StartStream() is currently
+          ignored in the software renderer.
         - JTarbox Added a packet size to the event serialization protocol
         - res changed csendian.h to utilize CONST_INT64() macro in
           double2longlong()/longlong2double instead of two separate

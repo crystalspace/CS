@@ -335,13 +335,19 @@ void csSoundRenderSoftware::MixingFunction()
     }
   }
 
+  /* Do not update the sound handles. Right now the source advances
+   *  the sound data stream.  The default handle UpdateCount() function
+   *  will also advance the stream causing the sound to skip and play
+   *  twice as fast if the stream is started.
+   */
+/*
   // update sound handles
-  long NumSamples = memorysize / (is16Bits()?2:1) / (isStereo()?2:1);
-  for (i=0;i<SoundHandles.Length();i++) {
+   long NumSamples = memorysize / (is16Bits()?2:1) / (isStereo()?2:1);
+   for (i=0;i<SoundHandles.Length();i++) {
     csSoundHandleSoftware *hdl = (csSoundHandleSoftware*)SoundHandles.Get(i);
     hdl->UpdateCount(NumSamples);
   }
-
+*/
   SoundDriver->UnlockMemory();
 }
 
