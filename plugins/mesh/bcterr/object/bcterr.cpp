@@ -143,7 +143,7 @@ void csSharedLODMesh::CreateMesh (int new_x_verts, int new_z_verts, int edge_res
   mesh->use_vertex_color = false;
   mesh->do_morph_texels = false;
   mesh->do_morph_colors = false;
-  mesh->do_fog = false;
+  mesh->do_fog = true;
   mesh->vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
   mesh->mixmode = CS_FX_GOURAUD;
   mesh->clip_portal = CS_CLIP_NOT;
@@ -253,7 +253,7 @@ void SetNil (G3DTriangleMesh *mesh)
   mesh->use_vertex_color = false;
   mesh->do_morph_texels = false;
   mesh->do_morph_colors = false;
-  mesh->do_fog = false;
+  mesh->do_fog = true;
   mesh->vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
   mesh->mixmode = CS_FX_GOURAUD;
   mesh->clip_portal = CS_CLIP_NOT;
@@ -317,7 +317,7 @@ void csBCTerrBlock::SetupBaseMesh ()
       verts[pos] = BezierCompute (u, work);
       if (j == 3) u = 1.0f;
       if (i == 3) v = 1.0f;
-      texels[pos].Set (u,v);
+      texels[pos].Set (v,u);
       color[pos].Set (1,1,1);
       normals[pos].Set(1,1,1);
       pos++;
@@ -470,7 +470,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
       if (u > 0.0f) u = u / u_add;
       if (u < 0.0f) u = 0.0f;
       if (u > 1.0f) u = 1.0f;
-      default_lod->texels[pos].Set ( u, 0);
+      default_lod->texels[pos].Set ( 0, u);
       default_lod->color[pos] = work_mesh->color[i];
       pos += 1;
       x1_end += 1;
@@ -491,7 +491,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
       default_lod->verts[pos] = BezierCompute (u, cntrl);
       //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: %f %f %f", default_lod->verts[pos].x, default_lod->verts[pos].y, default_lod->verts[pos].z);
       default_lod->normals[pos].Set (0,1,0);
-      default_lod->texels[pos].Set ( u, 0);
+      default_lod->texels[pos].Set ( 0, u);
       default_lod->color[pos].Set (1,1,1);
       x1_end++;
       pos++;
@@ -499,7 +499,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
     }
     default_lod->verts[pos] = cntrl[3];
     default_lod->normals[pos].Set (0,1,0);
-    default_lod->texels[pos].Set ( 1, 0);
+    default_lod->texels[pos].Set ( 0, 1);
     default_lod->color[pos].Set (1,1,1);
     x1_end++;
   }
@@ -512,7 +512,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
   pos = end + x1_end;
   default_lod->verts[pos] = cntrl[3];
   default_lod->normals[pos].Set (0,1,0);
-  default_lod->texels[pos].Set ( 1, 0);
+  default_lod->texels[pos].Set ( 0, 1);
   default_lod->color[pos].Set (1,1,1);
   u = u_add;
   pos += 1;
@@ -522,7 +522,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
     default_lod->verts[pos] = BezierControlCompute (u, &cntrl[3], nowner->hor_length) ;
     //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: %f %f %f", default_lod->verts[pos].x, default_lod->verts[pos].y, default_lod->verts[pos].z);
     default_lod->normals[pos].Set (0,1,0);
-    default_lod->texels[pos].Set ( 1, u);
+    default_lod->texels[pos].Set ( u, 1);
     default_lod->color[pos].Set (1,1,1);
     z1_end++;
     pos++;
@@ -540,7 +540,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
   pos = end + z1_end;
   default_lod->verts[pos] = work[0];
   default_lod->normals[pos].Set (0,1,0);
-  default_lod->texels[pos].Set ( 0, 1);
+  default_lod->texels[pos].Set ( 1, 0);
   default_lod->color[pos].Set (1,1,1);
   u = u_add;
   pos += 1;
@@ -551,7 +551,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
     //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: %f %f %f", default_lod->verts[pos].x, default_lod->verts[pos].y, default_lod->verts[pos].z);
 
     default_lod->normals[pos].Set (0,1,0);
-    default_lod->texels[pos].Set (u, 1);
+    default_lod->texels[pos].Set (1, u);
     default_lod->color[pos].Set (1,1,1);
     x2_end++;
     pos++;
@@ -580,7 +580,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
       if (u > 0.0f) u = u / u_add;
       if (u < 0.0f) u = 0.0f;
       if (u > 1.0f) u = 1.0f;
-      default_lod->texels[pos].Set ( 0.0, u);
+      default_lod->texels[pos].Set ( u, 0.0);
       default_lod->color[pos] = work_mesh->color[i];
       pos++;
       z2_end++;
@@ -601,7 +601,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
       default_lod->verts[pos] = BezierControlCompute (u, cntrl, nowner->hor_length);
       //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: %f %f %f", default_lod->verts[pos].x, default_lod->verts[pos].y, default_lod->verts[pos].z);
       default_lod->normals[pos].Set (0,1,0);
-      default_lod->texels[pos].Set ( 0, u);
+      default_lod->texels[pos].Set ( u, 0.0);
       default_lod->color[pos].Set (1,1,1);
       z2_end++;
       pos++;
@@ -609,7 +609,7 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
     }
     default_lod->verts[pos] = work[0];
     default_lod->normals[pos].Set (0,1,0);
-    default_lod->texels[pos].Set ( 0, 1);
+    default_lod->texels[pos].Set ( 1, 0);
     default_lod->color[pos].Set (1,1,1);
     z2_end++;
   }
@@ -623,10 +623,10 @@ void csBCTerrBlock::SetInfo ( csBCTerrObject* nowner, csVector3* cntrl, csBCTerr
   owner->SetupVertexBuffer ( default_lod->buf, default_lod->mesh->buffers[0] );
   //csReport (nowner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block","SetInfo: Finished");
   // lock mesh?
-  if (owner->vbufmgr)
-    owner->vbufmgr->LockBuffer(default_lod->mesh->buffers[0],
-        default_lod->verts, default_lod->texels, default_lod->color,
-        (end + z2_end), 0);
+  //if (owner->vbufmgr)
+  //  owner->vbufmgr->LockBuffer(default_lod->mesh->buffers[0],
+  //      default_lod->verts, default_lod->texels, default_lod->color,
+  //      (end + z2_end), 0);
   default_lod->mesh->mat_handle = material->GetMaterialHandle ();
 
   /*for (i= 0; i < end; i++)
@@ -1053,10 +1053,10 @@ void csBCTerrBlock::CreateNewMesh (int level)
   owner->SetupVertexBuffer ( current_lod->buf, current_lod->mesh->buffers[0] );
   // lock buffer?
   end = current_lod->x_verts * current_lod->z_verts;
-  if (owner->vbufmgr)
-    owner->vbufmgr->LockBuffer(current_lod->mesh->buffers[0],
-        current_lod->verts, current_lod->texels, current_lod->color,
-        (end + z2_end), 0);
+  //if (owner->vbufmgr)
+  //  owner->vbufmgr->LockBuffer(current_lod->mesh->buffers[0],
+  //      current_lod->verts, current_lod->texels, current_lod->color,
+  //      (end + z2_end), 0);
   current_lod->mesh->mat_handle = material->GetMaterialHandle ();
 }
 
@@ -1168,7 +1168,7 @@ void csBCTerrBlock::Draw (iRenderView *rview, iCamera* camera, int level)
   {
     iGraphics3D *pG3D = rview->GetGraphics3D();
     int end;
-    //if ((!current_lod) && (level == 0)) level = 1;
+    if ((!current_lod) && (level == 0)) level = 1;
     /* due to popping(if used incorrectly), the level = 2 or 3 isn't used
 
       If you do decide to use it, only use it at extreme distances
@@ -1186,27 +1186,28 @@ void csBCTerrBlock::Draw (iRenderView *rview, iCamera* camera, int level)
 
       *Only allow level = 3 if you entities can fly, and block is seen from the sky?
     */
-    if (!current_lod) level = 1;
+    //if ((!current_lod) || (level > 1)) level = 1;
     if (level == 0)
     {
       if (!current_lod->mesh->mat_handle)
         current_lod->mesh->mat_handle = material->GetMaterialHandle ();
       if (!current_lod->buf)
         owner->SetupVertexBuffer ( current_lod->buf, current_lod->mesh->buffers[0] );
-      if (!current_lod->buf->IsLocked ())
-      {
+      //if (!current_lod->buf->IsLocked ())
+      //{
         end = current_lod->x_verts * current_lod->z_verts;
         owner->vbufmgr->LockBuffer(current_lod->mesh->buffers[0],
           current_lod->verts, current_lod->texels, current_lod->color,
           (end + z2_end), 0);
-      }
+      //}
       current_lod->mesh->clip_portal = clip_portal;
       current_lod->mesh->clip_portal = clip_plane;
       current_lod->mesh->clip_portal = clip_z_plane;
 
-      //rview->CalculateFogMesh(camtrans, current_lod->mesh[0]);
+      rview->CalculateFogMesh(camtrans, current_lod->mesh[0]);
       //current_lod->mesh->do_mirror = true;
       pG3D->DrawTriangleMesh(current_lod->mesh[0]);
+      owner->vbufmgr->UnlockBuffer (current_lod->mesh->buffers[0]);
       //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block", "Drawing current_lod");
     } else if (level == 1)
     {
@@ -1214,19 +1215,20 @@ void csBCTerrBlock::Draw (iRenderView *rview, iCamera* camera, int level)
         default_lod->mesh->mat_handle = material->GetMaterialHandle ();
       if (!default_lod->buf)
         owner->SetupVertexBuffer ( default_lod->buf, default_lod->mesh->buffers[0] );
-      if (!default_lod->buf->IsLocked ())
-      {
+      //if (!default_lod->buf->IsLocked ())
+      //{
         end = default_lod->x_verts * default_lod->z_verts;
         owner->vbufmgr->LockBuffer(default_lod->mesh->buffers[0],
           default_lod->verts, default_lod->texels, default_lod->color,
           (end + z2_end), 0);
-      }
+      //}
       default_lod->mesh->clip_portal = clip_portal;
       default_lod->mesh->clip_portal = clip_plane;
       default_lod->mesh->clip_portal = clip_z_plane;
-      //rview->CalculateFogMesh(camtrans, default_lod->mesh[0]);
+      rview->CalculateFogMesh(camtrans, default_lod->mesh[0]);
       //default_lod->mesh->do_mirror = true;
       pG3D->DrawTriangleMesh(default_lod->mesh[0]);
+      owner->vbufmgr->UnlockBuffer (default_lod->mesh->buffers[0]);
       //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block", "Drawing default_lod");
     } else if (level == 2)
     {
@@ -1237,18 +1239,20 @@ void csBCTerrBlock::Draw (iRenderView *rview, iCamera* camera, int level)
         owner->SetupVertexBuffer (buf , draw_mesh.buffers[0]);
       else
         draw_mesh.buffers[0] = buf;
-      if (!buf->IsLocked ())
-      {
+      //if (!buf->IsLocked ())
+      //{
         owner->vbufmgr->LockBuffer(draw_mesh.buffers[0],
           verts, texels, color,
           16, 0);
-      }
+      //}
       draw_mesh.clip_portal = clip_portal;
       draw_mesh.clip_portal = clip_plane;
       draw_mesh.clip_portal = clip_z_plane;
       draw_mesh.triangles = &large_tri[0];
       draw_mesh.num_triangles = 18;
+      rview->CalculateFogMesh(camtrans, draw_mesh);
       pG3D->DrawTriangleMesh(draw_mesh);
+      owner->vbufmgr->UnlockBuffer (draw_mesh.buffers[0]);
     } else
     {
       //csReport (owner->object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Block", "Draw #4");
@@ -1258,18 +1262,20 @@ void csBCTerrBlock::Draw (iRenderView *rview, iCamera* camera, int level)
         owner->SetupVertexBuffer (buf , draw_mesh.buffers[0]);
       else
         draw_mesh.buffers[0] = buf;
-      if (!buf->IsLocked ())
-      {
+      //if (!buf->IsLocked ())
+      //{
         owner->vbufmgr->LockBuffer(draw_mesh.buffers[0],
           verts, texels, color,
           16, 0);
-      }
+      //}
       draw_mesh.clip_portal = clip_portal;
       draw_mesh.clip_portal = clip_plane;
       draw_mesh.clip_portal = clip_z_plane;
       draw_mesh.triangles = &small_tri[0];
       draw_mesh.num_triangles = 2;
+      rview->CalculateFogMesh(camtrans, draw_mesh);
       pG3D->DrawTriangleMesh(draw_mesh);
+      owner->vbufmgr->UnlockBuffer (draw_mesh.buffers[0]);
     }
   }
 }
@@ -1567,7 +1573,7 @@ void csBCTerrObject::SetupCollisionQuads ()
   {
     collision->AddBlock (&blocks[i]);
   }
-  //collision->RebuildBoundingBoxes ();
+  collision->RebuildBoundingBoxes ();
 }
 
 int csBCTerrObject::GetHeightFromImage (iImage* im, float x, float z)
@@ -1667,7 +1673,7 @@ bool csBCTerrObject::ComputeSharedMesh (csSharedLODMesh* mesh, csVector3* cntrl_
       mesh->verts[count] = BezierCompute (u, temp);
       //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Object","Interior Vertexes: %f %f %f", mesh->verts[count].x, mesh->verts[count].y, mesh->verts[count].z);
       //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Object","u %f", u);
-      mesh->texels[count].Set (u, v);
+      mesh->texels[count].Set (v, u);
       mesh->normals[count].Set (0, 1, 0); // ? just for now...
       mesh->color[count].Set ( 1, 1, 1);
       count++;
