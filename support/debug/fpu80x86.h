@@ -19,7 +19,7 @@
 #ifndef __FPU80X86_H__
 #define __FPU80X86_H__
 
-#if defined (PROC_INTEL) && defined (COMP_GCC)
+#if defined(PROC_INTEL) && defined(COMP_GCC) && !defined(OS_NEXT)
 
 /*
      ---- ---- --XX XXXX = MCW_EM - exception masks (1=handle exception internally, 0=fault)
@@ -65,7 +65,7 @@ static inline unsigned int _control87(unsigned int newcw, unsigned int mask)
 
 #else
 
-#define _control87(newcw, mask)	0
+static inline unsigned int _control87(unsigned int, unsigned int) { return 0; }
 
 #endif
 
