@@ -515,7 +515,7 @@ AbortDrag:
           app->CaptureMouse (NULL);
         return true;
       case csevMouseMove:
-        if (GetState (CSS_FOCUSED))
+        if (app->MouseOwner == this)
         {
           int dX = Event.Mouse.x, dY = Event.Mouse.y;
           LocalToGlobal (dX, dY);
@@ -1782,8 +1782,7 @@ bool csComponent::HandleDragEvent (iEvent &Event, int BorderW, int BorderH)
         } /* endif */
       } /* endif */
     case csevMouseMove:
-      if (GetState (CSS_FOCUSED)
-       && bound.ContainsRel (Event.Mouse.x, Event.Mouse.y))
+      if (bound.ContainsRel (Event.Mouse.x, Event.Mouse.y))
       {
         int cursortype = 0;
         if (DragStyle & CS_DRAG_SIZEABLE)
