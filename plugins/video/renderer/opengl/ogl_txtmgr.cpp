@@ -811,7 +811,7 @@ void csTextureManagerOpenGL::DetermineStorageSizes ()
 void csTextureManagerOpenGL::SetPixelFormat (csPixelFormat &PixelFormat)
 {
   pfmt = PixelFormat;
-  max_tex_size = G3D->max_texture_size;
+  max_tex_size = G3D->Caps.maxTexWidth;
   DetermineStorageSizes ();
 }
 

@@ -534,8 +534,6 @@ public:
   typedef void (csGraphics3DOGLCommon::*DrawPolygonPtr)(G3DPolygonDP& poly);
   DrawPolygonPtr DrawPolygonCall;
 
-  /// The maximum texture size
-  GLint max_texture_size;
   /// The texture cache.
   OpenGLTextureCache* texture_cache;
   /// The texture manager

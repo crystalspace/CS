@@ -217,8 +217,8 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   Caps.CanClip = false;
   Caps.minTexHeight = 2;
   Caps.minTexWidth = 2;
-  Caps.maxTexHeight = 1024;
-  Caps.maxTexWidth = 1024;
+  Caps.maxTexHeight = -1;
+  Caps.maxTexWidth = -1;
   Caps.fog = G3DFOGMETHOD_VERTEX;
   Caps.NeedsPO2Maps = false;
   Caps.MaxAspectRatio = 32768;
@@ -866,10 +866,11 @@ bool csGraphics3DOGLCommon::NewOpen ()
 
   z_buf_mode = CS_ZBUF_NONE;
   Caps.CanClip = config->GetBool("Video.OpenGL.Caps.CanClip", false);
-  Caps.minTexHeight = config->GetInt("Video.OpenGL.Caps.MinTexHeight", 2);
-  Caps.minTexWidth = config->GetInt("Video.OpenGL.Caps.MinTexWidth", 2);
-  Caps.maxTexHeight = config->GetInt("Video.OpenGL.Caps.MaxTexHeight", 1024);
-  Caps.maxTexWidth = config->GetInt("Video.OpenGL.Caps.MaxTexWidth", 1024);
+  Caps.minTexHeight = 2;
+  Caps.minTexWidth = 2;
+  int mts = config->GetInt ("Video.OpenGL.Caps.MaxTextureSize", -1);
+  Caps.maxTexHeight = mts;
+  Caps.maxTexWidth = mts;
   Caps.fog = G3DFOGMETHOD_VERTEX;
   Caps.NeedsPO2Maps = config->GetBool("Video.OpenGL.Caps.NeedsPO2Maps", false);
   Caps.MaxAspectRatio = config->GetInt("Video.OpenGL.Caps.MaxAspectRatio",
@@ -889,16 +890,6 @@ bool csGraphics3DOGLCommon::NewOpen ()
     "Video.OpenGL.SuperLightMapNum3", 128);
   OpenGLLightmapCache::super_lm_size = config->GetInt (
     "Video.OpenGL.SuperLightMapSize", 256);
-  if (OpenGLLightmapCache::super_lm_size > Caps.maxTexWidth)
-    OpenGLLightmapCache::super_lm_size = Caps.maxTexWidth;
-  Report (CS_REPORTER_SEVERITY_NOTIFY,
-    "  Super lightmaps: max_size=%dx%d num=%d %d %d %d",
-    OpenGLLightmapCache::super_lm_size,
-    OpenGLLightmapCache::super_lm_size,
-    OpenGLLightmapCache::super_lm_num[0],
-    OpenGLLightmapCache::super_lm_num[1],
-    OpenGLLightmapCache::super_lm_num[2],
-    OpenGLLightmapCache::super_lm_num[3]);
 
   unsigned int i, j;
   const char* clip_opt = config->GetStr ("Video.OpenGL.ClipOptional", "auto");
@@ -1054,12 +1045,33 @@ bool csGraphics3DOGLCommon::NewOpen ()
 
   delete [] transientfogdata;
 
-  glGetIntegerv (GL_MAX_TEXTURE_SIZE, &max_texture_size);
-  // adjust max texture size if bigger than maxwidth/height from config
-  if(Caps.maxTexWidth < max_texture_size)
-    max_texture_size = Caps.maxTexWidth;
-  if(Caps.maxTexHeight < max_texture_size)
-    max_texture_size = Caps.maxTexHeight;
+  if (Caps.maxTexWidth == -1)
+  {
+    GLint max_texture_size = 0;
+    glGetIntegerv (GL_MAX_TEXTURE_SIZE, &max_texture_size);
+    if (max_texture_size == 0)
+    {
+      // There appears to be a bug in some OpenGL drivers where
+      // getting the maximum texture size simply doesn't work. In that
+      // case we will issue a warning about this and assume 256x256.
+      max_texture_size = 256;
+      Report (CS_REPORTER_SEVERITY_WARNING, "Detecting maximum texture size fails! 256x256 is assumed.\nEdit Video.OpenGL.Caps.MaxTextureSize if you want to change.");
+    }
+    Caps.maxTexWidth = max_texture_size;
+    Caps.maxTexHeight = max_texture_size;
+  }
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+      "  Maximum texture size is %dx%d", Caps.maxTexWidth, Caps.maxTexHeight);
+  if (OpenGLLightmapCache::super_lm_size > Caps.maxTexWidth)
+    OpenGLLightmapCache::super_lm_size = Caps.maxTexWidth;
+  Report (CS_REPORTER_SEVERITY_NOTIFY,
+    "  Super lightmaps: max_size=%dx%d num=%d %d %d %d",
+    OpenGLLightmapCache::super_lm_size,
+    OpenGLLightmapCache::super_lm_size,
+    OpenGLLightmapCache::super_lm_num[0],
+    OpenGLLightmapCache::super_lm_num[1],
+    OpenGLLightmapCache::super_lm_num[2],
+    OpenGLLightmapCache::super_lm_num[3]);
 
   int max_cache_size = // 128mb combined cache per default
     config->GetInt("Video.OpenGL.MaxTextureCache", 128) * 1024*1024; 

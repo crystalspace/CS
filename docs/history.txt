@@ -1,5 +1,16 @@
 The history order is reversed so that new features are at the top.
 
+6-Feb-2003
+	- Removed Video.OpenGL.Caps.MaxTexWidth, MaxTexHeight, MinTexWidth,
+	  and MinTexHeight options in opengl.cfg. Instead there is now the
+	  Video.OpenGL.Caps.MaxTextureSize option. By default this is set
+	  to -1 which means the OpenGL renderer will autodetect maximum
+	  texture size.
+	- Apparently there are drivers when getting the maximum texture size
+	  with GL_MAX_TEXTURE_SIZE fails. The OpenGL renderer now detects
+	  this case and will issue a warning when that happens. In that case
+	  it will assume 256x256 max. You can then use the above option
+	  to set the real maximum size.
 4-Feb-2003
 	- Augmented the ODE check in configure.ac so that it works in two
 	  phases.  First it checks for libode.  Second, it checks if the
