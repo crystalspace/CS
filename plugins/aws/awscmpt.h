@@ -197,6 +197,8 @@ public:
     virtual void ClearAll (int color);
 
     virtual void Print (csRect *area = NULL);
+    virtual bool SetGamma (float) { return false; }
+    virtual float GetGamma () const { return 1.0; }
   };
 
   class awscG3D : public iGraphics3D

@@ -20,11 +20,6 @@
 #include "null_g3d.h"
 #include "null_txt.h"
 
-#define DP_NAME DrawPixmap8
-#define DP_PIXTYPE uint8
-#define DP_PIXFORM_INDEX8
-#include "drawsprt.inc"
-
 #define DP_NAME DrawPixmap16_555
 #define DP_PIXTYPE uint16
 #define DP_PIXFORM_R5G5B5
@@ -44,9 +39,7 @@ void csGraphics3DNull::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh,
   int tx, int ty, int tw, int th, uint8 Alpha)
 {
-  if (pfmt.PixelBytes == 1)
-    DrawPixmap8 (G2D, texmgrnull, hTex, sx,sy, sw,sh, tx,ty, tw,th, Alpha);
-  else if (pfmt.PixelBytes == 2)
+  if (pfmt.PixelBytes == 2)
   {
     if (pfmt.GreenBits == 5)
       DrawPixmap16_555 (G2D, texmgrnull, hTex, sx,sy, sw,sh, tx,ty, tw,th, Alpha);

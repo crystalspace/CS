@@ -29,15 +29,7 @@
     DP_PIXTYPE - The type of a pixel (uint8, uint16, uint32)
 */
 
-#if defined (DP_PIXFORM_INDEX8)
-#  define ALPHA_MIX(dst,src)						     \
-  {									     \
-    uint s = PrivateCMap [src], d = GlobalCMap [dst];        		     \
-    dst = inv_cmap [                                                         \
-          (((((s & 0x7c1f) * srcf) + ((d & 0x7c1f) * dstf)) >> 5) & 0x7c1f)  \
-        | (((((s & 0x03e0) * srcf) + ((d & 0x03e0) * dstf)) >> 5) & 0x03e0)];\
-  }
-#elif defined (DP_PIXFORM_R5G5B5)
+#if defined (DP_PIXFORM_R5G5B5)
 #  define ALPHA_MIX(dst,src)						     \
   {									     \
     uint s = palette [src], d = dst;					     \
@@ -80,11 +72,6 @@ static void DP_NAME (iGraphics2D *G2D, csTextureManagerNull *texman,
   uint8 *bitmap = txt_unl->get_bitmap ();
   uint8 *alpha_map = txt_unl->get_alphamap ();
   DP_PIXTYPE *palette = (DP_PIXTYPE *)tex_mm->GetPaletteToGlobal ();
-#ifdef DP_PIXFORM_INDEX8
-  uint16 *PrivateCMap = tex_mm->GetPaletteToGlobal8 ();
-  uint16 *GlobalCMap = texman->GlobalCMap;
-  uint8 *inv_cmap = texman->inv_cmap;
-#endif
 
   /// Retrieve clipping rectangle
   int ClipX1, ClipY1, ClipX2, ClipY2;
@@ -349,7 +336,6 @@ static void DP_NAME (iGraphics2D *G2D, csTextureManagerNull *texman,
 #undef ALPHA_MIX
 #undef DP_NAME
 #undef DP_PIXTYPE
-#undef DP_PIXFORM_INDEX8
 #undef DP_PIXFORM_R5G5B5
 #undef DP_PIXFORM_R5G6B5
 #undef DP_PIXFORM_R8G8B8

@@ -21,6 +21,9 @@ The history order is reversed so that new features are at the top.
 	  If people want it back we can always make 8-bit emulation mode
 	  (by rendering internally to 16-bit and then transforming to
 	  8-bit in Print()).
+	- Also removed 8-bit support from the internal AWS renderer
+	  and from the null3d renderer. For some reason it doesn't look
+	  like the null renderer needs 8-bit display support :-)
 17-Oct-2002
 	- Removed a few additional procedural texture functions from the
 	  iGraphics3D/iGraphics2D interfaces.

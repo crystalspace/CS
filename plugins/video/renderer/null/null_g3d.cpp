@@ -169,21 +169,6 @@ bool csGraphics3DNull::Open ()
   bool bFullScreen = G2D->GetFullScreen ();
 
   pfmt = *G2D->GetPixelFormat ();
-  if (pfmt.PalEntries)
-  {
-    // If we don't have truecolor we simulate 5:6:5 bits
-    // for R:G:B in the masks anyway because we still need the
-    // 16-bit format for our light mixing
-    pfmt.RedShift   = RGB2PAL_BITS_G + RGB2PAL_BITS_B;
-    pfmt.GreenShift = RGB2PAL_BITS_B;
-    pfmt.BlueShift  = 0;
-    pfmt.RedMask    = ((1 << RGB2PAL_BITS_G) - 1) << pfmt.RedShift;
-    pfmt.GreenMask  = ((1 << RGB2PAL_BITS_G) - 1) << pfmt.GreenShift;
-    pfmt.BlueMask   = ((1 << RGB2PAL_BITS_B) - 1);
-    pfmt.RedBits    = RGB2PAL_BITS_R;
-    pfmt.GreenBits  = RGB2PAL_BITS_G;
-    pfmt.BlueBits   = RGB2PAL_BITS_B;
-  }
   texmgrnull->SetPixelFormat (pfmt);
 
   SetDimensions (nWidth, nHeight);

@@ -69,65 +69,12 @@ static inline int rgb_dist (int tR, int tG, int tB, int sR, int sG, int sB)
          B_COEF_SQ * sB * sB * (32 - ((max - tB) >> 3));
 }
 
-//------------------------------------------------------------- csColorMapNull ---//
-
-int csColorMapNull::find_rgb (int r, int g, int b, int *d)
-{
-  CLIP_RGB;
-
-  int i, min, mindist;
-  mindist = 0x7fffffff;
-  min = -1;
-  // Color 0 is reserved for transparency
-  for (i = 1; i < 256; i++)
-    if (alloc [i])
-    {
-      register int dist = rgb_dist (r, g, b,
-        palette [i].red, palette [i].green, palette [i].blue);
-      if (dist < mindist) { mindist = dist; min = i; if (!dist) break; }
-    }
-  if (d) *d = mindist;
-  return min;
-}
-
-int csColorMapNull::alloc_rgb (int r, int g, int b, int dist)
-{
-  CLIP_RGB;
-
-  int d, j, i = find_rgb (r, g, b, &d);
-  if (i == -1 || d > dist)
-  {
-    for (j = 0; j < 256; j++)
-      if (!alloc [j])
-      {
-        alloc[j] = true;
-        palette [j].red = r;
-        palette [j].green = g;
-        palette [j].blue = b;
-        return j;
-      }
-    return i; // We couldn't allocate a new color, return best fit
-  }
-  else
-    return i;
-}
-
-int csColorMapNull::FreeEntries ()
-{
-  int i, colors = 0;
-  for (i = 0; i < 256; i++)
-    if (!alloc [i])
-      colors++;
-  return colors;
-}
-
-//-------------------------------------------------------- csTextureHandleNull ---//
+//--------------------------------------------------- csTextureHandleNull ---//
 
 csTextureHandleNull::csTextureHandleNull (csTextureManagerNull *txtmgr,
   iImage *image, int flags) : csTextureHandle (image, flags)
 {
   pal2glob = NULL;
-  pal2glob8 = NULL;
   (texman = txtmgr)->IncRef ();
 }
 
@@ -136,7 +83,6 @@ csTextureHandleNull::~csTextureHandleNull ()
   texman->UnregisterTexture (this);
   texman->DecRef ();
   delete [] (uint8 *)pal2glob;
-  delete [] pal2glob8;
 }
 
 csTexture *csTextureHandleNull::NewTexture (iImage *Image, bool /*ismipmap*/)
@@ -225,19 +171,6 @@ void csTextureHandleNull::remap_texture (csTextureManager *texman)
   csTextureManagerNull *txm = (csTextureManagerNull *)texman;
   switch (texman->pfmt.PixelBytes)
   {
-    case 1:
-      delete [] (uint8 *)pal2glob;
-      pal2glob = new uint8 [palette_size];
-      delete [] pal2glob8;
-      pal2glob8 = new uint16 [palette_size];
-      for (i = 0; i < palette_size; i++)
-      {
-        ((uint8 *)pal2glob) [i] = txm->cmap.find_rgb (palette [i].red,
-          palette [i].green, palette [i].blue);
-        pal2glob8 [i] = txm->encode_rgb (palette [i].red,
-          palette [i].green, palette [i].blue);
-      }
-      break;
     case 2:
       delete [] (uint16 *)pal2glob;
       pal2glob = new uint16 [palette_size];
@@ -269,32 +202,21 @@ csTextureManagerNull::csTextureManagerNull (iObjectRegistry *object_reg,
   ResetPalette ();
   read_config (config);
   G2D = iG2D;
-  inv_cmap = NULL;
-  GlobalCMap = NULL;
 }
 
 csTextureManagerNull::~csTextureManagerNull ()
 {
   Clear ();
-  delete [] GlobalCMap;
 }
 
 void csTextureManagerNull::SetPixelFormat (csPixelFormat &PixelFormat)
 {
   pfmt = PixelFormat;
-
-  truecolor = (pfmt.PalEntries == 0);
-
-  if ((pfmt.PixelBytes == 1) && !GlobalCMap)
-    GlobalCMap = new uint16 [256];
 }
 
 void csTextureManagerNull::read_config (iConfigFile *config)
 {
   csTextureManager::read_config (config);
-  prefered_dist = config->GetInt ("Video.Null.TextureManager.RGBDist", PREFERED_DIST);
-  uniform_bias = config->GetInt ("Video.Null.TextureManager.UniformBias", 75);
-  if (uniform_bias > 100) uniform_bias = 100;
 }
 
 void csTextureManagerNull::Clear ()
@@ -310,118 +232,14 @@ uint32 csTextureManagerNull::encode_rgb (int r, int g, int b)
     ((b >> (8 - pfmt.BlueBits))  << pfmt.BlueShift);
 }
 
-int csTextureManagerNull::find_rgb (int r, int g, int b)
-{
-  CLIP_RGB;
-  return inv_cmap [encode_rgb (r, g, b)];
-}
-
 int csTextureManagerNull::FindRGB (int r, int g, int b)
 {
   CLIP_RGB;
-  if (truecolor)
-    return encode_rgb (r, g, b);
-  else
-    return inv_cmap [encode_rgb (r, g, b)];
-}
-
-void csTextureManagerNull::create_inv_cmap ()
-{
-  // We create a inverse colormap for finding fast the nearest palette index
-  // given any R,G,B value. Usually this is done by scanning the entire palette
-  // which is way too slow for realtime. Because of this we use an table that
-  // that takes on input an 5:6:5 encoded value (like in 16-bit truecolor modes)
-  // and on output we get the palette index.
-
-  if (pfmt.PixelBytes != 1)
-    return;
-
-  // Greg Ewing, 12 Oct 1998
-  delete inv_cmap;
-  inv_cmap = NULL; // let the routine allocate the array itself
-  uint8* im;
-  csInverseColormap (256, &cmap [0], RGB2PAL_BITS_R, RGB2PAL_BITS_G,
-    RGB2PAL_BITS_B, im);
-  inv_cmap = im;
-
-  // Color number 0 is reserved for transparency
-  inv_cmap [encode_rgb (cmap [0].red, cmap [0].green, cmap [0].blue)] =
-    cmap.find_rgb (cmap [0].red, cmap [0].green, cmap [0].blue);
-
-  // Now we'll encode the palette into 16-bit values
-  int i;
-  for (i = 0; i < 256; i++)
-    GlobalCMap [i] = encode_rgb (cmap [i].red, cmap [i].green, cmap [i].blue);
-}
-
-void csTextureManagerNull::compute_palette ()
-{
-  int i;
-
-  if (truecolor) return;
-
-  // Allocate first 6*6*4=144 colors in a uniformly-distributed fashion
-  // since we'll get lighted/dimmed/colored textures more often
-  // than original pixel values, thus we should be prepared for this.
-  int _r, _g, _b;
-  for (_r = 0; _r < 6; _r++)
-    for (_g = 0; _g < 6; _g++)
-      for (_b = 0; _b < 4; _b++)
-        cmap.alloc_rgb (20 + _r * 42, 20 + _g * 42, 30 + _b * 50, prefered_dist);
-
-  // Compute a common color histogram for all textures
-  csColorQuantizer quant;
-  quant.Begin ();
-
-  for (i = textures.Length () - 1; i >= 0; i--)
-  {
-    csTextureHandleNull *txt = (csTextureHandleNull *)textures [i];
-    csRGBpixel *colormap = txt->GetColorMap ();
-    int colormapsize = txt->GetColorMapSize ();
-    if (txt->GetAlphaMap ())
-      colormap++, colormapsize--;
-    quant.Count (colormap, colormapsize);
-  }
-
-  // Introduce the uniform colormap bias into the histogram
-  csRGBpixel new_cmap [256];
-  int colors = 0;
-  for (i = 0; i < 256; i++)
-    if (!locked [i] && cmap.alloc [i])
-      new_cmap [colors++] = cmap [i];
-
-  quant.Bias (new_cmap, colors, uniform_bias);
-
-  // Now compute the actual colormap
-  colors = 0;
-  for (i = 0; i < 256; i++)
-    if (!locked [i]) colors++;
-  csRGBpixel *cmap_p = new_cmap;
-  quant.Palette (cmap_p, colors);
-
-  // Finally, put the computed colors back into the colormap
-  int outci = 0;
-  for (i = 0; i < colors; i++)
-  {
-    while (locked [outci]) outci++;
-    cmap [outci++] = new_cmap [i];
-  }
-
-  quant.End ();
-
-  // Now create the inverse colormap
-  create_inv_cmap ();
-
-  palette_ok = true;
+  return encode_rgb (r, g, b);
 }
 
 void csTextureManagerNull::PrepareTextures ()
 {
-  // Drop all "color allocated" flags to locked colors.
-  // We won't Clear the palette as we don't care about unused colors anyway.
-  // The locked colors will stay the same.
-  memcpy(cmap.alloc, locked, sizeof(locked));
-
   // Create mipmaps for all textures
   int i;
   for (i = 0; i < textures.Length (); i++)
@@ -429,10 +247,6 @@ void csTextureManagerNull::PrepareTextures ()
     csTextureHandle *txt = textures.Get (i);
     txt->CreateMipmaps ();
   }
-
-  // The only thing left to do is to compute the palette
-  // Everything other has been done during textures registration
-  compute_palette ();
 
   // Remap all textures according to the new colormap.
   for (i = 0; i < textures.Length (); i++)
@@ -457,32 +271,12 @@ void csTextureManagerNull::UnregisterTexture (csTextureHandleNull* handle)
 
 void csTextureManagerNull::ResetPalette ()
 {
-  memset (&locked, 0, sizeof (locked));
-  locked [0] = true;
-  locked [255] = true;
-  cmap [0] = csRGBcolor (0, 0, 0);
-  cmap [255] = csRGBcolor (255, 255, 255);
-  memcpy(cmap.alloc, locked, sizeof(locked));
-  palette_ok = false;
 }
 
-void csTextureManagerNull::ReserveColor (int r, int g, int b)
+void csTextureManagerNull::ReserveColor (int, int, int)
 {
-  if (!pfmt.PalEntries) return;
-  int color = cmap.alloc_rgb (r, g, b, 0);
-  locked [color] = true;
 }
 
 void csTextureManagerNull::SetPalette ()
 {
-  if (!truecolor && !palette_ok)
-    compute_palette ();
-
-  int i;
-  for (i = 0; i < 256; i++)
-    G2D->SetRGB (i, cmap [i].red, cmap [i].green, cmap [i].blue);
-
-  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
-  if (q != 0)
-    q->GetEventOutlet()->ImmediateBroadcast (cscmdPaletteChanged, this);
 }
