@@ -45,28 +45,13 @@ CS_IMPLEMENT_APPLICATION
 
 //-----------------------------------------------------------------------------
 
+const bool DoSprite = false;
+
 void Cleanup ();
 
-iModelData *Simple::ImportModel (iMaterialWrapper *OtherMaterial)
+iModelDataVertices *Simple::CreateDefaultModelVertexFrame ()
 {
-  iModelData *Model = new csModelData ();
-
-  iModelDataMaterial *mat = new csModelDataMaterial ();
-  mat->SetMaterialWrapper (OtherMaterial);
-
-  iModelDataObject *Object = new csModelDataObject ();
-  Model->QueryObject ()->ObjAdd (Object->QueryObject ());
   iModelDataVertices *Vertices = new csModelDataVertices ();
-  Object->SetDefaultVertices (Vertices);
-
-  Vertices->AddVertex (csVector3 (-5, -5, -5));
-  Vertices->AddVertex (csVector3 (-5, -5, +5));
-  Vertices->AddVertex (csVector3 (+5, -5, +5));
-  Vertices->AddVertex (csVector3 (+5, -5, -5));
-  Vertices->AddVertex (csVector3 (-5, +5, -5));
-  Vertices->AddVertex (csVector3 (-5, +5, +5));
-  Vertices->AddVertex (csVector3 (+5, +5, +5));
-  Vertices->AddVertex (csVector3 (+5, +5, -5));
 
   Vertices->AddNormal (csVector3 (1, 0, 0));
   Vertices->AddNormal (csVector3 (-1, 0, 0));
@@ -81,6 +66,56 @@ iModelData *Simple::ImportModel (iMaterialWrapper *OtherMaterial)
   Vertices->AddTexel (csVector2 (0, 5));
   Vertices->AddTexel (csVector2 (5, 5));
   Vertices->AddTexel (csVector2 (5, 0));
+
+  return Vertices;
+}
+
+iModelData *Simple::CreateDefaultModel (iMaterialWrapper *OtherMaterial)
+{
+  iModelData *Model = new csModelData ();
+
+  iModelDataMaterial *mat = new csModelDataMaterial ();
+  mat->SetMaterialWrapper (OtherMaterial);
+
+  iModelDataObject *Object = new csModelDataObject ();
+  Model->QueryObject ()->ObjAdd (Object->QueryObject ());
+  iModelDataVertices *Vertices = CreateDefaultModelVertexFrame ();
+  Object->SetDefaultVertices (Vertices);
+  iModelDataAction *Action = new csModelDataAction ();
+  Action->QueryObject ()->SetName ("action");
+  Object->QueryObject ()->ObjAdd (Action->QueryObject ());
+
+  Action->AddFrame (0.3, Vertices->QueryObject ());
+  Vertices->AddVertex (csVector3 (-3, -3, -3));
+  Vertices->AddVertex (csVector3 (-3, -3, +3));
+  Vertices->AddVertex (csVector3 (+3, -3, +3));
+  Vertices->AddVertex (csVector3 (+3, -3, -3));
+  Vertices->AddVertex (csVector3 (-3, +3, -3));
+  Vertices->AddVertex (csVector3 (-3, +3, +3));
+  Vertices->AddVertex (csVector3 (+3, +3, +3));
+  Vertices->AddVertex (csVector3 (+3, +3, -3));
+
+  Vertices = CreateDefaultModelVertexFrame ();
+  Action->AddFrame (0.6, Vertices->QueryObject ());
+  Vertices->AddVertex (csVector3 (-3, -7, -3));
+  Vertices->AddVertex (csVector3 (-3, -7, +3));
+  Vertices->AddVertex (csVector3 (+3, -7, +3));
+  Vertices->AddVertex (csVector3 (+3, -7, -3));
+  Vertices->AddVertex (csVector3 (-3, +7, -3));
+  Vertices->AddVertex (csVector3 (-3, +7, +3));
+  Vertices->AddVertex (csVector3 (+3, +7, +3));
+  Vertices->AddVertex (csVector3 (+3, +7, -3));
+
+  Vertices = CreateDefaultModelVertexFrame ();
+  Action->AddFrame (0.9, Vertices->QueryObject ());
+  Vertices->AddVertex (csVector3 (-7, -3, -3));
+  Vertices->AddVertex (csVector3 (-7, -3, +3));
+  Vertices->AddVertex (csVector3 (+7, -3, +3));
+  Vertices->AddVertex (csVector3 (+7, -3, -3));
+  Vertices->AddVertex (csVector3 (-7, +3, -3));
+  Vertices->AddVertex (csVector3 (-7, +3, +3));
+  Vertices->AddVertex (csVector3 (+7, +3, +3));
+  Vertices->AddVertex (csVector3 (+7, +3, -3));
 
   iModelDataPolygon *Polygon = new csModelDataPolygon ();
   Object->QueryObject ()->ObjAdd (Polygon->QueryObject ());
@@ -237,7 +272,7 @@ bool Simple::Initialize (int argc, const char* const argv[],
   iMeshFactoryWrapper *SpriteFactory = engine->CreateMeshFactory (
     "crystalspace.mesh.object.sprite.3d", "SpriteFactory");
 
-  iModelData *Model = ImportModel (tm2);
+  iModelData *Model = CreateDefaultModel (tm2);
   iThingState *fState =
 	SCF_QUERY_INTERFACE (ThingFactory, iThingState);
   iSprite3DFactoryState *sState = SCF_QUERY_INTERFACE (
@@ -253,25 +288,27 @@ bool Simple::Initialize (int argc, const char* const argv[],
   iMeshWrapper *ThingWrapper = engine->CreateMeshWrapper (ThingObject, "thing");
   iMeshWrapper *SpriteWrapper = engine->CreateMeshWrapper (SpriteFactory, "sprite");
 
-  ThingWrapper->GetMovable ()->SetSector (room);
-  ThingWrapper->GetMovable ()->UpdateMove ();
-  ThingWrapper->GetFlags().Set (CS_ENTITY_CONVEX);
-  ThingWrapper->SetZBufMode (CS_ZBUF_USE);
-  ThingWrapper->SetRenderPriority (engine->GetWallRenderPriority ());
+  if (!DoSprite)
+  {
+    ThingWrapper->GetMovable ()->SetSector (room);
+    ThingWrapper->GetMovable ()->UpdateMove ();
+    ThingWrapper->GetFlags().Set (CS_ENTITY_CONVEX);
+    ThingWrapper->SetZBufMode (CS_ZBUF_USE);
+    ThingWrapper->SetRenderPriority (engine->GetWallRenderPriority ());
+  } else {
+    SpriteWrapper->GetMovable ()->SetSector (room);
+    SpriteWrapper->GetMovable ()->UpdateMove ();
+    SpriteWrapper->GetFlags().Set (CS_ENTITY_CONVEX);
+    SpriteWrapper->SetZBufMode (CS_ZBUF_USE);
+    SpriteWrapper->SetRenderPriority (engine->GetWallRenderPriority ());
 
-/*
-  SpriteWrapper->GetMovable ()->SetSector (room);
-  SpriteWrapper->GetMovable ()->UpdateMove ();
-  SpriteWrapper->GetFlags().Set (CS_ENTITY_CONVEX);
-  SpriteWrapper->SetZBufMode (CS_ZBUF_USE);
-  SpriteWrapper->SetRenderPriority (engine->GetWallRenderPriority ());
-
-  iSprite3DState *sprState = SCF_QUERY_INTERFACE (SpriteWrapper->GetMeshObject (),
-    iSprite3DState);
-  sprState->SetBaseColor (csColor (1, 1, 1));
-  sprState->SetLighting (false);
-  sprState->DecRef ();
-*/
+    iSprite3DState *sprState = SCF_QUERY_INTERFACE (SpriteWrapper->GetMeshObject (),
+      iSprite3DState);
+    sprState->SetBaseColor (csColor (1, 1, 1));
+    sprState->SetLighting (false);
+    sprState->DecRef ();
+    sprState->SetAction ("action");
+  }
 
   engine->SetAmbientLight (csColor (0.5, 0.5, 0.5));
 
@@ -355,6 +392,7 @@ int main (int argc, char* argv[])
   //@@@ WHY IS THE FONTSERVER NEEDED FOR OPENGL AND NOT FOR SOFTWARE???
   System->RequestPlugin ("crystalspace.font.server.default:FontServer");
   System->RequestPlugin ("crystalspace.graphic.image.io.multiplex:ImageLoader");
+//  System->RequestPlugin ("crystalspace.graphics3d.opengl:VideoDriver");
   System->RequestPlugin ("crystalspace.graphics3d.software:VideoDriver");
   System->RequestPlugin ("crystalspace.engine.3d:Engine");
   System->RequestPlugin ("crystalspace.level.loader:LevelLoader");

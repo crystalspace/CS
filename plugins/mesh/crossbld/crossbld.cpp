@@ -108,8 +108,11 @@ bool csCrossBuilder::BuildThing (iModelData *Data, iThingState *tgt,
     // test if this is a valid polygon
     iModelDataPolygon *Polygon =
       SCF_QUERY_INTERFACE_FAST (it->GetObject (), iModelDataPolygon);
-    if (Polygon->GetVertexCount () < 3)
+    if (!Polygon || Polygon->GetVertexCount () < 3)
+    {
+      it->Next ();
       continue;
+    }
     iPolygon3D *ThingPoly = tgt->CreatePolygon ();
 
     // copy vertices

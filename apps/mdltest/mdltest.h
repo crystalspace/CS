@@ -50,7 +50,8 @@ public:
 	const char *iConfigName);
   virtual bool HandleEvent (iEvent&);
   virtual void NextFrame ();
-  iModelData *ImportModel (iMaterialWrapper *OtherMaterial);
+  iModelDataVertices *CreateDefaultModelVertexFrame ();
+  iModelData *CreateDefaultModel (iMaterialWrapper *OtherMaterial);
   iMaterialWrapper *LoadTexture (const char *Name, const char *Filename);
 };
 
