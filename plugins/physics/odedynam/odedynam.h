@@ -58,22 +58,20 @@ struct iSkeletonBone;
 struct colliderdata
 {
 public:
-  iCollideSystem* collsys;
-  iCollider* collider;
+  csRef<iCollideSystem> collsys;
+  csRef<iCollider> collider;
   float friction;
   dReal aabb[6];
 
   colliderdata (iCollideSystem* cs, iCollider* c, float f ) 
   {
-    collsys=cs; SCF_INC_REF(cs); collider=c; SCF_INC_REF(c); friction=f;
+    collsys=cs; collider=c; friction=f;
     aabb[0]=-dInfinity;	aabb[1]=dInfinity;	
     aabb[2]=-dInfinity;	aabb[3]=dInfinity;	
     aabb[4]=-dInfinity;	aabb[5]=dInfinity;
   }
   ~colliderdata() 
   {
-    SCF_DEC_REF(collsys);
-    SCF_DEC_REF(collider);
   }
 };
 

@@ -60,8 +60,6 @@
 
 // Implementation //////////////////////////////////////////////////////
 awsManager::awsManager (iBase *p) :
-  prefmgr(NULL),
-  sinkmgr(NULL),
   updatestore_dirty(true),
   top(NULL),
   mouse_in(NULL),
@@ -71,7 +69,6 @@ awsManager::awsManager (iBase *p) :
   ptG2D(NULL),
   ptG3D(NULL),
   object_reg(NULL),
-  canvas(NULL),
   flags(0)
 {
   SCF_CONSTRUCT_IBASE (p);
@@ -90,10 +87,6 @@ awsManager::~awsManager ()
     scfiEventHandler->DecRef ();
   }
 
-  SCF_DEC_REF (prefmgr);
-  SCF_DEC_REF (sinkmgr);
-  SCF_DEC_REF (canvas);
-
   void *p = component_factories.GetFirstItem ();
   while ((p = component_factories.GetCurrentItem ()))
   {
@@ -108,11 +101,13 @@ bool awsManager::Initialize (iObjectRegistry *object_reg)
 {
   awsManager::object_reg = object_reg;
 
-  prefmgr = SCF_CREATE_INSTANCE("crystalspace.window.preferencemanager",
-				iAwsPrefManager);
+  prefmgr = csPtr<iAwsPrefManager> (
+	  SCF_CREATE_INSTANCE("crystalspace.window.preferencemanager",
+				iAwsPrefManager));
 
-  sinkmgr = SCF_CREATE_INSTANCE ("crystalspace.window.sinkmanager",
-			        iAwsSinkManager);
+  sinkmgr = csPtr<iAwsSinkManager> (
+	  SCF_CREATE_INSTANCE ("crystalspace.window.sinkmanager",
+			        iAwsSinkManager));
 
   if (!prefmgr)
   {
@@ -152,8 +147,6 @@ iAwsSinkManager *awsManager::GetSinkMgr ()
 
 void awsManager::SetPrefMgr (iAwsPrefManager *pmgr)
 {
-  SCF_INC_REF(pmgr);
-  SCF_DEC_REF(prefmgr);
   prefmgr = pmgr;
 }
 
@@ -217,8 +210,6 @@ void awsManager::SetCanvas (iAwsCanvas *newCanvas)
   if (!newCanvas)
     return;
   
-  SCF_INC_REF(newCanvas);
-  SCF_DEC_REF(canvas);
   canvas = newCanvas;
 
   ptG2D = canvas->G2D ();

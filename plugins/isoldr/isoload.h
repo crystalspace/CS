@@ -137,9 +137,9 @@ private:
   /// load plugins)
   bool ParseMeshObject (char* buf, const char* prefix);
 
-  iIsoWorld *world;
+  csRef<iIsoWorld> world;
   iIsoGrid *current_grid;
-  iIsoView *view;
+  csRef<iIsoView> view;
 
   // Starting position in the world
   csVector3 start_v;

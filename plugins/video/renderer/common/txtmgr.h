@@ -230,7 +230,7 @@ class csMaterialHandle : public iMaterialHandle
 {
 protected:
   /// A texture.
-  iTextureHandle *texture;
+  csRef<iTextureHandle> texture;
   /// Numer of texture layers.
   int num_texture_layers;
   /// Texture layers.
@@ -245,9 +245,9 @@ protected:
   /// Material reflection parameters
   float diffuse, ambient, reflection;
   /// Original material.
-  iMaterial *material;
+  csRef<iMaterial> material;
   /// Parent texture manager
-  csTextureManager *texman;
+  csRef<csTextureManager> texman;
 
 public:
   ///

@@ -416,7 +416,7 @@ bool csIsoLoader::LoadMap (char* buf)
       ReportError(tag,"START POSITION outside world space - bye!");
       return false;
     }
-    view = Engine->CreateView(world);
+    view = csPtr<iIsoView> (Engine->CreateView(world));
     view->SetScroll (start_v, 
       csVector2(G3D->GetWidth()/2, G3D->GetHeight()/2));
  
@@ -1239,16 +1239,12 @@ csIsoLoader::csIsoLoader(iBase *p)
   SCF_CONSTRUCT_IBASE(p);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
 
-  world = NULL;
-  view = NULL;
   current_grid = NULL;
   object_reg = NULL;
 }
 
 csIsoLoader::~csIsoLoader()
 {
-  SCF_DEC_REF(world);
-  SCF_DEC_REF(view);
 }
 
 bool csIsoLoader::Initialize(iObjectRegistry *object_Reg)
@@ -1308,7 +1304,7 @@ bool csIsoLoader::Initialize(iObjectRegistry *object_Reg)
 
   G3D = CS_QUERY_REGISTRY(object_reg, iGraphics3D);
 
-  world = Engine->CreateWorld();
+  world = csPtr<iIsoWorld> (Engine->CreateWorld());
 
   return true;
 }

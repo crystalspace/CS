@@ -132,17 +132,15 @@ class csIsoFakeRenderView : public iRenderView
    * A callback function. If this is set then no drawing is done.
    * Instead the callback function is called.
    */
-  iDrawFuncCallback* callback;
+  csRef<iDrawFuncCallback> callback;
 
 public:
   SCF_DECLARE_IBASE;
   csIsoFakeRenderView()
   {
-    callback = NULL;
   }
   virtual ~csIsoFakeRenderView()
   {
-    SCF_DEC_REF (callback);
   }
 
   /// set data to render an isometric mesh
@@ -331,7 +329,7 @@ public:
   }
   virtual void SetCallback (iDrawFuncCallback* cb)
   {
-    SCF_SET_REF (callback, cb);
+    callback = cb;
   }
   virtual iDrawFuncCallback* GetCallback ()
   {

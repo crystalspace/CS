@@ -24,8 +24,6 @@ const bool DEBUG_INIT = false;
 /// The gradient step for the slightly darker and lighter versions of the highlight and shadow.
 const unsigned char GRADIENT_STEP = 25;
 
-iFile *aws_fileinputvfs;
-
 /***************************************************************************************************************
 *   This constructor converts the text-based name into a fairly unique numeric ID.  The ID's are then used for *
 * comparison.  The method of text-to-id mapping may be somewhat slower than a counter, but it does not have to *
@@ -274,9 +272,6 @@ bool awsPrefManager::Load (const char *def_file)
     "\tload successful (%i windows, %i skins loaded.)\n",
     n_win_defs - ncw,
     n_skin_defs - ncs);
-
-  SCF_DEC_REF (aws_fileinputvfs);
-  aws_fileinputvfs = NULL;
 
   return true;
 }

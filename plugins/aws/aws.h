@@ -42,10 +42,10 @@ class awsManager : public iAws
 {
 private:
   /// Handle to the preference manager.
-  iAwsPrefManager *prefmgr;
+  csRef<iAwsPrefManager> prefmgr;
 
   /// Handle to the sink manager
-  iAwsSinkManager *sinkmgr;
+  csRef<iAwsSinkManager> sinkmgr;
 
   /** This is the dirty region.  All clean/dirty code now utilizes the update
    *  region facility for non-contiguous rectangular spaces.  This buffer
@@ -101,7 +101,7 @@ private:
   iObjectRegistry *object_reg;
 
   /// canvas instantiation
-  iAwsCanvas *canvas;
+  csRef<iAwsCanvas> canvas;
 
   /**
     * Defines the mapping between a factory and it's interned name.  Used for window template instantiation.

@@ -79,13 +79,11 @@ csModelDataTexture::csModelDataTexture ()
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
   FileName = NULL;
-  TextureWrapper = NULL;
 }
 
 csModelDataTexture::~csModelDataTexture ()
 {
   delete[] FileName;
-  SCF_DEC_REF (TextureWrapper);
 }
 
 void csModelDataTexture::SetFileName (const char *fn)

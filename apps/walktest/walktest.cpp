@@ -192,8 +192,6 @@ WalkTest::~WalkTest ()
 {
   delete wf;
   delete [] auto_script;
-  SCF_DEC_REF (views[0]);
-  SCF_DEC_REF (views[1]);  
   delete infinite_maze;
   delete cslogo;
   /*
@@ -1444,8 +1442,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
   // You don't have to use csView as you can do the same by
   // manually creating a camera and a clipper but it makes things a little
   // easier.
-  views[0] = new csView (Engine, Gfx3D);
-  views[1] = new csView (Engine, Gfx3D);  
+  views[0] = csPtr<iView> (new csView (Engine, Gfx3D));
+  views[1] = csPtr<iView> (new csView (Engine, Gfx3D));
   view = views[0];
 
   // Get the collide system plugin.

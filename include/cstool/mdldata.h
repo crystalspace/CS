@@ -76,7 +76,7 @@ class csModelDataTexture : public iModelDataTexture
 private:
   char *FileName;
   csRef<iImage> Image;
-  iTextureWrapper *TextureWrapper;
+  csRef<iTextureWrapper> TextureWrapper;
 public:
   SCF_DECLARE_IBASE;
   CS_DECLARE_OBJECT_INTERFACE;

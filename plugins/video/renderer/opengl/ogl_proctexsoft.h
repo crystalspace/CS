@@ -59,18 +59,16 @@ class csOpenGLProcSoftware : public iGraphics3D
   {
     txt_handles (iTextureHandle *soft, iTextureHandle *ogl)
     {
-      (soft_txt = soft)->IncRef ();
-      (ogl_txt = ogl)->IncRef ();
+      soft_txt = soft;
+      ogl_txt = ogl;
     }
 
     ~txt_handles ()
     {
-      SCF_DEC_REF (soft_txt);
-      SCF_DEC_REF (ogl_txt);
     }
 
-    iTextureHandle *soft_txt;
-    iTextureHandle *ogl_txt;
+    csRef<iTextureHandle> soft_txt;
+    csRef<iTextureHandle> ogl_txt;
   };
 
   class TxtHandleVector : public csVector

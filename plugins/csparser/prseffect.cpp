@@ -45,7 +45,7 @@ bool csLoader::LoadEffectFile(const char* filename)
   }
 
   ResolveOnlyRegion = false;
-  SCF_DEC_REF (ldr_context); ldr_context = NULL;
+  ldr_context = NULL;
 
   csRef<iDocument> doc;
   bool er = TestXml (filename, buf, doc);

@@ -378,7 +378,7 @@ public:
   /// Value to indicate split state
   /// -1 = not split, other value is index of current view
   int split;
-  iView *views[2];
+  csRef<iView> views[2];
 
   /// is actually anything visible on the canvas?
   bool canvas_exposed;

@@ -120,7 +120,7 @@ private:
   static unsigned long LastCurveID;
 
   /// Material for this curve
-  iMaterialWrapper* Material;
+  csRef<iMaterialWrapper> Material;
 
   /// Pointer to the template for this curve
   csCurveTemplate* CurveTemplate;
@@ -335,7 +335,7 @@ SCF_VERSION (csCurveTemplate, 0, 0, 1);
 class csCurveTemplate : public csObject
 {
 protected:
-  iMaterialWrapper* Material;
+  csRef<iMaterialWrapper> Material;
 
 protected:
   ///

@@ -145,7 +145,6 @@ unsigned long csCurve:: LastCurveID = 0;
 
 csCurve::csCurve (csCurveTemplate *parent_tmpl) :
   csObject(),
-  Material(NULL),
   CurveTemplate(parent_tmpl),
   LightPatches(NULL),
   O2W(NULL),
@@ -159,7 +158,6 @@ csCurve::csCurve (csCurveTemplate *parent_tmpl) :
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiVertexBufferManagerClient);
 
   CurveID = LastCurveID++;
-  Material = NULL;
   vbuf = NULL;
   vbufmgr = NULL;
   SetupVertexBuffer ();
@@ -176,7 +174,6 @@ csCurve::~csCurve ()
   delete LightMap;
   delete[] uv2World;
   delete[] uv2Normal;
-  SCF_DEC_REF (Material);
   if (vbufmgr) vbufmgr->RemoveClient (&scfiVertexBufferManagerClient);
   if (vbuf) vbuf->DecRef ();
 }
@@ -195,7 +192,7 @@ void csCurve::SetupVertexBuffer ()
 
 void csCurve::SetMaterial (iMaterialWrapper *m)
 {
-  SCF_SET_REF (Material, m);
+  Material = m;
 }
 
 void csCurve::MakeDirtyDynamicLights ()
@@ -853,17 +850,15 @@ csCurveTemplate::csCurveTemplate () :
 {
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiCurveTemplate);
   csEngine::current_engine->AddToCurrentRegion (this);
-  Material = NULL;
 }
 
 csCurveTemplate::~csCurveTemplate ()
 {
-  SCF_DEC_REF (Material);
 }
 
 void csCurveTemplate::SetMaterial (iMaterialWrapper *m)
 {
-  SCF_SET_REF (Material, m);
+  Material = m;
 }
 
 // --- code for Bezier curves follows ----------------------------------------

@@ -216,13 +216,12 @@ csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
   DG_ADDI (this, NULL);
   DG_TYPE (this, "csMaterialHandle");
   num_texture_layers = 0;
-  if ((material = m) != 0)
+  material = m;
+  if (material != 0)
   {
-    material->IncRef ();
     texture = material->GetTexture ();
     if (texture)
     {
-      texture->IncRef ();
       DG_LINK (this, texture);
     }
     material->GetReflection (diffuse, ambient, reflection);
@@ -240,7 +239,7 @@ csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
 	texture_layers[i].vshift != 0;
     }
   }
-  (texman = parent)->IncRef ();
+  texman = parent;
 }
 
 csMaterialHandle::csMaterialHandle (iTextureHandle* t, csTextureManager *parent)
@@ -248,22 +247,20 @@ csMaterialHandle::csMaterialHandle (iTextureHandle* t, csTextureManager *parent)
   SCF_CONSTRUCT_IBASE (NULL);
   DG_ADDI (this, NULL);
   DG_TYPE (this, "csMaterialHandle");
-  material = NULL;
   num_texture_layers = 0;
   diffuse = 0.7; ambient = 0; reflection = 0;
-  if ((texture = t) != 0)
+  texture = t;
+  if (texture != 0)
   {
     DG_LINK (this, texture);
-    texture->IncRef ();
   }
-  (texman = parent)->IncRef ();
+  texman = parent;
 }
 
 csMaterialHandle::~csMaterialHandle ()
 {
   FreeMaterial ();
   texman->UnregisterMaterial (this);
-  texman->DecRef ();
   DG_REM (this);
 }
 
@@ -272,13 +269,8 @@ void csMaterialHandle::FreeMaterial ()
   if (texture)
   {
     DG_UNLINK (this, texture);
-    SCF_DEC_REF (texture);
   }
-  if (material)
-  {
-    material->DecRef ();
-    material = NULL;
-  }
+  material = NULL;
 }
 
 void csMaterialHandle::Prepare ()
@@ -288,11 +280,9 @@ void csMaterialHandle::Prepare ()
     if (texture != material->GetTexture())
     {
       DG_UNLINK (this, texture);
-      SCF_DEC_REF(texture);
       texture = material->GetTexture ();
       if (texture)
       {
-        texture->IncRef ();
 	DG_LINK (this, texture);
       }
     }

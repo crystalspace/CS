@@ -439,15 +439,13 @@ awsTest::SetupFrame()
   aws->Print(myG3D, 64);
   /*if (AWSTEST_SINGLEPROCTEXCANVAS)
   {
-    iTextureWrapper *tex = SCF_QUERY_INTERFACE(awsCanvas, iTextureWrapper);
+    csRef<iTextureWrapper> tex (SCF_QUERY_INTERFACE(awsCanvas, iTextureWrapper));
     if (tex)
     {
       myG3D->DrawPixmap(tex->GetTextureHandle(),
                     0,0,512,512,
                     0,0,512,512,
                     0);
-
-      SCF_DEC_REF(tex);
     }
   }*/
 }

@@ -114,7 +114,6 @@ void FontDeleteNotify::BeforeDelete (iFont *font)
 GLFontCache::GLFontCache (iFontServer *fs, iGraphics2D *g) : FontCache (8, 8)
 {
   g2d = g;
-  SCF_INC_REF( g2d );
   g2d->PerformExtension( "getstatecache", &statecache );
 
   int i = 0;
@@ -133,8 +132,6 @@ GLFontCache::~GLFontCache ()
   for (i = 0; i < FontCache.Length (); i++)
     FontCache.Get (i)->font->RemoveDeleteCallback (delete_callback);
   delete_callback->DecRef ();
-
-  SCF_DEC_REF( g2d );
 }
 
 GLGlyphSet *GLFontCache::CacheFont (iFont *font)

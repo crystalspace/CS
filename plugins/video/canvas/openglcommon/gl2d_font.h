@@ -116,7 +116,7 @@ protected:
   iFontDeleteNotify* delete_callback;
 
   // Graphics2D
-  iGraphics2D *g2d;
+  csRef<iGraphics2D> g2d;
   // State cache
   iGLStateCache *statecache;
 #ifndef OPENGL_BITMAP_FONT

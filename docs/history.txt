@@ -1,5 +1,14 @@
 The history order is reversed so that new features are at the top.
 
+15-Sep-2002
+	- Several csPtr/csRef related changes.
+	- Fixed a potential crash bug in AWS. An SCF_DEC_REF
+	  was called on aws_fileinputvfs but that variable was
+	  never initialized to anything.
+	- Fixed a bug in the effect loader. It was calling
+	  DecRef() on ldr_context.
+	- Fixed decref bug in odedynam. Don't do DecRef() on
+	  csRef's! (collidesys in this case).
 14-Sep-2002
 	- Fixed a ref counting bug in picview.
 	- Fixed the bug in the OpenGL state cache (canvas). It was not

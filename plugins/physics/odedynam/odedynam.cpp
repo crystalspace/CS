@@ -584,7 +584,6 @@ csODEDynamicSystem::csODEDynamicSystem ()
   SCF_CONSTRUCT_IBASE (NULL);
 
   //TODO: QUERY for collidesys
-  collidesys = NULL;
 
   worldID = dWorldCreate ();
   spaceID = dHashSpaceCreate ();
@@ -599,7 +598,6 @@ csODEDynamicSystem::~csODEDynamicSystem ()
   groups.DeleteAll ();	
   bodies.DeleteAll ();
 
-  SCF_DEC_REF (collidesys);
   dSpaceDestroy (spaceID);
   dWorldDestroy (worldID);
   if (move_cb) move_cb->DecRef ();
