@@ -55,6 +55,9 @@ The history order is reversed so that new features are at the top.
 	  regarding non-virtual destructor.
 	- Eric Sunshine added the `metaball' and `mballldr' targets to
 	  `walkall' since `flarge' now requires these modules.
+	- In an effort to eliminate the big iso engine bug I added
+	  some asserts.
+	- Wouter Wijngaards fixed another bug in iso engine.
 17-Jul-2001
 	- Worked around an internal compiler error (for MingW compiler) in
 	  recent changes to crossbld.cpp by completely rearranging the

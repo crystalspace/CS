@@ -63,6 +63,7 @@ void csIsoLight::SetGrid(iIsoGrid *grid)
   delete[] vismap;
   visw = grid->GetWidth() * grid->GetGroundMultX();
   vish = grid->GetHeight() * grid->GetGroundMultY();
+  CS_ASSERT (visw > 0 && vish > 0);
   //vismap = new uint8 [ (visw * vish + 7) / 8 ];
   vismap = new float [ visw * vish ];
   recalc_vis = true;
@@ -195,6 +196,8 @@ float csIsoLight::GetVis(int x, int y) const
   else if(y>=vish) y=vish-1;
   //int pos = y*visw+x;
   //return vismap[pos>>3] & bitmasks[pos&0x7];
+  CS_ASSERT (x >= 0 && x < visw);
+  CS_ASSERT (y >= 0 && y < vish);
   return vismap[ y*visw+x ];
 }
 

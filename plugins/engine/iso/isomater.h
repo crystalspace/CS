@@ -271,6 +271,7 @@ public:
     }
     virtual iMaterialWrapper* Get (int idx)
     {
+      CS_ASSERT (idx >= 0 && idx < GetMaterialCount ());
       return &(scfParent->Get (idx)->scfiMaterialWrapper);
     }
     virtual iMaterialWrapper* FindByName (const char* iName)

@@ -19,6 +19,7 @@
 #define CS_SYSDEF_PROVIDE_ALLOCA
 #include "cssysdef.h"
 #include "isomesh.h"
+#include "csutil/scf.h"
 #include "ivideo/graph3d.h"
 #include "csgeom/math2d.h"
 #include "csgeom/polyclip.h"
@@ -215,11 +216,7 @@ public:
   }
   virtual void SetCallback (iDrawFuncCallback* cb)
   {
-    if (callback)
-      callback->DecRef ();
-    callback = cb;
-    if (callback)
-      callback->IncRef ();
+    SCF_SET_REF (callback, cb);
   }
   virtual iDrawFuncCallback* GetCallback ()
   {

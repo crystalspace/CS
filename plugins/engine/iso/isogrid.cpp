@@ -40,6 +40,7 @@ csIsoGrid::csIsoGrid (iBase *iParent, iIsoWorld *world, int w, int h)
   groundmap = new csIsoGroundMap(this, 1, 1);
   recalc_staticlight = true;
   fakelights = NULL;
+  num_fakelights = 0;
 }
 
 csIsoGrid::~csIsoGrid ()
@@ -248,6 +249,7 @@ void csIsoGrid::Draw(iIsoRenderView *rview)
     if(fakelights)
     {
       delete[] fakelights; fakelights = NULL;
+      num_fakelights = 0;
     }
   }
 }
@@ -434,9 +436,11 @@ void csIsoGrid::GetFakeLights(const csVector3& pos, iLight **& flights,
   if(!fakelights)
   {
     // make an array 'big enough'
-    fakelights = new iLight* [ lights.Length() + dynamiclights.Length() ];
+    num_fakelights = lights.Length () + dynamiclights.Length ();
+    fakelights = new iLight* [ num_fakelights ];
   }
   flights = fakelights;
+  CS_ASSERT (num_fakelights == lights.Length () + dynamiclights.Length ());
 
   // fill the current array
   num = 0;

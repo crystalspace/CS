@@ -56,6 +56,7 @@ private:
 
   /// prealloced array to store iLight*s in.
   iLight **fakelights;
+  int num_fakelights;
 
 public:
   SCF_DECLARE_IBASE;
