@@ -533,8 +533,6 @@ void CalculateFogMesh (csRenderView* rview, csTransform* tr_o2c,
     InitializeFogTable ();
 #endif
 
-  float inv_aspect = rview->inv_aspect;
-
   int i;
   csVector3* verts = mesh.vertices[0];
   for (i = 0 ; i < mesh.num_vertices ; i++)
