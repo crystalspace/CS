@@ -51,8 +51,8 @@ public:
   virtual float GetVolume ();
   virtual void PlaySound(iSoundData *Data, bool Loop);
   virtual void PlaySound(iSoundStream *Sound, bool Loop);
-  virtual iSoundSource *CreateSource(iSoundData *Sound, bool is3d);
-  virtual iSoundSource *CreateSource(iSoundStream *Sound, bool is3d);
+  virtual iSoundSource *CreateSource(iSoundData *Sound, int mode3d);
+  virtual iSoundSource *CreateSource(iSoundStream *Sound, int mode3d);
   virtual iSoundListener *GetListener ();
   virtual const csSoundFormat *GetLoadFormat();
   virtual void MixingFunction ();

@@ -22,11 +22,11 @@
 #define __ISNDRDR_H__
 
 #include "iplugin.h"
+#include "isndsrc.h"
 
 struct iSoundListener;
 struct iSoundData;
 struct iSoundStream;
-struct iSoundSource;
 struct csSoundFormat;
 
 /**
@@ -73,15 +73,17 @@ public:
 
   /**
    * Create a sound source. This is a convenience function
-   * to create a new sound stream and attach it to a new sound source.
+   * to create a new sound stream and attach it to a new sound source. Mode3D
+   * can be one of SOUND_HEAD, SOUND_RELATIVE or SOUND_3D.
    */
-  virtual iSoundSource *CreateSource(iSoundData *Sound, bool is3d) = 0;
+  virtual iSoundSource *CreateSource(iSoundData *Sound, int Mode3D) = 0;
   /**
    * Create a sound source and attach the given sound stream. Note: No other
    * part of your program should read data from the sound stream as long as
-   * the sound source exists.
+   * the sound source exists. Mode3D can be one of SOUND_HEAD, SOUND_RELATIVE
+   * or SOUND_3D.
    */
-  virtual iSoundSource *CreateSource(iSoundStream *Sound, bool is3d) = 0;
+  virtual iSoundSource *CreateSource(iSoundStream *Sound, int Mode3D) = 0;
 
   /// Get the global Listener object
   virtual iSoundListener *GetListener () = 0;

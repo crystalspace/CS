@@ -23,17 +23,17 @@
 
 #define IMPLEMENT_SOUNDRENDER_CONVENIENCE_METHODS(classname)            \
   void classname::PlaySound(iSoundData *snd, bool Loop) {               \
-    iSoundSource *src = CreateSource(snd,false);                        \
+    iSoundSource *src = CreateSource(snd,SOUND3D_DISABLE);              \
     if (src) {src->Play(Loop?SOUND_LOOP:0); src->DecRef();}             \
   }                                                                     \
   void classname::PlaySound(iSoundStream *snd, bool Loop) {             \
-    iSoundSource *src = CreateSource(snd,false);                        \
+    iSoundSource *src = CreateSource(snd,SOUND3D_DISABLE);              \
     if (src) {src->Play(Loop?SOUND_LOOP:0); src->DecRef();}             \
   }                                                                     \
-  iSoundSource *classname::CreateSource(iSoundData *snd, bool is3d) {   \
+  iSoundSource *classname::CreateSource(iSoundData *snd, int m3d) {     \
     if (!snd) return NULL;                                              \
     iSoundStream *str = snd->CreateStream();                            \
-    iSoundSource *src = CreateSource(str, is3d);                        \
+    iSoundSource *src = CreateSource(str, m3d);                         \
     str->DecRef();                                                      \
     return src;                                                         \
   }

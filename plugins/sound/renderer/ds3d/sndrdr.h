@@ -48,8 +48,8 @@ public:
 
   virtual void PlaySound (iSoundData *snd, bool Loop);
   virtual void PlaySound (iSoundStream *snd, bool Loop);
-  virtual iSoundSource *CreateSource (iSoundData *snd, bool Is3d);
-  virtual iSoundSource *CreateSource (iSoundStream *snd, bool Is3d);
+  virtual iSoundSource *CreateSource (iSoundData *snd, int Mode3d);
+  virtual iSoundSource *CreateSource (iSoundStream *snd, int Mode3d);
 
   virtual iSoundListener *GetListener ();
   virtual const csSoundFormat *GetLoadFormat();
@@ -59,6 +59,8 @@ public:
   void SetDirty();
   void AddSource(csSoundSourceDS3D *src);
   void RemoveSource(csSoundSourceDS3D *src);
+
+  const char *GetError(HRESULT result);
 
 public:
   LPDIRECTSOUND AudioRenderer;

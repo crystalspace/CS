@@ -24,9 +24,19 @@
 #include "csutil/scf.h"
 #include "csgeom/vector3.h"
 
-// these are flags and can be or'd
+/// These flags define how the sound is played.
 #define SOUND_RESTART   1
 #define SOUND_LOOP      2
+
+/// Every sound source must be set to one of these 3d modes.
+enum {
+  /// Disable 3d effect.
+  SOUND3D_DISABLE,
+  /// Position of the sound is relative to the listener.
+  SOUND3D_RELATIVE,
+  /// Position of the sound is absolute.
+  SOUND3D_ABSOLUTE
+};
 
 SCF_VERSION (iSoundSource, 0, 0, 1);
 
@@ -38,7 +48,7 @@ SCF_VERSION (iSoundSource, 0, 0, 1);
  */
 struct iSoundSource : public iBase
 {
-  /// Play the sound
+  /// Play the sound. PlayMethod can be set to any combination of SOUND_*
   virtual void Play (unsigned long playMethod = 0) = 0;
   /// Stop the sound
   virtual void Stop () = 0;
@@ -51,15 +61,17 @@ struct iSoundSource : public iBase
   /// Get frequency factor
   virtual float GetFrequencyFactor () = 0;
 
-  /// is this a 3d source?
-  virtual bool Is3d() = 0;
-  /// set position of this source. Only used in 3d sources
+  /// return 3d mode
+  virtual int GetMode3D() = 0;
+  /// set 3d mode
+  virtual void SetMode3D(int m) = 0;
+  /// set position of this source
   virtual void SetPosition(csVector3 pos) = 0;
-  /// get position of this source. Only used in 3d sources
+  /// get position of this source
   virtual csVector3 GetPosition() = 0;
-  /// set velocity of this source. Only used in 3d sources
+  /// set velocity of this source
   virtual void SetVelocity(csVector3 spd) = 0;
-  /// get velocity of this source. Only used in 3d sources
+  /// get velocity of this source
   virtual csVector3 GetVelocity() = 0;
 };
 

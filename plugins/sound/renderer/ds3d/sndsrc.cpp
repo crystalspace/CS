@@ -55,7 +55,9 @@ csSoundSourceDS3D::~csSoundSourceDS3D() {
 }
 
 bool csSoundSourceDS3D::Initialize(csSoundRenderDS3D *srdr,
-        iSoundStream *Data, bool is3d) {
+        iSoundStream *Data, int mode3d) {
+  HRESULT r;
+
   srdr->IncRef();
   Renderer = srdr;
 
@@ -68,11 +70,15 @@ bool csSoundSourceDS3D::Initialize(csSoundRenderDS3D *srdr,
   BufferBytes = NumSamples * SampleBytes;
 
   DSBUFFERDESC dsbd;
-  ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
-  dsbd.dwSize = sizeof(DSBUFFERDESC);
-  dsbd.dwFlags = DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLPAN  | DSBCAPS_CTRL3D;
-	
   WAVEFORMATEX wfxFormat;
+
+  dsbd.dwSize = sizeof(DSBUFFERDESC);
+  dsbd.dwFlags = DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLPAN
+    | DSBCAPS_CTRL3D | (Precached ? DSBCAPS_STATIC : 0);
+  dsbd.dwBufferBytes = BufferBytes;
+  dsbd.dwReserved = 0;
+  dsbd.lpwfxFormat = &wfxFormat;
+
   wfxFormat.wFormatTag = WAVE_FORMAT_PCM;
   wfxFormat.nChannels = Data->GetFormat()->Channels;
   wfxFormat.nSamplesPerSec = Data->GetFormat()->Freq;
@@ -80,12 +86,14 @@ bool csSoundSourceDS3D::Initialize(csSoundRenderDS3D *srdr,
   wfxFormat.nBlockAlign = (wfxFormat.wBitsPerSample*wfxFormat.nChannels)/8;
   wfxFormat.nAvgBytesPerSec = wfxFormat.nBlockAlign*wfxFormat.nSamplesPerSec;
   wfxFormat.cbSize = 0;
-  dsbd.lpwfxFormat = &wfxFormat;
-  dsbd.dwBufferBytes = BufferBytes;
-	
-  if (Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &Buffer2D, NULL) != DS_OK)
+
+  r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &Buffer2D, NULL);
+  if (r != DS_OK) {
+    srdr->System->Printf(MSG_WARNING, "cannot create secondary sound buffer "
+     "for sound source (%s).\n", srdr->GetError(r));
     return false;
-	
+  }
+
   Write(databuf, BufferBytes);
   Data->DiscardBuffer(databuf);
 
@@ -94,14 +102,14 @@ bool csSoundSourceDS3D::Initialize(csSoundRenderDS3D *srdr,
     SoundStream->IncRef();
   }
 
-  if (is3d) {
-    if (Buffer2D->QueryInterface(IID_IDirectSound3DBuffer,
-      (void **) &Buffer3D) < DS_OK) return false;
-
-    DWORD dwMode = DS3DMODE_NORMAL;
-    if (Buffer3D->SetMode(dwMode, DS3D_IMMEDIATE) < DS_OK) return false;
+  r = Buffer2D->QueryInterface(IID_IDirectSound3DBuffer, (void **) &Buffer3D);
+  if (r != DS_OK) {
+    srdr->System->Printf(MSG_WARNING, "cannot query 3D buffer interface "
+      "for sound source (%s).\n", srdr->GetError(r));
+    return false;
   }
 
+  SetMode3D(mode3d);
   BaseFrequency = Data->GetFormat()->Freq;
   SetPosition(csVector3(0,0,0));
   SetVelocity(csVector3(0,0,0));
@@ -146,6 +154,30 @@ float csSoundSourceDS3D::GetVolume()
   return (float)(dsvol-DSBVOLUME_MIN)/(float)(DSBVOLUME_MAX-DSBVOLUME_MIN);
 }
 
+void csSoundSourceDS3D::SetMode3D(int mode3D) {
+  DWORD Mode = (mode3D == SOUND3D_ABSOLUTE) ? DS3DMODE_NORMAL :
+    (mode3D == SOUND3D_RELATIVE) ? DS3DMODE_HEADRELATIVE :  DS3DMODE_DISABLE;
+  
+  HRESULT r = Buffer3D->SetMode(Mode, DS3D_DEFERRED);
+  if (r != DS_OK) {
+    Renderer->System->Printf(MSG_WARNING, "cannot set secondary sound buffer 3d mode "
+      "for sound source (%s)\n.", Renderer->GetError(r));
+  } else Renderer->SetDirty();
+}
+
+int csSoundSourceDS3D::GetMode3D() {
+  DWORD Mode;
+  HRESULT r = Buffer3D->GetMode(&Mode);
+  if (r != DS_OK) {
+    Renderer->System->Printf(MSG_WARNING, "cannot get secondary sound buffer 3d mode "
+      "for sound source (%s)\n.", Renderer->GetError(r));
+    return false;
+  }
+  if (Mode == DS3DMODE_NORMAL) return SOUND3D_ABSOLUTE;
+  else if (Mode == DS3DMODE_HEADRELATIVE) return SOUND3D_RELATIVE;
+  else return SOUND3D_DISABLE;
+}
+
 void csSoundSourceDS3D::Play(unsigned long PlayMethod)
 {
   Looped = PlayMethod & SOUND_LOOP;
@@ -163,10 +195,6 @@ void csSoundSourceDS3D::Stop()
   Renderer->RemoveSource(this);
 }
 
-bool csSoundSourceDS3D::Is3d() {
-  return (Buffer3D != NULL);
-}
-
 void csSoundSourceDS3D::SetFrequencyFactor(float factor) {
   Buffer2D->SetFrequency(BaseFrequency * factor);
 }
@@ -176,6 +204,8 @@ float csSoundSourceDS3D::GetFrequencyFactor() {
   Buffer2D->GetFrequency(&frq);
   return (frq/BaseFrequency);
 }
+
+
 
 bool csSoundSourceDS3D::IsPlaying() {
   DWORD r;

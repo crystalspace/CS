@@ -70,17 +70,21 @@ bool csSoundRenderDS3D::Open()
 {
   System->Printf (MSG_INITIALIZATION, "SoundRender DirectSound3D selected\n");
   
+  HRESULT r;
   if (!AudioRenderer) {
-    if (FAILED(DirectSoundCreate(NULL, &AudioRenderer, NULL))) {
-      System->Printf(MSG_FATAL_ERROR, "Error : Cannot Initialize DirectSound3D !");
+    r = DirectSoundCreate(NULL, &AudioRenderer, NULL);
+    if (r != DS_OK) {
+      System->Printf(MSG_FATAL_ERROR, "Error : Cannot Initialize "
+        "DirectSound3D (%s).\n", GetError(r));
       Close();
       return false;
     }
   
     DWORD dwLevel = DSSCL_EXCLUSIVE;
-    if (FAILED(AudioRenderer->SetCooperativeLevel(GetForegroundWindow(), dwLevel)))
-    {
-      System->Printf(MSG_FATAL_ERROR, "Error : Cannot Set Cooperative Level!");
+    r = AudioRenderer->SetCooperativeLevel(GetForegroundWindow(), dwLevel);
+    if (r != DS_OK) {
+      System->Printf(MSG_FATAL_ERROR, "Error : Cannot Set "
+        "Cooperative Level (%s).\n", GetError(r));
       Close();
       return false;
     }
@@ -125,10 +129,10 @@ float csSoundRenderDS3D::GetVolume()
 
 IMPLEMENT_SOUNDRENDER_CONVENIENCE_METHODS(csSoundRenderDS3D);
 
-iSoundSource *csSoundRenderDS3D::CreateSource(iSoundStream *snd, bool is3d) {
+iSoundSource *csSoundRenderDS3D::CreateSource(iSoundStream *snd, int mode3d) {
   if (!snd) return NULL;
   csSoundSourceDS3D *src = new csSoundSourceDS3D(this);
-  if (!src->Initialize(this, snd, is3d)) {
+  if (!src->Initialize(this, snd, mode3d)) {
     src->DecRef();
     return NULL;
   } else return src;
@@ -173,5 +177,31 @@ void csSoundRenderDS3D::RemoveSource(csSoundSourceDS3D *src) {
   if (n!=-1) {
     ActiveSources.Delete(n);
     src->DecRef();
+  }
+}
+
+const char *csSoundRenderDS3D::GetError(HRESULT r) {
+  switch (r) {
+    case DS_OK: return "success";
+    case DSERR_ALLOCATED: return "the resource is already allocated";
+    case DSERR_ALREADYINITIALIZED: return "the object is already initialized";
+    case DSERR_BADFORMAT: return "the specified wave format is not supported";
+    case DSERR_BUFFERLOST: return "the buffer memory has been lost";
+    case DSERR_CONTROLUNAVAIL: return "the requested control "
+      "(volume, pan, ...) is not available";
+    case DSERR_INVALIDCALL: return "this function is not valid for the current "
+      "state of this object";
+    case DSERR_INVALIDPARAM: return "an invalid parameter was passed to the "
+      "returning function";
+    case DSERR_NOAGGREGATION: return "the object does not support aggregation";
+    case DSERR_NODRIVER: return "no sound driver is available for use";
+    case DSERR_OTHERAPPHASPRIO: return "OTHERAPPHASPRIO";
+    case DSERR_OUTOFMEMORY: return "out of memory";
+    case DSERR_PRIOLEVELNEEDED: return "the application does not have the "
+      "required priority level";
+    case DSERR_UNINITIALIZED: return "IDirectSound not initialized";
+    case DSERR_UNSUPPORTED: return "function is not supported at this time";
+
+    case DSERR_GENERIC: default: return "unknown DirectSound error";
   }
 }

@@ -31,7 +31,7 @@ public:
 
   csSoundSourceDS3D(iBase *scfParent);
   virtual ~csSoundSourceDS3D();
-  bool Initialize(csSoundRenderDS3D *srdr, iSoundStream *data, bool is3d);
+  bool Initialize(csSoundRenderDS3D *srdr, iSoundStream *data, int Mode3d);
 
   virtual void Play (unsigned long playMethod = 0);
   virtual void Stop ();
@@ -39,7 +39,8 @@ public:
   virtual float GetVolume ();
   virtual void SetFrequencyFactor (float factor);
   virtual float GetFrequencyFactor ();
-  virtual bool Is3d();
+  virtual int GetMode3D();
+  virtual void SetMode3D(int m);
   virtual void SetPosition(csVector3 pos);
   virtual csVector3 GetPosition();
   virtual void SetVelocity(csVector3 spd);

@@ -134,7 +134,7 @@ void csSoundRenderSoftware::Close()
 
 IMPLEMENT_SOUNDRENDER_CONVENIENCE_METHODS(csSoundRenderSoftware);
 
-iSoundSource *csSoundRenderSoftware::CreateSource(iSoundStream *Str, bool is3d) {
+iSoundSource *csSoundRenderSoftware::CreateSource(iSoundStream *Str, int mode3d) {
   if (!Str) return NULL;
   // check for correct input format
   const csSoundFormat *fmt = Str->GetFormat();
@@ -147,7 +147,7 @@ iSoundSource *csSoundRenderSoftware::CreateSource(iSoundStream *Str, bool is3d) 
     return NULL;
   }
 
-  return new csSoundSourceSoftware(this, Str, is3d);
+  return new csSoundSourceSoftware(this, Str, mode3d);
 }
 
 iSoundListener *csSoundRenderSoftware::GetListener()

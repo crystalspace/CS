@@ -872,7 +872,6 @@ struct ExplosionStruct
   int type;		// type == DYN_TYPE_EXPLOSION
   float radius;
   int dir;
-  iSoundSource *snd;
 };
 
 struct RandomLight
@@ -916,14 +915,23 @@ void HandleDynLight (csDynLight* dyn)
 	  Sys->view->GetEngine ()->RemoveSprite (ms->sprite);
 	}
         dyn->ObjRemove(dyn->GetChild (csDataObject::Type));
+        if (ms->snd)
+        {
+          ms->snd->Stop();
+          ms->snd->DecRef();
+        }
         delete ms;
-        ExplosionStruct* es = new ExplosionStruct;
         if (Sys->Sound)
-          if ((es->snd = Sys->Sound->CreateSource (Sys->wMissile_boom, true)))
+        {
+          iSoundSource *sndsrc;
+          if ((sndsrc = Sys->Sound->CreateSource (Sys->wMissile_boom, SOUND3D_ABSOLUTE)))
           {
-            es->snd->SetPosition (v);
-            es->snd->Play();
+            sndsrc->SetPosition (v);
+            sndsrc->Play();
+            sndsrc->DecRef();
           }
+        }
+        ExplosionStruct* es = new ExplosionStruct;
         es->type = DYN_TYPE_EXPLOSION;
         es->radius = 2;
         es->dir = 1;
@@ -952,11 +960,6 @@ void HandleDynLight (csDynLight* dyn)
         es->radius -= 2;
 	if (es->radius < 1)
 	{
-          if (Sys->Sound && es->snd)
-	  {
-            es->snd->Stop ();
-            es->snd->DecRef ();
-	  }
 	  delete es;
           Sys->view->GetEngine ()->RemoveDynLight (dyn);
           delete dyn;
@@ -1001,7 +1004,7 @@ void fire_missile ()
   dyn->Setup ();
   MissileStruct* ms = new MissileStruct;
   if (Sys->Sound)
-    if ((ms->snd = Sys->Sound->CreateSource (Sys->wMissile_whoosh, true)))
+    if ((ms->snd = Sys->Sound->CreateSource (Sys->wMissile_whoosh, SOUND3D_ABSOLUTE)))
     {
       ms->snd->SetPosition (pos);
       ms->snd->Play();

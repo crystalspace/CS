@@ -30,13 +30,13 @@ IMPLEMENT_IBASE(csSoundSourceSoftware)
 IMPLEMENT_IBASE_END;
 
 csSoundSourceSoftware::csSoundSourceSoftware(csSoundRenderSoftware *srdr,
-    iSoundStream *Stream, bool is3d) {
+    iSoundStream *Stream, bool m3d) {
   CONSTRUCT_IBASE(srdr);
 
   SoundRender = srdr;
   FrequencyFactor = 1;
   Volume = 1.0;
-  Sound3d = is3d;
+  Mode3d = m3d;
   Position = csVector3(0,0,0);
   Velocity = csVector3(0,0,0);
   Active = false;
@@ -85,8 +85,12 @@ float csSoundSourceSoftware::GetFrequencyFactor() {
   return FrequencyFactor;
 }
 
-bool csSoundSourceSoftware::Is3d() {
-  return Sound3d;
+int csSoundSourceSoftware::GetMode3D() {
+  return Mode3d;
+}
+
+void csSoundSourceSoftware::SetMode3D(int m3d) {
+  Mode3d = m3d;
 }
 
 void csSoundSourceSoftware::SetPosition(csVector3 pos) {
@@ -113,21 +117,34 @@ void csSoundSourceSoftware::Prepare(unsigned long VolDiv) {
   CalcVolL=CalcVolR=Volume/VolDiv;
 
   // for non-3d sources we don't calculate anything else
-  if (!Is3d()) return;
+  if (Mode3d == SOUND3D_DISABLE) return;
 
   // get the global listener object
   iSoundListener *Listener=SoundRender->GetListener();
-  float DistFactor=Listener->GetDistanceFactor();
-    
-  // calculate the 'left' vector
-  csVector3 Front,Top,Left;
-  Listener->GetDirection(Front,Top);
-  Left=Top%Front;
 
-  // calculate ear position
+  // position of the listener's ears
   csVector3 EarL,EarR;
-  EarL=Listener->GetPosition()+Left*Listener->GetHeadSize()/2;
-  EarR=Listener->GetPosition()-Left*Listener->GetHeadSize()/2;
+
+  if (Mode3d == SOUND3D_RELATIVE) {
+    // position of the sound is relative to the listener, so we simply
+    // place the listener at (0,0,0) with front (0,0,1) and top (0,1,0)
+    EarL = csVector3(-Listener->GetHeadSize()/2, 0, 0);
+    EarR = csVector3(+Listener->GetHeadSize()/2, 0, 0);
+  } else {
+    // calculate the 'left' vector
+    csVector3 Front,Top,Left;
+    Listener->GetDirection(Front,Top);
+    Left=Top%Front;
+    if (Left.Norm()<EPSILON) {
+      // user has supplied bad front and top vectors
+      CalcVolL = CalcVolR = 0;
+      return;
+    } else Left.Normalize();
+
+    // calculate ear position
+    EarL=Listener->GetPosition()+Left*Listener->GetHeadSize()/2;
+    EarR=Listener->GetPosition()-Left*Listener->GetHeadSize()/2;
+  }
 
   // calculate ear distance
   float DistL,DistR;
@@ -136,22 +153,23 @@ void csSoundSourceSoftware::Prepare(unsigned long VolDiv) {
 
   // the following tests should not be deleted until we see (or hear)
   // what gives the best results. Just try it!
-/*
+
   // @@@ test: amplify difference between ears.
-  float d=DistL-DistR;
-  DistL+=d;
-  DistR-=d;
-*/
+//  float d=DistL-DistR;
+//  DistL+=2*d;
+//  DistR-=2*d;
+
   // @@@ test: take square root of distance. Otherwise the missile sound
   // in walktest seems to become distant too fast.
-  DistL=sqrt(DistL);
-  DistR=sqrt(DistR);
+//  DistL=sqrt(DistL);
+//  DistR=sqrt(DistR);
 
   // prevent too near sounds
   if (DistL<1) DistL=1;
   if (DistR<1) DistR=1;
 
   // calculate ear volume
+  float DistFactor=Listener->GetDistanceFactor();
   CalcVolL/=DistL*DistFactor;
   CalcVolR/=DistR*DistFactor;
 }
@@ -175,14 +193,14 @@ void csSoundSourceSoftware::Prepare(unsigned long VolDiv) {
 
 #define ADDTOBUFFER_BITS {                                                  \
   stype *Buffer=(stype*)Memory;                                             \
-  long RemainingSamples=MemSize/(sizeof(stype));                            \
-  if (SoundRender->isStereo()) RemainingSamples/=2;                         \
+  long SamplesToWrite=MemSize/(sizeof(stype));                              \
+  if (SoundRender->isStereo()) SamplesToWrite/=2;                           \
                                                                             \
   while (1) {                                                               \
-    long NumSamples = RemainingSamples;                                     \
+    long NumSamples = SamplesToWrite;                                       \
     stype *RawData = (stype*)SoundStream->Read(NumSamples);                 \
-    if (Is3d()) {                                                           \
-      /* handle 3d sound using the above macros */                          \
+    if (Mode3d != SOUND3D_DISABLE) {                                        \
+      /* is 3d effect is enabled, stereo input channels are mixed */        \
       if (Format->Channels==2) {                                            \
         if (SoundRender->isStereo()) {                                      \
           LOOP {READSTEREO3D; WRITESTEREO3D;}                               \
@@ -228,8 +246,8 @@ void csSoundSourceSoftware::Prepare(unsigned long VolDiv) {
       }                                                                     \
     }                                                                       \
     SoundStream->DiscardBuffer(RawData);                                    \
-    RemainingSamples-=NumSamples;                                           \
-    if (RemainingSamples==0) break;                                         \
+    SamplesToWrite-=NumSamples;                                             \
+    if (SamplesToWrite==0) break;                                           \
     else {                                                                  \
       if (PlayMethod & SOUND_LOOP) SoundStream->Restart();                  \
       else {Active=false;return;}                                           \

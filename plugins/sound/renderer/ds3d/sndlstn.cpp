@@ -52,22 +52,24 @@ bool csSoundListenerDS3D::Initialize(csSoundRenderDS3D *srdr) {
   Renderer = srdr;
 	
   DSBUFFERDESC dsbd;
-  ZeroMemory(&dsbd, sizeof(DSBUFFERDESC));
   dsbd.dwSize = sizeof(DSBUFFERDESC);
-  dsbd.dwFlags = DSBCAPS_PRIMARYBUFFER | DSBCAPS_CTRL3D;
-	
-  if (Renderer->AudioRenderer->CreateSoundBuffer
-    (&dsbd, &PrimaryBuffer, NULL) != DS_OK) {
-    Renderer->System->Printf(MSG_INITIALIZATION, "DS3D listener: Cannot create primary"
-      " sound buffer.\n");
+  dsbd.dwFlags = DSBCAPS_PRIMARYBUFFER | DSBCAPS_CTRL3D | DSBCAPS_CTRLVOLUME;
+  dsbd.dwReserved = 0;
+  dsbd.dwBufferBytes = 0;
+  dsbd.lpwfxFormat = NULL;
+
+  HRESULT r;
+  r = Renderer->AudioRenderer->CreateSoundBuffer(&dsbd, &PrimaryBuffer, NULL);
+  if (r != DS_OK) {
+    Renderer->System->Printf(MSG_INITIALIZATION, "DS3D listener: "
+      "Cannot create primary sound buffer (%s).\n", Renderer->GetError(r));
     return false;
   }
 	
-  if (PrimaryBuffer->QueryInterface(IID_IDirectSound3DListener, 
-    (void **) &Listener) != DS_OK)
-  {
+  r = PrimaryBuffer->QueryInterface(IID_IDirectSound3DListener, (void **) &Listener);
+  if (r != DS_OK) {
     Renderer->System->Printf(MSG_INITIALIZATION, "DS3D listener: Cannot query listener"
-      " interface from primary sound buffer.\n");
+      " interface from primary sound buffer (%s).\n", Renderer->GetError(r));
     return false;
   }
 

@@ -42,8 +42,8 @@ public:
   virtual void SetFrequencyFactor(float vol);
   virtual float GetFrequencyFactor();
 
-  virtual bool Is3d();
-
+  virtual void SetMode3D(int m);
+  virtual int GetMode3D();
   virtual void SetPosition(csVector3 pos);
   virtual csVector3 GetPosition();
   virtual void SetVelocity(csVector3 spd);
@@ -67,8 +67,8 @@ protected:
   float FrequencyFactor;
   // volume
   float Volume;
-  // is this a 3d source?
-  bool Sound3d;
+  // 3d mode
+  int Mode3d;
   // position
   csVector3 Position;
   // velocity
