@@ -285,9 +285,10 @@ unsigned char* csGraphics2DGLCommon::GetPixelAt (int x, int y)
 csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
 {
   // For the time being copy data into system memory.
+#ifndef GL_VERSION_1_2
   if (pfmt.PixelBytes != 1 && pfmt.PixelBytes != 4)
     return NULL;
-
+#endif
   // Convert to Opengl co-ordinate system
   y = Height - (y + h);
 
@@ -318,8 +319,25 @@ csImageArea *csGraphics2DGLCommon::SaveArea (int x, int y, int w, int h)
   glDisable (GL_DEPTH_TEST);
   glDisable (GL_DITHER);
   glDisable (GL_ALPHA_TEST);
-  glReadPixels (x, y, w, h, pfmt.PixelBytes == 1 ? GL_COLOR_INDEX : GL_RGBA,
-    GL_UNSIGNED_BYTE, dest);
+  GLenum format, type;
+  switch (pfmt.PixelBytes)
+  {
+    case 1:
+      format = GL_COLOR_INDEX;
+      type = GL_UNSIGNED_BYTE;
+      break;
+#ifdef GL_VERSION_1_2
+    case 2:  
+      format = GL_RGB;
+      type = GL_UNSIGNED_SHORT_5_6_5;
+      break;
+#endif
+    case 4:  
+      format = GL_RGBA;
+      type = GL_UNSIGNED_BYTE;
+      break;
+  }
+  glReadPixels (x, y, w, h, format, type, dest);
 
   return Area;
 }
@@ -333,9 +351,26 @@ void csGraphics2DGLCommon::RestoreArea (csImageArea *Area, bool Free)
   glDisable (GL_ALPHA_TEST);
   if (Area)
   {
+    GLenum format, type;
+    switch (pfmt.PixelBytes)
+    {
+      case 1:
+        format = GL_COLOR_INDEX;
+        type = GL_UNSIGNED_BYTE;
+        break;
+#ifdef GL_VERSION_1_2
+      case 2:  
+        format = GL_RGB;
+        type = GL_UNSIGNED_SHORT_5_6_5;
+        break;
+#endif
+      case 4:  
+        format = GL_RGBA;
+        type = GL_UNSIGNED_BYTE;
+        break;
+    }
     glRasterPos2i (Area->x, Area->y);
-    glDrawPixels (Area->w, Area->h, pfmt.PixelBytes == 1 ? GL_COLOR_INDEX : GL_RGBA,
-      GL_UNSIGNED_BYTE, Area->data);
+    glDrawPixels (Area->w, Area->h, format, type, Area->data);
     glFlush ();
     if (Free)
       FreeArea (Area);
