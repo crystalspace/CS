@@ -184,6 +184,7 @@ csBezierMesh::csBezierMesh (iBase *parent, csBezierMeshObjectType* thing_type) :
   scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshViscull (&scfiPolygonMeshLOD);
+  scfiObjectModel.SetPolygonMeshShadows (&scfiPolygonMeshLOD);
 
   last_thing_id++;
   thing_id = last_thing_id;

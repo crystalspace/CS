@@ -44,6 +44,7 @@ private:
   iPolygonMesh* polymesh_base;
   csRef<iPolygonMesh> polymesh_colldet;
   csRef<iPolygonMesh> polymesh_viscull;
+  csRef<iPolygonMesh> polymesh_shadows;
   csRefArray<iObjectModelListener> listeners;
 
 public:
@@ -105,6 +106,11 @@ public:
   virtual void SetPolygonMeshViscull (iPolygonMesh* polymesh)
   {
     polymesh_viscull = polymesh;
+  }
+  virtual iPolygonMesh* GetPolygonMeshShadows () { return polymesh_shadows; }
+  virtual void SetPolygonMeshShadows (iPolygonMesh* polymesh)
+  {
+    polymesh_shadows = polymesh;
   }
   virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
   {

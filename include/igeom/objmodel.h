@@ -71,7 +71,7 @@ struct iObjectModelListener : public iBase
   virtual void ObjectModelChanged (iObjectModel* model) = 0;
 };
 
-SCF_VERSION (iObjectModel, 0, 2, 0);
+SCF_VERSION (iObjectModel, 0, 3, 0);
 
 /**
  * This interface represents data related to some geometry in object
@@ -134,6 +134,27 @@ struct iObjectModel : public iBase
    * given polymesh.
    */
   virtual void SetPolygonMeshViscull (iPolygonMesh* polymesh) = 0;
+
+  /**
+   * Get a polygon mesh specifically for shadow casting (to be used by the
+   * shadow manager). This polygon mesh is guaranteed to be smaller or equal
+   * to the real object. In other words: if you would render the original
+   * mesh in red and this one in blue you should not see any blue anywhere.
+   * Can return NULL if this object model doesn't support that. In that
+   * case the object will not be used for shadow casting.
+   */
+  virtual iPolygonMesh* GetPolygonMeshShadows () = 0;
+
+  /**
+   * Set a polygon mesh representing the geometry of the object.
+   * This mesh is useful for shadow casting.
+   * This can be used to replace the default polygon mesh returned
+   * by GetPolygonMeshShadows() with one that has less detail or
+   * even to support polygon mesh for mesh objects that otherwise don't
+   * support it. The object model will keep a reference to the
+   * given polymesh.
+   */
+  virtual void SetPolygonMeshShadows (iPolygonMesh* polymesh) = 0;
 
   /**
    * Create a polygon mesh representing a lower detail version of the

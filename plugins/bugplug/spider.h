@@ -123,6 +123,8 @@ public:
     virtual void SetPolygonMeshColldet (iPolygonMesh*) { }
     virtual iPolygonMesh* GetPolygonMeshViscull () { return NULL; }
     virtual void SetPolygonMeshViscull (iPolygonMesh*) { }
+    virtual iPolygonMesh* GetPolygonMeshShadows () { return NULL; }
+    virtual void SetPolygonMeshShadows (iPolygonMesh*) { }
     virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float)
     { return NULL; }
     virtual void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL)

@@ -12,6 +12,13 @@ The history order is reversed so that new features are at the top.
           other platforms.
 	- Jorrit removed csArray and csPArray->GetArray() again as this
 	  breaks encapsulation.
+	- Jorrit added iObjectModel->GetPolygonMeshShadows() and
+	  SetPolygonMeshShadows(). This will be used by the shadow manager
+	  in the new renderer. Implemented this in csObjectModel and also
+	  fixed all mesh objects.
+	- Jorrit extended the loader so you can now specify <shadows/>
+	  in a <polymesh> to indicate that the polymesh is for shadows (this
+	  is in addition to <viscull/> and <colldet/>).
 	- res scrapped the 'experimental' token list macros in favor of a more
 	  stable & portable solution suggested by Eric Sunshine.
 19-May-2003

@@ -258,6 +258,7 @@ csSprite3DMeshObjectFactory::csSprite3DMeshObjectFactory (iBase *pParent) :
   scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshViscull (NULL);
+  scfiObjectModel.SetPolygonMeshShadows (NULL);
 
   logparent = NULL;
   cstxt = NULL;

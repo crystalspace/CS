@@ -429,6 +429,14 @@ public:
     {
       // @@@ TODO: implement me!
     }
+    virtual iPolygonMesh* GetPolygonMeshShadows ()
+    {
+      return NULL;
+    }
+    virtual void SetPolygonMeshShadows (iPolygonMesh*)
+    {
+      // @@@ TODO: implement me!
+    }
     virtual csPtr<iPolygonMesh> CreateLowerDetailPolygonMesh (float /*detail*/)
     { return NULL; }
     virtual void GetObjectBoundingBox (csBox3& bbox,

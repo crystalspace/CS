@@ -874,6 +874,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("heightmap", XMLTOKEN_HEIGHTMAP);
   xmltokens.Register ("multiply", XMLTOKEN_MULTIPLY);
   xmltokens.Register ("partsize", XMLTOKEN_PARTSIZE);
+  xmltokens.Register ("shadows", XMLTOKEN_SHADOWS);
   xmltokens.Register ("single", XMLTOKEN_SINGLE);
   xmltokens.Register ("size", XMLTOKEN_SIZE);
   xmltokens.Register ("slope", XMLTOKEN_SLOPE);
@@ -1530,6 +1531,7 @@ bool csLoader::ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel)
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   bool colldet = false;
   bool viscull = false;
+  bool shadows = false;
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
@@ -1552,22 +1554,27 @@ bool csLoader::ParsePolyMesh (iDocumentNode* node, iObjectModel* objmodel)
       case XMLTOKEN_VISCULL:
         viscull = true;
 	break;
+      case XMLTOKEN_SHADOWS:
+        shadows = true;
+	break;
       default:
 	SyntaxService->ReportBadToken (child);
         return false;
     }
   }
-  if (!colldet && !viscull)
+  if (!colldet && !viscull && !shadows)
   {
     SyntaxService->ReportError (
 	"crystalspace.maploader.parse.polymesh",
-	node, "Please specify either <viscull/> or <colldet/>!");
+	node, "Please specify either <shadows/>, <viscull/> or <colldet/>!");
     return false;
   }
   if (colldet)
     objmodel->SetPolygonMeshColldet (polymesh);
   if (viscull)
     objmodel->SetPolygonMeshViscull (polymesh);
+  if (shadows)
+    objmodel->SetPolygonMeshShadows (polymesh);
 
   return true;
 }
@@ -2312,6 +2319,7 @@ bool csLoader::LoadPolyMeshInSector (iLoaderContext* ldr_context,
   csRef<iPolygonMesh> polymesh;
   bool colldet = false;
   bool viscull = false;
+  bool shadows = false;
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
   while (it->HasNext ())
@@ -2363,17 +2371,20 @@ bool csLoader::LoadPolyMeshInSector (iLoaderContext* ldr_context,
       case XMLTOKEN_VISCULL:
         viscull = true;
 	break;
+      case XMLTOKEN_SHADOWS:
+        shadows = true;
+	break;
       default:
 	SyntaxService->ReportBadToken (child);
         return false;
     }
   }
 
-  if (!colldet && !viscull)
+  if (!colldet && !viscull && !shadows)
   {
     SyntaxService->ReportError (
 	"crystalspace.maploader.parse.polymesh",
-	node, "Please specify either <viscull/> or <colldet/>!");
+	node, "Please specify either <shadows/>, <viscull/> or <colldet/>!");
     return false;
   }
   if (!polymesh)
@@ -2388,6 +2399,8 @@ bool csLoader::LoadPolyMeshInSector (iLoaderContext* ldr_context,
     objmodel->SetPolygonMeshColldet (polymesh);
   if (viscull)
     objmodel->SetPolygonMeshViscull (polymesh);
+  if (shadows)
+    objmodel->SetPolygonMeshShadows (polymesh);
 
   csRef<iNullMeshState> nullmesh = SCF_QUERY_INTERFACE (
     	mesh->GetMeshObject (), iNullMeshState);

@@ -89,6 +89,7 @@ csBallMeshObject::csBallMeshObject (iMeshObjectFactory* factory)
   scfiObjectModel.SetPolygonMeshBase (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshColldet (&scfiPolygonMesh);
   scfiObjectModel.SetPolygonMeshViscull (NULL);
+  scfiObjectModel.SetPolygonMeshShadows (NULL);
 
   logparent = NULL;
   initialized = false;
