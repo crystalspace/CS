@@ -24,17 +24,13 @@ AC_CONFIG_HEADERS(config.h)
 #----------------------------------------------------------------------------
 # Check for applications
 #----------------------------------------------------------------------------
-AC_PROG_CC
+CS_PROG_CC
 AS_IF([test -z "$CC"],
 	[AC_MSG_ERROR([Couldn't find a usable C compiler.])])
-CS_JAMCONFIG_PROPERTY([CMD.CC], [$CC])
-AC_PROG_CXX
+CS_PROG_CXX
 AS_IF([test -z "$CXX"],
         [AC_MSG_ERROR([Couldn't find a usable C++ compiler.])])
-CS_JAMCONFIG_PROPERTY([CMD.C++], [$CXX])
-
-# we use the c++ compiler for linking
-CS_JAMCONFIG_PROPERTY([CMD.LINK], [AS_ESCAPE([$(CMD.C++)])])
+CS_PROG_LINK
 
 AC_CHECK_PROGS([INSTALL], [install])
 AS_IF([test -n "$INSTALL"], [CS_JAMCONFIG_PROPERTY([CMD.INSTALL], [$INSTALL])])

@@ -19,7 +19,8 @@ The history order is reversed so that new features are at the top.
 	- Matze fixed a problem with jamrules on win32. shellscripts should be
 	  invoked through the shell.
 	- Matze made the configure script respect the CFLAGS, CXXFLAGS,
-	  CPPFLAGS and LDFLAGS passed to configure.
+	  CPPFLAGS and LDFLAGS passed to configure. Also augmented the
+	  jamtemplate to take care of this by adding a new compiler.m4 macros.
 1-May-2003
 	- res made the following changes to VFS:
 	    - Added iFile::SetPos() to complement iFile::GetPos().
