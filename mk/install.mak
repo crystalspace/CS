@@ -99,6 +99,7 @@ INSTALL_DOCS.DESTFILES = $(addprefix $(INSTALL_DIR)/,  \
 
 $(INSTALL_DOCS.DIR): 
 	$(MKDIR)
+	@echo $@/deleteme.dir >> $(INSTALL_LOG)
 
 $(INSTALL_DOCS.DESTFILES): $(INSTALL_DIR)/docs/% : docs/html/%
 	$(CP) $< $@
