@@ -329,6 +329,7 @@ inline typename csList<T>::Iterator csList<T>::PushFront (const T& item)
 template <class T>
 inline void csList<T>::InsertAfter (Iterator &it, const T& item)
 {
+  CS_ASSERT(it.HasCurrent());
   csListElement* el = it.ptr;
   csListElement* next = el->next;
   csListElement* prev = el;
@@ -343,6 +344,7 @@ inline void csList<T>::InsertAfter (Iterator &it, const T& item)
 template <class T>
 inline void csList<T>::InsertBefore (Iterator &it, const T& item)
 {
+  CS_ASSERT(it.HasCurrent());
   csListElement* el = it.ptr;
   csListElement* next = el;
   csListElement* prev = el->prev;
@@ -357,6 +359,7 @@ inline void csList<T>::InsertBefore (Iterator &it, const T& item)
 template <class T>
 inline void csList<T>::MoveAfter (const Iterator &it, const Iterator &item)
 {
+  CS_ASSERT(item.HasCurrent());
   csListElement* el_item = item.ptr;
 
   // Unlink the item.
@@ -369,6 +372,7 @@ inline void csList<T>::MoveAfter (const Iterator &it, const Iterator &item)
   else
     tail = el_item->prev;
 
+  CS_ASSERT(it.HasCurrent());
   csListElement* el = it.ptr;
   csListElement* next = el->next;
   csListElement* prev = el;
@@ -385,6 +389,7 @@ inline void csList<T>::MoveAfter (const Iterator &it, const Iterator &item)
 template <class T>
 inline void csList<T>::MoveBefore (const Iterator &it, const Iterator &item)
 {
+  CS_ASSERT(item.HasCurrent());
   csListElement* el_item = item.ptr;
 
   // Unlink the item.
@@ -397,6 +402,7 @@ inline void csList<T>::MoveBefore (const Iterator &it, const Iterator &item)
   else
     tail = el_item->prev;
 
+  CS_ASSERT(it.HasCurrent());
   csListElement* el = it.ptr;
   csListElement* next = el;
   csListElement* prev = el->prev;
@@ -413,15 +419,14 @@ inline void csList<T>::MoveBefore (const Iterator &it, const Iterator &item)
 template <class T>
 inline void csList<T>::Delete (Iterator &it)
 {
+  CS_ASSERT(it.HasCurrent());
   csListElement* el = it.ptr;
-  if (!el)
-    return;
 
   // Advance the iterator so we can delete the data it's using
   if (it.IsReverse())
-      --it;
+    --it;
   else
-      ++it;
+    ++it;
 
   Delete(el);
 }
@@ -429,7 +434,7 @@ inline void csList<T>::Delete (Iterator &it)
 template <class T>
 inline void csList<T>::Delete (csListElement *el)
 {
-  CS_ASSERT(el);
+  CS_ASSERT(el != 0);
 
   // Fix the pointers of the 2 surrounding elements
   if (el->prev)

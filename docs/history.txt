@@ -8,6 +8,10 @@ chronological order.
 
 9-Nov-2004
 	- Jorrit did some further work on foliage.
+	- Eric Sunshine added a number of CS_ASSERT()'s to csList<> to catch
+	  illegal cases when the iterator-based insertion, deletion, and
+	  manipulation methods are invoked with an iterator which does not
+	  point at an element.
 8-Nov-2004
 	- Eric Sunshine fixed problem in csStencilShadowCacheEntry where it was
 	  treating its `csArray<> face_normals' as if it was a
