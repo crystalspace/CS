@@ -1,79 +1,98 @@
 @c -*-texinfo-*-
-@node AWS List Box, , AWS Group Frame, AWS Signals and Actions reference
-@subsubsection Name = "List Box"
+@node AWS List Box, , AWS Group Frame, AWS Signals and Actions Reference
+@subsubsection List Box
+
+A list box's type is ``List Box''.
 
 @subsubheading Signals
 
-@table @samp
+List boxes send the following signals.
+
+@table @code
 @item signalListBoxSelectionChanged
 Occurs when the currently selected item changes.
 @end table
 
 @subsubheading Actions
 
-@table @samp
+List boxes understand the following actions.
+
+@table @code
 @item InsertItem
-Inserts a new item. See below for parameters. Note that an item 
-does not need to have text or image or state, but it should have 
+Inserts a new item. See below for parameters. Note that an item
+does not need to have text or image or state, but it should have
 one of the above.
 @end table
-  
+
 @subsubheading Input Parameters
 
+This sections describes the input parameters understood by the list box's
+@samp{InsertItem} action.
+
 @multitable @columnfractions .15 .2 .55
-@item @emph{Input Parameter Name} @tab @emph{Parameter Type} @tab @emph{Description}
-@item @samp{textX}
-@tab @samp{iString *}
-@tab The text for the item in column X.
+@item @emph{Name}
+@tab @emph{Type}
+@tab @emph{Description}
 
-@item @samp{imageX}
-@tab @samp{iString *}
-@tab The path to the image in column X.
+@item @code{textX}
+@tab @code{iString*}
+@tab Text for the item in column @emph{X}.
 
-@item @samp{statefulX}
-@tab @samp{bool}
-@tab True if the item in column X needs a state box (like a
-  check box or radio button)
+@item @code{imageX}
+@tab @code{iString*}
+@tab Pathname of the image in column @emph{X}.
 
-@item @samp{stateX}
-@tab @samp{bool}
-@tab The state of the item in column X.
+@item @code{statefulX}
+@tab @code{bool}
+@tab @samp{true} if the item in column @emph{X} needs a state box (like a
+check box or radio button).
 
-@item @samp{groupstateX}
-@tab @samp{bool}
-@tab If true, the item in column X will have a radio button
-  type state box instead of the default check-box style state.
+@item @code{stateX}
+@tab @code{bool}
+@tab State of the item in column @emph{X}.
 
-@item @samp{selectableX}
-@tab @samp{bool}
-@tab If false, then the item is not selectable and will never
-  be highlighted. This is useful for
-  items that have state of some sort and aren't intended to be "picked" out of
-  a list.
+@item @code{groupstateX}
+@tab @code{bool}
+@tab If @samp{true}, the item in column @emph{X} will have a radio button-type
+state box instead of the default check box-style state.
 
-@item @samp{aligntxtX}
-@tab @samp{int}
-@tab The alignment of the text in column X. By default, all text is left-aligned. This can be 0 or 1. Zero is left-align, 1 is right-align. If there is state, it will be aligned with the text.
+@item @code{selectableX}
+@tab @code{bool}
+@tab If @samp{false}, then the item is not selectable and will never be
+highlighted.  This is useful for items that have state of some sort and aren't
+intended to be ``picked'' out of a list.
 
-@item @samp{alignimgX}
-@tab @samp{int}
-@tab The same as @samp{aligntxtX}, only it operates on the image.
+@item @code{aligntxtX}
+@tab @code{int}
+@tab Alignment of the text in column @emph{X}.  By default, all text is
+left-aligned.  This can be 0 or 1.  Zero is left-align; 1 is right-align.  If
+there is state, it will be aligned with the text.
 
-@item @samp{parent}
-@tab @samp{int}
-@tab The key that identifies the parent that this item should
-  be added under. This will turn the
-  new item into a child item.
+@item @code{alignimgX}
+@tab @code{int}
+@tab This is the same as @samp{aligntxtX}, except that it operates on the
+image.
 
+@item @code{parent}
+@tab @code{int}
+@tab Key that identifies the parent of which this item should be a child.  This
+will turn the new item into a child item.
 @end multitable
 
 @subsubheading Output Parameters
 
+This sections describes the output parameters of the list box's
+@samp{InsertItem} action.
+
 @multitable @columnfractions .15 .2 .55
-@item @emph{Output Parameter Name} @tab @emph{Parameter Type} @tab @emph{Description}
+@item @emph{Name}
+@tab @emph{Type}
+@tab @emph{Description}
+
 @item @samp{key}
 @tab @samp{int}
-@tab The unique key of this item. This can be saved and used for the value of parent when adding
-  children under an item, or it may be saved and used with the GetState action.
+@tab Unique key of this item.  This can be saved and used as the value of a
+parent when adding children to an item, or it may be saved and used with the
+@samp{GetState} action.
 
 @end multitable

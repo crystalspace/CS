@@ -1,54 +1,60 @@
 @c -*-texinfo-*-
 @node AWS Signals, AWS Custom Components, AWS Quick Start, AWS
-@subsection Actually Finding Out What Your User Is Doing
+@subsection Signals: Responding To User Input
 
-Using the slot/signal mechanism usually does this.All @sc{aws} 
-components are signal sources, which means that you should be 
-able to find out anything important that happens to them by 
-creating appropriate sinks. The idea here is that the 
-application provider provides certain services. The @sc{gui} is event 
-driven, which means that you're not so much interested in finding 
-out when a certain button is clicked, but rather that you would 
-like to know when a user wants to do something. For example, you 
-don't care so much that the "Login" button has been pressed or 
-toggled or selected or whatever it is that happens to the "Login" 
-button to activate it, but rather that the user wants to login to 
-the system. Connection maps in the window definition file that a 
-@sc{gui} designer can hook up to signal sinks defined by an 
-application programmer support this paradigm. For a game, this 
-model seems especially appropriate. 
+@sc{aws} implements a @dfn{slot}/@dfn{signal} mechanism for responding to user
+input.
 
-For example, say the application programmer has defined a sink 
-called @samp{loginSink}. This sink has a few triggers: @samp{login}, 
-@samp{setusername}, and @samp{setpassword}. In order to have the login 
-proceed, all of these triggers must be activated. The simplest 
-method would be to hookup the @emph{TextChanged} signal from the 
-text boxes into the @samp{setusername} and @samp{setpassword} triggers. 
-Both these triggers might expect to receive a source that is an 
-@samp{awsComponent} supporting the property @emph{Text}. A 
-command button's @emph{Clicked} signal could be connected to the 
-@samp{login} trigger. Then the following sequence occurs: 
+All @sc{aws}
+components are signal @dfn{sources}, which means that you should be
+able to find out anything important that happens to them by
+creating appropriate @dfn{sinks}. The idea here is that the
+application provides certain services. The @sc{gui} is event
+driven, which means that you're not so much interested in finding
+out when a certain button is clicked, but rather you would
+like to know when a user wants to do something. For example, you
+don't care so much that the ``Login'' button has been pressed or
+toggled or selected or whatever it is that happens to the ``Login''
+button to activate it, but rather that the user wants to login to
+the system. In the window definition file,
+connection maps that a
+@sc{gui} designer can hook up to signal sinks defined by an
+application programmer support this paradigm. For a game, this
+model seems especially appropriate.
+
+For example, say the application programmer has defined a sink
+called @samp{loginSink}. This sink has a few triggers: @samp{login},
+@samp{setusername}, and @samp{setpassword}. In order to have the login
+proceed, all of these triggers must be activated. The simplest
+method would be to hookup the @samp{TextChanged} signal from the
+text boxes to the @samp{setusername} and @samp{setpassword} triggers.
+Both of these triggers might expect to receive a source that is an
+@samp{awsComponent} supporting the property @samp{Text}. A
+command button's @samp{Clicked} signal could be connected to the
+@samp{login} trigger.
+
+Once everything is properly connected, the following sequence occurs:
 
 @enumerate
 @item
-The user types in the username box. A signal is sent to the 
-@samp{setusername} trigger, which tries to lookup the value of 
-@emph{Text} using the component's @code{GetProperty} method. If this 
-succeeds, it stores a copy of the text. 
+The user enters text into the username box. A signal is sent to the
+@samp{setusername} trigger, which tries to extract the value of the
+@samp{Text} property
+using the component's @code{GetProperty()} method. If this
+succeeds, it stores a copy of the text.
 
 @item
 The user types in the password box. The same process occurs here.
 
-@item 
-The user clicks on the Login button. The @emph{Clicked} signal is 
-sent to the @samp{login} trigger, which then performs some sort 
-of authentication. It might also then call some controlling 
-object that it knows about to hide the window and change the 
-display into an intro menu configuration or something else. 
+@item
+The user clicks on the ``Login'' button.  The @samp{Clicked} signal is sent to
+the @samp{login} trigger, which then performs some sort of authentication.  It
+might also then call some controlling object to hide the window and change the
+display to an menu or something other.
 @end enumerate
 
-This is the general way that you interact with the user.The 
-controlling principle being that the application developer 
-provides the means, and the @sc{gui} designer provides the 
-manner. @sc{aws} tries to separate controller and view semantics 
+This is the general way that you interact with the user. The
+controlling principle being that the application developer
+provides the means; whereas the @sc{gui} designer provides the
+manner. @sc{aws} tries to separate controller and view semantics
 as much as possible.

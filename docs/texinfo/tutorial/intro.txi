@@ -5,7 +5,7 @@
 @cindex Plugin Manager
 @cindex Plugin Loader
 @cindex CS_LOAD_PLUGIN
-@cindex @coce{csPluginLoader}
+@cindex @code{csPluginLoader}
 @cindex @code{csInitializer}
 
 Crystal Space is a package of components and libraries which can all be useful
@@ -232,7 +232,12 @@ on Libraries (@pxref{Libraries}) and plug-in modules
 Now that you have learned some basics about the Crystal Space environment,
 you can try writing your first program.
 
-@node TutIntro Basic Concepts, Simple Minimum Requirements, Tutorial Simple, Tutorial Simple
+@menu
+* TutIntro Basic Concepts:: Basic Crystal Space Concepts
+* TutIntro Minimum Requirements:: Minimum Application Requirements
+@end menu
+
+@node TutIntro Basic Concepts, TutIntro Minimum Requirements, Tutorial Introduction, Tutorial Introduction
 @subsection Basic Crystal Space Concepts
 @cindex Basic Crystal Space Concepts
 @cindex Simple Tutorial
@@ -384,7 +389,7 @@ get the application running. In the tutorial below we will use several of the
 functions from @code{csInitializer}. This class contains only static member
 functions.
 
-@node TutIntro Minimum Requirements, Simple Header File, Simple Basic Concepts, Tutorial Simple
+@node TutIntro Minimum Requirements, , TutIntro Basic Concepts, Tutorial Introduction
 @subsection Minimum Application Requirements
 @cindex Tutorial Minimum Application Requirements
 @cindex Minimum Application Requirements, Tutorial

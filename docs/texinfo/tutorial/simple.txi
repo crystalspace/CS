@@ -38,7 +38,7 @@ Before reading this tutorial you should read the Tutorial Introduction first
 * Simple Locomotion:: Locomotion (Moving Around)
 @end menu
 
-@node Simple Header File, Simple Event Handling, Simple Minimum Requirements, Tutorial Simple
+@node Simple Header File, Simple Event Handling, Tutorial Simple, Tutorial Simple
 @subsection Simple Header File
 @cindex Tutorial Simple Header File
 @cindex Simple Header File, Tutorial

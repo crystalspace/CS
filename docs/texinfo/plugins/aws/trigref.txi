@@ -1,10 +1,10 @@
 @c -*-texinfo-*-
-@node AWS Standard Sink Trigger Reference, AWS Signals and Actions reference, AWS Custom Components, AWS
+@node AWS Trigger Reference, AWS Signals and Actions Reference, AWS Custom Components, AWS
 @subsection @sc{aws} Standard Sink Trigger Reference
 
-The following table lists triggers that the @samp{awsStandardSink} hosts. 
+The following table lists triggers that the @samp{awsStandardSink} hosts.
 
-@table @samp
+@table @code
 @item Hide
 Hides the component that sent the signal.
 
@@ -12,8 +12,8 @@ Hides the component that sent the signal.
 Shows the component that sent the signal.
 
 @item Invalidate
-Invalidates the component that sent the signal (forces a redraw).
+Invalidates the component that sent the signal (forces a re-draw).
 
 @item HideWindow
-Hides the window that the component that sent the signal is in.
+Hides the window containing the component that sent the signal.
 @end table

@@ -100,7 +100,7 @@ version @value{VERSION}, last updated @value{UPDATED}.
 * Building:: Building and Installing
 * Options:: Configuring Crystal Space
 * Applications::
-* Tutorials::
+* Tutorials:: Tutorials and HOWTO's
 * Libraries::
 * Plug-In Drivers:: Plug-In Modules and Drivers
 * Internals:: Internal Project Structure

@@ -1,24 +1,31 @@
 @c -*-texinfo-*-
-@node AWS Group Frame, AWS List Box, AWS Radio Button, AWS Signals and Actions reference
-@subsubsection Name = "Group Frame"
+@node AWS Group Frame, AWS List Box, AWS Radio Button, AWS Signals and Actions Reference
+@subsubsection Group Frame
+
+A group frame's type is ``Group Grame''.
 
 @subsubheading Attributes
 
-@table @samp
+Group frames publish the following attributes.
+
+@table @code
 @item Style
-One of: @samp{gfsBump}, @samp{gfsSimple}, @samp{gfsSunken}, 
-@samp{gfsRaised}. Determines the style of frame for the 
+One of @samp{gfsBump}, @samp{gfsSimple}, @samp{gfsSunken}, or
+@samp{gfsRaised}. Determines the style of frame for the
 component.
 
 @item Caption
-The text caption for the component, always drawn on the upper-left part of the frame.
+The caption (title) for the component, which always drawn on the upper-left
+part of the frame.
 @end table
 
 @subsubheading Skin Attributes
 
-@table @samp
+Group frames support the following skin attributes.
+
+@table @code
 @item OverlayTextureAlpha
-Used for texturing the frame area with a global texture.
+The alpha value of the overlay texture.
 
 @item Texture
 Used for overlaying the frame area with the global texture.

@@ -2,47 +2,54 @@
 @node AWS Quick Start, AWS Signals, AWS, AWS
 @subsection Quick Start
 
-In order to startup and use @sc{aws}, currently, the following needs to be done: 
+In order to startup and use @sc{aws}, currently, the following tasks need to be
+accomplished:
 
-Load the @sc{aws} plugin: 
+@enumerate
+@item
+Load the @sc{aws} plugin.
 
-@example 
-aws = CS_LOAD_PLUGIN(plugin_mgr, 
-"crystalspace.window.alternatemanager", "awsManager", iAws); 
+@example
+aws = CS_LOAD_PLUGIN(plugin_mgr,
+  "crystalspace.window.alternatemanager", "awsManager", iAws);
 @end example
 
-Setup the @sc{aws} plugin: 
+@item
+Setup the @sc{aws} plugin.
 
 @example
 aws->SetDefaultContext(engine, myG3D->GetTextureManager());
 @end example
 
-Load definition files: 
+@item
+Load definition files.
 
 @example
 aws->GetPrefMgr()->Load("./data/temp/awstest.def");
 @end example
 
-Select a default skin that @strong{all} windows will use:
+@item
+Select a default skin that @emph{all} windows will use.
 
 @example
 aws->GetPrefMgr()->SelectDefaultSkin("Normal Windows");
 @end example
 
-Create and show your windows:
+@item
+Create and display your windows.
 
 @example
-awsWindow *test = aws->CreateWindowFrom("Splash");
-awsWindow *test2 = aws->CreateWindowFrom("Another"); 
-if (test) test->Show();
+awsWindow *test1 = aws->CreateWindowFrom("Splash");
+awsWindow *test2 = aws->CreateWindowFrom("Another");
+if (test1) test1->Show();
 if (test2) test2->Show();
 @end example
+@end enumerate
 
-That's it. @sc{aws} is designed to be easy to use. Of course, this 
-brief look doesn't suppose that you want to get any data from 
-components in the windows, nor does it suppose that you want to 
-do anything other than show your windows. The windows created 
-here will be fully-fledged windows with all the controls listed 
-in the definition that you've created. For more advanced topics, 
-read "@ref{AWS Signals}" and "@ref{AWS Custom Components}".
-
+That's all there is to it.  @sc{aws} is designed to be easy to use.  Of course,
+this brief look does not illustrate how to get user input, from components in
+the windows, nor does it illustrate how to do anything other than display your
+windows.  However, the windows created here are full-fledged windows with all
+the controls listed in the definition that you've created.  For more advanced
+topics, read about signals (@pxref{AWS Signals}) and custom components
+(@pxref{AWS Custom Components}).

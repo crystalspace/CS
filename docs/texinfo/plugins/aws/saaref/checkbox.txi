@@ -1,30 +1,38 @@
 @c -*-texinfo-*-
-@node AWS Check Box, AWS Radio Button, AWS Label, AWS Signals and Actions reference
-@subsubsection Name = "Check Box"
+@node AWS Check Box, AWS Radio Button, AWS Label, AWS Signals and Actions Reference
+@subsubsection Check Box
+
+A check box's type is ``Check Box''.
 
 @subsubheading Signals
 
-@table @samp
+Check boxes send the following signals.
+
+@table @code
 @item signalCheckBoxClicked
-Generated when the check box's state changes (on to off)
+Generated when the check box's state changes (on to off or vice-versa).
 @end table
 
 @subsubheading Attributes
 
-@table @samp
+Check boxes publish the following attributes.
+
+@table @code
 @item Alpha
 The alpha of the checkbox images.
 
 @item Align
-Either @samp{cbAlignLeft} or @samp{cbAlignRight}, aligns the control and text.
+Either @samp{cbAlignLeft} or @samp{cbAlignRight}. Aligns the icon and text.
 
 @item Caption
-The text caption for the component.
+The caption (title) of the check box.
 @end table
 
 @subsubheading Skin Attributes
 
-@table @samp
+Check boxes support the following skin attributes.
+
+@table @code
 @item CheckBoxUp
 The image drawn when the checkbox is unpressed.
 
@@ -32,18 +40,20 @@ The image drawn when the checkbox is unpressed.
 The image drawn when the checkbox is pressed.
 
 @item CheckBoxOn
-The image drawn over the checkbox when it's state is "on"
+The image drawn over the checkbox when its state is ``on''.
 
 @item CheckBoxOff
-The image drawn over the checkbox when it's state is "off"
+The image drawn over the checkbox when its state is ``off''.
 @end table
 
 @subsubheading Properties
 
-@table @samp
+Check boxes publish the following properties.
+
+@table @code
 @item Caption
-The text of the label.
+The caption (title) of the check box.
 
 @item State
-Whether the component is "on" or "off"
+Whether the component is ``on'' or ``off''.
 @end table

@@ -1,0 +1,35 @@
+@c -*-texinfo-*-
+@node AWS, , Model Conversion, Plug-In Drivers
+@section Alternate Windowing System (@sc{aws})
+@cindex @sc{aws}
+@cindex Alternate Windowing System
+
+@noindent
+@emph{Written by Christopher Nelson, @email{paradox@@bbhc.org}.
+Conversion to Texinfo by F. Richter, @email{resqu@@gmx.ch}.}
+
+The Alternate Windowing System is a plugin designed to replace
+the old monolithic Crystal Space Windowing System (@sc{csws}). It utilizes an
+region optimal frame-thrower and can draw to either a procedural
+texture, to the default context, or to any user-supplied context.
+@sc{aws} also supports a definition system and access to
+components via a @dfn{signal}/@dfn{slot} mechanism. All @sc{gui} aspects can be
+modified by the @sc{gui} designer in definition files without the
+need to recompile the base application. This allows game interfaces to be
+easily @dfn{skinned} by non-programmers.
+
+@menu
+* AWS Quick Start:: Quick Start
+* AWS Signals:: Signals: Responding To User Input
+* AWS Custom Components:: Creating Custom @sc{aws} Components
+* AWS Trigger Reference:: @sc{aws} Standard Sink Trigger Reference
+* AWS Signals and Actions Reference:: @sc{aws} Standard Component Signal and Action Reference
+* AWS Architecture:: In-Depth Explanation of @sc{aws} Architecture
+@end menu
+
+@importss{plugins,aws,quick.txi}
+@importss{plugins,aws,signal.txi}
+@importss{plugins,aws,owncomps.txi}
+@importss{plugins,aws,trigref.txi}
+@importsss{plugins,aws,saaref,saaref.txi}
+@importss{plugins,aws,indepth.txi}

@@ -1,56 +1,69 @@
 @c -*-texinfo-*-
-@node AWS Command Button, AWS Label, AWS All, AWS Signals and Actions reference
-@subsubsection Name = "Command Button"
+@node AWS Command Button, AWS Label, AWS All Components, AWS Signals and Actions Reference
+@subsubsection Command Button
+
+A command button's type is ``Command Button''.
 
 @subsubheading Signals
 
-@table @samp
+Command buttons send the following signals.
+
+@table @code
 @item signalCmdButtonClicked
 Occurs when the user clicks a mouse button on the component.
 @end table
-  
+
 @subsubheading Properties
 
-@table @samp
+Command buttons publish the following properties.
+
+@table @code
 @item Caption
 Used to change the text on the button.
 @end table
-  
+
 @subsubheading Frame Styles
 
-@table @samp
+Command buttons may be configured to display the following frame styles.
+
+@table @code
 @item bfsNormal
-A normal frame with text and a 3d border, image optional.
+A normal frame with text, a 3D border, and an optional image.
 
 @item bfsToolbar
 A normal frame without text, but may have an image.
 
 @item bfsBitmap
-A frame whose appearance is entirely dictated by images. This 
-frame style MUST be present with the @samp{BitmapNormal}, 
-@samp{BitmapFocused} and @samp{BitmapClicked} attributes in a 
-definition file. 
+A frame whose appearance is entirely dictated by images. This
+frame style @emph{must} be present with the @samp{BitmapNormal},
+@samp{BitmapFocused} and @samp{BitmapClicked} attributes in a
+definition file.
 @end table
 
-@subsubheading Attributes 
+@subsubheading Attributes
 
-@table @samp
-@item Style 
-Defines the frame style. 
+Command buttons publish the following attributes.
 
-@item Alpha 
-Alpha level of the button. Only used for @samp{bfsBitmap} style. 
+@table @code
+@item Style
+Defines the frame style.
 
-@item Caption 
-The button's text. 
+@item Alpha
+Alpha level of the button. Only used for @samp{bfsBitmap} style.
+
+@item Caption
+The button's caption (title).
 @end table
 
 @subsubheading Skin Attributes
 
-@table @samp
-@item OverlayTextureAlpha 
-Used for texturing the button with a global texture. Can be used to give a "liquid" look to buttons. 
+Command buttons support the following skin attributes.
 
-@item Texture 
+@table @code
+@item OverlayTextureAlpha
+Used for texturing the button with a global texture.  Can be used to give a
+``liquid'' look to buttons.
+
+@item Texture
 Used for overlaying the button with the global texture.
 @end table

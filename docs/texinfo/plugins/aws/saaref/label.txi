@@ -1,24 +1,32 @@
 @c -*-texinfo-*-
-@node AWS Label, AWS Check Box, AWS Command Button, AWS Signals and Actions reference
-@subsubsection Name = "Label"
+@node AWS Label, AWS Check Box, AWS Command Button, AWS Signals and Actions Reference
+@subsubsection Label
+
+A label's type if ``Label''.
 
 @subsubheading Signals
 
-@table @samp
+Labels send the following signals.
+
+@table @code
 @item signalLabelClicked
 Occurs when the user clicks a mouse button on the component.
 @end table
 
 @subsubheading Attributes
 
-@table @samp
+Labels publish the following attributes.
+
+@table @code
 @item Caption
 The text of the label.
 @end table
 
 @subsubheading Properties
 
-@table @samp
+Labels publish the following properties.
+
+@table @code
 @item Caption
 The text of the label.
 @end table

@@ -1,0 +1,25 @@
+@c -*-texinfo-*-
+@node AWS Signals and Actions Reference, AWS Architecture, AWS Trigger Reference, AWS
+@subsection @sc{aws} Standard Component Signal and Action Reference
+
+The following sections embody the reference manual for the signals, actions,
+properties, attributes, skin attributes, and input/output parameters of the
+standard @sc{aws} components.
+
+@menu
+* AWS All Components:: All Components
+* AWS Command Button:: Command Button
+* AWS Label:: Label
+* AWS Check Box:: Check Box
+* AWS Radio Button:: Radio Button
+* AWS Group Frame:: Group Frame
+* AWS List Box:: List Box
+@end menu
+
+@importsss{plugins,aws,saaref,all.txi}
+@importsss{plugins,aws,saaref,cmdbtn.txi}
+@importsss{plugins,aws,saaref,label.txi}
+@importsss{plugins,aws,saaref,checkbox.txi}
+@importsss{plugins,aws,saaref,radiobtn.txi}
+@importsss{plugins,aws,saaref,grpframe.txi}
+@importsss{plugins,aws,saaref,listbox.txi}

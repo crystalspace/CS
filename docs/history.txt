@@ -10,6 +10,14 @@ The history order is reversed so that new features are at the top.
 	  $@ instead of ${id_rest}.
 	- Eric Sunshine fixed variable interpolation for older Bourne shells in
 	  cs-config.temppost.
+	- Eric Sunshine made the following changes to the AWS Texinfo sources:
+	    - Fixed some fairly minor mark-up problems.
+	    - Improved formatting of certain subsections.
+	    - Fixed a number of typographical and grammatical errors.
+	    - Eliminated a number of overfull and underfull `hbox' errors
+	      reported by TeX.
+	- Eric Sunshine fixed a few Texinfo mark-up errors in the `intro'
+	  section of the tutorial.
 20-Nov-2001
 	- Small fix in csObject::SetName() with relation to the debugging
 	  graph.

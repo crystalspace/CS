@@ -1,30 +1,38 @@
 @c -*-texinfo-*-
-@node AWS Radio Button, AWS Group Frame, AWS Check Box, AWS Signals and Actions reference
-@subsubsection Name = "Radio Button"
+@node AWS Radio Button, AWS Group Frame, AWS Check Box, AWS Signals and Actions Reference
+@subsubsection Radio Button
+
+A radio button's type is ``Radio Button''.
 
 @subsubheading Signals
 
-@table @samp
+Radio buttons send the following signals.
+
+@table @code
 @item signalRadButtonClicked
-Generated when the radio box's state changes (on to off)
+Generated when the radio button's state changes (on to off or vice-versa).
 @end table
 
 @subsubheading Attributes
 
-@table @samp
+Radio buttons publish the following attributes.
+
+@table @code
 @item Alpha
 The alpha of the radio button images.
 
 @item Align
-Either @samp{rbAlignLeft} or @samp{rbAlignRight}, aligns the control and text.
+Either @samp{rbAlignLeft} or @samp{rbAlignRight}, aligns the icon and text.
 
 @item Caption
-The text caption for the component.
+The caption (title) for the component.
 @end table
 
 @subsubheading Skin Attributes
 
-@table @samp
+Radio buttons support the following skin attributes.
+
+@table @code
 @item RadioButtonUp
 The image drawn when the radio button is unpressed.
 
@@ -32,18 +40,20 @@ The image drawn when the radio button is unpressed.
 The image drawn when the radio button is pressed.
 
 @item RadioButtonOn
-The image drawn over the radio button when it's state is "on"
+The image drawn over the radio button when it's state is ``on''.
 
 @item RadioButtonOff
-The image drawn over the radio button when it's state is "off"
+The image drawn over the radio button when it's state is ``off''.
 @end table
 
 @subsubheading Properties
 
-@table @samp
+Radio buttons publish the following properties.
+
+@table @code
 @item Caption
-The text of the label.
+The caption (title) of the radio button.
 
 @item State
-Whether the component is "on" or "off"
+Whether the component is ``on'' or ``off''.
 @end table
