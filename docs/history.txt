@@ -35,6 +35,8 @@ chronological order.
 	  zlib and pthread. The hardcoded linking of all apps resp. binaries
 	  against zlib and pthread has been removed from Jamrules. Also updated
 	  Jam msvcgen to handle ExternalLibs for libraries. 
+	- Jorrit fixed an initialization error in the NR OpenGL renderer
+	  with current_drawflags.
 26-Apr-2004
 	- Eric Sunshine fixed bugs in cross-product functions of csVector4 and
 	  csDVector4 where it was accessing 'x' component of wrong vector.
