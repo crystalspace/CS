@@ -276,8 +276,10 @@ install_all: \
 	@echo $"$"
 	@echo $"Calculating Lightmaps...$"
 	@echo $"------------------------$"
-	CRYSTAL=$"$(INSTALL_DIR)$" $(INSTALL_DIR)/bin/cslight -video=null flarge ; \
-	CRASTAL=$"$(INSTALL_DIR)$" $(INSTALL_DIR)/bin/cslight -video=null partsys
+	@echo $"It is possible that the following lighting run fails. $"
+	@echo $"(esp. on MacOS/X) start walktest with -relight then.$"
+	-CRYSTAL=$"$(INSTALL_DIR)$" $(INSTALL_DIR)/bin/cslight -video=null flarge ; \
+	-CRYSTAL=$"$(INSTALL_DIR)$" $(INSTALL_DIR)/bin/cslight -video=null partsys
 	@echo $"$"
 	@echo $"Installation complete$"
 	@echo $"---------------------$"
