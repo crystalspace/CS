@@ -88,6 +88,12 @@ Size of the flame particles (width and height).
 Origin of the flame.  Usually this is (0,0,0) and the engine is responsible for
 setting the correct position of the flame.  This works better for hierarchical
 transformations.
+@item ORIGINBOX
+Origin of the flame as a box. Usually this is (0,0,0, 0,0,0) and the engine
+is responsible for setting the correct position of the flame.  This works
+better for hierarchical transformations.
+@item DIRECTION
+Direction of the flame.
 @item SWIRL
 Swirl.
 @item COLORSCALE

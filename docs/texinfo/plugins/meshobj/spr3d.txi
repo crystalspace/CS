@@ -164,6 +164,8 @@ Material to use for the sprite.
 Set to true if you want to enable frame tweening.  Default is false.
 @item LIGHTING
 Set to true if you want to enable lighting.  Default is true.
+@item BASECOLOR
+Base color that will be added to all vertex colors. Default 0,0,0.
 @item ACTION
 The default action to use for this sprite instance.
 @end table
