@@ -164,7 +164,12 @@ bool csSolidBsp::InsertPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
       {
         rc1 = rc2 = false;
         csPlane2 edge_plane ((*poly)[0].v1, (*poly)[0].v2);
-	if (csMath2::PlanesEqual (edge_plane, node->splitter))
+	// @@@ PlanesClose is not efficient. Consider another way
+	// to test for this case. One way would be to take a single
+	// point at one side of a plane and see if it is on the same
+	// side for the other plane too. Also do this with
+	// TestPolygon.
+	if (csMath2::PlanesClose (edge_plane, node->splitter))
 	{
 	  // Two planes are equal. This means that the right node
 	  // will be solid.
@@ -301,7 +306,7 @@ bool csSolidBsp::TestPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
       if (left_poly->GetNumEdges () == 0 && right_poly->GetNumEdges () == 0)
       {
         csPlane2 edge_plane ((*poly)[0].v1, (*poly)[0].v2);
-	if (csMath2::PlanesEqual (edge_plane, node->splitter))
+	if (csMath2::PlanesClose (edge_plane, node->splitter))
 	{
 	  // Two planes are equal.
 	  if (!node->right->solid) { rc = true; goto end; }
@@ -416,7 +421,7 @@ void csSolidBsp::GfxDump (csSolidBspNode* node, iGraphics2D* ig2d, int depth,
     for (v.y = poly.GetBoundingBox ().Min ().y ; v.y < poly.GetBoundingBox ().Max ().y ; v.y += 4)
       for (v.x = poly.GetBoundingBox ().Min ().x ; v.x < poly.GetBoundingBox ().Max ().x ; v.x += 4)
         if (poly.In (v))
-	  ig2d->DrawPixel (v.x, height-v.y, red);
+	  ig2d->DrawPixel ((int)v.x, (int)(height-v.y), red);
   }
   if (depth == 0) return;
 
@@ -436,15 +441,15 @@ void csSolidBsp::GfxDump (csSolidBspNode* node, iGraphics2D* ig2d, int depth,
     ig2d->DrawLine (spc.x, height-spc.y, spc.x+dir.x, height-(spc.y+dir.y),
     	col);
 
-    ig2d->DrawPixel ((int)spc.x, (int)height-spc.y, blue);
-    ig2d->DrawPixel ((int)spc.x-1, (int)height-spc.y-1, blue);
-    ig2d->DrawPixel ((int)spc.x-2, (int)height-spc.y-2, blue);
-    ig2d->DrawPixel ((int)spc.x+1, (int)height-spc.y-1, blue);
-    ig2d->DrawPixel ((int)spc.x+2, (int)height-spc.y-2, blue);
-    ig2d->DrawPixel ((int)spc.x-1, (int)height-spc.y+1, blue);
-    ig2d->DrawPixel ((int)spc.x-2, (int)height-spc.y+2, blue);
-    ig2d->DrawPixel ((int)spc.x+1, (int)height-spc.y+1, blue);
-    ig2d->DrawPixel ((int)spc.x+2, (int)height-spc.y+2, blue);
+    ig2d->DrawPixel ((int)spc.x, (int)(height-spc.y), blue);
+    ig2d->DrawPixel ((int)spc.x-1, (int)(height-spc.y-1), blue);
+    ig2d->DrawPixel ((int)spc.x-2, (int)(height-spc.y-2), blue);
+    ig2d->DrawPixel ((int)spc.x+1, (int)(height-spc.y-1), blue);
+    ig2d->DrawPixel ((int)spc.x+2, (int)(height-spc.y-2), blue);
+    ig2d->DrawPixel ((int)spc.x-1, (int)(height-spc.y+1), blue);
+    ig2d->DrawPixel ((int)spc.x-2, (int)(height-spc.y+2), blue);
+    ig2d->DrawPixel ((int)spc.x+1, (int)(height-spc.y+1), blue);
+    ig2d->DrawPixel ((int)spc.x+2, (int)(height-spc.y+2), blue);
   }
 
   csPoly2D poly_left, poly_right;
