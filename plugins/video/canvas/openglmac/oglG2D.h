@@ -44,8 +44,6 @@ public:
 	virtual void	Print (csRect *area = NULL);
   
 	virtual void	SetRGB(int i, int r, int g, int b);
- 
-	virtual void	FinishDraw();
 
 	virtual void	ActivateWindow( WindowPtr theWindow, bool active );
 	virtual bool	UpdateWindow( WindowPtr theWindow );
@@ -56,9 +54,6 @@ public:
 	virtual bool	HandleEvent( EventRecord *inEvent );
 
 	virtual bool	SetMouseCursor (csMouseCursorID iShape);
-	virtual int		GetPage ();
-	virtual bool	DoubleBuffer (bool Enable);
-	virtual bool	GetDoubleBufferState ();
 
     virtual void	PauseDisplayContext( void );
     virtual void	ActivateDisplayContext( void );
@@ -74,11 +69,9 @@ protected:
 	AGLContext			mGLContext;
 	PaletteHandle		mMainPalette;
 	bool				mPaletteChanged;
-	bool				mDoubleBuffering;
 	short				mOldDepth;
 	CGrafPtr			mSavedPort;
 	GDHandle			mSavedGDHandle;
-	short				mActivePage;
 
 	void				DisplayErrorDialog( short errorIndex );
 };

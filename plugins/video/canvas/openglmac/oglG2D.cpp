@@ -60,26 +60,13 @@ csGraphics2DOpenGL::csGraphics2DOpenGL(iBase* iParent) :
 	mGLContext = NULL;
 	mMainPalette = NULL;
 	mPaletteChanged = false;
-	mDoubleBuffering = true;
 	mOldDepth = 0;
 	mSavedPort = NULL;
 	mSavedGDHandle = NULL;
-	mActivePage = 0;
 }
 
 csGraphics2DOpenGL::~csGraphics2DOpenGL(void)
 {
-	if ( mOldDepth ) {
-		GDHandle	theMainDevice;
-		theMainDevice = GetMainDevice();
-		SetDepth( theMainDevice, mOldDepth, (**theMainDevice).gdFlags, 1 );
-		mOldDepth = 0;
-	}
-
-	if ( mColorTable ) {
-		::DisposeHandle( (Handle)mColorTable );
-		mColorTable = NULL;
-	}
 }
 
 bool csGraphics2DOpenGL::Initialize (iSystem *pSystem)
@@ -262,8 +249,6 @@ bool csGraphics2DOpenGL::Open(const char *Title)
 	::ShowWindow( (WindowPtr)mMainWindow );
 	::SelectWindow( (WindowPtr)mMainWindow );
 
-	mDoubleBuffering = true;
-
 	/*
 	 *	Choose the pixel format.
 	 */
@@ -293,8 +278,6 @@ bool csGraphics2DOpenGL::Open(const char *Title)
 
 void csGraphics2DOpenGL::Close(void)
 {
-	csGraphics2DGLCommon::Close();
-
 	if ( mGLContext ) {
 		aglSetCurrentContext(NULL);
 		aglSetDrawable(mGLContext, NULL);
@@ -307,46 +290,28 @@ void csGraphics2DOpenGL::Close(void)
 		mMainWindow = NULL;
 	}
 
-	if ( mMainPalette )
+	if ( mMainPalette ) {
 		::RestoreDeviceClut( NULL );
-}
+	}
 
-int csGraphics2DOpenGL::GetPage ()
-{
-	return mActivePage;
-}
+	if ( mOldDepth ) {
+		GDHandle	theMainDevice;
+		theMainDevice = GetMainDevice();
+		SetDepth( mMainGDevice, mOldDepth, (**theMainDevice).gdFlags, 1 );
+		mOldDepth = 0;
+	}
 
-bool csGraphics2DOpenGL::DoubleBuffer( bool Enable )
-{
-	if ( Enable )
-		mDoubleBuffering = false;
-	else
-		mDoubleBuffering = true;
+	if ( mColorTable ) {
+		::DisposeHandle( (Handle)mColorTable );
+		mColorTable = NULL;
+	}
 
-	return true;
-}
-
-bool csGraphics2DOpenGL::GetDoubleBufferState()
-{
-	return mDoubleBuffering;
+	csGraphics2DGLCommon::Close();
 }
 
 void csGraphics2DOpenGL::Print( csRect *area )
 {
 	aglSwapBuffers( mGLContext );
-	glFlush ();
-}
-
-void csGraphics2DOpenGL::FinishDraw()
-{
-  csGraphics2D::FinishDraw ();
-  if (FrameBufferLocked)
-    return;
-
-  if (mActivePage == 0)
-    mActivePage = 1;
-  else
-    mActivePage = 0;
 }
 
 void csGraphics2DOpenGL::SetColorPalette()
