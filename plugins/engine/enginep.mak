@@ -41,11 +41,13 @@ INC.ENGINE = $(wildcard plugins/engine/*.h)
 SRC.ENGINE = $(wildcard plugins/engine/*.cpp)
 OBJ.ENGINE = $(addprefix $(OUT),$(notdir $(SRC.ENGINE:.cpp=$O)))
 # @@@ Should also include "CSENGINE" but see *Mingw* note below.
-DEP.ENGINE = CSGFX CSUTIL CSSYS CSENGINE CSGEOM CSOBJECT CSUTIL CSSYS
+DEP.ENGINE = CSGFX CSUTIL CSSYS CSGEOM CSOBJECT CSUTIL CSSYS
 
 MSVC.DSP += ENGINE
 DSP.ENGINE.NAME = engine
 DSP.ENGINE.TYPE = plugin
+# @@@ Should be no need to set this variable at all but see *Mingw* note below.
+DSP.ENGINE.RESOURCES = $(INC.CSENGINE) $(SRC.CSENGINE)
 
 endif # ifeq ($(MAKESECTION),postdefines)
 #----------------------------------------------------------------- targets ---#
