@@ -21,6 +21,8 @@ The history order is reversed so that new features are at the top.
 	- res changed csRegistryConfig::Save() and Load() from returning 
 	  'false' to 'true', fixing a false error report when the config 
 	  manager invoked those methods.
+	- duhprey fixed a dependency problem with the common area in the 
+	  renderloop plugins
 11-Jun-2003
 	- Eric Sunshine removed an invocation of class_scfFinalize() from
 	  SCF_REGISTER_STATIC_CLASS() which should have been removed yesterday
