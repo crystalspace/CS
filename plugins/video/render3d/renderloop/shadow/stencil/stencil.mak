@@ -41,12 +41,12 @@ else
 endif
 
 DIR.RLSSTENCIL = plugins/video/render3d/renderloop
-INF.RLSSTENCIL = $(SRCDIR)/$(DIR.RLSSTENCIL)/shadow/rlsstencil/rlsstencil.csplugin
+INF.RLSSTENCIL = $(SRCDIR)/$(DIR.RLSSTENCIL)/shadow/stencil/rlsstencil.csplugin
 INC.RLSSTENCIL = $(wildcard $(addprefix $(SRCDIR)/, \
-   $(DIR.RLSSTENCIL)/shadow/rlsstencil/*.h \
+   $(DIR.RLSSTENCIL)/shadow/stencil/*.h \
   plugins/video/render3d/renderloop/common/*.h))
 SRC.RLSSTENCIL = $(wildcard $(addprefix $(SRCDIR)/, \
-   $(DIR.RLSSTENCIL)/shadow/rlsstencil/*.cpp \
+   $(DIR.RLSSTENCIL)/shadow/stencil/*.cpp \
   plugins/video/render3d/renderloop/common/*.cpp))
 OBJ.RLSSTENCIL = $(addprefix $(OUT)/,$(notdir $(SRC.RLSSTENCIL:.cpp=$O)))
 DEP.RLSSTENCIL = CSTOOL CSGEOM CSUTIL CSSYS CSUTIL
@@ -69,7 +69,7 @@ rlsstencil: $(OUTDIRS) $(RLSSTENCIL)
 $(RLSSTENCIL): $(OBJ.RLSSTENCIL) $(LIB.RLSSTENCIL)
 	$(DO.PLUGIN)
 
-$(OUT)/%$O: $(SRCDIR)/$(DIR.RLSSTENCIL)/shadow/rlsstencil/%.cpp
+$(OUT)/%$O: $(SRCDIR)/$(DIR.RLSSTENCIL)/shadow/stencil/%.cpp
 	$(DO.COMPILE.CPP) $(RLSSTENCIL.CFLAGS)
 
 $(OUT)/%$O: $(SRCDIR)/$(DIR.RLSSTENCIL)/common/%.cpp

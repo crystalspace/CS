@@ -3,6 +3,9 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+01-Juj-2003
+	- res fixed rlsstencil.mak which got messed up when the plugin name
+	  was changed.
 29-Jun-2003
 	- Luca fixed the inconcistency of properties read and written by
 	  Set/GetProperty in the awsScrollBar class. He updated the texinfo
