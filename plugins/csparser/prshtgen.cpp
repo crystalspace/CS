@@ -28,6 +28,11 @@
 #include "iengine/engine.h"
 #include "iengine/texture.h"
 #include "iutil/object.h"
+#include "csutil/csstring.h"
+#include "csutil/databuf.h"
+#include "igraphic/imageio.h"
+#include "iutil/objreg.h"
+#include "iutil/vfs.h"
 
 struct PrsHeightMapData : public iGenerateImageFunction
 {
@@ -386,8 +391,46 @@ bool csLoader::ParseHeightgen (iLoaderContext* ldr_context, iDocumentNode* node)
 
 	  int startx = child->GetAttributeValueAsInt ("x");
 	  int starty = child->GetAttributeValueAsInt ("y");
-	  iImage* img = gen->Generate (totalw, totalh, startx*mw, starty*mh,
-	  	partw, parth);
+          const char* cachedir = child->GetAttributeValue ("cachedir");
+          csString name = cachedir;
+          // we are not sure that cachedir ends in a '/', but this
+          // is a useful feature, as it allows a custom prefix to the
+          // files in the cache.
+          name += "terrain_";
+          name += child->GetAttributeValue ("name");
+          name += ".png";
+          //iImage *img = 0;
+          csRef<iImage> img;
+          if(cachedir && VFS->Exists(name)) {
+            // try to load
+            img = LoadImage(name, CS_IMGFMT_INVALID);
+          }
+          if(!img) {
+	    img = gen->Generate (totalw, totalh, startx*mw, starty*mh,
+	      partw, parth);
+            if(cachedir) { // save terrain image in cache location.
+              csRef<iImageIO> imageio (CS_QUERY_REGISTRY (object_reg, 
+                iImageIO));
+              if(!imageio) {
+	        ReportError ("crystalspace.maploader.parse.heightgen",
+	          "Cannot get imageIO.");
+	        return false;
+              }
+              csRef<iDataBuffer> db (imageio->Save (img, "image/png",
+                  "progressive"));
+              if(!db) {
+	        ReportError ("crystalspace.maploader.parse.heightgen",
+	          "Cannot convert to imagebuffer.");
+	        return false;
+              }
+              bool sv = VFS->WriteFile (name, (const char*)db->GetData (),
+                db->GetSize ());
+              if(!sv) {
+	        ReportError ("crystalspace.maploader.parse.heightgen",
+	          "Could not save terrain cache file %s.", (const char*)name);
+              }
+            }
+          }
 	  csRef<iTextureHandle> TexHandle (G3D->GetTextureManager ()
 	  	->RegisterTexture (img, CS_TEXTURE_3D));
 	  if (!TexHandle)
