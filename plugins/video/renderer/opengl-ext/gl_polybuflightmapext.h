@@ -9,6 +9,7 @@
 
 #include "csgeom/vector2.h"
 #include "csgeom/vector3.h"
+#include "csgeom/matrix3.h"
 #include "csutil/garray.h"
 #include "plugins/video/renderer/common/vbufmgr.h"
 #include "ivideo/graph3d.h"
