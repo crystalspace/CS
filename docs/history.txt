@@ -28,6 +28,21 @@ chronological order.
 	  this value then VBO buffers will only be used if the buffer
 	  size (in bytes) exceeds that value. This may solve a problem
 	  that on some systems using VBO causes big memory overhead.
+	- Eric Sunshine made the following changes:
+	    - Fixed bug in csjoylin, the Linux joystick plugin, where it was
+	      incorrectly iterating over _all_ configuration keys from
+	      joystick.cfg, rather than only those specific to that plugin.
+	    - Changed the key composition in joystick.cfg so that it is based
+	      only upon the platform name (i.e. "Device.Joystick.Win32") rather
+	      than both platform and compiler names
+	      (i.e. "Device.Joystick.Win32.GCC"). Using the compiler to
+	      distinguish key names was inappropriate. If more fine-grained
+	      control is needed over key names, then some other, better
+	      mechanism should be employed.
+	    - Rewrote confusing comments and key names in joystick.cfg which
+	      incorrectly led the reader to believe that joystick numbers were
+	      0-based, despite the fact that iJoystickDriver and the event
+	      system consider them 1-based.
 28-Sep-2004
 	- Rhad mutexed some portions of the software renderer to reduce
 	  thread contention issues.  This is not a complete fix but should

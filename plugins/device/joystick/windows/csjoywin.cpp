@@ -31,10 +31,8 @@
 #include "csutil/win32/win32.h"
 
 // no config yet
-// #define CS_WINDOWS_JOYSTICK_CFG "/config/joywin.cfg"
-// #define CS_WINDOWS_JOYSTICK_KEY "Device.JoyWin."
-
-// #define CS_LINUX_JOYSTICK_OLD_EVENTS // the values of the first two axis are sent only
+// #define CS_WINDOWS_JOYSTICK_CFG "/config/joystick.cfg"
+// #define CS_WINDOWS_JOYSTICK_KEY "Device.Joystick." CS_PLATFORM_NAME "."
 
 CS_IMPLEMENT_PLUGIN;
 

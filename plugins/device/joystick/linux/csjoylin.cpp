@@ -29,9 +29,10 @@
 #include <linux/joystick.h>
 
 #define CS_LINUX_JOYSTICK_CFG "/config/joystick.cfg"
-#define CS_LINUX_JOYSTICK_KEY "Device.Joystick."
+#define CS_LINUX_JOYSTICK_KEY "Device.Joystick." CS_PLATFORM_NAME "."
 
-#define CS_LINUX_JOYSTICK_OLD_EVENTS // the values of the first two axis are sent only
+// The values of the first two axis are sent only.
+#define CS_LINUX_JOYSTICK_OLD_EVENTS
 
 CS_IMPLEMENT_PLUGIN;
 
@@ -109,14 +110,6 @@ bool csLinuxJoystick::Init ()
 {
   // read list of devices
   config.AddConfig (object_reg, CS_LINUX_JOYSTICK_CFG);
-
-  // create the key
-  csString key(CS_LINUX_JOYSTICK_KEY);
-  key += CS_PLATFORM_NAME;
-  key += ".";
-  key += CS_COMPILER_NAME;
-  key += ".";
-
   csRef<iConfigIterator> it (config->Enumerate (CS_LINUX_JOYSTICK_KEY));
 
   csArray<int> fds;
