@@ -1,3 +1,48 @@
 @c -*-texinfo-*-
 @node WinCVS Tutorial Step 4, WinCVS Tutorial Step 5, WinCVS Tutorial Step 3, WinCVS Tutorial
 @subsection Step 4: Setting WinCVS Preferences
+
+Firstly start the WinCVS client software. If it is the first time after installation of the
+client you will be presented with the Tip of the Day dialog box. Just click on close
+for the time being.
+
+@picturess{tutorial,wincvs,wincvsshot1}
+
+You will now be presented with the WinCVS Preferences dialog box @emph{Below}. If it is not
+the first time running the WinCVS client, then from the file menu click on Admin then
+Preferences to make the following dialog box appear.
+
+@picturess{tutorial,wincvs,wincvsshot2}
+
+Now fill in this portion of the dialog box to match the screenshot below.
+
+NOTE: In the Enter the CVSROOT section in the screenshot below, Crystal Space developers
+with write access to the CVS server need to replace pserver with ext and anonymous with
+their Sourceforge username e.g. johndoe. Developers also need to change the section
+Authentication to SSH Server.
+
+@picturess{tutorial,wincvs,wincvsshot3}
+
+Next, click on the property sheet tab Globals and edit to match the screenshot below.
+
+@picturess{tutorial,wincvs,wincvsshot4}
+
+Next click on the WinCVS property sheet tab and you'll realize why earlier you created
+a home directory. With the browse button to the right of the HOME folder
+(where cvs stores your passwords) edit box, browse and point it to your home directory.
+If you created your home directory on your c:\ drive, it should look as the screenshot
+below.
+
+@picturess{tutorial,wincvs,wincvsshot5}
+
+Now click on the OK button to apply the changes made.
+
+In the bottom Output window of the client - users should see the following appear.
+
+@emph{NEW CVSROOT: :pserver:anonymous@cvs.crystal.sourceforge.net:/cvsroot/crystal
+(password authentication)}
+
+Developers with write access to the server, should see something similar to below.
+
+@emph{NEW CVSROOT: :ext:johndoe@cvs.crystal.sourceforge.net:/cvsroot/crystal
+(ssh authentication)}

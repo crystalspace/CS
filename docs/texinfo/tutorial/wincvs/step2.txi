@@ -22,7 +22,7 @@ Now adjust your PATH environment variable. On Windows 95 and 98 edit the @file{C
 file add the following entries. On Windows NT and Windows 2000, use the System control panel
 to edit the environment variable.
 
-@code{set PATH=C:\ssh\bin}
+@emph{set PATH=C:\ssh\bin}
 
 Before continuing with this guide. Windows 95, 98, etc. users will need to reboot their
 systems, to make the previous the change's take effect.

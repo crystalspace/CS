@@ -7,4 +7,4 @@ your system. The home directory is a place where WinCVS will store data specific
 CVS passwords, servers you login too etc. For the purposes of this tutorial, we will
 assume you have created the home directory of your @file{C:\} drive, thus:
 
-@code{C:\home}
+@emph{C:\home}
