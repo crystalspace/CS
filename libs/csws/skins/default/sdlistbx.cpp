@@ -38,7 +38,8 @@
 // Horizontal large scrolling step
 #define LISTBOX_HORIZONTAL_PAGESTEP     8
 
-void csDefaultListBoxItemSkin::Draw (csComponent &This) {
+void csDefaultListBoxItemSkin::Draw (csComponent &This)
+{
 #define This ((csListBoxItem &)This)
 
  bool enabled = !This.parent->GetState (CSS_DISABLED);
@@ -116,6 +117,13 @@ void csDefaultListBoxSkin::Draw (csComponent &This)
       This.Rect3D (1, 1, This.bound.Width () - 1, This.bound.Height () - 1,
           CSPAL_LISTBOX_2LIGHT3D, CSPAL_LISTBOX_2DARK3D);
       break;
+     case cslfsTextured:
+       This.Pixmap(This.GetFrameBitmap(), 1, 1, This.bound.Width ()-1, This.bound.Height ()-1, 0, 0, This.GetAlpha());
+        This.Rect3D (0, 0, This.bound.Width (), This.bound.Height (),CSPAL_LISTBOX_LIGHT3D, CSPAL_LISTBOX_DARK3D);					       
+     break;
+     case cslfsBitmap:
+       This.Pixmap(This.GetFrameBitmap(), 0, 0, This.GetAlpha()); 
+     break;
     default:
       break;
   } /* endswitch */
@@ -125,4 +133,16 @@ void csDefaultListBoxSkin::Draw (csComponent &This)
     CSPAL_LISTBOX_BACKGROUND2 : CSPAL_LISTBOX_BACKGROUND);
 
   #undef This
+}
+
+void csDefaultListBoxSkin::SuggestSize (csListBox &This, int &w, int &h)
+{
+  w = h = 0;
+  if (This.GetHScroll())
+    h = This.GetHScroll()->bound.Height ();
+  if (This.GetVScroll())
+    w = This.GetVScroll()->bound.Width ();
+
+  h = MAX (This.bound.Height (), h);
+  w = MAX (This.bound.Width (), w);
 }
