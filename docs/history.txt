@@ -48,7 +48,7 @@ chronological order.
 	- Luca replaced the void return type with the bool one for the 
 	  SpriteCal3DState::ClearAnimCycle(int idx, float delay) method.
 18-Nov-2004
-	- Eric Sunshine changed CS_CHECK_PKG_CONFIG in checklib.h so that it
+	- Eric Sunshine changed CS_CHECK_PKG_CONFIG in checklib.m4 so that it
 	  also augments pkg-config's search path to reference directories which
 	  commonly contain .pc files, but which pkg-config does not search by
 	  default. In particular, it now instructs pkg-config to also search
