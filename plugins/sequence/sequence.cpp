@@ -113,6 +113,7 @@ void csSequence::AddOperation (csTicks time, iSequenceOperation* operation,
 void csSequence::AddRunSequence (csTicks time, iSequence* sequence,
 	iBase* params)
 {
+  seqmgr->RegisterRef (sequence);
   RunSequenceOp* op = new RunSequenceOp (seqmgr, sequence);
   AddOperation (time, op, params);
   op->DecRef ();
@@ -120,13 +121,16 @@ void csSequence::AddRunSequence (csTicks time, iSequence* sequence,
 
 void csSequence::RunSequenceOp::Do (csTicks dt, iBase* params)
 {
-  seqmgr->RunSequence (-(signed)dt, sequence, params);
+  if (sequence)
+    seqmgr->RunSequence (-(signed)dt, sequence, params);
 }
 
 void csSequence::AddCondition (csTicks time, iSequenceCondition* condition,
   	iSequence* trueSequence, iSequence* falseSequence,
 	iBase* params)
 {
+  if (trueSequence) seqmgr->RegisterRef (trueSequence);
+  if (falseSequence) seqmgr->RegisterRef (falseSequence);
   RunCondition* op = new RunCondition (seqmgr, condition, trueSequence,
   	falseSequence);
   AddOperation (time, op, params);
@@ -150,6 +154,7 @@ void csSequence::RunCondition::Do (csTicks dt, iBase* params)
 void csSequence::AddLoop (csTicks time, iSequenceCondition* condition,
   	iSequence* sequence, iBase* params)
 {
+  if (sequence) seqmgr->RegisterRef (sequence);
   RunLoop* op = new RunLoop (seqmgr, condition, sequence);
   AddOperation (time, op, params);
   op->DecRef ();
@@ -200,7 +205,13 @@ csSequenceManager::~csSequenceManager ()
       q->RemoveListener (scfiEventHandler);
     scfiEventHandler->DecRef ();
   }
+  Clear ();
   main_sequence->DecRef ();
+}
+
+void csSequenceManager::RegisterRef (iBase* ref)
+{
+  refs.Push (ref);
 }
 
 bool csSequenceManager::Initialize (iObjectRegistry *r)
@@ -248,6 +259,7 @@ csTicks csSequenceManager::GetDeltaTime () const
 
 void csSequenceManager::Clear ()
 {
+  refs.DeleteAll ();
   main_sequence->Clear ();
   main_time = 0;
   previous_time_valid = false;

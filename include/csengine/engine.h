@@ -26,6 +26,7 @@
 #include "csutil/parray.h"
 #include "csutil/stringarray.h"
 #include "csutil/refarr.h"
+#include "csutil/weakref.h"
 #include "csutil/hashmap.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -237,7 +238,7 @@ public:
   /**
    * Pointer to the engine sequence manager.
    */
-  csRef<iEngineSequenceManager> eseqmgr;
+  csWeakRef<iEngineSequenceManager> eseqmgr;
 
   /**
    * Pointer to an optional reporter that will be used for notification

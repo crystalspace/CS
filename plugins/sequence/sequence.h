@@ -19,7 +19,10 @@
 #ifndef __CS_SEQUENCE_H__
 #define __CS_SEQUENCE_H__
 
+#include "csutil/scf.h"
 #include "csutil/util.h"
+#include "csutil/weakref.h"
+#include "csutil/refarr.h"
 #include "ivaria/sequence.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
@@ -59,7 +62,7 @@ public:
   class RunSequenceOp : public StandardOperation
   {
   private:
-    csRef<iSequence> sequence;
+    csWeakRef<iSequence> sequence;
   protected:
     virtual ~RunSequenceOp () { }
   public:
@@ -78,8 +81,8 @@ public:
   {
   private:
     csRef<iSequenceCondition> condition;
-    csRef<iSequence> trueSequence;
-    csRef<iSequence> falseSequence;
+    csWeakRef<iSequence> trueSequence;
+    csWeakRef<iSequence> falseSequence;
   protected:
     virtual ~RunCondition () { }
   public:
@@ -100,7 +103,7 @@ public:
   {
   private:
     csRef<iSequenceCondition> condition;
-    csRef<iSequence> sequence;
+    csWeakRef<iSequence> sequence;
   protected:
     virtual ~RunLoop () { }
   public:
@@ -145,6 +148,13 @@ private:
   // sequence operations. New sequences will be merged with this one.
   csSequence* main_sequence;
 
+  // Array of references. This is used to avoid circular
+  // references. If you need a circular reference (for example, a sequence
+  // containing an operation that runs itself) then you need to use weak
+  // references in the operation and register the real reference here.
+  // @@@ Implementation detail: should use a set of refs instead of an array!
+  csRefArray<iBase> refs;
+
   // The previous time.
   csTicks previous_time;
   bool previous_time_valid;
@@ -162,6 +172,8 @@ public:
   csSequenceManager (iBase *iParent);
   virtual ~csSequenceManager ();
   virtual bool Initialize (iObjectRegistry *object_reg);
+
+  virtual void RegisterRef (iBase* ref);
 
   /// This is set to receive the once per frame nothing event.
   virtual bool HandleEvent (iEvent &event);
@@ -184,6 +196,7 @@ public:
     virtual bool Initialize (iObjectRegistry* p)
     { return scfParent->Initialize (p); }
   } scfiComponent;
+
   struct EventHandler : public iEventHandler
   {
   private:

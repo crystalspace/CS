@@ -7,6 +7,23 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 16-Oct-2003
+	- Jorrit fixed a big memory leak related to the engine sequence
+	  manager. There are actually three fixes to solve this bug:
+	    - Two callbacks for cleanup to sector and light used a csRef
+	      to a sector and light respectively. However, this causes a
+	      circular reference since those callbacks are added to the
+	      sector and light. Fixed this by using weak references.
+	    - Various objects in the engine sequence manager keep references
+	      to engine stuff. However the engine also kept a reference to
+	      the engine sequence manager. Changed the latter to use a weak
+	      reference.
+	    - Added iSequenceManager->RegisterRef(). This is a general routine
+	      with which you can register a specific reference. The purpose of
+	      this is to register references to sequences so that you can
+	      use weak references in the operations itself. That way circular
+	      references between operations and sequences are avoided and
+	      the sequences are cleaned up properly on destruction of the
+	      sequence manager and/or a manual call to Clear().
 	- res added the Joystick plugin for Windows (utilizing DirectInput)
 	  and the joytest app contributed by Turbo J <turboj@web.de>.
 	- res augmented the DirectX configure check to include DirectInput.

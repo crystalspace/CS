@@ -1109,7 +1109,7 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	  const char *colvar;
 	  if ((colvar = child->GetAttributeValue ("color_var")) != 0)
 	  { // variable set at run time
-	    var = FindSharedVariable (colvar, iSharedVariable::SV_COLOR );
+	    var = FindSharedVariable (colvar, iSharedVariable::SV_COLOR);
 	    if (!var)
 	    {
 	      SyntaxService->ReportError (

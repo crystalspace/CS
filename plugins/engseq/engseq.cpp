@@ -26,6 +26,7 @@
 #include "csutil/scf.h"
 #include "csutil/cscolor.h"
 #include "csutil/randomgen.h"
+#include "csutil/weakref.h"
 #include "iutil/objreg.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
@@ -951,8 +952,11 @@ private:
   int min,max;
   csRandomGen *rg;
   csSequenceWrapper *sequence;
+
 public:
-  OpRandomDelay (int min_int, int max_int,csSequenceWrapper *seq,iEngineSequenceManager* seqmgr)
+  OpRandomDelay (int min_int, int max_int,
+  	csSequenceWrapper *seq,
+	iEngineSequenceManager* seqmgr)
   {
     min = min_int;
     max = max_int;
@@ -1299,7 +1303,8 @@ void csSequenceWrapper::AddOperationSetAmbient (csTicks time,
 void csSequenceWrapper::AddOperationFadeAmbient (csTicks time,
 	iParameterESM* light, const csColor& color, csTicks duration)
 {
-  OpFadeAmbientLight* op = new OpFadeAmbientLight (light, color, duration, eseqmgr);
+  OpFadeAmbientLight* op = new OpFadeAmbientLight (light, color, duration,
+  	eseqmgr);
   sequence->AddOperation (time, op);
   op->DecRef ();
 }
@@ -1394,7 +1399,7 @@ void csSequenceWrapper::AddOperationTestTrigger (csTicks time,
   cond->DecRef ();
 }
 
-void csSequenceWrapper::OverrideTimings(OpStandard *afterop,int ticks)
+void csSequenceWrapper::OverrideTimings (OpStandard *afterop, int ticks)
 {
   csSequenceOp *curr;
   int time_diff=0;
@@ -1574,7 +1579,7 @@ SCF_IMPLEMENT_IBASE_END
 class csConditionCleanupSectorCB : public csConditionCleanup
 {
 private:
-  csRef<iSector> sector;
+  csWeakRef<iSector> sector;
   csRef<iSectorCallback> cb;
 
 public:
@@ -1600,7 +1605,7 @@ public:
 class csConditionCleanupLightCB : public csConditionCleanup
 {
 private:
-  csRef<iLight> mylight;
+  csWeakRef<iLight> mylight;
   csRef<iLightCallback> cb;
 
 public:

@@ -1633,24 +1633,26 @@ iEngineSequenceManager* csEngine::GetEngineSequenceManager ()
 {
   if (!eseqmgr)
   {
-    eseqmgr = CS_QUERY_REGISTRY (object_reg, iEngineSequenceManager);
-    if (!eseqmgr)
+    csRef<iEngineSequenceManager> es = CS_QUERY_REGISTRY (
+    	object_reg, iEngineSequenceManager);
+    if (!es)
     {
-      csRef<iPluginManager> plugin_mgr (
-  	  CS_QUERY_REGISTRY (object_reg, iPluginManager));
-      eseqmgr = CS_LOAD_PLUGIN (plugin_mgr,
+      csRef<iPluginManager> plugin_mgr =
+  	  CS_QUERY_REGISTRY (object_reg, iPluginManager);
+      es = CS_LOAD_PLUGIN (plugin_mgr,
     	  "crystalspace.utilities.sequence.engine", iEngineSequenceManager);
-      if (!eseqmgr)
+      if (!es)
       {
         Warn ("Could not load the engine sequence manager!");
         return 0;
       }
-      if (!object_reg->Register (eseqmgr, "iEngineSequenceManager"))
+      if (!object_reg->Register (es, "iEngineSequenceManager"))
       {
         Warn ("Could not register the engine sequence manager!");
         return 0;
       }
     }
+    eseqmgr = es;
   }
   return eseqmgr;
 }
