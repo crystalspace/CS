@@ -1,6 +1,14 @@
 The history order has been reversed so that new features are at the top.
 
+1-Feb-2001
+	- Philip Wyett updated levtool to take account of Andrew's changes
+	  yesterday. Move to csTreeBox and changed to new mouse handler
+	  csevMouseClick. App now compiles and runs OK again under Windows.
+	- Philip also added new avi plugin to autogeneration process. This
+	  will generate both the VC6 project files for the plugin and
+	  the test application.
 31-Jan-2001
+	- Martin Geisse fixed a compile-time error in CSWS.
 	- Added GetPrivateObject() to iMaterialWrapper.
 	- Added QUERY_INTERFACE_SAFE() which will first test if the given
 	  object is NULL. In that case it will return NULL. Otherwise
