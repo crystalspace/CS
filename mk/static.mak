@@ -116,7 +116,7 @@ endef
 # some platforms (such as DOS) which impose a maximum limit on the length of an
 # invoked command.
 define LIBREF.BODY
-  echo $"SCF_REGISTER_STATIC_LIBRARY($r);$">>$(SRC.LIBREF)
+  echo $"SCF_REGISTER_STATIC_LIBRARY($r)$">>$(SRC.LIBREF)
 
 endef
 
@@ -128,6 +128,7 @@ ifeq ($(MAKESECTION),targets)
 # Rule for creating directories.
 $(DIR.LIBREF): $(OUTBASE)
 	-$(MKDIR)
+	-$(RM) $(SRC.LIBREF)
 
 # Rule to synthesize SRC.LIBREF.
 $(SRC.LIBREF): $(DEP.LIBREF.EXTRA) $(DIR.LIBREF)
