@@ -31,11 +31,11 @@
  * directly is unsafe. <p>
  * 
  * Also, this means that CS_DECLARE_IBASE_VECTOR only has to cast from and to
- * (void*), which is always possible. Theoretically, casting from and to iBase
- * is also always possible because the contained objects *must* be
- * derived from iBase. Hwever, at the time CS_DECLARE_IBASE_VECTOR is used, this
- * inheritance may be unknown to the compiler because the class definition
- * of the contained class did not yet appear.
+ * (void*), which is always possible.  Theoretically, casting from and to iBase
+ * is also always possible because the contained objects *must* be derived from
+ * iBase.  Hwever, at the time CS_DECLARE_IBASE_VECTOR is used, this
+ * inheritance may be unknown to the compiler because the class definition of
+ * the contained class did not yet appear.
  */
 class csIBaseVector : public csVector
 {
@@ -225,7 +225,7 @@ public:
  * csVector members (type-unsafe!) from the inside, i.e. from your own methods.
  *
  * Usage (all features):
- *   CS_BEGIN_TYPED_IBASE_VECTOR_WITH_SUPERCLASS (NAME, TYPE, INHERIT, SUPERCLASS)
+ *   CS_BEGIN_TYPED_IBASE_VECTOR_WITH_SUPERCLASS(NAME,TYPE,INHERIT,SUPERCLASS)
  *     any user-defined methods
  *   CS_FINISH_TYPED_IBASE_VECTOR
  *
@@ -247,14 +247,14 @@ public:
  *          convenience). Note that if you use another superclass, then
  *          it must be a descendant of csIBaseVector.
  */
-#define CS_BEGIN_TYPED_IBASE_VECTOR_WITH_SUPERCLASS(NAME,TYPE,INHERIT,SCLASS)	\
+#define CS_BEGIN_TYPED_IBASE_VECTOR_WITH_SUPERCLASS(NAME,TYPE,INHERIT,SCLASS) \
   class NAME : INHERIT SCLASS						\
   {									\
     typedef SCLASS superclass;						\
     /* This function has no other purpose than to assure inheritance */	\
     /* from csIBaseVector.                                           */	\
     inline void TestIBaseVectorInhertiance ()				\
-    { csIBaseVector::TestInheritance (); }				\
+    { TestInheritance (); }						\
   public:								\
     inline bool Delete (int n)						\
     { return superclass::Delete (n); }					\

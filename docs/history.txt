@@ -5,14 +5,17 @@ The history order is reversed so that new features are at the top.
 	- Added iEngine::GetCameraPosition() which takes a name as a parameter
 	  instead of an index.
 	- Fixed a warning in engine.cpp.
+	- Eric fixed the new CS_BEGIN_TYPED_IBASE_VECTOR_WITH_SUPERCLASS macro
+	  so that it compiles error-free on NextStep.  It was reporting this
+	  error: "type `foo' is derived from private `csIBaseVector'".  Also
+	  made the TestIBaseVectorInhertiance() implementation more obvious.
 2-Jul-2001
 	- Removed the bad and global 'thisclass' pointer from the Python
-	  plugin. Removed the 'GetSystem()' call from 'cs.i'. The Python
+	  plugin.  Removed the 'GetSystem()' call from 'cs.i'.  The Python
 	  plugin now sets the pointer to iSystem in 'cspace.system' Python
-	  variable. So if a Python script does 'import cspace.*' then
-	  you can just use 'system' in your script.
-	  This change breaks the LUA plugin though. A similar change has
-	  to happen there but I don't know how.
+	  variable.  So if a Python script does 'import cspace.*' then you can
+	  just use 'system' in your script.  This change breaks the LUA plugin
+	  though.  A similar change has to happen there but I don't know how.
 	- Eric Sunshine fixed the csPython plugin so that it once again
 	  compiles cleanly under NextStep following the removal of `thisclass'.
 	  The problem was that the NextStep compiler disallows C++ expressions
@@ -27,18 +30,16 @@ The history order is reversed so that new features are at the top.
 	  Apple/NeXT system driver and AppKit-based 2D driver.
 	- Eric Sunshine eliminated several compilation warnings from
 	  cmdline.cpp and cmdline.h.
-	- Michael Voasse writes:
-	    - In the ongoing quest to implement HitBeam() in all
-  	      mesh objects, todays victims are cube and surface.
-  	      Both should now respond to bugplug and show their
-  	      bounding boxen and radii. I have optimized surface
-  	      a little by adding a set of corner vertices to
+	- Michael Voasse made the following changes:
+	    - In the ongoing quest to implement HitBeam() in all mesh objects,
+  	      todays victims are cube and surface.  Both should now respond to
+  	      bugplug and show their bounding boxen and radii.  I have
+  	      optimized surface a little by adding a set of corner vertices to
   	      shortcut the bbox and HitBeamObject() methods.
-	    - Fixed a small bug in csSector::HitBeam(). This now
-  	      returns the closest intersection be it a mesh or
-  	      polygon ( previously, was returning furthest mesh
-  	      or polygon ). Only the intersect vertex was affect,
-  	      no other methods or fields were harmed during this
+	    - Fixed a small bug in csSector::HitBeam().  This now returns the
+  	      closest intersection be it a mesh or polygon ( previously, was
+  	      returning furthest mesh or polygon ).  Only the intersect vertex
+  	      was affect, no other methods or fields were harmed during this
   	      procedure...
 	- Martin Geisse updated apimod19.txi with his latest changes.
 	- Martin also did the following:
@@ -51,55 +52,54 @@ The history order is reversed so that new features are at the top.
 	    - Moved all macros to their own header file, typedvec.h.
 	    - Internally, an even more flexible macro is used that allows
 	      usage of a user-defined superclass for the vector.
-	    - Modified the vectors for SCF objects. The contained class no
-	      longer needs to be defined at the time the vector is declared.
-	      On the bad side, it is now a requirement that the contained
-	      class must be a subclass of iBase. It is no longer sufficient
-	      that the class has IncRef/DecRef methods. However, this should
-	      not be too much of a limitation.
-	    - Vectors for normal objects and for SCF objects again use the
-	      same concept in their macro hierarchy.
+	    - Modified the vectors for SCF objects.  The contained class no
+  	      longer needs to be defined at the time the vector is declared.
+  	      On the bad side, it is now a requirement that the contained class
+  	      must be a subclass of iBase.  It is no longer sufficient that the
+  	      class has IncRef/DecRef methods.  However, this should not be too
+  	      much of a limitation.
+	    - Vectors for normal objects and for SCF objects again use the same
+  	      concept in their macro hierarchy.
 	- Martin also added a new system of object vectors:
-	    - This system should finally replace csNamedObjVector. The common
-	      superclass for those vectors is currently called
-	      csNamedObjectVector and is kept in the same source/header
-	      files. It extends the macros for typed vectors to produce
-	      type-safe object vectors.
-	    - In addition, csNamedObjVector itself provides all methods
-	      that are safe even if you don't know the type of contained
-	      objects. In this case, the objects are exposed to the user as
-	      (iObject*) pointers. This way you can deal with object vectors
-	      that store objects of unknown type, although the range of
-	      possible operations is of course limited.
+	    - This system should finally replace csNamedObjVector.  The common
+  	      superclass for those vectors is currently called
+  	      csNamedObjectVector and is kept in the same source/header files.
+  	      It extends the macros for typed vectors to produce type-safe
+  	      object vectors.
+	    - In addition, csNamedObjVector itself provides all methods that
+  	      are safe even if you don't know the type of contained objects.
+  	      In this case, the objects are exposed to the user as (iObject*)
+  	      pointers.  This way you can deal with object vectors that store
+  	      objects of unknown type, although the range of possible
+  	      operations is of course limited.
 	    - Finally, I re-implemented csTextureList using typed object
 	      vectors. Seems to work so far.
 	- To make sure our shift keys will not wear out too easily Philip
 	  Wyett did the following changes:
-		csPlugIn -> csPlugin
-		iPlugIn -> iPlugin
-		scfiPlugIn -> scfiPlugin
-		iLoaderPlugIn -> iLoaderPlugin
-		eiPlugIn -> eiPlugin
-	  This change is a change of PlugIn for Plugin in
-	  all instances inside the libs, plugins and apps.
-	  Work in progress...Hope will be finished today...
-	  Also removed  my commit log which for some reason
-	  appeared in some files :-/
+	    csPlugIn -> csPlugin
+	    iPlugIn -> iPlugin
+	    scfiPlugIn -> scfiPlugin
+	    iLoaderPlugIn -> iLoaderPlugin
+	    eiPlugIn -> eiPlugin
+	  This change is a change of PlugIn for Plugin in all instances inside
+	  the libs, plugins and apps.  Work in progress...Hope will be finished
+	  today...  Also removed my commit log which for some reason appeared
+	  in some files :-/
 	- Philip also did some work on documentation:
-	    - Changed extlibs.txi to tell that winlibs is for those using
-	      the MSVC compiler ONLY. Have been meaning to do this for a
-	      while - finally done. :-)
-	    - Modified dirhier.txi (CS dir hierarchy) for the csparser
-	      change from library to plugin.
-	    - In resource.txi: removed link pointing at 3D downloads as
-	      a D/L location for CS releases.
-	    - In faq.txi: Removed Borland C++ compiler from FAQ, what
-	      do I need to compile Crystal Space. This port is
-	      broken / never used, so will be removed.
-	    - In feedback.txi: added ones own name to copyright section.
-	      Added Windows XP to feedback/bug reporting docs.
-	    - In cpyright.txi: added ones own name to copyright section.
-	      Added Windows XP to feedback/bug reporting docs.
+	    - Changed extlibs.txi to tell that winlibs is for those using the
+	      MSVC compiler ONLY.  Have been meaning to do this for a while -
+	      finally done.  :-)
+	    - Modified dirhier.txi (CS dir hierarchy) for the csparser change
+	      from library to plugin.
+	    - In resource.txi: removed link pointing at 3D downloads as a D/L
+	      location for CS releases.
+	    - In faq.txi: Removed Borland C++ compiler from FAQ, what do I need
+	      to compile Crystal Space.  This port is broken / never used, so
+	      will be removed.
+	    - In feedback.txi: added ones own name to copyright section.  Added
+	      Windows XP to feedback/bug reporting docs.
+	    - In cpyright.txi: added ones own name to copyright section.  Added
+	      Windows XP to feedback/bug reporting docs.
 1-Jul-2001
 	- Eric Sunshine repaired the new cmdline.cpp and cmdline.h so that they
 	  compile error-free with the NextStep compiler.
@@ -135,19 +135,18 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine eliminated a compilation warning about
 	  csMeshFactoryWrapper having private destructor but no `friend'.
 	- Philip Wyett did the following:
-	    - Added forward declaration struct csFog (to thing.h).
-	      This fixes compile error in Python plugin.
+	    - Added forward declaration struct csFog (to thing.h).  This fixes
+	      compile error in Python plugin.
 	    - Changed some CrystalBall internal naming:
 	        - class crysVec -> class csCrystalBallVec
 	        - class trinode -> class csTriNode
 	      These 2 changes do not affect app writers...
-	    - Added another CSTOOL to eliminate link error for csdemo on
-	      MingW.
-	    - Changed cs_time to csTime. Now follows CS naming
-	      convention more closely and generally is a heck of alot more
-	      distinguishable/readable in code. :-)
-	    - Removed some no longer in existence includes from
-	      python plugin. Manually updated VC project files.
+	    - Added another CSTOOL to eliminate link error for csdemo on MingW.
+	    - Changed cs_time to csTime.  Now follows CS naming convention more
+	      closely and generally is a heck of alot more
+	      distinguishable/readable in code.  :-)
+	    - Removed some no longer in existence includes from python plugin.
+	      Manually updated VC project files.
 	    - More function name standardization:
 		do_key ()    -> DoKey ()
 		do_button () -> DoButton ()
@@ -157,46 +156,45 @@ The history order is reversed so that new features are at the top.
 		cleanup and CleanUp -> Cleanup ()
 		sys_fatalerror () -> SystemFatalError ()
 	    - Fixed on exit crasher under Windows for demosky.
-	    - Fixed "sys_fatalerror" to report a fatal error
-	      is in "glwin32.dll" and not "OpenGL2D.dll"
+	    - Fixed "sys_fatalerror" to report a fatal error is in
+	      "glwin32.dll" and not "OpenGL2D.dll"
 	- Martin Geisse did the following:
 	    - Added iSector::Draw(), iThingState::HasFog() and
 	      iThingState::GetFog ().
 	    - Some changes to use engine-related objects though interfaces.
-	    - Removed several forward and 'friend' declarations of the
-	      Dumper class.
-	    - Cleanup of the curve code. Added some missing methods.
-	      Materials are now correctly reference-counted. Functions are
-	      sorted by class in the file, and bezier-specific code is
-	      clearly separated from the rest.
+	    - Removed several forward and 'friend' declarations of the Dumper
+	      class.
+	    - Cleanup of the curve code.  Added some missing methods.
+	      Materials are now correctly reference-counted.  Functions are
+	      sorted by class in the file, and bezier-specific code is clearly
+	      separated from the rest.
 	    - Moved csMapNode and csView from csengine to cstool.
 	    - Updated simple tutorial to take account of changes.
-	    - Continued to split up csparser into several files. Also
-	      renamed some functions to keep a uniform naming style. None
-	      of these changes affects the interface.
-	    - Removed the global 'System' variable. Applications can still
-	      use their own global system variable, but then they must
-	      define it themselves. Some of the CS applications do that.
-	      The Win32 system driver also requires a global system variable
-	      and thus defines it, but it does so as a 'static' variable to
-	      avoid pollution of the global namespace.
-	      WARNING: He could only test this for Win32 / MSVC!
-	    - Updated the documentation to take account of the removal of
-	      the global system variable.
+	    - Continued to split up csparser into several files.  Also renamed
+	      some functions to keep a uniform naming style.  None of these
+	      changes affects the interface.
+	    - Removed the global 'System' variable.  Applications can still use
+	      their own global system variable, but then they must define it
+	      themselves.  Some of the CS applications do that.  The Win32
+	      system driver also requires a global system variable and thus
+	      defines it, but it does so as a 'static' variable to avoid
+	      pollution of the global namespace.  WARNING: He could only test
+	      this for Win32 / MSVC!
+	    - Updated the documentation to take account of the removal of the
+	      global system variable.
 	    - Fixed a compile error in g2d.cpp.
 30-Jun-2001
 	- Martin Geisse did the following:
-	    - Removed the SoundDriver, NetworkDriver and MotionManager
-	      members from the system driver because they are not used
-	      anywhere.
-	    - Removed command line parsing code out of the system driver
-	      and into its own class which is then used by the system driver.
+	    - Removed the SoundDriver, NetworkDriver and MotionManager members
+	      from the system driver because they are not used anywhere.
+	    - Removed command line parsing code out of the system driver and
+	      into its own class which is then used by the system driver.
 29-Jun-2001
-	- Got an Insure log from Philip Wyett. Using this I fixed a number
-	  of small problems and one rather bad problem. The bad problem
-	  that is fixed is:
-	      - Terrain visibility had a memory overwrite bug with the
-	        horizontal index lookup table.
+	- Got an Insure log from Philip Wyett.  Using this I fixed a number of
+	  small problems and one rather bad problem.  The bad problem that is
+	  fixed is:
+	    - Terrain visibility had a memory overwrite bug with the horizontal
+	      index lookup table.
 	- Added 'csparser' to 'make walkall' target.
 	- Fix to python plugin for csparser.
 	- Fixed the balls in csdemo.
@@ -274,9 +272,9 @@ The history order is reversed so that new features are at the top.
 	  changes.
 	- Martin Geisse fixed several compilation errors in g2d_dd8.cpp,
 	  wodrv.cpp, video.cpp, and texfile.cpp.
-	- Martin moved several functions out of csloader.cpp and in their
-	  own source files, grouped by their purpose. This is an attempt
-	  to make the loader code more readable.
+	- Martin moved several functions out of csloader.cpp and in their own
+	  source files, grouped by their purpose.  This is an attempt to make
+	  the loader code more readable.
 	- Norman Kramer fixed CallOnEvent in glx2d.cpp.
 	- Norman fixed bumptest.cpp and demo.cpp (loader -> imageio).
 28-Jun-2001
@@ -296,25 +294,25 @@ The history order is reversed so that new features are at the top.
 	- Fixed WalkTest terrain dynamic lighting for this change.
 	- Fixed WalkTest terrain collision detection for this change.
 	- Fixed BugPlug ability to enable/disable vistesting for terrains.
-	- Added SCF_SET_REF() to safely set a reference in a variable.
-	  This will make sure the old reference (if any) gets released
-	  and the new reference will be increased. Will safely work in
-	  combination with NULL.
+	- Added SCF_SET_REF() to safely set a reference in a variable.  This
+	  will make sure the old reference (if any) gets released and the new
+	  reference will be increased.  Will safely work in combination with
+	  NULL.
 	- Martin Geisse removed lots of unneeded include statements from
-	  walktest and squawk. Also made some changes to squawk, so it now
+	  walktest and squawk.  Also made some changes to squawk, so it now
 	  uses the engine only through interfaces.
 	- Martin also did:
 	    - Renamed BEGIN_TYPED_VECTOR_EXT to BEGIN_TYPED_VECTOR and
 	      END_TYPED_VECTOR_EXT to FINISH_TYPED_VECTOR.
-	    - Added GetArray() to typed vectors which returns the array
-	      of pointers as a (TYPE**) pointer.
+	    - Added GetArray() to typed vectors which returns the array of
+	      pointers as a (TYPE**) pointer.
 	    - Cleaned up the arrays from csengine/arrays.cpp using typed
 	      vectors.
-	    - Changed DECLARE_TYPED_VECTOR slightly. The user-defined
+	    - Changed DECLARE_TYPED_VECTOR slightly.  The user-defined
 	      FreeTypedItem method must now be given as a complete function
-	      (i.e.  with function name and brackets). This makes it
-	      possible to move the implementation outside the macro call
-	      and also to add other user-defined methods.
+	      (i.e. with function name and brackets).  This makes it possible
+	      to move the implementation outside the macro call and also to add
+	      other user-defined methods.
 	    - Removed the non-const operator [] from SCF vectors again. It
 	      is unsafe because it allows to replace items but ignore their
 	      reference count.
