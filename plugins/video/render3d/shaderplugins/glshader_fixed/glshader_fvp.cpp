@@ -374,6 +374,13 @@ bool csGLShaderFVP::Prepare(iShaderPass* pass)
   dynamicVars.Empty ();
   int i;
 
+  ambientVarRef = svContextHelper.GetVariable (ambientvar);
+  if (!ambientVarRef)
+    ambientVarRef = pass->GetVariableRecursive (ambientvar);
+  if (!ambientVarRef)
+    dynamicVars.InsertSorted (csShaderVariableProxy(ambientvar, 
+      (int)&ambientVarRef));
+
   for (i = 0; i < lights.Length (); i++)
   {
     lightingentry &ent = lights.Get (i);

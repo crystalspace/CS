@@ -27,7 +27,13 @@ chronological order.
 	- res updated a comment in ogl_txtmgr.cpp. Just dropping the alpha of
 	  keycolored pixels to 0 and leaving other pixels as is is indeed the
 	  desired behaviour.
-	- res added a paragraph about iGraphics2D::WriteBaseline().
+	- res added a paragraph about iGraphics2D::WriteBaseline() to 
+	  apimod98.txi.
+	- res fixed a crahs in the fixed function shader programs. A shader 
+	  var wasn't properly set up.
+	- res added a fix from Marten to 
+	  csShaderVariableContextHelper::FillVariableList().
+	  Previously, not all provided variables were actually filled.
 6-Nov-2003
 	- res bumped the version of the iGraphics2D interface and updated
 	  some doxygen comments in include/graph2d.h. (Basically the 

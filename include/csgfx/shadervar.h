@@ -334,6 +334,8 @@ public:
       }
       if (curVar->Name == curInput->Name && curInput->shaderVariable == 0)
         curInput->shaderVariable = curVar;
+      else if (curVar->Name > curInput->Name)
+        continue;
       else if (varIter.HasNext ())
         continue; //still may have more
       else
