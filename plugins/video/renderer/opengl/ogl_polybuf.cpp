@@ -183,7 +183,7 @@ void csTriangleArrayPolygonBuffer::AddTriangles(csTrianglesPerMaterial* pol,
 {
 
   csVector3 aux;
-  csVector2 uv[2];
+  csVector2 uv[3];
   int i;
   csTriangle triangle;  
   unsigned char r,g,b;
