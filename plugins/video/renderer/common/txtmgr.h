@@ -379,9 +379,6 @@ public:
     materials.DeleteAll ();
   }
 
-  /// Free all images associated with textures
-  virtual void FreeImages ();
-
   /**
    * Query the basic format of textures that can be registered with this
    * texture manager. It is very likely that the texture manager will

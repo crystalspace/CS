@@ -274,6 +274,7 @@ void csSoftwareTextureHandle::PrepareInt ()
   prepared = true;
   CreateMipmaps ();
   remap_texture ();
+  FreeImage ();
 }
 
 class csOFSCbSoftware : public iOffscreenCanvasCallback
@@ -387,8 +388,8 @@ csSoftRendererLightmap::csSoftRendererLightmap ()
 {
   SCF_CONSTRUCT_IBASE (0);
 
-  data = 0;
   dirty = false;
+  data = 0;
 
   lightCellSize = 0;
   memset (cacheData, 0, sizeof (cacheData));
@@ -396,7 +397,16 @@ csSoftRendererLightmap::csSoftRendererLightmap ()
 
 csSoftRendererLightmap::~csSoftRendererLightmap ()
 {
+  delete[] data;
   SCF_DESTRUCT_IBASE();
+}
+
+void csSoftRendererLightmap::SetSize (size_t lmPixels)
+{
+  delete[] data;
+  lmSize = lmPixels;
+  data = new csRGBpixel[lmSize];
+  lmSize *= sizeof (csRGBpixel);
 }
 
 void csSoftRendererLightmap::GetSLMCoords (int& left, int& top, 
@@ -408,7 +418,8 @@ void csSoftRendererLightmap::GetSLMCoords (int& left, int& top,
 
 void csSoftRendererLightmap::SetData (csRGBpixel* data)
 {
-  csSoftRendererLightmap::data = data;
+  memcpy (csSoftRendererLightmap::data, data,
+    lmSize);
   dirty = true;
 }
 
@@ -468,6 +479,7 @@ csPtr<iRendererLightmap> csSoftSuperLightmap::RegisterLightmap (int left, int to
                                                                 int width, int height)
 {
   csSoftRendererLightmap* rlm = RLMs.Alloc ();
+  rlm->SetSize (width * height);
   rlm->slm = this;
   rlm->rect.Set (left, top, left + width, top + height);
 

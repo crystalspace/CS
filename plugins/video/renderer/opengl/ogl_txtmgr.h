@@ -293,12 +293,6 @@ public:
     return 0;
   }
 
-  /** 
-   * Free all images associated with textures
-   * (ensures that all software proctexes have the needed textures) 
-   */
-  virtual void FreeImages ();
-
   /// Create a new super light map.
   virtual csPtr<iSuperLightmap> CreateSuperLightmap(int w, int h);
   

@@ -212,6 +212,7 @@ class csSoftRendererLightmap : public iRendererLightmap
 
   csRGBpixel* data;
   bool dirty;
+  size_t lmSize;
 
   int lightCellSize;
   int lightCellShift;
@@ -222,6 +223,7 @@ public:
 
   csSoftRendererLightmap ();
   virtual ~csSoftRendererLightmap ();
+  void SetSize (size_t lmPixels);
 
   virtual void GetSLMCoords (int& left, int& top, 
     int& width, int& height);

@@ -1,5 +1,7 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2004 by Jorrit Tyberghein
+	      (C) 2003 by Philip Aumayr
+	      (C) 2004 by Frank Richter
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -58,11 +60,23 @@ public:
 
   csGLTextureHandle *Parent;
 
-  uint8 *image_data;
-  GLint compressed;
-  GLint internalFormat;
-  GLint size;
-  int w, h, d, components;
+  struct UploadData
+  {
+    uint8* image_data;
+    /** 
+     * Ref to image that owns image_data.
+     * Note: only if imgRef == 0 image_data will be delete[]d.
+     */
+    csRef<iImage> imgRef;
+    GLint compressed;
+    GLint internalFormat;
+    GLint size;
+
+    UploadData ();
+    ~UploadData ();
+  };
+  UploadData* uploadData;
+  int w, h, d/*, components*/;
 
   void CleanupImageData ();
    ///
@@ -72,13 +86,15 @@ public:
 
   int get_depth () const { return d; }
 
-  int get_components () const { return components; } 
+  //int get_components () const { return components; } 
 
   uint8 *&get_image_data ()
-  { return image_data; }
+  { 
+    CS_ASSERT (uploadData);
+    return uploadData->image_data; 
+  }
 
   csGLTextureHandle *get_parent () { return Parent; }
-
 };
 
 class csGLTextureHandle : public iTextureHandle
@@ -113,6 +129,7 @@ private:
 
   void *cachedata;
 
+  bool Compressable () { return !(flags & CS_TEXTURE_2D); }
   bool transform (iImageVector *ImageVec, csGLTexture *tex);
 
   csGLTexture* NewTexture (iImage *Image, bool ismipmap);
@@ -122,9 +139,7 @@ private:
   void Load ();
   void Unload ();
 public:
-  int bpp;
   int formatidx;
-  int texelbytes;
   int orig_width, orig_height;
   csArray<csGLTexture*> vTex;
   csWeakRef<csGLGraphics3D> G3D;
@@ -133,11 +148,11 @@ public:
   int target;
   bool was_render_target;
 
-  csGLTextureHandle (iImage* image, int flags, int target, int bpp,
-    GLenum sourceFormat, csGLGraphics3D *iG3D);
+  csGLTextureHandle (iImage* image, int flags, int target, 
+    csGLGraphics3D *iG3D);
 
-  csGLTextureHandle (iImageVector* image, int flags, int target, int bpp,
-    GLenum sourceFormat, csGLGraphics3D *iG3D);
+  csGLTextureHandle (iImageVector* image, int flags, int target, 
+    csGLGraphics3D *iG3D);
 
   csGLTextureHandle (int target, GLuint Handle, csGLGraphics3D *iG3D);
 
@@ -464,7 +479,8 @@ private:
   csMatVector materials;
 
   csPixelFormat pfmt;
-  
+
+  void AlterTargetFormatForBits (GLint target, int bits);
   void AlterTargetFormat (const char *oldTarget, const char *newTarget);
 
   iObjectRegistry *object_reg;
@@ -483,8 +499,6 @@ public:
   int texture_downsample;
   /// texture filtering anisotropy
   float texture_filter_anisotropy;
-  /// what bpp should textures have?
-  int texture_bits;
   int rstate_bilinearmap;
 
   csStringID nameDiffuseTexture;
@@ -500,8 +514,6 @@ public:
   /// Read configuration values from config file.
   void read_config (iConfigFile *config);
   void Clear ();
-  void DetermineStorageSizes();
-  void SetPixelFormat (csPixelFormat const& PixelFormat);
 
 
   /**
@@ -519,27 +531,18 @@ public:
   SCF_DECLARE_IBASE;
   /**
    * Register a texture. The given input image is IncRef'd and DecRef'ed
-   * later when FreeImages () is called. If you want to keep the input image
+   * later when not needed any more. If you want to keep the input image
    * make sure you have called IncRef yourselves.
    */
   virtual csPtr<iTextureHandle> RegisterTexture (iImage *image, int flags);
 
   /**
    * Register a texture. The given input image is IncRef'd and DecRef'ed
-   * later when FreeImages () is called. If you want to keep the input image
+   * later when not needed any more. If you want to keep the input image
    * make sure you have called IncRef yourselves.
    */
   virtual csPtr<iTextureHandle> RegisterTexture (iImageVector *image,
   	int flags, int target);
-
-  /**
-   * Call this function if you want to release all iImage's as
-   * given to this texture manager. So the advantage
-   * of calling FreeImages() is that you gain memory (may be a lot)
-   * but the disadvantage is that when you want to add textures later
-   * you have to reload them all and start all over.
-   */
-  virtual void FreeImages ();
 
   /**
    * Register a material. The input material is IncRef'd and DecRef'ed

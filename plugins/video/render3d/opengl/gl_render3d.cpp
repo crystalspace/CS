@@ -56,6 +56,7 @@
 #include "gl_renderbuffer.h"
 #include "gl_txtmgr.h"
 #include "gl_polyrender.h"
+#include "normalizationcube.h"
 
 #include "plugins/video/canvas/openglcommon/glextmanager.h"
 
@@ -261,20 +262,16 @@ void csGLGraphics3D::SetZModeInternal (csZBufMode mode)
       statecache->SetDepthFunc (GL_EQUAL);
       statecache->SetDepthMask (GL_FALSE);
       break;
-    case CS_ZBUF_TEST:
-      statecache->Enable_GL_DEPTH_TEST ();
-      statecache->SetDepthFunc (GL_GREATER);
-      statecache->SetDepthMask (GL_FALSE);
-      break;
     case CS_ZBUF_INVERT:
       statecache->Enable_GL_DEPTH_TEST ();
       statecache->SetDepthFunc (GL_LESS);
       statecache->SetDepthMask (GL_FALSE);
       break;
+    case CS_ZBUF_TEST:
     case CS_ZBUF_USE:
       statecache->Enable_GL_DEPTH_TEST ();
       statecache->SetDepthFunc (GL_GEQUAL);
-      statecache->SetDepthMask (GL_TRUE);
+      statecache->SetDepthMask ((mode == CS_ZBUF_USE) ? GL_TRUE : GL_FALSE);
       break;
     default:
       break;
@@ -728,33 +725,6 @@ void csGLGraphics3D::SetupProjection ()
 // iGraphics3D
 ////////////////////////////////////////////////////////////////////
 
-
-static void FillNormalizationMapSide (unsigned char *normdata, int size, 
-                          int xx, int xy, int xo,
-                          int yx, int yy, int yo,
-                          int zx, int zy, int zo)
-{
-  const float halfSize = size / 2;
-  for (int y=0; y < size; y++)
-  {
-    float yv = (y + 0.5) / halfSize - 1.0f;
-    for (int x=0; x < size; x++)
-    {
-      float xv = (x + 0.5) / halfSize - 1.0f;
-      csVector3 norm = csVector3 (
-        xo + xv*xx + yv*xy, 
-        yo + xv*yx + yv*yy, 
-        zo + xv*zx + yv*zy);
-      norm.Normalize ();
-      *normdata++ = (unsigned char)(127.5f + norm.x*127.5f);
-      *normdata++ = (unsigned char)(127.5f + norm.y*127.5f);
-      *normdata++ = (unsigned char)(127.5f + norm.z*127.5f);
-      *normdata++ = 0;
-    }
-  }
-}
-
-
 bool csGLGraphics3D::Open ()
 {
   csRef<iPluginManager> plugin_mgr = CS_QUERY_REGISTRY (
@@ -801,6 +771,7 @@ bool csGLGraphics3D::Open ()
   ext->InitGL_ARB_multitexture ();
   ext->InitGL_ARB_texture_cube_map();
   ext->InitGL_EXT_texture3D ();
+  ext->InitGL_ARB_texture_compression ();
   //ext->InitGL_EXT_texture_compression_s3tc (); // not used atm
   ext->InitGL_ARB_vertex_buffer_object ();
   ext->InitGL_SGIS_generate_mipmap ();
@@ -1014,81 +985,19 @@ bool csGLGraphics3D::Open ()
   fogvar->SetValue (fogtex);
   shadermgr->AddVariable(fogvar);
 
-  const int normalizeCubeSize = config->GetInt (
-    "Video.OpenGL.NormalizeCubeSize", 256);
+  {
+    const int normalizeCubeSize = config->GetInt (
+      "Video.OpenGL.NormalizeCubeSize", 256);
 
-  imgvec = csPtr<iImageVector> (new csImageVector ());
-
-  // Positive X
-  unsigned char *normdata = 
-    new unsigned char[normalizeCubeSize*normalizeCubeSize*4];
-  FillNormalizationMapSide (normdata, normalizeCubeSize,  0,  0,  1,
-                                                          0, -1,  0,
-                                                         -1,  0,  0);
-  img = csPtr<iImage> (new csImageMemory (
-    normalizeCubeSize, normalizeCubeSize, normdata, true,
-    CS_IMGFMT_TRUECOLOR));
-  imgvec->AddImage (img);
-
-  // Negative X
-  normdata = new unsigned char[normalizeCubeSize*normalizeCubeSize*4];
-  FillNormalizationMapSide (normdata, normalizeCubeSize,  0,  0, -1,
-                                                          0, -1,  0,
-                                                          1,  0,  0);
-  img = csPtr<iImage> (new csImageMemory (
-    normalizeCubeSize, normalizeCubeSize, normdata, true, 
-    CS_IMGFMT_TRUECOLOR));
-  imgvec->AddImage (img);
-
-  // Positive Y
-  normdata = new unsigned char[normalizeCubeSize*normalizeCubeSize*4];
-  FillNormalizationMapSide (normdata, normalizeCubeSize,  1,  0,  0,
-                                                          0,  0,  1,
-                                                          0,  1,  0);
-  img = csPtr<iImage> (new csImageMemory (
-    normalizeCubeSize, normalizeCubeSize, normdata, true, 
-    CS_IMGFMT_TRUECOLOR));
-  imgvec->AddImage (img);
-
-  // Negative Y
-  normdata = new unsigned char[normalizeCubeSize*normalizeCubeSize*4];
-  FillNormalizationMapSide (normdata, normalizeCubeSize,  1,  0,  0,
-                                                          0,  0, -1,
-                                                          0, -1,  0);
-  img = csPtr<iImage> (new csImageMemory (
-    normalizeCubeSize, normalizeCubeSize, normdata, true, 
-    CS_IMGFMT_TRUECOLOR));
-  imgvec->AddImage (img);
-
-  // Positive Z
-  normdata = new unsigned char[normalizeCubeSize*normalizeCubeSize*4];
-  FillNormalizationMapSide (normdata, normalizeCubeSize,  1,  0,  0,
-                                                          0, -1,  0,
-                                                          0,  0,  1);
-  img = csPtr<iImage> (new csImageMemory (
-    normalizeCubeSize, normalizeCubeSize, normdata, true, 
-    CS_IMGFMT_TRUECOLOR));
-  imgvec->AddImage (img);
-
-  // Negative Z
-  normdata = new unsigned char[normalizeCubeSize*normalizeCubeSize*4];
-  FillNormalizationMapSide (normdata, normalizeCubeSize, -1,  0,  0,
-                                                          0, -1,  0,
-                                                          0,  0, -1);
-  img = csPtr<iImage> (new csImageMemory (
-    normalizeCubeSize, normalizeCubeSize, normdata, true, 
-    CS_IMGFMT_TRUECOLOR));
-  imgvec->AddImage (img);
-
-  csRef<iTextureHandle> normtex = txtmgr->RegisterTexture (
-    imgvec, CS_TEXTURE_3D | CS_TEXTURE_CLAMP | CS_TEXTURE_NOMIPMAPS, 
-    iTextureHandle::CS_TEX_IMG_CUBEMAP);
-
-  csRef<csShaderVariable> normvar = csPtr<csShaderVariable> (
-  	new csShaderVariable (
-		strings->Request ("standardtex normalization map")));
-  normvar->SetValue (normtex);
-  shadermgr->AddVariable(normvar);
+    csRef<csShaderVariable> normvar = 
+      csPtr<csShaderVariable> (new csShaderVariable (
+      strings->Request ("standardtex normalization map")));
+    csRef<iShaderVariableAccessor> normCube;
+    normCube.AttachNew (new csNormalizationCubeAccessor (txtmgr, 
+      normalizeCubeSize));
+    normvar->SetAccessor (normCube);
+    shadermgr->AddVariable(normvar);
+  }
 
   {
     csRGBpixel* white = new csRGBpixel[1];

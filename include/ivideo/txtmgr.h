@@ -120,7 +120,7 @@ struct iSuperLightmap : public iBase
   virtual iTextureHandle* GetTexture () = 0;
 };
 
-SCF_VERSION (iTextureManager, 2, 3, 2);
+SCF_VERSION (iTextureManager, 2, 4, 0);
 
 /**
  * This is the standard texture manager interface.
@@ -198,15 +198,6 @@ struct iTextureManager : public iBase
    */
   virtual csPtr<iTextureHandle> RegisterTexture (iImageVector *image,
   	int flags, int target) = 0;
-
-  /**
-   * Call this function if you want to release all iImage's as
-   * given to this texture manager. 
-   * The advantage of calling FreeImages() is that you gain memory (may
-   * be a lot) but the disadvantage is that when you want to add textures later
-   * you have to reload them all and start all over.
-   */
-  virtual void FreeImages () = 0;
 
   /**
    * Register a material. The input material is IncRef'd and DecRef'ed

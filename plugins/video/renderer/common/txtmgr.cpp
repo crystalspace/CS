@@ -350,13 +350,6 @@ void csTextureManager::read_config (iConfigFile* /*config*/)
 {
 }
 
-void csTextureManager::FreeImages ()
-{
-  size_t i;
-  for (i = 0 ; i < textures.Length () ; i++)
-    textures.Get (i)->FreeImage ();
-}
-
 int csTextureManager::GetTextureFormat ()
 {
   return CS_IMGFMT_TRUECOLOR | CS_IMGFMT_ALPHA;

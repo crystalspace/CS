@@ -567,6 +567,7 @@ void csTextureHandleOpenGL::PrepareInt ()
   if (prepared) return;
   prepared = true;
   InitTexture (txtmgr, &txtmgr->pfmt);
+  FreeImage();
 }
 
 class csOFSCbOpenGL : public iOffscreenCanvasCallback
@@ -883,15 +884,6 @@ void csTextureManagerOpenGL::Clear ()
   }
 
   csTextureManager::Clear ();
-}
-
-void csTextureManagerOpenGL::FreeImages ()
-{
-  size_t i;
-  for (i = 0 ; i < textures.Length () ; i++)
-  {
-    textures.Get (i)->FreeImage ();
-  }
 }
 
 csPtr<iSuperLightmap> csTextureManagerOpenGL::CreateSuperLightmap(int w, 

@@ -30,6 +30,7 @@
 #include "csutil/cfgacc.h"
 #include "csutil/cscolor.h"
 #include "csutil/csstring.h"
+#include "csutil/parray.h"
 #include "csutil/scf.h"
 #include "csutil/scfstrset.h"
 #include "csutil/weakref.h"
@@ -71,7 +72,6 @@ private:
   friend class csGLTextureHandle;
   friend class csGLTextureManager;
   friend class eiShaderRenderInterface;
-  friend class csShaderGLMTEX;
   friend class csGLPolygonRenderer;
 
   iObjectRegistry* object_reg;

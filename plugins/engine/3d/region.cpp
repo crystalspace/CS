@@ -317,8 +317,6 @@ bool csRegion::Prepare ()
 {
   if (!PrepareTextures ()) return false;
   if (!ShineLights ()) return false;
-  iTextureManager *txtmgr = engine->G3D->GetTextureManager ();
-  txtmgr->FreeImages ();
   return true;
 }
 

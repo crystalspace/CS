@@ -1290,10 +1290,6 @@ bool csEngine::Prepare (iProgressMeter *meter)
   PrepareTextures ();
   PrepareMeshes ();
 
-  // The images are no longer needed by the 3D engine.
-  iTextureManager *txtmgr = G3D->GetTextureManager ();
-  txtmgr->FreeImages ();
-
 #ifndef CS_USE_NEW_RENDERER
   G3D->ClearCache ();
 #else
@@ -1767,12 +1763,22 @@ iEngineSequenceManager* csEngine::GetEngineSequenceManager ()
     	  "crystalspace.utilities.sequence.engine", iEngineSequenceManager);
       if (!es)
       {
-        Warn ("Could not load the engine sequence manager!");
+	static bool engSeqLoadWarn = false;
+	if (!engSeqLoadWarn)
+	{
+	  Warn ("Could not load the engine sequence manager!");
+	  engSeqLoadWarn = true;
+	}
         return 0;
       }
       if (!object_reg->Register (es, "iEngineSequenceManager"))
       {
-        Warn ("Could not register the engine sequence manager!");
+	static bool engSeqRegWarn = false;
+	if (!engSeqRegWarn)
+	{
+	  Warn ("Could not register the engine sequence manager!");
+	  engSeqRegWarn = true;
+	}
         return 0;
       }
     }
