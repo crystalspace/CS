@@ -8,6 +8,30 @@ The history order is reversed so that new features are at the top.
 	  info when debugging inside a dll. Now this is solved at the cost
 	  of vastly bigger dll's (i.e. from 92K to 726K in one case).
 	  The dll's are only bigger in debug mode though.
+	- Philip Wyett did the following:
+	  Updated links etc. to take account of new release packages.
+	    - msvc_libs 0.92
+	    - csMinGW 0.92 - now incorporating bash shell
+	  For those who want to find out more about bash read
+	  the docs available in: X:\mingw32\usr\doc\bash-2.05a.
+	- Christopher Nelson did the following:
+	    - Made some improvements to the single proctex mode. It now
+	      works again.
+	    - Added SetFlag, ClearFlag, and GetFlags.
+	    - There is a new flag: AWSF_AlwaysEraseWindows. This flag makes
+	      the system always erase behind windows in case you want to use
+	      it for a proctex surface or as the primary draw system.
+	    - Erasing is fairly optimal, and shouldn't result in overdraw.
+	    - Added Inset, Outset, and Join methods to csRect.
+	    - Made another fix that allows a user to optimally draw single
+	      proctextures to the screen if they want. 
+	    - Fixed one of the die! bugs in single proctex mode.
+	      Still looking for the other.
+	    - Made some mods to this, including the removal of the #defines
+	      in favor of the more lexicographically stable const bool method.
+	    - Made some changes to demonstrate how to use the flags and the
+	      two different ways you can draw an aws canvas to the screen.
+	- 'res' did some bugfixes to AWS.
 10-Dec-2001
 	- Toni Asco' Gonzalez found a bug in 3ds2lev.
 	- Added thanks to Ted Nguyen for donating two copies of MSVC
@@ -46,6 +70,7 @@ The history order is reversed so that new features are at the top.
 	  API.
 	- Matze enabled python in cygwin port. (I didn't touch anything, but as
 	  I tried it again today, it suddenly worked :)
+	- Matze did a small fix after Jorrit's changes (terrfldr.h).
 9-Dec-2001
 	- Optimized the matrix multiply routine considerably (the
 	  *= operator) by avoiding the copy of 'this'. Instead
@@ -72,6 +97,7 @@ The history order is reversed so that new features are at the top.
 	  no big effect on framerate however.
 8-Dec-2001
 	- Fixed a closing brace in mapfmt.txi.
+	- 'res' fixed "unreferenced local variable" msvc warning in awswin.cpp.
 7-Dec-2001
 	- Added a new tutorial application (no doc yet) for collision
 	  detection. This tutorial contains a hierarchical mesh object
@@ -135,7 +161,12 @@ The history order is reversed so that new features are at the top.
 	  in a render priority based on this sorting flag.
 	- Matze added a -L/usr/lib/w32api to fix some issues on cygwin (the
 	  compiler is looking there by default but some external tools like
-	  libtool didn't)
+	  libtool didn't).
+	- Philip Wyett commented out wrong plugin. Fixed.
+	- Philipo also changed MAXPATHLEN to CS_MAXPATHLEN to eliminate
+	  a warning under the Cygwin Windows port of CS. This change
+	  is done blind into some CS ports, so sorry in advance if this
+	  causes any problems.
 4-Dec-2001
 	- Enabled aws in user.mak.
 	- Created a dummy thing object plugin. This plugin allows applications
@@ -159,13 +190,35 @@ The history order is reversed so that new features are at the top.
 	  and even between polygons belonging to other things (for texture
 	  planes). This improves (but does not fully fix) lighting and texture
 	  mapping in the partsys level.
-	- changed win slashes '\' in aws.mak to unix ones '/' to make it at
-	  least compiling with unix. I'm not sure if it still works in win now
-	  :)
+	- Matze changed win slashes '\' in aws.mak to unix ones '/' to make it
+	  at least compiling with unix. I'm not sure if it still works in win
+	  now :)
 	- Matze changed bin/arch.sh to use the value of the CPU, MACHINE and
 	  PROC vars if they are alread set in environment
-	- also changed comptest to use a already set ARCH var (Eric, please
-	  check if it still works with older shells)
+	- Matze also changed comptest to use a already set ARCH var (Eric,
+	  please check if it still works with older shells).
+	- Philip Wyett did the following:
+	    - Removed references to non base/out of date DDRAW and D3D plugins
+	      to avoid any WARNING messages or confusion in the 0.92 release.
+	      This was mentioned on the mailing list...
+	    - Removed DDRAW 8 plugin due to it causing more confusion than
+	      hell.
+	    - Removed references to D3D renderer from cfg files to stop
+	      confusion.
+	    - Updated docs to remove some old stuff and make clear that the AWS
+	      plugin is not in the default MSVC build process and those
+	      wushing to add if unsure contact me to find out howto re-add it.
+	    - Scratched the above change after noticing AWS is back in build
+	      process.
+	    - Added link to a second CS WorldCraft wad file I created which
+	      has twice the amount of textures and most of better quality for
+	      better development.
+	    - A little Windows docs cleaning.
+	    - Fixed function param redifinition error under MSVC.
+	    - Removed some old dependancy stuff ref'ing cswin32exe and
+	      cswin32dll.
+	- 'res' changed filenames of awssmpt.* to awscspt.* and also
+	  did some small fixes in aws.
 3-Dec-2001
 	- Toni Asco' Gonzalez fixed the 3ds loader so that it now correctly
 	  supports normal and texture mapping information.
@@ -182,11 +235,25 @@ The history order is reversed so that new features are at the top.
 	  csMeshWrapper::GetScreenBoundingBox(). It was incorrectly ignoring
 	  the movable transformation so it would not work on mesh objects
 	  that were moved away from the default identity position.
+	- Christopher Nelson did the following:
+	    - Commited F. Richter (res) 's updates to allow for multiple
+	      procedural textures that span the entire view space. Thanks to
+	      him, AWS windows can now occuppy the entire window. Note that
+	      this incurs a heavy speed penalty.
+ 	    - Fixed a couple of bugs that he had introduced, and introduced a
+	      couple of my own bugs.
+ 	    - Heavily modified for speed, and also fixed a couple of other
+	      items for simplicity.
+ 	    - The single-proctex mode might be broken now.
+30-Nov-2001
+	- 'res' added missing SCF_CONSTRUCT_IBASE to awsfparm.cpp.
+	- 'res' redefined macro CRASH to call DebugBreak().
 28-Nov-2001
 	- Made the test on bad UV coordinates for a polygon a little
 	  bit more strict so that it rejects more polygons. There were
 	  still polygons that came through which could crash the lighting
 	  calculator otherwise.
+	- 'res' added a missing @end example to simpmap.txi tutorial.
 27-Nov-2001
 	- Considerably optimized memory usage of graph debugger by
 	  reorganizing the data a little.
@@ -195,6 +262,7 @@ The history order is reversed so that new features are at the top.
 	- Fixed definition of CS_GNUC_PRINTF in case an old gcc is used.
 	  Also fixed definition of CS_GNUC_SCANF.
 	- Matze removed CS_GNUC_PRINTF from pubapi and devapi docs
+	- Philip Wyett fixed a compiler warning in csstring.cpp.
 26-Nov-2001
 	- Added documentation for terrain engine.
 	- Extended documentation on the format of the plugin loaders by also
@@ -277,6 +345,7 @@ The history order is reversed so that new features are at the top.
 	    - Fixed numerous cases where the unsafe sprint() was being used
 	      instead of the safe cs_vsnprintf().
 	    - Updated incomplete and outdated documentation for many methods.
+	- 'res' fixed 'text background not transparent' bug in OpenGL.
 24-Nov-2001
 	- Added more debug graph commands for iImage.  Also added links to
 	  iImage and the texture manager for the 3D renderers.  This reveals a
@@ -326,6 +395,17 @@ The history order is reversed so that new features are at the top.
 	  graph.
 	- Added yet more DG_LINK() commands in the engine so that the object
 	  graph is better defined in the graph debugger.
+	- Philip Wyett did the following:
+	    - Removed unused and unneeded variable in csosdefs.h, which
+	      hindered the developemnt of external DLL's which had there own
+	      DllMain.
+	    - Fixed a couple of ; at the end if statements (OpenGL) :-)
+	    - Fixed problem where a CS GUI app creates a frame, but the Window
+	      body does not appear until a level is loaded - simplept on
+	      slower systems was a good example of this. Added a stock default
+	      black RGB brush to fill until everything is ready.
+	    - Fixed link error in vsh, brought about by my change of this
+	      morning.
 22-Nov-2001
 	- Further work on documentation. Created a 'Documentation Guide'
 	  section which guides the CS game writer through some of the more
@@ -384,6 +464,10 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in the engine. When adding polygons or curves the
 	  bounding box of the thing would be invalid. Added code to
 	  invalidate the bouding box so that it will be recalculated later.
+	- Philip Wyett updated simplept and bumptest to preferred coding
+	  techniques and changed some basics which look like an overflow
+	  from copy and pasting from the simple1 app.
+	- Matze added a small fix from Rene Dudfield to csparser plugin.
 19-Nov-2001
 	- Added iEngine::RemoveObject() which is a conveniance function to
 	  'remove' a CS object from the engine. This will not clear the
@@ -410,6 +494,38 @@ The history order is reversed so that new features are at the top.
 	  the current region to loads it's material.
 	- Reverted the memory leak fix with textures. This was in fact not
 	  a bug and my fix caused crashes.
+	- Norman Kramer did the following:
+	  This fix will actually make use of the replacements of general/*
+	  in their respective subdirectories like unix/ etc. .
+	  Problem was that sorting put the general directory in front of unix
+	  directory for instance and if instpath.cpp (for example) is
+	  requested to compile its taken from the general directory.
+	  Note that this fix is considered a hack (by Eric (and me too - thats
+	  why I consulted him first:))
+	- Norman added unistd.h and CS_SYSDEF_PROVIDE_PATH, before it failed
+	  compiling what noone noticed since it never was compiled due to the
+	  cssys.mak problem.
+	- 'res' fixed errors in the AWS documentation he added yesterday.
+18-Nov-2001
+	- Philip Wyett did the following:
+	  By popular demand...
+	  This changes the outputted CS libs names under MSVC debug
+	  builds adds a "_d" to indicate the lib is of a debug build. I.E. now
+	  a debug built csengine lib will be named "libcsengine_d.lib",
+	  however the release built lib will keep the name "libcsengine.lib"
+	  this facilitates distinction between builds and allows project
+	  developers to create one libs directory in which they can drop both
+	  debug and release CS binary libs in without conflict.
+	  Note: Project developers please remember to adjust the names of the
+	  libs you are linking to in debug builds to account for this change,
+	  but hey adding "_d" is no hardship. :-)
+	- Matze made cs-config generation robust to wrong file attributes
+	  (non-executable).
+	- Matze also added a small robustness patch in addition to the patches
+	  yesterday (aws).
+	- 'res' converted Christopher Nelson's AWS documentation to texinfo.
+	- Martin Geisse fixed a circular reference between the map loader
+	  and the syntax services plugin.
 17-Nov-2001
 	- Added some additional DG_DESCRIBE0 statements to some
 	  constructors of engine objects in order to be able to do
@@ -436,6 +552,17 @@ The history order is reversed so that new features are at the top.
 	  this causes problems in some cases. i.e. re-added ObjReleaseOld().
 	- Matze fixed bad dllist usage in aws
 	- Matze changes aws Skin language loading to use vfs
+	- Martin Geisse did the following:
+	    - Fixed a bug in csMovableSectorList where it would IncRef an
+	      object that is not stored at all.
+	    - Removed ObjReleaseOld and the special destructor behaviour
+	      from csObject since it is no longer needed.
+	    - Fixed an old bug in the constructors of csObject and
+	      csConfigFile. When I changed these functions some time ago, I
+	      made the wrong assumption that it is possible to call one
+	      constructor from another one to handle common work. Instead,
+	      this creates another instance of the class on the stack,
+	      which is of course not the desired behaviour.
 16-Nov-2001
 	- Removed csDebuggingGraph::AddInterface() and instead added
 	  a 'bool scf' parameter to AddObject().
@@ -484,6 +611,7 @@ The history order is reversed so that new features are at the top.
 	  indicate the information can be found upwards.
 	- More cleanup of the output of csDebuggingGraph::Dump(). Added
 	  curly brackets for the children to group children more clearly.
+	- 'res' fixed a stupid bug in proctex.h.
 15-Nov-2001
 	- Added DG_ADDI and csDebuggingGraph::AddInterface() with which you
 	  can add an SCF interface (instance of iBase) to the debug graph.
@@ -497,6 +625,7 @@ The history order is reversed so that new features are at the top.
 	  made the ref count equal to 2 but it should be one as the only
 	  ref is the one from the regions vector. So added an additional
 	  DecRef().
+	- Matze Braun changed cs-config to report errors on stderr.
 14-Nov-2001
 	- It is very hard to properly debug the huge graph or tree structures
 	  that are used a lot in Crystal Space. Using 'printf' just doesn't
@@ -567,6 +696,9 @@ The history order is reversed so that new features are at the top.
 	  remove links between two objects if one or both of the objects are
 	  already deleted. This fixes a number of invalid bad links I got
 	  during debugging csObject.
+	- 'res' added to vfs:
+	    - Recursive resolution of variables.
+	    - Support for platform-specific built-in variables.
 13-Nov-2001
 	- Small comment fix in vfs.h.
 	- Fixed a bad bug in csObject destructor. It appears that it could
