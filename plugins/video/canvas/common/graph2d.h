@@ -205,6 +205,15 @@ public:
   /// Sets the type of the font.
   virtual void SetFontID (int FontID)
   { Font = FontID; }
+
+  /// Gets the font size.
+  virtual int GetFontSize ()
+  { long s; bool b = FontRenderer->GetFontProperty (Font, CS_FONTSIZE, s); return (b?s:-1);}
+  
+  /// Sets the font size.
+  virtual bool SetFontSize (int FontSize)
+  { long s=FontSize; return FontRenderer->SetFontProperty (Font, CS_FONTSIZE, s, false ); }
+
   /// Gets the font renderer.
   virtual iFontRender *GetFontRender ()
   { return FontRenderer; }
