@@ -111,7 +111,7 @@ bool BumpTest::InitProcDemo ()
   iImage *map = bptex->GetImageFile();
   prBump = new csProcBump (map);
   //prBump->SetBumpMap(map);
-  matBump = &(prBump->Initialize (this, engine->GetCsEngine (), txtmgr, "bumps"))->scfiMaterialWrapper;
+  matBump = prBump->Initialize (this, engine, txtmgr, "bumps");
   iMeshObjectType* thing_type = engine->GetThingType ();
   iMeshObjectFactory* thing_fact = thing_type->NewFactory ();
   iMeshObject* thing_obj = QUERY_INTERFACE (thing_fact, iMeshObject);

@@ -37,6 +37,8 @@ The history order is reversed so that new features are at the top.
 	  were calling glTexEnv() to set the mode to GL_REPLACE but this
 	  caused problems for the rest of CS since the rest of CS wants
 	  GL_MODULATE.
+	- Fixed iso engine, bumptest, mazed, and demosky after my changes
+	  above.
 	- Eric Sunshine made the following changes to CS/bin/win32conf.mak:
 	    - Eliminated unnecessary use of >>.  Now uses simple >.  This
 	      change should prevent confusion by some future maintainer.

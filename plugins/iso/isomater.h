@@ -66,8 +66,6 @@ public:
 
   /// Get the flat shading color
   inline csRGBcolor& GetFlatColor () { return flat_color; }
-  /// Set the flat shading color
-  inline void SetFlatColor (const csRGBcolor& col) { flat_color = col; }
 
   /// Get the texture (if none NULL is returned)
   inline iTextureHandle *GetTextureHandle () const { return texture; }
@@ -99,11 +97,21 @@ public:
   virtual int GetNumTextureLayers () { return 0; }
   /// Get a texture layer.
   virtual csTextureLayer* GetTextureLayer (int) { return NULL; }
+  /// Set the flat shading color
+  virtual void SetFlatColor (const csRGBcolor& col) { flat_color = col; }
   /// Get flat color.
   virtual void GetFlatColor (csRGBpixel &oColor);
   /// Get reflection values (diffuse, ambient, reflection).
   virtual void GetReflection (float &oDiffuse, float &oAmbient,
     float &oReflection);
+  /// Set reflection values (diffuse, ambient, reflection).
+  virtual void SetReflection (float oDiffuse, float oAmbient,
+    float oReflection)
+  {
+    diffuse = oDiffuse;
+    ambient = oAmbient;
+    reflection = oReflection;
+  }
 };
 
 /**
