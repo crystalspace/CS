@@ -1933,7 +1933,6 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   bool multimat = false;
   bool tex_transp = false;
   bool gouraud = (queue.mixmode & CS_FX_GOURAUD) != 0;
-  bool tex_flip = false;
 
   if (mat_handle)
   {
@@ -1948,7 +1947,6 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
       CacheTexture (queue.mat_handle);
       texturecache_data = (csTxtCacheData *)txt_mm->GetCacheData ();
       texturehandle = texturecache_data->Handle;
-      tex_flip = txt_mm->was_render_target;
     }
   }
 
@@ -1999,13 +1997,6 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
 
   if (txt_handle)
     statecache->SetTexture (GL_TEXTURE_2D, texturehandle);
-  if (tex_flip)
-  {
-    glMatrixMode (GL_TEXTURE);
-    glPushMatrix();
-    glScalef (1.0f, -1.0f, 1.0f);
-    glMatrixMode (GL_PROJECTION);
-  }
 
   //=================
   // Pass 1: The unlit texture with optional gouraud shading.
@@ -2034,12 +2025,6 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
     statecache->SetShadeModel (GL_FLAT);
   }
 
-  if (tex_flip)
-  {
-    glMatrixMode (GL_TEXTURE);
-    glPopMatrix();
-    glMatrixMode (GL_PROJECTION);
-  }
   //=================
   // If we have need other texture passes (for whatever reason)
   // we set the z-buffer to second pass state.
@@ -2332,7 +2317,6 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
   csTextureHandleOpenGL *txt_mm = 0;
   csTxtCacheData *texturecache_data = 0;
   GLuint texturehandle = 0;
-  bool tex_flip = false;
 
   if (mat_handle)
   {
@@ -2347,7 +2331,6 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
       CacheTexture (poly.mat_handle);
       texturecache_data = (csTxtCacheData *)txt_mm->GetCacheData ();
       texturehandle = texturecache_data->Handle;
-      tex_flip = txt_mm->was_render_target;
     }
   }
 
@@ -2442,23 +2425,10 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
   // Pass 1: The unlit texture
   //=================
 
-  if (tex_flip)
-  {
-    glMatrixMode (GL_TEXTURE);
-    glPushMatrix();
-    glScalef (1.0f, -1.0f, 1.0f);
-    glMatrixMode (GL_PROJECTION);
-  }
   SetClientStates (CS_CLIENTSTATE_VT);
   glVertexPointer (4, GL_FLOAT, 0, glverts);
   glTexCoordPointer (2, GL_FLOAT, 0, gltxt);
   glDrawArrays (GL_TRIANGLE_FAN, 0, poly.num);
-  if (tex_flip)
-  {
-    glMatrixMode (GL_TEXTURE);
-    glPopMatrix();
-    glMatrixMode (GL_PROJECTION);
-  }
 
   //=================
   // If we have need other texture passes (for whatever reason)
@@ -4884,8 +4854,6 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
 
 
     if (pass->GetLayerCount() > maxlayers) maxlayers = pass->GetLayerCount();
-    CS_ALLOC_STACK_ARRAY (bool, tex_flip, pass->GetLayerCount());
-    memset (tex_flip, 0, sizeof(bool) * pass->GetLayerCount());
     for (l=0 ; l<pass->GetLayerCount() ; l++ )
     {
       iEffectLayer* layer = pass->GetLayer (l);
@@ -4989,17 +4957,9 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
 		txt_handle->GetPrivateObject ();
         csTxtCacheData *cachedata = (csTxtCacheData *)txt_mm->GetCacheData ();
         texturehandle = cachedata->Handle;
-	tex_flip[l] = txt_mm->was_render_target;
 
         statecache->SetTexture (GL_TEXTURE_2D, texturehandle, l);
         statecache->Enable_GL_TEXTURE_2D (l);
-	if (tex_flip[l])
-	{
-	  glMatrixMode (GL_TEXTURE);
-	  glPushMatrix();
-	  glScalef (1.0f, -1.0f, 1.0f);
-	  glMatrixMode (GL_PROJECTION);
-	}
       }
 
       if (ARB_texture_env_combine || EXT_texture_env_combine)
@@ -5035,15 +4995,6 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
 
     statecache->Disable_GL_ALPHA_TEST ();
 
-    for (l=0 ; l<pass->GetLayerCount() ; l++ )
-    {
-      if (tex_flip[l])
-      {
-	glMatrixMode (GL_TEXTURE);
-	glPopMatrix();
-	glMatrixMode (GL_PROJECTION);
-      }
-    }
     if (pass_data->vertex_program > 0)
       glDisable ((GLenum)GL_VERTEX_PROGRAM_ARB);
   }

@@ -11,6 +11,13 @@ chronological order.
 	  It is disabled because it makes procedural textures upside down.
 	  So I need to find a way to either change the coordinate system
 	  or else specify a negative stride. Who can help me with this?
+	- Jorrit managed to enable the optimization in Blit() by disabling
+	  a correction in the GL renderer for this clumsy way Blit() works.
+	  It turns out that the GL renderer was specifically inverting
+	  texture space for procedural textures ONLY because Blit() was also
+	  inverting it. This optimization gives a 10% speedup approximatelly.
+	  It is possible that other procedural textures will now be inverted
+	  though.
 7-Dec-2003
 	- Eric Sunshine changed configure.ac's "mkdir -p" check so that it uses
 	  the more conservative "rmdir", rather than "rm -rf", to remove the
