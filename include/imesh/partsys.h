@@ -43,22 +43,34 @@ struct iParticleState : public iBase
   virtual void SetColor (const csColor& color) = 0;
   /// Get particle color.
   virtual const csColor& GetColor () const = 0;
+  /// Set the alpha of particles.
+  virtual void SetAlpha(float alpha) = 0;
+  /// Get the probable alpha of the particles
+  virtual float GetAlpha() const = 0;
   /// Set change color.
   virtual void SetChangeColor (const csColor& color) = 0;
   /// Unset change color.
   virtual void UnsetChangeColor () = 0;
+  /// see if change color is enabled, and get a copy if so.
+  virtual bool GetChangeColor (csColor& col) const = 0;
   /// Set change size of all particles, by factor per second.
   virtual void SetChangeSize (float factor) = 0;
   /// Unset change of size.
   virtual void UnsetChangeSize () = 0;
+  /// see if change size is enabled, and get the value if so.
+  virtual bool GetChangeSize (float& factor) const = 0;
   /// Change rotation of all particles, by angle in radians per second.
   virtual void SetChangeRotation (float angle) = 0;
   /// Stop change of rotation.
   virtual void UnsetChangeRotation () = 0;
+  /// see if change rotation is enabled, and get the angle if so.
+  virtual bool GetChangeRotation (float& angle) const = 0;
   /// Change alpha of all particles, by factor per second.
   virtual void SetChangeAlpha (float factor) = 0;
   /// Stop change of alpha.
   virtual void UnsetChangeAlpha () = 0;
+  /// see if change alpha is enabled, and get the value if so.
+  virtual bool GetChangeAlpha (float& factor) const = 0;
   /// Set selfdestruct mode on, and msec to live.
   virtual void SetSelfDestruct (cs_time t) = 0;
   /// System will no longer self destruct.

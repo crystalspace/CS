@@ -153,29 +153,41 @@ public:
   {change_color = true; colorpersecond = col;}
   /// Stop change of color
   inline void UnsetChangeColor() {change_color=false;}
+  /// see if change color is enabled, and get a copy if so.
+  inline bool GetChangeColor (csColor& col) const
+  { if(!change_color) return false; col = colorpersecond; return true; }
 
   /// Change size of all particles, by factor per second.
   inline void SetChangeSize(float factor) 
   {change_size = true; scalepersecond = factor;}
   /// Stop change of size
   inline void UnsetChangeSize() {change_size=false;}
+  /// see if change size is enabled, and get the value if so.
+  inline bool GetChangeSize (float& factor) const
+  { if(!change_size) return false; factor = scalepersecond; return true; }
 
   /// Set the alpha of particles.
   inline void SetAlpha(float alpha) 
   {alpha_now = alpha; MixMode = CS_FX_SETALPHA (alpha); SetupMixMode (); }
   /// Get the probable alpha of the particles
-  inline float GetAlpha() {return alpha_now;}
+  inline float GetAlpha() const {return alpha_now;}
   /// Change alpha of all particles, by factor per second.
   inline void SetChangeAlpha(float factor) 
   {change_alpha = true; alphapersecond = factor;}
   /// Stop change of alpha
   inline void UnsetChangeAlpha() {change_alpha=false;}
+  /// see if change alpha is enabled, and get the value if so.
+  inline bool GetChangeAlpha (float& factor) const
+  { if(!change_alpha) return false; factor = alphapersecond; return true; }
 
   /// Change rotation of all particles, by angle in radians per second.
   inline void SetChangeRotation(float angle) 
   {change_rotation = true; anglepersecond = angle;}
   /// Stop change of rotation
   inline void UnsetChangeRotation() {change_rotation=false;}
+  /// see if change rotation is enabled, and get the angle if so.
+  inline bool GetChangeRotation (float& angle) const
+  { if(!change_rotation) return false; angle = anglepersecond; return true; }
 
   /// Get the bounding box for this particle system.
   inline const csBox3& GetBoundingBox() const {return bbox;}
@@ -263,6 +275,8 @@ public:
     {
       return scfParent->color;
     }
+    virtual void SetAlpha(float alpha) {scfParent->SetAlpha(alpha);}
+    virtual float GetAlpha() const {return scfParent->GetAlpha ();}
     virtual void SetChangeColor (const csColor& color)
     {
       scfParent->SetChangeColor (color);
@@ -271,6 +285,9 @@ public:
     {
       scfParent->UnsetChangeColor ();
     }
+    virtual bool GetChangeColor (csColor& col) const
+    { 
+      return scfParent->GetChangeColor(col); }
     virtual void SetChangeSize (float factor)
     {
       scfParent->SetChangeSize (factor);
@@ -278,6 +295,10 @@ public:
     virtual void UnsetChangeSize ()
     {
       scfParent->UnsetChangeSize ();
+    }
+    virtual bool GetChangeSize (float& factor) const
+    { 
+      return scfParent->GetChangeSize(factor); 
     }
     virtual void SetChangeRotation (float angle)
     {
@@ -287,6 +308,10 @@ public:
     {
       scfParent->UnsetChangeRotation ();
     }
+    virtual bool GetChangeRotation (float& angle) const
+    { 
+      return scfParent->GetChangeRotation(angle); 
+    }
     virtual void SetChangeAlpha (float factor)
     {
       scfParent->SetChangeAlpha (factor);
@@ -294,6 +319,10 @@ public:
     virtual void UnsetChangeAlpha ()
     {
       scfParent->UnsetChangeAlpha ();
+    }
+    virtual bool GetChangeAlpha (float& factor) const
+    { 
+      return scfParent->GetChangeAlpha(factor); 
     }
     virtual void SetSelfDestruct (cs_time t)
     {
