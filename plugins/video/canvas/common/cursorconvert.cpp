@@ -59,7 +59,7 @@ bool csCursorConverter::ConvertTo1bpp (iImage* image, uint8*& bitmap,
   else
   {
     transp.Set (255, 0, 255);
-    StripAlpha (myImage, transp);
+    StripAlphaFromRGBA (myImage, transp);
 #ifdef DEBUG_WRITE_IMAGES
     csDebugImageWriter::DebugImageWrite (myImage, "cursor-%s-stripped.png",
       image->GetName ());
@@ -162,8 +162,114 @@ bool csCursorConverter::InternalConvertTo1bpp (iImage* image,
   return true;
 }
 
-void csCursorConverter::StripAlpha (iImage* image, csRGBpixel replaceColor)
+bool csCursorConverter::ConvertTo8bpp (iImage* image, uint8*& pixels, 
+				       csRGBpixel*& palette, 
+				       const csRGBcolor* keycolor)
 {
+  const int imgW = image->GetWidth ();
+  const int imgH = image->GetHeight ();
+  csRef<csImageMemory> myImage;
+  myImage.AttachNew (new csImageMemory (imgW, imgH, image->GetFormat ()));
+  myImage->SetName (image->GetName ());
+
+  size_t dataSize = imgW * imgH;
+  if ((image->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
+    dataSize *= sizeof (csRGBpixel);
+
+  memcpy (myImage->GetImageData (), image->GetImageData (),
+    dataSize);
+
+  csRGBcolor transp;
+  if (keycolor)
+    transp = *keycolor;
+  else
+  {
+    int tr = 255, tg = 0, tb = 255;
+    if (image->HasKeycolor ())
+      image->GetKeycolor (tr, tg, tb);
+    transp.Set (tr, tg, tb);
+  }
+  myImage->SetKeycolor (transp.red, transp.green, transp.blue);
+
+  myImage->SetFormat (CS_IMGFMT_PALETTED8 
+    | (image->GetFormat () & ~CS_IMGFMT_MASK));
+  if ((image->GetFormat() & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
+  {
+    // copy over the original palette
+    memcpy (myImage->GetPalette(), image->GetPalette(), 
+      sizeof (csRGBpixel) * 256);
+    myImage->ApplyKeycolor ();
+  }
+
+  if (myImage->GetFormat () & CS_IMGFMT_ALPHA)
+  {
+    StripAlphaFromPal8 (myImage);
+  }
+
+  pixels = new uint8[imgW * imgH];
+  memcpy (pixels, myImage->GetImageData (), imgW * imgH);
+  palette = new csRGBpixel[256];
+  memcpy (palette, myImage->GetPalette (), 256 * sizeof (csRGBpixel));
+
+  return true;
+}
+
+#define ALPHA_DITHERING
+
+void csCursorConverter::StripAlphaFromRGBA (iImage* image, 
+					    csRGBpixel replaceColor)
+{
+  CS_ASSERT_MSG (
+    "csCursorConverter::StripAlphaFromRGBA called with image of wrong format",
+    ((image->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_TRUECOLOR)
+    && (image->GetFormat () & CS_IMGFMT_ALPHA));;
+#ifdef ALPHA_DITHERING
+  // Fancy: dither alpha to opaque/transparent
+  csRGBpixel* imageData = (csRGBpixel*)image->GetImageData ();
+  int pixcount = image->GetWidth () * image->GetHeight ();
+  csRGBpixel* alphaData = new csRGBpixel[pixcount];
+  csRGBpixel* imagePtr = imageData;
+  csRGBpixel* alphaPtr = alphaData;
+  int p;
+  for (p = 0; p < pixcount; p++)
+  {
+    int a = (imagePtr++)->alpha;
+    (alphaPtr++)->Set (a, a, a);
+  }
+
+  csColorQuantizer quantizer;
+  quantizer.Begin ();
+
+  csRGBpixel* pal = 0;
+  int maxcolors = 2;
+
+  quantizer.Count (alphaData, pixcount);
+  quantizer.Palette (pal, maxcolors);
+
+  uint8* alphaDithered = 0;
+  quantizer.RemapDither (alphaData, pixcount, image->GetWidth (), pal, 
+    maxcolors, alphaDithered);
+
+  imagePtr = imageData;
+  uint8* ditherPtr = alphaDithered;
+  for (p = 0; p < pixcount; p++)
+  {
+    if (pal[*ditherPtr++].red < 128)
+    {
+      *imagePtr = replaceColor;
+    }
+    else
+    {
+      imagePtr->alpha = 255;
+    }
+    imagePtr++;
+  }
+
+  delete[] alphaData;
+  delete[] pal;
+  delete[] alphaDithered;
+#else
+  // Plain: cut off all alphas below 0.5
   csRGBpixel* imageData = (csRGBpixel*)image->GetImageData ();
   int pixcount = image->GetWidth () * image->GetHeight ();
   replaceColor.alpha = 0;
@@ -179,4 +285,69 @@ void csCursorConverter::StripAlpha (iImage* image, csRGBpixel replaceColor)
     }
     imageData++;
   }
+#endif
+}
+
+void csCursorConverter::StripAlphaFromPal8 (iImage* image)
+{
+  CS_ASSERT_MSG (
+    "csCursorConverter::StripAlphaFromRGBA called with image of wrong format",
+    ((image->GetFormat () & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8)
+    && (image->GetFormat () & CS_IMGFMT_ALPHA));;
+#ifdef ALPHA_DITHERING
+  // Fancy: dither alpha to opaque/transparent
+  uint8* imageData = image->GetAlpha ();
+  int pixcount = image->GetWidth () * image->GetHeight ();
+  csRGBpixel* alphaData = new csRGBpixel[pixcount];
+  uint8* imagePtr = imageData;
+  csRGBpixel* alphaPtr = alphaData;
+  int p;
+  for (p = 0; p < pixcount; p++)
+  {
+    int a = *imagePtr++;
+    (alphaPtr++)->Set (a, a, a);
+  }
+
+  csColorQuantizer quantizer;
+  quantizer.Begin ();
+
+  csRGBpixel* pal = 0;
+  int maxcolors = 2;
+
+  quantizer.Count (alphaData, pixcount);
+  quantizer.Palette (pal, maxcolors);
+
+  uint8* alphaDithered = 0;
+  quantizer.RemapDither (alphaData, pixcount, image->GetWidth (), pal, 
+    maxcolors, alphaDithered);
+
+  imagePtr = (uint8*)image->GetImageData ();
+  uint8* ditherPtr = alphaDithered;
+  for (p = 0; p < pixcount; p++)
+  {
+    if (pal[*ditherPtr++].red < 128)
+    {
+      *imagePtr = 0;
+    }
+    imagePtr++;
+  }
+
+  delete[] alphaData;
+  delete[] pal;
+  delete[] alphaDithered;
+#else
+  // Plain: cut off all alphas below 0.5
+  uint8* imageData = (uint8*)image->GetImageData ();
+  uint8* alphaData = (uint8*)image->GetAlpha ();
+  int pixcount = image->GetWidth () * image->GetHeight ();
+  while (pixcount-- > 0)
+  {
+    if (*alphaData < 128)
+    {
+      *imageData = 0;
+    }
+    imageData++;
+    alphaData++;
+  }
+#endif
 }

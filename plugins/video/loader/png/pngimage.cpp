@@ -504,9 +504,9 @@ nomem2:
 	  png_color_16p trans_values;
 	  png_get_tRNS (png, info, 0, 0, &trans_values);
 	  has_keycolour = true;
-	  keycolour_r = convert_endian (trans_values->gray) & 0xff;
-	  keycolour_g = convert_endian (trans_values->gray) & 0xff;
-	  keycolour_b = convert_endian (trans_values->gray) & 0xff;
+	  keycolour.red = convert_endian (trans_values->gray) & 0xff;
+	  keycolour.green = convert_endian (trans_values->gray) & 0xff;
+	  keycolour.blue = convert_endian (trans_values->gray) & 0xff;
 	}
       }
       break;
@@ -559,9 +559,9 @@ nomem2:
 	  png_color_16p trans_values;
 	  png_get_tRNS (png, info, 0, 0, &trans_values);
 	  has_keycolour = true;
-	  keycolour_r = convert_endian (trans_values->red) & 0xff;
-	  keycolour_g = convert_endian (trans_values->green) & 0xff;
-	  keycolour_b = convert_endian (trans_values->blue) & 0xff;
+	  keycolour.red = convert_endian (trans_values->red) & 0xff;
+	  keycolour.green = convert_endian (trans_values->green) & 0xff;
+	  keycolour.blue = convert_endian (trans_values->blue) & 0xff;
 	}
         png_set_filler (png, 0xff, PNG_FILLER_AFTER);
       }
@@ -647,9 +647,9 @@ nomem2:
     if (keycolor_index != -1)
     {
       has_keycolour = true;
-      keycolour_r = palette[keycolor_index].red;
-      keycolour_g = palette[keycolor_index].green;
-      keycolour_b = palette[keycolor_index].blue;
+      keycolour.red = palette[keycolor_index].red;
+      keycolour.green = palette[keycolor_index].green;
+      keycolour.blue = palette[keycolor_index].blue;
     }
     convert_pal8 ((uint8 *)NewImage, palette, colors);
     delete[] palette;

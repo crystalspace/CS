@@ -26,6 +26,7 @@
 struct _WinVersion 
 {
   bool IsWinNT;
+  cswinWindowsVersion version;
 
   _WinVersion()
   { 
@@ -33,6 +34,28 @@ struct _WinVersion
     vi.dwOSVersionInfoSize = sizeof (vi);
     GetVersionEx (&vi);
     IsWinNT = (vi.dwPlatformId == VER_PLATFORM_WIN32_NT);
+    if (!IsWinNT)
+    {
+      version = cswinWin9x;
+    }
+    else
+    {
+      if (vi.dwMajorVersion >= 5)
+      {
+	if (vi.dwMinorVersion >= 1)
+	{
+	  version = cswinWinXP;
+	}
+	else
+	{
+	  version = cswinWin2K;
+	}
+      }
+      else
+      {
+	version = cswinWinNT;
+      }
+    }
   };
 };
 
@@ -44,8 +67,10 @@ static _WinVersion* GetWinVer ()
   return winver;
 }
 
-bool cswinIsWinNT ()
+bool cswinIsWinNT (cswinWindowsVersion* version)
 {
+  if (version)
+    *version = GetWinVer ()->version;
   return GetWinVer ()->IsWinNT;
 }
 

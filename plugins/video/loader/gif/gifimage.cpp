@@ -301,10 +301,8 @@ int ImageGifFile::decode_gif (uint8* iBuffer, long iSize, int* Prefix,
 	  // get transparent color index - (ch==4), so the 3'th byte
 	  transp_index = gptr[3];
 	  csRGBcolor tcol = palette(transp_index);
-	  has_keycolour = 1;
-	  keycolour_r = tcol.red;
-	  keycolour_g = tcol.green;
-	  keycolour_b = tcol.blue;
+	  has_keycolour = true;
+	  keycolour = tcol;
 	}
 	gptr += ch;
 	break;

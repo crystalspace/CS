@@ -75,6 +75,12 @@ public:
   virtual void SetKeycolor (int r, int g, int b);
   /// Remove the keycolor
   virtual void ClearKeycolor ();
+
+  /**
+   * Apply the keycolor, that is, set all pixels which match the
+   * keycolor to 0.
+   */
+  virtual void ApplyKeycolor ();
 };
 
 

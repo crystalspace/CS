@@ -31,7 +31,6 @@ class csCursorConverter
     csColorQuantizer& quantizer, uint8*& bitmap, uint8*& mask,
     const csRGBcolor forecolor, const csRGBcolor backcolor, 
     csRGBpixel keycolor, bool XbitOrder);
-  static void StripAlpha (iImage* image, csRGBpixel replaceColor);
 public:
   //static bool ConvertTo1bpp (iImage* image, uint8*& bitmap, uint8*& mask,
   //  const csRGBcolor* keycolor = 0);
@@ -43,6 +42,14 @@ public:
   static bool ConvertTo1bpp (iImage* image, uint8*& bitmap, uint8*& mask,
     const csRGBcolor forecolor, const csRGBcolor backcolor, 
     const csRGBcolor* keycolor = 0, bool XbitOrder = false);
+  static bool ConvertTo8bpp (iImage* image, uint8*& pixels, 
+    csRGBpixel*& palette, const csRGBcolor* keycolor = 0);
+  /**
+   * Remove the alpha from an image by replacing the transparent parts
+   * with \p replaceColor.
+   */
+  static void StripAlphaFromRGBA (iImage* image, csRGBpixel replaceColor);
+  static void StripAlphaFromPal8 (iImage* image);
 };
 
 #endif // __CS_CANVAS_COMMON_CURSORCONVERT_H__

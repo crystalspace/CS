@@ -42,6 +42,17 @@ chronological order.
 	  1.3.22 for Python.
 	- res added iGraphics2D::GetRGB() methods (one for RGB retrieval, one 
 	  for RGBA) to complement the FindRGB() and SetRGB() methods.
+	- res augmented cswinIsWinNT() to allow a somewhat more fine-grained 
+	  classification of the running Windows version.
+	- res augmented csImageMemory with a method to set the keycolor and a
+	  method to apply the keycolor to paletted images (ie set all 
+	  occurances to the palette index 0).
+	- res changed the cursor plugin to postpone the texture registration
+	  with the texture manager until really needed (to avoid unnecessary
+	  resizing).
+	- res changed the Win32 custom cursor support to support 256 color 
+	  cursors (needed on older systems like WinNT4.0) and 32bpp cursors
+	  (with alpha transparency, on newer systems like Win2000+).
 25-Oct-2004
 	- Jorrit disabled VBO by default now. It gives too many problems
 	  (both on ATI and nVidia). Having this option on by default can

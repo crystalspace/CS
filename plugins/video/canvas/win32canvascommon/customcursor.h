@@ -27,6 +27,9 @@
 class csWin32CustomCursors
 {
   csHash<HCURSOR, csStrKey, csConstCharHashKeyHandler> cachedCursors;
+
+  HCURSOR CreateMonoCursor (iImage* image, const csRGBcolor* keycolor, 
+    int hotspot_x, int hotspot_y);
 public:
   ~csWin32CustomCursors ();
 
@@ -34,8 +37,8 @@ public:
     int hotspot_x, int hotspot_y, csRGBcolor fg, csRGBcolor bg);
 private:
 
-  HCURSOR CreateCursor(iImage* image, const csRGBcolor* keycolor, 
-					      int hotspot_x, int hotspot_y);
+  HCURSOR CreateCursor (iImage* image, const csRGBcolor* keycolor,
+    int hotspot_x, int hotspot_y);
 };
 
 #endif // __CS_CANVAS_WIN32CANVASCOMMON_CUSTOMCURSOR_H__

@@ -112,12 +112,80 @@ void csImageMemory::Rescale (int NewWidth, int NewHeight)
 void csImageMemory::SetKeycolor (int r, int g, int b)
 {
   has_keycolour = true;
-  keycolour_r = r;
-  keycolour_g = g;
-  keycolour_b = b;
+  keycolour.Set (r, g, b);
 }
 
 void csImageMemory::ClearKeycolor ()
 {
   has_keycolour = false;
+}
+
+void csImageMemory::ApplyKeycolor ()
+{
+  if (has_keycolour 
+    && ((Format & CS_IMGFMT_MASK) == CS_IMGFMT_PALETTED8))
+  {
+    uint8* imageData = (uint8*)Image;
+    uint8* imagePtr;
+    const int pixcount = Width * Height;
+    int i;
+
+    // Find out what colors in the palette are actually used
+    bool usedEntries[256];
+    memset (usedEntries, 0, sizeof (usedEntries));
+    int remainingEntries = 256;
+    imagePtr = imageData;
+    for (i = 0; (i < pixcount) && (remainingEntries > 0); i++)
+    {
+      if (!usedEntries[*imagePtr])
+      {
+	usedEntries[*imagePtr] = true;
+	remainingEntries--;
+      }
+      imagePtr++;
+    }
+
+    // Find original keycolor index
+    int keyIndex = -1;
+    for (i = 0; i < 256; i++)
+    {
+      if (Palette[i].eq (keycolour))
+      {
+	keyIndex = i;
+	break;
+      }
+    }
+    if (keyIndex <= 0)
+      return; // We're finished already
+
+    // First, find a palette entry that can take the old color at index 0
+    int newIndex = -1;
+    for (i = 0; i < 256; i++)
+    {
+      if (!usedEntries[i])
+      {
+	newIndex = i;
+	break;
+      }
+    }
+    if (newIndex == -1)
+    {
+      newIndex = closest_index (Palette + 0);
+    }
+    else
+    {
+      Palette[newIndex] = Palette[0];
+    }
+    Palette[0] = keycolour;
+
+    imagePtr = imageData;
+    for (i = 0; i < pixcount; i++)
+    {
+      if (*imagePtr == 0)
+	*imagePtr = newIndex;
+      else if (*imagePtr == keyIndex)
+	*imagePtr = 0;
+      imagePtr++;
+    }
+  }
 }

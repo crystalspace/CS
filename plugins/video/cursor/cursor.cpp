@@ -144,7 +144,7 @@ bool csCursor::ParseConfigFile (iConfigFile* ini)
         continue;
       }
       csRef<iImage> image = io->Load (buf->GetUint8(), buf->GetSize(),
-                      txtmgr->GetTextureFormat());
+	CS_IMGFMT_ANY | CS_IMGFMT_ALPHA);
       if (!image)
       {
         csReport (reg, CS_REPORTER_SEVERITY_WARNING, CURSOR_SCF_NAME,
@@ -211,6 +211,41 @@ bool csCursor::HandleEvent (iEvent &ev)
       if (!ci)
         return false;
 
+      if (!ci->pixmap)
+      {
+	const char* name = current.GetData();
+
+	csRef<iImage> newImage = ci->image->Clone ();
+	newImage->SetFormat (txtmgr->GetTextureFormat());
+	ci->image = newImage;
+
+	// Create texture 
+	csRef<iTextureHandle> txt = txtmgr->RegisterTexture (ci->image, 
+	  CS_TEXTURE_2D);
+	if (!txt)
+	{ 
+	  csReport (reg, CS_REPORTER_SEVERITY_ERROR, CURSOR_SCF_NAME,
+		    "Could not register texture for cursor %s, ignoring", name);
+	  RemoveCursor (name);
+	  return false;
+	}
+
+	// Prepare texture and set up keycolour
+	if (ci->hasKeyColor)
+	  txt->SetKeyColor (ci->keycolor.red, ci->keycolor.green, 
+	  ci->keycolor.blue);
+
+	// Create pixmap from texture
+	csSimplePixmap *pixmap = new csSimplePixmap (txt);
+	if (!pixmap)
+	{ 
+	  csReport (reg, CS_REPORTER_SEVERITY_ERROR, CURSOR_SCF_NAME,
+		    "Could not create pixmap for cursor %s, ignoring", name);
+	  RemoveCursor (name);
+	  return false;
+	}
+	ci->pixmap = pixmap;
+      }
       csRef<iVirtualClock> vc = CS_QUERY_REGISTRY (reg, iVirtualClock);
       ci->pixmap->Advance (vc->GetElapsedTicks ());
       csRef<iMouseDriver> mouse = CS_QUERY_REGISTRY (reg, iMouseDriver);
@@ -318,30 +353,8 @@ void csCursor::SetCursor (const char *name, iImage *image, csRGBcolor* key,
   // between cursors
   if (!image->GetName()) image->SetName (name);
 
-  // Create texture 
-  csRef<iTextureHandle> txt = txtmgr->RegisterTexture (image, CS_TEXTURE_2D);
-  if (!txt)
-  { 
-    csReport (reg, CS_REPORTER_SEVERITY_ERROR, CURSOR_SCF_NAME,
-              "Could not register texture for cursor %s, ignoring", name);
-    return;
-  }
-
-  // Prepare texture and set up keycolour
-  if (key)
-    txt->SetKeyColor (key->red, key->green, key->blue);
-
-  // Create pixmap from texture
-  csSimplePixmap *pixmap = new csSimplePixmap (txt);
-  if (!pixmap)
-  { 
-    csReport (reg, CS_REPORTER_SEVERITY_ERROR, CURSOR_SCF_NAME,
-              "Could not create pixmap for cursor %s, ignoring", name);
-    return;
-  }
-
   // Set pixmap in the structure
-  ci->pixmap = pixmap;
+  ci->pixmap = 0;//pixmap;
 
   // Add to hashlist
   {

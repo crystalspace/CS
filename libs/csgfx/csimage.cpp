@@ -98,10 +98,8 @@ csImageFile::csImageFile (int iFormat) : iImage()
   fName = 0;
   Alpha = 0;
   Format = iFormat;
-  has_keycolour = 0;
-  keycolour_r = 0;
-  keycolour_g = 0;
-  keycolour_b = 0;
+  has_keycolour = false;
+  keycolour.Set (0, 0, 0, 255);
 }
 
 csImageFile::~csImageFile ()
@@ -462,9 +460,9 @@ bool csImageFile::HasKeycolor ()
 
 void csImageFile::GetKeycolor (int &r, int &g, int &b)
 {
-  r = keycolour_r;
-  g = keycolour_g;
-  b = keycolour_b;
+  r = keycolour.red;
+  g = keycolour.green;
+  b = keycolour.blue;
 }
 
 void csImageFile::convert_rgba (csRGBpixel *iImage)
@@ -491,8 +489,14 @@ void csImageFile::convert_rgba (csRGBpixel *iImage)
         // The most complex case: reduce an RGB image to a paletted image.
         int maxcolors = 256;
 	csColorQuantizer quant;
-        quant.DoRGB (iImage, pixels, Width, (uint8 *&)Image, Palette,
-          maxcolors, true/*csImage_dither*/);
+	quant.Begin ();
+
+	quant.Count (iImage, pixels);
+	quant.Palette (Palette, maxcolors);
+	quant.RemapDither (iImage, pixels, Width, Palette, maxcolors, 
+	  (uint8 *&)Image, has_keycolour ? &keycolour : 0);
+
+	quant.End ();
       }
       delete [] iImage;
       break;

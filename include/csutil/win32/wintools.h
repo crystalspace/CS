@@ -156,15 +156,31 @@ extern CS_CSUTIL_EXPORT char* cswinGetErrorMessage (HRESULT code);
  *  #endif' statements.
  */
 extern CS_CSUTIL_EXPORT wchar_t* cswinGetErrorMessageW (HRESULT code);
+
+/// Windows versions cswinIsWinNT() can identify.
+enum cswinWindowsVersion
+{
+  /// Windows 95/98/ME
+  cswinWin9x = 30,
+  /// Windows NT 4.0
+  cswinWinNT = 40,
+  /// Windows 2000
+  cswinWin2K = 50,
+  /// Windows XP (or better)
+  cswinWinXP = 51
+};
+
 /**
  * Returns 'true' if the current Windows is from the NT strain, 'false' if
  * from the 9x strain.
+ * \param version Optionally returns more specifically what Windows is used.
+ * \return Whether the current OS is an Windows NT derivate.
  * \remarks This function provides functionality specific to the Win32 
  *  platform. To ensure that code using this functionality compiles properly 
  *  on all other platforms, the use of the function and inclusion of the 
  *  header file should be surrounded by appropriate `#if defined(CS_PLATFORM_WIN32) ... 
  *  #endif' statements.
  */
-extern CS_CSUTIL_EXPORT bool cswinIsWinNT ();
+extern CS_CSUTIL_EXPORT bool cswinIsWinNT (cswinWindowsVersion* version = 0);
 
 #endif
