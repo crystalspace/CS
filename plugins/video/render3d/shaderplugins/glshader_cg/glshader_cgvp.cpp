@@ -68,18 +68,67 @@ void csShaderGLCGVP::Activate(iShaderPass* current, csRenderMesh* mesh)
   while (param)
   {
     const char* binding = cgGetParameterSemantic (param);
-    if (!strcmp (binding, "MODELVIEW_PROJECTION_MATRIX"))
-    {
-      cgGLSetStateMatrixParameter (param,
-        CG_GL_MODELVIEW_PROJECTION_MATRIX, 
-        CG_GL_MATRIX_IDENTITY);
-    } else if (!strcmp (binding, "MODELVIEW_MATRIX"))
+    if (!strcmp (binding, "MV_MATRIX"))
     {
       cgGLSetStateMatrixParameter (param,
         CG_GL_MODELVIEW_MATRIX, 
         CG_GL_MATRIX_IDENTITY);
+    } else if (!strcmp (binding, "I_MV_MATRIX"))
+    {
+      cgGLSetStateMatrixParameter (param,
+        CG_GL_MODELVIEW_MATRIX, 
+        CG_GL_MATRIX_INVERSE);
+    } else if (!strcmp (binding, "T_MV_MATRIX"))
+    {
+      cgGLSetStateMatrixParameter (param,
+        CG_GL_MODELVIEW_MATRIX, 
+        CG_GL_MATRIX_TRANSPOSE);
+    } else if (!strcmp (binding, "IT_MV_MATRIX"))
+    {
+      cgGLSetStateMatrixParameter (param,
+        CG_GL_MODELVIEW_MATRIX, 
+        CG_GL_MATRIX_INVERSE_TRANSPOSE);
+    } else if (!strcmp (binding, "MVP_MATRIX"))
+    {
+      cgGLSetStateMatrixParameter (param,
+        CG_GL_MODELVIEW_PROJECTION_MATRIX, 
+        CG_GL_MATRIX_IDENTITY);
+    } else if (!strcmp (binding, "I_MVP_MATRIX"))
+    {
+      cgGLSetStateMatrixParameter (param,
+        CG_GL_MODELVIEW_PROJECTION_MATRIX, 
+        CG_GL_MATRIX_INVERSE);
+    } else if (!strcmp (binding, "T_MVP_MATRIX"))
+    {
+      cgGLSetStateMatrixParameter (param,
+        CG_GL_MODELVIEW_PROJECTION_MATRIX, 
+        CG_GL_MATRIX_TRANSPOSE);
+    } else if (!strcmp (binding, "IT_MVP_MATRIX"))
+    {
+      cgGLSetStateMatrixParameter (param,
+        CG_GL_MODELVIEW_PROJECTION_MATRIX, 
+        CG_GL_MATRIX_INVERSE_TRANSPOSE);
+    } else if (!strcmp (binding, "P_MATRIX"))
+    {
+      cgGLSetStateMatrixParameter (param,
+        CG_GL_PROJECTION_MATRIX, 
+        CG_GL_MATRIX_IDENTITY);
+    } else if (!strcmp (binding, "I_P_MATRIX"))
+    {
+      cgGLSetStateMatrixParameter (param,
+        CG_GL_PROJECTION_MATRIX, 
+        CG_GL_MATRIX_INVERSE);
+    } else if (!strcmp (binding, "T_P_MATRIX"))
+    {
+      cgGLSetStateMatrixParameter (param,
+        CG_GL_PROJECTION_MATRIX, 
+        CG_GL_MATRIX_TRANSPOSE);
+    } else if (!strcmp (binding, "IT_P_MATRIX"))
+    {
+      cgGLSetStateMatrixParameter (param,
+        CG_GL_PROJECTION_MATRIX, 
+        CG_GL_MATRIX_INVERSE_TRANSPOSE);
     }
-
     
     param = cgGetNextLeafParameter (param);
   }
