@@ -1,5 +1,21 @@
 The history order has been reversed so that new features are at the top.
 
+26-Nov-2000
+	- Martin Geisse modified the dungeon plugin:
+		- Now uses the old parser again.
+		- Renamed 'auto-connections' to the more appropriate
+		  name 'cross-connections'.
+	- Chris Bruner fixed a few problems that were causing compile
+	  errors with the Borland compiler.
+25-Nov-2000
+	- Seth Galbraith added MergeNormals to sprite templates and world
+	  format to smooth out sprite seams.
+	- Seth also removed the object_verts parameter from ComputeNormals.
+	  Use less accurate direction from light to center of sprite
+	  instead of direction from light to vertex in UpdateLightingLQ.
+	  Tried to implement normal interpolation in UpdateLightingLQ/HQ,
+	  but it doesn't do anything! Added MergeNormals to sprite templates
+	  and world format to smooth out sprite seams.
 24-Nov-2000
 	- Fixed a bug in alpha map support for DrawPixmap and software
 	  renderer when used on a 32-bit display. It was actually completely
