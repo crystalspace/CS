@@ -281,6 +281,10 @@ bool csGraphics2DGLX::Open(const char *Title)
     glXGetConfig(dpy, active_GLVisual, GLX_GREEN_SIZE, &pfmt.GreenBits);
     glXGetConfig(dpy, active_GLVisual, GLX_BLUE_SIZE, &pfmt.BlueBits);
     glXGetConfig(dpy, active_GLVisual, GLX_ALPHA_SIZE, &alpha_bits);
+    int bit;
+    bit=0; while (!(pfmt.RedMask & (1<<bit))) bit++; pfmt.RedShift = bit;
+    bit=0; while (!(pfmt.GreenMask & (1<<bit))) bit++; pfmt.GreenShift = bit;
+    bit=0; while (!(pfmt.BlueMask & (1<<bit))) bit++; pfmt.BlueShift = bit;
   }
 
   // Report Info
