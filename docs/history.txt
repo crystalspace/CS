@@ -14,6 +14,13 @@ chronological order.
 	- res added non-const versions for csHash<>::Get() and 
 	  GetElementPointer().
 	- res made spr2d's SV accessor a non-embedded interface. Fixes a leak.
+	- Eric Sunshine re-added 'ranlib' step to Library build rule in Jam.
+	  This is needed since Apple's 'ar' command apparently does not update
+	  the symbol index when creating the library.  (What was misleading was
+	  that the make build system only runs ranlib at install time, however
+	  the make system creates the library with Apple's 'libtool', whereas
+	  Jam creates it with 'ar'.)  Consequently, Jam build now runs ranlib
+	  at both build and install times.
 3-Apr-2004
 	- Jorrit fixed a new compile error in the simple console plugin.
 	- Jorrit added a new 'back2front' keyword for the genmesh factory

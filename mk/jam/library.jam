@@ -104,6 +104,11 @@ rule Library
   Clean $(<)clean : $(target) ;
   Depends clean : $(<)clean ;
 
+  if $(RANLIB)
+  {
+    Ranlib $(target) ;
+  }
+
   # If we can't scan the library, we have to leave the .o's around.
   if ! ( $(NOARSCAN) || $(NOARUPDATE) )
   {
