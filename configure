@@ -4912,8 +4912,6 @@ echo "$as_me:$LINENO: result: $ac_cv_lib_m_cosf" >&5
 echo "${ECHO_T}$ac_cv_lib_m_cosf" >&6
 if test $ac_cv_lib_m_cosf = yes; then
   cs_cv_libm_libs=-lm
-else
-  cs_cv_libm_libs=
 fi
 
 
