@@ -41,10 +41,10 @@ OBJ.RLE = $(addprefix $(OUT)/,$(notdir $(SRC.RLE:.cpp=$O)))
 DEP.RLE = CSUTIL CSSYS
 CFG.RLE =
 
-$(SRCDIR)/TO_INSTALL.CONFIG += $(CFG.RLE)
+TO_INSTALL.CONFIG += $(CFG.RLE)
 TO_INSTALL.DATA +=
 
-$(SRCDIR)/MSVC.DSP += RLE
+MSVC.DSP += RLE
 DSP.RLE.NAME = rlecodec
 DSP.RLE.TYPE = plugin
 

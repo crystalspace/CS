@@ -20,6 +20,10 @@ The history order is reversed so that new features are at the top.
 	      project in an external directory (outside of the source tree).
 	- Eric Sunshine eliminated numerous compilation warnings throughout the
 	  project.
+	- Eric Sunshine fixed botched conversion by automated script which
+	  emitted $(SRCDIR)/TO_INSTALL.CONFIG+=FOO and $(SRCDIR)/MSVC.DSP+=FOO
+	  in a couple makefiles rather than TO_INSTALL.CONFIG+=FOO and
+	  MSVC.DSP+=FOO.  (The SRCDIR prefix should not have been added.)
 27-Apr-2003
 	- Philip Wyett fixed the DDS plugin compilation under MSVC, by
 	  replacing struct with static (don't ask) and giving the the array an
