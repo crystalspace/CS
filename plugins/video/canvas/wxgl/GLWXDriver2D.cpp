@@ -46,6 +46,13 @@
 #ifdef WIN32
 #include "csutil/win32/win32.h"
 #include "csutil/win32/wintools.h"
+#elif !defined(CS_PLATFORM_MACOSX)
+#define USE_GLX
+#endif
+
+#ifdef USE_GLX
+#define GLX_GLXEXT_PROTOTYPES
+#include <GL/glx.h>
 #endif
 
 #include "GLWXDriver2D.h"
@@ -120,6 +127,12 @@ void* csGraphics2DWX::GetProcAddress (const char *funcname)
 {
 #ifdef WIN32
   return wglGetProcAddress (funcname);
+#elif defined(USE_GLX)
+  #if !defined(GLX_VERSION_1_4)
+    return (void*) glXGetProcAddressARB ((const GLubyte*) funcname);
+  #else
+    return (void*) glXGetProcAddress ((const GLubyte*) funcname);
+  #endif
 #else
   return 0;
 #endif
@@ -130,6 +143,29 @@ csGraphics2DWX::~csGraphics2DWX ()
   Close ();  
   // theCanvas is destroyed by wxWindows
 }
+
+#ifdef USE_GLX
+static const char *visual_class_name (int cls)
+{
+  switch (cls)
+  {
+    case StaticColor:
+      return "StaticColor";
+    case PseudoColor:
+      return "PseudoColor";
+    case StaticGray:
+      return "StaticGray";
+    case GrayScale:
+      return "GrayScale";
+    case TrueColor:
+      return "TrueColor";
+    case DirectColor:
+      return "DirectColor";
+    default:
+      return "";
+  }
+}
+#endif
 
 bool csGraphics2DWX::Open()
 {
@@ -213,6 +249,107 @@ bool csGraphics2DWX::Open()
 
       Depth = pfd.cColorBits; 
     }
+  }
+#elif defined(USE_GLX)
+  {
+    Display* dpy = (Display*) wxGetDisplay ();
+    GLXContext active_GLContext = glXGetCurrentContext();
+    XVisualInfo *xvis = (XVisualInfo*)theCanvas->vi;
+    
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Video driver GL/X version %s",
+      glXIsDirect (dpy, active_GLContext) ? "(direct renderer)" : 
+      "(indirect renderer)");
+    if (!glXIsDirect (dpy, active_GLContext))
+    {
+      Report (CS_REPORTER_SEVERITY_WARNING,
+	"Indirect rendering may indicate a flawed OpenGL setup if you run on "
+	"a local X server.");
+    }
+
+    Depth = xvis->depth;
+
+    if (Depth == 24 || Depth == 32)
+      pfmt.PixelBytes = 4;
+    else
+      pfmt.PixelBytes = 2;
+
+    Report (CS_REPORTER_SEVERITY_NOTIFY, "Visual ID: %x, %dbit %s",
+      xvis->visualid, Depth, visual_class_name (xvis->c_class));
+
+    int ctype, frame_buffer_depth, size_depth_buffer, level;
+    glXGetConfig(dpy, xvis, GLX_RGBA, &ctype);
+    //glXGetConfig(dpy, xvis, GLX_DOUBLEBUFFER, &double_buffer);
+    glXGetConfig(dpy, xvis, GLX_BUFFER_SIZE, &frame_buffer_depth);
+    glXGetConfig(dpy, xvis, GLX_DEPTH_SIZE, &size_depth_buffer);
+    glXGetConfig(dpy, xvis, GLX_LEVEL, &level);
+
+    int color_bits = 0;
+    int alpha_bits = 0;
+    if (ctype)
+    {
+      pfmt.RedMask = xvis->red_mask;
+      pfmt.GreenMask = xvis->green_mask;
+      pfmt.BlueMask = xvis->blue_mask;
+      glXGetConfig(dpy, xvis, GLX_RED_SIZE, &pfmt.RedBits);
+      color_bits += pfmt.RedBits;
+      glXGetConfig(dpy, xvis, GLX_GREEN_SIZE, &pfmt.GreenBits);
+      color_bits += pfmt.GreenBits;
+      glXGetConfig(dpy, xvis, GLX_BLUE_SIZE, &pfmt.BlueBits);
+      color_bits += pfmt.BlueBits;
+      glXGetConfig(dpy, xvis, GLX_ALPHA_SIZE, &alpha_bits);
+      pfmt.AlphaBits = alpha_bits;
+        
+      int bit;
+      // Fun hack, xvis doesn't provide alpha mask
+      bit=0; while (bit < alpha_bits) pfmt.AlphaMask |= (1<<(bit++));
+      pfmt.AlphaMask = pfmt.AlphaMask << color_bits;
+
+      bit=0; while (!(pfmt.RedMask & (1<<bit))) bit++; pfmt.RedShift = bit;
+      bit=0; while (!(pfmt.GreenMask & (1<<bit))) bit++; pfmt.GreenShift = bit;
+      bit=0; while (!(pfmt.BlueMask & (1<<bit))) bit++; pfmt.BlueShift = bit;
+      if (pfmt.AlphaMask)
+      {
+	bit=0; while (!(pfmt.AlphaMask & (1<<bit))) bit++; pfmt.AlphaShift = bit;
+      }
+    }
+
+    // Report Info
+    currentFormat[glpfvColorBits] = color_bits;
+    currentFormat[glpfvAlphaBits] = alpha_bits;
+    currentFormat[glpfvDepthBits] = size_depth_buffer;
+    int stencilSize = 0;
+    glXGetConfig(dpy, xvis, GLX_STENCIL_SIZE, &stencilSize);
+    currentFormat[glpfvStencilBits] = stencilSize;
+    int accumBits = 0;
+    int accumAlpha = 0;
+    {
+      int dummy;
+      glXGetConfig(dpy, xvis, GLX_RED_SIZE, &dummy);
+      accumBits += dummy;
+      glXGetConfig(dpy, xvis, GLX_GREEN_SIZE, &dummy);
+      accumBits += dummy;
+      glXGetConfig(dpy, xvis, GLX_BLUE_SIZE, &dummy);
+      accumBits += dummy;
+      glXGetConfig(dpy, xvis, GLX_ALPHA_SIZE, &accumAlpha);
+    }
+    currentFormat[glpfvAccumColorBits] = accumBits;
+    currentFormat[glpfvAccumAlphaBits] = accumAlpha;
+
+    if (ctype)
+    {
+      if (pfmt.RedMask > pfmt.BlueMask)
+      {
+	Report (CS_REPORTER_SEVERITY_NOTIFY, "R%d:G%d:B%d:A%d, ",
+	  pfmt.RedBits, pfmt.GreenBits, pfmt.BlueBits, alpha_bits);
+      }
+      else
+      {
+	Report (CS_REPORTER_SEVERITY_NOTIFY, "B%d:G%d:R%d:A%d, ",
+	  pfmt.BlueBits, pfmt.GreenBits, pfmt.RedBits, alpha_bits);
+      }
+    }
+
+    pfmt.complete ();
   }
 #endif
 

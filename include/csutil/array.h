@@ -912,8 +912,10 @@ public:
   void DeleteRange (size_t start, size_t end)
   {
     if (start >= count) return;
-    if (end < 0) return;
-    if (start < 0) start = 0;
+    // Treat 'csArrayItemNotFound' as invalid indices, do nothing.
+    // @@@ Assert that?
+    if (end == csArrayItemNotFound) return;
+    if (start == csArrayItemNotFound) return;//start = 0;
     if (end >= count) end = count - 1;
     size_t i;
     for (i = start ; i <= end ; i++)

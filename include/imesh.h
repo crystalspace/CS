@@ -19,7 +19,6 @@
 
 #include "cssysdef.h"
 #include "imesh/ball.h"
-#include "imesh/bcterr.h"
 #include "imesh/bezier.h"
 #include "imesh/crossbld.h"
 #include "imesh/emit.h"
