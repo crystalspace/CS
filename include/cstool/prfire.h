@@ -21,12 +21,14 @@
 #define __CS_PROCFIRETEX_H__
 
 #include "csutil/cscolor.h"
+#include "csutil/randomgen.h"
 #include "cstool/proctex.h"
+#include "itexture/ifire.h"
 
 /**
- *  Plasma.
+ * Fire.
  */
-class csProcFire : public csProcTexture
+class csProcFire : public csProcTexture, iFireTexture
 {
 private:
   /// Palette.
@@ -38,7 +40,9 @@ private:
   /// bottom line array
   uint8 *fireline;
   /// whole texture array...
-  uint8 *image;
+  uint8 *image[2];
+  int curimg;
+  unsigned char* blitbuf;
 
   /// make my palette, max nr of colours
   void MakePalette (int max);
@@ -61,10 +65,16 @@ private:
   bool single_flame_mode;
   /// 1/2 size of flame base, from middle bottom sideways.
   int halfbase;
+  /// Smooth again at the end?
+  int postsmooth;
+
+  csRandomGen rng;
 
 public:
+  SCF_DECLARE_IBASE_EXT(csProcTexture);
+
   /// Create a new texture.
-  csProcFire ();
+  csProcFire (int w = 128, int h = 128);
   ///
   virtual ~csProcFire ();
 
@@ -78,6 +88,30 @@ public:
   { single_flame_mode = enable; halfbase = halfflame; }
   /// is the flame in singleflame(true) or in leftright tiling mode?
   bool GetSingleFlame() const {return single_flame_mode;}
+
+  virtual void SetPossibleBurn (int possburn);
+  virtual int GetPossibleBurn();
+
+  virtual void SetAdditionalBurn (int addburn);
+  virtual int GetAdditionalBurn();
+  
+  virtual void SetContinuedBurn (int contburn);
+  virtual int GetContinuedBurn();
+  
+  virtual void SetSmoothing (int smoothing);
+  virtual int GetSmoothing();
+  
+  virtual void SetExtinguish (int extinguish);
+  virtual int GetExtinguish();
+  
+  virtual void SetSingleFlameMode (bool enable);
+  virtual bool GetSingleFlameMode();
+  
+  virtual void SetHalfBase (int halfbase);
+  virtual int GetHalfBase();
+
+  virtual void SetPostSmoothing (int amount);
+  virtual int GetPostSmoothing ();
 };
 
 #endif // __CS_PROCFIRETEX_H__

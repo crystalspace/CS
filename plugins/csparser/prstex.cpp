@@ -137,6 +137,7 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
   csColor transp (0, 0, 0);
   bool do_transp = false;
   bool keep_image = false;
+  bool always_animate = false;
   TextureLoaderContext context;
   csRef<iDocumentNode> ParamsNode;
   const char* type = NULL;
@@ -242,6 +243,10 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
 	      attr_h->GetValueAsInt());
 	  }
 	}
+	break;
+      case XMLTOKEN_ALWAYSANIMATE:
+	if (!SyntaxService->ParseBool (child, always_animate, false))
+	  return NULL;
 	break;
       default:
         SyntaxService->ReportBadToken (child);
@@ -366,6 +371,13 @@ iTextureWrapper* csLoader::ParseTexture (iDocumentNode* node)
     if (do_transp)
       tex->SetKeyColor (QInt (transp.red * 255.99),
         QInt (transp.green * 255.99), QInt (transp.blue * 255.99));
+
+    csRef<iProcTexture> ipt = csPtr<iProcTexture>
+      (SCF_QUERY_INTERFACE (tex, iProcTexture));
+    if (ipt)
+    {
+      ipt->SetAlwaysAnimate (always_animate);
+    }
   }
   return tex;
 }

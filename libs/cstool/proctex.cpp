@@ -82,6 +82,7 @@ bool ProcEventHandler::HandleEvent (iEvent& event)
   csTicks elapsed_time, current_time;
   elapsed_time = vc->GetElapsedTicks ();
   current_time = vc->GetCurrentTicks ();
+  csHashSet keep_tex;
   if (event.Type == csevBroadcast && event.Command.Code == cscmdPreProcess)
   {
     {
@@ -89,11 +90,23 @@ bool ProcEventHandler::HandleEvent (iEvent& event)
       while (it.HasNext ())
       {
         csProcTexture* pt = (csProcTexture*)it.Next ();
-        pt->Animate (current_time);
+	if (!pt->anim_prepared)
+	  pt->PrepareAnim();
+	if (pt->anim_prepared)
+          pt->Animate (current_time);
+	pt->visible = false;
+	if (pt->always_animate) keep_tex.Add (pt);
         pt->last_cur_time = current_time;
       }
     }
     textures.DeleteAll ();
+    // enqueue 'always animate' textures for next cycle
+    csGlobalHashIterator it (keep_tex.GetHashMap ());
+    while (it.HasNext ())
+    {
+      csProcTexture* pt = (csProcTexture*)it.Next ();
+      textures.Add (pt);
+    }
     return true;
   }
   return false;
@@ -101,8 +114,16 @@ bool ProcEventHandler::HandleEvent (iEvent& event)
 
 //---------------------------------------------------------------------------
 
+SCF_IMPLEMENT_IBASE_EXT (csProcTexture)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iTextureWrapper)
+  SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iProcTexture)
+SCF_IMPLEMENT_IBASE_EXT_END
+
 csProcTexture::csProcTexture ()
 {
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiTextureWrapper);
+  SCF_CONSTRUCT_EMBEDDED_IBASE (scfiProcTexture);
+
   ptReady = false;
   tex = NULL;
   texFlags = 0;
@@ -111,6 +132,8 @@ csProcTexture::csProcTexture ()
   use_cb = true;
   last_cur_time = 0;
   anim_prepared = false;
+  always_animate = false;
+  visible = false;
 }
 
 csProcTexture::~csProcTexture ()
@@ -149,6 +172,7 @@ SCF_IMPLEMENT_IBASE_END
 void ProcCallback::UseTexture (iTextureWrapper*)
 {
   if (!pt->PrepareAnim ()) return;
+  pt->visible = true;
   ((ProcEventHandler*)(iEventHandler*)(pt->proceh))->PushTexture (pt);
 }
 
@@ -157,8 +181,8 @@ bool csProcTexture::Initialize (iObjectRegistry* object_reg)
   csProcTexture::object_reg = object_reg;
   proceh = SetupProcEventHandler (object_reg);
 
-  iImage *proc_image;
-  proc_image = (iImage*) new csImageMemory (mat_w, mat_h);
+  csRef<iImage> proc_image;
+  proc_image.AttachNew (new csImageMemory (mat_w, mat_h));
 
 #ifndef CS_USE_NEW_RENDERER
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
@@ -169,7 +193,7 @@ bool csProcTexture::Initialize (iObjectRegistry* object_reg)
 
   csRef<iEngine> engine (CS_QUERY_REGISTRY (object_reg, iEngine));
   tex = engine->GetTextureList ()->NewTexture (proc_image);
-  proc_image->DecRef ();
+  proc_image = NULL;
   if (!tex)
     return false;
 
@@ -220,5 +244,118 @@ iMaterialWrapper* csProcTexture::Initialize (iObjectRegistry * object_reg,
   return mat;
 }
 
+bool csProcTexture::GetAlwaysAnimate ()
+{
+  return always_animate;
+}
+
+void csProcTexture::SetAlwaysAnimate (bool enable)
+{
+  always_animate = enable;
+  if (always_animate)
+  {
+    ((ProcEventHandler*)(iEventHandler*)proceh)->PushTexture (this);
+  }
+}
+
 //-----------------------------------------------------------------------------
 
+SCF_IMPLEMENT_EMBEDDED_IBASE (csProcTexture::eiTextureWrapper)
+  SCF_IMPLEMENTS_INTERFACE (iTextureWrapper)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+iObject* csProcTexture::eiTextureWrapper::QueryObject()
+{
+  return scfParent->tex->QueryObject();
+}
+
+iTextureWrapper* csProcTexture::eiTextureWrapper::Clone () const
+{
+  return scfParent->tex->Clone();
+}
+
+void csProcTexture::eiTextureWrapper::SetImageFile (iImage *Image)
+{
+  scfParent->tex->SetImageFile (Image);
+}
+
+iImage* csProcTexture::eiTextureWrapper::GetImageFile ()
+{
+  return scfParent->tex->GetImageFile();
+}
+
+void csProcTexture::eiTextureWrapper::SetTextureHandle (iTextureHandle *tex)
+{
+  scfParent->tex->SetTextureHandle (tex);
+}
+
+iTextureHandle* csProcTexture::eiTextureWrapper::GetTextureHandle ()
+{
+  return scfParent->tex->GetTextureHandle();
+}
+
+void csProcTexture::eiTextureWrapper::SetKeyColor (int red, int green, int blue)
+{
+  scfParent->tex->SetKeyColor (red, green, blue);
+}
+
+void csProcTexture::eiTextureWrapper::GetKeyColor (int &red, int &green, int &blue)
+{
+  scfParent->tex->GetKeyColor (red, green, blue);
+}
+
+void csProcTexture::eiTextureWrapper::SetFlags (int flags)
+{
+  scfParent->tex->SetFlags (flags);
+}
+
+int csProcTexture::eiTextureWrapper::GetFlags ()
+{
+  return scfParent->tex->GetFlags();
+}
+
+void csProcTexture::eiTextureWrapper::Register (iTextureManager *txtmng)
+{
+  scfParent->tex->Register (txtmng);
+}
+
+void csProcTexture::eiTextureWrapper::SetUseCallback (iTextureCallback* callback)
+{
+  scfParent->tex->SetUseCallback (callback);
+}
+
+iTextureCallback* csProcTexture::eiTextureWrapper::GetUseCallback ()
+{
+  return scfParent->tex->GetUseCallback();
+}
+
+void csProcTexture::eiTextureWrapper::Visit ()
+{
+  scfParent->tex->Visit();
+}
+
+void csProcTexture::eiTextureWrapper::SetKeepImage (bool k)
+{
+  scfParent->tex->SetKeepImage (k);
+}
+
+bool csProcTexture::eiTextureWrapper::KeepImage () const
+{
+  return scfParent->tex->KeepImage();
+}
+
+//-----------------------------------------------------------------------------
+
+SCF_IMPLEMENT_EMBEDDED_IBASE (csProcTexture::eiProcTexture)
+  SCF_IMPLEMENTS_INTERFACE (iProcTexture)
+SCF_IMPLEMENT_EMBEDDED_IBASE_END
+
+bool csProcTexture::eiProcTexture::GetAlwaysAnimate ()
+{
+  return scfParent->GetAlwaysAnimate();
+}
+
+void csProcTexture::eiProcTexture::SetAlwaysAnimate (bool enable)
+{
+  scfParent->SetAlwaysAnimate (enable);
+}

@@ -3,6 +3,22 @@ http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
 
+15-May-2003
+	- res made the following changes to the fire proctex:
+	    - changed the algorithm a bit so it doesn't look tilted any more.
+	    - added the ability to smooth the whole image after calculating 
+	      a pass.
+	    - added an interface to control some animation parameters.
+	    - used csRandomGen now.
+	- res changed proctexes to support an 'always animate' mode: the
+	  texture is updated even if it's not visible.
+	- res changed the way proctexes work: iTextureWrapper is now embedded
+	  into csProcTex. This way, procedural textures can provide interfaces
+	  that can be queried from the texture wrapper (e.g. the fire 
+	  properties.)
+	- res fixed an uninitialized variable in the checkerboard loader.
+	- res added interfaces for texture factories.
+	- res removed an unnecessary cut'n'paste leftover from ptanimimg.h.
 14-May-2003
 	- Jorrit fixed a bug in the syntax services. When a polygon is a
 	  portal it is now marked as excluded from the visculling mesh.

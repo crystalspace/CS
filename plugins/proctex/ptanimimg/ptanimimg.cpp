@@ -74,7 +74,6 @@ csPtr<iBase> csAnimateProctexLoader::Parse (iDocumentNode* node,
 					    iLoaderContext* ldr_context,
   					    iBase* context)
 {
-  int w = 64, h = 64, depth = 6;
   csRef<iTextureLoaderContext> ctx;
   if (context)
   {

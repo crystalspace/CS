@@ -303,7 +303,7 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
 					    iBase* context)
 {
   int w = 64, h = 64, depth = 6;
-  csColor color;
+  csColor color (1.0f, 1.0f, 1.0f);
   csRef<iTextureLoaderContext> ctx;
   if (context)
   {
@@ -356,7 +356,7 @@ csPtr<iBase> csCheckerTextureLoader::Parse (iDocumentNode* node,
 
   csRef<iTextureWrapper> TexWrapper =
 	Engine->GetTextureList ()->NewTexture(TexHandle);
-  TexWrapper->SetImageFile(ctx->GetImage());
+  TexWrapper->SetImageFile (Image);
 
   return csPtr<iBase> (TexWrapper);
 }

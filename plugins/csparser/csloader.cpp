@@ -710,6 +710,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
 
   xmltokens.Register ("ambient", XMLTOKEN_AMBIENT);
   xmltokens.Register ("addon", XMLTOKEN_ADDON);
+  xmltokens.Register ("alwaysanimate", XMLTOKEN_ALWAYSANIMATE);
   xmltokens.Register ("attenuation", XMLTOKEN_ATTENUATION);
 #ifdef CS_USE_NEW_RENDERER
   xmltokens.Register ("attenuationvec", XMLTOKEN_ATTENUATIONVECTOR);

@@ -22,6 +22,8 @@
 
 #include <stdarg.h>
 #include "csutil/csobject.h"
+#include "itexture/iproctex.h"
+#include "iengine/texture.h"
 #include "qint.h"
 
 struct iTextureWrapper;
@@ -35,6 +37,8 @@ struct iTextureManager;
 struct iTextureWrapper;
 struct iEventHandler;
 
+class ProcEventHandler;
+
 /**
  * Generic superclass for procedural textures. This class
  * takes care of scheduling when a procedural texture needs updating.
@@ -42,6 +46,7 @@ struct iEventHandler;
 class csProcTexture : public csObject
 {
   friend struct ProcCallback;
+  friend class ProcEventHandler;
 
 private:
   // Setup the procedural event handler (used for updating visible
@@ -72,6 +77,42 @@ protected:
   // so that the texture is automatically updated (Animate is called)
   // whenever it is used.
   bool use_cb;
+  // always animate, even if not visible
+  bool always_animate;
+  // Are we visible? Can be 'false' if animated w/ 'always animate'.
+  bool visible;
+
+  bool GetAlwaysAnimate ();
+  void SetAlwaysAnimate (bool enable);
+
+  struct eiTextureWrapper : public iTextureWrapper
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csProcTexture);
+    virtual iObject *QueryObject();
+    virtual iTextureWrapper *Clone () const;
+    virtual void SetImageFile (iImage *Image);
+    virtual iImage* GetImageFile ();
+    virtual void SetTextureHandle (iTextureHandle *tex);
+    virtual iTextureHandle* GetTextureHandle ();
+    virtual void SetKeyColor (int red, int green, int blue);
+    virtual void GetKeyColor (int &red, int &green, int &blue);
+    virtual void SetFlags (int flags);
+    virtual int GetFlags ();
+    virtual void Register (iTextureManager *txtmng);
+    virtual void SetUseCallback (iTextureCallback* callback);
+    virtual iTextureCallback* GetUseCallback ();
+    virtual void Visit ();
+    virtual void SetKeepImage (bool k);
+    virtual bool KeepImage () const;
+  } scfiTextureWrapper;
+
+  struct eiProcTexture : public iProcTexture
+  {
+    SCF_DECLARE_EMBEDDED_IBASE(csProcTexture);
+
+    virtual bool GetAlwaysAnimate ();
+    virtual void SetAlwaysAnimate (bool enable);
+  } scfiProcTexture;
 
 public:
   // The current time the previous time the callback was called.
@@ -83,6 +124,8 @@ private:
   static void ProcCallback (iTextureWrapper* txt, void* data);
 
 public:
+  SCF_DECLARE_IBASE_EXT (csObject);
+
   csProcTexture ();
   virtual ~csProcTexture ();
 
@@ -147,9 +190,6 @@ public:
    */
   virtual void Animate (csTicks current_time) = 0;
 
-  /// Get the texture corresponding with this procedural texture.
-  iTextureWrapper* GetTextureWrapper () { return tex; }
-
   /// get dimension
   virtual void GetDimension (int &w, int &h)
   { w = mat_w; h = mat_h; }
@@ -158,6 +198,9 @@ public:
   {
     return int ((float(max)*rand()/(RAND_MAX+1.0)));
   }
+
+  /// Get the texture corresponding with this procedural texture.
+  iTextureWrapper* GetTextureWrapper () { return &scfiTextureWrapper; /*return tex;*/ }
 };
 
 
