@@ -39,7 +39,8 @@
   gcc -c -fno-exceptions conftest.cpp -o conftest.o
   if not exist conftest.o goto noexceptions
 
-  del conftest.o >nul
+  attrib -r conftest.o
+  del conftest.o
   echo $$$ O.K., using the -fno-exceptions switch to get smaller executables
   echo CFLAGS.SYSTEM += -fno-exceptions>>config.tmp
 
@@ -49,7 +50,7 @@
   gcc -c -fno-rtti conftest.cpp -o conftest.o
   if not exist conftest.o goto nortti
 
-  del conftest.o >nul
+  del conftest.o
   echo $$$ O.K., using the -fno-rtti switch to get smaller executables
   echo CFLAGS.SYSTEM += -fno-rtti>>config.tmp
 
@@ -59,7 +60,7 @@
   gcc -c -mpentium -march=pentium conftest.cpp -o conftest.o
   if not exist conftest.o goto nop5
 
-  del conftest.o >nul
+  del conftest.o
   echo $$$ O.K., using -mpentium -march=pentium switches
   echo CFLAGS.SYSTEM += -mpentium -march=pentium>>config.tmp
 
@@ -69,7 +70,8 @@
   nasm -f coff conftest.asm -o conftest.o
   if not exist conftest.o goto nonasm
 
-  del conftest.o >nul
+  attrib -r conftest.o
+  del conftest.o
   echo $$$ O.K., setting NASM.INSTALLED to "yes"
   echo NASM.INSTALLED = yes>>config.tmp
 
@@ -79,7 +81,8 @@
   makedep conftest.cpp -fconftest.o -c
   if not exist conftest.o goto nomakedep
 
-  del conftest.o >nul
+  attrib -r conftest.o
+  del conftest.o
   echo $$$ O.K., setting MAKEDEP.INSTALLED to "yes"
   echo MAKEDEP.INSTALLED = yes>>config.tmp
 
@@ -90,7 +93,8 @@
   dxe2gen --help >conftest.o
   if not exist conftest.o goto nodxe2gen
 
-  del conftest.o >nul
+  attrib -r conftest.o
+  del conftest.o
   echo $$$ O.K., setting USE_PLUGINS to "yes"
   set SH=yes
 
