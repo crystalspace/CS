@@ -4920,6 +4920,7 @@ class iVisibilityCuller(iBase):
     def IntersectSegmentSloppy(*args): return _cspace.iVisibilityCuller_IntersectSegmentSloppy(*args)
     def IntersectSegment(*args): return _cspace.iVisibilityCuller_IntersectSegment(*args)
     def CastShadows(*args): return _cspace.iVisibilityCuller_CastShadows(*args)
+    def ParseCullerParameters(*args): return _cspace.iVisibilityCuller_ParseCullerParameters(*args)
     def __del__(self, destroy=_cspace.delete_iVisibilityCuller):
         try:
             if self.thisown: destroy(self)
