@@ -23,6 +23,8 @@ chronological order.
 	- Anders Stenberg fixed a bug in Win32 utils where command line 
 	  arguments were read directly instead of through the command line
 	  parser.
+	- Anders Stenberg added functionality to multiple materials
+	  on genmesh instances. 
 25-Feb-2005
 	- Jorrit added a new HOWTO that explains how to compile external
 	  applications for Crystal Space and CEL using Dev-CPP.
