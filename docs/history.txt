@@ -79,7 +79,7 @@ chronological order.
 	  smart enough to try both "plugin_compiler" and "_plugin_compiler",
 	  whereas csGetLibrarySymbol() is.
 	- Wouter Wijngaards fixed an off-by-one bug in csconin, where if
-	  you pressed the up arrow you would get the line before the previous 
+	  you pressed the up arrow you would get the line before the previous
 	  line instead of the previous line.
 	- Marten removed String shadervariabletype.
 	- Marten added accessors to shadervariable system. Currently they
@@ -261,7 +261,7 @@ chronological order.
 	  csHash instantiates Iterator and GlobalIterator even though csHash is
 	  a friend of Iterator and GlobalIterator.
 	- Luca fixed a MSVC6 'for(int i=)' scope bug.
-	- res fixed more stuff in the shadersystem. r3dtest works now, tho no 
+	- res fixed more stuff in the shadersystem. r3dtest works now, tho no
 	  stencil shadows yet.
 4-Dec-2003
         - Steven Geens added a odedynam function for mesh<->plane collisions.
@@ -273,7 +273,7 @@ chronological order.
 	- jamest commented out the setScale() function in sprcal3d
 	  so plugin would build until setScale() makes it into cal3d
 	  cvs
-	- res did a bunch of changes and fixes to shadersys. He attempted to get 
+	- res did a bunch of changes and fixes to shadersys. He attempted to get
 	  the r3dtest map functional, but hadn't too much success.
 2-Dec-2003
 	- res enabled VC the warning "class has virtual functions, but
@@ -420,13 +420,13 @@ chronological order.
 	- Luca fixed a compilation error in cssys/win32.cpp: the error was
 	  a bad casting.
 	- Marten Svanfeldt branched CS with the new branch NEW_SHADERSYS.
-	  The purpose of this branch is to develop the new shadersystem 
+	  The purpose of this branch is to develop the new shadersystem
 	  without disturbing all other development. Goal is to merge it back
 	  within three weeks. Initial changes to this branch is:
 	    - Move shadermgr into plugins\video\render3d\shader\shadermgr
 	    - Moved the shaderplugins to
 	      plugins\video\render3d\shader\shaderplugins
-	    - Added an initial implementation of csXMLShader and 
+	    - Added an initial implementation of csXMLShader and
 	      csXMLShaderCompiler in
 	      plugin\video\render3d\shader\shadercompiler\
 	      xmlshader. It have all methods but lacks testing.
