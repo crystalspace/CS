@@ -29,10 +29,12 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-# Non-Unix OpenGL renderer do not need the X11 libs
 ifndef LIBS.GL3D.SYSTEM
 
-LIBS.LOCAL.GL3D+=-L$(X11_PATH)/lib -lXext -lX11
+ifdef X11_PATH
+  CFLAGS.GL3D+=-I$(X11_PATH)/include
+  LIBS.LOCAL.GL3D+=-L$(X11_PATH)/lib -lXext -lX11
+endif
 
 ifeq ($(USE_MESA),1)
   ifdef MESA_PATH
@@ -47,8 +49,6 @@ else
   endif
   LIBS.LOCAL.GL3D+=-lGL
 endif
-
-CFLAGS.GL3D+=-I$(X11_PATH)/include
 
 else
 
@@ -92,7 +92,6 @@ gl3d: $(OUTDIRS) $(GL3D)
 
 $(OUT)%$O: plugins/video/renderer/opengl/%.cpp
 	$(DO.COMPILE.CPP) $(CFLAGS.GL3D)
-
  
 $(GL3D): $(OBJ.GL3D) $(DEP.GL3D)
 	$(DO.PLUGIN) $(LIBS.GL3D)
