@@ -53,8 +53,6 @@ private:
     FogExp2
   };
 
-  struct FogInfo;
-  friend struct FogInfo;
   struct FogInfo
   {
     FogMode mode;
@@ -66,6 +64,7 @@ private:
 
     FogInfo () : mode (FogOff) {}
   };
+  friend struct FogInfo; // MSVC6: For access to csGLStateCache::FogOff.
 
   FogInfo fog;
 
