@@ -29,7 +29,7 @@
 class csSector;
 class csWorld;
 class csStatLight;
-class csMaterialHandle;
+class csMaterialWrapper;
 class csMaterialList;
 class csPolygon3D;
 class CLights;
@@ -273,7 +273,7 @@ public:
   /**
    * Add polygons and vertices from the specified template.
    */
-  void MergeTemplate (csThingTemplate* tpl, csMaterialHandle* default_material = NULL,
+  void MergeTemplate (csThingTemplate* tpl, csMaterialWrapper* default_material = NULL,
   	float default_texlen = 1, CLights* default_lightx = NULL,
 	csVector3* shift = NULL, csMatrix3* transform = NULL);
 
@@ -282,7 +282,7 @@ public:
    * match one in the matList.
    */
   void MergeTemplate (csThingTemplate* tpl, csMaterialList* matList, const char* prefix, 
-	csMaterialHandle* default_material = NULL,
+	csMaterialWrapper* default_material = NULL,
   	float default_texlen = 1, CLights* default_lightx = NULL,
 	csVector3* shift = NULL, csMatrix3* transform = NULL);
 

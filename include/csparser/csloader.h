@@ -25,8 +25,8 @@
 
 struct iImage;
 struct csRGBcolor;
-class csTextureHandle;
-class csMaterialHandle;
+class csTextureWrapper;
+class csMaterialWrapper;
 class csSkeletonLimb;
 class csPolygonTemplate;
 class csThingTemplate;
@@ -91,7 +91,7 @@ class csLoader
     char* name, char* params);
   /// Parse the definition for a skydome and create the corresponding objects
   static void skydome_process (csSector& sector, char* name, char* buf,
-    csMaterialHandle* material);
+    csMaterialWrapper* material);
   /// Parse the terrain engine's parameters
   static void terrain_process (csSector& sector, char* name, char* buf);
   /// Load a sixface (i.e. box) definition (obsolete, should not be used)
@@ -100,11 +100,11 @@ class csLoader
   static csThing* load_thing (char* name, char* buf, csSector* sec);
   /// Parse a 3D polygon definition and return a new object
   static csPolygon3D* load_poly3d (char* polyname, char* buf,
-    csMaterialHandle* default_material, float default_texlen,
+    csMaterialWrapper* default_material, float default_texlen,
     CLights* default_lightx, csSector* sec, csPolygonSet* parent);
   /// Parse a Bezier surface definition and return a new object
   static csCurve* load_bezier (char* polyname, char* buf,
-    csMaterialHandle* default_material, float default_texlen,
+    csMaterialWrapper* default_material, float default_texlen,
     CLights* default_lightx, csSector* sec, csPolygonSet* parent);
 
   /// Load a image and return an iImage object
@@ -115,13 +115,13 @@ class csLoader
   static void mat_process (char *name, char* buf);
   /// Parse polygon template definition and return a new object
   static csPolygonTemplate* load_ptemplate (char* ptname, char* buf,
-    csMaterialHandle* default_material, float default_texlen,
+    csMaterialWrapper* default_material, float default_texlen,
     csThingTemplate* parent);
   /// Parse a thing template definition and return a new object
   static csThingTemplate* load_thingtpl (char* tname, char* buf);
   /// Parse a Bezier surface definition and return a new object
   static csCurveTemplate* load_beziertemplate (char* ptname, char* buf,
-    csMaterialHandle* default_material, float default_texlen,
+    csMaterialWrapper* default_material, float default_texlen,
     csThingTemplate* parent);
 
   /// Create a thing template from a sixface (obsolete)
@@ -197,7 +197,7 @@ public:
    * The texture will be registered for 3d use only.
    * A corresponding material with the same name will be added too.
    */
-  static csTextureHandle* LoadTexture (csWorld* world, const char* name,
+  static csTextureWrapper* LoadTexture (csWorld* world, const char* name,
     const char* fname);
 
   /**

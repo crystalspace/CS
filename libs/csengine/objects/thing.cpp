@@ -534,7 +534,7 @@ void csThing::Merge (csThing* other)
 
 
 void csThing::MergeTemplate (csThingTemplate* tpl,
-  csMaterialHandle* default_material, float default_texlen,
+  csMaterialWrapper* default_material, float default_texlen,
   CLights* default_lightx,
   csVector3* shift, csMatrix3* transform)
 {
@@ -637,7 +637,7 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
     p->SetParent (this);
     p->SetSector( GetSector() );
 
-    if (!pt->GetMaterialHandle ()) p->SetMaterialHandle (default_material);
+    if (!pt->GetMaterialWrapper ()) p->SetMaterialWrapper (default_material);
     for (j = 0 ; j < pt->NumVertices () ; j++)
       p->SetControlPoint (j, pt->GetVertex (j));
     AddCurve (p);
@@ -647,7 +647,7 @@ void csThing::MergeTemplate (csThingTemplate* tpl,
 }
 
 void csThing::MergeTemplate (csThingTemplate* tpl, csMaterialList* matList,
-  const char* prefix, csMaterialHandle* default_material, float default_texlen,
+  const char* prefix, csMaterialWrapper* default_material, float default_texlen,
   CLights* default_lightx, csVector3* shift, csMatrix3* transform)
 {
   int i;
@@ -661,10 +661,10 @@ void csThing::MergeTemplate (csThingTemplate* tpl, csMaterialList* matList,
   for (i = 0; i < GetNumPolygons (); i++)
   {
     csPolygon3D *p = GetPolygon3D (i);
-    txtname = p->GetCsMaterialHandle ()->GetName ();
+    txtname = p->GetMaterialWrapper ()->GetName ();
     newname = new char [strlen (prefix) + strlen (txtname) + 2];
     sprintf (newname, "%s_%s", prefix, txtname);
-    csMaterialHandle *th = matList->FindByName (newname);
+    csMaterialWrapper *th = matList->FindByName (newname);
     if (th != NULL)
       p->SetMaterial (th);
     delete [] newname;

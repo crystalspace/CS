@@ -37,7 +37,7 @@ csMaterial::csMaterial ()
   reflection = 0.0;
 }
 
-csMaterial::csMaterial (csTextureHandle *txt)
+csMaterial::csMaterial (csTextureWrapper *txt)
 {
   csMaterial ();
   texture = txt;
@@ -72,16 +72,16 @@ void csMaterial::GetReflection (float &oDiffuse, float &oAmbient, float &oReflec
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_CSOBJTYPE (csMaterialHandle, csObject);
+IMPLEMENT_CSOBJTYPE (csMaterialWrapper, csObject);
 
-csMaterialHandle::csMaterialHandle (iMaterial* material) :
+csMaterialWrapper::csMaterialWrapper (iMaterial* material) :
   csObject (), handle (NULL)
 {
-  csMaterialHandle::material = material;
+  csMaterialWrapper::material = material;
   material->IncRef ();
 }
 
-csMaterialHandle::csMaterialHandle (csMaterialHandle &th) :
+csMaterialWrapper::csMaterialWrapper (csMaterialWrapper &th) :
   csObject (), handle (NULL)
 {
   (material = th.material)->IncRef ();
@@ -89,14 +89,14 @@ csMaterialHandle::csMaterialHandle (csMaterialHandle &th) :
   SetName (th.GetName ());
 }
 
-csMaterialHandle::csMaterialHandle (iMaterialHandle *ith) :
+csMaterialWrapper::csMaterialWrapper (iMaterialHandle *ith) :
   csObject (), material (NULL)
 {
   ith->IncRef ();
   handle = ith;
 }
 
-csMaterialHandle::~csMaterialHandle ()
+csMaterialWrapper::~csMaterialWrapper ()
 {
   if (handle)
     handle->DecRef ();
@@ -104,15 +104,15 @@ csMaterialHandle::~csMaterialHandle ()
     material->DecRef ();
 }
 
-void csMaterialHandle::SetMaterial (iMaterial *material)
+void csMaterialWrapper::SetMaterial (iMaterial *material)
 {
-  if (csMaterialHandle::material)
-    csMaterialHandle::material->DecRef ();
-  csMaterialHandle::material = material;
+  if (csMaterialWrapper::material)
+    csMaterialWrapper::material->DecRef ();
+  csMaterialWrapper::material = material;
   material->IncRef ();
 }
 
-void csMaterialHandle::Register (iTextureManager *txtmgr)
+void csMaterialWrapper::Register (iTextureManager *txtmgr)
 {
   handle = txtmgr->RegisterMaterial (material);
 }
@@ -124,16 +124,16 @@ csMaterialList::~csMaterialList ()
   DeleteAll ();
 }
 
-csMaterialHandle* csMaterialList::NewMaterial (iMaterial* material)
+csMaterialWrapper* csMaterialList::NewMaterial (iMaterial* material)
 {
-  csMaterialHandle *tm = new csMaterialHandle (material);
+  csMaterialWrapper *tm = new csMaterialWrapper (material);
   Push (tm);
   return tm;
 }
 
-csMaterialHandle* csMaterialList::NewMaterial (iMaterialHandle *ith)
+csMaterialWrapper* csMaterialList::NewMaterial (iMaterialHandle *ith)
 {
-  csMaterialHandle *tm = new csMaterialHandle (ith);
+  csMaterialWrapper *tm = new csMaterialWrapper (ith);
   Push (tm);
   return tm;
 }

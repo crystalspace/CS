@@ -104,7 +104,7 @@ bool csTerrain::Initialize (const void* heightMapFile, unsigned long size)
       mesh->wheight (mesh->absMaxHeight ()), heightMap->rows ());
 
   // This is  code that allocates the texture array for the terrain.
-  _materialMap = new csMaterialHandle* [GetNumMaterials ()];
+  _materialMap = new csMaterialWrapper* [GetNumMaterials ()];
   return true;
 }
 

@@ -239,7 +239,7 @@ csRGBLightMap * csRadElement::ComputeTextureLumelSized()
   }
 
   // get texture of element
-  csMaterialHandle* mathandle = GetMaterialHandle ();
+  csMaterialWrapper* mathandle = GetMaterialWrapper ();
 
   if(mathandle == NULL) // no material: flatcol is enough.
     return map;
@@ -247,7 +247,7 @@ csRGBLightMap * csRadElement::ComputeTextureLumelSized()
   int transr=0, transg=0, transb=0; // transparent color
   
   csMaterial* mat = (csMaterial*)mathandle->GetMaterial ();
-  csTextureHandle* txthandle = mat->GetTextureHandle ();
+  csTextureWrapper* txthandle = mat->GetTextureWrapper ();
   txthandle->GetKeyColor(transr, transg, transb);
   
   iImage *txtimage = txthandle->GetImageFile();

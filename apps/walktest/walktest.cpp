@@ -1084,7 +1084,7 @@ void WalkTest::LoadLibraryData(void)
 
 void WalkTest::Inititalize2DTextures ()
 {
-  csTextureHandle *texh;
+  csTextureWrapper *texh;
   csTextureList *texlist = world->GetTextures ();
 
   // Find the Crystal Space logo and set the renderer Flag to for_2d, to allow
@@ -1098,7 +1098,7 @@ void WalkTest::Inititalize2DTextures ()
 void WalkTest::Create2DSprites(void)
 {
   int w, h;
-  csTextureHandle *texh;
+  csTextureWrapper *texh;
   iTextureHandle* phTex;
   csTextureList *texlist = world->GetTextures ();
 

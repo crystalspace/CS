@@ -95,7 +95,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
   // Create our world.
   Printf (MSG_INITIALIZATION, "Creating world!...\n");
 
-  csTextureHandle* tm = csLoader::LoadTexture (world, "stone", "/lib/std/stone4.gif");
+  csTextureWrapper* tm = csLoader::LoadTexture (world, "stone", "/lib/std/stone4.gif");
 
   iScript* is = CREATE_INSTANCE("crystalspace.script.python", iScript);
   is->Initialize(this);
@@ -107,7 +107,7 @@ bool PySimple::Initialize (int argc, const char* const argv[],
 	csSector *room=world->NewSector();
   view = new csView (world, G3D);
 
-	is->Store("csTextureHandle *", "unrmap.tmptr", tm);
+	is->Store("csTextureWrapper *", "unrmap.tmptr", tm);
 	is->Store("csSector *", "unrmap.roomptr", room);
 	is->Store("csView *", "unrmap.viewptr", view);
 

@@ -213,7 +213,7 @@ class csCrossBuild_Quake2Importer
     // find textures in a directory and add to the world.  the texture names
     // are made by concatinating the modelname passed in and the
     // texture file name
-    csTextureHandle * Import_Quake2Textures(char *skinpath, char *modelname, csWorld *importdestination) const;
+    csTextureWrapper * Import_Quake2Textures(char *skinpath, char *modelname, csWorld *importdestination) const;
 
     // given a prefix representing an action name, make a csSpriteAction
     // by concatinating all the frames that start with that prefix

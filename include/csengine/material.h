@@ -24,7 +24,7 @@
 #include "csobject/nobjvec.h"
 #include "imater.h"
 
-class csTextureHandle;
+class csTextureWrapper;
 struct iTextureManager;
 
 
@@ -38,7 +38,7 @@ private:
   /// flat shading color
   csRGBcolor flat_color;
   /// the texture of the material (can be NULL)
-  csTextureHandle *texture;
+  csTextureWrapper *texture;
 
   /// The diffuse reflection value of the material
   float diffuse;
@@ -55,7 +55,7 @@ public:
   /**
    * create a material with only the texture given.
    */
-  csMaterial (csTextureHandle *txt);
+  csMaterial (csTextureWrapper *txt);
 
   /**
    * destroy material
@@ -68,9 +68,9 @@ public:
   inline void SetFlatColor (const csRGBcolor& col) { flat_color = col; }
 
   /// Get the texture (if none NULL is returned)
-  inline csTextureHandle *GetTextureHandle () const { return texture; }
+  inline csTextureWrapper *GetTextureWrapper () const { return texture; }
   /// Set the texture (pass NULL to set no texture)
-  inline void SetTextureHandle (csTextureHandle *tex) { texture = tex; }
+  inline void SetTextureWrapper (csTextureWrapper *tex) { texture = tex; }
 
   /// Get diffuse reflection constant for the material
   inline float GetDiffuse () const { return diffuse; }
@@ -98,10 +98,10 @@ public:
 };
 
 /**
- * csMaterialHandle represents a texture and its link
+ * csMaterialWrapper represents a texture and its link
  * to the iMaterialHandle as returned by iTextureManager.
  */
-class csMaterialHandle : public csObject
+class csMaterialWrapper : public csObject
 {
 private:
   /// The corresponding iMaterial.
@@ -111,19 +111,19 @@ private:
 
 public:
   /// Construct a material handle given a material.
-  csMaterialHandle (iMaterial* Image);
+  csMaterialWrapper (iMaterial* Image);
 
   /**
-   * Construct a csMaterialHandle from a pre-registered AND prepared material 
+   * Construct a csMaterialWrapper from a pre-registered AND prepared material 
    * handle. The engine takes over responsibility for destroying the material
    * handle. To prevent this IncRef () the material handle.
    */
-  csMaterialHandle (iMaterialHandle *ith);
+  csMaterialWrapper (iMaterialHandle *ith);
 
   /// Copy constructor
-  csMaterialHandle (csMaterialHandle &th);
+  csMaterialWrapper (csMaterialWrapper &th);
   /// Release material handle
-  virtual ~csMaterialHandle ();
+  virtual ~csMaterialWrapper ();
 
   /// Get the material handle.
   iMaterialHandle* GetMaterialHandle () { return handle; }
@@ -152,21 +152,21 @@ public:
   virtual ~csMaterialList ();
 
   /// Create a new material.
-  csMaterialHandle* NewMaterial (iMaterial* material);
+  csMaterialWrapper* NewMaterial (iMaterial* material);
 
   /**
    * Create a engine wrapper for a pre-prepared iTextureHandle
    * The handle will be IncRefed.
    */
-  csMaterialHandle* NewMaterial (iMaterialHandle *ith);
+  csMaterialWrapper* NewMaterial (iMaterialHandle *ith);
 
   /// Return material by index
-  csMaterialHandle *Get (int idx)
-  { return (csMaterialHandle *)csNamedObjVector::Get (idx); }
+  csMaterialWrapper *Get (int idx)
+  { return (csMaterialWrapper *)csNamedObjVector::Get (idx); }
 
   /// Find a material by name
-  csMaterialHandle *FindByName (const char* iName)
-  { return (csMaterialHandle *)csNamedObjVector::FindByName (iName); }
+  csMaterialWrapper *FindByName (const char* iName)
+  { return (csMaterialWrapper *)csNamedObjVector::FindByName (iName); }
 };
 
 #endif // __CS_MATERIAL_H__

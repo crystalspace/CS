@@ -100,7 +100,7 @@ csPolygon3D* HugeRoom::create_polygon (csSector* sector, csPolygonSet* thing,
   csMatrix3 t_m;
   csVector3 t_v (0, 0, 0);
 
-  csMaterialHandle* tm = NULL;
+  csMaterialWrapper* tm = NULL;
   switch (txt)
   {
     case 0: tm = NULL; break;

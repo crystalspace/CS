@@ -22,7 +22,7 @@
 
 #include "csgeom/transfrm.h"
 
-class csMaterialHandle;
+class csMaterialWrapper;
 class CLights;
 class csWorld;
 class csTextureList;
@@ -30,7 +30,7 @@ class csTextureList;
 class PSLoadInfo
 {
 public:
-  csMaterialHandle* default_material;
+  csMaterialWrapper* default_material;
   float default_texlen;
   CLights* default_lightx;
   bool use_tex_set;

@@ -28,7 +28,7 @@
 #include "iparticl.h"
 
 class csSprite2D;
-class csMaterialHandle;
+class csMaterialWrapper;
 class csWorld;
 class csSector;
 class csDynLight;
@@ -100,14 +100,14 @@ public:
    * Add an rectangle shaped csSprite2d particle. Pass along half w and h.
    * adds sprite to world list.
    */
-  void AppendRectSprite (float width, float height, csMaterialHandle* mat,
+  void AppendRectSprite (float width, float height, csMaterialWrapper* mat,
     bool lighted);
 
   /** 
    *Add a csSprite2d n-gon with material, and given radius.
    *  adds sprite to world list.
    */
-  void AppendRegularSprite (int n, float radius, csMaterialHandle* mat,
+  void AppendRegularSprite (int n, float radius, csMaterialWrapper* mat,
     bool lighted);
 
   /// Set selfdestruct mode on, and msec to live.
@@ -260,13 +260,13 @@ protected:
   int time_before_new_particle; // needs to be signed.
   csVector3 source;
   int last_reuse;
-  csMaterialHandle* mat;
+  csMaterialWrapper* mat;
   csSector* this_sector;
 
 public:
   /// Specify max number of particles.
   csSpiralParticleSystem (csObject* theParent, int max, const csVector3& source,
-  	csMaterialHandle* mat);
+  	csMaterialWrapper* mat);
   virtual ~csSpiralParticleSystem ();
 
   /// Moves the particles depending on their acceleration and speed.
@@ -312,7 +312,7 @@ public:
    */
   csParSysExplosion (csObject* theParent, int number_p,
   	const csVector3& explode_center,
-  	const csVector3& push, csMaterialHandle *mat, int nr_sides = 6,
+  	const csVector3& push, csMaterialWrapper *mat, int nr_sides = 6,
 	float part_radius = 0.25, bool lighted_particles = false,
 	float spread_pos = 0.6, 
 	float spread_speed = 0.5, float spread_accel = 1.5);
@@ -376,7 +376,7 @@ public:
     *   You can make slanted rain this way. Although you would also want to
     *   slant the particles in that case...
     */
-  csRainParticleSystem(csObject* theParent, int number, csMaterialHandle* mat,
+  csRainParticleSystem(csObject* theParent, int number, csMaterialWrapper* mat,
     UInt mixmode,
     bool lighted_particles, float drop_width, float drop_height, 
     const csVector3& rainbox_min, const csVector3& rainbox_max,
@@ -420,7 +420,7 @@ public:
     *   slant the particles in that case...
     * swirl: is the amount of swirl for a flake, 0.0 is like rain.
     */
-  csSnowParticleSystem(csObject* theParent, int number, csMaterialHandle* mat,
+  csSnowParticleSystem(csObject* theParent, int number, csMaterialWrapper* mat,
     UInt mixmode,
     bool lighted_particles, float drop_width, float drop_height, 
     const csVector3& rainbox_min, const csVector3& rainbox_max,
@@ -478,7 +478,7 @@ public:
     *   angles in radians (2*PI is 360 degrees)
     */
   csFountainParticleSystem(csObject* theParent, int number, 
-    csMaterialHandle* mat, UInt mixmode,
+    csMaterialWrapper* mat, UInt mixmode,
     bool lighted_particles, float drop_width, float drop_height, 
     const csVector3& spot, const csVector3& accel, float fall_time,
     float speed, float opening, float azimuth, float elevation
@@ -534,7 +534,7 @@ public:
     * color_scale scales the colour the particles are set to.
     */
   csFireParticleSystem(csObject* theParent, int number, 
-    csMaterialHandle* mat, UInt mixmode,
+    csMaterialWrapper* mat, UInt mixmode,
     bool lighted_particles, float drop_width, float drop_height, 
     float total_time, const csVector3& dir, const csVector3& origin,
     float swirl, float color_scale

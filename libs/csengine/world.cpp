@@ -864,7 +864,7 @@ void csWorld::PrepareTextures ()
   // First register all textures to the texture manager.
   for (i = 0; i < textures->Length (); i++)
   {
-    csTextureHandle *csth = textures->Get (i);
+    csTextureWrapper *csth = textures->Get (i);
     if (!csth->GetTextureHandle ())
       csth->Register (txtmgr);
   }
@@ -875,7 +875,7 @@ void csWorld::PrepareTextures ()
   // Then register all materials to the texture manager.
   for (i = 0; i < materials->Length (); i++)
   {
-    csMaterialHandle *csmh = materials->Get (i);
+    csMaterialWrapper *csmh = materials->Get (i);
     if (!csmh->GetMaterialHandle ())
       csmh->Register (txtmgr);
   }
@@ -1745,8 +1745,8 @@ bool csWorld::DeleteLibrary (const char *iName)
   DELETE_ALL_OBJECTS (sprite_templates, csSpriteTemplate)
   DELETE_ALL_OBJECTS (thing_templates, csThingTemplate)
   DELETE_ALL_OBJECTS (sectors, csSector)
-  DELETE_ALL_OBJECTS ((*textures), csTextureHandle)
-  DELETE_ALL_OBJECTS ((*materials), csMaterialHandle)
+  DELETE_ALL_OBJECTS ((*textures), csTextureWrapper)
+  DELETE_ALL_OBJECTS ((*materials), csMaterialWrapper)
 
 #undef DELETE_ALL_OBJECTS
 #define DELETE_ALL_OBJECTS(vector,type)				\
@@ -1806,7 +1806,7 @@ bool csWorld::CreateTexture (const char *iName, const char *iFileName,
   delete [] xname;
 
   // Okay, now create the respective texture handle object
-  csTextureHandle *tex = GetTextures ()->FindByName (iName);
+  csTextureWrapper *tex = GetTextures ()->FindByName (iName);
   if (tex)
     tex->SetImageFile (ifile);
   else

@@ -106,9 +106,10 @@ csPolygonSet::~csPolygonSet ()
 void csPolygonSet::Prepare ()
 {
   int i;
+  csPolygon3D* p;
   for (i = 0 ; i < polygons.Length () ; i++)
   {
-    csPolygon3D* p = polygons.Get (i);
+    p = polygons.Get (i);
     p->Finish ();
   }
 }
@@ -317,7 +318,7 @@ iPolygon3D *csPolygonSet::PolySet::GetPolygon (int idx)
   return QUERY_INTERFACE(scfParent->GetPolygon3D (idx), iPolygon3D);
 }
 
-csPolygon3D* csPolygonSet::NewPolygon (csMaterialHandle* material)
+csPolygon3D* csPolygonSet::NewPolygon (csMaterialWrapper* material)
 {
   csPolygon3D* p = new csPolygon3D (material);
   p->SetSector (sector);
@@ -327,7 +328,7 @@ csPolygon3D* csPolygonSet::NewPolygon (csMaterialHandle* material)
 
 iPolygon3D *csPolygonSet::PolySet::CreatePolygon (const char *iName)
 {
-  csPolygon3D *p = new csPolygon3D ((csMaterialHandle *)NULL);
+  csPolygon3D *p = new csPolygon3D ((csMaterialWrapper *)NULL);
   p->SetName (iName);
   p->SetSector (scfParent->sector);
   scfParent->AddPolygon (p);

@@ -109,7 +109,7 @@ void csParticleSystem::UpdateInPolygonTrees ()
 
 
 void csParticleSystem :: AppendRectSprite(float width, float height, 
-  csMaterialHandle *mat, bool lighted)
+  csMaterialWrapper *mat, bool lighted)
 {
   csSprite2D *part = new csSprite2D(this);
   //csWorld::current_world->sprites.Push(part);
@@ -129,7 +129,7 @@ void csParticleSystem :: AppendRectSprite(float width, float height,
 
 
 void csParticleSystem :: AppendRegularSprite(int n, float radius, 
-  csMaterialHandle* mat, bool lighted)
+  csMaterialWrapper* mat, bool lighted)
 {
   csSprite2D *part = new csSprite2D(this);
   //csWorld::current_world->sprites.Push(part);
@@ -283,7 +283,7 @@ static csVector3& GetRandomDirection (const csVector3& magnitude,
 //-- csSpiralParticleSystem ------------------------------------------
 
 csSpiralParticleSystem::csSpiralParticleSystem (csObject* theParent, int max,
-	const csVector3& source, csMaterialHandle* mat) : csNewtonianParticleSystem (theParent, max)
+	const csVector3& source, csMaterialWrapper* mat) : csNewtonianParticleSystem (theParent, max)
 {
   csSpiralParticleSystem::max = max;
   csSpiralParticleSystem::source = source;
@@ -393,7 +393,7 @@ void csNewtonianParticleSystem :: Update(cs_time elapsed_time)
 
 csParSysExplosion :: csParSysExplosion(csObject* theParent, int number_p, 
     const csVector3& explode_center, const csVector3& push, 
-    csMaterialHandle *mat, int nr_sides, float part_radius,
+    csMaterialWrapper *mat, int nr_sides, float part_radius,
     bool lighted_particles,
     float spread_pos, float spread_speed, float spread_accel)
     : csNewtonianParticleSystem(theParent, number_p)
@@ -504,7 +504,7 @@ void csParSysExplosion :: RemoveLight()
 
 //-- csRainParticleSystem --------------------------------------------------
 
-csRainParticleSystem :: csRainParticleSystem(csObject* theParent, int number, csMaterialHandle* mat, 
+csRainParticleSystem :: csRainParticleSystem(csObject* theParent, int number, csMaterialWrapper* mat, 
   UInt mixmode, bool lighted_particles, float drop_width, float drop_height,
   const csVector3& rainbox_min, const csVector3& rainbox_max, 
   const csVector3& fall_speed)
@@ -576,7 +576,7 @@ void csRainParticleSystem :: Update(cs_time elapsed_time)
 
 //-- csSnowParticleSystem --------------------------------------------------
 
-csSnowParticleSystem :: csSnowParticleSystem(csObject* theParent, int number, csMaterialHandle* mat, 
+csSnowParticleSystem :: csSnowParticleSystem(csObject* theParent, int number, csMaterialWrapper* mat, 
   UInt mixmode, bool lighted_particles, float drop_width, float drop_height,
   const csVector3& rainbox_min, const csVector3& rainbox_max, 
   const csVector3& fall_speed, float swirl)
@@ -659,7 +659,7 @@ void csSnowParticleSystem :: Update(cs_time elapsed_time)
 //-- csFountainParticleSystem --------------------------------------------------
 
 csFountainParticleSystem :: csFountainParticleSystem(csObject* theParent, 
-  int number, csMaterialHandle* mat, UInt mixmode, 
+  int number, csMaterialWrapper* mat, UInt mixmode, 
   bool lighted_particles, float drop_width, float drop_height,
   const csVector3& spot, const csVector3& accel, float fall_time,
   float speed, float opening, float azimuth, float elevation)
@@ -773,7 +773,7 @@ void csFountainParticleSystem :: Update(cs_time elapsed_time)
 //-- csFireParticleSystem --------------------------------------------------
 
 csFireParticleSystem :: csFireParticleSystem(csObject* theParent, 
-  int number, csMaterialHandle* mat, UInt mixmode, 
+  int number, csMaterialWrapper* mat, UInt mixmode, 
   bool lighted_particles, float drop_width, float drop_height,
   float total_time, const csVector3& dir, const csVector3& origin,
   float swirl, float color_scale

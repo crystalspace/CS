@@ -142,7 +142,7 @@ protected:
 protected:
 
   /// return the material handle
-  virtual csMaterialHandle* GetMaterialHandle() = 0;
+  virtual csMaterialWrapper* GetMaterialWrapper () = 0;
   
   /// return the flat color value
   virtual csColor GetFlatColor() const = 0;
@@ -294,8 +294,8 @@ private:
 
 protected:
   /// return the material handle for this polygon
-  virtual csMaterialHandle* GetMaterialHandle()
-  { return polygon->GetCsMaterialHandle (); }
+  virtual csMaterialWrapper * GetMaterialWrapper ()
+  { return polygon->GetMaterialWrapper (); }
 
   /// return the flat color for the polygons texture
   virtual csColor GetFlatColor() const;
@@ -340,7 +340,7 @@ private:
 
 protected:
   /// return the texture handle for this curve
-  virtual csMaterialHandle* GetMaterialHandle()
+  virtual csMaterialWrapper * GetMaterialWrapper ()
   { return curve->cstxt; }
 
   /// return the flat color for the polygons texture

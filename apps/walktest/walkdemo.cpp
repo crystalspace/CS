@@ -82,7 +82,7 @@ extern void move_sprite (csSprite3D* sprite, csSector* where,
 void add_particles_rain (csSector* sector, char* matname, int num, float speed)
 {
   // First check if the material exists.
-  csMaterialHandle* mat = Sys->view->GetWorld ()->GetMaterials ()->
+  csMaterialWrapper* mat = Sys->view->GetWorld ()->GetMaterials ()->
   	FindByName (matname);
   if (!mat)
   {
@@ -141,7 +141,7 @@ void add_particles_rain (csSector* sector, char* matname, int num, float speed)
 void add_particles_snow (csSector* sector, char* matname, int num, float speed)
 {
   // First check if the material exists.
-  csMaterialHandle* mat = Sys->view->GetWorld ()->GetMaterials ()->
+  csMaterialWrapper* mat = Sys->view->GetWorld ()->GetMaterials ()->
   	FindByName (matname);
   if (!mat)
   {
@@ -201,7 +201,7 @@ void add_particles_fire (csSector* sector, char* matname, int num,
 	const csVector3& origin)
 {
   // First check if the material exists.
-  csMaterialHandle* mat = Sys->view->GetWorld ()->GetMaterials ()->
+  csMaterialWrapper* mat = Sys->view->GetWorld ()->GetMaterials ()->
   	FindByName (matname);
   if (!mat)
   {
@@ -224,7 +224,7 @@ void add_particles_fountain (csSector* sector, char* matname, int num,
 	const csVector3& origin)
 {
   // First check if the material exists.
-  csMaterialHandle* mat = Sys->view->GetWorld ()->GetMaterials ()->
+  csMaterialWrapper* mat = Sys->view->GetWorld ()->GetMaterials ()->
   	FindByName (matname);
   if (!mat)
   {
@@ -250,7 +250,7 @@ void add_particles_fountain (csSector* sector, char* matname, int num,
 void add_particles_explosion (csSector* sector, const csVector3& center, char* matname)
 {
   // First check if the material exists.
-  csMaterialHandle* mat = Sys->view->GetWorld ()->GetMaterials ()->
+  csMaterialWrapper* mat = Sys->view->GetWorld ()->GetMaterials ()->
   	FindByName (matname);
   if (!mat)
   {
@@ -278,7 +278,7 @@ void add_particles_explosion (csSector* sector, const csVector3& center, char* m
 void add_particles_spiral (csSector* sector, const csVector3& bottom, char* matname)
 {
   // First check if the material exists.
-  csMaterialHandle* mat = Sys->view->GetWorld ()->GetMaterials ()->
+  csMaterialWrapper* mat = Sys->view->GetWorld ()->GetMaterials ()->
   	FindByName (matname);
   if (!mat)
   {

@@ -26,7 +26,7 @@ class csWorld;
 class Sparse3D;
 class WideSparse3D;
 class csSector;
-class csMaterialHandle;
+class csMaterialWrapper;
 class csPolygon3D;
 
 /**
@@ -56,7 +56,7 @@ public:
 
   ///
   void create_one_side (csSector* room, char* pname,
-	csMaterialHandle* tm, csMaterialHandle* tm2,
+	csMaterialWrapper* tm, csMaterialWrapper* tm2,
 	float x1, float y1, float z1,
 	float x2, float y2, float z2,
 	float x3, float y3, float z3,

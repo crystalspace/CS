@@ -282,7 +282,7 @@ void csSpriteTemplate::SetMaterial (csMaterialList* materials, const char *matna
     fatal_exit (0, true);
     return;
   }
-  csMaterialHandle* material = materials->FindByName (matname);
+  csMaterialWrapper* material = materials->FindByName (matname);
   if (material == NULL)
   {
     CsPrintf (MSG_FATAL_ERROR, "Couldn't find material named '%s'!\n", matname);
@@ -632,7 +632,7 @@ void csSprite3D::SetTemplate (csSpriteTemplate* tmpl)
 void csSprite3D::SetMaterial (const char* name, csMaterialList* materials)
 {
   force_otherskin = true;
-  csMaterialHandle* material = materials->FindByName (name);
+  csMaterialWrapper* material = materials->FindByName (name);
   if (material == NULL)
   {
     CsPrintf (MSG_FATAL_ERROR, "Couldn't find material named '%s'!\n", name);

@@ -38,7 +38,7 @@
 class csSector;
 class StatLight;
 class CLights;
-class csMaterialHandle;
+class csMaterialWrapper;
 class csPolyPlane;
 class csPolyTxtPlane;
 class csPolygon2D;
@@ -366,7 +366,7 @@ private:
 
 public:
   /// Setup for the given polygon and material.
-  void Setup (csPolygon3D* poly3d, csMaterialHandle* math);
+  void Setup (csPolygon3D* poly3d, csMaterialWrapper* math);
 
   /// Return a type for the kind of texturing used.
   virtual int GetTextureType () { return POLYTXT_LIGHTMAP; }
@@ -498,7 +498,7 @@ private:
    * The material, this contains the texture handle,
    * the flat color (if no texture) and other parameters.
    */
-  csMaterialHandle* material;
+  csMaterialWrapper* material;
 
   /**
    * General lighting information for this polygon.
@@ -576,7 +576,7 @@ public:
   /**
    * Construct a new polygon with the given material. 
    */
-  csPolygon3D (csMaterialHandle *mat);
+  csPolygon3D (csMaterialWrapper *mat);
 
   /**
    * Construct a new polygon and copy from the given polygon.
@@ -824,12 +824,12 @@ public:
    * until finally csWorld::Prepare() is called (which in the end
    * calls Finish() for every polygon).
    */
-  void SetMaterial (csMaterialHandle* material);
+  void SetMaterial (csMaterialWrapper* material);
 
   /**
    * Get the material.
    */
-  csMaterialHandle* GetCsMaterialHandle () { return material; }
+  csMaterialWrapper* GetMaterialWrapper () { return material; }
 
   /**
    * Return true if this polygon or the texture it uses is transparent.

@@ -117,7 +117,7 @@ private:
   // sector of this curve
   csSector* sector;
 
-  csMaterialHandle* cstxt;
+  csMaterialWrapper* cstxt;
   // Pointer to the parent template.
   csCurveTemplate* parent_template;
   
@@ -210,7 +210,7 @@ public:
   ///
   iMaterialHandle* GetMaterialHandle () { return cstxt ? cstxt->GetMaterialHandle () : (iMaterialHandle*)NULL; }
   ///
-  void SetMaterialHandle (csMaterialHandle* h) { cstxt = h; }
+  void SetMaterialWrapper (csMaterialWrapper* h) { cstxt = h; }
 
   /// Return a bounding box in object space for this curve.
   virtual void GetObjectBoundingBox (csBox3& bbox) = 0;
@@ -278,7 +278,7 @@ class csCurveTemplate : public csObject
 protected:
   csThingTemplate *parent;
 
-  csMaterialHandle* cstxt;
+  csMaterialWrapper* cstxt;
 
 public:
   ///
@@ -297,9 +297,9 @@ public:
   ///
   virtual int NumVertices () = 0;
   ///
-  csMaterialHandle* GetMaterialHandle () { return cstxt; }
+  csMaterialWrapper* GetMaterialWrapper () { return cstxt; }
   ///
-  void SetMaterialHandle (csMaterialHandle* h) { cstxt = h; }
+  void SetMaterialWrapper (csMaterialWrapper* h) { cstxt = h; }
 
   CSOBJTYPE;
 };

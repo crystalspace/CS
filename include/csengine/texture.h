@@ -29,10 +29,10 @@ struct iTextureHandle;
 struct iImage;
 
 /**
- * csTextureHandle represents a texture and its link
+ * csTextureWrapper represents a texture and its link
  * to the iTextureHandle as returned by iTextureManager.
  */
-class csTextureHandle : public csObject
+class csTextureWrapper : public csObject
 {
 private:
   /// The corresponding iImage.
@@ -47,19 +47,19 @@ public:
   int flags;
 
   /// Construct a texture handle given a image file
-  csTextureHandle (iImage* Image);
+  csTextureWrapper (iImage* Image);
 
   /**
-   * Construct a csTextureHandle from a pre-registered AND prepared texture 
+   * Construct a csTextureWrapper from a pre-registered AND prepared texture 
    * handle. The engine takes over responsibility for destroying the texture
    * handle. To prevent this IncRef () the texture handle.
    */
-  csTextureHandle (iTextureHandle *ith);
+  csTextureWrapper (iTextureHandle *ith);
 
   /// Copy constructor
-  csTextureHandle (csTextureHandle &th);
+  csTextureWrapper (csTextureWrapper &th);
   /// Release texture handle
-  virtual ~csTextureHandle ();
+  virtual ~csTextureWrapper ();
 
   /// Get the texture handle.
   iTextureHandle* GetTextureHandle () { return handle; }
@@ -95,21 +95,21 @@ public:
   virtual ~csTextureList ();
 
   /// Create a new texture.
-  csTextureHandle *NewTexture (iImage *image);
+  csTextureWrapper *NewTexture (iImage *image);
 
   /**
    * Create a engine wrapper for a pre-prepared iTextureHandle
    * The handle will be IncRefed
    */
-  csTextureHandle *NewTexture (iTextureHandle *ith);
+  csTextureWrapper *NewTexture (iTextureHandle *ith);
 
   /// Return texture by index
-  csTextureHandle *Get (int idx)
-  { return (csTextureHandle *)csNamedObjVector::Get (idx); }
+  csTextureWrapper *Get (int idx)
+  { return (csTextureWrapper *)csNamedObjVector::Get (idx); }
 
   /// Find a texture by name
-  csTextureHandle *FindByName (const char* iName)
-  { return (csTextureHandle *)csNamedObjVector::FindByName (iName); }
+  csTextureWrapper *FindByName (const char* iName)
+  { return (csTextureWrapper *)csNamedObjVector::FindByName (iName); }
 };
 
 #endif // __TEXTURE_H__

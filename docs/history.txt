@@ -99,6 +99,17 @@ The history order has been reversed so that new features are at the top.
 	      accepted as a synonym; one day TEXNR should die.
 	- Norman Kramer updated the win32gcc.txi documentation to make it
 	  a little clearer.
+	- The big change from Andrew triggered a strange behaviour in
+	  the dynamic linker (dlopen) on Unix. Andrew renamed csMaterialMM
+	  in the texture manager to csMaterialHandle. However csMaterialHandle
+	  is already another class in the engine. When loading the software
+	  renderer dynamically it will use the already loaded csMaterialHandle
+	  in the application which is wrong. I fixed this by renaming
+	  csMaterialHandle in the engine to csMaterialWrapper. Not only does
+	  this solve the problem but it is actually also a better name.
+	  I also renamed csTextureHandle to csTextureWrapper and replace
+	  Get/Set MaterialHandle with Get/Set MaterialWrapper in various
+	  places. No doubt you'll have to modify your applications for this.
 20-Aug-2000
 	- Norman Kramer updated the install documentation for the win32gcc
 	  target.

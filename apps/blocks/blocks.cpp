@@ -425,7 +425,7 @@ csMatrix3 Blocks::create_rotate_z (float angle)
 }
 
 csPolygonTemplate* add_polygon_template (csThingTemplate* tmpl,
-	char* name, csMaterialHandle* material,
+	char* name, csMaterialWrapper* material,
 	int vt0, int vt1, int vt2, int vt3 = -1)
 {
   csPolygonTemplate* p;
@@ -618,7 +618,7 @@ void Blocks::add_hrast (int x, int y, float dx, float dy, float rot_z)
   hrast->Transform ();
 }
 
-void Blocks::ChangeThingMaterial (csThing* thing, csMaterialHandle* mat)
+void Blocks::ChangeThingMaterial (csThing* thing, csMaterialWrapper* mat)
 {
   for (int i = 0 ; i < thing->GetNumPolygons () ; i++)
   {
@@ -1418,7 +1418,7 @@ void Blocks::rotate_shape_internal (const csMatrix3& rot)
   shift_rotate = new_shift_rot;
 }
 
-csMaterialHandle* Blocks::GetMaterialForHeight (int z)
+csMaterialWrapper* Blocks::GetMaterialForHeight (int z)
 {
   switch (z % 4)
   {
@@ -1831,7 +1831,7 @@ void Blocks::DrawMenu (float menu_trans, float menu_hor_trans, int old_menu,
 
 void Blocks::CreateMenuEntry (const char* mat, int menu_nr)
 {
-  csMaterialHandle* tm_front = world->GetMaterials ()->FindByName (mat);
+  csMaterialWrapper* tm_front = world->GetMaterials ()->FindByName (mat);
   csThing* thing = new csThing (world);
 
   thing->AddVertex (-1, .25, 0);
@@ -1862,7 +1862,7 @@ void Blocks::CreateMenuEntry (const char* mat, int menu_nr)
 
 csThing* Blocks::CreateMenuArrow (bool left)
 {
-  csMaterialHandle* tm_front = world->GetMaterials ()->FindByName ("menu_back");
+  csMaterialWrapper* tm_front = world->GetMaterials ()->FindByName ("menu_back");
   csThing* thing = new csThing (world);
 
   float pointx;
@@ -1976,7 +1976,7 @@ void Blocks::StartKeyConfig ()
 
 void Blocks::InitGameRoom ()
 {
-  csMaterialHandle* tm = world->GetMaterials ()->FindByName ("room");
+  csMaterialWrapper* tm = world->GetMaterials ()->FindByName ("room");
   room = Sys->world->NewSector ();
   room->SetName ("room");
   Sys->set_cube_room (room);
@@ -2051,7 +2051,7 @@ void Blocks::InitGameRoom ()
 
 void Blocks::InitDemoRoom ()
 {
-  csMaterialHandle* demo_tm = world->GetMaterials ()->FindByName ("clouds");
+  csMaterialWrapper* demo_tm = world->GetMaterials ()->FindByName ("clouds");
   demo_room = Sys->world->NewSector ();
   demo_room->SetName ("room");
 

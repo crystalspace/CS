@@ -26,16 +26,16 @@
 
 //---------------------------------------------------------------------------
 
-IMPLEMENT_CSOBJTYPE (csTextureHandle,csObject);
+IMPLEMENT_CSOBJTYPE (csTextureWrapper,csObject);
 
-csTextureHandle::csTextureHandle (iImage* Image) :
+csTextureWrapper::csTextureWrapper (iImage* Image) :
   csObject (), handle (NULL), flags (CS_TEXTURE_3D)
 {
   (image = Image)->IncRef ();
   key_col_r = -1;
 }
 
-csTextureHandle::csTextureHandle (csTextureHandle &th) :
+csTextureWrapper::csTextureWrapper (csTextureWrapper &th) :
   csObject (), handle (NULL)
 {
   flags = th.flags;
@@ -49,7 +49,7 @@ csTextureHandle::csTextureHandle (csTextureHandle &th) :
     SetKeyColor (key_col_r, key_col_g, key_col_b);
 }
 
-csTextureHandle::csTextureHandle (iTextureHandle *ith) :
+csTextureWrapper::csTextureWrapper (iTextureHandle *ith) :
   csObject (), image (NULL)
 {
   ith->IncRef ();
@@ -63,7 +63,7 @@ csTextureHandle::csTextureHandle (iTextureHandle *ith) :
   handle = ith;
 }
 
-csTextureHandle::~csTextureHandle ()
+csTextureWrapper::~csTextureWrapper ()
 {
   if (handle)
     handle->DecRef ();
@@ -71,14 +71,14 @@ csTextureHandle::~csTextureHandle ()
     image->DecRef ();
 }
 
-void csTextureHandle::SetImageFile (iImage *Image)
+void csTextureWrapper::SetImageFile (iImage *Image)
 {
   if (image)
     image->DecRef ();
   (image = Image)->IncRef ();
 }
 
-void csTextureHandle::SetKeyColor (int red, int green, int blue)
+void csTextureWrapper::SetKeyColor (int red, int green, int blue)
 {
   if (handle)
     if (red >= 0)
@@ -90,7 +90,7 @@ void csTextureHandle::SetKeyColor (int red, int green, int blue)
   key_col_b = blue;
 }
 
-void csTextureHandle::Register (iTextureManager *txtmgr)
+void csTextureWrapper::Register (iTextureManager *txtmgr)
 {
   // smgh 22/07/00
   //if (handle) handle->DecRef ();
@@ -123,16 +123,16 @@ csTextureList::~csTextureList ()
   DeleteAll ();
 }
 
-csTextureHandle *csTextureList::NewTexture (iImage *image)
+csTextureWrapper *csTextureList::NewTexture (iImage *image)
 {
-  csTextureHandle *tm = new csTextureHandle (image);
+  csTextureWrapper *tm = new csTextureWrapper (image);
   Push (tm);
   return tm;
 }
 
-csTextureHandle *csTextureList::NewTexture (iTextureHandle *ith)
+csTextureWrapper *csTextureList::NewTexture (iTextureHandle *ith)
 {
-  csTextureHandle *tm = new csTextureHandle (ith);
+  csTextureWrapper *tm = new csTextureWrapper (ith);
   Push (tm);
   return tm;
 }

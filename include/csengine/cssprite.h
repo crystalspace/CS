@@ -38,7 +38,7 @@
 
 class Dumper;
 class csMaterialList;
-class csMaterialHandle;
+class csMaterialWrapper;
 class csLightHitsSprite;
 class csSkeleton;
 class csSkeletonState;
@@ -147,7 +147,7 @@ private:
   friend class csSprite3D;
 
   /// Material handle as returned by iTextureManager.
-  csMaterialHandle* cstxt;
+  csMaterialWrapper* cstxt;
 
   /// An optional skeleton.
   csSkeleton* skeleton;
@@ -301,7 +301,7 @@ public:
   { return (csSpriteAction *)actions [No]; }
 
   /// Get the material
-  csMaterialHandle* GetMaterial () const { return cstxt; }
+  csMaterialWrapper* GetMaterial () const { return cstxt; }
   /// Get the material handle.
   iMaterialHandle* GetMaterialHandle () const { return cstxt->GetMaterialHandle (); }
   /// Set the material used for this sprite
@@ -624,7 +624,7 @@ private:
   csSpriteTemplate* tpl;
 
   /// The material handle as returned by iTextureManager.
-  csMaterialHandle* cstxt;
+  csMaterialWrapper* cstxt;
 
   /// The current frame number.
   int cur_frame;

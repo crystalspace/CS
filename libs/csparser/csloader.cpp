@@ -667,7 +667,7 @@ csParticleSystem* csLoader::load_fountain (char* name, char* buf)
 
   char str[255];
   int number = 50;
-  csMaterialHandle* material = NULL;
+  csMaterialWrapper* material = NULL;
   UInt mixmode = CS_FX_ADD;
   int lighted_particles = 0;
   float drop_width = .1;
@@ -773,7 +773,7 @@ csParticleSystem* csLoader::load_fire (char* name, char* buf)
 
   char str[255];
   int number = 50;
-  csMaterialHandle* material = NULL;
+  csMaterialWrapper* material = NULL;
   UInt mixmode = CS_FX_ADD;
   int lighted_particles = 0;
   float drop_width = .1;
@@ -863,7 +863,7 @@ csParticleSystem* csLoader::load_rain (char* name, char* buf)
 
   char str[255];
   int number = 400;
-  csMaterialHandle* material = NULL;
+  csMaterialWrapper* material = NULL;
   UInt mixmode = CS_FX_ADD;
   int lighted_particles = 0;
   float drop_width = .3/50.;
@@ -951,7 +951,7 @@ csParticleSystem* csLoader::load_snow (char* name, char* buf)
 
   char str[255];
   int number = 400;
-  csMaterialHandle* material = NULL;
+  csMaterialWrapper* material = NULL;
   UInt mixmode = CS_FX_ADD;
   int lighted_particles = 0;
   float drop_width = .1;
@@ -1375,7 +1375,7 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
 
   thing->SetSector (sec);
   csReversibleTransform obj;
-  csMaterialHandle* material = NULL;
+  csMaterialWrapper* material = NULL;
   bool is_convex = false;
   float tscale = 1;
   int i;
@@ -1530,7 +1530,7 @@ csThing* csLoader::load_sixface (char* name, char* buf, csSector* sec)
     ObName poly;
     int v1, v2, v3, v4;
     int tv1, tv2;
-    csMaterialHandle* material;
+    csMaterialWrapper* material;
   };
   Todo todo[100];
   int done = 0;
@@ -1772,7 +1772,7 @@ csThing* csLoader::load_thing (char* name, char* buf, csSector* sec)
 //---------------------------------------------------------------------------
 
 csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
-  csMaterialHandle* default_material, float default_texlen,
+  csMaterialWrapper* default_material, float default_texlen,
   CLights* default_lightx, csSector* sec, csPolygonSet* parent)
 {
   TOKEN_TABLE_START (commands)
@@ -1837,7 +1837,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
   csPolygon3D *poly3d = new csPolygon3D (default_material);
   poly3d->SetName (polyname);
 
-  csMaterialHandle* mat = NULL;
+  csMaterialWrapper* mat = NULL;
   poly3d->SetSector (sec);
   poly3d->SetParent (parent);
 
@@ -2223,7 +2223,7 @@ csPolygon3D* csLoader::load_poly3d (char* polyname, char* buf,
 
 
 csCurve* csLoader::load_bezier (char* polyname, char* buf,
-  csMaterialHandle* default_material, float default_texlen,
+  csMaterialWrapper* default_material, float default_texlen,
   CLights* default_lightx, csSector* sec, csPolygonSet* parent)
 {
   TOKEN_TABLE_START (commands)
@@ -2256,9 +2256,9 @@ csCurve* csLoader::load_bezier (char* polyname, char* buf,
 
   csBezierCurve *curve = new csBezierCurve (NULL);
   curve->SetName (polyname);
-  curve->SetMaterialHandle (default_material);
+  curve->SetMaterialWrapper (default_material);
   curve->SetSector(sec);
-  csMaterialHandle* mat = NULL;
+  csMaterialWrapper* mat = NULL;
 //TODO??  poly3d->SetSector(sec);
 //TODO??  poly3d->SetParent (parent);
 
@@ -2294,7 +2294,7 @@ csCurve* csLoader::load_bezier (char* polyname, char* buf,
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
           fatal_exit (0, true);
         }
-        curve->SetMaterialHandle (mat);
+        curve->SetMaterialWrapper (mat);
         break;
       case TOKEN_TEXTURE:
         while ((cmd = csGetObject (&params, tex_commands, &name, &params2)) > 0)
@@ -2519,10 +2519,10 @@ void csLoader::txt_process (char *name, char* buf, const char* prefix)
 
   // Add a default material with the same name as the texture.
   csMaterial* material = new csMaterial ();
-  csMaterialHandle* mat = World->GetMaterials ()->NewMaterial (material);
+  csMaterialWrapper* mat = World->GetMaterials ()->NewMaterial (material);
 
-  csTextureHandle *tex = World->GetTextures ()->NewTexture (image);
-  material->SetTextureHandle (tex);
+  csTextureWrapper *tex = World->GetTextures ()->NewTexture (image);
+  material->SetTextureWrapper (tex);
   tex->flags = flags;
   if (prefix)
   {
@@ -2572,9 +2572,9 @@ void csLoader::mat_process (char *name, char* buf)
       case TOKEN_TEXTURE:
       {
         ScanStr (params, "%s", str);
-        csTextureHandle *texh = World->GetTextures ()->FindByName (str);
+        csTextureWrapper *texh = World->GetTextures ()->FindByName (str);
         if (texh)
-          material->SetTextureHandle (texh);
+          material->SetTextureWrapper (texh);
         else
         {
           CsPrintf (MSG_FATAL_ERROR, "Cannot find texture `%s' for material `%s'\n", str, name);
@@ -2606,7 +2606,7 @@ void csLoader::mat_process (char *name, char* buf)
     fatal_exit (0, false);
   }
 
-  csMaterialHandle *mat = World->GetMaterials ()->NewMaterial (material);
+  csMaterialWrapper *mat = World->GetMaterials ()->NewMaterial (material);
   mat->SetName (name);
   // dereference material since mat already incremented it
   material->DecRef ();
@@ -2615,7 +2615,7 @@ void csLoader::mat_process (char *name, char* buf)
 //---------------------------------------------------------------------------
 
 csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
-  csMaterialHandle* default_material, float default_texlen,
+  csMaterialWrapper* default_material, float default_texlen,
   csThingTemplate* parent)
 {
   TOKEN_TABLE_START (commands)
@@ -2660,7 +2660,7 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
 
   csPolygonTemplate *ptemplate =
               new csPolygonTemplate(parent, ptname, default_material);
-  csMaterialHandle* mat;
+  csMaterialWrapper* mat;
   if (default_material == NULL) mat = NULL;
   else ptemplate->SetMaterial (default_material);
 
@@ -2871,7 +2871,7 @@ csPolygonTemplate* csLoader::load_ptemplate (char* ptname, char* buf,
 }
 
 csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
-  csMaterialHandle* default_material, float default_texlen,
+  csMaterialWrapper* default_material, float default_texlen,
   csThingTemplate* parent)
 {
   TOKEN_TABLE_START (commands)
@@ -2905,9 +2905,9 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
 
   ptemplate->SetParent (parent);
 
-  csMaterialHandle* mat;
+  csMaterialWrapper* mat;
   if (default_material == NULL) mat = NULL;
-  else ptemplate->SetMaterialHandle (default_material);
+  else ptemplate->SetMaterialWrapper (default_material);
 
   bool tx1_given = false, tx2_given = false;
   csVector3 tx_orig (0, 0, 0), tx1 (0, 0, 0), tx2 (0, 0, 0);
@@ -2940,7 +2940,7 @@ csCurveTemplate* csLoader::load_beziertemplate (char* ptname, char* buf,
           CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
           fatal_exit (0, true);
         }
-        ptemplate->SetMaterialHandle (mat);
+        ptemplate->SetMaterialWrapper (mat);
         break;
       case TOKEN_TEXTURE:
         while ((cmd = csGetObject (&params, tex_commands, &name, &params2)) > 0)
@@ -3068,7 +3068,7 @@ csThingTemplate* csLoader::load_thingtpl (char* tname, char* buf)
   tmpl->SetName (tname);
   long cmd;
   char* params;
-  csMaterialHandle* default_material = NULL;
+  csMaterialWrapper* default_material = NULL;
   float default_texlen = 1.;
 
   csMatrix3 m_move;
@@ -3237,7 +3237,7 @@ csThingTemplate* csLoader::load_sixtpl (char* tname, char* buf)
   csThingTemplate* tmpl = new csThingTemplate ();
   tmpl->SetName (tname);
 
-  csMaterialHandle* material = NULL;
+  csMaterialWrapper* material = NULL;
   float tscale = 1;
 
   csVector3 v0 (-1,  1,  1);
@@ -3369,7 +3369,7 @@ csThingTemplate* csLoader::load_sixtpl (char* tname, char* buf)
     ObName poly;
     int v1, v2, v3, v4;
     int tv1, tv2;
-    csMaterialHandle* material;
+    csMaterialWrapper* material;
   };
   Todo todo[100];
   int done = 0;
@@ -3497,7 +3497,7 @@ struct Color
   Color () { len = 0; }
   ObName poly;
   ObName plane;
-  csMaterialHandle* material;
+  csMaterialWrapper* material;
   float len;
 };
 
@@ -3512,14 +3512,14 @@ struct Todo
   ObName poly;
   int v1, v2, v3, v4;
   int tv1, tv2;
-  csMaterialHandle* material;
+  csMaterialWrapper* material;
   int col_idx;          // Idx in colors table if there was an override.
   CLights* light;       // A dynamic light for this polygon
 };
 
 void add_to_todo (Todo* todo, int& todo_end, char* poly,
         int v1, int v2, int v3, int v4, int tv1, int tv2,
-        csMaterialHandle* material, int col_idx,
+        csMaterialWrapper* material, int col_idx,
         CLights* light,
         Color* colors, int num_colors,
         DLight* dlights, int num_light)
@@ -3673,7 +3673,7 @@ csSector* csLoader::load_room (char* secname, char* buf)
 
   csMatrix3 mm;
   csVector3 vm (0, 0, 0);
-  csMaterialHandle* material = NULL;
+  csMaterialWrapper* material = NULL;
   float tscale = 1;
   int no_lighting = false;
 
@@ -4304,7 +4304,7 @@ csSector* csLoader::load_sector (char* secname, char* buf)
 }
 
 void csLoader::skydome_process (csSector& sector, char* name, char* buf,
-        csMaterialHandle* material)
+        csMaterialWrapper* material)
 {
   TOKEN_TABLE_START (commands)
     TOKEN_TABLE (RADIUS)
@@ -4561,11 +4561,11 @@ void csLoader::terrain_process (csSector& sector, char* name, char* buf)
   int num_mat = terr->GetNumMaterials ();
   int i;
   char matname[256];
-  csMaterialHandle* first_mat = NULL;
+  csMaterialWrapper* first_mat = NULL;
   for (i = 0 ; i < num_mat ; i++)
   {
     sprintf (matname, texturebasename, i);
-    csMaterialHandle* mat = World->GetMaterials ()->FindByName (matname);
+    csMaterialWrapper* mat = World->GetMaterials ()->FindByName (matname);
     if (mat == NULL) mat = first_mat;
     first_mat = mat;
     terr->SetMaterial (i, mat);
@@ -5023,21 +5023,21 @@ bool csLoader::LoadLibraryFile (csWorld* world, const char* fname)
   return retcode;
 }
 
-csTextureHandle* csLoader::LoadTexture (csWorld* world, const char* name, const char* fname)
+csTextureWrapper* csLoader::LoadTexture (csWorld* world, const char* name, const char* fname)
 {
   World = world;
   iImage *image = load_image (fname);
   if (!image)
     return NULL;
-  csTextureHandle *th = world->GetTextures ()->NewTexture (image);
+  csTextureWrapper *th = world->GetTextures ()->NewTexture (image);
   th->SetName (name);
   // dereference image pointer since th already incremented it
   image->DecRef ();
 
   csMaterial* material = new csMaterial ();
-  csMaterialHandle* mat = World->GetMaterials ()->NewMaterial (material);
+  csMaterialWrapper* mat = World->GetMaterials ()->NewMaterial (material);
   mat->SetName (name);
-  material->SetTextureHandle (th);
+  material->SetTextureWrapper (th);
   material->DecRef ();
 
   return th;
@@ -5541,7 +5541,7 @@ bool csLoader::LoadSprite (csSprite2D* spr, char* buf)
       case TOKEN_MATERIAL:
         {
           ScanStr (params, "%s", str);
-          csMaterialHandle* mat = World->GetMaterials ()->FindByName (str);
+          csMaterialWrapper* mat = World->GetMaterials ()->FindByName (str);
           if (mat == NULL)
           {
             CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", params);

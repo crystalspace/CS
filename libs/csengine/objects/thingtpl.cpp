@@ -84,7 +84,7 @@ void csThingTemplate::AddCurveVertex (csVector3& v, csVector2& t)
 //---------------------------------------------------------------------------
 
 csPolygonTemplate::csPolygonTemplate (csThingTemplate* iParent, char* iName,
-  csMaterialHandle* iMaterial)
+  csMaterialWrapper* iMaterial)
   : flags (CS_POLY_LIGHTING | CS_POLYTPL_TEXMODE_LIGHTMAP | CS_POLYTPL_TEXMODE_LIGHTMAP)
 {
   parent = iParent;

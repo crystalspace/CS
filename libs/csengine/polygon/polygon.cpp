@@ -68,7 +68,7 @@ csPolyTexLightMap::~csPolyTexLightMap ()
   if (txt_plane) txt_plane->DecRef ();
 }
 
-void csPolyTexLightMap::Setup (csPolygon3D* poly3d, csMaterialHandle* mat)
+void csPolyTexLightMap::Setup (csPolygon3D* poly3d, csMaterialWrapper* mat)
 {
   tex->SetPolygon (poly3d);
   tex->SetMaterialHandle (mat->GetMaterialHandle ());
@@ -199,7 +199,7 @@ IMPLEMENT_EMBEDDED_IBASE (csPolygon3D::eiPolygon3D)
   IMPLEMENTS_INTERFACE (iPolygon3D)
 IMPLEMENT_EMBEDDED_IBASE_END
 
-csPolygon3D::csPolygon3D (csMaterialHandle* material) : csPolygonInt (),
+csPolygon3D::csPolygon3D (csMaterialWrapper* material) : csPolygonInt (),
   csObject (), vertices (4)
 {
   CONSTRUCT_IBASE (NULL);
@@ -445,7 +445,7 @@ bool csPolygon3D::Overlaps (csPolygonInt* overlapped)
   return false;
 }
 
-void csPolygon3D::SetMaterial (csMaterialHandle* material)
+void csPolygon3D::SetMaterial (csMaterialWrapper* material)
 {
   csPolygon3D::material = material;
 }

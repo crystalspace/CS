@@ -160,12 +160,12 @@ csSpriteTemplate *ivconbuild_Quake2csSpriteTemplate(Archive &pakarchive)
 // load textures from a quake-pakked file.  All textures will have
 // their names prefixed by the prefixstring if it is non-NULL
 // returns the 'default' texture for the sprite in this file
-csTextureHandle *ivconload_Quake2Textures(csWorld *world,Archive &pakarchive,char *prefixstring)
+csTextureWrapper *ivconload_Quake2Textures(csWorld *world,Archive &pakarchive,char *prefixstring)
 {
   // go through and load all .pcx and .bmp files in the archive
   void *currententry = pakarchive.first_file();
 
-  csTextureHandle *defaulttexture = NULL;
+  csTextureWrapper *defaulttexture = NULL;
 
   while (currententry != NULL)
   {
@@ -353,7 +353,7 @@ csSpriteTemplate *csCrossBuild_Quake2Importer::Import_Quake2File (
     lastslash = '\0';
   }
 
-  csTextureHandle *defaultskin = Import_Quake2Textures (skinpath,
+  csTextureWrapper *defaultskin = Import_Quake2Textures (skinpath,
     modelname, importdestination);
   
   newtemplate->SetTexture (importdestination->GetTextures (),
@@ -405,14 +405,14 @@ csSpriteTemplate *csCrossBuild_Quake2Importer::Import_Quake2SpriteTemplate(
   return NULL;
 }
 
-csTextureHandle *csCrossBuild_Quake2Importer::Import_Quake2Textures (
+csTextureWrapper *csCrossBuild_Quake2Importer::Import_Quake2Textures (
   char *skinpath, char *modelname, csWorld *importdestination) const
 {
   // go through and load all .pcx and .bmp files in the archive
   iStrVector *skinlist = localVFS.FindFiles(skinpath);
   int const skinfilecount = skinlist->Length();
 
-  csTextureHandle *defaulttexture = NULL;
+  csTextureWrapper *defaulttexture = NULL;
 
   for (int skinfileindex = 0; skinfileindex < skinfilecount; skinfileindex++)
   {
