@@ -4331,6 +4331,8 @@ class iTextureWrapper(iBase):
     def IsVisitRequired(*args): return _cspace.iTextureWrapper_IsVisitRequired(*args)
     def SetKeepImage(*args): return _cspace.iTextureWrapper_SetKeepImage(*args)
     def KeepImage(*args): return _cspace.iTextureWrapper_KeepImage(*args)
+    def SetTextureClass(*args): return _cspace.iTextureWrapper_SetTextureClass(*args)
+    def GetTextureClass(*args): return _cspace.iTextureWrapper_GetTextureClass(*args)
     def __del__(self, destroy=_cspace.delete_iTextureWrapper):
         try:
             if self.thisown: destroy(self)
@@ -9199,7 +9201,7 @@ class iTextureHandle(iBase):
     CS_TEXTURE_CUBE_NEG_Y = _cspace.iTextureHandle_CS_TEXTURE_CUBE_NEG_Y
     CS_TEXTURE_CUBE_POS_Z = _cspace.iTextureHandle_CS_TEXTURE_CUBE_POS_Z
     CS_TEXTURE_CUBE_NEG_Z = _cspace.iTextureHandle_CS_TEXTURE_CUBE_NEG_Z
-    def GetMipMapDimensions(*args): return _cspace.iTextureHandle_GetMipMapDimensions(*args)
+    def GetRendererDimensions(*args): return _cspace.iTextureHandle_GetRendererDimensions(*args)
     def GetOriginalDimensions(*args): return _cspace.iTextureHandle_GetOriginalDimensions(*args)
     def SetTextureTarget(*args): return _cspace.iTextureHandle_SetTextureTarget(*args)
     def GetTextureTarget(*args): return _cspace.iTextureHandle_GetTextureTarget(*args)
@@ -9210,9 +9212,10 @@ class iTextureHandle(iBase):
     def SetCacheData(*args): return _cspace.iTextureHandle_SetCacheData(*args)
     def GetPrivateObject(*args): return _cspace.iTextureHandle_GetPrivateObject(*args)
     def GetAlphaMap(*args): return _cspace.iTextureHandle_GetAlphaMap(*args)
-    def GetCanvas(*args): return _cspace.iTextureHandle_GetCanvas(*args)
     def GetAlphaType(*args): return _cspace.iTextureHandle_GetAlphaType(*args)
     def Precache(*args): return _cspace.iTextureHandle_Precache(*args)
+    def SetTextureClass(*args): return _cspace.iTextureHandle_SetTextureClass(*args)
+    def GetTextureClass(*args): return _cspace.iTextureHandle_GetTextureClass(*args)
     def __del__(self, destroy=_cspace.delete_iTextureHandle):
         try:
             if self.thisown: destroy(self)
