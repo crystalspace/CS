@@ -89,7 +89,7 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent, iMeshObject* mesh)
   is_visible = false;
   wor_bbox_movablenr = -1;
   Parent = theParent;
-  movable.SetMeshWrapper (&scfiMeshWrapper);
+  movable.SetMeshWrapper (this);
   if (Parent) movable.SetParent (Parent->GetMovable ());
 
   csEngine::current_engine->AddToCurrentRegion (this);
@@ -115,7 +115,7 @@ csMeshWrapper::csMeshWrapper (iMeshWrapper *theParent)
   is_visible = false;
   wor_bbox_movablenr = -1;
   Parent = theParent;
-  movable.SetMeshWrapper (&scfiMeshWrapper);
+  movable.SetMeshWrapper (this);
   if (Parent) movable.SetParent (Parent->GetMovable ());
 
   csEngine::current_engine->AddToCurrentRegion (this);
@@ -260,7 +260,7 @@ void csMeshWrapper::DrawInt (iRenderView* rview)
   int i;
   for (i = 0 ; i < children.Length () ; i++)
   {
-    csMeshWrapper* spr = children.Get (i)->GetPrivateObject ();
+    iMeshWrapper* spr = children.Get (i);
     spr->Draw (rview);
   }
 }
@@ -274,7 +274,7 @@ void csMeshWrapper::UpdateLighting (iLight** lights, int num_lights)
   int i;
   for (i = 0 ; i < children.Length () ; i++)
   {
-    csMeshWrapper* spr = children.Get (i)->GetPrivateObject ();
+    iMeshWrapper* spr = children.Get (i);
     spr->UpdateLighting (lights, num_lights);
   }
 }
@@ -407,7 +407,7 @@ void csMeshWrapper::HardTransform (const csReversibleTransform& t)
   int i;
   for (i = 0 ; i < children.Length () ; i++)
   {
-    csMeshWrapper* spr = children.Get (i)->GetPrivateObject ();
+    iMeshWrapper* spr = children.Get (i);
     spr->HardTransform (t);
   }
 }
@@ -498,7 +498,7 @@ void csMeshWrapper::AddChild (iMeshWrapper* child)
   else
     csEngine::current_engine->GetMeshes ()->RemoveMesh (child);
 
-  child->GetPrivateObject ()->SetParentContainer (&scfiMeshWrapper);
+  child->SetParentContainer (&scfiMeshWrapper);
   children.Push (child);
   child->GetMovable ()->SetParent (&movable.scfiMovable);
   child->DecRef ();
@@ -513,7 +513,7 @@ void csMeshWrapper::RemoveChild (iMeshWrapper* child)
   int idx = ch.Find (child);
   CS_ASSERT (idx != -1);
   ch.Delete (idx);		// Remove object
-  child->GetPrivateObject ()->SetParentContainer (NULL);
+  child->SetParentContainer (NULL);
   child->GetMovable ()->SetParent (NULL);
 }
 

@@ -298,6 +298,12 @@ struct iMeshWrapper : public iBase
    * it is contained in the engine directly).
    */
   virtual iMeshWrapper* GetParentContainer () = 0;
+  /**
+   * Set the parent of this mesh. This only changes the 'parent' pointer but
+   * does not add the mesh as a child mesh. Internal use only.
+   */
+  virtual void SetParentContainer (iMeshWrapper *) = 0;
+
   /// Get the radius of this mesh (ignoring children).
   virtual void GetRadius (csVector3& rad, csVector3& cent) const = 0;
 
@@ -308,6 +314,11 @@ struct iMeshWrapper : public iBase
    * want to render mesh objects in a CSWS window or something like that.
    */
   virtual void Draw (iRenderView* rview) = 0;
+
+  /**
+   * Returns true if the object wants to die.
+   */
+  virtual bool WantToDie () = 0;
 };
 
 SCF_VERSION (iMeshFactoryWrapper, 0, 1, 6);

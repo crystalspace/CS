@@ -66,8 +66,8 @@ void csMovableSectorList::AddSector (iSector* sector)
   if (movable->GetParent () == NULL)
   {
     Push (sector);
-    movable->GetMeshWrapper ()->GetPrivateObject ()->
-    	MoveToSector (sector->GetPrivateObject ());
+    movable->GetMeshWrapper ()->
+      MoveToSector (sector->GetPrivateObject ());
   }
 }
 
@@ -120,20 +120,6 @@ csMovable::~csMovable ()
     void* ml_data = listener_userdata[i];
     ml->MovableDestroyed (&scfiMovable, ml_data);
   }
-  //@@@
-  // The following DecRef() is not possible because we
-  // actually have a circular reference here (parent -> this and
-  // this -> parent).
-  //if (iparent) iparent->DecRef ();
-}
-
-void csMovable::SetParent (iMovable* p)
-{
-  //@@@ (see comment above)
-  //iMovable* ipar = SCF_QUERY_INTERFACE_SAFE (parent, iMovable);
-  //if (iparent) iparent->DecRef ();
-  //iparent = ipar;
-  parent = p;
 }
 
 void csMovable::SetPosition (iSector* home, const csVector3& pos)
@@ -169,7 +155,7 @@ void csMovable::ClearSectors ()
 {
   if (parent == NULL)
   {
-    object->GetPrivateObject ()->RemoveFromSectors ();
+    object->RemoveFromSectors ();
     sectors.SetLength (0);
   }
 }
@@ -192,7 +178,7 @@ void csMovable::RemoveListener (iMovableListener* listener)
 void csMovable::UpdateMove ()
 {
   updatenr++;
-  object->GetPrivateObject ()->UpdateMove ();
+  object->UpdateMove ();
 
   int i;
   for (i = 0 ; i < listeners.Length () ; i++)

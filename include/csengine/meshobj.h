@@ -566,11 +566,19 @@ public:
     {
       return scfParent->GetParentContainer ();
     }
+    virtual void SetParentContainer (iMeshWrapper* p)
+    {
+      scfParent->SetParentContainer (p);
+    }
     virtual void GetRadius (csVector3& rad, csVector3 &cent) const 
 	  { scfParent->GetRadius (rad,cent); }
     virtual void Draw (iRenderView* rview)
     {
       scfParent->Draw (rview);
+    }
+    virtual bool WantToDie ()
+    {
+      return scfParent->WantToDie ();
     }
   } scfiMeshWrapper;
   friend struct MeshWrapper;

@@ -372,14 +372,14 @@ csObject* csSector::HitBeam (const csVector3& start, const csVector3& end, csVec
 	csPolygon3D** polygonPtr)
 {
   float r, best_mesh_r = 10000000000.;
-  csMeshWrapper* near_mesh = NULL;
+  iMeshWrapper* near_mesh = NULL;
   csVector3 tsect;
 
   // First check all meshes in this sector.
   int i;
   for (i = 0 ; i < meshes.Length () ; i++)
   {
-    csMeshWrapper* mesh = meshes.Get (i)->GetPrivateObject ();
+    iMeshWrapper* mesh = meshes.Get (i);
     if (mesh->HitBeam (start, end, isect, &r))
     {
       if (r < best_mesh_r)
@@ -813,11 +813,11 @@ void csSector::Draw (iRenderView* rview)
 
   for (i = 0 ; i < spr_num ; i++)
   {
-    csMeshWrapper* sp;
-    if (mesh_queue) sp = mesh_queue[i];
-    else sp = meshes.Get (i)->GetPrivateObject ();
+    iMeshWrapper* sp;
+    if (mesh_queue) sp = &(mesh_queue[i]->scfiMeshWrapper);
+    else sp = meshes.Get (i);
 
-    if (!previous_sector || sp->GetMovable ().GetSectors ()->
+    if (!previous_sector || sp->GetMovable ()->GetSectors ()->
     	Find (previous_sector) == -1)
     {
       // Mesh is not in the previous sector or there is no previous sector.
@@ -903,7 +903,7 @@ csObject** csSector::GetVisibleObjects (iFrustumView* lview, int& num_objects)
   // @@@ Unify both loops below once csThing becomes a mesh object.
   for (j = 0 ; j < meshes.Length () ; j++)
   {
-    csMeshWrapper* sp = meshes.Get (j)->GetPrivateObject ();
+    iMeshWrapper* sp = meshes.Get (j);
     // If the light frustum is infinite then every thing
     // in this sector is of course visible.
     if (infinite) vis = true;
@@ -956,7 +956,7 @@ csObject** csSector::GetVisibleObjects (iFrustumView* lview, int& num_objects)
       }
     }
 
-    if (vis) visible_objects[num_objects++] = sp;
+    if (vis) visible_objects[num_objects++] = sp->GetPrivateObject ();
   }
   return visible_objects;
 }
@@ -1095,8 +1095,8 @@ void csSector::CalculateSectorBBox (csBox3& bbox,
   if (do_meshes)
     for (i = 0 ; i < meshes.Length () ; i++)
     {
-      csMeshWrapper* mesh = meshes.Get (i)->GetPrivateObject ();
-      mesh->GetTransformedBoundingBox (mesh->GetMovable ().GetTransform (), b);
+      iMeshWrapper* mesh = meshes.Get (i);
+      mesh->GetTransformedBoundingBox (mesh->GetMovable ()->GetTransform (), b);
       bbox += b;
     }
 }

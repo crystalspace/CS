@@ -26,7 +26,7 @@
 class csVector3;
 class csMatrix3;
 class csMovable;
-struct iMeshWrapper;
+class csMeshWrapper;
 
 CS_DECLARE_TYPED_VECTOR_NODELETE (csMovableListenerVector, iMovableListener);
 CS_DECLARE_TYPED_VECTOR_NODELETE (csSectorVector, iSector);
@@ -81,14 +81,14 @@ private:
    * Note that if the parent is not NULL then the list of
    * sectors is ignored for this movable (the parent list is
    * returned) and the 'obj' transformation is relative to
-   * the parent one.
+   * the parent one. The pointer is not reference-counted.
    */
   iMovable* parent;
 
   /**
    * Mesh on which this movable operates.
    */
-  iMeshWrapper* object;
+  csMeshWrapper* object;
 
   /// Update number.
   long updatenr;
@@ -103,19 +103,20 @@ public:
   virtual ~csMovable ();
 
   /// Set mesh on which this movable operates.
-  void SetMeshWrapper (iMeshWrapper* obj) { object = obj; }
+  void SetMeshWrapper (csMeshWrapper* obj)
+  { object = obj; }
 
   /// Get the mesh wrapper on which we operate.
-  iMeshWrapper* GetMeshWrapper () { return object; }
+  csMeshWrapper* GetMeshWrapper ()
+  { return object; }
 
   /// Set the parent movable.
-  void SetParent (iMovable* parent);
+  void SetParent (iMovable* par)
+  { parent = par; }
 
   /// Get the parent movable.
   iMovable* GetParent () const
-  {
-    return parent;
-  }
+  { return parent; }
 
   /**
    * Initialize the list of sectors to one sector where

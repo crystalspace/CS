@@ -1491,7 +1491,7 @@ void csEngine::ControlMeshes ()
   while (i >= 0)
   {
     iMeshWrapper* sp = (iMeshWrapper*)meshes[i];
-    if (sp->GetPrivateObject ()->WantToDie ())
+    if (sp->WantToDie ())
       GetMeshes ()->RemoveMesh (sp);
     i--;
   }
@@ -2041,17 +2041,16 @@ iMeshWrapper* csEngine::LoadMeshWrapper (
 iMeshWrapper* csEngine::CreateMeshWrapper (iMeshFactoryWrapper* factory,
   	const char* name, iSector* sector, const csVector3& pos)
 {
-  iMeshWrapper* meshwrap = factory->CreateMeshWrapper ();
-  csMeshWrapper* mesh = meshwrap->GetPrivateObject ();
-  if (name) mesh->SetName (name);
-  GetMeshes ()->AddMesh (meshwrap);
+  iMeshWrapper* mesh = factory->CreateMeshWrapper ();
+  if (name) mesh->QueryObject ()->SetName (name);
+  GetMeshes ()->AddMesh (mesh);
   if (sector)
   {
-    mesh->GetMovable ().SetSector (sector);
-    mesh->GetMovable ().SetPosition (pos);
-    mesh->GetMovable ().UpdateMove ();
+    mesh->GetMovable ()->SetSector (sector);
+    mesh->GetMovable ()->SetPosition (pos);
+    mesh->GetMovable ()->UpdateMove ();
   }
-  return meshwrap;
+  return mesh;
 }
 
 iMeshWrapper* csEngine::CreateMeshWrapper (iMeshObject* mesh,
