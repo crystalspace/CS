@@ -169,6 +169,7 @@ enum
   XMLTOKEN_PLUGIN,
   XMLTOKEN_PLUGINS,
   XMLTOKEN_POLYMESH,
+  XMLTOKEN_PORTAL,
   XMLTOKEN_POSITION,
   XMLTOKEN_PRIORITY,
   XMLTOKEN_PROCTEX,
@@ -504,6 +505,9 @@ private:
   iKeyValuePair* ParseKey (iDocumentNode* node, iObject* pParent);
   /// Parse a map node definition and add the node to the given sector
   iMapNode* ParseNode (iDocumentNode* node, iSector* sec);
+  /// Parse a portal definition.
+  bool ParsePortal (iLoaderContext* ldr_context,
+	iDocumentNode* node, iSector* sourceSector);
   /// Parse a sector definition and add the sector to the engine
   iSector* ParseSector (iLoaderContext* ldr_context, iDocumentNode* node);
   /// Find the named shared variable and verify its type if specified

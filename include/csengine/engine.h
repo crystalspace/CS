@@ -1014,10 +1014,11 @@ public:
   virtual csPtr<iMeshWrapper> CreatePortalContainer (const char* name,
   	iSector* sector = 0, const csVector3& pos = csVector3 (0, 0, 0));
   virtual csPtr<iMeshWrapper> CreatePortal (
-  	iMeshWrapper* parentMesh, iSector* destSector);
+  	iMeshWrapper* parentMesh, iSector* destSector,
+	csVector3* vertices, int num_vertices);
   virtual csPtr<iMeshWrapper> CreatePortal (
-  	iSector* sourceSector, const csVector3& pos,
-	iSector* destSector);
+  	iSector* sourceSector, const csVector3& pos, iSector* destSector,
+	csVector3* vertices, int num_vertices);
 
   virtual iClipper2D* GetTopLevelClipper () const;
 

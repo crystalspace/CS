@@ -123,7 +123,6 @@ private:
 
   // Object space data.
   csDirtyAccessArray<csVector3> vertices;
-  csArray<csPlane3> planes;	// One plane per portal.
   csBox3 object_bbox;
   csVector3 object_radius;
   float max_object_radius;
@@ -133,7 +132,6 @@ private:
   long movable_nr;
   bool movable_identity;
   csDirtyAccessArray<csVector3> world_vertices;
-  csArray<csPlane3> world_planes;
 
   // Camera space data.
   csDirtyAccessArray<csVector3> camera_vertices;
@@ -146,6 +144,16 @@ private:
   void ObjectToWorld (iMovable* movable, const csReversibleTransform& movtrans);
   /// Transform from world to camera space.
   void WorldToCamera (iCamera* camera, const csReversibleTransform& camtrans);
+
+  // Drawing stuff...
+  bool csPortalContainer::ClipToPlane (int portal_idx, csPlane3 *portal_plane,
+	const csVector3 &v_w2c, csVector3 * &pverts, int &num_verts);
+  bool DoPerspective (csVector3 *source, int num_verts,
+	csPoly2D *dest, bool mirror, int fov, float shift_x, float shift_y,
+	const csPlane3& plane_cam);
+  void DrawOnePortal (csPortal* po, const csPoly2D& poly,
+	const csReversibleTransform& movtrans, iRenderView *rview,
+	const csPlane3& camera_plane);
 
 protected:
   /**

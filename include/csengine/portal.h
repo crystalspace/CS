@@ -46,6 +46,10 @@ private:
   csPortalContainer* parent;
   /// Vertex indices.
   csDirtyAccessArray<int> vertex_indices;
+  /// Object plane.
+  csPlane3 object_plane;
+  /// World plane.
+  csPlane3 world_plane;
 
 public:
   /// Set of flags
@@ -91,6 +95,11 @@ public:
     return vertex_indices;
   }
 
+  const csPlane3& GetIntObjectPlane () { return object_plane; }
+  const csPlane3& GetIntWorldPlane () { return world_plane; }
+  void SetObjectPlane (const csPlane3& pl) { object_plane = pl; }
+  void SetWorldPlane (const csPlane3& pl) { world_plane = pl; }
+
   /// Return the sector that this portal points too.
   iSector* GetCsSector () const { return sector; }
   virtual iSector* GetSector () const { return GetCsSector (); }
@@ -101,8 +110,8 @@ public:
    */
   virtual void SetSector (iSector* s);
 
-  virtual const csPlane3& GetObjectPlane ();
-  virtual const csPlane3& GetWorldPlane ();
+  virtual const csPlane3& GetObjectPlane () { return object_plane; }
+  virtual const csPlane3& GetWorldPlane () { return world_plane; }
   virtual void ComputeCameraPlane (const csReversibleTransform& t,
   	csPlane3& camplane);
 
@@ -215,8 +224,6 @@ public:
    *
    * 'new_clipper' is the new 2D polygon to which all things drawn
    * should be clipped.<br>
-   * 'portal_polygon' is the polygon containing this portal. This routine
-   * will use the camera space plane of the portal polygon.<br>
    * 't' is the transform from object to world (this2other).
    * 'rview' is the current iRenderView.<p>
    *
@@ -226,11 +233,9 @@ public:
    * reached (like the maximum number of times a certain sector
    * can be drawn through a mirror).
    */
-#if 0
-  bool Draw (csPolygon2D* new_clipper, iPolygon3D* portal_polygon,
+  bool Draw (const csPoly2D& new_clipper,
 	const csReversibleTransform& t,
   	iRenderView* rview, const csPlane3& camera_plane);
-#endif
 
   /**
    * Follow a beam through this portal and return the polygon

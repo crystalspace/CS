@@ -881,7 +881,8 @@ struct iEngine : public iBase
    * or 0 on failure.
    */
   virtual csPtr<iMeshWrapper> CreatePortal (
-  	iMeshWrapper* parentMesh, iSector* destSector) = 0;
+  	iMeshWrapper* parentMesh, iSector* destSector,
+	csVector3* vertices, int num_vertices) = 0;
 
   /**
    * Conveniance function to create a portal from one sector to another.
@@ -897,7 +898,8 @@ struct iEngine : public iBase
    */
   virtual csPtr<iMeshWrapper> CreatePortal (
   	iSector* sourceSector, const csVector3& pos,
-	iSector* destSector) = 0;
+	iSector* destSector,
+	csVector3* vertices, int num_vertices) = 0;
 
   /**
    * Draw the 3D world given a camera and a clipper. Note that

@@ -17,6 +17,8 @@
 */
 #include "cssysdef.h"
 #include "csgeom/frustum.h"
+#include "csgeom/poly2d.h"
+#include "csgeom/polyclip.h"
 #include "ivideo/texture.h"
 #include "csengine/portal.h"
 #include "csengine/portalcontainer.h"
@@ -179,20 +181,6 @@ void csPortal::GetColorFilter (float &r, float &g, float &b) const
   b = filter_b;
 }
 
-csPlane3 temporary_p;
-
-const csPlane3& csPortal::GetObjectPlane ()
-{
-  // @@@ TODO
-  return temporary_p;
-}
-
-const csPlane3& csPortal::GetWorldPlane ()
-{
-  // @@@ TODO
-  return temporary_p;
-}
-
 void csPortal::ComputeCameraPlane (const csReversibleTransform& t,
 	csPlane3& camplane)
 {
@@ -227,10 +215,8 @@ void csPortal::WarpSpace (const csReversibleTransform& warp_wor,
   if (flags.Check (CS_PORTAL_MIRROR)) mirror = !mirror;
 }
 
-#if 0
 bool csPortal::Draw (
-  csPolygon2D *new_clipper,
-  iPolygon3D *portal_polygon,
+  const csPoly2D& new_clipper,
   const csReversibleTransform& t,
   iRenderView *rview,
   const csPlane3& camera_plane)
@@ -239,17 +225,18 @@ bool csPortal::Draw (
   if (sector->GetRecLevel () >= max_sector_visit)
     return false;
 
-  if (!new_clipper->GetVertexCount ()) return false;
+  if (!new_clipper.GetVertexCount ()) return false;
 
   iCamera *icam = rview->GetCamera ();
-  csPolygonClipper new_view (new_clipper, icam->IsMirrored (), true);
+  csPolygonClipper new_view ((csPoly2D*)&new_clipper,
+  	icam->IsMirrored (), true);
 
   csRenderContext *old_ctxt = rview->GetRenderContext ();
   rview->CreateRenderContext ();
   rview->SetRenderRecursionLevel (rview->GetRenderRecursionLevel () + 1);
   rview->SetClipper (&new_view);
   rview->ResetFogInfo ();
-  rview->SetPortalPolygon (portal_polygon);
+  rview->SetLastPortal ((iPortal*)this, 0);
   rview->SetPreviousSector (rview->GetThisSector ());
   rview->SetClipPlane (camera_plane);
   rview->GetClipPlane ().Invert ();
@@ -304,7 +291,6 @@ bool csPortal::Draw (
 
   return true;
 }
-#endif
 
 iPolygon3D *csPortal::HitBeam (
   const csReversibleTransform& t,

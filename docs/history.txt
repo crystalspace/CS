@@ -6,6 +6,17 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+24-Sep-2003
+	- Jorrit finished implemented basic drawing of portals in
+	  csPortalContainer. Still some optimizations and testing to do.
+	- Jorrit extended iEngine->CreatePortal() so that you can give the
+	  3D coordinates of the portal.
+	- Jorrit added the first basic support for the <portal> keyword in
+	  a sector (loader).
+	- Jorrit changed GetNearbyObjects() and GetNearbyMeshes() to support
+	  the new portal objects. This still leaves functions like
+	  FollowSegment() and IntersectSegment().
+	- Added a test standalone portal to flarge (in comments for now).
 23-Sep-2003
 	- Jorrit changed the default display depth in video.cfg from 16
 	  to 32. On 3D cards, CS performs awfully bad with 16-bit displays

@@ -83,6 +83,11 @@ public:
   csVector2* GetVertices () { return vertices; }
 
   /**
+   * Get the array with all vertices.
+   */
+  const csVector2* GetVertices () const { return vertices; }
+
+  /**
    * Get the specified vertex.
    */
   csVector2* GetVertex (int i)

@@ -60,6 +60,8 @@
 #include "iengine/imposter.h"
 #include "iengine/sharevar.h"
 #include "iengine/viscull.h"
+#include "iengine/portal.h"
+#include "iengine/portalcontainer.h"
 #include "ivideo/material.h"
 #include "ivideo/texture.h"
 #include "igraphic/imageio.h"
@@ -855,6 +857,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("plugins", XMLTOKEN_PLUGINS);
   xmltokens.Register ("position", XMLTOKEN_POSITION);
   xmltokens.Register ("polymesh", XMLTOKEN_POLYMESH);
+  xmltokens.Register ("portal", XMLTOKEN_PORTAL);
   xmltokens.Register ("priority", XMLTOKEN_PRIORITY);
   xmltokens.Register ("proctex", XMLTOKEN_PROCTEX);
   xmltokens.Register ("radius", XMLTOKEN_RADIUS);
@@ -3904,6 +3907,96 @@ iMapNode* csLoader::ParseNode (iDocumentNode* node, iSector* sec)
   return pNode;
 }
 
+class csMissingSectorCallback : public iPortalCallback
+{
+public:
+  csRef<iLoaderContext> ldr_context;
+  char* sectorname;
+
+  SCF_DECLARE_IBASE;
+  csMissingSectorCallback (iLoaderContext* ldr_context, const char* sector)
+  {
+    SCF_CONSTRUCT_IBASE (0);
+    csMissingSectorCallback::ldr_context = ldr_context;
+    sectorname = csStrNew (sector);
+  }
+  virtual ~csMissingSectorCallback ()
+  {
+    delete[] sectorname;
+  }
+  
+  virtual bool Traverse (iPortal* portal, iBase* /*context*/)
+  {
+    iSector* sector = ldr_context->FindSector (sectorname);
+    if (!sector) return false;
+    portal->SetSector (sector);
+    // For efficiency reasons we deallocate the name here.
+    delete[] sectorname;
+    sectorname = 0;
+    portal->RemoveMissingSectorCallback (this);
+    return true;
+  }
+};
+
+SCF_IMPLEMENT_IBASE (csMissingSectorCallback)
+  SCF_IMPLEMENTS_INTERFACE (iPortalCallback)
+SCF_IMPLEMENT_IBASE_END
+
+bool csLoader::ParsePortal (iLoaderContext* ldr_context,
+	iDocumentNode* node, iSector* sourceSector)
+{
+// @@@ NAME IGNORED
+  iSector* destSector = 0;
+  csDirtyAccessArray<csVector3> poly;
+  csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  csRef<csMissingSectorCallback> missing_cb;
+  while (it->HasNext ())
+  {
+    csRef<iDocumentNode> child = it->Next ();
+    if (child->GetType () != CS_NODE_ELEMENT) continue;
+    const char* value = child->GetValue ();
+    csStringID id = xmltokens.Request (value);
+    switch (id)
+    {
+      case XMLTOKEN_SECTOR:
+	destSector = ldr_context->FindSector (child->GetContentsValue ());
+	if (!destSector)
+	{
+	  missing_cb = csPtr<csMissingSectorCallback> (
+	  	new csMissingSectorCallback (ldr_context,
+			child->GetContentsValue ()));
+	}
+        break;
+      case XMLTOKEN_V:
+        {
+          csVector3 vec;
+          if (!SyntaxService->ParseVector (child, vec))
+	    return false;
+	  poly.Push (vec);
+	}
+        break;
+      default:
+	SyntaxService->ReportBadToken (child);
+	return false;
+    }
+  }
+
+  csRef<iMeshWrapper> mesh = Engine->CreatePortal (
+  	sourceSector, csVector3 (0), destSector,
+  	poly.GetArray (), poly.Length ());
+  if (!destSector)
+  {
+    // Create a callback to find the sector at runtime when the
+    // portal is first used.
+    csRef<iPortalContainer> pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+  	  iPortalContainer);
+    CS_ASSERT (pc != 0);
+    iPortal* portal = pc->GetPortal (0);
+    portal->SetMissingSectorCallback (missing_cb);
+  }
+  return true;
+}
+
 iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
 	iDocumentNode* node)
 {
@@ -3930,10 +4023,12 @@ iSector* csLoader::ParseSector (iLoaderContext* ldr_context,
     {
       case XMLTOKEN_ADDON:
 	if (!LoadAddOn (ldr_context, child, sector))
-	{
 	  return 0;
-	}
       	break;
+      case XMLTOKEN_PORTAL:
+        if (!ParsePortal (ldr_context, child, sector))
+	  return 0;
+        break;
       case XMLTOKEN_CULLER:
 	SyntaxService->ReportError (
 	  "crystalspace.maploader.parse.sector",

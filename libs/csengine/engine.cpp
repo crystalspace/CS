@@ -2515,6 +2515,7 @@ void csEngine::GetNearbyObjectList (iSector* sector,
 		imw->GetMeshObject (), iThingState);
         if (st)
         {
+	//@@@@ TEMPORARY UNTIL PORTALS ARE REMOVED FROM THING!
           // Check if there are portals and if they are near the position.
           int pc = st->GetFactory ()->GetPortalCount ();
           int j;
@@ -2566,6 +2567,59 @@ void csEngine::GetNearbyObjectList (iSector* sector,
             }
           }
         }
+	else
+	{
+	  iMeshObject* meshobj = imw->GetMeshObject ();
+          int pc = meshobj->GetPortalCount ();
+          int j;
+          for (j = 0 ; j < pc ; j++)
+          {
+            iPortal* portal = meshobj->GetPortal (j);
+            const csPlane3& wor_plane = portal->GetWorldPlane ();
+	    const csVector3* world_vertices = portal->GetVertices (); // @@@ NEED WORLD!
+            // Can we see the portal?
+            if (wor_plane.Classify (pos) < -0.001)
+            {
+              csVector3 poly[100];	//@@@ HARDCODE
+              int k;
+	      int* idx = portal->GetVertexIndices ();
+              for (k = 0 ; k < portal->GetVertexIndicesCount () ; k++)
+              {
+                poly[k] = world_vertices[idx[k]];
+              }
+              float sqdist_portal = csSquaredDist::PointPoly (
+                    pos, poly, portal->GetVertexIndicesCount (),
+                    wor_plane);
+              if (sqdist_portal <= radius * radius)
+              {
+                // Also handle objects in the destination sector unless
+                // it is a warping sector.
+                portal->CompleteSector (0);
+                CS_ASSERT (portal != 0);
+                if (sector != portal->GetSector () && portal->GetSector ()
+                                && !portal->GetFlags ().Check (CS_PORTAL_WARP))
+                {
+                  int l;
+                  bool already_visited = false;
+                  for (l = 0 ; l < visited_sectors.Length () ; l++)
+                  {
+                    if (visited_sectors[l] == portal->GetSector ())
+                    {
+                      already_visited = true;
+                      break;
+                    }
+                  }
+                  if (!already_visited)
+                  {
+                    visited_sectors.Push (portal->GetSector ());
+                    GetNearbyObjectList (portal->GetSector (), pos, radius, list,
+                                         visited_sectors);
+                  }
+                }
+              }
+            }
+          }
+	}
       }
     }
   }
@@ -2623,6 +2677,7 @@ void csEngine::GetNearbyMeshList (iSector* sector,
 		imw->GetMeshObject (), iThingState);
         if (st)
         {
+	//@@@@ TEMPORARY UNTIL PORTALS ARE REMOVED FROM THING!
           // Check if there are portals and if they are near the position.
           int pc = st->GetFactory ()->GetPortalCount ();
           int j;
@@ -2674,6 +2729,59 @@ void csEngine::GetNearbyMeshList (iSector* sector,
             }
           }
         }
+	else
+	{
+	  iMeshObject* meshobj = imw->GetMeshObject ();
+          int pc = meshobj->GetPortalCount ();
+          int j;
+          for (j = 0 ; j < pc ; j++)
+          {
+            iPortal* portal = meshobj->GetPortal (j);
+            const csPlane3& wor_plane = portal->GetWorldPlane ();
+	    const csVector3* world_vertices = portal->GetVertices (); // @@@ NEED WORLD!
+            // Can we see the portal?
+            if (wor_plane.Classify (pos) < -0.001)
+            {
+              csVector3 poly[100];	//@@@ HARDCODE
+              int k;
+	      int* idx = portal->GetVertexIndices ();
+              for (k = 0 ; k < portal->GetVertexIndicesCount () ; k++)
+              {
+                poly[k] = world_vertices[idx[k]];
+              }
+              float sqdist_portal = csSquaredDist::PointPoly (
+                    pos, poly, portal->GetVertexIndicesCount (),
+                    wor_plane);
+              if (sqdist_portal <= radius * radius)
+              {
+                // Also handle objects in the destination sector unless
+                // it is a warping sector.
+                portal->CompleteSector (0);
+                CS_ASSERT (portal != 0);
+                if (sector != portal->GetSector () && portal->GetSector ()
+                                && !portal->GetFlags ().Check (CS_PORTAL_WARP))
+                {
+                  int l;
+                  bool already_visited = false;
+                  for (l = 0 ; l < visited_sectors.Length () ; l++)
+                  {
+                    if (visited_sectors[l] == portal->GetSector ())
+                    {
+                      already_visited = true;
+                      break;
+                    }
+                  }
+                  if (!already_visited)
+                  {
+                    visited_sectors.Push (portal->GetSector ());
+                    GetNearbyMeshList (portal->GetSector (), pos, radius, list,
+                                         visited_sectors);
+                  }
+                }
+              }
+            }
+          }
+	}
       }
     }
   }
@@ -3238,19 +3346,25 @@ csPtr<iMeshWrapper> csEngine::CreatePortalContainer (const char* name,
 }
 
 csPtr<iMeshWrapper> csEngine::CreatePortal (
-  	iMeshWrapper* parentMesh, iSector* destSector)
+  	iMeshWrapper* parentMesh, iSector* destSector,
+	csVector3* vertices, int num_vertices)
 {
-  csRef<iMeshWrapper> mesh = CreatePortalContainer (0);
+  csRef<iMeshWrapper> mesh = CreatePortalContainer ("__dummy__");
   /* @@@ TODO */
   return csPtr<iMeshWrapper> (mesh);
 }
 
 csPtr<iMeshWrapper> csEngine::CreatePortal (
   	iSector* sourceSector, const csVector3& pos,
-	iSector* destSector)
+	iSector* destSector,
+	csVector3* vertices, int num_vertices)
 {
-  csRef<iMeshWrapper> mesh = CreatePortalContainer (0, sourceSector, pos);
-  /* @@@ TODO */
+  csRef<iMeshWrapper> mesh = CreatePortalContainer ("__dummy__",
+  	sourceSector, pos);
+  csRef<iPortalContainer> pc = SCF_QUERY_INTERFACE (mesh->GetMeshObject (),
+  	iPortalContainer);
+  iPortal* portal = pc->CreatePortal (vertices, num_vertices);
+  portal->SetSector (destSector);
   return csPtr<iMeshWrapper> (mesh);
 }
 
