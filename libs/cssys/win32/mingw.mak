@@ -18,6 +18,9 @@ endif
 # video/renderer/direct3d5
 # video/renderer/direct3d6
 
+# We don't need extra directories for dynamic libraries
+OUTSUFX.yes=
+
 #---------------------------------------------------- rootdefines & defines ---#
 ifneq (,$(findstring defines,$(MAKESECTION)))
 
@@ -68,6 +71,29 @@ SOUND_LIBS=
 # Does this system require libsocket.a?
 NEED_SOCKET_LIB=
 
+# Need to override some things due to limitations of Win32 input line
+ifdef DO_DEPEND
+SRC1.CSENGINE = $(wildcard libs/csengine/*.cpp)
+SRC2.CSENGINE = $(wildcard libs/csengine/*/*.cpp)
+
+dep:	$(OUTOS)csengine1.dep
+$(OUTOS)csengine1.dep: $(SRC1.CSENGINE)
+	$(DO.DEP1) $(CFLAGS.CSENGINE) $(DO.DEP2)
+
+dep:	$(OUTOS)csengine2.dep
+$(OUTOS)csengine2.dep: $(SRC2.CSENGINE)
+	$(DO.DEP1) $(CFLAGS.CSENGINE) $(DO.DEP2)
+
+DEPPART1 = csengine1.dep
+DEPPART2 = csengine2.dep
+MERGE = copy
+
+merge:	$(OUTOS)csengine.dep
+$(OUTOS)csengine.dep: $(MERGE) $(OUTOS)$(DEPPART1)+$(OUTOS)$(DEPPART2) $(OUTOS)csengine.dep
+
+endif
+
+
 # Indicate where special include files can be found.
 CFLAGS.INCLUDE=-Ilibs/zlib -Ilibs/libpng -Ilibs/libjpeg
 
@@ -90,13 +116,14 @@ CFLAGS.debug=-g
 # Flags for the compiler which are used when profiling.
 CFLAGS.profile=-p -O -g
 
-# Flags for the compiler which are used when building a shared library.
-CFLAGS.DLL=
+# Flags for the compiler which are used when building a shared/dynamic library.
+CFLAGS.DLL= -shared
 
 # General flags for the linker which are used in any case.
-#LFLAGS.GENERAL = -mconsole -mwindows
-#LFLAGS.GENERAL = -mwindows
 LFLAGS.GENERAL = -mconsole -mwindows
+
+# Flags for the linker which are used when building a shared/dynamic library.
+LFLAGS.DLL =
 
 # Flags for the linker which are used when optimizing.
 LFLAGS.optimize=
@@ -107,36 +134,90 @@ LFLAGS.debug=
 # Flags for the linker which are used when profiling.
 LFLAGS.profile=-p
 
-ifeq ($(USE_SHARED_PLUGINS),yes)
-# Flags for the linker which are used when building a shared library.
-  LFLAGS.DLL=--dll
-  LIB=.dll
-else
-# Typical extension for static libraries
-  LIB=.a
-#force static linking
-  LFLAGS.GENERAL+= -static
-endif
-
-# Typical extension for object files
-O=.o
-
 # Typical extension for assembler files
 ASM=.asm
 
-LIB_SUFFIX=
 
+ifneq ($(USE_NASM),no)
+#
+# System-dependent flags to pass to NASM
+#
+NASMFLAGS.SYSTEM=-f win32 -DEXTERNC_UNDERSCORE
+endif
+
+# The C compiler for Mingw/GCC
+CC=gcc -c
+
+# The C++ compiler for Mingw
+CXX=c++ -c
+
+# The linker for Mingw/G++
+LINK=c++
+
+ifeq ($(USE_SHARED_PLUGINS),yes)
+
+# ----- Construction Zone for .dlls ---------------------
+#
+#  This section under construction for defining and creating .def
+# files.
+#
+# -------------------------------------------------------
+
+# Build .def files using AR
+#
+	MAKE_DLL=yes
+	DLL=.dll
+
+#
+# Whenever AR is invoked, create a .def file
+# Ideally we should be able to also create the .dll
+# immediately after the .def file is created
+#
+
+  LIB=.def
+	override ARFLAGS.@=
+	override LFLAGS.@= -mdll -o $@
+	
+	define AR
+		dlltool 
+	endef
+	ARFLAGS=--export-all-symbols --output-def $@
+
+# A command format for generating a .dll from a .def
+# Assumes .def file already exists
+#
+# c++ -shared *.o [*.def] -o *.dll
+
+#	DO.BUILD.DLL = $(CXX) $(LFLAGS.GENERAL) $@ $(DLL_FLAGS) $(^^)
+
+#(OUT)%.def: %.dll
+#	$(DO.BUILD.DLL)  
+
+#	DO.SHARED.PLUGINS = $(DO.BUILD.DLL)
+ 
+else
+
+#
 # Setup 'lib' prefix for static library references
-LIB_PREFIX=lib
+#
+  LIB_PREFIX=lib
+
+# Typical extension for static libraries
+#
+  LIB=.a
+
+# Explicitly define of static linking mode
+#
+  LFLAGS.GENERAL+= -static
 
 define AR
   @rm -f $@
   ar
 endef
 ARFLAGS=cr
+endif
 
-# System-dependent flags to pass to NASM
-NASMFLAGS.SYSTEM=-f win32 -DEXTERNC_UNDERSCORE
+# ----- End Construction Zone ----------------------------
 
 # System dependent source files included into CSSYS library
 SRC.SYS_CSSYS = libs/cssys/win32/printf.cpp \
@@ -146,16 +227,6 @@ SRC.SYS_CSSYS = libs/cssys/win32/printf.cpp \
 SRC.SYS_CSSYS_EXE=libs/cssys/win32/exeentry.cpp
 SRC.SYS_CSSYS_DLL=libs/cssys/win32/dllentry.cpp
 
-# The C compiler for Mingw/GCC
-CC=gcc -c
-
-# The C++ compiler for Mingw
-# For internal compiler error handling
-#CXX=c++ -c --save-temp
-CXX=c++ -c
-
-# The linker for Mingw/G++
-LINK=c++
 
 # Command sequence for creating a directory.
 # Note that directories will have forward slashes. Please
