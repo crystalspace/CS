@@ -65,10 +65,10 @@ public:
   /// The object registry.
   iObjectRegistry* object_reg;
   /// The plugin manager.
-  iPluginManager* plugin_mgr;
+  csRef<iPluginManager> plugin_mgr;
 
   /// The font server
-  iFontServer *FontServer;
+  csRef<iFontServer> FontServer;
 
   /// Pointer to a title.
   char* win_title;

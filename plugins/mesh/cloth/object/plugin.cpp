@@ -67,12 +67,11 @@ void csStuffObject::SetupVertexBuffer ()
 	 	printf(" SETUPVERTEX BUFFER %u \n",count++);
    iObjectRegistry* object_reg = ((StuffFactory*)factory)->object_reg;
    	printf(" SETUPVERTEX BUFFER %u \n",count++);
-   iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+   csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
    // @@@ priority should be a parameter.
      	printf(" %u \n",count++);
 
    vbufmgr = g3d->GetVertexBufferManager ();
-   g3d->DecRef ();
    vbuf = vbufmgr->CreateBuffer (0);
  //  vbuf1 = vbufmgr->CreateBuffer (1);
    	printf(" %u \n",count++);
@@ -382,9 +381,8 @@ csPtr<iMeshObject> StuffFactory::NewInstance() {
 csStuffObject *obj = new csStuffObject((iMeshObjectFactory*) this);
 bool initOk = obj->Initialize(object_reg);
 if (!initOk) { delete(obj);  return NULL;  };
-iMeshObject *itface = SCF_QUERY_INTERFACE ( obj, iMeshObject );
-itface->DecRef();
-return itface;
+csRef<iMeshObject> itface (SCF_QUERY_INTERFACE ( obj, iMeshObject ));
+return csPtr<iMeshObject> (itface);	// DecRef is ok here.
 };
 
  void StuffFactory::HardTransform (const csReversibleTransform &) { };
@@ -425,8 +423,8 @@ csPtr<iMeshObjectFactory> StuffMeshObjectType::NewFactory ()
 {
   StuffFactory* cm = new StuffFactory (this);
   cm->Initialize(object_reg);
-  iMeshObjectFactory* ifact = SCF_QUERY_INTERFACE (cm, iMeshObjectFactory);
-  ifact->DecRef ();
-  return ifact;
+  csRef<iMeshObjectFactory> ifact (
+  	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
+  return csPtr<iMeshObjectFactory> (ifact);	// DecRef is ok here.
 }
 

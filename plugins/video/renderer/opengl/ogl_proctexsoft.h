@@ -76,22 +76,18 @@ class csOpenGLProcSoftware : public iGraphics3D
   class TxtHandleVector : public csVector
   {
     iObjectRegistry *object_reg;
-    iPluginManager* plugin_mgr;
-    iTextureManager* soft_man;
+    csRef<iTextureManager> soft_man;
   public:
     // Constructor
     TxtHandleVector (iObjectRegistry *objreg, iTextureManager *stm)
-      : csVector (8, 8), object_reg (objreg), soft_man (stm)
+      : csVector (8, 8), object_reg (objreg)
     {
-      plugin_mgr = CS_QUERY_REGISTRY (objreg, iPluginManager);
-      soft_man->IncRef ();
+      soft_man = stm;
     };
     // Destructor
     virtual ~TxtHandleVector ()
     {
       DeleteAll ();
-      SCF_DEC_REF (soft_man);
-      SCF_DEC_REF (plugin_mgr);
     }
     // Free an item from array
     virtual bool FreeItem (csSome Item)
@@ -113,7 +109,7 @@ class csOpenGLProcSoftware : public iGraphics3D
   int width, height;
   csPixelFormat pfmt;
   /// The interface to the software procedural texture
-  iSoftProcTexture *isoft_proc;
+  csRef<iSoftProcTexture> isoft_proc;
   csTextureHandleOpenGL *tex;
   /// The main renderer
   csGraphics3DOGLCommon *parent_g3d;
@@ -130,10 +126,10 @@ class csOpenGLProcSoftware : public iGraphics3D
   SCF_DECLARE_IBASE;
 
   /// The instance of csSoftProcTexture3D this instance wraps
-  iGraphics3D *g3d;
+  csRef<iGraphics3D> g3d;
 
   /// The redirector to the real G2D
-  iGraphics2D *dummy_g2d;
+  csRef<iGraphics2D> dummy_g2d;
 
   /// We keep a singly linked list of software textures
   csOpenGLProcSoftware *head_soft_tex;

@@ -2199,9 +2199,8 @@ void csBCTerrObject::SetupVertexBuffer (iVertexBuffer *&vbuf1, iVertexBuffer *&v
   {
     if (!vbufmgr)
     {
-      iGraphics3D* g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+      csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY (object_reg, iGraphics3D));
       vbufmgr = g3d->GetVertexBufferManager ();
-      g3d->DecRef ();
       vbufmgr->AddClient (&scfiVertexBufferManagerClient);
     }
     vbuf1 = vbufmgr->CreateBuffer (1);

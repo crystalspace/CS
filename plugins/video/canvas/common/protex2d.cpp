@@ -149,12 +149,9 @@ void csProcTextureSoft2D::Close ()
   // These arrays are shared with the texture, the texture will destroy them.
   Palette = NULL;
   csGraphics2D::Close ();
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-  {
     q->GetEventOutlet()->Broadcast (cscmdContextClose, this);
-    q->DecRef ();
-  }
 }
 
 void csProcTextureSoft2D::Print (csRect *area)

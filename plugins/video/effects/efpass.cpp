@@ -32,8 +32,9 @@
 iEffectLayer* csEffectPass::CreateLayer()
 {
   csEffectLayer* layerobj = new csEffectLayer();
-  iEffectLayer* layer = SCF_QUERY_INTERFACE( layerobj, iEffectLayer );
+  csRef<iEffectLayer> layer (SCF_QUERY_INTERFACE( layerobj, iEffectLayer ));
   layers.Push( layer );
+  layer->IncRef ();	// To avoid smart pointer release.
   return layer;
 }
 

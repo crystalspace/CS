@@ -247,7 +247,8 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
   it1 = Object->QueryObject ()->GetIterator ();
   while (!it1->IsFinished ())
   {
-    iModelDataAction *ac = SCF_QUERY_INTERFACE (it1->GetObject (), iModelDataAction);
+    csRef<iModelDataAction> ac (
+    	SCF_QUERY_INTERFACE (it1->GetObject (), iModelDataAction));
     if (ac)
     {
       const char *name = ac->QueryObject ()->GetName ();
@@ -264,9 +265,8 @@ bool csSpriteBuilder::Build (iModelDataObject *Object)
 	 * in 3d sprites.
 	 */
         int FrameIndex = (i == 0) ? (ac->GetFrameCount ()-1) : (i-1);
-	// @@@ MEMORY LEAK???
-        iModelDataVertices *ver = SCF_QUERY_INTERFACE (
-		ac->GetState (FrameIndex), iModelDataVertices);
+        csRef<iModelDataVertices> ver (SCF_QUERY_INTERFACE (
+		ac->GetState (FrameIndex), iModelDataVertices));
 	if (ver)
 	{
 	  float ThisTime = ac->GetTime (i);

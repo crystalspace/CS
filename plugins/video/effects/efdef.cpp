@@ -33,9 +33,10 @@
 iEffectTechnique* csEffectDefinition::CreateTechnique()
 {
   csEffectTechnique* techniqueobj = new csEffectTechnique();
-  iEffectTechnique* technique = SCF_QUERY_INTERFACE(
-  	techniqueobj, iEffectTechnique );
-  techniques.Push( technique );
+  csRef<iEffectTechnique> technique (SCF_QUERY_INTERFACE(
+  	techniqueobj, iEffectTechnique));
+  techniques.Push (technique);
+  technique->IncRef ();	// To avoid smart pointer release.
   return technique;
 }
 

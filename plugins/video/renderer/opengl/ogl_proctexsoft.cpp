@@ -96,7 +96,7 @@ iTextureHandle *csOpenGLProcSoftware::TxtHandleVector::RegisterAndPrepare (
 #endif
   // image gets a DecRef() in the software texture manager if procedural texture
   // flags are not set.
-  iTextureHandle *hstxt = soft_man->RegisterTexture (image, flags);
+  csRef<iTextureHandle> hstxt (soft_man->RegisterTexture (image, flags));
   // deal with key colours..
   if (ogl_txt->GetKeyColor ())
   {
@@ -108,6 +108,7 @@ iTextureHandle *csOpenGLProcSoftware::TxtHandleVector::RegisterAndPrepare (
 
   Push (new txt_handles (hstxt, ogl_txt));
   hstxt->Prepare ();
+  hstxt->IncRef ();	// To prevent smart pointer release @@@??? Investigate?
   return hstxt;
 }
 
@@ -123,13 +124,10 @@ csOpenGLProcSoftware::csOpenGLProcSoftware (iBase * pParent)
 {
   SCF_CONSTRUCT_IBASE (pParent);
   tex = NULL;
-  g3d = NULL;
-  isoft_proc = NULL;
   parent_g3d = NULL;
   alone_mode = true;
   head_soft_tex = NULL;
   next_soft_tex = NULL;
-  dummy_g2d = NULL;
 }
 
 csOpenGLProcSoftware::~csOpenGLProcSoftware ()
@@ -157,16 +155,10 @@ csOpenGLProcSoftware::~csOpenGLProcSoftware ()
   }
   if (object_reg != 0)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
     if (q != 0)
-    {
       q->GetEventOutlet()->Broadcast(cscmdContextClose,(void*)dummy_g2d);
-      q->DecRef ();
-    }
   }
-  SCF_DEC_REF (dummy_g2d);
-  SCF_DEC_REF (g3d);
-  SCF_DEC_REF (isoft_proc);
 }
 
 void csOpenGLProcSoftware::ConvertAloneMode ()
@@ -220,9 +212,10 @@ bool csOpenGLProcSoftware::Prepare(
   alone_mode = alone_hint;
 
   // Get an instance of the software procedural texture renderer
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY(object_reg, iPluginManager);
-  iGraphics3D *soft_proc_g3d = CS_LOAD_PLUGIN (plugin_mgr,
-    "crystalspace.graphics3d.software.offscreen", iGraphics3D);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY(object_reg, iPluginManager));
+  csRef<iGraphics3D> soft_proc_g3d (CS_LOAD_PLUGIN (plugin_mgr,
+    "crystalspace.graphics3d.software.offscreen", iGraphics3D));
   if (!soft_proc_g3d)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -230,7 +223,6 @@ bool csOpenGLProcSoftware::Prepare(
 	"Error creating offscreen software renderer");
     return false;
   }
-  plugin_mgr->DecRef();
 
   isoft_proc = SCF_QUERY_INTERFACE(soft_proc_g3d, iSoftProcTexture);
 
@@ -239,7 +231,6 @@ bool csOpenGLProcSoftware::Prepare(
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
 	"crystalspace.graphics3d.opengl",
 	"Error creating offscreen software renderer");
-    soft_proc_g3d->DecRef ();
     return false;
   }
 
@@ -248,15 +239,15 @@ bool csOpenGLProcSoftware::Prepare(
   // driver.
   //    g3d = parent_g3d;
 
+  iGraphics3D* head_soft_tex_g3d = NULL;
+  if (head_soft_tex) head_soft_tex_g3d = head_soft_tex->g3d;
   iTextureHandle *soft_proc_tex = isoft_proc->CreateOffScreenRenderer
-    ((iGraphics3D*) parent_g3d, head_soft_tex ? head_soft_tex->g3d : NULL,
+    ((iGraphics3D*) parent_g3d, head_soft_tex_g3d,
      width, height, buffer, &pfmt, tex->GetFlags());
 
   if (!soft_proc_tex)
   {
-    isoft_proc->DecRef ();
     isoft_proc = NULL;
-    soft_proc_g3d->DecRef ();
     return false;
   }
   // set to correct value.
@@ -264,7 +255,8 @@ bool csOpenGLProcSoftware::Prepare(
 
   // Get the main renderers pixel format as this is not necessarily 32bit
   csPixelFormat *main_pfmt = parent_g3d->GetDriver2D()->GetPixelFormat ();
-  dummy_g2d = (iGraphics2D*) new csOpenGLProcSoftware2D (g3d, main_pfmt);
+  dummy_g2d = csPtr<iGraphics2D> (
+  	(iGraphics2D*) new csOpenGLProcSoftware2D (g3d, main_pfmt));
 
   CS_ASSERT (object_reg != NULL);
   if (!head_soft_tex)

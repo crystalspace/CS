@@ -40,8 +40,9 @@ csEffectTechnique::csEffectTechnique()
 iEffectPass* csEffectTechnique::CreatePass()
 {
   csEffectPass* passobj = new csEffectPass();
-  iEffectPass* pass = SCF_QUERY_INTERFACE( passobj, iEffectPass );
+  csRef<iEffectPass> pass (SCF_QUERY_INTERFACE( passobj, iEffectPass ));
   passes.Push( pass );
+  pass->IncRef ();	// To prevent smart pointer release.
   return pass;
 }
 

@@ -182,7 +182,7 @@ public:
   iBase* logparent;
   iMeshObjectFactory* pFactory;
   iMeshObjectDrawCallback* vis_cb;
-  iBCTerrFactoryState* factory_state;
+  csRef<iBCTerrFactoryState> factory_state;
   iVertexBufferManager *vbufmgr;
   csBox3 bbox;
   csVector3 radius;

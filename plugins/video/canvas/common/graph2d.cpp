@@ -71,7 +71,6 @@ csGraphics2D::csGraphics2D (iBase* parent)
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiNativeWindowManager);
   scfiEventHandler = NULL;
   Memory = NULL;
-  FontServer = NULL;
   LineAddress = NULL;
   Palette = NULL;
   Width = 640;
@@ -82,7 +81,6 @@ csGraphics2D::csGraphics2D (iBase* parent)
   win_title = csStrNew ("Crystal Space Application");
   object_reg = NULL;
   AllowResizing = false;
-  plugin_mgr = NULL;
 }
 
 bool csGraphics2D::Initialize (iObjectRegistry* r)
@@ -133,12 +131,9 @@ bool csGraphics2D::Initialize (iObjectRegistry* r)
 
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-  {
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
-    q->DecRef ();
-  }
 
   return true;
 }
@@ -153,16 +148,11 @@ csGraphics2D::~csGraphics2D ()
 {
   if (scfiEventHandler)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
     if (q != 0)
-    {
       q->RemoveListener (scfiEventHandler);
-      q->DecRef ();
-    }
     scfiEventHandler->DecRef ();
   }
-  if (plugin_mgr) plugin_mgr->DecRef ();
-  if (FontServer) FontServer->DecRef ();
   Close ();
   delete [] Palette;
   delete [] win_title;

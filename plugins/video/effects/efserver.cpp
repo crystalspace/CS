@@ -42,18 +42,19 @@ bool csEffectServer::Initialize( iObjectRegistry* reg )
 iEffectDefinition* csEffectServer::CreateEffect()
 {
   csEffectDefinition* effectobj = new csEffectDefinition();
-  iEffectDefinition* effect = SCF_QUERY_INTERFACE(
-  	effectobj, iEffectDefinition );
+  csRef<iEffectDefinition> effect (SCF_QUERY_INTERFACE(
+  	effectobj, iEffectDefinition));
+  effect->IncRef ();	// To avoid smart pointer release.
+  // THIS ROUTINE MUST RETURN csPtr.
   return effect;
 }
 
 bool csEffectServer::Validate( iEffectDefinition* effect )
 {
-  iGraphics3D* g3d = CS_QUERY_REGISTRY( objectreg, iGraphics3D );
+  csRef<iGraphics3D> g3d (CS_QUERY_REGISTRY( objectreg, iGraphics3D ));
   if( g3d )
   {
-    iEffectClient* client = SCF_QUERY_INTERFACE( g3d, iEffectClient );
-    g3d->DecRef();
+    csRef<iEffectClient> client (SCF_QUERY_INTERFACE( g3d, iEffectClient ));
     if( client )
     {
       bool valideffect = false;
@@ -63,7 +64,6 @@ bool csEffectServer::Validate( iEffectDefinition* effect )
           effect->GetTechnique(i)->SetValidation( CS_TECHNIQUE_PASSED );
           valideffect = true;
         } else effect->GetTechnique(i)->SetValidation( CS_TECHNIQUE_FAILED );
-      client->DecRef();
       return valideffect;
     }
   }

@@ -222,7 +222,7 @@ float sAc, sBc, sCc, sDc;
 //csVector3 sV;
 
 csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
-  G2D (NULL), object_reg (NULL)
+  object_reg (NULL)
 {
   SCF_CONSTRUCT_IBASE (parent);
   SCF_CONSTRUCT_EMBEDDED_IBASE(scfiComponent);
@@ -235,7 +235,6 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon (iBase* parent):
   lightmap_cache = NULL;
   txtmgr = NULL;
   vbufmgr = NULL;
-  effectserver = NULL;
   m_fogtexturehandle = 0;
   fps_limit = 0;
   debug_edges = false;
@@ -337,19 +336,13 @@ csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
 {
   if (scfiEventHandler)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
     if (q != 0)
-    {
       q->RemoveListener (scfiEventHandler);
-      q->DecRef ();
-    }
     scfiEventHandler->DecRef ();
   }
 
   Close ();
-  if (G2D) G2D->DecRef ();
-
-  effectserver->DecRef ();
 
   // see note above
   tr_verts->DecRef ();
@@ -379,12 +372,9 @@ void csGraphics3DOGLCommon::Report (int severity, const char* msg, ...)
 {
   va_list arg;
   va_start (arg, msg);
-  iReporter* rep = CS_QUERY_REGISTRY (object_reg, iReporter);
+  csRef<iReporter> rep (CS_QUERY_REGISTRY (object_reg, iReporter));
   if (rep)
-  {
     rep->ReportV (severity, "crystalspace.graphics3d.opengl", msg, arg);
-    rep->DecRef ();
-  }
   else
   {
     csPrintfV (msg, arg);
@@ -399,12 +389,9 @@ bool csGraphics3DOGLCommon::Initialize (iObjectRegistry* p)
   CS_ASSERT (object_reg != NULL);
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
-  iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+  csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
-  {
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
-    q->DecRef ();
-  }
   return true;
 }
 
@@ -413,7 +400,7 @@ void csGraphics3DOGLCommon::InitGLExtensions ()
 #define EXT_CONFIG_KEY "Video.OpenGL.UseExtension"
   if (G2D)
   {
-    iOpenGLInterface *G2DGL = SCF_QUERY_INTERFACE (G2D, iOpenGLInterface);
+    csRef<iOpenGLInterface> G2DGL (SCF_QUERY_INTERFACE (G2D, iOpenGLInterface));
     if (G2DGL)
     {
       const unsigned char* extensions = glGetString(GL_EXTENSIONS);
@@ -457,7 +444,6 @@ void csGraphics3DOGLCommon::InitGLExtensions ()
 
   ext = next;
       }
-      G2DGL->DecRef ();
       delete[] extbuf;
     }
 
@@ -504,17 +490,16 @@ bool csGraphics3DOGLCommon::NewInitialize ()
 {
   config.AddConfig(object_reg, "/config/opengl.cfg");
 
-  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
-    iCommandLineParser);
+  csRef<iCommandLineParser> cmdline (CS_QUERY_REGISTRY (object_reg,
+    iCommandLineParser));
 
   const char *driver = cmdline->GetOption ("canvas");
-  cmdline->DecRef ();
   if (!driver)
     driver = config->GetStr ("Video.OpenGL.Canvas", CS_OPENGL_2D_DRIVER);
 
-  iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+  csRef<iPluginManager> plugin_mgr (
+  	CS_QUERY_REGISTRY (object_reg, iPluginManager));
   G2D = CS_LOAD_PLUGIN (plugin_mgr, driver, iGraphics2D);
-  plugin_mgr->DecRef ();
   if (!G2D)
     return false;
   if (!object_reg->Register (G2D, "iGraphics2D"))
@@ -1162,11 +1147,11 @@ void csGraphics3DOGLCommon::CommonOpen ()
   effectserver = CS_QUERY_REGISTRY(object_reg, iEffectServer);
   if( !effectserver )
   {
-    iPluginManager* plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
+    csRef<iPluginManager> plugin_mgr (
+    	CS_QUERY_REGISTRY (object_reg, iPluginManager));
     effectserver = CS_LOAD_PLUGIN (plugin_mgr,
       "crystalspace.video.effects.stdserver", iEffectServer);
     object_reg->Register (effectserver, "iEffectServer");
-    plugin_mgr->DecRef ();
   }
   csEffectStrings::InitStrings( effectserver );
   InitStockEffects();
@@ -1400,10 +1385,9 @@ void csGraphics3DOGLCommon::Print (csRect * area)
   if (fps_limit)
   {
     csTicks elapsed_time, current_time;
-    iVirtualClock* vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+    csRef<iVirtualClock> vc (CS_QUERY_REGISTRY (object_reg, iVirtualClock));
     elapsed_time = vc->GetElapsedTicks ();
     current_time = vc->GetCurrentTicks ();
-    vc->DecRef ();
     /// Smooth last n frames, to avoid jitter when objects appear/disappear.
     static int num = 10;
     static int times[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };

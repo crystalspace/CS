@@ -57,12 +57,9 @@ csOpenGLProcBackBuffer::~csOpenGLProcBackBuffer ()
   delete [] buffer;
   if (object_reg != 0)
   {
-    iEventQueue* q = CS_QUERY_REGISTRY(object_reg, iEventQueue);
+    csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
     if (q != 0)
-    {
       q->GetEventOutlet ()->Broadcast (cscmdContextClose, (void*)G2D);
-      q->DecRef ();
-    }
   }
 }
 
