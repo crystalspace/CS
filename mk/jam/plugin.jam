@@ -70,12 +70,12 @@ rule Plugin
   # construct install atrget
   if ! [ IsElem noinstall : $(3) ]
   {
-    InstallPlugin $(target) ;
+    SystemInstallPlugin $(target) ;
   }
 
   # Link
   MakeLocate $(target) : $(LOCATE.TARGETS) ;
-  SystemLinkPlugin $(<) : $(objects) : $(3) : $(metafile) ;
+  SystemLinkPlugin $(<) : $(objects) : $(3) ;
 
   CFlags $(<) : $(PLUGIN.CFLAGS) ;
   LFlags $(<) : $(LINKLIBS) $(PLUGIN.LFLAGS) ;
@@ -99,6 +99,8 @@ rule PluginMetaData
   Copy $(target) : $(>) ;
   Clean clean : $(target) ;
   Clean $(<)clean : $(target) ;
+
+  Depends install_plugin : [ DoInstall $(target) : $(plugindir) ] ;
 }
 
 # Construct pseudo target plugins

@@ -219,6 +219,11 @@ rule SystemLinkApplication
   AppResourceWin32 $(<) ;
 }
 
+rule SystemInstallApplication
+{
+  Depends install_bin : [ DoInstall $(<) : $(bindir) $(2) ] ; 
+}
+
 # SystemLinkPlugin target : objects : options
 rule SystemLinkPlugin
 {

@@ -60,7 +60,7 @@ rule Wildcard
     wildcards = $(<) ;
   }
 
-  files = [ GLOB [ FDirName $(SUBDIR) $(dir) ] : $(wildcards) ] ;
+  files = [ GLOB [ ConcatDirs $(SUBDIR) $(dir) ] : $(wildcards) ] ;
 
   return $(files:BSR=$(sdir)) ;
 }
@@ -169,6 +169,33 @@ rule Reverse
 rule GetVar
 {
   return $($(<)) ;
+}
+
+##  ConcatDirs dirs
+##    Concatenates a set of directories. This is a substitute for FDirName in
+##    Jambase. It works also correctly for several rooted paths, where FDirName
+##    fails.
+##    The advantage over $(dir1)/$(dir2) is that this also works correctly if
+##    $(dir1) or $(dir2) is not set.
+rule ConcatDirs
+{
+  local i ;
+  local result = $(<[1]) ;
+  if ! $(result) { $result = "" ; }
+  local dir1 dir2 ;
+
+  for i in $(<[2-])
+  {
+    # eleminate multiple slashes because jam is somewhat buggy here
+    dir1 = [ MATCH (.*[^/]?) : $(result) ] ;
+    dir2 = [ MATCH ([^/].*) : $(i) ] ;
+    if ! $(dir1) { dir1 = "" ; }
+    if $(dir1) != "" { dir1 = $(dir1)/ ; }
+    if ! $(dir2) { dir2 = "" ; }
+    result = $(dir1)$(dir2) ;
+  }
+
+  return $(result) ;
 }
 
 ##  Copy target : source

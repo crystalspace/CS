@@ -42,6 +42,17 @@ rule SystemLinkApplication
   Clean $(<)clean : $(target) ;
 }
 
+rule SystemInstallApplication
+{
+  Depends install_bin : [ DoInstall $(<) : $(bindir) $(2) : $(INSTALL_PROGRAM) ] ;
+}
+
+rule SystemInstallPlugin
+{
+  Depends install_plugin : [ DoInstall $(<) : $(plugindir) $(2) :
+      $(INSTALL_PROGRAM) ] ;
+}
+
 # Put the meta data into the object file headers
 rule ObjTagMetaData
 {

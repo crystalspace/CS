@@ -12,7 +12,5 @@ ExternalLibs gl3d :  GL ;
 
 CompileGroups gl3d :  drivers3d ;
 
-InstallConfig gl3dfx.cfg glnvgf.cfg opengl.cfg ;
-
 }
 

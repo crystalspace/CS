@@ -7,5 +7,3 @@ Application isomap
 ;
 LinkWith isomap : csgeom csgfx cstool csutil ;
 
-InstallMapfile isomap ;
-

@@ -29,66 +29,73 @@ actions Archive
 #    Constructs the application target name (ie. foo.app for foo)
 rule ConstructApplicationTarget
 {
-  if [ IsElem console : $(>) ] { return $(<) ; }
-  else { return $(<) ; }
+  return $(<) ;
 }
 
 # ConstructLibraryTarget target : options
 rule ConstructLibraryTarget
 {
-      return lib$(<)$(SUFLIB) ;
+      return lib$(<).a ;
 }
 
 # ConstructPluginTarget : options
 rule ConstructPluginTarget
 {
-  return $(<).csbundle ;
+    return $(<).csbundle ;
 }
 
 # SystemLinkApplication target : objects : options
 rule SystemLinkApplication
 {
-  local target = $($(<)_TARGET) ;
-  Depends $(target) : $(>) ;
-  if [ IsElem console : $(3) ]
-  {
-    LinkApplicationConsole $(target) : $(>) ;
-    Clean clean : $(target) ;
-    Clean $(<)clean : $(target) ;
-  }
-  else
-  {
-    CreateApplicationWrapper $(target) : $(>) ;
-    CleanDir clean : [ Wrapper $(<) : app ] ;
-    CleanDir $(<)clean : [ Wrapper $(<) : app ] ;
-  }
+    local target = $($(<)_TARGET) ;
+    Depends $(target) : $(>) ;
+    if [ IsElem console : $(3) ]
+    {
+        LinkApplicationConsole $(target) : $(>) ;
+        Clean clean : $(target) ;
+        Clean $(<)clean : $(target) ;
+    } else {
+        CreateApplicationWrapper $(target) : $(>) ;
+        CleanDir clean : [ Wrapper $(<) : app ] ;
+        CleanDir $(<)clean : [ Wrapper $(<) : app ] ;
+    }
+}
+
+rule SystemInstallApplication
+{
+    if [ IsElem console : $(3) ]
+    {
+        Depends install_bin : [ DoInstall $(<) : $(bindir) $(2) ] ;
+    } else {
+        InstallApplicationGUI $(<) 
+    }
 }
 
 # SystemLinkPlugin target : objects : options
 rule SystemLinkPlugin
 {
-  local target = $($(<)_TARGET) ;
-  Depends $(target) : $(>) ;
-  LinkPlugin $(target) : $(>) ;
-  PluginMetaData $(<) : $($(<)_METAFILE) ;
-  Clean clean : $(target) ;
-  Clean $(<)clean : $(target) ;
+    local target = $($(<)_TARGET) ;
+    Depends $(target) : $(>) ;
+    LinkPlugin $(target) : $(>) ;
+    PluginMetaData $(<) : $($(<)_METAFILE) ;
+    Clean clean : $(target) ;
+    Clean $(<)clean : $(target) ;
 }
 
 # LinkPlugin plugin : objects
 #    Link a plugin module from a set of object files.
 actions LinkPlugin bind NEEDLIBS bind EXTRAOBJECTS
 {
-  $(MACOSX.ENVIRON)
-  $(CMD.LINK) -bundle -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+    $(MACOSX.ENVIRON)
+    $(CMD.LINK) -bundle -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }
 
 # LinkApplicationConsole exe : objects
 #    Link a console (non-GUI) appliation from a set of object files.
 actions LinkApplicationConsole bind NEEDLIBS bind EXTRAOBJECTS
 {
-  $(MACOSX.ENVIRON)
-  $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+    $(MACOSX.ENVIRON)
+    $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }
 
 # CreateApplicationWrapper basename : objects
@@ -97,16 +104,16 @@ actions LinkApplicationConsole bind NEEDLIBS bind EXTRAOBJECTS
 #    control the icon associated with the application wrapper.
 rule CreateApplicationWrapper
 {
-  WrapFile $(<) : $(<) : Contents MacOS : AppExe : $(>) ;
-  WrapFile $(<) : PkgInfo : Contents : AppPkgInfo : $(>) ;
-  WrapFile $(<) : version.plist : Contents : AppVersionPlist : $(>) ;
-  WrapFile $(<) : Info.plist : Contents : AppInfoPlist : $(>) ;
-  WrapFile $(<) : InfoPlist.strings : Contents Resources English.lproj : 
-    AppInfoPlistStrings : $(>) ;
-  if $(MACOSX.APP_ICON) && ! $($(<)_APPICON)
-  {
-    AppIcon $(<) : $(MACOSX.APP_ICON) ;
-  }
+    WrapFile $(<) : $(<) : Contents MacOS : AppExe : $(>) ;
+    WrapFile $(<) : PkgInfo : Contents : AppPkgInfo : $(>) ;
+    WrapFile $(<) : version.plist : Contents : AppVersionPlist : $(>) ;
+    WrapFile $(<) : Info.plist : Contents : AppInfoPlist : $(>) ;
+    WrapFile $(<) : InfoPlist.strings : Contents Resources English.lproj : 
+        AppInfoPlistStrings : $(>) ;
+    if $(MACOSX.APP_ICON) && ! $($(<)_APPICON)
+    {
+        AppIcon $(<) : $(MACOSX.APP_ICON) ;
+    }
 }
 
 # ApplicationIconDefaultOSX icon [ : pathcomponents ]
@@ -114,11 +121,11 @@ rule CreateApplicationWrapper
 #    overriden for a individual application with the ApplicationIconOSX rule.
 rule ApplicationIconDefaultOSX
 {
-  MACOSX.APP_ICON = $(<) ;
-  if $(>)
-  {
-    SEARCH on $(<) = [ FDirName $(>) ] ;
-  }
+    MACOSX.APP_ICON = $(<) ;
+    if $(>)
+    {
+        SEARCH on $(<) = [ FDirName $(>) ] ;
+    }
 }
 
 # ApplicationIconOSX basename : icon [ : pathcomponents ]
@@ -140,12 +147,12 @@ rule ApplicationIconDefaultOSX
 #    to ensure that Info.plist mentions the correct icon in all cases.
 rule ApplicationIconOSX
 {
-  local dir ;
-  if $(3) { dir = [ FDirName $(3) ] ; }
-  else { dir = $(SEARCH_SOURCE) ; }
-  SEARCH on $(>) = $(dir) ;
-  $(<)_APPICON = $(>) ;
-  AppIcon $(<) : $(>) ;
+    local dir ;
+    if $(3) { dir = [ FDirName $(3) ] ; }
+    else { dir = $(SEARCH_SOURCE) ; }
+    SEARCH on $(>) = $(dir) ;
+    $(<)_APPICON = $(>) ;
+    AppIcon $(<) : $(>) ;
 }
 
 # Wrapper basename : suffix [ : pathcomponents ]
@@ -154,10 +161,10 @@ rule ApplicationIconOSX
 #    used.
 rule Wrapper
 {
-  local dir ;
-  if $(3) { dir = [ FDirName $(3) ] ; }
-  else { dir = $(LOCATE.TARGETS) ; }
-  return [ FDirName $(dir) $(1).$(2) ] ;
+    local dir ;
+    if $(3) { dir = [ FDirName $(3) ] ; }
+    else { dir = $(LOCATE.TARGETS) ; }
+    return [ FDirName $(dir) $(1).$(2) ] ;
 }
 
 # WrapFile basename : file : pathcomponents : rule [ : objects : [ suffix ] ]
@@ -183,35 +190,35 @@ rule Wrapper
 #    WrapFile rule.
 rule WrapFile
 {
-  local suffix ;
-  if $(6) { suffix = $(6) ; } else { suffix = app ; }
-  local target = $(2) ;
-  if $(target) != $(1)
-  {
-    target = $(target:G=$(1)) ;
-    Depends $(1) : $(target) ;
-  }
-  local dir = [ FDirName [ Wrapper $(1) : $(suffix) ] $(3) ] ;
-  MakeLocate $(target) : $(dir) ;
-  if $(5) { Depends $(target) : $(5) ; }
-  BASENAME on $(target) = $(1) ;
-  $(4) $(target) : $(5) : $(1) ;
+    local suffix ;
+    if $(6) { suffix = $(6) ; } else { suffix = app ; }
+    local target = $(2) ;
+    if $(target) != $(1)
+    {
+        target = $(target:G=$(1)) ;
+        Depends $(1) : $(target) ;
+    }
+    local dir = [ FDirName [ Wrapper $(1) : $(suffix) ] $(3) ] ;
+    MakeLocate $(target) : $(dir) ;
+    if $(5) { Depends $(target) : $(5) ; }
+    BASENAME on $(target) = $(1) ;
+    $(4) $(target) : $(5) : $(1) ;
 
-  Clean clean : [ FDirName $(dir) $(target) ] ;
-  Clean $(1)clean : [ FDirName $(dir) $(target) ] ;
+    Clean clean : [ FDirName $(dir) $(target) ] ;
+    Clean $(1)clean : [ FDirName $(dir) $(target) ] ;
 }
 
 # LinkApplication exe : objects
 actions AppExe bind NEEDLIBS bind EXTRAOBJECTS
 {
-  $(MACOSX.ENVIRON)
-  $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
+    $(MACOSX.ENVIRON)
+    $(CMD.LINK) -o $(<) $(>) $(EXTRAOBJECTS) $(NEEDLIBS) $(LINKLIBS)
 }
 
 # AppPkgInfo file
 actions AppPkgInfo
 {
-  echo 'APPL???' > $(<) ;
+    echo 'APPL???' > $(<) ;
 }
 
 # AppInfoPlistStrings file
@@ -257,10 +264,10 @@ EOT
 #    desire.
 rule AppInfoPlist
 {
-  if ! $($(3)_APPICON)
-  {
-    $(3)_APPICON = $(MACOSX.APP_ICON) ;
-  }
+    if ! $($(3)_APPICON)
+    {
+        $(3)_APPICON = $(MACOSX.APP_ICON) ;
+    }
 }
 
 actions AppInfoPlist
@@ -303,13 +310,13 @@ EOT
 #    valid assumption for icons.
 rule AppIcon
 {
-  local icon = $(>:G=$(<)) ;
-  Depends $(<) : $(icon) ; 
-  Depends $(icon) : $(>) ;
-  MakeLocate $(icon) : [ FDirName [ Wrapper $(<) : app ] Contents Resources ] ;
-  AppIcon1 $(icon) : $(>) ;
-  Clean clean : $(icon) ;
-  Clean $(<)clean : $(icon) ;
+    local icon = $(>:G=$(<)) ;
+    Depends $(<) : $(icon) ; 
+    Depends $(icon) : $(>) ;
+    MakeLocate $(icon) : [ FDirName [ Wrapper $(<) : app ] Contents Resources ] ;
+    AppIcon1 $(icon) : $(>) ;
+    Clean clean : $(icon) ;
+    Clean $(<)clean : $(icon) ;
 }
 
 actions AppIcon1
@@ -324,21 +331,22 @@ actions AppIcon1
 #    needed (i.e. the typical Install rule does not work).
 rule InstallApplicationGUI
 {
-  local target = $(<).app ;
-  local wrapper = [ Wrapper $(>) : app ] ;
-  SEARCH on $(wrapper) = $(LOCATE.TARGETS) ;
-  NotFile $(<) ;
-  Always $(<) ;
-  Depends $(<) : $(target) ;
-  Depends $(target) : $(<:D:G=dir) ; # Ensure installation directory exists.
-  MkDir $(<:D:G=dir) ;
-  Depends $(target) : $(wrapper) ;
-  Depends $(wrapper) : $(>) ;
-  InstallApplicationWrapper $(target) : $(wrapper) ;
+    local target = $(<).app ;
+    local wrapper = [ Wrapper $(>) : app ] ;
+    SEARCH on $(wrapper) = $(LOCATE.TARGETS) ;
+    NotFile $(<) ;
+    Always $(<) ;
+    Depends $(<) : $(target) ;
+    Depends $(target) : $(<:D:G=dir) ; # Ensure installation directory exists.
+    MkDir $(<:D:G=dir) ;
+    Depends $(target) : $(wrapper) ;
+    Depends $(wrapper) : $(>) ;
+    InstallApplicationWrapper $(target) : $(wrapper) ;
 }
 
 actions InstallApplicationWrapper
 {
-  $(DELTREE) $(<) ;
-  $(DEEPCOPY) $(>) $(<) ;
+    $(DELTREE) $(<) ;
+    $(DEEPCOPY) $(>) $(<) ;
 }
+

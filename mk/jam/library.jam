@@ -93,7 +93,7 @@ rule Library
   # Generate install rules
   if ! [ IsElem noinstall : $(3) ]
   {
-    InstallLibrary $(target) ;
+    Depends install_app : [ DoInstall $(target) : $(libdir) ] ;
   }
 
   if $(CRELIB) { CreLib $(target) : $(objects[1]) ; }

@@ -10,7 +10,5 @@ Plugin joylin
 LinkWith joylin : csutil ;
 ExternalLibs joylin :  JOYSTICK ;
 
-InstallConfig joystick.cfg ;
-
 }
 

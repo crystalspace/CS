@@ -17,6 +17,4 @@ Plugin softrender3d :
 ;
 LinkWith softrender3d : render3dcommon csgeom csgfx csutil ;
 
-InstallConfig softrender3d.cfg ;
-
 CompileGroups softrender3d :  drivers3d ;

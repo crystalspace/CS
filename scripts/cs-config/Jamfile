@@ -9,17 +9,17 @@ actions csConfigGen
   cat $(SUBDIR)/cs-config.temppre > $(<)
 
   cat >> $(<) << __END__
-CRYSTAL="\${CRYSTAL-$(INSTALLDIR.PREFIX)}"
+CRYSTAL="\${CRYSTAL-$(prefix)}"
 prefix="\${CRYSTAL}"
 exec_prefix="\${prefix}"
 makeout="$(LOCATE.OBJECTS)"
-version="$(PACKAGE.VERSION)"
-longversion="$(PACKAGE.STRING)"
+version="$(PACKAGE_VERSION)"
+longversion="$(PACKAGE_STRING)"
 # try to determine if we're in a source or installed CS version
 if [ -r \${prefix}/include/cssysdef.h ] ; then
   includedir="\${prefix}/include"
 else
-  includedir="$(INSTALLDIR.INCLUDE)"
+  includedir="$(includedir)"
 fi
 syslibs=" $(LINKLIBS) "
 common_cflags=" $(COMPILER.CFLAGS.MANDATORY) "

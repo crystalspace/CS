@@ -7,5 +7,3 @@ Plugin bugplug
 ;
 LinkWith bugplug : csgeom cstool csutil ;
 
-InstallConfig bugplug.cfg ;
-InstallConfig bugplug.key ;

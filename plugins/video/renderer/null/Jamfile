@@ -9,5 +9,3 @@ LinkWith null3d : renderercommon csgeom csgfx csutil ;
 
 CompileGroups null3d :  drivers3d ;
 
-InstallConfig null3d.cfg ;
-

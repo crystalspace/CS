@@ -5,8 +5,6 @@ if $(CMD.TEXI2HTML)
   FLAGS.TEXI2HTML on htmldocs += -init_file=$(TOP)/docs/support/texi2html.init -prefix=cs ;
   Texi2HTML htmldocs : cs-unix.txi : html ;
   Help htmldocs : "user manual in html format" ;
-
-  InstallDocDir htmldocs ;
 }
 
 if $(CMD.TEXI2DVI)

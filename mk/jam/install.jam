@@ -2,289 +2,138 @@
 # Rules for installation
 #============================================================================
 
-# Override Jam defaults.
-EXEMODE = 0755 ;
-FILEMODE = 0644 ;
+COPYDIRS ?= "cp -R" ;
 
-##  InstallApplication applicationname [ : subdir [ : options ] ]
-##    Install an application into the bindir directory.  A subdirectory
-##    relative to the bindir can be specified.  Possible options are "console"
-##    if this is a console application (as opposed to a GUI application).  This
-##    rule is already invoked by the Application rule, so usually there's no
-##    need to call it manually.
-rule InstallApplication
-{
-  local dir = [ FDirName $(INSTALLDIR.APPLICATION) $(2) ] ;
-  local target = $(<:R=$(dir):G=install) ;
+INSTALL ?= "install" ;
+INSTALL_PROGRAM ?= $(INSTALL) ;
+INSTALL_SCRIPT ?= $(INSTALL) ;
+INSTALL_DATA ?= "$(INSTALL) -m644" ;
 
-  CheckOptions console : $(3) : $(<) ;
-  if [ IsElem console : $(3) ]
-  {
-    InstallApplicationConsole $(target) : $(<) ;
-  }
-  else
-  {
-    InstallApplicationGUI $(target) : $(<) ;
-  }
-  Depends install_apps : $(target) ;
-}
-
-##  InstallApplicationGUI installapp : app
-##  InstallApplicationConsole installapp : app
-##    Utility rules for InstallApplication which perform the actual
-##    installation.  These default implementations merely invokes the Install
-##    rule. Platforms with special installation requirements may override
-##    these rules.
-rule InstallApplicationGUI
-{
-  Install $(<) : $(>) ;
-  MODE on $(<) = $(EXEMODE) ;
-}
-
-rule InstallApplicationConsole
-{
-  Install $(<) : $(>) ;
-  MODE on $(<) = $(EXEMODE) ;
-}
-
-
-##  InstallPlugin pluginname [ : subdir ]
-##    Install a plugin into the plugindir directory.  A subdirectory relative
-##    to the plugindir can be specified.  This rule is already invoked by the
-##    Plugin rule, so usually there's no need to call it manually.
-rule InstallPlugin
-{
-  local dir = [ FDirName $(INSTALLDIR.PLUGIN) $(2) ] ;
-  local target = $(<:R=$(dir):G=install) ;
-
-  InstallPluginPlatform $(target) : $(<) ;
-  Depends install_plugins : $(target) ;
-}
-
-##  InstallPluginPlatform installplugin : plugin
-##    Utility rule for InstallPlugin which performs the actual installation.
-##    This default implementations invokes the Install rule for the plugin
-##    executable and the associated meta-data file.  Platforms with special
-##    installation requirements may override this implementation.  (For
-##    example, a platform on which the meta-data information is bundled within
-##    the plugin itself, could simply install the plugin, without having to
-##    deal with an external meta-data file.)
-rule InstallPluginPlatform
-{
-  Install $(<) : $(>) ;
-  MODE on $(<) = $(EXEMODE) ;
-  
-  local metasrc = $(>:S=$(SUFMETA):G=$(GRISTMETA)) ;
-  local metadst = $(metasrc:R=$(dir):G=installmeta) ;
-  Install $(metadst) : $(metasrc) ;
-  MODE on $(metadst) = $(FILEMODE) ;
-  Depends install_plugins : $(metadst) ;
-}
-
-##  InstallLibrary libraryname [ : subdir ]
-##    Install a library into the libdir directory. A subdirectory relative to
-##    the libdar may be specified.
-##    This rule is already invoked by the Library rule, so usually there's no
-##    need to call it manually.
-rule InstallLibrary
-{
-  local dir = [ FDirName $(INSTALLDIR.LIBRARY) $(2) ] ;
-  local target = $(<:R=$(dir):G=install) ;
-  
-  Install $(target) : $(<) ;
-  MODE on $(target) = $(FILEMODE) ;
-  Depends install_libs : $(target) ;
-}
+# set some paths
+appdatadir ?= [ ConcatDirs $(datadir) $(PACKAGE_NAME) ] ;
+appdocdir ?= [ ConcatDirs $(datadir) doc $(PACKAGE_NAME) ] ;
+appconfdir ?= [ ConcatDirs $(sysconfdir) $(PACKAGE_NAME) ] ;
+plugindir ?= [ ConcatDirs $(libdir) $(PACKAGE_NAME) ] ;
 
 ##  InstallHeader headername [ : subdir ]
-##    Install a headerfile into the includedir directory. A subdirectory
+##    DoInstall a headerfile into the includedir directory. A subdirectory
 ##    relative to the includedir can be specified.
 rule InstallHeader
 {
-  local dir = [ FDirName $(INSTALLDIR.INCLUDE) $(2) ] ;
-  local target = $(<:R=$(dir):G=install) ;
-    
-  Install $(target) : $(<) ;
-  MODE on $(target) = $(FILEMODE) ;
-  Depends install_headers : $(target) ;
+    SEARCH on $(<:G=installheader) = $(SUBDIR) ;
+    Depends install_include : [ DoInstall $(<:G=installheader) : $(includedir) $(2) ] ;
 }
 
 ##  InstallShellScript scriptname [ : subdir ]
-##    Install a shell script into the bindir directory. A subdirectory
+##    Installs a shell script into the bindir directory. A subdirectory
 ##    relative to the bindir can be specified.
 rule InstallShellScript
 {
-  local dir = [ FDirName $(INSTALLDIR.APPLICATION) $(2) ] ;
-  local target = $(<:R=$(dir):G=install) ;
-  
-  Install $(target) : $(<) ;
-  MODE on $(target) = $(EXEMODE) ;
-  Depends install_shellscripts : $(target) ;
+    SEARCH on $(<:G=installscript) = $(SUBDIR) ;
+    Depends install_shellscript 
+        : [ DoInstall $(<:G=installscript) : $(bindir) $(2) : $(INSTALL_SCRIPT) ]
+    ;
 }
 
-##  InstallData datafiles [ : subdir ]
-##    Install files into the datadir directory. A subdirectory relative to the
-##    datadir may be specified. Note that the files should be marked as data
-##    with the Data rule first.
+##  InstallData files [ : subdir ]
+##    Installs data files
 rule InstallData
 {
-  local target dir d ;
-
-  for d in $(<)
-  {
-    dir = [ FDirName $(INSTALLDIR.DATA) $(2) ] ;
-    target = $(d:R=$(dir):G=install) ;
-        
-    Install $(target) : $(d:G=data) ;
-    MODE on $(target) = $(FILEMODE) ;
-    Depends install_data : $(target) ;
-  }
+    SEARCH on $(<:G=installdata) = $(SUBDIR) ;
+    Depends install_data : [ DoInstall $(<:G=installdata) : $(appdatadir) $(2) ] ;
 }
 
-##  InstallConfig configfiles [ : subdir ]
-##    Install files into the configdir directory. A subdirectory relative to
-##    the configdir may be specified. Note that the files should be marked as
-##    config with the Config rule first.
+##  InstallConfig files [ : subdir ]
+##    Installs configuration files
 rule InstallConfig
 {
-  local target dir c ;
-  
-  dir = [ FDirName $(INSTALLDIR.CONFIG) $(2) ] ;
-
-  for c in $(<)
-  {
-    target = $(c:R=$(dir):G=install) ;
-  
-    Install $(target) : $(c:G=config) ;
-    MODE on $(target) = $(FILEMODE) ;
-    Depends install_configs : $(target) ;
-  }
+    SEARCH on $(<:G=installconfig) = $(SUBDIR) ;
+    Depends install_config : [ DoInstall $(<:G=installconfig) : $(appconfdir) $(2) ] ;
 }
 
-##  InstallDoc filename [ : subdir ]
-##    Install documentation files. A subdirectory relative to the docdis may
-##    be specified.
+##  InstallDoc files [ : subdir ]
+##    Installs documentation files
 rule InstallDoc
 {
-  local dir target d ;
-  
-  dir = [ FDirName $(INSTALLDIR.DOC) $(2) ] ;
-  LOCATE on $(<:G=install) = $(SUBDIR) ;
-
-  for d in $(<)
-  {
-    target = $(d:R=$(dir):G=install) ;
-
-    Install $(target) : $(d:G=install) ;
-    MODE on $(target) = $(FILEMODE) ;
-    Depends install_docs : $(target) ;
-  }
+    SEARCH on $(<:G=installdoc) = $(SUBDIR) ;
+    Depends install_doc : [ DoInstall $(<:G=installdoc) : $(appdocdir) $(2) ] ;
 }
 
-rule InstallDocDir
+##  InstallMan files
+##    DoInstall man files
+rule InstallMan
 {
-  local target dir ;
-  
-  dir = [ FDirName $(INSTALLDIR.DOC) $(2) ] ;
-  target = $(<:R=$(dir):G=doc_install) ;
-  
-  Depends $(target) : $(<) ;
-  MODE on $(target) = $(FILEMODE) ;
-  CopyDirs $(target) : $(DOCDIR_$(<)) ;
-  Depends $(target) : $(<) ;
-  Depends install_docs : $(target) ;
-  Depends install_$(<) : $(target) ;
-}
-
-##  InstallMapfile name
-##    Install a mapfile which has been specified with the Mapfile rule before
-rule InstallMapfile
-{
-  local target dir m i ;
-  
-  for m in $(<)
-  {
-    local dir = [ FDirName $(INSTALLDIR.MAP) $(m) ] ;
-    local target = $(MAP_$(m)_WORLDFILE:R=$(dir):G=install_$(m)) ;
+    local dir i ;
     
-    Install $(target) : $(MAP_$(m)_WORLDFILE) ;
-    MODE on $(target) = $(FILEMODE) ;
-    Depends install_maps : $(target) ;
-
-    for i in $(MAP_$(m)_EXTRAFILES)
-    {
-      dir = [ FDirName $(INSTALLDIR.MAP) $(m) ] ;
-      target = $(i:R=$(dir):G=install_$(m)) ;
-      
-      Install $(target) : $(i) ;
-      MODE on $(target) = $(FILEMODE) ;
-      Depends install_maps : $(target) ;
+    SEARCH on $(<:G=installman) = $(SUBDIR) ;
+    for i in $(<:G=installman) {
+        dir = $(mandir) ;
+        switch $(i:S) {
+            case .1 : dir += man1 ;
+            case .2 : dir += man2 ;
+            case .3 : dir += man3 ;
+            case .4 : dir += man4 ;
+            case .5 : dir += man5 ;
+            case .6 : dir += man6 ;
+            case .7 : dir += man7 ;
+            case .8 : dir += man8 ;
+            case .9 : dir += man9 ;
+            case * :
+                echo "WARNING: manfile has no *.[0-9] ending." ;
+        }
+        Depends install_man : [ DoInstall $(i) : $(dir) ] ;
     }
-  }
 }
 
-##  Install Targetname : sourcename : directory
-##    Install a file. The filemode of the file has to be specified with the
-##    MODE variable for the target.
-##    Normally the InstallApplication/Plugin/Header... rules should be enough
-##    so that there's no need to call this rule.
-rule Install
+##  DoDoInstall sourcename : directories [ : installapp ]
+##    Creates a new installtarget for the given sources. The target(s) are
+##    returned as function result.
+##    (note: we can't name this rule Install, because Jambase already defines an
+##     action for DoInstall :-/)
+rule DoInstall
 {
-  Depends $(<) : $(>) ;
-  Always $(<) ;
+    local targets target i dir gdir ;
+    dir = [ ConcatDirs $(DESTDIR) $(2) ] ;
 
-  #Make sure the target directory exists
-  Depends $(<) : $(<:D:G=dir) ;
-  MkDir $(<:D:G=dir) ;
-}
-
-##  Data files ;
-##    Mark files in the current directory as datafiles. This is needed when
-##    using the InstallData rule.
-rule Data
-{
-  LOCATE on $(<:G=data) = $(SUBDIR) ;
-}
-
-##  Config files ;
-##    Mark files in the current directory as configfiles. This is needed when
-##    using the InstallConfig rule.
-rule Config
-{
-  LOCATE on $(<:G=config) = $(SUBDIR) ;
-}
-
-##  Mapfile name : worldfile [ : Additional Files ]
-##    Mark a file as mapfile. It is possible to specify additonal files which
-##    will be marked dependencies of the map.
-rule Mapfile
-{
-  local i ;
-  LOCATE on $(2:G=map_$(1)) = $(SUBDIR) ;
+    gdir = $(dir:G=dir) ;
+    MkDir $(gdir) ;
   
-  LOCATE on $(3:G=map_$(1)) = $(SUBDIR) ;
-  MAP_$(1)_EXTRAFILES += $(3:G=map_$(1)) ;
-  MAP_$(1)_WORLDFILE = $(2:G=map_$(1)) ;
+    for i in $(1) {
+        target = $(i:BSR=$(dir):G=install) ;
+        targets += $(target) ;
+        Depends $(target) : $(gdir) $(i) ;
+        Install1 $(target) : $(i) ;
+
+        if $(3) {
+            INSTALL_APP on $(target) = $(3) ;
+        } else {
+            INSTALL_APP on $(target) = $(INSTALL_DATA) ;
+        }
+    }
+
+    Always $(targets) ;
+    return $(targets) ;
 }
 
 #----------------------------------------------------------------------------
 
-INSTALLTARGETS = install_apps install_plugins install_libs install_headers
-		 install_shellscripts install_data install_configs
-		 install_maps ;
-EXTRAINSTALL = install_docs ;
+INSTALLTARGETS = install_bin install_plugin install_lib install_header
+		 install_shellscript install_data install_config
+                 install_doc ;
 
-Always install $(INSTALLTARGETS) $(EXTRAINSTALL) ;
-NotFile install $(INSTALLTARGETS) $(EXTRAINSTALL) ;
-
+Always install $(INSTALLTARGETS) ;
+NotFile install $(INSTALLTARGETS) ;
 Depends install : $(INSTALLTARGETS) ;
 
-actions Install
+Help install : "Install $(PACKAGE_NAME)" ;
+
+actions Install1
 {
-  $(CMD.INSTALL) -m$(MODE) $(>) $(<) $(INSTALLFLAGS) ;
+  $(INSTALL_APP) $(>) $(<) $(INSTALLFLAGS) ;
 }
 
 actions CopyDirs
 {
-  cp -R $(>) $(<)
+  $(COPYDIRS) $(>) $(<)
 }
+

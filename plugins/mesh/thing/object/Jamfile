@@ -7,5 +7,4 @@ Plugin thing
 ;
 LinkWith thing : csgfx csgeom csutil ;
 
-InstallConfig thing.cfg ;
 CompileGroups thing :  meshes ;

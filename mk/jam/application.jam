@@ -62,7 +62,7 @@ rule Application
     {
       install_opts += console ;
     }
-    InstallApplication $(target) : : $(install_opts) ;
+    SystemInstallApplication $(target) ;
   }
 
   # Link

@@ -7,5 +7,3 @@ Application awstest
 ;
 LinkWith awstest : csgeom csgfx cstool csutil ;
 
-InstallConfig awstest.cfg ;
-

@@ -66,6 +66,4 @@ SubVariant ;
 }
 
 Win32Resource walktest : $(TOP)/libs/cssys/win32/rsrc/cs1.rc ;
-InstallConfig autoexec.cfg walktest.cfg ;
-InstallMapfile flarge partsys ;
 

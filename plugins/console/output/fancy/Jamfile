@@ -7,6 +7,3 @@ Plugin fancycon
 ;
 LinkWith fancycon : csgeom csutil ;
 
-InstallConfig fancycon.cfg ;
-InstallData fancycon.zip ;
-

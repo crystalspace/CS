@@ -28,40 +28,21 @@ AS_IF([test $exec_prefix = NONE],
     [jam_exec_prefix="AS_ESCAPE([$(prefix)])"],
     [jam_exec_prefix=`echo "$exec_prefix" | sed -e 's:///*:/:g'`])
 
-# Hack: Unfortunately, values of the other directories often contain references
-# to prefix and exec_prefix in lowercase, thus we duplicate the above values.
-CS_JAMCONFIG_PROPERTY([prefix],
-    [CS_PREPARE_INSTALLPATH([$jam_prefix])])
-CS_JAMCONFIG_PROPERTY([exec_prefix],
-    [CS_PREPARE_INSTALLPATH([$jam_exec_prefix])])
+CS_JAMCONFIG_PROPERTY([prefix], [CS_PREPARE_INSTALLPATH([$jam_prefix])])
+CS_JAMCONFIG_PROPERTY([exec_prefix], [CS_PREPARE_INSTALLPATH([$jam_exec_prefix])])
 
-# Hack: Improve Autoconf's default paths a bit.
-docdir="$datadir/doc/$PACKAGE_NAME";
-AS_IF([test "$includedir" = '${prefix}/include'],
-      [includedir="AS_ESCAPE([$(prefix)])/include/$PACKAGE_NAME"])
-AS_IF([test "$datadir" = '${prefix}/share'],
-      [datadir="AS_ESCAPE([$(prefix)])/share/$PACKAGE_NAME"])
-AS_IF([test "$sysconfdir" = '${prefix}/etc'],
-      [sysconfdir="AS_ESCAPE([$(prefix)])/etc/$PACKAGE_NAME"])
-
-mapdir="$datadir/maps" ;
-plugindir="$libdir/$PACKAGE_NAME" ;
-
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.APPLICATION],[CS_PREPARE_INSTALLPATH([$bindir])])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.SBIN],[CS_PREPARE_INSTALLPATH([$sbindir])])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.LIBEXEC],[CS_PREPARE_INSTALLPATH([$libexecdir])])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.DATA],[CS_PREPARE_INSTALLPATH([$datadir])])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.MAP], [CS_PREPARE_INSTALLPATH([$mapdir])])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.CONFIG], [CS_PREPARE_INSTALLPATH([$sysconfdir])])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.SHAREDSTATE], [CS_PREPARE_INSTALLPATH([$sharedstatedir])])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.LOCALSTATE], [CS_PREPARE_INSTALLPATH([$localstatedir])])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.PLUGIN], [CS_PREPARE_INSTALLPATH([$plugindir])])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.DOC], [CS_PREPARE_INSTALLPATH([$docdir])])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.LIBRARY], [CS_PREPARE_INSTALLPATH([$libdir])])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.INCLUDE], [CS_PREPARE_INSTALLPATH([$includedir])])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.OLDINCLUDE], [CS_PREPARE_INSTALLPATH([$oldincludedir])])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.INFO], [CS_PREPARE_INSTALLPATH([$infodir])])
-CS_JAMCONFIG_PROPERTY([INSTALLDIR.MAN], [CS_PREPARE_INSTALLPATH([$mandir])])
+CS_JAMCONFIG_PROPERTY([bindir],[CS_PREPARE_INSTALLPATH([$bindir])])
+CS_JAMCONFIG_PROPERTY([sbindir],[CS_PREPARE_INSTALLPATH([$sbindir])])
+CS_JAMCONFIG_PROPERTY([libexecdir],[CS_PREPARE_INSTALLPATH([$libexecdir])])
+CS_JAMCONFIG_PROPERTY([datadir],[CS_PREPARE_INSTALLPATH([$datadir])])
+CS_JAMCONFIG_PROPERTY([sysconfdir], [CS_PREPARE_INSTALLPATH([$sysconfdir])])
+CS_JAMCONFIG_PROPERTY([sharedstatedir], [CS_PREPARE_INSTALLPATH([$sharedstatedir])])
+CS_JAMCONFIG_PROPERTY([localstatedir], [CS_PREPARE_INSTALLPATH([$localstatedir])])
+CS_JAMCONFIG_PROPERTY([libdir], [CS_PREPARE_INSTALLPATH([$libdir])])
+CS_JAMCONFIG_PROPERTY([includedir], [CS_PREPARE_INSTALLPATH([$includedir])])
+CS_JAMCONFIG_PROPERTY([oldincludedir], [CS_PREPARE_INSTALLPATH([$oldincludedir])])
+CS_JAMCONFIG_PROPERTY([infodir], [CS_PREPARE_INSTALLPATH([$infodir])])
+CS_JAMCONFIG_PROPERTY([mandir], [CS_PREPARE_INSTALLPATH([$mandir])])
 
 ])
 

@@ -8,5 +8,4 @@ Application csdemo
 LinkWith csdemo : csgeom csgfx cstool csutil ;
 
 Win32Resource csdemo : $(TOP)/libs/cssys/win32/rsrc/cs1.rc ;
-InstallConfig csdemo.cfg ;
 

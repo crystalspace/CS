@@ -20,9 +20,9 @@ rule VfsCfgGen
 actions VfsCfgGen
 {
   cat $(>) > $(<)
-  echo "VFS.$(TARGET.OS.NORMALIZED).CS_DATADIR = $(INSTALLDIR.DATA) " >> $(<)
-  echo "VFS.$(TARGET.OS.NORMALIZED).CS_CONFIGDIR = $(INSTALLDIR.CONFIG) " >> $(<)
-  echo "VFS.$(TARGET.OS.NORMALIZED).CS_MAPDIR = $(INSTALLDIR.MAP) " >> $(<)
+  echo "VFS.$(TARGET.OS.NORMALIZED).CS_DATADIR = $(appdatadir) " >> $(<)
+  echo "VFS.$(TARGET.OS.NORMALIZED).CS_CONFIGDIR = $(appconfdir) " >> $(<)
+  echo "VFS.$(TARGET.OS.NORMALIZED).CS_MAPDIR = $(appdatadir)/maps " >> $(<)
 }
 
 # Build our own vfs.cfg
@@ -30,7 +30,7 @@ VFS_CONFIGFILE = vfs.cfg ;
 MakeLocate $(VFS_CONFIGFILE:G=config) : $(LOCATE_TARGET) ;
 SEARCH on $(VFS_CONFIGFILE:G=config) = $(LOCATE_TARGET) ;
 VfsCfgGen $(VFS_CONFIGFILE:G=config) : $(SUBDIR)/vfs.cfg.template ;
-InstallConfig $(VFS_CONFIGFILE:G=config) ;
+Depends install_config : [ DoInstall $(VFS_CONFIGFILE:G=config) : $(appconfdir) ] ;
 
 }
 

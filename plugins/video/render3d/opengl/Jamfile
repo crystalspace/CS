@@ -12,5 +12,4 @@ ExternalLibs glrender3d : GL ;
 
 CompileGroups glrender3d : drivers3d nrall ;
 
-InstallConfig opengl.cfg render3d.cfg ;
 }

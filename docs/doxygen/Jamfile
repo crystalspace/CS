@@ -7,7 +7,5 @@ DoxyGen pubapi : pubapi.dox : pubapi : csblur.png csblurb.png csshadow.png ;
 DoxyGen devapi : devapi.dox : devapi ;
 Help pubapi : "public API reference manual" ;
 Help devapi : "developer API reference manual" ;
-
-InstallDocDir pubapi ;
 }
 

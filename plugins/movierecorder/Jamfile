@@ -6,6 +6,3 @@ Plugin movierecorder
 	: [ Wildcard *.cpp *.h ]
 ;
 LinkWith movierecorder : cstool csutil ;
-
-InstallConfig movierecorder.cfg ;
-

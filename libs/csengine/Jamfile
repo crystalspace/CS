@@ -12,5 +12,3 @@ Library csengine :
 
 LibDepends csengine : cstool csgfx csgeom csutil ;
 
-InstallConfig engine.cfg ;
-

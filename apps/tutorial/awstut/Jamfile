@@ -7,4 +7,3 @@ Application awstut
 ;
 LinkWith awstut : csgeom csgfx cstool csutil ;
 
-InstallConfig awstut.cfg ;

@@ -9,5 +9,3 @@ LinkWith sndplex : csutil ;
 
 CompileGroups sndplex :  soundloaders ;
 
-InstallConfig sound.cfg ;
-

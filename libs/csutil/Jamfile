@@ -7,11 +7,13 @@ Library csutil
 	: [ Wildcard *.cpp *.h ] $(CSSYS_SRC)
           [ Wildcard ../../include/csutil : *.h ]
           [ Wildcard ../../include/cssys : *.h ]
-	:
+          [ Wildcard ../../include/cssys/macosx : *.h ]
+          [ Wildcard ../../include/cssys/win32 : *.h ]
+          [ Wildcard ../../include/cssys/unix : *.h ]
+        :	
 ;
 
 CFlags csutil :
-  -DCS_CONFIGDIR='\"$(INSTALLDIR.CONFIG)\"' 
-  -DCS_PLUGINDIR='\"$(INSTALLDIR.PLUGIN)\"' ;
+  -DCS_CONFIGDIR='\"$(appconfdir)\"' 
+  -DCS_PLUGINDIR='\"$(plugindir)\"' ;
 
-InstallConfig mouse.cfg ;

@@ -8,6 +8,3 @@ Library cstool
 ;
 
 LibDepends cstool : csgfx csgeom csutil ;
-
-InstallConfig system.cfg ;
-

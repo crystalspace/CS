@@ -1,11 +1,12 @@
 SubDir TOP data ;
 
-Data [ Wildcard *.zip ] ;
+InstallData [ Wildcard *.zip ] ;
 
-InstallData standard.zip stdtex.zip ;
+maps = flarge partsys particles terrain r3dtest stenciltest isomap ;
+for map in $(maps) {
+    local mapfiles = [ Wildcard $(map) : *.jpg *.png *.map *.tga world ] ;
+    InstallData $(mapfiles) : maps $(map) ;
+}
 
 SubInclude TOP data config ;
-SubInclude TOP data flarge ;
-SubInclude TOP data partsys ;
-SubInclude TOP data isomap ;
-
+SubInclude TOP data shader ;

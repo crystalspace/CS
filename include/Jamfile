@@ -2,22 +2,22 @@ SubDir TOP include ;
 
 rule ScanHeaders
 {
-  local _top = $(<) ;
-  local _dir = [ FDirName $(_top) include $(>) ] ;
-  local _i, _files = [ GLOB $(_dir) : * ] ;
-
-  for _i in $(_files)
+  local top = $(<) ;
+  local dir = [ ConcatDirs $(top) include $(>) ] ;
+  local i, files = [ GLOB $(dir) : * ] ;
+  
+  for i in $(files)
   {
-    if $(_i:S) = ".h"
+    if $(i:S) = ".h"
     {
-      SEARCH on $(_i:BSG=header_$(>)) = $(_dir) ;
-      InstallHeader $(_i:BSG=header_$(>)) : $(>) ;
+      SEARCH on $(i:G=header) = $(top) ;
+      Depends install_include : [ DoInstall $(i:G=header) : $(includedir) $(>) ] ;
     }
     else
     {
-      if $(_i:BS) != $(DOT) && $(_i:BS) != $(DOTDOT)
+      if $(i:BS) != $(DOT) && $(i:BS) != $(DOTDOT)
       {
-	ScanHeaders $(_top) : [ FDirName $(>) $(_i:BS) ] ;
+	ScanHeaders $(top) : $(>) $(i:BS) ;
       }
     }
   }
@@ -31,3 +31,4 @@ if $(TOP) != "."
 {
   ScanHeaders $(BUILDTOP) ;
 }
+

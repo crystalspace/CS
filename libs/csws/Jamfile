@@ -10,6 +10,3 @@ Library csws :
 
 LibDepends csws : cstool csgfx csgeom csutil ;
 
-InstallConfig csws.cfg ;
-InstallData csws.zip ;
-

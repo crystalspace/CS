@@ -12,7 +12,5 @@ ExternalLibs asciiart :  LIBAA ;
 
 CompileGroups asciiart :  drivers2d ;
 
-InstallConfig asciiart.cfg ;
-
 }
 

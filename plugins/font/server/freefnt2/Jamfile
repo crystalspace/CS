@@ -10,7 +10,5 @@ Plugin freefnt2
 LinkWith freefnt2 : csutil ;
 ExternalLibs freefnt2 :  FT2 ;
 
-InstallConfig freetype.cfg ;
-
 }
 

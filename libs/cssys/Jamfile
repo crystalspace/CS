@@ -25,7 +25,6 @@ case MACOS_X :					# MacOS/X
 		general/printf.cpp
 		general/scanplugins.cpp
 		general/sysroot.cpp ;
-  InstallConfig macosx.cfg ;
 case * :					# Posix, Unix, Linux, etc.
   CSSYS_SRC += [ Filter [ Wildcard unix : *.cpp *.h ] : unix/bfdplugins.cpp ]
 		general/appdir.cpp
