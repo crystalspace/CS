@@ -47,6 +47,7 @@
 #include "iutil/plugin.h"
 #include "plugins/video/canvas/openglcommon/iogl.h"
 #include "plugins/video/canvas/openglcommon/glstates.h"
+#include "ivaria/bugplug.h"
 
 #include "ieffects/efdef.h"
 #include "ieffects/efserver.h"
@@ -251,6 +252,7 @@ public:
 
 private:
   csRef<iEffectServer> effectserver;
+  csRef<iBugPlug> bugplug;
 
   // [lightmap no/yes ][fog 0/1][mixmode]
   csRef<iEffectDefinition> StockEffects[2][2][9];

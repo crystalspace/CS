@@ -354,6 +354,7 @@ bool csGraphics3DOGLCommon::Initialize (iObjectRegistry* p)
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
   if (q != 0)
     q->RegisterListener (scfiEventHandler, CSMASK_Broadcast);
+  bugplug = CS_QUERY_REGISTRY (object_reg, iBugPlug);
   return true;
 }
 
@@ -417,6 +418,8 @@ bool csGraphics3DOGLCommon::NewInitialize ()
     driver = config->GetStr ("Video.OpenGL.Canvas", CS_OPENGL_2D_DRIVER);
 
   verbose = (cmdline->GetOption ("verbose") != 0);
+  if (!verbose) bugplug = 0;
+
   report_gl_errors = config->GetBool ("Video.OpenGL.ReportGLErrors",
 #ifdef CS_DEBUG
     true
@@ -1456,6 +1459,8 @@ void csGraphics3DOGLCommon::Print (csRect const* area)
     cur = (cur+1)%num;
     if (totaltime/10 < fps_limit) csSleep (fps_limit - totaltime/10);
   }
+  if (bugplug)
+    bugplug->ResetCounter ("Triangle Count");
   G2D->Print (area);
 }
 
@@ -1872,6 +1877,11 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
   }
   glVertexPointer (4, GL_FLOAT, 0, queue.glverts);
   glTexCoordPointer (2, GL_FLOAT, 0, queue.gltxt);
+
+  if (bugplug)
+  {
+    bugplug->AddCounter ("Triangle Count", queue.num_triangles);
+  }
   glDrawElements (GL_TRIANGLES, queue.num_triangles*3, GL_UNSIGNED_INT,
       queue.tris);
   if (gouraud && !multimat)
@@ -1931,6 +1941,10 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
       }
       glTexCoordPointer (2, GL_FLOAT, 0, p_gltxt);
       glVertexPointer (4, GL_FLOAT, 0, queue.glverts);
+      if (bugplug)
+      {
+        bugplug->AddCounter ("Triangle Count", queue.num_triangles);
+      }
       glDrawElements (GL_TRIANGLES, queue.num_triangles*3, GL_UNSIGNED_INT,
       queue.tris);
     }
@@ -1946,6 +1960,10 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
       SetClientStates (CS_CLIENTSTATE_VC);
       glColorPointer (4, GL_FLOAT, 0, queue.glcol);
       glVertexPointer (4, GL_FLOAT, 0, queue.glverts);
+      if (bugplug)
+      {
+        bugplug->AddCounter ("Triangle Count", queue.num_triangles);
+      }
       glDrawElements (GL_TRIANGLES, queue.num_triangles*3, GL_UNSIGNED_INT,
       queue.tris);
     }
@@ -1962,6 +1980,10 @@ void csGraphics3DOGLCommon::FlushDrawPolygon ()
     glColorPointer (3, GL_FLOAT, 0, queue.fog_color);
     glVertexPointer (4, GL_FLOAT, 0, queue.glverts);
     glTexCoordPointer (2, GL_FLOAT, 0, queue.fog_txt);
+    if (bugplug)
+    {
+      bugplug->AddCounter ("Triangle Count", queue.num_triangles);
+    }
     glDrawElements (GL_TRIANGLES, queue.num_triangles*3, GL_UNSIGNED_INT,
         queue.tris);
   }
@@ -4636,6 +4658,11 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
   // when a previous object has an alpha channel.
   statecache->Disable_GL_ALPHA_TEST ();
 
+  if (bugplug)
+  {
+    bugplug->AddCounter ("Mesh Count", 1);
+  }
+
   //@@@EXPERIMENTAL!!
   //CONTAINS EXPERIMENTAL VERSION OF RendererData-system  by Marten Svanfeldt
 
@@ -4851,6 +4878,10 @@ bool csGraphics3DOGLCommon::EffectDrawTriangleMesh (
         glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA_ARB, layer_data->alphap);
 	glTexEnvf(GL_TEXTURE_ENV, GL_ALPHA_SCALE, layer_data->scale_alpha);
       }
+    }
+    if (bugplug)
+    {
+      bugplug->AddCounter ("Triangle Count", num_triangles);
     }
     glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
 
@@ -5192,6 +5223,10 @@ bool csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
     glColor4f (flat_r, flat_g, flat_b, m_alpha);
   }
 
+  if (bugplug)
+  {
+    bugplug->AddCounter ("Triangle Count", num_triangles);
+  }
   glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
 
   // If we have multi-texturing or fog we set the second pass Z-buffer
@@ -5260,6 +5295,10 @@ bool csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
 
       glVertexPointer (3, GL_FLOAT, 0, & work_verts[0]);
       glTexCoordPointer (2, GL_FLOAT, 0, mul_uv);
+      if (bugplug)
+      {
+        bugplug->AddCounter ("Triangle Count", num_triangles);
+      }
       glDrawElements (GL_TRIANGLES, num_triangles*3,
         GL_UNSIGNED_INT, triangles);
 #if EXP_SCALE_MATRIX
@@ -5283,6 +5322,10 @@ bool csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
       else
         glColorPointer (3, GL_FLOAT, 0, & work_colors[0]);
       glVertexPointer (3, GL_FLOAT, 0, & work_verts[0]);
+      if (bugplug)
+      {
+        bugplug->AddCounter ("Triangle Count", num_triangles);
+      }
       glDrawElements (GL_TRIANGLES, num_triangles*3,
         GL_UNSIGNED_INT, triangles);
     }
@@ -5304,6 +5347,10 @@ bool csGraphics3DOGLCommon::OldDrawTriangleMesh (G3DTriangleMesh& mesh,
     glVertexPointer (3, GL_FLOAT, 0, & work_verts[0]);
     glTexCoordPointer (2, GL_FLOAT, sizeof(G3DFogInfo), &work_fog[0].intensity);
     glColorPointer (3, GL_FLOAT, sizeof (G3DFogInfo), &work_fog[0].r);
+    if (bugplug)
+    {
+      bugplug->AddCounter ("Triangle Count", num_triangles);
+    }
     glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
 
     if (!m_textured)
@@ -5423,6 +5470,10 @@ void csGraphics3DOGLCommon::FogDrawTriangleMesh (G3DTriangleMesh& mesh,
   glVertexPointer (3, GL_FLOAT, 0, & work_verts[0]);
   glTexCoordPointer (2, GL_FLOAT, sizeof(G3DFogInfo), &work_fog[0].intensity);
   glColorPointer (3, GL_FLOAT, sizeof (G3DFogInfo), &work_fog[0].r);
+  if (bugplug)
+  {
+    bugplug->AddCounter ("Triangle Count", num_triangles);
+  }
   glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
 
   if (setup)

@@ -29,6 +29,8 @@ chronological order.
 	  is easier to parse using some automated processor.
 	- Jorrit changed csbench to use the fastest clipping setting for the
 	  further tests.
+	- Jorrit changed the OR GL renderer to also report number of rendered
+	  triangles when -verbose is given (similar to what NR does).
 29-Jun-2004
 	- Jorrit fixed a bug in spr3d where manually specifying sprite normals
 	  didn't work.
