@@ -9,7 +9,7 @@ struct awsActionMap
   unsigned long name;
 
   /// The action to execute
-  void (*Action) (void *owner, iAwsParmList &parmlist);
+  void (*Action) (void *owner, iAwsParmList* parmlist);
 };
 
 class awsActionDispatcher
@@ -19,10 +19,10 @@ class awsActionDispatcher
 public:
   /// Register an action.
   void Register (const char *name,
-        void (Action) (void *owner, iAwsParmList &parmlist));
+        void (Action) (void *owner, iAwsParmList* parmlist));
 
   /// Execute the corresponding action
-  void Execute (const char *action, void *owner, iAwsParmList &parmlist);
+  void Execute (const char *action, void *owner, iAwsParmList* parmlist);
 };
 
 #endif

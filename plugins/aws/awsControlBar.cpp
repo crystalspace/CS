@@ -44,12 +44,14 @@ void awsControlBar::RemoveChild(iAwsComponent* comp)
   DoLayout();
 }
 
-bool awsControlBar::Execute(const char* action, iAwsParmList &parmlist)
+bool awsControlBar::Execute(const char* action, iAwsParmList* parmlist)
 {
+  if (!parmlist)
+    return false;
   if(strcmp(action, "AddComponent") == 0)
   {
     iAwsComponent* child;
-    if(parmlist.GetInt("Component", (int*)&child) && child)
+    if(parmlist->GetInt("Component", (int*)&child) && child)
     {
       AddChild(child);
       return true;
@@ -58,7 +60,7 @@ bool awsControlBar::Execute(const char* action, iAwsParmList &parmlist)
   else if(strcmp(action, "RemoveComponent") == 0)
   {
     iAwsComponent* child;
-    if(parmlist.GetInt("Component", (int*)&child) && child)
+    if(parmlist->GetInt("Component", (int*)&child) && child)
     {
       RemoveChild(child);
       return true;

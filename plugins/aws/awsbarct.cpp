@@ -168,16 +168,19 @@ bool awsBarChart::SetProperty (const char *name, void *parm)
   return false;
 }
 
-bool awsBarChart::Execute (const char *action, iAwsParmList &parmlist)
+bool awsBarChart::Execute (const char *action, iAwsParmList* parmlist)
 {
   if (awsComponent::Execute (action, parmlist)) return true;
+
+  if (!parmlist)
+    return false;
 
   if (strcmp(action, "AddItem")==0)
   {
     BarItem i;
     
-    parmlist.GetFloat("value", &i.value);
-    parmlist.GetString("label", &i.label);
+    parmlist->GetFloat("value", &i.value);
+    parmlist->GetString("label", &i.label);
 
     if (chart_options & coRolling)
     {

@@ -289,7 +289,7 @@ bool awsWindow::SetProperty (const char *name, void *parm)
   return false;
 }
 
-bool awsWindow::Execute (const char *action, iAwsParmList &parmlist)
+bool awsWindow::Execute (const char *action, iAwsParmList* parmlist)
 {
   if (awsComponent::Execute (action, parmlist)) return true;
 

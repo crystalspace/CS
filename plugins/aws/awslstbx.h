@@ -230,19 +230,19 @@ private:
   awsActionDispatcher actions;
 
   /// Inserts an item
-  static void InsertItem (void *owner, iAwsParmList &parmlist);
+  static void InsertItem (void *owner, iAwsParmList* parmlist);
 
   /// Deletes an item
-  static void DeleteItem (void *owner, iAwsParmList &parmlist);
+  static void DeleteItem (void *owner, iAwsParmList* parmlist);
 
   /// Get the selected item
-  static void GetSelectedItem (void *owner, iAwsParmList &parmlist);
+  static void GetSelectedItem (void *owner, iAwsParmList* parmlist);
 
   /// Get an item by row number
-  static void GetItem (void *owner, iAwsParmList &parmlist);
+  static void GetItem (void *owner, iAwsParmList* parmlist);
 
   /// Clears the entire list
-  static void ClearList (void *owner, iAwsParmList &parmlist);
+  static void ClearList (void *owner, iAwsParmList* parmlist);
 
   //////////////////////////// Static member helper functions
   //
@@ -274,7 +274,7 @@ protected:
   int GetRowDepth (awsListRow *row);
 
   /// get requested items for this row
-  bool GetItems (awsListRow *row, iAwsParmList &parmlist);
+  bool GetItems (awsListRow *row, iAwsParmList* parmlist);
 
   /// Find out if this row is the last child in it's parent's list
   bool IsLastChild (awsListRow *row);
@@ -317,7 +317,7 @@ public:
   bool SetProperty (const char *name, void *parm);
 
   /// Executes some actions
-  bool Execute (const char *action, iAwsParmList &parmlist);
+  bool Execute (const char *action, iAwsParmList* parmlist);
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual const char *Type ();

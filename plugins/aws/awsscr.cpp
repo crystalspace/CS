@@ -7,7 +7,7 @@
 #include <string.h>
 
 void awsActionDispatcher::Register (const char *name,
-  void (Action) (void *owner, iAwsParmList &parmlist))
+  void (Action) (void *owner, iAwsParmList* parmlist))
 {
   awsActionMap *map = new awsActionMap ();
 
@@ -23,7 +23,7 @@ void awsActionDispatcher::Register (const char *name,
 void awsActionDispatcher::Execute (
   const char *action,
   void *owner,
-  iAwsParmList &parmlist)
+  iAwsParmList* parmlist)
 {
   unsigned long name = aws_adler32 (
       aws_adler32 (0, NULL, 0),
@@ -38,3 +38,4 @@ void awsActionDispatcher::Execute (
     if (name == map->name) map->Action (owner, parmlist);
   }
 }
+

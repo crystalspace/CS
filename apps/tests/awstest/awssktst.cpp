@@ -65,19 +65,19 @@ awsTestSink::FillBarChart(void *sk, iAwsSource *source)
 
 
   pl->AddFloat("value", 10);
-  comp->Execute("AddItem", *pl);
+  comp->Execute("AddItem", pl);
   pl->Clear();
 
   pl->AddFloat("value", 20);
-  comp->Execute("AddItem", *pl);
+  comp->Execute("AddItem", pl);
   pl->Clear();
 
   pl->AddFloat("value", 30);
-  comp->Execute("AddItem", *pl);
+  comp->Execute("AddItem", pl);
   pl->Clear();
 
   pl->AddFloat("value", 5);
-  comp->Execute("AddItem", *pl);
+  comp->Execute("AddItem", pl);
   pl->Clear();
   
   pl->DecRef();
@@ -118,7 +118,7 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
     pl->AddString("text2", "Shenobi");
 
     // Add it into the list
-    comp->Execute("InsertItem", *pl);
+    comp->Execute("InsertItem", pl);
 
     pl->Clear();
 
@@ -133,7 +133,7 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
     pl->AddString("text2", "Tenalt");
 
     // Add it into the list
-    comp->Execute("InsertItem", *pl);
+    comp->Execute("InsertItem", pl);
 
     // Get the id of the last item for hierarchical support.
     pl->GetOpaque("id", &parent);
@@ -152,7 +152,7 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
     pl->AddOpaque("parent", parent);
 
     // Add it into the list
-    comp->Execute("InsertItem", *pl);
+    comp->Execute("InsertItem", pl);
     pl->Clear();
 
     //////////////////////////
@@ -168,7 +168,7 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
     pl->AddOpaque("Opaque", parent);
 
     // Add it into the list
-    comp->Execute("InsertItem", *pl);
+    comp->Execute("InsertItem", pl);
 
     // Get the id of the last item for hierarchical support.
     pl->GetOpaque("id", &parent);
@@ -187,7 +187,7 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
     pl->AddOpaque("parent", parent);
 
     // Add it into the list
-    comp->Execute("InsertItem", *pl);
+    comp->Execute("InsertItem", pl);
 
     pl->Clear();
 
@@ -202,7 +202,7 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
     pl->AddString("text2", "Sloth");
 
     // Add it into the list
-    comp->Execute("InsertItem", *pl);
+    comp->Execute("InsertItem", pl);
 
     pl->Clear();
 
@@ -217,7 +217,7 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
     pl->AddString("text2", "Klamath");
 
     // Add it into the list
-    comp->Execute("InsertItem", *pl);
+    comp->Execute("InsertItem", pl);
 
     // Get the id of the last item for hierarchical support.
     pl->GetOpaque("id", &parent);
@@ -236,7 +236,7 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
     pl->AddOpaque("parent", parent);
 
     // Add it into the list
-    comp->Execute("InsertItem", *pl);
+    comp->Execute("InsertItem", pl);
     pl->Clear();
 
     //////////////////////////
@@ -252,7 +252,7 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
     pl->AddOpaque("parent", parent);
 
     // Add it into the list
-    comp->Execute("InsertItem", *pl);
+    comp->Execute("InsertItem", pl);
 
     // Get the id of the last item for hierarchical support.
     pl->GetOpaque("id", &parent);
@@ -271,7 +271,7 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
     pl->AddOpaque("parent", parent);
 
     // Add it into the list
-    comp->Execute("InsertItem", *pl);
+    comp->Execute("InsertItem", pl);
 
     pl->Clear();
 
@@ -286,10 +286,9 @@ awsTestSink::FillListBox(void *sk, iAwsSource *source)
     pl->AddString("text2", "Gelvin");
 
     // Add it into the list
-    comp->Execute("InsertItem", *pl);
+    comp->Execute("InsertItem", pl);
 
     pl->Clear();
-
   }
 
   pl->DecRef();
@@ -352,12 +351,8 @@ awsTestSink::Login(void *sk, iAwsSource *source)
     iAwsComponent *comp = source->GetComponent();
 
     if (sink->wmgr) {
-      iAwsParmList *pl = sink->wmgr->CreateParmList();
-
-      comp->Execute("HideWindow", *pl);
+      comp->Execute("HideWindow");
       if (sink->test) sink->test->Show();
-
-      pl->DecRef();
     }
   }
 }

@@ -116,7 +116,7 @@ awsMultiLineEdit::~awsMultiLineEdit ()
   }
 }
 
-bool awsMultiLineEdit::Execute (const char *action, iAwsParmList &parmlist)
+bool awsMultiLineEdit::Execute (const char *action, iAwsParmList* parmlist)
 {
   if (awsComponent::Execute (action, parmlist)) return true;
   actions.Execute (action, this, parmlist);
@@ -1130,25 +1130,31 @@ void awsMultiLineEdit::CutToClipboard ()
 }
 
 
-void awsMultiLineEdit::actInsertRow (void *owner, iAwsParmList &parmlist)
+void awsMultiLineEdit::actInsertRow (void *owner, iAwsParmList* parmlist)
 {
+  if (!parmlist)
+    return;
+  
   awsMultiLineEdit *me = (awsMultiLineEdit *)owner;
   int row;
   iString *str=NULL;
 
-  if (parmlist.GetInt ("row", &row) && parmlist.GetString ("string", &str) && row <= me->vText.Length () && row >= 0)
+  if (parmlist->GetInt ("row", &row) && parmlist->GetString ("string", &str) && row <= me->vText.Length () && row >= 0)
   {
     csString *s = new csString (str->GetData ());
     me->vText.Insert (row, (csSome)s);
   }
 }
 
-void awsMultiLineEdit::actDeleteRow (void *owner, iAwsParmList &parmlist)
+void awsMultiLineEdit::actDeleteRow (void *owner, iAwsParmList* parmlist)
 {
+  if (parmlist)
+    return;
+  
   awsMultiLineEdit *me = (awsMultiLineEdit *)owner;
   int row;
 
-  if (parmlist.GetInt ("row", &row) && row < me->vText.Length () && row >= 0)
+  if (parmlist->GetInt ("row", &row) && row < me->vText.Length () && row >= 0)
   {
     csString *s = (csString*)me->vText.Get (row);
     me->vText.Delete (row);
@@ -1157,13 +1163,16 @@ void awsMultiLineEdit::actDeleteRow (void *owner, iAwsParmList &parmlist)
   }
 }
 
-void awsMultiLineEdit::actReplaceRow (void *owner, iAwsParmList &parmlist)
+void awsMultiLineEdit::actReplaceRow (void *owner, iAwsParmList* parmlist)
 {
+  if (!parmlist)
+    return;
+  
   awsMultiLineEdit *me = (awsMultiLineEdit *)owner;
   int row;
   iString *str=NULL;
 
-  if (parmlist.GetInt ("row", &row) && parmlist.GetString ("string", &str) && row <= me->vText.Length () && row >= 0)
+  if (parmlist->GetInt ("row", &row) && parmlist->GetString ("string", &str) && row <= me->vText.Length () && row >= 0)
   {
     csString *s = new csString (str->GetData ());
     me->vText.Insert (row, (csSome)s);
@@ -1173,18 +1182,21 @@ void awsMultiLineEdit::actReplaceRow (void *owner, iAwsParmList &parmlist)
   }
 }
 
-void awsMultiLineEdit::actGetRow (void *owner, iAwsParmList &parmlist)
+void awsMultiLineEdit::actGetRow (void *owner, iAwsParmList* parmlist)
 {
+  if (!parmlist)
+    return;
+  
   awsMultiLineEdit *me = (awsMultiLineEdit *)owner;
   int row;
 
-  if (parmlist.GetInt ("row", &row) && row < me->vText.Length () && row >= 0)
+  if (parmlist->GetInt ("row", &row) && row < me->vText.Length () && row >= 0)
   {
-    parmlist.AddString ("string", *((csString*) me->vText.Get(row)) );
+    parmlist->AddString ("string", *((csString*) me->vText.Get(row)) );
   }
 }
 
-void awsMultiLineEdit::actClear (void *owner, iAwsParmList &)
+void awsMultiLineEdit::actClear (void *owner, iAwsParmList* )
 {
   awsMultiLineEdit *me = (awsMultiLineEdit *)owner;
   for (int i=0; i < me->vText.Length (); i++)
@@ -1193,14 +1205,20 @@ void awsMultiLineEdit::actClear (void *owner, iAwsParmList &)
   me->MoveCursor (me->row, me->col); // in case we removed the last line
 }
 
-void awsMultiLineEdit::actGetRowCount (void *owner, iAwsParmList &parmlist)
+void awsMultiLineEdit::actGetRowCount (void *owner, iAwsParmList* parmlist)
 {
+  if (!parmlist)
+    return;
+  
   awsMultiLineEdit *me = (awsMultiLineEdit *)owner;
-  parmlist.AddInt ("count", me->vText.Length ());
+  parmlist->AddInt ("count", me->vText.Length ());
 }
 
-void awsMultiLineEdit::actGetText (void *owner, iAwsParmList &parmlist)
+void awsMultiLineEdit::actGetText (void *owner, iAwsParmList* parmlist)
 {
+  if (!parmlist)
+    return;
+  
   awsMultiLineEdit *me = (awsMultiLineEdit *)owner;
   csString text;
   for (int i=0; i < me->vText.Length (); i++)
@@ -1209,15 +1227,18 @@ void awsMultiLineEdit::actGetText (void *owner, iAwsParmList &parmlist)
     if (i < me->vText.Length ()-1)
       text.Append ("\n");
   }
-  parmlist.AddString ("text", text);
+  parmlist->AddString ("text", text);
 }
 
-void awsMultiLineEdit::actSetText (void *owner, iAwsParmList &parmlist)
+void awsMultiLineEdit::actSetText (void *owner, iAwsParmList* parmlist)
 {
+  if (!parmlist)
+    return;
+  
   awsMultiLineEdit *me = (awsMultiLineEdit *)owner;
   iString *text = NULL;
 
-  if (parmlist.GetString ("text", &text))
+  if (parmlist->GetString ("text", &text))
   {
     for (int i=0; i < me->vText.Length (); i++)
       delete (csString*)me->vText.Get (i);

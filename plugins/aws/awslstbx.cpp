@@ -366,8 +366,11 @@ static void DoRecursiveClearList (awsListRowVector *v)
 }
 
 /////////////// Scripted Actions /////////////////////////////////////////////////////////////
-void awsListBox::InsertItem (void *owner, iAwsParmList &parmlist)
+void awsListBox::InsertItem (void *owner, iAwsParmList* parmlist)
 {
+  if (!parmlist)
+    return;
+
   awsListBox *lb = (awsListBox *)owner;
 
   char buf[50];
@@ -382,9 +385,9 @@ void awsListBox::InsertItem (void *owner, iAwsParmList &parmlist)
   row->cols = new awsListItem[lb->ncolumns];
   memset (row->cols, 0, sizeof (awsListItem) * lb->ncolumns);
 
-  parmlist.GetOpaque ("parent", (void **) &(row->parent));
+  parmlist->GetOpaque ("parent", (void **) &(row->parent));
   row->selectable = true;
-  parmlist.GetBool ("selectable", &(row->selectable));
+  parmlist->GetBool ("selectable", &(row->selectable));
 
   /* Fill in the columns by looking for several parameters:
    *   textX, imageX, txtalignX, imgalignX, statefulX, stateX, groupstateX,
@@ -393,32 +396,32 @@ void awsListBox::InsertItem (void *owner, iAwsParmList &parmlist)
   for (i = 0; i < lb->ncolumns; ++i)
   {
     cs_snprintf (buf, 50, "text%d", i);
-    if (parmlist.GetString (buf, &(row->cols[i].text)))
+    if (parmlist->GetString (buf, &(row->cols[i].text)))
       row->cols[i].text->IncRef ();
 
     cs_snprintf (buf, 50, "image%d", i);
-    if (parmlist.GetString (buf, &str))
+    if (parmlist->GetString (buf, &str))
       row->cols[i].image = lb->WindowManager ()->GetPrefMgr ()->GetTexture (
           str->GetData (),
           str->GetData ());
 
     cs_snprintf (buf, 50, "stateful%d", i);
-    parmlist.GetBool (buf, &(row->cols[i].has_state));
+    parmlist->GetBool (buf, &(row->cols[i].has_state));
 
     cs_snprintf (buf, 50, "state%d", i);
-    parmlist.GetBool (buf, &(row->cols[i].state));
+    parmlist->GetBool (buf, &(row->cols[i].state));
 
     cs_snprintf (buf, 50, "groupstate%d", i);
-    parmlist.GetBool (buf, &(row->cols[i].group_state));
+    parmlist->GetBool (buf, &(row->cols[i].group_state));
 
     cs_snprintf (buf, 50, "aligntxt%d", i);
-    parmlist.GetInt (buf, &(row->cols[i].txt_align));
+    parmlist->GetInt (buf, &(row->cols[i].txt_align));
 
     cs_snprintf (buf, 50, "alignimg%d", i);
-    parmlist.GetInt (buf, &(row->cols[i].txt_align));
+    parmlist->GetInt (buf, &(row->cols[i].txt_align));
 
     cs_snprintf (buf, 50, "param%d", i);
-    parmlist.GetInt (buf, &(row->cols[i].param));
+    parmlist->GetInt (buf, &(row->cols[i].param));
   }
 
   // Add the item
@@ -436,21 +439,24 @@ void awsListBox::InsertItem (void *owner, iAwsParmList &parmlist)
     lb->rows.Push (row);
 
   // Pass back the id of this row, in case they want it.
-  parmlist.AddOpaque ("id", (void *)row);
+  parmlist->AddOpaque ("id", (void *)row);
 
   lb->map_dirty = true;
 }
 
-void awsListBox::DeleteItem (void *owner, iAwsParmList &parmlist)
+void awsListBox::DeleteItem (void *owner, iAwsParmList* parmlist)
 {
+  if (!parmlist)
+    return;
+  
   awsListBox *lb = (awsListBox *)owner;
 
   int i, selidx = -1;
   iString *str = NULL;
 
   // Try and find out what they're searching for
-  if (!parmlist.GetString ("text", &str))
-    if (!parmlist.GetString ("id", &str)) return ;
+  if (!parmlist->GetString ("text", &str))
+    if (!parmlist->GetString ("id", &str)) return ;
 
   if (lb->sel)
     selidx = lb->rows.Find (lb->sel);
@@ -479,29 +485,38 @@ void awsListBox::DeleteItem (void *owner, iAwsParmList &parmlist)
     lb->Invalidate ();
   }
   // Pass back the result, in case they want it
-  parmlist.AddInt ("result", (int)i);
+  parmlist->AddInt ("result", (int)i);
 
   lb->map_dirty = true;
 }
 
-void awsListBox::GetSelectedItem (void *owner, iAwsParmList &parmlist)
+void awsListBox::GetSelectedItem (void *owner, iAwsParmList* parmlist)
 {
+  if (!parmlist)
+    return;
+  
   awsListBox *lb = (awsListBox *)owner;
-  parmlist.AddBool ("success", lb->GetItems (lb->sel, parmlist));
+  parmlist->AddBool ("success", lb->GetItems (lb->sel, parmlist));
 }
 
-void awsListBox::GetItem (void *owner, iAwsParmList &parmlist)
+void awsListBox::GetItem (void *owner, iAwsParmList* parmlist)
 {
+  if (!parmlist)
+    return;
+  
   awsListBox *lb = (awsListBox *)owner;
   int row=-1;
-  if (parmlist.GetInt ("row", &row) && row >= -1 && row < lb->rows.Length ())
-    parmlist.AddBool ("success", lb->GetItems ((awsListRow*)lb->rows[row], parmlist));
+  if (parmlist->GetInt ("row", &row) && row >= -1 && row < lb->rows.Length ())
+    parmlist->AddBool ("success", lb->GetItems ((awsListRow*)lb->rows[row], parmlist));
   else
-    parmlist.AddBool ("success", false);
+    parmlist->AddBool ("success", false);
 }
 
-bool awsListBox::GetItems (awsListRow *row, iAwsParmList &parmlist)
+bool awsListBox::GetItems (awsListRow *row, iAwsParmList* parmlist)
 {
+  if (!parmlist)
+    return false;
+  
   bool succ = false;
 
   if (row)
@@ -529,28 +544,28 @@ bool awsListBox::GetItems (awsListRow *row, iAwsParmList &parmlist)
     for (i = 0; i < ncolumns; ++i)
     {
       cs_snprintf (buf, 50, "text%d", i);
-      if (parmlist.GetString (buf, &str[i]))
+      if (parmlist->GetString (buf, &str[i]))
       {
         str[i] = row->cols[i].text;
         usedt[i] = true;
       }
 
       cs_snprintf (buf, 50, "state%d", i);
-      if (parmlist.GetBool (buf, &state[i]))
+      if (parmlist->GetBool (buf, &state[i]))
       {
         state[i] = row->cols[i].state;
         useds[i] = true;
       }
 
       cs_snprintf (buf, 50, "param%d", i);
-      if (parmlist.GetInt (buf, &param[i]))
+      if (parmlist->GetInt (buf, &param[i]))
       {
         param[i] = row->cols[i].param;
         usedp[i] = true;
       }
     }
 
-    parmlist.Clear ();
+    parmlist->Clear ();
 
     // return parmlist
     for (i = 0; i < ncolumns; ++i)
@@ -558,19 +573,19 @@ bool awsListBox::GetItems (awsListRow *row, iAwsParmList &parmlist)
       if (usedt[i])
       {
         cs_snprintf (buf, 50, "text%d", i);
-        parmlist.AddString (buf, str[i]->GetData());
+        parmlist->AddString (buf, str[i]->GetData());
       }
 
       if (useds[i])
       {
         cs_snprintf (buf, 50, "state%d", i);
-        parmlist.AddBool (buf, state[i]);
+        parmlist->AddBool (buf, state[i]);
       }
 
       if (usedp[i])
       {
         cs_snprintf (buf, 50, "param%d", i);
-        parmlist.AddInt (buf, param[i]);
+        parmlist->AddInt (buf, param[i]);
       }
     }
 
@@ -585,7 +600,7 @@ bool awsListBox::GetItems (awsListRow *row, iAwsParmList &parmlist)
   return succ;
 }
 
-void awsListBox::ClearList (void *owner, iAwsParmList &)
+void awsListBox::ClearList (void *owner, iAwsParmList* )
 {
   awsListBox *lb = (awsListBox *)owner;
 
@@ -594,7 +609,7 @@ void awsListBox::ClearList (void *owner, iAwsParmList &)
   lb->map_dirty = true;
 }
 
-bool awsListBox::Execute (const char *action, iAwsParmList &parmlist)
+bool awsListBox::Execute (const char *action, iAwsParmList* parmlist)
 {
   if (awsPanel::Execute (action, parmlist)) return true;
 

@@ -452,7 +452,7 @@ struct iAwsComponent : public iAwsSource
   virtual bool SetProperty(const char* name, void *parm)=0;
 
   /// Executes a scriptable action
-  virtual bool Execute(const char* action, iAwsParmList &parmlist)=0;
+  virtual bool Execute(const char* action, iAwsParmList* parmlist = NULL) = 0;
 
   /// Invalidation routine: allow the component to be redrawn when you call this
   virtual void Invalidate()=0;

@@ -108,7 +108,7 @@ bool awsStatusBar::SetProperty (const char *name, void *parm)
   return false;
 }
 
-bool awsStatusBar::Execute (const char *action, iAwsParmList &parmlist)
+bool awsStatusBar::Execute (const char *action, iAwsParmList* parmlist)
 {
   if (awsComponent::Execute (action, parmlist)) return true;
  

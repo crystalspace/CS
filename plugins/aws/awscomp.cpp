@@ -251,7 +251,7 @@ bool awsComponent::SetProperty (const char *name, void *parm)
   return false;
 }
 
-bool awsComponent::Execute (const char* action, iAwsParmList &parmlist)
+bool awsComponent::Execute (const char* action, iAwsParmList* parmlist)
 {
   if (strcmp ("MoveTo", action) == 0)
   {
@@ -283,11 +283,14 @@ bool awsComponent::Execute (const char* action, iAwsParmList &parmlist)
   }
   else if (strcmp ("Overlaps", action) == 0)
   {
+    if (!parmlist)
+      return false;
+
     csRect *r;
-    if (parmlist.GetRect ("Rect", &r))
+    if (parmlist->GetRect ("Rect", &r))
     {
       bool result = Overlaps (*r);
-      parmlist.AddBool ("Result", result);
+      parmlist->AddBool ("Result", result);
     }
 
     return true;

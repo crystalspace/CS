@@ -168,7 +168,7 @@ public:
   bool SetProperty (const char *name, void *parm);
 
   /// Executes scriptable actions for this window
-  bool Execute (const char *action, iAwsParmList &parmlist);
+  bool Execute (const char *action, iAwsParmList* parmlist);
 
   /// Gets the preferred size of the awsComponent
   virtual csRect getPreferredSize ();

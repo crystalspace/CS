@@ -140,14 +140,14 @@ class awsMultiLineEdit : public awsComponent
   void CutToClipboard ();
 
   // actions
-  static void actInsertRow (void *owner, iAwsParmList &parmlist);
-  static void actDeleteRow (void *owner, iAwsParmList &parmlist);
-  static void actReplaceRow (void *owner, iAwsParmList &parmlist);
-  static void actGetRow (void *owner, iAwsParmList &parmlist);
-  static void actGetRowCount (void *owner, iAwsParmList &parmlist);
-  static void actGetText (void *owner, iAwsParmList &parmlist);
-  static void actSetText (void *owner, iAwsParmList &parmlist);
-  static void actClear (void *owner, iAwsParmList &parmlist);
+  static void actInsertRow (void *owner, iAwsParmList* parmlist);
+  static void actDeleteRow (void *owner, iAwsParmList* parmlist);
+  static void actReplaceRow (void *owner, iAwsParmList* parmlist);
+  static void actGetRow (void *owner, iAwsParmList* parmlist);
+  static void actGetRowCount (void *owner, iAwsParmList* parmlist);
+  static void actGetText (void *owner, iAwsParmList* parmlist);
+  static void actSetText (void *owner, iAwsParmList* parmlist);
+  static void actClear (void *owner, iAwsParmList* parmlist);
 
 
  public:
@@ -190,7 +190,7 @@ class awsMultiLineEdit : public awsComponent
   virtual const char *Type ();
 
   /// Executes some actions
-  virtual bool Execute (const char *action, iAwsParmList &parmlist);
+  virtual bool Execute (const char *action, iAwsParmList* parmlist);
 
  public:
 

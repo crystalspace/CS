@@ -159,7 +159,7 @@ public:
     { return comp->SetProperty(name, parm); }
 
     /// Executes scriptable actions for this window
-    virtual bool Execute(const char *action, iAwsParmList &parmlist)
+    virtual bool Execute(const char *action, iAwsParmList* parmlist)
     { return comp->Execute(action, parmlist); }
 
     /// Sets the flag (can handle multiple simultaneous sets)

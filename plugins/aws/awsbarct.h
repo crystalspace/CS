@@ -111,7 +111,7 @@ public:
   bool SetProperty (const char *name, void *parm);
 
   /// Performs "scripted" execution.
-  bool Execute (const char *action, iAwsParmList &parmlist);
+  bool Execute (const char *action, iAwsParmList* parmlist);
 
   /// Returns the named TYPE of the component, like "Radio Button", etc.
   virtual const char *Type ();

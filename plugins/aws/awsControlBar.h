@@ -48,7 +48,7 @@ public:
   virtual const char *Type ()
   {return "Control Bar";}
 
-  bool Execute(const char* action, iAwsParmList &parmlist);
+  bool Execute(const char* action, iAwsParmList *parmlist);
 
   /// Adds a component to the bar
   void AddChild(iAwsComponent *comp);
