@@ -1,5 +1,14 @@
 The history order has been reversed so that new features are at the top.
 
+19-Feb-2001
+	- Fixed a bug in csMeshWrapper::SetMeshObject().
+	- Fixed a bug in csMovable. The parent reference should not
+	  be incref'ed/decref'ed as that creates a circular reference.
+	- Fixed a bug in the handling of iMovable by csMeshWrapper. This
+	  caused simple to crash at exit.
+	- Fixed an additional bug in simple which would cause another
+	  crash at exit.
+	- Small update to python plugin.
 18-Feb-2001
 	- Eric Sunshine eliminated a compilation warning in levtool.cpp on
 	  BeOS.

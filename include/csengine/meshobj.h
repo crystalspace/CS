@@ -83,8 +83,6 @@ protected:
    * Position in the world.
    */
   csMovable movable;
-  /// SCF pointer to movable.
-  iMovable* imovable;
 
   /**
    * Pointer to the object to place in the polygon tree.
@@ -323,7 +321,7 @@ public:
     }
     virtual iMovable* GetMovable ()
     {
-      return scfParent->imovable;
+      return &(scfParent->movable.scfiMovable);
     }
     virtual bool HitBeamObject (const csVector3& start, const csVector3& end,
   	csVector3& isect, float* pr)

@@ -47,14 +47,22 @@ csMovable::csMovable ()
 
 csMovable::~csMovable ()
 {
-  if (iparent) iparent->DecRef ();
+  //@@@
+  // The following DecRef() is not possible because we
+  // actually have a circular reference here (parent -> this and
+  // this -> parent).
+  //if (iparent) iparent->DecRef ();
 }
 
 void csMovable::SetParent (csMovable* parent)
 {
-  iMovable* ipar = QUERY_INTERFACE_SAFE (parent, iMovable);
+  //@@@ (see comment above)
+  //iMovable* ipar = QUERY_INTERFACE_SAFE (parent, iMovable);
+  //if (iparent) iparent->DecRef ();
+  //iparent = ipar;
+  iparent = QUERY_INTERFACE_SAFE (parent, iMovable);
   if (iparent) iparent->DecRef ();
-  iparent = ipar;
+
   csMovable::parent = parent;
 }
 

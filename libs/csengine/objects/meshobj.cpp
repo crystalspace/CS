@@ -59,8 +59,6 @@ csMeshWrapper::csMeshWrapper (csObject* theParent, iMeshObject* mesh)
   mesh->IncRef ();
   draw_cb = NULL;
   factory = NULL;
-
-  imovable = QUERY_INTERFACE (&movable, iMovable);
 }
 
 csMeshWrapper::csMeshWrapper (csObject* theParent)
@@ -88,21 +86,18 @@ csMeshWrapper::csMeshWrapper (csObject* theParent)
   csMeshWrapper::mesh = NULL;
   draw_cb = NULL;
   factory = NULL;
-
-  imovable = QUERY_INTERFACE (&movable, iMovable);
 }
 
 void csMeshWrapper::SetMeshObject (iMeshObject* mesh)
 {
   if (mesh) mesh->IncRef ();
-  if (csMeshWrapper::mesh) mesh->DecRef ();
+  if (csMeshWrapper::mesh) csMeshWrapper::mesh->DecRef ();
   csMeshWrapper::mesh = mesh;
 }
 
 csMeshWrapper::~csMeshWrapper ()
 {
   if (mesh) mesh->DecRef ();
-  if (imovable) imovable->DecRef ();
   if (parent->GetType () == csEngine::Type)
   {
     csEngine* engine = (csEngine*)parent;
@@ -220,10 +215,10 @@ void csMeshWrapper::Draw (csRenderView& rview)
   iMeshWrapper* meshwrap = &scfiMeshWrapper;
   iRenderView* irv = QUERY_INTERFACE (&rview, iRenderView);
   if (draw_cb) draw_cb (meshwrap, irv, draw_cbData);
-  if (mesh->DrawTest (irv, imovable))
+  if (mesh->DrawTest (irv, &movable.scfiMovable))
   {
     UpdateDeferedLighting (movable.GetFullPosition ());
-    mesh->Draw (irv, imovable);
+    mesh->Draw (irv, &movable.scfiMovable);
   }
   int i;
   for (i = 0 ; i < children.Length () ; i++)
@@ -249,7 +244,7 @@ void csMeshWrapper::UpdateLighting (iLight** lights, int num_lights)
 {
   defered_num_lights = 0;
   if (num_lights <= 0) return;
-  mesh->UpdateLighting (lights, num_lights, imovable);
+  mesh->UpdateLighting (lights, num_lights, &movable.scfiMovable);
 
   int i;
   for (i = 0 ; i < children.Length () ; i++)
