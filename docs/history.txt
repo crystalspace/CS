@@ -18,6 +18,8 @@ The history order is reversed so that new features are at the top.
 	      The second attempt would fail.
 	    - It is once again possible to build pythmod when building the
 	      project in an external directory (outside of the source tree).
+	- Eric Sunshine eliminated numerous compilation warnings throughout the
+	  project.
 27-Apr-2003
 	- Philip Wyett fixed the DDS plugin compilation under MSVC, by
 	  replacing struct with static (don't ask) and giving the the array an

@@ -67,7 +67,7 @@ bool csGlobalHashIterator::HasNext ()
 void csGlobalHashIterator::GotoNextElement ()
 {
   element_index++;
-  if (element_index >= bucket_len)
+  if (element_index >= (int)bucket_len)
   {
     // Next bucket.
     bucket_index++;
@@ -184,7 +184,7 @@ void csHashMap::ChangeBuckets (uint32 newsize)
 {
 //printf ("Extend from %d to %d (hash_elements=%d)\n", NumBuckets, newsize, hash_elements);
   Buckets.SetLength (newsize, csHashBucket ());
-  int i;
+  uint32 i;
   // Only go up to old size.
   uint32 old_NumBuckets = NumBuckets;
   NumBuckets = newsize;
@@ -218,7 +218,7 @@ void csHashMap::Put (csHashKey key, csHashObject object)
   uint32 idx = key % NumBuckets;
   PutInternal (idx, key, object);
   hash_elements++;
-  if (NumBuckets < 20000 && hash_elements > NumBuckets*4)
+  if (NumBuckets < 20000UL && hash_elements > (int)(NumBuckets*4))
     ChangeBuckets (FindLargerPrime (NumBuckets*4));
 }
 
@@ -281,7 +281,7 @@ void csHashMap::DeleteAll ()
 
 void csHashMap::DumpStats ()
 {
-  int i;
+  uint32 i;
   int count_null = 0;
   int count_empty_but_not_null = 0;
   int count_elements = 0;
