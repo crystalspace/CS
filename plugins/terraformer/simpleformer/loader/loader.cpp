@@ -17,10 +17,12 @@
 */
 
 #include "cssysdef.h"
+#include "csutil/csendian.h"
 #include "iutil/objreg.h"
 #include "iutil/document.h"
 #include "iutil/object.h"
 #include "iutil/plugin.h"
+#include "iutil/vfs.h"
 #include "iengine/engine.h"
 #include "iengine/mesh.h"
 #include "iengine/movable.h"
@@ -40,6 +42,7 @@ enum
 {
   XMLTOKEN_NAME,
   XMLTOKEN_HEIGHTMAP,
+  XMLTOKEN_HEIGHTMAP32,
   XMLTOKEN_INTMAP,
   XMLTOKEN_FLOATMAP,
   XMLTOKEN_SCALE,
@@ -77,6 +80,7 @@ bool csSimpleFormerLoader::Initialize (iObjectRegistry* object_reg)
 
   xmltokens.Register ("name", XMLTOKEN_NAME);
   xmltokens.Register ("heightmap", XMLTOKEN_HEIGHTMAP);
+  xmltokens.Register ("heightmap32", XMLTOKEN_HEIGHTMAP32);
   xmltokens.Register ("intmap", XMLTOKEN_INTMAP);
   xmltokens.Register ("floatmap", XMLTOKEN_FLOATMAP);
   xmltokens.Register ("scale", XMLTOKEN_SCALE);
@@ -122,10 +126,52 @@ csPtr<iBase> csSimpleFormerLoader::Parse (iDocumentNode* node,
         if (map == 0) 
         {
           synldr->ReportError ("crystalspace.terraformer.simple.loader",
-            child, "Error reading in image file for heightmap '%s'", image);
+            child, "Error reading in image file '%s' for heightmap", image);
           return 0;
         }
         state->SetHeightmap (map);
+        break;
+      }
+      case XMLTOKEN_HEIGHTMAP32: 
+      {
+        const char *filename = child->GetContentsValue ();
+	csRef<iVFS> vfs = CS_QUERY_REGISTRY (objreg, iVFS);
+	csRef<iDataBuffer> buf = vfs->ReadFile (filename, false);
+        if (buf == 0) 
+        {
+          synldr->ReportError ("crystalspace.terraformer.simple.loader",
+            child, "Error reading in file '%s' for heightmap", filename);
+          return 0;
+        }
+	char* data = buf->GetData ();
+	char c1 = *data++;
+	char c2 = *data++;
+	char c3 = *data++;
+	char c4 = *data++;
+	if (c1 != 'H' || c2 != 'M' || c3 != '3' || c4 != '2')
+	{
+          synldr->ReportError ("crystalspace.terraformer.simple.loader",
+            child, "File '%s' is not a heightmap32 file", filename);
+          return 0;
+	}
+	uint32 width = csGetLittleEndianLong (data); data += 4;
+	uint32 height = csGetLittleEndianLong (data); data += 4;
+	if (buf->GetSize () != (4+4+4+ width*height*4))
+	{
+          synldr->ReportError ("crystalspace.terraformer.simple.loader",
+            child, "File '%s' is not a valid heightmap32 file: size mismatch",
+	    	filename);
+          return 0;
+	}
+	float* fdata = new float[width*height];
+	uint32 i;
+	for (i = 0 ; i < width * height ; i++)
+	{
+	  long d = csGetLittleEndianLong (data); data += 4;
+	  fdata[i] = float (d) / 4294967296.0f;
+	}
+        state->SetHeightmap (fdata, width, height);
+	delete[] fdata;
         break;
       }
       case XMLTOKEN_INTMAP: 

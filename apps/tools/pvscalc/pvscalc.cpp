@@ -613,10 +613,6 @@ void PVSCalcSector::BuildKDTree (void* node, const csArray<csBox3>& boxlist,
       return;
     }
   }
-  //else if (boxlist.Length () <= 10)
-  //{
-    //return;
-  //}
   else
   {
     float where0, where1, where2;

@@ -43,10 +43,11 @@ struct iSimpleFormerState : public iBase
    * Set a heightmap to be used. The heightmap will by default be
    * covering a region from -1..1 along X and Z, and areas outside
    * this will return a height of 0
-   * \remarks The plugin will take ownership of \a data. So, don't delete[]
-   *  it!
+   * \remarks The plugin will make a copy of the data. So you must
+   * delete it after calling this function.
    */
-  virtual void SetHeightmap (float* data, unsigned int width, unsigned int height) = 0;
+  virtual void SetHeightmap (float* data, unsigned int width,
+  	unsigned int height) = 0;
 
   /**
    * Set a scaling factor to be applied to the heightmap region (X, Z)

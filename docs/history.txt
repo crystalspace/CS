@@ -16,6 +16,24 @@ chronological order.
 	  terrainf to use it. Also modified r3dtest, and isomap levels to use
 	  data/shader/std_rloop_shadowed.xml and modified terrain to use
 	  data/shader/std_rloop_diffuse.xml.
+	- Jorrit fixed a bug in iSimpleFormerState->SetHeightmap() (the
+	  version that takes a float array). The function would take ownership
+	  of the array and delete it in the plugin when the plugin exits.
+	  However that breaks the rule that you can't allocate memory in
+	  one plugin/module and then delete it in another. Fixed it by
+	  having the simpleformer make a copy of the data instead of taking
+	  ownership. The caller should now delete the data after calling
+	  this function.
+	- Jorrit added a new 'heightmap32' keyword to the simplerformer
+	  loader plugin. With this keyword you can load 32-bit heightmap
+	  data for more accurate terrain representation. The format is
+	  as follows:
+	  	4 bytes: 'HM32'
+		4 bytes: width (little endian long)
+		4 bytes: height (little endian long)
+		the data order row by row. For every data there is a
+		4 byte little endian long which will be translated to a
+		floating point height value between 0 and 1.
 23-Mar-2005
 	- res removed the Apache snprintf code.
 	- res fixed AWS after the recent 64bit compatibility changes. In 
