@@ -4,4 +4,5 @@ Library partgen
 	: [ Wildcard *.cpp *.h ]
 	: noinstall
 ;
+LibDepends partgen : cstool csgfx csgeom csutil ;
 

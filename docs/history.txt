@@ -33,6 +33,7 @@ chronological order.
 	  projects.
 	- Jorrit fixed the explo mesh object so that it works correctly
 	  again.
+	- res fixed the partgen Jamfile to also contain a LibDepends statement.
 13-May-2004
 	- Eric Sunshine generalized the CS_EMIT_PACKAGEINFO() macro in
 	  packageinfo.m4 so that it can work with any suitable emitter macro,
