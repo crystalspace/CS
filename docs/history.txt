@@ -16,6 +16,10 @@ The history order is reversed so that new features are at the top.
 	  `if' conditional is desired since BUILDTOP is typically set by
 	  configure in Jamfile.  Use of ?= does not provide the proper
 	  behavior.
+	- Eric Sunshine modified cs-config makefile so that it also installs
+	  crystal.m4.  This allows people to access the crystal.m4 utility
+	  macro from a CS installation, rather than being forced to grab it
+	  from a source distribution (which might now be handy or available).
 12-Apr-2003
 	- Rhad fixed a couple potential deadlock and mutex issues in
 	  the ds3d sound renderer plugin. Also fixed similar issues in
