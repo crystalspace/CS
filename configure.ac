@@ -1198,8 +1198,8 @@ AS_IF([test $with_mesa != no],
 CS_CHECK_BUILD([for OpenGL], [cs_cv_libgl],
     [AC_LANG_PROGRAM([CS_GL_INCLUDE([CS_OPENGL_PATH],[GL],[gl.h])],[glEnd()])],
     [CS_CREATE_TUPLE([],[],[-lopengl32]) \
-    CS_CREATE_TUPLE([],[],[-lGL]) \
     CS_CREATE_TUPLE([-DCS_OPENGL_PATH=OpenGL],[],[-framework OpenGL]) \
+    CS_CREATE_TUPLE([],[],[-lGL]) \
     $cs_mesa_gl], [],
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_libgl], [GL])], [], [],
     [$cs_gl_plat_cflags], [$cs_gl_plat_lflags], [$cs_gl_plat_libs])
@@ -1214,8 +1214,8 @@ AS_IF([test $cs_cv_libgl = yes],
 	[AC_LANG_PROGRAM(
 	    [CS_GL_INCLUDE([CS_GL_PATH],[GL],[glu.h])], [gluNewQuadric()])],
 	[CS_CREATE_TUPLE([],[],[-lglu32]) \
-	CS_CREATE_TUPLE([],[],[-lGLU]) \
 	CS_CREATE_TUPLE([-DCS_GL_PATH=OpenGL],[],[-framework OpenGL]) \
+	CS_CREATE_TUPLE([],[],[-lGLU]) \
 	$cs_mesa_glu], [],
 	[CS_MAKEFILE_BUILD_RESULT([cs_cv_libglu], [GLU])], [], [],
 	[$cs_gl_plat_cflags], [$cs_gl_plat_lflags], [$cs_gl_plat_libs])
@@ -1225,8 +1225,8 @@ AS_IF([test $cs_cv_libgl = yes],
 	[AC_LANG_PROGRAM(
 	    [CS_GL_INCLUDE([CS_GLUT_PATH],[GL],[glut.h])], [glutSwapBuffers])],
 	[CS_CREATE_TUPLE([],[],[-lglut32]) \
-	CS_CREATE_TUPLE([],[],[-lglut]) \
-	CS_CREATE_TUPLE([-DCS_GLUT_PATH=GLUT],[],[-framework GLUT])], [],
+	CS_CREATE_TUPLE([-DCS_GLUT_PATH=GLUT],[],[-framework GLUT]) \
+	CS_CREATE_TUPLE([],[],[-lglut])], [],
 	[CS_MAKEFILE_BUILD_RESULT([cs_cv_libglut], [GLUT])], [], [],
 	[$cs_gl_plat_cflags], [$cs_gl_plat_lflags], [$cs_gl_plat_libs])
 
@@ -1391,11 +1391,25 @@ CS_CHECK_LIB_WITH([ode],
 # Check for libopenal.  In addition to the standard installed locations, we
 # also search CS/libs/libopenal*.
 #------------------------------------------------------------------------------
-CS_CHECK_LIB_WITH([openal],
+# CS_AL_INCLUDE(CPP-MACRO,FALLBACK,HEADER)
+AC_DEFUN([CS_AL_INCLUDE],
+    [@%:@ifndef CS_HEADER_GLOBAL
+    @%:@define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    @%:@define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    @%:@endif
+    @%:@ifdef $1
+    @%:@include CS_HEADER_GLOBAL($1,$3)
+    @%:@else
+    @%:@include <$2/$3>
+    @%:@endif])
+
+CS_CHECK_BUILD([for OpenAL], [cs_cv_libopenal],
     [AC_LANG_PROGRAM(
-	[#include <AL/alut.h>],
-	[alutInit (0, 0);])],
-    [libs/libopenal*], [],
+	[CS_AL_INCLUDE([CS_OPENAL_PATH],[AL],[alut.h])],
+	[alutInit(0,0);])],
+    [CS_CREATE_TUPLE([-DCS_OPENAL_PATH=OpenAL],[],[-framework OpenAL]) \
+    CS_CREATE_TUPLE([],[],[-lopenal -ldsound]) \
+    CS_CREATE_TUPLE([],[],[-lopenal])], [],
     [CS_MAKEFILE_BUILD_RESULT([cs_cv_libopenal], [OPENAL])])
 
 
@@ -1405,8 +1419,8 @@ CS_CHECK_LIB_WITH([openal],
 #-----------------------------------------------------------------------------
 AC_CHECK_FT2([2.0],
     [CS_MAKEFILE_PROPERTY([FT2.AVAILABLE], [yes])
-     CS_MAKEFILE_PROPERTY([FT2.LFLAGS], [$FT2_LIBS])
-     CS_MAKEFILE_PROPERTY([FT2.CFLAGS], [$FT2_CFLAGS])])
+    CS_MAKEFILE_PROPERTY([FT2.LFLAGS], [$FT2_LIBS])
+    CS_MAKEFILE_PROPERTY([FT2.CFLAGS], [$FT2_CFLAGS])])
 
 
 

@@ -936,9 +936,6 @@ Optional Packages:
   --with-libode=dir       specify location of libode if not detected
                           automatically; searches dir, dir/include, and
                           dir/lib
-  --with-libopenal=dir    specify location of libopenal if not detected
-                          automatically; searches dir, dir/include, and
-                          dir/lib
   --with-ft-prefix=PREFIX
                           Prefix where FreeType is installed (optional)
   --with-ft-exec-prefix=PREFIX
@@ -9818,8 +9815,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
     for cs_build_item in `echo @@@-lopengl32 | sed 'y% %#%'` \
-    `echo @@@-lGL | sed 'y% %#%'` \
     `echo @-DCS_OPENGL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
+    `echo @@@-lGL | sed 'y% %#%'` \
     $cs_mesa_gl
     do
 
@@ -9971,8 +9968,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
     for cs_build_item in `echo @@@-lopengl32 | sed 'y% %#%'` \
-    `echo @@@-lGL | sed 'y% %#%'` \
     `echo @-DCS_OPENGL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
+    `echo @@@-lGL | sed 'y% %#%'` \
     $cs_mesa_gl
     do
 
@@ -10160,8 +10157,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
     for cs_build_item in `echo @@@-lglu32 | sed 'y% %#%'` \
-	`echo @@@-lGLU | sed 'y% %#%'` \
 	`echo @-DCS_GL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
+	`echo @@@-lGLU | sed 'y% %#%'` \
 	$cs_mesa_glu
     do
 
@@ -10313,8 +10310,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
     for cs_build_item in `echo @@@-lglu32 | sed 'y% %#%'` \
-	`echo @@@-lGLU | sed 'y% %#%'` \
 	`echo @-DCS_GL_PATH=OpenGL@@-framework OpenGL | sed 'y% %#%'` \
+	`echo @@@-lGLU | sed 'y% %#%'` \
 	$cs_mesa_glu
     do
 
@@ -10497,8 +10494,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
     for cs_build_item in `echo @@@-lglut32 | sed 'y% %#%'` \
-	`echo @@@-lglut | sed 'y% %#%'` \
-	`echo @-DCS_GLUT_PATH=GLUT@@-framework GLUT | sed 'y% %#%'`
+	`echo @-DCS_GLUT_PATH=GLUT@@-framework GLUT | sed 'y% %#%'` \
+	`echo @@@-lglut | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -10649,8 +10646,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_build_ok=no
 
     for cs_build_item in `echo @@@-lglut32 | sed 'y% %#%'` \
-	`echo @@@-lglut | sed 'y% %#%'` \
-	`echo @-DCS_GLUT_PATH=GLUT@@-framework GLUT | sed 'y% %#%'`
+	`echo @-DCS_GLUT_PATH=GLUT@@-framework GLUT | sed 'y% %#%'` \
+	`echo @@@-lglut | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -15832,131 +15829,12 @@ fi
 # Check for libopenal.  In addition to the standard installed locations, we
 # also search CS/libs/libopenal*.
 #------------------------------------------------------------------------------
-
-# Check whether --with-libopenal or --without-libopenal was given.
-if test "${with_libopenal+set}" = set; then
-  withval="$with_libopenal"
-
-fi;
-
-    if test -z "$with_libopenal"; then
-  with_libopenal=yes
-fi
-
-    if test "$with_libopenal" != no; then
-  # If --with-lib value is same as cached value, then assume other
-	 # cached values are also valid; otherwise, ignore all cached values.
-	if test "$with_libopenal" != "$cs_cv_with_libopenal"; then
-  cs_ignore_cache=yes
-else
-  cs_ignore_cache=no
-fi
+# CS_AL_INCLUDE(CPP-MACRO,FALLBACK,HEADER)
 
 
-	if test $with_libopenal != yes; then
-  cs_check_lib_paths=$with_libopenal
-else
-  cs_check_lib_paths="| /usr/local/include|/usr/local/lib /sw/include|/sw/lib libs/libopenal*"
-fi
-
-
-	cs_check_lib_flags=''
-    for cs_lib_item in $cs_check_lib_paths
-    do
-	case $cs_lib_item in
-	    *\|*)
-    set filler `echo "$cs_lib_item" | awk 'BEGIN { FS="|" }
-	{ for (i=1; i <= NF; ++i)
-	    { if ($i == "") print "filler"; else print $i } }'`
-    shift
-    if test $# -eq 0; then
-  cs_check_incdir=''
-else
-  if test "$1" = filler; then
-  cs_check_incdir=''
-else
-  cs_check_incdir=$1
-fi
-
-	shift
-fi
-if test $# -eq 0; then
-  cs_check_libdir=''
-else
-  if test "$1" = filler; then
-  cs_check_libdir=''
-else
-  cs_check_libdir=$1
-fi
-
-	shift
-fi
-
-		if test -n "$cs_check_incdir"; then
-  cs_check_lib_cflag="-I$cs_check_incdir"
-else
-  cs_check_lib_cflag=''
-fi
-
-    if test -n "$cs_check_libdir"; then
-  cs_check_lib_lflag="-L$cs_check_libdir"
-else
-  cs_check_lib_lflag=''
-fi
-
-    if test -n "openal"; then
-  cs_check_lib_libs="-lopenal"
-else
-  cs_check_lib_libs=''
-fi
-
-    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		;;
-	    *)  if test -n "$cs_lib_item"; then
-  cs_check_lib_cflag="-I$cs_lib_item"
-else
-  cs_check_lib_cflag=''
-fi
-
-    if test -n "$cs_lib_item"; then
-  cs_check_lib_lflag="-L$cs_lib_item"
-else
-  cs_check_lib_lflag=''
-fi
-
-    if test -n "openal"; then
-  cs_check_lib_libs="-lopenal"
-else
-  cs_check_lib_libs=''
-fi
-
-    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		if test -n "$cs_lib_item/include"; then
-  cs_check_lib_cflag="-I$cs_lib_item/include"
-else
-  cs_check_lib_cflag=''
-fi
-
-    if test -n "$cs_lib_item/lib"; then
-  cs_check_lib_lflag="-L$cs_lib_item/lib"
-else
-  cs_check_lib_lflag=''
-fi
-
-    if test -n "openal"; then
-  cs_check_lib_libs="-lopenal"
-else
-  cs_check_lib_libs=''
-fi
-
-    cs_check_lib_flags="$cs_check_lib_flags `echo @$cs_check_lib_cflag@$cs_check_lib_lflag@$cs_check_lib_libs | sed 'y% %#%'`"
-		;;
-	esac
-    done
-
-	if test "$cs_ignore_cache" != yes; then
-  echo "$as_me:$LINENO: checking for libopenal" >&5
-echo $ECHO_N "checking for libopenal... $ECHO_C" >&6
+if test "" != yes; then
+  echo "$as_me:$LINENO: checking for OpenAL" >&5
+echo $ECHO_N "checking for OpenAL... $ECHO_C" >&6
 if test "${cs_cv_libopenal+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
@@ -15971,7 +15849,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in $cs_check_lib_flags
+    for cs_build_item in `echo @-DCS_OPENAL_PATH=OpenAL@@-framework OpenAL | sed 'y% %#%'` \
+    `echo @@@-lopenal -ldsound | sed 'y% %#%'` \
+    `echo @@@-lopenal | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -16037,11 +15917,19 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-#include <AL/alut.h>
+#ifndef CS_HEADER_GLOBAL
+    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    #endif
+    #ifdef CS_OPENAL_PATH
+    #include CS_HEADER_GLOBAL(CS_OPENAL_PATH,alut.h)
+    #else
+    #include <AL/alut.h>
+    #endif
 int
 main ()
 {
-alutInit (0, 0);
+alutInit(0,0);
   ;
   return 0;
 }
@@ -16093,8 +15981,8 @@ fi
 echo "$as_me:$LINENO: result: $cs_cv_libopenal" >&5
 echo "${ECHO_T}$cs_cv_libopenal" >&6
 else
-  echo "$as_me:$LINENO: checking for libopenal" >&5
-echo $ECHO_N "checking for libopenal... $ECHO_C" >&6
+  echo "$as_me:$LINENO: checking for OpenAL" >&5
+echo $ECHO_N "checking for OpenAL... $ECHO_C" >&6
 	    ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -16106,7 +15994,9 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
     cs_libs_save="$LIBS"
     cs_build_ok=no
 
-    for cs_build_item in $cs_check_lib_flags
+    for cs_build_item in `echo @-DCS_OPENAL_PATH=OpenAL@@-framework OpenAL | sed 'y% %#%'` \
+    `echo @@@-lopenal -ldsound | sed 'y% %#%'` \
+    `echo @@@-lopenal | sed 'y% %#%'`
     do
 
     set filler `echo "$cs_build_item" | awk 'BEGIN { FS="@" }
@@ -16172,11 +16062,19 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-#include <AL/alut.h>
+#ifndef CS_HEADER_GLOBAL
+    #define CS_HEADER_GLOBAL(X,Y) CS_HEADER_GLOBAL_COMPOSE(X,Y)
+    #define CS_HEADER_GLOBAL_COMPOSE(X,Y) <X/Y>
+    #endif
+    #ifdef CS_OPENAL_PATH
+    #include CS_HEADER_GLOBAL(CS_OPENAL_PATH,alut.h)
+    #else
+    #include <AL/alut.h>
+    #endif
 int
 main ()
 {
-alutInit (0, 0);
+alutInit(0,0);
   ;
   return 0;
 }
@@ -16229,21 +16127,6 @@ echo "${ECHO_T}$cs_cv_libopenal" >&6
 fi
 
     if test $cs_cv_libopenal = yes; then
-  :
-else
-  cs_cv_libopenal_cflags=''
-	cs_cv_libopenal_lflags=''
-	cs_cv_libopenal_libs=''
-	:
-fi
-
-else
-  cs_cv_libopenal=no
-fi
-
-    cs_cv_with_libopenal="$with_libopenal"
-
-    if test "$cs_cv_libopenal" = yes; then
   if test "$cs_cv_libopenal" = yes; then
   cs_makefile_text="${cs_makefile_text}OPENAL.AVAILABLE = yes
 "
@@ -16262,7 +16145,10 @@ fi
 fi
 
 else
-  :
+  cs_cv_libopenal_cflags=''
+	cs_cv_libopenal_lflags=''
+	cs_cv_libopenal_libs=''
+	:
 fi
 
 
@@ -16459,9 +16345,9 @@ if test x$no_ft = x ; then
 echo "${ECHO_T}yes" >&6
    cs_makefile_text="${cs_makefile_text}FT2.AVAILABLE = yes
 "
-     cs_makefile_text="${cs_makefile_text}FT2.LFLAGS = $FT2_LIBS
+    cs_makefile_text="${cs_makefile_text}FT2.LFLAGS = $FT2_LIBS
 "
-     cs_makefile_text="${cs_makefile_text}FT2.CFLAGS = $FT2_CFLAGS
+    cs_makefile_text="${cs_makefile_text}FT2.CFLAGS = $FT2_CFLAGS
 "
 else
    echo "$as_me:$LINENO: result: no" >&5

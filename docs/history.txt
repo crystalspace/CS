@@ -43,6 +43,19 @@ The history order is reversed so that new features are at the top.
 	    - Now uses the pthread flags if present when attempting to resolve
 	      the OpenGL library since some users have reported that Mesa's
 	      OpenGL library references pthread functions.
+	- Eric Sunshine made the following changes:
+	    - The configure script now checks for "-framework OpenGL" and
+	      cousins before checking for libGL, etc.  This ensures that it
+	      will find the built-in OpenGL.framework on MacOS/X before finding
+	      the optional Mesa libraries which some people have installed via
+	      Fink.
+	    - Removed hard-coded OpenGL build flags from macosx.mak.
+	    - Augmented OpenAL check in configure script to also recognize
+	      OpenAL.framework on MacOS/X.
+	    - Augmented OpenAL check in configure to automatically deduce need
+	      for dsound.lib on Windows.
+	    - Ported OpenAL renderer (plugins/sound/renderer/openal) to
+	      MacOS/X.  Works correctly with OpenAL.framework.
 2-Feb-2002
 	- Optimization with polygon buffers (DrawPolygonMesh) in OpenGL
 	  renderer. They use less memory now and they are also more efficient.

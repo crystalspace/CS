@@ -25,14 +25,12 @@
 #include "csutil/cfgacc.h"
 #include "iutil/eventh.h"
 
-// Bah. The OpenAL 1.0 SDK for Windows has the headers directly
-// below the Includes directory, and not in an "AL" subdir.
-#ifdef _WIN32_
-  #include <al.h>
-  #include <alut.h>
+#if defined(CS_OPENAL_PATH)
+#include CS_HEADER_GLOBAL(CS_OPENAL_PATH,al.h)
+#include CS_HEADER_GLOBAL(CS_OPENAL_PATH,alut.h)
 #else
-  #include <AL/al.h>
-  #include <AL/alut.h>
+#include <AL/al.h>
+#include <AL/alut.h>
 #endif
 
 class csSoundListenerOpenAL;
@@ -65,7 +63,8 @@ public:
   void AddSource (csSoundSourceOpenAL *src);
   void RemoveSource (csSoundSourceOpenAL *src);
 
-  /* These are set on a per source basis in openal, so this comes in from listener */
+  /* These are set on a per source basis in OpenAl, so this comes from
+     listener */
   void SetDistanceFactor (float d) { dist = d; }
   void SetRollOffFactor (float r) { roll = r; }
 
