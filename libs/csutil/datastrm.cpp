@@ -79,14 +79,16 @@ IMPLEMENT_READ_INT (ReadUInt16, uint16);
 IMPLEMENT_READ_INT (ReadInt32, int32);
 IMPLEMENT_READ_INT (ReadUInt32, uint32);
 
-int csDataStream::GetChar () {
+int csDataStream::GetChar ()
+{
   char val;
   if (Read (&val, sizeof(char)) < (int)sizeof(char))
     return EOF;
   return val;
 }
 
-int csDataStream::LookChar () {
+int csDataStream::LookChar ()
+{
   int OldPosition = Position;
   int Result = GetChar ();
   Position = OldPosition;
@@ -130,10 +132,13 @@ bool csDataStream::GetString (char* buf, int len, bool OmitNewline)
 int csDataStream::ReadTextInt ()
 {
   int Value, Length;
-  if (sscanf ((char*)(Data+Position), "%d%n", &Value, &Length) != 1) {
+  if (sscanf ((char*)(Data+Position), "%d%n", &Value, &Length) != 1)
+  {
     Position = Size;
     return 0;
-  } else {
+  }
+  else
+  {
     Position += Length;
     return Value;
   }
@@ -143,10 +148,13 @@ float csDataStream::ReadTextFloat ()
 {
   float Value;
   int Length;
-  if (sscanf ((char*)(Data+Position), "%f%n", &Value, &Length) != 1) {
+  if (sscanf ((char*)(Data+Position), "%f%n", &Value, &Length) != 1)
+  {
     Position = Size;
     return 0;
-  } else {
+  }
+  else
+  {
     Position += Length;
     return Value;
   }

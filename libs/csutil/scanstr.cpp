@@ -30,11 +30,11 @@ int csScanStr (const char* in, const char* format, ...)
   va_start (arg, format);
 
   int num = 0;
-  const char* orig_in=in;
+  const char* orig_in = in;
   in += strspn (in, CS_WHITE);
 
   char c[2] = { '\0', '\0' };
-  while (*format && *in)
+  while (*format)
   {
     c[0] = *format;
     if (c[0] == '%')
@@ -45,17 +45,22 @@ int csScanStr (const char* in, const char* format, ...)
         case 'n':
         {
           int* a = va_arg (arg, int*);
-          *a=in-orig_in;
+          *a = in-orig_in;
           break;
 	}
         case 'd':
 	{
 	  int* a = va_arg (arg, int*);
 	  in += strspn (in, CS_WHITE);
-	  *a = atoi (in);
-	  in += strspn (in, "0123456789+-");
-	  in += strspn (in, CS_WHITE);
-	  num++;
+	  if (*in)
+	  {
+	    *a = atoi (in);
+	    in += strspn (in, "0123456789+-");
+	    in += strspn (in, CS_WHITE);
+	    num++;
+	  }
+	  else
+	    *a = 0;
 	  break;
 	}
 	case 'D':
@@ -82,23 +87,33 @@ int csScanStr (const char* in, const char* format, ...)
 	{
 	  bool* a = va_arg (arg, bool*);
 	  in += strspn (in, CS_WHITE);
-	  const char* in2 = in + strspn (in,
-	    "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
-	  int l = (int)(in2-in);
-	  *a = !strncasecmp (in, "yes", l) || !strncasecmp (in, "true", l) ||
-	       !strncasecmp (in, "on", l)  || !strncasecmp (in, "1", l);
-	  in = in2 + strspn (in2, CS_WHITE);
-	  num++;
+	  if (*in)
+	  {
+	    const char* in2 = in + strspn (in,
+	      "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+	    int l = (int)(in2-in);
+	    *a = !strncasecmp (in, "yes", l) || !strncasecmp (in, "true", l) ||
+	         !strncasecmp (in, "on", l)  || !strncasecmp (in, "1", l);
+	    in = in2 + strspn (in2, CS_WHITE);
+	    num++;
+	  }
+	  else
+	    *a = false;
 	  break;
 	}
 	case 'f':
 	{
 	  float* a = va_arg (arg, float*);
 	  in += strspn (in, CS_WHITE);
-	  *a = atof (in);
-	  in += strspn (in, "0123456789.eE+-");
-	  in += strspn (in, CS_WHITE);
-	  num++;
+	  if (*in)
+	  {
+	    *a = atof (in);
+	    in += strspn (in, "0123456789.eE+-");
+	    in += strspn (in, CS_WHITE);
+	    num++;
+	  }
+	  else
+	    *a = 0.0f;
 	  break;
 	}
 	case 'F':
@@ -141,17 +156,18 @@ int csScanStr (const char* in, const char* format, ...)
 	      strcpy (a, in);
 	      in = strchr (in, 0);
 	    }
+	    num++;
 	  }
-	  else
+	  else if (*in != 0)
 	  {
 	    const char* in2 = in + strspn (in, "abcdefghijklmnopqrstuvwxyz"
 	      "ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789./");
 	    strncpy (a, in, (int)(in2-in));
 	    a[(int)(in2-in)] = 0;
 	    in = in2;
+	    num++;
 	  }
 	  in += strspn (in, CS_WHITE);
-	  num++;
 	  break;
 	}
 	case 'S':
@@ -215,26 +231,7 @@ int csScanStr (const char* in, const char* format, ...)
     else { num = -1; break; }
   }
 
-  while (*format)
-  {
-    c[0] = *format;
-    if (c[0] == '%')
-    {
-      format++;
-      switch (*format)
-      {
-        case 'n':
-        {
-          int* a = va_arg (arg, int*);
-          *a=in-orig_in;
-          break;
-	}
-      }
-      if (*format) format++;
-    }
-    else { num = -1; break; }
-  }
-
   va_end (arg);
   return num;
 }
+

@@ -1522,8 +1522,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[],
     // Load from a map file.
     Report (CS_REPORTER_SEVERITY_NOTIFY, "Loading map '%s'...", map_dir);
 
-    // Check the map and mount it if required
-    char tmp [100];
+    // Check the map and mount it if required.
+    char tmp [255];
     sprintf (tmp, "%s/", map_dir);
     if (!myVFS->Exists (map_dir))
     {

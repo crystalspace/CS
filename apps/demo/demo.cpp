@@ -59,6 +59,7 @@
 #include "iutil/objreg.h"
 #include "iutil/virtclk.h"
 #include "iutil/csinput.h"
+#include "iutil/cmdline.h"
 #include "igraphic/imageio.h"
 #include "ivaria/reporter.h"
 #include "qsqrt.h"
@@ -270,24 +271,60 @@ bool Demo::Initialize (int argc, const char* const argv[],
   Report (CS_REPORTER_SEVERITY_NOTIFY,
     "The Crystal Space Demo.");
 
-  // First disable the lighting cache. Our app is simple enough
-  // not to need this.
-  engine->SetLightingCacheMode (0);
-
   // Create our world.
   Report (CS_REPORTER_SEVERITY_NOTIFY, "Creating world!...");
 
-  //engine->RegisterRenderPriority ("starLevel1", 1);
-  //engine->RegisterRenderPriority ("starLevel2", 2);
-  //engine->RegisterRenderPriority ("object", 3);
-  //engine->RegisterRenderPriority ("alpha", 4);
+  // Check the demo file and mount it if required.
+  iCommandLineParser* cmdline = CS_QUERY_REGISTRY (object_reg,
+  	iCommandLineParser);
+  char map_dir[255];
+  const char *val;
+  if (!(val = cmdline->GetName ()))
+  {
+    // @@@ DEFAULT?
+    val = "BLA";
+  }
+  strcpy (map_dir, val);
+  cmdline->DecRef ();
 
-  if (!loader->LoadLibraryFile ("/data/demo/library"))
+  char tmp[255];
+  sprintf (tmp, "%s/", map_dir);
+  if (!myVFS->Exists (map_dir))
+  {
+    char *name = strrchr (map_dir, '/');
+    if (name)
+    {
+      name++;
+      char* extension = strrchr (name, '.');
+      if (extension && !strcmp (extension+1, "zip"))
+      {
+	// The file already ends with the correct extension.
+	sprintf (tmp, "$.$/data$/%s, $.$/%s, $(..)$/data$/%s, %s",
+             name, name, name, name);
+      }
+      else
+      {
+	// Add the extension.
+	sprintf (tmp, "$.$/data$/%s.%s, $.$/%s.%s, $(..)$/data$/%s.%s",
+             name, "zip", name, "zip", name, "zip");
+      }
+      myVFS->Mount (map_dir, tmp);
+    }
+  }
+
+  if (!myVFS->ChDir (map_dir))
+  {
+    Report (CS_REPORTER_SEVERITY_ERROR,
+	"The directory on VFS for demo file does not exist!");
+   return false;
+  }
+
+  if (!loader->LoadLibraryFile ("library"))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "There was an error loading library!");
     exit (0);
   }
-  if (!loader->LoadMapFile ("/data/demo/world", false, true))
+  if (!loader->LoadMapFile ("world", false, true))
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "There was an error loading world!");
     exit (0);
@@ -295,16 +332,16 @@ bool Demo::Initialize (int argc, const char* const argv[],
 
   room = engine->GetSectors ()->FindByName ("room");
   seqmgr = new DemoSequenceManager (this);
-  seqmgr->Setup ("/data/demo/sequences");
+  seqmgr->Setup ("sequences");
 
   engine->Prepare ();
 
-  Report (CS_REPORTER_SEVERITY_NOTIFY, "--------------------------------------");
-
   view = new csView (engine, myG3D);
   view->GetCamera ()->SetSector (room);
-  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0.0f, 0.0f, -900.0f));
-  view->GetCamera ()->GetTransform ().RotateThis (csVector3 (0.0f, 1.0f, 0.0f), 0.8f);
+  view->GetCamera ()->GetTransform ().SetOrigin (
+  	csVector3 (0.0f, 0.0f, -900.0f));
+  view->GetCamera ()->GetTransform ().RotateThis (
+  	csVector3 (0.0f, 1.0f, 0.0f), 0.8f);
   view->SetRectangle (0, 0, myG2D->GetWidth (), myG2D->GetHeight ());
 
   txtmgr->SetPalette ();

@@ -467,7 +467,7 @@ bool csSprite3DFactoryLoader::LoadSkeleton (iReporter* reporter,
       case CS_TOKEN_VERTICES:
         {
           int vert, next, tot=0;
-	  while(csScanStr (&params[tot], "%d%n", &vert, &next)>0)
+	  while (csScanStr (&params[tot], "%d%n", &vert, &next) > 0)
 	  {
             limb->AddVertex (vert);
 	    tot+=next;
@@ -718,6 +718,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
         {
           int num, list[30];
           csScanStr (params, "%D", list, &num);
+printf ("num=%d\n", num); fflush (stdout);
           switch (num)
           {
             case 0  :  spr3dLook->MergeNormals ();                  break;
@@ -726,7 +727,7 @@ iBase* csSprite3DFactoryLoader::Parse (const char* string,
 	    default:
 	      ReportError (reporter,
 		"crystalspace.sprite3dfactoryloader.parse.badsmooth",
-		"Bad smooth option %s, use 0, 1, or 2!", num);
+		"Bad smooth option '%s', use 0, 1, or 2 parameters!", params);
 	      spr3dLook->DecRef ();
 	      fact->DecRef ();
 	      return NULL;

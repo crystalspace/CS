@@ -1,5 +1,15 @@
 The history order is reversed so that new features are at the top.
 
+11-Mar-2002
+	- Fixed a bug in csScanStr when presented with an empty string
+	  as input. This prevented the proper scanning of the format
+	  string and thus also prevented some stuff that needs to happen
+	  even if input is empty (like setting count variables to 0 for
+	  lists like %D and %F).
+	- Fixed a bug in the parsing of SMOOTH (spr3dldr) which would
+	  use '%s' for a numeric parameter if an error occured. This
+	  causes crashes. Additionally also fixed the error message
+	  that occurs in this case.
 8-Mar-2002
 	- Peter Amstutz <tetron@student.umass.edu> gave a patch which
 	  does the following:
