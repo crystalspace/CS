@@ -108,16 +108,16 @@ const csVector& csMultiplexImageIO::GetDescription ()
   return formats;
 }
 
-iImage *csMultiplexImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
+csPtr<iImage> csMultiplexImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
 {
   int i;
   for (i=0; i<list.Length(); i++)
   {
     iImageIO *pIO = (iImageIO*)list.Get(i);
     iImage *img = pIO->Load(iBuffer, iSize, iFormat);
-    if (img) return img;
+    if (img) return csPtr<iImage> (img);
   }
-  return NULL;
+  return csPtr<iImage> (NULL);
 }
 
 /**

@@ -106,15 +106,15 @@ const csVector& csPNGImageIO::GetDescription ()
   return formats;
 }
 
-iImage *csPNGImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
+csPtr<iImage> csPNGImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
 {
   ImagePngFile* i = new ImagePngFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
   {
     delete i;
-    return NULL;
+    return csPtr<iImage> (NULL);
   }
-  return i;
+  return csPtr<iImage> (i);
 }
 
 void csPNGImageIO::SetDithering (bool)

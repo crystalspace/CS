@@ -1200,10 +1200,9 @@ bool csVFS::Initialize (iObjectRegistry *object_reg)
 
 bool csVFS::ReadConfig ()
 {
-  iConfigIterator *iterator = config.Enumerate ("VFS.Mount.");
+  csRef<iConfigIterator> iterator (config.Enumerate ("VFS.Mount."));
   while (iterator->Next ())
     AddLink (iterator->GetKey (true), iterator->GetStr ());
-  iterator->DecRef ();
   NodeList.QuickSort (0);
   return true;
 }

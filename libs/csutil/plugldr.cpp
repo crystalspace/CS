@@ -286,7 +286,7 @@ bool csPluginLoader::LoadPlugins ()
 
   // Now load and initialize all plugins
   iConfigManager* Config = CS_QUERY_REGISTRY (object_reg, iConfigManager);
-  iConfigIterator *plugin_list = Config->Enumerate ("System.Plugins.");
+  csRef<iConfigIterator> plugin_list (Config->Enumerate ("System.Plugins."));
   if (plugin_list)
   {
     while (plugin_list->Next ())
@@ -299,7 +299,6 @@ bool csPluginLoader::LoadPlugins ()
       if (classID)
         PluginList.Push (new csPluginLoadRec (tag, classID));
     }
-    plugin_list->DecRef ();
   }
 
   iVFS* VFS = CS_QUERY_REGISTRY (object_reg, iVFS);

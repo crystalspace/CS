@@ -166,15 +166,15 @@ const csVector& csBMPImageIO::GetDescription ()
   return formats;
 }
 
-iImage *csBMPImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
+csPtr<iImage> csBMPImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
 {
   ImageBMPFile* i = new ImageBMPFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
   {
     delete i;
-    return NULL;
+    return csPtr<iImage> (NULL);
   }
-  return i;
+  return csPtr<iImage> (i);
 }
 
 void csBMPImageIO::SetDithering (bool)

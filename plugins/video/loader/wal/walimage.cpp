@@ -85,17 +85,17 @@ const csVector& csWALImageIO::GetDescription ()
   return formats;
 }
 
-iImage *csWALImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
+csPtr<iImage> csWALImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
 {
   if (iSize < sizeof(WALHeader))
-    return NULL;
+    return csPtr<iImage> (NULL);
   ImageWALFile* i = new ImageWALFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
   {
     delete i;
-    return NULL;
+    return csPtr<iImage> (NULL);
   }
-  return i;
+  return csPtr<iImage> (i);
 }
 
 void csWALImageIO::SetDithering (bool)

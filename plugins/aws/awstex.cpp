@@ -25,7 +25,6 @@ static unsigned long NameToId (const char *txt)
 
 awsTextureManager::awsTexture::~awsTexture ()
 {
-  img->DecRef ();
   tex->DecRef ();
 }
 
@@ -160,13 +159,11 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
 
   int Format = txtmgr->GetTextureFormat ();
 
-  iImage *ifile = NULL;
-  iDataBuffer *buf = vfs->ReadFile (filename);
+  csRef<iImage> ifile;
+  csRef<iDataBuffer> buf (vfs->ReadFile (filename));
 
   if (buf == NULL || buf->GetSize () == 0)
   {
-    if (buf) buf->DecRef ();
-
     csReport (
       object_reg,
       CS_REPORTER_SEVERITY_ERROR,
@@ -178,7 +175,6 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
   }
 
   ifile = loader->Load (buf->GetUint8 (), buf->GetSize (), Format);
-  buf->DecRef ();
 
   if (!ifile)
   {
@@ -203,7 +199,6 @@ iTextureHandle *awsTextureManager::GetTexturebyID (
   }
   else
   {
-    awstxt->img->DecRef ();
     awstxt->tex->DecRef ();
   }
 

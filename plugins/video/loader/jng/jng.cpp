@@ -133,15 +133,15 @@ const csVector& csJNGImageIO::GetDescription ()
   return formats;
 }
 
-iImage *csJNGImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
+csPtr<iImage> csJNGImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
 {
   ImageJngFile* i = new ImageJngFile (iFormat, object_reg);
   if (i && !i->Load (iBuffer, iSize))
   {
     delete i;
-    return NULL;
+    return csPtr<iImage> (NULL);
   }
-  return i;
+  return csPtr<iImage> (i);
 }
 
 void csJNGImageIO::SetDithering (bool)

@@ -264,7 +264,7 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
   iImageIO *imgloader = NULL;
   iVFS *VFS = NULL;
   iDataBuffer *buf = NULL;
-  iImage *image = NULL;
+  csRef<iImage> image;
   iTextureHandle *handle = NULL;
   csIsoMaterial *material = NULL;
   iMaterialHandle *math = NULL;
@@ -328,7 +328,6 @@ iMaterialWrapper *csIsoEngine::CreateMaterialWrapper(const char *vfsfilename,
 
  create_out:
   if (math) math->DecRef ();
-  if (image) image->DecRef ();
   if (buf) buf->DecRef();
   if (imgloader) imgloader->DecRef ();
   if (VFS) VFS->DecRef ();

@@ -79,14 +79,12 @@ csModelDataTexture::csModelDataTexture ()
   SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiObject);
   FileName = NULL;
-  Image = NULL;
   TextureWrapper = NULL;
 }
 
 csModelDataTexture::~csModelDataTexture ()
 {
   delete[] FileName;
-  SCF_DEC_REF (Image);
   SCF_DEC_REF (TextureWrapper);
 }
 
@@ -107,14 +105,12 @@ CS_IMPLEMENT_ACCESSOR_METHOD_REF (csModelDataTexture, iTextureWrapper*, TextureW
 void csModelDataTexture::LoadImage (iVFS *vfs, iImageIO *io, int Format)
 {
   if (!FileName) return;
-  SCF_DEC_REF (Image);
   Image = NULL;
 
-  iDataBuffer *dbuf = vfs->ReadFile (FileName);
+  csRef<iDataBuffer> dbuf (vfs->ReadFile (FileName));
   if (!dbuf) return;
 
   Image = io->Load (dbuf->GetUint8 (), dbuf->GetSize (), Format);
-  dbuf->DecRef ();
 }
 
 void csModelDataTexture::Register (iTextureList *tl)

@@ -1118,8 +1118,7 @@ void CaptureScreen ()
   csRef<iImageIO> imageio (CS_QUERY_REGISTRY (Sys->object_reg, iImageIO));
   if (imageio)
   {
-    csRef<iDataBuffer> db (csPtr<iDataBuffer> (
-    	imageio->Save (img, "image/png")));
+    csRef<iDataBuffer> db (imageio->Save (img, "image/png"));
     if (db)
     {
       Sys->Report (CS_REPORTER_SEVERITY_NOTIFY, "Screenshot: %s", name);

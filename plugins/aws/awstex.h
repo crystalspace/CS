@@ -39,7 +39,7 @@ class awsTextureManager
   struct awsTexture
   {
     ~awsTexture();
-    iImage *img;
+    csRef<iImage> img;
     iTextureHandle *tex;
     unsigned long id;
   };

@@ -66,7 +66,7 @@ struct iImageIO : public iBase
    * are optional: if the image does not contain alpha mask, the GetFormat()
    * method of the image will return a value without that bit set.
    */
-  virtual iImage *Load (uint8* iBuffer, uint32 iSize, int iFormat) = 0;
+  virtual csPtr<iImage> Load (uint8* iBuffer, uint32 iSize, int iFormat) = 0;
 
   /**
    * Set global image dithering option.<p>
@@ -90,14 +90,14 @@ struct iImageIO : public iBase
    * <code>compress=50</code><br>
    * <code>progressive,compress=30</code>
    */
-  virtual iDataBuffer *Save (iImage *image, iImageIO::FileFormatDescription *format,
+  virtual iDataBuffer* Save (iImage *image, iImageIO::FileFormatDescription *format,
     const char* extraoptions = NULL) = 0;
 
   /**
    * Save an image using format <mime>.
    * If omitted format selection is left to the plugin.
    */
-  virtual iDataBuffer *Save (iImage *image, const char *mime = NULL,
+  virtual iDataBuffer* Save (iImage *image, const char *mime = NULL,
     const char* extraoptions = NULL) = 0;
 };
 

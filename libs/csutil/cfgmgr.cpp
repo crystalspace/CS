@@ -77,7 +77,7 @@ class csConfigManagerIterator : public iConfigIterator
 private:
   csConfigManager *Config;
   csConfigDomain *CurrentDomain;
-  iConfigIterator *CurrentIterator;
+  csRef<iConfigIterator> CurrentIterator;
   char *Subsection;
   csHashMap Iterated;
 public:
@@ -117,14 +117,12 @@ public:
     Config = cfg;
     Config->IncRef();
     CurrentDomain = Config->LastDomain;
-    CurrentIterator = NULL;
     Subsection = csStrNew(sub);
   }
   virtual ~csConfigManagerIterator()
   {
     Config->RemoveIterator(this);
     Config->DecRef();
-    if (CurrentIterator) CurrentIterator->DecRef();
     if (Subsection) delete[] Subsection;
     ClearIterated();
   }
@@ -138,7 +136,6 @@ public:
   }
   virtual void Rewind ()
   {
-    if (CurrentIterator) delete CurrentIterator;
     CurrentIterator = NULL;
     CurrentDomain = Config->LastDomain;
     ClearIterated();
@@ -156,7 +153,6 @@ public:
       }
       else
       {
-        CurrentIterator->DecRef();
         CurrentIterator = NULL;
       }
     }
@@ -389,11 +385,11 @@ void csConfigManager::Clear()
     if (d->Cfg) d->Cfg->Clear();
 }
 
-iConfigIterator *csConfigManager::Enumerate(const char *Subsection)
+csPtr<iConfigIterator> csConfigManager::Enumerate(const char *Subsection)
 {
   iConfigIterator *it = new csConfigManagerIterator(this, Subsection);
   Iterators.Push(it);
-  return it;
+  return csPtr<iConfigIterator> (it);
 }
 
 bool csConfigManager::KeyExists(const char *Key) const

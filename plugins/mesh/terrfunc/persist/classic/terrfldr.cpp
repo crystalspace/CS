@@ -423,7 +423,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString,
 	    return NULL;
 	  }
 
-	  iDataBuffer* buf = vfs->ReadFile (pStr);
+	  csRef<iDataBuffer> buf (vfs->ReadFile (pStr));
 	  vfs->DecRef ();
 	  if (!buf || !buf->GetSize ())
 	  {
@@ -432,19 +432,16 @@ iBase* csTerrFuncLoader::Parse (const char* pString,
 	    printf ("Can't open file '%s' in vfs!\n", pStr);
 	    return NULL;
 	  }
-	  iImage* ifile = loader->Load (buf->GetUint8 (), buf->GetSize (),
-	  	CS_IMGFMT_TRUECOLOR);
+	  csRef<iImage> ifile (loader->Load (buf->GetUint8 (), buf->GetSize (),
+	  	CS_IMGFMT_TRUECOLOR));
 	  loader->DecRef ();
 	  if (!ifile)
 	  {
-	    buf->DecRef ();
 	    // @@@ Use reporter!
 	    printf ("Error loading image '%s'!\n", pStr);
 	    return NULL;
 	  }
 	  terrstate->SetHeightMap (ifile, hscale, hshift);
-	  ifile->DecRef ();
-	  buf->DecRef ();
 	}
 	break;
     }
@@ -661,8 +658,7 @@ iBase* csTerrFuncLoader::Parse (iDocumentNode* node,
 		child, "Cannot read file '%s' on VFS!", imgname);
 	    return NULL;
 	  }
-	  csRef<iImage> ifile;
-	  ifile = csPtr<iImage> (loader->Load (buf->GetUint8 (), buf->GetSize (),
+	  csRef<iImage> ifile (loader->Load (buf->GetUint8 (), buf->GetSize (),
 	  	CS_IMGFMT_TRUECOLOR));
 	  if (!ifile)
 	  {

@@ -121,11 +121,10 @@ bool csFreeType2Server::Initialize (iObjectRegistry *object_reg)
   //  DEBUG_BREAK;
   csString s;
   s << fontset << '.';
-  iConfigIterator *fontenum = ftconfig->Enumerate (s);
+  csRef<iConfigIterator> fontenum (ftconfig->Enumerate (s));
   while (fontenum->Next ())
     if (fontenum->GetKey (true) [0] == '*')
       LoadFont (fontenum->GetKey (true));
-  fontenum->DecRef ();
 
   return true;
 }

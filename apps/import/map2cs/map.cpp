@@ -50,7 +50,7 @@ CMapFile::~CMapFile()
 bool CMapFile::Read(const char* filename, const char* configfile)
 {
   m_IniFilename = strdup(configfile);
-  m_pConfigFile->Load(configfile);
+  m_pConfigFile->Load (configfile);
   m_TextureManager.LoadTextureArchives(this);
 
   m_NumBrushes  = 0;

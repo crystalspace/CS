@@ -514,15 +514,14 @@ void csFancyConsole::PrepPix (iConfigFile *ini, const char *sect,
     if (len)
     {
       iTextureManager *tm = G3D->GetTextureManager ();
-      iImage *image =
-        ImageLoader->Load ((uint8 *)data, len, tm->GetTextureFormat ());
+      csRef<iImage> image (
+        ImageLoader->Load ((uint8 *)data, len, tm->GetTextureFormat ()));
       if (image)
       {
 	iTextureHandle* txt =
 	  tm->RegisterTexture ( image, CS_TEXTURE_3D | CS_TEXTURE_NOMIPMAPS );
 	iMaterialHandle* mat = tm->RegisterMaterial (txt);
 	border.mat = mat;
-	image->DecRef();
 
         Keyname.Clear() << "FancyConsole." << sect << ".x";
 	border.offx = ini->GetInt (Keyname, 0);

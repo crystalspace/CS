@@ -51,11 +51,10 @@ bool csPrefixConfig::LoadNow(const char *Filename, iVFS *vfs, bool overwrite)
     return false;
 
   // copy all options for the current user
-  iConfigIterator *it = cfg.Enumerate(Prefix);
+  csRef<iConfigIterator> it (cfg.Enumerate(Prefix));
   while (it->Next())
     if (overwrite || !KeyExists(it->GetKey(true)))
       SetStr(it->GetKey(true), it->GetStr());
-  it->DecRef();
 
   // copy the EOF comment
   SetEOFComment(cfg.GetEOFComment());
@@ -65,7 +64,7 @@ bool csPrefixConfig::LoadNow(const char *Filename, iVFS *vfs, bool overwrite)
 
 bool csPrefixConfig::SaveNow(const char *Filename, iVFS *vfs) const
 {
-  iConfigIterator *it;
+  csRef<iConfigIterator> it;
   csConfigFile cfg;
 
   // first load the existing config file to preserve the user
@@ -80,17 +79,16 @@ bool csPrefixConfig::SaveNow(const char *Filename, iVFS *vfs) const
   it = cfg.Enumerate(Prefix);
   while (it->Next())
     cfg.DeleteKey(it->GetKey());
-  it->DecRef();
 
   // copy all options for the current user
   it = ((iConfigFile*)this)->Enumerate();
-  while (it->Next()) {
+  while (it->Next())
+  {
     char tmp[1024];
     memcpy(tmp, Prefix, PrefixLength);
     strcpy(tmp + PrefixLength, it->GetKey());
     cfg.SetStr(tmp, it->GetStr());
   }
-  it->DecRef();
 
   // copy EOF comment
   cfg.SetEOFComment(GetEOFComment());

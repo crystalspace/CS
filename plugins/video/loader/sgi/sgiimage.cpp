@@ -60,15 +60,15 @@ const csVector& csSGIImageIO::GetDescription ()
   return formats;
 }
 
-iImage *csSGIImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
+csPtr<iImage> csSGIImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
 {
   ImageSGIFile* i = new ImageSGIFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
   {
     delete i;
-    return NULL;
+    return csPtr<iImage> (NULL);
   }
-  return i;
+  return csPtr<iImage> (i);
 }
 
 void csSGIImageIO::SetDithering (bool)

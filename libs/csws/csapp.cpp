@@ -295,21 +295,20 @@ void csApp::InitializeSkin ()
     }
   }
 
-  iConfigIterator *di;
+  csRef<iConfigIterator> di;
 
   // Now load all textures from the skin-specific section
-  if (skin->Prefix) {
+  if (skin->Prefix)
+  {
     di = config->Enumerate (SectionName);
     while (di->Next ())
       modified |= LoadTexture (di->GetKey (true), di->GetStr (), CS_TEXTURE_2D);
-    di->DecRef ();
   }
 
   // And now load the textures from the common-for-all-skins section
   di = config->Enumerate (DefaultSection);
   while (di->Next ())
     modified |= LoadTexture (di->GetKey (true), di->GetStr (), CS_TEXTURE_2D);
-  di->DecRef ();
 
   // Load definitions for all mouse cursors
   // @@@ If the skin-specific mouse section exists, this does not load
@@ -325,17 +324,18 @@ void csApp::InitializeSkin ()
 
   di = config->Enumerate(SectionName);
   // look if there are keys in this section
-  if (di->Next()) {
+  if (di->Next())
+  {
     di->Rewind();
-  } else {
-    di->DecRef();
+  }
+  else
+  {
     di = config->Enumerate(DefaultSection);
   }
 
   Mouse->ClearPointers ();
   while (di->Next ())
     Mouse->NewPointer (di->GetKey (true), di->GetStr ());
-  di->DecRef ();
 
   // Compute and set the work palette (instead of console palette)
   if (modified)
@@ -447,12 +447,11 @@ bool csApp::LoadTexture (const char *iTexName, const char *iTexParams,
   delete [] filename;
 
   iTextureManager *txtmgr = GfxPpl.G3D->GetTextureManager ();
-  iImage *image = ImageLoader->Load (fbuffer->GetUint8 (), fbuffer->GetSize (),
-    txtmgr->GetTextureFormat ());
+  csRef<iImage> image (ImageLoader->Load (fbuffer->GetUint8 (), fbuffer->GetSize (),
+    txtmgr->GetTextureFormat ()));
   fbuffer->DecRef ();
 
   csWSTexture *tex = new csWSTexture (iTexName, image, iFlags);
-  image->DecRef ();
   if (tb >= 0)
     tex->SetKeyColor (QInt (tr * 255.), QInt (tg * 255.), QInt (tb * 255.));
   Textures.Push (tex);

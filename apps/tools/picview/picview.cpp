@@ -263,11 +263,10 @@ void PicViewApp::LoadNextImage (int idx, int step)
   label1->SetText (sbuf);
   sprintf (sbuf, "%s", files->Get (i));
   label2->SetText (sbuf+6);
-  iDataBuffer* buf = VFS->ReadFile (files->Get (i));
+  csRef<iDataBuffer> buf (VFS->ReadFile (files->Get (i)));
   if (!buf) return;
-  iImage* ifile = image_loader->Load (buf->GetUint8 (),
-		  buf->GetSize (), txtmgr->GetTextureFormat ());
-  buf->DecRef ();
+  csRef<iImage> ifile (image_loader->Load (buf->GetUint8 (),
+		  buf->GetSize (), txtmgr->GetTextureFormat ()));
   if (image_view->image)
   {
     image_view->image->GetTextureHandle ()->DecRef ();
@@ -284,7 +283,6 @@ void PicViewApp::LoadNextImage (int idx, int step)
     txtmgr->ResetPalette ();
     txtmgr->PrepareTextures ();
     txtmgr->SetPalette ();
-    ifile->DecRef ();
     csSimplePixmap* pm = new csSimplePixmap (txt);
     image_view->image = pm;
     //int w = pm->Width ();

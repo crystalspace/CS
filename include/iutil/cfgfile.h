@@ -94,7 +94,7 @@ struct iConfigFile : public iBase
    * iterator does not yet point to a valid key.  You must call Next() to set
    * it to the first key.
    */
-  virtual iConfigIterator *Enumerate (const char *Subsection = NULL) = 0;
+  virtual csPtr<iConfigIterator> Enumerate (const char *Subsection = NULL) = 0;
 
   /// Test if a key exists.
   virtual bool KeyExists (const char *Key) const = 0;

@@ -427,8 +427,7 @@ static void cmd_conf (char *args)
     return;
   }
 
-  csRef<iConfigIterator> iter = csPtr<iConfigIterator> (
-  	config->Enumerate ("VFS.Mount."));
+  csRef<iConfigIterator> iter = config->Enumerate ("VFS.Mount.");
   while (iter->Next ())
   {
     const char *rpath = iter->GetKey (true);

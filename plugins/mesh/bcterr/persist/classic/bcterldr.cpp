@@ -606,8 +606,8 @@ iBase* csBCTerrLoader::Parse (const char* pString,
           printf ("Can't open file '%s' in vfs!\n", pStr);
           exit (0);
         }
-        iImage* ifile = loader->Load (buf->GetUint8 (), buf->GetSize (),
-          CS_IMGFMT_TRUECOLOR);
+        csRef<iImage> ifile (loader->Load (buf->GetUint8 (), buf->GetSize (),
+          CS_IMGFMT_TRUECOLOR));
         if (!ifile)
         {
           printf ("Error loading image '%s'!\n", pStr);
@@ -615,7 +615,6 @@ iBase* csBCTerrLoader::Parse (const char* pString,
         }
         //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"BC Loader","Set HeightMap");
         iState->SetHeightMap (ifile);
-        ifile->DecRef ();
         buf->DecRef ();
         vfs->DecRef ();
         loader->DecRef ();
@@ -802,9 +801,8 @@ iBase* csBCTerrLoader::Parse (iDocumentNode* node,
 	      child, "Can't open file '%s' in vfs!", mapname);
 	    return NULL;
           }
-          csRef<iImage> ifile (csPtr<iImage> (
-	  	loader->Load (buf->GetUint8 (), buf->GetSize (),
-            		CS_IMGFMT_TRUECOLOR)));
+          csRef<iImage> ifile (loader->Load (buf->GetUint8 (), buf->GetSize (),
+            		CS_IMGFMT_TRUECOLOR));
           if (!ifile)
           {
 	    synldr->ReportError ("crystalspace.bcterrldr.parse",

@@ -23,7 +23,7 @@ class csSGIImageIO : public iImageIO
   virtual ~csSGIImageIO () {}
 
   virtual const csVector& GetDescription ();
-  virtual iImage *Load (uint8* iBuffer, uint32 iSize, int iFormat);
+  virtual csPtr<iImage> Load (uint8* iBuffer, uint32 iSize, int iFormat);
   virtual void SetDithering (bool iEnable);
   virtual iDataBuffer *Save (iImage* image, const char* mime,
     const char* extraoptions);

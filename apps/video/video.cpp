@@ -358,12 +358,11 @@ iMeshWrapper *wallmesh = engine->CreateSectorWallsMesh (room, "walls");
     if (pVFS)
     {
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Opening the video file.");
-      iFile *pFile = pVFS->Open ("/this/data/video.avi", VFS_FILE_READ);
+      csRef<iFile> pFile (pVFS->Open ("/this/data/video.avi", VFS_FILE_READ));
       pVFS->DecRef ();
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Scanning the video file.");
       if (pFile && pVideoFormat->Load (pFile))
       {
-	pFile->DecRef ();
 	// get a iterator to enumerate all streams found
 	iStreamIterator *it = pVideoFormat->GetStreamIterator ();
 	// look up an video stream

@@ -452,7 +452,7 @@ void csSCF::RegisterConfigClassList (iConfigFile *iConfig)
 #ifndef CS_STATIC_LINKED
   if (iConfig)
   {
-    iConfigIterator *iterator = iConfig->Enumerate ();
+    csRef<iConfigIterator> iterator (iConfig->Enumerate ());
     if (iterator)
     {
       while (iterator->Next ())
@@ -464,7 +464,6 @@ void csSCF::RegisterConfigClassList (iConfigFile *iConfig)
         if (depend) *depend++ = 0;
         RegisterClass (iterator->GetKey (true), val, depend);
       }
-      iterator->DecRef ();
     }
   }
 #else

@@ -396,7 +396,7 @@ bool csBigTerrainObject::ConvertImageToMapFile (iFile *input,
 	"Unable to read from input file\n");
     return false;
   }
-  iImage *image = imageio->Load (raw, input->GetSize(), CS_IMGFMT_ANY);
+  csRef<iImage> image (imageio->Load (raw, input->GetSize(), CS_IMGFMT_ANY));
   if (!image) {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR, 
     	"crystalspace.mesh.object.terrbig", 
@@ -431,7 +431,6 @@ printf ("image w,h (%d, %d)\n", image->GetWidth(), image->GetHeight());
     terrain = new nTerrain;
   }
   terrain->BuildTree (hmfp, heightmap, image->GetWidth());
-  image->DecRef ();
 
   delete [] heightmap;
   fclose (hmfp);

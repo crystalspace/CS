@@ -59,15 +59,15 @@ const csVector& csGIFImageIO::GetDescription ()
   return formats;
 }
 
-iImage *csGIFImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
+csPtr<iImage> csGIFImageIO::Load (uint8* iBuffer, uint32 iSize, int iFormat)
 {
   ImageGifFile* i = new ImageGifFile (iFormat);
   if (i && !i->Load (iBuffer, iSize))
   {
     delete i;
-    return NULL;
+    return csPtr<iImage> (NULL);
   }
-  return i;
+  return csPtr<iImage> (i);
 }
 
 void csGIFImageIO::SetDithering (bool)

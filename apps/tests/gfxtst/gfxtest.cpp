@@ -413,7 +413,7 @@ static bool process_file (const char *fname)
   else
     fmt = CS_IMGFMT_ANY;
 
-  iImage *ifile = ImageLoader->Load (buffer, fsize, fmt | CS_IMGFMT_ALPHA);
+  csRef<iImage> ifile (ImageLoader->Load (buffer, fsize, fmt | CS_IMGFMT_ALPHA));
   delete [] buffer;
   if (!ifile)
   {
@@ -451,9 +451,8 @@ static bool process_file (const char *fname)
   if (opt.mipmap >= 0)
   {
     printf ("Creating mipmap level %d from image\n", opt.mipmap);
-    iImage *ifile2 = ifile->MipMap (opt.mipmap,
-      opt.transp ? &transpcolor : NULL);
-    ifile->DecRef ();
+    csRef<iImage> ifile2 (csPtr<iImage> (ifile->MipMap (opt.mipmap,
+      opt.transp ? &transpcolor : NULL)));
     ifile = ifile2;
     sprintf (strchr (suffix, 0), "-m%d", opt.mipmap);
   }

@@ -418,7 +418,7 @@ void csGraphics3DOGLCommon::InitGLExtensions ()
     }
 
     // Some diagnostic info, to detect typos etc.
-    iConfigIterator *it = config->Enumerate (EXT_CONFIG_KEY);
+    csRef<iConfigIterator> it (config->Enumerate (EXT_CONFIG_KEY));
     while (it->Next())
     {
 #     define USE_OGL_EXT(extname)				    \
@@ -433,7 +433,6 @@ void csGraphics3DOGLCommon::InitGLExtensions ()
 	    "actually not supported", it->GetKey());
       }
     }
-    it->DecRef();
   }
 #undef EXT_CONFIG_KEY
 }
@@ -801,16 +800,16 @@ bool csGraphics3DOGLCommon::NewOpen ()
 
   csStrVector oglconfigs;
 
-  iConfigIterator *it = config->Enumerate (OGLCONFIGS_PREFIX);
+  csRef<iConfigIterator> it (config->Enumerate (OGLCONFIGS_PREFIX));
   while (it->Next ())
   {
     csString oglconfig;
     char const* key = it->GetKey(true);
     char const* dot = strchr(key, '.');
     if (dot == 0)
-  oglconfig = key;
+      oglconfig = key;
     else
-  oglconfig.Append(key, dot - key); // Drop the '.' and all that follows.
+      oglconfig.Append(key, dot - key); // Drop the '.' and all that follows.
 
     if (oglconfigs.FindKey (oglconfig.GetData()) == -1)
     {
@@ -849,7 +848,6 @@ bool csGraphics3DOGLCommon::NewOpen ()
       oglconfigs.Push(csStrNew (oglconfig.GetData()));
     }
   }
-  it->DecRef();
 
 #undef OGLCONFIGS_PREFIX
 #undef OGLCONFIGS_SUFFIX

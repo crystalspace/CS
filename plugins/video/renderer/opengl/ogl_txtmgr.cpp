@@ -708,11 +708,9 @@ void csTextureManagerOpenGL::read_config (iConfigFile *config)
   sharpen_mipmaps = config->GetInt
         ("Video.OpenGL.SharpenMipmaps", 0);
 
-  iConfigIterator *it = config->Enumerate ("Video.OpenGL.TargetFormat");
+  csRef<iConfigIterator> it (config->Enumerate ("Video.OpenGL.TargetFormat"));
   while (it->Next ())
     AlterTargetFormat (it->GetKey (true)+1, it->GetStr ());
-
-  it->DecRef ();
 }
 
 void csTextureManagerOpenGL::AlterTargetFormat (const char *oldTarget, const char *newTarget)

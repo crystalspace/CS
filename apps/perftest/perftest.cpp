@@ -98,8 +98,8 @@ void Cleanup ()
 iMaterialHandle* PerfTest::LoadMaterial (char* file)
 {
   iTextureManager* txtmgr = myG3D->GetTextureManager ();
-  iImage* image;
-  iDataBuffer *buf = myVFS->ReadFile (file);
+  csRef<iImage> image;
+  csRef<iDataBuffer> buf (myVFS->ReadFile (file));
   if (!buf || !buf->GetSize ())
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Error loading texture '%s'!", file);
@@ -107,11 +107,9 @@ iMaterialHandle* PerfTest::LoadMaterial (char* file)
   }
   image = ImageLoader->Load (buf->GetUint8 (), buf->GetSize (),
   	txtmgr->GetTextureFormat ());
-  buf->DecRef ();
   if (!image) exit (-1);
   iTextureHandle* texture = txtmgr->RegisterTexture (image, CS_TEXTURE_3D);
   if (!texture) exit (-1);
-  image->DecRef ();
   iMaterialHandle* mat = txtmgr->RegisterMaterial (texture);
   return mat;
 }

@@ -246,7 +246,7 @@ iMaterialWrapper *Simple::LoadTexture (const char *name, const char *fn)
 
 iModelData *Simple::ImportModel (const char *fn)
 {
-  iDataBuffer *filebuf = vfs->ReadFile (fn);
+  csRef<iDataBuffer> filebuf (vfs->ReadFile (fn));
   if (!filebuf)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Error opening model file '%s' !", fn);
@@ -255,7 +255,6 @@ iModelData *Simple::ImportModel (const char *fn)
   }
 
   iModelData *mdl = converter->Load (filebuf->GetUint8 (), filebuf->GetSize ());
-  filebuf->DecRef ();
   if (!mdl)
   {
     Report (CS_REPORTER_SEVERITY_ERROR, "Invalid model file: '%s' !", fn);

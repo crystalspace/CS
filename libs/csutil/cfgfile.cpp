@@ -540,11 +540,11 @@ void csConfigFile::Clear()
   Dirty = true;
 }
 
-iConfigIterator *csConfigFile::Enumerate(const char *Subsection)
+csPtr<iConfigIterator> csConfigFile::Enumerate(const char *Subsection)
 {
   iConfigIterator *it = new csConfigIterator(this, Subsection);
   Iterators->Push(it);
-  return it;
+  return csPtr<iConfigIterator> (it);
 }
 
 bool csConfigFile::KeyExists(const char *Key) const

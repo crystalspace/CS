@@ -58,7 +58,7 @@ csPtr<iImage> csLoader::LoadImage (const char* name, int Format)
     }
   }
 
-  iImage *ifile = NULL;
+  csRef<iImage> ifile;
   char textureFileName[VFS_MAX_PATH_LEN];
   strcpy (textureFileName, name);
   bool found = VFS->Exists (textureFileName);
@@ -158,11 +158,10 @@ csPtr<iImage> csLoader::LoadImage (const char* name, int Format)
 
   if (found)
   {
-    iDataBuffer *buf = VFS->ReadFile (textureFileName);
+    csRef<iDataBuffer> buf (VFS->ReadFile (textureFileName));
 
     if (!buf || !buf->GetSize ())
     {
-      if (buf) buf->DecRef ();
       ReportError (
 		"crystalspace.maploader.parse.image",
     		"Could not open image file '%s' on VFS!", 
@@ -171,7 +170,6 @@ csPtr<iImage> csLoader::LoadImage (const char* name, int Format)
     else
     {
       ifile = ImageLoader->Load (buf->GetUint8 (), buf->GetSize (), Format);
-      buf->DecRef ();
 
       if (!ifile)
       {
@@ -184,13 +182,14 @@ csPtr<iImage> csLoader::LoadImage (const char* name, int Format)
   }
   if (!ifile)
   {
-    ifile = csCreateXORPatternImage(32, 32, 5);
+    ifile = csPtr<iImage> (csCreateXORPatternImage(32, 32, 5));
   }
 
   iDataBuffer *xname = VFS->ExpandPath (name);
   ifile->SetName (**xname);
   xname->DecRef ();
 
+  ifile->IncRef ();	// IncRef() so that smart pointer will not clean it up.
   return csPtr<iImage> (ifile);
 }
 

@@ -99,7 +99,7 @@ public:
    * iterator does not yet point to a valid key.  You must call Next() to set
    * it to the first key.
    */
-  virtual iConfigIterator *Enumerate(const char *Subsection = NULL);
+  virtual csPtr<iConfigIterator> Enumerate(const char *Subsection = NULL);
 
   /// Test if a key exists.
   virtual bool KeyExists(const char *Key) const;

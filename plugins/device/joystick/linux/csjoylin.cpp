@@ -112,7 +112,7 @@ bool csLinuxJoystick::Init ()
   key += CS_COMPILER_NAME;
   key += ".";
 
-  iConfigIterator *it = config->Enumerate (CS_LINUX_JOYSTICK_KEY);
+  csRef<iConfigIterator> it (config->Enumerate (CS_LINUX_JOYSTICK_KEY));
 
   csVector h;
   int fd;
@@ -136,7 +136,6 @@ bool csLinuxJoystick::Init ()
       nJoy++;
     h.Push ((csSome)fd);
   }
-  it->DecRef ();
 
   if (nJoy)
   {

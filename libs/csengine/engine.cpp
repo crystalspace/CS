@@ -2325,10 +2325,10 @@ iTextureWrapper *csEngine::CreateTexture (
     return NULL;
   }
 
-  iImage *ifile = ImageLoader->Load (
+  csRef<iImage> ifile (ImageLoader->Load (
       data->GetUint8 (),
       data->GetSize (),
-      CS_IMGFMT_TRUECOLOR); // GetTextureFormat ());
+      CS_IMGFMT_TRUECOLOR)); // GetTextureFormat ());
 
   if (!ifile)
   {
@@ -2348,9 +2348,6 @@ iTextureWrapper *csEngine::CreateTexture (
 
   tex->SetFlags (iFlags);
   tex->QueryObject ()->SetName (iName);
-
-  // dereference image pointer since tex already incremented it
-  ifile->DecRef ();
 
   if (iTransp)
     tex->SetKeyColor (

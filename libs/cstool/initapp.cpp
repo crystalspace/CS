@@ -136,16 +136,16 @@ bool csInitializer::InitializeSCF ()
 	  switch (scfver)
 	  {
 	    case 1:
-	      iConfigIterator* it;
-	      it = scfconfig.Enumerate();
-	      while (it->Next())
 	      {
-		char const* key = it->GetKey();
-		if (*key == '.')
-		  scfconfig.DeleteKey(key);
+	        csRef<iConfigIterator> it (scfconfig.Enumerate());
+	        while (it->Next())
+	        {
+		  char const* key = it->GetKey();
+		  if (*key == '.')
+		    scfconfig.DeleteKey(key);
+	        }
+	        scfInitialize (&scfconfig);
 	      }
-	      it->DecRef();
-	      scfInitialize (&scfconfig);
 	      break;
 	    default:
 	      /* unrecognized version */;
