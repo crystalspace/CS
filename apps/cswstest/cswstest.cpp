@@ -1060,6 +1060,10 @@ int main (int argc, char* argv[])
   if (app->Initialize ())
     csDefaultRunLoop(object_reg);
 
+  // Explicit release before DestroyApplication().
+  cmdline = NULL;
+  config = NULL;
+
   delete app;
   csInitializer::DestroyApplication (object_reg);
   return 0;
