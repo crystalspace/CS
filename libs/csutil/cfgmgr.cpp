@@ -24,19 +24,22 @@
 
 /* helper classes */
 
-class csConfigDomain {
+class csConfigDomain
+{
 public:
   iConfigFile *Cfg;
   int Pri;
   csConfigDomain *Prev, *Next;
 
-  void InsertAfter(csConfigDomain *Where) {
+  void InsertAfter(csConfigDomain *Where)
+  {
     Next = Where->Next;
     Prev = Where;
     Where->Next = this;
     if (Next) Next->Prev = this;
   }
-  void InsertPriority(csConfigDomain *Where) {
+  void InsertPriority(csConfigDomain *Where)
+  {
     if (!Where->Next)
       InsertAfter(Where);
     else if (Pri < Where->Next->Pri)
@@ -44,18 +47,21 @@ public:
     else
       InsertPriority(Where->Next);
   }
-  void Remove() {
+  void Remove()
+  {
     if (Next) Next->Prev = Prev;
     if (Prev) Prev->Next = Next;
     Prev = Next = NULL;
   }
-  csConfigDomain(iConfigFile *c, int p) {
+  csConfigDomain(iConfigFile *c, int p)
+  {
     Cfg = c;
     if (Cfg) Cfg->IncRef();
     Pri = p;
     Prev = Next = NULL;
   }
-  ~csConfigDomain() {
+  ~csConfigDomain()
+  {
     Remove();
     if (Cfg) Cfg->DecRef();
   }
@@ -77,30 +83,36 @@ private:
 public:
   SCF_DECLARE_IBASE;
 
-  void ClearIterated() {
+  void ClearIterated()
+  {
     csHashIterator it (&Iterated);
-    while (it.HasNext()) {
+    while (it.HasNext())
+    {
       char *n = (char*)it.Next();
       delete[] n;
     }
     Iterated.DeleteAll();
   }
-  bool FindIterated(const char *Key) {
+  bool FindIterated(const char *Key)
+  {
     csHashKey HashKey = csHashCompute(CurrentIterator->GetKey());
     csHashIterator it (&Iterated, HashKey);
-    while (it.HasNext()) {
+    while (it.HasNext())
+    {
       char *n = (char*)it.Next();
       if (strcasecmp(n, Key)==0)
         return true;
     }
     return false;
   }
-  void AddIterated(const char *Key) {
+  void AddIterated(const char *Key)
+  {
     csHashKey HashKey = csHashCompute(Key);
     Iterated.Put(HashKey, csStrNew(Key));
   }
 
-  csConfigManagerIterator(csConfigManager *cfg, const char *sub) {
+  csConfigManagerIterator(csConfigManager *cfg, const char *sub)
+  {
     SCF_CONSTRUCT_IBASE(NULL);
     Config = cfg;
     Config->IncRef();
@@ -108,33 +120,42 @@ public:
     CurrentIterator = NULL;
     Subsection = csStrNew(sub);
   }
-  virtual ~csConfigManagerIterator() {
+  virtual ~csConfigManagerIterator()
+  {
     Config->RemoveIterator(this);
     Config->DecRef();
     if (CurrentIterator) CurrentIterator->DecRef();
     if (Subsection) delete[] Subsection;
     ClearIterated();
   }
-  virtual iConfigFile *GetConfigFile() const {
+  virtual iConfigFile *GetConfigFile() const
+  {
     return Config;
   }
-  virtual const char *GetSubsection() const {
+  virtual const char *GetSubsection() const
+  {
     return Subsection;
   }
-  virtual void Rewind () {
+  virtual void Rewind ()
+  {
     if (CurrentIterator) delete CurrentIterator;
     CurrentIterator = NULL;
     CurrentDomain = Config->LastDomain;
     ClearIterated();
   }
-  virtual bool Next() {
-    if (CurrentIterator) {
-      if (CurrentIterator->Next()) {
+  virtual bool Next()
+  {
+    if (CurrentIterator)
+    {
+      if (CurrentIterator->Next())
+      {
         if (FindIterated(CurrentIterator->GetKey()))
           return Next();
         AddIterated(CurrentIterator->GetKey());
         return true;
-      } else {
+      }
+      else
+      {
         CurrentIterator->DecRef();
         CurrentIterator = NULL;
       }
@@ -146,22 +167,28 @@ public:
     CurrentIterator = CurrentDomain->Cfg->Enumerate(Subsection);
     return Next();
   }
-  virtual const char *GetKey(bool Local) const {
+  virtual const char *GetKey(bool Local) const
+  {
     return (CurrentIterator ? CurrentIterator->GetKey(Local) : NULL);
   }
-  virtual int GetInt() const {
+  virtual int GetInt() const
+  {
     return (CurrentIterator ? CurrentIterator->GetInt() : 0);
   }
-  virtual float GetFloat() const {
+  virtual float GetFloat() const
+  {
     return (CurrentIterator ? CurrentIterator->GetFloat() : 0.0f);
   }
-  virtual const char *GetStr() const {
+  virtual const char *GetStr() const
+  {
     return (CurrentIterator ? CurrentIterator->GetStr() : "");
   }
-  virtual bool GetBool() const {
+  virtual bool GetBool() const
+  {
     return (CurrentIterator ? CurrentIterator->GetBool() : false);
   }
-  virtual const char *GetComment() const {
+  virtual const char *GetComment() const
+  {
     return (CurrentIterator ? CurrentIterator->GetComment() : NULL);
   }
 };
@@ -193,7 +220,8 @@ csConfigManager::~csConfigManager()
   FlushRemoved();
 
   csConfigDomain *i, *Next;
-  for (i=FirstDomain; i!=NULL; i=Next) {
+  for (i=FirstDomain; i!=NULL; i=Next)
+  {
     Next = i->Next;
     delete i;
   }
@@ -204,7 +232,8 @@ csConfigManager::~csConfigManager()
 
 void csConfigManager::AddDomain(iConfigFile *Config, int Priority)
 {
-  if (Config) {
+  if (Config)
+  {
     csConfigDomain *d = new csConfigDomain(Config, Priority);
     d->InsertPriority(FirstDomain);
   }
@@ -212,15 +241,18 @@ void csConfigManager::AddDomain(iConfigFile *Config, int Priority)
 
 iConfigFile *csConfigManager::AddDomain(char const* path, iVFS* vfs, int priority)
 {
-  if (Optimize) {
+  if (Optimize)
+  {
     csConfigDomain *d = FindConfig(path);
-    if (d) {
+    if (d)
+    {
       AddDomain(d->Cfg, priority);
       return d->Cfg;
     }
 
     int n = FindRemoved(path);
-    if (n != -1) {
+    if (n != -1)
+    {
       iConfigFile *cfg = (iConfigFile*)Removed.Get(n);
       AddDomain(cfg, priority);
       FlushRemoved(n);
@@ -259,7 +291,8 @@ iConfigFile* csConfigManager::LookupDomain(char const *path) const
 void csConfigManager::SetDomainPriority(char const* path, int priority)
 {
   csConfigDomain *d = FindConfig(path);
-  if (d) {
+  if (d)
+  {
     d->Pri = priority;
     d->Remove();
     d->InsertPriority(FirstDomain);
@@ -269,7 +302,8 @@ void csConfigManager::SetDomainPriority(char const* path, int priority)
 void csConfigManager::SetDomainPriority(iConfigFile *cfg, int priority)
 {
   csConfigDomain *d = FindConfig(cfg);
-  if (d) {
+  if (d)
+  {
     d->Pri = priority;
     d->Remove();
     d->InsertPriority(FirstDomain);
@@ -499,7 +533,8 @@ void csConfigManager::RemoveIterator(csConfigManagerIterator *it)
 
 void csConfigManager::FlushRemoved()
 {
-  for (long i=0; i<Removed.Length(); i++) {
+  for (long i=0; i<Removed.Length(); i++)
+  {
     iConfigFile *cfg = (iConfigFile*)Removed.Get(i);
     cfg->DecRef();
   }
@@ -515,7 +550,8 @@ void csConfigManager::FlushRemoved(int n)
 
 int csConfigManager::FindRemoved(const char *Name) const
 {
-  for (long i=0; i<Removed.Length(); i++) {
+  for (long i=0; i<Removed.Length(); i++)
+  {
     iConfigFile *cfg = (iConfigFile*)Removed.Get(i);
     if (cfg->GetFileName())
       if (strcmp(cfg->GetFileName(), Name)==0)
@@ -527,7 +563,8 @@ int csConfigManager::FindRemoved(const char *Name) const
 void csConfigManager::RemoveDomain(csConfigDomain *d)
 {
   d->Remove();
-  if (Optimize && d->Cfg && d->Cfg->GetFileName()!=NULL && FindConfig(d->Cfg)==NULL) {
+  if (Optimize && d->Cfg && d->Cfg->GetFileName()!=NULL && FindConfig(d->Cfg)==NULL)
+  {
     d->Cfg->IncRef();
     Removed.Push(d->Cfg);
   }
