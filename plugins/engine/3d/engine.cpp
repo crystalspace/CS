@@ -2966,9 +2966,11 @@ public:
 
   virtual iSector* FindSector (const char* name);
   virtual iMaterialWrapper* FindMaterial (const char* name);
+  virtual iMaterialWrapper* FindNamedMaterial (const char* name,const char* filename);
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
   virtual iMeshWrapper* FindMeshObject (const char* name);
   virtual iTextureWrapper* FindTexture (const char* name);
+  virtual iTextureWrapper* FindNamedTexture (const char* name,const char* filename);
   virtual iLight* FindLight(const char *name);
   virtual bool CheckDupes () const { return false; }
   virtual iRegion* GetRegion () const { return region; }
@@ -3003,6 +3005,12 @@ iMaterialWrapper* EngineLoaderContext::FindMaterial (const char* name)
   return Engine->FindMaterial (name, curRegOnly ? region : 0);
 }
 
+iMaterialWrapper* EngineLoaderContext::FindNamedMaterial (const char* name,
+                                                          const char* filename)
+{
+  return Engine->FindMaterial (name, curRegOnly ? region : 0);
+}
+
 iMeshFactoryWrapper* EngineLoaderContext::FindMeshFactory (const char* name)
 {
   return Engine->FindMeshFactory (name, curRegOnly ? region : 0);
@@ -3014,6 +3022,12 @@ iMeshWrapper* EngineLoaderContext::FindMeshObject (const char* name)
 }
 
 iTextureWrapper* EngineLoaderContext::FindTexture (const char* name)
+{
+  return Engine->FindTexture (name, curRegOnly ? region : 0);
+}
+
+iTextureWrapper* EngineLoaderContext::FindNamedTexture (const char* name,
+                                                        const char* filename)
 {
   return Engine->FindTexture (name, curRegOnly ? region : 0);
 }

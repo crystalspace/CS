@@ -241,12 +241,13 @@ csMaterialHandle::csMaterialHandle (iMaterial* m, csTextureManager *parent)
     }
     material->GetReflection (diffuse, ambient, reflection);
     material->GetFlatColor (flat_color);
-    num_texture_layers = material->GetTextureLayerCount ();
+//    num_texture_layers = material->GetTextureLayerCount ();
+    num_texture_layers=0;  // kwf hack
     if (num_texture_layers > 4) num_texture_layers = 4;
     int i;
     for (i = 0 ; i < num_texture_layers ; i++)
     {
-      texture_layers[i] = *(material->GetTextureLayer (i));
+//      texture_layers[i] = *(material->GetTextureLayer (i));
       texture_layer_translate[i] =
 	texture_layers[i].uscale != 1 ||
 	texture_layers[i].vscale != 1 ||

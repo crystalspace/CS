@@ -132,7 +132,48 @@ iSector* StdLoaderContext::FindSector (const char* name)
   return Engine->FindSector (name, curRegOnly ? region : 0);
 }
 
-iMaterialWrapper* StdLoaderContext::FindMaterial (const char* name)
+iMaterialWrapper* StdLoaderContext::FindMaterial (const char* filename)
+{
+  // @@@ in case the material is not found a replacement is taken.
+  // however, somehow the location of the errorneous material name
+  // should be reported. 
+  iMaterialWrapper* mat = Engine->FindMaterial (filename, curRegOnly ? region : 0);
+  if (mat)
+    return mat;
+
+  loader->ReportNotify ("Could not find material '%s'. "
+    "Creating new material using texture with that name", filename);
+  iTextureWrapper* tex = FindTexture (filename);
+  if (tex)
+  {
+    // Add a default material with the same name as the texture
+    csRef<iMaterial> material (Engine->CreateBaseMaterial (tex));
+    iMaterialWrapper *mat = Engine->GetMaterialList ()
+      	->NewMaterial (material);
+    if (region) region->QueryObject ()->ObjAdd (mat->QueryObject ());
+    // First we have to extract the optional region name from the name:
+    char const* n = strchr (filename, '/');
+    if (!n) n = filename;
+    else n++;
+    mat->QueryObject()->SetName (n);
+
+    // @@@ should this be done here?
+    iTextureManager *tm;
+    if ((loader->G3D) && (tm = loader->G3D->GetTextureManager()))
+    {
+      tex->Register (tm);
+      tex->GetTextureHandle()->Prepare();
+      mat->Register (tm);
+      mat->GetMaterialHandle()->Prepare();
+    }
+    return mat;
+  }
+
+  return 0;
+}
+
+iMaterialWrapper* StdLoaderContext::FindNamedMaterial (const char* name, 
+                                                       const char *filename)
 {
   // @@@ in case the material is not found a replacement is taken.
   // however, somehow the location of the errorneous material name
@@ -143,7 +184,7 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* name)
 
   loader->ReportNotify ("Could not find material '%s'. "
     "Creating new material using texture with that name", name);
-  iTextureWrapper* tex = FindTexture (name);
+  iTextureWrapper* tex = FindNamedTexture (name,filename);
   if (tex)
   {
     // Add a default material with the same name as the texture
@@ -171,6 +212,7 @@ iMaterialWrapper* StdLoaderContext::FindMaterial (const char* name)
 
   return 0;
 }
+
 
 iMeshFactoryWrapper* StdLoaderContext::FindMeshFactory (const char* name)
 {
@@ -214,6 +256,30 @@ iTextureWrapper* StdLoaderContext::FindTexture (const char* name)
       name);
     csRef<iTextureWrapper> rc = loader->LoadTexture (name, name);
     if (region) region->QueryObject ()->ObjAdd (rc->QueryObject ());
+    result = rc;
+  }
+  return result;
+}
+
+iTextureWrapper* StdLoaderContext::FindNamedTexture (const char* name,
+                                                     const char *filename)
+{
+  // @@@ in case the texture is not found a replacement is taken.
+  // however, somehow the location of the errorneous texture name
+  // should be reported. 
+  iTextureWrapper* result;
+  if (region && curRegOnly)
+    result = region->FindTexture (name);
+  else
+    result = Engine->GetTextureList ()->FindByName (name);
+
+  if (!result)
+  {
+    loader->ReportNotify ("Could not find texture '%s'. Attempting to load.", 
+      name);
+    csRef<iTextureWrapper> rc = loader->LoadTexture (name, filename, 2, 0, false, false);
+    if (region)
+      region->QueryObject ()->ObjAdd (rc->QueryObject ());
     result = rc;
   }
   return result;
@@ -286,6 +352,47 @@ iMaterialWrapper* ThreadedLoaderContext::FindMaterial (const char* name)
   return 0;
 }
 
+iMaterialWrapper* ThreadedLoaderContext::FindNamedMaterial (const char* name,
+                                                            const char* filename)
+{
+  // @@@ in case the material is not found a replacement is taken.
+  // however, somehow the location of the errorneous material name
+  // should be reported. 
+  iMaterialWrapper* mat = Engine->FindMaterial (name, curRegOnly ? region : 0);
+  if (mat)
+    return mat;
+
+  loader->ReportNotify ("Could not find material '%s'. "
+    "Creating new material using texture with that name", name);
+  iTextureWrapper* tex = FindNamedTexture (name,filename);
+  if (tex)
+  {
+    // Add a default material with the same name as the texture
+    csRef<iMaterial> material (Engine->CreateBaseMaterial (tex));
+    iMaterialWrapper *mat = Engine->GetMaterialList ()
+      	->NewMaterial (material);
+    if (region) region->QueryObject ()->ObjAdd (mat->QueryObject ());
+    // First we have to extract the optional region name from the name:
+    char const* n = strchr (name, '/');
+    if (!n) n = name;
+    else n++;
+    mat->QueryObject()->SetName (n);
+
+    // @@@ should this be done here?
+    iTextureManager *tm;
+    if ((loader->G3D) && (tm = loader->G3D->GetTextureManager()))
+    {
+      tex->Register (tm);
+      tex->GetTextureHandle()->Prepare();
+      mat->Register (tm);
+      mat->GetMaterialHandle()->Prepare();
+    }
+    return mat;
+  }
+
+  return 0;
+}
+
 iMeshFactoryWrapper* ThreadedLoaderContext::FindMeshFactory (const char* name)
 {
   return Engine->FindMeshFactory (name, curRegOnly ? region : 0);
@@ -327,6 +434,29 @@ iTextureWrapper* ThreadedLoaderContext::FindTexture (const char* name)
     loader->ReportNotify ("Could not find texture '%s'. Attempting to load.", 
       name);
     csRef<iTextureWrapper> rc = loader->LoadTexture (name, name);
+    if (region) region->QueryObject ()->ObjAdd (rc->QueryObject ());
+    result = rc;
+  }
+  return result;
+}
+
+iTextureWrapper* ThreadedLoaderContext::FindNamedTexture (const char* name,
+                                                          const char* filename)
+{
+  // @@@ in case the texture is not found a replacement is taken.
+  // however, somehow the location of the errorneous texture name
+  // should be reported. 
+  iTextureWrapper* result;
+  if (region && curRegOnly)
+    result = region->FindTexture (name);
+  else
+    result = Engine->GetTextureList ()->FindByName (name);
+
+  if (!result)
+  {
+    loader->ReportNotify ("Could not find texture '%s'. Attempting to load.", 
+      name);
+    csRef<iTextureWrapper> rc = loader->LoadTexture (name, filename);
     if (region) region->QueryObject ()->ObjAdd (rc->QueryObject ());
     result = rc;
   }

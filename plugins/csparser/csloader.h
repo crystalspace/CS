@@ -298,9 +298,11 @@ public:
 
   virtual iSector* FindSector (const char* name);
   virtual iMaterialWrapper* FindMaterial (const char* name);
+  virtual iMaterialWrapper* FindNamedMaterial (const char* name, const char *filename);
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
   virtual iMeshWrapper* FindMeshObject (const char* name);
   virtual iTextureWrapper* FindTexture (const char* name);
+  virtual iTextureWrapper* FindNamedTexture (const char* name, const char *filename);
   virtual iLight* FindLight (const char *name);
   virtual bool CheckDupes () const { return checkDupes; }
   virtual iRegion* GetRegion () const { return region; }
@@ -334,9 +336,11 @@ public:
 
   virtual iSector* FindSector (const char* name);
   virtual iMaterialWrapper* FindMaterial (const char* name);
+  virtual iMaterialWrapper* FindNamedMaterial (const char* name, const char *filename);
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name);
   virtual iMeshWrapper* FindMeshObject (const char* name);
   virtual iTextureWrapper* FindTexture (const char* name);
+  virtual iTextureWrapper* FindNamedTexture (const char* name, const char *filename);
   virtual iLight* FindLight (const char *name);
   virtual bool CheckDupes () const { return checkDupes; }
   virtual iRegion* GetRegion () const { return region; }

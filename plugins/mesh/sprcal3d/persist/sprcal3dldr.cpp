@@ -346,10 +346,10 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
 	  iMaterialWrapper *mat=0;
 	  if (def_matl)
 	  {
-	    mat = LoadMaterialTag(newspr,child,ldr_context,def_matl);
+	    mat = LoadMaterialTag(newspr,child,ldr_context,def_matl,def_matl);
 	  }
 	  int mesh_index = newspr->LoadCoreMesh(vfs,file,name,attach,mat);
-          if (mesh_index == -1)
+      if (mesh_index == -1)
 	  {
 	  synldr->ReportError (
 	    "crystalspace.spritecal3dfactoryloader.parse.badfile",
@@ -460,20 +460,19 @@ iMaterialWrapper *csSpriteCal3DFactoryLoader::LoadMaterialTag(iSpriteCal3DFactor
   iMaterialWrapper* mat=0;
   if (file)
   {
-    mat = ldr_context->FindMaterial (file);
+    if (!name)
+      name = file;
+    else if (!file)
+      file = name;
+    mat = ldr_context->FindNamedMaterial (name, file);
     if (!mat)
     {
       synldr->ReportError (
 	"crystalspace.spritecal3dfactoryloader.parse.unknownmaterial",
-	child, "Couldn't find material named '%s'", file);
+	child, "Couldn't find material named '%s'", name);
       return 0;
     }
-    
-    if ( name )
-    {
-      mat->QueryObject()->SetName(name);
-    }
-    
+        
     newspr->AddCoreMaterial(mat);
   }
   else
