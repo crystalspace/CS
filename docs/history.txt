@@ -73,6 +73,7 @@ chronological order.
 	  was gristing the built source files in such a way that Jam would
 	  complain that it did not know how to create those files if they were
 	  needed.
+	- res enabled the glRasterPos hack in glcommon2d.cpp for NR, too.
 27-Apr-2004
 	- Jorrit removed ClipBSphere() from iRenderView.
 	- Jorrit added a private implementation of ClipBSphere() to

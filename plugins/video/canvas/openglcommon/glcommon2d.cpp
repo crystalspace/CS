@@ -491,7 +491,8 @@ void csGraphics2DGLCommon::Blit (int x, int y, int w, int h,
    */
   glRasterPos2i (x, Height-y+1);
 #else
-  glRasterPos2i (x, Height-y-h);
+  //glRasterPos2i (x, Height-y-h);
+  glRasterPos2i (x, Height-y);
 #endif // CS_USE_NEW_RENDERER
   glDrawPixels (w, h, GL_RGBA, GL_UNSIGNED_BYTE, data);
 
