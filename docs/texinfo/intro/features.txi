@@ -139,9 +139,6 @@ Multiple cameras. @xref{HOWTO Camera Movement}.
 Textures, materials, and shaders. @xref{Texture Mapping}.
 
 @item
-Optional isometric engine.
-
-@item
 Sound drivers (CoreAudio, @sc{oss}, and WaveOut). @xref{Sound Drivers}.
 
 @item

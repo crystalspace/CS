@@ -40,12 +40,6 @@ This is the core of Crystal Space. It is the main driving force behind
 CS. @xref{csEngine}.
 
 @item
-@emph{Isometric Engine}
-
-There is also an isometric engine that you can use instead of the 3D engine.
-While not as advanced as the 3D engine it is usable.
-
-@item
 @emph{Mesh Objects}
 
 Mesh objects are 3D objects that can be used and displayed by the engine.

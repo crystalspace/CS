@@ -60,7 +60,8 @@ The Crystal Space image manipulator.
 @cindex @file{isotest}
 @cindex Applications, @file{isotest}
 @item isotest
-An application demonstrating the Crystal Space ISO engine.
+An application demonstrating how you can use the 3D engine to simulate
+a semi-isometric view.
 
 @cindex @file{map2cs}
 @cindex Applications, @file{map2cs}

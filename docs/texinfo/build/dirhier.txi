@@ -214,18 +214,11 @@ Joystick support.
 @end table
 
 @item CS/plugins/engine
-The @dfn{engines} which drive Crystal Space.  Both 3D and isometric engines
-are available.
+The 3D @dfn{engine} which drives Crystal Space.
 
 @table @code
 @item CS/plugins/engine/3d
 The 3D engine plugin.
-
-@item CS/plugins/engine/iso
-The isometric engine provides an isometric view instead of a 3D view.
-Mesh objects also work with this engine with a few limitations (mostly
-regarding size).
-@end table
 
 @item CS/plugins/filesys
 Filesystem-related plugins.
@@ -246,9 +239,6 @@ FreeType (version 2) font server.
 @item CS/plugins/font/server/fontplex
 Font server multiplexer.
 @end table
-
-@item CS/plugins/isoldr
-Isometric world loader plug-in.
 
 @item CS/plugins/mesh
 Various mesh object implementations (@pxref{MeshObject}).  For every mesh
