@@ -87,4 +87,14 @@ keywords.  @xref{MeshObject PartSys}.
 Source of the spiral (3D coordinate).
 @item <number>nrParticles</number>
 Number of particles to use.
+@item <particlesize w="" h="" />
+Size of the particles in the spiral.
+@item <particletime>particleTime</particleTime>
+Time to live of particles, in msec.
+@item <radialspeed>radialSpeed</radialSpeed>
+Particle radial speed in spiral.
+@item <rotationspeed>rotationSpeed</rotationSpeed>
+Particle rotation speed in spiral.
+@item <climbspeed>climbSpeed</climbSpeed>
+Particle climb speed in spiral.
 @end table
