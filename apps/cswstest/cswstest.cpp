@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1999 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -20,6 +20,22 @@
 #include "sysdef.h"
 #include "cssys/system.h"
 #include "csws/csws.h"
+
+#if defined(OS_NEXT)
+// This is an ugly solution for an ugly problem.  On NeXT platforms, libraries
+// need to be linked into the application to satisfy symbolic linkages required
+// by plug-ins which are loaded dynamically, thus we need to force the linker
+// to link in symbols required by all plug-ins which this application loads.
+// In this case, the software renderer needs operator*() and csPolygonClipper.
+#include "csgeom/polyclip.h"
+#include "csgeom/transfrm.h"
+void* csWsForceLink()
+{
+  csVector3 v; csTransform t;
+  v = v * t; // operator*()
+  return new csPolygonClipper(0);
+}
+#endif
 
 class csWsTest : public csApp
 {
