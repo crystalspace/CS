@@ -4,6 +4,9 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug in the calculation of LOD for sprites. This
 	  bug could cause crashes due to an array access at -1.
 	  Thanks to Norman for reporting this.
+	- Added a patch from Loic Dachary <loic@gnu.org> to give more
+	  detailed error messages when plugins can't be loaded. This
+	  way it is easier to see what is wrong.
 19-Mar-2002
 	- Decreased maximum size of lightmaps for software renderer
 	  again. 16mil is WAY too much as that will not fit in the

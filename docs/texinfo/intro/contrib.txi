@@ -37,6 +37,13 @@ David enhanced the @sc{dos} port made by Murat.  He added C++ classes and
 @file{scan.cpp}.
 
 @item
+Loic Dachary (@email{loic@@gnu.org})
+
+Loic added a patch for better error reporting when a plugin
+can't load and also did some work on better compatibility with
+autoconf.
+
+@item
 Brendan Burns (@email{bburns@@genet.cs.umass.edu})
 
 Brendan worked on a memory canvas which can render to a memory buffer instead

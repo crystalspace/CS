@@ -17,6 +17,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #define CS_SYSDEF_PROVIDE_PATH
 #include "cssysdef.h"
 #include "cssys/csshlib.h"
@@ -32,10 +36,55 @@ void csAddLibraryPath (const char *iPath)
   GetLibPath ()->Push (csStrNew (iPath));
 }
 
-csLibraryHandle csFindLoadLibrary (const char *iPrefix, const char *iName,
-  const char *iSuffix)
+const int CALLBACK_STOP = 0;
+const int CALLBACK_CONTINUE = 1;
+
+class iCallback
+{
+public:
+  virtual int File (const char *file) = 0;
+};
+
+class callbackLoadLibrary : public iCallback
+{
+public:
+  callbackLoadLibrary ()
+  {
+    _handle = 0;
+    _file_found = 0;
+  }
+  
+  virtual int File (const char *file)
+  {
+    struct stat st;
+    if (stat (file, &st) == 0)
+    {
+      _handle = csLoadLibrary (file);
+      _file_found++;
+      return CALLBACK_STOP;
+    }
+    return CALLBACK_CONTINUE;
+  }
+
+  csLibraryHandle _handle;
+  int _file_found;
+};
+
+class callbackPrint : public iCallback
+{
+public:
+  virtual int File (const char *file)
+  {
+    fprintf (stderr, "\t%s\n", file);
+    return CALLBACK_CONTINUE;
+  }
+};
+
+static void csFindLoadLibraryHelper (const char *iPrefix, const char *iName,
+  const char *iSuffix, iCallback& callback)
 {
   int i, j;
+
   for (i = findlib_search_nodir ? -1 : 0; i < GetLibPath ()->Length (); i++)
   {
     char lib [CS_MAXPATHLEN + 1];
@@ -47,21 +96,44 @@ csLibraryHandle csFindLoadLibrary (const char *iPrefix, const char *iName,
       lib [0] = 0;
 
     size_t sl = strlen (lib);
-    for (j = 0; j < 2; j++)
+    for (j = 0 ; j < 2 ; j++)
     {
       if (j)
         strcpy (lib + sl, iPrefix);
       else
         lib [sl] = 0;
       strcat (strcat (lib + sl, iName), iSuffix);
-      csLibraryHandle lh = csLoadLibrary (lib);
-      if (lh)
-        return lh;
-      if (!iPrefix)
+
+      if (callback.File (lib) == CALLBACK_STOP)
+        return;
+
+      if (!iPrefix || iPrefix[0] == '\0')
         break;
     }
   }
 
-  csPrintLibraryError (iName);
-  return (csLibraryHandle)0;
+}
+
+csLibraryHandle csFindLoadLibrary (const char *iPrefix, const char *iName,
+  const char *iSuffix)
+{
+  callbackLoadLibrary loader;
+
+  csFindLoadLibraryHelper(iPrefix, iName, iSuffix, loader);
+
+  if (!loader._handle)
+  {
+    if (loader._file_found)
+    {
+      csPrintLibraryError (iName);
+    }
+    else
+    {
+      callbackPrint printer;
+      fprintf (stderr, "DLERROR: %s, file not found, tried:\n", iName);
+      csFindLoadLibraryHelper (iPrefix, iName, iSuffix, printer);
+    }
+  }
+
+  return loader._handle;
 }

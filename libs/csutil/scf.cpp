@@ -157,6 +157,8 @@ scfSharedLibrary::scfSharedLibrary (const char *iLibraryName)
     (scfInitializeFunc)csGetLibrarySymbol (LibraryHandle, name);
   if (func)
     ClassTable = func (PrivateSCF);
+  else
+    csPrintLibraryError (name);
 }
 
 scfSharedLibrary::~scfSharedLibrary ()
@@ -171,9 +173,12 @@ scfSharedLibrary::~scfSharedLibrary ()
     csSplitPath (LibraryName, NULL, 0, name, 200);
     strcat (name, "_scfFinalize");
 
-    scfFinalizeFunc func = (scfFinalizeFunc)csGetLibrarySymbol (LibraryHandle, name);
+    scfFinalizeFunc func = (scfFinalizeFunc)csGetLibrarySymbol (
+    	LibraryHandle, name);
     if (func)
       func ();
+    else
+      csPrintLibraryError (name);
     csUnloadLibrary (LibraryHandle);
   }
   delete [] LibraryName;
@@ -495,6 +500,9 @@ void *csSCF::CreateInstance (const char *iClassID, const char *iInterface,
     {
       instance = object->QueryInterface (GetInterfaceID (iInterface), iVersion);
       object->DecRef ();
+
+      if (!instance)
+        fprintf (stderr, "SCF_WARNING: factory returned a null instance for %s\n\tif error messages are not self explanatory, recompile CS with CS_DEBUG\n", iClassID);
     }
   } /* endif */
 
