@@ -2,6 +2,23 @@
 @node API Modifications 18, API Modifications 17, API Modifications, API Modifications
 @appendixsec @sc{api} Changes from 0.17 to 0.18
 @cindex @sc{api} Changes
+@cindex @code{AdvanceSpriteFrames()}
+@cindex @code{UpdateParticleSystems()}
+@cindex @code{PrepareParticleSystems()}
+@cindex @code{NextFrame()}
+@cindex @code{UpdateLighting()}
+@cindex @code{GetNearbyLights()}
+@cindex @code{WriteChar()}
+@cindex @code{CLights}
+@cindex @code{csPixmap}
+@cindex @code{csSimplePixmap}
+@cindex @code{csWorld}
+@cindex @code{csEngine}
+@cindex @code{iWorld}
+@cindex @code{iEngine}
+@cindex @code{csThingTemplate}
+@cindex @code{iParticle}
+@cindex @code{csRenderView}
 
 This section documents the major changes between versions 0.17 and 0.18 of of
 Crystal Space.
@@ -32,13 +49,16 @@ summary of all the changes which result from this:
 @code{world.h} becomes @code{engine.h}
 @end itemize
 
-@subheading Signature Change: @code{AdvanceSpriteFrames()}
-@cindex @code{AdvanceSpriteFrames()} Changes
-@cindex @code{NextFrame()} Changes
+@subheading @code{csThingTemplate} Removed
+@cindex @code{csThingTemplate}
 
-The @code{csEngine::AdvanceSpriteFrames()} method has been renamed to
-@code{NextFrame()}.  In addition @code{UpdateParticleSystems()} has been
-removed and is now also handled by @code{csEngine::NextFrame()}.
+The class @code{csThingTemplate} has been removed. Instead you use normal
+@code{csThing} instances and clone them using @code{csThing::MergeTemplate()}.
+The @code{thing_templates} list in @code{csEngine} is still there but it
+now contains instances of @code{csThing} instead of @code{csThingTemplate}.
+This also means that @code{csPolygonTemplate} is removed. Fixing applications
+for this change is not very hard. It mostly means replacing @code{csThingTemplate}
+with @code{csThing} and then doing small modifications to the API.
 
 @subheading Configuration File Changes
 @cindex Configuration Files
@@ -348,13 +368,6 @@ also an abstract class so where you would, in the past, instantiate
 In arguments and variables it is recommended you still use @samp{csPixmap} as
 it will allow you to use other kinds of pixmaps there, as well.
 
-@subheading @code{csRenderView} has no more public members
-@cindex @code{csRenderView}
-
-@code{csRenderView} has no public members anymore. You need to
-access everything through @code{Get...} and @code{Set...}. Check out
-the header for more details.
-
 @subheading General Use of @sc{scf} Interfaces
 @cindex @sc{scf} interfaces
 
@@ -370,11 +383,30 @@ accessible as a plugin.
 
 @itemize @bullet
 @item
-@code{iGraphics2D::WriteChar()} is removed. Use @code{Write()} instead.
+  @code{iGraphics2D::WriteChar()} is removed. Use @code{Write()} instead.
 @item
-All @code{UpdateLighting} calls now accept @code{iLight} pointers intead
-of @code{csLight} pointers. In addition @code{csEngine::GetNearbyLights()}
-returns an array of @code{iLight} pointers.
+  All @code{UpdateLighting} calls now accept @code{iLight} pointers intead
+  of @code{csLight} pointers. In addition @code{csEngine::GetNearbyLights()}
+  returns an array of @code{iLight} pointers.
+@item
+  The obsolete @code{CLights} class (for uniform dynamic lighting) is removed.
+  It wasn't working properly anyway.
+@item
+  @code{csEngine::PrepareParticleSystems()} is now gone.
+  Use @code{csEngine::PrepareMeshes()}.
+@item
+  The @code{csEngine::AdvanceSpriteFrames()} method has been renamed to
+  @code{NextFrame()}.  In addition @code{UpdateParticleSystems()} has been
+  removed and is now also handled by @code{csEngine::NextFrame()}.
+@item
+  With the new mesh object plugin system the @code{iParticle} interface
+  also changed a little. Check out the header to see the changes.
+@item
+  @code{FastSqrt()} is gone. Use @code{qsqrt()} instead. If you want
+  to calculate @code{1/sqrt()} then use @code{qisqrt()}.
+@item
+  @code{csRenderView} has no public members anymore. You need to
+  access everything through @code{Get...} and @code{Set...}. Check out
+  the header for more details.
 @end itemize
-
 

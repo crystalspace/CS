@@ -166,7 +166,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Martin Geisse added streamed sound sources to ds3d module.
 	  Output is still distorted but you can at least hear what it
 	  should be like.
-	- Seth Galbraith updated Squawk so that you can now controll the
+	- Seth Galbraith updated Squawk so that you can now control the
 	  views simultaneously. Also added simplified keyboard controls
 	  and todo list.
 	- Thomas Hieber had another idea on how to make iEntity _really_
