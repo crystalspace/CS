@@ -143,6 +143,9 @@ public:
   /// Should draw no border
   static const int foNoBorder;
 
+  /// window cannot be dragged
+  static const int foNoDrag;
+
   /// Should return false in the OnMouseMove event.
   static const int foDontCaptureMouseMove;
 

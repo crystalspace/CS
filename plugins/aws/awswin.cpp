@@ -34,6 +34,7 @@ const int awsWindow:: foMin = 0x4;
 const int awsWindow:: foClose = 0x8;
 const int awsWindow:: foTitle = 0x10;
 const int awsWindow:: foGrip = 0x20;
+const int awsWindow:: foNoDrag = 0x40;
 
 const int awsWindow:: foRoundBorder = 0x0;			// default
 const int awsWindow:: foBeveledBorder = 0x40;
@@ -410,6 +411,8 @@ bool awsWindow::OnMouseDown (int button, int x, int y)
 
     ///// Check for moving
     else if (
+	!(frame_options & foNoDrag)
+	&& (
           // Move using titlebar if it's a normal window
             (
               (style == fsNormal && !(frame_options & foBeveledBorder)) &&
@@ -423,6 +426,7 @@ bool awsWindow::OnMouseDown (int button, int x, int y)
             ) ||
           // Move using whole window frame if it's not
             (style != fsNormal || (frame_options & foBeveledBorder)))
+	)
     {
       orig_x = Frame().xmin;
       orig_y = Frame().ymin;
@@ -703,6 +707,7 @@ awsComponentFactory(wmgr)
   RegisterConstant ("wfoClose", awsWindow::foClose);
   RegisterConstant ("wfoTitle", awsWindow::foTitle);
   RegisterConstant ("wfoGrip", awsWindow::foGrip);
+  RegisterConstant ("wfoNoDrag", awsWindow::foNoDrag);
   RegisterConstant ("wfoRoundBorder", awsWindow::foRoundBorder);
   RegisterConstant ("wfoBeveledBorder", awsWindow::foBeveledBorder);
   RegisterConstant ("wfoDontCaptureMouseMove", awsWindow::foDontCaptureMouseMove);

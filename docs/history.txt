@@ -75,6 +75,8 @@ The history order is reversed so that new features are at the top.
 	  present changes have been tested. :-)
 	- Eric Sunshine eliminated a few instances of NULL which had creeped
 	  back into the project.
+	- Wouter added the option wfoNoDrag to aws windows, making the window
+	  non-draggable. Fixed fs3dMask constant to fit available values.
 19-Jun-2003
 	- Oktal made the following changes to the Perl plugin and module:
 	    - Got rid of all the warnings in the Perl plugin and module,

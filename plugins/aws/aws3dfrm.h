@@ -134,6 +134,6 @@ const int _3dfsThick = 7;
 const int _3dfsBitmap = 8;
 const int _3dfsSmallRaised = 9;
 const int _3dfsSmallSunken = 10;
-const int _3dfsMask  = 0xf;
+const int _3dfsMask  = 0x1f;
 
 #endif // __CS_AWS_3D_FRAME_DRAWER__
