@@ -2,6 +2,7 @@
 #define __CS_CSRENODE_H__
 
 #include <string.h>
+#include <ctype.h>
 
 /*****************************************************************************
     Copyright (C) 2001 by Christopher Nelson
@@ -23,6 +24,8 @@
 
 /****** Change log
   1. Fri Jun 01 09:59:08 AM MDT 2001 paradox <paradox@bbhc.org> Creation of file
+  2. Mon Jun 04 08:52:23 AM MDT 2001 paradox <paradox@bbhc.org> Changed all "char" to "unsigned char"
+  3. Mon Jun 04 09:05:02 AM MDT 2001 paradox <paradox@bbhc.org> Added support for named table nodes.
 ******/
 
 /**********
@@ -52,6 +55,21 @@
  
  const unsigned char CSRE_CHLEAF	  = 6;
  const unsigned char CSRE_TBLEAF	  = 7;
+ const unsigned char CSRE_NTLEAF      = 8;
+ 
+ /////////////////////////////////////////////////////////////////////////////
+ 
+ const unsigned char MATCH_ALPHA_TABLE	  = 1;		// op matches isalpha
+ const unsigned char MATCH_DIGIT_TABLE	  = 2;		// op matches isdigit
+ const unsigned char MATCH_ALNUM_TABLE	  = 3;		// op matches isalnum
+ const unsigned char MATCH_PUNCT_TABLE	  = 4;		// op matches ispunct
+ const unsigned char MATCH_SPACE_TABLE	  = 5;		// op matches isspace
+ const unsigned char MATCH_CNTRL_TABLE	  = 6;		// op matches iscntrl
+ const unsigned char MATCH_GRAPH_TABLE	  = 7;		// op matches isgraph
+ const unsigned char MATCH_LOWER_TABLE	  = 8;		// op matches islower
+ const unsigned char MATCH_UPPER_TABLE	  = 9;		// op matches isupper
+ const unsigned char MATCH_PRINT_TABLE	  = 10;		// op matches isprint
+ const unsigned char MATCH_XDIGIT_TABLE	 = 11;		// op matches isxdigit
  
  /// The base class for nodes.  All nodes have a type. 
  class csRENode
@@ -199,6 +217,48 @@
    virtual bool Accept(int ch)
    { return c==ch; } 
  };
+
+ /// The "character class" or named table leaf class.  Contains the identity of a named table to match.
+ class csRENamedTableLeaf : public csRENode
+ {
+  unsigned char char_class;
+   
+ public:
+   csRENamedTableLeaf(unsigned char cc):char_class(cc) {};
+   virtual ~csRENamedTableLeaf() {};
+   
+ public:
+   virtual unsigned char Type()
+   { return CSRE_NTLEAF; }
+ 
+   virtual csRENode *Left()
+   { return NULL; }
+   
+   virtual csRENode *Right()
+   { return NULL;  }
+   
+   /// Returns a true if this unsigned char matches the stored unsigned char.
+   virtual bool Accept(int ch)
+   {
+    switch(char_class)
+    {
+  	case MATCH_ALPHA_TABLE: return isalpha(ch);	  
+  	case MATCH_DIGIT_TABLE: return isdigit(ch);
+  	case MATCH_ALNUM_TABLE: return isalnum(ch);
+  	case MATCH_PUNCT_TABLE: return ispunct(ch);	  
+  	case MATCH_SPACE_TABLE: return isspace(ch);	  
+  	case MATCH_CNTRL_TABLE: return iscntrl(ch);	  
+  	case MATCH_GRAPH_TABLE: return isgraph(ch);	  
+  	case MATCH_LOWER_TABLE: return islower(ch);	  
+  	case MATCH_UPPER_TABLE: return isupper(ch);	  
+  	case MATCH_PRINT_TABLE: return isprint(ch);	  
+  	case MATCH_XDIGIT_TABLE: return isxdigit(ch);
+  	default:
+  	 return false;	 
+    } // end switch char class 	
+   } 
+ };
+
  
  /// The table leaf class.  Contains a set of unsigned characters to match.
  class csRETableLeaf : public csRENode

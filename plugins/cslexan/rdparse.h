@@ -21,6 +21,7 @@
 
  /****** Change log
   1. Sat Jun 02 10:06:15 AM MDT 2001 paradox <paradox@bbhc.org> Creation of file
+  2. Mon Jun 04 09:04:28 AM MDT 2001 paradox <paradox@bbhc.org> Added support for named table nodes.
  ******/
  
  const unsigned int RE_COMP_ERR_NONE				  = 0; 
@@ -29,7 +30,7 @@
  const unsigned int RE_COMP_ERR_MISSING_RIGHT_BRACKET = 3;
  const unsigned int RE_COMP_ERR_MISSING_LEFT_BRACKET  = 4;
  const unsigned int RE_COMP_ERR_UNKNOWN_CHAR_CLASS    = 5;
-
+  
  class csRESyntaxTree
  {
     unsigned int last_error;
