@@ -795,6 +795,8 @@ place where the recursion through portals occurs.
 The settings for this step are restored.
 @end itemize
 
+@subsubheading Drawing a Frame: Getting the Visible Meshes
+
 One very important function that is called from within @code{iRenderStep::Perform()}
 is @code{iSector::GetVisibleMeshes()}. This function is responsible for finding all
 meshes that are visible. To calculate this the sector will use the visibility
@@ -860,7 +862,63 @@ when it itself is visible. That means that you must always make sure that with s
 lod the parent is a mesh that is at least as big as the biggest child. Usually a nullmesh
 with an appropriate box is used for that purpose.
 
-@@@@@@TODO: explain iPortalContainer::Draw()
+@subsubheading Drawing a Frame: Traversing Portals
+
+During perform of the renderstep it will try traverse portals if that renderstep
+has portal traversal enabled. This will proceed to @code{iPortalContainer::Draw()}
+which will do the following steps:
+
+@itemize @bullet
+@item
+First it will call @code{Prepare()} to make sure that the portal container
+is ready for use. This function will initialize the portal container, compress
+the vertices (remove double vertices) and calculate the bounding box and sphere.
+
+@item
+Then it will call @code{WorldToCamera()}. This will take the world space vertices
+and planes and transform them to camera space.
+
+@item
+Then it sets up the portal and far plane if needed.
+
+@item
+During the call to @code{GetRenderMeshes()} that occured earlier (when the renderloop
+called @code{iSector->GetVisibleMeshes()}) we tested if the portal container object
+needed to be clipped to the frustum or near plane. We kept the result of that
+clip result in the variables @code{clip_plane}, @code{clip_portal}, and
+@code{clip_z_plane}. If clipping is required then we will loop over every portal
+and clip it before we traverse it. If no clipping is required we will simply loop
+over all portals and traverse them.
+
+@item
+Traversing through a portal is done with @code{DrawOnePortal()}. This function will
+first set up various things for fog and floating portals (like call
+@code{iGraphics3D::OpenPortal()}) and then it will call @code{csPortal::Draw()}.
+
+@item
+@code{csPortal::Draw()} will first make sure the sector is there by calling
+@code{CompleteSector()}. This function calls missing sector callbacks if the sector
+is missing and if those callbacks are there. This gives the application a chance
+to load the destination sector. If this fails then portal traversal will not occur.
+
+@item
+@code{csPortal::Draw()} will also make sure we are not recursing too much in the
+same sector. This is to avoid infinite loops caused by space warping portals
+that warp back in space so that the same portal is visible again.
+
+@item
+Then this function will update the @code{csRenderView} for the current portal
+(i.e. clipper, fog information, recursion level, last portal, previous sector,
+clip plane, @dots{}).
+
+@item
+If this is a space warping portal (a portal that changes the camera transform) then
+a new camera is created. @@@@@@ TODO Continue here...
+
+@end itemize
+
+
 @@@@@@TODO: explain Frustvis::VisTest()
 @@@@@@TODO: explain Dynavis::VisTest()
+@@@@@@TODO: explain the operations of one mesh object in the above context
 
