@@ -42,30 +42,31 @@
 	<animation file="taunt.CAF"  name="taunt"  type="action" idle_pct="34" />
 
 	<!-- materials are VFS filenames because they are CS materials and not cal3d materials. optional.-->
-	<material file="/planeshift/models/torso.bmp" />
-	<material file="/planeshift/models/pants.bmp" />
-	<material file="/planeshift/models/head.bmp" />
-	<material file="/planeshift/models/foot_n.bmp" />
-	<material file="/planeshift/models/arm.bmp" />
-	<material file="/planeshift/models/hand.bmp" />
-	<material file="/planeshift/models/eye.bmp" />
+	<material file="/planeshift/models/torso.bmp"  name="torso"  />
+	<material file="/planeshift/models/pants.bmp"  name="pants"  />
+	<material file="/planeshift/models/head.bmp"   name="head"   />
+	<material file="/planeshift/models/foot_n.bmp" name="foot_n" />
+	<material file="/planeshift/models/arm.bmp"    name="arm"    />
+	<material file="/planeshift/models/hand.bmp"   name="hand"   />
+	<material file="/planeshift/models/eye.bmp"    name="eye"    />
 
 	<!-- meshes specify each attachable part of the model.  The name is the CS-accessible name which will
 	     be used to select/deselect it for the model.  The material specified is the default CS material
 	     used by this mesh.  -->
-	<mesh file="stonem_head.CMF" name="Head" material="/planeshift/models/head.bmp" />
-	<mesh file="stonem_torso.CMF" name="Torso" material="/planeshift/models/torso.bmp" />
-	<mesh file="stonem_handr.CMF" name="Right Hand" material="/planeshift/models/hand.bmp" />
-	<mesh file="stonem_handl.CMF" name="Left Hand" material="/planeshift/models/hand.bmp" />
-	<mesh file="stonem_waist.CMF" name="Pants" material="/planeshift/models/pants.bmp" />
-	<mesh file="stonem_legr.CMF" name="Right Leg" material="/planeshift/models/foot_n.bmp" />
-	<mesh file="stonem_legl.CMF" name="Left Leg" material="/planeshift/models/foot_n.bmp" />
-	<mesh file="stonem_eyes.CMF" name="Eyes" material="/planeshift/models/eye.bmp" />
-	<mesh file="stonem_armr.CMF" name="Right Arm" material="/planeshift/models/arm.bmp" />
-	<mesh file="stonem_arml.CMF" name="Left Arm" material="/planeshift/models/arm.bmp" />
+	<mesh file="stonem_head.CMF" name="Head"        material="head" />
+	<mesh file="stonem_torso.CMF" name="Torso"      material="torso" />
+	<mesh file="stonem_handr.CMF" name="Right Hand" material="hand" />
+	<mesh file="stonem_handl.CMF" name="Left Hand"  material="hand" />
+	<mesh file="stonem_waist.CMF" name="Pants"      material="pants" />
+	<mesh file="stonem_legr.CMF" name="Right Leg"   material="foot_n" />
+	<mesh file="stonem_legl.CMF" name="Left Leg"    material="foot_n" />
+	<mesh file="stonem_eyes.CMF" name="Eyes"        material="eye" />
+	<mesh file="stonem_armr.CMF" name="Right Arm"   material="arm" />
+	<mesh file="stonem_arml.CMF" name="Left Arm"    material="arm" />
 
         <!--The following rotates the model and all anims around the Y axis by 180 degrees.  Any axis and angle may
             be specified, and translation may also be specified. -->
+
 	<hardtransform rot_axis_x="0" rot_axis_y="1" rot_axis_z="0" rot_angle="180" />
 
     </params>
