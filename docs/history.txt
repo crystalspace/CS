@@ -32,6 +32,11 @@ chronological order.
 	  cause crashes in some circumstances.
 	- Jorrit added an entry to the drivers database to disable stencil
 	  clipping on a Rage128 card on linux.
+	- Jorrit added a new data/shader/specifyambient.xml which is a variant
+	  of data/shader/ambient.xml but one that doesn't hardcode the
+	  ambient color (STANDARD_LIGHT_AMBIENT). So you can use this to
+	  set another ambient value on a material. This is useful to make
+	  fullbright materials for example.
 1-Apr-2004
 	- Eric Sunshine fixed include/Jamfile so that it installs Swig (*.i)
 	  files.  These are needed by CEL, for instance.
