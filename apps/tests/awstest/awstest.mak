@@ -1,3 +1,6 @@
+# Application target only valid if module is listed in PLUGINS.
+ifneq (,$(findstring aws,$(PLUGINS) $(PLUGINS.DYNAMIC)))
+
 # Application description
 DESCRIPTION.awstst = Alternate Windowing System test
 
@@ -68,3 +71,5 @@ else
 endif
 
 endif # ifeq ($(MAKESECTION),targets)
+
+endif # ifneq (,$(findstring aws,$(PLUGINS) $(PLUGINS.DYNAMIC)))

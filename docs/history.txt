@@ -46,6 +46,32 @@ The history order is reversed so that new features are at the top.
 	- Eric Sunshine fixed a problem in csutil.mak where CFG.CSUTIL was
 	  incorrectly given the value "scf.cfg mouse.cfg", rather than the
 	  correct value of "scf.cfg data/config/mouse.cfg".
+	- Eric Sunshine fixed the following problems with the new makefile
+	  caching facility:
+	    - The cache file was not correctly updated following changes to the
+	      PLUGINS variable in user.mak (or the platform-specific makefile).
+	      Although the change to user.mak would be noted, and although the
+	      cache file was rebuilt automatically as intended, the refreshed
+	      cache file did not reflect the changes to PLUGINS.  The problem
+	      was essentially that the caching mechanism was getting tripped up
+	      by itself.  Cached information made the facility believe that its
+	      idea of the selected list of plugins was already up-to-date, so
+	      even though it rewrote the cache file, it wouldn't actually
+	      bother to add or remove any makefile content from it.
+	    - At project configuration time, the makefile cache was being
+	      created too soon, with the result that plugins auto-detected by
+	      the configuration process would not appear in the cache.  This
+	      occurred because the cache was being created before the
+	      finalization of config.mak.  This was a problem because
+	      auto-detected plugins, such as cspython, are added to the PLUGINS
+	      list via entries in config.mak.
+	    - The makefile configuration cache was being deleted too early
+	      during the `distclean' target's run.  The result was that
+	      `distclean' did not benefit from cached makefile information as
+	      much as it should have benefitted.
+	- Eric Sunshine fixed the awstest.mak makefile so that it only adds the
+	  `awstst' target to the "help" list if the AWS plugin is present in
+	  the PLUGINS list.
 27-Aug-2001
 	- Fixed a linking error in povie.mak.
 	- Did a new change to iPolygonBuffer.  Materials for polygons are now

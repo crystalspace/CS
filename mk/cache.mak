@@ -123,6 +123,11 @@ define CACHE.BODY
   $(foreach r,$(SUBMAKEFILES),$(CACHE.BODY.CONTENT))
 endef
 
+define REFRESH_MAKEFILE_CACHE
+  @echo $"Refreshing makefile cache.$"
+  @$(MAKE) $(RECMAKEFLAGS) build-makefile-cache USE_MAKEFILE_CACHE=no
+endef
+
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #------------------------------------------------------------- roottargets ---#
@@ -130,26 +135,46 @@ ifeq ($(MAKESECTION),roottargets)
 
 ifeq ($(USE_MAKEFILE_CACHE),yes)
 
+ifeq ($(ROOTCONFIG),volatile)
 .PHONY: configure
 configure: $(MAKEFILE_CACHE)
+endif
+
 $(MAKEFILE_CACHE): $(CACHE_DEPS)
-	@$(CACHE.BODY)
+	@$(REFRESH_MAKEFILE_CACHE)
 
 .PHONY: recache
 recache:
-	$(RM) $(MAKEFILE_CACHE)
-	@$(MAKE) $(RECMAKEFLAGS) $(MAKEFILE_CACHE)
-	@echo $"Makefile cache refreshed.$"
+	@$(REFRESH_MAKEFILE_CACHE)
 
 endif # ifeq ($(USE_MAKEFILE_CACHE),yes)
 
-.PHONY: cleancache
+.PHONY: build-makefile-cache
+build-makefile-cache:
+	@$(RM) $(MAKEFILE_CACHE)
+	@$(CACHE.BODY)
+
+.PHONY: unknown
 unknown: cleancache
+
+endif # ifeq ($(MAKESECTION),roottargets)
+
+#----------------------------------------------------------------- targets ---#
+ifeq ($(MAKESECTION),targets)
+
+.PHONY: distclean
 distclean: cleancache
+
+endif # ifeq ($(MAKESECTION),targets)
+
+#----------------------------------------------------- roottargets/targets ---#
+ifneq (,$(findstring targets,$(MAKESECTION)))
+
+.PHONY: cleancache
 cleancache:
 	$(RM) $(MAKEFILE_CACHE)
 
-endif # ifeq ($(MAKESECTION),roottargets)
+endif # ifneq (,$(findstring targets,$(MAKESECTION)))
 
 #-------------------------------------------------------------- confighelp ---#
 ifeq ($(MAKESECTION),confighelp)
