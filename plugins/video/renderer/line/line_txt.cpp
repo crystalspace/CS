@@ -456,7 +456,8 @@ void csTextureManagerLine::PrepareTextures ()
   if (verbose) SysPrintf (MSG_INITIALIZATION, "  Creating texture mipmaps...\n");
 
   // Create mipmaps for all textures
-  for (int i = 0; i < textures.Length (); i++)
+  int i;
+  for (i = 0; i < textures.Length (); i++)
     ((csTextureMMLine*)textures[i])->create_mipmaps (
       mipmap_mode == MIPMAP_VERYNICE, do_blend_mipmap0);
 
@@ -465,7 +466,7 @@ void csTextureManagerLine::PrepareTextures ()
   compute_palette ();
 
   // Remap all textures according to the new colormap.
-  for (int i = 0; i < textures.Length (); i++)
+  for (i = 0; i < textures.Length (); i++)
     ((csTextureMMLine*)textures[i])->remap_texture (this);
 }
 
