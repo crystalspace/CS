@@ -226,7 +226,7 @@ void ddgTBinTree::removeMQ(ddgTriIndex tindex)
 		_mesh->qm()->remove(_index,tindex,p);
 	    tri(tindex)->_state.flags.mq = false;
 	}
-	else if (b = brother(tindex))
+	else if ((b = brother(tindex)) != 0)
 	{
 		bt = brotherTree(tindex);
 		unsigned int p = bt->priority(b);
