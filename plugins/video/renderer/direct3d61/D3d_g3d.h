@@ -225,7 +225,7 @@ public:
   virtual G3D_COLORMAPFORMAT GetColormapFormat ();
 
   /// Print the screen.
-  virtual void Print (csRect* rect) { return m_piG2D->Print(rect); }
+  virtual void Print (csRect* rect) { m_piG2D->Print(rect); }
   
   /// Set a render state
   virtual bool SetRenderState (G3D_RENDERSTATEOPTION, long);
@@ -233,7 +233,7 @@ public:
   virtual long GetRenderState (G3D_RENDERSTATEOPTION);
   
   /// Get a z-buffer point
-  virtual long *GetZBufPoint(int, int) { return NULL; }
+  virtual unsigned long *GetZBufPoint(int, int) { return NULL; }
   
   /// Get the width
   virtual int GetWidth () { return m_nWidth; }
@@ -255,7 +255,7 @@ public:
   { return (fogm == G3DFOGMETHOD_VERTEX); }
 
   /// Get the ITextureManager.
-  virtual ITextureManager *GetTextureManager ()
+  virtual iTextureManager *GetTextureManager ()
   { return txtmgr; }
 
   /// 
@@ -269,7 +269,7 @@ public:
   virtual csHaloHandle CreateHalo (float r, float g, float b);
   virtual void DestroyHalo (csHaloHandle haloInfo);
   virtual void DrawHalo (csVector3* pCenter, float fIntensity, csHaloHandle haloInfo);
-  virtual void TestHalo (csVector3* pCenter);
+  virtual bool TestHalo (csVector3 *pCenter);
 
   /// Our internal representation of halos.
   struct csG3DHardwareHaloInfo

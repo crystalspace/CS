@@ -34,7 +34,7 @@ private:
   void CalcPixelFormat ();
 
 public:
-  csGraphics2DOpenGL(iSystem* piSystem, bool bUses3D);
+  csGraphics2DOpenGL(iBase *iParent);
   virtual ~csGraphics2DOpenGL(void);
   
   virtual bool Open (const char *Title);

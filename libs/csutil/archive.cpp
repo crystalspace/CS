@@ -21,6 +21,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#define SYSDEF_DIR
 #define SYSDEF_PATH
 #define SYSDEF_TEMP
 #define SYSDEF_UNLINK

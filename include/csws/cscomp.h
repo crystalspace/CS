@@ -177,7 +177,7 @@ enum
    */
   cscmdLimitMaximize,
   /**
-   * These commands are used for message boxes. MessageBox (...) returns
+   * These commands are used for message boxes. csMessageBox (...) returns
    * cscmdOK, cscmdCancel and so on depending on which button user presses.
    */
   cscmdOK,

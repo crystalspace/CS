@@ -37,6 +37,6 @@
  * <p>Returns the number of successfully scanned arguments or -1 if there
  * was a mismatch.
  */
-int ScanStr (char* in, char* format, ...);
+int ScanStr (const char* in, char* format, ...);
 
 #endif // SCANSTR_H

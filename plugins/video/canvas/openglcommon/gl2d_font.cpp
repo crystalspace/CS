@@ -19,6 +19,7 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <windows.h>
 
 #include "sysdef.h"
 #include "cs2d/common/graph2d.h"

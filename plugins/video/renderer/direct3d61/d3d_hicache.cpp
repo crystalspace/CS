@@ -48,7 +48,7 @@ HighColorCache::~HighColorCache()
 void HighColorCache::Add(iTextureHandle *texture)
 {
     csHighColorCacheData *cached_texture;
-    ITextureMap* piTM = NULL;
+    iTextureMap* piTM = NULL;
     int size = 0;
     
     if(type!=HIGHCOLOR_TEXCACHE) return;
@@ -98,17 +98,15 @@ void HighColorCache::Add(iTextureHandle *texture)
         {
             // out of memory. remove units from bottom of list.
             csHighColorCacheData* l = tail;
-            iTextureHandle* piMMC;
-
-            l->pSource->QueryInterface (IID_ITextureHandle, (void**)&piMMC);
-            //ASSERT( piMMC );
+            iTextureHandle* piMMC = QUERY_INTERFACE(l->pSource, iTextureHandle);
+            ASSERT( piMMC );
             
             tail = tail->prev;
             if(tail) tail->next = NULL;
             else head = NULL;
             l->prev = NULL;
       	    csTextureMMDirect3D* txt_mm2 = (csTextureMMDirect3D*)piMMC->GetPrivateObject ();
-            txt_mm2->set_in_videomemory (false);
+            txt_mm2->SetInCache (false);
             txt_mm2->SetHighColorCacheData (NULL);
             
             Unload(l);					// unload it.
@@ -134,7 +132,7 @@ void HighColorCache::Add(iTextureHandle *texture)
         cached_texture->pSource = texture;
         cached_texture->lSize = size;
         
-        txt_mm->set_in_videomemory (true);
+        txt_mm->SetInCache (true);
         txt_mm->SetHighColorCacheData (cached_texture);
 
         cached_texture->pData = NULL;
@@ -179,8 +177,7 @@ void HighColorCache::Add(iPolygonTexture *polytex)
         delete l;
     }
 
-    piLM->IsCached( bInVideoMemory );
-    if (bInVideoMemory)
+    if (piLM->IsCached())
     {
         // move unit to front (MRU)
         
@@ -207,9 +204,7 @@ void HighColorCache::Add(iPolygonTexture *polytex)
         // unit is not in memory. load it into the cache
         while (total_size + size >= cache_size)
         {
-            iLightMap* ilm;
-            
-            l->pSource->QueryInterface( IID_iLightMap, (void**)&ilm );
+            iLightMap* ilm = QUERY_INTERFACE(l->pSource, iLightMap);
             ASSERT( ilm );
             
             // out of memory. remove units from bottom of list.

@@ -172,7 +172,7 @@ void D3DTextureCache::Load(csHighColorCacheData *d)
   ddsCaps.dwCaps = DDSCAPS_TEXTURE | DDSCAPS_MIPMAP;
   
   // grab a reference to this level (we call Release later)
-  lpDDLevel->IncRef();
+  lpDDLevel->AddRef();
   
   // only process one level if we aren't mipmapping.
   int cLevels = m_bMipMapping ? 4 : 1;
@@ -425,11 +425,10 @@ else mean = total_size/num;
 
 void D3DLightMapCache::Load(csHighColorCacheData *d)
 {
-  iLightMap *piLM;
   CHK (D3DLightCache_Data *cached_texture = new D3DLightCache_Data);
   d->pData = cached_texture;
   
-  VERIFY_SUCCESS( d->pSource->QueryInterface( IID_iLightMap, (void**)&piLM ) );
+  iLightMap *piLM = QUERY_INTERFACE(d->pSource, iLightMap);
   ASSERT( piLM );
   
   int lwidth = piLM->GetWidth();
@@ -484,9 +483,9 @@ void D3DLightMapCache::Load(csHighColorCacheData *d)
   unsigned char *lpGreen;
   unsigned char *lpBlue; 
   
-  piLM->GetMap(0, &lpRed);
-  piLM->GetMap(1, &lpGreen);
-  piLM->GetMap(2, &lpBlue);
+  lpRed   = piLM->GetMap(0);
+  lpGreen = piLM->GetMap(1);
+  lpBlue  = piLM->GetMap(2);
   
   unsigned long *lpL;
   unsigned short *lpS;

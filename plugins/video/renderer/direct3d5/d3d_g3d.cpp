@@ -84,9 +84,6 @@ IMPLEMENT_IBASE (csGraphics3DDirect3DDx5)
   IMPLEMENTS_INTERFACE (iHaloRasterizer)
 IMPLEMENT_IBASE_END
 
-//COM Helpers. (DirectX is still COM...)
-#define FINAL_RELEASE( d ) if (d!=NULL) { d->Release(); d = NULL; }
-
 //
 // Implementation
 //
@@ -166,6 +163,7 @@ csGraphics3DDirect3DDx5::csGraphics3DDirect3DDx5(iBase* iParent) :
   m_lpddPrimary(NULL),
   m_lpddZBuffer(NULL),
   m_pTextureCache(NULL),
+  m_piSystem(NULL),
   m_bVerbose(true)
 {
   CONSTRUCT_IBASE (iParent);
@@ -218,7 +216,8 @@ csGraphics3DDirect3DDx5::~csGraphics3DDirect3DDx5 ()
 
 bool csGraphics3DDirect3DDx5::Initialize (iSystem *iSys)
 {
-  (m_piSystem = iSys)->IncRef ();
+  m_piSystem = iSys;
+  m_piSystem->IncRef ();
 
   if (!m_piSystem->RegisterDriver ("iGraphics3D", this))
     return false;

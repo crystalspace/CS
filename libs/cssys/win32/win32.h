@@ -46,45 +46,7 @@
 
 #include "cssys/system.h"
 #include "csinput/csinput.h"
-// Maximal path length
-#ifndef MAXPATHLEN
-#  ifdef _MAX_FNAME
-#    define MAXPATHLEN _MAX_FNAME
-#  else
-#    define MAXPATHLEN 260		// and not 256!
-#  endif
-#endif
 
-// Directory read functions
-#ifndef COMP_BC
-#define __NEED_OPENDIR_PROTOTYPE
-
-#include <io.h>
-
-/// Directory entry
-struct dirent
-{
-  char d_name [MAXPATHLEN + 1];		// File name, 0 terminated
-  long d_size;				// File size (bytes)
-  unsigned d_attr;			// File attributes (Windows-specific)
-};
-
-/// Directory handle
-struct DIR
-{
-  bool valid;
-  long handle;
-  dirent de;
-  _finddata_t fd;
-};
-
-#define __NO_GENERIC_ISDIR
-static inline bool isdir (char *path, dirent *de)
-{
-  (void)path;
-  return !!(de->d_attr & _A_SUBDIR);
-}
-#endif
 
 /// Windows system driver
 class SysSystemDriver : public csSystemDriver, public iWin32SystemDriver

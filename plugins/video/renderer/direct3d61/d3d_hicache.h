@@ -26,6 +26,9 @@
 
 #include "csutil/scf.h"
 
+scfInterface iTextureHandle;
+scfInterface iPolygonTexture;
+
 ///
 struct csHighColorCacheData
 {

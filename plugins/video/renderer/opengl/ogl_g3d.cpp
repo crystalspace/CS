@@ -17,6 +17,7 @@
 */
 
 #include <stdarg.h>
+#include <windows.h>
 
 #include "sysdef.h"
 #include "qint.h"
@@ -170,7 +171,7 @@ bool csGraphics3DOpenGL::Open (const char *Title)
   SysPrintf (MSG_INITIALIZATION, "Using %s mode at resolution %dx%d.\n",
              bFullScreen ? "full screen" : "windowed", width, height);
 
-  csPixelFormat pfmt = *G2D->GetPixelFormat ();
+  //csPixelFormat pfmt = *G2D->GetPixelFormat ();
 
   if (m_renderstate.dither)
     glEnable (GL_DITHER);

@@ -17,6 +17,8 @@
 */
 
 #include <stdarg.h>
+#include <windows.h>
+
 #include "sysdef.h"
 #include "csutil/scf.h"
 #include "cs2d/openglcommon/glcommon2d.h"
@@ -264,7 +266,7 @@ void csGraphics2DGLCommon::DrawSprite (csGraphics2D *This, iTextureHandle *hTex,
   glEnd();
 }
 
-unsigned char* csGraphics2DGLCommon::GetPixelAt (csGraphics2D *This, int /*x*/, int /*y*/)
+unsigned char* csGraphics2DGLCommon::GetPixelAt (csGraphics2D* /*This*/, int /*x*/, int /*y*/)
 {
   return NULL;
 }

@@ -22,7 +22,7 @@
 #include "sysdef.h"
 #include "csutil/scanstr.h"
 
-int ScanStr (char* in, char* format, ...)
+int ScanStr (const char* in, char* format, ...)
 {
   va_list arg;
   va_start (arg, format);
@@ -70,7 +70,7 @@ int ScanStr (char* in, char* format, ...)
 	{
 	  int* a = va_arg (arg, int*);
 	  in += strspn (in, " \t\n\f");
-	  char* in2 = in + strspn (in, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+	  const char* in2 = in + strspn (in, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
 	  int l = (int)(in2-in);
 	  *a = !strncasecmp (in, "yes", l) || !strncasecmp (in, "true", l) || !strncasecmp (in, "on", l) ||
 	  	!strncasecmp (in, "1", l);
@@ -129,7 +129,7 @@ int ScanStr (char* in, char* format, ...)
 	  }
 	  else
 	  {
-	    char* in2 = in + strspn (in, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789.");
+	    const char* in2 = in + strspn (in, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789.");
 	    strncpy (a, in, (int)(in2-in));
 	    a[(int)(in2-in)] = 0;
 	    in = in2;

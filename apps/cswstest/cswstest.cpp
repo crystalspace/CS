@@ -235,7 +235,7 @@ bool csWsTest::HandleEvent (csEvent &Event)
               char filename [MAXPATHLEN + 1];
               csQueryFileDialog (d, filename, sizeof (filename));
               delete d;
-              MessageBox (app, "Result", filename);
+              csMessageBox (app, "Result", filename);
             }
             return true;
           }
@@ -254,7 +254,7 @@ bool csWsTest::HandleEvent (csEvent &Event)
               delete d;
               char buff [100];
               sprintf (buff, "color value: %08X\n", color);
-              MessageBox (app, "Result", buff);
+              csMessageBox (app, "Result", buff);
             }
             return true;
           }

@@ -24,7 +24,7 @@
 
 #undef main
 extern int csMain (int argc, char* argv[]);
-HINSTANCE ModuleHandle;		// defined in the COM library
+HINSTANCE ModuleHandle;	
 
 // The main entry for console applications
 int main (int argc, char* argv[])

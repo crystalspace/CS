@@ -66,7 +66,7 @@ protected:
 class cswsSystemDriver;
 
 /**
- * Message box style flags (used in MessageBox (...) as last parameter)<p>
+ * Message box style flags (used in csMessageBox (...) as last parameter)<p>
  * These style flags can be combined using logical OR (|) operation;
  * some styles are mutually exclusive (for example, a message box cannot
  * be CSMBS_INFORMATION and CSMBS_WARNING at same time)
@@ -109,7 +109,7 @@ class cswsSystemDriver;
 #define CSMBS_NONMODAL		0x80000000
 
 /// Display a message box and return ID of pressed button (0 for Esc)
-extern int MessageBox (csComponent *iParent, char *iTitle, char *iMessage,
+extern int csMessageBox (csComponent *iParent, char *iTitle, char *iMessage,
   int iFlags = CSMBS_INFO | CSMBS_OK);
 
 /// File name entry field in file dialogs

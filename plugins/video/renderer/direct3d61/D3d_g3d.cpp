@@ -184,7 +184,7 @@ csGraphics3DDirect3DDx6::csGraphics3DDirect3DDx6(iBase *iParent) :
   m_lpddPrimary(NULL),
   m_lpddZBuffer(NULL),
   m_pTextureCache(NULL),
-  m_piSystem(iSys),
+  m_piSystem(NULL),
   m_bVerbose(true)
 {
   CONSTRUCT_IBASE (iParent);
@@ -238,7 +238,8 @@ csGraphics3DDirect3DDx6::~csGraphics3DDirect3DDx6()
 
 bool csGraphics3DDirect3DDx6::Initialize (iSystem *iSys)
 {
-  (m_piSystem = iSys)->IncRef ();
+  m_piSystem = iSys;
+  m_piSystem->IncRef ();
 
   if (!m_piSystem->RegisterDriver ("iGraphics3D", this))
     return false;
@@ -285,18 +286,25 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
     return false;
   
   // Get the direct detection device.
+  iGraphics2DDDraw6* pSysGInfo = QUERY_INTERFACE(m_piG2D, iGraphics2DDDraw6);
+  ASSERT(pSysGInfo);
   
   pSysGInfo->GetDirectDetection(&m_pDirectDevice);
   ASSERT( m_pDirectDevice );
   
   pSysGInfo->GetDirectDrawDriver(&m_lpDD4);
+  ASSERT(m_lpDD4);
+
   pSysGInfo->GetDirectDrawPrimary(&m_lpddPrimary);
+  ASSERT(m_lpddPrimary);
+
   pSysGInfo->GetDirectDrawBackBuffer(&m_lpddDevice);
+  ASSERT(m_lpddDevice);
   
-  m_nWidth = pGraphicsInfo->GetWidth();
+  m_nWidth = m_piG2D->GetWidth();
   m_nHalfWidth = m_nWidth/2;
   
-  m_nHeight = pGraphicsInfo->GetHeight();
+  m_nHeight = m_piG2D->GetHeight();
   m_nHalfHeight = m_nHeight/2;
   
   // get the amount of texture memory on the video card.
@@ -366,11 +374,8 @@ bool csGraphics3DDirect3DDx6::Open(const char* Title)
   // Create Z-buffer
   if (!lpD3dDeviceDesc->dwDeviceZBufferBitDepth && m_bIsHardware)
   {
-    hRes = CSD3DERR_NOZBUFFER;
-    {
-      SysPrintf (MSG_FATAL_ERROR, "No Z-Buffer ! \n");
-      return false;
-    }
+    SysPrintf (MSG_FATAL_ERROR, "No Z-Buffer ! \n");
+    return false;
   }
 
   // Get the pixel-format of the rendering target, because the z-buffer should
@@ -804,11 +809,9 @@ void csGraphics3DDirect3DDx6::FinishDraw ()
     
     hRes = m_lpd3dDevice2->EndScene();
     if (FAILED(hRes))
-      return E_FAIL;
+      return;
   }
   m_nDrawMode = 0;
-  
-  return S_OK;
 }
 
 void csGraphics3DDirect3DDx6::SetZBufMode(G3DZBufMode mode)
@@ -830,9 +833,9 @@ void csGraphics3DDirect3DDx6::SetZBufMode(G3DZBufMode mode)
 }
 
 
-void csGraphics3DDirect3DDx6::GetColormapFormat( G3D_COLORMAPFORMAT& g3dFormat ) 
+G3D_COLORMAPFORMAT csGraphics3DDirect3DDx6::GetColormapFormat() 
 {
-  g3dFormat = G3DCOLORFORMAT_24BIT;
+  return G3DCOLORFORMAT_24BIT;
 }
 
 void csGraphics3DDirect3DDx6::DumpCache()
@@ -1202,8 +1205,6 @@ void csGraphics3DDirect3DDx6::DrawPolygon (G3DPolygonDP& poly)
     VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ZERO), DD_OK);
     VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE), DD_OK);
   }
-
-  return S_OK;
 } 
 
 void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
@@ -1278,8 +1279,6 @@ void csGraphics3DDirect3DDx6::StartPolygonFX (iTextureHandle* handle, UInt mode)
   }
 
   VERIFY_RESULT(m_lpd3dDevice2->SetTexture(0, ((D3DTextureCache_Data *)pTexData->pData)->lptex), DD_OK);
-
-  return S_OK;
 }
 
 void csGraphics3DDirect3DDx6::FinishPolygonFX()
@@ -1377,10 +1376,8 @@ void csGraphics3DDirect3DDx6::DrawPolygonFX(G3DPolygonDPFX& poly)
     VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND,        OldDestBlend), DD_OK); 
     VERIFY_RESULT(m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND,         OldSrcBlend),  DD_OK);
     VERIFY_RESULT(m_lpd3dDevice2->SetTexture(0, p_oldTexture), DD_OK);
-    if (p_oldTexture != NULL) p_oldTexture->DecRef();
+    if (p_oldTexture != NULL) p_oldTexture->Release();
   }
-
-  return S_OK;
 }
 
 void csGraphics3DDirect3DDx6::GetCaps(G3D_CAPS *caps)
@@ -1389,10 +1386,6 @@ void csGraphics3DDirect3DDx6::GetCaps(G3D_CAPS *caps)
     return;
   
   memcpy(caps, &m_Caps, sizeof(G3D_CAPS));
-}
-
-void csGraphics3DDirect3DDx6::GetStringError( HRESULT /*hRes*/, char* /*szErrorString*/ )
-{
 }
 
 void csGraphics3DDirect3DDx6::DrawLine (csVector3& v1, csVector3& v2, float aspect, int color)
@@ -1432,8 +1425,6 @@ void csGraphics3DDirect3DDx6::DrawLine (csVector3& v1, csVector3& v2, float aspe
   int py2 = m_nHeight - 1 - QInt (y2 * iz2 + (m_nHeight/2));
   
   m_piG2D->DrawLine (px1, py1, px2, py2, color);
-  
-  return S_OK;
 }
 
 bool csGraphics3DDirect3DDx6::SetRenderState(G3D_RENDERSTATEOPTION option, long value)
@@ -1543,7 +1534,6 @@ void csGraphics3DDirect3DDx6::AddFogPolygon (CS_ID /*id*/,
 
 void csGraphics3DDirect3DDx6::CloseFogObject (CS_ID /*id*/)
 {
-  return E_NOTIMPL;
 }
 
 void csGraphics3DDirect3DDx6::SysPrintf(int mode, char* szMsg, ...)
@@ -1636,8 +1626,8 @@ csHaloHandle csGraphics3DDirect3DDx6::CreateHalo(float r, float g, float b)
     
     VERIFY_SUCCESS( ddtex->Load(retval->lptex) );
     
-    retval->lptex->DecRef();
-    retval->lpsurf->DecRef();
+    retval->lptex->Release();
+    retval->lpsurf->Release();
     
     retval->lptex = ddtex;
     retval->lpsurf = lpddts;
@@ -1655,18 +1645,17 @@ void csGraphics3DDirect3DDx6::DestroyHalo(csHaloHandle haloInfo)
   {
     if( ((csG3DHardwareHaloInfo*)haloInfo)->lpsurf)
     {
-      ((csG3DHardwareHaloInfo*)haloInfo)->lpsurf->DecRef();
+      ((csG3DHardwareHaloInfo*)haloInfo)->lpsurf->Release();
       ((csG3DHardwareHaloInfo*)haloInfo)->lpsurf = NULL;
     }
     if (((csG3DHardwareHaloInfo*)haloInfo)->lptex)
     {
-      ((csG3DHardwareHaloInfo*)haloInfo)->lptex->DecRef();
+      ((csG3DHardwareHaloInfo*)haloInfo)->lptex->Release();
       ((csG3DHardwareHaloInfo*)haloInfo)->lptex = NULL;
     }
     
     delete (csG3DHardwareHaloInfo*)haloInfo;
   }
-  return S_OK;
 }
 
 void csGraphics3DDirect3DDx6::DrawHalo(csVector3* pCenter, float fIntensity, csHaloHandle haloInfo)
@@ -1676,7 +1665,7 @@ void csGraphics3DDirect3DDx6::DrawHalo(csVector3* pCenter, float fIntensity, csH
     int dont_forget_to_return_false=0;
     
     if (haloInfo == NULL)
-      return E_INVALIDARG;
+      return;
     
     if (pCenter->x > m_nWidth || pCenter->x < 0 || pCenter->y > m_nHeight || pCenter->y < 0 ) 
       dont_forget_to_return_false=1;
@@ -1707,7 +1696,7 @@ void csGraphics3DDirect3DDx6::DrawHalo(csVector3* pCenter, float fIntensity, csH
     vx.rhw = pCenter->z;
 
     if(fIntensity<=0.f)
-      return S_FALSE;
+      return;
 
 //    vx.color = D3DRGBA(1, 1, 1, fIntensity);
     vx.color = D3DRGBA(fIntensity, fIntensity, fIntensity, fIntensity);
@@ -1802,10 +1791,7 @@ void csGraphics3DDirect3DDx6::DrawHalo(csVector3* pCenter, float fIntensity, csH
     m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_ALPHABLENDENABLE, FALSE);
     m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_DESTBLEND, D3DBLEND_ONE);
     m_lpd3dDevice2->SetRenderState(D3DRENDERSTATE_SRCBLEND, D3DBLEND_ZERO);
-
-    return dont_forget_to_return_false?S_FALSE:S_OK;
   }
-  return S_FALSE;
 };
 
 bool csGraphics3DDirect3DDx6::TestHalo(csVector3* pCenter)

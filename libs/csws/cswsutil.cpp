@@ -213,7 +213,7 @@ csSprite2D *NewBitmap (csApp *app, char *texturename, int tx, int ty,
   return spr;
 }
 
-int MessageBox (csComponent *iParent, char *iTitle, char *iMessage, int iFlags)
+int csMessageBox (csComponent *iParent, char *iTitle, char *iMessage, int iFlags)
 {
   #define DIST_BITMAPX		8
   #define DIST_BITMAPY		8
@@ -417,7 +417,7 @@ void RectUnion (csObjVector &rect, csRect &result)
     Combinations (n, n, doRectUnion, &ru);
 }
 
-void FindCFGBitmap (cswsSystemDriver *System, csStrVector &sv, char *id,
+void FindCFGBitmap (cswsSystemDriver* /*System*/, csStrVector &sv, char *id,
   int *x, int *y, int *w, int *h)
 {
   char temp[256];
@@ -756,8 +756,8 @@ void cspFileDialog::Reread ()
 
   if (!(dh = opendir (path)))
   {
-    MessageBox (app, "Error", "Invalid directory");
-	System->Printf (MSG_INITIALIZATION, "Invalid directory path\n");
+    csMessageBox (app, "Error", "Invalid directory");
+    System->Printf (MSG_INITIALIZATION, "Invalid directory path\n");
     goto done;
   }
 

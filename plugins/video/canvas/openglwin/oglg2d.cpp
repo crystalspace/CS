@@ -154,7 +154,7 @@ void CreateIdentityPalette(RGBpaletteEntry *p)
     sys_fatalerror("Error creating identity palette.");
 }
 
-csGraphics2DOpenGL::csGraphics2DOpenGL(iBase *iParent, bool /*bUses3D*/) : 
+csGraphics2DOpenGL::csGraphics2DOpenGL(iBase *iParent) : 
                    csGraphics2DGLCommon (iParent),
                    m_hWnd(NULL),
                    m_bDisableDoubleBuffer(false),
@@ -180,13 +180,13 @@ bool csGraphics2DOpenGL::Initialize (iSystem *pSystem)
   // QI for iWin32SystemDriver //
   m_piWin32System = QUERY_INTERFACE (System, iWin32SystemDriver);
   if (!m_piWin32System)
-      sys_fatalerror("csGraphics2DDDraw3::Open(QI) -- iSystem passed does not support iWin32SystemDriver.", ddrval);
+      sys_fatalerror("csGraphics2DDDraw3::Open(QI) -- iSystem passed does not support iWin32SystemDriver.");
   
   // Get the creation parameters //
-  m_piWin32System->GetInstance(&m_hInstance);
-  m_piWin32System->GetCmdShow(&m_nCmdShow);
+  m_hInstance = m_piWin32System->GetInstance();
+  m_nCmdShow  = m_piWin32System->GetCmdShow();
 
-  System->GetSetting(Width, Height, Depth, FullScreen);
+  System->GetSettings(Width, Height, Depth, FullScreen);
     
   if (Depth==8)
   {
@@ -443,7 +443,7 @@ void csGraphics2DOpenGL::SetRGB(int i, int r, int g, int b)
   m_bPaletteChanged = true;
 }
 
-bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape, csTextureHandle* iBitmap)
+bool csGraphics2DOpenGL::SetMouseCursor (csMouseCursorID iShape, iTextureHandle* iBitmap)
 {
   (void)iShape; (void)iBitmap;
   return false;
