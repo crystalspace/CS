@@ -75,6 +75,14 @@ struct iDynamicSystem : public iBase
   virtual void SetGravity (const csVector3& v) = 0;
   /// Get the global gravity.
   virtual const csVector3 GetGravity () const = 0;
+  /// Set the global linear dampener.
+  virtual void SetLinearDampener (float d) = 0;
+  /// Get the global linear dampener setting.
+  virtual float GetLinearDampener () const = 0;
+  /// Set the global rolling dampener.
+  virtual void SetRollingDampener (float d) = 0;
+  /// Get the global rolling dampener setting.
+  virtual float GetRollingDampener () const = 0;
 
   /// Step the simulation forward by stepsize.
   virtual void Step (float stepsize) = 0;
@@ -102,6 +110,19 @@ struct iDynamicSystem : public iBase
 
   /// Get the default move callback.
   virtual iDynamicsMoveCallback* GetDefaultMoveCallback () = 0;
+
+  /// The following colliders exist relative only to the space and are static
+  virtual bool AttachColliderMesh (iMeshWrapper* mesh,
+  	const csOrthoTransform& trans, float friction, float elasticity) = 0;
+  virtual bool AttachColliderCylinder (float length, float radius,
+  	const csOrthoTransform& trans, float friction, float elasticity) = 0;
+  virtual bool AttachColliderBox (const csVector3 &size,
+  	const csOrthoTransform& trans, float friction, float elasticity) = 0;
+  virtual bool AttachColliderSphere (float radius, const csVector3 &offset,
+  	float friction, float elasticity) = 0;
+  virtual bool AttachColliderPlane (const csPlane3 &plane, float friction,
+    float elasticity) = 0;
+
 };
 
 SCF_VERSION (iDynamicsMoveCallback, 0, 0, 1);
@@ -114,6 +135,7 @@ struct iDynamicsMoveCallback : public iBase
 {
   virtual void Execute (iMeshWrapper* mesh, csOrthoTransform& t) = 0;
   virtual void Execute (iSkeletonBone* bone, csOrthoTransform& t) = 0;
+  virtual void Execute (csOrthoTransform& t) = 0;
 };
 
 SCF_VERSION (iDynamicsCollisionCallback, 0, 0, 1);
