@@ -935,7 +935,10 @@ csTiledCoverageBuffer::csTiledCoverageBuffer (int w, int h)
   bugplug = 0;
 
   Setup (w, h);
+#ifdef _X86_
   use_mmx = csProcessorCapability::HasMMX ();
+  //printf ("use_mmx=%d\n", use_mmx); fflush (stdout);
+#endif
 }
 
 csTiledCoverageBuffer::~csTiledCoverageBuffer ()
