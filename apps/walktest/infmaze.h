@@ -95,7 +95,7 @@ public:
   int x1, y1, z1;
   int x2, y2, z2;
   InfPortalCS () : csPortal () { lviews = NULL; }
-  virtual void CheckFrustum (csFrustumView& lview);
+  virtual void CheckFrustum (csFrustumView& lview, int alpha);
   virtual void CompleteSector ();
 };
 

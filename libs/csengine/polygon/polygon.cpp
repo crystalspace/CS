@@ -60,6 +60,7 @@ csLightMapped::csLightMapped () : csPolygonTextureType ()
   theDynLight = NULL;
   tex = new csPolyTexture ();
   lightmap_up_to_date = false;
+  cfg_alpha = 0;
 }
 
 csLightMapped::~csLightMapped ()
@@ -1754,19 +1755,18 @@ void csPolygon3D::CalculateLighting (csFrustumView *lview)
   }
 
   if (po)
-    po->CheckFrustum (new_lview);
+    po->CheckFrustum (new_lview, GetAlpha ());
   else if (!new_lview.dynamic && csSector::do_radiosity)
   {
     // If there is no portal we simulate radiosity by creating
     // a dummy portal for this polygon which reflects light.
     csPortal mirror;
     mirror.SetSector (GetSector ());
-    mirror.SetAlpha (10);
     UByte r, g, b;
     GetTextureHandle ()->GetMeanColor (r, g, b);
     mirror.SetFilter (r/1000., g/1000., b/1000.);
     mirror.SetWarp (csTransform::GetReflect (*GetPolyPlane ()));
-    mirror.CheckFrustum (new_lview);
+    mirror.CheckFrustum (new_lview, 10);
   }
 }
 

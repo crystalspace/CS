@@ -1106,7 +1106,7 @@ static void frustum_polygon_report_func (csObject *obj, csFrustumView* lview)
   new_lview.light_frustum = lview->light_frustum->Intersect(poly, num_vertices);
   if (!new_lview.light_frustum) return;
 
-  po->CheckFrustum (new_lview);
+  po->CheckFrustum (new_lview, destpoly3d->GetAlpha ());
 }
 
 

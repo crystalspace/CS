@@ -159,6 +159,12 @@ private:
    */
   CLights* theDynLight;
 
+  /**
+   * 0 is no alpha, 25 is 25% see through and
+   * 75% texture, ... Possible values are 0, 25, 50, and 75.
+   */
+  int cfg_alpha;
+
 private:
   /// Constructor.
   csLightMapped ();
@@ -172,6 +178,11 @@ public:
 
   /// Return a type for the kind of texturing used.
   virtual int GetTextureType () { return POLYTXT_LIGHTMAP; }
+
+  ///
+  int GetAlpha () { return cfg_alpha; }
+  ///
+  void SetAlpha (int a) { cfg_alpha = a; }
 
   /// Get the polytexture (lighted texture)
   csPolyTexture* GetPolyTex ();
@@ -1105,7 +1116,8 @@ public:
 
   /// Get the alpha transparency value for this polygon.
   virtual int GetAlpha ()
-  { return portal ? portal->GetAlpha () : 0; }
+  { return GetLightMapInfo () ? GetLightMapInfo ()->GetAlpha () : 0; }
+
   /**
    * Set the alpha transparency value for this polygon (only if
    * it is a portal).
@@ -1114,7 +1126,7 @@ public:
    * only the closest possible to one of the above.
    */
   virtual void SetAlpha (int iAlpha)
-  { if (portal) portal->SetAlpha (iAlpha); }
+  { if (GetLightMapInfo ()) GetLightMapInfo ()->SetAlpha (iAlpha); }
 
   /// Get the texture handle for the texture manager.
   virtual iTextureHandle *GetTextureHandle ();

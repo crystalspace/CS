@@ -28,7 +28,6 @@
 
 csPortal::csPortal ()
 {
-  cfg_alpha = 0;
   filter_texture = NULL;
   filter_r = 1;
   filter_g = 1;
@@ -141,7 +140,7 @@ csPolygon3D* csPortal::HitBeam (const csVector3& start, const csVector3& end,
   else return sector->HitBeam (start, end, isect);
 }
 
-void csPortal::CheckFrustum (csFrustumView& lview)
+void csPortal::CheckFrustum (csFrustumView& lview, int alpha)
 {
   if (!sector) CompleteSector ();
   if (sector->draw_busy > csSector::cfg_reflections) return;
@@ -183,9 +182,9 @@ void csPortal::CheckFrustum (csFrustumView& lview)
     copied_frustums = true;
     new_lview.shadows.Transform (&warp_wor);
 
-    if (cfg_alpha)
+    if (alpha)
     {
-      //float a = cfg_alpha;
+      //float a = alpha;
       //new_lview.r = (a * lview.r + (100-a) * filter_r) / 100.;
       //new_lview.g = (a * lview.g + (100-a) * filter_g) / 100.;
       //new_lview.b = (a * lview.b + (100-a) * filter_b) / 100.;

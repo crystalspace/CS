@@ -245,7 +245,7 @@ void InfPortalCS::CompleteSector ()
   {
     int old_draw_busy = s->draw_busy;
     s->draw_busy = 0;
-    CheckFrustum (lviews->lv);
+    CheckFrustum (lviews->lv, 0);
     s->draw_busy = old_draw_busy;
 
     LV* n = lviews->next;
@@ -255,7 +255,7 @@ void InfPortalCS::CompleteSector ()
   (void)new csRAPIDCollider (*s, s);
 }
 
-void InfPortalCS::CheckFrustum (csFrustumView& lview)
+void InfPortalCS::CheckFrustum (csFrustumView& lview, int alpha)
 {
   if (!GetSector ())
   {
@@ -273,7 +273,7 @@ void InfPortalCS::CheckFrustum (csFrustumView& lview)
   }
   else
   {
-    csPortal::CheckFrustum (lview);
+    csPortal::CheckFrustum (lview, alpha);
   }
 }
 

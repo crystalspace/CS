@@ -1,5 +1,11 @@
 The history order has been reversed so that new features are at the top.
 
+7-Jul-2000
+	- Moved alpha setting from portals to polygons. In most cases this
+	  setting only makes sense for portals but you can use it on a thing
+	  as well (and for a second skybox for example). Extended
+	  csPortal::CheckFrustum() so that it has the alpha as a parameter
+	  now because it needs it.
 6-Jul-2000
 	- Samuel Humphreys did the following changes:
             - Removed indentation from bin/dosupd.bat..hope the unix eol stuff
@@ -59,6 +65,16 @@ The history order has been reversed so that new features are at the top.
 	  WalkTest will animate the sky object indicated with <thing-name>.
 	  The rotation <dir> will be 'x', 'y', or 'z'. The speed will
 	  be relative to 1 meaning one full rotation in 1 second.
+	- Norman Kramer made some glide fixes: not only was the hardware
+	  framebuffer deleted in the derived class (which was stupid already)
+	  - we (read "i") did it here again :) when the doublebufferstate
+	  is changed we now call FinishDraw until the framebuffer is
+	  unlocked (this is important if DoubleBuffer() is called
+	  between BeginDraw()/FinishDraw()) - this will ensure the
+	  framebuffer is relocked upon next LFB access and points to the
+	  right buffer.
+	- Norman also removed deleting of hardwareframebuffer at exit, wonder
+	  why it did not segfaulted earlier - weird (for glidex2d).
 5-Jul-2000
 	- Samuel Humphreys did the following changes:
 	    - Rearranged iGraphics2D/3D so that related functions are

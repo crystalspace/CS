@@ -85,12 +85,6 @@ public:
 
 protected:
   /**
-   * 0 is no alpha, 25 is 25% see through and
-   * 75% texture, ... Possible values are 0, 25, 50, and 75.
-   */
-  int cfg_alpha;
-
-  /**
    * A flag which indicates if the destination of this portal should not be
    * transformed from object to world space. For mirrors you should
    * disable this flag because you want the destination to move with the
@@ -171,11 +165,6 @@ public:
    */
   void SetFilter (float r, float g, float b) { filter_r = r; filter_g = g; filter_b = b; filter_texture = NULL; }
 
-  ///
-  int GetAlpha () { return cfg_alpha; }
-  ///
-  void SetAlpha (int a) { cfg_alpha = a; }
-
   /**
    * Warp a position in world space.
    */
@@ -229,8 +218,10 @@ public:
 
   /**
    * Check frustum visibility of all polygons reachable through this portal.
+   * Alpha is the alpha value you'd like to use to pass through this
+   * portal (0 is no completely transparent, 100 is complete opaque).
    */
-  virtual void CheckFrustum (csFrustumView& lview);
+  virtual void CheckFrustum (csFrustumView& lview, int alpha);
 };
 
 #endif /*PORTAL_H*/
