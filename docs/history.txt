@@ -12,6 +12,43 @@ Short-term cleanups that need to be done:
 	- Check the dependencies of libraries/COM objects and try to find
 	  includes that don't belong there (like from csengine).
 
+17-Mar-2000
+	- Andrew Zabolotny did the following changes:
+	   - Re-implemented bi-linear filtering (enabled by "trilinear"
+	     command because "bilinear" enables some kind of bilinear
+	     dithering Denis Dmitriev wrote which is still somewhat faster
+	     than bilinear filtering) for 16-bit modes.  Now both 565 and
+	     555 pixel formats are supported. Also it is way faster
+	     than the old routine Denis wrote (two memory references and 6
+	     multiplies per pixel vs 16 memory lookups in Denis' code). On
+	     my computer the assembly draw_scanline_map does 23 fps, the
+	     "bilinear" code does 18 fps and the "trilinear" code does 14fps.
+	     Still useable (60% of no-filtering code speed).
+	   - Implemented draw_scanline_map_zfill with bilinear filtering
+	     (565 and 555 modes). Now things are also filtered thus the
+	     image looks more consistent.
+	   - Removed two lookup tables used by the old bi-linear
+	     filtering routine. Now software renderer eats 128K less memory.
+	   - Fully implemented bilinear filtering for 32bpp. I was able
+	     to implement it using same 6 multiplies per pixel, and four
+	     memory references. Both zfil and zuse versions are there.
+	   - Fixed a bug in archive.cpp that made walktest crash in
+	     some cases (if data directory is not under CS but under
+	     CS/../data).
+	   - Fixed a bug in makedep - it used to parse sometimes
+	     incorrectly the C++ "//" comment (if comment is empty, i.e.
+	     followed by a newline, the entire next line was skipped).
+	   - Re-thought the driver-dependent makedep flags issue. The
+	     solution is simple: if your driver needs specific include
+	     paths, defines etc during dependency generation, just change
+	     the lines:
+		$(OUTOS)something.dep: $(SRC.SOMETHING)
+		    $(DO.DEP)
+	     into
+		$(OUTOS)something.dep: $(SRC.SOMETHING)
+		    $(DO.DEP) $(CFLAGS.SOMETHING)
+	- Michael Dale Long fixed the 'make depend' target of the
+	  cctest app.
 16-Mar-2000
 	- Michael Dale Long did some changes to Crystal Clear:
 	    - Rewrote ccActor class to make it less prone to errors of
@@ -60,6 +97,11 @@ Short-term cleanups that need to be done:
 	  other renderers). I don't know if the other renderers need
 	  some work there.
 	- Again enhanced robustnes of the solid bsp culler.
+	- Eric Sunshine fixed a bug in the 'clean' target of walktest.
+	- Eric also fixed a number of compile errors and warnings
+	  in MazeD.
+	- Thomas Hieber fixed 32-bit display mode for the D3D renderer
+	  (6.1).
 15-Mar-2000
 	- Fixed bug in terrain interface to terrain engine. Now passes
 	  1/z instead of z. This fixes the OpenGL clipping bug and also

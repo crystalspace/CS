@@ -164,12 +164,8 @@ bool csSolidBsp::InsertPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
       {
         rc1 = rc2 = false;
         csPlane2 edge_plane ((*poly)[0].v1, (*poly)[0].v2);
-	// @@@ PlanesClose is not efficient. Consider another way
-	// to test for this case. One way would be to take a single
-	// point at one side of a plane and see if it is on the same
-	// side for the other plane too. Also do this with
-	// TestPolygon.
-	if (csMath2::PlanesClose (edge_plane, node->splitter))
+	if (SIGN (edge_plane.A ()) == SIGN (node->splitter.A ()) &&
+	    SIGN (edge_plane.B ()) == SIGN (node->splitter.B ()))
 	{
 	  // Two planes are equal. This means that the right node
 	  // will be solid.
@@ -306,7 +302,8 @@ bool csSolidBsp::TestPolygon (csSolidBspNode* node, csPoly2DEdges* poly)
       if (left_poly->GetNumEdges () == 0 && right_poly->GetNumEdges () == 0)
       {
         csPlane2 edge_plane ((*poly)[0].v1, (*poly)[0].v2);
-	if (csMath2::PlanesClose (edge_plane, node->splitter))
+	if (SIGN (edge_plane.A ()) == SIGN (node->splitter.A ()) &&
+	    SIGN (edge_plane.B ()) == SIGN (node->splitter.B ()))
 	{
 	  // Two planes are equal.
 	  if (!node->right->solid) { rc = true; goto end; }
