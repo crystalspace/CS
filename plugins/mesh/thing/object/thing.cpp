@@ -2404,7 +2404,7 @@ bool csThing::DrawTest (iRenderView *rview, iMovable *movable)
 #ifdef CS_USE_NEW_RENDERER
   //@@@
   int i;
-  tr_o2c = camtrans;
+  csReversibleTransform tr_o2c = camtrans;
   if (!movable->IsFullTransformIdentity ())
     tr_o2c /= movable->GetFullTransform ();
   int clip_portal, clip_plane, clip_z_plane;

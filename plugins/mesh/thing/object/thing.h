@@ -643,7 +643,7 @@ private:
 
 #ifdef CS_USE_NEW_RENDERER
   csDirtyAccessArray<csRenderMesh*> renderMeshes;
-  csReversibleTransform tr_o2c; //@@@
+  //csReversibleTransform tr_o2c; //@@@
 
   void PrepareRenderMeshes ();
   void ClearRenderMeshes ();
