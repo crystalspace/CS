@@ -117,7 +117,7 @@
 
 		const						AABB*		mAABBList;			//!< Shortcut to an app-controlled list of AABBs.
 	};
-
+#pragma warning( disable : 4512 )
 	class //OPCODE_API
        	AABBTreeOfTrianglesBuilder : public AABBTreeBuilder
 	{

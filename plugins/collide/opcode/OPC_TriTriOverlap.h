@@ -78,9 +78,9 @@ BOOL CoplanarTriTri(const Point& n, const Point& v0, const Point& v1, const Poin
 	short i0,i1;
 	/* first project onto an axis-aligned plane, that maximizes the area */
 	/* of the triangles, compute indices: i0,i1. */
-	A[0] = fabs(n[0]);
-	A[1] = fabs(n[1]);
-	A[2] = fabs(n[2]);
+	A[0] = (float)fabs(n[0]);
+	A[1] = (float)fabs(n[1]);
+	A[2] = (float)fabs(n[2]);
 	if(A[0]>A[1])
 	{
 		if(A[0]>A[2])
@@ -233,10 +233,10 @@ inline_ BOOL AABBTreeCollider::TriTriOverlap(const Point& V0, const Point& V1, c
 	const Point D = N1^N2;
 
 	// Compute and index to the largest component of D
-	float max=fabs(D[0]);
+	float max=(float)fabs(D[0]);
 	short index=0;
-	float bb=fabs(D[1]);
-	float cc=fabs(D[2]);
+	float bb=(float)fabs(D[1]);
+	float cc=(float)fabs(D[2]);
 	if(bb>max) max=bb,index=1;
 	if(cc>max) max=cc,index=2;
 

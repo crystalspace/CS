@@ -207,11 +207,11 @@
 				Matrix4x4&			Rotozoom(float angle, float zoom, float posx, float posy);
 
 		//! Sets a rotation matrix around the X axis.
-				void				RotX(float angle)	{ float Cos = cos(angle), Sin = sin(angle); Identity(); m[1][1] = m[2][2] = Cos; m[2][1] = -Sin;	m[1][2] = Sin;	}
+				void				RotX(float angle)	{ float Cos = (float)cos(angle), Sin = (float)sin(angle); Identity(); m[1][1] = m[2][2] = Cos; m[2][1] = -Sin;	m[1][2] = Sin;	}
 		//! Sets a rotation matrix around the Y axis.
-				void				RotY(float angle)	{ float Cos = cos(angle), Sin = sin(angle); Identity(); m[0][0] = m[2][2] = Cos; m[2][0] = Sin;	m[0][2] = -Sin;	}
+				void				RotY(float angle)	{ float Cos = (float)cos(angle), Sin = (float)sin(angle); Identity(); m[0][0] = m[2][2] = Cos; m[2][0] = Sin;	m[0][2] = -Sin;	}
 		//! Sets a rotation matrix around the Z axis.
-				void				RotZ(float angle)	{ float Cos = cos(angle), Sin = sin(angle); Identity(); m[0][0] = m[1][1] = Cos; m[1][0] = -Sin;	m[0][1] = Sin;	}
+				void				RotZ(float angle)	{ float Cos = (float)cos(angle), Sin = (float)sin(angle); Identity(); m[0][0] = m[1][1] = Cos; m[1][0] = -Sin;	m[0][1] = Sin;	}
 
 		//! Makes a rotation matrix about an arbitrary angle
 				Matrix4x4&			Rot(float angle, Point& p1, Point& p2);

@@ -153,7 +153,7 @@ Matrix4x4& Matrix4x4::Shadow(const Point& light, const Point& p0, const Point& p
 	Plane PlaneEquation;
 	float Coeff;
 	if(fabs(D)<0.0001f)	Coeff = -1.0f;
-	else					Coeff = -1.0f / fabs(D);
+	else					Coeff = -1.0f / (float)fabs(D);
 	PlaneEquation.n.x = n.x * Coeff;
 	PlaneEquation.n.y = n.y * Coeff;
 	PlaneEquation.n.z = n.z * Coeff;
@@ -254,7 +254,7 @@ Matrix4x4& Matrix4x4::Rot(float angle, Point& p1, Point& p2)
 
 	Matrix4x4 Rx, InvRx;
 	Rx.Identity();
-	float d = sqrt(Axis.y*Axis.y + Axis.z*Axis.z);
+	float d = (float)sqrt(Axis.y*Axis.y + Axis.z*Axis.z);
 	if(d!=0.0f)
 	{
 		float CosAngle = Axis.z / d;

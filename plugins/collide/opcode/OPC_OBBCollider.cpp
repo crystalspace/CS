@@ -196,7 +196,7 @@ BOOL OBBCollider::InitQuery(OBBCache& cache, const OBB& box, const Matrix4x4* wo
 		for(udword j=0;j<3;j++)
 		{
 			// Epsilon value prevents floating-point inaccuracies (strategy borrowed from RAPID)
-			mAR.m[i][j] = 1e-6f + fabs(mRBoxToModel.m[i][j]);
+			mAR.m[i][j] = 1e-6f + (float)fabs(mRBoxToModel.m[i][j]);
 		}
 	}
 
@@ -428,19 +428,19 @@ inline_ BOOL OBBCollider::OBBContainsBox(const Point& bc, const Point& be)
 	// - compute model-box's AABB in OBB space
 	// - test AABB-in-AABB
 	float NCx = bc.x * mRModelToBox.m[0][0] + bc.y * mRModelToBox.m[1][0] + bc.z * mRModelToBox.m[2][0];
-	float NEx = fabs(mRModelToBox.m[0][0] * be.x) + fabs(mRModelToBox.m[1][0] * be.y) + fabs(mRModelToBox.m[2][0] * be.z);
+	float NEx = (float)fabs(mRModelToBox.m[0][0] * be.x) + (float)fabs(mRModelToBox.m[1][0] * be.y) + (float)fabs(mRModelToBox.m[2][0] * be.z);
 
 	if(mB0.x < NCx+NEx)	return FALSE;
 	if(mB1.x > NCx-NEx)	return FALSE;
 
 	float NCy = bc.x * mRModelToBox.m[0][1] + bc.y * mRModelToBox.m[1][1] + bc.z * mRModelToBox.m[2][1];
-	float NEy = fabs(mRModelToBox.m[0][1] * be.x) + fabs(mRModelToBox.m[1][1] * be.y) + fabs(mRModelToBox.m[2][1] * be.z);
+	float NEy = (float)fabs(mRModelToBox.m[0][1] * be.x) + (float)fabs(mRModelToBox.m[1][1] * be.y) + (float)fabs(mRModelToBox.m[2][1] * be.z);
 
 	if(mB0.y < NCy+NEy)	return FALSE;
 	if(mB1.y > NCy-NEy)	return FALSE;
 
 	float NCz = bc.x * mRModelToBox.m[0][2] + bc.y * mRModelToBox.m[1][2] + bc.z * mRModelToBox.m[2][2];
-	float NEz = fabs(mRModelToBox.m[0][2] * be.x) + fabs(mRModelToBox.m[1][2] * be.y) + fabs(mRModelToBox.m[2][2] * be.z);
+	float NEz = (float)fabs(mRModelToBox.m[0][2] * be.x) + (float)fabs(mRModelToBox.m[1][2] * be.y) + (float)fabs(mRModelToBox.m[2][2] * be.z);
 
 	if(mB0.z < NCz+NEz)	return FALSE;
 	if(mB1.z > NCz-NEz)	return FALSE;

@@ -323,12 +323,12 @@ bool AABBNoLeafTree::Build(AABBTree* tree)
 	udword i;  \
 	for(i=0;i<mNbNodes;i++)																\
 	{																							\
-		if(fabs(Nodes[i].mAABB.mCenter.x)>CMax.x)	CMax.x = fabs(Nodes[i].mAABB.mCenter.x);	\
-		if(fabs(Nodes[i].mAABB.mCenter.y)>CMax.y)	CMax.y = fabs(Nodes[i].mAABB.mCenter.y);	\
-		if(fabs(Nodes[i].mAABB.mCenter.z)>CMax.z)	CMax.z = fabs(Nodes[i].mAABB.mCenter.z);	\
-		if(fabs(Nodes[i].mAABB.mExtents.x)>EMax.x)	EMax.x = fabs(Nodes[i].mAABB.mExtents.x);	\
-		if(fabs(Nodes[i].mAABB.mExtents.y)>EMax.y)	EMax.y = fabs(Nodes[i].mAABB.mExtents.y);	\
-		if(fabs(Nodes[i].mAABB.mExtents.z)>EMax.z)	EMax.z = fabs(Nodes[i].mAABB.mExtents.z);	\
+		if(fabs(Nodes[i].mAABB.mCenter.x)>CMax.x)	CMax.x = (float)fabs(Nodes[i].mAABB.mCenter.x);	\
+		if(fabs(Nodes[i].mAABB.mCenter.y)>CMax.y)	CMax.y = (float)fabs(Nodes[i].mAABB.mCenter.y);	\
+		if(fabs(Nodes[i].mAABB.mCenter.z)>CMax.z)	CMax.z = (float)fabs(Nodes[i].mAABB.mCenter.z);	\
+		if(fabs(Nodes[i].mAABB.mExtents.x)>EMax.x)	EMax.x = (float)fabs(Nodes[i].mAABB.mExtents.x);	\
+		if(fabs(Nodes[i].mAABB.mExtents.y)>EMax.y)	EMax.y = (float)fabs(Nodes[i].mAABB.mExtents.y);	\
+		if(fabs(Nodes[i].mAABB.mExtents.z)>EMax.z)	EMax.z = (float)fabs(Nodes[i].mAABB.mExtents.z);	\
 	}
 #define INIT_QUANTIZATION             \
  udword nbc=15; /* Keep one bit for sign */        \

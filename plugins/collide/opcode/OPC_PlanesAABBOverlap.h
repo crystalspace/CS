@@ -33,7 +33,7 @@ inline_ BOOL PlanesCollider::PlanesAABBOverlap(const Point& center, const Point&
 	{
 		if(in_clip_mask & Mask)				// if clip plane is active, process it..
 		{               
-			float NP = extents.x*fabs(p->n.x) + extents.y*fabs(p->n.y) + extents.z*fabs(p->n.z);	// ### fabs could be precomputed
+			float NP = extents.x*(float)fabs(p->n.x) + extents.y*(float)fabs(p->n.y) + extents.z*(float)fabs(p->n.z);	// ### fabs could be precomputed
 			float MP = center.x*p->n.x + center.y*p->n.y + center.z*p->n.z + p->d;
 
 			if(NP < MP)						// near vertex behind the clip plane... 

@@ -143,7 +143,7 @@ bool AABBTreeNode::Subdivide(AABBTreeBuilder* builder)
 	if(mNbPrimitives<=builder->mLimit)	return true;
 
 	bool ValidSplit = true;	// Optimism...
-	udword NbPos;
+	udword NbPos = 0;
 	if(builder->mRules&SPLIT_LARGESTAXIS)
 	{
 		// Find the largest axis to split along
