@@ -47,13 +47,13 @@ struct iLightningFactoryState : public iBase
 
   ///
   virtual float GetLength () const = 0;
-  ///
+  /// 
   virtual void SetLength (float value) = 0;
-  ///
+  /// 
   virtual int GetPointCount () const = 0;
-  ///
+  /// 
   virtual void SetPointCount (int n) = 0;
-  ///
+  /// 
   virtual float GetWildness () const = 0;
   ///
   virtual void SetWildness (float value) = 0;
@@ -67,6 +67,10 @@ struct iLightningFactoryState : public iBase
   virtual const csVector3& GetDirectional () = 0;
   ///
   virtual void SetUpdateInterval (csTicks value) = 0;
+  ///
+  virtual float GetBandWidth () const = 0;
+  ///
+  virtual void SetBandWidth (float value) = 0;
 };
 
 SCF_VERSION (iLightningState, 0, 0, 1);

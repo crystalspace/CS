@@ -75,7 +75,9 @@ csLightningMeshObject::csLightningMeshObject (csLightningMeshObjectFactory* fact
   points = factory->GetPointCount();
   origin = factory->GetOrigin ();
   directional = factory->GetDirectional ();
-
+  wildness = factory->GetWildness ();
+  vibration = factory->GetVibration ();
+  bandwidth = factory->GetBandWidth ();
   
   GenMesh = factory->GetMeshFactory ()->NewInstance ();
   if (GenMesh)
@@ -150,9 +152,8 @@ bool csLightningMeshObject::Draw (iRenderView* rview, iMovable* movable,
 { 
   csReversibleTransform &camtr = rview->GetCamera ()->GetTransform ();
   csReversibleTransform &sprtr = movable->GetTransform ();
-  sprtr.LookAt(directional,
-      camtr.GetOrigin () - sprtr.GetOrigin ());
-
+  sprtr.LookAt(directional, camtr.GetOrigin () - sprtr.GetOrigin ());  
+  
   movable->UpdateMove ();
 
   return GenMesh->Draw (rview, movable, mode);  
@@ -186,14 +187,14 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csLightningMeshObjectFactory::csLightningMeshObjectFactory (iBase *pParent, iObjectRegistry *object_registry)
 {
-  MaxPoints = 32;
-  wildness = 0.1f;
-  vibrate = 0.1f;
-  glowsize = 0.1f;
-  length = 10;
+  MaxPoints = 20;
+  wildness = 0.02f;
+  vibrate = 0.02f;
+  glowsize = 0.02f;
+  length = 5;
+  bandwidth = 0.3f;
   update_interval = 60;
   update_counter = 0;
-  ZCalculated = false;
   
   SCF_CONSTRUCT_IBASE (pParent);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiLightningFactoryState);
@@ -231,15 +232,12 @@ void csLightningMeshObjectFactory::CalculateFractal (int left, int right,
   const int mid2 = mid * 2;
   switch (xyz)
   {
-    case 0:
-      Vertices[mid2].x = origin.x + midh + (vibrate * csRndNum(-5, 5) - (vibrate / 2));
-      break;
+    case 0:    
+      Vertices[mid2].x = origin.x + midh + (vibrate * csRndNum(-5, 5) - (vibrate / 2));      
+      break;    
     case 1:
       Vertices[mid2].y = origin.y + midh + (vibrate * csRndNum(-5, 5) - (vibrate / 2));
-      break;
-    case 2:
-      Vertices[mid2].z = origin.z + midh + (vibrate * csRndNum(-5, 5) - (vibrate / 2));
-
+      break;    
   }
 
   if (res == 1)
@@ -258,38 +256,25 @@ void csLightningMeshObjectFactory::CalculateFractal()
 
   csVector3 *Vertices = GenFactState->GetVertices();
 
-
   CalculateFractal(0, MaxPoints - 1, 0, 0, 0, GenFactState->GetVertices());
-  CalculateFractal(0, MaxPoints - 1, 0, 0, 1, GenFactState->GetVertices());
-  
+  CalculateFractal(0, MaxPoints - 1, 0, 0, 1, GenFactState->GetVertices());  
   
   Vertices[0] = origin;
-  Vertices[MaxPoints * 2 - 1].x = origin.x;
-  Vertices[MaxPoints * 2 - 1].y = origin.y;
-  Vertices[MaxPoints * 2 - 2].x = origin.x;
-  Vertices[MaxPoints * 2 - 2].y = origin.y;
   
+  float CurrZ = 0;
+  float ZStep = length / (float)MaxPoints;
   
-
-  if (!ZCalculated)
-  {
-    float CurrZ = 0;
-    float ZStep = length/((float)MaxPoints);
-    for (i = 0; i < m2; i++)
-    {      
-      Vertices[i].z = CurrZ + origin.z;      
-      if (i & 1)
-        CurrZ += ZStep;
-    }
-    ZCalculated = true;
-  }
+  Vertices[m2 - 2].x = origin.x;
 
   for ( i = 0; i < m2; i += 2 )
   {
-    Vertices[i + 1] = Vertices[i];
-    Vertices[i + 1].x += 0.3f;
-  }
-
+    Vertices[i + 1].x = Vertices[i].x + bandwidth;
+    Vertices[i + 1].y = Vertices[i].y;
+    Vertices[i].z = CurrZ + origin.z;
+    Vertices[i + 1].z = Vertices[i].z;
+    CurrZ += ZStep;
+  }  
+  
 }
 
 void csLightningMeshObjectFactory::NextFrame (csTicks CurrentTime)

@@ -57,7 +57,10 @@ class csLightningMeshObject : public iMeshObject
   csVector3 radius;
   long shapenr;
   csRefArray<iObjectModelListener> listeners;
-  float length;
+  float length;  
+  float wildness;
+  float vibration;
+  float bandwidth;
   csVector3 origin;
   csVector3 directional;
   int points;
@@ -189,17 +192,16 @@ public:
     ///
     virtual float GetWildness() const
     {
-      return 0.0f;
+      return scfParent->wildness;
     }
     ///
     virtual void SetWildness(float value)
     {
     }
-
     ///
     virtual float GetVibration() const
     {
-      return 0.0f;
+      return scfParent->vibration;
     }
     ///
     virtual void SetVibration(float value)
@@ -219,6 +221,14 @@ public:
     {
       
     }
+    virtual float GetBandWidth () const
+    {
+      return scfParent->bandwidth;
+    }
+    virtual void SetBandWidth (float value)
+    {
+      ///
+    }
   } scfiLightningState;
   friend class LightningState;
 };
@@ -230,13 +240,12 @@ class csLightningMeshObjectFactory : public iMeshObjectFactory
 {
 private:
 
-  bool ZCalculated;
-
   int MaxPoints;
   float glowsize;
   float vibrate;
   float wildness;
   float length;
+  float bandwidth;
   csTicks update_interval;
   csTicks update_counter;
   iMaterialWrapper* material;
@@ -273,6 +282,9 @@ public:
   const float GetVibration () { return vibrate; }
   /// Get wildness
   const float GetWildness () { return wildness; }  
+  /// 
+  const float GetBandWidth () { return bandwidth; }
+
   //------------------------ iMeshObjectFactory implementation --------------
   SCF_DECLARE_IBASE;
 
@@ -283,8 +295,7 @@ public:
   virtual iBase* GetLogicalParent () const { return logparent; }
   virtual void NextFrame (csTicks CurrentTime);
   virtual void Invalidate ()
-  { 
-    ZCalculated = false; 
+  {     
     if (GenMeshFact)
     {
       GenFactState = SCF_QUERY_INTERFACE(
@@ -294,8 +305,10 @@ public:
             
       csVector2 *Texels = GenFactState->GetTexels();
       csColor   *Colors = GenFactState->GetColors();
+      csVector3 *Vertices = GenFactState->GetVertices();
 
       int i;
+          
       for (i = 0; i < MaxPoints; i++ )
       {
         *Texels = csVector2 (i & 1, 0);
@@ -310,6 +323,7 @@ public:
       }
 
       csTriangle *Triangles = GenFactState->GetTriangles();
+      
       for ( i = 0; i < (MaxPoints - 1) * 2; i += 2 )
       {
         Triangles->a = i;
@@ -323,7 +337,6 @@ public:
       }
 
       CalculateFractal ();
-      
       GenFactState->CalculateNormals ();
       GenFactState->Invalidate ();
     }
@@ -345,9 +358,9 @@ public:
     virtual void SetMixMode (uint mode) { scfParent->MixMode = mode; }
     virtual uint GetMixMode () const { return scfParent->MixMode; }
     virtual void SetOrigin(const csVector3& pos) 
-    { 
-      scfParent->ZCalculated = false;
+    {       
       scfParent->origin = pos; 
+      scfParent->Invalidate();
     }
     virtual const csVector3& GetOrigin () const 
     {      
@@ -405,6 +418,14 @@ public:
     virtual void SetUpdateInterval (csTicks value)
     {
       scfParent->update_interval = value;
+    }
+    virtual float GetBandWidth () const
+    {
+      return scfParent->bandwidth;
+    }
+    virtual void SetBandWidth (float value)
+    {
+      scfParent->bandwidth = value;
     }
   } scfiLightningFactoryState;
   friend class LightningFactoryState;

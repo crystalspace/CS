@@ -325,18 +325,59 @@ bool Simple::Initialize ()
  
   csRef<iMeshObjectType> type (CS_LOAD_PLUGIN(PluginManager,
   	"crystalspace.mesh.object.lightning", iMeshObjectType));  
-  csRef<iMeshObjectFactory> LightningObjectFactory = type->NewFactory();  
-  csRef<iLightningFactoryState> LightningFactoryState = SCF_QUERY_INTERFACE(LightningObjectFactory, iLightningFactoryState);
-  LightningFactoryState->SetMaterialWrapper(engine->GetMaterialList()->FindByName("energy"));
-  LightningFactoryState->SetMixMode(CS_FX_ADD);
-  LightningFactoryState->SetOrigin(csVector3(0, 0, 0));
-  LightningFactoryState->SetPointCount(20);
-  LightningFactoryState->SetLength(5);
-  LightningFactoryState->SetVibration(0.02f);
-  LightningFactoryState->SetUpdateInterval(30);
-  LightningFactoryState->SetDirectional(csVector3(0, 1, 0));  
-  csRef<iMeshObject> mesh = LightningObjectFactory->NewInstance();    
-  csRef<iMeshWrapper> mw = engine->CreateMeshWrapper(mesh, "lightning", room, csVector3(0, 3, 4));
+
+  /// Lightning 1
+  csRef<iMeshObjectFactory> LightningObjectFactory1 = type->NewFactory();
+  csRef<iLightningFactoryState> LightningFactoryState1 = SCF_QUERY_INTERFACE(LightningObjectFactory1, iLightningFactoryState);
+
+  LightningFactoryState1->SetMaterialWrapper(engine->GetMaterialList()->FindByName("energy"));
+  LightningFactoryState1->SetMixMode(CS_FX_ADD);
+  LightningFactoryState1->SetOrigin(csVector3(0, 0, 0));
+  LightningFactoryState1->SetPointCount(20);
+  LightningFactoryState1->SetLength(5);
+  LightningFactoryState1->SetVibration(0.02f);
+  LightningFactoryState1->SetWildness(0.03f);
+  LightningFactoryState1->SetUpdateInterval(30);
+  LightningFactoryState1->SetDirectional(csVector3(0, 1, 0));  
+
+  csRef<iMeshObject> mesh1 = LightningObjectFactory1->NewInstance();    
+  csRef<iMeshWrapper> mw1 = engine->CreateMeshWrapper(mesh1, "lightning1", room, csVector3(-2, 3, 4));
+
+
+  /// Lightning 2
+  csRef<iMeshObjectFactory> LightningObjectFactory2 = type->NewFactory();
+  csRef<iLightningFactoryState> LightningFactoryState2 = SCF_QUERY_INTERFACE(LightningObjectFactory2, iLightningFactoryState);
+
+  LightningFactoryState2->SetMaterialWrapper(engine->GetMaterialList()->FindByName("energy"));
+  LightningFactoryState2->SetMixMode(CS_FX_ADD);
+  LightningFactoryState2->SetOrigin(csVector3(0, 0, 0));
+  LightningFactoryState2->SetPointCount(60);
+  LightningFactoryState2->SetLength(5);
+  LightningFactoryState2->SetVibration(0.03f);
+  LightningFactoryState2->SetWildness(0.06f);
+  LightningFactoryState2->SetUpdateInterval(50);
+  LightningFactoryState2->SetDirectional(csVector3(0, 1, 0));  
+                       
+  csRef<iMeshObject> mesh2 = LightningObjectFactory2->NewInstance();    
+  csRef<iMeshWrapper> mw2 = engine->CreateMeshWrapper(mesh2, "lightning2", room, csVector3(0, 3, 4));
+
+  ///Lightning 3
+  csRef<iMeshObjectFactory> LightningObjectFactory3 = type->NewFactory();
+  csRef<iLightningFactoryState> LightningFactoryState3 = SCF_QUERY_INTERFACE(LightningObjectFactory3, iLightningFactoryState);
+
+  LightningFactoryState3->SetMaterialWrapper(engine->GetMaterialList()->FindByName("energy"));
+  LightningFactoryState3->SetMixMode(CS_FX_ADD);
+  LightningFactoryState3->SetOrigin(csVector3(0, 0, 0));
+  LightningFactoryState3->SetPointCount(30);
+  LightningFactoryState3->SetLength(5);
+  LightningFactoryState3->SetVibration(0.02f);
+  LightningFactoryState3->SetWildness(0.09f);
+  LightningFactoryState3->SetUpdateInterval(60);
+  LightningFactoryState3->SetDirectional(csVector3(0, 1, 0));  
+  LightningFactoryState3->SetBandWidth (0.6f);
+
+  csRef<iMeshObject> mesh3 = LightningObjectFactory3->NewInstance();    
+  csRef<iMeshWrapper> mw3 = engine->CreateMeshWrapper(mesh3, "lightning3", room, csVector3(2, 3, 4));
 
   engine->Prepare ();
 
