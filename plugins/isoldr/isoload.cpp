@@ -98,6 +98,7 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (GRID)
   CS_TOKEN_DEF (GRIDS)
   CS_TOKEN_DEF (SPRITE)
+  CS_TOKEN_DEF (HEIGHTMAP)
   CS_TOKEN_DEF (MATERIAL)
   CS_TOKEN_DEF (MATERIALS)
   CS_TOKEN_DEF (SIZE)
@@ -690,6 +691,7 @@ bool csIsoLoader::ParseTile2D (char* buf, const char* /*prefix*/)
     CS_TOKEN_TABLE (END)
     CS_TOKEN_TABLE (MATERIAL)
     CS_TOKEN_TABLE (STYLE)
+    CS_TOKEN_TABLE (HEIGHTMAP)
   CS_TOKEN_TABLE_END
 
   char* tag = "crystalspace.iso.loader.parsetile2d";
@@ -698,6 +700,7 @@ bool csIsoLoader::ParseTile2D (char* buf, const char* /*prefix*/)
   long cmd;
   csVector3 start,end;
   int offx,offz;
+  int height_map = false;
 
   iMaterialWrapper *mat_wrap=0;
 
@@ -735,6 +738,10 @@ bool csIsoLoader::ParseTile2D (char* buf, const char* /*prefix*/)
             return false;
           }
         }
+        break;
+
+      case CS_TOKEN_HEIGHTMAP:
+        height_map = true;
         break;
 
       case CS_TOKEN_STYLE:
@@ -803,17 +810,20 @@ bool csIsoLoader::ParseTile2D (char* buf, const char* /*prefix*/)
 	  {
       for(x=QInt(start.x); x<end.x; x++)
 	    {
-//        ReportNotify("Tiling at %d %d %d",x,y,z);
+//        ReportNotify("Tiling at %d %d %d %f %f %f",x,y,z,start.x,start.y,start.z);
 
         sprite = Engine->CreateFloorSprite(csVector3(x,y,z), 1.0, 1.0);
         sprite->SetMaterialWrapper(mat_wrap);
         world->AddSprite(sprite);
         sprite->DecRef ();
 
-        // Set heightmap bsed on ground value precision ??
-        for(mj=0; mj<current_grid->GetGroundMultY(); mj++)
-          for(mi=0; mi<current_grid->GetGroundMultX(); mi++)
-            current_grid->SetGroundValue(z-offz, x-offx, mi, mj, y);
+        if (height_map == true)
+        {
+          // Set heightmap based on ground value precision ??
+          for(mj=0; mj<current_grid->GetGroundMultY(); mj++)
+            for(mi=0; mi<current_grid->GetGroundMultX(); mi++)
+              current_grid->SetGroundValue(z-offz, x-offx, mi, mj, y);
+        }
       }
     }
   } 
@@ -826,16 +836,19 @@ bool csIsoLoader::ParseTile2D (char* buf, const char* /*prefix*/)
       {
 //        ReportNotify("Tiling at %d %d %d",x,y,z);
 
-        sprite = Engine->CreateXWallSprite(csVector3(x,y,z), 1.0, 1.0);
+        sprite = Engine->CreateZWallSprite(csVector3(x,y,z), 1.0, 1.0);
         sprite->SetMaterialWrapper(mat_wrap);
         world->AddSprite(sprite);
         sprite->DecRef ();
       }
 
-	    // Only need to map for z iterations at max y coz x aint changin'
-      for(mj=0; mj<current_grid->GetGroundMultY(); mj++)
-        for(mi=0; mi<current_grid->GetGroundMultX(); mi++)
-	        current_grid->SetGroundValue(z-offz, x-offx, mi, mj, y);
+      if (height_map == true)
+      {
+  	    // Only need to map for z iterations at max y coz x aint changin'
+        for(mj=0; mj<current_grid->GetGroundMultY(); mj++)
+          for(mi=0; mi<current_grid->GetGroundMultX(); mi++)
+	          current_grid->SetGroundValue(z-offz, x-offx, mi, mj, y);
+      }
     }
   }
   else if (start.z == end.z)
@@ -847,16 +860,19 @@ bool csIsoLoader::ParseTile2D (char* buf, const char* /*prefix*/)
       {		
 //        ReportNotify("Tiling at %d %d %d",x,y,z);
         
-        sprite = Engine->CreateZWallSprite(csVector3(x,y,z), 1.0, 1.0);
+        sprite = Engine->CreateXWallSprite(csVector3(x,y,z), 1.0, 1.0);
         sprite->SetMaterialWrapper(mat_wrap);
         world->AddSprite(sprite);
         sprite->DecRef ();
       }
 
-	    // Only need to map for x iterations at max y coz z aint changin'
-      for(mj=0; mj<current_grid->GetGroundMultY(); mj++)
-        for(mi=0; mi<current_grid->GetGroundMultX(); mi++)
-	        current_grid->SetGroundValue(z-offz, x-offx, mi, mj, y);
+      if (height_map == true)
+      {
+        // Only need to map for x iterations at max y coz z aint changin'
+        for(mj=0; mj<current_grid->GetGroundMultY(); mj++)
+          for(mi=0; mi<current_grid->GetGroundMultX(); mi++)
+	          current_grid->SetGroundValue(z-offz, x-offx, mi, mj, y);
+      }
     }
   }
 
