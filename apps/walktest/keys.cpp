@@ -468,7 +468,7 @@ static bool CommandHandler (char *cmd, char *arg)
   {
     Command::perform (cmd, arg);
     Sys->Printf (MSG_CONSOLE, "-*- Additional commands -*-\n");
-    Sys->Printf (MSG_CONSOLE, " coordsave, coordload,\n");
+    Sys->Printf (MSG_CONSOLE, " coordsave, coordload, dumpvis\n");
     Sys->Printf (MSG_CONSOLE, " bind, fclear, addlight, dellight, dellights\n");
     Sys->Printf (MSG_CONSOLE, " picklight, droplight, colldet, stats, hi, frustrum\n");
     Sys->Printf (MSG_CONSOLE, " fps, perftest, capture, coordshow, zbuf, freelook\n");
@@ -517,6 +517,15 @@ static bool CommandHandler (char *cmd, char *arg)
     }
 
     s->FClose(fp);
+  }
+  else if (!strcasecmp (cmd, "dumpvis"))
+  {
+    extern int dump_visible_indent;
+    dump_visible_indent = 0;
+    Sys->Printf (MSG_DEBUG_0, "====================================================================\n");
+    extern void dump_visible (csRenderView* rview, int type, void* entity);
+    Sys->view->GetWorld ()->DrawFunc (Sys->piG3D, Sys->view->GetCamera (), Sys->view->GetClipper (), dump_visible);
+    Sys->Printf (MSG_DEBUG_0, "====================================================================\n");
   }
   else if (!strcasecmp (cmd, "bind"))
     bind_key (arg);

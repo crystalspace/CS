@@ -332,6 +332,106 @@ void draw_map (csRenderView* /*rview*/, int type, void* entity)
   }
 }
 
+// Callback for DrawFunc() to dump debug information about everything
+// that is currently visible. This is useful to debug clipping errors
+// and other visual errors.
+int dump_visible_indent = 0;
+void dump_visible (csRenderView* rview, int type, void* entity)
+{
+  int i;
+  char indent_spaces[255];
+  int ind = dump_visible_indent;
+  if (ind > 254) ind = 254;
+  for (i = 0 ; i < ind ; i++) indent_spaces[i] = ' ';
+  indent_spaces[ind] = 0;
+
+  if (type == CALLBACK_POLYGON)
+  {
+    csPolygon3D* poly = (csPolygon3D*)entity;
+    const char* name = csNameObject::GetName (*poly);
+    if (!name) name = "(NULL)";
+    const char* pname = csNameObject::GetName (*(csPolygonSet*)poly->GetParent ());
+    if (!pname) pname = "(NULL)";
+    Sys->Printf (MSG_DEBUG_0, "%03d%sPolygon '%s/%s' ------\n",
+    	dump_visible_indent, indent_spaces, pname, name);
+    if (poly->GetPortal ())
+      Sys->Printf (MSG_DEBUG_0, "%03d%s   | Polygon has a portal.\n",
+        dump_visible_indent, indent_spaces);
+    for (i = 0 ; i < poly->GetNumVertices () ; i++)
+    {
+      csVector3& vw = poly->Vwor (i);
+      csVector3& vc = poly->Vcam (i);
+      Sys->Printf (MSG_DEBUG_0, "%03d%s   | %d: wor=(%f,%f,%f) cam=(%f,%f,%f)\n",
+      	dump_visible_indent, indent_spaces, i, vw.x, vw.y, vw.z, vc.x, vc.y, vc.z);
+    }
+  }
+  else if (type == CALLBACK_POLYGON2D)
+  {
+    csPolygon2D* poly = (csPolygon2D*)entity;
+    Sys->Printf (MSG_DEBUG_0, "%03d%s2D Polygon ------\n", dump_visible_indent, indent_spaces);
+    for (i = 0 ; i < poly->GetNumVertices () ; i++)
+    {
+      csVector2 v = *poly->GetVertex (i);
+      Sys->Printf (MSG_DEBUG_0, "%03d%s   | %d: persp=(%f,%f)\n",
+      	dump_visible_indent, indent_spaces, i, v.x, v.y);
+    }
+  }
+  else if (type == CALLBACK_POLYGONQ)
+  {
+    G3DPolygonDPQ* dpq = (G3DPolygonDPQ*)entity;
+  }
+  else if (type == CALLBACK_SECTOR)
+  {
+    csSector* sector = (csSector*)entity;
+    const char* name = csNameObject::GetName (*sector);
+    if (!name) name = "(NULL)";
+    Sys->Printf (MSG_DEBUG_0, "%03d%s BEGIN Sector '%s' ------------\n",
+    	dump_visible_indent+1, indent_spaces, name);
+    for (i = 0 ; i < sector->GetNumVertices () ; i++)
+    {
+      csVector3& vw = sector->Vwor (i);
+      csVector3& vc = sector->Vcam (i);
+      Sys->Printf (MSG_DEBUG_0, "%03d%s   | %d: wor=(%f,%f,%f) cam=(%f,%f,%f)\n",
+      	dump_visible_indent+1, indent_spaces, i, vw.x, vw.y, vw.z, vc.x, vc.y, vc.z);
+    }
+    dump_visible_indent++;
+  }
+  else if (type == CALLBACK_SECTOREXIT)
+  {
+    csSector* sector = (csSector*)entity;
+    const char* name = csNameObject::GetName (*sector);
+    if (!name) name = "(NULL)";
+    Sys->Printf (MSG_DEBUG_0, "%03d%sEXIT Sector '%s' ------------\n",
+    	dump_visible_indent, indent_spaces, name);
+    dump_visible_indent--;
+  }
+  else if (type == CALLBACK_THING)
+  {
+    csThing* thing = (csThing*)entity;
+    const char* name = csNameObject::GetName (*thing);
+    if (!name) name = "(NULL)";
+    Sys->Printf (MSG_DEBUG_0, "%03d%s BEGIN Thing '%s' ------------\n",
+    	dump_visible_indent+1, indent_spaces, name);
+    for (i = 0 ; i < thing->GetNumVertices () ; i++)
+    {
+      csVector3& vw = thing->Vwor (i);
+      csVector3& vc = thing->Vcam (i);
+      Sys->Printf (MSG_DEBUG_0, "%03d%s   | %d: wor=(%f,%f,%f) cam=(%f,%f,%f)\n",
+      	dump_visible_indent+1, indent_spaces, i, vw.x, vw.y, vw.z, vc.x, vc.y, vc.z);
+    }
+    dump_visible_indent++;
+  }
+  else if (type == CALLBACK_THINGEXIT)
+  {
+    csThing* thing = (csThing*)entity;
+    const char* name = csNameObject::GetName (*thing);
+    if (!name) name = "(NULL)";
+    Sys->Printf (MSG_DEBUG_0, "%03d%sEXIT Thing '%s' ------------\n",
+    	dump_visible_indent, indent_spaces, name);
+    dump_visible_indent--;
+  }
+}
+
 //------------------------------------------------------------------------
 
 void WalkTest::DrawFrame (long elapsed_time, long current_time)
@@ -1159,7 +1259,7 @@ void WalkTest::EndWorld() {}
 
 void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
 {
-//  CsPrintf (MSG_INITIALIZATION, "Computing OBBs ...\n");
+//  Sys->Printf (MSG_INITIALIZATION, "Computing OBBs ...\n");
 
   int sn = world->sectors.Length ();
   while (sn > 0)
@@ -1194,7 +1294,7 @@ void WalkTest::InitWorld (csWorld* world, csCamera* /*camera*/)
 //  player = csBeing::PlayerSpawn("Player");
 
 //  init = true;
-//  CsPrintf (MSG_INITIALIZATION, "DONE\n");
+//  Sys->Printf (MSG_INITIALIZATION, "DONE\n");
 }
 
 /*---------------------------------------------------------------------*
