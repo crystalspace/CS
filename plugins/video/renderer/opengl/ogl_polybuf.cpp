@@ -438,6 +438,36 @@ return;
   qsort (lmqueue.GetArray (), lmqueue.Length (), sizeof (csLmQueue),
 		  sort_lmqueue);
 
+#if 0
+  int size = 16;
+  bool fit = false;
+  while (size <= 256)
+  {
+    csSubRectangles* tr = new csSubRectangles (csRect (0, 0, size, size));
+    int i;
+    fit = true;
+    for (i = 0 ; i < lmqueue.Length () ; i++)
+    {
+      csLmQueue& q = lmqueue[i];
+      iLightMap* lm = q.polytext->GetLightMap ();
+      if (lm)
+      {
+	csRect rect;
+        if (!tr->Alloc (lm->GetWidth (), lm->GetHeight (), rect))
+        {
+	  fit = false;
+	  break;
+        }
+      }
+    }
+    delete tr;
+    if (fit) break;
+    size = size + size;
+  }
+printf ("size=d\n", size); fflush (stdout);
+#endif
+
+
   int i;
   for (i = 0 ; i < lmqueue.Length () ; i++)
   {
