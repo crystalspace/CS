@@ -14,6 +14,9 @@ The history order is reversed so that new features are at the top.
 	  Now the source of AWS finally conforms to CS coding style rules.
 	- Completely reformatted the engine source code using the GC utility.
 	- Completely reformatted the csgeom source code using the GC utility.
+	- Fixed memory leaks in AWS related to the canvas. Changed
+	  behaviour of GetCanvas() so that it no longer increases ref count
+	  of returned canvas.
 14-Feb-2002
 	- Fixed new gridbag constraints in AWS so that it is an enum
 	  (static const int is not legal in C++) and also renamed

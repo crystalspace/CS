@@ -86,6 +86,7 @@ awsManager::~awsManager ()
 
   SCF_DEC_REF (prefmgr);
   SCF_DEC_REF (sinkmgr);
+  SCF_DEC_REF (canvas);
 
   void *p = component_factories.GetFirstItem ();
   while ((p = component_factories.GetCurrentItem ()))
@@ -247,7 +248,9 @@ void awsManager::SetCanvas (iAwsCanvas *newCanvas)
 
 iAwsCanvas *awsManager::GetCanvas ()
 {
-  if (canvas) canvas->IncRef ();
+  //@@@ Jorrit: I think this is wrong, isn't it?
+  // A getter should never increase ref count:
+  // if (canvas) canvas->IncRef ();
   return canvas;
 }
 
@@ -261,7 +264,9 @@ iAwsCanvas *awsManager::CreateDefaultCanvas (
       object_reg,
       engine,
       txtmgr);
-  SCF_INC_REF (canvas);
+  //@@@ Jorrit: When a canvas is created it already has
+  // ref count 1. So doing another incref is not good.
+  //SCF_INC_REF (canvas);
 
   return canvas;
 }
@@ -280,7 +285,9 @@ iAwsCanvas *awsManager::CreateDefaultCanvas (
       engine,
       txtmgr,
       name);
-  SCF_INC_REF (canvas);
+  //@@@ Jorrit: When a canvas is created it already has
+  // ref count 1. So doing another incref is not good.
+  //SCF_INC_REF (canvas);
 
   return canvas;
 }
@@ -291,7 +298,9 @@ iAwsCanvas *awsManager::CreateCustomCanvas (
 {
   iAwsCanvas *canvas = new awsScreenCanvas (g2d, g3d);
 
-  SCF_INC_REF (canvas);
+  //@@@ Jorrit: When a canvas is created it already has
+  // ref count 1. So doing another incref is not good.
+  //SCF_INC_REF (canvas);
 
   return canvas;
 }
