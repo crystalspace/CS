@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+30-Jul-2002
+	- Added simple csRefCount class which does reference counting
+	  without the need for iBase.
+	- Added csRef class which is a smart pointer class that works
+	  with both iBase and csRefCount pointers. Still in testing
+	  phase!
 29-Jul-2002
 	- Fixed a memory leak in csThing::PreparePolygonBuffer().
 27-Jul-2002
