@@ -610,13 +610,22 @@ iRigidBody* Simple::CreateWalls (const csVector3& radius)
 
   csOrthoTransform t;
 #if 0
-  // trying to make the sector walls into a mesh collider doesn't seem to work..
-  dynSys->AttachColliderMesh (walls, t,10,0);
+  // Enabling this will work, however, mesh<->mesh collision
+  // requires a lot of hand tuning. When this is enabled, 
+  // mesh objects created with 'm' will either sink through
+  // the floor, or stick in it.
+
+  // Some hints to make mesh<->mesh work better:
+  //  * Decrease the time step. 1/300th of a second minimum
+  //  * Slow down objects
+  //  * Play with softness, cfm, etc.
+  dynSys->AttachColliderMesh (walls, t,10,1);
 #endif
 #if 0
+  // mesh <-> plane doesn't work yet, so we will use boxes for each 
+  // wall for now
   for(int i = 0; i < walls_state->GetPolygonCount(); i++)
   {
-      // mesh -> plan doesn't work yet, so we will use boxes for each wall for now
       rb->AttachColliderPlane(walls_state->GetPolygonObjectPlane(i), 10, 0, 0);
   }
 #endif

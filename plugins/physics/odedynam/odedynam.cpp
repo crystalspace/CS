@@ -248,8 +248,8 @@ void csODEDynamics::NearCallback (void *data, dGeomID o1, dGeomID o2)
   if (b1 && b2 && b1->GetGroup() != 0 && b1->GetGroup() == b2->GetGroup()) 
     return;
 
-  dContact contact[64];
-  int a = dCollide (o1, o2, 64, &(contact[0].geom), sizeof (dContact));
+  dContact contact[512];
+  int a = dCollide (o1, o2, 512, &(contact[0].geom), sizeof (dContact));
   if (a > 0)
   {
     /* there is only 1 actual body per set */
@@ -654,7 +654,7 @@ bool csODEDynamicSystem::AttachColliderMesh (iMeshWrapper* mesh,
   }
   dTriMeshDataID TriData = dGeomTriMeshDataCreate();
   dGeomTriMeshDataBuildSingle(TriData, vertices, 3*sizeof(float),
-      p->GetVertexCount(), indeces, tr_num, 3*sizeof(int));
+      p->GetVertexCount(), indeces, tr_num*3, 3*sizeof(int));
   dGeomID gid = dCreateTriMesh(spaceID, TriData, 0, 0, 0);
   dGeomSetPosition (gid, trans.GetOrigin().x, trans.GetOrigin().y, trans.GetOrigin().z);
   dMatrix3 mat;

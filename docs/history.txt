@@ -6,6 +6,10 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+5-Feb-2005
+	- Mike Handverger fixed a bug in iDynamicSystem::AttachColliderMesh
+          ODE needs number of tris * 3 to build the mesh data.
+        - Mike Handverger added some notes in phystut regarding mesh colliders.
 4-Feb-2005
 	- Erotoman added new genmesh animation control plugin for skeletal animations
 	  Here are some features that plugin brings:
