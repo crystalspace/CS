@@ -20,6 +20,8 @@ The history order is reversed so that new features are at the top.
 	- res changed the nomenclature in the apimod paragraph about
 	  iPolygonMesh changes, after Jorrit pointed out it should rather
 	  read 'object' instead of 'factory'.
+	- Philip Wyett updated MSVC build docs to reflect a new msvc_libs
+	  release. This release has a number of fixes and removes libmikmod.
 8-May-2003
 	- Eric Sunshine fixed problem in MacOS/X OpenGL canvas where it was not
 	  specifying its SCF dependency properly.
