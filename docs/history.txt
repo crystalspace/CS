@@ -39,6 +39,7 @@ chronological order.
 	  wrong (parsing of heightmap generation, <alwaysanimate/> for
 	  procedural textures, <persistent/> for render steps, and terrfunc
 	  parser).
+	- Jorrit added two entries to the FAQ.
 6-Jun-2004
 	- Jorrit modified the Jamfile so that the isotest application
 	  is only build with new renderer.

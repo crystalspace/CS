@@ -184,6 +184,18 @@ nVidia cards only have accelerated stencil in 24/32-bit color mode and
 not in 16-bit mode.
 
 @item
+@strong{Q}: Should I use the new renderer or the old renderer architecture?
+
+@strong{A}: Crystal Space is currently in the process of moving from the
+old renderer architecture to a new one. The new renderer supports advanced
+OpenGL features like shaders, stencil shadows, and a lot more but it is still
+in an experimental stage (although we feel it is already working rather well).
+Basically we recommend using the new renderer architecture unless
+it doesn't work for you (in which case we like to hear a report), you need
+the software renderer, or you require another feature of the new renderer
+that we don't support yet (like one of the missing meshes, fog, @dots{}).
+
+@item
 @strong{Q}: I want to create textures for Crystal Space.  What palette should I
 use?  How big should I create the textures?  What format can I use?
 
@@ -210,6 +222,53 @@ each other or above each other the boundaries should seamlessly integrate with
 each other.  Of course, it is entirely possible to create textures that are
 specifically drawn for untiled usage.  An example would be a texture
 representing a computer keyboard.
+
+@item
+@strong{Q}: How can I actually make 3D models and levels for use in Crystal
+Space?
+
+@strong{A1}: For levels and objects using either @samp{genmesh} or @samp{thing}
+(i.e. non-animated) you can use @samp{Blender} (@uref{http://www.blender3d.org})
+together with @samp{Blend2CS}
+(@uref{http://projects.blender.org/projects/blend2cs/}). @samp{Blend2CS} works
+really well and is fully supported by the Crystal Space project. Using this
+convertor you can make full maps with support for portals and a lot more.
+
+@strong{A2}: For animated models using @sc{Cal3D} (@xref{MeshObject SprCal3D})
+you can also use @samp{Blender} which has support for @sc{Cal3D} objects.
+There is a tutorial on this subject at:
+@uref{http://www.cs.indiana.edu/~joellis/CSIntro.html}.
+
+@strong{A3}: For levels and objects using either @samp{genmesh} or @samp{thing}
+you can also use @samp{3dsMax}. There is a @samp{3dsMax} exporter plugin
+included with Crystal Space (in @file{CS/scripts/max}) with associated
+documentation which works very well. This script is made and used by the 
+PlaneShift project: @uref{http://www.planeshift.it}. There is a tutorial
+on this exporter at: @uref{http://lww.demon-host.com/html/guide/}.
+
+@strong{A4}: For animated models using @sc{Cal3D} you can also use
+@samp{3dsMax}. There is a tutorial on this subject at:
+@uref{http://cal3d.sourceforge.net/modeling/tutorial.html}.
+
+@strong{A5}: Crystal Space still has the @samp{Map2CS} utility
+(@xref{map2cs Tutorial} and @xref{map2cs}) which can be used to convert
+levels from @samp{Q3Radiant}, @samp{Hammer}, or @samp{QuarK}. This tool is
+still somewhat supported but it lacks the advanced features and control of
+the tools mentioned above. We are basically still looking for a maintainer
+willing to work further on @samp{Map2CS}.
+
+@strong{A6}: There is a @samp{Maya2Spr} utility included with Crystal Space
+which can convert Maya files to 3D sprites. Not for levels though.
+
+@strong{A7}: There is a @samp{3ds2lev} utility to convert @samp{3ds} files
+to either a level or a 3D sprite model. This tool is very limited though
+and the generated levels usually require hand-editing.
+
+@strong{A8}: There is @samp{md22spr} which can convert Quake @sc{md2} and
+@sc{mdl} models to Crystal Space 3D sprites. The animation frames are also
+properly converted. This will not generate @samp{Cal3D} models!
+
+@strong{A9}: There is @samp{md32spr} which can convert Quake @sc{md3} models.
 
 @item
 @strong{Q}: I would like to contribute to Crystal Space.  What can I do?
