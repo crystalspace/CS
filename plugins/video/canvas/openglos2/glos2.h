@@ -92,7 +92,6 @@ public:
   virtual bool DoubleBuffer (bool Enable);
   virtual bool DoubleBuffer ();
 
-  virtual void Clear (int color);
   virtual void SetRGB (int i, int r, int g, int b);
 
   virtual bool BeginDraw ();

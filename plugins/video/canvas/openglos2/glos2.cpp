@@ -358,11 +358,6 @@ bool csGraphics2DOS2GL::DoubleBuffer ()
   return true;
 }
 
-void csGraphics2DOS2GL::Clear (int color)
-{
-  glClear (GL_COLOR_BUFFER_BIT);
-}
-
 void csGraphics2DOS2GL::SetRGB (int i, int r, int g, int b)
 {
   // set a rgb color in the palette of your graphic interface
