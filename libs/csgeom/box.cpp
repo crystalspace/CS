@@ -23,6 +23,18 @@
 
 //---------------------------------------------------------------------------
 
+csBox2::bEdge csBox2::edges[8] =
+  {
+    { BOX_CORNER_xy, BOX_CORNER_Xy },
+    { BOX_CORNER_Xy, BOX_CORNER_xy },
+    { BOX_CORNER_Xy, BOX_CORNER_XY },
+    { BOX_CORNER_XY, BOX_CORNER_Xy },
+    { BOX_CORNER_XY, BOX_CORNER_xY },
+    { BOX_CORNER_xY, BOX_CORNER_XY },
+    { BOX_CORNER_xY, BOX_CORNER_xy },
+    { BOX_CORNER_xy, BOX_CORNER_xY }
+  };
+
 csVector2 csBox2::GetCorner (int corner) const
 {
   switch (corner)
@@ -33,18 +45,6 @@ csVector2 csBox2::GetCorner (int corner) const
     case BOX_CORNER_XY: return Max ();
   }
   return csVector2 (0, 0);
-}
-
-csSegment2 csBox2::GetEdge (int edge) const
-{
-  switch (edge)
-  {
-    case 0: return csSegment2 (GetCorner (0), GetCorner (1));
-    case 1: return csSegment2 (GetCorner (0), GetCorner (2));
-    case 2: return csSegment2 (GetCorner (1), GetCorner (3));
-    case 3: return csSegment2 (GetCorner (2), GetCorner (3));
-  }
-  return csSegment2 ();
 }
 
 void csBox2::SetCenter (const csVector2& c)
@@ -244,6 +244,46 @@ static Outline outlines[27] =
   { 6, {6,2,3,1,5,4},       3, {BOX_SIDE_X,BOX_SIDE_Y,BOX_SIDE_Z} }	// 2,2,2
 };
 
+csBox3::bEdge csBox3::edges[24] =
+  {
+    { BOX_CORNER_Xyz, BOX_CORNER_xyz, BOX_SIDE_y, BOX_SIDE_z },
+    { BOX_CORNER_xyz, BOX_CORNER_Xyz, BOX_SIDE_z, BOX_SIDE_y },
+    { BOX_CORNER_xyz, BOX_CORNER_xYz, BOX_SIDE_x, BOX_SIDE_z },
+    { BOX_CORNER_xYz, BOX_CORNER_xyz, BOX_SIDE_z, BOX_SIDE_x },
+    { BOX_CORNER_xYz, BOX_CORNER_XYz, BOX_SIDE_Y, BOX_SIDE_z },
+    { BOX_CORNER_XYz, BOX_CORNER_xYz, BOX_SIDE_z, BOX_SIDE_Y },
+    { BOX_CORNER_XYz, BOX_CORNER_Xyz, BOX_SIDE_X, BOX_SIDE_z },
+    { BOX_CORNER_Xyz, BOX_CORNER_XYz, BOX_SIDE_z, BOX_SIDE_X },
+
+    { BOX_CORNER_Xyz, BOX_CORNER_XyZ, BOX_SIDE_X, BOX_SIDE_y },
+    { BOX_CORNER_XyZ, BOX_CORNER_Xyz, BOX_SIDE_y, BOX_SIDE_X },
+    { BOX_CORNER_XyZ, BOX_CORNER_XYZ, BOX_SIDE_X, BOX_SIDE_Z },
+    { BOX_CORNER_XYZ, BOX_CORNER_XyZ, BOX_SIDE_Z, BOX_SIDE_X },
+    { BOX_CORNER_XYZ, BOX_CORNER_XYz, BOX_SIDE_X, BOX_SIDE_Y },
+    { BOX_CORNER_XYz, BOX_CORNER_XYZ, BOX_SIDE_Y, BOX_SIDE_X },
+    { BOX_CORNER_XYZ, BOX_CORNER_xYZ, BOX_SIDE_Y, BOX_SIDE_Z },
+    { BOX_CORNER_xYZ, BOX_CORNER_XYZ, BOX_SIDE_Z, BOX_SIDE_Y },
+
+    { BOX_CORNER_xYZ, BOX_CORNER_xYz, BOX_SIDE_Y, BOX_SIDE_x },
+    { BOX_CORNER_xYz, BOX_CORNER_xYZ, BOX_SIDE_x, BOX_SIDE_Y },
+    { BOX_CORNER_xYZ, BOX_CORNER_xyZ, BOX_SIDE_x, BOX_SIDE_Z },
+    { BOX_CORNER_xyZ, BOX_CORNER_xYZ, BOX_SIDE_Z, BOX_SIDE_x },
+    { BOX_CORNER_xyZ, BOX_CORNER_xyz, BOX_SIDE_x, BOX_SIDE_y },
+    { BOX_CORNER_xyz, BOX_CORNER_xyZ, BOX_SIDE_y, BOX_SIDE_x },
+    { BOX_CORNER_xyZ, BOX_CORNER_XyZ, BOX_SIDE_y, BOX_SIDE_Z },
+    { BOX_CORNER_XyZ, BOX_CORNER_xyZ, BOX_SIDE_Z, BOX_SIDE_y }
+  };
+// Index by BOX_SIDE_? number.
+csBox3::bFace csBox3::faces[6] =
+  {
+    { BOX_EDGE_xyz_xyZ, BOX_EDGE_xyZ_xYZ, BOX_EDGE_xYZ_xYz, BOX_EDGE_xYz_xyz },
+    { BOX_EDGE_XYz_XYZ, BOX_EDGE_XYZ_XyZ, BOX_EDGE_XyZ_Xyz, BOX_EDGE_Xyz_XYz },
+    { BOX_EDGE_xyz_Xyz, BOX_EDGE_Xyz_XyZ, BOX_EDGE_XyZ_xyZ, BOX_EDGE_xyZ_xyz },
+    { BOX_EDGE_xYZ_XYZ, BOX_EDGE_XYZ_XYz, BOX_EDGE_XYz_xYz, BOX_EDGE_xYz_xYZ },
+    { BOX_EDGE_xYz_XYz, BOX_EDGE_XYz_Xyz, BOX_EDGE_Xyz_xyz, BOX_EDGE_xyz_xYz },
+    { BOX_EDGE_XYZ_xYZ, BOX_EDGE_xYZ_xyZ, BOX_EDGE_xyZ_XyZ, BOX_EDGE_XyZ_XYZ }
+  };
+
 csVector3 csBox3::GetCorner (int corner) const
 {
   switch (corner)
@@ -258,26 +298,6 @@ csVector3 csBox3::GetCorner (int corner) const
     case BOX_CORNER_XYZ: return Max ();
   }
   return csVector3 (0, 0, 0);
-}
-
-csSegment3 csBox3::GetEdge (int edge) const
-{
-  switch (edge)
-  {
-    case 0: return csSegment3 (GetCorner (0), GetCorner (1));
-    case 1: return csSegment3 (GetCorner (0), GetCorner (2));
-    case 2: return csSegment3 (GetCorner (0), GetCorner (4));
-    case 3: return csSegment3 (GetCorner (4), GetCorner (5));
-    case 4: return csSegment3 (GetCorner (4), GetCorner (6));
-    case 5: return csSegment3 (GetCorner (1), GetCorner (5));
-    case 6: return csSegment3 (GetCorner (1), GetCorner (3));
-    case 7: return csSegment3 (GetCorner (5), GetCorner (7));
-    case 8: return csSegment3 (GetCorner (3), GetCorner (7));
-    case 9: return csSegment3 (GetCorner (6), GetCorner (7));
-    case 10: return csSegment3 (GetCorner (2), GetCorner (3));
-    case 11: return csSegment3 (GetCorner (2), GetCorner (6));
-  }
-  return csSegment3 ();
 }
 
 void csBox3::SetCenter (const csVector3& c)

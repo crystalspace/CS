@@ -206,10 +206,9 @@ int csMath3::OuterPlanes (const csBox3& box1, const csBox3& box2,
     // are just edges with inverted direction.
     for (j = 0 ; j < 24 ; j++)
     {
-      csSegment3 seg = box2.GetEdge (j % 12);
+      csSegment3 seg = box2.GetEdge (j);
       csVector3 v2a, v2b;
-      if (j < 12) { v2a = seg.Start (); v2b = seg.End (); }
-      else { v2a = seg.End (); v2b = seg.Start (); }
+      v2a = seg.Start (); v2b = seg.End ();
       csPlane3 pl (v1, v2a, v2b);
       pl.Normalize ();
       // Check if we already have this plane.
@@ -238,12 +237,7 @@ int csMath3::OuterPlanes (const csBox3& box1, const csBox3& box2,
         if (num_planes >= 8)
 	{
 	  printf ("INTERNAL ERROR! OuterPlanes returns too many planes!\n");
-
-          //Thomas Hieber 2000-04-27: replaced fatal_exit with exit, because
-          //fatal_exit is defined in libs/system/system.cpp, and I don't think
-          //math3d.cpp should depend on this!
-          exit(0); 
-	  //fatal_exit (0, false);
+          exit (0); 
 	}
 	planes[num_planes++] = pl;
       }

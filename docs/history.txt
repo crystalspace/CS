@@ -1,6 +1,36 @@
 The history order has been reversed so that new features are at the top.
 
+16-Oct-2000
+	- Changed the meaning of csBox3::GetEdge so that it more conforms
+	  to the new indices defined in GetEdgeInfo().
+	  Added a second variant of GetEdge which fills in a given
+	  csSegment3 structure.
+	- Also did similar things to csBox2 (i.e. add GetEdgeInfo(), GetEdge(),
+	  ...).
+15-Oct-2000
+	- Added csBox3::GetEdgeInfo() and GetFaceEdges() which can be
+	  used to extract winged-edge information from a csBox3.
+	- Michael Dale Long did a big CrystalClear update. Most of it is
+	  related to moving CC away from impulses and towards using csEvent.
+	  csEventCords is in this update as well. cctest input changes
+	  are in this commit as well.
+	- Norman Kramer solved the walktest problem with the 12 remaining
+	  instances of colldet at exit.  When a thing deletes its attached
+	  objects it calls their destructors, wentity destructor itself
+	  removed  _this_ object from parent and shifted others down.
+	- Norman added a curve_templates member to the world. Parser
+	  now saves the loaded templates there (until now it forgot about
+	  it and never freed memory for them).
+	- Norman closed three memory leaks in sector.cpp and particle systems.
+	- Norman added a proper DecRef to iSoundData in csparser.
+14-Oct-2000
+	- Norman Kramer added initialization of BackTex member in csws, now
+	  cswstest works again (window background look good).
+	- Further work on leaf BSP builder in LevTool. Finished BSP
+	  builder and started work on portalizer.
 13-Oct-2000
+	- Martin Geisse improved the sound loading function of csparser.
+	- Martin also updated the MSVC project files.
 	- Eric Sunshine made the following maintenance changes to the BeOS
 	  port:
 	    - Repaired so that it once again compiles and works following the
@@ -117,6 +147,9 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine fixed the 'clean --> cleandoc' chain rule in docs.mak
 	  which broke on September 29, 2000.
 12-Oct-2000
+	- Thomas Hieber fnished implementing the attribute System, including
+	  all container classes specified in icsgame (untested).
+	- Improved the leafy BSP tree builder in LevTool.
 	- Disabled a new CS_ASSERT that was put in csVector::Get(). The
 	  problem was that some code in CS assumes that Get() also extends
 	  the array. It is a bit too complicated to fix this now (I'm busy
