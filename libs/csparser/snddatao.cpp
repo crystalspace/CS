@@ -22,6 +22,7 @@
 #include "cssysdef.h"
 #include "isound/handle.h"
 #include "csparser/snddatao.h"
+#include "csobject/csobject.h"
 
 IMPLEMENT_CSOBJTYPE (csSoundWrapper,csObject);
 
@@ -51,8 +52,9 @@ iSoundHandle* csSoundWrapper::GetSound ()
   return SoundHandle;
 }
 
-iSoundHandle* csSoundWrapper::GetSound (csObject& csobj, const char* name)
+iSoundHandle* csSoundWrapper::GetSound (iObject* iobj, const char* name)
 {
+  csObject &csobj = *((csObject*)iobj);
   if (!name) return NULL;
   csObjIterator i = csobj.GetIterator (csSoundWrapper::Type);
   while (!i.IsNull ())

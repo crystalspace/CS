@@ -1510,8 +1510,8 @@ bool WalkTest::Initialize (int argc, const char* const argv[], const char *iConf
 
   // Load a few sounds.
 #ifdef DO_SOUND
-  wMissile_boom = csSoundWrapper::GetSound(*engine, "boom.wav");
-  wMissile_whoosh = csSoundWrapper::GetSound(*engine, "whoosh.wav");
+  wMissile_boom = csSoundWrapper::GetSound(engine->QueryObject(), "boom.wav");
+  wMissile_whoosh = csSoundWrapper::GetSound(engine->QueryObject(), "whoosh.wav");
 #endif
 
   Printf (MSG_INITIALIZATION, "--------------------------------------\n");

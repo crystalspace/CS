@@ -1903,7 +1903,7 @@ bool CommandHandler (const char *cmd, const char *arg)
     if (Sys->Sound)
     {
       iSoundHandle *sb =
-        csSoundWrapper::GetSound(*(Sys->view->GetEngine()), arg);
+        csSoundWrapper::GetSound(Sys->view->GetEngine()->QueryObject(), arg);
       if (sb)
         sb->Play();
       else

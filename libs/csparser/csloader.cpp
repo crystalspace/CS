@@ -31,6 +31,7 @@
 #include "imap/reader.h"
 #include "imesh/sprite3d.h"
 #include "imesh/skeleton.h"
+#include "imesh/object.h"
 #include "iengine/engine.h"
 #include "iengine/motion.h"
 #include "iengine/skelbone.h"
@@ -45,6 +46,8 @@
 #include "iengine/halo.h"
 #include "iengine/light.h"
 #include "iengine/statlght.h"
+#include "iengine/mesh.h"
+#include "iengine/thing.h"
 #include "isound/data.h"
 #include "isound/loader.h"
 #include "isound/renderer.h"
@@ -58,7 +61,6 @@
 #include "igraphic/imageio.h"
 
 #include "csengine/material.h"
-#include "csengine/engine.h"
 #include "csengine/keyval.h"
 
 //---------------------------------------------------------------------------
@@ -1012,9 +1014,9 @@ bool csLoader::LoadMap (char* buf)
 	    char str[255];
 	    ScanStr (params, "%s", str);
 	    if (*str)
-	      Engine->GetCsEngine()->SelectRegion (str);
+	      Engine->SelectRegion (str);
 	    else
-	      Engine->GetCsEngine()->SelectRegion (NULL);
+	      Engine->SelectRegion (NULL);
 	  }
 	  break;
         case CS_TOKEN_SECTOR:
@@ -1057,7 +1059,7 @@ bool csLoader::LoadMap (char* buf)
           break;
         }
         case CS_TOKEN_KEY:
-          load_key (params, Engine->GetCsEngine());
+          load_key (params, Engine->QueryObject());
           break;
       }
     }
@@ -1090,7 +1092,7 @@ bool csLoader::LoadMap (char* buf)
 bool csLoader::LoadMapFile (const char* file, bool iClearEngine, bool iOnlyRegion)
 {
   Stats->Init ();
-  if (iClearEngine) Engine->GetCsEngine()->StartEngine ();
+  if (iClearEngine) Engine->DeleteAll ();
   ResolveOnlyRegion = iOnlyRegion;
 
   iDataBuffer *buf = VFS->ReadFile (file);
@@ -1370,7 +1372,7 @@ bool csLoader::LoadSounds (char* buf)
           System->Printf (MSG_FATAL_ERROR, "Unknown token '%s' found while parsing SOUND directive.\n", csGetLastOffender());
           fatal_exit (0, false);
         }
-        iSoundHandle *snd = csSoundWrapper::GetSound (*Engine->GetCsEngine(), name);
+        iSoundHandle *snd = csSoundWrapper::GetSound (Engine->QueryObject(), name);
         if (!snd)
           LoadSound(name, filename);
       }

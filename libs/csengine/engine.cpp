@@ -2073,6 +2073,7 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (iMeshObjectFactory *fact,
 
   csMeshFactoryWrapper* mfactwrap = new csMeshFactoryWrapper (fact);
   if (name) mfactwrap->SetName (name);
+  mfactwrap->IncRef ();
   mesh_factories.Push (mfactwrap);
   return &mfactwrap->scfiMeshFactoryWrapper;
 }
@@ -2087,6 +2088,7 @@ iMeshFactoryWrapper* csEngine::CreateMeshFactory (const char* name)
 
   csMeshFactoryWrapper* mfactwrap = new csMeshFactoryWrapper ();
   if (name) mfactwrap->SetName (name);
+  mfactwrap->IncRef ();
   mesh_factories.Push (mfactwrap);
   return &mfactwrap->scfiMeshFactoryWrapper;
 }
@@ -2152,6 +2154,7 @@ iMeshWrapper* csEngine::LoadMeshObject (
 
   csMeshWrapper* meshwrap = new csMeshWrapper (this);
   if (name) meshwrap->SetName (name);
+  meshwrap->IncRef ();
   meshes.Push (meshwrap);
   if (sector)
   {
@@ -2186,6 +2189,7 @@ iMeshWrapper* csEngine::CreateMeshObject (iMeshObject* mesh,
 {
   csMeshWrapper* meshwrap = new csMeshWrapper (this, mesh);
   if (name) meshwrap->SetName (name);
+  meshwrap->IncRef ();
   meshes.Push (meshwrap);
   if (sector)
   {
@@ -2200,6 +2204,7 @@ iMeshWrapper* csEngine::CreateMeshObject (const char* name)
 {
   csMeshWrapper* meshwrap = new csMeshWrapper (this);
   if (name) meshwrap->SetName (name);
+  meshwrap->IncRef ();
   meshes.Push (meshwrap);
   return &meshwrap->scfiMeshWrapper;
 }
@@ -2244,6 +2249,7 @@ iTerrainFactoryWrapper* csEngine::CreateTerrainFactory
 
   csTerrainFactoryWrapper* fwrap = new csTerrainFactoryWrapper (fact);
   if (pName) fwrap->SetName (pName);
+  fwrap->IncRef ();
   terrain_factories.Push (fwrap);
   return &fwrap->scfiTerrainFactoryWrapper;
 }
@@ -2259,6 +2265,7 @@ iTerrainFactoryWrapper* csEngine::CreateTerrainFactory(const char* pName)
 
   csTerrainFactoryWrapper* fwrap = new csTerrainFactoryWrapper ();
   if (pName) fwrap->SetName (pName);
+  fwrap->IncRef ();
   terrain_factories.Push (fwrap);
   return &fwrap->scfiTerrainFactoryWrapper;
 }
@@ -2278,6 +2285,7 @@ iTerrainWrapper* csEngine::CreateTerrainObject (iTerrainObject *terr,
 {
   csTerrainWrapper *twrap = new csTerrainWrapper (this, terr);
   if (pName) twrap->SetName (pName);
+  twrap->IncRef ();
   terrains.Push (twrap);
 
   // add new terrain to sector
@@ -2290,6 +2298,7 @@ iTerrainWrapper* csEngine::CreateTerrainObject (const char *pName)
 {
   csTerrainWrapper *twrap = new csTerrainWrapper (this);
   if (pName) twrap->SetName (pName);
+  twrap->IncRef ();
   terrains.Push (twrap);
   return &twrap->scfiTerrainWrapper;
 }

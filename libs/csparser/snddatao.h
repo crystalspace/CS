@@ -38,7 +38,7 @@ public:
   ///
   iSoundHandle* GetSound();
   ///
-  static iSoundHandle* GetSound(csObject& csobj, const char* name);
+  static iSoundHandle* GetSound(iObject* obj, const char* name);
 
   CSOBJTYPE;
   DECLARE_IBASE;
