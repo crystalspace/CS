@@ -8,7 +8,7 @@ def do_listdir(InDir):
 		print x
 	print
 	
-UserImports = ['csshex', 'sys', 'os']
+UserImports = ['*csshex', '*sys', '*os', '*cspace', 'cspacec']
 
 UserAlias={
 	'quit':'sys.exit(0)', 

@@ -29,19 +29,19 @@ class Vector3Ptr :
     def __repr__(self):
         return "<C Vector3 instance>"
 class Vector3(Vector3Ptr):
-    def __init__(self) :
-        self.this = cspacec.new_Vector3()
+    def __init__(self,arg0,arg1,arg2) :
+        self.this = cspacec.new_Vector3(arg0,arg1,arg2)
         self.thisown = 1
 
 
 
-def Vector3_s(arg0) :
-    val = Vector3Ptr(cspacec.new_Vector3_s(arg0))
+def Vector3n() :
+    val = Vector3Ptr(cspacec.new_Vector3n())
     val.thisown = 1
     return val
 
-def Vector3_xyz(arg0,arg1,arg2) :
-    val = Vector3Ptr(cspacec.new_Vector3_xyz(arg0,arg1,arg2))
+def Vector3s(arg0) :
+    val = Vector3Ptr(cspacec.new_Vector3s(arg0))
     val.thisown = 1
     return val
 
