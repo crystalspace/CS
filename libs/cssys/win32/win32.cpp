@@ -768,7 +768,7 @@ void SysSystemDriver::Help ()
     need_console ? "yes" : "no");
 }
 
-void csSystemDriver::console_out (const char *str)
+void csSystemDriver::ConsoleOut (const char *str)
 {
   fputs (str, stdout);
 }  

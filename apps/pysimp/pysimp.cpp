@@ -62,7 +62,7 @@ PySimple::~PySimple ()
 
 void Cleanup ()
 {
-  System->console_out ("Cleaning up...\n");
+  System->ConsoleOut ("Cleaning up...\n");
   delete System;
 }
 

@@ -3072,7 +3072,7 @@ void Blocks::TerminateConnection()
 void Cleanup ()
 {
   if (Sys)
-    Sys->console_out ("Cleaning up...\n");
+    Sys->ConsoleOut ("Cleaning up...\n");
   delete Sys;
   Sys = NULL;
 }

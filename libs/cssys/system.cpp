@@ -740,13 +740,13 @@ void csSystemDriver::Help ()
 
 void csSystemDriver::Alert (const char* msg)
 {
-  console_out (msg);
+  ConsoleOut (msg);
   debug_out (true, msg);
 }
 
 void csSystemDriver::Warn (const char* msg)
 {
-  console_out (msg);
+  ConsoleOut (msg);
   debug_out (true, msg);
 }
 
@@ -874,7 +874,7 @@ void csSystemDriver::PrintfV (int mode, char const* format, va_list args)
       break;
 
     case CS_MSG_INITIALIZATION:
-      console_out (buf);
+      ConsoleOut (buf);
       debug_out (true, buf);
       if (Console)
         Console->PutText (CS_MSG_INITIALIZATION, buf);
@@ -884,11 +884,11 @@ void csSystemDriver::PrintfV (int mode, char const* format, va_list args)
       if (Console)
         Console->PutText (CS_MSG_CONSOLE, buf);
       else
-        console_out (buf);
+        ConsoleOut (buf);
       break;
 
     case CS_MSG_STDOUT:
-      console_out (buf);
+      ConsoleOut (buf);
       break;
 
     case CS_MSG_DEBUG_0:

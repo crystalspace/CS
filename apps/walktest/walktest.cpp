@@ -1095,7 +1095,7 @@ void CaptureScreen ()
 
 void Cleanup ()
 {
-  Sys->console_out ("Cleaning up...\n");
+  Sys->ConsoleOut ("Cleaning up...\n");
   free_keymap ();
   Sys->EndEngine ();
   delete Sys; Sys = NULL;

@@ -31,7 +31,7 @@
 extern bool EnablePrintf;
 
 // to be called instead of printf (exact same prototype/functionality of printf)
-void csSystemDriver::console_out (const char *str)
+void csSystemDriver::ConsoleOut (const char *str)
 {
   if (EnablePrintf)
   {
