@@ -350,6 +350,7 @@ public:
       return scfParent->ClipBBox (sbox, cbox, do_clip);
     }
   } scfiRenderView;
+  friend class RenderView;
 };
 
 /**
