@@ -4,6 +4,10 @@
 # are specific to a given platform, if necessary.
 #------------------------------------------------------------------------------
 
+# The command for running shell scripts (usually the same as SHELL)
+
+RUN_SCRIPT=$(SHELL)
+
 # Typical extension for executables on this system (e.g. EXE=.exe)
 EXE=.exe
 

@@ -204,6 +204,11 @@ endif # ifeq ($(MAKESECTION),defines)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
+# If SHELL is the Windows COMMAND or CMD, then we need "bash" for scripts.
+ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL))$(findstring cmd,$(SHELL))$(findstring CMD,$(SHELL)))
+  RUN_SCRIPT = bash
+endif
+
 # How to make shared libs for cs-config
 LINK.PLUGIN=dllwrap
 PLUGIN.POSTFLAGS=-mwindows -mconsole
@@ -213,11 +218,7 @@ PLUGIN.POSTFLAGS=-mwindows -mconsole
 #  dllwrap $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows 
 
 # uncomment the following to enable workaround for dllwrap bug
-ifneq (,$(findstring command,$(SHELL))$(findstring COMMAND,$(SHELL))$(findstring cmd,$(SHELL))$(findstring CMD,$(SHELL)))
-  DLLWRAPWRAP = bash libs/cssys/win32/dllwrapwrap.sh
-else
-  DLLWRAPWRAP = $(SHELL) libs/cssys/win32/dllwrapwrap.sh
-endif
+DLLWRAPWRAP = $(RUN_SCRIPT) libs/cssys/win32/dllwrapwrap.sh
 
 DO.SHARED.PLUGIN.CORE = \
   $(DLLWRAPWRAP) $* $(LFLAGS.DLL) $(LFLAGS.@) $(^^) $(L^) $(LIBS) $(LFLAGS) -mwindows
