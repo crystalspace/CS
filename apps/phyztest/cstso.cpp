@@ -75,7 +75,8 @@ void csRigidSpaceTimeObj::update_space()
   ctMatrix3 M;
   csRigidSpaceTimeObj *sto;
 
-  for( int i = 0; i < continuum_end; i++ )
+  int i;
+  for(i = 0; i < continuum_end; i++)
   {
     sto = space_time_continuum[i];
     new_p = sto->rb->get_pos();
@@ -115,7 +116,8 @@ real csRigidSpaceTimeObj::collision_check()
 
   max_depth = 0;
 
-  for( int i = 0; i < continuum_end; i++ )
+  int i;
+  for(i = 0; i < continuum_end; i++)
   {
     first_sector = space_time_continuum[i]->sprt->GetMovable ()->GetSector (0);
     // Start collision detection.

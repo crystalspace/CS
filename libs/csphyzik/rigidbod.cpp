@@ -193,8 +193,9 @@ void ctRigidBody::calc_simple_I_tensor( real x, real y, real z )
   else
     k = MIN_REAL;
 
-  for( int i = 0; i < 3; i++ )
-    for( int j = 0; j < 3; j++ )
+  int i, j;
+  for(i = 0; i < 3; i++)
+    for(j = 0; j < 3; j++)
       I[i][j] = 0.0;
 
   I[0][0] = (y*y + z*z)*k;

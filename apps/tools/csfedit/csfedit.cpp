@@ -180,8 +180,9 @@ void csEditCharView::Draw()
     int pixcolor;
     int makeborder = 1; /// 1 makes a border
     if(celsize<=1) makeborder=0;
-    for(int cely = 0; cely<editchar->GetHeight(); cely++)
-      for(int celx = 0; celx<editchar->GetWidth(); celx++)
+	int cely, celx;
+    for(cely = 0; cely<editchar->GetHeight(); cely++)
+      for(celx = 0; celx<editchar->GetWidth(); celx++)
       {
         if(editchar->GetPixel(celx, cely))
 	  pixcolor = 1 + palstart;
@@ -555,9 +556,9 @@ void csEditFontView::Draw()
     SetClipRect( content.xmin-inset, content.ymin-inset, content.xmax, 
       content.ymax);
     csRect cel;
-    int charnum;
-    for(int cely = 0; cely<celpercol; cely++)
-      for(int celx = 0; celx<celperrow; celx++)
+    int cely, celx, charnum;
+    for(cely = 0; cely<celpercol; cely++)
+      for(celx = 0; celx<celperrow; celx++)
       {
 	charnum = cely*celperrow+ celx + font->GetStartChar();
 	if(charnum >= font->GetStartChar()+font->GetCharCount() ) continue;
@@ -836,7 +837,8 @@ csEditChar::csEditChar()
   pixels = NULL;
   width=10; height=10;
   pixels = new uint8[width*height];
-  for(int i=0; i<width*height; i++) pixels[i] = 0;
+  int i;
+  for(i=0; i<width*height; i++) pixels[i] = 0;
 }
 
 
@@ -868,8 +870,9 @@ csEditChar::~csEditChar()
 
 void csEditChar::Draw(csComponent *dest, int minx, int miny, int col)
 {
-  for(int y = 0; y < height ; y++)
-    for(int x = 0; x<width ; x++)
+  int y, x;
+  for(y = 0; y < height ; y++)
+    for(x = 0; x<width ; x++)
     {
       if(GetPixel(x,y)) dest->Pixel(minx+x, miny+y, col);
     }
@@ -925,7 +928,8 @@ int csEditChar::GetBitmap(int idx)
   int y = idx / bpl;
   int xstart = (idx - y*bpl)*8;
   int res = 0;
-  for(int x=xstart; x<xstart+8; x++)
+  int x;
+  for(x=xstart; x<xstart+8; x++)
   {
     res<<=1;
     if((x<width) && GetPixel(x,y)) res |=1;
@@ -948,7 +952,8 @@ csEditFont::csEditFont(csApp *iApp)
   fontwidth = 10;
   fontheight = 10;
   chars = new csEditChar* [numchars];
-  for(int i=0; i<numchars; i++) chars[i] = new csEditChar();
+  int i;
+  for(i=0; i<numchars; i++) chars[i] = new csEditChar();
 }
 
 csEditFont::csEditFont(csApp *iApp, const char *fromfile)
@@ -1119,7 +1124,8 @@ csEditFont::~csEditFont()
   if(filename) delete[] filename;
   if(fontname) delete[] fontname;
   if(chars) {
-    for(int i=0; i<numchars; i++) delete chars[i];
+	int i;
+    for(i=0; i<numchars; i++) delete chars[i];
     delete[] chars;
   }
 }
@@ -1290,22 +1296,24 @@ void csEditFont::SetStartNum(int start, int num)
 
 void csEditFont::SetWidth(int w)
 {
-  for(int c=0; c<numchars; c++)
+  int c;
+  for(c=0; c<numchars; c++)
     chars[c]->SetWidth(w);
   fontwidth = w;
 }
 
 void csEditFont::SetHeight(int h)
 {
-  for(int c=0; c<numchars; c++)
+  int c;
+  for(c=0; c<numchars; c++)
     chars[c]->SetHeight(h);
   fontheight = h;
 }
 
 void csEditFont::RecalcWidth()
 {
-  int w= 0;
-  for(int c=0; c<numchars; c++)
+  int w= 0, c;
+  for(c=0; c<numchars; c++)
     if(chars[c]->GetWidth() > w)
       w = chars[c]->GetWidth();
   fontwidth = w;
@@ -1313,7 +1321,8 @@ void csEditFont::RecalcWidth()
 
 int csEditFont::GetCharNumber(csEditChar *editchar)
 {
-  for(int c=0; c<numchars; c++)
+  int c;
+  for(c=0; c<numchars; c++)
     if(chars[c] == editchar)
       return c + startchar;
   printf("Error: no such character in font, ignoring...\n");

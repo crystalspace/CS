@@ -98,7 +98,8 @@ public:
 
   virtual ~ctMatrixN ()
   {
-    for( int i = 0; i < dimen; i++ )
+	int i;
+    for(i = 0; i < dimen; i++)
       delete [] (rows[i]);
     delete [] rows;
   }
@@ -199,8 +200,9 @@ public:
 
   void add3 ( ctMatrixN &pmdest, const ctMatrixN &pm1, const ctMatrixN &pm2 )
   {
-    for( int idx = 0; idx < dimen; idx++ )
-      for( int idy = 0; idy < dimen; idy++ )
+	int idx, idy;
+    for(idx = 0; idx < dimen; idx++ )
+      for(idy = 0; idy < dimen; idy++ )
         pmdest.rows[idx][idy] = pm1.rows[idx][idy] + pm2.rows[idx][idy];
   }
 

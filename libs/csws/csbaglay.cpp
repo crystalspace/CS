@@ -159,7 +159,7 @@ void csGridBagLayout::LayoutCells (CellInfo* cells, int xCnt, int yCnt,
   int outterSize, int outterPos, int _arrayWidth)
 {
   int actualSpaceUsed = 0;
-  int x = 0, y = 0;
+  int x, y, i;
 
   // calculate prefered size of each column
   int *prefColSizes = new int [xCnt];
@@ -274,7 +274,7 @@ void csGridBagLayout::LayoutCells (CellInfo* cells, int xCnt, int yCnt,
 	int compPos  = curPos;
 
 	// account for spaning multiple cells
-	for( int i = 0; i != cell.cellSpan && x + i < xCnt; ++i )
+	for(i = 0; i != cell.cellSpan && x + i < xCnt; ++i )
 	  compSize += CELL_AT(x+i,y).finalSize;
 	// align compoenent within cell's display area
 
