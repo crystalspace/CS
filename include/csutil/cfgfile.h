@@ -225,7 +225,7 @@ private:
   // EnumerateKeys, because it does more than creating this object.
   csConfigIterator(const csConfigFile *Config, const char *Subsection);
   // delete this iterator
-  ~csConfigIterator();
+  virtual ~csConfigIterator();
   // move to the previous node, ignoring subsection
   bool DoPrev();
   // move to the next node, ignoring subsection

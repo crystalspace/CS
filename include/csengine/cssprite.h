@@ -20,12 +20,12 @@
 #define __CS_CSSPRITE_H__
 
 #include "csutil/cscolor.h"
+#include "csutil/csvector.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math2d.h"
 #include "csgeom/poly2d.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/box.h"
-#include "csobject/nobjvec.h"
 #include "csengine/polyint.h"
 #include "csengine/bspbbox.h"
 #include "csengine/rview.h"
@@ -150,6 +150,32 @@ private:
 };
 
 /**
+ * A vector for frames which knows how to clean them up.
+ */
+class csFrameVector : public csVector
+{
+public:
+  /// Delete all inserted objects before deleting the object itself.
+  virtual ~csFrameVector ();
+
+  /// Free a item as a frame.
+  virtual bool FreeItem (csSome Item);
+};
+
+/**
+ * A vector for actions which knows how to clean them up.
+ */
+class csActionVector : public csVector
+{
+public:
+  /// Delete all inserted objects before deleting the object itself.
+  virtual ~csActionVector ();
+
+  /// Free a item as an action.
+  virtual bool FreeItem (csSome Item);
+};
+
+/**
  * A 3D sprite based on a triangle mesh with a single texture.
  * Animation is done with frames.
  * This class represents a template from which a csSprite3D
@@ -178,9 +204,9 @@ private:
   int* emerge_from;
 
   /// The frames
-  csNamedObjVector frames;
+  csFrameVector frames;
   /// The actions (a vector of csSpriteAction objects)
-  csNamedObjVector actions;
+  csActionVector actions;
 
   /// Enable tweening.
   bool do_tweening;

@@ -118,6 +118,30 @@ void csSpriteAction::AddFrame (iSpriteFrame * f, int d)
 
 //--------------------------------------------------------------------------
 
+bool csFrameVector::FreeItem (csSome Item)
+{
+  delete (csFrame *) Item;
+  return true;
+}
+
+csFrameVector::~csFrameVector ()
+{
+  DeleteAll ();
+}
+
+bool csActionVector::FreeItem (csSome Item)
+{
+  delete (csSpriteAction *) Item;
+  return true;
+}
+
+csActionVector::~csActionVector ()
+{
+  DeleteAll ();
+}
+
+//--------------------------------------------------------------------------
+
 IMPLEMENT_IBASE (csSpriteTemplate)
   IMPLEMENTS_EMBEDDED_INTERFACE (iSpriteTemplate)
 IMPLEMENT_IBASE_END
@@ -129,7 +153,7 @@ IMPLEMENT_EMBEDDED_IBASE_END
 IMPLEMENT_CSOBJTYPE (csSpriteTemplate, csPObject)
 
 csSpriteTemplate::csSpriteTemplate ()
-  : csPObject (), frames (8, 8), actions (8, 8),
+  : csPObject (),
     texels (8, 8), vertices (8, 8), normals (8, 8)
 {
   CONSTRUCT_EMBEDDED_IBASE (scfiSpriteTemplate);

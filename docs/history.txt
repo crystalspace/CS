@@ -1,5 +1,11 @@
 The history order has been reversed so that new features are at the top.
 
+19-Jan-2001
+	- Fixed the bug which Martin Geisse reported with sprite frames
+	  and actions. They were contained within a csNamedObjVector
+	  which is not right because they are not csObject's.
+	- Added a 'virtual' to the destructor of the new ini file stuff
+	  because otherwise gcc gave warnings.
 18-Jan-2001
 	- Wouter Wijngaards fixed Martin's stricmp() in cfgfile.cpp.
 	  stricmp is not portable, please use strcasecmp.
