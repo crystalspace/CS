@@ -14,6 +14,8 @@ chronological order.
 	- res added a new appendix for 0.98->1.00 API changes.
 	- res added a paragraph about the csArray<> index type change to the
 	  API changes.
+	- Jorrit added iRegion->Remove() to remove an object from a region.
+	  There was already an Add() but the Remove() was missing.
 1-Jul-2004
 	- Eric Sunshine augmented "jam install" so that CS/data/cube and
 	  CS/data/flarge/mosaic-detail.dds are also installed.

@@ -39,7 +39,7 @@ struct iCameraPosition;
 struct iObject;
 struct iCollection;
 
-SCF_VERSION (iRegion, 0, 1, 6);
+SCF_VERSION (iRegion, 0, 1, 7);
 
 /**
  * A region. A region is basically a collection of objects in the
@@ -53,7 +53,12 @@ struct iRegion : public iBase
   /**
    * Add an object to this region.
    */
-  virtual void Add(iObject *obj) = 0;
+  virtual void Add (iObject *obj) = 0;
+
+  /**
+   * Remove an object from this region.
+   */
+  virtual void Remove (iObject *obj) = 0;
 
   /**
    * Clear this region without removing the entities in it. The entities

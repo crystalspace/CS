@@ -49,8 +49,14 @@ public:
   /**
    * Add an object to this region.
    */
-  virtual void Add(iObject *obj)
+  virtual void Add (iObject *obj)
   { ObjAdd (obj); }
+
+  /**
+   * Remove an object from this region.
+   */
+  virtual void Remove (iObject *obj)
+  { ObjRemove (obj); }
 
   /**
    * Check if some object is in this region.
@@ -92,8 +98,10 @@ public:
     /// Query the iObject.
     virtual iObject *QueryObject();
 
-    virtual void Add(iObject *obj)
+    virtual void Add (iObject *obj)
     { scfParent->Add(obj); }
+    virtual void Remove (iObject *obj)
+    { scfParent->Remove (obj); }
 
     /**
      * Clear this region without removing the entities in it. The entities
