@@ -275,7 +275,7 @@ AC_DEFUN([CS_BUILD_PROPERTY],
 
 #------------------------------------------------------------------------------
 # _CS_TRANSLATE_MAKE_TO_JAM([TEXT])
-#	Helper function for CS_EMIT_PROPERTY() which translates makefile-style
+#	Helper function for CS_BUILD_PROPERTY() which translates makefile-style
 #	names to Jam style names.  This is necessary since the makefile and Jam
 #	build systems use different names in some cases.  It is more convenient
 #	to perform the name translation here in one place, than manually in
