@@ -17,6 +17,10 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine uploaded new archives of zlib, libpng, and libjpeg
 	  to the Crystal Space ftp site which conform to the new beta 13
 	  directory hierarchy.
+	- Collision detection is now correct for skeleton sprites (but
+	  remember that sprite CD is not enabled in WalkTest).
+	- The ghost now moves around. It uses real collision detection instead
+	  of the hack that the bots use. So this should work much better.
 20-Jul-1999
 	- Gary Haussmann changed the OpenGL X 2D driver to be a little
 	  bit smarter when detecting which supported visuals there are.
@@ -58,6 +62,10 @@ Short-term cleanups that need to be done:
 	      probably be placed elsewhere since they are generic enough to
 	      be useful to applications which use cssys but not csengine.  I
 	      would do it myself, but I don't have time right now.
+	- Added 'addghost' command to show a very nice skeleton green
+	  semi-transparent ghost.
+	- Michael Dale Long fixed dependency problem in ndrvdemo.mak.
+	- Gert Steenssens fixed some Glide compilation errors.
 19-Jul-1999
 	- Added GetXRotation(), GetYRotation() and GetZRotation() to
 	  csMatrix3.
