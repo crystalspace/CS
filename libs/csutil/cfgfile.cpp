@@ -353,17 +353,8 @@ SCF_IMPLEMENT_IBASE(csConfigFile);
   SCF_IMPLEMENTS_INTERFACE(iConfigFile);
 SCF_IMPLEMENT_IBASE_END;
 
-csConfigFile::csConfigFile(iBase *pBase)
+void csConfigFile::InitializeObject ()
 {
-  csConfigFile (NULL, NULL);
-  SCF_CONSTRUCT_IBASE (pBase);
-}
-
-csConfigFile::csConfigFile(const char *file, iVFS *vfs)
-{
-  SCF_CONSTRUCT_IBASE(NULL);
-
-  // create the first and last nodes
   FirstNode = new csConfigNode(NULL);
   LastNode = new csConfigNode(NULL);
   LastNode->InsertAfter(FirstNode);
@@ -373,7 +364,18 @@ csConfigFile::csConfigFile(const char *file, iVFS *vfs)
   VFS = NULL;
   Dirty = false;
   EOFComment = NULL;
+}
 
+csConfigFile::csConfigFile(iBase *pBase)
+{
+  SCF_CONSTRUCT_IBASE (pBase);
+  InitializeObject ();
+}
+
+csConfigFile::csConfigFile(const char *file, iVFS *vfs)
+{
+  SCF_CONSTRUCT_IBASE(NULL);
+  InitializeObject ();
   if (file)
     Load(file, vfs);
 }

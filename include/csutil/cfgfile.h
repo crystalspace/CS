@@ -160,6 +160,8 @@ private:
   // final comment at the end of the configuration file
   char *EOFComment;
 
+  // private initialization function
+  void InitializeObject ();
   // load the configuration from a file, ignoring the dirty flag
   virtual bool LoadNow(const char *Filename, iVFS *vfs, bool overwrite);
   // load the configuration from a data buffer and add it to the current

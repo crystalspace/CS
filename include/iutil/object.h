@@ -131,12 +131,6 @@ struct iObject : public iBase
    * remove child objects while iterating.
    */
   virtual iObjectIterator *GetIterator () = 0;
-
-  /**
-   * @@@ temporary fix: Remove an object from the tree without doing a
-   * DecRef on it.
-   */
-  virtual void ObjReleaseOld (iObject *obj) = 0;
 };
 
 

@@ -45,6 +45,9 @@ protected:
   /// Parent object
   iObject *ParentObject;
 
+  /// private initialization function
+  void InitializeObject ();
+
 public:
   /// Initialize the csObject
   csObject (iBase* pParent = NULL);
@@ -109,9 +112,6 @@ public:
   virtual iObjectIterator *GetIterator ();
 
   SCF_DECLARE_IBASE;
-
-  // @@@ temporary fix
-  virtual void ObjReleaseOld (iObject *obj);
 };
 
 #endif // __CSOBJ_H__

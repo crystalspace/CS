@@ -102,18 +102,24 @@ SCF_IMPLEMENT_IBASE_END
 
 #include "csutil/debug.h"
 
-csObject::csObject (iBase* pParent) : Children (NULL), Name (NULL)
+void csObject::InitializeObject ()
 {
-  SCF_CONSTRUCT_IBASE (pParent);
   static CS_ID id = 0;
   csid = id++;
   ParentObject = NULL;
   DG_ADDI (this, "csObject(NONAME)");
 }
 
+csObject::csObject (iBase* pParent) : Children (NULL), Name (NULL)
+{
+  SCF_CONSTRUCT_IBASE (pParent);
+  InitializeObject ();
+}
+
 csObject::csObject (csObject &o) : Children (NULL), Name (NULL)
 {
-  csObject (NULL);
+  SCF_CONSTRUCT_IBASE (NULL);
+  InitializeObject ();
 
   iObjectIterator *it = o.GetIterator ();
   while (!it->IsFinished ())
@@ -133,23 +139,6 @@ csObject::~csObject ()
 
   if (Children) { delete Children; Children = NULL; }
   delete [] Name; Name = NULL;
-
-  /*
-   * @@@ This should not be required for two reasons:
-   * 1. If the parent keeps a pointer to this object, then the pointer was
-   *    IncRef'ed, so this object cannot be deleted. Removing the object from
-   *    its parent from here is only needed if the object was illegally
-   *    deleted, not DecRef'ed.
-   * 2. Several objects could contain this object as a child. The 'parent'
-   *    pointer is not a safe way to find out which object contains this
-   *    object as a child.
-   */
-  if (ParentObject)
-  {
-    DG_REMCHILD (ParentObject, this);
-    DG_REMPARENT (this, ParentObject);
-    ParentObject->ObjReleaseOld (this);
-  }
 }
 
 void csObject::SetName (const char *iName)
@@ -204,28 +193,6 @@ void csObject::ObjRemove (iObject *obj)
     obj->SetObjectParent (NULL);
     DG_REMPARENT (obj, this);
     DG_REMCHILD (this, obj);
-    Children->Delete (n);
-  }
-}
-
-void csObject::ObjReleaseOld (iObject *obj)
-{ 
-  if (!Children || !obj)
-    return;
-
-  int n = Children->Find (obj);
-  if (n>=0)
-  {
-    obj->SetObjectParent (NULL);
-    // @@@ WARNING! Doing only one DecRef() here does not prevent a second
-    // deletion of 'obj'.  Keep in mind that we are currently executing
-    // in the destructor of 'obj' itself. If only one 'IncRef()' is used
-    // then the Delete() from the children vector will simply destroy the
-    // object again (with bad consequences). Doing two IncRef()'s is a
-    // solution for this and it doesn't prevent deletion of the object
-    // since it is being deleted already.
-    obj->IncRef ();
-    obj->IncRef ();
     Children->Delete (n);
   }
 }

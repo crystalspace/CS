@@ -54,13 +54,13 @@ bool csMovableSectorList::PrepareItem (csSome item)
   // check for a valid item and IncRef it
   iSector* sector = (iSector*)item;
   if (sector == NULL) return false;
-  sector->IncRef ();
 
   // if the movable has a parent, no sectors can be added.
   CS_ASSERT (movable != NULL);
   if (movable->GetParent ())
     return false;
 
+  sector->IncRef ();
   movable->GetMeshWrapper ()->
     MoveToSector (sector->GetPrivateObject ());
   return true;
