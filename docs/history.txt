@@ -1,5 +1,16 @@
 The history order is reversed so that new features are at the top.
 
+7-Apr-2002
+	- Norman Kramer fixed OpenGL renderer because
+	  clipped_lightmap_fog_texel was accessed wrong.
+	- Philip Wyett added MSVC #pragma to remove warning C4390 on
+	  DEBUG_BREAK. Also added newer msvc_libs files to cvsignore.
+	- Philip also updated AWS documentation as follows:
+	  Removed aws->SetDefaultContext(engine, myG3D->GetTextureManager());
+	  and replaced with the correct canvas creation code, which I cannot
+	  be bothered nor have the time to list. :)
+	  Thanks to "vrm" from #CrystalSpace for reporting the error this
+	  problem created.
 5-Apr-2002
 	- Andon M. Coleman patched 3ds2lev so it works correctly for
 	  non-texture mapped 3DS objects.
@@ -9,6 +20,14 @@ The history order is reversed so that new features are at the top.
 	  should almost never do exit but instead return an appropriate
 	  error to the caller (using the reporter and a return code for
 	  example).
+	- Philip Wyett did the following:
+	    - Fixed precedance under MSVC (lexan.cpp).
+	    - Phyztest: Removed Text which prompts for <ENTER> to add an
+	      Impulse Spring object as the object does not exist.
+	    - Phyztest: Changed <DEL> to <DELETE> in text for adding chain
+	      object. It is not the num pad <DEL> which creates the object and
+	      was confusing. Well it initially confused me anyway. :)
+	    - Code format cleanup in demosky.cpp.
 3-Apr-2002
 	- Added a texture-less material (green_color) to flarge so that
 	  we can easily see if this still works or not. The skeletal
