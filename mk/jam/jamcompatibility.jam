@@ -40,12 +40,6 @@ if $(JAMVERSION) < 2.4
     EXIT "Error: This buildsystem requires jam version 2.4 or later." ;
 }
 
-# Don't bother confusing users just yet...
-#if $(JAMVERSION) = 2.4 & $(JAM_DEBUG)
-#{
-#    echo "Warning: It is recommended to use jam2.5rc3 or later." ;
-#}
-
 # All scripts invoked by the build system expect a Bourne or compatible shell.
 # Reject C-shell and its variants (such as tcsh).  Unfortunately, this is a bit
 # of an ugly hack.  It would be nicer to perform this logic at the very end of
@@ -58,9 +52,19 @@ if [ Match (csh) : $(SHELL) ]
 }
 
 # Jam 2.4's SubDir rule had some problems and misses the useful SUBDIRRULES
-# extension. So we override it here with a better version (from jam 2.5rc3)
+# extension. So we override it here with a better version (from jam 2.5rc3).
+# Likewise, 2.4 is missing FReverse, which is needed by SubDir and other
+# custom rules we define.
 if $(JAMVERSION) = 2.4
 {
+
+rule FReverse 
+{
+	# FReverse a1 a2 a3 ... ;
+	# return ... a3 a2 a1 ;
+
+	if $(1) { return [ FReverse $(1[2-]) ] $(1[1]) ; }
+}
 
 rule SubDir
 {

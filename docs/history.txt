@@ -6,6 +6,11 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+15-May-2004
+	- Eric Sunshine added implementation of FReverse rule to 2.4 section of
+	  jamcompatibility.jam since it is missing in Jam 2.4 but is needed by
+	  the overridden SubDir rule in jamcompatibility.jam and by other
+	  custom rules we define.
 14-May-2004
 	- Eric Sunshine worked around VS.NET warning C4345 in blockallocator.h.
 	- Eric Sunshine augmented the Jam check in configure.ac so that it now
