@@ -8,6 +8,8 @@ The history order is reversed so that new features are at the top.
 	  'data/flarge' directory.
 	- Fixed a 'cs-config' typo in creating external app docs, reported
 	  by David Calkins.
+	- Reverted a change to the image loader multiplexer because it was
+	  EXTREMELY slow.
 9-Feb-2003
 	- res augmented flarge to contain a notice that the flickering in
 	  the street is intentional.
