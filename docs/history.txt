@@ -8,6 +8,32 @@ The history order has been reversed so that new features are at the top.
 	  button to test it. Select a sector from the list below and it
 	  will take the static thing (if present, else the sector polygons)
 	  to make a bsp. Not useful yet at the moment.
+	- Eric Sunshine made the following changes:
+	    - Added csHashCompute(char const*) to hashmap.{h|cpp} which
+	      quickly and effectively computes a hash key from a string.
+	    - Eliminated the bogus and broken GetReducedHash() which Brandon
+	      added to csMD5.  Brandon was using this as a bizarre form of
+	      very expensive string hashing.  To say that this was overkill is
+	      an understatement.  It was like using a sledge-hammer to kill an
+	      ant.  Furthermore, GetReducedHash() was buggy and failed to be
+	      endian-correct.
+	    - Modified Brandon's motion.cpp to use the inexpensive
+	      csHashCompute() rather than the overkill and bogus
+	      GetReducedHash().  Also reformatted motion.cpp to follow CS
+	      formatting guidelines.  (Brandon, please use tab size 8!)
+	    - Fixed a memory corruption bug in motion.cpp.  Was writing past
+	      the end of an allocated buffer when copying a string.
+	    - Removed garbage which brandon left in motion.mak.
+	    - Added Motion plugin to user.mak and static.cpp since Brandon
+	      forgot to do so.
+	    - Removed one of the CS_ASSERT() calls which Brandon inserted into
+	      csBasicVector since it fundamentally changed the behaviour of
+	      the class, even though he neglected to modify the rest of CS to
+	      take this fundamental behavioral change into account.  (Brandon,
+	      if you make fundamental behavioral changes like this, then you
+	      must also fix every place in the project which is affected by
+	      such changes.  Do not expect other people to keep cleaning up
+	      after you.)
 8-Oct-2000
 	- Brandon Ehle added the motion interface for sprites to the CVS tree.
 	  The SCF interfaces & the loader are 90% done, but the plugin and

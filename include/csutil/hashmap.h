@@ -16,14 +16,21 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef _CS_HASHMAP_H
-#define _CS_HASHMAP_H
+#ifndef __CS_HASHMAP_H__
+#define __CS_HASHMAP_H__
 
 #include "csutil/csvector.h"
-
 class csHashMap;
+
+/// An opaque hash key.
 typedef uint32 csHashKey;
+/// An opaque hash value.
 typedef void* csHashObject;
+
+/// Compute a hash key for a null-terminated string.
+csHashKey csHashCompute(char const*);
+/// Compute a hash key for a string of a given length.
+csHashKey csHashCompute(char const*, int length);
 
 /**
  * An element inside the hashmap (private element).
@@ -256,5 +263,5 @@ public:
   void Delete (csHashObject object);
 };
 
-#endif //_CS_HASHMAP_H
+#endif //__CS_HASHMAP_H__
 

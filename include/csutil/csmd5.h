@@ -108,11 +108,6 @@ public:
   static Digest Encode(const char*);
   /// Encode a buffer
   static Digest Encode(const void*, int nbytes);
-	/// Return a reduced hash
-	static unsigned int GetReducedHash(const Digest& d) {
-		unsigned int *t=(unsigned int*)&d;
-		return (t[0]*t[1]*t[2]*t[3])^(t[0]+t[1]+t[2]+t[3]);
-	}
 };
 
 #endif // __CS_MD5_H__

@@ -37,6 +37,7 @@ PLUGINS.DYNAMIC += csstdldr
 PLUGINS.DYNAMIC += netspace/nstp netspace/nsmgr
 PLUGINS.DYNAMIC += csauth/simple
 PLUGINS.DYNAMIC += metaball
+PLUGINS.DYNAMIC += motion
 
 #-----------------------------------------------------------------------------
 # Static Settings            *** TAKE NOTE ***

@@ -1,5 +1,5 @@
 /*
-    Hash Map.
+    Hash Map and hash support functions.
     Copyright (C) 2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
@@ -18,10 +18,42 @@
 */
 
 #include <stdio.h>
+#include <string.h>
 #include "cssysdef.h"
 #include "csutil/hashmap.h"
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+static csHashKey rotate_bits_right(csHashKey h, unsigned int nbits)
+{
+  while (nbits-- > 0)
+  {
+    bool carry = (h & 1) != 0;
+    h >>= 1;
+    if (carry)
+      h |= 0x80000000UL;
+  }
+  return h;
+}
+
+csHashKey csHashCompute(char const* s, int n)
+{
+  csHashKey h = 0;
+  char const* slim = s + n;
+  while (s < slim)
+  {
+    rotate_bits_right(h, 3);
+    h += *s++;
+  }
+  return h;
+}
+
+csHashKey csHashCompute(char const* s)
+{
+  return csHashCompute(s, strlen(s));
+}
+
+//-----------------------------------------------------------------------------
 
 bool csHashIterator::HasNext ()
 {
@@ -74,7 +106,7 @@ void csHashIterator::DeleteNext ()
   // @@@ Not yet implemented.
 }
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 csHashMap::csHashMap (uint32 size)
 {
@@ -118,7 +150,7 @@ csHashIterator* csHashMap::GetIterator (csHashKey key)
   uint32 idx = key % max_size;
 
   csHashIterator* iterator = new csHashIterator (this);
-  iterator->bucket = (csHashBucket*)buckets[idx]; // Will be NULL if bucket empty.
+  iterator->bucket = (csHashBucket*)buckets[idx]; // Is NULL for bucket empty.
   iterator->element_index = -1;
   iterator->bucket_index = idx;
   iterator->key = key;
@@ -159,7 +191,7 @@ void csHashMap::DeleteAll ()
     buckets.Delete (b);
 }
 
-//---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 csHashSet::csHashSet (uint32 size) : map (size)
 {
@@ -204,9 +236,6 @@ void csHashSet::DeleteAll ()
   map.DeleteAll ();
 }
 
-void csHashSet::Delete (csHashObject /*object*/)
+void csHashSet::Delete (csHashObject)
 {
 }
-
-//---------------------------------------------------------------------------
-

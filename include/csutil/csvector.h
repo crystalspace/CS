@@ -1,6 +1,6 @@
 /*
     Crystal Space utility library: vector class interface
-    Copyright (C) 1998,1999 by Andrew Zabolotny <bit@eltech.ru>
+    Copyright (C) 1998,1999,2000 by Andrew Zabolotny <bit@eltech.ru>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -136,8 +136,7 @@ public:
 
 inline csSome& csBasicVector::operator [] (int n)
 {
-  CS_ASSERT(n>=0);
-  CS_ASSERT(n<count);
+  CS_ASSERT (n >= 0);
   if (n >= count)
     SetLength (n + 1);
   return (root [n]);
@@ -145,15 +144,15 @@ inline csSome& csBasicVector::operator [] (int n)
 
 inline csSome& csBasicVector::operator [] (int n) const
 {
-  CS_ASSERT(n>=0);
-  CS_ASSERT(n<count);
+  CS_ASSERT (n >= 0);
+  CS_ASSERT (n < count);
   return (root [n]);
 }
 
 inline csSome& csBasicVector::Get (int n) const
 {
-  CS_ASSERT(n>=0);
-  CS_ASSERT(n<count);
+  CS_ASSERT (n >= 0);
+  CS_ASSERT (n < count);
   return (root [n]);
 }
 

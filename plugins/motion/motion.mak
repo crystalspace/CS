@@ -4,7 +4,7 @@ DESCRIPTION.motion = Crystal Space Skeletal Motion plugin
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
-# Driver-specific help commands
+# Plugin-specific help commands
 PLUGINHELP += \
   $(NEWLINE)echo $"  make motion       Make the $(DESCRIPTION.motion)$"
 
@@ -51,7 +51,6 @@ ifeq ($(MAKESECTION),targets)
 .PHONY: motion motionclean
 
 # Chain rules
-net: motion
 clean: motionclean
 
 motion: $(OUTDIRS) $(MOTION)
