@@ -67,12 +67,12 @@ bool csColorWheel::HandleEvent (iEvent &Event)
           app->CaptureMouse (this);
           trackmouse = true;
         }
-        float xc = bound.Width () / 2.0;
-        float yc = bound.Height () / 2.0;
+        float xc = (float) bound.Width () / 2;
+        float yc = (float) bound.Height () / 2;
         float ns = qsqrt ((Event.Mouse.x - xc)*(Event.Mouse.x - xc) + 
-			  (Event.Mouse.y - yc)*(Event.Mouse.y - yc)) / xc;
+          (Event.Mouse.y - yc)*(Event.Mouse.y - yc)) / xc;
         if (ns > 1) ns = 1;
-        float nh = atan2 (yc - Event.Mouse.y, Event.Mouse.x - xc) / TWO_PI;
+        float nh = (float) atan2 (yc - Event.Mouse.y, Event.Mouse.x - xc) / TWO_PI;
         if (nh < 0) nh += 1;
         if ((ns != s) || (nh != h))
         {
@@ -101,12 +101,12 @@ void csColorWheel::SetHS (float iH, float iS)
 void csColorWheel::Draw ()
 {
   csStatic::Draw ();
-  float xc = bound.Width () / 2.0;
-  float yc = bound.Height () / 2.0;
+  float xc = (float) bound.Width () / 2;
+  float yc = (float) bound.Height () / 2;
   int x = int (xc * (1 + s * cos (h * TWO_PI)));
   int y = int (yc * (1 - s * sin (h * TWO_PI)));
   if (x >= bound.Width ()) x = bound.Width () - 1;
   if (y >= bound.Height ()) y = bound.Height () - 1;
-  Line (x, 0, x, bound.Height (), CSPAL_STATIC_LIGHT3D);
-  Line (0, y, bound.Width (), y, CSPAL_STATIC_LIGHT3D);
+  Line ((float) x, 0, (float) x, (float) bound.Height (), CSPAL_STATIC_LIGHT3D);
+  Line (0, (float) y, (float) bound.Width (), (float) y, CSPAL_STATIC_LIGHT3D);
 }

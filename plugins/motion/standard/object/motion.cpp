@@ -544,40 +544,41 @@ void csMotionManager::DeleteController( iMotionController* inst )
 {
   MOT_DPRINTF(("DeleteController(%p) %p\n", inst, inst->GetSkeleton()));
 
-  controllers.Delete((csMotionController*)inst);
+  controllers.Delete ((csMotionController*)inst);
 }
 
-void csMotionManager::UpdateController(csMotionController *controller, float timedelta)
+void csMotionManager::UpdateController (csMotionController *controller, float timedelta)
 {
-  controller->Update(timedelta);
+  controller->Update (timedelta);
 }
 
-void csMotionManager::UpdateAll( float timedelta )
+void csMotionManager::UpdateAll (float timedelta)
 {
   MOT_DPRINTF(("Update all: time %f numskels %d\n",timedelta,controllers.Length()));
 
   int size = controllers.Length();
   for (int i = 0; i < size; i++)
   {
-    UpdateController( controllers[i], timedelta );
+    UpdateController (controllers[i], timedelta);
   }
 }
 
-void csMotionManager::UpdateAll( unsigned int curtime )
+void csMotionManager::UpdateAll (unsigned int curtime)
 {
 
-  if (oldtime == 0) oldtime = curtime;
+  if (oldtime == 0)
+    oldtime = curtime;
+
   csTicks elapsed_time = curtime - oldtime;
   oldtime = curtime;
-  float timedelta=elapsed_time*.001;
-
+  float timedelta = elapsed_time * 0.001f;
   UpdateAll(timedelta);
 }
 
-void csMotionManager::UpdateAll()
+void csMotionManager::UpdateAll ()
 {
   csTicks newtime = vc->GetCurrentTicks ();
-  UpdateAll( newtime );
+  UpdateAll (newtime);
 }
 
 /*
@@ -710,4 +711,3 @@ bool csMotionManager::UpdateAppliedMotion(csAppliedMotion *am, csTicks elapsedti
   UpdateAppliedFrame(am->frames[am->curframe]);
   return true;
 }*/
-

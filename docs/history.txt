@@ -21,6 +21,8 @@ The history order is reversed so that new features are at the top.
 	    - Moved the csperlxs_fallback.inc file back to include/cssys so
 	      it can still be accessed by the moved csperlxs.c file.
 	    - Added csperlxs.c to the Jamfile clean target.
+	- Philip Wyett eliminated more double to float warnings under MSVC 6.
+            - Also performed a minor CS code style cleanup.
 9-May-2003
 	- Philip Wyett did the following:
 	    - Added 'Makefile' to 'jam distclean', so at distclean the 'CS/'

@@ -399,7 +399,7 @@ awsTest::SetupFrame()
   current_time = vc->GetCurrentTicks ();
 
   // Now rotate the camera according to keyboard state
-  float speed = (elapsed_time / 1000.0) * (0.03 * 2);
+  float speed = (elapsed_time / 1000.0f) * (0.03f * 2);
 
   c->GetTransform ().RotateThis (CS_VEC_ROT_RIGHT, speed);
   c2->GetTransform ().RotateThis (CS_VEC_ROT_LEFT, speed);
@@ -417,7 +417,7 @@ awsTest::SetupFrame()
   if (!myG3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
 
   sprintf(message, "awsTest(%d)", counter);
-  myG2D->Write(font, 5,5, col_green, -1, message);
+  myG2D->Write(font, 5, 5, col_green, -1, message);
 
   aws->Redraw();
   aws->Print(myG3D, 64);
