@@ -218,15 +218,15 @@ iBase* csBCTerrFactoryLoader::Parse (const char* pString,
         float distance;
         int inc;
         csScanStr (pParams, "%f,%d", &distance, &inc);
-        //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"Factory Loader","AddLOD call");
+        //csReport (object_reg, CS_REPORTER_SEVERITY_NOTIFY,"Factory Loader","AddLOD call");        
         iState->AddLOD (distance, inc);
       }
       break;
       case CS_TOKEN_SYSDIST:
       {
-        float d;
-        csScanStr (pParams, "%f", &d);
-        iState->SetSystemDistance (d);
+        float d, s;
+        csScanStr (pParams, "%f, %f", &s, &d);
+        iState->SetSystemDistance (s, d);
       }
       break;
       case CS_TOKEN_EDGE:
