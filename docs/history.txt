@@ -14,6 +14,8 @@ The history order is reversed so that new features are at the top.
 	    - added a gradient parser to the syntax services.
 	    - changed partsys so that a fire system now has a small procedural
 	      fire instead of 'raindrop' texture.
+	- res fixed a crash caused by too much memory being memset() in the
+	  fire texture default palette creation.
 16-May-2003
 	- Wouter added csgeom/objmodel.h and igeom/objmodel.h to css.h.
 	- Jorrit fixed a very weird bug in genmesh where SCF_CONSTRUCT_IBASE

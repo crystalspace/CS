@@ -122,7 +122,7 @@ void csProcFire::MakePalette (int max)
   palsize = max;
   palette = new csRGBcolor [palsize];
   palette_idx = new int [palsize];
-  memset (palette, 0, 4*palsize);
+  memset (palette, 0, sizeof(csRGBcolor) * palsize);
   memset (palette_idx, 0, palsize*sizeof (int));
   /// fill the palette
   int maxcolours = palsize/2;
