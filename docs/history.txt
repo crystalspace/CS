@@ -20,6 +20,7 @@ Short-term cleanups that need to be done:
 	    dialog MazeD.
 	  - Replaced R/G/B spin buttons in light params dialog with a button
 	    that calls color choice dialog.
+	- Eric Sunshine fixed some new compiler warnings in MazeD and CSWS.
 11-Oct-1999
 	- Cleaned up world init a little more. Added an extra progress bar
 	  for even more startup fun :-)
