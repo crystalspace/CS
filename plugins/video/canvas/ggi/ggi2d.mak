@@ -4,18 +4,19 @@
 # Driver description
 DESCRIPTION.ggi2d = Crystal Space GGI 2D driver
 
-#-------------------------------------------------------------- rootdefines ---#
+#------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Driver-specific help commands
-DRIVERHELP += $(NEWLINE)echo $"  make ggi2d        Make the $(DESCRIPTION.ggi2d)$"
+DRIVERHELP += \
+  $(NEWLINE)echo $"  make ggi2d        Make the $(DESCRIPTION.ggi2d)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
-#-------------------------------------------------------------- roottargets ---#
+#------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: ggi2d
+.PHONY: ggi2d ggi2dclean
 
 all plugins drivers drivers2d: ggi2d
 
@@ -26,7 +27,7 @@ ggi2dclean:
 
 endif # ifeq ($(MAKESECTION),roottargets)
 
-#-------------------------------------------------------------- postdefines ---#
+#------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
 LIBS._GGI2D = -lggi
@@ -48,7 +49,7 @@ OBJ.GGI2D = $(addprefix $(OUT),$(notdir $(SRC.GGI2D:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
-#------------------------------------------------------------------ targets ---#
+#----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION),targets)
 
 vpath %.cpp plugins/video/canvas/ggi
@@ -70,7 +71,7 @@ $(GGI2D): $(OBJ.GGILIB2D) $(DEP.GGI2D)
 	$(DO.PLUGIN) $(LIBS.GGI2D)
 
 ggi2dclean:
-	$(RM) $(GGI2D) $(OBJ.GGI2D)
+	$(RM) $(GGI2D) $(OBJ.GGI2D) $(OUTOS)ggi2d.dep
 
 ifdef DO_DEPEND
 dep: $(OUTOS)ggi2d.dep
