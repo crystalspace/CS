@@ -3,6 +3,7 @@ The history order is reversed so that new features are at the top.
 7-Oct-2002
 	- Eric Sunshine fixed Texinfo error reported by makeinfo.
 	- Eric Sunshine made aesthetic improvements to FAQ.
+	- Removed some obsolete texmem.* files in the 3D renderer directories.
 6-Oct-2002
 	- Eric Sunshine upgraded CS/docs/texinfo/texinfo.tex to the most recent
 	  version.
