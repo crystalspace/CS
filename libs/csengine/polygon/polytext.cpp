@@ -292,7 +292,7 @@ bool csPolyTexture::RecalcDynamicLights ()
   //---
   // Now add all dynamic lights.
   //---
-  csLightPatch* lp = polygon->GetLightpatches ();
+  csLightPatch* lp = polygon->GetBasePolygon ()->GetLightpatches ();
   while (lp)
   {
     ShineDynLightMap (lp);

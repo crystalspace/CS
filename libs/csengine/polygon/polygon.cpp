@@ -714,8 +714,10 @@ void csPolygon3D::SetTextureSpace (
 
 void csPolygon3D::MakeDirtyDynamicLights ()
 {
-  if (orig_poly) return;
-  light_info.dyn_dirty = true;
+  csPolygon3D* p;
+  if (orig_poly) p = orig_poly;
+  else p = this;
+  p->light_info.dyn_dirty = true;
   csLightMapped* lmi = GetLightMapInfo ();
   if (!lmi) return;
   if (lmi->tex) lmi->tex->MakeDirtyDynamicLights ();
@@ -1384,7 +1386,7 @@ void csPolygon3D::FillLightMap (csLightView& lview)
     // We are working for a dynamic light. In this case we create
     // a light patch for this polygon.
     csLightPatch* lp = csWorld::current_world->lightpatch_pool->Alloc ();
-    AddLightpatch (lp);
+    GetBasePolygon ()->AddLightpatch (lp);
     csDynLight* dl = (csDynLight*)lview.l;
     dl->AddLightpatch (lp);
 

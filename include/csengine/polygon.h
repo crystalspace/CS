@@ -852,6 +852,12 @@ public:
   csPolygonInt* GetUnsplitPolygon () { return orig_poly; }
 
   /**
+   * Return the pointer to the original polygon (before any BSP splits).
+   * If polygon was not split this will return current poly.
+   */
+  csPolygon3D* GetBasePolygon () { return orig_poly ? (csPolygon3D*)orig_poly : this; }
+
+  /**
    * A dynamic light has changed (this can be either an
    * intensity/color change of a pseudo-dynamic light or else
    * a real dynamic light change).
