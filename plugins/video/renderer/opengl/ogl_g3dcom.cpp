@@ -122,6 +122,10 @@ fType  csGraphics3DOGLCommon::fName = (fType) NULL;
 # include "csglext.h"
 # undef CSGL_FUNCTION
 
+#ifdef CSGL_EXT_STATIC_ASSERTION
+#include "extstat.h"
+#endif
+
 float sAc, sBc, sCc, sDc;
 csMatrix3 sM;
 csVector3 sV;
@@ -243,9 +247,16 @@ bool csGraphics3DOGLCommon::Initialize (iObjectRegistry* p)
 
 void csGraphics3DOGLCommon::InitGLExtensions ()
 {
+
+#ifndef CSGL_EXT_STATIC_ASSERTION
 # define CSGL_FUNCTION(fType,fName) \
 fName = (fType) G2DGL->GetProcAddress ( #fName ); \
 allFound = allFound && fName != NULL;
+#else
+# define CSGL_FUNCTION(fType,fName) \
+csGraphics3DOGLCommon::fName = (fType) ::fName; \
+allFound = allFound && fName != NULL;
+#endif
 
   if (G2D)
   {
@@ -276,6 +287,7 @@ allFound = allFound && fName != NULL;
 	    Report (CS_REPORTER_SEVERITY_NOTIFY, "Found extension: %s\n", ext);
 	    if (!strcmp (ext, "GL_ARB_multitexture"))
 	    {
+#if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_ARB_multitexture)
 	      bool &allFound = ARB_multitexture;
 	      allFound = true;
 #             define _CSGLEXT_
@@ -291,6 +303,7 @@ allFound = allFound && fName != NULL;
 		glGetIntegerv (GL_MAX_TEXTURE_UNITS_ARB, &maxtextures);
 		if (maxtextures > 1) 
 		{
+                  printf ("dang\n");
 		  m_config_options.do_multitexture_level = maxtextures;
 		  Report (CS_REPORTER_SEVERITY_NOTIFY,
 			  "Using multitexture extension with %d texture units", maxtextures);
@@ -302,9 +315,11 @@ allFound = allFound && fName != NULL;
 			  " extension but only allows one texture unit!");
 		}
 	      }
+#endif
 	    }
 	    else if (!strcmp (ext, "GL_ARB_texture_compression"))
 	    {
+#if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_ARB_texture_compression)
 	      bool &allFound = ARB_texture_compression;
 	      allFound = true;
 #             define _CSGLEXT_
@@ -314,9 +329,11 @@ allFound = allFound && fName != NULL;
 	      if (!allFound)
 		Report (CS_REPORTER_SEVERITY_NOTIFY,
 			"Could not get all function addresse for %s", ext);
+#endif
 	    }
 	    else if (!strcmp (ext, "GL_NV_vertex_array_range"))
 	    {
+#if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_NV_vertex_array_range)
 	      bool &allFound = NV_vertex_array_range;
 	      allFound = true;
 #             define _CSGLEXT_
@@ -326,9 +343,11 @@ allFound = allFound && fName != NULL;
 	      if (!allFound)
 		Report (CS_REPORTER_SEVERITY_NOTIFY,
 			"Could not get all function addresse for %s", ext);
+#endif
 	    }
 	    else if (!strcmp (ext, "GL_ARB_texture_env_combine") && !ARB_texture_env_combine)
 	    {
+#if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_ARB_texture_env_combine)
 	      bool &allFound = ARB_texture_env_combine;
 	      allFound = true;
 #             define _CSGLEXT_
@@ -338,9 +357,11 @@ allFound = allFound && fName != NULL;
 	      if (!allFound)
 		Report (CS_REPORTER_SEVERITY_NOTIFY,
 			"Could not get all function addresse for %s", ext);
+#endif
 	    }
 	    else if (!strcmp (ext, "GL_EXT_texture_env_combine") && !ARB_texture_env_combine)
 	    {
+#if !defined(CSGL_EXT_STATIC_ASSERTION) || defined(CSGL_EXT_STATIC_ASSERTION_ARB_texture_env_combine)
 	      bool &allFound = ARB_texture_env_combine;
 	      allFound = true;
 #             define _CSGLEXT_
@@ -350,6 +371,7 @@ allFound = allFound && fName != NULL;
 	      if (!allFound)
 		Report (CS_REPORTER_SEVERITY_NOTIFY,
 			"Could not get all function addresse for %s", ext);
+#endif
 	    }
 	  }
 	  // find next occurance -- we could have multiple matches if we match the
