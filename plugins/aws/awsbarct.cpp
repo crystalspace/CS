@@ -30,7 +30,10 @@ const int awsBarChart:: signalTimer = 0x2;
 
 
 static iAwsSink *chart_sink = 0;
-static awsSlot chart_slot;
+
+CS_IMPLEMENT_STATIC_VAR (GetChartSlot, awsSlot,)
+
+static awsSlot *chart_slot = NULL;
 
 static void DriveTimer (void *parm, iAwsSource *source)
 {
@@ -54,13 +57,14 @@ awsBarChart::awsBarChart () :
   max_items(0),
   bar_color(0)
 {
+  chart_slot = GetChartSlot ();
 }
 
 awsBarChart::~awsBarChart ()
 {
   if (update_timer != 0)
   {
-    chart_slot.Disconnect (
+    chart_slot->Disconnect (
         update_timer,
         awsTimer::signalTick,
         chart_sink,
@@ -113,7 +117,7 @@ bool awsBarChart::Setup (iAws *_wmgr, awsComponentNode *settings)
     update_timer->SetTimer (timer_interval);
     update_timer->Start ();
 
-    chart_slot.Connect (
+    chart_slot->Connect (
       update_timer,
       awsTimer::signalTick,
       chart_sink,

@@ -625,7 +625,10 @@ void awsManager::Print (iGraphics3D *g3d, uint8 Alpha)
 void awsManager::Redraw ()
 {
   static unsigned redraw_tag = 1;
-  static csRect bounds (frame);
+  // @@@ is nowhere referenced so i disabled it (if its reenabled it has to be 
+  // rewritten using the CS static var handling macros - norman
+  //  static csRect bounds (frame); 
+
   int erasefill = GetPrefMgr ()->GetColor (AC_TRANSPARENT);
   int i;
 

@@ -16,7 +16,10 @@ const int awsTextBox:: signalChanged = 0x1;
 const int awsTextBox:: signalLostFocus = 0x2;
 
 static iAwsSink *textbox_sink = 0;
-static awsSlot textbox_slot;
+
+CS_IMPLEMENT_STATIC_VAR (GetTextBoxBlinkingCursorSlot, awsSlot,)
+
+static awsSlot *textbox_slot = NULL;
 
 static void BlinkCursor (void *parm, iAwsSource *source)
 {
@@ -43,13 +46,14 @@ awsTextBox::awsTextBox () :
   blink_timer(NULL),
   blink(true)
 {
+  textbox_slot = GetTextBoxBlinkingCursorSlot ();
 }
 
 awsTextBox::~awsTextBox ()
 {
   if (blink_timer != 0)
   {
-    textbox_slot.Disconnect (
+    textbox_slot->Disconnect (
         blink_timer,
         awsTimer::signalTick,
         textbox_sink,
@@ -78,7 +82,7 @@ bool awsTextBox::Setup (iAws *_wmgr, awsComponentNode *settings)
   blink_timer->SetTimer (350);
   blink_timer->Start ();
 
-  textbox_slot.Connect (
+  textbox_slot->Connect (
       blink_timer,
       awsTimer::signalTick,
       textbox_sink,
