@@ -684,6 +684,8 @@ void csTextureManagerOpenGL::read_config (iConfigFile *config)
 {
   sharpen_mipmaps = config->GetInt
         ("Video.OpenGL.SharpenMipmaps", 0);
+  texture_downsample = config->GetInt
+        ("Video.OpenGL.TextureDownsample", 0);
 
   csRef<iConfigIterator> it (config->Enumerate ("Video.OpenGL.TargetFormat"));
   while (it->Next ())
