@@ -300,13 +300,14 @@ bool Simple::Initialize ()
     	"Error loading mesh object factory!");
     return false;
   }
+  csMatrix3 m; m.Identity (); m *= .05;
+  csReversibleTransform tr (m, csVector3 (0));
+  imeshfact->HardTransform (tr);
 
   // Create the sprite and add it to the engine.
   csRef<iMeshWrapper> sprite (engine->CreateMeshWrapper (
   	imeshfact, "MySprite", room,
 	csVector3 (-3, 5, 3)));
-  csMatrix3 m; m.Identity (); m *= .05;
-  sprite->GetMovable ()->SetTransform (m);
   sprite->GetMovable ()->UpdateMove ();
   csRef<iSprite3DState> spstate (SCF_QUERY_INTERFACE (sprite->GetMeshObject (),
   	iSprite3DState));

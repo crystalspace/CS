@@ -44,6 +44,9 @@ chronological order.
 	  vertex buffers but didn't register itself as a vertex buffer
 	  client. This causes problems at destruction (and thus simpmap
 	  crashes at exit).
+	- Jorrit fixed visibility culling errors in mottest which were caused
+	  by scaling objects through the movable (not allowed!). Fixed this
+	  by using HardTransform instead.
 14-Oct-2003
 	- Eric Sunshine fixed typographical error in constant expression in
 	  cssys/general/platformconfig.cpp: S_IWGRPS_IXGRP --> S_IWGRP|S_IXGRP.
