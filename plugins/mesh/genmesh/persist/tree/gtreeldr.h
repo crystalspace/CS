@@ -17,7 +17,7 @@
 */
 
 #ifndef _GTREELDR_H_
-#define _TREEHLDR_H_
+#define _GTREELDR_H_
 
 #include "imap/reader.h"
 #include "imap/writer.h"
@@ -345,5 +345,5 @@ public:
   csTriangle* GetTriangles () const { return triangles; }
 };
 
-#endif // _TREEHLDR_H_
+#endif // _GTREELDR_H_
 

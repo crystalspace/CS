@@ -105,7 +105,8 @@ public:
 
   virtual int GetRotation (int)
   {
-    return (rand () >> 3) % 6;
+    return 1;
+    //return (rand () >> 3) % 6;
   }
 };
 
@@ -147,7 +148,8 @@ public:
 
   virtual int GetRotation (int)
   {
-    return (rand () >> 3) % 6;
+    return 1;
+    //return (rand () >> 3) % 6;
   }
 };
 
@@ -175,7 +177,8 @@ public:
 
   virtual int GetRotation (int)
   {
-    return (rand () >> 3) % 6;
+    return 1;
+    //return (rand () >> 3) % 6;
   }
 };
 
@@ -227,44 +230,44 @@ csGeneralTreeFactoryLoader::~csGeneralTreeFactoryLoader ()
 }
 
 void csGeneralTreeFactoryLoader::GenerateTrunk (csConstructionGeometry* co,
-	float bot_radius, float top_radius, float height)
+	float brad, float trad, float height)
 {
   int j;
-  csVector3 vertices[200];
+  csVector3 vt[200];
   csTriangle tri[200];
   csReversibleTransform transform;
   csMatrix3 m;
   int vtidx[100];
 
   j = 0;
-  vertices[j++].Set (-.1*bot_radius, 0, 0*bot_radius);
-  vertices[j++].Set (-.03*bot_radius, 0, .07*bot_radius);
-  vertices[j++].Set (.03*bot_radius, 0, .07*bot_radius);
-  vertices[j++].Set (.1*bot_radius, 0, 0*bot_radius);
-  vertices[j++].Set (.03*bot_radius, 0, -.07*bot_radius);
-  vertices[j++].Set (-.03*bot_radius, 0, -.07*bot_radius);
+  vt[j++].Set (-.1*brad, 0, 0*brad);
+  vt[j++].Set (-.03*brad, 0, .07*brad);
+  vt[j++].Set (.03*brad, 0, .07*brad);
+  vt[j++].Set (.1*brad, 0, 0*brad);
+  vt[j++].Set (.03*brad, 0, -.07*brad);
+  vt[j++].Set (-.03*brad, 0, -.07*brad);
 
-  vertices[j++].Set (-.1*top_radius, height, 0*top_radius);
-  vertices[j++].Set (-.03*top_radius, height, .07*top_radius);
-  vertices[j++].Set (.03*top_radius, height, .07*top_radius);
-  vertices[j++].Set (.1*top_radius, height, 0*top_radius);
-  vertices[j++].Set (.03*top_radius, height, -.07*top_radius);
-  vertices[j++].Set (-.03*top_radius, height, -.07*top_radius);
-  co->SetVertices (j, 6, vertices);
+  vt[j++].Set (-.1*trad, height, 0*trad);
+  vt[j++].Set (-.03*trad, height, .07*trad);
+  vt[j++].Set (.03*trad, height, .07*trad);
+  vt[j++].Set (.1*trad, height, 0*trad);
+  vt[j++].Set (.03*trad, height, -.07*trad);
+  vt[j++].Set (-.03*trad, height, -.07*trad);
+  co->SetVertices (j, 6, vt);
 
   j = 0;
-  tri[j].a = 0; tri[j].b = 1; tri[j].c = 7; j++;
-  tri[j].a = 7; tri[j].b = 6; tri[j].c = 0; j++;
-  tri[j].a = 1; tri[j].b = 2; tri[j].c = 8; j++;
-  tri[j].a = 8; tri[j].b = 7; tri[j].c = 1; j++;
-  tri[j].a = 2; tri[j].b = 3; tri[j].c = 9; j++;
-  tri[j].a = 9; tri[j].b = 8; tri[j].c = 2; j++;
-  tri[j].a = 3; tri[j].b = 4; tri[j].c = 10; j++;
-  tri[j].a = 10; tri[j].b = 9; tri[j].c = 3; j++;
-  tri[j].a = 4; tri[j].b = 5; tri[j].c = 11; j++;
-  tri[j].a = 11; tri[j].b = 10; tri[j].c = 4; j++;
-  tri[j].a = 5; tri[j].b = 0; tri[j].c = 6; j++;
-  tri[j].a = 6; tri[j].b = 11; tri[j].c = 5; j++;
+  tri[j].a = 0;  tri[j].b = 1;  tri[j].c = 7;  j++;
+  tri[j].a = 7;  tri[j].b = 6;  tri[j].c = 0;  j++;
+  tri[j].a = 1;  tri[j].b = 2;  tri[j].c = 8;  j++;
+  tri[j].a = 8;  tri[j].b = 7;  tri[j].c = 1;  j++;
+  tri[j].a = 2;  tri[j].b = 3;  tri[j].c = 9;  j++;
+  tri[j].a = 9;  tri[j].b = 8;  tri[j].c = 2;  j++;
+  tri[j].a = 3;  tri[j].b = 4;  tri[j].c = 10; j++;
+  tri[j].a = 10; tri[j].b = 9;  tri[j].c = 3;  j++;
+  tri[j].a = 4;  tri[j].b = 5;  tri[j].c = 11; j++;
+  tri[j].a = 11; tri[j].b = 10; tri[j].c = 4;  j++;
+  tri[j].a = 5;  tri[j].b = 0;  tri[j].c = 6;  j++;
+  tri[j].a = 6;  tri[j].b = 11; tri[j].c = 5;  j++;
   co->SetTriangles (j, tri);
   transform.SetO2TTranslation (csVector3 (0, -height, 0));
   m.Identity ();
@@ -281,10 +284,10 @@ void csGeneralTreeFactoryLoader::GenerateTrunk (csConstructionGeometry* co,
 }
 
 void csGeneralTreeFactoryLoader::GenerateBranch (csConstructionGeometry* co,
-	float bot_radius, float top_radius, float height)
+	float brad, float trad, float height)
 {
   int j;
-  csVector3 vertices[200];
+  csVector3 vt[200];
   csTriangle tri[200];
   csReversibleTransform transform;
   csMatrix3 m;
@@ -292,63 +295,59 @@ void csGeneralTreeFactoryLoader::GenerateBranch (csConstructionGeometry* co,
   int vtidx[100];
 
   j = 0;
-  vertices[j++].Set (-.1*bot_radius, 0, 0*bot_radius);
-  vertices[j++].Set (-.03*bot_radius, 0, .07*bot_radius);
-  vertices[j++].Set (.03*bot_radius, 0, .07*bot_radius);
-  vertices[j++].Set (.1*bot_radius, 0, 0*bot_radius);
-  vertices[j++].Set (.03*bot_radius, 0, -.07*bot_radius);
-  vertices[j++].Set (-.03*bot_radius, 0, -.07*bot_radius);
-  vertices[j++].Set (-.1*top_radius, height, 0*top_radius);
-  vertices[j++].Set (-.03*top_radius, height, .07*top_radius);
-  vertices[j++].Set (.03*top_radius, height, .07*top_radius);
-  vertices[j++].Set (.1*top_radius, height, 0*top_radius);
-  vertices[j++].Set (.03*top_radius, height, -.07*top_radius);
-  vertices[j++].Set (-.03*top_radius, height, -.07*top_radius);
+  vt[j++].Set (-.1*brad, 0, 0*brad);
+  vt[j++].Set (-.03*brad, 0, .07*brad);
+  vt[j++].Set (.03*brad, 0, .07*brad);
+  vt[j++].Set (.1*brad, 0, 0*brad);
+  vt[j++].Set (.03*brad, 0, -.07*brad);
+  vt[j++].Set (-.03*brad, 0, -.07*brad);
+  vt[j++].Set (-.1*trad, height, 0*trad);
+  vt[j++].Set (-.03*trad, height, .07*trad);
+  vt[j++].Set (.03*trad, height, .07*trad);
+  vt[j++].Set (.1*trad, height, 0*trad);
+  vt[j++].Set (.03*trad, height, -.07*trad);
+  vt[j++].Set (-.03*trad, height, -.07*trad);
 
   // Vertices for the connection to the side branch.
-  vertices[j++].Set (-.1, height*.28, 0);
-  vertices[j++].Set (-.065, height*.42, .035);
-  vertices[j++].Set (-.065, height*.58, .035);
-  vertices[j++].Set (-.1, height*.72, 0);
-  vertices[j++].Set (-.065, height*.58, -.035);
-  vertices[j++].Set (-.065, height*.42, -.035);
+  vt[j++].Set (-.1, height*.28, 0);
+  vt[j++].Set (-.065, height*.42, .035);
+  vt[j++].Set (-.065, height*.58, .035);
+  vt[j++].Set (-.1, height*.72, 0);
+  vt[j++].Set (-.065, height*.58, -.035);
+  vt[j++].Set (-.065, height*.42, -.035);
 
   // Vertices for the top of the side branch.
-  vertices[j++].Set (-.21, height*.8, 0);
-  vertices[j++].Set (-.18, height*.83, .035);
-  vertices[j++].Set (-.15, height*.86, .035);
-  vertices[j++].Set (-.12, height*.89, 0);
-  vertices[j++].Set (-.15, height*.86, -.035);
-  vertices[j++].Set (-.18, height*.83, -.035);
+  vt[j++].Set (-.21, height*.8, 0);
+  vt[j++].Set (-.18, height*.83, .035);
+  vt[j++].Set (-.15, height*.86, .035);
+  vt[j++].Set (-.12, height*.89, 0);
+  vt[j++].Set (-.15, height*.86, -.035);
+  vt[j++].Set (-.18, height*.83, -.035);
 
-  co->SetVertices (j, 6, vertices);
+  co->SetVertices (j, 6, vt);
   j = 0;
-  //tri[j].a = 0; tri[j].b = 1; tri[j].c = 7; j++;
-  //tri[j].a = 7; tri[j].b = 6; tri[j].c = 0; j++;
-  tri[j].a = 1; tri[j].b = 2; tri[j].c = 8; j++;
-  tri[j].a = 8; tri[j].b = 7; tri[j].c = 1; j++;
-  tri[j].a = 2; tri[j].b = 3; tri[j].c = 9; j++;
-  tri[j].a = 9; tri[j].b = 8; tri[j].c = 2; j++;
-  tri[j].a = 3; tri[j].b = 4; tri[j].c = 10; j++;
-  tri[j].a = 10; tri[j].b = 9; tri[j].c = 3; j++;
-  tri[j].a = 4; tri[j].b = 5; tri[j].c = 11; j++;
-  tri[j].a = 11; tri[j].b = 10; tri[j].c = 4; j++;
-  //tri[j].a = 5; tri[j].b = 0; tri[j].c = 6; j++;
-  //tri[j].a = 6; tri[j].b = 11; tri[j].c = 5; j++;
+  tri[j].a = 1;  tri[j].b = 2;  tri[j].c = 8;  j++;
+  tri[j].a = 8;  tri[j].b = 7;  tri[j].c = 1;  j++;
+  tri[j].a = 2;  tri[j].b = 3;  tri[j].c = 9;  j++;
+  tri[j].a = 9;  tri[j].b = 8;  tri[j].c = 2;  j++;
+  tri[j].a = 3;  tri[j].b = 4;  tri[j].c = 10; j++;
+  tri[j].a = 10; tri[j].b = 9;  tri[j].c = 3;  j++;
+  tri[j].a = 4;  tri[j].b = 5;  tri[j].c = 11; j++;
+  tri[j].a = 11; tri[j].b = 10; tri[j].c = 4;  j++;
 
   // Triangles for the connection of the main branch to side branch.
-  tri[j].a = 14; tri[j].b = 7; tri[j].c = 6; j++;
-  tri[j].a = 15; tri[j].b = 14; tri[j].c = 6; j++;
-  tri[j].a = 1; tri[j].b = 7; tri[j].c = 14; j++;
-  tri[j].a = 13; tri[j].b = 1; tri[j].c = 14; j++;
-  tri[j].a = 12; tri[j].b = 1; tri[j].c = 13; j++;
-  tri[j].a = 0; tri[j].b = 1; tri[j].c = 12; j++;
-  tri[j].a = 5; tri[j].b = 0; tri[j].c = 12; j++;
-  tri[j].a = 5; tri[j].b = 12; tri[j].c = 17; j++;
-  tri[j].a = 5; tri[j].b = 17; tri[j].c = 16; j++;
-  tri[j].a = 5; tri[j].b = 16; tri[j].c = 11; j++;
-  tri[j].a = 16; tri[j].b = 15; tri[j].c = 6; j++;
-  tri[j].a = 16; tri[j].b = 6; tri[j].c = 11; j++;
+  tri[j].a = 14; tri[j].b = 7;  tri[j].c = 6;  j++;
+  tri[j].a = 15; tri[j].b = 14; tri[j].c = 6;  j++;
+  tri[j].a = 1;  tri[j].b = 7;  tri[j].c = 14; j++;
+  tri[j].a = 13; tri[j].b = 1;  tri[j].c = 14; j++;
+  tri[j].a = 12; tri[j].b = 1;  tri[j].c = 13; j++;
+  tri[j].a = 0;  tri[j].b = 1;  tri[j].c = 12; j++;
+  tri[j].a = 5;  tri[j].b = 0;  tri[j].c = 12; j++;
+  tri[j].a = 5;  tri[j].b = 12; tri[j].c = 17; j++;
+  tri[j].a = 5;  tri[j].b = 17; tri[j].c = 16; j++;
+  tri[j].a = 5;  tri[j].b = 16; tri[j].c = 11; j++;
+  tri[j].a = 16; tri[j].b = 15; tri[j].c = 6;  j++;
+  tri[j].a = 16; tri[j].b = 6;  tri[j].c = 11; j++;
 
   // Side branch triangles.
   tri[j].a = 12; tri[j].b = 18; tri[j].c = 23; j++;
@@ -397,10 +396,10 @@ void csGeneralTreeFactoryLoader::GenerateBranch (csConstructionGeometry* co,
 
 void csGeneralTreeFactoryLoader::GenerateSmallBranch (
 	csConstructionGeometry* co,
-	float bot_radius, float top_radius, float height)
+	float brad, float trad, float height)
 {
   int j;
-  csVector3 vertices[200];
+  csVector3 vt[200];
   csTriangle tri[200];
   csReversibleTransform transform;
   csMatrix3 m;
@@ -408,63 +407,59 @@ void csGeneralTreeFactoryLoader::GenerateSmallBranch (
   int vtidx[100];
 
   j = 0;
-  vertices[j++].Set (-.1*bot_radius, 0, 0*bot_radius);
-  vertices[j++].Set (-.03*bot_radius, 0, .07*bot_radius);
-  vertices[j++].Set (.03*bot_radius, 0, .07*bot_radius);
-  vertices[j++].Set (.1*bot_radius, 0, 0*bot_radius);
-  vertices[j++].Set (.03*bot_radius, 0, -.07*bot_radius);
-  vertices[j++].Set (-.03*bot_radius, 0, -.07*bot_radius);
-  vertices[j++].Set (-.1*top_radius, height, 0*top_radius);
-  vertices[j++].Set (-.03*top_radius, height, .07*top_radius);
-  vertices[j++].Set (.03*top_radius, height, .07*top_radius);
-  vertices[j++].Set (.1*top_radius, height, 0*top_radius);
-  vertices[j++].Set (.03*top_radius, height, -.07*top_radius);
-  vertices[j++].Set (-.03*top_radius, height, -.07*top_radius);
+  vt[j++].Set (-.1*brad, 0, 0*brad);
+  vt[j++].Set (-.03*brad, 0, .07*brad);
+  vt[j++].Set (.03*brad, 0, .07*brad);
+  vt[j++].Set (.1*brad, 0, 0*brad);
+  vt[j++].Set (.03*brad, 0, -.07*brad);
+  vt[j++].Set (-.03*brad, 0, -.07*brad);
+  vt[j++].Set (-.1*trad, height, 0*trad);
+  vt[j++].Set (-.03*trad, height, .07*trad);
+  vt[j++].Set (.03*trad, height, .07*trad);
+  vt[j++].Set (.1*trad, height, 0*trad);
+  vt[j++].Set (.03*trad, height, -.07*trad);
+  vt[j++].Set (-.03*trad, height, -.07*trad);
 
   // Vertices for the connection to the side branch.
-  vertices[j++].Set (-.1, height*.4, 0);
-  vertices[j++].Set (-.085, height*.48, .015);
-  vertices[j++].Set (-.085, height*.52, .015);
-  vertices[j++].Set (-.1, height*.6, 0);
-  vertices[j++].Set (-.085, height*.52, -.015);
-  vertices[j++].Set (-.085, height*.48, -.015);
+  vt[j++].Set (-.1, height*.4, 0);
+  vt[j++].Set (-.085, height*.48, .015);
+  vt[j++].Set (-.085, height*.52, .015);
+  vt[j++].Set (-.1, height*.6, 0);
+  vt[j++].Set (-.085, height*.52, -.015);
+  vt[j++].Set (-.085, height*.48, -.015);
 
   // Vertices for the top of the side branch.
-  vertices[j++].Set (-.19, height*.52, 0);
-  vertices[j++].Set (-.175, height*.535, .015);
-  vertices[j++].Set (-.155, height*.555, .015);
-  vertices[j++].Set (-.14, height*.57, 0);
-  vertices[j++].Set (-.155, height*.555, -.015);
-  vertices[j++].Set (-.175, height*.535, -.015);
+  vt[j++].Set (-.19, height*.52, 0);
+  vt[j++].Set (-.175, height*.535, .015);
+  vt[j++].Set (-.155, height*.555, .015);
+  vt[j++].Set (-.14, height*.57, 0);
+  vt[j++].Set (-.155, height*.555, -.015);
+  vt[j++].Set (-.175, height*.535, -.015);
 
-  co->SetVertices (j, 6, vertices);
+  co->SetVertices (j, 6, vt);
   j = 0;
-  //tri[j].a = 0; tri[j].b = 1; tri[j].c = 7; j++;
-  //tri[j].a = 7; tri[j].b = 6; tri[j].c = 0; j++;
-  tri[j].a = 1; tri[j].b = 2; tri[j].c = 8; j++;
-  tri[j].a = 8; tri[j].b = 7; tri[j].c = 1; j++;
-  tri[j].a = 2; tri[j].b = 3; tri[j].c = 9; j++;
-  tri[j].a = 9; tri[j].b = 8; tri[j].c = 2; j++;
-  tri[j].a = 3; tri[j].b = 4; tri[j].c = 10; j++;
-  tri[j].a = 10; tri[j].b = 9; tri[j].c = 3; j++;
-  tri[j].a = 4; tri[j].b = 5; tri[j].c = 11; j++;
-  tri[j].a = 11; tri[j].b = 10; tri[j].c = 4; j++;
-  //tri[j].a = 5; tri[j].b = 0; tri[j].c = 6; j++;
-  //tri[j].a = 6; tri[j].b = 11; tri[j].c = 5; j++;
+  tri[j].a = 1;  tri[j].b = 2;  tri[j].c = 8;  j++;
+  tri[j].a = 8;  tri[j].b = 7;  tri[j].c = 1;  j++;
+  tri[j].a = 2;  tri[j].b = 3;  tri[j].c = 9;  j++;
+  tri[j].a = 9;  tri[j].b = 8;  tri[j].c = 2;  j++;
+  tri[j].a = 3;  tri[j].b = 4;  tri[j].c = 10; j++;
+  tri[j].a = 10; tri[j].b = 9;  tri[j].c = 3;  j++;
+  tri[j].a = 4;  tri[j].b = 5;  tri[j].c = 11; j++;
+  tri[j].a = 11; tri[j].b = 10; tri[j].c = 4;  j++;
 
   // Triangles for the connection of the main branch to side branch.
-  tri[j].a = 14; tri[j].b = 7; tri[j].c = 6; j++;
-  tri[j].a = 15; tri[j].b = 14; tri[j].c = 6; j++;
-  tri[j].a = 1; tri[j].b = 7; tri[j].c = 14; j++;
-  tri[j].a = 13; tri[j].b = 1; tri[j].c = 14; j++;
-  tri[j].a = 12; tri[j].b = 1; tri[j].c = 13; j++;
-  tri[j].a = 0; tri[j].b = 1; tri[j].c = 12; j++;
-  tri[j].a = 5; tri[j].b = 0; tri[j].c = 12; j++;
-  tri[j].a = 5; tri[j].b = 12; tri[j].c = 17; j++;
-  tri[j].a = 5; tri[j].b = 17; tri[j].c = 16; j++;
-  tri[j].a = 5; tri[j].b = 16; tri[j].c = 11; j++;
-  tri[j].a = 16; tri[j].b = 15; tri[j].c = 6; j++;
-  tri[j].a = 16; tri[j].b = 6; tri[j].c = 11; j++;
+  tri[j].a = 14; tri[j].b = 7;  tri[j].c = 6;  j++;
+  tri[j].a = 15; tri[j].b = 14; tri[j].c = 6;  j++;
+  tri[j].a = 1;  tri[j].b = 7;  tri[j].c = 14; j++;
+  tri[j].a = 13; tri[j].b = 1;  tri[j].c = 14; j++;
+  tri[j].a = 12; tri[j].b = 1;  tri[j].c = 13; j++;
+  tri[j].a = 0;  tri[j].b = 1;  tri[j].c = 12; j++;
+  tri[j].a = 5;  tri[j].b = 0;  tri[j].c = 12; j++;
+  tri[j].a = 5;  tri[j].b = 12; tri[j].c = 17; j++;
+  tri[j].a = 5;  tri[j].b = 17; tri[j].c = 16; j++;
+  tri[j].a = 5;  tri[j].b = 16; tri[j].c = 11; j++;
+  tri[j].a = 16; tri[j].b = 15; tri[j].c = 6;  j++;
+  tri[j].a = 16; tri[j].b = 6;  tri[j].c = 11; j++;
 
   // Side branch triangles.
   tri[j].a = 12; tri[j].b = 18; tri[j].c = 23; j++;
@@ -517,7 +512,7 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   plugin_mgr = CS_QUERY_REGISTRY (object_reg, iPluginManager);
   reporter = CS_QUERY_REGISTRY (object_reg, iReporter);
 
-  csVector3 vertices[100];
+  csVector3 vt[100];
   csTriangle tri[100];
   int j;
 
@@ -541,14 +536,14 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   // A tip with no output connectors.
   //---------
   j = 0;
-  vertices[j++].Set (-.1, 0, 0);
-  vertices[j++].Set (-.03, 0, .07);
-  vertices[j++].Set (.03, 0, .07);
-  vertices[j++].Set (.1, 0, 0);
-  vertices[j++].Set (.03, 0, -.07);
-  vertices[j++].Set (-.03, 0, -.07);
-  vertices[j++].Set (0, .5, 0);
-  cg_tip->SetVertices (j, 6, vertices);
+  vt[j++].Set (-.1, 0, 0);
+  vt[j++].Set (-.03, 0, .07);
+  vt[j++].Set (.03, 0, .07);
+  vt[j++].Set (.1, 0, 0);
+  vt[j++].Set (.03, 0, -.07);
+  vt[j++].Set (-.03, 0, -.07);
+  vt[j++].Set (0, .5, 0);
+  cg_tip->SetVertices (j, 6, vt);
   j = 0;
   tri[j].a = 0; tri[j].b = 1; tri[j].c = 6; j++;
   tri[j].a = 1; tri[j].b = 2; tri[j].c = 6; j++;
@@ -571,6 +566,16 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   co_tree = new csConstructionObject (cg_straighttrunk);
   co_branch1 = new csConstructionObject (cg_branch);
   co_branch2 = new csConstructionObject (cg_branch);
+  co_tree->AddRule (new csStraightRule (co_branch1));
+  co_branch1->AddRule (new csStraightRule (co_branch2));
+  co_branch1->AddRule (new csStraightRule (NULL));
+  co_branch2->AddRule (new csStraightRule (NULL));
+  co_branch2->AddRule (new csStraightRule (NULL));
+
+#if 0
+  co_tree = new csConstructionObject (cg_straighttrunk);
+  co_branch1 = new csConstructionObject (cg_branch);
+  co_branch2 = new csConstructionObject (cg_branch);
   co_top = new csConstructionObject (cg_tip);
   co_sidebranch = new csConstructionObject (cg_branch);
   co_twig = new csConstructionObject (cg_smallbranch);
@@ -588,6 +593,7 @@ bool csGeneralTreeFactoryLoader::Initialize (iObjectRegistry* object_reg)
   co_twig->AddRule (new csStraightRule (co_twigside1));
   co_twigside1->AddRule (new csStraightRule (co_twigside2));
   co_twigside2->AddRule (new csStraightRule (co_top));
+#endif
 
   return true;
 }
@@ -666,9 +672,20 @@ printf ("tri:%d vt:%d\n", construction->GetTriangleCount (),
 		construction->GetVertexCount ());
 
   state->SetVertexCount (construction->GetVertexCount ());
-  memcpy (state->GetVertices (), construction->GetVertices (),
+  csVector3* vt = state->GetVertices ();
+  memcpy (vt, construction->GetVertices (),
   	construction->GetVertexCount ()*sizeof (csVector3));
-  // @@@ Texels?
+  csVector2* tx = state->GetTexels ();
+  int i;
+  for (i = 0 ; i < construction->GetVertexCount () ; i++)
+  {
+    const csVector3& v = vt[i];
+    csVector2& uv = tx[i];
+    // This is a bit like 3D texture mapping.
+    uv.x = fmod (10.*fabs (v.x+v.z), 1.)/2.;
+    uv.y = fmod (fabs (v.y), 1.);
+    if (int (v.y) & 1) uv.y = 1-uv.y;
+  }
   state->SetTriangleCount (construction->GetTriangleCount ());
   memcpy (state->GetTriangles (), construction->GetTriangles (),
   	construction->GetTriangleCount ()*sizeof (csTriangle));
@@ -867,10 +884,9 @@ bool csConstruction::AddConstructionObject (int depth,
   else
   {
     new_g2o = &rotation;
-    rotation = g2o*csTransform (csYRotMatrix3 (
-    	-PI*2.*float (rotate_connection_points)
-		/ float (num_connection_points)),
-	csVector3 (0));
+    csYRotMatrix3 rot_matrix (-PI*2*float (rotate_connection_points)
+    		/ float (num_connection_points));
+    rotation = csTransform (rot_matrix, csVector3 (0)) * g2o;
   }
 
   // Add all vertices except for the initial connection points.
@@ -895,21 +911,24 @@ bool csConstruction::AddConstructionObject (int depth,
     csOutputConnector* ocon = geom->GetOutputConnector (i);
     csConstructionRule* rule = con->GetRule (i);
     csConstructionObject* new_con = rule->GetConstructionObject (depth);
-    int* new_points = new int[ocon->GetPointCount ()];
-    int j;
-    for (j = 0 ; j < ocon->GetPointCount () ; j++)
-      new_points[j] = mapping[ocon->GetPoints ()[j]];
-
-    if (!AddConstructionObject (depth+1, (*new_g2o)*ocon->GetTransform (),
-  	ocon->GetPointCount (), new_points,
-	rule->GetRotation (depth),
-	new_con))
+    if (new_con)
     {
+      int* new_points = new int[ocon->GetPointCount ()];
+      int j;
+      for (j = 0 ; j < ocon->GetPointCount () ; j++)
+        new_points[j] = mapping[ocon->GetPoints ()[j]];
+
+      if (!AddConstructionObject (depth+1, (*new_g2o)*ocon->GetTransform (),
+  	  ocon->GetPointCount (), new_points,
+	  rule->GetRotation (depth),
+	  new_con))
+      {
+        delete[] new_points;
+        delete[] mapping;
+        return false;
+      }
       delete[] new_points;
-      delete[] mapping;
-      return false;
     }
-    delete[] new_points;
   }
 
   delete[] mapping;

@@ -5,6 +5,8 @@ The history order is reversed so that new features are at the top.
 	  sprite actions. Also, scaling and axis conventions are now
 	  coherent with mdl2spr. I hope nobody was using it :-)
 	- Some further experiments with tree generation. Unfinished.
+	- Further work on tree. At this moment it doesn't even resemble
+	  a tree :-) I'm still debugging. Added texture mapping.
 28-Jan-2002
 	- Seperated geometry and rule in the tree generator. This will make
 	  it easier to setup better rules.

@@ -1,5 +1,6 @@
 WORLD (
   TEXTURES (
+    TEXTURE 'tree' (FILE (/lib/stdtex/tree.gif))
     TEXTURE 'oldmetal.gif' (FILE (/lib/stdtex/oldmetal.jpg))
     TEXTURE 'parket.gif' (FILE (/lib/stdtex/parket.jpg))
     TEXTURE 'asphalt.gif' (FILE (/lib/stdtex/asphalt.jpg))
@@ -31,6 +32,7 @@ WORLD (
     PROCTEX 'plasma' (TYPE (PLASMA))
   )
   MATERIALS (
+    MATERIAL 'tree' (TEXTURE ('tree'))
     MATERIAL 'snow' (TEXTURE ('snow'))
     MATERIAL 'spark' (TEXTURE ('spark'))
     MATERIAL 'mosholes' (TEXTURE ('mosholes.gif'))
@@ -2411,7 +2413,8 @@ WORLD (
       PLUGIN ('mesh')
       PARAMS (
         FACTORY ('treeFact')
-	MATERIAL ('mosaic')
+	MATERIAL ('tree')
+	MIXMODE (TILING ())
       )
       MOVE (V (-2.5,.3,14))
     )
