@@ -52,7 +52,7 @@ public:
   virtual bool SetMouseCursor(csMouseCursorID);
   virtual bool HandleEvent(iEvent&);
 
-  bool system_extension(char const* msg, void* = 0, void* = 0) const;
+  bool system_extension(char const* msg, va_list) const;
   void user_close() const;
 };
 
@@ -63,8 +63,8 @@ public:
 typedef void* NeXTDriver2D;
 
 N2D_PROTO(void,user_close)(NeXTDriver2D);
-N2D_PROTO(int,system_extension)
-    (NeXTDriver2D, char const* msg, void* data1, void* data2);
+N2D_PROTO(int,system_extension)(NeXTDriver2D, char const* msg, ...);
+N2D_PROTO(int,system_extension_v)(NeXTDriver2D, char const* msg, va_list);
 
 #undef N2D_PROTO
 

@@ -127,7 +127,7 @@ void NeXTSystemDriver::advance_state()
 
 
 //-----------------------------------------------------------------------------
-// PerformExtension
+// PerformExtensionV
 //
 // Perform a system-specific extension.  The following requests are understood:
 //
@@ -247,9 +247,18 @@ bool NeXTSystemDriver::PerformExtensionV(char const* cmd, va_list args)
   return ok;
 }
 
-NSD_PROTO(int,system_extension)
-  (NeXTSystemHandle h, char const* msg, void* d1, void* d2, void* d3)
-  { return ((NeXTSystemDriver*)h)->PerformExtension(msg, d1, d2, d3); }
+NSD_PROTO(int,system_extension_v)
+  (NeXTSystemHandle h, char const* msg, va_list args)
+  { return ((NeXTSystemDriver*)h)->PerformExtensionV(msg, args); }
+
+NSD_PROTO(int,system_extension)(NeXTSystemHandle h, char const* msg, ...)
+{
+  va_list args;
+  va_start(args, msg);
+  int const rc = NeXTSystemDriver_system_extension_v(h, msg, args);
+  va_end(args);
+  return rc;
+}
 
 
 //-----------------------------------------------------------------------------

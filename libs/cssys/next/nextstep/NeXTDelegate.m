@@ -133,7 +133,7 @@ enum
 static inline BOOL continue_running(NeXTSystemDriver driver)
 {
   int run;
-  NeXTSystemDriver_system_extension(driver, "continuerunning", &run, 0, 0);
+  NeXTSystemDriver_system_extension(driver, "continuerunning", &run);
   return run;
 }
 
@@ -198,7 +198,7 @@ static inline BOOL continue_running(NeXTSystemDriver driver)
 //-----------------------------------------------------------------------------
 - (id)applicationDefined:(NXEvent*)e
 {
-  NeXTSystemDriver_system_extension(driver, "advancestate", 0, 0, 0);
+  NeXTSystemDriver_system_extension(driver, "advancestate");
   if (!paused && continue_running(driver))
     [self scheduleEvent];
   return self;
@@ -254,7 +254,7 @@ ND_PROTO(void,flush_graphics_context)(NeXTDelegateHandle handle)
 //-----------------------------------------------------------------------------
 - (id)quit:(id)sender
 {
-  NeXTSystemDriver_system_extension(driver, "requestshutdown", 0, 0, 0);
+  NeXTSystemDriver_system_extension(driver, "requestshutdown");
   return self;
 }
 
@@ -410,8 +410,7 @@ ND_PROTO(void,flush_graphics_context)(NeXTDelegateHandle handle)
       modifiers &= ~csmask;
       request = "keyup";
     }
-    NeXTSystemDriver_system_extension(
-      driver, request, (void*)key, (void*)-1, 0);
+    NeXTSystemDriver_system_extension(driver, request, key, -1);
   }
 }
 
@@ -427,8 +426,7 @@ ND_PROTO(void,flush_graphics_context)(NeXTDelegateHandle handle)
     if ([self classifyKeyDown:p raw:&raw cooked:&cooked])
     {
       char const* request = flag ? "keydown" : "keyup";
-      NeXTSystemDriver_system_extension(
-	driver, request, (void*)raw, (void*)cooked, 0);
+      NeXTSystemDriver_system_extension(driver, request, raw, cooked);
     }
   }
 }
@@ -463,8 +461,7 @@ ND_PROTO(void,flush_graphics_context)(NeXTDelegateHandle handle)
   {
     int x, y;
     if ([self localize:p toView:v x:&x y:&y])
-      NeXTSystemDriver_system_extension(
-	driver, "mousemoved", (void*)x, (void*)y, 0);
+      NeXTSystemDriver_system_extension(driver, "mousemoved", x, y);
   }
 }
 
@@ -474,8 +471,7 @@ ND_PROTO(void,flush_graphics_context)(NeXTDelegateHandle handle)
   {
     int x, y;
     [self localize:p toView:v x:&x y:&y];
-    NeXTSystemDriver_system_extension(
-      driver, "mouseup", (void*)button, (void*)x, (void*)y);
+    NeXTSystemDriver_system_extension(driver, "mouseup", button, x, y);
   }
 }
 
@@ -485,8 +481,7 @@ ND_PROTO(void,flush_graphics_context)(NeXTDelegateHandle handle)
   {
     int x, y;
     [self localize:p toView:v x:&x y:&y];
-    NeXTSystemDriver_system_extension(
-      driver, "mousedown", (void*)button, (void*)x, (void*)y);
+    NeXTSystemDriver_system_extension(driver, "mousedown", button, x, y);
   }
 }
 
@@ -545,7 +540,7 @@ ND_PROTO(void,dispatch_event)
   {
     paused = YES;
     [self showMouse];
-    NeXTSystemDriver_system_extension(driver, "appdeactivated", 0, 0, 0);
+    NeXTSystemDriver_system_extension(driver, "appdeactivated");
   }
 }
 
@@ -555,7 +550,7 @@ ND_PROTO(void,dispatch_event)
   {
     paused = NO;
     [self scheduleEvent];
-    NeXTSystemDriver_system_extension(driver, "appactivated", 0, 0, 0);
+    NeXTSystemDriver_system_extension(driver, "appactivated");
   }
 }
 

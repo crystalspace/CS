@@ -125,7 +125,7 @@ N2D_PROTO(int,best_bits_per_sample)(NeXTDelegateHandle2D handle)
       tag:TRACK_TAG left:NO right:NO];
     [self enableMouseMoved:mouseInside];
     if (hideMouse && mouseInside)
-      NeXTDriver2D_system_extension(driver, "hidemouse", 0, 0);
+      NeXTDriver2D_system_extension(driver, "hidemouse");
     trackingMouse = YES;
   }
 }
@@ -140,7 +140,7 @@ N2D_PROTO(int,best_bits_per_sample)(NeXTDelegateHandle2D handle)
   {
     [self enableMouseMoved:NO];
     [window discardTrackingRect:TRACK_TAG];
-    NeXTDriver2D_system_extension(driver, "showmouse", 0, 0);
+    NeXTDriver2D_system_extension(driver, "showmouse");
     trackingMouse = NO;
   }
 }
@@ -264,7 +264,7 @@ N2D_PROTO(void,focus_changed)(NeXTDelegateHandle2D handle, int focused)
 - (void)flush
 {
   [view flush];
-  NeXTDriver2D_system_extension(driver, "flushgraphicscontext", 0, 0);
+  NeXTDriver2D_system_extension(driver, "flushgraphicscontext");
 }
 
 N2D_PROTO(void,flush)(NeXTDelegateHandle2D handle)
@@ -284,9 +284,9 @@ N2D_PROTO(void,flush)(NeXTDelegateHandle2D handle)
   }
   
   if (hideMouse)
-    NeXTDriver2D_system_extension(driver, "hidemouse", 0, 0);
+    NeXTDriver2D_system_extension(driver, "hidemouse");
   else
-    NeXTDriver2D_system_extension(driver, "showmouse", 0, 0);
+    NeXTDriver2D_system_extension(driver, "showmouse");
   return !hideMouse;
 }
 
@@ -304,7 +304,7 @@ N2D_PROTO(int,set_mouse_cursor)
   {
     [self enableMouseMoved:YES];
     if (hideMouse)
-      NeXTDriver2D_system_extension(driver, "hidemouse", 0, 0);
+      NeXTDriver2D_system_extension(driver, "hidemouse");
   }
   return self;
 }
@@ -318,7 +318,7 @@ N2D_PROTO(int,set_mouse_cursor)
   if (p->data.tracking.trackingNum == TRACK_TAG)
   {
     [self enableMouseMoved:NO];
-    NeXTDriver2D_system_extension(driver, "showmouse", 0, 0);
+    NeXTDriver2D_system_extension(driver, "showmouse");
   }
   return self;
 }
@@ -362,7 +362,7 @@ N2D_PROTO(int,set_mouse_cursor)
 {
   [self stopTrackingMouse];
   if (hideMouse)
-    NeXTDriver2D_system_extension(driver, "showmouse", 0, 0);
+    NeXTDriver2D_system_extension(driver, "showmouse");
   NeXTDriver2D_user_close(driver);
   return self;
 }

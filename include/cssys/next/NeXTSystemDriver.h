@@ -65,8 +65,8 @@ class SysSystemDriver : public NeXTSystemDriver {};
 
 typedef void* NeXTSystemDriver;
 
-NSD_PROTO(int,system_extension)
-  (NeXTSystemDriver, char const* msg, void* data1, void* data2, void* data3);
+NSD_PROTO(int,system_extension)(NeXTSystemDriver, char const* msg, ...);
+NSD_PROTO(int,system_extension_v)(NeXTSystemDriver, char const* msg, va_list);
 
 #undef NSD_PROTO
 

@@ -185,15 +185,24 @@ void NeXTDriver2D::setup_rgb_32()
 //-----------------------------------------------------------------------------
 // system_extension
 //-----------------------------------------------------------------------------
-bool NeXTDriver2D::system_extension(
-  char const* msg, void* data1, void* data2) const
+bool NeXTDriver2D::system_extension(char const* msg, va_list args) const
 {
-  return System->PerformExtension(msg, data1, data2);
+  return System->PerformExtensionV(msg, args);
 }
 
+N2D_PROTO(int,system_extension_v)
+  (NeXTDriverHandle2D handle, char const* msg, va_list args)
+  { return ((NeXTDriver2D*)handle)->system_extension(msg, args); }
+
 N2D_PROTO(int,system_extension)
-  (NeXTDriverHandle2D handle, char const* msg, void* data1, void* data2)
-  { return ((NeXTDriver2D*)handle)->system_extension(msg, data1, data2); }
+  (NeXTDriverHandle2D handle, char const* msg, ...)
+{
+  va_list args;
+  va_start(args, msg);
+  int const rc = NeXTDriver2D_system_extension_v(handle, msg, args);
+  va_end(args);
+  return rc;
+}
 
 
 //-----------------------------------------------------------------------------
