@@ -1,0 +1,181 @@
+crystalspace (0.96-20030119) unstable; urgency=low
+
+  * New upstream version
+
+ -- Christian Bayle <bayle@debian.org>  Sun, 19 Jan 2003 12:54:54 +0100
+
+crystalspace (0.94-20020502-4) unstable; urgency=low
+
+  * Integrate NMU changes upstream (Next time please, when you NMU
+    send a patch, thanks)
+  * Failed to build from source patch (Closes: bug#174969)
+  * Renaming zoo in cszoo for name conflic with /usr/bin/zoo
+   (Closes: bug#170536)
+  * Added script/cs-config files (Closes: bug#157234)
+
+ -- Christian Bayle <bayle@debian.org>  Sun, 12 Jan 2003 18:43:36 +0100
+
+crystalspace (0.94-20020502-3.1) unstable; urgency=low
+
+  * NMU to fix breakage caused by libvorbis0 split.
+
+ -- Christopher L Cheney <ccheney@debian.org>  Mon, 29 Jul 2002 23:00:00 -0500
+
+crystalspace (0.95-20020813) unstable; urgency=low
+
+  * Updates to make compilation easier with recent CVS
+
+ -- Peter Amstutz <tetron@interreality.org>  Tue, 13 Aug 2002 08:31:56 +0100
+
+crystalspace (0.94-20020502-3) unstable; urgency=low
+
+  * Added support for HPPA and M68K in arch.sh commited upstream
+  this should (Closes: bug#146076) and (Closes: bug#146688), please reopen
+  in case of problem
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
+crystalspace (0.94-20020502-2) unstable; urgency=low
+
+  * Upstream change, should solve ia64 compile problems (CLoses: bug#145631)
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
+crystalspace (0.94-20020502-1) unstable; urgency=low
+
+  * New snapshot
+  * Updated description in control file (Closes: bug#145225)
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
+crystalspace (0.94-20020412-3) unstable; urgency=low
+
+  * I completly missed version numbering to 2001 instead of 2002 
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
+crystalspace (0.94-20020412-2) unstable; urgency=low
+
+  * Make compile with -fPIC, this solve compile problems
+  on ia64 (Closes: bug#142633)
+  * Made a change in upstream plugins/net/driver/ensocket/inet.h
+  size_t is now  socklen_t to try to correct autobuilder failure on s390.
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
+crystalspace (0.94-20020412-1) unstable; urgency=low
+
+  * Added suggested changes proposed by Gerhard Tonn <GerhardTonn@swol.de>
+  to support s390 (Closes: bug#142404)
+  * Renaming picview in cspicview because of name conflict with picview 
+  package (Closes: bug#141198)
+  * New upstream
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
+crystalspace (0.93-20020318-8) unstable; urgency=low
+
+  * Changed svgalibg1-dev dependancy to try to get autobuilders happy
+  * I won't upload package daily when everything will compile on 
+  all platforms (Closes: bug#140851)
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
+crystalspace (0.93-20020318-7) unstable; urgency=low
+
+  * Changed version dependency on lib3ds-dev
+  * Repeating Automan correction/improvment (Closes: bug#140793)
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
+crystalspace (0.93-20020318-6) unstable; urgency=low
+
+  * Section changes in control file
+  * Added dependancy on zlib1g (Closes: bug#140649)
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
+crystalspace (0.93-20020318-5) unstable; urgency=low
+
+  * Repeating First upload (CLoses: bug#120691)
+  * Removed csdemo from demos menus (Closes: bug#140508)
+  * Added dependancy on on svgalib1 (Closes: bug#140510)
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
+crystalspace (0.93-20020318-4) unstable; urgency=low
+
+  * Automan correction/improvment
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
+crystalspace (0.93-20020318-3) unstable; urgency=low
+
+  * Added dependency on zip, libpng, libjpeg62
+  svgalibg1, python2.1, libfreetype6, lib3ds
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
+crystalspace (0.93-20020315-2) unstable; urgency=low
+
+  * Added dependency on xlibmesa
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
+crystalspace (0.93-20020315-1) unstable; urgency=low
+
+  * First upload (CLoses: bug#120691)
+  * Fix cs-config from Loic Dachary
+  * Cleanup in rules and createmenus
+  * Added Missing .cfg files from Loic
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
+crystalspace (0.92-1) unstable; urgency=low
+
+  * Made i386 only, no i[4-6]86 optimization
+  * CVS Daily Packaging
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 13 Feb 2002 08:31:56 +0100
+
+crystalspace (0.90-5) unstable; urgency=low
+
+  * Added hints in menu
+  * Added missing build dependencies
+  * Force compiling with i386 
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Mon,  3 Dec 2001 17:52:23 +0100
+
+crystalspace (0.90-4) unstable; urgency=low
+
+  * Policy Cleaning
+  * -Moved demos binaries to /usr/games
+  * -Moved dev binary to /usr/bin
+  * -Moved includes to /usr/include/crystalspace
+  * Added man generator (Not all binaries yet)
+  * Added menus for software or opengl rendering 
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Mon, 26 Nov 2001 10:22:33 +0100
+
+crystalspace (0.90-3) unstable; urgency=low
+
+  * Made better distribution of files beetween main and demos packages
+  * Added demos and data packages
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Wed, 21 Nov 2001 15:16:07 +0100
+
+crystalspace (0.90-2) unstable; urgency=low
+
+  * Added more appli in menus 
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Mon, 19 Nov 2001 22:35:02 +0100
+
+crystalspace (0.90-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Christian Bayle <bayle@aist.enst.fr>  Tue, 20 Nov 2001 21:49:31 +0100
+
+Local variables:
+mode: debian-changelog
+End:
