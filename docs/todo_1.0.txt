@@ -16,6 +16,8 @@ Bugs to fix:
 	  portals.
 	- Investigate if PlaceMesh() works correctly. I suspect it
 	  doesn't. May be related to bug [Bug 471638].
+	- One of the halos in flarge seems to disappear in some cases
+	  with OpenGL.
 	- Fix radiosity so that it works again. Radiosity is currently
 	  disabled because several things had been rewritten and the
 	  radiosity code was left behind.
