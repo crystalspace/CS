@@ -62,7 +62,7 @@ public:
    */
   virtual bool IsInRegion (iObject* obj);
 
-  SCF_DECLARE_IBASE;
+  SCF_DECLARE_IBASE_EXT (csObject);
 
   //--------------------- iRegion implementation ---------------------
   struct Region : public iRegion

@@ -34,9 +34,9 @@
 
 //---------------------------------------------------------------------------
 
-SCF_IMPLEMENT_IBASE (csRegion)
+SCF_IMPLEMENT_IBASE_EXT (csRegion)
   SCF_IMPLEMENTS_EMBEDDED_INTERFACE (iRegion)
-SCF_IMPLEMENT_IBASE_END
+SCF_IMPLEMENT_IBASE_EXT_END
 
 SCF_IMPLEMENT_EMBEDDED_IBASE (csRegion::Region)
   SCF_IMPLEMENTS_INTERFACE (iRegion)
@@ -44,7 +44,6 @@ SCF_IMPLEMENT_EMBEDDED_IBASE_END
 
 csRegion::csRegion (csEngine* e) : csObject ()
 {
-  SCF_CONSTRUCT_IBASE (NULL);
   SCF_CONSTRUCT_EMBEDDED_IBASE (scfiRegion);
   engine = e;
 }

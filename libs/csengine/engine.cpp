@@ -1583,6 +1583,7 @@ void csEngine::SelectRegion (const char *iName)
 
 void csEngine::SelectRegion (iRegion* region)
 {
+  if (!region) { csEngine::region = NULL; return; }
   csEngine::region = (csRegion*)(region->GetPrivateObject ());
 }
 
@@ -1830,8 +1831,11 @@ iSector *csEngine::FindSector (const char *iName, bool regionOnly) const
 {
   iSector* sec;
   if (regionOnly && region)
-    sec = SCF_QUERY_INTERFACE_FAST (FindObjectInRegion (region, sectors, iName),
-      iSector);
+  {
+    iObject* obj = FindObjectInRegion (region, sectors, iName);
+    if (!obj) return NULL;
+    sec = SCF_QUERY_INTERFACE_FAST (obj, iSector);
+  }
   else
     sec = sectors.FindByName (iName);
   return sec;
@@ -1904,8 +1908,11 @@ iMaterialWrapper* csEngine::FindMaterial (const char* iName,
 {
   iMaterialWrapper* wr;
   if (regionOnly && region)
-    wr = SCF_QUERY_INTERFACE_FAST (FindObjectInRegion (region, *materials, iName),
-      iMaterialWrapper);
+  {
+    iObject* obj = FindObjectInRegion (region, *materials, iName);
+    if (!obj) return NULL;
+    wr = SCF_QUERY_INTERFACE_FAST (obj, iMaterialWrapper);
+  }
   else
     wr = materials->FindByName (iName);
   return wr;
@@ -1916,8 +1923,11 @@ iTextureWrapper* csEngine::FindTexture (const char* iName,
 {
   iTextureWrapper* wr;
   if (regionOnly && region)
-    wr = SCF_QUERY_INTERFACE_FAST (FindObjectInRegion (region, *textures, iName),
-      iTextureWrapper);
+  {
+    iObject* obj = FindObjectInRegion (region, *textures, iName);
+    if (!obj) return NULL;
+    wr = SCF_QUERY_INTERFACE_FAST (obj, iTextureWrapper);
+  }
   else
     wr = textures->FindByName (iName);
   return wr;

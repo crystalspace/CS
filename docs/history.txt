@@ -25,8 +25,22 @@ The history order is reversed so that new features are at the top.
 		GetPlugInCount -> GetPluginCount
 		csPlugInsVector -> csPluginVector
 		iSaverPlugIn -> iSaverPlugin
-	  This change is a change of PlugIn for Plugin in all instances inside
-	  the libs, plugins and apps.
+		FindPlugIn -> FindPlugin
+		FindPlugInRec -> FindPluginRec
+		ConfigPriorityPlugIn -> ConfigPriorityPlugin
+		NewPlugIn -> NewPlugin
+	  This change is a change of PlugIn for Plugin in
+	  all instances inside the libs, plugins and apps.
+	  Docs and config files also updated.
+	- Fixed csEngine::FindMaterial(), FindTexture(), and FindSector()
+	  so that they actually don't crash when they couldn't find
+	  an object in the specified region. They were blindly doing
+	  SCF_QUERY_INTERFACE without first checking if the returned
+	  object was not-NULL.
+	- Fixed an SCF bug in csRegion. It was doing SCF_DECLARE_IBASE
+	  instead of SCF_DECLARE_IBASE_EXT.
+	- Fixed a bug in csEngine::SelectRegion(). It would crash if
+	  a NULL region was given.
 	- Eric Sunshine eliminated a couple compilation warnings in surf.cpp
 	  regarding possible use of unitialized variables.
 	- Eric Sunshine fixed a few minor problems with the SDL canvas which

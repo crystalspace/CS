@@ -278,10 +278,10 @@ void ceCswsEngineApp::SetupDefaultWorld ()
   iPolygon3D* p;
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
-  p->CreateVertex (csVector3 (-5, 0, 5));
-  p->CreateVertex (csVector3 (5, 0, 5));
-  p->CreateVertex (csVector3 (5, 0, -5));
-  p->CreateVertex (csVector3 (-5, 0, -5));
+  p->CreateVertex (csVector3 (-5, -1, 5));
+  p->CreateVertex (csVector3 (5, -1, 5));
+  p->CreateVertex (csVector3 (5, -1, -5));
+  p->CreateVertex (csVector3 (-5, -1, -5));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   p = walls_state->CreatePolygon ();
@@ -296,32 +296,32 @@ void ceCswsEngineApp::SetupDefaultWorld ()
   p->SetMaterial (tm);
   p->CreateVertex (csVector3 (-5, 20, 5));
   p->CreateVertex (csVector3 (5, 20, 5));
-  p->CreateVertex (csVector3 (5, 0, 5));
-  p->CreateVertex (csVector3 (-5, 0, 5));
+  p->CreateVertex (csVector3 (5, -1, 5));
+  p->CreateVertex (csVector3 (-5, -1, 5));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->CreateVertex (csVector3 (5, 20, 5));
   p->CreateVertex (csVector3 (5, 20, -5));
-  p->CreateVertex (csVector3 (5, 0, -5));
-  p->CreateVertex (csVector3 (5, 0, 5));
+  p->CreateVertex (csVector3 (5, -1, -5));
+  p->CreateVertex (csVector3 (5, -1, 5));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->CreateVertex (csVector3 (-5, 20, -5));
   p->CreateVertex (csVector3 (-5, 20, 5));
-  p->CreateVertex (csVector3 (-5, 0, 5));
-  p->CreateVertex (csVector3 (-5, 0, -5));
+  p->CreateVertex (csVector3 (-5, -1, 5));
+  p->CreateVertex (csVector3 (-5, -1, -5));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
 
   p = walls_state->CreatePolygon ();
   p->SetMaterial (tm);
   p->CreateVertex (csVector3 (5, 20, -5));
   p->CreateVertex (csVector3 (-5, 20, -5));
-  p->CreateVertex (csVector3 (-5, 0, -5));
-  p->CreateVertex (csVector3 (5, 0, -5));
+  p->CreateVertex (csVector3 (-5, -1, -5));
+  p->CreateVertex (csVector3 (5, -1, -5));
   p->SetTextureSpace (p->GetVertex (0), p->GetVertex (1), 3);
   walls_state->DecRef ();
 

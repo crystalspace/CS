@@ -1459,8 +1459,8 @@ void OpenPortal (iLoader *LevelLoader, iView* view, char* lev)
   thing->GetMovable ()->UpdateMove ();
 
   // First make a portal to the new level.
-  iCameraPosition* cp = Sys->Engine->GetCurrentRegion ()->
-  	FindCameraPosition ("Start");
+  iRegion* cur_region = Sys->Engine->GetCurrentRegion ();
+  iCameraPosition* cp = cur_region->FindCameraPosition ("Start");
   const char* room_name;
   csVector3 topos;
   if (cp) { room_name = cp->GetSector (); topos = cp->GetPosition (); }
