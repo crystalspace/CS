@@ -639,7 +639,7 @@ bool csBallMeshObject::HitBeamObject(const csVector3& start,
     if (csIntersect3::IntersectTriangle (vrt[tr[i].a], vrt[tr[i].b],
     	vrt[tr[i].c], seg, tmp))
     {
-      if ( dist > (temp = csSquaredDist::PointPoint (start, tmp)));
+      if ( dist > (temp = csSquaredDist::PointPoint (start, tmp)))
       {
           isect = tmp;
 	  dist = temp;
