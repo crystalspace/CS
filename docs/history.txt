@@ -22,6 +22,7 @@ chronological order.
 	- Wouter fixed glcommon2d to glClear after resizing. Apparently some
  	  drivers (like ati radeon 7500 on win XP) corrupt the video
  	  memory if you don't. Fix from Robin Stanton.
+	- Wouter added SetDefaultFont to AwsPrefsManager.
 11-Nov-2003
 	- Eric Sunshine fixed MacOS/X application menu malfunction introduced
 	  on August 1, 2003 when configuration was changed so that OSXDelegate

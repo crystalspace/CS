@@ -169,6 +169,11 @@ void awsPrefManager::SetFontServer (iFontServer *fntsvr)
   default_font = fontsvr->LoadFont (CSFONT_LARGE);
 }
 
+void awsPrefManager::SetDefaultFont (iFont *font)
+{
+  default_font = font;
+}
+
 void awsPrefManager::SetWindowMgr (iAws *_wmgr)
 {
   wmgr = _wmgr;

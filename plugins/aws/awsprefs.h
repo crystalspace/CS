@@ -806,6 +806,9 @@ public:
   /** Changes the font server.  This must be set during setup in awsManager. */
   virtual void SetFontServer (iFontServer *fntsvr);
 
+  /** Changes the default font. This must be set during setup in awsManager. */
+  virtual void SetDefaultFont (iFont *font);
+
   /** Changes the window manager.  This must be set during setup in awsManager. */
   virtual void SetWindowMgr (iAws *_wmgr);
 
