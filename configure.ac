@@ -1300,7 +1300,7 @@ AS_IF([test $cs_cv_libode_recent = yes],
 	    extern "C"
 	    int dCollideBoxPlane(dxGeom*,dxGeom*,int,dContactGeom*,int);]],
 	    [dCollideBoxPlane(0,0,0,0,0);])],
-	[], [C++], [CS_EMIT_BUILD_RESULT([ODE.EXTERN_C], [yes])], [], [],
+	[], [C++], [CS_EMIT_BUILD_PROPERTY([ODE.EXTERN_C], [yes])], [], [],
 	[$cs_cv_libode_cflags], [$cs_cv_libode_lflags], [$cs_cv_libode_libs])])
 
 
