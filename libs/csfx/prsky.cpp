@@ -92,6 +92,7 @@ csProcSky::csProcSky()
   sunpos = compassdir * sunpos;
   sunpos += center;
   suncolor.Set(1.0,1.0,0.6);
+  maxhaze.Set(130,150,255);
 
   nr_octaves = 5;
   octsize = 32; // octave is octsize x octsize
@@ -312,8 +313,9 @@ bool csProcSky::SphereIntersect(const csVector3& point, csVector3& isect)
 
 float csProcSky::GetSundist(const csVector3& spot)
 {
-  float sundist = (spot-sunpos).Norm()/ (radius - (cam.y-center.y));
-  sundist /=10.;
+  float rad = (radius - (cam.y - center.y));
+  float sundist = (spot-sunpos).SquaredNorm()/ (rad*rad);
+  sundist /= 5.;
   return sundist;
 }
 
@@ -323,7 +325,6 @@ csRGBcolor csProcSky::GetSkyBlue(const csVector3& spot, float& haze,
 {
   csRGBcolor res;
   int r,g,b;
-  csRGBcolor maxhaze(130,150,255);
 
   if(spot.y < cam.y) 
   {
@@ -366,7 +367,6 @@ csRGBcolor csProcSky::GetSkyBlue(const csVector3& spot, float& haze,
 
   float elev = haze; //- sundist;
   //if(elev<0.0)elev=0.0;
-
   b = maxhaze.blue;
   g = (int)( elev*float(maxhaze.green) );
   r = (int)( elev*float(maxhaze.red) );
