@@ -11,6 +11,12 @@ The history order is reversed so that new features are at the top.
 	  times for every internal DrawTriangleMesh call.
 	- Eric Sunshine fixed bug in walktest.mak.  The "walkall" target was
 	  not declared .PHONY.
+	- Eric Sunshine eliminated some compilation warnings from the project.
+	- Eric Sunshine update vfs.txi to reflect present reality.
+	- Eric Sunshine eliminated TeX `hbox' warnings from the user manual.
+	- Eric Sunshine added missing `#ifdef CS_HAS_MEMORY_MAPPED_IO' to
+	  csutil/mmapio.cpp.  Problem reported by Robert Stewart
+	  (rmsgrey@users.sourceforge.net).
 24-Jan-2003
 	- Added the notion of 'camera' flag to a render priority. When this
 	  flag is true the engine will scan all objects in this render
