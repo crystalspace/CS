@@ -2,6 +2,9 @@
 # Rules for compiling applications
 #============================================================================
 
+# Use a more sensible and typical mode for executables than Jam's default.
+if "$(EXEMODE)" = "711" { EXEMODE = "+x" ; }
+
 ##  Application appname : sources [ : options ]
 ##    Build an application out of sourcefiles. All sourcefiles will be passed
 ##    to the Objects rule which tries to compile them into object-files. You
@@ -71,6 +74,34 @@ rule Application
 
   CFlags $(<) : $(APPLICATION.CFLAGS) ;
   LFlags $(<) : $(LINKLIBS) $(APPLICATION.LFLAGS) ;      
+}
+
+##  ShellScript scriptname : rule [ : options ]
+##    Build a shell script by invoking `rule', the script creation rule, which
+##    is passed `scriptname' and `options'.
+##    Options:
+##	noinstall: Don't setup a default installation target.
+rule ShellScript
+{
+  CheckOptions noinstall : $(3) : $(<) ;
+
+  Always $(<)clean ;
+  NotFile $(<)clean ;
+  Clean clean : $(<) ;
+  Clean $(<)clean : $(<) ;
+  Depends apps : $(<) ;
+  MakeLocate $(<) : $(LOCATE.TARGETS) ;
+
+  if ! [ IsElem noinstall : $(3) ]
+  {
+    Depends install_bin : [ DoInstall $(<) : $(bindir) : $(INSTALL_PROGRAM) ] ;
+  }
+
+  $(2) $(<) : $(3) ;
+
+  MODE on $(<) = $(EXEMODE) ;
+  SUBDIR on $(<) = $(SUBDIR) ;
+  Chmod $(<) ;
 }
 
 #----------------------------------------------------------------------------

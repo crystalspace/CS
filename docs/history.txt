@@ -30,6 +30,14 @@ chronological order.
 	- Eric Sunshine fixed bugs in glshader_cg and renderloop/stdsteps where
 	  they were returning boolean values from methods declared as returning
 	  csPtr<>.
+	- Eric Sunshine added a ShellScript rule to application.jam, which
+	  roughly parallels the Application rule, except that it builds a shell
+	  script, rather than an application.  The ShellScript rules takes care
+	  of all the typical housekeeping, such as setting up the installation
+	  target and ensuring that the script is executable once created.  The
+	  actual content of the generated shell script is provided by a
+	  client-supplied "content creation" rule.  The cs-config script is now
+	  created via this new mechanism.
 10-Apr-2004
 	- Jorrit fixed a bug in spr3d with new renderer. It would try to
 	  tween vertices also for skeletal animation. That would cause

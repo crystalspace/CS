@@ -4,6 +4,26 @@
 
 SubDir TOP scripts cs-config ;
 
+rule csConfigGen
+{
+  LOCATE on cs-config.temppre cs-config.temppost = $(SUBDIR) ;
+  Depends $(<) : Jamconfig cs-config.temppre cs-config.temppost 
+  		 $(TOP)/scripts/cs-config/Jamfile ;
+
+  # Hack to produce a makevars output similar to the 'make' build system.
+  switch $(TARGET.OS)
+  {
+  case WIN32 :
+    MAKEVARS = makevar.win32 ;
+  case MACOS_X :
+    MAKEVARS = makevar.macosx ;
+  case * :
+    MAKEVARS = makevar.unix ;
+  }
+  MAKEVARS = $(MAKEVARS:R=$(SUBDIR)) ;
+  Depends $(<) : $(MAKEVARS) ;
+}
+
 actions csConfigGen
 {
   cat $(SUBDIR)/cs-config.temppre > $(<)
@@ -38,34 +58,4 @@ __END__
   cat $(SUBDIR)/cs-config.temppost >> $(<)
 }
 
-rule ConfigHelper
-{
-  csConfigGen $(<) ;
-  MODE on $(<) = $(EXEMODE) ;
-  SUBDIR on $(<) = $(SUBDIR) ;
-  Chmod $(<) ;
-
-  Depends exe : $(<) ;
-  LOCATE on cs-config.temppre cs-config.temppost = $(SUBDIR) ;
-  Depends $(<) : Jamconfig cs-config.temppre cs-config.temppost 
-  		 $(TOP)/scripts/cs-config/Jamfile ;
-
-# hack to produce a makevars output similar to the old ones
-  switch $(TARGET.OS)
-  {
-  case WIN32 :
-    MAKEVARS = makevar.win32 ;
-  case MACOS_X :
-    MAKEVARS = makevar.macosx ;
-  case * :
-    MAKEVARS = makevar.unix ;
-  }
-  MAKEVARS = $(MAKEVARS:R=$(SUBDIR)) ;
-  Depends $(<) : $(MAKEVARS) ;
-  Depends install_bin : [ DoInstall $(<) : $(bindir) : $(INSTALL_PROGRAM) ] ;
-}
-
-ConfigHelper cs-config ;
-Clean clean : cs-config ;
-Clean cs-configclean : cs-config ;
-
+ShellScript cs-config : csConfigGen ;
