@@ -108,11 +108,14 @@ public:
   /// Get the values of multiple symbols.
   csArray<csShaderVariable *> GetSymbols (const csArray<csStringID> &names);
 
+  /// Get all the symbols.
+  csArray<csShaderVariable *> GetSymbols ();
+
   /// Check if a symbol exists.
-  bool SymbolExists (csStringID name);
+  bool SymbolExists (csStringID name) const;
 
   /// Check if all of a set of symbols exist.
-  bool SymbolsExist (const csArray<csStringID> &names);
+  bool SymbolsExist (const csArray<csStringID> &names) const;
 };
 
 #endif

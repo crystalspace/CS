@@ -29,6 +29,9 @@ chronological order.
 	- Oktal reversed the inheritance override order in csSymbolTable:
 	  now parent tables' symbols override the children's symbols of the
 	  same name.
+	- Oktal added a GetSymbols() method with no parameters to csSymbolTable
+	  which returns an array containing all the symbols in the table, and
+	  fixed const correctness in the class.
 20-Aug-2003
 	- Jorrit moved the engine sequence manager documentation out of
 	  the xml format description. Also extended that documentation with

@@ -173,12 +173,20 @@ csArray<csShaderVariable *> csSymbolTable::GetSymbols
   return values;
 }
 
-bool csSymbolTable::SymbolExists (csStringID name)
+csArray<csShaderVariable *> csSymbolTable::GetSymbols ()
+{
+  csArray<csShaderVariable *> values;
+  csGlobalHashIterator iter (& Hash);
+  while (iter.HasNext ()) values.Push ((csShaderVariable *) iter.Next ());
+  return values;
+}
+
+bool csSymbolTable::SymbolExists (csStringID name) const
 {
   return Hash.Get (name);
 }
 
-bool csSymbolTable::SymbolsExist (const csArray<csStringID> &names)
+bool csSymbolTable::SymbolsExist (const csArray<csStringID> &names) const
 {
   for (int i = 0; i < names.Length (); i++)
     if (! Hash.Get (names[i])) return false;
