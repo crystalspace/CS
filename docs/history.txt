@@ -56,6 +56,10 @@ chronological order.
 	  fp/vp program files specified via a "file" attribute.
 	- res augmented the shader conditionals with an <?include?> statement.
 	  This will "mount" external documents into a tree.
+	- Eric Sunshine applied patch from Mike Gist <xordan@gmail.com> which
+	  works around crasher in csImage::Rescale() on AMD64. Very possibly,
+	  the problem was result of unintended sign-extension when assigning
+	  signed int csQint() result to unsigned long.
 5-Oct-2004
 	- Rhad fixed a long standing bug in the Ogg loader.
 	  - Per specs, SEEK_END must seek 1 byte past the end of data

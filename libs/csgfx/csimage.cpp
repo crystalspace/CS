@@ -190,9 +190,9 @@ void csImageFile::Rescale (int newwidth, int newheight)
   // such as blending multiple pixels together or bilinear filtering,
   // just a rough scale. It could be improved by someone in the future.
 
-  unsigned long x, y;
-  unsigned long dx = csQint16 (float (Width) / float (newwidth));
-  unsigned long dy = csQint16 (float (Height) / float (newheight));
+  unsigned int x, y;
+  unsigned int dx = csQint16 (float (Width) / float (newwidth));
+  unsigned int dy = csQint16 (float (Height) / float (newheight));
 
 #define RESIZE(pt, field)				\
   {							\
