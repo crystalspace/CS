@@ -43,6 +43,7 @@ struct iMaterialWrapper;
 struct iObjectRegistry;
 class csTerrainQuad;
 class csTerrainObject;
+class csSegment3;
 
 /**
 * This is one block in the terrain.
@@ -68,6 +69,7 @@ public:
   csRef<iMaterialWrapper> material;
   csVector3 center;
   float size;
+  int res;
 
   bool built;
 
@@ -116,7 +118,7 @@ public:
   void CalcLOD (iRenderView *rview);
 
   /// Returns true if this node is a leaf
-  bool IsLeaf () 
+  bool IsLeaf ()  const
   { return children[0] == 0; }
 
   void DrawTest (iGraphics3D* g3d, iRenderView *rview, uint32 frustum_mask, 
@@ -381,6 +383,9 @@ public:
   virtual void SetLogicalParent (iBase* lp) { logparent = lp; }
   virtual iBase* GetLogicalParent () const { return logparent; }
 
+  bool HitBeam (csTerrBlock* block,
+	const csSegment3& seg,
+	csVector3& isect, float* pr);
   virtual bool HitBeamOutline (const csVector3& start, const csVector3& end,
     csVector3& isect, float* pr);
   virtual bool HitBeamObject (const csVector3& start, const csVector3& end,

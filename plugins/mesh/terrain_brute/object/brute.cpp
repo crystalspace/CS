@@ -20,6 +20,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csgeom/vector3.h"
+#include "csgeom/segment.h"
 #include "csgfx/memimage.h"
 #include "csutil/util.h"
 #include "iengine/camera.h"
@@ -35,6 +36,7 @@ Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #include "iutil/objreg.h"
 #include "iutil/vfs.h"
 #include "brute.h"
+#include "qsqrt.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -145,7 +147,7 @@ void csTerrBlock::Detach ()
 
 void csTerrBlock::SetupMesh ()
 {
-  int res = terr->GetBlockResolution () + 1;
+  res = terr->GetBlockResolution () + 1;
 
   delete[] vertex_data;
   vertex_data = new csVector3[res * res];
@@ -433,8 +435,8 @@ void csTerrBlock::DrawTest (iGraphics3D* g3d,
       3);
     mesh_vertices->CopyToBuffer (vertex_data,
       sizeof(csVector3)*num_mesh_vertices);
-    delete[] vertex_data;
-    vertex_data = 0;
+    //delete[] vertex_data;@@@ CD
+    //vertex_data = 0;
 
     /*mesh_morphvertices = 
       g3d->CreateRenderBuffer (
@@ -1148,11 +1150,79 @@ int csTerrainObject::CollisionDetect (iMovable* m, csTransform* transform)
   }
 }
 
+bool csTerrainObject::HitBeam (csTerrBlock* block,
+	const csSegment3& seg,
+	csVector3& isect, float* pr)
+{
+  if (csIntersect3::BoxSegment (block->bbox, seg, isect) == -1)
+  {
+    return false;
+  }
+
+  // We have a hit.
+  if (block->IsLeaf ())
+  {
+    // Check the triangles.
+    csVector3* vt = block->vertex_data;
+    int res = block->res;
+    int x, y;
+    float tot_dist = csSquaredDist::PointPoint (seg.Start (), seg.End ());
+    float dist, temp;
+    float itot_dist = 1 / tot_dist;
+    dist = temp = tot_dist;
+    csVector3 tmp;
+    for (y = 0 ; y < res-1 ; y++)
+    {
+      int yr = y * res;
+      for (x = 0 ; x < res-1 ; x++)
+      {
+        if (csIntersect3::IntersectTriangle (vt[yr+x],
+		vt[yr+res+x], vt[yr+x+1], seg, tmp))
+	{
+          temp = csSquaredDist::PointPoint (seg.Start (), tmp);
+          if (temp < dist)
+          {
+            isect = tmp;
+	    dist = temp;
+          }
+	}
+        if (csIntersect3::IntersectTriangle (vt[yr+x+1],
+		vt[yr+res+x], vt[yr+res+x+1], seg, tmp))
+	{
+          temp = csSquaredDist::PointPoint (seg.Start (), tmp);
+          if (temp < dist)
+          {
+            isect = tmp;
+	    dist = temp;
+          }
+	}
+      }
+    }
+    if (pr) *pr = qsqrt (dist * itot_dist);
+    if (dist >= tot_dist)
+      return false;
+  }
+  else
+  {
+    // Check the children.
+    if (HitBeam (block->children[0], seg, isect, pr))
+      return true;
+    if (HitBeam (block->children[1], seg, isect, pr))
+      return true;
+    if (HitBeam (block->children[2], seg, isect, pr))
+      return true;
+    if (HitBeam (block->children[3], seg, isect, pr))
+      return true;
+  }
+  return false;
+}
+
 bool csTerrainObject::HitBeamOutline (const csVector3& start,
                                        const csVector3& end, 
                                        csVector3& isect, float* pr)
 {
-  return false;
+  csSegment3 seg (start, end);
+  return HitBeam (rootblock, seg, isect, pr);
 }
 
 bool csTerrainObject::HitBeamObject (const csVector3& start,
@@ -1160,7 +1230,9 @@ bool csTerrainObject::HitBeamObject (const csVector3& start,
                                       csVector3& isect, float* pr,
                                       int* polygon_idx)
 {
-  return false;
+  if (polygon_idx) *polygon_idx = -1;
+  csSegment3 seg (start, end);
+  return HitBeam (rootblock, seg, isect, pr);
 }
 
 //----------------------------------------------------------------------

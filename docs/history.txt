@@ -25,6 +25,8 @@ chronological order.
 	  By default it will be 256x256.
 	- Jorrit reverted a change to data/terrainf/world as it causes
 	  huge z-fighting on GF4 Go.
+	- Jorrit attempted to implement HitBeamObject/HitBeamOutline for
+	  bruteblock plugin. Untested at this moment.
 24-Jun-2004
 	- Jorrit fixed a bug in the GL renderer where it would fail to test
 	  for the existance of a clipper in some cases.
