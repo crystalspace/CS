@@ -68,7 +68,7 @@ csBumpMap :: csBumpMap(iImage* src, int fmt)
 	/// now dx,dy are -255 ... 255, but must fit in -8..+7
 	dx >>=5;
 	dy >>=5;
-	map[ y*width+x ] = (dx << 4) | dy;
+	map[ y*width+x ] = ((dx << 4)&0xF0) | (dy&0xF);
       }
   }
 
