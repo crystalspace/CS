@@ -1251,6 +1251,12 @@ driver for the MacOS/X port of Crystal Space.  The addition of these drivers
 makes Crystal Space a viable option for game development on Macintosh.
 Matt also worked a bit on the isometric engine and added a split-view
 option to WalkTest.
+
+@item
+Leandro Ezequiel Lovisolo (@email{lovisolo@@datafull.com})
+
+Leandro contributed the @file{crystal.fgd} definition file for Worldcraft.  He
+also made a few updates to the map2cs tutorial.
 @end itemize
 
 @noindent
@@ -1280,7 +1286,6 @@ Jason McKnight@*
 Jason Platt@*
 Jonathan Hudson (@email{nathanoj@@realmail.2ndmail.com})@*
 Jonathon Doran (@email{jon.doran@@nsc.com})@*
-Leandro Ezequiel Lovisolo (@email{lovisolo@@datafull.com})@*
 Malcolm Peacock (@email{malcolm@@mpeacock.demon.co.uk})@*
 Matt Keith (@email{keith@@www.keithcom.com})@*
 Michael Knorr (@email{damage-list@@freenet.de})@*
