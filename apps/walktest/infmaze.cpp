@@ -18,7 +18,6 @@
 
 #include "cssysdef.h"
 #include "cstool/collider.h"
-#include "csutil/dataobj.h"
 #include "csutil/sparse3d.h"
 #include "imesh/object.h"
 #include "imesh/lighting.h"
@@ -162,7 +161,7 @@ InfRoomData* InfiniteMaze::create_six_room (iEngine* engine, int x, int y, int z
   ird->walls = walls;
   ird->walls_fact_state = walls_fact_state;
   infinite_world->Set (x, y, z, (void*)ird);
-  csDataObject* irddata = new csDataObject (ird);
+  WalkDataObject* irddata = new WalkDataObject (ird);
   room->QueryObject ()->ObjAdd (irddata);
   irddata->DecRef ();
 

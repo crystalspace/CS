@@ -19,7 +19,6 @@
 #ifndef __WENTITY_H__
 #define __WENTITY_H__
 
-#include "csutil/dataobj.h"
 #include "csgeom/vector3.h"
 #include "csgeom/transfrm.h"
 #include "csutil/cscolor.h"

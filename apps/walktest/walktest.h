@@ -69,6 +69,38 @@ struct iGraphics2D;
 #define MAP_ON 2
 #define MAP_TXT 3
 
+SCF_VERSION (WalkDataObject, 0, 0, 1);
+class WalkDataObject : public csObject
+{
+protected:
+  /// Pointer to data.
+  void* data;
+
+public:
+  /// Initialize this object with data pointer initialized to 'd'
+  WalkDataObject (void *d) : csObject (), data (d)
+  {
+  }
+  /// Destroy object.
+  virtual ~WalkDataObject ()
+  {
+  }
+  /// Get the data associated with this object
+  void* GetData () const
+  { return data; }
+  /**
+   * Get first data pointer associated with other object.
+   */
+  static void* GetData (iObject* obj)
+  {
+    csRef<WalkDataObject> d (CS_GET_CHILD_OBJECT (obj, WalkDataObject));
+    void *res = (d ? d->GetData () : 0);
+    return res;
+  }
+
+  SCF_DECLARE_IBASE_EXT (csObject);
+};
+
 ///
 struct csKeyMap
 {

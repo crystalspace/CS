@@ -22,6 +22,9 @@ chronological order.
 	  are supposed to be used.
 	- Jorrit removed the unused iDataObject and csDataObject.
 	- Luca improved the speed of csLoader::CollectAllChildren method.
+	- Jorrit found out that walktest was actually using iDataObject.
+	  Instead of reviving iDataObject, fixed Walktest so that it no
+	  longer requires it.
 12-Apr-2004
 	- Luca added some code to csloader.cpp/*.h to recursively handle the
 	  flags in meshes' children if needed.

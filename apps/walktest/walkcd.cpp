@@ -30,7 +30,6 @@
 #include "imesh/terrfunc.h"
 #include "imesh/terrain.h"
 #include "csgeom/csrect.h"
-#include "csutil/dataobj.h"
 #include "cstool/keyval.h"
 #include "cstool/collider.h"
 #include "cstool/cspixmap.h"

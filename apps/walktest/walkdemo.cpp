@@ -35,7 +35,6 @@
 #include "imesh/object.h"
 #include "imesh/thing.h"
 #include "csutil/scanstr.h"
-#include "csutil/dataobj.h"
 #include "csgeom/math3d.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
@@ -1020,12 +1019,12 @@ struct RandomLight
 
 bool HandleDynLight (iLight* dyn)
 {
-  LightStruct* ls = (LightStruct*)(csDataObject::GetData(dyn->QueryObject ()));
+  LightStruct* ls = (LightStruct*)(WalkDataObject::GetData(dyn->QueryObject ()));
   switch (ls->type)
   {
     case DYN_TYPE_MISSILE:
     {
-      MissileStruct* ms = (MissileStruct*)(csDataObject::GetData(
+      MissileStruct* ms = (MissileStruct*)(WalkDataObject::GetData(
       	dyn->QueryObject ()));
       csVector3 v (0, 0, 2.5);
       csVector3 old = dyn->GetCenter ();
@@ -1051,9 +1050,9 @@ bool HandleDynLight (iLight* dyn)
 	  ms->sprite->GetMovable ()->ClearSectors ();
 	  Sys->view->GetEngine ()->GetMeshes ()->Remove (ms->sprite);
 	}
-	csRef<iDataObject> ido (
-		CS_GET_CHILD_OBJECT (dyn->QueryObject (), iDataObject));
-        dyn->QueryObject ()->ObjRemove (ido->QueryObject ());
+	csRef<WalkDataObject> ido (
+		CS_GET_CHILD_OBJECT (dyn->QueryObject (), WalkDataObject));
+        dyn->QueryObject ()->ObjRemove (ido);
         if (ms->snd)
         {
           ms->snd->Stop();
@@ -1073,7 +1072,7 @@ bool HandleDynLight (iLight* dyn)
         es->type = DYN_TYPE_EXPLOSION;
         es->radius = 2;
         es->dir = 1;
-        csDataObject* esdata = new csDataObject (es);
+        WalkDataObject* esdata = new WalkDataObject (es);
         dyn->QueryObject ()->ObjAdd (esdata);
 	esdata->DecRef ();
         add_particles_explosion (dyn->GetSector (), dyn->GetCenter (), "explo");
@@ -1095,7 +1094,7 @@ bool HandleDynLight (iLight* dyn)
     }
     case DYN_TYPE_EXPLOSION:
     {
-      ExplosionStruct* es = (ExplosionStruct*)(csDataObject::GetData(
+      ExplosionStruct* es = (ExplosionStruct*)(WalkDataObject::GetData(
       	dyn->QueryObject ()));
       if (es->dir == 1)
       {
@@ -1107,9 +1106,9 @@ bool HandleDynLight (iLight* dyn)
         es->radius -= 2;
 	if (es->radius < 1)
 	{
-	  csRef<iDataObject> ido (
-	  	CS_GET_CHILD_OBJECT (dyn->QueryObject (), iDataObject));
-	  dyn->QueryObject ()->ObjRemove (ido->QueryObject ());
+	  csRef<WalkDataObject> ido (
+	  	CS_GET_CHILD_OBJECT (dyn->QueryObject (), WalkDataObject));
+	  dyn->QueryObject ()->ObjRemove (ido);
 	  delete es;
 	  dyn->GetSector ()->GetLights ()->Remove (dyn);
 	  return true;
@@ -1121,7 +1120,7 @@ bool HandleDynLight (iLight* dyn)
     }
     case DYN_TYPE_RANDOM:
     {
-      RandomLight* rl = (RandomLight*)(csDataObject::GetData(
+      RandomLight* rl = (RandomLight*)(WalkDataObject::GetData(
       	dyn->QueryObject ()));
       rl->dyn_move += rl->dyn_move_dir;
       if (rl->dyn_move < 0 || rl->dyn_move > 2)
@@ -1195,7 +1194,7 @@ void fire_missile ()
   ms->type = DYN_TYPE_MISSILE;
   ms->dir = (csOrthoTransform)(Sys->view->GetCamera ()->GetTransform ());
   ms->sprite = 0;
-  csDataObject* msdata = new csDataObject(ms);
+  WalkDataObject* msdata = new WalkDataObject(ms);
   dyn->QueryObject ()->ObjAdd(msdata);
   msdata->DecRef ();
 
@@ -1227,7 +1226,7 @@ void AttachRandomLight (iLight* light)
   rl->dyn_move_dir = 0.2f;
   rl->dyn_move = 0;
   rl->dyn_r1 = rl->dyn_g1 = rl->dyn_b1 = 1;
-  csDataObject* rldata = new csDataObject (rl);
+  WalkDataObject* rldata = new WalkDataObject (rl);
   light->QueryObject ()->ObjAdd (rldata);
   rldata->DecRef ();
 }

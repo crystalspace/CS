@@ -29,7 +29,6 @@
 #include "iengine/sector.h"
 #include "imesh/object.h"
 #include "csutil/scanstr.h"
-#include "csutil/dataobj.h"
 #include "csgeom/math3d.h"
 #include "cstool/collider.h"
 #include "cstool/cspixmap.h"

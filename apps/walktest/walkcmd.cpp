@@ -26,7 +26,6 @@
 #include "csutil/scanstr.h"
 #include "csutil/csstring.h"
 #include "csutil/util.h"
-#include "csutil/dataobj.h"
 #include "csgeom/math3d.h"
 #include "csutil/csendian.h"
 #include "cstool/keyval.h"

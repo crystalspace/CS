@@ -37,7 +37,6 @@
 #include "iengine/sector.h"
 #include "csgeom/csrect.h"
 #include "csutil/scanstr.h"
-#include "csutil/dataobj.h"
 #include "csutil/csobject.h"
 #include "csutil/cspmeter.h"
 #include "cstool/cspixmap.h"
@@ -637,6 +636,10 @@ void WalkTest::DrawFullScreenFX3D (csTicks /*elapsed_time*/,
   }
 }
 
+SCF_IMPLEMENT_IBASE_EXT (WalkDataObject)
+  SCF_IMPLEMENTS_INTERFACE (WalkDataObject)
+SCF_IMPLEMENT_IBASE_EXT_END
+
 void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
 {
   // Tell Gfx3D we're going to display 3D things
@@ -650,8 +653,8 @@ void WalkTest::DrawFrame3D (int drawflags, csTicks /*current_time*/)
   {
     iLight* dyn = dynamic_lights[i];
     extern bool HandleDynLight (iLight*);
-    csRef<iDataObject> dao (
-    	CS_GET_CHILD_OBJECT (dyn->QueryObject (), iDataObject));
+    csRef<WalkDataObject> dao (
+    	CS_GET_CHILD_OBJECT (dyn->QueryObject (), WalkDataObject));
     if (dao)
       if (HandleDynLight (dyn))
       {
