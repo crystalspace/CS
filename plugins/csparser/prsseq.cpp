@@ -788,6 +788,23 @@ iSequenceWrapper* csLoader::LoadSequence (iLoaderContext* ldr_context,
 	    cur_time += time;  // standard delay can be hardcoded into next op
 	}
 	break;
+      case XMLTOKEN_MOVELIGHT:
+        {
+	  csRef<iParameterESM> light = ResolveOperationParameter (
+	  	ldr_context,
+	  	child, PARTYPE_LIGHT, "light", seqname, base_params);
+	  if (!light) return 0;
+
+	  int duration = child->GetAttributeValueAsInt ("duration");
+	  csVector3 offset;
+	  offset.x = child->GetAttributeValueAsFloat ("x");
+	  offset.y = child->GetAttributeValueAsFloat ("y");
+	  offset.z = child->GetAttributeValueAsFloat ("z");
+
+	  sequence->AddOperationMoveDuration (cur_time, light,
+		offset, duration);
+        }
+	break;
       case XMLTOKEN_MOVE:
         {
 	  csRef<iParameterESM> mesh = ResolveOperationParameter (

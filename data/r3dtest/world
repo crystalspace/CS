@@ -880,7 +880,7 @@
                 </p>
             </params>
         </meshobj>
-        <light>
+        <light name="bumplight">
             <center x="-4.2" y="-11" z="-1.4" />
             <radius>5</radius>
             <color red="1.5625" green="1.5625" blue="0.784314" />
@@ -999,4 +999,21 @@
             <position x="1.8" y="-12" z="-8.2" />
         </node>
     </sector>
+    <sequences>
+        <sequence name="moveLight">
+	    <movelight light="bumplight" duration="1000"
+              x="5" y="0" z="0" />
+	    <delay time="1000" />
+	    <movelight light="bumplight" duration="1000"
+              x="-5" y="0" z="0" />
+	    <delay time="1000" />
+	    <enable trigger="moveLight" />
+        </sequence>
+    </sequences>
+    <triggers>
+        <trigger name="moveLight">
+            <sectorvis sector="room" />
+            <fire delay="0" sequence="moveLight" />
+	</trigger>
+    </triggers>
 </world>

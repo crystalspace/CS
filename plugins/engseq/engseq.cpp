@@ -808,6 +808,31 @@ public:
 
 //---------------------------------------------------------------------------
 
+class MoveLightInfo : public iSequenceTimedOperation
+{
+public:
+  csRef<iLight> light;
+  csVector3 start_pos;
+  csVector3 offset;
+
+  MoveLightInfo ()
+  {
+    SCF_CONSTRUCT_IBASE (0);
+  }
+  virtual ~MoveLightInfo () { }
+  SCF_DECLARE_IBASE;
+
+  virtual void Do (float time, iBase*)
+  {
+    csVector3 new_pos = start_pos + time * offset;
+    light->SetCenter (new_pos);
+  }
+};
+
+SCF_IMPLEMENT_IBASE (MoveLightInfo)
+  SCF_IMPLEMENTS_INTERFACE (iSequenceTimedOperation)
+SCF_IMPLEMENT_IBASE_END
+
 class MoveInfo : public iSequenceTimedOperation
 {
 public:
@@ -843,6 +868,7 @@ class OpMove : public OpStandard
 private:
   csRef<iParameterESM> meshpar;
   csRef<iMeshWrapper> mesh;
+  csRef<iLight> light;
   csVector3 offset;
   csTicks duration;
   iEngineSequenceManager* eseqmgr;
@@ -853,9 +879,15 @@ public:
   	csTicks duration, iEngineSequenceManager* eseqmgr)
   {
     if (meshpar->IsConstant ())
+    {
       mesh = SCF_QUERY_INTERFACE (meshpar->GetValue (), iMeshWrapper);
+      if (!mesh)
+        light = SCF_QUERY_INTERFACE (meshpar->GetValue (), iLight);
+    }
     else
+    {
       OpMove::meshpar = meshpar;
+    }
     OpMove::offset = offset;
     OpMove::duration = duration;
     OpMove::eseqmgr = eseqmgr;
@@ -864,16 +896,35 @@ public:
   virtual void Do (csTicks dt, iBase* params)
   {
     if (meshpar)
+    {
       mesh = SCF_QUERY_INTERFACE (meshpar->GetValue (params), iMeshWrapper);
-    iMovable* movable = mesh->GetMovable ();
-    MoveInfo* mi = new MoveInfo ();
-    mi->mesh = mesh;
-    mi->start_pos = movable->GetTransform ().GetOrigin ();
-    mi->offset = offset;
-    eseqmgr->FireTimedOperation (dt, duration, mi);
-    mi->DecRef ();
+      if (!mesh)
+        light = SCF_QUERY_INTERFACE (meshpar->GetValue (params), iLight);
+    }
+    if (mesh)
+    {
+      iMovable* movable = mesh->GetMovable ();
+      MoveInfo* mi = new MoveInfo ();
+      mi->mesh = mesh;
+      mi->start_pos = movable->GetTransform ().GetOrigin ();
+      mi->offset = offset;
+      eseqmgr->FireTimedOperation (dt, duration, mi);
+      mi->DecRef ();
+    }
+    else if (light)
+    {
+      MoveLightInfo* mi = new MoveLightInfo ();
+      mi->light = light;
+      mi->start_pos = light->GetCenter ();
+      mi->offset = offset;
+      eseqmgr->FireTimedOperation (dt, duration, mi);
+      mi->DecRef ();
+    }
     if (meshpar)
+    {
       mesh = 0;
+      light = 0;
+    }
   }
 };
 

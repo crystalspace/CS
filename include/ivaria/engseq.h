@@ -310,8 +310,8 @@ struct iSequenceWrapper : public iBase
 		csTicks duration) = 0;
 
   /**
-   * Operation: move object during some time. After the time has elapsed
-   * the total relative move will be equal to the 'offset'.
+   * Operation: move object (mesh or light) during some time. After the time
+   * has elapsed the total relative move will be equal to the 'offset'.
    */
   virtual void AddOperationMoveDuration (csTicks time, iParameterESM* mesh,
 		const csVector3& offset, csTicks duration) = 0;

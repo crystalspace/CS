@@ -840,6 +840,7 @@ bool csLoader::Initialize (iObjectRegistry *object_Reg)
   xmltokens.Register ("meshobj", XMLTOKEN_MESHOBJ);
   xmltokens.Register ("meshref", XMLTOKEN_MESHREF);
   xmltokens.Register ("move", XMLTOKEN_MOVE);
+  xmltokens.Register ("movelight", XMLTOKEN_MOVELIGHT);
   xmltokens.Register ("mipmap", XMLTOKEN_MIPMAP);
   xmltokens.Register ("mixmode", XMLTOKEN_MIXMODE);
   xmltokens.Register ("node", XMLTOKEN_NODE);

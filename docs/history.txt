@@ -6,6 +6,18 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+11-Sep-2003
+	- Jorrit copied data/shader/light.xml to data/shader/light_bumpmap.xml.
+	  Then he created a new data/shader/light.xml which doesn't do the
+	  bumpmapping techniques. r3dtest now uses light_bumpmap.xml while
+	  stenciltest uses light.xml.
+	- Jorrit extended the engine sequence manager with the ability to
+	  move lights. This could be done without modifying the engine
+	  sequencer API as the AddOperationMoveDuration() function can be
+	  reused. In the parser Jorrit added the <movelight> operation.
+	- Jorrit added a few sequences to r3dtest so that the light now moves.
+	  This demonstrates how the shadows and bumpmaps are modified
+	  dynamically.
 10-Sep-2003
 	- Philip Wyett made struct ShadowDrawVisCallback a friend to
 	  class csStencilShadowStep. This works round C2248 MSVC 6
