@@ -228,8 +228,7 @@ void csSprite2D::Draw (csRenderView& rview)
     PreparePolygonFX2 (&g3dpolyfx, clipped_poly2d, num_clipped_verts,
     	clipped_vtstats, vertices.Length (), true);
 
-  extern void CalculateFogPolygon (csRenderView* rview, G3DPolygonDPFX& poly);
-  CalculateFogPolygon (&rview, g3dpolyfx);
+  rview.CalculateFogPolygon (g3dpolyfx);
   rview.g3d->StartPolygonFX (g3dpolyfx.mat_handle,
     	MixMode | CS_FX_GOURAUD);
   rview.g3d->DrawPolygonFX (g3dpolyfx);

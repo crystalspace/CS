@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -22,8 +22,18 @@
 
 //---------------------------------------------------------------------------
 
+IMPLEMENT_IBASE (csTransformationManager)
+  IMPLEMENTS_EMBEDDED_INTERFACE (iTransformationManager)
+IMPLEMENT_IBASE_END
+
+IMPLEMENT_EMBEDDED_IBASE (csTransformationManager::TransformationManager)
+  IMPLEMENTS_INTERFACE (iTransformationManager)
+IMPLEMENT_EMBEDDED_IBASE_END
+
 csTransformationManager::csTransformationManager ()
 {
+  CONSTRUCT_IBASE (NULL);
+  CONSTRUCT_EMBEDDED_IBASE (scfiTransformationManager);
   freed = NULL;
   alloced = NULL;
   last_alloced = NULL;

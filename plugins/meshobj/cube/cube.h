@@ -19,8 +19,12 @@
 #ifndef _CUBE_H_
 #define _CUBE_H_
 
+#include "csgeom/vector3.h"
+#include "csutil/cscolor.h"
 #include "imeshobj.h"
 #include "imcube.h"
+#include "igraph3d.h"
+#include "itranman.h"
 
 struct iMaterialWrapper;
 class csCubeMeshObjectFactory;
@@ -32,6 +36,23 @@ class csCubeMeshObject : public iMeshObject
 {
 private:
   csCubeMeshObjectFactory* factory;
+  csVector3 vertices[8];
+  csVector2 uv[8];
+  csColor colors[8];
+  csTriangle triangles[12];
+  G3DFogInfo fog[8];
+  float cur_size;
+  G3DTriangleMesh mesh;
+
+  /**
+   * Camera space bounding box is cached here.
+   * GetCameraBoundingBox() will check the current cookie from the
+   * transformation manager to see if it needs to recalculate this.
+   */
+  csBox3 camera_bbox;
+
+  /// Current cookie for camera_bbox.
+  csTranCookie camera_cookie;
 
 public:
   /// Constructor.
@@ -41,6 +62,21 @@ public:
   virtual ~csCubeMeshObject ();
 
 public:
+
+  /// Get the bounding box in transformed space.
+  void GetTransformedBoundingBox (iTransformationManager* tranman,
+      const csReversibleTransform& trans, csBox3& cbox);
+  /**
+   * Get the coordinates of the cube in screen coordinates.
+   * Fills in the boundingBox with the X and Y locations of the cube.
+   * Returns the max Z location of the cube, or -1 if not
+   * on-screen. If the cube is not on-screen, the X and Y values are not
+   * valid.
+   */
+  float GetScreenBoundingBox (iTransformationManager* tranman, float fov,
+      float shiftx, float shifty,
+      const csReversibleTransform& trans, csBox2& sbox, csBox3& cbox);
+
   ///------------------------ iMeshObject implementation ------------------------
   DECLARE_IBASE;
 

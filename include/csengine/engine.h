@@ -756,6 +756,9 @@ public:
       return 0;
   }
 
+  /// Get the transformation manager.
+  virtual iTransformationManager* GetTransformationManager ();
+
   /**
    * Set the culler to use in CS_ENGINE_FRONT2BACK mode.
    * Possible values are CS_CULLER_....

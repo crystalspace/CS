@@ -85,7 +85,7 @@ struct iMaterialHandle : public iBase
   virtual void Prepare () = 0;
 };
 
-SCF_VERSION (iMaterialWrapper, 0, 0, 1);
+SCF_VERSION (iMaterialWrapper, 0, 0, 2);
 
 /**
  * This class represents a material wrapper which holds
@@ -96,6 +96,8 @@ struct iMaterialWrapper : public iBase
 {
   /// Get the material handle.
   virtual iMaterialHandle* GetMaterialHandle () = 0;
+  /// Visit this material.
+  virtual void Visit () = 0;
 };
 
 #endif // __IMATER_H__

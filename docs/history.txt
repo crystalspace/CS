@@ -1,5 +1,20 @@
 The history order has been reversed so that new features are at the top.
 
+28-Dec-2000
+	- Seth Galbraith added more error checking to the MD2 importer.
+	- Added Visit() to iMaterialWrapper.
+	- Cube plugin now renders using DrawTriangleMesh.
+	- Added CalculateFogMesh() and CalculateFogPolygon() to iRenderView.
+	  Mesh object plugins can call this function to update the fog
+	  information in the mesh or poly object. Removed the badly
+	  placed same functions from pol2d.cpp.
+	- Cube plugin now supports fog.
+	- Added iTransformationManager SCF interface for the transformation
+	  manager. Only contains GetCookie() function at the moment.
+	  csTransformationManager implements this interface through
+	  embedding.
+	- Added iEngine::GetTransformationManager().
+	- Added iRenderView::GetEngine().
 27-Dec-2000
 	- Added iCubeMeshObject interface. The cube plugin implements
 	  this interface in addition to iMeshObjectFactory. Using

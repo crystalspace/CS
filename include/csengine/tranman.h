@@ -23,11 +23,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/transfrm.h"
 #include "csgeom/poly3d.h"
-
-/**
- * A cookie for the transformation manager.
- */
-typedef ULong csTranCookie;
+#include "itranman.h"
 
 class csTransformationManager;
 class csTransformedSet;
@@ -79,7 +75,7 @@ public:
  * can be used to detect if you have data relevant for this frame or obsoleted
  * because we are in a new frame.
  */
-class csTransformationManager
+class csTransformationManager : public iBase
 {
 private:
   /// Pool of free vertex arrays.
@@ -156,6 +152,15 @@ public:
   {
     return test_cookie < frame_cookie;
   }
+
+  DECLARE_IBASE;
+
+  //--------------------- iTransformationManager implementation --------------------//
+  struct TransformationManager : public iTransformationManager
+  {
+    DECLARE_EMBEDDED_IBASE (csTransformationManager);
+    virtual csTranCookie GetCookie () { return scfParent->GetCookie (); }
+  } scfiTransformationManager;
 };
 
 /**

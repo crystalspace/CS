@@ -21,7 +21,10 @@
 
 #include "csutil/scf.h"
 #include "csgeom/plane3.h"
+#include "csgeom/transfrm.h"
+#include "igraph3d.h"
 
+struct iEngine;
 struct iClipper2D;
 struct iGraphics2D;
 struct iGraphics3D;
@@ -62,7 +65,7 @@ public:
   csFog* fog;
 };
 
-SCF_VERSION (iRenderView, 0, 0, 1);
+SCF_VERSION (iRenderView, 0, 0, 3);
 
 /**
  * This interface represents all information needed to render
@@ -70,6 +73,8 @@ SCF_VERSION (iRenderView, 0, 0, 1);
  */
 struct iRenderView : public iBase
 {
+  /// Get the engine.
+  virtual iEngine* GetEngine () = 0;
   /// Get the 2D clipper for this view.
   virtual iClipper2D* GetClipper () = 0;
   /**
@@ -102,6 +107,21 @@ struct iRenderView : public iBase
    * Get the current camera.
    */
   virtual iCamera* GetCamera () = 0;
+  /**
+   * Calculate the fog information in the given G3DPolygonDP structure.
+   */
+  virtual void CalculateFogPolygon (G3DPolygonDP& poly) = 0;
+  /**
+   * Calculate the fog information in the given G3DPolygonDPFX structure.
+   */
+  virtual void CalculateFogPolygon (G3DPolygonDPFX& poly) = 0;
+  /**
+   * Calculate the fog information in the given G3DTriangleMesh
+   * structure. This function assumes the fog array is already preallocated
+   * and the rest of the structure should be filled in.
+   * This function will take care of correctly enabling/disabling fog.
+   */
+  virtual void CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh& mesh) = 0;
 };
 
 #endif

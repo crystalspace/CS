@@ -162,12 +162,29 @@ public:
     boty = by;
   }
 
+  /**
+   * Calculate the fog information in the given G3DPolygonDP structure.
+   */
+  void CalculateFogPolygon (G3DPolygonDP& poly);
+  /**
+   * Calculate the fog information in the given G3DPolygonDPFX structure.
+   */
+  void CalculateFogPolygon (G3DPolygonDPFX& poly);
+  /**
+   * Calculate the fog information in the given G3DTriangleMesh
+   * structure. This function assumes the fog array is already preallocated
+   * and the rest of the structure should be filled in.
+   * This function will take care of correctly enabling/disabling fog.
+   */
+  void CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh& mesh);
+
   DECLARE_IBASE_EXT (csCamera);
 
   //------------------- iRenderView implementation -----------------------
   struct RenderView : public iRenderView
   {
     DECLARE_EMBEDDED_IBASE (csRenderView);
+    virtual iEngine* GetEngine ();
     virtual iClipper2D* GetClipper ();
     virtual bool IsClipperRequired () { return scfParent->do_clip_frustum; }
     virtual iGraphics2D* GetGraphics2D () { return scfParent->g2d; }
@@ -186,6 +203,18 @@ public:
     }
     virtual csFogInfo* GetFirstFogInfo () { return scfParent->fog_info; }
     virtual iCamera* GetCamera ();
+    virtual void CalculateFogPolygon (G3DPolygonDP& poly)
+    {
+      scfParent->CalculateFogPolygon (poly);
+    }
+    virtual void CalculateFogPolygon (G3DPolygonDPFX& poly)
+    {
+      scfParent->CalculateFogPolygon (poly);
+    }
+    virtual void CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh& mesh)
+    {
+      scfParent->CalculateFogMesh (tr_o2c, mesh);
+    }
   } scfiRenderView;
 };
 

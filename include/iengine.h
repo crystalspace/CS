@@ -39,8 +39,9 @@ struct iCameraPosition;
 struct iRegion;
 struct iView;
 struct iGraphics3D;
+struct iTransformationManager;
 
-SCF_VERSION (iEngine, 0, 1, 6);
+SCF_VERSION (iEngine, 0, 1, 7);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -206,6 +207,9 @@ struct iEngine : public iPlugIn
    * flags that the application might be interested in.
    */
   virtual int GetBeginDrawFlags () = 0;
+
+  /// Get the transformation manager.
+  virtual iTransformationManager* GetTransformationManager () = 0;
 };
 
 #endif // __IENGINE_H__

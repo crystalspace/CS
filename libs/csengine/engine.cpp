@@ -62,6 +62,7 @@
 #include "igraph3d.h"
 #include "ievent.h"
 #include "icfgfile.h"
+#include "itranman.h"
 
 //---------------------------------------------------------------------------
 
@@ -2132,6 +2133,11 @@ iStatLight* csEngine::CreateLight (const csVector3& pos, float radius,
   csStatLight* light = new csStatLight (pos.x, pos.y, pos.z, radius,
   	color.red, color.green, color.blue, pseudoDyn);
   return QUERY_INTERFACE (light, iStatLight);
+}
+
+iTransformationManager* csEngine::GetTransformationManager ()
+{
+  return QUERY_INTERFACE (&tr_manager, iTransformationManager);
 }
 
 //----------------Begin-Multi-Context-Support------------------------------

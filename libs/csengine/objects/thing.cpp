@@ -315,9 +315,7 @@ void csThing::DrawCurves (csRenderView& rview, bool use_z_buf)
       CsPrintf (MSG_STDOUT, "Warning! Curve without material!\n");
       continue;
     }
-    extern void CalculateFogMesh (csRenderView* rview, csTransform* tr_o2c,
-	  G3DTriangleMesh& mesh);
-    CalculateFogMesh (&rview, &obj_cam, mesh);
+    rview.CalculateFogMesh (obj_cam, mesh);
 
     if (rview.callback)
       rview.callback (&rview, CALLBACK_MESH, (void*)&mesh);

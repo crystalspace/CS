@@ -373,9 +373,7 @@ void csDDGTerrain::Draw (csRenderView& rview, bool use_z_buf)
         fog_verts.SetLimit (nd);
       g3dmesh.vertex_fog = fog_verts.GetArray ();
 
-      extern void CalculateFogMesh (csRenderView* rview, csTransform* tr_o2c,
-	    G3DTriangleMesh& mesh);
-      CalculateFogMesh (&rview, &rview, g3dmesh);
+      rview.CalculateFogMesh (rview, g3dmesh);
 
       if (rview.callback)
         rview.callback (&rview, CALLBACK_MESH, (void*)&g3dmesh);

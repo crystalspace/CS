@@ -156,6 +156,7 @@ public:
     {
       return scfParent->GetMaterialHandle ();
     }
+    virtual void Visit () { scfParent->Visit (); }
   } scfiMaterialWrapper;
 };
 

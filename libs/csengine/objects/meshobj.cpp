@@ -80,7 +80,8 @@ void csMeshObject::UpdateInPolygonTrees ()
 
 void csMeshObject::Draw (csRenderView& rview)
 {
-  mesh->Draw (QUERY_INTERFACE ((&rview), iRenderView), QUERY_INTERFACE ((&movable), iMovable));
+  mesh->Draw (QUERY_INTERFACE (&rview, iRenderView),
+      	      QUERY_INTERFACE (&movable, iMovable));
 }
 
 

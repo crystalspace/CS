@@ -988,7 +988,7 @@ void csSprite3D::GetCameraBoundingBox (const csCamera& camtrans, csBox3& cbox)
 
 float csSprite3D::GetScreenBoundingBox (const csCamera& camtrans, csBox2& boundingBox, csBox3 &bbox3)
 {
-  csVector2   oneCorner;
+  csVector2 oneCorner;
 
   // @@@ Note. The bounding box created by this function greatly
   // exagerates the real bounding box. However, this function
@@ -1283,9 +1283,7 @@ void csSprite3D::Draw (csRenderView& rview)
     mesh.vertex_mode = G3DTriangleMesh::VM_WORLDSPACE;
   mesh.fxmode = MixMode | (vertex_colors ? CS_FX_GOURAUD : 0);
 
-  extern void CalculateFogMesh (csRenderView* rview, csTransform* tr_o2c,
-	G3DTriangleMesh& mesh);
-  CalculateFogMesh (&rview, &tr_o2c, mesh);
+  rview.CalculateFogMesh (tr_o2c, mesh);
 
   if (rview.callback)
     rview.callback (&rview, CALLBACK_MESH, (void*)&mesh);
