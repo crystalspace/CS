@@ -2948,7 +2948,7 @@ int main (int argc, char* argv[])
   
   // Network change.  
   // Should be loaded in config file, can't figure out how to.
-  Sys->RequestPlugin("crystalspace.network.driver.sockets");
+  Sys->RequestPlugin("crystalspace.network.driver.sockets:NetDriver");
   // end change.
 
   // temp hack until we find a better way

@@ -45,9 +45,9 @@ int main (int argc, char* argv[])
   System = new MyApp ();
   csWorld::System = System;
 
-  System->RequestPlugin ("crystalspace.kernel.vfs");
-  System->RequestPlugin ("crystalspace.engine.core");
-  System->RequestPlugin ("crystalspace.graphics3d.infinite");
+  System->RequestPlugin ("crystalspace.kernel.vfs:VFS");
+  System->RequestPlugin ("crystalspace.engine.core:Engine");
+  System->RequestPlugin ("crystalspace.graphics3d.infinite:VideoDriver");
 
   if (!System->Initialize (argc, argv, NULL))
   {
