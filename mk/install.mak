@@ -13,7 +13,7 @@
 #
 # Always copied:
 # TO_INSTALL.INCLUDE: does not exist, the entire include/ hierarchy is copied
-#    to include/.  (max 3 levels deep now)
+#    to include/.  (max 4 levels deep now)
 # TO_INSTALL.DOCS: also does not exist, the docs/html dir is copied (all html)
 #    to docs/html, as well as all subdirs (2 deep) with gif, jpg, png; also
 #    docs/README.html is copied, and docs/pubapi is copied (all html, gif, css).
@@ -69,7 +69,8 @@ INSTALL_LOG = $(INSTALL_DIR)/install.log
 
 # For the 'include/' hierarchy, only the header files detected here
 # will be copied
-INSTALL_INCLUDE.FILES = $(wildcard $(addprefix include/,*.h */*.h */*/*.h))
+INSTALL_INCLUDE.FILES = \
+  $(wildcard $(addprefix include/,*.h */*.h */*/*.h */*/*/*.h))
 
 # Given all .h files in 'include/', take their directory parts, sort those,
 # and remove trailing '/', then add the INSTALL_DIR prefix
