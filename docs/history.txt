@@ -30,6 +30,8 @@ chronological order.
 	- Jorrit fixed a bug in the new shader code from res2k. It would
 	  use SCF_DECLARE_IBASE instead of SCF_DECLARE_IBASE_EXT and this could
 	  cause crashes in some circumstances.
+	- Jorrit added an entry to the drivers database to disable stencil
+	  clipping on a Rage128 card on linux.
 1-Apr-2004
 	- Eric Sunshine fixed include/Jamfile so that it installs Swig (*.i)
 	  files.  These are needed by CEL, for instance.
