@@ -165,6 +165,8 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
   planes_init = false;
   frustum_valid = false;
 
+  dpfx_valid = false;
+
   // see note above
   tr_verts.IncRef ();
   uv_verts.IncRef ();
@@ -1029,6 +1031,7 @@ static float SetupBlend (UInt mode, float m_alpha, bool has_alpha)
 
 void csGraphics3DOGLCommon::FlushDrawPolygon ()
 {
+  dpfx_valid = false;	// @@@ Temporary
   if (queue.num_triangles <= 0) return;
   int i, j;
 
@@ -1357,6 +1360,8 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
     FlushDrawPolygon ();
   }
 
+  dpfx_valid = false;	// @@@ Temporary
+
   //========
   // Store information in the queue.
   //========
@@ -1616,9 +1621,24 @@ round16 (long f)
 //static UInt prev_mode = ~0;
 
 void csGraphics3DOGLCommon::RealStartPolygonFX (iMaterialHandle * handle,
-	UInt mode)
+	UInt mode, bool use_fog)
 {
-  FlushDrawPolygon ();
+  if (!dpfx_valid)
+    FlushDrawPolygon ();
+
+  if (!dpfx_valid ||
+  	use_fog != dpfx_use_fog ||
+	handle != dpfx_mat_handle ||
+	z_buf_mode != dpfx_z_buf_mode ||
+	mode != dpfx_mixmode)
+  {
+    dpfx_valid = true;
+    dpfx_use_fog = use_fog;
+    dpfx_mat_handle = handle;
+    dpfx_z_buf_mode = z_buf_mode;
+    dpfx_mixmode = mode;
+  }
+  else return;
 
   m_gouraud = m_renderstate.lighting && m_renderstate.gouraud && ((mode & CS_FX_GOURAUD) != 0);
   m_mixmode = mode;
@@ -1665,7 +1685,6 @@ void csGraphics3DOGLCommon::RealStartPolygonFX (iMaterialHandle * handle,
 
 void csGraphics3DOGLCommon::StartPolygonFX (iMaterialHandle * handle, UInt mode)
 {
-  RealStartPolygonFX (handle, mode);
 }
 
 void csGraphics3DOGLCommon::FinishPolygonFX ()
@@ -1674,6 +1693,8 @@ void csGraphics3DOGLCommon::FinishPolygonFX ()
 
 void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
 {
+  RealStartPolygonFX (poly.mat_handle, poly.mixmode, poly.use_fog);
+
   float flat_r = 1., flat_g = 1., flat_b = 1.;
   if (!m_textured)
   {
@@ -2463,7 +2484,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   //===========
   // Draw the base mesh.
   //===========
-  StartPolygonFX (mesh.mat_handle, mesh.fxmode);
+  RealStartPolygonFX (mesh.mat_handle, mesh.fxmode, mesh.do_fog);
   csMaterialHandle* mat = NULL;
   bool multitex = false;
   if (mesh.mat_handle)

@@ -214,7 +214,8 @@ private:
     bool exact_clipping);
 
   /// Start a series of DrawPolygonFX
-  void RealStartPolygonFX (iMaterialHandle* handle, UInt mode);
+  void RealStartPolygonFX (iMaterialHandle* handle, UInt mode,
+  	bool use_fog);
 
 protected:
   friend class csOpenGLHalo;
@@ -327,7 +328,6 @@ protected:
   bool dpfx_valid;
   bool dpfx_use_fog;
   iMaterialHandle* dpfx_mat_handle;
-  int dpfx_alpha;
   UInt dpfx_mixmode;
   csZBufMode dpfx_z_buf_mode;
 

@@ -1324,14 +1324,14 @@ void csEngine::Draw (csCamera* c, csClipper* view)
   csSector* s = c->GetSector ();
   s->Draw (&rview);
 
-  G3D->SetClipper (NULL, CS_CLIPPER_NONE);
-
   // draw all halos on the screen
   cs_time Elapsed, Current;
   System->GetElapsedTime (Elapsed, Current);
   for (int halo = halos.Length () - 1; halo >= 0; halo--)
     if (!halos.Get (halo)->Process (Elapsed, *this))
       halos.Delete (halo);
+
+  G3D->SetClipper (NULL, CS_CLIPPER_NONE);
 }
 
 void csEngine::DrawFunc (csCamera* c, csClipper* view,
@@ -1343,7 +1343,7 @@ void csEngine::DrawFunc (csCamera* c, csClipper* view,
   rview.SetCallback (callback, callback_data);
 
   // First initialize G3D with the right clipper.
-  G3D->SetClipper (view, true);	// We are at top-level.
+  G3D->SetClipper (view, CS_CLIPPER_TOPLEVEL);	// We are at top-level.
   G3D->ResetNearPlane ();
   G3D->SetPerspectiveAspect (c->GetFOV ());
 

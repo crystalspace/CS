@@ -22,6 +22,10 @@ The history order is reversed so that new features are at the top.
 	- Fixed a bug with the software clipper in OpenGL. It would not
 	  clip correctly for meshes that were already transformed by the
 	  engine (this can happen for skeletal sprites).
+	- Fixed two small bugs in csEngine::Draw() and csEngine::DrawFunc().
+	- StartPolygonFX and FinishPolygonFX in OpenGL are now empty.
+	  DrawPolygonFX will automatically detect the need for doing
+	  initialization.
 10-May-2001
 	- Fixed a bug in clipper detection for OpenGL. In some cases it
 	  would select 'N' for the required clipper which is not allowed.
