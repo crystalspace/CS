@@ -143,6 +143,7 @@ public:
   {
     root = 0;
     capacity = 0;
+    count = 0;
     CopyFrom (source);
   }
   
