@@ -193,6 +193,9 @@ void R3DTest::SetupFrame ()
   if (kbd->GetKeyState (CSKEY_DOWN))
     view->GetCamera ()->Move (CS_VEC_BACKWARD);
 
+  r3d->SetPerspectiveAspect (r3d->GetDriver2D ()->GetHeight ());
+  r3d->SetPerspectiveCenter (r3d->GetDriver2D ()->GetWidth ()/2,
+                             r3d->GetDriver2D ()->GetHeight ()/2);
   // Tell 3D driver we're going to display 3D things.
   if (!r3d->BeginDraw (CSDRAW_3DGRAPHICS | CSDRAW_CLEARSCREEN | CSDRAW_CLEARZBUFFER))
     return;
@@ -211,10 +214,10 @@ void R3DTest::SetupFrame ()
   trans.RotateOther (csVector3 (1,0,0), a*2.0);
   trans.RotateOther (csVector3 (0,1,0), a*1.5);
   trans.RotateOther (csVector3 (0,0,1), a*1.0);
-  trans.SetOrigin (csVector3 (0,0,5));
+  trans.SetOrigin (csVector3 (0,0,sin(a*10.0)*5));
   trans = trans.GetInverse ();
   r3d->SetObjectToCamera (&trans);
-  r3d->DrawMesh (&mesh);
+  r3d->DrawMesh (&mesh, CS_ZBUF_NONE, CS_CLIP_NOT, CS_CLIP_NOT, CS_CLIP_NOT);
 
   // Tell the camera to render into the frame buffer.
   //view->Draw ();
@@ -374,19 +377,19 @@ bool R3DTest::Initialize ()
   }
   matwrap = engine->GetMaterialList ()->FindByName ("portal");
 
-  // Just disregard this. It's for testing. /Anders Stenberg
-  /*vfs->Mount ("/level", "./data/newersky.zip");
+  /*// Just disregard this. It's for testing. /Anders Stenberg
+  vfs->Mount ("/level", "./data/newersky.zip");
   vfs->ChDir ("/level");
-  loader->LoadMapFile ("world", false);
+  loader->LoadMapFile ("world", false);*/
 
-  //csRef<iSector> room = engine->CreateSector ("room");
-  csRef<iSector> room = engine->FindSector ("room");
+  csRef<iSector> room = engine->CreateSector ("room");
+  //csRef<iSector> room = engine->FindSector ("room");
 
   view = csPtr<iView> (new csView (engine, r3d));
   view->GetCamera ()->SetSector (room);
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
   csRef<iGraphics2D> g2d = r3d->GetDriver2D ();
-  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());*/
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
 
   engine->Prepare ();
 
