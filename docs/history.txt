@@ -1,5 +1,10 @@
 The history order has been reversed so that new features are at the top.
 
+17-Dec-2000
+	- Eric Sunshine temporarily disabled the sumlog.awk script which
+	  performs CVS commit-time mailings.  This was necessary since gawk is
+	  not present on the new CVS server which SourceForget installed, thus
+	  all invocations of sumlog.awk were failing.
 15-Dec-2000
 	- Bugfix in csPolygon3D::ClipToPlane(). If the portal has a clipping
 	  plane (can happen with floating portals) then it was possible that
