@@ -1339,7 +1339,6 @@ void csShadowBitmap::UpdateLightMap (
       }
 
       // @@@ Optimization: It should be possible to combine these
-
       // calculations into a more efficient formula.
       float d = csSquaredDist::PointPoint (lightpos, v);
       if (d >= light->GetSquaredRadius ()) continue;
@@ -1353,10 +1352,7 @@ void csShadowBitmap::UpdateLightMap (
 	int* vertexs = poly->GetVertexIndices ();
 	csVector3* normals = poly->GetParent ()->GetNormals ();
 	int vCount = poly->GetVertexCount ();
-	csSegment3* segments = new csSegment3[vCount];
 
-	// int nearest; 
-	csVector3* nearest = new csVector3[vCount];
 	csVector3* nearestNormals = new csVector3[vCount];
 	float *distances = new float[vCount];
 	float shortestDistance = 10000000.0f;  // Big enought?
@@ -1365,16 +1361,16 @@ void csShadowBitmap::UpdateLightMap (
 	for (act = 0; act < vCount ; act++)
 	{
 	  // Create the 3D Segments
-	  segments[act].SetStart (poly->GetParent()->Vwor(vertexs[act]));
-	  segments[act].SetEnd (poly->GetParent()
-	  	->Vwor(vertexs[(act+1)%vCount]));
+	  csSegment3 seg;
+	  seg.SetStart (poly->GetParent()->Vwor(vertexs[act]));
+	  seg.SetEnd (poly->GetParent()->Vwor(vertexs[(act+1)%vCount]));
 
 	  // Find the nearest point from v to the segment
 	  // a: Start
 	  // b: End
 	  // c: point
-	  csVector3 v_a = segments[act].Start ();
-	  csVector3 v_b = segments[act].End ();
+	  csVector3 v_a = seg.Start ();
+	  csVector3 v_b = seg.End ();
 	  csVector3 v_c = v;
 	  float dt_a = (v_c.x - v_a.x) * (v_b.x - v_a.x) + 
 		(v_c.y - v_a.y) * (v_b.y - v_a.y) +
@@ -1383,36 +1379,32 @@ void csShadowBitmap::UpdateLightMap (
 		(v_c.y - v_b.y) * (v_a.y - v_b.y) +
 		(v_c.z - v_b.z) * (v_a.z - v_b.z);
 
+	  csVector3 nearest;
 	  if (dt_a <= 0)
 	  {
-	    nearest[act] = v_a;
+	    nearest = v_a;
 	  }
 	  else
 	  {
-	    if (dt_b <=0)
-	    {
-	      nearest[act] = v_b;
-	    }
+	    if (dt_b <= 0)
+	      nearest = v_b;
 	    else
-	    {
-	      nearest[act] = v_a + ((v_b - v_a) * dt_a)/(dt_a + dt_b);
-	    }
+	      nearest = v_a + ((v_b - v_a) * dt_a)/(dt_a + dt_b);
 	  }
 
 	  // Find the normal in the nearest point of the segment
 	  // ==> Linear interpolation between vertexs
 	  float AllDistance = qsqrt (
-	  	csSquaredDist::PointPoint(segments[act].Start (),
-		segments[act].End()));
+	  	csSquaredDist::PointPoint(seg.Start (), seg.End()));
 	  float factorA = 1.0 - (qsqrt (csSquaredDist::PointPoint (
-	  	segments[act].Start (),nearest[act]) ) / AllDistance);
+	  	seg.Start (),nearest) ) / AllDistance);
 	  float factorB = 1.0 - (qsqrt (csSquaredDist::PointPoint
-	  	(segments[act].End (),nearest[act]) ) / AllDistance);
+	  	(seg.End (),nearest) ) / AllDistance);
 	  nearestNormals[act] = factorA * normals[vertexs[act]]
 	  	+ factorB * normals[vertexs[((act+1)%vCount)]];
 
 	  // Get the distance
-	  distances[act] = qsqrt (csSquaredDist::PointPoint(v,nearest[act]));
+	  distances[act] = qsqrt (csSquaredDist::PointPoint(v,nearest));
 	  if (distances[act] < shortestDistance)
 	  {
 	    nearestNormal = act;
@@ -1445,11 +1437,9 @@ void csShadowBitmap::UpdateLightMap (
 
 	normal.Normalize();
 
-	delete [] nearest;
 	delete [] nearestNormals;
 	delete [] distances;
 	delete [] weights;
-	delete [] segments;
       }
 
       float cosinus = (v - lightpos) * normal;
