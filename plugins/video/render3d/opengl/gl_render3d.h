@@ -240,6 +240,10 @@ public:
     csRenderBufferType type, csRenderBufferComponentType componentType, 
     int componentCount, bool index);
 
+  /// Create interleaved renderbuffers
+  virtual void CreateInterleavedRenderBuffers (int size, 
+    csRenderBufferType type, int count, csArray<iRenderBuffer*> &buffers);
+
   /// Activate a vertex buffer
   bool ActivateBuffer (csVertexAttrib attrib, iRenderBuffer* buffer);
   void DeactivateBuffer (csVertexAttrib attrib);

@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh particles object ;
+
+Plugin particles
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith particles : csgfx csgeom csutil ;
+
+Help particles : "Particle system plug-in" ;
+CompileGroups particles :  meshes ;
+

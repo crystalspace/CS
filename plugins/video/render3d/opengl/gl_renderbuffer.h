@@ -33,10 +33,11 @@ class csGLRenderBuffer : public iRenderBuffer
 protected:
   friend class csGLGraphics3D;
 
-  int size, compcount, compSize;
+  int size, compcount, compSize, stride, offset;
   csRenderBufferType type;
   csRenderBufferComponentType comptype;
   GLenum compGLType;
+  bool nodelete;
 public:
   SCF_DECLARE_IBASE;
 
@@ -51,14 +52,32 @@ public:
   /// Get the size of the buffer (in bytes)
   virtual int GetSize() const { return size; }
 
+  /// Sets the number of components per element
+  virtual void SetComponentCount (int count)
+  { compcount = count; }
+
   /// Gets the number of components per element
   virtual int GetComponentCount () const { return compcount; }
+
+  /// Sets the component type
+  virtual void SetComponentType (csRenderBufferComponentType type);
 
   /// Gets the component type
   virtual csRenderBufferComponentType GetComponentType () const
   { return comptype; }
 
   virtual void* RenderLock (csGLRenderBufferLockType type) = 0;
+
+  virtual void SetStride (int s)
+  { stride = s; }
+
+  virtual int GetStride () const
+  { return stride; }
+
+  virtual void SetOffset (int o)
+  { offset = o; }
+
+  void SetInterleaved () { nodelete = true; }
 };
 
 
@@ -83,7 +102,7 @@ public:
 
   virtual ~csSysRenderBuffer ()
   {
-    delete[] (char *)buffer;
+    if(!nodelete) delete[] (char *)buffer;
   }
 
   /**
@@ -141,11 +160,20 @@ public:
       GL_ELEMENT_ARRAY_BUFFER_ARB:GL_ARRAY_BUFFER_ARB, size, 0, 
       (type==CS_BUF_STATIC) ? GL_STATIC_DRAW_ARB : GL_DYNAMIC_DRAW_ARB);
   }
+  csVBORenderBuffer (csVBORenderBuffer *copy) :
+    csGLRenderBuffer (copy->size, copy->type, copy->comptype, copy->compcount)
+  {
+    ext = copy->ext;
+    index = copy->index;
+    buftype = copy->buftype;
+    bufferId = copy->bufferId;
+    locked = false;
+  }
 
   virtual ~csVBORenderBuffer ()
   {
     GLuint buf = bufferId;
-    ext->glDeleteBuffersARB (1, &buf);
+    if(!nodelete) ext->glDeleteBuffersARB (1, &buf);
   }
 
   /**

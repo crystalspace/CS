@@ -1281,6 +1281,10 @@ bool csGLGraphics3D::ActivateBuffer (csVertexAttrib attrib,
 
   void* data = ((csGLRenderBuffer*)buffer)->RenderLock (
   	CS_GLBUF_RENDERLOCK_ARRAY); //buffer->Lock (CS_BUF_LOCK_RENDER);
+  int stride = buffer->GetStride ();
+  if(stride) {
+    stride = stride;
+  }
   if (data != (void*)-1)
   {
     if (ext->glEnableVertexAttribArrayARB && attrib < CS_VATTRIB_SPECIFIC_FIRST)
@@ -1288,14 +1292,8 @@ bool csGLGraphics3D::ActivateBuffer (csVertexAttrib attrib,
       ext->glEnableVertexAttribArrayARB (att);
       if (bind)
       {
-        if (use_hw_render_buffers)
-        {
-          ext->glVertexAttribPointerARB(attrib, buffer->GetComponentCount (),
-            ((csGLRenderBuffer*)buffer)->compGLType, true, 0, 0);
-        }
-        else
-          ext->glVertexAttribPointerARB(attrib, buffer->GetComponentCount (),
-            ((csGLRenderBuffer*)buffer)->compGLType, true, 0, data);
+        ext->glVertexAttribPointerARB(attrib, buffer->GetComponentCount (),
+          ((csGLRenderBuffer*)buffer)->compGLType, true, stride, data);
       }
     }
     else
@@ -1304,16 +1302,16 @@ bool csGLGraphics3D::ActivateBuffer (csVertexAttrib attrib,
       {
         case CS_VATTRIB_POSITION:
           glVertexPointer (buffer->GetComponentCount (),
-            ((csGLRenderBuffer*)buffer)->compGLType, 0, data);
+            ((csGLRenderBuffer*)buffer)->compGLType, stride, data);
           glEnableClientState (GL_VERTEX_ARRAY);
           break;
         case CS_VATTRIB_NORMAL:
-          glNormalPointer (((csGLRenderBuffer*)buffer)->compGLType, 0, data);
+          glNormalPointer (((csGLRenderBuffer*)buffer)->compGLType, stride, data);
           glEnableClientState (GL_NORMAL_ARRAY);
           break;
         case CS_VATTRIB_PRIMARY_COLOR:
           glColorPointer (buffer->GetComponentCount (),
-            ((csGLRenderBuffer*)buffer)->compGLType, 0, data);
+            ((csGLRenderBuffer*)buffer)->compGLType, stride, data);
           glEnableClientState (GL_COLOR_ARRAY);
 	  break;
         default:
@@ -1327,7 +1325,7 @@ bool csGLGraphics3D::ActivateBuffer (csVertexAttrib attrib,
 	    }
 	    else if (unit != 0) return false;
 	    glTexCoordPointer (buffer->GetComponentCount (), 
-	      ((csGLRenderBuffer*)buffer)->compGLType, 0, data);
+	      ((csGLRenderBuffer*)buffer)->compGLType, stride, data);
 	    glEnableClientState (GL_TEXTURE_COORD_ARRAY);
 	  }
 	  break;
@@ -1549,6 +1547,10 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
       break;
     case CS_MESHTYPE_POINT_SPRITES:
     {
+      if(!ext->CS_GL_ARB_point_sprite)
+      {
+        break;
+      }
       float radius, scale;
       mymesh->dynDomain->GetVariable(string_point_radius)->GetValue (radius);
       mymesh->dynDomain->GetVariable(string_point_scale)->GetValue (scale);
@@ -1557,11 +1559,11 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
       ext->glPointParameterfvARB (GL_POINT_DISTANCE_ATTENUATION_ARB, atten);
       ext->glPointParameterfARB (GL_POINT_SIZE_MAX_ARB, 9999.0f);
       ext->glPointParameterfARB (GL_POINT_SIZE_MIN_ARB, 0.0f);
-      ext->glPointParameterfARB (GL_POINT_FADE_THRESHOLD_SIZE_ARB, 0.1f);
+      ext->glPointParameterfARB (GL_POINT_FADE_THRESHOLD_SIZE_ARB, 1.0f);
 
       glEnable (GL_POINT_SPRITE_ARB);
       primitivetype = GL_POINTS;
-      statecache->Enable_GL_TEXTURE_2D ();
+      statecache->SetActiveTU (0);
       glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
 
       break;
@@ -1667,11 +1669,9 @@ void csGLGraphics3D::DrawMesh (csRenderMesh* mymesh)
     indexbuf->Release();
   }
 
-  if (mymesh->meshtype == CS_MESHTYPE_POINT_SPRITES)
-  {
-    //statecache->Enable_GL_TEXTURE_2D ();
-    glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE);
-    glDisable(GL_POINT_SPRITE_ARB);
+  if(mymesh->meshtype == CS_MESHTYPE_POINT_SPRITES) {
+      glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_FALSE);
+      glDisable(GL_POINT_SPRITE_ARB);
   }
 
   //if (clip_planes_enabled)

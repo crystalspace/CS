@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- particles.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.mesh.object.particles</name>
+        <implementation>csParticlesType</implementation>
+        <description>Crystal Space Particle System</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

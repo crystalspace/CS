@@ -1,0 +1,706 @@
+/*
+    Copyright (C) 2003 by Jorrit Tyberghein, John Harger, Daniel Duhprey
+
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Library General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Library General Public License for more details.
+
+    You should have received a copy of the GNU Library General Public
+    License along with this library; if not, write to the Free
+    Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#ifndef __CS_PARTICLES_H__
+#define __CS_PARTICLES_H__
+
+#include "csutil/cscolor.h"
+#include "csutil/array.h"
+#include "csutil/garray.h"
+
+#include "csgeom/transfrm.h"
+#include "csgeom/objmodel.h"
+
+#include "imesh/object.h"
+#include "imesh/particles.h"
+
+#include "iutil/comp.h"
+
+#include "ivideo/rendermesh.h"
+
+#include "csgfx/shadervar.h"
+#include "csgfx/shadervarcontext.h"
+
+struct iMaterialWrapper;
+struct iImage;
+struct iGraphics3D;
+struct iVirtualClock;
+
+class csParticlesType;
+class csParticlesFactory;
+class csParticlesObject;
+
+/**
+ * Particles type, instantiates factories which create meshes
+ */
+class csParticlesType : public iMeshObjectType
+{
+private:
+  iObjectRegistry *object_reg;
+  iBase* parent;
+
+public:
+  SCF_DECLARE_IBASE;	
+
+  csParticlesType (iBase* p);
+  virtual ~csParticlesType ();
+
+  csPtr<iMeshObjectFactory> NewFactory();
+
+  struct eiComponent : public iComponent
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csParticlesType);
+    bool Initialize (iObjectRegistry* p)
+    { scfParent->object_reg = p; return true; }
+  } scfiComponent;
+  friend struct eiComponent;
+};
+
+
+/**
+ * The factory only stores initial settings used for creating many
+ * instances of the same particle system type
+ */
+class csParticlesFactory : public iMeshObjectFactory
+{
+  friend class csParticlesObject;
+private:
+  iBase* parent;
+  iObjectRegistry *object_reg;
+
+  csRef<iGraphics3D> g3d;
+  csRef<iShaderManager> shmgr;
+
+  csParticleEmitType emit_type;
+  float emit_size_1;
+  float emit_size_2;
+  float emit_size_3;
+
+  csParticleForceType force_type;
+
+  csVector3 force_direction;
+  float force_range;
+  csParticleFalloffType force_falloff;
+  float force_cone_radius;
+  csParticleFalloffType force_cone_radius_falloff;
+
+  float force_amount;
+  float particle_mass;
+  float dampener;
+  
+  int max_particles;
+  int particles_per_second;
+  int initial_particles;
+
+  csVector3 gravity;
+  
+  float emit_time;
+  float time_to_live;
+  float time_variation;
+
+  float diffusion;
+
+  float particle_radius;
+
+  csArray<csColor> gradient_colors;
+  
+  csParticleHeatFunction heat_function;
+
+  float (*heat_callback)(float time, float speed, float dist);
+  csColor (*color_callback)(float heat);
+public:
+  SCF_DECLARE_IBASE;
+
+  csParticlesFactory (csParticlesType* p, iObjectRegistry* objreg);
+  virtual ~csParticlesFactory ();
+
+  csPtr<iMeshObject> NewInstance ();
+  void HardTransform (const csReversibleTransform&) { }
+  bool SupportsHardTransform () const { return false; }
+  void SetLogicalParent (iBase* lp) { parent = lp; }
+  iBase* GetLogicalParent () const { return parent; }
+  iObjectModel* GetObjectModel () { return 0; }
+
+  void SetParticlesPerSecond (int count)
+  { particles_per_second = count; }
+  void SetInitialParticleCount (int count)
+  { initial_particles = count; }
+  void SetPointEmitType ()
+  {
+    emit_type = CS_PART_EMIT_SPHERE;
+    emit_size_1 = 0.0015f;
+    emit_size_2 = 0.001f;
+  }
+  void SetSphereEmitType (float outer_radius, float inner_radius)
+  {
+    emit_type = CS_PART_EMIT_SPHERE;
+    emit_size_1 = outer_radius;
+    emit_size_2 = inner_radius;
+  }
+  void SetRadialForceType (float range, csParticleFalloffType falloff)
+  {
+    force_type = CS_PART_FORCE_RADIAL;
+    force_range = range;
+    force_falloff = falloff;
+  }
+  void SetLinearForceType (csVector3 &direction, float range, csParticleFalloffType falloff)
+  {
+    force_type = CS_PART_FORCE_LINEAR;
+    force_direction = direction;
+    force_range = range;
+    force_falloff = falloff;
+  }
+  void SetConeForceType (csVector3 &direction, float range, csParticleFalloffType falloff, float radius, csParticleFalloffType radius_falloff)
+  {
+    force_type = CS_PART_FORCE_CONE;
+    force_direction = direction;
+    force_range = range;
+    force_falloff = falloff;
+    force_cone_radius = radius;
+    force_cone_radius_falloff = radius_falloff;
+  }
+  void SetForce (float force)
+  { force_amount = force; }
+  void SetDiffusion (float size)
+  { diffusion = size; }
+  void SetGravity (csVector3 &gravity)
+  { csParticlesFactory::gravity = gravity; }
+  void SetEmitTime (float time)
+  { emit_time = time; }
+  void SetTimeToLive (float time)
+  { time_to_live = time; }
+  void SetTimeVariation (float variation)
+  { time_variation = variation; }
+  void SetMaxParticleCount (int count)
+  { max_particles = count; }
+
+  void SetParticleHeatFunction(csParticleHeatFunction type, float (*callback)(float time, float speed, float dist))
+  {
+    heat_function = type;
+    heat_callback = callback;
+  }
+  void AddColor (csColor color)
+  {
+    gradient_colors.Push(color);
+  }
+  void ClearColors ()
+  {
+    gradient_colors.DeleteAll ();
+  }
+  void SetColorCallback (csColor (*callback)(float heat) = NULL)
+  {
+    color_callback = callback;
+  }
+  void SetParticleRadius (float rad)
+  {
+    particle_radius = rad;
+  }
+  void SetDampener (float damp)
+  { dampener = damp; }
+  float GetDampener ()
+  { return dampener; }
+  void SetMass(float mass)
+  { particle_mass = mass; }
+  float GetMass()
+  { return particle_mass; }
+
+  struct eiParticlesFactoryState : public iParticlesFactoryState
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csParticlesFactory);
+    virtual void SetParticlesPerSecond (int count)
+    { scfParent->SetParticlesPerSecond (count); }
+    virtual void SetInitialParticleCount (int count)
+    { scfParent->SetInitialParticleCount (count); }
+    virtual void SetPointEmitType ()
+    { scfParent->SetPointEmitType (); }
+    virtual void SetSphereEmitType (float outer_radius, float inner_radius)
+    { scfParent->SetSphereEmitType(outer_radius, inner_radius); }
+    virtual void SetPlaneEmitType (float x_size, float y_size)
+    { }
+    virtual void SetBoxEmitType (float x_size, float y_size, float z_size)
+    { }
+    virtual void SetRadialForceType (float range, csParticleFalloffType falloff)
+    { scfParent->SetRadialForceType (range, falloff); }
+    virtual void SetLinearForceType (csVector3 &direction, float range, csParticleFalloffType falloff)
+    { scfParent->SetLinearForceType (direction, range, falloff); }
+    virtual void SetConeForceType (csVector3 &direction, float range, csParticleFalloffType falloff, float radius, csParticleFalloffType radius_falloff)
+    { scfParent->SetConeForceType (direction, range, falloff, radius, radius_falloff); }
+    virtual void SetForce (float force)
+    { scfParent->SetForce (force); }
+    virtual void SetDiffusion (float size)
+    { scfParent->SetDiffusion (size); }
+    virtual void SetGravity (csVector3 &gravity)
+    { scfParent->SetGravity (gravity); }
+    virtual void SetEmitTime (float time)
+    { scfParent->SetEmitTime (time); }
+    virtual void SetTimeToLive (float time)
+    { scfParent->SetTimeToLive (time); }
+    virtual void SetTimeVariation (float variation)
+    { scfParent->SetTimeVariation (variation); }
+    virtual void SetMaxParticleCount (int count)
+    { scfParent->SetMaxParticleCount (count); }
+    virtual void SetParticleHeatFunction(csParticleHeatFunction type, float (*callback)(float time, float speed, float dist) = NULL)
+    { scfParent->SetParticleHeatFunction (type, callback); }
+    virtual void AddColor (csColor color)
+    { scfParent->AddColor (color); }
+    virtual void ClearColors ()
+    { scfParent->ClearColors (); }
+    virtual void SetColorCallback (csColor (*callback)(float heat) = NULL)
+    { scfParent->SetColorCallback (callback); }
+    virtual void SetParticleRadius (float radius)
+    { scfParent->SetParticleRadius (radius); }
+    virtual void SetDampener (float damp)
+    { scfParent->SetDampener (damp); }
+    virtual float GetDampener ()
+    { return scfParent->GetDampener (); }
+    virtual void SetMass(float mass)
+    { scfParent->SetMass (mass); }
+    virtual float GetMass()
+    { return scfParent->GetMass (); }
+  } scfiParticlesFactoryState;
+  friend struct eiParticlesFactoryState;
+};
+
+
+/**
+ * Particles object instance
+ */
+class csParticlesObject : public iMeshObject
+{
+private:
+  iBase* logparent;
+  csParticlesFactory* pFactory;
+  iMeshObjectDrawCallback* vis_cb;
+  csRef<csShaderVariableContext> dynDomain;
+  csRef<iParticlesPhysics> physics;
+
+  csRef<iMaterialWrapper> matwrap;
+  csRenderMesh *mesh;
+  csRenderMesh **meshpp;
+  int meshppsize;
+
+  csReversibleTransform tr_o2c;
+  int tricount;
+
+  csStringID vertex_name;
+  csStringID color_name;
+  csStringID texcoord_name;
+  csStringID index_name;
+  csStringID radius_name;
+  csStringID scale_name;
+
+  int camera_fov;
+  int camera_pixels;
+
+  csColor basecolor;
+
+  csParticleEmitType emit_type;
+  float emit_size_1;
+  float emit_size_2;
+  float emit_size_3;
+
+  csParticleForceType force_type;
+
+  csVector3 force_direction;
+  float force_range;
+  csParticleFalloffType force_falloff;
+  float force_cone_radius;
+  csParticleFalloffType force_cone_radius_falloff;
+
+  float force_amount;
+  
+  int max_particles;
+  int particles_per_second;
+  int initial_particles;
+
+  csVector3 gravity;
+  
+  float emit_time;
+  float total_elapsed_time;
+  float time_to_live;
+  float time_variation;
+
+  float particle_mass;
+  float dampener;
+
+  float diffusion;
+
+  float particle_radius;
+
+  csArray<csColor> gradient_colors;
+
+  csParticleHeatFunction heat_function;
+
+  float (*heat_callback)(float time, float speed, float dist);
+  csColor (*color_callback)(float heat);
+
+  csDirtyAccessArray<csParticlesData> point_data;
+  struct i_vertex {
+    csVector3 position;
+    csVector4 color;
+  };
+  csDirtyAccessArray<i_vertex> vertex_data;
+
+  int vertex_count;
+
+  unsigned int *indices;
+  int index_count;
+
+  float new_particles;
+
+  bool point_sprites;
+
+  csRef<iRenderBuffer> vertex_buffer;
+  csRef<iRenderBuffer> color_buffer;
+  csRef<iRenderBuffer> texcoord_buffer;
+  csRef<iRenderBuffer> index_buffer;
+
+  csVector3 corners[4];
+
+  csRandomGen rng;
+  csVector3 emitter;
+  float radius;
+  static int ZSort (csParticlesData const &item1, csParticlesData const &item2);
+  static int ZSort (void const *item1, void const *item2);
+public: 
+  SCF_DECLARE_IBASE;
+
+  csParticlesObject (csParticlesFactory* f);
+  virtual ~csParticlesObject ();
+
+  /// Returns a point to the factory that made this
+  iMeshObjectFactory* GetFactory () const { return (iMeshObjectFactory*)pFactory; }
+
+  /**
+   * Does all pre-render calculation.  Determines which LOD children in the 
+   * tree should be drawn
+   */
+  bool DrawTest (iRenderView* rview, iMovable* movable);
+
+  /// Updates the lighting
+  void UpdateLighting (iLight** lights, int num_lights, iMovable* movable);
+  
+  bool Draw (iRenderView*, iMovable*, csZBufMode) 
+  { /* deprecated */ return false; }
+
+  /// Returns the mesh, ready for rendering
+  csRenderMesh** GetRenderMeshes (int &n);
+
+  void SetVisibleCallback (iMeshObjectDrawCallback* cb) { vis_cb = cb; }
+  iMeshObjectDrawCallback* GetVisibleCallback () const { return vis_cb; }
+
+  /// For creating the quads when necessary
+  void NextFrame (csTicks ticks, const csVector3&);
+
+  /// Unsupported
+  void HardTransform (const csReversibleTransform&) { }
+
+  /// Shows that HardTransform is not supported by this mesh
+  bool SupportsHardTransform () const { return false; }
+
+  /// Check if hit by the beam
+  bool HitBeamOutline (const csVector3& start, const csVector3& end, 
+	csVector3& isect, float* pr);
+  /// Find exact position of a beam hit
+  bool HitBeamObject (const csVector3& start, const csVector3& end, 
+	csVector3& isect, float* pr, int* polygon_idx = 0);
+
+  /// Set/Get logical parent
+  void SetLogicalParent (iBase* lp) { logparent = lp; }
+  iBase* GetLogicalParent () const { return logparent; }
+
+  /// Gets the object model
+  iObjectModel *GetObjectModel () { return &scfiObjectModel; }
+
+  /// Set (Get) the constant base color 
+  bool SetColor (const csColor& c) { basecolor = c; return true; }
+  bool GetColor (csColor &c) const { c = basecolor; return true; }
+
+  iRenderBuffer *GetRenderBuffer (csStringID name);
+
+  /** 
+   * Set (Get) the material wrapper
+   */
+  bool SetMaterialWrapper (iMaterialWrapper* m)
+  { matwrap = m; return true; }
+  iMaterialWrapper* GetMaterialWrapper () const { return matwrap; }
+  void InvalidateMaterialHandles () { }
+
+  void GetObjectBoundingBox (csBox3& bbox, int type = CS_BBOX_NORMAL);
+  void GetRadius (csVector3& rad, csVector3& c);
+
+  bool LoadPhysicsPlugin (const char *plugin_id);
+
+  void SetParticlesPerSecond (int count)
+  { particles_per_second = count; }
+  void SetInitialParticleCount (int count)
+  { initial_particles = count; }
+  void SetPointEmitType ()
+  {
+    emit_type = CS_PART_EMIT_SPHERE;
+    emit_size_1 = 0.0015f;
+    emit_size_2 = 0.001f;
+  }
+  void SetSphereEmitType (float outer_radius, float inner_radius)
+  {
+    emit_type = CS_PART_EMIT_SPHERE;
+    emit_size_1 = outer_radius;
+    emit_size_2 = inner_radius;
+  }
+  void SetRadialForceType (float range, csParticleFalloffType falloff)
+  {
+    force_type = CS_PART_FORCE_RADIAL;
+    force_range = range;
+    force_falloff = falloff;
+  }
+  void SetLinearForceType (csVector3 &direction, float range, csParticleFalloffType falloff)
+  {
+    force_type = CS_PART_FORCE_LINEAR;
+    force_direction = direction;
+    force_range = range;
+    force_falloff = falloff;
+  }
+  void SetConeForceType (csVector3 &direction, float range, csParticleFalloffType falloff, float radius, csParticleFalloffType radius_falloff)
+  {
+    force_type = CS_PART_FORCE_CONE;
+    force_direction = direction;
+    force_range = range;
+    force_falloff = falloff;
+    force_cone_radius = radius;
+    force_cone_radius_falloff = radius_falloff;
+  }
+  void SetForce (float force)
+  { force_amount = force; }
+  void SetDiffusion (float size)
+  { diffusion = size; }
+  void SetGravity (csVector3 &gravity)
+  { csParticlesObject::gravity = gravity; }
+  void SetEmitTime (float time)
+  { emit_time = time; }
+  void SetTimeToLive (float time)
+  { time_to_live = time; }
+  void SetTimeVariation (float variation)
+  { time_variation = variation; }
+  void SetMaxParticleCount (int count)
+  { max_particles = count; }
+  void SetParticleHeatFunction(csParticleHeatFunction type, float (*callback)(float time, float speed, float dist))
+  {
+    heat_function = type;
+    heat_callback = callback;
+  }
+  void AddColor (csColor color)
+  {
+    gradient_colors.Push(color);
+  }
+  void ClearColors ()
+  {
+    gradient_colors.DeleteAll ();
+  }
+  void SetColorCallback (csColor (*callback)(float heat) = NULL)
+  {
+    color_callback = callback;
+  }
+  void SetParticleRadius (float rad);
+
+  int GetParticlesPerSecond ()
+  { return particles_per_second; }
+  int GetInitialParticleCount ()
+  { return initial_particles; }
+  void GetEmitPosition (csVector3 &position)
+  { position = emitter; }
+  csParticleEmitType GetEmitType ()
+  { return emit_type; }
+  csParticleForceType GetForceType ()
+  { return force_type; }
+  void GetFalloffType(csParticleFalloffType &force,
+    csParticleFalloffType &cone)
+  {
+    force = force_falloff;
+    cone = force_cone_radius_falloff;
+  }
+  float GetForceRange ()
+  { return force_range; }
+  void GetForceDirection (csVector3 &dir)
+  { dir = force_direction; }
+  float GetForceConeRadius ()
+  { return force_cone_radius; }
+  float GetForce ()
+  { return force_amount; }
+  float GetDiffusion ()
+  { return diffusion; }
+  void GetGravity (csVector3 &gravity)
+  { gravity = csParticlesObject::gravity; }
+  float GetEmitTime ()
+  { return emit_time; }
+  float GetTimeToLive ()
+  { return time_to_live; }
+  float GetTimeVariation ()
+  { return time_variation; }
+  int GetMaxParticleCount ()
+  { return max_particles; }
+  float GetParticleRadius ()
+  { return particle_radius; }
+  void SetDampener (float damp)
+  { dampener = damp; }
+  float GetDampener ()
+  { return dampener; }
+  void SetMass(float mass)
+  { particle_mass = mass; }
+  float GetMass()
+  { return particle_mass; }
+
+  void Start ();
+  void Stop ()
+  { }
+
+  bool Update (float elapsed_time);
+
+  virtual void PositionChild (iMeshObject* child,csTicks current_time) { }
+
+  struct eiParticlesObjectState : public iParticlesObjectState
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csParticlesObject);
+    virtual void SetParticlesPerSecond (int count)
+    { scfParent->SetParticlesPerSecond (count); }
+    virtual void SetInitialParticleCount (int count)
+    { scfParent->SetInitialParticleCount (count); }
+    virtual void SetPointEmitType ()
+    { scfParent->SetPointEmitType (); }
+    virtual void SetSphereEmitType (float outer_radius, float inner_radius)
+    { scfParent->SetSphereEmitType (outer_radius, inner_radius); }
+    virtual void SetPlaneEmitType (float x_size, float y_size)
+    { }
+    virtual void SetBoxEmitType (float x_size, float y_size, float z_size)
+    { }
+    virtual void SetRadialForceType (float range, csParticleFalloffType falloff)
+    { scfParent->SetRadialForceType (range, falloff); }
+    virtual void SetLinearForceType (csVector3 &direction, float range, csParticleFalloffType falloff)
+    { scfParent->SetLinearForceType (direction, range, falloff); }
+    virtual void SetConeForceType (csVector3 &direction, float range, csParticleFalloffType falloff, float radius, csParticleFalloffType radius_falloff)
+    { scfParent->SetConeForceType (direction, range, falloff, radius, radius_falloff); }
+    virtual void SetForce (float force)
+    { scfParent->SetForce (force); }
+    virtual void SetDiffusion (float size)
+    { scfParent->SetDiffusion (size); }
+    virtual void SetGravity (csVector3 &gravity)
+    { scfParent->SetGravity (gravity); }
+    virtual void SetEmitTime (float time)
+    { scfParent->SetEmitTime (time); }
+    virtual void SetTimeToLive (float time)
+    { scfParent->SetTimeToLive (time); }
+    virtual void SetTimeVariation (float variation)
+    { scfParent->SetTimeVariation (variation); }
+    virtual void SetMaxParticleCount (int count)
+    { scfParent->SetMaxParticleCount (count); }
+    virtual void SetParticleHeatFunction(csParticleHeatFunction type, float (*callback)(float time, float speed, float dist) = NULL)
+    { scfParent->SetParticleHeatFunction (type, callback); }
+    virtual void AddColor (csColor color)
+    { scfParent->AddColor (color); }
+    virtual void ClearColors ()
+    { scfParent->ClearColors (); }
+    virtual void SetColorCallback (csColor (*callback)(float heat) = NULL)
+    { scfParent->SetColorCallback (callback); }
+    virtual void SetParticleRadius (float radius)
+    { scfParent->SetParticleRadius (radius); }
+    virtual int GetParticlesPerSecond ()
+    { return scfParent->GetParticlesPerSecond (); }
+    virtual int GetInitialParticleCount ()
+    { return scfParent->GetInitialParticleCount (); }
+    virtual void GetEmitPosition (csVector3 &position)
+    { scfParent->GetEmitPosition (position); }
+    virtual csParticleEmitType GetEmitType ()
+    { return scfParent->GetEmitType (); }
+    virtual csParticleForceType GetForceType ()
+    { return scfParent->GetForceType (); }
+    virtual void GetFalloffType(csParticleFalloffType &force,
+      csParticleFalloffType &cone)
+    { scfParent->GetFalloffType (force, cone); }
+    virtual float GetForceRange ()
+    { return scfParent->GetForceRange (); }
+    virtual void GetForceDirection (csVector3 &dir)
+    { scfParent->GetForceDirection (dir); }
+    virtual float GetForceConeRadius ()
+    { return scfParent->GetForceConeRadius (); }
+    virtual float GetForce ()
+    { return scfParent->GetForce (); }
+    virtual float GetDiffusion ()
+    { return scfParent->GetDiffusion (); }
+    virtual void GetGravity (csVector3 &gravity)
+    { scfParent->GetGravity (gravity); }
+    virtual float GetEmitTime ()
+    { return scfParent->GetEmitTime (); }
+    virtual float GetTimeToLive ()
+    { return scfParent->GetTimeToLive (); }
+    virtual float GetTimeVariation ()
+    { return scfParent->GetTimeVariation (); }
+    virtual int GetMaxParticleCount ()
+    { return scfParent->GetMaxParticleCount (); }
+    virtual float GetParticleRadius ()
+    { return scfParent->GetParticleRadius (); }
+    virtual void SetDampener (float damp)
+    { scfParent->SetDampener (damp); }
+    virtual float GetDampener ()
+    { return scfParent->GetDampener (); }
+    virtual void SetMass(float mass)
+    { scfParent->SetMass (mass); }
+    virtual float GetMass()
+    { return scfParent->GetMass (); }
+    virtual void Start ()
+    { scfParent->Start (); }
+    virtual void Stop ()
+    { scfParent->Stop (); }
+    virtual void Update (float elapsed_time)
+    { scfParent->Update (elapsed_time); }
+  } scfiParticlesObjectState;
+  friend struct eiParticlesObjectState;
+
+  struct eiObjectModel : public csObjectModel
+  {
+    SCF_DECLARE_EMBEDDED_IBASE (csParticlesObject);
+    void GetObjectBoundingBox (csBox3& b, int t = CS_BBOX_NORMAL)
+    { scfParent->GetObjectBoundingBox (b, t); }
+    void GetRadius (csVector3& r, csVector3& c)
+    { scfParent->GetRadius (r, c); }
+  } scfiObjectModel;
+  friend struct eiObjectModel;
+
+  class ShaderVariableAccessor : public iShaderVariableAccessor
+  {
+  public:
+    SCF_DECLARE_IBASE;
+
+    csParticlesObject* parent;
+    ShaderVariableAccessor (csParticlesObject* p) : parent(p)
+    {
+      SCF_CONSTRUCT_IBASE (0);
+    }
+    virtual ~ShaderVariableAccessor ()
+    {
+      SCF_DESTRUCT_IBASE ();
+    }
+    virtual void PreGetValue (csShaderVariable* variable)
+    {
+      parent->PreGetShaderVariableValue (variable);
+    }
+  } shaderVarAccessor;
+  friend class ShaderVariableAccessor;
+
+  void PreGetShaderVariableValue (csShaderVariable* variable);
+};
+
+#endif // __CS_PARTICLES_H__

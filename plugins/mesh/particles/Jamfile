@@ -1,0 +1,5 @@
+SubDir TOP plugins mesh particles ;
+
+SubInclude TOP plugins mesh particles object ;
+SubInclude TOP plugins mesh particles persist ;
+SubInclude TOP plugins mesh particles physics ;

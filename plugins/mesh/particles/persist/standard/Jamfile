@@ -1,0 +1,10 @@
+SubDir TOP plugins mesh particles persist standard ;
+
+Plugin particlesldr
+	: [ Wildcard *.cpp *.h ]
+;
+LinkWith particlesldr : csgeom csutil ;
+
+Help particlesldr : "Particle system object loader" ;
+CompileGroups particlesldr :  meshes ;
+

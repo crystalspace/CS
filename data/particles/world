@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<world>
+  <plugins>
+    <plugin name="thingFact">crystalspace.mesh.loader.factory.thing</plugin>
+    <plugin name="thing">crystalspace.mesh.loader.thing</plugin>
+    <plugin name="genmeshFactory">crystalspace.mesh.loader.factory.genmesh</plugin>
+    <plugin name="genmesh">crystalspace.mesh.loader.genmesh</plugin>
+  </plugins>
+
+  <textures>
+	<texture name="brick">
+		<file>/lib/stdtex/oldbrick.jpg</file>
+    </texture>
+	<texture name="dot">
+		<file>dot.tga</file>
+	</texture>
+  </textures>
+
+  <shaders>
+    <shader><file>/shader/ambient.xml</file></shader>
+    <shader><file>/shader/light.xml</file></shader>
+	<shader><file>/shader/particle_basic.xml</file></shader>
+  </shaders>
+
+  <materials>
+	  <material name="walls">
+		<texture>brick</texture>
+	    <shader type="ambient">ambient</shader>
+		<shader type="diffuse">light</shader>
+	  </material>
+	  <material name="particle">
+	    <texture>dot</texture>
+		<shader type="particles">particle_basic</shader>
+	  </material>
+  </materials>
+
+  <renderpriorities>
+    <priority name="sky">
+      <level>1</level>
+      <sort>NONE</sort>
+      <camera />
+    </priority>
+    <priority name="mirror">
+      <level>2</level>
+      <sort>FRONT2BACK</sort>
+    </priority>
+    <priority name="wall">
+      <level>3</level>
+      <sort>NONE</sort>
+    </priority>
+    <priority name="object">
+      <level>4</level>
+      <sort>NONE</sort>
+    </priority>
+    <priority name="alpha">
+      <level>5</level>
+      <sort>BACK2FRONT</sort>
+    </priority>
+  </renderpriorities>
+
+  <addon>
+    <plugin>crystalspace.renderloop.loop.loader</plugin>
+    <params>
+      <name>myLoop</name>
+      <steps>
+        <!-- ambient lighting -->
+        <step plugin="crystalspace.renderloop.step.generic">
+          <shadertype>ambient</shadertype>
+          <zoffset>yes</zoffset>
+          <zuse />
+        </step>
+        <step plugin="crystalspace.renderloop.step.lightiter">
+          <steps>
+	        <step plugin="crystalspace.renderloop.step.generic">
+	          <shadertype>diffuse</shadertype>
+	          <zoffset>no</zoffset>
+	          <ztest />
+	        </step>
+	  </steps>
+        </step>
+        <step plugin="crystalspace.renderloop.step.generic">
+          <shadertype>particles</shadertype>
+          <zoffset>yes</zoffset>
+          <ztest />
+        </step>
+      </steps>
+    </params>
+  </addon>
+    
+  <settings>
+    <clearzbuf>yes</clearzbuf>
+    <lightmapcellsize>16</lightmapcellsize>
+    <renderloop>myLoop</renderloop>
+  </settings>
+
+  <start>
+    <sector>room</sector>
+    <position x="0" y="5" z="0" />
+    <forward x="0" y="0" z="1" />
+    <up x="0" y="1" z="0" />
+  </start>
+
+  <meshfact name="f">
+    <plugin>genmeshFactory</plugin>
+    <params>
+      <numtri>2</numtri>
+      <numvt>4</numvt>
+      <v x="-10" y="10" z="10" u="1.000" v="0.000" />
+      <v x="10" y="10" z="10" u="0.000" v="0.000" />
+      <v x="-10" y="0" z="10" u="1.000" v="1.000" />
+      <v x="10" y="0" z="10" u="0.000" v="1.000" />
+      <t v1="0" v2="1" v3="2" />
+      <t v1="3" v2="2" v3="1" />
+      <autonormals />
+    </params>
+  </meshfact>
+  <meshfact name="b">
+    <plugin>genmeshFactory</plugin>
+    <params>
+      <numtri>2</numtri>
+      <numvt>4</numvt>
+      <v x="10" y="0" z="-10" u="1.000" v="1.000" />
+      <v x="10" y="10" z="-10" u="1.000" v="0.000" />
+      <v x="-10" y="0" z="-10" u="0.000" v="1.000" />
+      <v x="-10" y="10" z="-10" u="0.000" v="0.000" />
+      <t v1="0" v2="1" v3="2" />
+      <t v1="3" v2="2" v3="1" />
+      <autonormals />
+    </params>
+  </meshfact>
+  <meshfact name="d">
+    <plugin>genmeshFactory</plugin>
+    <params>
+      <numtri>2</numtri>
+      <numvt>4</numvt>
+      <v x="10" y="0" z="10" u="1.000" v="1.000" />
+      <v x="10" y="0" z="-10" u="1.000" v="0.000" />
+      <v x="-10" y="0" z="10" u="0.000" v="1.000" />
+      <v x="-10" y="0" z="-10" u="0.000" v="0.000" />
+      <t v1="0" v2="1" v3="2" />
+      <t v1="3" v2="2" v3="1" />
+      <autonormals />
+    </params>
+  </meshfact>
+  <meshfact name="l">
+    <plugin>genmeshFactory</plugin>
+    <params>
+      <numtri>2</numtri>
+      <numvt>4</numvt>
+      <v x="10" y="10" z="10" u="1.000" v="0.000" />
+      <v x="10" y="10" z="-10" u="0.000" v="0.000" />
+      <v x="10" y="0" z="10" u="1.000" v="1.000" />
+      <v x="10" y="0" z="-10" u="0.000" v="1.000" />
+      <t v1="0" v2="1" v3="2" />
+      <t v1="3" v2="2" v3="1" />
+      <autonormals />
+    </params>
+  </meshfact>
+  <meshfact name="u">
+    <plugin>genmeshFactory</plugin>
+    <params>
+      <numtri>2</numtri>
+      <numvt>4</numvt>
+      <v x="-10" y="10" z="10" u="1.000" v="1.000" />
+      <v x="-10" y="10" z="-10" u="1.000" v="0.000" />
+      <v x="10" y="10" z="10" u="0.000" v="1.000" />
+      <v x="10" y="10" z="-10" u="0.000" v="0.000" />
+      <t v1="0" v2="1" v3="2" />
+      <t v1="3" v2="2" v3="1" />
+      <autonormals />
+    </params>
+  </meshfact>
+  <meshfact name="r">
+    <plugin>genmeshFactory</plugin>
+    <params>
+      <numtri>2</numtri>
+      <numvt>4</numvt>
+      <v x="-10" y="0" z="10" u="0.000" v="1.000" />
+      <v x="-10" y="0" z="-10" u="1.000" v="1.000" />
+      <v x="-10" y="10" z="10" u="0.000" v="0.000" />
+      <v x="-10" y="10" z="-10" u="1.000" v="0.000" />
+      <t v1="0" v2="1" v3="2" />
+      <t v1="3" v2="2" v3="1" />
+      <autonormals />
+    </params>
+  </meshfact>
+  <meshfact name = "ballFact">
+    <plugin>crystalspace.mesh.loader.factory.ball</plugin>
+	<params />
+  </meshfact>
+	<meshfact name="explosionFACT">
+	  <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+	    <params>
+			<emitter type="sphere">
+				<time>300</time>
+				<innerradius>0.01</innerradius>
+				<outerradius>0.04</outerradius>
+		  </emitter>
+		  <force type="radial">
+			<amount>0.001</amount>
+			<range>0.5</range>
+			<falloff>linear</falloff>
+			<dampener>0.1</dampener>
+		  </force>
+		  <mass>1.0</mass>
+		  <maxparticles>1000</maxparticles>
+		  <pps>1000</pps>
+		  <initial>0</initial>
+		  <diffusion>0.1</diffusion>
+		  <radius>0.1</radius>
+		  <ttl>0.75</ttl>
+		  <timevariation>0.1</timevariation>
+		  <heatfunction>time_linear</heatfunction>
+		  <gradient>
+			<color red="1" green="1" blue="0"/>
+			<color red="1" green="0.5" blue="0"/>
+			<color red="1" green="0" blue="0"/>
+			<color red="0.5" green="0.5" blue="0.5"/>
+			<color red="0.7" green="0.7" blue="0.7"/>
+		  </gradient>
+	  </params>
+	</meshfact>
+	<meshfact name="fountainFACT">
+	  <plugin>crystalspace.mesh.loader.factory.particles</plugin>
+	    <params>
+		  <emitter type="sphere">
+				<time>300</time>
+				<innerradius>0.01</innerradius>
+				<outerradius>0.03</outerradius>
+		  </emitter>
+		  <force type="linear">
+			<direction x="0.5" y="1" z="0"/>
+			<amount>0.015</amount>
+			<range>3.0</range>
+			<falloff>linear</falloff>
+			<dampener>0.1</dampener>
+		  </force>
+		  <mass>5</mass>
+		  <maxparticles>5000</maxparticles>
+		  <pps>100</pps>
+		  <initial>0</initial>
+		  <gravity x="0" y="-0.001" z="0"/>
+		  <diffusion>0.1</diffusion>
+		  <radius>0.1</radius>
+		  <ttl>5</ttl>
+		  <timevariation>0.5</timevariation>
+		  <heatfunction>time_linear</heatfunction>
+		  <gradient>
+			<color red="0" green="0" blue="1"/>
+			<color red="0" green="0.5" blue="1"/>
+			<color red="1" green="1" blue="1"/>
+		  </gradient>
+	  </params>
+	</meshfact>
+
+  <sector name="room">
+    <light name="sun">
+	  <center x="5" y="5" z="5" />
+      <radius>0</radius>
+      <color red="1" green="1" blue="1" />
+      <influenceradius>30</influenceradius>
+      <attenuation>realistic</attenuation>
+    </light>
+
+    <meshobj name="u">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>u</factory>
+	<material>walls</material>
+      </params>
+      <priority>wall</priority>
+    </meshobj>
+    <meshobj name="d">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>d</factory>
+	<material>walls</material>
+      </params>
+      <priority>wall</priority>
+    </meshobj>
+    <meshobj name="l">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>l</factory>
+	<material>walls</material>
+      </params>
+      <priority>wall</priority>
+    </meshobj>
+    <meshobj name="r">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>r</factory>
+	<material>walls</material>
+      </params>
+      <priority>wall</priority>
+    </meshobj>
+    <meshobj name="f">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>f</factory>
+	<material>walls</material>
+      </params>
+      <priority>wall</priority>
+    </meshobj>
+    <meshobj name="b">
+      <plugin>genmesh</plugin>
+      <params>
+        <factory>b</factory>
+	<material>walls</material>
+      </params>
+      <priority>wall</priority>
+    </meshobj>
+	<meshobj name="explosion">
+		<plugin>crystalspace.mesh.loader.particles</plugin>
+		<params>
+			<factory>explosionFACT</factory>
+			<material>particle</material>
+		</params>
+		<move>
+			<v x="0" y="2" z="5"/>
+		</move>
+	</meshobj>
+	<meshobj name="fountain">
+		<plugin>crystalspace.mesh.loader.particles</plugin>
+		<params>
+			<factory>fountainFACT</factory>
+			<material>particle</material>
+		</params>
+		<move>
+			<v x="-2.5" y="1" z="5"/>
+		</move>
+	  </meshobj>
+
+  </sector>
+
+</world>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- particles.csplugin -->
+<plugin>
+  <scf>
+    <classes>
+      <class>
+        <name>crystalspace.particles.physics.simple</name>
+		<implementation>csParticlesPhysicsSimple</implementation>
+        <description>Crystal Space Simple Particle Physics</description>
+      </class>
+    </classes>
+  </scf>
+</plugin>

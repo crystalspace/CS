@@ -93,8 +93,14 @@ struct iRenderBuffer : public iBase
 
   virtual void CopyToBuffer(void *data, int length) = 0;
 
+  /// Sets the number of components per element
+  virtual void SetComponentCount (int count) = 0;
+
   /// Gets the number of components per element
   virtual int GetComponentCount () const = 0;
+
+  /// Sets the component type (float, int, etc)
+  virtual void SetComponentType (csRenderBufferComponentType type) = 0;
 
   /// Gets the component type (float, int, etc)
   virtual csRenderBufferComponentType GetComponentType () const = 0;
@@ -104,6 +110,12 @@ struct iRenderBuffer : public iBase
 
   /// Get the size of the buffer (in bytes)
   virtual int GetSize() const = 0;
+
+  virtual void SetStride(int stride) = 0;
+
+  virtual int GetStride() const = 0;
+
+  virtual void SetOffset(int offset) = 0;
 };
 
 SCF_VERSION (iRenderBufferSource, 0, 0, 1);
