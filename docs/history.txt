@@ -9,6 +9,7 @@ The history order is reversed so that new features are at the top.
 	  DEBUG_BREAK. Also added newer msvc_libs files to cvsignore.
 	- Philip also updated AWS documentation as follows:
 	  Removed aws->SetDefaultContext(engine, myG3D->GetTextureManager());
+        - Philip also updated docs to point to the 0.94 release of msvc_libs.
 	  and replaced with the correct canvas creation code, which I cannot
 	  be bothered nor have the time to list. :)
 	  Thanks to "vrm" from #CrystalSpace for reporting the error this
