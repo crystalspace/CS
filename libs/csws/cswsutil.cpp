@@ -29,6 +29,7 @@
 #include "csws/csradbut.h"
 #include "csws/cscwheel.h"
 #include "csws/cswssys.h"
+#include "csutil/csstrvec.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csinput/csinput.h"
@@ -757,27 +758,36 @@ void cspFileDialog::Reread ()
   {
     csMessageBox (app, "Error", "Invalid directory");
     System->Printf (MSG_INITIALIZATION, "Invalid directory path\n");
-    goto done;
   }
-
-  while ((de = readdir (dh)))
+  else
   {
-    if ((strcmp (de->d_name, ".") == 0)
-     || (strcmp (de->d_name, "..") == 0))
-      continue;
-
-    if (isdir (path, de))
+    int i, n;
+    csStrVector dirs;
+    csStrVector files;
+    while ((de = readdir (dh)) != NULL)
     {
-      CHK (csListBoxItem *lbi = new csListBoxItem (dp, de->d_name));
+      const char* const name = de->d_name;
+      if (strcmp (name, ".") != 0 && strcmp (name, "..") != 0)
+        if (isdir (path, de))
+	  dirs.Push (strnew(name));
+	else
+	  files.Push(strnew(name));
+    }
+    closedir (dh);
+
+    dirs.QuickSort (csStrVector::CASE_INSENSITIVE);
+    for (i = 0, n = dirs.Length(); i < n; i++)
+    {
+      csListBoxItem *lbi = new csListBoxItem (dp, dirs.Get(i));
       lbi->SetBitmap (fdspr [0], false);
       lbi->SetOffset (level * 6, 0);
     }
-    else
-      CHKB ((void)new csListBoxItem (fp, de->d_name));
-  } /* endwhile */
-  closedir (dh);
 
-done:
+    files.QuickSort (csStrVector::CASE_INSENSITIVE);
+    for (i = 0, n = files.Length(); i < n; i++)
+      (void)new csListBoxItem (fp, files.Get(i));
+  }
+
   busy = false;
   // Place listbox items
   // Activate current directory item
