@@ -15,6 +15,18 @@ chronological order.
 	- Wouter Wijngaards fixed signed/unsigned warning in
 	  csLoader::CreateSequenceParameters.
 	- Wouter Wijngaards fixed the movieplugin minilzo to compile again.
+	- res worked around an apparent failure of glClear() in NVidia GL 
+	  drivers to have any effect.
+	- res changed the driver detection to first check for 
+	  <screendriver>.dll before taking a random entry from the registry.
+	- res fixed the warning in the cal3d loader that discourages materials
+	  in .cal3d files to be less spamming.
+	- res changed the GL font cache to use nearest neighbour filtering
+	  instead of bilinear filtering for fonts again. While NN filtering 
+	  causes jaggies when oversized fonts are used, it is far less 
+	  problematic in the common case of sanely sized fonts, where bilinear
+	  filtering can cause microscopic leaks... which are problematic 
+	  nonetheless if e.g. keycoloring is used. 
 25-Mar-2005
 	- Wouter Wijngaards 
 	  - changed csBitArrayHashKeyHandler::ComputeHash in bitarray.h, 

@@ -35,7 +35,13 @@
 #include "csplugincommon/opengl/glcommon2d.h"
 #include "csplugincommon/opengl/glfontcache.h"
 
-const GLenum fontFilterMode = GL_LINEAR;
+/* While GL_NEAREST causes jaggies when oversized fonts are used, it is far
+ * less problematic in the common case of sanely sized fonts, where 
+ * GL_LINEAR can cause microscopic leaks... which are problematic nonetheless
+ * if e.g. keycoloring is used. 
+ * If someone needs oversized fonts really badly, some scheme to set approriate
+ * filtering depending on the size can be devised or so. */
+const GLenum fontFilterMode = /*GL_LINEAR*/GL_NEAREST;
 
 //---------------------------------------------------------------------------
 
