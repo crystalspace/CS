@@ -40,10 +40,10 @@ awsSimpleCanvas::awsSimpleCanvas ()
   mat_w=256;
   mat_h=256;
   
-  // @@@ hack to work around bug in OpenGL proctex support
-  texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS;
-  // should be:
+  // this doesn't work:
   //texFlags = CS_TEXTURE_2D | CS_TEXTURE_PROC;
+  // but this is ok either:
+  texFlags = CS_TEXTURE_3D | CS_TEXTURE_PROC | CS_TEXTURE_NOMIPMAPS;
 }
 
 void 
