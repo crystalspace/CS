@@ -1,5 +1,17 @@
 The history order has been reversed so that new features are at the top.
 
+6-Apr-2000
+	- Eric Sunshine did the following:
+	    - Fixed several Texinfo mark-up errors in cctest.txi. Slight
+	      structural reorganization. Rewrapped source Texinfo to fit
+	      within 80-columns.
+	    - Fixed a significant number of Texinfo mark-up errors and
+	      related problems in 3dsprite.txi.  Added much missing mark-up.
+	      Renamed nodes to ensure uniqueness within entire manual.
+	    - Removed all of the binary crud from these EPS files which was
+	      inserted by the image conversion application which Seth used.
+	      Now the images are viewable on NeXT.
+	- Andrew Zabolotny fixed/optimized the new INI file saving code.
 5-Apr-2000
 	- Jason Platt did some fixes after Jorrit's changes.
 	- Small fix in csInifile for Borland BCB4 as suggested by
@@ -18,6 +30,9 @@ The history order has been reversed so that new features are at the top.
 	      strict alignment.
 	- Restored old way to generate octree because it takes forever
 	  to compute now.
+	- Michael Ewert added collision response for articulated bodies.
+	  Doesn't work perfectly, but it is a start (still some bugs).
+	- Norman Kramer added saving/loading to/from iFile for csIniFile.
 4-Apr-2000
 	- Fixed several occurances of 'delete' that should be 'delete[]'.
 	  Reported by Paul Snively <psnively@earthlink.net>.
