@@ -36,6 +36,20 @@ chronological order.
 	  pursue a more complicated solution.
 	- Eric Sunshine added a lot of missing Doxygen comments to csMutex,
 	  csSemaphore, and csCondition.
+	- Eric Sunshine fixed an historical anomaly in csEventQueue where it
+	  was creating a single stack-based csEvent for broadcast of the
+	  cscmdPreProcess, cscmdProcess, cscmdPostProcess, and
+	  cscmdFinalProcess pseudo-events.  This was problematic for two
+	  reasons.  First, the event would be destroyed out from under
+	  receivers of the event even if they claimed co-ownership of the event
+	  via IncRef().  Second, the event object mutated from cscmdPreProcess
+	  to cscmdProcess to cscmdPostProcess to cscmdFinalProcess.  This could
+	  cause grief for a module which claimed co-ownership of an event.  For
+	  instance, what a module thought was a cscmdPreProcess event at the
+	  time that it invoked IncRef(), might suddenly become a
+	  cscmdFinalProcess a short time later.  This broke the
+	  event-is-immutable invariant.  To fix, these pseudo-events are now
+	  reclaimed from the event pool just like any other event.
 18-Dec-2003
 	- Jorrit added two new methods to iAwsComponent. One to set the
 	  preferred size and one to clear it again. This way one can forcibly

@@ -30,10 +30,11 @@ SCF_IMPLEMENT_IBASE (csEventQueue)
 SCF_IMPLEMENT_IBASE_END
 
 csEventQueue::csEventQueue (iObjectRegistry* r, size_t iLength) :
-  Registry(r), EventQueue(0), evqHead(0), evqTail(0), Length(0), SpinLock(0),
+  Registry(r), EventQueue(0), evqHead(0), evqTail(0), Length(0),
   busy_looping (0), delete_occured (false), EventPool(0)
 {
   SCF_CONSTRUCT_IBASE (0);
+  Mutex = csMutex::Create();
   Resize (iLength);
   // Create the default event outlet.
   EventOutlets.Push (new csEventOutlet (0, this, Registry));
@@ -190,23 +191,25 @@ void csEventQueue::EndLoop ()
   }
 }
 
-void csEventQueue::Notify (iEvent& e)
+void csEventQueue::Notify (unsigned int pseudo_event)
 {
-  int i;
+  csRef<iEvent> e(CreateEvent(csevBroadcast));
+  e->Command.Code = pseudo_event;
+  e->Command.Info = 0;
+
   StartLoop ();
-  for (i = Listeners.Length() - 1; i >= 0; i--)
+  for (int i = Listeners.Length() - 1; i >= 0; i--)
   {
     Listener const& listener = Listeners[i];
     if (listener.object && (listener.trigger & CSMASK_Nothing) != 0)
-      listener.object->HandleEvent (e);
+      listener.object->HandleEvent (*e);
   }
   EndLoop ();
 }
 
 void csEventQueue::Process ()
 {
-  csEvent notification (csGetTicks(), csevBroadcast, cscmdPreProcess);
-  Notify (notification);
+  Notify (cscmdPreProcess);
 
   csRef<iEvent> ev;
   for (ev = Get(); ev.IsValid(); ev = Get())
@@ -215,14 +218,9 @@ void csEventQueue::Process ()
     Dispatch (e);
   }
 
-  notification.Command.Code = cscmdProcess;
-  Notify (notification);
-
-  notification.Command.Code = cscmdPostProcess;
-  Notify (notification);
-
-  notification.Command.Code = cscmdFinalProcess;
-  Notify (notification);
+  Notify (cscmdProcess);
+  Notify (cscmdPostProcess);
+  Notify (cscmdFinalProcess);
 }
 
 void csEventQueue::Dispatch (iEvent& e)

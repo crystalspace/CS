@@ -28,8 +28,10 @@
 #include "csutil/csevent.h"
 #include "csutil/csevcord.h"
 #include "csutil/evoutlet.h"
-#include "csutil/garray.h"
+#include "csutil/array.h"
+#include "csutil/ref.h"
 #include "csutil/refarr.h"
+#include "cssys/thread.h"
 #include "iutil/eventq.h"
 
 struct iObjectRegistry;
@@ -43,10 +45,7 @@ struct iObjectRegistry;
 /**
  * This class represents a general event queue.  See the documentation of
  * iEventQueue for a detailed description of each method.  One instance of this
- * class is usually shared via iObjectRegistry.
- * <p>
- * The implemented event queue is limited thread-safe.  There are some
- * primitive spinlocks acquired/released in critical sections.
+ * class is usually shared via iObjectRegistry.  Event queues are thread-safe.
  */
 class csEventQueue : public iEventQueue
 {
@@ -59,7 +58,7 @@ private:
     iEventHandler* object;
     unsigned int trigger;
   };
-  typedef csDirtyAccessArray<Listener> ListenerVector;
+  typedef csArray<Listener> ListenerVector;
 
   int EventCordsFind (int cat, int subcat);
 
@@ -72,7 +71,7 @@ private:
   // The maximum queue length
   volatile size_t Length;
   // Protection against multiple threads accessing same event queue
-  volatile int SpinLock;
+  csRef<csMutex> Mutex;
   // Protection against delete while looping through the listeners.
   int busy_looping;
   /*  
@@ -87,18 +86,19 @@ private:
   // Array of allocated event cords.
   csRefArray<csEventCord> EventCords;
   // Pool of event objects
-  csPoolEvent *EventPool;
+  csPoolEvent* EventPool;
 
   // Enlarge the queue size.
   void Resize (size_t iLength);
   // Lock the queue for modifications: NESTED CALLS TO LOCK/UNLOCK NOT ALLOWED!
-  inline void Lock () { while (SpinLock) {} SpinLock++; }
+  inline void Lock () { Mutex->LockWait(); }
   // Unlock the queue
-  inline void Unlock () { SpinLock--; }
+  inline void Unlock () { Mutex->Release(); }
   // Find a particular listener index; return -1 if listener is not registered.
   int FindListener (iEventHandler*) const;
-  // Notify listeners of CSMASK_Nothing.
-  void Notify (iEvent&);
+  // Send listeners of CSMASK_FrameProcess one of the frame processing
+  // pseudo-events.
+  void Notify (unsigned int pseudo_event);
 
   /*
    * Start a loop. The purpose of this function is to protect
