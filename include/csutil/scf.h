@@ -777,7 +777,12 @@ public:
    * Retrieve the interface's current version number which was specified with
    * SCF_VERSION().
    */
-  static int GetVersion() { return 0; }
+  static int GetVersion()
+  {
+    CS_ASSERT_MSG("illegal invocation of non-specialized "
+      "scfInterface<>::GetVersion()", 1 == 0);
+    return 0;
+  }
 
   /**
    * Retrieve the interface's identifier.  This is a unique identifier by
@@ -786,12 +791,22 @@ public:
    * performance reasons, by scfInterfaceID, which is typically a small
    * integer.
    */
-  static scfInterfaceID GetID() { return (scfInterfaceID)(-1); }
+  static scfInterfaceID GetID()
+  {
+    CS_ASSERT_MSG("illegal invocation of non-specialized "
+      "scfInterface<>::GetID()", 1 == 0);
+    return (scfInterfaceID)(-1);
+  }
 
   /**
    * Retrieve the interface's name as a string.
    */
-  static char const* GetName() { return 0; }
+  static char const* GetName()
+  {
+    CS_ASSERT_MSG("illegal invocation of non-specialized "
+      "scfInterface<>::GetName()", 1 == 0);
+    return 0;
+  }
 };
 
 /**

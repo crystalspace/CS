@@ -16,6 +16,12 @@ chronological order.
 	  querying the non-specialized version of the scfInterface<> template
 	  rather than the version specialized for the particular interface if
 	  the client had not itself #included the appropriate header.
+	- Eric Sunshine changed the methods of the non-specialized version of
+	  scfInterface<> so that they throw an assertion failure if invoked.
+	  It is _always_ illegal to invoke these methods since they have no way
+	  of gleaning correct information about an interface.  They exist only
+	  as place-holders for the interface-specific specialized versions of
+	  scfInterface<>.
 10-May-2004
 	- Jorrit added a missing file in the new 3dsmax exporter from Luca
 	  Pancallo. Now it should work.
