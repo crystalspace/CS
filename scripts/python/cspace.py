@@ -3799,6 +3799,7 @@ class iSector(iBase):
     def GetPortalMeshes(*args): return _cspace.iSector_GetPortalMeshes(*args)
     def RegisterPortalMesh(*args): return _cspace.iSector_RegisterPortalMesh(*args)
     def UnregisterPortalMesh(*args): return _cspace.iSector_UnregisterPortalMesh(*args)
+    def UnlinkObjects(*args): return _cspace.iSector_UnlinkObjects(*args)
     def __del__(self, destroy=_cspace.delete_iSector):
         try:
             if self.thisown: destroy(self)
