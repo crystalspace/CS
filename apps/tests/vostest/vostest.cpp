@@ -1,5 +1,5 @@
 /*  -*- Mode: C++; tab-width: 2; indent-tabs-mode: nil; c-basic-offset: 2 -*-
-    Copyright (C) 2001 by Jorrit Tyberghein
+    Copyright (C) 2004 by Jorrit Tyberghein, Peter Amstutz
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -306,7 +306,7 @@ bool Vostest::Initialize ()
     vossector->IncRef(); // otherwise it gets deleted, which would be bad.
   } catch(std::exception& e) {
     csReport(object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.vostest", 
+        "crystalspace.application.vostest",
         "Error loading world %s: %s\n", vosWorldURL, e.what());
     return false;
   }

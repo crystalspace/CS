@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2004 by Jorrit Tyberghein, Peter Amstutz
+    Copyright (C) 2001 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -16,11 +16,13 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __VOSTEST_H__
-#define __VOSTEST_H__
+#ifndef __SIMPLE1_H__
+#define __SIMPLE1_H__
 
 #include <stdarg.h>
 #include "csutil/ref.h"
+
+#include <wx/wx.h>
 
 struct iEngine;
 struct iLoader;
@@ -31,9 +33,8 @@ struct iObjectRegistry;
 struct iEvent;
 struct iSector;
 struct iView;
-struct iVosA3DL;
 
-class Vostest
+class Simple : public wxFrame
 {
 private:
   iObjectRegistry* object_reg;
@@ -43,25 +44,29 @@ private:
   csRef<iKeyboardDriver> kbd;
   csRef<iVirtualClock> vc;
   csRef<iView> view;
-  csRef<iVosA3DL> vosa3dl;
   iSector* room;
 
   float rotY;
   float rotX;
 
-  static bool VostestEventHandler (iEvent& ev);
+  static bool SimpleEventHandler (iEvent& ev);
   bool HandleEvent (iEvent& ev);
   void SetupFrame ();
-  void CheckKeys ();
   void FinishFrame ();
 
 public:
-  Vostest (iObjectRegistry* object_reg);
-  ~Vostest ();
+  Simple (iObjectRegistry* object_reg);
+  ~Simple ();
 
   bool Initialize ();
   void Start ();
+
+  void PushFrame ();
+  void OnIconize(wxIconizeEvent& event);
+  void OnShow(wxShowEvent& event);
+
+  DECLARE_EVENT_TABLE()
 };
 
-#endif // __VOSTEST_H__
+#endif // __SIMPLE1_H__
 
