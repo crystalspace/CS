@@ -8,7 +8,7 @@ chronological order.
 
 18-Mar-2005
 	- Jorrit fixed isotest so that the actor displays again. For some
-	  reason someone (res2k?) put a NetMaterial() line in comments.
+	  reason someone (Eric) put a NetMaterial() line in comments.
 	  But that line is obviously needed. Thanks to Ross for finding
 	  this.
 17-Mar-2005
