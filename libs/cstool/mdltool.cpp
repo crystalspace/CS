@@ -145,7 +145,7 @@ CS_DECLARE_OBJECT_ITERATOR (csModelDataActionIterator, iModelDataAction);
 CS_DECLARE_OBJECT_ITERATOR (csModelDataTextureIterator, iModelDataTexture);
 CS_DECLARE_OBJECT_ITERATOR (csModelDataMaterialIterator, iModelDataMaterial);
 
-CS_TYPEDEF_GROWING_ARRAY (csVector3Array, csVector3);
+CS_TYPEDEF_GROWING_ARRAY (csVector3ArrayType, csVector3);
 CS_TYPEDEF_GROWING_ARRAY (csVector2Array, csVector2);
 CS_TYPEDEF_GROWING_ARRAY (csColorArray, csColor);
 CS_DECLARE_TYPED_VECTOR (csIntArrayVector, csIntArray);
@@ -181,7 +181,7 @@ static void ExtractObjects (iModelData *Parent, csModelDataObjectVector &vec)
  * DumpVertices (): Copy all elements of a vertex frame into growing arrays.
  */
 static void DumpVertices (iModelDataVertices *vframe,
-  csVector3Array *Vertices, csVector3Array *Normals,
+  csVector3ArrayType *Vertices, csVector3ArrayType *Normals,
   csColorArray *Colors, csVector2Array *Texels)
 {
   int i;
@@ -960,8 +960,8 @@ void csModelDataTools::CompressVertices (iModelDataObject *Object)
   it->DecRef ();
 
   // extract the data from one of the vertex frames into growing arrays
-  csVector3Array VertexList;
-  csVector3Array NormalList;
+  csVector3ArrayType VertexList;
+  csVector3ArrayType NormalList;
   csColorArray ColorList;
   csVector2Array TexelList;
 
