@@ -641,15 +641,16 @@ bool csBigTerrainObject::ConvertArrayToMapFile (float *data, int w, const char *
 
   nBlock *heightmap = new nBlock[size];
 
-  for (int i = 0; i < size; i ++) {
-    heightmap[i].pos.x = (i % w - w/2) * scale.x;
-    heightmap[i].pos.y = data[i] * scale.y;
-    heightmap[i].pos.z = (w/2 - i/w) * scale.z;
-    heightmap[i].error = 0.0;
-    heightmap[i].radius = 0.0;
+  int k;
+  for (k = 0; k < size; k ++) {
+    heightmap[k].pos.x = (k % w - w/2) * scale.x;
+    heightmap[k].pos.y = data[k] * scale.y;
+    heightmap[k].pos.z = (w/2 - k/w) * scale.z;
+    heightmap[k].error = 0.0;
+    heightmap[k].radius = 0.0;
   }
 
-  for  (int k = 0; k < size; k ++) {
+  for (k = 0; k < size; k ++) {
     csVector3 up = (k-w < 0) ? 
 	  csVector3(0,0,0) : heightmap[k-w].pos - heightmap[k].pos;
     csVector3 dn = (k+w >= size) ?  
