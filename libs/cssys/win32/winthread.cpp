@@ -35,13 +35,13 @@ FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | \
 
 #define CS_TEST(x) if(!(x)) {CS_GET_SYSERROR(); CS_SHOW_ERROR;}
 
-/*csRef<csMutex> csMutex::Create ()
+// ignore recursive switch... windows mutexes are always recursive.
+csRef<csMutex> csMutex::Create (bool )
 {
   return csPtr<csMutex>(new csWinMutex ());
-}  */
+}
 
-// ignore recursive switch... windows mutexes are always recursive.
-csWinMutex::csWinMutex (bool /*needrecursive*/)
+csWinMutex::csWinMutex ()
 {
   lasterr = NULL;
   mutex = CreateMutex (NULL, false, NULL);
