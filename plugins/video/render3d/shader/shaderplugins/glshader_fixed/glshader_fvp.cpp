@@ -317,6 +317,7 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
 
   do_lighting = false;
   ambientvar = csInvalidStringID;
+  primcolvar = csInvalidStringID;
 
   BuildTokenHash();
 
@@ -503,12 +504,13 @@ bool csGLShaderFVP::Compile(csArray<iShaderVariableContext*> &staticContexts)
   }
 
   primcolVarRef = 0;
-  for (j=0; j<staticContexts.Length(); j++)
-  {
-    if (!primcolVarRef)
-      primcolVarRef = 
-        staticContexts[j]->GetVariable (primcolvar);
-  }
+  if (primcolvar != csInvalidStringID)
+    for (j=0; j<staticContexts.Length(); j++)
+    {
+      if (!primcolVarRef)
+        primcolVarRef = 
+          staticContexts[j]->GetVariable (primcolvar);
+    }
 
   return true;
 }

@@ -11,6 +11,18 @@ chronological order.
 	  files.  These are needed by CEL, for instance.
 	- Eric Sunshine fixed mk/install.mak so that it installs Swig (*.i)
 	  files and Perl5 support files (scripts/perl5/*.pm).
+	- Jorrit fixed a problem in the fixed shader where it would fail
+	  to initialize the 'primcolvar' variable (VERTEX_COLOR token).
+	  In vertex_color was not given in the shader then the result would
+	  be essentially undefined because of this.
+	- Jorrit enabled VBO support in NR OpenGL renderer again. There is
+	  still a problem on linux with ATI and drivers 3.2.8 but for that
+	  we need to add something to the gldrivers database so that we
+	  can disable VBO for that situation alone.
+	- Jorrit fixed a slight problem in the PlaneGlyphElementHandler which
+	  is used in the font cache. It would not correctly copy the source
+	  element in the 'Construct()'. This fix does not fix the problem with
+	  the huge slowdown in CS though.
 31-Mar-2004
 	- Jorrit fixed a bug with iSector->HitBeamPortals(). It would not
 	  be able to register hits on meshes that don't return a polygon

@@ -764,7 +764,7 @@ bool csGLGraphics3D::Open ()
       Report (CS_REPORTER_SEVERITY_NOTIFY, "Point sprites are NOT supported.");
 
   // check for support of VBO
-  use_hw_render_buffers = false;//ext->CS_GL_ARB_vertex_buffer_object;
+  use_hw_render_buffers = ext->CS_GL_ARB_vertex_buffer_object;
   if (verbose)
     if (use_hw_render_buffers)
       Report (CS_REPORTER_SEVERITY_NOTIFY, "VBO is supported.");

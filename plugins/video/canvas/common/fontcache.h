@@ -110,7 +110,7 @@ protected:
   public:
     static void Construct (PlaneGlyphs** address, PlaneGlyphs* const& src)
     {
-      *address = 0;
+      *address = src;
     }
 
     static void Destroy (PlaneGlyphs** address)
