@@ -19,6 +19,7 @@
 #ifndef __CS_SPR3D_H__
 #define __CS_SPR3D_H__
 
+#include "cssys/sysfunc.h"
 #include "csutil/cscolor.h"
 #include "csutil/typedvec.h"
 #include "csutil/rng.h"
@@ -1193,6 +1194,7 @@ public:
     {
       cur_action = act;
       SetFrame (0);
+      last_time = csGetTicks ();
       return true;
     }
     return false;

@@ -5,6 +5,9 @@ The history order is reversed so that new features are at the top.
 	  fail with the result that CS_USE_FAKE_SOCKLEN_TYPE would always
 	  be set to 'yes'. Thanks to Markus Korth for finding and fixing
 	  this bug.
+	- Fixed a bug in spr3d->SetAction(). This function will now
+	  correctly reset the 'last_time' for frame interpolation so that
+	  frame interpolation works nicely when SetAction() is done.
 4-Nov-2001
 	- Matze Braun cleaned up config scripts for Unix and cygwin.
 	- Eric Sunshine made the following changes:
