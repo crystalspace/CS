@@ -49,7 +49,7 @@ public:
 	virtual void Update ();
 	virtual void SetVolume (float vol);
 	virtual float GetVolume ();
-	virtual void PlayEphemeral (csSoundData *snd);
+	virtual void PlayEphemeral (csSoundData *snd, bool loop = false);
 	virtual iSoundListener *GetListener ();
 	virtual iSoundSource *CreateSource (csSoundData *snd);
 	virtual iSoundBuffer *CreateSoundBuffer (csSoundData *snd);

@@ -232,7 +232,7 @@ float csSoundRenderSoftware::GetVolume()
 	return m_piSoundDriver->GetVolume();
 }
 
-void csSoundRenderSoftware::PlayEphemeral(csSoundData *snd)
+void csSoundRenderSoftware::PlayEphemeral(csSoundData *snd, bool loop)
 {
 	if (snd == NULL) return;
 	
@@ -241,7 +241,10 @@ void csSoundRenderSoftware::PlayEphemeral(csSoundData *snd)
 	
 	CHK (Channel *c = new Channel ());
 	
-	c->setSoundData (snd, false);
+	//to loop or not, defaults to not
+	if (loop == true) c->setSoundData (snd, true);
+	if (!loop) c->setSoundData (snd, false);
+	
 	c->setEphemeral ();
 	c->setPriority (Normal_Priority);
 	c->setStarted ();
