@@ -130,6 +130,8 @@ void PI_SCANFUNC (void *dest, int len, unsigned long *zbuff,
 #endif
   )
 {
+  (void)z; (void)dz; (void)zbuff;
+
 #if defined (PI_GOURAUD) && defined (PI_BLEND)
   (void) clamp; //remove the warning about an unused parameter
 #endif

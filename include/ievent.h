@@ -113,7 +113,7 @@ struct iEventPlug : public iBase
    * if both keyup and keydown events are disabled the plug may want to
    * release the keyboard and so on.
    */
-  virtual void EnableEvents (unsigned iType, bool iEnable) {}
+  virtual void EnableEvents (unsigned /*iType*/, bool /*iEnable*/) {}
 };
 
 class csEvent;
