@@ -32,6 +32,8 @@ chronological order.
 	    CONST_CAST()       --> CS_CONST_CAST()
 	- Eric Sunshine corrected order of libraries in DEP.RENDSTEP_STENCIL to
 	  fix linking problem on Cygwin (hopefully).
+	- Eric Sunshine fixed bug in cspace.i.  Was using bogus %ignoren rather
+	  than %ignore.
 20-Dec-2003
 	- Andreas Busch added Yield() to csThread for posix and win32.
 	- res made some changes to GL proc texes and the GL canvas to work

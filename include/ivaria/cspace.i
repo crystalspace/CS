@@ -734,7 +734,7 @@ TYPEMAP_OUT_csWrapPtr
 %include "cssys/sysfunc.h"
 
 %ignore csInitializer::RequestPlugins;
-%ignoren csInitializer::SetupEventHandler(iObjectRegistry*, csEventHandlerFunc, unsigned int);
+%ignore csInitializer::SetupEventHandler(iObjectRegistry*, csEventHandlerFunc, unsigned int);
 %rename(_SetupEventHandler) csInitializer::SetupEventHandler(iObjectRegistry*, iEventHandler *, unsigned int);
 %typemap(default) const char * configName { $1 = 0; }
 %include "cstool/initapp.h"
