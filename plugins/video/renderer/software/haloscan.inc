@@ -21,6 +21,7 @@
 static void HALO_NAME(void *src, void *dest, int count, int delta,
   int post_shift)
 {
+  (void)post_shift;
   unsigned char *A = (unsigned char *)src;
   HALO_PIXTYPE *D = (HALO_PIXTYPE *)dest;
   HALO_PIXTYPE *E = D + count;

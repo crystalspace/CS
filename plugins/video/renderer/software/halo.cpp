@@ -376,7 +376,11 @@ void csSoftHalo::Draw (float x, float y, float w, float h, float iIntensity,
         unsigned char *d = G3D->line_table [sy] + (xL << pixel_shift);
         unsigned char *s = Alpha + QRound (scaleY * (sy - yTL)) * Width +
           QRound (scaleX * (xL - xTL));
+#if defined (TOP8BITS_R8G8B8_USED)
         dscan (s, d, xR - xL, delta, PostShift);
+#else
+        dscan (s, d, xR - xL, delta, 0);
+#endif
       }
 
       sxL += dxL;
