@@ -15,6 +15,8 @@ The history order is reversed so that new features are at the top.
 	  where the values of SYSCONFIG and MAKE_VOLATILE_H were being set
 	  twice (so, for instance, CS_UNIX_PLUGIN_REQUIRES_MAIN appeared twice
 	  in the generated volatile.h).
+	- Eric Sunshine fixed csLoader so that it no longer emits misleading
+	  warning messages when one of the `optional' plugin is not loaded.
 18-Jun-2001
 	- Fixed a bug in the region checking code from the loader.
 	- Renamed csCollider to csColliderWrapper and moved it from csengine

@@ -1977,9 +1977,9 @@ csLoader::~csLoader()
   delete Stats;
 }
 
-#define GET_PLUGIN(var, func, intf, msgname)		\
+#define GET_PLUGIN(var, func, intf, msgname, required)	\
   var = QUERY_PLUGIN_ID(System, func, intf);		\
-  if (!var)						\
+  if (required && !var)					\
     System->Printf(MSG_INITIALIZATION,			\
       "  Failed to query "msgname" plug-in.\n");	\
 
@@ -1990,17 +1990,16 @@ bool csLoader::Initialize(iSystem *iSys)
   loaded_plugins.System = System;
 
   // get the virtual file system plugin
-  GET_PLUGIN(VFS, CS_FUNCID_VFS, iVFS, "VFS");
+  GET_PLUGIN(VFS, CS_FUNCID_VFS, iVFS, "VFS", true);
   if (!VFS) return false;
 
   // get all optional plugins
-  GET_PLUGIN(ImageLoader, CS_FUNCID_IMGLOADER, iImageIO, "image loader");
-  GET_PLUGIN(SoundLoader, CS_FUNCID_SNDLOADER, iSoundLoader, "sound loader");
-  GET_PLUGIN(Engine, CS_FUNCID_ENGINE, iEngine, "engine");
-  GET_PLUGIN(G3D, CS_FUNCID_VIDEO, iGraphics3D, "video driver");
-  GET_PLUGIN(SoundRender, CS_FUNCID_SOUND, iSoundRender, "sound driver");
-  GET_PLUGIN(MotionManager, CS_FUNCID_MOTION, iMotionManager, "motion manager");
-
+  GET_PLUGIN(ImageLoader, CS_FUNCID_IMGLOADER, iImageIO, "image loader", false);
+  GET_PLUGIN(SoundLoader, CS_FUNCID_SNDLOADER, iSoundLoader, "sound loader", false);
+  GET_PLUGIN(Engine, CS_FUNCID_ENGINE, iEngine, "engine", false);
+  GET_PLUGIN(G3D, CS_FUNCID_VIDEO, iGraphics3D, "video driver", false);
+  GET_PLUGIN(SoundRender, CS_FUNCID_SOUND, iSoundRender, "sound driver", false);
+  GET_PLUGIN(MotionManager, CS_FUNCID_MOTION, iMotionManager, "motion manager", false);
   return true;
 }
 
