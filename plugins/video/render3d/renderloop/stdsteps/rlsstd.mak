@@ -79,6 +79,9 @@ $(RLSSTD): $(OBJ.RLSSTD) $(LIB.RLSSTD)
 $(OUT.RLSSTD)/%$O: $(SRCDIR)/$(DIR.RLSSTD)/%.cpp
 	$(DO.COMPILE.CPP) $(RLSSTD.CFLAGS)
 
+$(OUT.RLSSTD)/%$O: $(SRCDIR)/$(DIR.RLSSTD)/../common/%.cpp
+	$(DO.COMPILE.CPP) $(RLSSTD.CFLAGS)
+
 clean: rlsstdclean
 rlsstdclean:
 	-$(RMDIR) $(RLSSTD) $(OBJ.RLSSTD) $(OUTDLL)/$(notdir $(INF.RLSSTD))

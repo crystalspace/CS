@@ -73,6 +73,9 @@ $(RLLOADER): $(OBJ.RLLOADER) $(LIB.RLLOADER)
 $(OUT.RLLOADER)/%$O: $(SRCDIR)/$(DIR.RLLOADER)/%.cpp
 	$(DO.COMPILE.CPP) $(RLLOADER.CFLAGS)
 
+$(OUT.RLLOADER)/%$O: $(SRCDIR)/$(DIR.RLLOADER)/../common/%.cpp
+	$(DO.COMPILE.CPP) $(RLLOADER.CFLAGS)
+
 clean: rlloaderclean
 rlloaderclean:
 	-$(RMDIR) $(RLLOADER) $(OBJ.RLLOADER) $(OUTDLL)/$(notdir $(INF.RLLOADER))
