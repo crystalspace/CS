@@ -26,6 +26,8 @@ chronological order.
 	  in case the third mouse button is pressed.
 	- Jorrit changed walktest to also  register the iCollideSystem to
 	  the object registry.
+	- Jorrit fixed csString::DeleteAt() so it no longer tries to do
+	  something in case iCount == 0.
 1-Sep-2004
 	- Jorrit added a new iCollideSystem->CollideRay() and
 	  GetIntersectingTriangles(). With this function it is possible

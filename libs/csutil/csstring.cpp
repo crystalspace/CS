@@ -110,6 +110,7 @@ csString &csString::Truncate (size_t iPos)
 
 csString &csString::DeleteAt (size_t iPos, size_t iCount)
 {
+  if (iCount <= 0) return *this;
   CS_ASSERT (iPos < Size && iPos + iCount <= Size);
   if (Data != 0)
   {
