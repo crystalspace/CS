@@ -84,7 +84,7 @@ public:
   /// \internal Define the state of the MD5 Algorithm.
   struct md5_state_t
   {
-    md5_word_t count[2]; // message length in bits, lsw first
+    size_t count[2]; // message length in bits, lsw first
     md5_word_t abcd[4];  // digest buffer
     md5_byte_t buf[64];  // accumulate block
   };
@@ -92,7 +92,7 @@ public:
   /// Initialize the algorithm.
   static void md5_init(md5_state_t*);
   /// Append a string to the message.
-  static void md5_append(md5_state_t*, const md5_byte_t* data, int nbytes);
+  static void md5_append(md5_state_t*, const md5_byte_t* data, size_t nbytes);
   /// Finish the message and return the digest.
   static void md5_finish(md5_state_t*, md5_byte_t digest[16]);
 
@@ -118,7 +118,7 @@ public:
   /// Encode a null-terminated string buffer.
   static Digest Encode(const char*);
   /// Encode a buffer.
-  static Digest Encode(const void*, int nbytes);
+  static Digest Encode(const void*, size_t nbytes);
 };
 
 #endif // __CS_CSMD5_H__

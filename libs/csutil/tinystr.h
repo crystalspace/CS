@@ -73,7 +73,7 @@ class TiXmlString
     }
 
     // Return the length of a TiXmlString
-    unsigned length () const { return clength; }
+    size_t length () const { return clength; }
 
     // TiXmlString = operator
     void operator = (const char * content);
@@ -157,20 +157,20 @@ class TiXmlString
     enum {	notfound = 0xffffffff,
             npos = notfound };
 
-    void append (const char *str, int len );
+    void append (const char *str, size_t len );
 
   protected :
 
     // The base string
     char * cstring;
     // Length of string (not including implicit null pointer).
-    unsigned clength;
+    size_t clength;
     // Number of chars allocated (including implicit null pointer).
-    unsigned allocated;
+    size_t allocated;
 
     // New size computation. It is simplistic right now : it returns twice the amount
     // we need
-    unsigned assign_new_size (unsigned minimum_to_allocate)
+    size_t assign_new_size (size_t minimum_to_allocate)
     {
         return minimum_to_allocate * 2;
     }

@@ -43,7 +43,7 @@ private:
   virtual const char *GetFileName () const;
 
   char *Prefix;
-  long PrefixLength;
+  size_t PrefixLength;
   char *Alias;
 };
 

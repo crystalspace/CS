@@ -34,14 +34,14 @@ distribution.
 // TiXmlString constructor, based on a C string
 TiXmlString::TiXmlString (const char* instring)
 {
-    unsigned newlen;
+    size_t newlen;
     char * newstring;
 
     if (!instring)
     {
         allocated = 0;
         cstring = 0;
-  clength = 0;
+	clength = 0;
         return;
     }
     newlen = strlen (instring) + 1;
@@ -55,7 +55,7 @@ TiXmlString::TiXmlString (const char* instring)
 // TiXmlString copy constructor
 TiXmlString::TiXmlString (const TiXmlString& copy)
 {
-  unsigned newlen;
+  size_t newlen;
   char * newstring;
 
   if (! copy . allocated)
@@ -76,7 +76,7 @@ TiXmlString::TiXmlString (const TiXmlString& copy)
 // TiXmlString = operator. Safe when assign own content
 void TiXmlString ::operator = (const char * content)
 {
-  unsigned newlen;
+  size_t newlen;
   char * newstring;
 
   if (! content)
@@ -96,7 +96,7 @@ void TiXmlString ::operator = (const char * content)
 // = operator. Safe when assign own content
 void TiXmlString ::operator = (const TiXmlString & copy)
 {
-  unsigned newlen;
+  size_t newlen;
   char * newstring;
 
   if (! copy . length ())
@@ -125,9 +125,9 @@ void TiXmlString ::operator = (const TiXmlString & copy)
 //}
 
 // append a const char * to an existing TiXmlString
-void TiXmlString::append( const char* str, int len )
+void TiXmlString::append( const char* str, size_t len )
 {
-  unsigned new_alloc, new_size;
+  size_t new_alloc, new_size;
 
   new_size = length () + len + 1;
   // check if we need to expand
@@ -162,7 +162,7 @@ void TiXmlString::append( const char* str, int len )
 // append a single char
 void TiXmlString::append( char single )
 {
-  unsigned new_alloc, new_size;
+  size_t new_alloc, new_size;
 
   new_size = length () + 1 + 1;
   // check if we need to expand

@@ -292,11 +292,11 @@ void csMD5::md5_init(md5_state_t *pms)
     pms->abcd[3] = 0x10325476;
 }
 
-void csMD5::md5_append(md5_state_t *pms, const md5_byte_t *data, int nbytes)
+void csMD5::md5_append(md5_state_t *pms, const md5_byte_t *data, size_t nbytes)
 {
     const md5_byte_t *p = data;
-    int left = nbytes;
-    int offset = (pms->count[0] >> 3) & 63;
+    size_t left = nbytes;
+    size_t offset = (pms->count[0] >> 3) & 63;
     md5_word_t nbits = (md5_word_t)(nbytes << 3);
 
     if (nbytes <= 0)
@@ -309,8 +309,9 @@ void csMD5::md5_append(md5_state_t *pms, const md5_byte_t *data, int nbytes)
 	pms->count[1]++;
 
     /* Process an initial partial block. */
-    if (offset) {
-	int copy = (offset + nbytes > 64 ? 64 - offset : nbytes);
+    if (offset) 
+    {
+	size_t copy = (offset + nbytes > 64 ? 64 - offset : nbytes);
 
 	memcpy(pms->buf + offset, p, copy);
 	if (offset + copy < 64)
@@ -356,7 +357,7 @@ csMD5::Digest csMD5::Encode(csString const& s)
   return Encode(s.GetData(), (int)s.Length());
 }
 
-csMD5::Digest csMD5::Encode(const void* data, int nbytes)
+csMD5::Digest csMD5::Encode(const void* data, size_t nbytes)
 {
   Digest digest;
   md5_state_t state;

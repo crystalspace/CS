@@ -223,7 +223,7 @@ private:
   csConfigFile *Config;
   csConfigNode *Node;
   char *Subsection;
-  int SubsectionLength;
+  size_t SubsectionLength;
 
   // Create a new iterator.
   csConfigIterator(csConfigFile *Config, const char *Subsection);
@@ -787,7 +787,7 @@ csConfigNode *csConfigFile::FindNode(const char *Name, bool isSubsection) const
   if (!Name) return 0;
 
   csConfigNode *n = FirstNode;
-  const int sz = (isSubsection ? strlen(Name) : 0);
+  const size_t sz = (isSubsection ? strlen(Name) : 0);
   while (n)
   {
     const char* s = n->GetName();

@@ -55,6 +55,7 @@ public:
 #else
     mmxSupported = false;
     sseSupported = false;
+    processorName[0] = 0;
 #endif
   }
 
@@ -63,6 +64,13 @@ public:
     Initialize ();
 
     return mmxSupported;
+  }
+
+  static inline const char* GetProcessorName ()
+  {
+    Initialize ();
+
+    return processorName;
   }
 
 private:
@@ -79,6 +87,9 @@ private:
   /// Is 3dNow! supported
   static bool AMD3dnowSupported;
   
+  /// The name of the processor
+  static char processorName[16];
+
   #ifdef PROC_X86
   /**
   * Check for x86 features. This function is written twice due to different
@@ -89,9 +100,9 @@ private:
     int32 capFlags;
     int CPUnum;
     int maxEax = 0;
+    const char* procName = processorName;
 
     bool have_cpuid;
-    char *processorName = new char [14];
 
     #if defined(COMP_VC)
     __asm
@@ -138,7 +149,7 @@ private:
         mov         maxEax, eax               //save the maximum eax for cpuid
 
         //save MFT string
-        mov         esi, processorName
+        mov         esi, procName
         mov         [esi+0], ebx
         mov         [esi+4], edx
         mov         [esi+8], ecx
@@ -206,7 +217,7 @@ end_detect:
     "  movl         %%edx,%3            \n"
     "1:                                 \n"
     : "=g" (CPUnum), "=g" (have_cpuid), "=g" (maxEax), "=g" (capFlags)
-    : "g" (processorName), "2" (maxEax)
+    : "g" (procName), "2" (maxEax)
     : "eax", "ebx", "ecx", "edx", "esi");
 
     #endif //COMP_

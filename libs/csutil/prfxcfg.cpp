@@ -23,7 +23,7 @@
 csPrefixConfig::csPrefixConfig(const char *fName, iVFS *vfs, const char *prf,
   const char *AliasName)
 {
-  long len = strlen(prf);
+  size_t len = strlen(prf);
   Prefix = new char[len + 2];
   memcpy(Prefix, prf, len);
   Prefix[len] = '.';

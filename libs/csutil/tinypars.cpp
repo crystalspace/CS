@@ -686,7 +686,7 @@ const char* TiXmlDeclaration::Parse( TiDocument* document, const char* p )
 
 bool TiXmlText::Blank() const
 {
-  unsigned int l = strlen (value);
+  size_t l = strlen (value);
   for ( unsigned i=0; i<l; i++ )
     if ( !isspace( value[i] ) )
       return false;

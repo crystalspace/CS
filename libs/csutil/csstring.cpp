@@ -291,7 +291,7 @@ csString &csString::RTrim()
 {
   if (Size > 0)
   {
-    int i;
+    size_t i;
     /* isalpha(int c)  toupper(int c) tolower(int c) isspace(int c)
      *        If  c  is  not  an  unsigned char value, or EOF, the behaviour of these
      *    functions is undefined.

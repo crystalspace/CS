@@ -350,10 +350,10 @@ void csFindReplace(char *dest, const char *src, const char *search,
   const char *found;
   const char *srcpos = src;
   char *destpos = dest;
-  int searchlen = strlen(search);
-  int replacelen = strlen(replace);
+  size_t searchlen = strlen (search);
+  size_t replacelen = strlen (replace);
   destpos[0] = 0;
-  int sizeleft = max;
+  size_t sizeleft = max;
   /// find and replace occurrences
   while( (found=strstr(srcpos, search)) != 0 )
   {
@@ -374,10 +374,10 @@ void csFindReplace(char *dest, const char *src, const char *search,
     srcpos += searchlen;
   }
   // add remainder of string
-  int todo = strlen(srcpos);
+  size_t todo = strlen (srcpos);
   sizeleft -= todo;
   if(sizeleft <= 0) { destpos[0]=0; return; }
-  strcpy(destpos, srcpos);
+  strcpy (destpos, srcpos);
   destpos += todo;
   destpos[0]=0;
 }

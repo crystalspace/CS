@@ -110,7 +110,7 @@ bool csVfsCacheManager::CacheData (void* data, uint32 size,
     return false;
   }
 
-  uint32 ws = cf->Write ((const char*)data, size);
+  size_t ws = cf->Write ((const char*)data, size);
   if (ws != size)
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,

@@ -49,10 +49,12 @@ void* operator new (size_t s, void* filename, int line)
 {
   return (void*)_malloc_dbg (s, _NORMAL_BLOCK, (char*)filename, line);
 }
+
 void* operator new[] (size_t s, void* filename, int line)
 {
   return (void*)_malloc_dbg (s, _NORMAL_BLOCK, (char*)filename, line);
 }
+
 void operator delete (void* p)
 {
   if (p) _free_dbg (p, _NORMAL_BLOCK);

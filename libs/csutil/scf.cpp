@@ -921,7 +921,7 @@ iStringArray* csSCF::QueryClassList (char const* pattern)
   int const rlen = ClassRegistry->Length();
   if (rlen != 0)
   {
-    int const plen = (pattern ? strlen(pattern) : 0);
+    size_t const plen = (pattern ? strlen(pattern) : 0);
     for (int i = 0; i < rlen; i++)
     {
       char const* s = ((iFactory*)ClassRegistry->Get(i))->QueryClassID();
