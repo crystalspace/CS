@@ -10119,6 +10119,7 @@ package cspace::iGraphics3D;
 *CreateHalo = *cspacec::iGraphics3D_CreateHalo;
 *DumpCache = *cspacec::iGraphics3D_DumpCache;
 *ClearCache = *cspacec::iGraphics3D_ClearCache;
+*PrecacheTexture = *cspacec::iGraphics3D_PrecacheTexture;
 *RemoveFromCache = *cspacec::iGraphics3D_RemoveFromCache;
 *GetVertexBufferManager = *cspacec::iGraphics3D_GetVertexBufferManager;
 *IsLightmapOK = *cspacec::iGraphics3D_IsLightmapOK;
