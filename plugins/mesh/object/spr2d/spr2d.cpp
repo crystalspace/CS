@@ -56,6 +56,7 @@ csSprite2DMeshObject::csSprite2DMeshObject (csSprite2DMeshObjectFactory* factory
   material = factory->GetMaterialWrapper ();
   lighting = factory->HasLighting ();
   MixMode = factory->GetMixMode ();
+  initialized = false;
 }
 
 csSprite2DMeshObject::~csSprite2DMeshObject ()
@@ -64,6 +65,20 @@ csSprite2DMeshObject::~csSprite2DMeshObject ()
 
 void csSprite2DMeshObject::SetupObject ()
 {
+  if (!initialized)
+  {
+    initialized = true;
+    if (!lighting)
+    {
+      // If there is no lighting then we need to copy the color_init
+      // array to color.
+      for (int i = 0 ; i < vertices.Length () ; i++)
+      {
+        vertices[i].color = vertices[i].color_init;
+        vertices[i].color.Clamp (2, 2, 2);
+      }
+    }
+  }
 }
 
 bool csSprite2DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)

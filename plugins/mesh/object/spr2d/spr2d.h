@@ -42,6 +42,7 @@ private:
 
   iMaterialWrapper* material;
   UInt MixMode;
+  bool initialized;
 
   /**
    * Array of 3D vertices.
