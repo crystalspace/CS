@@ -4,6 +4,11 @@ The history order has been reversed so that new features are at the top.
 	- Andrew Zabolotny did a few changes to the windows port to
 	  try to get it working after his large changes from a few
 	  days ago.
+	- Clarified the comment for csSector::HitBeam() a little.
+	- Fixed a bug with the bounding box for static-thing being
+	  corrupted after CompressVertices(). Modified CompressVertices()
+	  itself so that it recalculates the bounding box if it is
+	  there.
 18-Apr-2000
 	- Norman Kramer added QueueExtendedKeyEvent to support regional
 	  keyboardlayouts. For an example see HandleEvent in x2d.cpp.

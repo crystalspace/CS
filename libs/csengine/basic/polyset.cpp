@@ -279,6 +279,9 @@ void csPolygonSet::CompressVertices ()
   }
 
   CHK (delete [] vt);
+
+  // If there is a bounding box we recreate it.
+  if (bbox) CreateBoundingBox ();
 }
 
 csPolygonInt* csPolygonSet::GetPolygonInt (int idx)
