@@ -495,7 +495,6 @@ void csRainParticleSystem :: Update(time_t elapsed_time)
       //   but perhaps it won't be too bad...
       float toolow = ABS(rainbox.MinY() - part_pos[i].y);
       float height = rainbox.MaxY() - rainbox.MinY();
-      height /= 4.0;
       while(toolow>height) toolow-=height;
       pos = GetRandomDirection( csVector3 (rainbox.MaxX() - rainbox.MinX(), 
         0.0f, rainbox.MaxZ() - rainbox.MinZ()), rainbox.Min() );
@@ -576,7 +575,6 @@ void csSnowParticleSystem :: Update(time_t elapsed_time)
       //   but perhaps it won't be too bad...
       float toolow = ABS(rainbox.MinY() - part_pos[i].y);
       float height = rainbox.MaxY() - rainbox.MinY();
-      height /= 4.0;
       while(toolow>height) toolow-=height;
       pos = GetRandomDirection( csVector3 (rainbox.MaxX() - rainbox.MinX(), 
         0.0f, rainbox.MaxZ() - rainbox.MinZ()), rainbox.Min() );
