@@ -1,5 +1,7 @@
 The history order has been reversed so that new features are at the top.
 
+24-May-2000
+	- Some changes to terrain engine from Alex Pfaffe.
 23-May-2000
 	- Fixed a small potential problem with the polygon Covers function.
 	  It compared a float to 0 which seems to be a little system
@@ -71,6 +73,18 @@ The history order has been reversed so that new features are at the top.
 	- Eric Sunshine added a note to version.h instructing anyone updating
 	  CS_VERSION and CS_RELEASE that they should also update
 	  docs/texinfo/version.txi.
+	- Frank O'Connor did the following changes:
+	    - Added windows.h to csosdef.h
+	    - Removed windows.h from other places.
+	    - Removed scattered undef's that related to this file.
+	    - Fix misc bugs resulting in this inclusion.
+	    - Updated win32 opengl drivers with latest dynamic texture code.
+	    - Misc fixes/cleanup.
+	    - Initialize GfxPpl to null in CSWS. Prevents crash when a
+	      video plugin is unavailable.
+	    - Made GraphicsPipeline call G3D->FinishDraw before Print (in
+	      CSWS). This allows the DDraw plugin to work correctly now.
+	    - Fixes to VC project files.
 22-May-2000
 	- Added csPoly2D::GetSignedArea() and csPoly3D::GetSignedArea() to
 	  calculate the signed area of a polygon.
