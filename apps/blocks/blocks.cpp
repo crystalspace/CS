@@ -1018,6 +1018,9 @@ void Blocks::HandleGameOverKey (int key, bool /*shift*/, bool /*alt*/, bool /*ct
 
 void Blocks::HandleGameKey (int key, bool shift, bool alt, bool ctrl)
 {
+  if (key_pause.Match (key, shift, alt, ctrl)) pause = !pause;
+  if (pause) return;
+
   if (key_viewleft.Match (key, shift, alt, ctrl))
   {
     if (cam_move_dist) return;
@@ -1095,7 +1098,6 @@ void Blocks::HandleGameKey (int key, bool shift, bool alt, bool ctrl)
     else
       speed = MAX_FALL_SPEED;
   }
-  else if (key_pause.Match (key, shift, alt, ctrl)) pause = !pause;
   else if (key_esc.Match (key, shift, alt, ctrl))
   {
     initscreen = true;
@@ -2160,12 +2162,22 @@ void Blocks::NextFrame (time_t elapsed_time, time_t current_time)
   // This is where Blocks stuff really happens.
   HandleMovement (elapsed_time);
 
-  // Tell Gfx3D we're going to display 3D things
-  if (!Gfx3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
-  view->Draw ();
+  if (!pause)
+  {
+    // Tell Gfx3D we're going to display 3D things
+    if (!Gfx3D->BeginDraw (CSDRAW_3DGRAPHICS)) return;
+    view->Draw ();
+  }
 
   // Start drawing 2D graphics
   if (!Gfx3D->BeginDraw (CSDRAW_2DGRAPHICS)) return;
+
+  if (pause)
+  {
+    Gfx2D->Clear (0);
+    Gfx2D->Write (100, Sys->FrameHeight-20, white, black, "PAUSE");
+  }
+
   char scorebuf[50];
   sprintf (scorebuf, "%d", score);
   Gfx2D->Write (10, Sys->FrameHeight-20, white, black, scorebuf);
