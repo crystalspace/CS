@@ -2286,8 +2286,6 @@ csFPutErr = _cspace.csFPutErr
 
 csPrintfErr = _cspace.csPrintfErr
 
-csPrintfErrV = _cspace.csPrintfErrV
-
 csGetTicks = _cspace.csGetTicks
 
 csSleep = _cspace.csSleep
