@@ -1,4 +1,4 @@
-﻿Crystal Space detailed change log.
+Crystal Space detailed change log.
 http://crystal.sourceforge.net/
 
 The history order is reversed so that new features are at the top.
