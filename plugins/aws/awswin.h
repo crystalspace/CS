@@ -185,6 +185,12 @@ private:
     /// Event dispatcher, demultiplexes events and sends them off to the proper event handler
     virtual bool HandleEvent(iEvent& Event);
 
+    /// Gets the preferred size of the component
+    virtual csRect getPreferredSize();
+
+    /// Gets the minimum size that the component can be
+    virtual csRect getMinimumSize();
+
 public:
    static const unsigned long sWindowRaised;
    static const unsigned long sWindowLowered;

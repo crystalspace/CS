@@ -194,6 +194,11 @@ public:
     /// Sets the parent component of this component;
     virtual void SetParent(iAwsComponent *parent);
 
+    /// Gets the preferred size of the component
+    virtual csRect getPreferredSize();
+
+    /// Gets the minimum size that the component can be
+    virtual csRect getMinimumSize();
 
 public:
     /// Triggered when the component needs to draw

@@ -100,6 +100,11 @@ awsCheckBox::SetProperty(char *name, void *parm)
       caption->IncRef();
       Invalidate();
     }
+    else
+    {
+      if (caption) caption->DecRef();
+      caption=NULL;
+    }
 
     return true;
   }

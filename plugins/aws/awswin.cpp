@@ -1182,3 +1182,15 @@ awsWindow::GetEngineView()
 {
   return view;
 }
+
+csRect 
+awsWindow::getPreferredSize()
+{
+  return comp.Frame();
+}
+ 
+csRect 
+awsWindow::getMinimumSize()
+{
+  return comp.Frame();
+}

@@ -272,6 +272,18 @@ awsComponent::Overlaps(csRect &r)
   return frame.Intersects(r);
 }
 
+csRect 
+awsComponent::getPreferredSize()
+{
+	return getMinimumSize();	
+}
+
+csRect 
+awsComponent::getMinimumSize()
+{
+	return csRect(0,0,5,5);
+}
+
 void
 awsComponent::AddChild(iAwsComponent *child, bool owner)
 {
