@@ -285,9 +285,9 @@ SYSCONFIG += $(NEXT.SYSCONFIG) \
   $(NEWLINE)CC=cc CXX=cc sh bin/haspythn.sh>> config.tmp \
   $(NEWLINE)echo override DO_ASM = $(DO_ASM)>>config.tmp
 
-NEXT.DIR.ZLIB    = $(wildcard libs/zlib)
-NEXT.DIR.LIBPNG  = $(wildcard libs/libpng)
-NEXT.DIR.LIBJPEG = $(wildcard libs/libjpeg)
+NEXT.DIR.ZLIB    = $(wildcard libs/zlib*)
+NEXT.DIR.LIBPNG  = $(wildcard libs/libpng*)
+NEXT.DIR.LIBJPEG = $(wildcard libs/libjpeg* libs/jpeg*)
 
 # Unfortunately, these are not yet defined, so we do so manually.
 ifeq (,$(CFLAGS.I))

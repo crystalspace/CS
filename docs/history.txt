@@ -1,8 +1,14 @@
 The history order is reversed so that new features are at the top.
 
 18-Sep-2002
-	- Fixed several memory leaks in CS introduced by the new
-	  csPtr(csRef) constructor added yesterday.
+	- Fixed several memory leaks in CS introduced by the new csPtr(csRef)
+	  constructor added yesterday.
+	- Eric Sunshine changed next.mak so that it discovers zlib, libpng, and
+	  libjpeg libraries within CS/libs even if those directory names
+	  contain version numbers.  (Previously, it assumed that the directory
+	  names were not decorated with version numbers.) Also now recognizes
+	  CS/libs/jpeg in addition to CS/libs/libjpeg, since the shorter form
+	  is how the directory unpacks from official archives.
 17-Sep-2002
 	- Clarified some iMovable Doxygen comments.
 	- Fixed a serious bug in the csRef assignment operator for
