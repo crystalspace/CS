@@ -1,5 +1,11 @@
 The history order is reversed so that new features are at the top.
 
+1-Nov-2002
+	- Eric Sunshine fixed msvcgen.mak so that it no longer instructs the
+	  user to type "cvs add -kb" when adding MSVC7 project files.  These
+	  are plain text XML files which do not require the -kb flag.  The user
+	  is still instructed to use -kb when adding MSVC6 and earlier project
+	  files, however.
 31-Oct-2002
 	- Optimized frustvis and dynavis by removing some SCF_QUERY_INTERFACE
 	  calls.

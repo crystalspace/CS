@@ -237,9 +237,11 @@ MSVCGEN = $(PERL) mk/msvcgen/msvcgen.pl
 ifeq ($(MSVCGEN_VERSION),6)
 MSVCGEN.EXTRA = 
 MSVC.TEMPLATE.DIR = mk/msvcgen/template
+MSVC.CVS.FLAGS = -kb
 else
 MSVCGEN.EXTRA = -htmlents
 MSVC.TEMPLATE.DIR = mk/msvcgen/template7
+MSVC.CVS.FLAGS =
 endif
 ifneq (,$(MSVC_QUIET))
 MSVC.SILENT = @
@@ -404,7 +406,7 @@ while (defined($$f1) or defined($$f2)) { \
   if (!defined($$f2) or (defined($$f1) and $$f1 lt $$f2)) { \
     print "cvs remove $$f1\n"; $$f1 = shift @d1; } \
   elsif (!defined($$f1) or $$f1 gt $$f2) { \
-    print "cvs add -kb $$f2\n"; $$f2 = shift @d2; } \
+    print "cvs add $(MSVC.CVS.FLAGS) $$f2\n"; $$f2 = shift @d2; } \
   else { $$f1 = shift @d1; $$f2 = shift @d2; } \
 }'
 
