@@ -212,9 +212,9 @@ csNetworkDriverError csSocketDriver::GetLastError() const { return LastError; }
 bool csSocketDriver::Open()
 {
   ClearError();
-  Sys->Print (MSG_INITIALIZATION, "Initializing socket network driver: ");
+  Sys->Printf (MSG_INITIALIZATION, "Initializing socket network driver: ");
   const bool ok = PlatformDriverStart();
-  Sys->Print (MSG_INITIALIZATION, ok ? "OK\n" : "FAILED\n");
+  Sys->Printf (MSG_INITIALIZATION, ok ? "OK\n" : "FAILED\n");
   return ok;
 }
 

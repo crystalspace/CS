@@ -79,7 +79,7 @@ bool NeXTDriver2D::Initialize( iSystem* s )
 	else
 	    {
 	    ok = false;
-	    System->Print( MSG_FATAL_ERROR, "FATAL: The system driver does "
+	    System->Printf( MSG_FATAL_ERROR, "FATAL: The system driver does "
 		"not support the iNeXTSystemDriver interface\n" );
 	    }
 	}
@@ -117,7 +117,7 @@ bool NeXTDriver2D::init_driver( int simulate_depth )
 	    }
 	}
     else
-	System->Print( MSG_FATAL_ERROR, "FATAL: Bizarre internal error; "
+	System->Printf( MSG_FATAL_ERROR, "FATAL: Bizarre internal error; "
 		"support for 15- and 32-bit RGB only\n" );
     return ok;
     }
