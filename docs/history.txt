@@ -1,8 +1,11 @@
 The history order has been reversed so that new features are at the top.
 
 25-Mar-2001
-	- Eric Sunshine reverted a change to csconin.cpp by Philip Wyett since
-	  Philip's change was incorrect.  Eric applied the correct fix instead.
+	- Philip Wyett fixed runtime memory reference error in csconin.cpp
+	  under windows.
+	- Eric Sunshine reverted above change to csconin.cpp by Philip Wyett
+	  since Philip's change was incorrect.  Eric applied the correct fix
+	  instead.
 	- Eric Sunshine applied a patch to csNodeIterator which was sent to the
 	  mailing list by Malcolm Peacock <malcolm@mpeacock.demon.co.uk> on
 	  August 13, 2000.  This patch fixes a problem where the csNodeIterator
@@ -12,7 +15,22 @@ The history order has been reversed so that new features are at the top.
 	  element too early.
 	- Eric Sunshine renamed iConsoleOutput::SystemExtension(va_list) to
 	  SystemExtensionV() since some compilers failed to grok the overload.
+	- Martin Geisse changed the way walktest determines the word path.
+	  If the path begins with a slash, it is considered an absolute path
+	  and copied. Otherwise '/lev/' is prepended.
+	- Philip Wyett did the following changes to docs:
+	    - Update all docs to point to the new location at 3ddownloads.
+	    - Removed refs to old/no longer needed MingW files.
+	    - Updated links to DOS Nasm and other support files,
+	      with respect to new location at 3D Downloads.
 24-Mar-2001
+	- Philip Wyett added Python plugin to MingW build process. This
+	  addition also adds the compilation of CS Python test app, thanks
+	  to unix makefile system.
+	  Edited 'cspython.mak' inorder to allow MingW to build the
+	  Python plugin correctly. Is a bit of a hack. Eric will probably
+	  find a more elegant way... :-)
+	- Norman Kramer renamed iConsole to iConsoleOutput.
 	- Eric Sunshine made the following changes to the project:
 	    - Repaired an ultra nasty bug in csSystemDriver::LoadPlugIn().
 	      This bug has been present since the introduction of SCF on
@@ -83,6 +101,13 @@ The history order has been reversed so that new features are at the top.
 	  /temp.  Also renamed `coord' to `walktest.cam'.  Likewise, renamed
 	  `coord.bug' to `walktest.bug'.  This file has also been relocated
 	  from /this to /temp.
+	- Martin Geisse made the following changes:
+	    - Walktest no more plays unrecognized sounds in loop mode
+	      at startup.
+	    - Moved the 'coord' file to standard.zip.
+	    - The system driver now prints debug messages on calls to
+	      Initialize(), Open(), Close() and the destructor.
+	    - The initial debug level can now be set in the command line.
 23-Mar-2001:
 	- Wouter Wijngaards made 'make win32gcc' correctly detect the
 	  presence of a bash (or other) shell used by the makefile system.
