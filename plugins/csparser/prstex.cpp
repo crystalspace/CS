@@ -147,7 +147,7 @@ bool csLoader::ParseMaterialList (char* buf, const char* prefix)
 
 iTextureWrapper* csLoader::ParseProcTex (char *name, char* buf)
 {
-  if (!Engine) return false;
+  if (!Engine) return NULL;
 
   CS_TOKEN_TABLE_START (commands)
     CS_TOKEN_TABLE (TYPE)
