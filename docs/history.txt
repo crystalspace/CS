@@ -1,5 +1,9 @@
 The history order is reversed so that new features are at the top.
 
+14-Feb-2003
+	- Eric Sunshine merged Norman Kramer's fixes for the AWS notebook
+	  control into the R0_96 branch.  This fixes a bug where there was no
+	  initial page selection in the notebook.
 11-Feb-2003
 	- Eric Sunshine fixed documentation booboo (<texture> was used instead
 	  of <texmap>) in thing.txi which was reported by Oroszi Balazs
