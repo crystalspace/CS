@@ -19,7 +19,9 @@
 *****************************************************************************/
 #include "awscomp.h"
 #include "awscmdbt.h"
+#include "awstimer.h"
 
+class awsSliderButton;
 
 class awsScrollBar : public awsComponent
 {
@@ -48,10 +50,16 @@ class awsScrollBar : public awsComponent
   int alpha_level;
 
   /// Button for up or left
-  awsCmdButton *decVal;
+  awsSliderButton *decVal;
 
   /// Button for down or right
-  awsCmdButton *incVal;
+  awsSliderButton *incVal;
+
+  /// the knob
+  awsSliderButton *knob;
+
+  /// timer
+  awsTimer *timer;
 
   /// The sink for button messages
   iAwsSink *sink;
@@ -61,6 +69,13 @@ class awsScrollBar : public awsComponent
 
   /// The slot for increment button messages
   iAwsSlot *inc_slot;
+
+  /// The slot for knob button messages
+  iAwsSlot *knob_slot;
+
+  iAwsSlot *tick_slot;
+
+  int last_x, last_y;
 
   /// Value of scroll bar
   float value;
@@ -82,6 +97,8 @@ class awsScrollBar : public awsComponent
 
 protected:
 
+  bool awsScrollBar::HandleClicking (int btn,int x,int y);
+  bool captured;
   public:
   awsScrollBar();
   virtual ~awsScrollBar();
@@ -101,6 +118,15 @@ protected:
 
   /// Trigger called when dec button is clicked
   static void DecClicked(void *sk, iAwsSource *source);
+
+  static void TickTock(void *sk, iAwsSource *source);
+  static void KnobTick(void *sk, iAwsSource *source);
+
+  /// Trigger called when area above/left of knob button is clicked
+  static void DecPageClicked(void *sk, iAwsSource *source);
+
+  /// Trigger called when area below/right of knob button is clicked
+  static void IncPageClicked(void *sk, iAwsSource *source);
 
 public:
   /// Get's the texture handle and the title, plus style if there is one.
@@ -167,6 +193,67 @@ public:
   virtual ~awsScrollBarFactory();
 
   /// Returns a newly created component of the type this factory handles.
+  virtual iAwsComponent *Create();
+};
+
+class awsSliderButton : public awsCmdButton
+{
+ protected:
+
+  // the timer we use for repeated firing of "clicked" signal
+  awsTimer *timer;
+  // signals if we have captured the mouse
+  bool captured;
+  // fire the signal every nTick milliseconds
+  csTicks nTicks;
+
+  iAwsSink *sink;
+  iAwsSlot *tick_slot;
+
+  /**************** signal handlers ************************/
+  static void TickTock(void *sk, iAwsSource *);
+  
+ public:
+  SCF_DECLARE_IBASE_EXT (awsCmdButton);
+
+  awsSliderButton();
+  virtual ~awsSliderButton();
+
+  // Get's the texture handle and the title, plus style if there is one.
+  virtual bool Setup(iAws *wmgr, awsComponentNode *settings);
+
+  // Gets properties
+  bool GetProperty(char *name, void **parm);
+
+  // Sets properties
+  bool SetProperty(char *name, void *parm);
+
+  // Returns the named TYPE of the component, like "Radio Button", etc.
+  virtual char *Type();
+
+  virtual bool OnMouseDown(int btn, int x, int y);
+  virtual bool OnMouseUp(int btn, int x, int y);
+  virtual bool OnMouseMove(int button, int x, int y);
+  virtual bool OnMouseClick(int ,int ,int );
+  virtual bool OnMouseDoubleClick(int ,int ,int );
+
+ public:
+  // mouse position while capturing in progress
+  int last_x, last_y;
+};
+
+class awsSliderButtonFactory : public awsCmdButtonFactory
+{
+ public:
+  SCF_DECLARE_IBASE_EXT (awsCmdButtonFactory);
+
+  // Calls register to register the component that it builds with the window manager
+  awsSliderButtonFactory(iAws *wmgr);
+
+  // Does nothing
+  virtual ~awsSliderButtonFactory();
+
+  // Returns a newly created component of the type this factory handles.
   virtual iAwsComponent *Create();
 };
 

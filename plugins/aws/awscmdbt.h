@@ -22,6 +22,7 @@
 
 class awsCmdButton : public awsComponent
 {
+ protected:
    /// True when button is down, false if up
    bool is_down;
 

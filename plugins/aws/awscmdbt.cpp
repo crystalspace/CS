@@ -358,7 +358,7 @@ awsCmdButton::OnMouseUp(int ,int ,int )
 }
 
 bool
-awsCmdButton::OnMouseMove(int button, int x, int y)
+awsCmdButton::OnMouseMove(int , int , int )
 {    
   return false;
 }
