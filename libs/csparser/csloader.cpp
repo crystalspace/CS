@@ -797,21 +797,26 @@ static float HeightMapFunc (void* data, float x, float y)
   float col0010 = col00 * (1-dw) + col10 * dw;
   float col0111 = col01 * (1-dw) + col11 * dw;
   float col = col0010 * (1-dh) + col0111 * dh;
+  //printf("Heightmap x=%g y=%g height=%g\n", x, y, col * hm->hscale + hm->hshift);
   return col * hm->hscale + hm->hshift;
 }
 
 static float SlopeMapFunc (void* data, float x, float y)
 {
-  float mx = x-.01; if (mx < 0) mx = 0;
-  float px = x+.01; if (px > 1) px = 1;
+  float div = 0.02;
+  float mx = x-.01; if (mx < 0) { mx = x; div = .01; }
+  float px = x+.01; if (px > 1) { px = x; div = .01; }
   float dhdx = HeightMapFunc (data, px, y) - HeightMapFunc (data, mx, y);
-  dhdx /= .02;
-  float my = y-.01; if (my < 0) my = 0;
-  float py = y+.01; if (py > 1) py = 1;
+  dhdx /= div;
+  div = 0.02;
+  float my = y-.01; if (my < 0) { my = y; div = .01; }
+  float py = y+.01; if (py > 1) { py = y; div = .01; }
   float dhdy = HeightMapFunc (data, x, py) - HeightMapFunc (data, x, my);
-  dhdy /= .02;
-  //printf ("x=%g y=%g slope=%g\n", x, y, (dhdx+dhdy)/2); fflush (stdout);
-  return fabs ((dhdx+dhdy)/2.);
+  dhdy /= div;
+  //printf ("x=%g y=%g dhdx=%g dhdy=%g slope=%g , %g\n", x, y, dhdx, dhdy,
+    //fabs((dhdx+dhdy)/2.), fabs(dhdx)/2.+fabs(dhdy)/2.); fflush (stdout);
+  //return fabs ((dhdx+dhdy)/2.);
+  return (fabs(dhdx)+fabs(dhdy))/2.;
 }
 
 csGenerateImageValue* csLoader::heightgen_value_process (char* buf)
