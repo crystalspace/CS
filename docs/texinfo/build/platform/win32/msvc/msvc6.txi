@@ -149,7 +149,7 @@ For Visual C++ 6:
 Open @file{CS\mk\visualc\csall.dsw}.
 
 In the left hand @emph{Workspace} window click on the @emph{FileView} tab
-at the bottom, then in the window look for and find the project @emphplgaws}.
+at the bottom, then in the window look for and find the project @emph{plgaws}.
 
 Now expand the aws project in the tree and then the @emph{Resource Files} directory.
 
