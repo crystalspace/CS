@@ -58,7 +58,7 @@ public:
 	csException(const char* tError, const char* tHint="", unsigned long int tErrorVal=0)
 		:Error(tError), Hint(tHint), ErrorVal(tErrorVal) {}
 
-	const char* GetExceptionMessage();
+	inline const char* GetExceptionMessage();
 };
 
 #ifndef NO_STRING_COM
