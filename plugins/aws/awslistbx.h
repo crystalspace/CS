@@ -180,11 +180,23 @@ class awsListBox : public awsComponent
    /// Container of hotspots
    csBasicVector hotspots;
 
+   /// Currently selected row
+   awsListRow *sel;
+
 protected:
+   /// Used, but shouldn't be (remnant of radio-button code)
    void ClearGroup();
+
+   /// Used internally to clear group items, called by ClearPeers
    bool RecursiveClearPeers(awsListItem *itm, awsListRow *row);
+
+   /// Used internally to clear peers of some item.
    void ClearPeers(awsListItem *itm);
+
+   /// Used internally to reset the hotspots list.
    void ClearHotspots();
+
+   /// Used internally to redraw the list recursively (support tree/hierarchical drawing)
    bool DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, int depth, bool last_child);
    
 public:

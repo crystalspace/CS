@@ -85,7 +85,7 @@ awsListBox::awsListBox():is_down(false), mouse_is_over(false),
                          tree_collapsed(NULL), tree_expanded(NULL),
                          tree_hline(NULL), tree_vline(NULL),
                          frame_style(0), alpha_level(92), hi_alpha_level(128),
-                         control_type(0), ncolumns(1)
+                         control_type(0), ncolumns(1), sel(NULL)
                          
 {
 }
@@ -771,6 +771,27 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, in
       x+=columns[i].width;
 
     } // end for i (number of cols)
+   
+  // Create hot spot for this row
+  awsListHotspot *hs = new awsListHotspot;
+
+  hs->obj = row;
+  hs->type = hsRow;
+  hs->r.Set(Frame().xmin+border, y, Frame().xmax-border, y+ith);
+
+  hotspots.Push(hs);
+
+  // Draw the highlight, if we're highlighted
+  if (sel==row)
+  {
+    int hw, hh;
+
+     if (highlight)
+     {
+       highlight->GetOriginalDimensions(hw, hh);
+       g3d->DrawPixmap(highlight, Frame().xmin+border, y-1, Frame().Width()-(border*2), ith+2, 0,0,hw,hh, hi_alpha_level);
+     }
+  }
 
     // next row.
     y+=ith+2;
@@ -787,6 +808,8 @@ awsListBox::DrawItemsRecursively(awsListRow *row, int &x, int &y, int border, in
           return true;
       }
     }
+
+  
 
   // false means that we've not yet hit the bottom of the barrel.
   return false;
@@ -855,6 +878,15 @@ awsListBox::OnMouseUp(int button, int x, int y)
           if (itm->state) itm->state=false;
           else itm->state=true;
 
+          Invalidate();
+          return true;
+        }
+        break;
+
+      case hsRow:
+        {
+          awsListRow *row =(awsListRow *)hs->obj;
+          sel=row;
           Invalidate();
           return true;
         }
