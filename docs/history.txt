@@ -34,6 +34,14 @@ chronological order.
 	  Win32 path manipulation functions on the path.  Hopefully, this will
 	  resolve problem where csGetConfigPath() (csutil/win32/instpath.cpp)
 	  failed to respect CRYSTAL environment variable under CYGWIN.
+	- res did the following changes for map2cs:
+	    - Fixed map2cs to use csStrings instead of fixed-size buffers for
+	      map parsing. map2cs can now handle much longer tokens.
+	    - Added a sanity to entity property parsing to detect malformed
+	      maps.
+	    - Added a hack to the map2cs parser to correctly return "" tokens. 
+	    - Fixed map2cs to not emit an empty "_defaultsky" thing if no
+	      skybox was specified.
 7-Jun-2004
 	- Jorrit added an assignement operator to csHashMapReversible.  This
 	  actually fixes the crash at exit bug for some of the CSWS apps.
