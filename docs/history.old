@@ -56,7 +56,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 25-Dec-2002
 	- Philip Wyett did a minor MSVC documentation update.
 24-Dec-2002
-	- 'res' did the following:
+	- res did the following:
 	    - Fixed wrong #ifndef in win32.cpp reported by Lukas
 	      Erlinghagen <Erluk@web.de>.
 	- Keith Fulton fixed a compile error in directdetection.cpp.
@@ -899,7 +899,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  purpose is of this polygon mesh.
 	- Renamed iObjectModel->GetPolygonMesh() to GetPolygonMeshColldet().
 24-Nov-2002
-	- 'res' did the following:
+	- res did the following:
 	    - Devapi extracts static members as well now.
 	    - SCF_VERSION isn't listed as a function in devapi now.
 	    - Added some doxgen '\file' commands.
@@ -948,7 +948,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Implemented the start for a new optimization to make recalculating
 	  lighting on huge levels faster (a lot I hope). Not ready yet!
 21-Nov-2002
-	- 'res' did the following:
+	- res did the following:
 	    - Removed call to efed.pl after doxygen run; isn't needed
 	      because a custom footer w/o date is used.
 	    - Added some eyecandy to pubapi docs.
@@ -1007,7 +1007,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Added <keepimage> option for textures so that you can indicate
 	  in a map file that you want to keep the image.
 19-Nov-2002
-	- 'res' did the following:
+	- res did the following:
 	    - Octree and lm_precalc_info now use cache id ~0 as well.
 	    - iCacheManager docs mention the possibility of using ~0 as ID.
 	    - Added a line about the online FAQ in the Wiki.
@@ -1098,7 +1098,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	      test for it to r3dtest.
 	    - Small fix to stdrep for compiling with new renderer.
 	    - Implemented clipping.
-	- 'res' did the following:
+	- res did the following:
 	    - Fixes for cygwin.
 	- Fixed genmesh so it no longer crashes when there are no vertices.
 9-Nov-2002
@@ -1144,7 +1144,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  displacement anims.
 	- Keith also fixed bug in latest loader.  Existing v1.1 files will
 	  still work, but now their normals will be correctly loaded.
-	- 'res' fixed binary 3d sprite loader so that normals are now stored
+	- res fixed binary 3d sprite loader so that normals are now stored
 	  in binary 3d sprite format. ("old" bsprs w/o normals should still
 	  work as well).
 	- Enabled tiled culling by default in Dynavis. This gives a big
@@ -1336,7 +1336,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  to correct simple typographical errors.  Thanks to Andreas Busch
 	  <nobita@t-online.de> for the patches.
 27-Oct-2002
-	- 'res' did the following:
+	- res did the following:
 	    - GL texture bit depth can be specified through configs.
 	    - Forcing a texture format didn't work.
 	    - Moved code to prepare keycolored textures out of
@@ -1345,7 +1345,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	    - Small adjustment so keycolored textures are compressed as well.
 	- Fixed a few bugs in iThingState::GetPolygon() as reported by Groton.
 26-Oct-2002
-	- 'res' did the following:
+	- res did the following:
 	    - Fixed disappearing textures when enabling compression.
 	    - Added a function which checks for GL errors and optionally
 	      reports them.
@@ -1389,7 +1389,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	      support it.
 	    - Changed the buffer-locking mechanism.
 24-Oct-2002
-	- 'res' did the following:
+	- res did the following:
 	    - Texture downsampling added again to OpenGL renderer.
 	    - Fixed an uninitialized variable in OpenGL texture manager.
 	    - Mipmapped textures are supported as render targets in OpenGL.
@@ -1404,7 +1404,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Mathew Sutcliffe replaced false with NULL in a function that returns
 	  a pointer, not a bool (csloader).
 23-Oct-2002
-	- 'res' did the following:
+	- res did the following:
 	    - Disabled frequent heap consistency checking in MSVC debug builds.
 	      This fixes the small pauses experienced. Consistency checks
 	      stay enabled when CS_EXTENSIVE_MEMDEBUG is defined.
@@ -1951,7 +1951,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	    - Added matrix3 includes in OpenGL_ext.
 	    - Made classinterface for threading.
 	    - Renamed THREAD.INC to CS_THREAD.INC.
-	- 'res' did the following:
+	- res did the following:
 	    - Replaced some EPS files w/ versions without
 	      %%BeginBinary / %%EndBinary
 	    - Removed '% -*-texinfo-*-' which appeared on the first page.
@@ -2228,7 +2228,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  later while implementing them) and also removed all warnings
 	  in engine sequence manager.
 27-Sep-2002
-	- 'res' did the following:
+	- res did the following:
 	    - Changed the lighting code in ball and genmesh; now it is assumed
 	      that distance light-object in object space is equal to the
 	      distance in world space; this is wrong with "soft" scaling.
@@ -2241,7 +2241,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Eric Sunshine added appropriate PNG/MNG makefile definitions to
 	  next.mak.
 26-Sep-2002
-	- 'res' did the following:
+	- res did the following:
 	    - Fixed a division by 0 in UpdateLighting() under some
 	      circumstances (genmesh and ball).
 	- Norman Kramer did the following:
@@ -2323,7 +2323,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 24-Sep-2002
 	- Charlls Al'Quarra implemented the iMeshObject::HitBeam() family
 	  of methods for cloth plugin.
-	- 'res' did the following:
+	- res did the following:
 	    - Fixed PATH=(null) bug (win32).
 	    - Added downsampling of all textures to GL renderer.
 	    - Created a new MSVC7 build configuration for ext. memory
@@ -2548,7 +2548,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  csendian.h.  Note that in the future, CS_STRICT_ALIGNMENT should be
 	  moved to volatile.h and be determined at configuration time.
 19-Sep-2002
-	- 'res' did the following:
+	- res did the following:
 	    - On Win32, the platform-provided path expansion API
 	      is used by csExpandName().
 	- Daniel Duhprey did the following:
@@ -2575,7 +2575,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Eric Sunshine fixed an access-beyond-end-of-string crasher in
 	  NeXTGetInstallPath().
 18-Sep-2002
-	- 'res' did a SW_SHOWNORMAL fix.
+	- res did a SW_SHOWNORMAL fix.
 	- Philipp Aumayr continued implementing OpenGL_ext. Slowly getting
 	  somewhere :)
 	- Fixed several memory leaks in CS introduced by the new csPtr(csRef)
@@ -2694,7 +2694,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	    - New changes to the file structure.
 	    - Fixed some of the display glitches in terrbig. Put some lighting
 	      code in place, but its very poor quality.
-	- 'res' did the following:
+	- res did the following:
 	    - Moved CS_IMPLEMENT_STATIC_CLASSVAR to top of file as a strange
 	      fix for an internal compiler error on msvc7.
 	    - Added shell32.lib to MSVC6 projects.
@@ -2747,7 +2747,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Matthias Braun: more renamings needed for the Create_Interface
 	  declarations. It's Interface_Create now.
 	- Charlls Al'Quarra fixed the time issue in the cloth plugin.
-	- 'res' did the following:
+	- res did the following:
 	    - Moved platform vfs var stuff into a separate cpp file.
 	    - On Win32, "homedir" vfs var is translated to My Docs dir.
 	    - Changed csGetInstallPath() for Win32 a bit:
@@ -3035,7 +3035,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Christopher Nelson did the following:
 	    - Fixed a couple of minor compile problems in terrbig where a
 	      struct was declared and later referred to as a class.
-	- 'res' did the following:
+	- res did the following:
 	    - Moved platform memory mapping from include/cssys to libs/cssys.
 	    - csMemoryMappedIO can now fall back to emulation if platform mmap
 	     fails.
@@ -3158,7 +3158,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	      new cssys/sockets.h.
 	- Norman Kramer fixed PATH_SEPARATOR redefinition in makedep.
 	- Norman als added include of cssys/sockets.h to socket.h.
-	- 'res' did the following:
+	- res did the following:
 	    - Removed signal stuff from simpmap.
 	    - Added win32 specific stuff to sockets.h (basically c'n'p from
 	      csosdefs.h).
@@ -3182,7 +3182,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  'addon' in the main loader.
 	- Added support for 'EULER' (motion loader) in cs2xml.
 1-Sep-2002
-	- 'res' did the following:
+	- res did the following:
 	    - Cosmetic documentation changes.
 	    - Added a "#define CSMASK_FrameProcess CSMASK_Nothing" for
 	      event masks, as the name 'Nothing' seemed to confuse some people.
@@ -3220,7 +3220,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Charlls Al-Quarra added licensing stuff to the new OPCODE plugin.
 	- Charlls also did some minor inner opcode options changes
 	  (s/SPLIT_BESTAXIS/SPLIT_GEOMCENTER).
-	- 'res' changed the win32 PATH hack a bit to be more robust.
+	- res changed the win32 PATH hack a bit to be more robust.
 	- Matthias Braun fixed dependency of cstool in cs-config (needed
 	  csgfx lib).
 	- Daniel Duhprey added proper reference handling for csODEBodyGroup
@@ -3246,7 +3246,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  based on OPCODE.
 	- Charlls fixed OPCODE plugin: I thought that BOOL, FALSE and TRUE in
 	  uppercase stuff worked for MSVC, but seems not, so i changed it.
-	- 'res' did the following:
+	- res did the following:
 	    - Freefnt2 now supports antialiasing.
 	    - Freefnt2: the DPI value used to compute pixel from point size
 	      is now 96 instead of 72 dpi.
@@ -3295,7 +3295,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  fully csRef clean.
 	- Did several fixes to the new OPCODE CD plugin from Charlls Al-Quarra.
 28-Aug-2002
-	- 'res' did the following:
+	- res did the following:
 	    - Corrected a wrong comment in csver.h.
 	    - On Win32 the application path is considered when looking for
 	      the CS dir.
@@ -3336,7 +3336,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	    - Added iString::GetCapacity() and csString::GetCapacity() to
 	      complement existing SetCapacity().
 27-Aug-2002
-	- 'res' did the following:
+	- res did the following:
 	    - In  jng.cpp: quick fix for "'char' gefolgt von 'int' ist
 	      unzulaessig" error
 	    - glwin32 canvas now disables vsync (if supported).
@@ -3354,7 +3354,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Norman Kramer did the following:
 	    - Moved inclusion of extstat.h into ogl_initext.h.
 	- Matthias Braun did several fixes and cleanups of crystal.m4.
-	- 'res' did the following:
+	- res did the following:
 	    - Documentation updates for various headers.
 	    - Typo fix in graph3d.h.
 	    - Recomitted tweaked set of windows includes.
@@ -3386,7 +3386,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  compiled with this new compiler. :(
 23-Aug-2002
 	- Philip Wyett updated linex2d.h to latest font changes.
-	- 'res' added file descriptions to nulcache.h and vfscache.h.
+	- res added file descriptions to nulcache.h and vfscache.h.
 	- Cs2Xml now supports old-style START keyword.
 	- Fixed Cs2Xml so that it only adds the name attribute to some node
 	  if it is actually different from the empty string.
@@ -3440,7 +3440,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  problems include an apparent double-delete of allocated strings,
 	  unnecessary code inefficiencies, and poor API.
 22-Aug-2002
-	- 'res' did the following:
+	- res did the following:
 	    - Added custom CSS stylesheet for docs.
 	    - Added a new doc module Engine/Lighting.
 	    - Fixed typo in aws.h.
@@ -3807,7 +3807,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  and the currently configured platform-specific makefile (i.e.
 	  linux.mak).
 8-Aug-2002
-	- 'res' did the following:
+	- res did the following:
 	    - Changed some clean targets to be same name as the build
 	      targets (eg walkclean -> walktestclean).
 	    - Reactivated plugin resource stuff.
@@ -3870,7 +3870,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	    - Fixed an error in cs-config I introduced with my latest changes.
 	    - Removed now obsolete genscript.sh file.
 	    - More fixes for cs-config.
-	- 'res' did the following:
+	- res did the following:
 	    - Added information about changed make targets to api modification
 	      doc.
 	    - Fixed an off-by-one error csGraphics2DGLCommon::GetPixelAt()
@@ -3922,7 +3922,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Charles Al-Quarra moved unmaintained blender scripts to
 	  'scripts/blender/unmaint' and reorganized the directory
 	  in general.
-	- 'res' did the following:
+	- res did the following:
 	    - Added a bit of information on the rc merger script expects
 	      rc files to be shaped.
 	    - Deactivated resource stuff for plugins again, there are
@@ -3971,7 +3971,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Philip Wyett did the following:
 	    - Some documentation updates (link updating).
 	    - Fixed redefinition of i spotted by groton (in OpenGL).
-	- 'res' did the following:
+	- res did the following:
 	    - Changed the make targets of all applications to the name of the
 	      resulting binary the way Eric Sunshine suggested. e.g. 'walk'
 	      becomes 'walktest'.
@@ -4042,7 +4042,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	      that this macro has nothing to do with automake but only with
 	      autoconf.
 	    - Gave m4 macro a uniform naming crystal which is more clear.
-	- 'res' did the following:
+	- res did the following:
 	    - Forgot to commit an OpenGL header.
 	    - Temporary fix to msvcgen. disabled .rc generation until we
 	      find out how to properly fix it.
@@ -4097,7 +4097,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	    - Really fixed the aws key problem now, it was needed to have
 	      KeyCode and Char in Keyboard events.
 	    - Removed debug code I left in awstextcomponent.
-	- 'res' did the following:
+	- res did the following:
 	    - Version information is generated for MSVC projects.
 	    - Small fixes for other version info stuff.
 	    - Fixed weird linebreaks in csglext.h.
@@ -4135,7 +4135,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  changes and speed up a little more.
 2-Aug-2002
 	- Philip Wyett added cslua plugin. Not in build by default.
-	- 'res' did the following:
+	- res did the following:
 	    - Merged the msvc project generators.
 	    - Changed a few msvc6 project options to match their msvc7 cousins:
 	      all projects use runtime dll
@@ -4344,7 +4344,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	      of MSVC project files.
 	- Daniel Duhprey made csVector3 -> const csVector3& for speed
 	  (ODE dynamics plugin).
-	- 'res' did the following:
+	- res did the following:
 	    - <memory.h> is included for MSVC (to fix unresolved external
 	      fast_mem_copy)
 	    - Changed slightly the implementation of OS-special VFS vars
@@ -4387,7 +4387,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  socket that it is attached to. Also removed some test code and
 	  extra csMatrix3 that was not needed.
 	- Daniel Duhprey fixed ogl_g3dext.cpp to point to right .h.
-	- 'res' did the following:
+	- res did the following:
 	    - When doing CS_EXTENSIVE_MEMDEBUG w/ MSVC the crt's
 	      built-in memory debugging support for filename/line is used.
 	    - CS_EXTENSIVE_MEMDEBUG defined for MSVC 7 debug builds by
@@ -4439,9 +4439,9 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  determin max_LOD and use max_LOD. Still not lit. Edited draw
 	  function, will be rewriting it soon. Will also be adding visibility
 	  culling into the quadtree?
-	- 'res' fixed DLLWRAPWRAP under cmd.
+	- res fixed DLLWRAPWRAP under cmd.
 20-Jul-2002
-	- 'res' added workarounds for crash & weird artifacts with
+	- res added workarounds for crash & weird artifacts with
 	  freefont 2.1.2 (maybe someone with a little more knowledge
 	  about freetype than I have should find out the real cause).
 	- Philip Wyett encapsulated the recently added crtdbg.h (msvc only
@@ -4485,8 +4485,8 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  msvc_libs.
 	- Philip fixed a type and addes tests of new gcvs beta for -m bug
 	  fix (documentation).
-	- 'res' added .cvsignore for vc7 project files.
-	- 'res' fixed an error in the caltocs documentation found by
+	- res added .cvsignore for vc7 project files.
+	- res fixed an error in the caltocs documentation found by
 	  Scott DC <beuja@iinet.net.au>.
 	- Ryan Surkamp added collision detection using quadtrees to
 	  the bcterr landscape engine (currently unsupported by all apps).
@@ -4502,7 +4502,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  so that you can retrieve the functions used by the landscape
 	  engine.
 	- Philip Wyett added jng plugin to MSVC port.
-	- 'res' activated dllwrapwrap (to work around that dllwrap bug
+	- res activated dllwrapwrap (to work around that dllwrap bug
 	  that symbols in libs aren't exported properly). tested it
 	  on win2k with both cmd and bash as shell, works for me.
 	- Daniel Duhprey added new group handling to ODE dynamics.
@@ -4580,14 +4580,14 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  fixed the calls in csGraphics2D::Resize().
 	- Matt fixed two clipping calls in OpenGL's Resize() function.
 13-Jul-2002
-	- 'res' fixed broken loading of some images in png loader.
-	- 'res' also fixed a bug when stripping alpha from paletted images.
+	- res fixed broken loading of some images in png loader.
+	- res also fixed a bug when stripping alpha from paletted images.
 12-Jul-2002
 	- csPluginManager::LoadPlugin() is now a bit smarter. If a plugin
 	  is already on the plugin list it will not add it anymore. So you
 	  can now safely do CS_LOAD_PLUGIN multiple times to create multiple
 	  instances of the same plugin.
-	- 'res' fixed PNG image loader to have better handling of tRNS.
+	- res fixed PNG image loader to have better handling of tRNS.
 	- Matthias Braun changed Execute prototype in AWS and temporarily
 	  added GetThisNode() to iAwsKeyFactory because it is needed for
 	  creating external components.
@@ -4609,7 +4609,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- Peter also fixed bugs in Normalize(), added Invert() and prototypes
 	  for converting to a matrix, and to/from axis-angle representation
 	  (quaternions).
-	- 'res' did the following:
+	- res did the following:
 	    - Added requirement for missing JPEG libs to jngio.mak.
 	    - Some fixes to makefiles (jng).
 	    - Turned off CMS use in jng.
@@ -4679,7 +4679,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	      my previous fix from Craig Ching.
 	    - Added a comment which notes the possible problem noted by
 	      Craig Ching and Peter Amstutz.
-	- 'res' did the following:
+	- res did the following:
 	    - Jng plugin can now save as well.
 	    - Gfxtest crashed when image saver plugin returned NULL.
 	    - Gfxtest: output filename when saving is now optional.
@@ -4690,7 +4690,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	- csSector::GetVisibleObjects() now uses the efficient
 	  csIntersect3::BoxFrustum() routine. This also fixes a bug
 	  because the old code was actually not always correct.
-	- 'res' added image loader for JNG format (JPEG with alpha channel).
+	- res added image loader for JNG format (JPEG with alpha channel).
 	  This uses libmng.
 6-Jul-2002
 	- Removed -fno-rtti from comptest.sh. So this option will no
@@ -4715,7 +4715,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  creating this very useful script!
 	- Daniel Duhprey fixed some problems with the mesh colliders in the
 	  ODE dynamics plugin.
-	- 'res' did the following:
+	- res did the following:
 	    - Fixed a crash in CSWS when it was attempting to display
 	      empty directories.
 	    - When parsing fails (in csParser::GetObject()) *name and
@@ -4746,7 +4746,7 @@ This history is "historical".  See "history.txt" for more recent entries.
 		- Fixed a bug in connection parsing.
 	- Daniel Duhprey added a collision callback mechanism to the
 	  ODE dynamics plugin.
-	- 'res' fixed two parameters of awsParser. They had the same name.
+	- res fixed two parameters of awsParser. They had the same name.
 2-Jul-2002
 	- Removed an obsolete feature to show the c-buffer in walktest.
 	- Removed db_cbuffer console command in walktest.
@@ -4828,9 +4828,9 @@ This history is "historical".  See "history.txt" for more recent entries.
 	  iShadowBlockList. This means that it is now easier to use
 	  iShadowBlock outside the engine (i.e. from within Dynavis soon).
 28-Jun-2002
-	- 'res' made some Doxygen grouping changes and also some changes
+	- res made some Doxygen grouping changes and also some changes
 	  to the MSVC7 project file generation.
-	- 'res' did some changes to compile CS with gcc 3.1:
+	- res did some changes to compile CS with gcc 3.1:
 	    - Replaced alloca()'s with ALLOC_STACK_ARRAY.
 	    - Added a typecast in win32 loadlib.cpp.
 	- Christopher Nelson did the following:
@@ -6557,7 +6557,7 @@ updated3-Jun-2002
 	- Implemented caching of sprite normals (using SMOOTH()) option.
 	  This greatly speeds up load time of a sprite when the cached
 	  data is present.
-	- 'res' fixed a bug in the OpenGL renderer where sometimes
+	- res fixed a bug in the OpenGL renderer where sometimes
 	  textures where multiplied with texture mean color. This caused
 	  color seams.
 2-Apr-2002
@@ -6623,7 +6623,7 @@ updated3-Jun-2002
 	    - Linux lockup issues.
 	  Work is progressing... ;)
 28-Mar-2002
-	- Reverted part of 'res' changes to the lightmap checker because
+	- Reverted part of res's changes to the lightmap checker because
 	  they cause big problems.
 	- Toni Asco Gonzalez commited a big patch to a new version of
 	  DrawPolygonMesh for OpenGL:
@@ -6661,11 +6661,11 @@ updated3-Jun-2002
 	- Norman fixed the embedded eventhandler in the djgpp port so that
 	  it is now constructed. simple1 and simpcd work now compiled
 	  in static mode.
-	- 'res' fixed crash bug when relighting polygons with lightmaps
+	- res fixed crash bug when relighting polygons with lightmaps
 	  the renderer can't handle.
-	- 'res' also made sure that lighting for a polygon is always
+	- res also made sure that lighting for a polygon is always
 	  calculated even if the renderer can't handle the lightmap.
-	- 'res' fixed an infinite recursion in null2d canvas.
+	- res fixed an infinite recursion in null2d canvas.
 	- Matze fixed 3ds2lev optimization so it works better now.
 26-Mar-2002
 	- Matze added a farplane command to walktest. This command set's a
@@ -6712,7 +6712,7 @@ updated3-Jun-2002
 	    - Walktest: plugin_mgr was not decref'ed.
 	    - Walktest: added some more decref'ing.
 	    - Input console: lines array was not freed.
-	- 'res' fixed three small texinfo syntax errors.
+	- res fixed three small texinfo syntax errors.
 23-Mar-2002
 	- Fixed a bug in the patch from Loic which prevented CS
 	  from properly working if CRYSTAL var is unset and if
@@ -6731,12 +6731,12 @@ updated3-Jun-2002
 	- Replaced DLERROR with WARNING while loading a plugin because
 	  failure to load a plugin is not always an error (for example
 	  for the sound and image multiplexers).
-	- 'res' added function to iGraphics3D so that the engine can
+	- res added function to iGraphics3D so that the engine can
 	  check if a renderer can handle a lightmap. Provided implementation
 	  in OpenGL/Software versions.
-	- 'res' modified engine so it now checks if the renderer can handle
+	- res modified engine so it now checks if the renderer can handle
 	  the lightmap.
-	- 'res' also replaced some printfs() in the engine with Report().
+	- res also replaced some printfs() in the engine with Report().
 	- Christopher Nelson did the following to terrbig:
 	    - Small update to allow public setting of materials list.
 	    - Made another modification to the materials list. Now it makes a
@@ -6761,7 +6761,7 @@ updated3-Jun-2002
 	  Update to msvc_libs:
 	  Note: This is for developers building the bleeding edge cvs code
 	  or recent cvs snapshots with either MSVC 5, 6 or 7.
-	- 'res' did some changes to the software renderer: added some
+	- res did some changes to the software renderer: added some
 	  scanprocs for alpha/keycolor and alpha/alphamap combos. Also
 	  fixed two alpha-related crash bugs.
 	- Mathew Sutcliffe did a little docs fix to binder.h.
@@ -6774,7 +6774,7 @@ updated3-Jun-2002
 	- Matze Braun improved the 3ds2lev writer.
 	- Matze did 3ds2lev optimization part one: removing double vertices.
 	- Matze moved mmap functions outside csosdefs.h into mmiounix.h.
-	- 'res' reverted his own alpha changes from yesterday.
+	- res reverted his own alpha changes from yesterday.
 	- Christopher Nelson did a small fix to mmapio.h that can cause
 	  strange linking problems when all the software mmapio is not
 	  included, but the header is.
@@ -6803,9 +6803,9 @@ updated3-Jun-2002
 	      csBigTerrainObject::Draw and see if I even have the right idea,
 	      that would be great.
 	    - Discovered where to set the material.
-	- 'res' added render priority for explosion particles in walktest.
-	- 'res' increased upper limit for lit textures in software renderer.
-	- 'res' fixed alpha transparency for OpenGL again. Also fixed
+	- res added render priority for explosion particles in walktest.
+	- res increased upper limit for lit textures in software renderer.
+	- res fixed alpha transparency for OpenGL again. Also fixed
 	  disappearing of halos behind walls.
 	- Wouter Wijngaards did further work on the terrfunc terrain engine.
 	  Works nicely now but totally unoptimized so very slow.
@@ -6828,7 +6828,7 @@ updated3-Jun-2002
 	  This has now been fixed by saving additional information to the
 	  octree cache. This means the octree cache is now bigger but
 	  more robust on different platforms/debug/optimize mode.
-	- 'res' fixed a bug found by <lemkef@charter.net> in the bmp
+	- res fixed a bug found by <lemkef@charter.net> in the bmp
 	  loader by removing the check for biClrUsed.
 	- Mathew Sutcliffe fixed a problem with deciding whether to use
 	  event.Key.Code or .Char.
@@ -6848,7 +6848,7 @@ updated3-Jun-2002
 	  that makes using cs-config with autoconf easier.
 	- Matze fixed unix csosdefs.h to compoile at least again. But I
 	  think the mmapio functions shouldn't go to that header at all.
-	- 'res' fixed alpha transparency (full transparent in OpenGL was
+	- res fixed alpha transparency (full transparent in OpenGL was
 	  fully opaque in software and vice versa).
 	- Christian Bayle added more dependencies to the Debian scripts.
 	  Several other smaller changes.
@@ -6887,7 +6887,7 @@ updated3-Jun-2002
 	      extension is enabled either - you have to go here and enable by
 	      hand (or provide an extended chkogl.sh that detects all the
 	      nitty and maybe even the gritty).
-	- 'res' added ARB_texture_env_combine to config. Changed 3dfx config.
+	- res added ARB_texture_env_combine to config. Changed 3dfx config.
 	  Added GeForce config.
 	- Richard Uren added HEIGHTMAP token to isoloader to enable heightmap
 	  calculation when tiling. HEIGHTMAP lives in a TILE2D definition
@@ -7037,9 +7037,9 @@ updated3-Jun-2002
 	    - Declared cs_static_var_cleanup in cssysdef.h as
 	      CS_EXPORTED_FUNCTION (that should fix the compiler warnings on
 	      win32).
-	- 'res' renamed csCreateXORPatternImage() parameter 'patsize' to
+	- res renamed csCreateXORPatternImage() parameter 'patsize' to
 	  clearer 'recdepth'. Changed comment a bit.
-	- 'res' fixed rle.mak for wrong output file name under MSVC (now
+	- res fixed rle.mak for wrong output file name under MSVC (now
 	  rlecodec instead of rle).
 	- Philip Wyett removed 'byte' from xorpat.cpp, which is not always
 	  known for unsigned char.
@@ -7078,10 +7078,10 @@ updated3-Jun-2002
 	- Philip then proceeded to revert the massive commit he did a few
 	  minutes ago :-)
 	- Norman reverted on additional file that Philip forgot to revert.
-	- 'res' did some changes to procedural textures (plasma, fire, dots):
+	- res did some changes to procedural textures (plasma, fire, dots):
 	  changed texflags, removed nomipmaps on plasma/fire, added
 	  persistent on dots.
-	- 'res' fixed the OpenGL backbuffer procedural texture implementation
+	- res fixed the OpenGL backbuffer procedural texture implementation
 	  so that up is now up and down is down.
 8-Mar-2002
 	- Peter Amstutz <tetron@student.umass.edu> gave a patch which
@@ -7173,9 +7173,9 @@ updated3-Jun-2002
 	- Matze also added declarations for iEvent and csEvent again in
 	  inpnames.h. Please don't remove them again. They are needed.
 	- Matze then did a small bugfix for keyparsing.
-	- 'res' changed VFS so that when a file is opened for reading the
+	- res changed VFS so that when a file is opened for reading the
 	  directories are not automatically created.
-	- 'res' did the following changes to lightmaps:
+	- res did the following changes to lightmaps:
 	    - Changed the way lightmap is stored on disk:
 	      the 4th byte was 0x80 all the time, and the comment on line
 	      159 in lghtmap.cpp says it wasn't even known why :) now the
@@ -7418,9 +7418,9 @@ updated3-Jun-2002
 	      it would not function right.
 	    - Added BackgroundAlpha and OverlayAlpha to window.
 	    - Other fixes that I can't remember now.
-	- 'res' fixed the Windows OpenGL canvas so that the depth now contains
+	- res fixed the Windows OpenGL canvas so that the depth now contains
 	  the actual instead of the wanted color depth.
-	- 'res' fixed a typo in jobber.pl ('Inovking' instead of 'Invoking').
+	- res fixed a typo in jobber.pl ('Inovking' instead of 'Invoking').
 21-Feb-2002
 	- Peter Amstutz <tetron@student.umass.edu> added a patch to CS
 	  to add two additional broadcast events:
@@ -7470,15 +7470,15 @@ updated3-Jun-2002
 	    - Changed cast operator of iString to return const char* instead
 	      of char* (if you really need char* which is dangereous use
 	      GetData).
-	- 'res' fixed a @ref in the next documentation.
-	- 'res' fixed description on how to make a sky brush (skybox.txi).
-	- 'res' adds support for cscmdCanvasExposed/cscmdCanvasHidden for
+	- res fixed a @ref in the next documentation.
+	- res fixed description on how to make a sky brush (skybox.txi).
+	- res adds support for cscmdCanvasExposed/cscmdCanvasHidden for
 	  Windows.
-	- 'res' also adds cscmdCanvasExposed support to Walktest.
-	- 'res' reports that textures sizes in memory (OpenGL) were calculated
+	- res also adds cscmdCanvasExposed support to Walktest.
+	- res reports that textures sizes in memory (OpenGL) were calculated
 	  wrong in some cases. Also disabled mipmapping for procedural
 	  textures.
-	- 'res' added support for GL_SGIS_generate_mipmap which allows
+	- res added support for GL_SGIS_generate_mipmap which allows
 	  automagical creation of mipmaps for procedural textures.
 	- Christopher Nelson fixed a dumb bug in bar chart that was making
 	  display inverted.
@@ -7613,7 +7613,7 @@ updated3-Jun-2002
 	- Norman reports: gridlayout is now translated into aws GridBag
 	  layout (this has still some issues). Norman also added description
 	  on how to use the qt2aws.xsl stylesheet.
-	- 'res' reports: fontplex now breaks loading of font servers after 2
+	- res reports: fontplex now breaks loading of font servers after 2
 	  consecutive failures (instead after the first failure).
 16-Feb-2002
 	- Philip Wyett eliminated 'no newline' warnings in some aws source
@@ -7635,16 +7635,16 @@ updated3-Jun-2002
 	- Reverted Philip's change since for integers n/a*a is not always
 	  equal to n.
 15-Feb-2002
-	- Reverted 'res' change to win32gcc.mak since it breaks compile of
+	- Reverted res's change to win32gcc.mak since it breaks compile of
 	  ddraw plugin. The problem is that the -lddraw library link command
 	  is added after the command so it is added after the 'rm'. This is
 	  obviously wrong.
 	- Fixed a compile error in aws. You cannot say 'virtual Func ()'.
 	  You have to specify a return type or 'void'.
 	- Little code reformatting of libs/csutil/cfgmgr.cpp.
-	- Reverted 'res' change to enginep.mak since it breaks loading
+	- Reverted res's change to enginep.mak since it breaks loading
 	  of the engine plugin on MingW at least.
-	- 'res' added an alternative workaround for dllwrap on MingW (but
+	- res added an alternative workaround for dllwrap on MingW (but
 	  not activated by default).
 	- Completely reformatted the AWS source code using the GC utility.
 	  Now the source of AWS finally conforms to CS coding style rules.
@@ -7740,9 +7740,9 @@ updated3-Jun-2002
 	    - Fixed additional bugs related to ScrollBar and ListBox because
 	      of layouts.
 	    - Slight re-adjustment of space for scrollbar so it doesn't overlap.
-	- 'res' added ugly workaround to mingw dllwrap bug (functions with
+	- res added ugly workaround to mingw dllwrap bug (functions with
 	  _declspec(dllexport) are not auto-exported from libraries).
-	- 'res' modified lens flares so that they fade away.
+	- res modified lens flares so that they fade away.
 	- Norman Kramer added inclusion of unistd.h to cssysdef.h. Somehow
 	  recent changes broke compilation of socket plugin.
 	- Norman did some changes to qt2aws.xsl: pretty indenting. Top level
@@ -7776,7 +7776,7 @@ updated3-Jun-2002
 	  (--alwaysruns).
 	- Matt Reda fixed the next2d canvas so that it doesn't display
 	  [Paused] in the title bar if the run loop is set to never pause.
-	- 'res' added missing $/ at the end of VFS.Win32.TTF_PATH. Changed
+	- res added missing $/ at the end of VFS.Win32.TTF_PATH. Changed
 	  / to $/ in VFS.CP/M.TMP.
 	- Norman Kramer removed the GetDimensions() version Philip added
 	  since it is not needed (fontserv.h).
@@ -7949,8 +7949,8 @@ updated3-Jun-2002
 	  the c-buffer is used globally). I moved this code to the polygon
 	  drawer because then we can do it only when it is really needed.
 	- Philip Wyett removed Squawk and all associated files.
-	- 'res' changed some settings for freetype2 plugin.
-	- 'res' swapped some pixel layouts in csOpenGLProcSoftware::Prepare().
+	- res changed some settings for freetype2 plugin.
+	- res swapped some pixel layouts in csOpenGLProcSoftware::Prepare().
 	  Software renderer proctexes seem to work now (at least for me).
 5-Feb-2002
 	- Matt Reda update Next makefile to support new method of locating
@@ -7982,7 +7982,7 @@ updated3-Jun-2002
 	      of timers idling in the eventqueue can easily add up.
 	    - Fixed dragging knob which sometimes didn't get to the min/max
 	      value.
-	- 'res' did the following:
+	- res did the following:
 	    - Software proctex renderer works again (but flawed).
 	    - Backbuffer proctex renderer works again (but flawed).
 	- Christopher Nelson added the beginning of implementation for the
@@ -8148,7 +8148,7 @@ updated3-Jun-2002
 	- Matze fixed map2cs skybox export by addiong MOVEABLE() to PARAMS
 	  section, still the texture mapping seems incorrect
 	- Brandon Ehle did various doc fixes with hbox and item bugs.
-	- 'res' split the Windows Help files into two projects: docs and api.
+	- res split the Windows Help files into two projects: docs and api.
 	  Also added a script to create pretty TOCs/indices.
 	- Christopher Nelson did the following:
 	    - Made the system specializations more friendly. Now they exist
@@ -8379,7 +8379,7 @@ updated3-Jun-2002
 	  FPS increase :-)
 	- Matze added a first version of the annotated user manual hack.
 	- Matze fixed GNUC_PRINTF in reporter.h.
-	- 'res' fixed a single-line comment containing line-continuation
+	- res fixed a single-line comment containing line-continuation
 	  character.
 17-Jan-2002
 	- Jorge Acereda made the following changes:
@@ -8402,7 +8402,7 @@ updated3-Jun-2002
 	  an iImage.
 	- Philip Wyett removed a #warning for a comment (isoview.h) as it is
 	  causing a fatal error in MSVC port.
-	- Philip also reverted the change of 'res' yesterday as it was
+	- Philip also reverted the change of res's yesterday as it was
 	  forcing fullscreen by default. Later Philip re-implemented the code
 	  with one fix and a minor alteration.
 	- Philip fixed a typo in the msvc documentation pointed out by RobEG.
@@ -8434,7 +8434,7 @@ updated3-Jun-2002
 	      to disk to make them 64bit-friendly.
 	    - Fixed building of iso engine after a few new methods were
 	      added to iCamera.
-	- 'res' fixed some window/fullscreen and palette issues in the ddraw
+	- res fixed some window/fullscreen and palette issues in the ddraw
 	  canvas.
 15-Jan-2002
 	- Changed iIsoEngine::CreateMeshFactory() to return
@@ -8461,8 +8461,8 @@ updated3-Jun-2002
 14-Jan-2002
 	- Matt Reda added 3 OSX drivers (2 canvases and an audio driver)
 	  and updated various Makefiles to support these changes.
-	- 'res' changed error handling in the waveoutsd sound driver.
-	- Fixed a bug in the OpenGL renderer which 'res' introduced
+	- res changed error handling in the waveoutsd sound driver.
+	- Fixed a bug in the OpenGL renderer which res introduced
 	  by forgetting to test if txt_mm is non-NULL in FlushDrawPolygon().
 	- Eric Sunshine committed the following changes on behalf of Matthew
 	  Reda <mreda@mac.com>:
@@ -8497,11 +8497,11 @@ updated3-Jun-2002
 11-Jan-2002
 	- Matze removed DEBUG_BREAK_MSG again :) csString is using CS_ASSERT
 	  now.
-	- 'res' replaced CRASH macro with DEBUG_BREAK.
-	- 'res' modifed the standard reporter to have a different default
+	- res replaced CRASH macro with DEBUG_BREAK.
+	- res modifed the standard reporter to have a different default
 	  behaviour in debug mode (CS_DEBUG).
-	- 'res' fixed a missing ';' for csstring.h. Compiles with MSVC again.
-	- 'res' changed _control87 to csControl80x87 after Matt Reda pointed
+	- res fixed a missing ';' for csstring.h. Compiles with MSVC again.
+	- res changed _control87 to csControl80x87 after Matt Reda pointed
 	  it out.
 10-Jan-2002
 	- Matze added an autoconf macro for CS to scripts/cs-config, no
@@ -8516,12 +8516,12 @@ updated3-Jun-2002
 	  conflicts with same name routine from emx libc.
 	- RedEye Entertainment added #defines to walktest and squawk
 	  to make MSVC ignore the csControl80x87 changes of Andrew.
-	- 'res' made map2cs tutorial use a little bit less disk space.
+	- res made map2cs tutorial use a little bit less disk space.
 	- Philip Wyett fixed new DEBUG_BREAK_MSG and added define so MSVC
 	  can compile without errors.
-	- 'res' fixed csControl80x87 so that it works again with MSVC. 'res'
+	- res fixed csControl80x87 so that it works again with MSVC. He
 	  then removed the MSVC specific #ifdef's from walktest and squawk.
-	- 'res' added DEBUG_BREAK macro and removed #define DEBUG_BREAK_MSG.
+	- res added DEBUG_BREAK macro and removed #define DEBUG_BREAK_MSG.
 	- Philip Wyett added 'required' to the msvc documentation for the
 	  BisonFlex library as it is needed for successful linking.
 9-Jan-2002
@@ -8541,7 +8541,7 @@ updated3-Jun-2002
 	  optimisation.
 8-Jan-2002
 	- Reverted a change to the png loader plugin (in the saving part)
-	  that 'res' made some time ago. It caused quality degradation when
+	  that res made some time ago. It caused quality degradation when
 	  writing a big bunch of thumbnails using gfxtest.
 	- Eric Sunshine fixed a problem introduced by AndyZ when he modified
 	  os2gcc.mak.  His change unconditionally set the makefile SHELL
@@ -8556,7 +8556,7 @@ updated3-Jun-2002
 	  csGraphics2D::Initialize() already does so.  (No need to register the
 	  same event handler twice.)
 	- Eric Sunshine eliminated several compilation warnings from AWS.
-	- 'res' did a fix to the png image loader.
+	- res did a fix to the png image loader.
 	- Andrew Zabolotny fixed os2gcc.mak so that it always overrides
 	  SHELL with $(COMSPEC) to avoid a problem with Unix shells.
 7-Jan-2002
@@ -8617,9 +8617,9 @@ updated3-Jun-2002
 	- Fixed a bug with the portal console command so that the
 	  portal back to the original level is now correct.
 2-Jan-2002
-	- Fixed software renderer after 'res' broke it.
-	- Fixed csparser after 'res' broke it.
-	- Fixed OpenGL renderer after 'res' broke it.
+	- Fixed software renderer after res broke it.
+	- Fixed csparser after res broke it.
+	- Fixed OpenGL renderer after res broke it.
 	- After fixing the csgfx makefile so that it actually uses all
 	  .cpp files in the dir I reenabled the csCreateXORImage() in
 	  software, OpenGL, and csparser.
@@ -8643,7 +8643,7 @@ updated3-Jun-2002
 	  see this bug was to do 'portal sydney' in the console of WalkTest.
 	- Matze did a small hack to cspython.mak so it links with -util if
 	  python lib matches python2%.
-	- 'res' did the following on the OpenGL renderer:
+	- res did the following on the OpenGL renderer:
 	    - When using keycolored textures, z buffer is only used for
 	      non-transparent pixels.
 	    - Slight visual improvement of keycolored textures w/ bilinear
@@ -8659,7 +8659,7 @@ updated3-Jun-2002
 	    - Overfull and underfull `hbox' warnings from TeX.
 	    - Invalid use of @c comment on first line of cs-unix.txi,
 	      cs-mac.txi, and cs-dos.txi.
-	- 'res' updated a few places in CS so that a default image is used
+	- res updated a few places in CS so that a default image is used
 	  when an image file cannot be loaded:
 	    - An image file can't be loaded.
 	    - A NULL image is registered with the software and OpenGL texture
@@ -8685,9 +8685,9 @@ updated3-Jun-2002
 	  SO extremely slow I reimplemented it completely. It appears that
 	  generating colliders at real-time is not an option at all.
 	- Philip Wyett added debug information switch /ZI which I forgot
-	  to add after removing /Zi yesterday. Thanks to 'res' for pointing
+	  to add after removing /Zi yesterday. Thanks to res for pointing
 	  this out.
-	- 'res' updated the Ascii Art canvas to work with aalib 1.4rc4.
+	- res updated the Ascii Art canvas to work with aalib 1.4rc4.
 30-Dec-2001
 	- Fixed iPolygonMesh implementation in csThing so that it will
 	  check if the parent array of object-space vertices is still
@@ -8715,10 +8715,10 @@ updated3-Jun-2002
 		/Oi - Generate Intrinsic Functions.
 		/Ot - Favor Fast Code; Default.
 		/Oy - Frame-Pointer Omission
-	- 'res' did a small fix to awswin.cpp: engine view background now
+	- res did a small fix to awswin.cpp: engine view background now
 	  works correctly with single pt canvas too.
 29-Dec-2001
-	- 'res' did a fix to compile awslistbx.cpp on msvc.
+	- res did a fix to compile awslistbx.cpp on msvc.
 28-Dec-2001
 	- Small change to the scripting cs.i file so that it no longer
 	  includes from plugins/csscript/cspython.
@@ -8876,7 +8876,7 @@ updated3-Jun-2002
 	  first image to scale all the others too if multiple images
 	  where given and scaling is enabled.
 	- Fixed a potential overflow bug in the jpg image loader.
-	- 'res' did a small fix to the PNG image loader.
+	- res did a small fix to the PNG image loader.
 20-Dec-2001
 	- Fixed gfxtest so it will actually write out the PNG file correctly
 	  on windows (i.e. use binary mode for writing the file).
@@ -8902,9 +8902,9 @@ updated3-Jun-2002
 	    - Fixed panning bug by setting perspective center.
 	    - Also added field of view so it tries to draw correctly for the
 	      window.
-	- 'res' did a small crash fix to the standard output console.
-	- 'res' also updated awstodo.txt.
-	- 'res' fixed a typo in awstest.cpp.
+	- res did a small crash fix to the standard output console.
+	- res also updated awstodo.txt.
+	- res fixed a typo in awstest.cpp.
 	- Matze finised cs-config additions.
 	- Norman Kramer fixed caltocs so that it only compiles if setup found
 	  cal3d/cal3d.h include.
@@ -8958,11 +8958,11 @@ updated3-Jun-2002
 	- Matze optimized Makefile.template by using := instead of =, which
 	  results in only 1 call of cs-config.
 14-Dec-2001
-	- Reverted a patch from 'res' on the OpenGL windows canvas
+	- Reverted a patch from res on the OpenGL windows canvas
 	  related to the calculation of 'wwidth' and 'wheight'. This
 	  patch caused OpenGL to stop working correctly for me (ATI card).
 	  Don't know the reason though.
-	- 'res' did a window style change in the Windows/OpenGL canvas.
+	- res did a window style change in the Windows/OpenGL canvas.
 	- Christopher Nelson did the following:
 	    - Created a new class called aws3DFrame which encapsulates the
 	      "built-in" frame types that most components use. Having this
@@ -9012,7 +9012,7 @@ updated3-Jun-2002
 	    - Small crash fix to awscspt.cpp.
 	    - Temporary hack to work around an OpenGL renderer bug. AWS
 	      works now with OpenGL.
-	- 'res' did a small change of window style to the Windows canvas.
+	- res did a small change of window style to the Windows canvas.
 	- Brandon Ehle did the following:
 	    - Motion manager import from 3D Studio MAX is now working.
 	    - Fixed a couple bugs with interpolation and looping.
@@ -9062,9 +9062,9 @@ updated3-Jun-2002
 	  priorities and Z-buffer mode.
 	- Fixed a bad bug in the parsing of the START keyword. It would
 	  simply crash.
-	- 'res' fixed aws so that it doesn't require source files from
+	- res fixed aws so that it doesn't require source files from
 	  outside its directory. Also added transparency.
-	- 'res' did a small fix to the OpenGL procedural textures.
+	- res did a small fix to the OpenGL procedural textures.
 	- Fixed fire proc texture.
 	- Luca Pancallo fixed 3ds2lev for real.
 	- Fixed a bug in things when polygons were split. This caused
@@ -9107,7 +9107,7 @@ updated3-Jun-2002
 	      in favor of the more lexicographically stable const bool method.
 	    - Made some changes to demonstrate how to use the flags and the
 	      two different ways you can draw an aws canvas to the screen.
-	- 'res' did some bugfixes to AWS.
+	- res did some bugfixes to AWS.
 10-Dec-2001
 	- Toni Asco' Gonzalez found a bug in 3ds2lev.
 	- Added thanks to Ted Nguyen for donating two copies of MSVC
@@ -9173,7 +9173,7 @@ updated3-Jun-2002
 	  no big effect on framerate however.
 8-Dec-2001
 	- Fixed a closing brace in mapfmt.txi.
-	- 'res' fixed "unreferenced local variable" msvc warning in awswin.cpp.
+	- res fixed "unreferenced local variable" msvc warning in awswin.cpp.
 7-Dec-2001
 	- Added a new tutorial application (no doc yet) for collision
 	  detection. This tutorial contains a hierarchical mesh object
@@ -9293,7 +9293,7 @@ updated3-Jun-2002
 	    - Fixed function param redifinition error under MSVC.
 	    - Removed some old dependancy stuff ref'ing cswin32exe and
 	      cswin32dll.
-	- 'res' changed filenames of awssmpt.* to awscspt.* and also
+	- res changed filenames of awssmpt.* to awscspt.* and also
 	  did some small fixes in aws.
 3-Dec-2001
 	- Toni Asco' Gonzalez fixed the 3ds loader so that it now correctly
@@ -9322,14 +9322,14 @@ updated3-Jun-2002
 	      items for simplicity.
  	    - The single-proctex mode might be broken now.
 30-Nov-2001
-	- 'res' added missing SCF_CONSTRUCT_IBASE to awsfparm.cpp.
-	- 'res' redefined macro CRASH to call DebugBreak().
+	- res added missing SCF_CONSTRUCT_IBASE to awsfparm.cpp.
+	- res redefined macro CRASH to call DebugBreak().
 28-Nov-2001
 	- Made the test on bad UV coordinates for a polygon a little
 	  bit more strict so that it rejects more polygons. There were
 	  still polygons that came through which could crash the lighting
 	  calculator otherwise.
-	- 'res' added a missing @end example to simpmap.txi tutorial.
+	- res added a missing @end example to simpmap.txi tutorial.
 27-Nov-2001
 	- Considerably optimized memory usage of graph debugger by
 	  reorganizing the data a little.
@@ -9421,7 +9421,7 @@ updated3-Jun-2002
 	    - Fixed numerous cases where the unsafe sprint() was being used
 	      instead of the safe cs_vsnprintf().
 	    - Updated incomplete and outdated documentation for many methods.
-	- 'res' fixed 'text background not transparent' bug in OpenGL.
+	- res fixed 'text background not transparent' bug in OpenGL.
 24-Nov-2001
 	- Added more debug graph commands for iImage.  Also added links to
 	  iImage and the texture manager for the 3D renderers.  This reveals a
@@ -9581,7 +9581,7 @@ updated3-Jun-2002
 	- Norman added unistd.h and CS_SYSDEF_PROVIDE_PATH, before it failed
 	  compiling what noone noticed since it never was compiled due to the
 	  cssys.mak problem.
-	- 'res' fixed errors in the AWS documentation he added yesterday.
+	- res fixed errors in the AWS documentation he added yesterday.
 18-Nov-2001
 	- Philip Wyett did the following:
 	  By popular demand...
@@ -9599,7 +9599,7 @@ updated3-Jun-2002
 	  (non-executable).
 	- Matze also added a small robustness patch in addition to the patches
 	  yesterday (aws).
-	- 'res' converted Christopher Nelson's AWS documentation to texinfo.
+	- res converted Christopher Nelson's AWS documentation to texinfo.
 	- Martin Geisse fixed a circular reference between the map loader
 	  and the syntax services plugin.
 17-Nov-2001
@@ -9687,7 +9687,7 @@ updated3-Jun-2002
 	  indicate the information can be found upwards.
 	- More cleanup of the output of csDebuggingGraph::Dump(). Added
 	  curly brackets for the children to group children more clearly.
-	- 'res' fixed a stupid bug in proctex.h.
+	- res fixed a stupid bug in proctex.h.
 15-Nov-2001
 	- Added DG_ADDI and csDebuggingGraph::AddInterface() with which you
 	  can add an SCF interface (instance of iBase) to the debug graph.
@@ -9772,7 +9772,7 @@ updated3-Jun-2002
 	  remove links between two objects if one or both of the objects are
 	  already deleted. This fixes a number of invalid bad links I got
 	  during debugging csObject.
-	- 'res' added to vfs:
+	- res added to vfs:
 	    - Recursive resolution of variables.
 	    - Support for platform-specific built-in variables.
 13-Nov-2001
@@ -9799,7 +9799,7 @@ updated3-Jun-2002
 	- Wouter Wijngaards added documentation to the cs-config HOWTO for
 	  the new plugin-capable template makefile. Also fixed the template
 	  makefile depend target.
-	- 'res' added a request to canvas to perform extensionk
+	- res added a request to canvas to perform extensionk
 	  'configureopengl'.
 9-Nov-2001
 	- Reverted the SCF changes made to scfFactory yesterday since they
@@ -9911,20 +9911,20 @@ updated3-Jun-2002
 	  scfSharedLibrary objects more sane (and less insane).  Also fixed a
 	  bug where scfFactory was decrementing the reference count of the
 	  scfSharedLibrary one too many times.
-	- 'res' moved the windows icon in apps/win32 to libs/cssys/win32/rsrc.
-	- 'res' removed csInitializer::SetupCommandLineParser() and added
+	- res moved the windows icon in apps/win32 to libs/cssys/win32/rsrc.
+	- res removed csInitializer::SetupCommandLineParser() and added
 	  new parameters for csInitializer::CreateEnvironment() (argc and
 	  argv).
-	- 'res' added a facility to the OpenGL renderer to detect different
+	- res added a facility to the OpenGL renderer to detect different
 	  hardware and use different configs.
-	- 'res' fixed the windows port so that it uses the commandline parser
+	- res fixed the windows port so that it uses the commandline parser
 	  to read -noconsole option.
 7-Nov-2001
 	- Eric Sunshine fixed simpcon.cpp so that it now uses an octal
 	  character constant for cursor assignment, rather than using an 8-bit
 	  character, since not all compilers are capable of correctly dealing
 	  with 8-bit charactes.
-	- Reverted the code from 'res' to read the commandline in windows
+	- Reverted the code from res to read the commandline in windows
 	  port. This is not the right way to do this. The best way is to
 	  do this through the commandline parser. If needed this will have
 	  to be delayed until the commandline parser IS ready.
@@ -10075,7 +10075,7 @@ updated3-Jun-2002
 	      parameter "IterateWholeList". If you specify that as true,
 	      then the iterator mechanism will descend into all branches.
 	      Otherwise, it will only descend into visible branches.
-	- 'res' fixed win32 port so that disabling console via commandline
+	- res fixed win32 port so that disabling console via commandline
 	  works now. Moved csSleep() to timing32.cpp.
 5-Nov-2001
 	- Fixed a bug in bin/chkheadr.sh which caused that test to always
@@ -10135,7 +10135,7 @@ updated3-Jun-2002
 	    - Fixed the little tree-vline image to make it look right.
 	    - Fixed tree code so that it now draws properly and doesn't leave
 	      little danglies at the end of a child list.
-	- 'res' corrected wrong interface in iaws.h.
+	- res corrected wrong interface in iaws.h.
 	- Matze Braun made nasm test stronger again - older nasms which
 	  didn't work with CS passed before.
 4-Nov-2001
@@ -10152,7 +10152,7 @@ updated3-Jun-2002
 	    - Made the BeOS port a bit more robust for the makefile
 	      configuration phase.  No longer assumes that the scripts in the
 	      CS/bin directory have execute-permission.
-	- 'res' fixed demo.mak which he modified yesterday.
+	- res fixed demo.mak which he modified yesterday.
 	- Wouter Wijngaards did the following with regards to cs-config:
 	    - Added --makevars option to cs-config, this will echo a portion
 	      of a makefile with settings that the user can use. With these
@@ -10181,8 +10181,8 @@ updated3-Jun-2002
 		- Moved FindLight (id) to iLightList.
 		- The culler mesh is now stored as an iMeshWrapper.
 	    - Cosmetic cleanup work.
-	- 'res' reports that disabling windows mouse cursors works now.
-	- 'res' added support for native console in windows port and
+	- res reports that disabling windows mouse cursors works now.
+	- res added support for native console in windows port and
 	  also added application-specific icon support (apps/win32).
 	- Matze Braun did a small viewmesh fix/cleanup.
 2-Nov-2001
@@ -10245,12 +10245,12 @@ updated3-Jun-2002
 	    - Created a new csVector subclass for the listbox so that rows
 	      can be sorted by column, and can be quickly searched.
 31-Oct-2001
-	- Removed the windows pen support added by 'res'.  I don't have the
+	- Removed the windows pen support added by res.  I don't have the
 	  needed include files on mingw.
 	- Matze added VFS support to csFileDialog and also did some small
 	  changes to viewmesh.
-	- 'res' fixed pen support in windows port.
-	- 'res' fixed csFileDialog so that it compiles on MSVC.
+	- res fixed pen support in windows port.
+	- res fixed csFileDialog so that it compiles on MSVC.
 	- Jorge Acereda fixed infinite renderer. It failed to overload
 	  iGraphics2D::Write() because it had a different argument list.
 	- Martin Geisse removed GetPrivateObject() from iCollection.
@@ -10295,9 +10295,9 @@ updated3-Jun-2002
 	- Martin added an 'applicationID' parameter to SetupConfigManager().
 	  This parameter is used for the application ID, unless overridden by
 	  the application's config file.
-	- 'res' added mouse cursors: cross, pen. Windows mouse cursors
+	- res added mouse cursors: cross, pen. Windows mouse cursors
 	  can now be turned off via Video.SystemMouseCursor.
-	- Philip Wyett did some quick compile fixes on the changes from 'res'.
+	- Philip Wyett did some quick compile fixes on the changes from res.
 29-Oct-2001
 	- Eric Sunshine augmented the makefile configuration procedure for the
 	  Apple/NeXT ports so that they work even if executable permission has
@@ -10315,17 +10315,17 @@ updated3-Jun-2002
                 % "gfsSimple", A simple black border.
 	    - Updated test definition to show new group frame and how it
 	      acts with radio buttons.
-	- 'res' fixed a bug in CSWS: if button dismisses parent, command
+	- res fixed a bug in CSWS: if button dismisses parent, command
 	   isn't send (to parent, causing crash).
 28-Oct-2001
-	- 'res' fixed map2cs so that a proper message is given when a token
+	- res fixed map2cs so that a proper message is given when a token
 	  is too long (instead of crash). Texture names with special chars
 	  (like ~, + in half-life) are now corrected so CS parser will
 	  recognize string.
-	- 'res' fixed some of the OpenGL 2D routines so that they properly
+	- res fixed some of the OpenGL 2D routines so that they properly
 	  restore disabled states.
-	- 'res' also fixed wrong screen resolution on voodoo2 (openglwin).
-	- 'res' fixed a crash in 8 bit mode with ddraw canvas.
+	- res also fixed wrong screen resolution on voodoo2 (openglwin).
+	- res fixed a crash in 8 bit mode with ddraw canvas.
 27-Oct-2001
 	- Markus Korth <mkorth@military.de> fixed a bug with
 	  unixconf.sh which would use -mcpu=486 instead of -mcpu=i486.
@@ -10697,7 +10697,7 @@ updated3-Jun-2002
 	    - Added support for connect into lexical analyzer.
 	    - Removed .h files from aws plugin directory.
 	    - Various fixes to make all work again.
-	    - Accepted the patch by 'res' for cosmetic fix. Thanks!
+	    - Accepted the patch by res for cosmetic fix. Thanks!
 	    - Lots of changes in interface for slots. Trying to get handlers
 	      right.
 	    - Made (probably) final changes to slot mechanism to allow them
@@ -11162,7 +11162,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	      case.
 	    - In multitexturing case, the env_mode is now changed to
 	      GL_REPLACE instead of GL_MODULATE if the alpha value is 1.0.
-	- Wyat Miler did various fixes and corrections to the documentation.
+	- Wyatt Miler did various fixes and corrections to the documentation.
 	  Also completed parts of the unix 'user.mak' option list section.
 13-Oct-2001
 	- Fixed compilation error in OpenGL Canvas for X.
@@ -13694,7 +13694,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Philip cleaned up header defines and brought into line with CS coding
 	  style and standards.
 	- Philip renamed class: TextureTrans -> class csTextureTrans.
-	- Philiop changed the SCF config line from
+	- Philip changed the SCF config line from
 	  "crystalspace.sound.render.eax" to "crystalspace.sound.render.ds3d",
 	  being EAX plugin is supposed to be a higher layer on top of Direct
 	  Sound plugin.
@@ -20962,7 +20962,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  longer bothers reading the content of each file if the user only
 	  requested file-rename operations (that is, no content-edit
 	  operations).
-	- Jorrit, further removed some references to world space vertices
+	- Jorrit further removed some references to world space vertices
 	  from csPolygon3D.
 	- Eric Sunshine eliminated a compilation warning from system.cpp
 	  regarding unused `cfgacc' variable.
@@ -22583,7 +22583,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  applications (like WalkTest) require the ability to attach
 	  data to state objects so I extended the SCF interfaces with
 	  that ability.
-	- Modifed WalkTest to use the new user-data instead of the
+	- Modified WalkTest to use the new user-data instead of the
 	  csObject system.
 	- Extended the iSprite3DFactoryState interface with
 	  EnableSkeletalAnimation() and GetSkeleton(). Also extended
@@ -28243,7 +28243,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Norman Kramer fixed csFrustum::Classify(): corrected the
 	  CS_FRUST_PART, still in #if 0 - i guess jorrit want to double
 	  check this :)
-	- Fixed csFrustrum::Classify() again!!
+	- Fixed csFrustum::Classify() again!!
 	- Changed lightmap caching to make it more robust and system
 	  independent. This means that the format has changed completely.
 	  If you don't do -relight or -recalc CS will simply ignore
@@ -30989,7 +30989,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	    - Makes proper use of SOFTWARE_2D_DRIVER everywhere.
 4-May-2000
 	- Chris Bruner did some various cleanups in some files.
-	- Borland Ehle did an attempt to unify makefile for all Win32
+	- Brandon Ehle did an attempt to unify makefile for all Win32
 	  compilers.
 	- Frank O'Connor did a big win32 project overhaul to standardize
 	  (re-standardize) the settings, defines, paths whic the projects
@@ -31897,7 +31897,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Fixed a memory leak as well so that the polygon stubs are
 	  correctly freed when a sprite is removed.
 9-Apr-2000
-	- Drasticly improved octree building but NOT with the solid
+	- Drastically improved octree building but NOT with the solid
 	  space splitter. I still need to investigate that one.
 	  The new octree center selection just tries to minimize on
 	  polygons splits like before but instead of choosing random
@@ -33916,7 +33916,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  tweaking by someone who actually has access to the required tools.
 	- Eric Sunshine moved the binary packaging script for NeXT from
 	  CS/libs/cssys/next to CS/bin.
-	- Thomthee Besset" <Besset@sugar-land.dowell.slb.com> submitted a
+	- Thomthee Besset <Besset@sugar-land.dowell.slb.com> submitted a
 	  patch for several MSVC project files which remove obsolete COM junk
 	  from Release mode.
 	- Andrew Zabolotny added some header files mumbo-jumbo to avoid
@@ -34131,7 +34131,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  console functions is integrated into cctest.
 	- Did some extra cleaning up of the new dynamic object code
 	  (for polygon trees). Seems to be working properly now.
-	- Added view frustrum to csRenderView. Use this for quickly culling
+	- Added view frustum to csRenderView. Use this for quickly culling
 	  octree nodes. This should speed up rendering a bit.
 	- Brett Hall <swizin@rain.org> fixed OpenGL and software 2D
 	  drivers for X Windows so that they don't crash when the windows
@@ -35377,7 +35377,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Started fundamental speed optimizations in the lighting routines.
 	  These can make a huge difference! Speed optimization is based on
 	  using the quadtree for calculating shadows instead of the shadow
-	  frustrum list.
+	  frustum list.
 26-Oct-1999
 	- Eric Sunshine fixed a bug which was causing the engine to crash
 	  when a non-coplaner polygon was found in a world.
@@ -35412,7 +35412,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 25-Oct-1999
 	- CrystalClear updates from Michael Dale Long.
 	- FINALLY fixed the bug in the quadcube!!! Lighting shadow
-	  frustrum culling finally works well. There were actually two
+	  frustum culling finally works well. There were actually two
 	  unrelated bugs.
 	- Changes to Map2CS from Thomas Hieber. He added additional
 	  checks for degenerated polygons and moved all math from float
@@ -35976,8 +35976,8 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Some docs for DOS and Squawk from Seth Galbraith.
 22-Sep-1999
 	- Optimization for sprites. Sprites are now only clipped to the
-	  frustrum when really needed. This means they are clipped to the
-	  top-level frustrum (the screen in most cases) and to portals
+	  frustum when really needed. This means they are clipped to the
+	  top-level frustum (the screen in most cases) and to portals
 	  which indicate that they require this kind of clipping.
 	  In addition the clipping first happens with a bounding box
 	  clip. According to that test CS decides what to do next with
@@ -37544,13 +37544,13 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  and moved all of it to WalkTest using the new 'DrawFunc()' system.
 	  Again the engine becomes a little cleaner :-)
 	- Added csLight::LightingFunc() which is similar to
-	  csWorld::DrawFunc() but now for the lighting frustrum calculations.
+	  csWorld::DrawFunc() but now for the lighting frustum calculations.
 	- I fixed the crash in OpenGL when pressing on the WalkTest
 	  window with third mouse button.
 	- Moved polygon and lighting selection from engine to WalkTest.
 	- The 'frustrum' command has been moved from apps/support/command.cpp
 	  to apps/walktest/walktest.cpp.
-	- Frustrum dumping works again (enable edge drawing, select a light
+	- Frustum dumping works again (enable edge drawing, select a light
 	  with the right mouse button and enable the 'frustrum' command) and
 	  is moved from the engine to WalkTest.  So I removed the
 	  DumpFrustrum() function which existed in several classes (but wasn't
@@ -37575,7 +37575,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  added new csMath3::PlanesClose() function which is more correct (it
 	  also normalizes the planes before testing equality).
 	- Improved MarkRelevantShadowFrustrums() so that it also discards
-	  shadow frustrums for shadow objects which are on the same plane
+	  shadow frustums for shadow objects which are on the same plane
 	  as the object being shadowed. This improves shadow calculation
 	  for things somewhat (as well as optimizing it) but we're still not
 	  completely ready. Polygon of things can sometimes shadow other
@@ -37704,7 +37704,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Andrew added a faster version of QInt() and QInt24() for
 	  x86/GCC platforms (and QInt24() also for M68K).
 	- Andrew also fixed a few bugs in the NASM code.
-	- Andrew changed ALL occurrences of 'gouroud' still remaining to
+	- Andrew changed ALL occurrences of 'gouraud' still remaining to
 	  'gouraud' and removed an additional number of warnings.
 	- Andrew fixed OS/2 port by removing an unneeded WaitSwitch().
 	- Andrew avoided an internal compiler error for the sound loader
@@ -37736,7 +37736,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  code is not enabled by default yet.
 	- Andrew also moved the csCleanable sub-classes outside the functions.
 	  This should fix a few compilation problems for some compilers.
-	- Andrew also changed several occurrences of 'gouroud' to 'gouraud' (I
+	- Andrew also changed several occurrences of 'gouraud' to 'gouraud' (I
 	  hope this doesn't break things :-)
 	- Michael Dale Long updated cvsguide.txt for the new IP number.
 	- Thomas Hieber removed a LOT of warnings!
@@ -37758,7 +37758,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  correct. This basically means that the new lighting algorithm is
 	  fully ready except for reflected light which has not been fully
 	  tested yet with regards to things (and will most probably not
-	  work fully) and also light frustrums which extend from a floating
+	  work fully) and also light frustums which extend from a floating
 	  portal.
 	- Added 'L' key to autoexec.cfg. This creates a very large white
 	  dynamic light which casts shadows for things. It is very useful
@@ -37766,7 +37766,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Added creation of bounding boxes to things (csPolygonSet but only
 	  used by things for now). Those bounding boxes are now also used by
 	  the lighting routines to optimize lighting even more (things which
-	  are not in the light frustrum are quickly rejected that way).
+	  are not in the light frustum are quickly rejected that way).
 	- Thomas Hieber added a new DrawPolygonFX function to the 3D
 	  subsystem. This is a new variant of DrawPolygon which supports a
 	  number of nice and new features. Thomas added DrawPolygonFX for the
@@ -37779,7 +37779,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Further optimizations on the new lighting system. Reordered a few
 	  relevant calculations to discover more rapidly when lighting should
 	  not be done for a polygon and also eliminated having to check
-	  for shadow frustrums which are not relevant.
+	  for shadow frustums which are not relevant.
 	- Due to the previous optimizations it is now possible to enable
 	  shadows for things for dynamic lights without loosing too much
 	  speed. There are still more optimizations to do so I think I'm
@@ -37852,9 +37852,9 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Denis also added a cast to fix compilation on Windows.
 	- Added GetShadows() function to csPolygonSet. This is going to be
 	  used in the new lighting calculation routines.
-	- The lighting routines also calculate shadow frustrums
+	- The lighting routines also calculate shadow frustums
 	  for things now. All the calculations are present but the final
-	  shadow frustrums are not yet used.
+	  shadow frustums are not yet used.
 14-Jun-1999
 	- Gary Haussmann added basic 2D functionality for OpenGL in a common
 	  directory. Currently only the X OpenGL port uses this but other
@@ -38041,7 +38041,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- *** Release of 0.13_011 ***
 	- Added support for flat-shading triangles (for curves and sprites)
 	  with or without gouraud shading. Also started changing spelling
-	  of gouroud to gouraud. Note that gouraud shaded polygon objects
+	  of gouraud to gouraud. Note that gouraud shaded polygon objects
 	  still have a bug. I'm investigating this.
 	- Andrew Zabolotny added 'apps' target to makefile and also did some
 	  other makefile changes.
@@ -39193,7 +39193,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  perspective correct texture mapping (like the software renderer).
 	  Not all implementions honor this hint so nothing may happen.
 	  Default is 'no'.
-	- Thanks to Branimir Karadzic I managed to get Gouroud shading for
+	- Thanks to Branimir Karadzic I managed to get Gouraud shading for
 	  sprite triangles working in OpenGL.
 18-Feb-1999
 	- Fixed the Unix 2D drivers (SVGALIB, x2d, glx2d, and glide2d) for
@@ -39534,7 +39534,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Duplicated win32/opengl2d directory. Removed the old version.
 	- Fixes in config file for Glide and Sound.
 2-Feb-1999
-	- Gouroud shaded triangles are now correctly lighted even without
+	- Gouraud shaded triangles are now correctly lighted even without
 	  '-recalc'. This means that the sky.zip level is correct now.
 	- New patch to Macintosh port from Robert Bate. The Macintosh also
 	  supports sound now!! Join the club Mac :-)
@@ -39939,7 +39939,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  renderers because hardware can't handle textures larger than 256x256.
 	  We need to find a solution for this (splitting the texture?).
 	  Fog, halos and alpha-transparency are not supported yet.
-	  Gouroud shading should work.
+	  Gouraud shading should work.
 5-Jan-1999
 	- Fixed cs.mak so that it takes the correct libraries with static
 	  and dynamic linking. So you can do either 'make linux USE_DLL=no'
@@ -40009,7 +40009,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Added new csColor class which represents a color in RGB
 	  space. This class should be used instead throughout CS
 	  but this is not yet the case.
-	- Implemented Gouroud shading with DrawPolygonQuick. The sprite system
+	- Implemented Gouraud shading with DrawPolygonQuick. The sprite system
 	  does not support this yet (still need to perform quick lighting for
 	  every vertex) but you can use this with the COLORS statement in
 	  combination with UV or UVA (in POLYGON). Currently for the Zfill
@@ -40087,7 +40087,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Added array of uv coordinates to Polygon3D. If this array is
 	  set then we are going to use the perspective incorrect texture
 	  mapper instead (DrawPolygonQuick).
-	- Generalised polygon drawing for Things and sectors and move the
+	- Generalized polygon drawing for Things and sectors and move the
 	  code to draw an array of polygons to the common ancestor: PolygonSet.
 	  This makes the code smaller and maintanance easier.
 	- Implemented UV and UVA commands in polygon loader.  With these
@@ -40362,7 +40362,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  from the 3D Engine. For example, I moved the subtex_size
 	  and subtex_dynlight static configuration values from the
 	  TextureCache to PolyTexture.
-	- Succesfully separated the software cache from the 3D Engine.
+	- Successfully separated the software cache from the 3D Engine.
 	  Now the render directory is completely unused by the 3D Engine
 	  except for the COM interface include files.
 	  I also removed the COM interfaces for the texture cache as this
@@ -40433,7 +40433,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  more optimal but this also generates MUCH nicer lightmaps because
 	  the border cases are not missed anymore.  Another consequence of
 	  this is that it is no longer needed to scale the light-patch before
-	  applying it (the scale of the view frustrum when entering a portal
+	  applying it (the scale of the view frustum when entering a portal
 	  is still there.  That's another problem).
 	- I fixed the software renderer so that it supports arbitrary mipmaps.
 	  The 'verynice' option works again.
@@ -41147,7 +41147,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Received new loader patches from Ivan Avramovic.
 9-Sep-1998
 	- First substantial optimization of the dynamic lighting system.
-	  The previous version always calculated infinite frustrums
+	  The previous version always calculated infinite frustums
 	  as seen from the light. This means that even if the radius
 	  of the light is small every polygon that is visible from the
 	  position of the light is going to be recalculated in the
@@ -42019,7 +42019,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	- Added new scan_m68k.S from Maurice Vosmeijer (for Amiga port).
 	- Finally the new lighting code starts to work a bit. It still
 	  needs a lot of tweaking and a few enhancements (like expanding
-	  the view frustrum slightly BEFORE clipping instead of only
+	  the view frustum slightly BEFORE clipping instead of only
 	  in the light-shining routine). I also need to optimize it further.
 	  Then I will add pseudo-radiosity and alpha-mapped color
 	  changes (meaning that a colored light in a church will give nice
@@ -42077,14 +42077,14 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  a light to select it (in addition the normal mouse-click action
 	  also occurs: debug dump of the selected polygons).
 	- New 'frustrum' command (assigned as a toggle to the 'E' key).
-	  When 'frustrum' is enabled it will show the frustrum around
+	  When 'frustrum' is enabled it will show the frustum around
 	  the selected light. This means that all polygons that are hit
 	  by the light (ignoring things blocking the light) will be
 	  hilighted with a white outline indicating where the polygon is
 	  hit. Red lines connect the vertices of that outline with the
 	  center of the light. That way you get a good idea of where
 	  the light may affect polygons. I designed this tool to debug
-	  my new lighting system which is based on making a view frustrum
+	  my new lighting system which is based on making a view frustum
 	  arround a light.
 	  Try this feature sometimes. It looks really nice :-)
 5-Jun-1998
@@ -43760,7 +43760,7 @@ Re-enabled use of cs_snprintf as all seems to be well again.
 	  more or less).
 	- Started integration (optional at first) of the new experimental
 	  Graphics3D layer with the rest of the engine.
-	- Succesfully made the switch to the new Graphics3D layer but it
+	- Successfully made the switch to the new Graphics3D layer but it
 	  still lacks lots of features. To disable the new Graphics3D layer
 	  set USE_GRAPH3D in def.h to 0.
 20-Nov-1997
