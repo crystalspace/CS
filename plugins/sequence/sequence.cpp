@@ -24,9 +24,10 @@
 #include "iutil/objreg.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
+#include "iutil/virtclk.h"
+#include "iutil/vfs.h"
 #include "ivideo/graph3d.h"
 #include "ivideo/graph2d.h"
-#include "iutil/vfs.h"
 
 CS_IMPLEMENT_PLUGIN
 
@@ -209,6 +210,7 @@ csSequenceManager::~csSequenceManager ()
 bool csSequenceManager::Initialize (iObjectRegistry *r)
 {
   object_reg = r;
+  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   if (!scfiEventHandler)
     scfiEventHandler = new EventHandler (this);
   csRef<iEventQueue> q (CS_QUERY_REGISTRY(object_reg, iEventQueue));
@@ -227,7 +229,7 @@ bool csSequenceManager::HandleEvent (iEvent &event)
 
   if (!suspended)
   {
-    csTicks current_time = csGetTicks ();
+    csTicks current_time = vc->GetCurrentTicks ();
     if (!previous_time_valid)
     {
       previous_time = current_time;
@@ -245,7 +247,7 @@ csTicks csSequenceManager::GetDeltaTime () const
   if (!previous_time_valid)
     return 0;
   else
-    return csGetTicks () - previous_time;
+    return vc->GetCurrentTicks () - previous_time;
 }
 
 void csSequenceManager::Clear ()

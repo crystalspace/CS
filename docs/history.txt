@@ -6,6 +6,15 @@ The history order is reversed so that new features are at the top.
 7-Apr-2003
 	- Reverted endian changes from res because they break compile
 	  with MSYS.
+	- Changed several modules in CS to use the virtual clock instead
+	  of csGetTicks(). ALL game logic should use virtual clock instead
+	  of csGetTicks() because the virtual clock is what drives the
+	  game speed. If you use the virtual clock then the movie recorder
+	  will be able to record the movies more correctly and it will
+	  be possible to pause the game. The following modules were fixed:
+	    - spr3d
+	    - motion manager
+	    - sequence manager
 6-Apr-2003
         - Rhad fixed some thread syncronization issues in the OpenAL
           and Direct Sound 3d sound renderers.

@@ -39,6 +39,7 @@
 #include "iutil/config.h"
 #include "iutil/eventh.h"
 #include "iutil/comp.h"
+#include "iutil/virtclk.h"
 #include "igeom/polymesh.h"
 #include "igeom/objmodel.h"
 #include "ivideo/graph3d.h"
@@ -383,6 +384,7 @@ private:
 
 public:
   iObjectRegistry* object_reg;
+  iVirtualClock* vc;
 
   /**
    * Reference to the engine (optional because sprites can also be
@@ -1406,7 +1408,7 @@ public:
     {
       cur_action = act;
       SetFrame (0);
-      last_time = csGetTicks ();
+      last_time = factory->vc->GetCurrentTicks ();
       return true;
     }
     return false;
@@ -1854,6 +1856,8 @@ class csSprite3DMeshObjectType : public iMeshObjectType
 {
 private:
   iObjectRegistry* object_reg;
+  csRef<iVirtualClock> vc;
+  iEngine* engine;
 
 public:
   /// Constructor.
@@ -1861,6 +1865,8 @@ public:
 
   /// Destructor.
   virtual ~csSprite3DMeshObjectType ();
+
+  bool Initialize (iObjectRegistry* p);
 
   //------------------------ iMeshObjectType implementation --------------
   SCF_DECLARE_IBASE;
@@ -1883,7 +1889,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSprite3DMeshObjectType);
     virtual bool Initialize (iObjectRegistry* p)
-    { scfParent->object_reg = p; return true; }
+    { return scfParent->Initialize (p); }
   } scfiComponent;
   friend struct eiComponent;
 

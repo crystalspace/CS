@@ -270,11 +270,8 @@ bool csRegion::ShineLights ()
 
 bool csRegion::Prepare ()
 {
-printf ("Before csRegion::Prepare %d\n", csGetTicks ());
   if (!PrepareTextures ()) return false;
-printf ("Before csRegion::ShineLights %d\n", csGetTicks ());
   if (!ShineLights ()) return false;
-printf ("After csRegion::ShineLights %d\n", csGetTicks ());
   return true;
 }
 

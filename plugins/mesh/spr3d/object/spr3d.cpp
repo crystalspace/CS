@@ -1702,7 +1702,7 @@ void csSprite3DMeshObject::InitSprite ()
 
   if (!cur_action) { SetFrame (0); cur_action = factory->GetFirstAction (); }
 
-  last_time = csGetTicks ();
+  last_time = factory->vc->GetCurrentTicks ();
   last_pos = csVector3(0,0,0);
   last_displacement = 0;
 }
@@ -2438,13 +2438,22 @@ csSprite3DMeshObjectType::~csSprite3DMeshObjectType ()
 {
 }
 
+bool csSprite3DMeshObjectType::Initialize (iObjectRegistry* object_reg)
+{
+  csSprite3DMeshObjectType::object_reg = object_reg;
+  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
+  csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
+  // We don't want to keep a reference to the engine (circular ref otherwise).
+  engine = eng;
+  return true;
+}
+
 csPtr<iMeshObjectFactory> csSprite3DMeshObjectType::NewFactory ()
 {
   csSprite3DMeshObjectFactory* cm = new csSprite3DMeshObjectFactory (this);
   cm->object_reg = object_reg;
-  csRef<iEngine> eng = CS_QUERY_REGISTRY (object_reg, iEngine);
-  // We don't want to keep a reference to the engine (circular ref otherwise).
-  cm->engine = eng;
+  cm->vc = vc;
+  cm->engine = engine;
   csRef<iMeshObjectFactory> ifact (
   	SCF_QUERY_INTERFACE (cm, iMeshObjectFactory));
   cm->DecRef ();

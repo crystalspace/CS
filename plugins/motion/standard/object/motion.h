@@ -26,6 +26,8 @@
 #include "csutil/parray.h"
 #include "csgeom/quaterni.h"
 
+struct iVirtualClock;
+
 struct csMotionFrame
 {
   float frametime;
@@ -163,6 +165,7 @@ class csMotionManager : public iMotionManager
   csMotionControllerVector controllers;
 
   iObjectRegistry* object_reg;
+  csRef<iVirtualClock> vc;
 
 public:
   SCF_DECLARE_IBASE;

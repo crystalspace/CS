@@ -61,6 +61,8 @@ struct iVirtualClock : public iBase
 
   /**
    * Returns the absolute time of the last call to Advance().
+   * For game logic you should always use this function instead of
+   * csGetTicks().
    */
   virtual csTicks GetCurrentTicks () const = 0;
 };

@@ -26,6 +26,7 @@
 #include "iutil/comp.h"
 
 struct iObjectRegistry;
+struct iVirtualClock;
 
 
 class csSequence : public iSequence
@@ -139,6 +140,7 @@ class csSequenceManager : public iSequenceManager
 {
 private:
   iObjectRegistry *object_reg;
+  csRef<iVirtualClock> vc;
 
   // The sequence manager uses one big sequence to keep all queued
   // sequence operations. New sequences will be merged with this one.
@@ -181,7 +183,7 @@ public:
   {
     SCF_DECLARE_EMBEDDED_IBASE(csSequenceManager);
     virtual bool Initialize (iObjectRegistry* p)
-    { return scfParent->Initialize(p); }
+    { return scfParent->Initialize (p); }
   } scfiComponent;
   struct EventHandler : public iEventHandler
   {
@@ -194,7 +196,7 @@ public:
       EventHandler::parent = parent;
     }
     SCF_DECLARE_IBASE;
-    virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent(e); }
+    virtual bool HandleEvent (iEvent& e) { return parent->HandleEvent (e); }
   } * scfiEventHandler;
 };
 

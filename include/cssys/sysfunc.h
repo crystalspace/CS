@@ -75,7 +75,13 @@ int csPrintf (const char* str, ...) CS_GNUC_PRINTF (1, 2);
 /// CS version of vprintf
 int csPrintfV (const char* str, va_list arg) CS_GNUC_PRINTF (1, 0);
 
-/// Get the current tick count.
+/**
+ * Get the current tick count. Warning! Do NOT use this function for
+ * controlling game logic speed. To do that you should use the virtual
+ * clock (iVirtualClock) which you can get from the object registry. By
+ * using the virtual clock it will be possible to control the speed of your
+ * game and also to pause it if needed.
+ */
 csTicks csGetTicks ();
 
 /**

@@ -21,6 +21,8 @@
 #include "motion.h"
 #include "csgeom/transfrm.h"
 #include "csutil/hashmap.h"
+#include "iutil/virtclk.h"
+#include "iutil/objreg.h"
 
 //#define MOTION_DEBUG
 
@@ -450,6 +452,7 @@ csMotionManager::~csMotionManager()
 bool csMotionManager::Initialize (iObjectRegistry* object_reg)
 {
   csMotionManager::object_reg = object_reg;
+  vc = CS_QUERY_REGISTRY (object_reg, iVirtualClock);
   return true;
 }
 
@@ -573,7 +576,7 @@ void csMotionManager::UpdateAll( unsigned int curtime )
 
 void csMotionManager::UpdateAll()
 {
-  csTicks newtime = csGetTicks ();
+  csTicks newtime = vc->GetCurrentTicks ();
   UpdateAll( newtime );
 }
 
