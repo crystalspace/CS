@@ -396,7 +396,7 @@ void SimpleConsole::Print (csRect* area)
     Gfx2D->Write (x, y, fc, bc, s);				\
     if (area)							\
     {								\
-      int tw, th;						\
+      int tw;						\
       System->piGI->GetTextWidth (tw, console_font, s);		\
       area->Union (x, y, x + tw, y + th);			\
     }								\
