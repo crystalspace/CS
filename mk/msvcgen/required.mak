@@ -54,6 +54,8 @@ MSVC.PLUGINS.REQUIRED =         \
   filesys/vfs			\
   font/server/freefnt2          \
   mesh/impexp/3ds               \
+  mesh/sprcal3d/object          \
+  mesh/sprcal3d/persist         \
   net/driver/socket		\
   net/driver/ensocket		\
   physics/odedynam              \

@@ -28,6 +28,8 @@ chronological order.
 	  csPDelArray.
         - Philip Wyett changed sprcal3d plugin to link with cal3d lib and
           not the ode lib under MSVC as it was previously.
+        - Philip Wyett add sprcal3d and it's loader plugin(s), to default
+          MSVC build - required.mak.
 9-Aug-2003
         - Philip Wyett moved int j out of 'for' loop within
           csSpriteCal3DMeshObject::DetachCoreMesh () and fixed compile error.
