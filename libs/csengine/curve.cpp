@@ -18,7 +18,7 @@
 
 #include "cssysdef.h"
 #include "qint.h"
-#include "csgeom/fastsqrt.h"
+#include "qsqrt.h"
 #include "csengine/bezier.h"
 #include "csengine/curve.h"
 #include "csengine/polyset.h"
@@ -400,7 +400,7 @@ void csCurve::ShineDynLight (csLightPatch* lp)
 
       d = csSquaredDist::PointPoint (light->GetCenter (), pos);
       if (d >= light->GetSquaredRadius ()) continue;
-      d = FastSqrt (d);
+      d = qsqrt (d);
       normal = _uv2Normal[uv];
       float cosinus = (pos-light->GetCenter ())*normal;
       cosinus /= d;
@@ -587,7 +587,7 @@ void csCurve::CalculateLighting (csFrustumView& lview)
 
         d = csSquaredDist::PointPoint (light->GetCenter (), pos);
         if (d >= light->GetSquaredRadius ()) continue;
-        d = FastSqrt (d);
+        d = qsqrt (d);
 
         normal = _uv2Normal[uv];
         float cosinus = (pos-light->GetCenter ())*normal;

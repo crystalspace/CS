@@ -21,6 +21,7 @@
 #include <float.h>
 #include "cssysdef.h"
 #include "qint.h"
+#include "qsqrt.h"
 #include "csgeom/math3d.h"
 #include "csgeom/math3d_d.h"
 #include "csgeom/matrix3.h"
@@ -159,9 +160,11 @@ void csMath3::Between (const csVector3& v1, const csVector3& v2,
     pct /= 100.;
   else
   {
-    float dist = sqrt((v1-v2)*(v1-v2));
-    if (dist == 0) return;
-    pct = wid/dist;
+    float invdist = qisqrt((v1-v2)*(v1-v2));
+    pct = wid*invdist;
+    //float dist = sqrt((v1-v2)*(v1-v2));
+    //if (dist == 0) return;
+    //pct = wid/dist;
   }
   v = v1 + pct*(v2-v1);
 }

@@ -33,6 +33,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/vector3.h"
 #include "csgeom/frustum.h"
+#include "qsqrt.h"
 #include "iimage.h"
 #include "ilghtmap.h"
 #include "itexture.h"
@@ -1493,7 +1494,7 @@ void csRadiosity :: ShootPatch(int rx, int ry, int ruv)
   // Now we need to correct the cosinus factor so that it
   // really represents a cosinus.
   if(distance < 0.1f) return; // also prevents divide by zero
-  float inv_distance = 1./sqrt(distance);
+  float inv_distance = qisqrt (distance);
   path *= inv_distance;
   cosdestangle *= inv_distance;
   

@@ -42,15 +42,8 @@
 #include "csengine/terrlod.h"
 #include "csengine/dumper.h"
 #include "csengine/keyval.h"
-#include "csengine/particle.h"
 #include "csengine/region.h"
 #include "csengine/halo.h"
-#include "csfx/partexp.h"
-#include "csfx/partfire.h"
-#include "csfx/partspir.h"
-#include "csfx/partsnow.h"
-#include "csfx/partfoun.h"
-#include "csfx/partrain.h"
 #include "csutil/parser.h"
 #include "csutil/scanstr.h"
 #include "csutil/token.h"
@@ -112,7 +105,6 @@ int csLoaderStat::sounds_loaded   = 0;
 
 // Define all tokens used through this file
 CS_TOKEN_DEF_START
-  CS_TOKEN_DEF (ACCEL)
   CS_TOKEN_DEF (ACTION)
   CS_TOKEN_DEF (ACTIVATE)
   CS_TOKEN_DEF (ACTIVE)
@@ -122,7 +114,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (AMBIENT)
   CS_TOKEN_DEF (ANIM)
   CS_TOKEN_DEF (ATTENUATION)
-  CS_TOKEN_DEF (AZIMUTH)
   CS_TOKEN_DEF (BECOMING_ACTIVE)
   CS_TOKEN_DEF (BECOMING_INACTIVE)
   CS_TOKEN_DEF (BEZIER)
@@ -138,7 +129,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (COLLECTION)
   CS_TOKEN_DEF (COLOR)
   CS_TOKEN_DEF (COLORS)
-  CS_TOKEN_DEF (COLORSCALE)
   CS_TOKEN_DEF (CONVEX)
   CS_TOKEN_DEF (COPY)
   CS_TOKEN_DEF (COSFACT)
@@ -149,15 +139,11 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (DIFFUSE)
   CS_TOKEN_DEF (DIM)
   CS_TOKEN_DEF (DITHER)
-  CS_TOKEN_DEF (DROPSIZE)
   CS_TOKEN_DEF (DYNAMIC)
-  CS_TOKEN_DEF (ELEVATION)
   CS_TOKEN_DEF (EULER)
   CS_TOKEN_DEF (F)
-  CS_TOKEN_DEF (FALLTIME)
   CS_TOKEN_DEF (FILE)
   CS_TOKEN_DEF (FILTER)
-  CS_TOKEN_DEF (FIRE)
   CS_TOKEN_DEF (FIRST)
   CS_TOKEN_DEF (FIRST_LEN)
   CS_TOKEN_DEF (FLAT)
@@ -169,7 +155,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (FOG)
   CS_TOKEN_DEF (FOR_2D)
   CS_TOKEN_DEF (FOR_3D)
-  CS_TOKEN_DEF (FOUNTAIN)
   CS_TOKEN_DEF (FRAME)
   CS_TOKEN_DEF (GOURAUD)
   CS_TOKEN_DEF (HALO)
@@ -202,8 +187,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MULTIPLY2)
   CS_TOKEN_DEF (NODE)
   CS_TOKEN_DEF (NONE)
-  CS_TOKEN_DEF (NUMBER)
-  CS_TOKEN_DEF (OPENING)
   CS_TOKEN_DEF (ORIG)
   CS_TOKEN_DEF (ORIGIN)
   CS_TOKEN_DEF (PARAMS)
@@ -217,7 +200,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (PRIMARY_INACTIVE)
   CS_TOKEN_DEF (PROCEDURAL)
   CS_TOKEN_DEF (RADIUS)
-  CS_TOKEN_DEF (RAIN)
   CS_TOKEN_DEF (REFLECTION)
   CS_TOKEN_DEF (REGION)
   CS_TOKEN_DEF (ROOM)
@@ -241,17 +223,14 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (SKY)
   CS_TOKEN_DEF (SKYDOME)
   CS_TOKEN_DEF (SMOOTH)
-  CS_TOKEN_DEF (SNOW)
   CS_TOKEN_DEF (SOUND)
   CS_TOKEN_DEF (SOUNDS)
-  CS_TOKEN_DEF (SPEED)
   CS_TOKEN_DEF (SPLIT)
   CS_TOKEN_DEF (SPRITE)
   CS_TOKEN_DEF (START)
   CS_TOKEN_DEF (STATBSP)
   CS_TOKEN_DEF (STATELESS)
   CS_TOKEN_DEF (STATIC)
-  CS_TOKEN_DEF (SWIRL)
   CS_TOKEN_DEF (CLONE)
   CS_TOKEN_DEF (TEMPLATE)
   CS_TOKEN_DEF (TERRAIN)
@@ -268,7 +247,6 @@ CS_TOKEN_DEF_START
   CS_TOKEN_DEF (MOTION)
   CS_TOKEN_DEF (Q)
   CS_TOKEN_DEF (THING)
-  CS_TOKEN_DEF (TOTALTIME)
   CS_TOKEN_DEF (TRANSFORM)
   CS_TOKEN_DEF (TRANSPARENT)
   CS_TOKEN_DEF (TRIANGLE)
@@ -719,388 +697,6 @@ UInt ParseMixmode (char* buf)
     fatal_exit (0, false);
   }
   return Mixmode;
-}
-
-//---------------------------------------------------------------------------
-
-csParticleSystem* csLoader::load_fountain (char* name, char* buf)
-{
-  CS_TOKEN_TABLE_START(commands)
-    CS_TOKEN_TABLE (TEXTURE)
-    CS_TOKEN_TABLE (ORIGIN)
-    CS_TOKEN_TABLE (ACCEL)
-    CS_TOKEN_TABLE (SPEED)
-    CS_TOKEN_TABLE (FALLTIME)
-    CS_TOKEN_TABLE (COLOR)
-    CS_TOKEN_TABLE (OPENING)
-    CS_TOKEN_TABLE (AZIMUTH)
-    CS_TOKEN_TABLE (ELEVATION)
-    CS_TOKEN_TABLE (DROPSIZE)
-    CS_TOKEN_TABLE (LIGHTING)
-    CS_TOKEN_TABLE (NUMBER)
-    CS_TOKEN_TABLE (MIXMODE)
-  CS_TOKEN_TABLE_END
-
-  long cmd;
-  char* params;
-
-  char str[255];
-  int number = 50;
-  csMaterialWrapper* material = NULL;
-  UInt mixmode = CS_FX_ADD;
-  int lighted_particles = 0;
-  float drop_width = .1;
-  float drop_height = .1;
-  csVector3 origin (0);
-  csVector3 accel (0, -1.0, 0);
-  float fall_time = 5.0;
-  float speed = 3.0;
-  float opening = 0.2;
-  float azimuth = 0.0;
-  float elevation = 3.1415926535/2.;
-  csColor color (.25, .25, .25);
-
-  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
-  {
-    switch (cmd)
-    {
-      case CS_TOKEN_NUMBER:
-        ScanStr (params, "%d", &number);
-        break;
-      case CS_TOKEN_TEXTURE: //@@@MAT
-        ScanStr (params, "%s", str);
-        material = FindMaterial (str, onlyRegion);
-        if (material == NULL)
-        {
-          CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
-          fatal_exit (0, true);
-        }
-        break;
-      case CS_TOKEN_MIXMODE:
-        mixmode = ParseMixmode (params);
-        break;
-      case CS_TOKEN_LIGHTING:
-        ScanStr (params, "%b", &lighted_particles);
-        break;
-      case CS_TOKEN_DROPSIZE:
-        ScanStr (params, "%f,%f", &drop_width, &drop_height);
-	break;
-      case CS_TOKEN_ORIGIN:
-        ScanStr (params, "%f,%f,%f", &origin.x, &origin.y, &origin.z);
-        break;
-      case CS_TOKEN_ACCEL:
-        ScanStr (params, "%f,%f,%f", &accel.x, &accel.y, &accel.z);
-        break;
-      case CS_TOKEN_ELEVATION:
-        ScanStr (params, "%f", &elevation);
-        break;
-      case CS_TOKEN_AZIMUTH:
-        ScanStr (params, "%f", &azimuth);
-        break;
-      case CS_TOKEN_OPENING:
-        ScanStr (params, "%f", &opening);
-        break;
-      case CS_TOKEN_SPEED:
-        ScanStr (params, "%f", &speed);
-        break;
-      case CS_TOKEN_FALLTIME:
-        ScanStr (params, "%f", &fall_time);
-        break;
-      case CS_TOKEN_COLOR:
-        ScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
-        break;
-    }
-    if (cmd == CS_PARSERR_TOKENNOTFOUND)
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a fountain!\n", csGetLastOffender ());
-      fatal_exit (0, false);
-    }
-  }
-
-  if (material == NULL)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "A fountain requires a material!\n");
-    fatal_exit (0, false);
-  }
-
-  csFountainParticleSystem* partsys = new csFountainParticleSystem (
-  	Engine, number, material, mixmode, lighted_particles, drop_width,
-	drop_height, origin, accel, fall_time, speed, opening,
-	azimuth, elevation);
-  partsys->SetName (name);
-  partsys->SetColor (color);
-  return partsys;
-}
-
-csParticleSystem* csLoader::load_fire (char* name, char* buf)
-{
-  CS_TOKEN_TABLE_START(commands)
-    CS_TOKEN_TABLE (TEXTURE)
-    CS_TOKEN_TABLE (ORIGIN)
-    CS_TOKEN_TABLE (SPEED)
-    CS_TOKEN_TABLE (COLORSCALE)
-    CS_TOKEN_TABLE (DROPSIZE)
-    CS_TOKEN_TABLE (LIGHTING)
-    CS_TOKEN_TABLE (NUMBER)
-    CS_TOKEN_TABLE (MIXMODE)
-    CS_TOKEN_TABLE (SWIRL)
-    CS_TOKEN_TABLE (TOTALTIME)
-  CS_TOKEN_TABLE_END
-
-  long cmd;
-  char* params;
-
-  char str[255];
-  int number = 50;
-  csMaterialWrapper* material = NULL;
-  UInt mixmode = CS_FX_ADD;
-  int lighted_particles = 0;
-  float drop_width = .1;
-  float drop_height = .1;
-  csVector3 origin (0);
-  float total_time = 3.0;
-  csVector3 speed (0, 0.5, 0);
-  float colorscale = .35;
-  float swirl = 0.3;
-
-  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
-  {
-    switch (cmd)
-    {
-      case CS_TOKEN_NUMBER:
-        ScanStr (params, "%d", &number);
-        break;
-      case CS_TOKEN_TEXTURE:
-        ScanStr (params, "%s", str);
-        material = FindMaterial (str, onlyRegion);
-        if (material == NULL)
-        {
-          CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
-          fatal_exit (0, true);
-        }
-        break;
-      case CS_TOKEN_MIXMODE:
-        mixmode = ParseMixmode (params);
-        break;
-      case CS_TOKEN_LIGHTING:
-        ScanStr (params, "%b", &lighted_particles);
-        break;
-      case CS_TOKEN_DROPSIZE:
-        ScanStr (params, "%f,%f", &drop_width, &drop_height);
-	break;
-      case CS_TOKEN_ORIGIN:
-        ScanStr (params, "%f,%f,%f", &origin.x, &origin.y, &origin.z);
-        break;
-      case CS_TOKEN_SWIRL:
-        ScanStr (params, "%f", &swirl);
-        break;
-      case CS_TOKEN_TOTALTIME:
-        ScanStr (params, "%f", &total_time);
-        break;
-      case CS_TOKEN_COLORSCALE:
-        ScanStr (params, "%f", &colorscale);
-        break;
-      case CS_TOKEN_SPEED:
-        ScanStr (params, "%f,%f,%f", &speed.x, &speed.y, &speed.z);
-        break;
-    }
-    if (cmd == CS_PARSERR_TOKENNOTFOUND)
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a fountain!\n", csGetLastOffender ());
-      fatal_exit (0, false);
-    }
-  }
-
-  if (material == NULL)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "A fire requires a material!\n");
-    fatal_exit (0, false);
-  }
-
-  csFireParticleSystem* partsys = new csFireParticleSystem (
-  	Engine, number, material, mixmode, lighted_particles, drop_width,
-	drop_height, total_time, speed, origin, swirl, colorscale);
-  partsys->SetName (name);
-  return partsys;
-}
-
-csParticleSystem* csLoader::load_rain (char* name, char* buf)
-{
-  CS_TOKEN_TABLE_START(commands)
-    CS_TOKEN_TABLE (TEXTURE)
-    CS_TOKEN_TABLE (BOX)
-    CS_TOKEN_TABLE (SPEED)
-    CS_TOKEN_TABLE (COLOR)
-    CS_TOKEN_TABLE (DROPSIZE)
-    CS_TOKEN_TABLE (LIGHTING)
-    CS_TOKEN_TABLE (NUMBER)
-    CS_TOKEN_TABLE (MIXMODE)
-  CS_TOKEN_TABLE_END
-
-  long cmd;
-  char* params;
-
-  char str[255];
-  int number = 400;
-  csMaterialWrapper* material = NULL;
-  UInt mixmode = CS_FX_ADD;
-  int lighted_particles = 0;
-  float drop_width = .3/50.;
-  float drop_height = .3;
-  csVector3 speed (0, -2, 0);
-  csBox3 box (-1, -1, -1, 1, 1, 1);
-  csColor color (.25, .25, .25);
-
-  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
-  {
-    switch (cmd)
-    {
-      case CS_TOKEN_NUMBER:
-        ScanStr (params, "%d", &number);
-        break;
-      case CS_TOKEN_TEXTURE:
-        ScanStr (params, "%s", str);
-        material = FindMaterial (str, onlyRegion);
-        if (material == NULL)
-        {
-          CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
-          fatal_exit (0, true);
-        }
-        break;
-      case CS_TOKEN_MIXMODE:
-        mixmode = ParseMixmode (params);
-        break;
-      case CS_TOKEN_LIGHTING:
-        ScanStr (params, "%b", &lighted_particles);
-        break;
-      case CS_TOKEN_DROPSIZE:
-        ScanStr (params, "%f,%f", &drop_width, &drop_height);
-	break;
-      case CS_TOKEN_BOX:
-      {
-        float x1, y1, z1, x2, y2, z2;
-        ScanStr (params, "%f,%f,%f,%f,%f,%f", &x1, &y1, &z1, &x2, &y2, &z2);
-	box.Set (x1, y1, z1, x2, y2, z2);
-        break;
-      }
-      case CS_TOKEN_SPEED:
-        ScanStr (params, "%f,%f,%f", &speed.x, &speed.y, &speed.z);
-        break;
-      case CS_TOKEN_COLOR:
-        ScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
-        break;
-    }
-    if (cmd == CS_PARSERR_TOKENNOTFOUND)
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a fountain!\n", csGetLastOffender ());
-      fatal_exit (0, false);
-    }
-  }
-
-  if (material == NULL)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Rain requires a material!\n");
-    fatal_exit (0, false);
-  }
-
-  csRainParticleSystem* partsys = new csRainParticleSystem (
-  	Engine, number, material, mixmode, lighted_particles, drop_width,
-	drop_height, box.Min (), box.Max (), speed);
-  partsys->SetName (name);
-  partsys->SetColor (color);
-  return partsys;
-}
-
-csParticleSystem* csLoader::load_snow (char* name, char* buf)
-{
-  CS_TOKEN_TABLE_START(commands)
-    CS_TOKEN_TABLE (TEXTURE)
-    CS_TOKEN_TABLE (BOX)
-    CS_TOKEN_TABLE (SPEED)
-    CS_TOKEN_TABLE (COLOR)
-    CS_TOKEN_TABLE (DROPSIZE)
-    CS_TOKEN_TABLE (LIGHTING)
-    CS_TOKEN_TABLE (NUMBER)
-    CS_TOKEN_TABLE (MIXMODE)
-    CS_TOKEN_TABLE (SWIRL)
-  CS_TOKEN_TABLE_END
-
-  long cmd;
-  char* params;
-
-  char str[255];
-  int number = 400;
-  csMaterialWrapper* material = NULL;
-  UInt mixmode = CS_FX_ADD;
-  int lighted_particles = 0;
-  float drop_width = .1;
-  float drop_height = .1;
-  csVector3 speed (0, -.3, 0);
-  float swirl = .2;
-  csBox3 box (-1, -1, -1, 1, 1, 1);
-  csColor color (.25, .25, .25);
-
-  while ((cmd = csGetCommand (&buf, commands, &params)) > 0)
-  {
-    switch (cmd)
-    {
-      case CS_TOKEN_NUMBER:
-        ScanStr (params, "%d", &number);
-        break;
-      case CS_TOKEN_TEXTURE:
-        ScanStr (params, "%s", str);
-        material = FindMaterial (str, onlyRegion);
-        if (material == NULL)
-        {
-          CsPrintf (MSG_WARNING, "Couldn't find material named '%s'!\n", str);
-          fatal_exit (0, true);
-        }
-        break;
-      case CS_TOKEN_MIXMODE:
-        mixmode = ParseMixmode (params);
-        break;
-      case CS_TOKEN_LIGHTING:
-        ScanStr (params, "%b", &lighted_particles);
-        break;
-      case CS_TOKEN_DROPSIZE:
-        ScanStr (params, "%f,%f", &drop_width, &drop_height);
-	break;
-      case CS_TOKEN_SWIRL:
-        ScanStr (params, "%f", &swirl);
-	break;
-      case CS_TOKEN_BOX:
-      {
-        float x1, y1, z1, x2, y2, z2;
-        ScanStr (params, "%f,%f,%f,%f,%f,%f", &x1, &y1, &z1, &x2, &y2, &z2);
-	box.Set (x1, y1, z1, x2, y2, z2);
-        break;
-      }
-      case CS_TOKEN_SPEED:
-        ScanStr (params, "%f,%f,%f", &speed.x, &speed.y, &speed.z);
-        break;
-      case CS_TOKEN_COLOR:
-        ScanStr (params, "%f,%f,%f", &color.red, &color.green, &color.blue);
-        break;
-    }
-    if (cmd == CS_PARSERR_TOKENNOTFOUND)
-    {
-      CsPrintf (MSG_FATAL_ERROR, "Token '%s' not found while parsing a fountain!\n", csGetLastOffender ());
-      fatal_exit (0, false);
-    }
-  }
-
-  if (material == NULL)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Snow requires a material!\n");
-    fatal_exit (0, false);
-  }
-
-  csSnowParticleSystem* partsys = new csSnowParticleSystem (
-  	Engine, number, material, mixmode, lighted_particles, drop_width,
-	drop_height, box.Min (), box.Max (), speed, swirl);
-  partsys->SetName (name);
-  partsys->SetColor (color);
-  return partsys;
 }
 
 csStatLight* csLoader::load_statlight (char* name, char* buf)
@@ -2958,10 +2554,6 @@ csSector* csLoader::load_room (char* secname, char* buf)
     CS_TOKEN_TABLE (SPRITE)
     CS_TOKEN_TABLE (MESHOBJ)
     CS_TOKEN_TABLE (FOG)
-    CS_TOKEN_TABLE (FOUNTAIN)
-    CS_TOKEN_TABLE (RAIN)
-    CS_TOKEN_TABLE (SNOW)
-    CS_TOKEN_TABLE (FIRE)
     CS_TOKEN_TABLE (KEY)
   CS_TOKEN_TABLE_END
 
@@ -3028,7 +2620,6 @@ csSector* csLoader::load_room (char* secname, char* buf)
   float r;
 
   char str[255];
-  csParticleSystem* partsys;
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
@@ -3164,26 +2755,6 @@ csSector* csLoader::load_room (char* secname, char* buf)
         break;
       case CS_TOKEN_KEY:
         load_key (params, sector);
-        break;
-      case CS_TOKEN_FIRE:
-        partsys = load_fire (name, params);
-	partsys->GetMovable ().SetSector (sector);
-	partsys->GetMovable ().UpdateMove ();
-        break;
-      case CS_TOKEN_FOUNTAIN:
-        partsys = load_fountain (name, params);
-	partsys->GetMovable ().SetSector (sector);
-	partsys->GetMovable ().UpdateMove ();
-        break;
-      case CS_TOKEN_RAIN:
-        partsys = load_rain (name, params);
-	partsys->GetMovable ().SetSector (sector);
-	partsys->GetMovable ().UpdateMove ();
-        break;
-      case CS_TOKEN_SNOW:
-        partsys = load_snow (name, params);
-	partsys->GetMovable ().SetSector (sector);
-	partsys->GetMovable ().UpdateMove ();
         break;
       case CS_TOKEN_MESHOBJ:
         {
@@ -3525,10 +3096,6 @@ csSector* csLoader::load_sector (char* secname, char* buf)
     CS_TOKEN_TABLE (TERRAIN)
     CS_TOKEN_TABLE (NODE)
     CS_TOKEN_TABLE (KEY)
-    CS_TOKEN_TABLE (FOUNTAIN)
-    CS_TOKEN_TABLE (RAIN)
-    CS_TOKEN_TABLE (SNOW)
-    CS_TOKEN_TABLE (FIRE)
     CS_TOKEN_TABLE (HARDMOVE)
     CS_TOKEN_TABLE (BEZIER)
     CS_TOKEN_TABLE (CURVECENTER)
@@ -3548,7 +3115,6 @@ csSector* csLoader::load_sector (char* secname, char* buf)
   sector->SetAmbientColor (csLight::ambient_red, csLight::ambient_green, csLight::ambient_blue);
 
   PSLoadInfo info;
-  csParticleSystem* partsys;
 
   while ((cmd = csGetObject (&buf, commands, &name, &params)) > 0)
   {
@@ -3567,26 +3133,6 @@ csSector* csLoader::load_sector (char* secname, char* buf)
         break;
       case CS_TOKEN_STATBSP:
         do_stat_bsp = true;
-        break;
-      case CS_TOKEN_FIRE:
-        partsys = load_fire (name, params);
-	partsys->GetMovable ().SetSector (sector);
-	partsys->GetMovable ().UpdateMove ();
-        break;
-      case CS_TOKEN_FOUNTAIN:
-        partsys = load_fountain (name, params);
-	partsys->GetMovable ().SetSector (sector);
-	partsys->GetMovable ().UpdateMove ();
-        break;
-      case CS_TOKEN_RAIN:
-        partsys = load_rain (name, params);
-	partsys->GetMovable ().SetSector (sector);
-	partsys->GetMovable ().UpdateMove ();
-        break;
-      case CS_TOKEN_SNOW:
-        partsys = load_snow (name, params);
-	partsys->GetMovable ().SetSector (sector);
-	partsys->GetMovable ().UpdateMove ();
         break;
       case CS_TOKEN_SKY:
         Engine->skies.Push (load_thing (name, params, sector, true, false));

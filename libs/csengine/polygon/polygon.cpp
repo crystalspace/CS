@@ -34,6 +34,7 @@
 #include "csutil/garray.h"
 #include "csgeom/matrix2.h"
 #include "qint.h"
+#include "qsqrt.h"
 #include "igraph3d.h"
 #include "itexture.h"
 #include "itxtmgr.h"
@@ -916,13 +917,12 @@ void csPolygon3D::PlaneNormal (float* yz, float* zx, float* xy)
     i1 = i;
   }
 
-  float d = sqrt (ayz*ayz + azx*azx + axy*axy);
+  float invd = qisqrt (ayz*ayz + azx*azx + axy*axy);
+  //if (d < SMALL_EPSILON) d = SMALL_EPSILON;
 
-  if (d < SMALL_EPSILON) d = SMALL_EPSILON;
-
-  *yz = ayz / d;
-  *zx = azx / d;
-  *xy = axy / d;
+  *yz = ayz * invd;
+  *zx = azx * invd;
+  *xy = axy * invd;
 }
 
 
@@ -1567,7 +1567,7 @@ void csPolygon3D::UpdateVertexLighting (csLight* light, const csColor& lcol,
     {
       float d = csSquaredDist::PointPoint (light->GetCenter (), Vwor (i));
       if (d >= light->GetSquaredRadius ()) continue;
-      d = sqrt (d);
+      d = qsqrt (d);
       float cosinus = (Vwor (i)-light->GetCenter ())*GetPolyPlane ()->Normal ();
       cosinus /= d;
       cosinus += cosfact;

@@ -29,10 +29,10 @@
 #include "csengine/bspbbox.h"
 #include "csengine/dumper.h"
 #include "csgeom/polyclip.h"
-#include "csgeom/fastsqrt.h"
 #include "csutil/garray.h"
 #include "csutil/rng.h"
 #include "igraph3d.h"
+#include "qsqrt.h"
 
 // Set the default lighting quality.
 // See header file for CS_SPR_LIGHTING_* definitions.
@@ -1427,8 +1427,8 @@ void csSprite3D::UpdateLightingFast (csLight** lights, int num_lights)
 
     csVector3 obj_light_pos = movable.GetTransform ().Other2This (wor_light_pos);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_center);
-    float obj_dist = FastSqrt (obj_sq_dist);
-    float wor_dist = FastSqrt (wor_sq_dist);
+    float inv_obj_dist = qisqrt (obj_sq_dist);
+    float wor_dist = qsqrt (wor_sq_dist);
 
     csVector3 obj_light_dir = (obj_light_pos - obj_center);
     light_bright_wor_dist = lights[light_num]->GetBrightnessAtDistance (wor_dist);
@@ -1451,7 +1451,7 @@ void csSprite3D::UpdateLightingFast (csLight** lights, int num_lights)
     light_color_b = light_color.blue;
 
     // NOTE: Doing this to get rid of a divide in the loop.
-    obj_dist = 1 / obj_dist;
+    //obj_dist = 1 / obj_dist;
 
     // The first light should have the ambient color added.
     if(light_num == 0)
@@ -1459,7 +1459,7 @@ void csSprite3D::UpdateLightingFast (csLight** lights, int num_lights)
       for (j = 0 ; j < num_texels ; j++)
       {
         // this obj_dist is not the obj_dist, see NOTE above.
-        cosinus = (obj_light_dir * tpl->GetNormal (tf_idx, j)) * obj_dist;
+        cosinus = (obj_light_dir * tpl->GetNormal (tf_idx, j)) * inv_obj_dist;
         cosinus_light = (cosinus * light_bright_wor_dist);
         vertex_colors[j].Set(light_color_r * cosinus_light + amb_r,
                              light_color_g * cosinus_light + amb_g,
@@ -1471,7 +1471,7 @@ void csSprite3D::UpdateLightingFast (csLight** lights, int num_lights)
       for (j = 0 ; j < num_texels ; j++)
       {
         // this obj_dist is not the obj_dist, see NOTE above.
-        cosinus = (obj_light_dir * tpl->GetNormal (tf_idx, j)) * obj_dist;
+        cosinus = (obj_light_dir * tpl->GetNormal (tf_idx, j)) * inv_obj_dist;
         cosinus_light = (cosinus * light_bright_wor_dist);
         vertex_colors[j].Add(light_color_r * cosinus_light,
                              light_color_g * cosinus_light,
@@ -1510,12 +1510,12 @@ void csSprite3D::UpdateLightingLQ (csLight** lights, int num_lights)
 
     csVector3 obj_light_pos = movable.GetTransform ().Other2This (wor_light_pos);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_center);
-    float in_obj_dist = 1 / FastSqrt (obj_sq_dist);
+    float in_obj_dist = qisqrt (obj_sq_dist);
 
     csVector3 obj_light_dir = (obj_light_pos - obj_center);
 
     csColor light_color = lights[i]->GetColor () * (256. / NORMAL_LIGHT_LEVEL)
-      * lights[i]->GetBrightnessAtDistance (FastSqrt (wor_sq_dist));
+      * lights[i]->GetBrightnessAtDistance (qsqrt (wor_sq_dist));
 
     for (j = 0 ; j < num_texels ; j++)
     {
@@ -1592,7 +1592,7 @@ void csSprite3D::UpdateLightingHQ (csLight** lights, int num_lights)
       // can be optimized somewhat.
       float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_vertex);
       float wor_sq_dist = csSquaredDist::PointPoint (wor_light_pos, wor_vertex);
-      float obj_dist = FastSqrt (obj_sq_dist);
+      float obj_dist = qsqrt (obj_sq_dist);
 
       csVector3 normal = tpl->GetNormal (tf_idx, j);
       if (tween_ratio)
@@ -1640,7 +1640,7 @@ bool csSprite3D::HitBeamObject (const csVector3& start, const csVector3& end,
     {
       if (pr)
       {
-        *pr = sqrt (csSquaredDist::PointPoint (start, isect) /
+        *pr = qsqrt (csSquaredDist::PointPoint (start, isect) /
 		csSquaredDist::PointPoint (start, end));
       }
       return true;

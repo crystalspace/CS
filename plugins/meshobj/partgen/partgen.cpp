@@ -20,7 +20,6 @@
 
 #include "cssysdef.h"
 #include "csgeom/matrix3.h"
-#include "csgeom/fastsqrt.h"
 #include "csgeom/transfrm.h"
 #include "plugins/meshobj/partgen/partgen.h"
 #include "imeshobj.h"

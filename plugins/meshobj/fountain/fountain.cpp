@@ -19,7 +19,6 @@
 
 #include "cssysdef.h"
 #include "csgeom/matrix3.h"
-#include "csgeom/fastsqrt.h"
 #include "plugins/meshobj/fountain/fountain.h"
 #include "imater.h"
 #include <math.h>

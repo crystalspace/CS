@@ -18,7 +18,6 @@
 
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
-#include "csgeom/fastsqrt.h"
 #include "plugins/meshobj/cube/cube.h"
 #include "imovable.h"
 #include "irview.h"
@@ -31,6 +30,7 @@
 #include "itranman.h"
 #include "ilight.h"
 #include "lightdef.h"
+#include "qsqrt.h"
 
 IMPLEMENT_IBASE (csCubeMeshObject)
   IMPLEMENTS_INTERFACE (iMeshObject)
@@ -261,12 +261,12 @@ void csCubeMeshObject::UpdateLighting (iLight** lights, int num_lights,
 
     csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
     float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, obj_center);
-    float in_obj_dist = 1 / FastSqrt (obj_sq_dist);
+    float in_obj_dist = qisqrt (obj_sq_dist);
 
     csVector3 obj_light_dir = (obj_light_pos - obj_center);
 
     csColor light_color = li->GetColor () * (256. / NORMAL_LIGHT_LEVEL)
-      * li->GetBrightnessAtDistance (FastSqrt (wor_sq_dist));
+      * li->GetBrightnessAtDistance (qsqrt (wor_sq_dist));
 
     for (i = 0 ; i < 8 ; i++)
     {

@@ -19,13 +19,13 @@
 
 #include "cssysdef.h"
 #include "csgeom/matrix3.h"
-#include "csgeom/fastsqrt.h"
 #include "plugins/meshobj/fire/fire.h"
 #include "imater.h"
 #include "ilight.h"
 #include "idlight.h"
 #include "isector.h"
 #include "iengine.h"
+#include "qsqrt.h"
 #include <math.h>
 #include <stdlib.h>
 

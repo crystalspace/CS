@@ -38,12 +38,8 @@
 #include "csengine/thing.h"
 #include "csengine/cspixmap.h"
 #include "csengine/collider.h"
-#include "csengine/particle.h"
 #include "csengine/meshobj.h"
 #include "csengine/region.h"
-#include "csfx/partspir.h"
-#include "csfx/partsnow.h"
-#include "csfx/partrain.h"
 #include "csutil/scanstr.h"
 #include "csparser/impexp.h"
 #include "csobject/dataobj.h"
@@ -64,6 +60,9 @@
 #include "imfount.h"
 #include "imexplo.h"
 #include "imfire.h"
+#include "imsnow.h"
+#include "imrain.h"
+#include "imspiral.h"
 
 extern WalkTest* Sys;
 
@@ -135,14 +134,29 @@ void add_particles_rain (csSector* sector, char* matname, int num, float speed)
     bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i7));
     bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i8));
 
-    csRainParticleSystem* exp = new csRainParticleSystem (
-    	  Sys->view->GetEngine (), num,
-  	  mat, CS_FX_ADD, false, .3/50., .3,
-	  bbox.Min (), bbox.Max (),
-	  csVector3 (0, -speed, 0));
+    // @@@ Memory leak on factories!
+    iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.meshobj.rain",
+      	  "MeshObj", iMeshObjectType);
+    if (!type) type = LOAD_PLUGIN (System, "crystalspace.meshobj.rain",
+      	  "MeshObj", iMeshObjectType);
+    iMeshObjectFactory* factory = type->NewFactory ();
+    iMeshObject* mesh = factory->NewInstance ();
+    csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
+    Sys->view->GetEngine ()->sprites.Push (exp);
     exp->GetMovable ().SetSector (sector);
-    exp->SetColor (csColor (.25,.25,.25));
     exp->GetMovable ().UpdateMove ();
+
+    iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
+    partstate->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
+    partstate->SetMixMode (CS_FX_ADD);
+    partstate->SetColor (csColor (.25,.25,.25));
+
+    iRainState* rainstate = QUERY_INTERFACE (mesh, iRainState);
+    rainstate->SetNumberParticles (num);
+    rainstate->SetDropSize (.3/50., .3);
+    rainstate->SetLighting (false);
+    rainstate->SetBox (bbox.Min (), bbox.Max ());
+    rainstate->SetFallSpeed (csVector3 (0, -speed, 0));
   }
 }
 
@@ -195,14 +209,30 @@ void add_particles_snow (csSector* sector, char* matname, int num, float speed)
     bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i7));
     bbox.AddBoundingVertexSmart (pset->Vwor (pset_bbox->i8));
 
-    csSnowParticleSystem* exp = new csSnowParticleSystem (
-    	  Sys->view->GetEngine (), num,
-  	  mat, CS_FX_ADD, false, .07, .07,
-	  bbox.Min (), bbox.Max (),
-	  csVector3 (0, -speed, 0), .2);
+    // @@@ Memory leak on factories!
+    iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.meshobj.snow",
+      	  "MeshObj", iMeshObjectType);
+    if (!type) type = LOAD_PLUGIN (System, "crystalspace.meshobj.snow",
+      	  "MeshObj", iMeshObjectType);
+    iMeshObjectFactory* factory = type->NewFactory ();
+    iMeshObject* mesh = factory->NewInstance ();
+    csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
+    Sys->view->GetEngine ()->sprites.Push (exp);
     exp->GetMovable ().SetSector (sector);
-    exp->SetColor (csColor (.25,.25,.25));
     exp->GetMovable ().UpdateMove ();
+
+    iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
+    partstate->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
+    partstate->SetMixMode (CS_FX_ADD);
+    partstate->SetColor (csColor (.25,.25,.25));
+
+    iSnowState* snowstate = QUERY_INTERFACE (mesh, iSnowState);
+    snowstate->SetNumberParticles (num);
+    snowstate->SetDropSize (.07, .07);
+    snowstate->SetLighting (false);
+    snowstate->SetBox (bbox.Min (), bbox.Max ());
+    snowstate->SetFallSpeed (csVector3 (0, -speed, 0));
+    snowstate->SetSwirl (0.2);
   }
 }
 
@@ -355,19 +385,27 @@ void add_particles_spiral (csSector* sector, const csVector3& bottom, char* matn
     return;
   }
 
-  csSpiralParticleSystem* exp = new csSpiralParticleSystem (
-  	Sys->view->GetEngine (), 500,
-  	bottom, mat);
+  // @@@ Memory leak on factories!
+  iMeshObjectType* type = QUERY_PLUGIN_CLASS (System, "crystalspace.meshobj.spiral",
+      	"MeshObj", iMeshObjectType);
+  if (!type) type = LOAD_PLUGIN (System, "crystalspace.meshobj.spiral",
+      	"MeshObj", iMeshObjectType);
+  iMeshObjectFactory* factory = type->NewFactory ();
+  iMeshObject* mesh = factory->NewInstance ();
+  csMeshWrapper* exp = new csMeshWrapper (Sys->view->GetEngine (), mesh);
+  Sys->view->GetEngine ()->sprites.Push (exp);
   exp->GetMovable ().SetSector (sector);
-  //exp->SetSelfDestruct (3000);
-  exp->SetMixmode (CS_FX_SETALPHA (0.50));
-  //exp->SetChangeRotation(5.0);
-  //exp->SetChangeSize (1.25);
-  //exp->SetFadeSprites (500);
-  exp->SetColor( csColor(1,1,0) );
-  exp->SetChangeColor( csColor(+0.01,0.,-0.012) );
-  //exp->AddLight (Sys->engine, sector, 1000);
   exp->GetMovable ().UpdateMove ();
+
+  iParticleState* partstate = QUERY_INTERFACE (mesh, iParticleState);
+  partstate->SetMaterialWrapper (QUERY_INTERFACE (mat, iMaterialWrapper));
+  partstate->SetMixMode (CS_FX_SETALPHA (0.50));
+  partstate->SetColor (csColor (1, 1, 0));
+  partstate->SetChangeColor (csColor(+0.01,0.,-0.012));
+
+  iSpiralState* spirstate = QUERY_INTERFACE (mesh, iSpiralState);
+  spirstate->SetNumberParticles (500);
+  spirstate->SetSource (bottom);
 }
 
 //===========================================================================

@@ -19,7 +19,6 @@
 #define SYSDEF_ALLOCA
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
-#include "csgeom/fastsqrt.h"
 #include "plugins/meshobj/spr2d/spr2d.h"
 #include "imovable.h"
 #include "irview.h"
@@ -32,6 +31,7 @@
 #include "itranman.h"
 #include "ilight.h"
 #include "lightdef.h"
+#include "qsqrt.h"
 
 IMPLEMENT_IBASE (csSprite2DMeshObject)
   IMPLEMENTS_INTERFACE (iMeshObject)
@@ -102,7 +102,7 @@ void csSprite2DMeshObject::UpdateLighting (iLight** lights, int num_lights,
     float wor_sq_dist =
       csSquaredDist::PointPoint (wor_light_pos, pos);
     if (wor_sq_dist >= sq_light_radius) continue;
-    float wor_dist = sqrt (wor_sq_dist);
+    float wor_dist = qsqrt (wor_sq_dist);
     float cosinus = 1.;
     cosinus /= wor_dist;
     light_color *= cosinus * lights [i]->GetBrightnessAtDistance (wor_dist);

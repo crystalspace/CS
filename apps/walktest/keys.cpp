@@ -36,7 +36,6 @@
 #include "csengine/sector.h"
 #include "csengine/cspixmap.h"
 #include "csengine/collider.h"
-#include "csengine/particle.h"
 #include "csutil/scanstr.h"
 #include "csparser/impexp.h"
 #include "csobject/dataobj.h"

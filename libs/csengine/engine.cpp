@@ -48,7 +48,6 @@
 #include "csengine/quadtr3d.h"
 #include "csengine/lppool.h"
 #include "csengine/covtree.h"
-#include "csengine/particle.h"
 #include "csengine/radiosty.h"
 #include "csengine/region.h"
 #include "csgeom/fastsqrt.h"

@@ -20,7 +20,7 @@
 #define SYSDEF_ALLOCA
 #include "cssysdef.h"
 #include "qint.h"
-#include "csgeom/fastsqrt.h"
+#include "qsqrt.h"
 #include "csgeom/polyclip.h"
 #include "csgeom/polyaa.h"
 #include "csengine/polytext.h"
@@ -795,7 +795,7 @@ void csPolyTexture::FillLightMap (csFrustumView& lview)
       float d = csSquaredDist::PointPoint (lightpos, v);
       if (d >= light->GetSquaredRadius ()) continue;
 
-      d = FastSqrt (d);
+      d = qsqrt (d);
       hit = true;
 
       float cosinus = (v - lightpos) * polygon->GetPolyPlane ()->Normal ();
@@ -1030,7 +1030,7 @@ b:      if (scanL2 == MinIndex) goto finish;
 	  d = csSquaredDist::PointPoint (light->GetCenter (), v2);
 
 	  if (d >= light->GetSquaredRadius ()) continue;
-	  d = FastSqrt (d);
+	  d = qsqrt (d);
 
 	  //@@@ This is only right if we don't allow reflections for dynamic lights
 	  float cosinus = (v2-light->GetCenter ())*polygon->GetPolyPlane ()->Normal ();

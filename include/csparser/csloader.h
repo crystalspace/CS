@@ -91,14 +91,6 @@ class csLoader
   static csCollection* load_collection (char* name, char* buf);
   /// Parse a static light definition and return a new object
   static csStatLight* load_statlight (char* name, char* buf);
-  /// Parse a static fire definition and return a new object
-  static csParticleSystem* load_fire (char* name, char* buf);
-  /// Parse a static fountain definition and return a new object
-  static csParticleSystem* load_fountain (char* name, char* buf);
-  /// Parse a static rain definition and return a new object
-  static csParticleSystem* load_rain (char* name, char* buf);
-  /// Parse a static snow definition and return a new object
-  static csParticleSystem* load_snow (char* name, char* buf);
   /// Parse a key definition and return a new object
   static csKeyValuePair* load_key (char* buf, csObject* pParent);
   /// Parse a map node definition and return a new object

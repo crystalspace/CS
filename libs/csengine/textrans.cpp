@@ -20,6 +20,7 @@
 #include "cssysdef.h"
 #include "csgeom/math3d.h"
 #include "csengine/textrans.h"
+#include "qsqrt.h"
 
 //---------------------------------------------------------------------------
 
@@ -38,10 +39,10 @@ void TextureTrans::compute_texture_space (
 	float x1, float y1, float z1, float len1,
 	float A, float B, float C)
 {
-  float l1 = sqrt ((xo-x1)*(xo-x1) + (yo-y1)*(yo-y1) + (zo-z1)*(zo-z1));
-  x1 = (x1-xo) / l1;
-  y1 = (y1-yo) / l1;
-  z1 = (z1-zo) / l1;
+  float invl1 = qisqrt ((xo-x1)*(xo-x1) + (yo-y1)*(yo-y1) + (zo-z1)*(zo-z1));
+  x1 = (x1-xo) * invl1;
+  y1 = (y1-yo) * invl1;
+  z1 = (z1-zo) * invl1;
 
   float x2, y2, z2;
 
@@ -52,20 +53,20 @@ void TextureTrans::compute_texture_space (
   y2 = z1*A-x1*C;
   z2 = x1*B-y1*A;
 
-  float l2 = sqrt (x2*x2 + y2*y2 + z2*z2);
+  float invl2 = qisqrt (x2*x2 + y2*y2 + z2*z2);
 
   x1 *= len1;
   y1 *= len1;
   z1 *= len1;
-  x2 = x2*len1 / l2;
-  y2 = y2*len1 / l2;
-  z2 = z2*len1 / l2;
+  x2 = x2*len1 * invl2;
+  y2 = y2*len1 * invl2;
+  z2 = z2*len1 * invl2;
 
-  float l3 = sqrt (A*A + B*B + C*C);
+  float invl3 = qisqrt (A*A + B*B + C*C);
   float a, b, c;
-  a = A*len1 / l3;
-  b = B*len1 / l3;
-  c = C*len1 / l3;
+  a = A*len1 * invl3;
+  b = B*len1 * invl3;
+  c = C*len1 * invl3;
 
   compute_texture_space (m, v, xo, yo, zo, x1, y1, z1, x2, y2, z2, a, b, c);
 }
@@ -76,12 +77,12 @@ void TextureTrans::compute_texture_space (
 	const csVector3& v1, float len1,
 	const csVector3& v2, float len2)
 {
-  float l1 = sqrt (csSquaredDist::PointPoint (v_orig, v1));
-  if (ABS (l1) < SMALL_EPSILON) l1 = SMALL_EPSILON;
-  float l2 = sqrt (csSquaredDist::PointPoint (v_orig, v2));
-  if (ABS (l2) < SMALL_EPSILON) l2 = SMALL_EPSILON;
-  csVector3 v_u = (v1-v_orig) * len1 / l1;
-  csVector3 v_v = (v2-v_orig) * len2 / l2;
+  float invl1 = qisqrt (csSquaredDist::PointPoint (v_orig, v1));
+  //if (ABS (l1) < SMALL_EPSILON) l1 = SMALL_EPSILON;
+  float invl2 = qisqrt (csSquaredDist::PointPoint (v_orig, v2));
+  //if (ABS (l2) < SMALL_EPSILON) l2 = SMALL_EPSILON;
+  csVector3 v_u = (v1-v_orig) * len1 * invl1;
+  csVector3 v_v = (v2-v_orig) * len2 * invl2;
   csVector3 v_w = v_u % v_v;
   compute_texture_space (m, v,
 	v_orig.x, v_orig.y, v_orig.z,

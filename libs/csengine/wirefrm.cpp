@@ -19,6 +19,7 @@
 #include "cssysdef.h"
 #include "cstypes.h"
 #include "qint.h"
+#include "qsqrt.h"
 #include "csgeom/math3d.h"
 #include "csengine/wirefrm.h"
 #include "csengine/engine.h"
@@ -214,13 +215,12 @@ void csWfPolygon::Prepare ()
     i1 = i;
   }
 
-  float d = sqrt (A*A + B*B + C*C);
+  float invd = qisqrt (A*A + B*B + C*C);
+  //if (d < SMALL_EPSILON) d = SMALL_EPSILON;
 
-  if (d < SMALL_EPSILON) d = SMALL_EPSILON;
-
-  A /= d;
-  B /= d;
-  C /= d;
+  A *= invd;
+  B *= invd;
+  C *= invd;
 
   x = vertices[0].x;
   y = vertices[0].y;

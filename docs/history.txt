@@ -1,6 +1,45 @@
 The history order has been reversed so that new features are at the top.
 
+6-Jan-2001
+	- Created snow and rain mesh object plugins (for the snow and rain
+	  particle systems).
+	- Created iSnowState and iRainState interfaces to access these plugins.
+	- Modified WalkTest to use the new snow and rain plugins instead of
+	  the old particle systems in csfx.
+	- Finished the snow and rain loader plugins.
+	- Moved spiral particle system to plugin. Note that this particle
+	  system currently crashes. Also created the loader and modified
+	  WalkTest.
+	- Removed native support for loading particle systems in csloader.
+	  Particle systems are now loaded through the new MESHOBJ keyword
+	  and the plugins. This means that the flarge.zip you can find
+	  on the CS site will no longer work. I will soon put a replacement
+	  there.
+	- Removed dependency on CSFX library from most apps (all except
+	  simple) since the loader no longer depends on csfx itself.
+	- Removed particle support from csengine. All particles have now
+	  moved to plugins.
+	- Fixed the new qsqrt and qisqrt from Andrew. It appears that it
+	  was returning the negative square root. I negated the result.
+	  I modified several places in csengine and csgeom where either
+	  FastSqrt (the old one) and normal sqrt were used and replaced it
+	  with qsqrt() and qisqrt(). All seems to work well but in case
+	  something bad happens I added a define NO_QSQRT to include/qsqrt.h.
+	  If you enable this define the fast versions of qsqrt will not be
+	  used. I'd like to be notified of this if there are problems.
+	- Made a new ball plugin just for demonstration purposes and also
+	  because it is a very efficient way to make a ball :-)
+	  Extended simple application to show such a ball with a plasma
+	  texture on top of it (just turn around to see it). It looks
+	  really nice :-)
+	- Philip Wyett fixed several compile errors in demosky.
+	- Philip also fixed the ddraw canvas to actually open windowed
+	  when it is told to.
 5-Jan-2001
+	- Wouter Wijngaards Added a procedural skybox texture.
+	  And a demoing program (ala simple) to show it. 'demosky'.
+	  the bottom half of the skybox is filled with a mock watery splotch,
+	  the top half with clouds and a sunlighted spot.
 	- Wouter Wijngaards says: From Harald Fielker
 	  (fielker@informatik.fh-augsburg.de) I got an addition to csloader,
 	  a LoadThing and LoadThingTemplate methods. You can load a thing

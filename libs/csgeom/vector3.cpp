@@ -21,21 +21,24 @@
 #include <float.h>
 #include "cssysdef.h"
 #include "qint.h"
+#include "qsqrt.h"
 #include "csgeom/vector3.h"
 
 //---------------------------------------------------------------------------
 
 float csVector3::Norm () const
 { 
-  return sqrt (x*x + y*y + z*z); 
+  return qsqrt (x*x + y*y + z*z); 
 }
 
 void csVector3::Normalize ()
 {
-  float len;
-  len = this->Norm ();
-  if (len > SMALL_EPSILON)
-    *this /= len;
+  float invlen = qisqrt (x*x + y*y + z*z);
+  *this *= invlen;
+  //float len;
+  //len = this->Norm ();
+  //if (len > SMALL_EPSILON)
+    //*this /= len;
 }
 
 csVector3::csVector3 (const csDVector3& v)

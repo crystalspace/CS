@@ -26,6 +26,7 @@
 #include "csgeom/math3d.h"
 #include "csgeom/polyclip.h"
 #include "csparser/csloader.h"
+#include "qsqrt.h"
 #include "igraph3d.h"
 #include "itxtmgr.h"
 
@@ -163,7 +164,7 @@ void csLODTerrain::setupQuadTree (int x, int z, int width)
 {	
     int width2 = width/2;
 
-    float dis = sqrt((x - position[0]) * (x - position[0]) +
+    float dis = qsqrt((x - position[0]) * (x - position[0]) +
 			(z - position[2]) * (z - position[2]));
 
     float f = lod_c*d2Table[x][z];

@@ -19,12 +19,12 @@
 
 #include "cssysdef.h"
 #include "csgeom/matrix3.h"
-#include "csgeom/fastsqrt.h"
 #include "plugins/meshobj/explo/explo.h"
 #include "imater.h"
 #include "iengine.h"
 #include "idlight.h"
 #include "ilight.h"
+#include "qsqrt.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -70,8 +70,8 @@ void csExploMeshObject::SetupObject ()
     }
     startbox = bbox;
     radiusnow = 1.0;
-    maxspeed = FastSqrt (sqmaxspeed);
-    maxaccel = FastSqrt (sqmaxaccel);
+    maxspeed = qsqrt (sqmaxspeed);
+    maxaccel = qsqrt (sqmaxaccel);
     SetupColor ();
     SetupMixMode ();
   }

@@ -41,7 +41,6 @@
 #include "csengine/cspixmap.h"
 #include "csengine/radiosty.h"
 #include "csengine/collider.h"
-#include "csengine/particle.h"
 #include "csutil/scanstr.h"
 #include "csutil/csstring.h"
 #include "csutil/util.h"

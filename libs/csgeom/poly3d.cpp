@@ -17,6 +17,7 @@
 */
 
 #include "cssysdef.h"
+#include "qsqrt.h"
 #include "csgeom/poly3d.h"
 #include "csgeom/poly2d.h"
 
@@ -532,11 +533,11 @@ csVector3 csPoly3D::ComputeNormal (csVector3* vertices, int num)
     i1 = i;
   }
 
-  float d = sqrt (ayz*ayz + azx*azx + axy*axy);
-
-  if (d < SMALL_EPSILON) d = SMALL_EPSILON;
-
-  return csVector3 (ayz / d, azx / d, axy / d);
+  float invd = qisqrt (ayz*ayz + azx*azx + axy*axy);
+  return csVector3 (ayz * invd, azx * invd, axy * invd);
+  //float d = sqrt (ayz*ayz + azx*azx + axy*axy);
+  //if (d < SMALL_EPSILON) d = SMALL_EPSILON;
+  //return csVector3 (ayz / d, azx / d, axy / d);
 }
 
 csPlane3 csPoly3D::ComputePlane (csVector3* vertices, int num_vertices)
