@@ -543,6 +543,7 @@ int main (int argc, char *argv [])
   {
     char command [999];
     printf ("%s# ", VFS->GetCwd ());
+    fflush (stdout);
     if (!fgets (command, sizeof(command), stdin))
     {
       printf ("\r\n");
