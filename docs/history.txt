@@ -14,6 +14,12 @@ chronological order.
 	  to "install the CVS version of cal3d". This is especially important
 	  for our Unix users. We will also release an updated cs-win32libs
 	  package at the time of the CS 0.98r004 release.
+	- Eric Sunshine updated the cal3d "sufficiently recent" check in
+	  configure.ac so that it demands the latest CVS version of cal3d.
+	- Eric Sunshine added a <cmath> configure.ac check.  If present, then
+	  it is included by csdef.h before faking up cosf() and friends (if
+	  needed).  This works around potential problem where the faked-up
+	  functions could cause errors in <cmath> if it was later included.
 11-Aug-2004
 	- Oktal fixed a problem in the console input plugin where a '%' sign in
 	  the input would cause problems because of iConsoleOutput::PutText's

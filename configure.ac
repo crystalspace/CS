@@ -213,6 +213,10 @@ AS_IF([test -n "$NASM"],
 #------------------------------------------------------------------------------
 # Check for typical required libraries (libm, libmx, libdl, libnsl).
 #------------------------------------------------------------------------------
+AC_LANG_PUSH([C++])
+AC_CHECK_HEADER([cmath], [CS_HEADER_PROPERTY([CS_HAS_CMATH_H])])
+AC_LANG_POP([C++])
+
 AC_DEFUN([CS_CHECK_COMMON_LIBS],
     [AC_LANG_PUSH([C])
     AC_CHECK_LIB([m], [pow], [cs_cv_libm_libs=-lm], [cs_cv_libm_libs=])
@@ -1426,7 +1430,7 @@ AS_IF([test $cs_cv_libcal3d = yes],
     [CS_CHECK_BUILD([if cal3d is sufficiently recent], [cs_cv_cal3d_recent],
 	[AC_LANG_PROGRAM(
 	    [[#include <cal3d/cal3d.h>]],
-	    [CalModel m; m.getMixer()->removeAction(0);])],
+	    [CalCoreModel m; m.addAnimationName("",0);])],
 	[], [C++],
 	[CS_EMIT_BUILD_RESULT([cs_cv_libcal3d], [CAL3D])], [], [],
 	[$cs_cv_libcal3d_cflags],
