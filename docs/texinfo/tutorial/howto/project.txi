@@ -35,8 +35,13 @@ Crystal Space project directory.
 @cindex Makefile
 
 In the Crystal Space directory you will find the following file:
-@file{scripts/cs-config/Makefile.template}. Copy this file to the
-directory where your project is located and rename it to @file{Makefile}.
+
+@noindent
+@file{scripts/cs-config/Makefile.template}.
+
+@noindent
+Copy this file to the directory where your project is located and rename it to
+@file{Makefile}.
 
 @subsubheading @file{Makefile}
 
