@@ -23,7 +23,15 @@
 #include "csutil/scf.h"
 #include "iplugin.h"
 
+// forward declaration
 scfInterface iStrVector;
+
+/// Composite path divider
+#define VFS_PATH_DIVIDER        ','
+/// The "virtual" path separator
+#define VFS_PATH_SEPARATOR      '/'
+/// The maximal "virtual" path+filename length
+#define VFS_MAX_PATH_LEN        256
 
 /// File open mode mask
 #define VFS_FILE_MODE		0x0000000f

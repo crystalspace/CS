@@ -25,13 +25,6 @@
 #include "ivfs.h"
 #include "iplugin.h"
 
-// Composite path divider
-#define VFS_PATH_DIVIDER        ','
-// The "virtual" path separator
-#define VFS_PATH_SEPARATOR      '/'
-// The maximal "virtual" path+filename length
-#define VFS_MAX_PATH_LEN        256
-
 class VfsNode;
 class csIniFile;
 
