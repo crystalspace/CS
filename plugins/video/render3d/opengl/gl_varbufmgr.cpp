@@ -285,10 +285,13 @@ csVARRenderBuffer::csVARRenderBuffer(void *buffer, int size, CS_RENDERBUFFER_TYP
 
 csVARRenderBuffer::~csVARRenderBuffer()
 {
-  if (memblock)
+  if (memblock && type != CS_BUF_INDEX)
   {
     bm->render3d->ext.glFinishFenceNV(memblock->fence_id);
-    delete [] (char *)memblock->buffer;
+    bm->myalloc->free(memblock->buffer);
+  }else if(memblock && type == CS_BUF_INDEX)
+  {
+    delete memblock->buffer;
     delete memblock;
   }
 }
