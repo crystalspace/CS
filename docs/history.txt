@@ -10,6 +10,12 @@ chronological order.
 	- Eric Sunshine fixed crasher in csSimpleConsole::Initialize()
 	  (simpcon.cpp) where it would blindly access its G2D member without
 	  first checking if it had managed to actually locate a canvas.
+	- Eric Sunshine added check to configure.ac to determine how to disable
+	  warnings about uninitialized variables. The result of this check is
+	  useful for tool-generated code over which we have no control, and is
+	  now utilized when building Swig-generated code for Python and Perl.
+	  (To be fair to gcc, however, Swig _is_ generating crash-worthy code,
+	  so the warning message is warranted.)
 22-Apr-2004
 	- Jorrit removed motion and motldr from Jamrules for static
 	  compilation.

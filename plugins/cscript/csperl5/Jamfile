@@ -67,5 +67,7 @@ if $(PERL5.AVAILABLE) = "yes" && ! [ Property build : projgen ]
   LinkWith csperl5 : cstool csgfx csgeom csutil ;
   ExternalLibs csperl5 : PERL5 ;
   CFlags csperl5 :
-    [ FIncludes $(targetdir) ] $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) ;
+    [ FIncludes $(targetdir) ]
+    $(COMPILER.C++FLAGS.WARNING.NO_UNUSED)
+    $(COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED) ;
 }

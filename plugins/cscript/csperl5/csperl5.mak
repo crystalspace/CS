@@ -86,7 +86,8 @@ SWIG.PERL5.INSTALLPM = $(SWIG.PERL5.INSTALLDIR)/$(notdir $(SWIG.PERL5.PM))
 CEX.CSPERL5 = perl5.cex
 CIN.CSPERL5 = $(SRCDIR)/plugins/cscript/csperl5/perl5.cin
 
-PERL5.CFLAGS += $(CXXFLAGS.WARNING.NO_UNUSED)
+PERL5.CFLAGS += \
+  $(CXXFLAGS.WARNING.NO_UNUSED) $(CXXFLAGS.WARNING.NO_UNINITIALIZED)
 
 OUTDIRS += $(CSPERL5.DERIVED) $(SWIG.PERL5.INSTALLDIR)
 
@@ -209,8 +210,8 @@ install_cspace_pm: $(SWIG.PERL5.PM.IN)
 endif
 
 $(SWIG.PERL5.O): $(SWIG.PERL5.CPP)
-	$(filter-out -W -Wunused -Wall -Wmost,$(DO.COMPILE.CPP) \
-	$(PERL5.CFLAGS) -DPERL_POLLUTE $(CFLAGS.I)$(CSPERL5.DERIVED))
+	$(DO.COMPILE.CPP) $(PERL5.CFLAGS) -DPERL_POLLUTE \
+	$(CFLAGS.I)$(CSPERL5.DERIVED)
 
 # @@@ Kludge: We omit PREAMBLE and POSTAMBLE since we don't want metadata.
 # The more correct way to do this is to invoke Perl's own extension building

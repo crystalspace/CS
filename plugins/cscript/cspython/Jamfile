@@ -29,5 +29,7 @@ if $(PYTHON.AVAILABLE) = "yes"
   LinkWith cspython : cstool csgfx csgeom csutil ;
   ExternalLibs cspython : PYTHON ;
   CFlags cspython :
-    [ FDefines SWIG_GLOBAL ] $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) ;
+    [ FDefines SWIG_GLOBAL ]
+    $(COMPILER.C++FLAGS.WARNING.NO_UNUSED) 
+    $(COMPILER.C++FLAGS.WARNING.NO_UNINITIALIZED) ;
 }

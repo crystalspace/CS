@@ -65,7 +65,8 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-PYTHON.CFLAGS += -DSWIG_GLOBAL
+PYTHON.CFLAGS += -DSWIG_GLOBAL \
+  $(CXXFLAGS.WARNING.NO_UNUSED) $(CXXFLAGS.WARNING.NO_UNINITIALIZED)
 
 PYTHMOD.LFLAGS.PLATFORM += \
   $(foreach l,$(PYTHMOD.LIBS.PLATFORM),$(LFLAGS.l)$l) $(LIBBFD.LFLAGS)
@@ -156,7 +157,7 @@ clean: cspythonclean pythmodclean
 maintainerclean: cspythonmaintainerclean
 
 $(SWIG.CSPYTHON.OBJ): $(SWIG.CSPYTHON)
-	$(filter-out -W -Wunused -Wall -Wmost,$(DO.COMPILE.CPP) $(PYTHON.CFLAGS))
+	$(DO.COMPILE.CPP) $(PYTHON.CFLAGS)
 
 $(OUT)/%$O: $(SRCDIR)/plugins/cscript/cspython/%.cpp
 	$(DO.COMPILE.CPP) $(PYTHON.CFLAGS)
