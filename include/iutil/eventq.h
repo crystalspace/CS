@@ -88,7 +88,8 @@ struct iEventQueue : public iBase
    * events to the queue.  The module should implement the iEventPlug interface
    * and register that interface with this method.  In return, an iEventOutlet
    * object will be created which can be used to actually post events to the
-   * queue.
+   * queue.  It is the caller's responsibility to send a DecRef() message to
+   * the returned event outlet when it is no longer needed.
    */
   virtual iEventOutlet* CreateEventOutlet(iEventPlug*) = 0;
 
