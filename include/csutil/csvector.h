@@ -170,9 +170,9 @@ inline void csVector::QuickSort (int Mode)
  *   this vector are pointer to TYPE.
  */
 #define DECLARE_TYPED_VECTOR_WITH_BASE(NAME,TYPE,BASE)		\
-class NAME : protected BASE					\
-{								\
-public:								\
+  class NAME : protected BASE					\
+  {								\
+  public:							\
     NAME (int ilimit = 8, int ithreshold = 16) :		\
       BASE (ilimit, ithreshold) {}				\
     inline TYPE*& operator [] (int n)				\
@@ -201,7 +201,7 @@ public:								\
     { return BASE::Insert (n, Item); }				\
     virtual bool FreeItem (TYPE* Item)				\
     { return BASE::FreeItem (Item); }				\
-};
+  };
 
 #define DECLARE_TYPED_VECTOR(NAME,TYPE)				\
   DECLARE_TYPED_VECTOR_WITH_BASE (NAME,TYPE,csVector)
