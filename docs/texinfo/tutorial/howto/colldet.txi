@@ -1,11 +1,13 @@
 @c -*-texinfo-*-
 @node HOWTO Collision Detection, , HOWTO, HOWTO
 @subsection Doing Collision Detection
-@cindex iCollideSystem
-@cindex iCollider
-@cindex iPolygonMesh
-@cindex iObject
-@cindex iMeshWrapper
+@cindex @code{iCollideSystem}
+@cindex @code{iCollider}
+@cindex @code{iPolygonMesh}
+@cindex @code{iObject}
+@cindex @code{iMeshWrapper}
+@cindex collision detection
+@cindex RAPID
 
 Collision detection in CS is one of the more complicated issues. In this
 section I give a quick description of all the classes and interfaces in CS
@@ -111,4 +113,15 @@ detects when it is useful to do collision detection. You can use a bounding
 sphere for that. Also you should only do collision detection if the object
 moves.
 
+@subsubheading Limitation of RAPID
+
+The current @sc{RAPID} collision detection implementation has one
+important limitation. It assumes that the transform from object to world
+space will not change the size of the object. i.e. you cannot scale the
+object using the object to world transformation (which is kept in the
+@samp{iMovable}) and expect collision detection to be ok. The only way
+aroud this limitation is to use @code{HardTransform()} to transform
+the object space vertices itself. But this can of course not be used
+dynamically as you would have to recalculate the collider every time
+the object changes.
 

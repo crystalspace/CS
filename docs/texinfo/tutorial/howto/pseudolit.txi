@@ -1,0 +1,68 @@
+@c -*-texinfo-*-
+@node HOWTO Pseudo DynLight, , ,
+@subsection Pseudo-dynamic Lights
+@cindex pseudo-dynamic lights
+@cindex dynamic lights
+@cindex static lights
+
+One little known feature in CS is the ability to have pseudo-dynamic
+lights. Pseudo-dynamic lights are somewhere between static lights and
+dynamic lights. Static lights cannot move but they generate high quality
+lightmaps. Static lights can move but the quality of lighting is much
+less. Pseudo-dynamic lights are a variant of static lights. They cannot
+move either but they can change intensity and color dynamically. Since
+they also use lightmaps the quality is very good and they have correct
+shadows. Pseudo-dynamic lights are ideal for lights that can be switched
+on/off or possibly even for outside light that you want to turn off (at
+night). Note that the usage of pseudo-dynamic lights adds an additional
+shadow map to every polygon that is touched by that light. So memory
+usage can go up quickly.
+
+@subsubheading Creating a Pseudo-Dynamic Light
+
+To specify a pseudo-dynamic light in a map file you use the following
+syntax:
+
+@example
+  LIGHT 'DynLight' (
+    CENTER (23,1,5)
+    RADIUS (10)
+    COLOR (1,0,0)
+    DYNAMIC ()
+  )
+@end example
+
+In other words, the syntax is the same as for a normal light except for
+the @samp{DYNAMIC} keyword. Note that lights usually don't have a name
+but for a pseudo-dynamic light it is conveniant to have one since you can
+use that name to find the light later (which is essential if you want to
+change the color/intensity).
+
+To create a pseudo-dynamic light from within an application you can
+use the following code:
+
+@example
+  iStatLight* light = engine->CreateLight ("DynLight",
+  	csVector3 (23, 1, 5), 10, csColor (1, 0, 0), true);
+  sector->AddLight (light);
+@end example
+
+This will create exactly the same light as the one specified above.
+
+To find a light with a given name you can use:
+
+@example
+  iStatLight* light = engine->FindLight ("DynLight");
+@end example
+
+At some point you may want to change the color of the light. You can
+do this with the following code:
+
+@example
+  iStatLight* light;
+  iLight* il = light->QueryLight ();
+  il->SetColor (csColor (0, 0, 1));
+@end example
+
+This will change the color of the light from red to blue.
+

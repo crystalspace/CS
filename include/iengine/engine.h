@@ -127,7 +127,7 @@ struct iDataBuffer;
 #define CS_CULLER_COVTREE 2
 
 
-SCF_VERSION (iEngine, 0, 1, 23);
+SCF_VERSION (iEngine, 0, 1, 24);
 
 /**
  * This interface is the main interface to the 3D engine.
@@ -341,9 +341,9 @@ struct iEngine : public iPlugIn
 
   /// Create a new view on the engine.
   virtual iView* CreateView (iGraphics3D* g3d) = 0;
-  /// Create a static/pseudo-dynamic light.
-  virtual iStatLight* CreateLight (const csVector3& pos, float radius,
-  	const csColor& color, bool pseudoDyn) = 0;
+  /// Create a static/pseudo-dynamic light. name can be NULL.
+  virtual iStatLight* CreateLight (const char* name, const csVector3& pos,
+  	float radius, const csColor& color, bool pseudoDyn) = 0;
   /// Find a static/pseudo-dynamic light by name.
   virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false) = 0;
   /// Create a dynamic light.

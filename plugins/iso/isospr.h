@@ -34,8 +34,6 @@ private:
   csVector3 position;
   /// material to draw
   iMaterialWrapper *material;
-  /// mixmode to use
-  UInt mixmode;
   /// the 3d polygon in objectspace for the sprite
   csPoly3D poly;
   /// the (u,v) coordinates for the polygon (x=u, y=v)
@@ -68,8 +66,8 @@ public:
   virtual void SetMaterialWrapper(iMaterialWrapper *material)
   {csIsoSprite::material = material;}
   virtual iMaterialWrapper* GetMaterialWrapper() const {return material;}
-  virtual void SetMixMode(UInt mode) {mixmode = mode;}
-  virtual UInt GetMixMode() const {return mixmode;}
+  virtual void SetMixMode(UInt mode) {g3dpolyfx.mixmode = mode;}
+  virtual UInt GetMixMode() const {return g3dpolyfx.mixmode;}
   virtual void Draw(iIsoRenderView *rview);
   virtual void SetGrid(iIsoGrid *grid);
   virtual void SetAllColors(const csColor& color);

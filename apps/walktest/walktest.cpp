@@ -1714,7 +1714,7 @@ int main (int argc, char* argv[])
 
 void* operator new (size_t s)
 {
-  if (s <= 0) printf ("BAD SIZE in new %d\n", s);
+  if (s <= 0) { printf ("BAD SIZE in new %d\n", s); fflush (stdout); }
   char* rc = (char*)malloc (s+4+DETECT_SIZE+DETECT_SIZE);
   memcpy (rc, DETECT, DETECT_SIZE);
   memcpy (rc+DETECT_SIZE, &s, 4);
@@ -1724,7 +1724,7 @@ void* operator new (size_t s)
 
 void* operator new[] (size_t s)
 {
-  if (s <= 0) printf ("BAD SIZE in new[] %d\n", s);
+  if (s <= 0) { printf ("BAD SIZE in new[] %d\n", s); fflush (stdout); }
   char* rc = (char*)malloc (s+4+DETECT_SIZE+DETECT_SIZE);
   memcpy (rc, DETECTAR, DETECT_SIZE);
   memcpy (rc+DETECT_SIZE, &s, 4);
@@ -1739,8 +1739,10 @@ void operator delete (void* p)
   rc -= 4+DETECT_SIZE;
   size_t s;
   memcpy (&s, rc+DETECT_SIZE, 4);
-  if (strncmp (rc, DETECT, DETECT_SIZE) != 0) { printf ("operator delete: BAD START!\n"); CRASH; }
-  if (strncmp (rc+4+DETECT_SIZE+s, DETECT, DETECT_SIZE) != 0) { printf ("operator delete: BAD END!\n"); CRASH; }
+  if (strncmp (rc, DETECT, DETECT_SIZE) != 0)
+  { printf ("operator delete: BAD START!\n"); fflush (stdout); CRASH; }
+  if (strncmp (rc+4+DETECT_SIZE+s, DETECT, DETECT_SIZE) != 0)
+  { printf ("operator delete: BAD END!\n"); fflush(stdout); CRASH; }
   memcpy (rc, DETECTFREE, DETECT_SIZE);
   memcpy (rc+4+s+DETECT_SIZE, DETECTFREE, DETECT_SIZE);
   free (rc);
@@ -1753,8 +1755,10 @@ void operator delete[] (void* p)
   rc -= 4+DETECT_SIZE;
   size_t s;
   memcpy (&s, rc+DETECT_SIZE, 4);
-  if (strncmp (rc, DETECTAR, DETECT_SIZE) != 0) { printf ("operator delete[]: BAD START!\n"); CRASH; }
-  if (strncmp (rc+4+DETECT_SIZE+s, DETECTAR, DETECT_SIZE) != 0) { printf ("operator delete[]: BAD END!\n"); CRASH; }
+  if (strncmp (rc, DETECTAR, DETECT_SIZE) != 0)
+  { printf ("operator delete[]: BAD START!\n"); fflush (stdout); CRASH; }
+  if (strncmp (rc+4+DETECT_SIZE+s, DETECTAR, DETECT_SIZE) != 0)
+  { printf ("operator delete[]: BAD END!\n"); fflush (stdout); CRASH; }
   memcpy (rc, DETECTFREE, DETECT_SIZE);
   memcpy (rc+4+s+DETECT_SIZE, DETECTFREE, DETECT_SIZE);
   free (rc);

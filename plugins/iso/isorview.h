@@ -96,8 +96,6 @@ class csIsoRenderBucket
 public:
   /// ptr to alloced g3dpolyfx to draw
   G3DPolygonDPFX *g3dpolyfx;
-  /// mixmode
-  UInt mixmode;
   /// next to draw;
   csIsoRenderBucket *next;
 };

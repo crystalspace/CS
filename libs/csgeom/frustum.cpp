@@ -395,9 +395,9 @@ void csFrustum::ClipToPlane (csVector3* vertices, int& num_vertices,
       clipinfo[i].Copy (clipinfo[i + cw_offset]);
     }
     vertices[i] = isect_ccw;
-    clipinfo[i].Move (clip_ccw);
+    clipinfo[i].Copy (clip_ccw);
     vertices[i+1] = isect_cw;
-    clipinfo[i+1].Move (clip_cw);
+    clipinfo[i+1].Copy (clip_cw);
     num_vertices = 3 + ccw_offset - cw_offset;
   }
   else
@@ -416,9 +416,9 @@ void csFrustum::ClipToPlane (csVector3* vertices, int& num_vertices,
       }
 
     vertices[cw_offset] = isect_cw;
-    clipinfo[cw_offset].Move (clip_cw);
+    clipinfo[cw_offset].Copy (clip_cw);
     vertices[cw_offset+1] = isect_ccw;
-    clipinfo[cw_offset+1].Move (clip_ccw);
+    clipinfo[cw_offset+1].Copy (clip_ccw);
     num_vertices = 2 + cw_offset + num_vertices - ccw_offset - 1;
   }
 }

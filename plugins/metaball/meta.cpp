@@ -213,7 +213,8 @@ bool csMetaBalls::Draw ()
 {
   alpha += mp.d_alpha;
   poly->mat_handle = th;
-  G3D->StartPolygonFX(th, CS_FX_COPY | CS_FX_GOURAUD);
+  poly->mixmode = CS_FX_COPY | CS_FX_GOURAUD;
+  G3D->StartPolygonFX (th, poly->mixmode);
   G3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
   DrawSomething();
   G3D->FinishPolygonFX();

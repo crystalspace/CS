@@ -1,0 +1,56 @@
+@c -*-texinfo-*-
+@node HOWTO Mesh LightAnim, , ,
+@subsection Mesh Lighting and Animation
+
+This section describes how to do animation for meshes and how they can
+get lit by surrounding lights.
+
+@subsubheading Animation
+
+Not all meshes support animation. All particle systems and 3D sprites
+have animation.
+
+But on their own particle systems and meshes will not animate. To enable
+animation for all meshes in loaded in the engine you have to call
+@code{iEngine::NextFrame()} in your @code{NextFrame} routine. Usually this
+goes like this:
+
+@example
+void MyGame::NextFrame ()
+@{
+  SysSystemDriver::NextFrame ();
+  cs_time elapsed_time, current_time;
+  GetElapsedTime (elapsed_time, current_time);
+  engine->NextFrame (current_time);
+@}
+@end example
+
+Note that calling engine->NextFrame() will not actually do the animation.
+It will only tell the engine that every mesh will have to update it's
+animation to the given time as soon as that mesh is visible.
+So it is very efficient to call this function.
+
+@subsubheading Lighting
+
+Almost all meshes support lighting. Mesh things are treated
+specially as they have support for lightmaps and dynamic lighting using
+dynamic lightmaps. So this discussion is not for them. But for all other
+meshes the system below applies. Note that for many meshes lighting can
+be disabled (usually by calling @code{SetLighting(false)} on the
+state of the mesh object).
+
+To make sure that lighting will be calculated for an object you
+need to call @code{DeferUpdateLighting()} on the mesh wrapper.
+Usually this is called after creation of a mesh and also after moving
+lights and/or the mesh itself. This call is cheap. It will only set
+a flag that lighting has to be recalculated as soon as the object will
+be visible. Here is an example:
+
+@example
+  iMeshWrapper* mesh;
+  mesh->DeferUpdateLighting (CS_NLIGHT_STATIC|CS_NLIGHT_DYNAMIC, 10);
+@end example
+
+This example considers both dynamic and static lights and will take the
+10 lights that are closest to the mesh.
+

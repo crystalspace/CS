@@ -1,5 +1,27 @@
 The history order is reversed so that new features are at the top.
 
+11-May-2001
+	- Added additional HOWTO sections.
+	- Moved the FOG constants from OpenGL to ivideo/graph3d.h. They
+	  are general enough for any hardware accelerated fog implementation.
+	- Fixed fog in OpenGL. It now works again. For some reason it got
+	  broken. It is also faster (since no fog array needs to be copied
+	  anymore) and it uses less memory.
+	- Added a 'name' parameter to iEngine::CreateLight().
+	- Added GetLastAnimationTime() to csEngine.
+	- Removed csMeshWrapper::NextFrame(). csMeshWrapper will now use
+	  the last animation time from the engine to automatically detect
+	  if meshobj->NextFrame() has to be called. This is an optimization.
+	- Put 'mixmode' in G3DPolygonDPFX for DrawPolygonFX. This is in
+	  preparation for the removal of StartPolygonFX and FinishPolygonFX.
+	- Removed the support for Shortcut routines in OpenGL renderer. It
+	  was not used and did not work anyway.
+	- Fixed a memory leak in the software clipper used in OpenGL.
+	- Fixed a bug with the software clipper in OpenGL with meshes that
+	  resulted in no triangles after clipping.
+	- Fixed a bug with the software clipper in OpenGL. It would not
+	  clip correctly for meshes that were already transformed by the
+	  engine (this can happen for skeletal sprites).
 10-May-2001
 	- Fixed a bug in clipper detection for OpenGL. In some cases it
 	  would select 'N' for the required clipper which is not allowed.
@@ -26,6 +48,23 @@ The history order is reversed so that new features are at the top.
 	  needs some enhancements to actually sort polygons on material and
 	  so on.
 	- Started work on HOWTO section in documentation.
+	- Philip Wyett changed link for locaction to obtain WinCVS
+	  client software. "http://www.wincvs.org" now seems to be
+	  deprecated, so link now points to "http://www.cvsgui.org".
+	- Martin Geisse did the following changes:
+	    - The prefix config files can take an optional alias name that
+	      is returned from GetFileName() instead of the real file name.
+	      All other functions use the real file name.
+	    - The config manager does not use the VFS pointer anymore to
+	      identify single domains (only the file name).
+	    - The user-specific, global domain is now called "User.Global",
+	      the user-and-application-specific domain is now called
+	      "User.Application".
+	- Martin also optimized csHashCompute and changed hash iterators so
+	  they now have a public constructor that initializes all elements,
+	  removing the GetIterator() methods from csHashMap and csHashSet.
+	  This allows creating these iterators on the stack in time-critical
+	  situations.
 9-May-2001
 	- Martin Geisse added a version of typed vectors that don't delete
 	  their elements.

@@ -559,8 +559,7 @@ defaulthalo:
     }
   }
 
-  iStatLight* l = Engine->CreateLight (csVector3(x, y, z), dist, csColor(r, g, b), dyn);
-  l->QueryObject ()->SetName (name);
+  iStatLight* l = Engine->CreateLight (name, csVector3(x, y, z), dist, csColor(r, g, b), dyn);
   switch (halo.type)
   {
     case 1:

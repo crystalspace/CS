@@ -142,12 +142,13 @@ void csfxShadeVert(iGraphics3D *g3d, const csColor& topcolor,
   dpfx.vertices[3].g = bottomcolor.green;
   dpfx.vertices[3].b = bottomcolor.blue;
   dpfx.mat_handle = NULL;
+  dpfx.mixmode = mixmode | CS_FX_GOURAUD;
   dpfx.flat_color_r = 255;
   dpfx.flat_color_g = 255;
   dpfx.flat_color_b = 255;
   int oldzbufmode = g3d->GetRenderState(G3DRENDERSTATE_ZBUFFERMODE);
   g3d->SetRenderState(G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE);
-  g3d->StartPolygonFX(dpfx.mat_handle, mixmode | CS_FX_GOURAUD);
+  g3d->StartPolygonFX(dpfx.mat_handle, dpfx.mixmode);
   g3d->DrawPolygonFX(dpfx);
   g3d->FinishPolygonFX();
   g3d->SetRenderState(G3DRENDERSTATE_ZBUFFERMODE, oldzbufmode);
@@ -193,14 +194,15 @@ void csfxScreenDPFX(iGraphics3D *g3d, iMaterialHandle *mat, UInt mixmode,
   dpfx.vertices[3].g = 1.;
   dpfx.vertices[3].b = 1.;
   dpfx.mat_handle = mat;
+  dpfx.mixmode = mixmode;
   dpfx.flat_color_r = r;
   dpfx.flat_color_g = g;
   dpfx.flat_color_b = b;
-  int oldzbufmode = g3d->GetRenderState(G3DRENDERSTATE_ZBUFFERMODE);
-  g3d->SetRenderState(G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE);
-  g3d->StartPolygonFX(dpfx.mat_handle, mixmode);
-  g3d->DrawPolygonFX(dpfx);
-  g3d->FinishPolygonFX();
-  g3d->SetRenderState(G3DRENDERSTATE_ZBUFFERMODE, oldzbufmode);
+  int oldzbufmode = g3d->GetRenderState (G3DRENDERSTATE_ZBUFFERMODE);
+  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE);
+  g3d->StartPolygonFX (dpfx.mat_handle, dpfx.mixmode);
+  g3d->DrawPolygonFX (dpfx);
+  g3d->FinishPolygonFX ();
+  g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, oldzbufmode);
 }
 

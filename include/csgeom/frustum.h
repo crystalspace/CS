@@ -65,6 +65,7 @@ struct csClipInfo
     {
       delete inside.ci1;
       delete inside.ci2;
+      type = CS_CLIPINFO_ORIGINAL;
     }
   }
   ~csClipInfo () { Clear (); }

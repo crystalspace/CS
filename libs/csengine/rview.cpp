@@ -171,6 +171,7 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDP& poly)
     poly.fog_info[i].g = 0;
     poly.fog_info[i].b = 0;
     poly.fog_info[i].intensity = 0;
+    poly.fog_info[i].intensity2 = 0;
 
     // Consider a ray between (0,0,0) and v and calculate the thickness of every
     // fogged sector in between.
@@ -203,6 +204,10 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDP& poly)
 #else
       float I2 = ABS (dist2 - dist1) * fi->fog->density;
 #endif
+      if (I2 > CS_FOG_MAXVALUE)
+      	I2 = CS_FOGTABLE_CLAMPVALUE;
+      else
+	I2 = I2 * CS_FOGTABLE_DISTANCESCALE;
 
       if (poly.fog_info[i].intensity)
       {
@@ -215,11 +220,17 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDP& poly)
 	//	     P = polygon color
 	//	     C = result
 	float I1 = poly.fog_info[i].intensity;
-	poly.fog_info[i].intensity = I1 + I2 - I1 * I2;
-	float fact = 1. / (I1 + I2 - I1*I2);
-	poly.fog_info[i].r = (I2*fi->fog->red + I1*poly.fog_info[i].r + I1*I2*poly.fog_info[i].r) * fact;
-	poly.fog_info[i].g = (I2*fi->fog->green + I1*poly.fog_info[i].g + I1*I2*poly.fog_info[i].g) * fact;
-	poly.fog_info[i].b = (I2*fi->fog->blue + I1*poly.fog_info[i].b + I1*I2*poly.fog_info[i].b) * fact;
+	float I = I1 + I2 - I1 * I2;
+	if (I > CS_FOGTABLE_CLAMPVALUE)
+	  I = CS_FOGTABLE_CLAMPVALUE;
+	poly.fog_info[i].intensity = I;
+	float fact = 1. / I;
+	poly.fog_info[i].r = (I2*fi->fog->red + I1*poly.fog_info[i].r
+		+ I1*I2*poly.fog_info[i].r) * fact;
+	poly.fog_info[i].g = (I2*fi->fog->green + I1*poly.fog_info[i].g
+		+ I1*I2*poly.fog_info[i].g) * fact;
+	poly.fog_info[i].b = (I2*fi->fog->blue + I1*poly.fog_info[i].b
+		+ I1*I2*poly.fog_info[i].b) * fact;
       }
       else
       {
@@ -264,6 +275,7 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDPFX& poly)
     poly.fog_info[i].g = 0;
     poly.fog_info[i].b = 0;
     poly.fog_info[i].intensity = 0;
+    poly.fog_info[i].intensity2 = 0;
 
     // Consider a ray between (0,0,0) and v and calculate the thickness of every
     // fogged sector in between.
@@ -302,6 +314,10 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDPFX& poly)
 #else
       float I2 = ABS (dist2 - dist1) * fi->fog->density;
 #endif
+      if (I2 > CS_FOG_MAXVALUE)
+      	I2 = CS_FOGTABLE_CLAMPVALUE;
+      else
+	I2 = I2 * CS_FOGTABLE_DISTANCESCALE;
 
       if (poly.fog_info[i].intensity)
       {
@@ -314,11 +330,17 @@ void csRenderView::CalculateFogPolygon (G3DPolygonDPFX& poly)
 	//	     P = polygon color
 	//	     C = result
 	float I1 = poly.fog_info[i].intensity;
-	poly.fog_info[i].intensity = I1 + I2 - I1*I2;
-	float fact = 1. / (I1 + I2 - I1*I2);
-	poly.fog_info[i].r = (I2*fi->fog->red + I1*poly.fog_info[i].r + I1*I2*poly.fog_info[i].r) * fact;
-	poly.fog_info[i].g = (I2*fi->fog->green + I1*poly.fog_info[i].g + I1*I2*poly.fog_info[i].g) * fact;
-	poly.fog_info[i].b = (I2*fi->fog->blue + I1*poly.fog_info[i].b + I1*I2*poly.fog_info[i].b) * fact;
+	float I = I1 + I2 - I1*I2;
+	if (I > CS_FOGTABLE_CLAMPVALUE)
+	  I = CS_FOGTABLE_CLAMPVALUE;
+	poly.fog_info[i].intensity = I;
+	float fact = 1. / I;
+	poly.fog_info[i].r = (I2*fi->fog->red + I1*poly.fog_info[i].r
+		+ I1*I2*poly.fog_info[i].r) * fact;
+	poly.fog_info[i].g = (I2*fi->fog->green + I1*poly.fog_info[i].g
+		+ I1*I2*poly.fog_info[i].g) * fact;
+	poly.fog_info[i].b = (I2*fi->fog->blue + I1*poly.fog_info[i].b
+		+ I1*I2*poly.fog_info[i].b) * fact;
       }
       else
       {
@@ -366,6 +388,7 @@ void csRenderView::CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh&
     mesh.vertex_fog[i].g = 0;
     mesh.vertex_fog[i].b = 0;
     mesh.vertex_fog[i].intensity = 0;
+    mesh.vertex_fog[i].intensity2 = 0;
 
     // Consider a ray between (0,0,0) and v and calculate the thickness of every
     // fogged sector in between.
@@ -404,6 +427,10 @@ void csRenderView::CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh&
 #else
       float I2 = ABS (dist2 - dist1) * finfo->fog->density;
 #endif
+      if (I2 > CS_FOG_MAXVALUE)
+      	I2 = CS_FOGTABLE_CLAMPVALUE;
+      else
+	I2 = I2 * CS_FOGTABLE_DISTANCESCALE;
 
       if (mesh.vertex_fog[i].intensity)
       {
@@ -416,11 +443,17 @@ void csRenderView::CalculateFogMesh (const csTransform& tr_o2c, G3DTriangleMesh&
 	//	     P = polygon color
 	//	     C = result
 	float I1 = mesh.vertex_fog[i].intensity;
-	mesh.vertex_fog[i].intensity = I1 + I2 - I1*I2;
-	float fact = 1. / (I1 + I2 - I1*I2);
-	mesh.vertex_fog[i].r = (I2*finfo->fog->red + I1*mesh.vertex_fog[i].r + I1*I2*mesh.vertex_fog[i].r) * fact;
-	mesh.vertex_fog[i].g = (I2*finfo->fog->green + I1*mesh.vertex_fog[i].g + I1*I2*mesh.vertex_fog[i].g) * fact;
-	mesh.vertex_fog[i].b = (I2*finfo->fog->blue + I1*mesh.vertex_fog[i].b + I1*I2*mesh.vertex_fog[i].b) * fact;
+	float I = I1 + I2 - I1*I2;
+	if (I > CS_FOGTABLE_CLAMPVALUE)
+	  I = CS_FOGTABLE_CLAMPVALUE;
+	mesh.vertex_fog[i].intensity = I;
+	float fact = 1. / I;
+	mesh.vertex_fog[i].r = (I2*finfo->fog->red + I1*mesh.vertex_fog[i].r
+		+ I1*I2*mesh.vertex_fog[i].r) * fact;
+	mesh.vertex_fog[i].g = (I2*finfo->fog->green + I1*mesh.vertex_fog[i].g
+		+ I1*I2*mesh.vertex_fog[i].g) * fact;
+	mesh.vertex_fog[i].b = (I2*finfo->fog->blue + I1*mesh.vertex_fog[i].b
+		+ I1*I2*mesh.vertex_fog[i].b) * fact;
       }
       else
       {

@@ -410,7 +410,7 @@ void Demo::SetupSector ()
   //====================================================================
 
   iStatLight* light;
-  light = engine->CreateLight (csVector3 (-500, 300, 900), 1000000,
+  light = engine->CreateLight (NULL, csVector3 (-500, 300, 900), 1000000,
   	csColor (1, 1, 1), false);
   iLight* il = QUERY_INTERFACE (light, iLight);
   iFlareHalo* flare = il->CreateFlareHalo ();

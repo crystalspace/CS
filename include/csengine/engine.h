@@ -502,6 +502,16 @@ private:
   /// Frozen PVS position.
   csVector3 freeze_pvs_pos;
 
+  /**
+   * If this nextframe_pending is not 0 then a call of NextFrame
+   * has happened. As soon as some object is visible (DrawTest() returns
+   * true) we will really call NextFrame() if its locally remembered
+   * last-anim value is different from this one. This should improve
+   * global speed of the engine as this means that invisible particle
+   * systems will now not be updated anymore until they are really visible.
+  */
+  cs_time nextframe_pending;
+
 private:
   /**
    * Resolve the engine mode if it is CS_ENGINE_AUTODETECT.
@@ -666,6 +676,11 @@ public:
     else
       return 0;
   }
+
+  /**
+   * Get the last animation time.
+   */
+  cs_time GetLastAnimationTime () { return nextframe_pending; }
 
   /**
    * Set the culler to use in CS_ENGINE_FRONT2BACK mode.
@@ -1136,7 +1151,8 @@ public:
   virtual iView* CreateView (iGraphics3D* g3d);
 
   /// Create a static/pseudo-dynamic light.
-  virtual iStatLight* CreateLight (const csVector3& pos, float radius,
+  virtual iStatLight* CreateLight (const char* name,
+  	const csVector3& pos, float radius,
   	const csColor& color, bool pseudoDyn);
   /// Find a static/pseudo-dynamic light by name.
   virtual iStatLight* FindLight (const char *Name, bool RegionOnly = false);

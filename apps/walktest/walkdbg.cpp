@@ -665,10 +665,12 @@ void DrawDebugBoxSide (csCamera* cam, bool do3d,
   poly.vertices[3].r = c4.red;
   poly.vertices[3].g = c4.green;
   poly.vertices[3].b = c4.blue;
+  poly.mat_handle = NULL;
+  poly.mixmode = CS_FX_ADD|CS_FX_GOURAUD;
   if (do3d)
   {
     Gfx3D->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
-    Gfx3D->StartPolygonFX (NULL, CS_FX_ADD|CS_FX_GOURAUD);
+    Gfx3D->StartPolygonFX (poly.mat_handle, poly.mixmode);
     Gfx3D->DrawPolygonFX (poly);
     Gfx3D->FinishPolygonFX ();
   }

@@ -69,6 +69,7 @@ void SetupPolygonDPFX (iGraphics3D* /*g3d*/, G3DPolygonDPFX& poly,
   poly.flat_color_r = 255;
   poly.flat_color_g = 255;
   poly.flat_color_b = 255;
+  poly.mixmode = CS_FX_COPY | CS_FX_GOURAUD;
 }
 
 //-----------------------------------------------------------------------------
@@ -85,7 +86,7 @@ void SinglePolygonTester::Draw (iGraphics3D* g3d)
   draw++;
   g3d->SetPerspectiveAspect (400);
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILL);
-  g3d->StartPolygonFX (poly.mat_handle, CS_FX_COPY|CS_FX_GOURAUD);
+  g3d->StartPolygonFX (poly.mat_handle, poly.mixmode);
   g3d->DrawPolygonFX (poly);
   g3d->FinishPolygonFX ();
 }
@@ -101,13 +102,14 @@ void SinglePolygonTesterFlat::Setup (iGraphics3D* g3d, PerfTest* /*perftest*/)
 {
   draw = 0;
   SetupPolygonDPFX (g3d, poly, 10, 10, g3d->GetWidth ()-10, g3d->GetHeight ()-10);
+  poly.mat_handle = NULL;
 }
 
 void SinglePolygonTesterFlat::Draw (iGraphics3D* g3d)
 {
   draw++;
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILL);
-  g3d->StartPolygonFX (NULL, CS_FX_COPY|CS_FX_GOURAUD);
+  g3d->StartPolygonFX (poly.mat_handle, poly.mixmode);
   g3d->DrawPolygonFX (poly);
   g3d->FinishPolygonFX ();
 }
@@ -124,13 +126,14 @@ void SinglePolygonTesterAlpha::Setup (iGraphics3D* g3d, PerfTest* perftest)
   draw = 0;
   SetupPolygonDPFX (g3d, poly, 10, 10, g3d->GetWidth ()-10, g3d->GetHeight ()-10);
   poly.mat_handle = perftest->GetMaterial (0);
+  poly.mixmode = CS_FX_SETALPHA(.5) | CS_FX_GOURAUD;
 }
 
 void SinglePolygonTesterAlpha::Draw (iGraphics3D* g3d)
 {
   draw++;
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILL);
-  g3d->StartPolygonFX (poly.mat_handle, CS_FX_SETALPHA(.5) | CS_FX_GOURAUD);
+  g3d->StartPolygonFX (poly.mat_handle, poly.mixmode);
   g3d->DrawPolygonFX (poly);
   g3d->FinishPolygonFX ();
 }
@@ -155,6 +158,7 @@ void MultiPolygonTester::Setup (iGraphics3D* g3d, PerfTest* perftest)
       	10+y*h/NUM_MULTIPOLTEST,
       	10+(x+1)*w/NUM_MULTIPOLTEST, 10+(y+1)*h/NUM_MULTIPOLTEST);
       poly[x][y].mat_handle = perftest->GetMaterial (0);
+      poly[x][y].mixmode = CS_FX_COPY | CS_FX_GOURAUD;
     }
 }
 
@@ -162,7 +166,7 @@ void MultiPolygonTester::Draw (iGraphics3D* g3d)
 {
   draw++;
   g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_FILL);
-  g3d->StartPolygonFX (poly[0][0].mat_handle, CS_FX_COPY | CS_FX_GOURAUD);
+  g3d->StartPolygonFX (poly[0][0].mat_handle, poly[0][0].mixmode);
   int x, y;
   for (y = 0 ; y < NUM_MULTIPOLTEST ; y++)
     for (x = 0 ; x < NUM_MULTIPOLTEST ; x++)
@@ -192,6 +196,7 @@ void MultiPolygon2Tester::Setup (iGraphics3D* g3d, PerfTest* perftest)
       	10+y*h/NUM_MULTIPOLTEST,
       	10+(x+1)*w/NUM_MULTIPOLTEST, 10+(y+1)*h/NUM_MULTIPOLTEST);
       poly[x][y].mat_handle = perftest->GetMaterial (0);
+      poly[x][y].mixmode = CS_FX_COPY | CS_FX_GOURAUD;
     }
 }
 
@@ -203,7 +208,7 @@ void MultiPolygon2Tester::Draw (iGraphics3D* g3d)
   for (y = 0 ; y < NUM_MULTIPOLTEST ; y++)
     for (x = 0 ; x < NUM_MULTIPOLTEST ; x++)
     {
-      g3d->StartPolygonFX (poly[x][y].mat_handle, CS_FX_COPY | CS_FX_GOURAUD);
+      g3d->StartPolygonFX (poly[x][y].mat_handle, poly[x][y].mixmode);
       g3d->DrawPolygonFX (poly[x][y]);
       g3d->FinishPolygonFX ();
     }
@@ -230,6 +235,7 @@ void MultiTexture1Tester::Setup (iGraphics3D* g3d, PerfTest* perftest)
       	10+y*h/NUM_MULTIPOLTEST,
       	10+(x+1)*w/NUM_MULTIPOLTEST, 10+(y+1)*h/NUM_MULTIPOLTEST);
       poly[x][y].mat_handle = perftest->GetMaterial (i%4);
+      poly[x][y].mixmode = CS_FX_COPY;
       i++;
     }
 }
@@ -242,7 +248,7 @@ void MultiTexture1Tester::Draw (iGraphics3D* g3d)
   for (y = 0 ; y < NUM_MULTIPOLTEST ; y++)
     for (x = 0 ; x < NUM_MULTIPOLTEST ; x++)
     {
-      g3d->StartPolygonFX (poly[x][y].mat_handle, CS_FX_COPY);
+      g3d->StartPolygonFX (poly[x][y].mat_handle, poly[x][y].mixmode);
       g3d->DrawPolygonFX (poly[x][y]);
       g3d->FinishPolygonFX ();
     }
@@ -270,6 +276,7 @@ void MultiTexture2Tester::Setup (iGraphics3D* g3d, PerfTest* perftest)
         10+y*h/NUM_MULTIPOLTEST,
       	10+(x+1)*w/NUM_MULTIPOLTEST, 10+(y+1)*h/NUM_MULTIPOLTEST);
       poly[x][y].mat_handle = perftest->GetMaterial (i/div);
+      poly[x][y].mixmode = CS_FX_COPY;
       i++;
     }
 }
@@ -286,7 +293,7 @@ void MultiTexture2Tester::Draw (iGraphics3D* g3d)
       if (poly[x][y].mat_handle != prev)
       {
         if (prev != NULL) g3d->FinishPolygonFX ();
-        g3d->StartPolygonFX (poly[x][y].mat_handle, CS_FX_COPY);
+        g3d->StartPolygonFX (poly[x][y].mat_handle, poly[x][y].mixmode);
 	prev = poly[x][y].mat_handle;
       }
       g3d->DrawPolygonFX (poly[x][y]);

@@ -240,7 +240,8 @@ void csGraphicsPipeline::Polygon3D (G3DPolygonDPFX &poly, UInt mode)
     INCLUDE_MAX_POINT (x + 1, y + 1);
   }
 
-  G3D->StartPolygonFX (poly.mat_handle, mode);
+  poly.mixmode = mode;
+  G3D->StartPolygonFX (poly.mat_handle, poly.mixmode);
   G3D->DrawPolygonFX (poly);
   G3D->FinishPolygonFX ();
 }

@@ -989,7 +989,7 @@ bool csSprite3DMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
 
   csVector2* real_uv_verts;
   // Do vertex morphing if needed.
-  // 
+  //
   // @@@ Don't understand this piece of code.
   //   Why is it checking if the level == 0, and negative?  neg is supposed 
   //    to be off.  zero is a valid on number...???

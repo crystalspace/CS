@@ -1,0 +1,120 @@
+@c -*-texinfo-*-
+@node HOWTO Mesh Movement, , ,
+@subsection Mesh Movement
+@cindex @samp{iMovable}
+@cindex @samp{csReversibleTransform}
+@cindex movement
+@cindex moving
+@cindex @code{HardTransform}
+@cindex @code{LookAt}
+@cindex @code{GetTransform}
+@cindex @code{GetFullTransform}
+@cindex object space
+@cindex world space
+@cindex hierarchical transformations
+
+This section describes how to move meshes around in your world.
+
+@subsubheading Object and World Space
+
+It is very important to understand the concept of object and world
+space when talking about moving objects. Object space is the coordinate
+system that is used for describing the object itself independent of where
+it is. Depending on the type of object it is usually conveniant to place
+the origin of that object space at a central spot. For an actor you
+probably want it in at the center of the feet so that you can move the (0,0,0)
+point on the ground and the actor will stand correctly.
+
+World space is where the object will end up after it has been moved.
+Even after an object is moved to some other location the object coordinates
+will be unmodified (unless @code{HardTransform} is used, see later for that).
+
+@subsubheading The @samp{iMovable}
+
+The basic class that is use to control the position of a mesh is
+the @samp{iMovable}. Every mesh wrapper has one (note that it is the
+engine that is responsible for knowing where a mesh is, the mesh itself
+does not care except when it wants to be rendered or lit).
+
+A movable contains a list of sectors and a transformation
+(@samp{csReversibleTransform}) from object to world space. A transformation
+is itself a position (@samp{csVector3}) and a matrix (@samp{csMatrix3}).
+
+The reason that a movable contains a list of sectors and not just one
+sector is that a mesh can be in several sectors at the same time. This
+happens when the mesh crosses a portal and one side of the mesh is in
+sector A while the other is in sector B. The engine keeps track of this
+and will correctly render such objects provided the list of sectors is
+correctly. Unfortunatelly the engine gives little support for detecting
+in which sectors a mesh will be after it moves. This support will certainly
+arrive at some point in the near future.
+
+@subsubheading Moving a Mesh
+
+@samp{iMovable} contains various functions to help control movement. Here
+is an example of some code that places an object in some sector and position:
+
+@example
+  iMeshWrapper* mesh;
+  iMovable* movable = mesh->GetMovable ();
+  movable->SetSector (room);
+  movable->SetPosition (csVector3 (2, 3, 1));
+  movable->UpdateMove ();
+@end example
+
+One important function is @code{UpdateMove()}. This function MUST
+be called after moving an object. It makes sure internal data structures
+(for visibility and whatever) are recalculated for the new position of
+the object.
+
+Here is another example where you let the mesh point to some point in space:
+
+@example
+  iMeshWrapper* mesh;
+  iMovable* movable = mesh->GetMovable ();
+  csVector3 pos (1, 1, 0);
+  movable->SetPosition (pos);
+  movable->GetTransform ().LookAt (csVector3 (5, 2, 0)-pos,
+  	csVector3 (0, 1, 0));
+  movable->UpdateMove ();
+@end example
+
+The @code{LookAt()} function is very nice. It takes a position relative
+to the position where the object is and points the object in the direction
+of that point. The up-vector will be used to control the orientation along
+that axis. To really make this work well it is recommended that you design
+your objects so that X is one unit to the right, Y is one unit above, and
+Z points forwards. This is the way that CS works. But @code{LookAt()}
+can be used for any configuration.
+
+Note: @code{movable->GetTransform()} returns the @samp{csReversibleTransform}
+itself on which you can do various manipulations.
+
+@subsubheading Hierarchical Transformations
+
+Sometimes meshes can be put in a hierarchical relationship. This means that
+there is a parent mesh and children which have a position relative to that
+parent. For those children the movable is also used with a few small
+exceptions. First of all the list of sectors is not used as it is the
+parent mesh that will contain the correct list of sectors for all meshes
+in its hierarchy. Second the transform in the movable defines the position
+of the mesh relative to its parent. So if you call
+@code{movable->GetTransform()} you will not get the transform which will
+result in the position of the object but only the transform relative to
+the parent's local object space. To get the transform which will transform
+object space of that mesh to world space you need to call
+@code{GetFullTransform()}. Note that modifying this transform will not have
+any effect on the mesh (unlike modifying the transform returned by
+@code{GetTransform()}).
+
+@subsubheading The @code{HardTransform()} Function
+
+Some meshes also support the @code{HardTransform()} function. This function
+relocates the object space coordinates itself. In other words, it changes
+the object space origin of the object. This can be useful if you have objects
+that were designed with an origin that is less that desirable and you first
+want to move them so that the origin is ok. That can make later transformations
+from object to world space easier. @code{HardTransform()} is not a function
+of @samp{iMovable} but of @samp{iMeshWrapper} (which will in turn delegate
+this to the mesh object itself).
+

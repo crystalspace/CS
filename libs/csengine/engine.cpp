@@ -475,6 +475,7 @@ csEngine::csEngine (iBase *iParent) : csObject (), camera_positions (16, 16)
   library = NULL;
   engine_states = NULL;
   rad_debug = NULL;
+  nextframe_pending = 0;
 
   if (!covtree_lut)
   {
@@ -696,6 +697,7 @@ bool csEngine::HandleEvent (iEvent &Event)
 
 void csEngine::Clear ()
 {
+  nextframe_pending = 0;
   if (G3D) G3D->ClearCache ();
   halos.DeleteAll ();
   collections.DeleteAll ();
@@ -1478,15 +1480,11 @@ void csEngine::RemoveDynLight (csDynLight* dyn)
 
 void csEngine::NextFrame (cs_time current_time)
 {
-  int i;
-  for (i = 0 ; i < meshes.Length () ; i++)
-  {
-    csMeshWrapper* sp = (csMeshWrapper*)meshes[i];
-    sp->NextFrame (current_time);
-  }
+  nextframe_pending = current_time;
 
   // Delete particle systems that self-destructed now.
-  i = meshes.Length ()-1;
+  // @@@ Need to optimize this?
+  int i = meshes.Length ()-1;
   while (i >= 0)
   {
     csMeshWrapper* sp = (csMeshWrapper*)meshes[i];
@@ -2150,11 +2148,13 @@ iView* csEngine::CreateView (iGraphics3D* g3d)
   return iview;
 }
 
-iStatLight* csEngine::CreateLight (const csVector3& pos, float radius,
-  	const csColor& color, bool pseudoDyn)
+iStatLight* csEngine::CreateLight (const char* name,
+	const csVector3& pos, float radius, const csColor& color,
+	bool pseudoDyn)
 {
   csStatLight* light = new csStatLight (pos.x, pos.y, pos.z, radius,
   	color.red, color.green, color.blue, pseudoDyn);
+  if (name) light->SetName (name);
   iStatLight* il = QUERY_INTERFACE (light, iStatLight);
   il->DecRef ();
   return il;

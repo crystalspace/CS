@@ -181,46 +181,6 @@ private:
    */
   void SetGLZBufferFlagsPass2 (csZBufMode flags, bool multiPol);
 
-  /**
-   * Pointer to a member function that tries to draw the polygon in a quick
-   * optimized manner.  If this function succeeds in drawing the polygon,
-   * it should return true thus bypassing the normal polygon drawing code
-   * altogether.  If the function cannot draw the polygon for whatever
-   * reason (typically it is because the polygon has certain layers or
-   * attributes that cannot be drawn in an optimized manner) the function
-   * should return false, meaning that the default generalized polygon
-   * drawing code should draw the polygon instead.
-   */
-  bool (csGraphics3DOGLCommon::*ShortcutDrawPolygon)(G3DPolygonDP &poly);
-
-  /**
-   * This shortcut routine gets called by
-   * StartPolygonFX before normal FX setup occurs.  If the shortcut routine
-   * determines that it can draw the upcoming series of polygons in an
-   * optimized manner, it should set up properly and return true.  If it
-   * cannot, it should return false and let the standard DrawPolygonFX
-   * perform setup.  In any case, the value returned by the StartPolygonFX
-   * must be matched in subsequent calls to DrawPolygonFX; that is, if
-   * a StartPolygonFX call returns 'true', then calls to DrawPolygonFX and
-   * FinishPolygonFX must also return 'true' until the next time StartPolygonFX
-   * is called.
-   */
-  bool (csGraphics3DOGLCommon::*ShortcutStartPolygonFX)(iMaterialHandle *handle,UInt mode);
-
-  /**
-   * Shortcut tried before executing standard DrawPolygonFX code.  The
-   * value returned by this must match the most recent return value of
-   * ShortcutStartPolygonFX(); see comments for that member.
-   */
-  bool (csGraphics3DOGLCommon::*ShortcutDrawPolygonFX)(G3DPolygonDPFX &poly);
-
-  /**
-   * Shortcut tried before executing standard FinishPolygonFX code.
-   * The value returned by this must match the most recent return value of
-   * ShortcutStartPolygonFX(); see comments for that member.
-   */
-  bool (csGraphics3DOGLCommon::*ShortcutFinishPolygonFX)();
-
   // Some common shortcut functions that may or may not apply, depending
   // on the underlying hardware
   // guess the proper blend mode to use
@@ -250,7 +210,11 @@ private:
     G3DFogInfo* vertex_fog,
     int& num_clipped_triangles,
     int& num_clipped_vertices,
+    bool transform,
     bool exact_clipping);
+
+  /// Start a series of DrawPolygonFX
+  void RealStartPolygonFX (iMaterialHandle* handle, UInt mode);
 
 protected:
   friend class csOpenGLHalo;
@@ -358,6 +322,15 @@ protected:
   float m_alpha;
   /// Should DrawPolygonFX use texture?
   bool  m_textured;
+
+  /// Values to check if we have to reinit StartPolygonFX.
+  bool dpfx_valid;
+  bool dpfx_use_fog;
+  iMaterialHandle* dpfx_mat_handle;
+  int dpfx_alpha;
+  UInt dpfx_mixmode;
+  csZBufMode dpfx_z_buf_mode;
+
   /**
    * Pointer to material handle for DrawPolygonFX.
    * This is NULL normally but not NULL if multi-texture is used.
@@ -673,12 +646,6 @@ public:
 
   // Extension flags
   bool ARB_multitexture;
-
- protected:
-
-  void start_draw_poly ();
-  void end_draw_poly ();
-  bool in_draw_poly;
 };
 
 #endif // __OGL3DCOM_H__

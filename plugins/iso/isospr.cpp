@@ -36,7 +36,7 @@ csIsoSprite::csIsoSprite (iBase *iParent)
   CONSTRUCT_IBASE (iParent);
   position.Set(0,0,0);
   material = NULL;
-  mixmode = CS_FX_COPY;
+  g3dpolyfx.mixmode = CS_FX_COPY;
   grid = NULL;
   gridcall = NULL;
   gridcalldata = NULL;
@@ -195,7 +195,7 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
   iIsoView* view = rview->GetView ();
 
   // Prepare for rendering.
-  if((mixmode & CS_FX_MASK_MIXMODE) == CS_FX_COPY)
+  if((g3dpolyfx.mixmode & CS_FX_MASK_MIXMODE) == CS_FX_COPY)
     g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_USE);
   else g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_TEST);
   //g3d->SetRenderState (G3DRENDERSTATE_ZBUFFERMODE, CS_ZBUF_NONE);
@@ -256,13 +256,14 @@ void csIsoSprite::Draw(iIsoRenderView *rview)
   {
     /// delay drawing, put into buckets
     //printf("Drawing index %d \n", wrapindex->GetIndex());
-    rview->AddPolyFX(wrapindex->GetIndex(), &g3dpolyfx, mixmode|CS_FX_GOURAUD);
+    rview->AddPolyFX(wrapindex->GetIndex(), &g3dpolyfx, g3dpolyfx.mixmode|CS_FX_GOURAUD);
     wrapindex->DecRef();
     return;
   }
   // for non-iso-engine created materials, we have to draw them now.
   //rview->CalculateFogPolygon (g3dpolyfx);
-  g3d->StartPolygonFX (g3dpolyfx.mat_handle, mixmode | CS_FX_GOURAUD);
+  g3dpolyfx.mixmode = g3dpolyfx.mixmode | CS_FX_GOURAUD;
+  g3d->StartPolygonFX (g3dpolyfx.mat_handle, g3dpolyfx.mixmode);
   g3d->DrawPolygonFX (g3dpolyfx);
   g3d->FinishPolygonFX ();
 

@@ -194,8 +194,6 @@ bool csOpenGLProcBackBuffer::BeginDraw (int DrawFlags)
 
   DrawMode = DrawFlags;
 
-  end_draw_poly ();
-
   return true;
 }
 

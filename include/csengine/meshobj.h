@@ -71,13 +71,12 @@ protected:
   int defered_lighting_flags;
 
   /**
-   * If this nextframe_pending is not 0 then a call of NextFrame
-   * has happened. As soon as the object is visible (DrawTest() returns
-   * true) we will really call NextFrame(). This should improve
-   * global speed of the engine as this means that invisible particle
-   * systems will now not be updated anymore until they are really visible.
+   * This value indicates the last time that was used to do animation.
+   * If 0 then we haven't done animation yet. We compare this value
+   * with the value returned by engine->GetLastAnimationTime() to see
+   * if we need to call meshobj->NextFrame() again.
   */
-  cs_time nextframe_pending;
+  cs_time last_anim_time;
 
   /**
    * Flag which is set to true when the object is visible.
@@ -235,9 +234,6 @@ public:
    * Optionally update lighting if needed (DeferUpdateLighting()).
    */
   void Draw (iRenderView* rview);
-
-  /// Go the next animation frame.
-  void NextFrame (cs_time current_time);
 
   /// Returns true if this object wants to die.
   bool WantToDie () { return mesh->WantToDie (); }

@@ -90,43 +90,6 @@ void csglBindTexture (GLenum target, GLuint handle)
   //}
 }
 
-//@@@ For opt DrawPolygon:
-
-void csGraphics3DOGLCommon::start_draw_poly ()
-{
-  if (in_draw_poly) return;
-  in_draw_poly = true;
-}
-
-void csGraphics3DOGLCommon::end_draw_poly ()
-{
-  if (!in_draw_poly) return;
-  in_draw_poly = false;
-}
-
-/*===========================================================================
- Fog Variables Section
- ===========================================================================*/
-
-// size of the fog texture
-static const unsigned int FOGTABLE_SIZE = 64;
-
-// each texel in the fog table holds the fog alpha value at a certain
-// (distance*density).  The median distance parameter determines the
-// (distance*density) value represented by the texel at the center of
-// the fog table.  The fog calculation is:
-// alpha = 1.0 - exp( -(density*distance) / FOGTABLE_MEDIANDISTANCE)
-//
-static const double FOGTABLE_MEDIANDISTANCE = 10.0;
-static const double FOGTABLE_MAXDISTANCE = FOGTABLE_MEDIANDISTANCE * 2.0;
-static const double FOGTABLE_DISTANCESCALE = 1.0 / FOGTABLE_MAXDISTANCE;
-
-// fog (distance*density) is mapped to a texture coordinate and then
-// clamped.  This determines the clamp value.  Some OpenGL drivers don't
-// like clamping textures so we must do it ourself
-static const double FOGTABLE_CLAMPVALUE = 0.85;
-
-static const double FOG_MAXVALUE = FOGTABLE_MAXDISTANCE * FOGTABLE_CLAMPVALUE;
 /*=========================================================================
  Static growing array declaration for DrawTriangleMesh
 =========================================================================*/
@@ -144,10 +107,6 @@ static DECLARE_GROWING_ARRAY_REF (uv_mul_verts, csVector2);
 static DECLARE_GROWING_ARRAY_REF (color_verts, csColor);
 /// Array with RGBA colors.
 static DECLARE_GROWING_ARRAY_REF (rgba_verts, GLfloat);
-/// Array with fog values.
-static DECLARE_GROWING_ARRAY_REF (fog_intensities, float);
-/// Array with fog colors
-static DECLARE_GROWING_ARRAY_REF (fog_color_verts, csColor);
 
 /// Array for clipping.
 static DECLARE_GROWING_ARRAY_REF (clipped_triangles, csTriangle);
@@ -169,11 +128,6 @@ static DECLARE_GROWING_ARRAY_REF (clipped_fog, G3DFogInfo);
 csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
   G2D (NULL), System (NULL)
 {
-  ShortcutDrawPolygon = 0;
-  ShortcutStartPolygonFX = 0;
-  ShortcutDrawPolygonFX = 0;
-  ShortcutFinishPolygonFX = 0;
-
   texture_cache = NULL;
   lightmap_cache = NULL;
   txtmgr = NULL;
@@ -216,8 +170,6 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
   uv_verts.IncRef ();
   uv_mul_verts.IncRef ();
   color_verts.IncRef ();
-  fog_intensities.IncRef ();
-  fog_color_verts.IncRef ();
   clipped_triangles.IncRef ();
   clipped_translate.IncRef ();
   clipped_vertices.IncRef ();
@@ -225,11 +177,8 @@ csGraphics3DOGLCommon::csGraphics3DOGLCommon ():
   clipped_colors.IncRef ();
   clipped_fog.IncRef ();
 
-  in_draw_poly = false;
-
   // Are we going to use the inverted orthographic projection matrix?
   inverted = false;
-
 }
 
 csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
@@ -242,8 +191,6 @@ csGraphics3DOGLCommon::~csGraphics3DOGLCommon ()
   uv_verts.DecRef ();
   uv_mul_verts.DecRef ();
   color_verts.DecRef ();
-  fog_intensities.DecRef ();
-  fog_color_verts.DecRef ();
   clipped_triangles.DecRef ();
   clipped_translate.DecRef ();
   clipped_vertices.DecRef ();
@@ -725,23 +672,22 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   // this texture holds a 'table' of alpha values forming an exponential
   // curve, used for generating exponential fog by mapping it onto
   // fogged polygons as we draw them.
-  const unsigned int FOGTABLE_SIZE = 64;
-  unsigned char *transientfogdata = new unsigned char[FOGTABLE_SIZE * 4];
-  for (unsigned int fogindex = 0; fogindex < FOGTABLE_SIZE; fogindex++)
+  unsigned char *transientfogdata = new unsigned char[CS_FOGTABLE_SIZE * 4];
+  for (unsigned int fogindex = 0; fogindex < CS_FOGTABLE_SIZE; fogindex++)
   {
     transientfogdata[fogindex * 4 + 0] = (unsigned char) 255;
     transientfogdata[fogindex * 4 + 1] = (unsigned char) 255;
     transientfogdata[fogindex * 4 + 2] = (unsigned char) 255;
     double fogalpha =
-    (256 * (1.0 - exp (-float (fogindex) * FOGTABLE_MAXDISTANCE / FOGTABLE_SIZE)));
+    (256 * (1.0 - exp (-float (fogindex) * CS_FOGTABLE_MAXDISTANCE / CS_FOGTABLE_SIZE)));
     transientfogdata[fogindex * 4 + 3] = (unsigned char) fogalpha;
   }
   // prevent weird effects when 0 distance fog wraps around to the
   // 'max fog' texel
-  transientfogdata[(FOGTABLE_SIZE - 1) * 4 + 3] = 0;
+  transientfogdata[(CS_FOGTABLE_SIZE - 1) * 4 + 3] = 0;
 
   // dump the fog table into an OpenGL texture for later user.
-  // The texture is FOGTABLE_SIZE texels wide and one texel high;
+  // The texture is CS_FOGTABLE_SIZE texels wide and one texel high;
   // we could use a 1D texture but some OpenGL drivers don't
   // handle 1D textures very well
   glGenTextures (1, &m_fogtexturehandle);
@@ -749,7 +695,7 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexImage2D (GL_TEXTURE_2D, 0, 4, FOGTABLE_SIZE, 1, 0,
+  glTexImage2D (GL_TEXTURE_2D, 0, 4, CS_FOGTABLE_SIZE, 1, 0,
 		GL_RGBA, GL_UNSIGNED_BYTE, transientfogdata);
 
   delete [] transientfogdata;
@@ -788,8 +734,6 @@ bool csGraphics3DOGLCommon::NewOpen (const char *Title)
     m_config_options.m_lightmap_src_blend = srcblend;
     m_config_options.m_lightmap_dst_blend = dstblend;
   }
-
-  end_draw_poly ();
 
   glCullFace (GL_FRONT);
   glEnable (GL_CULL_FACE);
@@ -1003,8 +947,6 @@ bool csGraphics3DOGLCommon::BeginDraw (int DrawFlags)
     G2D->Clear (0);
 
   DrawMode = DrawFlags;
-
-  end_draw_poly ();
 
   toplevel_init = false;
 
@@ -1560,10 +1502,11 @@ void csGraphics3DOGLCommon::DrawPolygonSingleTexture (G3DPolygonDP& poly)
 
       // specify fog vertex alpha value using the fog table and fog
       // distance
-      if (poly.fog_info[i].intensity > FOG_MAXVALUE)
-        *fog_txt++ = FOGTABLE_CLAMPVALUE;
-      else
-        *fog_txt++ = poly.fog_info[i].intensity / FOGTABLE_MAXDISTANCE;
+      //if (poly.fog_info[i].intensity > CS_FOG_MAXVALUE)
+        //*fog_txt++ = CS_FOGTABLE_CLAMPVALUE;
+      //else
+        //*fog_txt++ = poly.fog_info[i].intensity * CS_FOGTABLE_DISTANCESCALE;
+      *fog_txt++ = poly.fog_info[i].intensity;
       *fog_txt++ = 0.0;
     }
   }
@@ -1672,23 +1615,10 @@ round16 (long f)
 //static iTextureHandle* prev_handle = NULL;
 //static UInt prev_mode = ~0;
 
-void csGraphics3DOGLCommon::StartPolygonFX (iMaterialHandle * handle, UInt mode)
+void csGraphics3DOGLCommon::RealStartPolygonFX (iMaterialHandle * handle,
+	UInt mode)
 {
   FlushDrawPolygon ();
-  end_draw_poly ();
-
-//@@@ Experimental!!!
-// If the following code is enabled then speed goes up considerably in some
-// cases. However this doesn't work very well. We need a global state mechanism
-// because other functions may mess up the state as well.
-//  if (handle == prev_handle && mode == prev_mode) return;
-//  prev_handle = handle;
-//  prev_mode = mode;
-
-
-  // try shortcut method if available
-  if (ShortcutStartPolygonFX && (this ->* ShortcutStartPolygonFX) (handle, mode))
-    return;
 
   m_gouraud = m_renderstate.lighting && m_renderstate.gouraud && ((mode & CS_FX_GOURAUD) != 0);
   m_mixmode = mode;
@@ -1733,19 +1663,17 @@ void csGraphics3DOGLCommon::StartPolygonFX (iMaterialHandle * handle, UInt mode)
   SetGLZBufferFlags (z_buf_mode);
 }
 
+void csGraphics3DOGLCommon::StartPolygonFX (iMaterialHandle * handle, UInt mode)
+{
+  RealStartPolygonFX (handle, mode);
+}
+
 void csGraphics3DOGLCommon::FinishPolygonFX ()
 {
-  // attempt shortcut method
-  if (ShortcutFinishPolygonFX && (this ->* ShortcutFinishPolygonFX) ())
-    return;
 }
 
 void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
 {
-  // take shortcut if possible
-  if (ShortcutDrawPolygonFX && (this ->* ShortcutDrawPolygonFX) (poly))
-    return;
-
   float flat_r = 1., flat_g = 1., flat_b = 1.;
   if (!m_textured)
   {
@@ -1926,11 +1854,11 @@ void csGraphics3DOGLCommon::DrawPolygonFX (G3DPolygonDPFX & poly)
 
       // specify fog vertex transparency
       float I = poly.fog_info[i].intensity;
-      if (I > FOG_MAXVALUE)
-	I = FOGTABLE_CLAMPVALUE;
-      else
-	I = I * FOGTABLE_DISTANCESCALE;
-      glTexCoord2f (I, I);
+      //if (I > CS_FOG_MAXVALUE)
+	//I = CS_FOGTABLE_CLAMPVALUE;
+      //else
+	//I = I * CS_FOGTABLE_DISTANCESCALE;
+      glTexCoord2f (I, 0);
 
       // specify fog vertex location
       glVertex4fv (p_glverts); p_glverts += 4;
@@ -1981,6 +1909,7 @@ static void ResolveVertex (
       if (ofog)
       {
 	fog.intensity = ofog[i1].intensity*(1-r)+ofog[i2].intensity*r;
+	fog.intensity2 = 0;
 	fog.r = ofog[i1].r * (1-r) + ofog[i2].r * r;
 	fog.g = ofog[i1].g * (1-r) + ofog[i2].g * r;
 	fog.b = ofog[i1].b * (1-r) + ofog[i2].b * r;
@@ -2009,7 +1938,8 @@ static void ResolveVertex (
       }
       if (ofog)
       {
-	fog.intensity = fog1.intensity*(1-r)+fog2.intensity*r;
+	fog.intensity =  fog1.intensity*(1-r)+fog2.intensity*r;
+	fog.intensity2 = 0;
 	fog.r = fog1.r * (1-r) + fog2.r * r;
 	fog.g = fog1.g * (1-r) + fog2.g * r;
 	fog.b = fog1.b * (1-r) + fog2.b * r;
@@ -2029,6 +1959,7 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     G3DFogInfo* vertex_fog,
     int& num_clipped_triangles,
     int& num_clipped_vertices,
+    bool transform,
     bool exact_clipping)
 {
   // Make sure the frustum is ok.
@@ -2040,7 +1971,12 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
   csPoly3D obj_frustum;
   int i, j, j1;
   for (i = 0 ; i < frustum.GetNumVertices () ; i++)
-    obj_frustum.AddVertex (o2c.This2OtherRelative (frustum[i]));
+  {
+    if (transform)
+      obj_frustum.AddVertex (o2c.This2OtherRelative (frustum[i]));
+    else
+      obj_frustum.AddVertex (frustum[i]);
+  }
   int num_frust = frustum.GetNumVertices ();
   j1 = num_frust-1;
   for (j = 0 ; j < num_frust ; j++)
@@ -2048,7 +1984,12 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
     frustum_planes[j].Set (csVector3 (0), obj_frustum[j], obj_frustum[j1]);
     j1 = j;
   }
-  csVector3 frust_origin = o2c.This2Other (csVector3 (0));
+  csVector3 frust_origin;
+  if (transform)
+    frust_origin = o2c.This2Other (csVector3 (0));
+  else
+    frust_origin.Set (0, 0, 0);
+
   // In addition to the frustum planes itself we also calculate all
   // diagonal planes which go from one side of the frustum to the other.
   // These are going to be used to detect the special case of a triangle
@@ -2073,20 +2014,21 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
   //@@@frustum_planes[num_frust].Set (0, 0, -1, .01);
 
   // Make sure our worktables are big enough for the clipped mesh.
-  int num_tri = num_triangles*2;
-  if (num_tri < 50) num_tri += 50;	// Increase for low # of triangles.
+  int num_tri = num_triangles*2+50;
   if (num_tri > clipped_triangles.Limit ())
   {
     // Use two times as many triangles. Hopefully this is enough.
     clipped_triangles.SetLimit (num_tri);
   }
   if (num_vertices > clipped_translate.Limit ())
-  {
     clipped_translate.SetLimit (num_vertices);	// Used for original vertices.
-    clipped_vertices.SetLimit (num_vertices*2);
-    clipped_texels.SetLimit (num_vertices*2);
-    clipped_colors.SetLimit (num_vertices*2);
-    clipped_fog.SetLimit (num_vertices*2);
+  int num_vts = num_vertices*2+100;
+  if (num_vts > clipped_vertices.Limit ())
+  {
+    clipped_vertices.SetLimit (num_vts);
+    clipped_texels.SetLimit (num_vts);
+    clipped_colors.SetLimit (num_vts);
+    clipped_fog.SetLimit (num_vts);
   }
 
   num_clipped_triangles = 0;
@@ -2196,6 +2138,9 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
       poly[0] = vertices[tri.a] - frust_origin;
       poly[1] = vertices[tri.b] - frust_origin;
       poly[2] = vertices[tri.c] - frust_origin;
+      clipinfo[0].Clear ();
+      clipinfo[1].Clear ();
+      clipinfo[2].Clear ();
       clipinfo[0].type = CS_CLIPINFO_ORIGINAL; clipinfo[0].original.idx = tri.a;
       clipinfo[1].type = CS_CLIPINFO_ORIGINAL; clipinfo[1].original.idx = tri.b;
       clipinfo[2].type = CS_CLIPINFO_ORIGINAL; clipinfo[2].original.idx = tri.c;
@@ -2257,7 +2202,6 @@ void csGraphics3DOGLCommon::ClipTriangleMesh (
 void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 {
   FlushDrawPolygon ();
-  end_draw_poly ();
 
   bool stencil_enabled = false;
   bool clip_planes_enabled = false;
@@ -2324,26 +2268,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   int i,k;
 
   //===========
-  // First setup the clipper that we need.
-  //===========
-  if (how_clip == 's')
-  {
-    SetupStencil ();
-    stencil_enabled = true;
-    // Use the stencil area.
-    glEnable (GL_STENCIL_TEST);
-    glStencilFunc (GL_EQUAL, 1, 1);
-    glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
-  }
-  else if (how_clip == 'p')
-  {
-    SetupClipPlanes ();
-    clip_planes_enabled = true;
-    for (i = 0 ; i <= frustum.GetNumVertices () ; i++)	// One extra!
-      glEnable ((GLenum)(GL_CLIP_PLANE0+i));
-  }
-
-  //===========
   // Update work tables.
   //===========
   int num_vertices = mesh.num_vertices;
@@ -2355,8 +2279,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     uv_mul_verts.SetLimit (num_vertices);
     rgba_verts.SetLimit (num_vertices*4);
     color_verts.SetLimit (num_vertices);
-    fog_intensities.SetLimit (num_vertices*2);
-    fog_color_verts.SetLimit (num_vertices);
   }
 
   //===========
@@ -2367,6 +2289,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   csVector3* f1 = mesh.vertices[0];
   csVector2* uv1 = mesh.texels[0];
   csColor* col1 = mesh.vertex_colors[0];
+  if (!col1) mesh.do_morph_colors = false;
   csVector3* work_verts;
   csVector2* work_uv_verts;
   csColor* work_colors;
@@ -2425,6 +2348,7 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
 	work_fog,
 	num_triangles,
 	num_vertices,
+	mesh.vertex_mode == G3DTriangleMesh::VM_WORLDSPACE,
 	!use_lazy_clipping);
     if (!use_lazy_clipping)
     {
@@ -2434,8 +2358,29 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
       work_fog = clipped_fog.GetArray ();
     }
     triangles = clipped_triangles.GetArray ();
+    if (num_triangles <= 0) return;	// Nothing to do!
   }
-  
+
+  //===========
+  // First setup the clipper that we need.
+  //===========
+  if (how_clip == 's')
+  {
+    SetupStencil ();
+    stencil_enabled = true;
+    // Use the stencil area.
+    glEnable (GL_STENCIL_TEST);
+    glStencilFunc (GL_EQUAL, 1, 1);
+    glStencilOp (GL_KEEP, GL_KEEP, GL_KEEP);
+  }
+  else if (how_clip == 'p')
+  {
+    SetupClipPlanes ();
+    clip_planes_enabled = true;
+    for (i = 0 ; i <= frustum.GetNumVertices () ; i++)	// One extra!
+      glEnable ((GLenum)(GL_CLIP_PLANE0+i));
+  }
+
   // set up coordinate transform
   GLfloat matrixholder[16];
 
@@ -2514,30 +2459,6 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
   matrixholder[11] = inv_aspect;
   matrixholder[14] = -inv_aspect;
   glMultMatrixf (matrixholder);
-
-  //===========
-  // Prepare the fog tables for later.
-  //===========
-  if (mesh.do_fog)
-  {
-    for (i=0 ; i < num_vertices ; i++)
-    {
-      // specify fog vertex transparency
-      float I = work_fog[i].intensity;
-      if (I > FOG_MAXVALUE)
-      	I = FOGTABLE_CLAMPVALUE;
-      else
-	I = I * FOGTABLE_DISTANCESCALE;
-
-      fog_intensities[i*2] = I;
-      fog_intensities[i*2+1] = I;
-      // @@@ To avoid this copy we better structure this differently
-      // inside G3DTriangleMesh.
-      fog_color_verts[i].red = work_fog[i].r;
-      fog_color_verts[i].green = work_fog[i].g;
-      fog_color_verts[i].blue = work_fog[i].b;
-    }
-  }
 
   //===========
   // Draw the base mesh.
@@ -2703,8 +2624,8 @@ void csGraphics3DOGLCommon::DrawTriangleMesh (G3DTriangleMesh& mesh)
     }
 
     glVertexPointer (3, GL_FLOAT, 0, & work_verts[0]);
-    glTexCoordPointer (2, GL_FLOAT, 0, & fog_intensities[0]);
-    glColorPointer (3, GL_FLOAT, 0, & fog_color_verts[0]);
+    glTexCoordPointer (2, GL_FLOAT, sizeof (G3DFogInfo), & work_fog[0].intensity);
+    glColorPointer (3, GL_FLOAT, sizeof (G3DFogInfo), & work_fog[0].r);
 
     glDrawElements (GL_TRIANGLES, num_triangles*3, GL_UNSIGNED_INT, triangles);
 
@@ -2773,8 +2694,6 @@ void csGraphics3DOGLCommon::CacheTexture (iPolygonTexture *texture)
 
 bool csGraphics3DOGLCommon::SetRenderState (G3D_RENDERSTATEOPTION op, long value)
 {
-  //@@@end_draw_poly ();
-
   switch (op)
   {
     case G3DRENDERSTATE_ZBUFFERMODE:
@@ -2856,7 +2775,6 @@ long csGraphics3DOGLCommon::GetRenderState (G3D_RENDERSTATEOPTION op)
 void csGraphics3DOGLCommon::ClearCache ()
 {
   FlushDrawPolygon ();
-  end_draw_poly ();
 
   // We will clear lightmap cache since when unloading a world lightmaps
   // become invalid. We won't clear texture cache since texture items are
@@ -2872,7 +2790,6 @@ void csGraphics3DOGLCommon::DrawLine (const csVector3 & v1, const csVector3 & v2
 	float fov, int color)
 {
   FlushDrawPolygon ();
-  end_draw_poly ();
 
   if (v1.z < SMALL_Z && v2.z < SMALL_Z)
     return;
@@ -2978,8 +2895,6 @@ void csGraphics3DOGLCommon::SetGLZBufferFlagsPass2 (csZBufMode flags,
 // multitexture
 bool csGraphics3DOGLCommon::DrawPolygonMultiTexture (G3DPolygonDP & poly)
 {
-  end_draw_poly ();//@@@
-
 // work in progress - GJH
 #if USE_MULTITEXTURE
 
@@ -3223,7 +3138,6 @@ void csGraphics3DOGLCommon::DrawPixmap (iTextureHandle *hTex,
   int sx, int sy, int sw, int sh, int tx, int ty, int tw, int th, uint8 Alpha)
 {
   FlushDrawPolygon ();
-  end_draw_poly ();
 
   int ClipX1, ClipY1, ClipX2, ClipY2;
   G2D->GetClipRect (ClipX1, ClipY1, ClipX2, ClipY2);

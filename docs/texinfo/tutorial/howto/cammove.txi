@@ -1,0 +1,54 @@
+@c -*-texinfo-*-
+@node HOWTO Camera Movement, , ,
+@subsection Camera Movement
+@cindex movement, camera
+@cindex moving, camera
+@cindex @code{LookAt}
+@cindex @samp{csOrthoTransform}
+@cindex @samp{csReversibleTransform}
+@cindex @samp{iCamera}
+@cindex world space
+@cindex camera space
+
+This section describes how to move the camera.
+
+@subsubheading The Camera is a Transform
+
+Internally in the engine the @samp{csCamera} class inherits
+directly from @samp{csOrthoTransform} which inherits from
+@samp{csReversibleTransform}. If you work with @samp{iCamera} then you
+can get the reference to this transform with @code{camera->GetTransform()}.
+In addition the transformation a camera also holds a pointer to the
+current sector.
+
+This means that all operations you have in @samp{csOrthoTransform} can
+be used on the camera. One of the most useful functions there is
+@code{LookAt()} with which you can make the camera point to some spot.
+Using @code{LookAt()} it is very easy to make a 3rd person view.
+
+In addition to the standard functions from @samp{csOrthoTransform} there
+are a number of other functions that you can use. The most interesting
+are @code{MoveWorld()} and @code{Move()}. These functions will move
+the camera and make sure that it cannot walk through a wall and also make
+sure that walking through portals will work. Both functions move the
+camera a relative amount. The difference between @code{MoveWorld()} and
+@code{Move()} is that the latter will move the camera in camera space.
+For example, take the following code:
+
+@example
+  iCamera* camera;
+  camera->GetTransform ().Move (csVector3 (0, 0, 1));
+@end example
+
+This will move the camera forward in camera space. This means that the
+camera will walk 'forward' :-) On the other hand:
+
+@example
+  iCamera* camera;
+  camera->GetTransform ().MoveWorld (csVector3 (0, 0, 1));
+@end example
+
+This will move the camera in the world so that it goes one unit in
+the positive Z direction. This will happen independently of the orientation
+of the camera.
+

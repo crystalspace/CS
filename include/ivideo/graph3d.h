@@ -46,6 +46,26 @@ struct csPixelFormat;
 #define CS_FOG_BACK		1
 #define CS_FOG_VIEW		2
 
+//======================================================================
+// For vertex based fog the following defines are used:
+#define CS_FOGTABLE_SIZE 64
+
+// Each texel in the fog table holds the fog alpha value at a certain
+// (distance*density).  The median distance parameter determines the
+// (distance*density) value represented by the texel at the center of
+// the fog table.  The fog calculation is:
+// alpha = 1.0 - exp( -(density*distance) / CS_FOGTABLE_MEDIANDISTANCE)
+#define CS_FOGTABLE_MEDIANDISTANCE 10.0
+#define CS_FOGTABLE_MAXDISTANCE (CS_FOGTABLE_MEDIANDISTANCE * 2.0)
+#define CS_FOGTABLE_DISTANCESCALE (1.0 / CS_FOGTABLE_MAXDISTANCE)
+
+// Fog (distance*density) is mapped to a texture coordinate and then
+// clamped.  This determines the clamp value.  Some drivers don't
+// like clamping textures so we must do it ourself
+#define CS_FOGTABLE_CLAMPVALUE 0.85
+#define CS_FOG_MAXVALUE (CS_FOGTABLE_MAXDISTANCE * CS_FOGTABLE_CLAMPVALUE)
+//======================================================================
+
 /**
  * Mix modes for DrawPolygonFX ()
  * The constants below can be ORed together if they belong to different masks.
@@ -95,8 +115,14 @@ class G3DFogInfo
 public:
   /// Color.
   float r, g, b;
-  /// Intensity (== density * thickness).
+  /**
+   * Intensity (== density * thickness).
+   * The second intensity value is always 0 and is put there
+   * to make it easier for 3D implementations to just use the
+   * two values below as a coordinate in a texture of 64*1.
+   */
   float intensity;
+  float intensity2;
 };
 
 ///
@@ -123,6 +149,8 @@ struct G3DPolygonDPFX
 
   /// The material handle as returned by iTextureManager.
   iMaterialHandle *mat_handle;
+  /// Mixmode to use. If CS_FX_COPY then no mixmode is used.
+  UInt mixmode;
 
   /// Use this color for drawing (if txt_handle == NULL) instead of a material.
   UByte flat_color_r;
