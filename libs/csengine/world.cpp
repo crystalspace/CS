@@ -763,6 +763,7 @@ void csWorld::Clear ()
   // Clear all object libraries
   Library = NULL;
   Libraries.DeleteAll ();
+  tr_manager.Initialize ();
 }
 
 void csWorld::ResolveEngineMode ()

@@ -1,6 +1,20 @@
 The history order has been reversed so that new features are at the top.
 
 31-Aug-2000
+	- Added csView::SetWorld() to change the world that is used
+	  for the view. This is useful for programs that reload the world
+	  later.
+	- Extended csTransformationManager so that you can initialize
+	  it again. Then call this initialize from csWorld::Clear().
+	  This means that it is now safe to clear the world and reload
+	  it.
+	- Added the ability to load levels in levtool. Now you just can
+	  use the 'Load Level' button and select a ZIP file using the
+	  archive. This will load the level in all available engine views.
+	- Added the first useful feature to 'levtool'. A 'cleanup' button
+	  that will remove all lightmaps and PVS info from a level archive.
+	- Added 'New View' button to add a new engine view window.
+	- Made the Control Window in levtool dragable.
 	- Found a bad bug in the loader (related to the recent changes
 	  with things) which caused things to be added twice to the sector
 	  list. This caused crashes when loading levels which had things

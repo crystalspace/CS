@@ -63,6 +63,8 @@ public:
 
   /// Get world.
   csWorld* GetWorld () { return world; }
+  /// Set the world.
+  void SetWorld (csWorld* w) { world = w; }
   /// Get current camera.
   csCamera* GetCamera () { return camera; }
   /// Set current camera.

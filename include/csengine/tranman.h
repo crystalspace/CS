@@ -101,6 +101,9 @@ public:
   /// Destruct.
   virtual ~csTransformationManager ();
 
+  /// Initialize (useful when the world has been cleared).
+  void Initialize ();
+
   /**
    * Return a new vertex array. Note that it is not possible
    * to free arrays. They are automatically freed every frame.

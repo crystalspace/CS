@@ -34,6 +34,11 @@ csTransformationManager::csTransformationManager ()
 
 csTransformationManager::~csTransformationManager ()
 {
+  Initialize ();
+}
+
+void csTransformationManager::Initialize ()
+{
   while (freed)
   {
     csVertexArray* n = freed->next;
@@ -46,6 +51,10 @@ csTransformationManager::~csTransformationManager ()
     delete alloced;
     alloced = n;
   }
+  cookie = 0;
+  max_cookie = 0;
+  frame_cookie = 0;
+  last_alloced = NULL;
 }
 
 void csTransformationManager::NewFrame ()
