@@ -19,6 +19,7 @@
 */
 
 #include <assert.h>
+#include "sysdef.h"
 #include "csphyzik/ctvector.h"
 #include "csphyzik/ctmatrix.h"
 #include "csphyzik/qtrigid.h"

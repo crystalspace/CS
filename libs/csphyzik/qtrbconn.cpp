@@ -18,6 +18,7 @@
 
 */
 
+#include "sysdef.h"
 #include "csphyzik/qtrbconn.h"
 #include "csphyzik/qtrigid.h"
 #include "csphyzik/phyzent.h"

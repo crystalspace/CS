@@ -19,6 +19,7 @@
 #ifdef DDG
 #include "ddggeom.h"
 #else
+#include "sysdef.h"
 #include "csterr/ddggeom.h"
 #endif
 	/** Project a point onto a plane defined by its normal.

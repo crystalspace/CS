@@ -20,6 +20,7 @@
 #include "ddgnoise.h"
 #include "ddgutil.h"
 #else
+#include "sysdef.h"
 #include "csterr/ddgnoise.h"
 #include "csterr/ddgutil.h"
 #endif

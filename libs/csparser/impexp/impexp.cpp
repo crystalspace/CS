@@ -20,6 +20,7 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "sysdef.h"
 #include "csparser/impexp.h"
 
 // converter.cpp: implementation of the converter class.

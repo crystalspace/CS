@@ -184,14 +184,7 @@ void csSector::UseStaticTree (int mode, bool octree)
   }
   CsPrintf (MSG_INITIALIZATION, "Calculate bsp/octree...\n");
   static_tree->Build (static_thing->GetPolygonArray ());
-  int num_nodes, num_leaves, max_depth, tot_polygons;
-  int max_poly_in_node, min_poly_in_node;
-  static_tree->Statistics (&num_nodes, &num_leaves, &max_depth,
-  	&tot_polygons, &max_poly_in_node, &min_poly_in_node);
-  CsPrintf (MSG_INITIALIZATION, "  nodes=%d leafs=%d max_depth=%d poly=%d\n",
-  	num_nodes, num_leaves, max_depth, tot_polygons);
-  CsPrintf (MSG_INITIALIZATION, "  max_poly/node=%d min_poly/node=%d\n",
-  	max_poly_in_node, min_poly_in_node);
+  static_tree->Statistics ();
   CsPrintf (MSG_INITIALIZATION, "Compress vertices...\n");
   static_thing->CompressVertices ();
   CsPrintf (MSG_INITIALIZATION, "Build vertex tables...\n");
@@ -393,14 +386,17 @@ static int count_cull_node_vis;
 // @@@ This routine need to be cleaned up!!! It probably needs to
 // be part of the class.
 
+bool debug_pvs = false; // @@@ TEMPORARY TO TEST PVS
 bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
 	const csVector3& pos, void* data)
 {
   if (!node) return false;
   if (node->Type () != NODE_OCTREE) return true;
+
   int i;
   csOctree* otree = (csOctree*)tree;
   csOctreeNode* onode = (csOctreeNode*)node;
+if (debug_pvs) return onode->visible;
   csCBuffer* c_buffer = csWorld::current_world->GetCBuffer ();
   csQuadtree* quadtree = csWorld::current_world->GetQuadtree ();
   csCoverageMaskTree* covtree = csWorld::current_world->GetCovtree ();
@@ -427,12 +423,13 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
       if (top && cam[i].y >= cam[i].z * rview->topy) top = false;
       if (bot && cam[i].y <= cam[i].z * rview->boty) bot = false;
     }
-    if (left || right || top || bot) return false;
+    if (left || right || top || bot) { onode->visible = false; return false; }
 
     if (num_z_0 == num_array)
     {
       // Node behind camera.
       count_cull_node_notvis_behind++;
+      onode->visible = false;
       return false;
     }
     persp.MakeEmpty ();
@@ -477,7 +474,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
       }
     }
 
-    if (!persp.ClipAgainst (rview->view)) return false;
+    if (!persp.ClipAgainst (rview->view)) { onode->visible = false; return false; }
 
     // c-buffer test.
     bool vis;
@@ -493,6 +490,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
     if (!vis)
     {
       count_cull_node_notvis_cbuffer++;
+      onode->visible = false;
       return false;
     }
   }
@@ -514,6 +512,7 @@ bool CullOctreeNode (csPolygonTree* tree, csPolygonTreeNode* node,
     for (i = 0 ; i < num_indices ; i++)
       cam[indices[i]] = rview->Other2This (pset->Vwor (indices[i]));
   }
+  onode->visible = true;
   return true;
 }
 

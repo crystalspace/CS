@@ -9,7 +9,6 @@
 #include "csphyzik/phyztype.h"
 
 #ifdef __CRYSTALSPACE__
-#include "sysdef.h"
 #include "csengine/world.h"
 //class csSystemDriver;
 #endif

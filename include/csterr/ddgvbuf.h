@@ -23,7 +23,6 @@
 #include "ddgvec.h"
 #include "ddgcolor.h"
 #else
-#include "sysdef.h"
 #include "csengine/terrain.h"
 #include "csterr/ddgvec.h"
 #endif

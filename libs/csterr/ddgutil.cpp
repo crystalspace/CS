@@ -18,7 +18,6 @@
 */
 // For timing info.
 
-#include "sysdef.h"
 #ifdef OS_WIN32
 #include <time.h>
 #elif OS_MACOS
@@ -28,6 +27,7 @@
 #ifdef DDG
 #include "ddgutil.h"
 #else
+#include "sysdef.h"
 #include "csterr/ddgutil.h"
 #endif
 // ----------------------------------------------------------------------

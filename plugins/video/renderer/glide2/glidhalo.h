@@ -19,7 +19,6 @@
 #ifndef _CSGLIDEHALO_H
 #define _CSGLIDEHALO_H
 
-#include "sysdef.h"
 #include "qint.h"
 #include "csgeom/math2d.h"
 #include "csutil/util.h"

@@ -20,7 +20,6 @@
 #ifndef __CS_SCAN_H__
 #define __CS_SCAN_H__
 
-#include "sysdef.h"
 #include "csutil/scf.h"
 #include "csgfxldr/rgbpixel.h"
 

@@ -1218,8 +1218,13 @@ static bool CommandHandler (char *cmd, char *arg)
   }
   else if (!strcasecmp (cmd, "debug2"))
   {
+#   if 0
     extern bool do_covtree_dump;
     do_covtree_dump = !do_covtree_dump;
+#   else
+    extern bool debug_pvs;
+    debug_pvs = !debug_pvs;
+#   endif
     //Sys->Printf (MSG_CONSOLE, "No debug2 implementation in this version.\n");
   }
   else if (!strcasecmp (cmd, "strafe_left"))

@@ -22,6 +22,7 @@
 #include "ddgvbuf.h"
 #include "ddgerror.h"
 #else
+#include "sysdef.h"
 #include "csterr/ddg.h"
 #include "csterr/ddgvbuf.h"
 #endif

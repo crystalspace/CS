@@ -22,6 +22,8 @@
 #include "csengine/bsp.h"
 #include "csengine/treeobj.h"
 #include "csengine/sector.h"
+#include "csengine/world.h"
+#include "isystem.h"
 
 //---------------------------------------------------------------------------
 
@@ -223,38 +225,71 @@ void SplitOptPlane (csPolygonInt* np, csPolygonInt** npF, csPolygonInt** npB,
   }
 }
 
-void SplitOptPlaneDyn (csPolygonInt* np, csPolygonInt** npF, csPolygonInt** npB,
-	int xyz, float xyz_val)
+float randflt ()
 {
-  if (!np)
+  return ((float)rand ()) / (float)RAND_MAX;
+}
+
+void csOctree::ChooseBestCenter (csOctreeNode* node,
+	csPolygonInt** polygons, int num)
+{
+  const csVector3& bmin = node->GetMinCorner ();
+  const csVector3& bmax = node->GetMaxCorner ();
+  const csVector3& orig = node->GetCenter ();
+  float xsize = (bmax.x - bmin.x)/10;
+  float ysize = (bmax.y - bmin.y)/10;
+  float zsize = (bmax.z - bmin.z)/10;
+
+  int i, j;
+  csVector3 best_center = orig;
+  int best_splits = 2000000000;
+  csVector3 tryit;
+#if 0
+  for (tryit.x = orig.x-xsize/2 ; tryit.x < orig.x+xsize/2 ; tryit.x += xsize/10)
+    for (tryit.y = orig.y-ysize/2 ; tryit.y < orig.y+ysize/2 ; tryit.y += ysize/10)
+      for (tryit.z = orig.z-zsize/2 ; tryit.z < orig.z+zsize/2 ; tryit.z += zsize/10)
+      {
+        int splits = 0;
+        for (j = 0 ; j < num ; j++)
+        {
+          if (polygons[j]->ClassifyX (tryit.x) == POL_SPLIT_NEEDED) splits++;
+          if (polygons[j]->ClassifyY (tryit.y) == POL_SPLIT_NEEDED) splits++;
+          if (polygons[j]->ClassifyZ (tryit.z) == POL_SPLIT_NEEDED) splits++;
+        }
+        if (splits < best_splits)
+        {
+          best_center = tryit;
+          best_splits = splits;
+        }
+      }
+#elif 0
+  // @@@ Choose based on vertices in polygons!
+#elif 0
+  // @@@ Choose one axis at a time instead of all three together!
+#elif 0
+  // @@@ Choose while trying to maximize the area of solid space
+  // This will improve occlusion!
+#else
+  for (i = 0 ; i < 500 ; i++)
   {
-    *npF = NULL;
-    *npB = NULL;
-    return;
+    tryit.x = orig.x + xsize * (randflt ()-.5);
+    tryit.y = orig.y + ysize * (randflt ()-.5);
+    tryit.z = orig.z + zsize * (randflt ()-.5);
+    int splits = 0;
+    for (j = 0 ; j < num ; j++)
+    {
+      if (polygons[j]->ClassifyX (tryit.x) == POL_SPLIT_NEEDED) splits++;
+      if (polygons[j]->ClassifyY (tryit.y) == POL_SPLIT_NEEDED) splits++;
+      if (polygons[j]->ClassifyZ (tryit.z) == POL_SPLIT_NEEDED) splits++;
+    }
+    if (splits < best_splits)
+    {
+      best_center = tryit;
+      best_splits = splits;
+    }
   }
-  int rc = 0;
-  switch (xyz)
-  {
-    case 0: rc = np->ClassifyX (xyz_val); break;
-    case 1: rc = np->ClassifyY (xyz_val); break;
-    case 2: rc = np->ClassifyZ (xyz_val); break;
-  }
-  if (rc == POL_SPLIT_NEEDED)
-  {
-    // In case of dynamic polygon adding we don't split the polygon.
-    *npF = np;
-    *npB = np;
-  }
-  else if (rc == POL_BACK)
-  {
-    *npF = NULL;
-    *npB = np;
-  }
-  else
-  {
-    *npF = np;
-    *npB = NULL;
-  }
+#endif
+  node->center = best_center;
 }
 
 void csOctree::Build (csOctreeNode* node, const csVector3& bmin,
@@ -275,6 +310,8 @@ void csOctree::Build (csOctreeNode* node, const csVector3& bmin,
     node->SetMiniBsp (bsp);
     return;
   }
+
+  ChooseBestCenter (node, polygons, num);
 
   const csVector3& center = node->GetCenter ();
 
@@ -423,15 +460,50 @@ void* csOctree::Front2Back (csOctreeNode* node, const csVector3& pos,
   return rc;
 }
 
-void csOctree::Statistics (csOctreeNode* node, int depth, int* num_nodes,
-	int* num_leaves, int* max_depth,
-  	int* tot_polygons, int* max_poly_in_node, int* min_poly_in_node)
+void csOctree::Statistics ()
 {
+  int num_oct_nodes = 0, max_oct_depth = 0, num_bsp_trees = 0;
+  int tot_bsp_nodes = 0, min_bsp_nodes = 1000000000, max_bsp_nodes = 0;
+  int tot_bsp_leaves = 0, min_bsp_leaves = 1000000000, max_bsp_leaves = 0;
+  int tot_max_depth = 0, min_max_depth = 1000000000, max_max_depth = 0;
+  int tot_tot_poly = 0, min_tot_poly = 1000000000, max_tot_poly = 0;
+  Statistics ((csOctreeNode*)root, 0,
+  	&num_oct_nodes, &max_oct_depth, &num_bsp_trees,
+  	&tot_bsp_nodes, &min_bsp_nodes, &max_bsp_nodes,
+	&tot_bsp_leaves, &min_bsp_leaves, &max_bsp_leaves,
+	&tot_max_depth, &min_max_depth, &max_max_depth,
+	&tot_tot_poly, &min_tot_poly, &max_tot_poly);
+  int avg_bsp_nodes = tot_bsp_nodes / num_bsp_trees;
+  int avg_bsp_leaves = tot_bsp_leaves / num_bsp_trees;
+  int avg_max_depth = tot_max_depth / num_bsp_trees;
+  int avg_tot_poly = tot_tot_poly / num_bsp_trees;
+  CsPrintf (MSG_INITIALIZATION, "  oct_nodes=%d max_oct_depth=%d num_bsp_trees=%d\n",
+  	num_oct_nodes, max_oct_depth, num_bsp_trees);
+  CsPrintf (MSG_INITIALIZATION, "  bsp nodes: tot=%d avg=%d min=%d max=%d\n",
+  	tot_bsp_nodes, avg_bsp_nodes, min_bsp_nodes, max_bsp_nodes);
+  CsPrintf (MSG_INITIALIZATION, "  bsp leaves: tot=%d avg=%d min=%d max=%d\n",
+  	tot_bsp_leaves, avg_bsp_leaves, min_bsp_leaves, max_bsp_leaves);
+  CsPrintf (MSG_INITIALIZATION, "  bsp max depth: tot=%d avg=%d min=%d max=%d\n",
+  	tot_max_depth, avg_max_depth, min_max_depth, max_max_depth);
+  CsPrintf (MSG_INITIALIZATION, "  bsp tot poly: tot=%d avg=%d min=%d max=%d\n",
+  	tot_tot_poly, avg_tot_poly, min_tot_poly, max_tot_poly);
+  	
+}
+
+void csOctree::Statistics (csOctreeNode* node, int depth,
+  	int* num_oct_nodes, int* max_oct_depth, int* num_bsp_trees,
+  	int* tot_bsp_nodes, int* min_bsp_nodes, int* max_bsp_nodes,
+	int* tot_bsp_leaves, int* min_bsp_leaves, int* max_bsp_leaves,
+	int* tot_max_depth, int* min_max_depth, int* max_max_depth,
+	int* tot_tot_poly, int* min_tot_poly, int* max_tot_poly)
+{
+  if (!node) return;
   depth++;
-  if (depth > *max_depth) *max_depth = depth;
+  if (depth > *max_oct_depth) *max_oct_depth = depth;
+  (*num_oct_nodes)++;
   if (node->GetMiniBsp ())
   {
-    (*num_leaves)++;
+    (*num_bsp_trees)++;
     int bsp_num_nodes;
     int bsp_num_leaves;
     int bsp_max_depth;
@@ -440,39 +512,34 @@ void csOctree::Statistics (csOctreeNode* node, int depth, int* num_nodes,
     int bsp_min_poly_in_node;
     node->GetMiniBsp ()->Statistics (&bsp_num_nodes, &bsp_num_leaves, &bsp_max_depth,
     	&bsp_tot_polygons, &bsp_max_poly_in_node, &bsp_min_poly_in_node);
-    (*tot_polygons) += bsp_tot_polygons;
-    (*num_nodes) += bsp_num_nodes;
-    (*num_leaves) += bsp_num_leaves;
-    if (depth+bsp_max_depth > *max_depth) *max_depth = depth+bsp_max_depth;
-    if (bsp_max_poly_in_node > *max_poly_in_node) *max_poly_in_node = bsp_max_poly_in_node;
-    if (bsp_min_poly_in_node < *min_poly_in_node) *min_poly_in_node = bsp_min_poly_in_node;
+    (*tot_tot_poly) += bsp_tot_polygons;
+    if (bsp_tot_polygons > *max_tot_poly) *max_tot_poly = bsp_tot_polygons;
+    if (bsp_tot_polygons < *min_tot_poly) *min_tot_poly = bsp_tot_polygons;
+    (*tot_max_depth) += bsp_max_depth;
+    if (bsp_max_depth > *max_max_depth) *max_max_depth = bsp_max_depth;
+    if (bsp_max_depth < *min_max_depth) *min_max_depth = bsp_max_depth;
+    (*tot_bsp_nodes) += bsp_num_nodes;
+    if (bsp_num_nodes > *max_bsp_nodes) *max_bsp_nodes = bsp_num_nodes;
+    if (bsp_num_nodes < *min_bsp_nodes) *min_bsp_nodes = bsp_num_nodes;
+    (*tot_bsp_leaves) += bsp_num_leaves;
+    if (bsp_num_leaves > *max_bsp_leaves) *max_bsp_leaves = bsp_num_leaves;
+    if (bsp_num_leaves < *min_bsp_leaves) *min_bsp_leaves = bsp_num_leaves;
   }
   else
   {
-    (*num_nodes)++;
     int i;
     for (i = 0 ; i < 8 ; i++)
       if (node->children[i])
       {
-        Statistics ((csOctreeNode*)(node->children[i]), depth, num_nodes,
-		num_leaves, max_depth, tot_polygons, max_poly_in_node, min_poly_in_node);
+	Statistics ((csOctreeNode*)(node->children[i]), depth,
+  	num_oct_nodes, max_oct_depth, num_bsp_trees,
+  	tot_bsp_nodes, min_bsp_nodes, max_bsp_nodes,
+	tot_bsp_leaves, min_bsp_leaves, max_bsp_leaves,
+	tot_max_depth, min_max_depth, max_max_depth,
+	tot_tot_poly, min_tot_poly, max_tot_poly);
       }
   }
   depth--;
-}
-
-void csOctree::Statistics (int* num_nodes, int* num_leaves, int* max_depth,
-  	int* tot_polygons, int* max_poly_in_node, int* min_poly_in_node)
-{
-  *num_nodes = 0;
-  *num_leaves = 0;
-  *max_depth = 0;
-  *tot_polygons = 0;
-  *max_poly_in_node = 0;
-  *min_poly_in_node = 10000000;
-  if (root) Statistics ((csOctreeNode*)root, 0, num_nodes, num_leaves,
-  	max_depth, tot_polygons,
-  	max_poly_in_node, min_poly_in_node);
 }
 
 //---------------------------------------------------------------------------

@@ -19,6 +19,7 @@
 #ifdef DDG
 #include "ddgsplay.h"
 #else
+#include "sysdef.h"
 #include "csterr/ddgsplay.h"
 #endif
 ddgSplayKey ddgSplayTree::_maxNode;

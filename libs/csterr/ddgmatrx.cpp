@@ -19,6 +19,7 @@
 #ifdef DDG
 #include "ddgmatrix.h"
 #else
+#include "sysdef.h"
 #include "csterr/ddgmatrx.h"
 #endif
 

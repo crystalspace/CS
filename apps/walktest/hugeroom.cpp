@@ -458,15 +458,8 @@ csSector* HugeRoom::create_huge_world (csWorld* world)
 
   Sys->Printf (MSG_INITIALIZATION, "Number of polygons: %d\n", pol_nr);
   room->UseStaticTree (BSP_ALMOST_MINIMIZE_SPLITS, true);
-  int num_nodes, num_leaves, max_depth, tot_polygons, max_poly_in_node,
-    min_poly_in_node;
-  room->GetStaticTree ()->Statistics (&num_nodes, &num_leaves, &max_depth,
-  	&tot_polygons, &max_poly_in_node, &min_poly_in_node);
+  room->GetStaticTree ()->Statistics ();
 
-  Sys->Printf (MSG_INITIALIZATION, "Statistics: nodes=%d leaves=%d max_depth=%d\n",
-  	num_nodes, num_leaves, max_depth);
-  Sys->Printf (MSG_INITIALIZATION, "            totpoly=%d maxpoly=%d minpoly=%d\n",
-	tot_polygons, max_poly_in_node, min_poly_in_node);
   Sys->Printf (MSG_INITIALIZATION, "            vertices=%d\n",
   	room->GetStaticThing ()->GetNumVertices ());
   return room;

@@ -22,7 +22,6 @@
 #include "ddgvec.h"
 #include "ddgerror.h"
 #else
-#include "sysdef.h"
 #include "csgeom/math2d.h"
 #include "csgeom/math3d.h"
 #include "csterr/ddg.h"

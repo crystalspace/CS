@@ -72,6 +72,11 @@ private:
   /// Number of vertices in minibsp_verts.
   int minibsp_numverts;
 
+public:
+  // Visible. @@@ This is a temporary variable to try out
+  // what a PVS could gain us.
+  bool visible;
+
 private:
   /// Make an empty octree node.
   csOctreeNode ();
@@ -152,16 +157,26 @@ private:
   	csTreeVisitFunc* func, void* data, csTreeCullFunc* cullfunc,
 	void* culldata);
 
-  /// Return statistics about this octree.
-  void Statistics (csOctreeNode* node, int depth, int* num_nodes,
-  	int* num_leaves, int* max_depth,
-  	int* tot_polygons, int* max_poly_in_node, int* min_poly_in_node);
-
   /**
    * Process all todo stubs in a node and add new
    * todo stubs to the children of this node.
    */
   void ProcessTodo (csOctreeNode* node);
+
+  /**
+   * Try to find the best center possible and update the node.
+   */
+  void ChooseBestCenter (csOctreeNode* node, csPolygonInt** polygons, int num);
+
+  /**
+   * Gather statistics info about this tree.
+   */
+  void Statistics (csOctreeNode* node, int depth,
+  	int* num_oct_nodes, int* max_oct_depth, int* num_bsp_trees,
+  	int* tot_bsp_nodes, int* min_bsp_nodes, int* max_bsp_nodes,
+	int* tot_bsp_leaves, int* min_bsp_leaves, int* max_bsp_leaves,
+	int* tot_max_depth, int* min_max_depth, int* max_max_depth,
+	int* tot_tot_poly, int* min_tot_poly, int* max_tot_poly);
 
 public:
   /**
@@ -219,9 +234,8 @@ public:
    */
   void BuildVertexTables () { if (root) ((csOctreeNode*)root)->BuildVertexTables (); }
 
-  /// Return statistics about this octree.
-  void Statistics (int* num_nodes, int* num_leaves, int* max_depth,
-  	int* tot_polygons, int* max_poly_in_node, int* min_poly_in_node);
+  /// Print statistics about this octree.
+  void Statistics ();
 };
 
 #endif /*OCTREE_H*/

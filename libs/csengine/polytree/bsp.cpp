@@ -21,6 +21,8 @@
 #include "csengine/treeobj.h"
 #include "csengine/bsp.h"
 #include "csengine/sector.h"
+#include "csengine/world.h"
+#include "isystem.h"
 
 //---------------------------------------------------------------------------
 
@@ -470,6 +472,21 @@ void csBspTree::Statistics (csBspNode* node, int depth, int* num_nodes,
   	num_leaves, max_depth, tot_polygons, max_poly_in_node,
 	min_poly_in_node);
   depth--;
+}
+
+void csBspTree::Statistics ()
+{
+  int num_nodes;
+  int num_leaves;
+  int max_depth;
+  int tot_polygons;
+  int max_poly_in_node;
+  int min_poly_in_node;
+  Statistics (&num_nodes, &num_leaves, &max_depth, &tot_polygons, &max_poly_in_node,
+  	&min_poly_in_node);
+  CsPrintf (MSG_INITIALIZATION, "  nodes=%d leaves=%d max_depth=%d poly:tot=%d,max=%d,min=%d)\n",
+  	num_nodes, num_leaves, max_depth, tot_polygons,
+	max_poly_in_node, min_poly_in_node);
 }
 
 void csBspTree::Statistics (int* num_nodes, int* num_leaves, int* max_depth,

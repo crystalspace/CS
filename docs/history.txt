@@ -13,6 +13,10 @@ Short-term cleanups that need to be done:
 	  includes that don't belong there (like from csengine).
 
 28-Feb-2000
+	- Michael Ewert did some more optimization work op csphyzik.
+	  At least another 2x speed increase overall.
+	- Norman Kramer did further fixes on the glide drivers.
+	  Line drawing works again too.
 	- Eric Sunshine rewrote the endian-conversion functions in the BMP
 	  loader to work on platforms (such as Sparc and HPPA) which enforce
 	  strict-alignment.  On such platforms, it is illegal to attempt to
@@ -20,6 +24,9 @@ Short-term cleanups that need to be done:
 	  the type's size.  For instance, a 'long' can only be accessed at a
 	  memory location which is a multiple of four.  He also cleaned up the
 	  palette conversion code a bit.
+	- Added a lot of sysdef.h to source files. Removed a lot of sysdef.h
+	  from include files. Added tests to decrease the probability of
+	  these errors.
 27-Feb-2000
 	- Eric Sunshine fixed a bug in polytext.cpp where a recent "patch"
 	  following Andrew's "Big Change" broke CleanIfDirty().  The 'src' and
@@ -44,6 +51,48 @@ Short-term cleanups that need to be done:
 	  problems in the new terrin library and also rewrote ddgMatrix4 to
 	  eliminate an unfortunate 'union' which was accepted by no compiler
 	  but MSVC.
+	- Thomas Hieber did some fixes for proper texture alignment of maps
+	  that use the QuArK extensions of the map format.
+	- Thomas fixed BMP loading for proper palette handling. Red and
+	  blue had been swapped.
+	- Norman Kramer made some fixes on the glide drivers again.
+	  Multipass filtering works now (still with some weird lightmap
+	  effects). Textured and lit drawing is seperated now.
+	- Gary Haussmann fixed text rendering with OpenGL. The problem was
+	  that the third parameter -- which tells OpenGL the components of
+	  data you are passing in -- was '1' when it should have been
+	  'GL_ALPHA'.
+	  While '1' is a legal value to place here it implicitly says the
+	  component you are passing in is the luminance component.  Since
+	  we were telling the driver to store only GL_ALPHA components
+	  (the seventh parameter) it will just throw away any luminance
+	  data we pass into it.  Only if we pass in GL_ALPHA data (and
+	  indicate such by passing in GL_ALPHA as the third parameter) will
+	  the OpenGL driver actually pay attention to our data.
+	- Gary also added "mipmap hack" to get around inability of the
+	  standard CS image to mipmap itself at 1xN and Nx1 sizes.
+	  Officially OpenGL requires you mipmap all the way down to 1x1,
+	  although many implementations are very forgiving.  However, on
+	  standard implementations the texture will not work--that is,
+	  you will see blank polygons without textures--unless all the
+	  mipmaps are produced.
+26-Feb-2000
+	- Michael Dale Long fixed Linux OSS Sound Driver to compile again
+	  (Printf name change). Still crashes whenever a rocket is fired
+	  in walktest.
+	- Michael also fixed up CrystalClear and cctest to compile again.
+	  Finally removed all warnings about unloaded drivers on exit.
+	- Thomas Hieber added support for mirrored textures in QuArK mode.
+	  (This problem was pointer out by Desmond Fletcher).
+	- Thomas also extended support for light (halos, attenuation,
+	  dynamics), added the possibility to assign a name to a sector.
+	  Code was provided by Desmond Fletcher. I just did some coding
+	  style adjustments.
+	- Thomas made further fixes to D3D 6.1 to make it compile again
+	  after Andrew's changes.
+	- Michael Ewert did some optimizations to csphyzik. Moved some
+	  classes around and changed the way data is stored and accessed
+	  in matrix classes. Boosted to almost 2x as fast.
 25-Feb-2000
 	- Fixed software texture cache so that it again allocates the
 	  texture cache based on number of pixels instead of bytes.
@@ -65,6 +114,10 @@ Short-term cleanups that need to be done:
 	    - Now compiles on NeXT.  Had to disable assembly for NeXT.
 	    - Fixed names of variables 'src' and 'dst' which were used in a
 	      fashion exactly opposite of their intended meanings.
+	- Experimented with a variable center for the octree calculation
+	  (in order to decrease number of polygon splits). This seems to
+	  give good results although I have to benchmark it better.
+	- Changed statistics printing for polygon trees.
 	- Eric Sunshine fixed many new compilation problems of various sorts
 	  which showed up following Andrew's Big Change.  CS once again
 	  compiles on NextStep.
@@ -73,6 +126,8 @@ Short-term cleanups that need to be done:
 	- Eric Sunshine added a new Description() method to csBitSet loosely
 	  based upon a PrintAsAscii() method which Rene Dudfield
 	  <illumen@yahoo.com> had sent in for inclusion in csBitSet.
+	- Thomas Hieber did the first steps to make things work again on
+	  Win32. He fixed a lot of compilation problems first.
 24-Feb-2000
 	- Michael Dale Long did various fixes after Andrew's large change.
 	- Wyatt Miler did some fixes to Mac sound drivers.

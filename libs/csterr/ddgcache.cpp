@@ -19,6 +19,7 @@
 #ifdef DDG
 #include "ddgcache.h"
 #else
+#include "sysdef.h"
 #include "csterr/ddgcache.h"
 #endif
 ddgCache::ddgCache(void)

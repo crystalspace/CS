@@ -23,7 +23,6 @@
 #ifdef DDG
 #include <iostream.h>
 #else
-#include "sysdef.h"
 #include "csgeom/math3d.h"
 #define ddgVector3	csVector3
 #endif

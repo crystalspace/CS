@@ -17,6 +17,10 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#ifndef __SYSDEFS_H__
+#error "sysdef.h must be included in EVERY source file!"
+#endif
+
 #ifndef __CS_MATH3D_H__
 #define __CS_MATH3D_H__
 

@@ -190,9 +190,8 @@ public:
   virtual void* Front2Back (const csVector3& pos, csTreeVisitFunc* func,
   	void* data, csTreeCullFunc* cullfunc = NULL, void* culldata = NULL) = 0;
 
-  /// Return statistics about this tree.
-  virtual void Statistics (int* num_nodes, int* num_leaves, int* max_depth,
-  	int* tot_polygons, int* max_poly_in_node, int* min_poly_in_node) = 0;
+  /// Print statistics about this tree.
+  virtual void Statistics () = 0;
 };
 
 #endif /*POLYTREE_H*/

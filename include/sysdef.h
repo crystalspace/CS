@@ -17,7 +17,9 @@
     Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef __SYSDEFS_H__
+#ifdef __SYSDEFS_H__
+#error "Don't include sysdef.h from header files please!"
+#else
 #define __SYSDEFS_H__
 
 #define OK_TO_INCLUDE_DEFS_IM_A_FRIEND

@@ -20,6 +20,8 @@
 #ifndef __CSOSDEFS_H__
 #define __CSOSDEFS_H__
 
+#include <math.h>
+
 extern char* get_software_2d_driver ();
 #define SOFTWARE_2D_DRIVER get_software_2d_driver ()
 

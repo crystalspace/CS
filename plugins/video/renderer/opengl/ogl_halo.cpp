@@ -145,7 +145,8 @@ void csOpenGLHalo::Draw(float x,float y,float w,float h,float iIntensity,csVecto
 
   //Our usual blending
   glBlendFunc (GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-  glColor3f(R,G,B);
+  //glColor3f(R,G,B);
+  glColor4f(R,G,B, 1.0);
   glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
   //Transform our halo (intensify)

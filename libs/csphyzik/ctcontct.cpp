@@ -1,3 +1,4 @@
+#include "sysdef.h"
 #include "csphyzik/rigidbod.h"
 #include "csphyzik/ctvector.h"
 #include "csphyzik/contact.h"
