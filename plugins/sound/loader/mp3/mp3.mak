@@ -26,7 +26,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp plugins/sound/loader/mp3 plugins/sound/loader/mp3/mpg123
+vpath %.cpp plugins/sound/loader/mp3 plugins/sound/loader/mp3/mpg123 plugins/sound/loader/mp3/mpg123/xfermem
 
 ifeq ($(USE_PLUGINS),yes)
   MP3 = $(OUTDLL)sndmp3$(DLL)
@@ -44,9 +44,9 @@ ifeq ($(OS),WIN32)
   SRC.MP3 = $(wildcard plugins/sound/loader/mp3/*.cpp) $(wildcard plugins/sound/loader/mp3/mpg123/*.cpp)
 else
   INC.MP3 = $(wildcard plugins/sound/loader/mp3/*.h) $(wildcard plugins/sound/loader/mp3/mpg123/*.h) \
-    $(wildcard plugins/sound/loader/mp3/mpg123/linux/*.h)
+    $(wildcard plugins/sound/loader/mp3/mpg123/xfermem/*.h)
   SRC.MP3 = $(wildcard plugins/sound/loader/mp3/*.cpp) $(wildcard plugins/sound/loader/mp3/mpg123/*.cpp) \
-    $(wildcard plugins/sound/loader/mp3/mpg123/linux/*.cpp)
+    $(wildcard plugins/sound/loader/mp3/mpg123/xfermem/*.cpp)
 endif
 
 OBJ.MP3 = $(addprefix $(OUT),$(notdir $(SRC.MP3:.cpp=$O)))
