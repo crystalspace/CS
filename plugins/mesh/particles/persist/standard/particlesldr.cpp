@@ -266,7 +266,7 @@ csPtr<iBase> csParticlesFactoryLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
             child, "No color method type specified!");
-          return false;
+          return 0;
         }
         if (!strcmp (str, "constant"))
         {
@@ -848,7 +848,7 @@ csPtr<iBase> csParticlesObjectLoader::Parse (iDocumentNode* node,
         {
           synldr->ReportError ("crystalspace.particles.factory.loader",
             child, "No color method type specified!");
-          return false;
+          return 0;
         }
         if (!strcmp (str, "constant"))
         {

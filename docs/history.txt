@@ -7,13 +7,16 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 25-Jan-2004
-        - Matze did some updates to the jam rules:
-          * I decided not to fight autoconf while using custom variable names.
-            This gives more trouble than necessary. So we're using bindir,
-            includedir, ... for installation directories now.
-          * Rewrote installation rules and used the ones from autojam
-          * fixed and simplified header install rules
-          * added new targets to install docu
+        - Matze made some updates to the Jam rules:
+	    - Decided not to fight Autoconf while using custom variable names
+	      since it gave more trouble than desired.  So, we're using bindir,
+	      includedir, etc. for installation directories now.
+	    - Rewrote installation rules and used the ones from autojam
+	    - Fixed and simplified header install rules.
+	    - Added new targets to install documentation.
+	- Eric Sunshine fixed a couple more places in particleldr.cpp where
+	  false was being returned as a csPtr<>.  Reported by Randall Foreman's
+	  Borland compiler.
 23-Jan-2004
 	- Jorrit fixed a crash bug in the engine.  At destruction it was
 	  forcing a get of the thing plugin.  However this also happens at
