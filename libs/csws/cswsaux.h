@@ -28,7 +28,6 @@
 
 #include "version.h"
 #include "apps/support/command.h"
-#include "csengine/scripts/intscri.h"
 #include "csengine/camera.h"
 #include "csengine/polygon/polygon.h"
 #include "csengine/sector.h"

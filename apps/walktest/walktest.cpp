@@ -40,8 +40,8 @@
 #include "csengine/library.h"
 #include "csengine/polygon/polytext.h"
 #include "csengine/polygon/pol2d.h"
-#include "csengine/scripts/csscript.h"
-#include "csengine/scripts/intscri.h"
+#include "csscript/csscript.h"
+#include "csscript/intscri.h"
 
 // Being is no more
 //#include "csengine/colldet/being.h"

@@ -28,7 +28,6 @@
 
 class csSector;
 class csTextureList;
-class csScript;
 class csSprite3D;
 class csPolygon3D;
 class csCamera;
@@ -124,11 +123,6 @@ public:
    * are not in this list.
    */
   csObjVector planes;
-
-  /**
-   * List of scripts. Obsolete but still functional.
-   */
-  csObjVector scripts;
 
   /**
    * List of collections. This vector contains objects of type
@@ -367,20 +361,6 @@ public:
    * Check if a light has a halo attached.
    */
   bool HasHalo (csLight* pLight);
-
-  /**
-   * Create a new script. 'params' should start with a
-   * qualifier indicating the language of the script.
-   * The syntax is as follows:<p>
-   *     SCRIPT 'name' (prim: dim 1,0,0)<p>
-   *	 SCRIPT 'name' (C:script1.c)
-   */
-  csScript* NewScript (LanguageLayer* layer, char* name, char* params);
-
-  /**
-   * Activate all triggers valid at this camera position.
-   */
-  void TriggerActivate (csCamera& c);
 
   /**
    * Draw the world given a camera and a clipper. Note that

@@ -36,10 +36,6 @@
 #include "csengine/light/lghtmap.h"
 #include "csengine/stats.h"
 #include "csengine/config.h"
-#include "csengine/scripts/primscri.h"
-#include "csengine/scripts/intscri.h"
-#include "csengine/scripts/csscript.h"
-#include "csengine/scripts/objtrig.h"
 #include "csgeom/fastsqrt.h"
 #include "csobject/nameobj.h"
 #include "csutil/archive.h"
@@ -84,7 +80,6 @@ void csWorld::Clear ()
   sectors.DeleteAll ();
   libraries.DeleteAll ();
   planes.DeleteAll ();
-  scripts.DeleteAll ();
   collections.DeleteAll ();
   sprite_templates.DeleteAll ();
   thing_templates.DeleteAll ();
@@ -166,55 +161,6 @@ csSector* csWorld::NewSector ()
   return s;
 }
 
-csScript* csWorld::NewScript (LanguageLayer* layer, char* name, char* params)
-{
-  if (!layer)
-    return NULL;
-
-  csScript* s = NULL;
-  char* par = strchr (params, ':');
-  if (!par)
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Missing language qualifier for script '%s'!\n", name);
-    fatal_exit (0, false);
-  }
-
-  if (scripts.FindByName (name))
-  {
-    CsPrintf (MSG_FATAL_ERROR, "A script with the name '%s' is already defined!\n", name);
-    fatal_exit (0, false);
-  }
-
-  // All different script languages should be recognized here.
-  if (!strncmp (params, "prim", (int)(par-params)))
-  {
-    CHK (PrimScript* sc = new PrimScript (layer));
-    csNameObject::AddName(*sc,name);
-    par++;
-    sc->load (&par);
-    s = (csScript*)sc;
-  }
-  else if (!strncmp (params, "int", (int)(par-params)))
-  {
-    CHK (IntScript* sc = new IntScript (layer));
-    csNameObject::AddName(*sc,name);
-    par++;
-    sc->load (par);
-    s = (csScript*)sc;
-  }
-  else
-  {
-    CsPrintf (MSG_FATAL_ERROR, "Unknown script qualifier for script '%s'!\n", name);
-    fatal_exit (0, false);
-    return NULL;
-  }
-
-  s->prepare ();
-  scripts.Push (s);
-
-  return s;
-}
-
 csThing* csWorld::GetThing (const char* name)
 {
   int i = sectors.Length ();
@@ -226,19 +172,6 @@ csThing* csWorld::GetThing (const char* name)
     if (t) return t;
   }
   return NULL;
-}
-
-void csWorld::TriggerActivate (csCamera& c)
-{
-  csVector3 where = c.This2Other (3*VEC_FORWARD);
-  csPolygon3D* p = c.GetHit (where);
-  if (p)
-  {
-    CsPrintf (MSG_CONSOLE, "Activate polygon '%s' ", csNameObject::GetName(*p));
-    csPolygonSet* ob = (csPolygonSet*)(p->GetParent ());
-    CsPrintf (MSG_CONSOLE, "in set '%s'\n", csNameObject::GetName(*ob));
-    csObjectTrigger::DoActivateTriggers(*ob);
-  }
 }
 
 bool csWorld::Initialize (ISystem* sys, IGraphicsInfo* ginfo, csIniFile* config)

@@ -1,21 +1,21 @@
 # Library description
-DESCRIPTION.csengine = Crystal Space 3D engine
+DESCRIPTION.csscript = Crystal Space 3D engine
 
 #-------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION),rootdefines)
 
 # Library-specific help commands
-LIBHELP += $(NEWLINE)echo $"  make csengine     Make the $(DESCRIPTION.csengine)$"
+LIBHELP += $(NEWLINE)echo $"  make csscript     Make the $(DESCRIPTION.csscript)$"
 
 endif # ifeq ($(MAKESECTION),rootdefines)
 
 #-------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION),roottargets)
 
-.PHONY: csengine
+.PHONY: csscript
 
-all libs: csengine
-csengine:
+all libs: csscript
+csscript:
 	$(MAKE_TARGET)
 
 endif # ifeq ($(MAKESECTION),roottargets)
@@ -23,36 +23,34 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #-------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
-vpath %.cpp libs/csengine libs/csengine/2d libs/csengine/basic \
-  libs/csengine/colldet libs/csengine/light libs/csengine/objects \
-  libs/csengine/polygon
+vpath %.cpp libs/csscript 
 
-CSENGINE.LIB = $(OUT)$(LIB_PREFIX)csengine$(LIB)
-SRC.CSENGINE = $(wildcard libs/csengine/*.cpp libs/csengine/*/*.cpp)
-OBJ.CSENGINE = $(addprefix $(OUT),$(notdir $(SRC.CSENGINE:.cpp=$O)))
+CSSCRIPT.LIB = $(OUT)$(LIB_PREFIX)csscript$(LIB)
+SRC.CSSCRIPT = $(wildcard libs/csscript/*.cpp libs/csscript/*/*.cpp)
+OBJ.CSSCRIPT = $(addprefix $(OUT),$(notdir $(SRC.CSSCRIPT:.cpp=$O)))
 
 endif # ifeq ($(MAKESECTION),postdefines)
 
 #------------------------------------------------------------------ targets ---#
 ifeq ($(MAKESECTION),targets)
 
-.PHONY: csengine csengineclean
+.PHONY: csscript csscriptclean
 
 all: $(CSENGINE.LIB)
-csengine: $(OUTDIRS) $(CSENGINE.LIB)
-clean: csengineclean
+csscript: $(OUTDIRS) $(CSSCRIPT.LIB)
+clean: csscriptclean
 
-$(CSENGINE.LIB): $(OBJ.CSENGINE)
+$(CSSCRIPT.LIB): $(OBJ.CSSCRIPT)
 	$(DO.STATIC.LIBRARY)
 
-csengineclean:
-	-$(RM) $(CSENGINE.LIB)
+csscriptclean:
+	-$(RM) $(CSSCRIPT.LIB)
 
 ifdef DO_DEPEND
-$(OUTOS)csengine.dep: $(SRC.CSENGINE)
+$(OUTOS)csscript.dep: $(SRC.CSSCRIPT)
 	$(DO.DEP)
 endif
 
--include $(OUTOS)csengine.dep
+-include $(OUTOS)csscript.dep
 
 endif # ifeq ($(MAKESECTION),targets)

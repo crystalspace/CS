@@ -44,7 +44,8 @@
 #include "csparser/sndbufo.h"
 #include "csgfxldr/csimage.h"
 #include "csobject/nameobj.h"
-#include "csengine/scripts/objtrig.h"
+#include "csscript/objtrig.h"
+#include "csscript/scripts.h"
 
 
 //---------------------------------------------------------------------------
@@ -374,7 +375,7 @@ csCollection* CSLoader::load_collection (char* name, csWorld* w, char* buf)
 
           if (!strcmp (str2, "activate"))
           {
-            csScript* s = (csScript*)w->scripts.FindByName (str3);
+            csScript* s = csScriptList::GetScript(str3);
             if (!s)
             {
               CsPrintf (MSG_FATAL_ERROR, "Don't know script '%s'!\n", str3);
@@ -556,7 +557,7 @@ csPolygonSet& CSLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info, int cmd,
     case kTokenPSetActivate:
       ScanStr (params, "%s", str);
       {
-        csScript* s = (csScript*)info.w->scripts.FindByName (str);
+        csScript* s = csScriptList::GetScript(str);
         if (!s)
         {
           CsPrintf (MSG_FATAL_ERROR, "Don't know script '%s'!\n", str);
@@ -576,7 +577,7 @@ csPolygonSet& CSLoader::ps_process (csPolygonSet& ps, PSLoadInfo& info, int cmd,
       ScanStr (params, "%s,%s", str, str2);
       if (!strcmp (str, "activate"))
       {
-        csScript* s = (csScript*)info.w->scripts.FindByName (str2);
+        csScript* s = csScriptList::GetScript(str2);
         if (!s)
         {
           CsPrintf (MSG_FATAL_ERROR, "Don't know script '%s'!\n", str2);
@@ -756,7 +757,7 @@ csThing* CSLoader::load_sixface (char* name, csWorld* w, char* buf,
       case kTokenSixActivate:
         ScanStr (params, "%s", str);
         {
-          csScript* s = (csScript*)w->scripts.FindByName (str);
+          csScript* s = csScriptList::GetScript(str);
           if (!s)
           {
             CsPrintf (MSG_FATAL_ERROR, "Don't know script '%s'!\n", str);
@@ -776,7 +777,7 @@ csThing* CSLoader::load_sixface (char* name, csWorld* w, char* buf,
         ScanStr (params, "%s,%s", str, str2);
         if (!strcmp (str, "activate"))
         {
-          csScript* s = (csScript*)w->scripts.FindByName (str2);
+          csScript* s = csScriptList::GetScript(str2);
           if (!s)
           {
             CsPrintf (MSG_FATAL_ERROR, "Don't know script '%s'!\n", str2);
@@ -2760,7 +2761,7 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
       case kTokenRoomActivate:
         ScanStr (params, "%s", str);
         {
-          csScript* s = (csScript*)w->scripts.FindByName (str);
+          csScript* s = csScriptList::GetScript(str);
           if (!s)
           {
             CsPrintf (MSG_FATAL_ERROR, "Don't know script '%s'!\n", str);
@@ -2780,7 +2781,7 @@ csSector* CSLoader::load_room (char* secname, csWorld* w, char* buf,
         ScanStr (params, "%s,%s", str, str2);
         if (!strcmp (str, "activate"))
         {
-          csScript* s = (csScript*)w->scripts.FindByName (str2);
+          csScript* s = csScriptList::GetScript(str2);
           if (!s)
           {
             CsPrintf (MSG_FATAL_ERROR, "Don't know script '%s'!\n", str2);
@@ -3468,7 +3469,7 @@ bool CSLoader::LoadWorld (csWorld* world, LanguageLayer* layer, char* buf)
           world->collections.Push ( CSLoader::load_collection(name,world,params) );
           break;
         case kTokenWorldScript:
-          world->NewScript (layer, name, params);
+          csScriptList::NewScript (layer, name, params);
           break;
         case kTokenWorldTexs:
           {
