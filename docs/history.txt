@@ -58,6 +58,8 @@ chronological order.
 	    variable arguments isn't valid
 	  - Macro now uses csPrintf (not a big issue, since it'll all be removed 
 	    once the shaderexps are complete).
+	  - Fixed initializer problem in csShaderExpression::Parse(), MSVC6 doesn't 
+	    accept the constant initializer for an oper_arg struct.
 16-Oct-2003
 	- Jorrit fixed a big memory leak related to the engine sequence
 	  manager. There are actually three fixes to solve this bug:

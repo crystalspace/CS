@@ -232,7 +232,8 @@ bool csShaderExpression::Parse(iDocumentNode * node, csSymbolTable * stab) {
 
   opcodes.ShrinkBestFit();
 
-  oper_arg tmp = {TYPE_INVALID};
+  oper_arg tmp;
+  tmp.type = TYPE_INVALID;
   accstack.SetLength(acc_top + 1, tmp);
 
   destruct_cons(head);
