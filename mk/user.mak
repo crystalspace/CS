@@ -33,7 +33,7 @@ ifndef PLUGINS
   PLUGINS += dungeon 
   PLUGINS += net/driver/socket net/netman 
   PLUGINS += font/renderer/csfont 
-#  PLUGINS += font/renderer/freefont
+# PLUGINS += font/renderer/freefont
   PLUGINS += netspace/nstp netspace/nsmgr 
   PLUGINS += csauth/simple 
   PLUGINS += $(DETECTED_PLUGINS)
@@ -108,7 +108,7 @@ MEM=$(MEM.$(MODE))
 
 # Set to 1 to use Mesa instead of "real" OpenGL.  You can define MESA_PATH
 # variable in environment to point to MesaGL base path
-USE_MESA=1
+USE_MESA=0
 
 # The tool used to build dependencies. The possible values are:
 # none  - Cannot build dependencies on this platform
