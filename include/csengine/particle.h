@@ -426,6 +426,9 @@ public:
  * falling down after that. Thus some particles may not reach the floor if
  * x is too small. If n is too small you will see not many particles.
  * Note that the 'spout' means the spot where the fountain originates.
+ * Also you know that after fall_time, a particle has reached
+ * sin(elevation)*speed*fall_time + accel.y*fall_time*fall_time + spot.y 
+ * i.e. the world y height of the pool of the fountain.
  */
 class csFountainParticleSystem : public csParticleSystem {
 protected:
@@ -454,6 +457,7 @@ public:
     * opening is the angle controlling the width of the stream.
     * azimuth is the angle of the direction (horizontally) of the stream.
     * elevation is the angle of the direction (up/down) of the stream.
+    *   angles in radians (2*PI is 360 degrees)
     */
   csFountainParticleSystem(csObject* theParent, int number, 
     csTextureHandle* txt, UInt mixmode,
