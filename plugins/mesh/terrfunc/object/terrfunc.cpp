@@ -33,8 +33,9 @@
 #include "ivideo/txtmgr.h"
 #include "igraphic/image.h"
 #include "iutil/objreg.h"
-#include "csgfx/rgbpixel.h"
 #include "iutil/vfs.h"
+#include "imap/ldrctxt.h"
+#include "csgfx/rgbpixel.h"
 #include "terrfunc.h"
 #include "terrvis.h"
 #include "qint.h"
@@ -251,7 +252,7 @@ void csTerrFuncObject::CorrectSeams (int tw, int th)
   }
 }
 
-void csTerrFuncObject::LoadMaterialGroup (iMaterialList* matlist,
+void csTerrFuncObject::LoadMaterialGroup (iLoaderContext* ldr_context,
 	const char *pName, int iStart, int iEnd)
 {
   if (!blocks || block_dim_invalid)
@@ -265,7 +266,7 @@ void csTerrFuncObject::LoadMaterialGroup (iMaterialList* matlist,
   for (i = iStart ; i <= iEnd ; i++)
   {
     sprintf (pMatName, pName, i);
-    iMaterialWrapper* mat = matlist->FindByName (pMatName);
+    iMaterialWrapper* mat = ldr_context->FindMaterial (pMatName);
     Index2Block(i, bx, by);
     Block2Index(by, bx, newi);
     blocks[newi].material = mat;

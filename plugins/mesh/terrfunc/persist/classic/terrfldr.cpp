@@ -229,7 +229,7 @@ iBase* csTerrFuncLoader::Parse (const char* pString,
 	{
 	  int rangeStart, rangeEnd;
 	  csScanStr (pParams, "%s,%d,%d", pStr, &rangeStart, &rangeEnd);
-	  iTerrainState->LoadMaterialGroup (matlist, pStr,
+	  iTerrainState->LoadMaterialGroup (ldr_context, pStr,
 	  	rangeStart, rangeEnd);
 	}
     	break;

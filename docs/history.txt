@@ -45,6 +45,10 @@ The history order is reversed so that new features are at the top.
 	  a rendering to some file without having to open a window. This is
 	  for the software renderer alone. Use the Screenshot() function to
 	  get the image.
+	- Removed 'required' from BisonFlex in msvc documentation as it is
+	  no longer required.
+	- Changed iTerrFuncState::LoadMaterialGroup() to use iLoaderContext
+	  instead of iMaterialList. This fixes a compilation error.
 21-Feb-2002
 	- Peter Amstutz <tetron@student.umass.edu> added a patch to CS
 	  to add two additional broadcast events:
@@ -88,6 +92,24 @@ The history order is reversed so that new features are at the top.
 	- Removed the 'link' parameter from iEngine::CreateSector(). Since
 	  this hack is no longer needed sectors are now always linked
 	  to the engine as they should.
+	- Matze did the following:
+	    - Changed csString to handle 0ptrs correctly (a null pointer is
+	      returned if a null pointer has been assigned).
+	    - Changed cast operator of iString to return const char* instead
+	      of char* (if you really need char* which is dangereous use
+	      GetData).
+	- 'res' fixed a @ref in the next documentation.
+	- 'res' fixed description on how to make a sky brush (skybox.txi).
+	- 'res' adds support for cscmdCanvasExposed/cscmdCanvasHidden for
+	  Windows.
+	- 'res' also adds cscmdCanvasExposed support to Walktest.
+	- 'res' reports that textures sizes in memory (OpenGL) were calculated
+	  wrong in some cases. Also disabled mipmapping for procedural
+	  textures.
+	- 'res' added support for GL_SGIS_generate_mipmap which allows
+	  automagical creation of mipmaps for procedural textures.
+	- Christopher Nelson fixed a dumb bug in bar chart that was making
+	  display inverted.
 20-Feb-2002
 	- Added SetMaximumSectorVisit() and GetMaximumSectorVisit() functions
 	  to iPortal. With this you can control how many times the same
@@ -104,6 +126,12 @@ The history order is reversed so that new features are at the top.
 	  can do. It is not an example of nice code :-)
 	  It also demonstrates a bug where the distance polygons are
 	  drawing wrong for some reason.
+	- Norman Kramer did the following in the glx2d canvas:
+	    - Xvis, cmap and active_GLContext were not set in case the first
+	      glXChooseVisual failed.
+	    - Also added a test for generic RGBA+Doublebuffer+DEPTH
+	      with help from Christophe Cavalaria.
+	- Wyatt Miler updated libpng version that is available in documentation.
 19-Feb-2002
 	- Toni Asco' Gonzalez implemented a faster version of DrawPolygonMesh()
 	  for OpenGL. This code is still experimental but it seems to work.
@@ -161,6 +189,45 @@ The history order is reversed so that new features are at the top.
 	  by using MESHLIB and then use HARDMOVE to position it elsewhere.
 	  The second library contains two mesh objects which are then put
 	  in the next sector.
+	- Christopher Nelson did the following:
+	    - Created new component called "Bar Chart". The bar chart
+	      recognizes vertical and horizontal specifications, and it can
+	      display both rolling charts and static charts.
+	      (A rolling chart must be updated by your application, but the
+	      component handles all the dirty work). Bar Chart has these
+	      options:
+		Options: bcoRolling bcoRollRight bcoRollLeft
+			 bcoVertGridLines bcoHorzGridLines bcoVerticalChart
+		InnerStyle: ... same as style, only for the inner frame that
+			contains the bars ...
+		XLegend: "Legend Name"
+		YLegend: "Legend Name"
+		MaxItems: 10 ... or any other reasonable integer, this is
+			only used for the rolling chart ...
+		Caption: "Chart Legend"
+	    - Added bar chart to common components list.
+	    - Added new function FindColor to preferences manager. It looks
+	      for the specified RGB triplet using AWS's built-in texture
+	      manager.
+	    - Made some fixes to bar chart so that the vertical stuff works
+	      right, and also so that the options are added in as constants.
+	    - Updated test app to fill up bar chart with some sample values.
+	    - Updated bar chart so that it displays a proper numerical legend
+	      on the left when NOT using bcoVerticalChart.
+	    - Fixed divide by zero bug. Also added new signal:
+	      signalBarChartTimer which can be controlled by UpdateInterval.
+	      This signal is sent every UpdateInterval milliseconds and can
+	      be trapped, but ONLY if the bar chart is rolling. Otherwise the
+	      signal is not mapped.
+	    - Added notion of Icons that can be shown left, right, above or
+	      below the text of a command button.
+	      Example:
+		component "East" is "Command Button"
+		{
+		  Caption: "East"
+		  Icon: "/aws/zoom.png"
+		  IconAlign: biaLeft
+		}
 18-Feb-2002
 	- Added experimental code to allow video mode selection using
 	  AWS. This does not work yet and the API is subject to change
@@ -168,6 +235,33 @@ The history order is reversed so that new features are at the top.
 	  application that uses this feature.
 	- Removed dependency on AWS to libflex (for MSVC). This is not
 	  required.
+	- Wouter Wijngaards fixed the layout bug Patrick spotted in csmod
+	  and csogg makefiles.
+	- Matze fixed annotation time to be really UTC.
+	- Norman reports: gridlayout is now translated into aws GridBag
+	  layout (this has still some issues). Norman also added description
+	  on how to use the qt2aws.xsl stylesheet.
+	- 'res' reports: fontplex now breaks loading of font servers after 2
+	  consecutive failures (instead after the first failure).
+16-Feb-2002
+	- Philip Wyett eliminated 'no newline' warnings in some aws source
+	  files.
+	- Norman Kramer did the following:
+	    - Modified csRectRegion::Include.
+	    - This solves the flickering problem in aws.
+	    - I'm sure Christopher dislikes my solution since it always splits
+	      the rectangle if it partly covers the new to be included
+	      rectangle, so the case where n>1 already existing rectangles
+	      cover the newly to be included rectangle is ignored.
+	- Philip Wyett made modification, which can be seen on cs-main.
+	  changed:
+		n = ((n + threshold - 1) / threshold) * threshold;
+	  to:
+ 		n = n + threshold - 1;
+	  This bug was found by Shawn Carroll and publised to the list
+	  by Patrick McFarland the creator of m4 for CS.
+	- Reverted Philip's change since for integers n/a*a is not always
+	  equal to n.
 15-Feb-2002
 	- Reverted 'res' change to win32gcc.mak since it breaks compile of
 	  ddraw plugin. The problem is that the -lddraw library link command
@@ -178,6 +272,8 @@ The history order is reversed so that new features are at the top.
 	- Little code reformatting of libs/csutil/cfgmgr.cpp.
 	- Reverted 'res' change to enginep.mak since it breaks loading
 	  of the engine plugin on MingW at least.
+	- 'res' added an alternative workaround for dllwrap on MingW (but
+	  not activated by default).
 	- Completely reformatted the AWS source code using the GC utility.
 	  Now the source of AWS finally conforms to CS coding style rules.
 	- Completely reformatted the engine source code using the GC utility.
@@ -189,6 +285,47 @@ The history order is reversed so that new features are at the top.
 	  config files and also clean up all loaded domains.
 	- Removed iConfigManager::CleanUp() again. This is not the right
 	  way to do this.
+	- Matt Reda fixed bug in OSX canvases. Window title never switched
+	  back after being unpaused.
+	- Wouter Wijngaards added a check to the new halo fading (which looks
+	  good!) so that it is only done if the flare component is CS_FX_ADD.
+	  Other mixmodes would be colored black, which would not be nice.
+	- Jonathan Tarbox added comments on how to enable NASM for CS
+	  under BeOS.
+	- Christopher Nelson did the following:
+	    - Renamed awslayot.cpp to awsgbl.cpp.
+	    - Added BorderLayout. Should work pretty much like the Java one,
+	      with the exception that it ignores "BEFORE_FIRST_LINE" and
+	      similar because that has no meaning in AWS. In order to specify
+	      the anchor point for children use Anchor: blNorth, blSouth,
+	      blEast, blWest, and blCenter.
+	    - Added BorderLayout constants to preference manager.
+	    - Fixed a couple of bugs in the BorderLayout. Now functional and
+	      works like the book says it should.
+	    - Fixed horizontal and vertical gap in border layout. Wasn't
+	      working quite right. NOW everything works just like the book
+	      says it should.
+	    - Updated the awstest.def definition file to include a group
+	      frame in a layout WITH a layout (BorderLayout) and five kids
+	      in their respective position with gap.
+	    - Fixed Group Frame so that it returns insets. This lets layout
+	      managers work correctly with it.
+	    - Added a new flag called AWSF_CMP_INVISIBLE which means that a
+	      component cannot be seen because it's too small. This keeps
+	      certain errors fram happening during resizing.
+	    - Fixed the two layouts to use this flag when components get too
+	      small. There is still the odd refresh issue that I don't
+	      understand, and there needs to be a way to lock windows into a
+	      minimum frame size. If a window gets sized too small then
+	      certain components will freak out. Plus, since clipping still
+	      does not work correctly in most of Crystal Space's canvases,
+	      something needs to be done about clipping components to a
+	      specific area. I'm unsure how to proceed on that one as of
+	      yet. Probably I'll wait until someone cares enough to mention
+	      it, then we can have a decent discussion.
+	    - Updated label to make it work right with layouts.
+	- Norman Kramer added the missing AWSF_CMP_INVISIBLE flag.
+	- Matt Reda fixed a copy-and-paste error he made last night.
 14-Feb-2002
 	- Fixed new gridbag constraints in AWS so that it is an enum
 	  (static const int is not legal in C++) and also renamed
@@ -200,6 +337,44 @@ The history order is reversed so that new features are at the top.
 	  on 'luck'.
 	- Eric Sunshine removed the outdated and broken classic Macintosh port,
 	  as well as the incomplete and unsupported PS2 port.
+	- Philip Wyett eliminated a warning with MSVC and starldr.cpp.
+	- Christopher Nelson did the following:
+ 	    - Fixed some ugly bugs in awsGridBagLayout.
+	    - Added constants in for GridBagConstraints (gbcCenter,
+	      gbcWeightX, etc.)
+	    - Enabled layouts in the window manager.
+	    - Modified windows to resize using the layout if its there,
+	      otherwise revert to old behavior.
+	    - There are still some odd problems with layout-enabled windows.
+	      I'm not entirely sure why, but they seem to have some bizarre
+	      redraw problems that cause blinking during refresh. I don't
+	      think that this is related to recalculating the layout, because
+	      layouts are only refreshed during a resize and when a window is
+	      created.  
+	    - GridBagLayout has a bug which may be related to that, but I'm
+	      unsure. As it is, layouts work, although GridBagLayout is the
+	      only one that exists and it doesn't behave quite right.
+	    - Fixed the GridBagLayout bug. Assigning ymax to xmax is not
+	      good :-)
+	    - Fixed yet another dumb bug related to layouts. They weren't
+	      getting the right settings node, so they weren't finding any
+	      settings!
+	    - Finally fixed all of the layout bugs. The strange refresh
+	      problem still exists, trying to discover what that issue is
+	      all about.
+	    - Updated test app to use layouts.
+	    - Fixed the zoom bug for windows and layouts. Only need to adjust
+	      by inset, since layouts automatically assume zero space.
+	    - Fixed additional bugs related to ScrollBar and ListBox because
+	      of layouts.
+	    - Slight re-adjustment of space for scrollbar so it doesn't overlap.
+	- 'res' added ugly workaround to mingw dllwrap bug (functions with
+	  _declspec(dllexport) are not auto-exported from libraries).
+	- 'res' modified lens flares so that they fade away.
+	- Norman Kramer added inclusion of unistd.h to cssysdef.h. Somehow
+	  recent changes broke compilation of socket plugin.
+	- Norman did some changes to qt2aws.xsl: pretty indenting. Top level
+	  widget is no longer handled in /UI but in a widget matching template.
 13-Feb-2002
 	- Added new tutorial app in apps/tutorial/awstut. This is a small
 	  AWS using application that demonstrates how to open and use
@@ -210,15 +385,61 @@ The history order is reversed so that new features are at the top.
 	  $(TEMP), if that doesn't exist it will try $(TMP). Otherwise it
 	  will use the temp dir in the Windows directory.
 	- Added fflush (stdout) to vshell so that it works on mingw correctly.
-	- Matze changed map2cs to support angle in info_player_start
-	- Matze removed hugeroom from walktest and cleaned small other things
+	- Matze changed map2cs to support angle in info_player_start.
+	- Matze removed hugeroom from walktest and cleaned small other things.
 	- Matze changed walktest to load camera position AND direction at
-	  startup
+	  startup.
 	- Matze eleminated angle vector in walktest which fixes the walking
-          through space warping portal bug
+          through space warping portal bug.
 	- Fixed several cases in AWS where SCF implementations were not
 	  calling SCF_CONSTRUCT_IBASE() from the constructor. This is BAD.
 	- Fixed a memory leak in aws on the font server.
+	- Philip Wyett did a hack to allow compilation of linex2d. This needs
+	  to be looked at in relation to recent changes with FreeType and
+	  others.
+	- Matt Reda added a flag that controls whether the runloop continues
+	  processing events when the window loses focus (the default is NO)
+	  on NeXT-derived platforms. This behavior can be toggled from a
+	  config file (System.RunWhenNotFocused) and command line
+	  (--alwaysruns).
+	- Matt Reda fixed the next2d canvas so that it doesn't display
+	  [Paused] in the title bar if the run loop is set to never pause.
+	- 'res' added missing $/ at the end of VFS.Win32.TTF_PATH. Changed
+	  / to $/ in VFS.CP/M.TMP.
+	- Norman Kramer removed the GetDimensions() version Philip added
+	  since it is not needed (fontserv.h).
+	- Christopher Nelson did the following:
+	    - Fixed bug which causes awstxtbx.cpp to crash when setting a
+	      string that is shorter than the previous string, and when start
+	      and cursor are greater than the length, especially in the
+	      case of the notorius empty string.
+	    - Added:
+		1. getPreferredSize and getMininumSize to support layouts.
+		2. design change fixing sill SetProperty behaviour.
+	    - Update to resolve empty string issue, while keeping memory
+	      consumption minimal. If a user attempts to set a caption to an
+	      empty string, the SetProperty method detects it and instead sets
+	      the caption to a NULL string. It does not keep track of the
+	      empty string, which will most likely go away as soon as the
+	      user DecRef's it.
+	    - Added the awsGridBagLayout class which supports the Java
+	      AWT/Swing GridBaglayout exactly as the definition lists.
+	    - Added the beginnings of an awsBorderLayout.
+	    - Added the base class for all layouts.
+	- Philip Wyett fixed unknown M_PI and unitialized angle.
+	- Norman Kramer did the following (AWS):
+	    - For scrollbars Min, Max, Value and PageSize are now recognized
+	      in the .def file.
+	    - For scrollbars changed name "Style" to "Orientation" and valid
+	      values from fsHorizontal to sboHorizontal and fsVertical to
+	      sboVertical.
+	    - Added recognition of QSlider which maps to awsScrollbar.
+	    - Now also for QWidget some code is generated.
+	    - Added the missing translation from QLineEdit to Text Box.
+	    - If caption is empty then the whole caption entry is omitted.
+	- Matt Reda reports: A constant is declared/defined as "RELATIVE_"
+	  but used as "RELATIVE" - changed to declare/define "RELATIVE" so
+	  code compiles (aws).
 12-Feb-2002
 	- Matt Reda moved the event-handling code in the OSX canvases 
 	  from the delegate to a new NSView-derived class.  The old code 
@@ -243,20 +464,97 @@ The history order is reversed so that new features are at the top.
 	- Added loader plugin for loading mesh objects of type 'stars'.
 	- Generalized csdemo a bit more. It now loads a file called 'world'
 	  in demodata.zip which setups the sector and all objects.
+	- Norman Kramer added indentation to the output of qt2aws.xsl. Also
+	  QListBox and QListView are now recognized. QListBox will map to
+	  an AWS listbox with Type ctList and a single column with generic
+	  header "Column0".
+	- Norman added recognition of QFrame which maps to an awsGroupFrame.
 11-Feb-2002
 	- Added csMath3::SpherePosition() which calculates the position
 	  on a unit sphere given two angles.
 	- Matt Reda fixed a bug in the explosion plugin which would cause
 	  the dynamic light that is created by it not to be deleted at
 	  destruction time.
+	- Philip Wyett did a quick hack to make freefont 1 plugin compile
+	  while in transition.
+	- Wouter added from Rene Dudfield:
+	  A preprocessor for header files to be used for swig. See README
+	  for more details including a TODO.
+	- Wouter Wijngaards added command line options for swig to make
+	  doc strings for the python wrapper.
+	- Norman Kramer added fsNone style for frames and extended the
+	  controls already using frame styles with fsNone (and fsFlat that
+	  was missing in some cases). Also added frame styles and image view.
+10-Feb-2002
+	- Philip Wyett updated freefont 2 plugin makefile for successful
+	  compilation with MSVC. Also updated msvc_libs adding FreeType 2.0.8.
+	  Note: This version of FreeType2 is a mod version from the official
+	  Freetype 2.0.8 distro. This is due to the poor quality of MSVC
+	  project file maintenance where the output filename does not match
+	  the distro release number (2.0.6 is outputted and not 2.0.8 as it
+	  should be. Fixed by me).
+	  Also the Freetype project uses an absolutley stupid method for
+	  #include which MSVC really does not like. In certain circumstances I
+	  have worked around this in the Free Font 2 MSVC project file and
+	  in some cases by hardcoded includes.
+	- Norman Kramer did the following:
+	    - Added notion of baseline (which happen to be 1 for all the
+	      standard fixed fonts :)
+	    - This makes csfont prepared for using with WriteBaseline.
+	    - Note I leave the xfont thing in linex2d untouched since it only
+	      uses a single hardcoded font (or maybe this should be made a
+	      more general fontserver and placed in plugins/font ?)
+	    - Added warning about using freefont/freetype1 in a commercial
+	      product.
+	    - Added first version of an extensible stylesheet to transform
+	      QT designers .ui files to aws .def files.
+9-Feb-2002
+	- Norman Kramer did the following:
+	    - Added WriteBaseline () to iGraphics2D. This will come in handy
+	      for writing with differently sized fonts having all letters on
+	      a baseline.
+	    - Currently only freefont2 is prepared for being used with
+	      WriteBaseline (and with the old Write), gonna prepare the others
+	      tomorrow.
+	    - Added new versions of GetGlyphSize, GetGlyphBitmap and
+	      GetDimension to the iFont interface which return information
+	      about offsets of the glyphbitmaps upper left point to a
+	      penposition (which sits on the baseline).
+	    - Changed major version of iFont to 2.
+	    - Extended csfont and the xfont (in linex).
+	    - Extended protex iGraph2d in the opengl renderer with
+	      WriteBaseline.
+	    - Added dummies for the new iFont interface (to freefont plugin).
 8-Feb-2002
 	- Matt Reda added support for displaying on any monitor on OSX
 	  systems with more than one monitor.  Also added small
 	  performance improvement to the OSX software canvas.
 	- Matt Reda changed the pixel formats used by the base OpenGL canvas
 	  to correspond to the pixel formats used by the software renderer.
+	- Matt updated the OSX canvases to support being placed on a specific
+	  screen for machines with more than one monitor/videocard. This can
+	  be controlled with the "--screen" command line switch or
+	  "Video.ScreenNumber" in video.cfg.
+	  This is untested as I only have one monitor
 	- Matze fixed a bug in csHashIterator - it was returning already
 	  deleted elements in some special cases.
+	- Philip Wyett did the following:
+	    - Fixed bug described by Paul Berg "-fs under 16bpp" on CS Main
+	      Mailing list (ddraw canvas).
+	    - Also took the opportunity to restructure HDC to use member
+	      variable rather than having many local versions.
+	- Christopher Nelson added the proper stuff to AWS for fsBitmap style
+	  windows. This code is tested and works fine. Note that if you specify
+	  a window as fsBitmap, it currently does not try to be an engine
+	  view. That's pretty easy to fix though.
+	- Christopher fixed it so that Bitmap windows draw an engine view if
+	  they are engine windows. This can let you make neat looking engine
+	  views: there is a background bitmap, then the engine is drawn over
+	  that, then there is an overlay bitmap.
+7-Feb-2002
+	- Christopher Nelson reports that the bigterrain mesh object now
+	  compiles with no errors. But it still doesn't work.
+	- Christian Bayle added the directory CS/scripts/debian.
 6-Feb-2002
 	- Matt Reda fixed a bug in the OpenGL renderer which caused
 	  fades (F5 in walktest and fade effect in csdemo) not to work
@@ -278,8 +576,88 @@ The history order is reversed so that new features are at the top.
 	  if the sector doesn't use c-buffer (i.e. we do it as soon as
 	  the c-buffer is used globally). I moved this code to the polygon
 	  drawer because then we can do it only when it is really needed.
+	- Philip Wyett removed Squawk and all associated files.
+	- 'res' changed some settings for freetype2 plugin.
+	- 'res' swapped some pixel layouts in csOpenGLProcSoftware::Prepare().
+	  Software renderer proctexes seem to work now (at least for me).
+5-Feb-2002
+	- Matt Reda update Next makefile to support new method of locating
+	  CS installation. OpenStep and MacOS X versions no longer use
+	  $CRYSTAL environment variable to locate CS installation directory.
+	  It now uses the 'defaults' database value CrystalSpaceRoot
+	- Matt fixed OSX so that if it does not find CrystalSpaceRoot in the
+	  defaults, it will check the CRYSTAL environment variable.
+	- 'res did a few small fixes to OpenGL renderer.
+	- Norman Kramer added a font server plugin for the FreeType2 engine.
+	  It is not yet enabled by default (edit mk/user.mak).
+4-Feb-2002
+	- Matt Reda fixed leaking ball mesh factory in demosky2.
+	- Matt also reports: In csProcSky::GetSkyBlue(), started by fixing
+	  some of the typecasts to int then switched to storing intermediate
+	  values as floats and rounding the final value. This should give
+	  more accurate result than the old method, which truncated the
+	  calculated value to an int after every calculation. 
+	- Norman Kramer did the following:
+	    - Made the cursor in the AWS textbox to blink.
+	    - Ok, since christopher didn't reply to my mail I go ahead and
+	      change the mousehandling for the captured mouse case the way I
+	      think it should be. I only let the capturing component work the
+	      event since no other component should be able to do it (that was
+	      the reason the component captured the mouse in the first
+	      place) - this solves the magic following of the scrollbar knob.
+	    - Awstimer now only hooks itself onto the eventqueue when its
+	      Start()'ed and removes itself if Stop()'ed. Otherwise the amount
+	      of timers idling in the eventqueue can easily add up.
+	    - Fixed dragging knob which sometimes didn't get to the min/max
+	      value.
+	- 'res' did the following:
+	    - Software proctex renderer works again (but flawed).
+	    - Backbuffer proctex renderer works again (but flawed).
+	- Christopher Nelson added the beginning of implementation for the
+	  bigterrain mesh object.
+3-Feb-2002
+	- Philip Wyett eliminated more truncation and conversion between
+	  types warnings under MSVC. Note: MSVC does not like float values
+	  being expressed as '.0' or '0.' and always likes you to
+	  use a trailing 'f' if you are allocating a value to the float type.
+	- Philip also moved some code to user qsqrt() instead of sqrt()
+	  where appropriate.
+	- Philip fixed performance warning (forcing int to bool).
+	- Philip fixed qsqrt() for MSVC adding a COMP_VC specific portion
+	  and eliminating all the double to float conversion warnings the
+	  old code generated.
+	- Began fixing inconsistencies of float and double in physics library.
+	- Matze fixed a 'no newline at end of file' warning (mmapio.h).
+	- Norman Kramer made the following changes to AWS:
+	    - Made the properties in awsCmdButton protected (instead of
+	      private) so the new awsSliderButton can access them (well I
+	      could have add accessor methods but I prefer it that way - feel
+	      free to change it).
+	    - Added a new descendend of awsCmdButton, the awsSliderButton
+	      which fires signals every n Ticks which can be configured via
+	      SetProperty.
+	    - awsScrollBar class now uses awsSliderButton controls for the
+	      dec/inc handle and the knob - which mean you can keep them
+	      pressed (and the knob can be moved around) and they'll send
+	      out signalChanged signals. Also the area where the knob moves
+	      reacts to button pressed events now.
 2-Feb-2002
 	- Toxe fixed a brand new bug in csMeshWrapper::HitBeam().
+	- Philip Wyett eliminated ATOM to bool warning while registering
+	  class (win32.cpp). Net method leaves no need for assertion on
+	  bResult, this this has been removed.
+	- Philip fixed several files to stop MSVC complaining about
+	  assignment inside evaluation expression and maintained execution
+	  order.
+	- Philip fixed a few truncations from double to float (mainly in
+	  csgeom and csengine).
+	- Norman Kramer set the initial value of 'stopped' to true (for
+	  awstimer), so that after first call to SetTimer() you must
+	  call Start() to get going.
+	- Wouter Wijngaards reports: the haze.h include file was using
+	  CS_SPRITE2D as the header #define. Changed it so the two no longer
+	  conflict.
+	- Philip fixed class access violation under MSVC 6 (bitary2d.h).
 1-Feb-2002
 	- Tobias Brueckner (Toxe) fixed a bug in the OpenGL 3D renderer that
 	  caused it to crash when rendering materials that only had an
@@ -298,25 +676,67 @@ The history order is reversed so that new features are at the top.
 	  an extension included it will not try to add its own extension.
 	  In addition you can now give a full pathname so walktest can load
 	  levels from everywhere without requiring a mount in vfs.cfg.
+	- Wouter Wijngaards modified the "Queen of all CS includes" (css.h)
+	  to now include everything in CS that an app can use. (Not platform
+	  specific stuff). Using #defines some parts can be left out if
+	  desired.  Note this file should only be used by projects external
+	  to CS.
+	- Philip Wyett fixed forward declaration errors and variable
+	  redefinition errors in the MSVC port.
+	- Philip eliminated a couple of unitialized variable warnings.
+	  One is a very MSVC specific complaint.
+	- Philip removed various other warnings (MSVC specific).
+	- Philip eliminated the assignments within conditional expression
+	  warnings under MSVC and also cleaned up some code.
 30-Jan-2002
 	- Added iEngine::FindLight().
 	- Improved comment with iCamera::GetHit().
 	- Further work on tree loader. Still not completely functional.
+	- Christopher Nelson added alpha version of the large terrain
+	  renderer's implementation to the mesh directory. Currently it's just
+	  the simple header file that contains all the implementation code.
+	  I still have to connect it to the genmesh plugin somehow and do some
+	  tests on it. Also, it has no provision for texturing at the moment.
 29-Jan-2002
 	- Jorge Acereda changed the MD2 importer so that it recognizes 
 	  sprite actions. Also, scaling and axis conventions are now
 	  coherent with mdl2spr. I hope nobody was using it :-)
+	- Jorge also fixed frame timing.
 	- Some further experiments with tree generation. Unfinished.
 	- Further work on tree. At this moment it doesn't even resemble
 	  a tree :-) I'm still debugging. Added texture mapping.
         - Matze added a null canvas for the null 3d renderer, this makes it
           possible to use CS on dedicated servers that can't display
 	  anything.
+	- Matze fixed destruction (memory leak) of null 3d renderer.
 28-Jan-2002
 	- Seperated geometry and rule in the tree generator. This will make
 	  it easier to setup better rules.
 	- Matze changed annotation to include a link to the page in the e-mail
 	  and mangles e-mail adress.
+	- Matze fixed a sky issue in map2cs.
+	- Christopher Nelson did the following:
+	    - Added new function: AllWindowsHidden(), which returns true if
+	      all windows in the system are currently hidden.
+	    - Added new parameter for CaptureMouse which lets you specify the
+	      component that wishes to capture the mouse. Note that only this
+	      component or it's children will recieve messages until release
+	      is called.  
+	    - Fixed previously broken functionality where moving from a
+	      component to the window wouldn't send out MouseEnter/Exit
+	      messages. There was a slight bug in awsTextBox that was
+	      breaking this. For future note:  if you want to get focus
+	      messages and keep them, you must override all the mouse events
+	      to return true. Otherwise the window will take back the focus
+	      because it assumes that the component has not handled and does
+	      not want focus.
+	- Philip Wyett added AUTHORS and COPYING to .cvsignore.
+27-Jan-2002
+	- Norman Kramer added GetObjectRegistry() to iAws interface. Components
+	  didn't have a chance to get their hands on the registry otherwise.
+	- Norman also added a timer class to AWS to give pulses for cases no
+	  new event is generated but actions should happen (think: keeping the
+	  mouse pressed on a scrollbar button).
 26-Jan-2002
 	- Matze fixed skybox generation in map2cs
 	- Added missing initialization of do_manual_colors to genmesh
@@ -353,6 +773,46 @@ The history order is reversed so that new features are at the top.
           path...
 	- Matze fixed map2cs skybox export by addiong MOVEABLE() to PARAMS
 	  section, still the texture mapping seems incorrect
+	- Brandon Ehle did various doc fixes with hbox and item bugs.
+	- 'res' split the Windows Help files into two projects: docs and api.
+	  Also added a script to create pretty TOCs/indices.
+	- Christopher Nelson did the following:
+	    - Made the system specializations more friendly. Now they exist
+	      inside of the csosdef.h file for each platform. In order for an
+	      implementation file to see them they should define
+	      CS_SYSDEF_PROVIDE_HARDWARE_MMIO before the cssysdef.h include.
+	      This will provide a structure called mmioInfo, and two
+	      	functions: MemoryMapFile and UnMemoryMapFile.
+	      These are platform dependent. mmioINfo is semi-opaque, meaning
+	      that data and file_size members should ALWAYS be defined as they
+	      are. It may contain as much additional information as the
+	      platform requires.
+	    - Modified the software demand pager so that it conforms to the
+	      same template as the hardware one. Removed all the system
+	      defines from the mmapio.h and mmapio.cpp files.
+	    - Moved a couple more items around, moved all software portions
+	      so that they won't be generated for hardware compiles.
+	    - Moved the includes specific for mmap into the #ifdef so that
+	      they'll only be included for modules that want them.
+	    - Added definitions for the Mac.
+	    - Made the inline function really inline.
+	    - Fixed some silly bugs in the software demand pager: lack of
+	      initializations, inverse check error, bad bit-field length
+	      calculation, bad checks.
+	    - Made a couple of fixes, and added hits and misses to the
+	      software cache set so that you can tweak it.
+	    - Killed the mods out of the classic Mac port.
+	    - Added the mods into the next port, since that also works with
+	      OS X stuff.
+	    - Update, fixed a couple of dumb bugs: cache size was not
+	      initialized before trying to allocate memory of
+	      block_size * cache_block_size, so it was attempting allcoate
+	      way too much RAM.
+	    - Fixed Windows hardware memory-mapped I/O code. I was under the
+	      impression that I should use one function when, in reality, I
+	      needed to use another. Instead of simply using OpenFileMapping,
+	      you must CreateFile(), then CreateMapping(), then MapViewOfFile().
+	      This code has been tested and works.
 24-Jan-2002
 	- Jorge Acereda relaxed a limit in 3ds2lev that made it crash
 	  with scenes with more than 100 textures.
@@ -364,6 +824,34 @@ The history order is reversed so that new features are at the top.
 	  loader for the new genmesh mesh object. Instead of creating a
 	  genmesh the usual way it will generate a tree instead. At this
 	  moment this code is very experimental and not meant to be used.
+	- Brandon Ehle added cal3d to CS tutorial.
+	- Christopher Nelson did the following:
+	    - Added headers for the new memory-mapped I/O stuff.
+	      Note that it looks for some bogus defines. The only one I'm
+	      pretty sure of right now is the WIN32 define.  
+	      Note also, that there currently is no _HAS_MEMORY_MAPPED_IO_ in
+	      the build, so that code will never compile, which means that
+	      right now everything falls back to software. The hardware code
+	      is in place, but I don't know if it will even compile because
+	      I haven't tested it yet.
+	      The mmio.cpp file compiles under MSVC, but I haven't tested it
+	      under any other platforms.
+	      Hopefully it doesn't cause any serious problems!  Note that the
+	      code isn't quite complete yet.
+	    - Added the implementation for memory mapped i/o.
+	    - Filled in demand paging section for reading the cache. Uses
+	        1. Old, inactive blocks.
+		2. New block if we have space.
+		3. Least-used block in bucket.
+	    - Finished software demand pager.
+	    - Removed inactive blocks list since it was unused.
+	    - Simplified the cache system slightly, which removed one
+	      additional indirection. This should result in a slightly faster
+	      implementation.
+	    - Modified the code lsightly to include LookupIndex right inside
+	      GetPointer. This will probably increase it's chances of being
+	      inlined, and remove an additional function setup/teardown even
+	      if it doesn't.
 23-Jan-2002 
         - Jorge Acereda fixed LoadCamera() (crashed if the sector
 	  wasn't found). Rewrote it to be more robust and coherent
@@ -389,6 +877,12 @@ The history order is reversed so that new features are at the top.
 	- Created a crystal-docs mailing list. The doc annotation script
 	  will now send mail to that mailing list.
 	- Jonathan Tarbox updated the BeOS port so that it works again.
+	- Matze fixed quoted slashes and makes e-mail unreadable for search
+	  engines (avoid spammers) (for annotation).
+	- Matze also added IP and user agent logging in the XML files.
+	  Format of time has been modified.
+	- Matze added a comment about circular list in doxygen comment
+	  of csdllist.h.
 21-Jan-2002
 	- Tobias Brueckner suggested a fix for OpenGL with materials
 	  that have no associated texture. The fix was incomplete
@@ -432,14 +926,38 @@ The history order is reversed so that new features are at the top.
 	  improvements.
 	- Eric Sunshine augmented annotate.php so that it now stores and
 	  displays the date/time of annotations.
+	- Matze did the following:
+	    - Made output of annotate.php a little bit nicer.
+	    - Removed the unneeded "click here to view your new entry".
+	- Philip Wyett updated 3ds2lev.mak to add new msvc_libs info and
+	  links. Also for msvc documentation.
 20-Jan-2002
 	- Tobias Brueckner did the following:
 	    - Fixed a potential initialization bug in the GLX OpenGL
 	      canvas (for Unix).
 	    - Fixed a crash bug in the terrain mesh object when
 	      BLOCKS(4,4) and GRID(4,4) was used (same values).
+	- Matze added iSector::GetName().
 	- Removed iSector::GetName() again after Matze added this.
 	  Please use sector->QueryObject()->GetName().
+	- Philip Wyett added initial documentation for successfully building
+	  Crystal Space with Visual C++ .NET (MSVC 7) due to be released to
+	  the public on the 13th, Febuary. The docs include a link to the new
+	  msvc7_libs which is solely for users of MSVC 7.
+	- Matt Reda did the following:
+	    - Fixed memory leak and small error where simplept was reporting
+	      itself as simple1.
+	    - Moved pixel format #defines (CS_24BIT_PIXEL_LAYOUT) out of
+	      pixtype.inc and into their own header (pixfmt.h). This was
+	      necessary because the constants are also needed in the OpenGL
+	      renderer (for procedural textures).
+	    - Modified OpenGL proctexes to use the same framebuffer order
+	      constants (CS_24BIT_PIXEL_LAYOUT) as the software renderer.
+	    - Added new file to define CS_24BIT_PIXEL_LAYOUT for platforms
+	      that do not explicitly define it. The values are assigned based
+	      on endianness in order to maintain the old behavior.
+	    - Changed CFLAGS.SOFT3D.PIXEL_LAYOUT to CFLAGS.PIXEL_LAYOUT since
+	      these flags are now also used for the OpenGL renderer.
 19-Jan-2002
 	- Richard Uren made the following changes to isotest app:
 	    - The code that was in isotest.cpp which looped through each
@@ -486,6 +1004,9 @@ The history order is reversed so that new features are at the top.
 	  Note that this will most likely not result in a significant
 	  FPS increase :-)
 	- Matze added a first version of the annotated user manual hack.
+	- Matze fixed GNUC_PRINTF in reporter.h.
+	- 'res' fixed a single-line comment containing line-continuation
+	  character.
 17-Jan-2002
 	- Jorge Acereda made the following changes:
 	    - Added a comment to iGraphics2D::Write() to document the
@@ -503,8 +1024,16 @@ The history order is reversed so that new features are at the top.
 	- Using the above new function it is now possible to correctly
 	  render mesh objects with the CS_ENTITY_CAMERA flag set even through
 	  space warping portals.
+	- Matt Reda uncommented a DecRef() in CreateMipmaps() that was leaking
+	  an iImage.
+	- Philip Wyett removed a #warning for a comment (isoview.h) as it is
+	  causing a fatal error in MSVC port.
+	- Philip also reverted the change of 'res' yesterday as it was
+	  forcing fullscreen by default. Later Philip re-implemented the code
+	  with one fix and a minor alteration.
+	- Philip fixed a typo in the msvc documentation pointed out by RobEG.
 16-Jan-2002
-	- Matt Reda fixed a memory leak in csIsoEngine::CreateMeshFactory()
+	- Matt Reda fixed a memory leak in csIsoEngine::CreateMeshFactory().
 	- Fixed a bug in iRenderView::ClipBSphere() in combination
 	  with mirroring and a portal that clips geometry.
 	- I discovered that there is a bug when a CAMERA object
@@ -519,6 +1048,20 @@ The history order is reversed so that new features are at the top.
 	  are shown instead of what the OpenGL renderer will render
 	  with glDrawElements. This is only for DrawTriangleMesh() at
 	  the moment.
+	- Philip Wyett fixed some msvc docs. Fixes pointed out by Wyatt Miler.
+	- Andrew Zabolotny did an attempt to fix qsqrt() for gcc 3.0.3 and
+	  later. If it causes qsqrt() to not work with gcc 2.95.2 and earlier,
+	  it should be reverted back (although I don't believe the changes
+	  will break it with earlier compilers).
+	- Jorge Acereda did the following:
+	    - Fixed a bug in the MDL/MD2 converter. Short values where
+	      incorrectly promoted to int when calling convert_endian().
+	    - Changed some type definitions on things intended to be saved
+	      to disk to make them 64bit-friendly.
+	    - Fixed building of iso engine after a few new methods were
+	      added to iCamera.
+	- 'res' fixed some window/fullscreen and palette issues in the ddraw
+	  canvas.
 15-Jan-2002
 	- Changed iIsoEngine::CreateMeshFactory() to return
 	  iMeshFactoryWrapper instead of iMeshObjectFactory.
@@ -544,6 +1087,7 @@ The history order is reversed so that new features are at the top.
 14-Jan-2002
 	- Matt Reda added 3 OSX drivers (2 canvases and an audio driver)
 	  and updated various Makefiles to support these changes.
+	- 'res' changed error handling in the waveoutsd sound driver.
 	- Fixed a bug in the OpenGL renderer which 'res' introduced
 	  by forgetting to test if txt_mm is non-NULL in FlushDrawPolygon().
 	- Eric Sunshine committed the following changes on behalf of Matthew
@@ -570,12 +1114,21 @@ The history order is reversed so that new features are at the top.
 	  invocation of Free() in the parent class' parent class.
 	- Eric Sunshine fixed the next2d canvas so that it once again displays
 	  the correct colors in 32-bit mode following changes by Matthew Reda.
+	- Philip Wyett added a few of the newer msvc_libs files to .cvsignore.
 13-Jan-2002
 	- Matze changed cs-config --version to only output major number, the
-	  --longversion outputs all
+	  --longversion outputs all.
+	- Philip Wyett updated docs to reflect new release of msvc_libs
+	  (0.92d).
 11-Jan-2002
 	- Matze removed DEBUG_BREAK_MSG again :) csString is using CS_ASSERT
-	  now
+	  now.
+	- 'res' replaced CRASH macro with DEBUG_BREAK.
+	- 'res' modifed the standard reporter to have a different default
+	  behaviour in debug mode (CS_DEBUG).
+	- 'res' fixed a missing ';' for csstring.h. Compiles with MSVC again.
+	- 'res' changed _control87 to csControl80x87 after Matt Reda pointed
+	  it out.
 10-Jan-2002
 	- Matze added an autoconf macro for CS to scripts/cs-config, no
 	  documentation on usage yet, but I think it should be clear how to use
@@ -583,7 +1136,22 @@ The history order is reversed so that new features are at the top.
 	- Matze fixed a strange compiler warning in csobject.cpp (I had to add
 	  a iObject() to the initializer list in the copy constructor, anyone
 	  knows why this is needed?)
+	- Matze also fixed a few warnings.
+	- Andrew Zabolotny fixed the OS/2 port of CS. Also renamed the
+	  _control80x87 debugging function to csControl80x87 to avoid
+	  conflicts with same name routine from emx libc.
+	- RedEye Entertainment added #defines to walktest and squawk
+	  to make MSVC ignore the csControl80x87 changes of Andrew.
+	- 'res' made map2cs tutorial use a little bit less disk space.
+	- Philip Wyett fixed new DEBUG_BREAK_MSG and added define so MSVC
+	  can compile without errors.
+	- 'res' fixed csControl80x87 so that it works again with MSVC. 'res'
+	  then removed the MSVC specific #ifdef's from walktest and squawk.
+	- 'res' added DEBUG_BREAK macro and removed #define DEBUG_BREAK_MSG.
+	- Philip Wyett added 'required' to the msvc documentation for the
+	  BisonFlex library as it is needed for successful linking.
 9-Jan-2002
+	- RedEye Entertainment fixed make errors introduced by Andrew yesterday.
 	- Eric Sunshine applied a much saner patch to the makefiles to combat
 	  the breakage caused by AndyZ's makefile change.  Reverted a patch
 	  which Philip Wyett made to cygwin.mak since the new saner patch
@@ -614,6 +1182,9 @@ The history order is reversed so that new features are at the top.
 	  csGrahpics2D::Initialize() already does so.  (No need to register the
 	  same event handler twice.)
 	- Eric Sunshine eliminated several compilation warnings from AWS.
+	- 'res' did a fix to the png image loader.
+	- Andrew Zabolotny fixed os2gcc.mak so that it always overrides
+	  SHELL with $(COMSPEC) to avoid a problem with Unix shells.
 7-Jan-2002
 	- Corrected the includes in the collision detection howto.
 	- Extended iLoader::LoadTexture() with a 'register' parameter which

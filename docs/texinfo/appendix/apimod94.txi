@@ -9,10 +9,18 @@ Crystal Space.
 @subheading Loader Changes
 @cindex @code{iLoaderPlugin}
 @cindex @code{iLoaderContext}
+@cindex @code{iTerrFuncState}
 
 All plugins implementing @code{iLoaderPlugin} will have to be changed
 since the material and mesh factory lists are now replaced with a
 @code{iLoaderContext} parameter.
+
+This change also means that @code{iTerrFuncState::LoadMaterialGroup()}
+now expects an @code{iLoaderContext} instead of @code{iMaterialList}.
+
+@em{WARNING!} This loader change means that the searching restricted
+on the current region now actually works! This means that by default
+when loading a map it will ONLY find objects defined in this map!
 
 @subheading iCamera changes
 @cindex @code{iCamera}
