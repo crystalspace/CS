@@ -189,7 +189,7 @@ void OSXAssistant::application_activated()
     csRef<iVirtualClock> c = get_virtual_clock();
     if (c != 0)
       c->Resume();
-  };
+  }
   event_outlet->ImmediateBroadcast(cscmdFocusChanged,(void*)true);
 }
 
@@ -200,7 +200,7 @@ void OSXAssistant::application_deactivated()
     csRef<iVirtualClock> c = get_virtual_clock();
     if (c != 0)
       c->Suspend();
-  };
+  }
   event_outlet->ImmediateBroadcast(cscmdFocusChanged, (void*)false);
 }
 
