@@ -139,6 +139,9 @@ class csGraphics3DDirect3DDx5 : public IGraphics3D,
 
   /// Capabilities of the renderer.
   G3D_CAPS m_Caps;
+
+  //Maximum possible aspect ratio for the renderer.
+  int m_MaxAspectRatio;
   
   /// the 2d graphics driver.
   IGraphics2D* m_piG2D;
@@ -253,7 +256,7 @@ public:
   ///
   STDMETHODIMP NeedsPO2Maps(void) { return S_OK; }
   ///
-  STDMETHODIMP GetMaximumAspectRatio(int& ratio) { ratio = 32768; return S_OK; }
+  STDMETHODIMP GetMaximumAspectRatio(int& ratio) { ratio = m_MaxAspectRatio; return S_OK; }
   
   /// Get the ITextureManager.
   STDMETHODIMP GetTextureManager (ITextureManager** pi) { *pi = (ITextureManager*)txtmgr; return S_OK; }

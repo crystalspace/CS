@@ -192,6 +192,7 @@ m_bUse24BitInternalTexture(false)
   }
   
   FINAL_RELEASE( piFactory );
+
   
   // default
   m_Caps.ColorModel = G3DCOLORMODEL_RGB;
@@ -209,6 +210,8 @@ m_bUse24BitInternalTexture(false)
   m_Caps.PrimaryCaps.PerspectiveCorrects = true;
   m_Caps.PrimaryCaps.FilterCaps = G3D_FILTERCAPS((int)G3DFILTERCAPS_NEAREST | (int)G3DFILTERCAPS_MIPNEAREST);
   m_Caps.fog = G3D_FOGMETHOD(0);
+
+  m_MaxAspectRatio = 1; 
 
   rstate_dither = false;
   rstate_specular = false;
@@ -361,7 +364,23 @@ STDMETHODIMP csGraphics3DDirect3DDx5::Open(char* Title)
   else ASSERT( FALSE );
 
   m_Caps.ZBufBitDepth = dwZBufferBitDepth;
-  
+
+  m_Caps.minTexHeight = lpD3dDeviceDesc->dwMinTextureHeight;
+  m_Caps.minTexWidth  = lpD3dDeviceDesc->dwMinTextureWidth;
+  m_Caps.maxTexHeight = lpD3dDeviceDesc->dwMinTextureHeight;
+  m_Caps.maxTexWidth  = lpD3dDeviceDesc->dwMaxTextureWidth;
+
+  if (lpD3dDeviceDesc->dpcTriCaps.dwTextureCaps & D3DPTEXTURECAPS_SQUAREONLY)
+  {
+    OutputDebugString("Direct3D Device supports only square textures\n");
+    m_MaxAspectRatio = 1;
+  }
+  else
+  {
+    OutputDebugString("Direct3D Device also supports non square textures\n");
+    m_MaxAspectRatio = 32768;
+  }
+
   memset(&ddsd, 0, sizeof(ddsd));
   ddsd.dwSize = sizeof(ddsd);
   ddsd.dwFlags = DDSD_CAPS | DDSD_WIDTH | DDSD_HEIGHT | DDSD_ZBUFFERBITDEPTH;
