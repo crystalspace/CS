@@ -33,6 +33,8 @@ The history order is reversed so that new features are at the top.
 	  and other functions to initialize the frustum view and by doing
 	  that get called for every object that is visible from the given
 	  frustum.
+	- First attempts at implementing shadow receiving for genmeshes.
+	  Not fully operational yet and also not enabled by default.
 16-Dec-2002
 	- Completely removed the old octree culler. This has a great impact
 	  on the internal engine structure. It greatly simplifies both

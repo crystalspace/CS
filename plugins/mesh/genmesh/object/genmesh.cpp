@@ -121,6 +121,15 @@ csGenmeshMeshObject::~csGenmeshMeshObject ()
 
 void csGenmeshMeshObject::InitializeDefault ()
 {
+  SetupObject ();
+
+  if (!do_shadow_rec) return;
+  if (do_manual_colors) return;
+
+  // Set all colors to ambient light (@@@ NEED TO GET AMBIENT!)
+  int i;
+  for (i = 0 ; i < factory->GetVertexCount () ; i++)
+    lit_mesh_colors[i].Set (0, 0, 0);
 }
 
 char* csGenmeshMeshObject::GenerateCacheName ()
@@ -251,10 +260,6 @@ void csGenmeshMeshObject::AppendShadows (iMovable* movable,
   }
 
   delete[] vt_world;
-}
-
-void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
-{
 }
 
 void csGenmeshMeshObject::GetTransformedBoundingBox (long cameranr,
@@ -402,12 +407,72 @@ bool csGenmeshMeshObject::DrawTest (iRenderView* rview, iMovable* movable)
   return true;
 }
 
+void csGenmeshMeshObject::CastShadows (iMovable* movable, iFrustumView* fview)
+{
+  SetupObject ();
+
+  if (do_manual_colors) return;
+  if (!do_shadow_rec) return;
+  if (!do_lighting) return;
+
+  csFrustumContext* ctxt = fview->GetFrustumContext ();
+  iBase* b = (iBase *)fview->GetUserdata ();
+  csRef<iLightingProcessInfo> lpi = SCF_QUERY_INTERFACE (b,
+  	iLightingProcessInfo);
+  CS_ASSERT (lpi != NULL);
+
+  iLight* li = lpi->GetLight ();
+
+  csFrustum* light_frust = ctxt->GetLightFrustum ();
+  const csVector3& light_pos = light_frust->GetOrigin ();
+
+  int i;
+  csColor* colors = lit_mesh_colors;
+  csVector3* normals = factory->GetNormals ();
+
+  // Do the lighting.
+  csReversibleTransform trans = movable->GetFullTransform ();
+  // the object center in world coordinates. "0" because the object
+  // center in object space is obviously at (0,0,0).
+
+  // Compute light position in object coordinates
+  csVector3 wor_light_pos = light_pos;
+  csVector3 obj_light_pos = trans.Other2This (wor_light_pos);
+  float obj_sq_dist = csSquaredDist::PointPoint (obj_light_pos, 0);
+  if (obj_sq_dist >= li->GetSquaredRadius ()) return;
+  float in_obj_dist = (obj_sq_dist >= SMALL_EPSILON)
+  	? qisqrt (obj_sq_dist) : 1.0f;
+
+  csColor light_color = lpi->GetColor () * (256. / CS_NORMAL_LIGHT_LEVEL)
+      * li->GetBrightnessAtDistance (qsqrt (obj_sq_dist));
+
+  for (i = 0 ; i < factory->GetVertexCount () ; i++)
+  {
+    csVector3 normal = normals[i];
+    float cosinus;
+    if (obj_sq_dist < SMALL_EPSILON) cosinus = 1;
+    else cosinus = obj_light_pos * normal;
+    // because the vector from the object center to the light center
+    // in object space is equal to the position of the light
+
+    if (cosinus > 0)
+    {
+      color = light_color;
+      if (obj_sq_dist >= SMALL_EPSILON) cosinus *= in_obj_dist;
+      if (cosinus < 1) color *= cosinus;
+      colors[i] += color;
+      colors[i].Clamp (2., 2., 2.);
+    }
+  }
+}
+
 void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
     iMovable* movable)
 {
   SetupObject ();
 
   if (do_manual_colors) return;
+  if (do_shadow_rec) return;
 
   int i, l;
   csColor* colors = lit_mesh_colors;
@@ -417,7 +482,7 @@ void csGenmeshMeshObject::UpdateLighting (iLight** lights, int num_lights,
   for (i = 0 ; i < factory->GetVertexCount () ; i++)
     colors[i] = color;
   if (!do_lighting) return;
-    // @@@ it is not effiecient to do this all the time.
+    // @@@ it is not efficient to do this all the time.
 
   // Do the lighting.
   csReversibleTransform trans = movable->GetFullTransform ();
