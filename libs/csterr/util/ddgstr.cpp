@@ -117,7 +117,7 @@ int ddgStr::stoi(const char *s)
         else if (*s == '-') neg = true;
         else
         {
-            b = b*10.0 + (float)(*s - '0');
+            b = (int)(b*10.0 + (float)(*s - '0'));
         }
         s++;
     }
@@ -153,6 +153,7 @@ ostream& operator << ( ostream&strm, Str str )
 */
 // Define an input and output stream operator for Vector2.
 // Output format is "abcd"
+#ifdef DDGSTREAM
 ostream& operator << ( ostream &stream, const ddgStr str )
      { return stream << str.s; }
 ostream& operator << ( ostream &stream, const ddgStr *str )
@@ -161,6 +162,6 @@ ostream& operator << ( ostream &stream, const ddgStr *str )
 // Input format is "abcd"
 istream& operator >> ( istream& stream, ddgStr& str)
      { char c[256]; stream >> c; str.assign(c); return stream; }
-
+#endif
 
 
