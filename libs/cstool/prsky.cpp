@@ -22,6 +22,7 @@
 #include "ivideo/graph3d.h"
 #include "ivideo/txtmgr.h"
 #include "qsqrt.h"
+#include "qint.h"
 #include "csgeom/matrix3.h"
 
 //---------- csProcSkyTexture ------------------------------------
@@ -352,7 +353,7 @@ csRGBcolor csProcSky::GetSkyBlue(const csVector3& spot, float& haze,
   float sundist, bool& below)
 {
   csRGBcolor res;
-  int r,g,b;
+  float r, g, b;
 
   if (spot.y < cam.y)
   {
@@ -367,21 +368,21 @@ csRGBcolor csProcSky::GetSkyBlue(const csVector3& spot, float& haze,
       //if(haze>1.0)haze=1.0;
     }
     if (d > 1.0f) d = 1.0f;
-    r = (int) maxhaze.red - d * 50.0f;
-    g = (int) maxhaze.green - d * 40.0f;
-    b = (int) maxhaze.blue - d * 30.0f;
+    r = maxhaze.red - d * 50.0f;
+    g = maxhaze.green - d * 40.0f;
+    b = maxhaze.blue - d * 30.0f;
     float sunmirror = 1.0f;
     if (sundist < sunmirror)
     {
       float m = (sunmirror-sundist) / sunmirror;
-      r += (int) suncolor.red * m * 30.0f;
-      g += (int) suncolor.green * m * 30.0f;
-      b += (int) suncolor.blue * m * 30.0f;
+      r += suncolor.red * m * 30.0f;
+      g += suncolor.green * m * 30.0f;
+      b += suncolor.blue * m * 30.0f;
     }
-    if (r > 255) r = 255;
-    if (g > 255) g = 255;
-    if (b > 255) b = 255;
-    res.Set(r, g, b);
+    if (r > 255.0) r = 255.0;
+    if (g > 255.0) g = 255.0;
+    if (b > 255.0) b = 255.0;
+    res.Set(QRound(r), QRound(g), QRound(b));
     return res;
   }
   haze = (spot.y-cam.y) / (radius - (cam.y - center.y));
@@ -396,22 +397,20 @@ csRGBcolor csProcSky::GetSkyBlue(const csVector3& spot, float& haze,
   float elev = haze; //- sundist;
   //if(elev<0.0)elev=0.0;
   b = maxhaze.blue;
-  g = (int)(elev * (float) maxhaze.green);
-  r = (int)(elev * (float) maxhaze.red);
+  g = elev * maxhaze.green; 
+  r = elev * maxhaze.red;
   elev = 1.0f - elev;
-  b -= (int)elev * 70.0f;
+  b -= (elev * 70.0f);
 
-  r += (int) suncolor.red * sundist * 255.0f;
-  g += (int) suncolor.green * sundist * 255.0f;
-  b += (int) suncolor.blue * sundist * 255.0f;
+  r += suncolor.red * sundist * 255.0f;
+  g += suncolor.green * sundist * 255.0f;
+  b += suncolor.blue * sundist * 255.0f;
 
   //printf("color %d %d %d\n", res.red, res.green, res.blue);
-  if (r > 255) r = 255;
-  if (g > 255) g = 255;
-  if (b > 255) b = 255;
-  res.red = r;
-  res.green = g;
-  res.blue = b;
+    if (r > 255.0) r = 255.0;
+    if (g > 255.0) g = 255.0;
+    if (b > 255.0) b = 255.0;
+    res.Set(QRound(r), QRound(g), QRound(b));
   return res;
 }
 
