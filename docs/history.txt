@@ -6,6 +6,9 @@ each new day's entries apears before the previous day's entries.  The
 individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
+7-Feb-2004
+        - Philip Wyett fixed make build of gl3d plugin after recent
+          effects changes.
 6-Feb-2004
 	- Jorrit clarified the comment for iEngine->CreateBaseMaterial().
 	- Jorrit corrected the howto on creating a thing. It was still
