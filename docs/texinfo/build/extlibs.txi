@@ -23,7 +23,7 @@ contains all headers, pre-built library files, and dynamic link libraries in
 pre-compiled form from the following location on the Crystal Space server:
 
 @noindent
-@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc_libs_0.19a.zip}
+@uref{ftp://ftp.sunsite.dk/projects/crystal/support/win32/msvc_libs_0.19b.zip}
 
 @subheading zlib
 @cindex zlib

@@ -45,6 +45,7 @@ MSVC.PLUGINS.REQUIRED =         \
   font/server/freefont          \
   mesh/impexp/3ds               \
   sound/driver/waveoutsd        \
+  sound/loader/mod              \
   sound/loader/ogg              \
   sound/renderer/ds3d           \
   sound/renderer/eax            \

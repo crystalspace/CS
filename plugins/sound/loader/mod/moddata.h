@@ -51,7 +51,7 @@ class csModSoundData : public iSoundData
   };
 
 
- private:
+ public:
   struct cs_mod_reader
   {
     cs_mod_reader (uint8 *d, size_t l, bool own);
