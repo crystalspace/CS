@@ -181,6 +181,8 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
   }
 
   csRef<iDocumentNodeIterator> it = node->GetNodes ();
+  float scale = 0.0;
+
   while (it->HasNext ())
   {
     csRef<iDocumentNode> child = it->Next ();
@@ -212,10 +214,8 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
       }
     case XMLTOKEN_SCALE:
       {
-	float scale = child->GetAttributeValueAsFloat("value");
-	if (scale)
-	  newspr->RescaleFactory(scale);
-	else
+	scale = child->GetAttributeValueAsFloat("value");
+	if (!scale)
 	{
 	  synldr->ReportError (
 	    "crystalspace.spritecal3dfactoryloader.parse.badvalue",
@@ -445,6 +445,9 @@ csPtr<iBase> csSpriteCal3DFactoryLoader::Parse (iDocumentNode* node,
       return 0;
     }
   }
+  if (scale)
+    newspr->RescaleFactory(scale);
+
   // Wrapup cal3d initialization
   newspr->BindMaterials();
 
