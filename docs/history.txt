@@ -14,6 +14,11 @@ The history order is reversed so that new features are at the top.
 	  failed and that the user should use "-verbose" for more details.  For
 	  debug builds, -verbose is the default.  For optimize builds, it is
 	  not.
+	- Eric Sunshine committed an update for win32/loadlib.cpp from John
+	  Harger <john_h@selectpath.com> which implements error reporting.
+	  Previously, win32/loadlib.cpp simply threw away all diagnostic
+	  information, which made it impossible to debug plugin load failures
+	  on Windows.
 19-Jan-2003
 	- Fixed a problem where RemoveObject() would not properly remove
 	  objects from the sectors so memory leaks would occur.

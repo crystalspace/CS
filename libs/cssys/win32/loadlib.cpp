@@ -21,25 +21,50 @@
 #ifdef __CYGWIN__
 #include <sys/cygwin.h>
 #endif
+#include "csutil/csstrvec.h"
+#include "csutil/util.h"
+#include <windows.h>
+
+static csStrVector ErrorMessages;
 
 csLibraryHandle csFindLoadLibrary (const char *iName)
 {
+  ErrorMessages.DeleteAll();
   return csFindLoadLibrary (NULL, iName, ".dll");
 }
 
 csLibraryHandle csLoadLibrary (const char* iName)
 {
+  csLibraryHandle handle;
 #ifdef __CYGWIN__
-  // cygwin wants to have win32 paths not unix paths
-  char *tmp=new char[160];
+  // Cygwin wants to have Win32 paths not Unix paths.
+  char *tmp=new char[1024];
   if (cygwin_conv_to_win32_path (iName,tmp))
-      return 0;
-  csLibraryHandle handle = LoadLibrary(tmp);
+  {
+    ErrorMessages.Push(
+	csStrNew("LoadLibrary() Cygwin/Win32 path conversion failed."));
+    delete[] tmp;
+    return 0;
+  }
+  handle = LoadLibrary (tmp);
   delete[] tmp;
-  return handle;
 #else
-  return LoadLibrary (iName);
+  handle = LoadLibrary (iName);
 #endif
+  if (handle == NULL)
+  {
+    char *buf;
+    FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+        FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPTSTR) &buf, 0, NULL);
+    char *str = new char[strlen(buf) + strlen(iName) + 50];
+    sprintf(str, "LoadLibrary('%s') error %d: %s",
+	iName, (int)GetLastError(), buf);
+    ErrorMessages.Push(str);
+    LocalFree (buf);
+  }
+  return handle;
 }
 
 void* csGetLibrarySymbol(csLibraryHandle Handle, const char* Name)
@@ -62,6 +87,13 @@ bool csUnloadLibrary (csLibraryHandle Handle)
   return FreeLibrary ((HMODULE)Handle)!=0;
 }
 
-void csPrintLibraryError (const char * /*iModule*/)
+void csPrintLibraryError (const char *iModule)
 {
+  char *str;
+  fprintf(stderr, "ERROR (%s):\n", iModule);
+  while((str = (char*)ErrorMessages.Pop()) != NULL)
+  {
+    fprintf (stderr, "    %s", str);
+    delete[] str;
+  }
 }
