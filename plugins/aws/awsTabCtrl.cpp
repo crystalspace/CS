@@ -407,7 +407,7 @@ void awsTabCtrl::DoLayout ()
   int x = 0;
   csRect r = Frame ();
 
-  for (j = first - 1; j >= 0; i--)
+  for (j = first - 1; j >= 0; j--)
   {
     awsTab *btn = vTabs.Get (j);
     csRect br =  btn->Frame ();

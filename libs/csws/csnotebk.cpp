@@ -683,11 +683,10 @@ bool csNotebook::HandleEvent (iEvent &Event)
         {
 	  if (firsttab > 0)
 	  {
-	    size_t np = firsttab - 1;
-	    while (np > 0
-		&& !(pages.Get (np)->flags & NOTEBOOK_PAGE_PRIMARY))
-	      np--;
-	    if ((np < firsttab) && (np >= 0)
+	    size_t np = firsttab;
+	    while (np-- > 0
+		&& !(pages.Get (np)->flags & NOTEBOOK_PAGE_PRIMARY));
+	    if ((np < firsttab) && (np != (size_t)-1)
 	    && (pages.Get (np)->flags & NOTEBOOK_PAGE_PRIMARY))
 	    {
 	      firsttab = np;

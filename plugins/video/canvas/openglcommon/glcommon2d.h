@@ -50,10 +50,7 @@ class GLFontCache;
  */
 class csGraphics2DGLCommon : public csGraphics2D, public iEventPlug
 {
-protected:
-  friend class csGLScreenShot;
-  friend class csGLFontCache;
-
+public:
   enum GLPixelFormatValue
   {
     glpfvColorBits = 0,
@@ -67,6 +64,9 @@ protected:
     glpfvValueCount
   };
   typedef int GLPixelFormat[glpfvValueCount];
+protected:
+  friend class csGLScreenShot;
+  friend class csGLFontCache;
   
   class csGLPixelFormatPicker
   {

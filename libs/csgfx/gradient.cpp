@@ -50,9 +50,9 @@ csGradient::csGradient (csColor first, csColor last)
 
 void csGradient::AddShade (csGradientShade shade)
 {
-  size_t lo = 0, hi = shades.Length() - 1;
+  size_t lo = 0, hi = shades.Length();
   size_t mid = 0;
-  while (lo <= hi)
+  while (lo < hi)
   {
     mid = (lo + hi) / 2;
     if (shades[mid].position < shade.position)
@@ -61,7 +61,7 @@ void csGradient::AddShade (csGradientShade shade)
     }
     else
     {
-      hi = mid - 1;
+      hi = mid;
     }
   }
   shades.Insert (lo, shade);

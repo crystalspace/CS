@@ -7,8 +7,10 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 3-Jul-2004
-	- Remi Bonnet fixed a few signed/unsigned comparaisons warnings and a
+	- Remi Bonnet fixed a few signed/unsigned comparisons warnings and a
 	  bug in aws where unsigned can't be used.
+	- res fixed some occasions of wrong array index comparisons.
+	- res fixed an MSVC compile error in glcommon2d.h.
 2-Jul-2004
 	- Jorrit fixed compile errors in sprcal3d and terrfunc.
 	- res changed the type of csArray<> indices and sizes from int to

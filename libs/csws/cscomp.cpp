@@ -168,7 +168,7 @@ void csComponent::SetApp (csApp *newapp)
 
 void csComponent::InsertClipChild (csComponent *clipchild)
 {
-  if (clipchildren.Find (clipchild) < 0)
+  if (clipchildren.Find (clipchild) == csArrayItemNotFound)
   {
     if (clipchild->clipparent)
       clipchild->clipparent->DeleteClipChild (clipchild);
