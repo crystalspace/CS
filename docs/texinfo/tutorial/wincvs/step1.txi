@@ -8,7 +8,7 @@ The WinCVS client is as Crystal Space, open source and presently is an under dev
 piece of software. A latest stable release of the WinCVS client can be obtained from
 the WinCVS website:
 
-@uref{http://www.wincvs.org}
+@uref{http://www.cvsgui.org}
 
 @subsubheading Secure Shell (SSH)
 
