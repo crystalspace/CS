@@ -43,6 +43,27 @@ SCF_VERSION (iMaterialWrapper, 0, 0, 5);
  * by a material wrapper, which keeps the pointer to the material handle, its
  * name, and possibly the base material object that was registered to create
  * the material handle.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iEngine::CreateMaterial()
+ *   <li>iMaterialList::NewMaterial()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iEngine::FindMaterial()
+ *   <li>iMaterialList::Get()
+ *   <li>iMaterialList::FindByName()
+ *   <li>iLoaderContext::FindMaterial()
+ *   <li>iLoaderContext::FindNamedMaterial()
+ *   <li>iMeshObject::GetMaterialWrapper()
+ *   <li>Various state interfaces for mesh objects.
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEngine
+ *   <li>Mesh objects
+ *   </ul>
  */
 struct iMaterialWrapper : public iBase
 {
@@ -93,6 +114,11 @@ SCF_VERSION (iMaterialEngine, 0, 0, 2);
  * that implements iMaterial you can query for iMaterialEngine.
  * So this interface basically augments iMaterial with engine specific
  * features.
+ * <p>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>SCF_QUERY_INTERFACE() from iMaterial
+ *   </ul>
  */
 struct iMaterialEngine : public iBase
 {
@@ -121,6 +147,15 @@ SCF_VERSION (iMaterialList, 0, 0, 1);
 
 /**
  * This class represents a list of materials.
+ * <p>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iEngine::GetMaterialList()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEngine
+ *   </ul>
  */
 struct iMaterialList : public iBase
 {

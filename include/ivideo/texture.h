@@ -38,6 +38,19 @@ SCF_VERSION (iTextureHandle, 2, 2, 2);
 
 /**
  * A texture handle as returned by iTextureManager.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iTextureManager::RegisterTexture()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iTextureWrapper::GetTextureHandle()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>3D renderer implementations (iGraphics3D).
+ *   </ul>
  */
 struct iTextureHandle : public iBase
 {

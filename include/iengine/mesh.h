@@ -163,6 +163,29 @@ SCF_VERSION (iMeshWrapper, 0, 8, 1);
  * iSprite3DState) must be queried from the mesh *objects*, not the wrappers!
  * <p>
  * Note that a mesh object should never be contained in more than one wrapper.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iEngine::CreateSectorWallsMesh()
+ *   <li>iEngine::CreateThingMesh()
+ *   <li>iEngine::CreateMeshWrapper()
+ *   <li>iEngine::LoadMeshWrapper()
+ *   <li>iEngine::CreatePortalContainer()
+ *   <li>iEngine::CreatePortal()
+ *   <li>iLoader::LoadMeshObject()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iEngine::FindMeshObject()
+ *   <li>iMeshList::Get()
+ *   <li>iMeshList::FindByName()
+ *   <li>iMeshWrapperIterator::Next()
+ *   <li>iLoaderContext::FindMeshObject()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEngine
+ *   </ul>
  */
 struct iMeshWrapper : public iBase
 {
@@ -516,12 +539,30 @@ SCF_VERSION (iMeshFactoryWrapper, 0, 1, 7);
  * A mesh factory wrapper is an engine-level object that wraps around a
  * mesh object factory (iMeshObjectFactory). Every mesh object factory in
  * the engine is represented by a mesh factory wrapper, which keeps the
- * pointer to the mesh factory, its name, etc. <p>
- *
+ * pointer to the mesh factory, its name, etc.
+ * <p>
  * Think of the mesh factory wrapper as the hook that holds the mesh
  * factory in the engine. An effect of this is that the i???FactoryState
  * interfaces (e.g. iSprite3DFactoryState) must be queried from the mesh
  * *factories*, not the wrappers!
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iEngine::CreateMeshFactory()
+ *   <li>iEngine::LoadMeshFactory()
+ *   <li>iLoader::LoadMeshObjectFactory()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iEngine::FindMeshFactory()
+ *   <li>iMeshFactoryList::Get()
+ *   <li>iMeshFactoryList::FindByName()
+ *   <li>iLoaderContext::FindMeshFactory()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEngine
+ *   </ul>
  */
 struct iMeshFactoryWrapper : public iBase
 {
@@ -624,6 +665,17 @@ SCF_VERSION (iMeshList, 0, 0, 1);
 
 /**
  * A list of meshes.
+ * <p>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iEngine::GetMeshes()
+ *   <li>iSector::GetMeshes()
+ *   <li>iMeshWrapper::GetChildren()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEngine
+ *   </ul>
  */
 struct iMeshList : public iBase
 {
@@ -660,6 +712,16 @@ SCF_VERSION (iMeshFactoryList, 0, 0, 1);
 
 /**
  * A list of mesh factories.
+ * <p>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iEngine::GetMeshFactories()
+ *   <li>iMeshFactoryWrapper::GetChildren()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEngine
+ *   </ul>
  */
 struct iMeshFactoryList : public iBase
 {
@@ -692,6 +754,12 @@ SCF_VERSION (iMeshWrapperIterator, 0, 1, 0);
 
 /**
  * This is an iterator mesh wrappers.
+ * <p>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iEngine::GetNearbyMeshes()
+ *   <li>iEngine::GetVisibleMeshes()
+ *   </ul>
  */
 struct iMeshWrapperIterator : public iBase
 {

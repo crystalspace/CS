@@ -89,6 +89,19 @@ SCF_VERSION (iMaterial, 0, 0, 6);
  * a handle to an internal compiled material. This interface
  * plays same role related to iMaterialHandle as iImage plays
  * related to iTextureHandle.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iEngine::CreateBaseMaterial()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iMaterialWrapper::GetMaterial()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>3D renderer implementations (iGraphics3D).
+ *   </ul>
  */
 struct iMaterial : public iShaderVariableContext
 {
@@ -153,6 +166,19 @@ SCF_VERSION (iMaterialHandle, 0, 0, 2);
 /**
  * This class represents a material handle (compiled material)
  * for the 3D rasterizer.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iTextureManager::RegisterMaterial()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iMaterialWrapper::GetMaterialHandle()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>3D renderer implementations (iGraphics3D).
+ *   </ul>
  */
 struct iMaterialHandle : public iBase
 {

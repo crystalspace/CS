@@ -60,26 +60,31 @@ struct iLoaderContext : public iBase
    */
   virtual iMaterialWrapper* FindMaterial (const char* filename) = 0;
 
-  /** Same as FindMaterial but there is no assumption that the name
-   *  and the filename are the same.  This is useful if the filename
-   *  has /'s in it (a pathname), since region searching will mean that
-   *  names with /'s will never be found correctly.
+  /**
+   * Same as FindMaterial but there is no assumption that the name
+   * and the filename are the same.  This is useful if the filename
+   * has /'s in it (a pathname), since region searching will mean that
+   * names with /'s will never be found correctly.
    */
-  virtual iMaterialWrapper* FindNamedMaterial (const char* name, const char *filename) = 0;
+  virtual iMaterialWrapper* FindNamedMaterial (const char* name,
+  	const char *filename) = 0;
   /// Find a mesh factory.
   virtual iMeshFactoryWrapper* FindMeshFactory (const char* name) = 0;
   /// Find a mesh object.
   virtual iMeshWrapper* FindMeshObject (const char* name) = 0;
   
-  /** Find a texture.  If not found, attempt to load and prepare the
-   *  texture using the supplied filename as the name.
+  /**
+   * Find a texture.  If not found, attempt to load and prepare the
+   * texture using the supplied filename as the name.
    */
   virtual iTextureWrapper* FindTexture (const char* filename) = 0;
 
-  /** Find a texture with the given name.  If not found, attempt to load
-   *  the supplied filename and prepare the texture using the supplied name.
+  /**
+   * Find a texture with the given name.  If not found, attempt to load
+   * the supplied filename and prepare the texture using the supplied name.
    */
-  virtual iTextureWrapper* FindNamedTexture (const char* name, const char *filename) = 0;
+  virtual iTextureWrapper* FindNamedTexture (const char* name,
+  	const char *filename) = 0;
 
   /// Find a light
   virtual iLight* FindLight (const char* name) = 0;

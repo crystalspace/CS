@@ -115,6 +115,15 @@ SCF_VERSION (iLightCallback, 0, 2, 1);
  * Set a callback which is called when this light color is changed.
  * The given context will be either an instance of iRenderView, iFrustumView,
  * or else 0.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Application.
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iLight
+ *   </ul>
  */
 struct iLightCallback : public iBase
 {
@@ -179,6 +188,25 @@ SCF_VERSION (iLight, 0, 0, 9);
  *     Shadows for dynamic lights will be less accurate because things
  *     will not cast accurate shadows (due to computation speed limitations).
  * </ul>
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iEngine::CreateLight()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iEngine::FindLight()
+ *   <li>iEngine::FindLightID()
+ *   <li>iEngine::GetLightIterator()
+ *   <li>iEngine::GetNearbyLights()
+ *   <li>iLightList::Get()
+ *   <li>iLightList::FindByName()
+ *   <li>iLoaderContext::FindLight()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEngine
+ *   </ul>
  */
 struct iLight : public iBase
 {
@@ -345,6 +373,15 @@ SCF_VERSION (iLightList, 0, 0, 2);
 
 /**
  * This structure represents a list of lights.
+ * <p>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iSector::GetLights()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEngine
+ *   </ul>
  */
 struct iLightList : public iBase
 {
@@ -442,6 +479,15 @@ SCF_VERSION (iLightIterator, 0, 1, 0);
  * This iterator assumes there are no fundamental changes
  * in the engine while it is being used.
  * If changes to the engine happen the results are unpredictable.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iEngine::GetLightIterator()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Application.
+ *   </ul>
  */
 struct iLightIterator : public iBase
 {

@@ -70,6 +70,15 @@ SCF_VERSION (iMovable, 0, 1, 2);
  * the model. Sometimes in the center or the center-bottom depending on what
  * is easiest. It is important to realize that all position setting routines
  * below operate relative to the local origin of the object.
+ * <p>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iMeshWrapper::GetMovable()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEngine
+ *   </ul>
  */
 struct iMovable : public iBase
 {

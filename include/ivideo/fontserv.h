@@ -107,6 +107,11 @@ SCF_VERSION (iFont, 5, 0, 0);
 /**
  * A font object.
  * Objects of this class are used by canvas driver to paint glyphs.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iFontServer::LoadFont()
+ *   </ul>
  */
 struct iFont : public iBase
 {
@@ -204,6 +209,21 @@ SCF_VERSION (iFontServer, 3, 0, 0);
  * the font server or are on disk; thus some font servers
  * may contain the fonts hardcoded; in this case the
  * font path is really a identifier.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Font Multiplexer plugin (crystalspace.font.server.multiplexer)
+ *   <li>Standard Font server plugin (crystalspace.font.server.default)
+ *   <li>FreeType2 Font server plugin (crystalspace.font.server.freetype2)
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iGraphics3D implementations (3D renderers).
+ *   </ul>
  */
 struct iFontServer : public iBase
 {

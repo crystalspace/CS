@@ -34,6 +34,20 @@ SCF_VERSION (iPortalContainer, 0, 0, 1);
 
 /**
  * A container for portals.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iEngine::CreatePortalContainer()
+ *   <li>iEngine::CreatePortal()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>SCF_QUERY_INTERFACE() on iMeshObject from a portal container mesh.
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEngine
+ *   </ul>
  */
 struct iPortalContainer : public iBase
 {

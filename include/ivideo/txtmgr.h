@@ -131,6 +131,15 @@ SCF_VERSION (iTextureManager, 2, 3, 2);
  * needed, calculating a palette if needed, and calculating all
  * lookup tables related to the textures. Mipmap creation is
  * also done in this class.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>The 3D renderers create an instance of this.
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iGraphics3D::GetTextureManager()
+ *   </ul>
  */
 struct iTextureManager : public iBase
 {

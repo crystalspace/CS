@@ -82,6 +82,22 @@ SCF_VERSION (iVisibilityCuller, 0, 4, 0);
  * To use it you first register visibility objects (which are all the
  * objects for which you want to test visibility) to this culler.
  * A visibility culler can usually also support shadow calculation.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Dynavis culler plugin (crystalspace.culling.dynavis)
+ *   <li>Frustvis culler plugin (crystalspace.culling.frustvis)
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   <li>CS_LOAD_PLUGIN()
+ *   <li>iSector::GetVisibilityCuller()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEngine
+ *   </ul>
  */
 struct iVisibilityCuller : public iBase
 {
@@ -210,6 +226,19 @@ SCF_VERSION (iVisibilityObject, 0, 2, 1);
 /**
  * An object that wants to know if it is visible or not
  * for some visibility culler needs to implement this interface.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>Mesh wrapper in the engine implements this.
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>SCF_QUERY_INTERFACE() from iMeshWrapper.
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Visibility culler plugins (iVisibilityCuller).
+ *   </ul>
  */
 struct iVisibilityObject : public iBase
 {

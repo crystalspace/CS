@@ -32,6 +32,21 @@ SCF_VERSION (iCollection, 0, 0, 3);
 /**
  * A collection object is for convenience of the script language.
  * It is simply a collection of other objects.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iCollectionList::NewCollection()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iCollectionList::Get()
+ *   <li>iCollectionList::FindByName()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Engine stores them.
+ *   <li>Application uses them.
+ *   </ul>
  */
 struct iCollection : public iBase
 {
@@ -55,7 +70,19 @@ struct iCollection : public iBase
 };
 
 SCF_VERSION (iCollectionList, 0, 0, 1);
-/// iCollection list.
+/**
+ * iCollection list.
+ * <p>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iEngine::GetCollections()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Engine stores them.
+ *   <li>Application uses them.
+ *   </ul>
+ */
 struct iCollectionList : public iBase
 {
   /// Create a new collection.

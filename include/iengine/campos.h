@@ -47,6 +47,21 @@ SCF_VERSION (iCameraPosition, 0, 1, 0);
  *      the camera.
  * <li> A far plane used to clip geometry which is too far away.
  * </ul>
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iCameraPositionList::NewCameraPosition()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iCameraPositionList::Get()
+ *   <li>iCameraPositionList::FindByName()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Engine stores them.
+ *   <li>Application uses them.
+ *   </ul>
  */
 struct iCameraPosition : public iBase
 {
@@ -108,7 +123,19 @@ struct iCameraPosition : public iBase
 
 SCF_VERSION (iCameraPositionList, 0, 0, 1);
 
-/// A list of camera position objects.
+/**
+ * A list of camera position objects.
+ * <p>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iEngine::GetCameraPositions()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Engine stores them.
+ *   <li>Application uses them.
+ *   </ul>
+ */
 struct iCameraPositionList : public iBase
 {
   /// Create a new empty camera position.

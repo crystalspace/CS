@@ -73,6 +73,19 @@ SCF_VERSION (iCamera, 0, 2, 0);
  * <li> Only Portals Flag: If this is true then no collisions are detected for
  *      camera movement except for portals.
  * </ul>
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iEngine::CreateCamera()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iView::GetCamera()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>csView and iView
+ *   </ul>
  */
 struct iCamera : public iBase
 {

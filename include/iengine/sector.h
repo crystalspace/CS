@@ -79,6 +79,24 @@ SCF_VERSION (iSector, 0, 5, 3);
  * The sector is the basic building block for any Crystal Space level.
  * A level can be made from one or more sectors. Using the thing mesh
  * object one can use portals to connect multiple sectors.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iEngine::CreateSector()
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iEngine::FindSector()
+ *   <li>iSectorList::Get()
+ *   <li>iSectorList::FindByName()
+ *   <li>iLoaderContext::FindSector()
+ *   <li>iPortal::GetSector()
+ *   <li>iCamera::GetSector()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEngine
+ *   </ul>
  */
 struct iSector : public iBase
 {
@@ -251,6 +269,16 @@ SCF_VERSION (iSectorList, 0, 0, 2);
 
 /**
  * A list of sectors.
+ * <p>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>iEngine::GetSectors()
+ *   <li>iMovable::GetSectors()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>iEngine
+ *   </ul>
  */
 struct iSectorList : public iBase
 {
@@ -284,6 +312,11 @@ SCF_VERSION (iSectorIterator, 0, 1, 0);
 /**
  * An iterator to iterate over sectors. Some functions in CS
  * return this.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>iEngine::GetNearbySectors()
+ *   </ul>
  */
 struct iSectorIterator : public iBase
 {

@@ -155,6 +155,28 @@ SCF_VERSION (iGraphics2D, 2, 4, 0);
  * This is the interface for 2D renderer. The 2D renderer is responsible
  * for all 2D operations such as creating the window, switching pages,
  * returning pixel format and so on.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>OpenGL/Windows canvas plugin (crystalspace.graphics2d.glwin32)
+ *   <li>OpenGL/X11 canvas plugin (crystalspace.graphics2d.glx)
+ *   <li>DirectDraw canvas plugin (crystalspace.graphics2d.directdraw)
+ *   <li>X11 canvas plugin (crystalspace.graphics2d.x2d)
+ *   <li>Memory canvas plugin (crystalspace.graphics2d.memory)
+ *   <li>Null 2D canvas plugin (crystalspace.graphics2d.null2d)
+ *   <li>Some others.
+ *   <li>Note that it is the 3D renderer that will automatically create
+ *       the right instance of the canvas that it requires.
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   <li>iGraphics3D::GetDriver2D()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>3D renderers (iGraphics3D implementations)
+ *   </ul>
  */
 struct iGraphics2D : public iBase
 {

@@ -125,6 +125,19 @@ SCF_VERSION (iEngine, 0, 22, 0);
  * This interface is the main interface to the 3D engine.
  * The engine is responsible for creating new engine-specific objects
  * such as sectors, mesh objects, mesh object factories, lights, and so on.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>3D Engine plugin (crystalspace.engine.3d)
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   </ul>
+ * Main users of this interface:
+ *   <ul>
+ *   <li>Application.
+ *   </ul>
  */
 struct iEngine : public iBase
 {

@@ -728,6 +728,17 @@ SCF_VERSION (iGraphics3D, 5, 3, 0);
  * All 3D graphics rasterizer servers for Crystal Space should implement this
  * interface, as well as the iGraphics2D interface.  The standard
  * implementation is csGraphics3DSoftware.
+ * <p>
+ * Main creators of instances implementing this interface:
+ *   <ul>
+ *   <li>OpenGL Renderer plugin (crystalspace.graphics3d.opengl)
+ *   <li>Software Renderer plugin (crystalspace.graphics3d.software)
+ *   <li>Null 3D Renderer plugin (crystalspace.graphics3d.null)
+ *   </ul>
+ * Main ways to get pointers to this interface:
+ *   <ul>
+ *   <li>CS_QUERY_REGISTRY()
+ *   </ul>
  */
 struct iGraphics3D : public iBase
 {
