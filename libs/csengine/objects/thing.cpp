@@ -1440,7 +1440,8 @@ void csThing::CreateLightMaps (iGraphics3D* g3d)
   }
 }
 
-csPolygon3D* csThing::IntersectSphere (csVector3& center, float radius, float* pr)
+csPolygon3D* csThing::IntersectSphere (csVector3& center, float radius,
+	float* pr)
 {
   float d, min_d = radius;
   int i;
@@ -1450,7 +1451,7 @@ csPolygon3D* csThing::IntersectSphere (csVector3& center, float radius, float* p
   for (i = 0 ; i < polygons.Length () ; i++)
   {
     p = GetPolygon3D (i);
-    const csPlane3& wpl = p->GetPlane ()->GetWorldPlane ();
+    const csPlane3& wpl = p->GetPlane ()->GetObjectPlane ();
     d = wpl.Distance (center);
     if (d < min_d && csMath3::Visible (center, wpl))
     {

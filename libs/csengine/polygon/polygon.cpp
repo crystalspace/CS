@@ -423,8 +423,8 @@ bool csPolygon3D::Overlaps (csPolygonInt* overlapped)
   // there is a vertex of this polygon that is in front of the 'totest'
   // polygon. If that is the case then we return true.
 
-  csPlane3& this_plane = plane->GetWorldPlane ();
-  csPlane3& test_plane = totest->plane->GetWorldPlane ();
+  csPlane3& this_plane = plane->GetObjectPlane ();
+  csPlane3& test_plane = totest->plane->GetObjectPlane ();
   int i;
   for (i = 0 ; i < totest->vertices.GetNumVertices () ; i++)
   {
@@ -805,7 +805,7 @@ void csPolygon3D::SetTextureSpace (
     {
       lmi->NewTxtPlane ();
       lmi->GetTxtPlane() ->SetTextureSpace (
-	plane->GetWorldPlane (),
+	plane->GetObjectPlane (),
   	xo, yo, zo, x1, y1, z1, len1);
     }
   }
@@ -1429,7 +1429,7 @@ bool csPolygon3D::DoPerspective (const csTransform& trans,
 bool csPolygon3D::PointOnPolygon (const csVector3& v)
 {
   // First check if point is on the plane.
-  csPlane3& pl = plane->GetWorldPlane ();
+  csPlane3& pl = plane->GetObjectPlane ();
   float dot = pl.D () + pl.A ()*v.x + pl.B ()*v.y + pl.C ()*v.z;
   if (ABS (dot) >= SMALL_EPSILON) return false;
 
@@ -1453,7 +1453,7 @@ bool csPolygon3D::IntersectRay (const csVector3& start, const csVector3& end)
 {
   // First we do backface culling on the polygon with respect to
   // the starting point of the beam.
-  csPlane3& pl = plane->GetWorldPlane ();
+  csPlane3& pl = plane->GetObjectPlane ();
   float dot1 = pl.D () + pl.A ()*start.x + pl.B ()*start.y + pl.C ()*start.z;
   if (dot1 > 0) return false;
 
@@ -1474,7 +1474,7 @@ bool csPolygon3D::IntersectRay (const csVector3& start, const csVector3& end)
   i1 = GetVertices ().GetNumVertices ()-1;
   for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
   {
-    csMath3::CalcNormal (normal, start, Vwor (i1), Vwor (i));
+    csMath3::CalcNormal (normal, start, Vobj (i1), Vobj (i));
     if ( (relend * normal) > 0) return false;
     i1 = i;
   }
@@ -1487,7 +1487,7 @@ bool csPolygon3D::IntersectRayNoBackFace (const csVector3& start, const csVector
 
   // If this vector is perpendicular to the plane of the polygon we
   // need to catch this case here.
-  csPlane3& pl = plane->GetWorldPlane ();
+  csPlane3& pl = plane->GetObjectPlane ();
   float dot1 = pl.D () + pl.A ()*start.x + pl.B ()*start.y + pl.C ()*start.z;
   float dot2 = pl.D () + pl.A ()*end.x + pl.B ()*end.y + pl.C ()*end.z;
   if (ABS (dot1-dot2) < SMALL_EPSILON) return false;
@@ -1508,7 +1508,7 @@ bool csPolygon3D::IntersectRayNoBackFace (const csVector3& start, const csVector
   i1 = GetVertices ().GetNumVertices ()-1;
   for (i = 0 ; i < GetVertices ().GetNumVertices () ; i++)
   {
-    csMath3::CalcNormal (normal, start, Vwor (i1), Vwor (i));
+    csMath3::CalcNormal (normal, start, Vobj (i1), Vobj (i));
     if (dot1 > 0)
     {
       if ( (relend * normal) < 0) return false;

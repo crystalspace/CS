@@ -114,12 +114,12 @@ bool csPolyPlane::IntersectSegment (const csVector3& start,
   // Set *pr to -1 to indicate error if we return false now.
   if (pr) *pr = -1;
 
-  denom = plane_wor.A ()*(x2-x1) + plane_wor.B ()*(y2-y1)
-  	+ plane_wor.C ()*(z2-z1);
+  denom = plane_obj.A ()*(x2-x1) + plane_obj.B ()*(y2-y1)
+  	+ plane_obj.C ()*(z2-z1);
   if (ABS (denom) < SMALL_EPSILON) return false;	// Lines are parallel
 
-  num = - (plane_wor.A ()*x1 + plane_wor.B ()*y1
-  	+ plane_wor.C ()*z1 + plane_wor.D ());
+  num = - (plane_obj.A ()*x1 + plane_obj.B ()*y1
+  	+ plane_obj.C ()*z1 + plane_obj.D ());
   r = num / denom;
 
   // Calculate 'r' and 'isect' even if the intersection point is

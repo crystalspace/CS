@@ -1,6 +1,20 @@
 The history order has been reversed so that new features are at the top.
 
 6-Mar-2001
+	- Changed the following functions to work in object space instead
+	  of world space:
+	    - csPolygon3D::IntersectSegment()
+	    - csPolygon3D::IntersectRay()
+	    - csPolygon3D::IntersectRayNoBackFace()
+	    - csPolygon3D::IntersectRayPlane()
+	    - csPolygon3D::Overlaps()
+	    - csPolygon3D::SetTextureSpace(...)
+	    - csPolygon3D::PointOnPolygon()
+	    - csPolyPlane::IntersectSegment()
+	    - csThing::IntersectSphere()
+	- Modified the csSector versions of IntersectSphere() and
+	  IntersectSegment() to correctly use the movable of the things
+	  if relevant to map world space to object space.
 5-Mar-2001
 	- Thomas Hieber did the following to the gamecore plugin:
 	    - Added to scf.cfg.

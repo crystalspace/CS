@@ -478,6 +478,8 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
   float r, best_r = 10000000000.;
   csVector3 cur_isect;
   csPolygon3D* best_p = NULL;
+  csVector3 obj_start, obj_end, obj_isect;
+  csReversibleTransform movtrans;
 
   int i;
   for (i = 0 ; i < things.Length () ; i++)
@@ -486,7 +488,24 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
     if (sp != static_thing)
     {
       r = best_r;
-      csPolygon3D* p = sp->IntersectSegment (start, end, cur_isect, &r);
+
+      if (sp->GetMovingOption () == CS_THING_MOVE_NEVER)
+      {
+        obj_start = start;
+	obj_end = end;
+      }
+      else
+      {
+        movtrans = sp->GetMovable ().GetFullTransform ();
+        obj_start = movtrans.Other2This (start);
+	obj_end = movtrans.Other2This (end);
+      }
+      csPolygon3D* p = sp->IntersectSegment (obj_start, obj_end, obj_isect, &r);
+      if (sp->GetMovingOption () == CS_THING_MOVE_NEVER)
+        cur_isect = obj_isect;
+      else
+        cur_isect = movtrans.This2Other (obj_isect);
+
       if (p && r < best_r)
       {
         best_r = r;
@@ -498,6 +517,8 @@ csPolygon3D* csSector::IntersectSegment (const csVector3& start,
 
   if (static_thing)
   {
+    // Static_thing has option CS_THING_MOVE_NEVER so
+    // object space == world space.
     csPolygonTree* static_tree = static_thing->GetStaticTree ();
     // Handle the octree.
     ISectData idata;
@@ -552,11 +573,20 @@ csPolygon3D* csSector::IntersectSphere (csVector3& center, float radius,
   int i;
   csPolygon3D* p, * min_p = NULL;
   csVector3 hit;
+  csVector3 obj_center;
+  csReversibleTransform movtrans;
 
   for (i = 0 ; i < things.Length () ; i++)
   {
     csThing* sp = (csThing*)things[i];
-    p = sp->IntersectSphere (center, radius, &d);
+    if (sp->GetMovingOption () == CS_THING_MOVE_NEVER)
+      obj_center = center;
+    else
+    {
+      movtrans = sp->GetMovable ().GetFullTransform ();
+      obj_center = movtrans.Other2This (center);
+    }
+    p = sp->IntersectSphere (obj_center, radius, &d);
     if (p && d < min_d)
     {
       min_d = d;

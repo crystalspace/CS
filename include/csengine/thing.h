@@ -713,9 +713,9 @@ public:
   //----------------------------------------------------------------------
 
   /**
-   * Intersects world-space sphere with polygons of this set. Return
+   * Intersects object-space sphere with polygons of this set. Return
    * polygon it hits with (or NULL) and the intersection point
-   * in world coordinates. It will also return the polygon with the
+   * in object coordinates. It will also return the polygon with the
    * closest hit (the most nearby polygon).
    * If 'pr' != NULL it will also return the distance where the
    * intersection happened.
@@ -724,9 +724,9 @@ public:
   	float* pr = NULL);
 
   /**
-   * Intersect world-space segment with polygons of this set. Return
+   * Intersect object-space segment with polygons of this set. Return
    * polygon it intersects with (or NULL) and the intersection point
-   * in world coordinates.<p>
+   * in object coordinates.<p>
    *
    * If 'pr' != NULL it will also return a value between 0 and 1
    * indicating where on the 'start'-'end' vector the intersection

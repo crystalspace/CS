@@ -1163,15 +1163,15 @@ public:
   int GetType () { return 1; }
 
   /**
-   * Intersect world-space segment with this polygon. Return
+   * Intersect object-space segment with this polygon. Return
    * true if it intersects and the intersection point in world coordinates.
    */
   bool IntersectSegment (const csVector3& start, const csVector3& end,
                           csVector3& isect, float* pr = NULL);
 
   /**
-   * Intersect world-space ray with this polygon. This function
-   * is similar to intersect_segment except that it doesn't keep the lenght
+   * Intersect object-space ray with this polygon. This function
+   * is similar to IntersectSegment except that it doesn't keep the lenght
    * of the ray in account. It just tests if the ray intersects with the
    * interior of the polygon. Note that this function also does back-face
    * culling.
@@ -1179,8 +1179,8 @@ public:
   bool IntersectRay (const csVector3& start, const csVector3& end);
 
   /**
-   * Intersect world-space ray with this polygon. This function
-   * is similar to intersect_segment except that it doesn't keep the lenght
+   * Intersect object-space ray with this polygon. This function
+   * is similar to IntersectSegment except that it doesn't keep the lenght
    * of the ray in account. It just tests if the ray intersects with the
    * interior of the polygon. Note that this function doesn't do
    * back-face culling.
@@ -1188,11 +1188,11 @@ public:
   bool IntersectRayNoBackFace (const csVector3& start, const csVector3& end);
 
   /**
-   * Intersect ray with the plane of this polygon and returns the intersection
-   * point. This function does not test if the intersection is inside the
-   * polygon. It just returns the intersection with the plane (in or out).
-   * This function returns false if the ray is parallel with the plane
-   * (i.e. there is no intersection).
+   * Intersect object space ray with the plane of this polygon and
+   * returns the intersection point. This function does not test if the
+   * intersection is inside the polygon. It just returns the intersection
+   * with the plane (in or out). This function returns false if the ray
+   * is parallel with the plane (i.e. there is no intersection).
    */
   bool IntersectRayPlane (const csVector3& start, const csVector3& end,
   	csVector3& isect);

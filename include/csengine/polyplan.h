@@ -107,7 +107,7 @@ public:
   void ClosestPoint (csVector3& v, csVector3& isect) const;
 
   /**
-   * Run a segment through this plane (in world space) and
+   * Run a segment through this plane (in object space) and
    * see where it intersects. Put value in 'pr' between 0 and 1 for
    * position on segment (0 is at start, 1 is at end) and also
    * put intersection point in 'isect'. Return false if there is
