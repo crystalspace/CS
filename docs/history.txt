@@ -27,6 +27,8 @@ chronological order.
 	- Jorrit modified the thing plugin so that by default it will only
 	  give 10 warnings about bad UV coordinates unless the -verbose
 	  commandline option is given.
+	- Jorrit did a big optimization to the NR by removing a
+	  CS_QUERY_REGISTRY in a critical spot (csGLShaderFVP::SetupState()).
 25-Feb-2004
 	- Fritz Elfert fixed the following lighting related crash in sprcal3d:
 	  Previously, csSpriteCal3DMeshObject managed a set of relevant lights

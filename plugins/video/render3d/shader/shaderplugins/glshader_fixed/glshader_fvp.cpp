@@ -56,6 +56,8 @@ csGLShaderFVP::csGLShaderFVP (csGLShader_FIXED* shaderPlug)
 
   environment = ENVIRON_NONE;
   g3d = CS_QUERY_REGISTRY (object_reg, iGraphics3D);
+  strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    object_reg, "crystalspace.shared.stringset", iStringSet);
 }
 
 csGLShaderFVP::~csGLShaderFVP ()
@@ -76,8 +78,8 @@ void csGLShaderFVP::SetupState (
 {
   int i;
 
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
-    object_reg, "crystalspace.shared.stringset", iStringSet);
+  //csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+    //object_reg, "crystalspace.shared.stringset", iStringSet);
 
   if (do_lighting)
   {
@@ -280,7 +282,8 @@ bool csGLShaderFVP::Load(iDocumentNode* program)
 
   csRef<iShaderManager> shadermgr = CS_QUERY_REGISTRY(
   	object_reg, iShaderManager);
-  csRef<iStringSet> strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
+  if (!strings)
+    strings = CS_QUERY_REGISTRY_TAG_INTERFACE (
 	object_reg, "crystalspace.shared.stringset", iStringSet);
 
   csRef<iDocumentNode> variablesnode = program->GetNode("fixedvp");

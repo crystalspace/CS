@@ -31,6 +31,7 @@ class csGLShaderFVP : public iShaderProgram
 {
 private:
   csRef<iGraphics3D> g3d;
+  csRef<iStringSet> strings;
   csGLShader_FIXED* shaderPlug;
 
   enum
