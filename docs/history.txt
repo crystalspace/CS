@@ -42,6 +42,8 @@ The history order is reversed so that new features are at the top.
 	  though.
 	- Added some information to the second tutorial about render
 	  priorities and Z-buffer mode.
+	- Fixed a bad bug in the parsing of the START keyword. It would
+	  simply crash.
 11-Dec-2001
 	- Thanks to Matze we finally got debugging to work properly with
 	  cygwin and mingw ports. In the past there was no useful debug

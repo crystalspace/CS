@@ -2231,7 +2231,7 @@ bool csLoader::ParseStart (char* buf, iCameraPosition* campos)
   }
   else
   {
-    csScanStr (params, "%s,%f,%f,%f", &start_sector,
+    csScanStr (buf, "%s,%f,%f,%f", &start_sector,
       &pos.x, &pos.y, &pos.z);
   }
 
