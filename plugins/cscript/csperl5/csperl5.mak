@@ -1,7 +1,8 @@
 DESCRIPTION.csperl5 = Crystal Space Perl5 scripting plugin
-DESCRIPTION.csperl5maintainer = $(DESCRIPTION.csperl5) interim files
-DESCRIPTION.swigperl5gen = $(DESCRIPTION.csperl5) (forcibly)
-DESCRIPTION.swigperl5inst = $(DESCRIPTION.csperl5) (install stage)
+DESCRIPTION.csperl5maintainer = SWIG Perl5 files
+DESCRIPTION.swigperl5gen = SWIG Perl5 files (forcibly)
+DESCRIPTION.swigperl5inst = SWIG Perl5 files (install)
+DESCRIPTION.swigperl5 = SWIG Perl5 files (clean)
 
 #------------------------------------------------------------- rootdefines ---#
 ifeq ($(MAKESECTION), rootdefines)
@@ -14,20 +15,24 @@ endif
 #------------------------------------------------------------- roottargets ---#
 ifeq ($(MAKESECTION), roottargets)
 
-.PHONY: csperl5 swigperl5gen csperl5clean csperl5maintainerclean
+.PHONY: csperl5 swigperl5gen csperl5clean swigperl5clean csperl5maintainerclean
 
 all plugins: csperl5
 
 csperl5:
 	$(MAKE_TARGET) MAKE_DLL=yes
-swigperl5gen:
-	$(MAKE_TARGET)
-swigperl5inst:
-	$(MAKE_TARGET)
 csperl5clean:
 	$(MAKE_CLEAN)
 csperl5maintainerclean:
 	$(MAKE_CLEAN)
+ifneq (,$(SWIGBIN))
+swigperl5gen:
+	$(MAKE_TARGET)
+swigperl5inst:
+	$(MAKE_TARGET) DO_SWIGPERL5INST=yes
+swigperl5clean:
+	$(MAKE_CLEAN)
+endif
 
 endif
 
@@ -100,7 +105,7 @@ endif
 #----------------------------------------------------------------- targets ---#
 ifeq ($(MAKESECTION), targets)
 
-.PHONY: csperl5 swigperl5gen csperl5clean csperl5maintainerclean
+.PHONY: csperl5 swigperl5gen csperl5clean swigperl5clean csperl5maintainerclean
 
 csperl5: $(OUTDIRS) $(CSPERL5) $(SWIG.PERL5.DLL) $(CEX.CSPERL5)
 
@@ -131,17 +136,29 @@ $(PERLXSI.O): $(PERLXSI.C)
 	$(DO.COMPILE.C) $(PERL5.CFLAGS)
 
 ifeq (,$(SWIGBIN))
-$(SWIG.PERL5.PM.IN) $(SWIG.PERL5.C.IN):
-	@echo $"ERROR: Swig 1.3.14 or newer, not detected$" >&2
+$(SWIG.PERL5.PM.IN):
+	-$(RM) $(SWIG.PERL5.PM.IN)
+	$(CP) $(SWIG.PERL5.PM) $(SWIG.PERL5.PM.IN)
+$(SWIG.PERL5.C.IN):
+	-$(RM) $(SWIG.PERL5.C.IN)
+	$(CP) $(SWIG.PERL5.C) $(SWIG.PERL5.C.IN)
 else
 $(SWIG.PERL5.PM.IN) $(SWIG.PERL5.C.IN): $(OUTDIRS)
-	-$(SWIGBIN) -perl5 -c++ -v -shadow -const -Iinclude \
+	-$(SWIGBIN) -perl5 -c++ -shadow -const -Iinclude -I$(SRCDIR)/include \
 	-module $(SWIG.MOD) -o $(SWIG.PERL5.C.IN) $(SWIG.I)
 endif
 
-$(SWIG.PERL5.PM) $(SWIG.PERL5.C): $(SWIG.PERL5.PM.IN) $(SWIG.PERL5.C.IN)
-	$(MV) $(SWIG.PERL5.PM.IN) $(SWIG.PERL5.PM)
-	$(MV) $(SWIG.PERL5.C.IN) $(SWIG.PERL5.C)
+ifeq ($(DO_SWIGPERL5INST),yes)
+swigperl5inst: $(SWIG.PERL5.C) $(SWIG.PERL5.PM)
+
+$(SWIG.PERL5.C): $(SWIG.PERL5.C.IN)
+	-$(RM) $@
+	$(CP) $(SWIG.PERL5.C.IN) $@
+
+$(SWIG.PERL5.PM): $(SWIG.PERL5.PM.IN)
+	-$(RM) $@
+	$(CP) $(SWIG.PERL5.PM.IN) $@
+endif
 
 $(SWIG.PERL5.O): $(SWIG.PERL5.CPP)
 	$(filter-out -W -Wunused -Wall -Wmost,$(DO.COMPILE.CPP) \
@@ -156,21 +173,20 @@ $(CEX.CSPERL5): $(CIN.CSPERL5)
 	$(PERL5) $(CIN.CSPERL5) \
 	$"CFLAGS=$(PERL5.CFLAGS)$" $"LFLAGS=$(PERL5.LFLAGS)$" > $@
 
-swigperl5gen: swigperl5clean $(SWIG.PERL5.C.IN) $(SWIG.PERL5.PM.IN)
-
-swigperl5inst: $(SWIG.PERL5.C) $(SWIG.PERL5.PM)
+swigperl5gen: $(OUTDIRS) swigperl5clean $(SWIG.PERL5.C.IN) $(SWIG.PERL5.PM.IN)
 
 clean: csperl5clean
 maintainerclean: csperl5maintainerclean
 
-csperl5clean:
+csperl5clean: swigperl5clean
 	-$(RMDIR) $(CSPERL5) $(OBJ.CSPERL5) $(OUTDLL)/$(notdir $(INF.CSPERL5)) \
 	$(PERLXSI.O) $(PERLXSI.C) $(SWIG.PERL5.O) $(SWIG.PERL5.DLL)
 
 swigperl5clean:
-	$(RM) $(SWIG.PERL5.C) $(SWIG.PERL5.PM)
+	-$(RM) $(SWIG.PERL5.C.IN) $(SWIG.PERL5.PM.IN)
 
-csperl5maintainerclean: csperl5clean swigperl5clean
+csperl5maintainerclean: csperl5clean
+	-$(RM) $(SWIG.PERL5.C) $(SWIG.PERL5.PM)
 
 ifdef DO_DEPEND
 dep: $(OUTOS)/csperl5.dep
