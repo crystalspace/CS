@@ -39,6 +39,7 @@ chronological order.
 	  return the number of encoded characters, but instead the number of
 	  encoding character (ex: A-umlaut is stored as two 8-bit values in
 	  UTF-8. That's one encoded character, but two encoding characters.)
+	- res made a cosmetic change in thingldr.cpp.
 14-Oct-2003
 	- Eric Sunshine fixed typographical error in constant expression in
 	  cssys/general/platformconfig.cpp: S_IWGRPS_IXGRP --> S_IWGRP|S_IXGRP.
