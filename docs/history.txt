@@ -31,6 +31,7 @@ The history order has been reversed so that new features are at the top.
 	  when lighting is disabled.
 	- Changed the 2D sprite plugin so that order of SetColor() and
 	  SetLighting() doesn't matter anymore.
+	- Eric Sunshine fixed a syntax error in irix.mak.
 16-Jan-2001
 	- Eric Sunshine changed the image-copying rule in docs.mak so that it
 	  should once again work on Windows/DOS.  (It used to work, but the
