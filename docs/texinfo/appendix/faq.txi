@@ -68,7 +68,8 @@ which tells the virtual file system (@sc{vfs}) where everything is located.
 @item
 In addition to maps that are included in the data folder of Crystal Space
 itself (@samp{flarge} and @samp{partsys} for old renderer architecture,
-and @samp{particles}, @samp{terrain}, @samp{terrainf} and @samp{isotest}
+and @samp{particles}, @samp{terrain}, @samp{terrainf}, @samp{r3dtest},
+@samp{stenciltest}, and @samp{isotest}
 for the new renderer) you can also download additional maps for @file{walktest}.
 The map files included with Crystal Space are normal directories but
 Crystal Space can also read directly from @sc{zip} archives.
