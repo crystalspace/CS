@@ -1014,7 +1014,7 @@ csRadElement* csRadiosity :: FetchNext()
     val=0.0f;
   }
 
-  val = pow(val, 2.0) * 0.98f;
+  val = pow(val, 2.0f) * 0.98f;
 
   int ticks_now = QRound( val * meter->GetTotal());
   
