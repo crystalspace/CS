@@ -101,8 +101,9 @@ void csPluginManager::QueryOptions (iComponent *obj)
     for (; on < OptionList.Length (); on++)
     {
       csPluginOption *pio = (csPluginOption *)OptionList.Get (on);
-      const char *val;
-      if ((val = CommandLine->GetOption (pio->Name)))
+      const char *val = CommandLine->GetOption (pio->Name);
+
+      if (val)
       {
         csVariant optval;
         switch (pio->Type)

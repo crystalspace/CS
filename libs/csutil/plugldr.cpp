@@ -240,9 +240,9 @@ bool csPluginLoader::LoadPlugins ()
 
   // Now eat all common-for-plugins command-line switches
   bool g3d_override = false;
+  const char *val = CommandLine->GetOption ("video");
 
-  const char *val;
-  if ((val = CommandLine->GetOption ("video")))
+  if (val)
   {
     // Alternate videodriver
     char temp [100];
@@ -254,7 +254,9 @@ bool csPluginLoader::LoadPlugins ()
     PluginList.Push (new csPluginLoadRec ("iGraphics3D", temp));
     g3d_override = true;
   }
-  if ((val = CommandLine->GetOption ("canvas")))
+
+  val = CommandLine->GetOption ("canvas");
+  if (val)
   {
     if (!strchr (val, '.'))
     {
