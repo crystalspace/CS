@@ -27,7 +27,7 @@ actions VfsCfgGen
 
 # Build our own vfs.cfg
 VFS_CONFIGFILE = vfs.cfg ;
-LOCATE on $(VFS_CONFIGFILE:G=config) = $(LOCATE_TARGET) ;
+MakeLocate $(VFS_CONFIGFILE:G=config) : $(LOCATE_TARGET) ;
 SEARCH on $(VFS_CONFIGFILE:G=config) = $(LOCATE_TARGET) ;
 VfsCfgGen $(VFS_CONFIGFILE:G=config) : $(SUBDIR)/vfs.cfg.template ;
 InstallConfig $(VFS_CONFIGFILE:G=config) ;
