@@ -465,8 +465,6 @@ void csPerfStats::WriteFrameHeader ()
 
 bool csPerfStats::WriteFile ()
 {
-  int i;
-
   if (!statvec)
     return false;
 
