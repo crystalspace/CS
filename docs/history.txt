@@ -9,6 +9,15 @@ chronological order.
 30-May-2004
 	- Jorrit fixed the lightning plugin so that it correctly gets the
 	  bounding box and radius from the genmesh.
+	- Eric Sunshine made the following changes to the new --with-vos
+	  configure option:
+	    - Now disables the VOS test if --without-vos or --with-vos=no is
+	      specified.
+	    - Now behaves sanely if given only --with-vos or --with-vos=yes,
+	      rather than assuming that "yes" is the path to th VOS pkg-config
+	      files.
+	    - Fixed --help message so that it shows how the path for the VOS
+	      pkg-config files can be given.
 29-May-2004
 	- Peter Amstutz added a "--with-vos" option to the configure
 	  script to set the PKG_CONFIG_PATH environment variable when

@@ -1440,30 +1440,32 @@ AS_IF([test $cs_cv_libsdl = yes],
 #------------------------------------------------------------------------------
 # Check for VOS.
 #------------------------------------------------------------------------------
-AC_ARG_WITH(vos, [AC_HELP_STRING([--with-vos],
-                  [location where VOS pkg-config files are installed])], 
-    [if test "$withval" != "no"; then
-        if test -n "$PKG_CONFIG_PATH"; then
-	    PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$withval
-	else
-	    PKG_CONFIG_PATH=$withval
-	fi
-	export PKG_CONFIG_PATH
-    fi], )
+AC_ARG_WITH([vos], [AC_HELP_STRING([--with-vos=dir],
+    [specify location of VOS pkg-config files])])
+AS_IF([test -z "$with_vos"], [with_vos=yes])
+
+AS_IF([test "$with_vos" != no && test "$with_vos" != yes],
+    [AS_IF([test -n "$PKG_CONFIG_PATH"],
+	[PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$with_vos"],
+	[PKG_CONFIG_PATH="$with_vos"])
+    export PKG_CONFIG_PATH])
 AC_CHECK_TOOLS([PKGCONFIG], [pkg-config])
-AC_CACHE_CHECK([for VOS], [cs_cv_libvos],
-    [AS_IF([test -n "$PKGCONFIG"],
-	[AS_IF([AC_RUN_LOG([$PKGCONFIG --exists libmetaobject_a3dl])],
-	    [cs_cv_libvos=yes
-	    cs_cv_libvos_cflags="`AC_RUN_LOG(
-		[$PKGCONFIG --cflags libmetaobject_a3dl libmetaobject_misc])`"
-	    cs_cv_libvos_lflags=''
-	    cs_cv_libvos_libs=`AC_RUN_LOG(
-		[$PKGCONFIG --libs libmetaobject_a3dl libmetaobject_misc])`],
-	    [cs_cv_libvos=no])],
-	[cs_cv_libvos=no])])
-AS_IF([test $cs_cv_libvos = yes],
-    [CS_EMIT_BUILD_RESULT([cs_cv_libvos], [VOS])])
+
+m4_define([cs_vos_pkgs], [libmetaobject_a3dl libmetaobject_misc])
+AS_IF([test "$with_vos" != no],
+    [AC_CACHE_CHECK([for VOS], [cs_cv_libvos],
+	[AS_IF([test -n "$PKGCONFIG"],
+	    [AS_IF([AC_RUN_LOG([$PKGCONFIG --exists libmetaobject_a3dl])],
+		[cs_cv_libvos=yes
+		cs_cv_libvos_cflags="`AC_RUN_LOG(
+		    [$PKGCONFIG --cflags cs_vos_pkgs])`"
+		cs_cv_libvos_lflags=''
+		cs_cv_libvos_libs=`AC_RUN_LOG(
+		    [$PKGCONFIG --libs cs_vos_pkgs])`],
+		[cs_cv_libvos=no])],
+	    [cs_cv_libvos=no])])
+    AS_IF([test $cs_cv_libvos = yes],
+	[CS_EMIT_BUILD_RESULT([cs_cv_libvos], [VOS])])])
 
 
 
