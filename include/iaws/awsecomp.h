@@ -20,6 +20,9 @@
 #include "iaws/aws.h"
 #include "iaws/awsparm.h"
 #include "iutil/event.h"
+#include "iaws/awsdefs.h"
+#include "aws/awsprefs.h"
+#include "aws/awslayot.h"
 
 /**
  * Class used to create new AWS components.<p>
@@ -305,12 +308,12 @@ public:
     { return comp->ComponentBelow(); }
 
     /// Set's the component above this one
-    virtual void SetComponentAbove(iAwsComponent *comp)
-    { comp->SetComponentAbove(comp); }
+    virtual void SetComponentAbove(iAwsComponent *cmp)
+    { comp->SetComponentAbove(cmp); }
 
     /// Set's the component below this one
-    virtual void SetComponentBelow(iAwsComponent *comp)
-    { comp->SetComponentBelow(comp); }
+    virtual void SetComponentBelow(iAwsComponent *cmp)
+    { comp->SetComponentBelow(cmp); }
 
     /// Moves this component above all its siblings
     virtual void Raise()

@@ -175,7 +175,7 @@ bool awsComponent::Create(iAws* wmgr, iAwsComponent* parent, awsComponentNode* s
 }
 
 /**
- *  This function is normally called automatically by OnCreate.  You may call it manually if you wish, but
+ *  This function is normally called automatically by Create.  You may call it manually if you wish, but
  * there's little reason to do so.
  **************************************************************************************************************/
 bool awsComponent::Setup (iAws *_wmgr, awsComponentNode *settings)
@@ -301,12 +301,7 @@ bool awsComponent::Execute (const char* action, iAwsParmList* parmlist)
 
 void awsComponent::Invalidate ()
 {
-  // have to adjust because frame is all inclusive whereas the
-  // csRect class actually doesn't include its ymax and xmax lines
-  csRect f(frame);
-  f.xmax++;
-  f.ymax++;
-  Invalidate(f);
+  Invalidate(frame);
 }
 
 void awsComponent::Invalidate (csRect area)
@@ -618,6 +613,8 @@ void awsComponent::LinkAbove (iAwsComponent *comp)
     comp->SetComponentAbove (this);
     if(above) above->SetComponentBelow(this);
   }
+
+  CS_ASSERT(LinkedListCheck());
 }
 
 void awsComponent::LinkBelow (iAwsComponent *comp)
@@ -629,6 +626,8 @@ void awsComponent::LinkBelow (iAwsComponent *comp)
     comp->SetComponentBelow (this);
 	if(below) below->SetComponentAbove(this);
   }
+
+  CS_ASSERT(LinkedListCheck());
 }
 
 void awsComponent::Unlink()
@@ -637,6 +636,8 @@ void awsComponent::Unlink()
 	  ComponentAbove()->SetComponentBelow(ComponentBelow());
   if(ComponentBelow())
 	  ComponentBelow()->SetComponentAbove(ComponentAbove());
+
+  CS_ASSERT(LinkedListCheck());
 }
 
 iAwsComponent* awsComponent::ComponentAbove()
@@ -652,16 +653,17 @@ iAwsComponent* awsComponent::ComponentBelow()
 void awsComponent::SetComponentAbove(iAwsComponent* comp)
 {
 	above = comp;
+  CS_ASSERT(LinkedListCheck());
 }
 
 void awsComponent::SetComponentBelow(iAwsComponent* comp)
 {
 	below = comp;
+  CS_ASSERT(LinkedListCheck());
 }
 
 void awsComponent::SetAbove(iAwsComponent* comp)
 {
-  CS_ASSERT(comp != this);
 	
   // Get us out of the hierarchy
   Unlink();
@@ -689,7 +691,6 @@ void awsComponent::SetAbove(iAwsComponent* comp)
 
 void awsComponent::SetBelow(iAwsComponent* comp)
 {
-   CS_ASSERT(comp != this);
 
 	// Get us out of the hierarchy
 	Unlink();
@@ -941,6 +942,20 @@ void awsComponentFactory::Register (const char *name)
 void awsComponentFactory::RegisterConstant (const char *name, int value)
 {
   wmgr->GetPrefMgr ()->RegisterConstant (name, value);
+}
+
+
+bool awsComponent::LinkedListCheck()
+{
+  iAwsComponent* cmp;
+  for(cmp = ComponentBelow(); cmp; cmp = cmp->ComponentBelow())
+    if(cmp == this) return false;
+  for(cmp = ComponentAbove(); cmp; cmp = cmp->ComponentAbove())
+    if(cmp == this) return false;
+  for(cmp = Parent(); cmp; cmp = cmp->Parent())
+    if(cmp == this) return false;
+
+  return true;
 }
 
 

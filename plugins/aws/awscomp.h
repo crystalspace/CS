@@ -239,11 +239,18 @@ public:
    */
   virtual void LayoutChildren ();
 
+
+
   /** 
+
    *  Adds a component to the layout, mostly used for custom components or
+
    * programmatic component creation.
+
    */
+
   virtual void AddToLayout(iAwsComponent* cmp,awsComponentNode* settings);
+
 
 
   /// Returns the redraw tag
@@ -396,6 +403,9 @@ protected:
 
   /// Performs the work of actually finding a child
   iAwsComponent *DoFindChild(unsigned id);
+
+  /// Performs a consistency check on the linked list for debugging
+  bool LinkedListCheck();
 
 };
 

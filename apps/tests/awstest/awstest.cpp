@@ -66,6 +66,7 @@
 #include "awssktst.h"
 #include <stdio.h>
 
+#include "cuscomp.h"
 
 const int AWSTEST_MULTIPROC  = 0;
 const int AWSTEST_SINGLEPROC = 1;
@@ -388,6 +389,10 @@ awsTest::Initialize(int argc, const char* const argv[], const char *iConfigName)
   s->SetWindowManager(aws);
 
   aws->GetSinkMgr()->RegisterSink("testButtonSink", sink);
+
+  // make the manager aware of our custom component
+  // the contructor automatically registers so we only need to create it
+  (void) new CustomComponentFactory(aws);
 
   // now load preferences
   if (!aws->GetPrefMgr()->Load("/this/data/temp/awstest.def"))
