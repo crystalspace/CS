@@ -59,7 +59,7 @@ class csDefaultWindowSkin : public csWindowSkin
 
 public:
   /// Initialize the window skin slice
-  csDefaultWindowSkin () : ButtonTex (NULL) {}
+  csDefaultWindowSkin () : ButtonTex (NULL), BackTex (NULL) {}
 
   /// Query the required resources from application
   virtual void Initialize (csApp *iApp, csSkin *Parent);
@@ -95,6 +95,9 @@ class csDefaultDialogSkin : public csDialogSkin
   iTextureHandle *BackTex;
 
 public:
+
+  csDefaultDialogSkin () : BackTex (NULL) {}
+
   /// Query the required resources from application
   void Initialize (csApp *iApp, csSkin *Parent);
 
