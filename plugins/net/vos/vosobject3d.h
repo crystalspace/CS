@@ -33,25 +33,27 @@
 #include "csvosa3dl.h"
 #include "vossector.h"
 
-class csVosObject3D : public iVosObject3D
+class csVosObject3D : public iVosObject3D, public iVosApi
 {
 private:
   csRef<iMeshWrapper> meshwrapper;
-
+  VOS::vRef<A3DL::Object3D> object3d;
 public:
   SCF_DECLARE_IBASE;
 
-  csVosObject3D();
+  csVosObject3D(A3DL::Object3D* obj3d);
   virtual ~csVosObject3D();
 
   virtual csRef<iMeshWrapper> GetMeshWrapper();
 
   void SetMeshWrapper(iMeshWrapper* mw);
+
+  virtual VOS::vRef<VOS::Vobject> GetVobject();
 };
 
 class csMetaObject3D : public virtual A3DL::Object3D,
                        public VOS::PropertyListener,
-					   public VOS::ChildChangeListener
+             public VOS::ChildChangeListener
 {
 protected:
   csRef<csVosObject3D> csvobj3d;
@@ -61,7 +63,7 @@ public:
   csMetaObject3D(VOS::VobjectBase* superobject);
   virtual ~csMetaObject3D();
 
-  static VOS::MetaObject* new_csMetaObject3D(VOS::VobjectBase* superobject, 
+  static VOS::MetaObject* new_csMetaObject3D(VOS::VobjectBase* superobject,
                                              const std::string& type);
 
   // Set up the object

@@ -29,6 +29,7 @@
 #include "iutil/csinput.h"
 #include "iutil/virtclk.h"
 #include "iutil/plugin.h"
+#include "iutil/cmdline.h"
 #include "iengine/sector.h"
 #include "iengine/engine.h"
 #include "iengine/camera.h"
@@ -57,6 +58,7 @@
 #include "csutil/event.h"
 
 #include "inetwork/vosa3dl.h"
+#include "inetwork/vosapi.h"
 
 #include <iostream>
 
@@ -169,8 +171,8 @@ bool Vostest::Initialize ()
                                       CS_REQUEST_REPORTER,
                                       CS_REQUEST_REPORTERLISTENER,
                                       CS_REQUEST_PLUGIN("crystalspace.network.vos.a3dl", iVosA3DL),
-									  CS_REQUEST_PLUGIN("crystalspace.mesh.crossbuilder", iCrossBuilder),
-									  CS_REQUEST_PLUGIN("crystalspace.modelconverter.multiplexer", iModelConverter),
+                    CS_REQUEST_PLUGIN("crystalspace.mesh.crossbuilder", iCrossBuilder),
+                    CS_REQUEST_PLUGIN("crystalspace.modelconverter.multiplexer", iModelConverter),
                                       CS_REQUEST_END))
   {
     csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
@@ -213,12 +215,6 @@ bool Vostest::Initialize ()
     "No iEngine plugin!");
     return false;
   }
-
-#if 0
-  csRef<iPluginManager> pm = CS_QUERY_REGISTRY (object_reg, iPluginManager);
-  pm->LoadPlugin("crystalspace.utilities.sequence.engine", "iEngineSequenceManager", 3, true);
-  pm->LoadPlugin("crystalspace.culling.frustvis", "iVisibilityCuller", 262144, true);
-#endif
 
   loader = CS_QUERY_REGISTRY (object_reg, iLoader);
   if (loader == 0)
@@ -265,6 +261,13 @@ bool Vostest::Initialize ()
     return false;
   }
 
+  csRef<iCommandLineParser> cmdline = CS_QUERY_REGISTRY(object_reg, iCommandLineParser);
+
+  char* vosWorldURL = "vop://localhost/world";
+  if(cmdline->GetName()) {
+    vosWorldURL = strdup(cmdline->GetName());
+  }
+
   rotY = 0;
   rotX = 0;
 
@@ -272,17 +275,8 @@ bool Vostest::Initialize ()
   // not to need this.
   engine->SetLightingCacheMode (0);
 
-  if (!loader->LoadTexture ("stone", "/lib/std/stone4.gif"))
-  {
-    csReport (object_reg, CS_REPORTER_SEVERITY_ERROR,
-        "crystalspace.application.vostest",
-        "Error loading 'stone4' texture!");
-    return false;
-  }
-  iMaterialWrapper* tm = engine->GetMaterialList ()->FindByName ("stone");
-
   engine->Prepare ();
-
+#if 1
   view = csPtr<iView> (new csView (engine, g3d));
   view->GetCamera ()->SetSector (engine->CreateSector("_tmp"));
   view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
@@ -292,9 +286,23 @@ bool Vostest::Initialize ()
   if (!g3d->BeginDraw (engine->GetBeginDrawFlags () | CSDRAW_3DGRAPHICS | CSDRAW_CLEARZBUFFER | CSDRAW_CLEARSCREEN));
   view->Draw ();
 
-  csRef<iVosSector> vossector = vosa3dl->GetSector("vop://localhost/world");
+  csRef<iVosSector> vossector = vosa3dl->GetSector(vosWorldURL);
   vossector->Load();
   view->GetCamera()->SetSector(vossector->GetSector());
+#else
+  csRef<iVosSector> vossector = vosa3dl->GetSector(vosWorldURL);
+  vossector->Load();
+
+  view = csPtr<iView> (new csView (engine, g3d));
+  view->GetCamera ()->SetSector(vossector->GetSector());
+  view->GetCamera ()->GetTransform ().SetOrigin (csVector3 (0, 5, -3));
+  iGraphics2D* g2d = g3d->GetDriver2D ();
+  view->SetRectangle (0, 0, g2d->GetWidth (), g2d->GetHeight ());
+#endif
+
+  csRef<iVosApi> vosapi = SCF_QUERY_INTERFACE(vosa3dl, iVosApi);
+  VOS::vRef<VOS::Vobject> vobject = vosapi->GetVobject();
+  printf("Connected to site is %s\n", vobject->getURLstr().c_str());
 
   return true;
 }

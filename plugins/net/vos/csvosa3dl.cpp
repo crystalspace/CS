@@ -41,6 +41,7 @@ using namespace VOS;
 using namespace A3DL;
 
 SCF_IMPLEMENT_IBASE (csVosA3DL)
+  SCF_IMPLEMENTS_INTERFACE (iVosApi)
   SCF_IMPLEMENTS_INTERFACE (iVosA3DL)
   SCF_IMPLEMENTS_INTERFACE (iComponent)
   SCF_IMPLEMENTS_INTERFACE (iEventHandler)
@@ -131,4 +132,10 @@ bool csVosA3DL::HandleEvent (iEvent &ev)
     }
   }
   return false;
+}
+
+
+VOS::vRef<Vobject> csVosA3DL::GetVobject()
+{
+  return localsite;
 }

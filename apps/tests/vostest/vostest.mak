@@ -29,6 +29,8 @@ endif # ifeq ($(MAKESECTION),roottargets)
 #------------------------------------------------------------- postdefines ---#
 ifeq ($(MAKESECTION),postdefines)
 
+VOSTEST.CFLAGS = $(CFLAGS.D)_REENTRANT $(CXXFLAGS.EXCEPTIONS.ENABLE) $(VOS.CFLAGS)
+
 VOSTEST.EXE = vostest$(EXE)
 DIR.VOSTEST = apps/tests/vostest
 OUT.VOSTEST = $(OUT)/$(DIR.VOSTEST)
@@ -37,6 +39,7 @@ SRC.VOSTEST = $(wildcard $(SRCDIR)/$(DIR.VOSTEST)/*.cpp)
 OBJ.VOSTEST = $(addprefix $(OUT.VOSTEST)/,$(notdir $(SRC.VOSTEST:.cpp=$O)))
 DEP.VOSTEST = CSTOOL CSGFX CSGEOM CSUTIL
 LIB.VOSTEST = $(foreach d,$(DEP.VOSTEST),$($d.LIB))
+LIB.VOSTEST.LOCAL = $(VOS.LFLAGS)
 
 OUTDIRS += $(OUT.VOSTEST)
 
@@ -57,10 +60,10 @@ build.vostest: $(OUTDIRS) $(VOSTEST.EXE)
 clean: vostestclean
 
 $(OUT.VOSTEST)/%$O: $(SRCDIR)/$(DIR.VOSTEST)/%.cpp
-	$(DO.COMPILE.CPP)
+	$(DO.COMPILE.CPP) $(VOSTEST.CFLAGS)
 
 $(VOSTEST.EXE): $(DEP.EXE) $(OBJ.VOSTEST) $(LIB.VOSTEST)
-	$(DO.LINK.EXE)
+	$(DO.LINK.EXE) $(LIB.VOSTEST.LOCAL)
 
 vostestclean:
 	-$(RM) vostest.txt

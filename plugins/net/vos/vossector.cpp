@@ -33,6 +33,7 @@ using namespace VOS;
 
 SCF_IMPLEMENT_IBASE (csVosSector)
   SCF_IMPLEMENTS_INTERFACE (iVosSector)
+  SCF_IMPLEMENTS_INTERFACE (iVosApi)
 SCF_IMPLEMENT_IBASE_END
 
 class RelightTask : public Task
@@ -111,6 +112,8 @@ void LoadSectorTask::doTask()
   LOG("csVosSector", 2, "Starting task");
 
   vRef<A3DL::Sector> sec = meta_cast<A3DL::Sector>(Vobject::findObjectFromRoot(url));
+  sector->sectorvobj = sec;
+
   LOG("csVosSector", 2, "Iterating");
   for (ChildListIterator ci = sec->getChildren(); ci.hasMore(); ci++)
   {
@@ -122,16 +125,16 @@ void LoadSectorTask::doTask()
     {
       try
       {
-		csRef<iMeshWrapper> wrapper = obj3d->GetCSinterface()->GetMeshWrapper();
+    csRef<iMeshWrapper> wrapper = obj3d->GetCSinterface()->GetMeshWrapper();
         if (wrapper)
         {
-		  if (wrapper->GetMovable()->GetSectors()->GetCount() == 0)
-		  {
+      if (wrapper->GetMovable()->GetSectors()->GetCount() == 0)
+      {
             LOG("LoadSectorTask", 3, "Object already setup, setting sector");
             wrapper->GetMovable()->GetSectors()->Add(sector->GetSector());
-		    wrapper->GetMovable()->UpdateMove();
-		  }
-		  else LOG("LoadSectorTask", 3, "Object already setup and in sector");
+        wrapper->GetMovable()->UpdateMove();
+      }
+      else LOG("LoadSectorTask", 3, "Object already setup and in sector");
         }
         else
           obj3d->Setup(vosa3dl, (csVosSector*)sector);
@@ -187,4 +190,9 @@ void csVosSector::Load()
 csRef<iSector> csVosSector::GetSector()
 {
   return sector;
+}
+
+VOS::vRef<VOS::Vobject> csVosSector::GetVobject()
+{
+  return sectorvobj;
 }

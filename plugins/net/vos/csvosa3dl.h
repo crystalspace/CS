@@ -28,13 +28,14 @@
 #include <vos/vos/taskqueue.hh>
 
 #include "inetwork/vosa3dl.h"
+#include "inetwork/vosapi.h"
 #include "iutil/objreg.h"
 #include "iutil/comp.h"
 #include "iutil/eventh.h"
 #include "iutil/event.h"
 #include "iutil/eventq.h"
 
-class csVosA3DL : public iComponent, public iEventHandler, public iVosA3DL
+class csVosA3DL : public iComponent, public iEventHandler, public iVosA3DL, public iVosApi
 {
 private:
   csRef<iEventQueue> eventq;
@@ -57,6 +58,8 @@ public:
     {
       return objreg;
     }
+
+  virtual VOS::vRef<VOS::Vobject> GetVobject();
 };
 
 #endif

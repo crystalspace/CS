@@ -35,11 +35,13 @@ using namespace VOS;
 
 SCF_IMPLEMENT_IBASE (csVosObject3D)
   SCF_IMPLEMENTS_INTERFACE (iVosObject3D)
+  SCF_IMPLEMENTS_INTERFACE (iVosApi)
 SCF_IMPLEMENT_IBASE_END
 
 /// csVosObject3D ///
 
-csVosObject3D::csVosObject3D()
+csVosObject3D::csVosObject3D(A3DL::Object3D* obj3d)
+  : object3d(obj3d, true)
 {
   SCF_CONSTRUCT_IBASE (0);
 }
@@ -57,6 +59,11 @@ csRef<iMeshWrapper> csVosObject3D::GetMeshWrapper()
 void csVosObject3D::SetMeshWrapper(iMeshWrapper* mw)
 {
   meshwrapper = mw;
+}
+
+VOS::vRef<VOS::Vobject> csVosObject3D::GetVobject()
+{
+  return object3d;
 }
 
 /// Construct an object3d
@@ -125,28 +132,28 @@ public:
 };
 
 // Set orientation task
-        
+
 class OrientateTask : public Task
 {
   vRef<csMetaObject3D> obj;
   csMatrix3 ori;
 
 public:
-  OrientateTask (csMetaObject3D *o, const csMatrix3 &m) 
+  OrientateTask (csMetaObject3D *o, const csMatrix3 &m)
     : obj(o, true), ori(m) {}
   ~OrientateTask () {}
 
   void doTask() { obj->changeTransform (ori); }
 };
-        
+
 
 
 /// csMetaObject3D ///
 
-csMetaObject3D::csMetaObject3D(VobjectBase* superobject) 
+csMetaObject3D::csMetaObject3D(VobjectBase* superobject)
     : A3DL::Object3D(superobject)
 {
-  csvobj3d = new csVosObject3D();
+  csvobj3d = new csVosObject3D(this);
   csvobj3d->IncRef();
 }
 
@@ -155,7 +162,7 @@ csMetaObject3D::~csMetaObject3D()
   delete csvobj3d;
 }
 
-MetaObject* csMetaObject3D::new_csMetaObject3D(VobjectBase* superobject, 
+MetaObject* csMetaObject3D::new_csMetaObject3D(VobjectBase* superobject,
                                                const std::string& type)
 {
   return new csMetaObject3D(superobject);
@@ -235,12 +242,12 @@ void csMetaObject3D::Setup(csVosA3DL* vosa3dl, csVosSector* sect)
   LOG("vosobject3d", 3, "setting position " << x << " " << y << " " << z);
 
   vosa3dl->mainThreadTasks.push (new ConstructObject3DTask(
-                            vosa3dl->GetObjectRegistry(), this, 
+                            vosa3dl->GetObjectRegistry(), this,
                             csVector3(x, y, z),                    // pos
                             csMatrix3(q),                          // ori
                             csVector3(xht, yht, zht),              // hardpos
                             csMatrix3(qht) * csMatrix3(sxht, 0, 0, // hardtrans
-                                                       0, syht, 0, 
+                                                       0, syht, 0,
                                                        0, 0, szht)));
   addChildListener (this);
 }
@@ -288,7 +295,7 @@ void csMetaObject3D::notifyChildReplaced (VobjectEvent &event)
     try
     {
       vRef<Property> prop = meta_cast<Property> (event.getOldChild());
-	  if (prop.isValid()) prop->removePropertyListener (this);
+    if (prop.isValid()) prop->removePropertyListener (this);
     }
     catch (...)
     {
@@ -296,7 +303,7 @@ void csMetaObject3D::notifyChildReplaced (VobjectEvent &event)
 
     try
     {
-	  meta_cast<Property> (event.getNewChild())->addPropertyListener (this);
+    meta_cast<Property> (event.getNewChild())->addPropertyListener (this);
     }
     catch (...)
     {
@@ -334,7 +341,7 @@ void csMetaObject3D::notifyPropertyChange(const PropertyEvent &event)
 void csMetaObject3D::changePosition (const csVector3 &pos)
 {
   csRef<iMeshWrapper> mw = GetCSinterface()->GetMeshWrapper();
-  LOG("vosobject3d", 2, "setting position of " << getURLstr() << 
+  LOG("vosobject3d", 2, "setting position of " << getURLstr() <<
       " to " << pos.x << " " << pos.y << " " << pos.z);
   if(mw.IsValid())
   {

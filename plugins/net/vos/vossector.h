@@ -28,7 +28,9 @@
 #include "iengine/engine.h"
 #include "iengine/sector.h"
 
-class csVosSector : public iVosSector
+#include <vos/metaobjects/a3dl/a3dl.hh>
+
+class csVosSector : public iVosSector, public iVosApi
 {
 private:
   char* url;
@@ -36,6 +38,7 @@ private:
   csRef<iEngine> engine;
   csRef<iSector> sector;
   csVosA3DL* vosa3dl;
+  VOS::vRef<A3DL::Sector> sectorvobj;
 
 public:
   SCF_DECLARE_IBASE;
@@ -45,6 +48,10 @@ public:
 
   virtual void Load();
   virtual csRef<iSector> GetSector();
+
+  virtual VOS::vRef<VOS::Vobject> GetVobject();
+
+  friend class LoadSectorTask;
 };
 
 #endif

@@ -7,6 +7,9 @@ individual changes for each given day, however, are in normal (ascending)
 chronological order.
 
 5-Apr-2004
+	- Peter Amstutz added the iVosApi interface to the csvosa3dl plugin.
+	  This interface allows the application to access the underlying
+	  Vobjects that have been loaded by the plugin.
 	- Eric Sunshine reverted Peter Amstutz's change to csvosa3dl.mak from
 	  yesterday since it broke static link mode; it caused 'ar' to be
 	  invoked with linker flags.  Instead, Eric fixed the copy/paste error
