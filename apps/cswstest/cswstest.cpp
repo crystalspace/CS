@@ -24,6 +24,7 @@
 class csWsTest : public csApp
 {
   void NotebookDialog ();
+  void GridDialog ();
 
 public:
   /// Initialize maze editor
@@ -37,6 +38,23 @@ public:
 };
 
 csWsTest *app;                        // The main Windowing System object
+
+//-----------------------------------------------------------------------------
+class csGridHeaderCell : public csGridCell
+{
+public:
+  csGridHeaderCell (){};
+  void Draw (){
+    // Draw the column number in the cell canvas
+    //    printf("ping\n");
+    csGridCell::Draw();
+    char tt[20];
+    sprintf( tt, "%d", col);
+    int tx = (bound.Width () - TextWidth (tt)) /2;
+    int ty = (bound.Height () - TextHeight ()) /2;
+    Text (tx, ty, CSPAL_GRIDCELL_DATA_FG, CSPAL_GRIDCELL_DATA_BG, tt );
+  }
+};
 
 //-----------------------------------------------------------------------------
 
@@ -255,9 +273,77 @@ bool csWsTest::InitialSetup (int argc, const char* const argv[],
 
     but = new csButton (this, 9997);
     but->SetText ("Notebook"); but->SetRect (400, 15, 500, 35);
+
+    but = new csButton (this, 9996);
+    but->SetText ("Grid"); but->SetRect (400, 45, 500, 65);
   }
 
   return true;
+}
+
+void csWsTest::GridDialog ()
+{
+  csComponent *window = new csWindow (this, "Grid test",
+    CSWS_BUTSYSMENU | CSWS_TITLEBAR | CSWS_BUTHIDE | CSWS_BUTCLOSE |
+    CSWS_BUTMAXIMIZE | CSWS_TOOLBAR | CSWS_TBPOS_BOTTOM);
+  window->SetSize (400, 300);
+  window->Center ();
+
+  // say how the cell should look initially
+  csGridCell *gc = new csGridCell;
+  gc->SetRect (0, 0, 50, 30);
+
+  csGrid *grid = new csGrid (window, 20000, 20000, CSGVS_DEFAULTVALUE|CSGS_VSPLIT|CSGS_HSPLIT, gc);
+
+  // create a subregion that looks different
+  gc = new csGridCell;
+  gc->SetColor (CSPAL_GRIDCELL_BACKGROUND, cs_Color_Brown_L);
+  gc->SetRect (0, 0, 50, 30);
+  gc->right.style = gc->left.style = GCBS_NONE;
+  csRect rc (3, 3, 10, 6);
+  grid->CreateRegion (rc, gc);
+
+  // because that was fun - make another subregion that crosses the previous
+  gc = new csGridCell;
+  gc->SetColor (CSPAL_GRIDCELL_BACKGROUND, cs_Color_Cyan_L);
+  gc->SetRect (0, 0, 50, 30);
+  rc.Set (5, 5, 8, 10);
+  grid->CreateRegion (rc, gc);
+
+  // make a column header row
+  gc = new csGridHeaderCell;
+  gc->SetColor (CSPAL_GRIDCELL_BACKGROUND, cs_Color_Gray_D);
+  gc->SetColor (CSPAL_GRIDCELL_DATA_BG, cs_Color_Gray_D);
+  gc->SetColor (CSPAL_GRIDCELL_DATA_FG, cs_Color_White);
+  gc->SetRect (0, 0, 50, 20);
+  rc.Set (0, 0, 20000, 1);
+  grid->CreateRegion (rc, gc);
+
+  // split the mainview and split the resulting new view again
+  grid->GetRootView ()->SplitX (150)->SplitY (150);
+
+  // show some important messages
+  gc = new csGridCell;
+  gc->SetRect (0, 0, 100, 30);
+  rc.Set (2, 2, 3, 3);
+  grid->CreateRegion (rc, gc);
+  grid->SetStringAt (2, 2, "CS rocks");
+  rc.Set (4, 5, 5, 6);
+  grid->CreateRegion (rc, gc);
+  grid->SetStringAt (5, 4, "HitSquad rulz");
+
+  // make a single cell region thats blue and contains a button component 
+  rc.Set (2, 8, 3, 9);
+  gc = new csGridCell;
+  gc->SetColor (CSPAL_GRIDCELL_BACKGROUND, cs_Color_Blue_L);
+  gc->SetRect (0, 0, 50, 30);
+  csButton *but = new csButton (gc, cscmdNothing, CSBS_DEFAULTVALUE, csbfsThinRect);
+  but->SetRect (5, 5, 45, 25);
+  but->SetText ("blah");
+  grid->CreateRegion (rc, gc);
+
+  Execute (window);
+  delete window;
 }
 
 void csWsTest::NotebookDialog ()
@@ -415,6 +501,11 @@ bool csWsTest::HandleEvent (csEvent &Event)
         case 9997:
         {
           NotebookDialog ();
+          return true;
+        }
+        case 9996:
+        {
+          GridDialog ();
           return true;
         }
       }
