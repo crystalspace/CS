@@ -333,37 +333,37 @@ void csRegion::ReleaseFromRegion (iObject* obj)
 
 iSector* csRegion::Region::FindSector (const char *iName)
 {
-  return GET_NAMED_CHILD_OBJECT_FAST(scfParent, iSector, iName);
+  return CS_GET_NAMED_CHILD_OBJECT_FAST(scfParent, iSector, iName);
 }
 
 iMeshWrapper* csRegion::Region::FindMeshObject (const char *iName)
 {
-  return GET_NAMED_CHILD_OBJECT_FAST(scfParent, iMeshWrapper, iName);
+  return CS_GET_NAMED_CHILD_OBJECT_FAST(scfParent, iMeshWrapper, iName);
 }
 
 iMeshFactoryWrapper* csRegion::Region::FindMeshFactory (const char *iName)
 {
-  return GET_NAMED_CHILD_OBJECT_FAST(scfParent, iMeshFactoryWrapper, iName);
+  return CS_GET_NAMED_CHILD_OBJECT_FAST(scfParent, iMeshFactoryWrapper, iName);
 }
 
 iTextureWrapper* csRegion::Region::FindTexture (const char *iName)
 {
-  return GET_NAMED_CHILD_OBJECT_FAST(scfParent, iTextureWrapper, iName);
+  return CS_GET_NAMED_CHILD_OBJECT_FAST(scfParent, iTextureWrapper, iName);
 }
 
 iMaterialWrapper* csRegion::Region::FindMaterial (const char *iName)
 {
-  return GET_NAMED_CHILD_OBJECT_FAST(scfParent, iMaterialWrapper, iName);
+  return CS_GET_NAMED_CHILD_OBJECT_FAST(scfParent, iMaterialWrapper, iName);
 }
 
 iCameraPosition* csRegion::Region::FindCameraPosition (const char *iName)
 {
-  return GET_NAMED_CHILD_OBJECT_FAST(scfParent, iCameraPosition, iName);
+  return CS_GET_NAMED_CHILD_OBJECT_FAST(scfParent, iCameraPosition, iName);
 }
 
 iCollection* csRegion::Region::FindCollection (const char *iName)
 {
-  return GET_NAMED_CHILD_OBJECT_FAST(scfParent, iCollection, iName);
+  return CS_GET_NAMED_CHILD_OBJECT_FAST(scfParent, iCollection, iName);
 }
 
 bool csRegion::IsInRegion (iObject* iobj)

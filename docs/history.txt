@@ -58,6 +58,16 @@ The history order is reversed so that new features are at the top.
 	  Apple/NeXT plugin loading mechanism can simply return the handle of
 	  an already-loaded plugin (one which could not be unloaded), if
 	  necessary.
+	- Eric Sunshine added a "CS_" prefix to the following macros from
+	  iutil/object.h:
+	    GET_CHILD_OBJECT()            --> CS_GET_CHILD_OBJECT()
+	    GET_CHILD_OBJECT_FAST()       --> CS_GET_CHILD_OBJECT_FAST()
+	    GET_NAMED_CHILD_OBJECT()      --> CS_GET_NAMED_CHILD_OBJECT()
+	    GET_NAMED_CHILD_OBJECT_FAST() --> CS_GET_NAMED_CHILD_OBJECT_FAST()
+	    GET_FIRST_NAMED_CHILD_OBJECT()
+		--> CS_GET_FIRST_NAMED_CHILD_OBJECT()
+	    GET_FIRST_NAMED_CHILD_OBJECT_FAST()
+		--> CS_GET_FIRST_NAMED_CHILD_OBJECT_FAST()
 3-Jul-2001
 	- Fixed the Python plugin after Martin's changes.
 	- Added iEngine::GetCameraPosition() which takes a name as a parameter

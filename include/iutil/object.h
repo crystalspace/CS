@@ -27,7 +27,7 @@ struct iObjectIterator;
  * You can use this macro to get a child object from a csObject. The returned
  * object will be IncRef'ed.
  */
-#define GET_CHILD_OBJECT(object,Interface)				\
+#define CS_GET_CHILD_OBJECT(object,Interface)				\
   ((Interface*)(object)->GetChild (					\
     iSCF::SCF->GetInterfaceID (#Interface), VERSION_##Interface))
 
@@ -36,14 +36,14 @@ struct iObjectIterator;
  * object will be IncRef'ed. This version requires a correctly set-up interface
  * ID variable.
  */
-#define GET_CHILD_OBJECT_FAST(object,Interface)				\
-  ((Interface*)(object)->GetChild (scfGetID_##Interface (), VERSION_##Interface))
+#define CS_GET_CHILD_OBJECT_FAST(object,Interface)			\
+  ((Interface*)(object)->GetChild(scfGetID_##Interface(), VERSION_##Interface))
 
 /**
  * You can use this macro to get a child object with the given name and
  * interface from a csObject. The returned object will be IncRef'ed.
  */
-#define GET_NAMED_CHILD_OBJECT(object,Interface,name)			\
+#define CS_GET_NAMED_CHILD_OBJECT(object,Interface,name)		\
   ((Interface*)(object)->GetChild (iSCF::SCF->GetInterfaceID		\
     (#Interface), VERSION_##Interface, name))
 
@@ -52,23 +52,25 @@ struct iObjectIterator;
  * interface from a csObject. The returned object will be IncRef'ed. This
  * version requires a correctly set-up interface ID variable.
  */
-#define GET_NAMED_CHILD_OBJECT_FAST(object,Interface,name)		\
-  ((Interface*)(object)->GetChild (scfGetID_##Interface (), VERSION_##Interface, name))
+#define CS_GET_NAMED_CHILD_OBJECT_FAST(object,Interface,name)		\
+  ((Interface*)(object)->GetChild					\
+  (scfGetID_##Interface (), VERSION_##Interface, name))
 
 /**
- * This is the same as GET_CHILD_OBJECT, but stops at the first object with
+ * This is the same as CS_GET_CHILD_OBJECT, but stops at the first object with
  * the given name, even if it does not implement the requested interface.
  */
-#define GET_FIRST_NAMED_CHILD_OBJECT(object,Interface,name)		\
+#define CS_GET_FIRST_NAMED_CHILD_OBJECT(object,Interface,name)		\
   ((Interface*)(object)->GetChild (iSCF::SCF->GetInterfaceID		\
     (#Interface), VERSION_##Interface, name, true))
 
 /**
- * This is the same as GET_CHILD_OBJECT_FAST, but stops at the first object with
- * the given name, even if it does not implement the requested interface.
+ * This is the same as CS_GET_CHILD_OBJECT_FAST, but stops at the first object
+ * with the given name, even if it does not implement the requested interface.
  */
-#define GET_FIRST_NAMED_CHILD_OBJECT_FAST(object,Interface,name)	\
-  ((Interface*)(object)->GetChild (scfGetID_##Interface (), VERSION_##Interface, name, true))
+#define CS_GET_FIRST_NAMED_CHILD_OBJECT_FAST(object,Interface,name)	\
+  ((Interface*)(object)->GetChild					\
+  (scfGetID_##Interface (), VERSION_##Interface, name, true))
 
 
 SCF_VERSION (iObject, 0, 3, 0);

@@ -44,11 +44,11 @@ public:
   { return data; }
   /**
    * Get first data pointer associated with other object (warning: SCF
-   * call is not speed-optimized, i.e. GET_CHILD_OBJECT_FAST could be used).
+   * call is not speed-optimized, i.e. CS_GET_CHILD_OBJECT_FAST could be used).
    */
   static void* GetData (iObject* obj)
   {
-    iDataObject *d = GET_CHILD_OBJECT (obj, iDataObject);
+    iDataObject *d = CS_GET_CHILD_OBJECT (obj, iDataObject);
     return d ? d->GetData () : NULL;
   }
   

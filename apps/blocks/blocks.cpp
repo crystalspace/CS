@@ -2264,7 +2264,7 @@ void Blocks::InitEngine ()
     // Load the blocks.zip library where sound refs are stored
     LevelLoader->LoadLibraryFile ("/data/blocks/Library");
     
-    iSoundWrapper* w = GET_NAMED_CHILD_OBJECT (
+    iSoundWrapper* w = CS_GET_NAMED_CHILD_OBJECT (
       engine->QueryObject (), iSoundWrapper, "background.wav");
     if (w)
     {

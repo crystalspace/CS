@@ -616,7 +616,7 @@ bool csLoader::LoadSounds (char* buf)
 	  return false;
         }
         iSoundWrapper *snd =
-	  GET_NAMED_CHILD_OBJECT (Engine->QueryObject (), iSoundWrapper, name);
+	  CS_GET_NAMED_CHILD_OBJECT (Engine->QueryObject (), iSoundWrapper, name);
         if (!snd)
           LoadSound (name, filename);
       }

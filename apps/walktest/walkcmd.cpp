@@ -1924,7 +1924,7 @@ bool CommandHandler (const char *cmd, const char *arg)
   {
     if (Sys->mySound)
     {
-      iSoundWrapper *sb = GET_NAMED_CHILD_OBJECT_FAST (Sys->view->GetEngine ()->
+      iSoundWrapper *sb = CS_GET_NAMED_CHILD_OBJECT_FAST (Sys->view->GetEngine ()->
         QueryObject (), iSoundWrapper, arg);
       if (sb)
         sb->GetSound ()->Play();

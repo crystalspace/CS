@@ -124,7 +124,7 @@ void csNodeIterator::SkipWrongClassname ()
   if (Classname)
     while (!Iterator->IsFinished ())
     {
-      iKeyValuePair *KeyVal = GET_NAMED_CHILD_OBJECT
+      iKeyValuePair *KeyVal = CS_GET_NAMED_CHILD_OBJECT
         (CurrentNode->QueryObject (), iKeyValuePair, "classname");
       if (KeyVal)
       {
