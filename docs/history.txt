@@ -32,6 +32,8 @@ chronological order.
 	- res fixed problems in the handling of the Pad+, Pad-, Pad* and 
 	  PadDecimal keys on Win32, as pointed out by Fritz Elfert 
 	  <felfert@to.com>.
+        - Philip Wyett corrected DIR.WATERDEMO path in apps makefile and
+          eliminated make depend failure when --enable-new-renderer is used.
 19-Oct-2003
 	- res fixed a bug in the OR polygon buffers: when two polygons 
 	  subsequently passed into AddPolygon() would have different lightmaps,

@@ -29,7 +29,7 @@ endif # ifeq ($(MAKESECTION),roottargets)
 ifeq ($(MAKESECTION),postdefines)
 
 WATERDEMO.EXE = waterdemo$(EXE)
-DIR.WATERDEMO = apps/tests/waterdemo
+DIR.WATERDEMO = apps/waterdemo
 OUT.WATERDEMO = $(OUT)/$(DIR.WATERDEMO)
 INC.WATERDEMO = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.WATERDEMO)/*.h ))
 SRC.WATERDEMO = $(wildcard $(addprefix $(SRCDIR)/,$(DIR.WATERDEMO)/*.cpp ))
