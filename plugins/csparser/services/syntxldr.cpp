@@ -915,7 +915,9 @@ bool csTextSyntaxService::ParsePoly3d (
             for (int i = 0 ; i < num ; i++)
 	    {
 	      if (list[i] == list[(i-1+num)%num])
-	        printf ("Duplicate vertex-index found! Ignored...\n");
+	        csPrintf ("Duplicate vertex-index found! "
+			"(polygon '%s' line %d)ignored ...\n",
+			poly3d->QueryObject()->GetName(), csGetParserLine());
 	      else
 	        poly3d->CreateVertex (list[i]+vt_offset);
 	    }
@@ -1004,8 +1006,8 @@ bool csTextSyntaxService::ParsePoly3d (
   if (cmd == CS_PARSERR_TOKENNOTFOUND)
   {
     ReportError (reporter, "crystalspace.syntax.polygon",
-      "Token '%s' not found while parsing a polygon!",
-      csGetLastOffender ());
+      "Token '%s' not found while parsing a polygon ('%s')!",
+      csGetLastOffender (), poly3d->QueryObject()->GetName());
     te->DecRef ();
     return false;
   }
@@ -1013,8 +1015,9 @@ bool csTextSyntaxService::ParsePoly3d (
   if (poly3d->GetVertexCount () < 3)
   {
     ReportError (reporter, "crystalspace.syntax.polygon",
-      "Polygon in line %d contains just %d vertices!",
-      csGetParserLine (), poly3d->GetVertexCount ());
+      "Polygon '%s' in line %d contains just %d vertices!",
+      poly3d->QueryObject()->GetName(), csGetParserLine (),
+      poly3d->GetVertexCount ());
     te->DecRef ();
     return false;
   }
