@@ -12,6 +12,7 @@ chronological order.
 	  'make'.  Also added information explaining how to obtain, build, and
 	  install Jam.  Finally, updated much outdated or incorrect information
 	  in the "Introduction" and "Build and Install" chapters.
+	- res fixed a VC6 compile error in chunklod.
 2-May-2004
 	- Eric Sunshine changed pubapi.dox so that it no longer excludes
 	  $(TOP)/include/csutil/win32 and csutil/unix.  In the past, these were

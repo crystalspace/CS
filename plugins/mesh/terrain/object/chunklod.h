@@ -326,6 +326,7 @@ private:
     virtual ~MeshTreeNodeWrapper();
     MeshTreeNodeWrapper* GetChild (int n);
   };
+  friend class MeshTreeNodeWrapper;
   class MeshTreeNodeSVA : public iShaderVariableAccessor
   {
     csWeakRef<MeshTreeNodeWrapper> wrapper;
@@ -339,6 +340,7 @@ private:
 
     virtual void PreGetValue (csShaderVariable *variable);
   };
+  friend class MeshTreeNodeSVA;
   
   csRef<MeshTreeNodeWrapper> rootNode;
   iMovable* light_movable; 
