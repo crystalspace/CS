@@ -27,6 +27,7 @@
 class csObject;
 class csObjectStubPool;
 class csPolygonInt;
+class csPolygonIntPool;
 class csPolyTreeObject;
 class csPolygonTreeNode;
 class csSector;
@@ -80,6 +81,17 @@ public:
 
   /// Visit this stub while traversing the tree (octree or BSP tree).
   virtual void* Visit (csSector* sector, csTreeVisitFunc* func, void* data) = 0;
+
+  /// Initialize this stub.
+  virtual void Initialize () = 0;
+
+  /**
+   * Clean up data from this stub (i.e. remove polygons and so on).
+   * This is a virtual function because in general the framework
+   * cannot know how the polygons need to be freed (i.e. is a
+   * pool used? reference counter? ...).
+   */
+  virtual void RemoveData () = 0;
 };
 
 /**
@@ -91,8 +103,6 @@ class csObjectStubFactory
 public:
   /// Create a new stub.
   virtual csObjectStub* Create () = 0;
-  /// Initialize a stub as new.
-  virtual void Initialize (csObjectStub* stub) = 0;
 };
 
 /**
@@ -104,8 +114,13 @@ class csPolygonStub : public csObjectStub
 private:
   // List of polygons.
   csPolygonIntArray polygons;
+  // The pool that is used to create polygons.
+  csPolygonIntPool* poly_pool;
 
 public:
+  /// Initialize this stub with a polygon pool.
+  csPolygonStub (csPolygonIntPool* pool) : poly_pool (pool) { }
+
   /// Get access to the list of polygons in this stub.
   csPolygonIntArray& GetPolygonArray () { return polygons; }
   /// Get list of polygons.
@@ -119,6 +134,17 @@ public:
     return func (sector, polygons.GetPolygons (), polygons.GetNumPolygons (),
     	false, data);
   }
+
+  /// Initialize this stub.
+  virtual void Initialize ()
+  {
+    polygons.Reset ();
+  }
+
+  /**
+   * Clean up data from this stub.
+   */
+  virtual void RemoveData ();
 };
 
 /**
@@ -126,16 +152,18 @@ public:
  */
 class csPolygonStubFactory : public csObjectStubFactory
 {
+private:
+  // The pool that is used to create polygons.
+  csPolygonIntPool* poly_pool;
+
 public:
+  /// Initialize this stub factory with a polygon pool.
+  csPolygonStubFactory (csPolygonIntPool* pool) : poly_pool (pool) { }
+
   /// Create a new stub.
   virtual csObjectStub* Create ()
   {
-    return new csPolygonStub ();
-  }
-  /// Initialize a stub as new.
-  virtual void Initialize (csObjectStub* stub)
-  {
-    ((csPolygonStub*)stub)->GetPolygonArray ().Reset ();
+    return new csPolygonStub (poly_pool);
   }
 };
 
@@ -244,14 +272,6 @@ public:
   virtual csObjectStub* GetBaseStub () = 0;
 
   /**
-   * Clean up data from this stub (i.e. remove polygons and so on).
-   * This is a virtual function because in general the framework
-   * cannot know how the polygons need to be freed (i.e. is a
-   * pool used? reference counter? ...).
-   */
-  virtual void RemoveData (csObjectStub* stub) = 0;
-
-  /**
    * Split the given stub with a plane and return
    * three new stubs (all on the plane, in front, or
    * back of the plane). This is a pure virtual function that will
@@ -319,13 +339,9 @@ class csDetailedPolyTreeObject : public csPolyTreeObject
   friend class Dumper;
 
 public:
-  /// A factory for polygon stubs.
-  static csPolygonStubFactory stub_fact;
-
-public:
   /// Constructor.
-  csDetailedPolyTreeObject (csObject* owner) :
-  	csPolyTreeObject (owner, &stub_fact) { }
+  csDetailedPolyTreeObject (csObject* owner, csObjectStubFactory* stub_fact) :
+  	csPolyTreeObject (owner, stub_fact) { }
   /// Destructor.
   virtual ~csDetailedPolyTreeObject () { }
 

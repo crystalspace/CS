@@ -1,5 +1,17 @@
 The history order has been reversed so that new features are at the top.
 
+15-Jun-2000
+	- Cleaned up some debugging stuff for c-buffer from WalkTest.
+	- Moved csOjbectStuffFactory::Initialize to csObjectStub.
+	- Moved csPolyTreeObject::RemoveData to csObjectStub.
+	- Added new classes csSphereStub, csSphereStubFactory, and
+	  csSphereTreeObject. These will be used for adding bounding
+	  spheres to a polygon tree. The implementation of these classes
+	  is not finished though.
+	- Moved glViewport() from OpenGL 3D renderer to the 2D canvas
+	  drivers for OpenGL. The reason for this is that some specific
+	  canvas (used for embedding for example) may want another
+	  viewport.
 14-Jun-2000
 	- Added new command 'db_frustum' to debug the CheckFrustum routine.
 	  This function expects an integer parameter and will draw an outline
@@ -26,6 +38,10 @@ The history order has been reversed so that new features are at the top.
 	  freefont.cpp.
 	- Norman also cleaned up some of the changes that Samuel did to the
 	  glide port.
+	- Martin Geisse converted more docs to TexInfo.
+	- Thomas Hieber fixed CSWS so that it compiles with MSVC again.
+	  Thomas also updated some VC project files and removed a few
+	  warnings in dungeon plugin and software renderer.
 13-Jun-2000
        - Samuel verbosely has been busy with the now called procedural textures:
            - Changed names from dynamic textures to the more correct term 

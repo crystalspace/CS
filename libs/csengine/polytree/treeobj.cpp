@@ -20,7 +20,6 @@
 #include "csengine/treeobj.h"
 #include "csengine/polytree.h"
 
-csPolygonStubFactory csDetailedPolyTreeObject::stub_fact;
 csObjectStubPool csPolyTreeObject::stub_pool;
 
 csPolyTreeObject::csPolyTreeObject (csObject* owner, csObjectStubFactory* factory)
@@ -59,6 +58,15 @@ void csPolyTreeObject::LinkStub (csObjectStub* ps)
   if (first_stub) first_stub->prev_obj = ps;
   first_stub = ps;
   ps->object = this;
+}
+
+//------------------------------------------------------------------------
+
+void csPolygonStub::RemoveData ()
+{
+  int i;
+  for (i = 0 ; i < GetNumPolygons () ; i++)
+    poly_pool->Free (GetPolygons ()[i]);
 }
 
 //------------------------------------------------------------------------
@@ -360,7 +368,7 @@ csObjectStub* csObjectStubPool::Alloc (csObjectStubFactory* factory)
   }
   pnew->next = alloced;
   alloced = pnew;
-  factory->Initialize (pnew->ps);
+  pnew->ps->Initialize ();
   pnew->ps->ref_count = 1;
   pnew->ps->object = NULL;
   pnew->ps->node = NULL;
@@ -369,11 +377,10 @@ csObjectStub* csObjectStubPool::Alloc (csObjectStubFactory* factory)
 
 void csObjectStubPool::Free (csObjectStub* ps)
 {
-  csPolyTreeObject* pto = ps->GetObject ();
   ps->RemoveStub ();
   ps->DecRef ();
   if (ps->ref_count > 0) return;
-  if (pto) pto->RemoveData (ps);  // @@@ Causes pure virtual call at exit!
+  ps->RemoveData ();
   if (alloced)
   {
     PoolObj* po = alloced;

@@ -1230,93 +1230,11 @@ void CreateSystem(void)
 }
 #endif
 
-#include "csengine/quadtree.h"
-
 /*---------------------------------------------------------------------*
  * Main function
  *---------------------------------------------------------------------*/
 int main (int argc, char* argv[])
 {
-#if 0
-{
-srand (12345678);
-csCBuffer* cbuf = new csCBuffer (0, 1023, 1024);
-//csQuadTree* qtree = new csQuadTree (csBox2 (0, 0, 1023, 1023), 11);
-csBox2 bbox (-1, -1, 1024, 1024);
-csPoly2D polys[5];
-csVector2 v;
-int i, j, k;
-float x, y;
-for (;;)
-{
-printf ("New cbuffer\n");
-  cbuf->Initialize ();
-  for (j = 0 ; j < 5 ; j++)
-  {
-    csPoly2D& poly = polys[j];
-    poly.Random (3, bbox);
-    if (poly.GetSignedArea () > 0)
-    {
-      for (i = 0 ; i < poly.GetNumVertices ()/2 ; i++)
-      {
-        csVector2 sw = poly[i];
-	poly[i] = poly[poly.GetNumVertices ()-i-1];
-	poly[poly.GetNumVertices ()-i-1] = sw;
-      }
-    }
-    cbuf->InsertPolygon (poly.GetVertices (), poly.GetNumVertices ());
-    //qtree->InsertPolygon (poly.GetVertices (), poly.GetNumVertices (),
-    	//poly.GetBoundingBox ());
-    for (x = 1 ; x < 1023 ; x+= 10)
-      for (y = 1 ; y < 1023 ; y+= 10)
-      {
-        v.Set (x, y);
-	bool cvis = cbuf->TestPoint (v);
-	bool pin = false;
-	bool ignore = false;
-	for (k = 0 ; k <= j ; k++)
-	{
-	  for (i = 0 ; i < polys[k].GetNumVertices () ; i++)
-	  {
-	    csPlane2 pl (polys[k][i], polys[k][(i+1)%polys[k].GetNumVertices ()]);
-	    pl.Normalize ();
-	    if (pl.Distance (v) < 5)
-	    {
-	      ignore = true;
-	      break;
-	    }
-	  }
-	  if (ignore) break;
-	  pin = polys[k].In (v);
-	  if (pin) break;
-	}
-	if (!ignore)
-	{
-	  if (cvis != pin)
-	  {
-            printf ("Insert polygon...\n");
-            for (i = 0 ; i < poly.GetNumVertices () ; i++)
-              printf ("  %d: %f,%f\n", i, poly[i].x, poly[i].y);
-	    printf ("  Mismatch v=(%f,%f) cbuf=%d pin=%d\n", x, y, cvis, pin);
-	  }
-	}
-	//int qvis = qtree->TestPoint (v);
-	//if (qvis != CS_QUAD_PARTIAL)
-	//{
-	  //bool cvis = cbuf->TestPoint (v);
-          //if (cvis != (qvis == CS_QUAD_EMPTY))
-	  //{
-	    //printf ("Mismatch v=(%f,%f) cbuf=%d quad=%d\n", x, y, cvis, qvis);
-	  //}
-	//}
-      }
-  }
-}
-}
-#endif
-
-
-
   // Initialize the random number generator
   srand (time (NULL));
 

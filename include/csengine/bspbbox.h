@@ -185,6 +185,10 @@ private:
   bool is_cam_transf;
 
 public:
+  /// A factory for polygon stubs.
+  static csPolygonStubFactory stub_fact;
+
+public:
   /// Constructor.
   csPolyTreeBBox (csObject* owner);
   /// Destructor.
@@ -192,9 +196,6 @@ public:
 
   /// Get the base set of polygons.
   virtual csObjectStub* GetBaseStub () { return base_stub; }
-
-  /// Remove polygons from a stub.
-  virtual void RemoveData (csObjectStub* stub);
 
   /// Get vector array for this container.
   csVector3Array& GetVertices () { return vertices; }
@@ -229,6 +230,88 @@ public:
 
   /// Clear camera transformation.
   void ClearTransform () { is_cam_transf = false; }
+};
+
+/**
+ * An object stub that is used together with csSphereTreeObject.
+ */
+class csSphereStub : public csObjectStub
+{
+public:
+  /// Visit this stub while traversing the tree (octree or BSP tree).
+  virtual void* Visit (csSector* sector, csTreeVisitFunc* func, void* data);
+
+  /// Initialize this stub.
+  virtual void Initialize () { }
+
+  /// Clean up data from this stub.
+  virtual void RemoveData () { }
+};
+
+/**
+ * Specific implementation of the csObjectStubFactory for csSphereStub.
+ */
+class csSphereStubFactory : public csObjectStubFactory
+{
+public:
+  /// Create a new stub.
+  virtual csObjectStub* Create ()
+  {
+    return new csSphereStub ();
+  }
+};
+
+/**
+ * An object with a radius for inclusion in an octree.
+ */
+class csSphereTreeObject : public csPolyTreeObject
+{
+private:
+  /// The radius.
+  float radius;
+  /// The center point.
+  csVector3 center;
+  /// The stub.
+  csSphereStub* base_stub;
+
+public:
+  /// The factory for radius stubs.
+  static csSphereStubFactory stub_fact;
+  /// Pool for sphere stubs.
+  static csObjectStubPool stub_pool;
+
+public:
+  /// Constructor.
+  csSphereTreeObject (csObject* owner, const csVector3& center, float rad);
+  /// Destructor.
+  virtual ~csSphereTreeObject () { }
+
+  /// Get the base set of polygons.
+  virtual csObjectStub* GetBaseStub () { return base_stub; }
+
+  /// Split with plane.
+  virtual void SplitWithPlane (csObjectStub* stub,
+  	csObjectStub** stub_on, csObjectStub** stub_front,
+	csObjectStub** stub_back,
+	const csPlane3& plane);
+
+  /// Split with plane.
+  virtual void SplitWithPlaneX (csObjectStub* stub,
+  	csObjectStub** stub_on, csObjectStub** stub_front,
+	csObjectStub** stub_back,
+	float x);
+
+  /// Split with plane.
+  virtual void SplitWithPlaneY (csObjectStub* stub,
+  	csObjectStub** stub_on, csObjectStub** stub_front,
+	csObjectStub** stub_back,
+	float y);
+
+  /// Split with plane.
+  virtual void SplitWithPlaneZ (csObjectStub* stub,
+  	csObjectStub** stub_on, csObjectStub** stub_front,
+	csObjectStub** stub_back,
+	float z);
 };
 
 #endif /*BSPBBOX_H*/

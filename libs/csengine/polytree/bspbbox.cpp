@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 1998 by Jorrit Tyberghein
+    Copyright (C) 1998-2000 by Jorrit Tyberghein
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Library General Public
@@ -758,7 +758,10 @@ bool csBspPolygon::DoPerspective (const csTransform& trans,
 
 //---------------------------------------------------------------------------
 
-csPolyTreeBBox::csPolyTreeBBox (csObject* owner) : csDetailedPolyTreeObject (owner)
+csPolygonStubFactory csPolyTreeBBox::stub_fact (&csBspPolygon::poly_pool);
+
+csPolyTreeBBox::csPolyTreeBBox (csObject* owner) :
+	csDetailedPolyTreeObject (owner, &stub_fact)
 {
   base_stub = (csPolygonStub*)csDetailedPolyTreeObject::stub_pool.Alloc (&stub_fact);
   base_stub->IncRef (); // Make sure this object is locked.
@@ -783,15 +786,60 @@ void csPolyTreeBBox::World2Camera (const csTransform& trans)
   is_cam_transf = true;
 }
 
-void csPolyTreeBBox::RemoveData (csObjectStub* stub)
+//---------------------------------------------------------------------------
+
+void* csSphereStub::Visit (csSector* sector, csTreeVisitFunc* func, void* data)
 {
-  int i;
-  csPolygonInt** polygons = ((csPolygonStub*)stub)->GetPolygons ();
-  for (i = 0 ; i < ((csPolygonStub*)stub)->GetNumPolygons () ; i++)
-  {
-    csBspPolygon* poly = (csBspPolygon*)polygons[i];
-    csBspPolygon::poly_pool.Free (poly);
-  }
+  (void)sector; (void)func; (void)data;
+  return NULL;
+}
+
+//---------------------------------------------------------------------------
+csSphereStubFactory csSphereTreeObject::stub_fact;
+csObjectStubPool csSphereTreeObject::stub_pool;
+
+csSphereTreeObject::csSphereTreeObject (csObject* owner,
+	const csVector3& center, float rad) : csPolyTreeObject (owner,
+		&stub_fact), radius (rad), center (center)
+{
+  base_stub = (csSphereStub*)stub_pool.Alloc (&stub_fact);
+  base_stub->IncRef (); // Make sure this object is locked.
+}
+
+void csSphereTreeObject::SplitWithPlane (csObjectStub* stub,
+  	csObjectStub** stub_on, csObjectStub** stub_front,
+	csObjectStub** stub_back,
+	const csPlane3& plane)
+{
+  (void)stub; (void)stub_on; (void)stub_front; (void)stub_back;
+  (void)plane;
+}
+
+void csSphereTreeObject::SplitWithPlaneX (csObjectStub* stub,
+  	csObjectStub** stub_on, csObjectStub** stub_front,
+	csObjectStub** stub_back,
+	float x)
+{
+  (void)stub; (void)stub_on; (void)stub_front; (void)stub_back;
+  (void)x;
+}
+
+void csSphereTreeObject::SplitWithPlaneY (csObjectStub* stub,
+  	csObjectStub** stub_on, csObjectStub** stub_front,
+	csObjectStub** stub_back,
+	float y)
+{
+  (void)stub; (void)stub_on; (void)stub_front; (void)stub_back;
+  (void)y;
+}
+
+void csSphereTreeObject::SplitWithPlaneZ (csObjectStub* stub,
+  	csObjectStub** stub_on, csObjectStub** stub_front,
+	csObjectStub** stub_back,
+	float z)
+{
+  (void)stub; (void)stub_on; (void)stub_front; (void)stub_back;
+  (void)z;
 }
 
 //---------------------------------------------------------------------------
