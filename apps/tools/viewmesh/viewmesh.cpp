@@ -435,25 +435,33 @@ bool ViewMesh::HandleEvent (iEvent& ev)
 	      fountain_type = CS_LOAD_PLUGIN (plugin_mgr,
 		  "crystalspace.mesh.object.fountain", iMeshObjectType);
 	    if (!fountain_type)
-	      printf ("No ball type plug-in found!\n");
+	      printf ("No fountain type plug-in found!\n");
 	    csRef<iMeshObjectFactory> fountain_factory = fountain_type->NewFactory ();
-
+	    if (!fountain_factory)
+	      printf ("Unable to create new fountain factory!\n");
 	    csRef<iMeshObject> fountainMesh = fountain_factory->NewInstance ();
+            if (!fountainMesh)
+	      printf ("Unable to create new fountain mesh!\n");
+            csRef<iParticleState> partState =
+              SCF_QUERY_INTERFACE (fountainMesh, iParticleState);
+	    if (!partState)
+              printf ("No particle state plug-in found!\n");
 	    csRef<iFountainState> fountainState =
 	      SCF_QUERY_INTERFACE (fountainMesh, iFountainState);
+	    if (!fountainState)
+              printf ("No fountain state plug-in found!\n");
 	    fountainState->SetParticleCount (50);
 	    fountainState->SetDropSize (0.05,0.05);
 	    fountainState->SetSpeed(1);
 	    fountainState->SetOpening(0.2);
-	    csRef<iParticleState> partState =
-	      SCF_QUERY_INTERFACE (fountainMesh, iParticleState);
 	    iMaterialWrapper* mat = engine->GetMaterialList ()->FindByName ("spark");
 	    partState->SetMaterialWrapper (mat);
 	    partState->SetColor(csColor(0.7,0.9,1));
+	    partState->SetMixMode (CS_FX_ADD);
 
 	    csRef<iMeshWrapper> meshwrap = engine->CreateMeshWrapper(
 		fountainMesh, "Fountain", room,
-		csVector3 (0, 10, 0));
+		csVector3 (0, 0, 0));
 	    sprite->GetChildren()->Add( meshwrap );
 	    socket->SetMeshWrapper( meshwrap );
 	  }
