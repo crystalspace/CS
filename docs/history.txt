@@ -13,6 +13,7 @@ chronological order.
 	  g2d->BeginDraw() to many times.
 	- Jorrit fixed another bug in the NR null3d renderer. It was using
 	  csRef and DecRef() at the same time.
+	- Jorrit added 'chunklod' to the list of static plugins for jam.
 28-Mar-2004
 	- Eric Sunshine moved csutil's copy of TinyXML into a private namespace
 	  to avoid clashes with other external libraries which also embed

@@ -102,6 +102,7 @@ if $(USE_NEW_RENDERER) = "yes"
     glrender3d
     shadermgr
     xmlshader
+    chunklod
     ;
 }
 else
